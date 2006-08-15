@@ -9,10 +9,10 @@ in future releases.  The public (stable) API is in m_pd.h. */
 
 /* in s_path.c */
 
-typedef struct _namelist
+typedef struct _namelist    /* element in a linked list of stored strings */
 {
-    struct _namelist *nl_next;
-    char *nl_string;
+    struct _namelist *nl_next;  /* next in list */
+    char *nl_string;            /* the string */
 } t_namelist;
 
 t_namelist *namelist_append(t_namelist *listwas, const char *s, int allowdup);
@@ -24,6 +24,11 @@ extern int sys_usestdpath;
 extern t_namelist *sys_externlist;
 extern t_namelist *sys_searchpath;
 extern t_namelist *sys_helppath;
+int sys_open_absolute(const char *name, const char* ext,
+    char *dirresult, char **nameresult, unsigned int size, int bin, int *fdp);
+int sys_trytoopenone(const char *dir, const char *name, const char* ext,
+    char *dirresult, char **nameresult, unsigned int size, int bin);
+
 
 /* s_file.c */
 
@@ -46,7 +51,7 @@ extern int sys_defaultfont;
 extern t_symbol *sys_libdir;    /* library directory for auxilliary files */
 
 /* s_loader.c */
-int sys_load_lib(char *dirname, char *filename);
+int sys_load_lib(t_canvas *canvas, char *filename);
 
 /* s_audio.c */
 

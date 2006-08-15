@@ -18,7 +18,7 @@ file format as in the dialog window for data.
 #include <string.h>
 
 static t_class *declare_class;
-static void canvas_savedeclarationsto(t_canvas *x, t_binbuf *b);
+void canvas_savedeclarationsto(t_canvas *x, t_binbuf *b);
 
     /* the following routines read "scalars" from a file into a canvas. */
 
@@ -621,7 +621,8 @@ static void canvas_saveto(t_canvas *x, t_binbuf *b)
                 x->gl_x1, x->gl_y1,
                 x->gl_x2, x->gl_y2,
                 (float)x->gl_pixwidth, (float)x->gl_pixheight,
-                1., (float)x->gl_xmargin, (float)x->gl_ymargin); 
+                (float)((x->gl_hidetext)?2.:1.),
+                (float)x->gl_xmargin, (float)x->gl_ymargin); 
                     /* otherwise write in 0.38-compatible form */
         else binbuf_addv(b, "ssfffffff;", gensym("#X"), gensym("coords"),
                 x->gl_x1, x->gl_y1,
@@ -729,64 +730,6 @@ static void canvas_menusave(t_canvas *x)
     else canvas_menusaveas(x2);
 }
 
-/* ------------------------------- declare ------------------------ */
-
-/* put "declare" objects in a patch to tell it about the environment in
-which objects should be created in this canvas.  This includes directories to
-search ("-path", "-stdpath") and object libraries to load
-("-lib" and "-stdlib").  These must be set before the patch containing
-the "declare" object is filled in with its contents; so when the patch is
-saved,  we throw early messages to the canvas to set the environment
-before any objects are created in it. */
-
-
-typedef struct _declare
-{
-    t_object x_obj;
-    t_canvas *x_canvas;
-    int x_useme;
-} t_declare;
-
-static void *declare_new(t_symbol *s, int argc, t_atom *argv)
-{
-    t_declare *x = (t_declare *)pd_new(declare_class);
-    x->x_useme = 1;
-    x->x_canvas = canvas_getcurrent();
-        /* LATER update environment and/or load libraries */
-    return (x);
-}
-
-static void declare_free(t_declare *x)
-{
-    x->x_useme = 0;
-        /* LATER update environment */
-}
-
-static void canvas_savedeclarationsto(t_canvas *x, t_binbuf *b)
-{
-    t_gobj *y;
-
-    for (y = x->gl_list; y; y = y->g_next)
-    {
-        if (pd_class(&y->g_pd) == declare_class)
-        {
-            binbuf_addv(b, "s", gensym("#X"));
-            binbuf_addbinbuf(b, ((t_declare *)y)->x_obj.te_binbuf);
-            binbuf_addv(b, ";");
-        }
-        else if (pd_class(&y->g_pd) == canvas_class)
-            canvas_savedeclarationsto((t_canvas *)y, b);
-    }
-}
-
-static void canvas_declare(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
-{
-    startpost("declare:: %s", s->s_name);
-    postatom(argc, argv);
-    endpost();
-}
-
-
 void g_readwrite_setup(void)
 {
     class_addmethod(canvas_class, (t_method)glist_write,
@@ -799,15 +742,9 @@ void g_readwrite_setup(void)
         gensym("savetofile"), A_SYMBOL, A_SYMBOL, 0);
     class_addmethod(canvas_class, (t_method)canvas_saveto,
         gensym("saveto"), A_CANT, 0);
-    class_addmethod(canvas_class, (t_method)canvas_declare,
-        gensym("declare"), A_GIMME, 0);
 /* ------------------ from the menu ------------------------- */
     class_addmethod(canvas_class, (t_method)canvas_menusave,
         gensym("menusave"), 0);
     class_addmethod(canvas_class, (t_method)canvas_menusaveas,
         gensym("menusaveas"), 0);
-/*---------------------------- declare ------------------- */
-    declare_class = class_new(gensym("declare"), (t_newmethod)declare_new,
-        (t_method)declare_free, sizeof(t_declare), CLASS_NOINLET, A_GIMME, 0);
-
 }

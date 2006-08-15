@@ -52,18 +52,54 @@ static char sys_dllextent[] = ".d_ppc", sys_dllextent2[] = ".pd_darwin";
 static char sys_dllextent[] = ".m_i386", sys_dllextent2[] = ".dll";
 #endif
 
+    /* maintain list of loaded modules to avoid repeating loads */
+typedef struct _loadedlist
+{
+    struct _loadedlist *ll_next;
+    t_symbol *ll_name;
+} t_loadlist;
+
+static t_loadlist *sys_loaded;
+int sys_onloadlist(char *classname) /* return true if already loaded */
+{
+    t_symbol *s = gensym(classname);
+    t_loadlist *ll;
+    for (ll = sys_loaded; ll; ll = ll->ll_next)
+        if (ll->ll_name == s)
+            return (1);
+    return (0);
+}
+
+void sys_putonloadlist(char *classname) /* add to list of loaded modules */
+{
+    t_loadlist *ll = (t_loadlist *)getbytes(sizeof(*ll));
+    ll->ll_name = gensym(classname);
+    ll->ll_next = sys_loaded;
+    sys_loaded = ll;
+    post("put on list %s", classname);
+}
+
 void class_set_extern_dir(t_symbol *s);
 
-static int sys_do_load_lib(char *dirname, char *classname)
+static int sys_do_load_lib(t_canvas *canvas, char *objectname)
 {
     char symname[MAXPDSTRING], filename[MAXPDSTRING], dirbuf[MAXPDSTRING],
-        *nameptr, altsymname[MAXPDSTRING];
+        *classname, *nameptr, altsymname[MAXPDSTRING];
     void *dlobj;
     t_xxx makeout = NULL;
     int i, hexmunge = 0, fd;
 #ifdef MSW
     HINSTANCE ntdll;
 #endif
+    if (classname = strrchr(objectname, '/'))
+        classname++;
+    else classname = objectname;
+    post("classname %s", classname);
+    if (sys_onloadlist(classname))
+    {
+        post("%s: already loaded", classname);
+        return (1);
+    }
     for (i = 0, nameptr = classname; i < MAXPDSTRING-7 && *nameptr; nameptr++)
     {
         char c = *nameptr;
@@ -93,28 +129,28 @@ static int sys_do_load_lib(char *dirname, char *classname)
         strncpy(symname, "setup_", 6);
     }
     else strcat(symname, "_setup");
-
-#if 0
-    fprintf(stderr, "lib %s %s\n", dirname, classname);
+    
+#if 1
+    fprintf(stderr, "lib: %s\n", classname);
 #endif
-        /* try looking in the path for (classname).(sys_dllextent) ... */
-    if ((fd = open_via_path(dirname, classname, sys_dllextent,
+        /* try looking in the path for (objectname).(sys_dllextent) ... */
+    if ((fd = canvas_open(canvas, objectname, sys_dllextent,
         dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
             goto gotone;
         /* same, with the more generic sys_dllextent2 */
-    if ((fd = open_via_path(dirname, classname, sys_dllextent2,
+    if ((fd = canvas_open(canvas, objectname, sys_dllextent2,
         dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
             goto gotone;
-        /* next try (classname)/(classname).(sys_dllextent) ... */
-    strncpy(filename, classname, MAXPDSTRING);
+        /* next try (objectname)/(classname).(sys_dllextent) ... */
+    strncpy(filename, objectname, MAXPDSTRING);
     filename[MAXPDSTRING-2] = 0;
     strcat(filename, "/");
     strncat(filename, classname, MAXPDSTRING-strlen(filename));
     filename[MAXPDSTRING-1] = 0;
-    if ((fd = open_via_path(dirname, filename, sys_dllextent,
+    if ((fd = canvas_open(canvas, filename, sys_dllextent,
         dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
             goto gotone;
-    if ((fd = open_via_path(dirname, filename, sys_dllextent2,
+    if ((fd = canvas_open(canvas, filename, sys_dllextent2,
         dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
             goto gotone;
     return (0);
@@ -159,11 +195,12 @@ gotone:
     }
     (*makeout)();
     class_set_extern_dir(&s_);
+    sys_putonloadlist(classname);
     return (1);
 }
 
 /* callback type definition */
-typedef int (*loader_t)(char *dirname, char *classname);
+typedef int (*loader_t)(t_canvas *canvas, char *classname);
 
 /* linked list of loaders */
 typedef struct loader_queue {
@@ -191,13 +228,13 @@ void sys_register_loader(loader_t loader)
     }   
 }
 
-int sys_load_lib(char *dirname, char *classname)
+int sys_load_lib(t_canvas *canvas, char *classname)
 {
     int dspstate = canvas_suspend_dsp();
     int ok = 0;
     loader_queue_t *q;
     for(q = &loaders; q; q = q->next)
-        if(ok = q->loader(dirname, classname)) break;
+        if (ok = q->loader(canvas, classname)) break;
     canvas_resume_dsp(dspstate);
     return ok;
 }

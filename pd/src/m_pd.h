@@ -9,7 +9,9 @@ extern "C" {
 #endif
 
 #define PD_MAJOR_VERSION 0
-#define PD_MINOR_VERSION 39   
+#define PD_MINOR_VERSION 40
+#define PD_BUGFIX_VERSION 0
+#define PD_TEST_VERSION "test02"
 
 /* old name for "MSW" flag -- we have to take it for the sake of many old
 "nmakefiles" for externs, which will define NT and not MSW */
@@ -288,6 +290,8 @@ EXTERN t_atom *binbuf_getvec(t_binbuf *x);
 EXTERN void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv);
 EXTERN int binbuf_read(t_binbuf *b, char *filename, char *dirname,
     int crflag);
+EXTERN int binbuf_read_via_canvas(t_binbuf *b, char *filename, t_canvas *canvas,
+    int crflag);
 EXTERN int binbuf_read_via_path(t_binbuf *b, char *filename, char *dirname,
     int crflag);
 EXTERN int binbuf_write(t_binbuf *x, char *filename, char *dir,
@@ -367,6 +371,8 @@ EXTERN t_symbol *canvas_getdir(t_glist *x);
 EXTERN int sys_fontwidth(int fontsize);
 EXTERN int sys_fontheight(int fontsize);
 EXTERN void canvas_dataproperties(t_glist *x, t_scalar *sc, t_binbuf *b);
+EXTERN int canvas_open(t_canvas *x, const char *name, const char *ext,
+    char *dirresult, char **nameresult, unsigned int size, int bin);
 
 /* ---------------- widget behaviors ---------------------- */
 
@@ -479,8 +485,8 @@ typedef struct _signal
     struct _signal *s_borrowedfrom;     /* signal to borrow it from */
     struct _signal *s_nextfree;         /* next in freelist */
     struct _signal *s_nextused;         /* next in used list */
+    int s_vecsize;      /* allocated size of array in points */
 } t_signal;
-
 
 typedef t_int *(*t_perfroutine)(t_int *args);
 

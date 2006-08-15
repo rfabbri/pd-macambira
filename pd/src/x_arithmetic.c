@@ -671,23 +671,31 @@ typedef struct _clip
     t_object x_ob;
     float x_f1;
     float x_f2;
+    float x_f3;
 } t_clip;
 
 static void *clip_new(t_floatarg f1, t_floatarg f2)
 {
     t_clip *x = (t_clip *)pd_new(clip_class);
-    floatinlet_new(&x->x_ob, &x->x_f1);
     floatinlet_new(&x->x_ob, &x->x_f2);
+    floatinlet_new(&x->x_ob, &x->x_f3);
     outlet_new(&x->x_ob, &s_float);
-    x->x_f1 = f1;
-    x->x_f2 = f2;
+    x->x_f2 = f1;
+    x->x_f3 = f2;
     return (x);
+}
+
+static void clip_bang(t_clip *x)
+{
+        outlet_float(x->x_ob.ob_outlet, (x->x_f1 < x->x_f2 ? x->x_f2 : (
+        x->x_f1 > x->x_f3 ? x->x_f3 : x->x_f1)));
 }
 
 static void clip_float(t_clip *x, t_float f)
 {
-    outlet_float(x->x_ob.ob_outlet, (f < x->x_f1 ? x->x_f1 : (
-        f > x->x_f2 ? x->x_f2 : f)));
+        x->x_f1 = f;
+        outlet_float(x->x_ob.ob_outlet, (x->x_f1 < x->x_f2 ? x->x_f2 : (
+        x->x_f1 > x->x_f3 ? x->x_f3 : x->x_f1)));
 }
 
 static void clip_setup(void)
@@ -695,6 +703,7 @@ static void clip_setup(void)
     clip_class = class_new(gensym("clip"), (t_newmethod)clip_new, 0,
         sizeof(t_clip), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addfloat(clip_class, clip_float);
+    class_addbang(clip_class, clip_bang);
 }
 
 void x_arithmetic_setup(void)

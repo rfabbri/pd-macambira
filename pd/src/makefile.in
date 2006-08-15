@@ -59,6 +59,20 @@ GSRC =  t_main.c t_tkcmd.c
 
 GOBJ = $(GSRC:.c=.o)
 
+# get version from m_pd.h to use in doc/1.manual/1.introduction.txt
+PD_MAJOR_VERSION := $(shell grep PD_MAJOR_VERSION m_pd.h | \
+	sed 's|^.define *PD_MAJOR_VERSION *\([0-9]*\).*|\1|' )
+PD_MINOR_VERSION := $(shell grep PD_MINOR_VERSION m_pd.h | \
+	sed 's|^.define *PD_MINOR_VERSION *\([0-9]*\).*|\1|' )
+PD_BUGFIX_VERSION := $(shell grep PD_BUGFIX_VERSION m_pd.h | \
+	sed 's|^.define *PD_BUGFIX_VERSION *\([0-9]*\).*|\1|' )
+PD_TEST_VERSION := $(shell grep PD_TEST_VERSION m_pd.h | \
+	sed 's|^.define *PD_TEST_VERSION *"\(.*\)".*|\1|' )
+PD_VERSION := $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
+ifneq ($(PD_TEST_VERSION),)
+	PD_VERSION := $(PD_VERSION)-$(PD_TEST_VERSION)
+endif
+
 #
 #  ------------------ targets ------------------------------------
 #
@@ -83,16 +97,19 @@ gui: $(BIN_DIR)/$(GUINAME)
 
 pd-watchdog: $(BIN_DIR)/pd-watchdog
 
-$(BIN_DIR)/pd-watchdog: s_watchdog.c
+$(BIN_DIR):
+	test -d $(BIN_DIR) || mkdir -p $(BIN_DIR)
+
+$(BIN_DIR)/pd-watchdog: s_watchdog.c $(BIN_DIR)
 	$(CC) -O2 $(STRIPFLAG) -o $(BIN_DIR)/pd-watchdog s_watchdog.c
 
-$(BIN_DIR)/pdsend: u_pdsend.c
+$(BIN_DIR)/pdsend: u_pdsend.c $(BIN_DIR)
 	$(CC) $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdsend u_pdsend.c
 
-$(BIN_DIR)/pdreceive: u_pdreceive.c
+$(BIN_DIR)/pdreceive: u_pdreceive.c $(BIN_DIR)
 	$(CC) $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdreceive u_pdreceive.c
 
-$(PDEXEC): $(OBJ) 
+$(PDEXEC): $(OBJ) $(BIN_DIR)
 	cd ../obj;  $(CC) $(LDFLAGS) $(DBG_CFLAGS) -o $(PDEXEC) $(OBJ) \
 	$(LIB)
 
@@ -127,6 +144,7 @@ externs:
 
 BINARYMODE=@binarymode@
 
+ABOUT_FILE=$(pddocdir)/1.manual/1.introduction.txt
 install:  all
 	install -d $(libpdbindir)
 	install $(BIN_DIR)/$(GUINAME) $(libpdbindir)/$(GUINAME)
@@ -146,6 +164,10 @@ install:  all
 		install -d $(pddocdir)/7.stuff/$$dir ; \
 		install -p ../doc/7.stuff/$$dir/*.* $(pddocdir)/7.stuff/$$dir ; \
 	done
+	mv $(ABOUT_FILE) $(ABOUT_FILE).tmp
+	cat $(ABOUT_FILE).tmp | sed 's|PD_VERSION|Pd version $(PD_VERSION)|' \
+		> $(ABOUT_FILE)
+	rm $(ABOUT_FILE).tmp
 	cp -pr ../extra $(libpddir)/
 	rm -f $(libpddir)/extra/*/*.o
 	install -d $(DESTDIR)$(includedir)

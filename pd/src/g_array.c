@@ -1379,8 +1379,7 @@ static void garray_read(t_garray *x, t_symbol *filename)
         return;
     }
     nelem = array->a_n;
-    if ((filedesc = open_via_path(
-        canvas_getdir(glist_getcanvas(x->x_glist))->s_name,
+    if ((filedesc = canvas_open(glist_getcanvas(x->x_glist),
             filename->s_name, "", buf, &bufptr, MAXPDSTRING, 0)) < 0 
                 || !(fd = fdopen(filedesc, "r")))
     {

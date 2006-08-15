@@ -170,188 +170,179 @@ void sys_setextrapath(const char *p)
 #define MSWOPENFLAG(bin) 0
 #endif
 
-/* search for a file in a specified directory, then along the globally
-defined search path, using ext as filename extension.  Exception:
-if the 'name' starts with a slash or a letter, colon, and slash in MSW,
-there is no search and instead we just try to open the file literally.  The
-fd is returned, the directory ends up in the "dirresult" which must be at
-least "size" bytes.  "nameresult" is set to point to the filename, which
-ends up in the same buffer as dirresult. */
+    /* try to open a file in the directory "dir", named "name""ext",
+    for reading.  "Name" may have slashes.  The directory is copied to
+    "dirresult" which must be at least "size" bytes.  "nameresult" is set
+    to point to the filename (copied elsewhere into the same buffer). 
+    The "bin" flag requests opening for binary (which only makes a difference
+    on Windows). */
 
-int open_via_path(const char *dir, const char *name, const char* ext,
+int sys_trytoopenone(const char *dir, const char *name, const char* ext,
     char *dirresult, char **nameresult, unsigned int size, int bin)
 {
-    t_namelist *nl, thislist;
-    int fd = -1;
-    char listbuf[MAXPDSTRING];
+    int fd;
+    if (strlen(dir) + strlen(name) + strlen(ext) + 4 > size)
+        return (-1);
+    strcpy(dirresult, dir);
+    if (*dirresult && dirresult[strlen(dirresult)-1] != '/')
+        strcat(dirresult, "/");
+    strcat(dirresult, name);
+    strcat(dirresult, ext);
+    sys_bashfilename(dirresult, dirresult);
 
+    DEBUG(post("looking for %s",dirresult));
+        /* see if we can open the file for reading */
+    if ((fd=open(dirresult,O_RDONLY | MSWOPENFLAG(bin))) >= 0)
+    {
+            /* in unix, further check that it's not a directory */
+#ifdef UNISTD
+        struct stat statbuf;
+        int ok =  ((fstat(fd, &statbuf) >= 0) &&
+            !S_ISDIR(statbuf.st_mode));
+        if (!ok)
+        {
+            if (sys_verbose) post("tried %s; stat failed or directory",
+                dirresult);
+            close (fd);
+            fd = -1;
+        }
+        else
+#endif
+        {
+            char *slash;
+            if (sys_verbose) post("tried %s and succeeded", dirresult);
+            sys_unbashfilename(dirresult, dirresult);
+            slash = strrchr(dirresult, '/');
+            if (slash)
+            {
+                *slash = 0;
+                *nameresult = slash + 1;
+            }
+            else *nameresult = dirresult;
+
+            return (fd);  
+        }
+    }
+    else
+    {
+        if (sys_verbose) post("tried %s and failed", dirresult);
+    }
+    return (-1);
+}
+
+    /* check if we were given an absolute pathname, if so try to open it
+    and return 1 to signal the caller to cancel any path searches */
+int sys_open_absolute(const char *name, const char* ext,
+    char *dirresult, char **nameresult, unsigned int size, int bin, int *fdp)
+{
     if (name[0] == '/' 
 #ifdef MSW
         || (name[1] == ':' && name[2] == '/')
 #endif
             )
     {
-        thislist.nl_next = 0;
-        thislist.nl_string = listbuf;
-        listbuf[0] = 0;
+        char dirbuf[MAXPDSTRING];
+        int dirlen = (strrchr(name, '/') - name);
+        if (dirlen > MAXPDSTRING-1) 
+            dirlen = MAXPDSTRING-1;
+        strncpy(dirbuf, name, dirlen);
+        dirbuf[dirlen] = 0;
+        *fdp = sys_trytoopenone(dirbuf, name+(dirlen+1), ext,
+            dirresult, nameresult, size, bin);
+        return (1);
     }
-    else
-    {
-        thislist.nl_string = listbuf;
-        thislist.nl_next = sys_searchpath;
-        strncpy(listbuf, dir, MAXPDSTRING);
-        listbuf[MAXPDSTRING-1] = 0;
-        sys_unbashfilename(listbuf, listbuf);
-    }
+    else return (0);
+}
 
-        /* search, first, through the search path (to which we prepended the
-        current directory), then, if enabled, look in the "extra" dir */
-    for (nl = &thislist; nl;
-        nl = (nl->nl_next ? nl->nl_next :
-            (nl == pd_extrapath ? 0 : 
-                (sys_usestdpath ? pd_extrapath : 0))))
-    {
-        if (strlen(nl->nl_string) + strlen(name) + strlen(ext) + 4 >
-            size)
-                continue;
-        strcpy(dirresult, nl->nl_string);
-        if (*dirresult && dirresult[strlen(dirresult)-1] != '/')
-               strcat(dirresult, "/");
-        strcat(dirresult, name);
-        strcat(dirresult, ext);
-        sys_bashfilename(dirresult, dirresult);
+/* search for a file in a specified directory, then along the globally
+defined search path, using ext as filename extension.  The
+fd is returned, the directory ends up in the "dirresult" which must be at
+least "size" bytes.  "nameresult" is set to point to the filename, which
+ends up in the same buffer as dirresult.  Exception:
+if the 'name' starts with a slash or a letter, colon, and slash in MSW,
+there is no search and instead we just try to open the file literally.  */
 
-        DEBUG(post("looking for %s",dirresult));
-            /* see if we can open the file for reading */
-        if ((fd=open(dirresult,O_RDONLY | MSWOPENFLAG(bin))) >= 0)
-        {
-                /* in unix, further check that it's not a directory */
-#ifdef UNISTD
-            struct stat statbuf;
-            int ok =  ((fstat(fd, &statbuf) >= 0) &&
-                !S_ISDIR(statbuf.st_mode));
-            if (!ok)
-            {
-                if (sys_verbose) post("tried %s; stat failed or directory",
-                    dirresult);
-                close (fd);
-                fd = -1;
-            }
-            else
-#endif
-            {
-                char *slash;
-                if (sys_verbose) post("tried %s and succeeded", dirresult);
-                sys_unbashfilename(dirresult, dirresult);
-                slash = strrchr(dirresult, '/');
-                if (slash)
-                {
-                    *slash = 0;
-                    *nameresult = slash + 1;
-                }
-                else *nameresult = dirresult;
-                
-                return (fd);  
-            }
-        }
-        else
-        {
-            if (sys_verbose) post("tried %s and failed", dirresult);
-        }
-    }
+/* see also canvas_openfile() which, in addition, searches down the
+canvas-specific path. */
+
+static int do_open_via_path(const char *dir, const char *name,
+    const char *ext, char *dirresult, char **nameresult, unsigned int size,
+    int bin, t_namelist *searchpath)
+{
+    t_namelist *nl;
+    int fd = -1;
+
+        /* first check if "name" is absolute (and if so, try to open) */
+    if (sys_open_absolute(name, ext, dirresult, nameresult, size, bin, &fd))
+        return (fd);
+    
+        /* otherwise "name" is relative; try the directory "dir" first. */
+    if ((fd = sys_trytoopenone(dir, name, ext,
+        dirresult, nameresult, size, bin)) >= 0)
+            return (fd);
+
+        /* next go through the search path */
+    for (nl = searchpath; nl; nl = nl->nl_next)
+        if ((fd = sys_trytoopenone(nl->nl_string, name, ext,
+            dirresult, nameresult, size, bin)) >= 0)
+                return (fd);
+
+        /* next look in "extra" */
+    if (sys_usestdpath &&
+        (fd = sys_trytoopenone(pd_extrapath->nl_string, name, ext,
+            dirresult, nameresult, size, bin)) >= 0)
+                return (fd);
+
     *dirresult = 0;
     *nameresult = dirresult;
     return (-1);
 }
 
-static int do_open_via_helppath(const char *realname, t_namelist *listp)
+    /* open via path, using the global search path. */
+int open_via_path(const char *dir, const char *name, const char *ext,
+    char *dirresult, char **nameresult, unsigned int size, int bin)
 {
-    t_namelist *nl;
-    int fd = -1;
-    char dirresult[MAXPDSTRING], realdir[MAXPDSTRING];
-    for (nl = listp; nl; nl = nl->nl_next)
-    {
-        strcpy(dirresult, nl->nl_string);
-        strcpy(realdir, dirresult);
-        if (*dirresult && dirresult[strlen(dirresult)-1] != '/')
-               strcat(dirresult, "/");
-        strcat(dirresult, realname);
-        sys_bashfilename(dirresult, dirresult);
-
-        DEBUG(post("looking for %s",dirresult));
-            /* see if we can open the file for reading */
-        if ((fd=open(dirresult,O_RDONLY | MSWOPENFLAG(0))) >= 0)
-        {
-                /* in unix, further check that it's not a directory */
-#ifdef UNISTD
-            struct stat statbuf;
-            int ok =  ((fstat(fd, &statbuf) >= 0) &&
-                !S_ISDIR(statbuf.st_mode));
-            if (!ok)
-            {
-                if (sys_verbose) post("tried %s; stat failed or directory",
-                    dirresult);
-                close (fd);
-                fd = -1;
-            }
-            else
-#endif
-            {
-                char *slash;
-                if (sys_verbose) post("tried %s and succeeded", dirresult);
-                sys_unbashfilename(dirresult, dirresult);
-                close (fd);
-                glob_evalfile(0, gensym((char*)realname), gensym(realdir));
-                return (1);
-            }
-        }
-        else
-        {
-            if (sys_verbose) post("tried %s and failed", dirresult);
-        }
-    }
-    return (0);
+    return (do_open_via_path(dir, name, ext, dirresult, nameresult,
+        size, bin, sys_searchpath));
 }
 
-    /* LATER make this use open_via_path above.  We expect the ".pd"
+    /* Open a help file using the help search path.  We expect the ".pd"
     suffix here, even though we have to tear it back off for one of the
     search attempts. */
 void open_via_helppath(const char *name, const char *dir)
 {
-    t_namelist *nl, thislist, *listp;
-    int fd = -1;
-    char dirbuf2[MAXPDSTRING], realname[MAXPDSTRING];
+    char realname[MAXPDSTRING], dirbuf[MAXPDSTRING], *basename;
+        /* make up a silly "dir" if none is supplied */
+    const char *usedir = (*dir ? dir : "./");
+    int fd;
 
-        /* if directory is supplied, put it at head of search list. */
-    if (*dir)
-    {
-        thislist.nl_string = dirbuf2;
-        thislist.nl_next = sys_helppath;
-        strncpy(dirbuf2, dir, MAXPDSTRING);
-        dirbuf2[MAXPDSTRING-1] = 0;
-        sys_unbashfilename(dirbuf2, dirbuf2);
-        listp = &thislist;
-    }
-    else listp = sys_helppath;
         /* 1. "objectname-help.pd" */
     strncpy(realname, name, MAXPDSTRING-10);
     realname[MAXPDSTRING-10] = 0;
     if (strlen(realname) > 3 && !strcmp(realname+strlen(realname)-3, ".pd"))
         realname[strlen(realname)-3] = 0;
     strcat(realname, "-help.pd");
-    if (do_open_via_helppath(realname, listp))
-        return;
+    if ((fd = do_open_via_path(dir, realname, "", dirbuf, &basename, 
+        MAXPDSTRING, 0, sys_helppath)) >= 0)
+            goto gotone;
+
         /* 2. "help-objectname.pd" */
     strcpy(realname, "help-");
     strncat(realname, name, MAXPDSTRING-10);
     realname[MAXPDSTRING-1] = 0;
-    if (do_open_via_helppath(realname, listp))
-        return;
+    if ((fd = do_open_via_path(dir, realname, "", dirbuf, &basename, 
+        MAXPDSTRING, 0, sys_helppath)) >= 0)
+            goto gotone;
+
         /* 3. "objectname.pd" */
-    if (do_open_via_helppath(name, listp))
-        return;
+    if ((fd = do_open_via_path(dir, name, "", dirbuf, &basename, 
+        MAXPDSTRING, 0, sys_helppath)) >= 0)
+            goto gotone;
     post("sorry, couldn't find help patch for \"%s\"", name);
     return;
+gotone:
+    close (fd);
+    glob_evalfile(0, gensym((char*)realname), gensym(dirbuf));
 }
 
 

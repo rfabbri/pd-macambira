@@ -1,5 +1,5 @@
 /*
- * $Id: pa_win_wdmks.c,v 1.5 2006-08-11 20:09:07 millerpuckette Exp $
+ * $Id: pa_win_wdmks.c,v 1.6 2006-08-15 04:54:15 millerpuckette Exp $
  * PortAudio Windows WDM-KS interface
  *
  * Author: Andrew Baldwin

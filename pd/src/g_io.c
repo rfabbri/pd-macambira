@@ -131,7 +131,7 @@ static void vinlet_dsp(t_vinlet *x, t_signal **sp)
     }
     else
     {
-        dsp_add(vinlet_perform, 3, x, outsig->s_vec, outsig->s_n);
+        dsp_add(vinlet_perform, 3, x, outsig->s_vec, outsig->s_vecsize);
         x->x_read = x->x_buf;
     }
 }
@@ -163,9 +163,9 @@ t_int *vinlet_doprolog(t_int *w)
 int inlet_getsignalindex(t_inlet *x);
 
         /* set up prolog DSP code  */
-void vinlet_dspprolog(t_vinlet *x, t_signal **parentsigs,
-    int myvecsize, int phase, int period, int frequency,
-    int downsample, int upsample, int reblock, int switched)
+void vinlet_dspprolog(struct _vinlet *x, t_signal **parentsigs,
+    int myvecsize, int calcsize, int phase, int period, int frequency,
+    int downsample, int upsample,  int reblock, int switched)
 {
     t_signal *insig, *outsig;
     x->x_updown.downsample = downsample;
@@ -187,7 +187,7 @@ void vinlet_dspprolog(t_vinlet *x, t_signal **parentsigs,
         if (parentsigs)
         {
             insig = parentsigs[inlet_getsignalindex(x->x_inlet)];
-            parentvecsize = insig->s_n;
+            parentvecsize = insig->s_vecsize;
             re_parentvecsize = parentvecsize * upsample / downsample;
         }
         else
@@ -428,8 +428,8 @@ int outlet_getsignalindex(t_outlet *x);
         parent, which, if "reblock" is false, will want to refer
         back to whatever we see on our input during the "dsp" method
         called later.  */
-void voutlet_dspprolog(t_voutlet *x, t_signal **parentsigs,
-    int myvecsize, int phase, int period, int frequency,
+void voutlet_dspprolog(struct _voutlet *x, t_signal **parentsigs,
+    int myvecsize, int calcsize, int phase, int period, int frequency,
     int downsample, int upsample, int reblock, int switched)
 {
     x->x_updown.downsample=downsample;
@@ -453,7 +453,7 @@ static void voutlet_dsp(t_voutlet *x, t_signal **sp)
     if (!x->x_buf) return;
     insig = sp[0];
     if (x->x_justcopyout)
-      dsp_add_copy(insig->s_vec, x->x_directsignal->s_vec, insig->s_n);
+        dsp_add_copy(insig->s_vec, x->x_directsignal->s_vec, insig->s_n);
     else if (x->x_directsignal)
     {
             /* if we're just going to make the signal available on the
@@ -468,9 +468,9 @@ static void voutlet_dsp(t_voutlet *x, t_signal **sp)
         /* set up epilog DSP code.  If we're reblocking, this is the
         time to copy the samples out to the containing object's outlets.
         If we aren't reblocking, there's nothing to do here.  */
-void voutlet_dspepilog(t_voutlet *x, t_signal **parentsigs,
-    int myvecsize, int phase, int period, int frequency, int downsample,
-    int upsample, int reblock, int switched)
+void voutlet_dspepilog(struct _voutlet *x, t_signal **parentsigs,
+    int myvecsize, int calcsize, int phase, int period, int frequency,
+    int downsample, int upsample, int reblock, int switched)
 {
     if (!x->x_buf) return;  /* this shouldn't be necesssary... */
     x->x_updown.downsample=downsample;
@@ -484,7 +484,7 @@ void voutlet_dspepilog(t_voutlet *x, t_signal **parentsigs,
         if (parentsigs)
         {
             outsig = parentsigs[outlet_getsignalindex(x->x_parentoutlet)];
-            parentvecsize = outsig->s_n;
+            parentvecsize = outsig->s_vecsize;
             re_parentvecsize = parentvecsize * upsample / downsample;
         }
         else

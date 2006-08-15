@@ -1,4 +1,4 @@
-PD_VERSION
+Pd version 0.40-0 test 01
 
 A real-time graphical programming environment for live interactive
 computer music, Pd works on SGI machines, Microsoft Windows,

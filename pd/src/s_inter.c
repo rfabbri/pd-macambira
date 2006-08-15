@@ -85,7 +85,6 @@ struct _socketreceiver
     t_socketreceivefn sr_socketreceivefn;
 };
 
-extern char pd_version[];
 extern int sys_guisetportnumber;
 extern char sys_font[]; /* tb: typeface */
 
@@ -847,6 +846,7 @@ void glob_watchdog(t_pd *dummy)
 static int defaultfontshit[] = {
     8, 5, 9, 10, 6, 10, 12, 7, 13, 14, 9, 17, 16, 10, 19, 24, 15, 28,
         24, 15, 28};
+#define NDEFAULTFONT (sizeof(defaultfontshit)/sizeof(*defaultfontshit))
 
 int sys_startgui(const char *guidir)
 {
@@ -894,7 +894,7 @@ int sys_startgui(const char *guidir)
     {
             /* fake the GUI's message giving cwd and font sizes; then
             skip starting the GUI up. */
-        t_atom zz[19];
+        t_atom zz[NDEFAULTFONT+2];
         int i;
 #ifdef MSW
         if (GetCurrentDirectory(MAXPDSTRING, cmdbuf) == 0)
@@ -906,9 +906,9 @@ int sys_startgui(const char *guidir)
         
 #endif
         SETSYMBOL(zz, gensym(cmdbuf));
-        for (i = 1; i < 22; i++)
-            SETFLOAT(zz + i, defaultfontshit[i-1]);
-        SETFLOAT(zz+22,0);
+        for (i = 0; i < (int)NDEFAULTFONT; i++)
+            SETFLOAT(zz+i+1, defaultfontshit[i]);
+        SETFLOAT(zz+NDEFAULTFONT+1,0);
         glob_initfromgui(0, 0, 23, zz);
     }
     else if (sys_guisetportnumber)  /* GUI exists and sent us a port number */
@@ -1247,8 +1247,7 @@ int sys_startgui(const char *guidir)
 #endif
          sys_get_audio_apis(buf);
          sys_get_midi_apis(buf2);
-         sys_vgui("pdtk_pd_startup {%s} %s %s {%s}\n", pd_version, buf, buf2,
-                                  sys_font); 
+         sys_vgui("pdtk_pd_startup %s %s {%s}\n", buf, buf2, sys_font); 
     }
     return (0);
 

@@ -381,6 +381,7 @@ t_canvas *canvas_new(void *dummy, t_symbol *sel, int argc, t_atom *argv)
         env->ce_argc = canvas_newargc;
         env->ce_argv = canvas_newargv;
         env->ce_dollarzero = dollarzero++;
+        env->ce_path = 0;
         canvas_newdirectory = &s_;
         canvas_newargc = 0;
         canvas_newargv = 0;
@@ -532,7 +533,7 @@ void glist_glist(t_glist *g, t_symbol *s, int argc, t_atom *argv)
     otherwise it appears as a text box. */
 int glist_isgraph(t_glist *x)
 {
-    return (x->gl_isgraph);
+  return (x->gl_isgraph|(x->gl_hidetext<<1));
 }
 
     /* This is sent from the GUI to inform a toplevel that its window has been
@@ -540,7 +541,7 @@ int glist_isgraph(t_glist *x)
 static void canvas_setbounds(t_canvas *x, int x1, int y1, int x2, int y2)
 {
     int heightwas = y2 - y1;
-    int heightchange = y2 - y1 - (x->gl_screeny2 - x->gl_screeny1);    
+    int heightchange = y2 - y1 - (x->gl_screeny2 - x->gl_screeny1);
     if (x->gl_screenx1 == x1 && x->gl_screeny1 == y1 &&
         x->gl_screenx2 == x2 && x->gl_screeny2 == y2)
             return;
@@ -1195,13 +1196,17 @@ int canvas_istable(t_canvas *x)
 
     /* return true if the "canvas" object should be treated as a text
     object.  This is true for abstractions but also for "table"s... */
+/* JMZ: add a flag to gop-abstractions to hide the title */
 int canvas_showtext(t_canvas *x)
 {
     t_atom *argv = (x->gl_obj.te_binbuf? binbuf_getvec(x->gl_obj.te_binbuf):0);
     int argc = (x->gl_obj.te_binbuf? binbuf_getnatom(x->gl_obj.te_binbuf) : 0);
     int isarray = (argc && argv[0].a_type == A_SYMBOL &&
         argv[0].a_w.w_symbol == gensym("graph"));
-    return (!isarray);
+    if(x->gl_hidetext)
+      return 0;
+    else
+      return (!isarray);
 }
 
     /* get the document containing this canvas */
@@ -1413,6 +1418,148 @@ void canvas_redrawallfortemplatecanvas(t_canvas *x, int action)
     canvas_redrawallfortemplate(0, action);
 }
 
+/* ------------------------------- declare ------------------------ */
+
+/* put "declare" objects in a patch to tell it about the environment in
+which objects should be created in this canvas.  This includes directories to
+search ("-path", "-stdpath") and object libraries to load
+("-lib" and "-stdlib").  These must be set before the patch containing
+the "declare" object is filled in with its contents; so when the patch is
+saved,  we throw early messages to the canvas to set the environment
+before any objects are created in it. */
+
+static t_class *declare_class;
+
+typedef struct _declare
+{
+    t_object x_obj;
+    t_canvas *x_canvas;
+    int x_useme;
+} t_declare;
+
+static void *declare_new(t_symbol *s, int argc, t_atom *argv)
+{
+    t_declare *x = (t_declare *)pd_new(declare_class);
+    x->x_useme = 1;
+    x->x_canvas = canvas_getcurrent();
+        /* LATER update environment and/or load libraries */
+    return (x);
+}
+
+static void declare_free(t_declare *x)
+{
+    x->x_useme = 0;
+        /* LATER update environment */
+}
+
+void canvas_savedeclarationsto(t_canvas *x, t_binbuf *b)
+{
+    t_gobj *y;
+
+    for (y = x->gl_list; y; y = y->g_next)
+    {
+        if (pd_class(&y->g_pd) == declare_class)
+        {
+            binbuf_addv(b, "s", gensym("#X"));
+            binbuf_addbinbuf(b, ((t_declare *)y)->x_obj.te_binbuf);
+            binbuf_addv(b, ";");
+        }
+        else if (pd_class(&y->g_pd) == canvas_class)
+            canvas_savedeclarationsto((t_canvas *)y, b);
+    }
+}
+
+static void canvas_declare(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
+{
+    int i;
+    t_canvasenvironment *e = canvas_getenv(x);
+#if 0
+    startpost("declare:: %s", s->s_name);
+    postatom(argc, argv);
+    endpost();
+#endif
+    for (i = 0; i < argc; i++)
+    {
+        char strbuf[MAXPDSTRING];
+        char *flag = atom_getsymbolarg(i, argc, argv)->s_name;
+        if ((argc > i+1) && !strcmp(flag, "-path"))
+        {
+            e->ce_path = namelist_append(e->ce_path, 
+                atom_getsymbolarg(i+1, argc, argv)->s_name, 0);
+            i++;
+        }
+        else if ((argc > i+1) && !strcmp(flag, "-stdpath"))
+        {
+            strncpy(strbuf, sys_libdir->s_name, MAXPDSTRING-3);
+            strbuf[MAXPDSTRING-4] = 0;
+            strcat(strbuf, "/");
+            strncpy(strbuf, atom_getsymbolarg(i+1, argc, argv)->s_name,
+                MAXPDSTRING-strlen(strbuf));
+            strbuf[MAXPDSTRING-1] = 0;
+            e->ce_path = namelist_append(e->ce_path, strbuf, 0);
+            i++;
+        }
+        else if ((argc > i+1) && !strcmp(flag, "-lib"))
+        {
+            sys_load_lib(x, atom_getsymbolarg(i+1, argc, argv)->s_name);
+            i++;
+        }
+        else if ((argc > i+1) && !strcmp(flag, "-stdlib"))
+        {
+            strncpy(strbuf, sys_libdir->s_name, MAXPDSTRING-3);
+            strbuf[MAXPDSTRING-4] = 0;
+            strcat(strbuf, "/");
+            strncpy(strbuf, atom_getsymbolarg(i+1, argc, argv)->s_name,
+                MAXPDSTRING-strlen(strbuf));
+            strbuf[MAXPDSTRING-1] = 0;
+            sys_load_lib(0, strbuf);
+            i++;
+        }
+        else post("declare: %s: unknown declaration", flag);
+    }
+}
+
+    /* utility function to read a file, looking first down the canvas's search
+    path (set with "declare" objects in the patch and recursively in calling
+    patches), then down the system one.  The filename is the concatenation of
+    "name" and "ext".  "Name" may be absolute, or may be relative with
+    slashes.  If anything can be opened, the true directory
+    ais put in the buffer dirresult (provided by caller), which should
+    be "size" bytes.  The "nameresult" pointer will be set somewhere in
+    the interior of "dirresult" and will give the file basename (with
+    slashes trimmed).  If "bin" is set a 'binary' open is
+    attempted, otherwise ASCII (this only matters on Microsoft.) 
+    If "x" is zero, the file is sought in the directory "." or in the
+    global path.*/
+
+int canvas_open(t_canvas *x, const char *name, const char *ext,
+    char *dirresult, char **nameresult, unsigned int size, int bin)
+{
+    t_namelist *nl, thislist;
+    int fd = -1;
+    char listbuf[MAXPDSTRING];
+    t_canvas *y;
+
+        /* first check if "name" is absolute (and if so, try to open) */
+    if (sys_open_absolute(name, ext, dirresult, nameresult, size, bin, &fd))
+        return (fd);
+    
+        /* otherwise "name" is relative; start trying in directories named
+        in this and parent environments */
+    for (y = x; y; y = y->gl_owner)
+        if (y->gl_env)
+    {
+        t_namelist *nl;
+        for (nl = y->gl_env->ce_path; nl; nl = nl->nl_next)
+        {
+            if ((fd = sys_trytoopenone(nl->nl_string, name, ext,
+                dirresult, nameresult, size, bin)) >= 0)
+                    return (fd);
+        }
+    }
+    return (open_via_path((x ? canvas_getdir(x)->s_name : "."), name, ext,
+        dirresult, nameresult, size, bin));
+}
 
 /* ------------------------------- setup routine ------------------------ */
 
@@ -1532,6 +1679,12 @@ void g_canvas_setup(void)
 
     class_addcreator((t_newmethod)table_new, gensym("table"),
         A_DEFSYM, A_DEFFLOAT, 0);
+
+/*---------------------------- declare ------------------- */
+    declare_class = class_new(gensym("declare"), (t_newmethod)declare_new,
+        (t_method)declare_free, sizeof(t_declare), CLASS_NOINLET, A_GIMME, 0);
+    class_addmethod(canvas_class, (t_method)canvas_declare,
+        gensym("declare"), A_GIMME, 0);
 
 /* -------------- setups from other files for canvas_class ---------------- */
     g_graph_setup();

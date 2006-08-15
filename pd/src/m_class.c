@@ -519,13 +519,12 @@ int pd_setloadingabstraction(t_symbol *sym);
 void new_anything(void *dummy, t_symbol *s, int argc, t_atom *argv)
 {
     t_pd *current;
-    t_symbol *dir = canvas_getcurrentdir();
     int fd;
     char dirbuf[MAXPDSTRING], *nameptr;
     if (tryingalready) return;
     newest = 0;
     class_loadsym = s;
-    if (sys_load_lib(dir->s_name, s->s_name))
+    if (sys_load_lib(canvas_getcurrent(), s->s_name))
     {
         tryingalready = 1;
         typedmess(dummy, s, argc, argv);
@@ -534,9 +533,9 @@ void new_anything(void *dummy, t_symbol *s, int argc, t_atom *argv)
     }
     class_loadsym = 0;
     current = s__X.s_thing;
-    if ((fd = open_via_path(dir->s_name, s->s_name, ".pd",
+    if ((fd = canvas_open(canvas_getcurrent(), s->s_name, ".pd",
         dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0 ||
-            (fd = open_via_path(dir->s_name, s->s_name, ".pat",
+            (fd = canvas_open(canvas_getcurrent(), s->s_name, ".pat",
                 dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0)
     {
         close (fd);

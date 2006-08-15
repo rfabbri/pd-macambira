@@ -1,5 +1,5 @@
 /*
- * $Id: s_audio_paring.c,v 1.3 2006-08-11 20:09:07 millerpuckette Exp $
+ * $Id: s_audio_paring.c,v 1.4 2006-08-15 04:54:15 millerpuckette Exp $
  * ringbuffer.c
  * Ring Buffer utility..
  *

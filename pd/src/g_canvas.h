@@ -182,6 +182,7 @@ struct _glist
     unsigned int gl_isdeleting:1;   /* we're inside glist_delete -- hack! */
     unsigned int gl_goprect:1;      /* draw rectangle for graph-on-parent */
     unsigned int gl_isgraph:1;      /* show as graph on parent */
+    unsigned int gl_hidetext:1;     /* hide object-name + args when doing graph on parent */
 };
 
 #define gl_gobj gl_obj.te_g

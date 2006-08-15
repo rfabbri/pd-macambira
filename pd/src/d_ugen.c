@@ -20,17 +20,20 @@
 extern t_class *vinlet_class, *voutlet_class, *canvas_class;
 t_sample *obj_findsignalscalar(t_object *x, int m);
 static int ugen_loud;
+static t_int *dsp_chain;
+static int dsp_chainsize;
+
 EXTERN_STRUCT _vinlet;
 EXTERN_STRUCT _voutlet;
 
 void vinlet_dspprolog(struct _vinlet *x, t_signal **parentsigs,
-    int myvecsize, int phase, int period, int frequency,
+    int myvecsize, int calcsize, int phase, int period, int frequency,
     int downsample, int upsample,  int reblock, int switched);
 void voutlet_dspprolog(struct _voutlet *x, t_signal **parentsigs,
-    int myvecsize, int phase, int period, int frequency,
+    int myvecsize, int calcsize, int phase, int period, int frequency,
     int downsample, int upsample, int reblock, int switched);
 void voutlet_dspepilog(struct _voutlet *x, t_signal **parentsigs,
-    int myvecsize, int phase, int period, int frequency,
+    int myvecsize, int calcsize, int phase, int period, int frequency,
     int downsample, int upsample, int reblock, int switched);
 
 t_int *zero_perform(t_int *w)   /* zero out a vector */
@@ -104,12 +107,14 @@ static t_class *block_class;
 typedef struct _block
 {
     t_object x_obj;
-    int x_vecsize;
+    int x_vecsize;      /* size of audio signals in this block */
+    int x_calcsize;     /* number of samples actually to compute */
     int x_overlap;
     int x_phase;        /* from 0 to period-1; when zero we run the block */
     int x_period;       /* submultiple of containing canvas */
     int x_frequency;    /* supermultiple of comtaining canvas */
-    int x_count;
+    int x_count;        /* number of times parent block has called us */
+    int x_chainonset;   /* beginning of code in DSP chain */
     int x_blocklength;  /* length of dspchain for this block */
     int x_epiloglength; /* length of epilog */
     char x_switched;    /* true if we're acting as a a switch */
@@ -117,7 +122,7 @@ typedef struct _block
     char x_reblock;     /* true if inlets and outlets are reblocking */
     int x_upsample;     /* upsampling-factor */
     int x_downsample;   /* downsampling-factor */
-
+    int x_return;       /* stop right after this block (for one-shots) */
 } t_block;
 
 static void block_set(t_block *x, t_floatarg fvecsize, t_floatarg foverlap,
@@ -136,17 +141,18 @@ static void *block_new(t_floatarg fvecsize, t_floatarg foverlap,
     return (x);
 }
 
-static void block_set(t_block *x, t_floatarg fvecsize, t_floatarg foverlap,
+static void block_set(t_block *x, t_floatarg fcalcsize, t_floatarg foverlap,
     t_floatarg fupsample)
 {
     int upsample, downsample;
-    int vecsize = fvecsize;
+    int calcsize = fcalcsize;
     int overlap = foverlap;
     int dspstate = canvas_suspend_dsp();
+    int vecsize;
     if (overlap < 1)
         overlap = 1;
-    if (vecsize < 0)
-        vecsize = 0;    /* this means we'll get it from parent later. */
+    if (calcsize < 0)
+        calcsize = 0;    /* this means we'll get it from parent later. */
 
     if (fupsample <= 0)
         upsample = downsample = 1;
@@ -160,6 +166,13 @@ static void block_set(t_block *x, t_floatarg fvecsize, t_floatarg foverlap,
         upsample   = 1;
     }
 
+        /* vecsize is smallest power of 2 large enough to hold calcsize */
+    if (calcsize)
+    {
+        if ((vecsize = (1 << ilog2(calcsize))) != calcsize)
+            vecsize *= 2;
+    }
+    else vecsize = 0;
     if (vecsize && (vecsize != (1 << ilog2(vecsize))))
     {
         pd_error(x, "block~: vector size not a power of 2");
@@ -181,6 +194,7 @@ static void block_set(t_block *x, t_floatarg fvecsize, t_floatarg foverlap,
         upsample = 1;
     }
 
+    x->x_calcsize = calcsize;
     x->x_vecsize = vecsize;
     x->x_overlap = overlap;
     x->x_upsample = upsample;
@@ -202,6 +216,21 @@ static void block_float(t_block *x, t_floatarg f)
     if (x->x_switched)
         x->x_switchon = (f != 0);
 }
+
+static void block_bang(t_block *x)
+{
+    if (x->x_switched && !x->x_switchon)
+    {
+        t_int *ip;
+        x->x_return = 1;
+        for (ip = dsp_chain + x->x_chainonset; ip; )
+            ip = (*(t_perfroutine)(*ip))(ip);
+        x->x_return = 0;
+    }
+    else pd_error(x, "bang to block~ or on-state switch~ has no effect");
+}
+
+
 #define PROLOGCALL 2
 #define EPILOGCALL 2
 
@@ -231,6 +260,8 @@ static t_int *block_epilog(t_int *w)
 {
     t_block *x = (t_block *)w[1];
     int count = x->x_count - 1;
+    if (x->x_return)
+        return (0);
     if (!x->x_reblock)
         return (w + x->x_epiloglength + EPILOGCALL);
     if (count)
@@ -257,12 +288,15 @@ void block_tilde_setup(void)
         A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addmethod(block_class, (t_method)block_dsp, gensym("dsp"), 0);
     class_addfloat(block_class, block_float);
+    class_addbang(block_class, block_bang);
 }
 
 /* ------------------ DSP call list ----------------------- */
 
-static t_int *dsp_chain;
-static int dsp_chainsize;
+static t_int dsp_done(t_int *w)
+{
+    return (0);
+}
 
 void dsp_add(t_perfroutine f, int n, ...)
 {
@@ -276,7 +310,7 @@ void dsp_add(t_perfroutine f, int n, ...)
     for (i = 0; i < n; i++)
         dsp_chain[dsp_chainsize + i] = va_arg(ap, t_int);
     va_end(ap);
-    dsp_chain[newsize-1] = 0;
+    dsp_chain[newsize-1] = (t_int)dsp_done;
     dsp_chainsize = newsize;
 }
 
@@ -290,7 +324,7 @@ void dsp_addv(t_perfroutine f, int n, t_int *vec)
     dsp_chain[dsp_chainsize-1] = (t_int)f;
     for (i = 0; i < n; i++)
         dsp_chain[dsp_chainsize + i] = vec[i];
-    dsp_chain[newsize-1] = 0;
+    dsp_chain[newsize-1] = (t_int)dsp_done;
     dsp_chainsize = newsize;
 }
 
@@ -299,7 +333,7 @@ void dsp_tick(void)
     if (dsp_chain)
     {
         t_int *ip;
-        for (ip = dsp_chain; *ip; ) ip = (*(t_perfroutine)(*ip))(ip);
+        for (ip = dsp_chain; ip; ) ip = (*(t_perfroutine)(*ip))(ip);
         dsp_phase++;
     }
 }
@@ -334,7 +368,7 @@ void signal_cleanup(void)
     {
         signal_usedlist = sig->s_nextused;
         if (!sig->s_isborrowed)
-            t_freebytes(sig->s_vec, sig->s_n * sizeof (*sig->s_vec));
+            t_freebytes(sig->s_vec, sig->s_vecsize * sizeof (*sig->s_vec));
         t_freebytes(sig, sizeof *sig);
     }
     for (i = 0; i <= MAXLOGSIG; i++)
@@ -345,7 +379,7 @@ void signal_cleanup(void)
     /* mark the signal "reusable." */
 void signal_makereusable(t_signal *sig)
 {
-    int logn = ilog2(sig->s_n);
+    int logn = ilog2(sig->s_vecsize);
 #if 1
     t_signal *s5;
     for (s5 = signal_freeborrowed; s5; s5 = s5->s_nextfree)
@@ -395,14 +429,14 @@ void signal_makereusable(t_signal *sig)
 
 t_signal *signal_new(int n, float sr)
 {
-    int logn, n2;
+    int logn, n2, vecsize = 0;
     t_signal *ret, **whichlist;
     t_sample *fp;
     logn = ilog2(n);
     if (n)
     {
-        if (n != (1 << logn))
-            bug("signal buffer not a power of 2");
+        if ((vecsize = (1<<logn)) != n)
+            vecsize *= 2;
         if (logn > MAXLOGSIG)
             bug("signal buffer too large");
         whichlist = signal_freelist + logn;
@@ -419,7 +453,7 @@ t_signal *signal_new(int n, float sr)
         ret = (t_signal *)t_getbytes(sizeof *ret);
         if (n)
         {
-            ret->s_vec = (t_sample *)getbytes(n * sizeof (*ret->s_vec));
+            ret->s_vec = (t_sample *)getbytes(vecsize * sizeof (*ret->s_vec));
             ret->s_isborrowed = 0;
         }
         else
@@ -431,6 +465,7 @@ t_signal *signal_new(int n, float sr)
         signal_usedlist = ret;
     }
     ret->s_n = n;
+    ret->s_vecsize = vecsize;
     ret->s_sr = sr;
     ret->s_refcount = 0;
     ret->s_borrowedfrom = 0;
@@ -452,6 +487,7 @@ void signal_setborrowed(t_signal *sig, t_signal *sig2)
     sig->s_borrowedfrom = sig2;
     sig->s_vec = sig2->s_vec;
     sig->s_n = sig2->s_n;
+    sig->s_vecsize = sig2->s_vecsize;
 }
 
 int signal_compatible(t_signal *s1, t_signal *s2)
@@ -504,7 +540,8 @@ struct _dspcontext
     int dc_noutlets;
     t_signal **dc_iosigs;
     float dc_srate;
-    int dc_vecsize;
+    int dc_vecsize;         /* vector size, power of two */
+    int dc_calcsize;        /* number of elements to calculate */
     char dc_toplevel;       /* true if "iosigs" is invalid. */
     char dc_reblock;        /* true if we have to reblock inlets/outlets */
     char dc_switched;       /* true if we're switched */
@@ -832,7 +869,7 @@ void ugen_done_graph(t_dspcontext *dc)
     t_dspcontext *parent_context = dc->dc_parentcontext;
     float parent_srate;
     int parent_vecsize;
-    int period, frequency, phase, vecsize;
+    int period, frequency, phase, vecsize, calcsize;
     float srate;
     int chainblockbegin;    /* DSP chain onset before block prolog code */
     int chainblockend;      /* and after block epilog code */
@@ -886,6 +923,9 @@ void ugen_done_graph(t_dspcontext *dc)
         vecsize = blk->x_vecsize;
         if (vecsize == 0)
             vecsize = parent_vecsize;
+        calcsize = blk->x_calcsize;
+        if (calcsize == 0)
+            calcsize = vecsize;
         realoverlap = blk->x_overlap;
         if (realoverlap > vecsize) realoverlap = vecsize;
         downsample = blk->x_downsample;
@@ -906,7 +946,7 @@ void ugen_done_graph(t_dspcontext *dc)
         if (! parent_context || (realoverlap != 1) ||
             (vecsize != parent_vecsize) || 
                 (downsample != 1) || (upsample != 1))
-          reblock = 1;
+                    reblock = 1;
         switched = blk->x_switched;
     }
     else
@@ -923,6 +963,7 @@ void ugen_done_graph(t_dspcontext *dc)
     dc->dc_switched = switched;
     dc->dc_srate = srate;
     dc->dc_vecsize = vecsize;
+    dc->dc_calcsize = calcsize;
     
         /* if we're reblocking or switched, we now have to create output
         signals to fill in for the "borrowed" ones we have now.  This
@@ -967,18 +1008,20 @@ void ugen_done_graph(t_dspcontext *dc)
 
         if (pd_class(zz) == vinlet_class)
             vinlet_dspprolog((struct _vinlet *)zz, 
-                dc->dc_iosigs, vecsize, dsp_phase, period, frequency,
+                dc->dc_iosigs, vecsize, calcsize, dsp_phase, period, frequency,
                     downsample, upsample, reblock, switched);
         else if (pd_class(zz) == voutlet_class)
             voutlet_dspprolog((struct _voutlet *)zz, 
-                outsigs, vecsize, dsp_phase, period, frequency,
+                outsigs, vecsize, calcsize, dsp_phase, period, frequency,
                     downsample, upsample, reblock, switched);
     }    
     chainblockbegin = dsp_chainsize;
 
     if (blk && (reblock || switched))   /* add the block DSP prolog */
+    {
         dsp_add(block_prolog, 1, blk);
-
+        blk->x_chainonset = dsp_chainsize - 1;
+    }   
         /* Initialize for sorting */
     for (u = dc->dc_ugenlist; u; u = u->u_next)
     {
@@ -1044,7 +1087,7 @@ void ugen_done_graph(t_dspcontext *dc)
             t_signal **iosigs = dc->dc_iosigs;
             if (iosigs) iosigs += dc->dc_ninlets;
             voutlet_dspepilog((struct _voutlet *)zz, 
-                iosigs, vecsize, dsp_phase, period, frequency,
+                iosigs, vecsize, calcsize, dsp_phase, period, frequency,
                     downsample, upsample, reblock, switched);
         }
     }

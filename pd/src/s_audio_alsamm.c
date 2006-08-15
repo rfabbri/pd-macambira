@@ -216,7 +216,7 @@ int alsamm_open_audio(int rate)
   /* init some structures */
   for(i=0;i < ALSA_MAXDEV;i++){
     alsa_indev[i].a_synced=alsa_outdev[i].a_synced=0;
-    alsa_indev[i].a_channels=alsa_outdev[i].a_channels=0;
+    alsa_indev[i].a_channels=alsa_outdev[i].a_channels=-1; /* query defaults */
   }
   alsamm_inchannels = 0;
   alsamm_outchannels = 0;
@@ -510,7 +510,7 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
     if(sys_verbose)
       post("Getting channels:min=%d, max= %d for request=%d",minchs,maxchs,channels);
 #endif
-
+    if(channels < 0)channels=maxchs;
     if(channels > maxchs)channels = maxchs;
     if(channels < minchs)channels = minchs;
 

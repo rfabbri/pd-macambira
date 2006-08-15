@@ -34,6 +34,8 @@ document tabwrite~_start
 $-expansion changed 
 
 problems:
+open_via_path call in d_soundfile.c isn't threadsafe
+Jack interface never goes idle? (Michael Berkowski, Pd list Aug 11 2006)
 crashed Pd putting vec and template in wrong order in array element of struct
 z.pd - list to numbox misbehaves (inlet and object but object is noinlet)
 floor, ciel functions in expr misdeclared

@@ -2,10 +2,6 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-char pd_version[] = "Pd version 0.40-0test01\n";
-char pd_compiletime[] = __TIME__;
-char pd_compiledate[] = __DATE__;
-
 #include "m_pd.h"
 #include "m_imp.h"
 #include "s_stuff.h"
@@ -26,6 +22,10 @@ char pd_compiledate[] = __DATE__;
 #include <winbase.h>
 #endif
 
+char *pd_version;
+char pd_compiletime[] = __TIME__;
+char pd_compiledate[] = __DATE__;
+
 void pd_init(void);
 int sys_argparse(int argc, char **argv);
 void sys_findprogdir(char *progname);
@@ -33,7 +33,9 @@ int sys_startgui(const char *guipath);
 int sys_rcfile(void);
 int m_scheduler(void);
 void sys_addhelppath(char *p);
+#ifdef USEAPI_ALSA
 void alsa_adddev(char *name);
+#endif
 
 int sys_debuglevel;
 int sys_verbose;
@@ -56,7 +58,7 @@ int sys_nmidiin = -1;
 int sys_midiindevlist[MAXMIDIINDEV] = {1};
 int sys_midioutdevlist[MAXMIDIOUTDEV] = {1};
 
-char sys_font[] = "courier"; /* tb: font name */
+char sys_font[100] = "courier"; /* tb: font name */
 static int sys_main_srate;
 static int sys_main_advance;
 
@@ -221,7 +223,7 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
 #endif
         /* load dynamic libraries specified with "-lib" args */
     for  (nl = sys_externlist; nl; nl = nl->nl_next)
-        if (!sys_load_lib(cwd, nl->nl_string))
+        if (!sys_load_lib(0, nl->nl_string))
             post("%s: can't load library", nl->nl_string);
         /* open patches specifies with "-open" args */
     for  (nl = sys_openlist; nl; nl = nl->nl_next)
@@ -242,6 +244,15 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
 
 static void sys_afterargparse(void);
 
+static void pd_makeversion(void)
+{
+    char foo[100];
+    sprintf(foo,  "Pd version %d.%d-%d%s\n",PD_MAJOR_VERSION,
+        PD_MINOR_VERSION,PD_BUGFIX_VERSION,PD_TEST_VERSION);
+    pd_version = malloc(strlen(foo+1));
+    strcpy(pd_version, foo);
+}
+
 /* this is called from main() in s_entry.c */
 int sys_main(int argc, char **argv)
 {
@@ -259,6 +270,8 @@ int sys_main(int argc, char **argv)
     if (sys_argparse(argc-1, argv+1))           /* parse cmd line */
         return (1);
     sys_afterargparse();                    /* post-argparse settings */
+        /* build version string from defines in m_pd.h */
+    pd_makeversion();
     if (sys_verbose || sys_version) fprintf(stderr, "%scompiled %s %s\n",
         pd_version, pd_compiletime, pd_compiledate);
     if (sys_version)    /* if we were just asked our version, exit here. */
@@ -726,10 +739,11 @@ int sys_argparse(int argc, char **argv)
                 /* tb: font name { */
         else if (!strcmp(*argv, "-typeface") && argc > 1)
         {
-                        strcpy(sys_font,*(argv+1));
-                        argc -= 2;
-                        argv += 2;
-                }
+            strncpy(sys_font,*(argv+1),sizeof(sys_font)-1);
+            sys_font[sizeof(sys_font)-1] = 0;
+            argc -= 2;
+            argv += 2;
+        }
                 /* } tb */
         else if (!strcmp(*argv, "-verbose"))
         {

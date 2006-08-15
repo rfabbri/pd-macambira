@@ -35,8 +35,8 @@ if {$pd_nt == 1} {
     global pd_guidir
     global pd_tearoff
     set pd_gui2 [string range $argv0 0 [expr [string last \\ $argv0 ] - 1]]
-    regsub -all \\\\ $pd_gui2 / pd_gui3
-    set pd_guidir $pd_gui3/..
+    regsub -all \\\\ $pd_gui2 / pd_guidir
+	set pd_guidir [string range $pd_guidir 0 [expr [string last / $pd_guidir] - 1]]
     load $pd_guidir/bin/pdtcl.dll
     set pd_tearoff 1
 }
@@ -203,6 +203,9 @@ pdtk_standardkeybindings .
 wm title . "Pd"
 . configure -menu .mbar -width 200 -height 150
 
+# Intercept closing the main pd window: MP 20060413:
+wm protocol . WM_DELETE_WINDOW menu_quit
+
 ############### set up global variables ################################
 
 set untitled_number 1
@@ -368,8 +371,7 @@ proc menu_opentext {filename} {
     while {![eof $f]} {
         set bigstring [read $f 1000]
         regsub -all PD_BASEDIR $bigstring $pd_guidir bigstring2
-        regsub -all PD_VERSION $bigstring2 $pd_myversion bigstring3
-        $name.text insert end $bigstring3
+        $name.text insert end $bigstring2
     }
     close $f
     set doc_number [expr $doc_number + 1] 
@@ -2875,6 +2877,8 @@ proc canvas_apply {id} {
     global $var_canvas_yscale
     set var_canvas_graphme [concat canvas_graphme_$vid]
     global $var_canvas_graphme
+    set var_canvas_hidetext [concat canvas_hidetext_$vid]
+    global $var_canvas_hidetext
     set var_canvas_x1 [concat canvas_x1_$vid]
     global $var_canvas_x1
     set var_canvas_x2 [concat canvas_x2_$vid]
@@ -2895,7 +2899,7 @@ proc canvas_apply {id} {
     pd [concat $id donecanvasdialog \
         [eval concat $$var_canvas_xscale] \
         [eval concat $$var_canvas_yscale] \
-        [eval concat $$var_canvas_graphme] \
+        [expr [eval concat $$var_canvas_graphme]+2*[eval concat $$var_canvas_hidetext]] \
         [eval concat $$var_canvas_x1] \
         [eval concat $$var_canvas_y1] \
         [eval concat $$var_canvas_x2] \
@@ -2927,6 +2931,8 @@ proc canvas_checkcommand {id} {
     global $var_canvas_yscale
     set var_canvas_graphme [concat canvas_graphme_$vid]
     global $var_canvas_graphme
+    set var_canvas_hidetext [concat canvas_hidetext_$vid]
+    global $var_canvas_hidetext
     set var_canvas_x1 [concat canvas_x1_$vid]
     global $var_canvas_x1
     set var_canvas_x2 [concat canvas_x2_$vid]
@@ -2945,6 +2951,7 @@ proc canvas_checkcommand {id} {
     global $var_canvas_ymargin
 
     if { [eval concat $$var_canvas_graphme] != 0 } {
+        $id.hidetext configure -state normal
         $id.xrange.entry1 configure -state normal
         $id.xrange.entry2 configure -state normal
         $id.xrange.entry3 configure -state normal
@@ -2975,6 +2982,7 @@ proc canvas_checkcommand {id} {
             set $var_canvas_ymargin 100
         }
     } else {
+        $id.hidetext configure -state disabled
         $id.xrange.entry1 configure -state disabled
         $id.xrange.entry2 configure -state disabled
         $id.xrange.entry3 configure -state disabled
@@ -3004,6 +3012,8 @@ proc pdtk_canvas_dialog {id xscale yscale graphme x1 y1 x2 y2 \
     global $var_canvas_yscale
     set var_canvas_graphme [concat canvas_graphme_$vid]
     global $var_canvas_graphme
+    set var_canvas_hidetext [concat canvas_hidetext_$vid]
+    global $var_canvas_hidetext
     set var_canvas_x1 [concat canvas_x1_$vid]
     global $var_canvas_x1
     set var_canvas_x2 [concat canvas_x2_$vid]
@@ -3021,10 +3031,10 @@ proc pdtk_canvas_dialog {id xscale yscale graphme x1 y1 x2 y2 \
     set var_canvas_ymargin [concat canvas_ymargin_$vid]
     global $var_canvas_ymargin
 
-
     set $var_canvas_xscale $xscale
     set $var_canvas_yscale $yscale
-    set $var_canvas_graphme $graphme
+    set $var_canvas_graphme [expr ($graphme!=0)?1:0]
+    set $var_canvas_hidetext [expr ($graphme&2)?1:0]
     set $var_canvas_x1 $x1
     set $var_canvas_y1 $y1
     set $var_canvas_x2 $x2
@@ -3057,6 +3067,11 @@ proc pdtk_canvas_dialog {id xscale yscale graphme x1 y1 x2 y2 \
         -variable $var_canvas_graphme -anchor w \
         -command [concat canvas_checkcommand $id]
     pack $id.graphme -side top
+
+    checkbutton $id.hidetext -text {hide object name and arguments} \
+        -variable $var_canvas_hidetext -anchor w \
+        -command [concat canvas_checkcommand $id]
+    pack $id.hidetext -side top
 
     frame $id.xrange
     pack $id.xrange -side top
@@ -3228,10 +3243,9 @@ proc pdtk_pd_ctrlkey {name key shift} {
 # seven "useful" font sizes.
 
 # tb: user defined typefaces
-proc pdtk_pd_startup {version apilist midiapilist fontname} {
-#    puts stderr [concat $version $apilist $fontname]
-    global pd_myversion pd_apilist pd_midiapilist
-    set pd_myversion $version
+proc pdtk_pd_startup {apilist midiapilist fontname} {
+#    puts stderr [concat $apilist $midiapilist $fontname]
+    global pd_apilist pd_midiapilist
     set pd_apilist $apilist
     set pd_midiapilist $midiapilist
     global pd_fontlist

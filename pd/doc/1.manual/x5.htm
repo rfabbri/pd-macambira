@@ -19,6 +19,35 @@
 <P>This section tracks changes in Pd's current implementation.</P>
 
 <H3> <A name="s2"> 5.1. release notes </A> </H3>
+<P> ------------------ 0.40 -----------------------------
+
+<P> A new object, "declare", allows patches to control where Pd looks
+for resources such as abstractions and libraries.
+
+<P> Sybmols can now be built using multiple dollar sign variables, as in
+"$1-$2.$3".
+
+<P> The switch~ object takes a "bang" message to compute one block of DSP on 
+demand.  Also, block sizes are no longer required to be powers of two 
+(although reblocking only works between powers of two.)
+
+<P> Externs may have characters in their names that aren't part of valid
+C variable names (i.e., outsize the range a-z,A-Z,0-9, _).
+
+<P> Openpanel and savepanel take an argument to set the initial directory to 
+search.
+
+<P> Support for large (>2G) soundfiles, in operating systems that offer it.
+
+<P> Text copy/paste fixed (I hope) for Macintosh
+
+<P> Intel Mac binaries.  New naming scheme for externs to allow disambiguation
+(although Pd falls back to the old names for compatibility.)
+
+<P> Templates can get notified when data are selected/deselected.  I want
+to provide this for mouse actions on locked canvases too, but haven't yet.
+
+<P> 6 or so patches adopted from sourceforge.
 
 <P> ------------------ 0.39.2 --------------------------
 

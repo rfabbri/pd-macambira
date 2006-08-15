@@ -757,6 +757,25 @@ int binbuf_read(t_binbuf *b, char *filename, char *dirname, int crflag)
     return (0);
 }
 
+    /* read a binbuf from a file, via the search patch of a canvas */
+int binbuf_read_via_canvas(t_binbuf *b, char *filename, t_canvas *canvas,
+    int crflag)
+{
+    int filedesc;
+    char buf[MAXPDSTRING], *bufptr;
+    if ((filedesc = canvas_open(canvas, filename, "",
+        buf, &bufptr, MAXPDSTRING, 0)) < 0)
+    {
+        error("%s: can't open", filename);
+        return (1);
+    }
+    else close (filedesc);
+    if (binbuf_read(b, bufptr, buf, crflag))
+        return (1);
+    else return (0);
+}
+
+    /* old version */
 int binbuf_read_via_path(t_binbuf *b, char *filename, char *dirname,
     int crflag)
 {

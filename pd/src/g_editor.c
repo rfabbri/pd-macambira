@@ -821,7 +821,7 @@ void canvas_setgraph(t_glist *x, int flag, int nogoprect)
             canvas_fixlinesfor(x->gl_owner, &x->gl_obj);
         }
     }
-    else if (flag && !glist_isgraph(x))
+    else if (flag)
     {
         if (x->gl_pixwidth <= 0)
             x->gl_pixwidth = GLIST_DEFGRAPHWIDTH;
@@ -832,6 +832,7 @@ void canvas_setgraph(t_glist *x, int flag, int nogoprect)
         if (x->gl_owner && !x->gl_loading && glist_isvisible(x->gl_owner))
             gobj_vis(&x->gl_gobj, x->gl_owner, 0);
         x->gl_isgraph = 1;
+        x->gl_hidetext = !(!(flag&2));
         if (!nogoprect && !x->gl_goprect)
         {
             t_gobj *g;
@@ -867,7 +868,7 @@ void canvas_properties(t_glist *x)
         sprintf(graphbuf,
             "pdtk_canvas_dialog %%s %g %g %d %g %g %g %g %d %d %d %d\n",
                 0., 0.,
-                1,
+                glist_isgraph(x) ,//1,
                 x->gl_x1, x->gl_y1, x->gl_x2, x->gl_y2, 
                 (int)x->gl_pixwidth, (int)x->gl_pixheight,
                 (int)x->gl_xmargin, (int)x->gl_ymargin);
@@ -897,7 +898,7 @@ static void canvas_donecanvasdialog(t_glist *x,
 
     xperpix = atom_getfloatarg(0, argc, argv);
     yperpix = atom_getfloatarg(1, argc, argv);
-    graphme = (atom_getfloatarg(2, argc, argv) != 0);
+    graphme = (int)(atom_getfloatarg(2, argc, argv));
     x1 = atom_getfloatarg(3, argc, argv);
     y1 = atom_getfloatarg(4, argc, argv);
     x2 = atom_getfloatarg(5, argc, argv);
