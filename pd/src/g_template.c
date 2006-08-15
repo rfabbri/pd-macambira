@@ -482,7 +482,6 @@ void template_notify(t_template *template, t_symbol *s, int argc, t_atom *argv)
         outlet_anything(template->t_list->x_obj.ob_outlet, s, argc, argv);
 }
 
-#if 0
     /* bash the first of (argv) with a pointer to a scalar, and send on
     to template as a notification message */
 static void template_notifyforscalar(t_template *template, t_glist *owner,
@@ -490,12 +489,11 @@ static void template_notifyforscalar(t_template *template, t_glist *owner,
 {
     t_gpointer gp;
     gpointer_init(&gp);
-    gpointer_setglist(&gp, owner, x);
+    gpointer_setglist(&gp, owner, sc);
     SETPOINTER(argv, &gp);
     template_notify(template, s, argc, argv);
     gpointer_unset(&gp);
 }
-#endif
 
     /* call this when reading a patch from a file to declare what templates
     we'll need.  If there's already a template, check if it matches.
@@ -791,6 +789,7 @@ static void fielddesc_setfloat_var(t_fielddesc *fd, t_symbol *s)
 
 #define CLOSED 1
 #define BEZ 2
+#define NOMOUSE 4
 #define A_ARRAY 55      /* LATER decide whether to enshrine this in m_pd.h */
 
 static void fielddesc_setfloatarg(t_fielddesc *fd, int argc, t_atom *argv)
@@ -956,7 +955,7 @@ t_class *curve_class;
 typedef struct _curve
 {
     t_object x_obj;
-    int x_flags;            /* CLOSED and/or BEZ */
+    int x_flags;            /* CLOSED and/or BEZ and/or NOMOUSE */
     t_fielddesc x_fillcolor;
     t_fielddesc x_outlinecolor;
     t_fielddesc x_width;
@@ -981,7 +980,6 @@ static void *curve_new(t_symbol *classsym, t_int argc, t_atom *argv)
     }
     else classname += 4;
     if (classname[0] == 'c') flags |= BEZ;
-    x->x_flags = flags;
     fielddesc_setfloat_const(&x->x_vis, 1);
     while (1)
     {
@@ -991,8 +989,14 @@ static void *curve_new(t_symbol *classsym, t_int argc, t_atom *argv)
             fielddesc_setfloatarg(&x->x_vis, 1, argv+1);
             argc -= 2; argv += 2;
         }
+        else if (!strcmp(firstarg->s_name, "-x"))
+        {
+            flags |= NOMOUSE;
+            argc -= 1; argv += 1;
+        }
         else break;
     }
+    x->x_flags = flags;
     if ((flags & CLOSED) && argc)
         fielddesc_setfloatarg(&x->x_fillcolor, argc--, argv++);
     else fielddesc_setfloat_const(&x->x_fillcolor, 0); 
@@ -1038,7 +1042,8 @@ static void curve_getrect(t_gobj *z, t_glist *glist,
     int i, n = x->x_npoints;
     t_fielddesc *f = x->x_vec;
     int x1 = 0x7fffffff, x2 = -0x7fffffff, y1 = 0x7fffffff, y2 = -0x7fffffff;
-    if (!fielddesc_getfloat(&x->x_vis, template, data, 0))
+    if (!fielddesc_getfloat(&x->x_vis, template, data, 0) ||
+        (x->x_flags & NOMOUSE))
     {
         *xp1 = *yp1 = 0x7fffffff;
         *xp2 = *yp2 = -0x7fffffff;
@@ -1185,6 +1190,7 @@ static t_scalar *curve_motion_scalar;
 static t_array *curve_motion_array;
 static t_word *curve_motion_wp;
 static t_template *curve_motion_template;
+static t_gpointer curve_motion_gpointer;
 
     /* LATER protect against the template changing or the scalar disappearing
     probably by attaching a gpointer here ... */
@@ -1193,6 +1199,12 @@ static void curve_motion(void *z, t_floatarg dx, t_floatarg dy)
 {
     t_curve *x = (t_curve *)z;
     t_fielddesc *f = x->x_vec + curve_motion_field;
+    t_atom at;
+    if (!gpointer_check(&curve_motion_gpointer, 0))
+    {
+        post("curve_motion: scalar disappeared");
+        return;
+    }
     curve_motion_xcumulative += dx;
     curve_motion_ycumulative += dy;
     if (f->fd_var && (dx != 0))
@@ -1207,6 +1219,10 @@ static void curve_motion(void *z, t_floatarg dx, t_floatarg dy)
             curve_motion_ybase + curve_motion_ycumulative * curve_motion_yper,
                 1); 
     }
+        /* LATER figure out what to do to notify for an array? */
+    if (curve_motion_scalar)
+        template_notifyforscalar(curve_motion_template, curve_motion_glist, 
+            curve_motion_scalar, gensym("change"), 1, &at);
     if (curve_motion_scalar)
         scalar_redraw(curve_motion_scalar, curve_motion_glist);
     if (curve_motion_array)
@@ -1264,6 +1280,8 @@ static int curve_click(t_gobj *z, t_glist *glist,
         curve_motion_wp = data;
         curve_motion_field = 2*bestn;
         curve_motion_template = template;
+        gpointer_setglist(&curve_motion_gpointer, curve_motion_glist,
+            curve_motion_scalar);
         glist_grab(glist, z, curve_motion, 0, xpix, ypix);
     }
     return (1);
@@ -2113,6 +2131,9 @@ static t_scalar *drawnumber_motion_scalar;
 static t_array *drawnumber_motion_array;
 static t_word *drawnumber_motion_wp;
 static t_template *drawnumber_motion_template;
+static t_gpointer drawnumber_motion_gpointer;
+static int drawnumber_motion_symbol;
+static int drawnumber_motion_firstkey;
 
     /* LATER protect against the template changing or the scalar disappearing
     probably by attaching a gpointer here ... */
@@ -2121,6 +2142,17 @@ static void drawnumber_motion(void *z, t_floatarg dx, t_floatarg dy)
 {
     t_drawnumber *x = (t_drawnumber *)z;
     t_fielddesc *f = &x->x_value;
+    t_atom at;
+    if (!gpointer_check(&drawnumber_motion_gpointer, 0))
+    {
+        post("drawnumber_motion: scalar disappeared");
+        return;
+    }
+    if (drawnumber_motion_symbol)
+    {
+        post("drawnumber_motion: symbol");
+        return;
+    }
     drawnumber_motion_ycumulative -= dy;
     template_setfloat(drawnumber_motion_template,
         f->fd_un.fd_varsym,
@@ -2128,9 +2160,82 @@ static void drawnumber_motion(void *z, t_floatarg dx, t_floatarg dy)
             drawnumber_motion_ycumulative,
                 1);
     if (drawnumber_motion_scalar)
+        template_notifyforscalar(drawnumber_motion_template,
+            drawnumber_motion_glist, drawnumber_motion_scalar,
+                gensym("change"), 1, &at);
+
+    if (drawnumber_motion_scalar)
         scalar_redraw(drawnumber_motion_scalar, drawnumber_motion_glist);
     if (drawnumber_motion_array)
         array_redraw(drawnumber_motion_array, drawnumber_motion_glist);
+}
+
+static void drawnumber_key(void *z, t_floatarg fkey)
+{
+    t_drawnumber *x = (t_drawnumber *)z;
+    t_fielddesc *f = &x->x_value;
+    int key = fkey;
+    char sbuf[MAXPDSTRING];
+    t_atom at;
+    if (!gpointer_check(&drawnumber_motion_gpointer, 0))
+    {
+        post("drawnumber_motion: scalar disappeared");
+        return;
+    }
+    if (key == 0)
+        return;
+    if (drawnumber_motion_symbol)
+    {
+            /* key entry for a symbol field */
+        if (drawnumber_motion_firstkey)
+            sbuf[0] = 0;
+        else strncpy(sbuf, template_getsymbol(drawnumber_motion_template,
+            f->fd_un.fd_varsym, drawnumber_motion_wp, 1)->s_name,
+                MAXPDSTRING);
+        sbuf[MAXPDSTRING-1] = 0;
+        if (key == '\b')
+        {
+            if (*sbuf)
+                sbuf[strlen(sbuf)-1] = 0;
+        }
+        else
+        {
+            sbuf[strlen(sbuf)+1] = 0;
+            sbuf[strlen(sbuf)] = key;
+        }
+    }
+    else
+    {
+            /* key entry for a numeric field.  This is just a stopgap. */
+        float newf;
+        if (drawnumber_motion_firstkey)
+            sbuf[0] = 0;
+        else sprintf(sbuf, "%g", template_getfloat(drawnumber_motion_template,
+            f->fd_un.fd_varsym, drawnumber_motion_wp, 1));
+        drawnumber_motion_firstkey = (key == '\n');
+        if (key == '\b')
+        {
+            if (*sbuf)
+                sbuf[strlen(sbuf)-1] = 0;
+        }
+        else
+        {
+            sbuf[strlen(sbuf)+1] = 0;
+            sbuf[strlen(sbuf)] = key;
+        }
+        if (sscanf(sbuf, "%g", &newf) < 1)
+            newf = 0;
+        template_setfloat(drawnumber_motion_template,
+            f->fd_un.fd_varsym, drawnumber_motion_wp, newf, 1);
+        if (drawnumber_motion_scalar)
+            template_notifyforscalar(drawnumber_motion_template,
+                drawnumber_motion_glist, drawnumber_motion_scalar,
+                    gensym("change"), 1, &at);
+        if (drawnumber_motion_scalar)
+            scalar_redraw(drawnumber_motion_scalar, drawnumber_motion_glist);
+        if (drawnumber_motion_array)
+            array_redraw(drawnumber_motion_array, drawnumber_motion_glist);
+    }
 }
 
 static int drawnumber_click(t_gobj *z, t_glist *glist, 
@@ -2154,9 +2259,14 @@ static int drawnumber_click(t_gobj *z, t_glist *glist,
             drawnumber_motion_template = template;
             drawnumber_motion_scalar = sc;
             drawnumber_motion_array = ap;
+            drawnumber_motion_firstkey = 1;
             drawnumber_motion_ycumulative =
                 fielddesc_getfloat(&x->x_value, template, data, 0);
-            glist_grab(glist, z, drawnumber_motion, 0, xpix, ypix);
+            drawnumber_motion_symbol = ((x->x_flags & DRAW_SYMBOL) != 0);
+            gpointer_setglist(&drawnumber_motion_gpointer, 
+                drawnumber_motion_glist, drawnumber_motion_scalar);
+            glist_grab(glist, z, drawnumber_motion, drawnumber_key,
+                xpix, ypix);
         }
         return (1);
     }

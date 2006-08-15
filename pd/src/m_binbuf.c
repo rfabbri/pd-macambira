@@ -490,11 +490,12 @@ t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew)
      * whenever this happened, enable this code
      */
     substr=strchr(str, '$');
-    if(substr)
-    {
-        strncat(buf2, str, (substr-str));
-        str=substr+1;
-    }
+    if (!substr || substr-str >= MAXPDSTRING)
+        return (s);
+
+    strncat(buf2, str, (substr-str));
+    str=substr+1;
+
 #endif
 
     while((next=binbuf_expanddollsym(str, buf, dollarnull, ac, av, tonew))>=0)
@@ -527,6 +528,7 @@ t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew)
         }
     }
 done:
+    post("realize %s->%s", s->s_name, buf2);
     return (gensym(buf2));
 }
 
