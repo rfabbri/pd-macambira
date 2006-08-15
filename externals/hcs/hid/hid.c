@@ -149,11 +149,11 @@ static unsigned int name_to_usage(char *usage_name)
 static short get_device_number_from_arguments(int argc, t_atom *argv)
 {
 	short device_number = -1;
-	unsigned short usage_number;
+	unsigned short device_type_instance;
 	unsigned int usage;
 	unsigned short vendor_id;
 	unsigned short product_id;
-	char usage_string[MAXPDSTRING] = "";
+	char device_type_string[MAXPDSTRING] = "";
 	t_symbol *first_argument;
 	t_symbol *second_argument;
 
@@ -162,20 +162,19 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 		first_argument = atom_getsymbolarg(0,argc,argv);
 		if(first_argument == &s_) 
 		{ // single float arg means device #
+			post("first_argument == &s_");
 			device_number = (short) atom_getfloatarg(0,argc,argv);
 			if(device_number < 0) device_number = -1;
 			debug_print(LOG_DEBUG,"[hid] setting device# to %d",device_number);
 		}
 		else
-		{ // single symbol arg means first instance of usage
-			debug_print(LOG_DEBUG,"[hid] setting device via usagepage/usage");
-			atom_string(argv, usage_string, MAXPDSTRING-1);
-			usage = name_to_usage(usage_string);
-			device_number = get_device_number_from_usage_list(0, 
-															  usage >> 16, 
-															  usage & 0xffff);
+		{ // single symbol arg means first instance of a device type
+			atom_string(argv, device_type_string, MAXPDSTRING-1);
+			usage = name_to_usage(device_type_string);
+			device_number = get_device_number_from_usage(0, usage >> 16, 
+														 usage & 0xffff);
 			debug_print(LOG_INFO,"[hid] using 0x%04x 0x%04x for %s",
-						usage, usage >> 16, usage & 0xffff, usage_string);
+						usage >> 16, usage & 0xffff, device_type_string);
 		}
 	}
 	else if(argc == 2)
@@ -184,12 +183,12 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 		second_argument = atom_getsymbolarg(1,argc,argv);
 		if( second_argument == &s_ ) 
 		{ /* a symbol then a float means match on usage */
-			atom_string(argv, usage_string, MAXPDSTRING-1);
-			usage = name_to_usage(usage_string);
-			usage_number = atom_getfloatarg(1,argc,argv);
+			atom_string(argv, device_type_string, MAXPDSTRING-1);
+			usage = name_to_usage(device_type_string);
+			device_type_instance = atom_getfloatarg(1,argc,argv);
 			debug_print(LOG_DEBUG,"[hid] looking for %s at #%d",
-						usage_string,usage_number);
-			device_number = get_device_number_from_usage_list(usage_number,
+						device_type_string, device_type_instance);
+			device_number = get_device_number_from_usage(device_type_instance,
 															  usage >> 16, 
 															  usage & 0xffff);
 		}
@@ -211,10 +210,20 @@ void hid_output_event(t_hid *x, t_hid_element *output_data)
 	if( (output_data->value != output_data->previous_value) ||
 		(output_data->relative) )  // relative data should always be output
 	{
+#if 1
+		// this is [hid] compatible
 		t_atom event_data[2];
 		SETSYMBOL(event_data, output_data->name);
 		SETFLOAT(event_data + 1, output_data->value);
 		outlet_anything(x->x_data_outlet,output_data->type,2,event_data);
+#else
+		// this outputs instance number, for [hid] v2
+		t_atom event_data[3];
+		SETSYMBOL(event_data, output_data->name);
+		SETFLOAT(event_data + 1, output_data->instance);
+		SETFLOAT(event_data + 2, output_data->value);
+		outlet_anything(x->x_data_outlet,output_data->type,3,event_data);
+#endif
 	}
 }
 

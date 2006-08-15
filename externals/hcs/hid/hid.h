@@ -15,7 +15,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 7
 
-/* static char *version = "$Revision: 1.26 $"; */
+/* static char *version = "$Revision: 1.27 $"; */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -118,7 +118,7 @@ void hid_print(t_hid* x); /* print info to the console */
 void hid_platform_specific_info(t_hid* x); /* device info on the status outlet */
 void hid_platform_specific_free(t_hid *x);
 short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id);
-short get_device_number_from_usage_list(short device_number, 
+short get_device_number_from_usage(short device_number, 
 										unsigned short usage_page, 
 										unsigned short usage);
 

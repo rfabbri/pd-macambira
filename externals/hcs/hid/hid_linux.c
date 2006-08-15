@@ -43,14 +43,14 @@
 /* LINUX-SPECIFIC SUPPORT FUNCTIONS */
 /* ------------------------------------------------------------------------------ */
 
-/* JMZ: i changed the convert functions (and the get-event function too!) to return
- * t_symbol* instead of writing into a fixed-sized buffer (which was way too
- * small and those made this object crash)
- * in order to change as little lines as possible the callback functions to the
- * hid-object still use (char*): so we convert a char[] into a symbol and then 
- * extract the (char*) out of it to make it a symbol again
- * LATER: use t_symbol's all over, since it is very flexible (with respect to length)
- * and sooner or later the strings are converted to t_symbol anyhow...
+/* JMZ: i changed the convert functions (and the get-event function too!) to
+ * return t_symbol* instead of writing into a fixed-sized buffer (which was
+ * way too small and those made this object crash) in order to change as
+ * little lines as possible the callback functions to the hid-object still use
+ * (char*): so we convert a char[] into a symbol and then extract the (char*)
+ * out of it to make it a symbol again LATER: use t_symbol's all over, since
+ * it is very flexible (with respect to length) and sooner or later the
+ * strings are converted to t_symbol anyhow...
  *
  * Why? bug-fixing
  */
@@ -510,7 +510,7 @@ t_int get_device_number_by_id(unsigned short vendor_id, unsigned short product_i
     return -1;
 }
 
-t_int get_device_number_from_usage_list(t_int device_number, 
+t_int get_device_number_from_usage(t_int device_number, 
                                         unsigned short usage_page, 
                                         unsigned short usage)
 {

@@ -23,23 +23,6 @@ I think they are unimplemented... :-(
 ______________________________________________________________________________
 = array lookups for symbols
 
-- make arrays to lookup symbols by usagepage# and usage#
-
-- advantage: much fewer symbol lookups
-
-- disadvantage: much more RAM used.
-
-implementation idea #1:
-
-make hid-specific gensym() function which checks an array for the symbol by
-#.  If it doesn't exist, it looks up the symbol and adds it to the array.  The
-array size should be dynamically allocated so that [hid] doesn't use massive
-amounts of memory.
-
-If no vendor-defined pages are used, then the array could be quite small.  If
-only one usage page is used, then it would also be not too big.  Otherwise, it
-could use 10+ megs of RAM... hmm..
-
 implementation idea #2:
 
 this array should be built by hid_build_elements_list().  Then each time it
@@ -58,6 +41,15 @@ struct _hid_element
 
 For Linux input.h, instead void *element, store the type and code numbers to
 compare against
+
+
+______________________________________________________________________________
+= make only the first executed instance fetch the data
+
+ the function is ugen_getsortno() -- returns
+an integer which increases eachtime DSP is restarted.  You can add the
+function call (to the ugen chain for instance) each time you see
+ugen_getsortno() return an integer greater than the previous one you've
 
 ______________________________________________________________________________
 = output one value per poll
@@ -95,6 +87,21 @@ ______________________________________________________________________________
 
 - Logical Min/Max i.e. [range -127 127(
 - device string  [name Trackpad( 
+
+______________________________________________________________________________
+= get tablets working on Mac OS X
+
+http://www.versiontracker.com/php/feedback/article.php?story=20051221163326829
+
+http://www.wacom-europe.com/forum/topic.asp?TOPIC_ID=2719&ARCHIVE=
+
+______________________________________________________________________________
+= block devices like mice/keyboards etc from outputting
+
+at least document the procedure needed
+
+Mac OS X:
+http://lists.apple.com/archives/usb/2005/Aug/msg00068.html
 
 
 

@@ -2,7 +2,7 @@
 /*
  *  Apple Darwin HID Manager support for Pd [hid] object
  *
- *  some code from SuperCollider3's SC_HID.cpp by Jan Truetzschler v. Falkenstein
+ *  some code from SuperCollider3's SC_HID.cpp by Jan Truetzschler Falkenstein
  *
  *  Copyright (c) 2004 Hans-Christoph All rights reserved.
  *
@@ -301,7 +301,7 @@ static t_float get_type_name_instance(t_symbol *type, t_symbol *name,
 
 short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
 {
-	debug_print(LOG_DEBUG,"get_device_number_from_usage_list");
+	debug_print(LOG_DEBUG,"get_device_number_from_usage");
 
 	pRecDevice    pCurrentHIDDevice;
 	t_int i;
@@ -331,10 +331,11 @@ short get_device_number_by_id(unsigned short vendor_id, unsigned short product_i
 	return(return_device_number);
 }
 
-short get_device_number_from_usage_list(short device_number, 
-										unsigned short usage_page, unsigned short usage)
+short get_device_number_from_usage(short device_number, 
+										unsigned short usage_page, 
+										unsigned short usage)
 {
-//	debug_print(LOG_DEBUG,"get_device_number_from_usage_list");
+//	debug_print(LOG_DEBUG,"get_device_number_from_usage");
 
 	pRecDevice    pCurrentHIDDevice;
 	t_int i;
