@@ -19,15 +19,18 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <m_pd.h>
+
 #include <math.h>
-#include "extlib_util.h"
 #include <stdlib.h>
+//#include "m_pd.h"
+#include "extlib_util.h"
+                               
+
 
 typedef struct permutctl
 {
   char c_type;
-  t_int *c_permutationtable;
+  int *c_permutationtable;
   int c_blocksize;
 } t_permutctl;
 
@@ -59,7 +62,7 @@ static void permut_random(t_permut *x, t_floatarg seed)
   int i,j;
   int N = x->x_ctl.c_blocksize;
   int mask = N-1;
-  t_int *p = x->x_ctl.c_permutationtable;
+  int *p = x->x_ctl.c_permutationtable;
   int r, last = 0;
 
   //srand(* ((unsigned int *)(&seed)));
@@ -100,7 +103,7 @@ static void permut_resize_table(t_permut *x, int size)
     {
       if (x->x_ctl.c_permutationtable)
 	free(x->x_ctl.c_permutationtable);
-      x->x_ctl.c_permutationtable = (t_int *)malloc(sizeof(int)*size);
+      x->x_ctl.c_permutationtable = (int *)malloc(sizeof(int)*size);
       x->x_ctl.c_blocksize = size;
 
       /* make sure it's initialized */

@@ -49,7 +49,7 @@ static void ffpoly_compute(t_ffpoly *x, t_floatarg fcoef)
     int in = (int)fcoef;
     int fo = x->x_field_order;
     int po = x->x_poly_order;
-    t_int* c = x->x_coef;
+    int* c = x->x_coef;
     int i, out;
 
     in %= fo;
@@ -135,7 +135,7 @@ static void *ffpoly_new(t_floatarg fpolyorder, t_floatarg ffieldorder)
     x->x_poly_order = polyorder;
     x->x_field_order = fieldorder;
 
-    x->x_coef = (t_int *)malloc((x->x_poly_order  + 1) * sizeof(int));
+    x->x_coef = (int *)malloc((x->x_poly_order  + 1) * sizeof(int));
 
     /* set poly to f(x) = x */
     ffpoly_coefficients(x, x->x_field_order);

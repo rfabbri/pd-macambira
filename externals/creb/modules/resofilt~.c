@@ -86,15 +86,19 @@ static t_int *resofilt_perform_fourpole(t_int *w)
   t_float f_prev = ctl->c_f_prev;
   t_float r_prev = ctl->c_r_prev;
 
-  /* use rms of input to drive freq and reso
-     this is such that connecting a dsp signal to the inlets has a reasonable result,
-     even if the inputs are oscillatory. the rms values will be interpolated linearly
-     (that is, linearly in the "analog" domain, so exponentially in the z-domain)  */
+  /* use rms of input to drive freq and reso.  this is such that
+     connecting a dsp signal to the inlets has a reasonable result,
+     even if the inputs are oscillatory. the rms values will be
+     interpolated linearly (that is, linearly in the "analog" domain,
+     so exponentially in the z-domain)  */
 
   reso_rms = freq_rms = 0.0f;
   for (i=0; i<n; i++){
-      t_float _freq = *freq++; /* first input is the reso frequency (absolute) */
-      t_float _reso = *reso++; /* second input is the resonnance (0->1), >1 == self osc */
+      /* first input is the reso frequency (absolute) */
+      t_float _freq = *freq++; 
+      /* second input is the resonnance (0->1), >1 == self osc */
+      t_float _reso = *reso++; 
+
       freq_rms += _freq * _freq;
       reso_rms += _reso * _reso;
   }
@@ -104,12 +108,14 @@ static t_int *resofilt_perform_fourpole(t_int *w)
   r = sqrt(sqrt(reso_rms));         
 
 
-  /* calculate the new pole locations
-     we use an impulse invariant transform: the moog vcf poles are located at
+  /* calculate the new pole locations.  we use an impulse invariant
+     transform: the moog vcf poles are located at 
+
      s_p = (-1 +- r \sqrt{+- j}, with r = (k/4)^(1/4) \in [0,1]
 
-     the poles are always complex, so we can use an orthogonal implementation
-     both conj pole pairs have the same angle, so we can use one phasor and 2 radii
+     the poles are always complex, so we can use an orthogonal
+     implementation both conj pole pairs have the same angle, so we
+     can use one phasor and 2 radii
   */
 
   /* compute phasor, radius and update eqs
@@ -179,7 +185,8 @@ static t_int *resofilt_perform_fourpole(t_int *w)
 
       *out++ = x;
 
-      /* saturate (normalize if pow > 1) state to prevent explosion and to allow self-osc */
+      /* saturate (normalize if pow > 1) state to prevent explosion
+       * and to allow self-osc */
       _sat_state(stateA);
       _sat_state(stateB);
       
@@ -222,13 +229,15 @@ static t_int *resofilt_perform_threepole(t_int *w)
   t_float f_prev = ctl->c_f_prev;
   t_float r_prev = ctl->c_r_prev;
 
-  t_float sqrt5 = sqrtf(5.0f);
+  t_float sqrt5 = sqrt(5.0);
 
   /* use rms of input to drive freq and reso */
   reso_rms = freq_rms = 0.0f;
   for (i=0; i<n; i++){
-      t_float _freq = *freq++; /* first input is the reso frequency (absolute) */
-      t_float _reso = *reso++; /* second input is the resonnance (0->1), >1 == self osc */
+      /* first input is the reso frequency (absolute) */
+      t_float _freq = *freq++;
+      /* second input is the resonnance (0->1), >1 == self osc */
+      t_float _reso = *reso++;
       freq_rms += _freq * _freq;
       reso_rms += _reso * _reso;
   }
@@ -238,8 +247,9 @@ static t_int *resofilt_perform_threepole(t_int *w)
   r = cbrt(reso_rms);         
 
 
-  /* calculate the new pole locations
-     we use an impulse invariant transform: the 303 vcf poles are located at
+  /* calculate the new pole locations. we use an impulse invariant
+     transform: the 303 vcf poles are located at
+
      s_p = omega(-1 + r sqrt(5) e^{pi/3(1+2p)})
 
      real pole: omega * (-1 -r)
@@ -248,13 +258,13 @@ static t_int *resofilt_perform_threepole(t_int *w)
        imag = omega (+- 2 r)
 
      
-     this is a strange beast. legend goes it was "invented" by taking the moog vcf
-     and moving one cap up, such that the not-so controllable 3-pole that emerged
-     would avoid the moog patent..
+     this is a strange beast. legend goes it was "invented" by taking
+     the moog vcf and moving one cap up, such that the not-so
+     controllable 3-pole that emerged would avoid the moog patent..
 
-     so, the sound is not so much the locations of the poles, but how the filter
-     reacts to time varying controls. i.e. the pole movement with constant reso,
-     used in the tb-303.
+     so, the sound is not so much the locations of the poles, but how
+     the filter reacts to time varying controls. i.e. the pole
+     movement with constant reso, used in the tb-303.
 
   */
 
@@ -320,7 +330,8 @@ static t_int *resofilt_perform_threepole(t_int *w)
 
       *out++ = x;
 
-      /* saturate (normalize if pow > 1) state to prevent explosion and to allow self-osc */
+      /* saturate (normalize if pow > 1) state to prevent explosion
+       * and to allow self-osc */
       _sat_state(stateA);
       _sat_state(stateB);
       

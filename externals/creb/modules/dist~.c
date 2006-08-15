@@ -17,8 +17,8 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <m_pd.h>
-#include <math.h>
+#include "extlib_util.h"
+
 
 #define     CLIP          0
 #define     INVERSE       1
@@ -237,7 +237,8 @@ static t_int *dist_perform(t_int *w)
 
 static void dist_dsp(t_dist *x, t_signal **sp)
 {
-    dsp_add(dist_perform, 4, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
+    dsp_add(dist_perform, 4, &x->x_ctl, sp[0]->s_n, 
+	    sp[0]->s_vec, sp[1]->s_vec);
 
 }                                  
 void dist_free(void)

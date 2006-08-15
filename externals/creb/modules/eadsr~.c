@@ -17,8 +17,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <m_pd.h>
-#include <math.h>
 #include "extlib_util.h"
 
 typedef struct eadsrctl
@@ -134,12 +132,13 @@ void eadsr_free(void)
 
 t_class *eadsr_class;
 
-void *eadsr_new(t_floatarg attack, t_floatarg decay, t_floatarg sustain, t_floatarg release)
+void *eadsr_new(t_floatarg attack, t_floatarg decay, 
+		t_floatarg sustain, t_floatarg release)
 {
     t_eadsr *x = (t_eadsr *)pd_new(eadsr_class);
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("attack"));  
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("decay"));  
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("sustain"));     
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("sustain"));
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("release"));
     outlet_new(&x->x_obj, gensym("signal")); 
 
@@ -158,50 +157,24 @@ void eadsr_tilde_setup(void)
 {
     //post("eadsr~ v0.1");
     eadsr_class = class_new(gensym("eadsr~"), (t_newmethod)eadsr_new,
-    	(t_method)eadsr_free, sizeof(t_eadsr), 0,  A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_addmethod(eadsr_class, (t_method)eadsr_float, gensym("float"), A_FLOAT, 0);
-    class_addmethod(eadsr_class, (t_method)eadsr_start, gensym("start"), 0);
+    	(t_method)eadsr_free, sizeof(t_eadsr), 0,  A_DEFFLOAT, 
+			    A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod(eadsr_class, (t_method)eadsr_float,
+		    gensym("float"), A_FLOAT, 0);
+    class_addmethod(eadsr_class, (t_method)eadsr_start,
+		    gensym("start"), 0);
     class_addmethod(eadsr_class, (t_method)eadsr_start, gensym("bang"), 0);
     class_addmethod(eadsr_class, (t_method)eadsr_stop, gensym("stop"), 0);
     class_addmethod(eadsr_class, (t_method)eadsr_dsp, gensym("dsp"), 0); 
-    class_addmethod(eadsr_class, (t_method)eadsr_attack, gensym("attack"), A_FLOAT, 0);
-    class_addmethod(eadsr_class, (t_method)eadsr_decay, gensym("decay"), A_FLOAT, 0);
-    class_addmethod(eadsr_class, (t_method)eadsr_sustain, gensym("sustain"), A_FLOAT, 0);
-    class_addmethod(eadsr_class, (t_method)eadsr_release, gensym("release"), A_FLOAT, 0);
+    class_addmethod(eadsr_class, (t_method)eadsr_attack,
+		    gensym("attack"), A_FLOAT, 0);
+    class_addmethod(eadsr_class, (t_method)eadsr_decay,
+		    gensym("decay"), A_FLOAT, 0);
+    class_addmethod(eadsr_class, (t_method)eadsr_sustain,
+		    gensym("sustain"), A_FLOAT, 0);
+    class_addmethod(eadsr_class, (t_method)eadsr_release,
+		    gensym("release"), A_FLOAT, 0);
 
 
 }
 
-/*
- *   Utility functions for exponential decay 
- *   Copyright (c) 2000-2003 by Tom Schouten
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- */
-
-
-//#include "extlib_util.h"
-
-float milliseconds_2_one_minus_realpole(float time)
-{
-  float r;
-
-  if (time < 0.0f) time = 0.0f;
-  r = -expm1(1000.0f * log(ENVELOPE_RANGE) / (sys_getsr() * time));
-  if (!(r < 1.0f)) r = 1.0f;
-
-  //post("%f",r);
-  return r;
-}

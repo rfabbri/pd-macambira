@@ -26,10 +26,8 @@ add more diffuse feedback matrix (hadamard)
 check filtering code
 
 */
-#include <m_pd.h>
-#include <math.h>
-#include "extlib_util.h"
 
+#include "extlib_util.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -106,7 +104,8 @@ typedef struct fdn
 
 static void fdn_order(t_fdn *x, t_int order){
   if (order > x->x_ctl.c_maxorder) {
-    post("fdn: this should not happen (panic!) order %d is larger than maxorder %d:", 
+    post("fdn: this should not happen (panic!) order %d "
+	 "is larger than maxorder %d:", 
 	 order, x->x_ctl.c_maxorder ); 
     exit(1);
   }
@@ -131,8 +130,12 @@ static void fdn_print(t_fdn *x)
 static void fdn_reset(t_fdn *x)
 {
   int i;
-  if (x->x_ctl.c_buf) memset(x->x_ctl.c_buf, 0, x->x_ctl.c_bufsize * sizeof(float));
-  if (x->x_ctl.c_vectorbuffer) memset(x->x_ctl.c_vectorbuffer, 0, x->x_ctl.c_maxorder * 2 * sizeof(float));
+  if (x->x_ctl.c_buf) 
+      memset(x->x_ctl.c_buf, 0, x->x_ctl.c_bufsize 
+	     * sizeof(float));
+  if (x->x_ctl.c_vectorbuffer) 
+      memset(x->x_ctl.c_vectorbuffer,
+	     0, x->x_ctl.c_maxorder * 2 * sizeof(float));
 }
 
 
@@ -326,7 +329,7 @@ static void fdn_setupdelayline(t_fdn *x){
   int sum, t, n;
   int mask = x->x_ctl.c_bufsize - 1;
   int start =  x->x_ctl.c_tap[0];
-  t_int *tap = x->x_ctl.c_tap;
+  int *tap = x->x_ctl.c_tap;
   float *length = x->x_ctl.c_length;
   float scale = sys_getsr() * .001f;
 
@@ -338,7 +341,8 @@ static void fdn_setupdelayline(t_fdn *x){
   }
 
   if (sum > mask){ 
-    post("fdn: warning: not enough delay memory, behaviour is undefined (this could lead to instability...)");
+    post("fdn: warning: not enough delay memory, behaviour "
+	 "is undefined (this could lead to instability...)");
   }
     
 
@@ -442,7 +446,8 @@ static void *fdn_new(t_floatarg maxiorder, t_floatarg maxibufsize)
   bufsize = bufround;
   
 
-  post("fdn: maximum nb of delay lines %d, total buffer size %d samples (%f seconds)", 
+  post("fdn: maximum nb of delay lines %d, total buffer "
+       "size %d samples (%f seconds)", 
        order, bufsize, ((float)bufsize) / sys_getsr());
   
   
@@ -489,12 +494,16 @@ void fdn_tilde_setup(void)
     CLASS_MAINSIGNALIN(fdn_class, t_fdn, x_f); 
     class_addmethod(fdn_class, (t_method)fdn_print, gensym("print"), 0);
     class_addmethod(fdn_class, (t_method)fdn_reset, gensym("reset"), 0);
-    class_addmethod(fdn_class, (t_method)fdn_timehigh, gensym("timehigh"), A_DEFFLOAT, 0);
-    class_addmethod(fdn_class, (t_method)fdn_timelow, gensym("timelow"), A_DEFFLOAT, 0);
+    class_addmethod(fdn_class, (t_method)fdn_timehigh,
+		    gensym("timehigh"), A_DEFFLOAT, 0);
+    class_addmethod(fdn_class, (t_method)fdn_timelow,
+		    gensym("timelow"), A_DEFFLOAT, 0);
     class_addmethod(fdn_class, (t_method)fdn_list, gensym("lines"), A_GIMME, 0);
     class_addmethod(fdn_class, (t_method)fdn_dsp, gensym("dsp"), 0); 
-    class_addmethod(fdn_class, (t_method)fdn_linear, gensym("linear"), A_FLOAT, A_FLOAT, A_FLOAT, 0); 
-    class_addmethod(fdn_class, (t_method)fdn_exponential, gensym("exponential"), A_FLOAT, A_FLOAT, A_FLOAT, 0); 
+    class_addmethod(fdn_class, (t_method)fdn_linear,
+		    gensym("linear"), A_FLOAT, A_FLOAT, A_FLOAT, 0); 
+    class_addmethod(fdn_class, (t_method)fdn_exponential,
+		    gensym("exponential"), A_FLOAT, A_FLOAT, A_FLOAT, 0); 
 
 }
 

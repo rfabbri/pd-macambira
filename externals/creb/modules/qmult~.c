@@ -147,7 +147,8 @@ static void *qmult_new(t_floatarg channels)
     int i;
     t_qmult *x = (t_qmult *)pd_new(qmult_class);
 
-    for (i=1;i<8;i++) inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("signal"), gensym("signal")); 
+    for (i=1;i<8;i++) inlet_new(&x->x_obj, &x->x_obj.ob_pd,
+				gensym("signal"), gensym("signal")); 
     for (i=0;i<4;i++) outlet_new(&x->x_obj, gensym("signal")); 
 
     return (void *)x;

@@ -64,8 +64,12 @@ typedef struct eblosc
 
 
 /* phase converters */
-static inline float _phase_to_float(u32 p){return ((float)p) * (1.0f / 4294967296.0f);}
-static inline u32 _float_to_phase(float f){return (u32)(f * 4294967296.0f);}
+static inline float _phase_to_float(u32 p){
+    return ((float)p) * (1.0f / 4294967296.0f);
+}
+static inline u32 _float_to_phase(float f){
+    return (u32)(f * 4294967296.0f);
+}
 
 
 
@@ -144,8 +148,8 @@ static void _bang_comparator(t_ebloscctl *ctl, float prev, float curr)
 
 	int voice;
 
-	/* determine the location of the discontinuity (in oversampled coordiates
- 	  using linear interpolation */
+	/* determine the location of the discontinuity (in oversampled
+ 	  coordiates using linear interpolation */
 
 	float f = (float)S * curr / (curr - prev);
 
@@ -208,8 +212,8 @@ static void _bang_phasor(t_ebloscctl *ctl, float freq)
 	voice = ctl->c_next_voice++;
 	ctl->c_next_voice &= VOICES-1;
 	    
-	/* determine the location of the discontinuity (in oversampled coordinates)
-	   which is S * (new phase) / (increment) */
+	/* determine the location of the discontinuity (in oversampled
+	   coordinates) which is S * (new phase) / (increment) */
 	    
 	table_index = phase / phase_inc_decimated;
 	    
@@ -218,7 +222,8 @@ static void _bang_phasor(t_ebloscctl *ctl, float freq)
 
 	table_phase = phase - (table_index * phase_inc_decimated);
 	    
-	/* use it to initialize the new voice index and interpolation fraction */
+	/* use it to initialize the new voice index and interpolation
+	 * fraction */
 	    
 	ctl->c_index[voice] = table_index;
 	ctl->c_frac[voice] = (float)table_phase / (float)phase_inc_decimated;
@@ -233,9 +238,9 @@ static void _bang_phasor(t_ebloscctl *ctl, float freq)
 }
 
 
-/* the 2 oscillator version:
-   the second osc can reset the first osc's phase (hence it determines the pitch)
-   the first osc determines the waveform */
+/* the 2 oscillator version: the second osc can reset the first osc's
+   phase (hence it determines the pitch) the first osc determines the
+   waveform */
 
 static void _bang_hardsync_phasor(t_ebloscctl *ctl, float freq, float freq2)
 {
@@ -297,8 +302,8 @@ static void _bang_hardsync_phasor(t_ebloscctl *ctl, float freq, float freq2)
 	voice = ctl->c_next_voice++;
 	ctl->c_next_voice &= VOICES-1;
 	    
-	/* determine the location of the discontinuity (in oversampled coordinates)
-	   which is S * (new phase) / (increment) */
+	/* determine the location of the discontinuity (in oversampled
+	   coordinates) which is S * (new phase) / (increment) */
 
 	table_index = phase / phase_inc_decimated;
 	    
@@ -307,11 +312,11 @@ static void _bang_hardsync_phasor(t_ebloscctl *ctl, float freq, float freq2)
 
 	table_phase = phase - (table_index * phase_inc_decimated);
 
-	/* determine the step size
-	   as opposed to saw/impulse waveforms, the step is not always equal to one. it is:
-           oldphase - phase + phase_inc 
-	   but for the unit step this will overflow to zero, so we
-	   reduce the bit depth to prevent overflow */
+	/* determine the step size. as opposed to saw/impulse
+	   waveforms, the step is not always equal to one. it is:
+	   oldphase - phase + phase_inc but for the unit step this
+	   will overflow to zero, so we reduce the bit depth to
+	   prevent overflow */
 
 	stepsize = _phase_to_float(((oldphase-phase) >> LOVERSAMPLE)
 				   + phase_inc_decimated) * (float)S;
@@ -354,7 +359,8 @@ static t_int *eblosc_perform_hardsync_saw(t_int *w)
 	/* add aliased sawtooth wave */
 	sample += _phase_to_float(ctl->c_phase) - 0.5f;
 
-	/* highpass filter output to remove DC offset and low frequency aliasing */
+	/* highpass filter output to remove DC offset and low
+	 * frequency aliasing */
 	ctl->c_butter->BangSmooth(sample, sample, 0.05f);
 
 	/* send to output */
@@ -416,7 +422,8 @@ static t_int *eblosc_perform_pulse(t_int *w)
 	/* get the bandlimited discontinuity */
 	float sample = _get_bandlimited_discontinuity(ctl, bli);
 
-	/* highpass filter output to remove DC offset and low frequency aliasing */
+	/* highpass filter output to remove DC offset and low
+	 * frequency aliasing */
 	ctl->c_butter->BangSmooth(sample, sample, 0.05f);
 
 	/* send to output */
@@ -496,30 +503,35 @@ static void eblosc_dsp(t_eblosc *x, t_signal **sp)
   if (x->x_ctl.c_waveform == gensym("syncsaw")){
       x->x_ctl.c_scale = 1.0f;
       x->x_ctl.c_scale_update = 1.0f;
-      dsp_add(eblosc_perform_hardsync_saw, 5, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec);
+      dsp_add(eblosc_perform_hardsync_saw, 5, &x->x_ctl, sp[0]->s_n,
+	      sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec);
   }
 
   /* 1 osc */
   else if (x->x_ctl.c_waveform == gensym("pulse")){
       x->x_ctl.c_scale = 1.0f;
       x->x_ctl.c_scale_update = 1.0f;
-      dsp_add(eblosc_perform_pulse, 4, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
+      dsp_add(eblosc_perform_pulse, 4, &x->x_ctl, sp[0]->s_n,
+	      sp[0]->s_vec, sp[1]->s_vec);
   }
   else if (x->x_ctl.c_waveform == gensym("pulse2")){
       x->x_ctl.c_phase_inc_scale *= 2;
       x->x_ctl.c_scale = 1.0f;
       x->x_ctl.c_scale_update = -1.0f;
-      dsp_add(eblosc_perform_pulse, 4, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
+      dsp_add(eblosc_perform_pulse, 4, &x->x_ctl, sp[0]->s_n,
+	      sp[0]->s_vec, sp[1]->s_vec);
   }
   else if (x->x_ctl.c_waveform == gensym("comparator")){
       x->x_ctl.c_scale = 1.0f;
       x->x_ctl.c_scale_update = 1.0f;
-      dsp_add(eblosc_perform_comparator, 4, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
+      dsp_add(eblosc_perform_comparator, 4, &x->x_ctl,
+	      sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
   }
   else{
        x->x_ctl.c_scale = 1.0f;
       x->x_ctl.c_scale_update = 1.0f;
-      dsp_add(eblosc_perform_saw, 4, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
+      dsp_add(eblosc_perform_saw, 4, &x->x_ctl, sp[0]->s_n,
+	      sp[0]->s_vec, sp[1]->s_vec);
   }
 
 
@@ -542,12 +554,14 @@ static void *eblosc_new(t_symbol *s)
 
     /* optional signal inlets */
     if (s == gensym("syncsaw")){
-	inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("signal"), gensym("signal"));  
+	inlet_new(&x->x_obj, &x->x_obj.ob_pd,
+		  gensym("signal"), gensym("signal"));  
     }
 
     /* optional phase inlet */
     if (s != gensym("comparator")){
-	inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("phase"));  
+	inlet_new(&x->x_obj, &x->x_obj.ob_pd,
+		  gensym("float"), gensym("phase"));  
     }
 
     /* create the postfilter */
@@ -585,15 +599,16 @@ extern "C"
 	build_tables();
 	
 	eblosc_class = class_new(gensym("eblosc~"), (t_newmethod)eblosc_new,
-				(t_method)eblosc_free, sizeof(t_eblosc), 0, A_DEFSYMBOL, A_NULL);
+				(t_method)eblosc_free, sizeof(t_eblosc),
+				 0, A_DEFSYMBOL, A_NULL);
 	CLASS_MAINSIGNALIN(eblosc_class, t_eblosc, x_f);
-	class_addmethod(eblosc_class, (t_method)eblosc_dsp, gensym("dsp"), A_NULL); 
-	class_addmethod(eblosc_class, (t_method)eblosc_phase, gensym("phase"), A_FLOAT, A_NULL); 
-	class_addmethod(eblosc_class, (t_method)eblosc_phase2, gensym("phase2"), A_FLOAT, A_NULL); 
-
-	
+	class_addmethod(eblosc_class, (t_method)eblosc_dsp,
+			gensym("dsp"), A_NULL); 
+	class_addmethod(eblosc_class, (t_method)eblosc_phase,
+			gensym("phase"), A_FLOAT, A_NULL); 
+	class_addmethod(eblosc_class, (t_method)eblosc_phase2,
+			gensym("phase2"), A_FLOAT, A_NULL); 
     }
-
 }
 
 #endif

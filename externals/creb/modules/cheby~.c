@@ -91,7 +91,8 @@ static t_int *cheby_perform(t_int *w)
 
 static void cheby_dsp(t_cheby *x, t_signal **sp)
 {
-    dsp_add(cheby_perform, 4, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
+    dsp_add(cheby_perform, 4, &x->x_ctl, sp[0]->s_n, 
+	    sp[0]->s_vec, sp[1]->s_vec);
 
 }                                  
 static void cheby_free(void)
@@ -132,7 +133,8 @@ void cheby_tilde_setup(void)
     CLASS_MAINSIGNALIN(cheby_class, t_cheby, x_f); 
     class_addmethod(cheby_class, (t_method)cheby_bang, gensym("bang"), 0);
     class_addmethod(cheby_class, (t_method)cheby_dsp, gensym("dsp"), 0); 
-    class_addmethod(cheby_class, (t_method)cheby_coef, gensym("coef"), A_DEFFLOAT, A_DEFFLOAT, 0); 
+    class_addmethod(cheby_class, (t_method)cheby_coef, gensym("coef"), 
+		    A_DEFFLOAT, A_DEFFLOAT, 0); 
 
 }
 

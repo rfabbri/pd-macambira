@@ -1,7 +1,6 @@
 /*
- *   dynwav.c  - static wavetable oscillator (scale + tabread)
- *   data organization is in (real, imag) pairs
- *   the first 2 components are (DC, NY)
+ *   statwav.c  - static wavetable oscillator (scale + tabread)
+ *
  *   Copyright (c) 2000-2003 by Tom Schouten
  *
  *   This program is free software; you can redistribute it and/or modify

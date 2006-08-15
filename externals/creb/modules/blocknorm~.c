@@ -1,5 +1,7 @@
 /*
- *   blocknorm.c  - normalize an array of dsp blocks (for spectral processing) 
+ *   blocknorm.c - Normalize an array of dsp blocks. (spectral
+ *   processing primitive)
+ *
  *   Copyright (c) 2000-2003 by Tom Schouten
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -68,7 +70,7 @@ static t_int *blocknorm_perform(t_int *word)
     /* normalize */
     for (j=0;j<c;j++){
 	for (i=0;i<n;i++){
-	    out[j][i] *= s;
+	    out[j][i] *= s;  // FIXME: clockwize addressing problem
 	}
     }
 
@@ -113,7 +115,8 @@ static void *blocknorm_new(t_floatarg channels)
     x->x_ctl.c_output = malloc(sizeof(float)*i);
 
     j = i;
-    while (--j) inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("signal"), gensym("signal"));  
+    while (--j) inlet_new(&x->x_obj, &x->x_obj.ob_pd, 
+			  gensym("signal"), gensym("signal"));  
     while (i--) outlet_new(&x->x_obj, gensym("signal")); 
 
     return (void *)x;

@@ -85,7 +85,8 @@ static t_int *lattice_perform(t_int *w)
 
 static void lattice_dsp(t_lattice *x, t_signal **sp)
 {
-    dsp_add(lattice_perform, 4, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
+    dsp_add(lattice_perform, 4, &x->x_ctl, sp[0]->s_n,
+	    sp[0]->s_vec, sp[1]->s_vec);
 
 }                                  
 static void lattice_free(void)
@@ -138,7 +139,8 @@ void lattice_tilde_setup(void)
     CLASS_MAINSIGNALIN(lattice_class, t_lattice, x_f); 
     class_addmethod(lattice_class, (t_method)lattice_dsp, gensym("dsp"), 0); 
     class_addmethod(lattice_class, (t_method)lattice_reset, gensym("reset"), 0); 
-    class_addmethod(lattice_class, (t_method)lattice_rc, gensym("rc"), A_FLOAT, A_FLOAT, 0); 
+    class_addmethod(lattice_class, (t_method)lattice_rc,
+		    gensym("rc"), A_FLOAT, A_FLOAT, 0); 
 
 }
 

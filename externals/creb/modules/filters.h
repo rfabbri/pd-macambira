@@ -2,9 +2,6 @@
 
 /* defined as inline functions with call by reference to enable compiler ref/deref optim */
 
-#ifndef CREB_FILTERS_H
-#define CREB_FILTERS_H
-
 /* the typedef */
 #ifndef T
 #define T float
@@ -227,6 +224,3 @@ PP eval_conj_pole_zero_ratfunc(float *val, float *arg, float *poles, float *zero
    (sample the impulse response)
 
 */
-
-#endif /* CREB_FILTERS_H */
-

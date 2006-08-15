@@ -1,7 +1,6 @@
 /*
- *   blosc.c  - bandlimited oscillators
- *   data organization is in (real, imag) pairs
- *   the first 2 components are (DC, NY)
+ *   dynwav~.c  - dynamic wavetable oscillators
+ *
  *   Copyright (c) 2000-2003 by Tom Schouten
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -109,7 +108,8 @@ static t_int *dynwav_perform(t_int *w)
   return (w+6);
 }
 
-static t_int *dynwav_perform_8point(t_int *w) /* werkt nog nie tegoei */
+static t_int *dynwav_perform_8point(t_int *w) 
+/* FIXME: i thought this was broken. */
 {
 
 
@@ -134,11 +134,11 @@ static t_int *dynwav_perform_8point(t_int *w) /* werkt nog nie tegoei */
   if (buf && dbuf)
     {
 
-      /* const float N1 = 1 / (   2      * (1-(1/9))  * (1-(1/25))  * (1-(1/49))  );
-      ** const float N2 = 1 / ( (1-(9))  *      2     * (1-(9/25))  * (1-(9/49))  );
-      ** const float N3 = 1 / ( (1-(25)) * (1-(25/9)) *      2      * (1-(25/49)) );
-      ** const float N4 = 1 / ( (1-(49)) * (1-(49/9)) * (1-(49/25)) *    2        );
-      */
+/* const float N1 = 1 / (   2      * (1-(1/9))  * (1-(1/25))  * (1-(1/49))  );
+** const float N2 = 1 / ( (1-(9))  *      2     * (1-(9/25))  * (1-(9/49))  );
+** const float N3 = 1 / ( (1-(25)) * (1-(25/9)) *      2      * (1-(25/49)) );
+** const float N4 = 1 / ( (1-(49)) * (1-(49/9)) * (1-(49/25)) *    2        );
+*/
 
       const float N1 =   0.59814453125;
       const float N2 =  -0.11962890625;
@@ -262,7 +262,8 @@ static void dynwav_dsp(t_dynwav *x, t_signal **sp)
     }
 
 
-  dsp_add(dynwav_perform_8point, 5, &x->x_ctl, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec);
+  dsp_add(dynwav_perform_8point, 5, &x->x_ctl, sp[0]->s_n, 
+	  sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec);
 
 
 }                                  

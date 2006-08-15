@@ -1,7 +1,8 @@
 /*
- *   bfft.c  - code for some fourrier transform variants and utility functions
- *   data organization is in (real, imag) pairs
- *   the first 2 components are (DC, NY)
+ *   bfft.c - Code for some fourrier transform variants and utility
+ *   functions. Data organization is in (real, imag) pairs the first 2
+ *   components are (DC, NY)
+ *
  *   Copyright (c) 2000-2003 by Tom Schouten
  *
  *   This program is free software; you can redistribute it and/or modify

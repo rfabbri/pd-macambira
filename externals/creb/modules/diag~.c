@@ -22,13 +22,9 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <m_pd.h>
-#include <math.h>
+#include "extlib_util.h"
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef IS_DENORMAL
-#include "extlib_util.h"
-#endif
 
 #define MAXORDER 64
 

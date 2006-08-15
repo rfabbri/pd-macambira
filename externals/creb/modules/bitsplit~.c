@@ -1,5 +1,5 @@
 /*
- *   bitsplit.c  - convert a signal to a binary vector 
+ *   bitsplit.c  - Convert a signal to a binary vector.
  *   Copyright (c) 2000-2003 by Tom Schouten
  *
  *   This program is free software; you can redistribute it and/or modify

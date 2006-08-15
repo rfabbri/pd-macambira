@@ -21,14 +21,15 @@
 /*  1D scroll grid attractor
     for more information see:
 
-    Yalcin M., Ozoguz S., Suykens J.A.K., Vandewalle J., 
-    ``Families of Scroll Grid Attractors'', 
-    International Journal of Bifurcation and Chaos, vol. 12, no. 1, Jan. 2002, pp. 23-41.
+    Yalcin M., Ozoguz S., Suykens J.A.K., Vandewalle J., ``Families of
+    Scroll Grid Attractors'', International Journal of Bifurcation and
+    Chaos, vol. 12, no. 1, Jan. 2002, pp. 23-41.
 
-    this file implements a digital variant of the method introduced in the paper,
-    so that it can be used as a parametrizable, bounded chatotic oscillator.
-    in short it is a switched linear system, with some added hard limiting to 
-    convert unstable oscillations into stable ones.
+    this file implements a digital variant of the method introduced in
+    the paper, so that it can be used as a parametrizable, bounded
+    chatotic oscillator.  in short it is a switched linear system,
+    with some added hard limiting to convert unstable oscillations
+    into stable ones.
     
 */
 
@@ -108,9 +109,12 @@ static t_int *scrollgrid1D_perform(t_int *w)
       //post("%f", r1);
 
       /* base transform + clipping to prevent blowup */
-      x = _sat(0.5f * (state[0] - state[2]), (float)o); /* projection onto axis containing fixed */
-      y = _sat(0.5f * state[1], 1.0f);                         /* the "pure" oscillation axis */
-      z = _sat(0.5f * (state[0] + state[2]), 1.0f);     /* orthogonal complement of x */
+      /* projection onto axis containing fixed */
+      x = _sat(0.5f * (state[0] - state[2]), (float)o); 
+      /* the "pure" oscillation axis */
+      y = _sat(0.5f * state[1], 1.0f);
+      /* orthogonal complement of x */
+      z = _sat(0.5f * (state[0] + state[2]), 1.0f);
 
       /* output */
       *outx++ = x;
@@ -209,12 +213,14 @@ static void *scrollgrid1D_new(t_floatarg algotype)
 void scrollgrid1D_tilde_setup(void)
 {
     //post("scrollgrid1D~ v0.1");
-    scrollgrid1D_class = class_new(gensym("scrollgrid1D~"), (t_newmethod)scrollgrid1D_new,
+    scrollgrid1D_class = class_new(gensym("scrollgrid1D~"),
+				   (t_newmethod)scrollgrid1D_new,
     	(t_method)scrollgrid1D_free, sizeof(t_scrollgrid1D), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(scrollgrid1D_class, t_scrollgrid1D, x_f);
-    class_addmethod(scrollgrid1D_class, (t_method)scrollgrid1D_dsp, gensym("dsp"), 0); 
-    class_addmethod(scrollgrid1D_class, (t_method)scrollgrid1D_reset, gensym("reset"), 0); 
-
+    class_addmethod(scrollgrid1D_class, (t_method)scrollgrid1D_dsp,
+		    gensym("dsp"), 0); 
+    class_addmethod(scrollgrid1D_class, (t_method)scrollgrid1D_reset,
+		    gensym("reset"), 0); 
 
 }
 
