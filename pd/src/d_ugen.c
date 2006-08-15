@@ -953,6 +953,7 @@ void ugen_done_graph(t_dspcontext *dc)
     {
         srate = parent_srate;
         vecsize = parent_vecsize;
+        calcsize = (parent_context ? parent_context->dc_calcsize : vecsize);
         downsample = upsample = 1;
         period = frequency = 1;
         phase = 0;

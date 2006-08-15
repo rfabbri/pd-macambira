@@ -35,8 +35,8 @@ if {$pd_nt == 1} {
     global pd_guidir
     global pd_tearoff
     set pd_gui2 [string range $argv0 0 [expr [string last \\ $argv0 ] - 1]]
-    regsub -all \\\\ $pd_gui2 / pd_guidir
-	set pd_guidir [string range $pd_guidir 0 [expr [string last / $pd_guidir] - 1]]
+    regsub -all \\\\ $pd_gui2 / pd_gui3
+    set pd_guidir $pd_gui3/..
     load $pd_guidir/bin/pdtcl.dll
     set pd_tearoff 1
 }
@@ -371,7 +371,8 @@ proc menu_opentext {filename} {
     while {![eof $f]} {
         set bigstring [read $f 1000]
         regsub -all PD_BASEDIR $bigstring $pd_guidir bigstring2
-        $name.text insert end $bigstring2
+        regsub -all PD_VERSION $bigstring2 $pd_myversion bigstring3
+        $name.text insert end $bigstring3
     }
     close $f
     set doc_number [expr $doc_number + 1] 
@@ -3243,9 +3244,10 @@ proc pdtk_pd_ctrlkey {name key shift} {
 # seven "useful" font sizes.
 
 # tb: user defined typefaces
-proc pdtk_pd_startup {apilist midiapilist fontname} {
-#    puts stderr [concat $apilist $midiapilist $fontname]
-    global pd_apilist pd_midiapilist
+proc pdtk_pd_startup {version apilist midiapilist fontname} {
+#    puts stderr [concat $version $apilist $fontname]
+    global pd_myversion pd_apilist pd_midiapilist
+    set pd_myversion $version
     set pd_apilist $apilist
     set pd_midiapilist $midiapilist
     global pd_fontlist

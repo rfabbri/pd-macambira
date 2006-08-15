@@ -76,7 +76,7 @@ void sys_putonloadlist(char *classname) /* add to list of loaded modules */
     ll->ll_name = gensym(classname);
     ll->ll_next = sys_loaded;
     sys_loaded = ll;
-    post("put on list %s", classname);
+    /* post("put on list %s", classname); */
 }
 
 void class_set_extern_dir(t_symbol *s);
@@ -94,7 +94,6 @@ static int sys_do_load_lib(t_canvas *canvas, char *objectname)
     if (classname = strrchr(objectname, '/'))
         classname++;
     else classname = objectname;
-    post("classname %s", classname);
     if (sys_onloadlist(classname))
     {
         post("%s: already loaded", classname);
@@ -130,7 +129,7 @@ static int sys_do_load_lib(t_canvas *canvas, char *objectname)
     }
     else strcat(symname, "_setup");
     
-#if 1
+#if 0
     fprintf(stderr, "lib: %s\n", classname);
 #endif
         /* try looking in the path for (objectname).(sys_dllextent) ... */

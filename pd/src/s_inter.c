@@ -85,6 +85,7 @@ struct _socketreceiver
     t_socketreceivefn sr_socketreceivefn;
 };
 
+extern char *pd_version;
 extern int sys_guisetportnumber;
 extern char sys_font[]; /* tb: typeface */
 
@@ -1247,7 +1248,8 @@ int sys_startgui(const char *guidir)
 #endif
          sys_get_audio_apis(buf);
          sys_get_midi_apis(buf2);
-         sys_vgui("pdtk_pd_startup %s %s {%s}\n", buf, buf2, sys_font); 
+         sys_vgui("pdtk_pd_startup {%s} %s %s {%s}\n", pd_version, buf, buf2,
+                                  sys_font); 
     }
     return (0);
 
