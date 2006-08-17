@@ -370,7 +370,7 @@ CREB_NAME=creb
 # ead* are compiled separately
 CREB_OBJECTS := $(wildcard $(externals_src)/creb/modules/*.c)
 # haven't figured these out yet
-#CREB_CXXOBJECTS := $(wildcard $(externals_src)/creb/modules++/*.cc)
+CREB_CXXOBJECTS := $(wildcard $(externals_src)/creb/modules++/*.cc)
 
 creb: $(CREB_OBJECTS:.c=.$(EXTENSION)) $(CREB_CXXOBJECTS:.cc=.$(EXTENSION))
 
@@ -914,7 +914,6 @@ else
     HID_CFLAGS = $(CFLAGS) -I$(externals_src)/hcs/hid/HID\ Utilities\ Source
     HID_UTILITIES_SOURCE = $(externals_src)/hcs/hid/HID\ Utilities\ Source
     HID_LIBS = $(LIBS) -L$(HID_UTILITIES_SOURCE)/build \
-       -L$(HID_UTILITIES_SOURCE)/build/Default \
        -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
   else
     HID_CFLAGS = $(CFLAGS) 
@@ -963,6 +962,7 @@ hid_clean:
 	-rm -f -- $(externals_src)/hcs/hid/*.$(EXTENSION)
 	-rm -f -- $(externals_src)/hcs/hid/*.bak
 	-rm -f -- $(externals_src)/hcs/hid/*.*~
+	-rm -f -- $(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
 
 
 #------------------------------------------------------------------------------#
@@ -1397,6 +1397,43 @@ motex_clean:
 	-rm -f -- $(externals_src)/motex/*.o
 	-rm -f -- $(externals_src)/motex/*.bak
 	-rm -f -- $(externals_src)/motex/*.*~
+
+
+
+
+#------------------------------------------------------------------------------#
+# MRPEACH
+MRPEACH_NAME=mrpeach
+MRPEACH_OBJECTS := $(wildcard $(externals_src)/mrpeach/*/*.c)
+mrpeach: $(MRPEACH_OBJECTS:.c=.$(EXTENSION))
+
+mrpeach_install: mrpeach
+	install -d $(objectsdir)/$(MRPEACH_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MRPEACH_NAME) \
+		--author "Martin Peach" \
+		--description "" \
+		--license "" \
+		--version ""
+	install -p $(MRPEACH_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MRPEACH_NAME)
+	install -d $(helpdir)/$(MRPEACH_NAME)
+	install -p $(externals_src)/mrpeach/*/*-help.pd \
+		$(helpdir)/$(MRPEACH_NAME)
+#	install -d $(manualsdir)/$(MRPEACH_NAME)
+#	install -p $(externals_src)/mrpeach/manual.txt \
+#		$(manualsdir)/$(MRPEACH_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/mrpeach/README \
+#		$(readmesdir)/$(MRPEACH_NAME).txt
+#	install -d $(examplesdir)/$(MRPEACH_NAME)
+#	install -p $(externals_src)/mrpeach/examples/*.pd \
+#		$(examplesdir)/$(MRPEACH_NAME)
+
+mrpeach_clean:
+	-rm -f -- $(MRPEACH_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(MRPEACH_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/mrpeach/*.bak
+	-rm -f -- $(externals_src)/mrpeach/*.*~
+
 
 
 #----------------------------------------------------------------------------
