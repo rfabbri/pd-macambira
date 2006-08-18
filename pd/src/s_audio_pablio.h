@@ -7,7 +7,6 @@ extern "C"
 #endif /* __cplusplus */
 
 /*
- * $Id: s_audio_pablio.h,v 1.6 2006-08-15 21:57:29 millerpuckette Exp $
  * PABLIO.h
  * Portable Audio Blocking read/write utility.
  *

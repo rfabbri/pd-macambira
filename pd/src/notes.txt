@@ -25,6 +25,7 @@ infrastructure for adding externs in non-ascii languages
 '$' patch (multiple dollar-sign expansion)
 
 doc:
+-x flag for curves
 object list
 document env~ second argument (and why is it no less than 1/10 of first???)
 vibrato example

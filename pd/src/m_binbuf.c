@@ -528,7 +528,6 @@ t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew)
         }
     }
 done:
-    post("realize %s->%s", s->s_name, buf2);
     return (gensym(buf2));
 }
 

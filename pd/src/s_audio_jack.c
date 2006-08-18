@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <m_pd.h>
-#include <s_stuff.h>
+#include "m_pd.h"
+#include "s_stuff.h"
 #include <jack/jack.h>
 #include <regex.h>
 

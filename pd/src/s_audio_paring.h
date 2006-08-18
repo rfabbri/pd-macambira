@@ -6,7 +6,6 @@ extern "C"
 #endif /* __cplusplus */
 
 /*
- * $Id: s_audio_paring.h,v 1.6 2006-08-15 21:57:29 millerpuckette Exp $
  * ringbuffer.h
  * Ring Buffer utility..
  *
