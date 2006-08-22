@@ -43,7 +43,7 @@ BUILDSRC_OS_NAME = $(OS_NAME)
 
 CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS)
 LDFLAGS =  
-LIBS = -lm
+LIBS = -lm -lstdc++
 
 ifeq ($(OS_NAME),darwin)
   CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix
@@ -369,8 +369,8 @@ corelibs_clean:
 CREB_NAME=creb
 # ead* are compiled separately
 CREB_OBJECTS := $(wildcard $(externals_src)/creb/modules/*.c)
-# haven't figured these out yet
-CREB_CXXOBJECTS := $(wildcard $(externals_src)/creb/modules++/*.cc)
+# loopsampler.cc doesn't compile, so omit
+CREB_CXXOBJECTS := $(wildcard $(externals_src)/creb/modules++/[a-km-z]*.cc)
 
 creb: $(CREB_OBJECTS:.c=.$(EXTENSION)) $(CREB_CXXOBJECTS:.cc=.$(EXTENSION))
 
@@ -378,12 +378,12 @@ creb_install: creb
 	install -d $(objectsdir)/$(CREB_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(CREB_NAME) \
 		--author "Tom Schouten <creb@zzz.kotnet.org>" \
-		--description "" \
+		--description "This is a collection of pd externals. My bag of tricks." \
 		--license "GNU GPL 2" \
-		--version ""
+		--version "0.9.2"
 	install -p $(externals_src)/creb/abs/*.pd $(objectsdir)/$(CREB_NAME)
-	install -p $(CREB_OBJECTS:.c=.$(EXTENSION)) $(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) \
-		$(objectsdir)/$(CREB_NAME)
+	install -p $(CREB_OBJECTS:.c=.$(EXTENSION)) \
+		$(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) 		$(objectsdir)/$(CREB_NAME)
 	install -d $(helpdir)/$(CREB_NAME)
 	install -p $(externals_src)/creb/doc/*.* $(helpdir)/$(CREB_NAME)
 	install -d $(manualsdir)/$(CREB_NAME)
