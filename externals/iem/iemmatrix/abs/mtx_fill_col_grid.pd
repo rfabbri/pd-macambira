@@ -1,4 +1,4 @@
-#N canvas 597 0 516 388 10;
+#N canvas 657 553 516 388 10;
 #X obj 70 20 inlet;
 #X obj 70 41 t a a;
 #X obj 119 87 mtx_size;
@@ -29,13 +29,16 @@
 #X text 291 98 fills in elements into;
 #X text 302 120 the given columns;
 #X text 331 145 of a matrix;
+#X obj 139 60 spigot 0;
+#X obj 200 60 t a a;
+#X obj 173 40 > 0;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 1 1 26 1;
 #X connect 2 0 15 0;
 #X connect 2 1 18 1;
 #X connect 3 0 5 0;
-#X connect 5 0 6 1;
+#X connect 5 0 31 0;
 #X connect 6 0 7 0;
 #X connect 7 0 8 0;
 #X connect 8 0 12 0;
@@ -47,6 +50,7 @@
 #X connect 12 0 26 2;
 #X connect 15 0 6 0;
 #X connect 15 1 20 0;
+#X connect 15 1 32 0;
 #X connect 16 0 17 0;
 #X connect 17 0 18 0;
 #X connect 18 0 11 0;
@@ -55,3 +59,7 @@
 #X connect 21 0 10 0;
 #X connect 22 0 26 0;
 #X connect 26 0 13 0;
+#X connect 30 0 6 0;
+#X connect 31 0 30 0;
+#X connect 31 1 6 1;
+#X connect 32 0 30 1;
