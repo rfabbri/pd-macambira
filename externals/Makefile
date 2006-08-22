@@ -121,7 +121,7 @@ else
     LIB_TARGETS += hid
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += 
+    LIB_TARGETS += hid
   endif
 endif
 
@@ -929,10 +929,12 @@ $(HID_OBJECTS) : %.o : %.c
 $(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a:
 # Apple changed the XCode CLI tool's name in xcode2... arg
 # if on non-Mac OS X, this target just echos a message
+ifeq ($(UNAME),Darwin)
 	cd $(HID_UTILITIES_SOURCE) && \
 		(test -x /usr/bin/xcodebuild && /usr/bin/xcodebuild) || \
 			(test -x /usr/bin/pbxbuild && /usr/bin/pbxbuild) || \
 				echo "Not building Apple HID Utilities"
+endif
 
 $(externals_src)/hcs/hid/hid.$(EXTENSION): $(HID_OBJECTS) \
 $(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a

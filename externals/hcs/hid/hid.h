@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <sys/syslog.h>
 
+#ifdef __linux__
+#include <linux/types.h>
+#endif /* __linux__ */
+
 #include <m_pd.h>
 
 /* 
@@ -15,7 +19,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 7
 
-/* static char *version = "$Revision: 1.27 $"; */
+/* static char *version = "$Revision: 1.28 $"; */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -72,19 +76,21 @@ extern unsigned short global_debug_level;
 typedef struct _hid_element
 {
 #ifdef __linux__
-	//GNU/Linux store type and code to compare against
+    /* GNU/Linux store type and code to compare against */
+    __u16 linux_type;
+    __u16 linux_code;
 #else
-	void *os_pointer;  // pRecElement on Mac OS X; 
+    void *os_pointer;  // pRecElement on Mac OS X; ... on Windows
 #endif /* __linux__ */
-	t_symbol *type; // Linux "type"; HID "usagePage"
-	t_symbol *name; // Linux "code"; HID "usage"
-	unsigned char polled; // is it polled or queued? (maybe only on Mac OS X?)
-	unsigned char relative; // relative data gets output everytime
-	t_int min; // from device report
-	t_int max; // from device report
-	t_float instance; // usage page/usage instance # ([absolute throttle 2 163( 
-	t_int value; // output the sum of events in a poll for relative axes
-	t_int previous_value; //only output on change on abs and buttons
+    t_symbol *type; // Linux "type"; HID "usagePage"
+    t_symbol *name; // Linux "code"; HID "usage"
+    unsigned char polled; // is it polled or queued? (maybe only on Mac OS X?)
+    unsigned char relative; // relative data gets output everytime
+    t_int min; // from device report
+    t_int max; // from device report
+    t_float instance; // usage page/usage instance # ([absolute throttle 2 163( 
+    t_int value; // output the sum of events in a poll for relative axes
+    t_int previous_value; //only output on change on abs and buttons
 } t_hid_element;
 
 /* mostly for status querying */

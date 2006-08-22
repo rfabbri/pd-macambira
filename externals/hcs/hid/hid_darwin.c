@@ -79,7 +79,7 @@ pRecDevice device_pointer[MAX_DEVICES];
  */
 
 /* conversion functions */
-char *convertEventsFromDarwinToLinux(pRecElement element);
+static char *convertEventsFromDarwinToLinux(pRecElement element);
 
 /*==============================================================================
  * EVENT TYPE/CODE CONVERSION FUNCTIONS
@@ -90,7 +90,7 @@ char *convertEventsFromDarwinToLinux(pRecElement element);
  * This function is needed to translate the USB HID relative flag into the
  * [hid]/linux style events
  */
-void convert_axis_to_symbols(pRecElement pCurrentHIDElement, t_hid_element *new_element, char *axis) 
+static void convert_axis_to_symbols(pRecElement pCurrentHIDElement, t_hid_element *new_element, char *axis) 
 {
 	char buffer[MAXPDSTRING];
 	if (pCurrentHIDElement->relative) 
@@ -108,7 +108,7 @@ void convert_axis_to_symbols(pRecElement pCurrentHIDElement, t_hid_element *new_
 }
 
 
-void get_usage_symbols(pRecElement pCurrentHIDElement, t_hid_element *new_element) 
+static void get_usage_symbols(pRecElement pCurrentHIDElement, t_hid_element *new_element) 
 {
 //	debug_print(LOG_DEBUG,"get_usage_symbols");
 	char buffer[MAXPDSTRING];
@@ -299,7 +299,7 @@ static t_float get_type_name_instance(t_symbol *type, t_symbol *name,
 /* DARWIN-SPECIFIC SUPPORT FUNCTIONS */
 /* ============================================================================== */
 
-short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
+static short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
 {
 	debug_print(LOG_DEBUG,"get_device_number_from_usage");
 
@@ -331,7 +331,7 @@ short get_device_number_by_id(unsigned short vendor_id, unsigned short product_i
 	return(return_device_number);
 }
 
-short get_device_number_from_usage(short device_number, 
+static short get_device_number_from_usage(short device_number, 
 										unsigned short usage_page, 
 										unsigned short usage)
 {
@@ -384,7 +384,7 @@ short get_device_number_from_usage(short device_number,
 }
 
 
-void hid_build_element_list(t_hid *x) 
+static void hid_build_element_list(t_hid *x) 
 {
 	char type_name[256];
 	char usage_name[256];
@@ -458,7 +458,7 @@ void hid_build_element_list(t_hid *x)
 	}
 }
 
-void hid_print_element_list(t_hid *x)
+static void hid_print_element_list(t_hid *x)
 {
 //	debug_print(LOG_DEBUG,"hid_print_element_list");
 	int i;
@@ -517,7 +517,7 @@ void hid_ff_print( t_hid *x )
 }
 
 
-void hid_print_device_list(t_hid *x) 
+static void hid_print_device_list(t_hid *x) 
 {
 	char device_type_buffer[256];
 	t_int i, numdevs;

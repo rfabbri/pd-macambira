@@ -11,11 +11,15 @@
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <unistd.h>
+#include <stdint.h>
 
 #include "hid.h"
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
+
+#define LINUX_BLOCK_DEVICE   "/dev/input/event"
+
 
 /*------------------------------------------------------------------------------
  * from evtest.c from the ff-utils package
@@ -43,21 +47,9 @@
 /* LINUX-SPECIFIC SUPPORT FUNCTIONS */
 /* ------------------------------------------------------------------------------ */
 
-/* JMZ: i changed the convert functions (and the get-event function too!) to
- * return t_symbol* instead of writing into a fixed-sized buffer (which was
- * way too small and those made this object crash) in order to change as
- * little lines as possible the callback functions to the hid-object still use
- * (char*): so we convert a char[] into a symbol and then extract the (char*)
- * out of it to make it a symbol again LATER: use t_symbol's all over, since
- * it is very flexible (with respect to length) and sooner or later the
- * strings are converted to t_symbol anyhow...
- *
- * Why? bug-fixing
- */
-
 t_symbol* hid_convert_linux_buttons_to_numbers(__u16 linux_code)
 {
-  char hid_code[10];
+    char hid_code[10];
     if(linux_code >= 0x100) 
     {
         if(linux_code < BTN_MOUSE)   
@@ -74,7 +66,7 @@ t_symbol* hid_convert_linux_buttons_to_numbers(__u16 linux_code)
             sprintf(hid_code,"btn_%d",linux_code - BTN_WHEEL);  /* wheel buttons */
 	else return 0;
     }
-    return gensym(hid_code);
+    return gensym(hid_code ? hid_code : "?");
 }
 
 /* Georg Holzmann: implementation of the keys */
@@ -91,59 +83,74 @@ t_symbol* hid_convert_linux_keys(__u16 linux_code)
 
     static char key_names[227][20] =
         { 
-            "key_reserved", "key_esc", "key_1", "key_2", "key_3", "key_4", "key_5", "key_6", "key_7",
-            "key_8", "key_9", "key_0", "key_minus", "key_equal", "key_backspace", "key_tab",
-            "key_q", "key_w", "key_e", "key_r", "key_t", "key_y", "key_u", "key_i", "key_o", "key_p",
-            "key_leftbrace", "key_rightbrace", "key_enter", "key_leftctrl", "key_a",
-            "key_s", "key_d", "key_f", "key_g", "key_h", "key_j", "key_k", "key_l", "key_semicolon",
-            "key_apostrophe", "key_grave", "key_leftshift", "key_backslash", "key_z",
-            "key_x", "key_c", "key_v", "key_b", "key_n", "key_m", "key_comma", "key_dot", "key_slash",
-            "key_rightshift", "key_kpasterisk", "key_leftalt", "key_space", "key_capslock",
-            "key_f1", "key_f2", "key_f3", "key_f4", "key_f5", "key_f6", "key_f7", "key_f8", "key_f9", "key_f10",
-            "key_numlock", "key_scrolllock", "key_kp7", "key_kp8", "key_kp9", "key_kpminus",
-            "key_kp4", "key_kp5", "key_kp6", "key_kpplus", "key_kp1", "key_kp2", "key_kp3", "key_kp3",  "key_kpdot",
-            "key_103rd", "key_f13", "key_102nd", "key_f11", "key_f12", "key_f14", "key_f15", "key_f16",
-            "key_f17", "key_f18", "key_f19", "key_f20", "key_kpenter", "key_rightctrl", "key_kpslash",
-            "key_sysrq", "key_rightalt", "key_linefeed", "key_home", "key_up", "key_pageup", "key_left",
-            "key_right", "key_end", "key_down", "key_pagedown", "key_insert", "key_delete", "key_macro",
-            "key_mute", "key_volumedown", "key_volumeup", "key_power", "key_kpequal", "key_kpplusminus",
-            "key_pause", "key_f21", "key_f22", "key_f23", "key_f24", "key_kpcomma", "key_leftmeta",
-            "key_rightmeta", "key_compose",
-    
-            "key_stop", "key_again", "key_props", "key_undo", "key_front", "key_copy", "key_open",
-            "key_paste", "key_find", "key_cut", "key_help", "key_menu", "key_calc", "key_setup", "key_sleep", "key_wakeup",
-            "key_file", "key_sendfile", "key_deletefile", "key_xfer", "key_prog1", "key_prog2", "key_www",
-            "key_msdos", "key_coffee", "key_direction", "key_cyclewindows", "key_mail", "key_bookmarks",
-            "key_computer", "key_back", "key_forward", "key_colsecd", "key_ejectcd", "key_ejectclosecd",
-            "key_nextsong", "key_playpause", "key_previoussong", "key_stopcd", "key_record",
-            "key_rewind", "key_phone", "key_iso", "key_config", "key_homepage", "key_refresh", "key_exit",
-            "key_move", "key_edit", "key_scrollup", "key_scrolldown", "key_kpleftparen", "key_kprightparen",
-    
-            "key_intl1", "key_intl2", "key_intl3", "key_intl4", "key_intl5", "key_intl6", "key_intl7",
-            "key_intl8", "key_intl9", "key_lang1", "key_lang2", "key_lang3", "key_lang4", "key_lang5",
-            "key_lang6", "key_lang7", "key_lang8", "key_lang9", "key_playcd", "key_pausecd", "key_prog3",
-            "key_prog4", "key_suspend", "key_close", "key_play", "key_fastforward", "key_bassboost",
-            "key_print", "key_hp", "key_camera", "key_sound", "key_question", "key_email", "key_chat",
-            "key_search", "key_connect", "key_finance", "key_sport", "key_shop", "key_alterase",
-            "key_cancel", "key_brightnessdown", "key_brightnessup", "key_media"
+            "key_reserved", "key_esc", "key_1", "key_2", "key_3", "key_4", 
+            "key_5", "key_6", "key_7", "key_8", "key_9", "key_0", "key_minus", 
+            "key_equal", "key_backspace", "key_tab", "key_q", "key_w", 
+            "key_e", "key_r", "key_t", "key_y", "key_u", "key_i", "key_o", 
+            "key_p","key_leftbrace", "key_rightbrace", "key_enter", 
+            "key_leftctrl", "key_a","key_s", "key_d", "key_f", "key_g", 
+            "key_h", "key_j", "key_k", "key_l", "key_semicolon",
+            "key_apostrophe", "key_grave", "key_leftshift", "key_backslash", 
+            "key_z","key_x", "key_c", "key_v", "key_b", "key_n", "key_m", 
+            "key_comma", "key_dot", "key_slash","key_rightshift", 
+            "key_kpasterisk", "key_leftalt", "key_space", "key_capslock",
+            "key_f1", "key_f2", "key_f3", "key_f4", "key_f5", "key_f6", 
+            "key_f7", "key_f8", "key_f9", "key_f10","key_numlock", 
+            "key_scrolllock", "key_kp7", "key_kp8", "key_kp9", "key_kpminus",
+            "key_kp4", "key_kp5", "key_kp6", "key_kpplus", "key_kp1", "key_kp2",
+            "key_kp3", "key_kp3",  "key_kpdot","key_103rd", "key_f13", 
+            "key_102nd", "key_f11", "key_f12", "key_f14", "key_f15", "key_f16",
+            "key_f17", "key_f18", "key_f19", "key_f20", "key_kpenter", 
+            "key_rightctrl", "key_kpslash","key_sysrq", "key_rightalt", 
+            "key_linefeed", "key_home", "key_up", "key_pageup", "key_left",
+            "key_right", "key_end", "key_down", "key_pagedown", "key_insert", 
+            "key_delete", "key_macro","key_mute", "key_volumedown", 
+            "key_volumeup", "key_power", "key_kpequal", "key_kpplusminus",
+            "key_pause", "key_f21", "key_f22", "key_f23", "key_f24", 
+            "key_kpcomma", "key_leftmeta","key_rightmeta", "key_compose",
+            "key_stop", "key_again", "key_props", "key_undo", "key_front", 
+            "key_copy", "key_open","key_paste", "key_find","key_cut","key_help", 
+            "key_menu", "key_calc", "key_setup", "key_sleep", "key_wakeup",
+            "key_file", "key_sendfile", "key_deletefile","key_xfer","key_prog1",
+            "key_prog2", "key_www","key_msdos", "key_coffee", "key_direction", 
+            "key_cyclewindows", "key_mail", "key_bookmarks","key_computer", 
+            "key_back", "key_forward", "key_colsecd", "key_ejectcd", 
+            "key_ejectclosecd","key_nextsong","key_playpause","key_previoussong",
+            "key_stopcd", "key_record","key_rewind", "key_phone", "key_iso", 
+            "key_config", "key_homepage", "key_refresh", "key_exit","key_move", 
+            "key_edit", "key_scrollup", "key_scrolldown", "key_kpleftparen", 
+            "key_kprightparen","key_intl1", "key_intl2", "key_intl3","key_intl4", 
+            "key_intl5", "key_intl6", "key_intl7","key_intl8", "key_intl9", 
+            "key_lang1", "key_lang2", "key_lang3", "key_lang4", "key_lang5",
+            "key_lang6", "key_lang7", "key_lang8", "key_lang9", "key_playcd", 
+            "key_pausecd", "key_prog3","key_prog4", "key_suspend", "key_close", 
+            "key_play", "key_fastforward", "key_bassboost","key_print", "key_hp",
+            "key_camera", "key_sound", "key_question", "key_email", "key_chat",
+            "key_search", "key_connect", "key_finance", "key_sport", "key_shop", 
+            "key_alterase","key_cancel", "key_brightnessdown", "key_brightnessup", 
+            "key_media"
         };
-    return gensym(key_names[linux_code]);
+    return gensym(key_names[linux_code]);   // TODO: this should just return the char *
 }
+
+
+
 
 void hid_print_element_list(t_hid *x)
 {
     debug_print(LOG_DEBUG,"hid_print_element_list");
-    unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
+    unsigned long element_bitmask[EV_MAX][NBITS(KEY_MAX)];
 //    char event_type_string[256];
 //    char event_code_string[256];
     char *event_type_name = "";
     t_int i, j;
     /* counts for various event types */
-    t_int syn_count,key_count,rel_count,abs_count,msc_count,led_count,snd_count,rep_count,ff_count,pwr_count,ff_status_count;
+    t_int syn_count,key_count,rel_count,abs_count,msc_count,led_count,
+        snd_count,rep_count,ff_count,pwr_count,ff_status_count;
 
-    /* get bitmask representing supported events (axes, keys, etc.) */
-    memset(bitmask, 0, sizeof(bitmask));
-    ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), bitmask[0]);
+    /* get bitmask representing supported element (axes, keys, etc.) */
+    memset(element_bitmask, 0, sizeof(element_bitmask));
+    ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), element_bitmask[0]);
     post("\nSupported events:");
     
 /* init all count vars */
@@ -153,9 +160,9 @@ void hid_print_element_list(t_hid *x)
     /* cycle through all possible event types 
      * i = i   j = j
      */
-    for (i = 1; i < EV_MAX; i++) 
+    for(i = 1; i < EV_MAX; i++) 
     {
-        if (test_bit(i, bitmask[0])) 
+        if(test_bit(i, element_bitmask[0])) 
         {
             /* make pretty names for event types */
             switch(i) 
@@ -175,7 +182,7 @@ void hid_print_element_list(t_hid *x)
             }
 		 
             /* get bitmask representing supported button types */
-            ioctl(x->x_fd, EVIOCGBIT(i, KEY_MAX), bitmask[i]);
+            ioctl(x->x_fd, EVIOCGBIT(i, KEY_MAX), element_bitmask[i]);
 		 
             post("");
             post("  TYPE\tCODE\tEVENT NAME");
@@ -185,21 +192,23 @@ void hid_print_element_list(t_hid *x)
              * testing to see which are supported.
              * i = i   j = j
              */
-            for (j = 0; j < KEY_MAX; j++) 
+            for(j = 0; j < KEY_MAX; j++) 
             {
-                if (test_bit(j, bitmask[i])) 
+                if(test_bit(j, element_bitmask[i])) 
                 {
-                    if ((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
+                    if((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
                     {
-			t_symbol*hid_codesym=hid_convert_linux_buttons_to_numbers(j);
-			if(hid_codesym){
-			  post("  %s\t%s\t%s",
-                             ev[i] ? ev[i] : "?", 
-                             hid_codesym->s_name,
-                             event_names[i] ? (event_names[i][j] ? event_names[i][j] : "?") : "?");
+			t_symbol * hid_codesym = hid_convert_linux_buttons_to_numbers(j);
+			if(hid_codesym)
+                        {
+                            post("  %s\t%s\t%s (%s)",
+                                 ev[i] ? ev[i] : "?", 
+                                 hid_codesym->s_name,
+                                 event_type_name,
+                                 event_names[i] ? (event_names[i][j] ? event_names[i][j] : "?") : "?");
 			}
 		    }
-                    else if (i != EV_SYN)
+                    else if(i != EV_SYN)
                     {
                         post("  %s\t%s\t%s",
                              ev[i] ? ev[i] : "?", 
@@ -236,17 +245,17 @@ void hid_print_element_list(t_hid *x)
     }
     
     post("\nDetected:");
-//    if (syn_count > 0) post ("  %d Synchronization types",syn_count);
-    if (key_count > 0) post ("  %d Key/Button types",key_count);
-    if (rel_count > 0) post ("  %d Relative Axis types",rel_count);
-    if (abs_count > 0) post ("  %d Absolute Axis types",abs_count);
-    if (msc_count > 0) post ("  %d Misc types",msc_count);
-    if (led_count > 0) post ("  %d LED types",led_count);
-    if (snd_count > 0) post ("  %d System Sound types",snd_count);
-    if (rep_count > 0) post ("  %d Key Repeat types",rep_count);
-    if (ff_count > 0) post ("  %d Force Feedback types",ff_count);
-    if (pwr_count > 0) post ("  %d Power types",pwr_count);
-    if (ff_status_count > 0) post ("  %d Force Feedback types",ff_status_count);
+//    if(syn_count > 0) post ("  %d Synchronization types",syn_count);
+    if(key_count > 0) post ("  %d Key/Button types",key_count);
+    if(rel_count > 0) post ("  %d Relative Axis types",rel_count);
+    if(abs_count > 0) post ("  %d Absolute Axis types",abs_count);
+    if(msc_count > 0) post ("  %d Misc types",msc_count);
+    if(led_count > 0) post ("  %d LED types",led_count);
+    if(snd_count > 0) post ("  %d System Sound types",snd_count);
+    if(rep_count > 0) post ("  %d Key Repeat types",rep_count);
+    if(ff_count > 0) post ("  %d Force Feedback types",ff_count);
+    if(pwr_count > 0) post ("  %d Power types",pwr_count);
+    if(ff_status_count > 0) post ("  %d Force Feedback types",ff_status_count);
 }
 
 
@@ -258,15 +267,15 @@ void hid_print_device_list(void)
     char dev_handle_name[20] = "/dev/input/event0";
 
     post("");
-    for (i=0;i<128;++i) 
+    for(i=0;i<128;++i) 
     {
         sprintf(dev_handle_name,"/dev/input/event%d",i);
-        if (dev_handle_name) 
+        if(dev_handle_name) 
         {
             /* open the device read-only, non-exclusive */
             fd = open (dev_handle_name, O_RDONLY | O_NONBLOCK);
             /* test if device open */
-            if (fd < 0 ) 
+            if(fd < 0 ) 
             { 
                 fd = -1;
             } 
@@ -282,6 +291,308 @@ void hid_print_device_list(void)
     }
     post("");	
 }
+
+/* ------------------------------------------------------------------------------ */
+/* Pd [hid] FUNCTIONS */
+/* ------------------------------------------------------------------------------ */
+
+void hid_get_events(t_hid *x)
+{
+    debug_print(LOG_DEBUG,"hid_get_events");
+
+/* for debugging, counts how many events are processed each time hid_read() is called */
+    DEBUG(t_int event_counter = 0;);
+
+    t_symbol*hid_code=0;
+
+/* this will go into the generic read function declared in hid.h and
+ * implemented in hid_linux.c 
+ */
+    struct input_event hid_input_event;
+
+    if(x->x_fd < 0) return;
+
+    while( read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1 )
+    {
+        hid_code=0;
+        if( hid_input_event.type == EV_KEY )
+        {
+	  /* JMZ: originally both functions were called, the latter evtl. overwriting
+	   * the former; now i only call the latter if the former does not return 
+	   * a valid result
+	   */
+	  if(!(hid_code=hid_convert_linux_buttons_to_numbers(hid_input_event.code)))
+            hid_code=hid_convert_linux_keys(hid_input_event.code);
+        }
+        else if( hid_input_event.type == EV_SYN )
+        {
+            // filter out EV_SYN events, they are currently unused
+        }
+        else if( event_names[hid_input_event.type][hid_input_event.code] != NULL )
+        {
+	  hid_code = gensym(event_names[hid_input_event.type][hid_input_event.code]);
+        }
+        else 
+        {
+	  hid_code = gensym("unknown");
+        }
+        /* TODO: needs porting
+        if( hid_code && hid_input_event.type != EV_SYN )
+            hid_output_event(x, gensym(ev[hid_input_event.type]), hid_code, 
+                             (t_float)hid_input_event.value);*/
+        DEBUG(++event_counter;);
+    }
+    DEBUG(
+        //if(event_counter > 0)
+        //post("output %d events",event_counter);
+	);
+	
+    return;
+}
+
+
+void hid_print(t_hid* x)
+{
+    hid_print_device_list();
+    hid_print_element_list(x);
+}
+
+
+t_int hid_open_device(t_hid *x, short device_number)
+{
+    debug_print(LOG_DEBUG,"hid_open_device");
+
+    char device_name[256] = "Unknown";
+    char block_device[20] = "/dev/input/event0";
+    struct input_event hid_input_event;
+
+    x->x_fd = -1;
+  
+    x->x_device_number = device_number;
+    sprintf(block_device,"/dev/input/event%d",x->x_device_number);
+
+    if(block_device) 
+    {
+        /* open the device read-only, non-exclusive */
+        x->x_fd = open(block_device, O_RDONLY | O_NONBLOCK);
+        /* test if device open */
+        if(x->x_fd < 0 ) 
+        { 
+            error("[hid] open %s failed",block_device);
+            x->x_fd = -1;
+            return 1;
+        }
+    } 
+  
+    /* read input_events from the HID_DEVICE stream 
+     * It seems that is just there to flush the input event queue
+     */
+    while (read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1);
+
+    /* get name of device */
+    ioctl(x->x_fd, EVIOCGNAME(sizeof(device_name)), device_name);
+    post ("[hid] opened device %d (%s): %s",
+          x->x_device_number,block_device,device_name);
+
+    hid_build_element_list(x);
+
+    return (0);
+}
+
+/*
+ * Under GNU/Linux, the device is a filehandle
+ */
+t_int hid_close_device(t_hid *x)
+{
+    debug_print(LOG_DEBUG,"hid_close_device");
+    if(x->x_fd <0) 
+        return 0;
+    else
+        return (close(x->x_fd));
+}
+
+
+void hid_build_device_list(void)
+{
+/*
+ *	since in GNU/Linux the device list is the input event devices 
+ *	(/dev/input/event?), nothing needs to be done as of yet to refresh 
+ * the device list.  Once the device name can be other things in addition
+ * the current t_float, then this will probably need to be changed.
+ */
+    int fd;
+    unsigned int i;
+    unsigned int last_active_device = 0;
+    char device_name[256] = "Unknown";
+    char block_device[20] = "/dev/input/event0";
+    struct input_event  x_input_event; 
+    
+    debug_print(LOG_DEBUG,"hid_build_device_list");
+    
+    debug_print(LOG_WARNING,"[hid] Building device list...");
+    
+    for(i=0; i<MAX_DEVICES; ++i)
+    {
+        sprintf(&block_device,"%s%d",LINUX_BLOCK_DEVICE,i);
+        /* open the device read-only, non-exclusive */
+        fd = open (&block_device, O_RDONLY | O_NONBLOCK);
+        /* test if device open */
+        if(fd < 0 ) { 
+            /* post("Nothing on %s.", &block_device); */
+            fd = -1;
+/* 			  return 0; */
+        } else {
+            /* read input_events from the LINUX_BLOCK_DEVICE stream 
+             * It seems that is just there to flush the event input buffer?
+             */
+            while (read (fd, &(x_input_event), sizeof(struct input_event)) > -1);
+			  
+            /* get name of device */
+            ioctl(fd, EVIOCGNAME(sizeof(device_name)), device_name);
+            post("Found '%s' on '%s'",device_name, &block_device);
+
+            close (fd);
+        }
+        last_active_device = i;
+
+    }
+    device_count = last_active_device ; // set the global variable
+    debug_print(LOG_WARNING,"[hid] completed device list.");
+}
+
+
+
+
+
+static void hid_build_element_list(t_hid *x) 
+{
+    unsigned long element_bitmask[EV_MAX][NBITS(KEY_MAX)];
+    uint8_t abs_bitmask[ABS_MAX/8 + 1];
+    struct input_absinfo abs_features;
+    char type_name[256];
+    char code_name[256];
+    t_hid_element *new_element = NULL;
+    t_int i, j;
+  
+    element_count[x->x_device_number] = 0;
+    if( x->x_fd ) 
+    {
+        new_element = getbytes(sizeof(t_hid_element));
+        /* get bitmask representing supported elements (axes, keys, etc.) */
+        memset(element_bitmask, 0, sizeof(element_bitmask));
+        if( ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), element_bitmask[0]) < 0 )
+            perror("[hid] error: evdev ioctl: element_bitmask");
+        memset(abs_bitmask, 0, sizeof(abs_bitmask));
+        if( ioctl(x->x_fd, EVIOCGBIT(EV_ABS, sizeof(abs_bitmask)), abs_bitmask) < 0 ) 
+            perror("[hid] error: evdev ioctl: abs_bitmask");
+        for( i = 1; i < EV_MAX; i++ ) 
+        {
+            if(test_bit(i, element_bitmask[0])) 
+            {
+                new_element->linux_type = i;
+                new_element->type = gensym(ev[i] ? ev[i] : "?");
+                /* get bitmask representing supported button types */
+                ioctl(x->x_fd, EVIOCGBIT(i, KEY_MAX), element_bitmask[i]);
+                /* cycle through all possible event codes (axes, keys, etc.) 
+                 * testing to see which are supported.
+                 * i = i   j = j
+                 */
+                for(j = 0; j < KEY_MAX; j++) 
+                {
+                    if(test_bit(j, abs_bitmask)) 
+                    {
+                        /* this means that the bit is set in the axes list */
+                        if(ioctl(x->x_fd, EVIOCGABS(j), &abs_features)) 
+                            perror("evdev EVIOCGABS ioctl");
+                        new_element->min = abs_features.minimum;
+                        new_element->max = abs_features.maximum;
+                    }
+                    else
+                    {
+                        new_element->min = 0;
+                        new_element->max = 0;
+                    }
+                    if(test_bit(j, element_bitmask[i])) 
+                    {
+                        new_element->linux_code = j;
+                        if((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
+                        {
+                            new_element->name = hid_convert_linux_buttons_to_numbers(j);
+                        }
+                        else
+                        {
+                            new_element->name = gensym(event_names[i][j] ? event_names[i][j] : "?");
+                        }
+                        if( i == EV_REL )
+                            new_element->relative = 1;
+                        else
+                            new_element->relative = 0;
+                        // fill in the t_hid_element struct here
+//                        post("x->x_device_number: %d   element_count[]: %d",
+//                             x->x_device_number, element_count[x->x_device_number]);
+                        post("linux_type/linux_code: %d/%d  type/name: %s %s    max: %d   min: %d ", 
+                             new_element->linux_type, new_element->linux_code, 
+                             new_element->type->s_name, new_element->name->s_name,
+                             new_element->max, new_element->min);
+                        post("\tpolled: %d   relative: %d",
+                             new_element->polled, new_element->relative);
+                        element[x->x_device_number][element_count[x->x_device_number]] = new_element;
+                        ++element_count[x->x_device_number];
+                    }
+                }
+            }        
+        }
+    }
+}
+
+
+void hid_platform_specific_free(t_hid *x)
+{
+    /* nothing to be done here on GNU/Linux */
+}
+
+/* device info on the status outlet */
+void hid_platform_specific_info(t_hid* x)
+{
+    struct input_id my_id;
+    char device_name[256] = "Unknown";
+    char vendor_id_string[7];
+    char product_id_string[7];
+    t_symbol *output_symbol;
+    t_atom *output_atom = getbytes(sizeof(t_atom));
+
+    ioctl(x->x_fd, EVIOCGID);
+    sprintf(vendor_id_string,"0x%04x", my_id.vendor);
+    SETSYMBOL(output_atom, gensym(vendor_id_string));
+    outlet_anything( x->x_status_outlet, gensym("vendorID"), 
+                     1, output_atom);
+    sprintf(product_id_string,"0x%04x", my_id.product);
+    SETSYMBOL(output_atom, gensym(product_id_string));
+    outlet_anything( x->x_status_outlet, gensym("productID"), 
+                     1, output_atom);
+    ioctl(x->x_fd, EVIOCGNAME(sizeof(device_name)), device_name);
+    SETSYMBOL(output_atom, gensym(device_name));
+    outlet_anything( x->x_status_outlet, gensym("name"), 
+                     1, output_atom);
+    freebytes(output_atom,sizeof(t_atom));
+}
+
+        
+short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
+{
+    
+    return -1;
+}
+
+short get_device_number_from_usage(short device_number, 
+                                        unsigned short usage_page, 
+                                        unsigned short usage)
+{
+
+    return -1;
+}
+
+
 
 /* ------------------------------------------------------------------------------ */
 /*  FORCE FEEDBACK FUNCTIONS */
@@ -341,183 +652,6 @@ t_int hid_ff_fftest ( t_hid *x, t_float value)
 void hid_ff_print( t_hid *x )
 {
 }
-
-
-
-/* ------------------------------------------------------------------------------ */
-/* Pd [hid] FUNCTIONS */
-/* ------------------------------------------------------------------------------ */
-
-void hid_get_events(t_hid *x)
-{
-    debug_print(LOG_DEBUG,"hid_get_events");
-
-/* for debugging, counts how many events are processed each time hid_read() is called */
-    DEBUG(t_int event_counter = 0;);
-
-    t_symbol*hid_code=0;
-
-/* this will go into the generic read function declared in hid.h and
- * implemented in hid_linux.c 
- */
-    struct input_event hid_input_event;
-
-    if (x->x_fd < 0) return;
-
-    while( read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1 )
-    {
-        hid_code=0;
-        if( hid_input_event.type == EV_KEY )
-        {
-	  /* JMZ: originally both functions were called, the latter evtl. overwriting
-	   * the former; now i only call the latter if the former does not return 
-	   * a valid result
-	   */
-	  if(!(hid_code=hid_convert_linux_buttons_to_numbers(hid_input_event.code)))
-            hid_code=hid_convert_linux_keys(hid_input_event.code);
-        }
-        else if( hid_input_event.type == EV_SYN )
-        {
-            // filter out EV_SYN events, they are currently unused
-        }
-        else if( event_names[hid_input_event.type][hid_input_event.code] != NULL )
-        {
-	  hid_code=gensym(event_names[hid_input_event.type][hid_input_event.code]);
-        }
-        else 
-        {
-	  hid_code=gensym("unknown");
-        }
-        if( hid_code && hid_input_event.type != EV_SYN )
-            hid_output_event(x, gensym(ev[hid_input_event.type]), hid_code, 
-                             (t_float)hid_input_event.value);
-        DEBUG(++event_counter;);
-    }
-    DEBUG(
-        //if (event_counter > 0)
-        //post("output %d events",event_counter);
-	);
-	
-    return;
-}
-
-
-void hid_print(t_hid* x)
-{
-    hid_print_device_list();
-    hid_print_element_list(x);
-}
-
-
-t_int hid_open_device(t_hid *x, t_int device_number)
-{
-    debug_print(LOG_DEBUG,"hid_open_device");
-
-    char device_name[256] = "Unknown";
-    char dev_handle_name[20] = "/dev/input/event0";
-    struct input_event hid_input_event;
-
-    x->x_fd = -1;
-  
-    x->x_device_number = device_number;
-    sprintf(dev_handle_name,"/dev/input/event%d",x->x_device_number);
-
-    if (dev_handle_name) 
-    {
-        /* open the device read-only, non-exclusive */
-        x->x_fd = open(dev_handle_name, O_RDONLY | O_NONBLOCK);
-        /* test if device open */
-        if (x->x_fd < 0 ) 
-        { 
-            error("[hid] open %s failed",dev_handle_name);
-            x->x_fd = -1;
-            return 1;
-        }
-    } 
-  
-    /* read input_events from the HID_DEVICE stream 
-     * It seems that is just there to flush the input event queue
-     */
-    while (read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1);
-
-    /* get name of device */
-    ioctl(x->x_fd, EVIOCGNAME(sizeof(device_name)), device_name);
-    post ("[hid] opened device %d (%s): %s",
-          x->x_device_number,dev_handle_name,device_name);
-
-    return (0);
-}
-
-/*
- * Under GNU/Linux, the device is a filehandle
- */
-t_int hid_close_device(t_hid *x)
-{
-    debug_print(LOG_DEBUG,"hid_close_device");
-    if (x->x_fd <0) 
-        return 0;
-    else
-        return (close(x->x_fd));
-}
-
-void hid_build_device_list(void)
-{
-    debug_print(LOG_DEBUG,"hid_build_device_list");
-    /* the device list should be refreshed here */
-/*
- *	since in GNU/Linux the device list is the input event devices 
- *	(/dev/input/event?), nothing needs to be done as of yet to refresh 
- * the device list.  Once the device name can be other things in addition
- * the current t_float, then this will probably need to be changed.
- */
-}
-
-void hid_platform_specific_free(t_hid *x)
-{
-    /* nothing to be done here on GNU/Linux */
-}
-
-/* device info on the status outlet */
-void hid_platform_specific_info(t_hid* x)
-{
-    struct input_id my_id;
-    char device_name[256] = "Unknown";
-    char vendor_id_string[7];
-    char product_id_string[7];
-    t_symbol *output_symbol;
-    t_atom *output_atom = getbytes(sizeof(t_atom));
-
-    ioctl(x->x_fd, EVIOCGID);
-    sprintf(vendor_id_string,"0x%04x", my_id.vendor);
-    SETSYMBOL(output_atom, gensym(vendor_id_string));
-    outlet_anything( x->x_status_outlet, gensym("vendorID"), 
-                     1, output_atom);
-    sprintf(product_id_string,"0x%04x", my_id.product);
-    SETSYMBOL(output_atom, gensym(product_id_string));
-    outlet_anything( x->x_status_outlet, gensym("productID"), 
-                     1, output_atom);
-    ioctl(x->x_fd, EVIOCGNAME(sizeof(device_name)), device_name);
-    SETSYMBOL(output_atom, gensym(device_name));
-    outlet_anything( x->x_status_outlet, gensym("name"), 
-                     1, output_atom);
-    freebytes(output_atom,sizeof(t_atom));
-}
-
-        
-t_int get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
-{
-    
-    return -1;
-}
-
-t_int get_device_number_from_usage(t_int device_number, 
-                                        unsigned short usage_page, 
-                                        unsigned short usage)
-{
-
-    return -1;
-}
-
 
 
 #endif  /* #ifdef __linux__ */

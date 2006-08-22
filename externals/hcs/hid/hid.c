@@ -1,9 +1,9 @@
 /* --------------------------------------------------------------------------*/
 /*                                                                           */
-/* MacOS X object to use HIDs (Human Interface Devices)                      */
+/* interface to native HID (Human Interface Devices) API                     */
 /* Written by Hans-Christoph Steiner <hans@at.or.at>                         */
 /*                                                                           */
-/* Copyright (c) 2004 Hans-Christoph Steiner                                 */
+/* Copyright (c) 2004-2006 Hans-Christoph Steiner                            */
 /*                                                                           */
 /* This program is free software; you can redistribute it and/or             */
 /* modify it under the terms of the GNU General Public License               */

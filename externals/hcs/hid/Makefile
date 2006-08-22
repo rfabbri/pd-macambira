@@ -15,5 +15,11 @@ test_locations:
 
 # for emacs
 etags:
+	make etags_`uname -s`
+
+etags_Darwin:
 	etags *.[ch] linux/input.h HID\ Utilities\ Source/*.[ch] \
 		/System/Library/Frameworks/IOKit.framework/Headers/hid*/*.[ch]
+
+etags_Linux:
+	etags *.[ch] /usr/include/*.h linux/input.h /usr/include/sys/*.h
