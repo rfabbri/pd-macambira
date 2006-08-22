@@ -15,7 +15,7 @@ run_build_script ()
 
 	 su pd -c "sh /home/pd/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh" >> $LOGFILE 2>&1
 
-	 rsync -a ${LOGFILE} rsync://128.238.56.50/upload/${DATE}/
+	 rsync -a ${LOGFILE} rsync://128.238.56.50/upload/${DATE}/logs/
 
 # send status report if something failed
 	 completion_test=`tail -1 ${LOGFILE}`
