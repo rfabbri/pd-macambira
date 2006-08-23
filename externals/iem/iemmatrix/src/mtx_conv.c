@@ -183,28 +183,25 @@ static void mTXConvKernelMatrix (MTXConv *mtx_conv_obj, t_symbol *s, int argc,
    readMatrixFromList (rows_k, columns_k, argv, mtx_conv_obj->k);
 }
 
-static void convolveRow (int columns, int columns_c, t_float *x, t_float *c, t_float *y)
-{
-   int n,k,count;
-   for (k = 0; k < columns_c; k++) 
-      for (n = k, count = columns; count--; n++) 
-	 y[n] += x[n-k] * c[k];
-}
-
 static void convolveMtx (int rows, int columns, int rows_h, int columns_h, 
       t_float **x, t_float **h, t_float **y)
 {
    int n,m,k,l;
    int rows_y=rows+rows_h-1;
    int cols_y=columns+columns_h-1;
+   int n_max, m_max;
    zeroTFloatMatrix (y, rows_y, cols_y);
 
 
-   for (n=0; n<rows_y; n++)
-      for (m=0; m<cols_y; m++) 
-	 for (k=n; (k<rows_h)&&(k-n<rows); k++)
-	    for (l=m; (l<columns_h)&&(l-m<columns); l++)
-	       y[n][m]+=x[k-n][l-m]*h[k][l];
+   for (k=0; k<rows_h; k++) {
+      n_max=(rows_y<rows+k)?rows_y:rows+k;
+      for (l=0; l<columns_h; l++) {
+	 m_max=(cols_y<columns+l)?cols_y:columns+l;
+	 for (n=k; n<n_max; n++) 
+	    for (m=l; m<m_max; m++) 
+	       y[n][m]+=x[n-k][m-l]*h[k][l];
+      }
+   }
 }
 
 
@@ -279,15 +276,13 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
      }
 
    }
-   //post("3");
    // main part
    readMatrixFromList (rows, columns, argv, mtx_conv_obj->x); 
-   //post("4");
+
    convolveMtx (rows, columns, rows_k, columns_k, 
 	 mtx_conv_obj->x, mtx_conv_obj->k, mtx_conv_obj->y);
-   //post("5");
+
    writeMatrixIntoList (rows_y, columns_y, list_ptr+2, mtx_conv_obj->y);
-   //post("6");
    SETSYMBOL(list_ptr, gensym("matrix"));
    SETFLOAT(list_ptr, rows_y);
    SETFLOAT(&list_ptr[1], columns_y);
