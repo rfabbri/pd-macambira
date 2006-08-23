@@ -169,7 +169,6 @@ static void mTXConvKernelMatrix (MTXConv *mtx_conv_obj, t_symbol *s, int argc,
       if (mtx_conv_obj->k)
 	 deleteTFloatMatrix (mtx_conv_obj->rows_k, mtx_conv_obj->columns_k,
 	       &mtx_conv_obj->k, &mtx_conv_obj->k_array);
-      post("getting %d rows and %d columns for k",rows_k,columns_k);
       getTFloatMatrix (rows_k, columns_k, &mtx_conv_obj->k, &mtx_conv_obj->k_array);
       if ((!mtx_conv_obj->k)||(!mtx_conv_obj->k_array)) {
 	 post("mtx_conv: memory allocation failed!");
@@ -242,7 +241,6 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
      if (mtx_conv_obj->x)
        deleteTFloatMatrix (mtx_conv_obj->rows, mtx_conv_obj->columns, 
 	     &mtx_conv_obj->x, &mtx_conv_obj->x_array);
-     post("getting %d rows and %d columns for x",rows,columns);
      getTFloatMatrix (rows, columns, &mtx_conv_obj->x, &mtx_conv_obj->x_array);
      if ((!mtx_conv_obj->x)||(!mtx_conv_obj->x_array)) {
 	post("mtx_conv: memory allocation failed!");
@@ -260,7 +258,6 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
      if (mtx_conv_obj->y)
         deleteTFloatMatrix (mtx_conv_obj->rows_y, mtx_conv_obj->columns_y,
                                &mtx_conv_obj->y, &mtx_conv_obj->y_array);
-     post("getting %d rows and %d columns for y",rows_y,columns_y);
      getTFloatMatrix (rows_y, columns_y, &mtx_conv_obj->y, &mtx_conv_obj->y_array);
      if ((!mtx_conv_obj->y)||(!mtx_conv_obj->y_array)) {
 	post("mtx_conv: memory allocation failed!");
