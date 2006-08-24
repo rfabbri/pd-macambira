@@ -10,6 +10,7 @@ MP 20060619 implemented status outlet
 MP 20060620 Add DTR and RTS control, add outputs to reflect CTS and DSR states.
 MP 20060621 Do all the above for Windows too.
 MP 20060709 All status goes out the status outlet when an info message is received
+MP 20060824 added clock_delay call in comport_devicename
 */
 
 #include "m_pd.h"
@@ -1208,6 +1209,7 @@ static void comport_devicename(t_comport *x, t_symbol *s)
 {
     x->serial_device = s;
     x->comhandle = open_serial(9999,x);
+    clock_delay(x->x_clock, x->x_deltime);
 }
 
 static void comport_print(t_comport *x, t_symbol *s, int argc, t_atom *argv)
