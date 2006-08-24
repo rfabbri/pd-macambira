@@ -1412,10 +1412,10 @@ mrpeach: $(MRPEACH_OBJECTS:.c=.$(EXTENSION))
 mrpeach_install: mrpeach
 	install -d $(objectsdir)/$(MRPEACH_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MRPEACH_NAME) \
-		--author "Martin Peach" \
+		--author "Martin Peach <martin.peach@sympatico.ca>" \
 		--description "" \
-		--license "" \
-		--version ""
+		--license "GNU GPL" \
+		--version "0.1"
 	install -p $(MRPEACH_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MRPEACH_NAME)
 	install -d $(helpdir)/$(MRPEACH_NAME)
 	install -p $(externals_src)/mrpeach/*/*-help.pd \
