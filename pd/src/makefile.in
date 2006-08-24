@@ -101,7 +101,7 @@ $(BIN_DIR):
 	test -d $(BIN_DIR) || mkdir -p $(BIN_DIR)
 
 $(BIN_DIR)/pd-watchdog: s_watchdog.c $(BIN_DIR)
-	$(CC) -O2 $(STRIPFLAG) -o $(BIN_DIR)/pd-watchdog s_watchdog.c
+	$(CC) $(CFLAGS) $(STRIPFLAG) -o $(BIN_DIR)/pd-watchdog s_watchdog.c
 
 $(BIN_DIR)/pdsend: u_pdsend.c $(BIN_DIR)
 	$(CC) $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdsend u_pdsend.c
@@ -122,7 +122,7 @@ $(BIN_DIR)/pd.tk: u_main.tk
 
 #this is for Max OSX only...
 $(BIN_DIR)/libPdTcl.dylib: $(GOBJ) $(GSRC)
-	cd ../obj && $(CC) -dynamiclib -read_only_relocs warning  \
+	cd ../obj && $(CC) $(CFLAGS) -dynamiclib -read_only_relocs warning  \
 		-o $(BIN_DIR)/libPdTcl.dylib $(GOBJ)  \
 		-F@TCLTK_FRAMEWORKS_PATH@ \
 		-framework Tcl  -framework Tk  -framework System  \

@@ -234,6 +234,8 @@ static void send_anything(t_send *x, t_symbol *s, int argc, t_atom *argv)
 static void *send_new(t_symbol *s)
 {
     t_send *x = (t_send *)pd_new(send_class);
+    if (!*s->s_name)
+        symbolinlet_new(&x->x_obj, &x->x_sym);
     x->x_sym = s;
     return (x);
 }

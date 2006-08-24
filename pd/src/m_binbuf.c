@@ -169,7 +169,7 @@ void binbuf_text(t_binbuf *x, char *text, size_t size)
                         dollar = 0;
                 if (dollar)
                     SETDOLLAR(ap, atoi(buf+1));
-                else post("dollsym %s", buf), SETDOLLSYM(ap, gensym(buf));
+                else SETDOLLSYM(ap, gensym(buf));
             }
             else SETSYMBOL(ap, gensym(buf));
         }
@@ -649,8 +649,11 @@ void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv)
                 s9 = binbuf_realizedollsym(at->a_w.w_symbol, argc, argv,
                     target == &pd_objectmaker);
                 if (!s9)
-                    goto broken;
-                SETSYMBOL(msp, s9);
+                {
+                    error("%s: argument number out of range", at->a_w.w_symbol->s_name);
+                    SETSYMBOL(msp, at->a_w.w_symbol);
+                }
+                else SETSYMBOL(msp, s9);
                 break;
             default:
                 bug("bad item in binbuf");

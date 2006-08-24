@@ -6,8 +6,6 @@ install: install_linux
 
 clean: clean_linux
 
-clobber: clobber_linux
-
 PDEXTERN=/usr/local/lib/pd/externs
 
 # ----------------------- NT -----------------------
@@ -119,13 +117,11 @@ install_linux:
 linux_clean:
 	rm -f *.pd_linux_o *.o
 
-linux_clobber: clean
-	rm -f expr.pd_linux
-
 # ----------------------- MAC OSX -----------------------
 
-MACOSXOBJ =  vexp.d_ppc_o vexp_fun.d_ppc_o vexp_if.d_ppc_o
-.SUFFIXES: .d_ppc_o
+MACOSXOBJ3 =  vexp.d_ppc_o vexp_fun.d_ppc_o vexp_if.d_ppc_o
+MACOSXOBJ =  vexp.d_fat_o vexp_fun.d_fat_o vexp_if.d_fat_o
+.SUFFIXES: .d_ppc_o .d_fat_o
 
 MACOSXCFLAGS = -DMACOSX -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch 
@@ -152,13 +148,21 @@ fexpr~.d_ppc: expr.d_ppc
 	rm -f ../fexpr~.d_ppc
 	-ln -s expr~/fexpr~.d_ppc ..
 
+install_d_fat:
+	install expr.d_fat $(PDEXTERN)
+	rm -f $(PDEXTERN)/expr~.d_fat
+	rm -f $(PDEXTERN)/fexpr~.d_fat
+	cd $(PDEXTERN); \
+	-ln -s expr.d_fat expr~.d_fat; \
+	-ln -s expr.d_fat fexpr~.d_fat
+
 d_fat: expr.d_fat expr~.d_fat fexpr~.d_fat
 .c.d_fat_o:
 	$(CC) -g $(MACOSXCFLAGS) $(MACOSXINCLUDE)  -arch i386 -arch ppc \
-	-o $*.d_ppc_o -c $*.c
+	-o $*.d_fat_o -c $*.c
 
 expr.d_fat: $(MACOSXOBJ)
-	$(CC) -bundle -undefined suppress  -flat_namespace \
+	$(CC) -arch i386 -arch ppc -bundle -undefined suppress  -flat_namespace \
 		-o expr.d_fat $(MACOSXOBJ)  -lm
 	rm -f ../expr.d_fat
 	-ln -s expr~/expr.d_fat ..
@@ -173,7 +177,7 @@ fexpr~.d_fat: expr.d_fat
 	rm -f ../fexpr~.d_fat
 	-ln -s expr~/fexpr~.d_fat ..
 
-install_darwin:
+install_d_ppc:
 	install expr.d_ppc $(PDEXTERN)
 	rm -f $(PDEXTERN)/expr~.d_ppc
 	rm -f $(PDEXTERN)/fexpr~.d_ppc
@@ -181,9 +185,6 @@ install_darwin:
 	-ln -s expr.d_ppc expr~.d_ppc; \
 	-ln -s expr.d_ppc fexpr~.d_ppc
 
-darwin_clean:
+clean_d_ppc:
 	rm -f *.d_ppc_o *.o
-
-darwin_clobber: clean
-	rm -f expr.d_ppc
 

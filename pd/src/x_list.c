@@ -22,17 +22,19 @@ extern t_pd *newest;
     list split - first n elements to first outlet, rest to second outlet 
     list trim - trim off "list" selector
     list length - output number of items in list
-    list nth - nth item in list, counting from zero
 
-Not sure we need these:
-    list cat - build a list by accumulating elements
-    list foreach - spit out elements of a list one by one
+Need to think more about:
+    list foreach - spit out elements of a list one by one (also in reverse?)
     list array - get items from a named array as a list
     list reverse - permute elements of a list back to front
     list pack - synonym for 'pack'
     list unpack - synonym for 'unpack'
+    list cat - build a list by accumulating elements
+
+Probably don't need:
     list first - output first n elements.
     list last - output last n elements
+    list nth - nth item in list, counting from zero
 */
 
 /* -------------- utility functions: storage, copying  -------------- */
@@ -383,6 +385,44 @@ static void list_trim_setup(void)
     class_sethelpsymbol(list_trim_class, &s_list);
 }
 
+/* ------------- list length --------------------- */
+
+t_class *list_length_class;
+
+typedef struct _list_length
+{
+    t_object x_obj;
+} t_list_length;
+
+static void *list_length_new( void)
+{
+    t_list_length *x = (t_list_length *)pd_new(list_length_class);
+    outlet_new(&x->x_obj, &s_float);
+    return (x);
+}
+
+static void list_length_list(t_list_length *x, t_symbol *s,
+    int argc, t_atom *argv)
+{
+    outlet_float(x->x_obj.ob_outlet, (float)argc);
+}
+
+static void list_length_anything(t_list_length *x, t_symbol *s,
+    int argc, t_atom *argv)
+{
+    outlet_float(x->x_obj.ob_outlet, (float)argc);
+}
+
+static void list_length_setup(void)
+{
+    list_length_class = class_new(gensym("list length"),
+        (t_newmethod)list_length_new, 0,
+        sizeof(t_list_length), 0, 0);
+    class_addlist(list_length_class, list_length_list);
+    class_addanything(list_length_class, list_length_anything);
+    class_sethelpsymbol(list_length_class, &s_list);
+}
+
 /* ------------- list ------------------- */
 
 static void *list_new(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
@@ -400,6 +440,8 @@ static void *list_new(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
             newest = list_split_new(atom_getfloatarg(1, argc, argv));
          else if (s2 == gensym("trim"))
             newest = list_trim_new();
+         else if (s2 == gensym("length"))
+            newest = list_length_new();
         else 
         {
             error("list %s: unknown function", s2->s_name);
@@ -416,5 +458,6 @@ void x_list_setup(void)
     list_prepend_setup();
     list_split_setup();
     list_trim_setup();
+    list_length_setup();
     class_addcreator((t_newmethod)list_new, &s_list, A_GIMME, 0);
 }

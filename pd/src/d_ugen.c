@@ -571,7 +571,7 @@ void ugen_start(void)
     ugen_stop();
     ugen_sortno++;
     dsp_chain = (t_int *)getbytes(sizeof(*dsp_chain));
-    dsp_chain[0] = 0;
+    dsp_chain[0] = (t_int)dsp_done;
     dsp_chainsize = 1;
     if (ugen_currentcontext) bug("ugen_start");
 }

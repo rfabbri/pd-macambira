@@ -33,6 +33,8 @@ block resampling arguments
 document tabwrite~_start
 "list" to signal inlet (e.g., "*~") or float inlet (f) complains.
 $-expansion changed 
+list length
+send inlet
 
 problems:
 open_via_path call in d_soundfile.c isn't threadsafe

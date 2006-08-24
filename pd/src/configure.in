@@ -256,6 +256,7 @@ then
     else
         MORECFLAGS="-arch i386 -arch ppc -Wno-error"
     	EXTERNTARGET=d_fat
+        LDFLAGS=$LDFLAGS" -arch i386 -arch ppc"
     fi
     SYSSRC="s_midi_pm.c s_audio_pa.c \
     	s_audio_pablio.c     \

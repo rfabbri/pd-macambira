@@ -85,8 +85,9 @@ DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
 	rm -f $*.o
 
 .c.d_fat:
-	$(CC) $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	$(CC) -bundle -undefined suppress -flat_namespace -o $*.pd_imac $*.o 
+	$(CC) -arch i386 -arch ppc $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
+	$(CC) -arch i386 -arch ppc -bundle -undefined suppress -flat_namespace \
+	    -o $*.d_fat $*.o 
 	rm -f $*.o
 
 # ----------------------------------------------------------
