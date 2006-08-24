@@ -132,9 +132,9 @@ d_ppc: expr.d_ppc expr~.d_ppc fexpr~.d_ppc
 .c.d_ppc_o:
 	$(CC) -g $(MACOSXCFLAGS) $(MACOSXINCLUDE) -o $*.d_ppc_o -c $*.c
 
-expr.d_ppc: $(MACOSXOBJ)
+expr.d_ppc: $(MACOSXOBJ3)
 	$(CC) -bundle -undefined suppress  -flat_namespace \
-		-o expr.d_ppc $(MACOSXOBJ)  -lm
+		-o expr.d_ppc $(MACOSXOBJ3)  -lm
 	rm -f ../expr.d_ppc
 	-ln -s expr~/expr.d_ppc ..
 
