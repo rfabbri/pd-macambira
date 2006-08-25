@@ -329,7 +329,7 @@ static void fdn_setupdelayline(t_fdn *x){
   int sum, t, n;
   int mask = x->x_ctl.c_bufsize - 1;
   int start =  x->x_ctl.c_tap[0];
-  int *tap = x->x_ctl.c_tap;
+  t_int *tap = x->x_ctl.c_tap;
   float *length = x->x_ctl.c_length;
   float scale = sys_getsr() * .001f;
 

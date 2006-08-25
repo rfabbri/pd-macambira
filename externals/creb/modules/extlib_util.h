@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef CREB_EXTLIB_UTIL_H 	 
+#ifndef CREB_EXTLIB_UTIL_H
 #define CREB_EXTLIB_UTIL_H
 
 #include <math.h>
@@ -47,5 +47,5 @@ typedef union
 #define IS_DENORMAL(f) (((((t_flint)(f)).i) & 0x7f800000) == 0)
 
 
-
 #endif /* CREB_EXTLIB_UTIL_H */
+

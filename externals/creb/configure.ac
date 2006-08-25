@@ -1,4 +1,4 @@
-AC_INIT(system/setup.c)
+AC_INIT(modules/setup.c)
 AC_PROG_CC
 AC_HEADER_STDC
 
