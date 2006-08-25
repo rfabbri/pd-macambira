@@ -30,7 +30,10 @@
  * these two methods both have got positive delays on 0,N/2-1 and the negative delays (-N/2, -1) are indexed on N/2,N-1 */
 
 
-#include "flib.h"
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <m_pd.h>
 #define SQ(a) (a * a)
 
 static t_class *cc_class;
@@ -40,9 +43,9 @@ typedef struct _cc {
     t_float f;
     t_int delay;
     t_int is_freq_domain;
-    t_float *buffer2Nsig1, *buffer2Nsig2;
+    t_float *bufferNsig1, *bufferNsig2;
     t_float *output_prev_block;
-    t_int is_new;
+    t_int is_new_or_rszd;
     t_int n;
 } t_cc;
 
@@ -112,102 +115,124 @@ static t_int *cc_perform_freq_domain(t_int *w)
   t_sample *sig2 = (t_sample *)(w[3]);
   t_sample *out  = (t_sample *)(w[4]);
   t_int size  = (int) w[5];
-  x->n = size;
   t_int size2 = size*2;
   t_int half = size/2;
+  t_int thrhalf = 3*half;
   t_float *expsig1 = NULL;
   t_float *revsig2 = NULL;
   t_float temp, temp2;
   t_int i=0;
-  t_int thrhalf;
 
+  if (x->n!=size)
+  {
+    x->n = size;
+    x->is_new_or_rszd=1;
+  }
+  
 // This stuff here sets up two buffers to hold the previous N samples
 // To get the usual overlapping block (2) design on each input
 
-  if (x->is_new)
+  if (x->is_new_or_rszd)
   {
-    x->buffer2Nsig1=getbytes(size*sizeof(t_float));    
-    x->buffer2Nsig2=getbytes(size*sizeof(t_float));
-    x->output_prev_block=getbytes(size*sizeof(t_float));        
-    x->is_new=0;
+    if (x->bufferNsig1!=NULL)
+    {
+      freebytes(x->bufferNsig1,size*sizeof(t_float));
+      freebytes(x->bufferNsig2,size*sizeof(t_float));
+      freebytes(x->output_prev_block,size*sizeof(t_float));
+    }
+    x->bufferNsig1=getbytes(size*sizeof(t_float));
+    x->bufferNsig2=getbytes(size*sizeof(t_float));
+    x->output_prev_block=getbytes(size*sizeof(t_float));
+    for(i=0; i<size; i++)
+    {
+      x->bufferNsig1[i]=0;
+      x->bufferNsig2[i]=0;
+      x->output_prev_block[i]=0;
+    }
+    x->is_new_or_rszd=0;
   }
-//  Here we set the buffers for the next round
-  for(i=half; i < size; i++)
- {
-    x->buffer2Nsig1[i]=sig1[i];
-    x->buffer2Nsig2[i]=sig2[i];
-  }
-// The two signals are created, nonzero on 0 to 1/4 and 3/4 to 1
-// Using a block size of 2N, --size2
 
-  expsig1=(float *) getbytes(size2*sizeof(float));
-  revsig2=(float *) getbytes(size2*sizeof(float));
+// The two signals are created, using a block size of 2N, --size2
+// expsig1 is the expanded signal1 x->bufferNsig1 + sig1
+// revsig2 is the reversed signal2 (reversed about i=0)
+// it is made 0.0 on 0 to half and thrhalf to size2
 
-// Loops for assignment of old values in buffer + new block
-  thrhalf = 3*half;
+
+  expsig1=(t_float *) getbytes(size2*sizeof(t_float));
+  revsig2=(t_float *) getbytes(size2*sizeof(t_float));
+
+// Loops for assignment of old values in new block + buffer
+
   for (i=0; i < half ; i++)
   {
-    expsig1[i]=x->buffer2Nsig1[i];
-    revsig2[i]=0;
+    expsig1[i]=x->bufferNsig1[i];
+    revsig2[i]=0.0;
   }
   for (i=half; i < size ; i++)
   {
-    expsig1[i]=x->buffer2Nsig1[i];
-    revsig2[i]=sig2[size-i];            /// Needs revision here, not too clear
+    expsig1[i]=x->bufferNsig1[i];
+    revsig2[i]=sig2[size-i];
   }
   expsig1[size]=sig1[0];
   revsig2[size]=sig2[0];
   for (i=size+1; i < thrhalf ; i++)
   {
     expsig1[i]=sig1[i-size];
-    revsig2[i]=x->buffer2Nsig2[size2-i];
+    revsig2[i]=x->bufferNsig2[size2-i];
   }
   for (i=thrhalf; i < size2 ; i++)
   {
     expsig1[i]=sig1[i-size];
-    revsig2[i]=0;
+    revsig2[i]=0.0;
   }
-
+//  Here we set the buffers for the next round
+  for(i=0; i < size; i++)
+  {
+    x->bufferNsig1[i]=(t_float) sig1[i];
+    x->bufferNsig2[i]=(t_float) sig2[i];
+  }
 //  fft the two blocks and multiply them
   mayer_realfft(size2, expsig1);
   mayer_realfft(size2, revsig2);
-
+  
   expsig1[0]*=revsig2[0];
   expsig1[size]*=revsig2[size];
-  for(i=1; i < size2; i++)  
+  
+  
+  for(i=1; i < size; i++)  
   {
     temp=expsig1[i];
     temp2=expsig1[size2-i];
     expsig1[i]=temp*revsig2[i]-temp2*revsig2[size2-i];
-    expsig1[size2-i]=temp*revsig2[size2-i]+temp2*revsig2[i];
+    expsig1[size2-i]=-1.0*(temp*revsig2[size2-i]+temp2*revsig2[i]);
   }
-  
 //  ifft
+  
   mayer_realifft(size2, expsig1);
-
 //  format the output:  this section formats the ouptut either as
 //  a simple cc or as a running cc
-if (x->is_freq_domain == 1)
-{
-  for(i=0; i < half; i++)
+  if (x->is_freq_domain == 1)
   {
-    out[i]=expsig1[i]/size2;
-    out[half + i]=expsig1[half + i]/size2;
+    for(i=0; i < half; i++)
+    {
+      out[i]=expsig1[thrhalf+i]/size2;
+      out[half + i]=expsig1[i]/size2;
+    }
   }
-} else {
-  for(i=0; i < half; i++)
+  else
   {
-    out[i]=x->output_prev_block[i] + expsig1[i]/size2;
-    out[half + i]=x->output_prev_block[half + i] + expsig1[half + i]/size2;
-    x->output_prev_block[i] = out[i];
-    x->output_prev_block[half + i] = out[half + i];
+    for(i=0; i < half; i++)
+    {
+      out[i]=x->output_prev_block[i] + expsig1[thrhalf+i]/size2;
+      out[half + i]=x->output_prev_block[half + i] + expsig1[i]/size2;
+      x->output_prev_block[i] = out[i];
+      x->output_prev_block[half + i] = out[half + i];
+    }
   }
-}
 
-freebytes(expsig1, size2*sizeof(float));
-freebytes(revsig2, size2*sizeof(float));
+  freebytes(expsig1, size2*sizeof(t_float));
+  freebytes(revsig2, size2*sizeof(t_float));
   return(w+6);
-
 }
 
 static void cc_dsp(t_cc *x, t_signal **sp)
@@ -249,21 +274,21 @@ static void *cc_new(t_symbol *s, t_int argc, t_atom *argv)
     } 
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
     outlet_new(&x->x_obj, &s_signal);
-    x->is_new=1;
-    x->buffer2Nsig1=NULL;
-    x->buffer2Nsig2=NULL;
+    x->is_new_or_rszd=1;
+    x->bufferNsig1=NULL;
+    x->bufferNsig2=NULL;
     x->output_prev_block=NULL;
     return (void *)x;
 }
 
 static void cc_free(t_cc *x)
 {
-  if     (x->buffer2Nsig1 != NULL)
-    freebytes(x->buffer2Nsig1, x->n*sizeof(float));
-  if     (x->buffer2Nsig2 != NULL)
-    freebytes(x->buffer2Nsig2, x->n*sizeof(float));
+  if     (x->bufferNsig1 != NULL)
+    freebytes(x->bufferNsig1, x->n*sizeof(t_float));
+  if     (x->bufferNsig2 != NULL)
+    freebytes(x->bufferNsig2, x->n*sizeof(t_float));
   if     (x->output_prev_block != NULL)
-    freebytes(x->output_prev_block, x->n*sizeof(float));
+    freebytes(x->output_prev_block, x->n*sizeof(t_float));
 }
 
 
@@ -279,4 +304,5 @@ void cc_tilde_setup(void) {
     CLASS_MAINSIGNALIN(cc_class, t_cc,f);
     class_sethelpsymbol(cc_class, gensym("help-flib"));
 }
+
 
