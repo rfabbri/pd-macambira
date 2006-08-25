@@ -15,8 +15,8 @@
 
 #include "hid.h"
 
-#define DEBUG(x)
-//#define DEBUG(x) x 
+//#define DEBUG(x)
+#define DEBUG(x) x 
 
 #define LINUX_BLOCK_DEVICE   "/dev/input/event"
 
@@ -49,21 +49,21 @@
 
 t_symbol* hid_convert_linux_buttons_to_numbers(__u16 linux_code)
 {
-    char hid_code[10];
+    char hid_code[MAXPDSTRING];
     if(linux_code >= 0x100) 
     {
-        if(linux_code < BTN_MOUSE)   
-            sprintf(hid_code,"btn_%d",linux_code - BTN_MISC);  /* numbered buttons */
-        else if(linux_code < BTN_JOYSTICK)
-            sprintf(hid_code,"btn_%d",linux_code - BTN_MOUSE);  /* mouse buttons */
-        else if(linux_code < BTN_GAMEPAD)
-            sprintf(hid_code,"btn_%d",linux_code - BTN_JOYSTICK);  /* joystick buttons */
-        else if(linux_code < BTN_DIGI)
-            sprintf(hid_code,"btn_%d",linux_code - BTN_GAMEPAD);  /* gamepad buttons */
-        else if(linux_code < BTN_WHEEL)
-            sprintf(hid_code,"btn_%d",linux_code - BTN_DIGI);  /* tablet buttons */
-        else if(linux_code < KEY_OK)
-            sprintf(hid_code,"btn_%d",linux_code - BTN_WHEEL);  /* wheel buttons */
+        if(linux_code < BTN_MOUSE)         /* numbered buttons */
+            snprintf(hid_code, MAXPDSTRING,"btn_%d",linux_code - BTN_MISC);  
+        else if(linux_code < BTN_JOYSTICK) /* mouse buttons */
+            snprintf(hid_code, MAXPDSTRING,"btn_%d",linux_code - BTN_MOUSE);
+        else if(linux_code < BTN_GAMEPAD)  /* joystick buttons */
+            snprintf(hid_code, MAXPDSTRING,"btn_%d",linux_code - BTN_JOYSTICK);
+        else if(linux_code < BTN_DIGI)     /* gamepad buttons */
+            snprintf(hid_code, MAXPDSTRING,"btn_%d",linux_code - BTN_GAMEPAD);
+        else if(linux_code < BTN_WHEEL)    /* tablet buttons */
+            snprintf(hid_code, MAXPDSTRING,"btn_%d",linux_code - BTN_DIGI);
+        else if(linux_code < KEY_OK)       /* wheel buttons */
+            snprintf(hid_code, MAXPDSTRING,"btn_%d",linux_code - BTN_WHEEL);
 	else return 0;
     }
     return gensym(hid_code ? hid_code : "?");
@@ -78,10 +78,8 @@ t_symbol* hid_convert_linux_keys(__u16 linux_code)
 {  
     if(linux_code > 226)
         return 0;
-    /*         quick hack to get the keys         */
-    /* (in future this should be auto-generated)  */
 
-    static char key_names[227][20] =
+    static char key_names[227][32] =
         { 
             "key_reserved", "key_esc", "key_1", "key_2", "key_3", "key_4", 
             "key_5", "key_6", "key_7", "key_8", "key_9", "key_0", "key_minus", 
@@ -263,13 +261,13 @@ void hid_print_device_list(void)
 {
     debug_print(LOG_DEBUG,"hid_print_device_list");
     int i,fd;
-    char device_output_string[256] = "Unknown";
-    char dev_handle_name[20] = "/dev/input/event0";
+    char device_output_string[MAXPDSTRING] = "Unknown";
+    char dev_handle_name[MAXPDSTRING] = "/dev/input/event0";
 
     post("");
     for(i=0;i<128;++i) 
     {
-        sprintf(dev_handle_name,"/dev/input/event%d",i);
+        snprintf(dev_handle_name, MAXPDSTRING, "/dev/input/event%d", i);
         if(dev_handle_name) 
         {
             /* open the device read-only, non-exclusive */
@@ -292,6 +290,88 @@ void hid_print_device_list(void)
     post("");	
 }
 
+
+
+static void hid_build_element_list(t_hid *x) 
+{
+    post("hid_build_element_list");
+    unsigned long element_bitmask[EV_MAX][NBITS(KEY_MAX)];
+    uint8_t abs_bitmask[ABS_MAX/8 + 1];
+    struct input_absinfo abs_features;
+    t_hid_element *new_element = NULL;
+    t_int i, j;
+  
+    element_count[x->x_device_number] = 0;
+    if( x->x_fd ) 
+    {
+        new_element = getbytes(sizeof(t_hid_element));
+        /* get bitmask representing supported elements (axes, keys, etc.) */
+        memset(element_bitmask, 0, sizeof(element_bitmask));
+        if( ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), element_bitmask[0]) < 0 )
+            perror("[hid] error: evdev ioctl: element_bitmask");
+        memset(abs_bitmask, 0, sizeof(abs_bitmask));
+        if( ioctl(x->x_fd, EVIOCGBIT(EV_ABS, sizeof(abs_bitmask)), abs_bitmask) < 0 ) 
+            perror("[hid] error: evdev ioctl: abs_bitmask");
+        for( i = 1; i < EV_MAX; i++ ) 
+        {
+            if(test_bit(i, element_bitmask[0])) 
+            {
+                new_element->linux_type = i;
+                new_element->type = gensym(ev[i] ? ev[i] : "?");
+                /* get bitmask representing supported button types */
+                ioctl(x->x_fd, EVIOCGBIT(i, KEY_MAX), element_bitmask[i]);
+                /* cycle through all possible event codes (axes, keys, etc.) 
+                 * testing to see which are supported.
+                 * i = i   j = j
+                 */
+                for(j = 0; j < KEY_MAX; j++) 
+                {
+                    if( (i == EV_ABS) && (test_bit(j, abs_bitmask)) )
+                    {
+                        /* this means that the bit is set in the axes list */
+                        if(ioctl(x->x_fd, EVIOCGABS(j), &abs_features)) 
+                            perror("evdev EVIOCGABS ioctl");
+                        new_element->min = abs_features.minimum;
+                        new_element->max = abs_features.maximum;
+                    }
+                    else
+                    {
+                        new_element->min = 0;
+                        new_element->max = 0;
+                    }
+                    if(test_bit(j, element_bitmask[i])) 
+                    {
+                        new_element->linux_code = j;
+                        if((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
+                        {
+                            new_element->name = hid_convert_linux_buttons_to_numbers(j);
+                        }
+                        else
+                        {
+                            new_element->name = gensym(event_names[i][j] ? event_names[i][j] : "?");
+                        }
+                        if( i == EV_REL )
+                            new_element->relative = 1;
+                        else
+                            new_element->relative = 0;
+                        // fill in the t_hid_element struct here
+                        post("x->x_device_number: %d   element_count[]: %d",
+                             x->x_device_number, element_count[x->x_device_number]);
+                        post("linux_type/linux_code: %d/%d  type/name: %s/%s    max: %d   min: %d ", 
+                             new_element->linux_type, new_element->linux_code, 
+                             new_element->type->s_name, new_element->name->s_name,
+                             new_element->max, new_element->min);
+                        post("\tpolled: %d   relative: %d",
+                             new_element->polled, new_element->relative);
+                        element[x->x_device_number][element_count[x->x_device_number]] = new_element;
+                        ++element_count[x->x_device_number];
+                    }
+                }
+            }        
+        }
+    }
+}
+
 /* ------------------------------------------------------------------------------ */
 /* Pd [hid] FUNCTIONS */
 /* ------------------------------------------------------------------------------ */
@@ -302,8 +382,8 @@ void hid_get_events(t_hid *x)
 
 /* for debugging, counts how many events are processed each time hid_read() is called */
     DEBUG(t_int event_counter = 0;);
-
-    t_symbol*hid_code=0;
+    unsigned short i;
+    t_hid_element *output_element = NULL;
 
 /* this will go into the generic read function declared in hid.h and
  * implemented in hid_linux.c 
@@ -314,37 +394,27 @@ void hid_get_events(t_hid *x)
 
     while( read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1 )
     {
-        hid_code=0;
-        if( hid_input_event.type == EV_KEY )
+        if( hid_input_event.type != EV_SYN )
         {
-	  /* JMZ: originally both functions were called, the latter evtl. overwriting
-	   * the former; now i only call the latter if the former does not return 
-	   * a valid result
-	   */
-	  if(!(hid_code=hid_convert_linux_buttons_to_numbers(hid_input_event.code)))
-            hid_code=hid_convert_linux_keys(hid_input_event.code);
+            for( i=0; i < element_count[x->x_device_number]; ++i )
+            {
+                output_element = element[x->x_device_number][i];
+                if( (hid_input_event.type == output_element->linux_type) && \
+                    (hid_input_event.code == output_element->linux_code) )
+                {
+                    output_element->value = hid_input_event.value;
+                    post("output %d",output_element->value);
+                    break;
+                }
+            }
+            if( output_element != NULL )
+                hid_output_event(x, output_element);
         }
-        else if( hid_input_event.type == EV_SYN )
-        {
-            // filter out EV_SYN events, they are currently unused
-        }
-        else if( event_names[hid_input_event.type][hid_input_event.code] != NULL )
-        {
-	  hid_code = gensym(event_names[hid_input_event.type][hid_input_event.code]);
-        }
-        else 
-        {
-	  hid_code = gensym("unknown");
-        }
-        /* TODO: needs porting
-        if( hid_code && hid_input_event.type != EV_SYN )
-            hid_output_event(x, gensym(ev[hid_input_event.type]), hid_code, 
-                             (t_float)hid_input_event.value);*/
         DEBUG(++event_counter;);
     }
     DEBUG(
-        //if(event_counter > 0)
-        //post("output %d events",event_counter);
+        if(event_counter > 0)
+        post("output %d events",event_counter);
 	);
 	
     return;
@@ -362,14 +432,14 @@ t_int hid_open_device(t_hid *x, short device_number)
 {
     debug_print(LOG_DEBUG,"hid_open_device");
 
-    char device_name[256] = "Unknown";
-    char block_device[20] = "/dev/input/event0";
+    char device_name[MAXPDSTRING] = "Unknown";
+    char block_device[MAXPDSTRING] = "/dev/input/event0";
     struct input_event hid_input_event;
 
     x->x_fd = -1;
   
     x->x_device_number = device_number;
-    sprintf(block_device,"/dev/input/event%d",x->x_device_number);
+    snprintf(block_device,MAXPDSTRING,"/dev/input/event%d",x->x_device_number);
 
     if(block_device) 
     {
@@ -394,6 +464,7 @@ t_int hid_open_device(t_hid *x, short device_number)
     post ("[hid] opened device %d (%s): %s",
           x->x_device_number,block_device,device_name);
 
+    post("pre hid_build_element_list");
     hid_build_element_list(x);
 
     return (0);
@@ -423,8 +494,8 @@ void hid_build_device_list(void)
     int fd;
     unsigned int i;
     unsigned int last_active_device = 0;
-    char device_name[256] = "Unknown";
-    char block_device[20] = "/dev/input/event0";
+    char device_name[MAXPDSTRING] = "Unknown";
+    char block_device[MAXPDSTRING] = "/dev/input/event0";
     struct input_event  x_input_event; 
     
     debug_print(LOG_DEBUG,"hid_build_device_list");
@@ -433,9 +504,9 @@ void hid_build_device_list(void)
     
     for(i=0; i<MAX_DEVICES; ++i)
     {
-        sprintf(&block_device,"%s%d",LINUX_BLOCK_DEVICE,i);
+        snprintf(block_device, MAXPDSTRING, "%s%d", LINUX_BLOCK_DEVICE, i);
         /* open the device read-only, non-exclusive */
-        fd = open (&block_device, O_RDONLY | O_NONBLOCK);
+        fd = open (block_device, O_RDONLY | O_NONBLOCK);
         /* test if device open */
         if(fd < 0 ) { 
             /* post("Nothing on %s.", &block_device); */
@@ -462,111 +533,29 @@ void hid_build_device_list(void)
 
 
 
-
-
-static void hid_build_element_list(t_hid *x) 
-{
-    unsigned long element_bitmask[EV_MAX][NBITS(KEY_MAX)];
-    uint8_t abs_bitmask[ABS_MAX/8 + 1];
-    struct input_absinfo abs_features;
-    char type_name[256];
-    char code_name[256];
-    t_hid_element *new_element = NULL;
-    t_int i, j;
-  
-    element_count[x->x_device_number] = 0;
-    if( x->x_fd ) 
-    {
-        new_element = getbytes(sizeof(t_hid_element));
-        /* get bitmask representing supported elements (axes, keys, etc.) */
-        memset(element_bitmask, 0, sizeof(element_bitmask));
-        if( ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), element_bitmask[0]) < 0 )
-            perror("[hid] error: evdev ioctl: element_bitmask");
-        memset(abs_bitmask, 0, sizeof(abs_bitmask));
-        if( ioctl(x->x_fd, EVIOCGBIT(EV_ABS, sizeof(abs_bitmask)), abs_bitmask) < 0 ) 
-            perror("[hid] error: evdev ioctl: abs_bitmask");
-        for( i = 1; i < EV_MAX; i++ ) 
-        {
-            if(test_bit(i, element_bitmask[0])) 
-            {
-                new_element->linux_type = i;
-                new_element->type = gensym(ev[i] ? ev[i] : "?");
-                /* get bitmask representing supported button types */
-                ioctl(x->x_fd, EVIOCGBIT(i, KEY_MAX), element_bitmask[i]);
-                /* cycle through all possible event codes (axes, keys, etc.) 
-                 * testing to see which are supported.
-                 * i = i   j = j
-                 */
-                for(j = 0; j < KEY_MAX; j++) 
-                {
-                    if(test_bit(j, abs_bitmask)) 
-                    {
-                        /* this means that the bit is set in the axes list */
-                        if(ioctl(x->x_fd, EVIOCGABS(j), &abs_features)) 
-                            perror("evdev EVIOCGABS ioctl");
-                        new_element->min = abs_features.minimum;
-                        new_element->max = abs_features.maximum;
-                    }
-                    else
-                    {
-                        new_element->min = 0;
-                        new_element->max = 0;
-                    }
-                    if(test_bit(j, element_bitmask[i])) 
-                    {
-                        new_element->linux_code = j;
-                        if((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
-                        {
-                            new_element->name = hid_convert_linux_buttons_to_numbers(j);
-                        }
-                        else
-                        {
-                            new_element->name = gensym(event_names[i][j] ? event_names[i][j] : "?");
-                        }
-                        if( i == EV_REL )
-                            new_element->relative = 1;
-                        else
-                            new_element->relative = 0;
-                        // fill in the t_hid_element struct here
-//                        post("x->x_device_number: %d   element_count[]: %d",
-//                             x->x_device_number, element_count[x->x_device_number]);
-                        post("linux_type/linux_code: %d/%d  type/name: %s %s    max: %d   min: %d ", 
-                             new_element->linux_type, new_element->linux_code, 
-                             new_element->type->s_name, new_element->name->s_name,
-                             new_element->max, new_element->min);
-                        post("\tpolled: %d   relative: %d",
-                             new_element->polled, new_element->relative);
-                        element[x->x_device_number][element_count[x->x_device_number]] = new_element;
-                        ++element_count[x->x_device_number];
-                    }
-                }
-            }        
-        }
-    }
-}
-
-
 void hid_platform_specific_free(t_hid *x)
 {
     /* nothing to be done here on GNU/Linux */
 }
 
+
+
+
 /* device info on the status outlet */
 void hid_platform_specific_info(t_hid* x)
 {
     struct input_id my_id;
-    char device_name[256] = "Unknown";
+    char device_name[MAXPDSTRING] = "Unknown";
     char vendor_id_string[7];
     char product_id_string[7];
-    t_symbol *output_symbol;
     t_atom *output_atom = getbytes(sizeof(t_atom));
 
     ioctl(x->x_fd, EVIOCGID);
-    sprintf(vendor_id_string,"0x%04x", my_id.vendor);
+    snprintf(vendor_id_string,7,"0x%04x", my_id.vendor);
     SETSYMBOL(output_atom, gensym(vendor_id_string));
     outlet_anything( x->x_status_outlet, gensym("vendorID"), 
                      1, output_atom);
-    sprintf(product_id_string,"0x%04x", my_id.product);
+    snprintf(product_id_string,7,"0x%04x", my_id.product);
     SETSYMBOL(output_atom, gensym(product_id_string));
     outlet_anything( x->x_status_outlet, gensym("productID"), 
                      1, output_atom);

@@ -2,7 +2,7 @@
 #X floatatom 27 439 5 0 0 0 - - -;
 #X floatatom 83 439 5 0 0 0 - - -;
 #X floatatom 63 395 6 0 0 0 - - -;
-#X obj 129 77 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 25 25
+#X obj 129 77 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 25
 ;
 #X floatatom 571 340 12 0 0 1 value - -;
 #X symbolatom 531 356 15 0 0 1 event_code - -;
@@ -31,7 +31,7 @@
 #X text 463 79 refresh device list;
 #X text 537 487 For more info:;
 #X text 266 557 released under the GNU GPL;
-#X text 472 544 $Revision: 1.25 $$Date: 2006-06-02 21:32:53 $;
+#X text 472 544 $Revision: 1.26 $$Date: 2006-08-25 01:41:49 $;
 #X text 473 557 $Author: eighthave $;
 #X msg 436 201 poll 20;
 #X msg 374 201 poll 2;
@@ -259,7 +259,7 @@ of it could change without notice !!!;
 #X obj 492 321 unpack s s f;
 #X msg 258 110 open \$1;
 #X obj 258 92 hradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
--1 2;
+-1 0;
 #X floatatom 247 111 1 0 0 0 - - -;
 #X text 298 346 event_type event_code value;
 #X obj 63 374 route abs_x abs_y abs_z abs_rx abs_ry abs_rz abs_throttle
@@ -358,7 +358,7 @@ type vendorID productID;
 #X connect 14 0 15 0;
 #X connect 16 0 17 0;
 #X restore 55 66 pd route info;
-#X obj 32 97 tgl 15 0 empty empty open 0 -6 0 8 -262144 -1 -1 1 1;
+#X obj 32 97 tgl 15 0 empty empty open 0 -6 0 8 -262144 -1 -1 0 1;
 #X obj 61 23 inlet;
 #X obj 74 44 print info;
 #X symbolatom 255 94 0 0 0 0 productID - -;
@@ -449,7 +449,7 @@ IDs (it is not case sensitive):;
 #X floatatom 73 172 5 0 0 0 - - -;
 #X obj 126 175 spigot;
 #X obj 124 216 print test;
-#X obj 167 152 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 167 152 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 270 82 spigot;
 #X obj 268 123 print test;

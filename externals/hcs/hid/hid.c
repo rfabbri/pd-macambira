@@ -35,8 +35,8 @@
  * LOCAL DEFINES
  */
 
-#define DEBUG(x)
-//#define DEBUG(x) x 
+//#define DEBUG(x)
+#define DEBUG(x) x 
 
 unsigned short global_debug_level = 0;
 
