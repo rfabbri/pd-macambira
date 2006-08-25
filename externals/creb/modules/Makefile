@@ -10,7 +10,7 @@ current: ead~.o ear~.o eadsr~.o dist~.o \
 	\
 	dwt.o cmath.o \
 	\
-	envelope_util.o setup.o
+	setup.o
 
 
 clean:
