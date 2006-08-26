@@ -43,12 +43,13 @@ typedef struct comport
 {
     t_object       x_obj;
     long           n; /* the state of a last input */
-    HANDLE         comhandle; /* holds the comport handle */
 #ifdef _WIN32
+    HANDLE         comhandle; /* holds the comport handle */
     DCB            dcb; /* holds the comm pars */
     DCB            dcb_old; /* holds the comm pars */
     COMMTIMEOUTS   old_timeouts;
 #else
+    int            comhandle; /* holds the comport handle */
     struct termios oldcom_termio; /* save the old com config */
     struct termios com_termio; /* for the new com config */
 #endif
@@ -700,7 +701,7 @@ static int set_xonxoff(t_comport *x, int nr)
 
 static int open_serial(unsigned int com_num, t_comport *x)
 {
-    HANDLE         fd;
+    int            fd;
     struct termios *old = &(x->oldcom_termio);
     struct termios *new = &(x->com_termio);
     float          *baud = &(x->baud);
@@ -883,8 +884,12 @@ static void comport_pollintervall(t_comport *x, t_floatarg g)
 
 static void comport_tick(t_comport *x)
 {
+#ifdef _WIN32
+	HANDLE       fd = x->comhandle;
+#else
+	int  fd = x->comhandle;
+#endif /* _WIN32 */
     int          err;
-    HANDLE       fd = x->comhandle;
 
     x->x_hit = 0;
 
@@ -1036,7 +1041,7 @@ static void *comport_new(t_floatarg com_num, t_floatarg fbaud)
 
 static void comport_free(t_comport *x)
 {
-    post("free serial...");
+    post("[comport] free serial...");
     clock_unset(x->x_clock);
     clock_free(x->x_clock);
     x->comhandle = close_serial(x);
@@ -1231,6 +1236,44 @@ static void comport_print(t_comport *x, t_symbol *s, int argc, t_atom *argv)
     }
 }
 
+static void comport_output_print(t_comport *x)
+{
+	unsigned int i;
+
+	post("[comport]: available serial ports:");
+#ifdef _WIN32
+	post("\t0 - COM1");
+	for(i=1; i<COMPORT_MAX; i++)
+	{
+		/* TODO: this should actually probe ports */
+		post("\t%d - COM%s", i, i);
+	}
+#else	
+    glob_t         glob_buffer;
+	switch( glob( x->serial_device_name, 0, NULL, &glob_buffer ) )
+	{
+	case GLOB_NOSPACE:
+		error("[comport] out of memory for \"%s\"",x->serial_device_name);
+		break;
+# ifdef GLOB_ABORTED
+	case GLOB_ABORTED:
+		error("[comport] aborted \"%s\"",x->serial_device_name);
+		break;
+# endif /* GLOB_ABORTED */
+# ifdef GLOB_NOMATCH
+	case GLOB_NOMATCH:
+		error("[comport] no serial devices found for \"%s\"",x->serial_device_name);
+		break;
+# endif /* GLOB_NOMATCH */
+	}
+	for(i=0; i<glob_buffer.gl_pathc; i++)
+	{
+		post("\t%d\t%s", i, glob_buffer.gl_pathv[i]);
+	}
+#endif  /* _WIN32 */
+}
+
+
 static void comport_output_status(t_comport *x, t_symbol *selector, t_float output_value)
 {
     t_atom *output_atom = getbytes(sizeof(t_atom));
@@ -1295,6 +1338,7 @@ static void comport_info(t_comport *x)
     comport_output_data_bits(x);
     comport_output_rtscts(x);
     comport_output_xonxoff(x);
+	comport_output_print(x);
 }
 
 /* ---------------- HELPER ------------------------- */
