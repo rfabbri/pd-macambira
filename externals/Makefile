@@ -43,7 +43,7 @@ BUILDSRC_OS_NAME = $(OS_NAME)
 
 CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS)
 LDFLAGS =  
-LIBS = -lm -lstdc++
+LIBS = -lm
 
 ifeq ($(OS_NAME),darwin)
   CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix
@@ -82,14 +82,23 @@ endif
 
 CXXFLAGS = $(CFLAGS)
 
-%.o: %.c
-	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+### C++ files
+%.$(EXTENSION): %.cpp
+%.$(EXTENSION): %.cc
+	$(CXX) $(CXXFLAGS) -o "$*.o" -c "$<"
+	$(CXX) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) 
+	chmod a-x "$*.$(EXTENSION)"
+#	$(STRIP) $*.$(EXTENSION)
+#	rm -f -- $*.o
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -o "$*.o" -c "$*.cpp"
-
 %.o: %.cc
-	$(CXX) $(CXXFLAGS) -o "$*.o" -c "$*.cc"
+	$(CXX) $(CXXFLAGS) -o "$*.o" -c "$<"
+
+
+### C files
+%.o: %.c
+	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
 
 %.$(EXTENSION): %.o
 	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) \
@@ -99,6 +108,8 @@ CXXFLAGS = $(CFLAGS)
 	chmod a-x "$*.$(EXTENSION)"
 #	$(STRIP) $*.$(EXTENSION)
 #	rm -f -- $*.o
+
+
 
 
 #------------------------------------------------------------------------------#
@@ -557,16 +568,16 @@ ekext_install: ekext
 		--version ""
 	install -p $(EKEXT_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(EKEXT_NAME)
 	install -d $(helpdir)/$(EKEXT_NAME)
-	install -p $(externals_src)/ekext/*/help-*.pd \
+	install -p $(externals_src)/ekext/*/*help*.pd \
 		$(helpdir)/$(EKEXT_NAME)
 #	install -d $(manualsdir)/$(EKEXT_NAME)
 #	install -p $(externals_src)/ekext/manual.txt \
 #		$(manualsdir)/$(EKEXT_NAME)
 #	install -p $(externals_src)/ekext/README \
 #		$(readmesdir)/$(EKEXT_NAME).txt
-#	install -d $(examplesdir)/$(EKEXT_NAME)
-#	install -p $(externals_src)/ekext/examples/*.pd \
-#		$(examplesdir)/$(EKEXT_NAME)
+	install -d $(examplesdir)/$(EKEXT_NAME)
+	install -p $(externals_src)/ekext/peakit~/peakit-listmoses.pd \
+		$(examplesdir)/$(EKEXT_NAME)
 
 ekext_clean:
 	-rm -f -- $(EKEXT_OBJECTS:.c=.$(EXTENSION))
@@ -914,7 +925,8 @@ else
     HID_CFLAGS = $(CFLAGS) -I$(externals_src)/hcs/hid/HID\ Utilities\ Source
     HID_UTILITIES_SOURCE = $(externals_src)/hcs/hid/HID\ Utilities\ Source
     HID_LIBS = $(LIBS) -L$(HID_UTILITIES_SOURCE)/build \
-       -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
+		-L$(HID_UTILITIES_SOURCE)/build/Default \
+      -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
   else
     HID_CFLAGS = $(CFLAGS) 
     HID_LIBS = $(LIBS)
