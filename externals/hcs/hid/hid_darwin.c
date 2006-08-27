@@ -299,7 +299,7 @@ static t_float get_type_name_instance(t_symbol *type, t_symbol *name,
 /* DARWIN-SPECIFIC SUPPORT FUNCTIONS */
 /* ============================================================================== */
 
-static short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
+short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
 {
 	debug_print(LOG_DEBUG,"get_device_number_from_usage");
 
@@ -331,7 +331,7 @@ static short get_device_number_by_id(unsigned short vendor_id, unsigned short pr
 	return(return_device_number);
 }
 
-static short get_device_number_from_usage(short device_number, 
+short get_device_number_from_usage(short device_number, 
 										unsigned short usage_page, 
 										unsigned short usage)
 {
