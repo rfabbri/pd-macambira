@@ -29,6 +29,15 @@
 #include "DSPIcomplex.h"
 #include "DSPIfilters.h"
 
+/* work around old bug in Apple compilers <hans@at.or.at> */
+//#if MAC_OS_X_VERSION < MAC_OS_X_VERSION_10_4 // arg, this didn't work
+#ifndef isnan
+extern "C" int isnan(double);
+#endif
+#ifndef isinf
+extern "C" int isinf(double);
+#endif
+
 typedef unsigned long long u64;
 typedef unsigned long u32;
 
