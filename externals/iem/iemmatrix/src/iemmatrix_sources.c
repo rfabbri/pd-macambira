@@ -10,6 +10,7 @@ void iemmatrix_sources_setup(void)
 	iemtx_abs_setup(); /* mtx_abs.c */
 	iemtx_add_setup(); /* mtx_add.c */
 	iemtx_and_setup(); /* mtx_and.c */
+	iemtx_atan_setup(); /* mtx_atan.c */
 	iemtx_binops_setup(); /* mtx_binops.c */
 	iemtx_bitand_setup(); /* mtx_bitand.c */
 	iemtx_bitleft_setup(); /* mtx_bitleft.c */
@@ -24,6 +25,7 @@ void iemmatrix_sources_setup(void)
 	iemtx_conv_setup(); /* mtx_conv.c */
 	iemtx_cos_setup(); /* mtx_cos.c */
 	iemtx_cumsum_setup(); /* mtx_cumsum.c */
+	iemtx_dbtopow_setup(); /* mtx_dbtopow.c */
 	iemtx_dbtorms_setup(); /* mtx_dbtorms.c */
 	iemtx_decay_setup(); /* mtx_decay.c */
 	iemtx_diag_setup(); /* mtx_diag.c */
@@ -51,14 +53,15 @@ void iemmatrix_sources_setup(void)
 	iemtx_mean_setup(); /* mtx_mean.c */
 	iemtx_min2_setup(); /* mtx_min2.c */
 	iemtx_minmax_setup(); /* mtx_minmax.c */
-	iemtx_mul__setup(); /* mtx_mul~.c */
 	iemtx_mul_setup(); /* mtx_mul.c */
+	iemtx_mul__setup(); /* mtx_mul~.c */
 	iemtx_neq_setup(); /* mtx_neq.c */
 	iemtx_not_setup(); /* mtx_not.c */
 	iemtx_ones_setup(); /* mtx_ones.c */
 	iemtx_or_setup(); /* mtx_or.c */
 	iemtx_pivot_setup(); /* mtx_pivot.c */
 	iemtx_pow_setup(); /* mtx_pow.c */
+	iemtx_powtodb_setup(); /* mtx_powtodb.c */
 	iemtx_print_setup(); /* mtx_print.c */
 	iemtx_prod_setup(); /* mtx_prod.c */
 	iemtx_rand_setup(); /* mtx_rand.c */
