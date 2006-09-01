@@ -35,7 +35,7 @@ static int gridcount=0;
 static int guidebug=0;
 static int pointsize = 5;
 
-static char   *grid_version = "grid: version 0.7, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *grid_version = "grid: version 0.8, written by Yves Degoyon (ydegoyon@free.fr)";
 
 #define GRID_SYS_VGUI2(a,b) if (guidebug) \
                          post(a,b);\
@@ -251,6 +251,37 @@ static void grid_output_current(t_grid* x)
     outlet_float( x->x_youtlet, yvalue );
 }
 
+/*az new method to change color */
+static void grid_draw_new_color(t_grid *x, t_glist *glist, char *col)
+{
+  t_canvas *canvas=glist_getcanvas(glist);
+  char *tagRoot;
+  char str1[80];
+
+    strcpy (str1,".x%x.c itemconfigure %xGRID -fill #");
+    strcat (str1,col);
+    strcat (str1,"\n");
+    tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x));
+    GRID_SYS_VGUI3(str1, canvas, x);
+    GRID_SYS_VGUI3(".x%x.c delete %so0\n", canvas, tagRoot);
+    GRID_SYS_VGUI3(".x%x.c delete %so1\n", canvas, tagRoot);
+    /*az redraw point if needed*/
+    if ( x->x_point )
+    {
+       grid_draw_update(x, glist);
+    }
+    GRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so0\n",
+         canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) + x->x_height+1,
+         text_xpix(&x->x_obj, glist)+7, text_ypix(&x->x_obj, glist) + x->x_height+2,
+         tagRoot);
+    GRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so1\n",
+         canvas, text_xpix(&x->x_obj, glist)+x->x_width-7, text_ypix(&x->x_obj, glist) + x->x_height+1,
+         text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist) + x->x_height+2,
+         tagRoot);
+
+    canvas_fixlinesfor( canvas, (t_text*)x );
+}
+
 /* ------------------------ grid widgetbehaviour----------------------------- */
 
 
@@ -429,6 +460,33 @@ static void grid_goto(t_grid *x, t_floatarg newx, t_floatarg newy)
         grid_output_current(x);
         grid_draw_update(x, x->x_glist);
     }
+}
+
+
+static void grid_new_color(t_grid *x, t_floatarg color1, t_floatarg color2, t_floatarg color3)
+{
+    char col[30], col1[10], col2[10], col3[10];
+
+    sprintf(col1,"%X",(int) color1);
+    if (color1 < 17)
+        sprintf(col1,"0%X",(int) color1);
+    else
+        sprintf(col1,"%X",(int) color1);
+
+    if (color2 < 17)
+        sprintf(col2,"0%X",(int) color2);
+    else
+        sprintf(col2,"%X",(int) color2);
+
+    if (color3 < 17)
+        sprintf(col3,"0%X",(int) color3);
+    else
+        sprintf(col3,"%X",(int) color3);
+    strcpy( col, col1);
+    strcat( col, col2 );
+    strcat( col, col3 );
+
+    grid_draw_new_color( x, x->x_glist, col);
 }
 
 static void grid_values(t_grid* x, t_floatarg xvalue, t_floatarg yvalue)
@@ -657,6 +715,7 @@ void grid_setup(void)
                     A_FLOAT, A_FLOAT, 0);
     class_addmethod(grid_class, (t_method)grid_goto, gensym("goto"), A_FLOAT, A_FLOAT, 0);
     class_addmethod(grid_class, (t_method)grid_dialog, gensym("dialog"), A_GIMME, 0);
+    class_addmethod(grid_class, (t_method)grid_new_color, gensym("color"), A_FLOAT, A_FLOAT, A_FLOAT, 0);
     grid_widgetbehavior.w_getrectfn =    grid_getrect;
     grid_widgetbehavior.w_displacefn =   grid_displace;
     grid_widgetbehavior.w_selectfn =     grid_select;
