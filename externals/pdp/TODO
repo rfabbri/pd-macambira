@@ -4,17 +4,22 @@ known bugs:
 short story: don't, use pdp_control's memlimit for limiting pdp's memory usage.
 
 
+
+
 todo 0.12.5:
 
+* fix sdl so it doesn't open window when object is created
+
 * find nasty 3dp bug
-* fix pdp_glx BadMatch bug (crashes on OSX)
+* fix pdp_glx BadMatch bug (crashes on OSX) : fixed in pf
 * platform independent [pdp_vdac] [pdp_vadc]
+* fix pdp_help_input/output so they are actually usable
+* incorporate jamie's osx changes / guenter's windows port
 
 
 
 todo later:
 
-* include guenter's / carmen's windows changes
 * field based bttv capture (might be possible without driver hacks using v4l2)
 * pdp_crop/pad
 * where to solve autoconvert? per type, or central in pdp_base? 2 cases:

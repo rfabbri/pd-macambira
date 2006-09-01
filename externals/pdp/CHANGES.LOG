@@ -159,5 +159,9 @@ v0.12:	2003/06/21
 	
 0.12.5:
 	build fixes
+	libquicktime api change
+	help patches renamed xxx.pd -> xxx-help.pd
+	pd-0.40 compatibility
+	sdl delayed window creation
 
 

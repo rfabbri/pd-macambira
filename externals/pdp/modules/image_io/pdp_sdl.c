@@ -43,8 +43,11 @@ TODO:
 
 /* initial image dimensions */
 
-#define WINWIDTH 640
-#define WINHEIGHT 480
+//#define WINWIDTH 640
+//#define WINHEIGHT 480
+#define WINWIDTH 320
+#define WINHEIGHT 240
+
 #define OVERLAYWIDTH 320
 #define OVERLAYHEIGHT 240
 
@@ -57,17 +60,25 @@ typedef struct pdp_sdl_struct {
     SDL_Overlay *x_overlay;
     int x_surface_flags;
 	
+    // current values
     int x_surface_width;
     int x_surface_height;
-
     unsigned int x_overlay_width;
     unsigned int x_overlay_height;
-    
+
+    // object creation args (wanted)
+    int x_w;
+    int x_h;
 
     t_outlet *x_outlet;
 
 
+
 } t_pdp_sdl;
+
+
+static int pdp_sdl_open(t_pdp_sdl *x);
+#define IF_NO_OVERLAY(x) if (!pdp_sdl_open(x))
 
 static t_pdp_sdl *sdl_singleton; // only one instance allowed
 
@@ -145,6 +156,7 @@ static void create_surface(t_pdp_sdl *x, int width, int height, int flags)
 }
 
 static void poll_events(t_pdp_sdl *x){
+    IF_NO_OVERLAY(x) { return; }
 
     SDL_Event event;
     static t_symbol *keydown=0, *keyup, *quit, *motion;
@@ -200,6 +212,8 @@ static void resize(t_pdp_sdl *x, t_floatarg fw, t_floatarg fh)
 
 static void input_0(t_pdp_sdl *x, t_symbol *s, t_floatarg f) {
 
+    IF_NO_OVERLAY(x) { return; }
+
     int input_packet = (int)f;
     if (s == gensym("register_ro")){
 	int p = pdp_packet_convert_ro(input_packet, pdp_gensym("bitmap/yv12/*"));
@@ -235,7 +249,7 @@ static void input_0(t_pdp_sdl *x, t_symbol *s, t_floatarg f) {
 	    }
 		
 	    else {
-		pdp_post("SDL: error creating overlay");
+		PDP_ASSERT(0);
 	    }
 		
 	    pdp_packet_mark_unused(p);
@@ -258,11 +272,37 @@ static void pdp_sdl_free(t_pdp_sdl *x)
 
 t_class *pdp_sdl_class;
 
-void *pdp_sdl_new(t_floatarg width, t_floatarg height) {
+
+static int pdp_sdl_open(t_pdp_sdl *x){
+
+    if (x->x_overlay) return -1;
+
+    /* try to create a surface */
+    create_surface(x, x->x_w ? x->x_w : WINWIDTH, x->x_h ? x->x_h : WINHEIGHT, 0);
+    if (!x->x_surface){
+	pdp_post("Can't create surface");
+	goto error_cleanup;
+    }
+
+    /* try to create overlay */
+    check_overlay(x, OVERLAYHEIGHT, OVERLAYWIDTH);
+    if (!x->x_overlay){
+	pdp_post("Can't create overlay");
+	goto error_cleanup;
+    }
+    return -1;
+
+
+  error_cleanup:
+    pdp_sdl_free(x);
+    return 0;
+
+}
+
+
+static void *pdp_sdl_new(t_floatarg width, t_floatarg height) {
 
     t_pdp_sdl *x;
-    int w = (int)width;
-    int h = (int)height;
 
     if (sdl_singleton) {
 	post("Only one sdl object allowed.");
@@ -282,29 +322,13 @@ void *pdp_sdl_new(t_floatarg width, t_floatarg height) {
     
     x->x_surface = NULL;
     x->x_overlay = NULL;
+    x->x_w = (int)width;
+    x->x_h = (int)height;
 
     x->x_outlet = outlet_new(&x->x_obj, &s_anything);
 
-
-    /* try to create a surface */
-    create_surface(x, w ? w : WINWIDTH, h ? h : WINHEIGHT, 0);
-    if (!x->x_surface){
-	pdp_post("Can't create surface");
-	goto error_cleanup;
-    }
-
-    /* try to create overlay */
-    check_overlay(x, 320, 240);
-    if (!x->x_overlay){
-	pdp_post("Can't create overlay");
-	goto error_cleanup;
-    }
-
     return (void *)x;
 
-  error_cleanup:
-    pdp_sdl_free(x);
-    return (void *)0;
 }
 
 
