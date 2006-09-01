@@ -31,6 +31,7 @@ typedef struct _grid
     t_float x_ystep; 	/* sets the step ( grain ) for y             */
     int x_xlines; 	/* number of vertical lines                  */
     int x_ylines; 	/* number of horizontal lines                */
+    char *x_bgcolor; 	/* background color                          */
 } t_grid;
 
 #endif
