@@ -28,9 +28,7 @@
 
 #include "pdp_3Dcontext.h"
 #include <GL/gl.h>
-//#include <GL/glx.h>
 #include <GL/glu.h>
-//#include <GL/glut.h>
 
 #define D if (0)
 

@@ -153,6 +153,7 @@ static void pdp_xv_bang_thread(t_pdp_xv *x)
 
 static void pdp_xv_bang_callback(t_pdp_xv *x)
 {
+
     /* receive events + send to outputs */
     t_pdp_list *eventlist = pdp_xwindow_get_eventlist(x->x_xwin);
     t_pdp_atom *a;

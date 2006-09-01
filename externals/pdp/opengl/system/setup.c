@@ -46,10 +46,15 @@ void pdp_3d_subcontext_setup(void);
     //#define D(x) { pdp_post_n( #x ".." ); x; pdp_post("done"); }
 #define D(x) x
 
+
+void pdp_setup(void);
 void pdp_opengl_setup(void)
 {
     int i;
-    post("PDP: pdp_opengl extension library");
+
+    pdp_setup();
+
+    post("PDP: opengl extensions version " PDP_VERSION);
 
     /* setup system */
     D(pdp_opengl_system_setup());

@@ -19,9 +19,14 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "pdp_mem.h"
 #include "pdp_debug.h"
 
+// defined here so we don't need to rebuild when changing it (deps for headers are broken)
+#define PDP_FASTALLOC_BLOCK_ELEMENTS 4096
+//#define PDP_FASTALLOC_BLOCK_ELEMENTS 1
+#define D if (0)
 
 /* malloc wrapper that calls garbage collector */
 void *pdp_alloc(int size)
@@ -29,6 +34,8 @@ void *pdp_alloc(int size)
     void *ptr = malloc(size);
     
     PDP_ASSERT(ptr);
+
+    D fprintf(stderr, "alloc %p %d\n", ptr, size);
 
     return ptr;
 
@@ -41,6 +48,7 @@ void *pdp_alloc(int size)
 
 void pdp_dealloc(void *stuff)
 {
+    D fprintf(stderr, "dealloc %p\n", stuff);
     free (stuff);
 }
 
@@ -87,6 +95,10 @@ static void _pdp_fastalloc_refill_freelist(t_pdp_fastalloc *x)
     
 }
 
+#define USE_FASTALLOC 1
+
+#if USE_FASTALLOC
+
 void *pdp_fastalloc_new_atom(t_pdp_fastalloc *x)
 {
   t_fastalloc *atom;
@@ -127,3 +139,10 @@ t_pdp_fastalloc *pdp_fastalloc_new(unsigned int size)
   return x;
 }
 
+#else
+
+void *pdp_fastalloc_new_atom(t_pdp_fastalloc *x)             {return pdp_alloc(12);}
+void pdp_fastalloc_save_atom(t_pdp_fastalloc *x, void *atom) {pdp_dealloc(atom);}
+t_pdp_fastalloc *pdp_fastalloc_new(unsigned int size)        {return 0;}
+
+#endif

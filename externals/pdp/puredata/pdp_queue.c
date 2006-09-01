@@ -79,10 +79,10 @@ void pdp_procqueue_wait(t_pdp_procqueue *q)
     D post("pdp_procqueue_wait(%x): pdp_procqueue_thread has finished processing", q);
 
 }
-void pdp_procqueue_finish(t_pdp_procqueue *q, int index)
+void pdp_procqueue_finish(t_pdp_procqueue *q, int indx)
 {
 
-  if (-1 == index) {
+  if (-1 == indx) {
       //post("pdp_pq_remove: index == -1");
       return;
   }
@@ -90,8 +90,8 @@ void pdp_procqueue_finish(t_pdp_procqueue *q, int index)
   pdp_procqueue_wait(q);
 
   /* invalidate callback at index */
-  q->q[index & q->mask].x_callback = 0;
-  q->q[index & q->mask].x_queue_id = 0;
+  q->q[indx & q->mask].x_callback = 0;
+  q->q[indx & q->mask].x_queue_id = 0;
 
 }
 
@@ -364,7 +364,7 @@ t_pdp_procqueue *pdp_queue_get_queue(void){return &pdp_queue;}
 #if 1
 /* default pdp queue shortcut methods */
 void pdp_queue_wait() {pdp_procqueue_wait(&pdp_queue);}
-void pdp_queue_finish(int index) { pdp_procqueue_finish(&pdp_queue, index);}
+void pdp_queue_finish(int indx) { pdp_procqueue_finish(&pdp_queue, indx);}
 void pdp_queue_add(void *owner, void *process, void *callback, int *queue_id) {
     pdp_procqueue_add(&pdp_queue, owner, process, callback, queue_id);
 }

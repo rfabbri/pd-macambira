@@ -37,8 +37,17 @@ extern "C"
 /* pdp's pd symbols for communication 
    don't use these directly!!
    use the macros instead, in case
-   this is proven to be too much of a hack.. */
+   this is proven to be too much of a hack..
 
+   it's too much of a hack. getting rid of them.
+
+ */
+
+
+#define PDP_SYMBOL_HACK 0
+
+
+#if PDP_SYMBOL_HACK
 extern t_symbol s_pdp;
 extern t_symbol s_register_ro;
 extern t_symbol s_register_rw;
@@ -57,6 +66,20 @@ extern t_symbol s_chanmask;
 #define S_INSPECT     &s_inspect
 #define S_ACCUMULATE  &s_accumulate
 #define S_CHANMASK    &s_chanmask
+
+#else
+
+#define S_PDP         gensym("pdp")
+#define S_REGISTER_RO gensym("register_ro")
+#define S_REGISTER_RW gensym("register_rw")
+#define S_PROCESS     gensym("process")
+#define S_DPD         gensym("dpd")
+#define S_INSPECT     gensym("inspect")
+#define S_ACCUMULATE  gensym("accumulate")
+#define S_CHANMASK    gensym("chanmask")
+
+
+#endif
 
 
 /* utility methods */

@@ -32,6 +32,8 @@
 #include "pdp_debug.h"
 
 
+#define D if(0)
+
 /* packet implementation. contains class and packet (instance) handling 
 
    some notes on packet operations.
@@ -152,6 +154,7 @@ int pdp_factory_newpacket(t_pdp_symbol *type)
 
     /* call class constructor */
     while(a){
+        D pdp_post("new: %s", type->s_name);
 	c = (t_pdp_class *)(a->w.w_pointer);
 	if (c->type && pdp_type_description_match(type, c->type)){
 	    //pdp_post("method %x, type %s", c->create, type->s_name);
@@ -287,6 +290,15 @@ pdp_packet_create(unsigned int datatype, unsigned int datasize /*without header*
 
 */
 
+/* NEW DOES NOT USE THE REUSE FIFO !!!! 
+   this is a true and genuine mess:
+   the reuse fifo can grow indefinitely with garbage elements if it's never used,
+   while it points to stale packets.. backdoor access = BAD.
+
+   if i recall, this is mainly a compatibility issue..
+
+*/
+
 int 
 pdp_packet_new(unsigned int datatype, unsigned int datasize)
 {
@@ -327,6 +339,9 @@ pdp_packet_new(unsigned int datatype, unsigned int datasize)
 void
 _pdp_packet_save_nolock(int packet)
 {
+
+
+
     t_pdp *header = pdp_packet_header(packet);
     t_pdp_symbol *s;
     PDP_ASSERT(header);
@@ -334,7 +349,30 @@ _pdp_packet_save_nolock(int packet)
     PDP_ASSERT(header->desc);
     s = header->desc;
     if (!s->s_reusefifo) s->s_reusefifo = pdp_list_new(0);
+
+
+    /* big o hack: since pdp_packet_new can reap packets behind our back,
+       we won't add a packet if it's already in here */
+
+    if (1) {
+      t_pdp_atom *a = s->s_reusefifo->first;
+      while (a){
+	if (a->w.w_packet == packet) goto found;
+	a = a->next;
+      }
+    }
+
     pdp_list_add(s->s_reusefifo, a_packet, (t_pdp_word)packet);
+    
+ found:
+      
+
+
+    if (PDP_DEBUG){
+      int el = s->s_reusefifo->elements;
+      int maxel = 100;
+      if (el > maxel) pdp_post("WARNING: %s reuse fifo has %d elements.", s->s_name, el);
+    }
 }
 
 /* this will revive a packet matching a certain type description

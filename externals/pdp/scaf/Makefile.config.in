@@ -12,7 +12,7 @@ DEFAULT_RULES_LIB = @DEFAULT_RULES_LIB@
 PDP_CA_AFLAGS  = 
 #--gstabs
 PDP_CA_CFLAGS  = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
-    -Wall -W -Wstrict-prototypes -Werror \
+    -Wall -W -Wstrict-prototypes -I../include -I../../include \
     -Wno-unused -Wno-parentheses -Wno-switch -g $(PDP_CFLAGS) $(PD_CFLAGS) \
     -DPDP_CA_RULES_LIB=\"$(DEFAULT_RULES_LIB)\"
 # -Wshadow

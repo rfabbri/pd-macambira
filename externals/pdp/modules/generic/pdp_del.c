@@ -71,7 +71,14 @@ static void pdp_del_input_0(t_pdp_del *x, t_symbol *s, t_floatarg f)
     else if (s == gensym("process")){
       out = (((x->x_head + x->x_delay)) % x->x_order);
       packet = x->x_packet[out];
-      pdp_packet_pass_if_valid(x->x_outlet0, &x->x_packet[out]);
+
+      // originally, we wouldn't keep the packet in the delay line to save memory
+      // however, this behaviour is very annoying, and doesn't allow ''scratching''
+      // so we send out a copy instead.
+      // pdp_packet_pass_if_valid(x->x_outlet0, &x->x_packet[out]);
+      int p = pdp_packet_copy_ro(packet);
+      pdp_packet_pass_if_valid(x->x_outlet0, &p);
+
 
 /*
       if (-1 != packet){
@@ -88,6 +95,15 @@ static void pdp_del_input_0(t_pdp_del *x, t_symbol *s, t_floatarg f)
 */
 
       x->x_head = (x->x_head + x->x_order - 1) % x->x_order;
+
+/*
+      int i;
+      for (i=0; i<x->x_order; i++){
+	  fprintf(stderr, " %d", x->x_packet[i]);
+      }
+      fprintf(stderr, "\n");
+*/
+
     }
 
 

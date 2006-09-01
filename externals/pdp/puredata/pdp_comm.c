@@ -116,11 +116,15 @@ void
 
 pdp_packet_pass_if_valid(t_outlet *outlet, int *packet_ptr)
 {
+
+
     t_pdp *header = pdp_packet_header(*packet_ptr);
     if (header){
 
+
 	/* send register phase */
 	outlet_pdp_register(outlet, *packet_ptr);
+
 
 	/* unregister */
 	pdp_packet_mark_unused(*packet_ptr);
@@ -129,7 +133,9 @@ pdp_packet_pass_if_valid(t_outlet *outlet, int *packet_ptr)
 	/* send process phase */
 	outlet_pdp_process(outlet);
 
+
     }
+
 }
 
 void
@@ -317,7 +323,7 @@ void pd_atom_to_pdp_atom(t_atom *pdatom, t_pdp_atom *pdpatom)
     }
 }
 
-
+#if PDP_SYMBOL_HACK
 
 /* some "accelerated" pd symbols */
 t_symbol s_pdp         = {"pdp", 0, 0};
@@ -328,6 +334,8 @@ t_symbol s_dpd         = {"dpd", 0, 0};
 t_symbol s_inspect     = {"inspect", 0, 0};
 t_symbol s_accumulate  = {"accumulate", 0, 0};
 t_symbol s_chanmask    = {"chanmask", 0, 0};
+
+
 
 // internal pd method
 t_symbol *dogensym(char *s, t_symbol *oldsym);
@@ -345,6 +353,7 @@ static void _addsym(t_symbol *s)
     }
 }
 
+
 void
 pdp_pdsym_setup(void)
 {
@@ -360,6 +369,12 @@ pdp_pdsym_setup(void)
 
 }
 
+#else
+
+void pdp_pdsym_setup(void){
+}
+
+#endif
 
 
 #ifdef __cplusplus

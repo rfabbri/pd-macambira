@@ -22,8 +22,22 @@
 #ifndef _PDP_POST_H_
 #define _PDP_POST_H_
 
+#include <stdarg.h>
+#include <m_pd.h>
+
 /* write a message to log (console) */
-void pdp_post_n(char *fmt, ...);
-void pdp_post(char *fmt, ...);
+
+#include <m_pd.h>
+
+// old
+//void pdp_post_n(char *fmt, ...);
+//void pdp_post(char *fmt, ...);
+
+// new
+//void startpost(const char *fmt, ...);
+//void post(const char *fmt, ...);
+
+#define pdp_post_n startpost
+#define pdp_post   post
 
 #endif

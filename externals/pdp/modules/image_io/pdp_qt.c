@@ -19,8 +19,10 @@
  */
 
 
-#include <quicktime/lqt.h>
-#include <quicktime/colormodels.h>
+//#include <quicktime/lqt.h>
+//#include <quicktime/colormodels.h>
+#include <lqt/lqt.h>
+#include <lqt/colormodels.h>
 
 #include "pdp.h"
 #include "pdp_llconv.h"

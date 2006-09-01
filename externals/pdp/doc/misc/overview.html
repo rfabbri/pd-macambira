@@ -16,12 +16,8 @@ standard PD numbers and symbol types. In short it puts any data object on
 the same level as a float or a symbol.
 
 <p>PDP runs on Linux and OSX. The OSX version depends on <a 
-href="http://fink.sourceforge.net/">Fink</a>, which is not in the "point & 
-click" stage yet, so setting it up will require some efford. There is no 
-windows version. The reason for this is simple: i don't use windows myself. 
-Porting would require writing code for input/output and getting the 
-libraries PDP depends on to work. If anyone is willing to do this, just let 
-me know. PDP can run without X Window, using SDL.
+href="http://fink.sourceforge.net/">Fink</a>. There is no 
+windows version.
 
 <p> Currently, PDP's focus is on images and video, but there is no reason it 
 should stay like that. There is limited support for matrix processing 
@@ -38,19 +34,20 @@ href="http://ydegoyon.free.fr/pidip.html">PiDiP</a> library.
 If you're used to working with PD, the the documentation and example 
 patches should be enough to get you started. Have a look at the README file 
 in the distribution to find out how to compile and setup. The file 
-doc/reference.txt contains a list of objects. If you have installed PDP 
+<code>doc/reference.txt</code> contains a list of objects. If you have installed PDP 
 properly, you can just press the right mouse button on an object and select 
 help to get a help patch. If this doesn't work, look in the directory 
-doc/objects for a collection of help patches. The directory doc/examples 
-contains some more demos. The directory doc/objects contains two 
+<code>doc/objects</code> for a collection of help patches. The directory <code>doc/examples</code>
+contains some more demos. The directory <code>doc/objects</code> contains two 
 abstractions that are used to setup the input and output in the help 
 patches. You might want to cut and connect some wires to use the 
 input/output setup that works for you.
 
 <h2>Packets and Types</h2>
 
-<p> PDP is centered around the concept of packets and operations on 
-packets. There are several types of packets. The default type for most 
+<p> PDP is about packets and operations on packets. Packets are just chunks
+of dumb data. The interpretation of this data depends on its type name.
+There are several types of packets. The default type for most 
 objects is <code><b>image/YCrCb/320x240</b></code>. This is a single video 
 frame, encoded in the internal 16bit YUV format, measuring 320 by 240 
 pixels. Another image type is the grayscale image 
@@ -90,13 +87,16 @@ can be drawn to the screen, captured as a texture, converted back to an
 image, which can then be converted to a sound, processed and converted back 
 to an image,  etc... You get the point. The possibilities are endless.
 
-
+<p> Over the last couple of years, PDP has given birth to a forked off project called
+<a href="http://zwizwa.goto10.org/zwikizwaki.php?page=PacketForth">Packet Forth</a>.
+This is a programming laguage based on ideas from Forth and Lisp. It's aim is
+loosely to be a kind of 'media Perl'.
 
     <hr>
     <address><a href="mailto:pdp@zzz.kotnet.org">Tom Schouten</a></address>
 <!-- Created: Thu Apr 24 22:21:03 CEST 2003 -->
 <!-- hhmts start -->
-Last modified: Thu Sep 25 20:51:44 CEST 2003
+Last modified: Thu Jan 25 23:56:07 CEST 2006
 <!-- hhmts end -->
   </body>
 </html>

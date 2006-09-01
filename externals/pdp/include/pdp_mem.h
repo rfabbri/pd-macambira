@@ -29,7 +29,6 @@ void pdp_dealloc(void *stuff);
 
 
 /* fast allocator object (for lists and atoms) */
-#define PDP_FASTALLOC_BLOCK_ELEMENTS 4096
 typedef struct _pdp_fastalloc
 {
   unsigned int atom_size;

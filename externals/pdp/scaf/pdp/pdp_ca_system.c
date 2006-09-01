@@ -296,7 +296,7 @@ void pdp_scaf_setup(void)
     t_pdp_conversion_program *program;
 
     /* babble */
-    post ("PDP: pdp_scaf extension library");
+    post ("PDP: cellular automata extension library");
 
     /* setup modules */
     pdp_ca_setup();

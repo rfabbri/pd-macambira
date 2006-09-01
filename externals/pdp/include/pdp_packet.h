@@ -49,11 +49,14 @@
 
     The interface to the packet manager contains the following managing methods:
 
-    * pdp_packet_new: create a new packet or reuse a previous one
+    * pdp_packet_create: create a new packet
     * pdp_packet_mark_unused: release a packet
     * pdp_packet_copy_ro: register a packet for read only use
     * pdp_packet_copy_rw: register a packet for read/write use (this creates a copy if necessary)
     * pdp_packet_clone_rw: create a new packet using a template, but don't copy the data
+
+    ( some types have shortcut methods pdp_packet_new_ which create/reuse a packet
+    unless you are writing a factory method for a packet, you should NEVER call a _create method )
 
     And two methods for raw data access
 

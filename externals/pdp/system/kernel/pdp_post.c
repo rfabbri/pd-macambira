@@ -29,14 +29,14 @@
 /* list printing should be moved here too */
 
 /* write a message to log (console) */
-void pdp_post_n(char *fmt, ...)
+void _pdp_post_n(char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
     vfprintf(stderr, fmt, ap);
     va_end(ap);
 }
-void pdp_post(char *fmt, ...)
+void _pdp_post(char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);

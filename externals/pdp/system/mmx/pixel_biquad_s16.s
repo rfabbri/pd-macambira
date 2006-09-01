@@ -124,7 +124,7 @@
 	# %mm0 == {a0 b0 c0 d0}
 
 	
-	.macro antitranspose_4x4:	
+	.macro antitranspose_4x4
 	movq %mm3, %mm4
 	punpcklwd %mm1, %mm4	# mm4 <- {b2 d2 b3 d3}
 	movq %mm3, %mm5	
@@ -163,7 +163,7 @@
 	# %mm0 == {d0 c0 b0 a0}
 
 	
-	.macro transpose_4x4:	
+	.macro transpose_4x4
 	movq %mm0, %mm4
 	punpcklwd %mm2, %mm4	# mm4 <- {c1 a1 c0 a0}
 	movq %mm0, %mm5	

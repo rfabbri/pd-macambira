@@ -88,7 +88,7 @@ static int _cleanup(t_png_image *x)
 
 static int _open_read(t_png_image* x, char *file)
 {
-    char header[SIG_BYTES];
+    unsigned char header[SIG_BYTES];
     int is_png;
 
     x->x_fp = fopen(file, "r");
@@ -243,7 +243,7 @@ static int _buildstruct_write(t_png_image *x)
 static int _getimagedata(t_png_image *x)
 {
     int nbchans = 0;
-    char *image_data;
+    unsigned char *image_data;
     png_bytep row_pointers[x->x_height];
     png_uint_32 i;
 
@@ -277,7 +277,7 @@ static int _saveimagedata(t_png_image *x, int packet)
     png_uint_32 i;
     int nbchans;
     t_pdp *h = pdp_packet_header(packet);
-    char *image_data = (char *)pdp_packet_data(packet);
+    unsigned char *image_data = (unsigned char *)pdp_packet_data(packet);
 
     if (!h) return 0;
     if (PDP_BITMAP != h->type) return 0;

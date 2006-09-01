@@ -39,5 +39,5 @@ install: all
 	#Check if pd is installed in $(prefix)/lib/pd. 
 	#If this fails the pdp_scaf lib and the docs won't be installed. 
 	test -d $(prefix)/lib/pd
-	install -m 755 pdp_scaf.pd_linux $(prefix)/lib/pd/externs
+	install -m 755 pdp_scaf.pd_linux $(prefix)/lib/pd/extra
 	install -m 644 doc/*.pd $(prefix)/lib/pd/doc/5.reference

@@ -72,6 +72,7 @@ typedef struct pdp_glx_struct
 
     int  x_initialized;
     int  x_autocreate;
+    int  x_interpol;
 
 } t_pdp_glx;
 
@@ -375,8 +376,17 @@ static void pdp_glx_display_texture(t_pdp_glx *x)
     glBindTexture(GL_TEXTURE_2D, x->x_texture);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+
+    if (x->x_interpol){
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    }
+    else {
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    }
+
+
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
     /* display texture */  
@@ -485,6 +495,9 @@ static void pdp_glx_display(t_pdp_glx *x, t_symbol *s)
     }
 }
 
+static void pdp_glx_interpol(t_pdp_glx *x, t_float finterpol){
+    x->x_interpol = (int)finterpol;
+}
 
 
 static void pdp_glx_free(t_pdp_glx *x)
@@ -525,6 +538,8 @@ void *pdp_glx_new(void)
     x->x_tex_width = 64;
     x->x_tex_height = 64;
 
+    x->x_interpol = 1;
+
     //pdp_glx_create(x);
 
     return (void *)x;
@@ -563,6 +578,7 @@ void pdp_glx_setup(void)
     class_addmethod(pdp_glx_class, (t_method)pdp_glx_cursor, gensym("cursor"), A_FLOAT, A_NULL);
     class_addmethod(pdp_glx_class, (t_method)pdp_glx_fullscreen, gensym("fullscreen"), A_NULL);
     class_addmethod(pdp_glx_class, (t_method)pdp_glx_moveresize, gensym("posdim"), A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_NULL);
+    class_addmethod(pdp_glx_class, (t_method)pdp_glx_interpol, gensym("interpol"), A_FLOAT, A_NULL);
     class_addmethod(pdp_glx_class, (t_method)pdp_glx_tile, gensym("tile"), A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_NULL);
 
 

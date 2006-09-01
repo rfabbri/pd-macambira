@@ -1,56 +1,30 @@
-
-todo 0.12.x:
-best to do an intermediate release for documentation. 0.13 is not 
-there yet.
-
-* check reference.txt
-
-
-
 known bugs:
 
 * running out of memory (using delay lines or loops) will likely crash pd. 
 short story: don't, use pdp_control's memlimit for limiting pdp's memory usage.
-* no known other fatal (crashing) bugs. please let me know if you find one.
 
 
-pdp/libpdp remark:
-i'm working on a version 2 of pdp. until that is finished, pdp proper will
-probably be frozen, except for bug fixes.
+todo 0.12.5:
+
+* find nasty 3dp bug
+* fix pdp_glx BadMatch bug (crashes on OSX)
+* platform independent [pdp_vdac] [pdp_vadc]
 
 
-todo 0.13:
 
-* yves shm code
-* make fobs (all c object code usable in packet forth should be wrapped (automaticly??))
-* pdp_xwindow event handling is not thread safe (fixed ?)
-* fine tune udp protocol
-* solve scheduling probs: pd+3dp = ok, pd+pdp+(3dp) = not 
-(lots of frags -> video slow, few frags -> audio drops. 
-pdp threading is not implemented everywhere and is a problem for feedback stuff. think about 
-a synchronous dropping scheme (central point of failure), like for 3dp. most of the threading
-problems could be solved with the new threadsafe pd 0.37 -> check this out)
+todo later:
 
-* add source type to source objects (noise,plasma,constant,...) (solve with forth)
+* include guenter's / carmen's windows changes
+* field based bttv capture (might be possible without driver hacks using v4l2)
 * pdp_crop/pad
-* seed plasma
-* reorganize headers to cut down compile time (done for core stuff, move pd objects to forth)
-* fullscreen x command -> add window manager suppression
 * where to solve autoconvert? per type, or central in pdp_base? 2 cases:
 - template based autoconvert: in pdp_base
 - compatibility based autoconvert: i.e. pdp_add (solve in base: move_passive)
 * finish high level packet conversion:
 - move 8bit images to packet level (iow: cleanup pdp_qt, pdp_v4l, pdp_xv) (solve with forth)
-- add bitmap packet support to source modules (optim for pdp_opengl usage)
-(solve with sliceforth: pdp image processing should become independent of image encoding: at least
-packed 8/16 rgb(a), and all planar rgb/yuv formats should be well supported: sliceforth feeders)
 - get rid of pdp_type* methods
 * fix mac/linux name differences (use pdp_video, pdp_movie, pdp_window)
 * pdp_xv framerate doc + pwc addons
-
-todo 0.14:
-
-* stress test the memory manager. it looks like there's a bug that pops up after running for a while
 * enable audio output on bttv cards in pdp_v4l
 * fix cache slicer objects + thread problems (fixed in sliceforth)
 * derive as much classes as possible from pdp_base class (obsolete: use forth instead)
@@ -76,18 +50,9 @@ todo 0.14:
 * moebius transforms
 * type multiplexing: find a way to use the same name for packet processors. (solved in forth: polymorhpy)
 i.e. pdp_add should add images, but also vectors, ascii packets, textures,...
-
-experimental stuff
-
 * modify 2D rotation to be used as arbitrary rotation (givens)
 * add 3D rotation
 * frame rate limited delay line (burst delay?)
 * optimize resampling code (mipmapped packed 16bit format?)
-
-* better type handling
-
-core is in place. todo:
-- better (tree) search algorithm (breadth first + cost)
-- add more converters
 
 

@@ -179,7 +179,7 @@ void pdp_list_add_back_atom(t_pdp_list *l, t_pdp_atom *a);
 /* these don't do error checking. out of bound == error */
 t_pdp_atom   *pdp_list_pop_atom      (t_pdp_list *l);
 t_pdp_word    pdp_list_pop           (t_pdp_list *l);
-t_pdp_word    pdp_list_index         (t_pdp_list *l, int index);
+t_pdp_word    pdp_list_index         (t_pdp_list *l, int indx);
 void          pdp_list_pop_push      (t_pdp_list *source, t_pdp_list *dest);
 
 /* some aliases */

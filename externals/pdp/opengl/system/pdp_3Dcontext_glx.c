@@ -28,7 +28,6 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include <GL/glu.h>
-//#include <GL/glut.h>
 
 /* all symbols are C-style */
 #ifdef __cplusplus

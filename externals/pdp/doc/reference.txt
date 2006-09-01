@@ -12,6 +12,7 @@ pdp_route	routes a packet to a specific outlet
 pdp_loop	a packet loop sampler (packet array)
 pdp_description	output a symbol describing the packet type
 pdp_convert	convert between packet types
+pdp_metro~	audio/video sync object
 
 image inputs/outputs:
 
@@ -19,6 +20,9 @@ pdp_xv		displays images using the xvideo extension
 pdp_glx		displays images using opengl
 pdp_v4l		reads images from a video4linux device
 pdp_qt		reads quicktime movies
+pdp_rawin	read packets from pipe or file
+pdp_rawout	write packets to pipe or file
+pdp_rawout~	write audio to pipe or file
 
 image processors:
 

@@ -71,6 +71,7 @@ t_pdp_symbol *pdp_packet_bitmap_get_description(int packet)
 	    case PDP_BITMAP_RGBA: c += sprintf(c, "/rgba"); break;
 	    case PDP_BITMAP_GREY: c += sprintf(c, "/grey"); break;
 	    case PDP_BITMAP_YV12: c += sprintf(c, "/yv12"); break;
+	    case PDP_BITMAP_I420: c += sprintf(c, "/i420"); break;
 	    default:
 		c += sprintf(c, "/unknown"); goto exit;
 	    }
@@ -108,6 +109,17 @@ int pdp_packet_new_bitmap_yv12(u32 w, u32 h)
     header->theclass = bitmap_class;
 
     return packet;
+}
+
+int pdp_packet_new_bitmap_i420(u32 w, u32 h){
+    int p = pdp_packet_new_bitmap_yv12(w,h);
+    if (-1 == p) return -1;
+    t_pdp *header    = pdp_packet_header(p);
+    t_bitmap *bitmap = pdp_packet_subheader(p);
+    bitmap->encoding = PDP_BITMAP_I420;
+    header->desc = 0; // structured programming.. ha!
+    header->desc = pdp_packet_bitmap_get_description(p);
+    return p;
 }
 
 int pdp_packet_new_bitmap_grey(u32 w, u32 h)
@@ -189,6 +201,7 @@ int pdp_packet_new_bitmap(int type, u32 w, u32 h)
     switch(type){
     case PDP_BITMAP_GREY: return pdp_packet_new_bitmap_grey(w,h);
     case PDP_BITMAP_YV12: return pdp_packet_new_bitmap_yv12(w,h);
+    case PDP_BITMAP_I420: return pdp_packet_new_bitmap_i420(w,h);
     case PDP_BITMAP_RGB:  return pdp_packet_new_bitmap_rgb(w,h);
     case PDP_BITMAP_RGBA: return pdp_packet_new_bitmap_rgba(w,h);
     default: return -1;
@@ -444,6 +457,39 @@ static int _pdp_packet_bitmap_convert_rgb8_to_mchp(int packet, t_pdp_symbol *des
     return new_p;
 }
 
+static int _pdp_packet_bitmap_convert_yv12_tofrom_i420(int packet, t_pdp_symbol *dest_template)
+{
+    t_pdp *header = pdp_packet_header(packet);
+    t_bitmap *in = pdp_packet_bitmap_info(packet);
+    int w = in->width;
+    int h = in->height;
+    int out_encoding;
+    if (in->encoding == PDP_BITMAP_YV12)      out_encoding = PDP_BITMAP_I420;
+    else if (in->encoding == PDP_BITMAP_I420) out_encoding = PDP_BITMAP_YV12;
+    else return -1;
+
+    int new_p = pdp_packet_new_bitmap(out_encoding, w,h);
+    // t_pdp *out_h = pdp_packet_header(new_p);
+    // pdp_post("%x %s", out_encoding, out_h->desc->s_name);
+
+
+    if (-1 == new_p) return -1;
+    unsigned char *in_d = pdp_packet_data(packet);
+    unsigned char *out_d = pdp_packet_data(new_p);
+    int plane = w*h;
+    memcpy(out_d, in_d, plane);
+    out_d += plane;
+    in_d += plane;
+    plane /= 4;
+    memcpy(out_d, in_d+plane, plane);
+    memcpy(out_d+plane, in_d, plane);
+ 
+
+
+   return new_p;    
+}
+
+
 static int _pdp_packet_bitmap_convert_yv12_to_image(int packet, t_pdp_symbol *dest_template)
 {
     t_pdp *header = pdp_packet_header(packet);
@@ -463,11 +509,6 @@ static int _pdp_packet_bitmap_convert_yv12_to_image(int packet, t_pdp_symbol *de
     return new_p;
 }
 
-static inline u8 _map(s32 pixel){
-    s32 mask = ~(pixel>>16);
-    return ((pixel >> 7) & mask);
-}
-
 static int _pdp_packet_bitmap_convert_mchp_to_rgb8(int packet, t_pdp_symbol *dest_template)
 {
     t_pdp *header = pdp_packet_header(packet);
@@ -479,6 +520,12 @@ static int _pdp_packet_bitmap_convert_mchp_to_rgb8(int packet, t_pdp_symbol *des
     int plane = w*h;
     int nb_channels = image->depth;
     int new_p, i;
+
+    //    static inline u8 _map(s32 pixel){
+    inline u8 _map(s32 pixel){
+	s32 mask = ~(pixel>>16);
+	return ((pixel >> 7) & mask);
+    }
 
     switch(nb_channels){
     default: return -1;
@@ -554,9 +601,9 @@ static int pdp_bitmap_factory(t_pdp_symbol *type)
     p = pdp_packet_new_bitmap(t,w,h);
 
     if (p != -1){
-	t_pdp *h = pdp_packet_header(p);
+	t_pdp *header = pdp_packet_header(p);
 	/* if type is not exact, delete the packet */
-	if (type != h->desc) {
+	if (type != header->desc) {
 	    pdp_packet_delete(p);
 	    p = -1;
 	}
@@ -587,6 +634,9 @@ void pdp_bitmap_setup(void)
     program = pdp_conversion_program_new(_pdp_packet_bitmap_convert_image_to_yv12, 0);
     pdp_type_register_conversion(pdp_gensym("image/YCrCb/*"), pdp_gensym("bitmap/yv12/*"), program);
     pdp_type_register_conversion(pdp_gensym("image/grey/*"), pdp_gensym("bitmap/yv12/*"), program);
+    pdp_type_register_conversion(pdp_gensym("image/YCrCb/*"), pdp_gensym("bitmap/*"), program);
+    pdp_type_register_conversion(pdp_gensym("image/grey/*"), pdp_gensym("bitmap/*"), program);
+
 
     program = pdp_conversion_program_new(_pdp_packet_bitmap_convert_yv12_to_image, 0);
     pdp_type_register_conversion(pdp_gensym("bitmap/yv12/*"), pdp_gensym("image/YCrCb/*"), program);
@@ -604,11 +654,17 @@ void pdp_bitmap_setup(void)
     pdp_type_register_conversion(pdp_gensym("image/multi/*"), pdp_gensym("bitmap/*/*"), program);
 
 
+    /* yv12 <-> i420 */
+    program = pdp_conversion_program_new(_pdp_packet_bitmap_convert_yv12_tofrom_i420, 0);
+    pdp_type_register_conversion(pdp_gensym("bitmap/yv12/*"), pdp_gensym("bitmap/i420/*"), program);
+    pdp_type_register_conversion(pdp_gensym("bitmap/i420/*"), pdp_gensym("bitmap/yv12/*"), program);
+
     /* rgb <-> rgba */
     program = pdp_conversion_program_new(_pdp_packet_bitmap_convert_rgb8_to_rgba8, 0);
     pdp_type_register_conversion(pdp_gensym("bitmap/rgb/*"), pdp_gensym("bitmap/rgba/*"), program);
     program = pdp_conversion_program_new(_pdp_packet_bitmap_convert_rgba8_to_rgb8, 0);
     pdp_type_register_conversion(pdp_gensym("bitmap/rgba/*"), pdp_gensym("bitmap/rgb/*"), program);
+
 
 
     /* fallback rgb convertor */

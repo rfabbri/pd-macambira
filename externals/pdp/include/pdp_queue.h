@@ -82,7 +82,7 @@ int pdp_procqueue_full(t_pdp_procqueue *q);
 
 void pdp_procqueue_flush(t_pdp_procqueue *q);
 void pdp_procqueue_wait(t_pdp_procqueue *q);
-void pdp_procqueue_finish(t_pdp_procqueue *q, int index);
+void pdp_procqueue_finish(t_pdp_procqueue *q, int indx);
 void pdp_procqueue_add(t_pdp_procqueue *q, void *owner, void *process, void *callback, int *queue_id);
 void pdp_procqueue_use_thread(t_pdp_procqueue* q, int t);
 void pdp_procqueue_init(t_pdp_procqueue *q, double milliseconds, int logsize);

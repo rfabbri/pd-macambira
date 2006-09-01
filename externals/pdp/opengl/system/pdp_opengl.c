@@ -56,6 +56,7 @@ static void pdp_control_thread(void *x, t_symbol *s, int argc, t_atom *argv)
 
 }
 
+
 /* kernel setup */
 void pdp_opengl_system_setup(void)
 {
@@ -68,6 +69,7 @@ void pdp_opengl_system_setup(void)
 
     /* add pdp_control method for thread */
     pdp_control_addmethod((t_method)pdp_control_thread, gensym("3dthread"));
+
 }
 
 t_pdp_procqueue* pdp_opengl_get_queue(void){return (&_3dp_queue);}

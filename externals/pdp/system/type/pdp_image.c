@@ -89,6 +89,7 @@ int pdp_packet_new_image_grey(u32 w, u32 h)
     u32 size = w*h;
     u32 totalnbpixels = size;
     u32 packet_size = totalnbpixels << 1;
+    //pdp_post("grey %d x %d = %d bytes", w,h,packet_size);
 
     _checkdim(w,h);
 
@@ -529,9 +530,9 @@ static int pdp_image_factory(t_pdp_symbol *type)
 	break;
     }
     if (p != -1){
-	t_pdp *h = pdp_packet_header(p);
+	t_pdp *header = pdp_packet_header(p);
 	/* if type is not exact, delete the packet */
-	if (type != h->desc) {
+	if (type != header->desc) {
 	    pdp_packet_delete(p);
 	    p = -1;
 	}

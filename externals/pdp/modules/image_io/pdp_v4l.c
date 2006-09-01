@@ -184,6 +184,18 @@ static void pdp_v4l_close_error(t_pdp_v4l *x)
     if(x->x_open_retry) x->x_open_retry--;
 }
 
+static void pdp_v4l_pwc_agc(t_pdp_v4l *x, float gain){
+    gain *= (float)(1<<16);
+    int g = (int)gain;
+    if (g < 0) g = -1;            // automatic
+    if (g > 1<<16) g = 1<<16 - 1; // fixed
+
+    //post("pdp_v4l: setting agc to %d", g);
+    if (ioctl(x->x_tvfd, VIDIOCPWCSAGC, &g)){
+	post("pdp_v4l: pwc: VIDIOCPWCSAGC");
+	//goto closit;
+    }
+}
 
 static void pdp_v4l_pwc_init(t_pdp_v4l *x)
 {
@@ -206,10 +218,21 @@ static void pdp_v4l_pwc_init(t_pdp_v4l *x)
 
     post("pdp_v4l: detected pwc");
 
+
     if(ioctl(x->x_tvfd, VIDIOCPWCRUSER)){
 	perror("pdp_v4l: pwc: VIDIOCPWCRUSER");
 	goto closit;
     }
+
+    /* this is a workaround:
+       we disable AGC after restoring user prefs
+       something is wrong with newer cams (like Qickcam 4000 pro)
+    */
+
+    if (1){
+	pdp_v4l_pwc_agc(x, 1.0);
+    }
+
  
     if (ioctl(x->x_tvfd, VIDIOCGWIN, &x->x_vwin)){
 	perror("pdp_v4l: pwc: VIDIOCGWIN");
@@ -824,6 +847,7 @@ void pdp_v4l_setup(void)
     class_addmethod(pdp_v4l_class, (t_method)pdp_v4l_dim, gensym("dim"), A_FLOAT, A_FLOAT, A_NULL);
     class_addmethod(pdp_v4l_class, (t_method)pdp_v4l_freq, gensym("freq"), A_FLOAT, A_NULL);
     class_addmethod(pdp_v4l_class, (t_method)pdp_v4l_freqMHz, gensym("freqMHz"), A_FLOAT, A_NULL);
+    class_addmethod(pdp_v4l_class, (t_method)pdp_v4l_pwc_agc, gensym("gain"), A_FLOAT, A_NULL);
     class_addmethod(pdp_v4l_class, (t_method)pdp_v4l_format, gensym("captureformat"), A_SYMBOL, A_NULL);
 
     

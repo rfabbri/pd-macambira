@@ -44,14 +44,14 @@ typedef struct pdp_cheby_struct
 static double pdp_cheby_mappingfunction(double f, void *params)
 {
     t_pdp_cheby *x = (t_pdp_cheby *)params;
-    int index;
+    int indx;
 
     /* if there's no array, return the identity function */
     if (!x->x_vec) return f;
 
     /* else interpolate the array */
-    index = ((f + 1) * 0.5) * (x->x_nbpoints - 1);
-    return x->x_vec[index];
+    indx = ((f + 1) * 0.5) * (x->x_nbpoints - 1);
+    return x->x_vec[indx];
     
 }
 

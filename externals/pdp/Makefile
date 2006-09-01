@@ -1,12 +1,18 @@
 include Makefile.config
 
-# all: $(PDP_TARGET)
+# hc ?
+#ifeq ($(OS_NAME),darwin)
+#all: darwin
+#else
+#all: linux
+#endif
 
-ifeq ($(OS_NAME),darwin)
-all: darwin
-else
-all: linux
-endif
+
+all: $(PDP_TARGET)
+
+everything: all
+	make -C opengl
+	make -C scaf
 
 pdp_all:
 	make -C system

@@ -494,7 +494,7 @@ void pdp_imageproc_random_setseed(void *x, float seed)
 
 void pdp_imageproc_random_process(void *x, u32 width, u32 height, short int *image)
 {
-    s32 *d = (u32 *)x;
+    u32 *d = (u32 *)x;
     u32 i;
     s32 r;
     srandom(d[0]);
@@ -586,8 +586,8 @@ void pdp_imageproc_resample_affinemap_process(void *x, u32 width, u32 height, s1
     double s = sin(angle);
 
     /* affine x, y mappings in screen coordinates */
-    double mapx(double x, double y){return cx + izx * ( c * (x-cx) + s * (y-cy));}
-    double mapy(double x, double y){return cy + izy * (-s * (x-cx) + c * (y-cy));}
+    double mapx(double _x, double _y){return cx + izx * ( c * (_x-cx) + s * (_y-cy));}
+    double mapy(double _x, double _y){return cy + izy * (-s * (_x-cx) + c * (_y-cy));}
 
     u32 colstate_x = (u32)(scalew * mapx(0,0));
     u32 colstate_y = (u32)(scaleh * mapy(0,0));

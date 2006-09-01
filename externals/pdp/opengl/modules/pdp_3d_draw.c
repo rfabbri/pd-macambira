@@ -20,7 +20,8 @@
 
 
 //#include "GL/gl.h"
-#include <GL/glut.h>
+//#include <GL/glut.h>
+#include <GL/glu.h>
 #include <math.h>
 
 #include "pdp_opengl.h"
@@ -162,16 +163,23 @@ static void draw_wtriangle(t_drawcommand *x)
 
 static void draw_wcube(t_drawcommand *x) 
 {
-    glutWireCube(x->x_p0);
+    x->x_p1 = x->x_p0; // set square z coord;
+    glPushMatrix();
+        draw_wsquare(x);
+	glRotatef(90, 0,1,0);
+	draw_wsquare(x);
+	glRotatef(90, 0,1,0);
+	draw_wsquare(x);
+	glRotatef(90, 0,1,0);
+	draw_wsquare(x);
+    glPopMatrix();
+
 }
 
 static void draw_cube(t_drawcommand *x) 
 {
     x->x_p1 = x->x_p0; // set square z coord;
 
-    //glutSolidCube(x->x_p0);
-
-    //glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
         draw_square(x);
 	glRotatef(90, 0,1,0);
@@ -201,7 +209,7 @@ static void draw_wtorus(t_drawcommand *x)
     if (n < 1) n = 20;
     if (m < 1) m = n;
 
-    glutWireTorus(ri, ro, n, m);
+    // glutWireTorus(ri, ro, n, m);
 
 }
 
@@ -215,7 +223,7 @@ static void draw_torus(t_drawcommand *x)
     if (n < 1) n = 20;
     if (m < 1) m = n;
 
-    glutSolidTorus(ri, ro, n, m);
+    // glutSolidTorus(ri, ro, n, m);
 
 }
 
@@ -229,7 +237,7 @@ static void draw_cone(t_drawcommand *x)
     if (n < 1) n = 20;
     if (m < 1) m = n;
 
-    glutSolidCone(base, height, n, m);
+    // glutSolidCone(base, height, n, m);
 
 }
 
@@ -243,21 +251,21 @@ static void draw_wcone(t_drawcommand *x)
     if (n < 1) n = 20;
     if (m < 1) m = n;
 
-    glutWireCone(base, height, n, m);
+    // glutWireCone(base, height, n, m);
 
 }
 
 static void draw_wteapot(t_drawcommand *x)
 {
     float f = x->x_p0;
-    glutWireTeapot(f);
+    // glutWireTeapot(f);
 
 }
 
 static void draw_teapot(t_drawcommand *x)
 {
     float f = x->x_p0;
-    glutSolidTeapot(f);
+    // glutSolidTeapot(f);
 
 }
 
@@ -270,7 +278,7 @@ static void draw_wsphere(t_drawcommand *x)
     if (n < 1) n = 20;
     if (m < 1) m = n;
 
-    glutWireSphere(f, n, m);
+    // glutWireSphere(f, n, m);
 
 }
 
@@ -289,15 +297,15 @@ static void draw_sphere(t_drawcommand *x)
 
 }
 
-static void draw_dodeca(t_drawcommand *x){glutSolidDodecahedron();}
-static void draw_octa(t_drawcommand *x)  {glutSolidOctahedron();}
-static void draw_tetra(t_drawcommand *x) {glutSolidTetrahedron();}
-static void draw_icosa(t_drawcommand *x) {glutSolidIcosahedron();}
+static void draw_dodeca(t_drawcommand *x){ /* glutSolidDodecahedron(); */ }
+static void draw_octa(t_drawcommand *x)  { /* glutSolidOctahedron(); */ }
+static void draw_tetra(t_drawcommand *x) { /* glutSolidTetrahedron(); */ }
+static void draw_icosa(t_drawcommand *x) { /* glutSolidIcosahedron(); */ } 
 
-static void draw_wdodeca(t_drawcommand *x){glutWireDodecahedron();}
-static void draw_wocta(t_drawcommand *x)  {glutWireOctahedron();}
-static void draw_wtetra(t_drawcommand *x) {glutWireTetrahedron();}
-static void draw_wicosa(t_drawcommand *x) {glutWireIcosahedron();}
+static void draw_wdodeca(t_drawcommand *x){ /* glutWireDodecahedron(); */ }
+static void draw_wocta(t_drawcommand *x)  { /* glutWireOctahedron(); */ }
+static void draw_wtetra(t_drawcommand *x) { /* glutWireTetrahedron(); */ }
+static void draw_wicosa(t_drawcommand *x) { /* glutWireIcosahedron(); */ }
 
 
 

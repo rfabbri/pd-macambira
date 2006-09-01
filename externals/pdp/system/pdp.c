@@ -22,6 +22,7 @@
 #include "pdp_config.h"
 #include "pdp_post.h"
 
+static int initialized = 0;
 
 /* all symbols are C style */
 #ifdef __cplusplus
@@ -91,6 +92,7 @@ void pdp_udp_send_setup(void);
 void pdp_udp_receive_setup(void);
 void pdp_rawin_setup(void);
 void pdp_rawout_setup(void);
+void pdp_metro_setup(void);
 
 
 /* hacks */
@@ -105,11 +107,13 @@ void pdp_dpd_test_setup(void);
 /* library setup routine */
 void pdp_setup(void){
     
-    /* babble */
-    pdp_post ("PDP: pure data packet");
+    if (initialized) return;
 
+    /* babble */
 #ifdef PDP_VERSION	
-    pdp_post("PDP: version " PDP_VERSION );
+    pdp_post("PDP: pure data packet version " PDP_VERSION );
+#else
+    pdp_post ("PDP: pure data packet");
 #endif
 
 
@@ -175,6 +179,7 @@ void pdp_setup(void){
     pdp_array_setup();
     pdp_rawin_setup();
     pdp_rawout_setup();
+    pdp_metro_setup();
 
 
     /* experimental stuff */
@@ -220,7 +225,7 @@ void pdp_setup(void){
     pdp_glx_setup();
 #endif
 
-
+    initialized++;
 
 
 }

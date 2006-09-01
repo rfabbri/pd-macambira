@@ -760,10 +760,10 @@ void pdp_list_pop_push(t_pdp_list *source, t_pdp_list *dest)
 
 
 /* return element at index */
-t_pdp_word pdp_list_index(t_pdp_list *l, int index)
+t_pdp_word pdp_list_index(t_pdp_list *l, int indx)
 {
     t_pdp_atom *a;
-    for (a = l->first; index--; a = a->next);
+    for (a = l->first; indx--; a = a->next);
     return a->w;
 }
 

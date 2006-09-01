@@ -114,7 +114,7 @@ typedef struct _pdp_udp_receiver
     unsigned int x_data_size;
     void *x_data;
     struct sockaddr_in x_source_socket;
-    int x_sslen;
+    socklen_t x_sslen;
     int x_receive_finished;
     int x_packet_transferred;
 

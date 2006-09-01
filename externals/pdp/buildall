@@ -3,16 +3,17 @@
 # a build script to build and configure the entire pdp distro
 # might need some editing to work for you
 
+# PREFIX=--prefix=/home/tom/pd 
+
 
 # build the stable stuff
-autoconf && ./configure --enable-mmx --prefix=/home/tom/pd && make install
+./configure --enable-mmx && make install
 
 cd scaf 
-autoconf && ./configure && make install
+./configure && make install
 cd ..
 
 
 # build the experimental stuff
-
 make -C opengl
 

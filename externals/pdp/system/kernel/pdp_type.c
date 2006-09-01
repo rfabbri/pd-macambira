@@ -342,7 +342,7 @@ int _pdp_packet_convert(int packet, t_pdp_symbol *dest_template)
 	    return -1;
 	}
 	if (program_last == program_tail){
-	    pdp_post("ERROR: pdp_packet_convert: conversion loop detected");
+	    //pdp_post("ERROR: pdp_packet_convert: conversion loop detected");
 	}
 	program_last = program_tail;
 
