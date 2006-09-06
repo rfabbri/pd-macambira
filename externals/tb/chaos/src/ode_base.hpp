@@ -76,59 +76,58 @@ protected:
     data_t m_k1[dimensions];
     data_t m_k2[dimensions];
     data_t m_k3[dimensions];
-	data_t m_tmp[dimensions];
-//    data_t m_tmp[dimensions];     
+	data_t m_tmp[dimensions];   
 
 	virtual void m_system (data_t* deriv, data_t* data) = 0;
 
     void rk1()
     {
-//        m_system (m_k0, m_data);
-//        for (int i = 0; i != dimensions; ++i)
-//            m_data[i] += m_dt * m_k0[i];
+        m_system (m_k0, chaos_base<dimensions>::m_data);
+        for (int i = 0; i != dimensions; ++i)
+            chaos_base<dimensions>::m_data[i] += m_dt * m_k0[i];
     }
     
     void rk2()
     {
-//        m_system (m_k0, m_data);
-//        for (int i = 0; i != dimensions; ++i)
-//            m_k0[i] = m_k0[i] * 0.5 * m_dt + m_data[i];
-//        
-//        m_system (m_k1, m_k0);
-//        for (int i = 0; i != dimensions; ++i)
-//            m_data[i] += m_dt * m_k1[i];
+        for (int i = 0; i != dimensions; ++i)
+            m_k0[i] = m_k0[i] * 0.5 * m_dt + chaos_base<dimensions>::m_data[i];
+        
+        m_system (m_k0, chaos_base<dimensions>::m_data);
+        m_system (m_k1, m_k0);
+        for (int i = 0; i != dimensions; ++i)
+            chaos_base<dimensions>::m_data[i] += m_dt * m_k1[i];
     }
     
     void rk4()
     {
-//        m_system (m_k0, m_data);
-//        for (int i = 0; i != dimensions; ++i)
-//        {
-//            m_k0[i] *= m_dt;
-//            m_tmp[i] = m_data[i] + 0.5 * m_k0[i];
-//        }
-//    
-//        m_system (m_k1, m_tmp);
-//        for (int i = 0; i != dimensions; ++i)
-//        {
-//            m_k1[i] *= m_dt;
-//            m_tmp[i] = m_data[i] + 0.5 * m_k1[i];
-//        }
-//        
-//        m_system (m_k2, m_tmp);
-//        for (int i = 0; i != dimensions; ++i)
-//        {
-//            m_k2[i] *= m_dt;
-//            m_tmp[i] = m_data[i] + m_k2[i];
-//        }
-//    
-//        m_system (m_k3, m_tmp);
-//        for (int i = 0; i != dimensions; ++i)
-//            m_k3[i] *= m_dt;
-//    
-//        for (int i = 0; i != dimensions; ++i)
-//            m_data[i] += (m_k0[i] + 2. * (m_k1[i] + m_k2[i]) + m_k3[i]) 
-//                / 6.;
+        m_system (m_k0, chaos_base<dimensions>::m_data);
+        for (int i = 0; i != dimensions; ++i)
+        {
+            m_k0[i] *= m_dt;
+            m_tmp[i] = chaos_base<dimensions>::m_data[i] + 0.5 * m_k0[i];
+        }
+    
+        m_system (m_k1, m_tmp);
+        for (int i = 0; i != dimensions; ++i)
+        {
+            m_k1[i] *= m_dt;
+            m_tmp[i] = chaos_base<dimensions>::m_data[i] + 0.5 * m_k1[i];
+        }
+        
+        m_system (m_k2, m_tmp);
+        for (int i = 0; i != dimensions; ++i)
+        {
+            m_k2[i] *= m_dt;
+            m_tmp[i] = chaos_base<dimensions>::m_data[i] + m_k2[i];
+        }
+    
+        m_system (m_k3, m_tmp);
+        for (int i = 0; i != dimensions; ++i)
+            m_k3[i] *= m_dt;
+    
+        for (int i = 0; i != dimensions; ++i)
+            chaos_base<dimensions>::m_data[i] += (m_k0[i] + 2. * (m_k1[i] + m_k2[i]) + m_k3[i]) 
+                / 6.;
     }
 };
 
