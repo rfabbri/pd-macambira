@@ -256,6 +256,7 @@ static void pd_makeversion(void)
 /* this is called from main() in s_entry.c */
 int sys_main(int argc, char **argv)
 {
+    int i, noprefs;
     sys_externalschedlib = 0;
     sys_extraflags = 0;
 #ifdef PD_DEBUG
@@ -263,7 +264,11 @@ int sys_main(int argc, char **argv)
 #endif
     pd_init();                                  /* start the message system */
     sys_findprogdir(argv[0]);                   /* set sys_progname, guipath */
-    sys_loadpreferences();                      /* load default settings */
+    for (i = noprefs = 0; i < argc; i++)        /* prescan args for noprefs */
+        if (!strcmp(argv[i], "-noprefs"))
+            noprefs = 1;
+    if (!noprefs)
+        sys_loadpreferences();                  /* load default settings */
 #ifndef MSW
     sys_rcfile();                               /* parse the startup file */
 #endif
@@ -387,6 +392,7 @@ static char *(usagemessage[]) = {
 "-guiport <n>     -- connect to pre-existing GUI over port <n>\n",
 "-guicmd \"cmd...\" -- start alternatve GUI program (e.g., remote via ssh)\n",
 "-send \"msg...\"   -- send a message at startup, after patches are loaded\n",
+"-noprefs         -- suppress loading preferences on startup\n",
 #ifdef UNISTD
 "-rt or -realtime -- use real-time priority\n",
 "-nrt             -- don't use real-time priority\n",
@@ -852,6 +858,8 @@ int sys_argparse(int argc, char **argv)
                 goto usage;
             argc -= 2; argv += 2;
         }
+        else if (!strcmp(*argv, "-noprefs")) /* did this earlier */
+            ;
         else
         {
             unsigned int i;

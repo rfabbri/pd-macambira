@@ -226,8 +226,11 @@ proc pdtk_enquote {x} {
 }
 
 #enquote a string to send it to Pd.  Blow off semi and comma; alias spaces
+#we also blow off "{", "}", "\" because they'll just cause bad trouble later.
 proc pdtk_unspace {x} {
-    string map {" " "_" ";" "" "," ""} $x
+    set y [string map {" " "_" ";" "" "," "" "{" "" "}" "" "\\" ""} $x]
+    if {$y == ""} {set y "empty"}
+    concat $y
 }
 
 #enquote a string for preferences (command strings etc.)
@@ -860,7 +863,7 @@ proc pdtk_canvas_new {name width height geometry editable} {
         set geometry [join $geometry +] 
    }
    wm geometry $name $geometry
-    canvas $name.c -width $width -height $height -background white \
+   canvas $name.c -width $width -height $height -background white \
         -yscrollcommand "$name.scrollvert set" \
         -xscrollcommand "$name.scrollhort set" \
         -scrollregion [concat 0 0 $width $height] 
@@ -1436,16 +1439,20 @@ proc canvastosym {name} {
 
 set pdtk_lastcanvasconfigured ""
 set pdtk_lastcanvasconfiguration ""
+set pdtk_lastcanvasconfiguration2 ""
 
 proc pdtk_canvas_checkgeometry {topname} {
     set boo [winfo geometry $topname.c]
     set boo2 [wm geometry $topname]
     global pdtk_lastcanvasconfigured
     global pdtk_lastcanvasconfiguration
+    global pdtk_lastcanvasconfiguration2
     if {$topname != $pdtk_lastcanvasconfigured || \
-        $boo != $pdtk_lastcanvasconfiguration} {
+        $boo != $pdtk_lastcanvasconfiguration || \
+        $boo2 != $pdtk_lastcanvasconfiguration2} {
             set pdtk_lastcanvasconfigured $topname
             set pdtk_lastcanvasconfiguration $boo
+            set pdtk_lastcanvasconfiguration2 $boo2
             pd $topname relocate $boo $boo2 \;
     }
 }
@@ -3516,9 +3523,9 @@ proc audio_popup {name buttonname varname devlist} {
 # opening several devices; if not, we get an extra button to turn longform
 # on and restart the dialog.
 
-proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
+proc pdtk_audio_dialog {id indev1 indev2 indev3 indev4 \
         inchan1 inchan2 inchan3 inchan4 \
-        outdevlist outdev1 outdev2 outdev3 outdev4 \
+        outdev1 outdev2 outdev3 outdev4 \
         outchan1 outchan2 outchan3 outchan4 sr advance multi longform} {
     global audio_indev1 audio_indev2 audio_indev3 audio_indev4 
     global audio_inchan1 audio_inchan2 audio_inchan3 audio_inchan4
@@ -3528,6 +3535,7 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
     global audio_outenable1 audio_outenable2 audio_outenable3 audio_outenable4
     global audio_sr audio_advance
     global audio_indevlist audio_outdevlist
+    global pd_indev pd_outdev
 
     set audio_indev1 $indev1
     set audio_indev2 $indev2
@@ -3559,8 +3567,6 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
 
     set audio_sr $sr
     set audio_advance $advance
-    set audio_indevlist $indevlist
-    set audio_outdevlist $outdevlist
 
     toplevel $id
     wm title $id {audio}
@@ -3594,49 +3600,52 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
 
     checkbutton $id.in1f.x0 -variable audio_inenable1 \
         -text {input device 1} -anchor e
-    button $id.in1f.x1 -text [lindex $indevlist $audio_indev1] \
-        -command [list audio_popup $id $id.in1f.x1 audio_indev1 $indevlist]
+    button $id.in1f.x1 -text [lindex $audio_indevlist $audio_indev1] \
+        -command [list audio_popup $id $id.in1f.x1 audio_indev1 $audio_indevlist]
     label $id.in1f.l2 -text "channels:"
     entry $id.in1f.x2 -textvariable audio_inchan1 -width 3
     pack $id.in1f.x0 $id.in1f.x1 $id.in1f.l2 $id.in1f.x2 -side left
 
         # input device 2
-    if {$longform && $multi > 1 && [llength $indevlist] > 1} {
+    if {$longform && $multi > 1 && [llength $audio_indevlist] > 1} {
         frame $id.in2f
         pack $id.in2f -side top
 
         checkbutton $id.in2f.x0 -variable audio_inenable2 \
             -text {input device 2} -anchor e
-        button $id.in2f.x1 -text [lindex $indevlist $audio_indev2] \
-            -command [list audio_popup $id $id.in2f.x1 audio_indev2 $indevlist]
+        button $id.in2f.x1 -text [lindex $audio_indevlist $audio_indev2] \
+            -command [list audio_popup $id $id.in2f.x1 audio_indev2 \
+                $audio_indevlist]
         label $id.in2f.l2 -text "channels:"
         entry $id.in2f.x2 -textvariable audio_inchan2 -width 3
         pack $id.in2f.x0 $id.in2f.x1 $id.in2f.l2 $id.in2f.x2 -side left
     }
 
         # input device 3
-    if {$longform && $multi > 1 && [llength $indevlist] > 2} {
+    if {$longform && $multi > 1 && [llength $audio_indevlist] > 2} {
         frame $id.in3f
         pack $id.in3f -side top
 
         checkbutton $id.in3f.x0 -variable audio_inenable3 \
             -text {input device 3} -anchor e
-        button $id.in3f.x1 -text [lindex $indevlist $audio_indev3] \
-            -command [list audio_popup $id $id.in3f.x1 audio_indev3 $indevlist]
+        button $id.in3f.x1 -text [lindex $audio_indevlist $audio_indev3] \
+            -command [list audio_popup $id $id.in3f.x1 audio_indev3 \
+                $audio_indevlist]
         label $id.in3f.l2 -text "channels:"
         entry $id.in3f.x2 -textvariable audio_inchan3 -width 3
         pack $id.in3f.x0 $id.in3f.x1 $id.in3f.l2 $id.in3f.x2 -side left
     }
 
         # input device 4
-    if {$longform && $multi > 1 && [llength $indevlist] > 3} {
+    if {$longform && $multi > 1 && [llength $audio_indevlist] > 3} {
         frame $id.in4f
         pack $id.in4f -side top
 
         checkbutton $id.in4f.x0 -variable audio_inenable4 \
             -text {input device 4} -anchor e
-        button $id.in4f.x1 -text [lindex $indevlist $audio_indev4] \
-            -command [list audio_popup $id $id.in4f.x1 audio_indev4 $indevlist]
+        button $id.in4f.x1 -text [lindex $audio_indevlist $audio_indev4] \
+            -command [list audio_popup $id $id.in4f.x1 audio_indev4 \
+                $audio_indevlist]
         label $id.in4f.l2 -text "channels:"
         entry $id.in4f.x2 -textvariable audio_inchan4 -width 3
         pack $id.in4f.x0 $id.in4f.x1 $id.in4f.l2 $id.in4f.x2 -side left
@@ -3646,15 +3655,15 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
     frame $id.out1f
     pack $id.out1f -side top
 
-    checkbutton $id.out1f.x0 -variable audio_outenable1 -text {output device 1} \
-        -anchor e
+    checkbutton $id.out1f.x0 -variable audio_outenable1 \
+        -text {output device 1} -anchor e
     if {$multi == 0} {
         label $id.out1f.l1 \
             -text "(same as input device) ..............      "
     } else {
-        button $id.out1f.x1 -text [lindex $outdevlist $audio_outdev1] \
-            -command \
-            [list audio_popup $id $id.out1f.x1 audio_outdev1 $outdevlist]
+        button $id.out1f.x1 -text [lindex $audio_outdevlist $audio_outdev1] \
+            -command  [list audio_popup $id $id.out1f.x1 audio_outdev1 \
+                $audio_outdevlist]
     }
     label $id.out1f.l2 -text "channels:"
     entry $id.out1f.x2 -textvariable audio_outchan1 -width 3
@@ -3665,45 +3674,45 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
     }
 
         # output device 2
-    if {$longform && $multi > 1 && [llength $indevlist] > 1} {
+    if {$longform && $multi > 1 && [llength $audio_outdevlist] > 1} {
         frame $id.out2f
         pack $id.out2f -side top
 
         checkbutton $id.out2f.x0 -variable audio_outenable2 \
             -text {output device 2} -anchor e
-        button $id.out2f.x1 -text [lindex $outdevlist $audio_outdev2] \
+        button $id.out2f.x1 -text [lindex $audio_outdevlist $audio_outdev2] \
             -command \
-            [list audio_popup $id $id.out2f.x1 audio_outdev2 $outdevlist]
+            [list audio_popup $id $id.out2f.x1 audio_outdev2 $audio_outdevlist]
         label $id.out2f.l2 -text "channels:"
         entry $id.out2f.x2 -textvariable audio_outchan2 -width 3
         pack $id.out2f.x0 $id.out2f.x1 $id.out2f.l2 $id.out2f.x2 -side left
     }
 
         # output device 3
-    if {$longform && $multi > 1 && [llength $indevlist] > 2} {
+    if {$longform && $multi > 1 && [llength $audio_outdevlist] > 2} {
         frame $id.out3f
         pack $id.out3f -side top
 
         checkbutton $id.out3f.x0 -variable audio_outenable3 \
             -text {output device 3} -anchor e
-        button $id.out3f.x1 -text [lindex $outdevlist $audio_outdev3] \
+        button $id.out3f.x1 -text [lindex $audio_outdevlist $audio_outdev3] \
             -command \
-            [list audio_popup $id $id.out3f.x1 audio_outdev3 $outdevlist]
+            [list audio_popup $id $id.out3f.x1 audio_outdev3 $audio_outdevlist]
         label $id.out3f.l2 -text "channels:"
         entry $id.out3f.x2 -textvariable audio_outchan3 -width 3
         pack $id.out3f.x0 $id.out3f.x1 $id.out3f.l2 $id.out3f.x2 -side left
     }
 
         # output device 4
-    if {$longform && $multi > 1 && [llength $indevlist] > 3} {
+    if {$longform && $multi > 1 && [llength $audio_outdevlist] > 3} {
         frame $id.out4f
         pack $id.out4f -side top
 
         checkbutton $id.out4f.x0 -variable audio_outenable4 \
             -text {output device 4} -anchor e
-        button $id.out4f.x1 -text [lindex $outdevlist $audio_outdev4] \
+        button $id.out4f.x1 -text [lindex $audio_outdevlist $audio_outdev4] \
             -command \
-            [list audio_popup $id $id.out4f.x1 audio_outdev4 $outdevlist]
+            [list audio_popup $id $id.out4f.x1 audio_outdev4 $audio_outdevlist]
         label $id.out4f.l2 -text "channels:"
         entry $id.out4f.x2 -textvariable audio_outchan4 -width 3
         pack $id.out4f.x0 $id.out4f.x1 $id.out4f.l2 $id.out4f.x2 -side left
@@ -3736,7 +3745,8 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
 
 proc midi_apply {id} {
     global midi_indev1 midi_indev2 midi_indev3 midi_indev4 
-    global midi_outdev1 midi_outdev2 midi_outdev3 midi_outdev4 midi_alsain midi_alsaout
+    global midi_outdev1 midi_outdev2 midi_outdev3 midi_outdev4
+    global midi_alsain midi_alsaout
 
     pd [concat pd midi-dialog \
         $midi_indev1 \
@@ -3785,8 +3795,8 @@ proc midi_popup {name buttonname varname devlist} {
 # start a dialog window to select midi devices.  "longform" asks us to make
 # controls for opening several devices; if not, we get an extra button to
 # turn longform on and restart the dialog.
-proc pdtk_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
-        outdevlist outdev1 outdev2 outdev3 outdev4 longform} {
+proc pdtk_midi_dialog {id indev1 indev2 indev3 indev4 \
+        outdev1 outdev2 outdev3 outdev4 longform} {
     global midi_indev1 midi_indev2 midi_indev3 midi_indev4 
     global midi_outdev1 midi_outdev2 midi_outdev3 midi_outdev4
     global midi_indevlist midi_outdevlist
@@ -3800,10 +3810,8 @@ proc pdtk_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     set midi_outdev2 $outdev2
     set midi_outdev3 $outdev3
     set midi_outdev4 $outdev4
-    set midi_indevlist $indevlist
-    set midi_outdevlist $outdevlist
-    set midi_alsain [llength $indevlist]
-    set midi_alsaout [llength $outdevlist]
+    set midi_alsain [llength $midi_indevlist]
+    set midi_alsaout [llength $midi_outdevlist]
 
     toplevel $id
     wm title $id {midi}
@@ -3826,40 +3834,43 @@ proc pdtk_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     pack $id.in1f -side top
 
     label $id.in1f.l1 -text "input device 1:"
-    button $id.in1f.x1 -text [lindex $indevlist $midi_indev1] \
-        -command [list midi_popup $id $id.in1f.x1 midi_indev1 $indevlist]
+    button $id.in1f.x1 -text [lindex $midi_indevlist $midi_indev1] \
+        -command [list midi_popup $id $id.in1f.x1 midi_indev1 $midi_indevlist]
     pack $id.in1f.l1 $id.in1f.x1 -side left
 
         # input device 2
-    if {$longform && [llength $indevlist] > 2} {
+    if {$longform && [llength $midi_indevlist] > 2} {
         frame $id.in2f
         pack $id.in2f -side top
 
         label $id.in2f.l1 -text "input device 2:"
-        button $id.in2f.x1 -text [lindex $indevlist $midi_indev2] \
-            -command [list midi_popup $id $id.in2f.x1 midi_indev2 $indevlist]
+        button $id.in2f.x1 -text [lindex $midi_indevlist $midi_indev2] \
+            -command [list midi_popup $id $id.in2f.x1 midi_indev2 \
+                $midi_indevlist]
         pack $id.in2f.l1 $id.in2f.x1 -side left
     }
 
         # input device 3
-    if {$longform && [llength $indevlist] > 3} {
+    if {$longform && [llength $midi_indevlist] > 3} {
         frame $id.in3f
         pack $id.in3f -side top
 
         label $id.in3f.l1 -text "input device 3:"
-        button $id.in3f.x1 -text [lindex $indevlist $midi_indev3] \
-            -command [list midi_popup $id $id.in3f.x1 midi_indev3 $indevlist]
+        button $id.in3f.x1 -text [lindex $midi_indevlist $midi_indev3] \
+            -command [list midi_popup $id $id.in3f.x1 midi_indev3 \
+                $midi_indevlist]
         pack $id.in3f.l1 $id.in3f.x1 -side left
     }
 
         # input device 4
-    if {$longform && [llength $indevlist] > 4} {
+    if {$longform && [llength $midi_indevlist] > 4} {
         frame $id.in4f
         pack $id.in4f -side top
 
         label $id.in4f.l1 -text "input device 4:"
-        button $id.in4f.x1 -text [lindex $indevlist $midi_indev4] \
-            -command [list midi_popup $id $id.in4f.x1 midi_indev4 $indevlist]
+        button $id.in4f.x1 -text [lindex $midi_indevlist $midi_indev4] \
+            -command [list midi_popup $id $id.in4f.x1 midi_indev4 \
+                $midi_indevlist]
         pack $id.in4f.l1 $id.in4f.x1 -side left
     }
 
@@ -3868,40 +3879,41 @@ proc pdtk_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     frame $id.out1f
     pack $id.out1f -side top
     label $id.out1f.l1 -text "output device 1:"
-    button $id.out1f.x1 -text [lindex $outdevlist $midi_outdev1] \
-        -command [list midi_popup $id $id.out1f.x1 midi_outdev1 $outdevlist]
+    button $id.out1f.x1 -text [lindex $midi_outdevlist $midi_outdev1] \
+        -command [list midi_popup $id $id.out1f.x1 midi_outdev1 \
+            $midi_outdevlist]
     pack $id.out1f.l1 $id.out1f.x1 -side left
 
         # output device 2
-    if {$longform && [llength $indevlist] > 2} {
+    if {$longform && [llength $midi_outdevlist] > 2} {
         frame $id.out2f
         pack $id.out2f -side top
         label $id.out2f.l1 -text "output device 2:"
-        button $id.out2f.x1 -text [lindex $outdevlist $midi_outdev2] \
+        button $id.out2f.x1 -text [lindex $midi_outdevlist $midi_outdev2] \
             -command \
-            [list midi_popup $id $id.out2f.x1 midi_outdev2 $outdevlist]
+            [list midi_popup $id $id.out2f.x1 midi_outdev2 $midi_outdevlist]
         pack $id.out2f.l1 $id.out2f.x1 -side left
     }
 
         # output device 3
-    if {$longform && [llength $indevlist] > 3} {
+    if {$longform && [llength $midi_midi_outdevlist] > 3} {
         frame $id.out3f
         pack $id.out3f -side top
         label $id.out3f.l1 -text "output device 3:"
-        button $id.out3f.x1 -text [lindex $outdevlist $midi_outdev3] \
+        button $id.out3f.x1 -text [lindex $midi_outdevlist $midi_outdev3] \
             -command \
-            [list midi_popup $id $id.out3f.x1 midi_outdev3 $outdevlist]
+            [list midi_popup $id $id.out3f.x1 midi_outdev3 $midi_outdevlist]
         pack $id.out3f.l1 $id.out3f.x1 -side left
     }
 
         # output device 4
-    if {$longform && [llength $indevlist] > 4} {
+    if {$longform && [llength $midi_midi_outdevlist] > 4} {
         frame $id.out4f
         pack $id.out4f -side top
         label $id.out4f.l1 -text "output device 4:"
-        button $id.out4f.x1 -text [lindex $outdevlist $midi_outdev4] \
+        button $id.out4f.x1 -text [lindex $midi_outdevlist $midi_outdev4] \
             -command \
-            [list midi_popup $id $id.out4f.x1 midi_outdev4 $outdevlist]
+            [list midi_popup $id $id.out4f.x1 midi_outdev4 $midi_outdevlist]
         pack $id.out4f.l1 $id.out4f.x1 -side left
     }
 
@@ -3917,8 +3929,8 @@ proc pdtk_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     }
 }
 
-proc pdtk_alsa_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
-        outdevlist outdev1 outdev2 outdev3 outdev4 longform alsa} {
+proc pdtk_alsa_midi_dialog {id indev1 indev2 indev3 indev4 \
+        outdev1 outdev2 outdev3 outdev4 longform alsa} {
     global midi_indev1 midi_indev2 midi_indev3 midi_indev4 
     global midi_outdev1 midi_outdev2 midi_outdev3 midi_outdev4
     global midi_indevlist midi_outdevlist
@@ -3932,10 +3944,8 @@ proc pdtk_alsa_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     set midi_outdev2 $outdev2
     set midi_outdev3 $outdev3
     set midi_outdev4 $outdev4
-    set midi_indevlist $indevlist
-    set midi_outdevlist $outdevlist
-    set midi_alsain [llength $indevlist]
-    set midi_alsaout [llength $outdevlist]
+    set midi_alsain [llength $midi_indevlist]
+    set midi_alsaout [llength $midi_outdevlist]
     
     toplevel $id
     wm title $id {midi}
@@ -3959,40 +3969,43 @@ proc pdtk_alsa_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
   if {$alsa == 0} {
         # input device 1
     label $id.in1f.l1 -text "input device 1:"
-    button $id.in1f.x1 -text [lindex $indevlist $midi_indev1] \
-        -command [list midi_popup $id $id.in1f.x1 midi_indev1 $indevlist]
+    button $id.in1f.x1 -text [lindex $midi_indevlist $midi_indev1] \
+        -command [list midi_popup $id $id.in1f.x1 midi_indev1 $midi_indevlist]
     pack $id.in1f.l1 $id.in1f.x1 -side left
 
         # input device 2
-    if {$longform && [llength $indevlist] > 2} {
+    if {$longform && [llength $midi_indevlist] > 2} {
         frame $id.in2f
         pack $id.in2f -side top
 
         label $id.in2f.l1 -text "input device 2:"
-        button $id.in2f.x1 -text [lindex $indevlist $midi_indev2] \
-            -command [list midi_popup $id $id.in2f.x1 midi_indev2 $indevlist]
+        button $id.in2f.x1 -text [lindex $midi_indevlist $midi_indev2] \
+            -command [list midi_popup $id $id.in2f.x1 midi_indev2 \
+                $midi_indevlist]
         pack $id.in2f.l1 $id.in2f.x1 -side left
     }
 
         # input device 3
-    if {$longform && [llength $indevlist] > 3} {
+    if {$longform && [llength $midi_indevlist] > 3} {
         frame $id.in3f
         pack $id.in3f -side top
 
         label $id.in3f.l1 -text "input device 3:"
-        button $id.in3f.x1 -text [lindex $indevlist $midi_indev3] \
-            -command [list midi_popup $id $id.in3f.x1 midi_indev3 $indevlist]
+        button $id.in3f.x1 -text [lindex $midi_indevlist $midi_indev3] \
+            -command [list midi_popup $id $id.in3f.x1 midi_indev3 \
+                $midi_indevlist]
         pack $id.in3f.l1 $id.in3f.x1 -side left
     }
 
         # input device 4
-    if {$longform && [llength $indevlist] > 4} {
+    if {$longform && [llength $midi_indevlist] > 4} {
         frame $id.in4f
         pack $id.in4f -side top
 
         label $id.in4f.l1 -text "input device 4:"
-        button $id.in4f.x1 -text [lindex $indevlist $midi_indev4] \
-            -command [list midi_popup $id $id.in4f.x1 midi_indev4 $indevlist]
+        button $id.in4f.x1 -text [lindex $midi_indevlist $midi_indev4] \
+            -command [list midi_popup $id $id.in4f.x1 midi_indev4 \
+                $midi_indevlist]
         pack $id.in4f.l1 $id.in4f.x1 -side left
     }
 
@@ -4001,40 +4014,41 @@ proc pdtk_alsa_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     frame $id.out1f
     pack $id.out1f -side top
     label $id.out1f.l1 -text "output device 1:"
-    button $id.out1f.x1 -text [lindex $outdevlist $midi_outdev1] \
-        -command [list midi_popup $id $id.out1f.x1 midi_outdev1 $outdevlist]
+    button $id.out1f.x1 -text [lindex $midi_outdevlist $midi_outdev1] \
+        -command [list midi_popup $id $id.out1f.x1 midi_outdev1 \
+            $midi_outdevlist]
     pack $id.out1f.l1 $id.out1f.x1 -side left
 
         # output device 2
-    if {$longform && [llength $indevlist] > 2} {
+    if {$longform && [llength $midi_outdevlist] > 2} {
         frame $id.out2f
         pack $id.out2f -side top
         label $id.out2f.l1 -text "output device 2:"
-        button $id.out2f.x1 -text [lindex $outdevlist $midi_outdev2] \
+        button $id.out2f.x1 -text [lindex $midi_outdevlist $midi_outdev2] \
             -command \
-            [list midi_popup $id $id.out2f.x1 midi_outdev2 $outdevlist]
+            [list midi_popup $id $id.out2f.x1 midi_outdev2 $midi_outdevlist]
         pack $id.out2f.l1 $id.out2f.x1 -side left
     }
 
         # output device 3
-    if {$longform && [llength $indevlist] > 3} {
+    if {$longform && [llength $midi_outdevlist] > 3} {
         frame $id.out3f
         pack $id.out3f -side top
         label $id.out3f.l1 -text "output device 3:"
-        button $id.out3f.x1 -text [lindex $outdevlist $midi_outdev3] \
+        button $id.out3f.x1 -text [lindex $midi_outdevlist $midi_outdev3] \
             -command \
-            [list midi_popup $id $id.out3f.x1 midi_outdev3 $outdevlist]
+            [list midi_popup $id $id.out3f.x1 midi_outdev3 $midi_outdevlist]
         pack $id.out3f.l1 $id.out3f.x1 -side left
     }
 
         # output device 4
-    if {$longform && [llength $indevlist] > 4} {
+    if {$longform && [llength $midi_outdevlist] > 4} {
         frame $id.out4f
         pack $id.out4f -side top
         label $id.out4f.l1 -text "output device 4:"
-        button $id.out4f.x1 -text [lindex $outdevlist $midi_outdev4] \
+        button $id.out4f.x1 -text [lindex $midi_outdevlist $midi_outdev4] \
             -command \
-            [list midi_popup $id $id.out4f.x1 midi_outdev4 $outdevlist]
+            [list midi_popup $id $id.out4f.x1 midi_outdev4 $midi_outdevlist]
         pack $id.out4f.l1 $id.out4f.x1 -side left
     }
 

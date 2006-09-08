@@ -37,6 +37,8 @@
 
 static void alsa_checkiosync( void);
 static void alsa_numbertoname(int iodev, char *devname, int nchar);
+static int alsa_jittermax;
+#define ALSA_DEFJITTERMAX 3
 
     /* don't assume we can turn all 31 bits when doing float-to-fix; 
     otherwise some audio drivers (e.g. Midiman/ALSA) wrap around. */
@@ -240,6 +242,7 @@ int alsa_open_audio(int naudioindev, int *audioindev, int nchindev,
         /* save our belief as to ALSA's buffer size for later */
     alsa_buf_samps = nfrags * frag_size;
     alsa_nindev = alsa_noutdev = 0;
+    alsa_jittermax = ALSA_DEFJITTERMAX;
 
     if (sys_verbose)
         post("audio buffer set to %d", (int)(0.001 * sys_schedadvance));
@@ -655,6 +658,7 @@ static void alsa_checkiosync( void)
         if (giveup-- <= 0)
         {
             post("tried but couldn't sync A/D/A");
+            alsa_jittermax += 1;
             return;
         }
         minphase = 0x7fffffff;
@@ -712,7 +716,7 @@ static void alsa_checkiosync( void)
             equal; but since we only make corrections DEFDACBLKSIZE samples
             at a time, we just ask that the spread be not more than 3/4
             of a block.  */
-        if (maxphase <= minphase + (3 * DEFDACBLKSIZE / 4))
+        if (maxphase <= minphase + (alsa_jittermax * (DEFDACBLKSIZE / 4)))
                 break;
 
         if (!alreadylogged)

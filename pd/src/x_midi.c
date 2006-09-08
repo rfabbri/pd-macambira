@@ -648,7 +648,7 @@ void inmidi_realtimein(int portno, int SysMsg)
         t_atom at[2];
         SETFLOAT(at, portno);
         SETFLOAT(at+1, SysMsg);
-        pd_list(midirealtimein_sym->s_thing, &s_list, 1, at);
+        pd_list(midirealtimein_sym->s_thing, &s_list, 2, at);
     }
 }
 

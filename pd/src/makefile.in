@@ -141,6 +141,7 @@ externs:
 	cd ../extra/loop~;make @EXTERNTARGET@
 	cd ../extra/lrshift~;make @EXTERNTARGET@
 	cd ../extra/pique;make @EXTERNTARGET@
+	cd ../extra/sigmund~;make @EXTERNTARGET@
 
 BINARYMODE=@binarymode@
 

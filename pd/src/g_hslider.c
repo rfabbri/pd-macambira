@@ -526,8 +526,8 @@ static void *hslider_new(t_symbol *s, int argc, t_atom *argv)
     t_hslider *x = (t_hslider *)pd_new(hslider_class);
     int bflcol[]={-262144, -1, -1};
     int w=IEM_SL_DEFAULTSIZE, h=IEM_GUI_DEFAULTSIZE;
-    int lilo=0, ldx=-2, ldy=-6, f=0, v=0, steady=1;
-    int fs=8;
+    int lilo=0, ldx=-2, ldy=-8, f=0, v=0, steady=1;
+    int fs=10;
     double min=0.0, max=(double)(IEM_SL_DEFAULTSIZE-1);
     char str[144];
 

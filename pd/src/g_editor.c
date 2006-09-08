@@ -1018,11 +1018,7 @@ static void canvas_done_popup(t_canvas *x, float which, float xpos, float ypos)
     if (which == 0)
         canvas_properties(x);
     else if (which == 2)
-    {
-        strcpy(pathbuf, sys_libdir->s_name);
-        strcat(pathbuf, "/doc/5.reference/0.INTRO.txt");
-        sys_vgui("menu_opentext %s\n", pathbuf);
-    }
+        open_via_helppath("intro.pd", canvas_getdir((t_canvas *)x)->s_name);
 }
 
 #define NOMOD 0
@@ -1480,7 +1476,7 @@ void canvas_key(t_canvas *x, t_symbol *s, int ac, t_atom *av)
     keynum = (av[1].a_type == A_FLOAT ? av[1].a_w.w_float : 0);
     if (keynum == '\\' || keynum == '{' || keynum == '}')
     {
-        post("%c: dropped", (int)keynum);
+        post("keycode %d: dropped", (int)keynum);
         return;
     }
 #if 0

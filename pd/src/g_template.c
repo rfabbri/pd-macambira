@@ -94,7 +94,7 @@ t_template *template_new(t_symbol *templatesym, int argc, t_atom *argv)
         else
         {
             pd_error(x, "%s: no such type", newtypesym->s_name);
-            return (0);
+            goto bad;
         }
         newn = (oldn = x->t_n) + 1;
         x->t_vec = (t_dataslot *)t_resizebytes(x->t_vec,
@@ -514,7 +514,7 @@ static void *template_usetemplate(void *dummy, t_symbol *s,
             /* check if there's already a template by this name. */
     if ((x = (t_template *)pd_findbyclass(templatesym, template_class)))
     {
-        t_template *y = template_new(&s_, argc, argv);
+        t_template *y = template_new(&s_, argc, argv), *y2;
             /* If the new template is the same as the old one,
             there's nothing to do.  */
         if (!template_match(x, y))
@@ -531,7 +531,8 @@ static void *template_usetemplate(void *dummy, t_symbol *s,
                     /* conform everyone to the new template */
                 template_conform(x, y);
                 pd_free(&x->t_pdobj);
-                template_new(templatesym, argc, argv);
+                y2 = template_new(templatesym, argc, argv);
+                y2->t_list = 0;
             }
         }
         pd_free(&y->t_pdobj);
@@ -656,6 +657,7 @@ static void gtemplate_free(t_gtemplate *x)
 {
         /* get off the template's list */
     t_template *t = x->x_template;
+    t_gtemplate *y;
     if (x == t->t_list)
     {
         canvas_redrawallfortemplate(t, 2);
@@ -663,13 +665,16 @@ static void gtemplate_free(t_gtemplate *x)
         {
                 /* if we were first on the list, and there are others on
                 the list, make a new template corresponding to the new
-                first-on-list and replace teh existing template with it. */
-            t_template *z = template_new(&s_, x->x_argc, x->x_argv);
+                first-on-list and replace the existing template with it. */
+            t_template *z = template_new(&s_,
+                x->x_next->x_argc, x->x_next->x_argv);
             template_conform(t, z);
             pd_free(&t->t_pdobj);
             pd_free(&z->t_pdobj);
-            z = template_new(x->x_sym, x->x_argc, x->x_argv);
+            z = template_new(x->x_sym, x->x_next->x_argc, x->x_next->x_argv);
             z->t_list = x->x_next;
+            for (y = z->t_list; y ; y = y->x_next)
+                y->x_template = z;
         }
         else t->t_list = 0;
         canvas_redrawallfortemplate(t, 1);

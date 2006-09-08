@@ -433,8 +433,8 @@ static void *bng_new(t_symbol *s, int argc, t_atom *argv)
     t_bng *x = (t_bng *)pd_new(bng_class);
     int bflcol[]={-262144, -1, -1};
     int a=IEM_GUI_DEFAULTSIZE;
-    int ldx=0, ldy=-6;
-    int fs=8;
+    int ldx=17, ldy=7;
+    int fs=10;
     int ftbreak=IEM_BNG_DEFAULTBREAKFLASHTIME,
         fthold=IEM_BNG_DEFAULTHOLDFLASHTIME;
     char str[144];

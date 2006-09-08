@@ -5,7 +5,7 @@
  * and subsequent work by Andrew Zeldis and Zico Kolter
  * and Roger B. Dannenberg
  *
- * $Id: pmmacosxcm.c,v 1.11 2006-08-24 15:40:28 millerpuckette Exp $
+ * $Id: pmmacosxcm.c,v 1.12 2006-09-08 23:45:30 millerpuckette Exp $
  */
  
 /* Notes:

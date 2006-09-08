@@ -42,7 +42,7 @@ static char sys_dllextent[] = ".l_i386", sys_dllextent2[] = ".pd_linux";
 #endif
 #endif
 #ifdef MACOSX
-#ifdef __i386__
+#ifndef MACOSX3
 static char sys_dllextent[] = ".d_fat", sys_dllextent2[] = ".pd_darwin";
 #else
 static char sys_dllextent[] = ".d_ppc", sys_dllextent2[] = ".pd_darwin";

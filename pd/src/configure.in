@@ -251,7 +251,7 @@ then
 	-DUSEAPI_PORTAUDIO -DPA19 -DPA_USE_COREAUDIO"
     if test `uname -r` = 7.9.0;
     then
-        MORECFLAGS="-DPA_BIG_ENDIAN -Wno-error"
+        MORECFLAGS="-DMACOSX3 -DPA_BIG_ENDIAN -Wno-error"
     	EXTERNTARGET=d_ppc
     else
         MORECFLAGS="-arch i386 -arch ppc -Wno-error"

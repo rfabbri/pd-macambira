@@ -650,29 +650,18 @@ void glob_midi_properties(t_pd *dummy, t_floatarg flongform)
     char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
     int nindevs = 0, noutdevs = 0, i;
 
-    char indevliststring[MAXNDEV*(DEVDESCSIZE+4)+80],
-        outdevliststring[MAXNDEV*(DEVDESCSIZE+4)+80];
-
     midi_getdevs(indevlist, &nindevs, outdevlist, &noutdevs,
         MAXNDEV, DEVDESCSIZE);
 
-    strcpy(indevliststring, "{ {none} ");
+    sys_gui("set midi_indevlist {none}\n");
     for (i = 0; i < nindevs; i++)
-    {
-        strcat(indevliststring, "\"");
-        strcat(indevliststring, indevlist + i * DEVDESCSIZE);
-        strcat(indevliststring, "\" ");
-    }
-    strcat(indevliststring, "}");
+        sys_vgui("lappend midi_indevlist \"%s\"\n",
+            indevlist + i * DEVDESCSIZE);
 
-    strcpy(outdevliststring, "{ {none} ");
+    sys_gui("set midi_outdevlist {none}\n");
     for (i = 0; i < noutdevs; i++)
-    {
-        strcat(outdevliststring, "\"");
-        strcat(outdevliststring, outdevlist + i * DEVDESCSIZE);
-        strcat(outdevliststring, "\" ");
-    }
-    strcat(outdevliststring, "}");
+        sys_vgui("lappend midi_outdevlist \"%s\"\n",
+            outdevlist + i * DEVDESCSIZE);
 
     sys_get_midi_params(&nindev, midiindev, &noutdev, midioutdev);
 
@@ -692,22 +681,18 @@ void glob_midi_properties(t_pd *dummy, t_floatarg flongform)
       if (sys_midiapi == API_ALSA)
     sprintf(buf,
 "pdtk_alsa_midi_dialog %%s \
-%s %d %d %d %d %s %d %d %d %d \
+%d %d %d %d %d %d %d %d \
 %d 1\n",
-        indevliststring,
         midiindev1, midiindev2, midiindev3, midiindev4, 
-        outdevliststring,
         midioutdev1, midioutdev2, midioutdev3, midioutdev4,
         (flongform != 0));
       else
 #endif
     sprintf(buf,
 "pdtk_midi_dialog %%s \
-%s %d %d %d %d %s %d %d %d %d \
+%d %d %d %d %d %d %d %d \
 %d\n",
-        indevliststring,
         midiindev1, midiindev2, midiindev3, midiindev4, 
-        outdevliststring,
         midioutdev1, midioutdev2, midioutdev3, midioutdev4,
         (flongform != 0));
 

@@ -170,7 +170,8 @@ void sys_open_audio(int naudioindev, int *audioindev, int nchindev,
 {
     int i, *ip;
     int defaultchannels = SYS_DEFAULTCH;
-    int inchans, outchans;
+    int inchans, outchans, nrealindev, nrealoutdev;
+    int realindev[MAXAUDIOINDEV], realoutdev[MAXAUDIOOUTDEV];
     int realinchans[MAXAUDIOINDEV], realoutchans[MAXAUDIOOUTDEV];
 
     char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
@@ -296,10 +297,22 @@ void sys_open_audio(int naudioindev, int *audioindev, int nchindev,
     }
     
         /* count total number of input and output channels */
-    for (i = inchans = 0; i < naudioindev; i++)
-        inchans += (realinchans[i] = (chindev[i] > 0 ? chindev[i] : 0));
-    for (i = outchans = 0; i < naudiooutdev; i++)
-        outchans += (realoutchans[i] = (choutdev[i] > 0 ? choutdev[i] : 0));
+    for (i = nrealindev = inchans = 0; i < naudioindev; i++)
+        if (chindev[i] > 0)
+    {
+        realinchans[nrealindev] = chindev[i];
+        realindev[nrealindev] = audioindev[i];
+        inchans += chindev[i];
+        nrealindev++;
+    }
+    for (i = nrealoutdev = outchans = 0; i < naudiooutdev; i++)
+        if (choutdev[i] > 0)
+    {
+        realoutchans[nrealoutdev] = choutdev[i];
+        realoutdev[nrealoutdev] = audiooutdev[i];
+        outchans += choutdev[i];
+        nrealoutdev++;
+    }
         /* if no input or output devices seem to have been specified,
         this really means just disable audio, which we now do. */
     if (!inchans && !outchans)
@@ -322,23 +335,23 @@ else
 #endif
 #ifdef USEAPI_JACK
         if (sys_audioapi == API_JACK) 
-            jack_open_audio((naudioindev > 0 ? realinchans[0] : 0),
-                            (naudiooutdev > 0 ? realoutchans[0] : 0), rate);
+            jack_open_audio((nrealindev > 0 ? realinchans[0] : 0),
+                (nrealoutdev > 0 ? realoutchans[0] : 0), rate);
 
         else
 #endif    
 #ifdef USEAPI_OSS
         if (sys_audioapi == API_OSS)
-            oss_open_audio(naudioindev, audioindev, nchindev, realinchans,
-                    naudiooutdev, audiooutdev, nchoutdev, realoutchans, rate);
+            oss_open_audio(nrealindev, realindev, nrealindev, realinchans,
+                nrealoutdev, realoutdev, nrealoutdev, realoutchans, rate);
         else
 #endif
 #ifdef USEAPI_ALSA
             /* for alsa, only one device is supported; it may
             be open for both input and output. */
         if (sys_audioapi == API_ALSA)
-            alsa_open_audio(naudioindev, audioindev, nchindev, realinchans,
-                    naudiooutdev, audiooutdev, nchoutdev, realoutchans, rate);
+            alsa_open_audio(nrealindev, audioindev, nrealindev, realinchans,
+                nrealoutdev, audiooutdev, nrealoutdev, realoutchans, rate);
         else 
 #endif
 #ifdef USEAPI_SGI
@@ -354,8 +367,8 @@ else
 #endif
 #ifdef USEAPI_MMIO
         if (sys_audioapi == API_MMIO)
-            mmio_open_audio(naudioindev, audioindev, nchindev, realinchans,
-                    naudiooutdev, audiooutdev, nchoutdev, realoutchans, rate);
+            mmio_open_audio(nrealindev, audioindev, nrealindev, realinchans,
+                nrealoutdev, audiooutdev, nrealoutdev, realoutchans, rate);
         else
 #endif
             post("unknown audio API specified");
@@ -638,29 +651,18 @@ void glob_audio_properties(t_pd *dummy, t_floatarg flongform)
     char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
     int nindevs = 0, noutdevs = 0, canmulti = 0, i;
 
-    char indevliststring[MAXNDEV*(DEVDESCSIZE+4)+80],
-        outdevliststring[MAXNDEV*(DEVDESCSIZE+4)+80];
-
     audio_getdevs(indevlist, &nindevs, outdevlist, &noutdevs, &canmulti,
         MAXNDEV, DEVDESCSIZE);
 
-    strcpy(indevliststring, "{");
+    sys_gui("set audio_indevlist {}\n");
     for (i = 0; i < nindevs; i++)
-    {
-        strcat(indevliststring, "\"");
-        strcat(indevliststring, indevlist + i * DEVDESCSIZE);
-        strcat(indevliststring, "\" ");
-    }
-    strcat(indevliststring, "}");
+        sys_vgui("lappend audio_indevlist \"%s\"\n",
+            indevlist + i * DEVDESCSIZE);
 
-    strcpy(outdevliststring, "{");
+    sys_gui("set audio_outdevlist {}\n");
     for (i = 0; i < noutdevs; i++)
-    {
-        strcat(outdevliststring, "\"");
-        strcat(outdevliststring, outdevlist + i * DEVDESCSIZE);
-        strcat(outdevliststring, "\" ");
-    }
-    strcat(outdevliststring, "}");
+        sys_vgui("lappend audio_outdevlist \"%s\"\n",
+            outdevlist + i * DEVDESCSIZE);
 
     sys_get_audio_params(&naudioindev, audioindev, chindev,
         &naudiooutdev, audiooutdev, choutdev, &rate, &advance);
@@ -669,7 +671,6 @@ void glob_audio_properties(t_pd *dummy, t_floatarg flongform)
             naudioindev, naudiooutdev, flongform); */
     if (naudioindev > 1 || naudiooutdev > 1)
         flongform = 1;
-
 
     audioindev1 = (naudioindev > 0 &&  audioindev[0]>= 0 ? audioindev[0] : 0);
     audioindev2 = (naudioindev > 1 &&  audioindev[1]>= 0 ? audioindev[1] : 0);
@@ -689,13 +690,11 @@ void glob_audio_properties(t_pd *dummy, t_floatarg flongform)
     audiooutchan4 = (naudiooutdev > 3 ? choutdev[3] : 0);
     sprintf(buf,
 "pdtk_audio_dialog %%s \
-%s %d %d %d %d %d %d %d %d \
-%s %d %d %d %d %d %d %d %d \
+%d %d %d %d %d %d %d %d \
+%d %d %d %d %d %d %d %d \
 %d %d %d %d\n",
-        indevliststring,
         audioindev1, audioindev2, audioindev3, audioindev4, 
         audioinchan1, audioinchan2, audioinchan3, audioinchan4, 
-        outdevliststring,
         audiooutdev1, audiooutdev2, audiooutdev3, audiooutdev4,
         audiooutchan1, audiooutchan2, audiooutchan3, audiooutchan4, 
         rate, advance, canmulti, (flongform != 0));

@@ -72,7 +72,7 @@ static void glist_doupdatewindowlist(t_glist *gl, char *sbuf)
             if (strlen(sbuf) + strlen(gl->gl_name->s_name) + 100 <= 1024)
             {
                 char tbuf[1024];
-                sprintf(tbuf, "{%s .x%lx} ", gl->gl_name->s_name,
+                sprintf(tbuf, "{{%s} .x%lx} ", gl->gl_name->s_name,
                     (t_int)canvas);
                 strcat(sbuf, tbuf);
             }
