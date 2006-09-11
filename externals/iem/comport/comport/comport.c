@@ -246,7 +246,7 @@ static long get_baud_ratebits(t_float *baud)
     if(i==BAUDRATETABLE_LEN ||  baudspeedbittable[i] < 0)
     {
         post("*Warning* The baud rate %d is not supported or out of range, using 9600\n",*baud);
-        i = 7;
+        i = 8;
     }
     *baud =  baudratetable[i];
 
@@ -981,6 +981,7 @@ static void *comport_new(t_floatarg com_num, t_floatarg fbaud)
 
 
 /*	 Open the Comport for RD and WR and get a handle */
+/* this line should use a real serial device */
     strncpy(test.serial_device_name, serial_device_name, strlen(serial_device_name)+1);
     test.baud = fbaud;
     test.data_bits = 8; /* default 8 data bits */
