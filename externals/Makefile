@@ -106,8 +106,8 @@ CXXFLAGS = $(CFLAGS)
 		`test -f $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs && \
 			cat $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs`
 	chmod a-x "$*.$(EXTENSION)"
-#	$(STRIP) $*.$(EXTENSION)
-#	rm -f -- $*.o
+	$(STRIP) $*.$(EXTENSION)
+	rm -f -- $*.o
 
 
 
@@ -1849,10 +1849,22 @@ UNAUTHORIZED_TKFILES = $(wildcard $(externals_src)/unauthorized/*/*.tk)
 %.tk2c: %.tk
 	bash $(externals_src)/unauthorized/tk2c.bash < $*.tk > $*.tk2c
 
-# [cooled~] doesn't compile under MinGW (yet) and it crashes Pd on Mac OS X,
-# so its excluded from the build here
-UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/[a-bd-uw-z]*/*.c) \
+# a number of objects don't compile under MinGW (yet? they used to, but the
+# needed changes were overwritten, so they are in CVS
+ifeq ($(OS_NAME),windows)
+UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/[abdg-oqrw]*/*.c)\
 $(wildcard $(externals_src)/unauthorized/c?[a-np-z]*/*.c)
+else
+ ifeq ($(OS_NAME),darwin)
+ # [cooled~] crashes Pd on Mac OS X, [vocoder~] doesn't compile
+  UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/[abd-uw-z]*/*.c)\
+  $(wildcard $(externals_src)/unauthorized/c?[a-np-z]*/*.c)
+ else
+   # GNU/Linux, BSD, IRIX, etc.
+  UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/*/*.c)
+ endif
+endif
+
 
 # [vocoder~] is built separately since its made from a number of files
 UNAUTHORIZED_VOCODER = $(wildcard $(externals_src)/unauthorized/vocoder*/*.c)
