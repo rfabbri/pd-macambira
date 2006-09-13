@@ -86,7 +86,7 @@ CXXFLAGS = $(CFLAGS)
 %.$(EXTENSION): %.cpp
 %.$(EXTENSION): %.cc
 	$(CXX) $(CXXFLAGS) -o "$*.o" -c "$<"
-	$(CXX) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) 
+	$(CXX) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o" $(LIBS)
 	chmod a-x "$*.$(EXTENSION)"
 #	$(STRIP) $*.$(EXTENSION)
 #	rm -f -- $*.o
@@ -122,7 +122,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib loaders mapping markex maxlib mjlib motex oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib loaders mapping markex maxlib mjlib motex oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1604,7 +1604,7 @@ $(externals_src)/pdp/configure: $(externals_src)/pdp/configure.ac
 	cd $(externals_src)/pdp && autoconf
 
 $(externals_src)/pdp/Makefile.config: $(externals_src)/pdp/Makefile.config.in
-	cd $(externals_src)/pdp && ./configure
+	cd $(externals_src)/pdp && ./configure PD_CPPFLAGS="-I$(pd_src)/src"
 
 $(externals_src)/pdp/pdp.$(EXTENSION):  $(externals_src)/pdp/configure \
 $(externals_src)/pdp/Makefile.config 
