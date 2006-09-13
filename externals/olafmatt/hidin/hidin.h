@@ -12,9 +12,13 @@
 #include <stdlib.h>
 #include <wtypes.h>
 #include <setupapi.h>
+#ifdef _MSC_VER
 #include "hidusage.h"
 #include "hidsdi.h"
-#include "setupapi.h"
+#else
+#include <ddk/hidusage.h>
+#include <ddk/hidsdi.h>
+#endif
 
 //
 // A structure to hold the steady state data received from the hid device.

@@ -982,8 +982,16 @@ hid_clean:
 #------------------------------------------------------------------------------#
 # HIDIN
 HIDIN_NAME=hidin
-HIDIN_OBJECTS := $(wildcard $(externals_src)/hidin/*.c)
-hidin: $(HIDIN_OBJECTS:.c=.$(EXTENSION))
+HIDIN_OBJECTS := $(wildcard $(externals_src)/olafmatt/hidin/*.c)
+HIDIN_DLL := $(externals_src)/olafmatt/hidin/hidin.$(EXTENSION)
+
+$(HIDIN_DLL): $(HIDIN_OBJECTS:.c=.o)
+	$(CC) $(LDFLAGS) -o "$(HIDIN_DLL)" $(HIDIN_OBJECTS:.c=.o) $(LIBS) -lhid \
+		-lsetupapi
+	chmod a-x "$(HIDIN_DLL)"
+	$(STRIP) $(HIDIN_DLL)
+
+hidin: $(HIDIN_DLL)
 
 hidin_install: hidin
 	install -d $(objectsdir)/$(HIDIN_NAME)
@@ -991,23 +999,23 @@ hidin_install: hidin
 		--author "Olaf Matthes" \
 		--description "HID input for Windows HID" \
 		--license "GNU GPL"
-	install -p $(HIDIN_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(HIDIN_NAME)
-	install -d $(helpdir)/$(HIDIN_NAME)
-	install -p $(externals_src)/hidin/help/*.pd \
-		$(helpdir)/$(HIDIN_NAME)
+	install -p $(HIDIN_DLL) $(objectsdir)/$(HIDIN_NAME)
+#	install -d $(helpdir)/$(HIDIN_NAME)
+#	install -p $(externals_src)/olafmatt/hidin/help/*.pd \
+#		$(helpdir)/$(HIDIN_NAME)
 #	install -d $(manualsdir)/$(HIDIN_NAME)
-	install -d $(readmesdir)
-	install -p $(externals_src)/hidin/README \
-		$(readmesdir)/$(HIDIN_NAME).txt
-	install -d $(examplesdir)/$(HIDIN_NAME)
-	install -p $(externals_src)/hidin/examples/*.pd \
-		$(examplesdir)/$(HIDIN_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/olafmatt/hidin/README \
+#		$(readmesdir)/$(HIDIN_NAME).txt
+#	install -d $(examplesdir)/$(HIDIN_NAME)
+#	install -p $(externals_src)/olafmatt/hidin/examples/*.pd \
+#		$(examplesdir)/$(HIDIN_NAME)
 
 hidin_clean:
-	-rm -f -- $(externals_src)/hidin/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/hidin/*.o
-	-rm -f -- $(externals_src)/hidin/*.bak
-	-rm -f -- $(externals_src)/hidin/*.*~
+	-rm -f -- $(HIDIN_DLL)
+	-rm -f -- $(HIDIN_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/olafmatt/hidin/*.bak
+	-rm -f -- $(externals_src)/olafmatt/hidin/*.*~
 
 
 

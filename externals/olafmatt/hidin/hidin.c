@@ -40,7 +40,7 @@ typedef struct _hidin
 	long          *x_prev_data;			/* data we read the time bofore */
 	void	      *x_qelem;             /* qelem for outputing the results */
 	long          x_device;             /* the HID device number we're connecting to */
-	short         x_elements;           /* number of elements (i.e. buttons, axes...)
+	short         x_elements;           /* number of elements (i.e. buttons, axes...)*/
 	
 		/* HID specific */
 	t_hid_device  *x_hid;               /* a struct containing all the needed stuff about the HID device */
@@ -741,7 +741,6 @@ void hidin_setup(void)
 	class_addmethod(hidin_class, (t_method)hidin_open, gensym("open"), A_FLOAT, 0);
 	class_addmethod(hidin_class, (t_method)hidin_close, gensym("close"), 0);
 	class_addmethod(hidin_class, (t_method)hidin_interval, gensym("interval"), A_FLOAT, 0);
-	class_sethelpsymbol(hidin_class, gensym("help-hidin.pd"));
 	post(hidin_version);
 }
 
