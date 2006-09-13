@@ -61,6 +61,7 @@ package: tarbz2
 
 PACKAGE_NAME = Pd-$(PD_VERSION)-$(OS_NAME)-$(shell uname -m)
 tarbz2: installer_makefile installer_readme
+	install -p .pdsettings $(DESTDIR)$(prefix)
 	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
 	cd $(DESTDIR) && \
 		tar cjf $(PACKAGE_NAME).tar.bz2  $(PACKAGE_NAME)
@@ -86,6 +87,9 @@ installer_readme:
 	echo -e "\tmake install prefix=/path/to\n" >> $(INSTALLER_README_FILE)
 	echo -e "To uninstall:\n" >> $(INSTALLER_README_FILE)
 	echo -e "\tmake uninstall prefix=/path/to\n" >> $(INSTALLER_README_FILE)
+	echo -e "\nTo load the default set of libraries, you need to install the .pdsettings file included in the package:\n\n" >> $(INSTALLER_README_FILE)
+	echo -e "mv .pdsettings ~\n\n" >> $(INSTALLER_README_FILE)
+	echo -e "(~ is your home directory)\n" >> $(INSTALLER_README_FILE)
 
 
 installer_makefile:
