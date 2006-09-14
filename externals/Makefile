@@ -853,6 +853,7 @@ hardware_install: hardware
 #	install -p $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) \
 #		$(objectsdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/lanbox/lanbox.pd \
+		$(externals_src)/hardware/arduino/arduino.pd \
 		$(objectsdir)/$(HARDWARE_NAME)
 	install -d $(helpdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/*/*-help.pd \
@@ -865,6 +866,7 @@ hardware_install: hardware
 		$(readmesdir)/$(HARDWARE_NAME).txt
 	install -d $(examplesdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/*/examples/*.pd \
+		$(externals_src)/hardware/arduino/arduino-test.pd \
 		$(examplesdir)/$(HARDWARE_NAME)
 
 hardware_clean:
