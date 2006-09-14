@@ -29,8 +29,10 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 PD_INNO_SETUP = pd-inno.iss
 
 package:  $(PD_INNO_SETUP)
-	start $(PD_INNO_SETUP)
-#	start "c:\\Program Files\\Inno Setup 5\\Compil32.exe /cc C:\\msys\\1.0\\\home\\**\\packages\\win32_inno\\pd-inno.iss"
+## this pops up the GUI app
+#	start $(PD_INNO_SETUP)
+## this compiles the package on the command line
+	/c/Program\ Files/Inno\ Setup\ 5/ISCC.exe $(PD_INNO_SETUP)
 	@echo " "
 	@echo "win32_inno install succeeded!"
 
@@ -45,7 +47,7 @@ pd_install: build_pd
 #	-make -C $(pd_src)/src $(DEST_PATHS) install
 	make -C $(pd_src)/src -f makefile.mingw $(DEST_PATHS) install
 
-install: pd_install prebuilt_install lib_install exe_install
+install: pd_install prebuilt_install lib_install exe_install gripd_hack
 	@echo " "
 	@echo "win32_inno install succeeded!"
 
@@ -98,6 +100,11 @@ exe_install:
 # here are some hacks to assemble a package from binaries
 no_compile_hacks:
 	cp -a /c/Program\ Files/pd-0.38-4 $(DESTDIR)$(prefix)/
+
+gripd_hack: GRIPD_ZIP=$(CWD)/gripd-0.1.1.zip
+gripd_hack:
+	test -e $(GRIPD_ZIP) && \
+		cd $(DESTDIR)$(prefix) && unzip $(GRIPD_ZIP)
 
 $(PD_INNO_SETUP): $(PD_INNO_SETUP).in
 	@echo "Making Inno Setup file: $(PD_INNO_SETUP)"

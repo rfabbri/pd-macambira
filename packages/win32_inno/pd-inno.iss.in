@@ -45,9 +45,9 @@ Name: {group}\GrIPD; Filename: {app}\gripd\gripd.exe
 #endif
 
 
-[Run]
+;[Run]
 ; NOTE: The following entry contains an English phrase ("Launch"). You are free to translate it into another language if required.
-Filename: {app}\bin\pd.exe; Description: Launch Pure Data; Flags: nowait postinstall skipifsilent
+;Filename: {app}\bin\pd.exe; Description: Launch Pure Data; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
 Type: files; Name: {app}\pd.url
