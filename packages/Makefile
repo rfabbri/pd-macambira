@@ -468,23 +468,33 @@ $(gem_src)/src/configure: $(gem_src)/src/configure.ac
 	cd $(gem_src)/src && autoconf
 
 $(gem_src)/src/Make.config: $(gem_src)/src/Make.config.in
-	cd $(gem_src)/src && ./configure --with-pd=../../pd
+	cd $(gem_src)/src && ./configure	--with-pd=$(pd_src)
 
-$(gem_src)/src/Gem.$(EXTENSION):  $(gem_src)/src/configure \
-$(gem_src)/src/Make.config 
+$(gem_src)/src/Gem.dll:
+
+$(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
+	cd $(gem_src)/src && ./configure --disable-sse2 --disable-Vertex \
+		--with-pd=$(pd_src)
 	make -C $(gem_src)/src
 
-#gem: $(gem_src)/src/Gem.$(EXTENSION)
-gem:
-#	cd $(gem_src)/Gem && xcodebuild
+$(gem_src)/src/Gem.pd_darwin:
+# once Gem is ready for the auto-builders, uncomment this:
+#$(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
+#	cd $(gem_src)/src && ./configure --with-pd=$(pd_src)
+#	make -C $(gem_src)/src
+
+gem: $(gem_src)/src/Gem.$(EXTENSION)
 
 gem_install: gem $(helpdir)
 	install -d $(helpdir)/$(GEM_NAME)
 	install -p $(gem_src)/help/*.* $(helpdir)/$(GEM_NAME)
-	install -p $(gem_src)/abstractions/*-help.pd $(helpdir)
+	install -p $(gem_src)/abstractions/*-help.pd $(helpdir)/$(GEM_NAME)
 	install -d $(objectsdir)/$(GEM_NAME)
+ifeq ($(OS_NAME),linux)
+	install -p $(gem_src)/src/Gem.$(EXTENSION)   $(objectsdir)
+endif
 	install -p $(shell ls -1 $(gem_src)/abstractions/*.* | \
-		grep -v '\-help.pd')  $(objectsdir)
+		grep -v '\-help.pd')  $(objectsdir)/$(GEM_NAME)
 	install -d $(manualsdir)/$(GEM_NAME)
 	install -p $(gem_src)/doc/*.* $(manualsdir)/$(GEM_NAME)
 	install -d $(manualsdir)/$(GEM_NAME)/manual
@@ -492,7 +502,7 @@ gem_install: gem $(helpdir)
 	for dir in $(shell ls -1 $(gem_src)/examples | grep -v CVS); do \
 		echo "installing $$dir"; \
 		install -d $(examplesdir)/$(GEM_NAME)/$$dir ; \
-		install -p $(gem_src)/examples/$$dir/*.* $(examplesdir)/$(GEM_NAME)/$$dir ; \
+		install -p $(gem_src)/examples/$$dir/*.* $(examplesdir)/$(GEM_NAME)/$$dir ;\
 	done
 
 
