@@ -20,3 +20,31 @@ diff -u -w -r1.15 configure.in
      SYSSRC="s_midi_pm.c s_audio_pa.c \
      	s_audio_pablio.c     \
  	s_audio_paring.c     \
+Index: d_array.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/d_array.c,v
+retrieving revision 1.5
+diff -u -w -r1.5 d_array.c
+--- d_array.c   11 Nov 2004 04:58:21 -0000      1.5
++++ d_array.c   16 Sep 2006 18:11:29 -0000
+@@ -540,12 +540,16 @@
+ #define int32 int32_t
+ 
+ #else
+-#ifdef MACOSX
++#ifdef __APPLE__
++#define int32 int  /* a data type that has 32 bits */
++# ifdef __BIG_ENDIAN__
+ #define HIOFFSET 0    /* word offset to find MSB */
+ #define LOWOFFSET 1    /* word offset to find LSB */
+-#define int32 int  /* a data type that has 32 bits */
+-
+-#endif /* MACOSX */
++# else 
++# define HIOFFSET 1    /* word offset to find MSB */
++# define LOWOFFSET 0    /* word offset to find LSB */
++#endif /* __BIG_ENDIAN__ */
++#endif /* __APPLE__ */
+ #endif /* __linux__ */
+ #endif /* MSW */
+ #endif /* SGI */
