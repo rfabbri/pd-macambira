@@ -1,0 +1,30 @@
+--- u_main.tk	2006-08-15 18:09:57.000000000 +0200
++++ u_main.tk	2006-09-04 10:12:10.000000000 +0200
+@@ -1137,6 +1137,7 @@
+ # bother with modifiers there.
+ # We don't handle multiple clicks yet.
+ 
++    bind $name.c <Configure> { pdtk_canvas_autoscrollbars %W %w %h }
+     bind $name.c <Button> {pdtk_canvas_click %W %x %y %b 0}
+     bind $name.c <Shift-Button> {pdtk_canvas_click %W %x %y %b 1}
+     bind $name.c <Control-Shift-Button> {pdtk_canvas_click %W %x %y %b 3}
+@@ -1430,6 +1431,19 @@
+ #get the name of the toplevel window for a canvas; this is also
+ #the name of the canvas object in Pd.
+ 
++proc pdtk_canvas_autoscrollbars {name x y} {
++    set size [$name bbox all]
++    set x2 [lindex $size 2]
++    set y2 [lindex $size 3]
++    set rootname [winfo parent $name]
++    if {$x > $x2} {pack forget $rootname.scrollhort}
++    if {$y > $y2} {pack forget $rootname.scrollvert}
++    if {$x < $x2} {pack $rootname.scrollhort -side bottom \
++                        -fill x -before $rootname.c}
++    if {$y < $y2} {pack $rootname.scrollvert -side right \
++                        -fill y -before $rootname.c}
++}
++
+ proc canvastosym {name} {
+     string range $name 0 [expr [string length $name] - 3]
+ }

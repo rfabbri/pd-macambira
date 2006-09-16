@@ -1,0 +1,20 @@
+--- u_main.tk	2006-08-15 18:09:57.000000000 +0200
++++ u_main.tk	2006-09-04 09:41:46.000000000 +0200
+@@ -140,15 +140,14 @@
+ frame .controls.switches
+ checkbutton .controls.switches.audiobutton -text {compute audio} \
+     -variable ctrls_audio_on \
+-    -anchor w \
+     -command {pd [concat pd dsp $ctrls_audio_on \;]}
+ 
+ checkbutton .controls.switches.meterbutton -text {peak meters} \
+     -variable ctrls_meter_on \
+-    -anchor w \
+     -command {pd [concat pd meters $ctrls_meter_on \;]}
+ 
+-pack .controls.switches.audiobutton .controls.switches.meterbutton -side top
++pack .controls.switches.audiobutton .controls.switches.meterbutton \
++     -side top -anchor w
+ 
+ frame .controls.inout
+ frame .controls.inout.in
