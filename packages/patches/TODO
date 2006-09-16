@@ -2,10 +2,13 @@
 - check out Mac/Intel patches
 
 
-----------------------
-Patches accepted into 0.40
-----------------------
+-----------------------------------
+Patches accepted into or obsoleted by 0.40
+-----------------------------------
 
+- bang_method_for_clip-0.40.pre.patch
+- complete_version_defines-0.39.2.patch
+- fftw_support-0.39-1.patch
 - number_bug_list_bug-0.39.2.patch
 - help_browser-0.39.2.patch
 - mingw_fixes-0.39-2.patch

@@ -1,31 +1,22 @@
 Index: configure.in
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/configure.in,v
-retrieving revision 1.16
-diff -u -w -r1.16 configure.in
---- configure.in	31 Dec 2005 20:55:25 -0000	1.16
-+++ configure.in	24 May 2006 16:57:41 -0000
-@@ -260,12 +260,22 @@
-         -framework AudioUnit -framework AudioToolbox \
-         -framework Carbon -framework CoreMIDI"
-     EXT=pd_darwin
--    MORECFLAGS="-DDL_OPEN -DMACOSX -DUNISTD -I/usr/X11R6/include \
-+if test `uname -p` = i386;
-+then
-+    MORECFLAGS="-DMACOSX -DUNISTD -I/usr/X11R6/include \
-+         -I../portaudio/pa_common -I../portaudio/pablio \
-+        -I../portmidi/pm_common -I../portmidi/pm_mac \
-+        -I../portmidi/porttime \
-+        -Wno-error \
-+        -DUSEAPI_PORTAUDIO -DPA_LITTLE_ENDIAN -DPA19 -DPA_USE_COREAUDIO"
-+else
-+    MORECFLAGS="-DMACOSX -DUNISTD -I/usr/X11R6/include \
- 	 -I../portaudio/pa_common -I../portaudio/pablio \
+retrieving revision 1.15
+diff -u -w -r1.15 configure.in
+--- configure.in	16 Aug 2005 04:06:28 -0000	1.15
++++ configure.in	16 Sep 2006 17:19:16 -0000
+@@ -265,7 +265,13 @@
  	-I../portmidi/pm_common -I../portmidi/pm_mac \
  	-I../portmidi/porttime \
  	-Wno-error \
- 	-DUSEAPI_PORTAUDIO -DPA_BIG_ENDIAN -DPA19 -DPA_USE_COREAUDIO"
-+fi
+-	-DUSEAPI_PORTAUDIO -DPA_BIG_ENDIAN -DPA19 -DPA_USE_COREAUDIO"
++	-DUSEAPI_PORTAUDIO -DPA19 -DPA_USE_COREAUDIO"
++	 if test `uname -p` == powerpc;
++	 then
++		  MORECFLAGS="$MORECFLAGS -DPA_BIG_ENDIAN"
++	 else
++		  MORECFLAGS="$MORECFLAGS -DPA_LITTLE_ENDIAN"
++	 fi
      SYSSRC="s_midi_pm.c s_audio_pa.c \
      	s_audio_pablio.c     \
  	s_audio_paring.c     \
