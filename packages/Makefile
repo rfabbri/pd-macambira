@@ -477,11 +477,10 @@ $(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
 		--with-pd=$(pd_src)
 	make -C $(gem_src)/src
 
-$(gem_src)/src/Gem.pd_darwin:
-# once Gem is ready for the auto-builders, uncomment this:
-#$(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
-#	cd $(gem_src)/src && ./configure --with-pd=$(pd_src)
-#	make -C $(gem_src)/src
+$(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
+	cd $(gem_src)/src && ./configure --without-ImageMagick \
+		 --with-pd=$(pd_src)
+	make -C $(gem_src)/src
 
 gem: $(gem_src)/src/Gem.$(EXTENSION)
 
