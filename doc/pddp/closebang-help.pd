@@ -1,0 +1,18 @@
+#N canvas 81 22 549 570 10;
+#X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 104 464 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm
+;
+#X text 104 61 This object does not accept arguments of any type.;
+#X text 14 62 ARGUMENTS:;
+#X text 29 82 OUTLETS:;
+#X text 20 121 EXAMPLES:;
+#X text 21 463 SEE ALSO:;
+#X obj 21 18 initbang;
+#X text 38 43 INLETS:;
+#X text 104 43 (none);
+#X text 108 18 - SEND "bang" AUTOMATICALLY WHEN ABSTRACTION IS CLOSED
+;
+#X text 104 82 A "bang" message is sent automatically when the containing
+patch is closed. It is only trigger when the patch is an embedded object
+in another patch.;
