@@ -5,15 +5,15 @@
 	<key>defeatrt</key>
 	<string>0</string>
 	<key>loadlib1</key>
-	<string>cyclone</string>
+	<string>Gem</string>
 	<key>loadlib2</key>
-	<string>zexy</string>
+	<string>cyclone</string>
 	<key>loadlib3</key>
-	<string>creb</string>
+	<string>zexy</string>
 	<key>loadlib4</key>
-	<string>cxc</string>
+	<string>creb</string>
 	<key>loadlib5</key>
-	<string>ext13</string>
+	<string>cxc</string>
 	<key>loadlib6</key>
 	<string>iemlib</string>
 	<key>loadlib7</key>
@@ -61,9 +61,11 @@
 	<key>loadlib28</key>
 	<string>jmmmp</string>
 	<key>loadlib29</key>
-	<string>flatspace</string>
+	<string>ext13</string>
 	<key>loadlib30</key>
 	<string>deprecated</string>
+	<key>loadlib31</key>
+	<string>flatspace</string>
 	<key>path1</key>
 	<string>/System/Library/Fonts</string>
 	<key>path2</key>

@@ -1,11 +1,11 @@
 Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Pd]
-"loadlib1"="cyclone"
-"loadlib2"="zexy"
-"loadlib3"="creb"
-"loadlib4"="cxc"
-"loadlib5"="ext13"
+"loadlib1"="Gem"
+"loadlib2"="cyclone"
+"loadlib3"="zexy"
+"loadlib4"="creb"
+"loadlib5"="cxc"
 "loadlib6"="iemlib"
 "loadlib7"="list-abs"
 "loadlib8"="mapping"
@@ -29,10 +29,10 @@ Windows Registry Editor Version 5.00
 "loadlib26"="freeverb"
 "loadlib27"="hcs"
 "loadlib28"="jmmmp"
-"loadlib29"="flatspace"
+"loadlib29"="ext13"
 "loadlib30"="deprecated"
+"loadlib31"="flatspace"
 ; delete any previous loadlib flags
-"loadlib31"=-
 "loadlib32"=-
 "loadlib33"=-
 "loadlib34"=-
