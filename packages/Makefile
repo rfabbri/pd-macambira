@@ -489,7 +489,7 @@ gem_install: gem $(helpdir)
 	install -p $(gem_src)/help/*.* $(helpdir)/$(GEM_NAME)
 	install -p $(gem_src)/abstractions/*-help.pd $(helpdir)/$(GEM_NAME)
 	install -d $(objectsdir)/$(GEM_NAME)
-ifeq ($(OS_NAME),linux)
+ifneq ($(OS_NAME),windows)
 	install -p $(gem_src)/src/Gem.$(EXTENSION)   $(objectsdir)
 endif
 	install -p $(shell ls -1 $(gem_src)/abstractions/*.* | \
