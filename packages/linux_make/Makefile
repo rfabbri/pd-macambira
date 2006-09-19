@@ -100,8 +100,8 @@ installer_makefile:
 	mv -i tarbz2Makefile $(DESTDIR)$(prefix)/Makefile
 
 installer_clean:
-	chmod -R +w $(packages_src)/linux_make/build
-	rm -rf $(packages_src)/linux_make/build
+	-chmod -R +w $(packages_src)/linux_make/build
+	-rm -rf $(packages_src)/linux_make/build
 
 
 #==============================================================================#
@@ -110,8 +110,12 @@ installer_clean:
 #
 #==============================================================================#
 
+distclean: clean
+	make -C $(packages_src) $(DEST_PATHS) distclean
+
+
 clean: installer_clean
-	cd $(packages_src) && make $(DEST_PATHS) clean
+	make -C $(packages_src) $(DEST_PATHS) clean
 
 
 test_package:
