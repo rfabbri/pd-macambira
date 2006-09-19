@@ -5,8 +5,8 @@
 CWD := $(shell pwd)
 
 DESTDIR = $(CWD)/build/
-cvs_root_dir = $(CWD)/../..
-BUILDLAYOUT_DIR = $(CWD)/..
+cvs_root_dir = $(shell cd $(CWD)/../.. && pwd)
+BUILDLAYOUT_DIR = $(shell cd $(CWD)/.. && pwd)
 
 
 # for command-line UNIX versions, you need to install Pd into the same

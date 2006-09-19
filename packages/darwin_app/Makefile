@@ -9,8 +9,8 @@ PD_APP_NAME = $(PACKAGE_NAME)
 PD_APP_CONTENTS = $(BUILD_BASE)/$(PD_APP_NAME).app/Contents
 DESTDIR = $(PD_APP_CONTENTS)/Resources
 
-cvs_root_dir = $(CWD)/../..
-BUILDLAYOUT_DIR = $(CWD)/..
+cvs_root_dir = $(shell cd $(CWD)/../.. && pwd)
+BUILDLAYOUT_DIR = $(shell cd $(CWD)/.. && pwd)
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
