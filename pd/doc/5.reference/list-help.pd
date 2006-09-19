@@ -1,6 +1,5 @@
 #N canvas 596 406 629 492 12;
 #X obj 29 11 list;
-#X text 352 455 updated for Pd version 0.39;
 #X text 76 12 - building and using variable-length messages;
 #N canvas 92 130 654 658 about-lists 0;
 #X obj 50 625 print message;
@@ -48,7 +47,7 @@ inappropriate!) way.;
 #X connect 6 0 4 0;
 #X connect 13 0 15 0;
 #X connect 14 0 15 0;
-#X restore 42 311 pd about-lists;
+#X restore 43 324 pd about-lists;
 #X text 33 52 There are four list classes:;
 #X obj 22 82 list append;
 #X obj 22 107 list prepend;
@@ -203,11 +202,11 @@ the split point.;
 #X connect 9 0 22 1;
 #X connect 22 0 5 0;
 #X restore 506 109 pd prepend;
-#X text 29 228 In general \, inlets that take lists (two each for append/prepend
+#X text 30 241 In general \, inlets that take lists (two each for append/prepend
 \, and one each for split and trim) will convert non-list messages
 (such as "set 5") to lists (such as "list set 5" automatically. Here's
 more about lists in Pd:;
-#X text 30 344 And here are some examples showing how to use these
+#X text 31 357 And here are some examples showing how to use these
 objects to compose and/or use variable length messages:;
 #N canvas 381 50 719 646 example1 0;
 #X obj 43 173 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -275,8 +274,8 @@ the list.;
 #X connect 15 0 17 0;
 #X connect 17 0 14 0;
 #X connect 18 0 11 0;
-#X restore 221 397 pd example1;
-#X text 64 396 simple sequencer;
+#X restore 222 410 pd example1;
+#X text 65 409 simple sequencer;
 #N canvas 126 39 568 569 example2 0;
 #X obj 66 263 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -327,9 +326,9 @@ by taking the "pitch" output before the delay object (previously the
 #X connect 16 0 15 0;
 #X connect 16 1 11 1;
 #X connect 16 2 19 0;
-#X restore 221 423 pd example2;
-#X text 55 425 another sequencer;
-#X text 113 452 serializer;
+#X restore 222 436 pd example2;
+#X text 56 438 another sequencer;
+#X text 115 465 serializer;
 #N canvas 116 31 673 426 example3 0;
 #X obj 19 287 list split 1;
 #X obj 19 378 print;
@@ -359,6 +358,31 @@ append" above.;
 #X connect 4 1 3 1;
 #X connect 5 0 2 1;
 #X connect 6 0 4 0;
-#X restore 220 450 pd example3;
-#X obj 22 194 list;
-#X text 70 195 - short for "list append";
+#X restore 222 463 pd example3;
+#X obj 23 207 list;
+#X text 71 208 - short for "list append";
+#X obj 22 182 list trim;
+#X text 141 185 - output number of items in list;
+#N canvas 188 111 576 365 length 0;
+#X msg 126 183 1 2 3;
+#X msg 126 134 list cis boom bah;
+#X msg 127 209 bang;
+#X msg 126 107 walk the dog;
+#X msg 127 231 1 x y;
+#X msg 126 257 x 1 y;
+#X msg 126 157 55;
+#X obj 101 285 list length;
+#X floatatom 101 311 5 0 0 0 - - -;
+#X text 29 18 length - number of items in list;
+#X text 27 55 The "list length" object outputs the number of arguments
+in a list or other message.;
+#X connect 0 0 7 0;
+#X connect 1 0 7 0;
+#X connect 2 0 7 0;
+#X connect 3 0 7 0;
+#X connect 4 0 7 0;
+#X connect 5 0 7 0;
+#X connect 6 0 7 0;
+#X connect 7 0 8 0;
+#X restore 506 186 pd length;
+#X text 353 468 updated for Pd version 0.40.;

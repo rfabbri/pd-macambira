@@ -131,9 +131,19 @@ static void audio_init( void)
 void sys_setchsr(int chin, int chout, int sr)
 {
     int nblk;
-    int inbytes = (chin ? chin : 2) * (DEFDACBLKSIZE*sizeof(float));
-    int outbytes = (chout ? chout : 2) * (DEFDACBLKSIZE*sizeof(float));
+    int inbytes = (chin ? chin : 2) *
+                (DEFDACBLKSIZE*sizeof(float));
+    int outbytes = (chout ? chout : 2) *
+                (DEFDACBLKSIZE*sizeof(float));
 
+    if (sys_soundin)
+        freebytes(sys_soundin, 
+            (sys_inchannels? sys_inchannels : 2) *
+                (DEFDACBLKSIZE*sizeof(float)));
+    if (sys_soundout)
+        freebytes(sys_soundout, 
+            (sys_outchannels? sys_outchannels : 2) *
+                (DEFDACBLKSIZE*sizeof(float)));
     sys_inchannels = chin;
     sys_outchannels = chout;
     sys_dacsr = sr;
@@ -141,14 +151,10 @@ void sys_setchsr(int chin, int chout, int sr)
     if (sys_advance_samples < 3 * DEFDACBLKSIZE)
         sys_advance_samples = 3 * DEFDACBLKSIZE;
 
-    if (sys_soundin)
-        free(sys_soundin);
-    sys_soundin = (t_float *)malloc(inbytes);
+    sys_soundin = (t_float *)getbytes(inbytes);
     memset(sys_soundin, 0, inbytes);
 
-    if (sys_soundout)
-        free(sys_soundout);
-    sys_soundout = (t_float *)malloc(outbytes);
+    sys_soundout = (t_float *)getbytes(outbytes);
     memset(sys_soundout, 0, outbytes);
 
     if (sys_verbose)
@@ -654,12 +660,12 @@ void glob_audio_properties(t_pd *dummy, t_floatarg flongform)
     audio_getdevs(indevlist, &nindevs, outdevlist, &noutdevs, &canmulti,
         MAXNDEV, DEVDESCSIZE);
 
-    sys_gui("set audio_indevlist {}\n");
+    sys_gui("global audio_indevlist; set audio_indevlist {}\n");
     for (i = 0; i < nindevs; i++)
         sys_vgui("lappend audio_indevlist \"%s\"\n",
             indevlist + i * DEVDESCSIZE);
 
-    sys_gui("set audio_outdevlist {}\n");
+    sys_gui("global audio_outdevlist; set audio_outdevlist {}\n");
     for (i = 0; i < noutdevs; i++)
         sys_vgui("lappend audio_outdevlist \"%s\"\n",
             outdevlist + i * DEVDESCSIZE);

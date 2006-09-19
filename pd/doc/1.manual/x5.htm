@@ -25,7 +25,8 @@
 for resources such as abstractions and libraries.
 
 <P> Sybmols can now be built using multiple dollar sign variables, as in
-"$1-$2.$3".
+"$1-$2.$3".  Meanwhile, naming subpatches as in "pd $1-foo" now seems to
+work correctly.
 
 <P> The switch~ object takes a "bang" message to compute one block of DSP on 
 demand.  Also, block sizes are no longer required to be powers of two 
@@ -47,7 +48,29 @@ search.
 <P> Templates can get notified when data are selected/deselected.  I want
 to provide this for mouse actions on locked canvases too, but haven't yet.
 
+<P> Characters like "\", "[", etc., typed into dialogs for labelling
+number boxes or other GUI objects, get filtered out so that they at
+least don't hang Pd up.
+
+<P> Drawcurve (and the others, filledcurve, drawpolygon, filledpolygon)
+have a new "-x" flag that inhibits a scalar getting
+selected when the curve is clicked on.  This is useful for drawing stuff in
+the background (grids, clefs, etc).
+
 <P> 6 or so patches adopted from sourceforge.
+
+<P> A "list length" object
+
+<P> IEM Gui labels (except for the VU meter) default to 10 point fonts
+(typically 8 before).
+
+<P> "send" without an argument gets an inlet to set the destination
+
+<P> A -noprefs flag defeats loading startup preferences.  This gives you a
+way to rescue things if Pd's settings somehow crash Pd on startup.
+
+<P> tabwrite~ takes a "start" message to allow writing into the middle
+of the table.
 
 <P> ------------------ 0.39.2 --------------------------
 

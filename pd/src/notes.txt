@@ -1,4 +1,6 @@
 ---------------- dolist --------------------
+check bug reports on sourceforge
+PC device counting problem (first device invoked by -audiodev 0)
 
 test:
 compile on various versions of linux
@@ -12,30 +14,6 @@ mac:
 what does OSX do when jack is compiled into Pd but not installed??
 turn on paMacCore_ChangeDeviceParameters for mac (pa_mac_core.h)
 Gnome: why don't windows pop up when clicked on?
-
-doc:
-declare help window
-openpanel directory
-big-soundfile support
-escaping filenames for wierdly named externs
-infrastructure for adding externs in non-ascii languages
-'$' patch (multiple dollar-sign expansion)
--x flag for curves
-object list
-document env~ second argument (and why is it no less than 1/10 of first???)
-vibrato example
-block resampling arguments
-document tabwrite~_start
-"list" to signal inlet (e.g., "*~") or float inlet (f) complains.
-$-expansion changed 
-list length
-send inlet
-bug fix: list to numbox (inlet and object but object is noinlet)
-bug fix: pd $1 bug ($1 is saved as it was evaluated, not as '$1')
-flag to defeat .pdsettings
-'{' dropped better
-'[' in numbox label breaks it (Yury Sept. 3)
-more reasonable font size default for GUIs
 
 problems:
 help browser (offer both versions?)
@@ -63,8 +41,10 @@ loading e-mailed patches without removing headers crashes pd
 check if _vsnprintf with zero argument in windows works any better...
 detect adc~ and dac~ reblocking
 
+more demonstration patches:
+vibrato using variable delay
+
 features:
-flag to defeat .pdsettings
 externs able to usurp built-ins (+mem alignment for SSE)
 replace gatom_escapit with a quoting mechanism (handle '[', spaces, etc.)
 sprout inlet for "route", "sel" if one arg
@@ -165,6 +145,6 @@ fix edit mode menu item
 fancier text editing
 tools (reassigns meaning of primary click)
 get gui to notice early EOF
-rewrite t_getbytes properly
+rewrite t_getbytes properly (m_newmemory.c in pd/attic)
 obj_new should do a longjmp on out-of-memory
 

@@ -217,10 +217,13 @@ void vinlet_dspprolog(struct _vinlet *x, t_signal **parentsigs,
               (x->x_hop - prologphase * re_parentvecsize);
 
             if (upsample * downsample == 1)
-                    dsp_add(vinlet_doprolog, 3, x, insig->s_vec, re_parentvecsize);
+                    dsp_add(vinlet_doprolog, 3, x, insig->s_vec,
+                        re_parentvecsize);
             else {
-              resamplefrom_dsp(&x->x_updown, insig->s_vec, parentvecsize, re_parentvecsize, x->x_updown.method);
-              dsp_add(vinlet_doprolog, 3, x, x->x_updown.s_vec, re_parentvecsize);
+              resamplefrom_dsp(&x->x_updown, insig->s_vec, parentvecsize,
+                re_parentvecsize, x->x_updown.method);
+              dsp_add(vinlet_doprolog, 3, x, x->x_updown.s_vec,
+                re_parentvecsize);
         }
 
             /* if the input signal's reference count is zero, we have

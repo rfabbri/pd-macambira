@@ -377,6 +377,8 @@ t_canvas *canvas_new(void *dummy, t_symbol *sel, int argc, t_atom *argv)
         static int dollarzero = 1000;
         t_canvasenvironment *env = x->gl_env =
             (t_canvasenvironment *)getbytes(sizeof(*x->gl_env));
+        if (!canvas_newargv)
+            canvas_newargv = getbytes(0);
         env->ce_dir = canvas_newdirectory;
         env->ce_argc = canvas_newargc;
         env->ce_argv = canvas_newargv;

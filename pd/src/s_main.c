@@ -249,7 +249,7 @@ static void pd_makeversion(void)
     char foo[100];
     sprintf(foo,  "Pd version %d.%d-%d%s\n",PD_MAJOR_VERSION,
         PD_MINOR_VERSION,PD_BUGFIX_VERSION,PD_TEST_VERSION);
-    pd_version = malloc(strlen(foo+1));
+    pd_version = malloc(strlen(foo)+1);
     strcpy(pd_version, foo);
 }
 
@@ -859,7 +859,7 @@ int sys_argparse(int argc, char **argv)
             argc -= 2; argv += 2;
         }
         else if (!strcmp(*argv, "-noprefs")) /* did this earlier */
-            ;
+            argc--, argv++;
         else
         {
             unsigned int i;
@@ -972,8 +972,8 @@ static void sys_afterargparse(void)
         advance = sys_main_advance;
     if (sys_main_srate)
         rate = sys_main_srate;
-    sys_open_audio(naudioindev, audioindev, naudioindev, chindev,
-        naudiooutdev, audiooutdev, naudiooutdev, choutdev, rate, advance, 0);
+    sys_open_audio(naudioindev, audioindev, nchindev, chindev,
+        naudiooutdev, audiooutdev, nchoutdev, choutdev, rate, advance, 0);
     sys_open_midi(nmidiindev, midiindev, nmidioutdev, midioutdev, 0);
 }
 
