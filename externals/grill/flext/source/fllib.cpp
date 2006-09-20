@@ -41,27 +41,31 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 //! Extract space-delimited words from a string
 static const char *extract(const char *name,int ix = 0)
 {
-	static char tmp[1024];
+	char tmp[1024];
 	const char *n = name;
 	
 	const char *del = strchr(name,ALIASDEL);
 
 	if(del) {
-		if(ix < 0) {
-			char *t = tmp;
-			while(n < del && (isspace(*n) || strchr(ALIASSLASHES,*n))) ++n;
-			while(n < del && !isspace(*n)) {
-				char c = *(n++);
-				*(t++) = strchr(ALIASSLASHES,c)?ALIASSLASH:c;
-			}
-			while(*t == ALIASSLASH && t > tmp) --t;
-			*t = 0;
-
-			return tmp;
+#if 0
+		char *t = tmp;
+		while(n < del && (isspace(*n) || strchr(ALIASSLASHES,*n))) ++n;
+		while(n < del && !isspace(*n)) {
+			char c = *(n++);
+			*(t++) = strchr(ALIASSLASHES,c)?ALIASSLASH:c;
 		}
+		while(*t == ALIASSLASH && t > tmp) --t;
+		*t = 0;
+#endif
+		if(ix < 0)
+			return del+1;
 
-		n = del+1;
+		strncpy(tmp,name,del-name);
+		tmp[del-name] = 0;
+		n = tmp;
 	}
+	else if(ix < 0)
+		return NULL; // no explicit help name
 
 	while(*n && isspace(*n)) ++n;
 	
@@ -301,7 +305,16 @@ void flext_obj::obj_add(bool lib,bool dsp,bool attr,const char *idname,const cha
 	t_classid clid = lo;
 
 	// make help reference
-	flext_obj::DefineHelp(clid,idname,extract(names,-1),dsp);
+	const char *helptxt = extract(names,-1);
+	if(helptxt) {
+		const char *sl = strchr(helptxt,'/');
+		if(sl && !sl[1])
+			// helptxt is only the path (path with trailing /)
+			flext_obj::DefineHelp(clid,idname,helptxt,dsp);
+		else 
+			// helptxt is path and patch name
+			flext_obj::DefineHelp(clid,helptxt,NULL,dsp);
+	}
 
 	for(int ix = 0; ; ++ix) {
 		// in this loop register all the possible aliases of the object
