@@ -1,0 +1,8 @@
+#N canvas 1004 669 454 304 10;
+#X obj 124 139 hostname;
+#X msg 124 94 bang;
+#X symbolatom 124 174 0 0 0 0 - - -;
+#X text 14 19 get the hostname of the machine. Currently it probably
+doesn't work on Windows...;
+#X connect 0 0 2 0;
+#X connect 1 0 0 0;
