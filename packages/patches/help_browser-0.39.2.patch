@@ -1,5 +1,10 @@
---- u_main.tk	2006-02-21 23:31:26.000000000 -0500
-+++ ../../pd-MAIN/src/u_main.tk	2005-12-31 15:55:25.000000000 -0500
+Index: u_main.tk
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
+retrieving revision 1.17
+diff -u -w -r1.17 u_main.tk
+--- u_main.tk	15 Oct 2005 23:14:28 -0000	1.17
++++ u_main.tk	20 Sep 2006 15:41:10 -0000
 @@ -89,6 +89,8 @@
      }
  }
@@ -51,29 +56,14 @@
  proc menu_doc_open {subdir basename} {
      global pd_guidir
   
-@@ -439,27 +406,62 @@
+@@ -439,26 +406,74 @@
      }
  }
  
 -proc doc_submenu {helpmenu subdir} {
 -         global help_top_directory pd_tearoff
--
--         set menudir $help_top_directory/$subdir
  
--    regsub -all "\\\." $subdir "" submenu
--
--         menu $helpmenu.$submenu -tearoff $pd_tearoff
--    regsub -all "\\\." $subdir " " submenuname
--         $helpmenu add cascade -label $submenuname \
--                  -menu $helpmenu.$submenu
--    catch {
--# use this glob pattern to exclude the supporting files
--#        foreach file [ lsort [ glob -dir $menudir {*[0-9][0-9]*} ] ] 
--         foreach file [ lsort [ glob -dir $menudir * ] ] {
--                  set filename ""
--                  regsub {.*/(.*\..+$)} $file {\1} filename
--                  $helpmenu.$submenu add command -label $filename \
--                                -command "menu_doc_open doc/$subdir $filename"
+-         set menudir $help_top_directory/$subdir
 +################## help browser and support functions #########################
 +proc menu_doc_browser {dir} {
 +	global .mbar
@@ -88,19 +78,11 @@
 +		frame .help_browser.frame
 +		pack .help_browser.frame -side top -fill both
 +		doc_make_listbox .help_browser.frame $dir 0
-          }
-     }
-+
++         }
++    }
+ 
+-    regsub -all "\\\." $subdir "" submenu
 +proc doc_make_listbox {base dir count} {
-+	global pd_guidir
-+	if {![file isdirectory $dir]} {
-+		regsub -- $pd_guidir [file dirname $dir] "" subdir
-+		set file [file tail $dir]
-+		if { [catch {menu_doc_open $subdir $file} fid] } {
-+			puts stderr "Could not open $pd_guidir/$subdir/$file\n"
-+		}
-+		return; 
-+	}
 +	# check for [file readable]?
 +	if { [info tclversion] >= 8.5 } {
 +		# requires Tcl 8.5 but probably deals with special chars better
@@ -121,18 +103,51 @@
 +					  [lsort -dictionary [glob -directory $dir -nocomplain -types {f} -- *]]]  {
 +		$current_listbox insert end "[file tail $item][expr {[file isdirectory $item] ? {/} : {}}]"
 +	}
-+	bind $current_listbox <Button-1> [list doc_navigate $dir [incr count] %W %x %y]
++	bind $current_listbox <Button-1> [list doc_navigate $dir $count %W %x %y]
++	bind $current_listbox <Double-Button-1> [list doc_double_button $dir $count %W %x %y]
 +}
-+
+ 
+-         menu $helpmenu.$submenu -tearoff $pd_tearoff
+-    regsub -all "\\\." $subdir " " submenuname
+-         $helpmenu add cascade -label $submenuname \
+-                  -menu $helpmenu.$submenu
+-    catch {
+-# use this glob pattern to exclude the supporting files
+-#        foreach file [ lsort [ glob -dir $menudir {*[0-9][0-9]*} ] ] 
+-         foreach file [ lsort [ glob -dir $menudir * ] ] {
+-                  set filename ""
+-                  regsub {.*/(.*\..+$)} $file {\1} filename
+-                  $helpmenu.$submenu add command -label $filename \
+-                                -command "menu_doc_open doc/$subdir $filename"
 +proc doc_navigate {dir count width x y} {
-+	if {[set subdir [$width get [$width index "@$x,$y"]]] eq {}} {
++	if {[set newdir [$width get [$width index "@$x,$y"]]] eq {}} {
 +		return
 +	}
-+	doc_make_listbox [winfo parent $width] [file join $dir $subdir] $count
++	set dir_to_open [file join $dir $newdir]
++	if {[file isdirectory $dir_to_open]} {
++		doc_make_listbox [winfo parent $width] $dir_to_open [incr count]
++	}
++}
++
++proc doc_double_button {dir count width x y} {
++	global pd_guidir
++	if {[set newdir [$width get [$width index "@$x,$y"]]] eq {}} {
++		return
++	}
++	set dir_to_open [file join $dir $newdir]
++	if {[file isdirectory $dir_to_open]} {
++		 doc_navigate $dir $count $width $x $y
++	} else {
++		regsub -- $pd_guidir [file dirname $dir_to_open] "" subdir
++		set file [file tail $dir_to_open]
++		if { [catch {menu_doc_open $subdir $file} fid] } {
++			puts stderr "Could not open $pd_guidir/$subdir/$file\n"
+          }
++		return; 
+     }
  }
  
- ############# routine to add media, help, and apple menu items ###############
-@@ -526,7 +528,7 @@
+@@ -526,7 +541,7 @@
      $mbar.help add command -label {Html ...} \
          -command {menu_doc_open doc/1.manual index.htm} 
      $mbar.help add command -label {Browser ...} \
