@@ -148,7 +148,7 @@ pd-msg_clean:
 PD_FILEFORMAT_NAME = Pd
 pd_fileformat_install: $(manualsdir)
 	install -d $(manualsdir)/$(PD_FILEFORMAT_NAME)
-	-curl http://student-kmt.hku.nl/%7Etjeerd/pd/pd_fileformat.html > \
+	install -p $(doc_src)/additional/pd-fileformat.html
 		$(manualsdir)/$(PD_FILEFORMAT_NAME)/Pd_File_Format.html
 
 pd_fileformat_clean:
@@ -176,41 +176,41 @@ tutorials_install: $(manualsdir)
 	install -d $(manualsdir)/PlayNow
 	install -p $(doc_src)/tutorials/playnow/*.* $(manualsdir)/PlayNow
 # intro
-	install -d $(manualsdir)/Intro
-	install -p $(doc_src)/tutorials/intro/*.* $(manualsdir)/Intro
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/Intro
+	install -d $(manualsdir)/0.Intro/Intro
+	install -p $(doc_src)/tutorials/intro/*.* $(manualsdir)/0.Intro/Intro
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Intro
 # sound
-	install -d $(manualsdir)/Sound
-	install -p $(doc_src)/tutorials/sound/*.* $(manualsdir)/Sound
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/Sound
+	install -d $(manualsdir)/0.Intro/Sound
+	install -p $(doc_src)/tutorials/sound/*.* $(manualsdir)/0.Intro/Sound
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Sound
 # visual
-	install -d $(manualsdir)/Visual
-	install -p $(doc_src)/tutorials/visual/*.* $(manualsdir)/Visual
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/Visual
+	install -d $(manualsdir)/0.Intro/Visual
+	install -p $(doc_src)/tutorials/visual/*.* $(manualsdir)/0.Intro/Visual
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Visual
 # networking
-	install -d $(manualsdir)/Networking
-	install -p $(doc_src)/tutorials/networking/*.* $(manualsdir)/Networking
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/Networking
+	install -d $(manualsdir)/0.Intro/Networking
+	install -p $(doc_src)/tutorials/networking/*.* $(manualsdir)/0.Intro/Networking
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Networking
 # physical
-	install -d $(manualsdir)/Physical
-	install -p $(doc_src)/tutorials/physical/*.* $(manualsdir)/Physical
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/Physical
+	install -d $(manualsdir)/0.Intro/Physical
+	install -p $(doc_src)/tutorials/physical/*.* $(manualsdir)/0.Intro/Physical
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Physical
 
 tutorials_clean:
 	-rm -f -- $(manualsdir)/PdDrums/*.*
 	-rmdir -- $(manualsdir)/PdDrums
 	-rm -f -- $(manualsdir)/PlayNow/*.*
 	-rmdir -- $(manualsdir)/PlayNow
-	-rm -f -- $(manualsdir)/Intro/*.*
-	-rmdir -- $(manualsdir)/Intro
-	-rm -f -- $(manualsdir)/Sound/*.*
-	-rmdir -- $(manualsdir)/Sound
-	-rm -f -- $(manualsdir)/Visual/*.*
-	-rmdir -- $(manualsdir)/Visual
-	-rm -f -- $(manualsdir)/Networking/*.*
-	-rmdir -- $(manualsdir)/Networking
-	-rm -f -- $(manualsdir)/Physical/*.*
-	-rmdir -- $(manualsdir)/Physical
+	-rm -f -- $(manualsdir)/0.Intro/Intro/*.*
+	-rmdir -- $(manualsdir)/0.Intro/Intro
+	-rm -f -- $(manualsdir)/0.Intro/Sound/*.*
+	-rmdir -- $(manualsdir)/0.Intro/Sound
+	-rm -f -- $(manualsdir)/0.Intro/Visual/*.*
+	-rmdir -- $(manualsdir)/0.Intro/Visual
+	-rm -f -- $(manualsdir)/0.Intro/Networking/*.*
+	-rmdir -- $(manualsdir)/0.Intro/Networking
+	-rm -f -- $(manualsdir)/0.Intro/Physical/*.*
+	-rmdir -- $(manualsdir)/0.Intro/Physical
 
 
 #==============================================================================#
