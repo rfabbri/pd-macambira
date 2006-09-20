@@ -148,7 +148,7 @@ pd-msg_clean:
 PD_FILEFORMAT_NAME = Pd
 pd_fileformat_install: $(manualsdir)
 	install -d $(manualsdir)/$(PD_FILEFORMAT_NAME)
-	install -p $(doc_src)/additional/pd-fileformat.html
+	install -p $(doc_src)/additional/pd-fileformat.html \
 		$(manualsdir)/$(PD_FILEFORMAT_NAME)/Pd_File_Format.html
 
 pd_fileformat_clean:
