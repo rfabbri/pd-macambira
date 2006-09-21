@@ -30,7 +30,7 @@ final_setup:
 	chmod -R ugo-w $(pddocdir)
 
 install: $(examplesdir) $(helpdir) $(manualsdir) $(objectsdir) $(readmesdir) \
-gripd_install ix_install
+gripd_install 
 	@echo " "
 	@echo "extensions install succeeded!"
 
@@ -73,12 +73,13 @@ gripd_clean:
 IX_NAME = ix
 ix_install:
 	install -d $(objectsdir)/$(IX_NAME)
-	install -p $(extensions_src)/gui/ix/*.wid $(objectsdir)/$(IX_NAME) 
+	install -p $(extensions_src)/gui/ix/toxy/*.wid $(objectsdir)/$(IX_NAME) 
 #	install -d $(manualsdir)/$(IX_NAME)
-	install -p $(extensions_src)/gui/ix/README \
-		$(readmesdir)/$(IX_NAME).txt
+#	install -d $(readmesdir)/$(IX_NAME)
+#	install -p $(extensions_src)/gui/ix/toxy/README \
+#		$(readmesdir)/$(IX_NAME).txt
 	install -d $(examplesdir)/$(IX_NAME)
-	install -p $(extensions_src)/gui/ix/*.pd $(examplesdir)/$(IX_NAME) 
+	install -p $(extensions_src)/gui/ix/toxy/*.pd $(examplesdir)/$(IX_NAME) 
 
 
 
