@@ -1,4 +1,12 @@
 
+
+______________________________________________________________________________
+= one->many
+
+something like [segment]? or [seglet]?
+
+______________________________________________________________________________
+=
 - check out behavior of [curve_power] and [curve_root] if non-integers are
   used as arguments on in the right inlets
 
