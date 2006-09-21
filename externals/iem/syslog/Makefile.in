@@ -52,7 +52,7 @@ install-bin:
 
 install-doc:
 	-install -d $(INSTALL_BIN)
-	-install -m 644 ../doc/*.pd $(INSTALL_BIN)
+	-install -m 644 *.pd $(INSTALL_BIN)
 
 dist: distclean
 	(cd ..;tar czvf $(TARNAME) $(LIBNAME))
