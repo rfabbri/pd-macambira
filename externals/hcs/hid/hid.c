@@ -35,8 +35,8 @@
  * LOCAL DEFINES
  */
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 unsigned short global_debug_level = 0;
 
@@ -224,7 +224,7 @@ void hid_output_event(t_hid *x, t_hid_element *output_data)
 		SETFLOAT(event_data + 2, output_data->value);
 		outlet_anything(x->x_data_outlet,output_data->type,3,event_data);
 #endif
-	}
+	} 
 }
 
 

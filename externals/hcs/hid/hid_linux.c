@@ -15,8 +15,8 @@
 
 #include "hid.h"
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 #define LINUX_BLOCK_DEVICE   "/dev/input/event"
 
@@ -25,12 +25,11 @@
  * from evtest.c from the ff-utils package
  */
 
+/* from asm/types.h and linux/input.h __kernel__ sections */
 #define BITS_PER_LONG (sizeof(long) * 8)
-#define NBITS(x) ((((x)-1)/BITS_PER_LONG)+1)
-#define OFF(x)  ((x)%BITS_PER_LONG)
-#define BIT(x)  (1UL<<OFF(x))
+#define NBITS(x) (((x)/BITS_PER_LONG)+1)
 #define LONG(x) ((x)/BITS_PER_LONG)
-#define test_bit(bit, array)	((array[LONG(bit)] >> OFF(bit)) & 1)
+#define test_bit(bit, array)	((array[LONG(bit)] >> (bit%BITS_PER_LONG)) & 1)
 
 
 /*
@@ -294,7 +293,7 @@ void hid_print_device_list(void)
 
 static void hid_build_element_list(t_hid *x) 
 {
-    post("hid_build_element_list");
+    debug_print(LOG_DEBUG,"hid_build_element_list");
     unsigned long element_bitmask[EV_MAX][NBITS(KEY_MAX)];
     uint8_t abs_bitmask[ABS_MAX/8 + 1];
     struct input_absinfo abs_features;
@@ -304,7 +303,6 @@ static void hid_build_element_list(t_hid *x)
     element_count[x->x_device_number] = 0;
     if( x->x_fd ) 
     {
-        new_element = getbytes(sizeof(t_hid_element));
         /* get bitmask representing supported elements (axes, keys, etc.) */
         memset(element_bitmask, 0, sizeof(element_bitmask));
         if( ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), element_bitmask[0]) < 0 )
@@ -316,8 +314,6 @@ static void hid_build_element_list(t_hid *x)
         {
             if(test_bit(i, element_bitmask[0])) 
             {
-                new_element->linux_type = i;
-                new_element->type = gensym(ev[i] ? ev[i] : "?");
                 /* get bitmask representing supported button types */
                 ioctl(x->x_fd, EVIOCGBIT(i, KEY_MAX), element_bitmask[i]);
                 /* cycle through all possible event codes (axes, keys, etc.) 
@@ -326,6 +322,7 @@ static void hid_build_element_list(t_hid *x)
                  */
                 for(j = 0; j < KEY_MAX; j++) 
                 {
+					new_element = getbytes(sizeof(t_hid_element));
                     if( (i == EV_ABS) && (test_bit(j, abs_bitmask)) )
                     {
                         /* this means that the bit is set in the axes list */
@@ -341,6 +338,8 @@ static void hid_build_element_list(t_hid *x)
                     }
                     if(test_bit(j, element_bitmask[i])) 
                     {
+						new_element->linux_type = i; /* the int from linux/input.h */
+						new_element->type = gensym(ev[i] ? ev[i] : "?"); /* the symbol */
                         new_element->linux_code = j;
                         if((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
                         {
@@ -378,7 +377,7 @@ static void hid_build_element_list(t_hid *x)
 
 void hid_get_events(t_hid *x)
 {
-    debug_print(LOG_DEBUG,"hid_get_events");
+    debug_print(9,"hid_get_events");
 
 /* for debugging, counts how many events are processed each time hid_read() is called */
     DEBUG(t_int event_counter = 0;);
@@ -398,12 +397,14 @@ void hid_get_events(t_hid *x)
         {
             for( i=0; i < element_count[x->x_device_number]; ++i )
             {
-                output_element = element[x->x_device_number][i];
+				output_element = element[x->x_device_number][i];
                 if( (hid_input_event.type == output_element->linux_type) && \
                     (hid_input_event.code == output_element->linux_code) )
                 {
                     output_element->value = hid_input_event.value;
-                    post("output %d",output_element->value);
+					debug_print(9,"i: %d  linux_type: %d  linux_code: %d", i, 
+								output_element->linux_type, output_element->linux_code);
+                    debug_print(9,"value to output: %d",output_element->value);
                     break;
                 }
             }
@@ -414,7 +415,7 @@ void hid_get_events(t_hid *x)
     }
     DEBUG(
         if(event_counter > 0)
-        post("output %d events",event_counter);
+        debug_print(8,"output %d events",event_counter);
 	);
 	
     return;
