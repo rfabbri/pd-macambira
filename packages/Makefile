@@ -463,9 +463,8 @@ flext_install:
 #------------------------------------------------------------------------------
 # gem_install
 GEM_NAME = Gem
-$(gem_src)/src/configure: $(gem_src)/src/configure.ac
-	cd $(gem_src)/src && aclocal
-	cd $(gem_src)/src && autoconf
+$(gem_src)/src/configure: 
+	make -C $(gem_src)/src configure
 
 # each platform currently needs a custom ./configure, so this is commented out
 # until the ./configure defaults work on all three platforms
