@@ -15,8 +15,7 @@ BUILDLAYOUT_DIR = $(CWD)
 
 
 ## default target
-all: pd abstractions doc externals
-#all: pd abstractions doc externals flext gem
+all: pd abstractions doc externals flext gem
 #all: pd++
 	@echo "Complete build succeeded!"
 
@@ -465,10 +464,13 @@ flext_install:
 # gem_install
 GEM_NAME = Gem
 $(gem_src)/src/configure: $(gem_src)/src/configure.ac
+	cd $(gem_src)/src && aclocal
 	cd $(gem_src)/src && autoconf
 
-$(gem_src)/src/Make.config: $(gem_src)/src/Make.config.in
-	cd $(gem_src)/src && ./configure	--with-pd=$(pd_src)
+# each platform currently needs a custom ./configure, so this is commented out
+# until the ./configure defaults work on all three platforms
+#$(gem_src)/src/Make.config: $(gem_src)/src/Make.config.in
+#	cd $(gem_src)/src && ./configure	--with-pd=$(pd_src)
 
 $(gem_src)/src/Gem.dll:
 
