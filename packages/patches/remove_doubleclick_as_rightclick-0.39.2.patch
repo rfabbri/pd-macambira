@@ -1,0 +1,32 @@
+Index: g_editor.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/g_editor.c,v
+retrieving revision 1.13
+diff -u -w -r1.13 g_editor.c
+--- g_editor.c	15 Sep 2005 03:17:27 -0000	1.13
++++ g_editor.c	24 Sep 2006 17:12:48 -0000
+@@ -1027,12 +1027,6 @@
+ #define ALTMOD 4
+ #define RIGHTCLICK 8
+ 
+-/* on one-button-mouse machines, you can use double click to
+-    mean right click (which gets the popup menu.)  Do this for Mac. */
+-#ifdef MACOSX
+-#define SIMULATERIGHTCLICK
+-#endif
+-
+ static double canvas_upclicktime;
+ static int canvas_upx, canvas_upy;
+ #define DCLICKINTERVAL 0.25
+@@ -1067,11 +1061,7 @@
+ 
+     if (doit && !runmode && xpos == canvas_upx && ypos == canvas_upy &&
+         sys_getrealtime() - canvas_upclicktime < DCLICKINTERVAL)
+-#ifdef SIMULATERIGHTCLICK
+-            rightclick = 1;
+-#else
+             doublemod = 1;
+-#endif
+     x->gl_editor->e_lastmoved = 0;
+     if (doit)
+     {
