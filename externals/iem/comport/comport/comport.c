@@ -11,6 +11,7 @@ MP 20060620 Add DTR and RTS control, add outputs to reflect CTS and DSR states.
 MP 20060621 Do all the above for Windows too.
 MP 20060709 All status goes out the status outlet when an info message is received
 MP 20060824 added clock_delay call in comport_devicename
+MP 20060924 added comport_enum to list available ports in Windows
 */
 
 #include "m_pd.h"
@@ -198,6 +199,7 @@ int comport_get_cts(t_comport *x);
 #ifdef _WIN32
 static HANDLE open_serial(unsigned int com_num, t_comport *x);
 static HANDLE close_serial(t_comport *x);
+static void comport_enum(void);
 #else
 static int open_serial(unsigned int com_num, t_comport *x);
 static int close_serial(t_comport *x);
@@ -1237,18 +1239,42 @@ static void comport_print(t_comport *x, t_symbol *s, int argc, t_atom *argv)
     }
 }
 
+#ifdef _WIN32
+static void comport_enum(void)
+{
+    HANDLE          fd;
+    char            device_name[10];
+	unsigned int    i;
+    DWORD           dw;
+
+    for(i = 1; i < COMPORT_MAX; i++)
+	{
+        sprintf(device_name, "\\\\.\\COM%d", i);/* the recommended way to specify COMs above 9 */
+        fd = CreateFile( device_name,
+                GENERIC_READ | GENERIC_WRITE,
+                0,
+                0,
+                OPEN_EXISTING,
+                FILE_FLAG_OVERLAPPED,
+                0);
+        dw = 0L;
+        if(fd == INVALID_HANDLE_VALUE)
+            dw = GetLastError();
+        else
+            CloseHandle(fd);
+        if (dw == 0)post("\t%d - COM%d (free)", i, i);
+        else if (dw == ERROR_ACCESS_DENIED)post("\t%d - COM%d (in use)", i, i);
+    }
+}
+#endif // WIN32
+
 static void comport_output_print(t_comport *x)
 {
 	unsigned int i;
 
 	post("[comport]: available serial ports:");
 #ifdef _WIN32
-	post("\t0 - COM1");
-	for(i=1; i<COMPORT_MAX; i++)
-	{
-		/* TODO: this should actually probe ports */
-		post("\t%d - COM%s", i, i);
-	}
+    comport_enum();
 #else	
     glob_t         glob_buffer;
 	switch( glob( x->serial_device_name, 0, NULL, &glob_buffer ) )
