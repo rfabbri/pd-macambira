@@ -14,7 +14,7 @@
 
 /* ------------------------ sfread~ ----------------------------- */
 
-#ifdef NT
+#ifdef _WIN32
 #define BINREADMODE "rb"
 #else
 #define BINREADMODE "r"

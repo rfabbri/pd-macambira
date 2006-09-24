@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef NT
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 

@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
-#ifndef NT
+#ifndef _WIN32
 #include <sys/mman.h>
 #endif
 

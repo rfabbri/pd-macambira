@@ -5,7 +5,9 @@
 
 #include <sys/types.h>
 #include <string.h>
-#if defined(UNIX) || defined(unix)
+#ifdef _WIN32
+#include <winsock2.h>
+#else
 #include <sys/socket.h>
 #include <sys/errno.h>
 #include <netinet/in.h>
@@ -13,8 +15,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 #define SOCKET_ERROR -1
-#else
-#include <winsock2.h>
 #endif
 
 /* these pragmas are only used for MSVC, not MinGW or Cygwin <hans@at.or.at> */
@@ -30,11 +30,11 @@
 
 static void sys_sockerror(char *s)
 {
-#if defined(UNIX) || defined(unix)
-    int err = errno;
-#else
+#ifdef _WIN32
     int err = WSAGetLastError();
     if (err == 10054) return;
+#else
+	int err = errno;
 #endif
     post("%s: %s (%d)\n", s, strerror(err), err);
 }
@@ -42,11 +42,10 @@ static void sys_sockerror(char *s)
 
 static void sys_closesocket(int fd)
 {
-#if defined(UNIX) || defined(unix)
-    close(fd);
-#endif
-#ifdef NT
+#ifdef _WIN32
     closesocket(fd);
+#else
+    close(fd);
 #endif
 }
 
@@ -91,7 +90,7 @@ static int streamin13_listen(t_streamin13 *x,int portno)
     int sockfd;
     static int on = 1;
     
-#ifndef NT
+#ifndef _WIN32
     shutdown(x->x_connectsocket,SHUT_RDWR);
 #else
     shutdown(x->x_connectsocket,SD_BOTH);
@@ -175,13 +174,13 @@ static t_int *streamin13_perform(t_int *w)
   int length;
   short* cbuf;
 
-#ifndef NT
+#ifndef _WIN32
   t_float *out[x->x_n];
 #else
   t_float **out = (t_float**) malloc(x->x_n * sizeof(t_float*));
 #endif
 
-#ifndef NT
+#ifndef _WIN32
      fd_set fdset;
 #endif
    for (i=0;i < x->x_n;i++) {
@@ -197,7 +196,7 @@ static t_int *streamin13_perform(t_int *w)
 
 	//     cbuf = x->cbuf + x->blockssincereceive * n * x->x_n;
      
-	#ifndef NT
+	#ifndef _WIN32
 	     FD_SET(x->x_connectsocket,&fdset);
 	     if (!select(x->x_connectsocket+1,&fdset,NULL,NULL,&timeout) 
 		 || !FD_ISSET(x->x_connectsocket,&fdset)) {
@@ -273,7 +272,7 @@ static t_int *streamin13_perform(t_int *w)
 	              break;
 	     }
      }
-#ifdef NT
+#ifdef _WIN32
 	free(out);
 #endif 
      return (w+offset+1+i);

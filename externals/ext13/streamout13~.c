@@ -3,14 +3,14 @@
 
 #include <sys/types.h>
 #include <string.h>
-#if defined(UNIX) || defined(unix)
+#ifdef _WIN32
+#include <winsock.h>
+#else
 #include <sys/errno.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #define SOCKET_ERROR -1
-#else
-#include <winsock.h>
 #endif
 
 #ifdef __APPLE__
@@ -28,11 +28,11 @@
 
 static void sys_sockerror(char *s)
 {
-#if defined(UNIX) || defined(unix)
-    int err = errno;
-#else
+#ifdef _WIN32
     int err = WSAGetLastError();
     if (err == 10054) return;
+#else
+    int err = errno;
 #endif
     post("%s: %s (%d)\n", s, strerror(err), err);
 }
@@ -41,11 +41,10 @@ static void sys_sockerror(char *s)
 
 static void sys_closesocket(int fd)
 {
-#if defined(UNIX) || defined(unix)
-    close(fd);
-#endif
-#ifdef NT
+#ifdef _WIN32
     closesocket(fd);
+#else
+    close(fd);
 #endif
 }
 
@@ -162,7 +161,7 @@ static t_int *streamout13_perform(t_int *w)
   char* buf = (char *)(w[2]); 
   short* cibuf;
   char* bp;
-#ifndef NT
+#ifndef _WIN32
   t_float *in[x->x_n];
 #else
   t_float** in = (t_float**) malloc(x->x_n * sizeof(t_float*));
@@ -269,7 +268,7 @@ static t_int *streamout13_perform(t_int *w)
      }  
   }
  // post ("b-s-s:%d, length:%d, last:%d, prev:%d",x->blockssincesend,length,*cibuf,prev);
-#ifdef NT
+#ifdef _WIN32
   free(in);
 #endif
   return (w + 2 + i * 2);

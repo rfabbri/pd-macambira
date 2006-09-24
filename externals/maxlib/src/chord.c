@@ -25,7 +25,7 @@
 #include "m_pd.h"
 #include <stdio.h>
 #include <string.h>
-#ifdef UNIX
+#ifndef _WIN32
 #include <stdlib.h>
 #endif
 

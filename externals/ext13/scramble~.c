@@ -2,7 +2,7 @@
 #include "ext13.h"
 #include <sys/types.h>
 #include <string.h>
-#ifndef NT
+#ifndef _WIN32
 #include <netinet/in.h>
 #include <netdb.h>
 #include <sys/errno.h>
@@ -111,7 +111,7 @@ t_int *scramble_tilde_perform(t_int *w)
     int erg=0;
     int n;
     t_float val, valL, valR, killval;
-#ifndef NT
+#ifndef _WIN32
     t_float* out[x->x_channels];
     t_float* in[x->x_channels];
 #else
@@ -448,7 +448,7 @@ t_int *scramble_tilde_perform(t_int *w)
           *out[1]++ = 0;
      }/*end if play */
    }/*end while n-- */
-#ifdef NT
+#ifdef _WIN32
    free(in);
    free(out);
 #endif

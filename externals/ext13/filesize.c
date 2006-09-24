@@ -2,7 +2,7 @@
 #include "m_pd.h"
 #include <sys/stat.h>
 #include <stdio.h>
-#ifndef NT
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 
