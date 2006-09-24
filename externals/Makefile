@@ -132,7 +132,7 @@ else
     LIB_TARGETS += hid
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid
+    LIB_TARGETS += hid pdp
   endif
 endif
 
@@ -1621,7 +1621,7 @@ $(externals_src)/pdp/Makefile.config: $(externals_src)/pdp/Makefile.config.in
 
 $(externals_src)/pdp/pdp.$(EXTENSION):  $(externals_src)/pdp/configure \
 $(externals_src)/pdp/Makefile.config 
-	make -C $(externals_src)/pdp
+	make -C $(externals_src)/pdp PD_EXECUTABLE="$(pd_src)/bin/pd"
 
 pdp: $(externals_src)/pdp/pdp.$(EXTENSION)
 
