@@ -1,10 +1,12 @@
 #!/bin/sh
 
-HOSTNAME=`hostname`
+HOSTNAME=`hostname | sed 's|\([a-zA-Z0-9-]\)\..*|\1|'`
 SYSTEM=`uname -s`
 DATE=`date +%Y-%m-%d`
 TIME=`date +%H.%M.%S`
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
+
+RECIPIENT=pd-cvs@iem.at
 
 run_build_script ()
 {
@@ -13,15 +15,15 @@ run_build_script ()
 	 LOGFILE=/home/pd/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${SCRIPT}.txt
 	 touch ${LOGFILE} 
 
-	 su pd -c "sh /home/pd/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh" >> $LOGFILE 2>&1
+	 sh /home/pd/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh >> $LOGFILE 2>&1
 
 	 rsync -a ${LOGFILE} rsync://128.238.56.50/upload/${DATE}/logs/
 
 # send status report if something failed
 	 completion_test=`tail -1 ${LOGFILE}`
 	 if [ "x${completion_test}" != "xSUCCESS" ]; then
-		  SUBJECT="$HOSTNAME Pd-$SYSTEM $distro build results $DATE $TIME"
-		  tail -200 ${LOGFILE} | mail -s "${SUBJECT}" hans@eds.org
+		  SUBJECT="autobuild: $distro $HOSTNAME $DATE $TIME"
+		  tail -200 ${LOGFILE} | mail -s "${SUBJECT}" ${RECIPIENT}
 	 fi
 }
 
