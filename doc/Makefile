@@ -10,7 +10,7 @@
 CWD := $(shell pwd)
 
 # these are designed to be overridden by the packages/Makefile
-cvs_root_dir = $(CWD)/..
+cvs_root_dir := $(shell cd $(CWD)/.. && pwd)
 DESTDIR = $(CWD)/build/
 BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
