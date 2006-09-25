@@ -41,7 +41,8 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 # this variable is to support old "win" directories, rather than "windows"
 BUILDSRC_OS_NAME = $(OS_NAME)
 
-CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS)
+#CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS)
+CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -W $(DEBUG_CFLAGS)
 LDFLAGS =  
 LIBS = -lm
 
@@ -1993,7 +1994,12 @@ ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-y0]*.c $(externals_src)/
 ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
 
-zexy: $(ZEXY_OBJECTS:.c=.$(EXTENSION))
+zexy_configure:
+	make -C $(externals_src)/zexy/src/ configure
+	cd $(externals_src)/zexy/src/ && ./configure --disable-library
+
+zexy: zexy_configure
+	make -C $(externals_src)/zexy/src/ 
 
 zexy_install: zexy
 	install -d $(objectsdir)/$(ZEXY_NAME)
@@ -2002,7 +2008,8 @@ zexy_install: zexy
 		--license "GNU GPL" \
 		--description "GUI and streaming objects" \
 		--version "$(ZEXY_VERSION)"
-	install -p $(ZEXY_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(ZEXY_NAME)
+#	install -p $(ZEXY_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(ZEXY_NAME)
+	install -p $(wildcard $(externals_src)/zexy/src/*.$(EXTENSION)) $(objectsdir)/$(ZEXY_NAME)
 	install -p $(shell ls -1 $(externals_src)/zexy/abs/*.pd | \
 		grep -v '-help.pd' | sed 's|\(.*\)|"\1"|g') \
 		$(objectsdir)/$(ZEXY_NAME)
