@@ -53,8 +53,10 @@ static void sigifftw_dsp(t_sigifftw *x, t_signal **sp)
     x->dim.n=n;
     x->dim.is=1;
     x->dim.os=1;
-    x->plan = fftwf_plan_guru_split_dft(1, &(x->dim), 0, NULL, in2, 
-					in1, out2, out1, FFTW_ESTIMATE);
+    x->plan = fftwf_plan_guru_split_dft(1, &(x->dim), 0, 
+                                        NULL, 
+                                        in2, in1, out2, out1, 
+                                        FFTW_ESTIMATE);
     dsp_add(sigifftw_perform, 1, &x->plan);
 }
 

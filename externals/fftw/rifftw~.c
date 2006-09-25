@@ -39,7 +39,6 @@ static t_int *sigrifftw_perform(t_int *w)
 {
   fftw_siginvert((t_sample *)w[2],w[3]); 
   fftwf_execute(*(fftwf_plan*)w[1]);
-    
   return (w+4);
 }
 
@@ -61,8 +60,10 @@ static void sigrifftw_dsp(t_sigrifftw *x, t_signal **sp)
       x->dim.n=n;
       x->dim.is=1;
       x->dim.os=1;
-      x->plan = fftwf_plan_guru_split_dft_c2r(1, &(x->dim), 0, NULL, 
-                                              in1, in2, out, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
+      x->plan = fftwf_plan_guru_split_dft_c2r(1, &(x->dim), 0, 
+                                              NULL, 
+                                              in1, in2, out, 
+                                              FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
       dsp_add_zero(in1+ n/2, n/2);
       dsp_add(sigrifftw_perform,3,&x->plan,in2,n2);
     }

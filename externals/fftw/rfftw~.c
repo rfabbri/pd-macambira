@@ -60,8 +60,10 @@ static void sigrfftw_dsp(t_sigrfftw *x, t_signal **sp)
       x->dim.n=n;
       x->dim.is=1;
       x->dim.os=1;
-      x->plan = fftwf_plan_guru_split_dft_r2c(1, &(x->dim), 0, NULL, 
-                                              in, out1, out2, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
+      x->plan = fftwf_plan_guru_split_dft_r2c(1, &(x->dim), 0, 
+                                              NULL,
+                                              in, out1, out2,
+                                              FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
       dsp_add(sigrfftw_perform,3,&x->plan,out2+1,n2-1);
     }
 
