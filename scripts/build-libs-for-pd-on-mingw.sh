@@ -32,8 +32,8 @@ if [ -e "$testfile" ]; then
 	 echo "$testfile exists, skipping..."
 else
 	 echo "Building everything for $testfile"
-	 tar xzf tcl8.4.11-src.tar.gz
-	 cd tcl8.4.11/win
+	 tar xzf tcl8.4.13-src.tar.gz
+	 cd tcl8.4.13/win
 	 ./configure && make CYGPATH=echo && make install
 	 cd ../..
 fi
@@ -44,8 +44,8 @@ if [ -e "$testfile" ]; then
 	 echo "$testfile exists, skipping..."
 else
 	 echo "Building everything for $testfile"
-	 tar xzf tk8.4.11-src.tar.gz
-	 cd tk8.4.11/win
+	 tar xzf tk8.4.13-src.tar.gz
+	 cd tk8.4.13/win
 	 ./configure && make CYGPATH=echo && make install
 	 cd ../..
 fi
@@ -102,8 +102,8 @@ if [ -e "$testfile" ]; then
 	 echo "$testfile exists, skipping..."
 else
 	 echo "Building everything for $testfile"
-	 tar xzf lame-3.96.1.tar.gz
-	 cd lame-3.96.1
+	 tar xzf lame-3.9*.tar.gz
+	 cd lame-3.9*
 	 ./configure && make && make install
 	 cd ..
 fi
@@ -126,7 +126,7 @@ if [ -e "$testfile" ]; then
 	 echo "$testfile exists, skipping..."
 else
 	 echo "Building everything for $testfile"
-	 tar xzf flac-1.1.2.tar.gz && cd flac-1.1.2
+	 tar xzf flac-1.1.*.tar.gz && cd flac-1.1.*
 	 ./configure && make && make install || echo -e "\n\n$testfile failed!!\n\n"
 # the compilation bombs, but builds most of what we need, so install anyway
 	 make -k install
