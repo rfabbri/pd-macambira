@@ -12,6 +12,7 @@ MP 20060621 Do all the above for Windows too.
 MP 20060709 All status goes out the status outlet when an info message is received
 MP 20060824 added clock_delay call in comport_devicename
 MP 20060924 added comport_enum to list available ports in Windows
+MP 20060925 add devices message to enumerate actual devices, info just outputs current port state
 */
 
 #include "m_pd.h"
@@ -194,12 +195,11 @@ static int set_rts(t_comport *x, int nr);
 static int set_xonxoff(t_comport *x, int nr);
 static int set_serial(t_comport *x);
 static int write_serial(t_comport *x, unsigned char serial_byte);
-int comport_get_dsr(t_comport *x);
-int comport_get_cts(t_comport *x);
+static int comport_get_dsr(t_comport *x);
+static int comport_get_cts(t_comport *x);
 #ifdef _WIN32
 static HANDLE open_serial(unsigned int com_num, t_comport *x);
 static HANDLE close_serial(t_comport *x);
-static void comport_enum(void);
 #else
 static int open_serial(unsigned int com_num, t_comport *x);
 static int close_serial(t_comport *x);
@@ -231,7 +231,9 @@ static void comport_output_stop_bits(t_comport *x);
 static void comport_output_data_bits(t_comport *x);
 static void comport_output_rtscts(t_comport *x);
 static void comport_output_xonxoff(t_comport *x);
+static void comport_enum(t_comport *x);
 static void comport_info(t_comport *x);
+static void comport_devices(t_comport *x);
 static void comport_verbose(t_comport *x, t_floatarg f);
 static void comport_help(t_comport *x);
 void comport_setup(void);
@@ -537,7 +539,7 @@ static int write_serial(t_comport *x, unsigned char serial_byte)
     return 1;
 }
 
-int comport_get_dsr(t_comport *x)
+static int comport_get_dsr(t_comport *x)
 {
     short  dsr_state = 0;
     if(x->comhandle != INVALID_HANDLE_VALUE)
@@ -847,10 +849,10 @@ static int write_serial(t_comport *x, unsigned char  serial_byte)
 */
 }
 
-int comport_get_dsr(t_comport *x)
+static int comport_get_dsr(t_comport *x)
 {
     short  dsr_state = 0;
-    
+
     if (x->comhandle != INVALID_HANDLE_VALUE)
     {
         int status;/*dsr outlet*/
@@ -864,7 +866,7 @@ int comport_get_dsr(t_comport *x)
 int comport_get_cts(t_comport *x)
 {
     short  cts_state = 0;
-    
+
     if (x->comhandle != INVALID_HANDLE_VALUE)
     {
         int status;/*cts outlet*/
@@ -1239,9 +1241,9 @@ static void comport_print(t_comport *x, t_symbol *s, int argc, t_atom *argv)
     }
 }
 
-#ifdef _WIN32
-static void comport_enum(void)
+static void comport_enum(t_comport *x)
 {
+#ifdef _WIN32
     HANDLE          fd;
     char            device_name[10];
 	unsigned int    i;
@@ -1265,39 +1267,47 @@ static void comport_enum(void)
         if (dw == 0)post("\t%d - COM%d (free)", i, i);
         else if (dw == ERROR_ACCESS_DENIED)post("\t%d - COM%d (in use)", i, i);
     }
+#else
+    unsigned int i;
+    glob_t         glob_buffer;
+    int            fd;
+    struct termios test;
+
+/* first look for registered devices in the filesystem */
+    switch( glob( x->serial_device_name, 0, NULL, &glob_buffer ) )
+    {
+    case GLOB_NOSPACE:
+        error("[comport] out of memory for \"%s\"",x->serial_device_name);
+        break;
+# ifdef GLOB_ABORTED
+        case GLOB_ABORTED:
+        error("[comport] aborted \"%s\"",x->serial_device_name);
+        break;
+# endif /* GLOB_ABORTED */
+# ifdef GLOB_NOMATCH
+    case GLOB_NOMATCH:
+        error("[comport] no serial devices found for \"%s\"",x->serial_device_name);
+        break;
+# endif /* GLOB_NOMATCH */
+    }
+    for(i=0; i<glob_buffer.gl_pathc; i++)
+    {
+/* now try to open the device */
+        if((fd = open(glob_buffer.gl_pathv[i], OPENPARAMS)) != INVALID_HANDLE_VALUE)
+        {
+/* now see if it has attributes */
+            if ((tcgetattr(fd, &test)) != -1)
+                post("\t%d\t%s", i, glob_buffer.gl_pathv[i]);// this one really exists
+                close (fd);
+        }
+    }
+#endif  /* _WIN32 */
 }
-#endif // WIN32
 
 static void comport_output_print(t_comport *x)
 {
-	unsigned int i;
-
-	post("[comport]: available serial ports:");
-#ifdef _WIN32
-    comport_enum();
-#else	
-    glob_t         glob_buffer;
-	switch( glob( x->serial_device_name, 0, NULL, &glob_buffer ) )
-	{
-	case GLOB_NOSPACE:
-		error("[comport] out of memory for \"%s\"",x->serial_device_name);
-		break;
-# ifdef GLOB_ABORTED
-	case GLOB_ABORTED:
-		error("[comport] aborted \"%s\"",x->serial_device_name);
-		break;
-# endif /* GLOB_ABORTED */
-# ifdef GLOB_NOMATCH
-	case GLOB_NOMATCH:
-		error("[comport] no serial devices found for \"%s\"",x->serial_device_name);
-		break;
-# endif /* GLOB_NOMATCH */
-	}
-	for(i=0; i<glob_buffer.gl_pathc; i++)
-	{
-		post("\t%d\t%s", i, glob_buffer.gl_pathv[i]);
-	}
-#endif  /* _WIN32 */
+    post("[comport]: available serial ports:");
+    comport_enum(x);
 }
 
 
@@ -1354,6 +1364,11 @@ static void comport_output_xonxoff(t_comport *x)
     comport_output_status(x, gensym("xonxoff"), x->xonxoff);
 }
 
+static void comport_devices(t_comport *x)
+{
+	comport_output_print(x);
+}
+
 static void comport_info(t_comport *x)
 {
     comport_output_port_status(x);
@@ -1365,7 +1380,6 @@ static void comport_info(t_comport *x)
     comport_output_data_bits(x);
     comport_output_rtscts(x);
     comport_output_xonxoff(x);
-	comport_output_print(x);
 }
 
 /* ---------------- HELPER ------------------------- */
@@ -1394,11 +1408,12 @@ static void comport_help(t_comport *x)
         "   rts <0|1>         ... set rts off|on\n"
         "   close             ... close device\n"
         "   open <num>        ... open device number num\n"
-        "   devicename <d>    ... set device name to s (eg. /dev/ttyS8)\n"
+        "   devicename <d>    ... set device name to d (eg. /dev/ttyS8)\n"
         "   print <list>      ... print list of atoms on serial\n"
         "   pollintervall <t> ... set poll interval to t ticks\n"
         "   verbose <level>   ... for debug set verbosity to level\n"
         "   info              ... output info on status outlet\n"
+        "   devices           ... post list of available devices\n"
         "   help              ... post this help");
 }
 
@@ -1431,6 +1446,7 @@ void comport_setup(void)
     class_addmethod(comport_class, (t_method)comport_verbose, gensym("verbose"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_help, gensym("help"), 0);
     class_addmethod(comport_class, (t_method)comport_info, gensym("info"), 0);
+    class_addmethod(comport_class, (t_method)comport_devices, gensym("devices"), 0);
 
 #ifndef _WIN32
     null_tv.tv_sec = 0; /* no wait */
