@@ -13,5 +13,3 @@ clean:
 test_locations:
 	make -C $(EXTERNALS_ROOT) test_locations
 
-configure: generate.sh
-	./generate.sh
