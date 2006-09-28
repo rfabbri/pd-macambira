@@ -146,3 +146,16 @@ else
 	 cd ..
 fi
 
+# fftw
+testfile=/usr/local/lib/libsndfile.a
+if [ -e "$testfile" ]; then 
+	 echo "$testfile exists, skipping..."
+else
+	 echo "Building everything for $testfile"
+	 tar xzf fftw-3.1.*.tar.gz
+	 cd fftw-3.1.*
+	 ./configure --with-our-malloc16 --with-windows-f77-mangling --enable-shared --disable-static --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse && \
+	     make && make install
+	 cd ..
+fi
+
