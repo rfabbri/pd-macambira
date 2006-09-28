@@ -475,7 +475,7 @@ cyclone_install: cyclone
 
 
 cyclone_clean:
-	-make -C $(externals_src)/miXed/cyclone $(DEST_PATHS) clean
+	-$(MAKE) -C $(externals_src)/miXed/cyclone $(DEST_PATHS) clean
 
 
 
@@ -1479,13 +1479,13 @@ $(externals_src)/OSCx/src/Makefile: $(externals_src)/OSCx/src/Makefile.in
 
 $(externals_src)/OSCx/src/OSCroute.$(EXTENSION):  $(externals_src)/OSCx/configure \
 $(externals_src)/OSCx/Makefile
-	make -C $(externals_src)/OSCx
+	$(MAKE) -C $(externals_src)/OSCx
 $(externals_src)/OSCx/src/dumpOSC.$(EXTENSION):  $(externals_src)/OSCx/configure \
 $(externals_src)/OSCx/Makefile
-	make -C $(externals_src)/OSCx
+	$(MAKE) -C $(externals_src)/OSCx
 $(externals_src)/OSCx/src/sendOSC.$(EXTENSION):  $(externals_src)/OSCx/configure \
 $(externals_src)/OSCx/Makefile
-	make -C $(externals_src)/OSCx
+	$(MAKE) -C $(externals_src)/OSCx
 
 oscx: $(externals_src)/OSCx/src/OSCroute.$(EXTENSION) \
 $(externals_src)/OSCx/src/dumpOSC.$(EXTENSION) \
@@ -1503,7 +1503,7 @@ oscx_install: oscx
 
 
 oscx_clean:
-	-cd $(externals_src)/OSCx && make $(DEST_PATHS) clean
+	-cd $(externals_src)/OSCx && $(MAKE) $(DEST_PATHS) clean
 	-cd $(externals_src)/OSCx && $(MAKE) CC=gcc clean
 	-rm $(externals_src)/OSCx/Makefile
 
@@ -1576,7 +1576,7 @@ pddp_install: pddp
 
 
 pddp_clean:
-	-make -C $(externals_src)/mixed/pddp $(DEST_PATHS) clean
+	-$(MAKE) -C $(externals_src)/mixed/pddp $(DEST_PATHS) clean
 
 
 
@@ -1623,7 +1623,7 @@ $(externals_src)/pdp/Makefile.config: $(externals_src)/pdp/Makefile.config.in
 
 $(externals_src)/pdp/pdp.$(EXTENSION):  $(externals_src)/pdp/configure \
 $(externals_src)/pdp/Makefile.config 
-	make -C $(externals_src)/pdp PD_EXECUTABLE="$(pd_src)/bin/pd"
+	$(MAKE) -C $(externals_src)/pdp PD_EXECUTABLE="$(pd_src)/bin/pd"
 
 pdp: $(externals_src)/pdp/pdp.$(EXTENSION)
 
@@ -1665,7 +1665,7 @@ $(externals_src)/pidip/Makefile: $(externals_src)/pidip/Makefile.in
 
 $(externals_src)/pidip/pidip.$(EXTENSION):  $(externals_src)/pidip/configure \
 $(externals_src)/pidip/Makefile
-	-make -C $(externals_src)/pidip
+	-$(MAKE) -C $(externals_src)/pidip
 
 pidip: $(externals_src)/pidip/pidip.$(EXTENSION)
 
@@ -1853,7 +1853,8 @@ toxy_install: toxy
 
 
 toxy_clean:
-	-make -C $(externals_src)/mixed/toxy $(DEST_PATHS) clean
+	-$(MAKE) -C $(externals_src)/mixed/toxy $(DEST_PATHS) clean
+
 
 
 #------------------------------------------------------------------------------#
@@ -1991,8 +1992,8 @@ vbap_clean:
 #------------------------------------------------------------------------------#
 # Zexy
 ZEXY_NAME = zexy
-ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-y0]*.c \
-$(externals_src)/zexy/src/z~.c)
+ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-vxy0]*.c) \
+$(externals_src)/zexy/src/wrap.c $(externals_src)/zexy/src/z~.c
 ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
 
@@ -2008,7 +2009,7 @@ $(externals_src)/zexy/src/configure $(externals_src)/zexy/src/zexyconf.h
 		--with-pd=$(pd_src)
 
 zexy: $(externals_src)/zexy/src/Make.config
-	make -C $(externals_src)/zexy/src/ 
+	$(MAKE) -C $(externals_src)/zexy/src/ 
 
 zexy_install: zexy
 	install -d $(objectsdir)/$(ZEXY_NAME)
@@ -2017,9 +2018,11 @@ zexy_install: zexy
 		--license "GNU GPL" \
 		--description "GUI and streaming objects" \
 		--version "$(ZEXY_VERSION)"
-#	install -p $(ZEXY_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(ZEXY_NAME)
-	install -p $(wildcard $(externals_src)/zexy/src/*.$(EXTENSION)) \
-		$(objectsdir)/$(ZEXY_NAME)
+	install -p $(ZEXY_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(ZEXY_NAME)
+# the below doesn't work for some reason, probably because of some kind of
+# strange make execution order <hans@at.or.at>
+#	install -p $(shell $(externals_src)/zexy/src/*.$(EXTENSION)) \
+#		$(objectsdir)/$(ZEXY_NAME)
 	install -p $(shell ls -1 $(externals_src)/zexy/abs/*.pd | \
 		grep -v '-help.pd' | sed 's|\(.*\)|"\1"|g') \
 		$(objectsdir)/$(ZEXY_NAME)
@@ -2032,7 +2035,9 @@ zexy_install: zexy
 	install -p $(externals_src)/zexy/examples/*.* $(helpdir)/$(ZEXY_NAME)
 
 zexy_clean:
+	-$(MAKE) -C $(externals_src)/zexy/src clean
 	-rm -f -- $(ZEXY_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(ZEXY_OBJECTS:.c=.d)
 	-rm -rf -- $(externals_src)/zexy/src/autom4ate
 	-rm -rf -- $(externals_src)/zexy/src/conf[0-9][0-9][0-9]*
 	-rm -f -- $(externals_src)/zexy/src/configure
