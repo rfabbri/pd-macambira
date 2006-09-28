@@ -71,6 +71,8 @@ case $SYSTEM in
 		  upload_build darwin_app . dmg
 		  ;;
 	 MINGW*)
+		  upload_build win32_inno Output exe
+		  ;;
 	 CYGWIN*)
 		  upload_build win32_inno Output exe
 		  ;;
