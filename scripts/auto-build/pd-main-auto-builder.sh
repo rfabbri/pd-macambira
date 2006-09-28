@@ -19,6 +19,10 @@ case $SYSTEM in
 		  configure_options=""
 		  platform_name=i386
 		  ;;
+	 CYGWIN*)
+		  configure_options=""
+		  platform_name=i386
+		  ;;
 	 *)
 		  echo "ERROR: Platform $SYSTEM not supported!"
 		  exit

@@ -8,6 +8,27 @@ TIME=`date +%H.%M.%S`
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
 
 
+BUILD_DIR=.
+case $SYSTEM in 
+	 Linux)
+		  BUILD_DIR=linux_make
+		  ;;
+	 Darwin)
+		  BUILD_DIR=darwin_app
+		  ;;
+	 MINGW*)
+		  BUILD_DIR=win32_inno
+		  ;;
+	 CYGWIN*)
+		  BUILD_DIR=win32_inno
+		  ;;
+	 *)
+		  echo "ERROR: Platform $SYSTEM not supported!"
+		  exit
+		  ;;
+esac
+
+
 # convert into absolute path
 cd `echo $0 | sed 's|\(.*\)/.*$|\1|'`/../..
 auto_build_root_dir=`pwd`
@@ -16,17 +37,6 @@ echo "root: $auto_build_root_dir"
 # let rsync handle the cleanup with --delete
 rsync -av --delete rsync://128.238.56.50/distros/pd-extended/ \
 	 ${auto_build_root_dir}/
-
-BUILD_DIR=.
-if [ "$SYSTEM" == "Linux" ]; then
-	 BUILD_DIR=linux_make
-fi
-if [ "$SYSTEM" == "Darwin" ]; then
-	 BUILD_DIR=darwin_app
-fi
-if [ "`echo $SYSTEM | sed -n 's|\(MINGW\)|\1|p'`" == "MINGW" ]; then
-	 BUILD_DIR=win32_inno
-fi
 
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
 make -C "${auto_build_root_dir}/packages" patch_pd
@@ -48,13 +58,17 @@ upload_build ()
 		  rsync://128.238.56.50/upload/${DATE}/`ls -1 ${archive} | sed "s|.*/\(.*\)\.${archive_format}|\1-${HOSTNAME}.${archive_format}|"`  &&  echo SUCCESS
 }
 
-if [ "$SYSTEM" == "Linux" ]; then
-    upload_build linux_make build tar.bz2
-fi
-if [ "$SYSTEM" == "Darwin" ]; then
-    upload_build darwin_app . dmg
-fi
-if [ "`echo $SYSTEM | sed -n 's|\(MINGW\)|\1|p'`" == "MINGW" ]; then
-    upload_build win32_inno Output exe
-fi
+
+case $SYSTEM in 
+	 Linux)
+		  upload_build linux_make build tar.bz2
+		  ;;
+	 Darwin)
+		  upload_build darwin_app . dmg
+		  ;;
+	 MINGW*)
+	 CYGWIN*)
+		  upload_build win32_inno Output exe
+		  ;;
+esac
 
