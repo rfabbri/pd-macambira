@@ -9,7 +9,7 @@
 CWD := $(shell pwd)
 
 # these are setup to be overridden by the packages/Makefile
-cvs_root_dir = $(CWD)/..
+cvs_root_dir = $(shell cd $(CWD)/.. && pwd)
 DESTDIR = $(CWD)/build/
 BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
@@ -1990,15 +1990,23 @@ vbap_clean:
 #------------------------------------------------------------------------------#
 # Zexy
 ZEXY_NAME = zexy
-ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-y0]*.c $(externals_src)/zexy/src/z~.c)
+ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-y0]*.c \
+$(externals_src)/zexy/src/z~.c)
 ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
 
-zexy_configure:
-	make -C $(externals_src)/zexy/src/ configure
-	cd $(externals_src)/zexy/src/ && ./configure --disable-library
+$(externals_src)/zexy/src/configure: $(externals_src)/zexy/src/configure.ac
+	cd $(externals_src)/zexy/src && autoconf
 
-zexy: zexy_configure
+$(externals_src)/zexy/src/zexyconf.h:
+	cd $(externals_src)/zexy/src && autoconf
+
+$(externals_src)/zexy/src/Make.config: $(externals_src)/zexy/src/Make.config.in \
+$(externals_src)/zexy/src/configure $(externals_src)/zexy/src/zexyconf.h
+	cd $(externals_src)/zexy/src/ && ./configure --disable-library \
+		--with-pd=$(pd_src)
+
+zexy: $(externals_src)/zexy/src/Make.config
 	make -C $(externals_src)/zexy/src/ 
 
 zexy_install: zexy
@@ -2009,7 +2017,8 @@ zexy_install: zexy
 		--description "GUI and streaming objects" \
 		--version "$(ZEXY_VERSION)"
 #	install -p $(ZEXY_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(ZEXY_NAME)
-	install -p $(wildcard $(externals_src)/zexy/src/*.$(EXTENSION)) $(objectsdir)/$(ZEXY_NAME)
+	install -p $(wildcard $(externals_src)/zexy/src/*.$(EXTENSION)) \
+		$(objectsdir)/$(ZEXY_NAME)
 	install -p $(shell ls -1 $(externals_src)/zexy/abs/*.pd | \
 		grep -v '-help.pd' | sed 's|\(.*\)|"\1"|g') \
 		$(objectsdir)/$(ZEXY_NAME)
@@ -2023,6 +2032,11 @@ zexy_install: zexy
 
 zexy_clean:
 	-rm -f -- $(ZEXY_OBJECTS:.c=.$(EXTENSION))
+	-rm -rf -- $(externals_src)/zexy/src/autom4ate
+	-rm -rf -- $(externals_src)/zexy/src/conf[0-9][0-9][0-9]*
+	-rm -f -- $(externals_src)/zexy/src/configure
+	-rm -f -- $(externals_src)/zexy/src/Make.config
+	-rm -f -- $(externals_src)/zexy/src/zexyconf.h
 	-rm -f -- $(externals_src)/zexy/src/*.o
 	-rm -f -- $(externals_src)/zexy/src/*.bak
 	-rm -f -- $(externals_src)/*/*.*~
