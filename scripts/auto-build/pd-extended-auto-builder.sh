@@ -12,15 +12,19 @@ BUILD_DIR=.
 case $SYSTEM in 
 	 Linux)
 		  BUILD_DIR=linux_make
+		  echo "Configuring to use $BUILD_DIR on GNU/Linux"
 		  ;;
 	 Darwin)
 		  BUILD_DIR=darwin_app
+		  echo "Configuring to use $BUILD_DIR on Darwin/Mac OS X"
 		  ;;
 	 MINGW*)
 		  BUILD_DIR=win32_inno
+		  echo "Configuring to use $BUILD_DIR on MinGW/Windows"
 		  ;;
 	 CYGWIN*)
 		  BUILD_DIR=win32_inno
+		  echo "Configuring to use $BUILD_DIR on Cygwin/Windows"
 		  ;;
 	 *)
 		  echo "ERROR: Platform $SYSTEM not supported!"
