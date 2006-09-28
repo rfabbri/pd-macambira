@@ -6,8 +6,8 @@ all: install
 CWD := $(shell pwd)
 
 DESTDIR = $(CWD)/build
-cvs_root_dir = $(shell cd $(CWD)/../.. && pwd)
-BUILDLAYOUT_DIR = $(shell cd $(CWD)/.. && pwd)
+cvs_root_dir := $(shell cd $(CWD)/../.. && pwd)
+BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
@@ -39,13 +39,13 @@ package:  $(PD_INNO_SETUP)
 # makefile.mingw is available from here:
 # http://sourceforge.net/tracker/index.php?func=detail&aid=1374659&group_id=55736&atid=478072
 build_pd:
-	make -C $(pd_src)/src -f makefile.mingw
+	$(MAKE) -C $(pd_src)/src -f makefile.mingw
 
 pd_install: build_pd
 # the autoconf/MinGW setup doesn't compile the extras yet
-#	make -C $(pd_src)/src $(DEST_PATHS) bin
-#	-make -C $(pd_src)/src $(DEST_PATHS) install
-	make -C $(pd_src)/src -f makefile.mingw $(DEST_PATHS) install
+#	$(MAKE) -C $(pd_src)/src $(DEST_PATHS) bin
+#	-$(MAKE) -C $(pd_src)/src $(DEST_PATHS) install
+	$(MAKE) -C $(pd_src)/src -f makefile.mingw $(DEST_PATHS) install
 
 install: pd_install prebuilt_install lib_install exe_install gripd_hack
 	@echo " "
@@ -53,8 +53,8 @@ install: pd_install prebuilt_install lib_install exe_install gripd_hack
 
 
 prebuilt_install:
-	make -C $(packages_src) $(DEST_PATHS) extended_install
-	make -C $(packages_src) $(DEST_PATHS) doc_format
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) extended_install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) doc_format
 	install -p pd-settings.reg $(DESTDIR)$(prefix)
 
 #==============================================================================#
@@ -123,7 +123,7 @@ $(PD_INNO_SETUP): $(PD_INNO_SETUP).in
 #==============================================================================#
 
 distclean: clean
-	cd $(packages_src) && make $(DEST_PATHS) distclean
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) distclean
 
 
 package_clean: 	
@@ -133,7 +133,7 @@ package_clean:
 
 
 clean: package_clean
-	cd $(packages_src) && make $(DEST_PATHS) clean
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
 
 
 test_locations:

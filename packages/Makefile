@@ -9,7 +9,7 @@
 
 CWD := $(shell pwd)
 
-cvs_root_dir = $(CWD)/..
+cvs_root_dir := $(shell cd $(CWD)/.. && pwd)
 DESTDIR = $(CWD)/build
 BUILDLAYOUT_DIR = $(CWD)
 
@@ -115,7 +115,7 @@ doc:
 #------------------------------------------------------------------------------
 # externals
 externals: 
-	cd $(externals_src) && make $(DEST_PATHS)
+	$(MAKE) -C $(externals_src) $(DEST_PATHS)
 
 
 #------------------------------------------------------------------------------
@@ -301,24 +301,24 @@ devel_install: pd_devel_install
 #------------------------------------------------------------------------------
 # abstractions_install
 abstractions_install:
-	make -C $(abstractions_src) $(DEST_PATHS) install
+	$(MAKE) -C $(abstractions_src) $(DEST_PATHS) install
 
 #------------------------------------------------------------------------------
 # doc_install
 doc_install: 
-	make -C $(doc_src) $(DEST_PATHS) install
+	$(MAKE) -C $(doc_src) $(DEST_PATHS) install
 
 
 #------------------------------------------------------------------------------
 # extensions_install
 extensions_install: 
-	make -C $(extensions_src) $(DEST_PATHS) install
+	$(MAKE) -C $(extensions_src) $(DEST_PATHS) install
 
 
 #------------------------------------------------------------------------------
 # externals_install
 externals_install: 
-	make -C $(externals_src) $(DEST_PATHS) install
+	$(MAKE) -C $(externals_src) $(DEST_PATHS) install
 
 
 
@@ -478,14 +478,14 @@ $(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
 	cd $(gem_src)/src && aclocal
 	cd $(gem_src)/src && autoconf
 	cd $(gem_src)/src && ./configure --without-ffmpeg --with-pd=$(pd_src)
-	make -C $(gem_src)/src
+	$(MAKE) -C $(gem_src)/src
 
 $(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
 # always run aclocal/autoconf until "configure" is deleted from CVS
 	cd $(gem_src)/src && aclocal
 	cd $(gem_src)/src && autoconf
 	cd $(gem_src)/src && ./configure --without-ImageMagick --with-pd=$(pd_src)
-	make -C $(gem_src)/src
+	$(MAKE) -C $(gem_src)/src
 
 gem: $(gem_src)/src/Gem.$(EXTENSION)
 
@@ -526,7 +526,7 @@ noncvs_install:
 # pd_install
 PD_NAME=Pd
 pd_install: pd
-	make -C $(pd_src)/src $(DEST_PATHS) $(PD_BUILD_FLAGS) install
+	$(MAKE) -C $(pd_src)/src $(DEST_PATHS) $(PD_BUILD_FLAGS) install
 	install -d $(manualsdir)/$(PD_NAME)
 	install -p $(pd_src)/src/notes.txt $(manualsdir)/$(PD_NAME)
 
@@ -785,10 +785,12 @@ patch_pd:
 		cd $(pd_src)/src/ && patch -p0 < $$patch; \
 	done
 # apply all platform-specific patches
+ifneq ($(OS_NAME),windows)
 	for patch in $(shell ls -1 $(CWD)/patches/$(OS_NAME)/*.patch); do \
 		echo "Applying $$patch"; \
 		cd $(pd_src)/src/ && patch -p0 < $$patch; \
 	done
+endif
 	-rm -f -- $(pd_src)/src/configure  $(pd_src)/src/makefile
 # change Pd's version number to reflect the extended build
 # this needs the complete_version_defines patch to work
@@ -869,14 +871,14 @@ unpatch_pd_devel:
 #
 #==============================================================================#
 abstractions_clean:
-	-cd $(abstractions_src) && make $(DEST_PATHS) clean
+	-$(MAKE) -C $(abstractions_src) $(DEST_PATHS) clean
 
 
 doc_clean:
 
 
 externals_clean:
-	-cd $(externals_src) && make $(DEST_PATHS) clean
+	-$(MAKE) -C $(externals_src) $(DEST_PATHS) clean
 
 
 flext_clean:
@@ -892,7 +894,7 @@ gem_clean:
 
 
 pd_clean:
-	-cd $(pd_src)/src && make $(DEST_PATHS) clean
+	-$(MAKE) $(pd_src)/src $(DEST_PATHS) clean
 
 
 # these targets are all from Makefile.buildlayout: install_clean cruft_clean
@@ -902,11 +904,11 @@ pd_clean
 
 
 distclean: clean cruft_clean
-	make -C $(abstractions_src) distclean
-	make -C $(doc_src) distclean
-	make -C $(extensions_src) distclean
-	make -C $(externals_src) distclean
-	-make -C $(pd_src) distclean
+	$(MAKE) -C $(abstractions_src) distclean
+	$(MAKE) -C $(doc_src) distclean
+	$(MAKE) -C $(extensions_src) distclean
+	$(MAKE) -C $(externals_src) distclean
+	-$(MAKE) -C $(pd_src) distclean
 
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"

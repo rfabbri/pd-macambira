@@ -9,8 +9,8 @@ PD_APP_NAME = $(PACKAGE_NAME)
 PD_APP_CONTENTS = $(BUILD_BASE)/$(PD_APP_NAME).app/Contents
 DESTDIR = $(PD_APP_CONTENTS)/Resources
 
-cvs_root_dir = $(shell cd $(CWD)/../.. && pwd)
-BUILDLAYOUT_DIR = $(shell cd $(CWD)/.. && pwd)
+cvs_root_dir := $(shell cd $(CWD)/../.. && pwd)
+BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
@@ -92,10 +92,10 @@ darwin_app_devel: darwin_app_devel_core rez_install
 # just want to fill it with goodies from CVS.  To do so, place your 
 # Pd.app in $(BUILD_BASE)/Pd.app
 extended_app_install:
-	cd $(packages_src) && $(MAKE) $(DEST_PATHS) abstractions_install
-	cd $(packages_src) && $(MAKE) $(DEST_PATHS) doc_install
-	cd $(packages_src) && $(MAKE) $(DEST_PATHS) extensions_install
-	cd $(packages_src) && $(MAKE) $(DEST_PATHS) externals_install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) abstractions_install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) doc_install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) extensions_install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) externals_install
 
 
 #------------------------------------------------------------------------------#
@@ -266,11 +266,11 @@ dmg:
 
 
 distclean: clean
-	cd $(packages_src) && $(MAKE) $(DEST_PATHS) distclean
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) distclean
 
 
 clean: package_clean
-	cd $(packages_src) && $(MAKE) $(DEST_PATHS) clean
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
 
 
 package_clean: darwin_app_clean
@@ -280,7 +280,7 @@ package_clean: darwin_app_clean
 	-rm -f -- "$(CWD)/$(DMG_NAME)/org.puredata.pd.plistx"
 
 devel_clean: darwin_app_devel_clean
-	cd $(packages_src) && $(MAKE) $(DEST_PATHS) clean
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
 	-rm Info.plist
 
 darwin_app_clean:

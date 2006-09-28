@@ -40,20 +40,18 @@ UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
   OS_NAME = linux
   EXTENSION = pd_linux
-else 
-  ifeq ($(UNAME),Darwin)
-    OS_NAME = darwin
-    EXTENSION = pd_darwin
-  else
-    ifeq (MINGW,$(findstring MINGW,$(UNAME)))
-      OS_NAME = windows
-      EXTENSION = dll
-    else
-      OS_NAME = unknown
-      EXTENSION = so
-      $(warning WARNING: unknown environment "$(UNAME)".)
-    endif
-  endif
+endif
+ifeq ($(UNAME),Darwin)
+  OS_NAME = darwin
+  EXTENSION = pd_darwin
+endif
+ifeq (MINGW,$(findstring MINGW,$(UNAME)))
+  OS_NAME = windows
+  EXTENSION = dll
+endif
+ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
+  OS_NAME = windows
+  EXTENSION = dll
 endif
 
 #==============================================================================#

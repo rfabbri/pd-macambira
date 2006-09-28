@@ -5,8 +5,8 @@
 CWD := $(shell pwd)
 
 DESTDIR = $(CWD)/build/
-cvs_root_dir = $(shell cd $(CWD)/../.. && pwd)
-BUILDLAYOUT_DIR = $(shell cd $(CWD)/.. && pwd)
+cvs_root_dir := $(shell cd $(CWD)/../.. && pwd)
+BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
 
 # for command-line UNIX versions, you need to install Pd into the same
@@ -42,12 +42,12 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				UNAME=$(UNAME)
 
 all: 	
-	make -C $(packages_src) $(DEST_PATHS)
+	$(MAKE) -C $(packages_src) $(DEST_PATHS)
 
 
 install: 
-	make -C $(packages_src) $(DEST_PATHS) install
-	make -C $(packages_src) $(DEST_PATHS) doc_format
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) doc_format
 	@echo " "
 	@echo "linux_make install succeeded!"
 
@@ -111,17 +111,17 @@ installer_clean:
 #==============================================================================#
 
 distclean: clean
-	make -C $(packages_src) $(DEST_PATHS) distclean
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) distclean
 
 
 clean: installer_clean
-	make -C $(packages_src) $(DEST_PATHS) clean
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
 
 
 test_package:
 	cd /tmp && tar xjf $(DESTDIR)/$(PACKAGE_NAME).tar.bz2
-	make -C /tmp/$(PACKAGE_NAME) prefix=/tmp/usr/local install
-	make -C /tmp/$(PACKAGE_NAME) prefix=/tmp/usr/local uninstall
+	$(MAKE) -C /tmp/$(PACKAGE_NAME) prefix=/tmp/usr/local install
+	$(MAKE) -C /tmp/$(PACKAGE_NAME) prefix=/tmp/usr/local uninstall
 	-rmdir /tmp/usr/local
 	-rmdir /tmp/usr
 	-rm -rf -- /tmp/$(PACKAGE_NAME)
