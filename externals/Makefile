@@ -1618,7 +1618,8 @@ $(externals_src)/pdp/configure: $(externals_src)/pdp/configure.ac
 	cd $(externals_src)/pdp && autoconf
 
 $(externals_src)/pdp/Makefile.config: $(externals_src)/pdp/Makefile.config.in
-	cd $(externals_src)/pdp && ./configure PD_CPPFLAGS="-I$(pd_src)/src"
+	cd $(externals_src)/pdp && ./configure PD_CPPFLAGS="-I$(pd_src)/src" \
+		--disable-quicktime
 
 $(externals_src)/pdp/pdp.$(EXTENSION):  $(externals_src)/pdp/configure \
 $(externals_src)/pdp/Makefile.config 
