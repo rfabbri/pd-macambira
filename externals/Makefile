@@ -133,7 +133,7 @@ else
     LIB_TARGETS += hid
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp
+    LIB_TARGETS += hid pdp pidip
   endif
 endif
 
@@ -209,8 +209,6 @@ flatspace_install: flatspace $(helpdir) $(objectsdir)
 				$(helpdir)/$(FLATSPACE_NAME)
 	install -p \
 			$(externals_src)/pdogg/*/*.pd \
-			$(externals_src)/pdp/doc/objects/*.* \
-			$(externals_src)/pidip/doc/*.pd \
 			$(externals_src)/plugin~/*.pd \
 			$(externals_src)/rhythm_estimator/*.p? \
 			$(externals_src)/signal/*/*.pd \
@@ -1661,7 +1659,8 @@ $(externals_src)/pidip/configure: $(externals_src)/pidip/configure.ac
 	cd $(externals_src)/pidip && autoconf
 
 $(externals_src)/pidip/Makefile: $(externals_src)/pidip/Makefile.in
-	-cd $(externals_src)/pidip && ./configure --with-pd=../../pd --with-pdp=../pdp
+	-cd $(externals_src)/pidip && ./configure --with-pd=$(pd_src) \
+		--with-pdp=$(externals_src)/pdp
 
 $(externals_src)/pidip/pidip.$(EXTENSION):  $(externals_src)/pidip/configure \
 $(externals_src)/pidip/Makefile
