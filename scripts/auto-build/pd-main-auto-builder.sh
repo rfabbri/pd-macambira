@@ -1,6 +1,6 @@
 #!/bin/sh
 
-HOSTNAME=`hostname`
+HOSTNAME=`hostname | sed 's|\([a-zA-Z0-9-]*\)\..*|\1|'`
 SYSTEM=`uname -s`
 DATE=`date +%Y-%m-%d`
 TIME=`date +%H.%M.%S`
