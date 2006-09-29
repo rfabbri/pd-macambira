@@ -118,7 +118,7 @@ $(PD_INNO_SETUP): $(PD_INNO_SETUP).in
 
 #==============================================================================#
 #
-## CVS SOURCES
+## CLEAN TARGETS
 #
 #==============================================================================#
 
@@ -134,6 +134,15 @@ package_clean:
 
 clean: package_clean
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
+
+#==============================================================================#
+#
+## TEST TARGETS
+#
+#==============================================================================#
+
+test_package:
+	echo "No tests here yet"
 
 
 test_locations:
@@ -153,4 +162,4 @@ test_locations:
 	@echo "EXAMPLESDIR  $(examplesdir)"
 
 
-.PHONY: all install package clean distclean test_locations dll_install exe_install
+.PHONY: all install package clean distclean test_locations test_package exe_install
