@@ -277,7 +277,7 @@ package_clean: darwin_app_clean
 	-rm -rf -- $(DESTDIR)
 	-rm Info.plist
 	-rm -f -- "$(CWD)/$(DMG_NAME)/ReadMe.html"
-	-rm -f -- "$(CWD)/$(DMG_NAME)/org.puredata.pd.plistx"
+	-rm -f -- "$(CWD)/$(DMG_NAME)/org.puredata.pd.plist"
 
 devel_clean: darwin_app_devel_clean
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
