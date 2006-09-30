@@ -7,7 +7,7 @@
 #include "m_pd.h"
 #include <stdlib.h>
 
-#ifndef MACOSX
+#ifndef __APPLE__
 #include <math.h>
 #endif
 
