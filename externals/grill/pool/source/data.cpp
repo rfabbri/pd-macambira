@@ -2,7 +2,7 @@
 
 pool - hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2005 Thomas Grill
+Copyright (c) 2002-2006 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -49,7 +49,9 @@ I pooldata::PrintAll(const AtomList &d)
     d.Print(tmp,sizeof tmp);
     pooldir *pd = root.GetDir(d);
     strcat(tmp," , ");
-	return pd?pd->PrintAll(tmp,sizeof tmp):0;
+	int cnt = pd?pd->PrintAll(tmp,sizeof tmp):0;
+    if(!cnt) post(tmp);
+    return cnt;
 }
 
 I pooldata::GetSub(const AtomList &d,const t_atom **&dirs)

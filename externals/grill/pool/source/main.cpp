@@ -2,7 +2,7 @@
 
 pool - hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2005 Thomas Grill
+Copyright (c) 2002-2006 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -10,6 +10,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "pool.h"
 #include <string>
+#include <map>
 
 #define POOL_VERSION "0.2.2pre"
 
@@ -38,6 +39,8 @@ protected:
 	V ms_pool(const AtomList &l);
 	V mg_pool(AtomList &l);
 
+    V mg_priv(bool &p) const { p = pl && pl->Private(); }
+
     // print some help message
     static V m_help() { post("pool " POOL_VERSION " - hierarchical storage object, (C)2002-2006 Thomas Grill"); }
 
@@ -52,6 +55,8 @@ protected:
 	V m_chdir(I argc,const A *argv,BL abs = true);		// change to dir
 	V m_rmdir(I argc,const A *argv,BL abs = true);		// remove dir
 	V m_updir(I argc,const A *argv);		// one or more levels up
+
+    V ms_curdir(const AtomList &l) { m_chdir(l.Count(),l.Atoms()); }
 
 	V m_mksub(I argc,const A *argv) { m_mkdir(argc,argv,false); }
 	V m_mkchsub(I argc,const A *argv) { m_mkdir(argc,argv,false,true); }
@@ -120,6 +125,7 @@ private:
 	V ToOutAtom(I ix,const A &a);
 
     static const t_symbol *sym_echo;
+    static const t_symbol *sym_error;
 
     enum get_t { get_norm,get_cnt,get_print };
 
@@ -142,14 +148,16 @@ private:
 
 	V echodir() { if(echo) getdir(sym_echo); }
 
-	BL priv,absdir,echo;
+	BL absdir,echo;
 	I vcnt,dcnt;
 	pooldata *pl;
 	Atoms curdir;
 	pooldir *clip;
-	const S *holdname;
 
-	static pooldata *head,*tail;
+	static const S *holdname; // used during initialization of new object (between constructor and Init method)
+
+    typedef std::map<const t_symbol *,pooldata *> PoolMap;
+	static PoolMap poolmap;
 
 	V SetPool(const S *s);
 	V FreePool();
@@ -160,10 +168,11 @@ private:
 	string MakeFilename(const C *fn) const;
 
 	FLEXT_CALLVAR_V(mg_pool,ms_pool)
+	FLEXT_ATTRGET_V(curdir)
+	FLEXT_CALLSET_V(ms_curdir)
 	FLEXT_ATTRVAR_B(absdir)
 	FLEXT_ATTRVAR_B(echo)
-	FLEXT_ATTRGET_B(priv)
-//	FLEXT_ATTRGET_B(curdir)
+	FLEXT_CALLGET_B(mg_priv)
 	FLEXT_ATTRVAR_I(vcnt)
 	FLEXT_ATTRVAR_I(dcnt)
 
@@ -232,8 +241,9 @@ private:
 FLEXT_NEW_V("pool",pool);
 
 
-pooldata *pool::head,*pool::tail;	
-const t_symbol *pool::sym_echo;
+pool::PoolMap pool::poolmap;	
+const t_symbol *pool::sym_echo,*pool::sym_error;
+const t_symbol *pool::holdname;
 
 
 V pool::setup(t_classid c)
@@ -242,13 +252,14 @@ V pool::setup(t_classid c)
     pool::m_help();
 	post("");
 
-	head = tail = NULL;
     sym_echo = MakeSymbol("echo");
+    sym_error = MakeSymbol("error");
 
 	FLEXT_CADDATTR_VAR(c,"pool",mg_pool,ms_pool);
+	FLEXT_CADDATTR_VAR(c,"curdir",curdir,ms_curdir);
 	FLEXT_CADDATTR_VAR1(c,"absdir",absdir);
 	FLEXT_CADDATTR_VAR1(c,"echodir",echo);
-	FLEXT_CADDATTR_GET(c,"private",priv);
+	FLEXT_CADDATTR_GET(c,"private",mg_priv);
 	FLEXT_CADDATTR_VAR1(c,"valcnt",vcnt);
 	FLEXT_CADDATTR_VAR1(c,"dircnt",dcnt);
 
@@ -315,7 +326,7 @@ V pool::setup(t_classid c)
 
 pool::pool(I argc,const A *argv):
 	absdir(true),echo(false),
-    pl(NULL),priv(false),
+    pl(NULL),
 	clip(NULL),
 	vcnt(VCNT),dcnt(DCNT)
 {
@@ -345,7 +356,6 @@ BL pool::Init()
 V pool::SetPool(const S *s)
 {
 	if(s) {
-		priv = false;
 		if(pl)
 			// check if new symbol equals the current one
 			if(pl->sym == s) 
@@ -355,11 +365,13 @@ V pool::SetPool(const S *s)
 		pl = GetPool(s);
 	}
 	else {
-		// if already private no need to allocate new storage
-		if(priv) return;
-
-		priv = true;
-		if(pl) FreePool();
+        if(pl) {
+    		// if already private no need to allocate new storage
+            if(pl->Private()) 
+                return;
+            else
+    		    FreePool();
+        }
 		pl = new pooldata(NULL,vcnt,dcnt);
 	}
 }
@@ -369,7 +381,7 @@ V pool::FreePool()
 	curdir(); // reset current directory
 
 	if(pl) {
-		if(!priv) 
+		if(!pl->Private()) 
 			RmvPool(pl);
 		else
 			delete pl;
@@ -393,7 +405,7 @@ V pool::ms_pool(const AtomList &l)
 
 V pool::mg_pool(AtomList &l)
 {
-	if(priv || !pl) l();
+	if(!pl || pl->Private()) l();
 	else { l(1); SetSymbol(l[0],pl->sym); }
 }
 
@@ -406,8 +418,8 @@ V pool::m_reset()
 
 V pool::getdir(const S *tag)
 {
-	ToOutAnything(3,tag,0,NULL);
-	ToOutList(2,curdir);
+	ToSysAnything(3,tag,0,NULL);
+	ToSysList(2,curdir);
 }
 
 V pool::m_getdir() { getdir(thisTag()); }
@@ -582,18 +594,18 @@ V pool::m_get(I argc,const A *argv)
 
 		poolval *r = pl->Ref(curdir,argv[0]);
 
-		ToOutAnything(3,thisTag(),0,NULL);
+		ToSysAnything(3,thisTag(),0,NULL);
 		if(absdir)
-			ToOutList(2,curdir);
+			ToSysList(2,curdir);
 		else
-			ToOutList(2,0,NULL);
+			ToSysList(2,0,NULL);
 		if(r) {
 			ToOutAtom(1,r->key);
-			ToOutList(0,*r->data);
+			ToSysList(0,*r->data);
 		}
 		else {
-			ToOutBang(1);
-			ToOutBang(0);
+			ToSysBang(1);
+			ToSysBang(0);
 		}
 	}
 
@@ -607,18 +619,18 @@ V pool::m_geti(I ix)
 	else {
 		poolval *r = pl->Refi(curdir,ix);
 
-		ToOutAnything(3,thisTag(),0,NULL);
+		ToSysAnything(3,thisTag(),0,NULL);
 		if(absdir)
-			ToOutList(2,curdir);
+			ToSysList(2,curdir);
 		else
-			ToOutList(2,0,NULL);
+			ToSysList(2,0,NULL);
 		if(r) {
 			ToOutAtom(1,r->key);
-			ToOutList(0,*r->data);
+			ToSysList(0,*r->data);
 		}
 		else {
-			ToOutBang(1);
-			ToOutBang(0);
+			ToSysBang(1);
+			ToSysBang(0);
 		}
 	}
 
@@ -647,10 +659,10 @@ I pool::getrec(const t_symbol *tag,I level,BL order,get_t how,const AtomList &rd
 			    post("%s - %s: error retrieving values",thisName(),GetString(tag));
 		    else {
 			    for(I i = 0; i < cnt; ++i) {
-				    ToOutAnything(3,tag,0,NULL);
-				    ToOutList(2,absdir?gldir:rdir);
+				    ToSysAnything(3,tag,0,NULL);
+				    ToSysList(2,absdir?gldir:rdir);
 				    ToOutAtom(1,k[i]);
-				    ToOutList(0,r[i]);
+				    ToSysList(0,r[i]);
 			    }
 			    delete[] k;
 			    delete[] r;
@@ -681,7 +693,7 @@ V pool::m_getall()
 {
 	AtomList l;
 	getrec(thisTag(),0,false,get_norm,l);
-	ToOutBang(3);
+	ToSysBang(3);
 
 	echodir();
 }
@@ -690,7 +702,7 @@ V pool::m_ogetall()
 {
 	AtomList l;
 	getrec(thisTag(),0,true,get_norm,l);
-	ToOutBang(3);
+	ToSysBang(3);
 
 	echodir();
 }
@@ -710,7 +722,7 @@ V pool::m_getrec(I argc,const A *argv)
 
 	AtomList l;
 	getrec(thisTag(),lvls,false,get_norm,l);
-	ToOutBang(3);
+	ToSysBang(3);
 
 	echodir();
 }
@@ -731,7 +743,7 @@ V pool::m_ogetrec(I argc,const A *argv)
 
 	AtomList l;
 	getrec(thisTag(),lvls,true,get_norm,l);
-	ToOutBang(3);
+	ToSysBang(3);
 
 	echodir();
 }
@@ -757,10 +769,10 @@ I pool::getsub(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
             ++ret;
 
 			if(how == get_norm) {
-				ToOutAnything(3,tag,0,NULL);
-				ToOutList(2,curdir);
-				ToOutList(1,ndir);
-				ToOutBang(0);
+				ToSysAnything(3,tag,0,NULL);
+				ToSysList(2,curdir);
+				ToSysList(1,ndir);
+				ToSysBang(0);
 			}
 
 			if(level != 0) {
@@ -789,7 +801,7 @@ V pool::m_getsub(I argc,const A *argv)
 	
 	AtomList l;
 	getsub(thisTag(),lvls,false,get_norm,l);
-	ToOutBang(3);
+	ToSysBang(3);
 
 	echodir();
 }
@@ -810,7 +822,7 @@ V pool::m_ogetsub(I argc,const A *argv)
 
 	AtomList l;
 	getsub(thisTag(),lvls,true,get_norm,l); 
-	ToOutBang(3);
+	ToSysBang(3);
 
 	echodir();
 }
@@ -820,10 +832,10 @@ V pool::m_cntall()
 {
 	AtomList l;
 	I cnt = getrec(thisTag(),0,false,get_cnt,l);
-	ToOutSymbol(3,thisTag());
-	ToOutBang(2);
-	ToOutBang(1);
-	ToOutInt(0,cnt);
+	ToSysSymbol(3,thisTag());
+	ToSysBang(2);
+	ToSysBang(1);
+	ToSysInt(0,cnt);
 
 	echodir();
 }
@@ -843,10 +855,10 @@ V pool::m_cntrec(I argc,const A *argv)
 	
 	AtomList l;
 	I cnt = getrec(thisTag(),lvls,false,get_cnt,l);
-	ToOutSymbol(3,thisTag());
-	ToOutBang(2);
-	ToOutBang(1);
-	ToOutInt(0,cnt);
+	ToSysSymbol(3,thisTag());
+	ToSysBang(2);
+	ToSysBang(1);
+	ToSysInt(0,cnt);
 
 	echodir();
 }
@@ -867,10 +879,10 @@ V pool::m_cntsub(I argc,const A *argv)
 
 	AtomList l;
 	I cnt = getsub(thisTag(),lvls,false,get_cnt,l);
-	ToOutSymbol(3,thisTag());
-	ToOutBang(2);
-	ToOutBang(1);
-	ToOutInt(0,cnt);
+	ToSysSymbol(3,thisTag());
+	ToSysBang(2);
+	ToSysBang(1);
+	ToSysInt(0,cnt);
 
 	echodir();
 }
@@ -884,8 +896,7 @@ V pool::m_printall()
 
 V pool::m_printrec(I argc,const A *argv,BL fromroot)
 {
-	const S *tag = MakeSymbol(fromroot?"printroot":"printrec");
-
+    const S *tag = thisTag();
 	I lvls = -1;
 	if(argc > 0) {
 		if(CanbeInt(argv[0])) {
@@ -992,19 +1003,24 @@ V pool::copyrec(const S *tag,I argc,const A *argv,BL cut)
 
 V pool::load(I argc,const A *argv,BL xml)
 {
-	const C *flnm = NULL;
+    const C *flnm = NULL;
 	if(argc > 0) {
 		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
 	}
 
+    bool ok = false;
 	if(!flnm) 
 		post("%s - %s: no filename given",thisName(),GetString(thisTag()));
 	else {
 		string file(MakeFilename(flnm));
-		if(!(xml?pl->LoadXML(file.c_str()):pl->Load(file.c_str())))
+        ok = xml?pl->LoadXML(file.c_str()):pl->Load(file.c_str());
+		if(!ok)
 			post("%s - %s: error loading data",thisName(),GetString(thisTag()));
 	}
+
+    t_atom at; SetBool(at,ok);
+    ToOutAnything(GetOutAttr(),thisTag(),1,&at);
 
 	echodir();
 }
@@ -1017,13 +1033,18 @@ V pool::save(I argc,const A *argv,BL xml)
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
 	}
 
+    bool ok = false;
 	if(!flnm) 
 		post("%s - %s: no filename given",thisName(),GetString(thisTag()));
 	else {
 		string file(MakeFilename(flnm));
-		if(!(xml?pl->SaveXML(file.c_str()):pl->Save(file.c_str())))
+        ok = xml?pl->SaveXML(file.c_str()):pl->Save(file.c_str());
+		if(!ok)
 			post("%s - %s: error saving data",thisName(),GetString(thisTag()));
 	}
+
+    t_atom at; SetBool(at,ok);
+    ToOutAnything(GetOutAttr(),thisTag(),1,&at);
 
 	echodir();
 }
@@ -1036,13 +1057,18 @@ V pool::lddir(I argc,const A *argv,BL xml)
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
 	}
 
+    bool ok = false;
 	if(!flnm)
 		post("%s - %s: invalid filename",thisName(),GetString(thisTag()));
 	else {
 		string file(MakeFilename(flnm));
-		if(!(xml?pl->LdDirXML(curdir,file.c_str(),0):pl->LdDir(curdir,file.c_str(),0))) 
+        ok = xml?pl->LdDirXML(curdir,file.c_str(),0):pl->LdDir(curdir,file.c_str(),0);
+		if(!ok) 
 			post("%s - %s: directory couldn't be loaded",thisName(),GetString(thisTag()));
 	}
+
+    t_atom at; SetBool(at,ok);
+    ToOutAnything(GetOutAttr(),thisTag(),1,&at);
 
 	echodir();
 }
@@ -1070,13 +1096,18 @@ V pool::ldrec(I argc,const A *argv,BL xml)
 		}
 	}
 
+    bool ok = false;
 	if(!flnm)
 		post("%s - %s: invalid filename",thisName(),GetString(thisTag()));
 	else {
 		string file(MakeFilename(flnm));
-        if(!(xml?pl->LdDirXML(curdir,file.c_str(),depth,mkdir):pl->LdDir(curdir,file.c_str(),depth,mkdir))) 
+        ok = xml?pl->LdDirXML(curdir,file.c_str(),depth,mkdir):pl->LdDir(curdir,file.c_str(),depth,mkdir);
+        if(!ok) 
 		    post("%s - %s: directory couldn't be saved",thisName(),GetString(thisTag()));
 	}
+
+    t_atom at; SetBool(at,ok);
+    ToOutAnything(GetOutAttr(),thisTag(),1,&at);
 
 	echodir();
 }
@@ -1089,13 +1120,18 @@ V pool::svdir(I argc,const A *argv,BL xml)
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
 	}
 
+    bool ok = false;
 	if(!flnm)
 		post("%s - %s: invalid filename",thisName(),GetString(thisTag()));
 	else {
 		string file(MakeFilename(flnm));
-        if(!(xml?pl->SvDirXML(curdir,file.c_str(),0,absdir):pl->SvDir(curdir,file.c_str(),0,absdir))) 
-		post("%s - %s: directory couldn't be saved",thisName(),GetString(thisTag()));
+        ok = xml?pl->SvDirXML(curdir,file.c_str(),0,absdir):pl->SvDir(curdir,file.c_str(),0,absdir);
+        if(!ok) 
+		    post("%s - %s: directory couldn't be saved",thisName(),GetString(thisTag()));
 	}
+
+    t_atom at; SetBool(at,ok);
+    ToOutAnything(GetOutAttr(),thisTag(),1,&at);
 
 	echodir();
 }
@@ -1108,13 +1144,18 @@ V pool::svrec(I argc,const A *argv,BL xml)
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
 	}
 
+    bool ok = false;
 	if(!flnm)
 		post("%s - %s: invalid filename",thisName(),GetString(thisTag()));
 	else {
 		string file(MakeFilename(flnm));
-        if(!(xml?pl->SvDirXML(curdir,file.c_str(),-1,absdir):pl->SvDir(curdir,file.c_str(),-1,absdir))) 
-		post("%s - %s: directory couldn't be saved",thisName(),GetString(thisTag()));
+        ok = xml?pl->SvDirXML(curdir,file.c_str(),-1,absdir):pl->SvDir(curdir,file.c_str(),-1,absdir);
+        if(!ok) 
+		    post("%s - %s: directory couldn't be saved",thisName(),GetString(thisTag()));
 	}
+
+    t_atom at; SetBool(at,ok);
+    ToOutAnything(GetOutAttr(),thisTag(),1,&at);
 
 	echodir();
 }
@@ -1138,11 +1179,11 @@ BL pool::ValChk(I argc,const t_atom *argv)
 V pool::ToOutAtom(I ix,const t_atom &a)
 {
 	if(IsSymbol(a))
-		ToOutSymbol(ix,GetSymbol(a));
+		ToSysSymbol(ix,GetSymbol(a));
 	else if(IsFloat(a))
-		ToOutFloat(ix,GetFloat(a));
+		ToSysFloat(ix,GetFloat(a));
 	else if(IsInt(a))
-		ToOutInt(ix,GetInt(a));
+		ToSysInt(ix,GetInt(a));
 	else
 		post("%s - %s type not supported!",thisName(),GetString(thisTag()));
 }
@@ -1151,36 +1192,25 @@ V pool::ToOutAtom(I ix,const t_atom &a)
 
 pooldata *pool::GetPool(const S *s)
 {
-	pooldata *pi = head;
-	for(; pi && pi->sym != s; pi = pi->nxt) (V)0;
-
-	if(pi) {
-		pi->Push();
-		return pi;
-	}
-	else {
-		pooldata *p = new pooldata(s);
-		p->Push();
-
-		// now add to chain
-		if(head) head->nxt = p;
-		else head = p;
-		tail = p;
-		return p;
-	}
+    PoolMap::iterator it = poolmap.find(s);
+    pooldata *p;   
+	if(it != poolmap.end())
+        p = it->second;
+	else
+		poolmap[s] = p = new pooldata(s);
+    p->Push();
+	return p;
 }
 
 V pool::RmvPool(pooldata *p)
 {
-	pooldata *prv = NULL,*pi = head;
-	for(; pi && pi != p; prv = pi,pi = pi->nxt) (V)0;
-
-	if(pi && !pi->Pop()) {
-		if(prv) prv->nxt = pi->nxt;
-		else head = pi->nxt;
-		if(!pi->nxt) tail = pi;
-
-		delete pi;
+    FLEXT_ASSERT(p->sym);
+    PoolMap::iterator it = poolmap.find(p->sym);
+    FLEXT_ASSERT(it != poolmap.end());
+    FLEXT_ASSERT(p == it->second);
+	if(!p->Pop()) {
+        poolmap.erase(it);
+		delete p;
 	}
 }
 

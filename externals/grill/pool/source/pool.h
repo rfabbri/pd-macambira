@@ -2,7 +2,7 @@
 
 pool - hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2005 Thomas Grill
+Copyright (c) 2002-2006 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -127,6 +127,8 @@ class pooldata:
 public:
 	pooldata(const S *s = NULL,I vcnt = 0,I dcnt = 0);
 	~pooldata();
+
+    bool Private() const { return sym == NULL; }
 
 	V Push() { ++refs; }
 	BL Pop() { return --refs > 0; }

@@ -3,6 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="pool"
+	ProjectGUID="{F6422672-C7DA-4DF1-9AFD-218947985297}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -113,7 +114,7 @@
 				AdditionalLibraryDirectories="c:\data\pd\pd-cvs\bin"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(outdir)/pool.pdb"
-				ImportLibrary=".\pd-msvc/d/pool.lib"
+				ImportLibrary="$(outdir)/pool.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"

@@ -1,6 +1,6 @@
 pool - a hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2005 Thomas Grill (gr@grrrr.org)
+Copyright (c) 2002-2006 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -80,6 +80,10 @@ Version history:
 - fixed double-free for clearing dirs and values
 - re-introduced a help message
 - fixed bug in nested-dir XML saving
+- changed printrec/printroot to display empty folders
+- new curdir attribute for getting/setting the current directory
+- changed pool name searching with STL code (more efficient)
+- added success/error reporting for file operations (through attribute outlet)
 
 0.2.1:
 - fixed "cntsub"... directories in current directory have been forgotten

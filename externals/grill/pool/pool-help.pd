@@ -1,4 +1,4 @@
-#N canvas 4 3 947 717 12;
+#N canvas 29 115 955 725 12;
 #X msg 296 105 set 1 2 3;
 #X obj 238 631 print K;
 #X msg 607 211 getall;
@@ -40,8 +40,8 @@
 #X text 673 208 bang at EOL;
 #X text 670 257 depth may be given;
 #X text 34 291 set pool name;
-#X text 31 89 at each command;
-#X text 31 73 echo current dir;
+#X text 30 89 at each command;
+#X text 30 73 echo current dir;
 #X text 295 82 set values;
 #X text 26 194 (default on);
 #X text 18 178 report absolute dirs;
@@ -53,7 +53,7 @@
 #X msg 609 366 cntrec;
 #X text 677 364 ... and subdirs;
 #X text 673 378 (depth may be given);
-#N canvas 472 45 420 631 dirs 0;
+#N canvas 472 45 424 635 dirs 0;
 #X msg 111 40 mkdir fld1;
 #X msg 113 135 chdir;
 #X msg 109 331 updir;
@@ -99,7 +99,7 @@
 #X connect 29 0 26 0;
 #X restore 716 496 pd dirs;
 #X text 713 470 directory operations;
-#N canvas 0 22 833 465 file 0;
+#N canvas 0 22 837 529 file 0;
 #X text 117 207 save dir and subdirs;
 #X text 117 165 save data in current dir;
 #X text 117 253 load data into current dir;
@@ -134,6 +134,9 @@
 #X msg 472 321 ldxrec pool.xml;
 #X text 26 398 If the file name is given without a path specification
 the folder containing the current patcher will be used.;
+#X text 27 451 The attribute outlet reports if file saving/loading
+has been successful \, by outputting the message tag and a boolean
+flag.;
 #X connect 20 0 9 0;
 #X connect 21 0 9 0;
 #X connect 22 0 9 0;
@@ -202,12 +205,12 @@ the folder containing the current patcher will be used.;
 #X msg 141 314 getpool;
 #X msg 297 345 add 2 14;
 #X obj 260 478 pool @valcnt 10 @dircnt 5;
-#X text 330 437 expected value and directory counts;
-#X text 330 452 can be given for optimal performance;
+#X text 330 425 expected value and directory counts;
+#X text 330 440 can be given for optimal performance;
 #X msg 429 155 get 3;
 #X msg 295 222 set 3 -1 1;
 #X msg 32 518 getmethods;
-#X text 328 466 (see attributes in properties dialog);
+#X text 328 454 (see attributes in properties dialog);
 #X text 715 638 console printout;
 #N canvas 0 22 612 291 print 0;
 #X obj 21 231 s \$0-pool;
@@ -235,7 +238,7 @@ the folder containing the current patcher will be used.;
 #X msg 295 276 seti 3 Uhu;
 #X text 424 343 clear value at index;
 #X msg 425 363 clri 2;
-#X text 272 13 a hierarchical storage object \, (C)2002-2005 Thomas
+#X text 272 13 a hierarchical storage object \, (C)2002-2006 Thomas
 Grill;
 #X connect 0 0 69 0;
 #X connect 2 0 69 0;
