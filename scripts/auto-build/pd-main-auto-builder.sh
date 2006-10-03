@@ -12,7 +12,7 @@ case $SYSTEM in
 		  platform_name=`uname -m`
 		  ;;
 	 Darwin)
-		  configure_options="--enable-jack"
+		  configure_options=""
 		  platform_name=`uname -p`
 		  ;;
 	 MINGW*)
