@@ -93,10 +93,11 @@ typedef struct comport
 #define COMPORT_MAX 99
 
 #ifdef _WIN32
+/* we don't use the  table for windos cos we can set the number directly. */
+/* This may result in more possible baud rates than the table contains. */
+/*
 static long baudspeedbittable[] =
 {
-    CBR_256000,
-    CBR_128000,
     CBR_115200,
     CBR_57600,
     CBR_56000,
@@ -106,83 +107,114 @@ static long baudspeedbittable[] =
     CBR_9600,
     CBR_4800,
     CBR_2400,
+    CBR_1800,
     CBR_1200,
     CBR_600,
     CBR_300,
     CBR_110
 };
-
+*/
 #else /* _WIN32 */
 
 #ifdef  IRIX
 #define OPENPARAMS (O_RDWR|O_NDELAY|O_NOCTTY)
 #define TIONREAD FIONREAD         /* re map the IOCTL function */
-#define BAUDRATE_256000 -1
-#define BAUDRATE_128000 -1
+#define BAUDRATE_230400 -1
 #define BAUDRATE_115200 -1
 #define BAUDRATE_57600  -1
-#define BAUDRATE_56000  -1
 #define BAUDRATE_38400  B38400
-#define BAUDRATE_14400  B19200 /* 14400 gibts nicht */
 #else /* IRIX */
 #define OPENPARAMS (O_RDWR|O_NDELAY|O_NOCTTY)
-#define BAUDRATE_256000 -1
-#define BAUDRATE_128000 -1
+#define BAUDRATE_230400 B230400
 #define BAUDRATE_115200 B115200
 #define BAUDRATE_57600  B57600
-#define BAUDRATE_56000  B57600 /* 56000 gibts nicht */
 #define BAUDRATE_38400  B38400
-#define BAUDRATE_14400  B19200 /* 14400 gibts nicht */
 #endif /* else IRIX */
 
 static
-short baudspeedbittable[] =
+long baudspeedbittable[] =
 {
-    BAUDRATE_256000,  /* CPU SPECIFIC */
-    BAUDRATE_128000,  /* CPU SPECIFIC */
+    BAUDRATE_230400,
     BAUDRATE_115200,  /* CPU SPECIFIC */
     BAUDRATE_57600,   /* CPU SPECIFIC */
-    BAUDRATE_56000,
     BAUDRATE_38400,   /* CPU SPECIFIC */
     B19200,
-    BAUDRATE_14400,
     B9600,
     B4800,
     B2400,
+    B1800,
     B1200,
     B600,
     B300,
-    B110
+    B200,
+    B150,
+    B134,
+    B110,
+    B75,
+    B50,
+    B0
 };
 
 struct timeval null_tv;
 
 #endif /* else _WIN32 */
 
-#define BAUDRATETABLE_LEN 15
+#define BAUDRATETABLE_LEN 19
 
 static long baudratetable[] =
 {
-    256000L,
-    128000L,
+    230400L,
     115200L,
     57600L,
-    56000L,
     38400L,
     19200L,
-    14400L,
     9600L,
     4800L,
     2400L,
+    1800L,
     1200L,
     600L,
     300L,
-    110L
+    200L,
+    150L,
+    134L,
+    110L,
+    75L,
+    50L,
+    0L
+
 }; /* holds the baud rate selections */
+
+/* From man cfsetospeed:
+       cfsetospeed()  sets  the  output  baud  rate stored in the
+       termios structure pointed to by termios_p to speed,  which
+       must be one of these constants:
+            B0
+            B50
+            B75
+            B110
+            B134
+            B150
+            B200
+            B300
+            B600
+            B1200
+            B1800
+            B2400
+            B4800
+            B9600
+            B19200
+            B38400
+            B57600
+            B115200
+            B230400
+  The  zero  baud rate, B0, is used to terminate the connec­
+  tion.  If B0 is specified, the modem control  lines  shall
+  no longer be asserted.  Normally, this will disconnect the
+  line.*/
 
 t_class *comport_class;
 
-static long get_baud_ratebits(t_float *baud);
 static void comport_pollintervall(t_comport *x, t_floatarg g);
 static void comport_tick(t_comport *x);
 static float set_baudrate(t_comport *x,t_float baud);
@@ -203,6 +235,7 @@ static HANDLE close_serial(t_comport *x);
 #else
 static int open_serial(unsigned int com_num, t_comport *x);
 static int close_serial(t_comport *x);
+static long get_baud_ratebits(t_float *baud);
 #endif
 static void comport_pollintervall(t_comport *x, t_floatarg g);
 static void comport_tick(t_comport *x);
@@ -240,22 +273,6 @@ void comport_setup(void);
 
 /* --------- sys independent serial setup helpers ---------------- */
 
-static long get_baud_ratebits(t_float *baud)
-{
-    int i = 0;
-
-    while(i < BAUDRATETABLE_LEN && baudratetable[i] > *baud) i++;
-
-    /* nearest Baudrate finding */
-    if(i==BAUDRATETABLE_LEN ||  baudspeedbittable[i] < 0)
-    {
-        post("*Warning* The baud rate %d is not supported or out of range, using 9600\n",*baud);
-        i = 8;
-    }
-    *baud =  baudratetable[i];
-
-    return baudspeedbittable[i];
-}
 
 
 /* ------------ sys dependent serial setup helpers ---------------- */
@@ -267,7 +284,7 @@ static long get_baud_ratebits(t_float *baud)
 
 static float set_baudrate(t_comport *x,t_float baud)
 {
-    x->dcb.BaudRate = get_baud_ratebits(&baud);
+    x->dcb.BaudRate = (DWORD)baud ;//!!!try directly setting any baud rate...was get_baud_ratebits(&baud);
     return baud;
 }
 
@@ -373,6 +390,14 @@ static int set_xonxoff(t_comport *x, int nr)
 static int set_serial(t_comport *x)
 {
     if (SetCommState(x->comhandle, &(x->dcb))) return 1;
+    /* Didn't work. Get the actual state of the device */
+    GetCommState(x->comhandle, &(x->dcb));
+    x->baud = x->dcb.BaudRate;
+    x->data_bits = x->dcb.ByteSize;
+    x->parity_bit = x->dcb.fParity;
+    x->stop_bits = x->dcb.StopBits;
+    x->xonxoff = (x->dcb.fOutX)?1:0;
+    x->ctsrts = (x->dcb.fOutxCtsFlow)?1:0;
     return 0;
 }
 
@@ -582,10 +607,27 @@ int comport_get_cts(t_comport *x)
 /* ----------------- POSIX - UNIX ------------------------------ */
 
 
-static float set_baudrate(t_comport *x,t_float baud)
+static long get_baud_ratebits(t_float *baud)
+{
+    int i = 0;
+
+    while(i < BAUDRATETABLE_LEN && baudratetable[i] > *baud) i++;
+
+    /* nearest Baudrate finding */
+    if(i==BAUDRATETABLE_LEN ||  baudspeedbittable[i] < 0)
+    {
+        post("*Warning* The baud rate %d is not supported or out of range, using 9600\n",*baud);
+        i = 8;
+    }
+    *baud =  baudratetable[i];
+
+    return baudspeedbittable[i];
+}
+
+static float set_baudrate(t_comport *x, t_float baud)
 {
     struct termios  *tio = &(x->com_termio);
-    long            baudbits = get_baud_ratebits(&baud);
+    speed_t            baudbits = get_baud_ratebits(&baud);
 
     cfsetispeed(tio, baudbits);
     cfsetospeed(tio, baudbits);
