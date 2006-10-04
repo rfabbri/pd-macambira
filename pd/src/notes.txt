@@ -1,5 +1,9 @@
 ---------------- dolist --------------------
 check bug reports on sourceforge
+double-click fix on mac?
+http://sourceforge.net/tracker/index.php?
+func=detail&aid=1564617&group_id=55736&atid=478072
+
 PC device counting problem (first device invoked by -audiodev 0)
 
 test:

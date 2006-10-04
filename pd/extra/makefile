@@ -57,7 +57,7 @@ pd_linux: $(NAME).pd_linux
 
 .SUFFIXES: .pd_linux
 
-LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer -fPIC \
+LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer -fPIC -m32 \
     -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch $(CFLAGS)
 
@@ -65,7 +65,7 @@ LINUXINCLUDE =  -I../../src
 
 .c.pd_linux:
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
+	$(CC) -m32 -export_dynamic -shared -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	rm -f $*.o
 

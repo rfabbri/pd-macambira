@@ -61,6 +61,7 @@ int sys_midioutdevlist[MAXMIDIOUTDEV] = {1};
 char sys_font[100] = "courier"; /* tb: font name */
 static int sys_main_srate;
 static int sys_main_advance;
+static int sys_listplease;
 
 int sys_externalschedlib;
 char sys_externalschedlibname[MAXPDSTRING];
@@ -800,7 +801,7 @@ int sys_argparse(int argc, char **argv)
         }
         else if (!strcmp(*argv, "-listdev"))
         {
-            sys_listdevs();
+            sys_listplease = 1;
             argc--; argv++;
         }
         else if (!strcmp(*argv, "-schedlib"))
@@ -920,6 +921,8 @@ static void sys_afterargparse(void)
         sys_midiindevlist[i]--;
     for (i = 0; i < sys_nmidiout; i++)
         sys_midioutdevlist[i]--;
+    if (sys_listplease)
+        sys_listdevs();
         
             /* get the current audio parameters.  These are set
             by the preferences mechanism (sys_loadpreferences()) or

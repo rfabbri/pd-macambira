@@ -359,7 +359,11 @@ static void message_adddollar(t_message *x, t_floatarg f)
 static void message_adddollsym(t_message *x, t_symbol *s)
 {
     t_atom a;
-    SETDOLLSYM(&a, s);
+    char buf[MAXPDSTRING];
+    buf[0] = '$';
+    strncpy(buf+1, s->s_name, MAXPDSTRING-2);
+    buf[MAXPDSTRING-1] = 0;
+    SETDOLLSYM(&a, gensym(buf));
     binbuf_add(x->m_text.te_binbuf, 1, &a);
     glist_retext(x->m_glist, &x->m_text);
 }

@@ -576,7 +576,7 @@ void sys_listmididevs(void )
         post("no midi input devices found");
     else
     {
-        post("input devices:");
+        post("MIDI input devices:");
         for (i = 0; i < nindevs; i++)
             post("%d. %s", i+1, indevlist + i * DEVDESCSIZE);
     }
@@ -584,7 +584,7 @@ void sys_listmididevs(void )
         post("no midi output devices found");
     else
     {
-        post("output devices:");
+        post("MIDI output devices:");
         for (i = 0; i < noutdevs; i++)
             post("%d. %s", i+DEVONSET, outdevlist + i * DEVDESCSIZE);
     }

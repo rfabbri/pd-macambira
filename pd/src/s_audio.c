@@ -607,11 +607,6 @@ static void audio_getdevs(char *indevlist, int *nindevs,
     }
 }
 
-#ifdef MSW
-#define DEVONSET 0  /* microsoft device list starts at 0 (the "mapper"). */
-#else               /* (see also MSW ifdef in sys_parsedevlist(), s_main.c)  */
-#define DEVONSET 1  /* To agree with command line flags, normally start at 1 */
-#endif
 
 static void sys_listaudiodevs(void )
 {
@@ -625,17 +620,23 @@ static void sys_listaudiodevs(void )
         post("no audio input devices found");
     else
     {
-        post("input devices:");
+            /* To agree with command line flags, normally start at 1 */
+            /* But microsoft "MMIO" device list starts at 0 (the "mapper"). */
+            /* (see also sys_mmio variable in s_main.c)  */
+
+        post("audio input devices:");
         for (i = 0; i < nindevs; i++)
-            post("%d. %s", i + DEVONSET, indevlist + i * DEVDESCSIZE);
+            post("%d. %s", i + (sys_audioapi != API_MMIO),
+                indevlist + i * DEVDESCSIZE);
     }
     if (!noutdevs)
         post("no audio output devices found");
     else
     {
-        post("output devices:");
+        post("audio output devices:");
         for (i = 0; i < noutdevs; i++)
-            post("%d. %s", i + DEVONSET, outdevlist + i * DEVDESCSIZE);
+            post("%d. %s", i + (sys_audioapi != API_MMIO),
+                outdevlist + i * DEVDESCSIZE);
     }
     post("API number %d\n", sys_audioapi);
 }

@@ -1027,12 +1027,6 @@ static void canvas_done_popup(t_canvas *x, float which, float xpos, float ypos)
 #define ALTMOD 4
 #define RIGHTCLICK 8
 
-/* on one-button-mouse machines, you can use double click to
-    mean right click (which gets the popup menu.)  Do this for Mac. */
-#ifdef __APPLE__
-#define SIMULATERIGHTCLICK
-#endif
-
 static double canvas_upclicktime;
 static int canvas_upx, canvas_upy;
 #define DCLICKINTERVAL 0.25
@@ -1067,11 +1061,7 @@ void canvas_doclick(t_canvas *x, int xpos, int ypos, int which,
 
     if (doit && !runmode && xpos == canvas_upx && ypos == canvas_upy &&
         sys_getrealtime() - canvas_upclicktime < DCLICKINTERVAL)
-#ifdef SIMULATERIGHTCLICK
-            rightclick = 1;
-#else
             doublemod = 1;
-#endif
     x->gl_editor->e_lastmoved = 0;
     if (doit)
     {

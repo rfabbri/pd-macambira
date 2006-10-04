@@ -432,15 +432,6 @@ proc menu_doc_browser {dir} {
     }
 
 proc doc_make_listbox {base dir count} {
-	global pd_guidir
-	if {![file isdirectory $dir]} {
-		regsub -- $pd_guidir [file dirname $dir] "" subdir
-		set file [file tail $dir]
-		if { [catch {menu_doc_open $subdir $file} fid] } {
-			puts stderr "Could not open $pd_guidir/$subdir/$file\n"
-		}
-		return; 
-	}
 	# check for [file readable]?
 	if { [info tclversion] >= 8.5 } {
 		# requires Tcl 8.5 but probably deals with special chars better
@@ -461,14 +452,36 @@ proc doc_make_listbox {base dir count} {
 					  [lsort -dictionary [glob -directory $dir -nocomplain -types {f} -- *]]]  {
 		$current_listbox insert end "[file tail $item][expr {[file isdirectory $item] ? {/} : {}}]"
 	}
-	bind $current_listbox <Button-1> [list doc_navigate $dir [incr count] %W %x %y]
+	bind $current_listbox <Button-1> [list doc_navigate $dir $count %W %x %y]
+	bind $current_listbox <Double-Button-1> [list doc_double_button $dir $count %W %x %y]
 }
 
 proc doc_navigate {dir count width x y} {
-	if {[set subdir [$width get [$width index "@$x,$y"]]] eq {}} {
+	if {[set newdir [$width get [$width index "@$x,$y"]]] eq {}} {
 		return
 	}
-	doc_make_listbox [winfo parent $width] [file join $dir $subdir] $count
+	set dir_to_open [file join $dir $newdir]
+	if {[file isdirectory $dir_to_open]} {
+		doc_make_listbox [winfo parent $width] $dir_to_open [incr count]
+	}
+}
+
+proc doc_double_button {dir count width x y} {
+	global pd_guidir
+	if {[set newdir [$width get [$width index "@$x,$y"]]] eq {}} {
+		return
+	}
+	set dir_to_open [file join $dir $newdir]
+	if {[file isdirectory $dir_to_open]} {
+		 doc_navigate $dir $count $width $x $y
+	} else {
+		regsub -- $pd_guidir [file dirname $dir_to_open] "" subdir
+		set file [file tail $dir_to_open]
+		if { [catch {menu_doc_open $subdir $file} fid] } {
+			puts stderr "Could not open $pd_guidir/$subdir/$file\n"
+		}
+		return; 
+	}
 }
 
 ############# routine to add media, help, and apple menu items ###############
@@ -3413,7 +3426,11 @@ proc pdtk_openpanel {target localdir} {
 }
 
 proc pdtk_savepanel {target localdir} {
-    set filename [tk_getSaveFile -initialdir $localdir]
+    if {$localdir == ""} {
+    	set filename [tk_getSaveFile]
+    } else {
+    	set filename [tk_getSaveFile -initialdir $localdir]
+    }
     if {$filename != ""} {
         pd [concat $target callback [pdtk_enquote $filename] \;]
     }

@@ -359,7 +359,7 @@ void binbuf_restore(t_binbuf *x, int argc, t_atom *argv)
             if (!strcmp(str, ";")) SETSEMI(ap);
             else if (!strcmp(str, ",")) SETCOMMA(ap);
             else if ((str2 = strchr(str, '$')) && str2[1] >= '0'
-                & str2[1] <= '9')
+                && str2[1] <= '9')
             {
                 int dollsym = 0;
                 if (*str != '$')

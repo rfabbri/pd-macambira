@@ -222,10 +222,11 @@ PaError OpenAudioStream( PABLIO_Stream **rwblPtr, double sampleRate,
     long   doWrite = 0;
     PaError err;
     PABLIO_Stream *aStream;
-    long   minNumBuffers;
     long   numFrames;
 #ifdef PA19
     PaStreamParameters instreamparams, outstreamparams;  /* MSP */
+#else
+    long   minNumBuffers;
 #endif
 
     /* fprintf(stderr,
