@@ -484,7 +484,10 @@ $(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
 # always run aclocal/autoconf until "configure" is deleted from CVS
 	cd $(gem_src)/src && aclocal
 	cd $(gem_src)/src && autoconf
-	cd $(gem_src)/src && ./configure --without-ImageMagick --with-pd=$(pd_src)
+	cd $(gem_src)/src && ./configure --without-x --without-ImageMagick \
+		--without-tiff --without-jpeg --without-mpeg --without-mpeg3 \
+		--without-ieee1394 --without-aviplay --without-avifile --without-ffmpeg \
+		--with-pd=$(pd_src)
 	$(MAKE) -C $(gem_src)/src
 
 gem: $(gem_src)/src/Gem.$(EXTENSION)
