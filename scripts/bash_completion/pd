@@ -66,6 +66,7 @@ _pd()
     -guiport \
     -guicmd \
     -send \
+    -noprefs \
     -rt \
     -realtime \
     -nrt"
