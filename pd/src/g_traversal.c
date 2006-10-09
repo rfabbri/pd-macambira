@@ -143,7 +143,7 @@ void gpointer_setglist(t_gpointer *gp, t_glist *glist, t_scalar *x)
     gs->gs_refcount++;
 }
 
-static void gpointer_setarray(t_gpointer *gp, t_array *array, t_word *w)
+void gpointer_setarray(t_gpointer *gp, t_array *array, t_word *w)
 {
     t_gstub *gs;
     if (gs = gp->gp_stub) gstub_dis(gs);

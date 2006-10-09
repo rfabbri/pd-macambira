@@ -13,7 +13,7 @@
 #include <io.h>
 #include <windows.h>
 #endif
-#ifdef MACOSX
+#ifdef __APPLE__
 #include <mach-o/dyld.h> 
 #endif
 #include <string.h>
@@ -41,7 +41,7 @@ static char sys_dllextent[] = ".l_ia64", sys_dllextent2[] = ".pd_linux";
 static char sys_dllextent[] = ".l_i386", sys_dllextent2[] = ".pd_linux";
 #endif
 #endif
-#ifdef MACOSX
+#ifdef __APPLE__
 #ifndef MACOSX3
 static char sys_dllextent[] = ".d_fat", sys_dllextent2[] = ".pd_darwin";
 #else

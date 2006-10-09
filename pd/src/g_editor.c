@@ -1947,7 +1947,7 @@ static void canvas_copy(t_canvas *x)
         int bufsize;
         rtext_getseltext(x->gl_editor->e_textedfor, &buf, &bufsize);
 
-#if defined(MSW) || defined(MACOSX)
+#if defined(MSW) || defined(__APPLE__)
             /* for Mac or Windows, copy the text to the clipboard here */
         sys_vgui("clipboard clear\n", bufsize, buf);
         sys_vgui("clipboard append {%.*s}\n", bufsize, buf);
@@ -2111,7 +2111,7 @@ static void canvas_paste(t_canvas *x)
     if (x->gl_editor->e_textedfor)
     {
             /* simulate keystrokes as if the copy buffer were typed in. */
-#if defined(MSW) || defined(MACOSX)
+#if defined(MSW) || defined(__APPLE__)
             /* for Mac or Windows,  ask the GUI to send the clipboard down */
         sys_gui("pdtk_pastetext\n");
 #else

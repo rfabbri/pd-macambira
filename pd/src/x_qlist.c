@@ -181,9 +181,8 @@ static void qlist_read(t_qlist *x, t_symbol *filename, t_symbol *format)
         cr = 1;
     else if (*format->s_name)
         error("qlist_read: unknown flag: %s", format->s_name);
-        
-    if (binbuf_read_via_path(x->x_binbuf, filename->s_name,
-        canvas_getdir(x->x_canvas)->s_name, cr))
+
+    if (binbuf_read_via_canvas(x->x_binbuf, filename->s_name, x->x_canvas, cr))
             error("%s: read failed", filename->s_name);
     x->x_onset = 0x7fffffff;
     x->x_reentered = 1;

@@ -536,6 +536,7 @@ EXTERN void array_free(t_array *x);
 EXTERN t_gstub *gstub_new(t_glist *gl, t_array *a);
 EXTERN void gstub_cutoff(t_gstub *gs);
 EXTERN void gpointer_setglist(t_gpointer *gp, t_glist *glist, t_scalar *x);
+EXTERN void gpointer_setarray(t_gpointer *gp, t_array *array, t_word *w);
 
 /* --------------------- scalars ------------------------- */
 EXTERN void word_init(t_word *wp, t_template *tmpl, t_gpointer *gp);

@@ -394,7 +394,7 @@ proc menu_openhtml {filename} {
             exec sh -c [format "open %s" $filename]
     } else {
         exec rundll32 url.dll,FileProtocolHandler \
-            [format "file:%s" $filename] &
+            [format "file://%s" $filename] &
     }
 }
 

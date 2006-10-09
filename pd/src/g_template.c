@@ -1285,8 +1285,11 @@ static int curve_click(t_gobj *z, t_glist *glist,
         curve_motion_wp = data;
         curve_motion_field = 2*bestn;
         curve_motion_template = template;
-        gpointer_setglist(&curve_motion_gpointer, curve_motion_glist,
-            curve_motion_scalar);
+        if (curve_motion_scalar)
+            gpointer_setglist(&curve_motion_gpointer, curve_motion_glist,
+                curve_motion_scalar);
+        else gpointer_setarray(&curve_motion_gpointer,
+                curve_motion_array, curve_motion_wp);
         glist_grab(glist, z, curve_motion, 0, xpix, ypix);
     }
     return (1);
@@ -2268,9 +2271,12 @@ static int drawnumber_click(t_gobj *z, t_glist *glist,
             drawnumber_motion_ycumulative =
                 fielddesc_getfloat(&x->x_value, template, data, 0);
             drawnumber_motion_symbol = ((x->x_flags & DRAW_SYMBOL) != 0);
-            gpointer_setglist(&drawnumber_motion_gpointer, 
-                drawnumber_motion_glist, drawnumber_motion_scalar);
-            glist_grab(glist, z, drawnumber_motion, drawnumber_key,
+            if (drawnumber_motion_scalar)
+                gpointer_setglist(&drawnumber_motion_gpointer, 
+                    drawnumber_motion_glist, drawnumber_motion_scalar);
+            else gpointer_setarray(&drawnumber_motion_gpointer,
+                    drawnumber_motion_array, drawnumber_motion_wp);
+           glist_grab(glist, z, drawnumber_motion, drawnumber_key,
                 xpix, ypix);
         }
         return (1);

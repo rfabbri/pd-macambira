@@ -200,18 +200,13 @@ static void swapstring(char *foo, int doit)
 * header and fill in the properties.
 */
 
-int open_soundfile(const char *dirname, const char *filename, int headersize,
+int open_soundfile_via_fd(int fd, int headersize,
     int *p_bytespersamp, int *p_bigendian, int *p_nchannels, long *p_bytelimit,
     long skipframes)
 {
-    char buf[OBUFSIZE], *bufptr;
-    int fd, format, nchannels, bigendian, bytespersamp, swap, sysrtn;
+    int format, nchannels, bigendian, bytespersamp, swap, sysrtn;
     long bytelimit = 0x7fffffff;
     errno = 0;
-    fd = open_via_path(dirname, filename,
-        "", buf, &bufptr, MAXPDSTRING, 1);
-    if (fd < 0)
-        return (-1);
     if (headersize >= 0) /* header detection overridden */
     {
         bigendian = *p_bigendian;
@@ -221,6 +216,7 @@ int open_soundfile(const char *dirname, const char *filename, int headersize,
     }
     else
     {
+        char buf[OBUFSIZE];
         int bytesread = read(fd, buf, READHDRSIZE);
         int format;
         if (bytesread < 4)
@@ -390,6 +386,38 @@ badheader:
         print out the error... */
     errno = EIO;
     return (-1);
+}
+
+    /* open a soundfile, using open_via_path().  This is used by readsf~ in
+    a not-perfectly-threadsafe way.  LATER replace with a thread-hardened
+    version of open_soundfile_via_canvas() */
+int open_soundfile(const char *dirname, const char *filename, int headersize,
+    int *p_bytespersamp, int *p_bigendian, int *p_nchannels, long *p_bytelimit,
+    long skipframes)
+{
+    char buf[OBUFSIZE], *bufptr;
+    int fd;
+    fd = open_via_path(dirname, filename, "", buf, &bufptr, MAXPDSTRING, 1);
+    if (fd < 0)
+        return (-1);
+    else return (open_soundfile_via_fd(fd, headersize, p_bytespersamp,
+        p_bigendian, p_nchannels, p_bytelimit, skipframes));
+}
+
+    /* open a soundfile, using open_via_canvas().  This is used by readsf~ in
+    a not-perfectly-threadsafe way.  LATER replace with a thread-hardened
+    version of open_soundfile_via_canvas() */
+int open_soundfile_via_canvas(t_canvas *canvas, const char *filename, int headersize,
+    int *p_bytespersamp, int *p_bigendian, int *p_nchannels, long *p_bytelimit,
+    long skipframes)
+{
+    char buf[OBUFSIZE], *bufptr;
+    int fd;
+    fd = canvas_open(canvas, filename, "", buf, &bufptr, MAXPDSTRING, 1);
+    if (fd < 0)
+        return (-1);
+    else return (open_soundfile_via_fd(fd, headersize, p_bytespersamp,
+        p_bigendian, p_nchannels, p_bytelimit, skipframes));
 }
 
 static void soundfile_xferin(int sfchannels, int nvecs, float **vecs,
@@ -1033,7 +1061,7 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
         }
         finalsize = vecsize;
     }
-    fd = open_soundfile(canvas_getdir(x->x_canvas)->s_name, filename,
+    fd = open_soundfile_via_canvas(x->x_canvas, filename,
         headersize, &bytespersamp, &bigendian, &channels, &bytelimit,
             skipframes);
     

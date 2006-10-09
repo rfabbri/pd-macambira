@@ -19,6 +19,20 @@
 <P>This section tracks changes in Pd's current implementation.</P>
 
 <H3> <A name="s2"> 5.1. release notes </A> </H3>
+
+<P> ------------------ 0.40-1 --------------------------
+
+<P> Fixed "declare" which wasn't working properly yet in 0.40-0, and
+made more objects (notably "soundfiler") respect "declared" paths.  Path
+entries are relative to the parent patch.  Declares inside abstractions are
+ignored.
+
+<P> "drawnumbers" are draggable now, even if they're in arrays.
+
+<P> Bug fix opening "html" help from windows.
+
+<P> Changed MACOSX to __APPLE__ in 4 places.
+
 <P> ------------------ 0.40 -----------------------------
 
 <P> A new object, "declare", allows patches to control where Pd looks
@@ -1496,7 +1510,9 @@ The following max-like objects are included:
 
 <H3> <A name="s2"> 5.2. known bugs </A> </H3>
 
-<P> In the list below, starred items are still things needing attention...
+<P> In the list below, starred items are still things needing attention.
+This list is no longer maintained; see the sourceforge bug tracker on
+https://sourceforge.net/tracker/?group_id=55736
 
 <P> *1. Timing of MIDI input/output is very shaky.  Audio I/O is primitive, but
 there's at least a way to detect errors now for linux and NT.
@@ -1537,7 +1553,7 @@ holds a "pd" object with tilde objects in the subpatch.
 <P> *13.  In linux, Pd doesn't report audio data-late errors yet.
 
 <P> *14.  Several objects, notably dac~, adc~, and env~, are incompatible with
-uses of block~ or switch~ objects that change block size frmo the default of
+uses of block~ or switch~ objects that change block size from the default of
 64.  Using switch~ without reblocking causes no problem.  Don't try to
 read/write delay lines or use send~/receive~, or throw~/catch~, between
 windows with different block sizes.

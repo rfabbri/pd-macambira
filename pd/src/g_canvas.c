@@ -1552,9 +1552,20 @@ int canvas_open(t_canvas *x, const char *name, const char *ext,
         if (y->gl_env)
     {
         t_namelist *nl;
+        t_canvas *x2 = x;
+        char *dir;
+        while (x2 && x2->gl_owner)
+            x2 = x2->gl_owner;
+        dir = (x2 ? canvas_getdir(x2)->s_name : ".");
         for (nl = y->gl_env->ce_path; nl; nl = nl->nl_next)
         {
-            if ((fd = sys_trytoopenone(nl->nl_string, name, ext,
+            char realname[MAXPDSTRING];
+            strncpy(realname, dir, MAXPDSTRING);
+            realname[MAXPDSTRING-3] = 0;
+            strcat(realname, "/");
+            strncat(realname, nl->nl_string, MAXPDSTRING-strlen(realname));
+            realname[MAXPDSTRING-1] = 0;
+            if ((fd = sys_trytoopenone(realname, name, ext,
                 dirresult, nameresult, size, bin)) >= 0)
                     return (fd);
         }

@@ -1,4 +1,4 @@
-#N canvas 596 406 629 492 12;
+#N canvas 256 20 629 492 12;
 #X obj 29 11 list;
 #X text 76 12 - building and using variable-length messages;
 #N canvas 92 130 654 658 about-lists 0;
@@ -361,7 +361,6 @@ append" above.;
 #X restore 222 463 pd example3;
 #X obj 23 207 list;
 #X text 71 208 - short for "list append";
-#X obj 22 182 list trim;
 #X text 141 185 - output number of items in list;
 #N canvas 188 111 576 365 length 0;
 #X msg 126 183 1 2 3;
@@ -386,3 +385,4 @@ in a list or other message.;
 #X connect 7 0 8 0;
 #X restore 506 186 pd length;
 #X text 353 468 updated for Pd version 0.40.;
+#X obj 22 182 list length;
