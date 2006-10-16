@@ -13,6 +13,7 @@ MP 20060709 All status goes out the status outlet when an info message is receiv
 MP 20060824 added clock_delay call in comport_devicename
 MP 20060924 added comport_enum to list available ports in Windows
 MP 20060925 add devices message to enumerate actual devices, info just outputs current port state
+MP 20061016 write_serial checks for GetOverlappedResult to avoid tx buffer overflow errors
 */
 
 #include "m_pd.h"
@@ -495,7 +496,7 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
 
     if (!GetCommTimeouts(fd, &(x->old_timeouts)))
     {
-        post("[comport] Couldn't get old timeouts for serial device");
+        post("[comport] Couldn't get old timeouts for serial device (%d)", GetLastError());
     }
 
     /* setting new timeouts for read to immediately return */
@@ -507,10 +508,14 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
 
     if (!SetCommTimeouts(fd, &timeouts))
     {
-        post("Couldn't set timeouts for serial device");
+        post("Couldn't set timeouts for serial device (%d)", GetLastError());
         return INVALID_HANDLE_VALUE;
     }
-
+	if (!SetupComm(x->comhandle, 4096L, 4096L))/* try to get big buffers to avoid overruns*/
+	{
+		post("[comport] Couldn't do SetupComm (%d)", GetLastError());
+	}
+	
     x->comport = com_num;/* output on next tick */
     return fd;
 }
@@ -539,9 +544,9 @@ static int write_serial(t_comport *x, unsigned char serial_byte)
 {
     OVERLAPPED osWrite = {0};
     DWORD      dwWritten;
-    DWORD      dwToWrite = 1;
+    DWORD      dwToWrite = 1L;
     DWORD      dwErr;
-    char       cErr[100];
+	DWORD      numTransferred = 0L;
 
     osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (osWrite.hEvent == NULL)
@@ -555,11 +560,15 @@ static int write_serial(t_comport *x, unsigned char serial_byte)
         dwErr = GetLastError();
         if (dwErr != ERROR_IO_PENDING)
         {
-            sprintf(cErr, "WriteFile error: %d", (int)dwErr);
-            post(cErr);
+            post("WriteFile error: %d", (int)dwErr);
             return 0;
         }
     }
+	if (!GetOverlappedResult(x->comhandle, &osWrite, &numTransferred, TRUE))
+	{/* wait for the character to be sent */
+        dwErr = GetLastError();
+		post("WriteFile:GetOverlappedResult error: %d", (int)dwErr);
+	}
     CloseHandle(osWrite.hEvent);
     return 1;
 }
