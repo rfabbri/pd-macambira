@@ -44,7 +44,7 @@ rsync -av --delete rsync://128.238.56.50/distros/pd-extended/ \
 	 ${auto_build_root_dir}/
 
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
-make -C "${auto_build_root_dir}/packages" patch_pd
+make -C "${auto_build_root_dir}/packages" patch
 make install && make package && make test_package
 make test_locations
 
