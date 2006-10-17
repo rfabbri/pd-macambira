@@ -5,6 +5,7 @@ Installation/Compilation instructions for "iemmatrix"
 1) linux (and other autoconf-systems):
 ======================================
 	"cd" into iemmatrix/src/
+	run "autoconf"
 	run "./configure" (see "./configure --help" for valid options)
 	run "make"
 	run "make install"
@@ -21,7 +22,7 @@ Installation/Compilation instructions for "iemmatrix"
 ============
 	there is nothing special in the code, so it should compile out of the box:
 	"cd" to iemmatrix/src
-	run "./configure; make" (for further details please see "1) linux")
+	run "autoconf; ./configure; make" (for further details please see "1) linux")
 
 3) irix:
 ========
@@ -46,14 +47,14 @@ CrossCompilation for w32 with MinGW (http://www.mingw.org) on linux-systems
 	to your "m_pd.h" (with --includedir) and to your "pd.lib" (with --libdir)
 	don't forget to override the default extension ("pd_linux" on linux-systems) with the more appropriate "dll".
 	on bash this looks like:
-	 % ./configure  --with-extension=dll --host=i586-mingw32msvc --with-pd=/path/to/w32-pd/ --disable-PIC
+	 % ./configure --disable-PIC --with-extension=dll --host=i586-mingw32msvc --with-pd=/path/to/w32-pd/
 	now run "make" and enjoy.
 	
 
 
 5) FreeBSD et al:
 =================
-	i don't know, but why shouldn't it run there ?
-	try the configure in iemmatrix/src
+	i don't know, but why it shouldn't run there ?
+	try the configure in iemmatrix/src (see 1)linux for more information)
 	and report any success or failure
 
