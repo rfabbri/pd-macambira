@@ -166,8 +166,11 @@ ifneq ($(PD_TEST_VERSION),)
 	PD_VERSION := $(PD_VERSION)-$(PD_TEST_VERSION)
 endif
 
+VERSION_DATE := $(shell date +%Y-%m-%d)
+
 # release version for this distro
-PACKAGE_VERSION = extended-test5
+PACKAGE_VERSION_PREFIX = extended
+PACKAGE_VERSION = $(PACKAGE_VERSION_PREFIX)-$(VERSION_DATE)
 PACKAGE_NAME = Pd-$(PD_VERSION)
 
 

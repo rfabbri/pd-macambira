@@ -779,6 +779,21 @@ devsymlinks_clean:
 	-sudo rm -f /usr/local/lib/libtclstub*.a /usr/local/lib/libtkstub*.a
 
 
+set_version:
+# change Pd's version number to reflect the extended build
+# this needs the complete_version_defines patch to work
+	cd $(pd_src)/src/ && \
+		sed 's|^\(#define PD_TEST_VERSION "\).*"|\1$(PACKAGE_VERSION)"|' m_pd.h > \
+			m_pd.h.tmp && mv m_pd.h.tmp m_pd.h
+
+unset_version:
+# change the version number back to the original 
+# this needs the complete_version_defines patch to work
+	cd $(pd_src)/src && \
+		sed 's|^\(#define PD_TEST_VERSION ".*\)$(PACKAGE_VERSION_PREFIX).*"|\1"|' \
+			m_pd.h > m_pd.h.tmp && \
+		mv m_pd.h.tmp m_pd.h
+
 
 patch_pd:
 	@echo pd_src $(pd_src)
@@ -795,22 +810,11 @@ ifneq ($(OS_NAME),windows)
 	done
 endif
 	-rm -f -- $(pd_src)/src/configure  $(pd_src)/src/makefile
-# change Pd's version number to reflect the extended build
-# this needs the complete_version_defines patch to work
-	cd $(pd_src)/src/ && \
-		sed 's|^\(#define PD_TEST_VERSION "\).*"|\1$(PACKAGE_VERSION)"|' m_pd.h > \
-			m_pd.h.tmp && mv m_pd.h.tmp m_pd.h
 	@echo " "
 	@echo "patching completed."
 
 
 unpatch_pd:
-# change the version number back to the original 
-# this needs the complete_version_defines patch to work
-	cd $(pd_src)/src && \
-		sed 's|^\(#define PD_TEST_VERSION ".*\)$(PACKAGE_VERSION)"|\1"|' \
-			m_pd.h > m_pd.h.tmp && \
-		mv m_pd.h.tmp m_pd.h
 # apply all platform-specific patches
 	for patch in $(shell ls -1r $(CWD)/patches/$(OS_NAME)/*.patch); do \
 		echo "Applying $$patch"; \
@@ -824,6 +828,13 @@ unpatch_pd:
 	-rm -f -- $(pd_src)/src/configure  $(pd_src)/src/makefile
 	@echo " "
 	@echo "unpatching completed."
+
+
+patch: patch_pd set_version
+
+unpatch: unset_version unpatch_pd
+
+
 
 patch_pd_devel:
 	@echo pd_src $(pd_src)
