@@ -1,0 +1,13 @@
+--- u_main.tk	Thu Jun  9 11:54:59 2005
++++ u_main.tk	Thu Jun  9 16:17:58 2005
+@@ -172,8 +171,8 @@
+ 
+ 
+ frame .printout
+-text .printout.text -relief raised -bd 2 -font -*-courier-bold--normal--12-* \
+-    -yscrollcommand ".printout.scroll set" -width 80
++text .printout.text -relief raised -bd 2 -font {courier 12 normal} \
++    -yscrollcommand ".printout.scroll set" -width 60
+ # .printout.text insert end "\n\n\n\n\n\n\n\n\n\n"
+ scrollbar .printout.scroll -command ".printout.text yview"
+ pack .printout.scroll -side right -fill y
