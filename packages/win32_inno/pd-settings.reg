@@ -30,10 +30,10 @@ Windows Registry Editor Version 5.00
 "loadlib27"="hcs"
 "loadlib28"="jmmmp"
 "loadlib29"="ext13"
-"loadlib30"="deprecated"
-"loadlib31"="flatspace"
+"loadlib30"="hardware"
+"loadlib31"="deprecated"
+"loadlib32"="flatspace"
 ; delete any previous loadlib flags
-"loadlib32"=-
 "loadlib33"=-
 "loadlib34"=-
 "loadlib35"=-
