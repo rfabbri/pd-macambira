@@ -920,7 +920,7 @@ pd_clean
 	echo "Complete clean finished."
 
 
-distclean: clean cruft_clean
+distclean: cruft_clean
 	$(MAKE) -C $(abstractions_src) distclean
 	$(MAKE) -C $(doc_src) distclean
 	$(MAKE) -C $(extensions_src) distclean

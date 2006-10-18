@@ -126,7 +126,7 @@ $(PD_INNO_SETUP): $(PD_INNO_SETUP).in
 #
 #==============================================================================#
 
-distclean: clean
+distclean: package_clean
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) distclean
 
 
