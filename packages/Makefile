@@ -802,7 +802,7 @@ patch_pd:
 		echo "Applying $$patch"; \
 		cd $(pd_src)/src/ && patch -p0 < $$patch; \
 	done
-# apply all platform-specific patches
+# apply all platform-specific patches (is broken on MINGW/Windows)
 ifneq ($(OS_NAME),windows)
 	for patch in $(shell ls -1 $(CWD)/patches/$(OS_NAME)/*.patch); do \
 		echo "Applying $$patch"; \
@@ -815,17 +815,20 @@ endif
 
 
 unpatch_pd:
-# apply all platform-specific patches
+# apply all platform-specific patches (is broken on MINGW/Windows)
+ifneq ($(OS_NAME),windows)
 	for patch in $(shell ls -1r $(CWD)/patches/$(OS_NAME)/*.patch); do \
 		echo "Applying $$patch"; \
 		cd $(pd_src)/src/ && patch -p0 -R < $$patch; \
 	done
+endif
 # apply all platform-neutral patches
 	for patch in $(shell ls -1r $(CWD)/patches/*.patch); do \
 		echo "Applying $$patch"; \
 		cd $(pd_src)/src/ && patch -p0 -R < $$patch; \
 	done
-	-rm -f -- $(pd_src)/src/configure  $(pd_src)/src/makefile
+	-rm -f -- $(pd_src)/src/configure  $(pd_src)/src/makefile \
+		$(pd_src)/src/makefile.dependencies
 	@echo " "
 	@echo "unpatching completed."
 

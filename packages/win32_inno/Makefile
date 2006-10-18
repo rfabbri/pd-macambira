@@ -64,6 +64,7 @@ prebuilt_install:
 #==============================================================================#
 
 bin_src = /usr/local/bin
+system32 = /c/WINDOWS/system32
 # ultimately, the DLLs should be installed in %SystemRoot%\system32 by InnoSetup
 #dlldir =  $(DESTDIR)$(prefix)/
 dlldir = $(bindir)
@@ -79,6 +80,9 @@ lib_install:
 	install -p $(bin_src)/tcl84.dll  $(dlldir)/tcl84.dll
 	install -p $(bin_src)/tclpip84.dll  $(dlldir)/tclpip84.dll
 	install -p $(bin_src)/tk84.dll  $(dlldir)/tk84.dll
+# if these are there, install them
+	-install -p $(system32)/msvcp71.dll $(dlldir)/msvcp71.dll
+	-install -p $(system32)/pthreadVC.dll $(dlldir)/pthreadVC.dll
 # this is a quick hack, since the gripd.dll still looks for pthreadVC.dll
 #	(test -e $(DESTDIR)$(prefix)/gripd/pthreadVC.dll && \
 #		install -p $(DESTDIR)$(prefix)/gripd/pthreadVC.dll $(dlldir)/pthreadVC.dll) || \
@@ -130,6 +134,7 @@ package_clean:
 	-rm $(PD_INNO_SETUP)
 	-chmod -R +w $(DESTDIR)
 	-rm -rf $(DESTDIR)
+	-rm -rf Output
 
 
 clean: package_clean
