@@ -1,13 +1,12 @@
 #!/bin/sh
-
 # this script is the first attempt to have an automated updater and builder
 
-HOSTNAME=`hostname | sed 's|\([a-zA-Z0-9-]*\)\..*|\1|'`
-SYSTEM=`uname -s`
-DATE=`date +%Y-%m-%d`
-TIME=`date +%H.%M.%S`
-SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
+# the source dir where this script is
+SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
+. $SCRIPT_DIR/auto-build-common
 
+# the name of this script
+SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
 
 BUILD_DIR=.
 case $SYSTEM in 

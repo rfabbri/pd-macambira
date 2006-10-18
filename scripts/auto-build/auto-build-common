@@ -1,0 +1,10 @@
+# these are common variables for the auto-build scripts
+
+HOSTNAME=`hostname | sed 's|\([a-zA-Z0-9-]\)\..*|\1|' | sed 'y|ABCDEFGHIJKLMNOPQRSTUVWXYZ|abcdefghijklmnopqrstuvwxyz|'`
+SYSTEM=`uname -s | sed 'y|ABCDEFGHIJKLMNOPQRSTUVWXYZ|abcdefghijklmnopqrstuvwxyz|'`
+DATE=`date +%Y-%m-%d`
+TIME=`date +%H.%M.%S`
+
+# recipient of any emails set from the scripts
+RECIPIENT=pd-cvs@iem.at
+

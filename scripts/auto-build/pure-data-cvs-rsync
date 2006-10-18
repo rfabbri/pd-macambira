@@ -1,9 +1,13 @@
 #!/bin/sh
+# rsync the CVS source files from SourceForge to make a local copy
 
-SYSTEM=`uname -s`
-DATE=`date +%Y-%m-%d`
-TIME=`date +%H.%M.%S`
+# the source dir where this script is
+SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
+. $SCRIPT_DIR/auto-build-common
+
+# the name of this script
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
+
 LOGFILE=/home/pd/logs/${DATE}_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
 
 VERBOSE_FLAGS=-v
