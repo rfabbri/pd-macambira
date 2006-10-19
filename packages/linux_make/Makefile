@@ -106,17 +106,25 @@ installer_clean:
 
 #==============================================================================#
 #
-## CVS SOURCES
+## CLEAN TARGETS
 #
 #==============================================================================#
 
-distclean: clean
+distclean: installer_clean 
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) distclean
 
 
 clean: installer_clean
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
 
+package_clean: installer_clean
+
+
+#==============================================================================#
+#
+## TEST TARGETS
+#
+#==============================================================================#
 
 test_package:
 	cd /tmp && tar xjf $(DESTDIR)/$(PACKAGE_NAME).tar.bz2
