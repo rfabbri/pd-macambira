@@ -17,6 +17,7 @@
 
 #define VERSION "0.3"
 
+/* this is for when building with non-Microsoft compilers */
 #ifndef OSC_API 
 #define OSC_API
 #endif

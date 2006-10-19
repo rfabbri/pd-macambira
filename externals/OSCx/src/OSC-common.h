@@ -48,15 +48,19 @@ typedef int Boolean;
 
 #ifdef _WIN32
 	#include <stdio.h>
+	#ifdef _DEBUG
+		#define DEBUG
+	#endif
+#endif /* _WIN32 */
+
+/* only needed on Microsoft compilers */
+#ifdef _MSC_VER
 	#ifdef OSC_EXPORTS
 		#define OSC_API __declspec(dllexport)
 	#else
 		#define OSC_API __declspec(dllimport)
 	#endif
-	#ifdef _DEBUG
-		#define DEBUG
-	#endif
-#endif
+#endif /* _MSC_VER */
 
 //#define int32_t t_int
 

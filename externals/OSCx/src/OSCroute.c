@@ -53,7 +53,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 #include "OSC-common.h"
 #include "OSC-pattern-match.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 	#include <stdlib.h>
 	#include <string.h>
   #include <stdio.h>
@@ -111,6 +111,11 @@ void OSCroute_version (t_OSCroute *x);
 /* void OSCroute_assist (OSCroute *x, void *box, long msg, long arg,  */
 /* 		      char *dstString); */
 void OSCroute_allmessages(t_OSCroute *x, t_symbol *s, int argc, t_atom *argv);
+#ifdef _MSC_VER
+OSC_API void OSCroute_setup(void);
+#else
+void OSCroute_setup(void);
+#endif /* _MSC_VER */
 
 static char *NextSlashOrNull(char *p);
 static void StrCopyUntilSlash(char *target, const char *source);
@@ -125,7 +130,7 @@ static void OSCroute_free(t_OSCroute *x)
 /* initialization routine */
 
 // setup
-#ifdef WIN32
+#ifdef _MSC_VER
   OSC_API void OSCroute_setup(void) { 
 #else
 void OSCroute_setup(void) {

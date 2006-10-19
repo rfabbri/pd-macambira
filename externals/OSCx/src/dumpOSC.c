@@ -143,11 +143,11 @@ Boolean ShowBytes = FALSE;
 Boolean Silent = FALSE;
 
 /* Declarations */
-#ifndef WIN32
+#ifndef _WIN32
 static int unixinitudp(int chan);
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
   typedef unsigned __int64 osc_time_t;
 #else
   typedef unsigned long long osc_time_t;
@@ -222,7 +222,7 @@ static void dumpOSC_read(t_dumpOSC *x, int sockfd) {
   //while( (n = recvfrom(sockfd, mbuf, MAXMESG, 0, &cl_addr, &clilen)) >0) 
   //  while((
 
-	#ifdef WIN32
+	#ifdef _WIN32
 	if ((n = recvfrom(sockfd, mbuf, MAXMESG, 0, (SOCKADDR*)&x->x_server, &clilen)) >0)
 	#else
 	if ((n = recvfrom(sockfd, mbuf, MAXMESG, 0, (struct sockaddr *)&x->x_server, &clilen)) >0)
@@ -345,7 +345,7 @@ void dumpOSC_setup(void)
 }
 
 
-#ifndef WIN32
+#ifndef _WIN32
 	#define UNIXDG_PATH "/tmp/htm"
 	#define UNIXDG_TMP "/tmp/htm.XXXXXX"
 	static int unixinitudp(int chan)
@@ -370,14 +370,14 @@ void dumpOSC_setup(void)
 		fcntl(sockfd, F_SETFL, FNDELAY); 
 		return sockfd;
 	}
-#endif	// #ifndef WIN32
+#endif	// #ifndef _WIN32
 
 
 
 static int initudp(int chan)
 {
 
-#ifdef WIN32
+#ifdef _WIN32
 	struct sockaddr_in serv_addr;
 	unsigned int sockfd;
 	ULONG nonBlocking = (ULONG) TRUE;
@@ -420,15 +420,8 @@ static int initudp(int chan)
 #endif
 }
 
-
-
-
-
-
-
-
 static void closeudp(int sockfd) {
-	#ifdef WIN32
+	#ifdef _WIN32
 		closesocket(sockfd);
 	#else
 		close(sockfd);
@@ -694,12 +687,12 @@ void dumpOSC_ParsePacket(t_dumpOSC *x, char *buf, int n, ClientAddr returnAddr) 
 
 static void dumpOSC_Smessage(t_dumpOSC *x, char *address, void *v, int n, ClientAddr returnAddr) {
   char *chars = v;
-  t_atom at;
+  //t_atom at;
   //t_atom myargv[50];
 
-  int myargc = x->x_outatc;
-  t_atom* mya = x->x_outat;
-  int myi;
+  //int myargc = x->x_outatc;
+  //t_atom* mya = x->x_outat;
+  //int myi;
 
 #ifdef DEBUG
   printf("%s ", address);
@@ -741,7 +734,7 @@ static void dumpOSC_PrintTypeTaggedArgs(t_dumpOSC *x, void *v, int n) {
   
   int myargc = x->x_outatc;
   t_atom* mya = x->x_outat;
-  int myi;
+  //int myi;
 
   typeTags = v;
   
@@ -863,7 +856,7 @@ static void dumpOSC_PrintHeuristicallyTypeGuessedArgs(t_dumpOSC *x, void *v, int
 	
   int myargc= x->x_outatc;
   t_atom* mya = x->x_outat;
-  int myi;
+  //int myi;
 
 
   /* Go through the arguments 32 bits at a time */
@@ -1010,4 +1003,4 @@ void complain(char *s, ...) {
     va_end(ap);
 }
 
-#endif /* __sgi or LINUX or WIN32 */
+#endif /* __sgi or LINUX or _WIN32 */

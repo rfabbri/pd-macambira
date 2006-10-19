@@ -87,7 +87,7 @@ typedef struct
 } typedArg;
 
 
-static int exitStatus = 0;  
+//static int exitStatus = 0;  
 static int useTypeTags = 0;
 
 static char bufferForOSCbuf[SC_BUFFER_SIZE];
@@ -245,7 +245,7 @@ void sendOSC_disconnect(t_sendOSC *x)
 static void sendOSC_sendtyped(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
   char messageName[MAXPDSTRING];
-  char *token;
+  //  char *token;
   typedArg args[MAX_ARGS];
   int i;
 
@@ -417,7 +417,6 @@ typedArg ParseAtom(t_atom *a)
 int WriteMessage(OSCbuf *buf, char *messageName, int numArgs, typedArg *args)
 {
   int j, returnVal;
-  const int wmERROR = -1;
 
   returnVal = 0;
 
