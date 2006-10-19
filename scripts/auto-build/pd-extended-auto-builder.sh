@@ -10,19 +10,19 @@ SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
 
 BUILD_DIR=.
 case $SYSTEM in 
-	 Linux)
+	 linux)
 		  BUILD_DIR=linux_make
 		  echo "Configuring to use $BUILD_DIR on GNU/Linux"
 		  ;;
-	 Darwin)
+	 darwin)
 		  BUILD_DIR=darwin_app
 		  echo "Configuring to use $BUILD_DIR on Darwin/Mac OS X"
 		  ;;
-	 MINGW*)
+	 mingw*)
 		  BUILD_DIR=win32_inno
 		  echo "Configuring to use $BUILD_DIR on MinGW/Windows"
 		  ;;
-	 CYGWIN*)
+	 cygwin*)
 		  BUILD_DIR=win32_inno
 		  echo "Configuring to use $BUILD_DIR on Cygwin/Windows"
 		  ;;
@@ -64,16 +64,16 @@ upload_build ()
 
 
 case $SYSTEM in 
-	 Linux)
+	 linux)
 		  upload_build linux_make build tar.bz2
 		  ;;
-	 Darwin)
+	 darwin)
 		  upload_build darwin_app . dmg
 		  ;;
-	 MINGW*)
+	 mingw*)
 		  upload_build win32_inno Output exe
 		  ;;
-	 CYGWIN*)
+	 cygwin*)
 		  upload_build win32_inno Output exe
 		  ;;
 esac

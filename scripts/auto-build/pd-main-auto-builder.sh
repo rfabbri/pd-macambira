@@ -8,19 +8,19 @@ SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
 
 case $SYSTEM in 
-	 Linux)
+	 linux)
 		  configure_options="--enable-alsa --enable-jack"
 		  platform_name=`uname -m`
 		  ;;
-	 Darwin)
+	 darwin)
 		  configure_options=""
 		  platform_name=`uname -p`
 		  ;;
-	 MINGW*)
+	 mingw*)
 		  configure_options=""
 		  platform_name=i386
 		  ;;
-	 CYGWIN*)
+	 cygwin*)
 		  configure_options=""
 		  platform_name=i386
 		  ;;

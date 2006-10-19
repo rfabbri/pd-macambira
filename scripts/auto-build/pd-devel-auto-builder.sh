@@ -8,16 +8,16 @@ SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
 
 case $SYSTEM in 
-	 Linux)
+	 linux)
 		  echo "Configuring for GNU/Linux"
 		  ;;
-	 Darwin)
+	 darwin)
 		  echo "Configuring for Darwin/Mac OS X"
 		  ;;
-	 MINGW*)
+	 mingw*)
 		  echo "Configuring for MinGW/Windows"
 		  ;;
-	 CYGWIN*)
+	 cygwin*)
 		  echo "Configuring for Cygwin/Windows"
 		  ;;
 	 *)
