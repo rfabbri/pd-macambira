@@ -16,7 +16,11 @@ run_build_script ()
 
 	 sh /home/pd/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh >> $LOGFILE 2>&1
 
+if [ "x$SYSTEM" == "xmingw" ]; then
+	 /c/cygwin/bin/sh --login -c "rsync -a ${LOGFILE} rsync://128.238.56.50/upload/${DATE}/logs/"
+else
 	 rsync -a ${LOGFILE} rsync://128.238.56.50/upload/${DATE}/logs/
+fi
 
 # send status report if something failed
 	 completion_test=`tail -1 ${LOGFILE}`

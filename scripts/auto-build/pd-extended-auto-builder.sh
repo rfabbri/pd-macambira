@@ -58,8 +58,16 @@ upload_build ()
     
     echo "upload specs $1 $2 $3"
     echo "Uploading $archive"
-    test -e ${archive} && rsync -a ${archive} \
-		  rsync://128.238.56.50/upload/${DATE}/`ls -1 ${archive} | sed "s|.*/\(.*\)\.${archive_format}|\1-${HOSTNAME}.${archive_format}|"`  &&  echo SUCCESS
+	 upload_filename=`ls -1 ${archive} | sed "s|.*/\(.*\)\.${archive_format}|\1-${HOSTNAME}.${archive_format}|"`
+	 if [ "x$SYSTEM" == "xmingw" ]; then
+		  test -e ${archive} && /c/cygwin/bin/sh --login -c "rsync -a ${archive} \
+				rsync://128.238.56.50/upload/${DATE}/${upload_filename}"  && \
+				echo SUCCESS
+	 else
+		  test -e ${archive} && rsync -a ${archive} \
+				rsync://128.238.56.50/upload/${DATE}/${upload_filename}  && \
+				echo SUCCESS
+	 fi
 }
 
 
