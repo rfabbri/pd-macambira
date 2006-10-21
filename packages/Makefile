@@ -674,9 +674,6 @@ doc_format:
 # run script to move help-*.pd files to *-help.pd according to the standard
 	cd $(helpdir) && \
 		$(scripts_src)/convert-help-to-standard.sh
-# remove write perms to prevent people form editing the helpfiles by mistake
-	find $(pddocdir) -name '*.pd' -print0 | xargs -0 chmod a-wx
-	find $(pddocdir) -name '*.txt' -print0 | xargs -0 chmod a-wx
 
 
 
@@ -783,14 +780,14 @@ set_version:
 # change Pd's version number to reflect the extended build
 # this needs the complete_version_defines patch to work
 	cd $(pd_src)/src/ && \
-		sed 's|^\(#define PD_TEST_VERSION "\).*"|\1$(PACKAGE_VERSION)"|' m_pd.h > \
+		sed 's|^\(#define PD_TEST_VERSION "\).*"|\1$(PD-EXTENDED_VERSION)"|' m_pd.h > \
 			m_pd.h.tmp && mv m_pd.h.tmp m_pd.h
 
 unset_version:
 # change the version number back to the original 
 # this needs the complete_version_defines patch to work
 	cd $(pd_src)/src && \
-		sed 's|^\(#define PD_TEST_VERSION ".*\)$(PACKAGE_VERSION_PREFIX).*"|\1"|' \
+		sed 's|^\(#define PD_TEST_VERSION ".*\)$(PD-EXTENDED_VERSION_PREFIX).*"|\1"|' \
 			m_pd.h > m_pd.h.tmp && \
 		mv m_pd.h.tmp m_pd.h
 
@@ -855,7 +852,7 @@ patch_pd_devel:
 # change Pd's version number to reflect the extended build
 # this needs the complete_version_defines patch to work
 	cd $(pd_src)/src/ && \
-		sed 's|^\(#define PD_TEST_VERSION "\).*"|\1$(PACKAGE_VERSION)"|' m_pd.h > \
+		sed 's|^\(#define PD_TEST_VERSION "\).*"|\1$(PD-EXTENDED_VERSION)"|' m_pd.h > \
 			m_pd.h.tmp && mv m_pd.h.tmp m_pd.h
 	@echo " "
 	@echo "patching completed."
@@ -865,7 +862,7 @@ unpatch_pd_devel:
 # change the version number back to the original 
 # this needs the complete_version_defines patch to work
 	cd $(pd_src)/src && \
-		sed 's|^\(#define PD_TEST_VERSION ".*\)$(PACKAGE_VERSION)"|\1"|' \
+		sed 's|^\(#define PD_TEST_VERSION ".*\)$(PD-EXTENDED_VERSION)"|\1"|' \
 			m_pd.h > m_pd.h.tmp && \
 		mv m_pd.h.tmp m_pd.h
 # apply all platform-specific patches
@@ -929,7 +926,7 @@ distclean: cruft_clean
 
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"
-	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
+	@echo "PD-EXTENDED_VERSION: $(PD-EXTENDED_VERSION)"
 	@echo "CWD $(CWD)"
 	@echo "DESTDIR $(DESTDIR)"
 	@echo "PREFIX $(prefix)"

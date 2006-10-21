@@ -136,7 +136,7 @@ test_package:
 
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"
-	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
+	@echo "PD-EXTENDED_VERSION: $(PD-EXTENDED_VERSION)"
 	@echo "CWD $(CWD)"
 	@echo "DESTDIR $(DESTDIR)"
 	@echo "PREFIX $(prefix)"

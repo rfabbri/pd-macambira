@@ -232,29 +232,28 @@ darwin_app_externals_c++:
 
 package: dmg
 
-DMG_NAME = $(PACKAGE_NAME)
 dmg: 
 	hdiutil create -format UDRW -fs HFS+ -srcfolder "$(BUILD_BASE)" \
-		-volname $(DMG_NAME) build.dmg
+		-volname $(PACKAGE_NAME) build.dmg
 # detach one with the same name first
-	-hdiutil detach "/Volumes/$(DMG_NAME)"
+	-hdiutil detach "/Volumes/$(PACKAGE_NAME)"
 	hdiutil attach build.dmg
-	install -p $(manualsdir)/Pd/ReadMe.html "/Volumes/$(DMG_NAME)"
-	install -p -m0644 org.puredata.pd.plist "/Volumes/$(DMG_NAME)"
-	install -d "/Volumes/$(DMG_NAME)/.imagefolder"
+	install -p $(manualsdir)/Pd/ReadMe.html "/Volumes/$(PACKAGE_NAME)"
+	install -p -m0644 org.puredata.pd.plist "/Volumes/$(PACKAGE_NAME)"
+	install -d "/Volumes/$(PACKAGE_NAME)/.imagefolder"
 # background image will only show when the disk image is called "Pd-extended
 # the background image needs to be added to the .DS_Store to work
-#	install -p background.png "/Volumes/$(DMG_NAME)/.imagefolder/"
-	install -p DS_Store "/Volumes/$(DMG_NAME)/.DS_Store"
-	chmod -R a-w "/Volumes/$(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources/doc"
-	hdiutil detach `mount | grep $(DMG_NAME) | cut -d ' ' -f 1`
-	hdiutil convert -format UDZO -o "$(DMG_NAME).dmg" build.dmg
+#	install -p background.png "/Volumes/$(PACKAGE_NAME)/.imagefolder/"
+	install -p DS_Store "/Volumes/$(PACKAGE_NAME)/.DS_Store"
+	chmod -R a-w "/Volumes/$(PACKAGE_NAME)/$(PD_APP_NAME).app/Contents/Resources/doc"
+	hdiutil detach `mount | grep $(PACKAGE_NAME) | cut -d ' ' -f 1`
+	hdiutil convert -format UDZO -o "$(PACKAGE_NAME).dmg" build.dmg
 	rm -f build.dmg
 # install license
-	hdiutil unflatten "$(DMG_NAME).dmg"
+	hdiutil unflatten "$(PACKAGE_NAME).dmg"
 	/Developer/Tools/Rez /Developer/Headers/FlatCarbon/*.r SLA.r -a \
-		-o "$(DMG_NAME).dmg"
-	hdiutil flatten "$(DMG_NAME).dmg"
+		-o "$(PACKAGE_NAME).dmg"
+	hdiutil flatten "$(PACKAGE_NAME).dmg"
 
 
 
@@ -274,10 +273,11 @@ clean: package_clean
 
 
 package_clean: darwin_app_clean
+	-chmod -R u+w -- $(DESTDIR)
 	-rm -rf -- $(DESTDIR)
 	-rm Info.plist
-	-rm -f -- "$(CWD)/$(DMG_NAME)/ReadMe.html"
-	-rm -f -- "$(CWD)/$(DMG_NAME)/org.puredata.pd.plist"
+	-rm -f -- "$(CWD)/$(PACKAGE_NAME)/ReadMe.html"
+	-rm -f -- "$(CWD)/$(PACKAGE_NAME)/org.puredata.pd.plist"
 
 devel_clean: darwin_app_devel_clean
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
@@ -297,7 +297,7 @@ darwin_app_clean:
 	-rmdir  $(BUILD_BASE)/$(PD_APP_NAME).app/Contents
 	-rmdir  $(BUILD_BASE)/$(PD_APP_NAME).app
 	-rmdir  $(BUILD_BASE)
-	-rm -f -- "$(DMG_NAME).dmg"
+	-rm -f -- "$(PACKAGE_NAME).dmg"
 	-rm -f -- build.dmg
 
 
@@ -309,19 +309,19 @@ darwin_app_clean:
 
 test_package:
 	echo "Bypassing test..."
-#	echo "Mounting $(DMG_NAME)"
+#	echo "Mounting $(PACKAGE_NAME)"
 # this triggers the license prompt... hmm how to work around that...
-#	cd $(CWD) && hdiutil mount "$(DMG_NAME).dmg"
+#	cd $(CWD) && hdiutil mount "$(PACKAGE_NAME).dmg"
 # some better tests should go in here
-#	echo "Ejecting $(DMG_NAME)"
-#	cd $(CWD) && hdiutil eject `mount | grep "$(DMG_NAME)" | cut -d ' ' -f 1`
+#	echo "Ejecting $(PACKAGE_NAME)"
+#	cd $(CWD) && hdiutil eject `mount | grep "$(PACKAGE_NAME)" | cut -d ' ' -f 1`
 
 
 
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"
 	@echo "PACKAGE_NAME: $(PACKAGE_NAME)"
-	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
+	@echo "PD-EXTENDED_VERSION: $(PD-EXTENDED_VERSION)"
 	@echo "WISH: $(WISH)"
 	@echo "TCLTK: $(TCLTK)"
 	@echo "TCLTK_BUGFIX_VERSION: $(TCLTK_BUGFIX_VERSION)"

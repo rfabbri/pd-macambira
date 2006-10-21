@@ -115,7 +115,7 @@ $(PD_INNO_SETUP): $(PD_INNO_SETUP).in
 	cat "$(PD_INNO_SETUP).in" | \
 		sed 's/PACKAGE_NAME/$(PACKAGE_NAME)/g' | \
 		sed 's/PD_VERSION/$(PD_VERSION)/g' | \
-		sed 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/g' > \
+		sed 's/PD-EXTENDED_VERSION/$(PD-EXTENDED_VERSION)/g' > \
 		$(PD_INNO_SETUP)
 #	start $(PD_INNO_SETUP)
 
@@ -132,7 +132,6 @@ distclean: package_clean
 
 package_clean: 	
 	-rm $(PD_INNO_SETUP)
-	-chmod -R +w $(DESTDIR)
 	-rm -rf $(DESTDIR)
 	-rm -rf Output
 
@@ -152,7 +151,7 @@ test_package:
 
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"
-	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
+	@echo "PD-EXTENDED_VERSION: $(PD-EXTENDED_VERSION)"
 	@echo "CWD $(CWD)"
 	@echo "DESTDIR $(DESTDIR)"
 	@echo "PREFIX $(prefix)"

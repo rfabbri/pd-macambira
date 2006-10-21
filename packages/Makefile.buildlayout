@@ -161,7 +161,7 @@ PD_BUGFIX_VERSION := $(shell grep PD_BUGFIX_VERSION $(pd_src)/src/m_pd.h | \
 	sed 's|^.define *PD_BUGFIX_VERSION *\([0-9]*\).*|\1|' )
 PD_TEST_VERSION := $(shell grep PD_TEST_VERSION $(pd_src)/src/m_pd.h | \
 	sed 's|^.define *PD_TEST_VERSION *"\(.*\)".*|\1|' )
-PD_VERSION := $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
+PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
 ifneq ($(PD_TEST_VERSION),)
 	PD_VERSION := $(PD_VERSION)-$(PD_TEST_VERSION)
 endif
@@ -169,10 +169,10 @@ endif
 VERSION_DATE := $(shell date +%Y-%m-%d)
 
 # release version for this distro
-PACKAGE_VERSION_PREFIX = extended
-PACKAGE_VERSION = $(PACKAGE_VERSION_PREFIX)-$(VERSION_DATE)
-PACKAGE_NAME = Pd-$(PD_VERSION)
+PD-EXTENDED_VERSION_PREFIX = extended
+PD-EXTENDED_VERSION = $(PD-EXTENDED_VERSION_PREFIX)-$(VERSION_DATE)
 
+PACKAGE_NAME = Pd-$(PD_VERSION)
 
 
 #==============================================================================#
