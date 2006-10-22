@@ -77,7 +77,7 @@ SGIINCLUDE =  -I/usr/people/msp/pd/pd/src
 LINUXOBJ =  vexp.pd_linux_o vexp_fun.pd_linux_o vexp_if.pd_linux_o
 .SUFFIXES: .pd_linux_o
 
-LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer -fPIC -m32 \
+LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer -fPIC \
     -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch 
 
@@ -87,7 +87,7 @@ LINUXINCLUDE =  -I../../src
 	$(CC) -g $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.pd_linux_o -c $*.c
 
 expr.pd_linux: $(LINUXOBJ)
-	$(CC) -m32 -export_dynamic  -shared -o expr.pd_linux $(LINUXOBJ) -lc -lm
+	$(CC) -export_dynamic  -shared -o expr.pd_linux $(LINUXOBJ) -lc -lm
 	strip --strip-unneeded expr.pd_linux
 
 expr~.pd_linux: expr.pd_linux

@@ -1,4 +1,9 @@
 ---------------- dolist --------------------
+0.40-1:
+  http "about" broken on MSW?
+  help browser broke on Panurge
+  binbuf_read_via_canvas in x_qlist.c
+
 check bug reports on sourceforge
 double-click fix on mac?
 http://sourceforge.net/tracker/index.php?
@@ -49,8 +54,12 @@ more demonstration patches:
 vibrato using variable delay
 
 features:
+sigmund~: sort by pitch; one-shot
+add -x flag to drawnumbers....
+grab new ALSA midi code from devel
 externs able to usurp built-ins (+mem alignment for SSE)
 replace gatom_escapit with a quoting mechanism (handle '[', spaces, etc.)
+unicode in filenames???  How does this work?  (bug report about windows)
 sprout inlet for "route", "sel" if one arg
 more list functions (see x_list.c)
 poly inlet to turn stealing on/off, plus mode to handle note-with-duration

@@ -1130,7 +1130,7 @@ char *garray_vec(t_garray *x) /* get the contents */
     /* routine that checks if we're just an array of floats and if
     so returns the goods */
 
-int garray_getfloatarray(t_garray *x, int *size, t_float **vec)
+int garray_getfloatwords(t_garray *x, int *size, t_word **vec)
 {
     int yonset, type, elemsize;
     t_array *a = garray_getarray_floatonly(x, &yonset, &elemsize);
@@ -1145,8 +1145,22 @@ int garray_getfloatarray(t_garray *x, int *size, t_float **vec)
         return (0);
     }
     *size = garray_npoints(x);
-    *vec =  (float *)garray_vec(x);
+    *vec =  (t_word *)garray_vec(x);
     return (1);
+}
+    /* older, non-64-bit safe version, supplied for older externs */
+
+int garray_getfloatarray(t_garray *x, int *size, t_float **vec)
+{
+    if (sizeof(t_word) != sizeof(float))
+    {
+        static int warned;
+        if (!warned)
+            post(
+ "warning: extern using garray_getfloatarray() won't work in 64-bit version");
+        warned = 1;
+    }
+    return (garray_getfloatwords(x, size, (t_word **)vec));
 }
 
     /* set the "saveit" flag */

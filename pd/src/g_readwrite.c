@@ -258,8 +258,7 @@ static void glist_doread(t_glist *x, t_symbol *filename, t_symbol *format,
     else if (*format->s_name)
         error("qlist_read: unknown flag: %s", format->s_name);
     
-    if (binbuf_read_via_path(b, filename->s_name,
-        canvas_getdir(canvas)->s_name, cr))
+    if (binbuf_read_via_canvas(b, filename->s_name, canvas, cr))
     {
         pd_error(x, "read failed");
         binbuf_free(b);

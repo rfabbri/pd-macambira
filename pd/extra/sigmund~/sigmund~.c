@@ -770,7 +770,7 @@ static t_class *sigmund_class;
 #define NHIST 100
 
 #define MODE_STREAM 1
-#define MODE_BLOCK 2        /* uninplemented */
+#define MODE_BLOCK 2        /* unimplemented */
 #define MODE_TABLE 3
 
 #define NPOINTS_DEF 1024
@@ -1098,7 +1098,7 @@ static void sigmund_list(t_sigmund *x, t_symbol *s, int argc, t_atom *argv)
     int arraysize, totstorage, nfound, i;
     t_garray *a;
     float *arraypoints, pit;
-    
+    t_word *wordarray = 0;
     if (argc < 5)
     {
         post(
@@ -1115,9 +1115,9 @@ static void sigmund_list(t_sigmund *x, t_symbol *s, int argc, t_atom *argv)
         error("sigmund: negative onset");
         return;
     }
-    
+    arraypoints = alloca(sizeof(float)*npts);
     if (!(a = (t_garray *)pd_findbyclass(syminput, garray_class)) ||
-        !garray_getfloatarray(a, &arraysize, &arraypoints) ||
+        !garray_getfloatwords(a, &arraysize, &wordarray) ||
             arraysize < onset + npts)
     {
         error("%s: array missing or too small", syminput->s_name);
@@ -1128,7 +1128,9 @@ static void sigmund_list(t_sigmund *x, t_symbol *s, int argc, t_atom *argv)
         error("sigmund~: too few points in array");
         return;
     }
-    sigmund_doit(x, npts, arraypoints+onset, loud, srate);
+    for (i = 0; i < npts; i++)
+        arraypoints[i] = wordarray[i+onset].w_float;
+    sigmund_doit(x, npts, arraypoints, loud, srate);
 }
 
 static void sigmund_clear(t_sigmund *x)

@@ -19,7 +19,7 @@ PDNTLIB = $(PDNTLDIR)\libc.lib \
 
 .c.dll:
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
-	link /dll /export:$(CSYM)_setup $*.obj $(PDNTLIB)
+	link /nologo /dll /export:$(CSYM)_setup $*.obj $(PDNTLIB)
 
 # ----------------------- IRIX 5.x -----------------------
 
@@ -57,7 +57,7 @@ pd_linux: $(NAME).pd_linux
 
 .SUFFIXES: .pd_linux
 
-LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer -fPIC -m32 \
+LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer -fPIC \
     -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch $(CFLAGS)
 
@@ -65,7 +65,7 @@ LINUXINCLUDE =  -I../../src
 
 .c.pd_linux:
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	$(CC) -m32 -export_dynamic -shared -o $*.pd_linux $*.o -lc -lm
+	$(CC) -export_dynamic -shared -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	rm -f $*.o
 

@@ -18,7 +18,7 @@ typedef struct _tabwrite_tilde
     t_object x_obj;
     int x_phase;
     int x_nsampsintab;
-    float *x_vec;
+    t_word *x_vec;
     t_symbol *x_arrayname;
     float x_f;
 } t_tabwrite_tilde;
@@ -52,7 +52,7 @@ static t_int *tabwrite_tilde_perform(t_int *w)
     if (endphase > phase)
     {
         int nxfer = endphase - phase;
-        float *fp = x->x_vec + phase;
+        t_word *wp = x->x_vec + phase;
         if (nxfer > n) nxfer = n;
         phase += nxfer;
         while (nxfer--)
@@ -60,7 +60,7 @@ static t_int *tabwrite_tilde_perform(t_int *w)
             float f = *in++;
             if (PD_BIGORSMALL(f))
                 f = 0;
-            *fp++ = f;
+            (wp++)->w_float = f;
         }
         if (phase >= endphase)
         {
@@ -85,7 +85,7 @@ void tabwrite_tilde_set(t_tabwrite_tilde *x, t_symbol *s)
             x->x_arrayname->s_name);
         x->x_vec = 0;
     }
-    else if (!garray_getfloatarray(a, &x->x_nsampsintab, &x->x_vec))
+    else if (!garray_getfloatwords(a, &x->x_nsampsintab, &x->x_vec))
     {
         pd_error(x, "%s: bad template for tabwrite~", x->x_arrayname->s_name);
         x->x_vec = 0;
@@ -146,7 +146,7 @@ typedef struct _tabplay_tilde
     int x_phase;
     int x_nsampsintab;
     int x_limit;
-    float *x_vec;
+    t_word *x_vec;
     t_symbol *x_arrayname;
     t_clock *x_clock;
 } t_tabplay_tilde;
@@ -168,7 +168,8 @@ static void *tabplay_tilde_new(t_symbol *s)
 static t_int *tabplay_tilde_perform(t_int *w)
 {
     t_tabplay_tilde *x = (t_tabplay_tilde *)(w[1]);
-    t_float *out = (t_float *)(w[2]), *fp;
+    t_float *out = (t_float *)(w[2]);
+    t_word *wp;
     int n = (int)(w[3]), phase = x->x_phase,
         endphase = (x->x_nsampsintab < x->x_limit ?
             x->x_nsampsintab : x->x_limit), nxfer, n3;
@@ -176,13 +177,13 @@ static t_int *tabplay_tilde_perform(t_int *w)
         goto zero;
     
     nxfer = endphase - phase;
-    fp = x->x_vec + phase;
+    wp = x->x_vec + phase;
     if (nxfer > n)
         nxfer = n;
     n3 = n - nxfer;
     phase += nxfer;
     while (nxfer--)
-        *out++ = *fp++;
+        *out++ = (wp++)->w_float;
     if (phase >= endphase)
     {
         clock_delay(x->x_clock, 0);
@@ -209,7 +210,7 @@ void tabplay_tilde_set(t_tabplay_tilde *x, t_symbol *s)
             x->x_arrayname->s_name);
         x->x_vec = 0;
     }
-    else if (!garray_getfloatarray(a, &x->x_nsampsintab, &x->x_vec))
+    else if (!garray_getfloatwords(a, &x->x_nsampsintab, &x->x_vec))
     {
         pd_error(x, "%s: bad template for tabplay~", x->x_arrayname->s_name);
         x->x_vec = 0;
@@ -273,7 +274,7 @@ typedef struct _tabread_tilde
 {
     t_object x_obj;
     int x_npoints;
-    float *x_vec;
+    t_word *x_vec;
     t_symbol *x_arrayname;
     float x_f;
 } t_tabread_tilde;
@@ -295,7 +296,7 @@ static t_int *tabread_tilde_perform(t_int *w)
     t_float *out = (t_float *)(w[3]);
     int n = (int)(w[4]);    
     int maxindex;
-    float *buf = x->x_vec, *fp;
+    t_word *buf = x->x_vec;
     int i;
     
     maxindex = x->x_npoints - 1;
@@ -308,7 +309,7 @@ static t_int *tabread_tilde_perform(t_int *w)
             index = 0;
         else if (index > maxindex)
             index = maxindex;
-        *out++ = buf[index];
+        *out++ = buf[index].w_float;
     }
     return (w+5);
  zero:
@@ -328,7 +329,7 @@ void tabread_tilde_set(t_tabread_tilde *x, t_symbol *s)
             pd_error(x, "tabread~: %s: no such array", x->x_arrayname->s_name);
         x->x_vec = 0;
     }
-    else if (!garray_getfloatarray(a, &x->x_npoints, &x->x_vec))
+    else if (!garray_getfloatwords(a, &x->x_npoints, &x->x_vec))
     {
         pd_error(x, "%s: bad template for tabread~", x->x_arrayname->s_name);
         x->x_vec = 0;
@@ -369,7 +370,7 @@ typedef struct _tabread4_tilde
 {
     t_object x_obj;
     int x_npoints;
-    float *x_vec;
+    t_word *x_vec;
     t_symbol *x_arrayname;
     float x_f;
 } t_tabread4_tilde;
@@ -391,7 +392,7 @@ static t_int *tabread4_tilde_perform(t_int *w)
     t_float *out = (t_float *)(w[3]);
     int n = (int)(w[4]);    
     int maxindex;
-    float *buf = x->x_vec, *fp;
+    t_word *buf = x->x_vec, *wp;
     int i;
     
     maxindex = x->x_npoints - 3;
@@ -425,11 +426,11 @@ static t_int *tabread4_tilde_perform(t_int *w)
         else if (index > maxindex)
             index = maxindex, frac = 1;
         else frac = findex - index;
-        fp = buf + index;
-        a = fp[-1];
-        b = fp[0];
-        c = fp[1];
-        d = fp[2];
+        wp = buf + index;
+        a = wp[-1].w_float;
+        b = wp[0].w_float;
+        c = wp[1].w_float;
+        d = wp[2].w_float;
         /* if (!i && !(count++ & 1023))
             post("fp = %lx,  shit = %lx,  b = %f",  fp, buf->b_shit,  b); */
         cminusb = c-b;
@@ -457,7 +458,7 @@ void tabread4_tilde_set(t_tabread4_tilde *x, t_symbol *s)
             pd_error(x, "tabread4~: %s: no such array", x->x_arrayname->s_name);
         x->x_vec = 0;
     }
-    else if (!garray_getfloatarray(a, &x->x_npoints, &x->x_vec))
+    else if (!garray_getfloatwords(a, &x->x_npoints, &x->x_vec))
     {
         pd_error(x, "%s: bad template for tabread4~", x->x_arrayname->s_name);
         x->x_vec = 0;
@@ -563,7 +564,7 @@ typedef struct _tabosc4_tilde
     t_object x_obj;
     float x_fnpoints;
     float x_finvnpoints;
-    float *x_vec;
+    t_word *x_vec;
     t_symbol *x_arrayname;
     float x_f;
     double x_phase;
@@ -595,7 +596,7 @@ static t_int *tabosc4_tilde_perform(t_int *w)
     int mask = fnpoints - 1;
     float conv = fnpoints * x->x_conv;
     int maxindex;
-    float *tab = x->x_vec, *addr;
+    t_word *tab = x->x_vec, *addr;
     int i;
     double dphase = fnpoints * x->x_phase + UNITBIT32;
 
@@ -612,10 +613,10 @@ static t_int *tabosc4_tilde_perform(t_int *w)
         addr = tab + (tf.tf_i[HIOFFSET] & mask);
         tf.tf_i[HIOFFSET] = normhipart;
         frac = tf.tf_d - UNITBIT32;
-        a = addr[0];
-        b = addr[1];
-        c = addr[2];
-        d = addr[3];
+        a = addr[0].w_float;
+        b = addr[1].w_float;
+        c = addr[2].w_float;
+        d = addr[3].w_float;
         cminusb = c-b;
         *out++ = b + frac * (
             cminusb - 0.1666667f * (1.-frac) * (
@@ -649,7 +650,7 @@ void tabosc4_tilde_set(t_tabosc4_tilde *x, t_symbol *s)
             pd_error(x, "tabosc4~: %s: no such array", x->x_arrayname->s_name);
         x->x_vec = 0;
     }
-    else if (!garray_getfloatarray(a, &pointsinarray, &x->x_vec))
+    else if (!garray_getfloatwords(a, &pointsinarray, &x->x_vec))
     {
         pd_error(x, "%s: bad template for tabosc4~", x->x_arrayname->s_name);
         x->x_vec = 0;
@@ -704,7 +705,7 @@ static t_class *tabsend_class;
 typedef struct _tabsend
 {
     t_object x_obj;
-    float *x_vec;
+    t_word *x_vec;
     int x_graphperiod;
     int x_graphcount;
     t_symbol *x_arrayname;
@@ -727,7 +728,7 @@ static t_int *tabsend_perform(t_int *w)
     t_tabsend *x = (t_tabsend *)(w[1]);
     t_float *in = (t_float *)(w[2]);
     int n = w[3];
-    t_float *dest = x->x_vec;
+    t_word *dest = x->x_vec;
     int i = x->x_graphcount;
     if (!x->x_vec) goto bad;
 
@@ -736,7 +737,7 @@ static t_int *tabsend_perform(t_int *w)
         float f = *in++;
         if (PD_BIGORSMALL(f))
             f = 0;
-         *dest++ = f;
+         (dest++)->w_float = f;
     }
     if (!i--)
     {
@@ -761,7 +762,7 @@ static void tabsend_dsp(t_tabsend *x, t_signal **sp)
         if (*x->x_arrayname->s_name)
             pd_error(x, "tabsend~: %s: no such array", x->x_arrayname->s_name);
     }
-    else if (!garray_getfloatarray(a, &vecsize, &x->x_vec))
+    else if (!garray_getfloatwords(a, &vecsize, &x->x_vec))
         pd_error(x, "%s: bad template for tabsend~", x->x_arrayname->s_name);
     else
     {
@@ -791,7 +792,7 @@ static t_class *tabreceive_class;
 typedef struct _tabreceive
 {
     t_object x_obj;
-    float *x_vec;
+    t_word *x_vec;
     int x_vecsize;
     t_symbol *x_arrayname;
 } t_tabreceive;
@@ -801,12 +802,12 @@ static t_int *tabreceive_perform(t_int *w)
     t_tabreceive *x = (t_tabreceive *)(w[1]);
     t_float *out = (t_float *)(w[2]);
     int n = w[3];
-    t_float *from = x->x_vec;
+    t_word *from = x->x_vec;
     if (from)
     {
         int vecsize = x->x_vecsize;
         while (vecsize--)
-            *out++ = *from++;
+            *out++ = (from++)->w_float;
         vecsize = n - x->x_vecsize;
         while (vecsize--)
             *out++ = 0;
@@ -823,7 +824,7 @@ static void tabreceive_dsp(t_tabreceive *x, t_signal **sp)
         if (*x->x_arrayname->s_name)
             pd_error(x, "tabsend~: %s: no such array", x->x_arrayname->s_name);
     }
-    else if (!garray_getfloatarray(a, &x->x_vecsize, &x->x_vec))
+    else if (!garray_getfloatwords(a, &x->x_vecsize, &x->x_vec))
         pd_error(x, "%s: bad template for tabreceive~", x->x_arrayname->s_name);
     else 
     {
@@ -865,18 +866,18 @@ static void tabread_float(t_tabread *x, t_float f)
 {
     t_garray *a;
     int npoints;
-    t_float *vec;
+    t_word *vec;
 
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))
         pd_error(x, "%s: no such array", x->x_arrayname->s_name);
-    else if (!garray_getfloatarray(a, &npoints, &vec))
+    else if (!garray_getfloatwords(a, &npoints, &vec))
         pd_error(x, "%s: bad template for tabread", x->x_arrayname->s_name);
     else
     {
         int n = f;
         if (n < 0) n = 0;
         else if (n >= npoints) n = npoints - 1;
-        outlet_float(x->x_obj.ob_outlet, (npoints ? vec[n] : 0));
+        outlet_float(x->x_obj.ob_outlet, (npoints ? vec[n].w_float : 0));
     }
 }
 
@@ -916,30 +917,31 @@ static void tabread4_float(t_tabread4 *x, t_float f)
 {
     t_garray *a;
     int npoints;
-    t_float *vec;
+    t_word *vec;
 
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))
         pd_error(x, "%s: no such array", x->x_arrayname->s_name);
-    else if (!garray_getfloatarray(a, &npoints, &vec))
+    else if (!garray_getfloatwords(a, &npoints, &vec))
         pd_error(x, "%s: bad template for tabread4", x->x_arrayname->s_name);
     else if (npoints < 4)
         outlet_float(x->x_obj.ob_outlet, 0);
     else if (f <= 1)
-        outlet_float(x->x_obj.ob_outlet, vec[1]);
+        outlet_float(x->x_obj.ob_outlet, vec[1].w_float);
     else if (f >= npoints - 2)
-        outlet_float(x->x_obj.ob_outlet, vec[npoints - 2]);
+        outlet_float(x->x_obj.ob_outlet, vec[npoints - 2].w_float);
     else
     {
         int n = f;
-        float a, b, c, d, cminusb, frac, *fp;
+        float a, b, c, d, cminusb, frac;
+        t_word *wp;
         if (n >= npoints - 2)
             n = npoints - 3;
-        fp = vec + n;
+        wp = vec + n;
         frac = f - n;
-        a = fp[-1];
-        b = fp[0];
-        c = fp[1];
-        d = fp[2];
+        a = wp[-1].w_float;
+        b = wp[0].w_float;
+        c = wp[1].w_float;
+        d = wp[2].w_float;
         cminusb = c-b;
         outlet_float(x->x_obj.ob_outlet, b + frac * (
             cminusb - 0.1666667f * (1.-frac) * (
@@ -984,11 +986,11 @@ static void tabwrite_float(t_tabwrite *x, t_float f)
 {
     int i, vecsize;
     t_garray *a;
-    t_float *vec;
+    t_word *vec;
 
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))
         pd_error(x, "%s: no such array", x->x_arrayname->s_name);
-    else if (!garray_getfloatarray(a, &vecsize, &vec))
+    else if (!garray_getfloatwords(a, &vecsize, &vec))
         pd_error(x, "%s: bad template for tabwrite", x->x_arrayname->s_name);
     else
     {
@@ -997,7 +999,7 @@ static void tabwrite_float(t_tabwrite *x, t_float f)
             n = 0;
         else if (n >= vecsize)
             n = vecsize-1;
-        vec[n] = f;
+        vec[n].w_float = f;
         garray_redraw(a);
     }
 }

@@ -110,15 +110,14 @@ $(BIN_DIR)/pdreceive: u_pdreceive.c $(BIN_DIR)
 	$(CC) $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdreceive u_pdreceive.c
 
 $(PDEXEC): $(OBJ) $(BIN_DIR)
-	cd ../obj;  $(CC) $(LDFLAGS) $(DBG_CFLAGS) -o $(PDEXEC) $(OBJ) \
-	$(LIB)
-
+	cd ../obj;  $(CC) $(LDFLAGS) $(DBG_CFLAGS) -o $(PDEXEC) $(OBJ) $(LIB)
+        
 $(BIN_DIR)/pd-gui: $(GOBJ) $(GSRC)
-	cd ../obj; $(CC) $(INCLUDE) -o $(BIN_DIR)/$(GUINAME) $(GOBJ) \
-	$(GLIB)
+	cd ../obj; $(CC) $(INCLUDE) -o $(BIN_DIR)/$(GUINAME) $(GOBJ) $(GLIB)
 
-$(BIN_DIR)/pd.tk: u_main.tk
+$(BIN_DIR)/pd.tk: u_main.tk $(BIN_DIR)
 	cp u_main.tk $(BIN_DIR)/pd.tk
+	touch -r makefile.dependencies $(BIN_DIR)
 
 #this is for Max OSX only...
 $(BIN_DIR)/libPdTcl.dylib: $(GOBJ) $(GSRC)

@@ -999,7 +999,7 @@ static void graph_motion(void *z, t_floatarg dx, t_floatarg dy)
     t_garray *a = (t_garray *)(x->gl_list);
     int oldx = 0.5 + glist_pixelstox(x, graph_lastxpix);
     int newx = 0.5 + glist_pixelstox(x, newxpix);
-    t_float *vec;
+    t_word *vec;
     int nelem, i;
     float oldy = glist_pixelstoy(x, graph_lastypix);
     float newy = glist_pixelstoy(x, newypix);
@@ -1008,7 +1008,7 @@ static void graph_motion(void *z, t_floatarg dx, t_floatarg dy)
         /* verify that the array is OK */
     if (!a || pd_class((t_pd *)a) != garray_class)
         return;
-    if (!garray_getfloatarray(a, &nelem, &vec))
+    if (!garray_getfloatwords(a, &nelem, &vec))
         return;
     if (oldx < 0) oldx = 0;
     if (oldx >= nelem)
@@ -1019,16 +1019,16 @@ static void graph_motion(void *z, t_floatarg dx, t_floatarg dy)
     if (oldx < newx - 1)
     {
         for (i = oldx + 1; i <= newx; i++)
-            vec[i] = newy + (oldy - newy) *
+            vec[i].w_float = newy + (oldy - newy) *
                 ((float)(newx - i))/(float)(newx - oldx);
     }
     else if (oldx > newx + 1)
     {
         for (i = oldx - 1; i >= newx; i--)
-            vec[i] = newy + (oldy - newy) *
+            vec[i].w_float = newy + (oldy - newy) *
                 ((float)(newx - i))/(float)(newx - oldx);
     }
-    else vec[newx] = newy;
+    else vec[newx].w_float = newy;
     garray_redraw(a);
 }
 

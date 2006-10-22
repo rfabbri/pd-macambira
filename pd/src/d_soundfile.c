@@ -422,7 +422,7 @@ int open_soundfile_via_canvas(t_canvas *canvas, const char *filename, int header
 
 static void soundfile_xferin(int sfchannels, int nvecs, float **vecs,
     long itemsread, unsigned char *buf, int nitems, int bytespersamp,
-    int bigendian)
+    int bigendian, int spread)
 {
     int i, j;
     unsigned char *sp, *sp2;
@@ -435,14 +435,14 @@ static void soundfile_xferin(int sfchannels, int nvecs, float **vecs,
         {
             if (bigendian)
             {
-                for (j = 0, sp2 = sp, fp=vecs[i] + itemsread;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                for (j = 0, sp2 = sp, fp=vecs[i] + spread * itemsread;
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                         *fp = SCALE * ((sp2[0] << 24) | (sp2[1] << 16));
             }
             else
             {
-                for (j = 0, sp2 = sp, fp=vecs[i] + itemsread;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                for (j = 0, sp2 = sp, fp=vecs[i] + spread * itemsread;
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                         *fp = SCALE * ((sp2[1] << 24) | (sp2[0] << 16));
             }
         }
@@ -450,15 +450,15 @@ static void soundfile_xferin(int sfchannels, int nvecs, float **vecs,
         {
             if (bigendian)
             {
-                for (j = 0, sp2 = sp, fp=vecs[i] + itemsread;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                for (j = 0, sp2 = sp, fp=vecs[i] + spread * itemsread;
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                         *fp = SCALE * ((sp2[0] << 24) | (sp2[1] << 16)
                             | (sp2[2] << 8));
             }
             else
             {
-                for (j = 0, sp2 = sp, fp=vecs[i] + itemsread;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                for (j = 0, sp2 = sp, fp=vecs[i] + spread * itemsread;
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                         *fp = SCALE * ((sp2[2] << 24) | (sp2[1] << 16)
                             | (sp2[0] << 8));
             }
@@ -467,15 +467,15 @@ static void soundfile_xferin(int sfchannels, int nvecs, float **vecs,
         {
             if (bigendian)
             {
-                for (j = 0, sp2 = sp, fp=vecs[i] + itemsread;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                for (j = 0, sp2 = sp, fp=vecs[i] + spread * itemsread;
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                         *(long *)fp = ((sp2[0] << 24) | (sp2[1] << 16)
                             | (sp2[2] << 8) | sp2[3]);
             }
             else
             {
-                for (j = 0, sp2 = sp, fp=vecs[i] + itemsread;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                for (j = 0, sp2 = sp, fp=vecs[i] + spread * itemsread;
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                         *(long *)fp = ((sp2[3] << 24) | (sp2[2] << 16)
                             | (sp2[1] << 8) | sp2[0]);
             }
@@ -824,7 +824,7 @@ baddonewrite:
 
 static void soundfile_xferout(int nchannels, float **vecs,
     unsigned char *buf, int nitems, long onset, int bytespersamp,
-    int bigendian, float normalfactor)
+    int bigendian, float normalfactor, int spread)
 {
     int i, j;
     unsigned char *sp, *sp2;
@@ -839,7 +839,7 @@ static void soundfile_xferout(int nchannels, float **vecs,
             if (bigendian)
             {
                 for (j = 0, sp2 = sp, fp = vecs[i] + onset;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                 {
                     int xx = 32768. + (*fp * ff);
                     xx -= 32768;
@@ -854,7 +854,7 @@ static void soundfile_xferout(int nchannels, float **vecs,
             else
             {
                 for (j = 0, sp2 = sp, fp=vecs[i] + onset;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                 {
                     int xx = 32768. + (*fp * ff);
                     xx -= 32768;
@@ -873,7 +873,7 @@ static void soundfile_xferout(int nchannels, float **vecs,
             if (bigendian)
             {
                 for (j = 0, sp2 = sp, fp=vecs[i] + onset;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                 {
                     int xx = 8388608. + (*fp * ff);
                     xx -= 8388608;
@@ -889,7 +889,7 @@ static void soundfile_xferout(int nchannels, float **vecs,
             else
             {
                 for (j = 0, sp2 = sp, fp=vecs[i] + onset;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                 {
                     int xx = 8388608. + (*fp * ff);
                     xx -= 8388608;
@@ -908,7 +908,7 @@ static void soundfile_xferout(int nchannels, float **vecs,
             if (bigendian)
             {
                 for (j = 0, sp2 = sp, fp=vecs[i] + onset;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                 {
                     float f2 = *fp * normalfactor;
                     xx = *(long *)&f2;
@@ -919,7 +919,7 @@ static void soundfile_xferout(int nchannels, float **vecs,
             else
             {
                 for (j = 0, sp2 = sp, fp=vecs[i] + onset;
-                    j < nitems; j++, sp2 += bytesperframe, fp++)
+                    j < nitems; j++, sp2 += bytesperframe, fp += spread)
                 {
                     float f2 = *fp * normalfactor;
                     xx = *(long *)&f2;
@@ -975,7 +975,7 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
     int fd = -1;
     char endianness, *filename;
     t_garray *garrays[MAXSFCHANS];
-    t_float *vecs[MAXSFCHANS];
+    t_word *vecs[MAXSFCHANS];
     char sampbuf[SAMPBUFSIZE];
     int bufframes, nitems;
     FILE *fp;
@@ -1051,7 +1051,8 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
             pd_error(x, "%s: no such table", argv[i].a_w.w_symbol->s_name);
             goto done;
         }
-        else if (!garray_getfloatarray(garrays[i], &vecsize, &vecs[i]))
+        else if (!garray_getfloatwords(garrays[i], &vecsize, 
+                &vecs[i]))
             error("%s: bad template for tabwrite",
                 argv[i].a_w.w_symbol->s_name);
         if (finalsize && finalsize != vecsize && !resize)
@@ -1101,7 +1102,8 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
             garray_resize(garrays[i], finalsize);
                 /* for sanity's sake let's clear the save-in-patch flag here */
             garray_setsaveit(garrays[i], 0);
-            garray_getfloatarray(garrays[i], &vecsize, &vecs[i]);
+            garray_getfloatwords(garrays[i], &vecsize, 
+                &vecs[i]);
                 /* if the resize failed, garray_resize reported the error */
             if (vecsize != framesinfile)
             {
@@ -1122,8 +1124,9 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
         thisread = (thisread > bufframes ? bufframes : thisread);
         nitems = fread(sampbuf, channels * bytespersamp, thisread, fp);
         if (nitems <= 0) break;
-        soundfile_xferin(channels, argc, vecs, itemsread,
-            (unsigned char *)sampbuf, nitems, bytespersamp, bigendian);
+        soundfile_xferin(channels, argc, (float **)vecs, itemsread,
+            (unsigned char *)sampbuf, nitems, bytespersamp, bigendian,
+                sizeof(t_word)/sizeof(float));
         itemsread += nitems;
     }
         /* zero out remaining elements of vectors */
@@ -1131,18 +1134,18 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
     for (i = 0; i < argc; i++)
     {
         int nzero, vecsize;
-        garray_getfloatarray(garrays[i], &vecsize, &vecs[i]);
+        garray_getfloatwords(garrays[i], &vecsize, &vecs[i]);
         for (j = itemsread; j < vecsize; j++)
-            vecs[i][j] = 0;
+            vecs[i][j].w_float = 0;
     }
         /* zero out vectors in excess of number of channels */
     for (i = channels; i < argc; i++)
     {
         int vecsize;
-        float *foo;
-        garray_getfloatarray(garrays[i], &vecsize, &foo);
+        t_word *foo;
+        garray_getfloatwords(garrays[i], &vecsize, &foo);
         for (j = 0; j < vecsize; j++)
-            foo[j] = 0;
+            foo[j].w_float = 0;
     }
         /* do all graphics updates */
     for (i = 0; i < argc; i++)
@@ -1171,7 +1174,7 @@ long soundfiler_dowrite(void *obj, t_canvas *canvas,
     long onset, nframes, itemsleft,
         maxsize = DEFMAXSIZE, itemswritten = 0;
     t_garray *garrays[MAXSFCHANS];
-    t_float *vecs[MAXSFCHANS];
+    t_word *vecs[MAXSFCHANS];
     char sampbuf[SAMPBUFSIZE];
     int bufframes, nitems;
     int fd = -1;
@@ -1198,7 +1201,7 @@ long soundfiler_dowrite(void *obj, t_canvas *canvas,
             pd_error(obj, "%s: no such table", argv[i].a_w.w_symbol->s_name);
             goto fail;
         }
-        else if (!garray_getfloatarray(garrays[i], &vecsize, &vecs[i]))
+        else if (!garray_getfloatwords(garrays[i], &vecsize, &vecs[i]))
             error("%s: bad template for tabwrite",
                 argv[i].a_w.w_symbol->s_name);
         if (nframes > vecsize - onset)
@@ -1206,10 +1209,10 @@ long soundfiler_dowrite(void *obj, t_canvas *canvas,
         
         for (j = 0; j < vecsize; j++)
         {
-            if (vecs[i][j] > biggest)
-                biggest = vecs[i][j];
-            else if (-vecs[i][j] > biggest)
-                biggest = -vecs[i][j];
+            if (vecs[i][j].w_float > biggest)
+                biggest = vecs[i][j].w_float;
+            else if (-vecs[i][j].w_float > biggest)
+                biggest = -vecs[i][j].w_float;
         }
     }
     if (nframes <= 0)
@@ -1244,8 +1247,9 @@ long soundfiler_dowrite(void *obj, t_canvas *canvas,
     {
         int thiswrite = nframes - itemswritten, nitems, nbytes;
         thiswrite = (thiswrite > bufframes ? bufframes : thiswrite);
-        soundfile_xferout(argc, vecs, (unsigned char *)sampbuf, thiswrite,
-            onset, bytespersamp, bigendian, normfactor);
+        soundfile_xferout(argc, (t_float **)vecs, (unsigned char *)sampbuf,
+            thiswrite, onset, bytespersamp, bigendian, normfactor,
+                 sizeof(t_word)/sizeof(float));
         nbytes = write(fd, sampbuf, nchannels * bytespersamp * thiswrite);
         if (nbytes < nchannels * bytespersamp * thiswrite)
         {
@@ -1789,7 +1793,7 @@ static t_int *readsf_perform(t_int *w)
             {
                 soundfile_xferin(sfchannels, noutlets, x->x_outvec, 0,
                     (unsigned char *)(x->x_buf + x->x_fifotail), xfersize,
-                        bytespersample, bigendian);
+                        bytespersample, bigendian, 1);
                 vecsize -= xfersize;
             }
                 /* then zero out the (rest of the) output */
@@ -1804,7 +1808,7 @@ static t_int *readsf_perform(t_int *w)
 
         soundfile_xferin(sfchannels, noutlets, x->x_outvec, 0,
             (unsigned char *)(x->x_buf + x->x_fifotail), vecsize,
-                bytespersample, bigendian);
+                bytespersample, bigendian, 1);
         
         x->x_fifotail += wantbytes;
         if (x->x_fifotail >= x->x_fifosize)
@@ -2264,7 +2268,7 @@ static t_int *writesf_perform(t_int *w)
 
         soundfile_xferout(sfchannels, x->x_outvec,
             (unsigned char *)(x->x_buf + x->x_fifohead), vecsize, 0,
-                bytespersample, bigendian, 1.);
+                bytespersample, bigendian, 1., 1);
         
         x->x_fifohead += wantbytes;
         if (x->x_fifohead >= x->x_fifosize)

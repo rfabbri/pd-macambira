@@ -262,7 +262,7 @@ ends up in the same buffer as dirresult.  Exception:
 if the 'name' starts with a slash or a letter, colon, and slash in MSW,
 there is no search and instead we just try to open the file literally.  */
 
-/* see also canvas_openfile() which, in addition, searches down the
+/* see also canvas_open() which, in addition, searches down the
 canvas-specific path. */
 
 static int do_open_via_path(const char *dir, const char *name,
