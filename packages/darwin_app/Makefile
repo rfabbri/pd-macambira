@@ -166,6 +166,10 @@ rez_install:
 darwin_app_embed_libs:
 	./embed-MacOSX-dependencies.sh $(PD_APP_CONTENTS)
 
+# shortcut to install the readme on non-Extended builds
+readme_install:
+	make -C $(packages_src) $(DEST_PATHS) readme_install
+
 
 #------------------------------------------------------------------------------#
 darwin_app_core: darwin_app_wrapper

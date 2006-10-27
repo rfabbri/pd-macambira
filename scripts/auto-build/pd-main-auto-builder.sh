@@ -35,20 +35,36 @@ cd `echo $0 | sed 's|\(.*\)/.*$|\1|'`/../..
 auto_build_root_dir=`pwd`
 echo "root: $auto_build_root_dir" 
 
-package_name="/tmp/pd-${DATE}-${SYSTEM}-${HOSTNAME}-${platform_name}.tar.bz2"
 
 # let rsync handle the cleanup with --delete
 rsync -av --delete rsync://128.238.56.50/distros/pd-main/ \
 	 ${auto_build_root_dir}/
 
-
-cd ${auto_build_root_dir}/pd/src && \
-	 autoconf && \
-	 ./configure $configure_options && \
-	 make  && \
-	 cd ../../ && \
-	 tar cjf $package_name pd && \
-	 rsync -a ${package_name} rsync://128.238.56.50/upload/${DATE}/ && \
-	 echo SUCCESS
-rm -f -- $package_name
+case $SYSTEM in 
+	 darwin)
+		  archive_format=dmg
+		  archive=`ls -1 ${auto_build_root_dir}/packages/darwin_app/build/Pd*.dmg`
+		  upload_filename=`ls -1 ${archive} | sed "s|.*/\(.*\)\.${archive_format}|\1-${HOSTNAME}.${archive_format}|"`
+		  cd ${auto_build_root_dir}/package/darwin_app/
+		  make package_clean
+		  make darwin_app_core
+		  make readme_install
+		  make package
+		  make test_locations
+		  rsync -a ${archive} \
+				rsync://128.238.56.50/upload/${DATE}/${upload_filename} && \
+				echo SUCCESS
+		  ;;
+	 *)
+		  package_name="/tmp/pd-${DATE}-${SYSTEM}-${HOSTNAME}-${platform_name}.tar.bz2"
+		  cd ${auto_build_root_dir}/pd/src && \
+				autoconf && \
+				./configure $configure_options && \
+				make  && \
+				cd ../../ && \
+				tar cjf $package_name pd && \
+				rsync -a ${package_name} rsync://128.238.56.50/upload/${DATE}/ && \
+				echo SUCCESS
+		  ;;
+esac
 
