@@ -273,8 +273,8 @@ clean: package_clean
 
 
 package_clean: darwin_app_clean
-	-chmod -R u+w -- $(DESTDIR)
-	-rm -rf -- $(DESTDIR)
+	-chmod -R u+w -- $(BUILD_BASE)
+	-rm -rf -- $(BUILD_BASE)
 	-rm Info.plist
 	-rm -f -- "$(CWD)/$(PACKAGE_NAME)/ReadMe.html"
 	-rm -f -- "$(CWD)/$(PACKAGE_NAME)/org.puredata.pd.plist"

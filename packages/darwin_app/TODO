@@ -1,4 +1,6 @@
 
+- try building against ActiveTcl 8.4.13 and 8.5
+
 - create background image for .dmg
 
 - create /Applications link in .dmg
