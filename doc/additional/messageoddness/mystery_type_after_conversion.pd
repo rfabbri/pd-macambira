@@ -1,5 +1,5 @@
-#N canvas 478 110 616 391 10;
-#X msg 65 89 1234;
+#N canvas 478 110 624 399 10;
+#X msg 65 79 1234;
 #X obj 20 285 print;
 #X obj 66 245 list trim;
 #X floatatom 113 309 5 0 0 0 - - -;
@@ -21,7 +21,6 @@ that is just a numeric atom \, but does not work as a float message.
 ;
 #X text 184 93 <-- this generates a symbolic atom with numeric data
 \, and outputs a symbol message.;
-#X msg 106 89 1.23;
 #X obj 65 112 makefilename %d;
 #X floatatom 143 176 5 0 0 0 - - -;
 #X symbolatom 191 175 10 0 0 0 - - -;
@@ -36,7 +35,20 @@ that is just a numeric atom \, but does not work as a float message.
 -1 -1;
 #X obj 287 196 bng 15 250 50 0 empty empty undefined -18 23 1 12 -262144
 -1 -1;
-#X connect 0 0 14 0;
+#X obj 7 231 atoi;
+#X floatatom 9 251 5 0 0 0 - - -;
+#X obj 324 330 select 1234;
+#X obj 324 349 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 396 349 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 426 350 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 491 349 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 426 330 route 1234;
+#X obj 4 154 print RAW;
+#X connect 0 0 13 0;
 #X connect 2 0 6 0;
 #X connect 2 0 1 0;
 #X connect 3 0 7 0;
@@ -46,13 +58,21 @@ that is just a numeric atom \, but does not work as a float message.
 #X connect 6 2 4 0;
 #X connect 6 3 9 0;
 #X connect 6 4 10 0;
-#X connect 13 0 14 0;
-#X connect 14 0 2 0;
+#X connect 6 4 24 0;
+#X connect 6 4 29 0;
+#X connect 13 0 2 0;
+#X connect 13 0 17 0;
+#X connect 13 0 22 0;
+#X connect 13 0 30 0;
 #X connect 14 0 18 0;
 #X connect 15 0 19 0;
-#X connect 16 0 20 0;
-#X connect 18 0 17 0;
-#X connect 18 1 15 0;
-#X connect 18 2 16 0;
-#X connect 18 3 21 0;
-#X connect 18 4 22 0;
+#X connect 17 0 16 0;
+#X connect 17 1 14 0;
+#X connect 17 2 15 0;
+#X connect 17 3 20 0;
+#X connect 17 4 21 0;
+#X connect 22 0 23 0;
+#X connect 24 0 25 0;
+#X connect 24 1 26 0;
+#X connect 29 0 27 0;
+#X connect 29 1 28 0;
