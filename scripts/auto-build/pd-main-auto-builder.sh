@@ -45,7 +45,7 @@ case $SYSTEM in
 		  archive_format=dmg
 		  archive=`ls -1 ${auto_build_root_dir}/packages/darwin_app/build/Pd*.dmg`
 		  upload_filename=`ls -1 ${archive} | sed "s|.*/\(.*\)\.${archive_format}|\1-${HOSTNAME}.${archive_format}|"`
-		  cd ${auto_build_root_dir}/package/darwin_app/
+		  cd ${auto_build_root_dir}/packages/darwin_app/
 		  make package_clean
 		  make darwin_app_core
 		  make readme_install
