@@ -1,0 +1,104 @@
+#N canvas 209 108 665 618 10;
+#X obj 39 467 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 2900 1;
+#X obj 56 467 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 2612 1;
+#X obj 73 467 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 2324 1;
+#X obj 90 467 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 2036 1;
+#X obj 107 467 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 1747 1;
+#X obj 124 467 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 1457 1;
+#X obj 141 467 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 1167 1;
+#X obj 158 467 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 876 1;
+#X obj 175 467 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 584 1;
+#X obj 192 467 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 292 1;
+#X obj 39 106 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 2900 1;
+#X obj 72 106 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 0 1;
+#X obj 39 436 route 0 1 2 3 4 5 6 7 8 9 10;
+#X obj 209 467 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 0 1;
+#X obj 39 306 pmstring 9 0.01 0.01;
+#X text 198 307 arguments : number of moving masses \, rigidity \,
+damping;
+#X text 210 19 simple Physical model of "string";
+#X text 164 40 usefull to create different correlated output with few
+input.;
+#X text 111 113 inlet : 1 \, 2 : position of 1st mass and last mass
+;
+#X text 180 136 3 : forces apply to masses;
+#X text 180 158 4 : rigidity;
+#X text 180 178 5 : damping;
+#X msg 106 279 3 1;
+#X text 137 281 mass 3 \, force = 1;
+#X obj 306 468 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 6122 1;
+#X obj 323 468 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 6400 1;
+#X obj 340 468 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 6400 1;
+#X obj 357 468 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 6399 1;
+#X obj 374 468 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 6399 1;
+#X obj 391 468 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 6399 1;
+#X obj 408 468 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 6399 1;
+#X obj 425 468 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 6399 1;
+#X obj 442 468 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 6400 1;
+#X obj 459 468 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 6400 1;
+#X obj 306 437 route 0 1 2 3 4 5 6 7 8 9 10;
+#X obj 476 468 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 6682 1;
+#X obj 39 245 resample 5;
+#X obj 306 342 unpack f f;
+#X obj 306 412 pack f f;
+#X obj 371 367 * 100;
+#X obj 371 391 + 64;
+#X text 99 361 2 : forces apply to masses;
+#X text 51 344 outlet 1 : position of masses;
+#X connect 10 0 36 0;
+#X connect 11 0 14 1;
+#X connect 12 0 0 0;
+#X connect 12 1 1 0;
+#X connect 12 2 2 0;
+#X connect 12 3 3 0;
+#X connect 12 4 4 0;
+#X connect 12 5 5 0;
+#X connect 12 6 6 0;
+#X connect 12 7 7 0;
+#X connect 12 8 8 0;
+#X connect 12 9 9 0;
+#X connect 12 10 13 0;
+#X connect 14 0 12 0;
+#X connect 14 1 37 0;
+#X connect 22 0 14 2;
+#X connect 34 0 24 0;
+#X connect 34 1 25 0;
+#X connect 34 2 26 0;
+#X connect 34 3 27 0;
+#X connect 34 4 28 0;
+#X connect 34 5 29 0;
+#X connect 34 6 30 0;
+#X connect 34 7 31 0;
+#X connect 34 8 32 0;
+#X connect 34 9 33 0;
+#X connect 34 10 35 0;
+#X connect 36 0 14 0;
+#X connect 37 0 38 0;
+#X connect 37 1 39 0;
+#X connect 38 0 34 0;
+#X connect 39 0 40 0;
+#X connect 40 0 38 1;

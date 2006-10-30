@@ -33,7 +33,7 @@ fixed \, in this case forces applied on them automatically \, by links
 -1;
 #X obj 476 318 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array rigidity1 4 float 1;
 #A 0 -1 0 1 2;
 #X array zero 4 float 1;
@@ -41,7 +41,7 @@ fixed \, in this case forces applied on them automatically \, by links
 #X coords 0 3 3 -3 200 150 1;
 #X restore 163 345 graph;
 #X text 221 498 L0;
-#N canvas 163 176 956 727 figure 0;
+#N canvas 127 141 956 727 figure 0;
 #X obj 182 108 loadbang;
 #X msg 191 180 \; rigidity1 resize 1 \; rigidity1 resize 4 \; rigidity1
 bounds 0 3 3 -3 \; rigidity1 0 -1 0 1 2 \; rigidity1 ylabel -0.5 \;
@@ -56,7 +56,6 @@ rigidity1 xlabel -3.5 \; rigidity1 xticks 0 1 1 \; rigidity1 yticks
 #X obj 343 517 * -1;
 #X obj 343 538 sqrt;
 #X obj 343 559 * -1;
-#X obj 375 429 counter 0 50;
 #X obj 481 479 - 20;
 #X obj 453 662 f;
 #X obj 453 632 t b f;
@@ -69,13 +68,10 @@ rigidity1 xlabel -3.5 \; rigidity1 xticks 0 1 1 \; rigidity1 yticks
 #X obj 480 564 t f f;
 #X obj 453 683 tabwrite rigidity4;
 #X obj 255 350 t b b;
-#X obj 374 404 until;
 #X obj 620 552 f;
 #X obj 620 522 t b f;
-#X obj 678 376 until;
 #X obj 620 623 tabwrite rigidity2;
 #X msg 763 574 0;
-#X obj 679 401 counter 0 100;
 #X obj 679 437 - 50;
 #X obj 751 491 moses 40;
 #X obj 681 510 moses -40;
@@ -86,8 +82,20 @@ rigidity1 xlabel -3.5 \; rigidity1 xticks 0 1 1 \; rigidity1 yticks
 rigidity2 yticks 0 5 5 \; rigidity3 resize 51 \; rigidity3 xticks 0
 1 5 \; rigidity3 yticks 0 1 5 \; rigidity4 resize 51 \; rigidity4 xticks
 0 1 5 \; rigidity4 yticks 0 100 5;
+#X msg 405 333 0;
+#X obj 405 361 f;
+#X obj 405 390 moses 50.5;
+#X obj 407 418 t f f;
+#X obj 408 446 + 1;
+#X msg 598 314 0;
+#X obj 598 342 f;
+#X obj 600 399 t f f;
+#X obj 601 427 + 1;
+#X obj 598 370 moses 100.5;
+#X obj 267 322 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
 #X connect 0 0 1 0;
-#X connect 0 0 23 0;
+#X connect 0 0 22 0;
 #X connect 2 0 5 1;
 #X connect 4 0 7 0;
 #X connect 5 0 3 0;
@@ -98,56 +106,63 @@ rigidity2 yticks 0 5 5 \; rigidity3 resize 51 \; rigidity3 xticks 0
 #X connect 8 0 9 0;
 #X connect 9 0 10 0;
 #X connect 10 0 5 1;
-#X connect 11 0 4 0;
-#X connect 11 0 6 0;
-#X connect 11 0 12 0;
 #X connect 11 0 14 0;
-#X connect 11 1 24 1;
-#X connect 12 0 15 0;
-#X connect 13 0 22 0;
-#X connect 14 0 13 0;
-#X connect 14 1 22 1;
-#X connect 15 0 16 0;
-#X connect 15 1 20 0;
-#X connect 16 0 21 0;
-#X connect 17 0 13 1;
-#X connect 18 0 13 1;
+#X connect 12 0 21 0;
+#X connect 13 0 12 0;
+#X connect 13 1 21 1;
+#X connect 14 0 15 0;
+#X connect 14 1 19 0;
+#X connect 15 0 20 0;
+#X connect 16 0 12 1;
+#X connect 17 0 12 1;
+#X connect 18 0 16 0;
 #X connect 19 0 17 0;
+#X connect 19 1 17 1;
 #X connect 20 0 18 0;
 #X connect 20 1 18 1;
-#X connect 21 0 19 0;
-#X connect 21 1 19 1;
-#X connect 23 0 24 0;
-#X connect 23 1 37 0;
-#X connect 23 1 27 0;
-#X connect 24 0 11 0;
-#X connect 25 0 34 0;
-#X connect 26 0 25 0;
-#X connect 26 1 28 1;
-#X connect 27 0 30 0;
-#X connect 29 0 25 1;
-#X connect 30 0 26 0;
-#X connect 30 0 31 0;
-#X connect 30 1 27 1;
-#X connect 31 0 35 0;
-#X connect 32 0 25 1;
-#X connect 32 1 29 0;
-#X connect 33 0 29 0;
-#X connect 33 1 25 1;
-#X connect 34 0 28 0;
+#X connect 22 0 34 0;
+#X connect 22 1 33 0;
+#X connect 22 1 39 0;
+#X connect 23 0 30 0;
+#X connect 24 0 23 0;
+#X connect 24 1 25 1;
+#X connect 26 0 23 1;
+#X connect 27 0 31 0;
+#X connect 28 0 23 1;
+#X connect 28 1 26 0;
+#X connect 29 0 26 0;
+#X connect 29 1 23 1;
+#X connect 30 0 25 0;
+#X connect 31 0 32 0;
+#X connect 31 1 28 0;
+#X connect 32 0 29 0;
+#X connect 32 1 26 0;
+#X connect 34 0 35 0;
 #X connect 35 0 36 0;
-#X connect 35 1 32 0;
-#X connect 36 0 33 0;
-#X connect 36 1 29 0;
+#X connect 36 0 37 0;
+#X connect 37 0 38 0;
+#X connect 37 1 4 0;
+#X connect 37 1 6 0;
+#X connect 37 1 13 0;
+#X connect 37 1 11 0;
+#X connect 38 0 35 0;
+#X connect 39 0 40 0;
+#X connect 40 0 43 0;
+#X connect 41 0 42 0;
+#X connect 41 1 27 0;
+#X connect 41 1 24 0;
+#X connect 42 0 40 0;
+#X connect 43 0 41 0;
+#X connect 44 0 22 0;
 #X restore 439 721 pd figure;
 #X text 167 322 Rigidity;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array rigidity2 101 float 1;
-#A 0 0 0 0 0 0 0 0 0 0 0 0 -60 -58.5 -57 -55.5 -54 -52.5 -51 -49.5
--48 -46.5 -45 -43.5 -42 -40.5 -39 -37.5 -36 -34.5 -33 -31.5 -30 -28.5
--27 -25.5 -24 -22.5 -21 -19.5 -18 -16.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0 0 0 15 16.5 18 19.5 21 22.5 24 25.5 27 28.5 30 31.5 33 34.5
-36 37.5 39 40.5 42 43.5 45 46.5 48 49.5 51 52.5 54 55.5 57 58.5 0 0
+#A 0 0 0 0 0 0 0 0 0 0 0 -60 -58.5 -57 -55.5 -54 -52.5 -51 -49.5 -48
+-46.5 -45 -43.5 -42 -40.5 -39 -37.5 -36 -34.5 -33 -31.5 -30 -28.5 -27
+-25.5 -24 -22.5 -21 -19.5 -18 -16.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 15 16.5 18 19.5 21 22.5 24 25.5 27 28.5 30 31.5 33 34.5 36
+37.5 39 40.5 42 43.5 45 46.5 48 49.5 51 52.5 54 55.5 57 58.5 0 0 0
 0 0 0 0 0 0 0 0;
 #X array zero 101 float 1;
 #A 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -160,7 +175,7 @@ rigidity2 yticks 0 5 5 \; rigidity3 resize 51 \; rigidity3 xticks 0
 #X text 583 318 Rigidity with Lmin and Lmax;
 #X text 686 496 Lmin;
 #X text 748 496 Lmax;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array rigidity3 51 float 1;
 #A 0 -4.47214 -4.3589 -4.24264 -4.12311 -4 -3.87298 -3.74166 -3.60555
 -3.4641 -3.31662 -3.16228 -3 -2.82843 -2.64575 -2.44949 -2.23607 -2
@@ -175,12 +190,11 @@ rigidity2 yticks 0 5 5 \; rigidity3 resize 51 \; rigidity3 xticks 0
 #X restore 162 547 graph;
 #X text 235 700 L0;
 #X text 167 525 Rigidity with power = 1/2;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array rigidity4 51 float 1;
-#A 0 -400 -361 -324 -289 -256 -225 -196 -169 -144 -121 -100 -81 -64
+#A 0 0 -400 -361 -324 -289 -256 -225 -196 -169 -144 -121 -100 -81 -64
 -49 -36 -25 -16 -9 -4 -1 0 1 4 9 16 25 36 49 64 81 100 121 144 169
-196 225 256 289 324 361 400 441 484 529 576 625 676 729 784 841 900
-;
+196 225 256 289 324 361 400 441 484 529 576 625 676 729 784 841;
 #X array zero 51 float 1;
 #A 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
@@ -320,10 +334,10 @@ state based on previous instant.;
 #X text 62 459 \$5 : damping;
 #X text 10 28 Creation messages are used to define the structure of
 the model. Messages create links and masses or destroy them.;
-#X msg 30 362 link \$1 \$2 \$3 \$4 \$5 ($6 \$7 \$8);
-#X text 59 477 ($6) : Power of the rigidity distance;
-#X text 59 496 ($7) : minimum lenght of link;
-#X text 59 513 ($8) : maximum lenght of link;
+#X msg 30 362 link \$1 \$2 \$3 \$4 \$5 (\$6 \$7 \$8);
+#X text 59 477 (\$6) : Power of the rigidity distance;
+#X text 59 496 (\$7) : minimum lenght of link;
+#X text 59 513 (\$8) : maximum lenght of link;
 #X obj 461 3 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 482 75 cnv 15 450 15 empty empty empty 20 12 0 14 -158509 -66577
@@ -338,9 +352,9 @@ the model. Messages create links and masses or destroy them.;
 #X text 519 233 \$3 : creation No/Id of mass2;
 #X text 519 268 \$5 : damping;
 #X text 799 169 Add tangential link(s);
-#X text 516 306 ($8) : Power of the rigidity distance;
-#X text 516 325 ($9) : minimum lenght of link;
-#X text 516 342 ($10) : maximum lenght of link;
+#X text 516 306 (\$8) : Power of the rigidity distance;
+#X text 516 325 (\$9) : minimum lenght of link;
+#X text 516 342 (\$10) : maximum lenght of link;
 #X text 520 401 \$1 : Id (symbol);
 #X text 520 454 \$4 : rigidity;
 #X text 520 401 \$1 : Id (symbol);
@@ -348,15 +362,15 @@ the model. Messages create links and masses or destroy them.;
 #X text 520 419 \$2 : creation No/Id of mass1;
 #X text 520 437 \$3 : creation No/Id of mass2;
 #X text 520 472 \$5 : damping;
-#X text 517 510 ($8) : Power of the rigidity distance;
-#X text 517 529 ($9) : minimum lenght of link;
-#X text 517 546 ($10) : maximum lenght of link;
+#X text 517 510 (\$8) : Power of the rigidity distance;
+#X text 517 529 (\$9) : minimum lenght of link;
+#X text 517 546 (\$10) : maximum lenght of link;
 #X text 485 75 Oriented links :;
 #X text 801 368 Add normal link(s);
 #X msg 32 167 mass \$1 \$2 \$3 \$4 \$5 \$6;
-#X msg 489 168 tLink \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8 ($9 \$10 \$11)
+#X msg 489 168 tLink \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8 (\$9 \$10 \$11)
 ;
-#X msg 491 368 nLink \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8 ($9 \$10 \$11)
+#X msg 491 368 nLink \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8 (\$9 \$10 \$11)
 ;
 #X text 519 491 \$6 \, \$7 \, \$8 : normal vector;
 #X text 518 287 \$6 \, \$7 \, \$8 : tangential vector;
@@ -464,7 +478,7 @@ internal parameters of links and masses.;
 #X text 140 355 \$1 : Attribute type ( massesPos / massesSpeeds / massesForces
 / linksPos );
 #X text 140 330 Get specific attribute on specific element;
-#X msg 20 328 get \$1 ($2);
+#X msg 20 328 get \$1 (\$2);
 #X text 7 290 Specific :;
 #X text 140 425 The get message return the asked attribute preceded
 by an identifier and the creation No of the element. The identifier
@@ -478,7 +492,7 @@ of his internal parameters. They can be output by lists for positions
 and forces of masses.;
 #X text 171 256 Output all forces applied on masses in a list on outlet
 No 1;
-#X text 140 392 ($2) : - If not defined all the attributes are send
+#X text 140 392 (\$2) : - If not defined all the attributes are send
 for all the elements. - Ids or/and creations No;
 #X text 174 520 [get massesPos( -----> [massesPos 0 x0 y0 z0(;
 #X text 335 534 [massesPos 2 x2 y2 z2(;
