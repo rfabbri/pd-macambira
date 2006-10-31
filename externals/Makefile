@@ -2015,7 +2015,7 @@ zexy_install: zexy
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(ZEXY_NAME) \
 		--author "IOhannes m zmoelnig <zmoelnig@iem.kug.ac.at>" \
 		--license "GNU GPL" \
-		--description "GUI and streaming objects" \
+		--description "swiss army knife for pd" \
 		--version "$(ZEXY_VERSION)"
 	install -p $(ZEXY_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(ZEXY_NAME)
 # the below doesn't work for some reason, probably because of some kind of
