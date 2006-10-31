@@ -1,7 +1,7 @@
 all: ..\..\lib\iem_t3_lib.dll
 
 VIS_CPP_PATH = "C:\Programme\Microsoft Visual Studio\Vc98"
-PD_INST_PATH = "C:\Programme\pd-0.37-3"
+PD_INST_PATH = "C:\Programme\pd-0.39-2"
 PD_WIN_INCLUDE_PATH = /I. /I$(PD_INST_PATH)\src /I$(VIS_CPP_PATH)\include
 PD_WIN_C_FLAGS = /nologo /W3 /WX /DMSW /DNT /DPD /DWIN32 /DWINDOWS /Ox -DPA_LITTLE_ENDIAN
 PD_WIN_L_FLAGS = /nologo
