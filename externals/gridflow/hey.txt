@@ -1,0 +1,4 @@
+if you want GridFlow, get it from GridFlow.ca !
+
+cvs -d :pserver:anonymous@cvs.gridflow.ca:/home/cvs/gridflow login
+cvs -d :pserver:anonymous@cvs.gridflow.ca:/home/cvs/gridflow checkout .
