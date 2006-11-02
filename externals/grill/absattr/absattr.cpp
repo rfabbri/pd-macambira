@@ -54,7 +54,8 @@ public:
         Loadbangs::iterator it = loadbangs.find(parent);
         if(it != loadbangs.end()) {
             Objects &o = it->second.obj;
-            for(Objects::iterator oit = o.begin(); oit != o.end(); ++oit) {
+			Objects::iterator oit;
+            for(oit = o.begin(); oit != o.end(); ++oit) {
                 if(*oit == this) {
                     // found
                     o.erase(oit);
@@ -149,11 +150,11 @@ protected:
     void BangAttr(int ix)
     {
         if(ix == 0)
-            ToOutList(ix,args);
+            ToSysList(ix,args);
 
         for(AttrMap::const_iterator it = attrs.begin(); it != attrs.end(); ++it) {
             const AtomList &lst = it->second;
-            ToOutAnything(1+ix,it->first,lst.Count(),lst.Atoms());
+            ToSysAnything(1+ix,it->first,lst.Count(),lst.Atoms());
         }
     }
 
@@ -166,7 +167,7 @@ protected:
         for(int i = 0; it != attrs.end(); ++it,++i)
             SetSymbol(lst[i],it->first);
 
-        ToOutAnything(1+ix,sym_attributes,lst.Count(),lst.Atoms());
+        ToSysAnything(1+ix,sym_attributes,lst.Count(),lst.Atoms());
     }
 
     void OutAttr(int ix,const t_symbol *s)
@@ -174,7 +175,7 @@ protected:
         AttrMap::const_iterator it = attrs.find(s);
         if(it != attrs.end()) {
             const AtomList &lst = it->second;
-            ToOutAnything(1+ix,s,lst.Count(),lst.Atoms());
+            ToSysAnything(1+ix,s,lst.Count(),lst.Atoms());
         }
         else
             post("%s - attribute %s not found",thisName(),GetString(s));
@@ -251,11 +252,11 @@ private:
         sym_attributes = MakeSymbol("attributes");
         sym_loadbang = MakeSymbol("loadbang");
 
-        FLEXT_CADDBANG(cl,0,m_bang);
+        FLEXT_CADDMETHOD(cl,0,m_bang);
         FLEXT_CADDMETHOD_(cl,0,"get",m_get);
         FLEXT_CADDMETHOD_(cl,0,"getattributes",m_dump);
         FLEXT_CADDMETHOD_(cl,0,"set",m_set);
-        FLEXT_CADDBANG(cl,1,m_bangx);
+        FLEXT_CADDMETHOD(cl,1,m_bangx);
         FLEXT_CADDMETHOD_(cl,1,"get",m_getx);
         FLEXT_CADDMETHOD_(cl,1,"getattributes",m_dumpx);
         FLEXT_CADDMETHOD_(cl,1,"set",m_set);
