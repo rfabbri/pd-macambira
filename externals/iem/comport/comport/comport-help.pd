@@ -1,4 +1,4 @@
-#N canvas 349 113 882 646 10;
+#N canvas 95 38 746 619 10;
 #X obj 18 415 comport 1 9600;
 #X msg 13 189 66;
 #X msg 7 147 64;
@@ -17,7 +17,7 @@
 #X text 392 86 extra stopbit 1=on \, 0=off;
 #X text 363 60 databits 5 \, 6 \, 7 \, 8;
 #X obj 43 394 r comctl;
-#X obj 199 417 s comctl;
+#X obj 199 447 s comctl;
 #X text 394 138 use handshake xon/off 1=on 0=off;
 #X text 392 166 cts/rts hardwarehandshake 1=on 0=off;
 #X msg 318 214 pollintervall 1;
@@ -25,8 +25,8 @@
 #X msg 317 246 close;
 #X msg 317 272 open 1;
 #X text 356 246 Close Serial port;
-#X msg 458 385 devicename /dev/ttyS1;
-#X text 458 402 Danger !!! you can open every file in your system and
+#X msg 313 415 devicename /dev/ttyS1;
+#X text 313 432 Danger !!! you can open every file in your system and
 maybe if suid is root damage the system.;
 #X text 4 -9 (C) 1998-2005 IEM Winfried Ritsch GPL (see LICENSE.txt)
 ;
@@ -35,7 +35,7 @@ maybe if suid is root damage the system.;
 #X floatatom 183 76 5 0 0 0 - - -;
 #X text 60 35 you can send bytes directly (0-255):;
 #X text 360 272 Open serial port by number;
-#X text 611 385 open the serial port by name;
+#X text 473 416 open the serial port by name;
 #X msg 313 353 dtr \$1;
 #X obj 293 353 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
@@ -50,14 +50,12 @@ maybe if suid is root damage the system.;
 1;
 #X text 377 197 set poll interval for read in ms;
 #X msg 123 191 info;
-#X floatatom 111 469 7 0 0 1 baud - -;
-#X floatatom 237 517 4 0 0 3 parity - -;
-#X floatatom 279 517 4 0 0 2 stop - -;
-#X floatatom 322 517 4 0 0 3 data - -;
-#X obj 491 469 print;
-#X obj 111 440 route baud dsr cts parity stop data rtscts xonxoff port
-;
-#X floatatom 448 466 4 0 0 0 port - -;
+#X floatatom 111 499 7 0 0 1 baud - -;
+#X floatatom 237 547 4 0 0 3 parity - -;
+#X floatatom 279 547 4 0 0 2 stop - -;
+#X floatatom 322 547 4 0 0 3 data - -;
+#X obj 526 498 print;
+#X floatatom 448 496 4 0 0 0 port - -;
 #X msg 136 291 devices;
 #X obj 141 74 % 255;
 #X floatatom 149 95 5 0 0 0 - - -;
@@ -69,18 +67,18 @@ maybe if suid is root damage the system.;
 #X floatatom 58 119 5 0 0 0 ascii - -;
 #X text 10 76 terminal:;
 #X msg 152 222 open 0;
-#X obj 364 484 tgl 15 0 empty empty rts/cts -10 -6 0 8 -262144 -1 -1
-0 1;
-#X obj 406 484 tgl 15 0 empty empty xon/xoff -10 20 0 8 -262144 -1
+#X obj 364 514 tgl 15 0 empty empty rts/cts -10 20 1 11 -262144 -1
 -1 0 1;
-#X text 87 516 serial packet format:;
-#X text 277 482 handshaking:;
-#X text 3 548 flow control inputs:;
-#X obj 153 549 tgl 15 0 empty empty dsr 0 22 0 8 -262144 -1 -1 0 1
+#X obj 406 514 tgl 15 0 empty empty xon/xoff -14 20 1 11 -262144 -1
+-1 0 1;
+#X text 87 546 serial packet format:;
+#X text 277 512 handshaking:;
+#X text 3 571 flow control inputs:;
+#X obj 153 572 tgl 15 0 empty empty dsr 0 20 1 11 -262144 -1 -1 0 1
 ;
-#X obj 195 549 tgl 15 0 empty empty cts 0 20 0 8 -262144 -1 -1 0 1
+#X obj 195 572 tgl 15 0 empty empty cts 0 20 1 11 -262144 -1 -1 0 1
 ;
-#N canvas 513 0 735 499 bauds 0;
+#N canvas 513 22 735 499 bauds 0;
 #X msg 229 314 baud 57600;
 #X msg 229 358 baud 230400;
 #X msg 229 336 baud 115200;
@@ -152,7 +150,11 @@ maybe if suid is root damage the system.;
 1;
 #X text 117 11 comport: a serial port interface;
 #X msg 102 118 13;
-#X connect 0 1 50 0;
+#X obj 111 470 route baud dsr cts parity stop data rtscts xonxoff port
+open;
+#X obj 484 499 tgl 15 0 empty empty open -6 20 1 11 -262144 -1 -1 0
+1;
+#X connect 0 1 76 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
 #X connect 5 0 0 0;
@@ -167,7 +169,7 @@ maybe if suid is root damage the system.;
 #X connect 24 0 18 0;
 #X connect 26 0 18 0;
 #X connect 29 0 30 0;
-#X connect 29 0 53 0;
+#X connect 29 0 52 0;
 #X connect 34 0 18 0;
 #X connect 35 0 34 0;
 #X connect 36 0 37 0;
@@ -176,25 +178,26 @@ maybe if suid is root damage the system.;
 #X connect 41 0 18 0;
 #X connect 42 0 41 0;
 #X connect 44 0 0 0;
-#X connect 50 0 45 0;
-#X connect 50 1 68 0;
-#X connect 50 2 69 0;
-#X connect 50 3 46 0;
-#X connect 50 4 47 0;
-#X connect 50 5 48 0;
-#X connect 50 6 63 0;
-#X connect 50 7 64 0;
-#X connect 50 8 51 0;
-#X connect 50 9 49 0;
+#X connect 51 0 0 0;
 #X connect 52 0 0 0;
-#X connect 53 0 0 0;
-#X connect 53 0 54 0;
-#X connect 58 0 59 0;
-#X connect 59 1 60 0;
-#X connect 59 1 0 0;
-#X connect 62 0 0 0;
-#X connect 71 0 18 0;
-#X connect 72 0 71 0;
-#X connect 73 0 18 0;
-#X connect 74 0 73 0;
-#X connect 76 0 0 0;
+#X connect 52 0 53 0;
+#X connect 57 0 58 0;
+#X connect 58 1 59 0;
+#X connect 58 1 0 0;
+#X connect 61 0 0 0;
+#X connect 70 0 18 0;
+#X connect 71 0 70 0;
+#X connect 72 0 18 0;
+#X connect 73 0 72 0;
+#X connect 75 0 0 0;
+#X connect 76 0 45 0;
+#X connect 76 1 67 0;
+#X connect 76 2 68 0;
+#X connect 76 3 46 0;
+#X connect 76 4 47 0;
+#X connect 76 5 48 0;
+#X connect 76 6 62 0;
+#X connect 76 7 63 0;
+#X connect 76 8 50 0;
+#X connect 76 9 77 0;
+#X connect 76 10 49 0;

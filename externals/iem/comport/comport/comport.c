@@ -1415,6 +1415,14 @@ static void comport_output_xonxoff(t_comport *x)
     comport_output_status(x, gensym("xonxoff"), x->xonxoff);
 }
 
+static void comport_output_open_status(t_comport *x)
+{
+    if(x->comhandle == INVALID_HANDLE_VALUE)
+		comport_output_status(x, gensym("open"), 0);
+	else
+		comport_output_status(x, gensym("open"), 1);
+}
+
 static void comport_devices(t_comport *x)
 {
 	comport_output_print(x);
@@ -1422,6 +1430,7 @@ static void comport_devices(t_comport *x)
 
 static void comport_info(t_comport *x)
 {
+	comport_output_open_status(x);
     comport_output_port_status(x);
     comport_output_baud_rate(x);
     comport_output_dsr_status(x);
