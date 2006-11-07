@@ -5,10 +5,7 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
+
 
 /* ------------------------ exp_inc ---------------------------- */
 /* ------- exponetial/linear-incremental-bang-counter ---------- */
@@ -19,12 +16,12 @@ static t_class *exp_inc_class;
 typedef struct _exp_inc
 {
   t_object x_obj;
-  float    x_initialval;
-  float    x_currentval;
-  float    x_mulfactor;
-  float    x_addincrement;
-  float    x_min;
-  float    x_max;
+  t_float  x_initialval;
+  t_float  x_currentval;
+  t_float  x_mulfactor;
+  t_float  x_addincrement;
+  t_float  x_min;
+  t_float  x_max;
 } t_exp_inc;
 
 static void exp_inc_bang(t_exp_inc *x)
@@ -48,7 +45,7 @@ static void exp_inc_reset(t_exp_inc *x)
 
 static void exp_inc_float(t_exp_inc *x, t_floatarg f)
 {
-  x->x_initialval = (float)f;
+  x->x_initialval = (t_float)f;
   x->x_currentval = x->x_initialval;
   if(x->x_currentval < x->x_min)
     x->x_currentval = x->x_min;
@@ -58,24 +55,24 @@ static void exp_inc_float(t_exp_inc *x, t_floatarg f)
 
 static void exp_inc_ft1(t_exp_inc *x, t_floatarg f)
 {
-  x->x_mulfactor = 1.0 + 0.01*(float)f;
+  x->x_mulfactor = 1.0 + 0.01*(t_float)f;
 }
 
 static void exp_inc_ft2(t_exp_inc *x, t_floatarg f)
 {
-  x->x_addincrement = (float)f;
+  x->x_addincrement = (t_float)f;
 }
 
 static void exp_inc_ft3(t_exp_inc *x, t_floatarg f)
 {
-  x->x_min = (float)f;
+  x->x_min = (t_float)f;
   if(x->x_currentval < x->x_min)
     x->x_currentval = x->x_min;
 }
 
 static void exp_inc_ft4(t_exp_inc *x, t_floatarg f)
 {
-  x->x_max = (float)f;
+  x->x_max = (t_float)f;
   if(x->x_currentval > x->x_max)
     x->x_currentval = x->x_max;
 }

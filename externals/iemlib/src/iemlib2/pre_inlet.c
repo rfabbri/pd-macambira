@@ -3,17 +3,9 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
+
 
 /* ------------------------ pre_inlet ---------------------------- */
 /* --------- any incoming message produce additionally a --------- */
@@ -38,7 +30,7 @@ static void pre_inlet_bang(t_pre_inlet *x)
   outlet_bang(x->x_obj.ob_outlet);
 }
 
-static void pre_inlet_float(t_pre_inlet *x, t_float f)
+static void pre_inlet_float(t_pre_inlet *x, t_floatarg f)
 {
   outlet_anything(x->x_obj.ob_outlet, x->x_sym, 1, &x->x_at);
   outlet_float(x->x_obj.ob_outlet, f);

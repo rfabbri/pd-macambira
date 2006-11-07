@@ -3,16 +3,9 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdio.h>
-#include <string.h>
 
 
 /* ------------------------ transf_fader ----------------------- */
@@ -24,7 +17,7 @@ typedef struct _transf_fader
   t_object  x_obj;
   int       x_size;
   int       x_message;
-  float     *x_array;
+  t_float     *x_array;
 } t_transf_fader;
 
 static t_class *transf_fader_class;
@@ -38,12 +31,12 @@ static void transf_fader_pairs(t_transf_fader *x, t_symbol *s, int argc, t_atom 
     int i_prev=0;
     int first=1;
     int i_delta;
-    float val_delta;
-    float delta;
-    float val_prev=0.0f;
-    float val=0.0f;
-    float *vec=x->x_array;
-    float fad_in, fad_out;
+    t_float val_delta;
+    t_float delta;
+    t_float val_prev=0.0f;
+    t_float val=0.0f;
+    t_float *vec=x->x_array;
+    t_float fad_in, fad_out;
 
     for(j=0; j<n; j++)
     {
@@ -84,10 +77,10 @@ static void transf_fader_pairs(t_transf_fader *x, t_symbol *s, int argc, t_atom 
           val_delta = val - val_prev;
           if(i_delta > 1)
           {
-            delta = val_delta / (float)i_delta;
+            delta = val_delta / (t_float)i_delta;
             for(k=i_prev+1; k<i; k++)
             {
-              vec[k] = val_prev + delta*(float)(k - i_prev);
+              vec[k] = val_prev + delta*(t_float)(k - i_prev);
             }
           }
           i_prev = i;
@@ -105,9 +98,9 @@ static void transf_fader_pairs(t_transf_fader *x, t_symbol *s, int argc, t_atom 
 
 static void transf_fader_float(t_transf_fader *x, t_floatarg fad_in)
 {
-  float fad_out;
-  float *vec=x->x_array;
-  float fract;
+  t_float fad_out;
+  t_float *vec=x->x_array;
+  t_float fract;
   int i;
 
   while(fad_in < 0.0f)
@@ -116,7 +109,7 @@ static void transf_fader_float(t_transf_fader *x, t_floatarg fad_in)
     fad_in = 999.0f;
 
   i = (int)fad_in;
-  fract = fad_in - (float)i;
+  fract = fad_in - (t_float)i;
   fad_out = vec[i] + fract*(vec[i+1] - vec[i]);
   if(fad_out > -123455.0f)
     outlet_float(x->x_obj.ob_outlet, fad_out);
@@ -124,7 +117,7 @@ static void transf_fader_float(t_transf_fader *x, t_floatarg fad_in)
 
 static void transf_fader_free(t_transf_fader *x)
 {
-  freebytes(x->x_array, x->x_size * sizeof(float));
+  freebytes(x->x_array, x->x_size * sizeof(t_float));
 }
 
 static void *transf_fader_new(t_symbol *s, int argc, t_atom *argv)
@@ -134,7 +127,7 @@ static void *transf_fader_new(t_symbol *s, int argc, t_atom *argv)
 
   x->x_size = 1001;
   x->x_message = 0;
-  x->x_array = (float *)getbytes(x->x_size * sizeof(float));
+  x->x_array = (t_float *)getbytes(x->x_size * sizeof(t_float));
   n = x->x_size;
   for(i=0; i<n; i++)
     x->x_array[i] = -123456.0f;

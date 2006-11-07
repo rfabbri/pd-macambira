@@ -5,10 +5,7 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
+
 
 /* --------------------------- bpe -------------------------------- */
 /* -- break-point-envelope, convert a list of value-time-doubles -- */
@@ -37,7 +34,7 @@ static void bpe_stop(t_bpe *x)
 static void bpe_tick(t_bpe *x)
 {
   t_atom *vec = x->x_beg;
-  float val, time;
+  t_float val, time;
   
   if(x->x_curindex >= x->x_curnum)
   {
@@ -59,7 +56,7 @@ static void bpe_tick(t_bpe *x)
 static void bpe_bang(t_bpe *x)
 {
   t_atom *vec = x->x_beg;
-  float val, time;
+  t_float val, time;
   
   if(x->x_curnum)
   {

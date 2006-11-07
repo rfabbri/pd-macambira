@@ -6,12 +6,7 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 #include "m_pd.h"
 #include "g_canvas.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
 
-EXTERN void canvas_getargs(int *argcp, t_atom **argvp);
 
 /* ------------------------- dollarg ---------------------------- */
 /* --- dollar-arguments, output the initial-arguments and the --- */

@@ -3,10 +3,6 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -79,7 +75,7 @@ static void iem_receive_proxy_bang(t_iem_receive_proxy *p)
   outlet_bang(x->x_obj.ob_outlet);
 }
 
-static void iem_receive_proxy_float(t_iem_receive_proxy *p, t_float f)
+static void iem_receive_proxy_float(t_iem_receive_proxy *p, t_floatarg f)
 {
 	t_iem_receive *x = p->p_owner;
 

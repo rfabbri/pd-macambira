@@ -3,33 +3,9 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-/*
-#include <ctype.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
-#ifndef _MSC_VER
-#include <sys/signal.h>
-#include <unistd.h>
-#endif
-
-#ifdef _MSC_VER
-#include <io.h>
-#endif
-*/
 
 static t_class *iemlib2_class;
 
@@ -45,29 +21,24 @@ void bpe_setup(void);
 void dollarg_setup(void);
 void exp_inc_setup(void);
 void float24_setup(void);
-void iem_anything_kernel_setup(void);
 void iem_anything_setup(void);
-void iem_append_kernel_setup(void);
 void iem_append_setup(void);
 void iem_i_route_setup(void);
-void iem_prepend_kernel_setup(void);
-void iem_prepend_setup(void);
 void iem_pbank_csv_setup(void);
-void iem_receive_kernel_setup(void);
+void iem_prepend_setup(void);
 void iem_receive_setup(void);
-void iem_send_kernel_setup(void);
-void iem_send_setup(void);
 void iem_route_setup(void);
 void iem_sel_any_setup(void);
+void iem_send_setup(void);
 void init_setup(void);
 void list2send_setup(void);
 void mergefilename_setup(void);
 void modulo_counter_setup(void);
 void parentdollarzero_setup(void);
+void post_netreceive_setup(void);
 void pre_inlet_setup(void);
 void prepend_ascii_setup(void);
 void protect_against_open_setup(void);
-void post_netreceive_setup(void);
 void receive2list_setup(void);
 void round_zero_setup(void);
 void sigfade_setup(void);
@@ -94,30 +65,25 @@ void iemlib2_setup(void)
   dollarg_setup();
   exp_inc_setup();
   float24_setup();
-  iem_anything_kernel_setup();
-	iem_anything_setup();
-  iem_append_kernel_setup();
-	iem_append_setup();
+  iem_anything_setup();
+  iem_append_setup();
   iem_i_route_setup();
   iem_pbank_csv_setup();
-  iem_prepend_kernel_setup();
-	iem_prepend_setup();
-  iem_receive_kernel_setup();
-	iem_receive_setup();
-  iem_send_kernel_setup();
-	iem_send_setup();
+  iem_prepend_setup();
+  iem_receive_setup();
   iem_route_setup();
   iem_sel_any_setup();
+  iem_send_setup();
   init_setup();
   list2send_setup();
   mergefilename_setup();
   modulo_counter_setup();
   parentdollarzero_setup();
+  post_netreceive_setup();
   pre_inlet_setup();
   prepend_ascii_setup();
   protect_against_open_setup();
-  post_netreceive_setup();
-	receive2list_setup();
+  receive2list_setup();
   round_zero_setup();
   sigfade_setup();
   sigiem_blocksize_setup();

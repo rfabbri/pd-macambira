@@ -3,16 +3,9 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include <math.h>
 
 /* ----------- m2f~ ----------- */
@@ -20,14 +13,14 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 
 #define M2FTABSIZE 2048
 
-float *iem_m2f_table=(float *)0L;
+t_float *iem_m2f_table=(t_float *)0L;
 
 static t_class *sigm2f_class;
 
 typedef struct _sigm2f
 {
   t_object x_obj;
-  float x_msi;
+  t_float x_msi;
 } t_sigm2f;
 
 static void *sigm2f_new(void)
@@ -44,7 +37,7 @@ static t_int *sigm2f_perform(t_int *w)
   t_float *out = (t_float *)(w[2]);
   t_sigm2f *x = (t_sigm2f *)(w[3]);
   int n = (int)(w[4]);
-  float *tab = iem_m2f_table, *addr, f1, f2, frac, iinn;
+  t_float *tab = iem_m2f_table, *addr, f1, f2, frac, iinn;
   double dphase;
   int normhipart;
   union tabfudge tf;
@@ -104,9 +97,9 @@ static void sigm2f_maketable(void)
   if(!iem_m2f_table)
   {
     int i;
-    float *fp, midi, refexp=440.0*exp(-5.75*log(2.0));
+    t_float *fp, midi, refexp=440.0*exp(-5.75*log(2.0));
     
-    iem_m2f_table = (float *)getbytes(sizeof(float) * (M2FTABSIZE+1));
+    iem_m2f_table = (t_float *)getbytes(sizeof(t_float) * (M2FTABSIZE+1));
     for(i=0, fp=iem_m2f_table, midi=-67.0; i<=M2FTABSIZE; i++, fp++, midi+=0.1)
       *fp = refexp * exp(0.057762265047 * midi);
   }

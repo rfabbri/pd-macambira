@@ -3,17 +3,12 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <math.h>
 
 /* ------------------------- list2send ----------------------------- */
 /* -- via an array of send labels, an incomming list with leading -- */
@@ -217,7 +212,7 @@ static void list2send_free(t_list2send *x)
   freebytes(x->x_send_entries, x->x_max * sizeof(t_symbol *));
 }
 
-static void *list2send_new(t_float fmax)
+static void *list2send_new(t_floatarg fmax)
 {
   t_list2send *x = (t_list2send *)pd_new(list2send_class);
   int i, max = (int)fmax;

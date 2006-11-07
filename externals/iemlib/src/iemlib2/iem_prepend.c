@@ -3,16 +3,10 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+
 
 /* ----------------------- iem_prepend --------------------------- */
 /* -- concatenates message from cold (right) inlet with message -- */
@@ -51,7 +45,7 @@ static void iem_prepend_bang(t_iem_prepend *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_selector_sym, x->x_ac, x->x_at);
 }
 
-static void iem_prepend_float(t_iem_prepend *x, t_float f)
+static void iem_prepend_float(t_iem_prepend *x, t_floatarg f)
 {
   if(x->x_selector_sym == &s_bang)
     outlet_float(x->x_obj.ob_outlet, f);
@@ -127,7 +121,7 @@ static void iem_prepend_proxy_bang(t_iem_prepend_proxy *p)
   x->x_selector_sym = &s_bang;
 }
 
-static void iem_prepend_proxy_float(t_iem_prepend_proxy *p, t_float f)
+static void iem_prepend_proxy_float(t_iem_prepend_proxy *p, t_floatarg f)
 {
   t_iem_prepend *x = p->p_owner;
 

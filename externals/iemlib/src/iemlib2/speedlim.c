@@ -3,16 +3,9 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 
 /* ----------------------- speedlim -------------------------- */
 /* -- reduces the flow of float-messages to one message per -- */
@@ -27,8 +20,8 @@ typedef struct _speedlim
   float     x_delay;
   int       x_output_is_locked;
   int       x_there_was_n_event;
-  float     x_curval;
-  float     x_lastout;
+  t_float   x_curval;
+  t_float   x_lastout;
 } t_speedlim;
 
 static void speedlim_stop(t_speedlim *x)
@@ -54,7 +47,7 @@ static void speedlim_tick(t_speedlim *x)
   }
 }
 
-static void speedlim_float(t_speedlim *x, t_float val)
+static void speedlim_float(t_speedlim *x, t_floatarg val)
 {
   x->x_curval = val;
   if(!x->x_output_is_locked)
@@ -68,7 +61,7 @@ static void speedlim_float(t_speedlim *x, t_float val)
     x->x_there_was_n_event = 1;
 }
 
-static void speedlim_ft1(t_speedlim *x, t_float delay)
+static void speedlim_ft1(t_speedlim *x, t_floatarg delay)
 {
   if(delay < 0.0)
     delay = 0.0;
@@ -80,7 +73,7 @@ static void speedlim_free(t_speedlim *x)
   clock_free(x->x_clock);
 }
 
-static void *speedlim_new(t_float delay)
+static void *speedlim_new(t_floatarg delay)
 {
   t_speedlim *x = (t_speedlim *)pd_new(speedlim_class);
   

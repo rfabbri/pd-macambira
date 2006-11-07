@@ -5,10 +5,7 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
+
 
 /* --------------------------------- add2_comma ----------------------------------- */
 /* -- a special add2-message for messageboxes, which append a comma to a message -- */
@@ -30,7 +27,7 @@ static void add2_comma_bang(t_add2_comma *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_sym, 1, x->x_at);
 }
 
-static void add2_comma_float(t_add2_comma *x, t_float f)
+static void add2_comma_float(t_add2_comma *x, t_floatarg f)
 {
   SETCOMMA(x->x_at);
   SETFLOAT(x->x_at+1, f);

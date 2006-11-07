@@ -18,7 +18,7 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 typedef struct _float24
 {
   t_object  x_obj;
-  float     x_arg;
+  t_float   x_arg;
 } t_float24;
 
 static t_class *float24_class;

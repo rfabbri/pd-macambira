@@ -3,10 +3,6 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -42,7 +38,7 @@ static void iem_send_bang(t_iem_send *x)
       pd_bang(x->x_send_label_sym->s_thing);
 }
 
-static void iem_send_float(t_iem_send *x, t_float f)
+static void iem_send_float(t_iem_send *x, t_floatarg f)
 {
 	if(x->x_send_label_sym)
     if(x->x_send_label_sym->s_thing)

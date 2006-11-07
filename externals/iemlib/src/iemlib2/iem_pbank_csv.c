@@ -3,10 +3,6 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -198,7 +194,7 @@ int iem_pbank_csv_text2atom(char *text, int text_size, t_atom **at_beg,
   const char *textp = text, *etext = text + text_size;
   int natom = 0;
   t_atom *ap = *at_beg;
-  float f;
+  t_float f;
   
   while(1)
   {
@@ -654,7 +650,7 @@ static void iem_pbank_csv_recall(t_iem_pbank_csv *x, t_symbol *s, int ac, t_atom
     nrp = x->x_nr_para - beg;
   atmem += x->x_nr_para * x->x_line + beg;
   atbuf += beg;
-  SETFLOAT(atout, (float)beg);
+  SETFLOAT(atout, (t_float)beg);
   atout++;
   for(i=0; i<nrp; i++)
   {
@@ -725,7 +721,7 @@ static void iem_pbank_csv_list(t_iem_pbank_csv *x, t_symbol *s, int ac, t_atom *
   }
 }
 
-static void iem_pbank_csv_ft1(t_iem_pbank_csv *x, t_float fline_nr)
+static void iem_pbank_csv_ft1(t_iem_pbank_csv *x, t_floatarg fline_nr)
 {
   int line = (int)fline_nr;
   

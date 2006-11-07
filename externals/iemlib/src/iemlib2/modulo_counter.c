@@ -3,17 +3,8 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
 
 /* ---------------- modulo-counter. ----------------- */
 /* -------- counter increments if input a bang ------ */
@@ -34,7 +25,7 @@ static void modulo_counter_bang(t_modulo_counter *x)
   x->x_cur = x->x_cur % x->x_max;
 }
 
-static void modulo_counter_float(t_modulo_counter *x, t_float max)
+static void modulo_counter_float(t_modulo_counter *x, t_floatarg max)
 {
   int i = (int)max;
   
@@ -45,7 +36,7 @@ static void modulo_counter_float(t_modulo_counter *x, t_float max)
   x->x_max = i;
 }
 
-static void modulo_counter_ft1(t_modulo_counter *x, t_float set_init)
+static void modulo_counter_ft1(t_modulo_counter *x, t_floatarg set_init)
 {
   int i = (int)set_init;
   

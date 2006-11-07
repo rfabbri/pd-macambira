@@ -3,16 +3,10 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+
 
 /* -------------------- LFO_noise~ --------------------- */
 /* ---- outputs a 2 point interpolated white noise ----- */
@@ -26,11 +20,11 @@ typedef struct _sigLFO_noise
   double       x_range;
   double       x_rcp_range;
   unsigned int x_state;
-  float        x_fact;
-  float        x_incr;
-  float        x_y1;
-  float        x_y2;
-  float        x_phase;
+  t_float        x_fact;
+  t_float        x_incr;
+  t_float        x_y1;
+  t_float        x_y2;
+  t_float        x_phase;
 } t_sigLFO_noise;
 
 static int sigLFO_noise_makeseed(void)
@@ -79,10 +73,10 @@ static t_int *sigLFO_noise_perform(t_int *w)
   t_float *out = (t_float *)(w[1]);
   t_sigLFO_noise *x = (t_sigLFO_noise *)(w[2]);
   int n = (int)(w[3]);
-  float phase = x->x_phase;
-  float x_y1 = x->x_y1;
-  float x_y2 = x->x_y2;
-  float incr = x->x_incr;
+  t_float phase = x->x_phase;
+  t_float x_y1 = x->x_y1;
+  t_float x_y2 = x->x_y2;
+  t_float incr = x->x_incr;
   
   while(n--)
   {
@@ -101,7 +95,7 @@ static t_int *sigLFO_noise_perform(t_int *w)
   return (w+4);
 }
 
-static void sigLFO_noise_float(t_sigLFO_noise *x, t_float freq)
+static void sigLFO_noise_float(t_sigLFO_noise *x, t_floatarg freq)
 {
   x->x_incr = freq * x->x_fact;
   if(x->x_incr < 0.0)

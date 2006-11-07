@@ -3,16 +3,8 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 
 /* ------------------------------- iem_anything ---------------------------------- */
 /* -- storage object for any message (bang, float, symbol, list, selector-list) -- */

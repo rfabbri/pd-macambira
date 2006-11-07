@@ -3,16 +3,8 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include <math.h>
 
 /* ------------------------- fade~ ----------------------------- */
@@ -32,13 +24,13 @@ static t_class *sigfade_class;
 typedef struct _sigfade
 {
   t_object x_obj;
-  float *x_table;
-  float x_f;
+  t_float *x_table;
+  t_float x_f;
 } t_sigfade;
 
 static void sigfade_set(t_sigfade *x, t_symbol *s)
 {
-  if(!strcmp(s->s_name, "_lin"))
+  /*if(!strcmp(s->s_name, "_lin"))
     x->x_table = iem_fade_table_lin;
   else if(!strcmp(s->s_name, "_linsqrt"))
     x->x_table = iem_fade_table_linsqrt;
@@ -49,6 +41,18 @@ static void sigfade_set(t_sigfade *x, t_symbol *s)
   else if(!strcmp(s->s_name, "_sinhann"))
     x->x_table = iem_fade_table_sinhann;
   else if(!strcmp(s->s_name, "_hann"))
+    x->x_table = iem_fade_table_hann;*/
+  if(s == gensym("_lin"))
+    x->x_table = iem_fade_table_lin;
+  else if(s == gensym("_linsqrt"))
+    x->x_table = iem_fade_table_linsqrt;
+  else if(s == gensym("_sqrt"))
+    x->x_table = iem_fade_table_sqrt;
+  else if(s == gensym("_sin"))
+    x->x_table = iem_fade_table_sin;
+  else if(s == gensym("_sinhann"))
+    x->x_table = iem_fade_table_sinhann;
+  else if(s == gensym("_hann"))
     x->x_table = iem_fade_table_hann;
 }
 
@@ -68,7 +72,7 @@ static t_int *sigfade_perform(t_int *w)
   t_float *out = (t_float *)(w[2]);
   t_sigfade *x = (t_sigfade *)(w[3]);
   int n = (int)(w[4]);
-  float *tab = x->x_table, *addr, f1, f2, frac;
+  t_float *tab = x->x_table, *addr, f1, f2, frac;
   double dphase;
   int normhipart;
   union tabfudge tf;
@@ -79,7 +83,7 @@ static t_int *sigfade_perform(t_int *w)
 #if 0     /* this is the readable version of the code. */
   while (n--)
   {
-    dphase = (double)(*in++ * (float)(COSTABSIZE) * 0.99999) + UNITBIT32;
+    dphase = (double)(*in++ * (t_float)(COSTABSIZE) * 0.99999) + UNITBIT32;
     tf.tf_d = dphase;
     addr = tab + (tf.tf_i[HIOFFSET] & (COSTABSIZE-1));
     tf.tf_i[HIOFFSET] = normhipart;
@@ -90,13 +94,13 @@ static t_int *sigfade_perform(t_int *w)
   }
 #endif
 #if 1     /* this is the same, unwrapped by hand. */
-  dphase = (double)(*in++ * (float)(COSTABSIZE) * 0.99999) + UNITBIT32;
+  dphase = (double)(*in++ * (t_float)(COSTABSIZE) * 0.99999) + UNITBIT32;
   tf.tf_d = dphase;
   addr = tab + (tf.tf_i[HIOFFSET] & (COSTABSIZE-1));
   tf.tf_i[HIOFFSET] = normhipart;
   while (--n)
   {
-    dphase = (double)(*in++ * (float)(COSTABSIZE) * 0.99999) + UNITBIT32;
+    dphase = (double)(*in++ * (t_float)(COSTABSIZE) * 0.99999) + UNITBIT32;
     frac = tf.tf_d - UNITBIT32;
     tf.tf_d = dphase;
     f1 = addr[0];
@@ -121,18 +125,18 @@ static void sigfade_dsp(t_sigfade *x, t_signal **sp)
 static void sigfade_maketable(void)
 {
   int i;
-  float *fp, phase, fff,phsinc = 0.5*3.141592653 / ((float)COSTABSIZE*0.99999);
+  t_float *fp, phase, fff,phsinc = 0.5*3.141592653 / ((t_float)COSTABSIZE*0.99999);
   union tabfudge tf;
   
   if(!iem_fade_table_sin)
   {
-    iem_fade_table_sin = (float *)getbytes(sizeof(float) * (COSTABSIZE+1));
+    iem_fade_table_sin = (t_float *)getbytes(sizeof(t_float) * (COSTABSIZE+1));
     for(i=COSTABSIZE+1, fp=iem_fade_table_sin, phase=0; i--; fp++, phase+=phsinc)
       *fp = sin(phase);
   }
   if(!iem_fade_table_sinhann)
   {
-    iem_fade_table_sinhann = (float *)getbytes(sizeof(float) * (COSTABSIZE+1));
+    iem_fade_table_sinhann = (t_float *)getbytes(sizeof(t_float) * (COSTABSIZE+1));
     for(i=COSTABSIZE+1, fp=iem_fade_table_sinhann, phase=0; i--; fp++, phase+=phsinc)
     {
       fff = sin(phase);
@@ -141,29 +145,29 @@ static void sigfade_maketable(void)
   }
   if(!iem_fade_table_hann)
   {
-    iem_fade_table_hann = (float *)getbytes(sizeof(float) * (COSTABSIZE+1));
+    iem_fade_table_hann = (t_float *)getbytes(sizeof(t_float) * (COSTABSIZE+1));
     for(i=COSTABSIZE+1, fp=iem_fade_table_hann, phase=0; i--; fp++, phase+=phsinc)
     {
       fff = sin(phase);
       *fp = fff*fff;
     }
   }
-  phsinc = 1.0 / ((float)COSTABSIZE*0.99999);
+  phsinc = 1.0 / ((t_float)COSTABSIZE*0.99999);
   if(!iem_fade_table_lin)
   {
-    iem_fade_table_lin = (float *)getbytes(sizeof(float) * (COSTABSIZE+1));
+    iem_fade_table_lin = (t_float *)getbytes(sizeof(t_float) * (COSTABSIZE+1));
     for(i=COSTABSIZE+1, fp=iem_fade_table_lin, phase=0; i--; fp++, phase+=phsinc)
       *fp = phase;
   }
   if(!iem_fade_table_linsqrt)
   {
-    iem_fade_table_linsqrt = (float *)getbytes(sizeof(float) * (COSTABSIZE+1));
+    iem_fade_table_linsqrt = (t_float *)getbytes(sizeof(t_float) * (COSTABSIZE+1));
     for(i=COSTABSIZE+1, fp=iem_fade_table_linsqrt, phase=0; i--; fp++, phase+=phsinc)
       *fp = pow(phase, 0.75);
   }
   if(!iem_fade_table_sqrt)
   {
-    iem_fade_table_sqrt = (float *)getbytes(sizeof(float) * (COSTABSIZE+1));
+    iem_fade_table_sqrt = (t_float *)getbytes(sizeof(t_float) * (COSTABSIZE+1));
     for(i=COSTABSIZE+1, fp=iem_fade_table_sqrt, phase=0; i--; fp++, phase+=phsinc)
       *fp = sqrt(phase);
   }

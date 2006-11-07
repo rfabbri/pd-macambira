@@ -3,10 +3,6 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -20,7 +16,7 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 typedef struct _wrap
 {
   t_object  x_obj;
-  float     x_f;
+  t_float     x_f;
 } t_wrap;
 
 static t_class *wrap_class;
@@ -30,14 +26,14 @@ static void wrap_bang(t_wrap *x)
   outlet_float(x->x_obj.ob_outlet, x->x_f);
 }
 
-static void wrap_float(t_wrap *x, t_float f)
+static void wrap_float(t_wrap *x, t_floatarg f)
 {
   int i=(int)f;
   
   if(f > 0.0)
-    x->x_f = f - (float)i;
+    x->x_f = f - (t_float)i;
   else
-    x->x_f = f - (float)(i - 1);
+    x->x_f = f - (t_float)(i - 1);
   wrap_bang(x);
 }
 

@@ -3,17 +3,10 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2004 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
+
 
 /* ------------------------ post_netreceive ---------------------------- */
 static t_class *post_netreceive_class;
@@ -171,7 +164,7 @@ static void post_netreceive_clear(t_post_netreceive *x)
   }
 }
 
-static void post_netreceive_fetch_all_parameters(t_post_netreceive *x, t_float nr_sended_para)
+static void post_netreceive_fetch_all_parameters(t_post_netreceive *x, t_floatarg nr_sended_para)
 {
   int nrsp=(int)nr_sended_para;
   t_atom *ap=x->x_atbuf+x->x_min_send_entries;
@@ -191,7 +184,7 @@ static void post_netreceive_free(t_post_netreceive *x)
   freebytes(x->x_plus_entries, x->x_max_send_entries * sizeof(t_symbol *));
 }
 
-static void *post_netreceive_new(t_float fmin, t_float fmax)
+static void *post_netreceive_new(t_floatarg fmin, t_floatarg fmax)
 {
   t_post_netreceive *x = (t_post_netreceive *)pd_new(post_netreceive_class);
   int i, min = (int)fmin, max = (int)fmax;

@@ -3,10 +3,6 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -32,7 +28,7 @@ typedef struct _iem_sel_any
 } t_iem_sel_any;
 
 
-static void iem_sel_any_float(t_iem_sel_any *x, t_float f)
+static void iem_sel_any_float(t_iem_sel_any *x, t_floatarg f)
 {
   int i = (int)f;
   t_atom at;
@@ -82,7 +78,7 @@ static void iem_sel_any_free(t_iem_sel_any *x)
   freebytes(x->x_any, x->x_max_ac * sizeof(t_symbol *));
 }
 
-static void *iem_sel_any_new(t_float fmax)
+static void *iem_sel_any_new(t_floatarg fmax)
 {
   t_iem_sel_any *x = (t_iem_sel_any *)pd_new(iem_sel_any_class);
   int i;

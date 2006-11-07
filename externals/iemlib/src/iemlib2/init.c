@@ -3,17 +3,9 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
+
 
 /* ------------------------ init ---------------------------- */
 /* -------- a combination of loadbang and any --------------- */
@@ -52,7 +44,7 @@ static void init_loadbang(t_init *x)
     init_bang(x);
 }
 
-static void init_float(t_init *x, t_float f)
+static void init_float(t_init *x, t_floatarg f)
 {
   x->x_ac = 1;
   SETFLOAT(x->x_at, f);

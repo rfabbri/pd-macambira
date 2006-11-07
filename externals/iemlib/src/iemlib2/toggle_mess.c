@@ -3,16 +3,9 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 
 /* ------------------------ toggle_mess ---------------------------- */
 /* -- inital arguments building a set of messages, any incomming --- */
@@ -36,7 +29,7 @@ static void toggle_mess_bang(t_toggle_mess *x)
 {
   int i = x->x_index;
 
-  outlet_float(x->x_out_rght_flt, (float)i);
+  outlet_float(x->x_out_rght_flt, (t_float)i);
   if(IS_A_FLOAT(x->x_at, i))
     outlet_float(x->x_out_mid_sym, atom_getfloat(&x->x_at[i]));
   else
@@ -44,7 +37,7 @@ static void toggle_mess_bang(t_toggle_mess *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_set, 1, &x->x_at[i]);
 }
 
-static void toggle_mess_float(t_toggle_mess *x, t_float f)
+static void toggle_mess_float(t_toggle_mess *x, t_floatarg f)
 {
   x->x_index++;
   if(x->x_index >= x->x_ac)

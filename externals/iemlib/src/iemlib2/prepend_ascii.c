@@ -3,17 +3,9 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
 
 /* ------------------------- prepend_ascii ---------------------------- */
 /* -- this object prepends to any incoming message a selector symbol -- */
@@ -42,7 +34,7 @@ static void prepend_ascii_bang(t_prepend_ascii *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_sym, x->x_ac, x->x_at);
 }
 
-static void prepend_ascii_float(t_prepend_ascii *x, t_float f)
+static void prepend_ascii_float(t_prepend_ascii *x, t_floatarg f)
 {
   SETFLOAT(x->x_at+x->x_ac, f);
   outlet_anything(x->x_obj.ob_outlet, x->x_sym, x->x_ac+1, x->x_at);
