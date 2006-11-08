@@ -3,16 +3,8 @@
 
 iem_t3_lib written by Gerhard Eckel, Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #include "m_pd.h"
 #include "iemlib.h"
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
 
 /* ------------------------ t3_bpe ---------------------------- */
 static t_class *t3_bpe_class;
@@ -42,7 +34,7 @@ static void t3_bpe_stop(t_t3_bpe *x)
 static void t3_bpe_tick(t_t3_bpe *x)
 {
   t_atom *vec = x->x_beg;
-  float val;
+  t_float val;
   double dticks, time;
   int iticks;
   
@@ -57,7 +49,7 @@ static void t3_bpe_tick(t_t3_bpe *x)
     vec += x->x_curindex;
     val = atom_getfloat(vec++);
     time = (double)atom_getfloat(vec);
-    outlet_float(x->x_out_time, (float)time);
+    outlet_float(x->x_out_time, time);
     x->x_at[1].a_w.w_float = val;
     x->x_at[0].a_w.w_float = x->x_t3_bang;
     outlet_list(x->x_obj.ob_outlet, &s_list, 2, x->x_at);

@@ -3,16 +3,8 @@
 
 iem_t3_lib written by Gerhard Eckel, Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #include "m_pd.h"
 #include "iemlib.h"
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
 
 /* -------------------------- sigt3_sig~ ------------------------------ */
 static t_class *sigt3_sig_class;
@@ -21,19 +13,19 @@ typedef struct _sigt3_sig
 {
   t_object x_obj;
   t_clock  *x_clock;
-  float    x_old_val;
-  float    x_new_val;
-  float    *x_beg;
+  t_float  x_old_val;
+  t_float  x_new_val;
+  t_float  *x_beg;
   int      x_n;
   int      x_t3_bang_samps;
   int      x_transient;
-  float    x_ms2samps;
-  float    x_ticks2ms;
+  t_float  x_ms2samps;
+  t_float  x_ticks2ms;
 } t_sigt3_sig;
 
 static void sigt3_sig_tick(t_sigt3_sig *x)
 {
-  float *trans = x->x_beg, val;
+  t_float *trans = x->x_beg, val;
   int n = x->x_n, t3_bang_samps, i;
   
   t3_bang_samps = x->x_t3_bang_samps;
@@ -61,8 +53,8 @@ static void sigt3_sig_list(t_sigt3_sig *x, t_symbol *s, int ac, t_atom *av)
   {
     int n = x->x_n, t3_bang_samps, ticks;
     
-    t3_bang_samps = (int)((float)atom_getfloatarg(0, ac, av)*x->x_ms2samps);
-    x->x_new_val = (float)atom_getfloatarg(1, ac, av);
+    t3_bang_samps = (int)((t_float)atom_getfloatarg(0, ac, av)*x->x_ms2samps);
+    x->x_new_val = (t_float)atom_getfloatarg(1, ac, av);
     if(t3_bang_samps < 0)
       t3_bang_samps = 0;
     ticks = t3_bang_samps / n;
@@ -82,7 +74,7 @@ static t_int *sigt3_sig_perform(t_int *w)
   
   if(x->x_transient)
   {
-    float *trans = x->x_beg;
+    t_float *trans = x->x_beg;
     
     while(n--)
       *out++ = *trans++;
@@ -90,7 +82,7 @@ static t_int *sigt3_sig_perform(t_int *w)
   }
   else
   {
-    float val = x->x_new_val;
+    t_float val = x->x_new_val;
     
     while(n--)
       *out++ = val;
@@ -106,7 +98,7 @@ static t_int *sigt3_sig_perf8(t_int *w)
   
   if(x->x_transient)
   {
-    float *trans = x->x_beg;
+    t_float *trans = x->x_beg;
     
     for(i=0; i<n; i+=8, out+=8, trans+=8)
     {
@@ -123,7 +115,7 @@ static t_int *sigt3_sig_perf8(t_int *w)
   }
   else
   {
-    float val = x->x_new_val;
+    t_float val = x->x_new_val;
     
     for(i=0; i<n; i+=8, out+=8)
     {
@@ -143,18 +135,18 @@ static t_int *sigt3_sig_perf8(t_int *w)
 static void sigt3_sig_dsp(t_sigt3_sig *x, t_signal **sp)
 {
   int i;
-  float *trans, val;
+  t_float *trans, val;
   
   if(sp[0]->s_n > x->x_n)
   {
-    freebytes(x->x_beg, x->x_n*sizeof(float));
+    freebytes(x->x_beg, x->x_n*sizeof(t_float));
     x->x_n = sp[0]->s_n;
-    x->x_beg = (float *)getbytes(x->x_n*sizeof(float));
+    x->x_beg = (t_float *)getbytes(x->x_n*sizeof(t_float));
   }
   else
     x->x_n = sp[0]->s_n;
-  x->x_ms2samps = 0.001*(float)sp[0]->s_sr;
-  x->x_ticks2ms = (float)x->x_n / x->x_ms2samps;
+  x->x_ms2samps = 0.001*(t_float)sp[0]->s_sr;
+  x->x_ticks2ms = (t_float)x->x_n / x->x_ms2samps;
   i = x->x_n;
   val = x->x_new_val;
   trans = x->x_beg;
@@ -170,7 +162,7 @@ static void sigt3_sig_dsp(t_sigt3_sig *x, t_signal **sp)
 static void sigt3_sig_free(t_sigt3_sig *x)
 {
   if(x->x_beg)
-    freebytes(x->x_beg, x->x_n*sizeof(float));
+    freebytes(x->x_beg, x->x_n*sizeof(t_float));
   clock_free(x->x_clock);
 }
 
@@ -180,10 +172,10 @@ static void *sigt3_sig_new(t_floatarg init_val)
   
   x->x_new_val = x->x_old_val = init_val;
   x->x_n = (int)sys_getblksize();
-  x->x_beg = (float *)getbytes(x->x_n*sizeof(float));
+  x->x_beg = (t_float *)getbytes(x->x_n*sizeof(t_float));
   x->x_t3_bang_samps = x->x_transient = 0;
-  x->x_ms2samps = 0.001 * (float)sys_getsr();
-  x->x_ticks2ms = (float)x->x_n / x->x_ms2samps;
+  x->x_ms2samps = 0.001 * (t_float)sys_getsr();
+  x->x_ticks2ms = (t_float)x->x_n / x->x_ms2samps;
   x->x_clock = clock_new(x, (t_method)sigt3_sig_tick);
   outlet_new(&x->x_obj, &s_signal);
   return (x);

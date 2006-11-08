@@ -15,11 +15,11 @@ PD_WIN_LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames /NODEFAULTLIB:kernel /NOD
 	$(PD_INST_PATH)\bin\pthreadVC.lib \
 	$(PD_INST_PATH)\bin\pd.lib
 
-SRC =	sigt3_line.c \
-	sigt3_sig.c \
-	t3_bpe.c \
+SRC =	t3_bpe.c \
 	t3_delay.c \
+	t3_line~.c \
 	t3_metro.c \
+	t3_sig~.c \
 	t3_timer.c \
 	iem_t3_lib.c
 

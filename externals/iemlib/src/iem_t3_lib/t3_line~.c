@@ -3,16 +3,9 @@
 
 iem_t3_lib written by Gerhard Eckel, Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
 
 /* -------------------------- t3_line~ ------------------------------ */
 static t_class *sigt3_line_class;
@@ -21,7 +14,7 @@ typedef struct _sigt3_line
 {
   t_object x_obj;
   t_clock  *x_clock;
-  float    *x_beg;
+  t_float  *x_beg;
   double   x_cur_val;
   double   x_dst_val;
   double   x_inlet_val;
@@ -38,7 +31,7 @@ typedef struct _sigt3_line
   int      x_transient;
 } t_sigt3_line;
 
-static void sigt3_line_nontransient(float *vec, t_sigt3_line *x, int n)
+static void sigt3_line_nontransient(t_float *vec, t_sigt3_line *x, int n)
 {
   int cur_samps = x->x_cur_samps, i;
   double inc = x->x_inc;
@@ -52,7 +45,7 @@ static void sigt3_line_nontransient(float *vec, t_sigt3_line *x, int n)
       while(n--)
       {
         cur_val += inc;
-        *vec++ = (float)cur_val;
+        *vec++ = (t_float)cur_val;
       }
       x->x_cur_val += x->x_inc64;
     }
@@ -62,7 +55,7 @@ static void sigt3_line_nontransient(float *vec, t_sigt3_line *x, int n)
       while(n--)
       {
         cur_val += inc;
-        *vec++ = (float)cur_val;
+        *vec++ = (t_float)cur_val;
       }
       x->x_cur_val = x->x_dst_val;
     }
@@ -71,18 +64,18 @@ static void sigt3_line_nontransient(float *vec, t_sigt3_line *x, int n)
       for(i=0; i<cur_samps; i++)
       {
         cur_val += inc;
-        *vec++ = (float)cur_val;
+        *vec++ = (t_float)cur_val;
       }
       x->x_cur_val = cur_val = x->x_dst_val;
       for(i=cur_samps; i<n; i++)
-        *vec++ = (float)cur_val;
+        *vec++ = (t_float)cur_val;
       x->x_cur_samps = 0;
     }
   }
   else
   {
     while(n--)
-      *vec++ = (float)cur_val;
+      *vec++ = (t_float)cur_val;
   }
 }
 
@@ -94,7 +87,7 @@ static t_int *sigt3_line_perform(t_int *w)
   
   if(x->x_transient)
   {
-    float *trans = x->x_beg;
+    t_float *trans = x->x_beg;
     
     while(n--)
       *out++ = *trans++;
@@ -107,7 +100,7 @@ static t_int *sigt3_line_perform(t_int *w)
 
 static void sigt3_line_tick(t_sigt3_line *x)
 {
-  float *trans = x->x_beg;
+  t_float *trans = x->x_beg;
   int n = x->x_n, t3_bang_samps, cur_samps, i;
   double inc, cur_val;
   
@@ -123,7 +116,7 @@ static void sigt3_line_tick(t_sigt3_line *x)
     x->x_cur_samps = 0;
     cur_val = x->x_cur_val = x->x_dst_val;
     for(i=t3_bang_samps; i<n; i++)
-      trans[i] = (float)cur_val;
+      trans[i] = (t_float)cur_val;
   }
   else
   {
@@ -145,7 +138,7 @@ static void sigt3_line_tick(t_sigt3_line *x)
       for(i=t3_bang_samps; i<n; i++)
       {
         cur_val += inc;
-        trans[i] = (float)cur_val;
+        trans[i] = (t_float)cur_val;
       }
       x->x_cur_val += (double)diff * inc;
       x->x_cur_samps -= diff;
@@ -155,7 +148,7 @@ static void sigt3_line_tick(t_sigt3_line *x)
       for(i=t3_bang_samps; i<n; i++)
       {
         cur_val += inc;
-        trans[i] = (float)cur_val;
+        trans[i] = (t_float)cur_val;
       }
       x->x_cur_val = x->x_dst_val;
       x->x_cur_samps = 0;
@@ -166,12 +159,12 @@ static void sigt3_line_tick(t_sigt3_line *x)
       for(i=t3_bang_samps; i<end; i++)
       {
         cur_val += inc;
-        trans[i] = (float)cur_val;
+        trans[i] = (t_float)cur_val;
       }
       cur_val = x->x_cur_val = x->x_dst_val;
       x->x_cur_samps = 0;
       for(i=end; i<n; i++)
-        trans[i] = (float)cur_val;
+        trans[i] = (t_float)cur_val;
     }
   }
   x->x_transient = 1;
@@ -185,7 +178,7 @@ static void sigt3_line_list(t_sigt3_line *x, t_symbol *s, int ac, t_atom *av)
     double time;
     
     x->x_inlet_val = (double)atom_getfloatarg(1, ac, av);
-    t3_bang_samps = (int)((float)atom_getfloatarg(0, ac, av)*x->x_ms2samps);
+    t3_bang_samps = (int)((t_float)atom_getfloatarg(0, ac, av)*x->x_ms2samps);
     if(t3_bang_samps < 0)
       t3_bang_samps = 0;
     ticks = t3_bang_samps / x->x_n;
@@ -221,13 +214,13 @@ static void sigt3_line_stop(t_sigt3_line *x)
 static void sigt3_line_dsp(t_sigt3_line *x, t_signal **sp)
 {
   int i;
-  float val, *trans;
+  t_float val, *trans;
   
   if(sp[0]->s_n > x->x_n)
   {
-    freebytes(x->x_beg, x->x_n*sizeof(float));
+    freebytes(x->x_beg, x->x_n*sizeof(t_float));
     x->x_n = (int)sp[0]->s_n;
-    x->x_beg = (float *)getbytes(x->x_n*sizeof(float));
+    x->x_beg = (t_float *)getbytes(x->x_n*sizeof(t_float));
   }
   else
     x->x_n = (int)sp[0]->s_n;
@@ -244,7 +237,7 @@ static void sigt3_line_dsp(t_sigt3_line *x, t_signal **sp)
 static void sigt3_line_free(t_sigt3_line *x)
 {
   if(x->x_beg)
-    freebytes(x->x_beg, x->x_n*sizeof(float));
+    freebytes(x->x_beg, x->x_n*sizeof(t_float));
   clock_free(x->x_clock);
 }
 
@@ -254,7 +247,7 @@ static void *sigt3_line_new(t_floatarg init_val)
   int i;
   
   x->x_n = (int)sys_getblksize();
-  x->x_beg = (float *)getbytes(x->x_n*sizeof(float));
+  x->x_beg = (t_float *)getbytes(x->x_n*sizeof(t_float));
   x->x_inlet_val = x->x_cur_val = x->x_dst_val = init_val;
   x->x_t3_bang_samps = x->x_cur_samps = x->x_dur_samps = x->x_transient = 0;
   x->x_inlet_time = x->x_dst_time = 0.0;

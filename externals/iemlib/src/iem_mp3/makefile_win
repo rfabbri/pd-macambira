@@ -15,8 +15,8 @@ PD_WIN_LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames /NODEFAULTLIB:kernel /NOD
 	$(PD_INST_PATH)\bin\pthreadVC.lib \
 	$(PD_INST_PATH)\bin\pd.lib
 
-SRC =	sigmp3play.c \
-		iem_mp3.c
+SRC =	mp3play~.c \
+	iem_mp3.c
 
 OBJ = $(SRC:.c=.obj)
 

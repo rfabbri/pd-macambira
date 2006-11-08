@@ -4,10 +4,10 @@
 iem_mp3 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
 /*
- sigmp3play.c - Mpeg Layer III Player for PD
+ mp3play~.c - Mpeg Layer III Player for PD
  Version:0.1
  05-18-2000
- written by Thomas Musil (musil_at_iem.kug.ac.at), Norbert Math (math_at_iem.kug.ac.at)
+ written by Thomas Musil (musil_at_iem.at), Norbert Math (math_at_iem.kug.ac.at)
  IEM Graz
 
  debugged for windows 013-03-2003
@@ -17,11 +17,6 @@ iem_mp3 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
  please see the README file for copyright notices!
 
  */
-
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -201,7 +196,7 @@ struct iemmp3_newHuff
 };
 
 
-typedef struct _sigmp3play
+typedef struct _mp3play_tilde
 {
     t_object x_obj;
     float length_sec;
@@ -237,7 +232,7 @@ typedef struct _sigmp3play
     t_outlet *x_bangout;
     t_outlet *x_floatout;
     t_canvas  *x_canvas;
-} t_sigmp3play;
+} t_mp3play_tilde;
 
 
 
@@ -274,7 +269,7 @@ static unsigned int getbits(int number_of_bits);
 static unsigned int getbits_fast(int number_of_bits);
 static unsigned int get1bit(void);
 
-static void sigmp3play_tick(t_sigmp3play *x);
+static void mp3play_tilde_tick(t_mp3play_tilde *x);
 
 
 struct iemmp3Struct *iemmp3_gmp;
@@ -723,7 +718,7 @@ static struct iemmp3_newHuff iemmp3_htc[] =
 };
 
 
-static t_class *sigmp3play_class;
+static t_class *mp3play_tilde_class;
 
 
 
@@ -3131,10 +3126,10 @@ static int synth_1to1(real *bandPtr,int channel,unsigned char *out,int *pnt)
 
 
 
-static void *sigmp3play_new(void)
+static void *mp3play_tilde_new(void)
 {
     char *vec;
-    t_sigmp3play *x = (t_sigmp3play *)pd_new(sigmp3play_class);
+    t_mp3play_tilde *x = (t_mp3play_tilde *)pd_new(mp3play_tilde_class);
 
     x->file_is_open = 0;
     x->play_state = 0;
@@ -3166,7 +3161,7 @@ static void *sigmp3play_new(void)
     *vec = 0;
     InitMP3(&(x->mp));
     x->mp_is_init = 1;
-    x->x_clock = clock_new(x, (t_method)sigmp3play_tick);
+    x->x_clock = clock_new(x, (t_method)mp3play_tilde_tick);
     outlet_new(&x->x_obj, &s_signal);
     outlet_new(&x->x_obj, &s_signal);
     x->x_floatout = outlet_new(&x->x_obj, &s_float);
@@ -3176,7 +3171,7 @@ static void *sigmp3play_new(void)
     return (x);
 }
 
-static void sigmp3play_cleanup(t_sigmp3play *x)
+static void mp3play_tilde_cleanup(t_mp3play_tilde *x)
 {
     x->file_is_open = 0;
     fclose(x->fh);
@@ -3188,7 +3183,7 @@ static void sigmp3play_cleanup(t_sigmp3play *x)
     clock_delay(x->x_clock, 0);
 }
 
-static int sigmp3play_read_frame_length_first(t_sigmp3play *x, int *frsz)
+static int mp3play_tilde_read_frame_length_first(t_mp3play_tilde *x, int *frsz)
 {
     int framesize, lsf, bitrate_index, sampling_frequency, padding, mpeg25, lay, ret=MP3_EX;
     int version, syncword;
@@ -3275,7 +3270,7 @@ static int sigmp3play_read_frame_length_first(t_sigmp3play *x, int *frsz)
     }
 }
 
-static int sigmp3play_read_frame_length_next(t_sigmp3play *x, int *frsz, int frame_counter)
+static int mp3play_tilde_read_frame_length_next(t_mp3play_tilde *x, int *frsz, int frame_counter)
 {
     int framesize, lsf, bitrate_index, sampling_frequency, *begframeseek=x->begframeseek;
     unsigned long head;
@@ -3316,13 +3311,13 @@ static int sigmp3play_read_frame_length_next(t_sigmp3play *x, int *frsz, int fra
   return(1);
 }
 
-static int sigmp3play_calc_frames(t_sigmp3play *x)
+static int mp3play_tilde_calc_frames(t_mp3play_tilde *x)
 {
     int *begframeseek=x->begframeseek, i, maxframeseek, framesize, frame_counter;
     float length;
 
     fseek(x->fh,0,SEEK_SET);
-    if(!sigmp3play_read_frame_length_first(x, &framesize))
+    if(!mp3play_tilde_read_frame_length_first(x, &framesize))
     {
   if(framesize <= 0)
   {
@@ -3350,7 +3345,7 @@ static int sigmp3play_calc_frames(t_sigmp3play *x)
   frame_counter = 1;
   /*x->curframeseek = maxframeseek;*/
   fseek(x->fh, begframeseek[1], SEEK_SET);
-  while(!sigmp3play_read_frame_length_next(x, &framesize, frame_counter))
+  while(!mp3play_tilde_read_frame_length_next(x, &framesize, frame_counter))
   {
       begframeseek[frame_counter+1] = begframeseek[frame_counter] + framesize;
       frame_counter++;
@@ -3368,7 +3363,7 @@ static int sigmp3play_calc_frames(t_sigmp3play *x)
   return(MP3_EX);
 }
 
-static void sigmp3play_do_open(t_sigmp3play *x, char *str, int calc_it)
+static void mp3play_tilde_do_open(t_mp3play_tilde *x, char *str, int calc_it)
 {
     int mp3_sr, obj_sr;
     int file_size, size, mp3_encode_return=MP3_OK, mp3_read_length, i, j, *begframeseek;
@@ -3419,10 +3414,10 @@ static void sigmp3play_do_open(t_sigmp3play *x, char *str, int calc_it)
     x->mp_is_init = 1;
       }
       if(calc_it)
-    mp3_encode_return = sigmp3play_calc_frames(x);
+    mp3_encode_return = mp3play_tilde_calc_frames(x);
       if(mp3_encode_return == MP3_EX)
       {
-    sigmp3play_cleanup(x);
+    mp3play_tilde_cleanup(x);
     return;
       }
       if(x->frame_counter)
@@ -3452,7 +3447,7 @@ static void sigmp3play_do_open(t_sigmp3play *x, char *str, int calc_it)
                 MY_MP3_MALLOC_IN_SIZE2, &size);
     if(mp3_encode_return == MP3_EX)
     {
-        sigmp3play_cleanup(x);
+        mp3play_tilde_cleanup(x);
         return;
     }
     post ("MPEG %s, Layer: %s, Freq: %ld, mode: %s, modext: %d, BPF : %d",
@@ -3533,9 +3528,9 @@ static void sigmp3play_do_open(t_sigmp3play *x, char *str, int calc_it)
     }
 }
 
-static t_int *sigmp3play_perform(t_int *w)
+static t_int *mp3play_tilde_perform(t_int *w)
 {
-    t_sigmp3play *x = (t_sigmp3play *)(w[1]);
+    t_mp3play_tilde *x = (t_mp3play_tilde *)(w[1]);
     t_float *out1 = (t_float *)(w[2]);
     t_float *out2 = (t_float *)(w[3]);
     int n = (int)(w[4]);
@@ -3545,9 +3540,9 @@ static t_int *sigmp3play_perform(t_int *w)
     int mp3_out_index = x->mp3_out_index;
 
     if (!x->file_is_open)
-  goto sigmp3play_labelzero;
+  goto mp3play_tilde_labelzero;
     if (x->play_state != 1)
-  goto sigmp3play_labelzero;
+  goto mp3play_tilde_labelzero;
 
     if(mp3_out_index >= x->mp3_encode_size)
     {
@@ -3561,8 +3556,8 @@ static t_int *sigmp3play_perform(t_int *w)
       x->mp3_encode_size = size * sizeof(char) / sizeof(short);
   else if(mp3_encode_return == MP3_EX)
   {
-      sigmp3play_cleanup(x);
-      goto sigmp3play_labelzero;
+      mp3play_tilde_cleanup(x);
+      goto mp3play_tilde_labelzero;
   }
   else
   {
@@ -3578,8 +3573,8 @@ static t_int *sigmp3play_perform(t_int *w)
       }
       else
       {
-    sigmp3play_cleanup(x);
-    goto sigmp3play_labelzero;
+    mp3play_tilde_cleanup(x);
+    goto mp3play_tilde_labelzero;
       }
 
       fread(x->mp3inbuf, mp3_read_length, sizeof(char), x->fh);
@@ -3588,8 +3583,8 @@ static t_int *sigmp3play_perform(t_int *w)
       x->mp3_encode_size = size * sizeof(char) / sizeof(short);
       if(mp3_encode_return == MP3_EX)
       {
-    sigmp3play_cleanup(x);
-    goto sigmp3play_labelzero;
+    mp3play_tilde_cleanup(x);
+    goto mp3play_tilde_labelzero;
       }
   }
     }
@@ -3741,7 +3736,7 @@ static t_int *sigmp3play_perform(t_int *w)
     }
     return (w+5);
 
-sigmp3play_labelzero:
+mp3play_tilde_labelzero:
 
     while (n--)
     {
@@ -3751,16 +3746,16 @@ sigmp3play_labelzero:
     return (w+5);
 }
 
-static void sigmp3play_dsp(t_sigmp3play *x, t_signal **sp)
+static void mp3play_tilde_dsp(t_mp3play_tilde *x, t_signal **sp)
 {
     x->obj_sr = (int)(sp[0]->s_sr);
     x->obj_n = (int)(sp[0]->s_n);
-    dsp_add(sigmp3play_perform, 4, x, sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
+    dsp_add(mp3play_tilde_perform, 4, x, sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 
 
 
-static void sigmp3play_stop(t_sigmp3play *x)
+static void mp3play_tilde_stop(t_mp3play_tilde *x)
 {
     if(x->file_is_open)
     {
@@ -3769,7 +3764,7 @@ static void sigmp3play_stop(t_sigmp3play *x)
     }
 }
 
-static void sigmp3play_start(t_sigmp3play *x)
+static void mp3play_tilde_start(t_mp3play_tilde *x)
 {
     if(x->file_is_open)
     {
@@ -3777,14 +3772,14 @@ static void sigmp3play_start(t_sigmp3play *x)
     }
 }
 
-static void sigmp3play_ft1(t_sigmp3play *x, t_floatarg offset)
+static void mp3play_tilde_ft1(t_mp3play_tilde *x, t_floatarg offset)
 {
     if(offset < 0.0)
   offset = 0.0;
     x->offset_sec = (float)offset;
 }
 
-static void sigmp3play_pause(t_sigmp3play *x)
+static void mp3play_tilde_pause(t_mp3play_tilde *x)
 {
     if(x->file_is_open)
     {
@@ -3795,32 +3790,32 @@ static void sigmp3play_pause(t_sigmp3play *x)
     }
 }
 
-static void sigmp3play_open(t_sigmp3play *x, t_symbol *s)
+static void mp3play_tilde_open(t_mp3play_tilde *x, t_symbol *s)
 {
     x->frame_counter = 0;
-    sigmp3play_do_open(x, (char *)s->s_name, 1);
+    mp3play_tilde_do_open(x, (char *)s->s_name, 1);
 }
 
-static void sigmp3play_open_again(t_sigmp3play *x)
+static void mp3play_tilde_open_again(t_mp3play_tilde *x)
 {
     x->frame_counter = 0;
-    sigmp3play_do_open(x, x->filename, 0);
+    mp3play_tilde_do_open(x, x->filename, 0);
 }
 
-static void sigmp3play_open_at(t_sigmp3play *x, t_symbol *s)
+static void mp3play_tilde_open_at(t_mp3play_tilde *x, t_symbol *s)
 {
     x->frame_counter = 1;
-    sigmp3play_do_open(x, (char *)s->s_name, 1);
+    mp3play_tilde_do_open(x, (char *)s->s_name, 1);
 }
 
-static void sigmp3play_open_again_at(t_sigmp3play *x)
+static void mp3play_tilde_open_again_at(t_mp3play_tilde *x)
 {
     x->frame_counter = 1;
-    sigmp3play_do_open(x, x->filename, 0);
+    mp3play_tilde_do_open(x, x->filename, 0);
 }
 
 
-static void sigmp3play_tick(t_sigmp3play *x)
+static void mp3play_tilde_tick(t_mp3play_tilde *x)
 {
     if(x->time1_bang0_handle)
     {
@@ -3832,7 +3827,7 @@ static void sigmp3play_tick(t_sigmp3play *x)
     }
 }
 
-static void sigmp3play_free(t_sigmp3play *x)
+static void mp3play_tilde_free(t_mp3play_tilde *x)
 {
     if(x->mp_is_init)
   ExitMP3(&(x->mp));
@@ -3844,21 +3839,21 @@ static void sigmp3play_free(t_sigmp3play *x)
     clock_free(x->x_clock);
 }
 
-void sigmp3play_setup(void)
+void mp3play_tilde_setup(void)
 {
-    sigmp3play_class = class_new(gensym("mp3play~"), (t_newmethod)sigmp3play_new,
-         (t_method)sigmp3play_free, sizeof(t_sigmp3play), 0, 0);
-    class_addmethod(sigmp3play_class, (t_method)sigmp3play_dsp, gensym("dsp"), 0);
-    class_addmethod(sigmp3play_class, (t_method)sigmp3play_start, gensym("start"), 0);
-    class_addmethod(sigmp3play_class, (t_method)sigmp3play_ft1,
+    mp3play_tilde_class = class_new(gensym("mp3play~"), (t_newmethod)mp3play_tilde_new,
+         (t_method)mp3play_tilde_free, sizeof(t_mp3play_tilde), 0, 0);
+    class_addmethod(mp3play_tilde_class, (t_method)mp3play_tilde_dsp, gensym("dsp"), 0);
+    class_addmethod(mp3play_tilde_class, (t_method)mp3play_tilde_start, gensym("start"), 0);
+    class_addmethod(mp3play_tilde_class, (t_method)mp3play_tilde_ft1,
         gensym("ft1"), A_FLOAT, 0);
-    class_addmethod(sigmp3play_class, (t_method)sigmp3play_stop, gensym("stop"), 0);
-    class_addmethod(sigmp3play_class, (t_method)sigmp3play_pause, gensym("pause"), 0);
-    class_addmethod(sigmp3play_class, (t_method)sigmp3play_open_again_at, gensym("open_again_at"), 0);
-    class_addmethod(sigmp3play_class, (t_method)sigmp3play_open, gensym("open"), A_DEFSYM, 0);
-    class_addmethod(sigmp3play_class, (t_method)sigmp3play_open_again, gensym("open_again"), 0);
-    class_addmethod(sigmp3play_class, (t_method)sigmp3play_open_at, gensym("open_at"), A_DEFSYM, 0);
-    class_sethelpsymbol(sigmp3play_class, gensym("iemhelp/help-mp3play~"));
+    class_addmethod(mp3play_tilde_class, (t_method)mp3play_tilde_stop, gensym("stop"), 0);
+    class_addmethod(mp3play_tilde_class, (t_method)mp3play_tilde_pause, gensym("pause"), 0);
+    class_addmethod(mp3play_tilde_class, (t_method)mp3play_tilde_open_again_at, gensym("open_again_at"), 0);
+    class_addmethod(mp3play_tilde_class, (t_method)mp3play_tilde_open, gensym("open"), A_DEFSYM, 0);
+    class_addmethod(mp3play_tilde_class, (t_method)mp3play_tilde_open_again, gensym("open_again"), 0);
+    class_addmethod(mp3play_tilde_class, (t_method)mp3play_tilde_open_at, gensym("open_at"), A_DEFSYM, 0);
+    class_sethelpsymbol(mp3play_tilde_class, gensym("iemhelp/help-mp3play~"));
     /*post("\nmp3play~ written by thomas musil & norbert math\nV 0.1 iem graz
      austria 05 2000\n");*/
 }
