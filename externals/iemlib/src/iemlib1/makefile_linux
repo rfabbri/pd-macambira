@@ -41,7 +41,7 @@ SRC = 	biquad_freq_resp.c \
 	split.c \
 	v2db.c \
 	vcf_filter~.c \
-	iemlib2.c
+	iemlib1.c
 
 TARGET = iemlib1.pd_linux
 
