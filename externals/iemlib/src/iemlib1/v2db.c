@@ -3,23 +3,17 @@
 
 iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 
 #include "m_pd.h"
 #include "iemlib.h"
 #include <math.h>
-#include <stdio.h>
-#include <string.h>
+
 
 /* -------- v2db - a rms-value to techn. dB  converter. --------- */
 
 static t_class *v2db_class;
 
-float v2db(float f)
+t_float v2db(t_float f)
 {
   return (f <= 0 ? -199.9 : 8.6858896381*log(f));
 }

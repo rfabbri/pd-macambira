@@ -3,17 +3,10 @@
 
 iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 
 #include "m_pd.h"
 #include "iemlib.h"
 #include <math.h>
-#include <stdio.h>
-#include <string.h>
 
 /* ------------------------- f2note ---------------------- */
 /* ------ frequency to note plus cents converter --------- */
@@ -25,27 +18,27 @@ typedef struct _f2note
   void     *x_outlet_note;
   void     *x_outlet_cent;
   int      x_centomidi;
-  float    x_refhz;
-  float    x_refexp;
-  float    x_reflog;
+  t_float  x_refhz;
+  t_float  x_refexp;
+  t_float  x_reflog;
   t_symbol *x_set;
 } t_f2note;
 
 static t_class *f2note_class;
 
-float f2note_mtof(t_f2note *x, float midi)
+t_float f2note_mtof(t_f2note *x, t_float midi)
 {
   return(x->x_refexp * exp(0.057762265047 * midi));
 }
 
-float f2note_ftom(t_f2note *x, float freq)
+t_float f2note_ftom(t_f2note *x, t_float freq)
 {
   return (freq > 0 ? 17.31234049 * log(x->x_reflog * freq) : -1500);
 }
 
 void f2note_calc_ref(t_f2note *x)
 {
-  float ln2=log(2.0);
+  t_float ln2=log(2.0);
   
   x->x_refexp = x->x_refhz*exp(-5.75*ln2);
   x->x_reflog = 1.0/x->x_refexp;
@@ -140,16 +133,16 @@ static void f2note_bang(t_f2note *x)
   
   i = (x->x_centomidi + 50)/100;
   j = x->x_centomidi - 100*i;
-  outlet_float(x->x_outlet_cent, (float)j);
+  outlet_float(x->x_outlet_cent, (t_float)j);
   f2note_make_note(s, i);
   SETSYMBOL(&at, gensym(s));
   outlet_anything(x->x_outlet_note, x->x_set, 1, &at);
-  outlet_float(x->x_outlet_midi, 0.01*(float)(x->x_centomidi));
+  outlet_float(x->x_outlet_midi, 0.01f*(t_float)(x->x_centomidi));
 }
 
 static void f2note_float(t_f2note *x, t_floatarg freq)
 {
-  x->x_centomidi = (int)(100.0*f2note_ftom(x, freq) + 0.5);
+  x->x_centomidi = (int)(100.0f*f2note_ftom(x, freq) + 0.5f);
   f2note_bang(x);
 }
 
@@ -163,10 +156,10 @@ static void *f2note_new(t_floatarg ref)
 {
   t_f2note *x = (t_f2note *)pd_new(f2note_class);
   
-  if(ref == 0.0)
-    ref=440.0;
+  if(ref == 0.0f)
+    ref=440.0f;
   x->x_refhz = ref;
-  x->x_centomidi = (int)(100.0*ref + 0.499);
+  x->x_centomidi = (int)(100.0f*ref + 0.499f);
   f2note_calc_ref(x);
   x->x_outlet_midi = outlet_new(&x->x_obj, &s_float);
   x->x_outlet_note = outlet_new(&x->x_obj, &s_list);

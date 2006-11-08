@@ -3,17 +3,10 @@
 
 iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 
 #include "m_pd.h"
 #include "iemlib.h"
 #include <math.h>
-#include <stdio.h>
-#include <string.h>
 
 /* ------------------------ biquad_freq_resp ------------------- */
 /* -- calculates the frequency responce of a biquad structure -- */
@@ -21,21 +14,21 @@ iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 typedef struct _biquad_freq_resp
 {
   t_object  x_obj;
-  float     a0;
-  float     a1;
-  float     a2;
-  float     b1;
-  float     b2;
+  t_float   a0;
+  t_float   a1;
+  t_float   a2;
+  t_float   b1;
+  t_float   b2;
   t_outlet  *x_out_re;
   t_outlet  *x_out_im;
 } t_biquad_freq_resp;
 
 static t_class *biquad_freq_resp_class;
 
-static void biquad_freq_resp_float(t_biquad_freq_resp *x, t_float f)
+static void biquad_freq_resp_float(t_biquad_freq_resp *x, t_floatarg f)
 {
-  float re1, im1, re2, im2;
-  float c, s, a;
+  t_float re1, im1, re2, im2;
+  t_float c, s, a;
   
   if(f < 0.0f)
     f = 0.0f;

@@ -3,17 +3,9 @@
 
 iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
 
 /* ----------------------------- for++ -------------------------------- */
 /* -- an internal timed counter (start-, stop-number and metro-time) -- */
@@ -23,7 +15,7 @@ typedef struct _forpp
   t_object  x_obj;
   int       x_beg;
   int       x_end;
-  float     x_delay;
+  t_float   x_delay;
   int       x_cur;
   int       x_incr;
   void      *x_out_end;
@@ -108,7 +100,7 @@ static void forpp_stop(t_forpp *x)
   clock_unset(x->x_clock2);
 }
 
-static void forpp_float(t_forpp *x, t_float beg)
+static void forpp_float(t_forpp *x, t_floatarg beg)
 {
   x->x_beg = (int)beg;
   if(x->x_end < x->x_beg)
@@ -117,7 +109,7 @@ static void forpp_float(t_forpp *x, t_float beg)
     x->x_incr = 1;
 }
 
-static void forpp_ft1(t_forpp *x, t_float end)
+static void forpp_ft1(t_forpp *x, t_floatarg end)
 {
   x->x_end = (int)end;
   if(x->x_end < x->x_beg)
@@ -126,7 +118,7 @@ static void forpp_ft1(t_forpp *x, t_float end)
     x->x_incr = 1;
 }
 
-static void forpp_ft2(t_forpp *x, t_float delay)
+static void forpp_ft2(t_forpp *x, t_floatarg delay)
 {
   if(delay < 0.0)
     delay = 0.0;

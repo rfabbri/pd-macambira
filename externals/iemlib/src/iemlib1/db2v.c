@@ -3,28 +3,21 @@
 
 iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 
 #include "m_pd.h"
 #include "iemlib.h"
 #include <math.h>
-#include <stdio.h>
-#include <string.h>
 
 /* -------- db2v - a techn. dB to rms-value converter. --------- */
 
 static t_class *db2v_class;
 
-float db2v(float f)
+t_float db2v(t_float f)
 {
   return (f <= -199.9 ? 0 : exp(0.11512925465 * f));
 }
 
-static void db2v_float(t_object *x, t_float f)
+static void db2v_float(t_object *x, t_floatarg f)
 {
   outlet_float(x->ob_outlet, db2v(f));
 }

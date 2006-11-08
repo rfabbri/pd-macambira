@@ -3,11 +3,6 @@
 
 iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #include "m_pd.h"
 #include "iemlib.h"
 #include <stdlib.h>
@@ -162,7 +157,7 @@ soundfile_info_fmt:
         post("soundfile_info_read-error:  %s has no common channel-number", completefilename);
         goto soundfile_info_end;
       }
-      SETFLOAT(x->x_atheader+SFI_HEADER_CHANNELS, (float)ss);
+      SETFLOAT(x->x_atheader+SFI_HEADER_CHANNELS, (t_float)ss);
       ch = ss;
       header_size += 2;
       cvec += 2;
@@ -173,7 +168,7 @@ soundfile_info_fmt:
         post("soundfile_info_read-error:  %s has no common samplerate", completefilename);
         goto soundfile_info_end;
       }
-      SETFLOAT(x->x_atheader+SFI_HEADER_SAMPLERATE, (float)ll);
+      SETFLOAT(x->x_atheader+SFI_HEADER_SAMPLERATE, (t_float)ll);
       sr = ll;
       header_size += 4;
       cvec += 4;
@@ -188,7 +183,7 @@ soundfile_info_fmt:
         post("soundfile_info_read-error:  %s has no common number of bytes per sample", completefilename);
         goto soundfile_info_end;
       }
-      SETFLOAT(x->x_atheader+SFI_HEADER_BYTES_PER_SAMPLE, (float)(ss/ch));
+      SETFLOAT(x->x_atheader+SFI_HEADER_BYTES_PER_SAMPLE, (t_float)(ss/ch));
       bps = ss;
       header_size += 2;
       cvec += 2;
@@ -210,11 +205,11 @@ soundfile_info_data:
       header_size += 8;
       cvec += 8;
       
-      SETFLOAT(x->x_atheader+SFI_HEADER_HEADERBYTES, (float)header_size);
+      SETFLOAT(x->x_atheader+SFI_HEADER_HEADERBYTES, (t_float)header_size);
       
       filesize -= header_size;
       filesize /= bps;
-      SETFLOAT(x->x_atheader+SFI_HEADER_MULTICHANNEL_FILE_LENGTH, (float)filesize);
+      SETFLOAT(x->x_atheader+SFI_HEADER_MULTICHANNEL_FILE_LENGTH, (t_float)filesize);
       SETSYMBOL(x->x_atheader+SFI_HEADER_ENDINESS, gensym("l"));
       SETSYMBOL(x->x_atheader+SFI_HEADER_FILENAME, gensym(completefilename));
       

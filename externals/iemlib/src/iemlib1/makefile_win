@@ -18,27 +18,27 @@ PD_WIN_LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames /NODEFAULTLIB:kernel /NOD
 SRC =	biquad_freq_resp.c \
 		db2v.c \
 		f2note.c \
+		filter~.c \
+		FIR~.c \
 		forpp.c \
 		gate.c \
-		sigfilter.c \
-		sigFIR.c \
-		sighml_shelf.c \
-		sigiem_cot4.c \
-		sigiem_delay.c \
-		sigiem_sqrt4.c \
-		sigiem_pow4.c \
-		siglp1_t.c \
-		sigmov_avrg_kern.c \
-		sigpara_bp2.c \
-		sigpeakenv.c \
-		sigprvu.c \
-		sigpvu.c \
-		sigrvu.c \
-		sigsin_phase.c \
-		sigvcf_filter.c \
+		hml_shelf~.c \
+		iem_cot4~.c \
+		iem_delay~.c \
+		iem_pow4~.c \
+		iem_sqrt4~.c \
+		lp1_t~.c \
+		mov_avrg_kern~.c \
+		para_bp2~.c \
+		peakenv~.c \
+		prvu~.c \
+		pvu~.c \
+		rvu~.c \
+		sin_phase~.c \
 		soundfile_info.c \
 		split.c \
 		v2db.c \
+		vcf_filter~.c \
 		iemlib1.c
 
 

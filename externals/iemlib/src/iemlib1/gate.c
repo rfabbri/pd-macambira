@@ -1,19 +1,12 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2004 */
-
-#ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
+iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
+
 
 /* --------- gate ---------------------- */
 /* ----------- like spigot  ------------ */
@@ -21,7 +14,7 @@ iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2004 
 typedef struct _gate
 {
   t_object  x_obj;
-  float     x_state;
+  t_float   x_state;
 } t_gate;
 
 static t_class *gate_class;
@@ -67,7 +60,7 @@ static void *gate_new(t_floatarg f)
   t_gate *x = (t_gate *)pd_new(gate_class);
   floatinlet_new(&x->x_obj, &x->x_state);
   outlet_new(&x->x_obj, 0);
-  x->x_state = (f==0.0)?0:1;
+  x->x_state = (f==0.0f)?0.0f:1.0f;
   return (x);
 }
 
