@@ -21,14 +21,14 @@ t_float *iem_fade_tilde_table_hann=(t_float *)0L;
 
 static t_class *fade_tilde_class;
 
-typedef struct _fade
+typedef struct _fade_tilde
 {
   t_object x_obj;
   t_float *x_table;
   t_float x_f;
 } t_fade_tilde;
 
-static void fade_set(t_fade_tilde *x, t_symbol *s)
+static void fade_tilde_set(t_fade_tilde *x, t_symbol *s)
 {
   if(s == gensym("_lin"))
     x->x_table = iem_fade_tilde_table_lin;
@@ -44,17 +44,17 @@ static void fade_set(t_fade_tilde *x, t_symbol *s)
     x->x_table = iem_fade_tilde_table_hann;
 }
 
-static void *fade_new(t_symbol *s)
+static void *fade_tilde_new(t_symbol *s)
 {
   t_fade_tilde *x = (t_fade_tilde *)pd_new(fade_tilde_class);
   outlet_new(&x->x_obj, gensym("signal"));
   x->x_f = 0;
   x->x_table = iem_fade_tilde_table_lin;
-  fade_set(x, s);
+  fade_tilde_set(x, s);
   return (x);
 }
 
-static t_int *fade_perform(t_int *w)
+static t_int *fade_tilde_perform(t_int *w)
 {
   t_float *in = (t_float *)(w[1]);
   t_float *out = (t_float *)(w[2]);
@@ -105,12 +105,12 @@ static t_int *fade_perform(t_int *w)
   return (w+5);
 }
 
-static void fade_dsp(t_fade_tilde *x, t_signal **sp)
+static void fade_tilde_dsp(t_fade_tilde *x, t_signal **sp)
 {
-  dsp_add(fade_perform, 4, sp[0]->s_vec, sp[1]->s_vec, x, sp[0]->s_n);
+  dsp_add(fade_tilde_perform, 4, sp[0]->s_vec, sp[1]->s_vec, x, sp[0]->s_n);
 }
 
-static void fade_maketable(void)
+static void fade_tilde_maketable(void)
 {
   int i;
   t_float *fp, phase, fff,phsinc = 0.5*3.141592653 / ((t_float)COSTABSIZE*0.99999);
@@ -166,11 +166,11 @@ static void fade_maketable(void)
 
 void fade_tilde_setup(void)
 {
-  fade_tilde_class = class_new(gensym("fade~"), (t_newmethod)fade_new, 0,
+  fade_tilde_class = class_new(gensym("fade~"), (t_newmethod)fade_tilde_new, 0,
     sizeof(t_fade_tilde), 0, A_DEFSYM, 0);
   CLASS_MAINSIGNALIN(fade_tilde_class, t_fade_tilde, x_f);
-  class_addmethod(fade_tilde_class, (t_method)fade_dsp, gensym("dsp"), 0);
-  class_addmethod(fade_tilde_class, (t_method)fade_set, gensym("set"), A_DEFSYM, 0);
+  class_addmethod(fade_tilde_class, (t_method)fade_tilde_dsp, gensym("dsp"), 0);
+  class_addmethod(fade_tilde_class, (t_method)fade_tilde_set, gensym("set"), A_DEFSYM, 0);
   class_sethelpsymbol(fade_tilde_class, gensym("iemhelp/help-fade~"));
-  fade_maketable();
+  fade_tilde_maketable();
 }
