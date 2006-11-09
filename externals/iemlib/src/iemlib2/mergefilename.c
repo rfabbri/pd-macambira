@@ -6,7 +6,6 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 
 #include "m_pd.h"
 #include "iemlib.h"
-#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -95,7 +94,7 @@ static void mergefilename_list(t_mergefilename *x, t_symbol *s, int ac, t_atom *
         strcat(x->x_mem, x->x_sep);
       }
 
-      if(IS_A_SYMBOL(av, i))
+      if(IS_A_SYMBOL(av, 0))
       {
         length = strlen(av->a_w.w_symbol->s_name);
         if((accu_size + length) > (MAXPDSTRING - 2))
@@ -110,7 +109,7 @@ static void mergefilename_list(t_mergefilename *x, t_symbol *s, int ac, t_atom *
           accu_size += length;
         }
       }
-      else if(IS_A_FLOAT(av, i))
+      else if(IS_A_FLOAT(av, 0))
       {
         sprintf(flt_buf, "%g", av->a_w.w_float);
         length = strlen(flt_buf);
@@ -126,6 +125,7 @@ static void mergefilename_list(t_mergefilename *x, t_symbol *s, int ac, t_atom *
           accu_size += length;
         }
       }
+      av++;
     }
   }
   outlet_symbol(x->x_obj.ob_outlet, gensym(x->x_mem));
@@ -155,7 +155,7 @@ static void mergefilename_anything(t_mergefilename *x, t_symbol *s, int ac, t_at
     for(i=0; i<ac; i++)
     {
       strcat(x->x_mem, x->x_sep);
-      if(IS_A_SYMBOL(av, i))
+      if(IS_A_SYMBOL(av, 0))
       {
         length = strlen(av->a_w.w_symbol->s_name);
         if((accu_size + length) > (MAXPDSTRING - 2))
@@ -170,7 +170,7 @@ static void mergefilename_anything(t_mergefilename *x, t_symbol *s, int ac, t_at
           accu_size += length;
         }
       }
-      else if(IS_A_FLOAT(av, i))
+      else if(IS_A_FLOAT(av, 0))
       {
         sprintf(flt_buf, "%g", av->a_w.w_float);
         length = strlen(flt_buf);
@@ -186,6 +186,7 @@ static void mergefilename_anything(t_mergefilename *x, t_symbol *s, int ac, t_at
           accu_size += length;
         }
       }
+      av++;
     }
   }
   outlet_symbol(x->x_obj.ob_outlet, gensym(x->x_mem));
