@@ -222,6 +222,7 @@ dsp		 control audio-engine, calculate dsp-performance (aka. dsp~)
 float24		 store a 24-bit accurate float-number
 init		 initialize a message via loadbang (abbr. ii)
 once		 any message pass through only the first time
+parentdollarzero receive parent unique number
 
 ------------------------- counter -----------------------------
 exp_inc		 exponential increment counter (bang triggered)
