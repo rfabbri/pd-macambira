@@ -1,4 +1,8 @@
-Installation-guide for iemlib under windows (win_xp, win2k, win_me, win_nt or win98)iemlib_R1.16 is written by Thomas Musil from IEM Graz Austria and it is compatible to miller puckette's pd-0.37-3 to pd-0.39-2.see also LICENCE.txt, GnuLGPL.txt and README.txt.
+Installation-guide for iemlib under windows (win_xp, win2k, win_me, win_nt or win98)
+
+iemlib_R1.16 is written by Thomas Musil from IEM Graz Austria
+ and it is compatible to miller puckette's pd-0.37-3 to pd-0.39-2.
+see also LICENCE.txt, GnuLGPL.txt and README.txt.
 
 1.) download and copy iemlib_R1.16_win.zip into your pd-installation-directory
  ( e.g. C:\Programs\pd\iemlib_R1.16_win.zip )

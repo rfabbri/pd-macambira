@@ -1,39 +1,37 @@
 Installation-guide for iemlib under linux
 
-iemlib_R1.15 is written by Thomas Musil from IEM Graz Austria
- and it is compatible to miller puckette's pd-0.36-0 and pd-0.37-0.
+iemlib_R1.16 is written by Thomas Musil from IEM Graz Austria
+ and it is compatible to miller puckette's pd-0.37-3 and pd-0.39-2.
 see also LICENCE.txt, GnuLGPL.txt and README.txt.
 
-1.) open a unix-shell, login as superuser, download and copy iemlib_R1.15_lin.tgz into your source-directory
- (e.g. /usr/local/src/iemlib_R1.15_lin.tgz)
 
-2.) untar and unzip iemlib_R1.15_lin.tgz
- "shell">  tar xzvf iemlib_R1.15_lin.tgz
-      (and a directory iemlib_R1.15 will be created)
+1.) open a unix-shell, login as superuser, download and copy iemlib_R1.16_lin.tgz into your source-directory
+ (e.g. /usr/local/src/iemlib_R1.16_lin.tgz)
 
-3.) create an externs-directory in your pd-installation-directory (if it does not exist)
- "shell">  mkdir /usr/local/lib/pd/externs
+2.) untar and unzip iemlib_R1.16_lin.tgz
+ "shell">  tar xzvf iemlib_R1.16_lin.tgz
+      (and a directory iemlib_R1.16 will be created)
 
-4.) copy external-libraries
+3.) copy external-libraries
  iemlib contains 4 *.pd_linux files (iem_mp3.pd_linux, iem_t3_lib.pd_linux, iemlib1.pd_linux, iemlib2.pd_linux)
- "shell">  cp /usr/local/src/iemlib_R1.15/lib/*.pd_linux /usr/local/lib/pd/externs/
+ "shell">  cp /usr/local/src/iemlib_R1.16/lib/*.pd_linux /usr/local/lib/pd/extra/
 
-5.) copy pd-abstractions-folder
- "shell">  cp -r /usr/local/src/iemlib_R1.15/iemabs /usr/local/lib/pd
+4.) copy pd-abstractions-folder
+ "shell">  cp -r /usr/local/src/iemlib_R1.16/iemabs /usr/local/lib/pd
 
-6.) copy pd-help-files-folder
- "shell">  cp -r /usr/local/src/iemlib_R1.15/iemhelp /usr/local/lib/pd/doc/5.reference/
+5.) copy pd-help-files-folder
+ "shell">  cp -r /usr/local/src/iemlib_R1.16/iemhelp /usr/local/lib/pd/doc/5.reference/
 
-7.) add to your pd_start_script, or into your pd-resource-file ~/.pdrc,
+6.) add to your pd_start_script, or into your pd-resource-file ~/.pdrc,
  the following configuration-options:
 
- -path /usr/local/lib/pd/externs -path /usr/local/lib/pd/iemabs -lib iemlib1:iemlib2:iem_mp3:iem_t3_lib
+ -path /usr/local/lib/pd/iemabs -lib iemlib1:iemlib2:iem_mp3:iem_t3_lib
 
- or create an executable textfile start_pd36 with this content:
+ or create an executable textfile script start_pd with this content:
 
 #!/bin/sh
 /usr/local/bin/pd -r 44100 -channels 2 -audiobuf 160 -audiodev 1 -nomidi \
--path /usr/local/lib/pd/externs -path /usr/local/lib/pd/iemabs \
+-path /usr/local/lib/pd/iemabs \
 -lib iemlib1 -lib iemlib2 -lib iem_mp3 -lib iem_t3_lib
 
 
@@ -42,50 +40,51 @@ How to compile iemlib under linux
 
 after installing iemlib:
 
-8.a) edit makefile of iemlib1
- change to directory /usr/local/src/iemlib_R1.15/src/iemlib1
+7.a) edit makefile of iemlib1
+ change to directory /usr/local/src/iemlib_R1.16/src/iemlib1
  and edit the following line of makefile and save
  ( INCLUDE = -I. -I/usr/local/src/pd/src )
 
-8.b) compile iemlib1
+7.b) compile iemlib1
  "shell">  make
- ( after this command, iemlib1.pd_linux will be created in /usr/local/src/iemlib_R1.15/lib/ ).
+ ( after this command, iemlib1.pd_linux will be created in /usr/local/src/iemlib_R1.16/lib/ ).
 
-9.a) edit makefile of iemlib2
- change to directory /usr/local/src/iemlib_R1.15/src/iemlib2
+8.a) edit makefile of iemlib2
+ change to directory /usr/local/src/iemlib_R1.16/src/iemlib2
  and edit the following line of makefile and save
  ( INCLUDE = -I. -I/usr/local/src/pd/src )
 
-9.b) compile iemlib2
+8.b) compile iemlib2
  "shell">  make
- ( after this command, iemlib2.pd_linux will be created in /usr/local/src/iemlib_R1.15/lib/ ).
+ ( after this command, iemlib2.pd_linux will be created in /usr/local/src/iemlib_R1.16/lib/ ).
 
-10.a) edit makefile of iem_mp3
- change to directory /usr/local/src/iemlib_R1.15/src/iem_mp3
+9.a) edit makefile of iem_mp3
+ change to directory /usr/local/src/iemlib_R1.16/src/iem_mp3
  and edit the following line of makefile and save
  ( INCLUDE = -I. -I/usr/local/src/pd/src )
 
-10.b) compile iem_mp3
+9.b) compile iem_mp3
  "shell">  make
- ( after this command, iem_mp3.pd_linux will be created in /usr/local/src/iemlib_R1.15/lib/ ).
+ ( after this command, iem_mp3.pd_linux will be created in /usr/local/src/iemlib_R1.16/lib/ ).
 
-11.a) edit makefile of iem_t3_lib
- change to directory /usr/local/src/iemlib_R1.15/src/iem_t3_lib
+10.a) edit makefile of iem_t3_lib
+ change to directory /usr/local/src/iemlib_R1.16/src/iem_t3_lib
  and edit the following line of makefile and save
  ( INCLUDE = -I. -I/usr/local/src/pd/src )
 
-11.b) compile iem_t3_lib
+10.b) compile iem_t3_lib
  "shell">  make
- ( after this command, iem_t3_lib.pd_linux will be created in /usr/local/src/iemlib_R1.15/lib/ ).
+ ( after this command, iem_t3_lib.pd_linux will be created in /usr/local/src/iemlib_R1.16/lib/ ).
 
 
-12.) copy external-libraries
- "shell">  cd /usr/local/src/iemlib_R1.15/lib
- "shell">  cp /usr/local/src/iemlib_R1.15/lib/*.pd_linux /usr/local/lib/externs/
+11.) copy external-libraries
+ "shell">  cd /usr/local/src/iemlib_R1.16/lib
+ "shell">  cp /usr/local/src/iemlib_R1.16/lib/*.pd_linux /usr/local/lib/pd/extra/
 
 
 
-contents of iemlib Release 1.15 from December 2003
+
+contents of iemlib Release 1.16 from May 2005
 
 ============================ DSP~ ===============================
 
