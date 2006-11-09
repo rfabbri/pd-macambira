@@ -1,4 +1,4 @@
-contents of iemlib Release 1.16 from August 2004
+contents of iemlib Release 1.16 from May 2005
 
 ============================ DSP~ ===============================
 
@@ -19,11 +19,9 @@ lp1~		 lowpass 1.order
 lp2~		 lowpass 2.order
 rbpq2~		 resonance-bandpass 2.order with Q-inlet
 rbpw2~		 resonance-bandpass 2.order with bandwidth-inlet
-
 hml_shelf~	 high-middle-low shelving-filter with freq- and gain-inlets
 lp1_t~		 lowpass 1.order with time_constant inlet
 para_bp2~	 parametrical bandpass 2. order with freq-, Q- and gain-inlet
-
 hp2_butt~, hp3_butt~, hp4_butt~, hp5_butt~, hp6_butt~, hp7_butt~,
 hp8_butt~, hp9_butt~, hp10_butt~
 	highpass 2.3.4.5.6.7.8.9.10.order with butterworth characteristic
@@ -48,7 +46,6 @@ lp8_bess~, lp9_bess~, lp10_bess~
 lp2_crit~, lp3_crit~, lp4_crit~, lp5_crit~, lp6_crit~, lp7_crit~,
 lp8_crit~, lp9_crit~, lp10_crit~
 	lowpass 2.3.4.5.6.7.8.9.10.order with critical damping
-
 vcf_hp2~, vcf_hp4~, vcf_hp6~, vcf_hp8~
 	highpass 2.4.6.8.order with freq- and Q-signal-inlets
 vcf_lp2~, vcf_lp4~, vcf_lp6~, vcf_lp8~
@@ -136,6 +133,7 @@ dsp		 control audio-engine, calculate dsp-performance (aka. dsp~)
 float24		 store a 24-bit accurate float-number
 init		 initialize a message via loadbang (abbr. ii)
 once		 any message pass through only the first time
+parentdollarzero receive parent unique number
 
 ------------------------- counter -----------------------------
 exp_inc		 exponential increment counter (bang triggered)
@@ -143,7 +141,7 @@ for++		 incremental counter (triggered by internal metro)
 modulo_counter	 endless loop counter (bang triggered)
 
 -------------------------- misc -------------------------------
-add2_comma	 add a comma-separated message to a messagebox 
+add2_comma	 add a comma-separated message to a messagebox
 bpe		 break point envelope controller
 f2note		 frequency to midi+cents+note
 gate		 interruptible message connection (like spigot)
