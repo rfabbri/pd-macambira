@@ -21,8 +21,7 @@ typedef struct _mergefilename
 {
   t_object x_obj;
   char     x_sep[2];
-  char     *x_mem;
-  t_int    x_size;
+  char     x_mem[MAXPDSTRING];  /* miller WHY ???? */
 } t_mergefilename;
 
 static void mergefilename_separator(t_mergefilename *x, t_symbol *s, int ac, t_atom *av)
@@ -89,59 +88,43 @@ static void mergefilename_list(t_mergefilename *x, t_symbol *s, int ac, t_atom *
   x->x_mem[0] = 0;
   if(ac > 0)
   {
-    if(IS_A_SYMBOL(av, 0))
+    for(i=0; i<ac; i++)
     {
-      length = strlen(av->a_w.w_symbol->s_name);
-      if((length + accu_size) >= (x->x_size-2))
+      if(i > 0)
       {
-        x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
-        x->x_size = 2*(length + accu_size);
+        strcat(x->x_mem, x->x_sep);
       }
-      strcat(x->x_mem, av->a_w.w_symbol->s_name);
-      accu_size += length;
-    }
-    else if(IS_A_FLOAT(av, 0))
-    {
-      sprintf(flt_buf, "%g", av->a_w.w_float);
-      length = strlen(flt_buf);
-      if((length + accu_size) >= (x->x_size-2))
-      {
-        x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
-        x->x_size = 2*(length + accu_size);
-      }
-      strcat(x->x_mem, flt_buf);
-      accu_size += length;
-    }
-  }
-  
-  if(ac > 1)
-  {
-    for(i=1; i<ac; i++)
-    {
-      av++;
-      strcat(x->x_mem, x->x_sep);
-      if(IS_A_SYMBOL(av, 0))
+
+      if(IS_A_SYMBOL(av, i))
       {
         length = strlen(av->a_w.w_symbol->s_name);
-        if((length + accu_size) >= (x->x_size-2))
+        if((accu_size + length) > (MAXPDSTRING - 2))
         {
-          x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
-          x->x_size = 2*(length + accu_size);
+          strncat(x->x_mem, av->a_w.w_symbol->s_name, MAXPDSTRING - 2 - accu_size);
+          accu_size = MAXPDSTRING - 2;
+          i = ac + 1;
         }
-        strcat(x->x_mem, av->a_w.w_symbol->s_name);
-        accu_size += length;
+        else
+        {
+          strcat(x->x_mem, av->a_w.w_symbol->s_name);
+          accu_size += length;
+        }
       }
-      else if(IS_A_FLOAT(av, 0))
+      else if(IS_A_FLOAT(av, i))
       {
         sprintf(flt_buf, "%g", av->a_w.w_float);
         length = strlen(flt_buf);
-        if((length + accu_size) >= (x->x_size-2))
+        if((accu_size + length) > (MAXPDSTRING - 2))
         {
-          x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
-          x->x_size = 2*(length + accu_size);
+          strncat(x->x_mem, flt_buf, MAXPDSTRING - 2 - accu_size);
+          accu_size = MAXPDSTRING - 2;
+          i = ac + 1;
         }
-        strcat(x->x_mem, flt_buf);
-        accu_size += length;
+        else
+        {
+          strcat(x->x_mem, flt_buf);
+          accu_size += length;
+        }
       }
     }
   }
@@ -155,42 +138,54 @@ static void mergefilename_anything(t_mergefilename *x, t_symbol *s, int ac, t_at
   
   x->x_mem[0] = 0;
   length = strlen(s->s_name);
-  if((length + accu_size) >= (x->x_size-2))
+  if(length > (MAXPDSTRING - 2))
   {
-    x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
-    x->x_size = 2*(length + accu_size);
+    strncat(x->x_mem, s->s_name, MAXPDSTRING - 2);
+    accu_size = MAXPDSTRING - 2;
+    i = ac + 1;
   }
-  strcat(x->x_mem, s->s_name);
-  accu_size += length;
+  else
+  {
+    strcat(x->x_mem, s->s_name);
+    accu_size = length;
+  }
+
   if(ac > 0)
   {
     for(i=0; i<ac; i++)
     {
       strcat(x->x_mem, x->x_sep);
-      if(IS_A_SYMBOL(av, 0))
+      if(IS_A_SYMBOL(av, i))
       {
         length = strlen(av->a_w.w_symbol->s_name);
-        if((length + accu_size) >= (x->x_size-2))
+        if((accu_size + length) > (MAXPDSTRING - 2))
         {
-          x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
-          x->x_size = 2*(length + accu_size);
+          strncat(x->x_mem, av->a_w.w_symbol->s_name, MAXPDSTRING - 2 - accu_size);
+          accu_size = MAXPDSTRING - 2;
+          i = ac + 1;
         }
-        strcat(x->x_mem, av->a_w.w_symbol->s_name);
-        accu_size += length;
+        else
+        {
+          strcat(x->x_mem, av->a_w.w_symbol->s_name);
+          accu_size += length;
+        }
       }
-      else if(IS_A_FLOAT(av, 0))
+      else if(IS_A_FLOAT(av, i))
       {
         sprintf(flt_buf, "%g", av->a_w.w_float);
         length = strlen(flt_buf);
-        if((length + accu_size) >= (x->x_size-2))
+        if((accu_size + length) > (MAXPDSTRING - 2))
         {
-          x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
-          x->x_size = 2*(length + accu_size);
+          strncat(x->x_mem, flt_buf, MAXPDSTRING - 2 - accu_size);
+          accu_size = MAXPDSTRING - 2;
+          i = ac + 1;
         }
-        strcat(x->x_mem, flt_buf);
-        accu_size += length;
+        else
+        {
+          strcat(x->x_mem, flt_buf);
+          accu_size += length;
+        }
       }
-      av++;
     }
   }
   outlet_symbol(x->x_obj.ob_outlet, gensym(x->x_mem));
@@ -198,7 +193,6 @@ static void mergefilename_anything(t_mergefilename *x, t_symbol *s, int ac, t_at
 
 static void mergefilename_free(t_mergefilename *x)
 {
-  freebytes(x->x_mem, x->x_size*sizeof(char));
 }
 
 static void *mergefilename_new(t_symbol *s, int ac, t_atom *av)
@@ -209,8 +203,7 @@ static void *mergefilename_new(t_symbol *s, int ac, t_atom *av)
   x->x_sep[1] = 0;
   if(ac > 0)
     mergefilename_separator(x, s, ac, av);
-  x->x_size = 400;
-  x->x_mem = (char *)getbytes(x->x_size*sizeof(char));
+  x->x_mem[0] = 0;
   outlet_new(&x->x_obj, &s_symbol);
   return (x);
 }
