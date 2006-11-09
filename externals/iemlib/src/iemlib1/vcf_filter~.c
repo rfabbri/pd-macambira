@@ -5,6 +5,7 @@ iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 
 #include "m_pd.h"
 #include "iemlib.h"
+#include <string.h>
 #include <math.h>
 
 /* ---------- vcf_filter~ - slow dynamic vcf_filter 1. and 2. order ----------- */
