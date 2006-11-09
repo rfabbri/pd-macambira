@@ -9,7 +9,7 @@
 CWD := $(shell pwd)
 
 # these are setup to be overridden by the packages/Makefile
-cvs_root_dir = $(shell cd $(CWD)/.. && pwd)
+cvs_root_dir := $(shell cd $(CWD)/.. && pwd)
 DESTDIR = $(CWD)/build/
 BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
@@ -1160,9 +1160,8 @@ iem16_clean:
 #------------------------------------------------------------------------------#
 # IEMLIB
 IEMLIB_NAME=iemlib
-# omit the lib files, iem_mp3, and the files starting with "sig"
-IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/src/*/[a-hj-rt-z]*.c) \
-$(wildcard $(externals_src)/iemlib/src/*/s[^i][^g]*.c) \
+# omit the lib files and iem_mp3
+IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/src/*/[a-hj-z]*.c) \
 $(wildcard $(externals_src)/iemlib/src/*/iem_????*[^l][^i][^b]*.c)
 iemlib: $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
 
@@ -1501,8 +1500,8 @@ oscx_install: oscx
 
 
 oscx_clean:
-	-cd $(externals_src)/OSCx && $(MAKE) $(DEST_PATHS) clean
-	-cd $(externals_src)/OSCx && $(MAKE) CC=gcc clean
+	-$(MAKE) -C $(externals_src)/OSCx $(DEST_PATHS) clean
+	-$(MAKE) -C $(externals_src)/OSCx CC=gcc clean
 	-rm $(externals_src)/OSCx/Makefile
 
 
@@ -1853,7 +1852,6 @@ toxy_install: toxy
 
 toxy_clean:
 	-$(MAKE) -C $(externals_src)/mixed/toxy $(DEST_PATHS) clean
-
 
 
 #------------------------------------------------------------------------------#
