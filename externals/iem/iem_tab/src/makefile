@@ -10,8 +10,8 @@ LIB = -ldl -lm
 #select either the DBG and OPT compiler flags below:
 
 CFLAGS = -DPD -DUNIX -W -Werror -Wno-unused \
-	-Wno-parentheses -Wno-switch -O6 -funroll-loops -fomit-frame-pointer \
-        -DDL_OPEN
+	-Wno-parentheses -Wno-switch -O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing \
+        -DDL_OPEN -fPIC
 
 SYSTEM = $(shell uname -m)
 
