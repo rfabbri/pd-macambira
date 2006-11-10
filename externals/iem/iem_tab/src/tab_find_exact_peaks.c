@@ -7,12 +7,12 @@ iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 #include "iemlib.h"
 #include "iem_tab.h"
 
-/* -------------------------- tab_find_peaks ------------------------------ */
+/* -------------------------- tab_find_exact_peaks ------------------------------ */
 
-#define IEMLIB_TAB_FIND_PEAKS_SORT_MODE_AMP 0
-#define IEMLIB_TAB_FIND_PEAKS_SORT_MODE_FREQ 1
+#define IEMLIB_TAB_FIND_EXACT_PEAKS_SORT_MODE_AMP 0
+#define IEMLIB_TAB_FIND_EXACT_PEAKS_SORT_MODE_FREQ 1
 
-typedef struct _tab_find_peaks
+typedef struct _tab_find_exact_peaks
 {
   t_object  x_obj;
   int       x_size_src1;
@@ -31,11 +31,11 @@ typedef struct _tab_find_peaks
   t_outlet  *x_sort_index_out;
   t_outlet  *x_peak_value_out;
   t_outlet  *x_peak_index_out;
-} t_tab_find_peaks;
+} t_tab_find_exact_peaks;
 
-static t_class *tab_find_peaks_class;
+static t_class *tab_find_exact_peaks_class;
 
-static void tab_find_peaks_max_peaks(t_tab_find_peaks *x, t_floatarg fmax_peaks)
+static void tab_find_exact_peaks_max_peaks(t_tab_find_exact_peaks *x, t_floatarg fmax_peaks)
 {
   int max_peaks = (int)fmax_peaks;
   
@@ -44,7 +44,7 @@ static void tab_find_peaks_max_peaks(t_tab_find_peaks *x, t_floatarg fmax_peaks)
   x->x_n_peaks = max_peaks;
 }
 
-static void tab_find_peaks_width_range(t_tab_find_peaks *x, t_symbol *s, int argc, t_atom *argv)
+static void tab_find_exact_peaks_width_range(t_tab_find_exact_peaks *x, t_symbol *s, int argc, t_atom *argv)
 {
   int minw, maxw, h;
   
@@ -69,29 +69,29 @@ static void tab_find_peaks_width_range(t_tab_find_peaks *x, t_symbol *s, int arg
   }
 }
 
-static void tab_find_peaks_abs_min_height_diff(t_tab_find_peaks *x, t_floatarg height_diff)
+static void tab_find_exact_peaks_abs_min_height_diff(t_tab_find_exact_peaks *x, t_floatarg height_diff)
 {
   if(height_diff < 0.0f)
     height_diff *= -1.0f;
   x->x_hdiff = height_diff;
 }
 
-static void tab_find_peaks_amp_sort(t_tab_find_peaks *x)
+static void tab_find_exact_peaks_amp_sort(t_tab_find_exact_peaks *x)
 {
-  x->x_sort_mode = IEMLIB_TAB_FIND_PEAKS_SORT_MODE_AMP;
+  x->x_sort_mode = IEMLIB_TAB_FIND_EXACT_PEAKS_SORT_MODE_AMP;
 }
 
-static void tab_find_peaks_freq_sort(t_tab_find_peaks *x)
+static void tab_find_exact_peaks_freq_sort(t_tab_find_exact_peaks *x)
 {
-  x->x_sort_mode = IEMLIB_TAB_FIND_PEAKS_SORT_MODE_FREQ;
+  x->x_sort_mode = IEMLIB_TAB_FIND_EXACT_PEAKS_SORT_MODE_FREQ;
 }
 
-static void tab_find_peaks_src(t_tab_find_peaks *x, t_symbol *s)
+static void tab_find_exact_peaks_src(t_tab_find_exact_peaks *x, t_symbol *s)
 {
   x->x_sym_scr1 = s;
 }
 
-static void tab_find_peaks_bang(t_tab_find_peaks *x)
+static void tab_find_exact_peaks_bang(t_tab_find_exact_peaks *x)
 {
   int i, n, w, ww;
   int ok_src, peak_index=0, sort_index=0;
@@ -103,7 +103,7 @@ static void tab_find_peaks_bang(t_tab_find_peaks *x)
   int max_width=x->x_max_width;
   t_float abs_min_height_diff=x->x_hdiff;
   
-  ok_src = iem_tab_check_arrays(gensym("tab_find_peaks"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
+  ok_src = iem_tab_check_arrays(gensym("tab_find_exact_peaks"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
   
   if(ok_src)
   {
@@ -125,7 +125,7 @@ static void tab_find_peaks_bang(t_tab_find_peaks *x)
       vec_src = x->x_beg_mem_src1;
       vec_work1 = x->x_beg_mem_work1;
       vec_work2 = x->x_beg_mem_work2;
-      if(x->x_sort_mode == IEMLIB_TAB_FIND_PEAKS_SORT_MODE_FREQ) // FREQ_SORT BEGIN
+      if(x->x_sort_mode == IEMLIB_TAB_FIND_EXACT_PEAKS_SORT_MODE_FREQ) // FREQ_SORT BEGIN
       {
         int sort_index=1,old=0,j;
         
@@ -186,7 +186,7 @@ static void tab_find_peaks_bang(t_tab_find_peaks *x)
         }
         outlet_bang(x->x_bang_out);
       }                                                               // FREQ_SORT END
-      else if(x->x_sort_mode == IEMLIB_TAB_FIND_PEAKS_SORT_MODE_AMP)  // AMP_SORT BEGIN
+      else if(x->x_sort_mode == IEMLIB_TAB_FIND_EXACT_PEAKS_SORT_MODE_AMP)  // AMP_SORT BEGIN
       {
         int sort_index=1,old=0,j;
         
@@ -276,7 +276,7 @@ static void tab_find_peaks_bang(t_tab_find_peaks *x)
   */
 }
 
-/*static void tab_find_peaks_list(t_tab_find_peaks *x, t_symbol *s, int argc, t_atom *argv)
+/*static void tab_find_exact_peaks_list(t_tab_find_exact_peaks *x, t_symbol *s, int argc, t_atom *argv)
 {
 int beg_src;
 int i, n;
@@ -295,7 +295,7 @@ t_float max=-1.0e37;
   if(n < 0)
   n = 0;
   
-    ok_src = iem_tab_check_arrays(gensym("tab_find_peaks"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, beg_src+n);
+    ok_src = iem_tab_check_arrays(gensym("tab_find_exact_peaks"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, beg_src+n);
     
       if(ok_src)
       {
@@ -318,12 +318,12 @@ t_float max=-1.0e37;
       }
       else
       {
-      post("tab_find_peaks-ERROR: list need 2 float arguments:");
+      post("tab_find_exact_peaks-ERROR: list need 2 float arguments:");
       post("  source_offset + number_of_samples_to_calc_max_index");
       }
 }*/
 
-static void tab_find_peaks_free(t_tab_find_peaks *x)
+static void tab_find_exact_peaks_free(t_tab_find_exact_peaks *x)
 {
   if(x->x_work_alloc)
   {
@@ -332,9 +332,9 @@ static void tab_find_peaks_free(t_tab_find_peaks *x)
   }
 }
 
-static void *tab_find_peaks_new(t_symbol *s, int argc, t_atom *argv)
+static void *tab_find_exact_peaks_new(t_symbol *s, int argc, t_atom *argv)
 {
-  t_tab_find_peaks *x = (t_tab_find_peaks *)pd_new(tab_find_peaks_class);
+  t_tab_find_exact_peaks *x = (t_tab_find_exact_peaks *)pd_new(tab_find_exact_peaks_class);
   t_symbol  *src;
   
   if((argc >= 1) &&
@@ -344,7 +344,7 @@ static void *tab_find_peaks_new(t_symbol *s, int argc, t_atom *argv)
   }
   else
   {
-    post("tab_find_peaks-ERROR: need 1 symbol argument:");
+    post("tab_find_exact_peaks-ERROR: need 1 symbol argument:");
     post("  source_array_name");
     return(0);
   }
@@ -362,18 +362,18 @@ static void *tab_find_peaks_new(t_symbol *s, int argc, t_atom *argv)
   return(x);
 }
 
-void tab_find_peaks_setup(void)
+void tab_find_exact_peaks_setup(void)
 {
-  tab_find_peaks_class = class_new(gensym("tab_find_peaks"), (t_newmethod)tab_find_peaks_new, (t_method)tab_find_peaks_free,
-    sizeof(t_tab_find_peaks), 0, A_GIMME, 0);
-  class_addbang(tab_find_peaks_class, (t_method)tab_find_peaks_bang);
-  /*class_addlist(tab_find_peaks_class, (t_method)tab_find_peaks_list);*/
-  class_addmethod(tab_find_peaks_class, (t_method)tab_find_peaks_src, gensym("src"), A_DEFSYMBOL, 0);
-  class_addmethod(tab_find_peaks_class, (t_method)tab_find_peaks_src, gensym("src1"), A_DEFSYMBOL, 0);
-  class_addmethod(tab_find_peaks_class, (t_method)tab_find_peaks_max_peaks, gensym("max_peaks"), A_DEFFLOAT, 0);
-  class_addmethod(tab_find_peaks_class, (t_method)tab_find_peaks_width_range, gensym("width_range"), A_GIMME, 0);
-  class_addmethod(tab_find_peaks_class, (t_method)tab_find_peaks_abs_min_height_diff, gensym("abs_min_height_diff"), A_DEFFLOAT, 0);
-  class_addmethod(tab_find_peaks_class, (t_method)tab_find_peaks_amp_sort, gensym("amp_sort"), 0);
-  class_addmethod(tab_find_peaks_class, (t_method)tab_find_peaks_freq_sort, gensym("freq_sort"), 0);
-  class_sethelpsymbol(tab_find_peaks_class, gensym("iemhelp2/tab_find_peaks-help"));
+  tab_find_exact_peaks_class = class_new(gensym("tab_find_exact_peaks"), (t_newmethod)tab_find_exact_peaks_new, (t_method)tab_find_exact_peaks_free,
+    sizeof(t_tab_find_exact_peaks), 0, A_GIMME, 0);
+  class_addbang(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_bang);
+  /*class_addlist(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_list);*/
+  class_addmethod(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_src, gensym("src"), A_DEFSYMBOL, 0);
+  class_addmethod(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_src, gensym("src1"), A_DEFSYMBOL, 0);
+  class_addmethod(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_max_peaks, gensym("max_peaks"), A_DEFFLOAT, 0);
+  class_addmethod(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_width_range, gensym("width_range"), A_GIMME, 0);
+  class_addmethod(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_abs_min_height_diff, gensym("abs_min_height_diff"), A_DEFFLOAT, 0);
+  class_addmethod(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_amp_sort, gensym("amp_sort"), 0);
+  class_addmethod(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_freq_sort, gensym("freq_sort"), 0);
+  class_sethelpsymbol(tab_find_exact_peaks_class, gensym("iemhelp2/help-tab_find_exact_peaks"));
 }
