@@ -3,19 +3,10 @@
 
 iem_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
-
 #include "m_pd.h"
 #include "iemlib.h"
 #include "iem_ambi.h"
 #include <math.h>
-#include <stdio.h>
-#include <string.h>
-
 
 
 /* -------------------------- ambi_decode2 ------------------------------ */
@@ -331,7 +322,7 @@ static void ambi_decode2_pseudo_inverse(t_ambi_decode2 *x, t_symbol *s, int argc
 	at += 2;
 	for(i=0; i<n; i++)
 	{
-		SETFLOAT(at, (float)(*dv1));
+		SETFLOAT(at, (t_float)(*dv1));
 		dv1++;
 		at++;
 	}
@@ -341,7 +332,7 @@ static void ambi_decode2_pseudo_inverse(t_ambi_decode2 *x, t_symbol *s, int argc
 	dv2 += n;
 	for(i=0; i<n; i++)
 	{
-		SETFLOAT(at, (float)(*dv1 + *dv2*mw));
+		SETFLOAT(at, (t_float)(*dv1 + *dv2*mw));
 		dv1++;
 		dv2++;
 		at++;
@@ -780,8 +771,8 @@ static void *ambi_decode2_new(t_symbol *s, int argc, t_atom *argv)
 		x->x_at = (t_atom *)getbytes(((x->x_n_ls+x->x_n_mir_ls) * x->x_n_ambi + 2) * sizeof(t_atom));
 		x->x_s_matrix = gensym("matrix");
 		/*change*/
-		SETFLOAT(x->x_at, (float)(x->x_n_ls+x->x_n_mir_ls));
-		SETFLOAT(x->x_at+1, (float)x->x_n_ambi);
+		SETFLOAT(x->x_at, (t_float)(x->x_n_ls+x->x_n_mir_ls));
+		SETFLOAT(x->x_at+1, (t_float)x->x_n_ambi);
 		x->x_mirror_weight = 0.0;
 
 		x->x_sqrt3				= sqrt(3.0);

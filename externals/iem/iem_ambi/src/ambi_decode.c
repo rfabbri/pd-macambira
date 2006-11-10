@@ -3,19 +3,9 @@
 
 iem_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
-
 #include "m_pd.h"
 #include "iemlib.h"
 #include <math.h>
-#include <stdio.h>
-#include <string.h>
-
-
 
 /* -------------------------- ambi_decode ------------------------------ */
 /*
@@ -325,7 +315,7 @@ static void ambi_decode_pinv(t_ambi_decode *x)
 	at += 2;
 	for(i=0; i<n; i++)
 	{
-		SETFLOAT(at, (float)(*dv));
+		SETFLOAT(at, (t_float)(*dv));
 		dv++;
 		at++;
 	}
@@ -690,8 +680,8 @@ static void *ambi_decode_new(t_symbol *s, int argc, t_atom *argv)
 		x->x_at = (t_atom *)getbytes((x->x_n_ls * x->x_n_ambi + 2) * sizeof(t_atom));
 		x->x_s_matrix = gensym("matrix");
 		/*change*/
-		SETFLOAT(x->x_at, (float)x->x_n_ls);
-		SETFLOAT(x->x_at+1, (float)x->x_n_ambi);
+		SETFLOAT(x->x_at, (t_float)x->x_n_ls);
+		SETFLOAT(x->x_at+1, (t_float)x->x_n_ambi);
 		x->x_sqrt3				= sqrt(3.0);
 		x->x_sqrt5_2			= sqrt(5.0) / 2.0;
 		x->x_sqrt6_4			= sqrt(6.0) / 4.0;

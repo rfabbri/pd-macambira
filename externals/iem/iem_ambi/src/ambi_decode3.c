@@ -3,35 +3,15 @@
 
 iem_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
-
 #include "m_pd.h"
 #include "iemlib.h"
 #include "iem_ambi.h"
 #include <math.h>
-#include <stdio.h>
-#include <string.h>
-
 
 
 /* -------------------------- ambi_decode3 ------------------------------ */
 /*
- ** berechnet ein reduziertes Ambisonic-Decoder-Set in die HRTF-Spektren **
- ** Inputs: ls + Liste von 3 floats: Index [1 .. 25] + Elevation [-90 .. +90 degree] + Azimut [0 .. 360 degree] **
- ** Inputs: calc_inv **
- ** Inputs: load_HRIR + float index1..25 **
- ** Outputs: List of 2 symbols: left-HRIR-File-name + HRIR-table-name **
- ** Inputs: calc_reduced **
- ** "output" ...  writes the HRTF into tables **
- **  **
- **  **
- ** setzt voraus , dass die HRIR-tabele-names von LS1_L_HRIR .. LS25_L_HRIR heissen und existieren **
- ** setzt voraus , dass die HRTF-tabele-names von LS1_HRTF_re .. LS25_HRTF_re heissen und existieren **
- ** setzt voraus , dass die HRTF-tabele-names von LS1_HRTF_im .. LS25_HRTF_im heissen und existieren **
+ 
  */
 
 typedef struct _ambi_decode3
@@ -326,7 +306,7 @@ static void ambi_decode3_begin_pseudo_inverse(t_ambi_decode3 *x)
 	at += 2;
 	for(i=0; i<n; i++)
 	{
-		SETFLOAT(at, (float)(*dv1));
+		SETFLOAT(at, (t_float)(*dv1));
 		dv1++;
 		at++;
 	}
@@ -338,7 +318,7 @@ static void ambi_decode3_ipht_ireal_muladd(t_ambi_decode3 *x, t_symbol *s, int a
 	int i, n=x->x_n_ambi;
 	int pht_index, real_index;
 	double mw;
-	float dat1;
+	t_float dat1;
 	double *dv2=x->x_prod;
 
 	if(argc < 3)
@@ -364,7 +344,7 @@ static void ambi_decode3_ipht_ireal_muladd(t_ambi_decode3 *x, t_symbol *s, int a
 	for(i=0; i<n; i++)
 	{
 		dat1 = atom_getfloat(at);
-		SETFLOAT(at, dat1 + (float)(*dv2*mw));
+		SETFLOAT(at, dat1 + (t_float)(*dv2*mw));
 		dv2++;
 		at++;
 	}
@@ -730,8 +710,8 @@ static void *ambi_decode3_new(t_symbol *s, int argc, t_atom *argv)
 		x->x_at = (t_atom *)getbytes((x->x_n_real_ls * x->x_n_ambi + 2) * sizeof(t_atom));
 		x->x_s_matrix = gensym("matrix");
 		/*change*/
-		SETFLOAT(x->x_at, (float)x->x_n_real_ls);
-		SETFLOAT(x->x_at+1, (float)x->x_n_ambi);
+		SETFLOAT(x->x_at, (t_float)x->x_n_real_ls);
+		SETFLOAT(x->x_at+1, (t_float)x->x_n_ambi);
 
 		x->x_sqrt3				= sqrt(3.0);
 		x->x_sqrt5_2			= sqrt(5.0) / 2.0;
