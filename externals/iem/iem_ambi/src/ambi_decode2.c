@@ -271,7 +271,7 @@ static void ambi_decode2_inverse(t_ambi_decode2 *x)
 		nz = ambi_decode2_eval_which_element_of_col_not_zero(x, i, i);
 		if(nz < 0)
 		{
-			post("ambi_decode2 ERROR: matrix not regular !!!!");
+			post("ambi_decode2 ERROR: matrix singular !!!!");
 			return;
 		}
 		else
@@ -304,7 +304,7 @@ static void ambi_decode2_inverse(t_ambi_decode2 *x)
 		}
 	}
 
-	post("matrix_inverse regular");
+	post("matrix_inverse nonsingular");
 }
 
 static void ambi_decode2_pseudo_inverse(t_ambi_decode2 *x, t_symbol *s, int argc, t_atom *argv)

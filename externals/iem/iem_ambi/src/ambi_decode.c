@@ -266,7 +266,7 @@ static void ambi_decode_inverse(t_ambi_decode *x)
 		nz = ambi_decode_eval_which_element_of_col_not_zero(x, i, i);
 		if(nz < 0)
 		{
-			post("ambi_decode ERROR: matrix not regular !!!!");
+			post("ambi_decode ERROR: matrix singular !!!!");
 			return;
 		}
 		else
@@ -299,7 +299,7 @@ static void ambi_decode_inverse(t_ambi_decode *x)
 		}
 	}
 
-	post("matrix_inverse regular");
+	post("matrix_inverse nonsingular");
 }
 
 static void ambi_decode_pinv(t_ambi_decode *x)

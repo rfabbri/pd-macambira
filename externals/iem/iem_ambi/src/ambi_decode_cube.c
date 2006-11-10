@@ -269,7 +269,7 @@ static void ambi_decode_cube_inverse(t_ambi_decode_cube *x)
 		nz = ambi_decode_cube_eval_which_element_of_col_not_zero(x, i, i);
 		if(nz < 0)
 		{
-			post("ambi_decode_cube ERROR: matrix not regular !!!!");
+			post("ambi_decode_cube ERROR: matrix singular !!!!");
 			return;
 		}
 		else
@@ -302,7 +302,7 @@ static void ambi_decode_cube_inverse(t_ambi_decode_cube *x)
 		}
 	}
 
-	post("matrix_inverse regular");
+	post("matrix_inverse nonsingular");
 }
 
 static void ambi_decode_cube_pinv(t_ambi_decode_cube *x)
