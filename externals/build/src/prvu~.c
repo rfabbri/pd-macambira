@@ -1,5 +1,1 @@
-#include "../../iemlib/src/iemlib1/sigprvu.c"
-void prvu_tilde_setup(void)
-{
-   sigprvu_setup();
-}
+#include "../../iemlib/src/iemlib1/prvu~.c"
