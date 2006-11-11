@@ -9,7 +9,9 @@ extern "C" {
 #endif
 
 #define PD_MAJOR_VERSION 0
-#define PD_MINOR_VERSION 38   
+#define PD_MINOR_VERSION 40
+#define PD_BUGFIX_VERSION 1
+#define PD_TEST_VERSION ""
 
 /* old name for "MSW" flag -- we have to take it for the sake of many old
 "nmakefiles" for externs, which will define NT and not MSW */
@@ -17,12 +19,13 @@ extern "C" {
 #define MSW
 #endif
 
-#ifdef MSW
+/* These pragmas are only used for MSVC, not MinGW or Cygwin <hans@at.or.at> */
+#ifdef _MSC_VER
 /* #pragma warning( disable : 4091 ) */
 #pragma warning( disable : 4305 )  /* uncast const double to float */
 #pragma warning( disable : 4244 )  /* uncast float/int conversion etc. */
 #pragma warning( disable : 4101 )  /* unused automatic variables */
-#endif /* MSW */
+#endif /* _MSC_VER */
 
     /* the external storage class is "extern" in UNIX; in MSW it's ugly. */
 #ifdef MSW
@@ -287,6 +290,8 @@ EXTERN t_atom *binbuf_getvec(t_binbuf *x);
 EXTERN void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv);
 EXTERN int binbuf_read(t_binbuf *b, char *filename, char *dirname,
     int crflag);
+EXTERN int binbuf_read_via_canvas(t_binbuf *b, char *filename, t_canvas *canvas,
+    int crflag);
 EXTERN int binbuf_read_via_path(t_binbuf *b, char *filename, char *dirname,
     int crflag);
 EXTERN int binbuf_write(t_binbuf *x, char *filename, char *dir,
@@ -337,6 +342,7 @@ EXTERN t_inlet *inlet_new(t_object *owner, t_pd *dest, t_symbol *s1,
 EXTERN t_inlet *pointerinlet_new(t_object *owner, t_gpointer *gp);
 EXTERN t_inlet *floatinlet_new(t_object *owner, t_float *fp);
 EXTERN t_inlet *symbolinlet_new(t_object *owner, t_symbol **sp);
+EXTERN t_inlet *signalinlet_new(t_object *owner, t_float f);
 EXTERN void inlet_free(t_inlet *x);
 
 EXTERN t_outlet *outlet_new(t_object *owner, t_symbol *s);
@@ -365,6 +371,8 @@ EXTERN t_symbol *canvas_getdir(t_glist *x);
 EXTERN int sys_fontwidth(int fontsize);
 EXTERN int sys_fontheight(int fontsize);
 EXTERN void canvas_dataproperties(t_glist *x, t_scalar *sc, t_binbuf *b);
+EXTERN int canvas_open(t_canvas *x, const char *name, const char *ext,
+    char *dirresult, char **nameresult, unsigned int size, int bin);
 
 /* ---------------- widget behaviors ---------------------- */
 
@@ -436,6 +444,7 @@ EXTERN void postfloat(float f);
 EXTERN void postatom(int argc, t_atom *argv);
 EXTERN void endpost(void);
 EXTERN void error(const char *fmt, ...);
+EXTERN void verbose(int level, const char *fmt, ...);
 EXTERN void bug(const char *fmt, ...);
 EXTERN void pd_error(void *object, const char *fmt, ...);
 EXTERN void sys_logerror(const char *object, const char *s);
@@ -454,9 +463,7 @@ EXTERN double sys_getrealtime(void);
 EXTERN int (*sys_idlehook)(void);   /* hook to add idle time computation */
 
 
-/* ------------  threading ------------------- */
-/* T.Grill - see m_sched.c */
- 
+/* ------------  threading ------------------- */ 
 EXTERN void sys_lock(void);
 EXTERN void sys_unlock(void);
 EXTERN int sys_trylock(void);
@@ -478,8 +485,8 @@ typedef struct _signal
     struct _signal *s_borrowedfrom;     /* signal to borrow it from */
     struct _signal *s_nextfree;         /* next in freelist */
     struct _signal *s_nextused;         /* next in used list */
+    int s_vecsize;      /* allocated size of array in points */
 } t_signal;
-
 
 typedef t_int *(*t_perfroutine)(t_int *args);
 
@@ -515,8 +522,9 @@ EXTERN float *cos_table;
 EXTERN int canvas_suspend_dsp(void);
 EXTERN void canvas_resume_dsp(int oldstate);
 EXTERN void canvas_update_dsp(void);
+EXTERN int canvas_dspstate;
 
-/* IOhannes { (up/downsampling) */
+/*   up/downsampling */
 typedef struct _resample
 {
   int method;       /* up/downsampling method ID */
@@ -540,7 +548,6 @@ EXTERN void resample_free(t_resample *x);
 EXTERN void resample_dsp(t_resample *x, t_sample *in, int insize, t_sample *out, int outsize, int method);
 EXTERN void resamplefrom_dsp(t_resample *x, t_sample *in, int insize, int outsize, int method);
 EXTERN void resampleto_dsp(t_resample *x, t_sample *out, int insize, int outsize, int method);
-/* } IOhannes */
 
 /* ----------------------- utility functions for signals -------------- */
 EXTERN float mtof(float);
