@@ -99,11 +99,11 @@ static void setAtomListConstFloat (int n, t_atom *x, t_float f)
       SETFLOAT(x,f);
 }
 
-static void writeIndexedValuesIntoList (int n, int *index, t_atom *x, t_atom *y)
+static void writeIndexedValuesIntoList (int n, int *indx, t_atom *x, t_atom *y)
 {
-   for (;n--;index++,y++)
-      if (*index)
-	 *y = x[*index-1];
+   for (;n--;indx++,y++)
+      if (*indx)
+	 *y = x[*indx-1];
 }
 
 static void mTXIndexRightMatrix (MTXindex *mtx_index_obj, t_symbol *s, 
@@ -165,7 +165,7 @@ static void mTXIndexMatrix (MTXindex *mtx_index_obj, t_symbol *s,
    t_atom *list_out = mtx_index_obj->list_out;
    int index_rows = mtx_index_obj->index_rows;
    int index_columns = mtx_index_obj->index_columns;
-   int *index = mtx_index_obj->index_in;
+   int *indx = mtx_index_obj->index_in;
 
    // size check
    if (!size) {
@@ -181,14 +181,14 @@ static void mTXIndexMatrix (MTXindex *mtx_index_obj, t_symbol *s,
       post("mtx_index: index exceeds matrix dimensions");
       return;
    }
-   if ((!index)||(mtx_index_obj->index_size == 0)) {
+   if ((!indx)||(mtx_index_obj->index_size == 0)) {
       post("mtx_index: index with what? no right matrix defined");
       return;
    }
    // main part
    list_out += 2;
    setAtomListConstFloat (mtx_index_obj->index_size, list_out, mtx_index_obj->fill_value);
-   writeIndexedValuesIntoList (mtx_index_obj->index_size, index,list_in,list_out);
+   writeIndexedValuesIntoList (mtx_index_obj->index_size, indx,list_in,list_out);
    list_out = mtx_index_obj->list_out;
    SETSYMBOL(list_out, gensym("matrix"));
    SETFLOAT(list_out, index_rows);

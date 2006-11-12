@@ -49,7 +49,7 @@ static void mtx_sum_list(t_matrix *x, t_symbol *s, int argc, t_atom *argv){
 }
 
 
-static void *mtx_sum_new()
+static void *mtx_sum_new(void)
 {
   t_matrix *x = (t_matrix *)pd_new(mtx_sum_class);
   outlet_new(&x->x_obj, 0);
