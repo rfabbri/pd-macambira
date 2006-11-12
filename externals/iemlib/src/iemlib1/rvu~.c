@@ -84,7 +84,7 @@ static t_int *rvu_tilde_perform(t_int *w)
   t_float *in = (t_float *)(w[1]);
   t_rvu_tilde *x = (t_rvu_tilde *)(w[2]);
   int n = (int)(w[3]);
-  t_float pow, sum=x->x_sum_rms;
+  t_float sum=x->x_sum_rms;
   int i;
   
   if(x->x_started)

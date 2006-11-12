@@ -771,7 +771,7 @@ static void ExitMP3(struct iemmp3Struct *mp)
 
 static int decodeMP3(struct iemmp3Struct *mp, char *in, int isize, char *out, int osize, int *done)
 {
-    int len,error=1;
+    int len,err=1;
 
     iemmp3_gmp = mp;
 
@@ -836,8 +836,8 @@ static int decodeMP3(struct iemmp3Struct *mp, char *in, int isize, char *out, in
     *done = 0;
     if(mp->fr.error_protection)
   getbits(16);
-    do_layer3(&mp->fr,(unsigned char *) out,done,&error);
-    if(!error)
+    do_layer3(&mp->fr,(unsigned char *) out,done,&err);
+    if(!err)
   return MP3_EX;
 
     mp->fsizeold = mp->framesize;
@@ -987,15 +987,15 @@ static void init_layer3(int down_sample_sblimit)
   bdf = bi->shortDiff+3;
   for(cb=3;cb<13;cb++)
   {
-      int l = (*bdf++) >> 1;
+      int l1 = (*bdf++) >> 1;
       for(lwin=0;lwin<3;lwin++)
       {
-    *mp++ = l;
+    *mp++ = l1;
     *mp++ = i + lwin;
     *mp++ = lwin;
     *mp++ = cb;
       }
-      i += 6*l;
+      i += 6*l1;
   }
   iemmp3_mapend[j][0] = mp;
 
@@ -1003,15 +1003,15 @@ static void init_layer3(int down_sample_sblimit)
   bdf = bi->shortDiff+0;
   for(i=0,cb=0;cb<13;cb++)
   {
-      int l = (*bdf++) >> 1;
+      int l1 = (*bdf++) >> 1;
       for(lwin=0;lwin<3;lwin++)
       {
-    *mp++ = l;
+    *mp++ = l1;
     *mp++ = i + lwin;
     *mp++ = lwin;
     *mp++ = cb;
       }
-      i += 6*l;
+      i += 6*l1;
   }
   iemmp3_mapend[j][1] = mp;
 
@@ -1175,17 +1175,17 @@ static int read_buf_byte(struct iemmp3Struct *mp,int *err)
 static int read_head(struct iemmp3Struct *mp)
 {
     unsigned long head;
-    int error=1;
+    int err=1;
 
-    head = read_buf_byte(mp,&error);
+    head = read_buf_byte(mp,&err);
     head <<= 8;
-    head |= read_buf_byte(mp,&error);
+    head |= read_buf_byte(mp,&err);
     head <<= 8;
-    head |= read_buf_byte(mp,&error);
+    head |= read_buf_byte(mp,&err);
     head <<= 8;
-    head |= read_buf_byte(mp,&error);
+    head |= read_buf_byte(mp,&err);
     mp->header = head;
-    return(error);
+    return(err);
 }
 
 static int decode_header(struct iemmp3_frame *fr,unsigned long newhead)

@@ -114,17 +114,17 @@ static t_int *prvu_tilde_perform(t_int *w)
   t_float *in = (t_float *)(w[1]);
   t_prvu_tilde *x = (t_prvu_tilde *)(w[2]);
   int n = (int)(w[3]);
-  t_float peak = x->x_cur_peak, pow, sum=x->x_sum_rms;
+  t_float peak = x->x_cur_peak, power, sum=x->x_sum_rms;
   int i;
   
   if(x->x_started)
   {
     for(i=0; i<n; i++)
     {
-      pow = in[i]*in[i];
-      if(pow > peak)
-        peak = pow;
-      sum += pow;
+      power = in[i]*in[i];
+      if(power > peak)
+        peak = power;
+      sum += power;
     }
     x->x_cur_peak = peak;
     x->x_sum_rms = sum;
