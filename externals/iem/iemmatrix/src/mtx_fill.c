@@ -81,17 +81,17 @@ static int copyNonZeroAtomsToIntegerArrayMax (int *size, t_atom *x, int *y)
    return max;
 }
 
-static void writeIndexedValuesIntoMatrix (int n, int *index, t_atom *x, t_atom *y)
+static void writeIndexedValuesIntoMatrix (int n, int *idx, t_atom *x, t_atom *y)
 {
-   for (;n--;index++,x++)
-      if (*index)
-	 y[*index-1] = *x;
+   for (;n--;idx++,x++)
+      if (*idx)
+	 y[*idx-1] = *x;
 }
-static void writeFloatIndexedIntoMatrix (int n, int *index, t_float f, t_atom *y)
+static void writeFloatIndexedIntoMatrix (int n, int *idx, t_float f, t_atom *y)
 {
-   for (;n--;index++)
-      if (*index)
-	 SETFLOAT(&y[*index-1], f);
+   for (;n--;idx++)
+      if (*idx)
+	 SETFLOAT(&y[*idx-1], f);
 }
 
 static void mTXFillIndexMatrix (MTXfill *mtx_fill_obj, t_symbol *s, 
@@ -101,7 +101,7 @@ static void mTXFillIndexMatrix (MTXfill *mtx_fill_obj, t_symbol *s,
    int columns = atom_getint (argv++);
    int size = rows * columns;
    int list_size = argc - 2;
-   int *index = mtx_fill_obj->index;
+   int *idx = mtx_fill_obj->index;
 
    // size check
    if (!size) {
@@ -125,17 +125,17 @@ static void mTXFillIndexMatrix (MTXfill *mtx_fill_obj, t_symbol *s,
    }
    else {
       if (size > mtx_fill_obj->index_size) {
-	 if (!index)
-	    index = (int *) getbytes (sizeof (int) * (size + 2));
+	 if (!idx)
+	    idx = (int *) getbytes (sizeof (int) * (size + 2));
 	 else
-	    index = (int *) resizebytes (index,
+	    idx = (int *) resizebytes (idx,
 		  sizeof (int) * (mtx_fill_obj->index_size+2),
 		  sizeof (t_atom) * (size + 2));
 	 mtx_fill_obj->index_size = size;
-	 mtx_fill_obj->index = index;
+	 mtx_fill_obj->index = idx;
       }
       mtx_fill_obj->max_index = 
-	 copyNonZeroAtomsToIntegerArrayMax (&size, argv++, index);
+	 copyNonZeroAtomsToIntegerArrayMax (&size, argv++, idx);
       mtx_fill_obj->num_idcs_used = size;
       if (!size) 
 	 mtx_fill_obj->fill_type = DONT_FILL_JUST_PASS;

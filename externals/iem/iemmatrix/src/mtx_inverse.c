@@ -17,7 +17,7 @@
 static t_class *mtx_inverse_class;
 
 
-t_matrixfloat* mtx_doInvert(t_matrixfloat*input, int rowcol, int*error){
+t_matrixfloat* mtx_doInvert(t_matrixfloat*input, int rowcol, int*err){
   /*
    * row==col==rowclo
    * input=t_matrixfloat[row*col]
@@ -77,7 +77,7 @@ t_matrixfloat* mtx_doInvert(t_matrixfloat*input, int rowcol, int*error){
         }
       }
   }
-  if(error!=0)*error=ok;
+  if(err!=0)*err=ok;
 
   return inverted;
 }
@@ -88,7 +88,7 @@ static void mtx_inverse_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
   int row=atom_getfloat(argv);
   int col=atom_getfloat(argv+1);
 
-  int error=0;
+  int err=0;
 
   t_matrixfloat *original, *inverted;
 
@@ -105,7 +105,7 @@ static void mtx_inverse_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
 
   if (row==col){
     /* fine, the matrix is square */
-    inverted=mtx_doInvert(original, row, &error);
+    inverted=mtx_doInvert(original, row, &err);
   } else {
     /* we'll have to do the pseudo-inverse:
      * P=A'*inv(A*A') if row<col
@@ -117,11 +117,11 @@ static void mtx_inverse_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
     if(row>col){
       inverteeCol=col;
       invertee  =mtx_doMultiply(col, transposed, row, original, col);
-      inverted  =mtx_doMultiply(col, mtx_doInvert(invertee, col, &error), col, transposed, row);
+      inverted  =mtx_doMultiply(col, mtx_doInvert(invertee, col, &err), col, transposed, row);
     } else {
       inverteeCol=row;
       invertee  =mtx_doMultiply(row, original, col, transposed, row);
-      inverted  =mtx_doMultiply(col, transposed, row, mtx_doInvert(invertee, row, &error), row);
+      inverted  =mtx_doMultiply(col, transposed, row, mtx_doInvert(invertee, row, &err), row);
     }
     freebytes(transposed, sizeof(t_matrixfloat)*col*row);
     freebytes(invertee  , sizeof(t_matrixfloat)*inverteeCol*inverteeCol);
@@ -133,9 +133,9 @@ static void mtx_inverse_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
   /* 3b destroy the buffers */
   freebytes(original, sizeof(t_matrixfloat)*row*col);
 
-  if(error){
+  if(err){
     outlet_bang(x->x_outlet);
-    pd_error(x, "mtx_inverse: couldn't really invert the matrix !!! %d error%c", error, (error-1)?'s':0);
+    pd_error(x, "mtx_inverse: couldn't really invert the matrix !!! %d error%c", err, (err-1)?'s':0);
   }
 
   /* 3c output the atombuf; */

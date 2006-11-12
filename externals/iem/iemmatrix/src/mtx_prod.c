@@ -49,7 +49,7 @@ static void mtx_prod_list(t_matrix *x, t_symbol *s, int argc, t_atom *argv){
 }
 
 
-static void *mtx_prod_new()
+static void *mtx_prod_new(void)
 {
   t_matrix *x = (t_matrix *)pd_new(mtx_prod_class);
   outlet_new(&x->x_obj, 0);

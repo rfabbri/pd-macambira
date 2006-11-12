@@ -70,8 +70,8 @@ static void mtx_distance2_matrix(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom 
 
       int n;
       for(n=0; n<col; n++){
-	t_float x=atom_getfloat(&m1[c1+n])-atom_getfloat(&m2[c2+n]);
-	f+=x*x;
+	t_float val=atom_getfloat(&m1[c1+n])-atom_getfloat(&m2[c2+n]);
+	f+=val*val;
       }
       SETFLOAT(m,f);
       m++;
