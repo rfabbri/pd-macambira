@@ -1,10 +1,6 @@
 
 - check F.Moore's Elements of Computer Music for panning algorithms
 
-- remove motex [pan~] from distros and replace with these Pd patches.
-
-- write equal power panning object in Pd to replace motex [pan~]
-
 - write pan_gogins~.c in Pd
 
 - write all_about_panning, including graphs and discussion from 
