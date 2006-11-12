@@ -43,7 +43,7 @@ CPU_FLAGS = -O2
 # PowerPC G5
 #CPU_FLAGS = -O3 -mpowerpc64 -maltivec -falign-functions=32 -falign-labels=32 -falign-loops=32 -falign-jumps=32
 
-OPTIM_FLAGS = -funroll-loops -fomit-frame-pointer $(CPU_FLAGS)
+OPTIM_FLAGS = -funroll-loops -fomit-frame-pointer -fno-strict-aliasing $(CPU_FLAGS)
 
 CFLAGS = -fPIC -DPD -DUNIX $(OPTIM_FLAGS)  \
     -Wall -W -Wshadow -Wstrict-prototypes  \
