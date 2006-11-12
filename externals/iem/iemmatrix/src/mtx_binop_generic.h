@@ -201,16 +201,16 @@ static void mtxbin_matrix(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom *argv)
   
   outlet_anything(x->x_obj.ob_outlet, gensym("matrix"), argc, x->m.atombuffer);
 }
-static void mtxbin_float(t_mtx_binmtx *x, t_float f)
+static void mtxbin_float(t_mtx_binmtx *x, t_float fval)
 {
   t_matrix *m=&x->m, *m2=&x->m2;
   t_atom *ap, *ap2=m2->atombuffer+2;
   int row2, col2, n;
 
 #ifdef MTXBIN_GENERIC__INTEGEROP
-  t_int offset=(t_int)f;
+  t_int offset=(t_int)fval;
 #else
-  t_float offset=f;
+  t_float offset=fval;
 #endif
 
 
