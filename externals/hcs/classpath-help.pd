@@ -1,0 +1,13 @@
+#N canvas 375 22 462 312 10;
+#X obj 85 99 classpath;
+#X msg 82 68 bang;
+#X obj 99 145 print;
+#X symbolatom 74 182 0 0 0 0 - - -;
+#X obj 146 120 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 124 71 rewind;
+#X connect 0 0 2 0;
+#X connect 0 0 3 0;
+#X connect 0 1 4 0;
+#X connect 1 0 0 0;
+#X connect 5 0 0 0;
