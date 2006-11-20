@@ -97,6 +97,7 @@ void unity_setup(void) {
 	unity_class = class_new(gensym("unity"), (t_newmethod) unity_new, 0, sizeof(unity_struct), 0, A_GIMME, 0);
 	class_addbang(unity_class, (t_method) calculate);
 	class_addmethod(unity_class, (t_method) reset, gensym("reset"), A_GIMME, 0);
-	class_sethelpsymbol(unity_class, gensym("help-unity.pd"));
+	
+	
 }
 

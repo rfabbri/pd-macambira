@@ -352,6 +352,7 @@ void three_d_setup(void) {
 	class_addmethod(three_d_class, (t_method) elyap, gensym("elyapunov"), 0);
 	class_addmethod(three_d_class, (t_method) search, gensym("search"), A_GIMME, 0);
 	class_addmethod(three_d_class, (t_method) constrain, gensym("constrain"), A_GIMME, 0);
-	class_sethelpsymbol(three_d_class, gensym("help-three_d.pd"));
+	
+	
 }
 

@@ -320,6 +320,7 @@ void tinkerbell_setup(void) {
 	class_addmethod(tinkerbell_class, (t_method) elyap, gensym("elyapunov"), 0);
 	class_addmethod(tinkerbell_class, (t_method) search, gensym("search"), A_GIMME, 0);
 	class_addmethod(tinkerbell_class, (t_method) constrain, gensym("constrain"), A_GIMME, 0);
-	class_sethelpsymbol(tinkerbell_class, gensym("help-tinkerbell.pd"));
+	
+	
 }
 

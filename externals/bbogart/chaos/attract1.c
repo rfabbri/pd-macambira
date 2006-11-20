@@ -364,6 +364,7 @@ void attract1_setup(void) {
 	class_addmethod(attract1_class, (t_method) elyap, gensym("elyapunov"), 0);
 	class_addmethod(attract1_class, (t_method) search, gensym("search"), A_GIMME, 0);
 	class_addmethod(attract1_class, (t_method) constrain, gensym("constrain"), A_GIMME, 0);
-	class_sethelpsymbol(attract1_class, gensym("help-attract1.pd"));
+	
+	
 }
 

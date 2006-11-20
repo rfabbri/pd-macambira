@@ -320,6 +320,7 @@ void lotkavolterra_setup(void) {
 	class_addmethod(lotkavolterra_class, (t_method) elyap, gensym("elyapunov"), 0);
 	class_addmethod(lotkavolterra_class, (t_method) search, gensym("search"), A_GIMME, 0);
 	class_addmethod(lotkavolterra_class, (t_method) constrain, gensym("constrain"), A_GIMME, 0);
-	class_sethelpsymbol(lotkavolterra_class, gensym("help-lotkavolterra.pd"));
+	
+	
 }
 

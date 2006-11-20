@@ -330,6 +330,7 @@ void rossler_setup(void) {
 	class_addmethod(rossler_class, (t_method) elyap, gensym("elyapunov"), 0);
 	class_addmethod(rossler_class, (t_method) search, gensym("search"), A_GIMME, 0);
 	class_addmethod(rossler_class, (t_method) constrain, gensym("constrain"), A_GIMME, 0);
-	class_sethelpsymbol(rossler_class, gensym("help-rossler.pd"));
+	
+	
 }
 

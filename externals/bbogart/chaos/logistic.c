@@ -242,6 +242,7 @@ void logistic_setup(void) {
 	class_addmethod(logistic_class, (t_method) elyap, gensym("elyapunov"), 0);
 	class_addmethod(logistic_class, (t_method) search, gensym("search"), A_GIMME, 0);
 	class_addmethod(logistic_class, (t_method) constrain, gensym("constrain"), A_GIMME, 0);
-	class_sethelpsymbol(logistic_class, gensym("help-logistic.pd"));
+	
+	
 }
 

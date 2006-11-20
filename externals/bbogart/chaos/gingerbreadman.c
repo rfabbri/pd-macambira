@@ -96,6 +96,7 @@ void gingerbreadman_setup(void) {
 	gingerbreadman_class = class_new(gensym("gingerbreadman"), (t_newmethod) gingerbreadman_new, 0, sizeof(gingerbreadman_struct), 0, A_GIMME, 0);
 	class_addbang(gingerbreadman_class, (t_method) calculate);
 	class_addmethod(gingerbreadman_class, (t_method) reset, gensym("reset"), A_GIMME, 0);
-	class_sethelpsymbol(gingerbreadman_class, gensym("help-gingerbreadman.pd"));
+	
+	
 }
 

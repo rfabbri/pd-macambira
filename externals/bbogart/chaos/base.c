@@ -264,6 +264,7 @@ void base_setup(void) {
 	class_addmethod(base_class, (t_method) elyap, gensym("elyapunov"), 0);
 	class_addmethod(base_class, (t_method) search, gensym("search"), A_GIMME, 0);
 	class_addmethod(base_class, (t_method) constrain, gensym("constrain"), A_GIMME, 0);
-	class_sethelpsymbol(base_class, gensym("help-base.pd"));
+	
+	
 }
 

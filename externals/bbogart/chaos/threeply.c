@@ -298,6 +298,7 @@ void threeply_setup(void) {
 	class_addmethod(threeply_class, (t_method) elyap, gensym("elyapunov"), 0);
 	class_addmethod(threeply_class, (t_method) search, gensym("search"), A_GIMME, 0);
 	class_addmethod(threeply_class, (t_method) constrain, gensym("constrain"), A_GIMME, 0);
-	class_sethelpsymbol(threeply_class, gensym("help-threeply.pd"));
+	
+	
 }
 

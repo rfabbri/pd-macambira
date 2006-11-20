@@ -323,6 +323,7 @@ void ikeda_setup(void) {
 	class_addmethod(ikeda_class, (t_method) elyap, gensym("elyapunov"), 0);
 	class_addmethod(ikeda_class, (t_method) search, gensym("search"), A_GIMME, 0);
 	class_addmethod(ikeda_class, (t_method) constrain, gensym("constrain"), A_GIMME, 0);
-	class_sethelpsymbol(ikeda_class, gensym("help-ikeda.pd"));
+	
+	
 }
 

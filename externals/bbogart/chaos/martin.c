@@ -254,6 +254,7 @@ void martin_setup(void) {
 	class_addmethod(martin_class, (t_method) elyap, gensym("elyapunov"), 0);
 	class_addmethod(martin_class, (t_method) search, gensym("search"), A_GIMME, 0);
 	class_addmethod(martin_class, (t_method) constrain, gensym("constrain"), A_GIMME, 0);
-	class_sethelpsymbol(martin_class, gensym("help-martin.pd"));
+	
+	
 }
 

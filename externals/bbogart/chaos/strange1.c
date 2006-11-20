@@ -496,6 +496,7 @@ void strange1_setup(void) {
 	class_addmethod(strange1_class, (t_method) elyap, gensym("elyapunov"), 0);
 	class_addmethod(strange1_class, (t_method) search, gensym("search"), A_GIMME, 0);
 	class_addmethod(strange1_class, (t_method) constrain, gensym("constrain"), A_GIMME, 0);
-	class_sethelpsymbol(strange1_class, gensym("help-strange1.pd"));
+	
+	
 }
 
