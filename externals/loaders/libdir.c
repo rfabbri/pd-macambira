@@ -4,7 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
 /* This loader opens a directory as a library.  In the long run, the idea is
  * that one folder will have all of objects files, all of the related
@@ -28,30 +28,21 @@ static int libdir_loader(t_canvas *canvas, char *classname)
     
     post("libdir_loader classname: %s\n", classname);
 
-    /* look for meta file (classname)/(classname).pd <hans@at.or.at> */
-    /* TODO: at "-META" to the meta filename */
+    /* look for meta file (classname)/(classname)-meta.pd <hans@at.or.at> */
+    /* TODO: add "-META" to the meta filename */
     strncpy(fullclassname, classname, MAXPDSTRING - 6);
     strcat(fullclassname, "/");
     strncat(fullclassname, classname, MAXPDSTRING - strlen(fullclassname) - 6);
-    strncat(fullclassname, classname, MAXPDSTRING - strlen(fullclassname) - 6);
     strcat(fullclassname, "-meta");
-/*    if ((fd = open_via_path(dirname, fullclassname, ".pd",
-	  dirbuf, &nameptr, MAXPDSTRING, 1)) < 0) */
-    post("libdir_loader fullclassname: %s\n", fullclassname);
-
-
-// TODO: this needs to be figured out! its the new 0.40 way of doing things
-/* send NULL as the canvas for the first argument, and it'll only look in the
- * global path and "." */
-    if ((fd = canvas_open(canvas, fullclassname, ".pd",
-        dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
-
+	post("libdir_loader trying fullclassname: '%s'\n", fullclassname);
+//	post("patch dir: '%s'",canvas->gl_env->ce_dir->s_name);
+	if ((fd = open_via_path("", fullclassname, ".pd",
+							dirbuf, &nameptr, MAXPDSTRING, 1)) < 0) 
     {
         return (0);
-    }
+	}
     close(fd);
-
-    post("libdir_loader loaded fullclassname: %s\n", fullclassname);
+    post("libdir_loader loaded fullclassname: '%s'\n", fullclassname);
     
         /* create full path to libdir for adding to the paths */
     strcpy(searchpathname,dirbuf);
@@ -63,6 +54,7 @@ static int libdir_loader(t_canvas *canvas, char *classname)
     strcat(helppathname, "/doc/5.reference/");
     strcat(helppathname, classname);
 
+	// TODO: have this add to the canvas-local path only
     sys_searchpath = namelist_append_files(sys_searchpath, searchpathname);
     /* this help path supports having the help files in a complete library
      * directory format, where everything is in one folder.  The help meta
