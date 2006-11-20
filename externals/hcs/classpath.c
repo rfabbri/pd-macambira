@@ -1,7 +1,7 @@
 /* --------------------------------------------------------------------------*/
 /*                                                                           */
-/* This object outputs the search path for finding objects using a similar   */
-/* interface as [textfile] and [qlist]                                       */
+/* This object outputs the global search path for finding objects using a    */
+/* similar interface as [textfile] and [qlist].                               */
 /*                                                                           */
 /* Copyright (c) 2006 Hans-Christoph Steiner                                 */
 /*                                                                           */
@@ -36,7 +36,7 @@
 
 #include <string.h>
 
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
 t_int classpath_instance_count;
 
@@ -104,7 +104,9 @@ static void *classpath_new()
 	}
 	classpath_instance_count++;
 
-	x->x_top = namelist_append_files(NULL,sys_libdir->s_name);
+	strncpy(buffer, sys_libdir->s_name, MAXPDSTRING);
+	strcat(buffer, "/extra");
+	x->x_top = namelist_append_files(NULL,buffer);
 	x->x_top->nl_next = sys_searchpath;
 	x->x_current = x->x_top;
 
@@ -113,6 +115,12 @@ static void *classpath_new()
 
 	return (x);
 }
+
+void classpath_free()
+{
+	// TODO: look into freeing the namelist
+}
+
 
 void classpath_setup(void) 
 {
