@@ -15,22 +15,38 @@ static t_class *import_class;
 
 typedef struct _import
 {
-    t_object    x_obj;
-    t_atom*     loaded_libs;
-    t_atom*     current;
-    t_int       num_libs;
+    t_object            x_obj;
+    t_atom*             loaded_libs;
+    t_atom*             current;
+    t_int               num_libs;
+	t_outlet            *x_data_outlet;
+	t_outlet            *x_status_outlet;
 } t_import;
 
 
 static int import_load_lib(char *libname)
 {
+	post("import_load_lib");
+/* sys_load_lib_dir is only used on Pd-extended < 0.40 */
+#if (PD_MINOR_VERSION >= 40)
+	t_canvas *canvas = canvas_getcurrent();
+
+    if (!sys_load_lib(canvas, libname))
+	{
+		post("%s: can't load library in %s", libname, sys_libdir->s_name);
+		return 0;
+	}
+#else
     if (!sys_load_lib(sys_libdir->s_name, libname))
+	{
         if (!sys_load_lib_dir(sys_libdir->s_name, libname)) 
         {
             post("%s: can't load library in %s", libname, sys_libdir->s_name);
             return 0;
         }
+	}
     return 1;
+#endif
 }
 
 
@@ -80,6 +96,8 @@ static void import_bang(t_import *x)
 static void *import_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_import *x = (t_import *)pd_new(import_class);
+	char buffer[MAXPDSTRING];
+
     x->loaded_libs = 0;
     x->num_libs = 0;
     import_load_arguments(x,argc,argv);
@@ -95,7 +113,11 @@ static void import_free(t_import *x)
     x->loaded_libs = 0;
     x->num_libs = 0;
   }
-
+  /* TODO: look into freeing the namelist.  It probably does not need to
+   * happen, since this class is just copying the pointer of an existing
+   * namelist that is handled elsewhere. */
+	x->x_data_outlet = outlet_new(&x->x_obj, &s_symbol);
+	x->x_status_outlet = outlet_new(&x->x_obj, 0);
 }
 
 
