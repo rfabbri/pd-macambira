@@ -20,7 +20,7 @@ typedef struct _splitfilename
 {
   t_object x_obj;
   char     x_sep[2];
-  char     *x_mem;
+  char     x_mem[MAXPDSTRING];
   t_int    x_size;
   t_outlet *x_outpath;
   t_outlet *x_outfile;
@@ -77,13 +77,12 @@ static void splitfilename_symbol(t_splitfilename *x, t_symbol *s)
     if(x->x_sep[0])
     {
       char *sep_ptr=x->x_mem;
-      
-      if(length > x->x_size)
-      {
-        x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), (length+100)*sizeof(char));
-        x->x_size = length + 100;
-      }
-      strcpy(x->x_mem, s->s_name);
+
+      if(length > (MAXPDSTRING - 2))
+        strncpy(x->x_mem, s->s_name, MAXPDSTRING - 2 - length);
+      else
+        strcpy(x->x_mem, s->s_name);
+
       sep_ptr = strrchr(x->x_mem, x->x_sep[0]);/* points to the leftest separator-char-index of string */
       if((!sep_ptr) || ((sep_ptr - x->x_mem) < 0) || ((sep_ptr - x->x_mem) >= length))
       { /* JMZ: 20050701 : removed typecast (char*) to (int); this is not portable */
@@ -106,11 +105,6 @@ static void splitfilename_symbol(t_splitfilename *x, t_symbol *s)
   }
 }
 
-static void splitfilename_free(t_splitfilename *x)
-{
-  freebytes(x->x_mem, x->x_size*sizeof(char));
-}
-
 static void *splitfilename_new(t_symbol *s, int ac, t_atom *av)
 {
   t_splitfilename *x = (t_splitfilename *)pd_new(splitfilename_class);
@@ -121,8 +115,6 @@ static void *splitfilename_new(t_symbol *s, int ac, t_atom *av)
     x->x_sep[0] = '/';
   else
     splitfilename_separator(x, s, ac, av);
-  x->x_size = 400;
-  x->x_mem = (char *)getbytes(x->x_size*sizeof(char));
   x->x_outpath = (t_outlet *)outlet_new(&x->x_obj, &s_symbol);
   x->x_outfile = (t_outlet *)outlet_new(&x->x_obj, &s_symbol);
   return (x);

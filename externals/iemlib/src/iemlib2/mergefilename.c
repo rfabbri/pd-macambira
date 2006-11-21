@@ -20,7 +20,7 @@ typedef struct _mergefilename
 {
   t_object x_obj;
   char     x_sep[2];
-  char     x_mem[MAXPDSTRING];  /* miller WHY ???? */
+  char     x_mem[MAXPDSTRING];
 } t_mergefilename;
 
 static void mergefilename_separator(t_mergefilename *x, t_symbol *s, int ac, t_atom *av)
