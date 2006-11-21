@@ -100,8 +100,12 @@ static void *import_new(t_symbol *s, int argc, t_atom *argv)
 
     x->loaded_libs = 0;
     x->num_libs = 0;
+	x->x_data_outlet = outlet_new(&x->x_obj, &s_symbol);
+	x->x_status_outlet = outlet_new(&x->x_obj, 0);
+
     import_load_arguments(x,argc,argv);
-    return (x);
+
+	return (x);
 }
 
 
@@ -116,8 +120,6 @@ static void import_free(t_import *x)
   /* TODO: look into freeing the namelist.  It probably does not need to
    * happen, since this class is just copying the pointer of an existing
    * namelist that is handled elsewhere. */
-	x->x_data_outlet = outlet_new(&x->x_obj, &s_symbol);
-	x->x_status_outlet = outlet_new(&x->x_obj, 0);
 }
 
 
