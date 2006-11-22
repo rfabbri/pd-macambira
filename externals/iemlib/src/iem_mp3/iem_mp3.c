@@ -15,7 +15,7 @@ static void *iem_mp3_new(void)
   return (x);
 }
 
-void sigmp3play_setup(void);
+void mp3play_tilde_setup(void);
 
 /* ------------------------ setup routine ------------------------- */
 
@@ -24,7 +24,7 @@ void iem_mp3_setup(void)
   iem_mp3_class = class_new(gensym("iem_mp3"), iem_mp3_new, 0,
     sizeof(t_object), CLASS_NOINLET, 0);
   
-  sigmp3play_setup();
+  mp3play_tilde_setup();
   
 	post("iem_mp3 (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
 	post("   musil%ciem.at iem KUG Graz Austria", '@');

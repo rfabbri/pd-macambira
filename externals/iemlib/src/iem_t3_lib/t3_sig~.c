@@ -6,10 +6,10 @@ iem_t3_lib written by Gerhard Eckel, Thomas Musil, Copyright (c) IEM KUG Graz Au
 #include "m_pd.h"
 #include "iemlib.h"
 
-/* -------------------------- sigt3_sig~ ------------------------------ */
-static t_class *sigt3_sig_class;
+/* -------------------------- t3_sig_tilde~ ------------------------------ */
+static t_class *t3_sig_tilde_class;
 
-typedef struct _sigt3_sig
+typedef struct _t3_sig_tilde
 {
   t_object x_obj;
   t_clock  *x_clock;
@@ -21,9 +21,9 @@ typedef struct _sigt3_sig
   int      x_transient;
   t_float  x_ms2samps;
   t_float  x_ticks2ms;
-} t_sigt3_sig;
+} t_t3_sig_tilde;
 
-static void sigt3_sig_tick(t_sigt3_sig *x)
+static void t3_sig_tilde_tick(t_t3_sig_tilde *x)
 {
   t_float *trans = x->x_beg, val;
   int n = x->x_n, t3_bang_samps, i;
@@ -41,13 +41,13 @@ static void sigt3_sig_tick(t_sigt3_sig *x)
     trans[i] = val;
 }
 
-static void sigt3_sig_stop(t_sigt3_sig *x)
+static void t3_sig_tilde_stop(t_t3_sig_tilde *x)
 {
   clock_unset(x->x_clock);
   x->x_new_val = x->x_old_val;
 }
 
-static void sigt3_sig_list(t_sigt3_sig *x, t_symbol *s, int ac, t_atom *av)
+static void t3_sig_tilde_list(t_t3_sig_tilde *x, t_symbol *s, int ac, t_atom *av)
 {
   if((ac == 2)&&IS_A_FLOAT(av,0)&&IS_A_FLOAT(av,1))
   {
@@ -60,16 +60,16 @@ static void sigt3_sig_list(t_sigt3_sig *x, t_symbol *s, int ac, t_atom *av)
     ticks = t3_bang_samps / n;
     x->x_t3_bang_samps = t3_bang_samps - n*ticks;
     if(ticks < 1)
-      sigt3_sig_tick(x);
+      t3_sig_tilde_tick(x);
     else
       clock_delay(x->x_clock, (double)ticks * (double)x->x_ticks2ms);
   }
 }
 
-static t_int *sigt3_sig_perform(t_int *w)
+static t_int *t3_sig_tilde_perform(t_int *w)
 {
   t_float *out = (t_float *)(w[1]);
-  t_sigt3_sig *x = (t_sigt3_sig *)(w[2]);
+  t_t3_sig_tilde *x = (t_t3_sig_tilde *)(w[2]);
   int n = (int)(w[3]);
   
   if(x->x_transient)
@@ -90,10 +90,10 @@ static t_int *sigt3_sig_perform(t_int *w)
   return (w+4);
 }
 
-static t_int *sigt3_sig_perf8(t_int *w)
+static t_int *t3_sig_tilde_perf8(t_int *w)
 {
   t_float *out = (t_float *)(w[1]);
-  t_sigt3_sig *x = (t_sigt3_sig *)(w[2]);
+  t_t3_sig_tilde *x = (t_t3_sig_tilde *)(w[2]);
   int n = (int)(w[3]), i;
   
   if(x->x_transient)
@@ -132,7 +132,7 @@ static t_int *sigt3_sig_perf8(t_int *w)
   return (w+4);
 }
 
-static void sigt3_sig_dsp(t_sigt3_sig *x, t_signal **sp)
+static void t3_sig_tilde_dsp(t_t3_sig_tilde *x, t_signal **sp)
 {
   int i;
   t_float *trans, val;
@@ -154,21 +154,21 @@ static void sigt3_sig_dsp(t_sigt3_sig *x, t_signal **sp)
     *trans++ = val;
   
   if((sp[0]->s_n)&7)
-    dsp_add(sigt3_sig_perform, 3, sp[0]->s_vec, x, sp[0]->s_n);
+    dsp_add(t3_sig_tilde_perform, 3, sp[0]->s_vec, x, sp[0]->s_n);
   else
-    dsp_add(sigt3_sig_perf8, 3, sp[0]->s_vec, x, sp[0]->s_n);
+    dsp_add(t3_sig_tilde_perf8, 3, sp[0]->s_vec, x, sp[0]->s_n);
 }
 
-static void sigt3_sig_free(t_sigt3_sig *x)
+static void t3_sig_tilde_free(t_t3_sig_tilde *x)
 {
   if(x->x_beg)
     freebytes(x->x_beg, x->x_n*sizeof(t_float));
   clock_free(x->x_clock);
 }
 
-static void *sigt3_sig_new(t_floatarg init_val)
+static void *t3_sig_tilde_new(t_floatarg init_val)
 {
-  t_sigt3_sig *x = (t_sigt3_sig *)pd_new(sigt3_sig_class);
+  t_t3_sig_tilde *x = (t_t3_sig_tilde *)pd_new(t3_sig_tilde_class);
   
   x->x_new_val = x->x_old_val = init_val;
   x->x_n = (int)sys_getblksize();
@@ -176,17 +176,17 @@ static void *sigt3_sig_new(t_floatarg init_val)
   x->x_t3_bang_samps = x->x_transient = 0;
   x->x_ms2samps = 0.001 * (t_float)sys_getsr();
   x->x_ticks2ms = (t_float)x->x_n / x->x_ms2samps;
-  x->x_clock = clock_new(x, (t_method)sigt3_sig_tick);
+  x->x_clock = clock_new(x, (t_method)t3_sig_tilde_tick);
   outlet_new(&x->x_obj, &s_signal);
   return (x);
 }
 
-void sigt3_sig_setup(void)
+void t3_sig_tilde_setup(void)
 {
-  sigt3_sig_class = class_new(gensym("t3_sig~"), (t_newmethod)sigt3_sig_new,
-        (t_method)sigt3_sig_free, sizeof(t_sigt3_sig), 0, A_DEFFLOAT, 0);
-  class_addmethod(sigt3_sig_class, (t_method)sigt3_sig_dsp, gensym("dsp"), 0);
-  class_addmethod(sigt3_sig_class, (t_method)sigt3_sig_stop, gensym("stop"), 0);
-  class_addlist(sigt3_sig_class, (t_method)sigt3_sig_list);
-  class_sethelpsymbol(sigt3_sig_class, gensym("iemhelp/help-t3_sig~"));
+  t3_sig_tilde_class = class_new(gensym("t3_sig~"), (t_newmethod)t3_sig_tilde_new,
+        (t_method)t3_sig_tilde_free, sizeof(t_t3_sig_tilde), 0, A_DEFFLOAT, 0);
+  class_addmethod(t3_sig_tilde_class, (t_method)t3_sig_tilde_dsp, gensym("dsp"), 0);
+  class_addmethod(t3_sig_tilde_class, (t_method)t3_sig_tilde_stop, gensym("stop"), 0);
+  class_addlist(t3_sig_tilde_class, (t_method)t3_sig_tilde_list);
+  class_sethelpsymbol(t3_sig_tilde_class, gensym("iemhelp/help-t3_sig~"));
 }

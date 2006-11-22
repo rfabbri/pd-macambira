@@ -8,9 +8,9 @@ iem_t3_lib written by Gerhard Eckel, Thomas Musil, Copyright (c) IEM KUG Graz Au
 #include "iemlib.h"
 
 /* -------------------------- t3_line~ ------------------------------ */
-static t_class *sigt3_line_class;
+static t_class *t3_line_tilde_class;
 
-typedef struct _sigt3_line
+typedef struct _t3_line_tilde
 {
   t_object x_obj;
   t_clock  *x_clock;
@@ -29,9 +29,9 @@ typedef struct _sigt3_line
   int      x_n;
   int      x_t3_bang_samps;
   int      x_transient;
-} t_sigt3_line;
+} t_t3_line_tilde;
 
-static void sigt3_line_nontransient(t_float *vec, t_sigt3_line *x, int n)
+static void t3_line_tilde_nontransient(t_float *vec, t_t3_line_tilde *x, int n)
 {
   int cur_samps = x->x_cur_samps, i;
   double inc = x->x_inc;
@@ -79,10 +79,10 @@ static void sigt3_line_nontransient(t_float *vec, t_sigt3_line *x, int n)
   }
 }
 
-static t_int *sigt3_line_perform(t_int *w)
+static t_int *t3_line_tilde_perform(t_int *w)
 {
   t_float *out = (t_float *)(w[1]);
-  t_sigt3_line *x = (t_sigt3_line *)(w[2]);
+  t_t3_line_tilde *x = (t_t3_line_tilde *)(w[2]);
   int n = (int)(w[3]);
   
   if(x->x_transient)
@@ -94,18 +94,18 @@ static t_int *sigt3_line_perform(t_int *w)
     x->x_transient = 0;
   }
   else
-    sigt3_line_nontransient(out, x, n);
+    t3_line_tilde_nontransient(out, x, n);
   return(w+4);
 }
 
-static void sigt3_line_tick(t_sigt3_line *x)
+static void t3_line_tilde_tick(t_t3_line_tilde *x)
 {
   t_float *trans = x->x_beg;
   int n = x->x_n, t3_bang_samps, cur_samps, i;
   double inc, cur_val;
   
   if(!x->x_transient)
-    sigt3_line_nontransient(trans, x, n);
+    t3_line_tilde_nontransient(trans, x, n);
   t3_bang_samps = x->x_t3_bang_samps;
   x->x_dst_val = x->x_inlet_val;
   if(x->x_inlet_time <= 0.0)
@@ -170,7 +170,7 @@ static void sigt3_line_tick(t_sigt3_line *x)
   x->x_transient = 1;
 }
 
-static void sigt3_line_list(t_sigt3_line *x, t_symbol *s, int ac, t_atom *av)
+static void t3_line_tilde_list(t_t3_line_tilde *x, t_symbol *s, int ac, t_atom *av)
 {
   if((ac >= 2)&&IS_A_FLOAT(av,0)&&IS_A_FLOAT(av,1))
   {
@@ -191,27 +191,27 @@ static void sigt3_line_list(t_sigt3_line *x, t_symbol *s, int ac, t_atom *av)
       x->x_inlet_time = time;
     }
     if(ticks < 1)
-      sigt3_line_tick(x);
+      t3_line_tilde_tick(x);
     else
       clock_delay(x->x_clock, (double)ticks * x->x_ticks2ms);
   }
 }
 
-static void sigt3_line_ft1(t_sigt3_line *x, t_float time)
+static void t3_line_tilde_ft1(t_t3_line_tilde *x, t_float time)
 {
   if(time < 0.0)
     time = 0.0;
   x->x_inlet_time = (double)time;
 }
 
-static void sigt3_line_stop(t_sigt3_line *x)
+static void t3_line_tilde_stop(t_t3_line_tilde *x)
 {
   clock_unset(x->x_clock);
   x->x_cur_samps = x->x_dur_samps = x->x_transient = 0;
   x->x_inc = x->x_inc64 = x->x_inlet_time = x->x_dst_time = 0.0;
 }
 
-static void sigt3_line_dsp(t_sigt3_line *x, t_signal **sp)
+static void t3_line_tilde_dsp(t_t3_line_tilde *x, t_signal **sp)
 {
   int i;
   t_float val, *trans;
@@ -231,19 +231,19 @@ static void sigt3_line_dsp(t_sigt3_line *x, t_signal **sp)
     *trans++ = val;
   x->x_ms2samps = 0.001*(double)sp[0]->s_sr;
   x->x_ticks2ms = (double)x->x_n / x->x_ms2samps;
-  dsp_add(sigt3_line_perform, 3, sp[0]->s_vec, x, sp[0]->s_n);
+  dsp_add(t3_line_tilde_perform, 3, sp[0]->s_vec, x, sp[0]->s_n);
 }
 
-static void sigt3_line_free(t_sigt3_line *x)
+static void t3_line_tilde_free(t_t3_line_tilde *x)
 {
   if(x->x_beg)
     freebytes(x->x_beg, x->x_n*sizeof(t_float));
   clock_free(x->x_clock);
 }
 
-static void *sigt3_line_new(t_floatarg init_val)
+static void *t3_line_tilde_new(t_floatarg init_val)
 {
-  t_sigt3_line *x = (t_sigt3_line *)pd_new(sigt3_line_class);
+  t_t3_line_tilde *x = (t_t3_line_tilde *)pd_new(t3_line_tilde_class);
   int i;
   
   x->x_n = (int)sys_getblksize();
@@ -254,19 +254,19 @@ static void *sigt3_line_new(t_floatarg init_val)
   x->x_inc64 = x->x_inc = 0.0;
   x->x_ms2samps = 0.001 * (double)sys_getsr();
   x->x_ticks2ms = (double)x->x_n / x->x_ms2samps;
-  x->x_clock = clock_new(x, (t_method)sigt3_line_tick);
+  x->x_clock = clock_new(x, (t_method)t3_line_tilde_tick);
   outlet_new(&x->x_obj, &s_signal);
   inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("ft1"));
   return (x);
 }
 
-void sigt3_line_setup(void)
+void t3_line_tilde_setup(void)
 {
-  sigt3_line_class = class_new(gensym("t3_line~"), (t_newmethod)sigt3_line_new,
-    (t_method)sigt3_line_free, sizeof(t_sigt3_line), 0, A_DEFFLOAT, 0);
-  class_addmethod(sigt3_line_class, (t_method)sigt3_line_dsp, gensym("dsp"), 0);
-  class_addmethod(sigt3_line_class, (t_method)sigt3_line_stop, gensym("stop"), 0);
-  class_addmethod(sigt3_line_class, (t_method)sigt3_line_ft1, gensym("ft1"), A_FLOAT, 0);
-  class_addlist(sigt3_line_class, (t_method)sigt3_line_list);
-  class_sethelpsymbol(sigt3_line_class, gensym("iemhelp/help-t3_line~"));
+  t3_line_tilde_class = class_new(gensym("t3_line~"), (t_newmethod)t3_line_tilde_new,
+    (t_method)t3_line_tilde_free, sizeof(t_t3_line_tilde), 0, A_DEFFLOAT, 0);
+  class_addmethod(t3_line_tilde_class, (t_method)t3_line_tilde_dsp, gensym("dsp"), 0);
+  class_addmethod(t3_line_tilde_class, (t_method)t3_line_tilde_stop, gensym("stop"), 0);
+  class_addmethod(t3_line_tilde_class, (t_method)t3_line_tilde_ft1, gensym("ft1"), A_FLOAT, 0);
+  class_addlist(t3_line_tilde_class, (t_method)t3_line_tilde_list);
+  class_sethelpsymbol(t3_line_tilde_class, gensym("iemhelp/help-t3_line~"));
 }
