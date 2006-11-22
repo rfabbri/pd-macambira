@@ -21,7 +21,6 @@ typedef struct _splitfilename
   t_object x_obj;
   char     x_sep[2];
   char     x_mem[MAXPDSTRING];
-  t_int    x_size;
   t_outlet *x_outpath;
   t_outlet *x_outfile;
 } t_splitfilename;
