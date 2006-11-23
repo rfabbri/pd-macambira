@@ -19,7 +19,7 @@ struct _canvasenvironment
 };
 
 
-static char *version = "$Revision: 1.4 $";
+static char *version = "$Revision: 1.5 $";
 
 /* This loader opens a directory with a -meta.pd file as a library.  In the
  * long run, the idea is that one folder will have all of objects files, all
@@ -50,6 +50,7 @@ static int libdir_loader(t_canvas *canvas, char *classname)
 	
 	/* if this is being called from a canvas, then add the library path to the
 	 * canvas-local path */
+#if (PD_MINOR_VERSION >= 40)
 	if(canvas) 
 	{
 		canvasenvironment = canvas_getenv(canvas);
@@ -65,6 +66,7 @@ static int libdir_loader(t_canvas *canvas, char *classname)
 		post("libdir_loader: added %s to the canvas-local path", classname);
 	}
 	else
+#endif
 	{
 		if ((fd = open_via_path(".", fullclassname, ".pd",
 								dirbuf, &nameptr, MAXPDSTRING, 0)) < 0) 
