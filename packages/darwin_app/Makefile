@@ -14,21 +14,13 @@ BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
-# source for the Wish Shell.app used to build Pd
-# download TclTkAquaStandalone-8.?.*.dmg from http://tcltkaqua.sourceforge.net/
-# and mount it.  The files will be copied from the mounted .dmg image.
-#WISH = /Applications/Utilities/Wish\ Shell.app
-TCLTK := $(shell find $(packages_src)/darwin_app -name 'TclTkAquaStandalone-8.?.*.dmg'|head -n 1|sed 's|.*/\(.*\)\.dmg|\1|')
-TCLTK_BUGFIX_VERSION := $(shell echo $(TCLTK) | \
-	sed 's|.*TclTkAquaStandalone-[0-9]\.[0-9]\.\([0-9]*\)|\1|')
-
-WISH_SOURCE = $(shell $(scripts_src)/find-wish.app.sh "$(TCLTK)")
+WISH_FRAMEWORKS_SOURCE := $(shell (test -e "/Library/Frameworks/Tk.framework/Tk" && echo "/Library/Frameworks") || /System/Library/Frameworks)
+WISH_SOURCE = $(WISH_FRAMEWORKS_SOURCE)/Tk.framework/Resources
 # Wish Shell.app changed to Wish.app in TclTk 8.4.10
 WISH_NAME := $(shell ( test -d $(WISH_SOURCE)/Wish.app && echo Wish) \
 	|| echo Wish Shell)
 WISH = "$(WISH_SOURCE)/$(WISH_NAME).app"
 WISH_CONTENTS = "$(WISH)/Contents"
-#WISH_CONTENTS = $(WISH)/Contents
 
 # base level optimizations
 OPT_CFLAGS = -Os -funroll-loops -fomit-frame-pointer
@@ -99,24 +91,52 @@ extended_app_install:
 
 
 #------------------------------------------------------------------------------#
-# check here for a reference on how to do this:
-# http://cvs.sourceforge.net/viewcvs.py/tkcvs/tkcvs-proj/PackApp?rev=1.4
+# build a standalone Wish.app from the installed Tcl/Tk Frameworks
 darwin_app_wrapper: Info.plist
-# copy Wish Shell.app from default install location
-# note: use the "standalone" Wish shell to make a "standalone" pd app
+# Wish
 	install -d "$(PD_APP_CONTENTS)/MacOS"
 	install -m0755 -p \
-		"$(WISH_CONTENTS)/MacOS/$(WISH_NAME)" \
-		"$(PD_APP_CONTENTS)/MacOS"
+		"$(WISH_CONTENTS)/MacOS/$(WISH_NAME)" "$(PD_APP_CONTENTS)/MacOS"
 	install -d "$(PD_APP_CONTENTS)/Resources"
 	install -m0644 -p \
 		"$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
 		"$(PD_APP_CONTENTS)/Resources"
-# only install Frameworks if using a standalone Wish.app
-	(test -d "$(WISH_CONTENTS)/Frameworks" && \
-		(install -d "$(PD_APP_CONTENTS)/Frameworks"; \
-		cp -Rp "$(WISH_CONTENTS)/Frameworks" "$(PD_APP_CONTENTS)" ) ) || \
-		echo "Skipping Frameworks copy."
+# Tcl
+	install -d $(PD_APP_CONTENTS)/Frameworks
+	install -d $(PD_APP_CONTENTS)/Frameworks/Tcl.framework
+	install -p $(WISH_FRAMEWORKS_SOURCE)/Tcl.framework/Versions/Current/Tcl \
+		$(PD_APP_CONTENTS)/Frameworks/Tcl.framework/
+	install -d $(PD_APP_CONTENTS)/Frameworks/Tcl.framework/Resources
+	install -p $(WISH_FRAMEWORKS_SOURCE)/Tcl.framework/Resources/Info.plist \
+		$(PD_APP_CONTENTS)/Frameworks/Tcl.framework/Resources/
+	ditto $(WISH_FRAMEWORKS_SOURCE)/Tcl.framework/Resources/Scripts \
+		$(PD_APP_CONTENTS)/Frameworks/Tcl.framework/Resources/
+# Tk
+	install -d $(PD_APP_CONTENTS)/Frameworks
+	install -d $(PD_APP_CONTENTS)/Frameworks/Tk.framework
+	install -p $(WISH_FRAMEWORKS_SOURCE)/Tk.framework/Versions/Current/Tk \
+		$(PD_APP_CONTENTS)/Frameworks/Tk.framework/
+	install -d $(PD_APP_CONTENTS)/Frameworks/Tk.framework/Resources
+	install -p $(WISH_FRAMEWORKS_SOURCE)/Tk.framework/Resources/Info.plist \
+		$(WISH_FRAMEWORKS_SOURCE)/Tk.framework/Resources/Tk.rsrc \
+		$(PD_APP_CONTENTS)/Frameworks/Tk.framework/Resources/
+	ditto $(WISH_FRAMEWORKS_SOURCE)/Tk.framework/Resources/Scripts \
+		$(PD_APP_CONTENTS)/Frameworks/Tk.framework/Resources/
+# from http://tktoolkit.cvs.sourceforge.net/tktoolkit/tk/macosx/GNUmakefile
+	fix_install_id ( ) { \
+	    chmod -R a+w "$$1"; \
+	    install_name_tool -id $$(otool -L "$$1" | awk "/$$2\.framework.*[^:]\$$/ {sub(\"^.*/Frameworks\",\"@executable_path/../Frameworks\",\$$1); print \$$1}") "$$1"; \
+	    chmod -R a-w "$$1"; \
+	} && \
+	fix_install_name ( ) { \
+	    chmod -R a+w "$$1"; \
+	    install_name_tool -change $$(otool -L "$$1" | awk "/$$2\.framework.*[^:]\$$/ {print \$$1; sub(\"^.*/Frameworks\",\"@executable_path/../Frameworks\",\$$1); print \$$1}") "$$1"; \
+	    chmod -R a-w "$$1"; \
+	} && \
+	fix_install_id $(PD_APP_CONTENTS)/Frameworks/Tcl.framework/Tcl Tcl && \
+	fix_install_id $(PD_APP_CONTENTS)/Frameworks/Tk.framework/Tk Tk && \
+	fix_install_name $(PD_APP_CONTENTS)/MacOS/Wish Tcl && \
+	fix_install_name $(PD_APP_CONTENTS)/MacOS/Wish Tk
 # set up app wrapper
 	install -d "$(PD_APP_CONTENTS)/Resources/Scripts"
 	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
@@ -127,7 +147,6 @@ darwin_app_wrapper: Info.plist
 #------------------------------------------------------------------------------#
 # 
 darwin_app_devel_wrapper: Info.plist
-#	test -d /Volumes/$(TCLTK) || hdiutil mount $(TCLTK).dmg
 # copy Wish Shell.app from default install location
 # note: use the "standalone" Wish shell to make a "standalone" pd app
 	install -d "$(PD_APP_CONTENTS)/MacOS"
@@ -147,7 +166,6 @@ darwin_app_devel_wrapper: Info.plist
 	install -m0644 -p *.icns  "$(PD_APP_CONTENTS)/Resources"
 	mv "$(PD_APP_CONTENTS)/MacOS/${WISH_NAME}" \
 		"$(PD_APP_CONTENTS)/MacOS/${PD_APP_NAME}"
-#	diskutil eject /Volumes/$(TCLTK)
 
 #------------------------------------------------------------------------------#
 # generate Info.plist using PD_APP_NAME and PD_VERSION
@@ -327,8 +345,8 @@ test_locations:
 	@echo "PACKAGE_NAME: $(PACKAGE_NAME)"
 	@echo "PD-EXTENDED_VERSION: $(PD-EXTENDED_VERSION)"
 	@echo "WISH: $(WISH)"
-	@echo "TCLTK: $(TCLTK)"
-	@echo "TCLTK_BUGFIX_VERSION: $(TCLTK_BUGFIX_VERSION)"
+	@echo "WISH_FRAMEWORKS_SOURCE: $(WISH_FRAMEWORKS_SOURCE)"
+	@echo "Tcl/Tk Version: $(shell sed -n 's|.*>\(8\..*\)<.*|\1|p' $(WISH_FRAMEWORKS_SOURCE)/Tk.framework/Resources/Info.plist | head -1)"
 	@echo "CWD $(CWD)"
 	@echo "DESTDIR $(DESTDIR)"
 	@echo "PREFIX $(prefix)"
