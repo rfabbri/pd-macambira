@@ -1,0 +1,79 @@
+#N canvas 439 25 595 461 10;
+#X obj 94 346 sieve;
+#X msg 147 276 set 2 1;
+#X msg 198 276 set 7 0.86;
+#X msg 148 198 map 0 1 0 0 0 3 0 2 0 0.7;
+#X msg 147 229 get 0;
+#X msg 147 250 get 1;
+#X floatatom 37 384 5 0 0 0 - - -;
+#X floatatom 81 382 5 0 0 0 - - -;
+#X obj 129 379 print MAPOUT;
+#X obj 218 379 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 218 397 print EXACT;
+#X obj 37 419 print MAPPED;
+#X obj 81 399 print VALUE;
+#X msg 147 324 clear;
+#X text 189 228 get map;
+#X text 189 249 get inverted map;
+#X floatatom 309 406 5 0 0 0 - - -;
+#X floatatom 350 406 5 0 0 0 - - -;
+#X obj 341 363 prepend map;
+#X obj 395 405 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 189 323 clear object;
+#X text 277 277 set [location \, value];
+#X msg 147 297 set 2 0;
+#X text 201 297 unset location;
+#X text 332 196 set map;
+#X floatatom 35 318 5 0 0 0 - - -;
+#X obj 29 184 vradio 15 1 0 4 empty empty mode 0 -6 0 10 -262144 -1
+-1 0;
+#X msg 29 248 mode \$1;
+#X text 62 170 : 0=exact \, 1=nearest \, 2=shunt up \, 3=shunt down
+;
+#X obj 341 383 sieve;
+#X obj 22 19 sieve;
+#X text 62 19 takes integers and maps them to floats if they are set.
+;
+#X text 63 32 in the default mode (mode 0) integers without an associated
+float are blocked \, so a map will sieve the input.;
+#X text 64 60 mode 1 forces the sieve to choose the nearest index \,
+so that inputs are sent to alternative outputs. The rightmost output
+bangs only if the input is exact.;
+#X text 64 101 In modes 2 and 3 the sieve chooses the next map up or
+the next map down. If the input is higher than the highest mapped integer
+in mode 2 \, or lower than the lowest in mode 3 \, then the shunting
+is wrapped and the lowest or highest is chosen respectively.;
+#X text 294 330 when the inverted map is sent to another;
+#X text 298 344 sieve object \, the input is segregated.;
+#X text 38 440 Polyphony control objects by Ed Kelly \, November 2006
+;
+#X text 411 439 See also;
+#X obj 476 438 polymap;
+#X obj 476 417 polystat;
+#X obj 532 438 maskxor;
+#X connect 0 0 6 0;
+#X connect 0 1 7 0;
+#X connect 0 2 8 0;
+#X connect 0 2 18 0;
+#X connect 0 3 9 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 0 0;
+#X connect 6 0 11 0;
+#X connect 7 0 12 0;
+#X connect 9 0 10 0;
+#X connect 13 0 0 0;
+#X connect 13 0 18 0;
+#X connect 18 0 29 0;
+#X connect 22 0 0 0;
+#X connect 25 0 0 0;
+#X connect 25 0 29 0;
+#X connect 26 0 27 0;
+#X connect 27 0 0 0;
+#X connect 29 0 16 0;
+#X connect 29 1 17 0;
+#X connect 29 3 19 0;
