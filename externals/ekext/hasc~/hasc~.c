@@ -45,7 +45,7 @@ t_int *hasc_tilde_perform(t_int *w)
   double vectorr, vectori;
   double alpha;
   x->f_topbin = 0;
-  x->f_thresh > 0 ? x->f_thresh : 1;
+  x->f_thresh = x->f_thresh > 0 ? x->f_thresh : 1;
 
   while (n--)
     {
