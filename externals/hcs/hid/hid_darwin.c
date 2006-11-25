@@ -53,8 +53,8 @@
 
 #include "hid.h"
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 /*==============================================================================
  *  GLOBAL VARS
