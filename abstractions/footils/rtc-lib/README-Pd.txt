@@ -27,11 +27,11 @@ Where nameclashes with existing Pd objects and externals occured, the
 respective RTC-objects also have been omitted. So far this only affected the
 [minus] abstraction.
 
-RTC-lib for Pd no lonfer mimicks the directory layout of the Max-version with
-its seperate directories for each section likt Harmony, Rhythm etc. Instead all
+RTC-lib for Pd no longer mimicks the directory layout of the Max-version with
+its seperate directories for each section like Harmony, Rhythm etc. Instead all
 patches and their help files have been put into a single directory called
 "rtc".  To install the patches, either add this directory to your path and use
-the objects with their standard names, or copy the while "rtc"-directory
+the objects with their standard names, or copy the whole "rtc"-directory
 somewhere into your path, like into /usr/lib/pd/extra/rtc and use them with a
 "rtc"-namespace prefix: Then for example the [super-rhythm] object could be
 called as [rtc/super-rhythm]. Note that then you may also need to add the
