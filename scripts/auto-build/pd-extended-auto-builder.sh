@@ -39,7 +39,7 @@ auto_build_root_dir=`pwd`
 echo "root: $auto_build_root_dir" 
 
 # let rsync handle the cleanup with --delete
-rsync -av --delete rsync://128.238.56.50/distros/pd-extended/ \
+rsync -a --delete rsync://128.238.56.50/distros/pd-extended/ \
 	 ${auto_build_root_dir}/
 
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
