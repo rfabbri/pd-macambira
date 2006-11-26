@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical
+LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical rtc-lib
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -368,6 +368,25 @@ rradical_install:
 	install -d $(examplesdir)/$(RRADICAL_NAME)/showcase/songs
 	install -p $(abstractions_src)/rradical/usecases/showcase/songs/*.* \
 		$(examplesdir)/$(RRADICAL_NAME)/showcase/songs
+
+#-------------------------------------------------------------------------------
+# rtc-lib
+RTC-LIB_NAME = rtc
+rtc-lib_install:
+	install -d $(objectsdir)/$(RTC-LIB_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/footils/rtc-lib/rtc/*.pd | \
+		grep -v '\-help.pd\|RTC-Overview.pd')  $(objectsdir)/$(RTC-LIB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(RTC-LIB_NAME) \
+		--author "Karlheinz Essel and Frank Barknecht" \
+		--license "Pd license" \
+		--description "Realtime Composition Library for Max ported to Pd"
+	install -d $(helpdir)/$(RTC-LIB_NAME)
+	install -d $(helpdir)/$(RTC-LIB_NAME)/rtc-help
+	install -p $(abstractions_src)/footils/rtc-lib/rtc/*-help.pd \
+		$(abstractions_src)/footils/rtc-lib/rtc/RTC-Overview.pd \
+		$(helpdir)/$(RTC-LIB_NAME)
+	install -p $(abstractions_src)/footils/rtc-lib/rtc/rtc-help/*.pd \
+		$(helpdir)/$(RTC-LIB_NAME)/rtc-help
 
 #==============================================================================#
 #
