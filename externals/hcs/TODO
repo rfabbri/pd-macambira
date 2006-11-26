@@ -1,12 +1,11 @@
 
+- pddate compare object
+
+- make ISOdate and ISOtime accept pddate format
+
 - rename [folder_list] to [file/match] and make other file lib objects
   - make [file/match] handle lists of patterns
-
-- write [version] object
-  - [bang( outputs list of version major minor bugfix i.e. [0 39 2(
-  - [time( outputs pd_compiletime
-  - [date( outputs pd_compiledate
-  - this should really be handled by messages to Pd, [;pd get date(
+  - make [file/match] behave like [qlist]
 
 
 - [cursor] object

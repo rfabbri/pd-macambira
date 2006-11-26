@@ -27,7 +27,7 @@
 
 #include <m_pd.h>
 
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
 t_int version_instance_count;
 
@@ -51,13 +51,15 @@ static void version_output(t_version* x)
 {
 	DEBUG(post("version_output"););
 
-	t_atom version_data[4];
+	t_atom version_data[6];
 	SETFLOAT(version_data, (float) PD_MAJOR_VERSION);
 	SETFLOAT(version_data + 1, (float) PD_MINOR_VERSION);
 	SETFLOAT(version_data + 2, (float) PD_BUGFIX_VERSION);
 	SETSYMBOL(version_data + 3, gensym(PD_TEST_VERSION));
+	SETSYMBOL(version_data + 4, gensym(__DATE__));
+	SETSYMBOL(version_data + 5, gensym(__TIME__));
 	
-	outlet_list(x->x_obj.ob_outlet, &s_list, 4, version_data);
+	outlet_list(x->x_obj.ob_outlet, &s_list, 6, version_data);
 }
 
 
@@ -90,5 +92,4 @@ void version_setup(void)
 								  0);
 	/* add inlet datatype methods */
 	class_addbang(version_class,(t_method) version_output);
-	
 }
