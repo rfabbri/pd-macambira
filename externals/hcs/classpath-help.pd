@@ -1,11 +1,19 @@
-#N canvas 375 22 462 312 10;
-#X obj 85 99 classpath;
-#X msg 82 68 bang;
-#X obj 99 145 print;
-#X symbolatom 74 182 0 0 0 0 - - -;
-#X obj 146 120 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#N canvas 375 22 466 316 10;
+#X obj 40 130 classpath;
+#X msg 37 99 bang;
+#X obj 54 176 print;
+#X symbolatom 29 213 0 0 0 0 - - -;
+#X obj 101 151 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
-#X msg 124 71 rewind;
+#X msg 79 102 reset;
+#X text 19 22 This object returns each path in the global classpath
+one at a time with each bang. [reset( refreshs the classpath data and
+starts again at the top of the list \, like [textfile] or [qlist]'s
+[reset(.;
+#X text 124 153 <-- banged when the end of the list is reached;
+#X text 234 294 released under the GNU GPL;
+#X text 18 281 (C) Copyright 2006 Hans-Christoph Steiner <hans@at.or.at>
+;
 #X connect 0 0 2 0;
 #X connect 0 0 3 0;
 #X connect 0 1 4 0;

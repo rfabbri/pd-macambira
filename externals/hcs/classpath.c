@@ -23,9 +23,12 @@
 /*                                                                           */
 /* --------------------------------------------------------------------------*/
 
-#include <m_pd.h>
-#include <s_stuff.h>
+#include "m_pd.h"
+#include "s_stuff.h"
 
+#include <string.h>
+
+/*
 #ifdef _WIN32
 #define _WIN32_WINNT 0x0400
 #include <windows.h>
@@ -33,10 +36,9 @@
 #else
 #include <stdlib.h>
 #endif
+*/
 
-#include <string.h>
-
-static char *version = "$Revision: 1.2 $";
+static char *version = "$Revision: 1.3 $";
 
 t_int classpath_instance_count;
 
@@ -64,6 +66,9 @@ static void classpath_output(t_classpath* x)
 {
 	DEBUG(post("classpath_output"););
 
+/* TODO: think about using x->x_current->nl_next so that if [classlist] is at
+ * the end of its list, and another element gets added to the global
+ * classpath, [classpath] will output the new element on the next bang. */
 	if(x->x_current)
 	{
 		outlet_symbol( x->x_data_outlet, gensym(x->x_current->nl_string) );
@@ -74,10 +79,15 @@ static void classpath_output(t_classpath* x)
 }
 
 
-static void classpath_rewind(t_classpath* x) 
+static void classpath_reset(t_classpath* x) 
 {
 	DEBUG(post("classpath_output"););
+	char buffer[MAXPDSTRING];
 	
+	strncpy(buffer, sys_libdir->s_name, MAXPDSTRING - 6);
+	strcat(buffer, "/extra");
+	x->x_top = namelist_append(NULL, buffer, 0);
+	x->x_top->nl_next = sys_searchpath;
 	x->x_current = x->x_top;
 }
 
@@ -91,27 +101,22 @@ static void classpath_add(t_classpath* x, t_symbol *s)
 static void *classpath_new() 
 {
 	DEBUG(post("classpath_new"););
-
 	t_classpath *x = (t_classpath *)pd_new(classpath_class);
-	t_symbol *currentdir;
-	char buffer[MAXPDSTRING];
 
 	if(!classpath_instance_count) 
 	{
 		post("[classpath] %s",version);  
 		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
 		post("\tcompiled on "__DATE__" at "__TIME__ " ");
+		post("\tcompiled against Pd version %d.%d.%d", PD_MAJOR_VERSION, 
+			 PD_MINOR_VERSION, PD_BUGFIX_VERSION);
 	}
 	classpath_instance_count++;
 
-	strncpy(buffer, sys_libdir->s_name, MAXPDSTRING);
-	strcat(buffer, "/extra");
-	x->x_top = namelist_append_files(NULL,buffer);
-	x->x_top->nl_next = sys_searchpath;
-	x->x_current = x->x_top;
-
 	x->x_data_outlet = outlet_new(&x->x_obj, &s_symbol);
 	x->x_status_outlet = outlet_new(&x->x_obj, 0);
+
+	classpath_reset(x);
 
 	return (x);
 }
@@ -135,8 +140,8 @@ void classpath_setup(void)
 	class_addbang(classpath_class,(t_method) classpath_output);
 	
 	/* add inlet message methods */
-	class_addmethod(classpath_class,(t_method) classpath_rewind,
-					gensym("rewind"), 0);
+	class_addmethod(classpath_class,(t_method) classpath_reset,
+					gensym("reset"), 0);
 	class_addmethod(classpath_class,(t_method) classpath_add,gensym("add"), 
 					A_DEFSYMBOL, 0);
 }

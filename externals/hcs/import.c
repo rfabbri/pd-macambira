@@ -28,7 +28,7 @@ struct _canvasenvironment
 };
 
 
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
 t_int import_instance_count;
 
@@ -98,6 +98,9 @@ static void import_output(t_import* x)
 	DEBUG(post("import_output"););
 	char buffer[MAXPDSTRING];
 
+/* TODO: think about using x->x_current->nl_next so that if [import] is at
+ * the end of its list, and another element gets added to the local
+ * namespace, [import] will output the new element on the next bang. */
 	if(x->x_current)
 	{
 		post("current string: %s",  x->x_current->nl_string);
