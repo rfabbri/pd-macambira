@@ -1,8 +1,10 @@
+
 #==============================================================================#
 #
 # Centralized build system for "externals".  
 #
 # see README for instructions  <hans@at.or.at>
+# http://puredata.org/docs/developer/build
 #
 #==============================================================================#
 
@@ -123,7 +125,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib loaders mapping markex maxlib mjlib motex oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib loaders mapping markex maxlib mjlib motex mrpeach oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -889,6 +891,10 @@ hcs_install: hcs
 		--license "GNU GPL" \
 		--version ""
 	install -p $(HCS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(HCS_NAME)
+# temp kludge: install [classpath] and [import] into global namespace since
+# they are used for loading libraries
+	install -p $(externals_src)/hcs/classpath.$(EXTENSION) \
+		$(externals_src)/hcs/import.$(EXTENSION) $(objectsdir)
 	install -p $(shell ls -1 $(externals_src)/hcs/*.pd | \
 			 grep -v '\-help.pd') $(objectsdir)/$(HCS_NAME)
 # hmm, these don't have a home yet...
@@ -1174,9 +1180,8 @@ iemlib_install: iemlib
 	cd $(externals_src)/iemlib/iemabs/ && \
 		install -p $(shell cd $(externals_src)/iemlib/iemabs/ && ls -1 *.pd | \
 			grep -v 'help') $(objectsdir)/$(IEMLIB_NAME)
-#  iemabs still has the help patches in the old help-*.pd style
 	install -d $(helpdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/iemabs/*help*.pd $(helpdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/iemabs/*-help.pd $(helpdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/iemabs/*.mp3 $(helpdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/iemabs/*.wav $(helpdir)/$(IEMLIB_NAME)
 # iemlib objects have their help path hard-coded :(
@@ -1264,8 +1269,8 @@ loaders_install: loaders
 	install -d $(objectsdir)/$(LOADERS_NAME)
 	install -p $(LOADERS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(LOADERS_NAME)
 	install -d $(helpdir)/$(LOADERS_NAME)
-	install -p $(wildcard $(externals_src)/loaders/help/*.pd) \
-		$(helpdir)/$(LOADERS_NAME)
+#	install -p $(wildcard $(externals_src)/loaders/help/*.pd) \
+#		$(helpdir)/$(LOADERS_NAME)
 #	install -d $(manualsdir)/$(LOADERS_NAME)
 #	install -p $(externals_src)/loaders/README.txt $(manualsdir)/$(LOADERS_NAME)
 
