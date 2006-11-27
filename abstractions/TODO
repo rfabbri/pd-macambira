@@ -2,4 +2,5 @@
 - fix up Makefile to use auto _install and _clean target generation, like in
   externals/Makefile
 
+- make a library for bw limited oscs written in Pd
 
