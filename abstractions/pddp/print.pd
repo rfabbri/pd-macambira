@@ -9,7 +9,7 @@
 #X obj 31 134 loadbang;
 #X msg 31 155 label;
 #X text 102 143 reset to blank;
-#X obj 9 110 iemlib/prepend label;
+#X obj 9 110 flatspace/prepend label;
 #X connect 0 0 2 0;
 #X connect 2 0 8 0;
 #X connect 5 0 6 0;
