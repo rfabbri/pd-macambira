@@ -1,4 +1,6 @@
 
+- for release branch, remove class_sethelpsymbol() from iemlib and zexy
+
 - make a web page that has stuff that can't be included due to license and patent issues:
   (percolate, mp3, mpeg2, mpeg4, etc)
 
@@ -6,9 +8,6 @@
 
 - make all of pd/src/x_*.c into a standalone library that is optionally loaded
   by Pd.  Then these objects can be placed into the namespace.
-
-
-- fix patch failures in patch_pd
 
 
 - allow DESTDIR to be a relative path

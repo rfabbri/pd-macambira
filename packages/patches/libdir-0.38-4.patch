@@ -1,12 +1,11 @@
-? configure
 Index: s_loader.c
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/s_loader.c,v
-retrieving revision 1.4
-diff -u -w -r1.4 s_loader.c
---- s_loader.c	6 Sep 2004 20:20:35 -0000	1.4
-+++ s_loader.c	20 Nov 2005 03:47:04 -0000
-@@ -163,3 +163,82 @@
+retrieving revision 1.6
+diff -u -w -r1.6 s_loader.c
+--- s_loader.c	30 May 2005 03:04:19 -0000	1.6
++++ s_loader.c	28 Nov 2006 03:59:50 -0000
+@@ -172,3 +175,83 @@
  
  
  
@@ -24,17 +23,18 @@ diff -u -w -r1.4 s_loader.c
 +{
 +    int fd = -1;
 +    char searchpathname[MAXPDSTRING], helppathname[MAXPDSTRING], 
-+        classname2[MAXPDSTRING], dirbuf[MAXPDSTRING], *nameptr;
++        fullclassname[MAXPDSTRING], dirbuf[MAXPDSTRING], *nameptr;
 +    
 +#if 0
 +    fprintf(stderr, "sys_load_lib_directory %s %s\n", dirname, classname);
 +#endif
 +
-+        /* look for meta file (classname)/(classname).pd <hans@at.or.at> */
-+    strncpy(classname2, classname, MAXPDSTRING);
-+    strcat(classname2, "/");
-+    strncat(classname2, classname, MAXPDSTRING-strlen(classname2));
-+    if ((fd = open_via_path(dirname, classname2, ".pd",
++/* look for meta file (classname)/(classname)-meta.pd */
++	strncpy(fullclassname, classname, MAXPDSTRING - 6);
++	strcat(fullclassname, "/");
++	strncat(fullclassname, classname, MAXPDSTRING - strlen(fullclassname) - 6);
++	strcat(fullclassname, "-meta");
++    if ((fd = open_via_path(dirname, fullclassname, ".pd",
 +                            dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
 +    {
 +        return (0);
