@@ -125,7 +125,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib loaders mapping markex maxlib mjlib motex mrpeach oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1256,6 +1256,41 @@ iemmatrix_clean:
 
 #iemmatrix_install: iemmatrix
 #	mv $(objectsdir)/mtx*.$(EXTENSION) $(objectsdir)/$(IEMMATRIX_NAME)
+
+
+
+#------------------------------------------------------------------------------#
+# JASCH_LIB
+JASCH_LIB_NAME=jasch_lib
+JASCH_LIB_OBJECTS := $(wildcard $(externals_src)/jasch_lib/*/*.c)
+jasch_lib: $(JASCH_LIB_OBJECTS:.c=.$(EXTENSION))
+
+jasch_lib_install: jasch_lib
+	install -d $(objectsdir)/$(JASCH_LIB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(JASCH_LIB_NAME) \
+		--author "Jasch" \
+		--license "GNU GPLv2" \
+		--version ""
+	install -p $(JASCH_LIB_OBJECTS:.c=.$(EXTENSION)) \
+		$(objectsdir)/$(JASCH_LIB_NAME)
+	install -d $(helpdir)/$(JASCH_LIB_NAME)
+	install -p $(externals_src)/jasch_lib/*/*-help.pd \
+		$(helpdir)/$(JASCH_LIB_NAME)
+#	install -d $(manualsdir)/$(JASCH_LIB_NAME)
+#	install -p $(externals_src)/jasch_lib/manual.txt \
+#		$(manualsdir)/$(JASCH_LIB_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/jasch_lib/README \
+#		$(readmesdir)/$(JASCH_LIB_NAME).txt
+#	install -d $(examplesdir)/$(JASCH_LIB_NAME)
+#	install -p $(externals_src)/jasch_lib/examples/*.pd \
+#		$(examplesdir)/$(JASCH_LIB_NAME)
+
+jasch_lib_clean:
+	-rm -f -- $(JASCH_LIB_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(JASCH_LIB_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/jasch_lib/*/*.bak
+	-rm -f -- $(externals_src)/jasch_lib/*/*.*~
 
 
 

@@ -64,7 +64,7 @@ LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer  -fPIC \
     -Wall -W -Wshadow -Wstrict-prototypes  \
     -Wno-unused -Wno-parentheses -Wno-switch $(CFLAGS)
 
-LINUXINCLUDE =  -I../../src
+LINUXINCLUDE =  -I../../src  -I../../../pd/src
 
 .c.pd_linux:
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
