@@ -3,12 +3,6 @@
 
 iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
-
 #include "m_pd.h"
 #include "iemlib.h"
 #include "iem_bin_ambi.h"
@@ -57,9 +51,9 @@ typedef struct _bin_ambi_reduced_decode_fir2
 	int						*x_phi;
 	int						*x_phi_sym;
 	int						*x_sym_flag;
-	float					*x_beg_fade_out_hrir;
-	float					*x_beg_hrir;
-	float					**x_beg_hrir_red;
+	t_float					*x_beg_fade_out_hrir;
+	t_float					*x_beg_hrir;
+	t_float					**x_beg_hrir_red;
 	t_symbol			**x_hrir_filename;
 	t_symbol			**x_s_hrir;
 	t_symbol			**x_s_hrir_red;
@@ -588,7 +582,7 @@ static void bin_ambi_reduced_decode_fir2_inverse(t_bin_ambi_reduced_decode_fir2 
 		nz = bin_ambi_reduced_decode_fir2_eval_which_element_of_col_not_zero(x, i, i);
 		if(nz < 0)
 		{
-			post("bin_ambi_reduced_decode_fir2 ERROR: matrix not regular !!!!");
+			post("bin_ambi_reduced_decode_fir2 ERROR: matrix singular !!!!");
 			x->x_seq_ok = 0;
 			return;
 		}
@@ -622,7 +616,7 @@ static void bin_ambi_reduced_decode_fir2_inverse(t_bin_ambi_reduced_decode_fir2 
 		}
 	}
 
-	post("matrix_inverse regular");
+	post("matrix_inverse nonsingular");
 	x->x_seq_ok = 1;
 }
 
@@ -669,7 +663,7 @@ static void bin_ambi_reduced_decode_fir2_ipht_ireal_muladd(t_bin_ambi_reduced_de
 	int i, pht_index, real_index;
 	double *dv3=x->x_prod3;
 	double *dv2=x->x_prod2;
-	float mw;
+	t_float mw;
 
 	if(argc < 3)
 	{
@@ -721,7 +715,7 @@ static void bin_ambi_reduced_decode_fir2_load_HRIR(t_bin_ambi_reduced_decode_fir
 	outlet_list(x->x_obj.ob_outlet, &s_list, 2, x->x_at);
 }
 
-static void bin_ambi_reduced_decode_fir2_check_HRIR_arrays(t_bin_ambi_reduced_decode_fir2 *x, float findex)
+static void bin_ambi_reduced_decode_fir2_check_HRIR_arrays(t_bin_ambi_reduced_decode_fir2 *x, t_floatarg findex)
 {
 	int index=(int)findex - 1;
 	int j, k, n;
@@ -730,7 +724,7 @@ static void bin_ambi_reduced_decode_fir2_check_HRIR_arrays(t_bin_ambi_reduced_de
 	int npoints;
 	t_symbol *hrir;
 	t_float *vec_hrir, *vec, *vec_fade_out_hrir;
-	float decr, sum;
+	t_float decr, sum;
 
 	if(index < 0)
 		index = 0;
@@ -765,7 +759,7 @@ static void bin_ambi_reduced_decode_fir2_check_HRIR_arrays(t_bin_ambi_reduced_de
 			for(j=0; j<n; j++)
 				vec[j] = vec_hrir[j];
 			sum = 1.0f;
-			decr = 4.0f / (float)firsize;
+			decr = 4.0f / (t_float)firsize;
 			for(j=n, k=0; j<firsize; j++, k++)
 			{
 				sum -= decr;
@@ -775,7 +769,7 @@ static void bin_ambi_reduced_decode_fir2_check_HRIR_arrays(t_bin_ambi_reduced_de
 	}
 }
 
-static void bin_ambi_reduced_decode_fir2_check_HRIR_RED_arrays(t_bin_ambi_reduced_decode_fir2 *x, float findex)
+static void bin_ambi_reduced_decode_fir2_check_HRIR_RED_arrays(t_bin_ambi_reduced_decode_fir2 *x, t_floatarg findex)
 {
 	int index=(int)findex - 1;
 	t_garray *a;
@@ -803,7 +797,7 @@ static void bin_ambi_reduced_decode_fir2_check_HRIR_RED_arrays(t_bin_ambi_reduce
 	}
 }
 
-static void bin_ambi_reduced_decode_fir2_calc_reduced(t_bin_ambi_reduced_decode_fir2 *x, float findex)
+static void bin_ambi_reduced_decode_fir2_calc_reduced(t_bin_ambi_reduced_decode_fir2 *x, t_floatarg findex)
 {
 	int index=(int)findex - 1;
 	int i, j;
@@ -812,7 +806,7 @@ static void bin_ambi_reduced_decode_fir2_calc_reduced(t_bin_ambi_reduced_decode_
 	double *dv;
 	int n_ambi = x->x_n_ambi;
 	int n_ls = x->x_n_real_ls;
-	float mul;
+	t_float mul;
 
 	if(x->x_seq_ok)
 	{
@@ -824,7 +818,7 @@ static void bin_ambi_reduced_decode_fir2_calc_reduced(t_bin_ambi_reduced_decode_
 		vec_hrir_red = x->x_beg_hrir_red[index];
 
 		dv = x->x_prod3 + index;
-		mul = (float)(*dv);
+		mul = (t_float)(*dv);
 		vec_hrir = x->x_beg_hrir;
 		for(i=0; i<firsize; i++)/*first step of acumulating the HRIRs*/
 		{
@@ -834,9 +828,10 @@ static void bin_ambi_reduced_decode_fir2_calc_reduced(t_bin_ambi_reduced_decode_
 		for(j=1; j<n_ls; j++)
 		{
 			dv += n_ambi;
-			mul = (float)(*dv);
+			mul = (t_float)(*dv);
 			vec_hrir = x->x_beg_hrir;
 			vec_hrir += j * firsize;
+
 			for(i=0; i<firsize; i++)
 			{
 				vec_hrir_red[i] += mul * vec_hrir[i];
@@ -966,7 +961,7 @@ static void bin_ambi_reduced_decode_fir2_calc_sym(t_bin_ambi_reduced_decode_fir2
 					SETFLOAT(x->x_at, 1.0f);
 				else if(plus_minus[i] == '-')
 					SETFLOAT(x->x_at, 2.0f);
-				SETFLOAT(x->x_at+1, (float)(i+1));
+				SETFLOAT(x->x_at+1, (t_float)(i+1));
 				outlet_list(x->x_out_sign_sum, &s_list, 2, x->x_at);
 			}
 		}
@@ -1040,8 +1035,8 @@ static void bin_ambi_reduced_decode_fir2_free(t_bin_ambi_reduced_decode_fir2 *x)
 	freebytes(x->x_phi_sym, x->x_n_real_ls * sizeof(int));
 	freebytes(x->x_sym_flag, x->x_n_real_ls * sizeof(int));
 
-	freebytes(x->x_beg_hrir, x->x_firsize * x->x_n_real_ls * sizeof(float));
-	freebytes(x->x_beg_hrir_red, x->x_n_ambi * sizeof(float *));
+	freebytes(x->x_beg_hrir, x->x_firsize * x->x_n_real_ls * sizeof(t_float));
+	freebytes(x->x_beg_hrir_red, x->x_n_ambi * sizeof(t_float *));
 }
 
 /*
@@ -1190,9 +1185,9 @@ static void *bin_ambi_reduced_decode_fir2_new(t_symbol *s, int argc, t_atom *arg
 		x->x_phi_sym		= (int *)getbytes(x->x_n_real_ls * sizeof(int));
 		x->x_sym_flag		= (int *)getbytes(x->x_n_real_ls * sizeof(int));
 
-		x->x_beg_fade_out_hrir	= (float *)0;
-		x->x_beg_hrir						= (float *)getbytes(x->x_firsize * x->x_n_real_ls * sizeof(float));
-		x->x_beg_hrir_red				= (float **)getbytes(x->x_n_ambi * sizeof(float *));
+		x->x_beg_fade_out_hrir	= (t_float *)0;
+		x->x_beg_hrir						= (t_float *)getbytes(x->x_firsize * x->x_n_real_ls * sizeof(t_float));
+		x->x_beg_hrir_red				= (t_float **)getbytes(x->x_n_ambi * sizeof(t_float *));
 
 		x->x_sqrt3				= sqrt(3.0);
 		x->x_sqrt5_2			= sqrt(5.0) / 2.0;

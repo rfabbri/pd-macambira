@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemlib.h written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
+iemlib written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
 #ifndef __IEMLIB_H__
 #define __IEMLIB_H__
@@ -95,8 +95,14 @@ union tabfudge
   int32 tf_i[2];
 };
 
+#ifdef __i386__
 #define IEM_DENORMAL(f) ((((*(unsigned int*)&(f))&0x60000000)==0) || \
 (((*(unsigned int*)&(f))&0x60000000)==0x60000000))
 /* more stringent test: anything not between 1e-19 and 1e19 in absolute val */
+#else
+
+#define IEM_DENORMAL(f) 0
+
+#endif
 
 #endif
