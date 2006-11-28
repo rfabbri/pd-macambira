@@ -378,7 +378,7 @@ rtc-lib_install:
 		grep -v '\-help.pd\|RTC-Overview.pd'| sed 's|\(.*\)|"\1"|g') \
 		$(objectsdir)/$(RTC-LIB_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(RTC-LIB_NAME) \
-		--author "Karlheinz Essel and Frank Barknecht" \
+		--author "Karlheinz Essl and Frank Barknecht" \
 		--license "Pd license" \
 		--description "Realtime Composition Library for Max ported to Pd"
 	install -d $(helpdir)/$(RTC-LIB_NAME)
