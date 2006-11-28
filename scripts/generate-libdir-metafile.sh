@@ -13,7 +13,7 @@ function print_pd_text ()
 {
 	 file_name="$1"; shift
 	 meta_type="$1"; shift
-	 echo "#X text 10 $Y ${meta_type}: $@;" >> "$file_name"
+	 echo "#X text 10 $Y ${meta_type} $@;" >> "$file_name"
 	 ((Y=Y+20))
 }
 
@@ -32,17 +32,17 @@ else
 
 BASE_DIR="$1"; shift
 LIBNAME="$1"; shift
-libdir_file_name="${BASE_DIR}/${LIBNAME}/${LIBNAME}.pd"
+libdir_file_name="${BASE_DIR}/${LIBNAME}/${LIBNAME}-meta.pd"
 # create pd file
 touch "${libdir_file_name}"
 
-# create .pd header with subpatch called "PDDP_META"
+# create .pd header with subpatch called "META"
 echo "#N canvas 10 10 200 200 10;" >> "${libdir_file_name}"
-echo "#N canvas 20 20 420 300 PDDP_META 0;" >> "${libdir_file_name}"
+echo "#N canvas 20 20 420 300 META 0;" >> "${libdir_file_name}"
 #N canvas 249 280 600 398 loc&precess 0;
 
 # add required meta fields
-print_pd_text "${libdir_file_name}" PDDP_META "this is a prototype of a libdir meta file"
+print_pd_text "${libdir_file_name}" META "this is a prototype of a libdir meta file"
 print_pd_text "${libdir_file_name}" NAME ${LIBNAME} 
 
 
@@ -71,11 +71,11 @@ while [ $# -ge 1 ]; do
 				echo "ERROR: unknown flag: $1 with data: $2"
 				;;
     esac
-    shift
+	 shift
 	 shift
 done
 
-echo "#X restore 10 10 pd PDDP_META;" >> "${libdir_file_name}"
+echo "#X restore 10 10 pd META;" >> "${libdir_file_name}"
 
 
 fi
