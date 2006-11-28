@@ -30,7 +30,7 @@ run_build_script ()
 	 completion_test=`tail -1 ${LOGFILE}`
 	 if [ "x${completion_test}" != "xSUCCESS" ]; then
 		  SUBJECT="autobuild: $distro $HOSTNAME $DATE $TIME"
-		  tail -200 ${LOGFILE} | mail -s "${SUBJECT}" ${RECIPIENT}
+		  tail -20 ${LOGFILE} | mail -s "${SUBJECT}" ${RECIPIENT}
 	 fi
 }
 
