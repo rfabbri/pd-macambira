@@ -5,7 +5,7 @@ current: all
 all: gripd.pd_linux joystickmodule.so midimodule.so
 
 LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes -Werror \
+    -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 MIDIDEFINES = -D$(MIDIOSSUBTYPE) -DLINUX
 MIDICOMPILEFLAGS  = -O6 -I./midiio/include $(MIDIDEFINES)
