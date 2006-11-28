@@ -101,27 +101,16 @@ darwin_app_wrapper: Info.plist
 	install -m0644 -p \
 		"$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
 		"$(PD_APP_CONTENTS)/Resources"
-# Tcl
-	install -d $(PD_APP_CONTENTS)/Frameworks
-	install -d $(PD_APP_CONTENTS)/Frameworks/Tcl.framework
-	install -p $(WISH_FRAMEWORKS_SOURCE)/Tcl.framework/Versions/Current/Tcl \
+# embed Tcl/Tk Frameworks and remove cruft
+	install -d $(PD_APP_CONTENTS)/Frameworks \
+		$(PD_APP_CONTENTS)/Frameworks/Tcl.framework \
+		$(PD_APP_CONTENTS)/Frameworks/Tk.framework
+	ditto $(WISH_FRAMEWORKS_SOURCE)/Tcl.framework \
 		$(PD_APP_CONTENTS)/Frameworks/Tcl.framework/
-	install -d $(PD_APP_CONTENTS)/Frameworks/Tcl.framework/Resources
-	install -p $(WISH_FRAMEWORKS_SOURCE)/Tcl.framework/Resources/Info.plist \
-		$(PD_APP_CONTENTS)/Frameworks/Tcl.framework/Resources/
-	ditto $(WISH_FRAMEWORKS_SOURCE)/Tcl.framework/Resources/Scripts \
-		$(PD_APP_CONTENTS)/Frameworks/Tcl.framework/Resources/
-# Tk
-	install -d $(PD_APP_CONTENTS)/Frameworks
-	install -d $(PD_APP_CONTENTS)/Frameworks/Tk.framework
-	install -p $(WISH_FRAMEWORKS_SOURCE)/Tk.framework/Versions/Current/Tk \
+	ditto $(WISH_FRAMEWORKS_SOURCE)/Tk.framework \
 		$(PD_APP_CONTENTS)/Frameworks/Tk.framework/
-	install -d $(PD_APP_CONTENTS)/Frameworks/Tk.framework/Resources
-	install -p $(WISH_FRAMEWORKS_SOURCE)/Tk.framework/Resources/Info.plist \
-		$(WISH_FRAMEWORKS_SOURCE)/Tk.framework/Resources/Tk.rsrc \
-		$(PD_APP_CONTENTS)/Frameworks/Tk.framework/Resources/
-	ditto $(WISH_FRAMEWORKS_SOURCE)/Tk.framework/Resources/Scripts \
-		$(PD_APP_CONTENTS)/Frameworks/Tk.framework/Resources/
+	rm -rf $(PD_APP_CONTENTS)/Frameworks/Tcl.framework/{,/Versions/8.4}/{Headers,PrivateHeaders,*_debug,lib*.a,*Config.sh} && \
+	rm -rf $(PD_APP_CONTENTS)/Frameworks/Tk.framework/{,/Versions/8.4}/{Headers,PrivateHeaders,*_debug,lib*.a,*Config.sh}
 # from http://tktoolkit.cvs.sourceforge.net/tktoolkit/tk/macosx/GNUmakefile
 	fix_install_id ( ) { \
 	    chmod -R a+w "$$1"; \
