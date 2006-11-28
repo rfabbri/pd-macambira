@@ -8,7 +8,7 @@
 current: pd_linux
 	@echo make pd_linux, pd_darwin, clean ... you must be specific
 	@echo default to pd_linux
-	
+
 
 clean: ; rm -f *.pd_linux *.o
 
@@ -22,7 +22,7 @@ LINUXCFLAGS =  -DPD -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch -fPIC
 
-LINUXINCLUDE =  -I../src -L/usr/lib/X11 -I/usr/include/X11 -L/usr/X11R6/lib
+LINUXINCLUDE =  -I../src -L/usr/lib/X11 -I/usr/include/X11 -L/usr/X11R6/lib -I../../pd/src
 LINUXLINKS = -lX11 -lXtst -lgtk -lgdk -lgmodule -lglib -ldl -lXi -lXext -lX11 -lm -lxmms
 
 .c.pd_linux:
