@@ -1,18 +1,7 @@
-#N canvas 12 5 965 703 10;
+#N canvas 4 2 973 711 10;
 #X text 27 436 1.arg: <float> ambisonic order;
 #X text 794 41 -180 <= phi <= +180;
 #X text 494 172 input: <ambi_weight> one mul-factor for each;
-#X text 490 505 output in case of 3d: <matrix> ((n_ao+1)*(n_ao+1)*n_ls+2)
-;
-#X text 490 443 output in case of 2d: <matrix> ((2*n_ao+1)*n_ls+2)
-;
-#X text 835 505 <float> :;
-#X text 794 442 <float> :;
-#X text 731 527 number of ambisonic-channels;
-#X text 702 538 <float> elements of a matrix;
-#X text 504 538 + (n_ao + 1) * (n_ao + 1) * n_ls;
-#X text 504 473 + (2*n_ao + 1) * n_ls <float> elements of a matrix
-;
 #X text 42 454 (1 .. 5 in case of 3 dimensional);
 #X text 42 445 (1 .. 12 in case of 2 dimensional);
 #X text 27 464 2.arg: <float> dimension (2 or 3);
@@ -119,7 +108,7 @@ part of;
 #X obj 221 601 cnv 15 228 15 empty empty empty 20 12 0 14 -260818 -66577
 0;
 #X text 537 255 Otherwise we say \, this matrix is singular.;
-#N canvas 149 60 409 545 real_speaker_example 0;
+#N canvas 149 60 413 549 real_speaker_example 0;
 #X obj 124 33 bng 35 250 50 0 empty empty empty 0 -6 0 8 -24198 -42246
 -1;
 #X obj 143 217 cnv 15 120 15 empty empty empty 20 12 0 14 -260818 -66577
@@ -154,7 +143,7 @@ part of;
 #X connect 8 2 9 0;
 #X connect 9 0 4 0;
 #X restore 220 575 pd real_speaker_example singular;
-#N canvas 250 68 433 605 phantom_speaker_example 0;
+#N canvas 250 68 437 609 phantom_speaker_example 0;
 #X obj 79 30 bng 35 250 50 0 empty empty empty 0 -6 0 8 -24198 -42246
 -1;
 #X obj 184 250 cnv 15 132 15 empty empty empty 20 12 0 14 -260818 -66577
@@ -211,12 +200,7 @@ part of;
 #X text 537 233 to achieve the identity matrix. This number has to
 be;
 #X obj 108 391 mtx_print;
-#X text 516 453 <float> n_row = (n_ls) = number of loudspeakers;
 #X text 504 463 + <float> n_col = (2*n_ao+1) = number of ambisonic-channels
-;
-#X text 493 328 input: <ipht_ireal_muladd> im_ls_index re_ls_index
-;
-#X text 546 341 multiplies the column "im_ls_index + re_ls_index" of
 ;
 #X text 27 476 3.arg: <float> number of real existing loudspeakers
 ;
@@ -242,27 +226,46 @@ be;
 #X text 525 141 encodes the (re_ls_index + vi_ls_index) row of a matrix
 ;
 #X text 532 153 we need them to achieve a nonsingular matrix;
-#X text 516 516 <float> n_row = (n_ls) = number of loudspeakers;
-#X text 504 527 + <float> n_col = (n_ao+1)*(n_ao+1) =;
-#X connect 21 0 64 0;
-#X connect 22 0 27 0;
-#X connect 23 0 31 0;
-#X connect 24 0 31 0;
-#X connect 25 0 35 1;
-#X connect 26 0 31 0;
-#X connect 27 0 32 0;
-#X connect 27 1 35 0;
-#X connect 27 2 30 0;
-#X connect 27 3 33 0;
-#X connect 27 4 28 0;
-#X connect 27 5 24 0;
-#X connect 27 6 25 0;
-#X connect 28 0 29 0;
-#X connect 29 0 31 0;
-#X connect 30 0 31 0;
-#X connect 31 0 21 0;
-#X connect 32 0 31 0;
-#X connect 33 0 26 0;
-#X connect 34 0 31 0;
-#X connect 35 0 34 0;
-#X connect 47 0 31 0;
+#X text 493 328 input: <ipht_ireal_muladd> vi_ls_index re_ls_index
+;
+#X text 546 341 multiplies the column "vi_ls_index + re_ls_index" of
+;
+#X text 811 443 floats :;
+#X text 851 503 floats :;
+#X text 516 513 <float> n_row = (n_re_ls) = number of real loudspeakers
+;
+#X text 516 453 <float> n_row = (n_re_ls) = number of real loudspeakers
+;
+#X text 784 523 ambisonic-channels;
+#X text 504 523 + <float> n_col = (n_ao+1)*(nao+1) = number of;
+#X text 825 534 decoder matrix;
+#X text 504 474 + (2*n_ao + 1) * n_re_ls <float> elements of the;
+#X text 504 534 + (n_ao+1)*(n_ao+1) * n_re_ls <float> elements of the
+;
+#X text 796 474 decoder matrix;
+#X text 490 443 output in case of 2d: <matrix> (n_re_ls*(2*n_ao+1)+2)
+;
+#X text 490 503 output in case of 3d: <matrix> (n_re_ls*(n_ao+1)*(n_ao+1)+2)
+;
+#X connect 13 0 56 0;
+#X connect 14 0 19 0;
+#X connect 15 0 23 0;
+#X connect 16 0 23 0;
+#X connect 17 0 27 1;
+#X connect 18 0 23 0;
+#X connect 19 0 24 0;
+#X connect 19 1 27 0;
+#X connect 19 2 22 0;
+#X connect 19 3 25 0;
+#X connect 19 4 20 0;
+#X connect 19 5 16 0;
+#X connect 19 6 17 0;
+#X connect 20 0 21 0;
+#X connect 21 0 23 0;
+#X connect 22 0 23 0;
+#X connect 23 0 13 0;
+#X connect 24 0 23 0;
+#X connect 25 0 18 0;
+#X connect 26 0 23 0;
+#X connect 27 0 26 0;
+#X connect 39 0 23 0;
