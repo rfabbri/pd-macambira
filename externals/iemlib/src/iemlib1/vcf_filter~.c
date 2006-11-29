@@ -320,7 +320,7 @@ static void *vcf_filter_tilde_new(t_symbol *filt_typ)
 void vcf_filter_tilde_setup(void)
 {
   vcf_filter_tilde_class = class_new(gensym("vcf_filter~"), (t_newmethod)vcf_filter_tilde_new,
-    0, sizeof(t_vcf_filter_tilde), 0, A_DEFSYM, 0);
+    0, sizeof(t_vcf_filter_tilde), 0, A_SYMBOL, 0);
   CLASS_MAINSIGNALIN(vcf_filter_tilde_class, t_vcf_filter_tilde, x_msi);
   class_addmethod(vcf_filter_tilde_class, (t_method)vcf_filter_tilde_dsp, gensym("dsp"), 0);
   class_sethelpsymbol(vcf_filter_tilde_class, gensym("iemhelp/help-vcf_filter~"));
