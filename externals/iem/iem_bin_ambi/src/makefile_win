@@ -1,5 +1,5 @@
 
-all: iem_bin_ambi.dll
+all: ..\iem_bin_ambi.dll
 
 VIS_CPP_PATH = "C:\Programme\Microsoft Visual Studio\Vc98"
 
@@ -35,9 +35,9 @@ OBJ = $(SRC:.c=.obj)
 .c.obj:
 	cl $(PD_WIN_C_FLAGS) $(PD_WIN_INCLUDE_PATH) /c $*.c
 
-iem_bin_ambi.dll: $(OBJ)
+..\iem_bin_ambi.dll: $(OBJ)
 	link $(PD_WIN_L_FLAGS) /dll /export:iem_bin_ambi_setup \
-	/out:iem_bin_ambi.dll $(OBJ) $(PD_WIN_LIB)
+	/out:..\iem_bin_ambi.dll $(OBJ) $(PD_WIN_LIB)
 
 clean:
 	del *.obj
