@@ -59,9 +59,13 @@ static t_int *nz_tilde_perform(t_int *w)
 	t_float *readvec;
 
 	writevec2 = x->x_begmem2 + x->x_writeindex;
+  writevec1 = x->x_begmem1 + x->x_writeindex;
 	in = x->x_io[0];
 	for(i=0; i<n; i++)
+  {
 		writevec2[i] = in[i];
+		writevec1[i] = in[i];
+  }
 
 	for(j=0; j<num_dels; j++)
 	{
@@ -70,10 +74,6 @@ static t_int *nz_tilde_perform(t_int *w)
 		for(i=0; i<n; i++)
 			out[i] = readvec[i];
 	}
-
-	writevec1 = x->x_begmem1 + x->x_writeindex;
-	for(i=0; i<n; i++)
-		writevec1[i] = writevec2[i];
 
 	x->x_writeindex += n;
 	if(x->x_writeindex >= x->x_mallocsize)
@@ -95,6 +95,7 @@ static t_int *nz_tilde_perf8(t_int *w)
 	t_float *readvec;
 
 	writevec2 = x->x_begmem2 + x->x_writeindex;
+  writevec1 = x->x_begmem1 + x->x_writeindex;
 	in = x->x_io[0];
 	i = n;
 	while(i)
@@ -108,7 +109,17 @@ static t_int *nz_tilde_perf8(t_int *w)
 		writevec2[6] = in[6];
 		writevec2[7] = in[7];
 
+    writevec1[0] = in[0];
+		writevec1[1] = in[1];
+		writevec1[2] = in[2];
+		writevec1[3] = in[3];
+		writevec1[4] = in[4];
+		writevec1[5] = in[5];
+		writevec1[6] = in[6];
+		writevec1[7] = in[7];
+
 		writevec2 += 8;
+    writevec1 += 8;
 		in += 8;
 		i -= 8;
 	}
@@ -134,25 +145,6 @@ static t_int *nz_tilde_perf8(t_int *w)
 		}
 	}
 
-	writevec1 = x->x_begmem1 + x->x_writeindex;
-	writevec2 = x->x_begmem2 + x->x_writeindex;
-	i = n;
-	while(i)
-	{
-		writevec1[0] = writevec2[0];
-		writevec1[1] = writevec2[1];
-		writevec1[2] = writevec2[2];
-		writevec1[3] = writevec2[3];
-		writevec1[4] = writevec2[4];
-		writevec1[5] = writevec2[5];
-		writevec1[6] = writevec2[6];
-		writevec1[7] = writevec2[7];
-
-		writevec1 += 8;
-		writevec2 += 8;
-		i -= 8;
-	}
-
 	x->x_writeindex += n;
 	if(x->x_writeindex >= x->x_mallocsize)
 		x->x_writeindex -= x->x_mallocsize;
@@ -170,6 +162,7 @@ static void nz_tilde_dsp(t_nz_tilde *x, t_signal **sp)
 		max_samps = x->x_max_delay_samples;
 		i = max_samps / n;
 		j = max_samps - i * n;
+    /* allocate memory as a multiple of blocksize */
 		if(j)
 			max_samps = (i+1) * n;
 		else
@@ -246,5 +239,5 @@ void nz_tilde_setup(void)
 	CLASS_MAINSIGNALIN(nz_tilde_class, t_nz_tilde, x_msi);
 	class_addlist(nz_tilde_class, (t_method)nz_tilde_list);
 	class_addmethod(nz_tilde_class, (t_method)nz_tilde_dsp, gensym("dsp"), 0);
-	class_sethelpsymbol(nz_tilde_class, gensym("iemhelp2/help-nz~"));
+	class_sethelpsymbol(nz_tilde_class, gensym("iemhelp2/nz~-help"));
 }

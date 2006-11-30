@@ -458,5 +458,5 @@ void n_delay2p_line_tilde_setup(void)
 	class_addmethod(n_delay2p_line_tilde_class, (t_method)n_delay2p_line_tilde_dsp, gensym("dsp"), 0);
 	class_addmethod(n_delay2p_line_tilde_class, (t_method)n_delay2p_line_tilde_stop, gensym("stop"), 0);
 	class_addmethod(n_delay2p_line_tilde_class, (t_method)n_delay2p_line_tilde_time, gensym("time"), A_FLOAT, 0);
-	class_sethelpsymbol(n_delay2p_line_tilde_class, gensym("iemhelp2/help-n_delay2p_line~"));
+	class_sethelpsymbol(n_delay2p_line_tilde_class, gensym("iemhelp2/n_delay2p_line~-help"));
 }

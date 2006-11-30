@@ -33,12 +33,13 @@ OBJ = $(SRC:.c=.o)
 #
 
 clean:
-	rm $(TARGET)
+	rm ../$(TARGET)
 	rm *.o
 
 all: $(OBJ)
 	@echo :: $(OBJ)
 	$(LD) $(LDFLAGS) -o $(TARGET) *.o $(LIB)
+	mv $(TARGET) ..
 	strip --strip-unneeded $(TARGET)
 
 $(OBJ) : %.o : %.c
