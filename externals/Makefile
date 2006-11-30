@@ -132,7 +132,7 @@ ifeq ($(OS_NAME),windows)
   LIB_TARGETS += hidin
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid
+    LIB_TARGETS += hid hidio
   else
     # GNU/Linux, BSD, IRIX, etc.
     LIB_TARGETS += hid pdp pidip
@@ -1023,6 +1023,74 @@ hidin_clean:
 	-rm -f -- $(HIDIN_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/olafmatt/hidin/*.bak
 	-rm -f -- $(externals_src)/olafmatt/hidin/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# HIDIO
+HIDIO_NAME = hidio
+ifeq ($(OS_NAME),windows)
+  HIDIO_CFLAGS = $(CFLAGS) 
+  HIDIO_LIBS = $(LIBS) -lhid -lsetupapi
+else
+  ifeq ($(OS_NAME),darwin)
+    FRAMEWORKS = Carbon IOKit ForceFeedback
+    HIDIO_CFLAGS = $(CFLAGS) -I$(externals_src)/io/hidio/HID\ Utilities\ Source
+    HID_UTILITIES_SOURCE = $(externals_src)/io/hidio/HID\ Utilities\ Source
+    HIDIO_LIBS = $(LIBS) -L$(HID_UTILITIES_SOURCE)/build \
+		-L$(HID_UTILITIES_SOURCE)/build/Default \
+      -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
+  else
+    HIDIO_CFLAGS = $(CFLAGS) 
+    HIDIO_LIBS = $(LIBS)
+  endif
+endif
+
+HIDIO_SRC = input_arrays.c hidio_$(OS_NAME).c hidio.c
+HIDIO_OBJECTS := $(patsubst %.c, $(externals_src)/io/hidio/%.o, $(HIDIO_SRC))
+$(HIDIO_OBJECTS) : %.o : %.c
+	$(CC) $(HIDIO_CFLAGS) -o "$*.o" -c "$*.c"
+
+$(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a:
+# Apple changed the XCode CLI tool's name in xcode2... arg
+# if on non-Mac OS X, this target just echos a message
+ifeq ($(UNAME),Darwin)
+	cd $(HID_UTILITIES_SOURCE) && \
+		(test -x /usr/bin/xcodebuild && /usr/bin/xcodebuild) || \
+			(test -x /usr/bin/pbxbuild && /usr/bin/pbxbuild) || \
+				echo "Not building Apple HID Utilities"
+endif
+
+$(externals_src)/io/hidio/hidio.$(EXTENSION): $(HIDIO_OBJECTS) \
+$(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
+	$(CC) $(LDFLAGS) -o $(externals_src)/io/hidio/hidio.$(EXTENSION) \
+		$(HIDIO_OBJECTS) $(HIDIO_LIBS)
+#	$(STRIP) $(externals_src)/io/hidio/hidio.$(EXTENSION)
+
+hidio: $(externals_src)/io/hidio/hidio.$(EXTENSION)
+
+hidio_install: hidio
+	install -d $(objectsdir)/$(HIDIO_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(HIDIO_NAME) \
+		--author "David Merrill <dmerrill@media.mit.edu>, Hans-Christoph Steiner <hans@at.or.at>, Olaf Matthes <olaf@nullmedium.de>" \
+		--description "I/O for USB HID and other supported devices" \
+		--license "GNU GPLv2" \
+		--version "0.0"
+	-install -p $(externals_src)/io/hidio/hidio.$(EXTENSION) $(objectsdir)
+#	install -p $(externals_src)/io/hidio/*.pd $(objectsdir)/$(HIDIO_NAME)
+	install -d $(helpdir)/$(HIDIO_NAME)
+	install -p $(externals_src)/io/hidio/*-help.pd  $(helpdir)/$(HIDIO_NAME)
+#	install -p $(externals_src)/io/hidio/examples/*.pd $(helpdir)/$(HIDIO_NAME)
+#	install -d $(examplesdir)/$(HIDIO_NAME)
+#	install -p $(externals_src)/io/hidio/examples/*.pd  $(examplesdir)/$(HIDIO_NAME)
+
+hidio_clean:
+	-rm -f -- $(externals_src)/io/hidio/*.o
+	-rm -f -- $(externals_src)/io/hidio/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/io/hidio/*.bak
+	-rm -f -- $(externals_src)/io/hidio/*.*~
+	-rm -f -- $(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
+
 
 
 
@@ -2133,3 +2201,5 @@ test_locations:
 
 .PHONY: all install clean distclean test_locations $(LIB_TARGETS) \
 $(patsubst %, %_install,$(LIB_TARGETS)) $(patsubst %, %_clean,$(LIB_TARGETS))
+
+
