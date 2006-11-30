@@ -14,7 +14,7 @@ BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
-WISH_FRAMEWORKS_SOURCE := $(shell (test -e "/Library/Frameworks/Tk.framework/Tk" && echo "/Library/Frameworks") || /System/Library/Frameworks)
+WISH_FRAMEWORKS_SOURCE := $(shell (test -e "/Library/Frameworks/Tk.framework/Tk" && echo "/Library/Frameworks") || echo /System/Library/Frameworks)
 WISH_SOURCE = $(WISH_FRAMEWORKS_SOURCE)/Tk.framework/Resources
 # Wish Shell.app changed to Wish.app in TclTk 8.4.10
 WISH_NAME := $(shell ( test -d $(WISH_SOURCE)/Wish.app && echo Wish) \
@@ -124,8 +124,8 @@ darwin_app_wrapper: Info.plist
 	} && \
 	fix_install_id $(PD_APP_CONTENTS)/Frameworks/Tcl.framework/Tcl Tcl && \
 	fix_install_id $(PD_APP_CONTENTS)/Frameworks/Tk.framework/Tk Tk && \
-	fix_install_name $(PD_APP_CONTENTS)/MacOS/Wish Tcl && \
-	fix_install_name $(PD_APP_CONTENTS)/MacOS/Wish Tk
+	fix_install_name "$(PD_APP_CONTENTS)/MacOS/$(WISH_NAME)" Tcl && \
+	fix_install_name "$(PD_APP_CONTENTS)/MacOS/$(WISH_NAME)" Tk
 # set up app wrapper
 	install -d "$(PD_APP_CONTENTS)/Resources/Scripts"
 	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
