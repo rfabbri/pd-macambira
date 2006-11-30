@@ -135,7 +135,7 @@ else
     LIB_TARGETS += hid hidio
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip
+    LIB_TARGETS += hid hidio pdp pidip
   endif
 endif
 

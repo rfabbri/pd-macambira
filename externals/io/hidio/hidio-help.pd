@@ -1,4 +1,4 @@
-#N canvas 157 38 921 595 10;
+#N canvas 157 38 925 599 10;
 #X floatatom 27 439 5 0 0 0 - - -;
 #X floatatom 83 439 5 0 0 0 - - -;
 #X floatatom 63 395 6 0 0 0 - - -;
@@ -31,7 +31,7 @@
 #X text 435 117 refresh device list;
 #X text 537 487 For more info:;
 #X text 266 557 released under the GNU GPL;
-#X text 472 544 $Revision: 1.1 $$Date: 2006-11-30 05:53:40 $;
+#X text 472 544 $Revision: 1.2 $$Date: 2006-11-30 06:14:59 $;
 #X text 473 557 $Author: eighthave $;
 #X msg 436 201 poll 20;
 #X msg 374 201 poll 2;

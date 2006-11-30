@@ -35,8 +35,8 @@
  * LOCAL DEFINES
  */
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 unsigned short global_debug_level = 0;
 
@@ -409,7 +409,6 @@ static void hidio_free(t_hidio* x)
 /* create a new instance of this class */
 static void *hidio_new(t_symbol *s, int argc, t_atom *argv) 
 {
-	DEBUG(post("hidio_new"););
 	t_hidio *x = (t_hidio *)pd_new(hidio_class);
 	unsigned int i;
 	
@@ -443,7 +442,7 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
 
 void hidio_setup(void) 
 {
-	hidio_class = class_new(gensym("hidin"), 
+	hidio_class = class_new(gensym("hidio"), 
 								 (t_newmethod)hidio_new, 
 								 (t_method)hidio_free,
 								 sizeof(t_hidio),
@@ -456,7 +455,7 @@ void hidio_setup(void)
 /* 	class_addanything(hidio_class,(t_method) hidio_anything); */
 	
 	/* add inlet message methods */
-/*	class_addmethod(hidio_class,(t_method) hidio_debug,gensym("debug"),A_DEFFLOAT,0);
+	class_addmethod(hidio_class,(t_method) hidio_debug,gensym("debug"),A_DEFFLOAT,0);
 	class_addmethod(hidio_class,(t_method) hidio_build_device_list,gensym("refresh"),0);
 	class_addmethod(hidio_class,(t_method) hidio_print,gensym("print"),0);
 	class_addmethod(hidio_class,(t_method) hidio_info,gensym("info"),0);
@@ -464,7 +463,7 @@ void hidio_setup(void)
 	class_addmethod(hidio_class,(t_method) hidio_close,gensym("close"),0);
 	class_addmethod(hidio_class,(t_method) hidio_poll,gensym("poll"),A_DEFFLOAT,0);
    /* force feedback messages */
-/*	class_addmethod(hidio_class,(t_method) hidio_ff_autocenter,
+	class_addmethod(hidio_class,(t_method) hidio_ff_autocenter,
 						 gensym("ff_autocenter"),A_DEFFLOAT,0);
 	class_addmethod(hidio_class,(t_method) hidio_ff_gain,gensym("ff_gain"),A_DEFFLOAT,0);
 	class_addmethod(hidio_class,(t_method) hidio_ff_motors,gensym("ff_motors"),A_DEFFLOAT,0);
@@ -473,13 +472,12 @@ void hidio_setup(void)
 	class_addmethod(hidio_class,(t_method) hidio_ff_reset,gensym("ff_reset"),0);
 	class_addmethod(hidio_class,(t_method) hidio_ff_stopall,gensym("ff_stopall"),0);
 	/* ff tests */
-/*	class_addmethod(hidio_class,(t_method) hidio_ff_fftest,gensym("fftest"),A_DEFFLOAT,0);
+	class_addmethod(hidio_class,(t_method) hidio_ff_fftest,gensym("fftest"),A_DEFFLOAT,0);
 	class_addmethod(hidio_class,(t_method) hidio_ff_print,gensym("ff_print"),0);
-*/
+
 
 	post("[hidio] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
 		 HIDIO_MAJOR_VERSION, HIDIO_MINOR_VERSION);  
 	post("\tcompiled on "__DATE__" at "__TIME__ " ");
-	post("arg!!!!!!");
 }
 
