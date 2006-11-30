@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
+iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -567,7 +567,7 @@ void bin_ambi_calc_HRTF_setup(void)
 	class_addmethod(bin_ambi_calc_HRTF_class, (t_method)bin_ambi_calc_HRTF_load_HRIR, gensym("load_HRIR"), A_FLOAT, 0);
 	class_addmethod(bin_ambi_calc_HRTF_class, (t_method)bin_ambi_calc_HRTF_check_arrays, gensym("check_arrays"), A_FLOAT, 0);
 	class_addmethod(bin_ambi_calc_HRTF_class, (t_method)bin_ambi_calc_HRTF_calc_fft, gensym("calc_fft"), A_FLOAT, 0);
-	class_sethelpsymbol(bin_ambi_calc_HRTF_class, gensym("iemhelp2/help-bin_ambi_calc_HRTF"));
+	class_sethelpsymbol(bin_ambi_calc_HRTF_class, gensym("iemhelp2/bin_ambi_calc_HRTF-help"));
 }
 /*
 Reihenfolge:

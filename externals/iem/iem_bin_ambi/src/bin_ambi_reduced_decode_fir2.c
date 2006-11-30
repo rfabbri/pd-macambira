@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
+iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -1234,7 +1234,7 @@ void bin_ambi_reduced_decode_fir2_setup(void)
 	class_addmethod(bin_ambi_reduced_decode_fir2_class, (t_method)bin_ambi_reduced_decode_fir2_calc_sym, gensym("calc_sym"), 0);
 	class_addmethod(bin_ambi_reduced_decode_fir2_class, (t_method)bin_ambi_reduced_decode_fir2_ambi_weight, gensym("ambi_weight"), A_GIMME, 0);
 	class_addmethod(bin_ambi_reduced_decode_fir2_class, (t_method)bin_ambi_reduced_decode_fir2_sing_range, gensym("sing_range"), A_DEFFLOAT, 0);
-	class_sethelpsymbol(bin_ambi_reduced_decode_fir2_class, gensym("iemhelp2/help-bin_ambi_reduced_decode_fir2"));
+	class_sethelpsymbol(bin_ambi_reduced_decode_fir2_class, gensym("iemhelp2/bin_ambi_reduced_decode_fir2-help"));
 }
 /*
 Reihenfolge:
