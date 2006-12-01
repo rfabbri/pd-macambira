@@ -62,6 +62,9 @@ t_hid_element *element[MAX_DEVICES][MAX_ELEMENTS];
 /* number of active elements per device */
 unsigned short element_count[MAX_DEVICES]; 
 
+/* pre-generated symbols */
+t_symbol *ps_open, *ps_device, *ps_poll, *ps_total, *ps_range;
+
 /*------------------------------------------------------------------------------
  * FUNCTION PROTOTYPES
  */
@@ -116,22 +119,22 @@ static void output_status(t_hidio *x, t_symbol *selector, t_float output_value)
 
 static void output_open_status(t_hidio *x)
 {
-	output_status(x, gensym("open"), x->x_device_open);
+	output_status(x, ps_open, x->x_device_open);
 }
 
 static void output_device_number(t_hidio *x)
 {
-	output_status(x, gensym("device"), x->x_device_number);
+	output_status(x, ps_device, x->x_device_number);
 }
 
 static void output_poll_time(t_hidio *x)
 {
-	output_status(x, gensym("poll"), x->x_delay);
+	output_status(x, ps_poll, x->x_delay);
 }
 
 static void output_device_count(t_hidio *x)
 {
-	output_status(x, gensym("total"), device_count);
+	output_status(x, ps_total, device_count);
 }
 
 static void output_element_ranges(t_hidio *x)
@@ -147,7 +150,7 @@ static void output_element_ranges(t_hidio *x)
 			SETSYMBOL(output_data + 1, element[x->x_device_number][i]->name);
 			SETFLOAT(output_data + 2, element[x->x_device_number][i]->min);
 			SETFLOAT(output_data + 3, element[x->x_device_number][i]->max);
-			outlet_anything(x->x_status_outlet, gensym("range"), 4, output_data);
+			outlet_anything(x->x_status_outlet, ps_range, 4, output_data);
 		}
 	}
 }
@@ -301,7 +304,7 @@ void hidio_poll(t_hidio* x, t_float f)
 	if(x->x_device_number > -1) 
 	{
 		if(!x->x_device_open) 
-			hidio_open(x,gensym("open"),0,NULL);
+			hidio_open(x,ps_open,0,NULL);
 		if(!x->x_started) 
 		{
 			clock_delay(x->x_clock, x->x_delay);
@@ -564,6 +567,14 @@ void hidio_setup(void)
 	post("[hidio] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
 		 HIDIO_MAJOR_VERSION, HIDIO_MINOR_VERSION);  
 	post("\tcompiled on "__DATE__" at "__TIME__ " ");
+	
+	/* pre-generate often used symbols */
+	ps_open = gensym("open");
+	ps_device = gensym("device");
+	ps_poll = gensym("poll");
+	ps_total = gensym("total");
+	ps_range = gensym("range");
+
 }
 #else /* Max */
 static void hidio_notify(t_hidio *x, t_symbol *s, t_symbol *msg, void *sender, void *data)
@@ -647,6 +658,13 @@ int main()
 
 	finder_addclass("Devices", "hidio");
 	post("hidio: © 2006 by Olaf Matthes");
+	
+	/* pre-generate often used symbols */
+	ps_open = gensym("open");
+	ps_device = gensym("device");
+	ps_poll = gensym("poll");
+	ps_total = gensym("total");
+	ps_range = gensym("range");
 
 	return 0;
 }
