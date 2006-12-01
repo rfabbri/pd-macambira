@@ -112,7 +112,11 @@ void debug_error(t_hidio *x, t_int message_debug_level, const char *fmt, ...)
 static void output_status(t_hidio *x, t_symbol *selector, t_float output_value)
 {
 	t_atom *output_atom = (t_atom *)getbytes(sizeof(t_atom));
+#ifdef PD
 	SETFLOAT(output_atom, output_value);
+#else
+	atom_setlong(output_atom, output_value);
+#endif
 	outlet_anything( x->x_status_outlet, selector, 1, output_atom);
 	freebytes(output_atom,sizeof(t_atom));
 }
@@ -148,8 +152,13 @@ static void output_element_ranges(t_hidio *x)
 		{
 			SETSYMBOL(output_data, element[x->x_device_number][i]->type);
 			SETSYMBOL(output_data + 1, element[x->x_device_number][i]->name);
+#ifdef PD
 			SETFLOAT(output_data + 2, element[x->x_device_number][i]->min);
 			SETFLOAT(output_data + 3, element[x->x_device_number][i]->max);
+#else
+			atom_setlong(output_data + 2, element[x->x_device_number][i]->min);
+			atom_setlong(output_data + 3, element[x->x_device_number][i]->max);
+#endif
 			outlet_anything(x->x_status_outlet, ps_range, 4, output_data);
 		}
 	}
@@ -364,7 +373,6 @@ t_int hidio_close(t_hidio *x)
 static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv) 
 {
 	debug_print(LOG_DEBUG,"hid_%s",s->s_name);
-/* store running state to be restored after the device has been opened */
 	short device_number;
 	
 	pthread_mutex_lock(&x->x_mutex);
@@ -424,12 +432,10 @@ t_int hidio_read(t_hidio *x, int fd)
 
 static void hidio_info(t_hidio *x)
 {
-	output_open_status(x);
-	output_device_number(x);
-	output_device_count(x);
-	output_poll_time(x);
-	output_element_ranges(x);
-	hidio_platform_specific_info(x);
+	pthread_mutex_lock(&x->x_mutex);
+	x->x_requestcode = REQUEST_INFO;
+	pthread_cond_signal(&x->x_requestcondition);
+	pthread_mutex_unlock(&x->x_mutex);
 }
 
 static void hidio_float(t_hidio* x, t_floatarg f) 
@@ -473,6 +479,7 @@ static void *hidio_child(void *zz)
 		else if (x->x_requestcode == REQUEST_OPEN)
 		{
 			short device_number = x->x_device_number;
+			/* store running state to be restored after the device has been opened */
 			t_int started = x->x_started;
 			int err;
 			pthread_mutex_unlock(&x->x_mutex);
@@ -509,6 +516,20 @@ static void *hidio_child(void *zz)
 		else if (x->x_requestcode == REQUEST_SEND)
 		{
 			if (x->x_requestcode == REQUEST_SEND)
+				x->x_requestcode = REQUEST_NOTHING;
+			pthread_cond_signal(&x->x_answercondition);
+		}
+		else if (x->x_requestcode == REQUEST_INFO)
+		{
+			pthread_mutex_unlock(&x->x_mutex);
+			output_open_status(x);
+			output_device_number(x);
+			output_device_count(x);
+			output_poll_time(x);
+			output_element_ranges(x);
+			hidio_platform_specific_info(x);
+			pthread_mutex_lock(&x->x_mutex);
+			if (x->x_requestcode == REQUEST_INFO)
 				x->x_requestcode = REQUEST_NOTHING;
 			pthread_cond_signal(&x->x_answercondition);
 		}

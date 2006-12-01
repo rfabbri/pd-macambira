@@ -35,7 +35,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.3 $"; */
+/* static char *version = "$Revision: 1.4 $"; */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -61,8 +61,9 @@ typedef void t_clock;
 #define REQUEST_OPEN 1
 #define REQUEST_READ 2
 #define REQUEST_SEND 3
-#define REQUEST_CLOSE 4
-#define REQUEST_QUIT 5
+#define REQUEST_INFO 4
+#define REQUEST_CLOSE 5
+#define REQUEST_QUIT 6
 
 
 /*------------------------------------------------------------------------------
