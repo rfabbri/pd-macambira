@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <sys/syslog.h>
+#include <pthread.h>
 
 #ifdef __linux__
 #include <linux/types.h>
@@ -34,7 +35,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.2 $"; */
+/* static char *version = "$Revision: 1.3 $"; */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -51,6 +52,18 @@ typedef void t_clock;
 /* this is limited so that the object doesn't cause a click getting too many
  * events from the OS's event queue */
 #define MAX_EVENTS_PER_POLL 64
+
+/*------------------------------------------------------------------------------
+ *  THREADING RELATED DEFINES
+ */
+ 
+#define REQUEST_NOTHING 0
+#define REQUEST_OPEN 1
+#define REQUEST_READ 2
+#define REQUEST_SEND 3
+#define REQUEST_CLOSE 4
+#define REQUEST_QUIT 5
+
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -73,6 +86,11 @@ typedef struct _hidio
 	t_clock             *x_clock;
 	t_outlet            *x_data_outlet;
 	t_outlet            *x_status_outlet;
+    t_int				x_requestcode;
+    pthread_mutex_t		x_mutex;
+	pthread_cond_t		x_requestcondition;
+    pthread_cond_t		x_answercondition;
+    pthread_t			x_thread;
 } t_hidio;
 
 

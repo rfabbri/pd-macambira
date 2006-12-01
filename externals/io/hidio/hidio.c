@@ -365,29 +365,23 @@ static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv)
 {
 	debug_print(LOG_DEBUG,"hid_%s",s->s_name);
 /* store running state to be restored after the device has been opened */
-	t_int started = x->x_started;
+	short device_number;
 	
-	short device_number = get_device_number_from_arguments(argc, argv);
+	pthread_mutex_lock(&x->x_mutex);
+	device_number = get_device_number_from_arguments(argc, argv);
 	if(device_number > -1)
 	{
 		if( (device_number != x->x_device_number) && (x->x_device_open) ) 
 			hidio_close(x);
 		if(! x->x_device_open)
 		{
-			if(hidio_open_device(x,device_number))
-				error("[hidio] can not open device %d",device_number);
-			else
-				x->x_device_open = 1;
+			x->x_device_number = device_number;
+			x->x_requestcode = REQUEST_OPEN;
+			pthread_cond_signal(&x->x_requestcondition);
 		}
 	}
 	else debug_print(LOG_WARNING,"[hidio] device does not exist");
-/* restore the polling state so that when I [tgl] is used to start/stop [hidio],
- * the [tgl]'s state will continue to accurately reflect [hidio]'s state  */
-	if(started)
-		hidio_set_from_float(x,x->x_delay);
-	debug_print(LOG_DEBUG,"[hidio] set device# to %d",device_number);
-	output_open_status(x);
-	output_device_number(x);
+	pthread_mutex_unlock(&x->x_mutex);
 }
 
 
@@ -461,17 +455,132 @@ static void hidio_debug(t_hidio *x, t_float f)
 
 
 /*------------------------------------------------------------------------------
+ * child thread
+ */
+ 
+static void *hidio_child(void *zz)
+{
+    t_hidio *x = zz;
+
+    pthread_mutex_lock(&x->x_mutex);
+    while (1)
+    {
+		if (x->x_requestcode == REQUEST_NOTHING)
+		{
+			pthread_cond_signal(&x->x_answercondition);
+			pthread_cond_wait(&x->x_requestcondition, &x->x_mutex);
+		}
+		else if (x->x_requestcode == REQUEST_OPEN)
+		{
+			short device_number = x->x_device_number;
+			t_int started = x->x_started;
+			int err;
+			pthread_mutex_unlock(&x->x_mutex);
+			err = hidio_open_device(x, device_number);
+			pthread_mutex_lock(&x->x_mutex);
+			if (err)
+			{
+				x->x_device_number = -1;
+				error("[hidio] can not open device %d",device_number);
+			}
+			else
+			{
+				x->x_device_open = 1;
+				pthread_mutex_unlock(&x->x_mutex);
+				/* restore the polling state so that when I [tgl] is used to start/stop [hidio],
+				 * the [tgl]'s state will continue to accurately reflect [hidio]'s state  */
+				if (started)
+					hidio_set_from_float(x,x->x_delay);
+				debug_print(LOG_DEBUG,"[hidio] set device# to %d",device_number);
+				output_open_status(x);
+				output_device_number(x);
+				pthread_mutex_lock(&x->x_mutex);
+			}
+			if (x->x_requestcode == REQUEST_OPEN)
+				x->x_requestcode = REQUEST_NOTHING;
+			pthread_cond_signal(&x->x_answercondition);
+		}
+		else if (x->x_requestcode == REQUEST_READ)
+		{
+			if (x->x_requestcode == REQUEST_READ)
+				x->x_requestcode = REQUEST_NOTHING;
+			pthread_cond_signal(&x->x_answercondition);
+		}
+		else if (x->x_requestcode == REQUEST_SEND)
+		{
+			if (x->x_requestcode == REQUEST_SEND)
+				x->x_requestcode = REQUEST_NOTHING;
+			pthread_cond_signal(&x->x_answercondition);
+		}
+		else if (x->x_requestcode == REQUEST_CLOSE)
+		{
+			pthread_mutex_unlock(&x->x_mutex);
+			hidio_close(x);
+			pthread_mutex_lock(&x->x_mutex);
+			if (x->x_requestcode == REQUEST_CLOSE)
+				x->x_requestcode = REQUEST_NOTHING;
+			pthread_cond_signal(&x->x_answercondition);
+		}
+		else if (x->x_requestcode == REQUEST_QUIT)
+		{
+			pthread_mutex_unlock(&x->x_mutex);
+			hidio_close(x);
+			pthread_mutex_lock(&x->x_mutex);
+			x->x_requestcode = REQUEST_NOTHING;
+			pthread_cond_signal(&x->x_answercondition);
+			break;	/* leave the while loop */
+		}
+		else
+		{
+			;	/* nothing: shouldn't get here anyway */
+		}
+    }
+    pthread_mutex_unlock(&x->x_mutex);
+    return (0);
+}
+
+ 
+/*------------------------------------------------------------------------------
  * system functions 
  */
 static void hidio_free(t_hidio* x) 
 {
+    void *threadrtn;
+
 	debug_print(LOG_DEBUG,"hidio_free");
 		
-	hidio_close(x);
+	/* stop polling for input */
+	if (x->x_clock)
+		clock_unset(x->x_clock);
+		
+    pthread_mutex_lock(&x->x_mutex);
+    /* request QUIT and wait for acknowledge */
+    x->x_requestcode = REQUEST_QUIT;
+	if (x->x_thread)
+	{
+		post("hidio: stopping worker thread. . .");
+		pthread_cond_signal(&x->x_requestcondition);
+		while (x->x_requestcode != REQUEST_NOTHING)
+		{
+			post("hidio: ...signalling...");
+			pthread_cond_signal(&x->x_requestcondition);
+    		pthread_cond_wait(&x->x_answercondition, &x->x_mutex);
+		}
+		pthread_mutex_unlock(&x->x_mutex);
+		if (pthread_join(x->x_thread, &threadrtn))
+    		error("hidio_free: join failed");
+		post("hidio: ...done");
+    }
+	else pthread_mutex_unlock(&x->x_mutex);
+
 	clock_free(x->x_clock);
 	hidio_instance_count--;
 
 	hidio_platform_specific_free(x);
+	
+    pthread_cond_destroy(&x->x_requestcondition);
+    pthread_cond_destroy(&x->x_answercondition);
+    pthread_mutex_destroy(&x->x_mutex);
 }
 
 /* create a new instance of this class */
@@ -519,11 +628,18 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
   x->x_data_outlet = outlet_new(x, "anything");
 #endif
 
+    pthread_mutex_init(&x->x_mutex, 0);
+    pthread_cond_init(&x->x_requestcondition, 0);
+    pthread_cond_init(&x->x_answercondition, 0);
+
   x->x_device_number = get_device_number_from_arguments(argc, argv);
   
   x->x_instance = hidio_instance_count;
   hidio_instance_count++;
 
+	x->x_requestcode = REQUEST_NOTHING;
+    pthread_create(&x->x_thread, 0, hidio_child, x);
+	
   return (x);
 }
 
