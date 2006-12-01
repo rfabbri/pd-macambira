@@ -72,7 +72,7 @@ t_symbol *ps_open, *ps_device, *ps_poll, *ps_total, *ps_range;
 //static void hidio_poll(t_hidio *x, t_float f);
 static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv);
 //static t_int hidio_close(t_hidio *x);
-//static t_int hidio_read(t_hidio *x,int fd);
+//static t_int hidio_read(t_hidio *x);
 //static void hidio_float(t_hidio* x, t_floatarg f);
 
 
@@ -348,16 +348,10 @@ t_int hidio_close(t_hidio *x)
 {
 	debug_print(LOG_DEBUG,"hidio_close");
 
-/* just to be safe, stop it first */
-	stop_poll(x);
-
-	if(! hidio_close_device(x)) 
-	{
-		debug_print(LOG_INFO,"[hidio] closed device %d",x->x_device_number);
-		x->x_device_open = 0;
-		return (0);
-	}
-
+	pthread_mutex_lock(&x->x_mutex);
+	x->x_requestcode = REQUEST_CLOSE;
+	pthread_cond_signal(&x->x_requestcondition);
+	pthread_mutex_unlock(&x->x_mutex);
 	return (1);
 }
 
@@ -380,7 +374,7 @@ static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv)
 	if(device_number > -1)
 	{
 		if( (device_number != x->x_device_number) && (x->x_device_open) ) 
-			hidio_close(x);
+			hidio_close(x);	/* LATER move this also to child thread */
 		if(! x->x_device_open)
 		{
 			x->x_device_number = device_number;
@@ -393,7 +387,7 @@ static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv)
 }
 
 
-t_int hidio_read(t_hidio *x, int fd) 
+t_int hidio_read(t_hidio *x) 
 {
 //	debug_print(LOG_DEBUG,"hidio_read");
 	unsigned int i;
@@ -421,13 +415,25 @@ t_int hidio_read(t_hidio *x, int fd)
 				current_element->previous_value = current_element->value;
 		}
 	}
+	
+	// TODO: why is this 1? 
+	return 1; 
+}
+
+static void *hidio_tick(t_hidio *x)
+{
+	pthread_mutex_lock(&x->x_mutex);
+	if (x->x_requestcode == REQUEST_NOTHING)
+	{
+		x->x_requestcode = REQUEST_READ;
+		pthread_cond_signal(&x->x_requestcondition);
+	}
 	if (x->x_started) 
 	{
 		clock_delay(x->x_clock, x->x_delay);
 	}
-	
-	// TODO: why is this 1? 
-	return 1; 
+	pthread_mutex_unlock(&x->x_mutex);
+	return NULL;
 }
 
 static void hidio_info(t_hidio *x)
@@ -509,6 +515,9 @@ static void *hidio_child(void *zz)
 		}
 		else if (x->x_requestcode == REQUEST_READ)
 		{
+			pthread_mutex_unlock(&x->x_mutex);
+			hidio_read(x);
+			pthread_mutex_lock(&x->x_mutex);
 			if (x->x_requestcode == REQUEST_READ)
 				x->x_requestcode = REQUEST_NOTHING;
 			pthread_cond_signal(&x->x_answercondition);
@@ -535,9 +544,16 @@ static void *hidio_child(void *zz)
 		}
 		else if (x->x_requestcode == REQUEST_CLOSE)
 		{
+			t_int ret;
 			pthread_mutex_unlock(&x->x_mutex);
-			hidio_close(x);
+			stop_poll(x);
+			ret = hidio_close_device(x);
 			pthread_mutex_lock(&x->x_mutex);
+			if (!ret) 
+			{
+				debug_print(LOG_INFO,"[hidio] closed device %d",x->x_device_number);
+				x->x_device_open = 0;
+			}
 			if (x->x_requestcode == REQUEST_CLOSE)
 				x->x_requestcode = REQUEST_NOTHING;
 			pthread_cond_signal(&x->x_answercondition);
@@ -545,7 +561,8 @@ static void *hidio_child(void *zz)
 		else if (x->x_requestcode == REQUEST_QUIT)
 		{
 			pthread_mutex_unlock(&x->x_mutex);
-			hidio_close(x);
+			stop_poll(x);
+			hidio_close_device(x);
 			pthread_mutex_lock(&x->x_mutex);
 			x->x_requestcode = REQUEST_NOTHING;
 			pthread_cond_signal(&x->x_answercondition);
@@ -625,7 +642,7 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
   x->x_delay = DEFAULT_DELAY;
   for(i=0; i<MAX_DEVICES; ++i) last_execute_time[i] = 0;
 
-  x->x_clock = clock_new(x, (t_method)hidio_read);
+  x->x_clock = clock_new(x, (t_method)hidio_tick);
 
   /* create anything outlet used for HID data */ 
   x->x_data_outlet = outlet_new(&x->x_obj, 0);
@@ -642,7 +659,7 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
   x->x_delay = DEFAULT_DELAY;
   for(i=0; i<MAX_DEVICES; ++i) last_execute_time[i] = 0;
 
-  x->x_clock = clock_new(x, (method)hidio_read);
+  x->x_clock = clock_new(x, (method)hidio_tick);
 
   /* create anything outlet used for HID data */ 
   x->x_status_outlet = outlet_new(x, "anything");
@@ -676,7 +693,7 @@ void hidio_setup(void)
 	
 	/* add inlet datatype methods */
 	class_addfloat(hidio_class,(t_method) hidio_float);
-	class_addbang(hidio_class,(t_method) hidio_read);
+	class_addbang(hidio_class,(t_method) hidio_tick);
 /* 	class_addanything(hidio_class,(t_method) hidio_anything); */
 	
 	/* add inlet message methods */
@@ -759,7 +776,7 @@ int main()
 	/* add methods to the class */
 	class_addmethod(c, (method)hidio_int, 			"int",	 		A_LONG, 0);  
 	class_addmethod(c, (method)hidio_float,			"float", 		A_FLOAT, 0);  
-	class_addmethod(c, (method)hidio_read, 			"bang",	 		A_GIMME, 0); 
+	class_addmethod(c, (method)hidio_tick, 			"bang",	 		A_GIMME, 0); 
 	
 	/* add inlet message methods */
 	class_addmethod(c, (method)hidio_debug, "debug",A_DEFFLOAT,0);
