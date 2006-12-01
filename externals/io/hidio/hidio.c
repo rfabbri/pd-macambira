@@ -40,7 +40,27 @@
 
 unsigned short global_debug_level = 0;
 
+/*------------------------------------------------------------------------------
+ *  GLOBAL VARIABLES
+ */
+
+/* count the number of instances of this object so that certain free()
+ * functions can be called only after the final instance is detroyed.
+ */
+t_int hidio_instance_count;
+
+/* this is used to test for the first instance to execute */
+double last_execute_time[MAX_DEVICES];
+
 static t_class *hidio_class;
+
+/* mostly for status querying */
+unsigned short device_count;
+
+/* store element structs to eliminate symbol table lookups, etc. */
+t_hid_element *element[MAX_DEVICES][MAX_ELEMENTS];
+/* number of active elements per device */
+unsigned short element_count[MAX_DEVICES]; 
 
 /*------------------------------------------------------------------------------
  * FUNCTION PROTOTYPES
@@ -88,7 +108,7 @@ void debug_error(t_hidio *x, t_int message_debug_level, const char *fmt, ...)
 
 static void output_status(t_hidio *x, t_symbol *selector, t_float output_value)
 {
-	t_atom *output_atom = getbytes(sizeof(t_atom));
+	t_atom *output_atom = (t_atom *)getbytes(sizeof(t_atom));
 	SETFLOAT(output_atom, output_value);
 	outlet_anything( x->x_status_outlet, selector, 1, output_atom);
 	freebytes(output_atom,sizeof(t_atom));
@@ -148,28 +168,48 @@ static unsigned int name_to_usage(char *usage_name)
 
 static short get_device_number_from_arguments(int argc, t_atom *argv)
 {
+#ifdef PD
 	short device_number = -1;
+	char device_type_string[MAXPDSTRING] = "";
 	unsigned short device_type_instance;
+#else
+	long device_number = -1;
+	char *device_type_string;
+	long device_type_instance;
+#endif
 	unsigned int usage;
 	unsigned short vendor_id;
 	unsigned short product_id;
-	char device_type_string[MAXPDSTRING] = "";
 	t_symbol *first_argument;
 	t_symbol *second_argument;
 
 	if(argc == 1)
 	{
+#ifdef PD
 		first_argument = atom_getsymbolarg(0,argc,argv);
 		if(first_argument == &s_) 
+#else
+		atom_arg_getsym(&first_argument, 0,argc,argv);
+		if(first_argument == _sym_nothing) 
+#endif
 		{ // single float arg means device #
 			post("first_argument == &s_");
+#ifdef PD
 			device_number = (short) atom_getfloatarg(0,argc,argv);
+#else
+			atom_arg_getlong(&device_number, 0, argc, argv);
+#endif
 			if(device_number < 0) device_number = -1;
 			debug_print(LOG_DEBUG,"[hidio] setting device# to %d",device_number);
 		}
 		else
 		{ // single symbol arg means first instance of a device type
+#ifdef PD
 			atom_string(argv, device_type_string, MAXPDSTRING-1);
+#else
+			device_type_string = atom_string(argv);
+			// LATER do we have to free this string manually???
+#endif
 			usage = name_to_usage(device_type_string);
 			device_number = get_device_number_from_usage(0, usage >> 16, 
 														 usage & 0xffff);
@@ -179,13 +219,25 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 	}
 	else if(argc == 2)
 	{ 
+#ifdef PD
 		first_argument = atom_getsymbolarg(0,argc,argv);
 		second_argument = atom_getsymbolarg(1,argc,argv);
 		if( second_argument == &s_ ) 
+#else
+		atom_arg_getsym(&first_argument, 0,argc,argv);
+		atom_arg_getsym(&second_argument, 1,argc,argv);
+		if( second_argument == _sym_nothing ) 
+#endif
 		{ /* a symbol then a float means match on usage */
+#ifdef PD
 			atom_string(argv, device_type_string, MAXPDSTRING-1);
 			usage = name_to_usage(device_type_string);
 			device_type_instance = atom_getfloatarg(1,argc,argv);
+#else
+			device_type_string = atom_string(argv);
+			usage = name_to_usage(device_type_string);
+			atom_arg_getlong(&device_type_instance, 1, argc, argv);
+#endif
 			debug_print(LOG_DEBUG,"[hidio] looking for %s at #%d",
 						device_type_string, device_type_instance);
 			device_number = get_device_number_from_usage(device_type_instance,
@@ -340,7 +392,11 @@ t_int hidio_read(t_hidio *x, int fd)
 {
 //	debug_print(LOG_DEBUG,"hidio_read");
 	unsigned int i;
+#ifdef PD
 	double right_now = clock_getlogicaltime();
+#else
+	double right_now = (double)systime_ms();
+#endif
 	t_hid_element *current_element;
 	
 	if(right_now > last_execute_time[x->x_device_number])
@@ -386,6 +442,15 @@ static void hidio_float(t_hidio* x, t_floatarg f)
 	hidio_set_from_float(x,f);
 }
 
+#ifndef PD
+static void hidio_int(t_hidio* x, long l) 
+{
+	debug_print(LOG_DEBUG,"hid_int");
+
+	hidio_set_from_float(x, (float)l);
+}
+#endif
+
 static void hidio_debug(t_hidio *x, t_float f)
 {
 	global_debug_level = f;
@@ -409,6 +474,7 @@ static void hidio_free(t_hidio* x)
 /* create a new instance of this class */
 static void *hidio_new(t_symbol *s, int argc, t_atom *argv) 
 {
+#ifdef PD
 	t_hidio *x = (t_hidio *)pd_new(hidio_class);
 	unsigned int i;
 	
@@ -431,6 +497,24 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
   /* create anything outlet used for HID data */ 
   x->x_data_outlet = outlet_new(&x->x_obj, 0);
   x->x_status_outlet = outlet_new(&x->x_obj, 0);
+#else /* Max */
+	t_hidio *x = (t_hidio *)object_alloc(hidio_class);
+	unsigned int i;
+	
+  /* init vars */
+  global_debug_level = 9; /* high numbers here means see more messages */
+  x->x_has_ff = 0;
+  x->x_device_open = 0;
+  x->x_started = 0;
+  x->x_delay = DEFAULT_DELAY;
+  for(i=0; i<MAX_DEVICES; ++i) last_execute_time[i] = 0;
+
+  x->x_clock = clock_new(x, (method)hidio_read);
+
+  /* create anything outlet used for HID data */ 
+  x->x_status_outlet = outlet_new(x, "anything");
+  x->x_data_outlet = outlet_new(x, "anything");
+#endif
 
   x->x_device_number = get_device_number_from_arguments(argc, argv);
   
@@ -440,6 +524,7 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
   return (x);
 }
 
+#ifdef PD
 void hidio_setup(void) 
 {
 	hidio_class = class_new(gensym("hidio"), 
@@ -480,4 +565,90 @@ void hidio_setup(void)
 		 HIDIO_MAJOR_VERSION, HIDIO_MINOR_VERSION);  
 	post("\tcompiled on "__DATE__" at "__TIME__ " ");
 }
+#else /* Max */
+static void hidio_notify(t_hidio *x, t_symbol *s, t_symbol *msg, void *sender, void *data)
+{
+	if (msg == _sym_free)	// this message is sent when a child object is freeing
+	{
+		object_detach(gensym("_obex_hidio"), s, x);
+		object_unregister(sender); 
+	}
+}
+
+static void hidio_assist(t_hidio *x, void *b, long m, long a, char *s)
+{
+	if (m == 2)
+	{
+		sprintf(s, "hidio outlet");
+	}
+	else
+	{
+		switch (a)
+		{	
+		case 0:
+			sprintf(s, "inlet 1");
+			break;
+		case 1:
+			sprintf(s, "inlet 2");
+			break;
+		}
+	}
+}
+
+int main()
+{
+	t_class	*c;
+	
+	c = class_new("hidio", (method)hidio_new, (method)hidio_free, (short)sizeof(t_hidio), 
+		0L, A_GIMME, 0);
+	
+	/* initialize the common symbols, since we want to use them */
+	common_symbols_init();
+
+	/* register the byte offset of obex with the class */
+	class_obexoffset_set(c, calcoffset(t_hidio, x_obex));
+	
+	/* add methods to the class */
+	class_addmethod(c, (method)hidio_int, 			"int",	 		A_LONG, 0);  
+	class_addmethod(c, (method)hidio_float,			"float", 		A_FLOAT, 0);  
+	class_addmethod(c, (method)hidio_read, 			"bang",	 		A_GIMME, 0); 
+	
+	/* add inlet message methods */
+	class_addmethod(c, (method)hidio_debug, "debug",A_DEFFLOAT,0);
+	class_addmethod(c, (method)hidio_build_device_list, "refresh",0);
+	class_addmethod(c, (method)hidio_print, "print",0);
+	class_addmethod(c, (method)hidio_info, "info",0);
+	class_addmethod(c, (method)hidio_open, "open",A_GIMME,0);
+	class_addmethod(c, (method)hidio_close, "close",0);
+	class_addmethod(c, (method)hidio_poll, "poll",A_DEFFLOAT,0);
+   /* force feedback messages */
+	class_addmethod(c, (method)hidio_ff_autocenter, "ff_autocenter",A_DEFFLOAT,0);
+	class_addmethod(c, (method)hidio_ff_gain, "ff_gain",A_DEFFLOAT,0);
+	class_addmethod(c, (method)hidio_ff_motors, "ff_motors",A_DEFFLOAT,0);
+	class_addmethod(c, (method)hidio_ff_continue, "ff_continue",0);
+	class_addmethod(c, (method)hidio_ff_pause, "ff_pause",0);
+	class_addmethod(c, (method)hidio_ff_reset, "ff_reset",0);
+	class_addmethod(c, (method)hidio_ff_stopall, "ff_stopall",0);
+	/* ff tests */
+	class_addmethod(c, (method)hidio_ff_fftest, "fftest",A_DEFFLOAT,0);
+	class_addmethod(c, (method)hidio_ff_print, "ff_print",0);
+
+	class_addmethod(c, (method)hidio_assist, 		"assist",	 	A_CANT, 0);  
+
+	/* add a notify method, so we get notifications from child objects */
+	class_addmethod(c, (method)hidio_notify,		"notify",		A_CANT, 0); 
+	// add methods for dumpout and quickref	
+	class_addmethod(c, (method)object_obex_dumpout,		"dumpout",		A_CANT, 0); 
+	class_addmethod(c, (method)object_obex_quickref,	"quickref",		A_CANT, 0);
+
+	/* we want this class to instantiate inside of the Max UI; ergo CLASS_BOX */
+	class_register(CLASS_BOX, c);
+	hidio_class = c;
+
+	finder_addclass("Devices", "hidio");
+	post("hidio: © 2006 by Olaf Matthes");
+
+	return 0;
+}
+#endif
 

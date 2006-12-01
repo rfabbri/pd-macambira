@@ -408,7 +408,7 @@ static void hidio_build_element_list(t_hidio *x)
 			HIDGetUsageName(pCurrentHIDElement->usagePage, 
 							pCurrentHIDElement->usage, usage_name);
 
-			new_element = getbytes(sizeof(t_hid_element));
+			new_element = (t_hid_element *)getbytes(sizeof(t_hid_element));
 			new_element->pHIDElement = (void *) pCurrentHIDElement;
 			get_usage_symbols(pCurrentHIDElement, new_element);
 			new_element->relative = pCurrentHIDElement->relative;
@@ -562,7 +562,7 @@ void hidio_platform_specific_info(t_hidio *x)
 	char product_id_string[7];
 	char device_type_buffer[256];
 	t_symbol *output_symbol;
-	t_atom *output_atom = getbytes(sizeof(t_atom));
+	t_atom *output_atom = (t_atom *)getbytes(sizeof(t_atom));
 
 	if(x->x_device_number > -1)
 	{
@@ -582,7 +582,11 @@ void hidio_platform_specific_info(t_hidio *x)
 			if(pCurrentHIDDevice->serial != NULL)
 			{
 				output_symbol = gensym(pCurrentHIDDevice->serial);
+#ifdef PD
 				if( output_symbol != &s_ )
+#else
+				if( output_symbol != _sym_nothing )
+#endif
 				{ /* the serial is rarely used on USB devices, so test for it */
 					SETSYMBOL(output_atom, output_symbol);
 					outlet_anything( x->x_status_outlet, gensym("serial"), 
