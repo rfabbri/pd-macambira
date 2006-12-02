@@ -1,4 +1,72 @@
 
+======================
+Installing Pd-extended
+======================
+
+To install this package of Pd, you need to type somethings on the command
+line.  Open Terminal, xterm, Console, or whatever its called on your machine,
+and type in the commands listed below.
+
+To install:
+    tar xjf PACKAGE_NAME.tar.bz2
+    cd PACKAGE_NAME
+    make install
+
+To uninstall:
+    cd PACKAGE_NAME
+    make uninstall
+
+To load the default set of libraries, you need to install the .pdsettings file
+included in the package (~ is your home directory):
+
+    mv .pdsettings ~
+
+Installing the needed dependencies
+----------------------------------
+
+You will need to install other libraries to make sure that things like MP3,
+video, etc work properly.
+
+___Debian/Ubuntu___
+
+If you want to save room, then don't install the "-dev" packages.
+
+http://puredata.org/docs/developer/Debian
+
+
+___Fedora Core___
+
+If you want to save room, then don't install the "-devel" packages.
+
+http://puredata.org/docs/developer/Fedora
+
+
+
+Installing in a different location
+----------------------------------
+
+You can install this package elsewhere, but its been compiled to run in
+/usr/local.  If you install it somewhere other than /usr/local, you will only
+be able to run Pd like this:
+
+        cd /path/to/bin/pd && ./pd
+
+Here's how to install it elsewhere:
+To install:
+
+        make install prefix=/path/to
+
+To uninstall:
+
+        make uninstall prefix=/path/to
+
+
+
+====================
+Building Pd-extended
+====================
+
+
 To build everything and create an generic installer for linux, do this:
 
 

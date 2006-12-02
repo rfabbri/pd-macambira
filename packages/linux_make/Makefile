@@ -72,24 +72,8 @@ INSTALLER_README_FILE = $(DESTDIR)$(prefix)/README.txt
 installer_readme:
 	install -d $(DESTDIR)$(prefix)
 	-rm $(INSTALLER_README_FILE)
-	touch $(INSTALLER_README_FILE)
-	echo -e "$(PACKAGE_NAME)" >> $(INSTALLER_README_FILE)
-	echo -e "\n\n" >> $(INSTALLER_README_FILE)
-	echo -e "To install:\n" >> $(INSTALLER_README_FILE)
-	echo -e "\tmake install\n" >> $(INSTALLER_README_FILE)
-	echo -e "To uninstall:\n" >> $(INSTALLER_README_FILE)
-	echo -e "\tmake uninstall\n" >> $(INSTALLER_README_FILE)
-	echo -e "\n\n" >> $(INSTALLER_README_FILE)
-	echo -e "You can install this package elsewhere, but its been compiled to run in $(prefix).  If you install it somewhere other than $(prefix), you will only be able to run Pd like this:\n" >> $(INSTALLER_README_FILE)
-	echo -e "\tcd /path/to/bin/pd && ./pd\n" >> $(INSTALLER_README_FILE)
-	echo -e "Here's how to install it elsewhere:" >> $(INSTALLER_README_FILE)
-	echo -e "To install:\n" >> $(INSTALLER_README_FILE)
-	echo -e "\tmake install prefix=/path/to\n" >> $(INSTALLER_README_FILE)
-	echo -e "To uninstall:\n" >> $(INSTALLER_README_FILE)
-	echo -e "\tmake uninstall prefix=/path/to\n" >> $(INSTALLER_README_FILE)
-	echo -e "\nTo load the default set of libraries, you need to install the .pdsettings file included in the package:\n\n" >> $(INSTALLER_README_FILE)
-	echo -e "mv .pdsettings ~\n\n" >> $(INSTALLER_README_FILE)
-	echo -e "(~ is your home directory)\n" >> $(INSTALLER_README_FILE)
+	sed 's|PACKAGE_NAME|$(PACKAGE_NAME)|' $(packages_src)/linux_make/README > \
+		$(INSTALLER_README_FILE)
 
 
 installer_makefile:
