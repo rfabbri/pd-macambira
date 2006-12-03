@@ -2,8 +2,17 @@
 #define _HIDIO_H
 
 #include <stdio.h>
+#ifdef _WINDOWS
+#include "pthread.h"	/* needs pthread library */
+#define LOG_DEBUG 7
+#define LOG_INFO 6
+#define LOG_WARNING 4
+#define vsnprintf _vsnprintf
+#pragma warning (disable: 4305 4244 4761)
+#else
 #include <sys/syslog.h>
 #include <pthread.h>
+#endif
 
 #ifdef __linux__
 #include <linux/types.h>
@@ -35,7 +44,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.4 $"; */
+/* static char *version = "$Revision: 1.5 $"; */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES

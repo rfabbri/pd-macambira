@@ -2,6 +2,7 @@
 /*                                                                           */
 /* interface to native HID (Human Interface Devices) API                     */
 /* Written by Hans-Christoph Steiner <hans@at.or.at>                         */
+/* Max/MSP port by Olaf Matthes <olaf.matthes@gmx.de>                        */
 /*                                                                           */
 /* Copyright (c) 2004-2006 Hans-Christoph Steiner                            */
 /*                                                                           */
@@ -23,11 +24,15 @@
 /*                                                                           */
 /* --------------------------------------------------------------------------*/
 
+#ifdef _WINDOWS
+/* any Windows specific includes go in here */
+#else
 #include <unistd.h>
+#include <ctype.h>
+#endif
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 #include "hidio.h"
 
@@ -91,6 +96,7 @@ void debug_print(t_int message_debug_level, const char *fmt, ...)
 		vsnprintf(buf, MAXPDSTRING-1, fmt, ap);
 		post(buf);
 		va_end(ap);
+
 	}
 }
 
@@ -384,8 +390,8 @@ t_int hidio_close(t_hidio *x)
  */
 static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv) 
 {
-	debug_print(LOG_DEBUG,"hid_%s",s->s_name);
 	short device_number;
+	debug_print(LOG_DEBUG,"hid_%s",s->s_name);
 	
 	pthread_mutex_lock(&x->x_mutex);
 	device_number = get_device_number_from_arguments(argc, argv);
@@ -830,7 +836,7 @@ int main()
 	hidio_class = c;
 
 	finder_addclass("Devices", "hidio");
-	post("hidio: © 2006 by Olaf Matthes");
+	post("hidio: © 2006 by Hans-Christoph Steiner & Olaf Matthes");
 	
 	/* pre-generate often used symbols */
 	ps_open = gensym("open");
