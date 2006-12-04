@@ -48,7 +48,15 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.7 $"; */
+/* static char *version = "$Revision: 1.8 $"; */
+
+/*------------------------------------------------------------------------------
+ * MACRO DEFINES
+ */
+
+#ifndef CLIP
+#define CLIP(a, lo, hi) ( (a)>(lo)?( (a)<(hi)?(a):(hi) ):(lo) )
+#endif
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -110,6 +118,7 @@ typedef struct _hidio
 	pthread_cond_t		x_requestcondition;
     pthread_cond_t		x_answercondition;
     pthread_t			x_thread;
+	t_int				x_priority;
 } t_hidio;
 
 

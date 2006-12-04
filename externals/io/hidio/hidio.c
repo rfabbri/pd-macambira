@@ -26,6 +26,9 @@
 
 #ifdef _WINDOWS
 /* any Windows specific includes go in here */
+#ifdef PD
+#include <windows.h>
+#endif /* PD */
 #else
 #include <unistd.h>
 #include <ctype.h>
@@ -395,16 +398,11 @@ static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv)
 	
 	pthread_mutex_lock(&x->x_mutex);
 	device_number = get_device_number_from_arguments(argc, argv);
-	if(device_number > -1)
+	if (device_number > -1)
 	{
-		if( (device_number != x->x_device_number) && (x->x_device_open) ) 
-			hidio_close(x);	/* LATER move this also to child thread */
-		if(! x->x_device_open)
-		{
-			x->x_device_number = device_number;
-			x->x_requestcode = REQUEST_OPEN;
-			pthread_cond_signal(&x->x_requestcondition);
-		}
+		x->x_device_number = device_number;
+		x->x_requestcode = REQUEST_OPEN;
+		pthread_cond_signal(&x->x_requestcondition);
 	}
 	else debug_print(LOG_WARNING,"[hidio] device does not exist");
 	pthread_mutex_unlock(&x->x_mutex);
@@ -487,7 +485,9 @@ static void hidio_int(t_hidio* x, long l)
 
 static void hidio_debug(t_hidio *x, t_float f)
 {
+	pthread_mutex_lock(&x->x_mutex);
 	global_debug_level = f;
+	pthread_mutex_unlock(&x->x_mutex);
 }
 
 
@@ -498,6 +498,7 @@ static void hidio_debug(t_hidio *x, t_float f)
 static void *hidio_child(void *zz)
 {
     t_hidio *x = zz;
+	short device_number = -1;
 
     pthread_mutex_lock(&x->x_mutex);
     while (1)
@@ -509,30 +510,45 @@ static void *hidio_child(void *zz)
 		}
 		else if (x->x_requestcode == REQUEST_OPEN)
 		{
-			short device_number = x->x_device_number;
+			short new_device_number = x->x_device_number;
 			/* store running state to be restored after the device has been opened */
 			t_int started = x->x_started;
-			int err;
-			pthread_mutex_unlock(&x->x_mutex);
-			err = hidio_open_device(x, device_number);
-			pthread_mutex_lock(&x->x_mutex);
-			if (err)
+			int ret;
+			/* check whether we have to close previous device */
+			if (x->x_device_open && device_number != x->x_device_number)
 			{
-				x->x_device_number = -1;
-				error("[hidio] can not open device %d",device_number);
-			}
-			else
-			{
-				x->x_device_open = 1;
 				pthread_mutex_unlock(&x->x_mutex);
-				/* restore the polling state so that when I [tgl] is used to start/stop [hidio],
-				 * the [tgl]'s state will continue to accurately reflect [hidio]'s state  */
-				if (started)
-					hidio_set_from_float(x,x->x_delay);
-				debug_print(LOG_DEBUG,"[hidio] set device# to %d",device_number);
-				output_open_status(x);
-				output_device_number(x);
+				stop_poll(x);
+				ret = hidio_close_device(x);
 				pthread_mutex_lock(&x->x_mutex);
+				x->x_device_open = 0;
+				device_number = -1;
+			}
+			/* no device open, so open one now */
+			if (!x->x_device_open)
+			{
+				pthread_mutex_unlock(&x->x_mutex);
+				ret = hidio_open_device(x, new_device_number);
+				pthread_mutex_lock(&x->x_mutex);
+				if (ret)
+				{
+					x->x_device_number = -1;
+					error("[hidio] can not open device %d",device_number);
+				}
+				else
+				{
+					x->x_device_open = 1;
+					device_number = x->x_device_number;	/* keep local copy */
+					pthread_mutex_unlock(&x->x_mutex);
+					/* restore the polling state so that when I [tgl] is used to start/stop [hidio],
+					 * the [tgl]'s state will continue to accurately reflect [hidio]'s state  */
+					if (started)
+						hidio_set_from_float(x,x->x_delay);
+					debug_print(LOG_DEBUG,"[hidio] set device# to %d",device_number);
+					output_open_status(x);
+					output_device_number(x);
+					pthread_mutex_lock(&x->x_mutex);
+				}
 			}
 			if (x->x_requestcode == REQUEST_OPEN)
 				x->x_requestcode = REQUEST_NOTHING;
@@ -602,7 +618,46 @@ static void *hidio_child(void *zz)
     return (0);
 }
 
- 
+/* change priority of child thread */
+#ifdef PD
+static void hidio_priority(t_hidio *x, t_floatarg p)
+#else
+static void hidio_priority(t_hidio *x, long p)
+#endif
+{
+	pthread_mutex_lock(&x->x_mutex);
+	p = 2 * (CLIP(p, 0, 10) - 5);
+	if (x->x_thread)
+	{
+		struct sched_param parm;
+		int policy;
+		if (pthread_getschedparam(x->x_thread, &policy, &parm) < 0)
+		{
+			post("hidio: warning: failed to get thread priority");
+		}
+		else
+		{
+			parm.sched_priority = x->x_priority + (int)p;	/* adjust priority */
+
+			if (parm.sched_priority < sched_get_priority_min(policy))
+			{
+				parm.sched_priority = sched_get_priority_min(policy);
+			}
+			else if (parm.sched_priority > sched_get_priority_max(policy))
+			{
+				parm.sched_priority = sched_get_priority_max(policy);
+			}
+			
+			if (pthread_setschedparam(x->x_thread, policy, &parm) < 0)
+			{
+				post("hidio: warning: failed to change thread priority to %d", parm.sched_priority);
+			}
+		}
+	}
+	pthread_mutex_unlock(&x->x_mutex);
+}
+
+
 /*------------------------------------------------------------------------------
  * system functions 
  */
@@ -649,33 +704,25 @@ static void hidio_free(t_hidio* x)
 /* create a new instance of this class */
 static void *hidio_new(t_symbol *s, int argc, t_atom *argv) 
 {
+	unsigned int i;
 #ifdef PD
 	t_hidio *x = (t_hidio *)pd_new(hidio_class);
-	unsigned int i;
 	
-#if !defined(__linux__) && !defined(__APPLE__)
-  error("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
-  error("     This is a dummy, since this object only works GNU/Linux and MacOS X!");
-  error("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
-#endif
+	x->x_clock = clock_new(x, (t_method)hidio_tick);
 
-  /* init vars */
-  global_debug_level = 9; /* high numbers here means see more messages */
-  x->x_has_ff = 0;
-  x->x_device_open = 0;
-  x->x_started = 0;
-  x->x_delay = DEFAULT_DELAY;
-  for(i=0; i<MAX_DEVICES; ++i) last_execute_time[i] = 0;
-
-  x->x_clock = clock_new(x, (t_method)hidio_tick);
-
-  /* create anything outlet used for HID data */ 
-  x->x_data_outlet = outlet_new(&x->x_obj, 0);
-  x->x_status_outlet = outlet_new(&x->x_obj, 0);
+	/* create anything outlet used for HID data */ 
+	x->x_data_outlet = outlet_new(&x->x_obj, 0);
+	x->x_status_outlet = outlet_new(&x->x_obj, 0);
 #else /* Max */
 	t_hidio *x = (t_hidio *)object_alloc(hidio_class);
-	unsigned int i;
 	
+	x->x_clock = clock_new(x, (method)hidio_tick);
+
+	/* create anything outlet used for HID data */ 
+	x->x_status_outlet = outlet_new(x, "anything");
+	x->x_data_outlet = outlet_new(x, "anything");
+#endif
+
 	/* init vars */
 	global_debug_level = 9; /* high numbers here means see more messages */
 	x->x_has_ff = 0;
@@ -683,12 +730,8 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
 	x->x_started = 0;
 	x->x_delay = DEFAULT_DELAY;
 	for(i=0; i<MAX_DEVICES; ++i) last_execute_time[i] = 0;
-
-	x->x_clock = clock_new(x, (method)hidio_tick);
-
-	/* create anything outlet used for HID data */ 
-	x->x_status_outlet = outlet_new(x, "anything");
-	x->x_data_outlet = outlet_new(x, "anything");
+#ifdef _WINDOWS
+	x->x_fd = INVALID_HANDLE_VALUE;
 #endif
 
     pthread_mutex_init(&x->x_mutex, 0);
@@ -702,7 +745,7 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
 
 	x->x_requestcode = REQUEST_NOTHING;
     pthread_create(&x->x_thread, 0, hidio_child, x);
-	
+
 	return (x);
 }
 
@@ -729,7 +772,7 @@ void hidio_setup(void)
 	class_addmethod(hidio_class,(t_method) hidio_open,gensym("open"),A_GIMME,0);
 	class_addmethod(hidio_class,(t_method) hidio_close,gensym("close"),0);
 	class_addmethod(hidio_class,(t_method) hidio_poll,gensym("poll"),A_DEFFLOAT,0);
-   /* force feedback messages */
+	/* force feedback messages */
 	class_addmethod(hidio_class,(t_method) hidio_ff_autocenter,
 						 gensym("ff_autocenter"),A_DEFFLOAT,0);
 	class_addmethod(hidio_class,(t_method) hidio_ff_gain,gensym("ff_gain"),A_DEFFLOAT,0);
@@ -741,6 +784,8 @@ void hidio_setup(void)
 	/* ff tests */
 	class_addmethod(hidio_class,(t_method) hidio_ff_fftest,gensym("fftest"),A_DEFFLOAT,0);
 	class_addmethod(hidio_class,(t_method) hidio_ff_print,gensym("ff_print"),0);
+
+	class_addmethod(hidio_class,(t_method) hidio_priority, gensym("priority"), A_FLOAT, A_NULL);
 
 
 	post("[hidio] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
@@ -769,17 +814,25 @@ static void hidio_assist(t_hidio *x, void *b, long m, long a, char *s)
 {
 	if (m == 2)
 	{
-		sprintf(s, "hidio outlet");
+		switch (a)
+		{	
+		case 0:
+			sprintf(s, "(list) Received Events");
+			break;
+		case 1:
+			sprintf(s, "(list) Status Info");
+			break;
+		}
 	}
 	else
 	{
 		switch (a)
 		{	
 		case 0:
-			sprintf(s, "inlet 1");
+			sprintf(s, "Control Messages");
 			break;
 		case 1:
-			sprintf(s, "inlet 2");
+			sprintf(s, "nothing");
 			break;
 		}
 	}
@@ -822,6 +875,8 @@ int main()
 	/* ff tests */
 	class_addmethod(c, (method)hidio_ff_fftest, "fftest",A_DEFFLOAT,0);
 	class_addmethod(c, (method)hidio_ff_print, "ff_print",0);
+	/* perfomrance / system stuff */
+	class_addmethod(c, (method)hidio_priority, 		"priority",	 	A_LONG,0); 
 
 	class_addmethod(c, (method)hidio_assist, 		"assist",	 	A_CANT, 0);  
 
@@ -836,7 +891,9 @@ int main()
 	hidio_class = c;
 
 	finder_addclass("Devices", "hidio");
-	post("hidio: © 2006 by Hans-Christoph Steiner & Olaf Matthes");
+	post("hidio %d.%d: © 2006 by Hans-Christoph Steiner & Olaf Matthes",
+		 HIDIO_MAJOR_VERSION, HIDIO_MINOR_VERSION);
+	post("hidio: compiled on "__DATE__" at "__TIME__ " ");
 	
 	/* pre-generate often used symbols */
 	ps_open = gensym("open");
