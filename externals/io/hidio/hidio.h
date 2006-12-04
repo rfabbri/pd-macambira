@@ -7,6 +7,7 @@
 #define LOG_DEBUG 7
 #define LOG_INFO 6
 #define LOG_WARNING 4
+#define LOG_ERR 3
 #define vsnprintf _vsnprintf
 #else
 #include <sys/syslog.h>
@@ -47,7 +48,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.6 $"; */
+/* static char *version = "$Revision: 1.7 $"; */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -88,7 +89,12 @@ typedef struct _hidio
 #ifndef PD
 	void				*x_obex;
 #endif
+#ifdef _WINDOWS
+	HANDLE				x_fd;
+#endif
+#ifdef __linux__
 	t_int               x_fd;
+#endif
 	void                *x_ff_device;
 	short               x_device_number;
 	short               x_instance;
@@ -131,10 +137,12 @@ typedef struct _hid_element
     __u16 linux_code;
 #endif /* __linux__ */
 #ifdef _WIN32
-	/* this should store the UsagePage and Usage */
+	/* this stores the UsagePage and UsageID */
+	unsigned short usage_page;
+	unsigned short usage_id;
 #endif /* _WIN32 */
 #ifdef __APPLE__
-    void *pHIDElement;  // pRecElement on Mac OS X; ... on Windows
+    void *pHIDElement;  // pRecElement on Mac OS X
 #endif /* __APPLE__ */
     t_symbol *type; // Linux "type"; HID "usagePage", but using the hidio scheme
     t_symbol *name; // Linux "code"; HID "usage", but using the hidio scheme
