@@ -167,7 +167,7 @@ Info.plist: Info.plist.in
 # tigital's Gem window focus black magic
 rez_install:
 	install -pv "$(CWD)/mac.r" "$(bindir)"
-	cd $(bindir) && /Developer/tools/Rez -t APPL mac.r -o pd
+	cd $(bindir) && /Developer/Tools/Rez -t APPL mac.r -o pd
 
 
 darwin_app_embed_libs:
@@ -348,4 +348,5 @@ test_locations:
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
+	sw_vers
 
