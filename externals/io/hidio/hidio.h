@@ -8,10 +8,13 @@
 #define LOG_INFO 6
 #define LOG_WARNING 4
 #define vsnprintf _vsnprintf
-#pragma warning (disable: 4305 4244 4761)
 #else
 #include <sys/syslog.h>
 #include <pthread.h>
+#endif
+
+#ifdef _MSC_VER /* this only applies to Microsoft compilers */
+#pragma warning (disable: 4305 4244 4761)
 #endif
 
 #ifdef __linux__
@@ -44,7 +47,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.5 $"; */
+/* static char *version = "$Revision: 1.6 $"; */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -128,13 +131,13 @@ typedef struct _hid_element
     __u16 linux_code;
 #endif /* __linux__ */
 #ifdef _WIN32
-	/* this should be pointers to the UsagePage and Usage */
+	/* this should store the UsagePage and Usage */
 #endif /* _WIN32 */
 #ifdef __APPLE__
     void *pHIDElement;  // pRecElement on Mac OS X; ... on Windows
 #endif /* __APPLE__ */
-    t_symbol *type; // Linux "type"; HID "usagePage"
-    t_symbol *name; // Linux "code"; HID "usage"
+    t_symbol *type; // Linux "type"; HID "usagePage", but using the hidio scheme
+    t_symbol *name; // Linux "code"; HID "usage", but using the hidio scheme
     unsigned char polled; // is it polled or queued? (maybe only on Mac OS X?)
     unsigned char relative; // relative data gets output everytime
     t_int min; // from device report
