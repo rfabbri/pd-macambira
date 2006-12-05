@@ -174,7 +174,7 @@ void pix_2pdp::bangMess()
 
 void pix_2pdp::obj_setupCallback(t_class *classPtr)
 {
-  post( "pix_2pdp : a bridge between a Gem pix and PDP/PiDiP, Georg Holzmann 2005 <grh@mur.at> & tigital 2005 <tigital@mac.com>" );
+  ::post( "pix_2pdp : a bridge between a Gem pix and PDP/PiDiP, Georg Holzmann 2005 <grh@mur.at> & tigital 2005 <tigital@mac.com>" );
   class_addmethod(classPtr, (t_method)&pix_2pdp::bangMessCallback,
     	    gensym("bang"), A_NULL);
 }

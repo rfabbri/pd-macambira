@@ -310,7 +310,7 @@ void pdp2gem :: csMess(char* format)
 
 void pdp2gem :: obj_setupCallback(t_class *classPtr)
 {
-  post( "pdp2gem : a bridge between PDP/PiDiP and GEM v"GEM2PDP_VERSION" (ydegoyon@free.fr & tigital@mac.com)" );
+  ::post( "pdp2gem : a bridge between PDP/PiDiP and GEM v"GEM2PDP_VERSION" (ydegoyon@free.fr & tigital@mac.com)" );
   class_addmethod(classPtr, (t_method)&pdp2gem::pdpCallback, 
 				  gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pdp2gem::csMessCallback,
