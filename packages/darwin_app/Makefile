@@ -101,7 +101,8 @@ darwin_app_wrapper: Info.plist
 	install -m0644 -p \
 		"$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
 		"$(PD_APP_CONTENTS)/Resources"
-# embed Tcl/Tk Frameworks and remove cruft
+# only embed the Tcl/Tk Frameworks if not building against the built-in ones
+ifneq (/System,$(findstring /System,$(WISH_FRAMEWORKS_SOURCE)))
 	install -d $(PD_APP_CONTENTS)/Frameworks \
 		$(PD_APP_CONTENTS)/Frameworks/Tcl.framework \
 		$(PD_APP_CONTENTS)/Frameworks/Tk.framework
@@ -126,6 +127,7 @@ darwin_app_wrapper: Info.plist
 	fix_install_id $(PD_APP_CONTENTS)/Frameworks/Tk.framework/Tk Tk && \
 	fix_install_name "$(PD_APP_CONTENTS)/MacOS/$(WISH_NAME)" Tcl && \
 	fix_install_name "$(PD_APP_CONTENTS)/MacOS/$(WISH_NAME)" Tk
+endif # NOT /System
 # set up app wrapper
 	install -d "$(PD_APP_CONTENTS)/Resources/Scripts"
 	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
