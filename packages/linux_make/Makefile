@@ -119,6 +119,7 @@ test_package:
 	-rm -rf -- /tmp/$(PACKAGE_NAME)
 
 test_locations:
+	@echo --------------------------------------------------
 	@echo "PD_VERSION: $(PD_VERSION)"
 	@echo "PD-EXTENDED_VERSION: $(PD-EXTENDED_VERSION)"
 	@echo "CWD $(CWD)"
@@ -133,3 +134,9 @@ test_locations:
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
+	@echo --------------------------------------------------
+	autoconf --version
+	@echo --------------------------------------------------
+	make --version
+	@echo --------------------------------------------------
+	gcc --version

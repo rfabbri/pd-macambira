@@ -332,6 +332,7 @@ test_package:
 
 
 test_locations:
+	@echo --------------------------------------------------
 	@echo "PD_VERSION: $(PD_VERSION)"
 	@echo "PACKAGE_NAME: $(PACKAGE_NAME)"
 	@echo "PD-EXTENDED_VERSION: $(PD-EXTENDED_VERSION)"
@@ -350,5 +351,13 @@ test_locations:
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
+	@echo --------------------------------------------------
 	sw_vers
-
+	@echo --------------------------------------------------
+	autoconf --version
+	@echo --------------------------------------------------
+	make --version
+	@echo --------------------------------------------------
+	gcc --version
+	@echo --------------------------------------------------
+	xcodebuild -version || pbxbuild -version
