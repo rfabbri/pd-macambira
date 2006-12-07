@@ -1,6 +1,9 @@
 # this needs to be "yes" for it to start automatically
 #RUNPDDAEMON=yes
 
+# if your Pd is installed elsewhere, set the correct location
+#DAEMON=/usr/local/bin/pd
+
 # load your patches here
 #OPTIONS="-open /home/hans/cvs/pure-data/doc/tutorials/networking/chat-server.pd"
 

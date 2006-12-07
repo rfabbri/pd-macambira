@@ -30,9 +30,6 @@ DAEMON=/usr/bin/$NAME
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
-# Gracefully exit if the package has been removed.
-test -x $DAEMON || exit 0
-
 # options
 RUNPDDAEMON=no
 USER=nobody
@@ -49,6 +46,9 @@ then
 	. /etc/default/$NAME
 fi
 
+# Gracefully exit if the package has been removed.
+test -x $DAEMON || exit 0
+
 if [ "$RUNPDDAEMON" != "yes" ];then
 	echo "Pd not configured to run as a daemon. Edit /etc/default/$NAME."
 	exit 1
@@ -60,6 +60,7 @@ then
   exit 1
 fi
 
+# this is meant for running Pd as a server, so it turns off everything
 PARAMS="-nogui -noaudio -nomidi $OPTIONS"
 
 # for the log file
@@ -69,7 +70,8 @@ DATE=`date +20%y-%m-%d_%H.%M.%S`
 #	Function that starts the daemon/service.
 #
 d_start() {
-#	 /bin/su - arw -c "/usr/bin/pd -nogui" > /tmp/pd-`date +20%y-%m-%d_%H.%M.%S`.log 2>&1 &
+# if you want a log, use this line (until Pd gets syslog support)
+#	 /bin/su - $USER -c "$DAEMON $PARAMS" > /tmp/pd-$DATE.log 2>&1 &
 	start-stop-daemon -v --start --quiet --background --make-pidfile \
 		 --chuid $USER --pidfile $PIDFILE --exec $DAEMON -- $PARAMS
 }
@@ -80,8 +82,7 @@ d_start() {
 d_stop() {
 	start-stop-daemon --stop --quiet --pidfile $PIDFILE \
 		--user $USER --name $NAME --retry 5
-#	 echo "quit;quit;quit;" | /usr/bin/pdsend $PORT
-#	 sleep 5
+# if you used the /bin/su command in d_start(), you need this to stop Pd:
 #	 /usr/bin/killall -KILL pd || echo "Warning: $DESC was not running"
 }
 
