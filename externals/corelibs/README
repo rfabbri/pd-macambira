@@ -3,7 +3,15 @@ These are just the objects included in Miller's Pd compiled as stand-alone
 libraries based on their source files.  Its a quick and dirty hack to strip Pd
 down to the bare essentials so that the namespace will be fully functional.
 
-These files are generated using the included script, generate.sh.  They should
-not be modified directly.
+The lib_x_* files are generated using the included script, generate.sh.  They
+should not be modified directly.  Ideally, these would be compiled as
+individual objects.
 
+The files named after the classes are GUI objects that originally had g_
+prefixes on the file names.
 
+This stuff is currently here as a proof of concept for turning Pd core into a
+micro-language.  If you want to start modifying these, then we should discuss
+how these should be maintained along with Miller's changes.
+
+<hans@at.or.at>
