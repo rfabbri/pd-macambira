@@ -30,11 +30,6 @@
 #include <machine/endian.h>
 #endif
 
-#ifdef __APPLE__
-#define __BYTE_ORDER BYTE_ORDER
-#define __LITTLE_ENDIAN LITTLE_ENDIAN
-#endif                                                                          
-
 #ifdef __linux__
 #include <endian.h>
 #endif
@@ -55,13 +50,11 @@
 #define int32 int32_t
 #endif /* __unix__ or __APPLE__*/
 
-
 union tabfudge
 {
     double tf_d;
     int32 tf_i[2];
 };
-
 
 /* -------------------------- phasor~ ------------------------------ */
 static t_class *phasor_class, *scalarphasor_class;

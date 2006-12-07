@@ -503,32 +503,28 @@ static void tabread4_tilde_setup(void)
 #define HIOFFSET 0    /* word offset to find MSB */
 #define LOWOFFSET 1    /* word offset to find LSB */
 #define int32 long  /* a data type that has 32 bits */
-#else
+#endif /* IRIX */
+
 #ifdef MSW
     /* little-endian; most significant byte is at highest address */
 #define HIOFFSET 1
 #define LOWOFFSET 0
 #define int32 long
-#else
-#ifdef __FreeBSD__
-#include <machine/endian.h>
-#if BYTE_ORDER == LITTLE_ENDIAN
-#define HIOFFSET 1
-#define LOWOFFSET 0
-#else
-#define HIOFFSET 0    /* word offset to find MSB */
-#define LOWOFFSET 1    /* word offset to find LSB */
-#endif /* BYTE_ORDER */
-#include <sys/types.h>
-#define int32 int32_t
 #endif
 
-#ifdef  __linux__
+#if defined(__FreeBSD__) || defined(__APPLE__)
+#include <machine/endian.h>
+#endif
+
+#ifdef __linux__
 #include <endian.h>
+#endif
+
+#if defined(__unix__) || defined(__APPLE__)
 #if !defined(__BYTE_ORDER) || !defined(__LITTLE_ENDIAN)                         
 #error No byte order defined                                                    
 #endif                                                                          
-                                                                                
+
 #if __BYTE_ORDER == __LITTLE_ENDIAN                                             
 #define HIOFFSET 1                                                              
 #define LOWOFFSET 0                                                             
@@ -536,20 +532,9 @@ static void tabread4_tilde_setup(void)
 #define HIOFFSET 0    /* word offset to find MSB */                             
 #define LOWOFFSET 1    /* word offset to find LSB */                            
 #endif /* __BYTE_ORDER */                                                       
-
 #include <sys/types.h>
 #define int32 int32_t
-
-#else
-#ifdef __APPLE__
-#define HIOFFSET 0    /* word offset to find MSB */
-#define LOWOFFSET 1    /* word offset to find LSB */
-#define int32 int  /* a data type that has 32 bits */
-
-#endif /* __APPLE__ */
-#endif /* __linux__ */
-#endif /* MSW */
-#endif /* SGI */
+#endif /* __unix__ or __APPLE__*/
 
 union tabfudge
 {

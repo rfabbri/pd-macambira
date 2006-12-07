@@ -254,7 +254,8 @@ then
         MORECFLAGS="-DMACOSX3 -DPA_BIG_ENDIAN -Wno-error"
     	EXTERNTARGET=d_ppc
     else
-        MORECFLAGS="-arch i386 -arch ppc -Wno-error"
+        MORECFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk \
+            -arch i386 -arch ppc -Wno-error"
     	EXTERNTARGET=d_fat
         LDFLAGS=$LDFLAGS" -arch i386 -arch ppc"
     fi

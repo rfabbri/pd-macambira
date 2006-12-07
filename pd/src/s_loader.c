@@ -35,7 +35,7 @@ a fat binary or an indication of the instruction set. */
 static char sys_dllextent[] = ".b_i386", sys_dllextent2[] = ".pd_freebsd";
 #endif
 #ifdef __linux__
-#ifdef __ia64__
+#ifdef __x86_64__
 static char sys_dllextent[] = ".l_ia64", sys_dllextent2[] = ".pd_linux";
 #else
 static char sys_dllextent[] = ".l_i386", sys_dllextent2[] = ".pd_linux";
@@ -94,9 +94,9 @@ static int sys_do_load_lib(t_canvas *canvas, char *objectname)
     if (classname = strrchr(objectname, '/'))
         classname++;
     else classname = objectname;
-    if (sys_onloadlist(classname))
+    if (sys_onloadlist(objectname))
     {
-        post("%s: already loaded", classname);
+        post("%s: already loaded", objectname);
         return (1);
     }
     for (i = 0, nameptr = classname; i < MAXPDSTRING-7 && *nameptr; nameptr++)
@@ -194,7 +194,7 @@ gotone:
     }
     (*makeout)();
     class_set_extern_dir(&s_);
-    sys_putonloadlist(classname);
+    sys_putonloadlist(objectname);
     return (1);
 }
 

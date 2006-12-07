@@ -19,7 +19,7 @@ PDNTLIB = $(PDNTLDIR)\libc.lib \
 
 .c.dll:
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
-	link /nologo /dll /export:$(CSYM)_setup $*.obj $(PDNTLIB)
+	link /dll /export:$(CSYM)_setup $*.obj $(PDNTLIB)
 
 # ----------------------- IRIX 5.x -----------------------
 

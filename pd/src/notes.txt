@@ -1,13 +1,7 @@
 ---------------- dolist --------------------
 0.40-1:
-  http "about" broken on MSW?
   help browser broke on Panurge
   binbuf_read_via_canvas in x_qlist.c
-
-check bug reports on sourceforge
-double-click fix on mac?
-http://sourceforge.net/tracker/index.php?
-func=detail&aid=1564617&group_id=55736&atid=478072
 
 PC device counting problem (first device invoked by -audiodev 0)
 
@@ -52,6 +46,7 @@ detect adc~ and dac~ reblocking
 
 more demonstration patches:
 vibrato using variable delay
+real-time spectrum grapher
 
 features:
 sigmund~: sort by pitch; one-shot

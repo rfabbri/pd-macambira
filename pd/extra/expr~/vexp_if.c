@@ -895,10 +895,10 @@ max_ex_tab(struct expr *expr, fts_symbol_t s, struct ex_ex *arg,
 #ifdef PD
         t_garray *garray;
         int size, indx;
-        t_float *vec;
+        t_word *wvec;
 
         if (!s || !(garray = (t_garray *)pd_findbyclass(s, garray_class)) ||
-            !garray_getfloatarray(garray, &size, &vec))
+            !garray_getfloatwords(garray, &size, &wvec))
         {
                 optr->ex_type = ET_FLT;
                 optr->ex_flt = 0;
@@ -922,7 +922,7 @@ max_ex_tab(struct expr *expr, fts_symbol_t s, struct ex_ex *arg,
         }
         if (indx < 0) indx = 0;
         else if (indx >= size) indx = size - 1;
-        optr->ex_flt = vec[indx];
+        optr->ex_flt = wvec[indx].w_float;
 #else /* MSP */
         /*
          * table lookup not done for MSP yet
@@ -952,7 +952,7 @@ max_ex_var(struct expr *expr, fts_symbol_t var, struct ex_ex *optr)
            */
 #define ISTABLE(sym, garray, size, vec)                               \
 if (!sym || !(garray = (t_garray *)pd_findbyclass(sym, garray_class)) || \
-                !garray_getfloatarray(garray, &size, &vec))  {          \
+                !garray_getfloatwords(garray, &size, &vec))  {          \
         optr->ex_type = ET_FLT;                                         \
         optr->ex_int = 0;                                               \
         error("no such table '%s'", sym->s_name);                       \
@@ -968,7 +968,7 @@ ex_size(t_expr *e, long int argc, struct ex_ex *argv, struct ex_ex *optr)
         t_symbol *s;
         t_garray *garray;
         int size;
-        t_float *vec;
+        t_word *wvec;
 
         if (argv->ex_type != ET_SYM)
         {
@@ -980,7 +980,7 @@ ex_size(t_expr *e, long int argc, struct ex_ex *argv, struct ex_ex *optr)
 
         s = (fts_symbol_t ) argv->ex_ptr;
 
-        ISTABLE(s, garray, size, vec);
+        ISTABLE(s, garray, size, wvec);
 
         optr->ex_type = ET_INT;
         optr->ex_int = size;
@@ -996,7 +996,8 @@ ex_sum(t_expr *e, long int argc, struct ex_ex *argv, struct ex_ex *optr)
         t_symbol *s;
         t_garray *garray;
         int size;
-        t_float *vec, sum;
+        t_word *wvec;
+        float sum;
         int indx;
 
         if (argv->ex_type != ET_SYM)
@@ -1009,10 +1010,10 @@ ex_sum(t_expr *e, long int argc, struct ex_ex *argv, struct ex_ex *optr)
 
         s = (fts_symbol_t ) argv->ex_ptr;
 
-        ISTABLE(s, garray, size, vec);
+        ISTABLE(s, garray, size, wvec);
 
         for (indx = 0, sum = 0; indx < size; indx++)
-                sum += vec[indx];
+                sum += wvec[indx].w_float;
 
         optr->ex_type = ET_FLT;
         optr->ex_flt = sum;
@@ -1029,7 +1030,8 @@ ex_Sum(t_expr *e, long int argc, struct ex_ex *argv, struct ex_ex *optr)
         t_symbol *s;
         t_garray *garray;
         int size;
-        t_float *vec, sum;
+        t_word *wvec;
+        t_float sum;
         int indx, n1, n2;
 
         if (argv->ex_type != ET_SYM)
@@ -1042,7 +1044,7 @@ ex_Sum(t_expr *e, long int argc, struct ex_ex *argv, struct ex_ex *optr)
 
         s = (fts_symbol_t ) argv->ex_ptr;
 
-        ISTABLE(s, garray, size, vec);
+        ISTABLE(s, garray, size, wvec);
 
         if (argv->ex_type != ET_INT || argv[1].ex_type != ET_INT)
         {
@@ -1056,7 +1058,7 @@ ex_Sum(t_expr *e, long int argc, struct ex_ex *argv, struct ex_ex *optr)
 
         for (indx = n1, sum = 0; indx < n2; indx++)
                 if (indx >= 0 && indx < size)
-                        sum += vec[indx];
+                        sum += wvec[indx].w_float;
 
         optr->ex_type = ET_FLT;
         optr->ex_flt = sum;
