@@ -44,7 +44,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 BUILDSRC_OS_NAME = $(OS_NAME)
 
 #CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS)
-CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -W $(DEBUG_CFLAGS)
+CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -W $(DEBUG_CFLAGS) -ftree-vectorize -ftree-vectorizer-verbose=3
 LDFLAGS =  
 LIBS = -lm
 
@@ -1030,28 +1030,30 @@ hidin_clean:
 # HIDIO
 HIDIO_NAME = hidio
 ifeq ($(OS_NAME),windows)
+  HIDIO_SRC = hidio_windows.c hidio_types.c hidio.c
   HIDIO_CFLAGS = $(CFLAGS) 
   HIDIO_LIBS = $(LIBS) -lhid -lsetupapi
-else
-  ifeq ($(OS_NAME),darwin)
-    FRAMEWORKS = Carbon IOKit ForceFeedback
-    HIDIO_CFLAGS = $(CFLAGS) -I$(externals_src)/io/hidio/HID\ Utilities\ Source
-    HID_UTILITIES_SOURCE = $(externals_src)/io/hidio/HID\ Utilities\ Source
-    HIDIO_LIBS = $(LIBS) -L$(HID_UTILITIES_SOURCE)/build \
-		-L$(HID_UTILITIES_SOURCE)/build/Default \
-      -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
-  else
-    HIDIO_CFLAGS = $(CFLAGS) 
-    HIDIO_LIBS = $(LIBS)
-  endif
+endif
+ifeq ($(OS_NAME),darwin)
+  HIDIO_SRC = hidio_darwin.c hidio_types.c hidio.c
+  FRAMEWORKS = Carbon IOKit ForceFeedback
+  HIDIO_CFLAGS = $(CFLAGS) -I$(externals_src)/io/hidio/HID\ Utilities\ Source
+  HID_UTILITIES_SOURCE = $(externals_src)/io/hidio/HID\ Utilities\ Source
+  HIDIO_LIBS = $(LIBS) -L$(HID_UTILITIES_SOURCE)/build \
+    -L$(HID_UTILITIES_SOURCE)/build/Default \
+    -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
+endif
+ifeq ($(OS_NAME),linux)
+  HIDIO_SRC = input_arrays.c hidio_linux.c hidio_types.c hidio.c
+  HIDIO_CFLAGS = $(CFLAGS) 
+  HIDIO_LIBS = $(LIBS)
 endif
 
-HIDIO_SRC = input_arrays.c hidio_$(OS_NAME).c hidio.c
 HIDIO_OBJECTS := $(patsubst %.c, $(externals_src)/io/hidio/%.o, $(HIDIO_SRC))
 $(HIDIO_OBJECTS) : %.o : %.c
 	$(CC) $(HIDIO_CFLAGS) -o "$*.o" -c "$*.c"
 
-$(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a:
+$(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a:
 # Apple changed the XCode CLI tool's name in xcode2... arg
 # if on non-Mac OS X, this target just echos a message
 ifeq ($(UNAME),Darwin)
@@ -1062,7 +1064,7 @@ ifeq ($(UNAME),Darwin)
 endif
 
 $(externals_src)/io/hidio/hidio.$(EXTENSION): $(HIDIO_OBJECTS) \
-$(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
+$(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
 	$(CC) $(LDFLAGS) -o $(externals_src)/io/hidio/hidio.$(EXTENSION) \
 		$(HIDIO_OBJECTS) $(HIDIO_LIBS)
 #	$(STRIP) $(externals_src)/io/hidio/hidio.$(EXTENSION)
@@ -1085,11 +1087,12 @@ hidio_install: hidio
 #	install -p $(externals_src)/io/hidio/examples/*.pd  $(examplesdir)/$(HIDIO_NAME)
 
 hidio_clean:
-	-rm -f -- $(externals_src)/io/hidio/*.o
-	-rm -f -- $(externals_src)/io/hidio/*.$(EXTENSION)
+	-rm -f -- $(HIDIO_OBJECTS:.c=.o)
+	-rm -f -- $(HIDIO_OBJECTS:.c=.$(EXTENSION))
 	-rm -f -- $(externals_src)/io/hidio/*.bak
 	-rm -f -- $(externals_src)/io/hidio/*.*~
 	-rm -f -- $(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
+	-rm -f -- $(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
 
 
 
@@ -1779,7 +1782,8 @@ pidip_install:
 	install -d $(objectsdir)/$(PIDIP_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PIDIP_NAME) \
 		--author "Yves Degoyon" \
-		--description "PiDiP is Definitely in Pieces"
+		--description "PiDiP is Definitely in Pieces" \
+		--license "GNU GPLv2"
 	-install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)/$(PIDIP_NAME)
 	install -d $(helpdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)/$(PIDIP_NAME)
