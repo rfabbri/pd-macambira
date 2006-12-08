@@ -131,7 +131,7 @@ static void output_status(t_hidio *x, t_symbol *selector, t_float output_value)
 #ifdef PD
 	SETFLOAT(output_atom, output_value);
 #else
-	atom_setlong(output_atom, output_value);
+	atom_setlong(output_atom, (long)output_value);
 #endif /* PD */
 	outlet_anything( x->x_status_outlet, selector, 1, output_atom);
 	freebytes(output_atom,sizeof(t_atom));
@@ -166,12 +166,14 @@ static void output_element_ranges(t_hidio *x)
 		
 		for(i=0;i<element_count[x->x_device_number];++i)
 		{
+#ifdef PD
 			SETSYMBOL(output_data, element[x->x_device_number][i]->type);
 			SETSYMBOL(output_data + 1, element[x->x_device_number][i]->name);
-#ifdef PD
 			SETFLOAT(output_data + 2, element[x->x_device_number][i]->min);
 			SETFLOAT(output_data + 3, element[x->x_device_number][i]->max);
 #else
+			atom_setsym(output_data, element[x->x_device_number][i]->type);
+			atom_setsym(output_data + 1, element[x->x_device_number][i]->name);
 			atom_setlong(output_data + 2, element[x->x_device_number][i]->min);
 			atom_setlong(output_data + 3, element[x->x_device_number][i]->max);
 #endif /* PD */
@@ -291,10 +293,17 @@ void hidio_output_event(t_hidio *x, t_hid_element *output_data)
 		(output_data->value != output_data->previous_value) )
 	{
 		t_atom event_data[3];
+#ifdef PD
 		SETSYMBOL(event_data, output_data->name);
 		SETFLOAT(event_data + 1, output_data->instance);
 		SETFLOAT(event_data + 2, output_data->value);
-		outlet_anything(x->x_data_outlet,output_data->type,3,event_data);
+#else
+		atom_setsym(event_data, output_data->name);
+		atom_setsym(event_data, output_data->name);
+		atom_setlong(event_data + 1, (long)output_data->instance);
+		atom_setlong(event_data + 2, (long)output_data->value);
+#endif
+		outlet_anything(x->x_data_outlet, output_data->type, 3, event_data);
 	} 
 }
 
@@ -424,10 +433,8 @@ t_int hidio_child_read(t_hidio *x)
 #ifdef PD
 	double right_now = clock_getlogicaltime();
 #else
-/* TODO: this should use gettime() not systime_ms().  This needs to be logical
- * time, not system time because the idea is that only one instance should get
- * events from the OS in each slice of logical time <hans@at.or.at> */
-	double right_now = (double)systime_ms();
+	double right_now;
+	clock_getftime(&right_now);
 #endif /* PD */
 	t_hid_element *current_element;
 	
@@ -467,6 +474,14 @@ static void *hidio_tick(t_hidio *x)
 	}
 	pthread_mutex_unlock(&x->x_mutex);
 	return NULL;
+}
+
+static void hidio_print(t_hidio *x)
+{
+	pthread_mutex_lock(&x->x_mutex);
+	x->x_requestcode = REQUEST_PRINT;
+	pthread_cond_signal(&x->x_requestcondition);
+	pthread_mutex_unlock(&x->x_mutex);
 }
 
 static void hidio_info(t_hidio *x)
@@ -576,6 +591,15 @@ static void *hidio_child(void *zz)
 		else if (x->x_requestcode == REQUEST_SEND)
 		{
 			if (x->x_requestcode == REQUEST_SEND)
+				x->x_requestcode = REQUEST_NOTHING;
+			pthread_cond_signal(&x->x_answercondition);
+		}
+		else if (x->x_requestcode == REQUEST_PRINT)
+		{
+			pthread_mutex_unlock(&x->x_mutex);
+			hidio_doprint(x);
+			pthread_mutex_lock(&x->x_mutex);
+			if (x->x_requestcode == REQUEST_PRINT)
 				x->x_requestcode = REQUEST_NOTHING;
 			pthread_cond_signal(&x->x_answercondition);
 		}

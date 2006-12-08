@@ -738,7 +738,7 @@ void hidio_build_device_list(void)
 }
 
 /* TODO: this should be dumped for [devices( and [elements( messages */
-void hidio_print(t_hidio *x)
+void hidio_doprint(t_hidio *x)
 {
 	if( !HIDHaveDeviceList() ) hidio_build_device_list();
 	hidio_print_device_list(x);

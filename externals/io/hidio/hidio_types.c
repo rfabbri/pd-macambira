@@ -1,5 +1,8 @@
-
+#ifdef PD
 #include "m_pd.h"
+#else
+#include "ext.h"
+#endif
 #include "hidio.h"
 
 //#define DEBUG(x)

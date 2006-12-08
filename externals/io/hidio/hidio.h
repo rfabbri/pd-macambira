@@ -42,7 +42,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.9 $"; */
+/* static char *version = "$Revision: 1.10 $"; */
 
 /*------------------------------------------------------------------------------
  * MACRO DEFINES
@@ -76,9 +76,10 @@ typedef void t_clock;
 #define REQUEST_OPEN 1
 #define REQUEST_READ 2
 #define REQUEST_SEND 3
-#define REQUEST_INFO 4
-#define REQUEST_CLOSE 5
-#define REQUEST_QUIT 6
+#define REQUEST_PRINT 4
+#define REQUEST_INFO 5
+#define REQUEST_CLOSE 6
+#define REQUEST_QUIT 7
 
 
 /*------------------------------------------------------------------------------
@@ -183,7 +184,7 @@ t_int hidio_open_device(t_hidio *x, short device_number);
 t_int hidio_close_device(t_hidio *x);
 void hidio_build_device_list(void);
 void hidio_get_events(t_hidio *x);
-void hidio_print(t_hidio* x); /* print info to the console */
+void hidio_doprint(t_hidio* x); /* print info to the console */
 void hidio_platform_specific_info(t_hidio* x); /* device info on the status outlet */
 void hidio_platform_specific_free(t_hidio *x);
 short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id);
@@ -191,7 +192,6 @@ short get_device_number_by_id(unsigned short vendor_id, unsigned short product_i
 short get_device_number_from_usage(short device_number, 
 										unsigned short usage_page, 
 										unsigned short usage);
-
 
 /* cross-platform force feedback functions */
 t_int hidio_ff_autocenter(t_hidio *x, t_float value);
