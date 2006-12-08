@@ -15,6 +15,12 @@
 
 #include "hidio.h"
 
+/* 
+ * this is automatically generated from linux/input.h by
+ * make-arrays-from-input.h.pl to be the cross-platform event types and codes 
+ */
+#include "input_arrays.h"
+
 #define DEBUG(x)
 //#define DEBUG(x) x 
 

@@ -2,7 +2,7 @@
 #define _HIDIO_H
 
 #include <stdio.h>
-#ifdef _WINDOWS
+#ifdef _WIN32
 #include "pthread.h"	/* needs pthread library */
 #define LOG_DEBUG 7
 #define LOG_INFO 6
@@ -12,11 +12,11 @@
 #else
 #include <sys/syslog.h>
 #include <pthread.h>
-#endif
+#endif /* _WIN32 */
 
 #ifdef _MSC_VER /* this only applies to Microsoft compilers */
 #pragma warning (disable: 4305 4244 4761)
-#endif
+#endif /* _MSC_VER */
 
 #ifdef __linux__
 #include <linux/types.h>
@@ -24,7 +24,7 @@
 
 #ifdef PD
 #include <m_pd.h>
-#else
+#else /* Max */
 #include "ext.h"
 #include "ext_obex.h"
 #include "commonsyms.h"
@@ -37,18 +37,12 @@ typedef void t_clock;
 #define MAXPDSTRING 512
 #define pd_error(x, b) error(b)
 #define SETSYMBOL SETSYM
-#endif
-
-/* 
- * this is automatically generated from linux/input.h by
- * make-arrays-from-input.h.pl to be the cross-platform event types and codes 
- */
-#include "input_arrays.h"
+#endif /* PD */
 
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.8 $"; */
+/* static char *version = "$Revision: 1.9 $"; */
 
 /*------------------------------------------------------------------------------
  * MACRO DEFINES
@@ -56,7 +50,7 @@ typedef void t_clock;
 
 #ifndef CLIP
 #define CLIP(a, lo, hi) ( (a)>(lo)?( (a)<(hi)?(a):(hi) ):(lo) )
-#endif
+#endif /* NOT CLIP */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -96,13 +90,13 @@ typedef struct _hidio
 	t_object            x_obj;
 #ifndef PD
 	void				*x_obex;
-#endif
-#ifdef _WINDOWS
+#endif /* PD */
+#ifdef _WIN32
 	HANDLE				x_fd;
-#endif
+#endif /* _WIN32 */
 #ifdef __linux__
 	t_int               x_fd;
-#endif
+#endif /* __linux */
 	void                *x_ff_device;
 	short               x_device_number;
 	short               x_instance;
@@ -212,8 +206,35 @@ t_int hidio_ff_stopall(t_hidio *x);
 t_int hidio_ff_fftest (t_hidio *x, t_float value);
 void hidio_ff_print(t_hidio *x);
 
+/*==============================================================================
+ * event symbols array sizes
+ *==============================================================================
+ */
+
+#define ABSOLUTE_ARRAY_MAX      16
+#define BUTTON_ARRAY_MAX        128
+#define KEY_ARRAY_MAX           256
+#define LED_ARRAY_MAX           77
+#define PID_ARRAY_MAX           256
+#define RELATIVE_ARRAY_MAX      16
 
 
+/*==============================================================================
+ * symbol pointers for pre-generated event symbols
+ *==============================================================================
+ */
+
+extern t_symbol *ps_absolute, *ps_button, *ps_key, *ps_led, *ps_pid, *ps_relative;
+
+extern t_symbol *absolute_symbols[ABSOLUTE_ARRAY_MAX];
+extern t_symbol *button_symbols[BUTTON_ARRAY_MAX];
+extern t_symbol *key_symbols[KEY_ARRAY_MAX];
+extern t_symbol *led_symbols[LED_ARRAY_MAX];
+extern t_symbol *pid_symbols[PID_ARRAY_MAX];
+extern t_symbol *relative_symbols[RELATIVE_ARRAY_MAX];
+
+void generate_event_symbols();
+void generate_type_symbols();
 
 
-#endif  /* #ifndef _HIDIO_H */
+#endif  /* NOT _HIDIO_H */

@@ -90,23 +90,20 @@ static char *convertEventsFromDarwinToLinux(pRecElement element);
  * This function is needed to translate the USB HID relative flag into the
  * [hidio]/linux style events
  */
-static void convert_axis_to_symbols(pRecElement pCurrentHIDElement, t_hid_element *new_element, char *axis) 
+static void convert_axis_to_symbols(pRecElement pCurrentHIDElement, 
+									t_hid_element *new_element, int array_index)
 {
-	char buffer[MAXPDSTRING];
 	if (pCurrentHIDElement->relative) 
 	{ 
-		new_element->type = gensym("rel"); 
-		snprintf(buffer, sizeof(buffer), "rel_%s", axis); 
-		new_element->name = gensym(buffer);
+		new_element->type = ps_relative; 
+		new_element->name = relative_symbols[array_index];
 	}
 	else 
 	{ 
-		new_element->type = gensym("abs"); 
-		snprintf(buffer, sizeof(buffer), "abs_%s", axis); 
-		new_element->name = gensym(buffer);
+		new_element->type = ps_absolute; 
+		new_element->name = absolute_symbols[array_index];
 	}
 }
-
 
 static void get_usage_symbols(pRecElement pCurrentHIDElement, t_hid_element *new_element) 
 {
@@ -124,39 +121,24 @@ static void get_usage_symbols(pRecElement pCurrentHIDElement, t_hid_element *new
 		return;
 	}
 
-	switch(pCurrentHIDElement->type)
-	{
-	case kIOHIDElementTypeInput_Button:
-		new_element->type = gensym("key");
-		break;
-	}
 	switch (pCurrentHIDElement->usagePage)
 	{
 	case kHIDPage_GenericDesktop:
 		switch (pCurrentHIDElement->usage)
 		{
-		case kHIDUsage_GD_X: convert_axis_to_symbols(pCurrentHIDElement, new_element, "x"); break;
-		case kHIDUsage_GD_Y: convert_axis_to_symbols(pCurrentHIDElement, new_element, "y"); break;
-		case kHIDUsage_GD_Z: convert_axis_to_symbols(pCurrentHIDElement, new_element, "z"); break;
-		case kHIDUsage_GD_Rx: convert_axis_to_symbols(pCurrentHIDElement, new_element, "rx"); break;
-		case kHIDUsage_GD_Ry: convert_axis_to_symbols(pCurrentHIDElement, new_element, "ry"); break;
-		case kHIDUsage_GD_Rz: convert_axis_to_symbols(pCurrentHIDElement, new_element, "rz"); break;
-		case kHIDUsage_GD_Slider:
-			new_element->type = gensym("abs");
-			new_element->name = gensym("abs_throttle");
-			break;
-		case kHIDUsage_GD_Dial:
-			new_element->type = gensym("abs");
-			new_element->name = gensym("abs_ry");
-			break;
-		case kHIDUsage_GD_Wheel: 
-			new_element->type = gensym("rel"); 
-			new_element->name = gensym("rel_wheel");
-			break;
-		case kHIDUsage_GD_Hatswitch:
+		case kHIDUsage_GD_X: convert_axis_to_symbols(pCurrentHIDElement, new_element, 0); break;
+		case kHIDUsage_GD_Y: convert_axis_to_symbols(pCurrentHIDElement, new_element, 1); break;
+		case kHIDUsage_GD_Z: convert_axis_to_symbols(pCurrentHIDElement, new_element, 2); break;
+		case kHIDUsage_GD_Rx: convert_axis_to_symbols(pCurrentHIDElement, new_element, 3); break;
+		case kHIDUsage_GD_Ry: convert_axis_to_symbols(pCurrentHIDElement, new_element, 4); break;
+		case kHIDUsage_GD_Rz: convert_axis_to_symbols(pCurrentHIDElement, new_element, 5); break;
+		case kHIDUsage_GD_Slider: convert_axis_to_symbols(pCurrentHIDElement, new_element, 6); break;
+		case kHIDUsage_GD_Dial: convert_axis_to_symbols(pCurrentHIDElement, new_element, 7); break;
+		case kHIDUsage_GD_Wheel: convert_axis_to_symbols(pCurrentHIDElement, new_element, 8); break; 
+		case kHIDUsage_GD_Hatswitch: 
 			// this is still a mystery how to handle
-			new_element->type = gensym("abs"); 
-			new_element->name = gensym("hatswitch");
+			new_element->type = ps_absolute; 
+			new_element->name = absolute_symbols[9]; /* hatswitch */
 			break;
 		default:
 			new_element->type = gensym("DESKTOP");
@@ -168,12 +150,12 @@ static void get_usage_symbols(pRecElement pCurrentHIDElement, t_hid_element *new
 		switch (pCurrentHIDElement->usage)
 		{
 		case kHIDUsage_Sim_Rudder: 
-			new_element->type = gensym("abs");
-			new_element->name = gensym("abs_rz");
+			new_element->type = ps_absolute;
+			new_element->name = absolute_symbols[5]; /* rz */
 			break;
 		case kHIDUsage_Sim_Throttle:
-			new_element->type = gensym("abs");
-			new_element->name = gensym("abs_throttle");
+			new_element->type = ps_absolute;
+			new_element->name = absolute_symbols[6]; /* slider */
 			break;
 		default:
 			new_element->type = gensym("SIMULATION");
@@ -182,28 +164,24 @@ static void get_usage_symbols(pRecElement pCurrentHIDElement, t_hid_element *new
 		}
 		break;
 	case kHIDPage_KeyboardOrKeypad:
-		new_element->type = gensym("key"); 
-		/* temporary kludge until I feel like writing the translation table */
-		snprintf(buffer, sizeof(buffer), "key_%ld", pCurrentHIDElement->usage); 
-		new_element->name = gensym(buffer);
+		new_element->type = ps_key;
+		if( (pCurrentHIDElement->usage > -1) && 
+			(pCurrentHIDElement->usage < KEY_ARRAY_MAX) )
+			new_element->name = key_symbols[pCurrentHIDElement->usage];
+		else /* PowerBook ADB keyboard reports 0xffffffff */
+			new_element->name = key_symbols[0];
 		break;
 	case kHIDPage_Button:
-		new_element->type = gensym("key"); 
-		/* HID Manager button numbers start at 1, [hidio] start at 0 */
-		snprintf(buffer, sizeof(buffer), "btn_%ld", pCurrentHIDElement->usage - 1); 
-		new_element->name = gensym(buffer);
+		new_element->type = ps_button;
+		new_element->name = button_symbols[pCurrentHIDElement->usage];
 		break;
 	case kHIDPage_LEDs:
-		/* temporary kludge until I feel like writing the translation table */
-		new_element->type = gensym("led"); 
-		snprintf(buffer, sizeof(buffer), "led_%ld", pCurrentHIDElement->usage); 
-		new_element->name = gensym(buffer);
+		new_element->type = ps_led; 
+		new_element->name = led_symbols[pCurrentHIDElement->usage];
 		break;
 	case kHIDPage_PID:
-		/* temporary kludge until I feel like writing the translation table */
-		new_element->type = gensym("ff"); 
-		snprintf(buffer, sizeof(buffer), "ff_%ld", pCurrentHIDElement->usage); 
-		new_element->name = gensym(buffer);
+		new_element->type = ps_pid; 
+		new_element->name = pid_symbols[pCurrentHIDElement->usage];
 		break;
 	default:
 		/* the rest are "vendor defined" so no translation table is possible */
@@ -214,7 +192,8 @@ static void get_usage_symbols(pRecElement pCurrentHIDElement, t_hid_element *new
 	}
 }
 
-
+/* this functions checks to see if there are any existing instances of a given
+ * type/code and assigns an number to this instance */
 static t_float get_type_name_instance(t_symbol *type, t_symbol *name, 
 									   int argc, t_hid_element **argv) 
 {
@@ -758,7 +737,7 @@ void hidio_build_device_list(void)
 	debug_print(LOG_WARNING,"[hidio] completed device list.");
 }
 
-
+/* TODO: this should be dumped for [devices( and [elements( messages */
 void hidio_print(t_hidio *x)
 {
 	if( !HIDHaveDeviceList() ) hidio_build_device_list();
@@ -830,7 +809,8 @@ t_int hidio_ff_gain(t_hidio *x, t_float value)
 		ffgain_value = value * 10000;
 		/* FFPROP_FFGAIN has a integer range of 0-10000 */
 		result = FFDeviceSetForceFeedbackProperty( 
-			(FFDeviceObjectReference)x->x_ff_device, FFPROP_FFGAIN, &ffgain_value );
+			(FFDeviceObjectReference)x->x_ff_device, FFPROP_FFGAIN, 
+			&ffgain_value );
 		if ( result != FF_OK )
 		{
 			post("[hidio]: ff_gain failed!");

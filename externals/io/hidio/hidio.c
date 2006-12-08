@@ -24,7 +24,7 @@
 /*                                                                           */
 /* --------------------------------------------------------------------------*/
 
-#ifdef _WINDOWS
+#ifdef _WIN32
 /* any Windows specific includes go in here */
 #ifdef PD
 #include <windows.h>
@@ -32,7 +32,7 @@
 #else
 #include <unistd.h>
 #include <ctype.h>
-#endif
+#endif /* _WIN32 */
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -72,6 +72,13 @@ unsigned short element_count[MAX_DEVICES];
 
 /* pre-generated symbols */
 t_symbol *ps_open, *ps_device, *ps_poll, *ps_total, *ps_range;
+t_symbol *ps_absolute, *ps_button, *ps_key, *ps_led, *ps_pid, *ps_relative;
+t_symbol *absolute_symbols[ABSOLUTE_ARRAY_MAX];
+t_symbol *button_symbols[BUTTON_ARRAY_MAX];
+t_symbol *key_symbols[KEY_ARRAY_MAX];
+t_symbol *led_symbols[LED_ARRAY_MAX];
+t_symbol *pid_symbols[PID_ARRAY_MAX];
+t_symbol *relative_symbols[RELATIVE_ARRAY_MAX];
 
 /*------------------------------------------------------------------------------
  * FUNCTION PROTOTYPES
@@ -125,7 +132,7 @@ static void output_status(t_hidio *x, t_symbol *selector, t_float output_value)
 	SETFLOAT(output_atom, output_value);
 #else
 	atom_setlong(output_atom, output_value);
-#endif
+#endif /* PD */
 	outlet_anything( x->x_status_outlet, selector, 1, output_atom);
 	freebytes(output_atom,sizeof(t_atom));
 }
@@ -167,7 +174,7 @@ static void output_element_ranges(t_hidio *x)
 #else
 			atom_setlong(output_data + 2, element[x->x_device_number][i]->min);
 			atom_setlong(output_data + 3, element[x->x_device_number][i]->max);
-#endif
+#endif /* PD */
 			outlet_anything(x->x_status_outlet, ps_range, 4, output_data);
 		}
 	}
@@ -197,7 +204,7 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 	long device_number = -1;
 	char *device_type_string;
 	long device_type_instance;
-#endif
+#endif /* PD */
 	unsigned int usage;
 	unsigned short vendor_id;
 	unsigned short product_id;
@@ -212,14 +219,14 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 #else
 		atom_arg_getsym(&first_argument, 0,argc,argv);
 		if(first_argument == _sym_nothing) 
-#endif
+#endif /* PD */
 		{ // single float arg means device #
 			post("first_argument == &s_");
 #ifdef PD
 			device_number = (short) atom_getfloatarg(0,argc,argv);
 #else
 			atom_arg_getlong(&device_number, 0, argc, argv);
-#endif
+#endif /* PD */
 			if(device_number < 0) device_number = -1;
 			debug_print(LOG_DEBUG,"[hidio] setting device# to %d",device_number);
 		}
@@ -230,7 +237,7 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 #else
 			device_type_string = atom_string(argv);
 			// LATER do we have to free this string manually???
-#endif
+#endif /* PD */
 			usage = name_to_usage(device_type_string);
 			device_number = get_device_number_from_usage(0, usage >> 16, 
 														 usage & 0xffff);
@@ -248,7 +255,7 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 		atom_arg_getsym(&first_argument, 0,argc,argv);
 		atom_arg_getsym(&second_argument, 1,argc,argv);
 		if( second_argument == _sym_nothing ) 
-#endif
+#endif /* PD */
 		{ /* a symbol then a float means match on usage */
 #ifdef PD
 			atom_string(argv, device_type_string, MAXPDSTRING-1);
@@ -258,7 +265,7 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 			device_type_string = atom_string(argv);
 			usage = name_to_usage(device_type_string);
 			atom_arg_getlong(&device_type_instance, 1, argc, argv);
-#endif
+#endif /* PD */
 			debug_print(LOG_DEBUG,"[hidio] looking for %s at #%d",
 						device_type_string, device_type_instance);
 			device_number = get_device_number_from_usage(device_type_instance,
@@ -280,8 +287,8 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 
 void hidio_output_event(t_hidio *x, t_hid_element *output_data)
 {
-	if( (output_data->value != output_data->previous_value) ||
-		(output_data->relative) )  // relative data should always be output
+	if( (output_data->relative) || // relative data should always be output
+		(output_data->value != output_data->previous_value) )
 	{
 		t_atom event_data[3];
 		SETSYMBOL(event_data, output_data->name);
@@ -389,7 +396,7 @@ t_int hidio_close(t_hidio *x)
  * closed / same device          open 
  * open / same device            no action 
  * closed / different device     open 
- * open / different device       close open 
+ * open / different device       close, open 
  */
 static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv) 
 {
@@ -417,8 +424,11 @@ t_int hidio_child_read(t_hidio *x)
 #ifdef PD
 	double right_now = clock_getlogicaltime();
 #else
+/* TODO: this should use gettime() not systime_ms().  This needs to be logical
+ * time, not system time because the idea is that only one instance should get
+ * events from the OS in each slice of logical time <hans@at.or.at> */
 	double right_now = (double)systime_ms();
-#endif
+#endif /* PD */
 	t_hid_element *current_element;
 	
 	if(right_now > last_execute_time[x->x_device_number])
@@ -481,7 +491,7 @@ static void hidio_int(t_hidio* x, long l)
 
 	hidio_set_from_float(x, (float)l);
 }
-#endif
+#endif /* NOT PD */
 
 static void hidio_debug(t_hidio *x, t_float f)
 {
@@ -721,7 +731,7 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
 	/* create anything outlet used for HID data */ 
 	x->x_status_outlet = outlet_new(x, "anything");
 	x->x_data_outlet = outlet_new(x, "anything");
-#endif
+#endif /* PD */
 
 	/* init vars */
 	global_debug_level = 9; /* high numbers here means see more messages */
@@ -730,9 +740,9 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
 	x->x_started = 0;
 	x->x_delay = DEFAULT_DELAY;
 	for(i=0; i<MAX_DEVICES; ++i) last_execute_time[i] = 0;
-#ifdef _WINDOWS
+#ifdef _WIN32
 	x->x_fd = INVALID_HANDLE_VALUE;
-#endif
+#endif /* _WIN32 */
 
     pthread_mutex_init(&x->x_mutex, 0);
     pthread_cond_init(&x->x_requestcondition, 0);
@@ -767,6 +777,7 @@ void hidio_setup(void)
 	/* add inlet message methods */
 	class_addmethod(hidio_class,(t_method) hidio_debug,gensym("debug"),A_DEFFLOAT,0);
 	class_addmethod(hidio_class,(t_method) hidio_build_device_list,gensym("refresh"),0);
+/* TODO: [print( should be dumped for [devices( and [elements( messages */
 	class_addmethod(hidio_class,(t_method) hidio_print,gensym("print"),0);
 	class_addmethod(hidio_class,(t_method) hidio_info,gensym("info"),0);
 	class_addmethod(hidio_class,(t_method) hidio_open,gensym("open"),A_GIMME,0);
@@ -799,6 +810,8 @@ void hidio_setup(void)
 	ps_total = gensym("total");
 	ps_range = gensym("range");
 
+	generate_type_symbols();
+	generate_event_symbols();
 }
 #else /* Max */
 static void hidio_notify(t_hidio *x, t_symbol *s, t_symbol *msg, void *sender, void *data)
@@ -859,6 +872,7 @@ int main()
 	/* add inlet message methods */
 	class_addmethod(c, (method)hidio_debug, "debug",A_DEFFLOAT,0);
 	class_addmethod(c, (method)hidio_build_device_list, "refresh",0);
+/* TODO: [print( should be dumped for [devices( and [elements( messages */
 	class_addmethod(c, (method)hidio_print, "print",0);
 	class_addmethod(c, (method)hidio_info, "info",0);
 	class_addmethod(c, (method)hidio_open, "open",A_GIMME,0);
@@ -902,7 +916,9 @@ int main()
 	ps_total = gensym("total");
 	ps_range = gensym("range");
 
+	generate_event_symbols();
+
 	return 0;
 }
-#endif
+#endif /* PD */
 

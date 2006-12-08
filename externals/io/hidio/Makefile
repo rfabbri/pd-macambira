@@ -15,11 +15,18 @@ test_locations:
 
 # for emacs
 etags:
+	etags ../../../pd/src/*.h *.[ch] linux/input.h 
 	make etags_`uname -s`
 
 etags_Darwin:
-	etags *.[ch] linux/input.h HID\ Utilities\ Source/*.[ch] \
+	etags -a HID\ Utilities\ Source/*.[ch] \
+		/System/Library/Frameworks/ForceFeedback.framework/Headers/*.h \
+		/System/Library/Frameworks/Carbon.framework/Headers/*.h  \
 		/System/Library/Frameworks/IOKit.framework/Headers/hid*/*.[ch]
 
 etags_Linux:
-	etags *.[ch] /usr/include/*.h linux/input.h /usr/include/sys/*.h
+	etags -a /usr/include/*.h linux/input.h /usr/include/sys/*.h
+
+etags_MINGW:
+	etags -a /usr/include/*.h /usr/include/sys/*.h \
+		/usr/local/include/*.h /usr/local/include/sys/*.h
