@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ "x${PD}" = "x" ]
+then
+ PD=pd
+fi
+
 RUNTESTS_TXT=runtests.txt
 RUNTESTS_LOG=runtests.log
 
