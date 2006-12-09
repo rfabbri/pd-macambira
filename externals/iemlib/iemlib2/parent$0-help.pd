@@ -1,4 +1,4 @@
-#N canvas 272 366 632 308 10;
+#N canvas 88 175 632 308 10;
 #X obj 35 111 test-parentdollarzero;
 #X obj 299 107 f \$0;
 #X obj 299 88 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -15,12 +15,12 @@
 #X text 14 28 (abbr. parent$0);
 #X text 23 148 output: <symbol> of unique number;
 #X text 241 148 output: <float> of unique number;
-#X text 115 238 IEM KUG;
-#X text 99 226 musil;
-#X text 129 226 @;
-#X text 135 226 iem.at;
-#X text 50 215 (c) Thomas Musil 2000 - 2005;
-#X text 98 248 Graz \, Austria;
+#X text 115 228 IEM KUG;
+#X text 99 216 musil;
+#X text 129 216 @;
+#X text 135 216 iem.at;
+#X text 98 238 Graz \, Austria;
+#X text 50 205 (c) Thomas Musil 2000 - 2006;
 #X connect 0 0 4 0;
 #X connect 1 0 3 0;
 #X connect 2 0 1 0;
