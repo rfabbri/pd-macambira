@@ -1,4 +1,4 @@
-#N canvas 24 9 934 571 10;
+#N canvas 24 9 942 579 10;
 #X obj 188 46 pp 0;
 #X floatatom 188 23 5 0 0 0 - - -;
 #X floatatom 224 31 5 0 0 0 - - -;
@@ -96,8 +96,6 @@
 #X text 390 222 recall memory-line to input-buffer;
 #X text 398 231 and output all parameter of this line;
 #X obj 330 403 pp from;
-#X msg 542 167 read iemhelp/help-iem_pbank.pbank csl;
-#X msg 547 190 read help-iem_pbank.pbank csl;
 #X obj 21 357 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X text 38 355 output input-buffer;
@@ -107,8 +105,10 @@
 #X text 120 513 musil;
 #X text 150 513 @;
 #X text 156 513 iem.at;
-#X text 71 502 (c) Thomas Musil 2000 - 2005;
 #X text 119 535 Graz \, Austria;
+#X msg 493 159 read iem_pbank.pbank csl;
+#X obj 493 138 loadbang;
+#X text 71 502 (c) Thomas Musil 2000 - 2006;
 #X connect 0 0 73 0;
 #X connect 1 0 0 0;
 #X connect 2 0 6 0;
@@ -152,13 +152,13 @@
 #X connect 72 0 66 0;
 #X connect 73 0 17 0;
 #X connect 73 1 86 0;
-#X connect 73 1 92 0;
+#X connect 73 1 90 0;
 #X connect 75 0 42 0;
 #X connect 76 0 42 0;
 #X connect 77 0 42 0;
 #X connect 82 0 73 0;
 #X connect 86 0 74 0;
 #X connect 87 0 73 0;
-#X connect 88 0 73 0;
 #X connect 89 0 73 0;
-#X connect 91 0 73 0;
+#X connect 96 0 73 0;
+#X connect 97 0 96 0;

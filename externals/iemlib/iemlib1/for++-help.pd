@@ -1,4 +1,4 @@
-#N canvas 324 220 748 404 10;
+#N canvas 276 220 752 408 10;
 #X obj 25 52 bng 15 250 50 0 empty empty empty 8 -8 0 10 -262144 -1
 -1;
 #X obj 65 186 bng 15 250 50 0 empty empty empty 8 -8 0 10 -262144 -1
@@ -46,9 +46,9 @@
 #X text 62 245 musil;
 #X text 92 245 @;
 #X text 98 245 iem.at;
-#X text 13 234 (c) Thomas Musil 2000 - 2005;
 #X text 61 267 Graz \, Austria;
 #X text 67 9 counter with its own interval-timer;
+#X text 13 234 (c) Thomas Musil 2000 - 2006;
 #X connect 0 0 7 0;
 #X connect 2 0 7 0;
 #X connect 3 0 7 1;

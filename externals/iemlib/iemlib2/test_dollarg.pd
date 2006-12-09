@@ -1,4 +1,4 @@
-#N canvas 75 94 758 543 10;
+#N canvas 75 94 762 547 10;
 #X obj 126 224 dollarg;
 #X obj 126 40 inlet;
 #X obj 32 387 outlet;
@@ -33,8 +33,8 @@ input:;
 #X text 90 473 musil;
 #X text 120 473 @;
 #X text 126 473 iem.at;
-#X text 41 462 (c) Thomas Musil 2000 - 2005;
 #X text 89 495 Graz \, Austria;
+#X text 41 462 (c) Thomas Musil 2000 - 2006;
 #X connect 0 0 2 0;
 #X connect 0 0 6 0;
 #X connect 0 1 3 0;
