@@ -1,28 +1,28 @@
 Installation-guide for iemlib under windows (win_xp, win2k, win_me, win_nt or win98)
 
-iemlib_R1.16 is written by Thomas Musil from IEM Graz Austria
- and it is compatible to miller puckette's pd-0.37-3 to pd-0.39-2.
-see also LICENCE.txt, GnuLGPL.txt.
+iemlib_R1.17 is written by Thomas Musil from IEM Graz Austria
+ and it is compatible to miller puckette's pd-0.38-3 to pd-0.39-2.
+see also LICENCE.txt, GnuLGPL.txt and README.txt.
 
-1.) download and copy iemlib_R1.16_win.zip into your pd-installation-directory
- ( e.g. C:\Programs\pd\iemlib_R1.16_win.zip )
-
-
-2.) unzip iemlib_R1.16_win.zip
- winzip create a directory    C:\Programs\pd\iemlib_R1.16\
+1.) download and copy iemlib_R1.17_win.zip into your pd-installation-directory
+ ( e.g.C:\Programs\pd\iemlib_R1.17_win.zip )
 
 
-3.) copy external-libraries
- iemlib contains 4 *.dll-files ( iem_mp3.dll, iem_t3_lib.dll, iemlib1.dll, iemlib2.dll )
- ( e.g. copy C:\Programs\pd\iemlib_R1.16\lib\*.dll  -->  C:\Programs\pd\extra\ )
+2.) unzip iemlib_R1.17_win.zip
+ winzip create a directory    C:\Programs\pd\iemlib_R1.17\
 
+3.) install external library folders
+ copy from C:\Programs\pd\iemlib_R1.17\iemlib1 to C:\Programs\pd\extra
+ copy from C:\Programs\pd\iemlib_R1.17\iemlib2 to C:\Programs\pd\extra
+ copy from C:\Programs\pd\iemlib_R1.17\iem_mp3 to C:\Programs\pd\extra
+ copy from C:\Programs\pd\iemlib_R1.17\iem_t3_lib to C:\Programs\pd\extra
 
-4.) copy pd-help-files-folder
- ( e.g. copy C:\Programs\pd\iemlib_R1.16\iemhelp\  -->  C:\Programs\pd\doc\5.reference\iemhelp\ )
-
+4.) install pd abstraction folder
+ copy from C:\Programs\pd\iemlib_R1.17\iemabs to C:\Programs\pd\extra
 
 5.) add to your pd_start.bat the following configuration-options:
- -path C:\Programs\pd\iemlib_R1.16\iemabs -lib iemlib1 -lib iemlib2 -lib iem_mp3 -lib iem_t3_lib
+
+ -path C:\Programs\pd\extra\iemabs  -lib iemlib1;iemlib2;iem_mp3;iem_t3_lib
 
 or create a textfile pd_start.bat with this content:
 
@@ -30,8 +30,8 @@ or create a textfile pd_start.bat with this content:
 set PD_INSTALL=C:\Programme\pd\bin
 set PD_AUDIO=-r 44100 -audiobuf 160
 set PD_MIDI=-nomidi
-set PD_PATH=-path C:/Programme/pd/iemlib_R1.16\iemabs
-set PD_LIB=-lib iemlib1 -lib iemlib2 -lib iem_mp3 -lib iem_t3_lib
+set PD_PATH=-path C:/Programme/pd/extra/iemabs
+set PD_LIB=-lib iemlib1;iemlib2;iem_mp3;iem_t3_lib
 @echo starting pd ...
 %PD_INSTALL%\pd %PD_AUDIO% %PD_MIDI% %PD_PATH% %PD_LIB%
 
@@ -42,57 +42,61 @@ How to compile iemlib under windows
 
 after installing iemlib and if You are owner of a VCC++ compiler:
 
-6.a) edit makefile_win of iemlib1
- change to directory C:\Programs\pd\iemlib_R1.16\iemlib1
+4.a) edit makefile_win of iemlib1
+ change to directory C:\Programs\pd\iemlib_R1.17\iemlib1\src
  and edit following lines of makefile_win and save
  ( VIS_CPP_PATH = ""  and  PD_INST_PATH = "" )
 
-6.b) compile iemlib1
+4.b) compile iemlib1
  doubleclick iemlib1.dsw, VCC++ will start,
  Menue: build/configuration = Release,
  Menue: build/build all ,
- ( after this command, iemlib1.dll will be created in C:\Programs\pd\iemlib_R1.16\lib ).
+ ( after this command, iemlib1.dll will be created in C:\Programs\pd\iemlib_R1.17\iemlib1 ).
 
-7.a) edit makefile_win of iemlib2
- change to directory C:\Programs\pd\iemlib_R1.16\iemlib2
+5.a) edit makefile_win of iemlib2
+ change to directory C:\Programs\pd\iemlib_R1.17\iemlib2\src
  and edit following lines of makefile_win and save
  ( VIS_CPP_PATH = ""  and  PD_INST_PATH = "" )
 
-7.b) compile iemlib2
+5.b) compile iemlib2
  doubleclick iemlib2.dsw, VCC++ will start,
  Menue: build/configuration = Release,
  Menue: build/build all ,
- ( after this command, iemlib2.dll will be created in C:\Programs\pd\iemlib_R1.16\lib ).
+ ( after this command, iemlib2.dll will be created in C:\Programs\pd\iemlib_R1.17\iemlib2 ).
 
-8.a) edit makefile_win of iem_mp3
- change to directory C:\Programs\pd\iemlib_R1.16\iem_mp3
+6.a) edit makefile_win of iem_mp3
+ change to directory C:\Programs\pd\iemlib_R1.17\iem_mp3\src
  and edit following lines of makefile_win and save
  ( VIS_CPP_PATH = ""  and  PD_INST_PATH = "" )
 
-8.b) compile iem_mp3
+6.b) compile iem_mp3
  doubleclick iem_mp3.dsw, VCC++ will start,
  Menue: build/configuration = Release,
  Menue: build/build all ,
- ( after this command, iem_mp3.dll will be created in C:\Programs\pd\iemlib_R1.16\lib ).
+ ( after this command, iem_mp3.dll will be created in C:\Programs\pd\iemlib_R1.17\iem_mp3 ).
 
-9.a) edit makefile_win of iem_t3_lib
- change to directory C:\Programs\pd\iemlib_R1.16\iem_t3_lib
+7.a) edit makefile_win of iem_t3_lib
+ change to directory C:\Programs\pd\iemlib_R1.17\iem_t3_lib\src
  and edit following lines of makefile_win and save
  ( VIS_CPP_PATH = ""  and  PD_INST_PATH = "" )
 
-9.b) compile iem_t3_lib
+7.b) compile iem_t3_lib
  doubleclick iem_t3_lib.dsw, VCC++ will start,
  Menue: build/configuration = Release,
  Menue: build/build all ,
- ( after this command, iem_t3_lib.dll will be created in C:\Programs\pd\iemlib_R1.16\lib ).
+ ( after this command, iem_t3_lib.dll will be created in C:\Programs\pd\iemlib_R1.17\iem_t3_lib ).
 
-10.) copy external-libraries
- change to C:\Programs\pd\iemlib_R1.16\lib\
- ( e.g. copy C:\Programs\pd\iemlib_R1.16\lib\*.dll  -->  C:\Programs\pd\extra\ )
+8.) install dynamic libraries
+ copy from C:\Programs\pd\iemlib_R1.17\iemlib1\iemlib1.dll to C:\Programs\pd\extra\iemlib1\iemlib1.dll
+ copy from C:\Programs\pd\iemlib_R1.17\iemlib2\iemlib2.dll to C:\Programs\pd\extra\iemlib2\iemlib2.dll
+ copy from C:\Programs\pd\iemlib_R1.17\iem_mp3\iem_mp3.dll to C:\Programs\pd\extra\iem_mp3\iem_mp3.dll
+ copy from C:\Programs\pd\iemlib_R1.17\iem_t3_lib\iem_t3_lib.dll to C:\Programs\pd\extra\iem_t3_lib\iem_t3_lib.dll
 
 
 
-contents of iemlib Release 1.16 from May 2005
+
+
+content of iemlib Release 1.17 from November 2006
 
 ============================ DSP~ ===============================
 

@@ -1,9 +1,10 @@
-Iemlib contains 4 dlls and 2 directories:
-iemlib1, iemlib2, iem_t3_lib, iem_mp3 and iemabs, iemhelp.
+Iemlib contains 5 directories, 4 external libraries with help files 
+and 1 abstraction folder with help files:
+iemlib1, iemlib2, iem_t3_lib, iem_mp3 and iemabs.
 
 This library extends the performance of miller puckette's pure data (pd).
 
-Copyright (C) 2000-2005 Thomas MUSIL [musil_at_iem.at]
+Copyright (C) 2000-2006 Thomas MUSIL [musil_at_iem.at]
 
 IEM - Institute of Electronic Music and Acoustics, Graz
 Inffeldgasse 10/3, 8010 Graz, Austria
@@ -24,5 +25,5 @@ http://iem.at
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-         Graz, 15 June 2005
+         Graz, 22 November 2006
             Thomas Musil

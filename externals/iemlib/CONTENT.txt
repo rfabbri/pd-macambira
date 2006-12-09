@@ -1,4 +1,4 @@
-contents of iemlib Release 1.16 from May 2005
+contents of iemlib Release 1.17 from November 2006
 
 ============================ DSP~ ===============================
 
