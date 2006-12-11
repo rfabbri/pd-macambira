@@ -271,7 +271,7 @@ PACKAGE_VERSION=
 PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT IMLIB2_CONFIG IMLIB_LIBS IMLIB_CFLAGS IMLIB2_CFLAGS IMLIB2_LIBS CAIRO_CFLAGS PDP_PIDIP_VERSION MAGICK_LIBS MAGICK_CFLAGS THEORA_LIBS PD_DIR PDP_DIR FFMPEG_SOURCE_DIR MPEG4IP_SOURCE_DIR MPEG4IP_CFLAGS PDP_STREAMING_OBJECTS PDP_PIDIP_LIBS PDP_PIDIP_INCLUDES LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT IMLIB2_CONFIG IMLIB2_CFLAGS IMLIB2_LIBS PD_DIR PDP_DIR FFMPEG_SOURCE_DIR MPEG4IP_SOURCE_DIR MPEG4IP_CFLAGS PDP_PIDIP_VERSION MAGICK_LIBS MAGICK_CFLAGS IMLIB_LIBS IMLIB_CFLAGS THEORA_LIBS PDP_STREAMING_OBJECTS PDP_CAPTURE_OBJECT PDP_PIDIP_LIBS PDP_PIDIP_INCLUDES LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1273,6 +1273,12 @@ PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
 MPEG4IP_SOURCE_DIR=/SOURCES/mpeg4ip
 PDP_STREAMING_OBJECTS=
+PDP_CAPTURE_OBJECT=
+IMLIB_LIBS=
+IMLIB_CFLAGS=
+MAGIC_LIBS=
+MAGIC_CFLAGS=
+THEORA_LIBS=
 enable_ffmpeg=no
 enable_mpeg4ip=no
 
@@ -3977,9 +3983,8 @@ echo $ECHO_N "checking for imlib2 - version >= 1.0.0... $ECHO_C" >&6
   if test "x$no_imlib2" = x ; then
      echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-
-
-
+      IMLIB_LIBS=`imlib2-config --libs`
+  IMLIB_CFLAGS=`imlib2-config --cflags`
   else
      echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
@@ -3999,15 +4004,6 @@ echo "$as_me: error: Cannot find imlib2: Is imlib2-config in the path?" >&2;}
 
 
 
-
-
-
-IMLIB_LIBS=`imlib2-config --libs`
-IMLIB_CFLAGS=`imlib2-config --cflags`
-
-
-
-CAIRO_CFLAGS="-I/usr/include/cairo/ -I/usr/local/include/cairo/"
 
 
 
@@ -4076,17 +4072,18 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_Magick_XWindowByProperty" >&5
 echo "${ECHO_T}$ac_cv_lib_Magick_XWindowByProperty" >&6
 if test $ac_cv_lib_Magick_XWindowByProperty = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBMAGICK 1
+   PDP_CAPTURE_OBJECT="pdp_capture.o"
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_IMAGE_MAGICK 1
 _ACEOF
 
-  LIBS="-lMagick $LIBS"
-
+              MAGICK_LIBS="-L/usr/X11R6/lib -lMagick `Magick-config --libs` `Magick-config --ldflags`"
+              MAGICK_CFLAGS="-I/usr/X11R6/include `Magick-config --cflags` "
 else
-  { { echo "$as_me:$LINENO: error: screen captures requires ImageMagick library!!" >&5
-echo "$as_me: error: screen captures requires ImageMagick library!!" >&2;}
-   { (exit 1); exit 1; }; }
+  echo "Image Magick not found : not building pdp_capture"
 fi
+
 
 
 echo "$as_me:$LINENO: checking for BZ2_bzBuffToBuffCompress in -lbz2" >&5
@@ -4713,14 +4710,128 @@ echo "$as_me: error: theora library needed! sorry..." >&2;}
 fi
 
 
+echo "$as_me:$LINENO: checking for lqt_decode_video in -lquicktime" >&5
+echo $ECHO_N "checking for lqt_decode_video in -lquicktime... $ECHO_C" >&6
+if test "${ac_cv_lib_quicktime_lqt_decode_video+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lquicktime  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char lqt_decode_video ();
+int
+main ()
+{
+lqt_decode_video ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_quicktime_lqt_decode_video=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_quicktime_lqt_decode_video=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_quicktime_lqt_decode_video" >&5
+echo "${ECHO_T}$ac_cv_lib_quicktime_lqt_decode_video" >&6
+if test $ac_cv_lib_quicktime_lqt_decode_video = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBQUICKTIME 1
+_ACEOF
+
+  LIBS="-lquicktime $LIBS"
+
+else
+  { { echo "$as_me:$LINENO: error: libquicktime not found" >&5
+echo "$as_me: error: libquicktime not found" >&2;}
+   { (exit 1); exit 1; }; }
+fi
 
 
-MAGICK_LIBS="-L/usr/X11R6/lib -lMagick `Magick-config --libs` `Magick-config --ldflags`"
-MAGICK_CFLAGS="-I/usr/X11R6/include `Magick-config --cflags` "
+qt_minor_version="`lqt-config --version | cut -f3 -d'.'`"
+echo "qt version minor : ${qt_minor_version}"
+if test ${qt_minor_version} == "8";
+then
 
+cat >>confdefs.h <<\_ACEOF
+#define QUICKTIME_NEWER 1
+_ACEOF
 
+fi
+if test ${qt_minor_version} == "9";
+then
 
-THEORA_LIBS=""
+cat >>confdefs.h <<\_ACEOF
+#define QUICKTIME_NEWER 1
+_ACEOF
+
+fi
+if test ${qt_minor_version} == "10";
+then
+
+cat >>confdefs.h <<\_ACEOF
+#define QUICKTIME_NEWER 1
+_ACEOF
+
+fi
+if test ${qt_minor_version} == "11";
+then
+
+cat >>confdefs.h <<\_ACEOF
+#define QUICKTIME_NEWER 1
+_ACEOF
+
+fi
+if test ${qt_minor_version} == "12";
+then
+
+cat >>confdefs.h <<\_ACEOF
+#define QUICKTIME_NEWER 1
+_ACEOF
+
+fi
+
+THEORA_LIBS="-ltheora -logg -lvorbis -lvorbisenc"
 if test -f /usr/lib/libtheora.a
 then
    THEORA_LIBS="$THEORA_LIBS /usr/lib/libtheora.a"
@@ -4753,8 +4864,6 @@ if test -f /usr/local/lib/libvorbisenc.a
 then
    THEORA_LIBS="$THEORA_LIBS /usr/local/lib/libvorbisenc.a"
 fi
-
-
 
 echo -n "looking for pd sources (required) ... "
 if test -f $PD_DIR/src/m_pd.h
@@ -4819,6 +4928,13 @@ _ACEOF
     exit -1
   fi
 fi
+
+
+
+
+
+
+
 
 
 
@@ -5456,21 +5572,21 @@ s,@MAINTAINER_MODE_TRUE@,$MAINTAINER_MODE_TRUE,;t t
 s,@MAINTAINER_MODE_FALSE@,$MAINTAINER_MODE_FALSE,;t t
 s,@MAINT@,$MAINT,;t t
 s,@IMLIB2_CONFIG@,$IMLIB2_CONFIG,;t t
-s,@IMLIB_LIBS@,$IMLIB_LIBS,;t t
-s,@IMLIB_CFLAGS@,$IMLIB_CFLAGS,;t t
 s,@IMLIB2_CFLAGS@,$IMLIB2_CFLAGS,;t t
 s,@IMLIB2_LIBS@,$IMLIB2_LIBS,;t t
-s,@CAIRO_CFLAGS@,$CAIRO_CFLAGS,;t t
-s,@PDP_PIDIP_VERSION@,$PDP_PIDIP_VERSION,;t t
-s,@MAGICK_LIBS@,$MAGICK_LIBS,;t t
-s,@MAGICK_CFLAGS@,$MAGICK_CFLAGS,;t t
-s,@THEORA_LIBS@,$THEORA_LIBS,;t t
 s,@PD_DIR@,$PD_DIR,;t t
 s,@PDP_DIR@,$PDP_DIR,;t t
 s,@FFMPEG_SOURCE_DIR@,$FFMPEG_SOURCE_DIR,;t t
 s,@MPEG4IP_SOURCE_DIR@,$MPEG4IP_SOURCE_DIR,;t t
 s,@MPEG4IP_CFLAGS@,$MPEG4IP_CFLAGS,;t t
+s,@PDP_PIDIP_VERSION@,$PDP_PIDIP_VERSION,;t t
+s,@MAGICK_LIBS@,$MAGICK_LIBS,;t t
+s,@MAGICK_CFLAGS@,$MAGICK_CFLAGS,;t t
+s,@IMLIB_LIBS@,$IMLIB_LIBS,;t t
+s,@IMLIB_CFLAGS@,$IMLIB_CFLAGS,;t t
+s,@THEORA_LIBS@,$THEORA_LIBS,;t t
 s,@PDP_STREAMING_OBJECTS@,$PDP_STREAMING_OBJECTS,;t t
+s,@PDP_CAPTURE_OBJECT@,$PDP_CAPTURE_OBJECT,;t t
 s,@PDP_PIDIP_LIBS@,$PDP_PIDIP_LIBS,;t t
 s,@PDP_PIDIP_INCLUDES@,$PDP_PIDIP_INCLUDES,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
@@ -5968,5 +6084,5 @@ fi
 
 
 echo "used configure options:"
-echo "  --enable-ffmpeg=$enable_ffmpeg"
-echo "  --enable-mpeg4ip=$enable_mpeg4ip"
+echo "  --enable_ffmpeg=$enable_ffmpeg"
+echo "  --enable_mpeg4ip=$enable_mpeg4ip"

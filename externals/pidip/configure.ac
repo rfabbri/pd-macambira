@@ -9,6 +9,12 @@ PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
 MPEG4IP_SOURCE_DIR=/SOURCES/mpeg4ip
 PDP_STREAMING_OBJECTS=
+PDP_CAPTURE_OBJECT=
+IMLIB_LIBS=
+IMLIB_CFLAGS=
+MAGIC_LIBS=
+MAGIC_CFLAGS=
+THEORA_LIBS=
 enable_ffmpeg=no
 enable_mpeg4ip=no
 
@@ -83,21 +89,19 @@ AM_SANITY_CHECK
 AM_MAINTAINER_MODE
 AM_WITH_DMALLOC
 
-AC_PATH_GENERIC(imlib2, 1.0.0, [
-  AC_SUBST(IMLIB_LIBS)
-  AC_SUBST(IMLIB_CFLAGS) ],
+AC_PATH_GENERIC(imlib2, 1.0.0, 
+  [ IMLIB_LIBS=`imlib2-config --libs`
+  IMLIB_CFLAGS=`imlib2-config --cflags` ],
   AC_MSG_ERROR(Cannot find imlib2: Is imlib2-config in the path?) )
 
-dnl the above doesn't work for some reason :/
-IMLIB_LIBS=`imlib2-config --libs`
-IMLIB_CFLAGS=`imlib2-config --cflags`
-AC_SUBST(IMLIB_LIBS)
-AC_SUBST(IMLIB_CFLAGS)
+AC_CHECK_LIB(Magick, XWindowByProperty, 
+              [ PDP_CAPTURE_OBJECT="pdp_capture.o"
+              AC_DEFINE(HAVE_IMAGE_MAGICK, 1, image magick capture capability)
+              MAGICK_LIBS="-L/usr/X11R6/lib -lMagick `Magick-config --libs` `Magick-config --ldflags`"
+              MAGICK_CFLAGS="-I/usr/X11R6/include `Magick-config --cflags` " ],
+              echo "Image Magick not found : not building pdp_capture", 
+              -I/usr/X11R6/include -L/usr/X11R6/lib )
 
-CAIRO_CFLAGS="-I/usr/include/cairo/ -I/usr/local/include/cairo/"
-AC_SUBST(CAIRO_CFLAGS)
-
-AC_CHECK_LIB(Magick, XWindowByProperty, , AC_MSG_ERROR(screen captures requires ImageMagick library!!), -I/usr/X11R6/include -L/usr/X11R6/lib )
 AC_CHECK_LIB(bz2, BZ2_bzBuffToBuffCompress, , AC_MSG_ERROR(streaming requires bz2 library!!))
 AC_CHECK_LIB(z, deflate, , AC_MSG_ERROR(streaming requires compress library!!))
 AC_CHECK_LIB(dl, dlopen, , AC_MSG_ERROR(streaming requires dynamic loader library!!))
@@ -106,15 +110,32 @@ AC_CHECK_LIB(ogg, ogg_stream_init, , AC_MSG_ERROR(streaming requires ogg library
 AC_CHECK_LIB(vorbis, vorbis_analysis_init, , AC_MSG_ERROR(streaming requires vorbis library!!), -lm)
 AC_CHECK_LIB(vorbisenc, vorbis_encode_setup_init, , AC_MSG_ERROR(streaming requires vorbis encoder library!!), -lm)
 AC_CHECK_LIB(theora, theora_encode_init, , AC_MSG_ERROR(theora library needed! sorry...), -lm)
+AC_CHECK_LIB(quicktime, lqt_decode_video, , AC_MSG_ERROR(libquicktime not found) )
 
-AC_SUBST(PDP_PIDIP_VERSION)
+qt_minor_version="`lqt-config --version | cut -f3 -d'.'`"
+echo "qt version minor : ${qt_minor_version}"
+if test ${qt_minor_version} == "8";
+then
+  AC_DEFINE(QUICKTIME_NEWER, 1, newer quicktime lib)
+fi
+if test ${qt_minor_version} == "9";
+then
+  AC_DEFINE(QUICKTIME_NEWER, 1, newer quicktime lib)
+fi
+if test ${qt_minor_version} == "10";
+then
+  AC_DEFINE(QUICKTIME_NEWER, 1, newer quicktime lib)
+fi
+if test ${qt_minor_version} == "11";
+then
+  AC_DEFINE(QUICKTIME_NEWER, 1, newer quicktime lib)
+fi
+if test ${qt_minor_version} == "12";
+then
+  AC_DEFINE(QUICKTIME_NEWER, 1, newer quicktime lib)
+fi
 
-MAGICK_LIBS="-L/usr/X11R6/lib -lMagick `Magick-config --libs` `Magick-config --ldflags`"
-MAGICK_CFLAGS="-I/usr/X11R6/include `Magick-config --cflags` "
-AC_SUBST(MAGICK_LIBS)
-AC_SUBST(MAGICK_CFLAGS)
-
-THEORA_LIBS=""
+THEORA_LIBS="-ltheora -logg -lvorbis -lvorbisenc"
 if test -f /usr/lib/libtheora.a
 then
    THEORA_LIBS="$THEORA_LIBS /usr/lib/libtheora.a"
@@ -147,8 +168,6 @@ if test -f /usr/local/lib/libvorbisenc.a
 then
    THEORA_LIBS="$THEORA_LIBS /usr/local/lib/libvorbisenc.a"
 fi
-
-AC_SUBST(THEORA_LIBS)
 
 echo -n "looking for pd sources (required) ... "
 if test -f $PD_DIR/src/m_pd.h
@@ -206,7 +225,14 @@ then
   fi
 fi
 
+AC_SUBST(PDP_PIDIP_VERSION)
+AC_SUBST(MAGICK_LIBS)
+AC_SUBST(MAGICK_CFLAGS)
+AC_SUBST(IMLIB_LIBS)
+AC_SUBST(IMLIB_CFLAGS)
+AC_SUBST(THEORA_LIBS)
 AC_SUBST(PDP_STREAMING_OBJECTS)
+AC_SUBST(PDP_CAPTURE_OBJECT)
 AC_SUBST(PDP_PIDIP_LIBS)
 AC_SUBST(PDP_PIDIP_INCLUDES)
 
@@ -218,5 +244,5 @@ modules/Makefile
 AC_OUTPUT
 
 echo "used configure options:"
-echo "  --enable-ffmpeg=$enable_ffmpeg"
-echo "  --enable-mpeg4ip=$enable_mpeg4ip"
+echo "  --enable_ffmpeg=$enable_ffmpeg"
+echo "  --enable_mpeg4ip=$enable_mpeg4ip"
