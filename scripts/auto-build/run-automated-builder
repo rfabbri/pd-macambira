@@ -36,6 +36,7 @@ run_build_script ()
 
 run_build_script pd-main
 run_build_script pd-extended
+run_build_script pd-extended-release
 #run_build_script pd-devel
 
 
