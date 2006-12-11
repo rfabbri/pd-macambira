@@ -10,11 +10,6 @@
   the objects call the correct setup function since it can change the
   functionality
 
-- put objects with conflicting names into a directory namespace
-
-		Gem/scale
-		flext/prepend
-
 - add these to the build system:
       PDContainer
       ann

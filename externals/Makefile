@@ -43,8 +43,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 # this variable is to support old "win" directories, rather than "windows"
 BUILDSRC_OS_NAME = $(OS_NAME)
 
-#CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS)
-CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -W $(DEBUG_CFLAGS) -ftree-vectorize -ftree-vectorizer-verbose=3
+CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS)
 LDFLAGS =  
 LIBS = -lm
 
@@ -55,32 +54,32 @@ ifeq ($(OS_NAME),darwin)
   DYLIB_LDFLAGS = -dynamiclib -read_only_relocs warning -L/sw/lib
   DYLIB_EXTENSION = dylib
   STRIP = strip -x
-else
-  ifeq ($(OS_NAME),windows)
-    BUILDSRC_OS_NAME = win
-	 WINDOWS_HACKS = -D'O_NONBLOCK=1' -D'srand48(n)=srand((n))' \
-      -D'drand48()=((double)rand()/RAND_MAX)' -D'bzero(p,n)=memset(p,0,n)'
+endif
+ifeq ($(OS_NAME),linux)
+  CFLAGS +=  -DUNIX -Dunix -fPIC
+  LDFLAGS += -Wl,-export_dynamic  -shared
+  LIBS += -lc
+  DYLIB_LDFLAGS = $(LDFLAGS)
+  DYLIB_EXTENSION = dll
+  STRIP = strip --strip-unneeded -R .note -R .comment
+endif
+ifeq ($(OS_NAME),windows)
+  BUILDSRC_OS_NAME = win
+  WINDOWS_HACKS = -D'O_NONBLOCK=1' -D'srand48(n)=srand((n))' \
+    -D'drand48()=((double)rand()/RAND_MAX)' -D'bzero(p,n)=memset(p,0,n)'
 # These don't seem to be needed:
 #	-D'PROT_READ=1' \
 #	-D'MAP_PRIVATE=2' \
 #	-D'O_NDELAY=O_NONBLOCK'
-    CFLAGS += -mms-bitfields -DMSW -DNT $(WINDOWS_HACKS)
-    LDFLAGS += -shared
+  CFLAGS += -mms-bitfields -DMSW -DNT $(WINDOWS_HACKS)
+  LDFLAGS += -shared
 # all of these included libs are part of libc in UNIX platforms.  All except
 # libregex are in DLLs, so they get stripped from the external's .dll binary
-    LIBS += -L$(pd_src)/bin  -L$(pd_src)/obj  -lpd \
-      -lwsock32 -lpthreadGC2 -lkernel32 -luser32 -lgdi32 -lregex
-    DYLIB_LDFLAGS = -shared
-    DYLIB_EXTENSION = so
-    STRIP = strip --strip-unneeded -R .note -R .comment
-  else
-    CFLAGS +=  -DUNIX -Dunix -fPIC
-    LDFLAGS += -Wl,-export_dynamic  -shared
-    LIBS += -lc
-    DYLIB_LDFLAGS = $(LDFLAGS)
-    DYLIB_EXTENSION = dll
-    STRIP = strip --strip-unneeded -R .note -R .comment
-  endif
+  LIBS += -L$(pd_src)/bin  -L$(pd_src)/obj  -lpd \
+    -lwsock32 -lpthreadGC2 -lkernel32 -luser32 -lgdi32 -lregex
+  DYLIB_LDFLAGS = -shared
+  DYLIB_EXTENSION = so
+  STRIP = strip --strip-unneeded -R .note -R .comment
 endif
 
 CXXFLAGS = $(CFLAGS)
@@ -943,7 +942,7 @@ HID_OBJECTS := $(patsubst %.c, $(externals_src)/hcs/hid/%.o, $(HID_SRC))
 $(HID_OBJECTS) : %.o : %.c
 	$(CC) $(HID_CFLAGS) -o "$*.o" -c "$*.c"
 
-$(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a:
+$(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a:
 # Apple changed the XCode CLI tool's name in xcode2... arg
 # if on non-Mac OS X, this target just echos a message
 ifeq ($(UNAME),Darwin)
@@ -954,7 +953,7 @@ ifeq ($(UNAME),Darwin)
 endif
 
 $(externals_src)/hcs/hid/hid.$(EXTENSION): $(HID_OBJECTS) \
-$(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
+$(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
 	$(CC) $(LDFLAGS) -o $(externals_src)/hcs/hid/hid.$(EXTENSION) \
 		$(HID_OBJECTS) $(HID_LIBS)
 #	$(STRIP) $(externals_src)/hcs/hid/hid.$(EXTENSION)
@@ -978,10 +977,11 @@ hid_install: hid
 
 hid_clean:
 	-rm -f -- $(externals_src)/hcs/hid/*.o
-	-rm -f -- $(externals_src)/hcs/hid/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/hcs/hid/hid.$(EXTENSION)
 	-rm -f -- $(externals_src)/hcs/hid/*.bak
 	-rm -f -- $(externals_src)/hcs/hid/*.*~
 	-rm -f -- $(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
+	-rm -f -- $(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
 
 
 #------------------------------------------------------------------------------#
@@ -1036,9 +1036,9 @@ ifeq ($(OS_NAME),darwin)
   HIDIO_SRC = hidio_darwin.c hidio_types.c hidio.c
   FRAMEWORKS = Carbon IOKit ForceFeedback
   HIDIO_CFLAGS = $(CFLAGS) -I$(externals_src)/io/hidio/HID\ Utilities\ Source
-  HID_UTILITIES_SOURCE = $(externals_src)/io/hidio/HID\ Utilities\ Source
-  HIDIO_LIBS = $(LIBS) -L$(HID_UTILITIES_SOURCE)/build \
-    -L$(HID_UTILITIES_SOURCE)/build/Default \
+  HIDIO_HID_UTILITIES_SOURCE = $(externals_src)/io/hidio/HID\ Utilities\ Source
+  HIDIO_LIBS = $(LIBS) -L$(HIDIO_HID_UTILITIES_SOURCE)/build \
+    -L$(HIDIO_HID_UTILITIES_SOURCE)/build/Default \
     -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
 endif
 ifeq ($(OS_NAME),linux)
@@ -1051,18 +1051,18 @@ HIDIO_OBJECTS := $(patsubst %.c, $(externals_src)/io/hidio/%.o, $(HIDIO_SRC))
 $(HIDIO_OBJECTS) : %.o : %.c
 	$(CC) $(HIDIO_CFLAGS) -o "$*.o" -c "$*.c"
 
-$(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a:
+$(HIDIO_HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a:
 # Apple changed the XCode CLI tool's name in xcode2... arg
 # if on non-Mac OS X, this target just echos a message
 ifeq ($(UNAME),Darwin)
-	cd $(HID_UTILITIES_SOURCE) && \
+	cd $(HIDIO_HID_UTILITIES_SOURCE) && \
 		(test -x /usr/bin/xcodebuild && /usr/bin/xcodebuild) || \
 			(test -x /usr/bin/pbxbuild && /usr/bin/pbxbuild) || \
 				echo "Not building Apple HID Utilities"
 endif
 
 $(externals_src)/io/hidio/hidio.$(EXTENSION): $(HIDIO_OBJECTS) \
-$(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
+$(HIDIO_HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
 	$(CC) $(LDFLAGS) -o $(externals_src)/io/hidio/hidio.$(EXTENSION) \
 		$(HIDIO_OBJECTS) $(HIDIO_LIBS)
 #	$(STRIP) $(externals_src)/io/hidio/hidio.$(EXTENSION)
@@ -1089,8 +1089,8 @@ hidio_clean:
 	-rm -f -- $(HIDIO_OBJECTS:.c=.$(EXTENSION))
 	-rm -f -- $(externals_src)/io/hidio/*.bak
 	-rm -f -- $(externals_src)/io/hidio/*.*~
-	-rm -f -- $(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
-	-rm -f -- $(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
+	-rm -f -- $(HIDIO_HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
+	-rm -f -- $(HIDIO_HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
 
 
 
