@@ -1,8 +1,4 @@
 
-- make iemlibs into libdir for backwards compatibility
-
-- make C++ compile targets (packages/darwin_app/Makefile has some)
-
 - add version number getters from packages/Makefile
 
 - document externals building following the smlib example

@@ -1,1 +1,1 @@
-#include "../../iemlib/src/iemlib1/mov_avrg_kern~.c"
+#include "../../iemlib/iemlib1/src/mov_avrg_kern~.c"

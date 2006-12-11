@@ -1237,9 +1237,8 @@ iem16_clean:
 #------------------------------------------------------------------------------#
 # IEMLIB
 IEMLIB_NAME=iemlib
-# omit the lib files and iem_mp3
-IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/src/*/[a-hj-z]*.c) \
-$(wildcard $(externals_src)/iemlib/src/*/iem_????*[^l][^i][^b]*.c)
+# omit the lib files and iem_mp3 (for patent reasons :( )
+IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/iem?[^m]*/src/[a-hj-z]*.c)
 iemlib: $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
 
 iemlib_install: iemlib
@@ -1248,25 +1247,18 @@ iemlib_install: iemlib
 		--description "a collection of objects written at IEM/KUG" \
 		--license "GNU GPL"
 	install -p $(IEMLIB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEMLIB_NAME)
-	cd $(externals_src)/iemlib/iemabs/ && \
-		install -p $(shell cd $(externals_src)/iemlib/iemabs/ && ls -1 *.pd | \
-			grep -v 'help') $(objectsdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/iemabs/*[^-][^h][^e][^l][^p].pd \
+		$(objectsdir)/$(IEMLIB_NAME)
 	install -d $(helpdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/iemabs/*-help.pd $(helpdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/iemabs/*.mp3 $(helpdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/iemabs/*.wav $(helpdir)/$(IEMLIB_NAME)
-# iemlib objects have their help path hard-coded :(
-	install -d $(helpdir)/iemhelp
-	install -p $(externals_src)/iemlib/iemhelp/*.* $(helpdir)/iemhelp
+	install -p $(externals_src)/iemlib/*/*-help.pd $(helpdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/*/*.mp3 $(helpdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/*/*.wav $(helpdir)/$(IEMLIB_NAME)
 	install -d $(examplesdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/examples/*.* \
 		$(examplesdir)/$(IEMLIB_NAME)
 	install -d $(manualsdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/*.pdf \
-		$(manualsdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/*.txt \
-		$(manualsdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/iemabs/*.txt \
+	install -p $(externals_src)/iemlib/*.pdf $(externals_src)/iemlib/*.txt \
+		$(externals_src)/iemlib/iemabs/*.txt \
 		$(manualsdir)/$(IEMLIB_NAME)
 
 
@@ -1275,8 +1267,6 @@ iemlib_clean:
 	-rmdir -- $(objectsdir)/$(IEMLIB_NAME)
 	-rm -f -- $(helpdir)/$(IEMLIB_NAME)/*.*
 	-rmdir -- $(helpdir)/$(IEMLIB_NAME)
-	-rm -f -- $(helpdir)/iemhelp/*.*
-	-rmdir -- $(helpdir)/iemhelp
 	-rm -f -- $(examplesdir)/$(IEMLIB_NAME)/*.*
 	-rmdir -- $(examplesdir)/$(IEMLIB_NAME)
 	-rm -f -- $(manualsdir)/$(IEMLIB_NAME)/*.*
