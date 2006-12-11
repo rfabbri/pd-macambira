@@ -51,7 +51,6 @@ extern "C"
     void pdp_segsnd_tilde_setup(void);
     void pdp_noquark_setup(void);
     void pdp_juxta_setup(void);
-    void pdp_capture_setup(void);
     void pdp_smuck_setup(void);
     void pdp_lumafilt_setup(void);
     void pdp_transition_setup(void);
@@ -80,6 +79,10 @@ extern "C"
     void pdp_icedthe_tilde_setup(void);
     void pdp_fdiff_setup(void);
     void pdp_hue_setup(void);
+
+#ifdef HAVE_IMAGE_MAGICK
+    void pdp_capture_setup(void);
+#endif
 
 #ifdef HAVE_PIDIP_FFMPEG
     void pdp_ffmpeg_tilde_setup(void);
@@ -138,7 +141,6 @@ void pidip_setup(void){
     pdp_segsnd_tilde_setup();
     pdp_noquark_setup();
     pdp_juxta_setup();
-    pdp_capture_setup();
     pdp_smuck_setup();
     pdp_lumafilt_setup();
     pdp_transition_setup();
@@ -167,6 +169,10 @@ void pidip_setup(void){
     pdp_icedthe_tilde_setup();
     pdp_fdiff_setup();
     pdp_hue_setup();
+
+#ifdef HAVE_IMAGE_MAGICK
+    pdp_capture_setup();
+#endif
 
 #ifdef HAVE_PIDIP_FFMPEG
     pdp_ffmpeg_tilde_setup();
