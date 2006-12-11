@@ -240,8 +240,6 @@ extern "C" void rx7_tilde_setup(void)
 			A_NULL
 			);
 
-	class_sethelpsymbol(rx7_class, gensym("help-rx7~.pd"));
-
 	class_addmethod(rx7_class, (t_method)rx7_dsp,      gensym("dsp"),  A_NULL);
 	class_addmethod(rx7_class, (t_method)rx7_loadbank, gensym("load"), A_GIMME, 0);
 	class_addmethod(rx7_class, (t_method)rx7_note, gensym("note"), A_GIMME, 0);
