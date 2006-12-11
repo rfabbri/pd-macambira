@@ -129,7 +129,7 @@ LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone deprecated ekext ext13 fla
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
-  LIB_TARGETS += hidin
+  LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
     LIB_TARGETS += hid hidio
@@ -191,6 +191,7 @@ flatspace_install: flatspace $(helpdir) $(objectsdir)
 			$(externals_src)/aenv~/*.pd \
 			$(externals_src)/arraysize/*.pd \
 			$(externals_src)/beatpipe/*.pd \
+			$(externals_src)/bsaylor/help/*.pd \
 			$(externals_src)/control/*/*.pd \
 			$(externals_src)/bbogart/chaos/tools/*.pd \
 			$(externals_src)/bbogart/*/*.pd \
@@ -215,10 +216,7 @@ flatspace_install: flatspace $(helpdir) $(objectsdir)
 			$(externals_src)/rhythm_estimator/*.p? \
 			$(externals_src)/signal/*/*.pd \
 			$(externals_src)/sprinkler/sprinkler-help.pd \
-			$(externals_src)/susloop~/*.pd \
-			$(externals_src)/svf~/*.pd \
 			$(externals_src)/vst/*.pd \
-			$(externals_src)/zhzxh~/*.pd \
 				$(helpdir)/$(FLATSPACE_NAME)
 
 
