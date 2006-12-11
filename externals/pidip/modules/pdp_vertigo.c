@@ -36,21 +36,21 @@ typedef struct pdp_vertigo_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
     short int *x_buffer;
     short int *x_current_buffer;
     short int *x_alt_buffer;
-    t_int x_dx;
-    t_int x_dy;
-    t_int x_sx;
-    t_int x_sy;
+    int x_dx;
+    int x_dy;
+    int x_sx;
+    int x_sy;
     double x_phase;
     double x_phase_increment;
     double x_zoomrate;
@@ -70,7 +70,7 @@ static void pdp_vertigo_zoomrate(t_pdp_vertigo *x, t_floatarg fzoomrate )
 
 static void pdp_vertigo_allocate(t_pdp_vertigo *x, t_floatarg fnewsize )
 {
-  t_int nsize = (int) fnewsize;
+  int nsize = (int) fnewsize;
 
     if ( x->x_buffer ) freebytes( x->x_buffer, 2*((x->x_vsize + (x->x_vsize>>1))<<1) );
     x->x_buffer = (short int *) getbytes( 2*(( nsize + (nsize>>1))<<1) );

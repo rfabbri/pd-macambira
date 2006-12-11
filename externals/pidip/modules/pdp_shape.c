@@ -34,31 +34,31 @@ typedef struct pdp_shape_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_red;
-    t_int x_green;
-    t_int x_blue;
+    int x_red;
+    int x_green;
+    int x_blue;
 
-    t_int x_cursX;
-    t_int x_cursY;
+    int x_cursX;
+    int x_cursY;
     
-    t_int x_colorY; // YUV components of selected color
-    t_int x_colorU;
-    t_int x_colorV;
+    int x_colorY; // YUV components of selected color
+    int x_colorU;
+    int x_colorV;
 
-    t_int x_tolerance;  // tolerance
-    t_int x_paint;      // paint option
-    t_int x_isolate;    // isolate option
-    t_int x_shape;      // drawing shape option
-    t_int x_luminosity; // use luminosity or not
+    int x_tolerance;  // tolerance
+    int x_paint;      // paint option
+    int x_isolate;    // isolate option
+    int x_shape;      // drawing shape option
+    int x_luminosity; // use luminosity or not
 
     short int *x_bdata;
     short int *x_bbdata;
@@ -68,15 +68,15 @@ typedef struct pdp_shape_struct
     t_outlet *x_y1; // output y1 coordinate of blob
     t_outlet *x_x2; // output x2 coordinate of blob
     t_outlet *x_y2; // output y2 coordinate of blob
-    t_int    x_vx1; // x1 coordinate of blob
-    t_int    x_vx2; // x1 coordinate of blob
-    t_int    x_vy1; // x1 coordinate of blob
-    t_int    x_vy2; // x1 coordinate of blob
+    int    x_vx1; // x1 coordinate of blob
+    int    x_vx2; // x1 coordinate of blob
+    int    x_vy1; // x1 coordinate of blob
+    int    x_vy2; // x1 coordinate of blob
 
 
 } t_pdp_shape;
 
-static void pdp_shape_allocate(t_pdp_shape *x, t_int newsize)
+static void pdp_shape_allocate(t_pdp_shape *x, int newsize)
 {
  int i;
 
@@ -117,28 +117,28 @@ static void pdp_shape_isolate(t_pdp_shape *x, t_floatarg fisolate )
 
 static void pdp_shape_paint(t_pdp_shape *x, t_floatarg fpaint )
 {
-   if ( ( (t_int)fpaint == 0 ) || ( (t_int)fpaint == 1 ) )
+   if ( ( (int)fpaint == 0 ) || ( (int)fpaint == 1 ) )
    {
-      x->x_paint = (t_int)fpaint;
+      x->x_paint = (int)fpaint;
    }
 }
 
 static void pdp_shape_shape(t_pdp_shape *x, t_floatarg fshape )
 {
-   if ( ( (t_int)fshape == 0 ) || ( (t_int)fshape == 1 ) )
+   if ( ( (int)fshape == 0 ) || ( (int)fshape == 1 ) )
    {
-      x->x_shape = (t_int)fshape;
+      x->x_shape = (int)fshape;
    }
 }
 
 static void pdp_shape_do_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y);
 static void pdp_shape_frame_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y);
 
-static t_int pdp_shape_check_point(t_pdp_shape *x, t_int nX, t_int nY)
+static int pdp_shape_check_point(t_pdp_shape *x, int nX, int nY)
 {
  short int  *pbY, *pbU, *pbV;
  short int  y, v, u;
- t_int      diff;
+ int      diff;
 
   if ( ( nX < 0 ) || ( nX >= x->x_vwidth ) || 
        ( nY < 0 ) || ( nY >= x->x_vheight ) )
@@ -163,7 +163,7 @@ static t_int pdp_shape_check_point(t_pdp_shape *x, t_int nX, t_int nY)
   return 0;
 }
 
-static void pdp_shape_propagate(t_pdp_shape *x, t_int nX, t_int nY)
+static void pdp_shape_propagate(t_pdp_shape *x, int nX, int nY)
 {
 
   if ( ( nX >= 0 ) && ( nX < x->x_vwidth ) && 
@@ -181,7 +181,7 @@ static void pdp_shape_do_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
  short int  *pbbY, *pbbU, *pbbV;
  short int  nX, nY, y, v, u;
  short int *data;
- t_int      diff, px, py, inc, maxXY;
+ int      diff, px, py, inc, maxXY;
 
   pbY = x->x_bdata;
   pbU = (x->x_bdata+x->x_vsize);
@@ -190,14 +190,14 @@ static void pdp_shape_do_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
   pbbU = (x->x_bbdata+x->x_vsize);
   pbbV = (x->x_bbdata+x->x_vsize+(x->x_vsize>>2));
 
-  if ( ( (t_int)X < 0 ) || ( (t_int)X >= x->x_vwidth ) || 
-       ( (t_int)Y < 0 ) || ( (t_int)Y >= x->x_vheight ) )
+  if ( ( (int)X < 0 ) || ( (int)X >= x->x_vwidth ) || 
+       ( (int)Y < 0 ) || ( (int)Y >= x->x_vheight ) )
   {
      return;
   }
 
-  nX = (t_int) X; 
-  nY = (t_int) Y; 
+  nX = (int) X; 
+  nY = (int) Y; 
   *(x->x_checked + nY*x->x_vwidth + nX) = 1;
 
   y = *(pbY+nY*x->x_vwidth+nX);
@@ -239,64 +239,64 @@ static void pdp_shape_do_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
      {
        for ( inc=0; inc<=maxXY; inc++ )
        {
-        nX = (t_int) X+inc; 
-        nY = (t_int) Y; 
+        nX = (int) X+inc; 
+        nY = (int) Y; 
         if ( pdp_shape_check_point( x, nX, nY ) )
         {
           pdp_shape_frame_detect( x, x->x_cursX, x->x_cursY );
           return;
         }
           
-        nX = (t_int) X-inc; 
-        nY = (t_int) Y; 
+        nX = (int) X-inc; 
+        nY = (int) Y; 
         if ( pdp_shape_check_point( x, nX, nY ) )
         {
           pdp_shape_frame_detect( x, x->x_cursX, x->x_cursY );
           return;
         }
       
-        nX = (t_int) X-inc; 
-        nY = (t_int) Y-inc; 
+        nX = (int) X-inc; 
+        nY = (int) Y-inc; 
         if ( pdp_shape_check_point( x, nX, nY ) )
         {
           pdp_shape_frame_detect( x, x->x_cursX, x->x_cursY );
           return;
         }
       
-        nX = (t_int) X; 
-        nY = (t_int) Y-inc; 
+        nX = (int) X; 
+        nY = (int) Y-inc; 
         if ( pdp_shape_check_point( x, nX, nY ) )
         {
           pdp_shape_frame_detect( x, x->x_cursX, x->x_cursY );
           return;
         }
       
-        nX = (t_int) X+inc; 
-        nY = (t_int) Y-inc; 
+        nX = (int) X+inc; 
+        nY = (int) Y-inc; 
         if ( pdp_shape_check_point( x, nX, nY ) )
         {
           pdp_shape_frame_detect( x, x->x_cursX, x->x_cursY );
           return;
         }
       
-        nX = (t_int) X-inc; 
-        nY = (t_int) Y+inc; 
+        nX = (int) X-inc; 
+        nY = (int) Y+inc; 
         if ( pdp_shape_check_point( x, nX, nY ) )
         {
           pdp_shape_frame_detect( x, x->x_cursX, x->x_cursY );
           return;
         }
       
-        nX = (t_int) X; 
-        nY = (t_int) Y+inc; 
+        nX = (int) X; 
+        nY = (int) Y+inc; 
         if ( pdp_shape_check_point( x, nX, nY ) )
         {
           pdp_shape_frame_detect( x, x->x_cursX, x->x_cursY );
           return;
         }
       
-        nX = (t_int) X+inc; 
-        nY = (t_int) Y+inc; 
+        nX = (int) X+inc; 
+        nY = (int) Y+inc; 
         if ( pdp_shape_check_point( x, nX, nY ) )
         {
           pdp_shape_frame_detect( x, x->x_cursX, x->x_cursY );
@@ -326,46 +326,46 @@ static void pdp_shape_do_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
      }
   }
 
-  nX = (t_int) X+1; 
-  nY = (t_int) Y; 
+  nX = (int) X+1; 
+  nY = (int) Y; 
   pdp_shape_propagate(x, nX, nY);
     
-  nX = (t_int) X-1; 
-  nY = (t_int) Y; 
+  nX = (int) X-1; 
+  nY = (int) Y; 
   pdp_shape_propagate(x, nX, nY);
 
-  nX = (t_int) X-1; 
-  nY = (t_int) Y-1; 
+  nX = (int) X-1; 
+  nY = (int) Y-1; 
   pdp_shape_propagate(x, nX, nY);
 
-  nX = (t_int) X; 
-  nY = (t_int) Y-1; 
+  nX = (int) X; 
+  nY = (int) Y-1; 
   pdp_shape_propagate(x, nX, nY);
 
-  nX = (t_int) X+1; 
-  nY = (t_int) Y-1; 
+  nX = (int) X+1; 
+  nY = (int) Y-1; 
   pdp_shape_propagate(x, nX, nY);
 
-  nX = (t_int) X-1; 
-  nY = (t_int) Y+1; 
+  nX = (int) X-1; 
+  nY = (int) Y+1; 
   pdp_shape_propagate(x, nX, nY);
 
-  nX = (t_int) X; 
-  nY = (t_int) Y+1; 
+  nX = (int) X; 
+  nY = (int) Y+1; 
   pdp_shape_propagate(x, nX, nY);
 
-  nX = (t_int) X+1; 
-  nY = (t_int) Y+1; 
+  nX = (int) X+1; 
+  nY = (int) Y+1; 
   pdp_shape_propagate(x, nX, nY);
 
 }
 
 static void pdp_shape_pick(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
 {
- t_int y,u,v;
+ int y,u,v;
 
-   x->x_cursX = (t_int) (X*(t_float)x->x_vwidth);
-   x->x_cursY = (t_int) (Y*(t_float)x->x_vheight);
+   x->x_cursX = (int) (X*(t_float)x->x_vwidth);
+   x->x_cursY = (int) (Y*(t_float)x->x_vheight);
    // post( "pdp_shape : pick color at : %d,%d", x->x_cursX, x->x_cursY );
    if ( ( x->x_cursX >= 0 ) && ( x->x_cursX < x->x_vwidth )
         && ( x->x_cursY >= 0 ) && ( x->x_cursY < x->x_vheight ) )
@@ -388,7 +388,7 @@ static void pdp_shape_frame_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
 {
    if ( x->x_bdata == NULL ) return;
 
-   // post( "pdp_shape : detect %d %d", (t_int)x->x_cursX, (t_int)x->x_cursY );
+   // post( "pdp_shape : detect %d %d", (int)x->x_cursX, (int)x->x_cursY );
    x->x_vx1 = -1; 
    x->x_vx2 = -1; 
    x->x_vy1 = -1; 
@@ -404,10 +404,10 @@ static void pdp_shape_frame_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
 
 static void pdp_shape_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
 {
- t_int wX, wY;
+ int wX, wY;
 
-   wX = (t_int) (X*(t_float)x->x_vwidth);
-   wY = (t_int) (Y*(t_float)x->x_vheight);
+   wX = (int) (X*(t_float)x->x_vwidth);
+   wY = (int) (Y*(t_float)x->x_vheight);
    // post( "pdp_shape : detect %d %d", wX, wY );
    if ( (wX<0) || (wX>x->x_vwidth) )
    {
@@ -445,8 +445,8 @@ static void pdp_shape_process_yv12(t_pdp_shape *x)
     short int  *pbbY, *pbbU, *pbbV;
 
     /* allocate all ressources */
-    if ( ((t_int)header->info.image.width != x->x_vwidth ) ||
-         ((t_int)header->info.image.height != x->x_vheight ) ) 
+    if ( ((int)header->info.image.width != x->x_vwidth ) ||
+         ((int)header->info.image.height != x->x_vheight ) ) 
     {
         pdp_shape_allocate(x, header->info.image.width*header->info.image.height );
         post( "pdp_shape : reallocating buffers" );

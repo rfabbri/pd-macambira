@@ -38,23 +38,23 @@ typedef struct pdp_ascii_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_color; // rendering color option
-    t_int x_brightness; // added value for brightness
+    int x_color; // rendering color option
+    int x_brightness; // added value for brightness
     t_float x_ratio;    // character to pixel ratio
 
-    t_int x_charwidth;  // width of characters 
-    t_int x_charheight; // height of characters 
-    t_int x_nbchars;    // number of characters in the map
+    int x_charwidth;  // width of characters 
+    int x_charheight; // height of characters 
+    int x_nbchars;    // number of characters in the map
     char* x_charmaps;   // the table of characters
 
     FILE  *x_filed;     // charmaps file descriptor
@@ -94,10 +94,10 @@ static void pdp_ascii_process_yv12(t_pdp_ascii *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     i, pixsum;
-    t_int     px, py, ppx, ppy;
-    t_int     rank, value;
-    t_int     pwidth, pheight, offset;
+    int     i, pixsum;
+    int     px, py, ppx, ppy;
+    int     rank, value;
+    int     pwidth, pheight, offset;
 
     x->x_vwidth = header->info.image.width;
     x->x_vheight = header->info.image.height;
@@ -243,8 +243,8 @@ static void pdp_ascii_load(t_pdp_ascii *x, t_symbol *sfile)
  char *word1 = (char*) getbytes( LINE_MAX_LENGTH );
  char *word2 = (char*) getbytes( LINE_MAX_LENGTH );
  char *word3 = (char*) getbytes( LINE_MAX_LENGTH );
- t_int charwidth, charheight, nbchars, nblines;
- t_int nbexpdata;
+ int charwidth, charheight, nbchars, nblines;
+ int nbexpdata;
  char *pdata;
  char charread;
 

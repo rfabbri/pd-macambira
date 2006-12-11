@@ -33,18 +33,18 @@ typedef struct pdp_hitandmiss_struct
 {
     t_object x_obj;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_queue_id;
-    t_int x_dropped;
+    int x_packet0;
+    int x_packet1;
+    int x_queue_id;
+    int x_dropped;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_kernelw; // width of the (square) kernel
-    t_int x_kernelh; // height of the square kernel
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_kernelw; // width of the (square) kernel
+    int x_kernelh; // height of the square kernel
     char  *x_kdata;  // kernel data
-    t_int x_nbpasses; // number of passes
+    int x_nbpasses; // number of passes
     short int *x_frame;  // keep a copy of current frame for transformations
 
     t_outlet *x_pdp_output; // output packets
@@ -55,19 +55,19 @@ static void pdp_hitandmiss_nbpasses(t_pdp_hitandmiss *x,  t_floatarg fpasses )
 {
    if ( fpasses>=1.) 
    {
-      x->x_nbpasses = (t_int)fpasses;
+      x->x_nbpasses = (int)fpasses;
    }
 }
 
 static void pdp_hitandmiss_kernelw(t_pdp_hitandmiss *x,  t_floatarg fkernelw )
 {
- t_int oldw, minw;
+ int oldw, minw;
  char *nkdata;
 
    if ( fkernelw>=0.) 
    {
       oldw = x->x_kernelw;
-      x->x_kernelw = (t_int)fkernelw;
+      x->x_kernelw = (int)fkernelw;
 
       nkdata= (char*) malloc( x->x_kernelw*x->x_kernelh );
 
@@ -85,13 +85,13 @@ static void pdp_hitandmiss_kernelw(t_pdp_hitandmiss *x,  t_floatarg fkernelw )
 
 static void pdp_hitandmiss_kernelh(t_pdp_hitandmiss *x,  t_floatarg fkernelh )
 {
- t_int oldh, minh;
+ int oldh, minh;
  char *nkdata;
 
    if ( fkernelh>=0.) 
    {
       oldh = x->x_kernelh;
-      x->x_kernelh = (t_int)fkernelh;
+      x->x_kernelh = (int)fkernelh;
 
       nkdata= (char*) malloc( x->x_kernelw*x->x_kernelh );
 
@@ -108,7 +108,7 @@ static void pdp_hitandmiss_kernelh(t_pdp_hitandmiss *x,  t_floatarg fkernelh )
 
 static void pdp_hitandmiss_kdata(t_pdp_hitandmiss *x, t_symbol *s, int argc, t_atom *argv)
 {
- t_int nbvalues, ivalue, iv;
+ int nbvalues, ivalue, iv;
 
    if ( argc > x->x_kernelw*x->x_kernelh )
    {
@@ -139,7 +139,7 @@ static void pdp_hitandmiss_kdata(t_pdp_hitandmiss *x, t_symbol *s, int argc, t_a
       }
       else
       {
-         ivalue = (t_int) argv[iv].a_w.w_float;
+         ivalue = (int) argv[iv].a_w.w_float;
          if ( ( ivalue != 0 ) && ( ivalue != 1 ) && ( ivalue != -1 ) )
          {
            post( "pdp_hitandmiss : wrong data (%d), unchanged", iv );
@@ -174,10 +174,10 @@ static void pdp_hitandmiss_process_yv12(t_pdp_hitandmiss *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     i;
-    t_int     px=0, py=0; 
+    int     i;
+    int     px=0, py=0; 
     short int *pfY, *pfU, *pfV;
-    t_int     ppx, ppy, ix, iy, pn, kx, ky;
+    int     ppx, ppy, ix, iy, pn, kx, ky;
     short int pvalue;
 
     // allocate all ressources

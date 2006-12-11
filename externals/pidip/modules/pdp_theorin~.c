@@ -63,14 +63,14 @@ typedef struct pdp_theorin_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_dropped;
+    int x_packet0;
+    int x_dropped;
 
     t_pdp *x_header;
     unsigned char *x_data;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
     t_outlet *x_pdp_out;           // output decoded pdp packets
     t_outlet *x_outlet_left;       // left audio output
@@ -83,31 +83,31 @@ typedef struct pdp_theorin_struct
     pthread_t x_decodechild;       // file decoding thread
     pthread_mutex_t x_audiolock;   // audio mutex
     pthread_mutex_t x_videolock;   // video mutex
-    t_int x_usethread;             // flag to activate decoding in a thread
-    t_int x_autoplay;              // flag to autoplay the file ( default = true )
-    t_int x_nextimage;             // flag to play next image in manual mode
-    t_int x_priority;              // priority of decoding thread
+    int x_usethread;             // flag to activate decoding in a thread
+    int x_autoplay;              // flag to autoplay the file ( default = true )
+    int x_nextimage;             // flag to play next image in manual mode
+    int x_priority;              // priority of decoding thread
 
     char  *x_filename;
     FILE  *x_infile;        // file descriptor
-    t_int x_decoding;       // decoding flag
-    t_int x_theorainit;     // flag for indicating that theora is initialized
-    t_int x_videoready;     // video ready flag
-    t_int x_noframeshits;   // number of tries without getting a frame  
-    t_int x_newpicture;     // new picture flag
-    t_int x_newpictureready;// new picture ready flag
-    t_int x_notpackets;     // number of theora packets decoded
-    t_int x_novpackets;     // number of vorbis packets decoded
-    t_int x_endoffile;      // end of the file reached
-    t_int x_nbframes;       // number of frames emitted
-    t_int x_framerate;      // framerate
-    t_int x_samplerate;     // audio sample rate
-    t_int x_audiochannels;  // audio channels
-    t_int x_blocksize;      // audio block size
-    t_int x_audioon;        // audio buffer filling flag
-    t_int x_reading;        // file reading flag
-    t_int x_cursec;         // current second
-    t_int x_secondcount;    // number of frames received in the current second
+    int x_decoding;       // decoding flag
+    int x_theorainit;     // flag for indicating that theora is initialized
+    int x_videoready;     // video ready flag
+    int x_noframeshits;   // number of tries without getting a frame  
+    int x_newpicture;     // new picture flag
+    int x_newpictureready;// new picture ready flag
+    int x_notpackets;     // number of theora packets decoded
+    int x_novpackets;     // number of vorbis packets decoded
+    int x_endoffile;      // end of the file reached
+    int x_nbframes;       // number of frames emitted
+    int x_framerate;      // framerate
+    int x_samplerate;     // audio sample rate
+    int x_audiochannels;  // audio channels
+    int x_blocksize;      // audio block size
+    int x_audioon;        // audio buffer filling flag
+    int x_reading;        // file reading flag
+    int x_cursec;         // current second
+    int x_secondcount;    // number of frames received in the current second
     struct timeval x_starttime; // reading starting time
 
       /* vorbis/theora structures */
@@ -126,10 +126,10 @@ typedef struct pdp_theorin_struct
     yuv_buffer       x_yuvbuffer;      // yuv buffer
 
       /* audio structures */
-    t_int x_audio;           // flag to activate the decoding of audio
+    int x_audio;           // flag to activate the decoding of audio
     t_float x_audio_inl[4*MAX_AUDIO_PACKET_SIZE]; // left buffer for pd
     t_float x_audio_inr[4*MAX_AUDIO_PACKET_SIZE]; // right buffer for pd
-    t_int x_audioin_position;// writing position for incoming audio
+    int x_audioin_position;// writing position for incoming audio
     t_float **x_pcm;         // buffer for vorbis decoding
 
 } t_pdp_theorin;
@@ -176,10 +176,10 @@ static void pdp_theorin_bang(t_pdp_theorin *x)
    x->x_nextimage = 1;
 }
 
-static t_int pdp_theorin_get_buffer_from_file(FILE *in, ogg_sync_state *oy)
+static int pdp_theorin_get_buffer_from_file(FILE *in, ogg_sync_state *oy)
 {
   char *buffer;
-  t_int bytes;
+  int bytes;
 
     buffer=ogg_sync_buffer(oy,4096);
     bytes=fread(buffer,1,4096,in);
@@ -187,14 +187,14 @@ static t_int pdp_theorin_get_buffer_from_file(FILE *in, ogg_sync_state *oy)
     return(bytes);
 }
 
-static t_int pdp_theorin_queue_page(t_pdp_theorin *x)
+static int pdp_theorin_queue_page(t_pdp_theorin *x)
 {
   if(x->x_notpackets) ogg_stream_pagein(&x->x_statet, &x->x_ogg_page);
   if(x->x_novpackets) ogg_stream_pagein(&x->x_statev, &x->x_ogg_page); 
   return 0;
 }
 
-static t_int pdp_theorin_decode_packet(t_pdp_theorin *x)
+static int pdp_theorin_decode_packet(t_pdp_theorin *x)
 {
   int ret, count, maxsamples, samples, si=0, sj=0;
   struct timespec mwait;
@@ -204,7 +204,7 @@ static t_int pdp_theorin_decode_packet(t_pdp_theorin *x)
   unsigned char *pY, *pU, *pV; 
   unsigned char *psY, *psU, *psV; 
   t_float **lpcm;
-  t_int px, py;
+  int px, py;
 
    // post( "pdp_theorin~ : decode packet" );
 
@@ -397,7 +397,7 @@ static void *pdp_decode_file(void *tdata)
 {
   t_pdp_theorin *x = (t_pdp_theorin*)tdata;
   struct sched_param schedprio;
-  t_int pmin, pmax, p1;
+  int pmin, pmax, p1;
   struct timespec twait;
 
     twait.tv_sec = 0; 
@@ -434,7 +434,7 @@ static void *pdp_decode_file(void *tdata)
 
 static void pdp_theorin_close(t_pdp_theorin *x)
 {
- t_int ret, i, count=0;
+ int ret, i, count=0;
  struct timespec twait;
 
    twait.tv_sec = 0; 
@@ -497,7 +497,7 @@ static void pdp_theorin_close(t_pdp_theorin *x)
 
 static void pdp_theorin_open(t_pdp_theorin *x, t_symbol *s)
 {
-  t_int ret, i;
+  int ret, i;
   pthread_attr_t decode_child_attr;
   ogg_stream_state o_tempstate;
   struct stat fileinfos;
@@ -631,7 +631,7 @@ static void pdp_theorin_open(t_pdp_theorin *x, t_symbol *s)
    if( x->x_notpackets )
    {
      theora_decode_init(&x->x_theora_state, &x->x_theora_info);
-     x->x_framerate = (t_int)x->x_theora_info.fps_numerator/x->x_theora_info.fps_denominator;
+     x->x_framerate = (int)x->x_theora_info.fps_numerator/x->x_theora_info.fps_denominator;
      // post("pdp_theorin~ : stream %x is theora %dx%d %d fps video.",
      //                      x->x_statet.serialno,
      //                      x->x_theora_info.width,x->x_theora_info.height,
@@ -767,7 +767,7 @@ static t_int *pdp_theorin_perform(t_int *w)
   t_pdp_theorin *x = (t_pdp_theorin *)(w[3]);
   int n = (int)(w[4]);                      // number of samples 
   struct timeval etime;
-  t_int sn;
+  int sn;
 
     // decode a packet if not in thread mode
     if ( !x->x_usethread && x->x_reading )

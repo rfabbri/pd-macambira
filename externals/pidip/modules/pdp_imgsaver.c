@@ -37,23 +37,23 @@ typedef struct pdp_imgsaver_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_save_pending;
+    int x_save_pending;
 
         /* imlib data */
     Imlib_Image x_image;
     DATA32     *x_imdata;
-    t_int       x_iwidth;
-    t_int       x_iheight;
+    int       x_iwidth;
+    int       x_iheight;
 
     t_symbol    *x_filename;
     short int   *x_datas;
@@ -66,7 +66,7 @@ static void *pdp_imgsaver_do_save(void *tdata)
 {
   Imlib_Load_Error imliberr;
   t_pdp_imgsaver *x = (t_pdp_imgsaver*) tdata;
-  t_int px, py;
+  int px, py;
   short int *pY, *pU, *pV;
   unsigned char y, u, v;
 
@@ -195,7 +195,7 @@ static void pdp_imgsaver_process_yv12(t_pdp_imgsaver *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     px, py;
+    int     px, py;
     t_float   alpha, factor;
     unsigned  char y, u, v;
     short int *pY, *pU, *pV;

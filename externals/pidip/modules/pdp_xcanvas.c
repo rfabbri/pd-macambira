@@ -40,26 +40,26 @@ typedef struct pdp_xcanvas_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_opacket;
+    int x_opacket;
 
-    t_int x_current;
+    int x_current;
     t_float x_xmouse;
     t_float x_ymouse;
 
-    t_int *x_packets;
-    t_int *x_widths;
-    t_int *x_heights;
+    int *x_packets;
+    int *x_widths;
+    int *x_heights;
     t_float *x_xoffsets;
     t_float *x_yoffsets;
-    t_int *x_sizes;
+    int *x_sizes;
 
-    t_int x_owidth;
-    t_int x_oheight;
-    t_int x_osize;
-    t_int x_nbinputs;
+    int x_owidth;
+    int x_oheight;
+    int x_osize;
+    int x_nbinputs;
 
     // X data
     t_outlet      *x_events;
@@ -140,13 +140,13 @@ static void pdp_xcanvas_cursor(t_pdp_xcanvas *x, t_floatarg f)
 
 static void pdp_xcanvas_process_yv12(t_pdp_xcanvas *x)
 {
-  t_int     px, py, ppx, ppy, ii, nbs;
+  int     px, py, ppx, ppy, ii, nbs;
   char      *pY, *pU, *pV;
   char      *ppY, *ppU, *ppV;
   t_pdp     *oheader;
   char      *odata, *pdata;
   t_pdp     *iheader;
-  t_int     mx, dx, my, dy;
+  int     mx, dx, my, dy;
 
   if ( !x->x_initialized )
   {
@@ -213,12 +213,12 @@ static void pdp_xcanvas_process_yv12(t_pdp_xcanvas *x)
 
       for ( py=x->x_yoffsets[ii]+my; py<x->x_yoffsets[ii]+dy; py++)
       {
-         memcpy( pY+(py*x->x_owidth)+(t_int)x->x_xoffsets[ii]+mx, 
-                     ppY+(py-(t_int)x->x_yoffsets[ii])*x->x_widths[ii]+mx, dx );
-         memcpy( pU+((py>>1)*(x->x_owidth>>1))+((t_int)(x->x_xoffsets[ii]+mx)>>1), 
-                     ppU+((py-(t_int)x->x_yoffsets[ii])>>1)*(x->x_widths[ii]>>1)+(mx>>1), (dx>>1) );
-         memcpy( pV+((py>>1)*(x->x_owidth>>1))+((t_int)(x->x_xoffsets[ii]+mx)>>1), 
-                     ppV+((py-(t_int)x->x_yoffsets[ii])>>1)*(x->x_widths[ii]>>1)+(mx>>1), (dx>>1) );
+         memcpy( pY+(py*x->x_owidth)+(int)x->x_xoffsets[ii]+mx, 
+                     ppY+(py-(int)x->x_yoffsets[ii])*x->x_widths[ii]+mx, dx );
+         memcpy( pU+((py>>1)*(x->x_owidth>>1))+((int)(x->x_xoffsets[ii]+mx)>>1), 
+                     ppU+((py-(int)x->x_yoffsets[ii])>>1)*(x->x_widths[ii]>>1)+(mx>>1), (dx>>1) );
+         memcpy( pV+((py>>1)*(x->x_owidth>>1))+((int)(x->x_xoffsets[ii]+mx)>>1), 
+                     ppV+((py-(int)x->x_yoffsets[ii])>>1)*(x->x_widths[ii]>>1)+(mx>>1), (dx>>1) );
       }
     }
   }
@@ -240,7 +240,7 @@ static void pdp_xcanvas_display_packet(t_pdp_xcanvas *x)
   XFlush(x->x_xvid.dpy);
 }
 
-static void pdp_xcanvas_process(t_pdp_xcanvas *x, t_int ni)
+static void pdp_xcanvas_process(t_pdp_xcanvas *x, int ni)
 {
    int encoding;
    t_pdp *header = 0;
@@ -278,7 +278,7 @@ static void pdp_xcanvas_offset(t_pdp_xcanvas *x, t_floatarg ni, t_floatarg xoffs
 
 static void pdp_xcanvas_select(t_pdp_xcanvas *x, t_floatarg X, t_floatarg Y)
 {
- t_int ii;
+ int ii;
 
   x->x_current = -1;
   X = X*x->x_owidth;
@@ -319,7 +319,7 @@ static void pdp_xcanvas_unselect(t_pdp_xcanvas *x)
   x->x_current = -1;
 }
 
-static void pdp_xcanvas_input(t_pdp_xcanvas *x, t_symbol *s, t_floatarg f, t_int ni)
+static void pdp_xcanvas_input(t_pdp_xcanvas *x, t_symbol *s, t_floatarg f, int ni)
 {
   t_pdp     *header;
   short int *data;
@@ -403,7 +403,7 @@ static void pdp_xcanvas_input9(t_pdp_xcanvas *x, t_symbol *s, t_floatarg f)
 
 static void pdp_xcanvas_free(t_pdp_xcanvas *x)
 {
- t_int ii;
+ int ii;
 
   pdp_queue_finish(x->x_queue_id);
   for ( ii=0; ii<x->x_nbinputs; ii++)
@@ -411,10 +411,10 @@ static void pdp_xcanvas_free(t_pdp_xcanvas *x)
     pdp_packet_mark_unused(x->x_packets[ii]);
   }
   pdp_packet_mark_unused(x->x_opacket);
-  if ( x->x_packets ) freebytes( x->x_packets, x->x_nbinputs*sizeof(t_int) );
-  if ( x->x_widths ) freebytes( x->x_widths, x->x_nbinputs*sizeof(t_int) );
-  if ( x->x_heights ) freebytes( x->x_heights, x->x_nbinputs*sizeof(t_int) );
-  if ( x->x_sizes ) freebytes( x->x_sizes, x->x_nbinputs*sizeof(t_int) );
+  if ( x->x_packets ) freebytes( x->x_packets, x->x_nbinputs*sizeof(int) );
+  if ( x->x_widths ) freebytes( x->x_widths, x->x_nbinputs*sizeof(int) );
+  if ( x->x_heights ) freebytes( x->x_heights, x->x_nbinputs*sizeof(int) );
+  if ( x->x_sizes ) freebytes( x->x_sizes, x->x_nbinputs*sizeof(int) );
   if ( x->x_xoffsets ) freebytes( x->x_xoffsets, x->x_nbinputs*sizeof(t_float) );
   if ( x->x_yoffsets ) freebytes( x->x_yoffsets, x->x_nbinputs*sizeof(t_float) );
   pdp_xcanvas_destroy(x);
@@ -427,7 +427,7 @@ t_class *pdp_xcanvas_class;
 void *pdp_xcanvas_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_pdp_xcanvas *x = (t_pdp_xcanvas *)pd_new(pdp_xcanvas_class);
-  t_int ii;
+  int ii;
   char *imes[32];
 
   if ( argc != 3 )
@@ -473,10 +473,10 @@ void *pdp_xcanvas_new(t_symbol *s, int argc, t_atom *argv)
 
   post ( "pdp_xcanvas : new %dx%d canvas with %d inputs", x->x_owidth, x->x_oheight, x->x_nbinputs );
 
-  x->x_packets = ( t_int* ) getbytes( x->x_nbinputs*sizeof(t_int) );
-  x->x_widths = ( t_int* ) getbytes( x->x_nbinputs*sizeof(t_int) );
-  x->x_heights = ( t_int* ) getbytes( x->x_nbinputs*sizeof(t_int) );
-  x->x_sizes = ( t_int* ) getbytes( x->x_nbinputs*sizeof(t_int) );
+  x->x_packets = ( int* ) getbytes( x->x_nbinputs*sizeof(int) );
+  x->x_widths = ( int* ) getbytes( x->x_nbinputs*sizeof(int) );
+  x->x_heights = ( int* ) getbytes( x->x_nbinputs*sizeof(int) );
+  x->x_sizes = ( int* ) getbytes( x->x_nbinputs*sizeof(int) );
   x->x_xoffsets = ( t_float* ) getbytes( x->x_nbinputs*sizeof(t_float) );
   x->x_yoffsets = ( t_float* ) getbytes( x->x_nbinputs*sizeof(t_float) );
 

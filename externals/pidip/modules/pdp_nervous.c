@@ -44,23 +44,23 @@ typedef struct pdp_nervous_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_mode;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_mode;
     short int *x_buffer;
     short int **x_planetable;
-    t_int x_planes;
-    t_int x_plane;
-    t_int x_stock;
-    t_int x_timer;
-    t_int x_stride;
-    t_int x_readplane;
+    int x_planes;
+    int x_plane;
+    int x_stock;
+    int x_timer;
+    int x_stride;
+    int x_readplane;
 
 } t_pdp_nervous;
 

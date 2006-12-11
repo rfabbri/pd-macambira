@@ -39,24 +39,24 @@ typedef struct pdp_aa_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
       /* aalib structures */
     aa_context  *x_context;   // a lot of things and image data
     aa_renderparams  x_renderparams;  // rendering parameters
     char* x_driver;    // name of driver
-    t_int x_render;    // rendering option
+    int x_render;    // rendering option
 
     char **x_aa_options;  // aa options passed as arguments
-    t_int x_nb_options;    // number of aa options
+    int x_nb_options;    // number of aa options
 
 } t_pdp_aa;
 
@@ -135,9 +135,9 @@ static void pdp_aa_process_yv12(t_pdp_aa *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     i, pixsum;
-    t_int     px, py, ppx, ppy;
-    t_int     hratio, wratio;
+    int     i, pixsum;
+    int     px, py, ppx, ppy;
+    int     hratio, wratio;
 
     if (  ( (int)header->info.image.width != x->x_vwidth ) ||
           ( (int)header->info.image.height != x->x_vheight ) )

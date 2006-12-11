@@ -38,16 +38,16 @@ typedef struct pdp_lumafilt_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_filter[MAX_LUMA]; // transform number
+    int x_filter[MAX_LUMA]; // transform number
 
 } t_pdp_lumafilt;
 
@@ -74,7 +74,7 @@ static void pdp_lumafilt_filter(t_pdp_lumafilt *x, t_floatarg fluma, t_floatarg 
 
 static void pdp_lumafilt_mfilter(t_pdp_lumafilt *x, t_floatarg flumas, t_floatarg flumae, t_floatarg fonoff )
 {
-  t_int li;
+  int li;
 
   if ( ( (int)flumas >= 0 ) && ( (int)flumas < MAX_LUMA ) &&
        ( (int)flumae >= 0 ) && ( (int)flumae < MAX_LUMA ) &&
@@ -96,7 +96,7 @@ static void pdp_lumafilt_process_yv12(t_pdp_lumafilt *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     px, py, luma;
+    int     px, py, luma;
     short     int *pnY, *pnU, *pnV;
 
     /* allocate all ressources */

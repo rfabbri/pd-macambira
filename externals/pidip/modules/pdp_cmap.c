@@ -52,10 +52,10 @@ extern t_rtext *glist_findrtext(t_glist *gl, t_text *who);
 
 typedef struct _color
 {
-    t_int on;
-    t_int y,u,v;
-    t_int oy,ou,ov;
-    t_int tolerance;
+    int on;
+    int y,u,v;
+    int oy,ou,ov;
+    int tolerance;
 } t_color;
 
 #define COLORHEIGHT 5
@@ -68,26 +68,26 @@ typedef struct pdp_cmap_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_dropped;
+    int x_packet0;
+    int x_dropped;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_capacity; // number of mapped colors
-    t_int x_current;  // current color
+    int x_capacity; // number of mapped colors
+    int x_current;  // current color
     t_color *x_colors; // color substitution table
 
-    t_int x_cursor; // show cursor or not
-    t_int x_luminosity; // use luminosity or not
+    int x_cursor; // show cursor or not
+    int x_luminosity; // use luminosity or not
 
-    t_int x_colorR; // setable r
-    t_int x_colorG; // setable g
-    t_int x_colorB; // setable b
+    int x_colorR; // setable r
+    int x_colorG; // setable g
+    int x_colorB; // setable b
 
-    t_int x_cursX;  // X coordinate of cursor
-    t_int x_cursY;  // Y coordinate of cursor
+    int x_cursX;  // X coordinate of cursor
+    int x_cursY;  // Y coordinate of cursor
     short int *x_frame;  // keep a copy of current frame for picking color
 
     t_outlet *x_pdp_output; // output packets
@@ -96,9 +96,9 @@ typedef struct pdp_cmap_struct
 
 } t_pdp_cmap;
 
-static void pdp_cmap_draw_color(t_pdp_cmap *x, t_int r, t_int g, t_int b)
+static void pdp_cmap_draw_color(t_pdp_cmap *x, int r, int g, int b)
 {
- t_int width, height;
+ int width, height;
  char color[32];
 
     sprintf( color, "#%.2X%.2X%.2X", r, g, b );
@@ -189,7 +189,7 @@ static void pdp_cmap_delete(t_pdp_cmap *x, t_floatarg fcolor )
 
 static void pdp_cmap_clear(t_pdp_cmap *x)
 {
-  t_int ci;
+  int ci;
 
    for ( ci=0; ci<x->x_capacity; ci++)
    {
@@ -201,7 +201,7 @@ static void pdp_cmap_clear(t_pdp_cmap *x)
 static void pdp_cmap_resize(t_pdp_cmap *x,  t_floatarg fnewsize  )
 {
   t_color *colors;
-  t_int ci, csize;
+  int ci, csize;
 
     if ( (int) fnewsize<=0 ) return;
 
@@ -267,7 +267,7 @@ static void pdp_cmap_cursor(t_pdp_cmap *x, t_floatarg fcursor )
 
 static void pdp_cmap_pick(t_pdp_cmap *x)
 {
- t_int y,u,v;
+ int y,u,v;
 
    if ( x->x_frame && ( x->x_cursX > 0 ) && ( x->x_cursX < x->x_vwidth ) 
         && ( x->x_cursY > 0 ) && ( x->x_cursY < x->x_vheight ) )
@@ -309,12 +309,12 @@ static void pdp_cmap_process_yv12(t_pdp_cmap *x)
 {
     t_pdp     *header = pdp_packet_header(x->x_packet0);
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
-    t_int     i, ci;
-    t_int     px=0, py=0, ppx=0, ppy=0; 
-    t_int     y=0, u=0, v=0;
+    int     i, ci;
+    int     px=0, py=0, ppx=0, ppy=0; 
+    int     y=0, u=0, v=0;
     short int *pfY, *pfU, *pfV;
     short int *poY, *poU, *poV;
-    t_int     diff;
+    int     diff;
 
     /* allocate all ressources */
     if ( ( (int)header->info.image.width != x->x_vwidth ) ||
@@ -471,7 +471,7 @@ t_class *pdp_cmap_class;
 
 void *pdp_cmap_new(void)
 {
-  t_int ci;
+  int ci;
 
     t_pdp_cmap *x = (t_pdp_cmap *)pd_new(pdp_cmap_class);
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("current"));

@@ -70,14 +70,14 @@ typedef struct pdp_icedthe_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_dropped;
+    int x_packet0;
+    int x_dropped;
 
     t_pdp *x_header;
     unsigned char *x_data;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
     t_outlet *x_pdp_out;           // output decoded pdp packets
     t_outlet *x_outlet_left;       // left audio output
@@ -92,35 +92,35 @@ typedef struct pdp_icedthe_struct
     pthread_t x_connectchild;      // connecting thread
     pthread_mutex_t x_audiolock;   // audio mutex
     pthread_mutex_t x_videolock;   // video mutex
-    t_int x_priority;              // priority of decoding thread
+    int x_priority;              // priority of decoding thread
 
     char  *x_url;           // url to connect to
     char  *x_hostname;      // hostname of the server ( or IP )
     char  *x_mountpoint;    // mountpoint requested
-    t_int x_bitrate;        // bitrate of stream read at connection time
+    int x_bitrate;        // bitrate of stream read at connection time
     char  *x_name;          // name of stream 
     char  *x_genre;         // genre of stream
-    t_int x_portnum;        // port number
-    t_int x_insock;         // socket file descriptor
-    t_int x_decoding;       // decoding flag
-    t_int x_theorainit;     // flag for indicating that theora is initialized
-    t_int x_videoready;     // video ready flag
-    t_int x_newpicture;     // new picture flag
-    t_int x_notpackets;     // number of theora packets decoded
-    t_int x_novpackets;     // number of vorbis packets decoded
-    t_int x_nbnostream;     // number of cycles without a video stream
-    t_int x_endofstream;    // end of the stream reached
-    t_int x_nbframes;       // number of frames emitted
+    int x_portnum;        // port number
+    int x_insock;         // socket file descriptor
+    int x_decoding;       // decoding flag
+    int x_theorainit;     // flag for indicating that theora is initialized
+    int x_videoready;     // video ready flag
+    int x_newpicture;     // new picture flag
+    int x_notpackets;     // number of theora packets decoded
+    int x_novpackets;     // number of vorbis packets decoded
+    int x_nbnostream;     // number of cycles without a video stream
+    int x_endofstream;    // end of the stream reached
+    int x_nbframes;       // number of frames emitted
     t_float x_framerate;    // framerate
-    t_int x_forcedframerate;// the framerate we want to receive
-    t_int x_samplerate;     // audio sample rate
-    t_int x_audiochannels;  // audio channels
-    t_int x_blocksize;      // audio block size
-    t_int x_audioon;        // audio buffer filling flag
-    t_int x_connected;      // connection flag
-    t_int x_pconnected;     // previous state
-    t_int x_cursec;         // current second
-    t_int x_secondcount;    // number of frames received in the current second
+    int x_forcedframerate;// the framerate we want to receive
+    int x_samplerate;     // audio sample rate
+    int x_audiochannels;  // audio channels
+    int x_blocksize;      // audio block size
+    int x_audioon;        // audio buffer filling flag
+    int x_connected;      // connection flag
+    int x_pconnected;     // previous state
+    int x_cursec;         // current second
+    int x_secondcount;    // number of frames received in the current second
     struct timeval x_starttime; // reading starting time
     char  x_request[STRBUF_SIZE]; // string to be send to server
 
@@ -144,16 +144,16 @@ typedef struct pdp_icedthe_struct
     double           x_ptime;          // previous state
 
       /* audio structures */
-    t_int x_audio;           // flag to activate the decoding of audio
+    int x_audio;           // flag to activate the decoding of audio
     t_float x_audio_inl[4*MAX_AUDIO_PACKET_SIZE]; /* buffer for float audio decoded from ogg */
     t_float x_audio_inr[4*MAX_AUDIO_PACKET_SIZE]; /* buffer for float audio decoded from ogg */
-    t_int x_audioin_position; // writing position for incoming audio
+    int x_audioin_position; // writing position for incoming audio
 
 } t_pdp_icedthe;
 
 static void pdp_icedthe_priority(t_pdp_icedthe *x, t_floatarg fpriority )
 {
-   if ( ( (t_int)fpriority >= MIN_PRIORITY ) && ( (t_int)fpriority <= MAX_PRIORITY ) )
+   if ( ( (int)fpriority >= MIN_PRIORITY ) && ( (int)fpriority <= MAX_PRIORITY ) )
    {
      x->x_priority = (int)fpriority;
    }
@@ -189,7 +189,7 @@ static int strip_ice_header(char *head, int n)
 
 static void pdp_icedthe_disconnect(t_pdp_icedthe *x)
 {
- t_int ret, i, count=0;
+ int ret, i, count=0;
  struct timespec twait;
 
    twait.tv_sec = 0; 
@@ -249,10 +249,10 @@ static void pdp_icedthe_disconnect(t_pdp_icedthe *x)
    x->x_endofstream = 1;
 }
 
-static t_int pdp_icedthe_get_buffer_from_network(t_int socket, ogg_sync_state *oy)
+static int pdp_icedthe_get_buffer_from_network(int socket, ogg_sync_state *oy)
 {
   char *buffer;
-  t_int bytes;
+  int bytes;
 
     buffer=ogg_sync_buffer(oy, NET_BUFFER_SIZE);
     if ( ( bytes = read( socket, buffer, NET_BUFFER_SIZE ) ) < 0 )
@@ -265,7 +265,7 @@ static t_int pdp_icedthe_get_buffer_from_network(t_int socket, ogg_sync_state *o
     return(bytes);
 }
 
-static t_int pdp_icedthe_queue_page(t_pdp_icedthe *x)
+static int pdp_icedthe_queue_page(t_pdp_icedthe *x)
 {
  
   if(x->x_notpackets) 
@@ -289,7 +289,7 @@ static t_int pdp_icedthe_queue_page(t_pdp_icedthe *x)
   return 0;
 }
 
-static t_int pdp_icedthe_decode_stream(t_pdp_icedthe *x)
+static int pdp_icedthe_decode_stream(t_pdp_icedthe *x)
 {
   int ret, count, maxsamples, samples, si=0, sj=0;
   float **pcm;
@@ -299,7 +299,7 @@ static t_int pdp_icedthe_decode_stream(t_pdp_icedthe *x)
   long long ttheoretical;
   unsigned char *pY, *pU, *pV; 
   unsigned char *psY, *psU, *psV; 
-  t_int px, py;
+  int px, py;
 
    // post( "pdp_icedthe~ : decode packet" );
 
@@ -477,7 +477,7 @@ static void *pdp_icedthe_decode(void *tdata)
 {
   t_pdp_icedthe *x = (t_pdp_icedthe*)tdata;
   struct sched_param schedprio;
-  t_int pmin, pmax, p1;
+  int pmin, pmax, p1;
   struct timespec twait;
 
     twait.tv_sec = 0; 
@@ -521,7 +521,7 @@ static void *pdp_icedthe_decode(void *tdata)
 static void pdp_icedthe_split_url(t_pdp_icedthe *x)
 {
   char *hostptr = NULL, *p, *endhost = NULL, *pathptr = NULL;
-  t_int length;
+  int length;
 
      /* strip http:// or ftp:// */
    p = x->x_url;
@@ -552,7 +552,7 @@ static void pdp_icedthe_split_url(t_pdp_icedthe *x)
          break;
    }
 
-   length = (t_int)(endhost - hostptr);
+   length = (int)(endhost - hostptr);
    if ( x->x_hostname ) 
    {
      post ("pdp_icedthe~ : freeing hostname" );
@@ -577,15 +577,15 @@ static void *pdp_icedthe_do_connect(void *tdata)
   pthread_attr_t decode_child_attr;
   ogg_stream_state o_tempstate;
   t_pdp_icedthe *x = (t_pdp_icedthe*)tdata;
-  t_int         sockfd;
+  int         sockfd;
   struct        sockaddr_in server;
   struct        hostent *hp;
   fd_set        fdset;
   struct timeval tv;
-  t_int         numrelocs = 0;
-  t_int         i, ret, rest, nanswers=0;
+  int         numrelocs = 0;
+  int         i, ret, rest, nanswers=0;
   char          *cpoint = NULL;
-  t_int         offset = 0, endofheaders = 0, wpackets = 0;
+  int         offset = 0, endofheaders = 0, wpackets = 0;
   char          *sptr = NULL;
    
    if ( x->x_insock != -1 )
@@ -1113,7 +1113,7 @@ static void *pdp_icedthe_do_connect(void *tdata)
 
 static void pdp_icedthe_connect(t_pdp_icedthe *x, t_symbol *s)
 {
-  t_int ret, i;
+  int ret, i;
   pthread_attr_t connect_child_attr;
 
    if ( x->x_connectchild != 0 )
@@ -1168,7 +1168,7 @@ static t_int *pdp_icedthe_perform(t_int *w)
   t_pdp_icedthe *x = (t_pdp_icedthe *)(w[3]);
   int n = (int)(w[4]);                       // number of samples 
   struct timeval etime;
-  t_int sn;
+  int sn;
 
     x->x_blocksize = n;
 

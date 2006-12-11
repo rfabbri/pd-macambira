@@ -36,23 +36,23 @@ typedef struct pdp_cycle_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_cycley; // flag to activate y cycling
-    t_int x_cycleu; // flag to activate u cycling
-    t_int x_cyclev; // flag to activate v cycling
+    int x_cycley; // flag to activate y cycling
+    int x_cycleu; // flag to activate u cycling
+    int x_cyclev; // flag to activate v cycling
 
-    t_int x_yoffset;
-    t_int x_uoffset;
-    t_int x_voffset;
+    int x_yoffset;
+    int x_uoffset;
+    int x_voffset;
 
 } t_pdp_cycle;
 
@@ -86,8 +86,8 @@ static void pdp_cycle_process_yv12(t_pdp_cycle *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     i;
-    t_int     px, py, y, u, v;
+    int     i;
+    int     px, py, y, u, v;
 
     x->x_vwidth = header->info.image.width;
     x->x_vheight = header->info.image.height;

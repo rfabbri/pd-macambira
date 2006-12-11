@@ -35,17 +35,17 @@ typedef struct pdp_cropper_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_csizex;
-    t_int x_csizey;
-    t_int x_csizev;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_csizex;
+    int x_csizey;
+    int x_csizev;
     unsigned int x_encoding;
 
     int       x_cropx1;
@@ -59,7 +59,7 @@ static void pdp_cropper_cropx1(t_pdp_cropper *x, t_floatarg fcropx1 )
 {
     if ( ( fcropx1>=0 ) && ( fcropx1<x->x_vwidth ) )
     {
-       x->x_cropx1 = (t_int)fcropx1;
+       x->x_cropx1 = (int)fcropx1;
     }
 }
 
@@ -67,7 +67,7 @@ static void pdp_cropper_cropx2(t_pdp_cropper *x, t_floatarg fcropx2 )
 {
     if ( ( fcropx2>=0 ) && ( fcropx2<x->x_vwidth ) )
     {
-       x->x_cropx2 = (t_int)fcropx2;
+       x->x_cropx2 = (int)fcropx2;
     }
 }
 
@@ -75,7 +75,7 @@ static void pdp_cropper_cropy1(t_pdp_cropper *x, t_floatarg fcropy1 )
 {
     if ( ( fcropy1>=0 ) && ( fcropy1<x->x_vheight ) )
     {
-       x->x_cropy1 = (t_int)fcropy1;
+       x->x_cropy1 = (int)fcropy1;
     }
 }
 
@@ -83,7 +83,7 @@ static void pdp_cropper_cropy2(t_pdp_cropper *x, t_floatarg fcropy2 )
 {
     if ( ( fcropy2>=0 ) && ( fcropy2<x->x_vheight ) )
     {
-       x->x_cropy2 = (t_int)fcropy2;
+       x->x_cropy2 = (int)fcropy2;
     }
 }
 
@@ -102,8 +102,8 @@ static void pdp_cropper_process_yv12(t_pdp_cropper *x)
     int miny, maxy;
 
     /* allocate all ressources */
-    if ( ( (t_int)header->info.image.width != x->x_vwidth ) ||
-         ( (t_int)header->info.image.height != x->x_vheight ) ) 
+    if ( ( (int)header->info.image.width != x->x_vwidth ) ||
+         ( (int)header->info.image.height != x->x_vheight ) ) 
     {
        x->x_vwidth = header->info.image.width;
        x->x_vheight = header->info.image.height;

@@ -34,8 +34,6 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <quicktime/quicktime.h>
-#include <quicktime/colormodels.h>
 #include <bzlib.h> // bz2 compression routines
 
 #define DEFAULT_FRAME_RATE 25
@@ -47,26 +45,26 @@ typedef struct pdp_o_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_hsize;   // size of huffman coded data
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_hsize;   // size of huffman coded data
 
-    t_int x_packet0;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_emitflag;
+    int x_emitflag;
 
         /* connection data        */
     int x_fd;          // info about connection status 
-    t_int x_framessent;
-    t_int x_framesdropped;
-    t_int x_secondcount;
-    t_int x_bandwidthcount;
-    t_int x_cursec;
-    t_int x_framerate;
-    t_int x_smoothing;
+    int x_framessent;
+    int x_framesdropped;
+    int x_secondcount;
+    int x_bandwidthcount;
+    int x_cursec;
+    int x_framerate;
+    int x_smoothing;
  
     t_hpacket x_hpacket; // packet header
 
@@ -137,9 +135,9 @@ static void pdp_o_smoothing(t_pdp_o *x, t_floatarg fsmoothing)
 }
 
     /* smoothe image */
-static void pdp_o_smoothe(t_pdp_o *x, short int *source, t_int size )
+static void pdp_o_smoothe(t_pdp_o *x, short int *source, int size )
 {
-  t_int i;
+  int i;
   char evalue, eevalue;
   char value;
 
@@ -179,12 +177,12 @@ static void pdp_o_smoothe(t_pdp_o *x, short int *source, t_int size )
 }
 
     /* huffman coding */
-static int pdp_o_huffman(t_pdp_o *x, char *source, char *dest, t_int size, t_int *csize )
+static int pdp_o_huffman(t_pdp_o *x, char *source, char *dest, int size, int *csize )
 {
-  t_int i;
+  int i;
   int value = source[0];
   char count = 0;
-  t_int tcount=0;
+  int tcount=0;
   char *pcount=dest;
   char *pvalue=dest+1;
 
@@ -320,7 +318,7 @@ static void pdp_o_process_yv12(t_pdp_o *x)
 {
     t_pdp     *header = pdp_packet_header(x->x_packet0);
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
-    t_int     count, i, ret=0;
+    int     count, i, ret=0;
 
     /* setting video track */
     if ( x->x_emitflag )
@@ -341,7 +339,7 @@ static void pdp_o_process_yv12(t_pdp_o *x)
 
       for ( i=0; i<x->x_vsize; i++ )
       {
-        t_int downvalue;
+        int downvalue;
           
           downvalue = (data[i]>>7);
           if ( ( downvalue > 128 ) || 
@@ -361,7 +359,7 @@ static void pdp_o_process_yv12(t_pdp_o *x)
       }
       for ( i=x->x_vsize; i<(x->x_vsize+(x->x_vsize>>1)); i++ )
       {
-        t_int downvalue;
+        int downvalue;
           
           downvalue = (data[i]>>8);
           if ( ( downvalue > 128 ) || 

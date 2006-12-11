@@ -37,22 +37,22 @@ typedef struct pdp_spotlight_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_cx;         // coordinates of lens center
-    t_int x_cy;         // coordinates of lens center
-    t_int x_ssize;      // width of the spotlight
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_cx;         // coordinates of lens center
+    int x_cy;         // coordinates of lens center
+    int x_ssize;      // width of the spotlight
     t_float x_strength; // strength of the light (0<=strength<=1) 
     
-    t_int x_colorR;   // red component of the color
-    t_int x_colorG;   // green component of the color
-    t_int x_colorB;   // blue component of the color
+    int x_colorR;   // red component of the color
+    int x_colorG;   // green component of the color
+    int x_colorB;   // blue component of the color
 
 } t_pdp_spotlight;
 

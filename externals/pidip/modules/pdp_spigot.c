@@ -35,12 +35,12 @@ typedef struct pdp_spigot_struct
 
     t_outlet *x_outlet0;
     t_outlet *x_outlet1;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_packet0;
-    t_int x_toggle;
+    int x_packet0;
+    int x_toggle;
 
 } t_pdp_spigot;
 
@@ -58,7 +58,7 @@ static void pdp_spigot_process_packet(t_pdp_spigot *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = 0;
     short int *newdata = 0;
-    t_int     newpacket = -1, i;
+    int     newpacket = -1, i;
 
     x->x_vwidth = header->info.image.width;
     x->x_vheight = header->info.image.height;

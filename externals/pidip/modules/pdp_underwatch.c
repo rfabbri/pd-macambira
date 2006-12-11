@@ -37,21 +37,21 @@ typedef struct pdp_underwatch_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_line;
-    t_int x_sline;
-    t_int x_sheight;
-    t_int x_prevline;
-    t_int x_prevsline;
-    t_int x_prevsheight;
-    t_int x_stripsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_line;
+    int x_sline;
+    int x_sheight;
+    int x_prevline;
+    int x_prevsline;
+    int x_prevsheight;
+    int x_stripsize;
 
 } t_pdp_underwatch;
 

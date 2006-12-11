@@ -32,20 +32,20 @@ typedef struct pdp_binary_struct
 {
     t_object x_obj;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_queue_id;
-    t_int x_dropped;
+    int x_packet0;
+    int x_packet1;
+    int x_queue_id;
+    int x_dropped;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_colorY; // YUV components of binary mask
-    t_int x_colorU;
-    t_int x_colorV;
-    t_int x_cursX; // X position of the cursor
-    t_int x_cursY; // Y position of the cursor
-    t_int x_tolerance; // tolerance 
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_colorY; // YUV components of binary mask
+    int x_colorU;
+    int x_colorV;
+    int x_cursX; // X position of the cursor
+    int x_cursY; // Y position of the cursor
+    int x_tolerance; // tolerance 
     short int *x_frame;  // keep a copy of current frame for picking color
 
     t_outlet *x_pdp_output; // output packets
@@ -68,7 +68,7 @@ static void pdp_binary_y(t_pdp_binary *x, t_floatarg fy )
 {
    if ( fy <= 255. )
    {
-      x->x_colorY = (t_int)fy;
+      x->x_colorY = (int)fy;
       outlet_float( x->x_Y, x->x_colorY );
    }
 }
@@ -77,7 +77,7 @@ static void pdp_binary_u(t_pdp_binary *x, t_floatarg fu )
 {
    if ( fu <= 255. )
    {
-      x->x_colorU = (t_int)fu;
+      x->x_colorU = (int)fu;
       outlet_float( x->x_U, x->x_colorU );
    }
 }
@@ -86,7 +86,7 @@ static void pdp_binary_v(t_pdp_binary *x, t_floatarg fv )
 {
    if ( fv < 255 )
    {
-      x->x_colorV = (t_int)fv;
+      x->x_colorV = (int)fv;
       outlet_float( x->x_V, x->x_colorV );
    }
 }
@@ -155,11 +155,11 @@ static void pdp_binary_process_yv12(t_pdp_binary *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     i;
-    t_int     px=0, py=0; 
-    t_int     y=0, u=0, v=0;
+    int     i;
+    int     px=0, py=0; 
+    int     y=0, u=0, v=0;
     short int *pfY, *pfU, *pfV;
-    t_int     diff;
+    int     diff;
 
     /* allocate all ressources */
     if ( ( (int)header->info.image.width != x->x_vwidth ) ||

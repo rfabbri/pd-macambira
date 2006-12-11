@@ -36,30 +36,30 @@ typedef struct pdp_edge_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_mapw;
-    t_int x_maph;
-    t_int x_video_width_margin;
-    t_int *x_map;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_mapw;
+    int x_maph;
+    int x_video_width_margin;
+    int *x_map;
 
 } t_pdp_edge;
 
 static void pdp_edge_allocate(t_pdp_edge *x)
 {
-  x->x_map = (t_int*) getbytes ( ( x->x_vwidth * x->x_vheight * sizeof (t_int) ) << 1 );
-  bzero(x->x_map, ( x->x_vwidth * x->x_vheight * sizeof (t_int) ) << 1 );
+  x->x_map = (int*) getbytes ( ( x->x_vwidth * x->x_vheight * sizeof (int) ) << 1 );
+  bzero(x->x_map, ( x->x_vwidth * x->x_vheight * sizeof (int) ) << 1 );
 }
 
 static void pdp_edge_free_ressources(t_pdp_edge *x)
 {
-  if ( x->x_map ) freebytes ( x->x_map, ( x->x_vwidth * x->x_vheight * sizeof (t_int) ) << 1 );
+  if ( x->x_map ) freebytes ( x->x_map, ( x->x_vwidth * x->x_vheight * sizeof (int) ) << 1 );
 }
 
 static void pdp_edge_process_yv12(t_pdp_edge *x)
@@ -70,12 +70,12 @@ static void pdp_edge_process_yv12(t_pdp_edge *x)
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
     int       i;
 
-    t_int px, py;
-    t_int y, u, v;
-    t_int y0, u0, v0;
-    t_int y1, u1, v1;
-    t_int y2, u2, v2;
-    t_int y3, u3, v3;
+    int px, py;
+    int y, u, v;
+    int y0, u0, v0;
+    int y1, u1, v1;
+    int y2, u2, v2;
+    int y3, u3, v3;
     short int *pdata, *pnewdata;
 
     /* allocate all ressources */

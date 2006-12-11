@@ -41,36 +41,36 @@ typedef struct pdp_puzzle_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
      /* puzzle parameters */
-    t_int *x_blockpos;
-    t_int *x_blockoffset;
-    t_int *x_ublockoffset;
-    t_int *x_vblockoffset;
-    t_int x_nbblocks;
-    t_int x_blockwidth;
-    t_int x_blockheight;
-    t_int x_blockw;
-    t_int x_blockh;
-    t_int x_blocknum;
-    t_int x_spacepos;
-    t_int x_spacex;
-    t_int x_spacey;
+    int *x_blockpos;
+    int *x_blockoffset;
+    int *x_ublockoffset;
+    int *x_vblockoffset;
+    int x_nbblocks;
+    int x_blockwidth;
+    int x_blockheight;
+    int x_blockw;
+    int x_blockh;
+    int x_blocknum;
+    int x_spacepos;
+    int x_spacex;
+    int x_spacey;
 
 } t_pdp_puzzle;
 
 static void pdp_puzzle_init_tables(t_pdp_puzzle *x)
 {
-  t_int i, a, b, c;
+  int i, a, b, c;
 
     for(i=0; i<x->x_blocknum; i++)
     {
@@ -95,7 +95,7 @@ static void pdp_puzzle_init_tables(t_pdp_puzzle *x)
 
 static void pdp_puzzle_up(t_pdp_puzzle *x )
 {
-  t_int tmp, nextpos=-1;
+  int tmp, nextpos=-1;
 
     if(x->x_spacey>0) 
     {
@@ -113,7 +113,7 @@ static void pdp_puzzle_up(t_pdp_puzzle *x )
 
 static void pdp_puzzle_down(t_pdp_puzzle *x )
 {
-  t_int tmp, nextpos=-1;
+  int tmp, nextpos=-1;
 
     if(x->x_spacey<x->x_blockh-1) 
     {
@@ -131,7 +131,7 @@ static void pdp_puzzle_down(t_pdp_puzzle *x )
 
 static void pdp_puzzle_left(t_pdp_puzzle *x )
 {
-  t_int tmp, nextpos=-1;
+  int tmp, nextpos=-1;
 
     if(x->x_spacex>0) 
     {
@@ -149,7 +149,7 @@ static void pdp_puzzle_left(t_pdp_puzzle *x )
 
 static void pdp_puzzle_right(t_pdp_puzzle *x )
 {
-  t_int tmp, nextpos=-1;
+  int tmp, nextpos=-1;
 
     if(x->x_spacex<x->x_blockw-1) 
     {
@@ -175,7 +175,7 @@ static void pdp_puzzle_free_ressources(t_pdp_puzzle *x)
 
 static void pdp_puzzle_allocate(t_pdp_puzzle *x)
 {
- t_int px, py;
+ int px, py;
 
    x->x_blockwidth = x->x_vwidth / x->x_nbblocks;
    x->x_blockheight = x->x_vheight / x->x_nbblocks;
@@ -223,7 +223,7 @@ static void pdp_puzzle_process_yv12(t_pdp_puzzle *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     px, py, xx, yy, i;
+    int     px, py, xx, yy, i;
     short int *pY, *qY, *pU, *pV, *qU, *qV;
 
     /* allocate all ressources */

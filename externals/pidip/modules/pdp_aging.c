@@ -36,10 +36,10 @@ static unsigned int fastrand_val;
 
 typedef struct _scratch
 {
-    t_int life;
-    t_int x;
-    t_int dx;
-    t_int init;
+    int life;
+    int x;
+    int dx;
+    int init;
 } scratch;
 
 typedef struct pdp_aging_struct
@@ -48,18 +48,18 @@ typedef struct pdp_aging_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_area_scale;
-    t_int x_nb_scratches;
-    t_int x_dust_interval;
-    t_int x_pits_interval;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_area_scale;
+    int x_nb_scratches;
+    int x_dusinterval;
+    int x_pits_interval;
     scratch x_scratches[PDP_AGING_MAX_SCRATCHES];
 
 } t_pdp_aging;
@@ -167,10 +167,10 @@ static void pdp_aging_dusts(t_pdp_aging *x, short int *dest)
    const int width = x->x_vwidth;
    const int height = x->x_vheight;
 
-   if(x->x_dust_interval == 0) 
+   if(x->x_dusinterval == 0) 
    {
      if((inline_fastrand()&0xf0000000) == 0) {
-       x->x_dust_interval = inline_fastrand()>>29;
+       x->x_dusinterval = inline_fastrand()>>29;
      }
      return;
    }
@@ -191,7 +191,7 @@ static void pdp_aging_dusts(t_pdp_aging *x, short int *dest)
          d = (d + inline_fastrand()%3 - 1) & 7;
       }
     }
-    x->x_dust_interval--;
+    x->x_dusinterval--;
 }
 
 static void pdp_aging_pits(t_pdp_aging *x, short int *dest)

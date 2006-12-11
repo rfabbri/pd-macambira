@@ -24,11 +24,17 @@
 
 
 #include "pdp.h"
+#include "pidip_config.h"
 #include <math.h>
 #include <time.h>
 #include <sys/time.h>
-#include <quicktime/quicktime.h>
+#ifdef QUICKTIME_NEWER
+#include <lqt/lqt.h>
+#include <lqt/colormodels.h>
+#else
+#include <quicktime/lqt.h>
 #include <quicktime/colormodels.h>
+#endif
 
 #define DEFAULT_FRAME_RATE 25
 #define DEFAULT_CHANNELS 2
@@ -45,36 +51,36 @@ typedef struct pdp_rec_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
     quicktime_t *x_qtfile;
     unsigned char **x_yuvpointers;
     unsigned char *x_yuvbuffer;
-    t_int x_framerate;
-    t_int x_forced_framerate;
-    t_int x_jpeg_quality;
-    t_int x_newfile;
+    int x_framerate;
+    int x_forced_framerate;
+    int x_jpeg_quality;
+    int x_newfile;
     char  *x_compressor; 
-    t_int x_recflag;
-    t_int x_frameswritten;
+    int x_recflag;
+    int x_frameswritten;
     struct timeval x_tstart;
     struct timeval x_tstop;
     struct timeval x_tlastrec;
 
      /* audio structures */
     int16_t **x_audio_buf; /* buffer for incoming audio */
-    t_int x_audioin_position; // writing position for incoming audio
+    int x_audioin_position; // writing position for incoming audio
     char  *x_acompressor;  // audio compressor
-    t_int x_channels;      // audio channels 
-    t_int x_samplerate;    // audio sample rate 
-    t_int x_bits;          // audio bits
+    int x_channels;      // audio channels 
+    int x_samplerate;    // audio sample rate 
+    int x_bits;          // audio bits
 
 } t_pdp_rec;
 
@@ -107,7 +113,7 @@ static void pdp_rec_allocate(t_pdp_rec *x)
     /* set video track whenever width or height is changed */
 static void pdp_rec_set_video(t_pdp_rec *x)
 {
-  t_int ret;
+  int ret;
 
     if ( !x->x_qtfile ) {
        post( "pdp_rec~ : no video recording file is opened !!");
@@ -129,7 +135,7 @@ static void pdp_rec_set_video(t_pdp_rec *x)
     /* set framerate */
 static void pdp_rec_set_framerate(t_pdp_rec *x)
 {
-  t_int ret;
+  int ret;
 
     if ( !x->x_qtfile ) {
        post( "pdp_rec~ : no video recording file is opened !!");
@@ -144,7 +150,7 @@ static void pdp_rec_set_framerate(t_pdp_rec *x)
     /* set audio track */
 static void pdp_rec_set_audio(t_pdp_rec *x)
 {
-  t_int ret;
+  int ret;
 
     if ( !x->x_qtfile ) {
        post( "pdp_rec~ : no video recording file is opened !!");
@@ -165,7 +171,7 @@ static void pdp_rec_set_audio(t_pdp_rec *x)
     /* set color model : it's hard coded : only one model supported */
 static void pdp_rec_set_cmodel(t_pdp_rec *x)
 {
-  t_int ret;
+  int ret;
 
     if ( !x->x_qtfile ) {
        post( "pdp_rec~ : no video recording file is opened !!");
@@ -343,7 +349,7 @@ static void pdp_rec_close(t_pdp_rec *x)
     /* open a new video file */
 static void pdp_rec_open(t_pdp_rec *x, t_symbol *sfile)
 {
-  t_int ret=0;
+  int ret=0;
 
     // close previous video file if existing
     pdp_rec_close(x);
@@ -435,7 +441,7 @@ static t_int *pdp_rec_perform(t_int *w)
   t_pdp_rec *x = (t_pdp_rec *)(w[3]);
   int n = (int)(w[4]);                      // number of samples
   t_float fsample;
-  t_int   isample, i;
+  int   isample, i;
 
    if ( x->x_recflag ) 
    {
@@ -474,11 +480,11 @@ static void pdp_rec_process_yv12(t_pdp_rec *x)
 {
   t_pdp     *header = pdp_packet_header(x->x_packet0);
   short int *data   = (short int *)pdp_packet_data(x->x_packet0);
-  t_int     i, ret;
-  t_int     px, py;
+  int     i, ret;
+  int     px, py;
   unsigned short *poy, *pou, *pov;
   struct timeval trec;
-  t_int     nbaudiosamples, nbusecs, nbrecorded;
+  int     nbaudiosamples, nbusecs, nbrecorded;
   t_float   fframerate=0.0;
 
     x->x_vwidth = header->info.image.width;
@@ -645,7 +651,7 @@ t_class *pdp_rec_class;
 
 void *pdp_rec_new(void)
 {
-  t_int i;
+  int i;
 
     t_pdp_rec *x = (t_pdp_rec *)pd_new(pdp_rec_class);
     inlet_new (&x->x_obj, &x->x_obj.ob_pd, gensym ("signal"), gensym ("signal"));

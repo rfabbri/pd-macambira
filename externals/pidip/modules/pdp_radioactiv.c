@@ -44,39 +44,39 @@ typedef struct pdp_radioactiv_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
     unsigned char *x_blurzoombuf;
-    t_int *x_blurzoomx;
-    t_int *x_blurzoomy;
-    t_int x_buf_width_blocks;
-    t_int x_buf_width;
-    t_int x_buf_height;
-    t_int x_buf_area;
-    t_int x_buf_margin_right;
-    t_int x_buf_margin_left;
-    t_int x_palette[COLORS];
-    t_int x_mode;            /* 0=normal 1=strobe 2=strobe2 3=trigger */
-    t_int x_snap_time;
-    t_int x_snap_interval;
+    int *x_blurzoomx;
+    int *x_blurzoomy;
+    int x_buf_width_blocks;
+    int x_buf_width;
+    int x_buf_height;
+    int x_buf_area;
+    int x_buf_margin_right;
+    int x_buf_margin_left;
+    int x_palette[COLORS];
+    int x_mode;            /* 0=normal 1=strobe 2=strobe2 3=trigger */
+    int x_snap_time;
+    int x_snap_interval;
     short int *x_snapframe;
     short int *x_diff;
     short int *x_bdata;
-    t_int x_snapshot;
+    int x_snapshot;
 
 } t_pdp_radioactiv;
 
 static void pdp_radioactiv_free_ressources(t_pdp_radioactiv *x)
 {
    if ( x->x_blurzoombuf ) freebytes ( x->x_blurzoombuf, x->x_buf_area*2 );
-   if ( x->x_blurzoomx ) freebytes ( x->x_blurzoomx, x->x_buf_width*sizeof(t_int) );
-   if ( x->x_blurzoomy ) freebytes ( x->x_blurzoomy, x->x_buf_height*sizeof(t_int) );
+   if ( x->x_blurzoomx ) freebytes ( x->x_blurzoomx, x->x_buf_width*sizeof(int) );
+   if ( x->x_blurzoomy ) freebytes ( x->x_blurzoomy, x->x_buf_height*sizeof(int) );
    if ( x->x_snapframe ) freebytes ( x->x_snapframe, ( ( x->x_vsize + x->x_vsize>>1 ) << 1 ) );
    if ( x->x_diff ) freebytes( x->x_diff, (x->x_vsize + (x->x_vsize>>1))<<1 );
    if ( x->x_bdata ) freebytes( x->x_bdata, (( x->x_vsize + (x->x_vsize>>1))<<1));
@@ -94,8 +94,8 @@ static void pdp_radioactiv_allocate(t_pdp_radioactiv *x)
    x->x_buf_margin_right = x->x_vwidth - x->x_buf_width - x->x_buf_margin_left;
 
    x->x_blurzoombuf = (unsigned char *) getbytes (x->x_buf_area*2);
-   x->x_blurzoomx = (t_int *) getbytes (x->x_buf_width*sizeof(t_int));
-   x->x_blurzoomy = (t_int *) getbytes (x->x_buf_height*sizeof(t_int));
+   x->x_blurzoomx = (int *) getbytes (x->x_buf_width*sizeof(int));
+   x->x_blurzoomy = (int *) getbytes (x->x_buf_height*sizeof(int));
    x->x_snapframe = (short int *) getbytes ( ( ( x->x_vsize + x->x_vsize>>1 ) << 1 ) );
    x->x_diff = (short int*) getbytes((x->x_vsize + (x->x_vsize>>1))<<1);
    x->x_bdata = (short int *) getbytes((( x->x_vsize + (x->x_vsize>>1))<<1));
@@ -215,7 +215,7 @@ static void pdp_radioactiv_snap_time(t_pdp_radioactiv *x, t_floatarg fsnaptime )
 {
    if ( fsnaptime > 0 )
    {
-      x->x_snap_time = (t_int) fsnaptime;
+      x->x_snap_time = (int) fsnaptime;
    }
 }
 
@@ -223,7 +223,7 @@ static void pdp_radioactiv_snap_interval(t_pdp_radioactiv *x, t_floatarg fsnapin
 {
    if ( fsnapinterval > 1 ) 
    {
-      x->x_snap_interval = (t_int) fsnapinterval;
+      x->x_snap_interval = (int) fsnapinterval;
    }
 }
 

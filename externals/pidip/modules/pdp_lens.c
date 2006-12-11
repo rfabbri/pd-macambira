@@ -36,32 +36,32 @@ typedef struct pdp_lens_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
     t_float   x_zoom;     // zoom factor
-    t_int     x_cx;       // coordinates of lens center
-    t_int     x_cy;       // coordinates of lens center
-    t_int     x_csize;    // width of the lens
-    t_int     x_xd;
-    t_int     x_yd;
-    t_int     x_mode;
-    t_int     *x_lens;
-    t_int     x_init;
+    int     x_cx;       // coordinates of lens center
+    int     x_cy;       // coordinates of lens center
+    int     x_csize;    // width of the lens
+    int     x_xd;
+    int     x_yd;
+    int     x_mode;
+    int     *x_lens;
+    int     x_init;
 
 } t_pdp_lens;
 
-static void pdp_lens_preset(t_pdp_lens *x, t_int oldsize, t_int newsize)
+static void pdp_lens_preset(t_pdp_lens *x, int oldsize, int newsize)
 {
  int px, py, r;
 
-  if ( x->x_lens ) freebytes(x->x_lens, oldsize * oldsize * sizeof( t_int) ); 
-  x->x_lens = (t_int *) getbytes( newsize * newsize * sizeof( t_int ) );
+  if ( x->x_lens ) freebytes(x->x_lens, oldsize * oldsize * sizeof( int) ); 
+  x->x_lens = (int *) getbytes( newsize * newsize * sizeof( int ) );
   r = x->x_csize / 2;
 
   /* it is sufficient to generate 1/4 of the lens and reflect this

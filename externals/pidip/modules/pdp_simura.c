@@ -36,13 +36,13 @@ typedef struct pdp_simura_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     unsigned short int x_color; /* color for the mask */
-    t_int x_mode;      /* mirror mode        */
+    int x_mode;      /* mirror mode        */
 
 } t_pdp_simura;
 

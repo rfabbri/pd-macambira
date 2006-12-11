@@ -34,10 +34,10 @@ static char   *pdp_imgloader_version = "pdp_imgloader: version 0.2 : image loadi
 
 typedef struct _triangle
 {
-  t_int used;
-  t_int x1, y1;
-  t_int x2, y2;
-  t_int x3, y3;
+  int used;
+  int x1, y1;
+  int x2, y2;
+  int x3, y3;
   t_float a1, b1;
   t_float a2, b2;
   t_float a3, b3;
@@ -48,29 +48,29 @@ typedef struct pdp_imgloader_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_xoffset; // x offset of the image
-    t_int x_yoffset; // y offset of the image
+    int x_xoffset; // x offset of the image
+    int x_yoffset; // y offset of the image
 
         /* imlib data */
     Imlib_Image x_image;
     DATA32     *x_imdata;
-    t_int       x_iwidth;
-    t_int       x_iheight;
-    t_int       x_operation;
-    t_int       b_fit;
+    int       x_iwidth;
+    int       x_iheight;
+    int       x_operation;
+    int       b_fit;
 
     t_float     x_blend;
-    t_int       x_quality;   // quality forces an additional yuv->rgb conversion in yuv mode
+    int       x_quality;   // quality forces an additional yuv->rgb conversion in yuv mode
 
     t_triangle  x_hiddenzones[ MAX_ZONES ]; // hide these parts of the image
     unsigned char *x_mask;
@@ -150,9 +150,9 @@ static void pdp_imgloader_operation(t_pdp_imgloader *x, t_symbol *s)
 	else if      (s == gensym("substract")) x->x_operation = IMLIB_OP_SUBTRACT;
 	else if      (s == gensym("reshade")) x->x_operation = IMLIB_OP_RESHADE;
 }
-static t_int pdp_imgloader_isinzone(t_pdp_imgloader *x, t_int px, t_int py, t_int index)
+static int pdp_imgloader_isinzone(t_pdp_imgloader *x, int px, int py, int index)
 {
-  t_int c1=0, c2=0, c3=0;
+  int c1=0, c2=0, c3=0;
 
    if ( !x->x_hiddenzones[index].used )
    {
@@ -275,9 +275,9 @@ static t_int pdp_imgloader_isinzone(t_pdp_imgloader *x, t_int px, t_int py, t_in
    return c1 && c2 && c3;
 }
 
-static t_int pdp_imgloader_ishidden(t_pdp_imgloader *x, t_int px, t_int py)
+static int pdp_imgloader_ishidden(t_pdp_imgloader *x, int px, int py)
 {
-  t_int ti;
+  int ti;
 
     for ( ti=0; ti<MAX_ZONES; ti++ )
     {
@@ -294,7 +294,7 @@ static t_int pdp_imgloader_ishidden(t_pdp_imgloader *x, t_int px, t_int py)
 
 static void pdp_imgloader_update_mask(t_pdp_imgloader *x )
 {
-  t_int px, py;
+  int px, py;
 
   for ( py=0; py<x->x_vheight; py++ )
   {
@@ -307,7 +307,7 @@ static void pdp_imgloader_update_mask(t_pdp_imgloader *x )
 
 static void pdp_imgloader_hide(t_pdp_imgloader *x, t_symbol *s, int argc, t_atom *argv)
 {
-  t_int ti;
+  int ti;
   t_float fx1, fy1, fx2, fy2, fx3, fy3;
 
    if ( argc != 6 )
@@ -570,7 +570,7 @@ static void pdp_imgloader_process_yv12(t_pdp_imgloader *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     px, py;
+    int     px, py;
     t_float   alpha, factor;
     unsigned  char y, u, v;
     short int *pY, *pU, *pV;

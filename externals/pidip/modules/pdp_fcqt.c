@@ -21,11 +21,17 @@
 
 
 #include "pdp.h"
+#include "pidip_config.h"
 #include "pdp_llconv.h"
 #include "time.h"
 #include "sys/time.h"
+#ifdef QUICKTIME_NEWER
+#include <lqt/lqt.h>
+#include <lqt/colormodels.h>
+#else
 #include <quicktime/lqt.h>
 #include <quicktime/colormodels.h>
+#endif
 #include <bzlib.h> // bz2 compression routines
 
 typedef struct pdp_fcqt_struct
@@ -41,14 +47,14 @@ typedef struct pdp_fcqt_struct
     int packet0;
     bool initialized;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_fsize; // frames size
-    t_int x_length;
-    t_int x_current_frame;
-    t_int x_cursec;
-    t_int x_framescount;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_fsize; // frames size
+    int x_length;
+    int x_current_frame;
+    int x_cursec;
+    int x_framescount;
 
     unsigned char * qt_rows[3];
 
@@ -57,7 +63,7 @@ typedef struct pdp_fcqt_struct
     int qt_cmodel;
 
     unsigned int** x_frames;
-    t_int* x_fsizes;
+    unsigned int* x_fsizes;
 
 } t_pdp_fcqt;
 
@@ -65,7 +71,7 @@ typedef struct pdp_fcqt_struct
 
 static void pdp_fcqt_close(t_pdp_fcqt *x)
 {
-  t_int fi;
+  int fi;
 
     if (x->initialized){
 	quicktime_close(x->qt);
@@ -82,7 +88,7 @@ static void pdp_fcqt_close(t_pdp_fcqt *x)
 
 static void pdp_fcqt_open(t_pdp_fcqt *x, t_symbol *name)
 {
-  t_int fi, osize, ret;
+  int fi, osize, ret;
   unsigned int *odata, *cdata;
 
     post("pdp_fcqt: opening %s", name->s_name);
@@ -131,7 +137,7 @@ static void pdp_fcqt_open(t_pdp_fcqt *x, t_symbol *name)
     // read all frames
     x->x_current_frame = 0;
     x->x_frames = (unsigned int**) getbytes( x->x_length*sizeof(unsigned int*) );
-    x->x_fsizes = (t_int*) getbytes( x->x_length*sizeof(t_int) );
+    x->x_fsizes = (unsigned int*) getbytes( x->x_length*sizeof(int) );
     x->x_fsize = 0;
     if ( !x->x_frames )
     {
@@ -205,7 +211,8 @@ static void pdp_fcqt_open(t_pdp_fcqt *x, t_symbol *name)
 
 static void pdp_fcqt_bang(t_pdp_fcqt *x)
 {
-  t_int object, ret, dsize, psize;
+  int object, ret;
+  unsigned int dsize, psize;
   short int* data;
   t_pdp* header;
   struct timeval etime;

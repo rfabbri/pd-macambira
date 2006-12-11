@@ -37,17 +37,17 @@ typedef struct pdp_background_struct
 
     t_outlet *x_outlet0;
 
-    t_int x_packet0;
+    int x_packet0;
 
-    t_int x_colorR;
-    t_int x_colorG;
-    t_int x_colorB;
-    t_int x_colorY;
-    t_int x_colorU;
-    t_int x_colorV;
+    int x_colorR;
+    int x_colorG;
+    int x_colorB;
+    int x_colorY;
+    int x_colorU;
+    int x_colorV;
 
-    t_int x_width;
-    t_int x_height;
+    int x_width;
+    int x_height;
 
 } t_pdp_background;
 
@@ -57,11 +57,11 @@ static void pdp_background_bang(t_pdp_background *x)
   t_pdp *header;
   unsigned char *data;
   unsigned char *pY, *pU, *pV;
-  t_int px, py;
+  int px, py;
 
     x->x_packet0 = pdp_packet_new_bitmap_yv12( x->x_width, x->x_height );
 
-    data = (char *)pdp_packet_data(x->x_packet0);
+    data = (unsigned char *)pdp_packet_data(x->x_packet0);
     pY = data;
     pV = data+(x->x_width*x->x_height);
     pU = data+(x->x_width*x->x_height)+((x->x_width*x->x_height)>>2);
@@ -76,32 +76,32 @@ static void pdp_background_bang(t_pdp_background *x)
 
 static void pdp_background_dim(t_pdp_background *x, t_floatarg fwidth, t_floatarg fheight)
 {
-   if ( ( (t_int)fwidth>0 ) && ( (t_int) fheight>0 ) )
+   if ( ( (int)fwidth>0 ) && ( (int) fheight>0 ) )
    {
-      if ( ((t_int)fwidth)%8 == 0 )
+      if ( ((int)fwidth)%8 == 0 )
       {
-        x->x_width = (t_int)fwidth; 
+        x->x_width = (int)fwidth; 
       }
       else
       {
-        x->x_width = (t_int)fwidth + (8-((t_int)fwidth)%8); // align on 8 
+        x->x_width = (int)fwidth + (8-((int)fwidth)%8); // align on 8 
       }
-      if ( ((t_int)fheight)%8 == 0 )
+      if ( ((int)fheight)%8 == 0 )
       {
-        x->x_height = (t_int)fheight; 
+        x->x_height = (int)fheight; 
       }
       else
       {
-        x->x_height = (t_int)fheight + (8-((t_int)fheight)%8); // align on 8 
+        x->x_height = (int)fheight + (8-((int)fheight)%8); // align on 8 
       }
    }
 }
 
 static void pdp_background_red(t_pdp_background *x, t_floatarg fred)
 {
-   if ( ( (t_int)fred>=0 ) && ( (t_int) fred <= 255 ) )
+   if ( ( (int)fred>=0 ) && ( (int) fred <= 255 ) )
    {
-      x->x_colorR = (t_int) fred;
+      x->x_colorR = (int) fred;
       x->x_colorY = yuv_RGBtoY( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB );
       x->x_colorU = yuv_RGBtoU( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB );
       x->x_colorV = yuv_RGBtoV( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB );
@@ -110,9 +110,9 @@ static void pdp_background_red(t_pdp_background *x, t_floatarg fred)
 
 static void pdp_background_green(t_pdp_background *x, t_floatarg fgreen)
 {
-   if ( ( (t_int)fgreen>=0 ) && ( (t_int) fgreen <= 255 ) )
+   if ( ( (int)fgreen>=0 ) && ( (int) fgreen <= 255 ) )
    {
-      x->x_colorG = (t_int) fgreen;
+      x->x_colorG = (int) fgreen;
       x->x_colorY = yuv_RGBtoY( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB );
       x->x_colorU = yuv_RGBtoU( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB );
       x->x_colorV = yuv_RGBtoV( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB );
@@ -121,9 +121,9 @@ static void pdp_background_green(t_pdp_background *x, t_floatarg fgreen)
 
 static void pdp_background_blue(t_pdp_background *x, t_floatarg fblue)
 {
-   if ( ( (t_int)fblue>=0 ) && ( (t_int) fblue <= 255 ) )
+   if ( ( (int)fblue>=0 ) && ( (int) fblue <= 255 ) )
    {
-      x->x_colorB = (t_int) fblue;
+      x->x_colorB = (int) fblue;
       x->x_colorY = yuv_RGBtoY( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB );
       x->x_colorU = yuv_RGBtoU( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB );
       x->x_colorV = yuv_RGBtoV( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB );

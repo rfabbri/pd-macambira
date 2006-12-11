@@ -37,37 +37,37 @@ typedef struct pdp_transition_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_packet;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_packet;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth0;
-    t_int x_vheight0;
-    t_int x_vsize0;
+    int x_vwidth0;
+    int x_vheight0;
+    int x_vsize0;
 
-    t_int x_vwidth1;
-    t_int x_vheight1;
-    t_int x_vsize1;
+    int x_vwidth1;
+    int x_vheight1;
+    int x_vsize1;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_transition_mode; // 1 : "circle"
-    t_int x_transition_pending; 
+    int x_transition_mode; // 1 : "circle"
+    int x_transition_pending; 
 
-    t_int x_current_source;
-    t_int x_target_source;
+    int x_current_source;
+    int x_target_source;
 
-    t_int x_pos; // current position for transition
-    t_int x_inc; // increment for various mode
-    t_int x_rand;// randomizing argument
+    int x_pos; // current position for transition
+    int x_inc; // increment for various mode
+    int x_rand;// randomizing argument
 
 } t_pdp_transition;
 
-static t_int pdp_transition_min( t_int a, t_int b )
+static int pdp_transition_min( int a, int b )
 {
    if ( a == 0 ) return b;
    if ( b == 0 ) return a;
@@ -265,8 +265,8 @@ static void pdp_transition_process_yv12(t_pdp_transition *x)
     short int *data1 = (short int *)pdp_packet_data(x->x_packet1);
     t_pdp     *header;
     short int *data;
-    t_int     tsource, cx=0, cy=0;
-    t_int     px, py, rvalue=0, h1pos, h2pos, xcent, ycent;
+    int     tsource, cx=0, cy=0;
+    int     px, py, rvalue=0, h1pos, h2pos, xcent, ycent;
     t_float   factor, alpha;
     int       i;
     short int *poY, *poV, *poU, *p0Y, *p0V, *p0U, *p1Y, *p1V, *p1U;

@@ -36,19 +36,19 @@ typedef struct pdp_rev_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_vgrabtime;
-    t_int x_vgrab;
-    t_int x_linespace;
-    t_int x_vscale;
-    t_int x_vcolor;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_vgrabtime;
+    int x_vgrab;
+    int x_linespace;
+    int x_vscale;
+    int x_vcolor;
 
 } t_pdp_rev;
 

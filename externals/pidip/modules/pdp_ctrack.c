@@ -59,25 +59,25 @@ typedef struct pdp_ctrack_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_dropped;
+    int x_packet0;
+    int x_dropped;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_colorR; // RGB components of tracked color
-    t_int x_colorG;
-    t_int x_colorB;
-    t_int x_colorY; // YUV components of tracked color
-    t_int x_colorU;
-    t_int x_colorV;
-    t_int x_tolerance; // tolerance 
-    t_int x_luminosity; // use luminosity or not
-    t_int x_steady; // steady mode : the zone is searched around the cursor
-    t_int x_cursor; // show cursor or not
-    t_int x_showframe; // show frame or not
-    t_int x_cursX;  // X coordinate of cursor
-    t_int x_cursY;  // Y coordinate of cursor
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_colorR; // RGB components of tracked color
+    int x_colorG;
+    int x_colorB;
+    int x_colorY; // YUV components of tracked color
+    int x_colorU;
+    int x_colorV;
+    int x_tolerance; // tolerance 
+    int x_luminosity; // use luminosity or not
+    int x_steady; // steady mode : the zone is searched around the cursor
+    int x_cursor; // show cursor or not
+    int x_showframe; // show frame or not
+    int x_cursX;  // X coordinate of cursor
+    int x_cursY;  // Y coordinate of cursor
     short int *x_frame;  // keep a copy of current frame for picking color
 
     t_outlet *x_pdp_output; // output packets
@@ -95,7 +95,7 @@ typedef struct pdp_ctrack_struct
 
 static void pdp_ctrack_draw_color(t_pdp_ctrack *x)
 {
- t_int width, height;
+ int width, height;
  char color[32];
 
     sprintf( color, "#%.2X%.2X%.2X", x->x_colorR, x->x_colorG, x->x_colorB );
@@ -214,7 +214,7 @@ static void pdp_ctrack_steady(t_pdp_ctrack *x, t_floatarg fsteady )
 
 static void pdp_ctrack_pick(t_pdp_ctrack *x)
 {
- t_int y,u,v;
+ int y,u,v;
 
    if ( x->x_frame && ( x->x_cursX > 0 ) && ( x->x_cursX < x->x_vwidth ) 
         && ( x->x_cursY > 0 ) && ( x->x_cursY < x->x_vheight ) )
@@ -256,13 +256,13 @@ static void pdp_ctrack_process_yv12(t_pdp_ctrack *x)
 {
     t_pdp     *header = pdp_packet_header(x->x_packet0);
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
-    t_int     i, cf;
-    t_int     px=0, py=0, ppx=0, ppy=0, found=0, xcell=0, ycell=0; 
-    t_int     y=0, u=0, v=0;
-    t_int     x1=0, y1=0, x2=0, y2=0;
-    t_int     X1=0, Y1=0, X2=0, Y2=0;
+    int     i, cf;
+    int     px=0, py=0, ppx=0, ppy=0, found=0, xcell=0, ycell=0; 
+    int     y=0, u=0, v=0;
+    int     x1=0, y1=0, x2=0, y2=0;
+    int     X1=0, Y1=0, X2=0, Y2=0;
     short int *pfY, *pfU, *pfV;
-    t_int     diff;
+    int     diff;
 
     /* allocate all ressources */
     if ( ( (int)header->info.image.width != x->x_vwidth ) ||

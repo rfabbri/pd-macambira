@@ -37,35 +37,35 @@ typedef struct pdp_ocanvas_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_opacket;
+    int x_opacket;
 
-    t_int x_current;
+    int x_current;
     t_float x_xmouse;
     t_float x_ymouse;
 
-    t_int x_average;
+    int x_average;
 
-    t_int *x_packets;
-    t_int *x_widths;
-    t_int *x_heights;
+    int *x_packets;
+    int *x_widths;
+    int *x_heights;
     t_float *x_xoffsets;
     t_float *x_yoffsets;
     t_float *x_alphas;
-    t_int *x_sizes;
+    int *x_sizes;
 
-    t_int x_owidth;
-    t_int x_oheight;
-    t_int x_osize;
-    t_int x_nbinputs;
+    int x_owidth;
+    int x_oheight;
+    int x_osize;
+    int x_nbinputs;
 
 } t_pdp_ocanvas;
 
 static void pdp_ocanvas_process_yv12(t_pdp_ocanvas *x)
 {
-  t_int     px, py, ppx, ppy, ii, nbs;
+  int     px, py, ppx, ppy, ii, nbs;
   short int *pY, *pU, *pV;
   short int *piY, *piU, *piV;
   t_pdp     *oheader;
@@ -138,7 +138,7 @@ static void pdp_ocanvas_sendpacket(t_pdp_ocanvas *x)
   pdp_packet_pass_if_valid(x->x_outlet0, &x->x_opacket);
 }
 
-static void pdp_ocanvas_process(t_pdp_ocanvas *x, t_int ni)
+static void pdp_ocanvas_process(t_pdp_ocanvas *x, int ni)
 {
    int encoding;
    t_pdp *header = 0;
@@ -193,7 +193,7 @@ static void pdp_ocanvas_alpha(t_pdp_ocanvas *x, t_floatarg ni, t_floatarg xalpha
 
 static void pdp_ocanvas_select(t_pdp_ocanvas *x, t_floatarg X, t_floatarg Y)
 {
- t_int ii;
+ int ii;
 
   x->x_current = -1;
   X = X*x->x_owidth;
@@ -242,7 +242,7 @@ static void pdp_ocanvas_average(t_pdp_ocanvas *x, t_floatarg bvalue)
   }
 }
 
-static void pdp_ocanvas_input(t_pdp_ocanvas *x, t_symbol *s, t_floatarg f, t_int ni)
+static void pdp_ocanvas_input(t_pdp_ocanvas *x, t_symbol *s, t_floatarg f, int ni)
 {
   t_pdp     *header;
   short int *data;
@@ -326,7 +326,7 @@ static void pdp_ocanvas_input9(t_pdp_ocanvas *x, t_symbol *s, t_floatarg f)
 
 static void pdp_ocanvas_free(t_pdp_ocanvas *x)
 {
- t_int ii;
+ int ii;
 
   pdp_queue_finish(x->x_queue_id);
   for ( ii=0; ii<x->x_nbinputs; ii++)
@@ -334,10 +334,10 @@ static void pdp_ocanvas_free(t_pdp_ocanvas *x)
     pdp_packet_mark_unused(x->x_packets[ii]);
   }
   pdp_packet_mark_unused(x->x_opacket);
-  if ( x->x_packets ) freebytes( x->x_packets, x->x_nbinputs*sizeof(t_int) );
-  if ( x->x_widths ) freebytes( x->x_widths, x->x_nbinputs*sizeof(t_int) );
-  if ( x->x_heights ) freebytes( x->x_heights, x->x_nbinputs*sizeof(t_int) );
-  if ( x->x_sizes ) freebytes( x->x_sizes, x->x_nbinputs*sizeof(t_int) );
+  if ( x->x_packets ) freebytes( x->x_packets, x->x_nbinputs*sizeof(int) );
+  if ( x->x_widths ) freebytes( x->x_widths, x->x_nbinputs*sizeof(int) );
+  if ( x->x_heights ) freebytes( x->x_heights, x->x_nbinputs*sizeof(int) );
+  if ( x->x_sizes ) freebytes( x->x_sizes, x->x_nbinputs*sizeof(int) );
   if ( x->x_xoffsets ) freebytes( x->x_xoffsets, x->x_nbinputs*sizeof(t_float) );
   if ( x->x_yoffsets ) freebytes( x->x_yoffsets, x->x_nbinputs*sizeof(t_float) );
   if ( x->x_alphas ) freebytes( x->x_alphas, x->x_nbinputs*sizeof(t_float) );
@@ -348,7 +348,7 @@ t_class *pdp_ocanvas_class;
 void *pdp_ocanvas_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_pdp_ocanvas *x = (t_pdp_ocanvas *)pd_new(pdp_ocanvas_class);
-  t_int ii;
+  int ii;
   char *imes[32];
 
   if ( argc != 3 )
@@ -392,10 +392,10 @@ void *pdp_ocanvas_new(t_symbol *s, int argc, t_atom *argv)
 
   post ( "pdp_ocanvas : new %dx%d canvas with %d inputs", x->x_owidth, x->x_oheight, x->x_nbinputs );
 
-  x->x_packets = ( t_int* ) getbytes( x->x_nbinputs*sizeof(t_int) );
-  x->x_widths = ( t_int* ) getbytes( x->x_nbinputs*sizeof(t_int) );
-  x->x_heights = ( t_int* ) getbytes( x->x_nbinputs*sizeof(t_int) );
-  x->x_sizes = ( t_int* ) getbytes( x->x_nbinputs*sizeof(t_int) );
+  x->x_packets = ( int* ) getbytes( x->x_nbinputs*sizeof(int) );
+  x->x_widths = ( int* ) getbytes( x->x_nbinputs*sizeof(int) );
+  x->x_heights = ( int* ) getbytes( x->x_nbinputs*sizeof(int) );
+  x->x_sizes = ( int* ) getbytes( x->x_nbinputs*sizeof(int) );
   x->x_xoffsets = ( t_float* ) getbytes( x->x_nbinputs*sizeof(t_float) );
   x->x_yoffsets = ( t_float* ) getbytes( x->x_nbinputs*sizeof(t_float) );
   x->x_alphas = ( t_float* ) getbytes( x->x_nbinputs*sizeof(t_float) );

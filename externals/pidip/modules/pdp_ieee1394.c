@@ -58,7 +58,7 @@ typedef struct pdp_ieee1394_struct
   bool x_initialized;
   bool x_auto_open;
 
-  t_int        x_packet;
+  int        x_packet;
   t_pdp*       x_header;
   short int    *x_data;
   unsigned char *x_sdata; // static data to hold the grabbed images
@@ -71,7 +71,7 @@ typedef struct pdp_ieee1394_struct
   int          x_continue_thread;
   unsigned int x_framerate;
   int          x_frame_ready;
-  t_int        x_quality;
+  int        x_quality;
 
   SeqGrabComponent x_sg;   
   SGChannel        x_vc;  
@@ -199,14 +199,14 @@ static void pdp_ieee1394_reset(t_pdp_ieee1394 *x)
 
 static void pdp_ieee1394_quality(t_pdp_ieee1394 *x, t_floatarg fquality)
 {
-  if ( ( (t_int)fquality < 0 ) || ( (t_int)fquality > 3 ) )
+  if ( ( (int)fquality < 0 ) || ( (int)fquality > 3 ) )
   {
-     post("pdp_ieee1394: wrong quality %d", (t_int)fquality );
+     post("pdp_ieee1394: wrong quality %d", (int)fquality );
      return;
   }
   else
   {
-     x->x_quality = (t_int)fquality;
+     x->x_quality = (int)fquality;
   }
 }
 
@@ -215,7 +215,7 @@ static void pdp_ieee1394_free(t_pdp_ieee1394 *x)
     pdp_ieee1394_close(x);
 }
 
-static t_int pdp_ieee1394_init_grabber(t_pdp_ieee1394 *x)
+static int pdp_ieee1394_init_grabber(t_pdp_ieee1394 *x)
 {
   OSErr anErr;
   x->x_srcRect.top = 0;
@@ -357,7 +357,7 @@ static void pdp_ieee1394_bang(t_pdp_ieee1394 *x)
 {
   unsigned char *pQ;
   short int *pY, *pU, *pV;
-  t_int px, py;
+  int px, py;
 
     if (!(x->x_continue_thread))
     {
@@ -394,9 +394,9 @@ static void pdp_ieee1394_bang(t_pdp_ieee1394 *x)
     pY = x->x_data;
     pV = x->x_data+x->x_size;
     pU = x->x_data+x->x_size+(x->x_size>>2);
-    for ( py=0; py<(t_int)x->x_height; py++ )
+    for ( py=0; py<(int)x->x_height; py++ )
     {
-      for ( px=0; px<(t_int)x->x_width; px++ )
+      for ( px=0; px<(int)x->x_width; px++ )
       {
         *(pY+py*x->x_width+px) = (*(pQ+1+2*(py*x->x_width+px)))<<7;
         if ( px%2 == 0 )

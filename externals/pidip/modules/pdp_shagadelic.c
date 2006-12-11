@@ -38,24 +38,24 @@ typedef struct pdp_shagadelic_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
     /* shagadelic parameters */
     char *x_ripple;
     char *x_spiral;
     unsigned char x_phase;
-    t_int x_rx, x_ry;
-    t_int x_bx, x_by;
-    t_int x_rvx, x_rvy;
-    t_int x_bvx, x_bvy;
+    int x_rx, x_ry;
+    int x_bx, x_by;
+    int x_rvx, x_rvy;
+    int x_bvx, x_bvy;
     short int x_mask;
 
 } t_pdp_shagadelic;
@@ -68,7 +68,7 @@ static void pdp_shagadelic_mask(t_pdp_shagadelic *x, t_floatarg fmask )
     }
 }
 
-static int pdp_shagadelic_map_from_table(t_pdp_shagadelic *x, t_int px, t_int py, t_int t) 
+static int pdp_shagadelic_map_from_table(t_pdp_shagadelic *x, int px, int py, int t) 
 {
   int xd,yd;
 
@@ -82,7 +82,7 @@ static int pdp_shagadelic_map_from_table(t_pdp_shagadelic *x, t_int px, t_int py
 
 static void pdp_shagadelic_init_tables(t_pdp_shagadelic *x)
 {
-  t_int px, py, i;
+  int px, py, i;
   double xx, yy;
 
    i = 0;
@@ -131,8 +131,8 @@ static void pdp_shagadelic_process_yv12(t_pdp_shagadelic *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     i;
-    t_int     px, py;
+    int     i;
+    int     px, py;
     unsigned  char y, u, v;
     char      *p_y, *p_u, *p_v;
 

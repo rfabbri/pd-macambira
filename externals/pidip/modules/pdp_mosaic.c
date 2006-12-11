@@ -39,19 +39,19 @@ typedef struct pdp_mosaic_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_censor_level;
-    t_int x_ssize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_censor_level;
+    int x_ssize;
     short int *x_diff;
     short int *x_bdata;
-    t_int x_snapshot;
+    int x_snapshot;
 
 } t_pdp_mosaic;
 

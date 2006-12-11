@@ -21,11 +21,17 @@
 
 
 #include "pdp.h"
+#include "pidip_config.h"
 #include "pdp_llconv.h"
 #include "time.h"
 #include "sys/time.h"
+#ifdef QUICKTIME_NEWER
+#include <lqt/lqt.h>
+#include <lqt/colormodels.h>
+#else
 #include <quicktime/lqt.h>
 #include <quicktime/colormodels.h>
+#endif
 
 typedef struct pdp_fqt_struct
 {
@@ -40,14 +46,14 @@ typedef struct pdp_fqt_struct
     int packet0;
     bool initialized;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_size;
-    t_int x_fsize; // frames size
-    t_int x_length;
-    t_int x_current_frame;
-    t_int x_cursec;
-    t_int x_framescount;
+    int x_vwidth;
+    int x_vheight;
+    int x_size;
+    int x_fsize; // frames size
+    int x_length;
+    int x_current_frame;
+    int x_cursec;
+    int x_framescount;
 
     unsigned char *qt_rows[3];
 
@@ -56,7 +62,7 @@ typedef struct pdp_fqt_struct
     int qt_cmodel;
 
     unsigned char **x_frames;
-    t_int* x_fsizes;
+    int* x_fsizes;
 
 } t_pdp_fqt;
 
@@ -64,7 +70,7 @@ typedef struct pdp_fqt_struct
 
 static void pdp_fqt_close(t_pdp_fqt *x)
 {
-  t_int fi;
+  int fi;
 
     if (x->initialized){
 	quicktime_close(x->qt);
@@ -81,7 +87,7 @@ static void pdp_fqt_close(t_pdp_fqt *x)
 
 static void pdp_fqt_open(t_pdp_fqt *x, t_symbol *name)
 {
-  t_int fi;
+  int fi;
 
     post("pdp_fqt: opening %s", name->s_name);
 
@@ -129,7 +135,7 @@ static void pdp_fqt_open(t_pdp_fqt *x, t_symbol *name)
     // read all frames
     x->x_current_frame = 0;
     x->x_frames = (unsigned char**) getbytes( x->x_length*sizeof(unsigned char*) );
-    x->x_fsizes = (t_int*) getbytes( x->x_length*sizeof(t_int) );
+    x->x_fsizes = (int*) getbytes( x->x_length*sizeof(int) );
     x->x_fsize = 0;
     if ( !x->x_frames )
     {

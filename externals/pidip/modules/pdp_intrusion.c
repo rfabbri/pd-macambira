@@ -43,18 +43,18 @@ typedef struct pdp_intrusion_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     unsigned int x_noisepattern[256]; // noise pattern
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
     unsigned int x_encoding;
     short int *x_images[NB_IMAGES];
-    t_int x_rtimage;
+    int x_rtimage;
     short int *x_diff;
     short int *x_bdata;
     int       x_threshold;
@@ -122,7 +122,7 @@ static void pdp_intrusion_background(t_pdp_intrusion *x )
     }
 }
 
-static void pdp_intrusion_allocate(t_pdp_intrusion *x, t_int newsize)
+static void pdp_intrusion_allocate(t_pdp_intrusion *x, int newsize)
 {
  int i;
 

@@ -64,14 +64,14 @@ typedef struct pdp_live_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_dropped;
+    int x_packet0;
+    int x_dropped;
 
     t_pdp *x_header;
     unsigned char *x_data;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
     t_outlet *x_pdp_out;           // output decoded pdp packets
     t_outlet *x_outlet_left;       // left audio output
@@ -85,29 +85,29 @@ typedef struct pdp_live_struct
     pthread_t x_decodechild;       // stream decoding thread
     pthread_mutex_t x_audiolock;   // audio mutex
     pthread_mutex_t x_videolock;   // video mutex
-    t_int x_usethread;             // flag to activate decoding in a thread
-    t_int x_autoplay;              // flag to autoplay the file ( default = true )
-    t_int x_nextimage;             // flag to play next image in manual mode
-    t_int x_priority;              // priority of decoding thread
+    int x_usethread;             // flag to activate decoding in a thread
+    int x_autoplay;              // flag to autoplay the file ( default = true )
+    int x_nextimage;             // flag to play next image in manual mode
+    int x_priority;              // priority of decoding thread
 
     char  *x_url;
-    t_int x_streaming;      // streaming flag
-    t_int x_decoding;       // decoding flag
-    t_int x_loop;           // looping flag ( default = on )
-    t_int x_nopackets;      // no packet to decode
-    t_int x_endofstream;    // end of the stream reached
-    t_int x_nbframes;       // number of frames emitted
-    t_int x_framerate;      // framerate
-    t_int x_samplerate;     // audio sample rate
-    t_int x_audiochannels;  // audio channels
-    t_int x_audioon;        // enough audio data to start playing
-    t_int x_blocksize;      // audio block size
+    int x_streaming;      // streaming flag
+    int x_decoding;       // decoding flag
+    int x_loop;           // looping flag ( default = on )
+    int x_nopackets;      // no packet to decode
+    int x_endofstream;    // end of the stream reached
+    int x_nbframes;       // number of frames emitted
+    int x_framerate;      // framerate
+    int x_samplerate;     // audio sample rate
+    int x_audiochannels;  // audio channels
+    int x_audioon;        // enough audio data to start playing
+    int x_blocksize;      // audio block size
     struct timeval x_starttime; // streaming starting time
-    t_int x_cursec;         // current second
-    t_int x_secondcount;    // number of frames received in the current second
-    t_int x_nbvideostreams; // number of video streams
-    t_int x_nbaudiostreams; // number of audio streams
-    t_int x_videoindex;     // index of the first video stream
+    int x_cursec;         // current second
+    int x_secondcount;    // number of frames received in the current second
+    int x_nbvideostreams; // number of video streams
+    int x_nbaudiostreams; // number of audio streams
+    int x_videoindex;     // index of the first video stream
 
       /* AV data structures */
     AVFormatContext  *x_avcontext;
@@ -117,13 +117,13 @@ typedef struct pdp_live_struct
     long long int x_pts;               // presentation time stamp
     long long int x_previouspts;       // previous presentation time stamp
     long long int x_firstpts;          // first presentation time stamp ( time origin )
-    t_int x_newpicture;
+    int x_newpicture;
 
       /* audio structures */
-    t_int x_audio;           // flag to activate the decoding of audio
+    int x_audio;           // flag to activate the decoding of audio
     short x_audio_buf[4*MAX_AUDIO_PACKET_SIZE]; /* buffer for audio from stream*/
     short x_audio_in[4*MAX_AUDIO_PACKET_SIZE]; /* buffer for resampled PCM audio */
-    t_int x_audioin_position; // writing position for incoming audio
+    int x_audioin_position; // writing position for incoming audio
     ReSampleContext *x_audio_resample_ctx; // structures for audio resample
 
 } t_pdp_live;
@@ -180,8 +180,8 @@ static void pdp_live_bang(t_pdp_live *x)
 
 static void pdp_live_frame_cold(t_pdp_live *x, t_floatarg frameindex)
 {
-    t_int frame = (int)frameindex;
-    t_int ret, flags=0;
+    int frame = (int)frameindex;
+    int ret, flags=0;
     uint64_t newpts;
 
     if (!(x->x_streaming)) return;
@@ -209,15 +209,15 @@ static void pdp_live_frame_cold(t_pdp_live *x, t_floatarg frameindex)
 #endif
 } 
 
-static t_int pdp_live_decode_packet(t_pdp_live *x)
+static int pdp_live_decode_packet(t_pdp_live *x)
 {
-  t_int chunksize=0, length, err, ret;
-  t_int audiosize, sizeout, imagesize, pictureok;
+  int chunksize=0, length, err, ret;
+  int audiosize, sizeout, imagesize, pictureok;
   AVFrame frame;
   uint8_t *pcktptr;
   unsigned char *pY, *pU, *pV; 
   uint8_t *psY, *psU, *psV; 
-  t_int px, py;
+  int px, py;
   long long tplaying;
   long long ttheoretical;
   struct timeval ctime;
@@ -382,7 +382,7 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                     imagesize = (x->x_avcontext->streams[x->x_pkt.stream_index]->codec->width * 
                                  x->x_avcontext->streams[x->x_pkt.stream_index]->codec->height * 3) / 2; // yuv planar
 
-                    x->x_framerate = ( t_int ) av_q2d( x->x_avcontext->streams[x->x_pkt.stream_index]->r_frame_rate );
+                    x->x_framerate = ( int ) av_q2d( x->x_avcontext->streams[x->x_pkt.stream_index]->r_frame_rate );
                     if ( x->x_framerate == 0 ) x->x_framerate = DEFAULT_FRAME_RATE;
                     x->x_videoindex = x->x_pkt.stream_index; 
 
@@ -528,7 +528,7 @@ static void *pdp_decode_stream_from_url(void *tdata)
 {
   t_pdp_live *x = (t_pdp_live*)tdata;
   struct sched_param schedprio;
-  t_int pmin, pmax;
+  int pmin, pmax;
   struct timespec twait;
 
     twait.tv_sec = 0; 
@@ -755,7 +755,7 @@ static void *pdp_live_connect_to_url(void *tdata)
 
 static void pdp_live_disconnect(t_pdp_live *x)
 {
- t_int ret, i, count=0;
+ int ret, i, count=0;
  struct timespec twait;
 
    twait.tv_sec = 0; 
@@ -806,7 +806,7 @@ static void pdp_live_disconnect(t_pdp_live *x)
 
 static void pdp_live_connect(t_pdp_live *x, t_symbol *s)
 {
-  t_int ret, i;
+  int ret, i;
   pthread_attr_t connect_child_attr;
 
    if ( ( x->x_streaming ) || ( x->x_connectchild != 0 ) )
@@ -852,7 +852,7 @@ static t_int *pdp_live_perform(t_int *w)
   int n = (int)(w[4]);                      // number of samples 
   short sampleL, sampleR;
   struct timeval etime;
-  t_int sn;
+  int sn;
 
     // decode a packet if not in thread mode
     if ( !x->x_usethread && x->x_streaming )

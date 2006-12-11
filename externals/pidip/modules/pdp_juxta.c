@@ -35,23 +35,23 @@ typedef struct pdp_juxta_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_packet;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_packet;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth0;
-    t_int x_vheight0;
-    t_int x_vsize0;
+    int x_vwidth0;
+    int x_vheight0;
+    int x_vsize0;
 
-    t_int x_vwidth1;
-    t_int x_vheight1;
-    t_int x_vsize1;
+    int x_vwidth1;
+    int x_vheight1;
+    int x_vsize1;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
 } t_pdp_juxta;
 

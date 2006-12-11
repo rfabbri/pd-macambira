@@ -30,7 +30,7 @@
 
 static char   *pdp_pen_version = "pdp_pen: version 0.1, free hand drawing object written by Yves Degoyon (ydegoyon@free.fr)";
 
-static t_int nbits=0; // number of recursive calls
+static int nbits=0; // number of recursive calls
 
 typedef struct pdp_pen_struct
 {
@@ -38,30 +38,30 @@ typedef struct pdp_pen_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_red;
-    t_int x_green;
-    t_int x_blue;
-    t_int x_xoffset;
-    t_int x_yoffset;
+    int x_red;
+    int x_green;
+    int x_blue;
+    int x_xoffset;
+    int x_yoffset;
     t_float x_alpha;
     
-    t_int x_pwidth;
-    t_int x_mode;  // 0=draw ( default), 1=erase
+    int x_pwidth;
+    int x_mode;  // 0=draw ( default), 1=erase
 
     short int *x_bdata;
 
 } t_pdp_pen;
 
-static void pdp_pen_allocate(t_pdp_pen *x, t_int newsize)
+static void pdp_pen_allocate(t_pdp_pen *x, int newsize)
 {
  int i;
 
@@ -75,8 +75,8 @@ static void pdp_pen_allocate(t_pdp_pen *x, t_int newsize)
 static void pdp_pen_draw(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
 {
  short int  *pbY, *pbU, *pbV;
- t_int mx, Mx, my, My;
- t_int px, py;
+ int mx, Mx, my, My;
+ int px, py;
 
   if ( !x->x_bdata ) return;
 
@@ -135,22 +135,22 @@ static void pdp_pen_do_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
   if ( !x->x_bdata ) return;
 
   nbits++;
-  // post( "pdp_pen_do_fill : X=%d, Y=%d stack=%d", (t_int)X, (t_int)Y, nbits );
+  // post( "pdp_pen_do_fill : X=%d, Y=%d stack=%d", (int)X, (int)Y, nbits );
 
   pbY = x->x_bdata;
   pbU = (x->x_bdata+x->x_vsize);
   pbV = (x->x_bdata+x->x_vsize+(x->x_vsize>>2));
 
-  if ( ( (t_int)X < 0 ) || ( (t_int)X >= x->x_vwidth ) || 
-       ( (t_int)Y < 0 ) || ( (t_int)Y >= x->x_vheight ) )
+  if ( ( (int)X < 0 ) || ( (int)X >= x->x_vwidth ) || 
+       ( (int)Y < 0 ) || ( (int)Y >= x->x_vheight ) )
   {
      nbits--;
      return;
   }
 
-  nX = (t_int) X; 
-  nY = (t_int) Y; 
-  if ( *(pbY+(t_int)Y*x->x_vwidth+(t_int)X) != 0 )
+  nX = (int) X; 
+  nY = (int) Y; 
+  if ( *(pbY+(int)Y*x->x_vwidth+(int)X) != 0 )
   {
      nbits--;
      return;
@@ -165,8 +165,8 @@ static void pdp_pen_do_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
         (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
   }
 
-  nX = (t_int) X+1; 
-  nY = (t_int) Y; 
+  nX = (int) X+1; 
+  nY = (int) Y; 
   if ( (*(pbY+nY*x->x_vwidth+nX)) == 0 )
   {
      pdp_pen_do_fill( x, nX, nY );
@@ -178,8 +178,8 @@ static void pdp_pen_do_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
         (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
   } 
 
-  nX = (t_int) X-1; 
-  nY = (t_int) Y; 
+  nX = (int) X-1; 
+  nY = (int) Y; 
   if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
   {
      pdp_pen_do_fill( x, nX, nY );
@@ -191,8 +191,8 @@ static void pdp_pen_do_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
         (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
   } 
 
-  nX = (t_int) X-1; 
-  nY = (t_int) Y-1; 
+  nX = (int) X-1; 
+  nY = (int) Y-1; 
   if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
   {
      pdp_pen_do_fill( x, nX, nY );
@@ -204,8 +204,8 @@ static void pdp_pen_do_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
         (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
   } 
 
-  nX = (t_int) X; 
-  nY = (t_int) Y-1; 
+  nX = (int) X; 
+  nY = (int) Y-1; 
   if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
   {
      pdp_pen_do_fill( x, nX, nY );
@@ -217,8 +217,8 @@ static void pdp_pen_do_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
         (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
   } 
 
-  nX = (t_int) X+1; 
-  nY = (t_int) Y-1; 
+  nX = (int) X+1; 
+  nY = (int) Y-1; 
   if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
   {
      pdp_pen_do_fill( x, nX, nY );
@@ -230,8 +230,8 @@ static void pdp_pen_do_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
         (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
   } 
 
-  nX = (t_int) X-1; 
-  nY = (t_int) Y+1; 
+  nX = (int) X-1; 
+  nY = (int) Y+1; 
   if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
   {
      pdp_pen_do_fill( x, nX, nY );
@@ -243,8 +243,8 @@ static void pdp_pen_do_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
         (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
   } 
 
-  nX = (t_int) X; 
-  nY = (t_int) Y+1; 
+  nX = (int) X; 
+  nY = (int) Y+1; 
   if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
   {
      pdp_pen_do_fill( x, nX, nY );
@@ -256,8 +256,8 @@ static void pdp_pen_do_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
         (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
   } 
 
-  nX = (t_int) X+1; 
-  nY = (t_int) Y+1; 
+  nX = (int) X+1; 
+  nY = (int) Y+1; 
   if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
   {
      pdp_pen_do_fill( x, nX, nY );
@@ -358,15 +358,15 @@ static void pdp_pen_process_yv12(t_pdp_pen *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int      i;
-    t_int      px, py;
+    int      i;
+    int      px, py;
     short int  *pY, *pU, *pV;
     short int  *pbY, *pbU, *pbV;
     short int  *pnY, *pnU, *pnV;
 
     /* allocate all ressources */
-    if ( ((t_int)header->info.image.width != x->x_vwidth ) ||
-         ((t_int)header->info.image.height != x->x_vheight ) ) 
+    if ( ((int)header->info.image.width != x->x_vwidth ) ||
+         ((int)header->info.image.height != x->x_vheight ) ) 
     {
         pdp_pen_allocate(x, header->info.image.width*header->info.image.height );
         post( "pdp_pen : reallocating buffers" );

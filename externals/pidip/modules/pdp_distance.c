@@ -33,20 +33,20 @@ typedef struct pdp_distance_struct
 {
     t_object x_obj;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_queue_id;
-    t_int x_dropped;
+    int x_packet0;
+    int x_packet1;
+    int x_queue_id;
+    int x_dropped;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
     short int *x_frame;  // keep a copy of current frame for transformations
 
-    t_int x_coeff1;
-    t_int x_coeff2;
-    t_int x_coeff3;
-    t_int x_coeff4;
+    int x_coeff1;
+    int x_coeff2;
+    int x_coeff3;
+    int x_coeff4;
 
     t_outlet *x_pdp_output; // output packets
 
@@ -94,10 +94,10 @@ static void pdp_distance_process_yv12(t_pdp_distance *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     i;
-    t_int     px=0, py=0; 
+    int     i;
+    int     px=0, py=0; 
     short int *pfY, *pfU, *pfV;
-    t_int     nvalues, values[5], ival, mval;
+    int     nvalues, values[5], ival, mval;
 
     // allocate all ressources
     if ( ( (int)header->info.image.width != x->x_vwidth ) ||

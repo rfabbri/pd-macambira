@@ -43,29 +43,29 @@ typedef struct pdp_text_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
     char **x_text_array;
-    t_int *x_xoffsets;
-    t_int *x_yoffsets;
-    t_int *x_r;
-    t_int *x_g;
-    t_int *x_b;
+    int *x_xoffsets;
+    int *x_yoffsets;
+    int *x_r;
+    int *x_g;
+    int *x_b;
     t_float *x_angle;
     t_float x_alpha;
-    t_int *x_scroll;
+    int *x_scroll;
 
-    t_int x_nbtexts;
-    t_int x_current;
-    t_int x_capacity;
+    int x_nbtexts;
+    int x_current;
+    int x_capacity;
 
         /* imlib data */
     Imlib_Image x_image;
@@ -78,7 +78,7 @@ static void pdp_text_add(t_pdp_text *x, t_symbol *s, int argc, t_atom *argv)
 {
  char *pname;
  char *pdname;
- t_int len;
+ int len;
 
    if ( x->x_nbtexts >= x->x_capacity )
    {
@@ -106,8 +106,8 @@ static void pdp_text_add(t_pdp_text *x, t_symbol *s, int argc, t_atom *argv)
    {
       if ( (*pname=='%') && ( isdigit(*(pname+1)) || (*(pname+1)=='%') ) )
       {
-        t_int ivalue;
-        t_int ndigits;
+        int ivalue;
+        int ndigits;
         char  *piname;
 
          ndigits=0;
@@ -263,7 +263,7 @@ static void pdp_text_clear(t_pdp_text *x )
 
 static void pdp_text_delete(t_pdp_text *x,  t_floatarg fnum  )
 {
-  t_int i;
+  int i;
   char *lostword;
 
     if ( ( fnum>0 ) && ( fnum<=x->x_nbtexts ) )
@@ -288,27 +288,27 @@ static void pdp_text_delete(t_pdp_text *x,  t_floatarg fnum  )
 static void pdp_text_resize(t_pdp_text *x,  t_floatarg fnewsize  )
 {
   char **text_array;
-  t_int *xoffsets;
-  t_int *yoffsets;
-  t_int *r;
-  t_int *g;
-  t_int *b;
+  int *xoffsets;
+  int *yoffsets;
+  int *r;
+  int *g;
+  int *b;
   t_float *angle;
-  t_int *scroll;
+  int *scroll;
 
-  t_int i, csize;
+  int i, csize;
 
     if ( (int) fnewsize<=0 ) return;
 
     // allocate new structures
     text_array = (char**) getbytes( fnewsize*sizeof(char*) );
-    xoffsets = (t_int*) getbytes( fnewsize*sizeof(t_int) );
-    yoffsets = (t_int*) getbytes( fnewsize*sizeof(t_int) );
-    r = (t_int*) getbytes( fnewsize*sizeof(t_int) );
-    g = (t_int*) getbytes( fnewsize*sizeof(t_int) );
-    b = (t_int*) getbytes( fnewsize*sizeof(t_int) );
+    xoffsets = (int*) getbytes( fnewsize*sizeof(int) );
+    yoffsets = (int*) getbytes( fnewsize*sizeof(int) );
+    r = (int*) getbytes( fnewsize*sizeof(int) );
+    g = (int*) getbytes( fnewsize*sizeof(int) );
+    b = (int*) getbytes( fnewsize*sizeof(int) );
     angle = (t_float*) getbytes( fnewsize*sizeof(t_float) );
-    scroll = (t_int*) getbytes( fnewsize*sizeof(t_int) );
+    scroll = (int*) getbytes( fnewsize*sizeof(int) );
 
 
     for ( i=0; i<fnewsize; i++ )
@@ -343,13 +343,13 @@ static void pdp_text_resize(t_pdp_text *x,  t_floatarg fnewsize  )
   
     // free old structures
     if ( x->x_text_array ) freebytes( x->x_text_array, x->x_capacity*sizeof(char*) );
-    if ( x->x_xoffsets ) freebytes( x->x_xoffsets, x->x_capacity*sizeof(t_int) );
-    if ( x->x_yoffsets ) freebytes( x->x_yoffsets, x->x_capacity*sizeof(t_int) );
-    if ( x->x_r ) freebytes( x->x_r, x->x_capacity*sizeof(t_int) );
-    if ( x->x_g ) freebytes( x->x_g, x->x_capacity*sizeof(t_int) );
-    if ( x->x_b ) freebytes( x->x_b, x->x_capacity*sizeof(t_int) );
+    if ( x->x_xoffsets ) freebytes( x->x_xoffsets, x->x_capacity*sizeof(int) );
+    if ( x->x_yoffsets ) freebytes( x->x_yoffsets, x->x_capacity*sizeof(int) );
+    if ( x->x_r ) freebytes( x->x_r, x->x_capacity*sizeof(int) );
+    if ( x->x_g ) freebytes( x->x_g, x->x_capacity*sizeof(int) );
+    if ( x->x_b ) freebytes( x->x_b, x->x_capacity*sizeof(int) );
     if ( x->x_angle) freebytes( x->x_angle, x->x_capacity*sizeof(t_float) );
-    if ( x->x_scroll) freebytes( x->x_scroll, x->x_capacity*sizeof(t_int) );
+    if ( x->x_scroll) freebytes( x->x_scroll, x->x_capacity*sizeof(int) );
 
     // set new structures
     x->x_text_array = text_array;
@@ -409,8 +409,8 @@ static void pdp_text_process_yv12(t_pdp_text *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     ti;
-    t_int     px, py;
+    int     ti;
+    int     px, py;
     unsigned char y, u, v;
     DATA32    *imdata;
     DATA32    bgcolor;
@@ -580,13 +580,13 @@ void *pdp_text_new(void)
 
 
     x->x_text_array = (char**) getbytes( x->x_capacity*sizeof(char*) );
-    x->x_xoffsets = (t_int*) getbytes( x->x_capacity*sizeof(t_int) );
-    x->x_yoffsets = (t_int*) getbytes( x->x_capacity*sizeof(t_int) );
-    x->x_r = (t_int*) getbytes( x->x_capacity*sizeof(t_int) );
-    x->x_g = (t_int*) getbytes( x->x_capacity*sizeof(t_int) );
-    x->x_b = (t_int*) getbytes( x->x_capacity*sizeof(t_int) );
+    x->x_xoffsets = (int*) getbytes( x->x_capacity*sizeof(int) );
+    x->x_yoffsets = (int*) getbytes( x->x_capacity*sizeof(int) );
+    x->x_r = (int*) getbytes( x->x_capacity*sizeof(int) );
+    x->x_g = (int*) getbytes( x->x_capacity*sizeof(int) );
+    x->x_b = (int*) getbytes( x->x_capacity*sizeof(int) );
     x->x_angle = (t_float*) getbytes( x->x_capacity*sizeof(t_float) );
-    x->x_scroll = (t_int*) getbytes( x->x_capacity*sizeof(t_int) );
+    x->x_scroll = (int*) getbytes( x->x_capacity*sizeof(int) );
 
    for ( i=0; i<x->x_capacity; i++ )
     {

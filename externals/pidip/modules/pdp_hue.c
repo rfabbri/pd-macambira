@@ -32,13 +32,13 @@ typedef struct pdp_hue_struct
     t_outlet *x_meang;
     t_outlet *x_meanb;
 
-    t_int x_packet0;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
     unsigned int x_encoding;
 
 } t_pdp_hue;
@@ -49,10 +49,10 @@ static void pdp_hue_process_rgb(t_pdp_hue *x)
     unsigned char *data = (unsigned char*)pdp_packet_data(x->x_packet0);
     int       i;
 
-    t_int px, py;
+    int px, py;
     unsigned char *sr, *sg, *sb;
     double meanr=0, meang=0, meanb=0;
-    t_int nbpixs=0;
+    int nbpixs=0;
 
     /* allocate all ressources */
     x->x_vwidth = header->info.image.width;

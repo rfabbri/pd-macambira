@@ -83,29 +83,29 @@ typedef struct pdp_spiral_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
     short int *x_buffer;
     short int *x_planetable[PLANES];
-    t_int x_plane;
-    t_int *x_depthmap;
-    t_int x_mode;
-    t_int x_focus_x;
-    t_int x_focus_y;
-    t_int x_cursor_state;
-    t_int x_cursor_local;
-    t_int x_toggle_xor;
-    t_int x_animate_focus;
-    t_int x_focus_interval;
-    t_int x_focus_counter;
+    int x_plane;
+    int *x_depthmap;
+    int x_mode;
+    int x_focus_x;
+    int x_focus_y;
+    int x_cursor_state;
+    int x_cursor_local;
+    int x_toggle_xor;
+    int x_animate_focus;
+    int x_focus_interval;
+    int x_focus_counter;
     unsigned int x_depth_shift; // Cheesy way to adjust intensity
-    t_int  x_focus_radius;
+    int  x_focus_radius;
     double x_focus_degree;
     double x_focus_increment;
 
@@ -113,7 +113,7 @@ typedef struct pdp_spiral_struct
 
 static void pdp_spiral_define_waves(t_pdp_spiral *x) 
 {
-  t_int   i, w, iw;
+  int   i, w, iw;
   double  sinus_val = M_PI/2.0;
 
   if (NULL == the_wave_table) return;
@@ -156,10 +156,10 @@ static void pdp_spiral_define_waves(t_pdp_spiral *x)
 
 void pdp_spiral_create_map(t_pdp_spiral *x)
 {
-    t_int px, py, rel_x, rel_y, yy;
+    int px, py, rel_x, rel_y, yy;
     float x_ratio;
     float y_ratio;
-    t_int v, i, wave_offset;
+    int v, i, wave_offset;
 
     if ( x->x_vsize == -1 ) 
     {
@@ -284,7 +284,7 @@ static void pdp_spiral_allocate(t_pdp_spiral *x)
        x->x_planetable[i] = &x->x_buffer[ ( ( x->x_vsize + x->x_vsize>>1 ) << 1 ) * i];
     }
 
-    x->x_depthmap = (t_int*) malloc (  x->x_vsize * sizeof ( t_int ) );
+    x->x_depthmap = (int*) malloc (  x->x_vsize * sizeof ( int ) );
 
     if ( !the_wave_table || !x->x_buffer || !x->x_depthmap )
     {

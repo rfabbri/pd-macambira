@@ -38,20 +38,20 @@ typedef struct pdp_transform_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int **x_table_list; // mapping tables
-    t_int **x_table_list_u; // mapping tables
-    t_int x_table; // current table
-    t_int x_t;
+    int **x_table_list; // mapping tables
+    int **x_table_list_u; // mapping tables
+    int x_table; // current table
+    int x_t;
 
 
 } t_pdp_transform;
@@ -64,7 +64,7 @@ static void pdp_transform_table(t_pdp_transform *x, t_floatarg ftable )
     }
 }
 
-static int pdp_transform_map_from_table(t_pdp_transform *x, t_int px, t_int py, t_int t) 
+static int pdp_transform_map_from_table(t_pdp_transform *x, int px, int py, int t) 
 {
   int xd,yd;
 
@@ -76,7 +76,7 @@ static int pdp_transform_map_from_table(t_pdp_transform *x, t_int px, t_int py, 
     return (xd+yd*x->x_vwidth);
 }
 
-static int pdp_transform_map_from_table_u(t_pdp_transform *x, t_int px, t_int py, t_int t) 
+static int pdp_transform_map_from_table_u(t_pdp_transform *x, int px, int py, int t) 
 {
   int xd,yd;
 
@@ -91,7 +91,7 @@ static int pdp_transform_map_from_table_u(t_pdp_transform *x, t_int px, t_int py
 static void pdp_transform_square_table_init(t_pdp_transform *x)
 {
   const int size = 16;
-  t_int px, py, tx, ty;
+  int px, py, tx, ty;
 
     for(py=0; py<x->x_vheight; py++) 
     {
@@ -130,7 +130,7 @@ static void pdp_transform_square_table_init(t_pdp_transform *x)
 
 static void pdp_transform_init_tables(t_pdp_transform *x)
 {
-  t_int px, py;
+  int px, py;
 
     for (py=0;py<x->x_vheight;py++) 
     {
@@ -170,8 +170,8 @@ static void pdp_transform_allocate(t_pdp_transform *x)
     // allocate tables
     for(i=0;i<MAX_TABLES;i++)
     {
-       x->x_table_list[i] = (t_int *) getbytes( x->x_vsize*sizeof(int) );
-       x->x_table_list_u[i] = (t_int *) getbytes( x->x_vsize*sizeof(int) );
+       x->x_table_list[i] = (int *) getbytes( x->x_vsize*sizeof(int) );
+       x->x_table_list_u[i] = (int *) getbytes( x->x_vsize*sizeof(int) );
     }
 }
 
@@ -181,9 +181,9 @@ static void pdp_transform_process_yv12(t_pdp_transform *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     i, iu;
-    t_int     px, py;
-    t_int     d, o, du=0, ou;
+    int     i, iu;
+    int     px, py;
+    int     d, o, du=0, ou;
     short int *pY, *pU, *pV, *pnY, *pnU, *pnV;
 
     /* allocate all ressources */
@@ -327,8 +327,8 @@ void *pdp_transform_new(void)
     x->x_packet1 = -1;
     x->x_queue_id = -1;
 
-    x->x_table_list = (t_int **) getbytes(MAX_TABLES * sizeof(int *));
-    x->x_table_list_u = (t_int **) getbytes(MAX_TABLES * sizeof(int *));
+    x->x_table_list = (int **) getbytes(MAX_TABLES * sizeof(int *));
+    x->x_table_list_u = (int **) getbytes(MAX_TABLES * sizeof(int *));
     x->x_t = 0;
 
     return (void *)x;

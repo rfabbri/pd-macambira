@@ -39,15 +39,15 @@ typedef struct pdp_baltan_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int *x_planebuf;
-    t_int x_plane;
-    t_int x_pixels;
-    t_int x_dfts; /* the factor */
+    int *x_planebuf;
+    int x_plane;
+    int x_pixels;
+    int x_dfts; /* the factor */
 
 } t_pdp_baltan;
 
@@ -67,7 +67,7 @@ static void pdp_baltan_process_yv12(t_pdp_baltan *x)
     unsigned int v_offset = size + (size>>2);
     unsigned int totnbpixels = size + (size>>1);
 
-    t_int i, cf;
+    int i, cf;
 
     newheader->info.image.encoding = header->info.image.encoding;
     newheader->info.image.width = w;
@@ -76,12 +76,12 @@ static void pdp_baltan_process_yv12(t_pdp_baltan *x)
     /* allocate buffers if necessary  */
     if ( ( x->x_planebuf == NULL ) || ( (int)size != x->x_pixels ) ) 
     {
-       if ( x->x_planebuf ) freebytes( x->x_planebuf, x->x_pixels*PLANES*sizeof(t_int) );
+       if ( x->x_planebuf ) freebytes( x->x_planebuf, x->x_pixels*PLANES*sizeof(int) );
        
        x->x_pixels = size;
-       x->x_planebuf = (t_int*)getbytes(x->x_pixels*PLANES*sizeof(t_int));
-       post("pdp_baltan : allocated plane buffer (size=%d)", x->x_pixels*PLANES*sizeof(t_int) );
-       bzero(x->x_planebuf, x->x_pixels*PLANES*sizeof(t_int));
+       x->x_planebuf = (int*)getbytes(x->x_pixels*PLANES*sizeof(int));
+       post("pdp_baltan : allocated plane buffer (size=%d)", x->x_pixels*PLANES*sizeof(int) );
+       bzero(x->x_planebuf, x->x_pixels*PLANES*sizeof(int));
        x->x_plane = 0;
        if ( !x->x_planebuf ) 
        {
@@ -175,12 +175,12 @@ static void pdp_baltan_input_0(t_pdp_baltan *x, t_symbol *s, t_floatarg f)
 
 static void pdp_baltan_dfts(t_pdp_baltan *x, t_floatarg fdfts )
 {
-    x->x_dfts = (t_int)fdfts;
+    x->x_dfts = (int)fdfts;
 }
 
 static void pdp_baltan_free(t_pdp_baltan *x)
 {
-    if ( x->x_planebuf ) freebytes( x->x_planebuf, x->x_pixels*PLANES*sizeof(t_int) );
+    if ( x->x_planebuf ) freebytes( x->x_planebuf, x->x_pixels*PLANES*sizeof(int) );
     pdp_queue_finish(x->x_queue_id);
     pdp_packet_mark_unused(x->x_packet0);
 }

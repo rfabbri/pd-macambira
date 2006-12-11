@@ -33,16 +33,16 @@ typedef struct pdp_mapper_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
     unsigned int x_encoding;
-    t_int *x_pixelmap;
+    int *x_pixelmap;
 
 } t_pdp_mapper;
 
@@ -53,13 +53,13 @@ static void pdp_mapper_copy(t_pdp_mapper *x, t_floatarg fromX, t_floatarg fromY,
         ( fromY >= 0 ) && ( fromY < x->x_vheight ) &&
         ( toY >= 0 ) && ( toY < x->x_vheight ) )
     {
-        x->x_pixelmap[ (t_int)toY*x->x_vwidth+(t_int)toX ] = x->x_pixelmap[ (t_int)fromY*x->x_vwidth+(t_int)fromX ];
+        x->x_pixelmap[ (int)toY*x->x_vwidth+(int)toX ] = x->x_pixelmap[ (int)fromY*x->x_vwidth+(int)fromX ];
     }
 }
 
 static void pdp_mapper_reset(t_pdp_mapper *x)
 {
- t_int px, py;
+ int px, py;
 
   if ( x->x_vsize > 0 )
   {
@@ -76,30 +76,30 @@ static void pdp_mapper_reset(t_pdp_mapper *x)
 static void pdp_mapper_swap(t_pdp_mapper *x, t_floatarg fromX, t_floatarg fromY, t_floatarg toX, t_floatarg toY)
 {
 
- t_int tval;
+ int tval;
  
    if ( ( fromX >= 0 ) && ( fromX < x->x_vwidth ) &&
         ( toX >= 0 ) && ( toX < x->x_vwidth ) &&
         ( fromY >= 0 ) && ( fromY < x->x_vheight ) &&
         ( toY >= 0 ) && ( toY < x->x_vheight ) )
     {
-        tval = x->x_pixelmap[ (t_int)toY*x->x_vwidth+(t_int)toX ];
-        x->x_pixelmap[ (t_int)toY*x->x_vwidth+(t_int)toX ] = x->x_pixelmap[ (t_int)fromY*x->x_vwidth+(t_int)fromX ];
-        x->x_pixelmap[ (t_int)fromY*x->x_vwidth+(t_int)fromX ] = tval;
+        tval = x->x_pixelmap[ (int)toY*x->x_vwidth+(int)toX ];
+        x->x_pixelmap[ (int)toY*x->x_vwidth+(int)toX ] = x->x_pixelmap[ (int)fromY*x->x_vwidth+(int)fromX ];
+        x->x_pixelmap[ (int)fromY*x->x_vwidth+(int)fromX ] = tval;
     }
 }
 
-static void pdp_mapper_allocate(t_pdp_mapper *x, t_int newsize)
+static void pdp_mapper_allocate(t_pdp_mapper *x, int newsize)
 {
  int i, px, py;
 
   if ( x->x_pixelmap != NULL )
   {
-       freebytes( x->x_pixelmap, x->x_vsize*sizeof(t_int) );
+       freebytes( x->x_pixelmap, x->x_vsize*sizeof(int) );
   }
 
   x->x_vsize = newsize;
-  x->x_pixelmap = (t_int*) getbytes( x->x_vsize*sizeof(t_int) );
+  x->x_pixelmap = (int*) getbytes( x->x_vsize*sizeof(int) );
 
   for ( py=0; py<x->x_vheight; py++ )
   {
@@ -118,14 +118,14 @@ static void pdp_mapper_process_yv12(t_pdp_mapper *x)
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
     int       i;
 
-    t_int px, py, ppx, ppy, offset;
+    int px, py, ppx, ppy, offset;
     short int *sy, *su, *sv, t;
-    t_int *spy;
+    int *spy;
     short int *sny, *snu, *snv;
 
     /* allocate all ressources */
-    if ( ((t_int)header->info.image.width != x->x_vwidth ) || 
-         ((t_int)header->info.image.height != x->x_vheight ) )
+    if ( ((int)header->info.image.width != x->x_vwidth ) || 
+         ((int)header->info.image.height != x->x_vheight ) )
     {
         x->x_vwidth = header->info.image.width;
         x->x_vheight = header->info.image.height;
@@ -232,7 +232,7 @@ static void pdp_mapper_free(t_pdp_mapper *x)
     pdp_queue_finish(x->x_queue_id);
     pdp_packet_mark_unused(x->x_packet0);
 
-    if ( x->x_pixelmap ) freebytes( x->x_pixelmap, x->x_vsize*sizeof(t_int) );
+    if ( x->x_pixelmap ) freebytes( x->x_pixelmap, x->x_vsize*sizeof(int) );
 
 }
 

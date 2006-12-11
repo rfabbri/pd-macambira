@@ -74,7 +74,7 @@ static char   *pdp_colorgrid_version = "pdp_colorgrid: version 0.4, written by Y
 static void pdp_colorgrid_draw_update(t_pdp_colorgrid *x, t_glist *glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
-    t_int xpoint=x->x_current, ypoint=x->y_current;
+    int xpoint=x->x_current, ypoint=x->y_current;
 
     // later : try to figure out what's this test for ??  
     // if (glist_isvisible(glist))
@@ -414,7 +414,7 @@ static void pdp_colorgrid_save(t_gobj *z, t_binbuf *b)
 
    // post( "saving pdp_colorgrid : %s", x->x_name->s_name );
    binbuf_addv(b, "ssiissiffiffiffiiff", gensym("#X"),gensym("obj"),
-		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
+		(int)x->x_obj.te_xpix, (int)x->x_obj.te_ypix,
 		gensym("pdp_colorgrid"), x->x_name, x->x_width, x->x_min,
 		x->x_max, x->x_height,
                 x->y_min, x->y_max,

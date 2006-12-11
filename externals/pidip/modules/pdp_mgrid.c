@@ -36,18 +36,18 @@ typedef struct pdp_mgrid_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_dropped;
+    int x_packet0;
+    int x_dropped;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
     short int *x_previous_frame;
-    t_int x_xdim;
-    t_int x_ydim;
-    t_int x_threshold;
+    int x_xdim;
+    int x_ydim;
+    int x_threshold;
     short int x_color;
-    t_int x_firstimage;
+    int x_firstimage;
 
     t_outlet *x_pdp_output; // output packets
     t_outlet *x_xmotion; // output x coordinate of block which has been detected
@@ -119,10 +119,10 @@ static void pdp_mgrid_process_yv12(t_pdp_mgrid *x)
 {
     t_pdp     *header = pdp_packet_header(x->x_packet0);
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
-    t_int     i, cf;
-    t_int     px=0, py=0, xcell=0, ycell=0; 
-    t_int     celldiff=0, cellwidth=0, cellheight=0;
-    t_int     yindex=0, uindex=0, vindex=0;
+    int     i, cf;
+    int     px=0, py=0, xcell=0, ycell=0; 
+    int     celldiff=0, cellwidth=0, cellheight=0;
+    int     yindex=0, uindex=0, vindex=0;
 
     /* allocate all ressources */
     if ( ( (int)header->info.image.width != x->x_vwidth ) ||

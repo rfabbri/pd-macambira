@@ -32,16 +32,16 @@ typedef struct pdp_disintegration_struct
 {
     t_object x_obj;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_queue_id;
-    t_int x_dropped;
+    int x_packet0;
+    int x_packet1;
+    int x_queue_id;
+    int x_dropped;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_nbpasses;  // number of passes
-    t_int x_reductor; // fraction reductor
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_nbpasses;  // number of passes
+    int x_reductor; // fraction reductor
     short int *x_frame;  // keep a copy of current frame for transformations
 
     t_outlet *x_pdp_output; // output packets
@@ -52,7 +52,7 @@ static void pdp_disintegration_nbpasses(t_pdp_disintegration *x,  t_floatarg fpa
 {
    if ( fpasses>=1.) 
    {
-      x->x_nbpasses = (t_int)fpasses;
+      x->x_nbpasses = (int)fpasses;
    }
 }
 
@@ -60,7 +60,7 @@ static void pdp_disintegration_reductor(t_pdp_disintegration *x,  t_floatarg fre
 {
    if ( freductor>=1.) 
    {
-      x->x_reductor = (t_int)freductor;
+      x->x_reductor = (int)freductor;
    }
 }
 
@@ -86,11 +86,11 @@ static void pdp_disintegration_process_yv12(t_pdp_disintegration *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     i;
-    t_int     px=0, py=0; 
+    int     i;
+    int     px=0, py=0; 
     short int *pfY, *pfU, *pfV;
-    t_int     ppx, ppy, ix, iy, pn;
-    t_int     nvalue;
+    int     ppx, ppy, ix, iy, pn;
+    int     nvalue;
 
     // allocate all ressources
     if ( ( (int)header->info.image.width != x->x_vwidth ) ||

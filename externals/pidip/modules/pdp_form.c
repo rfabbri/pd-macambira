@@ -46,8 +46,8 @@ typedef enum _form_type t_form_type;
 typedef struct _form
 {
     t_form_type type;
-    t_int n1,n2,n3,n4; // numerical coordinates or rays
-    t_int r,g,b;
+    int n1,n2,n3,n4; // numerical coordinates or rays
+    int r,g,b;
 } t_form;
 
 
@@ -60,20 +60,20 @@ typedef struct pdp_form_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
     t_form *x_forms;
-    t_int x_nbforms;
-    t_int x_current;
-    t_int x_capacity;
+    int x_nbforms;
+    int x_current;
+    int x_capacity;
     t_float x_alpha;
 
         /* imlib data */
@@ -300,7 +300,7 @@ static void pdp_form_clear(t_pdp_form *x )
 
 static void pdp_form_delete(t_pdp_form *x,  t_floatarg fnum  )
 {
-  t_int i;
+  int i;
   char *lostword;
 
     if ( ( fnum>0 ) && ( fnum<=x->x_nbforms ) )
@@ -324,7 +324,7 @@ static void pdp_form_alpha(t_pdp_form *x, t_floatarg falpha )
 static void pdp_form_resize(t_pdp_form *x,  t_floatarg fnewsize  )
 {
   t_form *forms;
-  t_int i, csize;
+  int i, csize;
 
     if ( (int) fnewsize<=0 ) return;
 
@@ -390,8 +390,8 @@ static void pdp_form_process_yv12(t_pdp_form *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     ti;
-    t_int     px, py;
+    int     ti;
+    int     px, py;
     unsigned char y, u, v;
     DATA32    *imdata;
     DATA32    bgcolor;

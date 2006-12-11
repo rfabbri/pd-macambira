@@ -48,22 +48,22 @@ typedef struct pdp_dice_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
     char  *x_dicemap;
 
-    t_int x_cube_bits;
-    t_int x_cube_size;
-    t_int x_map_height;
-    t_int x_map_width;
+    int x_cube_bits;
+    int x_cube_size;
+    int x_map_height;
+    int x_map_width;
 
 } t_pdp_dice;
 
@@ -119,9 +119,9 @@ static void pdp_dice_process_yv12(t_pdp_dice *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     i, iuv;
-    t_int     mapx, mapy, mapi;
-    t_int     base, baseuv, dx, dy, di, diuv;
+    int     i, iuv;
+    int     mapx, mapy, mapi;
+    int     base, baseuv, dx, dy, di, diuv;
 
     /* allocate all ressources */
     if ( ((int)header->info.image.width != x->x_vwidth) ||

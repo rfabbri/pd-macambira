@@ -31,14 +31,14 @@
 struct _rtext
 {
     char *x_buf;
-    t_int x_bufsize;
-    t_int x_selstart;
-    t_int x_selend;
-    t_int x_active;
-    t_int x_dragfrom;
-    t_int x_height;
-    t_int x_drawnwidth;
-    t_int x_drawnheight;
+    int x_bufsize;
+    int x_selstart;
+    int x_selend;
+    int x_active;
+    int x_dragfrom;
+    int x_height;
+    int x_drawnwidth;
+    int x_drawnheight;
     t_text *x_text;
     t_glist *x_glist;
     char x_tag[50];
@@ -60,25 +60,25 @@ typedef struct pdp_compose_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_colorR; // RGB components of mixing color
-    t_int x_colorG;
-    t_int x_colorB;
-    t_int x_colorY; // YUV components of mixing color
-    t_int x_colorU;
-    t_int x_colorV;
-    t_int x_tolerance; // tolerance 
-    t_int x_cursX;  // X coordinate of cursor
-    t_int x_cursY;  // Y coordinate of cursor
-    t_int x_cursor; // cursor drawing flag
-    t_int x_luminosity; // flag to indicate if luminosity is used
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_colorR; // RGB components of mixing color
+    int x_colorG;
+    int x_colorB;
+    int x_colorY; // YUV components of mixing color
+    int x_colorU;
+    int x_colorV;
+    int x_tolerance; // tolerance 
+    int x_cursX;  // X coordinate of cursor
+    int x_cursY;  // Y coordinate of cursor
+    int x_cursor; // cursor drawing flag
+    int x_luminosity; // flag to indicate if luminosity is used
     short int *x_frame;  // keep a copy of current frame for picking color
     short int *x_right_frame;  // 2nd video source
 
@@ -90,7 +90,7 @@ typedef struct pdp_compose_struct
 
 static void pdp_compose_draw_color(t_pdp_compose *x)
 {
- t_int width, height;
+ int width, height;
  char color[32];
 
     sprintf( color, "#%.2X%.2X%.2X", x->x_colorR, x->x_colorG, x->x_colorB );
@@ -190,7 +190,7 @@ static void pdp_compose_luminosity(t_pdp_compose *x, t_floatarg fluminosity )
 
 static void pdp_compose_pick(t_pdp_compose *x)
 {
- t_int y,u,v;
+ int y,u,v;
 
    if ( x->x_frame && ( x->x_cursX > 0 ) && ( x->x_cursX < x->x_vwidth ) 
         && ( x->x_cursY > 0 ) && ( x->x_cursY < x->x_vheight ) )
@@ -232,11 +232,11 @@ static void pdp_compose_process_yv12(t_pdp_compose *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata   = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     i, cf;
-    t_int     px=0, py=0, ppx=0, ppy=0, found=0, xcell=0, ycell=0; 
-    t_int     celldiff=0, cellwidth=0, cellheight=0;
-    t_int     y=0, u=0, v=0;
-    t_int     sum;
+    int     i, cf;
+    int     px=0, py=0, ppx=0, ppy=0, found=0, xcell=0, ycell=0; 
+    int     celldiff=0, cellwidth=0, cellheight=0;
+    int     y=0, u=0, v=0;
+    int     sum;
     short int *pfY, *pfV, *pfU, *prY, *prV, *prU, *pdY, *pdV, *pdU;
 
     /* allocate all ressources */

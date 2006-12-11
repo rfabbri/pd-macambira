@@ -29,7 +29,7 @@
 #include <math.h>
 
 #define NBCOLORS 9
-static t_int colortable[NBCOLORS] = {
+static int colortable[NBCOLORS] = {
         0x000080, 0x008045, 0x07f0e7,
         0x0000f0, 0x00f07f, 0x037a10,
         0x0023d9, 0x0080f0, 0x083df0
@@ -43,17 +43,17 @@ typedef struct pdp_warhol_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_dividerx;
-    t_int x_dividery;
-    t_int x_colorindex;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_dividerx;
+    int x_dividery;
+    int x_colorindex;
 
 } t_pdp_warhol;
 
@@ -61,7 +61,7 @@ static void pdp_warhol_dividerx(t_pdp_warhol *x, t_floatarg fdivider )
 {
    if ( ( fdivider > 1 ) && ( fdivider < x->x_vwidth ) )
    {
-      x->x_dividerx = (t_int) fdivider;
+      x->x_dividerx = (int) fdivider;
    }
 }
 
@@ -69,7 +69,7 @@ static void pdp_warhol_dividery(t_pdp_warhol *x, t_floatarg fdivider )
 {
    if ( ( fdivider > 1 ) && ( fdivider < x->x_vwidth ) )
    {
-      x->x_dividery = (t_int) fdivider;
+      x->x_dividery = (int) fdivider;
    }
 }
 
@@ -77,13 +77,13 @@ static void pdp_warhol_colorindex(t_pdp_warhol *x, t_floatarg findex )
 {
    if ( ( findex >= 0 ) && ( findex < NBCOLORS ) )
    {
-      x->x_colorindex = (t_int) findex;
+      x->x_colorindex = (int) findex;
    }
 }
 
 static void pdp_warhol_v(t_pdp_warhol *x, t_floatarg fv )
 {
- t_int tc;
+ int tc;
 
    if ( ( fv >= 0 ) && ( fv < 255 ) )
    {
@@ -95,7 +95,7 @@ static void pdp_warhol_v(t_pdp_warhol *x, t_floatarg fv )
 
 static void pdp_warhol_u(t_pdp_warhol *x, t_floatarg fu )
 {
- t_int tc;
+ int tc;
 
    if ( ( fu >= 0 ) && ( fu < 255 ) )
    {
@@ -107,7 +107,7 @@ static void pdp_warhol_u(t_pdp_warhol *x, t_floatarg fu )
 
 static void pdp_warhol_y(t_pdp_warhol *x, t_floatarg fy )
 {
- t_int tc;
+ int tc;
 
    if ( ( fy >= 0 ) && ( fy < 255 ) )
    {

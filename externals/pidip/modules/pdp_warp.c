@@ -30,7 +30,7 @@
 
 #define CTABLE_SIZE 1024
 
-static t_int sintable[CTABLE_SIZE+256];
+static int sintable[CTABLE_SIZE+256];
 
 static char   *pdp_warp_version = "pdp_warp: version 0.1, port of warp from effectv( Fukuchi Kentaro ) adapted by Yves Degoyon (ydegoyon@free.fr)";
 
@@ -40,19 +40,19 @@ typedef struct pdp_warp_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_tval;
-    t_int x_mode;
-    t_int x_ctable[CTABLE_SIZE];
-    t_int *x_disttable;
-    t_int *x_offstable;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_tval;
+    int x_mode;
+    int x_ctable[CTABLE_SIZE];
+    int *x_disttable;
+    int *x_offstable;
 
 } t_pdp_warp;
 
@@ -71,7 +71,7 @@ static void pdp_warp_tval(t_pdp_warp *x, t_floatarg ftval )
 
 static void pdp_warp_init_sin_table(void) 
 {
-  t_int  *tptr, *tsinptr;
+  int  *tptr, *tsinptr;
   double  i;
 
    tsinptr = tptr = sintable;
@@ -98,7 +98,7 @@ static void pdp_warp_init_offs_table(t_pdp_warp* x)
 
 static void pdp_warp_init_dist_table(t_pdp_warp *x) 
 {
-  t_int  halfw, halfh, *distptr;
+  int  halfw, halfh, *distptr;
   double  px,py,m;
 
     halfw = x->x_vwidth>> 1;
@@ -120,16 +120,16 @@ static void pdp_warp_init_dist_table(t_pdp_warp *x)
 
 static void pdp_warp_free_ressources(t_pdp_warp *x)
 {
-  if ( x->x_offstable ) freebytes( x->x_offstable, x->x_vheight * sizeof (t_int) );
-  if ( x->x_disttable ) freebytes( x->x_disttable, x->x_vwidth * x->x_vheight * sizeof (t_int) );
+  if ( x->x_offstable ) freebytes( x->x_offstable, x->x_vheight * sizeof (int) );
+  if ( x->x_disttable ) freebytes( x->x_disttable, x->x_vwidth * x->x_vheight * sizeof (int) );
 }
 
 static void pdp_warp_allocate(t_pdp_warp *x)
 {
  int i;
 
-  x->x_offstable = (t_int*) getbytes ( x->x_vheight * sizeof (t_int) );
-  x->x_disttable = (t_int*) getbytes ( x->x_vwidth * x->x_vheight * sizeof (t_int) );
+  x->x_offstable = (int*) getbytes ( x->x_vheight * sizeof (int) );
+  x->x_disttable = (int*) getbytes ( x->x_vwidth * x->x_vheight * sizeof (int) );
   pdp_warp_init_offs_table(x); 
   pdp_warp_init_dist_table(x);
   
@@ -137,8 +137,8 @@ static void pdp_warp_allocate(t_pdp_warp *x)
 
 void pdp_warp_do_warp(t_pdp_warp *x, short int* src, short int *dest, int xw, int yw, int cw) 
 {
-  t_int c, i, px, py, dx, dy, dxu, dyu, maxx, maxy;
-  t_int width, height, skip, *ctptr, *distptr;
+  int c, i, px, py, dx, dy, dxu, dyu, maxx, maxy;
+  int width, height, skip, *ctptr, *distptr;
   short int *destptr, *destptru, *destptrv;
 
     ctptr = x->x_ctable;
@@ -207,7 +207,7 @@ static void pdp_warp_process_yv12(t_pdp_warp *x)
     int width, height;
     int *p, *q, *r;
     signed char *vp;
-    t_int xw, yw, cw;
+    int xw, yw, cw;
 
     /* allocate all ressources */
     if ( (int)(header->info.image.width*header->info.image.height) != x->x_vsize )

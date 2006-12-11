@@ -55,26 +55,26 @@ typedef struct pdp_ripple_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
-    t_int x_maph;
-    t_int x_mapw;
-    t_int x_mode;
-    t_int x_threshold;
-    t_int *x_map;
-    t_int *x_map1;
-    t_int *x_map2;
-    t_int *x_map3;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
+    int x_maph;
+    int x_mapw;
+    int x_mode;
+    int x_threshold;
+    int *x_map;
+    int *x_map1;
+    int *x_map2;
+    int *x_map3;
     signed char *x_vtable;
     short int *x_diff;
     short int *x_bdata;
-    t_int x_snapshot;
+    int x_snapshot;
 
 } t_pdp_ripple;
 
@@ -105,7 +105,7 @@ static void pdp_ripple_free_ressources(t_pdp_ripple *x)
 {
   if ( x->x_diff != NULL ) freebytes( x->x_diff, (x->x_vsize + (x->x_vsize>>1))<<1 );
   if ( x->x_bdata ) freebytes( x->x_bdata, (( x->x_vsize + (x->x_vsize>>1))<<1));
-  if ( x->x_map ) freebytes(x->x_map, x->x_maph*x->x_mapw*3*sizeof(t_int));
+  if ( x->x_map ) freebytes(x->x_map, x->x_maph*x->x_mapw*3*sizeof(int));
   if ( x->x_vtable ) freebytes(x->x_vtable, x->x_maph*x->x_mapw*2*sizeof(signed char));
 }
 
@@ -117,7 +117,7 @@ static void pdp_ripple_allocate(t_pdp_ripple *x)
   x->x_bdata = (short int *) getbytes((( x->x_vsize + (x->x_vsize>>1))<<1));
   x->x_maph = x->x_vheight / 2 + 1;
   x->x_mapw = x->x_vwidth / 2 + 1;
-  x->x_map = (int *)getbytes(x->x_maph*x->x_mapw*3*sizeof(t_int));
+  x->x_map = (int *)getbytes(x->x_maph*x->x_mapw*3*sizeof(int));
   x->x_vtable = (signed char *)getbytes(x->x_maph*x->x_mapw*2*sizeof(signed char));
   if( !x->x_map || !x->x_vtable || !x->x_bdata || !x->x_diff ) {
       post( "pdp_ripple : severe error : cannot allocate buffers" );

@@ -40,20 +40,20 @@ typedef struct pdp_segsnd_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_x1;  // coordinates of fixed segment
-    t_int x_y1;
-    t_int x_x2;
-    t_int x_y2;
-    t_int x_random;
+    int x_x1;  // coordinates of fixed segment
+    int x_y1;
+    int x_x2;
+    int x_y2;
+    int x_random;
 
     short int *x_data;
 
@@ -127,8 +127,8 @@ static void pdp_segsnd_process_yv12(t_pdp_segsnd *x)
   short int *data   = (short int *)pdp_packet_data(x->x_packet0);
   t_pdp     *newheader = pdp_packet_header(x->x_packet1);
   short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-  t_int     ti;
-  t_int     px, py;
+  int     ti;
+  int     px, py;
   unsigned char y, u, v;
   short int *pY, *pU, *pV;
   DATA32    *imdata;
@@ -278,8 +278,8 @@ static t_int *pdp_segsnd_perform(t_int *w)
 {
   t_float *out   = (t_float *)(w[1]);       // audio generated sound
   t_pdp_segsnd *x = (t_pdp_segsnd *)(w[2]);
-  t_int n = (int)(w[3]); 
-  t_int npoints, xi, px, py;
+  int n = (int)(w[3]); 
+  int npoints, xi, px, py;
   t_float a=0;
 
    // set initial coordinates

@@ -66,25 +66,25 @@ typedef struct pdp_theorout_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_tvwidth;       /* theora 16 pixels aligned width value */
-    t_int x_vheight;
-    t_int x_tvheight;      /* theora 16 pixels aligned height value */
-    t_int x_vsize;
+    int x_vwidth;
+    int x_tvwidth;       /* theora 16 pixels aligned width value */
+    int x_vheight;
+    int x_tvheight;      /* theora 16 pixels aligned height value */
+    int x_vsize;
 
     FILE  *x_tfile;
-    t_int x_framerate;
-    t_int x_newfile;
-    t_int x_einit;
-    t_int x_recflag;
-    t_int x_enduprec;;
-    t_int x_frameswritten;
-    t_int x_frames;
+    int x_framerate;
+    int x_newfile;
+    int x_einit;
+    int x_recflag;
+    int x_enduprec;;
+    int x_frameswritten;
+    int x_frames;
     struct timeval x_tstart;
     struct timeval x_tzero;
     struct timeval x_tcurrent;
@@ -104,19 +104,19 @@ typedef struct pdp_theorout_struct
     vorbis_comment   x_vorbis_comment; // vorbis comment
     yuv_buffer       x_yuvbuffer;      // yuv buffer
 
-    t_int            x_akbps;          // audio bit rate
-    t_int            x_vkbps;          // video bit rate
+    int            x_akbps;          // audio bit rate
+    int            x_vkbps;          // video bit rate
     t_float          x_aquality;       // audio quality
-    t_int            x_vquality;       // video quality
-    t_int            x_abytesout;      // audio bytes written
-    t_int            x_vbytesout;      // video bytes written
+    int            x_vquality;       // video quality
+    int            x_abytesout;      // audio bytes written
+    int            x_vbytesout;      // video bytes written
 
      /* audio structures */
     t_float **x_audio_buf; /* buffer for incoming audio */
-    t_int x_audioin_position; // writing position for incoming audio
-    t_int x_channels;      // audio channels 
-    t_int x_samplerate;    // audio sample rate 
-    t_int x_bits;          // audio bits
+    int x_audioin_position; // writing position for incoming audio
+    int x_channels;      // audio channels 
+    int x_samplerate;    // audio sample rate 
+    int x_bits;          // audio bits
 
 } t_pdp_theorout;
 
@@ -133,9 +133,9 @@ static void pdp_theorout_allocate(t_pdp_theorout *x)
     x->x_yuvbuffer.uv_height=x->x_vheight>>1;
     x->x_yuvbuffer.uv_stride=x->x_vwidth>>1;
 
-    x->x_yuvbuffer.y = (char *)malloc( x->x_yuvbuffer.y_width * x->x_yuvbuffer.y_height );
-    x->x_yuvbuffer.u = (char *)malloc( x->x_yuvbuffer.uv_width * x->x_yuvbuffer.uv_height );
-    x->x_yuvbuffer.v = (char *)malloc( x->x_yuvbuffer.uv_width * x->x_yuvbuffer.uv_height );
+    x->x_yuvbuffer.y = (unsigned char *)malloc( x->x_yuvbuffer.y_width * x->x_yuvbuffer.y_height );
+    x->x_yuvbuffer.u = (unsigned char *)malloc( x->x_yuvbuffer.uv_width * x->x_yuvbuffer.uv_height );
+    x->x_yuvbuffer.v = (unsigned char *)malloc( x->x_yuvbuffer.uv_width * x->x_yuvbuffer.uv_height );
 }
 
     /* free internal ressources */
@@ -149,7 +149,7 @@ static void pdp_theorout_free_ressources(t_pdp_theorout *x)
     /* initialize the encoder */
 static void pdp_theorout_init_encoder(t_pdp_theorout *x)
 {
-  t_int ret;
+  int ret;
 
     x->x_einit=0;
 
@@ -216,7 +216,7 @@ static void pdp_theorout_init_encoder(t_pdp_theorout *x)
 
 static void pdp_theorout_write_headers(t_pdp_theorout *x)
 {
-  t_int ret;
+  int ret;
   ogg_packet aheader, aheadercomm, aheadercode;
 
     if ( !x->x_einit )
@@ -362,7 +362,7 @@ static void pdp_theorout_close(t_pdp_theorout *x)
     /* open a new video file */
 static void pdp_theorout_open(t_pdp_theorout *x, t_symbol *sfile)
 {
-  t_int ret=0;
+  int ret=0;
 
     // close previous video file if existing
     pdp_theorout_close(x);
@@ -437,49 +437,49 @@ static void pdp_theorout_stop(t_pdp_theorout *x)
    /* set video bitrate */
 static void pdp_theorout_vbitrate(t_pdp_theorout *x, t_floatarg vbitrate )
 {
-  if ( ( (t_int) vbitrate < MIN_VIDEO_BITRATE ) || ( (t_int) vbitrate > MAX_VIDEO_BITRATE ) )
+  if ( ( (int) vbitrate < MIN_VIDEO_BITRATE ) || ( (int) vbitrate > MAX_VIDEO_BITRATE ) )
   {
      post( "pdp_theorout~ : wrong video bitrate %d : should be in [%d,%d] kbps", 
-                            (t_int) vbitrate, MIN_VIDEO_BITRATE, MAX_VIDEO_BITRATE );
+                            (int) vbitrate, MIN_VIDEO_BITRATE, MAX_VIDEO_BITRATE );
      return;
   }
-  x->x_vkbps = (t_int) vbitrate;
+  x->x_vkbps = (int) vbitrate;
 }
 
    /* set audio bitrate */
 static void pdp_theorout_abitrate(t_pdp_theorout *x, t_floatarg abitrate )
 {
-  if ( ( (t_int) abitrate < MIN_AUDIO_BITRATE ) || ( (t_int) abitrate > MAX_AUDIO_BITRATE ) )
+  if ( ( (int) abitrate < MIN_AUDIO_BITRATE ) || ( (int) abitrate > MAX_AUDIO_BITRATE ) )
   {
      post( "pdp_theorout~ : wrong audio bitrate %d : should be in [%d,%d] kbps", 
-                            (t_int) abitrate, MIN_AUDIO_BITRATE, MAX_AUDIO_BITRATE );
+                            (int) abitrate, MIN_AUDIO_BITRATE, MAX_AUDIO_BITRATE );
      return;
   }
-  x->x_akbps = (t_int) abitrate;
+  x->x_akbps = (int) abitrate;
 }
 
    /* set video quality */
 static void pdp_theorout_vquality(t_pdp_theorout *x, t_floatarg vquality )
 {
-  if ( ( (t_int) vquality < MIN_VIDEO_QUALITY ) || ( (t_int) vquality > MAX_VIDEO_QUALITY ) )
+  if ( ( (int) vquality < MIN_VIDEO_QUALITY ) || ( (int) vquality > MAX_VIDEO_QUALITY ) )
   {
      post( "pdp_theorout~ : wrong video quality %d : should be in [%d,%d]", 
-                            (t_int) vquality, MIN_VIDEO_QUALITY, MAX_VIDEO_QUALITY );
+                            (int) vquality, MIN_VIDEO_QUALITY, MAX_VIDEO_QUALITY );
      return;
   }
-  x->x_vquality = (t_int) vquality;
+  x->x_vquality = (int) vquality;
 }
 
    /* set audio quality */
 static void pdp_theorout_aquality(t_pdp_theorout *x, t_floatarg aquality )
 {
-  if ( ( (t_int) aquality < MIN_AUDIO_QUALITY ) || ( (t_int) aquality > MAX_AUDIO_QUALITY ) )
+  if ( ( (int) aquality < MIN_AUDIO_QUALITY ) || ( (int) aquality > MAX_AUDIO_QUALITY ) )
   {
      post( "pdp_theorout~ : wrong audio quality %d : should be in [%d,%d]", 
-                            (t_int) aquality, MIN_AUDIO_QUALITY, MAX_AUDIO_QUALITY );
+                            (int) aquality, MIN_AUDIO_QUALITY, MAX_AUDIO_QUALITY );
      return;
   }
-  x->x_aquality = (t_int) aquality;
+  x->x_aquality = (int) aquality;
 }
 
     /* store audio data in PCM format in a buffer for now */
@@ -490,7 +490,7 @@ static t_int *pdp_theorout_perform(t_int *w)
   t_pdp_theorout *x = (t_pdp_theorout *)(w[3]);
   int n = (int)(w[4]);                      // number of samples
   t_float fsample;
-  t_int   isample, i;
+  int   isample, i;
 
    if ( x->x_recflag ) 
    {
@@ -525,13 +525,13 @@ static void pdp_theorout_process_yv12(t_pdp_theorout *x)
 {
   t_pdp     *header = pdp_packet_header(x->x_packet0);
   unsigned char *data   = (unsigned char *)pdp_packet_data(x->x_packet0);
-  t_int     i, ret;
-  t_int     px, py;
-  char      *pY, *pU, *pV;
+  int     i, ret;
+  int     px, py;
+  unsigned char *pY, *pU, *pV;
   struct timeval trec;
-  t_int     nbaudiosamples, nbusecs, nbrecorded;
+  int     nbaudiosamples, nbusecs, nbrecorded;
   t_float   fframerate=0.0;
-  t_int     precflag;
+  int     precflag;
   ogg_page  apage;
   ogg_page  vpage;
   t_float   **vbuffer;
@@ -859,7 +859,7 @@ t_class *pdp_theorout_class;
 
 void *pdp_theorout_new(void)
 {
-  t_int i;
+  int i;
 
     t_pdp_theorout *x = (t_pdp_theorout *)pd_new(pdp_theorout_class);
     inlet_new (&x->x_obj, &x->x_obj.ob_pd, gensym ("signal"), gensym ("signal"));

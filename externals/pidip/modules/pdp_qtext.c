@@ -60,34 +60,34 @@ struct text_frame_struct
 
 typedef struct text_layer_struct
 {
-    t_int l_xoffset;	// x position
-    t_int l_yoffset;    // y position
-    t_int l_r;		// first color
-    t_int l_g;
-    t_int l_b;
-    t_int l_a;
-    t_int l_2r;	// color for even lines of feed
-    t_int l_2g;
-    t_int l_2b;
-    t_int l_2a;
-    t_int l_borderr;	// color for the border
-    t_int l_borderg;
-    t_int l_borderb;
+    int l_xoffset;	// x position
+    int l_yoffset;    // y position
+    int l_r;		// first color
+    int l_g;
+    int l_b;
+    int l_a;
+    int l_2r;	// color for even lines of feed
+    int l_2g;
+    int l_2b;
+    int l_2a;
+    int l_borderr;	// color for the border
+    int l_borderg;
+    int l_borderb;
     t_float l_angle;	// angle
-    t_int l_scroll;
-    t_int l_alignment;	// 0 - center; 1 - left; 2 - right;
-    t_int l_marginh;	// top margin
-    t_int l_marginv;	// bottom margin
-    t_int l_active;	// slot is active?
+    int l_scroll;
+    int l_alignment;	// 0 - center; 1 - left; 2 - right;
+    int l_marginh;	// top margin
+    int l_marginv;	// bottom margin
+    int l_active;	// slot is active?
 
-    t_int l_feed_turn;  // even or odd turn
+    int l_feed_turn;  // even or odd turn
 
-    t_int l_mode;	// work mode: static, scroll, feed/chat, slow
-    t_int l_scroll_speed;	
-    t_int l_upwards;	// whether to put new elements at top or bottom of the queue
+    int l_mode;	// work mode: static, scroll, feed/chat, slow
+    int l_scroll_speed;	
+    int l_upwards;	// whether to put new elements at top or bottom of the queue
     TEXT_FRAME *l_texts;
     TEXT_FRAME *l_last_text;
-    t_int l_ntexts; // number of texts in the chat queue
+    int l_ntexts; // number of texts in the chat queue
     Imlib_Font l_font;
 } TEXTLAYER;
 
@@ -96,19 +96,19 @@ typedef struct pdp_qtext_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     t_outlet *x_outlet0;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
-    t_int x_nbtexts;
-    t_int x_current;	// currently selected layer
-    t_int x_capacity;	// maximum texts
+    int x_nbtexts;
+    int x_current;	// currently selected layer
+    int x_capacity;	// maximum texts
 
     // text layers
     TEXTLAYER *x_layers;
@@ -220,7 +220,7 @@ static void pdp_qtext_add(t_pdp_qtext *x, t_symbol *s, int argc, t_atom *argv)
 {
  char *pname;
  char *pdname;
- t_int len;
+ int len;
 
    if ( argc < 3 )
    {
@@ -270,8 +270,8 @@ static void pdp_qtext_add(t_pdp_qtext *x, t_symbol *s, int argc, t_atom *argv)
    {
       if ( (*pname=='%') && ( isdigit(*(pname+1)) || (*(pname+1)=='%') ) )
       {
-        t_int ivalue;
-        t_int ndigits;
+        int ivalue;
+        int ndigits;
         char  *piname;
 
          ndigits=0;
@@ -513,7 +513,7 @@ static void pdp_qtext_right(t_pdp_qtext *x )
 
 static void pdp_qtext_delete(t_pdp_qtext *x,  t_floatarg fnum  )
 {
-  t_int i;
+  int i;
   char *lostword;
 
   text_layer_flush(&x->x_layers[x->x_current]);
@@ -560,15 +560,15 @@ static void pdp_qtext_mode(t_pdp_qtext *x, t_symbol *s)
 static void pdp_qtext_resize(t_pdp_qtext *x,  t_floatarg fnewsize  )
 {
   char **text_array;
-  t_int *xoffsets;
-  t_int *yoffsets;
-  t_int *r;
-  t_int *g;
-  t_int *b;
+  int *xoffsets;
+  int *yoffsets;
+  int *r;
+  int *g;
+  int *b;
   t_float *angle;
-  t_int *scroll;
+  int *scroll;
 
-  t_int i, csize;
+  int i, csize;
 
   TEXTLAYER * layers;
     if ( (int) fnewsize<=0 ) return;
@@ -744,7 +744,7 @@ static void pdp_qtext_draw_all_texts(t_pdp_qtext *x)
     int chat_lines = 0;        // total lines of chat rendered
     int linenumber;	// lines of chat we have rendered in current message
     int feed_mes = 0;	// messages rendered
-    t_int     tlayer;
+    int     tlayer;
 
     // draw all texts
     imlib_context_set_direction(IMLIB_TEXT_TO_ANGLE);
@@ -755,7 +755,7 @@ static void pdp_qtext_draw_all_texts(t_pdp_qtext *x)
     while (curr_text != NULL) {
      if (x->x_layers[tlayer].l_active)
      {
-       t_int base=tlayer;
+       int base=tlayer;
        linenumber = 0;
        int ti = feed_mes;
        imlib_context_set_angle( x->x_layers[base].l_angle );
@@ -858,8 +858,8 @@ static void pdp_qtext_process_yv12(t_pdp_qtext *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
-    t_int     ti;
-    t_int     px, py;
+    int     ti;
+    int     px, py;
     unsigned char y, u, v;
     DATA32    *imdata;
     DATA32    bgcolor=0;

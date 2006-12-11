@@ -31,13 +31,13 @@ typedef struct pdp_yvu2rgb_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
     unsigned int *x_RGBFrame;
-    t_int        x_RGBFrameSize;
+    int        x_RGBFrameSize;
 
 
 } t_pdp_yvu2rgb;

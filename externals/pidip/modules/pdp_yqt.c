@@ -24,8 +24,14 @@
 #include "pdp_llconv.h"
 #include "time.h"
 #include "sys/time.h"
+#include "pidip_config.h"
+#ifdef QUICKTIME_NEWER
+#include <lqt/lqt.h>
+#include <lqt/colormodels.h>
+#else
 #include <quicktime/lqt.h>
 #include <quicktime/colormodels.h>
+#endif
 
 #define     MIN_AUDIO_INPUT           1024  /* we must have at least n chunks to play a steady sound */
 #define     OUTPUT_BUFFER_SIZE        128*1024  /* audio output buffer : 128k */
@@ -48,8 +54,8 @@ typedef struct pdp_yqt_struct
 
     unsigned int x_vwidth;
     unsigned int x_vheight;
-    t_int x_cursec;
-    t_int x_framescount;
+    int x_cursec;
+    int x_framescount;
 
     bool loop;
 
@@ -59,17 +65,17 @@ typedef struct pdp_yqt_struct
     quicktime_t *qt;
     int qt_cmodel;
 
-    t_int    x_audio;             /* indicates the existence of an audio track */
-    t_int    x_audio_channels;	  /* number of audio channels of first track   */
-    t_int    x_mono;              /* indicates a mono audio track              */
-    t_int    x_audio_rate;        /* audio rate                                */
-    t_int    x_resampling_factor; /* resampling factor                         */
+    int    x_audio;             /* indicates the existence of an audio track */
+    int    x_audio_channels;	  /* number of audio channels of first track   */
+    int    x_mono;              /* indicates a mono audio track              */
+    int    x_audio_rate;        /* audio rate                                */
+    int    x_resampling_factor; /* resampling factor                         */
 
     t_float *x_outbuffer;         /* buffer to store audio decoded data        */
-    t_int    x_outwriteposition;
-    t_int    x_outreadposition;
-    t_int    x_outunread;
-    t_int    x_outbuffersize;
+    int    x_outwriteposition;
+    int    x_outreadposition;
+    int    x_outunread;
+    int    x_outbuffersize;
     t_float  *x_outl;
     t_float  *x_outr;
 

@@ -32,20 +32,20 @@ typedef struct pdp_fdiff_struct
     t_outlet *x_diffy;
     t_outlet *x_diffu;
     t_outlet *x_diffv;
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
     unsigned int x_encoding;
     short int *x_pframe;
 
 } t_pdp_fdiff;
 
-static void pdp_fdiff_allocate(t_pdp_fdiff *x, t_int newsize)
+static void pdp_fdiff_allocate(t_pdp_fdiff *x, int newsize)
 {
  int i;
 
@@ -63,12 +63,12 @@ static void pdp_fdiff_process_yv12(t_pdp_fdiff *x)
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
     int       i;
 
-    t_int px, py;
+    int px, py;
     short int *diff;
     short int *sy, *su, *sv, t;
     short int *sby, *sbu, *sbv;
-    t_int Y=0, U=0, V=0;
-    t_int maxdy=0, maxdu=0, maxdv=0, pdiff;
+    int Y=0, U=0, V=0;
+    int maxdy=0, maxdu=0, maxdv=0, pdiff;
 
     /* allocate all ressources */
     if ( ((int)header->info.image.width != x->x_vwidth ) ||

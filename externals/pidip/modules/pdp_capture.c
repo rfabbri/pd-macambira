@@ -37,7 +37,7 @@
 #define PDP_DISPLAY_LENGTH 1024
 
 // trick to handle Image Magick compatibility
-#if MagickLibVersion >= 0x619
+#if MagickLibVersion >= 0x618
 #include "../include/xwindow-private.h"
 #endif
 
@@ -48,18 +48,18 @@ typedef struct pdp_capture_struct
     t_object x_obj;
 
     t_outlet *x_outlet0;
-    t_int x_packet0;
+    int x_packet0;
     short int *x_data;
     t_pdp *x_header;
-    t_int x_displayopen;
+    int x_displayopen;
 
     char *x_display;
-    t_int x_screen;
-    t_int x_x;
-    t_int x_y;
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_screen;
+    int x_x;
+    int x_y;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
     Image *x_Ximage;
     Display *x_dpy;
@@ -717,8 +717,8 @@ static void pdp_capture_screen(t_pdp_capture *x, t_floatarg fscreen)
 
 static void pdp_capture_x(t_pdp_capture *x, t_floatarg fx)
 {
-  t_int width;
-  t_int err;
+  int width;
+  int err;
 
    if (!x->x_displayopen)
    {
@@ -743,8 +743,8 @@ static void pdp_capture_x(t_pdp_capture *x, t_floatarg fx)
 
 static void pdp_capture_y(t_pdp_capture *x, t_floatarg fy)
 {
-  t_int height;
-  t_int err;
+  int height;
+  int err;
 
    if (!x->x_displayopen)
    {
@@ -769,8 +769,8 @@ static void pdp_capture_y(t_pdp_capture *x, t_floatarg fy)
 
 static void pdp_capture_width(t_pdp_capture *x, t_floatarg fwidth)
 {
-  t_int width;
-  t_int err;
+  int width;
+  int err;
 
    if (!x->x_displayopen)
    {
@@ -791,8 +791,8 @@ static void pdp_capture_width(t_pdp_capture *x, t_floatarg fwidth)
 
 static void pdp_capture_height(t_pdp_capture *x, t_floatarg fheight)
 {
-  t_int height;
-  t_int err;
+  int height;
+  int err;
 
    if (!x->x_displayopen)
    {
@@ -825,7 +825,7 @@ static void pdp_capture_bang(t_pdp_capture *x)
    PixelPacket pixel;
    short int *pY, *pU, *pV;
    unsigned char y, u, v;
-   t_int px, py, r, g, b;
+   int px, py, r, g, b;
    long number_pixels;
 
     // capture the image and output a PDP packet

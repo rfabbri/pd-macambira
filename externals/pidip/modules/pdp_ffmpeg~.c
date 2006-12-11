@@ -42,13 +42,13 @@ typedef struct pdp_ffmpeg_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_vheight;
-    t_int x_vsize;
+    int x_vwidth;
+    int x_vheight;
+    int x_vsize;
 
     t_outlet *x_outlet_streaming;  // indicates the action of streaming
     t_outlet *x_outlet_nbframes;   // number of frames emitted
@@ -56,13 +56,13 @@ typedef struct pdp_ffmpeg_struct
     t_outlet *x_outlet_nbframes_dropped; // number of frames dropped
 
     char  *x_feedname;
-    t_int x_streaming;   // streaming flag
-    t_int x_nbframes;    // number of frames emitted
-    t_int x_nbframes_dropped; // number of frames dropped
-    t_int x_nbvideostreams; // number of video streams
-    t_int x_nbaudiostreams; // number of audio streams
-    t_int x_cursec;   // current second
-    t_int *x_secondcount; // number of frames emitted in the current second ( per video stream )
+    int x_streaming;   // streaming flag
+    int x_nbframes;    // number of frames emitted
+    int x_nbframes_dropped; // number of frames dropped
+    int x_nbvideostreams; // number of video streams
+    int x_nbaudiostreams; // number of audio streams
+    int x_cursec;   // current second
+    int *x_secondcount; // number of frames emitted in the current second ( per video stream )
 
       /* AV data structures */
     AVFormatContext  *x_avcontext;
@@ -81,8 +81,8 @@ typedef struct pdp_ffmpeg_struct
     short x_audio_buf[2*MAX_AUDIO_PACKET_SIZE]; /* buffer for incoming audio */
     short x_audio_enc_buf[2*MAX_AUDIO_PACKET_SIZE]; /* buffer for audio to be encoded */
     uint8_t x_audio_out[4*MAX_AUDIO_PACKET_SIZE]; /* buffer for encoded audio */
-    t_int x_audioin_position; // writing position for incoming audio
-    t_int x_audio_per_frame;  // number of audio samples to transmit for each frame
+    int x_audioin_position; // writing position for incoming audio
+    int x_audio_per_frame;  // number of audio samples to transmit for each frame
     ReSampleContext *x_audio_resample_ctx; // structures for audio resample
     FifoBuffer      *x_audio_fifo;  // audio fifos ( one per codec )
 
@@ -158,8 +158,8 @@ static int pdp_ffmpeg_read_ffserver_streams(t_pdp_ffmpeg *x)
     }
 
     if ( x->x_secondcount ) free( x->x_secondcount );
-    x->x_secondcount = (t_int*) malloc( x->x_nbvideostreams*sizeof(t_int) );
-    memset( x->x_secondcount, 0x00, x->x_nbvideostreams*sizeof(t_int) );
+    x->x_secondcount = (int*) malloc( x->x_nbvideostreams*sizeof(int) );
+    memset( x->x_secondcount, 0x00, x->x_nbvideostreams*sizeof(int) );
     x->x_audio_fifo = (FifoBuffer*) malloc( x->x_nbaudiostreams*sizeof(FifoBuffer) );
     for ( i=0; i<x->x_nbaudiostreams; i++)
     {
@@ -173,7 +173,7 @@ static int pdp_ffmpeg_read_ffserver_streams(t_pdp_ffmpeg *x)
 
 static void pdp_ffmpeg_starve(t_pdp_ffmpeg *x)
 {
- t_int ret, i;
+ int ret, i;
 
    if (!x->x_streaming)
    {
@@ -223,7 +223,7 @@ static void pdp_ffmpeg_starve(t_pdp_ffmpeg *x)
 
 static void pdp_ffmpeg_feed(t_pdp_ffmpeg *x, t_symbol *s)
 {
-  t_int ret, i;
+  int ret, i;
 
    if (x->x_streaming)
    {
@@ -346,18 +346,18 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = 0;
     short int *newdata = 0;
-    t_int     newpacket = -1, i, j;
+    int     newpacket = -1, i, j;
     short int *pY, *pU, *pV;
     uint8_t     *pnY, *pnU, *pnV;
-    t_int     px, py;
-    t_int     svideoindex;
-    t_int     saudioindex;
+    int     px, py;
+    int     svideoindex;
+    int     saudioindex;
     struct timeval etime;
-    t_int   sizeout, size, encsize;
-    t_int   framebytes;
-    t_int   owidth, oheight;
+    int   sizeout, size, encsize;
+    int   framebytes;
+    int   owidth, oheight;
     short   *pencbuf;
-    t_int   framerate, atime, ttime;
+    int   framerate, atime, ttime;
 
         /* allocate all ressources */
     if ( ((int)header->info.image.width != x->x_vwidth) ||
@@ -412,7 +412,7 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
              /* convert pixel format and size if needed */
            if ( x->x_avcontext->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO )
            {
-             t_int size;
+             int size;
 
              // check if the framerate has been exceeded
              if ( gettimeofday(&etime, NULL) == -1)
@@ -521,7 +521,7 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
 #if LIBAVCODEC_BUILD > 4715	
                AVPacket vpkt;
 #endif
-               t_int fsize, ret;
+               int fsize, ret;
                 
                  memset(&aframe, 0, sizeof(AVFrame));
                  *(AVPicture*)&aframe= *x->x_final_picture;
@@ -643,7 +643,7 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
              /* convert pixel format and size if needed */
            if ( x->x_avcontext->streams[i]->codec.codec_type == CODEC_TYPE_VIDEO )
            {
-             t_int size;
+             int size;
 
              // check if the framerate has been exceeded
              if ( gettimeofday(&etime, NULL) == -1)
@@ -752,7 +752,7 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
 #if LIBAVCODEC_BUILD > 4715	
                AVPacket vpkt;
 #endif
-               t_int fsize, ret;
+               int fsize, ret;
                 
                  memset(&aframe, 0, sizeof(AVFrame));
                  *(AVPicture*)&aframe= *x->x_final_picture;
@@ -889,7 +889,7 @@ static t_int *pdp_ffmpeg_perform(t_int *w)
   t_pdp_ffmpeg *x = (t_pdp_ffmpeg *)(w[3]);
   int n = (int)(w[4]);                      // number of samples 
   t_float fsample;
-  t_int   isample, i;
+  int   isample, i;
 
     // just fills the buffer
     while (n--)

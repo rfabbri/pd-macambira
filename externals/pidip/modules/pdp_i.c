@@ -99,37 +99,37 @@ static t_class *pdp_i_class;
 typedef struct _pdp_i
 {
      t_object x_obj;
-     t_int x_socket;
+     int x_socket;
      t_outlet *x_connection_status;
      t_outlet *x_frames;
      t_outlet *x_connectionip;
      t_outlet *x_pdp_output;
-     t_int x_serversocket;
-     t_int x_framesreceived;   // total number of frames received
+     int x_serversocket;
+     int x_framesreceived;   // total number of frames received
 
      void *x_inbuffer;   /* accumulation buffer for incoming frames */
-     t_int x_inwriteposition;
-     t_int x_inbuffersize;
+     int x_inwriteposition;
+     int x_inbuffersize;
 
        /* PDP data structures */
-     t_int x_packet; 
+     int x_packet; 
      t_pdp *x_header;
-     t_int x_vheight;
-     t_int x_vwidth;
-     t_int x_vsize;
-     t_int x_psize;
-     t_int x_hsize;
-     t_int x_bsize;
-     t_int x_bzsize;
+     int x_vheight;
+     int x_vwidth;
+     int x_vsize;
+     int x_psize;
+     int x_hsize;
+     unsigned int x_bsize;
+     unsigned int x_bzsize;
      short int *x_data;
-     unsigned char  *x_hdata; // huffman coded data
-     unsigned char  *x_ddata; // decompressed data
+     char  *x_hdata; // huffman coded data
+     char  *x_ddata; // decompressed data
      unsigned short *x_bdata; // previous data
 
 } t_pdp_i;
 
  /* huffman decoding */
-static int pdp_i_huffman(t_pdp_i *x, char *source, char *dest, t_int size, t_int *dsize)
+static int pdp_i_huffman(t_pdp_i *x, char *source, char *dest, int size, int *dsize)
 {
   char *pcount=source;   
   char *pvalue=(source+1);   
@@ -163,8 +163,8 @@ static void pdp_i_allocate(t_pdp_i *x)
    x->x_psize = x->x_vsize + (x->x_vsize>>1);
    x->x_hsize = (x->x_vsize + (x->x_vsize>>1));
    x->x_bsize = (x->x_vsize + (x->x_vsize>>1))*sizeof(unsigned short);
-   x->x_ddata = (unsigned char*) getbytes(x->x_psize);
-   x->x_hdata = (unsigned char*) getbytes(x->x_hsize);
+   x->x_ddata = (char*) getbytes(x->x_psize);
+   x->x_hdata = (char*) getbytes(x->x_hsize);
    x->x_bdata = (unsigned short*) getbytes(x->x_bsize);
    if ( !x->x_ddata || !x->x_hdata )
    {
@@ -219,8 +219,8 @@ static void pdp_i_recv(t_pdp_i *x)
                   (int)((char*)pheader - (char*)(x->x_inbuffer)) +
                         (int)sizeof(t_hpacket) + (int)ntohl(pheader->clength) )
              {
-                if ( ( x->x_vwidth != (t_int)ntohl(pheader->width) ) ||
-                     ( x->x_vheight != (t_int)ntohl(pheader->height) ) )
+                if ( ( x->x_vwidth != (int)ntohl(pheader->width) ) ||
+                     ( x->x_vheight != (int)ntohl(pheader->height) ) )
                 {
                    pdp_i_free_ressources(x);
                    x->x_vheight = ntohl(pheader->height);
@@ -326,7 +326,7 @@ static void pdp_i_recv(t_pdp_i *x)
 static void pdp_i_acceptconnection(t_pdp_i *x)
 {
     struct sockaddr_in incomer_address;
-    int sockaddrl = (int) sizeof( struct sockaddr );
+    unsigned int sockaddrl;
 
     int fd = accept(x->x_serversocket, (struct sockaddr*)&incomer_address, &sockaddrl );
 

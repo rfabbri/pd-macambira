@@ -78,21 +78,21 @@ typedef struct pdp_theonice_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
-    t_int x_packet1;
-    t_int x_dropped;
-    t_int x_queue_id;
+    int x_packet0;
+    int x_packet1;
+    int x_dropped;
+    int x_queue_id;
 
-    t_int x_vwidth;
-    t_int x_tvwidth;       // theora 16 pixels aligned width value 
-    t_int x_vheight;
-    t_int x_tvheight;      // theora 16 pixels aligned height value 
-    t_int x_vsize;
+    int x_vwidth;
+    int x_tvwidth;       // theora 16 pixels aligned width value 
+    int x_vheight;
+    int x_tvheight;      // theora 16 pixels aligned height value 
+    int x_vsize;
 
     pthread_t x_connectchild;      // thread used for connecting to a stream
     int x_socketfd;                // connection socket
-    t_int x_streaming;             // streaming on : connected and all 
-    t_int x_pstreaming;            // previous state
+    int x_streaming;             // streaming on : connected and all 
+    int x_pstreaming;            // previous state
     char  *x_passwd;               // password
     char  x_title[MAX_COMMENT_LENGTH];         // title of the stream 
     char  x_url[MAX_COMMENT_LENGTH];           // url of the stream 
@@ -103,25 +103,25 @@ typedef struct pdp_theonice_struct
     char  x_date[MAX_COMMENT_LENGTH];          // starting system date 
     char  x_hostname[MAX_COMMENT_LENGTH];      // name or IP of host to connect to 
     char  x_mountpoint[MAX_COMMENT_LENGTH];    // mountpoint
-    t_int x_port;                     // port number
-    t_int x_public;                   // publish on www.oggcast.com 
-    t_int x_framerate;
-    t_int x_mframerate;               // measured framerate 
-    t_int x_pmframerate;               // previous state
-    t_int x_einit;
-    t_int x_frameswritten;
-    t_int x_pframeswritten;
-    t_int x_frameslate;
-    t_int x_nbframes_dropped;
-    t_int x_pnbframes_dropped;
-    t_int x_frames;
+    int x_port;                     // port number
+    int x_public;                   // publish on www.oggcast.com 
+    int x_framerate;
+    int x_mframerate;               // measured framerate 
+    int x_pmframerate;               // previous state
+    int x_einit;
+    int x_frameswritten;
+    int x_pframeswritten;
+    int x_frameslate;
+    int x_nbframes_dropped;
+    int x_pnbframes_dropped;
+    int x_frames;
     t_float x_maxdrift;     /* maximum delay between audio and video */
     struct timeval x_tstart;
     struct timeval x_tzero;
     struct timeval x_tcurrent;
     struct timeval x_tprevstream;
-    t_int x_cursec;   // current second
-    t_int x_secondcount; // number of frames emitted in the current second
+    int x_cursec;   // current second
+    int x_secondcount; // number of frames emitted in the current second
 
      /* vorbis/theora structures */
     ogg_page         x_ogg_page;       // ogg page for headers
@@ -138,14 +138,14 @@ typedef struct pdp_theonice_struct
     vorbis_block     x_vorbis_block;   // vorbis block
     vorbis_comment   x_vorbis_comment; // vorbis comment
     yuv_buffer       x_yuvbuffer;      // yuv buffer
-    t_int            x_eos;            // end of stream 
+    int            x_eos;            // end of stream 
 
-    t_int            x_akbps;          // audio bit rate
-    t_int            x_vkbps;          // video bit rate
+    int            x_akbps;          // audio bit rate
+    int            x_vkbps;          // video bit rate
     t_float          x_aquality;       // audio quality
-    t_int            x_vquality;       // video quality
-    t_int            x_abytesout;      // audio bytes written
-    t_int            x_vbytesout;      // video bytes written
+    int            x_vquality;       // video quality
+    int            x_abytesout;      // audio bytes written
+    int            x_vbytesout;      // video bytes written
     double           x_audiotime;      // audio stream time
     double           x_paudiotime;     // previous value
     double           x_videotime;      // video stream time
@@ -153,10 +153,10 @@ typedef struct pdp_theonice_struct
 
      /* audio structures */
     t_float x_audio_buf[DEFAULT_CHANNELS][MAX_AUDIO_PACKET_SIZE]; // buffer for incoming audio
-    t_int x_audioin_position; // writing position for incoming audio
-    t_int x_channels;      // audio channels 
-    t_int x_samplerate;    // audio sample rate 
-    t_int x_bits;          // audio bits
+    int x_audioin_position; // writing position for incoming audio
+    int x_channels;      // audio channels 
+    int x_samplerate;    // audio sample rate 
+    int x_bits;          // audio bits
 
     t_outlet *x_outlet_streaming;  // indicates the action of streaming
     t_outlet *x_outlet_nbframes;   // number of frames emitted
@@ -181,9 +181,9 @@ static void pdp_theonice_allocate(t_pdp_theonice *x)
     x->x_yuvbuffer.uv_height=x->x_vheight>>1;
     x->x_yuvbuffer.uv_stride=x->x_vwidth>>1;
 
-    x->x_yuvbuffer.y = (char *)malloc( x->x_yuvbuffer.y_width * x->x_yuvbuffer.y_height );
-    x->x_yuvbuffer.u = (char *)malloc( x->x_yuvbuffer.uv_width * x->x_yuvbuffer.uv_height );
-    x->x_yuvbuffer.v = (char *)malloc( x->x_yuvbuffer.uv_width * x->x_yuvbuffer.uv_height );
+    x->x_yuvbuffer.y = (unsigned char *)malloc( x->x_yuvbuffer.y_width * x->x_yuvbuffer.y_height );
+    x->x_yuvbuffer.u = (unsigned char *)malloc( x->x_yuvbuffer.uv_width * x->x_yuvbuffer.uv_height );
+    x->x_yuvbuffer.v = (unsigned char *)malloc( x->x_yuvbuffer.uv_width * x->x_yuvbuffer.uv_height );
 }
 
     /* free internal ressources */
@@ -197,7 +197,7 @@ static void pdp_theonice_free_ressources(t_pdp_theonice *x)
     /* initialize the encoder */
 static void pdp_theonice_init_encoder(t_pdp_theonice *x)
 {
-  t_int ret;
+  int ret;
 
     x->x_einit=0;
 
@@ -271,7 +271,7 @@ static void pdp_theonice_init_encoder(t_pdp_theonice *x)
     /* terminate the encoding process */
 static void pdp_theonice_shutdown_encoder(t_pdp_theonice *x)
 {
-  t_int ret;
+  int ret;
 
     if ( x->x_streaming )
     {
@@ -336,7 +336,7 @@ static void pdp_theonice_disconnect(t_pdp_theonice *x)
 
 static int pdp_theonice_write_headers(t_pdp_theonice *x)
 {
-  t_int ret;
+  int ret;
   ogg_packet aheader, aheadercomm, aheadercode;
 
     if ( !x->x_einit )
@@ -466,7 +466,7 @@ static int pdp_theonice_write_headers(t_pdp_theonice *x)
 static int pdp_theonice_start(t_pdp_theonice *x)
 {
   time_t start_t;
-  t_int ret;
+  int ret;
 
     if ( gettimeofday(&x->x_tstart, NULL) == -1)
     {
@@ -508,7 +508,7 @@ static void pdp_theonice_url(t_pdp_theonice *x, t_symbol *url)
     /* set title */
 static void pdp_theonice_title(t_pdp_theonice *x, t_symbol *s, int argc, t_atom *argv)
 {
-  t_int i;
+  int i;
 
     strcpy( x->x_title, "" );
     for ( i=0; i<argc; i++ )
@@ -520,7 +520,7 @@ static void pdp_theonice_title(t_pdp_theonice *x, t_symbol *s, int argc, t_atom 
        } 
        if (argv[i].a_type == A_FLOAT)
        {
-          sprintf( x->x_title, "%s %d", x->x_title, (t_int)argv[i].a_w.w_float );  
+          sprintf( x->x_title, "%s %d", x->x_title, (int)argv[i].a_w.w_float );  
        } 
     }
     sprintf( x->x_title, "%s", x->x_title+1 );  
@@ -530,7 +530,7 @@ static void pdp_theonice_title(t_pdp_theonice *x, t_symbol *s, int argc, t_atom 
     /* set artist */
 static void pdp_theonice_artist(t_pdp_theonice *x, t_symbol *s, int argc, t_atom *argv)
 {
-  t_int i;
+  int i;
 
     strcpy( x->x_artist, "" );
     for ( i=0; i<argc; i++ )
@@ -542,7 +542,7 @@ static void pdp_theonice_artist(t_pdp_theonice *x, t_symbol *s, int argc, t_atom
        } 
        if (argv[i].a_type == A_FLOAT)
        {
-          sprintf( x->x_artist, "%s %d", x->x_artist, (t_int)argv[i].a_w.w_float );  
+          sprintf( x->x_artist, "%s %d", x->x_artist, (int)argv[i].a_w.w_float );  
        } 
     }
     sprintf( x->x_artist, "%s", x->x_artist+1 );  
@@ -552,7 +552,7 @@ static void pdp_theonice_artist(t_pdp_theonice *x, t_symbol *s, int argc, t_atom
     /* set description */
 static void pdp_theonice_description(t_pdp_theonice *x, t_symbol *s, int argc, t_atom *argv)
 {
-  t_int i;
+  int i;
 
     strcpy( x->x_description, "" );
     for ( i=0; i<argc; i++ )
@@ -564,7 +564,7 @@ static void pdp_theonice_description(t_pdp_theonice *x, t_symbol *s, int argc, t
        } 
        if (argv[i].a_type == A_FLOAT)
        {
-          sprintf( x->x_description, "%s %d", x->x_description, (t_int)argv[i].a_w.w_float );  
+          sprintf( x->x_description, "%s %d", x->x_description, (int)argv[i].a_w.w_float );  
        } 
     }
     sprintf( x->x_description, "%s", x->x_description+1 );  
@@ -574,7 +574,7 @@ static void pdp_theonice_description(t_pdp_theonice *x, t_symbol *s, int argc, t
     /* set genre */
 static void pdp_theonice_genre(t_pdp_theonice *x, t_symbol *s, int argc, t_atom *argv)
 {
-  t_int i;
+  int i;
 
     strcpy( x->x_genre, "" );
     for ( i=0; i<argc; i++ )
@@ -586,7 +586,7 @@ static void pdp_theonice_genre(t_pdp_theonice *x, t_symbol *s, int argc, t_atom 
        } 
        if (argv[i].a_type == A_FLOAT)
        {
-          sprintf( x->x_genre, "%s %d", x->x_genre, (t_int)argv[i].a_w.w_float );  
+          sprintf( x->x_genre, "%s %d", x->x_genre, (int)argv[i].a_w.w_float );  
        } 
     }
     sprintf( x->x_genre, "%s", x->x_genre+1 );  
@@ -627,9 +627,9 @@ char *pdp_theonice_base64_encode(char *data)
   return result;
 }
 
-static void sendsock( t_int sockfd, char *buf, size_t buflen )
+static void sendsock( int sockfd, char *buf, size_t buflen )
 {
-   if ( send( sockfd, buf, buflen, MSG_NOSIGNAL ) != (t_int)buflen )
+   if ( send( sockfd, buf, buflen, MSG_NOSIGNAL ) != (int)buflen )
    {
       post( "pdp_theonice~ : could not send message to the server" );
       post( "pdp_theonice~ : message : %s", buf );
@@ -645,7 +645,7 @@ static void *pdp_theonice_do_connect(void *tdata)
   unsigned int    len;
   fd_set          fdset;
   struct timeval  tv;
-  t_int           sockfd, ret;
+  int           sockfd, ret;
   struct          sockaddr_in sinfo;
   struct          hostent *hp;
   t_pdp_theonice  *x;
@@ -783,7 +783,7 @@ static void *pdp_theonice_do_connect(void *tdata)
     /* launch a connection thread */
 static void pdp_theonice_connect(t_pdp_theonice *x, t_symbol *shost, t_symbol *smountpoint, t_floatarg fport)
 {
-  t_int ret=0;
+  int ret=0;
   pthread_attr_t connect_child_attr;
 
    // check parameters
@@ -797,14 +797,14 @@ static void pdp_theonice_connect(t_pdp_theonice *x, t_symbol *shost, t_symbol *s
      strcpy( x->x_hostname, shost->s_name);
    }
 
-   if ( ( (t_int)fport < 0 ) || ( (t_int)fport > 65535 ) )
+   if ( ( (int)fport < 0 ) || ( (int)fport > 65535 ) )
    {
      post("pdp_theonice~ : wrong port number." );
      return;
    }
    else
    {
-     x->x_port = (t_int)fport; 
+     x->x_port = (int)fport; 
    }
 
    strcpy( x->x_mountpoint, smountpoint->s_name );
@@ -845,61 +845,61 @@ static void pdp_theonice_connect(t_pdp_theonice *x, t_symbol *shost, t_symbol *s
    /* set video bitrate */
 static void pdp_theonice_vbitrate(t_pdp_theonice *x, t_floatarg vbitrate )
 {
-  if ( ( (t_int) vbitrate < MIN_VIDEO_BITRATE ) || ( (t_int) vbitrate > MAX_VIDEO_BITRATE ) )
+  if ( ( (int) vbitrate < MIN_VIDEO_BITRATE ) || ( (int) vbitrate > MAX_VIDEO_BITRATE ) )
   {
      post( "pdp_theonice~ : wrong video bitrate %d : should be in [%d,%d] kbps", 
-                            (t_int) vbitrate, MIN_VIDEO_BITRATE, MAX_VIDEO_BITRATE );
+                            (int) vbitrate, MIN_VIDEO_BITRATE, MAX_VIDEO_BITRATE );
      return;
   }
-  x->x_vkbps = (t_int) vbitrate;
+  x->x_vkbps = (int) vbitrate;
 }
 
    /* set audio bitrate */
 static void pdp_theonice_abitrate(t_pdp_theonice *x, t_floatarg abitrate )
 {
-  if ( ( (t_int) abitrate < MIN_AUDIO_BITRATE ) || ( (t_int) abitrate > MAX_AUDIO_BITRATE ) )
+  if ( ( (int) abitrate < MIN_AUDIO_BITRATE ) || ( (int) abitrate > MAX_AUDIO_BITRATE ) )
   {
      post( "pdp_theonice~ : wrong audio bitrate %d : should be in [%d,%d] kbps", 
-                            (t_int) abitrate, MIN_AUDIO_BITRATE, MAX_AUDIO_BITRATE );
+                            (int) abitrate, MIN_AUDIO_BITRATE, MAX_AUDIO_BITRATE );
      return;
   }
-  x->x_akbps = (t_int) abitrate;
+  x->x_akbps = (int) abitrate;
 }
 
    /* set video quality */
 static void pdp_theonice_vquality(t_pdp_theonice *x, t_floatarg vquality )
 {
-  if ( ( (t_int) vquality < MIN_VIDEO_QUALITY ) || ( (t_int) vquality > MAX_VIDEO_QUALITY ) )
+  if ( ( (int) vquality < MIN_VIDEO_QUALITY ) || ( (int) vquality > MAX_VIDEO_QUALITY ) )
   {
      post( "pdp_theonice~ : wrong video quality %d : should be in [%d,%d]", 
-                            (t_int) vquality, MIN_VIDEO_QUALITY, MAX_VIDEO_QUALITY );
+                            (int) vquality, MIN_VIDEO_QUALITY, MAX_VIDEO_QUALITY );
      return;
   }
-  x->x_vquality = (t_int) vquality;
+  x->x_vquality = (int) vquality;
 }
 
    /* set audio quality */
 static void pdp_theonice_aquality(t_pdp_theonice *x, t_floatarg aquality )
 {
-  if ( ( (t_int) aquality < MIN_AUDIO_QUALITY ) || ( (t_int) aquality > MAX_AUDIO_QUALITY ) )
+  if ( ( (int) aquality < MIN_AUDIO_QUALITY ) || ( (int) aquality > MAX_AUDIO_QUALITY ) )
   {
      post( "pdp_theonice~ : wrong audio quality %d : should be in [%d,%d]", 
-                            (t_int) aquality, MIN_AUDIO_QUALITY, MAX_AUDIO_QUALITY );
+                            (int) aquality, MIN_AUDIO_QUALITY, MAX_AUDIO_QUALITY );
      return;
   }
-  x->x_aquality = (t_int) aquality;
+  x->x_aquality = (int) aquality;
 }
 
    /* set framerate */
 static void pdp_theonice_framerate(t_pdp_theonice *x, t_floatarg fframerate )
 {
-  if ( ( (t_int) fframerate < MIN_FRAMERATE ) || ( (t_int) fframerate > MAX_FRAMERATE ) )
+  if ( ( (int) fframerate < MIN_FRAMERATE ) || ( (int) fframerate > MAX_FRAMERATE ) )
   {
      post( "pdp_theonice~ : wrong framerate %d : should be in [%d,%d]", 
-                            (t_int) fframerate, MIN_FRAMERATE, MAX_FRAMERATE );
+                            (int) fframerate, MIN_FRAMERATE, MAX_FRAMERATE );
      return;
   }
-  x->x_framerate = (t_int) fframerate;
+  x->x_framerate = (int) fframerate;
 }
 
     /* store audio data in PCM format in a buffer for now */
@@ -910,7 +910,7 @@ static t_int *pdp_theonice_perform(t_int *w)
   t_pdp_theonice *x = (t_pdp_theonice *)(w[3]);
   int n = (int)(w[4]);                      // number of samples
   t_float fsample;
-  t_int   isample, i;
+  int   isample, i;
 
    if ( x->x_streaming ) 
    {
@@ -976,14 +976,14 @@ static void pdp_theonice_process_yv12(t_pdp_theonice *x)
 {
   t_pdp     *header = pdp_packet_header(x->x_packet0);
   unsigned char *data   = (unsigned char *)pdp_packet_data(x->x_packet0);
-  t_int     i, ret;
-  t_int     px, py;
-  char      *pY, *pU, *pV;
+  int     i, ret;
+  int     px, py;
+  unsigned char *pY, *pU, *pV;
   struct timeval tstream;
   struct timeval etime;
-  t_int     nbaudiosamples, nbusecs, nbsamples;
+  int     nbaudiosamples, nbusecs, nbsamples;
   t_float   fframerate=0.0;
-  t_int ttime, atime;
+  int ttime, atime;
 
     if ( ( (int)(header->info.image.width) != x->x_vwidth ) || 
          ( (int)(header->info.image.height) != x->x_vheight ) )
@@ -1231,7 +1231,7 @@ t_class *pdp_theonice_class;
 
 void *pdp_theonice_new(void)
 {
-  t_int i;
+  int i;
 
     t_pdp_theonice *x = (t_pdp_theonice *)pd_new(pdp_theonice_class);
     inlet_new (&x->x_obj, &x->x_obj.ob_pd, gensym ("signal"), gensym ("signal"));
