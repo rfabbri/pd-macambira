@@ -3,17 +3,11 @@ PDP_DIR = /usr/local/pd/pdp
 FFMPEG_SOURCE_DIR = /SOURCES/ffmpeg
 
 PDP_PIDIP_LIBS =  -lbz2 -lz -ldl -lmp3lame -logg -lvorbis -lvorbisenc
-IMLIB_CFLAGS = -I/usr/local/include -I/usr/X11R6/include
-IMLIB_LIBS = -L/usr/local/lib -lImlib2 -lfreetype -lz -lm -ldl -lXext -lXext -lX11 -L/usr/X11R6/lib
-MAGICK_CFLAGS = -I/usr/X11R6/include -g -O2 -Wall -pthread 
-MAGICK_LIBS = -L/usr/X11R6/lib -lMagick -lMagick -ltiff -lfreetype -ljpeg -lpng -lXext -lXt -lSM -lICE -lX11 -lbz2 -lxml2 -lz -lpthread -lm -lpthread -L/usr/local/lib -L/usr/X11R6/lib -lfreetype -lz -L/usr/lib
-
-# what are those? seem to be related to xorg
-#MAGICK_LIBS += -ldpstk -ldps
-
-#THEORA_LIBS =  /usr/lib/libtheora.a /usr/lib/libogg.a /usr/lib/libvorbis.a /usr/lib/libvorbisenc.a
-#THEORA_LIBS += /usr/local/lib/libtheora.a /usr/local/lib/libogg.a /usr/local/lib/libvorbis.a /usr/local/lib/libvorbisenc.a
-THEORA_LIBS =  -ltheora -logg -lvorbis -lvorbisenc
+IMLIB_CFLAGS = 
+IMLIB_LIBS = -L/usr/lib -lImlib2 -lfreetype -lz -L/usr/X11R6/lib -lX11 -lXext -ldl -lm
+MAGICK_CFLAGS = -I/usr/X11R6/include -O2 -g -pipe -m32 -march=i386 -mtune=pentium4 -Wall -pthread 
+MAGICK_LIBS = -L/usr/X11R6/lib -lMagick -lMagick -ltiff -lfreetype -ljpeg -lpng -ldpstk -ldps -lXext -lXt -lSM -lICE -lX11 -lbz2 -lxml2 -lz -lpthread -lm -lpthread -L/usr/lib -L/usr/X11R6/lib -lfreetype -lz -L/usr/lib
+THEORA_LIBS = -ltheora -logg -lvorbis -lvorbisenc /usr/local/lib/libtheora.a /usr/lib/libogg.a /usr/local/lib/libogg.a /usr/lib/libvorbis.a /usr/local/lib/libvorbis.a /usr/lib/libvorbisenc.a /usr/local/lib/libvorbisenc.a
 PDP_PIDIP_INCLUDES =  -I/usr/local/pd/src -I. -I/usr/local/pd/pdp/include -I../include -I../charmaps
 PDP_PIDIP_VERSION = 0.12.20
 MPEG4IP_CFLAGS = 
@@ -24,13 +18,13 @@ PDP_PIDIP_TARBALL = $(PDP_PIDIP_DISTRO).tar.gz
 
 PDP_PIDIP_CFLAGS  = $(MPEG4IP_CFLAGS) $(MAGICK_CFLAGS) $(IMLIB_CFLAGS) \
     -DPD -DX_DISPLAY_MISSING -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
-    -Wall -W -Wstrict-prototypes -fPIC \
+    -Wall -W -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch \
     -DPDP_PIDIP_VERSION=\"$(PDP_PIDIP_VERSION)\" -g
 
 PDP_PIDIP_CPPFLAGS  = $(MPEG4IP_CFLAGS) $(MAGICK_CFLAGS) $(IMLIB_CFLAGS) \
     -DPD -DX_DISPLAY_MISSING -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
-    -Wall -W -Wstrict-prototypes -fPIC \
+    -Wall -W -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch \
     -DPDP_PIDIP_VERSION=\"$(PDP_PIDIP_VERSION)\" -g
 

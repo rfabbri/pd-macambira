@@ -11,19 +11,18 @@ THEORA_LIBS = @THEORA_LIBS@
 PDP_PIDIP_INCLUDES =  @PDP_PIDIP_INCLUDES@
 PDP_PIDIP_VERSION = @PDP_PIDIP_VERSION@
 MPEG4IP_CFLAGS = @MPEG4IP_CFLAGS@
-CAIRO_CFLAGS = @CAIRO_CFLAGS@
 
 PDP_PIDIP_DISTRO = /mnt/c/ydegoyon.free.fr/pidip-$(PDP_PIDIP_VERSION)
 PDP_PIDIP_TARBALL = $(PDP_PIDIP_DISTRO).tar.gz
 
 
-PDP_PIDIP_CFLAGS  = $(MPEG4IP_CFLAGS) $(MAGICK_CFLAGS) $(IMLIB_CFLAGS) $(CAIRO_CFLAGS) \
+PDP_PIDIP_CFLAGS  = $(MPEG4IP_CFLAGS) $(MAGICK_CFLAGS) $(IMLIB_CFLAGS) \
     -DPD -DX_DISPLAY_MISSING -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
     -Wall -W -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch \
     -DPDP_PIDIP_VERSION=\"$(PDP_PIDIP_VERSION)\" -g
 
-PDP_PIDIP_CPPFLAGS  = $(MPEG4IP_CFLAGS) $(MAGICK_CFLAGS) $(IMLIB_CFLAGS) $(CAIRO_CFLAGS) \
+PDP_PIDIP_CPPFLAGS  = $(MPEG4IP_CFLAGS) $(MAGICK_CFLAGS) $(IMLIB_CFLAGS) \
     -DPD -DX_DISPLAY_MISSING -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
     -Wall -W -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch \
