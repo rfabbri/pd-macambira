@@ -1,3 +1,9 @@
+/* quicktime library minor version */
+#undef QUICKTIME_NEWER
+
+/* Define to 1 if you have image magick */
+#undef HAVE_IMAGE_MAGICK
+
 /* Define to 1 if you have ffmpeg source tree */
 #undef HAVE_PIDIP_FFMPEG
 
