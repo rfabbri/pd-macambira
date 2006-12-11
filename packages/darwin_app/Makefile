@@ -22,13 +22,24 @@ WISH_NAME := $(shell ( test -d $(WISH_SOURCE)/Wish.app && echo Wish) \
 WISH = "$(WISH_SOURCE)/$(WISH_NAME).app"
 WISH_CONTENTS = "$(WISH)/Contents"
 
-# base level optimizations
-OPT_CFLAGS = -Os -funroll-loops -fomit-frame-pointer
-
 # which CPU to compile for
 TARGET_PLATFORM := $(shell uname -p)
 
-# CPU-specific gleaned from http://developer.apple.com/releasenotes/DeveloperTools/GCC3.html
+# base level optimizations
+OPT_CFLAGS = -Os -funroll-loops -fomit-frame-pointer
+
+# auto-vectorization in GCC 4.x (too buggy in 4.0, wait for 4.1)
+#OPT_CFLAGS += -ftree-vectorize -ftree-vectorizer-verbose=3
+
+ifeq ($(TARGET_PLATFORM),i386)
+OPT_CFLAGS += -march=pentium3 -msse -msse2 -mfpmath=sse
+endif
+
+ifeq ($(TARGET_PLATFORM),powerpc)
+# Package default, support older PowerPCs, but G4 (7450) is the most common
+OPT_CFLAGS += -mcpu=powerpc -mtune=7450 -mpowerpc-gfxopt
+
+# CPU-specific gleaned from http://developer.apple.com/releasenotes/DeveloperTools/RN-GCC4/
 # check this too: http://hpc.sourceforge.net/
 # Generic PowerPC
 #OPT_CFLAGS += -mcpu=powerpc -mpowerpc
@@ -37,16 +48,9 @@ TARGET_PLATFORM := $(shell uname -p)
 # PowerPC 7400 (G4 <= 700Mhz) 
 #OPT_CFLAGS += -mcpu=7400 -faltivec -mpowerpc-gfxopt
 # PowerPC 7450 (G4 >= 533MHz) 
-#OPT_CFLAGS += -fast -fPIC -mcpu=7450 -mtune=7450 -faltivec -ffast-math -mpowerpc-gfxopt
+#OPT_CFLAGS += -fPIC -mcpu=7450 -mtune=7450 -fast -faltivec -ffast-math -mpowerpc-gfxopt
 # PowerPC G5 (gcc-3.3)
 #OPT_CFLAGS += -fast -fPIC -faltivec -mpowerpc-gpopt -mpowerpc-gfxopt
-
-# auto-vectorization would be nice:
-# http://gcc.gnu.org/projects/tree-ssa/vectorization.html
-
-ifeq ($(TARGET_PLATFORM),powerpc)
-  # Package default, support older PowerPCs, but G4 (7450) is the most common
-  OPT_CFLAGS += -mcpu=powerpc -mtune=7450 -mpowerpc-gfxopt
 endif
 
 
@@ -254,6 +258,8 @@ dmg:
 	install -p $(manualsdir)/Pd/ReadMe.html "/Volumes/$(PACKAGE_NAME)"
 	install -p -m0644 org.puredata.pd.plist "/Volumes/$(PACKAGE_NAME)"
 	install -d "/Volumes/$(PACKAGE_NAME)/.imagefolder"
+# add link to /Applications for easy install
+	cd "/Volumes/$(PACKAGE_NAME)/" && ln -s /Applications
 # background image will only show when the disk image is called "Pd-extended
 # the background image needs to be added to the .DS_Store to work
 #	install -p background.png "/Volumes/$(PACKAGE_NAME)/.imagefolder/"
@@ -277,7 +283,7 @@ dmg:
 #==============================================================================#
 
 
-distclean: clean
+distclean: package_clean
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) distclean
 
 
