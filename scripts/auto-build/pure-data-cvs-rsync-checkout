@@ -9,24 +9,18 @@ SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
 LOGFILE=/home/pd/logs/${DATE}_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
 
+function update_distro ()
+{
+	 distro=$1
+	 echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
+	 echo "$distro"	>> $LOGFILE 2>&1
+	 echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
+	 /home/pd/rsync/$distro/scripts/update-developer-layout.sh >> $LOGFILE 2>&1
+}
+
 touch $LOGFILE
 
-# extended
-echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
-echo "pd-extended"	>> $LOGFILE 2>&1
-echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
-su pd -c "/home/pd/rsync/pd-extended/scripts/update-developer-layout.sh" >> $LOGFILE 2>&1
-
-# devel
-echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
-echo "pd-devel"	>> $LOGFILE 2>&1
-echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
-su pd -c "cd /home/pd/rsync/pd-devel/pd && cvs up -Pd" >> $LOGFILE 2>&1
-su pd -c "/home/pd/rsync/pd-devel/scripts/update-developer-layout.sh" >> $LOGFILE 2>&1
-
-# main
-echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
-echo "pd-main"	>> $LOGFILE 2>&1
-echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
-su pd -c "cd /home/pd/rsync/pd-main/pd && cvs up -APd" >> $LOGFILE 2>&1
-su pd -c "/home/pd/rsync/pd-main/scripts/update-developer-layout.sh" >> $LOGFILE 2>&1
+update_distro pd-extended
+update_distro pd-extended-release
+update_distro pd-main
+update_distro pd-devel
