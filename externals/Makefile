@@ -187,7 +187,6 @@ flatspace_install: flatspace $(helpdir) $(objectsdir)
 # all standard objs' help files
 #    it had to be broken up because the list is soo long
 	install -p \
-			$(externals_src)/aenv~/*.pd \
 			$(externals_src)/arraysize/*.pd \
 			$(externals_src)/beatpipe/*.pd \
 			$(externals_src)/bsaylor/help/*.pd \
