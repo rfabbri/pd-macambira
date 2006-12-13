@@ -19,18 +19,19 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 TARGET_PLATFORM := $(shell uname -m)
 ifeq ($(TARGET_PLATFORM),i686)
 # Generic x86 (tune for Pentium III, since that's more common these days)
-OPT_CFLAGS += -march=i386
-else
-  ifeq ($(TARGET_PLATFORM),ppc)
+#OPT_CFLAGS += -march=i386
+OPT_CFLAGS += -march=pentium3 -msse -mfpmath=sse
+endif
+ifeq ($(TARGET_PLATFORM),ppc)
     OPT_CFLAGS += -pipe -fsigned-char -mpowerpc-gfxopt
-  else
-    # more CPUs should go here
-    OPT_CFLAGS += 
-  endif
+endif
+
+GCC_VERSION := $(shell gcc -dumpversion)
+ifeq ($(GCC_VERSION),4.1.2)
+  OPT_CFLAGS += -ftree-vectorize -ftree-vectorizer-verbose=3
 endif
 
 # lots more here: http://www.gentoo.se/docs/doc-cflags.php
-
 
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
