@@ -1,4 +1,4 @@
-#N canvas 87 6 810 646 10;
+#N canvas 87 6 818 654 10;
 #X obj 29 365 soundfiler;
 #X obj 38 203 unpack s s;
 #X msg 29 344 read -skip \$1 \$2 \$3;
@@ -69,21 +69,21 @@
 #X text 429 20 calculates a reduced set;
 #X obj 39 112 cnv 15 102 15 empty empty empty 20 12 0 14 -260818 -66577
 0;
-#N canvas 0 5 998 715 input_messages 0;
+#N canvas 0 5 1006 718 input_messages 0;
 #X obj 197 645 outlet;
-#X msg 67 401 calc_pinv;
+#X msg 67 383 calc_pinv;
 #X msg 14 615 calc_sym;
 #X obj 93 273 pp pht_ls;
 #X obj 107 218 pp real_ls;
 #X obj 120 174 pp load_HRIR;
 #X msg 120 154 1 L0e045a.wav \, 2 L0e135a.wav \, 3 L0e225a.wav \, 4
 L0e315a.wav;
-#X obj 80 336 pp ipht_ireal_muladd;
+#X obj 80 329 pp ipht_ireal_muladd;
 #X obj 133 130 pp ambi_weight;
 #X obj 147 86 pp sing_range;
 #X msg 93 253 1 -90 0;
 #X msg 147 66 1e-010;
-#X msg 80 315 1 4 0.707;
+#X msg 80 308 1 4 0.707;
 #X obj 14 26 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X msg 133 110 1 1;
@@ -95,11 +95,11 @@ L0e315a.wav;
 #X text 667 49 all angles in degree;
 #X text 276 126 ambisonic order group to suppress the side-lobe-phenomena
 ;
-#X text 273 388 of all (real + phantom) loudspeaker positions \,;
-#X text 274 412 and calculates the pseudo inverse.;
-#X text 277 400 multiplicates the ambi order weight;
-#X text 536 304 mirror_weight;
-#X text 275 330 phantom speaker with the factor "mirror_weight" and
+#X text 273 370 of all (real + phantom) loudspeaker positions \,;
+#X text 274 394 and calculates the pseudo inverse.;
+#X text 277 382 multiplicates the ambi order weight;
+#X text 536 297 mirror_weight;
+#X text 275 323 phantom speaker with the factor "mirror_weight" and
 adds;
 #X text 231 38 input: <sing_range> singularity range;
 #X text 274 49 when calculating the inverse of the matrix by gauss
@@ -132,21 +132,19 @@ adds;
 #X obj 27 584 pp calc_reduced;
 #X msg 27 562 1 \, 2 \, 3;
 #X msg 40 506 1 \, 2 \, 3;
-#X msg 53 454 1 \, 2 \, 3 \, 4;
-#X obj 53 475 pp check_HRIR_arrays;
+#X msg 53 439 1 \, 2 \, 3 \, 4;
+#X obj 53 460 pp check_HRIR_arrays;
 #X text 481 150 input: <load_HRIR> : re_ls_index + left_ear_HRIR_wav_file
 ;
-#X text 230 377 input: <calc_pinv> starts the encoding;
-#X text 230 304 input: <ipht_ireal_muladd> vi_ls_index re_ls_index
+#X text 230 359 input: <calc_pinv> starts the encoding;
+#X text 230 297 input: <ipht_ireal_muladd> vi_ls_index re_ls_index
 ;
-#X text 276 317 multiplies the column "vi_ls_index + re_ls_index" of
+#X text 276 310 multiplies the column "vi_ls_index + re_ls_index" of
 ;
-#X text 274 343 this column to the column "re_ls_index" of real speaker
+#X text 274 336 this column to the column "re_ls_index" of real speaker
 ;
-#X text 230 442 input: <check_HRIR_arrays> re_ls_index;
-#X text 275 468 index of the HRIR from loudspeaker to the left ear.
-;
-#X text 274 455 checks the existence of the table with the "re_ls_index"-th
+#X text 230 424 input: <check_HRIR_arrays> re_ls_index;
+#X text 274 437 checks the existence of the table with the "re_ls_index"-th
 ;
 #X text 274 509 checks the existence of the reduced decoder table;
 #X text 275 522 with the "ambi_ch_index"-th index.;
@@ -158,8 +156,6 @@ adds;
 #X text 26 663 to bin_ambi_reduced_decode_fft2;
 #X text 524 162 and outputs on the left 2 symbols (table + wav);
 #X text 230 611 input: <calc_sym> outputs a list of 2 floats;
-#X text 273 622 second float is the index \, first float is one or
-two;
 #X text 273 633 one means symmetric \, two means asymmetric column
 of;
 #X text 273 644 reduced decoder matrix. (message is especially for
@@ -168,11 +164,11 @@ of;
 ;
 #X text 253 279 ____________________________________________________________
 ;
-#X text 253 347 ____________________________________________________________
+#X text 253 340 ____________________________________________________________
 ;
-#X text 253 416 ____________________________________________________________
+#X text 253 398 ____________________________________________________________
 ;
-#X text 253 473 ____________________________________________________________
+#X text 253 476 ____________________________________________________________
 ;
 #X text 253 539 ____________________________________________________________
 ;
@@ -191,6 +187,11 @@ of;
 #X obj 40 527 pp check_HRIR_RED_arrays;
 #X text 230 496 input: <check_HRIR_RED_arrays> ambi_ch_index;
 #X text 273 587 column of the decoder matrix;
+#X text 274 462 and multiplies this HRIR with the fadeout table;
+#X text 275 450 index of the HRIR from loudspeaker to the left ear
+;
+#X text 273 622 second float is the index \, first float is one or
+two \,;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
 #X connect 3 0 0 0;
@@ -218,10 +219,10 @@ of;
 #X connect 45 10 11 0;
 #X connect 46 0 0 0;
 #X connect 47 0 46 0;
-#X connect 48 0 85 0;
+#X connect 48 0 83 0;
 #X connect 49 0 50 0;
 #X connect 50 0 0 0;
-#X connect 85 0 0 0;
+#X connect 83 0 0 0;
 #X restore 38 111 pd input_messages;
 #X text 108 203 load control of Head Related;
 #X text 108 215 Impulse Responses;

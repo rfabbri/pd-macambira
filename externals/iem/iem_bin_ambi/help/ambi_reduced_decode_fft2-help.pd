@@ -1,4 +1,4 @@
-#N canvas 87 6 749 642 10;
+#N canvas 87 6 761 654 10;
 #X obj 29 365 soundfiler;
 #X obj 38 203 unpack s s;
 #X msg 29 344 read -skip \$1 \$2 \$3;
@@ -96,37 +96,37 @@ name;
 #X text 429 20 calculates a reduced set;
 #X obj 39 112 cnv 15 102 15 empty empty empty 20 12 0 14 -260818 -66577
 0;
-#N canvas 0 5 982 699 input_messages 0;
+#N canvas 0 5 1012 718 input_messages 0;
 #X obj 147 645 outlet;
-#X msg 67 401 calc_pinv;
-#X msg 14 615 calc_sym;
-#X obj 93 273 pp pht_ls;
-#X obj 107 218 pp real_ls;
-#X obj 120 174 pp load_HRIR;
-#X msg 120 154 1 L0e045a.wav \, 2 L0e135a.wav \, 3 L0e225a.wav \, 4
+#X msg 80 324 calc_pinv;
+#X msg 14 621 calc_sym;
+#X obj 93 277 pp pht_ls;
+#X obj 107 222 pp real_ls;
+#X obj 120 178 pp load_HRIR;
+#X msg 120 158 1 L0e045a.wav \, 2 L0e135a.wav \, 3 L0e225a.wav \, 4
 L0e315a.wav;
-#X obj 80 336 pp ipht_ireal_muladd;
+#X obj 67 396 pp ipht_ireal_muladd;
 #X obj 133 130 pp ambi_weight;
 #X obj 147 86 pp sing_range;
-#X msg 93 253 1 -90 0;
+#X msg 93 257 1 -90 0;
 #X msg 147 66 1e-010;
-#X msg 80 315 1 4 0.707;
+#X msg 67 375 1 4 0.707;
 #X obj 14 26 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X msg 133 110 1 1;
 #X obj 14 5 inlet;
-#X msg 107 198 1 45 \, 2 135 \, 3 225 \, 4 315;
+#X msg 107 202 1 45 \, 2 135 \, 3 225 \, 4 315;
 #X text 670 112 -180 <= phi <= +180;
 #X text 231 115 input: <ambi_weight> one mul-factor for each;
 #X text 655 12 n_ao = ambisonic-order;
 #X text 667 49 all angles in degree;
 #X text 276 126 ambisonic order group to suppress the side-lobe-phenomena
 ;
-#X text 273 388 of all (real + phantom) loudspeaker positions \,;
-#X text 274 412 and calculates the pseudo inverse.;
-#X text 277 400 multiplicates the ambi order weight;
-#X text 536 304 mirror_weight;
-#X text 275 330 phantom speaker with the factor "mirror_weight" and
+#X text 273 317 of all (real + phantom) loudspeaker positions \,;
+#X text 274 341 and calculates the pseudo inverse.;
+#X text 277 329 multiplicates the ambi order weight;
+#X text 536 366 mirror_weight;
+#X text 275 392 phantom speaker with the factor "mirror_weight" and
 adds;
 #X text 231 38 input: <sing_range> singularity range;
 #X text 274 49 when calculating the inverse of the matrix by gauss
@@ -140,71 +140,67 @@ adds;
 ;
 #X text 640 23 n_re_ls = number of real loudspeakers;
 #X text 640 35 n_vi_ls = number of virtual phantom loudspeakers;
-#X text 271 197 input: <real_ls> re_ls_index + phi .. 2-dimensional
+#X text 298 201 input: <real_ls> re_ls_index + phi .. 2-dimensional
 ;
-#X text 271 208 input: <real_ls> re_ls_index + theta + phi .. 3-dimensional
+#X text 298 212 input: <real_ls> re_ls_index + theta + phi .. 3-dimensional
 ;
-#X text 231 241 input: <pht_ls> vi_ls_index + phi .. 2-dimensional
+#X text 230 247 input: <pht_ls> vi_ls_index + phi .. 2-dimensional
 ;
-#X text 231 252 input: <pht_ls> vi_ls_index + theta + phi .. 3-dimensional
+#X text 230 258 input: <pht_ls> vi_ls_index + theta + phi .. 3-dimensional
 ;
 #X text 670 100 -90 <= theta <= +90;
 #X text 662 76 1 <= re_ls_index <= n_re_ls;
 #X text 662 87 1 <= vi_ls_index <= n_vi_ls;
-#X text 313 219 encodes the re_ls_index row of a matrix;
-#X text 274 264 encodes the (re_ls_index + vi_ls_index) row of a matrix
+#X text 340 223 encodes the re_ls_index row of a matrix;
+#X text 273 270 encodes the (re_ls_index + vi_ls_index) row of a matrix
 ;
-#X text 275 275 we need them to achieve a nonsingular matrix;
+#X text 274 281 we need them to achieve a nonsingular matrix;
 #X obj 14 45 t b b b b b b b b b b b;
-#X obj 27 584 pp calc_reduced;
-#X msg 27 562 1 \, 2 \, 3;
-#X obj 40 527 pp check_HRTF_arrays;
-#X msg 40 506 1 \, 2 \, 3;
-#X msg 53 454 1 \, 2 \, 3 \, 4;
-#X obj 53 475 pp check_HRIR_arrays;
-#X text 481 150 input: <load_HRIR> : re_ls_index + left_ear_HRIR_wav_file
+#X obj 27 586 pp calc_reduced;
+#X msg 27 564 1 \, 2 \, 3;
+#X obj 40 532 pp check_HRTF_arrays;
+#X msg 40 511 1 \, 2 \, 3;
+#X msg 53 437 1 \, 2 \, 3 \, 4;
+#X obj 53 458 pp check_HRIR_arrays;
+#X text 491 157 input: <load_HRIR> : re_ls_index + left_ear_HRIR_wav_file
 ;
-#X text 230 377 input: <calc_pinv> starts the encoding;
-#X text 230 304 input: <ipht_ireal_muladd> vi_ls_index re_ls_index
+#X text 230 306 input: <calc_pinv> starts the encoding;
+#X text 230 366 input: <ipht_ireal_muladd> vi_ls_index re_ls_index
 ;
-#X text 276 317 multiplies the column "vi_ls_index + re_ls_index" of
+#X text 276 379 multiplies the column "vi_ls_index + re_ls_index" of
 ;
-#X text 274 343 this column to the column "re_ls_index" of real speaker
+#X text 274 405 this column to the column "re_ls_index" of real speaker
 ;
-#X text 230 442 input: <check_HRIR_arrays> re_ls_index;
-#X text 275 468 index of the HRIR from loudspeaker to the left ear.
+#X text 227 435 input: <check_HRIR_arrays> re_ls_index;
+#X text 271 448 checks the existence of the table with the "re_ls_index"-th
 ;
-#X text 274 455 checks the existence of the table with the "re_ls_index"-th
-;
-#X text 274 509 checks the existence of the reduced decoder table;
-#X text 230 496 input: <check_HRTF_arrays> ambi_ch_index;
-#X text 275 522 with the "ambi_ch_index"-th index.;
-#X text 273 534 [1 .. (2*n_ao+1)] 2d;
-#X text 421 534 [1 .. (n_ao+1)*(n_ao+1)] 3d;
+#X text 271 511 checks the existence of the reduced decoder table;
+#X text 227 498 input: <check_HRTF_arrays> ambi_ch_index;
+#X text 272 524 with the "ambi_ch_index"-th index.;
+#X text 270 536 [1 .. (2*n_ao+1)] 2d;
+#X text 418 536 [1 .. (n_ao+1)*(n_ao+1)] 3d;
 #X text 230 561 input: <calc_reduced> ambi_ch_index;
 #X text 275 574 multiplies the matrix of HRIR with the "ambi_ch_index"-th
 ;
 #X text 273 587 column of the decoder matrix and does a real FFT;
 #X text 26 663 to bin_ambi_reduced_decode_fft2;
-#X text 524 162 and outputs on the left 2 symbols (table + wav);
+#X text 534 169 and outputs on the left 2 symbols (table + wav);
 #X text 230 611 input: <calc_sym> outputs a list of 2 floats;
-#X text 273 622 second float is the index \, first float is one or
-two;
 #X text 273 633 one means symmetric \, two means asymmetric column
 of;
 #X text 273 644 reduced decoder matrix. (message is especially for
 ;
-#X text 253 223 ____________________________________________________________
+#X text 280 227 ____________________________________________________________
 ;
-#X text 253 279 ____________________________________________________________
+#X text 252 285 ____________________________________________________________
 ;
-#X text 253 347 ____________________________________________________________
+#X text 253 409 ____________________________________________________________
 ;
-#X text 253 416 ____________________________________________________________
+#X text 253 345 ____________________________________________________________
 ;
-#X text 253 473 ____________________________________________________________
+#X text 250 480 ____________________________________________________________
 ;
-#X text 253 539 ____________________________________________________________
+#X text 250 541 ____________________________________________________________
 ;
 #X text 253 592 ____________________________________________________________
 ;
@@ -212,12 +208,21 @@ of;
 ;
 #X text 255 95 ____________________________________________________________
 ;
-#X text 496 168 ____________________________________________________________
+#X text 506 178 ____________________________________________________________
 ;
 #X text 636 58 _________________________________________________;
 #X text 636 121 _________________________________________________;
 #X text 66 24 in this order;
 #X text 275 655 matrix object "spec2_matrix_bundle_stat~";
+#X text 250 133 ____________________________________________________________
+;
+#X text 276 178 ____________________________________________________________
+;
+#X text 272 461 index of the HRIR from loudspeaker to the left ear
+;
+#X text 271 473 and multiplies this HRIR with the fadeout table;
+#X text 273 622 second float is the index \, first float is one or
+two \,;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
 #X connect 3 0 0 0;
@@ -238,8 +243,7 @@ of;
 #X connect 45 1 47 0;
 #X connect 45 2 49 0;
 #X connect 45 3 50 0;
-#X connect 45 4 1 0;
-#X connect 45 5 12 0;
+#X connect 45 5 1 0;
 #X connect 45 7 16 0;
 #X connect 45 8 6 0;
 #X connect 45 9 14 0;
