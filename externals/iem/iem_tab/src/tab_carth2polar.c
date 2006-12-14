@@ -230,5 +230,5 @@ void tab_carth2polar_setup(void)
   class_addmethod(tab_carth2polar_class, (t_method)tab_carth2polar_src_im, gensym("src1_im"), A_DEFSYMBOL, 0);
   class_addmethod(tab_carth2polar_class, (t_method)tab_carth2polar_dst_mag, gensym("dst_mag"), A_DEFSYMBOL, 0);
   class_addmethod(tab_carth2polar_class, (t_method)tab_carth2polar_dst_arg, gensym("dst_arg"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_carth2polar_class, gensym("iemhelp2/help-tab_carth2polar"));
+//  class_sethelpsymbol(tab_carth2polar_class, gensym("iemhelp2/help-tab_carth2polar"));
 }

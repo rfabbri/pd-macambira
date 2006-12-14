@@ -194,5 +194,5 @@ void tab_counter_setup(void)
   class_addmethod(tab_counter_class, (t_method)tab_counter_src, gensym("src"), A_DEFSYMBOL, 0);
   class_addmethod(tab_counter_class, (t_method)tab_counter_dst, gensym("dst"), A_DEFSYMBOL, 0);
   class_addmethod(tab_counter_class, (t_method)tab_counter_reset, gensym("reset"), 0);
-  class_sethelpsymbol(tab_counter_class, gensym("iemhelp2/tab_counter-help"));
+//  class_sethelpsymbol(tab_counter_class, gensym("iemhelp2/tab_counter-help"));
 }

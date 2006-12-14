@@ -169,5 +169,5 @@ void tab_eq_scalar_setup(void)
   class_addmethod(tab_eq_scalar_class, (t_method)tab_eq_scalar_src, gensym("src1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_eq_scalar_class, (t_method)tab_eq_scalar_src, gensym("src"), A_DEFSYMBOL, 0);
   class_addmethod(tab_eq_scalar_class, (t_method)tab_eq_scalar_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_eq_scalar_class, gensym("iemhelp2/tab_eq_scalar-help"));
+//  class_sethelpsymbol(tab_eq_scalar_class, gensym("iemhelp2/tab_eq_scalar-help"));
 }

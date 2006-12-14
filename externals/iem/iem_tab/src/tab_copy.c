@@ -156,5 +156,5 @@ void tab_copy_setup(void)
   class_addmethod(tab_copy_class, (t_method)tab_copy_src, gensym("src"), A_DEFSYMBOL, 0);
   class_addmethod(tab_copy_class, (t_method)tab_copy_src, gensym("src1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_copy_class, (t_method)tab_copy_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_copy_class, gensym("iemhelp2/tab_copy-help"));
+//  class_sethelpsymbol(tab_copy_class, gensym("iemhelp2/tab_copy-help"));
 }

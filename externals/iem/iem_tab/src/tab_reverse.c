@@ -158,5 +158,5 @@ void tab_reverse_setup(void)
   class_addmethod(tab_reverse_class, (t_method)tab_reverse_src, gensym("src"), A_DEFSYMBOL, 0);
   class_addmethod(tab_reverse_class, (t_method)tab_reverse_src, gensym("src1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_reverse_class, (t_method)tab_reverse_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_reverse_class, gensym("iemhelp2/tab_reverse-help"));
+//  class_sethelpsymbol(tab_reverse_class, gensym("iemhelp2/tab_reverse-help"));
 }

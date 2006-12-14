@@ -142,5 +142,5 @@ void tab_min_index_setup(void)
   class_addlist(tab_min_index_class, (t_method)tab_min_index_list);
   class_addmethod(tab_min_index_class, (t_method)tab_min_index_src, gensym("src"), A_DEFSYMBOL, 0);
   class_addmethod(tab_min_index_class, (t_method)tab_min_index_src, gensym("src1"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_min_index_class, gensym("iemhelp2/tab_min_index-help"));
+//  class_sethelpsymbol(tab_min_index_class, gensym("iemhelp2/tab_min_index-help"));
 }

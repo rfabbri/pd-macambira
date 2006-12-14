@@ -234,5 +234,5 @@ void tab_complex_inv_setup(void)
   class_addmethod(tab_complex_inv_class, (t_method)tab_complex_inv_src1_im, gensym("src1_im"), A_DEFSYMBOL, 0);
   class_addmethod(tab_complex_inv_class, (t_method)tab_complex_inv_src1_im, gensym("src_im"), A_DEFSYMBOL, 0);
   class_addmethod(tab_complex_inv_class, (t_method)tab_complex_inv_dst_im, gensym("dst_im"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_complex_inv_class, gensym("iemhelp2/tab_complex_inv-help"));
+//  class_sethelpsymbol(tab_complex_inv_class, gensym("iemhelp2/tab_complex_inv-help"));
 }

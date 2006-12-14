@@ -192,5 +192,5 @@ void tab_eq_setup(void)
   class_addmethod(tab_eq_class, (t_method)tab_eq_src1, gensym("src1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_eq_class, (t_method)tab_eq_src2, gensym("src2"), A_DEFSYMBOL, 0);
   class_addmethod(tab_eq_class, (t_method)tab_eq_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_eq_class, gensym("iemhelp2/tab_eq-help"));
+//  class_sethelpsymbol(tab_eq_class, gensym("iemhelp2/tab_eq-help"));
 }

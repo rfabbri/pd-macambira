@@ -141,5 +141,5 @@ void tab_max_index_setup(void)
   class_addlist(tab_max_index_class, (t_method)tab_max_index_list);
   class_addmethod(tab_max_index_class, (t_method)tab_max_index_src, gensym("src"), A_DEFSYMBOL, 0);
   class_addmethod(tab_max_index_class, (t_method)tab_max_index_src, gensym("src1"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_max_index_class, gensym("iemhelp2/tab_max_index-help"));
+//  class_sethelpsymbol(tab_max_index_class, gensym("iemhelp2/tab_max_index-help"));
 }

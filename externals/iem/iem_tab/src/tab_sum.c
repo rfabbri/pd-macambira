@@ -129,5 +129,5 @@ void tab_sum_setup(void)
   class_addlist(tab_sum_class, (t_method)tab_sum_list);
   class_addmethod(tab_sum_class, (t_method)tab_sum_src, gensym("src"), A_DEFSYMBOL, 0);
   class_addmethod(tab_sum_class, (t_method)tab_sum_src, gensym("src1"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_sum_class, gensym("iemhelp2/tab_sum-help"));
+//  class_sethelpsymbol(tab_sum_class, gensym("iemhelp2/tab_sum-help"));
 }

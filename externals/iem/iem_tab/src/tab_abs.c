@@ -159,5 +159,5 @@ void tab_abs_setup(void)
   class_addmethod(tab_abs_class, (t_method)tab_abs_src, gensym("src"), A_DEFSYMBOL, 0);
   class_addmethod(tab_abs_class, (t_method)tab_abs_src, gensym("src1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_abs_class, (t_method)tab_abs_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_abs_class, gensym("iemhelp2/tab_abs-help"));
+//  class_sethelpsymbol(tab_abs_class, gensym("iemhelp2/tab_abs-help"));
 }

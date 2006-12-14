@@ -394,5 +394,5 @@ void tab_rifft_setup(void)
   class_addmethod(tab_rifft_class, (t_method)tab_rifft_src_im, gensym("src2"), A_DEFSYMBOL, 0);
   class_addmethod(tab_rifft_class, (t_method)tab_rifft_dst, gensym("dst"), A_DEFSYMBOL, 0);
   class_addmethod(tab_rifft_class, (t_method)tab_rifft_dst, gensym("dst1"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_rifft_class, gensym("iemhelp2/tab_rifft-help"));
+//  class_sethelpsymbol(tab_rifft_class, gensym("iemhelp2/tab_rifft-help"));
 }

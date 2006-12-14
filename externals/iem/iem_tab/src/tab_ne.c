@@ -193,5 +193,5 @@ void tab_ne_setup(void)
   class_addmethod(tab_ne_class, (t_method)tab_ne_src1, gensym("src1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_ne_class, (t_method)tab_ne_src2, gensym("src2"), A_DEFSYMBOL, 0);
   class_addmethod(tab_ne_class, (t_method)tab_ne_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_ne_class, gensym("iemhelp2/tab_ne-help"));
+//  class_sethelpsymbol(tab_ne_class, gensym("iemhelp2/tab_ne-help"));
 }

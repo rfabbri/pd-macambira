@@ -216,5 +216,5 @@ void tab_conv_setup(void)
   class_addmethod(tab_conv_class, (t_method)tab_conv_src1, gensym("src1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_conv_class, (t_method)tab_conv_src2, gensym("src2"), A_DEFSYMBOL, 0);
   class_addmethod(tab_conv_class, (t_method)tab_conv_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_conv_class, gensym("iemhelp2/tab_conv-help"));
+//  class_sethelpsymbol(tab_conv_class, gensym("iemhelp2/tab_conv-help"));
 }

@@ -379,5 +379,5 @@ void tab_rfft_setup(void)
   class_addmethod(tab_rfft_class, (t_method)tab_rfft_dst_im, gensym("dst_im"), A_DEFSYMBOL, 0);
   class_addmethod(tab_rfft_class, (t_method)tab_rfft_dst_re, gensym("dst1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_rfft_class, (t_method)tab_rfft_dst_im, gensym("dst2"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_rfft_class, gensym("iemhelp2/tab_rfft-help"));
+//  class_sethelpsymbol(tab_rfft_class, gensym("iemhelp2/tab_rfft-help"));
 }

@@ -243,5 +243,5 @@ void tab_mls_setup(void)
   class_addfloat(tab_mls_class, (t_method)tab_mls_float);
   class_addlist(tab_mls_class, (t_method)tab_mls_list);
   class_addmethod(tab_mls_class, (t_method)tab_mls_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_mls_class, gensym("iemhelp2/tab_mls-help"));
+//  class_sethelpsymbol(tab_mls_class, gensym("iemhelp2/tab_mls-help"));
 }

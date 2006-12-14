@@ -375,5 +375,5 @@ void tab_find_exact_peaks_setup(void)
   class_addmethod(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_abs_min_height_diff, gensym("abs_min_height_diff"), A_DEFFLOAT, 0);
   class_addmethod(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_amp_sort, gensym("amp_sort"), 0);
   class_addmethod(tab_find_exact_peaks_class, (t_method)tab_find_exact_peaks_freq_sort, gensym("freq_sort"), 0);
-  class_sethelpsymbol(tab_find_exact_peaks_class, gensym("iemhelp2/help-tab_find_exact_peaks"));
+//  class_sethelpsymbol(tab_find_exact_peaks_class, gensym("iemhelp2/help-tab_find_exact_peaks"));
 }

@@ -209,5 +209,5 @@ void tab_sqrt_setup(void)
   class_addmethod(tab_sqrt_class, (t_method)tab_sqrt_src, gensym("src"), A_DEFSYMBOL, 0);
   class_addmethod(tab_sqrt_class, (t_method)tab_sqrt_src, gensym("src1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_sqrt_class, (t_method)tab_sqrt_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_sqrt_class, gensym("iemhelp2/tab_sqrt-help"));
+//  class_sethelpsymbol(tab_sqrt_class, gensym("iemhelp2/tab_sqrt-help"));
 }

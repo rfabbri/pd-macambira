@@ -155,5 +155,5 @@ void tab_const_setup(void)
   class_addfloat(tab_const_class, (t_method)tab_const_float);
   class_addlist(tab_const_class, (t_method)tab_const_list);
   class_addmethod(tab_const_class, (t_method)tab_const_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_const_class, gensym("iemhelp2/tab_const-help"));
+//  class_sethelpsymbol(tab_const_class, gensym("iemhelp2/tab_const-help"));
 }

@@ -209,5 +209,5 @@ void tab_cross_corr_setup(void)
   class_addmethod(tab_cross_corr_class, (t_method)tab_cross_corr_src2, gensym("src2"), A_DEFSYMBOL, 0);
   class_addmethod(tab_cross_corr_class, (t_method)tab_cross_corr_src1, gensym("src1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_cross_corr_class, (t_method)tab_cross_corr_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_cross_corr_class, gensym("iemhelp2/tab_cross_corr-help"));
+//  class_sethelpsymbol(tab_cross_corr_class, gensym("iemhelp2/tab_cross_corr-help"));
 }

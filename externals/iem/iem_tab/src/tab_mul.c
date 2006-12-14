@@ -183,5 +183,5 @@ void tab_mul_setup(void)
   class_addmethod(tab_mul_class, (t_method)tab_mul_src1, gensym("src1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_mul_class, (t_method)tab_mul_src2, gensym("src2"), A_DEFSYMBOL, 0);
   class_addmethod(tab_mul_class, (t_method)tab_mul_dst, gensym("dst"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_mul_class, gensym("iemhelp2/tab_mul-help"));
+//  class_sethelpsymbol(tab_mul_class, gensym("iemhelp2/tab_mul-help"));
 }

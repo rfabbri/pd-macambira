@@ -284,5 +284,5 @@ void tab_complex_mul_setup(void)
   class_addmethod(tab_complex_mul_class, (t_method)tab_complex_mul_src1_im, gensym("src1_im"), A_DEFSYMBOL, 0);
   class_addmethod(tab_complex_mul_class, (t_method)tab_complex_mul_src2_im, gensym("src2_im"), A_DEFSYMBOL, 0);
   class_addmethod(tab_complex_mul_class, (t_method)tab_complex_mul_dst_im, gensym("dst_im"), A_DEFSYMBOL, 0);
-  class_sethelpsymbol(tab_complex_mul_class, gensym("iemhelp2/tab_complex_mul-help"));
+//  class_sethelpsymbol(tab_complex_mul_class, gensym("iemhelp2/tab_complex_mul-help"));
 }
