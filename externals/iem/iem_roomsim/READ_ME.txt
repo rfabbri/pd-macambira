@@ -7,6 +7,6 @@ see also LICENCE.txt, GnuGPL.txt.
 iem_roomsim contains 2 objects: 
 "cart2del_damp_2d" and "cart2del_damp_3d".
 
-this are 2 mirror source method rendering objects, the calculate the radius distance,
+this are 2 mirror source method rendering objects, they calculate the radius distance,
 the delay time and the spheric coordinates in case of 3D or the polar coordinates in case of 2D
 of all the first and second reflections between an subjekt and an object in a cuboid room.
