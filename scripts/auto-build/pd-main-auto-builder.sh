@@ -64,6 +64,7 @@ case $SYSTEM in
 				cd ../../ && \
 				tar cjf $package_name pd && \
 				rsync -a ${package_name} rsync://128.238.56.50/upload/${DATE}/ && \
+				rm -f -- ${package_name} && \
 				echo SUCCESS
 		  ;;
 esac
