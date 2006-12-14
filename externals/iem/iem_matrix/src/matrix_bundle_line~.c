@@ -489,5 +489,5 @@ void matrix_bundle_line_tilde_setup(void)
   class_addmethod(matrix_bundle_line_tilde_class, (t_method)matrix_bundle_line_tilde_bundle, gensym("bundle"), A_GIMME, 0);
   class_addmethod(matrix_bundle_line_tilde_class, (t_method)matrix_bundle_line_tilde_stop, gensym("stop"), 0);
   class_addmethod(matrix_bundle_line_tilde_class, (t_method)matrix_bundle_line_tilde_time, gensym("time"), A_FLOAT, 0);
-  class_sethelpsymbol(matrix_bundle_line_tilde_class, gensym("iemhelp/matrix_bundle_line~-help"));
+//  class_sethelpsymbol(matrix_bundle_line_tilde_class, gensym("iemhelp/matrix_bundle_line~-help"));
 }

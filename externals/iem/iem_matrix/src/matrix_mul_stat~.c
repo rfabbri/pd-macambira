@@ -458,5 +458,5 @@ void matrix_mul_stat_tilde_setup(void)
   class_addmethod(matrix_mul_stat_tilde_class, (t_method)matrix_mul_stat_tilde_element, gensym("element"), A_GIMME, 0);
   class_addmethod(matrix_mul_stat_tilde_class, (t_method)matrix_mul_stat_tilde_row, gensym("row"), A_GIMME, 0);
   class_addmethod(matrix_mul_stat_tilde_class, (t_method)matrix_mul_stat_tilde_col, gensym("col"), A_GIMME, 0);
-  class_sethelpsymbol(matrix_mul_stat_tilde_class, gensym("iemhelp2/matrix_mul_stat~-help"));
+//  class_sethelpsymbol(matrix_mul_stat_tilde_class, gensym("iemhelp2/matrix_mul_stat~-help"));
 }

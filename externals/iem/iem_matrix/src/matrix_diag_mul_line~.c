@@ -411,5 +411,5 @@ void matrix_diag_mul_line_tilde_setup(void)
   class_addlist(matrix_diag_mul_line_tilde_class, (t_method)matrix_diag_mul_line_tilde_list);
   class_addmethod(matrix_diag_mul_line_tilde_class, (t_method)matrix_diag_mul_line_tilde_stop, gensym("stop"), 0);
   class_addmethod(matrix_diag_mul_line_tilde_class, (t_method)matrix_diag_mul_line_tilde_time, gensym("time"), A_FLOAT, 0);
-  class_sethelpsymbol(matrix_diag_mul_line_tilde_class, gensym("iemhelp2/matrix_diag_mul_line~-help"));
+//  class_sethelpsymbol(matrix_diag_mul_line_tilde_class, gensym("iemhelp2/matrix_diag_mul_line~-help"));
 }

@@ -748,5 +748,5 @@ void ambi_decode3_setup(void)
 	class_addmethod(ambi_decode3_class, (t_method)ambi_decode3_begin_pseudo_inverse, gensym("begin_pseudo_inverse"), 0);
 	class_addmethod(ambi_decode3_class, (t_method)ambi_decode3_ipht_ireal_muladd, gensym("ipht_ireal_muladd"), A_GIMME, 0);
 	class_addmethod(ambi_decode3_class, (t_method)ambi_decode3_end_pseudo_inverse, gensym("end_pseudo_inverse"), 0);
-	class_sethelpsymbol(ambi_decode3_class, gensym("iemhelp2/ambi_decode3-help"));
+//	class_sethelpsymbol(ambi_decode3_class, gensym("iemhelp2/ambi_decode3-help"));
 }

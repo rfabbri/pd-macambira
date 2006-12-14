@@ -29,6 +29,6 @@ void iem_delay_setup(void)
 	nz_tilde_setup();
 	block_delay_tilde_setup();
 
-    post("iem_delay (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
+    post("iem_delay (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
 	post("   musil%ciem.at iem KUG Graz Austria", '@');
 }

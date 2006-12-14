@@ -384,5 +384,5 @@ void cart2del_damp_2d_setup(void)
   class_addmethod(cart2del_damp_2d_class, (t_method)cart2del_damp_2d_room_dim, gensym("room_dim"), A_GIMME, 0);
   class_addmethod(cart2del_damp_2d_class, (t_method)cart2del_damp_2d_sonic_speed, gensym("sonic_speed"), A_FLOAT, 0);
   class_addmethod(cart2del_damp_2d_class, (t_method)cart2del_damp_2d_r_ambi, gensym("r_ambi"), A_FLOAT, 0);
-  class_sethelpsymbol(cart2del_damp_2d_class, gensym("iemhelp2/cart2del_damp_2d-help"));
+//  class_sethelpsymbol(cart2del_damp_2d_class, gensym("iemhelp2/cart2del_damp_2d-help"));
 }

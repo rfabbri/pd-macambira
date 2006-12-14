@@ -405,5 +405,5 @@ void matrix_diag_mul_line8_tilde_setup(void)
   class_addmethod(matrix_diag_mul_line8_tilde_class, (t_method)matrix_diag_mul_line8_tilde_element, gensym("element"), A_GIMME, 0);
   class_addmethod(matrix_diag_mul_line8_tilde_class, (t_method)matrix_diag_mul_line8_tilde_stop, gensym("stop"), 0);
   class_addmethod(matrix_diag_mul_line8_tilde_class, (t_method)matrix_diag_mul_line8_tilde_time, gensym("time"), A_FLOAT, 0);
-  class_sethelpsymbol(matrix_diag_mul_line8_tilde_class, gensym("iemhelp2/matrix_diag_mul_line8~-help"));
+//  class_sethelpsymbol(matrix_diag_mul_line8_tilde_class, gensym("iemhelp2/matrix_diag_mul_line8~-help"));
 }

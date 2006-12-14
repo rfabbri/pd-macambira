@@ -260,5 +260,5 @@ static void spherical_line_setup(void)
   spherical_line_class = class_new(gensym("spherical_line"), (t_newmethod)spherical_line_new, (t_method)spherical_line_free,
     sizeof(t_spherical_line), 0, A_FLOAT, 0);
   class_addmethod(spherical_line_class, (t_method)spherical_line_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(spherical_line_class, gensym("iemhelp/spherical_line-help"));
+//  class_sethelpsymbol(spherical_line_class, gensym("iemhelp/spherical_line-help"));
 }

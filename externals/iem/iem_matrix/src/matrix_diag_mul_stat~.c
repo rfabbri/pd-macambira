@@ -265,5 +265,5 @@ void matrix_diag_mul_stat_tilde_setup(void)
   class_addmethod(matrix_diag_mul_stat_tilde_class, (t_method)matrix_diag_mul_stat_tilde_diag, gensym("diag"), A_GIMME, 0);
   class_addmethod(matrix_diag_mul_stat_tilde_class, (t_method)matrix_diag_mul_stat_tilde_element, gensym("element"), A_GIMME, 0);
   class_addlist(matrix_diag_mul_stat_tilde_class, (t_method)matrix_diag_mul_stat_tilde_list);
-  class_sethelpsymbol(matrix_diag_mul_stat_tilde_class, gensym("iemhelp2/matrix_diag_mul_stat~-help"));
+//  class_sethelpsymbol(matrix_diag_mul_stat_tilde_class, gensym("iemhelp2/matrix_diag_mul_stat~-help"));
 }

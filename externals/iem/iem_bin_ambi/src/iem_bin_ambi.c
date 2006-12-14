@@ -36,6 +36,6 @@ void iem_bin_ambi_setup(void)
 	bin_ambi_reduced_decode_fft2_setup();
 	bin_ambi_reduced_decode_fir2_setup();
 
-    post("iem_bin_ambi (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
+    post("iem_bin_ambi (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
 	post("   musil%ciem.at iem KUG Graz Austria", '@');
 }

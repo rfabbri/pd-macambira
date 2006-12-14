@@ -52,8 +52,8 @@ void iem_atan2_setup(void)
     0, sizeof(t_iem_atan2), 0, 0);
   class_addbang(iem_atan2_class, (t_method)iem_atan2_bang);
   class_addfloat(iem_atan2_class, (t_method)iem_atan2_float);
-  class_sethelpsymbol(iem_atan2_class, gensym("iemhelp/help-iem_atan2"));
-  post("iem_atan2 (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
+//  class_sethelpsymbol(iem_atan2_class, gensym("iemhelp/help-iem_atan2"));
+  post("iem_atan2 (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
 	post("   musil%ciem.at iem KUG Graz Austria", '@');
 }
 

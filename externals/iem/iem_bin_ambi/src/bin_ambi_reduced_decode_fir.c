@@ -1358,7 +1358,7 @@ void bin_ambi_reduced_decode_fir_setup(void)
 	class_addmethod(bin_ambi_reduced_decode_fir_class, (t_method)bin_ambi_reduced_decode_fir_calc_sym, gensym("calc_sym"), 0);
 	class_addmethod(bin_ambi_reduced_decode_fir_class, (t_method)bin_ambi_reduced_decode_fir_ambi_weight, gensym("ambi_weight"), A_GIMME, 0);
 	class_addmethod(bin_ambi_reduced_decode_fir_class, (t_method)bin_ambi_reduced_decode_fir_sing_range, gensym("sing_range"), A_DEFFLOAT, 0);
-	class_sethelpsymbol(bin_ambi_reduced_decode_fir_class, gensym("iemhelp2/bin_ambi_reduced_decode_fir-help"));
+//	class_sethelpsymbol(bin_ambi_reduced_decode_fir_class, gensym("iemhelp2/bin_ambi_reduced_decode_fir-help"));
 }
 /*
 Reihenfolge:

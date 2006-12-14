@@ -39,6 +39,6 @@ void iem_matrix_setup(void)
   matrix_bundle_line8_tilde_setup();
   matrix_bundle_stat_tilde_setup();
   
-  post("iem_matrix (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
+  post("iem_matrix (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
   post("   musil%ciem.at iem KUG Graz Austria", '@');
 }

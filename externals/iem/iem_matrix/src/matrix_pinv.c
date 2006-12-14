@@ -596,5 +596,5 @@ void matrix_pinv_setup(void)
   matrix_pinv_class = class_new(gensym("matrix_pinv"), (t_newmethod)matrix_pinv_new, (t_method)matrix_pinv_free,
     sizeof(t_matrix_pinv), 0, 0);
   class_addmethod(matrix_pinv_class, (t_method)matrix_pinv_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(matrix_pinv_class, gensym("iemhelp/matrix_pinv-help"));
+//  class_sethelpsymbol(matrix_pinv_class, gensym("iemhelp/matrix_pinv-help"));
 }

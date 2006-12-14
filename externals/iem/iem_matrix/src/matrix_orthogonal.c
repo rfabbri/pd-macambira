@@ -157,5 +157,5 @@ static void matrix_orthogonal_setup(void)
   matrix_orthogonal_class = class_new(gensym("matrix_orthogonal"), (t_newmethod)matrix_orthogonal_new, (t_method)matrix_orthogonal_free,
     sizeof(t_matrix_orthogonal), 0, 0);
   class_addmethod(matrix_orthogonal_class, (t_method)matrix_orthogonal_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(matrix_orthogonal_class, gensym("iemhelp/matrix_orthogonal-help"));
+//  class_sethelpsymbol(matrix_orthogonal_class, gensym("iemhelp/matrix_orthogonal-help"));
 }

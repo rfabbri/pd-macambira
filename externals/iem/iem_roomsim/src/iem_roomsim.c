@@ -29,6 +29,6 @@ void iem_roomsim_setup(void)
   cart2del_damp_2d_setup();
   cart2del_damp_3d_setup();
   
-  post("iem_roomsim (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
+  post("iem_roomsim (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
   post("   musil%ciem.at iem KUG Graz Austria", '@');
 }

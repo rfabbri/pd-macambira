@@ -421,5 +421,5 @@ void ambi_encode_setup(void)
   class_addmethod(ambi_encode_class, (t_method)ambi_encode_row, gensym("row"), A_GIMME, 0);
   class_addmethod(ambi_encode_class, (t_method)ambi_encode_col, gensym("col"), A_GIMME, 0);
   class_addmethod(ambi_encode_class, (t_method)ambi_encode_ambi_weight, gensym("ambi_weight"), A_GIMME, 0);
-  class_sethelpsymbol(ambi_encode_class, gensym("iemhelp2/ambi_encode-help"));
+//  class_sethelpsymbol(ambi_encode_class, gensym("iemhelp2/ambi_encode-help"));
 }

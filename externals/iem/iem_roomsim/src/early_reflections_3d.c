@@ -898,5 +898,5 @@ void early_reflections_3d_setup(void)
   class_addmethod(early_reflections_3d_class, (t_method)early_reflections_3d_sonic_speed, gensym("sonic_speed"), A_FLOAT, 0);
   class_addmethod(early_reflections_3d_class, (t_method)early_reflections_3d_bundle, gensym("bundle"), A_FLOAT, 0);
   class_addmethod(early_reflections_3d_class, (t_method)early_reflections_3d_dump_para, gensym("dump_para"), 0);
-  class_sethelpsymbol(early_reflections_3d_class, gensym("iemhelp2/early_reflections_3d-help"));
+//  class_sethelpsymbol(early_reflections_3d_class, gensym("iemhelp2/early_reflections_3d-help"));
 }

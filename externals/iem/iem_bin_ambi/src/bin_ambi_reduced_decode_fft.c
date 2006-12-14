@@ -1485,7 +1485,7 @@ void bin_ambi_reduced_decode_fft_setup(void)
 	class_addmethod(bin_ambi_reduced_decode_fft_class, (t_method)bin_ambi_reduced_decode_fft_calc_sym, gensym("calc_sym"), 0);
 	class_addmethod(bin_ambi_reduced_decode_fft_class, (t_method)bin_ambi_reduced_decode_fft_ambi_weight, gensym("ambi_weight"), A_GIMME, 0);
 	class_addmethod(bin_ambi_reduced_decode_fft_class, (t_method)bin_ambi_reduced_decode_fft_sing_range, gensym("sing_range"), A_DEFFLOAT, 0);
-	class_sethelpsymbol(bin_ambi_reduced_decode_fft_class, gensym("iemhelp2/bin_ambi_reduced_decode_fft-help"));
+//	class_sethelpsymbol(bin_ambi_reduced_decode_fft_class, gensym("iemhelp2/bin_ambi_reduced_decode_fft-help"));
 }
 /*
 Reihenfolge:

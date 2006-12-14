@@ -567,7 +567,7 @@ void bin_ambi_calc_HRTF_setup(void)
 	class_addmethod(bin_ambi_calc_HRTF_class, (t_method)bin_ambi_calc_HRTF_load_HRIR, gensym("load_HRIR"), A_FLOAT, 0);
 	class_addmethod(bin_ambi_calc_HRTF_class, (t_method)bin_ambi_calc_HRTF_check_arrays, gensym("check_arrays"), A_FLOAT, 0);
 	class_addmethod(bin_ambi_calc_HRTF_class, (t_method)bin_ambi_calc_HRTF_calc_fft, gensym("calc_fft"), A_FLOAT, 0);
-	class_sethelpsymbol(bin_ambi_calc_HRTF_class, gensym("iemhelp2/bin_ambi_calc_HRTF-help"));
+//	class_sethelpsymbol(bin_ambi_calc_HRTF_class, gensym("iemhelp2/bin_ambi_calc_HRTF-help"));
 }
 /*
 Reihenfolge:
