@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
 
 
 #include "m_pd.h"
@@ -47,7 +47,7 @@ static void tab_reverse_bang(t_tab_reverse *x)
   
   if(ok_src && ok_dst)
   {
-    if(x->x_size_src1 > x->x_size_dst)
+    if(x->x_size_src1 < x->x_size_dst)
       n = x->x_size_src1;
     else
       n = x->x_size_dst;
