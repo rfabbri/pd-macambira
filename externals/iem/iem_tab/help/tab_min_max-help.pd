@@ -1,4 +1,4 @@
-#N canvas 116 92 778 405 10;
+#N canvas 82 83 782 436 10;
 #N canvas 0 0 450 300 graph1 0;
 #X array src 100 float 1;
 #A 0 -0.442858 -0.414287 -0.385715 -0.342858 -0.314287 -0.257144 -0.128572
@@ -16,37 +16,47 @@
 0.214286 0.257144 0.285715 0.314287 0.342858 0.357144 0.357144 0.357144
 0.357144 0.357144 0.342858 0.328572;
 #X coords 0 1 99 -1 200 140 1;
-#X restore 534 10 graph;
-#X obj 61 31 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X restore 534 20 graph;
+#X obj 61 34 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 61 106 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 61 109 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 59 294 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 59 297 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X text 56 165 src-onset;
-#X text 269 299 1.arg: <symbol> source-name;
-#X msg 183 222 src src;
-#X obj 61 78 tab_min_max src;
-#X floatatom 103 101 5 0 0 0 - - -;
-#X floatatom 146 100 5 0 0 0 - - -;
-#X text 110 115 min;
-#X text 155 117 max;
-#X floatatom 110 295 5 0 0 0 - - -;
-#X floatatom 162 294 5 0 0 0 - - -;
-#X text 117 309 min;
-#X text 171 311 max;
-#X msg 59 211 35 50;
-#X text 90 29 <bang> calculate min. and max. from zero-onset;
-#X text 164 39 to the end of array;
-#X text 44 154 list of 2 floats:;
-#X text 58 175 n samples to calc. min. and max.;
-#X obj 59 262 tab_min_max src;
-#X connect 1 0 7 0;
-#X connect 6 0 21 0;
-#X connect 7 0 2 0;
-#X connect 7 1 8 0;
-#X connect 7 2 9 0;
-#X connect 16 0 21 0;
-#X connect 21 0 3 0;
-#X connect 21 1 12 0;
-#X connect 21 2 13 0;
+#X text 205 273 1.arg: <symbol> source-name;
+#X msg 101 216 src src;
+#X floatatom 103 106 5 0 0 0 - - -;
+#X floatatom 146 107 5 0 0 0 - - -;
+#X text 154 121 max;
+#X floatatom 101 323 5 0 0 0 - - -;
+#X floatatom 144 339 5 0 0 0 - - -;
+#X msg 59 196 35 50;
+#X text 75 387 IEM KUG;
+#X text 59 375 musil;
+#X text 89 375 @;
+#X text 95 375 iem.at;
+#X text 58 397 Graz \, Austria;
+#X text 10 364 (c) Thomas Musil 2000 - 2006;
+#X text 229 261 initial arguments:;
+#X text 65 283 <bang> output;
+#X text 152 216 <src> xxx : change source name;
+#X text 43 153 list of 2 floats:;
+#X text 55 163 1.) src onset;
+#X text 151 322 <float> maximum value output;
+#X text 11 9 tab_min_max;
+#X text 85 32 <bang> calculate minimum and maximum element value of
+array;
+#X text 55 174 2.) n samples to calculate minimum and maximum;
+#X text 110 120 min;
+#X obj 61 81 tab_min_max src;
+#X text 108 304 <float> minimum value output;
+#X obj 59 265 tab_min_max src;
+#X connect 1 0 28 0;
+#X connect 5 0 30 0;
+#X connect 11 0 30 0;
+#X connect 28 0 2 0;
+#X connect 28 1 6 0;
+#X connect 28 2 7 0;
+#X connect 30 0 3 0;
+#X connect 30 1 9 0;
+#X connect 30 2 10 0;

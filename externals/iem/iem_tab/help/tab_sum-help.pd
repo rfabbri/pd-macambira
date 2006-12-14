@@ -1,4 +1,4 @@
-#N canvas 116 92 782 409 10;
+#N canvas 116 92 794 421 10;
 #N canvas 0 0 450 300 graph1 0;
 #X array src 100 float 1;
 #A 0 -0.442858 -0.414287 -0.385715 -0.342858 -0.314287 -0.257144 -0.128572
@@ -16,28 +16,40 @@
 0.214286 0.257144 0.285715 0.314287 0.342858 0.357144 0.357144 0.357144
 0.357144 0.357144 0.342858 0.328572;
 #X coords 0 1 99 -1 200 140 1;
-#X restore 534 10 graph;
+#X restore 524 40 graph;
 #X obj 61 31 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 61 106 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 59 301 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X text 56 165 src-onset;
-#X text 143 263 1.arg: <symbol> source-name;
-#X msg 142 217 src src;
+#X msg 93 213 src src;
 #X obj 61 78 tab_sum src;
 #X floatatom 122 104 5 0 0 0 - - -;
-#X text 59 175 n samples to calc sum;
-#X text 44 154 list of 2 floats:;
-#X text 90 29 <bang> calc sum of array-elements;
-#X obj 59 264 tab_sum src;
-#X msg 59 211 50 20;
-#X floatatom 120 295 5 0 0 0 - - -;
-#X connect 1 0 7 0;
-#X connect 6 0 12 0;
-#X connect 7 0 2 0;
-#X connect 7 1 8 0;
-#X connect 12 0 3 0;
-#X connect 12 1 14 0;
-#X connect 13 0 12 0;
+#X obj 59 244 tab_sum src;
+#X msg 59 188 50 20;
+#X floatatom 120 305 5 0 0 0 - - -;
+#X text 75 364 IEM KUG;
+#X text 59 352 musil;
+#X text 89 352 @;
+#X text 95 352 iem.at;
+#X text 58 374 Graz \, Austria;
+#X text 10 341 (c) Thomas Musil 2000 - 2006;
+#X text 90 29 <bang> calc sum of all array elements;
+#X text 182 234 initial arguments:;
+#X text 65 260 <bang> output;
+#X text 11 6 tab_sum;
+#X text 55 171 2.) n samples to calc sum;
+#X text 142 213 <src> xxx : change source name;
+#X text 164 247 1.arg: <symbol> source-name;
+#X text 125 280 <float> sum output;
+#X text 118 118 sum value;
+#X text 43 150 list of 2 floats:;
+#X text 55 160 1.) src onset;
+#X connect 1 0 5 0;
+#X connect 4 0 7 0;
+#X connect 5 0 2 0;
+#X connect 5 1 6 0;
+#X connect 7 0 3 0;
+#X connect 7 1 9 0;
+#X connect 8 0 7 0;

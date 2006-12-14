@@ -1,4 +1,4 @@
-#N canvas 116 92 847 552 10;
+#N canvas 116 92 855 560 10;
 #N canvas 0 0 450 300 graph1 0;
 #X array src1 100 float 1;
 #A 0 -0.442858 -0.414287 -0.385715 -0.342858 -0.314287 -0.257144 -0.128572
@@ -25,10 +25,9 @@
 -1;
 #X obj 61 106 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 59 310 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 59 340 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X text 57 173 dst-onset;
-#X msg 286 234 dst dst;
+#X msg 255 276 dst dst;
 #N canvas 0 0 450 300 graph1 0;
 #X array src2 100 float 1;
 #A 0 0.557135 0.57142 0.557135 0.528564 0.499992 0.428564 0.357136
@@ -47,24 +46,38 @@
 -0.6 -0.6 -0.614286 -0.614286 -0.614286;
 #X coords 0 1 99 -1 200 140 1;
 #X restore 535 161 graph;
-#X msg 142 217 src1 src1;
-#X msg 218 223 src2 src2;
+#X msg 136 233 src1 src1;
+#X msg 195 255 src2 src2;
 #X msg 59 211 50 50 20 50;
 #X text 45 139 list of 4 floats:;
-#X text 57 153 src1-onset;
-#X text 56 163 src2-onset;
-#X text 212 333 3.arg: <symbol> destination-name;
-#X text 126 42 with the minimum-size of arrays;
+#X text 212 353 3.arg: <symbol> destination-name;
 #X text 90 29 <bang> add the 2 src-arrays to dst-array;
-#X text 57 183 n samples to add;
 #X obj 61 78 tab_add src1 src2 dst;
-#X obj 59 271 tab_add src1 src2 dst;
-#X text 211 306 1.arg: <symbol> source1-name;
-#X text 211 319 2.arg: <symbol> source2-name;
-#X connect 2 0 18 0;
-#X connect 6 0 19 0;
-#X connect 8 0 19 0;
-#X connect 9 0 19 0;
-#X connect 10 0 19 0;
-#X connect 18 0 3 0;
-#X connect 19 0 4 0;
+#X obj 59 301 tab_add src1 src2 dst;
+#X text 78 435 IEM KUG;
+#X text 62 423 musil;
+#X text 92 423 @;
+#X text 98 423 iem.at;
+#X text 61 445 Graz \, Austria;
+#X text 13 412 (c) Thomas Musil 2000 - 2006;
+#X text 234 312 initial arguments:;
+#X text 72 319 <bang> output;
+#X text 306 275 <dst> xxx : change destination name;
+#X text 12 3 tab_add;
+#X text 208 86 the minimum of the 3 array lengths);
+#X text 56 177 3.) dst onset;
+#X text 56 155 1.) src_1 onset;
+#X text 56 166 2.) src_2 onset;
+#X text 56 187 4.) n samples to add;
+#X text 199 233 <src1> xxx : change source name 1;
+#X text 257 255 <src2> xxx : change source name 2;
+#X text 211 326 1.arg: <symbol> source-name 1;
+#X text 211 339 2.arg: <symbol> source-name 2;
+#X text 195 72 (the number of samples which were added are:;
+#X connect 2 0 13 0;
+#X connect 5 0 14 0;
+#X connect 7 0 14 0;
+#X connect 8 0 14 0;
+#X connect 9 0 14 0;
+#X connect 13 0 3 0;
+#X connect 14 0 4 0;

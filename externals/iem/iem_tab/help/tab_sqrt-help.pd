@@ -1,4 +1,4 @@
-#N canvas 116 92 782 409 10;
+#N canvas 116 92 786 482 10;
 #N canvas 0 0 450 300 graph1 0;
 #X array src 100 float 1;
 #A 0 0.916135 0.888992 0.83593 0.810011 0.784501 0.759399 0.734704
@@ -20,30 +20,41 @@
 #N canvas 0 0 450 300 graph1 0;
 #X array dst 100 float 0;
 #X coords 0 1 99 -1 200 140 1;
-#X restore 534 156 graph;
-#X obj 61 31 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X restore 534 176 graph;
+#X obj 60 35 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 61 106 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 60 110 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 59 301 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 58 345 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 59 211 50 20 50;
-#X text 44 154 list of 3 floats:;
-#X text 56 165 src-onset;
-#X text 56 175 dst-onset;
-#X text 139 299 1.arg: <symbol> source-name;
-#X text 139 312 2.arg: <symbol> destination-name;
-#X text 130 40 the minimum-size of arrays;
-#X msg 142 217 src src;
-#X msg 202 226 dst dst;
-#X obj 61 78 tab_sqrt src dst;
-#X obj 59 264 tab_sqrt src dst;
-#X text 90 29 <bang> calc square root from zero-onset to zero-onset
-;
-#X text 58 184 n samples to copy square root;
-#X connect 2 0 14 0;
-#X connect 5 0 15 0;
-#X connect 12 0 15 0;
-#X connect 13 0 15 0;
-#X connect 14 0 3 0;
-#X connect 15 0 4 0;
+#X msg 58 215 50 20 50;
+#X text 194 318 1.arg: <symbol> source-name;
+#X text 194 331 2.arg: <symbol> destination-name;
+#X msg 115 235 src src;
+#X msg 165 253 dst dst;
+#X text 184 73 (the number of samples which are copied are:;
+#X text 197 87 the minimum of both array lengths);
+#X text 43 168 list of 3 floats:;
+#X text 77 419 IEM KUG;
+#X text 61 407 musil;
+#X text 91 407 @;
+#X text 97 407 iem.at;
+#X text 60 429 Graz \, Austria;
+#X text 12 396 (c) Thomas Musil 2000 - 2006;
+#X text 55 179 1.) src onset;
+#X text 55 189 2.) dst onset;
+#X text 225 306 initial arguments:;
+#X text 73 323 <bang> output;
+#X text 172 233 <src> xxx : change source name;
+#X text 218 252 <dst> xxx : change destination name;
+#X text 11 7 tab_sqrt;
+#X text 89 33 <bang> copy square root value from src to dst;
+#X obj 60 82 tab_sqrt src dst;
+#X text 55 198 3.) n samples to copy square root;
+#X obj 58 306 tab_sqrt src dst;
+#X connect 2 0 27 0;
+#X connect 5 0 29 0;
+#X connect 8 0 29 0;
+#X connect 9 0 29 0;
+#X connect 27 0 3 0;
+#X connect 29 0 4 0;
