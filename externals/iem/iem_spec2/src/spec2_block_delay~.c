@@ -153,5 +153,5 @@ void spec2_block_delay_tilde_setup(void)
     sizeof(t_spec2_block_delay_tilde), 0, 0);
   CLASS_MAINSIGNALIN(spec2_block_delay_tilde_class, t_spec2_block_delay_tilde, x_msi);
   class_addmethod(spec2_block_delay_tilde_class, (t_method)spec2_block_delay_tilde_dsp, gensym("dsp"), 0);
-  class_sethelpsymbol(spec2_block_delay_tilde_class, gensym("iemhelp2/spec2_block_delay~-help"));
+//  class_sethelpsymbol(spec2_block_delay_tilde_class, gensym("iemhelp2/spec2_block_delay~-help"));
 }

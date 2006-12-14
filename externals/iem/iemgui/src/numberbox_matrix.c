@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemgui written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
+iemgui written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -1378,5 +1378,5 @@ void numberbox_matrix_setup(void)
 #endif
   
   class_setwidget(numberbox_matrix_class, &numberbox_matrix_widgetbehavior);
-  class_sethelpsymbol(numberbox_matrix_class, gensym("iemhelp2/help-numberbox_matrix"));
+//  class_sethelpsymbol(numberbox_matrix_class, gensym("iemhelp2/help-numberbox_matrix"));
 }

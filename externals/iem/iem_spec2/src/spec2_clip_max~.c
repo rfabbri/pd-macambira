@@ -163,5 +163,5 @@ void spec2_clip_max_tilde_setup(void)
     sizeof(t_spec2_clip_max_tilde), 0, 0);
   CLASS_MAINSIGNALIN(spec2_clip_max_tilde_class, t_spec2_clip_max_tilde, x_msi);
   class_addmethod(spec2_clip_max_tilde_class, (t_method)spec2_clip_max_tilde_dsp, gensym("dsp"), 0);
-  class_sethelpsymbol(spec2_clip_max_tilde_class, gensym("iemhelp2/spec2_clip_max~-help"));
+//  class_sethelpsymbol(spec2_clip_max_tilde_class, gensym("iemhelp2/spec2_clip_max~-help"));
 }

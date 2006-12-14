@@ -833,5 +833,5 @@ void iem_vu_setup(void)
 #endif
   
   class_setwidget(iem_vu_class, &iem_vu_widgetbehavior);
-  class_sethelpsymbol(iem_vu_class, gensym("iemhelp2/help-iem_vu"));
+//  class_sethelpsymbol(iem_vu_class, gensym("iemhelp2/help-iem_vu"));
 }

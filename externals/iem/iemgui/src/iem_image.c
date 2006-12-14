@@ -421,7 +421,7 @@ void iem_image_setup(void)
 #endif
   
   class_setwidget(iem_image_class, &iem_image_widgetbehavior);
-  class_sethelpsymbol(iem_image_class, gensym("iemhelp2/help-iem_image"));
+//  class_sethelpsymbol(iem_image_class, gensym("iemhelp2/help-iem_image"));
   
   //  post("iem_image library loaded!");
 }

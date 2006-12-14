@@ -787,5 +787,5 @@ void cube_sphere_setup(void)
 #endif
   
   class_setwidget(cube_sphere_class, &cube_sphere_widgetbehavior);
-  class_sethelpsymbol(cube_sphere_class, gensym("iemhelp2/help-cube_sphere"));
+//  class_sethelpsymbol(cube_sphere_class, gensym("iemhelp2/help-cube_sphere"));
 }

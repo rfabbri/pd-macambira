@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_spec2 written by Thomas Musil (c) IEM KUG Graz Austria 2002 - 2006 */
+iem_spec2 written by Thomas Musil (c) IEM KUG Graz Austria 2000 - 2006 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -143,5 +143,5 @@ void spec2_tabreceive_tilde_setup(void)
     0, sizeof(t_spec2_tabreceive_tilde), 0, A_DEFSYM, 0);
   class_addmethod(spec2_tabreceive_tilde_class, (t_method)spec2_tabreceive_tilde_dsp, gensym("dsp"), 0);
   class_addsymbol(spec2_tabreceive_tilde_class, (t_method)spec2_tabreceive_tilde_symbol);
-  class_sethelpsymbol(spec2_tabreceive_tilde_class, gensym("iemhelp/spec2_tabreceive~-help"));
+//  class_sethelpsymbol(spec2_tabreceive_tilde_class, gensym("iemhelp/spec2_tabreceive~-help"));
 }

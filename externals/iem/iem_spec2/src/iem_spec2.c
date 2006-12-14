@@ -71,6 +71,6 @@ void iem_spec2_setup(void)
   spec2_tabreceive_enable_tilde_setup();
   spec2_tabreceive_tilde_setup();
   
-  post("iem_spec2 (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
+  post("iem_spec2 (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
   post("   musil%ciem.at iem KUG Graz Austria", '@');
 }

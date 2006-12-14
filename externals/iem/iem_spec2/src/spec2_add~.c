@@ -97,5 +97,5 @@ void spec2_add_tilde_setup(void)
   class_addcreator((t_newmethod)spec2_add_tilde_new, gensym("spec2+~"), 0);
   CLASS_MAINSIGNALIN(spec2_add_tilde_class, t_spec2_add_tilde, x_msi);
   class_addmethod(spec2_add_tilde_class, (t_method)spec2_add_tilde_dsp, gensym("dsp"), 0);
-  class_sethelpsymbol(spec2_add_tilde_class, gensym("iemhelp2/spec2_add~-help"));
+//  class_sethelpsymbol(spec2_add_tilde_class, gensym("iemhelp2/spec2_add~-help"));
 }

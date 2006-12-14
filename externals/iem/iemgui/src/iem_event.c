@@ -469,5 +469,5 @@ void iem_event_setup(void)
 #endif
   
   class_setwidget(iem_event_class, &iem_event_widgetbehavior);
-  class_sethelpsymbol(iem_event_class, gensym("iemhelp2/help-iem_event"));
+//  class_sethelpsymbol(iem_event_class, gensym("iemhelp2/help-iem_event"));
 }

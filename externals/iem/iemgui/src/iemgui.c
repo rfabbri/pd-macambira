@@ -108,6 +108,6 @@ void iemgui_setup(void)
   iem_event_setup();
   //  toggle_matrix_setup();
   
-  post("iemgui (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
+  post("iemgui (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
   post("   musil%ciem.at iem KUG Graz Austria", '@');
 }

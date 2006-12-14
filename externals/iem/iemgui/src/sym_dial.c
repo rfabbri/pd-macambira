@@ -927,5 +927,5 @@ void sym_dial_setup(void)
 #endif
   
   class_setwidget(sym_dial_class, &sym_dial_widgetbehavior);
-  class_sethelpsymbol(sym_dial_class, gensym("iemhelp2/help-sym_dial"));
+//  class_sethelpsymbol(sym_dial_class, gensym("iemhelp2/help-sym_dial"));
 }

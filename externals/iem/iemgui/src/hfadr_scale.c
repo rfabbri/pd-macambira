@@ -198,5 +198,5 @@ void hfadr_scale_setup(void)
 #endif
   
   class_setwidget(hfadr_scale_class, &hfadr_scale_widgetbehavior);
-  class_sethelpsymbol(hfadr_scale_class, gensym("iemhelp2/help-hfadr_scale"));
+//  class_sethelpsymbol(hfadr_scale_class, gensym("iemhelp2/help-hfadr_scale"));
 }

@@ -823,5 +823,5 @@ void room_sim_2d_setup(void)
 #endif
   
   class_setwidget(room_sim_2d_class, &room_sim_2d_widgetbehavior);
-  class_sethelpsymbol(room_sim_2d_class, gensym("iemhelp2/help-room_sim_2d"));
+//  class_sethelpsymbol(room_sim_2d_class, gensym("iemhelp2/help-room_sim_2d"));
 }

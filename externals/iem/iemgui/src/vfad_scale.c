@@ -198,5 +198,5 @@ void vfad_scale_setup(void)
 #endif
   
   class_setwidget(vfad_scale_class, &vfad_scale_widgetbehavior);
-  class_sethelpsymbol(vfad_scale_class, gensym("iemhelp2/help-vfad_scale"));
+//  class_sethelpsymbol(vfad_scale_class, gensym("iemhelp2/help-vfad_scale"));
 }

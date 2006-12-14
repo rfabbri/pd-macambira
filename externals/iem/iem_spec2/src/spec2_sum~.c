@@ -116,5 +116,5 @@ void spec2_sum_tilde_setup(void)
     0, sizeof(t_spec2_sum_tilde), 0, 0);
   CLASS_MAINSIGNALIN(spec2_sum_tilde_class, t_spec2_sum_tilde, x_msi);
   class_addmethod(spec2_sum_tilde_class, (t_method)spec2_sum_tilde_dsp, gensym("dsp"), 0);
-  class_sethelpsymbol(spec2_sum_tilde_class, gensym("iemhelp2/spec2_sum~-help"));
+//  class_sethelpsymbol(spec2_sum_tilde_class, gensym("iemhelp2/spec2_sum~-help"));
 }

@@ -89,5 +89,5 @@ void spec2_sqrt_tilde_setup(void)
     0, sizeof(t_spec2_sqrt_tilde), 0, 0);
   CLASS_MAINSIGNALIN(spec2_sqrt_tilde_class, t_spec2_sqrt_tilde, x_msi);
   class_addmethod(spec2_sqrt_tilde_class, (t_method)spec2_sqrt_tilde_dsp, gensym("dsp"), 0);
-  class_sethelpsymbol(spec2_sqrt_tilde_class, gensym("iemhelp2/spec2_sqrt~-help"));
+//  class_sethelpsymbol(spec2_sqrt_tilde_class, gensym("iemhelp2/spec2_sqrt~-help"));
 }

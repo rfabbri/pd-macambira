@@ -281,5 +281,5 @@ void spec2_matrix_bundle_stat_tilde_setup(void)
   class_addlist(spec2_matrix_bundle_stat_tilde_class, (t_method)spec2_matrix_bundle_stat_tilde_list);
   class_addmethod(spec2_matrix_bundle_stat_tilde_class, (t_method)spec2_matrix_bundle_stat_tilde_element, gensym("element"), A_GIMME, 0);
   class_addmethod(spec2_matrix_bundle_stat_tilde_class, (t_method)spec2_matrix_bundle_stat_tilde_bundle, gensym("bundle"), A_GIMME, 0);
-  class_sethelpsymbol(spec2_matrix_bundle_stat_tilde_class, gensym("iemhelp2/spec2_matrix_bundle_stat~-help"));
+//  class_sethelpsymbol(spec2_matrix_bundle_stat_tilde_class, gensym("iemhelp2/spec2_matrix_bundle_stat~-help"));
 }

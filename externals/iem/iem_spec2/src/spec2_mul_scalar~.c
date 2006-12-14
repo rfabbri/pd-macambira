@@ -101,5 +101,5 @@ void spec2_mul_scalar_tilde_setup(void)
   CLASS_MAINSIGNALIN(spec2_mul_scalar_tilde_class, t_spec2_mul_scalar_tilde, x_msi);
   class_addmethod(spec2_mul_scalar_tilde_class, (t_method)spec2_mul_scalar_tilde_ft1, gensym("ft1"), A_FLOAT, 0);
   class_addmethod(spec2_mul_scalar_tilde_class, (t_method)spec2_mul_scalar_tilde_dsp, gensym("dsp"), 0);
-  class_sethelpsymbol(spec2_mul_scalar_tilde_class, gensym("iemhelp2/spec2_mul_scalar~-help"));
+//  class_sethelpsymbol(spec2_mul_scalar_tilde_class, gensym("iemhelp2/spec2_mul_scalar~-help"));
 }

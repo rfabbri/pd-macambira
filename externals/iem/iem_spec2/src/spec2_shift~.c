@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_spec2 written by Thomas Musil (c) IEM KUG Graz Austria 2002 - 2006 */
+iem_spec2 written by Thomas Musil (c) IEM KUG Graz Austria 2000 - 2006 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -103,5 +103,5 @@ void spec2_shift_tilde_setup(void)
   CLASS_MAINSIGNALIN(spec2_shift_tilde_class, t_spec2_shift_tilde, x_msi);
   class_addmethod(spec2_shift_tilde_class, (t_method)spec2_shift_tilde_dsp, gensym("dsp"), 0);
   class_addfloat(spec2_shift_tilde_class, (t_method)spec2_shift_tilde_add);
-  class_sethelpsymbol(spec2_shift_tilde_class, gensym("iemhelp/spec2_shift~-help"));
+//  class_sethelpsymbol(spec2_shift_tilde_class, gensym("iemhelp/spec2_shift~-help"));
 }

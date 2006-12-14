@@ -500,5 +500,5 @@ void spec2_1p1z_freq_tilde_setup(void)
   CLASS_MAINSIGNALIN(spec2_1p1z_freq_tilde_class, t_spec2_1p1z_freq_tilde, x_msi);
   class_addmethod(spec2_1p1z_freq_tilde_class, (t_method)spec2_1p1z_freq_tilde_dsp, gensym("dsp"), 0);
   class_addlist(spec2_1p1z_freq_tilde_class, (t_method)spec2_1p1z_freq_tilde_list);
-  class_sethelpsymbol(spec2_1p1z_freq_tilde_class, gensym("iemhelp2/spec2_1p1z_freq~-help"));
+//  class_sethelpsymbol(spec2_1p1z_freq_tilde_class, gensym("iemhelp2/spec2_1p1z_freq~-help"));
 }

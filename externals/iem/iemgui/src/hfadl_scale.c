@@ -199,5 +199,5 @@ void hfadl_scale_setup(void)
 #endif
   
   class_setwidget(hfadl_scale_class, &hfadl_scale_widgetbehavior);
-  class_sethelpsymbol(hfadl_scale_class, gensym("iemhelp2/help-hfadl_scale"));
+//  class_sethelpsymbol(hfadl_scale_class, gensym("iemhelp2/help-hfadl_scale"));
 }
