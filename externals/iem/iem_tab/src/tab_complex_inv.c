@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -229,8 +229,10 @@ void tab_complex_inv_setup(void)
   class_addbang(tab_complex_inv_class, (t_method)tab_complex_inv_bang);
   class_addlist(tab_complex_inv_class, (t_method)tab_complex_inv_list);
   class_addmethod(tab_complex_inv_class, (t_method)tab_complex_inv_src1_re, gensym("src1_re"), A_DEFSYMBOL, 0);
+  class_addmethod(tab_complex_inv_class, (t_method)tab_complex_inv_src1_re, gensym("src_re"), A_DEFSYMBOL, 0);
   class_addmethod(tab_complex_inv_class, (t_method)tab_complex_inv_dst_re, gensym("dst_re"), A_DEFSYMBOL, 0);
   class_addmethod(tab_complex_inv_class, (t_method)tab_complex_inv_src1_im, gensym("src1_im"), A_DEFSYMBOL, 0);
+  class_addmethod(tab_complex_inv_class, (t_method)tab_complex_inv_src1_im, gensym("src_im"), A_DEFSYMBOL, 0);
   class_addmethod(tab_complex_inv_class, (t_method)tab_complex_inv_dst_im, gensym("dst_im"), A_DEFSYMBOL, 0);
   class_sethelpsymbol(tab_complex_inv_class, gensym("iemhelp2/tab_complex_inv-help"));
 }
