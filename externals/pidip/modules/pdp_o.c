@@ -38,6 +38,10 @@
 
 #define DEFAULT_FRAME_RATE 25
 
+#ifndef MSG_NOSIGNAL
+# define MSG_NOSIGNAL SO_NOSIGPIPE
+#endif
+
 static char   *pdp_o_version = "pdp_o: version 0.1, a video stream emitter, written by ydegoyon@free.fr";
 
 typedef struct pdp_o_struct

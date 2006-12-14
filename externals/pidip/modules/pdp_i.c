@@ -46,6 +46,10 @@ extern void sys_addpollfn(int fd, t_fdpollfn fn, void *ptr);
 #define SOCKET_ERROR -1
 #define INPUT_BUFFER_SIZE  1048578 /* 1 M */
 
+#ifndef MSG_NOSIGNAL
+# define MSG_NOSIGNAL SO_NOSIGPIPE
+#endif
+
 /* time-out used for select() call */
 static struct timeval ztout;
 
@@ -68,7 +72,7 @@ void pdp_i_closesocket(int fd)
 int pdp_i_setsocketoptions(int sockfd)
 { 
      int sockopt = 1;
-     if (setsockopt(sockfd, SOL_TCP, TCP_NODELAY, (const char*) &sockopt, sizeof(int)) < 0)
+     if (setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (const char*) &sockopt, sizeof(int)) < 0)
      {
 	  post("pdp_i : setsockopt TCP_NODELAY failed");
           perror( "setsockopt" );

@@ -74,7 +74,7 @@ then
 fi
 
 PDP_PIDIP_LIBS="$PDP_PIDIP_LIBS -lbz2 -lz -ldl -lmp3lame -logg -lvorbis -lvorbisenc"
-PDP_PIDIP_INCLUDES="-I$PD_DIR/src -I. -I$PDP_DIR/include -I../include -I../charmaps"
+PDP_PIDIP_INCLUDES="-I$PD_DIR/src -I. -I$PDP_DIR/include -I../include -I../charmaps -I/sw/include/libquicktime"
 
 make clean
 

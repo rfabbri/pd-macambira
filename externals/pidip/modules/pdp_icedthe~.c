@@ -63,6 +63,10 @@
 #define THEORA_NUM_HEADER_PACKETS 3
 #define MAX_WRONG_PACKETS 10
 
+#ifndef MSG_NOSIGNAL
+# define MSG_NOSIGNAL SO_NOSIGPIPE
+#endif
+
 static char   *pdp_icedthe_version = "pdp_icedthe~: version 0.1, a theora stream reader ( ydegoyon@free.fr).";
 
 typedef struct pdp_icedthe_struct

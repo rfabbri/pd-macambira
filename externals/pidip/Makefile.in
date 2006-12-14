@@ -28,11 +28,22 @@ PDP_PIDIP_CPPFLAGS  = $(MPEG4IP_CFLAGS) $(MAGICK_CFLAGS) $(IMLIB_CFLAGS) \
     -Wno-unused -Wno-parentheses -Wno-switch \
     -DPDP_PIDIP_VERSION=\"$(PDP_PIDIP_VERSION)\" -g
 
+ifeq ($(shell uname -s),Darwin)
+all: pidip.pd_darwin
+endif
+
+ifeq ($(shell uname -s),Linux)
 all: pidip.pd_linux
+endif
 
 pdp_pidip_all:
 	make -C system
 	make -C modules
+
+pidip.pd_darwin: pdp_pidip_all
+	rm -f pidip.pd_darwin
+	g++ -bundle -undefined dynamic_lookup -o pidip.pd_darwin modules/*.o system/*.o -L/sw/lib $(THEORA_LIBS) $(PDP_PIDIP_LIBS) $(IMLIB_LIBS) $(MAGICK_LIBS)
+	strip -x pidip.pd_darwin
 
 pidip.pd_linux: pdp_pidip_all
 	rm -f pidip.pd_linux

@@ -64,6 +64,10 @@
 #define STRBUF_SIZE 32
 #define OGG_AUDIO_SIZE 1024
 
+#ifndef MSG_NOSIGNAL
+# define MSG_NOSIGNAL SO_NOSIGPIPE
+#endif
+
 static char base64table[65] = {
     'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
     'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
