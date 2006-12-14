@@ -47,7 +47,7 @@ pd_install: build_pd
 #	-$(MAKE) -C $(pd_src)/src $(DEST_PATHS) install
 	$(MAKE) -C $(pd_src)/src -f makefile.mingw $(DEST_PATHS) install
 
-install: pd_install prebuilt_install lib_install exe_install gripd_hack
+install: pd_install prebuilt_install lib_install exe_install
 	@echo " "
 	@echo "win32_inno install succeeded!"
 
@@ -83,11 +83,6 @@ lib_install:
 # if these are there, install them
 	-install -p $(system32)/msvcp71.dll $(dlldir)/msvcp71.dll
 	-install -p $(system32)/pthreadVC.dll $(dlldir)/pthreadVC.dll
-# this is a quick hack, since the gripd.dll still looks for pthreadVC.dll
-#	(test -e $(DESTDIR)$(prefix)/gripd/pthreadVC.dll && \
-#		install -p $(DESTDIR)$(prefix)/gripd/pthreadVC.dll $(dlldir)/pthreadVC.dll) || \
-#		test -e $(SYSTEMROOT)/system32/pthreadVC.dll || \
-#			install -p $(SYSTEMROOT)/pthreadVC.dll $(dlldir)/pthreadVC.dll
 # these go into the Pd package's lib dir
 	install -d $(libdir)/tcl8.4
 	cp -r /usr/local/lib/tcl8.4/* $(libdir)/tcl8.4
@@ -104,11 +99,6 @@ exe_install:
 # here are some hacks to assemble a package from binaries
 no_compile_hacks:
 	cp -a /c/Program\ Files/pd-0.38-4 $(DESTDIR)$(prefix)/
-
-gripd_hack: GRIPD_ZIP=$(CWD)/gripd-0.1.1.zip
-gripd_hack:
-	test -e $(GRIPD_ZIP) && \
-		cd $(DESTDIR)$(prefix) && unzip $(GRIPD_ZIP)
 
 $(PD_INNO_SETUP): $(PD_INNO_SETUP).in
 	@echo "Making Inno Setup file: $(PD_INNO_SETUP)"
