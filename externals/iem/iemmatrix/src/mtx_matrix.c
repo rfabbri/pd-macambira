@@ -484,7 +484,7 @@ static void matrix_read(t_matrix *x, t_symbol *filename)
 static void matrix_write(t_matrix *x, t_symbol *filename)
 {
   t_atom *ap=x->atombuffer+2;
-  char *filnam = (char*)getbytes(sizeof(char)*MAXPDSTRING);;
+  char *filnam = (char*)getbytes(sizeof(char)*MAXPDSTRING);
   int rows = x->row, cols = x->col;
   FILE *f=0;
 
