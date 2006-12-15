@@ -66,6 +66,7 @@
 # define fabsf fabs
 # define sqrtf sqrt
 # define powf pow
+# define atanf atan
 #endif
 
 #ifdef __APPLE__
