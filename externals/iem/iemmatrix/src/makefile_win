@@ -20,7 +20,11 @@ PD_WIN_LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames /NODEFAULTLIB:kernel /NOD
 	libc.lib \
 	/LIBPATH:$(PD_INST_PATH)\bin pd.lib
 
-SRC = mtx_not.c \
+SRC = mtx_powtodb.c \
+	mtx_dbtopow.c \
+	mtx_bspline.c \
+	mtx_atan.c \
+	mtx_not.c \
 	mtx_add.c \
 	mtx_and.c \
 	mtx_cos.c \
