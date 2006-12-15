@@ -109,7 +109,10 @@ Source: build\bin\*.*; DestDir: {app}\bin; Flags: ignoreversion confirmoverwrite
 Source: build\doc\*.*; DestDir: {app}\doc; Flags: ignoreversion confirmoverwrite recursesubdirs uninsremovereadonly; Attribs: readonly
 Source: build\extra\*.*; DestDir: {app}\extra; Flags: ignoreversion recursesubdirs uninsremovereadonly promptifolder; Attribs: readonly
 Source: build\lib\*.*; DestDir: {app}\lib; Flags: ignoreversion recursesubdirs
+#ifexist "build\gripd"
 Source: build\gripd\*.*; DestDir: {app}\gripd; Flags: ignoreversion
+#endif
+
 ;; build stuff is not included now
 ;Source: build\portaudio\*.*; DestDir: {app}\portaudio; Flags: ignoreversion recursesubdirs
 ;Source: build\src\*.*; DestDir: {app}\src; Flags: ignoreversion recursesubdirs
