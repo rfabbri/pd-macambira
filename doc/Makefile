@@ -175,6 +175,9 @@ tutorials_install: $(manualsdir)
 # playnow
 	install -d $(manualsdir)/PlayNow
 	install -p $(doc_src)/tutorials/playnow/*.* $(manualsdir)/PlayNow
+# cognition
+	install -d $(manualsdir)/Cognition
+	install -p $(doc_src)/tutorials/cognition/*.* $(manualsdir)/Cognition
 # intro
 	install -d $(manualsdir)/0.Intro/Intro
 	install -p $(doc_src)/tutorials/intro/*.* $(manualsdir)/0.Intro/Intro
@@ -184,9 +187,9 @@ tutorials_install: $(manualsdir)
 	install -p $(doc_src)/tutorials/sound/*.* $(manualsdir)/0.Intro/Sound
 	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Sound
 # visual
-	install -d $(manualsdir)/0.Intro/Visual
-	install -p $(doc_src)/tutorials/visual/*.* $(manualsdir)/0.Intro/Visual
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Visual
+	install -d $(manualsdir)/0.Intro/Image
+	install -p $(doc_src)/tutorials/visual/*.* $(manualsdir)/0.Intro/Image
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Image
 # networking
 	install -d $(manualsdir)/0.Intro/Networking
 	install -p $(doc_src)/tutorials/networking/*.* $(manualsdir)/0.Intro/Networking
