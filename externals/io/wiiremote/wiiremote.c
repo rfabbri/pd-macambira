@@ -4,6 +4,8 @@
 
 #include "wiiremote.h"
 
+#include <unistd.h>
+
 // this type is used a lot (data array):
 typedef unsigned char darr[];
 

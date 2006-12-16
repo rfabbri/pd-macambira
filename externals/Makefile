@@ -131,7 +131,7 @@ ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid hidio
+    LIB_TARGETS += hid hidio wiiremote
   else
     # GNU/Linux, BSD, IRIX, etc.
     LIB_TARGETS += hid hidio pdp pidip
@@ -2087,7 +2087,7 @@ vbap_clean:
 
 #------------------------------------------------------------------------------#
 # WIIREMOTE
-WIIREMOTE_NAME=wiiremote
+WIIREMOTE_NAME=io # this is installed into the "io" library
 WIIREMOTE_SRC := $(wildcard $(externals_src)/io/wiiremote/*.c)
 
 WIIREMOTE_OBJECTS := $(WIIREMOTE_SRC:.c=.o)
@@ -2104,10 +2104,6 @@ wiiremote: $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION)
 
 wiiremote_install: wiiremote
 	install -d $(objectsdir)/$(WIIREMOTE_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(WIIREMOTE_NAME) \
-		--author "DarwiinRemote: Hiroako Kimura, Max object: Masayuki Akamatsu, Pd port: Hans-Christoph Steiner" \
-		--description "support for the Nintendo Wii Remote" \
-		--license "BSD-style"
 	install -p $(WIIREMOTE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(WIIREMOTE_NAME)
 #	install -d $(helpdir)/$(WIIREMOTE_NAME)
 #	install -p $(externals_src)/io/wiiremote/*.pd \

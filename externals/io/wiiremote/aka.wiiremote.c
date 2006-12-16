@@ -238,13 +238,17 @@ void akawiiremote_getledstatus(t_akawiiremote *x)
 {
 	t_atom list[4]; 
 	
+#ifdef PD
+	SETFLOAT(list,     x->wiiremote->isLED1Illuminated);
+	SETFLOAT(list + 1, x->wiiremote->isLED2Illuminated);
+	SETFLOAT(list + 2, x->wiiremote->isLED3Illuminated);
+	SETFLOAT(list + 3, x->wiiremote->isLED4Illuminated);
+	outlet_anything(x->statusOut, gensym("ledstatus"), 4, list);
+#else /* Max */
 	SETLONG(list,     x->wiiremote->isLED1Illuminated);
 	SETLONG(list + 1, x->wiiremote->isLED2Illuminated);
 	SETLONG(list + 2, x->wiiremote->isLED3Illuminated);
 	SETLONG(list + 3, x->wiiremote->isLED4Illuminated);
-#ifdef PD
-	outlet_anything(x->statusOut, gensym("ledstatus"), 4, list);
-#else /* Max */
 	outlet_anything(x->statusOut, gensym("ledstatus"), 4, &list);
 #endif
 }
