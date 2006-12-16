@@ -2086,6 +2086,51 @@ vbap_clean:
 
 
 #------------------------------------------------------------------------------#
+# WIIREMOTE
+WIIREMOTE_NAME=wiiremote
+WIIREMOTE_SRC := $(wildcard $(externals_src)/io/wiiremote/*.c)
+
+WIIREMOTE_OBJECTS := $(WIIREMOTE_SRC:.c=.o)
+$(WIIREMOTE_OBJECTS) : %.o : %.c
+	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+
+$(externals_src)/io/wiiremote/wiiremote.$(EXTENSION): $(WIIREMOTE_OBJECTS) 
+	$(CC) $(LDFLAGS) -o $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION) \
+		$(WIIREMOTE_OBJECTS) -weak_framework IOBluetooth \
+		-weak_framework CoreFoundation
+#	$(STRIP) $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION)
+
+wiiremote: $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION)
+
+wiiremote_install: wiiremote
+	install -d $(objectsdir)/$(WIIREMOTE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(WIIREMOTE_NAME) \
+		--author "DarwiinRemote: Hiroako Kimura, Max object: Masayuki Akamatsu, Pd port: Hans-Christoph Steiner" \
+		--description "support for the Nintendo Wii Remote" \
+		--license "BSD-style"
+	install -p $(WIIREMOTE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(WIIREMOTE_NAME)
+#	install -d $(helpdir)/$(WIIREMOTE_NAME)
+#	install -p $(externals_src)/io/wiiremote/*.pd \
+#		$(helpdir)/$(WIIREMOTE_NAME)
+#	install -d $(manualsdir)/$(WIIREMOTE_NAME)
+#	install -p $(externals_src)/io/wiiremote/manual.txt \
+#		$(manualsdir)/$(WIIREMOTE_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/io/wiiremote/COPYRIGHT.txt \
+		$(readmesdir)/$(WIIREMOTE_NAME).txt
+#	install -d $(examplesdir)/$(WIIREMOTE_NAME)
+#	install -p $(externals_src)/io/wiiremote/examples/*.pd \
+#		$(examplesdir)/$(WIIREMOTE_NAME)
+
+wiiremote_clean:
+	-rm -f -- $(WIIREMOTE_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(WIIREMOTE_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/io/wiiremote/*.bak
+	-rm -f -- $(externals_src)/io/wiiremote/*.*~
+
+
+
+#------------------------------------------------------------------------------#
 # Zexy
 ZEXY_NAME = zexy
 ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-vxy0]*.c) \
