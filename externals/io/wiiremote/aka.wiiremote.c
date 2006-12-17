@@ -115,9 +115,12 @@ void main()
 void akawiiremote_bang(t_akawiiremote *x)
 {
 	t_atom list[4]; 
-	
-	if (x->wiiremote->device == nil)
+
+	if (x->wiiremote->device == nil) 
+	{
+		post("warning: your WiiRemote is not connected");
 		return;	// do nothing
+	}
 
 #ifdef PD
 	outlet_float(x->buttonsOut, (t_float) x->wiiremote->buttonData);
@@ -319,6 +322,8 @@ void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
 {
 #ifdef PD
 	t_akawiiremote *x = (t_akawiiremote *)pd_new(wiiremote_class);
+
+	x->wiiremote = wiiremote_init();
 	
 	x->clock = clock_new(x, (t_method)akawiiremote_clock);
 
