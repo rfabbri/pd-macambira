@@ -19,8 +19,9 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 TARGET_PLATFORM := $(shell uname -m)
 ifeq ($(TARGET_PLATFORM),i686)
 # Generic x86 (tune for Pentium III, since that's more common these days)
-OPT_CFLAGS += -mcpu=i386 -mtune=pentium3
+OPT_CFLAGS += -mcpu=i686 -march=i386
 #OPT_CFLAGS += -march=pentium3 -msse -mfpmath=sse
+#OPT_CFLAGS += -march=pentium4 -msse -msse2 -mfpmath=sse
 endif
 ifeq ($(TARGET_PLATFORM),ppc)
     OPT_CFLAGS += -pipe -fsigned-char -mpowerpc-gfxopt
