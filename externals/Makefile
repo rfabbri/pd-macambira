@@ -2087,7 +2087,8 @@ vbap_clean:
 
 #------------------------------------------------------------------------------#
 # WIIREMOTE
-WIIREMOTE_NAME=io # this is installed into the "io" library
+# this is installed into the "io" library
+WIIREMOTE_NAME=io
 WIIREMOTE_SRC := $(wildcard $(externals_src)/io/wiiremote/*.c)
 
 WIIREMOTE_OBJECTS := $(WIIREMOTE_SRC:.c=.o)
