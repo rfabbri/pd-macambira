@@ -1,10 +1,11 @@
 
+- output the compilation flags to the resulting package so that different
+  builds with the same name can be distinguished
+
 - for release branch, remove class_sethelpsymbol() from iemlib and zexy
 
 - make a web page that has stuff that can't be included due to license and patent issues:
   (percolate, mp3, mpeg2, mpeg4, etc)
-
-- reintroduce patch for making Pd window font not bold
 
 - make all of pd/src/x_*.c into a standalone library that is optionally loaded
   by Pd.  Then these objects can be placed into the namespace.

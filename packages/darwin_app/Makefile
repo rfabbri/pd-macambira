@@ -26,33 +26,33 @@ WISH_CONTENTS = "$(WISH)/Contents"
 TARGET_PLATFORM := $(shell uname -p)
 
 # base level optimizations
-OPT_CFLAGS = -Os -funroll-loops -fomit-frame-pointer
+#OPT_CFLAGS = -Os -funroll-loops -fomit-frame-pointer
 
-# auto-vectorization in GCC 4.x (too buggy in 4.0, wait for 4.1)
-#OPT_CFLAGS += -ftree-vectorize -ftree-vectorizer-verbose=3
+# auto-vectorization in GCC 4.x for CPUs with SIMD
+OPT_CFLAGS += -ftree-vectorize -ftree-vectorizer-verbose=3
 
 ifeq ($(TARGET_PLATFORM),i386)
-OPT_CFLAGS += -march=pentium3 -msse -msse2 -mfpmath=sse
+OPT_CFLAGS += -march=pentium4 -msse -msse2 -mfpmath=sse
 endif
 
 ifeq ($(TARGET_PLATFORM),powerpc)
-# Package default, support older PowerPCs, but G4 (7450) is the most common
-OPT_CFLAGS += -mcpu=powerpc -mtune=7450 -mpowerpc-gfxopt
+# Package default, support older PowerPCs, but G3 is the most common
+#OPT_CFLAGS += -mcpu=powerpc -mtune=G3
 
-# CPU-specific gleaned from http://developer.apple.com/releasenotes/DeveloperTools/RN-GCC4/
-# check this too: http://hpc.sourceforge.net/
+# CPU-specific gleaned from:
+# http://developer.apple.com/releasenotes/DeveloperTools/RN-GCC4/
+# http://hpc.sourceforge.net/
 # Generic PowerPC
 #OPT_CFLAGS += -mcpu=powerpc -mpowerpc
 # PowerPC 750 (G3)
 #OPT_CFLAGS += -mcpu=750 -mpowerpc-gfxopt
 # PowerPC 7400 (G4 <= 700Mhz) 
-#OPT_CFLAGS += -mcpu=7400 -faltivec -mpowerpc-gfxopt
+#OPT_CFLAGS += -fast -fPIC -mcpu=G4 -mtune=G4
 # PowerPC 7450 (G4 >= 533MHz) 
-#OPT_CFLAGS += -fPIC -mcpu=7450 -mtune=7450 -fast -faltivec -ffast-math -mpowerpc-gfxopt
-# PowerPC G5 (gcc-3.3)
-#OPT_CFLAGS += -fast -fPIC -faltivec -mpowerpc-gpopt -mpowerpc-gfxopt
+OPT_CFLAGS += -fast -fPIC -mcpu=7450 -mtune=7450
+# PowerPC G5 (gcc-4.x)
+#OPT_CFLAGS += -fast -fPIC
 endif
-
 
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
@@ -339,6 +339,7 @@ test_package:
 
 test_locations:
 	@echo --------------------------------------------------
+	@echo "OPT_CFLAGS: $(OPT_CFLAGS)"
 	@echo "PD_VERSION: $(PD_VERSION)"
 	@echo "PACKAGE_NAME: $(PACKAGE_NAME)"
 	@echo "PD-EXTENDED_VERSION: $(PD-EXTENDED_VERSION)"

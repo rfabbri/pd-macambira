@@ -263,9 +263,10 @@ $(pd_src)/src/configure: $(pd_src)/src/configure.in
 #$(pd_src)/src/makefile: $(pd_src)/src/makefile.in
 #	cd $(pd_src)/src/ && ./configure $(PD_CONFIGURE_FLAGS)
 
+# this line has the "-" to support the current makefile.mingw hack
 pd: $(pd_src)/src/configure
-	echo $$MACOSX_DEPLOYMENT_TARGET
 	-cd $(pd_src)/src && ./configure $(PD_CONFIGURE_FLAGS) && \
+		make OPT_CFLAGS="" depend  && \
 		make $(DEST_PATHS) $(PD_BUILD_FLAGS)
 
 pd++:
