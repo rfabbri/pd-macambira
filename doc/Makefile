@@ -179,41 +179,41 @@ tutorials_install: $(manualsdir)
 	install -d $(manualsdir)/Cognition
 	install -p $(doc_src)/tutorials/cognition/*.* $(manualsdir)/Cognition
 # intro
-	install -d $(manualsdir)/0.Intro/Intro
-	install -p $(doc_src)/tutorials/intro/*.* $(manualsdir)/0.Intro/Intro
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Intro
+	install -d $(manualsdir)/0.Intro
+	install -p $(doc_src)/tutorials/intro/*.* $(manualsdir)/0.Intro
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro
 # sound
-	install -d $(manualsdir)/0.Intro/Sound
-	install -p $(doc_src)/tutorials/sound/*.* $(manualsdir)/0.Intro/Sound
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Sound
+	install -d $(manualsdir)/1.Sound
+	install -p $(doc_src)/tutorials/sound/*.* $(manualsdir)/1.Sound
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/1.Sound
 # visual
-	install -d $(manualsdir)/0.Intro/Image
-	install -p $(doc_src)/tutorials/visual/*.* $(manualsdir)/0.Intro/Image
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Image
+	install -d $(manualsdir)/2.Image
+	install -p $(doc_src)/tutorials/visual/*.* $(manualsdir)/2.Image
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/2.Image
 # networking
-	install -d $(manualsdir)/0.Intro/Networking
-	install -p $(doc_src)/tutorials/networking/*.* $(manualsdir)/0.Intro/Networking
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Networking
+	install -d $(manualsdir)/3.Networking
+	install -p $(doc_src)/tutorials/networking/*.* $(manualsdir)/3.Networking
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/3.Networking
 # physical
-	install -d $(manualsdir)/0.Intro/Physical
-	install -p $(doc_src)/tutorials/physical/*.* $(manualsdir)/0.Intro/Physical
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro/Physical
+	install -d $(manualsdir)/4.Physical
+	install -p $(doc_src)/tutorials/physical/*.* $(manualsdir)/4.Physical
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/4.Physical
 
 tutorials_clean:
 	-rm -f -- $(manualsdir)/PdDrums/*.*
 	-rmdir -- $(manualsdir)/PdDrums
 	-rm -f -- $(manualsdir)/PlayNow/*.*
 	-rmdir -- $(manualsdir)/PlayNow
-	-rm -f -- $(manualsdir)/0.Intro/Intro/*.*
-	-rmdir -- $(manualsdir)/0.Intro/Intro
-	-rm -f -- $(manualsdir)/0.Intro/Sound/*.*
-	-rmdir -- $(manualsdir)/0.Intro/Sound
+	-rm -f -- $(manualsdir)/0.Intro/*.*
+	-rmdir -- $(manualsdir)/0.Intro
+	-rm -f -- $(manualsdir)/1.Sound/*.*
+	-rmdir -- $(manualsdir)/1.Sound
 	-rm -f -- $(manualsdir)/0.Intro/Visual/*.*
 	-rmdir -- $(manualsdir)/0.Intro/Visual
-	-rm -f -- $(manualsdir)/0.Intro/Networking/*.*
-	-rmdir -- $(manualsdir)/0.Intro/Networking
-	-rm -f -- $(manualsdir)/0.Intro/Physical/*.*
-	-rmdir -- $(manualsdir)/0.Intro/Physical
+	-rm -f -- $(manualsdir)/3.Networking/*.*
+	-rmdir -- $(manualsdir)/3.Networking
+	-rm -f -- $(manualsdir)/4.Physical/*.*
+	-rmdir -- $(manualsdir)/4.Physical
 
 
 #==============================================================================#
