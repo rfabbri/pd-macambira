@@ -1,0 +1,40 @@
+#N canvas 256 47 862 626 10;
+#X obj 192 535 print;
+#X obj 192 331 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 299 357 1 2 3 4 5;
+#X symbolatom 312 378 10 0 0 0 - - -;
+#X floatatom 325 395 5 0 0 0 - - -;
+#X symbolatom 419 424 10 0 0 0 - - -;
+#X msg 109 412 clear;
+#X obj 250 505 bng 15 250 50 0 empty empty EOL 17 7 1 10 -262144 -1
+-1;
+#X text 117 175 CAUTION:;
+#X text 118 193 When a message contains the delimiter symbol \, it
+is falsely split into two parts.;
+#X text 117 110 [list-fifo] can be used to limit the number of messages
+passing during a certain time (might be usefull to limit the used network
+bandwidth). It also can be used as a sequencer.;
+#X text 81 29 [list-fifo];
+#X text 118 228 Default delimiter between messages is the empty symbol.
+You can customize this with the first argument:;
+#X text 61 397 clear stored list;
+#X text 163 314 trigger output;
+#X text 288 315 store lists or elements;
+#X text 416 407 manually change delimiter symbol;
+#X text 119 55 [list-fifo] stores incoming (list-)messages and outputs
+them one by one on incoming bangs in the order they arrive like a FIFO:
+first in \, first out.;
+#X text 104 580 Based on a patch and idea by Roman Haefli 2006;
+#X obj 192 476 list-fifo;
+#X msg 290 337 eins due trois four;
+#X obj 121 270 list-fifo MY_DELIMITER;
+#X connect 1 0 19 0;
+#X connect 2 0 19 1;
+#X connect 3 0 19 1;
+#X connect 4 0 19 1;
+#X connect 5 0 19 2;
+#X connect 6 0 19 0;
+#X connect 19 0 0 0;
+#X connect 19 1 7 0;
+#X connect 20 0 19 1;
