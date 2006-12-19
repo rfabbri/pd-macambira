@@ -1,0 +1,15 @@
+Index: s_main.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_main.c,v
+retrieving revision 1.20.2.1
+diff -u -w -r1.20.2.1 s_main.c
+--- s_main.c	19 Dec 2006 05:55:44 -0000	1.20.2.1
++++ s_main.c	19 Dec 2006 06:01:58 -0000
+@@ -47,7 +47,6 @@
+ char *sys_guicmd;
+ t_symbol *sys_libdir;
+ static t_symbol *sys_guidir;
+-t_namelist *sys_externlist;
+ static t_namelist *sys_openlist;
+ static t_namelist *sys_messagelist;
+ static int sys_version;
