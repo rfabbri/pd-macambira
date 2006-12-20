@@ -60,8 +60,6 @@
  *  GLOBAL VARS
  *======================================================================== */
 
-extern t_int hid_instance_count; // in hid.h
-
 /* store device pointers so I don't have to query them all the time */
 pRecDevice device_pointer[MAX_DEVICES];
 

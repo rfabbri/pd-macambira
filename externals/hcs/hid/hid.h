@@ -19,7 +19,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 7
 
-/* static char *version = "$Revision: 1.28 $"; */
+/* static char *version = "$Revision: 1.29 $"; */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -65,12 +65,12 @@ typedef struct _hid
 /* count the number of instances of this object so that certain free()
  * functions can be called only after the final instance is detroyed.
  */
-t_int hid_instance_count;
+EXTERN t_int hid_instance_count;
 
 /* this is used to test for the first instance to execute */
-double last_execute_time[MAX_DEVICES];
+EXTERN double last_execute_time[MAX_DEVICES];
 
-extern unsigned short global_debug_level;
+EXTERN unsigned short global_debug_level;
 
 /* built up when the elements of an open device are enumerated */
 typedef struct _hid_element
@@ -94,12 +94,12 @@ typedef struct _hid_element
 } t_hid_element;
 
 /* mostly for status querying */
-unsigned short device_count;
+EXTERN unsigned short device_count;
 
 /* store element structs to eliminate symbol table lookups, etc. */
-t_hid_element *element[MAX_DEVICES][MAX_ELEMENTS];
+EXTERN t_hid_element *element[MAX_DEVICES][MAX_ELEMENTS];
 /* number of active elements per device */
-unsigned short element_count[MAX_DEVICES]; 
+EXTERN unsigned short element_count[MAX_DEVICES]; 
 
 /*------------------------------------------------------------------------------
  *  FUNCTION PROTOTYPES FOR DIFFERENT PLATFORMS

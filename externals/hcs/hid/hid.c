@@ -54,6 +54,21 @@ static void hid_open(t_hid *x, t_symbol *s, int argc, t_atom *argv);
 
 
 /*------------------------------------------------------------------------------
+ * GLOBAL VARIABLES DECLARED extern IN hid.h
+ */
+t_int hid_instance_count;
+unsigned short device_count;
+
+/* this is used to test for the first instance to execute */
+double last_execute_time[MAX_DEVICES];
+
+/* store element structs to eliminate symbol table lookups, etc. */
+t_hid_element *element[MAX_DEVICES][MAX_ELEMENTS];
+/* number of active elements per device */
+unsigned short element_count[MAX_DEVICES]; 
+
+
+/*------------------------------------------------------------------------------
  * SUPPORT FUNCTIONS
  */
 
