@@ -429,6 +429,7 @@ static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv)
 t_int hidio_child_read(t_hidio *x) 
 {
 //	debug_print(LOG_DEBUG,"hidio_child_read");
+	t_hid_element *current_element;
 	unsigned int i;
 #ifdef PD
 	double right_now = clock_getlogicaltime();
@@ -436,7 +437,6 @@ t_int hidio_child_read(t_hidio *x)
 	double right_now;
 	clock_getftime(&right_now);
 #endif /* PD */
-	t_hid_element *current_element;
 	
 	if(right_now > last_execute_time[x->x_device_number])
 	{
@@ -940,6 +940,7 @@ int main()
 	ps_total = gensym("total");
 	ps_range = gensym("range");
 
+	generate_type_symbols();
 	generate_event_symbols();
 
 	return 0;
