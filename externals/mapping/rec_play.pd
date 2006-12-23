@@ -34,7 +34,7 @@
 #X obj 632 200 pack s s;
 #X obj 192 370 mod \$1;
 #X obj 199 47 t f f;
-#X obj 41 47 resample \$2;
+#X obj 59 45 resample \$2;
 #X obj 41 21 inlet;
 #X msg 632 226 write \$1 \$2;
 #X msg 491 220 read \$1.wav \$2;
@@ -72,8 +72,8 @@
 #X connect 34 0 11 1;
 #X connect 34 1 20 0;
 #X connect 35 0 11 0;
-#X connect 35 0 12 0;
 #X connect 35 0 17 0;
 #X connect 36 0 35 0;
+#X connect 36 0 12 0;
 #X connect 37 0 25 0;
 #X connect 38 0 25 0;
