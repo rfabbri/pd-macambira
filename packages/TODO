@@ -1,11 +1,6 @@
 
-- output the compilation flags to the resulting package so that different
-  builds with the same name can be distinguished
-
-- for release branch, remove class_sethelpsymbol() from iemlib and zexy
-
-- make a web page that has stuff that can't be included due to license and patent issues:
-  (percolate, mp3, mpeg2, mpeg4, etc)
+- make a web page that has stuff that can't be included due to license and
+  patent issues:  (percolate, mp3, mpeg2, mpeg4, etc)
 
 - make all of pd/src/x_*.c into a standalone library that is optionally loaded
   by Pd.  Then these objects can be placed into the namespace.
@@ -14,22 +9,14 @@
 - allow DESTDIR to be a relative path
 
 
-- fiddle~, bonk~, etc. didn't get installed
-
-
-- try out FFTW patch from patch tracker (it applies fine, but the build system
-  needs to set the define to enable it).
-
-
 - document generate-libdir-metafile.sh
 
 
-- move darwin_app_perms to here and make generic prerelease_clean target which
-  is called separately
+- rm "configure" on distclean
 
 
-- test for "configure" before running autoconf, also rm "configure" on distclean
-
+- output the compilation flags to the resulting package so that different
+  builds with the same name can be distinguished
 
 - global optimization flags
   		ideally, you would use a version of Pd that is fully optimized for your

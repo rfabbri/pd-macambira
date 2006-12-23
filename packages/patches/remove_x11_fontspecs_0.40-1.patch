@@ -1,22 +1,22 @@
-? conf28360.sh
 ? configure
+? makefile
 Index: g_graph.c
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/g_graph.c,v
-retrieving revision 1.9
-diff -u -w -r1.9 g_graph.c
---- g_graph.c	15 Sep 2005 03:17:27 -0000	1.9
-+++ g_graph.c	17 Oct 2006 04:52:43 -0000
-@@ -739,7 +739,7 @@
-             int ymin = (y1 < y2 ? y1 : y2);
-             t_symbol *s = garray_getname((t_garray *)g);
-             sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor sw\
+retrieving revision 1.10
+diff -u -w -r1.10 g_graph.c
+--- g_graph.c	3 Jun 2006 19:13:07 -0000	1.10
++++ g_graph.c	23 Dec 2006 07:27:29 -0000
+@@ -741,7 +741,7 @@
+         {
+             i -= sys_fontheight(glist_getfont(x));
+             sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor nw\
 -             -font -*-courier-bold--normal--%d-* -tags %s\n",
 +             -font {courier %d bold} -tags %s\n",
-                 (long)glist_getcanvas(x),  x1, ymin, s->s_name,
+                 (long)glist_getcanvas(x),  x1, i, arrayname->s_name,
                  sys_hostfontsize(glist_getfont(x)), tag);
          }
-@@ -821,7 +821,7 @@
+@@ -823,7 +823,7 @@
              /* draw x labels */
          for (i = 0; i < x->gl_nxlabels; i++)
              sys_vgui(".x%lx.c create text\
@@ -25,7 +25,7 @@ diff -u -w -r1.9 g_graph.c
                  glist_getcanvas(x),
                  (int)glist_xtopixels(x, atof(x->gl_xlabel[i]->s_name)),
                  (int)glist_ytopixels(x, x->gl_xlabely), x->gl_xlabel[i]->s_name,
-@@ -830,7 +830,7 @@
+@@ -832,7 +832,7 @@
              /* draw y labels */
          for (i = 0; i < x->gl_nylabels; i++)
              sys_vgui(".x%lx.c create text\
@@ -37,11 +37,11 @@ diff -u -w -r1.9 g_graph.c
 Index: g_template.c
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/g_template.c,v
-retrieving revision 1.13
-diff -u -w -r1.13 g_template.c
---- g_template.c	21 Aug 2005 17:46:52 -0000	1.13
-+++ g_template.c	17 Oct 2006 04:52:43 -0000
-@@ -2090,7 +2090,7 @@
+retrieving revision 1.18
+diff -u -w -r1.18 g_template.c
+--- g_template.c	9 Oct 2006 04:36:12 -0000	1.18
++++ g_template.c	23 Dec 2006 07:27:30 -0000
+@@ -2126,7 +2126,7 @@
          drawnumber_sprintf(x, buf, &at);
          sys_vgui(".x%lx.c create text %d %d -anchor nw -fill %s -text {%s}",
                  glist_getcanvas(glist), xloc, yloc, colorstring, buf);
@@ -53,11 +53,11 @@ diff -u -w -r1.13 g_template.c
 Index: s_main.c
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/s_main.c,v
-retrieving revision 1.20
-diff -u -w -r1.20 s_main.c
---- s_main.c	2 Dec 2005 04:58:24 -0000	1.20
-+++ s_main.c	17 Oct 2006 04:52:43 -0000
-@@ -155,11 +155,7 @@
+retrieving revision 1.28
+diff -u -w -r1.28 s_main.c
+--- s_main.c	4 Oct 2006 19:35:06 -0000	1.28
++++ s_main.c	23 Dec 2006 07:27:31 -0000
+@@ -158,11 +158,7 @@
  }
  
  int sys_defaultfont;
@@ -72,11 +72,11 @@ diff -u -w -r1.20 s_main.c
 Index: u_main.tk
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
-retrieving revision 1.17
-diff -u -w -r1.17 u_main.tk
---- u_main.tk	15 Oct 2005 23:14:28 -0000	1.17
-+++ u_main.tk	17 Oct 2006 04:52:43 -0000
-@@ -171,7 +171,7 @@
+retrieving revision 1.25
+diff -u -w -r1.25 u_main.tk
+--- u_main.tk	9 Oct 2006 04:36:12 -0000	1.25
++++ u_main.tk	23 Dec 2006 07:27:33 -0000
+@@ -175,7 +175,7 @@
  
  
  frame .printout
@@ -85,8 +85,8 @@ diff -u -w -r1.17 u_main.tk
      -yscrollcommand ".printout.scroll set" -width 80
  # .printout.text insert end "\n\n\n\n\n\n\n\n\n\n"
  scrollbar .printout.scroll -command ".printout.text yview"
-@@ -355,7 +355,7 @@
- #    global pd_font3
+@@ -364,7 +364,7 @@
+     global pd_myversion
      set name [format ".help%d" $doc_number]
      toplevel $name
 -    text $name.text -relief raised -bd 2 -font -*-times-regular--normal--14-* \
@@ -94,7 +94,7 @@ diff -u -w -r1.17 u_main.tk
          -yscrollcommand "$name.scroll set" -background white
      scrollbar $name.scroll -command "$name.text yview"
      pack $name.scroll -side right -fill y
-@@ -1252,7 +1252,7 @@
+@@ -1279,7 +1279,7 @@
      set $windowName.lb [listbox $windowName.lb -height 20 -width 25\
                          -selectmode extended \
                          -relief solid -background white -borderwidth 1 \
@@ -103,7 +103,7 @@ diff -u -w -r1.17 u_main.tk
                                 $font] \
                          -yscrollcommand "$windowName.lb.sb set"]
      set $windowName.lb.sb [scrollbar $windowName.lb.sb \
-@@ -1371,7 +1371,7 @@
+@@ -1398,7 +1398,7 @@
      set bbox [$lbName bbox $itemNum]
      set y [expr [lindex $bbox 1] - 4]
      set $lbName.entry [entry $lbName.entry \
@@ -112,7 +112,7 @@ diff -u -w -r1.17 u_main.tk
      $lbName.entry insert 0 []
      place configure $lbName.entry -relx 0 -y $y -relwidth 1
      lower $lbName.entry
-@@ -3180,8 +3180,8 @@
+@@ -3214,8 +3214,8 @@
  
  ############ pdtk_text_new -- create a new text object #2###########
  proc pdtk_text_new {canvasname myname x y text font color} {
@@ -121,26 +121,5 @@ diff -u -w -r1.17 u_main.tk
 +#    if {$font < 13} {set fontname [format {courier %d bold} $font]}
 +#    if {$font >= 13} {set fontname [format {courier %d normal} $font]}
  
-         global pd_font1 pd_font2 pd_font3 pd_font4 pd_font5 pd_font6 pd_font7 
+         global pd_fontlist 
          switch -- $font {
-@@ -3235,13 +3235,13 @@
-     set pd_midiapilist $midiapilist
-     global pd_font1 pd_font2 pd_font3 pd_font4 pd_font5 pd_font6 pd_font7
- 
--    set pd_font1 [format -*-%s-bold--normal--8-* $fontname]
--    set pd_font2 [format -*-%s-bold--normal--10-* $fontname]
--    set pd_font3 [format -*-%s-bold--normal--12-* $fontname]
--    set pd_font4 [format -*-%s-bold--normal--14-* $fontname]
--    set pd_font5 [format -*-%s-bold--normal--16-* $fontname]
--    set pd_font6 [format -*-%s-bold--normal--24-* $fontname]
--    set pd_font7 [format -*-%s-bold--normal--36-* $fontname]
-+    set pd_font1 [format {%s 8 bold} $fontname]
-+    set pd_font2 [format {%s 10 bold} $fontname]
-+    set pd_font3 [format {%s 12 bold} $fontname]
-+    set pd_font4 [format {%s 14 bold} $fontname]
-+    set pd_font5 [format {%s 16 bold} $fontname]
-+    set pd_font6 [format {%s 24 bold} $fontname]
-+    set pd_font7 [format {%s 36 bold} $fontname]
- 
-     set width1 [font measure  $pd_font1 x]
-     set height1 [lindex [font metrics $pd_font1] 5]
