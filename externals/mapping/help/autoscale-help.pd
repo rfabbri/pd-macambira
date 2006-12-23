@@ -1,4 +1,4 @@
-#N canvas 229 80 470 526 10;
+#N canvas 248 54 487 774 10;
 #X floatatom 26 76 5 0 0 0 - - -;
 #X floatatom 26 140 0 0 0 0 - - -;
 #X obj 2 -10 cnv 15 450 20 empty empty [autoscale] 2 11 1 18 -233017
@@ -9,48 +9,76 @@ range set as arguments \, and an input range which is set dynamically.
 #X floatatom 177 244 5 0 0 1 min - -;
 #X obj 161 301 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X text 221 465 released under the GNU GPL;
+#X text 219 707 released under the GNU GPL;
 #X floatatom 150 140 0 0 0 0 - - -;
 #X floatatom 297 140 0 0 0 0 - - -;
 #X obj 213 71 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 1;
-#X text 4 484 $Revision: 1.4 $$Date: 2006-12-23 06:24:59 $;
-#X text 316 484 $Author: eighthave $;
+-1 -1 7300 1;
+#X text 314 726 $Author: nusmuk $;
 #X floatatom 136 363 5 0 0 0 - - -;
 #X obj 161 416 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 9358 1;
+-1 -1 4233 1;
 #X msg 186 361 reset;
 #X text 13 181 If you use [autoscale] with no arguments \, then the
 output range defaults to 0-1.;
 #X msg 239 361 bang;
-#X obj 158 393 autoscale;
 #X text 14 211 You can also set the output min and max using the 2nd
 and 3rd inlets:;
 #X floatatom 195 260 5 0 0 1 max - -;
 #X floatatom 117 250 5 0 0 0 - - -;
-#X obj 295 361 tgl 15 1 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 295 361 tgl 15 1 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X obj 26 110 autoscale;
-#X obj 158 278 autoscale;
-#X obj 150 110 autoscale -0.01 0.01;
-#X obj 297 110 autoscale -4095 4095;
-#X text 4 451 (C) Copyright 2006 Hans-Christoph Steiner <hans@at.or.at>
+#X text 2 693 (C) Copyright 2006 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 14 322 The [reset( message or banging the 4th inlet resets
 the stored max and min to zero. 0 disables the auto-tracking \, 1 re-enables
 it:;
-#X connect 0 0 22 0;
-#X connect 4 0 23 1;
-#X connect 9 0 24 0;
-#X connect 9 0 25 0;
-#X connect 12 0 17 0;
-#X connect 14 0 17 0;
-#X connect 16 0 17 3;
-#X connect 17 0 13 0;
-#X connect 19 0 23 2;
-#X connect 20 0 23 0;
-#X connect 21 0 17 3;
-#X connect 22 0 1 0;
-#X connect 23 0 5 0;
-#X connect 24 0 7 0;
-#X connect 25 0 8 0;
+#X floatatom 127 517 5 0 0 0 - - -;
+#X obj 130 662 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 7109 1;
+#X msg 215 580 set \$1;
+#X msg 215 627 2.89;
+#X msg 304 579 set \$1;
+#X msg 304 628 3.83;
+#X obj 323 598 loadbang;
+#X msg 169 517 dump;
+#X text 16 453 The dump message allow "autoscale" to output the min
+and max of the input data. this allow user to save this data in order
+to load the same callibration with a loadbang :;
+#X obj 127 556 autoscale 0 1 ____________;
+#X msg 304 532 0;
+#X obj 304 509 loadbang;
+#X text 2 726 $Revision: 1.5 $$Date: 2006-12-23 10:32:41 $;
+#X obj 158 393 autoscale;
+#X obj 26 110 autoscale;
+#X obj 158 278 autoscale;
+#X obj 150 110 autoscale -0.01 0.01;
+#X obj 297 110 autoscale -4095 4095;
+#X connect 0 0 36 0;
+#X connect 4 0 37 1;
+#X connect 9 0 38 0;
+#X connect 9 0 39 0;
+#X connect 11 0 35 0;
+#X connect 13 0 35 0;
+#X connect 15 0 35 3;
+#X connect 17 0 37 2;
+#X connect 18 0 37 0;
+#X connect 19 0 35 3;
+#X connect 22 0 31 0;
+#X connect 24 0 25 0;
+#X connect 25 0 31 1;
+#X connect 26 0 27 0;
+#X connect 27 0 31 2;
+#X connect 28 0 27 0;
+#X connect 28 0 25 0;
+#X connect 29 0 31 0;
+#X connect 31 0 23 0;
+#X connect 31 1 24 0;
+#X connect 31 2 26 0;
+#X connect 32 0 31 3;
+#X connect 33 0 32 0;
+#X connect 35 0 12 0;
+#X connect 36 0 1 0;
+#X connect 37 0 5 0;
+#X connect 38 0 7 0;
+#X connect 39 0 8 0;
