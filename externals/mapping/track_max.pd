@@ -1,4 +1,4 @@
-#N canvas 353 201 457 385 10;
+#N canvas 353 201 461 389 10;
 #X obj 83 269 outlet;
 #X obj 294 7 inlet;
 #X obj 37 7 inlet;
@@ -11,7 +11,6 @@
 #X obj 37 207 moses;
 #X obj 37 143 spigot 1;
 #X text 59 235 max;
-#X obj 173 200 print ARG;
 #X obj 177 164 purepd/float_argument \$1 -9.99e+37;
 #X obj 83 234 + 1e-09;
 #X text 33 292 1e-09 is added so [moses] doesn't output the current
@@ -22,16 +21,15 @@ maximum value again.;
 #X connect 1 0 3 0;
 #X connect 2 0 10 0;
 #X connect 3 0 4 0;
-#X connect 3 1 13 0;
+#X connect 3 1 12 0;
 #X connect 4 0 5 0;
 #X connect 4 1 6 0;
 #X connect 5 0 10 1;
 #X connect 6 0 10 1;
-#X connect 7 0 13 0;
-#X connect 8 0 13 0;
-#X connect 9 1 14 0;
+#X connect 7 0 12 0;
+#X connect 8 0 12 0;
+#X connect 9 1 13 0;
 #X connect 10 0 9 0;
+#X connect 12 0 9 1;
+#X connect 13 0 0 0;
 #X connect 13 0 9 1;
-#X connect 13 0 12 0;
-#X connect 14 0 0 0;
-#X connect 14 0 9 1;
