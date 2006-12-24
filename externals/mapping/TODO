@@ -1,4 +1,8 @@
+______________________________________________________________________________
+= spread/segment/seglet
 
+Make [collect] and [distribute], which are like [segment] and [desegment].
+Perhaps it should be called [seglet] and [deseglet]
 
 ______________________________________________________________________________
 = one->many
