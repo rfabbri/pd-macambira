@@ -10,44 +10,42 @@ typedef unsigned char darr[];
 
 #define	kTrial	10
 
-static	WiiRemoteRec	gWiiRemote;
+//static	WiiRemoteRec	gWiiRemote;		// remove in 1.0B4
 
 //--------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------
 
-WiiRemoteRef wiiremote_init(void)
+void wiiremote_init(WiiRemoteRef wiiremote)
 {
-	gWiiRemote.inquiry = nil;
-	gWiiRemote.device = nil;
-	gWiiRemote.ichan = nil;
-	gWiiRemote.cchan = nil;
+	wiiremote->inquiry = nil;
+	wiiremote->device = nil;
+	wiiremote->ichan = nil;
+	wiiremote->cchan = nil;
 	
-	gWiiRemote.accX = 0x10;
-	gWiiRemote.accY = 0x10;
-	gWiiRemote.accZ = 0x10;
-	gWiiRemote.buttonData = 0;
-	gWiiRemote.leftPoint = -1;
-	gWiiRemote.tracking = false;
+	wiiremote->accX = 0x10;
+	wiiremote->accY = 0x10;
+	wiiremote->accZ = 0x10;
+	wiiremote->buttonData = 0;
+	wiiremote->leftPoint = -1;
+	wiiremote->tracking = false;
 	
-	gWiiRemote.batteryLevel = 0;
+	wiiremote->batteryLevel = 0;
 	
-	gWiiRemote.isIRSensorEnabled = false;
-	gWiiRemote.isMotionSensorEnabled = false;
-	gWiiRemote.isVibrationEnabled = false;
+	wiiremote->isIRSensorEnabled = false;
+	wiiremote->isMotionSensorEnabled = false;
+	wiiremote->isVibrationEnabled = false;
 	
-	gWiiRemote.isExpansionPortUsed = false;
-	gWiiRemote.isLED1Illuminated = false;
-	gWiiRemote.isLED2Illuminated = false;
-	gWiiRemote.isLED3Illuminated = false;
-	gWiiRemote.isLED4Illuminated = false;
-	
-	return &gWiiRemote;
+	wiiremote->isExpansionPortUsed = false;
+	wiiremote->isLED1Illuminated = false;
+	wiiremote->isLED2Illuminated = false;
+	wiiremote->isLED3Illuminated = false;
+	wiiremote->isLED4Illuminated = false;
 }
 
 //--------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------
 
-void checkDevice(IOBluetoothDeviceRef device)
+void checkDevice(WiiRemoteRef wiiremote, IOBluetoothDeviceRef device)
 {
 	CFStringRef	myString;
 
@@ -56,21 +54,21 @@ void checkDevice(IOBluetoothDeviceRef device)
 	{
 		if (CFStringCompare(myString, CFSTR("Nintendo RVL-CNT-01"), 0) == kCFCompareEqualTo)
 		{
-			gWiiRemote.device = IOBluetoothObjectRetain(device);
-			if ( !wiiremote_connect())	// add in B3
-				wiiremote_disconnect(); // add in B3
+			wiiremote->device = IOBluetoothObjectRetain(device);
+			if ( !wiiremote_connect(wiiremote))	// add in B3
+				wiiremote_disconnect(wiiremote); // add in B3
 		}
 	}
 }
 
 void myFoundFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOBluetoothDeviceRef device)
 {
-	checkDevice(device);
+	checkDevice((WiiRemoteRef)refCon, device);
 }
 
 void myUpdatedFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOBluetoothDeviceRef device, uint32_t devicesRemaining)
 {
-	checkDevice(device);
+	checkDevice((WiiRemoteRef)refCon, device);
 }
 
 void myCompleteFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOReturn error, Boolean aborted)
@@ -79,60 +77,60 @@ void myCompleteFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOReturn 
 	
 	if (error != kIOReturnSuccess)
 	{
-		wiiremote_stopsearch();
+		wiiremote_stopsearch((WiiRemoteRef)refCon);
 	}
 }
 
 //--------------------------------------------------------------------------------------------
 
-Boolean wiiremote_isconnected(void)
+Boolean wiiremote_isconnected(WiiRemoteRef wiiremote)
 {
 	Boolean	result;
 	
-	result = gWiiRemote.device != nil && IOBluetoothDeviceIsConnected(gWiiRemote.device);
+	result = wiiremote->device != nil && IOBluetoothDeviceIsConnected(wiiremote->device);
 	return result;
 }
 	
-Boolean wiiremote_search(void)
+Boolean wiiremote_search(WiiRemoteRef wiiremote)
 {
 	IOReturn	ret;
 	
-	if (gWiiRemote.inquiry != nil)
+	if (wiiremote->inquiry != nil)
 		return true;
 	
-	gWiiRemote.inquiry = IOBluetoothDeviceInquiryCreateWithCallbackRefCon(nil);
-	IOBluetoothDeviceInquirySetDeviceFoundCallback(gWiiRemote.inquiry, myFoundFunc);
-	IOBluetoothDeviceInquirySetDeviceNameUpdatedCallback(gWiiRemote.inquiry, myUpdatedFunc);
-	IOBluetoothDeviceInquirySetCompleteCallback(gWiiRemote.inquiry, myCompleteFunc);
+	wiiremote->inquiry = IOBluetoothDeviceInquiryCreateWithCallbackRefCon((void *)wiiremote);
+	IOBluetoothDeviceInquirySetDeviceFoundCallback(wiiremote->inquiry, myFoundFunc);
+	IOBluetoothDeviceInquirySetDeviceNameUpdatedCallback(wiiremote->inquiry, myUpdatedFunc);
+	IOBluetoothDeviceInquirySetCompleteCallback(wiiremote->inquiry, myCompleteFunc);
 
-	ret = IOBluetoothDeviceInquiryStart(gWiiRemote.inquiry);
+	ret = IOBluetoothDeviceInquiryStart(wiiremote->inquiry);
 	if (ret != kIOReturnSuccess)
 	{
-		IOBluetoothDeviceInquiryDelete(gWiiRemote.inquiry);
-		gWiiRemote.inquiry = nil;
+		IOBluetoothDeviceInquiryDelete(wiiremote->inquiry);
+		wiiremote->inquiry = nil;
 		return false;
 	}
 	return true;
 }
 
-Boolean wiiremote_stopsearch(void)
+Boolean wiiremote_stopsearch(WiiRemoteRef wiiremote)
 {
 	IOReturn	ret;
 
-	if (gWiiRemote.inquiry == nil)
+	if (wiiremote->inquiry == nil)
 	{
 		return true;	// already stopped
 	}
 	
-	ret = IOBluetoothDeviceInquiryStop(gWiiRemote.inquiry);
+	ret = IOBluetoothDeviceInquiryStop(wiiremote->inquiry);
 	
 	if (ret != kIOReturnSuccess && ret != kIOReturnNotPermitted)
 	{
 		// kIOReturnNotPermitted is if it's already stopped
 	}
 	
-	IOBluetoothDeviceInquiryDelete(gWiiRemote.inquiry);
-	gWiiRemote.inquiry = nil;
+	IOBluetoothDeviceInquiryDelete(wiiremote->inquiry);
+	wiiremote->inquiry = nil;
 	
 	return (ret==kIOReturnSuccess);
 }
@@ -142,51 +140,52 @@ Boolean wiiremote_stopsearch(void)
 
  void myDataListener(IOBluetoothL2CAPChannelRef channel, void *data, UInt16 length, void *refCon)
 {
-	unsigned char *dp = (unsigned char*)data;
+	WiiRemoteRef	wiiremote = (WiiRemoteRef)refCon;
+	unsigned char	*dp = (unsigned char*)data;
 
-	 if (dp[1] == 0x20 && length >= 8)
-	 {
-		 gWiiRemote.batteryLevel = (double)dp[7];
-		 gWiiRemote.batteryLevel /= (double)0xC0;
+	if (dp[1] == 0x20 && length >= 8)
+	{
+		wiiremote->batteryLevel = (double)dp[7];
+		wiiremote->batteryLevel /= (double)0xC0;
 		 
-		 gWiiRemote.isExpansionPortUsed =  (dp[4] & 0x02) != 0;
-		 gWiiRemote.isLED1Illuminated = (dp[4] & 0x10) != 0;
-		 gWiiRemote.isLED2Illuminated = (dp[4] & 0x20) != 0;
-		 gWiiRemote.isLED3Illuminated = (dp[4] & 0x40) != 0;
-		 gWiiRemote.isLED4Illuminated = (dp[4] & 0x80) != 0;
+		wiiremote->isExpansionPortUsed =  (dp[4] & 0x02) != 0;
+		wiiremote->isLED1Illuminated = (dp[4] & 0x10) != 0;
+		wiiremote->isLED2Illuminated = (dp[4] & 0x20) != 0;
+		wiiremote->isLED3Illuminated = (dp[4] & 0x40) != 0;
+		wiiremote->isLED4Illuminated = (dp[4] & 0x80) != 0;
 		 
-		 //have to reset settings (vibration, motion, IR and so on...)
-		 wiiremote_irsensor(gWiiRemote.isIRSensorEnabled);
-	 }
+		//have to reset settings (vibration, motion, IR and so on...)
+		wiiremote_irsensor(wiiremote, wiiremote->isIRSensorEnabled);
+	}
 
 	if ((dp[1]&0xF0) == 0x30)
 	{
-		gWiiRemote.buttonData = ((short)dp[2] << 8) + dp[3];
+		wiiremote->buttonData = ((short)dp[2] << 8) + dp[3];
 	 
 		if (dp[1] & 0x01)
 		{
-			gWiiRemote.accX = dp[4];
-			gWiiRemote.accY = dp[5];
-			gWiiRemote.accZ = dp[6];
+			wiiremote->accX = dp[4];
+			wiiremote->accY = dp[5];
+			wiiremote->accZ = dp[6];
 		 
-			gWiiRemote.lowZ = gWiiRemote.lowZ * .9 + gWiiRemote.accZ * .1;
-			gWiiRemote.lowX = gWiiRemote.lowX * .9 + gWiiRemote.accX * .1;
+			wiiremote->lowZ = wiiremote->lowZ * .9 + wiiremote->accZ * .1;
+			wiiremote->lowX = wiiremote->lowX * .9 + wiiremote->accX * .1;
 		 
-			float absx = abs(gWiiRemote.lowX - 128);
-			float absz = abs(gWiiRemote.lowZ - 128);
+			float absx = abs(wiiremote->lowX - 128);
+			float absz = abs(wiiremote->lowZ - 128);
 		 
-			if (gWiiRemote.orientation == 0 || gWiiRemote.orientation == 2) absx -= 5;
-			if (gWiiRemote.orientation == 1 || gWiiRemote.orientation == 3) absz -= 5;
+			if (wiiremote->orientation == 0 || wiiremote->orientation == 2) absx -= 5;
+			if (wiiremote->orientation == 1 || wiiremote->orientation == 3) absz -= 5;
 		 
 			if (absz >= absx)
 			{
 				if (absz > 5)
-					gWiiRemote.orientation = (gWiiRemote.lowZ > 128) ? 0 : 2;
+					wiiremote->orientation = (wiiremote->lowZ > 128) ? 0 : 2;
 			}
 			else
 			{
 				if (absx > 5)
-					gWiiRemote.orientation = (gWiiRemote.lowX > 128) ? 3 : 1;
+					wiiremote->orientation = (wiiremote->lowX > 128) ? 3 : 1;
 			}
 			//printf("orientation: %d\n", orientation);
 		}
@@ -196,65 +195,66 @@ Boolean wiiremote_stopsearch(void)
 			int i;
 			for(i=0 ; i<4 ; i++)
 			{
-				gWiiRemote.irData[i].x = dp[7 + 3*i];
-				gWiiRemote.irData[i].y = dp[8 + 3*i];
-				gWiiRemote.irData[i].s = dp[9 + 3*i];
-				gWiiRemote.irData[i].x += (gWiiRemote.irData[i].s & 0x30) << 4;
-				gWiiRemote.irData[i].y += (gWiiRemote.irData[i].s & 0xC0) << 2;
-				gWiiRemote.irData[i].s &= 0x0F;
+				wiiremote->irData[i].x = dp[7 + 3*i];
+				wiiremote->irData[i].y = dp[8 + 3*i];
+				wiiremote->irData[i].s = dp[9 + 3*i];
+				wiiremote->irData[i].x += (wiiremote->irData[i].s & 0x30) << 4;
+				wiiremote->irData[i].y += (wiiremote->irData[i].s & 0xC0) << 2;
+				wiiremote->irData[i].s &= 0x0F;
 			} 
 		}
 	}
 
 	float ox, oy;
 
-	if (gWiiRemote.irData[0].s < 0x0F && gWiiRemote.irData[1].s < 0x0F)
+	if (wiiremote->irData[0].s < 0x0F && wiiremote->irData[1].s < 0x0F)
 	{
-		int l = gWiiRemote.leftPoint, r;
-		if (gWiiRemote.leftPoint == -1)
+		int l = wiiremote->leftPoint, r;
+		if (wiiremote->leftPoint == -1)
 		{
 			//	printf("Tracking.\n");
-			switch (gWiiRemote.orientation)
+			switch (wiiremote->orientation)
 			{
-				case 0: l = (gWiiRemote.irData[0].x < gWiiRemote.irData[1].x) ? 0 : 1; break;
-				case 1: l = (gWiiRemote.irData[0].y > gWiiRemote.irData[1].y) ? 0 : 1; break;
-				case 2: l = (gWiiRemote.irData[0].x > gWiiRemote.irData[1].x) ? 0 : 1; break;
-				case 3: l = (gWiiRemote.irData[0].y < gWiiRemote.irData[1].y) ? 0 : 1; break;
+				case 0: l = (wiiremote->irData[0].x < wiiremote->irData[1].x) ? 0 : 1; break;
+				case 1: l = (wiiremote->irData[0].y > wiiremote->irData[1].y) ? 0 : 1; break;
+				case 2: l = (wiiremote->irData[0].x > wiiremote->irData[1].x) ? 0 : 1; break;
+				case 3: l = (wiiremote->irData[0].y < wiiremote->irData[1].y) ? 0 : 1; break;
 			}
-			gWiiRemote.leftPoint = l;
+			wiiremote->leftPoint = l;
 		}
 		
 		r = 1-l;
 	 
-		float dx = gWiiRemote.irData[r].x - gWiiRemote.irData[l].x;
-		float dy = gWiiRemote.irData[r].y - gWiiRemote.irData[l].y;
+		float dx = wiiremote->irData[r].x - wiiremote->irData[l].x;
+		float dy = wiiremote->irData[r].y - wiiremote->irData[l].y;
 	 
 		float d = sqrt(dx*dx+dy*dy);
 	 
 		dx /= d;
 		dy /= d;
 	 
-		float cx = (gWiiRemote.irData[l].x+gWiiRemote.irData[r].x)/1024.0 - 1;
-		float cy = (gWiiRemote.irData[l].y+gWiiRemote.irData[r].y)/1024.0 - .75;
+		float cx = (wiiremote->irData[l].x+wiiremote->irData[r].x)/1024.0 - 1;
+		float cy = (wiiremote->irData[l].y+wiiremote->irData[r].y)/1024.0 - .75;
 	 
-		gWiiRemote.angle = atan2(dy, dx);
+		wiiremote->angle = atan2(dy, dx);
 	 
 		ox = -dy*cy-dx*cx;
 		oy = -dx*cy+dy*cx;
 		//printf("x:%5.2f;  y: %5.2f;  angle: %5.1f\n", ox, oy, angle*180/M_PI);
 		
-		gWiiRemote.tracking = true;
+		wiiremote->tracking = true;
 	}
 	else
 	{
 		//	printf("Not tracking.\n");
 		ox = oy = -100;
-		gWiiRemote.leftPoint = -1;
-		gWiiRemote.tracking = false;
+		wiiremote->angle = -100;
+		wiiremote->leftPoint = -1;
+		wiiremote->tracking = false;
 	}
 	
-	gWiiRemote.posX = ox;	
-	gWiiRemote.posY = oy;
+	wiiremote->posX = ox;	
+	wiiremote->posY = oy;
 }
 
 void myEventListener(IOBluetoothL2CAPChannelRef channel, void *refCon, IOBluetoothL2CAPChannelEvent *event)
@@ -282,29 +282,32 @@ void myDisconnectedFunc(void * refCon, IOBluetoothUserNotificationRef inRef, IOB
 
 //--------------------------------------------------------------------------------------------
 
-Boolean wiiremote_connect(void)
+Boolean wiiremote_connect(WiiRemoteRef wiiremote)
 {
+	IOReturn	ret;
 	short		i;
 	
-	if (gWiiRemote.device == nil)
+	if (wiiremote->device == nil)
 		return false;
 	
 	// connect the device
 	for (i=0; i<kTrial; i++)
 	{
-		if (IOBluetoothDeviceOpenConnection(gWiiRemote.device, nil, nil) == kIOReturnSuccess)
+		ret = IOBluetoothDeviceOpenConnection(wiiremote->device, nil, nil);
+		if ( ret == kIOReturnSuccess)
 			break;
 		usleep(10000); //  wait 10ms
 	}
 	if (i==kTrial)
 		return false;
 	
-	gWiiRemote.disconnectNotification = IOBluetoothDeviceRegisterForDisconnectNotification(gWiiRemote.device, myDisconnectedFunc, 0);
+	wiiremote->disconnectNotification = IOBluetoothDeviceRegisterForDisconnectNotification(wiiremote->device, myDisconnectedFunc, 0);
 	
 	// performs an SDP query
 	for (i=0; i<kTrial; i++)
 	{
-		if (IOBluetoothDevicePerformSDPQuery(gWiiRemote.device, nil, nil) == kIOReturnSuccess)
+		ret = IOBluetoothDevicePerformSDPQuery(wiiremote->device, nil, nil);
+		if ( ret == kIOReturnSuccess)
 			break;
 		usleep(10000); //  wait 10ms
 	}
@@ -314,84 +317,86 @@ Boolean wiiremote_connect(void)
 	// open L2CAPChannel : BluetoothL2CAPPSM = 17
 	for (i=0; i<kTrial; i++)
 	{
-		if (IOBluetoothDeviceOpenL2CAPChannelSync(gWiiRemote.device, &(gWiiRemote.cchan), 17, myEventListener, nil) == kIOReturnSuccess)
+		ret = IOBluetoothDeviceOpenL2CAPChannelSync(wiiremote->device, &(wiiremote->cchan), 17, myEventListener, (void *)wiiremote);
+		if ( ret == kIOReturnSuccess)
 			break;
 		usleep(10000); //  wait 10ms
 	}
 	if (i==kTrial)
 	{
-		gWiiRemote.cchan = nil;
-		IOBluetoothDeviceCloseConnection(gWiiRemote.device);
-		gWiiRemote.device = nil;
+		wiiremote->cchan = nil;
+		IOBluetoothDeviceCloseConnection(wiiremote->device);
+		wiiremote->device = nil;
 		return false;
 	}
 	
 	// open L2CAPChannel : BluetoothL2CAPPSM = 19
 	for (i=0; i<kTrial; i++)
 	{
-		if (IOBluetoothDeviceOpenL2CAPChannelSync(gWiiRemote.device, &(gWiiRemote.ichan), 19, myEventListener, nil) == kIOReturnSuccess)
+		ret = IOBluetoothDeviceOpenL2CAPChannelSync(wiiremote->device, &(wiiremote->ichan), 19, myEventListener, (void *)wiiremote);
+		if ( ret == kIOReturnSuccess)
 			break;
 		usleep(10000); //  wait 10ms
 	}
 	if (i==kTrial)
 	{
-		gWiiRemote.ichan = nil;
-		IOBluetoothL2CAPChannelCloseChannel(gWiiRemote.cchan);
-		IOBluetoothDeviceCloseConnection(gWiiRemote.device);
-		gWiiRemote.device = nil;
+		wiiremote->ichan = nil;
+		IOBluetoothL2CAPChannelCloseChannel(wiiremote->cchan);
+		IOBluetoothDeviceCloseConnection(wiiremote->device);
+		wiiremote->device = nil;
 		return false;
 	}
 
-	wiiremote_motionsensor(true);
-	wiiremote_irsensor(false);
-	wiiremote_vibration(false);
-	wiiremote_led(false, false, false, false);
+	wiiremote_motionsensor(wiiremote, true);
+	wiiremote_irsensor(wiiremote, false);
+	wiiremote_vibration(wiiremote, false);
+	wiiremote_led(wiiremote, false, false, false, false);
 	
 	return true;
 }
 
 
-Boolean wiiremote_disconnect(void)
+Boolean wiiremote_disconnect(WiiRemoteRef wiiremote)
 {
 	short	i;
 	
-	if (gWiiRemote.disconnectNotification != nil)
+	if (wiiremote->disconnectNotification != nil)
 	{
-		IOBluetoothUserNotificationUnregister(gWiiRemote.disconnectNotification);
-		gWiiRemote.disconnectNotification = nil;
+		IOBluetoothUserNotificationUnregister(wiiremote->disconnectNotification);
+		wiiremote->disconnectNotification = nil;
 	}
 	
-	if (gWiiRemote.cchan && IOBluetoothDeviceIsConnected(gWiiRemote.device))
+	if (wiiremote->cchan && IOBluetoothDeviceIsConnected(wiiremote->device))
 	{
 		for (i=0; i<kTrial; i++)
 		{
-			if (IOBluetoothL2CAPChannelCloseChannel(gWiiRemote.cchan) == kIOReturnSuccess)
+			if (IOBluetoothL2CAPChannelCloseChannel(wiiremote->cchan) == kIOReturnSuccess)
 			{
-				gWiiRemote.cchan = nil;
+				wiiremote->cchan = nil;
 				break;
 			}
 		}
 		if (i==kTrial)	return false;
 	}
 	
-	if (gWiiRemote.ichan && IOBluetoothDeviceIsConnected(gWiiRemote.device))
+	if (wiiremote->ichan && IOBluetoothDeviceIsConnected(wiiremote->device))
 	{
 		for (i=0; i<kTrial; i++)
 		{
-			if (IOBluetoothL2CAPChannelCloseChannel(gWiiRemote.ichan) == kIOReturnSuccess)
+			if (IOBluetoothL2CAPChannelCloseChannel(wiiremote->ichan) == kIOReturnSuccess)
 			{
-				gWiiRemote.ichan = nil;
+				wiiremote->ichan = nil;
 				break;
 			}
 		}
 		if (i==kTrial)	return false;
 	}
 	
-	if (gWiiRemote.device && IOBluetoothDeviceIsConnected(gWiiRemote.device))
+	if (wiiremote->device && IOBluetoothDeviceIsConnected(wiiremote->device))
 	{
 		for (i=0; i<kTrial; i++)
 		{
-			if (IOBluetoothDeviceCloseConnection(gWiiRemote.device) == kIOReturnSuccess)
+			if (IOBluetoothDeviceCloseConnection(wiiremote->device) == kIOReturnSuccess)
 			{
 				break;
 			}
@@ -399,10 +404,10 @@ Boolean wiiremote_disconnect(void)
 		if (i==kTrial)	return false;
 	}
 	
-	if (gWiiRemote.device != nil)
+	if (wiiremote->device != nil)
 	{
-		IOBluetoothObjectRelease(gWiiRemote.device);
-		gWiiRemote.device = nil;
+		IOBluetoothObjectRelease(wiiremote->device);
+		wiiremote->device = nil;
 	}
 	
 	return true;
@@ -411,7 +416,7 @@ Boolean wiiremote_disconnect(void)
 //--------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------
 
-Boolean sendCommand(unsigned char *data, size_t length)
+Boolean sendCommand(WiiRemoteRef wiiremote, unsigned char *data, size_t length)
 {
 	unsigned char buf[40];
 	IOReturn	ret;
@@ -427,7 +432,7 @@ Boolean sendCommand(unsigned char *data, size_t length)
 	
 	for (i = 0; i<kTrial; i++)
 	{
-		ret = IOBluetoothL2CAPChannelWriteSync(gWiiRemote.cchan, buf, length);
+		ret = IOBluetoothL2CAPChannelWriteSync(wiiremote->cchan, buf, length);
 		if (ret == kIOReturnSuccess)
 			break;
 		usleep(10000);
@@ -436,10 +441,10 @@ Boolean sendCommand(unsigned char *data, size_t length)
 	return (ret==kIOReturnSuccess);
 }
 
-Boolean	writeData(const unsigned char *data, unsigned long address, size_t length)
+Boolean	writeData(WiiRemoteRef wiiremote, const unsigned char *data, unsigned long address, size_t length)
 {
 	unsigned char cmd[22];
-	int i;
+	unsigned int i;
 
 	for(i=0 ; i<length ; i++) cmd[i+6] = data[i];
 	
@@ -453,43 +458,43 @@ Boolean	writeData(const unsigned char *data, unsigned long address, size_t lengt
 	cmd[5] = length;
 
 	// and of course the vibration flag, as usual
-	if (gWiiRemote.isVibrationEnabled)	cmd[1] |= 0x01;
+	if (wiiremote->isVibrationEnabled)	cmd[1] |= 0x01;
 	
 	data = cmd;
 	
-	return sendCommand(cmd, 22);
+	return sendCommand(wiiremote, cmd, 22);
 }
 
 //--------------------------------------------------------------------------------------------
 
-Boolean wiiremote_motionsensor(Boolean enabled)
+Boolean wiiremote_motionsensor(WiiRemoteRef wiiremote, Boolean enabled)
 {
-	gWiiRemote.isMotionSensorEnabled = enabled;
+	wiiremote->isMotionSensorEnabled = enabled;
 
 	unsigned char cmd[] = {0x12, 0x00, 0x30};
-	if (gWiiRemote.isVibrationEnabled)		cmd[1] |= 0x01;
-	if (gWiiRemote.isMotionSensorEnabled)	cmd[2] |= 0x01;
-	if (gWiiRemote.isIRSensorEnabled)		cmd[2] |= 0x02;
+	if (wiiremote->isVibrationEnabled)		cmd[1] |= 0x01;
+	if (wiiremote->isMotionSensorEnabled)	cmd[2] |= 0x01;
+	if (wiiremote->isIRSensorEnabled)		cmd[2] |= 0x02;
 	
-	return sendCommand(cmd, 3);
+	return sendCommand(wiiremote, cmd, 3);
 }
 
-Boolean wiiremote_irsensor(Boolean enabled)
+Boolean wiiremote_irsensor(WiiRemoteRef wiiremote, Boolean enabled)
 {
 	IOReturn ret;
 	
-	gWiiRemote.isIRSensorEnabled = enabled;
+	wiiremote->isIRSensorEnabled = enabled;
 	
 	// set register 0x12 (report type)
-	if (ret = wiiremote_motionsensor(gWiiRemote.isMotionSensorEnabled)) return ret;
+	if (ret = wiiremote_motionsensor(wiiremote, wiiremote->isMotionSensorEnabled) == false)	return ret;
 	
 	// set register 0x13 (ir enable/vibe)
-	if (ret = wiiremote_vibration(gWiiRemote.isVibrationEnabled)) return ret;
+	if (ret = wiiremote_vibration(wiiremote, wiiremote->isVibrationEnabled) == false)	return ret;
 	
 	// set register 0x1a (ir enable 2)
 	unsigned char cmd[] = {0x1a, 0x00};
 	if (enabled)	cmd[1] |= 0x04;
-	if (ret = sendCommand(cmd, 2)) return ret;
+	if (ret = sendCommand(wiiremote, cmd, 2) == false) return ret;
 	
 	if(enabled){
 		// based on marcan's method, found on wiili wiki:
@@ -497,65 +502,65 @@ Boolean wiiremote_irsensor(Boolean enabled)
 		// of it actually turning on 100% of the time (was seeing 30-40% failure rate before)
 		// the sleeps help it it seems
 		usleep(10000);
-		if (ret = writeData((darr){0x01}, 0x04B00030, 1)) return ret;
+		if (ret = writeData(wiiremote, (darr){0x01}, 0x04B00030, 1) == false) return ret;
 		usleep(10000);
-		if (ret = writeData((darr){0x08}, 0x04B00030, 1)) return ret;
+		if (ret = writeData(wiiremote, (darr){0x08}, 0x04B00030, 1) == false) return ret;
 		usleep(10000);
-		if (ret = writeData((darr){0x90}, 0x04B00006, 1)) return ret;
+		if (ret = writeData(wiiremote, (darr){0x90}, 0x04B00006, 1) == false) return ret;
 		usleep(10000);
-		if (ret = writeData((darr){0xC0}, 0x04B00008, 1)) return ret;
+		if (ret = writeData(wiiremote, (darr){0xC0}, 0x04B00008, 1) == false) return ret;
 		usleep(10000);
-		if (ret = writeData((darr){0x40}, 0x04B0001A, 1)) return ret;
+		if (ret = writeData(wiiremote, (darr){0x40}, 0x04B0001A, 1) == false) return ret;
 		usleep(10000);
-		if (ret = writeData((darr){0x33}, 0x04B00033, 1)) return ret;
+		if (ret = writeData(wiiremote, (darr){0x33}, 0x04B00033, 1) == false) return ret;
 		usleep(10000);
-		if (ret = writeData((darr){0x08}, 0x04B00030, 1)) return ret;
+		if (ret = writeData(wiiremote, (darr){0x08}, 0x04B00030, 1) == false) return ret;
 		
 	}else{
 		// probably should do some writes to power down the camera, save battery
 		// but don't know how yet.
 		
 		//bug fix #1614587 
-		wiiremote_motionsensor(gWiiRemote.isMotionSensorEnabled);
-		wiiremote_vibration(gWiiRemote.isVibrationEnabled);
+		wiiremote_motionsensor(wiiremote, wiiremote->isMotionSensorEnabled);
+		wiiremote_vibration(wiiremote, wiiremote->isVibrationEnabled);
 	}
 	
 	return true;
 }
 
-Boolean wiiremote_vibration(Boolean enabled)
+Boolean wiiremote_vibration(WiiRemoteRef wiiremote, Boolean enabled)
 {
 	
-	gWiiRemote.isVibrationEnabled = enabled;
+	wiiremote->isVibrationEnabled = enabled;
 	
 	unsigned char cmd[] = {0x13, 0x00};
-	if (gWiiRemote.isVibrationEnabled)	cmd[1] |= 0x01;
-	if (gWiiRemote.isIRSensorEnabled)	cmd[1] |= 0x04;
+	if (wiiremote->isVibrationEnabled)	cmd[1] |= 0x01;
+	if (wiiremote->isIRSensorEnabled)	cmd[1] |= 0x04;
 	
-	return sendCommand(cmd, 2);;
+	return sendCommand(wiiremote, cmd, 2);;
 }
 
-Boolean wiiremote_led(Boolean enabled1, Boolean enabled2, Boolean enabled3, Boolean enabled4)
+Boolean wiiremote_led(WiiRemoteRef wiiremote, Boolean enabled1, Boolean enabled2, Boolean enabled3, Boolean enabled4)
 {
 	unsigned char cmd[] = {0x11, 0x00};
-	if (gWiiRemote.isVibrationEnabled)	cmd[1] |= 0x01;
+	if (wiiremote->isVibrationEnabled)	cmd[1] |= 0x01;
 	if (enabled1)	cmd[1] |= 0x10;
 	if (enabled2)	cmd[1] |= 0x20;
 	if (enabled3)	cmd[1] |= 0x40;
 	if (enabled4)	cmd[1] |= 0x80;
 	
-	gWiiRemote.isLED1Illuminated = enabled1;
-	gWiiRemote.isLED2Illuminated = enabled2;
-	gWiiRemote.isLED3Illuminated = enabled3;
-	gWiiRemote.isLED4Illuminated = enabled4;
+	wiiremote->isLED1Illuminated = enabled1;
+	wiiremote->isLED2Illuminated = enabled2;
+	wiiremote->isLED3Illuminated = enabled3;
+	wiiremote->isLED4Illuminated = enabled4;
 	
-	return sendCommand(cmd, 2);
+	return sendCommand(wiiremote, cmd, 2);
 }
 
-void wiiremote_getstatus(void)
+Boolean wiiremote_getstatus(WiiRemoteRef wiiremote)
 {
 	unsigned char cmd[] = {0x15, 0x00};
-	sendCommand(cmd, 2);
+	return sendCommand(wiiremote, cmd, 2);
 }
 
 

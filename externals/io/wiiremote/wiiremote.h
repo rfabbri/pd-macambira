@@ -5,7 +5,6 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOBluetooth/Bluetooth.h>
 #include <IOBluetooth/IOBluetoothUserLib.h>
-
 #include <stdio.h>
 #include <string.h>
 
@@ -50,14 +49,14 @@ typedef struct _WiiRemoteRec
 	IOBluetoothUserNotificationRef	disconnectNotification;
 }	WiiRemoteRec, *WiiRemoteRef;
 
-WiiRemoteRef	wiiremote_init(void);
-Boolean			wiiremote_isconnected(void);
-Boolean			wiiremote_search(void);
-Boolean			wiiremote_stopsearch(void);
-Boolean			wiiremote_connect(void);
-Boolean			wiiremote_disconnect(void);
-Boolean			wiiremote_motionsensor(Boolean enabled);
-Boolean			wiiremote_irsensor(Boolean enabled);
-Boolean			wiiremote_vibration(Boolean enabled);
-Boolean			wiiremote_led(Boolean enabled1, Boolean enabled2, Boolean enabled3, Boolean enabled4);
-void			wiiremote_getstatus(void);
+void			wiiremote_init(WiiRemoteRef wiiremote);
+Boolean			wiiremote_isconnected(WiiRemoteRef wiiremote);
+Boolean			wiiremote_search(WiiRemoteRef wiiremote);
+Boolean			wiiremote_stopsearch(WiiRemoteRef wiiremote);
+Boolean			wiiremote_connect(WiiRemoteRef wiiremote);
+Boolean			wiiremote_disconnect(WiiRemoteRef wiiremote);
+Boolean			wiiremote_motionsensor(WiiRemoteRef wiiremote, Boolean enabled);
+Boolean			wiiremote_irsensor(WiiRemoteRef wiiremote, Boolean enabled);
+Boolean			wiiremote_vibration(WiiRemoteRef wiiremote, Boolean enabled);
+Boolean			wiiremote_led(WiiRemoteRef wiiremote, Boolean enabled1, Boolean enabled2, Boolean enabled3, Boolean enabled4);
+Boolean			wiiremote_getstatus(WiiRemoteRef wiiremote);

@@ -13,7 +13,6 @@ static t_class *wiiremote_class;
 #endif /* PD */
 
 #include "wiiremote.h"
-
 #include <stdio.h>
 
 #define kInterval	100
@@ -40,8 +39,6 @@ typedef struct _akawiiremote
 } t_akawiiremote;
 
 void *akawiiremote_class;	// the number of instance of this object
-
-short	akawiiremote_count;
 
 void akawiiremote_bang(t_akawiiremote *x);
 void akawiiremote_connect(t_akawiiremote *x);
@@ -83,7 +80,7 @@ void main()
 		return;
 	}
 
-	post("aka.wiiremote 1.0B3-UB by Masayuki Akamatsu");
+	post("aka.wiiremote 1.0B4-UB by Masayuki Akamatsu");
 
 #ifdef PD
 	post("\tPd port by Hans-Christoph Steiner");
@@ -125,8 +122,6 @@ void main()
 	
 	addmess((method)akawiiremote_assist,"assist",A_CANT,0);
 #endif /* PD */
-	
-	akawiiremote_count = 0;
 }
 
 //--------------------------------------------------------------------------------------------
@@ -170,14 +165,14 @@ void akawiiremote_connect(t_akawiiremote *x)
 	t_atom	status;
 	Boolean	result;
 
-	if (wiiremote_isconnected())
+	if (wiiremote_isconnected(x->wiiremote))
 	{
 		SETLONG(&status, -1);
 		outlet_anything(x->statusOut, gensym("connect"), 1, &status);		
 	}
 	else
 	{
-		result = wiiremote_search();	// start searching the device
+		result = wiiremote_search(x->wiiremote);	// start searching the device
 		x->trial = 0;
 		clock_unset(x->clock);			// stop clock
 		clock_delay(x->clock, 0);		// start clock to check the device found
@@ -193,29 +188,29 @@ void akawiiremote_disconnect(t_akawiiremote *x)
 	Boolean	result;
 	t_atom	status;
 	
-	result = wiiremote_disconnect();
+	result = wiiremote_disconnect(x->wiiremote);
 	SETLONG(&status, result);
 	outlet_anything(x->statusOut, gensym("disconnect"), 1, &status);		
 }
 
 void akawiiremote_motionsensor(t_akawiiremote *x, long enable)
 {
-	wiiremote_motionsensor(enable);
+	wiiremote_motionsensor(x->wiiremote, enable);
 }
 
 void akawiiremote_irsensor(t_akawiiremote *x, long enable)
 {
-	wiiremote_irsensor(enable);
+	wiiremote_irsensor(x->wiiremote, enable);
 }
 
 void akawiiremote_vibration(t_akawiiremote *x, long enable)
 {
-	wiiremote_vibration(enable);
+	wiiremote_vibration(x->wiiremote, enable);
 }
 
 void akawiiremote_led(t_akawiiremote *x, long enable1, long enable2, long enable3, long enable4)
 {
-	wiiremote_led(enable1, enable2, enable3, enable4);
+	wiiremote_led(x->wiiremote, enable1, enable2, enable3, enable4);
 }
 
 //--------------------------------------------------------------------------------------------
@@ -251,16 +246,16 @@ void akawiiremote_getledstatus(t_akawiiremote *x)
 
 void akawiiremote_clock(t_akawiiremote *x)
 {
-	Boolean	result;
+	//Boolean	result;
 	t_atom	status;
 	
-	if (wiiremote_isconnected())	// if the device is connected...
+	if (wiiremote_isconnected(x->wiiremote))	// if the device is connected...
 	{
 		clock_unset(x->clock);			// stop clock
 
-		wiiremote_stopsearch();
+		wiiremote_stopsearch(x->wiiremote);
 		//result = wiiremote_connect();	// remove in B3
-		wiiremote_getstatus();			// add in B3
+		wiiremote_getstatus(x->wiiremote);		// add in B3
 		SETLONG(&status, 1);
 		outlet_anything(x->statusOut, gensym("connect"), 1, &status);
 	}
@@ -274,7 +269,7 @@ void akawiiremote_clock(t_akawiiremote *x)
 		{
 			clock_unset(x->clock);		// stop clock
 
-			wiiremote_stopsearch();
+			wiiremote_stopsearch(x->wiiremote);
 			SETLONG(&status, 0);
 			outlet_anything(x->statusOut, gensym("connect"), 1, &status);
 		}
@@ -315,7 +310,8 @@ void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
 #ifdef PD
 	t_akawiiremote *x = (t_akawiiremote *)pd_new(wiiremote_class);
 
-	x->wiiremote = wiiremote_init();
+	if (x->wiiremote != nil)
+		wiiremote_init(x->wiiremote);
 	
 	x->clock = clock_new(x, (t_method)akawiiremote_clock);
 
@@ -329,7 +325,9 @@ void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
 	
 	x = (t_akawiiremote *)newobject(akawiiremote_class);
 	
-	x->wiiremote = wiiremote_init();
+	x->wiiremote = (WiiRemoteRef)getbytes(sizeof(WiiRemoteRec));		// add in 1.0B4
+	if (x->wiiremote != nil)
+		wiiremote_init(x->wiiremote);
 	
 	x->clock = clock_new(x, (method)akawiiremote_clock);
 	
@@ -341,15 +339,16 @@ void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
 	x->trial = 0;
 	x->interval	= kInterval;
 
-	akawiiremote_count++;
 	return x;
 }
 
 void akawiiremote_free(t_akawiiremote *x)
 {
-	akawiiremote_count--;
-	if (akawiiremote_count == 0)
-		wiiremote_disconnect();
+	if (x->wiiremote != nil)							// add in 1.0B4
+	{
+		wiiremote_disconnect(x->wiiremote);
+		freebytes(x->wiiremote, sizeof(WiiRemoteRec));	// add in 1.0B4
+	}
 	
 	clock_unset(x->clock);
 #ifdef PD
