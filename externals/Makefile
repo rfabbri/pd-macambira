@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1235,7 +1235,8 @@ iem16_clean:
 # IEMLIB
 IEMLIB_NAME=iemlib
 # omit the lib files and iem_mp3 (for patent reasons :( )
-IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/iem?[^m]*/src/[a-hj-z]*.c)
+IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/iem?[^m]*/src/[a-hj-z]*.c) \
+$(wildcard $(externals_src)/iemlib/iemlib?/src/iem_*.c)
 iemlib: $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
 
 iemlib_install: iemlib
@@ -1556,6 +1557,55 @@ mrpeach_clean:
 	-rm -f -- $(MRPEACH_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/mrpeach/*.bak
 	-rm -f -- $(externals_src)/mrpeach/*.*~
+
+
+
+
+#------------------------------------------------------------------------------#
+# MSD
+MSD_NAME=msd
+MSD_OBJECTS := $(wildcard $(externals_src)/nusmuk/msd*/*.cpp)
+#msd: $(MSD_OBJECTS:.c=.$(EXTENSION))
+msd:
+
+msd_install: msd
+	install -d $(objectsdir)/$(MSD_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MSD_NAME) \
+		--author "Nicolas Montgermont, Cyrille Henry, and Frank Barknecht" \
+		--description "Mass Spring Damper modeling for Pd" \
+		--license "GNU LGPL" \
+		--version "0.07"
+#	install -p $(MSD_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MSD_NAME)
+	install -d $(helpdir)/$(MSD_NAME)
+	install -p $(externals_src)/nusmuk/msd*/*-help.pd \
+		$(helpdir)/$(MSD_NAME)
+#	install -d $(manualsdir)/$(MSD_NAME)
+#	install -p $(externals_src)/msd/manual.txt \
+#		$(manualsdir)/$(MSD_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/nusmuk/README.txt \
+		$(readmesdir)/$(MSD_NAME).txt
+	install -d $(examplesdir)/$(MSD_NAME)
+	install -d $(examplesdir)/$(MSD_NAME)/msd
+	install -p $(externals_src)/nusmuk/msd/*.pd \
+		$(examplesdir)/$(MSD_NAME)/msd
+	install -d $(examplesdir)/$(MSD_NAME)/msd2D
+	install -p $(externals_src)/nusmuk/msd2D/*.pd \
+		$(examplesdir)/$(MSD_NAME)/msd2D
+	install -d $(examplesdir)/$(MSD_NAME)/msd3D
+	install -p $(externals_src)/nusmuk/msd3D/*.pd \
+		$(examplesdir)/$(MSD_NAME)/msd3D
+	install -d $(examplesdir)/$(MSD_NAME)/editor
+	install -p $(externals_src)/nusmuk/editor/*.* \
+		$(examplesdir)/$(MSD_NAME)/editor
+	install -p $(externals_src)/nusmuk/editor/README \
+		$(examplesdir)/$(MSD_NAME)/editor/README.txt
+
+msd_clean:
+	-rm -f -- $(MSD_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(MSD_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/msd/*.bak
+	-rm -f -- $(externals_src)/msd/*.*~
 
 
 
@@ -2120,7 +2170,7 @@ wiiremote_install: wiiremote
 #		$(examplesdir)/$(WIIREMOTE_NAME)
 
 wiiremote_clean:
-	-rm -f -- $(WIIREMOTE_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION)
 	-rm -f -- $(WIIREMOTE_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/io/wiiremote/*.bak
 	-rm -f -- $(externals_src)/io/wiiremote/*.*~
