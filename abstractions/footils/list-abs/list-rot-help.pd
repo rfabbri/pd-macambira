@@ -6,7 +6,7 @@
 #X text 124 33 list-rot;
 #X text 64 61 Rotate a list (move ROT# elements from front to back)
 ;
-#X text 63 81 ROT# has to be positive \, negative ROT# will not rotate!
+#X text 63 81 Negative ROT# will rotate elements from back to front.
 ;
 #X connect 0 0 3 0;
 #X connect 1 0 3 1;
