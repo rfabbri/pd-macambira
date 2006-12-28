@@ -14,4 +14,11 @@ This stuff is currently here as a proof of concept for turning Pd core into a
 micro-language.  If you want to start modifying these, then we should discuss
 how these should be maintained along with Miller's changes.
 
+test version
+------------
+
+Once 0.40.x is done, then I plan on making the full test of this concept in
+the branch-v0-40-x-extended, splitting out each class into its own file in
+"extra", and compiling each as its own lib.
+
 <hans@at.or.at>
