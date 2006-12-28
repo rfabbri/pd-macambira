@@ -47,10 +47,11 @@ typedef struct _WiiRemoteRec
 	Boolean			isLED3Illuminated;
 	Boolean			isLED4Illuminated;
 	
-	IOBluetoothUserNotificationCallback	*disconnectNotification;
+	IOBluetoothUserNotificationRef	disconnectNotification;
 }	WiiRemoteRec, *WiiRemoteRef;
 
 WiiRemoteRef	wiiremote_init(void);
+Boolean			wiiremote_isconnected(void);
 Boolean			wiiremote_search(void);
 Boolean			wiiremote_stopsearch(void);
 Boolean			wiiremote_connect(void);

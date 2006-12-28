@@ -1,7 +1,8 @@
 // aka.wiiremote.c
 // Copyright by Masayuki Akamatsu
-// port to Pd by Hans-Christoph Steiner <hans@at.or.at>
-
+// 1.0B1 : 2006.12.12
+// 1.0B2 : 2006.12.15
+// 1.0B3 : 2006.12.20
 
 #ifdef PD
 #include "m_pd.h"
@@ -9,12 +10,14 @@
 static t_class *wiiremote_class;
 #else /* Max */
 #include "ext.h"
-#endif
+#endif /* PD */
+
 #include "wiiremote.h"
+
+#include <stdio.h>
 
 #define kInterval	100
 #define	kMaxTrial	100
-
 
 typedef struct _akawiiremote
 {
@@ -29,7 +32,7 @@ typedef struct _akawiiremote
 	void			*clock;
 	long			interval;
 	long			trial;
-
+	
 	void			*statusOut;
 	void			*buttonsOut;
 	void			*irOut;
@@ -59,7 +62,32 @@ void akawiiremote_free(t_akawiiremote *x);
 
 #ifdef PD
 void wiiremote_setup()
+#else /* Max */
+void main()
+#endif /* PD */
 {
+	NumVersion				outSoftwareVersion;
+	BluetoothHCIVersionInfo	outHardwareVersion;
+	
+	if (IOBluetoothGetVersion(&outSoftwareVersion, &outHardwareVersion)==kIOReturnSuccess)
+	{
+		if (outSoftwareVersion.majorRev < 1 || outSoftwareVersion.minorAndBugRev < 0x63)
+		{
+			error("requires Blutooth version 1.6.3 or later.");
+			return;
+		}
+	}
+	else
+	{
+		error("can't get Bluetooth version.");
+		return;
+	}
+
+	post("aka.wiiremote 1.0B3-UB by Masayuki Akamatsu");
+
+#ifdef PD
+	post("\tPd port by Hans-Christoph Steiner");
+
 	wiiremote_class = class_new(gensym("wiiremote"), 
 								 (t_newmethod)akawiiremote_new, 
 								 (t_method)akawiiremote_free,
@@ -80,15 +108,7 @@ void wiiremote_setup()
 	class_addmethod(wiiremote_class,(t_method)akawiiremote_getledstatus,gensym("getledstatus"),0);
 	
 	class_addmethod(wiiremote_class,(t_method)akawiiremote_assist,gensym("assist"),A_CANT,0);
-	
-	post("aka.wiiremote 1.0B2-UB by Masayuki Akamatsu");
-	post("\tPd port by Hans-Christoph Steiner");
-	
-	akawiiremote_count = 0;
-}
 #else /* Max */
-void main()
-{
 	setup((t_messlist **)&akawiiremote_class, (method)akawiiremote_new, (method)akawiiremote_free, (short)sizeof(t_akawiiremote), 0L, A_GIMME, 0);
 
 	addbang((method)akawiiremote_bang);
@@ -104,46 +124,25 @@ void main()
 	addmess((method)akawiiremote_getledstatus,"getledstatus",0);
 	
 	addmess((method)akawiiremote_assist,"assist",A_CANT,0);
-	
-	post("aka.wiiremote 1.0B2-UB by Masayuki Akamatsu");
+#endif /* PD */
 	
 	akawiiremote_count = 0;
 }
-#endif /* PD */
+
 //--------------------------------------------------------------------------------------------
 
 void akawiiremote_bang(t_akawiiremote *x)
 {
 	t_atom list[4]; 
-
-	if (x->wiiremote->device == nil) 
-	{
-		post("warning: your WiiRemote is not connected");
+	
+	if (x->wiiremote->device == nil)
 		return;	// do nothing
-	}
-
+	
 #ifdef PD
 	outlet_float(x->buttonsOut, (t_float) x->wiiremote->buttonData);
-
-	if (x->wiiremote->isIRSensorEnabled)
-	{
-		SETFLOAT(list,     x->wiiremote->posX);
-		SETFLOAT(list + 1, x->wiiremote->posY);
-		SETFLOAT(list + 2, x->wiiremote->angle);
-		SETFLOAT (list + 3, x->wiiremote->tracking);
-		outlet_list(x->irOut, &s_list, 4, list); 
-	}
-
-	if (x->wiiremote->isMotionSensorEnabled)
-	{
-		SETFLOAT(list,     x->wiiremote->accX);
-		SETFLOAT(list + 1, x->wiiremote->accY);
-		SETFLOAT(list + 2, x->wiiremote->accZ);
-		SETFLOAT(list + 3, x->wiiremote->orientation);
-		outlet_list(x->accOut, &s_list, 4, list); 
-	}
 #else /* Max */	
 	outlet_int(x->buttonsOut, x->wiiremote->buttonData);
+#endif /* PD */
 
 	if (x->wiiremote->isIRSensorEnabled)
 	{
@@ -151,7 +150,7 @@ void akawiiremote_bang(t_akawiiremote *x)
 		SETFLOAT(list + 1, x->wiiremote->posY);
 		SETFLOAT(list + 2, x->wiiremote->angle);
 		SETLONG (list + 3, x->wiiremote->tracking);
-		outlet_list(x->irOut, 0L, 4, &list); 
+		outlet_list(x->irOut, 0L, 4, list); 
 	}
 
 	if (x->wiiremote->isMotionSensorEnabled)
@@ -160,33 +159,33 @@ void akawiiremote_bang(t_akawiiremote *x)
 		SETLONG(list + 1, x->wiiremote->accY);
 		SETLONG(list + 2, x->wiiremote->accZ);
 		SETLONG(list + 3, x->wiiremote->orientation);
-		outlet_list(x->accOut, 0L, 4, &list); 
+		outlet_list(x->accOut, 0L, 4, list); 
 	}
-#endif /* PD */
 	
-	wiiremote_getstatus();
+	//wiiremote_getstatus();	// stopped in B3
 }
 
 void akawiiremote_connect(t_akawiiremote *x)
 {
-	if (x->wiiremote->device == nil)	// if not connected
-	{
-		if (x->wiiremote->inquiry == nil)	// if not seatching
-		{
-			Boolean	result;
+	t_atom	status;
+	Boolean	result;
 
-			result = wiiremote_search();	// start searching the device
-			x->trial = 0;
-			clock_delay(x->clock, 0); // start clock to check the device found
-		}
-	}
-	else	// if already connected
+	if (wiiremote_isconnected())
 	{
-		t_atom	status;
-
-		SETLONG(&status, 1);
-		outlet_anything(x->statusOut, gensym("connect"), 1, &status);
+		SETLONG(&status, -1);
+		outlet_anything(x->statusOut, gensym("connect"), 1, &status);		
 	}
+	else
+	{
+		result = wiiremote_search();	// start searching the device
+		x->trial = 0;
+		clock_unset(x->clock);			// stop clock
+		clock_delay(x->clock, 0);		// start clock to check the device found
+	}
+}
+
+void akawiiremote_foundFunc(t_akawiiremote *x)
+{
 }
 
 void akawiiremote_disconnect(t_akawiiremote *x)
@@ -241,19 +240,11 @@ void akawiiremote_getledstatus(t_akawiiremote *x)
 {
 	t_atom list[4]; 
 	
-#ifdef PD
-	SETFLOAT(list,     x->wiiremote->isLED1Illuminated);
-	SETFLOAT(list + 1, x->wiiremote->isLED2Illuminated);
-	SETFLOAT(list + 2, x->wiiremote->isLED3Illuminated);
-	SETFLOAT(list + 3, x->wiiremote->isLED4Illuminated);
-	outlet_anything(x->statusOut, gensym("ledstatus"), 4, list);
-#else /* Max */
 	SETLONG(list,     x->wiiremote->isLED1Illuminated);
 	SETLONG(list + 1, x->wiiremote->isLED2Illuminated);
 	SETLONG(list + 2, x->wiiremote->isLED3Illuminated);
 	SETLONG(list + 3, x->wiiremote->isLED4Illuminated);
-	outlet_anything(x->statusOut, gensym("ledstatus"), 4, &list);
-#endif
+	outlet_anything(x->statusOut, gensym("ledstatus"), 4, list);		
 }
 
 //--------------------------------------------------------------------------------------------
@@ -263,16 +254,17 @@ void akawiiremote_clock(t_akawiiremote *x)
 	Boolean	result;
 	t_atom	status;
 	
-	if (x->wiiremote->device != nil)	// if the device is found...
+	if (wiiremote_isconnected())	// if the device is connected...
 	{
 		clock_unset(x->clock);			// stop clock
 
 		wiiremote_stopsearch();
-		result = wiiremote_connect();	// connect to it
-		SETLONG(&status, result);
+		//result = wiiremote_connect();	// remove in B3
+		wiiremote_getstatus();			// add in B3
+		SETLONG(&status, 1);
 		outlet_anything(x->statusOut, gensym("connect"), 1, &status);
 	}
-	else	// if the device is not found...
+	else	// if the device is not connected...
 	{
 		x->trial++;
 		//SETLONG(&status, x->trial);
@@ -334,13 +326,13 @@ void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
 	x->accOut = outlet_new(&x->x_obj, &s_list);
 #else /* Max */	
 	t_akawiiremote *x;
-
+	
 	x = (t_akawiiremote *)newobject(akawiiremote_class);
 	
 	x->wiiremote = wiiremote_init();
 	
 	x->clock = clock_new(x, (method)akawiiremote_clock);
-
+	
 	x->statusOut = outlet_new(x, 0);
 	x->buttonsOut = intout(x);
 	x->irOut = listout(x);
@@ -348,7 +340,6 @@ void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
 #endif /* PD */
 	x->trial = 0;
 	x->interval	= kInterval;
-	
 
 	akawiiremote_count++;
 	return x;
@@ -359,13 +350,12 @@ void akawiiremote_free(t_akawiiremote *x)
 	akawiiremote_count--;
 	if (akawiiremote_count == 0)
 		wiiremote_disconnect();
-
+	
+	clock_unset(x->clock);
 #ifdef PD
-	if (x->clock)
-		clock_unset(x->clock);
 	clock_free(x->clock);
 #else /* Max */	
-	freeobject(x->clock); 
-#endif
+	freeobject((t_object *)x->clock); 
+#endif /* PD */
 }
 

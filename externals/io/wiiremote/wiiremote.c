@@ -3,7 +3,6 @@
 // Based on "DarwiinRemote" by Hiroaki Kimura
 
 #include "wiiremote.h"
-
 #include <unistd.h>
 
 // this type is used a lot (data array):
@@ -53,37 +52,47 @@ void checkDevice(IOBluetoothDeviceRef device)
 	CFStringRef	myString;
 
 	myString = IOBluetoothDeviceGetName(device);
-	if (CFStringCompare(myString, CFSTR("Nintendo RVL-CNT-01"), 0) == kCFCompareEqualTo)
+	if (myString != nil)
 	{
-		gWiiRemote.device = IOBluetoothObjectRetain(device);
+		if (CFStringCompare(myString, CFSTR("Nintendo RVL-CNT-01"), 0) == kCFCompareEqualTo)
+		{
+			gWiiRemote.device = IOBluetoothObjectRetain(device);
+			if ( !wiiremote_connect())	// add in B3
+				wiiremote_disconnect(); // add in B3
+		}
 	}
 }
 
-IOBluetoothDeviceInquiryDeviceFoundCallback myFoundFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOBluetoothDeviceRef device)
+void myFoundFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOBluetoothDeviceRef device)
 {
 	checkDevice(device);
 }
 
-IOBluetoothDeviceInquiryDeviceNameUpdatedCallback	myUpdatedFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOBluetoothDeviceRef device, uint32_t devicesRemaining)
+void myUpdatedFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOBluetoothDeviceRef device, uint32_t devicesRemaining)
 {
 	checkDevice(device);
 }
 
-IOBluetoothDeviceInquiryCompleteCallback myCompleteFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOReturn error, Boolean aborted)
+void myCompleteFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOReturn error, Boolean aborted)
 {
-	IOReturn				result;
-	
 	if (aborted) return; // called by stop ;)
 	
 	if (error != kIOReturnSuccess)
 	{
 		wiiremote_stopsearch();
-		return;
 	}
 }
 
 //--------------------------------------------------------------------------------------------
 
+Boolean wiiremote_isconnected(void)
+{
+	Boolean	result;
+	
+	result = gWiiRemote.device != nil && IOBluetoothDeviceIsConnected(gWiiRemote.device);
+	return result;
+}
+	
 Boolean wiiremote_search(void)
 {
 	IOReturn	ret;
@@ -131,7 +140,7 @@ Boolean wiiremote_stopsearch(void)
 //--------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------
 
- IOBluetoothL2CAPChannelIncomingDataListener myDataListener(IOBluetoothL2CAPChannelRef channel, void *data, UInt16 length, void *refCon)
+ void myDataListener(IOBluetoothL2CAPChannelRef channel, void *data, UInt16 length, void *refCon)
 {
 	unsigned char *dp = (unsigned char*)data;
 
@@ -248,35 +257,33 @@ Boolean wiiremote_stopsearch(void)
 	gWiiRemote.posY = oy;
 }
 
-IOBluetoothL2CAPChannelIncomingEventListener myEventListener(IOBluetoothL2CAPChannelRef channel, void *refCon, IOBluetoothL2CAPChannelEvent *event)
+void myEventListener(IOBluetoothL2CAPChannelRef channel, void *refCon, IOBluetoothL2CAPChannelEvent *event)
 {
-	switch (event->eventType)
+	if (event->eventType == kIOBluetoothL2CAPChannelEventTypeData)
 	{
-		case kIOBluetoothL2CAPChannelEventTypeData:
-			// In thise case:
-			// event->u.newData.dataPtr  is a pointer to the block of data received.
-			// event->u.newData.dataSize is the size of the block of data.
-			myDataListener(channel, event->u.data.dataPtr, event->u.data.dataSize, refCon);
-			break;
-			
-		case kIOBluetoothL2CAPChannelEventTypeClosed:
-			// In this case:
-			// event->u.terminatedChannel is the channel that was terminated. It can be converted in an IOBluetoothL2CAPChannel
-			// object with [IOBluetoothL2CAPChannel withL2CAPChannelRef:]. (see below).
-			break;
+		// In thise case:
+		// event->u.newData.dataPtr  is a pointer to the block of data received.
+		// event->u.newData.dataSize is the size of the block of data.
+		myDataListener(channel, event->u.data.dataPtr, event->u.data.dataSize, refCon);
+	}
+	else
+	if (event->eventType == kIOBluetoothL2CAPChannelEventTypeClosed)
+	{
+		// In this case:
+		// event->u.terminatedChannel is the channel that was terminated. It can be converted in an IOBluetoothL2CAPChannel
+		// object with [IOBluetoothL2CAPChannel withL2CAPChannelRef:]. (see below).
 	}
 }
 
-IOBluetoothUserNotificationCallback myDisconnectedFunc(void * refCon, IOBluetoothUserNotificationRef inRef, IOBluetoothObjectRef objectRef)
+void myDisconnectedFunc(void * refCon, IOBluetoothUserNotificationRef inRef, IOBluetoothObjectRef objectRef)
 {
-	wiiremote_disconnect();
+	//wiiremote_disconnect();
 }
 
 //--------------------------------------------------------------------------------------------
 
 Boolean wiiremote_connect(void)
 {
-	IOReturn	result;
 	short		i;
 	
 	if (gWiiRemote.device == nil)
@@ -289,7 +296,8 @@ Boolean wiiremote_connect(void)
 			break;
 		usleep(10000); //  wait 10ms
 	}
-	if (i==kTrial)	return false;
+	if (i==kTrial)
+		return false;
 	
 	gWiiRemote.disconnectNotification = IOBluetoothDeviceRegisterForDisconnectNotification(gWiiRemote.device, myDisconnectedFunc, 0);
 	
@@ -300,7 +308,8 @@ Boolean wiiremote_connect(void)
 			break;
 		usleep(10000); //  wait 10ms
 	}
-	if (i==kTrial)	return false;
+	if (i==kTrial)
+		return false;
 	
 	// open L2CAPChannel : BluetoothL2CAPPSM = 17
 	for (i=0; i<kTrial; i++)
@@ -313,6 +322,7 @@ Boolean wiiremote_connect(void)
 	{
 		gWiiRemote.cchan = nil;
 		IOBluetoothDeviceCloseConnection(gWiiRemote.device);
+		gWiiRemote.device = nil;
 		return false;
 	}
 	
@@ -328,6 +338,7 @@ Boolean wiiremote_connect(void)
 		gWiiRemote.ichan = nil;
 		IOBluetoothL2CAPChannelCloseChannel(gWiiRemote.cchan);
 		IOBluetoothDeviceCloseConnection(gWiiRemote.device);
+		gWiiRemote.device = nil;
 		return false;
 	}
 
@@ -382,13 +393,18 @@ Boolean wiiremote_disconnect(void)
 		{
 			if (IOBluetoothDeviceCloseConnection(gWiiRemote.device) == kIOReturnSuccess)
 			{
-				gWiiRemote.device = nil;
 				break;
 			}
 		}
 		if (i==kTrial)	return false;
 	}
-		
+	
+	if (gWiiRemote.device != nil)
+	{
+		IOBluetoothObjectRelease(gWiiRemote.device);
+		gWiiRemote.device = nil;
+	}
+	
 	return true;
 }
 
