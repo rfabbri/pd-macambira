@@ -14,15 +14,9 @@ cvs_root_dir=`echo $0 | sed 's|\(.*\)/.*$|\1|'`/..
 
 cd $cvs_root_dir
 
-# don't update the "pd" tree yet, since Pd-extended is still built against a
-# static tag, and not HEAD
-for section in abstractions doc extensions externals packages scripts Gem GemLibs; do
+for section in abstractions doc extensions externals packages pd scripts Gem GemLibs; do
 	 echo "$section"
 	 cd $section
     cvs up -Pd
 	 cd ..
 done
-
-# use specific portaudio version, since that's always a mess
-#cd ${cvs_root_dir}/pd
-#cvs up -APd port*
