@@ -92,6 +92,7 @@ typedef struct comport
 #define TXBUFOVERRUN -5
 
 #define COMPORT_MAX 99
+#define USE_DEVICENAME 9999 /* use the device name instead of the number */
 
 #ifdef _WIN32
 /* we don't use the  table for windos cos we can set the number directly. */
@@ -762,8 +763,8 @@ static int open_serial(unsigned int com_num, t_comport *x)
     float          *baud = &(x->baud);
     glob_t         glob_buffer;
 
-    /* if com_num == 9999, use device name directly, else try port # */
-    if(com_num != 9999)
+    /* if com_num == USE_DEVICENAME, use device name directly, else try port # */
+    if(com_num != USE_DEVICENAME)
     {
         if(com_num >= COMPORT_MAX)
         {
@@ -1269,7 +1270,7 @@ static void comport_open(t_comport *x, t_floatarg f)
 static void comport_devicename(t_comport *x, t_symbol *s)
 {
     x->serial_device = s;
-    x->comhandle = open_serial(9999,x);
+    x->comhandle = open_serial(USE_DEVICENAME,x);
     clock_delay(x->x_clock, x->x_deltime);
 }
 
