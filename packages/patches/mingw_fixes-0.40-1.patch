@@ -194,3 +194,37 @@ diff -u -w -r1.14 s_inter.c
  #include <stdarg.h>
  #include <signal.h>
  #include <fcntl.h>
+Index: s_entry.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_entry.c,v
+retrieving revision 1.3
+diff -u -w -r1.3 s_entry.c
+--- s_entry.c	11 Nov 2004 04:58:21 -0000	1.3
++++ s_entry.c	29 Dec 2006 03:13:08 -0000
+@@ -3,7 +3,11 @@
+ 
+ int sys_main(int argc, char **argv);
+ 
+-#ifdef MSW
++/* 
++ * gcc does not support the __try stuff, only MSVC.  Also, MinGW allows you to
++ * use main() instead of WinMain(). <hans@at.or.at>
++ */
++#ifdef _MSC_VER
+ #include <windows.h>
+ #include <stdio.h>
+ 
+@@ -21,11 +25,11 @@
+     }
+ }
+ 
+-#else /* not MSW */
++#else /* not _MSC_VER */
+ int main(int argc, char **argv)
+ {
+     return (sys_main(argc, argv));
+ }
+-#endif
++#endif /* _MSC_VER */
+ 
+ 
