@@ -29,7 +29,7 @@ TARGET_PLATFORM := $(shell uname -p)
 #OPT_CFLAGS = -Os -funroll-loops -fomit-frame-pointer
 
 # auto-vectorization in GCC 4.x for CPUs with SIMD
-OPT_CFLAGS += -ftree-vectorize -ftree-vectorizer-verbose=3
+OPT_CFLAGS += -ftree-vectorize -ftree-vectorizer-verbose=2
 
 ifeq ($(TARGET_PLATFORM),i386)
 OPT_CFLAGS += -march=pentium4 -msse -msse2 -mfpmath=sse
@@ -186,15 +186,14 @@ readme_install:
 
 #------------------------------------------------------------------------------#
 darwin_app_core: darwin_app_wrapper
-	$(MAKE) -C $(packages_src) $(DEST_PATHS) PD_CONFIGURE_FLAGS=--enable-jack \
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) \
+		PD_CONFIGURE_FLAGS="--enable-jack --disable-fat" \
 		pd_install 
 	cd "$(PD_APP_CONTENTS)/Resources/Scripts" && \
 		ln -s ../bin/pd.tk AppMain.tcl
 # support for Info Panel Plugins mgmt
 	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
-# run script to move help-*.pd files to *-help.pd according to the standard
-	cd $(pddocdir) && \
-		$(scripts_src)/convert-help-to-standard.sh
+
 
 #------------------------------------------------------------------------------#
 darwin_app_devel_core: darwin_app_devel_wrapper

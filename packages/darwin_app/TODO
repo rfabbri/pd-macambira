@@ -1,15 +1,13 @@
 
-- try building against ActiveTcl 8.4.13 and 8.5
+
+- check code to make it all use single-precision/libmx functions on Mac OSX.
+
 
 - create background image for .dmg
 
-- create /Applications link in .dmg
 
 - fix app permissions so that you can drop a new app on top of an old one to
   upgrade
-
-
-- check code to make it all use single-precision/libmx functions on Mac OSX.
 
 
 - make sure that org.puredata.pd.plist is rw in the .dmg (possible?)
