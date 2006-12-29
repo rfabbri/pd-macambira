@@ -747,8 +747,5 @@ void ann_mlp_setup(void) {
 	// the most important one: running the ann
 	class_addlist(ann_mlp_class, (t_method)ann_mlp_manage_list);
 
-	// help patch
-	class_sethelpsymbol(ann_mlp_class, gensym("help-ann_mlp"));
-
 
 }

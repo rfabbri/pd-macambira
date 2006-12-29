@@ -758,7 +758,6 @@ static void som_setup(void)
 
   class_addmethod(som_class, (t_method)som_print, gensym("print"), 0);
   class_addmethod(som_class, (t_method)som_help, gensym("help"), 0);
-  class_sethelpsymbol(som_class, gensym("som"));
 
 }
 

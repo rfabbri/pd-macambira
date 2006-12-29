@@ -658,8 +658,5 @@ void ann_td_setup(void) {
 	// the most important one: running the ann
 	class_addlist(ann_td_class, (t_method)ann_td_manage_list);
 
-	// help patch
-	class_sethelpsymbol(ann_td_class, gensym("help-ann_td"));
-
 
 }
