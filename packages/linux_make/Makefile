@@ -61,7 +61,7 @@ install:
 
 package: tarbz2
 
-PACKAGE_NAME = Pd-$(PD_VERSION)-$(OS_NAME)-$(shell uname -m)
+PACKAGE_NAME = Pd-$(PD_VERSION)
 tarbz2: installer_makefile installer_readme
 	install -p .pdsettings $(DESTDIR)$(prefix)
 	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
