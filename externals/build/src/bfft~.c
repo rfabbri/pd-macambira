@@ -3,7 +3,7 @@
  * <hans@at.or.at>
  */
 #ifdef WIN32
-#include "../../../pd/src/d_mayer_fft.c"
+#include "../../../pd/src/d_fft_mayer.c"
 #endif
 
 #include "../../creb/modules/bfft~.c"
