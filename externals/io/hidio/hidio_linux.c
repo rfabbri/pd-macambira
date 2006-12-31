@@ -434,7 +434,7 @@ void hidio_print(t_hidio* x)
     hidio_print_element_list(x);
 }
 
-
+// TODO: return the same as POSIX open()/close() - 0=success, -1=fail
 t_int hidio_open_device(t_hidio *x, short device_number)
 {
     debug_print(LOG_DEBUG,"hidio_open_device");
@@ -477,9 +477,8 @@ t_int hidio_open_device(t_hidio *x, short device_number)
     return (0);
 }
 
-/*
- * Under GNU/Linux, the device is a filehandle
- */
+/* Under GNU/Linux, the device is a filehandle */
+// TODO: return the same as POSIX open()/close() - 0=success, -1=fail
 t_int hidio_close_device(t_hidio *x)
 {
     debug_print(LOG_DEBUG,"hidio_close_device");

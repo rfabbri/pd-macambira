@@ -87,7 +87,6 @@ t_symbol *relative_symbols[RELATIVE_ARRAY_MAX];
 //static void hidio_poll(t_hidio *x, t_float f);
 static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv);
 //static t_int hidio_close(t_hidio *x);
-//static t_int hidio_child_read(t_hidio *x);
 //static void hidio_float(t_hidio* x, t_floatarg f);
 
 
@@ -297,40 +296,40 @@ void hidio_output_event(t_hidio *x, t_hid_element *output_data)
 		SETSYMBOL(event_data, output_data->name);
 		SETFLOAT(event_data + 1, output_data->instance);
 		SETFLOAT(event_data + 2, output_data->value);
-#else
+#else /* Max */
 		atom_setsym(event_data, output_data->name);
 		atom_setsym(event_data, output_data->name);
 		atom_setlong(event_data + 1, (long)output_data->instance);
 		atom_setlong(event_data + 2, (long)output_data->value);
-#endif
+#endif /* PD */
 		outlet_anything(x->x_data_outlet, output_data->type, 3, event_data);
 	} 
 }
 
 
 /* stop polling the device */
-static void stop_poll(t_hidio* x) 
+static void hidio_stop_poll(t_hidio* x) 
 {
-  debug_print(LOG_DEBUG,"stop_poll");
+  debug_print(LOG_DEBUG,"hidio_stop_poll");
   
-  pthread_mutex_lock(&x->x_mutex);
   if (x->x_started) 
   { 
 	  clock_unset(x->x_clock);
 	  debug_print(LOG_INFO,"[hidio] polling stopped");
 	  x->x_started = 0;
   }
-  pthread_mutex_unlock(&x->x_mutex);
 }
 
 /*------------------------------------------------------------------------------
  * METHODS FOR [hidio]'s MESSAGES                    
  */
 
-
+/* TODO: poll time should be set based on how fast the OS is actually polling
+ * the device, whether that is IOUSBEndpointDescriptor.bInterval, or something
+ * else.
+ */
 void hidio_poll(t_hidio* x, t_float f) 
 {
-	pthread_mutex_lock(&x->x_mutex);
 	debug_print(LOG_DEBUG,"hidio_poll");
   
 /*	if the user sets the delay less than 2, set to block size */
@@ -342,9 +341,7 @@ void hidio_poll(t_hidio* x, t_float f)
 	{
 		if(!x->x_device_open)
 		{
-			pthread_mutex_unlock(&x->x_mutex);
 			hidio_open(x,ps_open,0,NULL);
-			pthread_mutex_lock(&x->x_mutex);
 		}
 		if(!x->x_started) 
 		{
@@ -353,37 +350,28 @@ void hidio_poll(t_hidio* x, t_float f)
 			x->x_started = 1;
 		} 
 	}
-	pthread_mutex_unlock(&x->x_mutex);
 }
 
 static void hidio_set_from_float(t_hidio *x, t_floatarg f)
 {
-	pthread_mutex_lock(&x->x_mutex);
 /* values greater than 1 set the polling delay time */
 /* 1 and 0 for start/stop so you can use a [tgl] */
 	if(f > 1)
 	{
 		x->x_delay = (t_int)f;
-		pthread_mutex_unlock(&x->x_mutex);
 		hidio_poll(x,f);
-		pthread_mutex_lock(&x->x_mutex);
 	}
 	else if(f == 1) 
 	{
 		if(! x->x_started)
 		{
-			pthread_mutex_unlock(&x->x_mutex);
 			hidio_poll(x,f);
-			pthread_mutex_lock(&x->x_mutex);
 		}
 	}
 	else if(f == 0) 		
 	{
-		pthread_mutex_unlock(&x->x_mutex);
-		stop_poll(x);
-		pthread_mutex_lock(&x->x_mutex);
+		hidio_stop_poll(x);
 	}
-	pthread_mutex_unlock(&x->x_mutex);
 }
 
 /* close the device */
@@ -391,10 +379,16 @@ t_int hidio_close(t_hidio *x)
 {
 	debug_print(LOG_DEBUG,"hidio_close");
 
-	pthread_mutex_lock(&x->x_mutex);
-	x->x_requestcode = REQUEST_CLOSE;
-	pthread_cond_signal(&x->x_requestcondition);
-	pthread_mutex_unlock(&x->x_mutex);
+ /* just to be safe, stop it first */
+ 	hidio_stop_poll(x);
+ 
+ 	if(! hidio_close_device(x))
+ 	{
+ 		debug_print(LOG_INFO,"[hidio] closed device %d",x->x_device_number);
+ 		x->x_device_open = 0;
+ 		return (0);
+ 	}
+ 
 	return (1);
 }
 
@@ -409,26 +403,48 @@ t_int hidio_close(t_hidio *x)
  */
 static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv) 
 {
-	short device_number;
 	debug_print(LOG_DEBUG,"hid_%s",s->s_name);
+	short new_device_number = get_device_number_from_arguments(argc, argv);
+	t_int started = x->x_started; // store state to restore after device is opened
 	
-	pthread_mutex_lock(&x->x_mutex);
-	device_number = get_device_number_from_arguments(argc, argv);
-	if (device_number > -1)
+	if (new_device_number > -1)
 	{
-		x->x_device_number = device_number;
-		x->x_requestcode = REQUEST_OPEN;
-		pthread_cond_signal(&x->x_requestcondition);
+		/* check whether we have to close previous device */
+		if (x->x_device_open && new_device_number != x->x_device_number)
+		{
+			hidio_close(x);
+		}
+		/* no device open, so open one now */
+		if (!x->x_device_open)
+		{
+			if(hidio_open_device(x, new_device_number))
+			{
+				x->x_device_number = -1;
+				error("[hidio] can not open device %d",new_device_number);
+			}
+			else
+			{
+				x->x_device_open = 1;
+				x->x_device_number = new_device_number;
+				/* restore the polling state so that when I [tgl] is used to
+				 * start/stop [hidio], the [tgl]'s state will continue to
+				 * accurately reflect [hidio]'s state  */
+				if (started)
+					hidio_set_from_float(x,x->x_delay); // TODO is this useful?
+				debug_print(LOG_DEBUG,"[hidio] set device# to %d",new_device_number);
+				output_device_number(x);
+			}
+		}
 	}
 	else debug_print(LOG_WARNING,"[hidio] device does not exist");
-	pthread_mutex_unlock(&x->x_mutex);
+	/* always output open result so you can test for success in Pd space */
+	output_open_status(x);
 }
 
 
-/* read from event queue, called from child thread, no mutex needed */
-t_int hidio_child_read(t_hidio *x) 
+static void hidio_tick(t_hidio *x)
 {
-//	debug_print(LOG_DEBUG,"hidio_child_read");
+//	debug_print(LOG_DEBUG,"hidio_tick");
 	t_hid_element *current_element;
 	unsigned int i;
 #ifdef PD
@@ -437,7 +453,9 @@ t_int hidio_child_read(t_hidio *x)
 	double right_now;
 	clock_getftime(&right_now);
 #endif /* PD */
-	
+
+	debug_print(LOG_DEBUG,"# %u\tnow: %u\tlast: %u", x->x_device_number,
+				right_now, last_execute_time[x->x_device_number]);
 	if(right_now > last_execute_time[x->x_device_number])
 	{
 		hidio_get_events(x);
@@ -455,41 +473,20 @@ t_int hidio_child_read(t_hidio *x)
 				current_element->previous_value = current_element->value;
 		}
 	}
-	
-	// TODO: why is this 1? 
-	return 1; 
-}
-
-static void *hidio_tick(t_hidio *x)
-{
-	pthread_mutex_lock(&x->x_mutex);
-	if (x->x_requestcode == REQUEST_NOTHING)
-	{
-		x->x_requestcode = REQUEST_READ;
-		pthread_cond_signal(&x->x_requestcondition);
-	}
 	if (x->x_started) 
 	{
 		clock_delay(x->x_clock, x->x_delay);
 	}
-	pthread_mutex_unlock(&x->x_mutex);
-	return NULL;
-}
-
-static void hidio_print(t_hidio *x)
-{
-	pthread_mutex_lock(&x->x_mutex);
-	x->x_requestcode = REQUEST_PRINT;
-	pthread_cond_signal(&x->x_requestcondition);
-	pthread_mutex_unlock(&x->x_mutex);
 }
 
 static void hidio_info(t_hidio *x)
 {
-	pthread_mutex_lock(&x->x_mutex);
-	x->x_requestcode = REQUEST_INFO;
-	pthread_cond_signal(&x->x_requestcondition);
-	pthread_mutex_unlock(&x->x_mutex);
+	output_open_status(x);
+	output_device_number(x);
+	output_device_count(x);
+	output_poll_time(x);
+	output_element_ranges(x);
+	hidio_platform_specific_info(x);
 }
 
 static void hidio_float(t_hidio* x, t_floatarg f) 
@@ -499,7 +496,7 @@ static void hidio_float(t_hidio* x, t_floatarg f)
 	hidio_set_from_float(x,f);
 }
 
-#ifndef PD
+#ifndef PD /* Max */
 static void hidio_int(t_hidio* x, long l) 
 {
 	debug_print(LOG_DEBUG,"hid_int");
@@ -510,185 +507,7 @@ static void hidio_int(t_hidio* x, long l)
 
 static void hidio_debug(t_hidio *x, t_float f)
 {
-	pthread_mutex_lock(&x->x_mutex);
 	global_debug_level = f;
-	pthread_mutex_unlock(&x->x_mutex);
-}
-
-
-/*------------------------------------------------------------------------------
- * child thread
- */
- 
-static void *hidio_child(void *zz)
-{
-    t_hidio *x = zz;
-	short device_number = -1;
-
-    pthread_mutex_lock(&x->x_mutex);
-    while (1)
-    {
-		if (x->x_requestcode == REQUEST_NOTHING)
-		{
-			pthread_cond_signal(&x->x_answercondition);
-			pthread_cond_wait(&x->x_requestcondition, &x->x_mutex);
-		}
-		else if (x->x_requestcode == REQUEST_OPEN)
-		{
-			short new_device_number = x->x_device_number;
-			/* store running state to be restored after the device has been opened */
-			t_int started = x->x_started;
-			int ret;
-			/* check whether we have to close previous device */
-			if (x->x_device_open && device_number != x->x_device_number)
-			{
-				pthread_mutex_unlock(&x->x_mutex);
-				stop_poll(x);
-				ret = hidio_close_device(x);
-				pthread_mutex_lock(&x->x_mutex);
-				x->x_device_open = 0;
-				device_number = -1;
-			}
-			/* no device open, so open one now */
-			if (!x->x_device_open)
-			{
-				pthread_mutex_unlock(&x->x_mutex);
-				ret = hidio_open_device(x, new_device_number);
-				pthread_mutex_lock(&x->x_mutex);
-				if (ret)
-				{
-					x->x_device_number = -1;
-					error("[hidio] can not open device %d",device_number);
-				}
-				else
-				{
-					x->x_device_open = 1;
-					device_number = x->x_device_number;	/* keep local copy */
-					pthread_mutex_unlock(&x->x_mutex);
-					/* restore the polling state so that when I [tgl] is used to start/stop [hidio],
-					 * the [tgl]'s state will continue to accurately reflect [hidio]'s state  */
-					if (started)
-						hidio_set_from_float(x,x->x_delay);
-					debug_print(LOG_DEBUG,"[hidio] set device# to %d",device_number);
-					output_open_status(x);
-					output_device_number(x);
-					pthread_mutex_lock(&x->x_mutex);
-				}
-			}
-			if (x->x_requestcode == REQUEST_OPEN)
-				x->x_requestcode = REQUEST_NOTHING;
-			pthread_cond_signal(&x->x_answercondition);
-		}
-		else if (x->x_requestcode == REQUEST_READ)
-		{
-			pthread_mutex_unlock(&x->x_mutex);
-			hidio_child_read(x);
-			pthread_mutex_lock(&x->x_mutex);
-			if (x->x_requestcode == REQUEST_READ)
-				x->x_requestcode = REQUEST_NOTHING;
-			pthread_cond_signal(&x->x_answercondition);
-		}
-		else if (x->x_requestcode == REQUEST_SEND)
-		{
-			if (x->x_requestcode == REQUEST_SEND)
-				x->x_requestcode = REQUEST_NOTHING;
-			pthread_cond_signal(&x->x_answercondition);
-		}
-		else if (x->x_requestcode == REQUEST_PRINT)
-		{
-			pthread_mutex_unlock(&x->x_mutex);
-			hidio_doprint(x);
-			pthread_mutex_lock(&x->x_mutex);
-			if (x->x_requestcode == REQUEST_PRINT)
-				x->x_requestcode = REQUEST_NOTHING;
-			pthread_cond_signal(&x->x_answercondition);
-		}
-		else if (x->x_requestcode == REQUEST_INFO)
-		{
-			pthread_mutex_unlock(&x->x_mutex);
-			output_open_status(x);
-			output_device_number(x);
-			output_device_count(x);
-			output_poll_time(x);
-			output_element_ranges(x);
-			hidio_platform_specific_info(x);
-			pthread_mutex_lock(&x->x_mutex);
-			if (x->x_requestcode == REQUEST_INFO)
-				x->x_requestcode = REQUEST_NOTHING;
-			pthread_cond_signal(&x->x_answercondition);
-		}
-		else if (x->x_requestcode == REQUEST_CLOSE)
-		{
-			t_int ret;
-			pthread_mutex_unlock(&x->x_mutex);
-			stop_poll(x);
-			ret = hidio_close_device(x);
-			pthread_mutex_lock(&x->x_mutex);
-			if (!ret) 
-			{
-				debug_print(LOG_INFO,"[hidio] closed device %d",x->x_device_number);
-				x->x_device_open = 0;
-			}
-			if (x->x_requestcode == REQUEST_CLOSE)
-				x->x_requestcode = REQUEST_NOTHING;
-			pthread_cond_signal(&x->x_answercondition);
-		}
-		else if (x->x_requestcode == REQUEST_QUIT)
-		{
-			pthread_mutex_unlock(&x->x_mutex);
-			stop_poll(x);
-			hidio_close_device(x);
-			pthread_mutex_lock(&x->x_mutex);
-			x->x_requestcode = REQUEST_NOTHING;
-			pthread_cond_signal(&x->x_answercondition);
-			break;	/* leave the while loop */
-		}
-		else
-		{
-			;	/* nothing: shouldn't get here anyway */
-		}
-    }
-    pthread_mutex_unlock(&x->x_mutex);
-    return (0);
-}
-
-/* change priority of child thread */
-#ifdef PD
-static void hidio_priority(t_hidio *x, t_floatarg p)
-#else
-static void hidio_priority(t_hidio *x, long p)
-#endif
-{
-	pthread_mutex_lock(&x->x_mutex);
-	p = 2 * (CLIP(p, 0, 10) - 5);
-	if (x->x_thread)
-	{
-		struct sched_param parm;
-		int policy;
-		if (pthread_getschedparam(x->x_thread, &policy, &parm) < 0)
-		{
-			post("hidio: warning: failed to get thread priority");
-		}
-		else
-		{
-			parm.sched_priority = x->x_priority + (int)p;	/* adjust priority */
-
-			if (parm.sched_priority < sched_get_priority_min(policy))
-			{
-				parm.sched_priority = sched_get_priority_min(policy);
-			}
-			else if (parm.sched_priority > sched_get_priority_max(policy))
-			{
-				parm.sched_priority = sched_get_priority_max(policy);
-			}
-			
-			if (pthread_setschedparam(x->x_thread, policy, &parm) < 0)
-			{
-				post("hidio: warning: failed to change thread priority to %d", parm.sched_priority);
-			}
-		}
-	}
-	pthread_mutex_unlock(&x->x_mutex);
 }
 
 
@@ -697,42 +516,13 @@ static void hidio_priority(t_hidio *x, long p)
  */
 static void hidio_free(t_hidio* x) 
 {
-    void *threadrtn;
-
 	debug_print(LOG_DEBUG,"hidio_free");
-		
-	/* stop polling for input */
-	if (x->x_clock)
-		clock_unset(x->x_clock);
-		
-    pthread_mutex_lock(&x->x_mutex);
-    /* request QUIT and wait for acknowledge */
-    x->x_requestcode = REQUEST_QUIT;
-	if (x->x_thread)
-	{
-		post("hidio: stopping worker thread. . .");
-		pthread_cond_signal(&x->x_requestcondition);
-		while (x->x_requestcode != REQUEST_NOTHING)
-		{
-			post("hidio: ...signalling...");
-			pthread_cond_signal(&x->x_requestcondition);
-    		pthread_cond_wait(&x->x_answercondition, &x->x_mutex);
-		}
-		pthread_mutex_unlock(&x->x_mutex);
-		if (pthread_join(x->x_thread, &threadrtn))
-    		error("hidio_free: join failed");
-		post("hidio: ...done");
-    }
-	else pthread_mutex_unlock(&x->x_mutex);
 
+	hidio_close(x);
 	clock_free(x->x_clock);
 	hidio_instance_count--;
 
 	hidio_platform_specific_free(x);
-	
-    pthread_cond_destroy(&x->x_requestcondition);
-    pthread_cond_destroy(&x->x_answercondition);
-    pthread_mutex_destroy(&x->x_mutex);
 }
 
 /* create a new instance of this class */
@@ -768,17 +558,10 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
 	x->x_fd = INVALID_HANDLE_VALUE;
 #endif /* _WIN32 */
 
-    pthread_mutex_init(&x->x_mutex, 0);
-    pthread_cond_init(&x->x_requestcondition, 0);
-    pthread_cond_init(&x->x_answercondition, 0);
-
 	x->x_device_number = get_device_number_from_arguments(argc, argv);
   
 	x->x_instance = hidio_instance_count;
 	hidio_instance_count++;
-
-	x->x_requestcode = REQUEST_NOTHING;
-    pthread_create(&x->x_thread, 0, hidio_child, x);
 
 	return (x);
 }
@@ -819,9 +602,6 @@ void hidio_setup(void)
 	/* ff tests */
 	class_addmethod(hidio_class,(t_method) hidio_ff_fftest,gensym("fftest"),A_DEFFLOAT,0);
 	class_addmethod(hidio_class,(t_method) hidio_ff_print,gensym("ff_print"),0);
-
-	class_addmethod(hidio_class,(t_method) hidio_priority, gensym("priority"), A_FLOAT, A_NULL);
-
 
 	post("[hidio] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
 		 HIDIO_MAJOR_VERSION, HIDIO_MINOR_VERSION);  
@@ -914,7 +694,6 @@ int main()
 	class_addmethod(c, (method)hidio_ff_fftest, "fftest",A_DEFFLOAT,0);
 	class_addmethod(c, (method)hidio_ff_print, "ff_print",0);
 	/* perfomrance / system stuff */
-	class_addmethod(c, (method)hidio_priority, 		"priority",	 	A_LONG,0); 
 
 	class_addmethod(c, (method)hidio_assist, 		"assist",	 	A_CANT, 0);  
 

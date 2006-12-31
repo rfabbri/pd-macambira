@@ -2,8 +2,6 @@
 /*
  *  Apple Darwin HID Manager support for Pd [hidio] object
  *
- *  some code from SuperCollider3's SC_HID.cpp by Jan Truetzschler Falkenstein
- *
  *  Copyright (c) 2004 Hans-Christoph All rights reserved.
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -47,24 +45,29 @@
 
 #include <IOKit/hid/IOHIDUsageTables.h>
 #include <ForceFeedback/ForceFeedback.h>
+#include <CoreServices/CoreServices.h>
 
 #include <mach/mach.h>
+#include <mach/mach_time.h>
 #include <mach/mach_error.h>
 
 #include "hidio.h"
 
-#define DEBUG(x)
-//#define DEBUG(x) x 
+//#define DEBUG(x)
+#define DEBUG(x) x 
 
 /*==============================================================================
  *  GLOBAL VARS
  *======================================================================== */
 
-extern t_int hidio_instance_count; // in hidio.h
-
 /* store device pointers so I don't have to query them all the time */
 pRecDevice device_pointer[MAX_DEVICES];
 
+// temp hack for measuring latency
+#define LATENCY_MAX 8192
+int latency[LATENCY_MAX];
+int latency_i;
+int latency_average;
 
 // this stuff is moving to the t_hid_element struct
 
@@ -136,7 +139,7 @@ static void get_usage_symbols(pRecElement pCurrentHIDElement, t_hid_element *new
 		case kHIDUsage_GD_Dial: convert_axis_to_symbols(pCurrentHIDElement, new_element, 7); break;
 		case kHIDUsage_GD_Wheel: convert_axis_to_symbols(pCurrentHIDElement, new_element, 8); break; 
 		case kHIDUsage_GD_Hatswitch: 
-			// this is still a mystery how to handle
+			// TODO: this is still a mystery how to handle, due to USB HID vs. Linux input.h
 			new_element->type = ps_absolute; 
 			new_element->name = absolute_symbols[9]; /* hatswitch */
 			break;
@@ -278,6 +281,25 @@ static t_float get_type_name_instance(t_symbol *type, t_symbol *name,
 /* DARWIN-SPECIFIC SUPPORT FUNCTIONS */
 /* ============================================================================== */
 
+double calculate_event_latency( uint64_t endTime, uint64_t startTime )
+{
+   uint64_t difference = endTime - startTime;
+   static double conversion = 0.0;
+
+   if( 0.0 == conversion )
+   {
+       mach_timebase_info_data_t info;
+       kern_return_t err = mach_timebase_info( &info );
+       if( 0 == err )
+	   {
+           //convert to seconds (multiply by 1e-6 to get miliseconds)
+           conversion = 1e-6 * (double) info.numer / (double) info.denom;
+       }
+   }
+   return conversion * (double) difference;
+}
+
+
 short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
 {
 	debug_print(LOG_DEBUG,"get_device_number_from_usage");
@@ -380,6 +402,11 @@ static void hidio_build_element_list(t_hidio *x)
 		HIDQueueDevice(pCurrentHIDDevice);
 		pCurrentHIDElement = HIDGetFirstDeviceElement( pCurrentHIDDevice,
 													   kHIDElementTypeInput );
+
+		/* TODO: axes should be the first elements in the array since they
+		 * produce many more events than buttons.  This will save loop cycles
+		 * in the read statement, since it had to cycle thru the elements to
+		 * find a match. */
 		while( pCurrentHIDElement != NULL) 
 		{
 			/* these two functions just get the pretty names for display */
@@ -396,33 +423,40 @@ static void hidio_build_element_list(t_hidio *x)
 														   element_count[x->x_device_number],
 														   element[x->x_device_number]);
 			
-			if( (pCurrentHIDElement->usagePage == kHIDPage_GenericDesktop) &&
-				(!pCurrentHIDElement->relative) )
+			if(!pCurrentHIDElement->relative) /* relative elements should remain queued */
 			{
-				switch(pCurrentHIDElement->usage)
+				switch( pCurrentHIDElement->usagePage)
 				{
-				case kHIDUsage_GD_X:
-				case kHIDUsage_GD_Y:
-				case kHIDUsage_GD_Z:
-				case kHIDUsage_GD_Rx:
-				case kHIDUsage_GD_Ry:
-				case kHIDUsage_GD_Rz:
-				case kHIDUsage_GD_Slider:
-				case kHIDUsage_GD_Dial:
-				case kHIDUsage_GD_Wheel:
-					//case kHIDUsage_GD_Hatswitch: // hatswitches are more like buttons, so queue them
-					debug_print(LOG_INFO,"[hidio] storing absolute axis to poll %s, %s (0x%04x 0x%04x)",
-								type_name, usage_name, 
+				case kHIDPage_GenericDesktop:
+					switch(pCurrentHIDElement->usage)
+					{
+					case kHIDUsage_GD_X:
+					case kHIDUsage_GD_Y:
+					case kHIDUsage_GD_Z:
+					case kHIDUsage_GD_Rx:
+					case kHIDUsage_GD_Ry:
+					case kHIDUsage_GD_Rz:
+					case kHIDUsage_GD_Slider:
+					case kHIDUsage_GD_Dial:
+					case kHIDUsage_GD_Wheel:
+						//case kHIDUsage_GD_Hatswitch: // hatswitches are more like buttons, so queue them
+						debug_print(LOG_INFO,"[hidio] storing absolute axis to poll %s, %s (0x%04x 0x%04x)",
+									type_name, usage_name, 
+									pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
+						if(HIDDequeueElement(pCurrentHIDDevice,pCurrentHIDElement) != kIOReturnSuccess)
+							debug_print(LOG_ERR,"[hidio] could not dequeue element");
+						new_element->polled = 1;
+						break;
+					}
+				default:
+					debug_print(LOG_INFO,"\tqueuing element %s, %s (0x%04x 0x%04x)",
+								type_name, usage_name,
 								pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
-					if(HIDDequeueElement(pCurrentHIDDevice,pCurrentHIDElement) != kIOReturnSuccess)
-						debug_print(LOG_ERR,"[hidio] could not dequeue element");
-					new_element->polled = 1;
-					break;
 				}
 			}
-			else
+			else 
 			{
-				debug_print(LOG_INFO,"[hidio] queuing element %s, %s (0x%04x 0x%04x)",
+				debug_print(LOG_INFO,"\tqueuing element %s, %s (0x%04x 0x%04x)",
 							type_name, usage_name,
 							pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
 			}
@@ -608,15 +642,16 @@ void hidio_platform_specific_info(t_hidio *x)
 
 void hidio_get_events(t_hidio *x)
 {
-	unsigned int i;
-	pRecDevice  pCurrentHIDDevice;
-	t_hid_element *current_element;
-	IOHIDEventStruct event;
+	unsigned int       i,j;
+	pRecDevice         pCurrentHIDDevice;
+	t_hid_element      *current_element;
+	IOHIDEventStruct   event;
+    uint64_t           timestamp, now, difference;
 
 	pCurrentHIDDevice = device_pointer[x->x_device_number];
 
 	/* get the queued events first and store them */
-//	while( (HIDGetEvent(pCurrentHIDDevice, (void*) &event)) && (event_counter < MAX_EVENTS_PER_POLL) ) 
+// TODO: while( (HIDGetEvent(pCurrentHIDDevice, (void*) &event)) && (event_counter < MAX_EVENTS_PER_POLL) ) 
 	while(HIDGetEvent(pCurrentHIDDevice, (void*) &event))
 	{
 		i=0;
@@ -628,9 +663,35 @@ void hidio_get_events(t_hidio *x)
 				  (IOHIDElementCookie) event.elementCookie) );
 		
 		current_element->value = event.value;
-		debug_print(LOG_DEBUG,"output this: %s %s %d prev %d",current_element->type->s_name,
-			 current_element->name->s_name, current_element->value, 
-			 current_element->previous_value);
+//		debug_print(LOG_DEBUG,"output this: %s %s %d prev %d",current_element->type->s_name,
+//			 current_element->name->s_name, current_element->value, 
+//			 current_element->previous_value);
+//		debug_print(LOG_DEBUG,"timestamp: %u %u", event.timestamp.hi, event.timestamp.lo);
+		timestamp =  * (uint64_t *) &(event.timestamp);
+		now =  mach_absolute_time();
+		difference = calculate_event_latency(now, timestamp);
+		// temp hack to measure latency
+		if( latency_i < LATENCY_MAX)
+		{
+			latency[latency_i] = (int) difference;
+			if( latency[latency_i] < 100 )
+				latency_average += latency[latency_i];
+			++latency_i;
+		}
+		else
+		{
+/*			for(j=0;j<LATENCY_MAX;++j)
+			{
+				fprintf(stderr,"%d ",latency[j]);
+				}*/
+			latency_average = latency_average / LATENCY_MAX;
+			fprintf(stderr,"average: %d\n",latency_average);
+			latency_i = 0;
+			latency_average = 0;
+		}
+//		debug_print(LOG_DEBUG,"\t\t\t\t\ttimestamp: %llu",timestamp);
+//		debug_print(LOG_DEBUG,"\t\t\t\t\tdifference: %llu", difference);
+//		post("%d %llu", i, difference);
 	}
 	/* absolute axes don't need to be queued, they can just be polled */
 	for(i=0; i< element_count[x->x_device_number]; ++i)
@@ -645,7 +706,7 @@ void hidio_get_events(t_hidio *x)
 	}
 }
 
-
+// TODO: return the same as POSIX open()/close() - 0=success, -1=fail
 t_int hidio_open_device(t_hidio *x, short device_number)
 {
 	debug_print(LOG_DEBUG,"hidio_open_device");
@@ -655,6 +716,8 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 
 	io_service_t hidDevice = 0;
 	FFDeviceObjectReference ffDeviceReference = NULL;
+
+	latency_i = 0;latency_average = 0; // temp hack, to be removed
 
 /* rebuild device list to make sure the list is current */
 	if( !HIDHaveDeviceList() ) hidio_build_device_list();
@@ -694,7 +757,7 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 	return(result);
 }
 
-
+// TODO: return the same as POSIX open()/close() - 0=success, -1=fail
 t_int hidio_close_device(t_hidio *x)
 {
 	debug_print(LOG_DEBUG,"hidio_close_device");
@@ -738,7 +801,7 @@ void hidio_build_device_list(void)
 }
 
 /* TODO: this should be dumped for [devices( and [elements( messages */
-void hidio_doprint(t_hidio *x)
+void hidio_print(t_hidio *x)
 {
 	if( !HIDHaveDeviceList() ) hidio_build_device_list();
 	hidio_print_device_list(x);
@@ -752,6 +815,7 @@ void hidio_doprint(t_hidio *x)
 
 void hidio_platform_specific_free(t_hidio *x)
 {
+	int j;
 	debug_print(LOG_DEBUG,"hidio_platform_specific_free");
 /* only call this if the last instance is being freed */
 	if (hidio_instance_count < 1) 
@@ -759,6 +823,10 @@ void hidio_platform_specific_free(t_hidio *x)
 		DEBUG(post("RELEASE ALL hidio_instance_count: %d", hidio_instance_count););
 		HIDReleaseAllDeviceQueues();
 		HIDReleaseDeviceList();
+	}
+	for(j=0;j<LATENCY_MAX;++j)
+	{
+		fprintf(stderr,"%d ",latency[j]);
 	}
 }
 

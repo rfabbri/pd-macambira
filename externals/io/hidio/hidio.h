@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #ifdef _WIN32
-#include "pthread.h"	/* needs pthread library */
 #define LOG_DEBUG 7
 #define LOG_INFO 6
 #define LOG_WARNING 4
@@ -11,7 +10,6 @@
 #define vsnprintf _vsnprintf
 #else
 #include <sys/syslog.h>
-#include <pthread.h>
 #endif /* _WIN32 */
 
 #ifdef _MSC_VER /* this only applies to Microsoft compilers */
@@ -44,7 +42,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.11 $"; */
+/* static char *version = "$Revision: 1.12 $"; */
 
 /*------------------------------------------------------------------------------
  * MACRO DEFINES
@@ -67,8 +65,10 @@ typedef void t_clock;
 #define MAX_ELEMENTS 64
 
 /* this is limited so that the object doesn't cause a click getting too many
- * events from the OS's event queue */
-#define MAX_EVENTS_PER_POLL 64
+ * events from the OS's event queue.  On Mac OS X, this is set in on the
+ * kernel level in HID_Utilities_External.h with the constant
+ * kDeviceQueueSize */
+#define MAX_EVENTS_PER_POLL 50
 
 /*------------------------------------------------------------------------------
  *  THREADING RELATED DEFINES
@@ -93,13 +93,13 @@ typedef struct _hidio
 	t_object            x_obj;
 #ifndef PD
 	void				*x_obex;
-#endif /* PD */
+#endif 
 #ifdef _WIN32
 	HANDLE				x_fd;
-#endif /* _WIN32 */
+#endif 
 #ifdef __linux__
 	t_int               x_fd;
-#endif /* __linux */
+#endif 
 	void                *x_ff_device;
 	short               x_device_number;
 	short               x_instance;
@@ -110,12 +110,6 @@ typedef struct _hidio
 	t_clock             *x_clock;
 	t_outlet            *x_data_outlet;
 	t_outlet            *x_status_outlet;
-    t_int				x_requestcode;
-    pthread_mutex_t		x_mutex;
-	pthread_cond_t		x_requestcondition;
-    pthread_cond_t		x_answercondition;
-    pthread_t			x_thread;
-	t_int				x_priority;
 } t_hidio;
 
 
@@ -186,7 +180,7 @@ extern t_int hidio_open_device(t_hidio *x, short device_number);
 extern t_int hidio_close_device(t_hidio *x);
 extern void hidio_build_device_list(void);
 extern void hidio_get_events(t_hidio *x);
-extern void hidio_doprint(t_hidio* x); /* print info to the console */
+extern void hidio_print(t_hidio* x); /* print info to the console */
 extern void hidio_platform_specific_info(t_hidio* x); /* device info on the status outlet */
 extern void hidio_platform_specific_free(t_hidio *x);
 extern short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id);

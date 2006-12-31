@@ -52,10 +52,12 @@ compare against
 ______________________________________________________________________________
 = make only the first executed instance fetch the data
 
- the function is ugen_getsortno() -- returns
-an integer which increases eachtime DSP is restarted.  You can add the
-function call (to the ugen chain for instance) each time you see
-ugen_getsortno() return an integer greater than the previous one you've
+- double right_now = clock_getlogicaltime();
+  this only works when instances are in the same patch, not when instances are
+  in different patches
+
+- implement event output data structure
+
 
 ______________________________________________________________________________
 = output one value per poll
