@@ -141,7 +141,7 @@ t_symbol* hidio_convert_linux_keys(__u16 linux_code)
 
 void hidio_print_element_list(t_hidio *x)
 {
-    debug_print(LOG_DEBUG,"hidio_print_element_list");
+    debug_post(LOG_DEBUG,"hidio_print_element_list");
     unsigned long element_bitmask[EV_MAX][NBITS(KEY_MAX)];
 //    char event_type_string[256];
 //    char event_code_string[256];
@@ -264,7 +264,7 @@ void hidio_print_element_list(t_hidio *x)
 
 void hidio_print_device_list(void)
 {
-    debug_print(LOG_DEBUG,"hidio_print_device_list");
+    debug_post(LOG_DEBUG,"hidio_print_device_list");
     int i,fd;
     char device_output_string[MAXPDSTRING] = "Unknown";
     char dev_handle_name[MAXPDSTRING] = "/dev/input/event0";
@@ -299,7 +299,7 @@ void hidio_print_device_list(void)
 
 static void hidio_build_element_list(t_hidio *x) 
 {
-    debug_print(LOG_DEBUG,"hidio_build_element_list");
+    debug_post(LOG_DEBUG,"hidio_build_element_list");
     unsigned long element_bitmask[EV_MAX][NBITS(KEY_MAX)];
     uint8_t abs_bitmask[ABS_MAX/8 + 1];
     struct input_absinfo abs_features;
@@ -383,7 +383,7 @@ static void hidio_build_element_list(t_hidio *x)
 
 void hidio_get_events(t_hidio *x)
 {
-    debug_print(9,"hidio_get_events");
+    debug_post(9,"hidio_get_events");
 
 /* for debugging, counts how many events are processed each time hidio_read() is called */
     DEBUG(t_int event_counter = 0;);
@@ -408,9 +408,9 @@ void hidio_get_events(t_hidio *x)
                     (hidio_input_event.code == output_element->linux_code) )
                 {
                     output_element->value = hidio_input_event.value;
-					debug_print(9,"i: %d  linux_type: %d  linux_code: %d", i, 
+					debug_post(9,"i: %d  linux_type: %d  linux_code: %d", i, 
 								output_element->linux_type, output_element->linux_code);
-                    debug_print(9,"value to output: %d",output_element->value);
+                    debug_post(9,"value to output: %d",output_element->value);
                     break;
                 }
             }
@@ -421,7 +421,7 @@ void hidio_get_events(t_hidio *x)
     }
     DEBUG(
         if(event_counter > 0)
-        debug_print(8,"output %d events",event_counter);
+        debug_post(8,"output %d events",event_counter);
 	);
 	
     return;
@@ -437,7 +437,7 @@ void hidio_print(t_hidio* x)
 // TODO: return the same as POSIX open()/close() - 0=success, -1=fail
 t_int hidio_open_device(t_hidio *x, short device_number)
 {
-    debug_print(LOG_DEBUG,"hidio_open_device");
+    debug_post(LOG_DEBUG,"hidio_open_device");
 
     char device_name[MAXPDSTRING] = "Unknown";
     char block_device[MAXPDSTRING] = "/dev/input/event0";
@@ -481,7 +481,7 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 // TODO: return the same as POSIX open()/close() - 0=success, -1=fail
 t_int hidio_close_device(t_hidio *x)
 {
-    debug_print(LOG_DEBUG,"hidio_close_device");
+    debug_post(LOG_DEBUG,"hidio_close_device");
     if(x->x_fd <0) 
         return 0;
     else
@@ -504,9 +504,9 @@ void hidio_build_device_list(void)
     char block_device[MAXPDSTRING] = "/dev/input/event0";
     struct input_event  x_input_event; 
     
-    debug_print(LOG_DEBUG,"hidio_build_device_list");
+    debug_post(LOG_DEBUG,"hidio_build_device_list");
     
-    debug_print(LOG_WARNING,"[hidio] Building device list...");
+    debug_post(LOG_WARNING,"[hidio] Building device list...");
     
     for(i=0; i<MAX_DEVICES; ++i)
     {
@@ -534,7 +534,7 @@ void hidio_build_device_list(void)
 
     }
     device_count = last_active_device ; // set the global variable
-    debug_print(LOG_WARNING,"[hidio] completed device list.");
+    debug_post(LOG_WARNING,"[hidio] completed device list.");
 }
 
 

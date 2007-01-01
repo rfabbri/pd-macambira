@@ -72,7 +72,7 @@ void hidio_build_element_list(t_hidio *x)
 
 t_int hidio_print_element_list(t_hidio *x)
 {
-	debug_print(LOG_DEBUG,"hidio_print_element_list");
+	debug_post(LOG_DEBUG,"hidio_print_element_list");
 
 
 	return (0);	
@@ -248,7 +248,7 @@ void hidio_ff_print( t_hidio *x )
 
 t_int hidio_get_events(t_hidio *x)
 {
-	//debug_print(LOG_DEBUG,"hidio_get_events");
+	//debug_post(LOG_DEBUG,"hidio_get_events");
 
 	return (0);	
 }
@@ -256,7 +256,7 @@ t_int hidio_get_events(t_hidio *x)
 
 t_int hidio_open_device(t_hidio *x, t_int device_number)
 {
-	debug_print(LOG_DEBUG,"hidio_open_device");
+	debug_post(LOG_DEBUG,"hidio_open_device");
 	t_int result = 0;
 	
 
@@ -266,7 +266,7 @@ t_int hidio_open_device(t_hidio *x, t_int device_number)
 
 t_int hidio_close_device(t_hidio *x)
 {
-	debug_print(LOG_DEBUG,"hidio_close_device");
+	debug_post(LOG_DEBUG,"hidio_close_device");
 
 	t_int result = 0;
 	
@@ -276,7 +276,7 @@ t_int hidio_close_device(t_hidio *x)
 
 t_int hidio_build_device_list(t_hidio *x)
 {
-	debug_print(LOG_DEBUG,"hidio_build_device_list");
+	debug_post(LOG_DEBUG,"hidio_build_device_list");
 	
 /*
  * The Windows DDK "hid.dll" has to be loaded manually because Windows gets
@@ -321,7 +321,7 @@ void hidio_print(t_hidio *x)
 
 void hidio_platform_specific_free(t_hidio *x)
 {
-	debug_print(LOG_DEBUG,"hidio_platform_specific_free");
+	debug_post(LOG_DEBUG,"hidio_platform_specific_free");
 /* only call this if the last instance is being freed */
 	if (hidio_instance_count < 1) 
 	{

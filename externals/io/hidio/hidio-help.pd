@@ -1,4 +1,4 @@
-#N canvas 157 38 878 603 10;
+#N canvas 157 38 886 611 10;
 #X floatatom 27 445 5 0 0 0 - - -;
 #X floatatom 83 445 5 0 0 0 - - -;
 #X obj 191 164 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 25
@@ -14,15 +14,15 @@
 #X text 435 117 refresh device list;
 #X text 537 487 For more info:;
 #X text 266 557 released under the GNU GPL;
-#X text 472 544 $Revision: 1.4 $$Date: 2006-12-31 22:49:16 $;
+#X text 472 544 $Revision: 1.5 $$Date: 2007-01-01 01:06:11 $;
 #X text 473 557 $Author: eighthave $;
 #X msg 436 201 poll 20;
 #X msg 374 201 poll 2;
 #X text 370 186 start polling and set the poll delay in ms;
 #X text 425 33 !!! This software is very much alpha \, so any aspect
 of it could change without notice !!!;
-#X obj 9 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
-;
+#X obj 9 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+66455;
 #N canvas 278 328 631 544 Event_Codes 0;
 #X text 28 48 (For a complete listing of Linux Input Events \, see
 /usr/include/linux/input.h.);
@@ -240,36 +240,36 @@ of it could change without notice !!!;
 #X floatatom 263 401 6 0 0 0 - - -;
 #X floatatom 313 401 6 0 0 0 - - -;
 #X floatatom 363 401 6 0 0 0 - - -;
-#X obj 39 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
-;
-#X obj 69 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
-;
-#X obj 99 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
-;
-#X obj 129 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
-#X obj 159 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
-#X obj 189 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
-#X obj 219 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
-#X obj 249 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
-#X obj 279 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
-#X obj 309 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
-#X obj 339 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
-#X obj 369 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
-#X obj 399 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
-#X obj 429 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
-#X obj 459 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-1;
+#X obj 39 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+133004;
+#X obj 69 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+133004;
+#X obj 99 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+66455;
+#X obj 129 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+66455;
+#X obj 159 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+66455;
+#X obj 189 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+133004;
+#X obj 219 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+133004;
+#X obj 249 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+66455;
+#X obj 279 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+133004;
+#X obj 309 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+133004;
+#X obj 339 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+66455;
+#X obj 369 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+66455;
+#X obj 399 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+133004;
+#X obj 429 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+66455;
+#X obj 459 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+66455;
 #X msg 25 155 debug 9;
 #X msg 298 145 info;
 #N canvas 743 25 411 235 see 0;
@@ -394,7 +394,7 @@ IDs (it is not case sensitive):;
 #X connect 7 0 4 0;
 #X restore 174 37 pd open by vendor/product ID;
 #X msg 504 201 poll 200;
-#X msg 225 309 relative y 0 1;
+#X msg 225 309 key key_255 0 133004;
 #X text 49 543 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #N canvas 162 133 570 420 serin 0;
@@ -425,12 +425,12 @@ IDs (it is not case sensitive):;
 #X connect 10 0 8 0;
 #X coords 0 -1 1 1 165 17 1 60 60;
 #X restore 25 134 pd serin;
-#X msg 262 114 open 2;
+#X msg 262 114 open 0;
 #N canvas 162 133 570 420 serin 0;
-#X obj 209 61 cnv 15 15 15 empty \$0-open-canvas 2 4 8 0 14 -233017
+#X obj 209 61 cnv 15 15 15 empty \$0-open-canvas 0 4 8 0 14 -233017
 -1 0;
 #X obj 60 61 hradio 15 1 1 10 empty empty empty 0 -6 0 8 -225271 -1
--1 2;
+-1 0;
 #X obj 60 13 inlet;
 #X msg 200 202 label \$1;
 #X obj 200 180 makefilename %d;
@@ -478,7 +478,7 @@ IDs (it is not case sensitive):;
 #X restore 10 293 pd remove instance numbers;
 #X obj 9 466 route a_key b_key c_key d_key e_key f_key g_key h_key
 i_key j_key k_key l_key m_key n_key o_key p_key;
-#N canvas 114 93 475 354 raw 0;
+#N canvas 114 93 487 366 raw 0;
 #X obj 144 45 inlet;
 #X obj 88 104 route DESKTOP;
 #X obj 87 158 route DESKTOP57;
@@ -490,10 +490,10 @@ i_key j_key k_key l_key m_key n_key o_key p_key;
 #X obj 189 192 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 292 122 spigot;
-#X obj 290 163 print test;
 #X obj 333 99 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #X obj 354 45 inlet;
+#X obj 290 162 print RAW;
 #X connect 0 0 1 0;
 #X connect 0 0 8 0;
 #X connect 1 0 2 0;
@@ -502,9 +502,9 @@ i_key j_key k_key l_key m_key n_key o_key p_key;
 #X connect 2 0 5 0;
 #X connect 5 0 6 0;
 #X connect 7 0 5 1;
-#X connect 8 0 9 0;
-#X connect 10 0 8 1;
-#X connect 11 0 10 0;
+#X connect 8 0 11 0;
+#X connect 9 0 8 1;
+#X connect 10 0 9 0;
 #X restore 408 294 pd raw;
 #X floatatom 63 401 6 0 0 0 - - -;
 #X obj 455 295 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0

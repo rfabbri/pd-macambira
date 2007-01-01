@@ -94,7 +94,7 @@ static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv);
  * SUPPORT FUNCTIONS
  */
 
-void debug_print(t_int message_debug_level, const char *fmt, ...)
+void debug_post(t_int message_debug_level, const char *fmt, ...)
 {
 	if(message_debug_level <= global_debug_level)
 	{
@@ -229,7 +229,7 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 			atom_arg_getlong(&device_number, 0, argc, argv);
 #endif /* PD */
 			if(device_number < 0) device_number = -1;
-			debug_print(LOG_DEBUG,"[hidio] setting device# to %d",device_number);
+			debug_post(LOG_DEBUG,"[hidio] setting device# to %d",device_number);
 		}
 		else
 		{ // single symbol arg means first instance of a device type
@@ -242,7 +242,7 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 			usage = name_to_usage(device_type_string);
 			device_number = get_device_number_from_usage(0, usage >> 16, 
 														 usage & 0xffff);
-			debug_print(LOG_INFO,"[hidio] using 0x%04x 0x%04x for %s",
+			debug_post(LOG_INFO,"[hidio] using 0x%04x 0x%04x for %s",
 						usage >> 16, usage & 0xffff, device_type_string);
 		}
 	}
@@ -267,7 +267,7 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 			usage = name_to_usage(device_type_string);
 			atom_arg_getlong(&device_type_instance, 1, argc, argv);
 #endif /* PD */
-			debug_print(LOG_DEBUG,"[hidio] looking for %s at #%d",
+			debug_post(LOG_DEBUG,"[hidio] looking for %s at #%d",
 						device_type_string, device_type_instance);
 			device_number = get_device_number_from_usage(device_type_instance,
 															  usage >> 16, 
@@ -291,31 +291,38 @@ void hidio_output_event(t_hidio *x, t_hid_element *output_data)
 	if( (output_data->relative) || // relative data should always be output
 		(output_data->value != output_data->previous_value) )
 	{
+/*		debug_post(LOG_DEBUG,"hidio_output_event: instance %d/%d last: %llu", 
+				   x->x_instance+1, hidio_instance_count,
+				   last_execute_time[x->x_device_number]);*/
 		t_atom event_data[3];
+		/* TODO: this output message should be stored in t_hid_element, then just
+		 * the value updated.  That would save a bit of CPU time since this is
+		 * run for every event that is output. */
 #ifdef PD
-		SETSYMBOL(event_data, output_data->name);
+		SETSYMBOL(event_data, output_data->name); 
 		SETFLOAT(event_data + 1, output_data->instance);
 		SETFLOAT(event_data + 2, output_data->value);
 #else /* Max */
 		atom_setsym(event_data, output_data->name);
+		//TODO: why is this line repeated?
 		atom_setsym(event_data, output_data->name);
 		atom_setlong(event_data + 1, (long)output_data->instance);
 		atom_setlong(event_data + 2, (long)output_data->value);
 #endif /* PD */
 		outlet_anything(x->x_data_outlet, output_data->type, 3, event_data);
-	} 
+	}
 }
 
 
 /* stop polling the device */
 static void hidio_stop_poll(t_hidio* x) 
 {
-  debug_print(LOG_DEBUG,"hidio_stop_poll");
+  debug_post(LOG_DEBUG,"hidio_stop_poll");
   
   if (x->x_started) 
   { 
 	  clock_unset(x->x_clock);
-	  debug_print(LOG_INFO,"[hidio] polling stopped");
+	  debug_post(LOG_INFO,"[hidio] polling stopped");
 	  x->x_started = 0;
   }
 }
@@ -330,7 +337,7 @@ static void hidio_stop_poll(t_hidio* x)
  */
 void hidio_poll(t_hidio* x, t_float f) 
 {
-	debug_print(LOG_DEBUG,"hidio_poll");
+	debug_post(LOG_DEBUG,"hidio_poll");
   
 /*	if the user sets the delay less than 2, set to block size */
 	if( f > 2 )
@@ -346,7 +353,7 @@ void hidio_poll(t_hidio* x, t_float f)
 		if(!x->x_started) 
 		{
 			clock_delay(x->x_clock, x->x_delay);
-			debug_print(LOG_DEBUG,"[hidio] polling started");
+			debug_post(LOG_DEBUG,"[hidio] polling started");
 			x->x_started = 1;
 		} 
 	}
@@ -377,14 +384,14 @@ static void hidio_set_from_float(t_hidio *x, t_floatarg f)
 /* close the device */
 t_int hidio_close(t_hidio *x) 
 {
-	debug_print(LOG_DEBUG,"hidio_close");
+	debug_post(LOG_DEBUG,"hidio_close");
 
  /* just to be safe, stop it first */
  	hidio_stop_poll(x);
  
  	if(! hidio_close_device(x))
  	{
- 		debug_print(LOG_INFO,"[hidio] closed device %d",x->x_device_number);
+ 		debug_post(LOG_INFO,"[hidio] closed device %d",x->x_device_number);
  		x->x_device_open = 0;
  		return (0);
  	}
@@ -403,7 +410,7 @@ t_int hidio_close(t_hidio *x)
  */
 static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv) 
 {
-	debug_print(LOG_DEBUG,"hid_%s",s->s_name);
+	debug_post(LOG_DEBUG,"hid_%s",s->s_name);
 	short new_device_number = get_device_number_from_arguments(argc, argv);
 	t_int started = x->x_started; // store state to restore after device is opened
 	
@@ -431,12 +438,12 @@ static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv)
 				 * accurately reflect [hidio]'s state  */
 				if (started)
 					hidio_set_from_float(x,x->x_delay); // TODO is this useful?
-				debug_print(LOG_DEBUG,"[hidio] set device# to %d",new_device_number);
+				debug_post(LOG_DEBUG,"[hidio] set device# to %d",new_device_number);
 				output_device_number(x);
 			}
 		}
 	}
-	else debug_print(LOG_WARNING,"[hidio] device does not exist");
+	else debug_post(LOG_WARNING,"[hidio] device does not exist");
 	/* always output open result so you can test for success in Pd space */
 	output_open_status(x);
 }
@@ -444,7 +451,7 @@ static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv)
 
 static void hidio_tick(t_hidio *x)
 {
-//	debug_print(LOG_DEBUG,"hidio_tick");
+//	debug_post(LOG_DEBUG,"hidio_tick");
 	t_hid_element *current_element;
 	unsigned int i;
 #ifdef PD
@@ -454,17 +461,22 @@ static void hidio_tick(t_hidio *x)
 	clock_getftime(&right_now);
 #endif /* PD */
 
-	debug_print(LOG_DEBUG,"# %u\tnow: %u\tlast: %u", x->x_device_number,
-				right_now, last_execute_time[x->x_device_number]);
+//	debug_post(LOG_DEBUG,"# %u\tnow: %llu\tlast: %llu", x->x_device_number,
+//				right_now, last_execute_time[x->x_device_number]);
 	if(right_now > last_execute_time[x->x_device_number])
 	{
 		hidio_get_events(x);
 		last_execute_time[x->x_device_number] = right_now;
-/*		post("executing: instance %d/%d at %ld", 
-		x->x_instance, hidio_instance_count, right_now);*/
+/*		debug_post(LOG_DEBUG,"executing: instance %d/%d at %llu last: %llu", 
+			 x->x_instance+1, hidio_instance_count, right_now,
+			 last_execute_time[x->x_device_number]);*/
 	}
 	for(i=0; i< element_count[x->x_device_number]; ++i)
 	{
+		/* TODO: since relative events need to be output every time, they need
+		 * to be flagged when new relative events arrive.  Otherwise, it'll
+		 * just spam out relative events no matter if anything new has
+		 * arrived */
 		current_element = element[x->x_device_number][i];
 		if(current_element->previous_value != current_element->value)
 		{
@@ -491,7 +503,7 @@ static void hidio_info(t_hidio *x)
 
 static void hidio_float(t_hidio* x, t_floatarg f) 
 {
-	debug_print(LOG_DEBUG,"hid_float");
+	debug_post(LOG_DEBUG,"hid_float");
 
 	hidio_set_from_float(x,f);
 }
@@ -499,7 +511,7 @@ static void hidio_float(t_hidio* x, t_floatarg f)
 #ifndef PD /* Max */
 static void hidio_int(t_hidio* x, long l) 
 {
-	debug_print(LOG_DEBUG,"hid_int");
+	debug_post(LOG_DEBUG,"hid_int");
 
 	hidio_set_from_float(x, (float)l);
 }
@@ -516,7 +528,7 @@ static void hidio_debug(t_hidio *x, t_float f)
  */
 static void hidio_free(t_hidio* x) 
 {
-	debug_print(LOG_DEBUG,"hidio_free");
+	debug_post(LOG_DEBUG,"hidio_free");
 
 	hidio_close(x);
 	clock_free(x->x_clock);

@@ -42,7 +42,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.12 $"; */
+/* static char *version = "$Revision: 1.13 $"; */
 
 /*------------------------------------------------------------------------------
  * MACRO DEFINES
@@ -150,7 +150,7 @@ typedef struct _hid_element
     unsigned char relative; // relative data gets output everytime
     t_int min; // from device report
     t_int max; // from device report
-    t_float instance; // usage page/usage instance # ([absolute throttle 2 163( 
+    t_float instance; // usage page/usage instance # (e.g. [absolute x 2 163( )
     t_int value; // output the sum of events in a poll for relative axes
     t_int previous_value; //only output on change on abs and buttons
 } t_hid_element;
@@ -168,7 +168,7 @@ extern unsigned short element_count[MAX_DEVICES];
  */
 
 /* support functions */
-void debug_print(t_int debug_level, const char *fmt, ...);
+void debug_post(t_int debug_level, const char *fmt, ...);
 void debug_error(t_hidio *x, t_int debug_level, const char *fmt, ...);
 void hidio_output_event(t_hidio *x, t_hid_element *output_data);
 

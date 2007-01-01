@@ -110,17 +110,17 @@ static void convert_axis_to_symbols(pRecElement pCurrentHIDElement,
 
 static void get_usage_symbols(pRecElement pCurrentHIDElement, t_hid_element *new_element) 
 {
-//	debug_print(LOG_DEBUG,"get_usage_symbols");
+//	debug_post(LOG_DEBUG,"get_usage_symbols");
 	char buffer[MAXPDSTRING];
 
 	if(new_element == NULL)
 	{
-		debug_print(LOG_EMERG,"[hidio] new_element == NULL!!  This is a bug, please report it.");
+		debug_post(LOG_EMERG,"[hidio] new_element == NULL!!  This is a bug, please report it.");
 		return;
 	}
 	if(pCurrentHIDElement == NULL)
 	{
-		debug_print(LOG_EMERG,"[hidio] pCurrentHIDElement == NULL!!  This is a bug, please report it.");
+		debug_post(LOG_EMERG,"[hidio] pCurrentHIDElement == NULL!!  This is a bug, please report it.");
 		return;
 	}
 
@@ -302,7 +302,7 @@ double calculate_event_latency( uint64_t endTime, uint64_t startTime )
 
 short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
 {
-	debug_print(LOG_DEBUG,"get_device_number_from_usage");
+	debug_post(LOG_DEBUG,"get_device_number_from_usage");
 
 	pRecDevice    pCurrentHIDDevice;
 	t_int i;
@@ -315,7 +315,7 @@ short get_device_number_by_id(unsigned short vendor_id, unsigned short product_i
 	while(pCurrentHIDDevice != NULL)
 	{
 		--i;
-		debug_print(LOG_INFO,"compare 0x%04x == 0x%04x  0x%04x == 0x%04x",
+		debug_post(LOG_INFO,"compare 0x%04x == 0x%04x  0x%04x == 0x%04x",
 					pCurrentHIDDevice->vendorID,
 					vendor_id,
 					pCurrentHIDDevice->productID,
@@ -336,7 +336,7 @@ short get_device_number_from_usage(short device_number,
 										unsigned short usage_page, 
 										unsigned short usage)
 {
-//	debug_print(LOG_DEBUG,"get_device_number_from_usage");
+//	debug_post(LOG_DEBUG,"get_device_number_from_usage");
 
 	pRecDevice    pCurrentHIDDevice;
 	t_int i;
@@ -369,7 +369,7 @@ short get_device_number_from_usage(short device_number,
 			HIDGetUsageName(pCurrentHIDDevice->usagePage, 
 							pCurrentHIDDevice->usage, 
 							cstrDeviceName);
-			debug_print(LOG_DEBUG,"[hidio]: found a %s at %d/%d: %s %s"
+			debug_post(LOG_DEBUG,"[hidio]: found a %s at %d/%d: %s %s"
 						,cstrDeviceName,
 						i,
 						total_devices,
@@ -440,29 +440,29 @@ static void hidio_build_element_list(t_hidio *x)
 					case kHIDUsage_GD_Dial:
 					case kHIDUsage_GD_Wheel:
 						//case kHIDUsage_GD_Hatswitch: // hatswitches are more like buttons, so queue them
-						debug_print(LOG_INFO,"[hidio] storing absolute axis to poll %s, %s (0x%04x 0x%04x)",
+						debug_post(LOG_INFO,"[hidio] storing absolute axis to poll %s, %s (0x%04x 0x%04x)",
 									type_name, usage_name, 
 									pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
 						if(HIDDequeueElement(pCurrentHIDDevice,pCurrentHIDElement) != kIOReturnSuccess)
-							debug_print(LOG_ERR,"[hidio] could not dequeue element");
+							debug_post(LOG_ERR,"[hidio] could not dequeue element");
 						new_element->polled = 1;
 						break;
 					}
 				default:
-					debug_print(LOG_INFO,"\tqueuing element %s, %s (0x%04x 0x%04x)",
+					debug_post(LOG_INFO,"\tqueuing element %s, %s (0x%04x 0x%04x)",
 								type_name, usage_name,
 								pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
 				}
 			}
 			else 
 			{
-				debug_print(LOG_INFO,"\tqueuing element %s, %s (0x%04x 0x%04x)",
+				debug_post(LOG_INFO,"\tqueuing element %s, %s (0x%04x 0x%04x)",
 							type_name, usage_name,
 							pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
 			}
 			new_element->min = pCurrentHIDElement->min;
 			new_element->max = pCurrentHIDElement->max;
-			debug_print(LOG_DEBUG,"\tlogical min %d max %d",
+			debug_post(LOG_DEBUG,"\tlogical min %d max %d",
 						pCurrentHIDElement->min,pCurrentHIDElement->max);
 			element[x->x_device_number][element_count[x->x_device_number]] = new_element;
 			++element_count[x->x_device_number];
@@ -473,7 +473,7 @@ static void hidio_build_element_list(t_hidio *x)
 
 static void hidio_print_element_list(t_hidio *x)
 {
-//	debug_print(LOG_DEBUG,"hidio_print_element_list");
+//	debug_post(LOG_DEBUG,"hidio_print_element_list");
 	int i;
 	pRecElement	pCurrentHIDElement;
 	pRecDevice pCurrentHIDDevice;
@@ -507,7 +507,7 @@ static void hidio_print_element_list(t_hidio *x)
 
 void hidio_ff_print( t_hidio *x )
 {
-	debug_print(LOG_DEBUG,"hidio_ff_print");
+	debug_post(LOG_DEBUG,"hidio_ff_print");
 	HRESULT result;
 	UInt32 value;
 
@@ -663,14 +663,14 @@ void hidio_get_events(t_hidio *x)
 				  (IOHIDElementCookie) event.elementCookie) );
 		
 		current_element->value = event.value;
-//		debug_print(LOG_DEBUG,"output this: %s %s %d prev %d",current_element->type->s_name,
+//		debug_post(LOG_DEBUG,"output this: %s %s %d prev %d",current_element->type->s_name,
 //			 current_element->name->s_name, current_element->value, 
 //			 current_element->previous_value);
-//		debug_print(LOG_DEBUG,"timestamp: %u %u", event.timestamp.hi, event.timestamp.lo);
+//		debug_post(LOG_DEBUG,"timestamp: %u %u", event.timestamp.hi, event.timestamp.lo);
 		timestamp =  * (uint64_t *) &(event.timestamp);
 		now =  mach_absolute_time();
 		difference = calculate_event_latency(now, timestamp);
-		// temp hack to measure latency
+// temp hack to measure latency
 		if( latency_i < LATENCY_MAX)
 		{
 			latency[latency_i] = (int) difference;
@@ -680,18 +680,11 @@ void hidio_get_events(t_hidio *x)
 		}
 		else
 		{
-/*			for(j=0;j<LATENCY_MAX;++j)
-			{
-				fprintf(stderr,"%d ",latency[j]);
-				}*/
 			latency_average = latency_average / LATENCY_MAX;
 			fprintf(stderr,"average: %d\n",latency_average);
 			latency_i = 0;
 			latency_average = 0;
 		}
-//		debug_print(LOG_DEBUG,"\t\t\t\t\ttimestamp: %llu",timestamp);
-//		debug_print(LOG_DEBUG,"\t\t\t\t\tdifference: %llu", difference);
-//		post("%d %llu", i, difference);
 	}
 	/* absolute axes don't need to be queued, they can just be polled */
 	for(i=0; i< element_count[x->x_device_number]; ++i)
@@ -709,7 +702,7 @@ void hidio_get_events(t_hidio *x)
 // TODO: return the same as POSIX open()/close() - 0=success, -1=fail
 t_int hidio_open_device(t_hidio *x, short device_number)
 {
-	debug_print(LOG_DEBUG,"hidio_open_device");
+	debug_post(LOG_DEBUG,"hidio_open_device");
 
 	t_int result = 0;
 	pRecDevice pCurrentHIDDevice = NULL;
@@ -733,7 +726,7 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 		debug_error(x,LOG_ERR,"[hidio]: device %d is not a valid device\n",device_number);
 		return(1);
 	}
-	debug_print(LOG_WARNING,"[hidio] opened device %d: %s %s",
+	debug_post(LOG_WARNING,"[hidio] opened device %d: %s %s",
 				device_number, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product);
 
 	hidio_build_element_list(x);
@@ -741,7 +734,7 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 	hidDevice = AllocateHIDObjectFromRecDevice( pCurrentHIDDevice );
 	if( FFIsForceFeedback(hidDevice) == FF_OK ) 
 	{
-		debug_print(LOG_WARNING,"\tdevice has Force Feedback support");
+		debug_post(LOG_WARNING,"\tdevice has Force Feedback support");
 		if( FFCreateDevice(hidDevice,&ffDeviceReference) == FF_OK ) 
 		{
 			x->x_has_ff = 1;
@@ -760,7 +753,7 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 // TODO: return the same as POSIX open()/close() - 0=success, -1=fail
 t_int hidio_close_device(t_hidio *x)
 {
-	debug_print(LOG_DEBUG,"hidio_close_device");
+	debug_post(LOG_DEBUG,"hidio_close_device");
 
 	t_int result = 0;
 //	pRecDevice pCurrentHIDDevice = hidio_get_device_by_number(x->x_device_number);
@@ -779,9 +772,9 @@ void hidio_build_device_list(void)
 	int device_number = 0;
 	pRecDevice pCurrentHIDDevice;
 	
-	debug_print(LOG_DEBUG,"hidio_build_device_list");
+	debug_post(LOG_DEBUG,"hidio_build_device_list");
 
-	debug_print(LOG_WARNING,"[hidio] Building device list...");
+	debug_post(LOG_WARNING,"[hidio] Building device list...");
 	if(HIDBuildDeviceList (0, 0)) 
 		post("[hidio]: no HID devices found\n");
 
@@ -797,7 +790,7 @@ void hidio_build_device_list(void)
 		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
 	}
 	device_count = (unsigned int) HIDCountDevices(); // set the global variable
-	debug_print(LOG_WARNING,"[hidio] completed device list.");
+	debug_post(LOG_WARNING,"[hidio] completed device list.");
 }
 
 /* TODO: this should be dumped for [devices( and [elements( messages */
@@ -816,7 +809,7 @@ void hidio_print(t_hidio *x)
 void hidio_platform_specific_free(t_hidio *x)
 {
 	int j;
-	debug_print(LOG_DEBUG,"hidio_platform_specific_free");
+	debug_post(LOG_DEBUG,"hidio_platform_specific_free");
 /* only call this if the last instance is being freed */
 	if (hidio_instance_count < 1) 
 	{
@@ -824,10 +817,11 @@ void hidio_platform_specific_free(t_hidio *x)
 		HIDReleaseAllDeviceQueues();
 		HIDReleaseDeviceList();
 	}
-	for(j=0;j<LATENCY_MAX;++j)
+/* dump latency test array */
+/*	for(j=0;j<LATENCY_MAX;++j)
 	{
 		fprintf(stderr,"%d ",latency[j]);
-	}
+		}*/
 }
 
 
@@ -842,7 +836,7 @@ void hidio_platform_specific_free(t_hidio *x)
 
 t_int hidio_ff_autocenter(t_hidio *x, t_float value)
 {
-	debug_print(LOG_DEBUG,"hidio_ff_autocenter");
+	debug_post(LOG_DEBUG,"hidio_ff_autocenter");
 	HRESULT result;
 	UInt32 autocenter_value;
 
@@ -866,7 +860,7 @@ t_int hidio_ff_autocenter(t_hidio *x, t_float value)
 
 t_int hidio_ff_gain(t_hidio *x, t_float value)
 {
-	debug_print(LOG_DEBUG,"hidio_ff_gain");
+	debug_post(LOG_DEBUG,"hidio_ff_gain");
 	HRESULT result;
 	UInt32 ffgain_value;
 	
@@ -907,37 +901,37 @@ t_int hidio_ff_send_ff_command (t_hidio *x, UInt32 ff_command)
 
 t_int hidio_ff_continue( t_hidio *x )
 {
-	debug_print(LOG_DEBUG,"hidio_ff_continue");
+	debug_post(LOG_DEBUG,"hidio_ff_continue");
 	return(  hidio_ff_send_ff_command( x, FFSFFC_CONTINUE ) );
 }
 
 t_int hidio_ff_pause( t_hidio *x )
 {
-	debug_print(LOG_DEBUG,"hidio_ff_pause");
+	debug_post(LOG_DEBUG,"hidio_ff_pause");
 	return(  hidio_ff_send_ff_command( x, FFSFFC_PAUSE ) );
 }
 
 t_int hidio_ff_reset( t_hidio *x )
 {
-	debug_print(LOG_DEBUG,"hidio_ff_reset");
+	debug_post(LOG_DEBUG,"hidio_ff_reset");
 	return(  hidio_ff_send_ff_command( x, FFSFFC_RESET ) );
 }
 
 t_int hidio_ff_setactuatorsoff( t_hidio *x )
 {
-	debug_print(LOG_DEBUG,"hidio_ff_setactuatorsoff");
+	debug_post(LOG_DEBUG,"hidio_ff_setactuatorsoff");
 	return(  hidio_ff_send_ff_command( x, FFSFFC_SETACTUATORSOFF ) );
 }
 
 t_int hidio_ff_setactuatorson( t_hidio *x )
 {
-	debug_print(LOG_DEBUG,"hidio_ff_setactuatorson");
+	debug_post(LOG_DEBUG,"hidio_ff_setactuatorson");
 	return(  hidio_ff_send_ff_command( x, FFSFFC_SETACTUATORSON ) );
 }
 
 t_int hidio_ff_stopall( t_hidio *x )
 {
-	debug_print(LOG_DEBUG,"hidio_ff_stopall");
+	debug_post(LOG_DEBUG,"hidio_ff_stopall");
 	return(  hidio_ff_send_ff_command( x, FFSFFC_STOPALL ) );
 }
 
@@ -960,7 +954,7 @@ t_int hidio_ff_motors( t_hidio *x, t_float value )
 
 t_int hidio_ff_fftest ( t_hidio *x, t_float value)
 {
-	debug_print(LOG_DEBUG,"hidio_ff_fftest");
+	debug_post(LOG_DEBUG,"hidio_ff_fftest");
 	
 	return( 0 );
 }
