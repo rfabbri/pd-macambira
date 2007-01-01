@@ -359,6 +359,8 @@ static void hidio_build_element_list(t_hidio *x)
                             new_element->relative = 1;
                         else
                             new_element->relative = 0;
+						SETSYMBOL(new_element->output_message, new_element->name); 
+						SETFLOAT(new_element->output_message + 1, new_element->instance);
                         // fill in the t_hid_element struct here
                         post("x->x_device_number: %d   element_count[]: %d",
                              x->x_device_number, element_count[x->x_device_number]);

@@ -417,6 +417,13 @@ static void hidio_build_element_list(t_hidio *x)
 			new_element = (t_hid_element *)getbytes(sizeof(t_hid_element));
 			new_element->pHIDElement = (void *) pCurrentHIDElement;
 			get_usage_symbols(pCurrentHIDElement, new_element);
+#ifdef PD
+			SETSYMBOL(new_element->output_message, new_element->name); 
+			SETFLOAT(new_element->output_message + 1, new_element->instance);
+#else /* Max */
+			atom_setsym(new_element->output_message, new_element->name);
+			atom_setlong(new_element->output_message + 1, (long)new_element->instance);
+#endif /* PD */
 			new_element->relative = pCurrentHIDElement->relative;
 			new_element->instance = get_type_name_instance(new_element->type, 
 														   new_element->name,

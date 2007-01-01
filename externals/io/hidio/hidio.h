@@ -42,7 +42,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.13 $"; */
+/* static char *version = "$Revision: 1.14 $"; */
 
 /*------------------------------------------------------------------------------
  * MACRO DEFINES
@@ -151,6 +151,7 @@ typedef struct _hid_element
     t_int min; // from device report
     t_int max; // from device report
     t_float instance; // usage page/usage instance # (e.g. [absolute x 2 163( )
+	t_atom output_message[3]; // pre-generated message for hidio_output_event()
     t_int value; // output the sum of events in a poll for relative axes
     t_int previous_value; //only output on change on abs and buttons
 } t_hid_element;
