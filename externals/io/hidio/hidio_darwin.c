@@ -283,7 +283,6 @@ static t_float get_type_name_instance(t_symbol *type, t_symbol *name,
 /* DARWIN-SPECIFIC SUPPORT FUNCTIONS */
 /* ============================================================================== */
 
-/*
 // temp hack for measuring latency
 double calculate_event_latency( uint64_t endTime, uint64_t startTime )
 {
@@ -297,7 +296,7 @@ double calculate_event_latency( uint64_t endTime, uint64_t startTime )
        if( 0 == err )
 	   {
            //convert to seconds (multiply by 1e-6 to get miliseconds)
-           conversion = 1e-6 * (double) info.numer / (double) info.denom;
+           conversion = 1e-3 * (double) info.numer / (double) info.denom;
        }
    }
    return conversion * (double) difference;
@@ -677,8 +676,9 @@ void hidio_get_events(t_hidio *x)
 //		debug_post(LOG_DEBUG,"output this: %s %s %d prev %d",current_element->type->s_name,
 //			 current_element->name->s_name, current_element->value, 
 //			 current_element->previous_value);
-//		debug_post(LOG_DEBUG,"timestamp: %u %u", event.timestamp.hi, event.timestamp.lo);
 		timestamp =  * (uint64_t *) &(event.timestamp);
+		difference = calculate_event_latency(timestamp,0);
+		debug_post(LOG_DEBUG,"timestamp: %llu %llu", timestamp, difference);
 		now =  mach_absolute_time();
 /*
 // temp hack for measuring latency

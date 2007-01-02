@@ -42,7 +42,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.15 $"; */
+/* static char *version = "$Revision: 1.16 $"; */
 
 /*------------------------------------------------------------------------------
  * MACRO DEFINES
@@ -194,8 +194,8 @@ extern short get_device_number_from_usage(short device_number,
 										unsigned short usage);
 
 /* cross-platform force feedback functions */
-extern void hidio_ff_autocenter(t_hidio *x, t_float value);
-extern void hidio_ff_gain(t_hidio *x, t_float value);
+extern t_int hidio_ff_autocenter(t_hidio *x, t_float value);
+extern t_int hidio_ff_gain(t_hidio *x, t_float value);
 extern t_int hidio_ff_motors(t_hidio *x, t_float value);
 extern t_int hidio_ff_continue(t_hidio *x);
 extern t_int hidio_ff_pause(t_hidio *x);
