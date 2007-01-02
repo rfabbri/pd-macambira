@@ -86,7 +86,7 @@ t_symbol *relative_symbols[RELATIVE_ARRAY_MAX];
 
 //static void hidio_poll(t_hidio *x, t_float f);
 static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv);
-//static t_int hidio_close(t_hidio *x);
+//static void hidio_close(t_hidio *x);
 //static void hidio_float(t_hidio* x, t_floatarg f);
 
 
@@ -129,7 +129,7 @@ static void output_status(t_hidio *x, t_symbol *selector, t_float output_value)
 	t_atom *output_atom = (t_atom *)getbytes(sizeof(t_atom));
 #ifdef PD
 	SETFLOAT(output_atom, output_value);
-#else
+#else /* Max */
 	atom_setlong(output_atom, (long)output_value);
 #endif /* PD */
 	outlet_anything( x->x_status_outlet, selector, 1, output_atom);
@@ -184,14 +184,14 @@ static void output_element_ranges(t_hidio *x)
 
 static unsigned int name_to_usage(char *usage_name)
 { // output usagepage << 16 + usage
-	if(strcmp(usage_name,"pointer") == 0)   return(0x00010001);
-	if(strcmp(usage_name,"mouse") == 0)     return(0x00010002);
-	if(strcmp(usage_name,"joystick") == 0)  return(0x00010004);
-	if(strcmp(usage_name,"gamepad") == 0)   return(0x00010005);
-	if(strcmp(usage_name,"keyboard") == 0)  return(0x00010006);
-	if(strcmp(usage_name,"keypad") == 0)    return(0x00010007);
-	if(strcmp(usage_name,"multiaxiscontroller") == 0) return(0x00010008);
-	return(0);
+	if(strcmp(usage_name,"pointer") == 0)   return 0x00010001;
+	if(strcmp(usage_name,"mouse") == 0)     return 0x00010002;
+	if(strcmp(usage_name,"joystick") == 0)  return 0x00010004;
+	if(strcmp(usage_name,"gamepad") == 0)   return 0x00010005;
+	if(strcmp(usage_name,"keyboard") == 0)  return 0x00010006;
+	if(strcmp(usage_name,"keypad") == 0)    return 0x00010007;
+	if(strcmp(usage_name,"multiaxiscontroller") == 0) return 0x00010008;
+	return 0;
 }
 
 
@@ -282,7 +282,7 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 			device_number = get_device_number_by_id(vendor_id,product_id);
 		}
 	}
-	return(device_number);
+	return device_number;
 }
 
 
@@ -372,7 +372,7 @@ static void hidio_set_from_float(t_hidio *x, t_floatarg f)
 }
 
 /* close the device */
-t_int hidio_close(t_hidio *x) 
+static void hidio_close(t_hidio *x) 
 {
 	debug_post(LOG_DEBUG,"hidio_close");
 
@@ -383,10 +383,7 @@ t_int hidio_close(t_hidio *x)
  	{
  		debug_post(LOG_INFO,"[hidio] closed device %d",x->x_device_number);
  		x->x_device_open = 0;
- 		return (0);
  	}
- 
-	return (1);
 }
 
 
@@ -414,12 +411,7 @@ static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv)
 		/* no device open, so open one now */
 		if (!x->x_device_open)
 		{
-			if(hidio_open_device(x, new_device_number))
-			{
-				x->x_device_number = -1;
-				error("[hidio] can not open device %d",new_device_number);
-			}
-			else
+			if(hidio_open_device(x, new_device_number) == EXIT_SUCCESS)
 			{
 				x->x_device_open = 1;
 				x->x_device_number = new_device_number;
@@ -430,6 +422,11 @@ static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv)
 					hidio_set_from_float(x,x->x_delay); // TODO is this useful?
 				debug_post(LOG_DEBUG,"[hidio] set device# to %d",new_device_number);
 				output_device_number(x);
+			}
+			else
+			{
+				x->x_device_number = -1;
+				error("[hidio] can not open device %d",new_device_number);
 			}
 		}
 	}
@@ -566,7 +563,7 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
 	x->x_instance = hidio_instance_count;
 	hidio_instance_count++;
 
-	return (x);
+	return x;
 }
 
 #ifdef PD
@@ -725,7 +722,7 @@ int main()
 	generate_type_symbols();
 	generate_event_symbols();
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 #endif /* PD */
 

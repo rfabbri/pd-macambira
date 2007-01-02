@@ -64,10 +64,12 @@
 pRecDevice device_pointer[MAX_DEVICES];
 
 // temp hack for measuring latency
-#define LATENCY_MAX 8192
+/*#define LATENCY_MAX 8192
 int latency[LATENCY_MAX];
 int latency_i;
 int latency_average;
+//end latency hack
+*/
 
 // this stuff is moving to the t_hid_element struct
 
@@ -281,6 +283,8 @@ static t_float get_type_name_instance(t_symbol *type, t_symbol *name,
 /* DARWIN-SPECIFIC SUPPORT FUNCTIONS */
 /* ============================================================================== */
 
+/*
+// temp hack for measuring latency
 double calculate_event_latency( uint64_t endTime, uint64_t startTime )
 {
    uint64_t difference = endTime - startTime;
@@ -298,7 +302,7 @@ double calculate_event_latency( uint64_t endTime, uint64_t startTime )
    }
    return conversion * (double) difference;
 }
-
+//end latency hack */
 
 short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
 {
@@ -379,9 +383,9 @@ short get_device_number_from_usage(short device_number,
 		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
 	}
 	if(i < total_devices)
-		return(return_device_number);
+		return return_device_number;
 	else
-		return(-1);
+		return -1;
 }
 
 
@@ -676,8 +680,9 @@ void hidio_get_events(t_hidio *x)
 //		debug_post(LOG_DEBUG,"timestamp: %u %u", event.timestamp.hi, event.timestamp.lo);
 		timestamp =  * (uint64_t *) &(event.timestamp);
 		now =  mach_absolute_time();
+/*
+// temp hack for measuring latency
 		difference = calculate_event_latency(now, timestamp);
-// temp hack to measure latency
 		if( latency_i < LATENCY_MAX)
 		{
 			latency[latency_i] = (int) difference;
@@ -692,6 +697,8 @@ void hidio_get_events(t_hidio *x)
 			latency_i = 0;
 			latency_average = 0;
 		}
+// end latency hack
+*/
 	}
 	/* absolute axes don't need to be queued, they can just be polled */
 	for(i=0; i< element_count[x->x_device_number]; ++i)
@@ -706,18 +713,15 @@ void hidio_get_events(t_hidio *x)
 	}
 }
 
-// TODO: return the same as POSIX open()/close() - 0=success, -1=fail
 t_int hidio_open_device(t_hidio *x, short device_number)
 {
 	debug_post(LOG_DEBUG,"hidio_open_device");
 
-	t_int result = 0;
 	pRecDevice pCurrentHIDDevice = NULL;
-
 	io_service_t hidDevice = 0;
 	FFDeviceObjectReference ffDeviceReference = NULL;
 
-	latency_i = 0;latency_average = 0; // temp hack, to be removed
+//	latency_i = 0;latency_average = 0; // temp hack for measuring latency
 
 /* rebuild device list to make sure the list is current */
 	if( !HIDHaveDeviceList() ) hidio_build_device_list();
@@ -731,7 +735,7 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 	else
 	{
 		debug_error(x,LOG_ERR,"[hidio]: device %d is not a valid device\n",device_number);
-		return(1);
+		return EXIT_FAILURE;
 	}
 	debug_post(LOG_WARNING,"[hidio] opened device %d: %s %s",
 				device_number, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product);
@@ -751,26 +755,19 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 		{
 			x->x_has_ff = 0;
 			post("[hidio]: FF device creation failed!");
-			return( -1 );
+			return EXIT_FAILURE;
 		}
 	}
-	return(result);
+	return EXIT_SUCCESS;
 }
 
-// TODO: return the same as POSIX open()/close() - 0=success, -1=fail
+
 t_int hidio_close_device(t_hidio *x)
 {
 	debug_post(LOG_DEBUG,"hidio_close_device");
 
-	t_int result = 0;
-//	pRecDevice pCurrentHIDDevice = hidio_get_device_by_number(x->x_device_number);
 	pRecDevice pCurrentHIDDevice = device_pointer[x->x_device_number];
-
-	HIDDequeueDevice(pCurrentHIDDevice);
-// this doesn't seem to be needed at all, but why not use it?
-//   result = HIDCloseReleaseInterface(pCurrentHIDDevice);
-	
-	return(result);
+	return HIDDequeueDevice(pCurrentHIDDevice);
 }
 
 
@@ -828,7 +825,8 @@ void hidio_platform_specific_free(t_hidio *x)
 /*	for(j=0;j<LATENCY_MAX;++j)
 	{
 		fprintf(stderr,"%d ",latency[j]);
-		}*/
+x	}
+*/
 }
 
 
@@ -841,7 +839,7 @@ void hidio_platform_specific_free(t_hidio *x)
  * autocenter ( 0/1 ), ffgain (overall feedback gain 0-10000)
  */
 
-t_int hidio_ff_autocenter(t_hidio *x, t_float value)
+void hidio_ff_autocenter(t_hidio *x, t_float value)
 {
 	debug_post(LOG_DEBUG,"hidio_ff_autocenter");
 	HRESULT result;
@@ -861,11 +859,9 @@ t_int hidio_ff_autocenter(t_hidio *x, t_float value)
 			post("[hidio]: ff_autocenter failed!");
 		}
 	}
-	
-	return(0);
 }
 
-t_int hidio_ff_gain(t_hidio *x, t_float value)
+void hidio_ff_gain(t_hidio *x, t_float value)
 {
 	debug_post(LOG_DEBUG,"hidio_ff_gain");
 	HRESULT result;
@@ -885,8 +881,6 @@ t_int hidio_ff_gain(t_hidio *x, t_float value)
 			post("[hidio]: ff_gain failed!");
 		}
 	}
-	
-	return(0);
 }
 
 /* --------------------------------------------------------------------------
@@ -963,7 +957,7 @@ t_int hidio_ff_fftest ( t_hidio *x, t_float value)
 {
 	debug_post(LOG_DEBUG,"hidio_ff_fftest");
 	
-	return( 0 );
+	return EXIT_SUCCESS;
 }
 
 /* ---------------------------------------------------------------------------------------------------- 

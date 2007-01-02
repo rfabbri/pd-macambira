@@ -42,7 +42,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.14 $"; */
+/* static char *version = "$Revision: 1.15 $"; */
 
 /*------------------------------------------------------------------------------
  * MACRO DEFINES
@@ -70,19 +70,6 @@ typedef void t_clock;
  * kDeviceQueueSize */
 #define MAX_EVENTS_PER_POLL 50
 
-/*------------------------------------------------------------------------------
- *  THREADING RELATED DEFINES
- */
- 
-#define REQUEST_NOTHING 0
-#define REQUEST_OPEN 1
-#define REQUEST_READ 2
-#define REQUEST_SEND 3
-#define REQUEST_PRINT 4
-#define REQUEST_INFO 5
-#define REQUEST_CLOSE 6
-#define REQUEST_QUIT 7
-
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -91,7 +78,7 @@ typedef struct _hidio
 
 {
 	t_object            x_obj;
-#ifndef PD
+#ifndef PD /* Max */
 	void				*x_obex;
 #endif 
 #ifdef _WIN32
@@ -146,7 +133,7 @@ typedef struct _hid_element
 #endif /* __APPLE__ */
     t_symbol *type; // Linux "type"; HID "usagePage", but using the hidio scheme
     t_symbol *name; // Linux "code"; HID "usage", but using the hidio scheme
-    unsigned char polled; // is it polled or queued? (maybe only on Mac OS X?)
+    unsigned char polled; // is it polled or queued?
     unsigned char relative; // relative data gets output everytime
     t_int min; // from device report
     t_int max; // from device report
@@ -163,6 +150,22 @@ extern unsigned short device_count;
 extern t_hid_element *element[MAX_DEVICES][MAX_ELEMENTS];
 /* number of active elements per device */
 extern unsigned short element_count[MAX_DEVICES]; 
+
+
+/* Each instance registers itself with a hidio_instances[] linked list when it
+ * opens a device.  Whichever instance gets the events from the OS will then
+ * go thru this linked list and call its output function. */
+
+/* basic element of a linked list of hidio instances */
+typedef struct _hidio_instance
+{
+    t_hidio *x;
+    struct _hidio_instance *x_next;
+} t_hidio_instance;
+
+/* array of linked lists of instances wanting events from a given device. */
+extern t_hidio_instance *hidio_instances[MAX_DEVICES]; 
+
 
 /*------------------------------------------------------------------------------
  *  FUNCTION PROTOTYPES FOR DIFFERENT PLATFORMS
@@ -191,8 +194,8 @@ extern short get_device_number_from_usage(short device_number,
 										unsigned short usage);
 
 /* cross-platform force feedback functions */
-extern t_int hidio_ff_autocenter(t_hidio *x, t_float value);
-extern t_int hidio_ff_gain(t_hidio *x, t_float value);
+extern void hidio_ff_autocenter(t_hidio *x, t_float value);
+extern void hidio_ff_gain(t_hidio *x, t_float value);
 extern t_int hidio_ff_motors(t_hidio *x, t_float value);
 extern t_int hidio_ff_continue(t_hidio *x);
 extern t_int hidio_ff_pause(t_hidio *x);

@@ -436,7 +436,7 @@ void hidio_print(t_hidio* x)
     hidio_print_element_list(x);
 }
 
-// TODO: return the same as POSIX open()/close() - 0=success, -1=fail
+
 t_int hidio_open_device(t_hidio *x, short device_number)
 {
     debug_post(LOG_DEBUG,"hidio_open_device");
@@ -459,7 +459,7 @@ t_int hidio_open_device(t_hidio *x, short device_number)
         { 
             error("[hidio] open %s failed",block_device);
             x->x_fd = -1;
-            return 1;
+            return EXIT_FAILURE;
         }
     } 
   
@@ -476,7 +476,7 @@ t_int hidio_open_device(t_hidio *x, short device_number)
     post("pre hidio_build_element_list");
     hidio_build_element_list(x);
 
-    return (0);
+    return EXIT_SUCCESS;
 }
 
 /* Under GNU/Linux, the device is a filehandle */
@@ -484,10 +484,10 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 t_int hidio_close_device(t_hidio *x)
 {
     debug_post(LOG_DEBUG,"hidio_close_device");
-    if(x->x_fd <0) 
-        return 0;
-    else
+    if(x->x_fd > -1) 
         return (close(x->x_fd));
+    else
+        return EXIT_SUCCESS;
 }
 
 
@@ -519,12 +519,10 @@ void hidio_build_device_list(void)
         if(fd < 0 ) { 
             /* post("Nothing on %s.", &block_device); */
             fd = -1;
-/* 			  return 0; */
         } else {
             /* read input_events from the LINUX_BLOCK_DEVICE stream 
-             * It seems that is just there to flush the event input buffer?
-             */
-            while (read (fd, &(x_input_event), sizeof(struct input_event)) > -1);
+             * It seems that is just there to flush the event input buffer? */
+            while( read(fd, &(x_input_event),sizeof(struct input_event)) > -1 );
 			  
             /* get name of device */
             ioctl(fd, EVIOCGNAME(sizeof(device_name)), device_name);
@@ -598,43 +596,43 @@ short get_device_number_from_usage(short device_number,
 /* cross-platform force feedback functions */
 t_int hidio_ff_autocenter( t_hidio *x, t_float value )
 {
-    return ( 0 );
+    return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_gain( t_hidio *x, t_float value )
 {
-    return ( 0 );
+    return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_motors( t_hidio *x, t_float value )
 {
-    return ( 0 );
+    return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_continue( t_hidio *x )
 {
-    return ( 0 );
+    return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_pause( t_hidio *x )
 {
-    return ( 0 );
+    return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_reset( t_hidio *x )
 {
-    return ( 0 );
+    return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_stopall( t_hidio *x )
 {
-    return ( 0 );
+    return EXIT_SUCCESS;
 }
 
 
@@ -642,7 +640,7 @@ t_int hidio_ff_stopall( t_hidio *x )
 // these are just for testing...
 t_int hidio_ff_fftest ( t_hidio *x, t_float value)
 {
-    return ( 0 );
+    return EXIT_SUCCESS;
 }
 
 

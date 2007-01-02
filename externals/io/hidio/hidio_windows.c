@@ -59,26 +59,20 @@ extern t_int hidio_instance_count;
 /* WINDOWS DDK HID SPECIFIC SUPPORT FUNCTIONS */
 /* ============================================================================== */
 
-void hidio_get_device_by_number(t_int device_number)
-{
-	
-}
-
-
 void hidio_build_element_list(t_hidio *x) 
 {
 	
 }
 
-t_int hidio_print_element_list(t_hidio *x)
+static void hidio_print_element_list(t_hidio *x)
 {
 	debug_post(LOG_DEBUG,"hidio_print_element_list");
 
 
-	return (0);	
+	return EXIT_SUCCESS;	
 }
 
-t_int hidio_print_device_list(t_hidio *x) 
+static t_int hidio_print_device_list(t_hidio *x) 
 {
 	struct _GUID GUID;
 	SP_INTERFACE_DEVICE_DATA DeviceInterfaceData;
@@ -165,7 +159,7 @@ t_int hidio_print_device_list(t_hidio *x)
 	} // for (i = 0; i < 32; i++)
 	SetupDiDestroyDeviceInfoList(PnPHandle);
 #endif
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 void hidio_output_device_name(t_hidio *x, char *manufacturer, char *product) 
@@ -190,43 +184,43 @@ void hidio_output_device_name(t_hidio *x, char *manufacturer, char *product)
 /* cross-platform force feedback functions */
 t_int hidio_ff_autocenter( t_hidio *x, t_float value )
 {
-	return ( 0 );
+	return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_gain( t_hidio *x, t_float value )
 {
-	return ( 0 );
+	return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_motors( t_hidio *x, t_float value )
 {
-	return ( 0 );
+	return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_continue( t_hidio *x )
 {
-	return ( 0 );
+	return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_pause( t_hidio *x )
 {
-	return ( 0 );
+	return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_reset( t_hidio *x )
 {
-	return ( 0 );
+	return EXIT_SUCCESS;
 }
 
 
 t_int hidio_ff_stopall( t_hidio *x )
 {
-	return ( 0 );
+	return EXIT_SUCCESS;
 }
 
 
@@ -234,7 +228,7 @@ t_int hidio_ff_stopall( t_hidio *x )
 // these are just for testing...
 t_int hidio_ff_fftest ( t_hidio *x, t_float value)
 {
-	return ( 0 );
+	return EXIT_SUCCESS;
 }
 
 
@@ -246,21 +240,17 @@ void hidio_ff_print( t_hidio *x )
 /* Pd [hidio] FUNCTIONS */
 /* ============================================================================== */
 
-t_int hidio_get_events(t_hidio *x)
+void hidio_get_events(t_hidio *x)
 {
 	//debug_post(LOG_DEBUG,"hidio_get_events");
-
-	return (0);	
 }
 
 
 t_int hidio_open_device(t_hidio *x, t_int device_number)
 {
 	debug_post(LOG_DEBUG,"hidio_open_device");
-	t_int result = 0;
-	
 
-	return(result);
+	return EXIT_SUCCESS;
 }
 
 
@@ -268,13 +258,11 @@ t_int hidio_close_device(t_hidio *x)
 {
 	debug_post(LOG_DEBUG,"hidio_close_device");
 
-	t_int result = 0;
-	
-	return(result);
+	return EXIT_SUCCESS;
 }
 
 
-t_int hidio_build_device_list(t_hidio *x)
+void hidio_build_device_list(t_hidio *x)
 {
 	debug_post(LOG_DEBUG,"hidio_build_device_list");
 	
@@ -292,7 +280,6 @@ t_int hidio_build_device_list(t_hidio *x)
 	if( !hidDllPathLength  )
 	{
 		error("[hidio] ERROR: cannot get SystemRoot");
-		return 0;
 	}
 	strcat(hidDllPath,"\\hid.dll");
 	post("hidDllPath: %s",hidDllPath);
@@ -300,10 +287,7 @@ t_int hidio_build_device_list(t_hidio *x)
 	if ( !hModule )
 	{
 		error("[hidio] ERROR: couldn't load %s: error %d",hidDllPath,GetLastError());
-		return 0;
 	}
-
-	return 1;
 }
 
 
