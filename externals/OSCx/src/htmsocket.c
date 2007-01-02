@@ -104,7 +104,7 @@ typedef struct
 
 /* open a socket for HTM communication to given  host on given portnumber */
 /* if host is 0 then UNIX protocol is used (i.e. local communication */
-void *OpenHTMSocket(char *host, int portnumber)
+void *OpenHTMSocket(char *host, int portnumber, unsigned char multicast_TTL)
 {
 	struct sockaddr_in  cl_addr;
 	#ifndef WIN32
@@ -229,7 +229,12 @@ void *OpenHTMSocket(char *host, int portnumber)
 				
 				// enable broadcast: jdl ~2003
 				if(setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &oval, sizeof(int)) == -1) {
-				  perror("setsockopt");
+				  perror("setsockopt broadcast");
+				}
+
+				// set multicast Time-To-Live: ss
+				if(setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_TTL, sizeof(multicast_TTL)) == -1) {
+				  perror("setsockopt TTL");
 				}
 
 				if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0) {
@@ -251,6 +256,11 @@ void *OpenHTMSocket(char *host, int portnumber)
 				// enable broadcast: jdl ~2003
 				if(setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &oval, sizeof(int)) == -1) {
 				  perror("setsockopt");
+				}
+
+				// set multicast Time-To-Live: ss 2006
+				if(setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_TTL, sizeof(multicast_TTL)) == -1) {
+				  perror("setsockopt TTL");
 				}
 
 				if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0) {

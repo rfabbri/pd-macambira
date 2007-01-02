@@ -113,7 +113,7 @@ static void *sendOSC_new(t_floatarg udpflag);
 void sendOSC_openbundle(t_sendOSC *x);
 static void sendOSC_closebundle(t_sendOSC *x);
 static void sendOSC_settypetags(t_sendOSC *x, t_float *f);
-static void sendOSC_connect(t_sendOSC *x, t_symbol *hostname, t_floatarg fportno);
+static void sendOSC_connect(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv);
 void sendOSC_disconnect(t_sendOSC *x);
 static void sendOSC_sendtyped(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv);
 void sendOSC_send(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv);
@@ -187,16 +187,39 @@ static void sendOSC_settypetags(t_sendOSC *x, t_float *f)
    post("sendOSC.c: setting typetags %d",x->x_typetags);
  }
 
-static void sendOSC_connect(t_sendOSC *x, t_symbol *hostname, t_floatarg fportno)
+static void sendOSC_connect(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv) // t_symbol *hostname, t_floatarg fportno, int argc, t_atom *argv)
 {
-	int portno = fportno;
+  float fportno=0;
+  t_symbol *hostname;
+  int portno = fportno;
+  unsigned char ttl=1;
   char *protocolStr;
-	/* create a socket */
+  /* create a socket */
+
+  if (argc < 2)
+	  return;
+
+  if (argv[0].a_type==A_SYMBOL)
+	  hostname = argv[0].a_w.w_symbol;
+  else
+	  return;
+
+  if (argv[1].a_type==A_FLOAT)
+	  portno = (int)argv[1].a_w.w_float;
+  else
+	  return;
+
+  if (argc >= 3) {
+	  if (argv[2].a_type==A_FLOAT)
+		  ttl = (unsigned char)argv[2].a_w.w_float;
+	  else
+		  return;
+  }
 
 	//	make sure handle is available
   if(x->x_htmsocket == 0)
   {
-		x->x_htmsocket = OpenHTMSocket(hostname->s_name, portno);
+		x->x_htmsocket = OpenHTMSocket(hostname->s_name, portno, ttl);
 		if (!x->x_htmsocket)
       post("sendOSC: Couldn't open socket: ");
     else
@@ -213,8 +236,8 @@ static void sendOSC_connect(t_sendOSC *x, t_symbol *hostname, t_floatarg fportno
           protocolStr = "unknown";
           break;
 	  }
-      post("sendOSC: connected to port %s:%d (hSock=%d) protocol = %s", 
-        hostname->s_name, portno, x->x_htmsocket, protocolStr);
+      post("sendOSC: connected to port %s:%d (hSock=%d) protocol = %s ttl = %d", 
+        hostname->s_name, portno, x->x_htmsocket, protocolStr, ttl);
 			outlet_float(x->x_obj.ob_outlet, 1);
 		}
 	}
@@ -337,7 +360,7 @@ void sendOSC_setup(void)
 			      (t_method)sendOSC_free,
 			      sizeof(t_sendOSC), 0, A_DEFFLOAT, 0);
     class_addmethod(sendOSC_class, (t_method)sendOSC_connect,
-		    gensym("connect"), A_SYMBOL, A_FLOAT, 0);
+		    gensym("connect"), A_GIMME, 0);
     class_addmethod(sendOSC_class, (t_method)sendOSC_disconnect,
 		    gensym("disconnect"), 0);
     class_addmethod(sendOSC_class, (t_method)sendOSC_settypetags,

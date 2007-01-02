@@ -253,13 +253,35 @@ static void dumpOSC_read(t_dumpOSC *x, int sockfd) {
 }
 
 static void *dumpOSC_new(t_symbol *compatflag,
-			 t_floatarg fportno) {
+			 int argc, t_atom* argv) {
   t_dumpOSC *x;
   struct sockaddr_in server;
   int clilen=sizeof(server);
   int sockfd;
-  int portno=fportno;
+  int portno=0;
   int udp = 1;
+  t_symbol *castgroup=NULL;
+
+  if (argc == 1) {
+	  if (argv[0].a_type==A_FLOAT)
+		  portno = (int)argv[0].a_w.w_float;
+	  else
+		  return NULL;
+  }
+
+  else if (argc == 2) {
+	  if (argv[0].a_type==A_SYMBOL)
+		  castgroup = argv[0].a_w.w_symbol;
+	  else
+		  return NULL;
+
+	  if (argv[1].a_type==A_FLOAT)
+		  portno = (int)argv[1].a_w.w_float;
+	  else
+		  return NULL;
+  }
+
+  else return NULL;
 
   //x->x_b = binbuf_new();
   //x->x_outat = binbuf_getvec(x->x_b);
@@ -278,6 +300,18 @@ static void *dumpOSC_new(t_symbol *compatflag,
   server.sin_addr.s_addr = INADDR_ANY;
   /* assign server port number */
   server.sin_port = htons((u_short)portno);
+
+  // ss 2006
+  if (castgroup) {
+	  struct ip_mreq mreq;
+	  mreq.imr_multiaddr.s_addr = inet_addr(castgroup->s_name);
+	  mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+	  if (setsockopt(sockfd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&mreq,sizeof(mreq)) < 0) {
+		  sys_sockerror("setsockopt");
+	  }
+  }
+
+
   /* name the socket */
   if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
     {
@@ -339,8 +373,7 @@ void dumpOSC_setup(void)
 {
     dumpOSC_class = class_new(gensym("dumpOSC"),
     	(t_newmethod)dumpOSC_new, (t_method)dumpOSC_free,
-    	sizeof(t_dumpOSC), CLASS_NOINLET, A_DEFFLOAT, A_DEFFLOAT, 
-	    A_DEFSYM, 0);
+							  sizeof(t_dumpOSC), CLASS_NOINLET, A_GIMME, 0);
     class_sethelpsymbol(dumpOSC_class, gensym("dumpOSC-help.pd"));
 }
 
