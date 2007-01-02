@@ -42,72 +42,30 @@
 //#define DEBUG(x)
 #define DEBUG(x) x 
 
-#define debug_post(d, p) post(p)
+#define debug_print(d, p) post(p)
 
-typedef struct _hid_data
+typedef struct _hid_device_
 {
-   BOOLEAN			IsButtonData;
-   unsigned char	Reserved;
-   USAGE			UsagePage;   // The usage page for which we are looking.
-   unsigned long	Status;      // The last status returned from the accessor function
-                            // when updating this field.
-   unsigned long	ReportID;    // ReportID for this given data structure
-   BOOLEAN			IsDataSet;   // Variable to track whether a given data structure
-                            //  has already been added to a report structure
+	HANDLE					fh;	/* file handle to the hid device */
+	OVERLAPPED				overlapped;
 
-   union
-   {
-      struct
-	  {
-         unsigned long	UsageMin;       // Variables to track the usage minimum and max
-         unsigned long	UsageMax;       // If equal, then only a single usage
-         unsigned long	MaxUsageLength; // Usages buffer length.
-         PUSAGE			Usages;         // list of usages (buttons ``down'' on the device.
+	PHIDP_PREPARSED_DATA	ppd; // The opaque parser info describing this device
+	HIDP_CAPS				caps; // The Capabilities of this hid device.
+	HIDD_ATTRIBUTES			attributes;
+	char					*inputReportBuffer;
+	unsigned long			inputDataLength; // Num elements in this array.
+	PHIDP_BUTTON_CAPS		inputButtonCaps;
+	PHIDP_VALUE_CAPS		inputValueCaps;
 
-      } ButtonData;
-      struct
-	  {
-         USAGE			Usage; // The usage describing this value;
-         unsigned short	Reserved;
+	char					*outputReportBuffer;
+	unsigned long			outputDataLength;
+	PHIDP_BUTTON_CAPS		outputButtonCaps;
+	PHIDP_VALUE_CAPS		outputValueCaps;
 
-         unsigned long	Value;
-         long			ScaledValue;
-      } ValueData;
-   };
-} t_hid_data;
-
-typedef struct _hid_device
-{   
-    char                 *devicePath;
-    HANDLE               device; // A file handle to the hid device.
-	HANDLE               event;
-	OVERLAPPED           overlapped;
-
-    BOOL                 openedForRead;
-    BOOL                 openedForWrite;
-    BOOL                 openedOverlapped;
-    BOOL                 openedExclusive;
-
-    PHIDP_PREPARSED_DATA ppd; // The opaque parser info describing this device
-    HIDP_CAPS            caps; // The Capabilities of this hid device.
-    HIDD_ATTRIBUTES      attributes;
-    char                 *inputReportBuffer;
-    t_hid_data           *inputData; // array of hid data structures
-    unsigned long        inputDataLength; // Num elements in this array.
-    PHIDP_BUTTON_CAPS    inputButtonCaps;
-    PHIDP_VALUE_CAPS     inputValueCaps;
-
-    char                 *outputReportBuffer;
-    t_hid_data           *outputData;
-    unsigned long        outputDataLength;
-    PHIDP_BUTTON_CAPS    outputButtonCaps;
-    PHIDP_VALUE_CAPS     outputValueCaps;
-
-    char                 *featureReportBuffer;
-    t_hid_data           *featureData;
-    unsigned long        featureDataLength;
-    PHIDP_BUTTON_CAPS    featureButtonCaps;
-    PHIDP_VALUE_CAPS     featureValueCaps;
+	char					*featureReportBuffer;
+	unsigned long			featureDataLength;
+	PHIDP_BUTTON_CAPS		featureButtonCaps;
+	PHIDP_VALUE_CAPS		featureValueCaps;
 } t_hid_device;
 
 
@@ -115,7 +73,7 @@ typedef struct _hid_device
  *  GLOBAL VARS
  *======================================================================== */
 
-extern t_int hidio_instance_count; // in hidio.c
+extern t_int hidio_instance_count; // in hidio.h
 
 /* store device pointers so I don't have to query them all the time */
 // t_hid_devinfo device_pointer[MAX_DEVICES];
@@ -228,7 +186,7 @@ static short _hid_get_device_path(short device_number, char **path, short length
 	free(DeviceDetail);
 
 	SetupDiDestroyDeviceInfoList(DeviceInfo);
-	return EXIT_SUCCESS;
+	return 0;
 }
 
 
@@ -251,7 +209,7 @@ static short _hid_get_capabilities(HANDLE fd, HIDP_CAPS *capabilities)
 
 	/* no need for PreparsedData any more, so free the memory it's using */
 	HidD_FreePreparsedData(preparsedData);
-	return EXIT_SUCCESS;
+	return 0;
 }
 
 
@@ -316,6 +274,7 @@ short get_device_number_from_usage(short device_number,
 
 void hidio_build_element_list(t_hidio *x) 
 {
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
 	char type_name[256];
 	char usage_name[256];
 
@@ -325,10 +284,10 @@ void hidio_build_element_list(t_hidio *x)
 	short i;
 
 	element_count[x->x_device_number] = 0;
-	if (x->x_fd != INVALID_HANDLE_VALUE)
+	if (self->fh != INVALID_HANDLE_VALUE)
 	{
 		/* now get device capabilities */
-		_hid_get_capabilities(x->x_fd, &capabilities);
+		_hid_get_capabilities(self->fh, &capabilities);
 
 		/* for every possible element check what we got */
         for (i = 0; i < capabilities.NumberInputDataIndices; i++) 
@@ -340,7 +299,7 @@ void hidio_build_element_list(t_hidio *x)
                     if ((i == EV_ABS) && (test_bit(j, abs_bitmask)))
                     {
                         /* this means that the bit is set in the axes list */
-                        if(ioctl(x->x_fd, EVIOCGABS(j), &abs_features)) 
+                        if(ioctl(self->fh, EVIOCGABS(j), &abs_features)) 
                             perror("evdev EVIOCGABS ioctl");
                         new_element->min = abs_features.minimum;
                         new_element->max = abs_features.maximum;
@@ -389,13 +348,16 @@ void hidio_build_element_list(t_hidio *x)
 
 t_int hidio_print_element_list(t_hidio *x)
 {
-	debug_post(LOG_DEBUG,"hidio_print_element_list");
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
 
-	return EXIT_SUCCESS;	
+	debug_print(LOG_DEBUG,"hidio_print_element_list");
+
+	return (0);	
 }
 
 t_int hidio_print_device_list(t_hidio *x) 
 {
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
 	struct _GUID GUID;
 	SP_INTERFACE_DEVICE_DATA DeviceInterfaceData;
 	struct
@@ -493,11 +455,12 @@ t_int hidio_print_device_list(t_hidio *x)
 
 	post("");
 
-	return EXIT_SUCCESS;
+	return 0;
 }
 
 void hidio_output_device_name(t_hidio *x, char *manufacturer, char *product) 
 {
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
 	char      *device_name;
 	t_symbol  *device_name_symbol;
 
@@ -520,45 +483,52 @@ void hidio_output_device_name(t_hidio *x, char *manufacturer, char *product)
 /* ------------------------------------------------------------------------------ */
 
 /* cross-platform force feedback functions */
-void hidio_ff_autocenter( t_hidio *x, t_float value )
+t_int hidio_ff_autocenter( t_hidio *x, t_float value )
 {
-	return EXIT_SUCCESS;
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
+	return ( 0 );
 }
 
 
-void hidio_ff_gain( t_hidio *x, t_float value )
+t_int hidio_ff_gain( t_hidio *x, t_float value )
 {
-	return EXIT_SUCCESS;
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
+	return ( 0 );
 }
 
 
 t_int hidio_ff_motors( t_hidio *x, t_float value )
 {
-	return EXIT_SUCCESS;
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
+	return ( 0 );
 }
 
 
 t_int hidio_ff_continue( t_hidio *x )
 {
-	return EXIT_SUCCESS;
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
+	return ( 0 );
 }
 
 
 t_int hidio_ff_pause( t_hidio *x )
 {
-	return EXIT_SUCCESS;
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
+	return ( 0 );
 }
 
 
 t_int hidio_ff_reset( t_hidio *x )
 {
-	return EXIT_SUCCESS;
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
+	return ( 0 );
 }
 
 
 t_int hidio_ff_stopall( t_hidio *x )
 {
-	return EXIT_SUCCESS;
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
+	return ( 0 );
 }
 
 
@@ -566,12 +536,14 @@ t_int hidio_ff_stopall( t_hidio *x )
 // these are just for testing...
 t_int hidio_ff_fftest ( t_hidio *x, t_float value)
 {
-	return EXIT_SUCCESS;
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
+	return ( 0 );
 }
 
 
 void hidio_ff_print( t_hidio *x )
 {
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
 }
 
 /* ============================================================================== */
@@ -580,14 +552,16 @@ void hidio_ff_print( t_hidio *x )
 
 void hidio_platform_specific_info(t_hidio *x)
 {
-	//debug_post(LOG_DEBUG,"hidio_platform_specific_info");
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
+	//debug_print(LOG_DEBUG,"hidio_platform_specific_info");
 }
 
 void hidio_get_events(t_hidio *x)
 {
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
 	long bytesRead;
 
-	debug_post(LOG_DEBUG,"hidio_get_events");
+	debug_print(LOG_DEBUG,"hidio_get_events");
 #if 0
 	while (1)
 	{
@@ -616,19 +590,20 @@ void hidio_get_events(t_hidio *x)
 
 t_int hidio_open_device(t_hidio *x, short device_number)
 {
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
 	short ret;
 	char path[MAX_PATH];
 	char *pp = (char *)path;
 	short device_count = -1;
 
-	debug_post(LOG_DEBUG,"hidio_open_device");
+	debug_print(LOG_DEBUG,"hidio_open_device");
 
 	device_count = _hid_count_devices();
 
 	if (device_number > device_count)
 	{
 		debug_error(x,LOG_ERR,"[hidio]: device %d is not a valid device (%d)\n", device_number, device_count);
-		return EXIT_FAILURE;
+		return 1;
 	}
 
 	/* get path for specified device number */
@@ -636,22 +611,22 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 	if (ret == -1)
 	{
 		debug_error(x,LOG_ERR,"[hidio]: could not obtain path for device %d\n", device_number);
-		return EXIT_FAILURE;
+		return 1;
 	}
 	else
 	{
 		/* open file on the device (read & write, no overlapp) */
-		x->x_fd = CreateFile(path,
+		self->fh = CreateFile(path,
 							 GENERIC_READ|GENERIC_WRITE,
 							 FILE_SHARE_READ|FILE_SHARE_WRITE,
 							 (LPSECURITY_ATTRIBUTES)NULL,
 							 OPEN_EXISTING,
 							 FILE_FLAG_OVERLAPPED,
 							 NULL);
-		if (x->x_fd == INVALID_HANDLE_VALUE)
+		if (self->fh == INVALID_HANDLE_VALUE)
 		{
 			debug_error(x,LOG_ERR,"[hidio]: failed to open device %d at %s\n", device_number, path);
-			return EXIT_FAILURE;
+			return 1;
 		}
 		/* LATER get the real device name here instead of displaying the path */
 		post ("[hidio] opened device %d: %s", device_number, path);
@@ -659,22 +634,23 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 		post("pre hidio_build_element_list");
 		hidio_build_element_list(x);
 	}
-	return EXIT_SUCCESS;
+	return 0;
 }
 
 
 t_int hidio_close_device(t_hidio *x)
 {
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
 	t_int result = 0;
 
-	debug_post(LOG_DEBUG, "hidio_close_device");
+	debug_print(LOG_DEBUG, "hidio_close_device");
 	
 	if (x->x_device_number > -1)
 	{
-		if (x->x_fd != INVALID_HANDLE_VALUE)
+		if (self->fh != INVALID_HANDLE_VALUE)
 		{
-			CloseHandle(x->x_fd);
-			x->x_fd = INVALID_HANDLE_VALUE;
+			CloseHandle(self->fh);
+			self->fh = INVALID_HANDLE_VALUE;
 		}
 	}
 
@@ -684,12 +660,14 @@ t_int hidio_close_device(t_hidio *x)
 
 void hidio_build_device_list(void)
 {
-	debug_post(LOG_DEBUG,"hidio_build_device_list");
+	debug_print(LOG_DEBUG,"hidio_build_device_list");
 }
 
 
 void hidio_print(t_hidio *x)
 {
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
+
 	hidio_print_device_list(x);
 	
 	if (x->x_device_open) 
@@ -702,17 +680,26 @@ void hidio_print(t_hidio *x)
 
 void hidio_platform_specific_free(t_hidio *x)
 {
-	debug_post(LOG_DEBUG,"hidio_platform_specific_free");
-/* only call this if the last instance is being freed */
-	if (hidio_instance_count < 1) 
-	{
-		DEBUG(post("RELEASE ALL hidio_instance_count: %d", hidio_instance_count););
-	}
+	t_hid_device *self = (t_hid_device *)x->x_hid_device;
+
+	debug_print(LOG_DEBUG,"hidio_platform_specific_free");
+
+	if (self)
+		freebytes(self, sizeof(t_hid_device));
 }
 
 
+void *hidio_platform_specific_new(t_hidio *x)
+{
+	t_hid_device *self;
 
+	debug_print(LOG_DEBUG,"hidio_platform_specific_new");
 
+	/* alloc memory for our instance */
+	self = (t_hid_device *)getbytes(sizeof(t_hid_device));
+	self->fh = INVALID_HANDLE_VALUE;
 
+	return (void *)self;	/* return void pointer to our data struct */
+}
 
 #endif  /* _WINDOWS */

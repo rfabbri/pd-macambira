@@ -42,7 +42,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.17 $"; */
+/* static char *version = "$Revision: 1.18 $"; */
 
 /*------------------------------------------------------------------------------
  * MACRO DEFINES
@@ -82,7 +82,7 @@ typedef struct _hidio
 	void				*x_obex;
 #endif 
 #ifdef _WIN32
-	HANDLE				x_fd;
+	void				*x_hid_device;
 #endif 
 #ifdef __linux__
 	t_int               x_fd;
@@ -187,6 +187,7 @@ extern void hidio_get_events(t_hidio *x);
 extern void hidio_print(t_hidio* x); /* print info to the console */
 extern void hidio_platform_specific_info(t_hidio* x); /* device info on the status outlet */
 extern void hidio_platform_specific_free(t_hidio *x);
+extern void *hidio_platform_specific_new(t_hidio *x);
 extern short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id);
 /* TODO: this function should probably accept the single unsigned for the combined usage_page and usage, instead of two separate variables */
 extern short get_device_number_from_usage(short device_number, 
@@ -194,8 +195,8 @@ extern short get_device_number_from_usage(short device_number,
 										unsigned short usage);
 
 /* cross-platform force feedback functions */
-extern void hidio_ff_autocenter(t_hidio *x, t_float value);
-extern void hidio_ff_gain(t_hidio *x, t_float value);
+extern t_int hidio_ff_autocenter(t_hidio *x, t_float value);
+extern t_int hidio_ff_gain(t_hidio *x, t_float value);
 extern t_int hidio_ff_motors(t_hidio *x, t_float value);
 extern t_int hidio_ff_continue(t_hidio *x);
 extern t_int hidio_ff_pause(t_hidio *x);

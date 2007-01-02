@@ -397,9 +397,9 @@ static void hidio_close(t_hidio *x)
  */
 static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv) 
 {
-	debug_post(LOG_DEBUG,"hid_%s",s->s_name);
 	short new_device_number = get_device_number_from_arguments(argc, argv);
 	t_int started = x->x_started; // store state to restore after device is opened
+	debug_post(LOG_DEBUG,"hid_%s",s->s_name);
 	
 	if (new_device_number > -1)
 	{
@@ -554,10 +554,9 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
 	x->x_started = 0;
 	x->x_delay = DEFAULT_DELAY;
 	for(i=0; i<MAX_DEVICES; ++i) last_execute_time[i] = 0;
-#ifdef _WIN32
-	x->x_fd = INVALID_HANDLE_VALUE;
-#endif /* _WIN32 */
-
+#ifdef _WINDOWS
+	x->x_hid_device = hidio_platform_specific_new(x);
+#endif
 	x->x_device_number = get_device_number_from_arguments(argc, argv);
   
 	x->x_instance = hidio_instance_count;
