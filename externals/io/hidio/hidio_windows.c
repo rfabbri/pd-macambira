@@ -520,13 +520,13 @@ void hidio_output_device_name(t_hidio *x, char *manufacturer, char *product)
 /* ------------------------------------------------------------------------------ */
 
 /* cross-platform force feedback functions */
-t_int hidio_ff_autocenter( t_hidio *x, t_float value )
+void hidio_ff_autocenter( t_hidio *x, t_float value )
 {
 	return EXIT_SUCCESS;
 }
 
 
-t_int hidio_ff_gain( t_hidio *x, t_float value )
+void hidio_ff_gain( t_hidio *x, t_float value )
 {
 	return EXIT_SUCCESS;
 }
