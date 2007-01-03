@@ -888,7 +888,7 @@ void hidio_ff_gain(t_hidio *x, t_float value)
  * continue, pause, reset, setactuatorsoff, setactuatorson, stopall
  */
 
-t_int hidio_ff_send_ff_command (t_hidio *x, UInt32 ff_command)
+void hidio_ff_send_ff_command (t_hidio *x, UInt32 ff_command)
 {
 	HRESULT result = 0;
 
@@ -900,51 +900,51 @@ t_int hidio_ff_send_ff_command (t_hidio *x, UInt32 ff_command)
 	return ( (t_int) result );
 }
 
-t_int hidio_ff_continue( t_hidio *x )
+void hidio_ff_continue( t_hidio *x )
 {
 	debug_post(LOG_DEBUG,"hidio_ff_continue");
-	return(  hidio_ff_send_ff_command( x, FFSFFC_CONTINUE ) );
+	hidio_ff_send_ff_command( x, FFSFFC_CONTINUE );
 }
 
-t_int hidio_ff_pause( t_hidio *x )
+void hidio_ff_pause( t_hidio *x )
 {
 	debug_post(LOG_DEBUG,"hidio_ff_pause");
-	return(  hidio_ff_send_ff_command( x, FFSFFC_PAUSE ) );
+	hidio_ff_send_ff_command( x, FFSFFC_PAUSE );
 }
 
-t_int hidio_ff_reset( t_hidio *x )
+void hidio_ff_reset( t_hidio *x )
 {
 	debug_post(LOG_DEBUG,"hidio_ff_reset");
-	return(  hidio_ff_send_ff_command( x, FFSFFC_RESET ) );
+	hidio_ff_send_ff_command( x, FFSFFC_RESET );
 }
 
-t_int hidio_ff_setactuatorsoff( t_hidio *x )
+void hidio_ff_setactuatorsoff( t_hidio *x )
 {
 	debug_post(LOG_DEBUG,"hidio_ff_setactuatorsoff");
-	return(  hidio_ff_send_ff_command( x, FFSFFC_SETACTUATORSOFF ) );
+	hidio_ff_send_ff_command( x, FFSFFC_SETACTUATORSOFF );
 }
 
-t_int hidio_ff_setactuatorson( t_hidio *x )
+void hidio_ff_setactuatorson( t_hidio *x )
 {
 	debug_post(LOG_DEBUG,"hidio_ff_setactuatorson");
-	return(  hidio_ff_send_ff_command( x, FFSFFC_SETACTUATORSON ) );
+	hidio_ff_send_ff_command( x, FFSFFC_SETACTUATORSON );
 }
 
-t_int hidio_ff_stopall( t_hidio *x )
+void hidio_ff_stopall( t_hidio *x )
 {
 	debug_post(LOG_DEBUG,"hidio_ff_stopall");
-	return(  hidio_ff_send_ff_command( x, FFSFFC_STOPALL ) );
+	hidio_ff_send_ff_command( x, FFSFFC_STOPALL );
 }
 
-t_int hidio_ff_motors( t_hidio *x, t_float value )
+void hidio_ff_motors( t_hidio *x, t_float value )
 {
 	if ( value > 0 ) 
 	{
-		return ( hidio_ff_setactuatorson( x )  );
+		hidio_ff_setactuatorson( x );
 	}
 	else
 	{
-		return ( hidio_ff_setactuatorsoff( x )  );
+		hidio_ff_setactuatorsoff( x );
 	}
 }
 
@@ -953,11 +953,10 @@ t_int hidio_ff_motors( t_hidio *x, t_float value )
  * FF test functions
  */
 
-t_int hidio_ff_fftest ( t_hidio *x, t_float value)
+void hidio_ff_fftest ( t_hidio *x, t_float value)
 {
 	debug_post(LOG_DEBUG,"hidio_ff_fftest");
 	
-	return EXIT_SUCCESS;
 }
 
 /* ---------------------------------------------------------------------------------------------------- 

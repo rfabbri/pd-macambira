@@ -594,53 +594,53 @@ short get_device_number_from_usage(short device_number,
 /* ------------------------------------------------------------------------------ */
 
 /* cross-platform force feedback functions */
-t_int hidio_ff_autocenter( t_hidio *x, t_float value )
+void hidio_ff_autocenter( t_hidio *x, t_float value )
 {
-    return EXIT_SUCCESS;
+
 }
 
 
-t_int hidio_ff_gain( t_hidio *x, t_float value )
+void hidio_ff_gain( t_hidio *x, t_float value )
 {
-    return EXIT_SUCCESS;
+
 }
 
 
-t_int hidio_ff_motors( t_hidio *x, t_float value )
+void hidio_ff_motors( t_hidio *x, t_float value )
 {
-    return EXIT_SUCCESS;
+
 }
 
 
-t_int hidio_ff_continue( t_hidio *x )
+void hidio_ff_continue( t_hidio *x )
 {
-    return EXIT_SUCCESS;
+
 }
 
 
-t_int hidio_ff_pause( t_hidio *x )
+void hidio_ff_pause( t_hidio *x )
 {
-    return EXIT_SUCCESS;
+
 }
 
 
-t_int hidio_ff_reset( t_hidio *x )
+void hidio_ff_reset( t_hidio *x )
 {
-    return EXIT_SUCCESS;
+
 }
 
 
-t_int hidio_ff_stopall( t_hidio *x )
+void hidio_ff_stopall( t_hidio *x )
 {
-    return EXIT_SUCCESS;
+
 }
 
 
 
 // these are just for testing...
-t_int hidio_ff_fftest ( t_hidio *x, t_float value)
+void hidio_ff_fftest ( t_hidio *x, t_float value)
 {
-    return EXIT_SUCCESS;
+
 }
 
 

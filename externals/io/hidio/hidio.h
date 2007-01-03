@@ -2,12 +2,15 @@
 #define _HIDIO_H
 
 #include <stdio.h>
+#include <stdlib.h>
+
 #ifdef _WIN32
 #define LOG_DEBUG 7
 #define LOG_INFO 6
 #define LOG_WARNING 4
 #define LOG_ERR 3
 #define vsnprintf _vsnprintf
+#include <windows.h>
 #else
 #include <sys/syslog.h>
 #endif /* _WIN32 */
@@ -39,10 +42,11 @@ typedef void t_clock;
 #define SETSYMBOL SETSYM
 #endif /* PD */
 
+
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.18 $"; */
+/* static char *version = "$Revision: 1.19 $"; */
 
 /*------------------------------------------------------------------------------
  * MACRO DEFINES
@@ -71,11 +75,9 @@ typedef void t_clock;
 #define MAX_EVENTS_PER_POLL 50
 
 
-/*------------------------------------------------------------------------------
- *  CLASS DEF
- */
-typedef struct _hidio
-
+/* -----------------------------------------------------------------------------
+ *  CLASS DEF */
+typedef struct _hidio 
 {
 	t_object            x_obj;
 #ifndef PD /* Max */
@@ -129,18 +131,18 @@ typedef struct _hid_element
 	unsigned short usage_id;
 #endif /* _WIN32 */
 #ifdef __APPLE__
-    void *pHIDElement;  // pRecElement on Mac OS X
+    void *pHIDElement;  /* pRecElement on Mac OS X */
 #endif /* __APPLE__ */
-    t_symbol *type; // Linux "type"; HID "usagePage", but using the hidio scheme
-    t_symbol *name; // Linux "code"; HID "usage", but using the hidio scheme
-    unsigned char polled; // is it polled or queued?
-    unsigned char relative; // relative data gets output everytime
-    t_int min; // from device report
-    t_int max; // from device report
-    t_float instance; // usage page/usage instance # (e.g. [absolute x 2 163( )
-	t_atom output_message[3]; // pre-generated message for hidio_output_event()
-    t_int value; // output the sum of events in a poll for relative axes
-    t_int previous_value; //only output on change on abs and buttons
+    t_symbol *type; /* Linux "type"; HID "usagePage", but using hidio scheme */
+    t_symbol *name; /* Linux "code"; HID "usage", but using hidio scheme */
+    unsigned char polled; /* is it polled or queued? */
+    unsigned char relative; /* relative data gets output everytime */
+    t_int min; /* from device report */
+    t_int max; /* from device report */
+    t_float instance; /* usage page/usage instance # (e.g. [absolute x 2 163( */
+	t_atom output_message[3]; /* pre-generated message for hidio_output_event */
+    t_int value; /* output the sum of events in a poll for relative axes */
+    t_int previous_value; /*only output on change on abs and buttons */
 } t_hid_element;
 
 /* mostly for status querying */
@@ -195,16 +197,16 @@ extern short get_device_number_from_usage(short device_number,
 										unsigned short usage);
 
 /* cross-platform force feedback functions */
-extern t_int hidio_ff_autocenter(t_hidio *x, t_float value);
-extern t_int hidio_ff_gain(t_hidio *x, t_float value);
-extern t_int hidio_ff_motors(t_hidio *x, t_float value);
-extern t_int hidio_ff_continue(t_hidio *x);
-extern t_int hidio_ff_pause(t_hidio *x);
-extern t_int hidio_ff_reset(t_hidio *x);
-extern t_int hidio_ff_stopall(t_hidio *x);
+extern void hidio_ff_autocenter(t_hidio *x, t_float value);
+extern void hidio_ff_gain(t_hidio *x, t_float value);
+extern void hidio_ff_motors(t_hidio *x, t_float value);
+extern void hidio_ff_continue(t_hidio *x);
+extern void hidio_ff_pause(t_hidio *x);
+extern void hidio_ff_reset(t_hidio *x);
+extern void hidio_ff_stopall(t_hidio *x);
 
-// these are just for testing...
-extern t_int hidio_ff_fftest (t_hidio *x, t_float value);
+/* these are just for testing... */
+extern void hidio_ff_fftest (t_hidio *x, t_float value);
 extern void hidio_ff_print(t_hidio *x);
 
 /*==============================================================================

@@ -34,7 +34,6 @@
 #include <ctype.h>
 #endif /* _WIN32 */
 #include <stdarg.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "hidio.h"

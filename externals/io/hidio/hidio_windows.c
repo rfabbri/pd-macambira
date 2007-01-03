@@ -483,61 +483,53 @@ void hidio_output_device_name(t_hidio *x, char *manufacturer, char *product)
 /* ------------------------------------------------------------------------------ */
 
 /* cross-platform force feedback functions */
-t_int hidio_ff_autocenter( t_hidio *x, t_float value )
+void hidio_ff_autocenter( t_hidio *x, t_float value )
 {
 	t_hid_device *self = (t_hid_device *)x->x_hid_device;
-	return ( 0 );
 }
 
 
-t_int hidio_ff_gain( t_hidio *x, t_float value )
+void hidio_ff_gain( t_hidio *x, t_float value )
 {
 	t_hid_device *self = (t_hid_device *)x->x_hid_device;
-	return ( 0 );
 }
 
 
-t_int hidio_ff_motors( t_hidio *x, t_float value )
+void hidio_ff_motors( t_hidio *x, t_float value )
 {
 	t_hid_device *self = (t_hid_device *)x->x_hid_device;
-	return ( 0 );
 }
 
 
-t_int hidio_ff_continue( t_hidio *x )
+void hidio_ff_continue( t_hidio *x )
 {
 	t_hid_device *self = (t_hid_device *)x->x_hid_device;
-	return ( 0 );
 }
 
 
-t_int hidio_ff_pause( t_hidio *x )
+void hidio_ff_pause( t_hidio *x )
 {
 	t_hid_device *self = (t_hid_device *)x->x_hid_device;
-	return ( 0 );
 }
 
 
-t_int hidio_ff_reset( t_hidio *x )
+void hidio_ff_reset( t_hidio *x )
 {
 	t_hid_device *self = (t_hid_device *)x->x_hid_device;
-	return ( 0 );
 }
 
 
-t_int hidio_ff_stopall( t_hidio *x )
+void hidio_ff_stopall( t_hidio *x )
 {
 	t_hid_device *self = (t_hid_device *)x->x_hid_device;
-	return ( 0 );
 }
 
 
 
 // these are just for testing...
-t_int hidio_ff_fftest ( t_hidio *x, t_float value)
+void hidio_ff_fftest ( t_hidio *x, t_float value)
 {
 	t_hid_device *self = (t_hid_device *)x->x_hid_device;
-	return ( 0 );
 }
 
 
