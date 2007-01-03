@@ -52,34 +52,40 @@ a test tests something that gets tested
 \layout Standard
 
 (write ontological nonsense here)
+\layout Standard
+
+fsdfsdf
+\layout Standard
+
+sfsdfsdf
 \layout Subsection
 
 a triad of testing
 \layout Standard
 
 I've thought of a triad:
-\layout Standard
+\layout Itemize
 
 A.
  "the real thing"
-\layout Standard
+\layout Itemize
 
 B.
  what it's documented as
-\layout Standard
+\layout Itemize
 
 C.
  a way to verify that (1) and (2) agree
 \layout Standard
 
 and another one:
-\layout Standard
+\layout Itemize
 
 changing A to match B+C: programming
-\layout Standard
+\layout Itemize
 
 changing B to match A+C: the scientific method (aka reverse engineering)
-\layout Standard
+\layout Itemize
 
 changing C to match A+B: unit-tests and contracts and scientific experiments
 \layout Section
@@ -111,6 +117,9 @@ Quelques cossins
 \layout Subsection
 
 Protocol
+\layout Standard
+
+(steal text from the GF paper from Graz)
 \layout Subsection
 
 Preconditions
@@ -140,7 +149,34 @@ Unit-Tests
 Algebraic Properties
 \layout Subsection
 
+Temporal Logic
+\layout Subsection
+
 TODO
+\layout Bibliography
+\bibitem {co99}
+
+a constructive deconstruction of type theory by Alistair Cockburn
+\layout Bibliography
+\bibitem {key-7}
+
+Programming Ruby by David Thomas & Andrew Hunt
+\layout Bibliography
+\bibitem {key-6}
+
+Abstract Algebra, Dummit & Foote
+\layout Bibliography
+\bibitem {key-5}
+
+Wikipedia
+\layout Bibliography
+\bibitem {key-3}
+
+my brain
+\layout Section*
+
+Colophon
 \layout Standard
 
+made with LyX and some coffee
 \the_end
