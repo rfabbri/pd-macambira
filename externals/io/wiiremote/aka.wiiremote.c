@@ -310,6 +310,7 @@ void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
 #ifdef PD
 	t_akawiiremote *x = (t_akawiiremote *)pd_new(wiiremote_class);
 
+	x->wiiremote = (WiiRemoteRef)getbytes(sizeof(WiiRemoteRec));		// add in 1.0B4
 	if (x->wiiremote != nil)
 		wiiremote_init(x->wiiremote);
 	
