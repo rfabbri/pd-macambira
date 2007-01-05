@@ -32,8 +32,8 @@ if [ -e "$testfile" ]; then
 	 echo "$testfile exists, skipping..."
 else
 	 echo "Building everything for $testfile"
-	 tar xzf tcl8.4.13-src.tar.gz
-	 cd tcl8.4.13/win
+	 tar xzf tcl8.4.*-src.tar.gz
+	 cd tcl8.4.*/win
 	 ./configure && make CYGPATH=echo && make install
 	 cd ../..
 fi
@@ -44,8 +44,8 @@ if [ -e "$testfile" ]; then
 	 echo "$testfile exists, skipping..."
 else
 	 echo "Building everything for $testfile"
-	 tar xzf tk8.4.13-src.tar.gz
-	 cd tk8.4.13/win
+	 tar xzf tk8.4.*-src.tar.gz
+	 cd tk8.4.*/win
 	 ./configure && make CYGPATH=echo && make install
 	 cd ../..
 fi
@@ -56,7 +56,8 @@ if [ -e "$testfile" ]; then
 	 echo "$testfile exists, skipping..."
 else
 	 echo "Building everything for $testfile"
-	 tar xzf libogg-1.1.3.tar.gz && cd libogg-1.1.3
+	 tar xzf libogg-1.1.*.tar.gz
+	 cd libogg-1.1.*
 	 ./configure && make && make install
 	 cd ..
 fi
@@ -84,7 +85,8 @@ if [ -e "$testfile" ]; then
 	 echo "$testfile exists, skipping..."
 else
 	 echo "Building everything for $testfile"
-	 tar xzf libvorbis-1.1.2.tar.gz && cd libvorbis-1.1.2
+	 tar xzf libvorbis-1.1.*.tar.gz
+	 cd libvorbis-1.1.*
 	 ./configure && make
 	 cd lib
 	 /bin/sh ../libtool --tag=CC --mode=link gcc  -O20 -D__NO_MATH_INLINES \
