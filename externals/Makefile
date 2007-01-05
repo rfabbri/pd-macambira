@@ -124,17 +124,17 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid hidio wiiremote
+    LIB_TARGETS += hid wiiremote
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid hidio pdp pidip
+    LIB_TARGETS += hid pdp pidip
   endif
 endif
 
@@ -206,7 +206,8 @@ flatspace_install: flatspace $(helpdir) $(objectsdir)
 	install -p \
 			$(externals_src)/hcs/*/doc/*.pd \
 			$(externals_src)/iem/comport/*/*-help.pd \
-			$(externals_src)/nusmuk/line3/*.pd\
+			$(externals_src)/nusmuk/line3/*.pd \
+			$(externals_src)/olafmatt/flashserver/*-help.pd \
 				$(helpdir)/$(FLATSPACE_NAME)
 	install -p \
 			$(externals_src)/pdogg/*/*.pd \
@@ -789,10 +790,10 @@ freeverb_install: freeverb
 
 
 freeverb_clean:
-	-rm -f -- $(externals_src)/freeverb/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/freeverb/*.o
-	-rm -f -- $(externals_src)/freeverb/*.bak
-	-rm -f -- $(externals_src)/freeverb/*.*~
+	-rm -f -- $(externals_src)/freeverb~/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/freeverb~/*.o
+	-rm -f -- $(externals_src)/freeverb~/*.bak
+	-rm -f -- $(externals_src)/freeverb~/*.*~
 
 
 #------------------------------------------------------------------------------#
