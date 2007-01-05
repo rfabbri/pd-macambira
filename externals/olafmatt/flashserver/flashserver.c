@@ -826,7 +826,7 @@ static void flashserver_open(t_flashserver *x, t_symbol *sym, int argc, t_atom *
         /* Lose setuid priveliges */
         seteuid(getuid());
         /* set lowest priority, SCHED_OTHER policy, unlock mem*/
-#ifdef _POSIX_PRIORITY_SCHEDULING
+#if (_POSIX_PRIORITY_SCHEDULING - 0) >=  200112L
         p1 = sched_get_priority_min(SCHED_OTHER);
         par.sched_priority = p1;
         if (sched_setscheduler(0,SCHED_OTHER, &par) == -1)
