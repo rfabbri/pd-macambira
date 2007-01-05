@@ -207,7 +207,6 @@ flatspace_install: flatspace $(helpdir) $(objectsdir)
 			$(externals_src)/hcs/*/doc/*.pd \
 			$(externals_src)/iem/comport/*/*-help.pd \
 			$(externals_src)/nusmuk/line3/*.pd \
-			$(externals_src)/olafmatt/flashserver/*-help.pd \
 				$(helpdir)/$(FLATSPACE_NAME)
 	install -p \
 			$(externals_src)/pdogg/*/*.pd \
