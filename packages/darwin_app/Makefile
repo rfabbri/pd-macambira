@@ -25,14 +25,20 @@ WISH_CONTENTS = "$(WISH)/Contents"
 # which CPU to compile for
 TARGET_PLATFORM := $(shell uname -p)
 
-# base level optimizations
-#OPT_CFLAGS = -Os -funroll-loops -fomit-frame-pointer
-
+# 10.3 uses gcc 3.3, and 10.3 only runs on PowerPC
+GCC_VERSION := $(shell gcc -dumpversion)
+ifeq ($(GCC_VERSION),3.3)
+OPT_CFLAGS += -O3 -funroll-loops -fomit-frame-pointer -mcpu=powerpc -mtune=G3
+else
 # auto-vectorization in GCC 4.x for CPUs with SIMD
-OPT_CFLAGS += -ftree-vectorize -ftree-vectorizer-verbose=2
+OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 \
+	-fast -fPIC -mcpu=7450 -mtune=7450
+endif
 
+# Mac/Intels only run 10.4, so always gcc 4.x
 ifeq ($(TARGET_PLATFORM),i386)
-OPT_CFLAGS += -march=pentium4 -msse -msse2 -mfpmath=sse
+OPT_CFLAGS = -march=pentium4 -msse2 -mfpmath=sse \
+	-ftree-vectorize -ftree-vectorizer-verbose=2
 endif
 
 ifeq ($(TARGET_PLATFORM),powerpc)
@@ -49,7 +55,7 @@ ifeq ($(TARGET_PLATFORM),powerpc)
 # PowerPC 7400 (G4 <= 700Mhz) 
 #OPT_CFLAGS += -fast -fPIC -mcpu=G4 -mtune=G4
 # PowerPC 7450 (G4 >= 533MHz) 
-OPT_CFLAGS += -fast -fPIC -mcpu=7450 -mtune=7450
+#OPT_CFLAGS += -fast -fPIC -mcpu=7450 -mtune=7450
 # PowerPC G5 (gcc-4.x)
 #OPT_CFLAGS += -fast -fPIC
 endif
@@ -213,7 +219,7 @@ darwin_app_devel_core: darwin_app_devel_wrapper
 darwin_app_doc_format:
 	find $(pddocdir) -name '*.pd' -exec \
 		sed -i.b 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' '{}' \;
-	find $(DESTDIR) -name '*.pd.b' -delete
+	find $(DESTDIR) -name '*.pd.b' -print0 | xargs -0 rm -f --
 
 
 #==============================================================================#
