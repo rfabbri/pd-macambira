@@ -2238,22 +2238,6 @@ zexy_clean:
 
 
 
-
-
-#PDCONTAINER_XML =  $(wildcard $(externals_src)/grh/PDContainer/tinyxml/*.cpp)
-#PDCONTAINER_SRC := $(wildcard $(externals_src)/grh/PDContainer/src/*.cpp) \
-#                   $(PDCONTAINER_XML)
-#PDCONTAINER_OBJECTS := $(PDCONTAINER_SRC:.cpp=.o)
-#PDCONTAINER_LIB_SRC = $(wildcard $(externals_src)/grh/PDContainer/src/H*.cpp) \
-#                      $(PDCONTAINER_XML)
-#PDCONTAINER_LIB = $(PDCONTAINER_BASE_SRC:.cpp=.o)
-#PDCONTAINER_TMP := $(wildcard $(externals_src)/grh/PDContainer/src/h_*.cpp)
-#PDCONTAINER_TARGETS = $(PDCONTAINER_TMP:.cpp=.$(EXTENSION))
-
-#compile_pdcontainer: $(PDCONTAINER_TARGETS)
-#	#rm -f -- $(PDCONTAINER_OBJECTS)
-
-
 #------------------------------------------------------------------------------#
 # PDContainer
 PDCONTAINER_NAME = pdcontainer
