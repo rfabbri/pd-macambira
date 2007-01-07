@@ -1,4 +1,4 @@
-PDContainer - by Georg Holzmann <grh@mur.at>, 2004-2005
+PDContainer - by Georg Holzmann <grh@mur.at>, 2004-2007
 
 
 --------------------------------license---------------------------------------
