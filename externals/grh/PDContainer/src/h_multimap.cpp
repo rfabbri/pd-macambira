@@ -335,7 +335,7 @@ static void *h_multimap_free(t_h_multimap *x)
   return (void *)x;
 }
 
-void h_multimap_setup(void) 
+extern "C" void h_multimap_setup(void) 
 {
   h_multimap_class = class_new(gensym("h_multimap"), (t_newmethod)h_multimap_new,
 				(t_method)h_multimap_free, sizeof(t_h_multimap), 

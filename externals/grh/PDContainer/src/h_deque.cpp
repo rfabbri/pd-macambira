@@ -538,7 +538,7 @@ static void *h_deque_free(t_h_deque *x)
   return (void *)x;
 }
 
-void h_deque_setup(void) 
+extern "C" void h_deque_setup(void) 
 {
   // the object class
   h_deque_class = class_new(gensym("h_deque"), (t_newmethod)h_deque_new,

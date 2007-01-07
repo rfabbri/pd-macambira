@@ -338,7 +338,7 @@ static void *h_map_free(t_h_map *x)
   return (void *)x;
 }
 
-void h_map_setup(void) 
+extern "C" void h_map_setup(void) 
 {
   // the object class
   h_map_class = class_new(gensym("h_map"), (t_newmethod)h_map_new,

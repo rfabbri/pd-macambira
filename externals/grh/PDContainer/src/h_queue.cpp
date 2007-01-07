@@ -136,7 +136,7 @@ static void *h_queue_free(t_h_queue *x)
   return (void *)x;
 }
 
-void h_queue_setup(void) 
+extern "C" void h_queue_setup(void) 
 {
   // the object class
   h_queue_class = class_new(gensym("h_queue"), (t_newmethod)h_queue_new,

@@ -205,7 +205,7 @@ static void *h_multiset_free(t_h_multiset *x)
   return (void *)x;
 }
 
-void h_multiset_setup(void) 
+extern "C" void h_multiset_setup(void) 
 {
   // the object class
   h_multiset_class = class_new(gensym("h_multiset"), (t_newmethod)h_multiset_new,

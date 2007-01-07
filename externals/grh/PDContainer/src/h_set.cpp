@@ -205,7 +205,7 @@ static void *h_set_free(t_h_set *x)
   return (void *)x;
 }
 
-void h_set_setup(void) 
+extern "C" void h_set_setup(void) 
 {
   // the object class
   h_set_class = class_new(gensym("h_set"), (t_newmethod)h_set_new,

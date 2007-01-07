@@ -393,7 +393,7 @@ static void *h_list_free(t_h_list *x)
   return (void *)x;
 }
 
-void h_list_setup(void) 
+extern "C" void h_list_setup(void) 
 {
   // the object class
   h_list_class = class_new(gensym("h_list"), (t_newmethod)h_list_new,

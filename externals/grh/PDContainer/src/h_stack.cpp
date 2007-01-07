@@ -136,7 +136,7 @@ static void *h_stack_free(t_h_stack *x)
   return (void *)x;
 }
 
-void h_stack_setup(void) 
+extern "C" void h_stack_setup(void) 
 {
   // the object class
   h_stack_class = class_new(gensym("h_stack"), (t_newmethod)h_stack_new,

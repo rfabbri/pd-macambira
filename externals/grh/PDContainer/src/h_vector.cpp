@@ -456,7 +456,7 @@ static void *h_vector_free(t_h_vector *x)
   return (void *)x;
 }
 
-void h_vector_setup(void) 
+extern "C" void h_vector_setup(void) 
 {
   // the object class
   h_vector_class = class_new(gensym("h_vector"), (t_newmethod)h_vector_new,

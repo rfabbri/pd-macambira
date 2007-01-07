@@ -216,7 +216,7 @@ static void *h_priority_queue_free(t_h_priority_queue *x)
   return (void *)x;
 }
 
-void h_priority_queue_setup(void) 
+extern "C" void h_priority_queue_setup(void) 
 {
   // the object class
   h_priority_queue_class = class_new(gensym("h_priority_queue"), (t_newmethod)h_priority_queue_new,
