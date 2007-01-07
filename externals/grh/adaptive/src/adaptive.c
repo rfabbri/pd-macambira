@@ -15,6 +15,11 @@
 
 #include "adaptive.h"
 
+#ifdef ADAPTIVE_SINGLE_OBJ
+// for single externals disable the adaptive object
+#else
+// build as library
+
 typedef struct _adaptive 
 {
   t_object x_obj;
@@ -64,6 +69,7 @@ void adaptive_setup(void)
   class_addmethod(adaptive_class, (t_method)adaptive_help, gensym("help"), 0);
 }
 
+#endif // library
 
 /* ---------------------- helpers ----------------------- */
 
