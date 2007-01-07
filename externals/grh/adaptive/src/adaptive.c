@@ -20,7 +20,7 @@ typedef struct _adaptive
   t_object x_obj;
 } t_adaptive;
 
-t_class *adaptive_class;
+t_class *adaptive_class = NULL;
 
 static void adaptive_help(void)
 {
