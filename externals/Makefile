@@ -60,7 +60,7 @@ ifeq ($(OS_NAME),linux)
   LDFLAGS += -Wl,-export_dynamic  -shared
   LIBS += -lc
   DYLIB_LDFLAGS = $(LDFLAGS)
-  DYLIB_EXTENSION = dll
+  DYLIB_EXTENSION = so
   STRIP = strip --strip-unneeded -R .note -R .comment
 endif
 ifeq ($(OS_NAME),windows)
@@ -78,7 +78,7 @@ ifeq ($(OS_NAME),windows)
   LIBS += -L$(pd_src)/bin  -L$(pd_src)/obj  -lpd \
     -lwsock32 -lpthreadGC2 -lkernel32 -luser32 -lgdi32 -lregex
   DYLIB_LDFLAGS = -shared
-  DYLIB_EXTENSION = so
+  DYLIB_EXTENSION = dll
   STRIP = strip --strip-unneeded -R .note -R .comment
 endif
 
@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -2236,6 +2236,129 @@ zexy_clean:
 	-rm -f -- $(externals_src)/*/*.*~
 	-rm -f -- $(externals_src)/*.*~
 
+
+
+
+
+#PDCONTAINER_XML =  $(wildcard $(externals_src)/grh/PDContainer/tinyxml/*.cpp)
+#PDCONTAINER_SRC := $(wildcard $(externals_src)/grh/PDContainer/src/*.cpp) \
+#                   $(PDCONTAINER_XML)
+#PDCONTAINER_OBJECTS := $(PDCONTAINER_SRC:.cpp=.o)
+#PDCONTAINER_LIB_SRC = $(wildcard $(externals_src)/grh/PDContainer/src/H*.cpp) \
+#                      $(PDCONTAINER_XML)
+#PDCONTAINER_LIB = $(PDCONTAINER_BASE_SRC:.cpp=.o)
+#PDCONTAINER_TMP := $(wildcard $(externals_src)/grh/PDContainer/src/h_*.cpp)
+#PDCONTAINER_TARGETS = $(PDCONTAINER_TMP:.cpp=.$(EXTENSION))
+
+#compile_pdcontainer: $(PDCONTAINER_TARGETS)
+#	#rm -f -- $(PDCONTAINER_OBJECTS)
+
+
+#------------------------------------------------------------------------------#
+# PDContainer
+PDCONTAINER_NAME = pdcontainer
+PDCONTAINER_INCLUDE = -I$(externals_src)/grh/PDContainer
+
+# shared library libpdc for shared code
+LIBPDC_SRC = $(wildcard $(externals_src)/grh/PDContainer/src/H*.cpp) \
+             $(wildcard $(externals_src)/grh/PDContainer/tinyxml/*.cpp)
+LIBPDC_OBJ = $(LIBPDC_SRC:.cpp=.o)
+LIBPDC_TARGET = $(externals_src)/grh/PDContainer/src/libpdc.$(DYLIB_EXTENSION)
+
+# the pd externals (linked to libpdc)
+PDCONTAINER_SRC = $(wildcard $(externals_src)/grh/PDContainer/src/h_*.cpp)
+PDCONTAINER_TARGETS = $(PDCONTAINER_SRC:.cpp=.$(EXTENSION))
+
+
+pdcontainer: $(PDCONTAINER_TARGETS)
+
+$(PDCONTAINER_TARGETS) : %.$(EXTENSION) : libpdc
+	$(CXX) $(CXXFLAGS) $(PDCONTAINER_INCLUDE) -o "$*.o" -c "$*.cpp"
+	$(CXX) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(LIBS) $(LIBPDC_TARGET)
+	strip --strip-unneeded $*.$(EXTENSION)
+	chmod 755 $*.$(EXTENSION)
+	-rm -f -- "$*.o"
+
+libpdc: $(LIBPDC_OBJ)
+	$(CXX) $(LDFLAGS) -o $(LIBPDC_TARGET) $(LIBPDC_OBJ) $(LIBS)
+	strip --strip-unneeded $(LIBPDC_TARGET)
+	chmod 755 $(LIBPDC_TARGET)
+	-rm -f -- $(LIBPDC_OBJ)
+
+$(LIBPDC_OBJ) : %.o : %.cpp
+	$(CXX) $(CXXFLAGS) $(PDCONTAINER_INCLUDE) -o "$*.o" -c "$*.cpp"
+
+pdcontainer_install: pdcontainer
+	install -d $(objectsdir)/$(PDCONTAINER_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDCONTAINER_NAME) \
+		--author "Georg Holzmann" \
+		--description "container objects of the C++ STL for Pd" \
+		--license "GPL" \
+		--version ""
+	install -p $(LIBPDC_TARGET) $(PDCONTAINER_TARGETS) $(objectsdir)/$(PDCONTAINER_NAME)
+	install -d $(helpdir)/$(PDCONTAINER_NAME)
+	install -p $(externals_src)/grh/PDContainer/help/*.pd \
+		$(helpdir)/$(PDCONTAINER_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/grh/PDContainer/readme.txt \
+		$(readmesdir)/$(PDCONTAINER_NAME).txt
+
+pdcontainer_clean:
+	-rm -f -- $(PDCONTAINER_TARGETS)
+	-rm -f -- $(LIBPDC_TARGETS)
+	-rm -f -- $(externals_src)/grh/PDContainer/src/*.o
+	-rm -f -- $(externals_src)/grh/PDContainer/src/*.bak
+	-rm -f -- $(externals_src)/grh/PDContainer/src/*.*~
+	-rm -f -- $(externals_src)/grh/PDContainer/tinyxml/*.o
+	-rm -f -- $(externals_src)/grh/PDContainer/tinyxml/*.bak
+	-rm -f -- $(externals_src)/grh/PDContainer/tinyxml/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# adaptive
+ADAPTIVE_NAME=adaptive
+ADAPTIVE_SRC := $(wildcard $(externals_src)/grh/adaptive/src/*.c)
+ADAPTIVE_OBJECTS := $(ADAPTIVE_SRC:.c=.o)
+ADAPTIVE_FLAGS := -DADAPTIVE_SINGLE_OBJ
+ADAPTIVE_TMP := $(wildcard $(externals_src)/grh/adaptive/src/*lms*.c)
+ADAPTIVE_TARGETS := $(ADAPTIVE_TMP:.c=.$(EXTENSION))
+
+adaptive: $(ADAPTIVE_TARGETS)
+
+$(ADAPTIVE_TARGETS) : %.$(EXTENSION) : %.o $(ADAPTIVE_OBJECTS)
+	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(externals_src)/grh/adaptive/src/adaptive.o $(LIBS)
+	strip --strip-unneeded $*.$(EXTENSION)
+	chmod 755 $*.$(EXTENSION)
+	rm -f -- "$*.o"
+
+$(ADAPTIVE_OBJECTS) : %.o : %.c
+	$(CC) $(CFLAGS) $(ADAPTIVE_FLAGS) -o "$*.o" -c "$*.c"
+
+adaptive_install: adaptive
+	install -d $(objectsdir)/$(ADAPTIVE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(ADAPTIVE_NAME) \
+		--author "Georg Holzmann, Gerda Strobl" \
+		--description "library for adaptive systems and filters" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(ADAPTIVE_TARGETS) $(objectsdir)/$(ADAPTIVE_NAME)
+	install -d $(helpdir)/$(ADAPTIVE_NAME)
+	install -p $(externals_src)/grh/adaptive/doc/*.pd \
+		$(helpdir)/$(ADAPTIVE_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/grh/adaptive/readme \
+		$(readmesdir)/$(ADAPTIVE_NAME).txt
+	install -d $(examplesdir)/$(ADAPTIVE_NAME)
+	install -p $(externals_src)/grh/adaptive/examples/*.pd \
+		$(externals_src)/grh/adaptive/examples/*.dat \
+		$(examplesdir)/$(ADAPTIVE_NAME)
+
+adaptive_clean:
+	-rm -f -- $(ADAPTIVE_TARGETS)
+	-rm -f -- $(ADAPTIVE_OBJECTS)
+	-rm -f -- $(externals_src)/grh/adaptive/src/*.bak
+	-rm -f -- $(externals_src)/grh/adaptive/src/*.*~
 
 
 
