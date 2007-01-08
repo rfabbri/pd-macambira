@@ -2252,20 +2252,21 @@ LIBPDC_TARGET = $(externals_src)/grh/PDContainer/src/libpdc.$(DYLIB_EXTENSION)
 # the pd externals (linked to libpdc)
 PDCONTAINER_SRC = $(wildcard $(externals_src)/grh/PDContainer/src/h_*.cpp)
 PDCONTAINER_TARGETS = $(PDCONTAINER_SRC:.cpp=.$(EXTENSION))
+PDCONTAINER_LD = -L$(externals_src)/grh/PDContainer/src
 
 
 pdcontainer: $(PDCONTAINER_TARGETS)
 
 $(PDCONTAINER_TARGETS) : %.$(EXTENSION) : libpdc
 	$(CXX) $(CXXFLAGS) $(PDCONTAINER_INCLUDE) -o "$*.o" -c "$*.cpp"
-	$(CXX) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(LIBS) $(LIBPDC_TARGET)
-	strip --strip-unneeded $*.$(EXTENSION)
+	$(CXX) $(LDFLAGS) $(PDCONTAINER_LD) -o $*.$(EXTENSION) "$*.o" $(LIBS) -lpdc
+	$(STRIP) $*.$(EXTENSION)
 	chmod 755 $*.$(EXTENSION)
 	-rm -f -- "$*.o"
 
 libpdc: $(LIBPDC_OBJ)
 	$(CXX) $(LDFLAGS) -o $(LIBPDC_TARGET) $(LIBPDC_OBJ) $(LIBS)
-	strip --strip-unneeded $(LIBPDC_TARGET)
+	$(STRIP) $(LIBPDC_TARGET)
 	chmod 755 $(LIBPDC_TARGET)
 	-rm -f -- $(LIBPDC_OBJ)
 
@@ -2312,7 +2313,7 @@ adaptive: $(ADAPTIVE_TARGETS)
 
 $(ADAPTIVE_TARGETS) : %.$(EXTENSION) : %.o $(ADAPTIVE_OBJECTS)
 	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(externals_src)/grh/adaptive/src/adaptive.o $(LIBS)
-	strip --strip-unneeded $*.$(EXTENSION)
+	$(STRIP) $*.$(EXTENSION)
 	chmod 755 $*.$(EXTENSION)
 	rm -f -- "$*.o"
 
