@@ -2,7 +2,9 @@ current: all
 
 .SUFFIXES: .pd_linux
 
-INCLUDE = -I. -I/usr/local/src/pd/src
+PDSOURCE = /usr/local/src/pd/src
+
+INCLUDE = -I. -I${PDSOURCE}
 
 LDFLAGS = -export-dynamic -shared
 LIB = -ldl -lm -lpthread
@@ -52,8 +54,8 @@ OBJ = $(SRC:.c=.o)
 #
 
 clean:
-	rm ../$(TARGET)
-	rm *.o
+	rm -f ../$(TARGET)
+	rm -f *.o
 
 all: $(OBJ)
 	@echo :: $(OBJ)
