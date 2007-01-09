@@ -2242,35 +2242,22 @@ zexy_clean:
 # PDContainer
 PDCONTAINER_NAME = pdcontainer
 PDCONTAINER_INCLUDE = -I$(externals_src)/grh/PDContainer
-
-# shared library libpdc for shared code
-LIBPDC_SRC = $(wildcard $(externals_src)/grh/PDContainer/src/H*.cpp) \
-             $(wildcard $(externals_src)/grh/PDContainer/tinyxml/*.cpp)
-LIBPDC_OBJ = $(LIBPDC_SRC:.cpp=.o)
-LIBPDC_TARGET = $(externals_src)/grh/PDContainer/src/libpdc.$(DYLIB_EXTENSION)
-
-# the pd externals (linked to libpdc)
-PDCONTAINER_SRC = $(wildcard $(externals_src)/grh/PDContainer/src/h_*.cpp)
-PDCONTAINER_TARGETS = $(PDCONTAINER_SRC:.cpp=.$(EXTENSION))
-PDCONTAINER_LD = -L$(externals_src)/grh/PDContainer/src
-
+PDCONTAINER_SRC = $(wildcard $(externals_src)/grh/PDContainer/src/[hH]*.cpp) \
+                  $(wildcard $(externals_src)/grh/PDContainer/tinyxml/*.cpp)
+PDCONTAINER_OBJ = $(PDCONTAINER_SRC:.cpp=.o)
+PDCONTAINER_TMP = $(wildcard $(externals_src)/grh/PDContainer/src/h_*.cpp)
+PDCONTAINER_TARGETS = $(PDCONTAINER_TMP:.cpp=.$(EXTENSION))
+PDC_SHARED = $(wildcard $(externals_src)/grh/PDContainer/tinyxml/*.cpp)
 
 pdcontainer: $(PDCONTAINER_TARGETS)
 
-$(PDCONTAINER_TARGETS) : %.$(EXTENSION) : libpdc
-	$(CXX) $(CXXFLAGS) $(PDCONTAINER_INCLUDE) -o "$*.o" -c "$*.cpp"
-	$(CXX) $(LDFLAGS) $(PDCONTAINER_LD) -o $*.$(EXTENSION) "$*.o" $(LIBS) -lpdc
+$(PDCONTAINER_TARGETS) : %.$(EXTENSION) : $(PDCONTAINER_OBJ)
+	$(CXX) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(shell ls `echo "$*.o" | sed -e s/"h_[a-z]"/"\?\?"/g -e s/"map"/"Map"/g -e s/"set"/"Set"/g -e s/"queue"/"Queue"/g`) $(PDC_SHARED:.cpp=.o) $(LIBS)
 	$(STRIP) $*.$(EXTENSION)
 	chmod 755 $*.$(EXTENSION)
-	-rm -f -- "$*.o"
+	#rm -f -- "$*.o"
 
-libpdc: $(LIBPDC_OBJ)
-	$(CXX) $(LDFLAGS) -o $(LIBPDC_TARGET) $(LIBPDC_OBJ) $(LIBS)
-	$(STRIP) $(LIBPDC_TARGET)
-	chmod 755 $(LIBPDC_TARGET)
-	-rm -f -- $(LIBPDC_OBJ)
-
-$(LIBPDC_OBJ) : %.o : %.cpp
+$(PDCONTAINER_OBJ) : %.o : %.cpp
 	$(CXX) $(CXXFLAGS) $(PDCONTAINER_INCLUDE) -o "$*.o" -c "$*.cpp"
 
 pdcontainer_install: pdcontainer
@@ -2280,7 +2267,7 @@ pdcontainer_install: pdcontainer
 		--description "container objects of the C++ STL for Pd" \
 		--license "GPL" \
 		--version ""
-	install -p $(LIBPDC_TARGET) $(PDCONTAINER_TARGETS) $(objectsdir)/$(PDCONTAINER_NAME)
+	install -p $(PDCONTAINER_TARGETS) $(objectsdir)/$(PDCONTAINER_NAME)
 	install -d $(helpdir)/$(PDCONTAINER_NAME)
 	install -p $(externals_src)/grh/PDContainer/help/*.pd \
 		$(helpdir)/$(PDCONTAINER_NAME)
@@ -2290,7 +2277,6 @@ pdcontainer_install: pdcontainer
 
 pdcontainer_clean:
 	-rm -f -- $(PDCONTAINER_TARGETS)
-	-rm -f -- $(LIBPDC_TARGETS)
 	-rm -f -- $(externals_src)/grh/PDContainer/src/*.o
 	-rm -f -- $(externals_src)/grh/PDContainer/src/*.bak
 	-rm -f -- $(externals_src)/grh/PDContainer/src/*.*~
