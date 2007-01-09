@@ -14,31 +14,31 @@
 #include "include/HPrioQueue.h"
 
 
-static t_class *h_priority_queue_class;
+static t_class *h_prioqueue_class;
 static t_class *proxy_class;
 
-typedef struct _h_priority_queue 
+typedef struct _h_prioqueue 
 {
   t_object  x_obj;
   t_canvas *x_canvas;
   t_outlet *out0, *out1, *out2;
-  HPrioQueue *hpriority_queue;
+  HPrioQueue *hprioqueue;
   Element value;
   bool event_set;
-} t_h_priority_queue;
+} t_h_prioqueue;
 
 typedef struct proxy
 {
   t_object obj;
   t_int index;  // number of proxy inlet(s)
-  t_h_priority_queue *x;	// we'll put the other struct in here
+  t_h_prioqueue *x;	// we'll put the other struct in here
 } t_proxy;
 
-static void h_priority_queue_push(t_h_priority_queue *x, t_symbol *s, int argc, t_atom *argv)
+static void h_prioqueue_push(t_h_prioqueue *x, t_symbol *s, int argc, t_atom *argv)
 {
   if(!x->event_set)
     {
-      post("h_priority_queue, insert: you must first set a value at right inlet!");
+      post("h_prioqueue, insert: you must first set a value at right inlet!");
       return;
     }
 
@@ -47,17 +47,17 @@ static void h_priority_queue_push(t_h_priority_queue *x, t_symbol *s, int argc, 
     prio = static_cast<float>(argv[0].a_w.w_float);
   else
     {
-      post("h_priority_queue, push: invalid priority!");
+      post("h_prioqueue, push: invalid priority!");
       return;
     }
 
-  x->hpriority_queue->push(prio,x->value);
+  x->hprioqueue->push(prio,x->value);
   x->event_set = false;
 }
 
-static void h_priority_queue_value(t_proxy *p, t_symbol *s, int argc, t_atom *argv)
+static void h_prioqueue_value(t_proxy *p, t_symbol *s, int argc, t_atom *argv)
 {
-  t_h_priority_queue *x = (t_h_priority_queue *)(p->x);
+  t_h_prioqueue *x = (t_h_prioqueue *)(p->x);
 
   // symbol without selector "symbol":
   if(argc == 0)
@@ -106,16 +106,16 @@ static void h_priority_queue_value(t_proxy *p, t_symbol *s, int argc, t_atom *ar
   }
 }
 
-static void h_priority_queue_top(t_h_priority_queue *x)
+static void h_prioqueue_top(t_h_prioqueue *x)
 {
-  if(x->hpriority_queue->getSize()==0)
+  if(x->hprioqueue->getSize()==0)
     {
       // if there was no Element found, put out a bang at the right outlet
       outlet_bang(x->out2);
       return;
     }
 
-  Element output = x->hpriority_queue->top();
+  Element output = x->hprioqueue->top();
  
   if(output.getLength() == 1) // symbol or float
     {
@@ -137,50 +137,50 @@ static void h_priority_queue_top(t_h_priority_queue *x)
   outlet_bang(x->out2);
 }
 
-static void h_priority_queue_pop(t_h_priority_queue *x)
+static void h_prioqueue_pop(t_h_prioqueue *x)
 {
-  if(x->hpriority_queue->getSize()<=0)
+  if(x->hprioqueue->getSize()<=0)
     {
-      post("h_priority_queue, pop: size is already 0 !");
+      post("h_prioqueue, pop: size is already 0 !");
       return;
     }
 
-  x->hpriority_queue->pop();
+  x->hprioqueue->pop();
 }
 
-static void h_priority_queue_getsize(t_h_priority_queue *x)
+static void h_prioqueue_getsize(t_h_prioqueue *x)
 {
-  outlet_float(x->out1,x->hpriority_queue->getSize());
+  outlet_float(x->out1,x->hprioqueue->getSize());
 }
 
-static void h_priority_queue_help(t_h_priority_queue *x)
+static void h_prioqueue_help(t_h_prioqueue *x)
 {
-  x->hpriority_queue->help();
+  x->hprioqueue->help();
 }
 
-static void h_priority_queue_set_namespace(t_h_priority_queue *x, t_symbol *s)
+static void h_prioqueue_set_namespace(t_h_prioqueue *x, t_symbol *s)
 {
-  x->hpriority_queue->setNamespace(s->s_name);
+  x->hprioqueue->setNamespace(s->s_name);
 }
 
-static void h_priority_queue_get_namespace(t_h_priority_queue *x)
+static void h_prioqueue_get_namespace(t_h_prioqueue *x)
 {
-  post("h_priority_queue current namespace: %s",x->hpriority_queue->getNamespace().c_str());
+  post("h_prioqueue current namespace: %s",x->hprioqueue->getNamespace().c_str());
 }
 
-static void h_priority_queue_clear(t_h_priority_queue *x)
+static void h_prioqueue_clear(t_h_prioqueue *x)
 {
-  x->hpriority_queue->clearNamespace();
+  x->hprioqueue->clearNamespace();
 }
 
-static void h_priority_queue_clear_all(t_h_priority_queue *x)
+static void h_prioqueue_clear_all(t_h_prioqueue *x)
 {
-  x->hpriority_queue->clearAll();
+  x->hprioqueue->clearAll();
 }
 
-static void *h_priority_queue_new(t_symbol *s, int argc, t_atom *argv) 
+static void *h_prioqueue_new(t_symbol *s, int argc, t_atom *argv) 
 {
-  t_h_priority_queue *x = (t_h_priority_queue *)pd_new(h_priority_queue_class);
+  t_h_prioqueue *x = (t_h_prioqueue *)pd_new(h_prioqueue_class);
   t_proxy *inlet = (t_proxy *)pd_new(proxy_class); // for the proxy inlet
 
   inlet->x = x;	// make x visible to the proxy inlets
@@ -188,12 +188,12 @@ static void *h_priority_queue_new(t_symbol *s, int argc, t_atom *argv)
   switch(argc)
     {
     default:
-      post("h_priority_queue warning: only one argument for namespace is possible!");
+      post("h_prioqueue warning: only one argument for namespace is possible!");
    case 1:
-      x->hpriority_queue = new HPrioQueue(atom_getsymbol(argv)->s_name);
+      x->hprioqueue = new HPrioQueue(atom_getsymbol(argv)->s_name);
       break;
     case 0:
-      x->hpriority_queue = new HPrioQueue();
+      x->hprioqueue = new HPrioQueue();
       break;
     }
 
@@ -210,41 +210,41 @@ static void *h_priority_queue_new(t_symbol *s, int argc, t_atom *argv)
   return (void *)x;
 }
 
-static void *h_priority_queue_free(t_h_priority_queue *x)
+static void *h_prioqueue_free(t_h_prioqueue *x)
 {
-  delete x->hpriority_queue;
+  delete x->hprioqueue;
   return (void *)x;
 }
 
 extern "C" void h_prioqueue_setup(void) 
 {
   // the object class
-  h_priority_queue_class = class_new(gensym("h_priority_queue"), (t_newmethod)h_priority_queue_new,
-				(t_method)h_priority_queue_free, sizeof(t_h_priority_queue), 
+  h_prioqueue_class = class_new(gensym("h_prioqueue"), (t_newmethod)h_prioqueue_new,
+				(t_method)h_prioqueue_free, sizeof(t_h_prioqueue), 
 				CLASS_DEFAULT, A_GIMME, 0);
 
   // a class for the proxy-inlet
-  proxy_class = class_new(gensym("h_priority_queue_proxy"), NULL, NULL, sizeof(t_proxy),
+  proxy_class = class_new(gensym("h_prioqueue_proxy"), NULL, NULL, sizeof(t_proxy),
 			  CLASS_PD|CLASS_NOINLET, A_NULL);
 
-  class_addmethod(h_priority_queue_class, (t_method)h_priority_queue_push, 
+  class_addmethod(h_prioqueue_class, (t_method)h_prioqueue_push, 
 		  gensym("push"), A_GIMME, 0);
-  class_addanything(proxy_class, (t_method)h_priority_queue_value); // the right inlet
-  class_addmethod(h_priority_queue_class, (t_method)h_priority_queue_pop, 
+  class_addanything(proxy_class, (t_method)h_prioqueue_value); // the right inlet
+  class_addmethod(h_prioqueue_class, (t_method)h_prioqueue_pop, 
 		  gensym("pop"), A_DEFFLOAT, 0);
-  class_addmethod(h_priority_queue_class, (t_method)h_priority_queue_top, 
+  class_addmethod(h_prioqueue_class, (t_method)h_prioqueue_top, 
 		  gensym("top"), A_DEFFLOAT, 0);
-  class_addmethod(h_priority_queue_class, (t_method)h_priority_queue_getsize, 
+  class_addmethod(h_prioqueue_class, (t_method)h_prioqueue_getsize, 
 		  gensym("getsize"), A_DEFFLOAT , 0);
-  class_addmethod(h_priority_queue_class, (t_method)h_priority_queue_set_namespace, 
+  class_addmethod(h_prioqueue_class, (t_method)h_prioqueue_set_namespace, 
 		  gensym("namespace"), A_DEFSYMBOL , 0);
-  class_addmethod(h_priority_queue_class, (t_method)h_priority_queue_get_namespace, 
+  class_addmethod(h_prioqueue_class, (t_method)h_prioqueue_get_namespace, 
 		  gensym("getnamespace"), A_DEFFLOAT, 0);
-  class_addmethod(h_priority_queue_class, (t_method)h_priority_queue_clear,  
+  class_addmethod(h_prioqueue_class, (t_method)h_prioqueue_clear,  
 		  gensym("clear"), A_DEFFLOAT, 0);
-  class_addmethod(h_priority_queue_class, (t_method)h_priority_queue_clear_all,  
+  class_addmethod(h_prioqueue_class, (t_method)h_prioqueue_clear_all,  
 		  gensym("clearall"), A_DEFFLOAT, 0);
 
   // without an argument the following two methods wont work ??? why?? because of c++?
-  class_addmethod(h_priority_queue_class, (t_method)h_priority_queue_help, gensym("help"),A_DEFFLOAT, 0);
+  class_addmethod(h_prioqueue_class, (t_method)h_prioqueue_help, gensym("help"),A_DEFFLOAT, 0);
 }
