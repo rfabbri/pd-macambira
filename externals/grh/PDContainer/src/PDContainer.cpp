@@ -48,7 +48,7 @@ void h_multiset_setup();
 void h_vector_setup();
 void h_deque_setup();
 void h_queue_setup();
-void h_priority_queue_setup();
+void h_prioqueue_setup();
 void h_stack_setup();
 void h_list_setup();
 //-end-of-declaration----------------------------------
@@ -64,7 +64,7 @@ extern "C" void PDContainer_setup(void)
   h_vector_setup();
   h_deque_setup();
   h_queue_setup();
-  h_priority_queue_setup();
+  h_prioqueue_setup();
   h_stack_setup();
   h_list_setup();
   //-end-----------------------------------------------
