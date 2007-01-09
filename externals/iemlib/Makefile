@@ -17,7 +17,7 @@ INSTALL_DOC=$(PREFIX)/extra/iemhelp
 iemlibs: $(IEMLIBS)
 
 $(IEMLIBS):
-	$(MAKE) -C src/$@
+	$(MAKE) -C $@/src
 
 install: install-bin install-doc install-abs
 
@@ -27,7 +27,11 @@ install-bin:
 
 install-doc:
 	-install -d ${INSTALL_DOC}
-	-install -m 644 iemhelp/*.pd $(INSTALL_DOC)
+	-for d in ${IEMLIBS}; do \
+	 for e in pd wav; do \
+	  install -m644 $$d/*.$$e $(INSTALL_DOC); \
+	 done; \
+	done
 
 install-abs:
 	-install -d ${INSTALL_BIN}
@@ -35,5 +39,5 @@ install-abs:
 
 clean:
 	for d in ${IEMLIBS}; do \
-	  ${MAKE} -C src/$$d clean; \
+	  ${MAKE} -C $$d/src clean; \
 	done
