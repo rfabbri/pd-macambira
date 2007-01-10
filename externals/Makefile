@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1164,40 +1164,7 @@ iem_bin_ambi_clean:
 
 
 #------------------------------------------------------------------------------#
-# IEM_TAB
-IEM_TAB_NAME=iem_tab
-# exclude the files for the single-file library format
-IEM_TAB_OBJECTS := $(wildcard $(externals_src)/iem/iem_tab/src/[a-hj-z]*.c)
-iem_tab: $(IEM_TAB_OBJECTS:.c=.$(EXTENSION))
-
-iem_tab_install: iem_tab
-	install -d $(objectsdir)/$(IEM_TAB_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEM_TAB_NAME) \
-		--author "" \
-		--description "" \
-		--license "" \
-		--version ""
-	install -p $(IEM_TAB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEM_TAB_NAME)
-	install -d $(helpdir)/$(IEM_TAB_NAME)
-	install -p $(externals_src)/iem/iem_tab/help/*.pd \
-		$(helpdir)/$(IEM_TAB_NAME)
-#	install -d $(manualsdir)/$(IEM_TAB_NAME)
-	install -d $(readmesdir)
-	install -p $(externals_src)/iem/iem_tab/READ_ME.txt \
-		$(readmesdir)/$(IEM_TAB_NAME).txt
-	install -d $(examplesdir)/$(IEM_TAB_NAME)
-	install -p $(externals_src)/iem/iem_tab/examples/*.pd \
-		$(examplesdir)/$(IEM_TAB_NAME)
-
-iem_tab_clean:
-	-rm -f -- $(IEM_TAB_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(IEM_TAB_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/iem/iem_tab/*.bak
-	-rm -f -- $(externals_src)/iem/iem_tab/*.*~
-
-
-
-#------------------------------------------------------------------------------#
+# G.Holzmann: Hm, still don't work because of more externals in one file !
 # IEM16
 IEM16_NAME=iem16
 IEM16_OBJECTS := $(wildcard $(externals_src)/iem16/src/iem16_*.c)
@@ -1274,13 +1241,22 @@ iemlib_clean:
 
 
 #------------------------------------------------------------------------------#
+# G.Holzmann: STILL DOESN'T WORK - HAVE TO CHECK SOME PROBLEMS !!!
 # IEMMATRIX
 IEMMATRIX_NAME=iemmatrix
-IEMMATRIX_SOURCES := $(wildcard $(externals_src)/iem/iemmatrix/src/mtx_*.c)
-IEMMATRIX_OBJECTS := $(wildcard $(externals_src)/iem/iemmatrix/src/mtx_*.c)
-IEMMATRIX_VERSION := $(shell echo $(externals_src)/iem/iemmatrix/VERSION.txt)
-iemmatrix: $(IEMMATRIX_OBJECTS:.c=.o)
+IEMMATRIX_SRC := $(wildcard $(externals_src)/iem/iemmatrix/src/mtx_*.c)
+IEMMATRIX_OBJ := $(IEMMATRIX_SRC:.c=.o)
 
+iemmatrix: $(IEMMATRIX_OBJ:.o=.$(EXTENSION))
+
+$(IEMMATRIX_OBJ:.o=.$(EXTENSION)) : %.$(EXTENSION) : %.o $(IEMMATRIX_OBJ)
+	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(externals_src)/iem/iemmatrix/src/mtx_binops.o $(LIBS)
+	$(STRIP) $*.$(EXTENSION)
+	chmod 755 $*.$(EXTENSION)
+	rm -f -- "$*.o"
+
+$(IEMMATRIX_OBJ) : %.o : %.c
+	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
 
 iemmatrix_install: iemmatrix
 	install -d $(objectsdir)/$(IEMMATRIX_NAME)
@@ -1289,7 +1265,7 @@ iemmatrix_install: iemmatrix
 		--description "objects for matrix operations and math" \
 		--license "GNU GPL" \
 		--version "$(IEMMATRIX_VERSION)"
-	install -p $(IEMMATRIX_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEMMATRIX_NAME)
+	install -p $(IEMMATRIX_OBJ:.o=.$(EXTENSION)) $(objectsdir)/$(IEMMATRIX_NAME)
 	install -p $(shell ls -1 $(externals_src)/iem/iemmatrix/abs/*.* | \
 		grep -v '\-help.pd') $(objectsdir)/$(IEMMATRIX_NAME)
 	install -d $(helpdir)/$(IEMMATRIX_NAME)
@@ -1308,13 +1284,10 @@ iemmatrix_install: iemmatrix
 #		$(examplesdir)/$(IEMMATRIX_NAME)
 
 iemmatrix_clean:
-	-rm -f -- $(IEMMATRIX_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(IEMMATRIX_OBJECTS:.c=.o)
+	-rm -f -- $(IEMMATRIX_OBJ:.o=.$(EXTENSION))
+	-rm -f -- $(IEMMATRIX_OBJ)
 	-rm -f -- $(externals_src)/iem/iemmatrix/*.bak
 	-rm -f -- $(externals_src)/iem/iemmatrix/*.*~
-
-#iemmatrix_install: iemmatrix
-#	mv $(objectsdir)/mtx*.$(EXTENSION) $(objectsdir)/$(IEMMATRIX_NAME)
 
 
 
@@ -2495,6 +2468,35 @@ iem_tab_clean:
 	-rm -f -- $(externals_src)/iem/iem_tab/src/*.bak
 	-rm -f -- $(externals_src)/iem/iem_tab/src/*.*~
 
+
+
+#------------------------------------------------------------------------------#
+# FLASHSERVER
+FLASHSERVER_NAME=flashserver
+FLASHSERVER_OBJECTS := $(wildcard $(externals_src)/olafmatt/flashserver/*.c)
+flashserver: $(FLASHSERVER_OBJECTS:.c=.$(EXTENSION))
+
+flashserver_install: flashserver
+	install -d $(objectsdir)/$(FLASHSERVER_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(FLASHSERVER_NAME) \
+		--author "Olaf Matthes" \
+		--description "a flashserver for multiple clients" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(FLASHSERVER_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(FLASHSERVER_NAME)
+	install -d $(helpdir)/$(FLASHSERVER_NAME)
+	install -p $(externals_src)/olafmatt/flashserver/*.pd \
+		$(helpdir)/$(FLASHSERVER_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/olafmatt/flashserver/README \
+		$(readmesdir)/$(FLASHSERVER_NAME).txt
+	install -d $(examplesdir)/$(FLASHSERVER_NAME)
+
+flashserver_clean:
+	-rm -f -- $(FLASHSERVER_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(FLASHSERVER_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/olafmatt/flashserver/*.bak
+	-rm -f -- $(externals_src)/olafmatt/flashserver/*.*~
 
 
 #==============================================================================#
