@@ -2333,6 +2333,37 @@ adaptive_clean:
 
 
 
+#------------------------------------------------------------------------------#
+# G.Holzmann: DOES NOT WORK YET - OBJECTS CAN'T BE OPENED IN PD !!!
+# iem_adaptfilt
+IEMADAPT_NAME=iem_adaptfilt
+IEMADAPT_SRC := $(wildcard $(externals_src)/iem/iem_adaptfilt/src/*LMS*.c)
+
+iem_adaptfilt: $(IEMADAPT_SRC:.c=.$(EXTENSION))
+
+iem_adaptfilt_install: iem_adaptfilt
+	install -d $(objectsdir)/$(IEMADAPT_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMADAPT_NAME) \
+		--author "Markus Noisternig, Thomas Musil" \
+		--description "several algorithms for adaptive filters" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(IEMADAPT_SRC:.c=.$(EXTENSION)) $(objectsdir)/$(IEMADAPT_NAME)
+	install -d $(helpdir)/$(IEMADAPT_NAME)
+	install -p $(externals_src)/iem/iem_adaptfilt/help/*.pd \
+		$(helpdir)/$(IEMADAPT_NAME)
+	install -d $(manualsdir)/$(IEMADAPT_NAME)
+	install -p $(externals_src)/iem/iem_adaptfilt/doc/adapt_filt_lib.pdf \
+		$(manualsdir)/$(IEMADAPT_NAME)
+
+iem_adaptfilt_clean:
+	-rm -f -- $(IEMADAPT_SRC:.c=.$(EXTENSION))
+	-rm -f -- $(IEMADAPT_SRC:.c=.o)
+	-rm -f -- $(externals_src)/iem/iem_adaptfilt/src/*.bak
+	-rm -f -- $(externals_src)/iem/iem_adaptfilt/src/*.*~
+
+
+
 #==============================================================================#
 #
 # DEVELOPER'S TARGETS
