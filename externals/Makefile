@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -2392,6 +2392,35 @@ iem_delay_clean:
 	-rm -f -- $(externals_src)/iem/iem_delay/src/*.bak
 	-rm -f -- $(externals_src)/iem/iem_delay/src/*.*~
 
+
+
+#------------------------------------------------------------------------------#
+# iem_roomsim
+IEMROOM_NAME=iem_roomsim
+IEMROOM_SRC := $(wildcard $(externals_src)/iem/iem_roomsim/src/*d.c)
+
+iem_roomsim: $(IEMROOM_SRC:.c=.$(EXTENSION))
+
+iem_roomsim_install: iem_roomsim
+	install -d $(objectsdir)/$(IEMROOM_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMROOM_NAME) \
+		--author "Thomas Musil" \
+		--description "objects for room simulation" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(IEMROOM_SRC:.c=.$(EXTENSION)) $(objectsdir)/$(IEMROOM_NAME)
+	install -d $(helpdir)/$(IEMROOM_NAME)
+	install -p $(externals_src)/iem/iem_roomsim/help/*.pd \
+		$(helpdir)/$(IEMROOM_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/iem/iem_roomsim/READ_ME.txt \
+		$(readmesdir)/$(IEMROOM_NAME).txt
+
+iem_roomsim_clean:
+	-rm -f -- $(IEMROOM_SRC:.c=.$(EXTENSION))
+	-rm -f -- $(IEMROOM_SRC:.c=.o)
+	-rm -f -- $(externals_src)/iem/iem_roomsim/src/*.bak
+	-rm -f -- $(externals_src)/iem/iem_roomsim/src/*.*~
 
 
 #==============================================================================#
