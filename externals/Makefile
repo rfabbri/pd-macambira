@@ -2364,6 +2364,36 @@ iem_adaptfilt_clean:
 
 
 
+#------------------------------------------------------------------------------#
+# iem_delay
+IEMDELAY_NAME=iem_delay
+IEMDELAY_SRC := $(wildcard $(externals_src)/iem/iem_delay/src/*~.c)
+
+iem_delay: $(IEMDELAY_SRC:.c=.$(EXTENSION))
+
+iem_delay_install: iem_delay
+	install -d $(objectsdir)/$(IEMDELAY_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMDELAY_NAME) \
+		--author "Thomas Musil" \
+		--description "various delay objects" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(IEMDELAY_SRC:.c=.$(EXTENSION)) $(objectsdir)/$(IEMDELAY_NAME)
+	install -d $(helpdir)/$(IEMDELAY_NAME)
+	install -p $(externals_src)/iem/iem_delay/help/*.pd \
+		$(helpdir)/$(IEMDELAY_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/iem/iem_delay/READ_ME.txt \
+		$(readmesdir)/$(IEMDELAY_NAME).txt
+
+iem_delay_clean:
+	-rm -f -- $(IEMDELAY_SRC:.c=.$(EXTENSION))
+	-rm -f -- $(IEMDELAY_SRC:.c=.o)
+	-rm -f -- $(externals_src)/iem/iem_delay/src/*.bak
+	-rm -f -- $(externals_src)/iem/iem_delay/src/*.*~
+
+
+
 #==============================================================================#
 #
 # DEVELOPER'S TARGETS
