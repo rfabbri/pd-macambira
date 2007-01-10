@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -2421,6 +2421,80 @@ iem_roomsim_clean:
 	-rm -f -- $(IEMROOM_SRC:.c=.o)
 	-rm -f -- $(externals_src)/iem/iem_roomsim/src/*.bak
 	-rm -f -- $(externals_src)/iem/iem_roomsim/src/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# iem_spec2
+IEMSPEC2_NAME=iem_spec2
+IEMSPEC2_SRC := $(wildcard $(externals_src)/iem/iem_spec2/src/*~.c)
+
+iem_spec2: $(IEMSPEC2_SRC:.c=.$(EXTENSION))
+
+iem_spec2_install: iem_spec2
+	install -d $(objectsdir)/$(IEMSPEC2_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMSPEC2_NAME) \
+		--author "Thomas Musil" \
+		--description "special spectral processing objects, which only calculates blocksize/2 + 1 samples of a signal" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(IEMSPEC2_SRC:.c=.$(EXTENSION)) $(objectsdir)/$(IEMSPEC2_NAME)
+	install -d $(helpdir)/$(IEMSPEC2_NAME)
+	install -p $(externals_src)/iem/iem_spec2/help/*.pd \
+		$(helpdir)/$(IEMSPEC2_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/iem/iem_spec2/READ_ME.txt \
+		$(readmesdir)/$(IEMSPEC2_NAME).txt
+
+iem_spec2_clean:
+	-rm -f -- $(IEMSPEC2_SRC:.c=.$(EXTENSION))
+	-rm -f -- $(IEMSPEC2_SRC:.c=.o)
+	-rm -f -- $(externals_src)/iem/iem_spec2/src/*.bak
+	-rm -f -- $(externals_src)/iem/iem_spec2/src/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# iem_tab
+IEMTAB_NAME=iem_tab
+IEMTAB_SRC := $(wildcard $(externals_src)/iem/iem_tab/src/*.c)
+IEMTAB_OBJ := $(IEMTAB_SRC:.c=.o)
+IEMTAB_TARTMP := $(wildcard $(externals_src)/iem/iem_tab/src/tab_*.c)
+IEMTAB_TARGETS := $(IEMTAB_TARTMP:.c=.$(EXTENSION))
+IEMTAB_FLAGS := -DIEMTAB_SINGLE_OBJ
+
+iem_tab: $(IEMTAB_TARGET)
+
+$(IEMTAB_TARGETS) : %.$(EXTENSION) : %.o $(IEMTAB_OBJ)
+	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(externals_src)/iem/iem_tab/src/iem_tab.o $(LIBS)
+	$(STRIP) $*.$(EXTENSION)
+	chmod 755 $*.$(EXTENSION)
+	rm -f -- "$*.o"
+
+$(IEMTAB_OBJ) : %.o : %.c
+	$(CC) $(CFLAGS) $(IEMTAB_FLAGS) -o "$*.o" -c "$*.c"
+
+iem_tab_install: iem_tab
+	install -d $(objectsdir)/$(IEMTAB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMTAB_NAME) \
+		--author "Thomas Musil" \
+		--description "library to manipulate tables or arrays" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(IEMTAB_TARGETS) $(objectsdir)/$(IEMTAB_NAME)
+	install -d $(helpdir)/$(IEMTAB_NAME)
+	install -p $(externals_src)/iem/iem_tab/help/*.pd \
+		$(helpdir)/$(IEMTAB_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/iem/iem_tab/READ_ME.txt \
+		$(readmesdir)/$(IEMTAB_NAME).txt
+
+iem_tab_clean:
+	-rm -f -- $(IEMTAB_TARGETS)
+	-rm -f -- $(IEMTAB_OBJ)
+	-rm -f -- $(externals_src)/iem/iem_tab/src/*.bak
+	-rm -f -- $(externals_src)/iem/iem_tab/src/*.*~
+
 
 
 #==============================================================================#
