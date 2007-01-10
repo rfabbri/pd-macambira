@@ -6,8 +6,6 @@ iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 
 #include "m_pd.h"
 #include "iemlib.h"
 
-static t_class *iem_tab_class;
-
 int iem_tab_check_arrays(t_symbol *obj_name, t_symbol *array_name, t_float **beg_mem, int *array_size, int max_index)
 {
   int ok=1;
@@ -30,6 +28,15 @@ int iem_tab_check_arrays(t_symbol *obj_name, t_symbol *array_name, t_float **beg
   }
   return(ok);
 }
+
+
+// Georg Holzmann:
+#ifdef IEMTAB_SINGLE_OBJ
+// for single externals disable the iem_tab object
+#else
+// build as library
+
+static t_class *iem_tab_class;
 
 static void *iem_tab_new(void)
 {
@@ -130,3 +137,5 @@ void iem_tab_setup(void)
   post("iem_tab (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
   post("   musil%ciem.at iem KUG Graz Austria", '@');
 }
+
+#endif // library

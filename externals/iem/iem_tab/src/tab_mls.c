@@ -119,9 +119,9 @@ static void tab_mls_calc(t_float *vec, int mls_order)
     i = work1 & mask;
     work2 = work1 >> 1;
     exor = 0;
-    for(j=0; j<lms_order; j++)
+    for(j=0; j<mls_order; j++)
     {
-      exor +=  & 1;
+      exor += 1; //??? exor +=  & 1; ???
       work1 >>= 1;
     }
     if(exor & 1)
