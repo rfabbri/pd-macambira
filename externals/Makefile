@@ -2307,11 +2307,9 @@ adaptive_clean:
 
 
 #------------------------------------------------------------------------------#
-# G.Holzmann: we would have to rename the externals, otherwise they won't
-#             build as single objects !
 # iem_adaptfilt
 IEMADAPT_NAME=iem_adaptfilt
-IEMADAPT_SRC := $(wildcard $(externals_src)/iem/iem_adaptfilt/src/*LMS*.c)
+IEMADAPT_SRC := $(wildcard $(externals_src)/iem/iem_adaptfilt/src/*~.c)
 
 iem_adaptfilt: $(IEMADAPT_SRC:.c=.$(EXTENSION))
 
