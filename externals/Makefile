@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui iem_adaptfilt iemmatrix
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1239,23 +1239,23 @@ iemlib_clean:
 
 
 
-
 #------------------------------------------------------------------------------#
-# G.Holzmann: STILL DOESN'T WORK - HAVE TO CHECK SOME PROBLEMS !!!
 # IEMMATRIX
 IEMMATRIX_NAME=iemmatrix
-IEMMATRIX_SRC := $(wildcard $(externals_src)/iem/iemmatrix/src/mtx_*.c)
+IEMMATRIX_SRC := $(wildcard $(externals_src)/iem/iemmatrix/src/m[at]*.c)
 IEMMATRIX_OBJ := $(IEMMATRIX_SRC:.c=.o)
+IEMMATRIX_SHARED := $(wildcard $(externals_src)/iem/iemmatrix/src/iemmatrix_binops.c) \
+                    $(wildcard $(externals_src)/iem/iemmatrix/src/iemmatrix_utility.c)
 
 iemmatrix: $(IEMMATRIX_OBJ:.o=.$(EXTENSION))
 
-$(IEMMATRIX_OBJ:.o=.$(EXTENSION)) : %.$(EXTENSION) : %.o $(IEMMATRIX_OBJ)
-	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(externals_src)/iem/iemmatrix/src/mtx_binops.o $(LIBS)
+$(IEMMATRIX_OBJ:.o=.$(EXTENSION)) : %.$(EXTENSION) : $(IEMMATRIX_OBJ) $(IEMMATRIX_SHARED:.c=.o)
+	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(IEMMATRIX_SHARED:.c=.o) $(LIBS)
 	$(STRIP) $*.$(EXTENSION)
 	chmod 755 $*.$(EXTENSION)
-	rm -f -- "$*.o"
+	#rm -f -- "$*.o"
 
-$(IEMMATRIX_OBJ) : %.o : %.c
+$(IEMMATRIX_OBJ) $(IEMMATRIX_SHARED:.c=.o) : %.o : %.c
 	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
 
 iemmatrix_install: iemmatrix
@@ -1276,16 +1276,10 @@ iemmatrix_install: iemmatrix
 	install -d $(manualsdir)/$(IEMMATRIX_NAME)
 	install -p $(externals_src)/iem/iemmatrix/*.txt \
 		$(manualsdir)/$(IEMMATRIX_NAME)
-#	install -d $(readmesdir)
-#	install -p $(externals_src)/iem/iemmatrix/README \
-#		$(readmesdir)/$(IEMMATRIX_NAME).txt
-#	install -d $(examplesdir)/$(IEMMATRIX_NAME)
-#	install -p $(externals_src)/iem/iemmatrix/examples/*.pd \
-#		$(examplesdir)/$(IEMMATRIX_NAME)
 
 iemmatrix_clean:
 	-rm -f -- $(IEMMATRIX_OBJ:.o=.$(EXTENSION))
-	-rm -f -- $(IEMMATRIX_OBJ)
+	-rm -f -- $(externals_src)/iem/iemmatrix/*.o
 	-rm -f -- $(externals_src)/iem/iemmatrix/*.bak
 	-rm -f -- $(externals_src)/iem/iemmatrix/*.*~
 
@@ -2212,7 +2206,7 @@ zexy_clean:
 
 
 #------------------------------------------------------------------------------#
-# PDContainer
+# pdcontainer
 PDCONTAINER_NAME = pdcontainer
 PDCONTAINER_INCLUDE = -I$(externals_src)/grh/PDContainer
 PDCONTAINER_SRC = $(wildcard $(externals_src)/grh/PDContainer/src/[hH]*.cpp) \
