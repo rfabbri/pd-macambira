@@ -121,6 +121,11 @@ typedef struct _mtx_binmtx
 } t_mtx_binmtx;
 
 
+/*
+  G.Holzmann: the following is now implemented
+              in iemmatrix_utility.c
+*/
+
 void matrix_free(t_matrix*x);
 
 /* utility function */
@@ -148,6 +153,10 @@ void matrix_row(t_matrix *x, t_symbol *s, int argc, t_atom *argv);
 void matrix_col(t_matrix *x, t_symbol *s, int argc, t_atom *argv);
 void matrix_element(t_matrix *x, t_symbol *s, int argc, t_atom *argv);
 
+
+/*
+  in iemmatrix_binops.c
+*/
 
 void mtx_bin_matrix2(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom *argv);
 void mtx_binmtx_bang(t_mtx_binmtx *x);
