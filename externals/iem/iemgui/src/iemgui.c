@@ -63,6 +63,13 @@ void my_iemgui_change_scale_col(char *gif, int color)
   gif[27] = my_iemgui_base64[i];
 }
 
+
+// Georg Holzmann:
+#ifdef IEMGUI_SINGLE_OBJ
+// for single externals disable the iemgui object
+#else
+// build as library
+
 static t_class *iemgui_class;
 
 static void *iemgui_new(void)
@@ -111,3 +118,5 @@ void iemgui_setup(void)
   post("iemgui (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
   post("   musil%ciem.at iem KUG Graz Austria", '@');
 }
+
+#endif // library
