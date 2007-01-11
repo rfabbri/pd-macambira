@@ -21,10 +21,10 @@ PD_WIN_LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames /NODEFAULTLIB:kernel /NOD
 	$(PD_INST_PATH)\bin\pd.lib
 
 
-SRC =	sigNLMS.c \
-	sigNLMSCC.c \
-	sign_CNLMS.c \
-	sign_CLNLMS.c \
+SRC =	NLMS~.c \
+	NLMSCC~.c \
+	n_CNLMS~.c \
+	n_CLNLMS~.c \
 	iem_adaptfilt.c
 
 

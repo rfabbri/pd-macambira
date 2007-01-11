@@ -23,19 +23,19 @@ static void *iem_adaptfilt_new(void)
 	return (x);
 }
 
-void sigNLMS_setup(void);
-void sigNLMSCC_setup(void);
-void sign_CNLMS_setup(void);
-void sign_CLNLMS_setup(void);
+void NLMS_tilde_setup(void);
+void NLMSCC_tilde_setup(void);
+void n_CNLMS_tilde_setup(void);
+void n_CLNLMS_tilde_setup(void);
 
 /* ------------------------ setup routine ------------------------- */
 
 void iem_adaptfilt_setup(void)
 {
-  sigNLMS_setup();
-  sigNLMSCC_setup();
-  sign_CNLMS_setup();
-  sign_CLNLMS_setup();
+  NLMS_tilde_setup();
+  NLMSCC_tilde_setup();
+  n_CNLMS_tilde_setup();
+  n_CLNLMS_tilde_setup();
   	
   	post("----------------------------------------------");
 	post("iem_adaptfilt (R-1.02) library loaded!");

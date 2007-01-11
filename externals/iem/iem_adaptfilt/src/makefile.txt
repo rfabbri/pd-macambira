@@ -17,9 +17,9 @@ SYSTEM = $(shell uname -m)
 
 # the sources
 
-SRC = sigNLMS.c \
-	sigNLMSCC.c \
-	sign_CNLMS.c \
+SRC = NLMS~.c \
+	NLMSCC~.c \
+	n_CNLMS~.c \
 	iem_adaptfilt.c
 
 TARGET = iem_adaptfilt.pd_linux
