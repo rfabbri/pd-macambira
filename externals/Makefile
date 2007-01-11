@@ -2436,7 +2436,7 @@ IEMTAB_TARTMP := $(wildcard $(externals_src)/iem/iem_tab/src/tab_*.c)
 IEMTAB_TARGETS := $(IEMTAB_TARTMP:.c=.$(EXTENSION))
 IEMTAB_FLAGS := -DIEMTAB_SINGLE_OBJ
 
-iem_tab: $(IEMTAB_TARGET)
+iem_tab: $(IEMTAB_TARGETS)
 
 $(IEMTAB_TARGETS) : %.$(EXTENSION) : %.o $(IEMTAB_OBJ)
 	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(externals_src)/iem/iem_tab/src/iem_tab.o $(LIBS)
