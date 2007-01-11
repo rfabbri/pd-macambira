@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui iem_adaptfilt iemmatrix
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui iem_adaptfilt iemmatrix iemxmlrpc
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -2571,6 +2571,53 @@ iemgui_clean:
 	-rm -f -- $(IEMGUI_OBJ)
 	-rm -f -- $(externals_src)/iem/iemgui/src/*.bak
 	-rm -f -- $(externals_src)/iem/iemgui/src/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# iemxmlrpc
+IEMXMLRPC_NAME=iemxmlrpc
+IEMXMLRPC_SRC := $(externals_src)/iem/iemxmlrpc/main.cpp
+IEMXMLRPC_TARGET := $(externals_src)/iem/iemxmlrpc/xmlrpc.$(EXTENSION)
+IEMXMLRPC_FLAGS := -I$(externals_src)/iem/iemxmlrpc/xmlrpc++/src
+XMLRPCPP_SRC := $(wildcard $(externals_src)/iem/iemxmlrpc/xmlrpc++/src/*.cpp)
+
+iemxmlrpc: $(IEMXMLRPC_TARGET)
+
+$(IEMXMLRPC_TARGET) : $(IEMXMLRPC_SRC:.cpp=.o) $(XMLRPCPP_SRC:.cpp=.o)
+	$(CXX) $(LDFLAGS) -o $(IEMXMLRPC_TARGET) $(IEMXMLRPC_SRC:.cpp=.o) $(XMLRPCPP_SRC:.cpp=.o) $(LIBS)
+	$(STRIP) $(IEMXMLRPC_TARGET)
+	chmod 755 $(IEMXMLRPC_TARGET)
+	#rm -f -- "$*.o"
+
+$(IEMXMLRPC_SRC:.cpp=.o) $(XMLRPCPP_SRC:.cpp=.o) : %.o : %.cpp
+	$(CXX) $(CXXFLAGS) $(IEMXMLRPC_FLAGS) -o "$*.o" -c "$*.cpp"
+
+iemxmlrpc_install: iemxmlrpc
+	install -d $(objectsdir)/$(IEMXMLRPC_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMXMLRPC_NAME) \
+		--author "Thomas Grill, Winfried Ritsch" \
+		--description "XMLRPC external for PD" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(IEMXMLRPC_TARGET) $(objectsdir)/$(IEMXMLRPC_NAME)
+	install -d $(helpdir)/$(IEMXMLRPC_NAME)
+	install -p $(externals_src)/iem/iemxmlrpc/*.pd \
+		$(helpdir)/$(IEMXMLRPC_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/iem/iemxmlrpc/README.txt \
+		$(readmesdir)/$(IEMXMLRPC_NAME).txt
+	install -d $(examplesdir)/$(IEMXMLRPC_NAME)
+	install -p $(externals_src)/iem/iemxmlrpc/*.pd \
+                   $(externals_src)/iem/iemxmlrpc/*.py \
+		   $(examplesdir)/$(IEMXMLRPC_NAME)
+
+iemxmlrpc_clean:
+	-rm -f -- $(IEMXMLRPC_TARGET)
+	-rm -f -- $(externals_src)/iem/iemxmlrpc/xmlrpc++/src/*.o
+	-rm -f -- $(externals_src)/iem/iemxmlrpc/*.o
+	-rm -f -- $(externals_src)/iem/iemxmlrpc/*.bak
+	-rm -f -- $(externals_src)/iem/iemxmlrpc/*.*~
 
 
 
