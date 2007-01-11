@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -134,7 +134,7 @@ else
     LIB_TARGETS += hid wiiremote
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip
+    LIB_TARGETS += hid pdp pidip hdspm_mixer
   endif
 endif
 
@@ -2307,7 +2307,8 @@ adaptive_clean:
 
 
 #------------------------------------------------------------------------------#
-# G.Holzmann: DOES NOT WORK YET - OBJECTS CAN'T BE OPENED IN PD !!!
+# G.Holzmann: we would have to rename the externals, otherwise they won't
+#             build as single objects !
 # iem_adaptfilt
 IEMADAPT_NAME=iem_adaptfilt
 IEMADAPT_SRC := $(wildcard $(externals_src)/iem/iem_adaptfilt/src/*LMS*.c)
@@ -2471,7 +2472,7 @@ iem_tab_clean:
 
 
 #------------------------------------------------------------------------------#
-# FLASHSERVER
+# flashserver
 FLASHSERVER_NAME=flashserver
 FLASHSERVER_OBJECTS := $(wildcard $(externals_src)/olafmatt/flashserver/*.c)
 flashserver: $(FLASHSERVER_OBJECTS:.c=.$(EXTENSION))
@@ -2497,6 +2498,88 @@ flashserver_clean:
 	-rm -f -- $(FLASHSERVER_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/olafmatt/flashserver/*.bak
 	-rm -f -- $(externals_src)/olafmatt/flashserver/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# hdspm_mixer
+HDSPM_NAME=hdspm_mixer
+HDSPM_SRC := $(wildcard $(externals_src)/iem/hdspm_mixer/*.c)
+HDSPM_OBJ := $(HDSPM_SRC:.c=.o)
+HDSPM_TARGET := $(externals_src)/iem/hdspm_mixer/hdspmmixer.$(EXTENSION)
+
+hdspm_mixer: $(HDSPM_TARGET)
+
+$(HDSPM_TARGET) : $(HDSPM_OBJ)
+	$(CC) $(LDFLAGS) -o $(HDSPM_TARGET) $(HDSPM_OBJ) $(LIBS)
+	$(STRIP) $(HDSPM_TARGET)
+	chmod 755 $(HDSPM_TARGET)
+	rm -f -- $(HDSPM_OBJ)
+
+$(HDSPM_OBJ) : %.o : %.c
+	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+
+hdspm_mixer_install: hdspm_mixer
+	install -d $(objectsdir)/$(HDSPM_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(HDSPM_NAME) \
+		--author "Winfried Ritsch" \
+		--description "pd-mixer for RME hammerfall devices" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(HDSPM_TARGET) $(objectsdir)/$(HDSPM_NAME)
+	install -d $(helpdir)/$(HDSPM_NAME)
+	install -p $(externals_src)/iem/hdspm_mixer/*.pd \
+		$(helpdir)/$(HDSPM_NAME)
+
+hdspm_mixer_clean:
+	-rm -f -- $(HDSPM_TARGET)
+	-rm -f -- $(HDSPM_OBJ)
+	-rm -f -- $(externals_src)/iem/hdspm_mixer/*.bak
+	-rm -f -- $(externals_src)/iem/hdspm_mixer/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# iemgui
+IEMGUI_NAME=iemgui
+IEMGUI_SRC := $(wildcard $(externals_src)/iem/iemgui/src/*.c)
+IEMGUI_OBJ := $(IEMGUI_SRC:.c=.o)
+IEMGUI_TARTMP := $(wildcard $(externals_src)/iem/iemgui/src/*_*.c)
+IEMGUI_TARGETS := $(IEMGUI_TARTMP:.c=.$(EXTENSION))
+IEMGUI_FLAGS := -DIEMGUI_SINGLE_OBJ
+
+iemgui: $(IEMGUI_TARGETS)
+
+$(IEMGUI_TARGETS) : %.$(EXTENSION) : %.o $(IEMGUI_OBJ)
+	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(externals_src)/iem/iemgui/src/iemgui.o $(LIBS)
+	$(STRIP) $*.$(EXTENSION)
+	chmod 755 $*.$(EXTENSION)
+	rm -f -- "$*.o"
+
+$(IEMGUI_OBJ) : %.o : %.c
+	$(CC) $(CFLAGS) $(IEMGUI_FLAGS) -o "$*.o" -c "$*.c"
+
+iemgui_install: iemgui
+	install -d $(objectsdir)/$(IEMGUI_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMGUI_NAME) \
+		--author "Thomas Musil" \
+		--description "some more GUI objects for PD" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(IEMGUI_TARGETS) $(objectsdir)/$(IEMGUI_NAME)
+	install -d $(helpdir)/$(IEMGUI_NAME)
+	install -p $(externals_src)/iem/iemgui/help/*.pd \
+		$(helpdir)/$(IEMGUI_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/iem/iemgui/READ_ME.txt \
+		$(readmesdir)/$(IEMGUI_NAME).txt
+
+iemgui_clean:
+	-rm -f -- $(IEMGUI_TARGETS)
+	-rm -f -- $(IEMGUI_OBJ)
+	-rm -f -- $(externals_src)/iem/iemgui/src/*.bak
+	-rm -f -- $(externals_src)/iem/iemgui/src/*.*~
+
 
 
 #==============================================================================#
