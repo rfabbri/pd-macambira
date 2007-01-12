@@ -2090,9 +2090,9 @@ vbap_install: vbap
 #	install -d $(manualsdir)/$(VBAP_NAME)
 #	install -p $(externals_src)/vbap/manual.txt \
 #		$(manualsdir)/$(VBAP_NAME)
-#	install -d $(examplesdir)/$(VBAP_NAME)
-#	install -p $(externals_src)/vbap/examples/*.pd \
-#		$(examplesdir)/$(VBAP_NAME)
+	install -d $(examplesdir)/$(VBAP_NAME)
+	install -p $(externals_src)/vbap/*-demo.pd \
+		$(examplesdir)/$(VBAP_NAME)
 
 vbap_clean:
 	-rm -f -- $(VBAP_OBJECTS:.c=.$(EXTENSION))
