@@ -85,4 +85,9 @@ void sigcatch13_setup(void)
     class_addmethod(sigcatch13_class, (t_method)sigcatch13_dsp, gensym("dsp"), 0);
 }
 
+void catch13_tilde_setup()
+{
+  sigcatch13_setup();
+}
+
 

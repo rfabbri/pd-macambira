@@ -298,7 +298,10 @@ void sfwrite13_setup(void)
      
 }
 
-
+void sfwrite13_tilde_setup()
+{
+  void sfwrite13_setup();
+}
 
 
 

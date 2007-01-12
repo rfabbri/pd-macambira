@@ -309,3 +309,8 @@ void streamin13_setup(void)
     class_addmethod(streamin13_class, (t_method) streamin13_dsp, gensym("dsp"), 0);
     class_addmethod(streamin13_class, (t_method)streamin13_port,gensym("port"),A_DEFFLOAT,0);
 }
+
+void streamin13_tilde_setup()
+{
+  streamin13_setup();
+}

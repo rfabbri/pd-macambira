@@ -119,4 +119,8 @@ void sigreceive13_setup(void)
     	0);
 }
 
+void receive13_tilde_setup()
+{
+  sigreceive13_setup();
+}
 

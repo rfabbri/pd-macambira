@@ -90,4 +90,8 @@ void sigthrow13_setup(void)
     class_addmethod(sigthrow13_class, (t_method)sigthrow13_dsp, gensym("dsp"), 0);
 }
 
+void throw13_tilde_setup()
+{
+  sigthrow13_setup();
+}
 

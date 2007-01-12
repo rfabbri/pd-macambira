@@ -389,3 +389,8 @@ void streamout13_setup(void)
     class_addmethod(streamout13_class, (t_method)streamout13_host,gensym("host"),A_DEFSYM,0);
 
 }
+
+void streamout13_tilde_setup()
+{
+  streamout13_setup();
+}
