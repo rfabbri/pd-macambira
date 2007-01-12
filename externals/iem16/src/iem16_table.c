@@ -200,7 +200,7 @@ static void table16_read16(t_table16 *x, t_symbol *filename,  t_symbol *endian, 
 }
 
  
-static void table16_setup(void){
+void table16_setup(void){
   table16_class = class_new(gensym("table16"),
 			    (t_newmethod)table16_new, (t_method)table16_free,
 			    sizeof(t_table16), 0, A_DEFSYM, A_DEFFLOAT, 0);

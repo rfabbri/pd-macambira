@@ -45,7 +45,7 @@ static void *tab16read_new(t_symbol *s){
   return (x);
 }
 
-static void tab16read_setup(void){
+void tab16read_setup(void){
   tab16read_class = class_new(gensym("tab16read"), (t_newmethod)tab16read_new,
 			      0, sizeof(t_tab16read), 0, A_DEFSYM, 0);
   class_addfloat(tab16read_class, (t_method)tab16read_float);
@@ -106,7 +106,7 @@ static void *tab16read4_new(t_symbol *s){
   return (x);
 }
 
-static void tab16read4_setup(void){
+void tab16read4_setup(void){
   tab16read4_class = class_new(gensym("tab16read4"), (t_newmethod)tab16read4_new,
 			       0, sizeof(t_tab16read4), 0, A_DEFSYM, 0);
   class_addfloat(tab16read4_class, (t_method)tab16read4_float);

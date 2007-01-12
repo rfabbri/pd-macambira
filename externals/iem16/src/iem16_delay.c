@@ -110,6 +110,12 @@ static void sigdel16write_setup(void){
 		  gensym("dsp"), 0);
 }
 
+// G.Holzmann: for PD-extended build system
+void del16write_tilde_setup(void)
+{
+  sigdel16write_setup();
+}
+
 /* ----------------------------- del16read~ ----------------------------- */
 static t_class *sigdel16read_class;
 
@@ -192,6 +198,11 @@ static void sigdel16read_setup(void){
   class_addfloat(sigdel16read_class, (t_method)sigdel16read_16bit);
 }
 
+// G.Holzmann: for PD-extended build system
+void del16read_tilde_setup(void)
+{
+  sigdel16read_setup();
+}
 
 /* ----------------------------- vd~ ----------------------------- */
 static t_class *sig16vd_class;
@@ -273,6 +284,12 @@ static void sig16vd_setup(void){
 			    sizeof(t_sig16vd), 0, A_DEFSYM, 0);
   class_addmethod(sig16vd_class, (t_method)sig16vd_dsp, gensym("dsp"), 0);
   CLASS_MAINSIGNALIN(sig16vd_class, t_sig16vd, x_f);
+}
+
+// G.Holzmann: for PD-extended build system
+void vd16_tilde_setup(void)
+{
+  sig16vd_setup();
 }
 
 /* ----------------------- global setup routine ---------------- */

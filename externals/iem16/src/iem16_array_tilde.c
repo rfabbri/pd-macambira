@@ -76,7 +76,7 @@ static void tab16write_tilde_stop(t_tab16write_tilde *x){}
 
 static void tab16write_tilde_free(t_tab16write_tilde *x){}
 
-static void tab16write_tilde_setup(void){
+void tab16write_tilde_setup(void){
   tab16write_tilde_class = class_new(gensym("tab16write~"),
 				     (t_newmethod)tab16write_tilde_new, (t_method)tab16write_tilde_free,
 				     sizeof(t_tab16write_tilde), 0, A_DEFSYM, 0);
@@ -179,7 +179,7 @@ static void tab16play_tilde_stop(t_tab16play_tilde *x){
 
 static void tab16play_tilde_free(t_tab16play_tilde *x){}
 
-static void tab16play_tilde_setup(void){
+void tab16play_tilde_setup(void){
   tab16play_tilde_class = class_new(gensym("tab16play~"),
 				    (t_newmethod)tab16play_tilde_new, (t_method)tab16play_tilde_free,
 				    sizeof(t_tab16play_tilde), 0, A_DEFSYM, 0);
@@ -259,6 +259,12 @@ static void tab16send_setup(void){
   class_addmethod(tab16send_class, (t_method)tab16send_dsp, gensym("dsp"), 0);
 }
 
+// G.Holzmann: for PD-extended build system
+void tab16send_tilde_setup(void)
+{
+  tab16send_setup();
+}
+
 /* ------------------------ tab16receive~ ------------------------- */
 
 static t_class *tab16receive_class;
@@ -310,6 +316,12 @@ static void tab16receive_setup(void){
 				 sizeof(t_tab16receive), 0, A_DEFSYM, 0);
   class_addmethod(tab16receive_class, (t_method)tab16receive_dsp,
 		  gensym("dsp"), 0);
+}
+
+// G.Holzmann: for PD-extended build system
+void tab16receive_tilde_setup(void)
+{
+  tab16receive_setup();
 }
 
 /******************** tab16read~ ***********************/
@@ -384,7 +396,7 @@ static void tab16read_tilde_dsp(t_tab16read_tilde *x, t_signal **sp){
 
 static void tab16read_tilde_free(t_tab16read_tilde *x){}
 
-static void tab16read_tilde_setup(void){
+void tab16read_tilde_setup(void){
   tab16read_tilde_class = class_new(gensym("tab16read~"),
 				    (t_newmethod)tab16read_tilde_new, (t_method)tab16read_tilde_free,
 				    sizeof(t_tab16read_tilde), 0, A_DEFSYM, 0);
@@ -479,7 +491,7 @@ static void tab16read4_tilde_dsp(t_tab16read4_tilde *x, t_signal **sp){
 	  sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 
-static void tab16read4_tilde_setup(void){
+void tab16read4_tilde_setup(void){
   tab16read4_tilde_class = class_new(gensym("tab16read4~"),
 				     (t_newmethod)tab16read4_tilde_new, 0,
 				     sizeof(t_tab16read4_tilde), 0, A_DEFSYM, 0);
