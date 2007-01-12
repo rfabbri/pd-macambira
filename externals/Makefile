@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui iem_adaptfilt iemmatrix iemxmlrpc
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui iem_adaptfilt iemmatrix iemxmlrpc iem16
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1164,37 +1164,60 @@ iem_bin_ambi_clean:
 
 
 #------------------------------------------------------------------------------#
-# G.Holzmann: Hm, still don't work because of more externals in one file !
 # IEM16
+# more externals in one file - so a little bit complicated ... ;)
 IEM16_NAME=iem16
-IEM16_OBJECTS := $(wildcard $(externals_src)/iem16/src/iem16_*.c)
-iem16: $(IEM16_OBJECTS:.c=.$(EXTENSION))
+IEM16_DIR := $(externals_src)/iem16/src
+IEM16_SRC := $(wildcard $(externals_src)/iem16/src/iem16_*.c)
+IEM16_TAR1 := tab16read.$(EXTENSION) tab16read4.$(EXTENSION) tab16write.$(EXTENSION)
+IEM16_TAR2 := tab16write~.$(EXTENSION) tab16play~.$(EXTENSION) \
+              tab16read~.$(EXTENSION) tab16read4~.$(EXTENSION) \
+              tab16send~.$(EXTENSION) tab16receive~.$(EXTENSION)
+IEM16_TAR3 := del16read~.$(EXTENSION) del16write~.$(EXTENSION) vd16~.$(EXTENSION)
+IEM16_TAR4 := table16.$(EXTENSION)
+
+iem16: $(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR1)) $(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR2)) $(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR3)) $(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR4))
+
+$(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR1)): %.$(EXTENSION) : $(IEM16_SRC:.c=.o)
+	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) $(externals_src)/iem16/src/iem16_array.o $(externals_src)/iem16/src/iem16_table.o $(LIBS)
+	$(STRIP) $*.$(EXTENSION)
+	chmod 755 $*.$(EXTENSION)
+
+$(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR2)): %.$(EXTENSION) : $(IEM16_SRC:.c=.o)
+	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) $(externals_src)/iem16/src/iem16_array_tilde.o $(externals_src)/iem16/src/iem16_table.o $(LIBS)
+	$(STRIP) $*.$(EXTENSION)
+	chmod 755 $*.$(EXTENSION)
+
+$(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR3)): %.$(EXTENSION) : $(IEM16_SRC:.c=.o)
+	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) $(externals_src)/iem16/src/iem16_delay.o $(LIBS) $(externals_src)/iem16/src/iem16_table.o
+	$(STRIP) $*.$(EXTENSION)
+	chmod 755 $*.$(EXTENSION)
+
+$(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR4)): %.$(EXTENSION) : $(IEM16_SRC:.c=.o)
+	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) $(externals_src)/iem16/src/iem16_table.o $(LIBS)
+	$(STRIP) $*.$(EXTENSION)
+	chmod 755 $*.$(EXTENSION)
+
+$(IEM16_SRC:.c=.o) : %.o : %.c
+	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
 
 iem16_install: iem16
 	install -d $(objectsdir)/$(IEM16_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEM16_NAME) \
 		--author "IOhannes m zmoelnig" \
-		--description "16bit objects for low memory usage" \
+		--description "16bit table, array objects for low memory usage" \
 		--license "GNU GPL" \
 		--version "0.1"
-	install -p $(IEM16_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEM16_NAME)
-#	install -d $(helpdir)/$(IEM16_NAME)
-#	install -p $(externals_src)/iem16/help/*.pd \
-#		$(helpdir)/$(IEM16_NAME)
-#	install -d $(manualsdir)/$(IEM16_NAME)
-#	install -p $(externals_src)/iem16/manual.txt \
-#		$(manualsdir)/$(IEM16_NAME)
-#	install -p $(externals_src)/iem16/README \
-#		$(readmesdir)/$(IEM16_NAME).txt
-	install -d $(examplesdir)/$(IEM16_NAME)
-	install -p $(externals_src)/iem16/examples/*.pd \
-		$(examplesdir)/$(IEM16_NAME)
+	install -p $(externals_src)/iem16/src/*.$(EXTENSION) $(objectsdir)/$(IEM16_NAME)
+	install -d $(helpdir)/$(IEM16_NAME)
+	install -p $(externals_src)/iem16/help/*.pd \
+		$(helpdir)/$(IEM16_NAME)
 
 iem16_clean:
-	-rm -f -- $(IEM16_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(IEM16_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/iem16/*.bak
-	-rm -f -- $(externals_src)/iem16/*.*~
+	-rm -f -- $(externals_src)/iem16/src/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/iem16/src/*.o
+	-rm -f -- $(externals_src)/iem16/src/*.bak
+	-rm -f -- $(externals_src)/iem16/src/*.*~
 
 
 
