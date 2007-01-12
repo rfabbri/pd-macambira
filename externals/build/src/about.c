@@ -1,1 +1,0 @@
-#include "../../mjlib/about.c"
