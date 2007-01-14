@@ -1266,7 +1266,8 @@ iemlib_clean:
 # IEMMATRIX
 IEMMATRIX_NAME=iemmatrix
 IEMMATRIX_SRC := $(wildcard $(externals_src)/iem/iemmatrix/src/m[at]*.c)
-IEMMATRIX_OBJ := $(IEMMATRIX_SRC:.c=.o)
+IEMMATRIX_ALIAS := $(wildcard $(externals_src)/iem/iemmatrix/alias/*.c)
+IEMMATRIX_OBJ := $(IEMMATRIX_SRC:.c=.o) $(IEMMATRIX_ALIAS:.c=.o)
 IEMMATRIX_SHARED := $(wildcard $(externals_src)/iem/iemmatrix/src/iemmatrix_binops.c) \
                     $(wildcard $(externals_src)/iem/iemmatrix/src/iemmatrix_utility.c)
 
@@ -1302,9 +1303,10 @@ iemmatrix_install: iemmatrix
 
 iemmatrix_clean:
 	-rm -f -- $(IEMMATRIX_OBJ:.o=.$(EXTENSION))
-	-rm -f -- $(externals_src)/iem/iemmatrix/*.o
-	-rm -f -- $(externals_src)/iem/iemmatrix/*.bak
-	-rm -f -- $(externals_src)/iem/iemmatrix/*.*~
+	-rm -f -- $(externals_src)/iem/iemmatrix/src/*.o
+	-rm -f -- $(externals_src)/iem/iemmatrix/alias/*.o
+	-rm -f -- $(externals_src)/iem/iemmatrix/src/*.bak
+	-rm -f -- $(externals_src)/iem/iemmatrix/src/*.*~
 
 
 
