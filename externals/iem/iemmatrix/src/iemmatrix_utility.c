@@ -416,3 +416,107 @@ void matrix_free(t_matrix *x)
   x->atombuffer=0;
   x->col=x->row=0;
 }
+
+
+/* some math */
+
+/*  invert a square matrix (row=col=rowcol) */
+/* if "error" is non-NULL, it's content will be set to 0 if the matrix was invertable, else to non-0 */
+t_matrixfloat* mtx_doInvert(t_matrixfloat*input, int rowcol, int*err){
+  /*
+   * row==col==rowclo
+   * input=t_matrixfloat[row*col]
+   * output=t_matrixfloat[row*col]
+   */
+  int i, k;
+  t_matrixfloat *a1, *b1, *a2, *b2;
+
+  int ok=0; /* error counter */
+
+  int col=rowcol, row=rowcol, row2=row*col;
+  t_matrixfloat *original=input;
+  t_matrixfloat *inverted = 0;
+
+  if(input==0)return 0;
+
+  /* 1a reserve space for the inverted matrix */
+  inverted=(t_matrixfloat *)getbytes(sizeof(t_matrixfloat)*row2);
+  if(inverted==0)return 0;
+
+  /* 1b make an eye-shaped float-buf for B */
+  i=row2;
+  b1=inverted;
+  while(i--)*b1++=0;
+  i=row;
+  b1=inverted;
+  while(i--)b1[i*(row+1)]=1;
+
+  /* 2. do the Gauss-Jordan */
+  for (k=0;k<row;k++) {
+    /* adjust current row */
+    t_matrixfloat diagel = original[k*(col+1)];
+    t_matrixfloat i_diagel = diagel?1./diagel:0;
+    if (!diagel)ok++;
+
+    /* normalize current row (set the diagonal-element to 1 */
+    a2=original+k*col;
+    b2=inverted+k*col;
+    i=row;
+    while(i--){
+      *a2++*=i_diagel;
+      *b2++*=i_diagel;
+    }
+
+    /* eliminate the k-th element in each row by adding the weighted normalized row */
+    a2=original+k*row;
+    b2=inverted+k*row;
+    for(i=0;i<row;i++)
+      if (i-k) {
+        t_matrixfloat f=-*(original+i*row+k);
+        int j = row;
+        a1=original+i*row;
+        b1=inverted+i*row;
+        while (j--) {
+          *(a1+j)+=f**(a2+j);
+          *(b1+j)+=f**(b2+j);
+        }
+      }
+  }
+  if(err!=0)*err=ok;
+
+  return inverted;
+}
+
+/*  transpose a matrix */
+t_matrixfloat*mtx_doTranspose(t_matrixfloat*transposee, int row, int col){
+  int r,c;
+  t_matrixfloat*transposed=0;
+  if(!transposee||!row||!col)return 0;
+  transposed=(t_matrixfloat*)getbytes(sizeof(t_matrixfloat)*row*col);
+  r=row;
+  while(r--){
+    c=col;
+    while(c--)
+      transposed[c*row+r]=transposee[r*col+c];
+  }
+  return transposed;
+}
+
+/*  multiply matrix A=[rowA*colA] with matrix B=[rowB*colB]; C=A*B; colA=rowB=colArowB */
+t_matrixfloat*mtx_doMultiply(int rowA, t_matrixfloat*A, int colArowB, t_matrixfloat*B, int colB){
+  t_matrixfloat*result=0;
+  int r, c, n;
+
+  if(!A || !B || !rowA || !colArowB || !colB)return 0;
+  result=(t_matrixfloat*)getbytes(sizeof(t_matrixfloat)*rowA*colB);
+
+  for(r=0; r<rowA; r++){
+    for(c=0; c<colB; c++){
+      t_matrixfloat sum=0.f;
+      for(n=0;n<colArowB; n++)
+        sum+=A[colArowB*r+n]*B[colB*n+c];
+      result[colB*r+c]=sum;
+    }
+  }
+  return result;
+}

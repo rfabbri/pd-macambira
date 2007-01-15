@@ -23,23 +23,6 @@
 
 */
 
-t_matrixfloat*mtx_doMultiply(int rowA, t_matrixfloat*A, int colArowB, t_matrixfloat*B, int colB){
-  t_matrixfloat*result=0;
-  int r, c, n;
-
-  if(!A || !B || !rowA || !colArowB || !colB)return 0;
-  result=(t_matrixfloat*)getbytes(sizeof(t_matrixfloat)*rowA*colB);
-
-  for(r=0; r<rowA; r++){
-    for(c=0; c<colB; c++){
-      t_matrixfloat sum=0.f;
-      for(n=0;n<colArowB; n++)
-        sum+=A[colArowB*r+n]*B[colB*n+c];
-      result[colB*r+c]=sum;
-    }
-  }
-  return result;
-}
 
 /* mtx_mul */
 static t_class *mtx_mul_class, *mtx_mulelement_class, *mtx_mulscalar_class;
