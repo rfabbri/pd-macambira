@@ -63,11 +63,11 @@ all: $(LINUXOBJECTS)
 
 	@echo :: $(LINUXOBJECTS)
 
-	ld -export_dynamic  -shared -o iem16.pd_linux *.o -lc -lm
+	$(LD) -export_dynamic  -shared -o iem16.pd_linux *.o -lc -lm
 	strip --strip-unneeded iem16.pd_linux
 
 .c.pd_linux:
-	cc $(CFLAGS) -O2 -DPD -fPIC $(INCLUDE) -c -o $*.o $*.c
+	$(CC) $(CFLAGS) -O2 -DPD -fPIC $(INCLUDE) -c -o $*.o $*.c
 
 
 install: installdocs
