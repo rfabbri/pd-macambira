@@ -76,12 +76,17 @@ EXTERN void table16_usedindsp(t_table16*x);
 #define int32 int32_t
 
 #else
-#ifdef __apple__
+#ifdef __APPLE__
+#ifdef __BIG_ENDIAN__
 #define HIOFFSET 0    /* word offset to find MSB */
 #define LOWOFFSET 1    /* word offset to find LSB */
+#else
+#define HIOFFSET 1
+#define LOWOFFSET 0
+#endif
 #define int32 int  /* a data type that has 32 bits */
 
-#endif /* MACOSX */
+#endif /* __APPLE__ */
 #endif /* __linux__ */
 #endif /* MSW */
 #endif /* SGI */
