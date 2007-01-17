@@ -49,7 +49,7 @@ typedef struct _filter_tilde
   t_float   x_msi;
 } t_filter_tilde;
 
-t_class *filter_tilde_class;
+static t_class *filter_tilde_class;
 
 static void filter_tilde_snafu(t_filter_tilde *x)
 {

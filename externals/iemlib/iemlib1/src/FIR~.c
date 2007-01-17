@@ -21,7 +21,7 @@ typedef struct _FIR_tilde
   t_float   x_msi;
 } t_FIR_tilde;
 
-t_class *FIR_tilde_class;
+static t_class *FIR_tilde_class;
 
 static t_int *FIR_tilde_perform(t_int *w)
 {

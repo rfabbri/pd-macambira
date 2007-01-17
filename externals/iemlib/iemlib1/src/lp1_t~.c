@@ -27,7 +27,7 @@ typedef struct _lp1_t_tilde
   t_float   x_msi;
 } t_lp1_t_tilde;
 
-t_class *lp1_t_tilde_class;
+static t_class *lp1_t_tilde_class;
 
 static void lp1_t_tilde_dsp_tick(t_lp1_t_tilde *x)
 {

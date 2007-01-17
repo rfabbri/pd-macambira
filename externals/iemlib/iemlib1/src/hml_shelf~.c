@@ -50,7 +50,7 @@ typedef struct _hml_shelf_tilde
   t_float   x_msi;
 } t_hml_shelf_tilde;
 
-t_class *hml_shelf_tilde_class;
+static t_class *hml_shelf_tilde_class;
 
 static void hml_shelf_tilde_calc(t_hml_shelf_tilde *x)
 {

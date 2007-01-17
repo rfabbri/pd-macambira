@@ -19,7 +19,7 @@ typedef struct _vcf_filter_tilde
   char     x_filtname[6];
 } t_vcf_filter_tilde;
 
-t_class *vcf_filter_tilde_class;
+static t_class *vcf_filter_tilde_class;
 
 static t_int *vcf_filter_tilde_perform_snafu(t_int *w)
 {

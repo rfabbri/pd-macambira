@@ -33,7 +33,7 @@ typedef struct _prvu_tilde
   t_float   x_msi;
 } t_prvu_tilde;
 
-t_class *prvu_tilde_class;
+static t_class *prvu_tilde_class;
 static void prvu_tilde_tick_metro(t_prvu_tilde *x);
 static void prvu_tilde_tick_hold(t_prvu_tilde *x);
 

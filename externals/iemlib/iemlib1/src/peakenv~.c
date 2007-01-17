@@ -20,7 +20,7 @@ typedef struct _peakenv_tilde
   t_float  x_msi;
 } t_peakenv_tilde;
 
-t_class *peakenv_tilde_class;
+static t_class *peakenv_tilde_class;
 
 static void peakenv_tilde_reset(t_peakenv_tilde *x)
 {

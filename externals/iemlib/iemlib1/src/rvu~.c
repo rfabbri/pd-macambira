@@ -25,7 +25,7 @@ typedef struct _rvu_tilde
   t_float   x_msi;
 } t_rvu_tilde;
 
-t_class *rvu_tilde_class;
+static t_class *rvu_tilde_class;
 static void rvu_tilde_tick_metro(t_rvu_tilde *x);
 
 static void rvu_tilde_reset(t_rvu_tilde *x)

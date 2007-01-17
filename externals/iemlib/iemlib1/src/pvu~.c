@@ -26,7 +26,7 @@ typedef struct _pvu_tilde
   t_float   x_msi;
 } t_pvu_tilde;
 
-t_class *pvu_tilde_class;
+static t_class *pvu_tilde_class;
 static void pvu_tilde_tick(t_pvu_tilde *x);
 
 static void pvu_tilde_reset(t_pvu_tilde *x)

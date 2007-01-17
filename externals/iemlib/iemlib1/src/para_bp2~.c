@@ -44,7 +44,7 @@ typedef struct _para_bp2_tilde
   t_float  x_msi;
 } t_para_bp2_tilde;
 
-t_class *para_bp2_tilde_class;
+static t_class *para_bp2_tilde_class;
 
 static void para_bp2_tilde_calc(t_para_bp2_tilde *x)
 {

@@ -23,7 +23,7 @@ typedef struct _sin_phase_tilde
   t_float  x_msi;
 } t_sin_phase_tilde;
 
-t_class *sin_phase_tilde_class;
+static t_class *sin_phase_tilde_class;
 
 static t_int *sin_phase_tilde_perform(t_int *w)
 {

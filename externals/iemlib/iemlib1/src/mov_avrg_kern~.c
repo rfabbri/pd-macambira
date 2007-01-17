@@ -22,7 +22,7 @@ typedef struct _mov_avrg_kern_tilde
   t_float  x_msi;
 } t_mov_avrg_kern_tilde;
 
-t_class *mov_avrg_kern_tilde_class;
+static t_class *mov_avrg_kern_tilde_class;
 
 static t_int *mov_avrg_kern_tilde_perform(t_int *w)
 {
