@@ -20,7 +20,7 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 
 /* -- if you putting this object into a subpatch or an abstraction, -- */
 /* ------------ you cannot open again this subpatch ------------------ */
 
-t_widgetbehavior protect_against_open_widgetbehavior;
+static t_widgetbehavior protect_against_open_widgetbehavior;
 static t_class *protect_against_open_class;
 
 typedef struct _protect_against_open

@@ -80,8 +80,13 @@ should have been by CPU type and not by operating system! */
 
 #else
 #ifdef __APPLE__
+#ifdef __BIG_ENDIAN__
 #define HIOFFSET 0    /* word offset to find MSB */
 #define LOWOFFSET 1    /* word offset to find LSB */
+#else
+#define HIOFFSET 1    /* word offset to find MSB */
+#define LOWOFFSET 0    /* word offset to find LSB */
+#endif
 #define int32 int  /* a data type that has 32 bits */
 
 #endif /* __APPLE__ */
