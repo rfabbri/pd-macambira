@@ -95,6 +95,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 	#include <ctype.h>
 	#include <signal.h>
 	#include <stdio.h>
+    #include <ws2tcpip.h>
 #else
 	#include <stdio.h>
 	#include <string.h>
@@ -306,11 +307,10 @@ static void *dumpOSC_new(t_symbol *compatflag,
 	  struct ip_mreq mreq;
 	  mreq.imr_multiaddr.s_addr = inet_addr(castgroup->s_name);
 	  mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-	  if (setsockopt(sockfd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&mreq,sizeof(mreq)) < 0) {
+	  if (setsockopt(sockfd,IPPROTO_IP,IP_ADD_MEMBERSHIP,(char*)&mreq,sizeof(mreq)) < 0) {
 		  sys_sockerror("setsockopt");
 	  }
   }
-
 
   /* name the socket */
   if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)

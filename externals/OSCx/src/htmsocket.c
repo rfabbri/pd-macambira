@@ -55,6 +55,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 	#include <stdlib.h>
 	#include "OSC-common.h"
 	#include <stdio.h>
+    #include <ws2tcpip.h>
 #else
 	#include <stdio.h>
 	#include <unistd.h>
