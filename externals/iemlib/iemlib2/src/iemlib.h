@@ -100,7 +100,7 @@ union tabfudge
   int32 tf_i[2];
 };
 
-#ifdef __i386__
+#if defined __i386__ || defined __x86_64__
 #define IEM_DENORMAL(f) ((((*(unsigned int*)&(f))&0x60000000)==0) || \
 (((*(unsigned int*)&(f))&0x60000000)==0x60000000))
 /* more stringent test: anything not between 1e-19 and 1e19 in absolute val */

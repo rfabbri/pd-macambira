@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iemlib written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
 
 #ifndef __IEMLIB_H__
 #define __IEMLIB_H__
@@ -80,8 +80,13 @@ should have been by CPU type and not by operating system! */
 
 #else
 #ifdef __APPLE__
+#ifdef __BIG_ENDIAN__
 #define HIOFFSET 0    /* word offset to find MSB */
 #define LOWOFFSET 1    /* word offset to find LSB */
+#else
+#define HIOFFSET 1    /* word offset to find MSB */
+#define LOWOFFSET 0    /* word offset to find LSB */
+#endif
 #define int32 int  /* a data type that has 32 bits */
 
 #endif /* __APPLE__ */
@@ -95,8 +100,14 @@ union tabfudge
   int32 tf_i[2];
 };
 
+#if defined __i386__ || defined __x86_64__
 #define IEM_DENORMAL(f) ((((*(unsigned int*)&(f))&0x60000000)==0) || \
 (((*(unsigned int*)&(f))&0x60000000)==0x60000000))
 /* more stringent test: anything not between 1e-19 and 1e19 in absolute val */
+#else
+
+#define IEM_DENORMAL(f) 0
+
+#endif
 
 #endif
