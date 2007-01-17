@@ -4,6 +4,9 @@
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
+#ifndef INCLUDE_IEM16_TABLE_H__
+#define INCLUDE_IEM16_TABLE_H__
+
 /* sampling */
 
 #include "iem16.h"
@@ -96,3 +99,5 @@ union tabfudge
     double tf_d;
     int32 tf_i[2];
 };
+
+#endif
