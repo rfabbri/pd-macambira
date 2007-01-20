@@ -209,7 +209,7 @@ protected:
 
 		static void px_method(proxyout *obj,const t_symbol *s,int argc,const t_atom *argv)
 		{
-			obj->th->ToOutAnything(obj->outlet,s,argc,argv);
+			obj->th->ToSysAnything(obj->outlet,s,argc,argv);
 		}
 
     protected:
