@@ -2,7 +2,7 @@
 
 py/pyext - python script object for PD and Max/MSP
 
-Copyright (c)2002-2005 Thomas Grill (gr@grrrr.org)
+Copyright (c)2002-2006 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -13,34 +13,35 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #undef PY_ARRAYS
 
 
-#if defined(PY_NUMERIC) || defined(PY_NUMPY)
+#if defined(PY_NUMERIC) || defined(PY_NUMPY) || defined(PY_NUMARRAY)
     #define PY_ARRAYS 1
-#elif defined(PY_NUMARRAY)
-    #define PY_ARRAYS 1
-    #define NA
 #endif
 
 #ifdef PY_ARRAYS
 
-#ifdef NA
-    #if FLEXT_OS == FLEXT_OS_MAC
-    #include <Python/numarray/libnumarray.h>
-    #else
-    #include <numarray/libnumarray.h>
-    #endif
+#ifdef PY_NUMARRAY
+#	if FLEXT_OS == FLEXT_OS_MAC
+#		include <Python/numarray/libnumarray.h>
+#	else
+#		include <numarray/libnumarray.h>
+#	endif
 
 static NumarrayType numtype = tAny;
 inline bool arrsupport() { return numtype != tAny; }
 
 #else
-    #if FLEXT_OS == FLEXT_OS_MAC
-    #include <Python/numarray/arrayobject.h>
-    #else
-    #include <numarray/arrayobject.h>
-    #endif
+#	if defined(PY_NUMPY)
+#		include <numpy/arrayobject.h>
+#	else
+#		if FLEXT_OS == FLEXT_OS_MAC
+#			include <Python/numarray/arrayobject.h>
+#		else
+#			include <numarray/arrayobject.h>
+#		endif
+#	endif
 
-static PyArray_TYPES numtype = PyArray_NOTYPE;
-inline bool arrsupport() { return numtype != PyArray_NOTYPE; }
+	static PyArray_TYPES numtype = PyArray_NOTYPE;
+	inline bool arrsupport() { return numtype != PyArray_NOTYPE; }
 #endif
 #endif
 
@@ -257,7 +258,7 @@ PyObject *arrayfrombuffer(PyObject *buf,int c,int n)
         int shape[2];
         shape[0] = n;
         shape[1] = c;
-#ifdef NA
+#ifdef PY_NUMARRAY
         arr = (PyObject *)NA_NewAllFromBuffer(c == 1?1:2,shape,numtype,buf,0,0,NA_ByteOrder(),1,1);
 #else
         void *data;
@@ -266,6 +267,7 @@ PyObject *arrayfrombuffer(PyObject *buf,int c,int n)
         if(!err) {
             FLEXT_ASSERT(len <= n*c*sizeof(t_sample));
             Py_INCREF(buf);
+			// \todo change to new API!
             arr = PyArray_FromDimsAndData(c == 1?1:2,shape,numtype,(char *)data);
         }
         else {
@@ -364,7 +366,7 @@ static int buffer_ass_slice(pySamplebuffer *self,int ilow,int ihigh,PyObject *va
             if(ihigh < 0) ihigh += n;
             if(ihigh > n) ihigh = n;
 
-#ifdef NA
+#ifdef PY_NUMARRAY
             PyArrayObject *out = NA_InputArray(value,numtype,NUM_C_ARRAY);
 #else
             PyArrayObject *out = (PyArrayObject *)PyArray_ContiguousFromObject(value,numtype,0,0);
@@ -380,7 +382,7 @@ static int buffer_ass_slice(pySamplebuffer *self,int ilow,int ihigh,PyObject *va
             else {
                 int dlen = ihigh-ilow;
                 int slen = out->dimensions[0];
-#ifdef NA
+#ifdef PY_NUMARRAY
                 flext::CopySamples(self->buf->Data()+ilow,(t_sample *)NA_OFFSETDATA(out),slen < dlen?slen:dlen);
 #else
                 flext::CopySamples(self->buf->Data()+ilow,(t_sample *)out->data,slen < dlen?slen:dlen);
@@ -764,7 +766,7 @@ void initsamplebuffer()
     PyErr_Clear();
 
 #ifdef PY_ARRAYS
-#ifdef NA
+#ifdef PY_NUMARRAY
     import_libnumarray();
 #else
     import_array();
@@ -774,7 +776,7 @@ void initsamplebuffer()
         PyErr_Clear();
     else {
         // numarray support ok
-#ifdef NA
+#ifdef PY_NUMARRAY
         numtype = sizeof(t_sample) == 4?tFloat32:tFloat64;
 #else
         numtype = sizeof(t_sample) == 4?PyArray_FLOAT:PyArray_DOUBLE;
