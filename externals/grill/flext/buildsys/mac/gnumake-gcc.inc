@@ -1,32 +1,32 @@
 ##############################################
 
 ifneq (,$(findstring Frameworks,$(FLEXTPREFIX)))
-FLEXTFRAMEWORK=$(FLEXTPREFIX)/flext.framework
+FLEXTFRAMEWORK := $(FLEXTPREFIX)/flext.framework
 endif
 
 ifdef FLEXTFRAMEWORK
 ifndef FLEXTLIB
-FLEXTLIB=$(FLEXTFRAMEWORK)
+FLEXTLIB := $(FLEXTFRAMEWORK)
 endif
 ifndef FLEXTINC
-FLEXTINC=$(FLEXTFRAMEWORK)/Headers
+FLEXTINC := $(FLEXTFRAMEWORK)/Headers
 endif
 ifndef FLEXTSYS
-FLEXTSYS=$(FLEXTFRAMEWORK)/Resources
+FLEXTSYS := $(FLEXTFRAMEWORK)/Resources
 endif
 else
 ifndef FLEXTLIB
-FLEXTLIB=$(FLEXTPREFIX)/lib
+FLEXTLIB := $(FLEXTPREFIX)/lib
 endif
 ifndef FLEXTINC
-FLEXTINC=$(FLEXTPREFIX)/include/flext
+FLEXTINC := $(FLEXTPREFIX)/include/flext
 endif
 ifndef FLEXTSYS
-FLEXTSYS=$(FLEXTPREFIX)/lib/flext
+FLEXTSYS := $(FLEXTPREFIX)/lib/flext
 endif
 endif
 
-FLEXTBIN=$(FLEXTPREFIX)/bin
+FLEXTBIN := $(FLEXTPREFIX)/bin
 
 ##############################################
 
@@ -46,3 +46,11 @@ LDFLAGS += -Wl,-S
 endif
 endif
 
+##############################################
+
+LDFLAGS += $(patsubst %,-arch %,$(ARCH))
+
+ifdef OSXSDK
+CFLAGS += -isysroot $(OSXSDK)
+LDFLAGS += -isysroot $(OSXSDK)
+endif

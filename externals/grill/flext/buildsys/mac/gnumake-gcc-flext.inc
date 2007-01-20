@@ -7,39 +7,10 @@ LDFLAGS += -compatibility_version $(FLEXTMAJOR).$(FLEXTMINOR)
 LDFLAGS += -preload -seg1addr 0xd0000000
 endif
 
-##############################################
+# common compilation stuff
+include $(BUILDPATH)$(PLATFORM)/gnumake-gcc-targets.inc
 
-CSRCS=$(patsubst %.c,$(SRCDIR)/%.c,$(filter %.c,$(SRCS)))
-CPPSRCS=$(patsubst %.cpp,$(SRCDIR)/%.cpp,$(filter %.cpp,$(SRCS)))
-COBJS=$(patsubst %.c,$(OBJPATH)/%.o,$(filter %.c,$(SRCS))) 
-CPPOBJS=$(patsubst %.cpp,$(OBJPATH)/%.opp,$(filter %.cpp,$(SRCS))) 
-
-# default target
-_build_: $(TARGET)
-
-$(CSRCS) $(CPPSRCS): $(patsubst %,$(SRCDIR)/%,$(HDRS))
-	touch $@
-
-$(OBJPATH):
-	-mkdir -p $@
-
-$(TARGETPATH):
-	-mkdir -p $@
-
-ifdef PRECOMPILE
-PRECOMSRC=$(SRCDIR)/$(PRECOMPILE)
-PRECOMDST=$(OBJPATH)/$(notdir $(PRECOMSRC)).gch
-PRECOMINC = -include $(OBJPATH)/$(notdir $(PRECOMSRC))
-endif
-
-$(PRECOMDST): $(PRECOMSRC) $(patsubst %,$(SRCDIR)/%,$(HDRS))
-	$(CXX) -c $(CFLAGS) $(DEFS) $(INCPATH) $(PRECOMSRC) -o $@
-
-$(OBJPATH)/%.opp : $(SRCDIR)/%.cpp
-	$(CXX) -c $(CFLAGS) $(DEFS) $(PRECOMINC) $(INCPATH) $< -o $@
-
-$(OBJPATH)/%.o : $(SRCDIR)/%.c
-	$(CC) -c $(CFLAGS) $(DEFS) $(INCPATH) $< -o $@
+##### linking ###################
 
 $(TARGET) :: $(OBJPATH) $(TARGETPATH)
 
@@ -58,13 +29,11 @@ else
 	libtool -static -o $@ $(COBJS) $(CPPOBJS)
 endif
 
-##############################################
+ifdef TARGETPOST
+$(TARGET) :: $(TARGETPOST)
+endif
 
-_clean_:
-	-rm -r $(TARGETPATH)
-	-rm -r $(OBJPATH)
-
-##############################################
+###################################
 
 $(FLEXTINC):
 	-mkdir -p $@
