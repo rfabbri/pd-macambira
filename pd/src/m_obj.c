@@ -250,14 +250,17 @@ void obj_init(void)
     pointerinlet_class = class_new(gensym("inlet"), 0, 0,
         sizeof(t_inlet), CLASS_PD, 0);
     class_addpointer(pointerinlet_class, pointerinlet_pointer);
-
+    class_addanything(pointerinlet_class, inlet_wrong);
+    
     floatinlet_class = class_new(gensym("inlet"), 0, 0,
         sizeof(t_inlet), CLASS_PD, 0);
     class_addfloat(floatinlet_class, (t_method)floatinlet_float);
+    class_addanything(floatinlet_class, inlet_wrong);
 
     symbolinlet_class = class_new(gensym("inlet"), 0, 0,
         sizeof(t_inlet), CLASS_PD, 0);
     class_addsymbol(symbolinlet_class, symbolinlet_symbol);
+    class_addanything(symbolinlet_class, inlet_wrong);
 
 }
 

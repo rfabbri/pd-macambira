@@ -1,6 +1,4 @@
 ---------------- dolist --------------------
-0.40-1:
-  help browser broke on Panurge
   binbuf_read_via_canvas in x_qlist.c
 
 PC device counting problem (first device invoked by -audiodev 0)
@@ -19,7 +17,10 @@ turn on paMacCore_ChangeDeviceParameters for mac (pa_mac_core.h)
 Gnome: why don't windows pop up when clicked on?
 
 problems:
-help browser (offer both versions?)
+TK menu on Windows says "wish"
+activating windows in Gnome?
+help browser broke on Panurge
+offer both new and old help browser style
 look again at array vis/invis conundrum, g_template.c
 TK commands to nonexistent windows? (occasionally still happens)
 still can't detect when a window is moved or resized
@@ -47,8 +48,12 @@ detect adc~ and dac~ reblocking
 more demonstration patches:
 vibrato using variable delay
 real-time spectrum grapher
+document ||, |, etc, better
 
 features:
+messages to suppress menus&accelerators, and invisibilize Pd window
+machine-independent fonts
+callback scheduling on Mac
 sigmund~: sort by pitch; one-shot
 add -x flag to drawnumbers....
 grab new ALSA midi code from devel

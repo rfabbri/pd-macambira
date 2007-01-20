@@ -35,11 +35,11 @@
 #endif
 
 #if defined(__unix__) || defined(__APPLE__)
-#if !defined(__BYTE_ORDER) || !defined(__LITTLE_ENDIAN)                         
+#if !defined(BYTE_ORDER) || !defined(LITTLE_ENDIAN)                         
 #error No byte order defined                                                    
 #endif                                                                          
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN                                             
+#if BYTE_ORDER == LITTLE_ENDIAN                                             
 #define HIOFFSET 1                                                              
 #define LOWOFFSET 0                                                             
 #else                                                                           
