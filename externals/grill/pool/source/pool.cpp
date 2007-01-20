@@ -15,7 +15,103 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <stdlib.h>
 #include <fstream>
 
+#if FLEXT_OS == FLEXT_OS_WIN
+#include <windows.h> // for charset conversion functions
+#elif FLEXT_OS == FLEXT_OS_MAC
+#include <Carbon/Carbon.h>
+#else
+static bool WCStoUTF8(char *sdst,const wchar_t *src,int dstlen)
+{
+    unsigned char *dst = (unsigned char *)sdst;
+    unsigned char *max = dst+dstlen;
+    for(;;) {
+        wchar_t ud = *(src++);
+        if(ud < 128) {
+            if(dst+1 >= max) return false;
+            *(dst++) = (unsigned char)ud;
+        }
+        else if(ud < 2048) {
+            if(dst+2 >= max) return false;
+            *(dst++) = 192+(unsigned char)(ud/64);
+            *(dst++) = 128+(unsigned char)(ud%64);
+        }
+        else if(ud < 65535) {
+            if(dst+3 >= max) return false;
+            *(dst++) = 224+(unsigned char)(ud/4096);
+            *(dst++) = 128+(unsigned char)((ud/64)%64);
+            *(dst++) = 128+(unsigned char)(ud%64);
+        }
+        else if(ud < 2097151) {
+            if(dst+4 >= max) return false;
+            *(dst++) = 240+(unsigned char)(ud/262144);
+            *(dst++) = 128+(unsigned char)((ud/4096)%64);
+            *(dst++) = 128+(unsigned char)((ud/64)%64);
+            *(dst++) = 128+(unsigned char)(ud%64);
+        }
+        else if(ud < 67108863) {
+            if(dst+5 >= max) return false;
+            *(dst++) = 248+(unsigned char)(ud/16777216);
+            *(dst++) = 128+(unsigned char)((ud/262144)%64);
+            *(dst++) = 128+(unsigned char)((ud/4096)%64);
+            *(dst++) = 128+(unsigned char)((ud/64)%64);
+            *(dst++) = 128+(unsigned char)(ud%64);
+        }
+        else {
+            if(dst+6 >= max) return false;
+            *(dst++) = 252+(unsigned char)(ud/1073741824);
+            *(dst++) = 128+(unsigned char)((ud/16777216)%64);
+            *(dst++) = 128+(unsigned char)((ud/262144)%64);
+            *(dst++) = 128+(unsigned char)((ud/4096)%64);
+            *(dst++) = 128+(unsigned char)((ud/64)%64);
+            *(dst++) = 128+(unsigned char)(ud%64);
+        }
+        if(!ud) break;
+    }
+    return true;
+}
+
+static bool UTF8toWCS(wchar_t *dst,const char *ssrc,int dstlen)
+{
+    const unsigned char *src = (const unsigned char *)ssrc;
+    wchar_t *max = dst+dstlen;
+    for(;;) {
+        if(*src < 128) {
+            *dst = *(src++);
+            if(!*dst) break;
+        }
+        else if(*src < 224) {
+            *dst = wchar_t(src[0]-192)*64+wchar_t(src[1]-128);
+            src += 2;
+        }
+        else if(*src < 240) {
+            *dst = wchar_t(src[0]-224)*4096+wchar_t(src[1]-128)*64+wchar_t(src[2]-128);
+            src += 3;
+        }
+        else if(*src < 248) {
+            *dst = wchar_t(src[0]-240)*262144+wchar_t(src[1]-128)*4096+wchar_t(src[2]-128)*64+wchar_t(src[3]-128);
+            src += 4;
+        }
+        else if(*src < 252) {
+            *dst = wchar_t(src[0]-248)*16777216+wchar_t(src[1]-128)*262144+wchar_t(src[2]-128)*4096+wchar_t(src[3]-128)*64+wchar_t(src[4]-128);
+            src += 5;
+        }
+        else if(*src < 254) {
+            *dst = wchar_t(src[0]-252)*1073741824+wchar_t(src[1]-128)*16777216+wchar_t(src[2]-128)*262144+wchar_t(src[3]-128)*4096+wchar_t(src[4]-128)*64+wchar_t(src[5]-128);
+            src += 6;
+        }
+        else
+			// invalid string
+            return false;
+
+        if(++dst >= max) return false;
+    }
+    return true;
+}
+
+#endif
+
 using namespace std;
+
 
 
 inline I compare(I a,I b) { return a == b?0:(a < b?-1:1); }
@@ -487,11 +583,12 @@ BL pooldir::Copy(pooldir *p,I depth,BL cut)
 	return ok;
 }
 
+static bool _isspace(char c) { return c > 0 && isspace(c); }
 
-static const char *ReadAtom(const char *c,A &a)
+static const char *ReadAtom(const char *c,A &a,bool utf8)
 {
-	// skip leading whitespace
-	while(*c && isspace(*c)) ++c;
+	// skip leading whitespace (NON-ASCII character are < 0)
+	while(*c && _isspace(*c)) ++c;
 	if(!*c) return NULL;
 
 	char tmp[1024];
@@ -518,11 +615,11 @@ static const char *ReadAtom(const char *c,A &a)
         else if(*c == '"' && issymbol && !escaped) {
             // end of string
             ++c;
-            FLEXT_ASSERT(!*c || isspace(*c));
+            FLEXT_ASSERT(!*c || _isspace(*c));
             *m = 0;
             break;
         }
-        else if(!*c || (isspace(*c) && !escaped)) {
+        else if(!*c || (_isspace(*c) && !escaped)) {
             *m = 0;
             break;
         }
@@ -550,69 +647,152 @@ static const char *ReadAtom(const char *c,A &a)
             flext::SetFloat(a,fres);
     }
     // no, it's a symbol
-    else
-        flext::SetString(a,tmp);
+    else {
+		const char *c;
+        if(utf8) {
+#if FLEXT_OS == FLEXT_OS_WIN
+            wchar_t wtmp[1024];
+            int err = MultiByteToWideChar(CP_UTF8,0,tmp,strlen(tmp),wtmp,1024);
+            if(!err) return false;
+            err = WideCharToMultiByte(CP_ACP,0,wtmp,err,tmp,1024,NULL,FALSE);
+            if(!err) return false;
+            tmp[err] = 0;
+			c = tmp;
+#elif FLEXT_OS == FLEXT_OS_MAC
+            char ctmp[1024];
+
+			// is the output always MacRoman?
+			TextEncoding inconv = CreateTextEncoding(kTextEncodingUnicodeDefault,kTextEncodingDefaultVariant,kUnicodeUTF8Format);
+			TextEncoding outconv = CreateTextEncoding(kTextEncodingMacRoman,kTextEncodingDefaultVariant,kTextEncodingDefaultFormat);
+
+			TECObjectRef converter;
+			OSStatus status = TECCreateConverter(&converter,inconv,outconv);
+			if(status) return false;
+			
+			ByteCount inlen,outlen;
+			status = TECConvertText(
+			   converter,
+			   (ConstTextPtr)tmp,strlen(tmp),&inlen,
+			   (TextPtr)ctmp,sizeof(ctmp),&outlen
+			);
+			ctmp[outlen] = 0;
+	
+			TECDisposeConverter(converter);
+			c = ctmp;
+			if(status) return false;
+#else
+            wchar_t wtmp[1024];
+			size_t len = mbstowcs(wtmp,tmp,1024);
+			if(len < 0) return false;
+			if(!WCStoUTF8(tmp,wtmp,sizeof(tmp))) return false;
+			c = tmp;
+#endif
+		}
+		else 
+			c = tmp;
+        flext::SetString(a,c);
+	}
 
 	return c;
 }
 
-static BL ParseAtoms(C *tmp,flext::AtomList &l)
+static BL ParseAtoms(C *tmp,flext::AtomList &l,bool utf8)
 {
     const int MAXATOMS = 1024;
     int cnt = 0;
     t_atom atoms[MAXATOMS];
     for(const char *t = tmp; *t && cnt < MAXATOMS; ++cnt) {
-		t = ReadAtom(t,atoms[cnt]);
+		t = ReadAtom(t,atoms[cnt],utf8);
         if(!t) break;
     }
     l(cnt,atoms);
 	return true;
 }
 
-static BL ParseAtoms(string &s,flext::AtomList &l) 
+static BL ParseAtoms(string &s,flext::AtomList &l,bool utf8) 
 { 
-    return ParseAtoms((C *)s.c_str(),l); 
+    return ParseAtoms((C *)s.c_str(),l,utf8); 
 }
 
-static BL ReadAtoms(istream &is,flext::AtomList &l,C del)
+static bool ReadAtoms(istream &is,flext::AtomList &l,C del,bool utf8)
 {
-	C tmp[1024];
+	char tmp[1024];
 	is.getline(tmp,sizeof tmp,del); 
 	if(is.eof() || !is.good()) 
         return false;
     else
-        return ParseAtoms(tmp,l);
+        return ParseAtoms(tmp,l,utf8);
 }
 
-static V WriteAtom(ostream &os,const A &a)
+static bool WriteAtom(ostream &os,const A &a,bool utf8)
 {
-	switch(a.a_type) {
-	case A_FLOAT:
-		os << a.a_w.w_float;
-		break;
-#if FLEXT_SYS == FLEXT_SYS_MAX
-	case A_LONG:
-		os << a.a_w.w_long;
-		break;
+	if(flext::IsFloat(a))
+		os << flext::GetFloat(a);
+    else if(flext::IsInt(a))
+		os << flext::GetInt(a);
+    else if(flext::IsSymbol(a)) {
+        const char *c = flext::GetString(a);
+        if(utf8) {
+#if FLEXT_OS == FLEXT_OS_WIN
+            char tmp[1024];
+            wchar_t wtmp[1024];
+            int err = MultiByteToWideChar(CP_ACP,0,c,strlen(c),wtmp,1024);
+            if(!err) return false;
+            err = WideCharToMultiByte(CP_UTF8,0,wtmp,err,tmp,1024,NULL,FALSE);
+            if(!err) return false;
+            tmp[err] = 0;
+            c = tmp;
+#elif FLEXT_OS == FLEXT_OS_MAC
+            char tmp[1024];
+
+			// is the input always MacRoman?
+			TextEncoding inconv = CreateTextEncoding(kTextEncodingMacRoman,kTextEncodingDefaultVariant,kTextEncodingDefaultFormat);
+			TextEncoding outconv = CreateTextEncoding(kTextEncodingUnicodeDefault,kTextEncodingDefaultVariant,kUnicodeUTF8Format);
+
+			TECObjectRef converter;
+			OSStatus status = TECCreateConverter(&converter,inconv,outconv);
+			if(status) return false;
+			
+			ByteCount inlen,outlen;
+			status = TECConvertText(
+			   converter,
+			   (ConstTextPtr)c,strlen(c),&inlen,
+			   (TextPtr)tmp,sizeof(tmp),&outlen
+			);
+			tmp[outlen] = 0;
+	
+			TECDisposeConverter(converter);
+
+			if(status) return false;
+            c = tmp;
+#else
+            char tmp[1024];
+            wchar_t wtmp[1024];
+			if(!UTF8toWCS(wtmp,c,1024)) return false;
+			size_t len = wcstombs(tmp,wtmp,sizeof(tmp));
+			if(len < 0) return false;
+            c = tmp;
 #endif
-    case A_SYMBOL: {
-        const char *c = flext::GetString(flext::GetSymbol(a));
+        }
+
         os << '"';
         for(; *c; ++c) {
-            if(isspace(*c) || *c == '\\' || *c == ',' || *c == '"')
+			// escape some special characters
+            if(_isspace(*c) || *c == '\\' || *c == ',' || *c == '"')
                 os << '\\';
 	        os << *c;
         }
         os << '"';
-		break;
 	}
-    }
+    else
+        FLEXT_ASSERT(false);
+    return true;
 }
 
-static V WriteAtoms(ostream &os,const flext::AtomList &l)
+static void WriteAtoms(ostream &os,const flext::AtomList &l,bool utf8)
 {
 	for(I i = 0; i < l.Count(); ++i) {
-		WriteAtom(os,l[i]);
+		WriteAtom(os,l[i],utf8);
 		if(i < l.Count()-1) os << ' ';
 	}
 }
@@ -622,9 +802,9 @@ BL pooldir::LdDir(istream &is,I depth,BL mkdir)
 	for(I i = 1; !is.eof(); ++i) {
 		Atoms d,k,*v = new Atoms;
 		BL r = 
-            ReadAtoms(is,d,',') && 
-            ReadAtoms(is,k,',') &&
-            ReadAtoms(is,*v,'\n');
+            ReadAtoms(is,d,',',false) && 
+            ReadAtoms(is,k,',',false) &&
+            ReadAtoms(is,*v,'\n',false);
 
 		if(r) {
 			if(depth < 0 || d.Count() <= depth) {
@@ -655,18 +835,18 @@ BL pooldir::SvDir(ostream &os,I depth,const AtomList &dir)
     I cnt = 0;
 	for(I vi = 0; vi < vsize; ++vi) {
 		for(poolval *ix = vals[vi].v; ix; ix = ix->nxt) {
-			WriteAtoms(os,dir);
+			WriteAtoms(os,dir,false);
 			os << " , ";
-			WriteAtom(os,ix->key);
+			WriteAtom(os,ix->key,false);
 			os << " , ";
-			WriteAtoms(os,*ix->data);
+			WriteAtoms(os,*ix->data,false);
 			os << endl;
             ++cnt;
 		}
 	}
     if(!cnt) {
         // no key/value pairs present -> force empty directory
-		WriteAtoms(os,dir);
+		WriteAtoms(os,dir,false);
 		os << " , ," << endl;
     }
 	if(depth) {
@@ -706,7 +886,7 @@ static bool gettag(istream &is,xmltag &tag)
 
     for(;;) {
         // eat whitespace
-        while(isspace(is.peek())) is.get();
+        while(_isspace(is.peek())) is.get();
 
         // no tag begin -> break
         if(is.peek() != '<') break;
@@ -753,17 +933,17 @@ static bool gettag(istream &is,xmltag &tag)
 
             char *tb = tmp,*te = t-1,*tf;
 
-            for(; isspace(*tb); ++tb) {}
+            for(; _isspace(*tb); ++tb) {}
             if(*tb == '/') { 
                 // slash at the beginning -> end tag
                 tag.type = xmltag::t_end;
-                for(++tb; isspace(*tb); ++tb) {}
+                for(++tb; _isspace(*tb); ++tb) {}
             }
             else {
-                for(; isspace(*te); --te) {}
+                for(; _isspace(*te); --te) {}
                 if(*te == '/') { 
                     // slash at the end -> empty tag
-                    for(--te; isspace(*te); --te) {}
+                    for(--te; _isspace(*te); --te) {}
                     tag.type = xmltag::t_empty;
                 }
                 else 
@@ -772,9 +952,9 @@ static bool gettag(istream &is,xmltag &tag)
             }
 
             // copy tag text without slashes
-            for(tf = tb; tf <= te && *tf && !isspace(*tf); ++tf) {}
+            for(tf = tb; tf <= te && *tf && !_isspace(*tf); ++tf) {}
             tag.tag.assign(tb,tf-tb);
-            while(isspace(*tf)) ++tf;
+            while(_isspace(*tf)) ++tf;
             tag.attr.assign(tf,te-tf+1);
 
             return true;
@@ -824,14 +1004,14 @@ BL pooldir::LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d)
                     if(v.Count())
                         post("pool - XML load: value data already given, ignoring new data");
                     else
-                        ret = ParseAtoms(s,v);
+                        ret = ParseAtoms(s,v,true);
                 }
                 else // inkey
                     if(inval) {
                         if(k.Count())
                             post("pool - XML load, value key already given, ignoring new key");
                         else
-                            ret = ParseAtoms(s,k);
+                            ret = ParseAtoms(s,k,true);
                     }
                     else {
                         t_atom &dkey = d[d.Count()-1];
@@ -841,7 +1021,7 @@ BL pooldir::LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d)
                         if(*ds) 
                             post("pool - XML load: dir key already given, ignoring new key");
                         else
-                            ReadAtom(s.c_str(),dkey);
+                            ReadAtom(s.c_str(),dkey,true);
 
                         ret = true;
                     }
@@ -893,7 +1073,7 @@ BL pooldir::LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d)
                         if(fnd == d.Count()-1)
                             post("pool - XML load: dir key must be given prior to values");
 
-                        // else: one directoy level has been left unintialized, ignore items
+                        // else: one directory level has been left unintialized, ignore items
                     }
                     else {
                         // only use first word of key
@@ -981,7 +1161,7 @@ BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir,I ind)
 		os << "<dir>" << endl;
 		indent(os,ind+i+1);
 		os << "<key>";
-		WriteAtom(os,dir[ind+i]);
+		WriteAtom(os,dir[ind+i],true);
 		os << "</key>" << endl;
 	}
 
@@ -989,9 +1169,9 @@ BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir,I ind)
 		for(poolval *ix = vals[vi].v; ix; ix = ix->nxt) {
             indent(os,ind+lvls);
             os << "<value><key>";
-			WriteAtom(os,ix->key);
+			WriteAtom(os,ix->key,true);
             os << "</key><data>";
-			WriteAtoms(os,*ix->data);
+			WriteAtoms(os,*ix->data,true);
 			os << "</data></value>" << endl;
 		}
 	}

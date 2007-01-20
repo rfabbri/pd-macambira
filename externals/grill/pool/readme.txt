@@ -84,6 +84,9 @@ Version history:
 - new curdir attribute for getting/setting the current directory
 - changed pool name searching with STL code (more efficient)
 - added success/error reporting for file operations (through attribute outlet)
+- fixed handling of non-ASCII-characters
+- XML files are now encoded UTF-8
+- implemented output sorting (ogetall, ogetrec, ogetsub)
 
 0.2.1:
 - fixed "cntsub"... directories in current directory have been forgotten

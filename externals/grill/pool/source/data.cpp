@@ -195,7 +195,7 @@ BL pooldata::SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir)
 			Atoms tmp;
 			if(absdir) tmp = d;
             if(file.good()) {
-                file << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" << endl;
+                file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
                 file << "<!DOCTYPE pool SYSTEM \"http://grrrr.org/ext/pool/pool-0.2.dtd\">" << endl;
                 file << "<pool>" << endl;
                 BL ret = pd->SvDirXML(file,depth,tmp);

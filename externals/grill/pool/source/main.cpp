@@ -77,7 +77,7 @@ protected:
 	V m_getall();	// only values
 	V m_getrec(I argc,const A *argv);	// also subdirectories
 	V m_getsub(I argc,const A *argv);	// only subdirectories
-	V m_ogetall();	// only values (ordered)
+	V m_ogetall(int argc,const A *argv);	// only values (ordered)
 	V m_ogetrec(I argc,const A *argv);	// also subdirectories (ordered)
 	V m_ogetsub(I argc,const A *argv);	// only subdirectories (ordered)
 	V m_cntall();	// only values
@@ -131,8 +131,8 @@ private:
 
 	V set(I argc,const A *argv,BL over);
 	V getdir(const S *tag);
-	I getrec(const S *tag,I level,BL order,get_t how /*= get_norm*/,const AtomList &rdir);
-	I getsub(const S *tag,I level,BL order,get_t how /*= get_norm*/,const AtomList &rdir);
+	int getrec(const S *tag,int level,int order,bool rev,get_t how /*= get_norm*/,const AtomList &rdir);
+	int getsub(const S *tag,int level,int order,bool rev,get_t how /*= get_norm*/,const AtomList &rdir);
 
 	V paste(const S *tag,I argc,const A *argv,BL repl);
 	V copy(const S *tag,I argc,const A *argv,BL cut);
@@ -204,7 +204,7 @@ private:
 	FLEXT_CALLBACK(m_getall)
 	FLEXT_CALLBACK_V(m_getrec)
 	FLEXT_CALLBACK_V(m_getsub)
-	FLEXT_CALLBACK(m_ogetall)
+	FLEXT_CALLBACK_V(m_ogetall)
 	FLEXT_CALLBACK_V(m_ogetrec)
 	FLEXT_CALLBACK_V(m_ogetsub)
 	FLEXT_CALLBACK(m_cntall)
@@ -637,50 +637,136 @@ V pool::m_geti(I ix)
 	echodir();
 }
 
-I pool::getrec(const t_symbol *tag,I level,BL order,get_t how,const AtomList &rdir)
+
+// ---- some sorting stuff ----------------------------------
+
+inline bool smaller(const A &a,const A &b,int index) { return a < b; }
+inline void swap(A &a,A &b) { A c = a; a = b; b = c; }
+
+inline bool smaller(const A *a,const A *b,int index) { return *a < *b; }
+inline void swap(A *a,A *b) { A *c = a; a = b; b = c; }
+
+inline bool smaller(const Atoms &a,const Atoms &b,int index) 
+{ 
+	if(a.Count()-1 < index)
+		return true;
+	else if(b.Count()-1 < index)
+		return false;
+	else
+		return a[index] < b[index];
+}
+
+inline void swap(Atoms &a,Atoms &b) { Atoms c(a); a = b; b = c; }
+
+inline bool smaller(const Atoms *a,const Atoms *b,int index) { return smaller(*a,*b,index); }
+inline void swap(Atoms *a,Atoms *b) { Atoms *c = a; a = b; b = c; }
+
+template <typename T1,typename T2>
+void sift(T1 *a,T2 *b,int start,int count,int index,bool rev) 
+{
+	int root = start;                    // Point to a root node
+	int child;
+
+	while((child = root * 2 + 1) < count) {             // While the root has child(ren) point to its left child
+		// If the child has a sibling and the child's value is less than its sibling's...
+		if(child < count-1 && smaller(a[child],a[child+1],index) != rev)
+			child++;                // ... point to the right child instead
+			 
+		if(smaller(a[root],a[child],index) == rev) break;
+		
+		// If the value in root is less than in child...
+		swap(a[root], a[child]);           // ... swap the values in root and child and...
+		if(b) swap(b[root], b[child]);
+
+		root = child;                // ... make root point to its child
+	}
+}
+
+template <typename T1,typename T2>
+void heapsort(T1 *a,T2 *b,int count,int index,bool rev) 
+{
+	int start = count/2-1;
+	int end = count-1;
+
+	for(; start >= 0; start--)
+		sift(a, b, start, count, index, rev);
+
+	for(; end > 0; --end) {
+		swap(a[end], a[0]);
+		if(b) swap(b[end], b[0]);
+		sift(a, b, 0, end, index, rev);
+	}
+}
+ 
+template <typename T1,typename T2>
+static void orderpairs(T1 *keys,T2 *atoms,int count,int index,bool rev)
+{
+	FLEXT_ASSERT(index >= 0);
+
+	if(!count) return;
+	
+	if(index)
+		heapsort(atoms,keys,count,index-1,rev);
+	else
+		heapsort(keys,atoms,count,0,rev);
+}
+
+// ---- sorting stuff ends ----------------------------------
+
+int pool::getrec(const t_symbol *tag,int level,int order,bool rev,get_t how,const AtomList &rdir)
 {
 	Atoms gldir(curdir);
 	gldir.Append(rdir);
 
-	I ret = 0;
+	int ret = 0;
 
     switch(how) {
-        case get_cnt: 
-            ret = pl->CntAll(gldir);
-            break;
-        case get_print:
-            ret = pl->PrintAll(gldir);
-            break;
-        case get_norm: {
-		    A *k;
-		    Atoms *r;
-		    I cnt = pl->GetAll(gldir,k,r);
-		    if(!k) 
-			    post("%s - %s: error retrieving values",thisName(),GetString(tag));
-		    else {
-			    for(I i = 0; i < cnt; ++i) {
-				    ToSysAnything(3,tag,0,NULL);
-				    ToSysList(2,absdir?gldir:rdir);
-				    ToOutAtom(1,k[i]);
-				    ToSysList(0,r[i]);
-			    }
-			    delete[] k;
-			    delete[] r;
-		    }
-		    ret = cnt;
-        }
+		case get_cnt:
+			ret = pl->CntAll(gldir);
+			break;
+		case get_print:
+			ret = pl->PrintAll(gldir);
+			break;
+		case get_norm: {
+			A *k;
+			Atoms *r;
+			int cnt = pl->GetAll(gldir,k,r);
+			if(!k) {
+				FLEXT_ASSERT(!k);
+				post("%s - %s: error retrieving values",thisName(),GetString(tag));
+			}
+			else {
+				FLEXT_ASSERT(r);
+			
+				if(order >= 0)
+					orderpairs(k,r,cnt,order,rev);
+			
+				for(int i = 0; i < cnt; ++i) {
+					ToSysAnything(3,tag,0,NULL);
+					ToSysList(2,absdir?gldir:rdir);
+					ToOutAtom(1,k[i]);
+					ToSysList(0,r[i]);
+				}
+				delete[] k;
+				delete[] r;
+			}
+			ret = cnt;
+		}
 	}
 
 	if(level != 0) {
 		const A **r;
-		I cnt = pl->GetSub(gldir,r);
+		int cnt = pl->GetSub(gldir,r);
 		if(!r) 
 			post("%s - %s: error retrieving directories",thisName(),GetString(tag));
 		else {
-			I lv = level > 0?level-1:-1;
-			for(I i = 0; i < cnt; ++i) {
+			if(order >= 0)
+				orderpairs(r,(Atoms *)NULL,cnt,order,rev);
+
+			int lv = level > 0?level-1:-1;
+			for(int i = 0; i < cnt; ++i) {
 				Atoms l(rdir); l.Append(*r[i]);
-				ret += getrec(tag,lv,order,how,l);
+				ret += getrec(tag,lv,order,rev,how,l);
 			}
 			delete[] r;
 		}
@@ -692,16 +778,37 @@ I pool::getrec(const t_symbol *tag,I level,BL order,get_t how,const AtomList &rd
 V pool::m_getall()
 {
 	AtomList l;
-	getrec(thisTag(),0,false,get_norm,l);
+	getrec(thisTag(),0,-1,false,get_norm,l);
 	ToSysBang(3);
 
 	echodir();
 }
 
-V pool::m_ogetall()
+V pool::m_ogetall(I argc,const A *argv)
 {
+	int index = 0;
+	if(argc) {
+		if(!CanbeInt(*argv) || (index = GetAInt(*argv)) < 0) {
+			index = 0;
+			post("%s - %s: invalid sort index specification - set to 0",thisName(),GetString(thisTag()));
+		}
+		--argc,++argv;
+	}
+
+	bool rev = false;
+	if(argc) {
+		if(!CanbeBool(*argv))
+			post("%s - %s: invalid sort direction specification - set to forward",thisName(),GetString(thisTag()));
+		else
+			rev = GetABool(*argv);
+		--argc,++argv;
+	}
+
+	if(argc)
+		post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
+	
 	AtomList l;
-	getrec(thisTag(),0,true,get_norm,l);
+	getrec(thisTag(),0,index,rev,get_norm,l);
 	ToSysBang(3);
 
 	echodir();
@@ -709,19 +816,20 @@ V pool::m_ogetall()
 
 V pool::m_getrec(I argc,const A *argv)
 {
-	I lvls = -1;
-	if(argc > 0) {
-		if(CanbeInt(argv[0])) {
-			if(argc > 1)
-				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
-			lvls = GetAInt(argv[0]);
+	int lvls = -1;
+	if(argc) {
+		if(!CanbeInt(*argv) || (lvls = GetAInt(*argv)) < -1) {
+			lvls = -1;
+			post("%s - %s: invalid level specification - set to %i",thisName(),GetString(thisTag()),lvls);
 		}
-		else 
-			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(thisTag()));
+		--argc,++argv;
 	}
 
+	if(argc)
+		post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
+	
 	AtomList l;
-	getrec(thisTag(),lvls,false,get_norm,l);
+	getrec(thisTag(),lvls,-1,false,get_norm,l);
 	ToSysBang(3);
 
 	echodir();
@@ -730,40 +838,62 @@ V pool::m_getrec(I argc,const A *argv)
 
 V pool::m_ogetrec(I argc,const A *argv)
 {
-	I lvls = -1;
-	if(argc > 0) {
-		if(CanbeInt(argv[0])) {
-			if(argc > 1)
-				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
-			lvls = GetAInt(argv[0]);
+	int lvls = -1;
+	if(argc) {
+		if(!CanbeInt(*argv) || (lvls = GetAInt(*argv)) < -1) {
+			lvls = -1;
+			post("%s - %s: invalid level specification - set to %i",thisName(),GetString(thisTag()),lvls);
 		}
-		else 
-			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(thisTag()));
+		--argc,++argv;
 	}
 
+	int index = 0;
+	if(argc) {
+		if(!CanbeInt(*argv) || (index = GetAInt(*argv)) < 0) {
+			index = 0;
+			post("%s - %s: invalid sort index specification - set to 0",thisName(),GetString(thisTag()));
+		}
+		--argc,++argv;
+	}
+
+	bool rev = false;
+	if(argc) {
+		if(!CanbeBool(*argv))
+			post("%s - %s: invalid sort direction specification - set to forward",thisName(),GetString(thisTag()));
+		else
+			rev = GetABool(*argv);
+		--argc,++argv;
+	}
+
+	if(argc)
+		post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
+	
 	AtomList l;
-	getrec(thisTag(),lvls,true,get_norm,l);
+	getrec(thisTag(),lvls,index,rev,get_norm,l);
 	ToSysBang(3);
 
 	echodir();
 }
 
 
-I pool::getsub(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
+int pool::getsub(const S *tag,int level,int order,bool rev,get_t how,const AtomList &rdir)
 {
 	Atoms gldir(curdir);
 	gldir.Append(rdir);
 	
-	I ret = 0;
+	int ret = 0;
 
 	const A **r = NULL;
 	// CntSub is not used here because it doesn't allow checking for valid directory
-	I cnt = pl->GetSub(gldir,r);
+	int cnt = pl->GetSub(gldir,r);
 	if(!r) 
 		post("%s - %s: error retrieving directories",thisName(),GetString(tag));
 	else {
-		I lv = level > 0?level-1:-1;
-		for(I i = 0; i < cnt; ++i) {
+		if(order >= 0)
+			orderpairs(r,(Atoms *)NULL,cnt,order,rev);
+
+		int lv = level > 0?level-1:-1;
+		for(int i = 0; i < cnt; ++i) {
 			Atoms ndir(absdir?gldir:rdir);
 			ndir.Append(*r[i]);
             ++ret;
@@ -777,7 +907,7 @@ I pool::getsub(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
 
 			if(level != 0) {
 				AtomList l(rdir); l.Append(*r[i]);
-				ret += getsub(tag,lv,order,how,l);
+				ret += getsub(tag,lv,order,rev,how,l);
 			}
 		}
 		delete[] r;
@@ -786,42 +916,62 @@ I pool::getsub(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
 	return ret;
 }
 
-V pool::m_getsub(I argc,const A *argv)
+V pool::m_getsub(int argc,const A *argv)
 {
-	I lvls = 0;
-	if(argc > 0) {
-		if(CanbeInt(argv[0])) {
-			if(argc > 1)
-				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
-			lvls = GetAInt(argv[0]);
+	int lvls = 0;
+	if(argc) {
+		if(!CanbeInt(*argv) || (lvls = GetAInt(*argv)) < -1) {
+			lvls = 0;
+			post("%s - %s: invalid level specification - set to %i",thisName(),GetString(thisTag()),lvls);
 		}
-		else 
-			post("%s - %s: invalid level specification - set to 0",thisName(),GetString(thisTag()));
+		--argc,++argv;
 	}
+
+	if(argc)
+		post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 	
 	AtomList l;
-	getsub(thisTag(),lvls,false,get_norm,l);
+	getsub(thisTag(),lvls,-1,false,get_norm,l);
 	ToSysBang(3);
 
 	echodir();
 }
 
 
-V pool::m_ogetsub(I argc,const A *argv)
+V pool::m_ogetsub(int argc,const A *argv)
 {
-	I lvls = 0;
-	if(argc > 0) {
-		if(CanbeInt(argv[0])) {
-			if(argc > 1)
-				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
-			lvls = GetAInt(argv[0]);
+	int lvls = 0;
+	if(argc) {
+		if(!CanbeInt(*argv) || (lvls = GetAInt(*argv)) < -1) {
+			lvls = 0;
+			post("%s - %s: invalid level specification - set to %i",thisName(),GetString(thisTag()),lvls);
 		}
-		else 
-			post("%s - %s: invalid level specification - set to 0",thisName(),GetString(thisTag()));
+		--argc,++argv;
 	}
 
+	int index = 0;
+	if(argc) {
+		if(!CanbeInt(*argv) || (index = GetAInt(*argv)) < 0) {
+			index = 0;
+			post("%s - %s: invalid sort index specification - set to 0",thisName(),GetString(thisTag()));
+		}
+		--argc,++argv;
+	}
+
+	bool rev = false;
+	if(argc) {
+		if(!CanbeBool(*argv))
+			post("%s - %s: invalid sort direction specification - set to forward",thisName(),GetString(thisTag()));
+		else
+			rev = GetABool(*argv);
+		--argc,++argv;
+	}
+
+	if(argc)
+		post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
+	
 	AtomList l;
-	getsub(thisTag(),lvls,true,get_norm,l); 
+	getsub(thisTag(),lvls,index,rev,get_norm,l); 
 	ToSysBang(3);
 
 	echodir();
@@ -831,7 +981,7 @@ V pool::m_ogetsub(I argc,const A *argv)
 V pool::m_cntall()
 {
 	AtomList l;
-	I cnt = getrec(thisTag(),0,false,get_cnt,l);
+	I cnt = getrec(thisTag(),0,-1,false,get_cnt,l);
 	ToSysSymbol(3,thisTag());
 	ToSysBang(2);
 	ToSysBang(1);
@@ -840,21 +990,22 @@ V pool::m_cntall()
 	echodir();
 }
 
-V pool::m_cntrec(I argc,const A *argv)
+V pool::m_cntrec(int argc,const A *argv)
 {
-	I lvls = -1;
-	if(argc > 0) {
-		if(CanbeInt(argv[0])) {
-			if(argc > 1)
-				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
-			lvls = GetAInt(argv[0]);
+	int lvls = -1;
+	if(argc) {
+		if(!CanbeInt(*argv) || (lvls = GetAInt(*argv)) < -1) {
+			lvls = -1;
+			post("%s - %s: invalid level specification - set to %i",thisName(),GetString(thisTag()),lvls);
 		}
-		else 
-			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(thisTag()));
+		--argc,++argv;
 	}
+
+	if(argc)
+		post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 	
 	AtomList l;
-	I cnt = getrec(thisTag(),lvls,false,get_cnt,l);
+	I cnt = getrec(thisTag(),lvls,-1,false,get_cnt,l);
 	ToSysSymbol(3,thisTag());
 	ToSysBang(2);
 	ToSysBang(1);
@@ -866,19 +1017,20 @@ V pool::m_cntrec(I argc,const A *argv)
 
 V pool::m_cntsub(I argc,const A *argv)
 {
-	I lvls = 0;
-	if(argc > 0) {
-		if(CanbeInt(argv[0])) {
-			if(argc > 1)
-				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
-			lvls = GetAInt(argv[0]);
+	int lvls = 0;
+	if(argc) {
+		if(!CanbeInt(*argv) || (lvls = GetAInt(*argv)) < -1) {
+			lvls = 0;
+			post("%s - %s: invalid level specification - set to %i",thisName(),GetString(thisTag()),lvls);
 		}
-		else 
-			post("%s - %s: invalid level specification - set to 0",thisName(),GetString(thisTag()));
+		--argc,++argv;
 	}
 
+	if(argc)
+		post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
+	
 	AtomList l;
-	I cnt = getsub(thisTag(),lvls,false,get_cnt,l);
+	I cnt = getsub(thisTag(),lvls,-1,false,get_cnt,l);
 	ToSysSymbol(3,thisTag());
 	ToSysBang(2);
 	ToSysBang(1);
@@ -890,29 +1042,31 @@ V pool::m_cntsub(I argc,const A *argv)
 V pool::m_printall()
 {
 	AtomList l;
-	I cnt = getrec(thisTag(),0,false,get_print,l);
+	I cnt = getrec(thisTag(),0,-1,false,get_print,l);
     post("");
 }
 
 V pool::m_printrec(I argc,const A *argv,BL fromroot)
 {
     const S *tag = thisTag();
-	I lvls = -1;
-	if(argc > 0) {
-		if(CanbeInt(argv[0])) {
-			if(argc > 1)
-				post("%s - %s: superfluous arguments ignored",thisName(),GetString(tag));
-			lvls = GetAInt(argv[0]);
+	int lvls = -1;
+	
+	if(argc) {
+		if(!CanbeInt(*argv) || (lvls = GetAInt(*argv)) < -1) {
+			lvls = 0;
+			post("%s - %s: invalid level specification - set to %i",thisName(),GetString(tag),lvls);
 		}
-		else 
-			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(tag));
+		--argc,++argv;
 	}
 
+	if(argc)
+		post("%s - %s: superfluous arguments ignored",thisName(),GetString(tag));
+	
 	Atoms svdir(curdir);
     if(fromroot) curdir.Clear();
 
 	AtomList l;
-	I cnt = getrec(tag,lvls,false,get_print,l);
+	I cnt = getrec(tag,lvls,-1,false,get_print,l);
     post("");
 
     curdir = svdir;
