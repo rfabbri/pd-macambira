@@ -87,7 +87,7 @@ delsplit::delsplit(int argc,const t_atom *argv):
 static int chknum(const char *s)
 {
 	int num = 0,pts = 0;
-	for(const char *si = s; *s; ++s) {
+	for(; *s; ++s) {
 		if(*s == '.') ++pts;
 		else if(isdigit(*s)) ++num;
 		else { num = 0; break; }
@@ -152,7 +152,7 @@ void delsplit::m_any(const t_symbol *sym,int argc,const t_atom *argv)
         else if(IsString(argv[i]))
 	        strcpy(str,GetString(argv[i]));
         else if(CanbeFloat(argv[i]))
-            sprintf(str,"%e",GetAFloat(argv[i]));
+            STD::sprintf(str,"%e",GetAFloat(argv[i]));
         else
             str[0] = 0;
     	
@@ -170,5 +170,5 @@ void delsplit::m_any(const t_symbol *sym,int argc,const t_atom *argv)
 	    }
     }
 	
-	ToOutList(0,cnt,lst);
+	ToSysList(0,cnt,lst);
 }
