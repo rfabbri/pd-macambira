@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical rtc-lib
+LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical rtc-lib puremeasurement
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -388,6 +388,28 @@ rtc-lib_install:
 		$(helpdir)/$(RTC-LIB_NAME)
 	install -p $(abstractions_src)/footils/rtc-lib/rtc/rtc-help/*.pd \
 		$(helpdir)/$(RTC-LIB_NAME)/rtc-help
+
+
+#-------------------------------------------------------------------------------
+# PUREMEASUREMENT
+PUREMEASURE_NAME = puremeasurement
+puremeasurement_install:
+	install -d $(objectsdir)/$(PUREMEASURE_NAME)
+	install -p $(abstractions_src)/puremeasurement/applications/*.pd $(objectsdir)/$(PUREMEASURE_NAME)
+	install -p $(abstractions_src)/puremeasurement/tools/*.pd $(objectsdir)/$(PUREMEASURE_NAME)
+	install -p $(abstractions_src)/puremeasurement/testsig/*.wav $(objectsdir)/$(PUREMEASURE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PUREMEASURE_NAME) \
+		--author "Matthias Blau" \
+		--description "patches for acoustical measurements" \
+		--license "GNU GPL v2" \
+		--version "v28II06"
+	install -d $(examplesdir)/$(PUREMEASURE_NAME)
+	install -p $(abstractions_src)/puremeasurement/applications/*.pd \
+		 $(examplesdir)/$(PUREMEASURE_NAME)
+	install -d $(readmesdir)
+	install -p $(abstractions_src)/puremeasurement/readme \
+		$(readmesdir)/$(PUREMEASURE_NAME).txt
+
 
 #==============================================================================#
 #
