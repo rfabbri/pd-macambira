@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui iem_adaptfilt iemmatrix iemxmlrpc iem16
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui iem_adaptfilt iemmatrix iemxmlrpc iem16 earplug
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -2643,6 +2643,35 @@ iemxmlrpc_clean:
 	-rm -f -- $(externals_src)/iem/iemxmlrpc/*.o
 	-rm -f -- $(externals_src)/iem/iemxmlrpc/*.bak
 	-rm -f -- $(externals_src)/iem/iemxmlrpc/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# EARPLUG
+EARPLUG_NAME=earplug~
+EARPLUG_OBJECTS := $(wildcard $(externals_src)/earplug~/*.c)
+earplug: $(EARPLUG_OBJECTS:.c=.$(EXTENSION))
+
+earplug_install: earplug
+	install -d $(objectsdir)/$(EARPLUG_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(EARPLUG_NAME) \
+		--author "Pei Xiang" \
+		--description "filters for binaural audio spatialization, based on KEMAR impulse measurement" \
+		--license "" \
+		--version ""
+	install -p $(EARPLUG_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(EARPLUG_NAME)
+	install -d $(helpdir)/$(EARPLUG_NAME)
+	install -p $(externals_src)/earplug~/*-help.pd \
+		$(helpdir)/$(EARPLUG_NAME)
+	install -d $(examplesdir)/$(EARPLUG_NAME)
+	install -p $(externals_src)/earplug~/*-help.pd \
+		   $(examplesdir)/$(EARPLUG_NAME)
+
+earplug_clean:
+	-rm -f -- $(EARPLUG_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(EARPLUG_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/earplug~/*.bak
+	-rm -f -- $(externals_src)/earplug~/*.*~
 
 
 
