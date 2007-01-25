@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical rtc-lib puremeasurement
+LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical rtc-lib puremeasurement timestretch sssad
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -409,6 +409,55 @@ puremeasurement_install:
 	install -d $(readmesdir)
 	install -p $(abstractions_src)/puremeasurement/readme \
 		$(readmesdir)/$(PUREMEASURE_NAME).txt
+
+
+#-------------------------------------------------------------------------------
+# TIMESTRETCH
+TIMESTRETCH_NAME = timestretch
+timestretch_install:
+	install -d $(objectsdir)/$(TIMESTRETCH_NAME)
+	install -p $(abstractions_src)/timestretch/*.pd $(objectsdir)/$(TIMESTRETCH_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(TIMESTRETCH_NAME) \
+		--author "" \
+		--description "" \
+		--license "" \
+		--version "" 
+	install -d $(helpdir)/$(TIMESTRETCH_NAME)
+	install -p $(abstractions_src)/timestretch/*-help.pd \
+		 $(helpdir)/$(TIMESTRETCH_NAME)
+#	install -d $(manualsdir)/$(TIMESTRETCH_NAME)
+#	install -p $(abstractions_src)/timestretch/doc/*.txt \
+#		 $(manualsdir)/$(TIMESTRETCH_NAME)
+#	install -d $(readmesdir)
+#	install -p $(abstractions_src)/timestretch/README \
+#		$(readmesdir)/$(TIMESTRETCH_NAME).txt
+
+
+#-------------------------------------------------------------------------------
+# SSSAD
+SSSAD_NAME = sssad
+sssad_install:
+	install -d $(objectsdir)/$(SSSAD_NAME)
+	install -d $(objectsdir)/$(SSSAD_NAME)/_sssad
+	install -p $(abstractions_src)/footils/sssad/*.pd $(objectsdir)/$(SSSAD_NAME)
+	install -p $(abstractions_src)/footils/sssad/_sssad/*.pd $(objectsdir)/$(SSSAD_NAME)/_sssad
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(SSSAD_NAME) \
+		--author "Frank Barkneht" \
+		--description "Stupid-super-simplistic State-saving for PD" \
+		--license "same as Pd's license" \
+		--version "" 
+	install -d $(helpdir)/$(SSSAD_NAME)
+	install -p $(abstractions_src)/footils/sssad/*-help.pd \
+		 $(helpdir)/$(SSSAD_NAME)
+	install -p $(abstractions_src)/footils/sssad/_sssad/*-help.pd \
+		 $(helpdir)/$(SSSAD_NAME)
+	install -d $(examplesdir)/$(SSSAD_NAME)
+	install -p $(abstractions_src)/footils/sssad/sssad-example.pd \
+		 $(examplesdir)/$(SSSAD_NAME)
+	install -d $(readmesdir)
+	install -p $(abstractions_src)/footils/sssad/README.txt \
+		$(readmesdir)/$(SSSAD_NAME).txt
+
 
 
 #==============================================================================#
