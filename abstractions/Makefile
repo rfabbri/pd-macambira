@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical rtc-lib puremeasurement timestretch sssad
+LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical rtc-lib puremeasurement timestretch sssad pd-wavelet
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -442,7 +442,7 @@ sssad_install:
 	install -p $(abstractions_src)/footils/sssad/*.pd $(objectsdir)/$(SSSAD_NAME)
 	install -p $(abstractions_src)/footils/sssad/_sssad/*.pd $(objectsdir)/$(SSSAD_NAME)/_sssad
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(SSSAD_NAME) \
-		--author "Frank Barkneht" \
+		--author "Frank Barknecht" \
 		--description "Stupid-super-simplistic State-saving for PD" \
 		--license "same as Pd's license" \
 		--version "" 
@@ -458,6 +458,27 @@ sssad_install:
 	install -p $(abstractions_src)/footils/sssad/README.txt \
 		$(readmesdir)/$(SSSAD_NAME).txt
 
+
+#-------------------------------------------------------------------------------
+# PDWAVELET
+PDWAVELET_NAME = pd-wavelet
+pd-wavelet_install:
+	install -d $(objectsdir)/$(PDWAVELET_NAME)
+	install -p $(abstractions_src)/pd-wavelet/*.pd \
+	$(objectsdir)/$(PDWAVELET_NAME)
+	install -p $(abstractions_src)/pd-wavelet/abs/*.pd \
+	$(objectsdir)/$(PDWAVELET_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDWAVELET_NAME) \
+		--author "Raul Diaz Poblete" \
+		--description "manipulation of audio in the wavelet domain" \
+		--license "GNU GPL v2" \
+		--version "" 
+	install -d $(examplesdir)/$(PDWAVELET_NAME)
+	install -p $(abstractions_src)/pd-wavelet/main.pd \
+		 $(examplesdir)/$(PDWAVELET_NAME)
+	install -d $(readmesdir)
+	install -p $(abstractions_src)/pd-wavelet/README.txt \
+		$(readmesdir)/$(PDWAVELET_NAME).txt
 
 
 #==============================================================================#
