@@ -19,7 +19,7 @@ struct _canvasenvironment
 };
 
 
-static char *version = "$Revision: 1.5 $";
+static char *version = "$Revision: 1.6 $";
 
 /* This loader opens a directory with a -meta.pd file as a library.  In the
  * long run, the idea is that one folder will have all of objects files, all
@@ -38,9 +38,10 @@ static char *version = "$Revision: 1.5 $";
 
 static int libdir_loader(t_canvas *canvas, char *classname)
 {
-    int fd = -1;
-    char fullclassname[MAXPDSTRING], dirbuf[MAXPDSTRING], *nameptr;
-	t_canvasenvironment *canvasenvironment;
+    int fd = -1, i;
+    char fullclassname[MAXPDSTRING], dirbuf[MAXPDSTRING];
+    char reldirbuf[MAXPDSTRING], curdir[MAXPDSTRING], *nameptr;
+    t_canvasenvironment *canvasenvironment;
 
 /* look for meta file (classname)/(classname)-meta.pd */
 	strncpy(fullclassname, classname, MAXPDSTRING - 6);
@@ -60,9 +61,26 @@ static int libdir_loader(t_canvas *canvas, char *classname)
 			return (0);
 		}
 		close(fd);
+
+
+		// G.Holzmann: canvas will look to a relative path to it, so we cannot add
+                // the absulote dirbuf path, we have to make it relative to the current canvas
+		// (see from line 1561 in g_canvas.c)
+
+		sys_unbashfilename(canvas_getdir(canvas)->s_name, curdir);
+		
+		// count depth of the current dir
+		for(i=0; i<strlen(curdir); i++)
+		{
+			if(curdir[i] == 47) // 47 is "/" in ascii
+                          strncat(reldirbuf, "../", MAXPDSTRING);
+		}
+		strncat(reldirbuf, dirbuf, MAXPDSTRING);
+
+
 		// TODO: have this add to the canvas-local path only
 		canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path, 
-													 dirbuf, 0);
+								reldirbuf, 0);
 		post("libdir_loader: added %s to the canvas-local path", classname);
 	}
 	else
