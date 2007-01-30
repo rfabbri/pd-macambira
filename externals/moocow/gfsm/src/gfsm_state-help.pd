@@ -1,4 +1,4 @@
-#N canvas 232 0 651 599 10;
+#N canvas 154 10 651 599 10;
 #X obj 85 569 gfsm;
 #X text 15 569 SEE ALSO:;
 #X text 41 6 gfsm_state : position "pointer" for finite-state automata
@@ -12,38 +12,45 @@
 #X text 52 47 FSM_NAME - symbolic name of a gfsm_automaton;
 #X text 52 61 STATE_ID - numeric Id of the target state;
 #X obj 26 531 print gfsm-state-out;
-#X msg 44 182 id;
-#X text 164 185 "id" : get current state Id;
-#X text 135 205 "set ID" : set current state Id;
-#X msg 50 205 set 0;
+#X msg 44 168 id;
+#X text 164 171 "id" : get current state Id;
+#X text 135 185 "set ID" : set current state Id;
+#X msg 50 185 set 0;
 #X msg 26 127 automaton;
-#X msg 31 149 automaton fsm-help;
+#X msg 31 144 automaton fsm-help;
 #X text 197 128 "automaton" : use an object-local machine;
-#X text 163 151 "automaton NAME" : use a shared machine named NAME
+#X text 163 146 "automaton NAME" : use a shared machine named NAME
 ;
-#X msg 58 239 degree;
-#X text 137 240 "degree" : get number of outgoing arcs (linear time)
+#X msg 58 212 degree;
+#X text 137 213 "degree" : get number of outgoing arcs (linear time)
 ;
-#X msg 61 295 arc_first;
-#X msg 61 317 arc_next;
-#X msg 59 382 arc_reset;
+#X msg 61 325 arc_first;
+#X msg 61 342 arc_next;
+#X msg 65 412 arc_reset;
 #X obj 26 508 gfsm_state fsm-help 0;
-#X text 229 398 arcs are output as a list:;
-#X text 277 414 NEXT_STATEID LO HI WEIGHT;
-#X text 306 359 (negative labels are ignored);
-#X msg 58 345 arc_seek 202 -1;
-#X text 208 294 "arc_first" : get first outgoing arc;
-#X text 214 318 "arc_next" : get next available outgoing arc (maybe
+#X text 75 258 arcs are output as a list:;
+#X text 265 258 NEXT_STATEID LO HI WEIGHT;
+#X text 306 392 (negative labels are ignored);
+#X msg 64 376 arc_seek 202 -1;
+#X text 208 326 "arc_first" : get first outgoing arc;
+#X text 215 342 "arc_next" : get next available outgoing arc (maybe
 first);
-#X text 173 344 "arc_seek LO HI" : get next arc with labels LO:HI;
-#X text 207 383 "arc_reset" : close internal arc iterator;
-#X msg 54 447 add_weight 1 -1 101 0.9;
-#X text 233 450 "add_weight ID LO HI W" : add W to 1st arc to state
+#X text 173 377 "arc_seek LO HI" : get next arc with labels LO:HI;
+#X text 213 413 "arc_reset" : close internal arc iterator;
+#X msg 54 467 add_weight 1 -1 101 0.9;
+#X text 233 470 "add_weight ID LO HI W" : add W to 1st arc to state
 ID;
-#X text 416 463 with labels LO:HI;
-#X text 271 479 (implicitly resets arc iterator);
-#X msg 59 263 cyclic;
-#X text 141 263 "cyclic" : does this state lead to any cycles?;
+#X text 416 483 with labels LO:HI;
+#X text 271 499 (implicitly resets arc iterator);
+#X msg 61 229 cyclic;
+#X text 137 229 "cyclic" : does this state lead to any cycles?;
+#X msg 64 359 arc_nth 0;
+#X text 208 360 "arc_nth N" : seek to n-th arc (counting from zero)
+;
+#X msg 61 278 arc_gen 42 1;
+#X text 186 281 "arc_gen W SR" : generate an arc;
+#X text 312 295 W - weight hint (0..sum(weights(state));
+#X text 304 309 SR - boolean - whether to use gfsmSemiring;
 #X connect 12 0 25 0;
 #X connect 15 0 25 0;
 #X connect 16 0 25 0;
@@ -56,3 +63,5 @@ ID;
 #X connect 29 0 25 0;
 #X connect 34 0 25 0;
 #X connect 38 0 25 0;
+#X connect 40 0 25 0;
+#X connect 42 0 25 0;

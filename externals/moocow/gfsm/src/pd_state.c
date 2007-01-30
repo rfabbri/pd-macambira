@@ -3,7 +3,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state automata for Pd
  *
- * Copyright (c) 2004-2006 Bryan Jurish.
+ * Copyright (c) 2004-2007 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
@@ -201,6 +201,91 @@ static void pd_gfsm_state_arc_seek(t_pd_gfsm_state *x, t_float flo, t_float fhi)
   pd_gfsm_state_outlet_arc(x, gensym("arc_seek"));
 }
 
+/*--------------------------------------------------------------------
+ * arc_nth(n)
+ */
+static void pd_gfsm_state_arc_nth(t_pd_gfsm_state *x, t_float n)
+{
+  int i = n;
+  gfsmState *s = gfsm_automaton_find_state(x->x_automaton_pd->x_automaton, x->x_id);
+
+  if (s) {
+    gfsm_arciter_close(&x->x_arci);
+    for (gfsm_arciter_open(&x->x_arci, x->x_automaton_pd->x_automaton, x->x_id);
+	 i > 0 && gfsm_arciter_ok(&x->x_arci);
+	 gfsm_arciter_next(&x->x_arci))
+      ;
+  }
+
+  pd_gfsm_state_outlet_arc(x, gensym("arc_nth"));
+}
+
+/*--------------------------------------------------------------------
+ * get_total_weight(bool use_semiring)
+ *  + low-level
+ */
+static t_float pd_gfsm_state_get_total_weight(t_pd_gfsm_state *x, int use_semiring)
+{
+  gfsmAutomaton *fsm = x->x_automaton_pd->x_automaton;
+  gfsmState     *s   = gfsm_automaton_find_state(fsm, x->x_id);
+  gfsmSemiring  *sr  = fsm->sr;
+  gfsmWeight     w   = use_semiring ? sr->zero : 0.0;
+
+  if (s) {
+    /*w = gfsm_sr_plus(sr,w,gfsm_automaton_get_final_weight(fsm,x->x_id));*/ //--ignore final weights!
+    gfsm_arciter_close(&x->x_arci);
+    for (gfsm_arciter_open(&x->x_arci, x->x_automaton_pd->x_automaton, x->x_id);
+	 gfsm_arciter_ok(&x->x_arci);
+	 gfsm_arciter_next(&x->x_arci))
+      {
+	gfsmArc *a = gfsm_arciter_arc(&x->x_arci);
+	w = use_semiring ? gfsm_sr_plus(sr,w,a->weight) : (w+a->weight);
+      }
+  }
+  return w;
+}
+
+/*--------------------------------------------------------------------
+ * total_weight()
+ *  + pd level
+ */
+static void pd_gfsm_state_total_weight(t_pd_gfsm_state *x, t_float use_semiring)
+{
+  t_float w = pd_gfsm_state_get_total_weight(x, (int)use_semiring);
+  SETFLOAT(x->x_argv, (t_float)(w));
+  outlet_anything(x->x_valout, gensym("total_weight"), 1, x->x_argv);
+}
+
+
+/*--------------------------------------------------------------------
+ * arc_gen(weight_hint)
+ */
+static void pd_gfsm_state_arc_gen(t_pd_gfsm_state *x, t_float weight_hint, t_float use_semiring_f)
+{
+  gfsmState *s = gfsm_automaton_find_state(x->x_automaton_pd->x_automaton, x->x_id);
+  int use_semiring = (int)use_semiring_f;
+  if (s) {
+    gfsmSemiring *sr = x->x_automaton_pd->x_automaton->sr;
+    gfsmWeight     w = use_semiring ? sr->zero : 0;
+
+    for (gfsm_arciter_open(&x->x_arci, x->x_automaton_pd->x_automaton, x->x_id);
+	 gfsm_arciter_ok(&x->x_arci);
+	 gfsm_arciter_next(&x->x_arci))
+      {
+	gfsmArc *a = gfsm_arciter_arc(&x->x_arci);
+	if (use_semiring) {
+	  w = gfsm_sr_plus(sr,w,a->weight);
+	  if (!gfsm_sr_less(sr,w,weight_hint)) break;
+	} else {
+	  w += a->weight;
+	  if (w >= weight_hint) break;
+	}
+      }
+  }
+  pd_gfsm_state_outlet_arc(x, gensym("arc_gen"));
+}
+
+
 
 /*--------------------------------------------------------------------
  * arc_reset
@@ -314,6 +399,14 @@ void pd_gfsm_state_setup(void)
 		  gensym("arc_seek"), A_FLOAT, A_FLOAT, A_NULL);
   class_addmethod(pd_gfsm_state_class, (t_method)pd_gfsm_state_arc_reset,
 		  gensym("arc_reset"), A_NULL);
+
+  //-- new arc methods
+  class_addmethod(pd_gfsm_state_class, (t_method)pd_gfsm_state_arc_nth,
+		  gensym("arc_nth"), A_DEFFLOAT, A_NULL);
+  class_addmethod(pd_gfsm_state_class, (t_method)pd_gfsm_state_total_weight,
+		  gensym("total_weight"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+  class_addmethod(pd_gfsm_state_class, (t_method)pd_gfsm_state_arc_gen,
+		  gensym("arc_gen"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
 
   //-- methods: manipulation
   class_addmethod(pd_gfsm_state_class, (t_method)pd_gfsm_state_add_weight,
