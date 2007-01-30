@@ -1,4 +1,4 @@
-#N canvas 595 54 563 818 10;
+#N canvas 595 54 563 765 10;
 #X obj 4 369 cnv 15 550 15 empty empty empty 20 12 0 14 -158509 -66577
 0;
 #X obj 5 779 cnv 15 550 30 empty empty empty 20 12 0 14 -158509 -66577
@@ -192,10 +192,9 @@ rigidity2 yticks 0 5 5 \; rigidity3 resize 51 \; rigidity3 xticks 0
 #X text 126 505 Rigidity with power = 1/2;
 #N canvas 0 0 450 300 (subpatch) 0;
 #X array rigidity4 51 float 1;
-#A 0 900 -400 -361 -324 -289 -256 -225 -196 -169 -144 -121 -100 -81
--64 -49 -36 -25 -16 -9 -4 -1 0 1 4 9 16 25 36 49 64 81 100 121 144
-169 196 225 256 289 324 361 400 441 484 529 576 625 676 729 784 841
-;
+#A 0 0 -400 -361 -324 -289 -256 -225 -196 -169 -144 -121 -100 -81 -64
+-49 -36 -25 -16 -9 -4 -1 0 1 4 9 16 25 36 49 64 81 100 121 144 169
+196 225 256 289 324 361 400 441 484 529 576 625 676 729 784 841;
 #X array zero 51 float 1;
 #A 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
@@ -512,27 +511,27 @@ for all the elements. - Ids or/and creations No;
 #X obj 109 36 inlet;
 #X obj 109 98 t b;
 #X obj 238 131 + 4;
-#X obj 109 125 l 0 0;
 #X msg 57 182 posX fix \$1;
 #X msg 57 203 posY fix \$2;
 #X obj 189 108 / 62.5;
 #X obj 237 107 / -62.5;
 #X obj 189 131 - 4;
-#X connect 0 0 10 0;
-#X connect 0 1 11 0;
+#X obj 109 125 list 0 0;
+#X connect 0 0 9 0;
+#X connect 0 1 10 0;
 #X connect 0 2 2 1;
 #X connect 1 0 2 0;
-#X connect 2 0 7 1;
+#X connect 2 0 12 1;
 #X connect 4 0 5 0;
-#X connect 5 0 7 0;
+#X connect 5 0 12 0;
 #X connect 6 0 1 1;
-#X connect 7 0 8 0;
-#X connect 7 0 9 0;
+#X connect 7 0 3 0;
 #X connect 8 0 3 0;
-#X connect 9 0 3 0;
-#X connect 10 0 12 0;
-#X connect 11 0 6 0;
-#X connect 12 0 1 0;
+#X connect 9 0 11 0;
+#X connect 10 0 6 0;
+#X connect 11 0 1 0;
+#X connect 12 0 7 0;
+#X connect 12 0 8 0;
 #X restore 393 295 pd gemmouse;
 #X obj 393 274 gemhead;
 #X obj 336 216 gemwin;
