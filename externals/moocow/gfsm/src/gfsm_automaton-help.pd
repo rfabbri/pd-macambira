@@ -1,4 +1,4 @@
-#N canvas 126 0 479 520 10;
+#N canvas 8 34 479 520 10;
 #X text 89 7 gfsm_automaton : weighted finite state machine;
 #X text 183 489 Bryan Jurish <moocow@ling.uni-potsdam.de>;
 #X text 7 436 SEE ALSO:;
@@ -12,11 +12,6 @@
 #X text 7 211 SUBTOPICS:;
 #X text 10 114 DESCRIPTION:;
 #X text 245 211 GUTS:;
-#X text 28 130 gfsm_automaton objects represent weighted finite state
-machines (acceptors or transducers) -- rooted \, acyclic graphs whose
-edges are labelled with triples (LO \, HI \, WEIGHT) \, where LO and
-HI are alphabet labels (see gfsm_alphabet) \, and WEIGHT is a floating
-point number.;
 #X obj 265 272 print fsm-help-out;
 #X obj 135 457 gfsm_alphabet;
 #N canvas 192 14 651 458 help-automaton-flags 0;
@@ -153,11 +148,11 @@ transducer" format \, regardless of automaton flags or input file content.
 #X msg 24 140 concat fsm-help;
 #X text 215 141 "concat FSM2" : concatenate with automaton named FSM2
 ;
-#X text 187 197 "difference FSM2" : remove language of automaton named
+#X text 187 203 "difference FSM2" : remove language of automaton named
 FSM2;
-#X text 194 228 "intersect FSM2" : intersect with automaton named FSM2
+#X text 194 235 "intersect FSM2" : intersect with automaton named FSM2
 ;
-#X text 250 266 "invert" : swap upper and lower labels;
+#X text 250 268 "invert" : swap upper and lower labels;
 #X msg 24 302 project 0;
 #X msg 24 319 project 1;
 #X text 208 298 "project SIDE" : project one label side;
@@ -165,10 +160,10 @@ FSM2;
 #X text 328 323 SIDE=1: project upper labels;
 #X text 208 348 "product FSM2" : compute Cartesian product with FSM2
 ;
-#X text 243 407 "reverse" : reverse language of an automaton;
+#X text 243 414 "reverse" : reverse language of an automaton;
 #X text 95 6 gfsm_automaton : algebraic operations;
-#X text 229 439 "rmepsilon" : remove epsilon arcs;
-#X text 222 478 "union FSM2" : compute union with automaton FSM2;
+#X text 229 444 "rmepsilon" : remove epsilon arcs;
+#X text 222 480 "union FSM2" : compute union with automaton FSM2;
 #X obj 24 505 s fsm-help-in;
 #X text 31 551 WARNING: these methods may block for long periods of
 time for large automata.;
@@ -178,7 +173,7 @@ time for large automata.;
 #X text 229 70 "closure N" : compute N-ary closure;
 #X text 215 170 "determinize" : determinize an acceptor;
 #X msg 24 383 connect;
-#X text 244 382 "connect" : remove useless states and arcs;
+#X text 244 385 "connect" : remove useless states and arcs;
 #X connect 0 0 27 0;
 #X connect 1 0 27 0;
 #X connect 2 0 27 0;
@@ -336,5 +331,10 @@ package from at&t.;
 #X connect 10 0 2 0;
 #X connect 15 0 2 0;
 #X restore 22 386 pd help-automaton-lookup;
-#X connect 21 0 28 0;
-#X connect 28 0 14 0;
+#X text 28 130 gfsm_automaton objects represent weighted finite state
+machines (acceptors or transducers) -- rooted and possibly cyclic graphs
+whose edges are labelled with triples (LO \, HI \, WEIGHT) \, where
+LO and HI are alphabet labels (see gfsm_alphabet) \, and WEIGHT is
+a floating point number.;
+#X connect 20 0 27 0;
+#X connect 27 0 13 0;
