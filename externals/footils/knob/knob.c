@@ -607,7 +607,15 @@ static void knob_steady(t_knob *x, t_floatarg f)
 
 static void knob_loadbang(t_knob *x)
 {
+  /* WARNING: this is a kludge to get this object building on
+     Windows. Currently, the linker fails on the symbol
+     "sys_noloadbang".  <hans@at.or.at>
+   */
+#ifdef _WIN32
+    if(x->x_gui.x_isa.x_loadinit)
+#else
     if(!sys_noloadbang && x->x_gui.x_isa.x_loadinit)
+#endif
     {
 	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
 	knob_bang(x);
