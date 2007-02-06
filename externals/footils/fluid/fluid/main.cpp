@@ -246,6 +246,7 @@ void fluid::fluid_gen(int argc, t_atom *argv)
 
 
 void fluid::fluid_init(int argc, t_atom *argv)
+    : synth(NULL)
 {
 	if (synth != NULL) 
 		delete_fluid_synth(synth);
