@@ -2,7 +2,9 @@ current: all
 
 .SUFFIXES: .pd_linux
 
-INCLUDE = -I. -I/usr/local/src/pd/src
+PDSOURCE = /usr/local/src/pd/src
+
+INCLUDE = -I. -I${PDSOURCE}
 
 LDFLAGS = -export-dynamic -shared
 LIB = -ldl -lm -lpthread
@@ -10,7 +12,7 @@ LIB = -ldl -lm -lpthread
 #select either the DBG and OPT compiler flags below:
 
 CFLAGS = -DPD -DUNIX -W -Werror -Wno-unused \
-	-Wno-parentheses -Wno-switch -O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing \
+	-Wno-parentheses -Wno-switch -O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing -fPIC \
         -DDL_OPEN
 
 SYSTEM = $(shell uname -m)
