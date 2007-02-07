@@ -12,12 +12,10 @@
 #X text 107 441 bang : synonym for "next";
 #X text 16 24 SYNTAX: gfsm_markov OBJNAME;
 #X text 15 44 REQUIRES:;
-#X obj 83 44 gfsm;
 #X text 75 147 load BASE : load text files BASE.lab and BASE.tfst;
 #X text 75 159 save BASE : save text files BASE.lab \, BASE.tfst;
 #X text 47 182 load_bin BASE : load files BASE.lab \, BASE.gfst;
 #X text 47 194 save_bin BASE : save files BASE.lab \, BASE.gfst;
-#X obj 121 45 zexy;
 #X text 156 294 from current state \, and move to;
 #X text 23 281 add A1 A2 WEIGHT : add WEIGHT to arc on atom-pair A1:A2
 ;
@@ -35,6 +33,7 @@ A1:A2;
 #X text 217 92 2 - upper side atoms on "next";
 #X text 217 78 1 - lower side atoms on "next";
 #X text 102 250 clear : clear underlying objects;
+#X text 82 44 [gfsm] \, [zexy];
 #X restore 309 19 pd gfsm_markov_doc;
 #X obj 20 60 inlet;
 #X obj 22 261 outlet;
