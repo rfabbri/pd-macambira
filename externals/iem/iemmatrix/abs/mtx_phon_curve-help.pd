@@ -1,11 +1,10 @@
-#N canvas 276 123 849 390 10;
-#X obj 247 206 mtx_* 0.5;
+#N canvas 263 0 849 390 10;
 #N canvas 0 0 450 300 (subpatch) 0;
 #X array phon_curve 31 float 1;
-#A 0 83.0956 69.3994 57.9927 48.4958 40.591 34.0127 28.5391 23.985
-20.1961 17.0438 14.4208 12.2374 10.4185 8.90086 7.62984 6.55604 5.62926
-4.78645 3.92454 2.8461 1.20451 -1.26109 -3.41784 -1.95161 2.02311 3.88731
-6.19619 12.1587 27.3273 65.5882 161.827;
+#A 0 84.0263 70.2655 58.8035 49.2594 41.3145 34.7019 29.1992 24.6203
+20.8105 17.6404 15.0023 12.8061 10.9765 9.44971 8.17099 7.09068 6.15842
+5.31097 4.44516 3.36343 1.71908 -0.748856 -2.90756 -1.44298 2.53035
+4.39339 6.70128 12.6629 27.8308 66.0912 162.329;
 #X coords 0 120 30 0 200 140 1;
 #X restore 36 187 graph;
 #N canvas 0 0 450 300 mtx2tablemsg 0;
@@ -27,7 +26,6 @@
 #X connect 7 0 4 0;
 #X restore 247 230 pd mtx2tablemsg;
 #X obj 356 210 loadbang;
-#X obj 247 165 mtx_rmstodb;
 #X obj 247 125 mtx_logspace;
 #X text 30 331 20;
 #X text 70 331 80;
@@ -53,17 +51,17 @@ frequencies;
 threshold of hearing;
 #X text 44 32 [mtx_phon_curve];
 #X obj 247 145 mtx_phon_curve 0;
-#X connect 0 0 2 0;
-#X connect 2 0 19 0;
-#X connect 3 0 13 0;
-#X connect 4 0 17 0;
-#X connect 5 0 26 0;
-#X connect 9 0 5 0;
-#X connect 13 0 19 0;
-#X connect 14 0 15 0;
-#X connect 15 0 9 0;
-#X connect 15 1 26 1;
-#X connect 15 2 16 0;
-#X connect 16 0 17 1;
-#X connect 17 0 0 0;
-#X connect 26 0 4 0;
+#X obj 247 165 mtx_powtodb;
+#X connect 1 0 17 0;
+#X connect 2 0 11 0;
+#X connect 3 0 24 0;
+#X connect 7 0 3 0;
+#X connect 11 0 17 0;
+#X connect 12 0 13 0;
+#X connect 13 0 7 0;
+#X connect 13 1 24 1;
+#X connect 13 2 14 0;
+#X connect 14 0 15 1;
+#X connect 15 0 1 0;
+#X connect 24 0 25 0;
+#X connect 25 0 15 0;
