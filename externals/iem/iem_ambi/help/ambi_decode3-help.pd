@@ -1,4 +1,4 @@
-#N canvas 4 2 973 711 10;
+#N canvas 4 2 981 718 10;
 #X text 27 436 1.arg: <float> ambisonic order;
 #X text 794 41 -180 <= phi <= +180;
 #X text 494 172 input: <ambi_weight> one mul-factor for each;
@@ -89,8 +89,6 @@
 #X text 799 328 mirror_weight;
 #X text 545 354 phantom speaker with the factor "mirror_weight" and
 adds;
-#X text 544 367 this column to the column "rl_ls_index" of real speaker
-;
 #X text 494 202 input: <sing_range> singularity range;
 #X text 537 213 when calculating the inverse of the matrix by gauss
 ;
@@ -228,8 +226,6 @@ be;
 #X text 532 153 we need them to achieve a nonsingular matrix;
 #X text 493 328 input: <ipht_ireal_muladd> vi_ls_index re_ls_index
 ;
-#X text 546 341 multiplies the column "vi_ls_index + re_ls_index" of
-;
 #X text 811 443 floats :;
 #X text 851 503 floats :;
 #X text 516 513 <float> n_row = (n_re_ls) = number of real loudspeakers
@@ -247,7 +243,10 @@ be;
 ;
 #X text 490 503 output in case of 3d: <matrix> (n_re_ls*(n_ao+1)*(n_ao+1)+2)
 ;
-#X connect 13 0 56 0;
+#X text 544 367 this column to the column "re_ls_index" of real speaker
+;
+#X text 546 341 multiplies the column "vi_ls_index + n_re_ls" of;
+#X connect 13 0 55 0;
 #X connect 14 0 19 0;
 #X connect 15 0 23 0;
 #X connect 16 0 23 0;
