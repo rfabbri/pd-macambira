@@ -166,10 +166,13 @@ static void iem_vu_change_bkgd_col(t_iem_vu *x)
   iem_vu_cpy(pix_bkgd_col, cvec, 8);
   cvec[7] = 0;
   
-  sys_vgui("%xBKGDIMAGE_PROTO put {%s} -to 0 0\n", x, x->x_bkgd_gif_bord);
-  sys_vgui("%xBKGDIMAGE_PROTO put {%s} -to 1 0\n", x, x->x_bkgd_gif_cent);
-  sys_vgui("%xBKGDIMAGE_PROTO put {%s} -to 2 0\n", x, x->x_bkgd_gif_cent);
-  sys_vgui("%xBKGDIMAGE_PROTO put {%s} -to 3 0\n", x, x->x_bkgd_gif_bord);
+  if(glist_isvisible(x->x_gui.x_glist))
+  {
+    sys_vgui("%xBKGDIMAGE_PROTO put {%s} -to 0 0\n", x, x->x_bkgd_gif_bord);
+    sys_vgui("%xBKGDIMAGE_PROTO put {%s} -to 1 0\n", x, x->x_bkgd_gif_cent);
+    sys_vgui("%xBKGDIMAGE_PROTO put {%s} -to 2 0\n", x, x->x_bkgd_gif_cent);
+    sys_vgui("%xBKGDIMAGE_PROTO put {%s} -to 3 0\n", x, x->x_bkgd_gif_bord);
+  }
 }
 
 static void iem_vu_draw_new(t_iem_vu *x, t_glist *glist)
@@ -307,27 +310,30 @@ static void iem_vu_draw_config(t_iem_vu* x, t_glist* glist)
   int i, zoom = x->x_gui.x_w / 4;
   t_canvas *canvas=glist_getcanvas(glist);
   
-  iem_vu_change_bkgd_col(x);
-  if(x->x_gui.x_w != x->x_old_width)
+  if(glist_isvisible(glist))
   {
-    x->x_old_width = x->x_gui.x_w;
-    sys_vgui("%xBKGDIMAGE blank\n", x);
-    sys_vgui("%xBKGDIMAGE configure -width %d -height %d\n",
-      x, x->x_gui.x_w, x->x_gui.x_h+3);
+    iem_vu_change_bkgd_col(x);
+    if(x->x_gui.x_w != x->x_old_width)
+    {
+      x->x_old_width = x->x_gui.x_w;
+      sys_vgui("%xBKGDIMAGE blank\n", x);
+      sys_vgui("%xBKGDIMAGE configure -width %d -height %d\n",
+        x, x->x_gui.x_w, x->x_gui.x_h+3);
+    }
+    sys_vgui("%xBKGDIMAGE copy %xBKGDIMAGE_PROTO -zoom %d 1\n", x, x, zoom);
+    
+    my_iemgui_change_scale_col(x->x_scale_gif, x->x_gui.x_lcol);
+    sys_vgui("%xSCALEIMAGE configure -data {%s}\n", x, x->x_scale_gif);
+    
+    sys_vgui(".x%x.c itemconfigure %xLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
+      canvas, x, x->x_gui.x_font, x->x_gui.x_fontsize,
+      x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_lcol,
+      strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"");
+    
+    sys_vgui(".x%x.c itemconfigure %xRCOVER -fill #%6.6x -outline #%6.6x\n",
+      canvas, x, x->x_gui.x_bcol, x->x_gui.x_bcol);
+    sys_vgui(".x%x.c itemconfigure %xPLED -width %d\n", canvas, x, 2);
   }
-  sys_vgui("%xBKGDIMAGE copy %xBKGDIMAGE_PROTO -zoom %d 1\n", x, x, zoom);
-  
-  my_iemgui_change_scale_col(x->x_scale_gif, x->x_gui.x_lcol);
-  sys_vgui("%xSCALEIMAGE configure -data {%s}\n", x, x->x_scale_gif);
-  
-  sys_vgui(".x%x.c itemconfigure %xLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
-    canvas, x, x->x_gui.x_font, x->x_gui.x_fontsize,
-    x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_lcol,
-    strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"");
-  
-  sys_vgui(".x%x.c itemconfigure %xRCOVER -fill #%6.6x -outline #%6.6x\n",
-    canvas, x, x->x_gui.x_bcol, x->x_gui.x_bcol);
-  sys_vgui(".x%x.c itemconfigure %xPLED -width %d\n", canvas, x, 2);
 }
 
 static void iem_vu_draw_io(t_iem_vu* x, t_glist* glist, int old_snd_rcv_flags)
