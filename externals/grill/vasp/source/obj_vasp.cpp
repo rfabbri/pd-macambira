@@ -98,7 +98,7 @@ public:
 	virtual V m_help() { post("%s - Update graphics of a vasp",thisName()); }
 };
 
-FLEXT_LIB("vasp, vasp.update vasp.u",vasp_update)
+FLEXT_LIB("vasp.update vasp.u, vasp",vasp_update)
 
 
 
@@ -151,7 +151,7 @@ public:
 	virtual V m_help() { post("%s - Check vasp dimensions",thisName()); }
 };
 
-FLEXT_LIB("vasp, vasp.check vasp.chk",vasp_check)
+FLEXT_LIB("vasp.check vasp.chk, vasp",vasp_check)
 
 
 
@@ -201,5 +201,5 @@ public:
 	virtual V m_help() { post("%s - Output a vasp multiple times",thisName()); }
 };
 
-FLEXT_LIB_V("vasp, vasp.multi vasp.m",vasp_multi)
+FLEXT_LIB_V("vasp.multi vasp.m, vasp",vasp_multi)
 

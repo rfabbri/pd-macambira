@@ -77,7 +77,7 @@ private:
 	FLEXT_ATTRGET_I(frms);
 };
 
-FLEXT_LIB_V("vasp, vasp.frames vasp.f",vasp_frames)
+FLEXT_LIB_V("vasp.frames vasp.f, vasp",vasp_frames)
 
 
 
@@ -113,7 +113,7 @@ public:
 	virtual V m_help() { post("%s - Raise/lower a vasp's frame count",thisName()); }
 };
 
-FLEXT_LIB_V("vasp, vasp.frames+ vasp.f+",vasp_dframes)
+FLEXT_LIB_V("vasp.frames+ vasp.f+, vasp",vasp_dframes)
 
 
 
@@ -166,7 +166,7 @@ protected:
 	FLEXT_ATTRGET_F(factor);
 };
 
-FLEXT_LIB_V("vasp, vasp.frames* vasp.f*",vasp_mframes)
+FLEXT_LIB_V("vasp.frames* vasp.f*, vasp",vasp_mframes)
 
 
 
@@ -199,7 +199,7 @@ public:
 	virtual V m_help() { post("%s - Divide a vasp's frame count",thisName()); }
 };
 
-FLEXT_LIB_V("vasp, vasp.frames/ vasp.f/",vasp_rframes)
+FLEXT_LIB_V("vasp.frames/ vasp.f/, vasp",vasp_rframes)
 
 
 
@@ -236,6 +236,6 @@ public:
 	virtual V m_help() { post("%s - Get a vasp's frame count",thisName()); }
 };
 
-FLEXT_LIB("vasp, vasp.frames? vasp.f?",vasp_qframes)
+FLEXT_LIB("vasp.frames? vasp.f?, vasp",vasp_qframes)
 
 

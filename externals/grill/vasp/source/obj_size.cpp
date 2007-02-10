@@ -81,7 +81,7 @@ private:
 	FLEXT_ATTRVAR_B(zero);
 };
 
-FLEXT_LIB_V("vasp, vasp.size vasp.s",vasp_size)
+FLEXT_LIB_V("vasp.size vasp.s, vasp",vasp_size)
 
 
 
@@ -117,7 +117,7 @@ public:
 	virtual V m_help() { post("%s - Increase the size of the vector buffers",thisName()); }
 };
 
-FLEXT_LIB_V("vasp, vasp.size+ vasp.s+",vasp_dsize)
+FLEXT_LIB_V("vasp.size+ vasp.s+, vasp",vasp_dsize)
 
 
 
@@ -170,7 +170,7 @@ protected:
 	FLEXT_ATTRGET_F(factor);
 };
 
-FLEXT_LIB_V("vasp, vasp.size* vasp.s*",vasp_msize)
+FLEXT_LIB_V("vasp.size* vasp.s*, vasp",vasp_msize)
 
 
 
@@ -203,7 +203,7 @@ public:
 	virtual V m_help() { post("%s - Divide the size of the vector buffers",thisName()); }
 };
 
-FLEXT_LIB_V("vasp, vasp.size/ vasp.s/",vasp_rsize)
+FLEXT_LIB_V("vasp.size/ vasp.s/, vasp",vasp_rsize)
 
 
 
@@ -261,5 +261,5 @@ public:
 	virtual V m_help() { post("%s - Get the buffer size of a vector",thisName()); }
 };
 
-FLEXT_LIB("vasp, vasp.size? vasp.s?",vasp_qsize)
+FLEXT_LIB("vasp.size? vasp.s?, vasp",vasp_qsize)
 

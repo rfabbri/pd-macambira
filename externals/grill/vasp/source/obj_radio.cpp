@@ -49,7 +49,7 @@ private:
 	FLEXT_CALLBACK_A(m_any);
 };
 
-FLEXT_LIB("vasp, vasp.radio",vasp_radio)
+FLEXT_LIB("vasp.radio, vasp",vasp_radio)
 
 
 V vasp_radio::m_any(const t_symbol *s,I argc,const t_atom *argv) 

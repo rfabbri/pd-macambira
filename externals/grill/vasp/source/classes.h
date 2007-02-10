@@ -2,7 +2,7 @@
 
 VASP modular - vector assembling signal processor / objects for Max/MSP and PD
 
-Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -271,7 +271,7 @@ protected:																		\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\
-FLEXT_LIB("vasp," name,vasp_##op)												
+FLEXT_LIB(name ",vasp",vasp_##op)												
 
 
 #define VASP_BINARY(name,op,to,def,help)										\
@@ -290,7 +290,7 @@ protected:																		\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\
-FLEXT_LIB_V("vasp," name,vasp_##op)												
+FLEXT_LIB_V(name ",vasp",vasp_##op)												
 
 
 #define VASP_ANYOP(name,op,args,to,def,help)									\
@@ -309,7 +309,7 @@ protected:																		\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\
-FLEXT_LIB_V("vasp," name,vasp_##op)												
+FLEXT_LIB_V(name ",vasp",vasp_##op)												
 
 
 #define VASP__SETUP(op) FLEXT_SETUP(vasp_##op);  

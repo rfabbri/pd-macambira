@@ -118,6 +118,6 @@ private:
 	FLEXT_ATTRVAR_B(zero);
 };
 
-FLEXT_LIB_V("vasp, vasp.imm vasp.!",vasp_imm)
+FLEXT_LIB_V("vasp.imm vasp.!, vasp",vasp_imm)
 
 

@@ -68,7 +68,7 @@ private:
 	FLEXT_ATTRGET_I(ix);
 };
 
-FLEXT_LIB_V("vasp, vasp.channel vasp.c",vasp_channel)
+FLEXT_LIB_V("vasp.channel vasp.c, vasp",vasp_channel)
 
 
 
@@ -111,7 +111,7 @@ public:
 	virtual V m_help() { post("%s - Get channel index of 0th vector in vasp",thisName()); }
 };
 
-FLEXT_LIB("vasp, vasp.channel? vasp.c?",vasp_qchannel)
+FLEXT_LIB("vasp.channel? vasp.c?, vasp",vasp_qchannel)
 
 
 /*! \class vasp_qchannels
@@ -154,7 +154,7 @@ public:
 	virtual V m_help() { post("%s - Get channel index of 0th vector in vasp",thisName()); }
 };
 
-FLEXT_LIB("vasp, vasp.channels?",vasp_qchannels)
+FLEXT_LIB("vasp.channels?, vasp",vasp_qchannels)
 
 
 

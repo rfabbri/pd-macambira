@@ -125,6 +125,6 @@ private:
 	FLEXT_CALLBACK(m_reset)
 };
 
-FLEXT_LIB_V("vasp, vasp.sync",vasp_sync)
+FLEXT_LIB_V("vasp.sync, vasp",vasp_sync)
 
 

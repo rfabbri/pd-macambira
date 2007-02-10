@@ -3,6 +3,7 @@ Version history:
 0.1.4:
 - FIX: resurrect help message-functionality and add some missing help texts
 - FIX: break condition for some loop constructs (thanks to Patrick King)
+- FIX: help file names / object names have been broken by flext changes
 
 0.1.3:
 - CHANGE: exchanged #defines for templates in vector calculation loops

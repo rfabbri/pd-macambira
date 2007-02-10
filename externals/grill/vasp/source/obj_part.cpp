@@ -110,6 +110,6 @@ protected:
 	FLEXT_CALLVAR_V(m_getpart,m_setpart);
 };
 
-FLEXT_LIB_V("vasp, vasp.part",vasp_part)
+FLEXT_LIB_V("vasp.part, vasp",vasp_part)
 
 
