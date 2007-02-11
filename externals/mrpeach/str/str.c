@@ -1,15 +1,37 @@
-/* str.c by Martin Peach, started 20061227 */
+/* str.c MP 20061227 */
 /* version 20070101 no more resizing memory */
-/* The str object uses the t_string type */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include "m_pd.h"
 
-#ifndef t_string
-#error "str needs t_string support in pd source"
-#endif
+#ifndef PD_STRINGS /* PD_STRINGS is not defined in m_pd.h: No PD string support: Make a dummy str object */
+typedef struct _str
+{
+    t_object        x_obj;
+} t_str;
+static t_class *str_class;
+
+void str_setup(void);
+static void *str_new(t_symbol *s, int argc, t_atom *argv);
+
+static void *str_new(t_symbol *s, int argc, t_atom *argv)
+{
+    t_str           *x;
+
+    x = (t_str *)pd_new(str_class);
+    if (x == NULL) return (x);
+    post("This str is a dummy str.");
+    return (x);
+}
+
+void str_setup(void)
+{
+    str_class = class_new(gensym("str"), (t_newmethod)str_new, 0, sizeof(t_str), 0, 0);
+}
+#else //ifndef PD_STRINGS
+/* Make a _real_ str object: */
 
 typedef enum
 {
@@ -52,13 +74,11 @@ typedef struct _str
     size_t          x_atom_list_length;
 } t_str;
 
-/*
-* typedef struct _string //pointer to a string
-* {
-*     unsigned long s_length; // length of string in bytes
-*     unsigned char *s_data; // pointer to 1st byte of string
-* } t_string;
-*/
+//typedef struct _string /* pointer to a string */
+//{
+//   unsigned long s_length; /* length of string in bytes */
+//   unsigned char *s_data; /* pointer to 1st byte of string */
+//} t_string;
 
 static t_class *str_class;
 
@@ -321,12 +341,12 @@ static void str_buf_to_string(t_str *x, t_string *dest)
 
     limit = (dest->s_length < x->x_buf.s_length)? dest->s_length: x->x_buf.s_length;
     if (limit > x->x_buf_end) limit = x->x_buf_end;/* normally the case */
-/*    post("str_buf_to_string: limit %lu", limit); */
+//    post("str_buf_to_string: limit %lu", limit);
     for (i = 0; i < limit; ++i)
     {
         dest->s_data[i] = x->x_buf.s_data[i];
     }
-/*    post("str_buf_to_string: new length %lu", dest->s_length); */
+//    post("str_buf_to_string: new length %lu", dest->s_length);
     return;
 }
 
@@ -455,7 +475,7 @@ static void str_string(t_str *x, t_string *st)
 
 static void str_anything(t_str *x, t_symbol *s, int argc, t_atom *argv)
 {
-/*    post("str_anything"); */
+//    post("str_anything");
     x->x_buf_end = sprintf((char *)x->x_buf.s_data, "%s", s->s_name); /* the selector is just another word... */
     str_list_to_buf(x, argv, argc);
     x->x_string_in1_end = x->x_buf_end;
@@ -466,7 +486,7 @@ static void str_anything(t_str *x, t_symbol *s, int argc, t_atom *argv)
 
 static void str_list(t_str *x, t_symbol *s, int argc, t_atom *argv)
 {
-/*    post("str_list"); */
+//    post("str_list");
     x->x_buf_end = 0L;
     str_list_to_buf(x, argv, argc);
     x->x_string_in1_end = x->x_buf_end;
@@ -477,7 +497,7 @@ static void str_list(t_str *x, t_symbol *s, int argc, t_atom *argv)
 
 static void str_symbol(t_str *x, t_symbol *s)
 {
-/*    post("str_symbol");*/
+//    post("str_symbol");
     x->x_buf_end = sprintf((char *)x->x_buf.s_data, "%s", s->s_name);
     x->x_string_in1_end = x->x_buf_end;
     str_buf_to_string(x, &x->x_string_in1);
@@ -489,7 +509,7 @@ static void str_float(t_str *x, t_float f)
 {
     x->x_buf_end = 0L;
 
-/*    post("str_float");*/
+//    post("str_float");
     str_float_to_buf(x, f);
     x->x_string_in1_end = x->x_buf_end;
     str_buf_to_string(x, &x->x_string_in1);
@@ -499,7 +519,7 @@ static void str_float(t_str *x, t_float f)
 
 static void str_bang(t_str *x)
 {
-/*    post("str_bang");*/
+//    post("str_bang");
     if((x->x_function == add) && (x->x_string_in2_end != 0))str_do_out3(x);
     else str_do_string(x);
 }
@@ -511,7 +531,7 @@ static void str_do_out0(t_str *x)
 /* so we temporarily replace s_length with string end. */
     size_t  true_length = x->x_string_in1.s_length;
     x->x_string_in1.s_length = x->x_string_in1_end;
-/*    post("str_do_out0: x->x_string_in1.s_data[0] = %d", x->x_string_in1.s_data[0]);*/
+//    post("str_do_out0: x->x_string_in1.s_data[0] = %d", x->x_string_in1.s_data[0]);
     outlet_string(x->x_outlet_1, &x->x_string_in1);
     x->x_string_in1.s_length = true_length;
 }
@@ -521,7 +541,7 @@ static void str_do_out0(t_str *x)
 {
    size_t  true_length = x->x_string_out1.s_length;
     x->x_string_out1.s_length = x->x_string_out1_end;
-/*    post("str_do_out1: x->x_string_out1.s_data[0] = %d", x->x_string_out1.s_data[0]);*/
+//    post("str_do_out1: x->x_string_out1.s_data[0] = %d", x->x_string_out1.s_data[0]);
     outlet_string(x->x_outlet_1, &x->x_string_out1);
     x->x_string_out1.s_length = true_length;
 }
@@ -531,7 +551,7 @@ static void str_do_out2(t_str *x)
 {
     size_t  true_length = x->x_string_out2.s_length;
     x->x_string_out2.s_length = x->x_string_out2_end;
-/*    post("str_do_out2: x->x_string_out2.s_data[0] = %d", x->x_string_out2.s_data[0]);*/
+//    post("str_do_out2: x->x_string_out2.s_data[0] = %d", x->x_string_out2.s_data[0]);
     outlet_string(x->x_outlet_2, &x->x_string_out2);
     x->x_string_out2.s_length = true_length;
 }
@@ -618,7 +638,7 @@ static void str_do_string(t_str *x)
 
 static void str_free(t_str *x)
 {
-/*    post("str_free");*/
+//    post("str_free");
     freebytes(x->x_string_out1.s_data, x->x_string_out1.s_length);
     freebytes(x->x_string_out2.s_data, x->x_string_out2.s_length);
     freebytes(x->x_string_in1.s_data, x->x_string_in1.s_length);
@@ -668,7 +688,7 @@ static void *str_new(t_symbol *s, int argc, t_atom *argv)
             if (strcmp((char *)x->x_buf.s_data, str_function_names[i]) == 0)
             {
                 x->x_function = i;
-/*                post("str_new: x_function is %s", str_function_names[x->x_function]);*/
+//                post("str_new: x_function is %s", str_function_names[x->x_function]);
                 next = 1;
                 if ((x->x_function == nsplit) || (x->x_function == csplit))
                     x->x_outlet_2 = outlet_new((t_object *)x, &s_anything);
@@ -723,5 +743,6 @@ void str_setup(void)
     class_addmethod(str_class, (t_method)str_fwrite, gensym("file_write"), A_GIMME, 0);
     class_addmethod(str_class, (t_method)str_set_second, gensym(""), A_STRING, 0);
 }
+#endif // ifndef PD_STRINGS
 /* end str.c */
 
