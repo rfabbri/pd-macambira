@@ -444,16 +444,19 @@ static void unpackOSC_PrintTypeTaggedArgs(t_unpackOSC *x, void *v, int n)
 #ifdef DEBUG
                 printf("[Nil]");
 #endif
-                post("sendOSC: [Nil] not implemented");
+                SETFLOAT(mya+myargc,0.);
+                myargc++;
                 break;
             case 'I':
 #ifdef DEBUG
                 printf("[Infinitum]");
 #endif
-                post("sendOSC: [Infinitum] not implemented");
+                SETSYMBOL(mya+myargc,gensym("INF"));
+                myargc++;
                 break;
             default:
-                post("sendOSC: [Unrecognized type tag %c]", *thisType);
+                post("unpackOSC: [Unrecognized type tag %c]", *thisType);
+                myargc++;
          }
     }
 	x->x_data_atc = myargc;
