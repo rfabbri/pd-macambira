@@ -1,21 +1,40 @@
-#N canvas 611 6 488 317 12;
-#X obj 171 184 udpsend;
-#X msg 177 158 disconnect;
-#X msg 171 96 connect 127.0.0.1 9997;
-#X obj 71 96 packOSC;
-#X obj 71 128 prepend send;
-#X obj 171 207 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
-1;
-#X msg 14 18 send /test/one/two/three zz 88 T;
-#X msg 71 65 send /test 1 2 3;
-#X msg 90 43 send /west 35;
-#X msg 201 41 send /*/left 22;
-#X msg 296 24 send /?est/ 1;
-#X msg 246 66 send /left one two;
-#X msg 339 43 send /right 88;
-#X text 4 226 packOSC is like sendOSC except that it outputs a list
+#N canvas 348 273 985 649 12;
+#X obj 72 541 udpsend;
+#X msg 136 486 disconnect;
+#X msg 136 457 connect 127.0.0.1 9997;
+#X obj 72 296 packOSC;
+#X obj 72 408 prepend send;
+#X obj 72 576 tgl 15 0 empty empty 1=connected 20 8 0 8 -262144 -1
+-1 1 1;
+#X msg 3 3 send /test/one/two/three zz 88 T;
+#X msg 54 54 send /test 1 2 3;
+#X msg 31 29 send /west 35;
+#X msg 72 82 send /*/left 22;
+#X msg 87 109 send /?est/ 1;
+#X msg 112 161 send /left one two;
+#X msg 100 135 send /right 88;
+#X text 140 288 packOSC is like sendOSC except that it outputs a list
 of floats instead of directly connecting to the network;
-#X text 158 276 2006/04/25 Martin Peach;
+#X text 279 4 send a type-guessed message;
+#X text 381 183 send a type-forced message;
+#X obj 420 69 routeOSC;
+#X text 341 69 see also:;
+#X msg 121 264 typetags \$1;
+#X obj 121 244 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 218 264 typetags are on by default;
+#X text 610 154 Useable types are:;
+#X text 610 172 i: 32 bit integer;
+#X text 610 190 f: 32-bit float;
+#X text 610 208 s: string;
+#X text 499 26 send a type-forced message;
+#X msg 164 27 sendtyped /test/one/two/three sis zz 88 T;
+#X msg 112 202 sendtyped /left/right TTiTIFNfisf 1.1 2.1 3.1 4.1 5.1
+;
+#X text 610 226 T: true (no argument);
+#X text 610 244 F: false (no argument);
+#X text 610 262 I: infinitum (no argument);
+#X text 334 407 2007/02/15 Martin Peach;
 #X connect 0 0 5 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
@@ -28,3 +47,7 @@ of floats instead of directly connecting to the network;
 #X connect 10 0 3 0;
 #X connect 11 0 3 0;
 #X connect 12 0 3 0;
+#X connect 18 0 3 0;
+#X connect 19 0 18 0;
+#X connect 26 0 3 0;
+#X connect 27 0 3 0;
