@@ -271,6 +271,8 @@ pddp_install:
 		--license "GNU GPL" \
 		--description "support objects for the Pure Data Documentation Project"
 	install -d $(helpdir)/$(PDDP_NAME)
+	# if 0-pager.pd is not here make a dummy:
+	touch $(abstractions_src)/pddp/0-pager.pd
 	install -p $(abstractions_src)/pddp/*-help.pd \
 		$(helpdir)/$(PDDP_NAME)
 #	install -d $(manualsdir)/$(PDDP_NAME)
