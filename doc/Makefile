@@ -181,23 +181,23 @@ tutorials_install: $(manualsdir)
 # intro
 	install -d $(manualsdir)/0.Intro
 	install -p $(doc_src)/tutorials/intro/*.* $(manualsdir)/0.Intro
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/0.Intro
+	install -p $(abstractions_src)/pddp/+pager.pd $(manualsdir)/0.Intro
 # sound
 	install -d $(manualsdir)/1.Sound
 	install -p $(doc_src)/tutorials/sound/*.* $(manualsdir)/1.Sound
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/1.Sound
+	install -p $(abstractions_src)/pddp/+pager.pd $(manualsdir)/1.Sound
 # visual
 	install -d $(manualsdir)/2.Image
 	install -p $(doc_src)/tutorials/visual/*.* $(manualsdir)/2.Image
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/2.Image
+	install -p $(abstractions_src)/pddp/+pager.pd $(manualsdir)/2.Image
 # networking
 	install -d $(manualsdir)/3.Networking
 	install -p $(doc_src)/tutorials/networking/*.* $(manualsdir)/3.Networking
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/3.Networking
+	install -p $(abstractions_src)/pddp/+pager.pd $(manualsdir)/3.Networking
 # physical
 	install -d $(manualsdir)/4.Physical
 	install -p $(doc_src)/tutorials/physical/*.* $(manualsdir)/4.Physical
-	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/4.Physical
+	install -p $(abstractions_src)/pddp/+pager.pd $(manualsdir)/4.Physical
 
 tutorials_clean:
 	-rm -f -- $(manualsdir)/PdDrums/*.*
