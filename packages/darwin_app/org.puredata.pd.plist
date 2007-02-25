@@ -72,6 +72,8 @@
 	<string>deprecated</string>
 	<key>loadlib33</key>
 	<string>flatspace</string>
+	<key>loadlib34</key>
+	<string>iem_anything</string>
 	<key>path1</key>
 	<string>/System/Library/Fonts</string>
 	<key>path2</key>

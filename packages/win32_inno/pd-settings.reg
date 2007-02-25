@@ -34,8 +34,8 @@ Windows Registry Editor Version 5.00
 "loadlib31"="hardware"
 "loadlib32"="deprecated"
 "loadlib33"="flatspace"
+"loadlib34"="iem_anything"
 ; delete any previous loadlib flags
-"loadlib34"=-
 "loadlib35"=-
 "loadlib36"=-
 "loadlib37"=-

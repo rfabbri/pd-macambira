@@ -33,8 +33,9 @@ loadlib30: ext13
 loadlib31: hardware
 loadlib32: deprecated
 loadlib33: flatspace
+loadlib34: iem_anything
 path1: /usr/X11R6/lib/X11/fonts
 path2: /usr/X11R6/lib/X11/fonts/TTF
 path3: /usr/lib/X11/fonts
 path4: /usr/share/fonts/truetype
-nloadlib: 33
+nloadlib: 34
