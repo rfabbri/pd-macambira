@@ -136,7 +136,12 @@ static void *h_stack_free(t_h_stack *x)
   return (void *)x;
 }
 
-extern "C" void h_stack_setup(void) 
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+extern "C" {
+#endif
+
+void h_stack_setup(void) 
 {
   // the object class
   h_stack_class = class_new(gensym("h_stack"), (t_newmethod)h_stack_new,
@@ -163,3 +168,8 @@ extern "C" void h_stack_setup(void)
   // without an argument the following two methods wont work ??? why?? because of c++?
   class_addmethod(h_stack_class, (t_method)h_stack_help, gensym("help"),A_DEFFLOAT, 0);
 }
+
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+}
+#endif

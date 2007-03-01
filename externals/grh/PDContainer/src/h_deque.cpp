@@ -538,7 +538,13 @@ static void *h_deque_free(t_h_deque *x)
   return (void *)x;
 }
 
-extern "C" void h_deque_setup(void) 
+
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+extern "C" {
+#endif
+
+void h_deque_setup(void) 
 {
   // the object class
   h_deque_class = class_new(gensym("h_deque"), (t_newmethod)h_deque_new,
@@ -602,3 +608,8 @@ extern "C" void h_deque_setup(void)
   // without an argument the following two methods wont work ??? why?? because of c++?
   class_addmethod(h_deque_class, (t_method)h_deque_help, gensym("help"),A_DEFFLOAT, 0);
 }
+
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+}
+#endif

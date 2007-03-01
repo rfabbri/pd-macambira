@@ -456,7 +456,12 @@ static void *h_vector_free(t_h_vector *x)
   return (void *)x;
 }
 
-extern "C" void h_vector_setup(void) 
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+extern "C" {
+#endif
+
+void h_vector_setup(void) 
 {
   // the object class
   h_vector_class = class_new(gensym("h_vector"), (t_newmethod)h_vector_new,
@@ -488,7 +493,7 @@ extern "C" void h_vector_setup(void)
 		  gensym("namespace"), A_DEFSYMBOL , 0);
   class_addmethod(h_vector_class, (t_method)h_vector_get_namespace, 
 		  gensym("getnamespace"), A_DEFFLOAT, 0);
-  class_addmethod(h_vector_class, (t_method)h_vector_print,
+  class_addmethod(h_vector_class, (t_method)h_vector_getall,
 		  gensym("getall"), A_DEFFLOAT, 0);
   class_addmethod(h_vector_class, (t_method)h_vector_print,
 		  gensym("print"), A_DEFFLOAT, 0);
@@ -512,3 +517,8 @@ extern "C" void h_vector_setup(void)
   // without an argument the following two methods wont work ??? why?? because of c++?
   class_addmethod(h_vector_class, (t_method)h_vector_help, gensym("help"),A_DEFFLOAT, 0);
 }
+
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+}
+#endif

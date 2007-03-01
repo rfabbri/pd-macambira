@@ -338,7 +338,12 @@ static void *h_map_free(t_h_map *x)
   return (void *)x;
 }
 
-extern "C" void h_map_setup(void) 
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+extern "C" {
+#endif
+
+void h_map_setup(void) 
 {
   // the object class
   h_map_class = class_new(gensym("h_map"), (t_newmethod)h_map_new,
@@ -384,3 +389,8 @@ extern "C" void h_map_setup(void)
   // without an argument the following two methods wont work ??? why?? because of c++?
   class_addmethod(h_map_class, (t_method)h_map_help, gensym("help"),A_DEFFLOAT, 0);
 }
+
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+}
+#endif

@@ -205,7 +205,12 @@ static void *h_set_free(t_h_set *x)
   return (void *)x;
 }
 
-extern "C" void h_set_setup(void) 
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+extern "C" {
+#endif
+
+void h_set_setup(void) 
 {
   // the object class
   h_set_class = class_new(gensym("h_set"), (t_newmethod)h_set_new,
@@ -244,3 +249,8 @@ extern "C" void h_set_setup(void)
   // without an argument the following two methods wont work ??? why?? because of c++?
   class_addmethod(h_set_class, (t_method)h_set_help, gensym("help"),A_DEFFLOAT, 0);
 }
+
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+}
+#endif

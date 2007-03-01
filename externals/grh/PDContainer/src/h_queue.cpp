@@ -136,7 +136,12 @@ static void *h_queue_free(t_h_queue *x)
   return (void *)x;
 }
 
-extern "C" void h_queue_setup(void) 
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+extern "C" {
+#endif
+
+void h_queue_setup(void) 
 {
   // the object class
   h_queue_class = class_new(gensym("h_queue"), (t_newmethod)h_queue_new,
@@ -163,3 +168,8 @@ extern "C" void h_queue_setup(void)
   // without an argument the following two methods wont work ??? why?? because of c++?
   class_addmethod(h_queue_class, (t_method)h_queue_help, gensym("help"),A_DEFFLOAT, 0);
 }
+
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+}
+#endif

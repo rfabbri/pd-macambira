@@ -335,7 +335,12 @@ static void *h_multimap_free(t_h_multimap *x)
   return (void *)x;
 }
 
-extern "C" void h_multimap_setup(void) 
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+extern "C" {
+#endif
+
+void h_multimap_setup(void) 
 {
   h_multimap_class = class_new(gensym("h_multimap"), (t_newmethod)h_multimap_new,
 				(t_method)h_multimap_free, sizeof(t_h_multimap), 
@@ -381,3 +386,9 @@ extern "C" void h_multimap_setup(void)
   class_addmethod(h_multimap_class, (t_method)h_multimap_help, 
 		  gensym("help"),A_DEFFLOAT, 0);
 }
+
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+}
+#endif
+

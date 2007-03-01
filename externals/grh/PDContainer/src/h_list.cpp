@@ -393,7 +393,12 @@ static void *h_list_free(t_h_list *x)
   return (void *)x;
 }
 
-extern "C" void h_list_setup(void) 
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+extern "C" {
+#endif
+
+void h_list_setup(void) 
 {
   // the object class
   h_list_class = class_new(gensym("h_list"), (t_newmethod)h_list_new,
@@ -466,3 +471,8 @@ extern "C" void h_list_setup(void)
   // without an argument the following two methods wont work ??? why?? because of c++?
   class_addmethod(h_list_class, (t_method)h_list_help, gensym("help"),A_DEFFLOAT, 0);
 }
+
+#if defined(PDCONTAINER_SINGLE_OBJECT)
+// for PD-Extended
+}
+#endif
