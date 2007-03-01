@@ -2250,7 +2250,7 @@ $(PDCONTAINER_TARGETS) : %.$(EXTENSION) : $(PDCONTAINER_OBJ)
 	#rm -f -- "$*.o"
 
 $(PDCONTAINER_OBJ) : %.o : %.cpp
-	$(CXX) $(CXXFLAGS) $(PDCONTAINER_INCLUDE) -o "$*.o" -c "$*.cpp"
+	$(CXX) $(CXXFLAGS) -DPDCONTAINER_SINGLE_OBJECT $(PDCONTAINER_INCLUDE) -o "$*.o" -c "$*.cpp"
 
 pdcontainer_install: pdcontainer
 	install -d $(objectsdir)/$(PDCONTAINER_NAME)
