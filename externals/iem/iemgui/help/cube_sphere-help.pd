@@ -1,4 +1,4 @@
-#N canvas 33 0 924 718 10;
+#N canvas 33 0 928 718 10;
 #X obj 42 118 r to_GUI;
 #X floatatom 493 53 5 20 500 0 - - -;
 #X floatatom 493 152 5 5 150 0 - - -;
@@ -492,7 +492,7 @@
 #X connect 7 0 5 0;
 #X connect 8 0 6 0;
 #X connect 9 0 7 1;
-#X restore 715 525 pd colors;
+#X restore 811 397 pd colors;
 #X text 9 11 cube_sphere;
 #X obj 42 139 cube_sphere 5 222 50 354 0 250684 347 194 195567 229
 98 225270 84 205 241290 191 332 24197 314 314;
@@ -567,6 +567,21 @@
 #X text 100 36 the elevation is geodatical: northpole is +90 degree
 ;
 #X text 120 47 equator is 0 degree;
+#X obj 642 369 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X msg 642 440 \; to_GUI vis 2 \$1;
+#X obj 642 423 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X obj 642 477 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 642 531 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 642 585 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X msg 642 386 \; to_GUI vis 1 \$1;
+#X msg 642 494 \; to_GUI vis 3 \$1;
+#X msg 642 548 \; to_GUI vis 4 \$1;
+#X msg 642 602 \; to_GUI vis 5 \$1;
 #X connect 0 0 18 0;
 #X connect 1 0 20 0;
 #X connect 2 0 3 0;
@@ -613,3 +628,8 @@
 #X connect 59 0 57 0;
 #X connect 59 1 58 0;
 #X connect 67 0 68 0;
+#X connect 87 0 93 0;
+#X connect 89 0 88 0;
+#X connect 90 0 94 0;
+#X connect 91 0 95 0;
+#X connect 92 0 96 0;
