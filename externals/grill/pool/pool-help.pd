@@ -1,4 +1,4 @@
-#N canvas 24 27 960 781 12;
+#N canvas 24 27 964 785 12;
 #X msg 296 105 set 1 2 3;
 #X obj 238 631 print K;
 #X msg 607 211 getall;
@@ -51,7 +51,7 @@
 #X msg 609 366 cntrec;
 #X text 677 364 ... and subdirs;
 #X text 673 378 (depth may be given);
-#N canvas 472 45 440 651 dirs 0;
+#N canvas 472 45 444 655 dirs 0;
 #X msg 111 40 mkdir fld1;
 #X msg 113 135 chdir;
 #X msg 109 331 updir;
@@ -97,7 +97,7 @@
 #X connect 29 0 26 0;
 #X restore 715 490 pd dirs;
 #X text 714 469 directory operations;
-#N canvas 0 22 841 533 file 0;
+#N canvas 0 22 845 610 file 0;
 #X text 117 207 save dir and subdirs;
 #X text 117 165 save data in current dir;
 #X text 117 253 load data into current dir;
@@ -135,6 +135,9 @@ the folder containing the current patcher will be used.;
 #X text 27 451 The attribute outlet reports if file saving/loading
 has been successful \, by outputting the message tag and a boolean
 flag.;
+#X text 29 517 Please note: the absdir flag is also used for paths
+written into the files. With absdir=1 absolute paths are written \,
+absdir=0 means relative paths.;
 #X connect 20 0 9 0;
 #X connect 21 0 9 0;
 #X connect 22 0 9 0;
@@ -229,8 +232,8 @@ flag.;
 #X text 272 33 http://grrrr.org;
 #X msg 428 225 geti \$1;
 #X text 426 185 get indexed element;
-#X obj 427 205 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
--262144 -1 -1 0 256;
+#X obj 427 205 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
+10 -262144 -1 -1 0 256;
 #X text 297 323 set but don't replace;
 #X text 294 256 set value at index;
 #X msg 295 276 seti 3 Uhu;
