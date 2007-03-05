@@ -2,7 +2,7 @@
 #include <math.h>
 #include <string.h>
 #define MAXPOLY 32
-#define POLYMAP 512
+#define POLYMAP 1024
 
 /* The polymap is a two-dimensional array, but here instead of this we have a one dimensional array of length MAXPOLY^2 */
 
