@@ -2,7 +2,7 @@
 
 py/pyext - python script object for PD and MaxMSP
 
-Copyright (c)2002-2005 Thomas Grill (gr@grrrr.org)
+Copyright (c)2002-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -15,6 +15,12 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "pysymbol.h"
 #include "pybuffer.h"
 #include "pybundle.h"
+
+#ifdef PY_USE_GIL
+	typedef PyGILState_STATE ThrState;
+#else
+	typedef PyThreadState *ThrState;
+#endif
 
 class pybase
     : public flext
@@ -173,11 +179,15 @@ protected:
     }
 
     static void quworker(thr_params *);
+    static void pyworker(thr_params *);
     void erasethreads();
 
     static PyFifo qufifo;
     static ThrCond qucond;
-    static PyThreadState *pythrsys;
+	
+#ifndef PY_USE_GIL
+    static ThrState pythrsys;
+#endif
 #endif
 
     static const t_symbol *sym_fint; // float or int symbol, depending on native number message type
@@ -191,35 +201,48 @@ public:
 	static void AddToPath(const char *dir);
 
 #ifdef FLEXT_THREADS
-    static PyThreadState *FindThreadState();
-    static void FreeThreadState();
-
     // this is especially needed when one py/pyext object calls another one
     // we don't want the message to be queued, but otoh we have to avoid deadlock
     // (recursive calls can only happen in the system thread)
     static int lockcount;
 
-	static PyThreadState *PyLock(PyThreadState *st = FindThreadState()) 
+#ifdef PY_USE_GIL
+    static inline ThrState FindThreadState() { return ThrState(); }
+
+	static inline ThrState PyLock(ThrState = ThrState()) { return PyGILState_Ensure(); }
+	static inline ThrState PyLockSys() { return PyLock(); }
+	static inline void PyUnlock(ThrState st) { PyGILState_Release(st); }
+#else // PY_USE_GIL
+    static ThrState FindThreadState();
+    static void FreeThreadState();
+
+	static ThrState PyLock(ThrState st = FindThreadState()) 
     { 
         if(!IsSystemThread() || !lockcount++) PyEval_AcquireLock();
 	    return PyThreadState_Swap(st);
     }
 
-	static PyThreadState *PyLockSys() 
+#if 1
+	static inline ThrState PyLockSys() { return PyLock(); }
+#else
+	static ThrState PyLockSys() 
     { 
         if(!lockcount++) PyEval_AcquireLock();
 	    return PyThreadState_Swap(pythrsys);
     }
+#endif
 
-	static void PyUnlock(PyThreadState *st) 
+	static void PyUnlock(ThrState st) 
     {
-        PyThreadState *old = PyThreadState_Swap(st);
+        ThrState old = PyThreadState_Swap(st);
         if(old != pythrsys || !--lockcount) PyEval_ReleaseLock();
     }
-#else
-	static PyThreadState *PyLock(PyThreadState * = NULL) { return NULL; }
-	static PyThreadState *PyLockSys() { return NULL; }
-	static void PyUnlock(PyThreadState *st) {}
+#endif // PY_USE_GIL
+	
+#else // FLEXT_THREADS
+	static inline ThrState PyLock(ThrState = NULL) { return NULL; }
+	static inline ThrState PyLockSys() { return NULL; }
+	static inline void PyUnlock(ThrState st) {}
 #endif
 
 	static PyObject* StdOut_Write(PyObject* Self, PyObject* Args);
