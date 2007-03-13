@@ -2097,7 +2097,7 @@ usbhid_clean:
 
 #------------------------------------------------------------------------------#
 # VBAP
-VBAP_NAME=vbap
+VBAP_NAME=vbap_ext
 VBAP_OBJECTS := $(wildcard $(externals_src)/vbap/*.c)
 vbap: $(VBAP_OBJECTS:.c=.$(EXTENSION))
 
