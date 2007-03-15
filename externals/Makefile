@@ -2660,6 +2660,7 @@ earplug_install: earplug
 		--license "" \
 		--version ""
 	install -p $(EARPLUG_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(EARPLUG_NAME)
+	install -p $(externals_src)/earplug~/earplug_data.txt $(objectsdir)/$(EARPLUG_NAME)
 	install -d $(helpdir)/$(EARPLUG_NAME)
 	install -p $(externals_src)/earplug~/*-help.pd \
 		$(helpdir)/$(EARPLUG_NAME)
