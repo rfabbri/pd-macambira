@@ -20,6 +20,7 @@ AC_SUBST(PDLIBDIR)
 AC_SUBST(INCLUDES)
 AC_SUBST(LIBNAME)
 AC_SUBST(CONFIGUREFLAGS)
+AC_SUBST(BUILDLIBRARY)
 
 ## store the flags passed to us
 ## is there no way to get the flags without quotes?
@@ -32,6 +33,12 @@ AC_ARG_WITH(pdversion, [  --with-pdversion=<ver>  enforce a certain pd-version (
 AC_ARG_WITH(extension, [  --with-extension=<ext>  enforce a certain extension for the dynamic library (e.g. dll)])
 AC_ARG_WITH(pdpath,    [  --with-pd=</path/to/pd> where to look for pd-headers and and -libs])
 AC_ARG_ENABLE(PIC,     [  --disable-PIC           disable compilation with PIC-flag])
+AC_ARG_ENABLE(library,[  --disable-library       split the library into single externals])
+
+if test "xno" != "x${enable_library}" ; then
+dnl LATER: find a more generic way to generate the .._LIBRARY define
+ BUILDLIBRARY="-DBUILD_LIBRARY"
+fi
 
 dnl Checks for libraries.
 dnl Replace `main' with a function in -lc:

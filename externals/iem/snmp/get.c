@@ -38,6 +38,7 @@ typedef struct _snmpget
 
 static void snmpget_get(t_snmpget *x, t_symbol *s)
 { 
+  post("system::get: %s", s->s_name);
   if(NULL!=x->x_session){
     oid             name[MAX_OID_LEN];
     size_t          name_length=MAX_OID_LEN;
@@ -45,6 +46,7 @@ static void snmpget_get(t_snmpget *x, t_symbol *s)
     netsnmp_pdu     *pdu,*response;
     int err=0;
     char*symname=s->s_name;
+    post("getting %s", symname);
     
     if(!snmp_parse_oid(symname, name, &name_length)){
       error("snmpget: bad OID %d", name_length);
@@ -228,7 +230,11 @@ void snmpget_setup(void)
 
   snmpget_class = class_new(gensym("snmpget"), (t_newmethod)snmpget_new, 
 			   0, sizeof(t_snmpget), 0, A_GIMME, 0);
+  class_addcreator((t_newmethod)snmpget_new, gensym("snmp/get"), 0);
+  //class_addcreator((t_newmethod)snmpget_new, gensym("get"), 0);
+
   class_addmethod(snmpget_class, (t_method)snmpget_get, gensym("get"), A_SYMBOL, 0);
+
   class_addmethod(snmpget_class, (t_method)snmpget_connect, gensym("connect"), A_SYMBOL, A_DEFSYM, 0);
   class_addmethod(snmpget_class, (t_method)snmpget_disconnect, gensym("disconnect"), 0);
   class_addmethod(snmpget_class, (t_method)snmpget_raw, gensym("raw"), A_FLOAT, 0);

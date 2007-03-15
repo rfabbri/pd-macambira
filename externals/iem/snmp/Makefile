@@ -5,7 +5,7 @@ default: all
 	install install-bin install-doc install-abs \
 	tests
 
-HELPERSOURCES=
+HELPERSOURCES=snmp.c
 OBJECTSOURCES=$(sort $(filter-out $(HELPERSOURCES), $(filter %.c, $(wildcard *.c))))
 SOURCES=$(OBJECTSOURCES) $(HELPERSOURCES)
 
@@ -28,7 +28,7 @@ ifdef MAKEDEP_FLAGS
 ## see http://www.gnu.org/software/make/manual/html_node/make_47.html#SEC51
 %.d: %.c
 	@set -e; rm -f $@; \
-	 $(CPP) $(MAKEDEP_FLAGS) $(Z_CFLAGS) $< > $@.$$$$; \
+	 $(CPP) $(MAKEDEP_FLAGS) $(CFLAGS) $< > $@.$$$$; \
 	 sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	 rm -f $@.$$$$
 endif
@@ -59,7 +59,7 @@ $(LIBNAME): $(TARGETS)
 	$(STRIP) $(STRIPFLAGS) $(LIBNAME).$(EXT)
 
 $(TARGETS): %.o : %.c
-	$(CC) $(Z_CFLAGS) -c -o $@ $*.c
+	$(CC) $(CFLAGS) -c -o $@ $*.c
 
 clean:
 	-rm -f *.$(EXT) *.o 
