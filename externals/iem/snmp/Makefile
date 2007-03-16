@@ -77,8 +77,10 @@ install: install-bin install-doc
 
 install-bin:
 	-install -d $(INSTALL_BIN)
-	-install -m 644 $(LIBNAME).$(EXT) $(INSTALL_BIN)
+	-install -m 644 *.$(EXT) $(INSTALL_BIN)
 
 install-doc:
+	-install -d $(INSTALL_DOC)
+	-install -m 644 *-help.pd $(INSTALL_DOC)
 
 everything: clean all install distclean

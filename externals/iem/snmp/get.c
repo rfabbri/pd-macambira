@@ -228,10 +228,10 @@ void snmpget_setup(void)
 {
   init_snmp("snmp4pd");
 
-  snmpget_class = class_new(gensym("snmpget"), (t_newmethod)snmpget_new, 
+  snmpget_class = class_new(gensym("get"), (t_newmethod)snmpget_new, 
 			   0, sizeof(t_snmpget), 0, A_GIMME, 0);
   class_addcreator((t_newmethod)snmpget_new, gensym("snmp/get"), 0);
-  //class_addcreator((t_newmethod)snmpget_new, gensym("get"), 0);
+  class_addcreator((t_newmethod)snmpget_new, gensym("snmpget"), 0);
 
   class_addmethod(snmpget_class, (t_method)snmpget_get, gensym("get"), A_SYMBOL, 0);
 
