@@ -38,7 +38,6 @@ typedef struct _snmpget
 
 static void snmpget_get(t_snmpget *x, t_symbol *s)
 { 
-  post("system::get: %s", s->s_name);
   if(NULL!=x->x_session){
     oid             name[MAX_OID_LEN];
     size_t          name_length=MAX_OID_LEN;
@@ -46,7 +45,6 @@ static void snmpget_get(t_snmpget *x, t_symbol *s)
     netsnmp_pdu     *pdu,*response;
     int err=0;
     char*symname=s->s_name;
-    post("getting %s", symname);
     
     if(!snmp_parse_oid(symname, name, &name_length)){
       error("snmpget: bad OID %d", name_length);
