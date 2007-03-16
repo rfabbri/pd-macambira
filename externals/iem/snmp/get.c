@@ -36,6 +36,8 @@ typedef struct _snmpget
   int x_raw; /* if set, the raw string is output; no interpretation is done */
 } t_snmpget;
 
+static void snmpget_disconnect(t_snmpget *x);
+
 static void snmpget_get(t_snmpget *x, t_symbol *s)
 { 
   if(NULL!=x->x_session){
@@ -84,24 +86,25 @@ static void snmpget_get(t_snmpget *x, t_symbol *s)
             case ASN_GAUGE:  case ASN_COUNTER:
             case ASN_INTEGER:
               {
+		t_atom aflist[2];
                 long v=(long)(*vars->val.integer);
-                outlet_float(x->out_data, (t_float)v);
+		unsigned short lo=(unsigned short)v;
+		unsigned short hi=(unsigned short)(v>>16);
+		SETFLOAT(aflist+0, hi);
+		SETFLOAT(aflist+1, lo);
+		outlet_anything(x->out_data, 
+				s, 
+				2, aflist);
+		//outlet_float(x->out_data, (t_float)v);
               }
               break;
-              /*
-                case ASN_OCTET_STR:
-                {
-                outlet_symbol(x->out_data, gensym(vars->val.string));
-                }
-                break;
-              */
             default:
               snprint_value(mybuf, sizeof(mybuf), vars->name, vars->name_length, vars);
               binbuf_text(bbuf, mybuf, strlen(mybuf)); 
               int ac=binbuf_getnatom(bbuf);
               t_atom*av=binbuf_getvec(bbuf);
               outlet_list(x->out_data, 
-                          gensym("list"), 
+                          s, 
                           ac, av);
             }
           } else {
@@ -109,20 +112,20 @@ static void snmpget_get(t_snmpget *x, t_symbol *s)
             ap=&atm;
             snprint_value(mybuf, sizeof(mybuf), vars->name, vars->name_length, vars);
             SETSYMBOL(ap, gensym(mybuf));
-            outlet_anything(x->out_data, gensym("raw"), 1, ap);
+            outlet_anything(x->out_data, s, 1, ap);
           }
           if(bbuf)binbuf_free(bbuf);
         }
       }
     } else {
       error("[snmp/get] error while synching");
+      snmpget_disconnect(x);
     }
     snmp_free_pdu(response);
   } else {
     pd_error(x, "[snmp/get] not connected");
   }
 }
-
 
 
 /*
