@@ -69,7 +69,7 @@ realclean: clean
 	-rm -f *.d *.d.*
 
 distclean: realclean
-	-rm -f Make.config  ../*.$(EXT)
+	-rm -f Make.config
 	-rm -f *.exp  *.lib  *.ncb  *.opt  *.plg
 	-rm -rf autom4te.cache/
 
