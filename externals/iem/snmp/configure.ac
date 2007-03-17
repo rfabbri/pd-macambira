@@ -52,7 +52,7 @@ dnl AC_CHECK_LIB(pthread, main)
 dnl Replace `main' with a function in -lstk:
 dnl AC_CHECK_LIB(stk, main, STK=yes)
 
-AC_CHECK_LIB(snmp, snmp_parse_oid)
+AC_CHECK_LIB(snmp, snmp_parse_oid,, echo no SNMP library found && exit 1)
 
 if test "x$with_pd" != "x"; then
  if test -d "${with_pd}/src"; then
