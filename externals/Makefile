@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui iem_adaptfilt iemmatrix iemxmlrpc iem16 earplug
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem16 earplug
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1306,6 +1306,34 @@ iemmatrix_clean:
 	-rm -f -- $(externals_src)/iem/iemmatrix/alias/*.o
 	-rm -f -- $(externals_src)/iem/iemmatrix/src/*.bak
 	-rm -f -- $(externals_src)/iem/iemmatrix/src/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# IEM_MATRIX
+IEM_MATRIX_NAME=iem_matrix
+IEM_MATRIX_SRC := $(wildcard $(externals_src)/iem/iem_matrix/src/matrix_?????*.c)
+IEM_MATRIX_OBJ := $(IEM_MATRIX_SRC:.c=.o)
+
+iem_matrix: $(IEM_MATRIX_OBJ:.o=.$(EXTENSION))
+
+iem_matrix_install: iem_matrix
+	install -d $(objectsdir)/$(IEM_MATRIX_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEM_MATRIX_NAME) \
+		--author "Thomas Musil" \
+		--description "audio matrix objects" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(IEM_MATRIX_OBJ:.o=.$(EXTENSION)) $(objectsdir)/$(IEM_MATRIX_NAME)
+	install -d $(helpdir)/$(IEM_MATRIX_NAME)
+	install -p $(externals_src)/iem/iem_matrix/help/*.pd \
+		$(helpdir)/$(IEM_MATRIX_NAME)
+
+iem_matrix_clean:
+	-rm -f -- $(IEM_MATRIX_OBJ:.o=.$(EXTENSION))
+	-rm -f -- $(externals_src)/iem/iem_matrix/src/*.o
+	-rm -f -- $(externals_src)/iem/iem_matrix/src/*.bak
+	-rm -f -- $(externals_src)/iem/iem_matrix/src/*.*~
 
 
 

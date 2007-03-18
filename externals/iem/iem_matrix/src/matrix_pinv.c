@@ -3,6 +3,8 @@
 
 iem_matrix written by Thomas Musil (c) IEM KUG Graz Austria 2002 - 2006 */
 
+#include "m_pd.h"
+
 /* -------------------------- matrix_pinv ------------------------------ */
 
 typedef struct _matrix_pinv
@@ -400,7 +402,7 @@ static void matrix_pinv_mul2(t_matrix_pinv *x)
 {
   int n_ls=x->x_n_ls+x->x_n_phls;
   int n_ambi=x->x_n_ambi;
-  int n_ambi2=2*n_ambi;
+  int n_ambi2=2*x->x_n_ambi;
   int i, j, k;
   double *vec1, *beg1=x->x_transp;
   double *vec2, *beg2=x->x_inv_work2+n_ambi;

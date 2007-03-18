@@ -3,6 +3,9 @@
 
 iem_matrix written by Thomas Musil (c) IEM KUG Graz Austria 2002 - 2006 */
 
+#include "m_pd.h"
+#include "math.h"
+
 /* -------------------------- spherical_line ------------------------------ */
 
 typedef struct _spherical_line
