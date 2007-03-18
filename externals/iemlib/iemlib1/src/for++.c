@@ -174,6 +174,8 @@ void forpp_setup(void)
   forpp_class = class_new(gensym("for++"), (t_newmethod)forpp_new,
     (t_method)forpp_ff, sizeof(t_forpp),
     0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+  class_addcreator((t_newmethod)forpp_new, gensym("for_pp"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+
   class_addbang(forpp_class, forpp_bang);
   class_addfloat(forpp_class, forpp_float);
   class_addlist(forpp_class, forpp_list);
