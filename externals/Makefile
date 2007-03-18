@@ -1225,7 +1225,7 @@ iem16_clean:
 # IEMLIB
 IEMLIB_NAME=iemlib
 # omit the lib files and iem_mp3 (for patent reasons :( )
-IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/iem?[^m]*/src/*.c)
+IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/iem?[^m]*/src/*.c) $(wildcard $(externals_src)/iemlib/alias/*.c)
 iemlib: $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
 
 iemlib_install: iemlib
@@ -1234,8 +1234,8 @@ iemlib_install: iemlib
 		--description "a collection of objects written at IEM/KUG" \
 		--license "GNU GPL"
 	install -p $(IEMLIB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/iemabs/*.pd \
-		$(objectsdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/iemabs/*.pd $(objectsdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/alias/*.pd $(objectsdir)/$(IEMLIB_NAME)
 	install -d $(helpdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/*/*-help.pd $(helpdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/*/*.mp3 $(helpdir)/$(IEMLIB_NAME)
