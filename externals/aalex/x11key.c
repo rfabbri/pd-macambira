@@ -31,7 +31,7 @@ void x11key_letter(t_x11key *x, t_symbol *s, int argc, t_atom *argv) {
   KeyCode keycode;
   int result;
   
-  if (argc == 1) {
+  if (argc >= 1) {
     if (argv[0].a_type == A_SYMBOL) {
       t_symbol *sym = atom_getsymbolarg(0, argc, argv);
       char *theChars = sym->s_name;
@@ -47,15 +47,28 @@ void x11key_letter(t_x11key *x, t_symbol *s, int argc, t_atom *argv) {
         //post("letter = %s", theChars);
         //post("keycode = %d", (int) keycode);
         /** Pushes on and off the letter */
-        result = XTestFakeKeyEvent(display, keycode, True, 0);
-        //post("result = %d", result);
-        if (result == 0) {
-          post("Error : could not simulate typing the letter.");
-        }
-        result = XTestFakeKeyEvent(display, keycode, False, 0); 
-        if (result == 0) {
-          post("Error : could not simulate typing the letter.");
-        }
+        /*
+        if (argc >= 2) {
+          if (argv[1].a_type == A_FLOAT) {
+            int isPressed = (atom_getfloatarg(0, argc, argv) == 0) ? true: false;
+            result = XTestFakeKeyEvent(display, keycode, isPressed, 0);
+            //post("result = %d", result);
+            if (result == 0) {
+              post("Error : could not simulate typing the letter.");
+            }
+          }
+        } else { */
+          // defaults to press and release
+          result = XTestFakeKeyEvent(display, keycode, True, 0);
+          //post("result = %d", result);
+          if (result == 0) {
+            post("Error : could not simulate typing the letter.");
+          }
+          result = XTestFakeKeyEvent(display, keycode, False, 0); 
+          if (result == 0) {
+            post("Error : could not simulate typing the letter.");
+          }
+        /* } //endif argc >= 2 */
         XCloseDisplay(display);
       }
     } else {
