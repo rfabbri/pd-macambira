@@ -8,7 +8,7 @@ LOG_FILE=/tmp/load_every_help-log-`date +20%y-%m-%d_%H.%M.%S`.txt
 helpdir=${PD_ROOT}/doc
 bindir=${PD_ROOT}/bin
 
-function make_netreceive_patch () 
+make_netreceive_patch () 
 {
 	 rm $1
 	 touch $1
@@ -16,13 +16,13 @@ function make_netreceive_patch ()
 	 echo "#X obj 111 83 netreceive $PORT_NUMBER 0 old;" >> $1
 }
 
-function open_patch ()
+open_patch ()
 {
 	 echo "OPENING: $1 $2" >> $LOG_FILE
 	 echo "; pd open $1 $2;" | ${bindir}/pdsend $PORT_NUMBER localhost tcp
 }
 
-function close_patch ()
+close_patch ()
 {
 	 echo "CLOSING: $1" >> $LOG_FILE
 	 echo "; pd-$1 menuclose;" | ${bindir}/pdsend $PORT_NUMBER localhost tcp

@@ -29,12 +29,12 @@ echo -e $MACOSX_HEADER > $MACOSX_FILE
 echo -e $WINDOWS_HEADER > $WINDOWS_FILE
 
 # GNU/Linux -------------------------------------------------------------------#
-function print_gnulinux ()
+print_gnulinux ()
 {
 	 echo "loadlib$1: $2" >> $GNULINUX_FILE
 }
 
-function print_gnulinux_fontpath ()
+print_gnulinux_fontpath ()
 {
 	 i=0
 	 for fontpath in $GNULINUX_FONTPATH; do
@@ -43,19 +43,19 @@ function print_gnulinux_fontpath ()
 	 done
 }
 
-function print_gnulinux_footer ()
+print_gnulinux_footer ()
 {
 	 echo "nloadlib: $1" >> $GNULINUX_FILE
 }
 
 # Mac OS X --------------------------------------------------------------------#
-function print_macosx () 
+print_macosx () 
 {
 	 echo -e "\t<key>loadlib$1</key>" >> $MACOSX_FILE
 	 echo -e "\t<string>$2</string>" >> $MACOSX_FILE
 }
 
-function print_macosx_fontpath ()
+print_macosx_fontpath ()
 {
 	 i=0
 	 for fontpath in $MACOSX_FONTPATH; do
@@ -66,12 +66,12 @@ function print_macosx_fontpath ()
 }
 
 # Windows ---------------------------------------------------------------------#
-function print_windows ()
+print_windows ()
 {
 	 echo "\"loadlib$1\"=\"$2\"" >> $WINDOWS_FILE
 }
 
-function print_windows_fontpath ()
+print_windows_fontpath ()
 {
 	 j=0
 	 for fontpath in $WINDOWS_FONTPATH; do
@@ -80,7 +80,7 @@ function print_windows_fontpath ()
 	 done
 }
 
-function print_windows_delete ()
+print_windows_delete ()
 {
 	 echo "\"${1}${2}\"=-" >> $WINDOWS_FILE
 }

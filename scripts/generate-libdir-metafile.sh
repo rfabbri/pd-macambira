@@ -9,7 +9,7 @@
 Y=10
 
 # Usage: print_pd_text($to_file, $meta_type, $text_to_print)
-function print_pd_text () 
+print_pd_text () 
 {
 	 file_name="$1"; shift
 	 meta_type="$1"; shift

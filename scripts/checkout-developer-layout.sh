@@ -10,7 +10,7 @@
 # Be aware that SourceForge's anonymous CVS server is generally 24 hours
 # behind the authenticated CVS.
 
-function print_usage ()
+print_usage ()
 {
     echo " "
     echo "Usage: $0 [sourceforge ID]"

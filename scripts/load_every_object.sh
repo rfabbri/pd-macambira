@@ -40,7 +40,7 @@ else
 fi
 
 
-function make_netreceive_patch () 
+make_netreceive_patch () 
 {
 	 rm $1
 	 touch $1
@@ -48,7 +48,7 @@ function make_netreceive_patch ()
 	 echo "#X obj 111 83 netreceive $PORT_NUMBER 0 old;" >> $1
 }
 
-function make_patch ()
+make_patch ()
 {
 	 rm $2
 	 touch $2
@@ -57,13 +57,13 @@ function make_patch ()
 	 echo "#X obj 111 83 $object;" >> $2
 }
 
-function open_patch ()
+open_patch ()
 {
 	 echo "OPENING: $1 $2" >> $LOG_FILE
 	 echo "; pd open $1 $2;" | ${PDSEND} $PORT_NUMBER localhost tcp
 }
 
-function close_patch ()
+close_patch ()
 {
 	 echo "CLOSING: $1" >> $LOG_FILE
 	 echo "; pd-$1 menuclose;" | ${PDSEND} $PORT_NUMBER localhost tcp
