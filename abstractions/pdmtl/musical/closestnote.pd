@@ -1,0 +1,47 @@
+#N canvas 314 224 897 589 10;
+#X msg 467 214 12;
+#X obj 113 313 f;
+#X obj 273 283 min;
+#X obj 344 313 f;
+#X obj -42 240 +;
+#X text 306 280 minimum difference from a note that is in the scale/chord
+;
+#X text 135 329 final minimum;
+#X obj 234 51 t f b f b;
+#X obj 225 168 t f f;
+#X obj 224 233 expr (12+$f1-($f2%12))%12;
+#X obj 236 3 inlet;
+#X obj 494 28 inlet;
+#X text 548 29 list (scale);
+#X text 298 3 float (about which note to play);
+#X obj 79 519 outlet;
+#X text 60 539 float (midi note);
+#X obj 293 508 outlet;
+#X text 310 534 difference between the original note and the closest
+note in the chord.;
+#X text 402 415 TODO: if previous value was higher \, floor \, if the
+previous value was lower \, ceil \, oterwise \, keep it like previous
+time...;
+#X obj 224 120 list append;
+#X obj 153 222 bang;
+#X obj 112 165 list/op;
+#X connect 0 0 2 1;
+#X connect 1 0 4 1;
+#X connect 1 0 16 0;
+#X connect 2 0 3 0;
+#X connect 3 0 2 1;
+#X connect 3 0 1 1;
+#X connect 4 0 14 0;
+#X connect 7 0 4 0;
+#X connect 7 1 19 0;
+#X connect 7 2 9 1;
+#X connect 7 3 0 0;
+#X connect 8 0 21 1;
+#X connect 8 1 9 0;
+#X connect 9 0 2 0;
+#X connect 10 0 7 0;
+#X connect 11 0 19 1;
+#X connect 19 0 21 0;
+#X connect 20 0 1 0;
+#X connect 21 0 20 0;
+#X connect 21 1 8 0;

@@ -1,0 +1,129 @@
+#N canvas 25 109 1247 842 10;
+#X msg 374 -198 gain \$1 \$2;
+#X msg 335 110 speed \$1 \$2;
+#X msg 515 -101 attack \$1 \$2;
+#X msg 332 12 length \$1 \$2;
+#X msg 516 -197 sustain \$1 \$2;
+#X msg 231 -199 onset \$1 \$2;
+#X floatatom 87 128 5 0 0 0 voices - -;
+#X msg -3 -199 envelope \$1;
+#X obj -3 -221 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X msg 81 -198 interonset \$1 \$2;
+#X obj -84 -452 sample/table 2 882000;
+#X msg -23 -252 peek;
+#X obj -67 -161 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 86 106 print peek_last_grain;
+#X obj 442 213 grid grid1 200 -1 1 200 -1 1 1 0.01 0.01 10 10 505 354
+;
+#X msg 447 445 position \$1 \$2;
+#X obj 447 422 pack f f;
+#X obj -85 82 dac~ 1 2 3 4 5 6 7 8;
+#X text -96 -609 Description: Granular synthesis with 8 individual
+outputs. Works with the "sample" format.;
+#X obj 403 182 pack;
+#X obj 399 142 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 539 143 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 424 161 t b f;
+#X floatatom 354 166 5 0 0 0 - - -;
+#X floatatom 559 167 5 0 0 0 - - -;
+#X text 394 126 Horizontal(x) spread;
+#X text 536 127 Vertical(y) spread;
+#X msg 336 206 spread \$1 \$2;
+#X text 517 79 The more horizontal or vertical spread the more the
+grains will be distant from the center position.;
+#X obj 567 446 gui/da;
+#X text 483 194 Grain center position (x y);
+#X text 344 -548 By default \, the 4 virtual speakers are at the coordinates
+-1 -1 \, 1 -1 \, 1 1 and -1 1 The others are spread around in the same
+-1 to 1 range.;
+#X text 346 -614 Imagine a virtual 2d space \, containing 8 speakers.
+A grain can be positionned anywhere in this space. Each of synth/particulate~'s
+signal outlet corresponds to one of these virtual speakers.;
+#X text 346 -502 You can change any of the virtual speakers position
+\, max distance \, and curve.;
+#X msg 373 -468 output 0 position 5 3;
+#X text 515 -332 This will change the max distance of all virtual speakers.
+;
+#X msg 375 -335 outputs distance 2;
+#X msg 377 -440 output 1 distance 2;
+#X msg 374 -408 output 0 curve 0.5;
+#X msg 375 -365 output 0 curve 1.5;
+#X text 512 -362 This will change the curve of all virtual speakers.
+;
+#X text 531 -474 This will position the virtual speaker linked with
+outlet 0 to 5 3;
+#X text 536 -442 This will change the max distance of the vitual speaker
+linked to outlet 1;
+#X text 520 -410 This will change the curve of the vitual speaker linked
+to outlet 0;
+#X text 404 -306 For more info on the virtual speakers \, check 2d/speaker's
+help.;
+#X msg 151 -31 output 0 position 0 0;
+#X msg 135 19 outputs distance 2;
+#X obj -84 -20 sample/particulate~;
+#X msg -80 -535 ../examples/media/sounds/loop0.wav;
+#X msg -2 -511 ../examples/media/sounds/loop1.wav;
+#X obj -84 -479 file/parentfolder;
+#X text -52 -163 on/off;
+#X obj -72 -563 loadbang;
+#X obj 82 -267 input/minmax_ 5 100;
+#X obj 241 -268 input/minmax_ 0 1;
+#X obj 576 -265 input/minmax_ 0 1;
+#X obj 402 -261 input/minmax_ 0 1;
+#X obj 514 -158 input/minmax_ 0 1;
+#X obj 334 -45 input/minmax_ 0 1;
+#X obj 335 40 input/minmax_ -2 2;
+#X text -68 -394 This abstraction does not support sample_id's region
+loop points yet!;
+#X connect 0 0 47 1;
+#X connect 1 0 47 1;
+#X connect 2 0 47 1;
+#X connect 3 0 47 1;
+#X connect 4 0 47 1;
+#X connect 5 0 47 1;
+#X connect 7 0 47 1;
+#X connect 8 0 7 0;
+#X connect 9 0 47 1;
+#X connect 10 0 47 0;
+#X connect 11 0 47 1;
+#X connect 12 0 47 1;
+#X connect 14 0 16 0;
+#X connect 14 1 16 1;
+#X connect 15 0 47 1;
+#X connect 16 0 15 0;
+#X connect 16 0 29 0;
+#X connect 19 0 27 0;
+#X connect 20 0 19 0;
+#X connect 20 0 23 0;
+#X connect 21 0 22 0;
+#X connect 21 0 24 0;
+#X connect 22 0 19 0;
+#X connect 22 1 19 1;
+#X connect 27 0 47 1;
+#X connect 45 0 47 1;
+#X connect 46 0 47 1;
+#X connect 47 0 17 0;
+#X connect 47 1 17 1;
+#X connect 47 2 17 2;
+#X connect 47 3 17 3;
+#X connect 47 4 17 4;
+#X connect 47 5 17 5;
+#X connect 47 6 17 6;
+#X connect 47 7 17 7;
+#X connect 47 8 6 0;
+#X connect 47 9 13 0;
+#X connect 48 0 50 0;
+#X connect 49 0 50 0;
+#X connect 50 0 10 0;
+#X connect 52 0 48 0;
+#X connect 53 0 9 0;
+#X connect 54 0 5 0;
+#X connect 55 0 4 0;
+#X connect 56 0 0 0;
+#X connect 57 0 2 0;
+#X connect 58 0 3 0;
+#X connect 59 0 1 0;

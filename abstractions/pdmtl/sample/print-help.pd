@@ -1,0 +1,15 @@
+#N canvas 54 440 745 367 10;
+#X obj 166 137 bng 15 250 50 0 empty empty print 0 -6 0 8 -262144 -1
+-1;
+#X obj 60 166 sample/print;
+#X obj 275 175 sample/print 1;
+#X text 60 6 Description: Prints a sample's details.;
+#X text 62 42 Version: 2;
+#X text 381 169 If you initiate it with a 1 \, it will print everytime
+there is a change in the sample.;
+#X text 59 22 Flags: sample_id;
+#X text 265 76 Inlet_1: sample_id signal;
+#X text 265 97 Outlet_1: sample_id signal;
+#X text 89 229 For examples \, check the pdmtl/examples/sample_id folder!
+;
+#X connect 0 0 1 1;

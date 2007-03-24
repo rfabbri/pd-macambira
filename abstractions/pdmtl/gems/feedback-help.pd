@@ -1,0 +1,64 @@
+#N canvas 735 133 777 645 10;
+#X obj 229 511 rotateXYZ;
+#X obj 282 560 * 4;
+#X floatatom 387 608 5 0 0 0 - - -;
+#X obj 229 72 gemhead 100;
+#X obj 25 69 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 229 322 translateXYZ 0 0 -0.5;
+#X floatatom 290 485 5 0 0 0 - - -;
+#X obj 229 94 alpha 1;
+#X obj 28 319 triangle 0.3;
+#X obj 229 344 colorRGB 1 1 1 0.9;
+#X obj 28 276 gemhead 50;
+#X text 329 71 The gemhead rendering order number must be higher than
+the objects that you want to appear in the video feedback loop.;
+#X obj 290 464 line;
+#X msg 290 444 \$1 10000;
+#X obj 289 406 metro 10000;
+#X obj 291 424 random 360;
+#X obj 289 387 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X text 56 5 Description: Video feedback loop using snapshots of the
+rendering window.;
+#X obj 289 365 loadbang;
+#X text 389 322 Looks better if in front or behinf the other shapes.
+;
+#X text 388 335 A little transparency makes it fade out.;
+#X obj 28 297 colorRGB 1 0.9 0.1;
+#X text 412 470 Change the size of the shape it is drawn on.;
+#X text 388 349 A little rotation can do a lot.;
+#X obj 387 474 vsl 15 128 1 4 1 0 empty empty empty 0 -8 0 8 -262144
+-1 -1 12700 1;
+#X msg 55 64 FSAA 6;
+#X text 331 201 WARNING : I inverted the arguments of the pix_snap
+object.;
+#X obj 23 91 gems/win 600 600;
+#X msg 23 36 cursor 0;
+#X obj 229 204 gems/feedback;
+#X text 330 185 The size defaults to the gemwin size \, and offset
+to 0 0;
+#X text 330 157 Arguments (and 1 \, 2 \, 3 \, 4th inlets) : sizeX \,
+sizeY \, offsetX \, offsetY;
+#X obj 229 580 square 5;
+#X connect 0 0 32 0;
+#X connect 1 0 32 1;
+#X connect 2 0 1 0;
+#X connect 3 0 7 0;
+#X connect 4 0 27 0;
+#X connect 5 0 9 0;
+#X connect 6 0 0 3;
+#X connect 7 0 29 0;
+#X connect 9 0 0 0;
+#X connect 10 0 21 0;
+#X connect 12 0 6 0;
+#X connect 13 0 12 0;
+#X connect 14 0 15 0;
+#X connect 15 0 13 0;
+#X connect 16 0 14 0;
+#X connect 18 0 16 0;
+#X connect 21 0 8 0;
+#X connect 24 0 2 0;
+#X connect 25 0 27 0;
+#X connect 28 0 27 0;
+#X connect 29 0 5 0;

@@ -1,0 +1,107 @@
+#N canvas 1420 381 976 539 10;
+#X obj 14 128 gemhead;
+#X obj 25 418 rectangle;
+#X obj 517 68 gems/win 320 240;
+#X obj 111 85 bng 15 250 50 0 empty empty LOAD_ANOTHER_IMAGE 0 -6 0
+8 -262144 -1 -1;
+#X obj 25 245 pix_texture;
+#X text 507 10 Switch between these two window sizes and notice the
+image is always displayed with the same size.;
+#N canvas 0 0 450 300 custom_image 0;
+#X obj 54 53 inlet;
+#X obj 54 78 t b;
+#X obj 54 97 openpanel;
+#X msg 54 122 open \$1;
+#X obj 69 201 outlet;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X restore 112 107 pd custom_image;
+#X obj 25 203 pix_image;
+#X text 25 11 Description: Displays an image or movie in Gem window
+at it's original size.;
+#X floatatom 120 377 5 0 0 0 - - -;
+#X floatatom 63 374 5 0 0 0 - - -;
+#X text 160 138 (All of these images are 256x256 pixels);
+#X msg 519 47 1;
+#X msg 647 47 1;
+#X msg 556 45 0;
+#X msg 166 271 window;
+#X obj 105 269 hradio 15 1 0 3 empty empty empty 0 -6 0 8 -262144 -1
+-1 0;
+#X obj 649 69 gems/win 640 480;
+#X msg 190 294 pixsize;
+#X msg 249 316 pixratio;
+#X msg 240 403 dimen 320 240;
+#X text 488 272 window: fit to the gem window (all portions will still
+be visible);
+#X text 489 305 pixsize: reproduce the image \, pixel by pixel in the
+gem win.;
+#X text 488 327 pixratio: only send out the normalized ration of the
+image's size.;
+#X obj 126 136 hradio 15 1 0 2 empty empty empty 0 -6 0 8 -262144 -1
+-1 1;
+#N canvas 0 0 450 300 small_images 0;
+#X obj 194 163 file/parentfolder;
+#X msg 194 186 open \$1;
+#X obj 70 8 loadbang;
+#X obj 189 238 outlet;
+#X obj 270 40 inlet;
+#X msg 76 32 0;
+#X obj 116 100 makesymbol ../examples/media/images/img%s.jpg;
+#X connect 0 0 1 0;
+#X connect 1 0 3 0;
+#X connect 2 0 5 0;
+#X connect 4 0 6 0;
+#X connect 5 0 6 0;
+#X connect 6 0 0 0;
+#X restore 126 159 pd small_images;
+#N canvas 0 0 450 300 big_image 0;
+#X obj 194 163 file/parentfolder;
+#X msg 194 186 open \$1;
+#X obj 189 238 outlet;
+#X obj 107 40 inlet;
+#X obj 116 100 makesymbol ../examples/media/images/bigimg%s.jpg;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 3 0 4 0;
+#X connect 4 0 0 0;
+#X restore 127 203 pd big_image;
+#X obj 127 181 hradio 15 1 0 2 empty empty empty 0 -6 0 8 -262144 -1
+-1 1;
+#X text 440 223 Inlet_1 : gemlist.;
+#X text 436 251 Inlet_2 : selects how you want the fitting.;
+#X text 504 99 Argument_1: Selects how you want the fitting.;
+#X text 340 404 <- Only use this message if you are not using gems/win
+(you can also set the gem window dimensions with arguments 2 and 3)
+;
+#X text 502 142 Argument_2: (Only if you are not using gems/win) Gem
+window width.;
+#X text 502 169 Argument_3: (Only if you are not using gems/win) Gem
+window height.;
+#X obj 25 333 gems/fit window;
+#X obj 508 120 gems/fit window;
+#X obj 626 120 gems/fit pixratio;
+#X connect 0 0 7 0;
+#X connect 3 0 6 0;
+#X connect 4 0 34 0;
+#X connect 6 0 7 0;
+#X connect 7 0 4 0;
+#X connect 9 0 1 2;
+#X connect 10 0 1 1;
+#X connect 12 0 2 0;
+#X connect 13 0 17 0;
+#X connect 14 0 2 0;
+#X connect 15 0 34 1;
+#X connect 16 0 34 1;
+#X connect 18 0 34 1;
+#X connect 19 0 34 1;
+#X connect 20 0 34 1;
+#X connect 24 0 25 0;
+#X connect 25 0 7 0;
+#X connect 26 0 7 0;
+#X connect 27 0 26 0;
+#X connect 34 0 1 0;
+#X connect 34 1 10 0;
+#X connect 34 2 9 0;

@@ -1,0 +1,25 @@
+#N canvas 296 166 938 656 12;
+#X obj 179 333 list/build;
+#X floatatom 319 179 5 0 0 0 - - -;
+#X obj 156 203 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 304 427 print length;
+#X obj 152 451 print result;
+#X text 318 156 Data;
+#X msg 317 234 symbol foo;
+#X msg 321 265 symbol glue;
+#X text 428 245 works with symbols too;
+#X obj 317 323 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 342 323 Bang to clear current list;
+#X text 9 177 Bang to output and clear;
+#X text 93 59 Description: Builds a list with the incomming data. New
+data is added at the end of the built list.;
+#X text 91 96 Similar: list/buildrev;
+#X connect 0 0 4 0;
+#X connect 0 1 3 0;
+#X connect 1 0 0 1;
+#X connect 2 0 0 0;
+#X connect 6 0 0 1;
+#X connect 7 0 0 1;
+#X connect 9 0 0 1;

@@ -1,0 +1,13 @@
+#N canvas 0 0 450 300 10;
+#X obj 117 199 list/element;
+#X msg 108 128 list a b c d e f g;
+#X floatatom 315 97 5 0 0 0 - - -;
+#X obj 297 126 t b f;
+#X obj 123 244 print ELEMENT;
+#X text 44 32 Description: Returns the nth element of a list.;
+#X text 43 48 Comment: Also works with negative values.;
+#X connect 0 0 4 0;
+#X connect 1 0 0 0;
+#X connect 2 0 3 0;
+#X connect 3 0 1 0;
+#X connect 3 1 0 1;

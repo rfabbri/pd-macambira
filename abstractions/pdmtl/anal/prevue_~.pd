@@ -1,0 +1,19 @@
+#N canvas 376 236 430 416 12;
+#X obj 102 67 inlet~;
+#X text 16 7 NEEDS lpn_speedlim;
+#X text 16 26 TOOL FOR THE GUI VU;
+#X text 17 44 ARGUMENT 1(optional) : update speed (msec);
+#X text 198 64 defaults to 100;
+#X obj 196 159 prvu~;
+#X obj 106 143 vu 15 120 empty empty -1 -8 0 8 -66577 -1 1 0;
+#X obj 55 288 outlet;
+#X obj 134 285 outlet;
+#X obj 106 122 tgl 15 0 \$0dummy \$0dummy empty 0 -6 0 8 -262144 -1
+-1 0 1;
+#X obj 17 131 switch~;
+#X connect 0 0 5 0;
+#X connect 5 0 6 0;
+#X connect 6 0 7 0;
+#X connect 6 1 8 0;
+#X connect 9 0 10 0;
+#X coords 0 -1 1 1 60 170 1 100 100;

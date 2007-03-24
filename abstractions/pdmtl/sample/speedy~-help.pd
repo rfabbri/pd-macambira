@@ -1,0 +1,86 @@
+#N canvas 227 193 1117 727 10;
+#X obj -108 150 sample/table;
+#X obj 369 170 f;
+#X text 401 171 note;
+#X msg 313 126 86;
+#X msg 378 130 90;
+#X msg 347 129 88;
+#X msg 411 130 91;
+#X msg 445 133 93;
+#X msg 476 134 95;
+#X msg 506 134 97;
+#X msg 536 133 98;
+#X obj 159 597 dac~;
+#X obj -108 171 sample/print 1;
+#X floatatom 372 228 5 0 0 0 - - -;
+#X obj 365 204 convert/m2speed 86;
+#X msg 405 348 1;
+#X msg 369 346 0.5;
+#X obj -104 64 openpanel;
+#X obj -105 45 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 121 194 0;
+#X text -95 7 Description: Variable speed sample player with variable
+beginning and end points;
+#X obj 532 441 pack f f;
+#X obj 555 417 t b f;
+#X text 594 443 Start and end points;
+#X text 306 554 Inlets: sample \, play at speed (0 to stop) \, start
+and eding offsets;
+#X obj 161 545 sample/speedy~;
+#X obj 444 308 vsl 25 50 0.1 2 1 0 empty empty empty 3 -8 0 8 -33289
+-262144 -1 4500 1;
+#X obj -95 -24 cnv 15 430 20 empty empty empty 20 12 0 14 -216438 -66577
+0;
+#X obj -95 -3 cnv 1 430 1 empty empty empty 4 -10 2 12 -66577 -1 0
+;
+#X obj -95 -24 cnv 1 430 1 empty empty empty 0 -10 0 16 -66577 -66577
+0;
+#X text 195 -20 Version: 2007-01-09;
+#X text -94 -21 :: sample/speedy~ ::;
+#X obj 107 516 vsl 25 50 0 1 0 0 empty empty empty 3 -8 0 8 -33289
+-262144 -1 2700 1;
+#X obj 160 569 *~ 0.1;
+#X text 253 100 Speed is a ratio on 1 : plays the sample right away
+;
+#X text 109 176 Zero stops playing;
+#X obj 510 171 nbx 6 14 0 127 0 0 empty empty empty 0 -8 0 10 -33289
+-262144 -1 0 256;
+#X obj 527 365 nbx 6 14 0 200 0 0 empty empty in 0 -8 0 10 -33289 -262144
+-1 0 256;
+#X obj 598 368 nbx 6 14 0 200 0 0 empty empty out 0 -8 0 10 -33289
+-262144 -1 0 256;
+#X obj -32 106 file/parentfolder;
+#X text 307 589 Comments: only works in mono for now;
+#X msg -28 81 ../examples/media/sounds/loop2.wav;
+#X connect 0 0 12 0;
+#X connect 1 0 14 0;
+#X connect 3 0 1 0;
+#X connect 4 0 1 0;
+#X connect 5 0 1 0;
+#X connect 6 0 1 0;
+#X connect 7 0 1 0;
+#X connect 8 0 1 0;
+#X connect 9 0 1 0;
+#X connect 10 0 1 0;
+#X connect 12 0 25 0;
+#X connect 14 0 13 0;
+#X connect 14 0 25 1;
+#X connect 15 0 25 1;
+#X connect 16 0 25 1;
+#X connect 17 0 0 0;
+#X connect 18 0 17 0;
+#X connect 19 0 25 1;
+#X connect 21 0 25 2;
+#X connect 22 0 21 0;
+#X connect 22 1 21 1;
+#X connect 25 0 33 0;
+#X connect 26 0 25 1;
+#X connect 32 0 33 1;
+#X connect 33 0 11 0;
+#X connect 33 0 11 1;
+#X connect 36 0 14 1;
+#X connect 37 0 21 0;
+#X connect 38 0 22 0;
+#X connect 39 0 0 0;
+#X connect 41 0 39 0;

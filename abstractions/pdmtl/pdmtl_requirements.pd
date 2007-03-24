@@ -1,0 +1,48 @@
+#N canvas 519 117 591 709 10;
+#X text 49 124 All of the requirements can be found in Hans' Pd installers
+(http://at.or.at/hans/pd/installers.html).;
+#X text 53 100 Pure Data version >= 0.39.;
+#X obj 59 195 dollarg;
+#X text 54 29 If any of the following externals are not found by Pure
+Data \, either you are missing (or did not install correctly) a library
+(indicated by the name between the "--") or an external required by
+the pdmtl abstractions.;
+#X obj 60 246 msgfile;
+#X obj 61 292 MouseState;
+#X obj 61 338 gemhead;
+#X obj 234 219 scrolllist 100 130 60 {Helvetica 10 bold} #457782 black
+red;
+#X text 55 174 -- iemlib --;
+#X text 56 223 -- zexy --;
+#X text 56 269 -- cyclone --;
+#X text 62 317 -- Gem --;
+#X text 258 558 Externals;
+#X obj 54 638 folder_list;
+#X text 53 368 -- ext13 --;
+#X obj 66 389 send13;
+#X obj 259 591 arraysize;
+#X text 54 421 -- ggee --;
+#X obj 67 442 getdir;
+#X obj 235 342 playlist all 200 100 {Helvetica 10 bold} #457782 yellow
+black red;
+#X text 278 305 playlist;
+#X text 261 202 scrolllist;
+#X text 259 179 -- unauthorized --;
+#X obj 64 483 mtx;
+#X text 42 462 -- iemmatrix --;
+#X text 41 508 -- list-abs --;
+#X obj 59 531 list-rot;
+#X obj 257 640 iem_anything;
+#X text 40 563 -- maxlib --;
+#X obj 75 591 dist;
+#X text 56 618 -- hcs --;
+#X text 54 5 Description: pdtml requirements.;
+#X obj 248 493 mtx_*;
+#X obj 248 518 mtx_phon_curve;
+#X text 235 473 -- iemmatrix --;
+#X obj 258 616 expr;
+#X text 363 520 (abstraction);
+#X text 125 531 (abstraction);
+#X obj 144 292 comport;
+#X obj 259 666 fiddle~;
+#X obj 318 667 bonk~;

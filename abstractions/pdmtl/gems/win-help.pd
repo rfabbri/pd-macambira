@@ -1,0 +1,48 @@
+#N canvas 408 166 858 706 10;
+#X obj 42 90 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X text 43 16 Description: Controls the Gem window.;
+#X obj 43 161 print settings;
+#X obj 164 653 s gems/win/force_render;
+#X obj 163 630 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 158 398 -- MOUSE CONTROLS --;
+#X text 152 536 -- EXTERNAL CONTROLS --;
+#X text 38 419 Clicking with the RIGHT mouse button in the Gem window
+will move the camera.;
+#X text 39 452 Double clicking with the RIGHT mouse button will reset
+the camera.;
+#X text 39 484 Double clicking with the MIDDLE mouse button will destroy
+the Gem window.;
+#X text 404 223 If you create gems/win with 4 arguments \, it will
+create a window without borders.;
+#X text 397 121 Outlet_1: Outputs the settings made to the Gem window.
+NOTE that this outlet is COMMON to all gems/win.;
+#X text 397 67 Inlet_1(float): 1=Create and render. 0=Destroy. All
+of the standard Gem window commands can still be used (see gemwin's
+help for more information).;
+#X obj 44 232 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X text 61 89 Create a 320x240 Gem window with a border.;
+#X text 62 229 Create a 200x200 Gem window without a border.;
+#X obj 44 275 gems/win 200 200 100 100;
+#X text 404 182 Argument_1: Gem window width (defaults to 320).;
+#X text 404 200 Argument_2: Gem window height (defaults to 240).;
+#X text 405 259 Argument_3: Gem window x position.;
+#X text 406 278 Argument_4: Gem window y position.;
+#X text 589 327 -- NOTES --;
+#X text 492 353 Once you create a gems/light object \, lighting is
+automatically turned on.;
+#X text 37 570 Force Gem Window Creation: sometimes you need to guarantee
+that the Gem window is created before another action (like loading
+a movie). You can use the following to force the creation of the Gem
+window:;
+#X obj 43 133 gems/win 320 240;
+#X text 39 333 WARNING: There is a 200 ms delay when closing a Gem
+window to make sure PD & Gem do not crash. If you try to destroy and
+destroy the window too quickly some commands will be ingored for your
+own protection.;
+#X connect 0 0 24 0;
+#X connect 4 0 3 0;
+#X connect 13 0 16 0;
+#X connect 24 0 2 0;

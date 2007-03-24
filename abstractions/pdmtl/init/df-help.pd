@@ -1,0 +1,47 @@
+#N canvas 357 287 792 483 10;
+#X obj 64 93 loadbang;
+#X obj 77 204 metro;
+#X msg 66 151 1;
+#X obj 77 240 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 110 160 init/df \$1 100;
+#X floatatom 110 184 5 0 0 0 - - -;
+#X obj 411 103 loadbang;
+#X obj 427 186 metro;
+#X obj 427 222 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 460 166 5 0 0 0 - - -;
+#X obj 68 117 t b b;
+#X obj 414 124 t b b;
+#X text 60 12 Description: Default float.;
+#X text 62 46 If the first argument is 0 \, the second argument is
+outputed.;
+#X obj 101 344 loadbang;
+#X floatatom 101 406 5 0 0 0 - - -;
+#X obj 395 340 loadbang;
+#X floatatom 395 402 5 0 0 0 - - -;
+#X text 119 292 Inside the following abstractions \, you will find
+a init/df. If the abstraction's argument is not set \, the default
+float is selected.;
+#X text 205 374 Argument no set.;
+#X text 533 370 Argument set to 594;
+#X obj 101 375 examples/dfabs;
+#X obj 460 142 init/df 50 100;
+#X obj 395 371 examples/dfabs 594;
+#X connect 0 0 10 0;
+#X connect 1 0 3 0;
+#X connect 2 0 1 0;
+#X connect 4 0 5 0;
+#X connect 5 0 1 1;
+#X connect 6 0 11 0;
+#X connect 7 0 8 0;
+#X connect 9 0 7 1;
+#X connect 10 0 2 0;
+#X connect 10 1 4 0;
+#X connect 11 0 7 0;
+#X connect 11 1 22 0;
+#X connect 14 0 21 0;
+#X connect 16 0 23 0;
+#X connect 21 0 15 0;
+#X connect 22 0 9 0;
+#X connect 23 0 17 0;

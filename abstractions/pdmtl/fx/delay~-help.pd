@@ -1,0 +1,18 @@
+#N canvas 198 327 709 372 10;
+#X obj 69 319 dac~;
+#X text 300 236 Arguments : 1) max delay \, defaults to 1000 milliseconds
+;
+#X obj 215 152 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 12700 1;
+#X obj 72 237 fx/delay~ 250;
+#X text 354 151 Delay (0-127);
+#X obj 69 175 adc~;
+#X obj 221 183 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 6100 1;
+#X text 359 182 Wetness (0-127);
+#X text 89 47 Description: A simple delay.;
+#X connect 2 0 3 1;
+#X connect 3 0 0 1;
+#X connect 3 0 0 0;
+#X connect 5 0 3 0;
+#X connect 6 0 3 2;

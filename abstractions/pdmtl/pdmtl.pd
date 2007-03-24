@@ -1,0 +1,38 @@
+#N canvas 543 272 727 449 10;
+#X obj 23 -13 cnv 15 400 60 empty empty pdmtl 12 12 1 14 -261681 -1
+0;
+#X obj 268 -13 cnv 15 155 22 empty empty VERSION_07-03-23 30 12 1 8
+-1 -262144 0;
+#X text 32 22 A collection of abstractions made by Montreal pd users.
+;
+#X text 25 52 This collection of abstractions is maintained by tof@danslchamp.org
+\, puredata@11h11.com and alex@sourcelibre.com.;
+#X text 190 122 <-Click to open this patch and check the requirements.
+;
+#X text 229 205 <-Click to open this patch and browse the pdmtl abstractions.
+;
+#X text 229 153 <-Click to open this patch and create an index file
+(plain text format) containing all the abstractions and their information.
+;
+#N canvas 0 0 493 414 open 0;
+#X obj 64 80 inlet;
+#X obj 117 258 file/parentfolder;
+#X msg 77 319 \; pd open \$1 \$2;
+#X obj 65 284 pack s s;
+#X obj 72 127 t a b;
+#X obj 69 178 symbol;
+#X connect 0 0 4 0;
+#X connect 1 0 3 1;
+#X connect 3 0 2 0;
+#X connect 4 0 5 0;
+#X connect 4 1 1 0;
+#X connect 5 0 3 0;
+#X restore 24 259 pd open;
+#X msg 139 208 hbrowser.pd;
+#X text 128 261 All of the patches can be found in the pdmtl root folder.
+;
+#X msg 25 121 pdmtl_requirements.pd;
+#X msg 80 154 pdmtl_indexmaker.pd;
+#X connect 8 0 7 0;
+#X connect 10 0 7 0;
+#X connect 11 0 7 0;

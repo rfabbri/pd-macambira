@@ -1,0 +1,158 @@
+#N canvas 1280 27 979 912 10;
+#X obj 117 538 dac~;
+#X text 303 512 Loop progress;
+#X obj 205 509 gui/snap~;
+#X msg 358 186 0;
+#X text 390 186 Stop;
+#X msg 390 208 1;
+#X msg 415 305 autoplay 1;
+#X msg 432 337 autoplay 0;
+#X text 518 337 Autoplay off;
+#X text -3 117 Version: 2007-1-11;
+#X obj 461 395 cnv 15 450 170 empty empty empty 20 12 0 14 -233017
+-66577 0;
+#X text 420 208 Trigger a play and loop from start.;
+#X text 0 30 Description: Loops a "sample". Can be synched.;
+#X text 496 304 Play and loop the sample once it is loaded \, 0/off
+by default.;
+#X text -2 82 Changes: Added "autoplay" and removed "autogain". Updated
+guts and sync code. Removed one signal outlet.;
+#X obj 70 315 file/parentfolder;
+#X msg -28 220 ../examples/media/sounds/loop0.wav;
+#X msg 98 245 ../examples/media/sounds/loop1.wav;
+#X text 1 62 Flags: sample_id sync;
+#X obj 71 384 sample/filer;
+#X text 198 158 -- Unsynched example --;
+#X text 325 589 -- Synched example --;
+#X text -14 640 If sample/looper~ is in sync mode but does not receive
+both sync signals (speed and beat) \, it will not play!;
+#X text -14 678 To turn synch on \, send "synch 1" to the second inlet
+of sample/looper~.;
+#X obj 528 663 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X floatatom 595 658 5 0 0 0 - - -;
+#X obj 595 635 init/lf 120;
+#X obj 528 635 loadbang;
+#X obj 754 706 hradio 15 1 0 4 empty empty empty 0 -6 0 8 -262144 -1
+-1 2;
+#X obj 535 721 gui/snap~;
+#X obj 659 722 gui/snap~;
+#X text 757 687 Step;
+#X obj 528 742 s~ \$0master_speed;
+#X obj 659 741 s~ \$0master_sync;
+#X text 637 658 <-Set your BPM here.;
+#X obj 528 689 timing/master~ 120 4;
+#X obj 311 1146 dac~;
+#X obj 316 912 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X obj 612 940 r~ \$0master_speed;
+#X obj 684 961 r~ \$0master_sync;
+#X obj 255 980 r~ \$0master_speed;
+#X obj 262 1008 r~ \$0master_sync;
+#X msg 316 932 sync \$1;
+#X obj 597 892 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X msg 592 914 sync \$1;
+#X obj 276 1118 *~ 0.5;
+#X obj 345 1117 *~ 0.5;
+#X obj 317 887 loadbang;
+#X obj 596 868 loadbang;
+#X obj 95 923 sample/table 4 882000;
+#X msg 118 962 0;
+#X msg 180 963 1;
+#X obj 474 871 sample/table 4;
+#X msg 514 912 1;
+#X msg 524 936 0;
+#X msg 148 961 2;
+#X obj 95 872 file/parentfolder;
+#X obj 474 840 file/parentfolder;
+#X msg 473 810 ../examples/media/sounds/loop2.wav;
+#X obj -5 756 loadbang;
+#X obj 472 784 loadbang;
+#X text 87 716 WARNING: Sync might not work properly with a sample
+rate other than 44100 This will be checked/fixed in the next release.
+;
+#X msg -3 777 ../examples/media/sounds/loop1.wav;
+#X msg 123 802 ../examples/media/sounds/loop0.wav;
+#X msg 413 232 2;
+#X text 443 233 Play twice as fast.;
+#X text 468 457 Loop bounds can be changed with the sample/region and
+sample/region_ abstractions:;
+#X text 464 405 WARNING: sample/looper~ only reacts to changes to the
+start and length (bounds) properties ONCE it receives a new trigger.
+;
+#X obj 470 505 sample/region;
+#X obj 589 503 sample/region_;
+#X text 476 1082 When sample/looper~ is synched \, it will always adjust
+the playback speed to best match timing/master~;
+#X msg 611 833 ../examples/media/sounds/loop1.wav;
+#X obj 440 841 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 34 855 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 212 964 0.5;
+#X obj 113 462 sample/looper~;
+#X obj 474 1029 sample/looper~;
+#X obj 94 1030 sample/looper~;
+#X msg 542 962 2;
+#X obj 89 496 *~ 0.5;
+#X obj 140 498 *~ 0.5;
+#X text -12 613 This is all very experimental!;
+#X connect 3 0 75 1;
+#X connect 5 0 75 1;
+#X connect 6 0 75 1;
+#X connect 7 0 75 1;
+#X connect 15 0 19 0;
+#X connect 16 0 15 0;
+#X connect 17 0 15 0;
+#X connect 19 0 75 0;
+#X connect 24 0 35 0;
+#X connect 25 0 35 1;
+#X connect 26 0 25 0;
+#X connect 27 0 24 0;
+#X connect 35 0 29 0;
+#X connect 35 0 32 0;
+#X connect 35 1 30 0;
+#X connect 35 1 33 0;
+#X connect 35 2 28 0;
+#X connect 37 0 42 0;
+#X connect 38 0 76 2;
+#X connect 39 0 76 3;
+#X connect 40 0 77 2;
+#X connect 41 0 77 3;
+#X connect 42 0 77 1;
+#X connect 43 0 44 0;
+#X connect 44 0 76 1;
+#X connect 45 0 36 0;
+#X connect 46 0 36 1;
+#X connect 47 0 37 0;
+#X connect 48 0 43 0;
+#X connect 49 0 77 0;
+#X connect 50 0 77 1;
+#X connect 51 0 77 1;
+#X connect 52 0 76 0;
+#X connect 53 0 76 1;
+#X connect 54 0 76 1;
+#X connect 55 0 77 1;
+#X connect 56 0 49 0;
+#X connect 57 0 52 0;
+#X connect 58 0 57 0;
+#X connect 59 0 62 0;
+#X connect 60 0 58 0;
+#X connect 62 0 56 0;
+#X connect 63 0 56 0;
+#X connect 64 0 75 1;
+#X connect 71 0 57 0;
+#X connect 72 0 52 0;
+#X connect 73 0 49 0;
+#X connect 74 0 77 1;
+#X connect 75 0 79 0;
+#X connect 75 1 80 0;
+#X connect 75 2 2 0;
+#X connect 76 0 45 0;
+#X connect 76 1 46 0;
+#X connect 77 0 45 0;
+#X connect 77 1 46 0;
+#X connect 78 0 76 1;
+#X connect 79 0 0 0;
+#X connect 80 0 0 1;

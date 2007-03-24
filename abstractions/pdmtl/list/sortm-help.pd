@@ -1,0 +1,88 @@
+#N canvas 204 243 1022 675 10;
+#X msg 111 415 45 3 4 \, 32 8 2 \, 12 4 4;
+#X obj 78 366 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 78 386 t b b;
+#X obj 7 513 print smallest;
+#X obj 130 514 print the_rest_ascending;
+#X obj 172 477 print done;
+#X obj 57 598 t b b;
+#X obj 59 574 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 511 366 t b b;
+#X obj 509 335 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 446 472 print biggest;
+#X obj 651 582 print smallest;
+#X obj 511 537 print second;
+#X text 18 61 a is smaller than z.;
+#X text 19 77 A is smaller than a.;
+#X text 18 93 Numbers are smaller than A.;
+#X text 16 4 Description: Sorts multiple lists. The value of any index
+can be used as comparator.;
+#X text 17 41 list/sortm uses the ascii values to determines the ordering.
+;
+#X msg 78 626 list steve 32 \, list rob 45 \, list alice 17;
+#X text 80 571 Find who has the highest score.;
+#X obj 61 743 print highest;
+#X msg 60 717 \$1 has the highest score;
+#X obj 80 449 list/sortm 0 <;
+#X msg 538 396 5 a \, 76 b \, 64 c;
+#X text 435 308 You can create cascades to get 2nd \, 3rd \, 4th \,
+etc...;
+#X obj 60 681 list/sortm 1 >;
+#X obj 509 427 list/sortm 0 >;
+#X obj 573 474 list/sortm 0 >;
+#X obj 645 522 list/sortm 0 >;
+#X msg 175 220 <;
+#X msg 216 221 >;
+#X text 105 363 Sorts ascending by first element.;
+#X text 175 201 Ascending/descending sort;
+#X obj 54 260 list/sortm 0 <;
+#X floatatom 137 173 5 0 0 0 - - -;
+#X text 176 174 Index to sort by (0 = first element);
+#X msg 93 136 (multiple lists to compare);
+#X msg 0 173 bang;
+#X text -11 156 Compare;
+#X msg 0 292 (first list);
+#X msg 102 291 (other lists);
+#X msg 215 287 (done);
+#X text 634 215 dir defaults to descending;
+#X text 636 189 > : descending sort;
+#X text 635 202 < : ascending sort;
+#X text 479 167 Creation : "list/sortm (index to sort by) (> or <)"
+;
+#X text 171 648 This example sorts descending by comparing the value
+ofthe second elements.;
+#X connect 0 0 22 1;
+#X connect 1 0 2 0;
+#X connect 2 0 22 0;
+#X connect 2 1 0 0;
+#X connect 6 0 25 0;
+#X connect 6 1 18 0;
+#X connect 7 0 6 0;
+#X connect 8 0 26 0;
+#X connect 8 1 23 0;
+#X connect 9 0 8 0;
+#X connect 18 0 25 1;
+#X connect 21 0 20 0;
+#X connect 22 0 3 0;
+#X connect 22 1 4 0;
+#X connect 22 2 5 0;
+#X connect 23 0 26 1;
+#X connect 25 0 21 0;
+#X connect 26 0 10 0;
+#X connect 26 1 27 1;
+#X connect 26 2 27 0;
+#X connect 27 0 12 0;
+#X connect 27 1 28 1;
+#X connect 27 2 28 0;
+#X connect 28 0 11 0;
+#X connect 29 0 33 3;
+#X connect 30 0 33 3;
+#X connect 33 0 39 0;
+#X connect 33 1 40 0;
+#X connect 33 2 41 0;
+#X connect 34 0 33 2;
+#X connect 36 0 33 1;
+#X connect 37 0 33 0;

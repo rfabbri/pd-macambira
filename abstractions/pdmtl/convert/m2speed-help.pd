@@ -1,0 +1,19 @@
+#N canvas 375 105 487 487 10;
+#X msg 296 271 60;
+#X floatatom 167 259 5 0 0 0 - - -;
+#X msg 328 271 72;
+#X text 305 241 Original note;
+#X text 170 231 Current note;
+#X floatatom 154 422 5 0 0 0 - - -;
+#X obj 172 356 convert/m2speed 72;
+#X text 21 154 Defaults to 60 if no argument given.;
+#X text 212 423 Play speed ratio (on 1);
+#X text 19 73 Converts a desired note to the speed ratio to which you
+should read a sound file or array \, given the midi pitch of the original
+sound. The ratio is a fractionnal number on 1;
+#X text 20 46 convert/m2speed;
+#X text 22 140 Argument : the midi pitch of the original sound.;
+#X connect 0 0 6 1;
+#X connect 1 0 6 0;
+#X connect 2 0 6 1;
+#X connect 6 0 5 0;

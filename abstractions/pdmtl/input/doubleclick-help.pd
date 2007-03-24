@@ -1,0 +1,9 @@
+#N canvas 1145 213 450 300 10;
+#X obj 235 87 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 173 176 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 64 28 Description: Detects double clicks.;
+#X obj 180 139 input/doubleclick 175;
+#X connect 0 0 3 0;
+#X connect 3 0 1 0;

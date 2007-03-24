@@ -1,0 +1,5 @@
+#N canvas 216 252 564 378 12;
+#X obj 214 191 print;
+#X obj 214 108 init/ls yeah;
+#X text 114 38 Description: Loadbang a symbol.;
+#X connect 1 0 0 0;

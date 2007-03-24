@@ -1,0 +1,8 @@
+#N canvas 629 206 450 300 10;
+#X obj 57 29 inlet list;
+#X obj 248 30 inlet element;
+#X obj 78 215 outlet value;
+#X obj 77 113 packel \$1;
+#X connect 0 0 3 0;
+#X connect 1 0 3 1;
+#X connect 3 0 2 0;

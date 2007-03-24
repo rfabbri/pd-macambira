@@ -1,0 +1,14 @@
+#N canvas 83 452 593 266 10;
+#X symbolatom 62 146 10 0 0 0 - - -;
+#X symbolatom 241 146 10 0 0 0 - - -;
+#X obj 241 123 init/ds steve bob;
+#X obj 63 96 loadbang;
+#X obj 237 96 loadbang;
+#X text 60 12 Description: Default symbol.;
+#X text 62 39 Same as init/df but for symbols.;
+#X obj 313 38 init/df;
+#X obj 62 123 init/ds \$1 bob;
+#X connect 2 0 1 0;
+#X connect 3 0 8 0;
+#X connect 4 0 2 0;
+#X connect 8 0 0 0;

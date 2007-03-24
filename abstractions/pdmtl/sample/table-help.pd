@@ -1,0 +1,51 @@
+#N struct 1795preview float x float y float p float h;
+#N canvas 1374 208 775 731 10;
+#X text 88 89 By default \, sample/table can only store one file of
+up to 20 seconds of data @ 44100;
+#X text 87 37 arg 2: size of table (882000) by default;
+#X obj 333 577 bng 15 250 50 0 empty empty done 0 -6 0 8 -262144 -1
+-1;
+#X msg 176 523 sound_file;
+#X text 384 488 Autogain is on(1) by default.;
+#X text 88 62 arg 3: autogain on/off;
+#X obj 164 558 sample/table 2 882000 1;
+#X msg 305 490 autogain 1;
+#X msg 334 524 autogain 0;
+#X obj 165 603 sample/print 1;
+#X obj 134 487 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X text 158 481 on/off;
+#X obj 81 351 sample/display_ 643;
+#X text 80 -30 Description: Loads a sound file without audio glitches
+and generates a sample_id signal.;
+#X obj 81 243 file/parentfolder;
+#X text 193 302 <- This is the sample/table abstraction. It's first
+argument determines that the file will be loaded 16 (2*2*2*2) times
+faster than it's regular playing speed.;
+#X obj 264 269 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 288 269 <- Try with one of your own WAV files!;
+#X text 79 123 This method is the best when loading files as it supports
+all the sample_id features \, but in can't load long files by default
+(this can be bypassed through the second argument).;
+#X text 210 239 <- This simply prepends current patch's path to the
+file names.;
+#X obj 81 306 sample/table 4;
+#X text 67 184 Click these to watch the sample load in the sample/table.
+;
+#X msg 80 207 ../examples/media/sounds/loop0.wav;
+#X msg 360 206 ../examples/media/sounds/loop1.wav;
+#X text 201 450 -- MORE MESSAGES --;
+#X text 85 15 arg 1: power of 2 quick loading. So 4 = 16 times faster
+;
+#X connect 3 0 6 0;
+#X connect 6 0 9 0;
+#X connect 6 1 2 0;
+#X connect 7 0 6 1;
+#X connect 8 0 6 1;
+#X connect 10 0 6 0;
+#X connect 14 0 20 0;
+#X connect 16 0 20 0;
+#X connect 20 0 12 0;
+#X connect 22 0 14 0;
+#X connect 23 0 14 0;

@@ -1,0 +1,82 @@
+#N struct 1655preview float x float y float p float h;
+#N canvas 1343 231 801 708 10;
+#X obj -262 477 dac~;
+#X obj -171 472 gui/snap~;
+#X obj -263 158 sample/table 2 882000 1;
+#X msg -223 403 1;
+#X msg -253 403 0;
+#X msg -194 403 -1;
+#X obj -263 450 sample/groove~;
+#X msg -164 403 autoplay 1;
+#X text 45 215 sample/groove~ can not play a loop that wraps back to
+the beginning of the sample.;
+#X text -153 442 You can send a signal to sample/groove~'s third inlet
+to modulate the playback rate.;
+#X text -73 494 The third outlet displays the loops progress.;
+#X text 43 295 <- Click and drag up and down to change the playback
+region.;
+#X obj -164 379 loadbang;
+#X obj -292 -37 cnv 1 430 1 empty empty empty 0 -10 0 16 -66577 -66577
+0;
+#X obj -292 -130 cnv 15 430 20 empty empty empty 20 12 0 14 -216438
+-66577 0;
+#X obj -292 -109 cnv 1 430 1 empty empty empty 4 -10 2 12 -66577 -1
+0;
+#X obj -292 -130 cnv 1 430 1 empty empty empty 0 -10 0 16 -66577 -66577
+0;
+#X text -278 -82 Description: Groove a sample.;
+#X text -279 -67 Comments: Wraps xgroove~ from the xsample library
+;
+#X text -2 -126 Version: 2007-01-11;
+#X text -291 -127 :: sample/groove ::;
+#X obj -107 179 bng 15 250 50 0 empty empty done 21 7 0 10 -195568
+-262144 -1;
+#X obj -168 491 hsl 89 22 0 1 0 0 empty empty empty -2 -8 0 8 -33289
+-262144 -33289 3001 1;
+#X msg -21 402 speed \$1;
+#X msg -81 403 mode \$1;
+#X msg 45 402 crossfade \$1;
+#X msg -87 133 autogain \$1;
+#X obj -71 104 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X text -62 352 >;
+#X text -62 369 >>;
+#X text -62 384 <>;
+#X obj -81 353 vradio 15 1 0 3 empty empty empty 0 -8 0 8 -195568 -262144
+-1 0;
+#X obj -18 377 hsl 50 22 -10 10 0 0 empty empty empty -2 -8 0 8 -33289
+-262144 -33289 0 1;
+#X obj 48 377 hsl 50 22 0 2000 0 0 empty empty empty -2 -8 0 8 -33289
+-262144 -33289 0 1;
+#X obj -263 202 sample/display_;
+#X obj -263 295 sample/region_;
+#X text -278 -26 WARNING: This abstraction requires the xsample library.
+;
+#X text -279 -96 Flags: sample_id optional;
+#X obj -265 57 file/parentfolder;
+#X msg -265 36 ../examples/media/sounds/loop0.wav;
+#X msg -139 61 ../examples/media/sounds/loop1.wav;
+#X connect 1 0 22 0;
+#X connect 2 0 34 0;
+#X connect 2 1 21 0;
+#X connect 3 0 6 1;
+#X connect 4 0 6 1;
+#X connect 5 0 6 1;
+#X connect 6 0 0 0;
+#X connect 6 1 0 1;
+#X connect 6 2 1 0;
+#X connect 7 0 6 1;
+#X connect 12 0 7 0;
+#X connect 23 0 6 1;
+#X connect 24 0 6 1;
+#X connect 25 0 6 1;
+#X connect 26 0 2 1;
+#X connect 27 0 26 0;
+#X connect 31 0 24 0;
+#X connect 32 0 23 0;
+#X connect 33 0 25 0;
+#X connect 34 0 35 0;
+#X connect 35 0 6 0;
+#X connect 38 0 2 0;
+#X connect 39 0 38 0;
+#X connect 40 0 38 0;

@@ -1,0 +1,5 @@
+#N canvas 47 188 683 305 12;
+#X text 69 73 Description: same as a loadbang.;
+#X obj 169 138 init/lb;
+#X obj 169 171 print lb;
+#X connect 1 0 2 0;

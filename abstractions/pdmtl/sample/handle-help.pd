@@ -1,0 +1,46 @@
+#N canvas 1414 180 830 614 10;
+#X obj 22 238 sample/handle;
+#X floatatom 50 437 5 0 0 1 sample_status - -;
+#X text 21 487 Sample status codes:;
+#X text 21 519 1 = ready;
+#X text 18 535 -1 = empty/not connected/not ready;
+#X floatatom 166 372 5 0 0 1 loading/recording_percent - -;
+#X obj 108 264 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 21 504 0 = filling(loading/recording);
+#X msg 65 179 frames \, filename \, channels \, samplerate \, name
+\, start \, length \, table_id \, preview_id \, gain \, ...;
+#X obj 22 460 route frames filename channels samplerate ...;
+#X obj 79 348 route bang;
+#X obj 79 371 bng 15 250 50 0 empty empty force_update 20 6 0 8 -262144
+-1 -1;
+#X text 440 177 <-Get a sample's property. If you want to get many
+properties \, separate properties by spaces not commas.;
+#X text 127 262 Bangs when the sample_id changes (the new status will
+automatically be checked). This a post bang \, meaning \, it will output
+after the new state has been output. No use has been found yet.;
+#X obj 21 26 cnv 15 600 56 empty empty sample/handle 0 -10 0 16 -33289
+-66577 0;
+#X obj 22 30 cnv 15 598 50 empty empty empty 20 12 0 14 -241404 -66577
+0;
+#X text 26 62 Author: Thomas Ouellet Fredericks;
+#X msg 108 215 bounds (start) (length);
+#X text 279 215 <- This is a special message to change the start and
+length properties of a sample.;
+#X obj 79 318 route %;
+#X text 493 10 Version: 2007-1-11;
+#X text 27 32 Description: Interconnects "sample_id" abstractions.
+;
+#X text 26 47 Flags: internal sample_id;
+#X text 27 93 WARNING: This is an abstraction to help the development
+of sample_id abstractions. It will be further documented in pdmtls
+next release).;
+#X connect 0 0 9 0;
+#X connect 0 1 1 0;
+#X connect 0 2 19 0;
+#X connect 0 3 6 0;
+#X connect 8 0 0 1;
+#X connect 10 0 11 0;
+#X connect 10 1 5 0;
+#X connect 17 0 0 2;
+#X connect 19 0 10 0;

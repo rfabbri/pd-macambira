@@ -1,0 +1,11 @@
+#N canvas 230 214 450 300 10;
+#X text 89 80 Comments: Wraps zexy's drip.;
+#X text 84 51 Description: Unfolds a list into it's individual elements.
+;
+#X obj 106 172 list/unfold;
+#X obj 106 231 print;
+#X msg 109 120 list a short list;
+#X msg 196 146 1 84 32 3;
+#X connect 2 0 3 0;
+#X connect 4 0 2 0;
+#X connect 5 0 2 0;
