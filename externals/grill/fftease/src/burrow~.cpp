@@ -43,7 +43,7 @@ private:
 	FLEXT_ATTRVAR_B(_invert)
 };
 
-FLEXT_LIB_DSP_V("fftease, burrow~",burrow)
+FLEXT_LIB_DSP_V("burrow~",burrow)
 
 
 V burrow::setup(t_classid c)

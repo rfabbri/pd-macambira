@@ -27,7 +27,7 @@ protected:
 	BL _qual;
 };
 
-FLEXT_LIB_DSP_V("fftease, shapee~",shapee)
+FLEXT_LIB_DSP_V("shapee~",shapee)
 
 
 shapee::shapee(I argc,const t_atom *argv):

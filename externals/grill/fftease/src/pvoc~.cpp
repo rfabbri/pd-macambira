@@ -43,7 +43,7 @@ private:
 	FLEXT_ATTRVAR_B(_invert)
 };
 
-FLEXT_LIB_DSP_V("fftease, pvoc~",pvoc)
+FLEXT_LIB_DSP_V("pvoc~",pvoc)
 
 
 V pvoc::setup(t_classid c)

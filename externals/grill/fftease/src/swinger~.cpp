@@ -30,7 +30,7 @@ protected:
 	virtual V Transform(I n,S *const *in);
 };
 
-FLEXT_LIB_DSP_V("fftease, swinger~",swinger)
+FLEXT_LIB_DSP_V("swinger~",swinger)
 
 
 swinger::swinger(I argc,const t_atom *argv):

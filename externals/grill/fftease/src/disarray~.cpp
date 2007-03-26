@@ -46,7 +46,7 @@ private:
 	FLEXT_ATTRVAR_I(_shuffle_count)
 };
 
-FLEXT_LIB_DSP_V("fftease, disarray~",disarray)
+FLEXT_LIB_DSP_V("disarray~",disarray)
 
 
 V disarray::setup(t_classid c)

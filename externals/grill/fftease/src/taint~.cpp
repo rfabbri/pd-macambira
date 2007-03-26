@@ -37,7 +37,7 @@ private:
 	FLEXT_ATTRVAR_B(_invert)
 };
 
-FLEXT_LIB_DSP_V("fftease, taint~",taint)
+FLEXT_LIB_DSP_V("taint~",taint)
 
 
 V taint::setup(t_classid c)

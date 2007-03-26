@@ -35,7 +35,7 @@ private:
 	FLEXT_ATTRVAR_F(_threshMult)
 };
 
-FLEXT_LIB_DSP_V("fftease, ether~",ether)
+FLEXT_LIB_DSP_V("ether~",ether)
 
 
 V ether::setup(t_classid c)

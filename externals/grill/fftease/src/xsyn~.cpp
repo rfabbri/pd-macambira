@@ -24,7 +24,7 @@ protected:
 	virtual V Transform(I n,S *const *in);
 };
 
-FLEXT_LIB_DSP("fftease, xsyn~",xsyn)
+FLEXT_LIB_DSP("xsyn~",xsyn)
 
 
 xsyn::xsyn():

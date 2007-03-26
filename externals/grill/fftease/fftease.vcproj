@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\programme\audio\pd\src,f:\prog\max\flext\source"
+				AdditionalIncludeDirectories="c:\programme\audio\pd\src,..\flext\source"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
@@ -39,11 +39,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pd.lib flext_d-pdwin.lib"
+				AdditionalDependencies="pd.lib"
 				OutputFile=".\pd-msvc/d/fftease.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="c:\programme\audio\pd\bin,f:\prog\max\flext\pd-msvc"
+				AdditionalLibraryDirectories="c:\programme\audio\pd\bin,c:\data\pdmax\flext\pd-msvc"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\pd-msvc/d/fftease.pdb"
 				ImportLibrary=".\pd-msvc/d/fftease.lib"

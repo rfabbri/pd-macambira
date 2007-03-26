@@ -24,7 +24,7 @@ protected:
 	virtual V Transform(I n,S *const *in);
 };
 
-FLEXT_LIB_DSP("fftease, drown~ denude~",drown)
+FLEXT_LIB_DSP("drown~ denude~",drown)
 
 
 drown::drown():

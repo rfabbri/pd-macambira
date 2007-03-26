@@ -37,7 +37,7 @@ private:
 	FLEXT_ATTRVAR_B(memory)
 };
 
-FLEXT_LIB_DSP("fftease, cross~",cross)
+FLEXT_LIB_DSP("cross~",cross)
 
 
 V cross::setup(t_classid c)

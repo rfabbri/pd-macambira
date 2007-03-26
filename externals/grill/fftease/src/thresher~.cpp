@@ -38,7 +38,7 @@ private:
 	static V setup(t_classid c);
 };
 
-FLEXT_LIB_DSP("fftease, thresher~ nacho~",thresher)
+FLEXT_LIB_DSP("thresher~ nacho~",thresher)
 
 
 V thresher::setup(t_classid )

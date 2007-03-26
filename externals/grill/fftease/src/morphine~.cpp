@@ -41,7 +41,7 @@ private:
 	FLEXT_ATTRVAR_F(_index)
 };
 
-FLEXT_LIB_DSP_V("fftease, morphine~",morphine)
+FLEXT_LIB_DSP_V("morphine~",morphine)
 
 
 V morphine::setup(t_classid c)

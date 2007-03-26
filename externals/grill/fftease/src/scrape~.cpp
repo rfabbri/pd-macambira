@@ -52,7 +52,7 @@ private:
 	FLEXT_CALLSET_F(ms_thresh2)
 };
 
-FLEXT_LIB_DSP_V("fftease, scrape~",scrape)
+FLEXT_LIB_DSP_V("scrape~",scrape)
 
 
 V scrape::setup(t_classid c)

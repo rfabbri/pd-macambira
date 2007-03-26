@@ -50,7 +50,7 @@ private:
 	FLEXT_CALLSET_I(ms_teeth)
 };
 
-FLEXT_LIB_DSP_V("fftease, dentist~",dentist)
+FLEXT_LIB_DSP_V("dentist~",dentist)
 
 
 V dentist::setup(t_classid c)

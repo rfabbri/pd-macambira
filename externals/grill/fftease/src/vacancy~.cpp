@@ -40,7 +40,7 @@ private:
 	FLEXT_ATTRVAR_B(_swapPhase)
 };
 
-FLEXT_LIB_DSP_V("fftease, vacancy~",vacancy)
+FLEXT_LIB_DSP_V("vacancy~",vacancy)
 
 
 V vacancy::setup(t_classid c)
