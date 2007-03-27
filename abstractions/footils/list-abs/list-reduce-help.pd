@@ -1,0 +1,81 @@
+#N canvas 407 86 648 705 10;
+#X floatatom 128 311 5 0 0 0 - - -;
+#X msg 137 151 bang;
+#X obj 179 306 print TWO_ITEMS;
+#X obj 107 336 print RESULT;
+#X msg 144 175 1;
+#X msg 152 221 1 2 3;
+#X msg 149 197 1 2;
+#X msg 155 244 1 2 3 4;
+#X obj 196 273 *;
+#X text 182 152 redo last list;
+#X text 73 22 [list-reduce];
+#X text 188 176 list with only one item will pass unchanged.;
+#X symbolatom 101 451 15 0 0 0 - - -;
+#X msg 196 420 \$2-\$1;
+#X obj 103 587 list-reduce;
+#X msg 103 560 1 2 3 4 5 6 7 8;
+#X msg 198 586 \$2 \$1;
+#N canvas 209 220 605 355 more-info 0;
+#X msg 84 101 bang;
+#X obj 126 236 print TWO_ITEMS;
+#X obj 54 266 print RESULT;
+#X msg 91 125 1;
+#X msg 99 171 1 2 3;
+#X msg 96 147 1 2;
+#X text 36 42 If nothing is connected to the right inlet \, [list-reduce]
+will act like the left and right outlets of [list split 2] reversed.
+;
+#X obj 54 203 list-reduce;
+#X msg 342 100 bang;
+#X obj 385 244 print TWO_ITEMS;
+#X obj 312 265 print RESULT;
+#X msg 349 124 1;
+#X msg 357 170 1 2 3;
+#X msg 354 146 1 2;
+#X obj 312 202 list split 2;
+#X text 178 202 equal to this:;
+#X connect 0 0 7 0;
+#X connect 3 0 7 0;
+#X connect 4 0 7 0;
+#X connect 5 0 7 0;
+#X connect 7 0 2 0;
+#X connect 7 1 1 0;
+#X connect 8 0 14 0;
+#X connect 11 0 14 0;
+#X connect 12 0 14 0;
+#X connect 13 0 14 0;
+#X connect 14 0 9 0;
+#X connect 14 2 10 0;
+#X restore 354 422 pd more-info;
+#X obj 103 615 print REVERSE?;
+#X obj 101 421 list-reduce;
+#X text 93 64 [list-reduce] returns a single value constructed by calling
+the user-defined objects connected to the right outlet on the first
+two items of the sequence \, then on the result (if it comes in through
+the right inlet) and the next item of the original list \, and so on.
+;
+#X obj 107 273 list-reduce;
+#X text 100 485 It's important \, that there will be only one element
+coming back in through the right inlet. Lists with more than one item
+will be shortened automatically to avoid stack overflows.;
+#X text 252 585 <-- two items == bad idea;
+#X msg 101 394 a b c d e;
+#X connect 1 0 21 0;
+#X connect 4 0 21 0;
+#X connect 5 0 21 0;
+#X connect 6 0 21 0;
+#X connect 7 0 21 0;
+#X connect 8 0 21 1;
+#X connect 13 0 19 1;
+#X connect 14 0 18 0;
+#X connect 14 1 16 0;
+#X connect 15 0 14 0;
+#X connect 16 0 14 1;
+#X connect 19 0 12 0;
+#X connect 19 1 13 0;
+#X connect 21 0 0 0;
+#X connect 21 0 3 0;
+#X connect 21 1 2 0;
+#X connect 21 1 8 0;
+#X connect 24 0 19 0;
