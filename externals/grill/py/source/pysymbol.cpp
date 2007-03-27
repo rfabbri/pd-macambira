@@ -2,7 +2,7 @@
 
 py/pyext - python script object for PD and Max/MSP
 
-Copyright (c)2002-2005 Thomas Grill (gr@grrrr.org)
+Copyright (c)2002-2007 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -62,14 +62,19 @@ static PyObject *symbol_richcompare(PyObject *a,PyObject *b,int cmp)
     if(pySymbol_Check(a) && pySymbol_Check(b)) {
         const t_symbol *asym = pySymbol_AS_SYMBOL(a);
         const t_symbol *bsym = pySymbol_AS_SYMBOL(b);
+
+		int res = asym == bsym?0:strcmp(flext::GetString(asym),flext::GetString(bsym));
+		
         bool ret;
         switch(cmp) {
-            case Py_LT: ret = asym < bsym; break;
-            case Py_LE: ret = asym <= bsym; break;
-            case Py_EQ: ret = asym == bsym; break;
-            case Py_NE: ret = asym != bsym; break;
-            case Py_GT: ret = asym > bsym; break;
-            case Py_GE: ret = asym >= bsym; break;
+            case Py_LT: ret = res < 0; break;
+            case Py_LE: ret = res <= 0; break;
+            case Py_EQ: ret = res == 0; break;
+            case Py_NE: ret = res != 0; break;
+            case Py_GE: ret = res >= 0; break;
+            case Py_GT: ret = res > 0; break;
+			default:
+				FLEXT_ASSERT(false);
         }
         return PyBool_FromLong(ret);
     }
