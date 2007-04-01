@@ -124,17 +124,17 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs hidio iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem16 earplug
+LIB_TARGETS = boids bsaylor creb cxc cyclone deprecated ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib jasch_lib loaders mapping markex maxlib mjlib motex mrpeach msd oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy pdcontainer adaptive iem_delay iem_roomsim iem_spec2 iem_tab flashserver iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem16 earplug
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid wiiremote
+    LIB_TARGETS += hid hidio wiiremote
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip hdspm_mixer
+    LIB_TARGETS += hid hidio pdp pidip hdspm_mixer
   endif
 endif
 
@@ -1834,13 +1834,13 @@ $(externals_src)/pidip/Makefile
 
 pidip: $(externals_src)/pidip/pidip.$(EXTENSION)
 
-pidip_install:
+pidip_install: pidip
 	install -d $(objectsdir)/$(PIDIP_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PIDIP_NAME) \
 		--author "Yves Degoyon" \
 		--description "PiDiP is Definitely in Pieces" \
 		--license "GNU GPLv2"
-	-install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)/$(PIDIP_NAME)
+	install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)/$(PIDIP_NAME)
 	install -d $(helpdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)/$(PIDIP_NAME)
 	install -d $(examplesdir)/$(PIDIP_NAME)
