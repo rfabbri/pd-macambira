@@ -22,7 +22,7 @@ CXXFLAGS = $(CFLAGS)
 
 LIBS = -lc -lm 
 #LIBS = -lpthread -lm -lc 
-SOURCES = ENV.c ascseq.c ascwave.c bangfilt.c bangfilt2.c binshift.c cx.c ixprint.c mean.c microtime.c proc.c randomix.c reson.c sigdelta.c split.c
+SOURCES = ENV.c ascseq.c ascwave.c bangfilt.c bangfilt2.c binshift.c cx.c ixprint.c mean.c utime.c proc.c randomix.c reson~.c sigdelta.c split.c
 TARGETS = $(SOURCES:.c=.$(EXT)) 
 
 # all: $(TARGETS) 

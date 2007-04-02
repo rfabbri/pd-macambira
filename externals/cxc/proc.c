@@ -218,6 +218,5 @@ void proc_setup(void)
     //class_addmethod(proc_class, (t_method)proc_getenv, gensym("getenv"), A_SYMBOL);
     //class_addmethod(proc_class, (t_method)proc_setenv, gensym("setenv"), A_SYMBOL, A_SYMBOL);
     class_addfloat(proc_class, proc_float);
-    class_sethelpsymbol(proc_class, gensym("proc.pd"));
 }
 

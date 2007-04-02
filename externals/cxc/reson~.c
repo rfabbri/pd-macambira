@@ -143,7 +143,7 @@ void *sigreson_new(t_floatarg f,  t_floatarg g)
 	return (x);
 }
 
-void reson_setup()
+void reson_tilde_setup()
 {
 	sigreson_class = class_new(gensym("reson~"), (t_newmethod)sigreson_new,
 			(t_method)sigreson_ff, sizeof(t_sigreson), 0,
