@@ -1,4 +1,4 @@
-#N canvas 177 113 498 447 10;
+#N canvas 87 98 472 431 10;
 #X obj 5 2 cnv 15 450 20 empty empty [curve] 2 11 1 18 -233017 -66577
 0;
 #X msg 422 3 pddp;
@@ -16,7 +16,7 @@
 #X array \$0-curve 200 float 0;
 #X coords 0 1 199 0 200 200 1;
 #X restore 254 92 graph;
-#N canvas 786 75 423 413 draw_array 0;
+#N canvas 786 75 427 417 draw_array 0;
 #X msg 54 82 bang;
 #X obj 54 103 until;
 #X text 85 82 start;
@@ -51,21 +51,21 @@
 #X connect 13 0 15 0;
 #X connect 15 0 8 0;
 #X restore 127 207 pd draw_array;
-#X text 17 39 This object maps the input range to a exponential curve
-\, the inverse of a logarithmic curve.;
 #X text 286 301 related objects:;
 #X obj 342 320 curve_power;
 #X obj 259 338 curve_exp;
 #X obj 342 338 curve_log;
 #X obj 117 166 hsl 128 15 -1 1 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 12700 0;
+-1 -1 5300 0;
 #X floatatom 192 184 7 0 0 0 - #0-to-numbox -;
 #X obj 259 319 sinusoid;
 #X obj 25 207 mapping/curve;
 #X obj 262 359 pddp/open mapping-about;
-#X connect 5 0 19 0;
+#X text 17 39 This object generates a curve based on a -1 to 1 argument
+range.;
+#X connect 5 0 18 0;
 #X connect 6 0 7 0;
 #X connect 8 0 5 0;
-#X connect 16 0 10 0;
-#X connect 16 0 19 1;
-#X connect 19 0 6 0;
+#X connect 15 0 10 0;
+#X connect 15 0 18 1;
+#X connect 18 0 6 0;

@@ -1,4 +1,12 @@
 ______________________________________________________________________________
+= curves
+
+review all curves in accordance with the paper
+
+- [curve_table] or [curve_graph]?
+
+
+______________________________________________________________________________
 = spread/segment/seglet
 
 Make [collect] and [distribute], which are like [segment] and [desegment].
