@@ -7,7 +7,7 @@
 
 #include "m_pd.h"
 #include <math.h>
-//#include <stdlib.h>
+#include <stdlib.h>
 
 
 /* cx.mean: calculate the mean from a table */
