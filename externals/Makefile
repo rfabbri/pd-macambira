@@ -1225,7 +1225,7 @@ iem16_clean:
 # IEMLIB
 IEMLIB_NAME=iemlib
 # omit the lib files and iem_mp3 (for patent reasons :( )
-IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/iemlib?/src/*.c) $(wildcard $(externals_src)/iemlib/iemlib_t3_lib/src/t3_*.c)  $(wildcard $(externals_src)/iemlib/alias/*.c)
+IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/iemlib1/src/*[^1].c) $(wildcard $(externals_src)/iemlib/iemlib2/src/*[^2].c)  $(wildcard $(externals_src)/iemlib/iemlib_t3_lib/src/t3_*.c)  $(wildcard $(externals_src)/iemlib/alias/*.c)
 iemlib: $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
 
 iemlib_install: iemlib
