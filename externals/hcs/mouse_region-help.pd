@@ -1,0 +1,22 @@
+#N canvas 227 186 598 404 10;
+#X obj 33 173 pointer_position;
+#X obj 33 145 tgl 15 1 empty empty empty 0 -6 0 10 -262144 -1 -1 1
+1;
+#X msg 52 144 bang;
+#X obj 342 136 cnv 15 100 60 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 48 84 keyup;
+#X obj 48 105 select 32;
+#X text 124 41 give mouse coordinates only after clicking and dragging
+in a region.;
+#X obj 145 295 unpack float float;
+#X floatatom 144 325 5 0 0 0 - - -;
+#X floatatom 252 326 5 0 0 0 - - -;
+#X obj 146 248 mouse_region 342 443 137 194;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 4 0 5 0;
+#X connect 5 0 2 0;
+#X connect 7 0 8 0;
+#X connect 7 1 9 0;
+#X connect 10 0 7 0;
