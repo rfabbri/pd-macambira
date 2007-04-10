@@ -65,9 +65,8 @@ union tabfudge
     int32 tf_i[2];
 };
 
-static t_class *sqosc_class, *scalarsqosc_class;
+static t_class *sqosc_class;
 
-static float *sqosc_table;
 /* COSTABSIZE is 512 in m_pd.h, we start with that... */
 #define LOGSQOSCTABSIZE 9
 #define SQOSCTABSIZE 512
@@ -86,7 +85,6 @@ typedef struct _sqosc
     int       x_pulse_ended; /* nonzero if pulse has finished */
 } t_sqosc;
 
-static void sqosc_maketable(void);
 void sqosc_tilde_setup(void);
 static void sqosc_ft1(t_sqosc *x, t_float f);
 static void sqosc_pw(t_sqosc *x, t_float pw);
@@ -94,26 +92,6 @@ static void sqosc_dsp(t_sqosc *x, t_signal **sp);
 static t_int *sqosc_perform(t_int *w);
 static void *sqosc_new(t_floatarg f, t_floatarg pw, t_float bw);
 
-static void sqosc_maketable(void)
-{
-    int    i;
-    float  *fp, phase, phsinc = (2. * 3.14159) / SQOSCTABSIZE; 
-    union  tabfudge tf;
-
-    if (sqosc_table) return;
-    sqosc_table = (float *)getbytes(sizeof(float) * (SQOSCTABSIZE+1));
-    for (i = SQOSCTABSIZE + 1, fp = sqosc_table, phase = 0; i--;
-        fp++, phase += phsinc)
-    {
-        *fp = cos(phase);
-    }
-    /* here we check at startup whether the byte alignment
-        is as we declared it.  If not, the code has to be
-        recompiled the other way. */
-    tf.tf_d = UNITBIT32 + 0.5;
-    if ((unsigned)tf.tf_i[LOWOFFSET] != 0x80000000)
-        bug("cos~: unexpected machine alignment");
-}
 
 static void *sqosc_new(t_floatarg f, t_floatarg pw, t_floatarg bw)
 {
@@ -220,7 +198,7 @@ static t_int *sqosc_perform(t_int *w)
     t_float         *out = (t_float *)(w[3]);
     t_float         sample;
     int             n = (int)(w[4]);
-    float           *tab = sqosc_table, *addr, f1, f2, frac;
+    float           *addr, f1, f2, frac;
     int             index;  
     double          dphase = x->x_phase + UNITBIT32;
     int             normhipart;
@@ -340,7 +318,7 @@ static t_int *sqosc_perform(t_int *w)
     }
     else f2 = -twothirds;
     sample = f1 + frac * (f2 - f1); /* the final sample */
-    if (_finite(sample))*out++ = sample;
+    if (finite(sample))*out++ = sample;
     else *out++ = 0.0;
 
     tf.tf_d = UNITBIT32 * SQOSCTABSIZE; /* this just changes the exponent if the table size is a power of 2 */
@@ -379,7 +357,6 @@ void sqosc_tilde_setup(void)
     class_addmethod(sqosc_class, (t_method)sqosc_ft1, gensym("ft1"), A_FLOAT, 0);
     class_addmethod(sqosc_class, (t_method)sqosc_pw, gensym("pw"), A_FLOAT, 0);
 
-    sqosc_maketable(); /* make the same table as cos_table */
 }
 
 
