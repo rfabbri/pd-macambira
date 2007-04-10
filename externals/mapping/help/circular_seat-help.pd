@@ -1,4 +1,4 @@
-#N canvas 107 47 482 425 10;
+#N canvas 107 47 486 429 10;
 #X obj 5 2 cnv 15 450 20 empty empty circular_seat 2 11 1 18 -233017
 -66577 0;
 #X msg 422 3 pddp;
@@ -106,10 +106,11 @@
 #X obj 262 308 send \$0-x;
 #X obj 404 307 send \$0-y;
 #X obj 111 167 hsl 50 15 0 1 0 0 \$0-x-slider \$0-x-slider-receive
-x 5 9 0 11 -232576 -1 -1 2450 0;
+x 5 9 0 11 -232576 -1 -1 0 0;
 #X floatatom 117 187 7 0 0 0 - - -;
 #X text 17 39 This object curves the input range using a double-circular
 seat controlled by one parameter.;
+#X text 15 71 (click in the gray area to play);
 #X connect 4 0 11 0;
 #X connect 5 0 6 0;
 #X connect 7 0 4 0;

@@ -1,14 +1,14 @@
-#N canvas 709 123 506 437 10;
-#X obj 5 2 cnv 15 450 20 empty empty exponential_seat 2 11 1 18 -233017
+#N canvas 453 22 486 429 10;
+#X obj 5 2 cnv 15 450 20 empty empty circular_sigmoid 2 11 1 18 -233017
 -66577 0;
 #X msg 422 3 pddp;
-#X text 283 392 released under the GNU GPL;
-#X text 158 361 For more info:;
-#X floatatom 25 127 8 0 0 0 - - -;
-#X floatatom 25 288 8 0 0 0 - - -;
-#X obj 28 305 hsl 200 20 0 1 0 0 empty empty curved_output 22 11 1
+#X text 273 392 released under the GNU GPL;
+#X text 148 361 For more info:;
+#X floatatom 15 127 8 0 0 0 - - -;
+#X floatatom 15 288 8 0 0 0 - - -;
+#X obj 18 305 hsl 200 20 0 1 0 0 empty empty curved_output 22 11 1
 12 -262144 -1 -1 0 1;
-#X obj 28 101 hsl 200 20 0 1 0 0 empty empty raw_input 22 11 1 12 -261681
+#X obj 18 101 hsl 200 20 0 1 0 0 empty empty raw_input 22 11 1 12 -261681
 -1 -1 0 1;
 #N canvas 273 69 470 403 draw_array 0;
 #X msg 54 82 bang;
@@ -76,7 +76,7 @@
 #X restore 265 348 pd receive from gcanvas;
 #X obj 138 9 receive \$0-x-slider;
 #X obj 54 108 speedlim 100;
-#X obj 53 313 exponential_seat;
+#X obj 53 313 circular_sigmoid;
 #X connect 0 0 15 0;
 #X connect 1 0 3 0;
 #X connect 3 0 4 0;
@@ -94,21 +94,21 @@
 #X connect 14 0 9 0;
 #X connect 15 0 1 0;
 #X connect 16 0 8 0;
-#X restore 377 71 pd draw_array;
-#X obj 262 359 pddp/open mapping-about;
-#X text 16 391 (C) Copyright 2007 Free Software Foundation;
-#X obj 25 217 exponential_seat;
-#X obj 272 103 gcanvas 200 200;
+#X restore 367 71 pd draw_array;
+#X obj 252 359 pddp/open mapping-about;
+#X text 6 391 (C) Copyright 2007 Free Software Foundation;
+#X obj 15 217 circular_sigmoid;
+#X obj 262 103 gcanvas 200 200;
 #N canvas 0 22 450 300 graph1 0;
 #X array \$0-curve 200 float 0;
 #X coords 0 1 199 0 200 200 1;
-#X restore 272 103 graph;
-#X obj 272 308 send \$0-x;
-#X obj 414 307 send \$0-y;
-#X obj 121 167 hsl 50 15 0 1 0 0 \$0-x-slider \$0-x-slider-receive
-x 5 9 0 11 -232576 -1 -1 0 0;
-#X floatatom 127 187 7 0 0 0 - - -;
-#X text 17 39 This object curves the input range using a double-exponential
+#X restore 262 103 graph;
+#X obj 262 308 send \$0-x;
+#X obj 404 307 send \$0-y;
+#X obj 111 167 hsl 50 15 0 1 0 0 \$0-x-slider \$0-x-slider-receive
+x 5 9 0 11 -232576 -1 -1 1029 0;
+#X floatatom 117 187 7 0 0 0 - - -;
+#X text 17 39 This object curves the input range using a double-circular
 seat controlled by one parameter.;
 #X text 15 71 (click in the gray area to play);
 #X connect 4 0 11 0;
