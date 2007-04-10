@@ -7,6 +7,10 @@
 # pragma warning(disable:4786)    // identifier was truncated in debug info
 #endif
 
+#if defined(__WIN32__) && !defined(_WINDOWS)
+# define _WINDOWS
+#endif
+
 #ifndef MAKEDEPEND
 # include <string>
 #endif
