@@ -1,4 +1,4 @@
-#N canvas 167 129 952 593 10;
+#N canvas 167 129 956 597 10;
 #X obj 241 386 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
 0;
 #X obj 241 355 cnv 15 78 20 empty empty 78x20 2 12 0 9 -128992 -66577
@@ -29,9 +29,9 @@
 #X text 17 314 these represent the size of this message box:;
 #X msg 346 313 courier10;
 #X text 15 1 the fonts line up on these platforms:;
-#X obj 139 35 cnv 15 100 60 empty empty courier10 20 12 0 10 -233017
+#X obj 139 35 cnv 15 100 60 empty empty courier10 20 12 0 9 -233017
 -66577 0;
-#X msg 157 38 courier10;
+#X msg 157 41 courier10;
 #X obj 103 389 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
 0;
 #X text 91 334 0.39.2-extended-RC1;
@@ -65,7 +65,6 @@
 #X text 176 284 10pt;
 #X text 656 129 9 pt;
 #X text 492 205 6 pt (closest);
-#X text 141 78 10 pt (closest);
 #X obj 20 35 cnv 15 100 60 empty empty courier10 20 12 0 12 -233017
 -66577 0;
 #X msg 39 39 courier10;
@@ -89,3 +88,6 @@
 #X msg 40 106 courier10;
 #X text 48 144 12 pt;
 #X text 41 131 0.39-2;
+#X text 141 78 9 pt (closest);
+#X obj 810 500 cnv 6 53 6 empty empty 53x6 2 15 0 11 -128992 -66577
+0;
