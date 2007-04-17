@@ -12,14 +12,14 @@
 0;
 #X obj 811 387 cnv 15 60 15 empty empty 60x15 2 12 0 9 -128992 -66577
 0;
-#X obj 380 92 cnv 15 100 60 empty empty courier6 20 12 0 6 -233017
+#X obj 490 162 cnv 15 100 60 empty empty courier6 20 12 0 6 -233017
 -66577 0;
-#X msg 399 96 courier10;
-#X text 384 113 Windows/0.40-2;
-#X obj 380 162 cnv 15 100 60 empty empty courier9 20 12 0 9 -233017
+#X msg 509 166 courier10;
+#X text 494 183 Windows/0.40-2;
+#X obj 620 92 cnv 15 100 60 empty empty courier9 20 12 0 9 -233017
 -66577 0;
-#X msg 400 164 courier10;
-#X text 381 183 Windows/0.39.2-extended-test7;
+#X msg 640 94 courier10;
+#X text 621 113 Windows/0.39.2-extended-test7;
 #X obj 611 357 cnv 15 60 17 empty empty 60x17 2 12 0 9 -128992 -66577
 0;
 #X obj 711 357 cnv 15 60 17 empty empty 60x17 2 12 0 9 -128992 -66577
@@ -27,12 +27,12 @@
 #X obj 241 416 cnv 15 87 19 empty empty 87x19 2 12 0 9 -128992 -66577
 0;
 #X text 17 314 these represent the size of this message box:;
-#X msg 336 313 courier10;
+#X msg 346 313 courier10;
 #X text 15 1 the fonts line up on these platforms:;
-#X obj 19 25 cnv 15 100 60 empty empty courier10 20 12 0 10 -233017
+#X obj 139 35 cnv 15 100 60 empty empty courier10 20 12 0 10 -233017
 -66577 0;
-#X msg 37 28 courier10;
-#X obj 96 387 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
+#X msg 157 38 courier10;
+#X obj 103 389 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
 0;
 #X text 91 334 0.39.2-extended-RC1;
 #X text 240 335 0.39.2-extended-test7;
@@ -46,11 +46,9 @@
 0;
 #X text 524 335 0.38-4;
 #X text 18 444 these represent the size of this comment:;
-#X obj 20 230 cnv 15 100 60 empty empty courier10 20 12 0 10 -233017
+#X obj 140 240 cnv 15 100 60 empty empty courier10 20 12 0 10 -233017
 -66577 0;
-#X msg 38 233 courier10;
-#X text 19 54 Mac OS X/devel 0.39-1test1;
-#X text 20 255 Mac OS X/0.39-2-extended-rc1;
+#X msg 158 243 courier10;
 #X obj 100 500 cnv 7 52 7 empty empty 52x7 2 15 0 11 -128992 -66577
 0;
 #X text 21 499 Mac OS X;
@@ -60,13 +58,27 @@
 0;
 #X obj 404 500 cnv 7 62 7 empty empty 62x7 2 15 0 11 -128992 -66577
 0;
-#X text 318 444 courier10;
-#X obj 20 160 cnv 15 100 60 empty empty courier10 20 12 0 12 -233017
+#X obj 20 170 cnv 15 100 60 empty empty courier10 20 12 0 12 -233017
 -66577 0;
-#X msg 39 164 courier10;
-#X text 20 189 Mac OS X/0.40-2;
-#X text 47 202 12 pt;
-#X text 56 274 10pt;
-#X text 416 199 9 pt;
-#X text 382 135 6 pt (closest);
-#X text 21 68 10 pt (closest);
+#X msg 39 174 courier10;
+#X text 47 212 12 pt;
+#X text 176 284 10pt;
+#X text 656 129 9 pt;
+#X text 492 205 6 pt (closest);
+#X text 141 78 10 pt (closest);
+#X obj 20 35 cnv 15 100 60 empty empty courier10 20 12 0 12 -233017
+-66577 0;
+#X msg 39 39 courier10;
+#X text 47 77 12 pt;
+#X text 40 64 0.38-4;
+#X text 40 199 0.40-2;
+#X text 139 64 devel 0.39-1test1;
+#X text 140 265 0.39-2-extended-rc1;
+#X text 32 16 ---------- Mac OS X ----------;
+#X obj 524 500 cnv 7 63 8 empty empty 63x8 2 15 0 11 -128992 -66577
+0;
+#X text 351 445 courier10;
+#X text 435 442 ----------------------------------------------------------
+;
+#X text 445 312 ----------------------------------------------------------
+;
