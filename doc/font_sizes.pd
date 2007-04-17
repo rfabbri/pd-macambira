@@ -1,4 +1,4 @@
-#N canvas 167 129 956 597 10;
+#N canvas 68 129 960 601 10;
 #X obj 241 386 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
 0;
 #X obj 241 355 cnv 15 78 20 empty empty 78x20 2 12 0 9 -128992 -66577
@@ -15,7 +15,6 @@
 #X obj 490 162 cnv 15 100 60 empty empty courier6 20 12 0 6 -233017
 -66577 0;
 #X msg 509 166 courier10;
-#X text 494 183 Windows/0.40-2;
 #X obj 620 92 cnv 15 100 60 empty empty courier9 20 12 0 9 -233017
 -66577 0;
 #X msg 640 94 courier10;
@@ -64,7 +63,7 @@
 #X text 47 212 12 pt;
 #X text 176 284 10pt;
 #X text 656 129 9 pt;
-#X text 492 205 6 pt (closest);
+#X text 496 202 6 pt (closest);
 #X obj 20 35 cnv 15 100 60 empty empty courier10 20 12 0 12 -233017
 -66577 0;
 #X msg 39 39 courier10;
@@ -76,7 +75,6 @@
 #X text 32 16 ---------- Mac OS X ----------;
 #X obj 524 500 cnv 7 63 8 empty empty 63x8 2 15 0 11 -128992 -66577
 0;
-#X text 351 445 courier10;
 #X text 435 442 ----------------------------------------------------------
 ;
 #X text 445 312 ----------------------------------------------------------
@@ -90,4 +88,13 @@
 #X text 41 131 0.39-2;
 #X text 141 78 9 pt (closest);
 #X obj 810 500 cnv 6 53 6 empty empty 53x6 2 15 0 11 -128992 -66577
+0;
+#X obj 490 92 cnv 15 100 60 empty empty courier8 20 12 0 8 -233017
+-66577 0;
+#X msg 509 96 courier10;
+#X text 518 113 0.39-2;
+#X text 512 16 ---------- Windows ----------;
+#X text 498 129 8 pt (closest);
+#X text 519 186 0.40-2;
+#X obj 614 470 cnv 5 51 5 empty empty 51x5 2 15 0 11 -128992 -66577
 0;
