@@ -1,4 +1,4 @@
-#N canvas 68 129 960 601 10;
+#N canvas 23 36 964 605 10;
 #X obj 241 386 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
 0;
 #X obj 241 355 cnv 15 78 20 empty empty 78x20 2 12 0 9 -128992 -66577
@@ -12,7 +12,7 @@
 0;
 #X obj 811 387 cnv 15 60 15 empty empty 60x15 2 12 0 9 -128992 -66577
 0;
-#X obj 490 162 cnv 15 100 60 empty empty courier6 20 12 0 6 -233017
+#X obj 490 162 cnv 15 100 60 empty empty courier8 20 12 0 8 -233017
 -66577 0;
 #X msg 509 166 courier10;
 #X obj 620 92 cnv 15 100 60 empty empty courier9 20 12 0 9 -233017
@@ -63,7 +63,6 @@
 #X text 47 212 12 pt;
 #X text 176 284 10pt;
 #X text 656 129 9 pt;
-#X text 496 202 6 pt (closest);
 #X obj 20 35 cnv 15 100 60 empty empty courier10 20 12 0 12 -233017
 -66577 0;
 #X msg 39 39 courier10;
@@ -98,3 +97,7 @@
 #X text 519 186 0.40-2;
 #X obj 614 470 cnv 5 51 5 empty empty 51x5 2 15 0 11 -128992 -66577
 0;
+#X text 496 202 8 pt (closest);
+#X obj 714 470 cnv 5 51 5 empty empty 51x5 2 15 0 11 -128992 -66577
+0;
+#X text 296 443 courier10;
