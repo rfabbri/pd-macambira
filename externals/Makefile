@@ -131,7 +131,7 @@ ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid hidio wiiremote
+    LIB_TARGETS += hid hidio pidip wiiremote
   else
     # GNU/Linux, BSD, IRIX, etc.
     LIB_TARGETS += hid hidio pdp pidip hdspm_mixer
@@ -1800,8 +1800,8 @@ pdp_install: pdp
 	install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)
 #	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)
-	install -d $(helpdir)/$(PDP_NAME)
-	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)/$(PDP_NAME)
+#	install -d $(helpdir)/$(PDP_NAME)
+	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)
 	install -d $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/reference.txt $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/introduction/*.* \
@@ -1835,14 +1835,14 @@ $(externals_src)/pidip/Makefile
 pidip: $(externals_src)/pidip/pidip.$(EXTENSION)
 
 pidip_install: pidip
-	install -d $(objectsdir)/$(PIDIP_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PIDIP_NAME) \
-		--author "Yves Degoyon" \
-		--description "PiDiP is Definitely in Pieces" \
-		--license "GNU GPLv2"
-	install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)/$(PIDIP_NAME)
-	install -d $(helpdir)/$(PIDIP_NAME)
-	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)/$(PIDIP_NAME)
+#	install -d $(objectsdir)/$(PIDIP_NAME)
+#	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PIDIP_NAME) \
+#		--author "Yves Degoyon" \
+#		--description "PiDiP is Definitely in Pieces" \
+#		--license "GNU GPLv2"
+	install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)
+	install -d $(helpdir)
+	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)
 	install -d $(examplesdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/patches/*.* $(examplesdir)/$(PIDIP_NAME)
 #	install -d $(manualsdir)/$(PIDIP_NAME)
