@@ -1,6 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT
+AC_CANONICAL_HOST
 AC_CONFIG_HEADER(include/pidip_config.h)
 
 PDP_PIDIP_VERSION="0.12.20"
@@ -17,6 +18,25 @@ MAGIC_CFLAGS=
 THEORA_LIBS=
 enable_ffmpeg=no
 enable_mpeg4ip=no
+
+# Check for DarwinPorts and/or Fink on Mac OS X/Darwin
+case "$host" in
+  *-darwin* | *-macos10*)
+     if test -d /sw ; then
+       # Fink
+       PATH="/sw/bin:/sw/sbin:$PATH"
+       CFLAGS="$CFLAGS -I/sw/include"
+       CPPFLAGS="$CPPFLAGS -I/sw/include"
+       LDFLAGS="$LDFLAGS -L/sw/lib"
+     elif test -d /opt/local ; then
+       # DarwinPorts
+       PATH="/opt/local/bin:/opt/local/sbin:$PATH"
+       CFLAGS="$CFLAGS -I/opt/local/include"
+       CPPFLAGS="$CPPFLAGS -I/opt/local/include"
+       LDFLAGS="$LDFLAGS -L/opt/local/lib"
+     fi
+  ;;
+esac
 
 AC_ARG_WITH(pdsources, [  --with-pd=PATH          pd source tree])
 if ! test -z "${with_pd}"
