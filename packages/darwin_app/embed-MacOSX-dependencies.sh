@@ -29,9 +29,10 @@ for pd_darwin in `find $PD_APP_CONTENTS -name '*.pd_darwin'`; do
 			echo -e "\t$lib"
 			install -d $PD_APP_LIB
 			install -p /sw/lib/$lib $PD_APP_LIB
+			new_lib=`echo $lib | sed 's|.*/\(.*\.dylib\)|\1|'`
 			# @executable_path starts from Contents/Resources/bin/pd
-			install_name_tool -id @executable_path/../../$LIB_DIR/$lib $PD_APP_LIB/$lib
-			install_name_tool -change /sw/lib/$lib @executable_path/../../$LIB_DIR/$lib $pd_darwin
+			install_name_tool -id @executable_path/../../$LIB_DIR/$new_lib $PD_APP_LIB/$new_lib
+			install_name_tool -change /sw/lib/$lib @executable_path/../../$LIB_DIR/$new_lib $pd_darwin
 		done
 		echo " "
 	fi
@@ -43,14 +44,15 @@ for dylib in $PD_APP_LIB/*.dylib; do
 		echo "`echo $dylib | sed 's|.*/\(.*\.dylib\)|\1|'` is using:"
 		for lib in $LIBS; do
 			echo -e "\t$lib"
-			if [ -e  $PD_APP_LIB/$lib ]; then
-				echo "$PD_APP_LIB/$lib already exists, skipping copy."
+			new_lib=`echo $lib | sed 's|.*/\(.*\.dylib\)|\1|'`
+			if [ -e  $PD_APP_LIB/$new_lib ]; then
+				echo "$PD_APP_LIB/$new_lib already exists, skipping copy."
 			else
 				install -vp /sw/lib/$lib $PD_APP_LIB
 			fi
 			# @executable_path starts from Contents/Resources/bin/pd
-			install_name_tool -id @executable_path/../../$LIB_DIR/$lib $PD_APP_LIB/$lib
-			install_name_tool -change /sw/lib/$lib @executable_path/../../$LIB_DIR/$lib $dylib
+			install_name_tool -id @executable_path/../../$LIB_DIR/$new_lib $PD_APP_LIB/$new_lib
+			install_name_tool -change /sw/lib/$lib @executable_path/../../$LIB_DIR/$new_lib $dylib
 		done
 		echo " "
 	fi
