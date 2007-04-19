@@ -1,28 +1,29 @@
-#N canvas 23 36 964 605 10;
-#X obj 241 386 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
+#N canvas 76 60 986 591 10;
+#X obj 351 386 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
 0;
-#X obj 241 355 cnv 15 78 20 empty empty 78x20 2 12 0 9 -128992 -66577
+#X obj 351 355 cnv 15 78 20 empty empty 78x20 2 12 0 9 -128992 -66577
 0;
-#X obj 611 387 cnv 15 70 17 empty empty 70x17 2 12 0 9 -128992 -66577
+#X obj 695 387 cnv 15 70 17 empty empty 70x17 2 12 0 9 -128992 -66577
 0;
-#X text 21 389 Mac OS X;
-#X text 20 357 Windows;
-#X text 21 417 GNU/Linux;
-#X obj 711 387 cnv 15 70 17 empty empty 70x17 2 12 0 9 -128992 -66577
+#X text 161 389 Mac OS X;
+#X text 160 357 Windows;
+#X text 161 417 GNU/Linux;
+#X obj 775 387 cnv 15 70 17 empty empty 70x17 2 12 0 9 -128992 -66577
 0;
-#X obj 811 387 cnv 15 60 15 empty empty 60x15 2 12 0 9 -128992 -66577
+#X obj 865 387 cnv 15 60 15 empty empty 60x15 2 12 0 9 -128992 -66577
 0;
-#X obj 580 162 cnv 15 100 60 empty empty courier8 20 12 0 8 -233017
+#X obj 520 173 cnv 15 100 60 empty empty courier10 20 12 0 8 -233017
 -66577 0;
-#X msg 599 166 courier10;
-#X obj 710 92 cnv 15 100 60 empty empty courier9 20 12 0 9 -233017
+#X msg 539 177 courier10;
+#X obj 650 103 cnv 15 100 60 empty empty courier10 20 12 0 9 -233017
 -66577 0;
-#X msg 730 94 courier10;
-#X obj 611 357 cnv 15 60 17 empty empty 60x17 2 12 0 9 -128992 -66577
+#X msg 670 105 courier10;
+#X text 651 124 Windows/0.39.2-extended-test7;
+#X obj 695 357 cnv 15 60 17 empty empty 60x17 2 12 0 9 -128992 -66577
 0;
-#X obj 711 357 cnv 15 60 17 empty empty 60x17 2 12 0 9 -128992 -66577
+#X obj 775 357 cnv 15 60 17 empty empty 60x17 2 12 0 9 -128992 -66577
 0;
-#X obj 241 416 cnv 15 87 19 empty empty 87x19 2 12 0 9 -128992 -66577
+#X obj 351 416 cnv 15 87 19 empty empty 87x19 2 12 0 9 -128992 -66577
 0;
 #X text 17 314 these represent the size of this message box:;
 #X msg 346 313 courier10;
@@ -30,38 +31,38 @@
 #X obj 139 35 cnv 15 100 60 empty empty courier10 20 12 0 9 -233017
 -66577 0;
 #X msg 157 41 courier10;
-#X obj 103 389 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
+#X obj 233 389 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
 0;
-#X text 91 334 0.39.2-extended-RC1;
-#X text 240 335 0.39.2-extended-test7;
-#X text 613 335 0.39-2;
-#X text 713 334 0.40-2;
-#X text 803 334 devel 0.39-1test1;
-#X obj 401 386 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
+#X text 221 334 0.39.2-extended-RC1;
+#X text 350 335 0.39.2-extended-test7;
+#X text 697 335 0.39-2;
+#X text 777 334 0.40-2;
+#X text 857 334 devel 0.39-1test1;
+#X obj 501 386 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
 0;
-#X text 400 335 0.38.4-extended;
-#X obj 522 387 cnv 15 70 17 empty empty 70x17 2 12 0 9 -128992 -66577
+#X text 500 335 0.38.4-extended;
+#X obj 612 387 cnv 15 70 17 empty empty 70x17 2 12 0 9 -128992 -66577
 0;
-#X text 524 335 0.38-4;
+#X text 614 335 0.38-4;
 #X text 18 444 these represent the size of this comment:;
 #X obj 140 240 cnv 15 100 60 empty empty courier10 20 12 0 10 -233017
 -66577 0;
 #X msg 158 243 courier10;
-#X obj 100 500 cnv 7 52 7 empty empty 52x7 2 15 0 11 -128992 -66577
+#X obj 232 500 cnv 7 52 7 empty empty 52x7 2 15 0 11 -128992 -66577
 0;
-#X text 21 499 Mac OS X;
-#X text 20 467 Windows;
-#X text 21 527 GNU/Linux;
-#X obj 714 500 cnv 7 63 8 empty empty 63x8 2 15 0 11 -128992 -66577
+#X text 163 499 Mac OS X;
+#X text 162 467 Windows;
+#X text 163 527 GNU/Linux;
+#X obj 784 500 cnv 7 63 8 empty empty 63x8 2 15 0 11 -128992 -66577
 0;
-#X obj 404 500 cnv 7 62 7 empty empty 62x7 2 15 0 11 -128992 -66577
+#X obj 506 500 cnv 7 62 7 empty empty 62x7 2 15 0 11 -128992 -66577
 0;
 #X obj 20 170 cnv 15 100 60 empty empty courier10 20 12 0 12 -233017
 -66577 0;
 #X msg 39 174 courier10;
 #X text 47 212 12 pt;
 #X text 176 284 10pt;
-#X text 746 129 9 pt;
+#X text 686 140 9 pt;
 #X obj 20 35 cnv 15 100 60 empty empty courier10 20 12 0 12 -233017
 -66577 0;
 #X msg 39 39 courier10;
@@ -71,13 +72,13 @@
 #X text 139 64 devel 0.39-1test1;
 #X text 140 265 0.39-2-extended-rc1;
 #X text 32 16 ---------- Mac OS X ----------;
-#X obj 524 500 cnv 7 63 8 empty empty 63x8 2 15 0 11 -128992 -66577
+#X obj 614 500 cnv 7 63 8 empty empty 63x8 2 15 0 11 -128992 -66577
 0;
 #X text 435 442 ----------------------------------------------------------
 ;
 #X text 445 312 ----------------------------------------------------------
 ;
-#X obj 614 500 cnv 7 63 8 empty empty 63x8 2 15 0 11 -128992 -66577
+#X obj 699 500 cnv 7 63 8 empty empty 63x8 2 15 0 11 -128992 -66577
 0;
 #X obj 21 102 cnv 15 100 60 empty empty courier10 20 12 0 12 -233017
 -66577 0;
@@ -85,38 +86,57 @@
 #X text 48 144 12 pt;
 #X text 41 131 0.39-2;
 #X text 141 78 9 pt (closest);
-#X obj 810 500 cnv 6 53 6 empty empty 53x6 2 15 0 11 -128992 -66577
+#X obj 870 500 cnv 6 53 6 empty empty 53x6 2 15 0 11 -128992 -66577
 0;
-#X obj 580 92 cnv 15 100 60 empty empty courier8 20 12 0 8 -233017
+#X obj 520 103 cnv 15 100 60 empty empty courier10 20 12 0 8 -233017
 -66577 0;
-#X msg 599 96 courier10;
-#X text 608 113 0.39-2;
-#X text 602 16 ---------- Windows ----------;
-#X text 588 129 8 pt (closest);
-#X text 609 186 0.40-2;
-#X obj 614 470 cnv 5 51 5 empty empty 51x5 2 15 0 11 -128992 -66577
+#X msg 539 107 courier10;
+#X text 548 124 0.39-2;
+#X text 542 16 ---------- Windows ----------;
+#X text 528 140 8 pt (closest);
+#X text 549 197 0.40-2;
+#X obj 699 470 cnv 5 51 5 empty empty 51x5 2 15 0 11 -128992 -66577
 0;
-#X text 586 202 8 pt (closest);
-#X obj 714 470 cnv 5 51 5 empty empty 51x5 2 15 0 11 -128992 -66577
+#X text 526 213 8 pt (closest);
+#X obj 784 470 cnv 5 51 5 empty empty 51x5 2 15 0 11 -128992 -66577
 0;
-#X text 336 443 courier10;
-#X obj 290 92 cnv 15 100 60 empty empty courier10 20 12 0 8 -233017
+#X text 296 443 courier10;
+#X obj 782 150 comment 173 10 helvetica ? 0 0 0 0 adjust the font size
+in the canvas until it matches the message box. Move the message box
+over the canvas font so it lines up it exactly. Mark down the font
+size in the canvas. If you can't get an exact match \, write (closest)
+;
+#X obj 13 340 comment 132 10 helvetica ? 0 0 0 0 copy and paste one
+of the canvases with the dimensions in it (e.g. 69x16). Take this canvas
+and make it fit exactly over the [courier10( message box. then put
+it in the right place in the grid.;
+#X obj 13 480 comment 132 10 helvetica ? 0 0 0 0 copy and paste one
+of the canvases with the dimensions in it (e.g. 53x6). Take this canvas
+and make it fit exactly over the comment "courier10". then put it in
+the correct place in the grid.;
+#X obj 269 102 cnv 15 100 60 empty empty courier10 20 12 0 8 -233017
 -66577 0;
-#X msg 309 96 courier10;
-#X text 318 113 0.39-2;
-#X text 312 16 ---------- GNU/Linux ----------;
-#X text 711 113 0.39.2-extended-test7;
-#X obj 102 416 cnv 15 62 17 empty empty 62x17 2 12 0 9 -128992 -66577
-0;
-#X obj 420 242 cnv 15 100 60 empty empty courier10 20 12 0 8 -233017
+#X msg 288 106 courier10;
+#X text 297 123 0.39-2;
+#X text 272 16 ---------- GNU/Linux ----------;
+#X obj 381 242 cnv 15 100 60 empty empty courier10 20 12 0 8 -233017
 -66577 0;
-#X msg 438 246 courier10;
-#X text 421 263 0.39.2-extended-RC1;
-#X text 456 279 8 pt;
-#X obj 100 530 cnv 7 53 6 empty empty 53x6 2 15 0 11 -128992 -66577
+#X msg 399 246 courier10;
+#X text 382 263 0.39.2-extended-RC1;
+#X text 417 279 8 pt;
+#X text 307 139 8 pt;
+#X obj 695 414 cnv 15 69 17 empty empty 69x17 2 12 0 9 -128992 -66577
 0;
-#X obj 610 414 cnv 15 69 17 empty empty 69x17 2 12 0 9 -128992 -66577
+#X obj 232 530 cnv 7 53 6 empty empty 53x6 2 15 0 11 -128992 -66577
 0;
-#X obj 614 530 cnv 7 61 8 empty empty 61x8 2 15 0 11 -128992 -66577
+#X obj 700 530 cnv 7 61 8 empty empty 61x8 2 15 0 11 -128992 -66577
 0;
-#X text 328 129 8 pt;
+#X obj 233 416 cnv 15 62 17 empty empty 62x17 2 12 0 9 -128992 -66577
+0;
+#X obj 380 103 cnv 15 100 60 empty empty courier8 20 12 0 8 -233017
+-66577 0;
+#X msg 399 106 courier10;
+#X text 416 140 8 pt;
+#X text 381 124 0.39.2-extended-test7;
+#X obj 355 529 cnv 7 80 10 empty empty 80x10 2 15 0 11 -128992 -66577
+0;
