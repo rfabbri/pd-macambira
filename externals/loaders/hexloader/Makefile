@@ -13,24 +13,31 @@ PDLIBDIR=$(PDROOT)/bin
 # people have to specify it at the cmdline: eg "make pd_linux"
 EXTENSION=$(MAKECMDGOALS)
 
+
+DEFINES=-DPD
+
 # if no filename-extension is supplied by the user
 # try to guess one, based on what "uname" tells us
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
   DEFAULTEXTENSION= pd_linux
+  DEFINES+=-DDL_OPEN
 else
   ifeq ($(UNAME),Darwin)
     DEFAULTEXTENSION= pd_darwin
+    DEFINES+=-DDL_OPEN
   else
     ifeq (MINGW,$(findstring MINGW,$(UNAME)))
-      DEFAULTEXTENSION= pd_nt
+      DEFAULTEXTENSION=pd_nt
     else
       ifeq ($(UNAME),IRIX)
 	UNAMEV := $(shell uname -R)
 	ifeq (6.,$(findstring 6.,$(UNAMEV)))
 	  DEFAULTEXTENSION= pd_irix6
+          DEFINES+=-DDL_OPEN
 	else
 	  DEFAULTEXTENSION= pd_irix5
+          DEFINES+=-DDL_OPEN
 	endif
       else
 	DEFAULTEXTENSION=help
@@ -61,7 +68,7 @@ TARGETS=$(SOURCES:.c=.$(EXTENSION))
 
 pd_linux: $(TARGETS)
 
-LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer -fPIC \
+LINUXCFLAGS = $(DEFINES) -O2 -funroll-loops -fomit-frame-pointer -fPIC \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch
 
@@ -79,7 +86,7 @@ LINUXINCLUDE =  -I$(PDSRCDIR)
 
 pd_darwin: $(TARGETS)
 
-DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
+DARWINCFLAGS = $(DEFINES) -O2 -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 DARWININCLUDE = -I$(PDSRCDIR)
@@ -93,7 +100,7 @@ DARWINLDFLAGS = -bundle -undefined suppress -flat_namespace
 # ----------------------- IRIX 5.x -----------------------
 pd_irix5: $(TARGETS)
 
-SGICFLAGS5 = -o32 -DPD -DSGI -O2
+SGICFLAGS5 = -o32 $(DEFINES) -DSGI -O2
 
 SGIINCLUDE =  -I$(PDSRCDIR)
 
@@ -108,7 +115,7 @@ SGILDFLAGS =  -elf -shared -rdata_shared
 # ----------------------- IRIX 6.x -----------------------
 pd_irix6: $(TARGETS)
 
-SGICFLAGS6 = -DPD -DSGI -n32 \
+SGICFLAGS6 = $(DEFINES) -DSGI -n32 \
 	-OPT:roundoff=3 -OPT:IEEE_arithmetic=3 -OPT:cray_ivdep=true \
 	-Ofast=ip32
 
@@ -141,7 +148,7 @@ PDNTLIB = $(PDNTLDIR)\libc.lib \
 
 pd_nt: $(TARGETS)
 
-MINGWCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
+MINGWCFLAGS = $(DEFINES) -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch -mms-bitfields
 

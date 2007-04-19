@@ -1,8 +1,20 @@
+/* Copyright (c) 2007 IOhannes m zmölnig @ IEM
+ * For information on usage and redistribution, and for a DISCLAIMER OF ALL
+ * WARRANTIES, see the file, "LICENSE.txt," that comes with Pd.  
+ */
+
+/*
+ * this code adds an external "loader" to Miller S. Puckette's "pure data",
+ * which allows the loading of libraries/externals with special characters
+ * in the classname
+ *
+ * the infrastructure of this file is based on hcsteiner's "libdir" loader
+ */
+
+
 #ifdef __WIN32__
 # define MSW
 #endif
-
-#define DL_OPEN
 
 #include "m_pd.h"
 #include "s_stuff.h"
@@ -42,7 +54,7 @@ typedef struct _hexloader
 } t_hexloader;
 static t_class *hexloader_class;
 
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
 
 static char*hex_dllextent[] = {
