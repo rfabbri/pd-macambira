@@ -34,9 +34,9 @@ run_build_script ()
 	 fi
 }
 
-run_build_script pd-main
-run_build_script pd-extended
-run_build_script pd-extended-release
-#run_build_script pd-devel
-
-
+for dir in /home/pd/auto-build/*; do 
+	 echo $dir
+	 dirname=`echo $dir | sed 's|.*/\(.*\)|\1|'`
+	 test -e $dir/scripts/auto-build/${dirname}-auto-builder.sh && \
+		  run_build_script $dirname
+done
