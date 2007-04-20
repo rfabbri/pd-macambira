@@ -779,7 +779,7 @@ freeverb_install: freeverb
 		--license "GNU GPL" \
 		--version "1.2"
 	install -p $(FREEVERB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(FREEVERB_NAME)
-	install -d $(helpdir)
+	install -d $(helpdir)/$(FREEVERB_NAME)
 	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) \
 		$(helpdir)/$(FREEVERB_NAME)
 #	install -d $(manualsdir)/$(FREEVERB_NAME)
