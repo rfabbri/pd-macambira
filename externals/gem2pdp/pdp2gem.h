@@ -23,7 +23,7 @@
 #include "Base/GemBase.h"
 #include "Base/GemPixUtil.h"
 #include "Base/config.h"
-#include "pdp-light.h"
+#include "pdp.h"
 #include <pthread.h>
 
 class GEM_EXTERN pdp2gem : public GemBase

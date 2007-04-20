@@ -90,8 +90,42 @@ else
   exit -1
 fi
 
+
+AC_CANONICAL_HOST
+case "$host" in
+ 	*-linux*)
+		  EXTENSION=pd_linux
+		  LDFLAGS="$LDFLAGS -export_dynamic -shared"
+		  ;;
+ 	*-mingw*)
+		  CFLAGS="$CFLAGS -mms-bitfields"
+		  EXTENSION=dll
+		  LDFLAGS="$LDFLAGS -shared"
+		  ;;
+   *-darwin* | *-macos10*)
+	  EXTENSION=pd_darwin
+	  LDFLAGS="$LDFLAGS -bundle -undefined dynamic_lookup"
+  	  # Check for DarwinPorts and/or Fink on Mac OS X/Darwin
+     if test -d /sw ; then
+       # Fink
+       PATH="/sw/bin:/sw/sbin:$PATH"
+       INCLUDES="$INCLUDES -I/sw/include"
+       LIBS="$LIBS -L/sw/lib"
+     elif test -d /opt/local ; then
+       # DarwinPorts
+       PATH="/opt/local/bin:/opt/local/sbin:$PATH"
+       INCLUDES="$INCLUDES -I/opt/local/include"
+       LIBS="$LIBS -L/opt/local/lib"
+     fi
+  ;;
+esac
+
+AC_SUBST(CFLAGS)
+AC_SUBST(EXTENSION)
+AC_SUBST(INCLUDES)
+AC_SUBST(LDFLAGS)
+
 LIBS="$LIBS -lm"
-CFLAGS="$CFLAGS -Wall"
 
 AC_CONFIG_FILES([
 Makefile

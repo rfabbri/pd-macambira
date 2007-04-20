@@ -15,7 +15,7 @@
 
 #include "Base/GemPixObj.h"
 
-#include "pdp-light.h"
+#include "pdp.h"
 
 class GEM_EXTERN pix_2pdp : public GemPixObj
 {

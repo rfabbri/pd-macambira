@@ -12,7 +12,7 @@
 
 #include "Base/GemBase.h"
 #include "Base/GemPixUtil.h"
-#include "pdp-light.h"
+#include "pdp.h"
 
 class GEM_EXTERN gem2pdp : public GemBase
 {

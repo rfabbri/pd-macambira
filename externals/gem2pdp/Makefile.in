@@ -3,53 +3,56 @@ PDP_DIR = @PDP_DIR@
 GEM_DIR = @GEM_DIR@
 
 LIBS = @LIBS@
+LDFLAGS = @LDFLAGS@
+EXTENSION = @EXTENSION@
+
 GEM2PDP_VERSION = @GEM2PDP_VERSION@
 
 GEM2PDP_DISTRO = /mnt/c/ydegoyon.free.fr/gem2pdp-$(GEM2PDP_VERSION)
 GEM2PDP_TARBALL = $(GEM2PDP_DISTRO).tar.gz
 # build flags
 
-GEM2PDP_INCLUDE =  -I$(PD_DIR)/src -I. -I$(PDP_DIR)/include  -I$(GEM_DIR)/src 
-GEM2PDP_CPPFLAGS  = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
+INCLUDES = @INCLUDES@ -I$(PD_DIR)/src -I. -I$(PDP_DIR)/include  -I$(GEM_DIR)/src 
+CFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
     -Wall -W -Wno-unused -Wno-parentheses -Wno-switch \
-    -DGEM2PDP_VERSION=\"$(GEM2PDP_VERSION)\" -g
-PDP_PIDIP_CPPFLAGS  = -O
+    -DGEM2PDP_VERSION=\"$(GEM2PDP_VERSION)\" -g  @CFLAGS@
+PDP_PIDIP_CFLAGS  = -O
 
-all: gem2pdp.pd_linux pdp2gem.pd_linux pix_2pdp.pd_linux
+export MACOSX_DEPLOYMENT_TARGET = 10.3
 
-pdp2gem.pd_linux: pdp2gem.o yuv.o
-	rm -f pdp2gem.pd_linux
-	gcc -export_dynamic -shared -o pdp2gem.pd_linux pdp2gem.o yuv.o $(LIBS)
+all: gem2pdp.$(EXTENSION) pdp2gem.$(EXTENSION) pix_2pdp.$(EXTENSION)
 
-gem2pdp.pd_linux: gem2pdp.o yuv.o
-	rm -f gem2pdp.pd_linux
-	gcc -export_dynamic -shared -o gem2pdp.pd_linux gem2pdp.o yuv.o $(LIBS)
+pdp2gem.$(EXTENSION): pdp2gem.o yuv.o
+	rm -f pdp2gem.$(EXTENSION)
+	gcc $(LDFLAGS) -o pdp2gem.$(EXTENSION) pdp2gem.o yuv.o $(LIBS)
 
-pix_2pdp.pd_linux: pix_2pdp.o yuv.o
-	rm -f pix_2pdp.pd_linux
-	gcc -export_dynamic -shared -o pix_2pdp.pd_linux pix_2pdp.o yuv.o $(LIBS)
+gem2pdp.$(EXTENSION): gem2pdp.o yuv.o
+	rm -f gem2pdp.$(EXTENSION)
+	gcc $(LDFLAGS) -o gem2pdp.$(EXTENSION) gem2pdp.o yuv.o $(LIBS)
+
+pix_2pdp.$(EXTENSION): pix_2pdp.o yuv.o
+	rm -f pix_2pdp.$(EXTENSION)
+	gcc $(LDFLAGS) -o pix_2pdp.$(EXTENSION) pix_2pdp.o yuv.o $(LIBS)
 
 clean:
 	rm -f *.o
-	rm -f gem2pdp.pd_linux
-	rm -f pdp2gem.pd_linux
-	rm -f pix_2pdp.pd_linux
+	rm -f gem2pdp.$(EXTENSION)
+	rm -f pdp2gem.$(EXTENSION)
+	rm -f pix_2pdp.$(EXTENSION)
 
 distro: clean all
 	rm *.o
-	strip --strip-unneeded gem2pdp.pd_linux
+	strip --strip-unneeded gem2pdp.$(EXTENSION)
 	cd .. && cp -rf gem2pdp /tmp/gem2pdp-$(GEM2PDP_VERSION)
 	cd /tmp && tar vczf $(GEM2PDP_TARBALL) gem2pdp-$(GEM2PDP_VERSION)
 	cp /mnt/c/ydegoyon.free.fr/gem2pdp-$(GEM2PDP_VERSION).tar.gz /mnt/c/Yves
 	rm -rf /tmp/gem2pdp-$(GEM2PDP_VERSION)
 
 .cpp.o:
-	cat $(PDP_DIR)/include/pdp.h | grep -v m_pd > pdp-light.h
-	g++ $(GEM2PDP_CPPFLAGS) $(GEM2PDP_INCLUDE) -o $*.o -c $*.cpp
+	g++ $(CFLAGS) $(INCLUDES) -o $*.o -c $*.cpp
 
 .c.o:
-	cat $(PDP_DIR)/include/pdp.h | grep -v m_pd > pdp-light.h
-	gcc $(GEM2PDP_CPPFLAGS) $(GEM2PDP_INCLUDE) -o $*.o -c $*.c
+	gcc $(CFLAGS) $(INCLUDES) -o $*.o -c $*.c
 
 install:
 	cp -f --remove-destination *.pd $(PD_DIR)/doc/5.reference
