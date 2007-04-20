@@ -12,7 +12,7 @@ diff -u -w -r1.4 g_rtext.c
 -        if (n == '\n' || isprint(n))
 +/* at guenter's suggestion, this gets european characters working */
 +/*         if (n == '\n' || isprint(n)) */
-+        if (n == '\n' || n > 31)
++        if ((n == '\n' || n > 31) && n != 127)
          {
              newsize = x->x_bufsize+1;
              x->x_buf = resizebytes(x->x_buf, x->x_bufsize, newsize);
