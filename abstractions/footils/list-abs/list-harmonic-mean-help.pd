@@ -1,4 +1,4 @@
-#N struct 1026-dial float y;
+#N struct 1029-dial float y;
 #N canvas 402 177 566 571 10;
 #N canvas 0 0 450 300 randlist 0;
 #X obj 134 129 until;
@@ -62,7 +62,7 @@
 #X coords 0 10 9 0 200 140 1;
 #X restore 75 152 graph;
 #N canvas 0 0 916 918 \$0-c 0;
-#X scalar 1026-dial 0 \;;
+#X scalar 1029-dial 0 \;;
 #X coords 0 0 200 140 200 140 1;
 #X restore 75 152 pd \$0-c;
 #N canvas 0 0 503 429 create 0;
@@ -143,7 +143,7 @@ the array.;
 #X connect 4 0 0 0;
 #X restore 339 363 pd scale;
 #X obj 339 313 list-harmonic-mean;
-#X msg 79 414 0.6 6.9 3.6 5.6 0.7 3.8 3.9 5.3 9.2 9.2;
+#X msg 79 414 7.4 4.8 2 8.4 5.6 3.6 1.1 8.6 5 8.6;
 #X connect 0 0 26 0;
 #X connect 1 0 0 0;
 #X connect 2 0 3 0;
@@ -171,8 +171,6 @@ the array.;
 #X connect 26 0 2 0;
 #X restore 98 459 pd graphical-mean;
 #X obj 98 405 list-harmonic-mean;
-#X text 114 91 geometric mean = n / (1/f0 + 1/f1 + 1/f2 + ... + 1/fn)
-;
 #X text 86 22 [list-harmonic-mean];
 #X text 96 51 Calculates the harmonic mean of a list (of floats) according
 to:;
@@ -184,10 +182,12 @@ well.;
 #X obj 185 493 list-geometric-mean;
 #X obj 184 515 list-mean;
 #X text 97 494 More means:;
+#X text 114 91 harmonic mean = n / (1/f0 + 1/f1 + 1/f2 + ... + 1/fn)
+;
 #X connect 0 0 3 0;
 #X connect 1 0 0 0;
 #X connect 3 0 9 0;
 #X connect 4 0 9 0;
 #X connect 5 0 9 0;
 #X connect 9 0 2 0;
-#X connect 13 0 9 0;
+#X connect 12 0 9 0;
