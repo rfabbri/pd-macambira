@@ -45,7 +45,7 @@
 #X obj 210 559 outlet;
 #X obj 127 399 spigot 1;
 #X obj 145 285 f;
-#X obj 240 528 print list-cog;
+#X obj 240 528 print list-centroid;
 #X obj 210 468 t b b;
 #X msg 240 503 warning: sum of items equals 0: centroid is undefined!
 ;
