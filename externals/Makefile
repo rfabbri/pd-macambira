@@ -1782,7 +1782,7 @@ $(externals_src)/pdp/configure: $(externals_src)/pdp/configure.ac
 	cd $(externals_src)/pdp && autoconf
 
 $(externals_src)/pdp/Makefile.config: $(externals_src)/pdp/Makefile.config.in
-	cd $(externals_src)/pdp && ./configure PD_CPPFLAGS="-I$(pd_src)/src" \
+	cd $(externals_src)/pdp && ./configure PD_CPPFLAGS="-I$(pd_src)/src"
 		--disable-quicktime
 
 $(externals_src)/pdp/pdp.$(EXTENSION):  $(externals_src)/pdp/configure \
@@ -1816,6 +1816,56 @@ pdp_clean:
 	-find $(externals_src)/pdp -name '*.bak' | xargs rm -f --
 	-rm -f -- $(externals_src)/pdp/Makefile.config
 	-rm -f -- $(externals_src)/pdp/configure
+
+
+
+
+#------------------------------------------------------------------------------#
+# GEM2PDP
+GEM2PDP_NAME=gem2pdp
+GEM2PDP_OBJECTS := $(wildcard $(externals_src)/gem2pdp/*.c)
+$(externals_src)/gem2pdp/configure: $(externals_src)/gem2pdp/configure.ac
+	cd $(externals_src)/pdp && autoconf
+
+$(externals_src)/gem2pdp/Makefile.config: $(externals_src)/gem2pdp/Makefile.config.in
+	cd $(externals_src)/pdp && ./configure PD_CPPFLAGS="-I$(pd_src)/src" \
+		--disable-quicktime
+
+$(externals_src)/gem2pdp/pdp.$(EXTENSION):  $(externals_src)/gem2pdp/configure \
+$(externals_src)/pdp/Makefile.config 
+	$(MAKE) -C $(externals_src)/pdp PD_EXECUTABLE="$(pd_src)/bin/pd"
+
+gem2pdp: $(externals_src)/gem2pdp/gem2pdp.$(EXTENSION)
+
+gem2pdp: $(GEM2PDP_OBJECTS:.c=.$(EXTENSION))
+
+gem2pdp_install: gem2pdp
+	install -d $(objectsdir)/$(GEM2PDP_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(GEM2PDP_NAME) \
+		--author "Yves Degoyon, Jamie Tittle, Georg Holzmann" \
+		--description "Bridges between Gem and PDP" \
+		--version "0.6"
+	install -p $(wildcard $(externals_src)/gem2pdp/*.$(EXTENSION)) \
+		$(objectsdir)/$(GEM2PDP_NAME)
+	install -d $(helpdir)/$(GEM2PDP_NAME)
+	install -p $(externals_src)/gem2pdp/help/*.pd \
+		$(helpdir)/$(GEM2PDP_NAME)
+#	install -d $(manualsdir)/$(GEM2PDP_NAME)
+#	install -p $(externals_src)/gem2pdp/manual.txt \
+#		$(manualsdir)/$(GEM2PDP_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/gem2pdp/README \
+		$(readmesdir)/$(GEM2PDP_NAME).txt
+#	install -d $(examplesdir)/$(GEM2PDP_NAME)
+#	install -p $(externals_src)/gem2pdp/examples/*.pd \
+#		$(examplesdir)/$(GEM2PDP_NAME)
+
+gem2pdp_clean:
+	-rm -f -- $(externals_src)/gem2pdp/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/gem2pdp/*.o
+	-rm -f -- $(externals_src)/gem2pdp/*.bak
+	-rm -f -- $(externals_src)/gem2pdp/*.*~
+
 
 
 #------------------------------------------------------------------------------#
