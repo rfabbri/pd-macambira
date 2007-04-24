@@ -20,7 +20,7 @@
 #X msg 387 128 1;
 #X obj 341 76 symbol \$1;
 #X obj 325 232 f;
-#X obj 78 322 expr $f1 \$1 $f2;
+#X obj 78 322 \$1;
 #X connect 0 0 14 0;
 #X connect 1 0 4 1;
 #X connect 3 0 8 0;
