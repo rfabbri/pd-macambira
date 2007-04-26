@@ -1,4 +1,4 @@
-#N canvas 76 60 986 591 10;
+#N canvas 276 149 994 599 10;
 #X obj 351 386 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
 0;
 #X obj 351 355 cnv 15 78 20 empty empty 78x20 2 12 0 9 -128992 -66577
@@ -101,19 +101,6 @@
 #X obj 784 470 cnv 5 51 5 empty empty 51x5 2 15 0 11 -128992 -66577
 0;
 #X text 296 443 courier10;
-#X obj 782 150 comment 173 10 helvetica ? 0 0 0 0 adjust the font size
-in the canvas until it matches the message box. Move the message box
-over the canvas font so it lines up it exactly. Mark down the font
-size in the canvas. If you can't get an exact match \, write (closest)
-;
-#X obj 13 340 comment 132 10 helvetica ? 0 0 0 0 copy and paste one
-of the canvases with the dimensions in it (e.g. 69x16). Take this canvas
-and make it fit exactly over the [courier10( message box. then put
-it in the right place in the grid.;
-#X obj 13 480 comment 132 10 helvetica ? 0 0 0 0 copy and paste one
-of the canvases with the dimensions in it (e.g. 53x6). Take this canvas
-and make it fit exactly over the comment "courier10". then put it in
-the correct place in the grid.;
 #X obj 269 102 cnv 15 100 60 empty empty courier10 20 12 0 8 -233017
 -66577 0;
 #X msg 288 106 courier10;
@@ -127,8 +114,6 @@ the correct place in the grid.;
 #X text 307 139 8 pt;
 #X obj 695 414 cnv 15 69 17 empty empty 69x17 2 12 0 9 -128992 -66577
 0;
-#X obj 232 530 cnv 7 53 6 empty empty 53x6 2 15 0 11 -128992 -66577
-0;
 #X obj 700 530 cnv 7 61 8 empty empty 61x8 2 15 0 11 -128992 -66577
 0;
 #X obj 233 416 cnv 15 62 17 empty empty 62x17 2 12 0 9 -128992 -66577
@@ -140,3 +125,49 @@ the correct place in the grid.;
 #X text 381 124 0.39.2-extended-test7;
 #X obj 355 529 cnv 7 80 10 empty empty 80x10 2 15 0 11 -128992 -66577
 0;
+#X obj 269 170 cnv 15 100 60 empty empty courier10 20 12 0 10 -233017
+-66577 0;
+#X msg 290 175 courier10;
+#X text 298 194 0.40-2;
+#X text 275 210 10 pt (closest);
+#X obj 785 530 cnv 7 61 8 empty empty 61x8 2 15 0 11 -128992 -66577
+0;
+#N canvas 0 22 466 290 instructions 0;
+#X text 18 45 If the sizing was all working nicely \, the fonts would
+line up exactly on the top section when both are set to 10 point since
+they are the same font. That is what we are trying to achieve. But
+that doesn't happen very much. So here are the three tests \, from
+the top to bottom: - top: adjust the font size in the canvas until
+it matches the message box. Move the message box over the canvas font
+so it lines up it exactly. Mark down the font size in the canvas. If
+you can't get an exact match \, write (closest) - middle: copy and
+paste one of the canvases with the dimensions in it (e.g. 69x16). Take
+this canvas and make it fit exactly over the [courier10( message box.
+then put it in the right place in the grid. - bottom: copy and paste
+one of the canvases with the dimensions in it (e.g. 53x6). Take this
+canvas and make it fit exactly over the comment "courier1)". then put
+it in the correct place in the grid.;
+#X obj 364 7 import cyclone;
+#X restore 849 28 pd instructions;
+#X obj 782 150 comment 173 10 helvetica ? 0 0 0 0 adjust the font size
+in the canvas until it matches the message box. Move the message box
+over the canvas font so it lines up it exactly. Mark down the font
+size in the canvas. If you can't get an exact match \, write (closest)
+;
+#X obj 13 340 comment 132 10 helvetica ? 0 0 0 0 copy and paste one
+of the canvases with the dimensions in it (e.g. 69x16). Take this canvas
+and make it fit exactly over the [courier10( message box. then put
+it in the right place in the grid.;
+#X obj 13 480 comment 132 10 helvetica ? 0 0 0 0 copy and paste one
+of the canvases with the dimensions in it (e.g. 53x6). Take this canvas
+and make it fit exactly over the comment "courier10". then put it in
+the correct place in the grid.;
+#X obj 354 499 cnv 7 63 8 empty empty 63x8 2 15 0 11 -128992 -66577
+0;
+#X obj 233 529 cnv 7 53 9 empty empty 53x9 2 15 0 11 -128992 -66577
+0;
+#X obj 140 170 cnv 15 100 60 empty empty courier10 20 12 0 12 -233017
+-66577 0;
+#X msg 159 174 courier10;
+#X text 167 212 12 pt;
+#X text 140 196 0.39.2-ext-test7;
