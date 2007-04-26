@@ -1,4 +1,4 @@
-#N canvas 276 149 994 599 10;
+#N canvas 75 181 998 603 10;
 #X obj 351 386 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
 0;
 #X obj 351 355 cnv 15 78 20 empty empty 78x20 2 12 0 9 -128992 -66577
@@ -171,3 +171,57 @@ the correct place in the grid.;
 #X msg 159 174 courier10;
 #X text 167 212 12 pt;
 #X text 140 196 0.39.2-ext-test7;
+#N canvas 285 122 610 587 get-fontsize 0;
+#X obj 45 79 cnv 10 68 16 empty \$0-cnv 68x16 2 30 0 11 -260818 -128992
+0;
+#X obj 146 165 pack 0 0;
+#X floatatom 146 80 5 0 0 0 - - -;
+#X obj 176 139 t b a;
+#X floatatom 176 119 5 0 0 0 - - -;
+#X obj 146 235 s \$0-cnv;
+#X msg 45 79 courier10;
+#X msg 146 207 vis_size \$1 \$2 \, label \$1x\$2;
+#X text 144 261 setting label this way only works with pd >= 0-40;
+#X obj 50 319 cnv 10 55 8 empty \$0-cnv2 55x8 2 30 0 11 -260818 -128992
+0;
+#X obj 152 387 pack 0 0;
+#X floatatom 152 322 5 0 0 0 - - -;
+#X obj 182 361 t b a;
+#X floatatom 182 341 5 0 0 0 - - -;
+#X msg 152 449 vis_size \$1 \$2 \, label \$1x\$2;
+#X text 150 503 setting label this way only works with pd >= 0-40;
+#X obj 152 477 s \$0-cnv2;
+#X text 48 316 courier10;
+#X obj 148 45 hsl 128 15 40 80 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 9200 1;
+#X obj 145 61 int;
+#X obj 188 85 hsl 128 15 5 20 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 9800 1;
+#X obj 185 101 int;
+#X obj 154 285 hsl 128 15 40 80 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 5000 1;
+#X obj 151 301 int;
+#X obj 194 305 hsl 128 15 5 20 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 3200 1;
+#X obj 191 321 int;
+#X connect 1 0 7 0;
+#X connect 2 0 1 0;
+#X connect 3 0 1 0;
+#X connect 3 1 1 1;
+#X connect 4 0 3 0;
+#X connect 7 0 5 0;
+#X connect 10 0 14 0;
+#X connect 11 0 10 0;
+#X connect 12 0 10 0;
+#X connect 12 1 10 1;
+#X connect 13 0 12 0;
+#X connect 14 0 16 0;
+#X connect 18 0 19 0;
+#X connect 19 0 2 0;
+#X connect 20 0 21 0;
+#X connect 21 0 4 0;
+#X connect 22 0 23 0;
+#X connect 23 0 11 0;
+#X connect 24 0 25 0;
+#X connect 25 0 13 0;
+#X restore 852 60 pd get-fontsize;
