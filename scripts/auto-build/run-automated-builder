@@ -35,7 +35,6 @@ run_build_script ()
 }
 
 for dir in /home/pd/auto-build/*; do 
-	 echo $dir
 	 dirname=`echo $dir | sed 's|.*/\(.*\)|\1|'`
 	 test -e $dir/scripts/auto-build/${dirname}-auto-builder.sh && \
 		  run_build_script $dirname
