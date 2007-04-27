@@ -798,7 +798,7 @@ freeverb_clean:
 #------------------------------------------------------------------------------#
 # GEM2PDP
 GEM2PDP_NAME=gem2pdp
-GEM2PDP_OBJECTS := $(wildcard $(externals_src)/gem2pdp/*.c)
+GEM2PDP_OBJECTS := $(wildcard $(externals_src)/gem2pdp/*.cpp)
 $(externals_src)/gem2pdp/configure: $(externals_src)/gem2pdp/configure.ac
 	cd $(externals_src)/gem2pdp && autoconf
 
@@ -806,20 +806,19 @@ $(externals_src)/gem2pdp/Makefile: $(externals_src)/gem2pdp/Makefile.in
 	cd $(externals_src)/gem2pdp && ./configure --with-pddir=$(pd_src) \
 		--with-gemdir=$(gem_src)  --with-pdpdir=$(externals_src)/pdp
 
-$(externals_src)/gem2pdp/gem2pdp.$(EXTENSION): \
-$(externals_src)/gem2pdp/configure $(externals_src)/gem2pdp/Makefile 
+gem2pdp: $(externals_src)/gem2pdp/configure $(externals_src)/gem2pdp/Makefile
 	$(MAKE) -C $(externals_src)/gem2pdp
 
-gem2pdp: $(externals_src)/gem2pdp/gem2pdp.$(EXTENSION)
-
 gem2pdp_install: gem2pdp
+	install -d $(objectsdir)
 #	install -d $(objectsdir)/$(GEM2PDP_NAME)
 #	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(GEM2PDP_NAME) \
 #		--author "Yves Degoyon, Jamie Tittle, Georg Holzmann" \
 #		--description "Bridges between Gem and PDP" \
 #		--version "0.6"
-	install -p $(wildcard $(externals_src)/gem2pdp/*.$(EXTENSION)) $(objectsdir)
+	install -p $(GEM2PDP_OBJECTS:.cpp=.$(EXTENSION)) $(objectsdir)
 #	install -d $(helpdir)/$(GEM2PDP_NAME)
+	install -d $(helpdir)
 	install -p $(externals_src)/gem2pdp/*.pd  $(helpdir)
 #	install -d $(manualsdir)/$(GEM2PDP_NAME)
 #	install -p $(externals_src)/gem2pdp/manual.txt \
@@ -837,7 +836,7 @@ gem2pdp_clean:
 	-rm -f -- $(externals_src)/gem2pdp/config.log
 	-rm -f -- $(externals_src)/gem2pdp/configure
 	-rm -f -- $(externals_src)/gem2pdp/Makefile
-	-rm -f -- $(externals_src)/gem2pdp/*.$(EXTENSION)
+	-rm -f -- $(GEM2PDP_OBJECTS:.cpp=.$(EXTENSION))
 	-rm -f -- $(externals_src)/gem2pdp/*.o
 	-rm -f -- $(externals_src)/gem2pdp/*.bak
 	-rm -f -- $(externals_src)/gem2pdp/*.*~
