@@ -81,7 +81,7 @@ window -6 21 1 9 -233017 -33289 -33289 0 1;
 #X obj 161 58 trigger float bang;
 #X msg 223 307 \; GLOBAL_GEMWIN_CONTROL_CANVAS color \$1 12 12;
 #X obj 469 128 change;
-#X obj 381 128 iemlib/once;
+#X obj 381 128 purepd/once;
 #X connect 0 0 2 0;
 #X connect 0 1 1 0;
 #X connect 1 0 4 0;
