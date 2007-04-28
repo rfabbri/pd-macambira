@@ -10,7 +10,7 @@
 #X obj 274 39 loadbang;
 #X msg 400 287 getdir;
 #X obj 168 240 outlet;
-#X obj 597 323 prepend get;
+#X obj 597 323 prepent get;
 #X msg 456 172 getall;
 #X obj 526 239 s \$0-substate;
 #X obj 510 213 t b f;
@@ -43,7 +43,7 @@
 #X restore 510 284 pd mkchange2substate;
 #X obj 345 177 t b b s;
 #X obj 415 201 s \$0-memento;
-#X obj 555 168 prepend set;
+#X obj 555 168 prepent set;
 #X obj 6 111 print pool;
 #X obj 345 94 route state getstate getall substate set get;
 #X obj 637 168 select copy paste;

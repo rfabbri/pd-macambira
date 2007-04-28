@@ -1,6 +1,6 @@
 _ Memento _
 
-ver. 0.4
+ver. 0.5
 
 This is a work-in-progress collection of a unified preset system for Pd
 patches. It tries to loosely follow the Memento [1] design pattern from the Gang of
@@ -70,6 +70,14 @@ settings in the pool to disk.
 Please follow the tutorial to learn more about Memento-usage.
 
 _ ChangeLog _
+
+0.5
+* removed all prepend from cyclone again and instead use [prepent] with is just
+  [list prepend]-[list trim]
+* replace OSCprepend with a Miller Vanilla version.
+* added [list] to commun's outlet to get automatic type conversions. 
+  commun now will output proper list-messages. This may result in 
+  subtle bugs with older patches however!
 
 0.4
 * Wrote a tutorial, yeah.

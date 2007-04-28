@@ -2,8 +2,6 @@
 #X text 14 92 originator requires two arguments: arg1 must start with
 a slash and will be the general name of a state. arg2 is used to communicate
 with commun objects.;
-#X text 10 225 caretakers are independent of these: They can collect
-all currently actuve states and save them.;
 #N canvas 121 22 1029 567 originator-help 0;
 #X obj 42 182 originator /name \$0;
 #X text 168 238 OSC-outlet;
@@ -86,14 +84,12 @@ Beware of the slash! Also note \, that states created using this will
 #X obj 65 164 pack 0 0;
 #X floatatom 97 116 5 0 0 0 - - -;
 #X floatatom 141 116 5 0 0 0 - - -;
-#X obj 233 212 symbol;
 #X obj 233 186 commun /asymbol \$0;
 #X symbolatom 233 159 10 0 0 0 - - -;
 #X text 248 64 Some typical uses of [commun];
 #X obj 141 137 t b f;
 #X obj 233 127 r \$0-thesymbol;
 #X obj 233 238 s \$0-thesymbol;
-#X text 282 211 unfortunatly this is necessary.;
 #X connect 0 0 1 0;
 #X connect 1 0 0 0;
 #X connect 2 0 3 0;
@@ -101,13 +97,12 @@ Beware of the slash! Also note \, that states created using this will
 #X connect 3 1 6 0;
 #X connect 4 0 2 0;
 #X connect 5 0 4 0;
-#X connect 6 0 11 0;
-#X connect 7 0 13 0;
+#X connect 6 0 10 0;
+#X connect 7 0 12 0;
 #X connect 8 0 7 0;
-#X connect 9 0 8 0;
-#X connect 11 0 4 0;
-#X connect 11 1 4 1;
-#X connect 12 0 9 0;
+#X connect 10 0 4 0;
+#X connect 10 1 4 1;
+#X connect 11 0 8 0;
 #X restore 16 379 pd commun-help;
 #X text 14 278 Detailed help on [originator];
 #X text 12 350 Detailed help on [commun];
@@ -160,3 +155,5 @@ and will be the variable name of one "thing" to save inside the state
 specified by originator's arg1. arg2 will select the originator to
 use: communs will talk to all originators \, whose arg2 equals its
 own arg2.;
+#X text 10 225 caretakers are independent of these: They can collect
+all currently active states and save them.;
