@@ -50,7 +50,7 @@ void iem16_setup(void) {
   iem16_class = class_new(gensym("iem16"), 
 			  iem16_new, 
 			  0, 
-			  sizeof(t_iem16), 0, 0);
+			  sizeof(t_iem16), CLASS_NOINLET, 0);
 
   class_addcreator((t_newmethod)iem16_new, 
 		   gensym("IEM16"), 0); 
