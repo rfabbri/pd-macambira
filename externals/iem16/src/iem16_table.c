@@ -219,11 +219,11 @@ void table16_setup(void){
   table16_class = class_new(gensym("table16"),
 			    (t_newmethod)table16_new, (t_method)table16_free,
 			    sizeof(t_table16), 0, A_DEFSYM, A_DEFFLOAT, 0);
-  class_addmethod(table16_class, (t_method)table16_resize, gensym("resize"), A_DEFFLOAT);
-  class_addmethod(table16_class, (t_method)table16_const, gensym("const"), A_DEFFLOAT);
-  class_addmethod(table16_class, (t_method)table16_from, gensym("from"), A_GIMME);
+  class_addmethod(table16_class, (t_method)table16_resize, gensym("resize"), A_DEFFLOAT, 0);
+  class_addmethod(table16_class, (t_method)table16_const, gensym("const"), A_DEFFLOAT, 0);
+  class_addmethod(table16_class, (t_method)table16_from, gensym("from"), A_GIMME, 0);
   class_addmethod(table16_class, (t_method)table16_read16, gensym("read16"),  A_SYMBOL, 
-                  A_DEFFLOAT, A_DEFSYM, A_NULL);
+                  A_DEFFLOAT, A_DEFSYM, 0);
 }
 
 
