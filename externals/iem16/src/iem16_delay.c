@@ -7,7 +7,8 @@
 /* del16read~, del16write~, vd16~ */
 
 #include "iem16_table.h"
-#ifdef NT
+
+#if defined __WIN32 || defined __WIN32__
 static int ugen_getsortno(void){return 0;}
 #else
 extern int ugen_getsortno(void);

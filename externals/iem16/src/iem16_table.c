@@ -8,6 +8,8 @@
 
 #include "iem16_table.h"
 
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>      /* for read/write to files */
 
 static int am_bigendian(void){
