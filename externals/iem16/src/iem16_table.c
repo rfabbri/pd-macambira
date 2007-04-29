@@ -92,10 +92,17 @@ static void table16_from(t_table16*x, t_symbol*s, int argc, t_atom*argv){
     return;
   }
   s=atom_getsymbol(argv);  argc--;argv++;
+#if defined __WIN32__ || defined __WIN32
+  // hmm, how do i import garray_class on w32??
+  error("ack, windows hit the wall...tell me how to see garray_class");
+  return;
+#else
   if (!(a = (t_garray *)pd_findbyclass(s, garray_class))){
     error("%s: no such array", s->s_name);
     return;
-  } else if (!garray_getfloatarray(a, &npoints, &vec)){
+  } else 
+#endif
+  if (!garray_getfloatarray(a, &npoints, &vec)){
     error("%s: bad template for tabread4", s->s_name);
     return;
   }

@@ -139,7 +139,7 @@ static void *sigdel16read_new(t_symbol *s, t_floatarg f){
   x->x_n = 1;
   x->x_zerodel = 0;
   sigdel16read_16bit(x, f);
-  outlet_new(&x->x_obj, &s_signal);
+  outlet_new(&x->x_obj, gensym("signal"));
   return (x);
 }
 
@@ -222,7 +222,7 @@ static void *sig16vd_new(t_symbol *s){
   x->x_sym = s;
   x->x_sr = 1;
   x->x_zerodel = 0;
-  outlet_new(&x->x_obj, &s_signal);
+  outlet_new(&x->x_obj, gensym("signal"));
   x->x_f = 0;
   return (x);
 }

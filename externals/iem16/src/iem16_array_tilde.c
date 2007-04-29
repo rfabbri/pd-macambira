@@ -109,7 +109,7 @@ static void *tab16play_tilde_new(t_symbol *s){
   x->x_phase = 0x7fffffff;
   x->x_limit = 0;
   x->x_arrayname = s;
-  outlet_new(&x->x_obj, &s_signal);
+  outlet_new(&x->x_obj, gensym("signal"));
   x->x_bangout = outlet_new(&x->x_obj, gensym("bang"));
   return (x);
 }
