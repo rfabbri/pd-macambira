@@ -15,7 +15,7 @@ BUILDLAYOUT_DIR = $(CWD)
 
 
 ## default target
-all: pd abstractions doc externals flext gem
+all: pd abstractions doc gem externals flext
 #all: pd++
 	@echo "Complete build succeeded!"
 
