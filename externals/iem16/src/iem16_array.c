@@ -41,7 +41,7 @@ static void tab16read_set(t_tab16read *x, t_symbol *s){
 static void *tab16read_new(t_symbol *s){
   t_tab16read *x = (t_tab16read *)pd_new(tab16read_class);
   x->x_arrayname = s;
-  outlet_new(&x->x_obj, &s_float);
+  outlet_new(&x->x_obj, gensym("float"));
   return (x);
 }
 
@@ -102,7 +102,7 @@ static void tab16read4_set(t_tab16read4 *x, t_symbol *s){
 static void *tab16read4_new(t_symbol *s){
   t_tab16read4 *x = (t_tab16read4 *)pd_new(tab16read4_class);
   x->x_arrayname = s;
-  outlet_new(&x->x_obj, &s_float);
+  outlet_new(&x->x_obj, gensym("float"));
   return (x);
 }
 

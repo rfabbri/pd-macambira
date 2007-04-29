@@ -12,6 +12,11 @@
 #include <string.h>
 #include <stdio.h>      /* for read/write to files */
 
+#if (defined(_MSC_VER) && (_MSC_VER > 600))
+# define fdopen(fd,type) _fdopen(fd,type)
+#endif
+
+
 static int am_bigendian(void){
     /* actually this should be in m_pd.h */
     unsigned short s = 1;
@@ -170,7 +175,8 @@ static void table16_read16(t_table16 *x, t_symbol *filename,  t_symbol *endian, 
     if ((filedesc = open_via_path(
         canvas_getdir(x->x_canvas)->s_name,
             filename->s_name, "", buf, &bufptr, MAXPDSTRING, 1)) < 0 
-                || !(fd = fdopen(filedesc, BINREADMODE)))
+                || !(fd = fdopen(filedesc, BINREADMODE))
+	)
     {
         error("%s: can't open", filename->s_name);
         return;

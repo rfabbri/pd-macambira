@@ -110,7 +110,7 @@ static void *tab16play_tilde_new(t_symbol *s){
   x->x_limit = 0;
   x->x_arrayname = s;
   outlet_new(&x->x_obj, &s_signal);
-  x->x_bangout = outlet_new(&x->x_obj, &s_bang);
+  x->x_bangout = outlet_new(&x->x_obj, gensym("bang"));
   return (x);
 }
 
@@ -306,7 +306,7 @@ static void tab16receive_dsp(t_tab16receive *x, t_signal **sp){
 static void *tab16receive_new(t_symbol *s){
   t_tab16receive *x = (t_tab16receive *)pd_new(tab16receive_class);
   x->x_arrayname = s;
-  outlet_new(&x->x_obj, &s_signal);
+  outlet_new(&x->x_obj, gensym("signal"));
   return (x);
 }
 

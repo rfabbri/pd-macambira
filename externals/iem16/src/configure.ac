@@ -57,6 +57,7 @@ dnl Checks for libraries.
 dnl Replace `main' with a function in -lc:
 AC_CHECK_LIB(c, main)
 AC_CHECK_LIB(crtdll, fclose)
+AC_CHECK_LIB(coldname, fdopen)
 
 dnl Replace `main' with a function in -lm:
 AC_CHECK_LIB(m, main)
