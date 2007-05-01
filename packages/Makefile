@@ -285,7 +285,7 @@ pd++:
 
 # this is used for installing into a pre-build Pd binary
 extended_install: abstractions_install doc_install extensions_install \
-externals_install flext_install gem_install readme_install welcome_install \
+gem_install externals_install flext_install readme_install welcome_install \
 license_install noncvs_install
 
 
