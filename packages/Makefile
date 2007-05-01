@@ -488,6 +488,7 @@ $(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
 	cd $(gem_src)/src && ./configure --without-x --without-ImageMagick \
 		--without-tiff --without-jpeg --without-mpeg --without-mpeg3 \
 		--without-ieee1394 --without-aviplay --without-avifile --without-ffmpeg \
+		--with-ftgl-includes=/sw/include --with-ftgl-libs=/sw/lib \
 		--with-pd=$(pd_src)
 	$(MAKE) -C $(gem_src)/src
 
