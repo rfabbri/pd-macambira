@@ -907,6 +907,7 @@ flext_clean:
 
 
 gem_clean:
+	-$(MAKE) -C $(gem_src)/src clean
 
 
 pd_clean:
