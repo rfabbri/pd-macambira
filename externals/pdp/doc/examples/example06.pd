@@ -4,7 +4,7 @@
 #X msg 42 25 stop;
 #X msg 80 24 bang;
 #X floatatom 122 25 5 0 0;
-#X obj 60 485 pdp_xv;
+#X obj 60 485 pdp_glx;
 #X obj 60 439 pdp_bq;
 #X obj 111 334 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
 1;

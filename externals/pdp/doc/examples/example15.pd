@@ -13,7 +13,7 @@
 #X obj 126 224 pdp_gain 22;
 #X text 7 2 using motion_fade \, contrast \, mul and gain to get a
 motion triggered effect;
-#X obj 126 258 pdp_xv;
+#X obj 126 258 pdp_glx;
 #X connect 0 0 1 0;
 #X connect 1 0 3 0;
 #X connect 2 0 1 0;

@@ -1,6 +1,6 @@
 #N canvas 400 126 715 814 10;
 #X obj 59 391 pdp_qt;
-#X obj 59 462 pdp_xv;
+#X obj 59 462 pdp_glx;
 #X floatatom 77 429 5 0 0;
 #X floatatom 127 430 5 0 0;
 #X obj 56 41 metro 40;
@@ -35,7 +35,7 @@ argument is the audio channel (default = 0 = left);
 #X text 252 432 the second outlet outputs the current frame number.
 the third outlet outputs the total number of frames in a movie when
 it is opened.;
-#X obj 56 786 pdp_xv;
+#X obj 56 786 pdp_glx;
 #X obj 56 715 pdp_qt~;
 #X obj 84 757 dac~;
 #X msg 33 644 play;

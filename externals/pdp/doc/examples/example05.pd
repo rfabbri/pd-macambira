@@ -68,7 +68,7 @@ frequency flickering;
 #X connect 18 0 8 0;
 #X connect 18 0 9 0;
 #X restore 121 274 pd nlmap;
-#X obj 73 576 pdp_xv;
+#X obj 73 576 pdp_glx;
 #X floatatom 180 232 5 0 0;
 #X text 196 275 2 iterations of the logistic map function;
 #X obj 121 143 pdp_mul;

@@ -53,7 +53,7 @@
 #X msg 515 37 0.17;
 #X text 236 208 send a signal to a table and use this as an intensity
 mapping function in pdp_cheby;
-#X obj 20 250 pdp_xv;
+#X obj 20 250 pdp_glx;
 #X obj 20 15 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #X msg 573 36 3;

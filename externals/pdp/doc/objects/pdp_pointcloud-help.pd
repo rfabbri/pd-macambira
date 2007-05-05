@@ -13,7 +13,7 @@
 #X msg 267 174 nbclusters \$1;
 #X obj 180 216 pdp_description;
 #X obj 180 243 print;
-#X obj 35 296 pdp_xv;
+#X obj 35 296 pdp_glx;
 #X obj 39 221 pdp_m_mm A A^T;
 #X obj 34 273 pdp_scale 64 64;
 #X obj 34 252 pdp_convert image/*/*;

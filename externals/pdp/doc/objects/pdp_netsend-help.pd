@@ -24,14 +24,14 @@
 #X msg 212 62 dim 320 240;
 #X msg 18 44 connect localhost 7777;
 #X obj 65 247 pdp_netreceive 7777;
-#X obj 78 275 pdp_xv;
+#X obj 78 275 pdp_glx;
 #X obj 123 136 pdp_route;
 #X obj 203 130 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X floatatom 281 248 5 0 0 0 - - -;
 #X msg 281 268 timeout \$1;
 #X obj 154 103 pdp_v4l;
-#X obj 132 275 pdp_xv;
+#X obj 132 275 pdp_glx;
 #X text 97 334 this is still experimental (SIGSEGVs ahead);
 #X connect 0 0 26 0;
 #X connect 1 0 26 0;

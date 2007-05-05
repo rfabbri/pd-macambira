@@ -32,7 +32,7 @@ negative feedback around suddon changes);
 #X msg 144 13 1000;
 #X msg 146 119 type grey;
 #X msg 147 90 type yv12;
-#X obj 68 619 pdp_xv;
+#X obj 68 619 pdp_glx;
 #X text 393 206 mix in some noise to get it going (set blur to minimal
 when starting so the added noise won't be blurred to black);
 #X obj 68 363 pdp_del 50;

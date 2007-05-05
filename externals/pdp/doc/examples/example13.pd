@@ -1,5 +1,5 @@
 #N canvas 419 114 799 646 10;
-#X obj 450 429 pdp_xv;
+#X obj 450 429 pdp_glx;
 #X obj 545 76 pdp_control;
 #X msg 545 48 thread \$1;
 #X obj 545 24 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1

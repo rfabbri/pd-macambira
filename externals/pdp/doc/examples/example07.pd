@@ -1,5 +1,5 @@
 #N canvas 466 98 659 764 10;
-#X obj 18 649 pdp_xv;
+#X obj 18 649 pdp_glx;
 #X obj 17 58 pdp_noise;
 #X obj 16 14 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;

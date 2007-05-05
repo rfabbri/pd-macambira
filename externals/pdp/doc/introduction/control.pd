@@ -1,5 +1,5 @@
 #N canvas 372 355 668 154 10;
-#X obj 33 107 pdp_xv;
+#X obj 33 107 pdp_glx;
 #X obj 33 57 pdp_v4l;
 #X msg 33 12 bang;
 #X obj 33 81 pdp_trigger;
