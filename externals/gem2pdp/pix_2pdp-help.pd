@@ -3,7 +3,7 @@
 #X obj 399 302 gemhead;
 #X obj 151 557 pix_texture;
 #X obj 151 589 rectangle 4 4;
-#X obj 501 531 pdp_xv;
+#X obj 501 531 pdp_glx;
 #X msg 546 478 create;
 #X msg 546 502 destroy;
 #X obj 399 436 pix_2pdp;

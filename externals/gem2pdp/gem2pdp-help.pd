@@ -40,7 +40,7 @@
 #X obj 239 336 pdp_spigot;
 #X obj 355 327 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X obj 239 390 pdp_xv;
+#X obj 239 390 pdp_glx;
 #X msg 126 360 dim 320 240;
 #X obj 43 359 loadbang;
 #X obj 526 199 teapot;
