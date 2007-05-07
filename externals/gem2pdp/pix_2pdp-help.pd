@@ -15,7 +15,7 @@
 #X obj 466 252 openpanel;
 #X obj 466 232 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 466 300 open /home/Georg/pd-cvs/gem/Gem/examples/data/homer.avi
+#X msg 466 300 open ../examples/Gem/data/homer.avi
 ;
 #X msg 92 251 create \, 1;
 #X msg 104 273 0 \, destroy;
