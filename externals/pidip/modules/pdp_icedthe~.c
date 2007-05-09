@@ -488,10 +488,12 @@ static void *pdp_icedthe_decode(void *tdata)
     twait.tv_nsec = 25000000; // 25 ms
  
     schedprio.sched_priority = sched_get_priority_min(SCHED_FIFO) + x->x_priority;
+#ifdef __gnu_linux__
     if ( sched_setscheduler(0, SCHED_FIFO, &schedprio) == -1)
     {
         post("pdp_icedthe~ : couldn't set priority for decoding thread.");
     }
+#endif
 
     while ( x->x_decodechild )
     {

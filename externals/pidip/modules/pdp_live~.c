@@ -535,11 +535,12 @@ static void *pdp_decode_stream_from_url(void *tdata)
     twait.tv_nsec = 10000000; // 10 ms
  
     schedprio.sched_priority = sched_get_priority_min(SCHED_FIFO) + x->x_priority;
+#ifdef __gnu_linux__
     if ( sched_setscheduler(0,SCHED_FIFO,&schedprio) == -1)
     {
         post("pdp_live~ : couldn't set priority for decoding thread.");
     }
-
+#endif
     if ( ! (x->x_avcontext->iformat->flags & AVFMT_NOHEADER ) )
     {
        if (x->x_avcontext->iformat->read_header(x->x_avcontext, &x->x_avparameters) < 0) 

@@ -127,10 +127,12 @@ static void *pdp_mp4player_decode(void *tdata)
     twait.tv_nsec = 10000000; // 10 ms
 
     schedprio.sched_priority = 0;
+#ifdef __gnu_linux__
     if ( sched_setscheduler(0, SCHED_OTHER, &schedprio) == -1)
     {
        post("pdp_mp4player~ : couldn't set scheduler for decoding thread.\n");
     }
+#endif
     if ( setpriority( PRIO_PROCESS, 0, x->x_priority ) < 0 )
     {
        post("pdp_mp4player~ : couldn't set priority to %d for decoding thread.\n", x->x_priority );
