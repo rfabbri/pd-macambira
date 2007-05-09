@@ -28,12 +28,14 @@ case "$host" in
        CFLAGS="$CFLAGS -I/sw/include"
        CPPFLAGS="$CPPFLAGS -I/sw/include"
        LDFLAGS="$LDFLAGS -L/sw/lib"
+		 PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_ieee1394.o"
      elif test -d /opt/local ; then
        # DarwinPorts
        PATH="/opt/local/bin:/opt/local/sbin:$PATH"
        CFLAGS="$CFLAGS -I/opt/local/include"
        CPPFLAGS="$CPPFLAGS -I/opt/local/include"
        LDFLAGS="$LDFLAGS -L/opt/local/lib"
+		 PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_ieee1394.o"
      fi
   ;;
 esac
@@ -94,7 +96,7 @@ then
 fi
 
 PDP_PIDIP_LIBS="$PDP_PIDIP_LIBS -lbz2 -lz -ldl -lmp3lame -logg -lvorbis -lvorbisenc"
-PDP_PIDIP_INCLUDES="-I$PD_DIR/src -I. -I$PDP_DIR/include -I../include -I../charmaps -I/sw/include/libquicktime"
+PDP_PIDIP_INCLUDES="-I$PD_DIR/src -I. -I$PDP_DIR/include -I../include -I../charmaps"
 
 make clean
 
@@ -115,7 +117,7 @@ AC_PATH_GENERIC(imlib2, 1.0.0,
   AC_MSG_ERROR(Cannot find imlib2: Is imlib2-config in the path?) )
 
 AC_CHECK_LIB(Magick, XWindowByProperty, 
-              [ PDP_CAPTURE_OBJECT="pdp_capture.o"
+              [ PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_capture.o"
               AC_DEFINE(HAVE_IMAGE_MAGICK, 1, image magick capture capability)
               MAGICK_LIBS="-L/usr/X11R6/lib -lMagick `Magick-config --libs` `Magick-config --ldflags`"
               MAGICK_CFLAGS="-I/usr/X11R6/include `Magick-config --cflags` " ],
@@ -136,23 +138,23 @@ qt_minor_version="`lqt-config --version | cut -f3 -d'.'`"
 echo "qt version minor : ${qt_minor_version}"
 if test ${qt_minor_version} == "8";
 then
-  AC_DEFINE(QUICKTIME_NEWER, 1, newer quicktime lib)
+  IMLIB_CFLAGS="$CFLAGS -DQUICKTIME_NEWER=1"
 fi
 if test ${qt_minor_version} == "9";
 then
-  AC_DEFINE(QUICKTIME_NEWER, 1, newer quicktime lib)
+  IMLIB_CFLAGS="$CFLAGS -DQUICKTIME_NEWER=1"
 fi
 if test ${qt_minor_version} == "10";
 then
-  AC_DEFINE(QUICKTIME_NEWER, 1, newer quicktime lib)
+  IMLIB_CFLAGS="$CFLAGS -DQUICKTIME_NEWER=1"
 fi
 if test ${qt_minor_version} == "11";
 then
-  AC_DEFINE(QUICKTIME_NEWER, 1, newer quicktime lib)
+  IMLIB_CFLAGS="$CFLAGS -DQUICKTIME_NEWER=1"
 fi
 if test ${qt_minor_version} == "12";
 then
-  AC_DEFINE(QUICKTIME_NEWER, 1, newer quicktime lib)
+  IMLIB_CFLAGS="$CFLAGS -DQUICKTIME_NEWER=1"
 fi
 
 THEORA_LIBS="-ltheora -logg -lvorbis -lvorbisenc"
