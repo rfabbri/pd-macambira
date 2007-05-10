@@ -22,20 +22,19 @@ enable_mpeg4ip=no
 # Check for DarwinPorts and/or Fink on Mac OS X/Darwin
 case "$host" in
   *-darwin* | *-macos10*)
+	  PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_ieee1394.o"
      if test -d /sw ; then
        # Fink
        PATH="/sw/bin:/sw/sbin:$PATH"
        CFLAGS="$CFLAGS -I/sw/include"
        CPPFLAGS="$CPPFLAGS -I/sw/include"
        LDFLAGS="$LDFLAGS -L/sw/lib"
-		 PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_ieee1394.o"
      elif test -d /opt/local ; then
        # DarwinPorts
        PATH="/opt/local/bin:/opt/local/sbin:$PATH"
        CFLAGS="$CFLAGS -I/opt/local/include"
        CPPFLAGS="$CPPFLAGS -I/opt/local/include"
        LDFLAGS="$LDFLAGS -L/opt/local/lib"
-		 PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_ieee1394.o"
      fi
   ;;
 esac
