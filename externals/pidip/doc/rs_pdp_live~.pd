@@ -67,7 +67,7 @@
 #X text 390 424 ([0 \, 20 ] default : 1 );
 #X text 6 222 ffmpeg >= 0.4.9;
 #X text 6 207 warning : works only with;
-#X obj 35 501 pdp_xv;
+#X obj 35 501 pdp_glx;
 #X obj 66 61 block~ 1024;
 #X msg 246 78 connect http://gollum.artefacte.org:8090/osas.mpg;
 #X connect 6 0 37 0;

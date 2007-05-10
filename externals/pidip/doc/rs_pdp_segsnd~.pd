@@ -27,7 +27,7 @@
 #X obj 559 390 route pdp_drop;
 #X text 113 393 pdp_segsnd~ : turn pixels from a segment into sound
 ;
-#X obj 210 311 pdp_xv;
+#X obj 210 311 pdp_glx;
 #X floatatom 237 243 5 0 0;
 #X floatatom 284 244 5 0 0;
 #X floatatom 333 244 5 0 0;

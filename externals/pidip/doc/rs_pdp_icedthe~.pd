@@ -39,7 +39,7 @@
 #X msg 294 350 framerate \$1;
 #X floatatom 393 352 5 0 0 0 - - -;
 #X text 439 352 Set the desired receiving framerate;
-#X obj 39 496 pdp_xv;
+#X obj 39 496 pdp_glx;
 #X msg 199 191 connect http://hackitectura.net:8000/vlnc.ogg;
 #X connect 3 0 34 0;
 #X connect 4 0 3 0;

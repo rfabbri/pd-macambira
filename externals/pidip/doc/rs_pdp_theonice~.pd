@@ -29,7 +29,7 @@
 #X text 381 161 ==== ACTIONS ========;
 #X text 382 382 ==== VIDEOS SETTINGS ========;
 #X text 381 483 ==== AUDIO SETTINGS ========;
-#X obj 23 329 pdp_xv;
+#X obj 23 329 pdp_glx;
 #X obj 74 178 pdp_affine;
 #X floatatom 106 152 5 0 0 0 - - -;
 #X obj 356 19 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1

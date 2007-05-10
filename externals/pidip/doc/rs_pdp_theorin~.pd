@@ -54,7 +54,7 @@
 #X text 11 207 ( sorry \, theora is not really;
 #X floatatom 309 455 5 0 0 0 - - -;
 #X text 354 455 File size ( in kbs );
-#X obj 39 496 pdp_xv;
+#X obj 39 496 pdp_glx;
 #X obj 78 259 vsl 15 128 0 510 0 0 empty filesize empty 0 -8 0 8 -262144
 -1 -1 0 1;
 #X msg 310 473 \; filesize range 0 \$1;

@@ -3,7 +3,7 @@
 #X floatatom 305 462 5 0 0 0 - - -;
 #X text 351 461 Streaming status;
 #X floatatom 300 440 5 0 0 0 - - -;
-#X obj 36 449 pdp_xv;
+#X obj 36 449 pdp_glx;
 #X text 321 185 Disconnect from the current stream;
 #X msg 243 183 disconnect;
 #X text 349 441 Number of video frames decoded;
