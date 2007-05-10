@@ -311,7 +311,7 @@ void pdp_spotlight_setup(void)
     class_addmethod(pdp_spotlight_class, (t_method)pdp_spotlight_g, gensym("g"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_spotlight_class, (t_method)pdp_spotlight_b, gensym("b"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_spotlight_class, (t_method)pdp_spotlight_strength, gensym("strength"),  A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_spotlight_class, gensym("pdp_spotlight.pd") );
+
 
 }
 

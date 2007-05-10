@@ -311,7 +311,7 @@ void pdp_juxta_setup(void)
 
     class_addmethod(pdp_juxta_class, (t_method)pdp_juxta_input_0, gensym("pdp1"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_juxta_class, (t_method)pdp_juxta_input_1, gensym("pdp2"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_juxta_class, gensym("pdp_juxta.pd") );
+
 
 }
 

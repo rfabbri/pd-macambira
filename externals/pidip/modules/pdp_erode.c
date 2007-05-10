@@ -273,7 +273,7 @@ void pdp_erode_setup(void)
     class_addmethod(pdp_erode_class, (t_method)pdp_erode_nbpasses, gensym("nbpasses"), A_FLOAT, A_NULL);
     class_addmethod(pdp_erode_class, (t_method)pdp_erode_kernelw, gensym("kernelw"), A_FLOAT, A_NULL);
     class_addmethod(pdp_erode_class, (t_method)pdp_erode_kernelh, gensym("kernelh"), A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_erode_class, gensym("pdp_erode.pd") );
+
 }
 
 #ifdef __cplusplus

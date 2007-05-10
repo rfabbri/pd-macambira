@@ -273,7 +273,7 @@ void pdp_dilate_setup(void)
     class_addmethod(pdp_dilate_class, (t_method)pdp_dilate_nbpasses, gensym("nbpasses"), A_FLOAT, A_NULL);
     class_addmethod(pdp_dilate_class, (t_method)pdp_dilate_kernelw, gensym("kernelw"), A_FLOAT, A_NULL);
     class_addmethod(pdp_dilate_class, (t_method)pdp_dilate_kernelh, gensym("kernelh"), A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_dilate_class, gensym("pdp_dilate.pd") );
+
 }
 
 #ifdef __cplusplus

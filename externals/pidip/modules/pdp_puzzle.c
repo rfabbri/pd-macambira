@@ -413,7 +413,7 @@ void pdp_puzzle_setup(void)
     class_addmethod(pdp_puzzle_class, (t_method)pdp_puzzle_left, gensym("left"), A_NULL);
     class_addmethod(pdp_puzzle_class, (t_method)pdp_puzzle_right, gensym("right"), A_NULL);
     class_addmethod(pdp_puzzle_class, (t_method)pdp_puzzle_nbblocks, gensym("nbblocks"), A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_puzzle_class, gensym("pdp_puzzle.pd") );
+
 
 }
 

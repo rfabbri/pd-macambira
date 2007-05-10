@@ -272,7 +272,7 @@ void pdp_disintegration_setup(void)
     class_addmethod(pdp_disintegration_class, (t_method)pdp_disintegration_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_disintegration_class, (t_method)pdp_disintegration_nbpasses, gensym("nbpasses"), A_FLOAT, A_NULL);
     class_addmethod(pdp_disintegration_class, (t_method)pdp_disintegration_reductor, gensym("reductor"), A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_disintegration_class, gensym("pdp_disintegration.pd") );
+
 }
 
 #ifdef __cplusplus

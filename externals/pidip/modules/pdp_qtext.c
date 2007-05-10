@@ -1070,7 +1070,7 @@ void pdp_qtext_setup(void)
     class_addmethod(pdp_qtext_class, (t_method)pdp_qtext_marginv, gensym("marginv"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_qtext_class, (t_method)pdp_qtext_direction, gensym("direction"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_qtext_class, (t_method)pdp_qtext_mode, gensym("layermode"),  A_SYMBOL, A_NULL);
-    class_sethelpsymbol( pdp_qtext_class, gensym("pdp_qtext.pd") );
+
 
     imlib_add_path_to_font_path("/usr/X11R6/lib/X11/fonts/TTF");
     font = imlib_load_font(DEFAULT_FONT);

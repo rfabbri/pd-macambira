@@ -671,7 +671,7 @@ void pdp_ctrack_setup(void)
     class_addmethod(pdp_ctrack_class, (t_method)pdp_ctrack_cursor, gensym("cursor"), A_FLOAT, A_NULL);
     class_addmethod(pdp_ctrack_class, (t_method)pdp_ctrack_frame, gensym("frame"), A_FLOAT, A_NULL);
     class_addmethod(pdp_ctrack_class, (t_method)pdp_ctrack_setcur, gensym("setcur"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_ctrack_class, gensym("pdp_ctrack.pd") );
+
 }
 
 #ifdef __cplusplus

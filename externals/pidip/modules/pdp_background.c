@@ -179,7 +179,7 @@ void pdp_background_setup(void)
     class_addmethod(pdp_background_class, (t_method)pdp_background_green, gensym("green"), A_FLOAT, A_NULL);
     class_addmethod(pdp_background_class, (t_method)pdp_background_blue, gensym("blue"), A_FLOAT, A_NULL);
     class_addmethod(pdp_background_class, (t_method)pdp_background_dim, gensym("dim"), A_FLOAT, A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_background_class, gensym("pdp_background.pd") );
+
 
 }
 

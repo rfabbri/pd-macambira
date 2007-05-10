@@ -472,7 +472,7 @@ void pdp_compose_setup(void)
     class_addmethod(pdp_compose_class, (t_method)pdp_compose_tolerance, gensym("tolerance"), A_FLOAT, A_NULL);
     class_addmethod(pdp_compose_class, (t_method)pdp_compose_luminosity, gensym("luminosity"), A_FLOAT, A_NULL);
     class_addmethod(pdp_compose_class, (t_method)pdp_compose_setcur, gensym("setcur"), A_FLOAT, A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_compose_class, gensym("pdp_compose.pd") );
+
 }
 
 #ifdef __cplusplus

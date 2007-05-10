@@ -160,7 +160,7 @@ void pdp_spigot_setup(void)
 
     class_addmethod(pdp_spigot_class, (t_method)pdp_spigot_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_spigot_class, (t_method)pdp_spigot_toggle, gensym("toggle"),  A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_spigot_class, gensym("pdp_spigot.pd") );
+
 
 }
 

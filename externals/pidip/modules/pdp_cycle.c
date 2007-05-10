@@ -238,7 +238,7 @@ void pdp_cycle_setup(void)
     class_addmethod(pdp_cycle_class, (t_method)pdp_cycle_cycley, gensym("cycley"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_cycle_class, (t_method)pdp_cycle_cycleu, gensym("cycleu"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_cycle_class, (t_method)pdp_cycle_cyclev, gensym("cyclev"),  A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_cycle_class, gensym("pdp_cycle.pd") );
+
 
 }
 

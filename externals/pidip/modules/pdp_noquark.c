@@ -271,7 +271,7 @@ void pdp_noquark_setup(void)
     class_addmethod(pdp_noquark_class, (t_method)pdp_noquark_input_0, gensym("pdp"), A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_noquark_class, (t_method)pdp_noquark_planes, gensym("planes"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_noquark_class, (t_method)pdp_noquark_tolerance, gensym("tolerance"), A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_noquark_class, gensym("pdp_noquark.pd") );
+
 
 }
 

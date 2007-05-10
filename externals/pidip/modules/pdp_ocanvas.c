@@ -432,7 +432,7 @@ void pdp_ocanvas_setup(void)
   // post( pdp_ocanvas_version );
   pdp_ocanvas_class = class_new(gensym("pdp_ocanvas"), (t_newmethod)pdp_ocanvas_new,
     	(t_method)pdp_ocanvas_free, sizeof(t_pdp_ocanvas), 0, A_GIMME, A_NULL);
-  class_sethelpsymbol( pdp_ocanvas_class, gensym("pdp_ocanvas.pd") );
+
 
   class_addmethod(pdp_ocanvas_class, (t_method)pdp_ocanvas_input0, gensym("pdp0"), A_SYMBOL, A_DEFFLOAT, A_NULL);
   class_addmethod(pdp_ocanvas_class, (t_method)pdp_ocanvas_input1, gensym("pdp1"), A_SYMBOL, A_DEFFLOAT, A_NULL);

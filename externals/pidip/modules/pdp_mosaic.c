@@ -304,7 +304,7 @@ void pdp_mosaic_setup(void)
     class_addmethod(pdp_mosaic_class, (t_method)pdp_mosaic_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_mosaic_class, (t_method)pdp_mosaic_background, gensym("background"), A_NULL);
     class_addmethod(pdp_mosaic_class, (t_method)pdp_mosaic_level, gensym("level"), A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_mosaic_class, gensym("pdp_mosaic.pd") );
+
 
 }
 

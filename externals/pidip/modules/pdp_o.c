@@ -590,7 +590,7 @@ void pdp_o_setup(void)
     class_addmethod(pdp_o_class, (t_method)pdp_o_refresh, gensym("refresh"), A_NULL);
     class_addmethod(pdp_o_class, (t_method)pdp_o_framerate, gensym("framerate"), A_FLOAT, A_NULL);
     class_addmethod(pdp_o_class, (t_method)pdp_o_smoothing, gensym("smoothing"), A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_o_class, gensym("pdp_o.pd") );
+
 
 }
 

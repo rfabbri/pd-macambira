@@ -854,7 +854,7 @@ void pdp_transition_setup(void)
     class_addmethod(pdp_transition_class, (t_method)pdp_transition_melt, gensym("melt"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_transition_class, (t_method)pdp_transition_blend, gensym("blend"),  A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_transition_class, (t_method)pdp_transition_page, gensym("page"),  A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_transition_class, gensym("pdp_transition.pd") );
+
 
 
 }

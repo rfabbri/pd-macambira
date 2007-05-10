@@ -283,7 +283,7 @@ void pdp_cropper_setup(void)
     class_addmethod(pdp_cropper_class, (t_method)pdp_cropper_cropx2, gensym("x2"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_cropper_class, (t_method)pdp_cropper_cropy1, gensym("y1"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_cropper_class, (t_method)pdp_cropper_cropy2, gensym("y2"),  A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_cropper_class, gensym("pdp_cropper.pd") );
+
 }
 
 #ifdef __cplusplus

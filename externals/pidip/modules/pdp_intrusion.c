@@ -420,7 +420,7 @@ void pdp_intrusion_setup(void)
     class_addmethod(pdp_intrusion_class, (t_method)pdp_intrusion_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_intrusion_class, (t_method)pdp_intrusion_background, gensym("background"),  A_NULL);
     class_addmethod(pdp_intrusion_class, (t_method)pdp_intrusion_threshold, gensym("threshold"),  A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_intrusion_class, gensym("pdp_intrusion.pd") );
+
 
 }
 

@@ -260,7 +260,7 @@ void pdp_quark_setup(void)
     class_addmethod(pdp_quark_class, (t_method)pdp_quark_input_0, gensym("pdp"), A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_quark_class, (t_method)pdp_quark_planes, gensym("planes"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_quark_class, (t_method)pdp_quark_tolerance, gensym("tolerance"), A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_quark_class, gensym("pdp_quark.pd") );
+
 
 }
 

@@ -471,6 +471,6 @@ void pdp_i_setup(void)
     pdp_i_class = class_new(gensym("pdp_i"), 
     	(t_newmethod) pdp_i_new, (t_method) pdp_i_free,
     	sizeof(t_pdp_i),  CLASS_NOINLET, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_i_class, gensym("pdp_i.pd") );
+
 
 }

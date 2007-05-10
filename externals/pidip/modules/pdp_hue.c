@@ -175,7 +175,7 @@ void pdp_hue_setup(void)
     	(t_method)pdp_hue_free, sizeof(t_pdp_hue), 0, A_NULL);
 
     class_addmethod(pdp_hue_class, (t_method)pdp_hue_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_hue_class, gensym("pdp_hue.pd") );
+
 
 }
 

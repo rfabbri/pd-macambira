@@ -1329,7 +1329,7 @@ void pdp_theonice_tilde_setup(void)
     class_addmethod(pdp_theonice_class, (t_method)pdp_theonice_url, gensym("url"), A_SYMBOL, A_NULL);
     class_addmethod(pdp_theonice_class, (t_method)pdp_theonice_description, gensym("description"), A_GIMME, A_NULL);
     class_addmethod(pdp_theonice_class, (t_method)pdp_theonice_genre, gensym("genre"), A_GIMME, A_NULL);
-    class_sethelpsymbol( pdp_theonice_class, gensym("pdp_theonice~.pd") );
+
 
 }
 

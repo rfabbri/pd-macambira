@@ -383,7 +383,7 @@ void pdp_ascii_setup(void)
     class_addmethod(pdp_ascii_class, (t_method)pdp_ascii_brightness, gensym("brightness"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_ascii_class, (t_method)pdp_ascii_ratio, gensym("ratio"),  A_DEFFLOAT, A_NULL);
     class_addmethod( pdp_ascii_class, (t_method)pdp_ascii_load, gensym("load"), A_SYMBOL, 0);
-    class_sethelpsymbol( pdp_ascii_class, gensym("pdp_ascii.pd") );
+
 
 }
 

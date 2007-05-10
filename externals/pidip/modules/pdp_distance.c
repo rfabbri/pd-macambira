@@ -329,7 +329,7 @@ void pdp_distance_setup(void)
     class_addmethod(pdp_distance_class, (t_method)pdp_distance_coeff2, gensym("coeff2"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_distance_class, (t_method)pdp_distance_coeff3, gensym("coeff3"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_distance_class, (t_method)pdp_distance_coeff4, gensym("coeff4"),  A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_distance_class, gensym("pdp_distance.pd") );
+
 }
 
 #ifdef __cplusplus

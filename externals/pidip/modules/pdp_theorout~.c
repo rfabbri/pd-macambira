@@ -924,7 +924,7 @@ void pdp_theorout_tilde_setup(void)
     class_addmethod(pdp_theorout_class, (t_method)pdp_theorout_vbitrate, gensym("videobitrate"), A_FLOAT, A_NULL);
     class_addmethod(pdp_theorout_class, (t_method)pdp_theorout_aquality, gensym("audioquality"), A_FLOAT, A_NULL);
     class_addmethod(pdp_theorout_class, (t_method)pdp_theorout_vquality, gensym("videoquality"), A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_theorout_class, gensym("pdp_theorout~.pd") );
+
 
 }
 

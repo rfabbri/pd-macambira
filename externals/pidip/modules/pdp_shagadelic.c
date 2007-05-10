@@ -299,7 +299,7 @@ void pdp_shagadelic_setup(void)
 
     class_addmethod(pdp_shagadelic_class, (t_method)pdp_shagadelic_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_shagadelic_class, (t_method)pdp_shagadelic_mask, gensym("mask"),  A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_shagadelic_class, gensym("pdp_shagadelic.pd") );
+
 
 }
 

@@ -332,7 +332,7 @@ void pdp_imgsaver_setup(void)
     class_addmethod(pdp_imgsaver_class, (t_method)pdp_imgsaver_input_0, gensym("pdp"),  
                              A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_imgsaver_class, (t_method)pdp_imgsaver_save, gensym("save"),  A_SYMBOL, A_NULL);
-    class_sethelpsymbol( pdp_imgsaver_class, gensym("pdp_imgsaver.pd") );
+
 
 }
 

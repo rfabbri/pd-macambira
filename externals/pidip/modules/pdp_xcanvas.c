@@ -516,7 +516,7 @@ void pdp_xcanvas_setup(void)
   // post( pdp_xcanvas_version );
   pdp_xcanvas_class = class_new(gensym("pdp_xcanvas"), (t_newmethod)pdp_xcanvas_new,
     	(t_method)pdp_xcanvas_free, sizeof(t_pdp_xcanvas), 0, A_GIMME, A_NULL);
-  class_sethelpsymbol( pdp_xcanvas_class, gensym("pdp_xcanvas.pd") );
+
 
   class_addmethod(pdp_xcanvas_class, (t_method)pdp_xcanvas_input0, gensym("pdp0"), A_SYMBOL, A_DEFFLOAT, A_NULL);
   class_addmethod(pdp_xcanvas_class, (t_method)pdp_xcanvas_input1, gensym("pdp1"), A_SYMBOL, A_DEFFLOAT, A_NULL);

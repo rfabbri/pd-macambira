@@ -511,7 +511,7 @@ void pdp_spiral_setup(void)
     class_addmethod(pdp_spiral_class, (t_method)pdp_spiral_depth_shift, gensym("focus_increment"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_spiral_class, (t_method)pdp_spiral_depth_shift, gensym("toggle_xor"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_spiral_class, (t_method)pdp_spiral_depth_shift, gensym("animate_focus"),  A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_spiral_class, gensym("pdp_spiral.pd") );
+
 
 }
 

@@ -697,5 +697,5 @@ void pdp_colorgrid_setup(void)
     class_setwidget(pdp_colorgrid_class, &pdp_colorgrid_widgetbehavior);
     class_setpropertiesfn(pdp_colorgrid_class, pdp_colorgrid_properties);
     class_setsavefn(pdp_colorgrid_class, pdp_colorgrid_save);
-    class_sethelpsymbol(pdp_colorgrid_class, gensym("help-pdp_colorgrid.pd"));
+
 }

@@ -529,7 +529,7 @@ void pdp_pen_setup(void)
 //    post( pdp_pen_version );
     pdp_pen_class = class_new(gensym("pdp_pen"), (t_newmethod)pdp_pen_new,
     	(t_method)pdp_pen_free, sizeof(t_pdp_pen), 0, A_NULL);
-    class_sethelpsymbol( pdp_pen_class, gensym("pdp_pen.pd") );
+
 
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_draw, gensym("draw"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);

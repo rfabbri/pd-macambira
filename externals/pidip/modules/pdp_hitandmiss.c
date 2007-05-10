@@ -378,7 +378,7 @@ void pdp_hitandmiss_setup(void)
     class_addmethod(pdp_hitandmiss_class, (t_method)pdp_hitandmiss_kernelw, gensym("kernelw"), A_FLOAT, A_NULL);
     class_addmethod(pdp_hitandmiss_class, (t_method)pdp_hitandmiss_kernelh, gensym("kernelh"), A_FLOAT, A_NULL);
     class_addmethod(pdp_hitandmiss_class, (t_method)pdp_hitandmiss_kdata, gensym("kernel"), A_GIMME, A_NULL);
-    class_sethelpsymbol( pdp_hitandmiss_class, gensym("pdp_hitandmiss.pd") );
+
 }
 
 #ifdef __cplusplus

@@ -605,7 +605,7 @@ void pdp_shape_setup(void)
 //    post( pdp_shape_version );
     pdp_shape_class = class_new(gensym("pdp_shape"), (t_newmethod)pdp_shape_new,
     	(t_method)pdp_shape_free, sizeof(t_pdp_shape), 0, A_NULL);
-    class_sethelpsymbol( pdp_shape_class, gensym("pdp_shape.pd") );
+
 
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_pick, gensym("pick"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);

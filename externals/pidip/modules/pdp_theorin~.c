@@ -994,7 +994,7 @@ void pdp_theorin_tilde_setup(void)
     class_addmethod(pdp_theorin_class, (t_method)pdp_theorin_threadify, gensym("thread"), A_FLOAT, A_NULL);
     class_addmethod(pdp_theorin_class, (t_method)pdp_theorin_bang, gensym("bang"), A_NULL);
     class_addmethod(pdp_theorin_class, (t_method)pdp_theorin_frame_cold, gensym("frame_cold"), A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_theorin_class, gensym("pdp_theorin~.pd") );
+
 
 }
 

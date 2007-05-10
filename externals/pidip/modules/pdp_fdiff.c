@@ -223,7 +223,7 @@ void pdp_fdiff_setup(void)
     	(t_method)pdp_fdiff_free, sizeof(t_pdp_fdiff), 0, A_NULL);
 
     class_addmethod(pdp_fdiff_class, (t_method)pdp_fdiff_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_fdiff_class, gensym("pdp_fdiff.pd") );
+
 
 }
 

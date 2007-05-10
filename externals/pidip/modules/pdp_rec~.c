@@ -712,7 +712,7 @@ void pdp_rec_tilde_setup(void)
     class_addmethod(pdp_rec_class, (t_method)pdp_rec_jpeg, gensym("jpeg"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_rec_class, (t_method)pdp_rec_start, gensym("start"), A_NULL);
     class_addmethod(pdp_rec_class, (t_method)pdp_rec_stop, gensym("stop"), A_NULL);
-    class_sethelpsymbol( pdp_rec_class, gensym("pdp_rec~.pd") );
+
 
 }
 

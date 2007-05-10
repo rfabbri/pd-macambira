@@ -405,7 +405,7 @@ void pdp_segsnd_tilde_setup(void)
     class_addmethod(pdp_segsnd_class, (t_method)pdp_segsnd_x2, gensym("x2"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_segsnd_class, (t_method)pdp_segsnd_y2, gensym("y2"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_segsnd_class, (t_method)pdp_segsnd_random, gensym("random"),  A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_segsnd_class, gensym("pdp_segsnd~.pd") );
+
 
 }
 

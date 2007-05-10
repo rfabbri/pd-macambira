@@ -344,7 +344,7 @@ void pdp_warp_setup(void)
     class_addmethod(pdp_warp_class, (t_method)pdp_warp_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_warp_class, (t_method)pdp_warp_mode, gensym("mode"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_warp_class, (t_method)pdp_warp_tval, gensym("tval"),  A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_warp_class, gensym("pdp_warp.pd") );
+
 
 }
 

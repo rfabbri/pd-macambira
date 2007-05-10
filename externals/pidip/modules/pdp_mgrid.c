@@ -327,7 +327,7 @@ void pdp_mgrid_setup(void)
     class_addmethod(pdp_mgrid_class, (t_method)pdp_mgrid_x_dim, gensym("dimx"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_mgrid_class, (t_method)pdp_mgrid_y_dim, gensym("dimy"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_mgrid_class, (t_method)pdp_mgrid_color, gensym("color"),  A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_mgrid_class, gensym("pdp_mgrid.pd") );
+
 
 
 }

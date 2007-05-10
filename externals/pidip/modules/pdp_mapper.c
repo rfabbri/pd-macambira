@@ -271,7 +271,7 @@ void pdp_mapper_setup(void)
     class_addmethod(pdp_mapper_class, (t_method)pdp_mapper_copy, gensym("copy"),  A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_mapper_class, (t_method)pdp_mapper_swap, gensym("swap"),  A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_mapper_class, (t_method)pdp_mapper_reset, gensym("reset"), A_NULL);
-    class_sethelpsymbol( pdp_mapper_class, gensym("pdp_mapper.pd") );
+
 
 }
 

@@ -1092,7 +1092,7 @@ void pdp_live_tilde_setup(void)
     class_addmethod(pdp_live_class, (t_method)pdp_live_threadify, gensym("thread"), A_FLOAT, A_NULL);
     class_addmethod(pdp_live_class, (t_method)pdp_live_bang, gensym("bang"), A_NULL);
     class_addmethod(pdp_live_class, (t_method)pdp_live_frame_cold, gensym("frame_cold"), A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_live_class, gensym("pdp_live~.pd") );
+
 
 }
 

@@ -356,7 +356,7 @@ void pdp_binary_setup(void)
     class_addmethod(pdp_binary_class, (t_method)pdp_binary_pick, gensym("pick"),  A_NULL);
     class_addmethod(pdp_binary_class, (t_method)pdp_binary_tolerance, gensym("tolerance"), A_FLOAT, A_NULL);
     class_addmethod(pdp_binary_class, (t_method)pdp_binary_setcur, gensym("setcur"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_binary_class, gensym("pdp_binary.pd") );
+
 }
 
 #ifdef __cplusplus

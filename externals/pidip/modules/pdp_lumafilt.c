@@ -247,7 +247,7 @@ void pdp_lumafilt_setup(void)
     class_addmethod(pdp_lumafilt_class, (t_method)pdp_lumafilt_input_0, gensym("pdp"), A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_lumafilt_class, (t_method)pdp_lumafilt_filter, gensym("filter"),  A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_lumafilt_class, (t_method)pdp_lumafilt_mfilter, gensym("mfilter"),  A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_lumafilt_class, gensym("pdp_lumafilt.pd") );
+
 
 }
 

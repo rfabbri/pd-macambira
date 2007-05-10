@@ -1052,7 +1052,7 @@ void pdp_ffmpeg_tilde_setup(void)
     class_addmethod(pdp_ffmpeg_class, (t_method)pdp_ffmpeg_dsp, gensym("dsp"), 0);
     class_addmethod(pdp_ffmpeg_class, (t_method)pdp_ffmpeg_feed, gensym("feed"), A_SYMBOL, A_NULL);
     class_addmethod(pdp_ffmpeg_class, (t_method)pdp_ffmpeg_starve, gensym("starve"), A_NULL);
-    class_sethelpsymbol( pdp_ffmpeg_class, gensym("pdp_ffmpeg~.pd") );
+
 
 }
 

@@ -277,7 +277,7 @@ void pdp_warhol_setup(void)
     class_addmethod(pdp_warhol_class, (t_method)pdp_warhol_y, gensym("Y"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_warhol_class, (t_method)pdp_warhol_u, gensym("U"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_warhol_class, (t_method)pdp_warhol_v, gensym("V"),  A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_warhol_class, gensym("pdp_warhol.pd") );
+
 
 }
 

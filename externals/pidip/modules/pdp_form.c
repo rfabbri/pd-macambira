@@ -613,7 +613,7 @@ void pdp_form_setup(void)
     class_addmethod(pdp_form_class, (t_method)pdp_form_delete, gensym("delete"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_form_class, (t_method)pdp_form_resize, gensym("resize"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_form_class, (t_method)pdp_form_alpha, gensym("alpha"),  A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_form_class, gensym("pdp_form.pd") );
+
 
 }
 

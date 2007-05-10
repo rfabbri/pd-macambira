@@ -281,7 +281,7 @@ void pdp_fqt_setup(void)
     class_addfloat (pdp_fqt_class, (t_method)pdp_fqt_frame);
     class_addmethod(pdp_fqt_class, (t_method)pdp_fqt_frame_cold, gensym("frame_cold"), A_FLOAT, A_NULL);
     class_addmethod(pdp_fqt_class, nullfn, gensym("signal"), 0);
-    class_sethelpsymbol( pdp_fqt_class, gensym("pdp_fqt.pd") );
+
 
 }
 

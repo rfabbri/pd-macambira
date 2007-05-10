@@ -1387,7 +1387,7 @@ void pdp_icedthe_tilde_setup(void)
     class_addmethod(pdp_icedthe_class, (t_method)pdp_icedthe_priority, gensym("priority"), A_FLOAT, A_NULL);
     class_addmethod(pdp_icedthe_class, (t_method)pdp_icedthe_framerate, gensym("framerate"), A_FLOAT, A_NULL);
     class_addmethod(pdp_icedthe_class, (t_method)pdp_icedthe_audio, gensym("audio"), A_FLOAT, A_NULL);
-    class_sethelpsymbol( pdp_icedthe_class, gensym("pdp_icedthe~.pd") );
+
 
 }
 

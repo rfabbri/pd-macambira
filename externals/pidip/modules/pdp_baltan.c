@@ -223,7 +223,7 @@ void pdp_baltan_setup(void)
 
     class_addmethod(pdp_baltan_class, (t_method)pdp_baltan_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_baltan_class, (t_method)pdp_baltan_dfts, gensym("dfts"),  A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_baltan_class, gensym("pdp_baltan.pd") );
+
 
 
 }

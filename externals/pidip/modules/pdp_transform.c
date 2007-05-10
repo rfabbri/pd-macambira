@@ -349,7 +349,7 @@ void pdp_transform_setup(void)
 
     class_addmethod(pdp_transform_class, (t_method)pdp_transform_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_transform_class, (t_method)pdp_transform_table, gensym("table"),  A_DEFFLOAT, A_NULL);
-    class_sethelpsymbol( pdp_transform_class, gensym("pdp_transform.pd") );
+
 
 }
 
