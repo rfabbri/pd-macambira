@@ -481,7 +481,7 @@ $(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
 	cd $(gem_src)/src && ./configure --without-ffmpeg --with-pd=$(pd_src) --disable-NV
 	$(MAKE) -C $(gem_src)/src
 
-$(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
+$(gem_src)/src/Gem.pd_darwin:
 # always run aclocal/autoconf until "configure" is deleted from CVS
 	cd $(gem_src)/src && aclocal
 	cd $(gem_src)/src && autoconf
