@@ -14,4 +14,4 @@ test_locations:
 	make -C $(EXTERNALS_ROOT) test_locations
 
 etags:
-	etags *.[ch] ~/cvs/pure-data/pd/src/*.[ch] /usr/include/*.h /usr/include/sys/*.h
+	etags *.[ch] ../../pd/src/*.[ch] /usr/include/*.h /usr/include/sys/*.h
