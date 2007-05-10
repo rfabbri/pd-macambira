@@ -27,7 +27,7 @@
 #X obj 496 159 t b f;
 #X text 330 108 Set position :;
 #X msg 339 159 goto \$1 \$2;
-#X obj 90 376 colorgrid colorgrid1 256 0 256 50 0 50 0 1 1 10 10 147
+#X obj 90 376 pdp_colorgrid colorgrid1 256 0 256 50 0 50 0 1 1 10 10 147
 392.06;
 #X connect 2 0 4 0;
 #X connect 3 0 17 0;
