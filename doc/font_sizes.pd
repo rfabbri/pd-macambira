@@ -1,4 +1,4 @@
-#N canvas 75 181 998 603 10;
+#N canvas 26 165 1002 607 10;
 #X obj 351 386 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
 0;
 #X obj 351 355 cnv 15 78 20 empty empty 78x20 2 12 0 9 -128992 -66577
@@ -180,7 +180,7 @@ the correct place in the grid.;
 #X floatatom 176 119 5 0 0 0 - - -;
 #X obj 146 235 s \$0-cnv;
 #X msg 45 79 courier10;
-#X msg 146 207 vis_size \$1 \$2 \, label \$1x\$2;
+#X msg 146 207 vis_size \$1 \$2 \, label \$1x$2;
 #X text 144 261 setting label this way only works with pd >= 0-40;
 #X obj 50 319 cnv 10 55 8 empty \$0-cnv2 55x8 2 30 0 11 -260818 -128992
 0;
@@ -188,21 +188,21 @@ the correct place in the grid.;
 #X floatatom 152 322 5 0 0 0 - - -;
 #X obj 182 361 t b a;
 #X floatatom 182 341 5 0 0 0 - - -;
-#X msg 152 449 vis_size \$1 \$2 \, label \$1x\$2;
+#X msg 152 449 vis_size \$1 \$2 \, label \$1x$2;
 #X text 150 503 setting label this way only works with pd >= 0-40;
 #X obj 152 477 s \$0-cnv2;
 #X text 48 316 courier10;
 #X obj 148 45 hsl 128 15 40 80 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 9200 1;
+-1 -1 0 1;
 #X obj 145 61 int;
 #X obj 188 85 hsl 128 15 5 20 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 9800 1;
+-1 -1 0 1;
 #X obj 185 101 int;
 #X obj 154 285 hsl 128 15 40 80 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 5000 1;
+-1 -1 0 1;
 #X obj 151 301 int;
 #X obj 194 305 hsl 128 15 5 20 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 3200 1;
+-1 -1 0 1;
 #X obj 191 321 int;
 #X connect 1 0 7 0;
 #X connect 2 0 1 0;
@@ -225,3 +225,12 @@ the correct place in the grid.;
 #X connect 24 0 25 0;
 #X connect 25 0 13 0;
 #X restore 852 60 pd get-fontsize;
+#X obj 520 240 cnv 15 100 60 empty empty courier10 20 12 0 10 -233017
+-66577 0;
+#X msg 538 244 courier10;
+#X text 556 284 10pt;
+#X text 520 265 0.39-2-extended-rc2;
+#X obj 233 359 cnv 15 62 17 empty empty 62x17 2 12 0 9 -128992 -66577
+0;
+#X obj 232 470 cnv 7 52 7 empty empty 52x7 2 15 0 11 -128992 -66577
+0;
