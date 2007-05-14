@@ -1253,6 +1253,13 @@ protected:
 					ToOutAnything(0,S_massesPos,1+N,sortie);
 				}
 			}
+			else if (auxtype == S_massesPosName)	{	// get all masses positions output Id
+				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {	
+					SetSymbol(sortie[0],mit.data()->Id);
+					for(int i = 0; i < N; ++i) SetFloat(sortie[1+i],mit.data()->pos[i]);
+					ToOutAnything(0,S_massesPos,1+N,sortie);
+				}
+			}
 			else if (auxtype == S_massesPosMean)	{	// get all masses positions mean
 				for(int i = 0; i<N; ++i) 
 					mean[i] = 0;
@@ -1714,6 +1721,7 @@ private:
 	const static t_symbol *S_Mass_deleted;
 	const static t_symbol *S_Link_deleted;
 	const static t_symbol *S_massesPos;
+	const static t_symbol *S_massesPosName;
 	const static t_symbol *S_massesPosMean;
 	const static t_symbol *S_massesPosStd;
 	const static t_symbol *S_massesPosNo;
@@ -1753,6 +1761,7 @@ private:
 		S_Mass_deleted = MakeSymbol("Mass deleted");
 		S_Link_deleted = MakeSymbol("Link deleted");
 		S_massesPos = MakeSymbol("massesPos");
+		S_massesPosName = MakeSymbol("massesPosName");
 		S_massesPosMean = MakeSymbol("massesPosMean");
 		S_massesPosStd = MakeSymbol("massesPosStd");
 		S_massesPosNo = MakeSymbol("massesPosNo");
@@ -1892,6 +1901,7 @@ template<int N> const t_symbol *msdN<N>::S_nLink;
 template<int N> const t_symbol *msdN<N>::S_Mass_deleted;
 template<int N> const t_symbol *msdN<N>::S_Link_deleted;
 template<int N> const t_symbol *msdN<N>::S_massesPos;
+template<int N> const t_symbol *msdN<N>::S_massesPosName;
 template<int N> const t_symbol *msdN<N>::S_massesPosNo;
 template<int N> const t_symbol *msdN<N>::S_massesPosId;
 template<int N> const t_symbol *msdN<N>::S_linksPos;
