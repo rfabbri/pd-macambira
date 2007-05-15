@@ -31,9 +31,6 @@
 #X obj 139 35 cnv 15 100 60 empty empty courier10 20 12 0 9 -233017
 -66577 0;
 #X msg 157 41 courier10;
-#X obj 233 389 cnv 15 69 16 empty empty 69x16 2 12 0 9 -128992 -66577
-0;
-#X text 221 334 0.39.2-extended-RC1;
 #X text 350 335 0.39.2-extended-test7;
 #X text 697 335 0.39-2;
 #X text 777 334 0.40-2;
@@ -70,7 +67,6 @@
 #X text 40 64 0.38-4;
 #X text 40 199 0.40-2;
 #X text 139 64 devel 0.39-1test1;
-#X text 140 265 0.39-2-extended-rc1;
 #X text 32 16 ---------- Mac OS X ----------;
 #X obj 614 500 cnv 7 63 8 empty empty 63x8 2 15 0 11 -128992 -66577
 0;
@@ -164,8 +160,6 @@ and make it fit exactly over the comment "courier10". then put it in
 the correct place in the grid.;
 #X obj 354 499 cnv 7 63 8 empty empty 63x8 2 15 0 11 -128992 -66577
 0;
-#X obj 233 529 cnv 7 53 9 empty empty 53x9 2 15 0 11 -128992 -66577
-0;
 #X obj 140 170 cnv 15 100 60 empty empty courier10 20 12 0 12 -233017
 -66577 0;
 #X msg 159 174 courier10;
@@ -234,3 +228,14 @@ the correct place in the grid.;
 0;
 #X obj 232 470 cnv 7 52 7 empty empty 52x7 2 15 0 11 -128992 -66577
 0;
+#X obj 233 389 cnv 15 62 17 empty empty 62x17 2 12 0 9 -128992 -66577
+0;
+#X obj 270 240 cnv 15 100 60 empty empty courier10 20 12 0 10 -233017
+-66577 0;
+#X msg 288 244 courier10;
+#X text 306 284 10pt;
+#X text 270 265 0.39-2-extended-rc2;
+#X text 140 265 0.39-2-extended-rc2;
+#X obj 232 530 cnv 7 52 7 empty empty 52x7 2 15 0 11 -128992 -66577
+0;
+#X text 221 334 0.39.2-extended-rc2;
