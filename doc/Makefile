@@ -99,14 +99,14 @@ externals-howto_clean:
 #------------------------------------------------------------------------------#
 # MEDIA
 MEDIA_NAME = media
-media_install: $(manualsdir)
-	install -d $(manualsdir)/$(MEDIA_NAME)
+media_install: $(pddocdir)
+	install -d $(pddocdir)/$(MEDIA_NAME)
 	install -p $(doc_src)/media/*.* \
-		$(manualsdir)/$(MEDIA_NAME) 
+		$(pddocdir)/$(MEDIA_NAME) 
 
 media_clean:
-	-rm -f -- $(manualsdir)/$(MEDIA_NAME)/*.*
-	-rmdir --	$(manualsdir)/$(MEDIA_NAME) 
+	-rm -f -- $(pddocdir)/$(MEDIA_NAME)/*.*
+	-rmdir --	$(pddocdir)/$(MEDIA_NAME) 
 
 
 
