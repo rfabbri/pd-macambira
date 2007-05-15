@@ -16,9 +16,10 @@ DefaultDirName={pf}\pd
 DefaultGroupName=Pure Data
 LicenseFile=..\..\externals\maxlib\LICENSE
 
-Compression=zip/9
+Compression=lzma/ultra
 ChangesAssociations=true
 OutputBaseFilename=PACKAGE_NAME
+AppCopyright=GNU GPL
 [Tasks]
 ; NOTE: The following entry contains English phrases ("Create a desktop icon" and "Additional icons"). You are free to translate them into another language if required.
 Name: desktopicon; Description: Create a &desktop icon; GroupDescription: Additional icons:
@@ -63,7 +64,7 @@ Root: HKCR; SubKey: .pd; ValueType: string; ValueData: Pure.Data; Flags: noerror
 Root: HKCR; SubKey: .pd; ValueType: string; ValueName: Content Type; ValueData: text/plain; Flags: noerror uninsdeletekey
 
 [_ISTool]
-Use7zip=false
+Use7zip=true
 OutputExeFilename=Output\PACKAGE_NAME.exe
 
 [Files]
@@ -95,6 +96,21 @@ Source: build\bin\cyclist.exe; DestDir: {sys}; Flags: confirmoverwrite promptifo
 ; start.exe - like Mac OS X's 'open' command, allows you to open files and
 ; URLs from the command line
 ;Source: C:\msys\1.0\bin\start.exe; DestDir: {sys}; Flags: confirmoverwrite
+;
+;
+;-----------------------------------------------------------------------------
+; Bitstream Vera Sans Mono Font Files
+; the files needed for the Pd-0.39.2-extended default font
+Source: C:\WINDOWS\Fonts\Vera.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Sans
+Source: C:\WINDOWS\Fonts\VeraBd.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Sans Bold
+Source: C:\WINDOWS\Fonts\VeraBI.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Sans Bold Oblique
+Source: C:\WINDOWS\Fonts\VeraMono.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Sans Mono
+Source: C:\WINDOWS\Fonts\VeraMoBd.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Sans Mono Bold
+Source: C:\WINDOWS\Fonts\VeraMoBI.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Sans Mono Bold Oblique
+Source: C:\WINDOWS\Fonts\VeraMoIt.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Sans Mono Oblique
+Source: C:\WINDOWS\Fonts\VeraIt.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Sans Oblique
+Source: C:\WINDOWS\Fonts\VeraSe.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Serif
+Source: C:\WINDOWS\Fonts\VeraSeBd.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Serif Bold
 ;
 ;
 ;-----------------------------------------------------------------------------
