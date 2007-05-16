@@ -66,23 +66,25 @@ prebuilt_install:
 bin_src = /usr/local/bin
 system32 = /c/WINDOWS/system32
 # ultimately, the DLLs should be installed in %SystemRoot%\system32 by InnoSetup
-#dlldir =  $(DESTDIR)$(prefix)/
-dlldir = $(bindir)
+dlldir =  $(DESTDIR)$(prefix)/
+#dlldir = $(bindir)
 lib_install:
 # these get installed into %SystemRoot%\system32 by the installer
 	install -d $(dlldir)
-	install -p $(bin_src)/libogg-0.dll  $(dlldir)/libogg-0.dll
-	install -p $(bin_src)/libsndfile-1.dll  $(dlldir)/libsndfile-1.dll
-	install -p $(bin_src)/libvorbis-0.dll  $(dlldir)/libvorbis-0.dll
-	install -p $(bin_src)/libvorbisenc-2.dll  $(dlldir)/libvorbisenc-2.dll
-	install -p $(bin_src)/libvorbisfile-3.dll  $(dlldir)/libvorbisfile-3.dll
-	install -p $(bin_src)/pthreadGC2.dll  $(dlldir)/pthreadGC2.dll
-	install -p $(bin_src)/tcl84.dll  $(dlldir)/tcl84.dll
-	install -p $(bin_src)/tclpip84.dll  $(dlldir)/tclpip84.dll
-	install -p $(bin_src)/tk84.dll  $(dlldir)/tk84.dll
+	install -p $(bin_src)/libogg-0.dll  $(dlldir)
+	install -p $(bin_src)/libsndfile-1.dll  $(dlldir)
+	install -p $(bin_src)/libvorbis-0.dll  $(dlldir)
+	install -p $(bin_src)/libvorbisenc-2.dll  $(dlldir)
+	install -p $(bin_src)/libvorbisfile-3.dll  $(dlldir)
+	install -p $(bin_src)/pthreadGC2.dll  $(dlldir)
+# these stay with pd.exe
+	install -p $(bin_src)/tcl84.dll  $(bindir)
+	install -p $(bin_src)/tclpip84.dll  $(bindir)
+	install -p $(bin_src)/tk84.dll  $(bindir)
 # if these are there, install them
-	-install -p $(system32)/msvcp71.dll $(dlldir)/msvcp71.dll
-	-install -p $(system32)/pthreadVC.dll $(dlldir)/pthreadVC.dll
+	-install -p $(system32)/msvcp71.dll $(dlldir)
+	-install -p $(system32)/msvcr71.dll $(dlldir)
+	-install -p $(system32)/pthreadVC.dll $(dlldir)
 # these go into the Pd package's lib dir
 	install -d $(libdir)/tcl8.4
 	cp -r /usr/local/lib/tcl8.4/* $(libdir)/tcl8.4

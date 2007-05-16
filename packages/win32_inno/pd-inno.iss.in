@@ -128,7 +128,17 @@ Source: build\lib\*.*; DestDir: {app}\lib; Flags: ignoreversion recursesubdirs
 #ifexist "build\gripd"
 Source: build\gripd\*.*; DestDir: {app}\gripd; Flags: ignoreversion
 #endif
-
+;
+; DLLs
+;
+Source: build\lib*.dll; DestDir: {sys}; Flags: restartreplace confirmoverwrite sharedfile
+Source: build\pthread*.dll; DestDir: {sys}; Flags: restartreplace confirmoverwrite sharedfile
+#ifexist "build\msvcp71.dll"
+Source: build\msvcp71.dll; DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+#endif
+#ifexist "build\msvcr71.dll"
+Source: build\msvcr71.dll; DestDir: {sys}; Flags: restartreplace uninsneveruninstall sharedfile
+#endif
 ;; build stuff is not included now
 ;Source: build\portaudio\*.*; DestDir: {app}\portaudio; Flags: ignoreversion recursesubdirs
 ;Source: build\src\*.*; DestDir: {app}\src; Flags: ignoreversion recursesubdirs
