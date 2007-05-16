@@ -1,4 +1,4 @@
-#N canvas 479 25 563 818 10;
+#N canvas 479 25 563 764 10;
 #X obj 4 369 cnv 15 550 15 empty empty empty 20 12 0 14 -158509 -66577
 0;
 #X obj 5 779 cnv 15 550 30 empty empty empty 20 12 0 14 -158509 -66577
@@ -154,11 +154,11 @@ yticks 0 0.2 5;
 #X text 630 499 L0;
 #X text 562 325 Rigidity with power = 1/2;
 #N canvas 0 0 450 300 (subpatch) 0;
-#X array rigidity4 52 float 1;
+#X array rigidity4 51 float 1;
 #A 0 -400 -361 -324 -289 -256 -225 -196 -169 -144 -121 -100 -81 -64
 -49 -36 -25 -16 -9 -4 -1 0 1 4 9 16 25 36 49 64 81 100 121 144 169
 196 225 256 289 324 361 400 441 484 529 576 625 676 729 784 841 900
-900;
+;
 #X array zero 51 float 1;
 #A 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
@@ -365,7 +365,7 @@ msd object. They are of three types :;
 #X text 10 25 Dynamic settings messages allows the user to redefine
 internal parameters of links and masses.;
 #X restore 12 478 pd dynamic settings;
-#N canvas 382 95 598 603 attributes______ 0;
+#N canvas 191 75 634 669 attributes______ 1;
 #X obj 11 95 cnv 15 100 35 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X obj 5 75 cnv 15 590 15 empty empty empty 20 12 0 14 -158509 -66577
@@ -389,32 +389,37 @@ internal parameters of links and masses.;
 #X msg 32 198 massesForcesL;
 #X text 170 170 Output all masses positions in a list on outlet No
 1;
-#X text 140 305 \$1 : Attribute type ( massesPos / massesSpeeds / massesForces
-/ linksPos );
 #X text 140 280 Get specific attribute on specific element;
 #X msg 20 278 get \$1 (\$2);
 #X text 7 240 Specific :;
-#X text 140 375 The get message return the asked attribute preceded
+#X text 140 381 The get message return the asked attribute preceded
 by an identifier and the creation No of the element. The identifier
 is made of the asked parameter and the way you asked for it.;
-#X text 141 451 message;
-#X text 381 451 response;
-#X text 140 432 Examples with 3 masses numbered 0 \, 1 and 2 and named
+#X text 141 457 message;
+#X text 381 457 response;
+#X text 140 438 Examples with 3 masses numbered 0 \, 1 and 2 and named
 mas:;
-#X text 146 541 [get massesPos mas( -----> [massesPosId 0 x0(;
-#X text 335 556 [massesPosId 2 x2(;
-#X text 335 571 [massesPosId 1 x1(;
-#X text 174 470 [get massesPos( -----> [massesPos 0 x0(;
-#X text 335 484 [massesPos 2 x2(;
-#X text 335 498 [massesPos 1 x1(;
-#X text 160 520 [get massesPos 1( -----> [massesPosNo 1 x1(;
+#X text 146 547 [get massesPos mas( -----> [massesPosId 0 x0(;
+#X text 335 562 [massesPosId 2 x2(;
+#X text 335 577 [massesPosId 1 x1(;
+#X text 174 476 [get massesPos( -----> [massesPos 0 x0(;
+#X text 335 490 [massesPos 2 x2(;
+#X text 335 504 [massesPos 1 x1(;
+#X text 160 526 [get massesPos 1( -----> [massesPosNo 1 x1(;
 #X text 15 30 The attributes messages ask the object to output some
 of his internal parameters. They can be output by lists for positions
 and forces of masses.;
 #X text 170 199 Output all forces applied on masses in a list on outlet
 No 1;
-#X text 140 342 (\$2) : - If not defined all the attributes are send
+#X text 140 348 (\$2) : - If not defined all the attributes are send
 for all the elements. - Ids or/and creations No;
+#X text 140 305 \$1 : Attribute type ( massesPos / massesPosName /
+massesSpeeds / massesSpeedsName / massesForces / massesForces / linksPos
+/ linksPos );
+#X text 146 596 [get massesPosName( -----> [massesPosName name_0 x0(
+;
+#X text 336 626 [massesPosName name_1 x1(;
+#X text 336 611 [massesPosName name_2 x2(;
 #X restore 12 499 pd attributes______;
 #X text 9 761 KEYWORDS: physical model mass spring damper link;
 #X text 267 786 - Nicolas Montgermont \, May 12 \, 2005;

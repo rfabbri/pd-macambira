@@ -1,4 +1,4 @@
-#N canvas 461 3 553 632 10;
+#N canvas 449 91 553 632 10;
 #X obj 4 369 cnv 15 550 15 empty empty empty 20 12 0 14 -158509 -66577
 0;
 #X obj 5 779 cnv 15 550 30 empty empty empty 20 12 0 14 -158509 -66577
@@ -285,7 +285,7 @@ their Id.;
 #X connect 4 0 2 0;
 #X restore 17 209 pd compute;
 #X obj 17 181 tgl 20 0 empty empty ON/OFF 25 10 1 10 -262144 -1 -1
-1 1;
+0 1;
 #X obj 172 270 r \$0-out;
 #X obj 17 126 bng 20 250 50 0 empty empty Reset 25 10 1 10 -262144
 -1 -1;
@@ -439,7 +439,7 @@ internal parameters of links and masses.;
 #X msg 30 217 Ymin \$1;
 #X msg 89 217 Ymax \$1;
 #X restore 12 478 pd dynamic settings;
-#N canvas 382 95 601 642 attributes______ 0;
+#N canvas 382 95 601 681 attributes______ 0;
 #X obj 11 95 cnv 15 100 35 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X obj 5 75 cnv 15 590 15 empty empty empty 20 12 0 14 -158509 -66577
@@ -473,13 +473,6 @@ is made of the asked parameter and the way you asked for it.;
 #X text 380 492 response;
 #X text 139 473 Examples with 3 masses numbered 0 \, 1 and 2 and named
 mas:;
-#X text 145 582 [get massesPos mas( -----> [massesPosId 0 x0(;
-#X text 334 597 [massesPosId 2 x2(;
-#X text 334 612 [massesPosId 1 x1(;
-#X text 173 511 [get massesPos( -----> [massesPos 0 x0(;
-#X text 334 525 [massesPos 2 x2(;
-#X text 334 539 [massesPos 1 x1(;
-#X text 159 561 [get massesPos 1( -----> [massesPosNo 1 x1(;
 #X text 15 30 The attributes messages ask the object to output some
 of his internal parameters. They can be output by lists for positions
 and forces of masses.;
@@ -490,8 +483,20 @@ for all the elements. - Ids or/and creations No;
 #X msg 32 192 massesPosXL;
 #X text 170 202 Output all masses x or y in a list on outlet No 1;
 #X msg 32 213 massesPosYL;
-#X text 139 346 \$1 : Attribute type ( massesPos / massesSpeeds / massesForces
-/ linksPos / linksLenghts);
+#X text 138 340 \$1 : Attribute type ( massesPos / massesPosName /
+massesSpeeds / massesSpeedsName / massesForces / massesForces / linksPos
+/ linksPos );
+#X text 173 511 [get massesPos( -----> [massesPos 0 x0 y0(;
+#X text 334 525 [massesPos 2 x2 y2(;
+#X text 334 539 [massesPos 1 x1 y1(;
+#X text 159 561 [get massesPos 1( -----> [massesPosNo 1 x1 y1(;
+#X text 145 582 [get massesPos mas( -----> [massesPosId 0 x0 y0(;
+#X text 334 597 [massesPosId 2 x2 y2(;
+#X text 334 612 [massesPosId 1 x1 y1(;
+#X text 145 633 [get massesPosName( -----> [massesPosName name_0 x0
+y0(;
+#X text 335 648 [massesPosName name_2 x2 y2(;
+#X text 335 663 [massesPosName name_1 x1 y1(;
 #X restore 12 499 pd attributes______;
 #X text 9 761 KEYWORDS: physical model mass spring damper link;
 #X text 267 786 - Nicolas Montgermont \, May 12 \, 2005;
