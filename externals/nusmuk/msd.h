@@ -1257,7 +1257,7 @@ protected:
 				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {	
 					SetSymbol(sortie[0],mit.data()->Id);
 					for(int i = 0; i < N; ++i) SetFloat(sortie[1+i],mit.data()->pos[i]);
-					ToOutAnything(0,S_massesPos,1+N,sortie);
+					ToOutAnything(0,S_massesPosName,1+N,sortie);
 				}
 			}
 			else if (auxtype == S_massesPosMean)	{	// get all masses positions mean
@@ -1295,6 +1295,13 @@ protected:
 					SetInt(sortie[0],mit.data()->nbr);	
 					for(int i = 0; i < N; ++i) SetFloat(sortie[1+i],mit.data()->out_force[i]);
 					ToOutAnything(0,S_massesForces,1+N,sortie);
+				}
+			}
+			else if (auxtype == S_massesForcesName)	{ // get all masses forces
+				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {	
+					SetSymbol(sortie[0],mit.data()->Id);	
+					for(int i = 0; i < N; ++i) SetFloat(sortie[1+i],mit.data()->out_force[i]);
+					ToOutAnything(0,S_massesForcesName,1+N,sortie);
 				}
 			}
 			else if (auxtype == S_massesForcesMean)	{	// get all masses forces mean
@@ -1337,6 +1344,16 @@ protected:
 					ToOutAnything(0,S_linksPos,1+2*N,sortie);
 				}
 			}
+			else if (auxtype == S_linksPosName) {		// get all links positions
+				for(typename IndexMap<t_link *>::iterator lit(link); lit; ++lit) {	
+					SetSymbol(sortie[0],lit.data()->Id);	
+					for(int i = 0; i < N; ++i) {
+						SetFloat(sortie[1+i],lit.data()->mass1->pos[i]);
+						SetFloat(sortie[1+N+i],lit.data()->mass2->pos[i]);
+					}
+					ToOutAnything(0,S_linksPosName,1+2*N,sortie);
+				}
+			}
 			else if (auxtype == S_linksLenghts) {		// get all links lenghts
 				for(typename IndexMap<t_link *>::iterator lit(link); lit; ++lit) {	
 					SetInt(sortie[0],lit.data()->nbr);	
@@ -1376,6 +1393,13 @@ protected:
 					SetInt(sortie[0],mit.data()->nbr);	
 					for(int i = 0; i < N; ++i) SetFloat(sortie[1+i],mit.data()->speed[i]);
 					ToOutAnything(0,S_massesSpeeds,1+N,sortie);
+				}
+			}
+			else if (auxtype == S_massesSpeedsName) {		// get all masses speeds
+				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {	
+					SetSymbol(sortie[0],mit.data()->Id);	
+					for(int i = 0; i < N; ++i) SetFloat(sortie[1+i],mit.data()->speed[i]);
+					ToOutAnything(0,S_massesSpeedsName,1+N,sortie);
 				}
 			}
 			else if (auxtype == S_massesSpeedsMean)	{	// get all masses forces mean
@@ -1727,6 +1751,7 @@ private:
 	const static t_symbol *S_massesPosNo;
 	const static t_symbol *S_massesPosId;
 	const static t_symbol *S_linksPos;
+	const static t_symbol *S_linksPosName;
 	const static t_symbol *S_linksPosNo;
 	const static t_symbol *S_linksPosId;
 	const static t_symbol *S_linksLenghts;
@@ -1735,11 +1760,13 @@ private:
 	const static t_symbol *S_linksLenghtsNo;
 	const static t_symbol *S_linksLenghtsId;
 	const static t_symbol *S_massesForces;
+	const static t_symbol *S_massesForcesName;
 	const static t_symbol *S_massesForcesMean;
 	const static t_symbol *S_massesForcesStd;
 	const static t_symbol *S_massesForcesNo;
 	const static t_symbol *S_massesForcesId;
 	const static t_symbol *S_massesSpeeds;
+	const static t_symbol *S_massesSpeedsName;
 	const static t_symbol *S_massesSpeedsMean;
 	const static t_symbol *S_massesSpeedsStd;
 	const static t_symbol *S_massesSpeedsNo;
@@ -1767,6 +1794,7 @@ private:
 		S_massesPosNo = MakeSymbol("massesPosNo");
 		S_massesPosId = MakeSymbol("massesPosId");
 		S_linksPos = MakeSymbol("linksPos");
+		S_linksPosName = MakeSymbol("linksPosName");
 		S_linksPosNo = MakeSymbol("linksPosNo");
 		S_linksPosId = MakeSymbol("linksPosId");
 		S_linksLenghts = MakeSymbol("linksLenghts");
@@ -1775,11 +1803,13 @@ private:
 		S_linksLenghtsNo = MakeSymbol("linksLenghtsNo");
 		S_linksLenghtsId = MakeSymbol("linksLenghtsId");
 		S_massesForces = MakeSymbol("massesForces");
+		S_massesForcesName = MakeSymbol("massesForcesName");
 		S_massesForcesMean = MakeSymbol("massesForcesMean");
 		S_massesForcesStd = MakeSymbol("massesForcesStd");
 		S_massesForcesNo = MakeSymbol("massesForcesNo");
 		S_massesForcesId = MakeSymbol("massesForcesId");
 		S_massesSpeeds = MakeSymbol("massesSpeeds");
+		S_massesSpeedsName = MakeSymbol("massesSpeedsName");
 		S_massesSpeedsMean = MakeSymbol("massesSpeedsMean");
 		S_massesSpeedsStd = MakeSymbol("massesSpeedsStd");
 		S_massesSpeedsNo = MakeSymbol("massesSpeedsNo");
@@ -1905,6 +1935,7 @@ template<int N> const t_symbol *msdN<N>::S_massesPosName;
 template<int N> const t_symbol *msdN<N>::S_massesPosNo;
 template<int N> const t_symbol *msdN<N>::S_massesPosId;
 template<int N> const t_symbol *msdN<N>::S_linksPos;
+template<int N> const t_symbol *msdN<N>::S_linksPosName;
 template<int N> const t_symbol *msdN<N>::S_linksPosNo;
 template<int N> const t_symbol *msdN<N>::S_linksPosId;
 template<int N> const t_symbol *msdN<N>::S_linksLenghts;
@@ -1913,11 +1944,13 @@ template<int N> const t_symbol *msdN<N>::S_linksLenghtsStd;
 template<int N> const t_symbol *msdN<N>::S_linksLenghtsNo;
 template<int N> const t_symbol *msdN<N>::S_linksLenghtsId;
 template<int N> const t_symbol *msdN<N>::S_massesForces;
+template<int N> const t_symbol *msdN<N>::S_massesForcesName;
 template<int N> const t_symbol *msdN<N>::S_massesForcesMean;
 template<int N> const t_symbol *msdN<N>::S_massesForcesStd;
 template<int N> const t_symbol *msdN<N>::S_massesForcesNo;
 template<int N> const t_symbol *msdN<N>::S_massesForcesId;
 template<int N> const t_symbol *msdN<N>::S_massesSpeeds;
+template<int N> const t_symbol *msdN<N>::S_massesSpeedsName;
 template<int N> const t_symbol *msdN<N>::S_massesSpeedsMean;
 template<int N> const t_symbol *msdN<N>::S_massesSpeedsStd;
 template<int N> const t_symbol *msdN<N>::S_massesSpeedsNo;
