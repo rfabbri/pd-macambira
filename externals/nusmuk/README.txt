@@ -31,8 +31,11 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 --------------------------
-Version 0.07 -- 17.05.2005
+# Version 0.07 -- 17.05.2005
+initial final vertion
 
+Version 0.08 -- 20070517
+add somes get messages
 --------------------------
 BUILD -- msd, msd2D, msd3D
 
