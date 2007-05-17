@@ -2222,7 +2222,8 @@ wiiremote: $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION)
 
 wiiremote_install: wiiremote
 	install -d $(objectsdir)/$(WIIREMOTE_NAME)
-	install -p $(WIIREMOTE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(WIIREMOTE_NAME)
+	install -p $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION) \
+		$(objectsdir)/$(WIIREMOTE_NAME)
 #	install -d $(helpdir)/$(WIIREMOTE_NAME)
 #	install -p $(externals_src)/io/wiiremote/*.pd \
 #		$(helpdir)/$(WIIREMOTE_NAME)
