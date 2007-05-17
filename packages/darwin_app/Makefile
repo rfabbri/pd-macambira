@@ -256,7 +256,7 @@ package: dmg
 
 dmg: 
 	hdiutil create -format UDRW -fs HFS+ -srcfolder "$(BUILD_BASE)" \
-		-volname $(PACKAGE_NAME) build.dmg
+		-volname Pd-extended build.dmg
 # detach one with the same name first
 	-hdiutil detach "/Volumes/$(PACKAGE_NAME)"
 	hdiutil attach build.dmg
@@ -267,8 +267,9 @@ dmg:
 	cd "/Volumes/$(PACKAGE_NAME)/" && ln -s /Applications
 # background image will only show when the disk image is called "Pd-extended
 # the background image needs to be added to the .DS_Store to work
-#	install -p background.png "/Volumes/$(PACKAGE_NAME)/.imagefolder/"
+	install -p background.png "/Volumes/$(PACKAGE_NAME)/.imagefolder/"
 	install -p DS_Store "/Volumes/$(PACKAGE_NAME)/.DS_Store"
+	install -p VolumeIcon.icns "/Volumes/$(PACKAGE_NAME)/.VolumeIcon.icns"
 	chmod -R a-w "/Volumes/$(PACKAGE_NAME)/$(PD_APP_NAME).app/Contents/Resources/doc"
 	hdiutil detach `mount | grep $(PACKAGE_NAME) | cut -d ' ' -f 1`
 	hdiutil convert -format UDZO -o "$(PACKAGE_NAME).dmg" build.dmg
