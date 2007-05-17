@@ -257,24 +257,25 @@ darwin_app_externals_c++:
 
 package: dmg
 
+VOLUME_NAME = Pd-extended
 dmg: 
 	hdiutil create -format UDRW -fs HFS+ -srcfolder "$(BUILD_BASE)" \
-		-volname Pd-extended build.dmg
+		-volname $(VOLUME_NAME) build.dmg
 # detach one with the same name first
-	-hdiutil detach "/Volumes/$(PACKAGE_NAME)"
+	-hdiutil detach "/Volumes/$(VOLUME_NAME)"
 	hdiutil attach build.dmg
-	install -p $(manualsdir)/Pd/ReadMe.html "/Volumes/$(PACKAGE_NAME)"
-	install -p -m0644 org.puredata.pd.plist "/Volumes/$(PACKAGE_NAME)"
-	install -d "/Volumes/$(PACKAGE_NAME)/.imagefolder"
+	install -p $(manualsdir)/Pd/ReadMe.html "/Volumes/$(VOLUME_NAME)"
+	install -p -m0644 org.puredata.pd.plist "/Volumes/$(VOLUME_NAME)"
+	install -d "/Volumes/$(VOLUME_NAME)/.imagefolder"
 # add link to /Applications for easy install
-	cd "/Volumes/$(PACKAGE_NAME)/" && ln -s /Applications
-# background image will only show when the disk image is called "Pd-extended
+	ln -s /Applications /Volumes/$(VOLUME_NAME)/Applications
+# background image will only show when the disk image is called "$(VOLUME_NAME)
 # the background image needs to be added to the .DS_Store to work
-	install -p background.png "/Volumes/$(PACKAGE_NAME)/.imagefolder/"
-	install -p DS_Store "/Volumes/$(PACKAGE_NAME)/.DS_Store"
-	install -p VolumeIcon.icns "/Volumes/$(PACKAGE_NAME)/.VolumeIcon.icns"
-	chmod -R a-w "/Volumes/$(PACKAGE_NAME)/$(PD_APP_NAME).app/Contents/Resources/doc"
-	hdiutil detach `mount | grep $(PACKAGE_NAME) | cut -d ' ' -f 1`
+	install -p background.png "/Volumes/$(VOLUME_NAME)/.imagefolder/"
+	install -p DS_Store "/Volumes/$(VOLUME_NAME)/.DS_Store"
+	install -p VolumeIcon.icns "/Volumes/$(VOLUME_NAME)/.VolumeIcon.icns"
+	chmod -R a-w "/Volumes/$(VOLUME_NAME)/$(PD_APP_NAME).app/Contents/Resources/doc"
+	hdiutil detach `mount | grep $(VOLUME_NAME) | cut -d ' ' -f 1`
 	hdiutil convert -format UDZO -o "$(PACKAGE_NAME).dmg" build.dmg
 	rm -f build.dmg
 # install license
