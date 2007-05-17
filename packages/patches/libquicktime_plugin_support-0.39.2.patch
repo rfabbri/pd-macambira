@@ -1,0 +1,17 @@
+Index: u_main.tk
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
+retrieving revision 1.17.2.10
+diff -u -w -r1.17.2.10 u_main.tk
+--- u_main.tk	15 May 2007 04:58:58 -0000	1.17.2.10
++++ u_main.tk	17 May 2007 03:48:19 -0000
+@@ -55,6 +55,9 @@
+     global pd_guidir
+     global pd_tearoff
+     set pd_gui2 [string range $argv0 0 [expr [string last / $argv0 ] - 1]]
++# this is the embedded libquicktime can find its embedded plugins
++	 puts stderr "Setting LIBQUICKTIME_PLUGIN_DIR: $pd_gui2/../../lib/libquicktime"
++	 set env(LIBQUICKTIME_PLUGIN_DIR) $pd_gui2/../../lib/libquicktime
+     set pd_guidir $pd_gui2/..
+     load $pd_guidir/bin/libPdTcl.dylib
+     set pd_tearoff 0
