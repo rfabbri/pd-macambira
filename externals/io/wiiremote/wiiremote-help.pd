@@ -1,21 +1,29 @@
-#N canvas 41 171 573 456 10;
+#N canvas 41 171 577 460 10;
 #X obj 451 21 import io;
-#X obj 169 251 wiiremote;
-#X msg 124 70 connect;
-#X msg 141 96 disconnect;
-#X msg 242 100 motionsensor \$1;
-#X obj 242 78 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 213 388 wiiremote;
+#X msg 168 207 connect;
+#X msg 185 233 disconnect;
+#X msg 286 237 motionsensor \$1;
+#X obj 286 215 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 406 215 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X msg 406 237 irsensor \$1;
+#X obj 64 254 metro 100;
+#X obj 64 233 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
-#X obj 362 78 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X msg 376 290 getbatterylevel;
+#X msg 376 310 getledstatus;
+#X msg 376 330 getexpansionstatus;
+#X msg 129 283 bang;
+#X text 49 49 - Use the Bluetooth Setup Assistant to setup the WiiRemote
+with your computer (only required for the first use).;
+#X text 49 79 - Press the "Sync" button on the WiiRemote \, four LEDs
+will start blinking.;
+#X text 49 109 - Click on the [connect( message \, the LEDs will stop
+blinking once its connected;
+#X text 49 139 - Start the [metro] to get updates from [wiiremote]
 ;
-#X msg 362 100 irsensor \$1;
-#X obj 20 117 metro 100;
-#X obj 20 96 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
-;
-#X msg 332 153 getbatterylevel;
-#X msg 332 173 getledstatus;
-#X msg 332 193 getexpansionstatus;
-#X msg 85 146 bang;
 #X connect 2 0 1 0;
 #X connect 3 0 1 0;
 #X connect 4 0 1 0;
