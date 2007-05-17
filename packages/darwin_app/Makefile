@@ -184,6 +184,9 @@ rez_install:
 
 darwin_app_embed_libs:
 	./embed-MacOSX-dependencies.sh $(PD_APP_CONTENTS)
+# embed libquicktime plugins
+	install -d $(PD_APP_CONTENTS)/lib/libquicktime
+	install -p /sw/lib/libquicktime/*.so $(PD_APP_CONTENTS)/lib/libquicktime
 
 # shortcut to install the readme on non-Extended builds
 readme_install:
