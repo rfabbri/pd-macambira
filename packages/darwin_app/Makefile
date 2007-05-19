@@ -76,8 +76,7 @@ install: darwin_app
 devel_install: darwin_app_devel
 
 #------------------------------------------------------------------------------#
-darwin_app: darwin_app_core extended_install darwin_app_doc_format rez_install \
-darwin_app_embed_libs
+darwin_app: darwin_app_core extended_install rez_install darwin_app_embed_libs
 	@echo " "
 	@echo "Pd.app build succeeded!"
 
@@ -215,14 +214,6 @@ darwin_app_devel_core: darwin_app_devel_wrapper
 # run script to move help-*.pd files to *-help.pd according to the standard
 	cd $(pddocdir) && \
 		$(scripts_src)/convert-help-to-standard.sh
-
-# set the font to 10pt on all help patches
-# the BSD/Darwin version of sed must create a backup file when doing 
-# in-place replacement, so delete the unneeded backup files.
-darwin_app_doc_format:
-	find $(pddocdir) -name '*.pd' -exec \
-		sed -i.b 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' '{}' \;
-	find $(DESTDIR) -name '*.pd.b' -print0 | xargs -0 rm -f --
 
 
 #==============================================================================#
