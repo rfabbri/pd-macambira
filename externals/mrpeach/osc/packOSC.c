@@ -30,7 +30,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 */
 
-#define MAX_ARGS 2000
 #define SC_BUFFER_SIZE 64000
 
 #include "m_pd.h"
@@ -322,38 +321,55 @@ static void packOSC_settypetags(t_packOSC *x, t_float *f)
 
 static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
-    char        messageName[MAXPDSTRING];
-    char        typeStr[MAX_ARGS];
-    typedArg    args[MAX_ARGS];
-    int         i, j, k, nTags, nArgs;
-    char        c;
+    char            messageName[MAXPDSTRING];
+    unsigned int    nTypeTags = 0, typeStrTotalSize;
+    unsigned int    argsSize = sizeof(typedArg)*argc;
+    char*           typeStr = NULL; /* might not be used */
+    typedArg*       args = (typedArg*)getbytes(argsSize);
+    int             i, nTags, nArgs;
+    unsigned int    m, j, k;
+    char            c;
 
-    messageName[0] = '\0'; // empty
-
-    if(argc>MAX_ARGS)
+    if (args == NULL)
     {
-        post ("packOSC: too many arguments! (max: %d)", MAX_ARGS);
+        post("packOSC: unable to allocate %lu bytes for args", argsSize);
         return;
     }
+    messageName[0] = '\0'; // empty
 
     atom_string(&argv[0], messageName, MAXPDSTRING); /* the OSC address string */
     if (x->x_typetags & 2)
-    { /* first arg is typestring */
-        typeStr[0] = ',';
-        atom_string(&argv[1], &typeStr[1], MAXPDSTRING);
-        nArgs = argc-2;
-        for (i = nTags = 0; i < MAX_ARGS; ++i)
+    { /* second arg is typestring */
+        /* we need to find out how long the type string is before we copy it*/
+        nTypeTags = strlen(atom_getsymbol(&argv[1])->s_name);
+        typeStrTotalSize = nTypeTags + 2;
+        typeStr = (char*)getzbytes(typeStrTotalSize);
+        if (typeStr == NULL)
         {
-            if (typeStr[i+1] == 0) break;
-            if (!(typeStr[i+1] == 'T' || typeStr[i+1] == 'F' || typeStr[i+1] == 'N' || typeStr[i+1] == 'I'))
+            post("packOSC: unable to allocate %lu bytes for typeStr", nTypeTags);
+            return;
+        }
+        typeStr[0] = ',';
+        atom_string(&argv[1], &typeStr[1], typeStrTotalSize);
+#ifdef DEBUG
+        post("typeStr: %s, nTypeTags %lu", typeStr, nTypeTags);
+#endif
+        nArgs = argc-2;
+        for (m = nTags = 0; m < nTypeTags; ++m)
+        {
+#ifdef DEBUG
+            post("typeStr[%d] %c", m+1, typeStr[m+1]);
+#endif
+            if ((c = typeStr[m+1]) == 0) break;
+            if (!(c == 'T' || c == 'F' || c == 'N' || c == 'I'))
                 ++nTags; /* these tags have data */
         }
         if (nTags != nArgs)
         {
             post("packOSC: Tags count %d doesn't match argument count %d", nTags, nArgs);
-            return;
+	        goto cleanup;
         }
-        for (j = k = 0; j < i; ++j) /* i is the number of tags */
+        for (j = k = 0; j < m; ++j) /* m is the number of tags */
         {
             c = typeStr[j+1];
             if (!(c == 'T' || c == 'F' || c == 'N' || c == 'I')) /* not no data */
@@ -365,7 +381,7 @@ static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
         if(packOSC_writetypedmessage(x, x->x_oscbuf, messageName, nArgs, args, typeStr))
         {
             post("packOSC: usage error, write-msg failed.");
-            return;
+	        goto cleanup;
         }
     }
     else
@@ -395,7 +411,7 @@ static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
         if(packOSC_writemessage(x, x->x_oscbuf, messageName, i, args))
         {
             post("packOSC: usage error, write-msg failed.");
-            return;
+	        goto cleanup;
         }
     }
 
@@ -404,6 +420,10 @@ static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
         packOSC_sendbuffer(x);
         OSC_initBuffer(x->x_oscbuf, SC_BUFFER_SIZE, bufferForOSCbuf);
     }
+
+cleanup:
+    if (typeStr != NULL) freebytes(typeStr, typeStrTotalSize);
+    if (args != NULL) freebytes(args, argsSize);
 }
 
 static void packOSC_send_type_forced(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
@@ -645,7 +665,7 @@ static int packOSC_writemessage(t_packOSC *x, OSCbuf *buf, char *messageName, in
     else
     {
         /* First figure out the type tags */
-        char typeTags[MAX_ARGS+2];
+        char *typeTags=(char*)getbytes(sizeof(char)*(numArgs+2));
 
         typeTags[0] = ',';
         for (j = 0; j < numArgs; ++j)
@@ -672,6 +692,7 @@ static int packOSC_writemessage(t_packOSC *x, OSCbuf *buf, char *messageName, in
         {
             post("packOSC: Problem writing address.");
         }
+	freebytes(typeTags, sizeof(char)*(numArgs+2));
     }
     for (j = 0; j < numArgs; j++)
     {
