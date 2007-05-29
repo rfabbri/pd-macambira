@@ -3,8 +3,8 @@ Index: pd/src/g_text.c
 RCS file: /cvsroot/pure-data/pd/src/g_text.c,v
 retrieving revision 1.15
 diff -u -w -r1.15 g_text.c
---- pd/src/g_text.c	4 Oct 2006 19:35:06 -0000	1.15
-+++ pd/src/g_text.c	12 Feb 2007 03:45:43 -0000
+--- g_text.c	4 Oct 2006 19:35:06 -0000	1.15
++++ g_text.c	12 Feb 2007 03:45:43 -0000
 @@ -276,6 +276,11 @@
      outlet_symbol(x->mr_outlet, s);
  }
@@ -44,8 +44,8 @@ Index: pd/src/m_atom.c
 RCS file: /cvsroot/pure-data/pd/src/m_atom.c,v
 retrieving revision 1.4
 diff -u -w -r1.4 m_atom.c
---- pd/src/m_atom.c	11 Aug 2006 20:09:07 -0000	1.4
-+++ pd/src/m_atom.c	12 Feb 2007 03:45:43 -0000
+--- m_atom.c	11 Aug 2006 20:09:07 -0000	1.4
++++ m_atom.c	12 Feb 2007 03:45:43 -0000
 @@ -28,6 +28,14 @@
      else return (&s_float);
  }
@@ -66,8 +66,8 @@ Index: pd/src/m_binbuf.c
 RCS file: /cvsroot/pure-data/pd/src/m_binbuf.c,v
 retrieving revision 1.13
 diff -u -w -r1.13 m_binbuf.c
---- pd/src/m_binbuf.c	4 Oct 2006 19:35:06 -0000	1.13
-+++ pd/src/m_binbuf.c	12 Feb 2007 03:45:44 -0000
+--- m_binbuf.c	4 Oct 2006 19:35:06 -0000	1.13
++++ m_binbuf.c	12 Feb 2007 03:45:44 -0000
 @@ -672,6 +672,10 @@
              case A_SYMBOL:
                  typedmess(target, stackwas->a_w.w_symbol, nargs-1, stackwas+1);
@@ -84,8 +84,8 @@ Index: pd/src/m_class.c
 RCS file: /cvsroot/pure-data/pd/src/m_class.c,v
 retrieving revision 1.7
 diff -u -w -r1.7 m_class.c
---- pd/src/m_class.c	15 Aug 2006 04:54:15 -0000	1.7
-+++ pd/src/m_class.c	12 Feb 2007 03:45:44 -0000
+--- m_class.c	15 Aug 2006 04:54:15 -0000	1.7
++++ m_class.c	12 Feb 2007 03:45:44 -0000
 @@ -20,6 +20,7 @@
  
  static t_symbol *class_loadsym;     /* name under which an extern is invoked */
@@ -201,8 +201,8 @@ Index: pd/src/m_imp.h
 RCS file: /cvsroot/pure-data/pd/src/m_imp.h,v
 retrieving revision 1.4
 diff -u -w -r1.4 m_imp.h
---- pd/src/m_imp.h	19 Aug 2005 23:28:03 -0000	1.4
-+++ pd/src/m_imp.h	12 Feb 2007 03:45:44 -0000
+--- m_imp.h	19 Aug 2005 23:28:03 -0000	1.4
++++ m_imp.h	12 Feb 2007 03:45:44 -0000
 @@ -25,6 +25,7 @@
  typedef void (*t_pointermethod)(t_pd *x, t_gpointer *gp);
  typedef void (*t_floatmethod)(t_pd *x, t_float f);
@@ -224,8 +224,8 @@ Index: pd/src/m_obj.c
 RCS file: /cvsroot/pure-data/pd/src/m_obj.c,v
 retrieving revision 1.4
 diff -u -w -r1.4 m_obj.c
---- pd/src/m_obj.c	18 May 2005 04:28:51 -0000	1.4
-+++ pd/src/m_obj.c	12 Feb 2007 03:45:44 -0000
+--- m_obj.c	18 May 2005 04:28:51 -0000	1.4
++++ m_obj.c	12 Feb 2007 03:45:44 -0000
 @@ -15,6 +15,7 @@
      t_gpointer *iu_pointerslot;
      t_float *iu_floatslot;
@@ -329,8 +329,8 @@ Index: pd/src/m_pd.c
 RCS file: /cvsroot/pure-data/pd/src/m_pd.c,v
 retrieving revision 1.4
 diff -u -w -r1.4 m_pd.c
---- pd/src/m_pd.c	28 Nov 2004 21:20:42 -0000	1.4
-+++ pd/src/m_pd.c	12 Feb 2007 03:45:44 -0000
+--- m_pd.c	28 Nov 2004 21:20:42 -0000	1.4
++++ m_pd.c	12 Feb 2007 03:45:44 -0000
 @@ -284,6 +284,12 @@
      (*(*x)->c_symbolmethod)(x, s);
  }
@@ -349,8 +349,8 @@ Index: pd/src/m_pd.h
 RCS file: /cvsroot/pure-data/pd/src/m_pd.h,v
 retrieving revision 1.17
 diff -u -w -r1.17 m_pd.h
---- pd/src/m_pd.h	22 Oct 2006 21:46:11 -0000	1.17
-+++ pd/src/m_pd.h	12 Feb 2007 03:45:44 -0000
+--- m_pd.h	22 Oct 2006 21:46:11 -0000	1.17
++++ m_pd.h	12 Feb 2007 03:45:44 -0000
 @@ -102,6 +102,16 @@
      t_gstub *gp_stub;               /* stub which points to glist/array */
  } t_gpointer;
