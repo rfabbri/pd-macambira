@@ -14,7 +14,7 @@
 /* ------------------------- table16 -------------------------- */
 /* a 16bit table */
 
-static t_class *table16_class;
+t_class *table16_class;
 typedef struct _table16 {
   t_object x_obj;
 
