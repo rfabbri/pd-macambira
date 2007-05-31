@@ -201,6 +201,7 @@ darwin_app_core: darwin_app_wrapper
 		ln -s ../bin/pd.tk AppMain.tcl
 # support for Info Panel Plugins mgmt
 	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
+	install -p -m0666 org.puredata.pd.plist "$(PD_APP_CONTENTS)/"
 
 
 #------------------------------------------------------------------------------#
@@ -256,7 +257,6 @@ dmg:
 	-hdiutil detach "/Volumes/$(VOLUME_NAME)"
 	hdiutil attach build.dmg
 	install -p $(manualsdir)/Pd/ReadMe.html "/Volumes/$(VOLUME_NAME)"
-	install -p -m0644 org.puredata.pd.plist "/Volumes/$(VOLUME_NAME)"
 	install -d "/Volumes/$(VOLUME_NAME)/.imagefolder"
 # add link to /Applications for easy install
 	ln -s /Applications /Volumes/$(VOLUME_NAME)/Applications
@@ -297,7 +297,6 @@ package_clean: darwin_app_clean
 	-rm -rf -- $(BUILD_BASE)
 	-rm Info.plist
 	-rm -f -- "$(CWD)/$(PACKAGE_NAME)/ReadMe.html"
-	-rm -f -- "$(CWD)/$(PACKAGE_NAME)/org.puredata.pd.plist"
 
 devel_clean: darwin_app_devel_clean
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
