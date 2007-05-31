@@ -247,6 +247,9 @@ static int pdp_glx_try_autocreate(t_pdp_glx *x)
 	post("pdp_glx: autocreate window");
 	pdp_glx_create(x);
 	if (!(x->x_initialized)){
+#ifdef __APPLE__
+	    system("/usr/bin/open /Applications/Utilities/X11.app &");
+#endif
 	    x->x_autocreate--;
 	    if (!x->x_autocreate){
 		post ("pdp_glx: autocreate failed %d times: disabled", PDP_OGL_AUTOCREATE_RETRY);
