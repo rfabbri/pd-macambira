@@ -50,20 +50,20 @@ FLEXT_VERSION := $(FLEXT_MAJOR_VERSION).$(FLEXT_MINOR_VERSION).$(FLEXT_MICRO_VER
 
 
 GEM_VERSION := $(shell grep "GEM_VERSION" $(gem_src)/src/Base/GemVersion.h | \
-	cut -d '"' -f 2)
+	sed -n 's|.*GEM_VERSION = "\(.*\)".*|\1|p')
 
 
 MAXLIB_VERSION := $(shell grep "define VERSION" \
 	$(externals_src)/maxlib/maxlib.c | cut -d '"' -f 2)
 
-
 OSC_VERSION := $(shell grep "define VERSION" $(externals_src)/OSCx/src/OSC.c | \
 	cut -d '"' -f 2)
-
 
 PDP_VERSION := $(shell grep PDP_VERSION= $(externals_src)/pdp/configure.ac | \
 	cut -d '=' -f 2)
 
+PIDIP_VERSION := $(shell grep _VERSION= $(externals_src)/pidip/configure.ac | \
+       cut -d '"' -f 2)
 
 PMPD_VERSION := $(shell grep "define VERSION" \
 	$(externals_src)/pmpd/src/pmpd.c | cut -d '"' -f 2)
@@ -606,8 +606,8 @@ ifeq ($(OS_NAME),linux)
 	echo "<p></p>" >> $(README_FILE)
 endif
 ifeq ($(OS_NAME),darwin)
-	echo "<p>To install Pd, drag the $(PACKAGE_NAME).app into your /Applications folder.</p>" >> $(README_FILE)	
-	echo "<p>If you want to have all of the included libraries loaded at startup, copy <code>org.puredata.pd.plist</code> to <code>~/Library/Preferences</code> (<code>~</code> means your home folder).  WARNING: this will overwrite any existing Pd preferences!</p>" >> $(README_FILE)	
+	echo "<p>To install Pd, drag the $(PACKAGE_NAME).app into your <b>/Applications</b> folder or to the shortcut in the disk image.</p>" >> $(README_FILE)
+	echo "<p>By default, most of the included libraries are loaded at startup.  To change this, set your own preferences in the <b>Startup...</b> Preferences pane usings the <b>Save all settings</b> button.   If you want to start with a blank set of preferences, run this command in the Terminal.app: <code>touch ~/Library/Preferences/org.puredata.pd.plist</code> (<code>~</code> means your home folder).</p>" >> $(README_FILE)
 endif
 ifeq ($(OS_NAME),windows)
 	echo "<p>To install, run the installer.</p>" >> $(README_FILE)
@@ -641,13 +641,14 @@ endif
 	echo "<li>pd-externals: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<li>pddp: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<li>pdp: $(PDP_VERSION)" >> $(README_FILE)
+	echo "<li>pidip: $(PIDIP_VERSION)" >> $(README_FILE)
 	echo "<li>toxy: $(TOXY_VERSION)" >> $(README_FILE)
 	echo "<li>unauthorized: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<li>zexy: $(ZEXY_VERSION)" >> $(README_FILE)
 	echo "</ul>" >> $(README_FILE)
 	echo "<h3>Patented Algorithms</h3>" >> $(README_FILE)
 	echo "<p>" >> $(README_FILE)
-	echo "This package may contain software that is covered by patents in certain countries.  In order to use this software you must have the proper license.  Below is a list of the known software packages that are covered by patents in some countries:" >> $(README_FILE)
+	echo "This package may contain software that is covered by patents in certain countries, like the U.S. and Germany.  In order to use this software you must have the proper license.  Below is a list of the known software packages that are covered by patents in some countries:" >> $(README_FILE)
 	echo "</p>" >> $(README_FILE)
 	echo "<ul>" >> $(README_FILE)
 	echo '<li><a href="http://en.wikipedia.org/wiki/MP3" target="license">MP3 aka MPEG-1 Part 3 Layer 3</a></li>' >> $(README_FILE)
