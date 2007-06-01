@@ -1,0 +1,23 @@
+Index: s_file.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_file.c,v
+--- s_file.c    15 Oct 2005 23:14:28 -0000      1.8
++++ s_file.c    31 May 2007 22:39:12 -0000      1.8.2.3
+@@ -215,7 +215,17 @@
+ {
+     char cmdbuf[256];
+     int nread = 0, nleft = size;
++       char embedded_prefs[MAXPDSTRING];
++       char user_prefs[MAXPDSTRING];
++       char *homedir = getenv("HOME");
++    struct stat statbuf;
++       /* the 'defaults' command expects the filename without .plist at the end */
++       snprintf(embedded_prefs, MAXPDSTRING, "%s/../org.puredata.pd", sys_libdir->s_name);
++       snprintf(user_prefs, MAXPDSTRING, "%s/Library/Preferences/org.puredata.pd.plist", homedir);
++       if (stat(user_prefs, &statbuf) == 0)
+     snprintf(cmdbuf, 256, "defaults read org.puredata.pd %s 2> /dev/null\n", key);
++       else 
++               snprintf(cmdbuf, 256, "defaults read %s %s 2> /dev/null\n", embedded_prefs, key);
+     FILE *fp = popen(cmdbuf, "r");
+     while (nread < size)
+     {
