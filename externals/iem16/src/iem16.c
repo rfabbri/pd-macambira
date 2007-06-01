@@ -22,10 +22,19 @@ static void *iem16_new(void){
 }
 
 /* include some externals */
-void iem16_table_setup();
-void iem16_array_setup();
-void iem16_array_tilde_setup();
-void iem16_delay_setup();
+void del16read_tilde_setup();
+void del16write_tilde_setup();
+void tab16play_tilde_setup();
+void tab16read4_setup();
+void tab16read4_tilde_setup();
+void tab16read_setup();
+void tab16read_tilde_setup();
+void tab16receive_tilde_setup();
+void tab16send_tilde_setup();
+void tab16write_setup();
+void tab16write_tilde_setup();
+void table16_setup();
+void vd16_tilde_setup();
 
 void iem16_setup(void) {
   static unsigned int setupcount=0;
@@ -34,11 +43,21 @@ void iem16_setup(void) {
     return;
   }
   setupcount++;
-  iem16_table_setup();
-  iem16_array_setup();
-  iem16_array_tilde_setup();
-  iem16_delay_setup();
 
+  del16read_tilde_setup();
+  del16write_tilde_setup();
+  tab16play_tilde_setup();
+  tab16read4_setup();
+  tab16read4_tilde_setup();
+  tab16read_setup();
+  tab16read_tilde_setup();
+  tab16receive_tilde_setup();
+  tab16send_tilde_setup();
+  tab16write_setup();
+  tab16write_tilde_setup();
+  table16_setup();
+  vd16_tilde_setup();
+  
   /* ************************************** */
   post("iem16:\t16bit-objects for low memory usage");
   post("iem16:\t(l) forum::für::umläute\t\tIOhannes m zmölnig");
