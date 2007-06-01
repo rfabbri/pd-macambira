@@ -7,7 +7,7 @@
 #X text 281 251 2nd argument: length of delay line in msec;
 #X text 24 292 see also:;
 #X obj 24 16 del16write~;
-#X obj 112 294 delread16~;
+#X obj 112 294 del16read~;
 #X obj 209 294 vd16~;
 #X text 16 353 similar pd-objects:;
 #X obj 201 352 delread~;

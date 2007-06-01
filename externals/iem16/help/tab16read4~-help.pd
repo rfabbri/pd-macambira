@@ -14,7 +14,6 @@ shift-drag the number box to see the effect of interpolation.;
 #X text 116 158 "set" message permits you to switch between arrays
 ;
 #X text 149 228 creation argument initializes array name;
-#X obj 10 228 tab16read4~ array99;
 #X obj 460 301 table16 array99;
 #X text 395 400 updated for iem16 version1.0;
 #X obj 11 395 tab16write~;
@@ -30,10 +29,11 @@ lookup algorithms. The interpolation scheme is 4-point polynomial.
 ;
 #X text 185 266 since [table16] can only hold 16bit-values \, the stored
 integer values -32768..+32767 are converted to floats -1.0..+1.0;
+#X obj 10 228 tab16read4~ array99;
 #X connect 2 0 7 0;
 #X connect 3 0 2 0;
-#X connect 4 0 12 0;
+#X connect 4 0 24 0;
 #X connect 5 0 4 0;
 #X connect 6 0 3 0;
-#X connect 9 0 12 0;
-#X connect 12 0 2 0;
+#X connect 9 0 24 0;
+#X connect 24 0 2 0;

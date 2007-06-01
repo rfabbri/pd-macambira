@@ -6,13 +6,11 @@
 #X text 99 279 signal input (delay time in ms);
 #X text 218 310 creation argument: name of delay line;
 #X text 35 400 see also:;
-#X obj 24 16 vd16~;
 #X text 77 10 reads a signal from a 16bit delay line at a variable
 delay time (4-point-interpolation);
 #X text 31 51 vd16~ implements a 4-point interpolating delay tap from
 a corresponding delwrite~ object. The delay in milliseconds of the
 tap is specified by the incoming signal.;
-#X obj 50 314 vd16~ del_example;
 #X text 16 433 similar pd-objects:;
 #X obj 201 432 delread~;
 #X obj 285 432 delwrite~;
@@ -27,6 +25,8 @@ need only half of the memory of pd's floatingpoint-based object.;
 additional noise (because floats are more precise than 16bit) \, and
 you cannot have values>1 stored in the delay-line;
 #X obj 375 112 vd~;
+#X obj 50 314 vd16~ del_example;
+#X obj 24 16 vd16~;
 #X connect 0 0 3 0;
-#X connect 3 0 10 0;
-#X connect 10 0 1 0;
+#X connect 3 0 20 0;
+#X connect 20 0 1 0;

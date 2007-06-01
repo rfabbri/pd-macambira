@@ -11,12 +11,6 @@
 #X msg 43 153 stop;
 #X text 85 154 stop recording;
 #X text 385 366 updated for iem16 version1.0;
-#X obj 14 343 tab16write~;
-#X obj 14 362 tab16read4~;
-#X obj 118 362 tab16read;
-#X obj 118 343 tab16write;
-#X obj 213 343 tab16send~;
-#X obj 213 362 tab16receive~;
 #X obj 337 348 table16;
 #X text 26 322 see also:;
 #X obj 22 211 tab16write~ array99;
@@ -25,8 +19,14 @@
 #X text 120 27 object to write a 16bit-signal in an array;
 #X text 261 261 since [table16] can only hold 16bit-values \, the incoming
 signal (-1.0..+1.0) is stored as integer values -32768..+32767;
-#X connect 0 0 20 0;
+#X obj 14 343 tab16write~;
+#X obj 14 362 tab16read4~;
+#X obj 118 362 tab16read;
+#X obj 118 343 tab16write;
+#X obj 213 343 tab16send~;
+#X obj 213 362 tab16receive~;
+#X connect 0 0 14 0;
 #X connect 1 0 2 0;
-#X connect 2 0 20 0;
-#X connect 4 0 20 0;
-#X connect 9 0 20 0;
+#X connect 2 0 14 0;
+#X connect 4 0 14 0;
+#X connect 9 0 14 0;

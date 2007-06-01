@@ -7,7 +7,6 @@
 #X text 185 175 gives array name;
 #X msg 35 125 set array99;
 #X text 147 125 change array name;
-#X obj 25 165 tab16read array99;
 #X obj 422 131 table16 array99;
 #X obj 17 13 tab16read;
 #X text 412 257 updated for iem16 version1.0;
@@ -22,6 +21,7 @@
 #X text 21 42 since [table16] can only hold 16bit values \, the output
 of [tab16read] is limited to integer-values between -32768..+32767
 ;
-#X connect 1 0 8 0;
-#X connect 6 0 8 0;
-#X connect 8 0 2 0;
+#X obj 25 165 tab16read array99;
+#X connect 1 0 20 0;
+#X connect 6 0 20 0;
+#X connect 20 0 2 0;
