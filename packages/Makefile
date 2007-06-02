@@ -607,7 +607,7 @@ ifeq ($(OS_NAME),linux)
 endif
 ifeq ($(OS_NAME),darwin)
 	echo "<p>To install Pd, drag the $(PACKAGE_NAME).app into your <b>/Applications</b> folder or to the shortcut in the disk image.</p>" >> $(README_FILE)
-	echo "<p>By default, most of the included libraries are loaded at startup.  To change this, set your own preferences in the <b>Startup...</b> Preferences pane usings the <b>Save all settings</b> button.   If you want to start with a blank set of preferences, run this command in the Terminal.app: <code>touch ~/Library/Preferences/org.puredata.pd.plist</code> (<code>~</code> means your home folder).</p>" >> $(README_FILE)
+	echo "<p>By default, most of the included libraries are loaded at startup.  To change this, set your own preferences in the <b>Startup...</b> Preferences pane usings the <b>Save all settings</b> button.   If you want to start with a blank set of preferences, run this command in the Terminal.app:</p><p><code>touch ~/Library/Preferences/org.puredata.pd.plist</code></p><p>(<code>~</code> means your home folder).</p>" >> $(README_FILE)
 endif
 ifeq ($(OS_NAME),windows)
 	echo "<p>To install, run the installer.</p>" >> $(README_FILE)
