@@ -198,13 +198,13 @@ static t_int *sqosc_perform(t_int *w)
     t_float         *out = (t_float *)(w[3]);
     t_float         sample;
     int             n = (int)(w[4]);
-    float           *addr, f1, f2, frac;
+    float           f1, f2, frac;
     int             index;  
     double          dphase = x->x_phase + UNITBIT32;
     int             normhipart;
     union           tabfudge tf;
     float           conv = x->x_conv;
-    double          lastin, findex, slewindex;
+    double          lastin, slewindex;
     static double   twothirds = 2.0/3.0;
     static double   onethird = 1.0/3.0;
 
@@ -216,14 +216,12 @@ static t_int *sqosc_perform(t_int *w)
     if (lastin > x->x_bw) lastin = x->x_bw;/* limit frequency to bandwidth */
     slewindex = x->x_slew*lastin;
     dphase += lastin * conv; /* new phase is old phase + (frequency * table period) */
-    /*addr = tab + (tf.tf_i[HIOFFSET] & (SQOSCTABSIZE-1)); */ /* point to the current sample in the table */
     index = tf.tf_i[HIOFFSET] & (SQOSCTABSIZE-1);
     tf.tf_i[HIOFFSET] = normhipart; /* zero the non-fractional part of the phase */
     frac = tf.tf_d - UNITBIT32; /* extract the fractional part of the phase  */
     while (--n)
     {
         tf.tf_d = dphase;
-        /*f1 = addr[0]; */ /* first sample */
         if (index <= slewindex)
         { /* rising phase */
             if(x->x_pulse_ended)
@@ -233,15 +231,13 @@ static t_int *sqosc_perform(t_int *w)
                 else x->x_dpw = x->x_pw;
                 x->x_pulse_ended = 0;
             }
-            /*findex = (index/(x->x_slew*lastin))*HALFSQOSCTABSIZE;*/
-            /*addr = tab + HALFSQOSCTABSIZE + (int)findex; */
-            f1 = 1.0-2.0*(slewindex-index)/slewindex;/* a ramp from -1 to +1 */ /* addr[0];*/
+            f1 = 1.0-2.0*(slewindex-index)/slewindex;/* a ramp from -1 to +1 */
             f1 = f1 - pow(f1, 3.0)*onethird;/* smooth the ramp */
         }
         else if (index < x->x_dpw) f1 = twothirds; /* risen */
         else if (index <= slewindex+x->x_dpw)
         { /* falling phase */
-            f1 = -1.0+2.0*(slewindex-index+x->x_dpw)/slewindex;/* a ramp from +1 to -1 */ /* addr[0];*/
+            f1 = -1.0+2.0*(slewindex-index+x->x_dpw)/slewindex;/* a ramp from +1 to -1 */
             f1 = f1 - pow(f1, 3.0)*onethird;/* smooth the ramp */
             x->x_pulse_ended = 1;
         }
@@ -254,29 +250,26 @@ static t_int *sqosc_perform(t_int *w)
         if (lastin > x->x_bw) lastin = x->x_bw;/* limit frequency to bandwidth */
         slewindex = x->x_slew*lastin;
         dphase += lastin * conv; /* next phase */
-        /*f2 = addr[1]; */ /* second sample */
         if (index+1 <= slewindex)
         {
-            f2 = 1.0-2.0*(slewindex-index-1)/slewindex;/* addr[1]; */
+            f2 = 1.0-2.0*(slewindex-index-1)/slewindex;
             f2 = f2 - pow(f2, 3.0)*onethird;
         }
         else if (index+1 < x->x_dpw) f2 = twothirds;
         else if (index+1 <= slewindex+x->x_dpw)
         {
-            f2 = -1.0+2.0*(slewindex-index-1+x->x_dpw)/slewindex;/* addr[1]; */
+            f2 = -1.0+2.0*(slewindex-index-1+x->x_dpw)/slewindex;
             f2 = f2 - pow(f2, 3.0)*onethird;
         }
         else f2 = -twothirds;
 
         sample = f1 + frac * (f2 - f1); /* output first sample plus fraction of second sample (linear interpolation) */
         *out++ = sample;
-        /* addr = tab + (tf.tf_i[HIOFFSET] & (SQOSCTABSIZE-1)); */ /* point to the next sample */
         index = tf.tf_i[HIOFFSET] & (SQOSCTABSIZE-1);
         tf.tf_i[HIOFFSET] = normhipart; /* zero the non-fractional part */
 
         frac = tf.tf_d - UNITBIT32; /* get next fractional part */
     }
-    /* f1 = addr[0]; */
     if (index <= slewindex)
     {
         if(x->x_pulse_ended)
@@ -286,17 +279,13 @@ static t_int *sqosc_perform(t_int *w)
             else x->x_dpw = x->x_pw;
             x->x_pulse_ended = 0;
         }
-        /* findex = (index/(x->x_slew*lastin))*HALFSQOSCTABSIZE; */
-        /* addr = tab + HALFSQOSCTABSIZE + (int)findex; */
-        f1 = 1.0-2.0*(slewindex-index)/slewindex;/* addr[0]; */
+        f1 = 1.0-2.0*(slewindex-index)/slewindex;
         f1 = f1 - pow(f1, 3.0)*onethird;
     }
     else if (index < x->x_dpw) f1 = twothirds; /* risen */
     else if (index <= slewindex+x->x_dpw)
     { /* falling phase */
-/*        findex = ((index-HALFSQOSCTABSIZE)/(x->x_slew*lastin))*HALFSQOSCTABSIZE;*/
-/*        addr = tab + (int)findex; */
-        f1 = -1.0+2.0*(slewindex-index+x->x_dpw)/slewindex;/* addr[0]; */
+        f1 = -1.0+2.0*(slewindex-index+x->x_dpw)/slewindex;
         f1 = f1 - pow(f1, 3.0)*onethird;
         x->x_pulse_ended = 1;
     }
@@ -304,16 +293,15 @@ static t_int *sqosc_perform(t_int *w)
     { /* fallen */
         f1 = -twothirds;
     }
-    /* f2 = addr[1]; */ /* second sample */
     if (index+1 <= slewindex)
     {
-        f2 = 1.0-2.0*(slewindex-index-1)/slewindex;/* addr[1];*/
+        f2 = 1.0-2.0*(slewindex-index-1)/slewindex;
         f2 = f2 - pow(f2, 3.0)*onethird;
     }
     else if (index+1 < x->x_dpw) f2 = twothirds;
     else if (index+1 <= slewindex+x->x_dpw)
     {
-        f2 = -1.0+2.0*(slewindex-index-1+x->x_dpw)/slewindex;/* addr[1];*/
+        f2 = -1.0+2.0*(slewindex-index-1+x->x_dpw)/slewindex;
         f2 = f2 - pow(f2, 3.0)*onethird;
     }
     else f2 = -twothirds;
