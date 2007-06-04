@@ -231,26 +231,27 @@ typedef struct
     } datum;
 } typedArg;
 
-static char bufferForOSCbuf[SC_BUFFER_SIZE];
-static t_atom bufferForOSClist[SC_BUFFER_SIZE];
 
 static t_class *packOSC_class;
 
 typedef struct _packOSC
 {
     t_object    x_obj;
-    t_int       x_typetags; // typetag flag
-    int         x_bundle; // bundle open flag
-    OSCbuf      x_oscbuf[1]; // OSCbuffer
-    t_atom      *x_osclist;
-    t_outlet    *x_bdpthout; // bundle-depth floatoutlet
-    t_outlet    *x_listout; // OSC packet list ouput
+    t_int       x_typetags; /* typetag flag */
+    int         x_bundle; /* bundle open flag */
+    OSCbuf      x_oscbuf[1]; /* OSCbuffer */
+    t_outlet    *x_bdpthout; /* bundle-depth floatoutlet */
+    t_outlet    *x_listout; /* OSC packet list ouput */
+    size_t      x_buflength; /* number of elements in x_bufferForOSCbuf and x_bufferForOSClist */
+    char        *x_bufferForOSCbuf; /*[SC_BUFFER_SIZE];*/
+    t_atom      *x_bufferForOSClist; /*[SC_BUFFER_SIZE];*/
 } t_packOSC;
 
 static void *packOSC_new(t_floatarg udpflag);
 static void packOSC_openbundle(t_packOSC *x);
 static void packOSC_closebundle(t_packOSC *x);
-static void packOSC_settypetags(t_packOSC *x, t_float *f);
+static void packOSC_settypetags(t_packOSC *x, t_floatarg f);
+static void packOSC_setbufsize(t_packOSC *x, t_floatarg f);
 static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void packOSC_send_type_forced(t_packOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void packOSC_send(t_packOSC *x, t_symbol *s, int argc, t_atom *argv);
@@ -265,12 +266,17 @@ static void packOSC_sendbuffer(t_packOSC *x);
 static void *packOSC_new(t_floatarg udpflag)
 {
     t_packOSC *x = (t_packOSC *)pd_new(packOSC_class);
-    // set typetags to 1 by default
-    x->x_typetags = 1;
-    // bundle is closed
-    x->x_bundle   = 0;
-    OSC_initBuffer(x->x_oscbuf, SC_BUFFER_SIZE, bufferForOSCbuf);
-    x->x_osclist = bufferForOSClist;
+    x->x_typetags = 1; /* set typetags to 1 by default */
+    x->x_bundle   = 0; /* bundle is closed */
+    x->x_buflength = SC_BUFFER_SIZE;
+    x->x_bufferForOSCbuf = (char *)getbytes(sizeof(char)*x->x_buflength);
+    if(x->x_bufferForOSCbuf == NULL)
+        error("packOSC: unable to allocate %lu bytes for x_bufferForOSCbuf", sizeof(char)*x->x_buflength);
+    x->x_bufferForOSClist = (t_atom *)getbytes(sizeof(t_atom)*x->x_buflength);
+    if(x->x_bufferForOSClist == NULL)
+        error("packOSC: unable to allocate %lu bytes for x_bufferForOSClist", sizeof(t_atom)*x->x_buflength);
+    if (x->x_oscbuf != NULL)
+        OSC_initBuffer(x->x_oscbuf, x->x_buflength, x->x_bufferForOSCbuf);
     x->x_listout = outlet_new(&x->x_obj, &s_list);
     x->x_bdpthout = outlet_new(&x->x_obj, &s_float);
     return (x);
@@ -297,32 +303,46 @@ static void packOSC_closebundle(t_packOSC *x)
         return;
     }
     outlet_float(x->x_bdpthout, (float)x->x_oscbuf->bundleDepth);
-    // in bundle mode we send when bundle is closed?
+    /* in bundle mode we send when bundle is closed */
     if(!OSC_isBufferEmpty(x->x_oscbuf) > 0 && OSC_isBufferDone(x->x_oscbuf))
     {
         packOSC_sendbuffer(x);
-        OSC_initBuffer(x->x_oscbuf, SC_BUFFER_SIZE, bufferForOSCbuf);
+        OSC_initBuffer(x->x_oscbuf, x->x_buflength, x->x_bufferForOSCbuf);
         x->x_bundle = 0;
         return;
     }
 }
 
-static void packOSC_settypetags(t_packOSC *x, t_float *f)
+static void packOSC_settypetags(t_packOSC *x, t_floatarg f)
 {
     x->x_typetags = (f != 0)?1:0;
-    post("packOSC: setting typetags %d",x->x_typetags);
+    post("packOSC: setting typetags %d", x->x_typetags);
+}
+
+static void packOSC_setbufsize(t_packOSC *x, t_floatarg f)
+{
+    if (x->x_bufferForOSCbuf != NULL) freebytes((void *)x->x_bufferForOSCbuf, sizeof(char)*x->x_buflength);
+    if (x->x_bufferForOSClist != NULL) freebytes((void *)x->x_bufferForOSClist, sizeof(t_atom)*x->x_buflength);
+    post("packOSC: bufsize arg is %f (%lu)", f, (long)f);
+    x->x_buflength = (long)f;
+    x->x_bufferForOSCbuf = (char *)getbytes(sizeof(char)*x->x_buflength);
+    if(x->x_bufferForOSCbuf == NULL)
+        error("packOSC unable to allocate %lu bytes for x_bufferForOSCbuf", sizeof(char)*x->x_buflength);
+    x->x_bufferForOSClist = (t_atom *)getbytes(sizeof(t_atom)*x->x_buflength);
+    if(x->x_bufferForOSClist == NULL)
+        error("packOSC unable to allocate %lu bytes for x_bufferForOSClist", sizeof(t_atom)*x->x_buflength);
+    OSC_initBuffer(x->x_oscbuf, x->x_buflength, x->x_bufferForOSCbuf);
+    post("packOSC: bufsize is now %d",x->x_buflength);
 }
 
 
-
-//////////////////////////////////////////////////////////////////////
-// this is the real and only sending routine now, for both typed and
-// undtyped mode.
+/* this is the real and only sending routine now, for both typed and */
+/* undtyped mode. */
 
 static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
     char            messageName[MAXPDSTRING];
-    unsigned int    nTypeTags = 0, typeStrTotalSize;
+    unsigned int    nTypeTags = 0, typeStrTotalSize = 0;
     unsigned int    argsSize = sizeof(typedArg)*argc;
     char*           typeStr = NULL; /* might not be used */
     typedArg*       args = (typedArg*)getbytes(argsSize);
@@ -335,7 +355,7 @@ static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
         post("packOSC: unable to allocate %lu bytes for args", argsSize);
         return;
     }
-    messageName[0] = '\0'; // empty
+    messageName[0] = '\0'; /* empty */
 
     atom_string(&argv[0], messageName, MAXPDSTRING); /* the OSC address string */
     if (x->x_typetags & 2)
@@ -418,7 +438,7 @@ static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
     if(!x->x_bundle)
     {
         packOSC_sendbuffer(x);
-        OSC_initBuffer(x->x_oscbuf, SC_BUFFER_SIZE, bufferForOSCbuf);
+        OSC_initBuffer(x->x_oscbuf, x->x_buflength, x->x_bufferForOSCbuf);
     }
 
 cleanup:
@@ -445,6 +465,8 @@ static void packOSC_send(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
 
 static void packOSC_free(t_packOSC *x)
 {
+    if (x->x_bufferForOSCbuf != NULL) freebytes((void *)x->x_bufferForOSCbuf, sizeof(char)*x->x_buflength);
+    if (x->x_bufferForOSClist != NULL) freebytes((void *)x->x_bufferForOSClist, sizeof(t_atom)*x->x_buflength);
 }
 
 void packOSC_setup(void)
@@ -453,7 +475,9 @@ void packOSC_setup(void)
         (t_method)packOSC_free,
         sizeof(t_packOSC), 0, A_DEFFLOAT, 0);
     class_addmethod(packOSC_class, (t_method)packOSC_settypetags,
-        gensym("typetags"), A_FLOAT, 0);
+        gensym("typetags"), A_DEFFLOAT, 0);
+    class_addmethod(packOSC_class, (t_method)packOSC_setbufsize,
+        gensym("bufsize"), A_DEFFLOAT, 0);
     class_addmethod(packOSC_class, (t_method)packOSC_send,
         gensym("send"), A_GIMME, 0);
     class_addmethod(packOSC_class, (t_method)packOSC_send,
@@ -485,7 +509,7 @@ static typedArg packOSC_parseatom(t_atom *a)
             f = atom_getfloat(a);
             i = atom_getint(a);
             if (f == (t_float)i)
-            { // assume that if the int and float are the same, it's an int
+            { /* assume that if the int and float are the same, it's an int */
                 returnVal.type = INT_osc;
                 returnVal.datum.i = i;
             }
@@ -601,7 +625,8 @@ static typedArg packOSC_forceatom(t_atom *a, char ctype)
     return returnVal;
 }
 
-static int packOSC_writetypedmessage(t_packOSC *x, OSCbuf *buf, char *messageName, int numArgs, typedArg *args, char *typeStr)
+static int packOSC_writetypedmessage
+(t_packOSC *x, OSCbuf *buf, char *messageName, int numArgs, typedArg *args, char *typeStr)
 {
     int i, j, returnVal = OSC_writeAddressAndTypes(buf, messageName, typeStr);
 
@@ -708,7 +733,7 @@ static int packOSC_writemessage(t_packOSC *x, OSCbuf *buf, char *messageName, in
                 returnVal = OSC_writeStringArg(buf, args[j].datum.s);
                 break;
             default:
-                break; // just skip bad types (which we won't get anyway unless this code is buggy)
+                break; /* just skip bad types (which we won't get anyway unless this code is buggy) */
         }
     }
     return returnVal;
@@ -731,17 +756,17 @@ static void packOSC_sendbuffer(t_packOSC *x)
     if (!OSC_isBufferDone(x->x_oscbuf))
     {
         post("packOSC_sendbuffer() called but buffer not ready!, not exiting");
-        return;	//{{raf}}
+        return;
     }
     length = OSC_packetSize(x->x_oscbuf);
-    buf = OSC_getPacket(x->x_oscbuf);
+    buf = (unsigned char *)OSC_getPacket(x->x_oscbuf);
 #ifdef DEBUG
     post ("packOSC_sendbuffer: length: %lu", length);
 #endif
     /* convert the bytes in the buffer to floats in a list */
-    for (i = 0; i < length; ++i) SETFLOAT(&x->x_osclist[i], buf[i]);
+    for (i = 0; i < length; ++i) SETFLOAT(&x->x_bufferForOSClist[i], buf[i]);
     /* send the list out the outlet */
-    outlet_list(x->x_listout, &s_list, length, x->x_osclist);
+    outlet_list(x->x_listout, &s_list, length, x->x_bufferForOSClist);
 }
 
 /* The next part is copied and morphed from OSC-client.c. */
@@ -981,6 +1006,7 @@ static int OSC_writeAddressAndTypes(OSCbuf *buf, char *name, char *types)
     int      result;
     int4byte paddedLength;
 
+    if (buf == NULL) return 10;
     if (CheckTypeTag(buf, '\0')) return 9;
 
     result = OSC_writeAddress(buf, name);
@@ -1106,7 +1132,7 @@ static int OSC_strlen(char *s)
 static int OSC_effectiveStringLength(char *string)
 {
     int len = OSC_strlen(string) + 1;  /* We need space for the null char. */
-    
+
     /* Round up len to next multiple of STRING_ALIGN_PAD to account for alignment padding */
     if ((len % STRING_ALIGN_PAD) != 0)
     {
@@ -1118,16 +1144,16 @@ static int OSC_effectiveStringLength(char *string)
 static int OSC_padString(char *dest, char *str)
 {
     int i;
-    
+
     for (i = 0; str[i] != '\0'; i++) dest[i] = str[i];
-    
+
     return OSC_WritePadding(dest, i);
 }
 
 static int OSC_padStringWithAnExtraStupidComma(char *dest, char *str)
 {
     int i;
-    
+
     dest[0] = ',';
     for (i = 0; str[i] != '\0'; i++) dest[i+1] = str[i];
 
