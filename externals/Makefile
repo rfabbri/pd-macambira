@@ -1215,38 +1215,20 @@ iem_bin_ambi_clean:
 # more externals in one file - so a little bit complicated ... ;)
 IEM16_NAME=iem16
 IEM16_DIR := $(externals_src)/iem16/src
-IEM16_SRC := $(wildcard $(externals_src)/iem16/src/iem16_*.c)
-IEM16_TAR1 := tab16read.$(EXTENSION) tab16read4.$(EXTENSION) tab16write.$(EXTENSION)
-IEM16_TAR2 := tab16write~.$(EXTENSION) tab16play~.$(EXTENSION) \
-              tab16read~.$(EXTENSION) tab16read4~.$(EXTENSION) \
-              tab16send~.$(EXTENSION) tab16receive~.$(EXTENSION)
-IEM16_TAR3 := del16read~.$(EXTENSION) del16write~.$(EXTENSION) vd16~.$(EXTENSION)
-IEM16_TAR4 := table16.$(EXTENSION)
+IEM16_SRC := $(wildcard $(externals_src)/iem16/src/*.c)
 
-iem16: $(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR1)) $(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR2)) $(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR3)) $(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR4))
 
-$(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR1)): %.$(EXTENSION) : $(IEM16_SRC:.c=.o)
-	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) $(externals_src)/iem16/src/iem16_array.o $(externals_src)/iem16/src/iem16_table.o $(LIBS)
-	$(STRIP) $*.$(EXTENSION)
-	chmod 755 $*.$(EXTENSION)
+$(externals_src)/iem16/src/configure: $(externals_src)/iem16/src/configure.ac
+	cd $(externals_src)/iem16/src && autoconf
 
-$(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR2)): %.$(EXTENSION) : $(IEM16_SRC:.c=.o)
-	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) $(externals_src)/iem16/src/iem16_array_tilde.o $(externals_src)/iem16/src/iem16_table.o $(LIBS)
-	$(STRIP) $*.$(EXTENSION)
-	chmod 755 $*.$(EXTENSION)
+$(externals_src)/iem16/src/Make.config: $(externals_src)/iem16/src/Make.config.in \
+$(externals_src)/iem16/src/configure
+	cd $(externals_src)/iem16/src/ && ./configure --disable-library \
+		--with-pd=$(pd_src)
 
-$(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR3)): %.$(EXTENSION) : $(IEM16_SRC:.c=.o)
-	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) $(externals_src)/iem16/src/iem16_delay.o $(LIBS) $(externals_src)/iem16/src/iem16_table.o
-	$(STRIP) $*.$(EXTENSION)
-	chmod 755 $*.$(EXTENSION)
+iem16: $(externals_src)/iem16/src/Make.config
+	$(MAKE) -C $(externals_src)/iem16/src/ 
 
-$(patsubst %,$(externals_src)/iem16/src/%,$(IEM16_TAR4)): %.$(EXTENSION) : $(IEM16_SRC:.c=.o)
-	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) $(externals_src)/iem16/src/iem16_table.o $(LIBS)
-	$(STRIP) $*.$(EXTENSION)
-	chmod 755 $*.$(EXTENSION)
-
-$(IEM16_SRC:.c=.o) : %.o : %.c
-	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
 
 iem16_install: iem16
 	install -d $(objectsdir)/$(IEM16_NAME)
@@ -1261,7 +1243,13 @@ iem16_install: iem16
 		$(helpdir)/$(IEM16_NAME)
 
 iem16_clean:
+	-$(MAKE) -C $(externals_src)/iem16/src clean
 	-rm -f -- $(externals_src)/iem16/src/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/iem16/src/*.d
+	-rm -rf -- $(externals_src)/iem16/src/autom4ate
+	-rm -rf -- $(externals_src)/iem16/src/conf[0-9][0-9][0-9]*
+	-rm -f -- $(externals_src)/iem16/src/configure
+	-rm -f -- $(externals_src)/iem16/src/Make.config
 	-rm -f -- $(externals_src)/iem16/src/*.o
 	-rm -f -- $(externals_src)/iem16/src/*.bak
 	-rm -f -- $(externals_src)/iem16/src/*.*~
