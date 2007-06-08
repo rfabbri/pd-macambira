@@ -178,6 +178,8 @@ then
   else
     OFLAGS="-g"
   fi
+  DFLAGS="$DFLAGS -DPIC"
+  OFLAGS="$OFLAGS -fPIC"
   PDEXT=pd_linux	
 fi
 
