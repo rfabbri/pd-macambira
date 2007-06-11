@@ -1215,19 +1215,21 @@ iem_bin_ambi_clean:
 # more externals in one file - so a little bit complicated ... ;)
 IEM16_NAME=iem16
 IEM16_DIR := $(externals_src)/iem16/src
-IEM16_SRC := $(wildcard $(externals_src)/iem16/src/*.c)
+IEM16_SRC := $(wildcard $(IEM16_DIR)/*.c)
 
+$(IEM16_DIR)/aclocal.m4: $(IEM16_DIR)/acinclude.m4
+	cd $(IEM16_DIR) && aclocal
 
-$(externals_src)/iem16/src/configure: $(externals_src)/iem16/src/configure.ac
-	cd $(externals_src)/iem16/src && autoconf
+$(IEM16_DIR)/configure: $(IEM16_DIR)/configure.ac $(IEM16_DIR)/aclocal.m4
+	cd $(IEM16_DIR) && autoconf
 
-$(externals_src)/iem16/src/Make.config: $(externals_src)/iem16/src/Make.config.in \
-$(externals_src)/iem16/src/configure
-	cd $(externals_src)/iem16/src/ && ./configure --disable-library \
+$(IEM16_DIR)/Make.config: $(IEM16_DIR)/Make.config.in \
+$(IEM16_DIR)/configure
+	cd $(IEM16_DIR) && ./configure --disable-library \
 		--with-pd=$(pd_src)
 
-iem16: $(externals_src)/iem16/src/Make.config
-	$(MAKE) -C $(externals_src)/iem16/src/ 
+iem16: $(IEM16_DIR)/Make.config
+	$(MAKE) -C $(IEM16_DIR)
 
 
 iem16_install: iem16
@@ -1237,22 +1239,22 @@ iem16_install: iem16
 		--description "16bit table, array objects for low memory usage" \
 		--license "GNU GPL" \
 		--version "0.1"
-	install -p $(externals_src)/iem16/src/*.$(EXTENSION) $(objectsdir)/$(IEM16_NAME)
+	install -p $(IEM16_DIR)/*.$(EXTENSION) $(objectsdir)/$(IEM16_NAME)
 	install -d $(helpdir)/$(IEM16_NAME)
 	install -p $(externals_src)/iem16/help/*.pd \
 		$(helpdir)/$(IEM16_NAME)
 
 iem16_clean:
-	-$(MAKE) -C $(externals_src)/iem16/src clean
-	-rm -f -- $(externals_src)/iem16/src/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/iem16/src/*.d
-	-rm -rf -- $(externals_src)/iem16/src/autom4ate
-	-rm -rf -- $(externals_src)/iem16/src/conf[0-9][0-9][0-9]*
-	-rm -f -- $(externals_src)/iem16/src/configure
-	-rm -f -- $(externals_src)/iem16/src/Make.config
-	-rm -f -- $(externals_src)/iem16/src/*.o
-	-rm -f -- $(externals_src)/iem16/src/*.bak
-	-rm -f -- $(externals_src)/iem16/src/*.*~
+	-$(MAKE) -C $(IEM16_DIR) clean
+	-rm -f -- $(IEM16_DIR)/*.$(EXTENSION)
+	-rm -f -- $(IEM16_DIR)/*.d
+	-rm -rf -- $(IEM16_DIR)/autom4ate
+	-rm -rf -- $(IEM16_DIR)/conf[0-9][0-9][0-9]*
+	-rm -f -- $(IEM16_DIR)/configure
+	-rm -f -- $(IEM16_DIR)/Make.config
+	-rm -f -- $(IEM16_DIR)/*.o
+	-rm -f -- $(IEM16_DIR)/*.bak
+	-rm -f -- $(IEM16_DIR)/*.*~
 
 
 
