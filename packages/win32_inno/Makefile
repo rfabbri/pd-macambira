@@ -52,7 +52,7 @@ install: pd_install prebuilt_install lib_install exe_install
 	@echo "win32_inno install succeeded!"
 
 
-prebuilt_install:
+prebuilt_install: pddplink_hack
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) extended_install
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) doc_format
 	install -p pd-settings.reg $(DESTDIR)$(prefix)
@@ -96,6 +96,12 @@ exe_install:
 	install -d $(bindir)
 	install -p $(bin_src)/wish84.exe  $(bindir)
 	install -p $(bin_src)/tclsh84.exe  $(bindir)
+
+
+# on Windows, the pddp tcl files need to be in pd/lib aka $(libdir)
+pddplink_hack:
+	install -d $(libdir)/pddp
+	install -p $(externals_src)/miXed/bin/pddp/*.tcl $(libdir)/pddp
 
 
 # here are some hacks to assemble a package from binaries
