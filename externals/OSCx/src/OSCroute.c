@@ -280,7 +280,7 @@ void OSCroute_list(t_OSCroute *x, t_symbol *s, int argc, t_atom *argv) {
   if (argc > 0 && argv[0].a_type == A_SYMBOL) {
     /* Ignore the fact that this is a "list" */
     OSCroute_doanything(x, argv[0].a_w.w_symbol, argc-1, argv+1);
-  } else {
+  } else if (argc > 0)  {
     // post("* OSC-route: invalid list beginning with a number");
     // output on unmatched outlet jdl 20020908
     if (argv[0].a_type == A_FLOAT) {
@@ -288,6 +288,10 @@ void OSCroute_list(t_OSCroute *x, t_symbol *s, int argc, t_atom *argv) {
     } else {
       post("* OSC-route: unrecognized atom type!");
     }
+  }
+  else {
+      //  output a bang on the rejected outlet if no arguments
+      outlet_bang(x->x_outlets[x->x_num]);
   }
   // ExitCallback();
 }
