@@ -305,8 +305,12 @@ static void *dumpOSC_new(t_symbol *compatflag,
   // ss 2006
   if (castgroup) {
 	  struct ip_mreq mreq;
+      int t = 1;
 	  mreq.imr_multiaddr.s_addr = inet_addr(castgroup->s_name);
 	  mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+      if (setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&t,sizeof(t)) < 0) {
+		  sys_sockerror("setsockopt");
+      }
 	  if (setsockopt(sockfd,IPPROTO_IP,IP_ADD_MEMBERSHIP,(char*)&mreq,sizeof(mreq)) < 0) {
 		  sys_sockerror("setsockopt");
 	  }
