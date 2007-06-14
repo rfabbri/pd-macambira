@@ -38,7 +38,7 @@ typedef int bool;
 
 /* open a socket for HTM communication to given  host on given portnumber */
 /* if host is 0 then UNIX protocol is used (i.e. local communication) */
-void *OpenHTMSocket(char *host, int portnumber, unsigned char multicast_TTL);
+void *OpenHTMSocket(char *host, int portnumber, short *multicast_TTL);
 
 /* send a buffer of data over htm socket, returns TRUE on success.
  Note that udp sends rarely fail. UNIX sends fail if a kernal buffer overflows */

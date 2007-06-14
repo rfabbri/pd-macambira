@@ -192,7 +192,7 @@ static void sendOSC_connect(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv) /
   float fportno=0;
   t_symbol *hostname;
   int portno = fportno;
-  unsigned char ttl=1;
+  short ttl=-1;
   char *protocolStr;
   /* create a socket */
 
@@ -211,7 +211,7 @@ static void sendOSC_connect(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv) /
 
   if (argc >= 3) {
 	  if (argv[2].a_type==A_FLOAT)
-		  ttl = (unsigned char)argv[2].a_w.w_float;
+		  ttl = (short)(unsigned char)argv[2].a_w.w_float;
 	  else
 		  return;
   }
@@ -219,9 +219,12 @@ static void sendOSC_connect(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv) /
 	//	make sure handle is available
   if(x->x_htmsocket == 0)
   {
-		x->x_htmsocket = OpenHTMSocket(hostname->s_name, portno, ttl);
-		if (!x->x_htmsocket)
-      post("sendOSC: Couldn't open socket: ");
+		x->x_htmsocket = OpenHTMSocket(hostname->s_name, portno, &ttl);
+		if (!x->x_htmsocket) {
+            post("sendOSC: Couldn't open socket: ");
+            if (ttl==-2)
+                post("sendOSC: Multicast group range 224.0.0.[0-255] is reserved.\n");
+        }
     else
 	{
       switch (x->x_protocol)
@@ -236,12 +239,16 @@ static void sendOSC_connect(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv) /
           protocolStr = "unknown";
           break;
 	  }
-      post("sendOSC: connected to port %s:%d (hSock=%d) protocol = %s ttl = %d", 
-        hostname->s_name, portno, x->x_htmsocket, protocolStr, ttl);
-			outlet_float(x->x_obj.ob_outlet, 1);
-		}
-	}
-	else 
+      if (ttl>=0)
+          post("sendOSC: connected to port %s:%d (hSock=%d) protocol = %s ttl = %d", 
+               hostname->s_name, portno, x->x_htmsocket, protocolStr, ttl);
+      else
+          post("sendOSC: connected to port %s:%d (hSock=%d) protocol = %s", 
+               hostname->s_name, portno, x->x_htmsocket, protocolStr);
+      outlet_float(x->x_obj.ob_outlet, 1);
+    }
+  }
+  else 
     perror("call to sendOSC_connect() against unavailable socket handle");
 }
 

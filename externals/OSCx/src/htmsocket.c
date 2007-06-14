@@ -103,9 +103,29 @@ typedef struct
 	int id;
 } desc;
 
+int IsAddressMulticast(unsigned long address)
+{
+    unsigned long adr = ntohl(address);
+    unsigned char A = (unsigned char)((adr & 0xFF000000) >> 24);
+    unsigned char B = (unsigned char)((adr & 0xFF0000) >> 16);
+    unsigned char C = (unsigned char)((adr & 0xFF00) >> 8);
+
+    if (A==224 && B==0 && C==0) {
+        // This multicast group range is reserved for routing
+        // information and not meant to be used by applications.
+        return -1;
+    }
+
+    // This is the multicast group IP range
+    if (A>=224 && A<=239)
+        return 1;
+
+    return 0;
+}
+
 /* open a socket for HTM communication to given  host on given portnumber */
 /* if host is 0 then UNIX protocol is used (i.e. local communication */
-void *OpenHTMSocket(char *host, int portnumber, unsigned char multicast_TTL)
+void *OpenHTMSocket(char *host, int portnumber, short *multicast_TTL)
 {
 	struct sockaddr_in  cl_addr;
 	#ifndef WIN32
@@ -233,16 +253,37 @@ void *OpenHTMSocket(char *host, int portnumber, unsigned char multicast_TTL)
 				  perror("setsockopt broadcast");
 				}
 
-				// set multicast Time-To-Live: ss
-				if(setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_TTL, sizeof(multicast_TTL)) == -1) {
-				  perror("setsockopt TTL");
-				}
+                // check if specified address is a multicast group: ss 2007
+                int multicast = IsAddressMulticast(o->serv_addr.sin_addr.s_addr);
 
-				if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0) {
-					perror("could not bind\n");
-					closesocket(sockfd);
-					sockfd = -1;
-				}
+                if (multicast == -1) {
+                    perror("Multicast group range 224.0.0.[0-255] is reserved.\n");
+                    *multicast_TTL = -2;
+                    close(sockfd);
+                    sockfd = -1;
+                }
+                else {
+                    // set TTL according to whether we have a multicast group or not
+                    if (multicast) {
+                        if (*multicast_TTL<0)
+                            *multicast_TTL = 1;
+                    } else
+                        *multicast_TTL = -1;
+
+                    // set multicast Time-To-Live only if it is a multicast group: ss 2007
+                    if(*multicast_TTL>=0) {
+                        unsigned char ttl = (unsigned char)*multicast_TTL;
+                        if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL,
+                                       &ttl, sizeof(ttl)) == -1)
+                            perror("setsockopt TTL");
+                    }
+
+                    if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0) {
+                        perror("could not bind\n");
+                        closesocket(sockfd);
+                        sockfd = -1;
+                    }
+                }
 			}
 			else { perror("unable to make socket\n");}
 		#else
@@ -259,16 +300,37 @@ void *OpenHTMSocket(char *host, int portnumber, unsigned char multicast_TTL)
 				  perror("setsockopt");
 				}
 
-				// set multicast Time-To-Live: ss 2006
-				if(setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_TTL, sizeof(multicast_TTL)) == -1) {
-				  perror("setsockopt TTL");
-				}
+                // check if specified address is a multicast group: ss 2007
+                int multicast = IsAddressMulticast(o->serv_addr.sin_addr.s_addr);
 
-				if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0) {
-					perror("could not bind\n");
-					close(sockfd);
-					sockfd = -1;
-				}
+                if (multicast == -1) {
+                    perror("Multicast group range 224.0.0.[0-255] is reserved.\n");
+                    *multicast_TTL = -2;
+                    close(sockfd);
+                    sockfd = -1;
+                }
+                else {
+                    // check if specified address is a multicast group: ss 2007
+                    if (multicast) {
+                        if (*multicast_TTL<0)
+                            *multicast_TTL = 1;
+                    } else
+                        *multicast_TTL = -1;
+
+                    // set multicast Time-To-Live only if it is a multicast group: ss 2007
+                    if(*multicast_TTL>=0) {
+                        unsigned char ttl = (unsigned char)*multicast_TTL;
+                        if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL,
+                                       &ttl, sizeof(ttl)) == -1)
+                            perror("setsockopt TTL");
+                    }
+
+                    if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0) {
+                        perror("could not bind\n");
+                        close(sockfd);
+                        sockfd = -1;
+                    }
+                }
 			}
 			else { perror("unable to make socket\n");}
 		#endif
