@@ -2,6 +2,7 @@
 /* This allows for the separation of the protocol and its transport. */
 /* Started by Martin Peach 20060403 */
 /* 20060425 version independent of libOSC */
+/* 20070620 added packOSC_path and packOSC_anything methods by zmoelnig */
 /* packOSC.c makes extensive use of code from OSC-client.c and sendOSC.c */
 /* as well as some from OSC-timetag.c. These files have the following header: */
 /*
@@ -245,9 +246,11 @@ typedef struct _packOSC
     size_t      x_buflength; /* number of elements in x_bufferForOSCbuf and x_bufferForOSClist */
     char        *x_bufferForOSCbuf; /*[SC_BUFFER_SIZE];*/
     t_atom      *x_bufferForOSClist; /*[SC_BUFFER_SIZE];*/
+    char        *x_prefix;
 } t_packOSC;
 
 static void *packOSC_new(t_floatarg udpflag);
+static void packOSC_path(t_packOSC *x, t_symbol*s);
 static void packOSC_openbundle(t_packOSC *x);
 static void packOSC_closebundle(t_packOSC *x);
 static void packOSC_settypetags(t_packOSC *x, t_floatarg f);
@@ -255,6 +258,7 @@ static void packOSC_setbufsize(t_packOSC *x, t_floatarg f);
 static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void packOSC_send_type_forced(t_packOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void packOSC_send(t_packOSC *x, t_symbol *s, int argc, t_atom *argv);
+static void packOSC_anything(t_packOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void packOSC_free(t_packOSC *x);
 void packOSC_setup(void);
 static typedArg packOSC_parseatom(t_atom *a);
@@ -282,6 +286,21 @@ static void *packOSC_new(t_floatarg udpflag)
     return (x);
 }
 
+static void packOSC_path(t_packOSC *x, t_symbol*s)
+{
+/* Set a default prefix to the OSC path */
+    if(s == gensym(""))
+    {
+        x->x_prefix = 0;
+        return;
+    }
+    if ((*s->s_name) != '/')
+    {
+        pd_error(x, "packOSC: bad path: '%s'", s->s_name);
+        return;
+    }
+    x->x_prefix = s->s_name;
+}
 
 static void packOSC_openbundle(t_packOSC *x)
 {
@@ -356,8 +375,18 @@ static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
         return;
     }
     messageName[0] = '\0'; /* empty */
+    if(x->x_prefix) /* if there is a prefix, prefix it to the path */
+    {
+        size_t len = strlen(x->x_prefix);
+        if(len >= MAXPDSTRING)
+        len = MAXPDSTRING-1;
 
-    atom_string(&argv[0], messageName, MAXPDSTRING); /* the OSC address string */
+        strncpy(messageName, x->x_prefix, MAXPDSTRING);
+        atom_string(&argv[0], messageName+len, MAXPDSTRING-len);
+    }
+    else
+        atom_string(&argv[0], messageName, MAXPDSTRING); /* the OSC address string */
+
     if (x->x_typetags & 2)
     { /* second arg is typestring */
         /* we need to find out how long the type string is before we copy it*/
@@ -463,6 +492,27 @@ static void packOSC_send(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
     packOSC_sendtyped(x, s, argc, argv);
 }
 
+static void packOSC_anything(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
+{
+/* If the message starts with '/', assume it's an OSC path and send it */
+    t_atom*ap = 0;
+
+    if ((*s->s_name)!='/')
+    {
+        pd_error(x, "packOSC: bad path: '%s'", s->s_name);
+        return;
+    }
+
+    ap = (t_atom*)getbytes((argc+1)*sizeof(t_atom));
+    SETSYMBOL(ap, s);
+    memcpy(ap+1, argv, argc * sizeof(t_atom));
+
+    packOSC_send(x, gensym("send"), argc+1, ap);
+
+    freebytes(ap, (argc+1)*sizeof(t_atom));
+
+}
+
 static void packOSC_free(t_packOSC *x)
 {
     if (x->x_bufferForOSCbuf != NULL) freebytes((void *)x->x_bufferForOSCbuf, sizeof(char)*x->x_buflength);
@@ -474,6 +524,8 @@ void packOSC_setup(void)
     packOSC_class = class_new(gensym("packOSC"), (t_newmethod)packOSC_new,
         (t_method)packOSC_free,
         sizeof(t_packOSC), 0, A_DEFFLOAT, 0);
+    class_addmethod(packOSC_class, (t_method)packOSC_path,
+        gensym("prefix"), A_DEFSYM, 0);
     class_addmethod(packOSC_class, (t_method)packOSC_settypetags,
         gensym("typetags"), A_DEFFLOAT, 0);
     class_addmethod(packOSC_class, (t_method)packOSC_setbufsize,
@@ -488,6 +540,7 @@ void packOSC_setup(void)
         gensym("["), 0, 0);
     class_addmethod(packOSC_class, (t_method)packOSC_closebundle,
         gensym("]"), 0, 0);
+    class_addanything(packOSC_class, (t_method)packOSC_anything);
 }
 
 static typedArg packOSC_parseatom(t_atom *a)
