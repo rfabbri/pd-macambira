@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_matrix written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_matrix written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2007 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -78,9 +78,7 @@ static t_int *matrix_diag_mul_stat_tilde_perform(t_int *w)
   t_float *buf = x->x_buf;
   t_float *mat = x->x_matbuf;
   int n_io = x->x_n_io;
-  int hn_io = n_io / 2;
-  int dn_io = 2 * n_io;
-  t_float *in, *out1, *out2, mul;
+  t_float *in, *out, mul;
   int i, j;
   
   for(j=0; j<n_io; j++)
@@ -88,25 +86,15 @@ static t_int *matrix_diag_mul_stat_tilde_perform(t_int *w)
     mul = mat[j];
     in = io[j];
     for(i=0; i<n; i++)
-    {
-      in[i] *= mul;
-    }
+      *buf++ = in[i] * mul;
   }
-  for(j=0; j<hn_io; j++)
+
+  buf = x->x_buf;
+  for(j=0; j<n_io; j++)
   {
-    in = io[j];
+    out = io[j+n_io];
     for(i=0; i<n; i++)
-    {
-      buf[i] = in[i];
-    }
-    in = io[n_io-j-1];
-    out1 = io[j+n_io];
-    out2 = io[dn_io-j-1];
-    for(i=0; i<n; i++)
-    {
-      out1[i] = in[i];
-      out2[i] = buf[i];
-    }
+      out[i] = *buf++;
   }
   return (w+3);
 }
@@ -116,67 +104,43 @@ static t_int *matrix_diag_mul_stat_tilde_perf8(t_int *w)
   t_matrix_diag_mul_stat_tilde *x = (t_matrix_diag_mul_stat_tilde *)(w[1]);
   int n = (int)(w[2]);
   t_float **io = x->x_io;
-  t_float *buf;
+  t_float *buf = x->x_buf;
   t_float *mat = x->x_matbuf;
   int n_io = x->x_n_io;
-  int hn_io = n_io / 2;
-  int dn_io = 2 * n_io;
-  t_float *in, *out1, *out2, mul;
+  t_float *in, *out, mul;
   int i, j;
   
   for(j=0; j<n_io; j++)
   {
     mul = mat[j];
     in = io[j];
-    for(i=n; i; i -= 8, in += 8)
+    for(i=n; i; i -= 8, in += 8, buf += 8)
     {
-      in[0] *= mul;
-      in[1] *= mul;
-      in[2] *= mul;
-      in[3] *= mul;
-      in[4] *= mul;
-      in[5] *= mul;
-      in[6] *= mul;
-      in[7] *= mul;
+      buf[0] = in[0] * mul;
+      buf[1] = in[1] * mul;
+      buf[2] = in[2] * mul;
+      buf[3] = in[3] * mul;
+      buf[4] = in[4] * mul;
+      buf[5] = in[5] * mul;
+      buf[6] = in[6] * mul;
+      buf[7] = in[7] * mul;
     }
   }
-  for(j=0; j<hn_io; j++)
+
+  buf = x->x_buf;
+  for(j=0; j<n_io; j++)
   {
-    in = io[j];
-    buf = x->x_buf;
-    for(i=n; i; i -= 8, buf += 8, in += 8)
+    out = io[j+n_io];
+    for(i=n; i; i -= 8, buf += 8, out += 8)
     {
-      buf[0] = in[0];
-      buf[1] = in[1];
-      buf[2] = in[2];
-      buf[3] = in[3];
-      buf[4] = in[4];
-      buf[5] = in[5];
-      buf[6] = in[6];
-      buf[7] = in[7];
-    }
-    in = io[n_io-j-1];
-    out1 = io[j+n_io];
-    out2 = io[dn_io-j-1];
-    buf = x->x_buf;
-    for(i=n; i; i -= 8, buf += 8, in += 8, out1 += 8, out2 += 8)
-    {
-      out2[0] = in[0];
-      out2[1] = in[1];
-      out2[2] = in[2];
-      out2[3] = in[3];
-      out2[4] = in[4];
-      out2[5] = in[5];
-      out2[6] = in[6];
-      out2[7] = in[7];
-      out1[0] = buf[0];
-      out1[1] = buf[1];
-      out1[2] = buf[2];
-      out1[3] = buf[3];
-      out1[4] = buf[4];
-      out1[5] = buf[5];
-      out1[6] = buf[6];
-      out1[7] = buf[7];
+      out[0] = buf[0];
+      out[1] = buf[1];
+      out[2] = buf[2];
+      out[3] = buf[3];
+      out[4] = buf[4];
+      out[5] = buf[5];
+      out[6] = buf[6];
+      out[7] = buf[7];
     }
   }
   return (w+3);
@@ -185,23 +149,24 @@ static t_int *matrix_diag_mul_stat_tilde_perf8(t_int *w)
 static void matrix_diag_mul_stat_tilde_dsp(t_matrix_diag_mul_stat_tilde *x, t_signal **sp)
 {
   int i, n=sp[0]->s_n;
+  int bufsize = sp[0]->s_n*x->x_n_io;
   
   if(!x->x_buf)
   {
-    x->x_bufsize = n;
+    x->x_bufsize = bufsize;
     x->x_buf = (t_float *)getbytes(x->x_bufsize * sizeof(t_float));
   }
-  else if(x->x_bufsize != n)
+  else if(x->x_bufsize != bufsize)
   {
-    x->x_buf = (t_float *)resizebytes(x->x_buf, x->x_bufsize*sizeof(t_float), n*sizeof(t_float));
-    x->x_bufsize = n;
+    x->x_buf = (t_float *)resizebytes(x->x_buf, x->x_bufsize*sizeof(t_float), bufsize*sizeof(t_float));
+    x->x_bufsize = bufsize;
   }
   
   n = 2 * x->x_n_io;
   for(i=0; i<n; i++)
   {
     x->x_io[i] = sp[i]->s_vec;
-    //    post("iovec_addr = %d", (unsigned int)x->x_io[i]);
+//    post("iovec_addr = %d", (unsigned int)x->x_io[i]);
   }
   
   n = sp[0]->s_n;
