@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_matrix written by Thomas Musil (c) IEM KUG Graz Austria 2002 - 2006 */
+iem_matrix written by Thomas Musil (c) IEM KUG Graz Austria 2002 - 2007 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -169,7 +169,6 @@ static t_int *matrix_mul_stat_tilde_perform(t_int *w)
 {
   t_matrix_mul_stat_tilde *x = (t_matrix_mul_stat_tilde *)(w[1]);
   int n = (int)(w[2]);
-  
   t_float **io = x->x_io;
   t_float *outsum, *houtsum;
   t_float *mat  = x->x_matbuf;

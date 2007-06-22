@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_matrix written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_matrix written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2007 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -39,6 +39,6 @@ void iem_matrix_setup(void)
   matrix_bundle_line8_tilde_setup();
   matrix_bundle_stat_tilde_setup();
   
-  post("iem_matrix (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
+  post("iem_matrix (R-1.17) library loaded!   (c) Thomas Musil 06.2007");
   post("   musil%ciem.at iem KUG Graz Austria", '@');
 }
