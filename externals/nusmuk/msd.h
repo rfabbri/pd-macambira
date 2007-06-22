@@ -596,14 +596,18 @@ protected:
 			return;
 		}
 		
-		t_mass *m = mass.find(GetAInt(argv[0]));
-		if(m) {
-			// Delete all associated links 
-			for(typename std::vector<t_link *>::iterator it = m->links.begin(); it < m->links.end(); ++it)
-				deletelink(*it);
-			outmass(S_Mass_deleted,m);
-			massids.erase(m);
-			mass.remove(m->nbr);
+
+                t_mass *m = mass.find(GetAInt(argv[0]));
+                if(m) {
+                        // Delete all associated links
+
+            while(!m->links.empty())
+                deletelink(m->links.front());
+
+                        outmass(S_Mass_deleted,m);
+                        massids.erase(m);
+                        mass.remove(m->nbr); 
+
 			delete m;
 			mass_deleted = 1;
 		}
