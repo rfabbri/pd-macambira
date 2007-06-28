@@ -1,0 +1,48 @@
+#N canvas 918 327 492 500 10;
+#X obj 5 2 cnv 15 450 20 empty empty one->two 2 11 1 18 -233017 -66577
+0;
+#X msg 422 3 pddp;
+#X text 273 457 released under the GNU GPL;
+#X floatatom 153 110 5 0 0 0 - - -;
+#X floatatom 83 186 5 0 0 0 - - -;
+#X obj 156 91 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 86 203 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X floatatom 263 186 5 0 0 0 - - -;
+#X obj 266 203 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X text 18 28 Simple one-to-two mapping object. The first inlet is
+passed thru \, the range of the output data on the second inlet starts
+at the point in the input range specified as an arugment.;
+#X text 6 457 (C) Copyright 2007 Free Software Foundation;
+#X floatatom 153 303 5 0 0 0 - - -;
+#X floatatom 83 399 5 0 0 0 - - -;
+#X obj 156 284 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 86 416 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X floatatom 263 399 5 0 0 0 - - -;
+#X obj 266 416 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X text 21 243 You can set the breakpoint using the argument or the
+right inlet:;
+#X floatatom 221 333 5 0 0 0 - - -;
+#X obj 224 314 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 9700 1;
+#X obj 153 139 one->two;
+#X obj 153 352 one->two 0.2;
+#X connect 3 0 20 0;
+#X connect 4 0 6 0;
+#X connect 5 0 3 0;
+#X connect 7 0 8 0;
+#X connect 11 0 21 0;
+#X connect 12 0 14 0;
+#X connect 13 0 11 0;
+#X connect 15 0 16 0;
+#X connect 18 0 21 1;
+#X connect 19 0 18 0;
+#X connect 20 0 4 0;
+#X connect 20 1 7 0;
+#X connect 21 0 12 0;
+#X connect 21 1 15 0;
