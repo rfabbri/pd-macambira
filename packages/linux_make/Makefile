@@ -1,4 +1,4 @@
-#
+g#
 # for making a tar.bz2 that installs using a Makefile
 #
 
@@ -62,6 +62,22 @@ install:
 package: tarbz2
 
 PACKAGE_NAME = Pd-$(PD_VERSION)
+
+deb:
+# GNOME menu support
+	test -d $(DESTDIR)/usr/share/icons/hicolor/128x128/apps || \
+		mkdir -p $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
+	install -p $(packages_src)/linux_make/pd.png \
+		$(DESTDIR)/usr/share/icons/hicolor/128x128/apps/
+	test -d $(DESTDIR)/usr/share/applications/ || \
+		mkdir -p $(DESTDIR)/usr/share/applications/
+	install -p $(packages_src)/linux_make/pd-extended.desktop \
+		$(DESTDIR)/usr/share/applications/
+# debian packageing
+	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
+	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
+	dpkg-deb --build $(DESTDIR) $(packages_src)/linux_make/$(PACKAGE_NAME).deb
+
 tarbz2: installer_makefile installer_readme
 	install -p .pdsettings $(DESTDIR)$(prefix)
 	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
@@ -105,6 +121,12 @@ clean: installer_clean
 
 package_clean: installer_clean
 
+
+#==============================================================================#
+#
+## TEST TARGETS
+#
+#==============================================================================#
 
 #==============================================================================#
 #

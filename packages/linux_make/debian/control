@@ -1,0 +1,11 @@
+Package: pd-extended
+Version: 0.39.2.cvs20070626-0rc4 
+Section: base
+Priority: optional
+Architecture: all
+Depends: libjack0.100.0-0, ttf-bitstream-vera, tcl8.4 (>= 8.4.1-0), tk8.4 (>= 8.4.1-0), libasound2, libogg0, libvorbis0a, libfreetype6, libvorbisenc2, libvorbisfile3, libspeex1, libflac7, libsndfile1, libpcre3, libtheora0, imagemagick, liblcms1, libpng3, libtiff4, libmpeg1, libmpeg2-4, libmpeg3-1, libquicktime0, libx11-6, libdv4, libxv1, libimlib2, libfreetype6,libsm6, libxml2, libxext6, libxt6, libglu1-mesa, libgsl0, libmagick++9c2a
+Recommends: xmms, liblo0, liblame0
+Maintainer: Hans-Christoph Steiner <hans@at.or.at>
+Description: Pure Data with a large collection of externals
+ This distribution of Pd includes a wide array of libraries that allow
+ you to work with HIDs, video, OpenGL 3D graphics, and more.
