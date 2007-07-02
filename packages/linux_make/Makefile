@@ -1,4 +1,4 @@
-g#
+#
 # for making a tar.bz2 that installs using a Makefile
 #
 
@@ -78,6 +78,13 @@ deb:
 	install -p $(scripts_src)/debian/default/pd $(DESTDIR)/etc/default
 	install -d $(DESTDIR)/etc/init.d
 	install -p $(scripts_src)/debian/init.d/pd $(DESTDIR)/etc/init.d
+# emacs mode for .pd files
+	install -d $(DESTDIR)/usr/share/emacs/site-lisp/
+	install -p $(scripts_src)/pd-mode.el $(DESTDIR)/usr/share/emacs/site-lisp/
+# Pd-related scripts
+	install -d $(DESTDIR)/usr/local/bin
+	install -p $(scripts_src)/pd-diff $(DESTDIR)/usr/local/bin
+	install -p $(scripts_src)/config-switcher.sh $(DESTDIR)/usr/local/bin
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
