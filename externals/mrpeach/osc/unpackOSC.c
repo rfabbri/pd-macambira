@@ -4,6 +4,7 @@
 /* Started by Martin Peach 20060420 */
 /* This version tries to be standalone from LIBOSC MP 20060425 */
 /* MP 20060505 fixed a bug (line 209) where bytes are wrongly interpreted as negative */
+/* MP 20070705 added timestamp outlet */
 /* dumpOSC.c header follows: */
 /*
 Written by Matt Wright and Adrian Freed, The Center for New Music and
@@ -33,44 +34,39 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 */
 
 
-  /* 
+/*
 
-     dumpOSC.c
-	server that displays OpenSoundControl messages sent to it
-	for debugging client udp and UNIX protocol
+    dumpOSC.c
+    server that displays OpenSoundControl messages sent to it
+    for debugging client udp and UNIX protocol
 
-     by Matt Wright, 6/3/97
-       modified from dumpSC.c, by Matt Wright and Adrian Freed
+    by Matt Wright, 6/3/97
+    modified from dumpSC.c, by Matt Wright and Adrian Freed
 
-     version 0.2: Added "-silent" option a.k.a. "-quiet"
+    version 0.2: Added "-silent" option a.k.a. "-quiet"
 
-     version 0.3: Incorporated patches from Nicola Bernardini to make
-       things Linux-friendly.  Also added ntohl() in the right places
-       to support little-endian architectures.
- 
+    version 0.3: Incorporated patches from Nicola Bernardini to make
+    things Linux-friendly.  Also added ntohl() in the right places
+    to support little-endian architectures.
 
+    to-do:
 
-	compile:
-		cc -o dumpOSC dumpOSC.c
+    More robustness in saying exactly what's wrong with ill-formed
+    messages.  (If they don't make sense, show exactly what was
+    received.)
 
-	to-do:
+    Time-based features: print time-received for each packet
 
-	    More robustness in saying exactly what's wrong with ill-formed
-	    messages.  (If they don't make sense, show exactly what was
-	    received.)
+    Clean up to separate OSC parsing code from socket/select stuff
 
-	    Time-based features: print time-received for each packet
+    pd: branched from http://www.cnmat.berkeley.edu/OpenSoundControl/src/dumpOSC/dumpOSC.c
+    -------------
+    -- added pd functions
+    -- socket is made differently than original via pd mechanisms
+    -- tweaks for Win32    www.zeggz.com/raf	13-April-2002
+    -- the OSX changes from cnmat didnt make it here yet but this compiles
+        on OSX anyway.
 
-	    Clean up to separate OSC parsing code from socket/select stuff
-
-	pd: branched from http://www.cnmat.berkeley.edu/OpenSoundControl/src/dumpOSC/dumpOSC.c
-	-------------
-	-- added pd functions
-	-- socket is made differently than original via pd mechanisms
-	-- tweaks for Win32    www.zeggz.com/raf	13-April-2002
-	-- the OSX changes from cnmat didnt make it here yet but this compiles
-	   on OSX anyway.
-	
 */
 
 #if HAVE_CONFIG_H 
@@ -79,46 +75,18 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 
 #include "m_pd.h"
 
-/* declarations */
-
-
 #ifdef _WIN32
-    #ifdef _MSC_VER
-//    #include "OSC-common.h"
-    #endif /* _MSC_VER */
     #include <string.h>
     #include <stdlib.h>
     #include <winsock2.h>
     #include <stdio.h>
 #else
-	#include <stdio.h>
-	#include <string.h>
-	#include <stdlib.h>
-//	#include <unistd.h>
-//	#include <fcntl.h>
-	#include <sys/types.h>
-//	#include <sys/stat.h>
-	#include <netinet/in.h>
-//	#include <rpc/rpc.h>
-//	#include <sys/socket.h>
-//	#include <sys/un.h>
-//	#include <sys/times.h>
-//	#include <sys/param.h>
-//	#include <sys/time.h>
-//	#include <sys/ioctl.h>
+    #include <stdio.h>
+    #include <string.h>
+    #include <stdlib.h>
+    #include <sys/types.h>
+    #include <netinet/in.h>
     #include <ctype.h>
-//	#include <arpa/inet.h>
-//	#include <netdb.h>
-//	#include <pwd.h>
-//	#include <signal.h>
-//	#include <grp.h>
-//	#include <sys/file.h>
-	//#include <sys/prctl.h>
-
-//	#ifdef NEED_SCHEDCTL_AND_LOCK
-//	#include <sys/schedctl.h>
-//	#include <sys/lock.h>
-//	#endif
 #endif /* _WIN32 */
 
 /* Declarations */
@@ -140,15 +108,14 @@ typedef struct _unpackOSC
 {
     t_object x_obj;
     t_outlet *x_data_out;
+    t_outlet *x_timetag_out;
+    t_atom   x_timetag[4];// timetag as four floats
     t_atom   x_data_at[MAX_MESG];// symbols making up the path + payload
     int      x_data_atc;// number of symbols to be output
-	char     x_raw[MAX_MESG];// bytes making up the entire OSC message
-	int      x_raw_c;// number of bytes in OSC message
+    char     x_raw[MAX_MESG];// bytes making up the entire OSC message
+    int      x_raw_c;// number of bytes in OSC message
 } t_unpackOSC;
 
-#ifdef MSW
-__declspec(dllexport)
-#endif
 void unpackOSC_setup(void);
 static void *unpackOSC_new(void);
 static void unpackOSC_free(t_unpackOSC *x);
@@ -167,7 +134,8 @@ static void *unpackOSC_new(void)
 
     x = (t_unpackOSC *)pd_new(unpackOSC_class);
     x->x_data_out = outlet_new(&x->x_obj, &s_list);
-	x->x_raw_c = x->x_data_atc = 0;
+    x->x_timetag_out = outlet_new(&x->x_obj, &s_list);
+    x->x_raw_c = x->x_data_atc = 0;
     return (x);
 }
 
@@ -175,9 +143,6 @@ static void unpackOSC_free(t_unpackOSC *x)
 {
 }
 
-#ifdef MSW
-__declspec(dllexport)
-#endif
 void unpackOSC_setup(void)
 {
     unpackOSC_class = class_new(gensym("unpackOSC"),
@@ -191,10 +156,13 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
     int size, messageLen, i, j;
     char *messageName, *args, *buf;
-  
+    unsigned long timetag_s;
+    unsigned long timetag_ms;
+    unsigned short timetag[4];
+
     if ((argc%4) != 0)
     {
-		post("unpackOSC: packet size (%d) not a multiple of 4 bytes: dropping packet", argc);
+        post("unpackOSC: packet size (%d) not a multiple of 4 bytes: dropping packet", argc);
         return;
     }
     /* copy the list to a byte buffer, checking for bytes only */
@@ -202,28 +170,28 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
     {
         if (argv[i].a_type == A_FLOAT)
         {
-			j = (int)argv[i].a_w.w_float;
-//			if ((j == argv[i].a_w.w_float) && (j >= 0) && (j <= 255))
+            j = (int)argv[i].a_w.w_float;
+//          if ((j == argv[i].a_w.w_float) && (j >= 0) && (j <= 255))
 // this can miss bytes between 128 and 255 because they are interpreted somewhere as negative
 // , so change to this:
-			if ((j == argv[i].a_w.w_float) && (j >= -128) && (j <= 255))
-			{
+            if ((j == argv[i].a_w.w_float) && (j >= -128) && (j <= 255))
+            {
                 x->x_raw[i] = (char)j;
-			}
+            }
             else
             {
-				post("unpackOSC: data out of range (%d), dropping packet", argv[i].a_w.w_float);
+                post("unpackOSC: data out of range (%d), dropping packet", argv[i].a_w.w_float);
                 return;
             }
         }
         else
-		{
+        {
             post("unpackOSC: data not float, dropping packet");
             return;
         }
     }
     x->x_raw_c = argc;
-	buf = x->x_raw;
+    buf = x->x_raw;
 
     if ((argc >= 8) && (strncmp(buf, "#bundle", 8) == 0))
     { /* This is a bundle message. */
@@ -242,7 +210,15 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
         printf("unpackOSC: [ %lx%08lx\n", ntohl(*((unsigned long *)(buf+8))),
             ntohl(*((unsigned long *)(buf+12))));
 #endif
-
+/* split the timetag into 4 16-bit fragments so we can output them as floats */
+        timetag_s = ntohl(*((unsigned long *)(buf+8)));
+        timetag_ms = ntohl(*((unsigned long *)(buf+12)));
+        timetag[0] = (short)(timetag_s>>8);
+        timetag[1] = (short)(timetag_s & 0xFFFF);
+        timetag[2] = (short)(timetag_ms>>8);
+        timetag[3] = (short)(timetag_ms & 0xFFFF);
+        for (i = 0; i < 4; ++i) SETFLOAT(&x->x_timetag[i], (float)timetag[i]);
+        outlet_list(x->x_timetag_out, &s_list, 4, x->x_timetag);
         /* Note: if we wanted to actually use the time tag as a little-endian
           64-bit int, we'd have to word-swap the two 32-bit halves of it */
 
@@ -270,8 +246,8 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
 
         if (i != argc)
         {
-			post("unpackOSC: This can't happen");
-		}
+            post("unpackOSC: This can't happen");
+        }
 #ifdef DEBUG
         printf("]\n");
 #endif
@@ -309,9 +285,9 @@ static int unpackOSC_path(t_unpackOSC *x, char *path)
 {
     int i;
 
-	if (path[0] != '/')
+    if (path[0] != '/')
     {
-		post("unpackOSC: bad path (%s)", path);
+        post("unpackOSC: bad path (%s)", path);
         return 0;
     }
     for (i = 1; i < MAX_MESG; ++i)
@@ -356,8 +332,8 @@ static void unpackOSC_Smessage(t_unpackOSC *x, void *v, int n)
 static void unpackOSC_PrintTypeTaggedArgs(t_unpackOSC *x, void *v, int n)
 { 
     char    *typeTags, *thisType, *p;
-	int     myargc = x->x_data_atc;
-	t_atom  *mya = x->x_data_at;
+    int     myargc = x->x_data_atc;
+    t_atom  *mya = x->x_data_at;
 
     typeTags = v;
 
@@ -459,7 +435,7 @@ static void unpackOSC_PrintTypeTaggedArgs(t_unpackOSC *x, void *v, int n)
                 myargc++;
          }
     }
-	x->x_data_atc = myargc;
+    x->x_data_atc = myargc;
 }
 
 static void unpackOSC_PrintHeuristicallyTypeGuessedArgs(t_unpackOSC *x, void *v, int n, int skipComma)
@@ -468,8 +444,8 @@ static void unpackOSC_PrintHeuristicallyTypeGuessedArgs(t_unpackOSC *x, void *v,
     int     *ints;
     float   thisf;
     char    *chars, *string, *nextString;
-	int     myargc= x->x_data_atc;
-	t_atom* mya = x->x_data_at;
+    int     myargc= x->x_data_atc;
+    t_atom* mya = x->x_data_at;
 
 
     /* Go through the arguments 32 bits at a time */
@@ -493,7 +469,7 @@ static void unpackOSC_PrintHeuristicallyTypeGuessedArgs(t_unpackOSC *x, void *v,
             i++;
         }
         else if (thisf >= -1000.f && thisf <= 1000000.f &&
-	        (thisf <=0.0f || thisf >= SMALLEST_POSITIVE_FLOAT))
+            (thisf <=0.0f || thisf >= SMALLEST_POSITIVE_FLOAT))
         {
 #ifdef DEBUG
             printf("%f ",  thisf);
@@ -516,11 +492,11 @@ static void unpackOSC_PrintHeuristicallyTypeGuessedArgs(t_unpackOSC *x, void *v,
         {
             // unhandled .. ;)
 #ifdef DEBUG
-			post("unpackOSC: indeterminate type: 0x%x xx", ints[i]);
+            post("unpackOSC: indeterminate type: 0x%x xx", ints[i]);
 #endif
             i++;
         }
-		x->x_data_atc = myargc;
+        x->x_data_atc = myargc;
     }
 }
 
@@ -550,7 +526,7 @@ static char *unpackOSC_DataAfterAlignedString(char *string, char *boundary)
     {
         if (string + i >= boundary)
         {
-			post("unpackOSC: DataAfterAlignedString: Unreasonably long string");
+            post("unpackOSC: DataAfterAlignedString: Unreasonably long string");
             return 0;
         }
     }
@@ -562,12 +538,12 @@ static char *unpackOSC_DataAfterAlignedString(char *string, char *boundary)
     {
         if (string + i >= boundary)
         {
-			post("unpackOSC: DataAfterAlignedString: Unreasonably long string");
+            post("unpackOSC: DataAfterAlignedString: Unreasonably long string");
             return 0;
         }
         if (string[i] != '\0')
         {
-			post("unpackOSC:DataAfterAlignedString: Incorrectly padded string");
+            post("unpackOSC:DataAfterAlignedString: Incorrectly padded string");
             return 0;
         }
     }

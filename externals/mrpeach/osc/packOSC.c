@@ -37,6 +37,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #ifdef MSW
 #include <winsock2.h>
@@ -102,6 +103,9 @@ typedef struct
 /* Return the time tag 0x0000000000000001, indicating to the receiving device
    that it should process the message immediately. */
 static OSCTimeTag OSCTT_Immediately(void);
+static OSCTimeTag OSCTT_Infinite(void);
+
+static OSCTimeTag OSCTT_CurrentTimePlusOffset(uint4 offset);
 
 /* The int4byte type has to be a 4-byte integer.  You may have to
    change this to long or something else on your system.  */
@@ -239,6 +243,7 @@ typedef struct _packOSC
 {
     t_object    x_obj;
     t_int       x_typetags; /* typetag flag */
+    t_int       x_timeTagOffset;
     int         x_bundle; /* bundle open flag */
     OSCbuf      x_oscbuf[1]; /* OSCbuffer */
     t_outlet    *x_bdpthout; /* bundle-depth floatoutlet */
@@ -249,12 +254,13 @@ typedef struct _packOSC
     char        *x_prefix;
 } t_packOSC;
 
-static void *packOSC_new(t_floatarg udpflag);
+static void *packOSC_new(void);
 static void packOSC_path(t_packOSC *x, t_symbol*s);
 static void packOSC_openbundle(t_packOSC *x);
 static void packOSC_closebundle(t_packOSC *x);
 static void packOSC_settypetags(t_packOSC *x, t_floatarg f);
 static void packOSC_setbufsize(t_packOSC *x, t_floatarg f);
+static void packOSC_setTimeTagOffset(t_packOSC *x, t_floatarg f);
 static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void packOSC_send_type_forced(t_packOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void packOSC_send(t_packOSC *x, t_symbol *s, int argc, t_atom *argv);
@@ -267,7 +273,7 @@ static int packOSC_writetypedmessage(t_packOSC *x, OSCbuf *buf, char *messageNam
 static int packOSC_writemessage(t_packOSC *x, OSCbuf *buf, char *messageName, int numArgs, typedArg *args);
 static void packOSC_sendbuffer(t_packOSC *x);
 
-static void *packOSC_new(t_floatarg udpflag)
+static void *packOSC_new(void)
 {
     t_packOSC *x = (t_packOSC *)pd_new(packOSC_class);
     x->x_typetags = 1; /* set typetags to 1 by default */
@@ -283,6 +289,7 @@ static void *packOSC_new(t_floatarg udpflag)
         OSC_initBuffer(x->x_oscbuf, x->x_buflength, x->x_bufferForOSCbuf);
     x->x_listout = outlet_new(&x->x_obj, &s_list);
     x->x_bdpthout = outlet_new(&x->x_obj, &s_float);
+    x->x_timeTagOffset = -1; /* immediately */
     return (x);
 }
 
@@ -304,12 +311,12 @@ static void packOSC_path(t_packOSC *x, t_symbol*s)
 
 static void packOSC_openbundle(t_packOSC *x)
 {
-    if (x->x_oscbuf->bundleDepth + 1 >= MAX_BUNDLE_NESTING ||
-        OSC_openBundle(x->x_oscbuf, OSCTT_Immediately()))
-    {
-        post("packOSC: Problem opening bundle.");
-        return;
-    }
+    int result;
+    if (x->x_timeTagOffset == -1)
+        result = OSC_openBundle(x->x_oscbuf, OSCTT_Immediately());
+    else
+        result = OSC_openBundle(x->x_oscbuf, OSCTT_CurrentTimePlusOffset((uint4)x->x_timeTagOffset));
+    if (result != 0) return;
     x->x_bundle = 1;
     outlet_float(x->x_bdpthout, (float)x->x_oscbuf->bundleDepth);
 }
@@ -355,6 +362,10 @@ static void packOSC_setbufsize(t_packOSC *x, t_floatarg f)
 }
 
 
+static void packOSC_setTimeTagOffset(t_packOSC *x, t_floatarg f)
+{
+    x->x_timeTagOffset = (t_int)f;
+}
 /* this is the real and only sending routine now, for both typed and */
 /* undtyped mode. */
 
@@ -530,6 +541,8 @@ void packOSC_setup(void)
         gensym("typetags"), A_DEFFLOAT, 0);
     class_addmethod(packOSC_class, (t_method)packOSC_setbufsize,
         gensym("bufsize"), A_DEFFLOAT, 0);
+    class_addmethod(packOSC_class, (t_method)packOSC_setTimeTagOffset,
+        gensym("timetagoffset"), A_DEFFLOAT, 0);
     class_addmethod(packOSC_class, (t_method)packOSC_send,
         gensym("send"), A_GIMME, 0);
     class_addmethod(packOSC_class, (t_method)packOSC_send,
@@ -1240,4 +1253,41 @@ static OSCTimeTag OSCTT_Immediately(void)
     tt.seconds = 0;
     return tt;
 }
+
+static OSCTimeTag OSCTT_Infinite(void)
+{
+    OSCTimeTag tt;
+    tt.fraction = 0xffffffffL;
+    tt.seconds = 0xffffffffL;
+    return tt;
+}
+
+#define SECONDS_FROM_1900_to_1970 2208988800LL /* 17 leap years */
+#define TWO_TO_THE_32_OVER_ONE_MILLION 4295LL
+
+static OSCTimeTag OSCTT_CurrentTimePlusOffset(uint4 offset)
+{ /* offset is in microseconds */
+    OSCTimeTag tt;
+    struct timeval tv;
+    struct timezone tz;
+    static unsigned int onemillion = 1000000;
+
+    gettimeofday(&tv, &tz);
+
+    /* First get the seconds right */
+    tt.seconds = (unsigned) SECONDS_FROM_1900_to_1970 +
+        (unsigned) tv.tv_sec -
+        (unsigned) 60 * tz.tz_minuteswest +
+        (unsigned) (tz.tz_dsttime ? 3600 : 0)+
+        (unsigned) offset/onemillion;
+    /* Now get the fractional part. */
+    tt.fraction = ((unsigned) tv.tv_usec + (unsigned)(offset%onemillion)) * (unsigned) TWO_TO_THE_32_OVER_ONE_MILLION;
+    if (tt.fraction > onemillion)
+    {
+        tt.fraction -= onemillion;
+        tt.seconds++;
+    }
+    return tt;
+}
+
 /* end packOSC.c*/
