@@ -1,4 +1,4 @@
-#N canvas 555 25 947 765 10;
+#N canvas 820 22 951 769 10;
 #X obj 32 13 loadbang;
 #X obj 603 265 gemwin;
 #X msg 603 243 0 \, destroy;
@@ -9,27 +9,29 @@
 -1;
 #X msg 203 63 reset;
 #X obj 33 298 gemhead;
-#N canvas 721 124 605 590 massrender 0;
+#N canvas 721 124 609 594 massrender 0;
 #X obj 127 22 inlet;
 #X obj 48 203 translateXYZ;
 #X obj 48 177 separator;
-#X obj 48 153 any;
 #X obj 127 136 t b f;
 #X obj 127 57 unpack f f f;
-#X obj 64 114 gemhead 45;
+#X obj 48 154 gemhead 45;
 #X obj 48 283 cuboid 0.005 0.15 0.08;
 #X obj 48 239 color 0.8 0.8 0.8;
-#X connect 0 0 5 0;
-#X connect 1 0 8 0;
+#X obj 48 90 loadbang;
+#X msg 48 118 0;
+#X connect 0 0 4 0;
+#X connect 1 0 7 0;
 #X connect 2 0 1 0;
-#X connect 3 0 2 0;
+#X connect 3 0 5 0;
+#X connect 3 1 1 1;
 #X connect 4 0 3 0;
-#X connect 4 1 1 1;
-#X connect 5 0 4 0;
-#X connect 5 1 1 2;
-#X connect 5 2 7 3;
-#X connect 6 0 3 1;
-#X connect 8 0 7 0;
+#X connect 4 1 1 2;
+#X connect 4 2 6 3;
+#X connect 5 0 2 0;
+#X connect 7 0 6 0;
+#X connect 8 0 9 0;
+#X connect 9 0 5 0;
 #X restore 274 531 pd massrender;
 #X msg 203 83 symbol reset;
 #X text 793 205 Select view;
@@ -48,13 +50,13 @@
 #X msg 421 523 get massesPos \$1;
 #X obj 602 334 rotateXYZ;
 #X obj 56 547 vsl 15 128 0 4 0 0 empty empty empty 0 -8 0 8 -262131
--1 -1 0 1;
+-1 -1 6200 1;
 #X obj 75 547 vsl 15 128 0 4 0 0 empty empty empty 0 -8 0 8 -262131
--1 -1 0 1;
+-1 -1 6500 1;
 #X obj 94 547 vsl 15 128 0 4 0 0 empty empty empty 0 -8 0 8 -262131
--1 -1 600 1;
+-1 -1 7600 1;
 #X obj 112 547 vsl 15 128 0 4 0 0 empty empty empty 0 -8 0 8 -262131
--1 -1 0 1;
+-1 -1 6800 1;
 #X msg 56 682 posX 0 \$1;
 #X msg 603 138 reset \, dimen 800 800 \, create \, lighting 1 \, 1
 ;
