@@ -129,7 +129,7 @@ void pybase::lib_setup()
 	Py_Initialize();
 
 #ifdef FLEXT_DEBUG
-	Py_DebugFlag = 1;
+//	Py_DebugFlag = 1;
 //	Py_VerboseFlag = 1;
 #else
     Py_OptimizeFlag = 1;
@@ -198,6 +198,15 @@ void pybase::lib_setup()
     initbundle();
     PyModule_AddObject(module_obj,"Bundle",(PyObject *)&pyBundle_Type);
 
+	// -------------------------------------------------------------
+#ifdef PY_USE_INOFFICIAL
+    // add PD paths
+
+    char *dir;
+    for(int i = 0; (dir = namelist_get(sys_searchpath,i)) != NULL; ++i) {
+        AddToPath(dir);
+    }
+#endif
 	// -------------------------------------------------------------
 
 	FLEXT_SETUP(pyobj);
