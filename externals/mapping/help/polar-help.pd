@@ -26,8 +26,8 @@
 (radius \, angle). The angle is in radians (-pi to pi). The angle 0
 is at cartesian (1 \, 0.5) or to the right.;
 #X obj 197 303 spiral;
-#X obj 356 303 mapping2degrees;
-#X obj 245 303 mapping2radians;
+#X obj 356 303 mapping->degrees;
+#X obj 245 303 mapping->radians;
 #X connect 3 0 7 0;
 #X connect 7 0 4 0;
 #X connect 7 1 11 0;

@@ -14,7 +14,7 @@
 #X obj 315 146 float;
 #X obj 128 76 trigger bang float bang;
 #X obj 334 76 trigger bang bang float;
-#X obj 204 183 mapping2radians;
+#X obj 204 183 mapping->radians;
 #X obj 128 183 * 1.41421;
 #X obj 204 271 / 2;
 #X obj 204 291 + 0.5;
