@@ -7,17 +7,17 @@
 	<key>flags</key>
 	<string></string>
 	<key>loadlib1</key>
-	<string>libdir</string>
-	<key>loadlib2</key>
 	<string>Gem</string>
-	<key>loadlib3</key>
+	<key>loadlib2</key>
 	<string>cyclone</string>
-	<key>loadlib4</key>
+	<key>loadlib3</key>
 	<string>zexy</string>
-	<key>loadlib5</key>
+	<key>loadlib4</key>
 	<string>creb</string>
-	<key>loadlib6</key>
+	<key>loadlib5</key>
 	<string>cxc</string>
+	<key>loadlib6</key>
+	<string>ggee</string>
 	<key>loadlib7</key>
 	<string>iemlib</string>
 	<key>loadlib8</key>
@@ -74,6 +74,10 @@
 	<string>flatspace</string>
 	<key>loadlib34</key>
 	<string>iem_anything</string>
+	<key>loadlib35</key>
+	<string>pdp</string>
+	<key>loadlib36</key>
+	<string>pidip</string>
 	<key>path1</key>
 	<string>/System/Library/Fonts</string>
 	<key>path2</key>

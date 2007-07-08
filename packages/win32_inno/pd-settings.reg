@@ -1,12 +1,12 @@
 Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Pd]
-"loadlib1"="libdir"
-"loadlib2"="Gem"
-"loadlib3"="cyclone"
-"loadlib4"="zexy"
-"loadlib5"="creb"
-"loadlib6"="cxc"
+"loadlib1"="Gem"
+"loadlib2"="cyclone"
+"loadlib3"="zexy"
+"loadlib4"="creb"
+"loadlib5"="cxc"
+"loadlib6"="ggee"
 "loadlib7"="iemlib"
 "loadlib8"="list-abs"
 "loadlib9"="mapping"
