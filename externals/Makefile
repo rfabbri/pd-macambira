@@ -1550,6 +1550,42 @@ mjlib_clean:
 	-rm -f -- $(externals_src)/mjlib/*.*~
 
 
+
+#------------------------------------------------------------------------------#
+# MOONLIB
+MOONLIB_NAME=moonlib
+MOONLIB_OBJECTS := $(wildcard $(externals_src)/moonlib/*.c)
+moonlib: $(MOONLIB_OBJECTS:.c=.$(EXTENSION))
+
+moonlib_install: moonlib
+	install -d $(objectsdir)/$(MOONLIB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MOONLIB_NAME) \
+		--author "Antoine Rousseau" \
+		--version "0.2"
+	install -p $(MOONLIB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MOONLIB_NAME)
+	install -d $(helpdir)/$(MOONLIB_NAME)
+	install -p $(externals_src)/moonlib/help/*.pd $(helpdir)/$(MOONLIB_NAME)
+	install -p $(externals_src)/moonlib/help/*.gif $(helpdir)/$(MOONLIB_NAME)
+	install -d $(helpdir)/$(MOONLIB_NAME)/d
+	install -p $(externals_src)/moonlib/help/d/*.gif $(helpdir)/$(MOONLIB_NAME)/d
+#	install -d $(manualsdir)/$(MOONLIB_NAME)
+#	install -p $(externals_src)/moonlib/manual.txt \
+#		$(manualsdir)/$(MOONLIB_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/moonlib/README.txt \
+		$(readmesdir)/$(MOONLIB_NAME).txt
+	install -d $(examplesdir)/$(MOONLIB_NAME)
+#	install -p $(externals_src)/moonlib/examples/*.pd \
+#		$(examplesdir)/$(MOONLIB_NAME)
+
+moonlib_clean:
+	-rm -f -- $(MOONLIB_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(MOONLIB_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/moonlib/*.bak
+	-rm -f -- $(externals_src)/moonlib/*.*~
+
+
+
 #------------------------------------------------------------------------------#
 # MOTEX
 MOTEX_NAME=motex
