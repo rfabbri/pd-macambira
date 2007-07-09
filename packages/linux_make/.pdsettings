@@ -36,8 +36,9 @@ loadlib33: flatspace
 loadlib34: iem_anything
 loadlib35: pdp
 loadlib36: pidip
+loadlib37: flib
 path1: /usr/X11R6/lib/X11/fonts
 path2: /usr/X11R6/lib/X11/fonts/TTF
 path3: /usr/lib/X11/fonts
 path4: /usr/share/fonts/truetype
-nloadlib: 36
+nloadlib: 37
