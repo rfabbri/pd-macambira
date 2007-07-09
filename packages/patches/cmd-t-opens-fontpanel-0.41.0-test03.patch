@@ -1,0 +1,27 @@
+Index: u_main.tk
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
+retrieving revision 1.17.2.16
+diff -u -w -r1.17.2.16 u_main.tk
+--- u_main.tk	8 Jul 2007 21:56:30 -0000	1.17.2.16
++++ u_main.tk	9 Jul 2007 16:29:16 -0000
+@@ -1618,6 +1619,7 @@
+ }
+ 
+ proc pdtk_canvas_ctrlkey {name key shift} {
++	 global pd_nt
+ # first get rid of ".c" suffix; we'll refer to the toplevel instead
+     set topname [string trimright $name .c]
+ #   puts stderr [concat ctrl-key $key $topname]
+@@ -1658,7 +1659,11 @@
+         if {$key == "v" || $key == "V"} {menu_paste $topname}
+         if {$key == "d" || $key == "D"} {menu_duplicate $topname}
+         if {$key == "a" || $key == "A"} {menu_selectall $topname}
++		  if {$pd_nt == 2} { # by default, Cmd-T opens the font panel on Mac OS X
++				if {$key == "t" || $key == "T"} {menu_font $topname}
++		  } else {
+         if {$key == "t" || $key == "T"} {menu_texteditor $topname}
++		  }
+         if {$key == "f" || $key == "F"} {menu_findobject $topname}
+         if {$key == "g" || $key == "G"} {menu_findagain $topname}
+     }
