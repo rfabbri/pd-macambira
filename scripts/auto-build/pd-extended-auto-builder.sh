@@ -77,7 +77,11 @@ upload_build ()
 
 case $SYSTEM in 
 	 linux)
-		  upload_build linux_make build tar.bz2
+		  if [ -x /usr/bin/dpkg-deb ]; then
+				upload_build linux_make . deb
+		  else
+				upload_build linux_make build tar.bz2
+		  fi
 		  ;;
 	 darwin)
 		  upload_build darwin_app . dmg
