@@ -1,0 +1,25 @@
+Index: u_main.tk
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
+retrieving revision 1.17.2.16
+diff -u -w -r1.17.2.16 u_main.tk
+--- u_main.tk	8 Jul 2007 21:56:30 -0000	1.17.2.16
++++ u_main.tk	9 Jul 2007 17:04:42 -0000
+@@ -1194,6 +1194,7 @@
+         bind $name.c <Option-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
+         bind $name.c <Option-Control-Shift-Button> \
+             {pdtk_canvas_click %W %x %y %b 7}
++        bind $name.c <Mod1-Button> {pdtk_canvas_ctrlclick %W %x %y %b}
+     } else {
+         bind $name.c <Alt-Button> {pdtk_canvas_click %W %x %y %b 4}
+         bind $name.c <Alt-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
+@@ -1514,7 +1515,8 @@
+ }
+ 
+ proc pdtk_canvas_ctrlclick {name x y b} {
+-    pd [canvastosym $name] mouse [$name canvasx $x] [$name canvasy $y] $b 2 \;
++# first get rid of ".c" suffix; we'll refer to the toplevel instead
++	 menu_editmode [string trimright $name .c]
+ }
+ 
+ proc pdtk_canvas_altclick {name x y b} {
