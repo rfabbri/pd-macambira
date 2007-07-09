@@ -99,7 +99,7 @@ deb: $(bindir)
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
-	dpkg-deb --build $(DESTDIR) $(packages_src)/linux_make/$(PACKAGE_NAME).deb
+	fakeroot dpkg-deb --build $(DESTDIR) $(packages_src)/linux_make/$(PACKAGE_NAME).deb
 
 tarbz2: installer_makefile installer_readme
 	install -p .pdsettings $(DESTDIR)$(prefix)

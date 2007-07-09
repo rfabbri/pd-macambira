@@ -1,11 +1,25 @@
 Package: pd-extended
-Version: 0.39.2.cvs20070626-0rc4 
-Section: base
+Version: 0.40.2cvs20070709-1 
+Section: sound
 Priority: optional
-Architecture: all
-Depends: libjack0.100.0-0, ttf-bitstream-vera, tcl8.4 (>= 8.4.1-0), tk8.4 (>= 8.4.1-0), libasound2, libogg0, libvorbis0a, libfreetype6, libvorbisenc2, libvorbisfile3, libspeex1, libflac7, libsndfile1, libpcre3, libtheora0, imagemagick, liblcms1, libpng3, libtiff4, libmpeg1, libmpeg2-4, libmpeg3-1, libquicktime0, libx11-6, libdv4, libxv1, libimlib2, libfreetype6,libsm6, libxml2, libxext6, libxt6, libglu1-mesa, libgsl0, libmagick++9c2a
-Recommends: xmms, liblo0, liblame0
+Architecture: any
+Depends: libjack0.100.0-0, ttf-bitstream-vera, tcl8.4 (>= 8.4.1-0), tk8.4 (>= 8.4.1-0), libasound2, libogg0, libvorbis0a, libvorbisenc2, libvorbisfile3, libspeex1, libflac7, libsndfile1, libpcre3, libtheora0, imagemagick, liblcms1, libpng3, libtiff4, libmpeg1, libmpeg2-4, libmpeg3-1, libquicktime0, libx11-6, libdv4, libxv1, libimlib2, libfreetype6,libsm6, libxml2, libxext6, libxt6, libglu1-mesa, libgsl0, libmagick++9c2a
+Recommends: liblo0, liblame0
+Suggests: xmms
 Maintainer: Hans-Christoph Steiner <hans@at.or.at>
-Description: Pure Data with a large collection of externals
+Description: Pure Data with patches and a large collection of externals
+ Pd (aka Pure Data) is a real-time graphical programming environment for
+ audio, video, and graphical processing. It is the third major branch of the
+ family of patcher programming languages known as Max (Max/FTS, ISPW Max,
+ Max/MSP, jMax, etc.) originally developed by Miller Puckette and company at
+ IRCAM. The core of Pd is written and maintained by Miller Puckette and
+ includes the work of many developers, making the whole package very much a
+ community effort.
+ .
+ Pd was created to explore ideas of how to further refine the Max paradigm
+ with the core ideas of allowing data to be treated in a more open-ended way
+ and opening it up to applications outside of audio and MIDI, such as graphics
+ and video.
+ .
  This distribution of Pd includes a wide array of libraries that allow
  you to work with HIDs, video, OpenGL 3D graphics, and more.
