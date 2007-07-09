@@ -59,11 +59,17 @@ install:
 #
 #==============================================================================#
 
-package: tarbz2
+# if machine has dpkg-deb, build a Debian package
+DPKG := $(shell test -x `which dpkg-deb` && echo YES)
+ifeq ($(DPKG),YES)
+  package: deb
+else
+  package: tarbz2
+endif
 
 PACKAGE_NAME = Pd-$(PD_VERSION)
 
-deb:
+deb: $(bindir)
 # GNOME menu support
 	install -d $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
 	install -p $(packages_src)/linux_make/pd.png \
@@ -78,13 +84,18 @@ deb:
 	install -p $(scripts_src)/debian/default/pd $(DESTDIR)/etc/default
 	install -d $(DESTDIR)/etc/init.d
 	install -p $(scripts_src)/debian/init.d/pd $(DESTDIR)/etc/init.d
+# default prefs file
+	install -d $(DESTDIR)/etc/pd-extended
+	ln -s $(prefix)/lib/pd/default.pdsettings \
+		$(DESTDIR)/etc/pd-extended/default.pdsettings
+	install -p $(packages_src)/linux_make/.pdsettings \
+		$(libpddir)/default.pdsettings
 # emacs mode for .pd files
 	install -d $(DESTDIR)/usr/share/emacs/site-lisp/
 	install -p $(scripts_src)/pd-mode.el $(DESTDIR)/usr/share/emacs/site-lisp/
 # Pd-related scripts
-	install -d $(DESTDIR)/usr/local/bin
-	install -p $(scripts_src)/pd-diff $(DESTDIR)/usr/local/bin
-	install -p $(scripts_src)/config-switcher.sh $(DESTDIR)/usr/local/bin
+	install -p $(scripts_src)/pd-diff $(bindir)
+	install -p $(scripts_src)/config-switcher.sh $(bindir)
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
