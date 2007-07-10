@@ -1,0 +1,35 @@
+#N canvas 408 244 450 300 10;
+#X obj 85 215 writesf~ 2;
+#X msg 341 148 stop;
+#X msg 92 118 start;
+#X obj 52 70 catch~ mainout-l;
+#X obj 208 57 catch~ mainout-r;
+#X obj 8 36 bng 16 250 50 0 \$0-open \$1-open open 0 -6 0 8 -260818
+-1 -1;
+#X obj 50 37 bng 16 250 50 0 \$0-record \$1-record record 0 -6 0 8
+-260818 -1 -1;
+#X obj 102 38 bng 16 250 50 0 \$0-stop \$1-stop stop 0 -6 0 8 -260818
+-1 -1;
+#X msg 212 143 open \$1;
+#X obj 212 119 savepanel;
+#X obj 212 95 r \$0-open;
+#X obj 92 96 r \$0-record;
+#X obj 341 126 r \$0-stop;
+#X obj 13 222 s~ main-l;
+#X obj 300 89 s~ main-r;
+#X obj 206 211 outlet~;
+#X obj 310 213 outlet~;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 3 0 13 0;
+#X connect 3 0 15 0;
+#X connect 4 0 0 1;
+#X connect 4 0 14 0;
+#X connect 4 0 16 0;
+#X connect 8 0 0 0;
+#X connect 9 0 8 0;
+#X connect 10 0 9 0;
+#X connect 11 0 2 0;
+#X connect 12 0 1 0;
+#X coords 0 0 1 1 140 60 1 0 0;
