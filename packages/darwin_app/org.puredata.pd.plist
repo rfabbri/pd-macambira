@@ -96,6 +96,8 @@
 	<string>/sw/lib/X11/fonts/intl/TrueType</string>
 	<key>path8</key>
 	<string>/sw/lib/X11/fonts/applettf</string>
+	<key>path9</key>
+	<string>/sw/lib/X11/fonts/msttf</string>
 </dict>
  </plist>
 
