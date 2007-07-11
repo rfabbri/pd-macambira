@@ -1,0 +1,10 @@
+--- u_main.tk	2006-12-11 21:20:49.000000000 -0500
++++ u_main.tk	2007-07-11 17:46:11.000000000 -0400
+@@ -1152,6 +1192,7 @@
+         bind $name.c <Option-Button> {pdtk_canvas_click %W %x %y %b 4}
+         bind $name.c <Option-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
+         bind $name.c <Option-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
++        bind $name.c <Mod1-Button> {pdtk_canvas_click %W %x %y %b 6}
+         bind $name.c <Option-Control-Shift-Button> \
+             {pdtk_canvas_click %W %x %y %b 7}
+     } else {
