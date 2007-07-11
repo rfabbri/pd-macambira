@@ -33,7 +33,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 */
 
-
 /*
 
     dumpOSC.c
@@ -75,15 +74,13 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 
 #include "m_pd.h"
 
+    #include <stdio.h>
+    #include <string.h>
+    #include <stdlib.h>
+    #include <sys/time.h>
 #ifdef _WIN32
-    #include <string.h>
-    #include <stdlib.h>
     #include <winsock2.h>
-    #include <stdio.h>
 #else
-    #include <stdio.h>
-    #include <string.h>
-    #include <stdlib.h>
     #include <sys/types.h>
     #include <netinet/in.h>
     #include <ctype.h>
@@ -96,30 +93,39 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
   typedef unsigned long long osc_time_t;
 #endif
 
-#define MAX_MESG 65536 // was 32768 MP: make same as MAX_UDP_PACKET
+#define MAX_MESG 65536
+/* MAX_MESG was 32768 MP: make same as MAX_UDP_PACKET */
 
 /* ----------------------------- was dumpOSC ------------------------- */
 
-#define MAX_PATH_AT 50 // maximum nuber of elements in OSC path
+#define MAX_PATH_AT 50
+/* MAX_PATH_AT = maximum number of elements in OSC path */
+
+/* You may have to redefine this typedef if ints on your system
+  aren't 4 bytes. */
+typedef unsigned int uint4;
+typedef struct
+{
+    uint4 seconds;
+    uint4 fraction;
+} OSCTimeTag;
 
 static t_class *unpackOSC_class;
 
 typedef struct _unpackOSC
 {
-    t_object x_obj;
-    t_outlet *x_data_out;
-    t_outlet *x_timetag_out;
-    t_atom   x_timetag[4];// timetag as four floats
-    t_atom   x_data_at[MAX_MESG];// symbols making up the path + payload
-    int      x_data_atc;// number of symbols to be output
-    char     x_raw[MAX_MESG];// bytes making up the entire OSC message
-    int      x_raw_c;// number of bytes in OSC message
+    t_object    x_obj;
+    t_outlet    *x_data_out;
+    t_outlet    *x_delay_out;
+    t_atom      x_data_at[MAX_MESG];/* symbols making up the path + payload */
+    int         x_data_atc;/* number of symbols to be output */
+    char        x_raw[MAX_MESG];/* bytes making up the entire OSC message */
+    int         x_raw_c;/* number of bytes in OSC message */
 } t_unpackOSC;
 
 void unpackOSC_setup(void);
 static void *unpackOSC_new(void);
 static void unpackOSC_free(t_unpackOSC *x);
-void unpackOSC_setup(void);
 static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv);
 static int unpackOSC_path(t_unpackOSC *x, char *path);
 static void unpackOSC_Smessage(t_unpackOSC *x, void *v, int n);
@@ -127,6 +133,7 @@ static void unpackOSC_PrintTypeTaggedArgs(t_unpackOSC *x, void *v, int n);
 static void unpackOSC_PrintHeuristicallyTypeGuessedArgs(t_unpackOSC *x, void *v, int n, int skipComma);
 static char *unpackOSC_DataAfterAlignedString(char *string, char *boundary);
 static int unpackOSC_IsNiceString(char *string, char *boundary);
+static t_float unpackOSC_DeltaTime(OSCTimeTag tt);
 
 static void *unpackOSC_new(void)
 {
@@ -134,7 +141,7 @@ static void *unpackOSC_new(void)
 
     x = (t_unpackOSC *)pd_new(unpackOSC_class);
     x->x_data_out = outlet_new(&x->x_obj, &s_list);
-    x->x_timetag_out = outlet_new(&x->x_obj, &s_list);
+    x->x_delay_out = outlet_new(&x->x_obj, &s_float);
     x->x_raw_c = x->x_data_atc = 0;
     return (x);
 }
@@ -154,11 +161,9 @@ void unpackOSC_setup(void)
 /* unpackOSC_list expects an OSC packet in the form of a list of floats on [0..255] */
 static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv) 
 {
-    int size, messageLen, i, j;
-    char *messageName, *args, *buf;
-    unsigned long timetag_s;
-    unsigned long timetag_ms;
-    unsigned short timetag[4];
+    int             size, messageLen, i, j;
+    char            *messageName, *args, *buf;
+    OSCTimeTag      tt;
 
     if ((argc%4) != 0)
     {
@@ -171,9 +176,9 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
         if (argv[i].a_type == A_FLOAT)
         {
             j = (int)argv[i].a_w.w_float;
-//          if ((j == argv[i].a_w.w_float) && (j >= 0) && (j <= 255))
-// this can miss bytes between 128 and 255 because they are interpreted somewhere as negative
-// , so change to this:
+/*          if ((j == argv[i].a_w.w_float) && (j >= 0) && (j <= 255)) */
+/* this can miss bytes between 128 and 255 because they are interpreted somewhere as negative */
+/* , so change to this: */
             if ((j == argv[i].a_w.w_float) && (j >= -128) && (j <= 255))
             {
                 x->x_raw[i] = (char)j;
@@ -210,15 +215,11 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
         printf("unpackOSC: [ %lx%08lx\n", ntohl(*((unsigned long *)(buf+8))),
             ntohl(*((unsigned long *)(buf+12))));
 #endif
-/* split the timetag into 4 16-bit fragments so we can output them as floats */
-        timetag_s = ntohl(*((unsigned long *)(buf+8)));
-        timetag_ms = ntohl(*((unsigned long *)(buf+12)));
-        timetag[0] = (short)(timetag_s>>8);
-        timetag[1] = (short)(timetag_s & 0xFFFF);
-        timetag[2] = (short)(timetag_ms>>8);
-        timetag[3] = (short)(timetag_ms & 0xFFFF);
-        for (i = 0; i < 4; ++i) SETFLOAT(&x->x_timetag[i], (float)timetag[i]);
-        outlet_list(x->x_timetag_out, &s_list, 4, x->x_timetag);
+/* convert the timetag into a millisecond delay from now */
+        tt.seconds = ntohl(*((unsigned long *)(buf+8)));
+        tt.fraction = ntohl(*((unsigned long *)(buf+12)));
+        /* pd can use a delay in milliseconds */
+        outlet_float(x->x_delay_out, unpackOSC_DeltaTime(tt));
         /* Note: if we wanted to actually use the time tag as a little-endian
           64-bit int, we'd have to word-swap the two 32-bit halves of it */
 
@@ -490,7 +491,7 @@ static void unpackOSC_PrintHeuristicallyTypeGuessedArgs(t_unpackOSC *x, void *v,
         }
         else
         {
-            // unhandled .. ;)
+            /* unhandled .. ;) */
 #ifdef DEBUG
             post("unpackOSC: indeterminate type: 0x%x xx", ints[i]);
 #endif
@@ -580,4 +581,32 @@ static int unpackOSC_IsNiceString(char *string, char *boundary)
     return 1;
 }
 
+#define SECONDS_FROM_1900_to_1970 2208988800LL /* 17 leap years */
+#define TWO_TO_THE_32_OVER_ONE_MILLION 4295LL
+#define ONE_MILLION_OVER_TWO_TO_THE_32 0.00023283064365386963
+
+/* return the time difference in milliseconds between an OSC timetag and now */
+static t_float unpackOSC_DeltaTime(OSCTimeTag tt)
+{
+    OSCTimeTag ttnow;
+    struct timeval tv;
+    struct timezone tz;
+    static double onemillion = 1000000.0f;
+    double  ttusec, nowusec, delta;
+
+    if (tt.fraction == 1 && tt.seconds == 0) return 0.0; /* immediate */
+    gettimeofday(&tv, &tz); /* find now */
+    /* First get the seconds right */
+    ttnow.seconds = (unsigned) SECONDS_FROM_1900_to_1970 +
+        (unsigned) tv.tv_sec -
+        (unsigned) 60 * tz.tz_minuteswest +
+        (unsigned) (tz.tz_dsttime ? 3600 : 0);
+    /* find usec in tt */
+    ttusec = tt.seconds*onemillion + ONE_MILLION_OVER_TWO_TO_THE_32*tt.fraction;
+    nowusec = ttnow.seconds*onemillion + tv.tv_usec;
+    /* subtract now from tt to get delta time */
+    if (ttusec < nowusec) return 0.0;
+    delta = ttusec - nowusec;
+    return (float)(delta*0.001f);
+}
 /* end of unpackOSC.c */

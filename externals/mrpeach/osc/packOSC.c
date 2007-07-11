@@ -1281,12 +1281,13 @@ static OSCTimeTag OSCTT_CurrentTimePlusOffset(uint4 offset)
         (unsigned) (tz.tz_dsttime ? 3600 : 0)+
         (unsigned) offset/onemillion;
     /* Now get the fractional part. */
-    tt.fraction = ((unsigned) tv.tv_usec + (unsigned)(offset%onemillion)) * (unsigned) TWO_TO_THE_32_OVER_ONE_MILLION;
+    tt.fraction = (unsigned) tv.tv_usec + (unsigned)(offset%onemillion); /* in usec */
     if (tt.fraction > onemillion)
     {
         tt.fraction -= onemillion;
         tt.seconds++;
     }
+    tt.fraction *= (unsigned) TWO_TO_THE_32_OVER_ONE_MILLION; /* convert usec to 32-bit fraction of 1 sec */
     return tt;
 }
 
