@@ -16,10 +16,9 @@ To uninstall:
     cd PACKAGE_NAME
     make uninstall
 
-To load the default set of libraries, you need to install the .pdsettings file
-included in the package (~ is your home directory):
-
-    mv .pdsettings ~
+A preferences file is embedded into this distro.  It loads the default set of
+libraries, and sets a couple of other things. If you save the preferences
+within Pd, it will override these embedded preferences.
 
 Installing the needed dependencies
 ----------------------------------

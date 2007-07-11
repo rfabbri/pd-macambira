@@ -88,8 +88,7 @@ deb: $(bindir)
 	install -d $(DESTDIR)/etc/pd-extended
 	ln -s $(prefix)/lib/pd/default.pdsettings \
 		$(DESTDIR)/etc/pd-extended/default.pdsettings
-	install -p $(packages_src)/linux_make/.pdsettings \
-		$(libpddir)/default.pdsettings
+	install -p $(packages_src)/linux_make/default.pdsettings $(libpddir)
 # emacs mode for .pd files
 	install -d $(DESTDIR)/usr/share/emacs/site-lisp/
 	install -p $(scripts_src)/pd-mode.el $(DESTDIR)/usr/share/emacs/site-lisp/
@@ -102,7 +101,7 @@ deb: $(bindir)
 	fakeroot dpkg-deb --build $(DESTDIR) $(packages_src)/linux_make/$(PACKAGE_NAME).deb
 
 tarbz2: installer_makefile installer_readme
-	install -p .pdsettings $(DESTDIR)$(prefix)
+	install -p $(packages_src)/linux_make/default.pdsettings $(libpddir)
 	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
 	cd $(DESTDIR) && \
 		tar cjf $(PACKAGE_NAME).tar.bz2  $(PACKAGE_NAME)
