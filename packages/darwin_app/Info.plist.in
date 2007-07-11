@@ -34,5 +34,14 @@
 	<string>pd.icns</string>
 	<key>CFBundleVersion</key>
 	<string>PD_VERSION</string>
+        <key>LSUIPresentationMode</key>
+        <integer>0</integer>
+        <key>LSUIElement</key>
+        <integer>0</integer>
+        <key>LSEnvironment</key>
+        <dict>
+          	<key>EXAMPLE_ENVIRONMENT_VARIABLE</key>
+		<string>this is just a test</string>
+        </dict>
 </dict>
 </plist>
