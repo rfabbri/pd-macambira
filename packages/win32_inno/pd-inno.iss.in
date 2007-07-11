@@ -63,7 +63,7 @@ Root: HKCR; SubKey: Pure.Data\DefaultIcon; ValueType: string; ValueData: {app}\l
 Root: HKCR; SubKey: Pure.Data\shell; ValueType: string; ValueData: open; Flags: noerror uninsdeletekey; Tasks: fileassociations
 Root: HKCR; SubKey: Pure.Data\shell\open\command; ValueType: string; ValueData: """{app}\bin\pd.exe"" -listdev ""%1"""; Flags: uninsdeletekey noerror; Tasks: fileassociations
 Root: HKCR; SubKey: .pd; ValueType: string; ValueData: Pure.Data; Flags: noerror uninsdeletekey; Tasks: fileassociations
-Root: HKCR; SubKey: .pd; ValueType: string; ValueName: Content Type; ValueData: text/plain; Flags: noerror uninsdeletekey; Tasks: asdfasdf fileassociations
+Root: HKCR; SubKey: .pd; ValueType: string; ValueName: Content Type; ValueData: text/plain; Flags: noerror uninsdeletekey; Tasks: fileassociations
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib1; ValueData: libdir; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib2; ValueData: Gem; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib3; ValueData: cyclone; Tasks: libs
