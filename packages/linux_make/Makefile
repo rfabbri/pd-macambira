@@ -60,7 +60,7 @@ install:
 #==============================================================================#
 
 # if machine has dpkg-deb, build a Debian package
-DPKG := $(shell test -x `which dpkg-deb` && echo YES)
+DPKG := $(shell test -x /usr/bin/dpkg-deb && echo YES)
 ifeq ($(DPKG),YES)
   package: deb
 else
