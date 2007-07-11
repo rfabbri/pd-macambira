@@ -352,6 +352,22 @@ static void unpackOSC_PrintTypeTaggedArgs(t_unpackOSC *x, void *v, int n)
     {
         switch (*thisType)
         {
+            case 'b': /* blob: an int32 size count followed by that many 8-bit bytes */
+            {
+                int i, blob_bytes = ntohl(*((int *) p));
+#ifdef DEBUG
+                post("blob: %lu bytes", blob_bytes);
+#endif
+                p += 4;
+                for (i = 0; i < blob_bytes; ++i, ++p, ++myargc)
+                    SETFLOAT(mya+myargc,(*(unsigned char *)p));
+                while (i%4)
+                {
+                    ++i;
+                    ++p;
+                }
+                break;
+            }
             case 'i': case 'r': case 'm': case 'c':
 #ifdef DEBUG
                 post("integer: %d", ntohl(*((int *) p)));
