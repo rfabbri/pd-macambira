@@ -84,19 +84,25 @@ static void pipelist_hang_tick(t_hang *h)
 
 static void pipelist_list(t_pipelist *x, t_symbol *s, int ac, t_atom *av)
 {
-    t_hang *h = (t_hang *)getbytes(sizeof(t_hang));
-    int i;
+    if (x->x_deltime > 0)
+    { /* if delay is real, save the list for output in delay milliseconds */
+        t_hang *h;
+        int i;
 
-    h->h_n = ac;
-    h->h_atoms = (t_atom *)getbytes(h->h_n*sizeof(t_atom));
+        h = (t_hang *)getbytes(sizeof(t_hang));
+        h->h_n = ac;
+        h->h_atoms = (t_atom *)getbytes(h->h_n*sizeof(t_atom));
 
-    for (i = 0; i < h->h_n; ++i)
-        h->h_atoms[i] = av[i];
-    h->h_next = x->x_hang;
-    x->x_hang = h;
-    h->h_owner = x;
-    h->h_clock = clock_new(h, (t_method)pipelist_hang_tick);
-    clock_delay(h->h_clock, (x->x_deltime >= 0 ? x->x_deltime : 0));
+        for (i = 0; i < h->h_n; ++i)
+            h->h_atoms[i] = av[i];
+        h->h_next = x->x_hang;
+        x->x_hang = h;
+        h->h_owner = x;
+        h->h_clock = clock_new(h, (t_method)pipelist_hang_tick);
+        clock_delay(h->h_clock, (x->x_deltime >= 0 ? x->x_deltime : 0));
+    }
+    /* otherwise just pass the list straight through  */
+    else outlet_list(x->x_pipelistout, &s_list, ac, av);
 }
 
 static void pipelist_flush(t_pipelist *x)
