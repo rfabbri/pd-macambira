@@ -621,7 +621,8 @@ static t_float unpackOSC_DeltaTime(OSCTimeTag tt)
     ttusec = tt.seconds*onemillion + ONE_MILLION_OVER_TWO_TO_THE_32*tt.fraction;
     nowusec = ttnow.seconds*onemillion + tv.tv_usec;
     /* subtract now from tt to get delta time */
-    if (ttusec < nowusec) return 0.0;
+    /* if (ttusec < nowusec) return 0.0; */
+    /*negative delays are all right */
     delta = ttusec - nowusec;
     return (float)(delta*0.001f);
 }
