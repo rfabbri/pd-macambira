@@ -69,6 +69,8 @@ endif
 
 PACKAGE_NAME = Pd-$(PD_VERSION)
 
+DEB_BUILD_ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
+DEB_PD_VERSION := $(shell echo $(PD_VERSION) | sed 's|\(.*\)-extended-\(.*\)|\1cvs\2-1|')
 deb: $(bindir)
 # GNOME menu support
 	install -d $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
@@ -97,6 +99,11 @@ deb: $(bindir)
 # Pd-related scripts
 	install -p $(scripts_src)/pd-diff $(bindir)
 	install -p $(scripts_src)/config-switcher.sh $(bindir)
+# set build architecture and version for the package
+	sed -i 's|^Version:.*|Version: $(DEB_PD_VERSION)|' \
+		$(packages_src)/linux_make/debian/control
+	sed -i 's|^Architecture:.*|Architecture: $(DEB_BUILD_ARCH)|' \
+		$(packages_src)/linux_make/debian/control
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN

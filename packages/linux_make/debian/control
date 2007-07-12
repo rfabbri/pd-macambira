@@ -1,10 +1,10 @@
 Package: pd-extended
-Version: 0.40.2cvs20070709-1 
+Version: 0.40.2cvs20070712-1
 Section: sound
 Priority: optional
-Architecture: any
+Architecture: i386
 Depends: libjack0.100.0-0, ttf-bitstream-vera, tcl8.4 (>= 8.4.1-0), tk8.4 (>= 8.4.1-0), libasound2, libogg0, libvorbis0a, libvorbisenc2, libvorbisfile3, libspeex1, libflac7, libsndfile1, libpcre3, libtheora0, imagemagick, liblcms1, libpng3, libtiff4, libmpeg1, libmpeg2-4, libmpeg3-1, libquicktime0, libx11-6, libdv4, libxv1, libimlib2, libfreetype6, libsm6, libxml2, libxext6, libxt6, libglu1-mesa, libgsl0, libmagick++9c2a, x-ttcidfont-conf
-Recommends: liblo0, liblame0
+Recommends: liblo0, liblame0, qjackctl
 Suggests: xmms
 Maintainer: Hans-Christoph Steiner <hans@at.or.at>
 Description: Pure Data with patches and a large collection of externals
