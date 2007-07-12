@@ -75,5 +75,5 @@ public:
 	virtual V m_help() { post("%s - Get the sum of a vasp's sample values",thisName()); }
 };
 
-FLEXT_LIB("vasp.sum?, vasp",vasp_qsum)
+VASP_LIB("vasp.sum?",vasp_qsum)
 

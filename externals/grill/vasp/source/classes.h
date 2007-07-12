@@ -271,7 +271,7 @@ protected:																		\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\
-FLEXT_LIB(name ",vasp",vasp_##op)												
+    FLEXT_LIB(name ", vasp_" #op,vasp_##op)												
 
 
 #define VASP_BINARY(name,op,to,def,help)										\
@@ -290,7 +290,7 @@ protected:																		\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\
-FLEXT_LIB_V(name ",vasp",vasp_##op)												
+FLEXT_LIB_V(name ", vasp_" #op,vasp_##op)												
 
 
 #define VASP_ANYOP(name,op,args,to,def,help)									\
@@ -309,7 +309,10 @@ protected:																		\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\
-FLEXT_LIB_V(name ",vasp",vasp_##op)												
+FLEXT_LIB_V(name ", vasp_" #op,vasp_##op)												
+
+#define VASP_LIB(name,cl) FLEXT_LIB(name ", " #cl,cl);  
+#define VASP_LIB_V(name,cl) FLEXT_LIB_V(name ", " #cl,cl);  
 
 
 #define VASP__SETUP(op) FLEXT_SETUP(vasp_##op);  

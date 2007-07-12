@@ -171,7 +171,7 @@ public:
 
 	virtual V m_help() { post("%s - Get non-zero values only for peaks",thisName()); }
 };																				
-FLEXT_LIB_V("vasp.peaks, vasp",vasp_peaks)
+VASP_LIB_V("vasp.peaks",vasp_peaks)
 
 
 class vasp_valleys:
@@ -188,7 +188,7 @@ public:
 
 	virtual V m_help() { post("%s - Get non-zero values only for values",thisName()); }
 };																				
-FLEXT_LIB_V("vasp.valleys, vasp",vasp_valleys)
+VASP_LIB_V("vasp.valleys",vasp_valleys)
 
 
 class vasp_rpeaks:
@@ -205,7 +205,7 @@ public:
 
 	virtual V m_help() { post("%s - Get non-zero values only for peaks of the complex radius",thisName()); }
 };																				
-FLEXT_LIB_V("vasp.rpeaks, vasp",vasp_rpeaks)
+VASP_LIB_V("vasp.rpeaks",vasp_rpeaks)
 
 
 class vasp_rvalleys:
@@ -222,5 +222,5 @@ public:
 
 	virtual V m_help() { post("%s - Get non-zero values only for valleys of the complex radius",thisName()); }
 };																				
-FLEXT_LIB_V("vasp.rvalleys, vasp",vasp_rvalleys)
+VASP_LIB_V("vasp.rvalleys",vasp_rvalleys)
 

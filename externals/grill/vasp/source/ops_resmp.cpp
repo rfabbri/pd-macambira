@@ -251,7 +251,7 @@ private:
 	FLEXT_ATTRVAR_E(fill,xt_fill)
 	FLEXT_ATTRVAR_E(inter,xt_inter)
 };																				
-FLEXT_LIB_V("vasp.tilt, vasp",vasp_tilt)
+VASP_LIB_V("vasp.tilt",vasp_tilt)
 
 
 class vasp_xtilt:
@@ -270,6 +270,6 @@ public:
 		
 	virtual V m_help() { post("%s - Resamples buffer data symmetrically (in two halves)",thisName()); }
 };																				
-FLEXT_LIB_V("vasp.xtilt, vasp",vasp_xtilt)
+VASP_LIB_V("vasp.xtilt",vasp_xtilt)
 
 

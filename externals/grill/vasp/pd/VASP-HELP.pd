@@ -372,7 +372,7 @@
 0;
 #X obj 89 61 cnv 2 2 2 empty 14-15-r empty 20 12 64 14 -225271 -262144
 0;
-#X text 54 90 vasp modular - vector assembling signal processor ©2002
+#X text 54 90 vasp modular - vector assembling signal processor ©2002-2007
 thomas grill;
 #X text 54 123 vasp is a library of objects for max/msp and pd \, containing
 functions to generate and modify vectors as well as buffer content

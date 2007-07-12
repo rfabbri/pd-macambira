@@ -59,7 +59,7 @@ public:
 	virtual V m_help() { post("%s - Get list of samples of a vasp vector",thisName()); }
 };
 
-FLEXT_LIB("vasp.list vasp.?, vasp",vasp_list)
+VASP_LIB("vasp.list vasp.?",vasp_list)
 
 
 
@@ -120,5 +120,5 @@ public:
 	virtual V m_help() { post("%s - Get list of non-zero samples of a vasp vector",thisName()); }
 };
 
-FLEXT_LIB("vasp.nonzero vasp.??, vasp",vasp_nonzero)
+VASP_LIB("vasp.nonzero vasp.??",vasp_nonzero)
 

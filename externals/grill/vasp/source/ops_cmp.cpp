@@ -39,7 +39,7 @@ VASP_BINARY("vasp.rmax",rmax,true,VASP_ARG_R(0),"assigns the maximum of the radi
 
 // --------------------------------------------------------------
 
-VASP_UNARY("vasp, vasp.minmax",minmax,true,"compare two vectors, assign the lower values to the first and the higher to the second one") 
+VASP_UNARY("vasp.minmax",minmax,true,"compare two vectors, assign the lower values to the first and the higher to the second one") 
 
 
 

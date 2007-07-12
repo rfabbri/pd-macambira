@@ -62,7 +62,7 @@ private:
 	FLEXT_CALLBACK_V(a_radio);
 };
 
-FLEXT_LIB_V("vasp, vasp",vasp_v)
+VASP_LIB_V("vasp",vasp_v)
 
 
 
@@ -98,7 +98,7 @@ public:
 	virtual V m_help() { post("%s - Update graphics of a vasp",thisName()); }
 };
 
-FLEXT_LIB("vasp.update vasp.u, vasp",vasp_update)
+VASP_LIB("vasp.update vasp.u",vasp_update)
 
 
 
@@ -151,7 +151,7 @@ public:
 	virtual V m_help() { post("%s - Check vasp dimensions",thisName()); }
 };
 
-FLEXT_LIB("vasp.check vasp.chk, vasp",vasp_check)
+VASP_LIB("vasp.check vasp.chk",vasp_check)
 
 
 
@@ -201,5 +201,5 @@ public:
 	virtual V m_help() { post("%s - Output a vasp multiple times",thisName()); }
 };
 
-FLEXT_LIB_V("vasp.multi vasp.m, vasp",vasp_multi)
+VASP_LIB_V("vasp.multi vasp.m",vasp_multi)
 

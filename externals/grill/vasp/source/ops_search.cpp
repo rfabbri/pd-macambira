@@ -191,7 +191,7 @@ public:
 
 	virtual V m_help() { post("%s - Define starting point by searching for given value",thisName()); }
 };																				
-FLEXT_LIB_V("vasp.offset= vasp.o=, vasp",vasp_soffset)
+VASP_LIB_V("vasp.offset= vasp.o=",vasp_soffset)
 
 
 class vasp_sframes:
@@ -208,6 +208,6 @@ public:
 
 	virtual V m_help() { post("%s - Define vasp frame length by searching for given value",thisName()); }
 };																				
-FLEXT_LIB_V("vasp.frames= vasp.f=, vasp",vasp_sframes)
+VASP_LIB_V("vasp.frames= vasp.f=",vasp_sframes)
 
 
