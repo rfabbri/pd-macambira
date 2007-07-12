@@ -167,7 +167,7 @@ ifneq ($(PD_TEST_VERSION),)
 	PD_VERSION := $(PD_VERSION)-$(PD_TEST_VERSION)
 endif
 
-VERSION_DATE := $(shell date +%Y-%m-%d)
+VERSION_DATE := $(shell date +%Y%m%d)
 
 # release version for this distro
 PD-EXTENDED_VERSION_PREFIX = extended
