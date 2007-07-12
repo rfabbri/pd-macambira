@@ -89,6 +89,8 @@ deb: $(bindir)
 	ln -s $(prefix)/lib/pd/default.pdsettings \
 		$(DESTDIR)/etc/pd-extended/default.pdsettings
 	install -p $(packages_src)/linux_make/default.pdsettings $(libpddir)
+# folder to install libs into
+	install -d -m0775 $(DESTDIR)/usr/share/pd
 # emacs mode for .pd files
 	install -d $(DESTDIR)/usr/share/emacs/site-lisp/
 	install -p $(scripts_src)/pd-mode.el $(DESTDIR)/usr/share/emacs/site-lisp/
