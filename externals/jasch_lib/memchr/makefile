@@ -1,5 +1,5 @@
-NAME=memchr
-CSYM=memchr
+NAME=strchr
+CSYM=strchr
 
 current: pd_darwin
 
