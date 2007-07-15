@@ -37,12 +37,13 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/time.h>
 
 #ifdef MSW
 #include <winsock2.h>
+#include <sys/timeb.h>
 #else
 #include <ctype.h>
+#include <sys/time.h>
 #endif
 
 #ifdef unix
@@ -1268,9 +1269,22 @@ static OSCTimeTag OSCTT_Infinite(void)
 static OSCTimeTag OSCTT_CurrentTimePlusOffset(uint4 offset)
 { /* offset is in microseconds */
     OSCTimeTag tt;
+    static unsigned int onemillion = 1000000;
+    static unsigned int onethousand = 1000;
+#ifdef MSW
+    struct _timeb tb;
+
+    _ftime(&tb);
+
+    /* First get the seconds right */
+    tt.seconds = (unsigned)SECONDS_FROM_1900_to_1970 +
+        (unsigned)tb.time+
+        (unsigned)offset/onemillion;
+    /* Now get the fractional part. */
+    tt.fraction = (unsigned)tb.millitm*onethousand + (unsigned)(offset%onemillion); /* in usec */
+#else
     struct timeval tv;
     struct timezone tz;
-    static unsigned int onemillion = 1000000;
 
     gettimeofday(&tv, &tz);
 
@@ -1282,6 +1296,7 @@ static OSCTimeTag OSCTT_CurrentTimePlusOffset(uint4 offset)
         (unsigned) offset/onemillion;
     /* Now get the fractional part. */
     tt.fraction = (unsigned) tv.tv_usec + (unsigned)(offset%onemillion); /* in usec */
+#endif
     if (tt.fraction > onemillion)
     {
         tt.fraction -= onemillion;

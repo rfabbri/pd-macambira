@@ -77,13 +77,14 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
     #include <stdio.h>
     #include <string.h>
     #include <stdlib.h>
-    #include <sys/time.h>
 #ifdef _WIN32
     #include <winsock2.h>
+    #include <sys/timeb.h>
 #else
     #include <sys/types.h>
     #include <netinet/in.h>
     #include <ctype.h>
+    #include <sys/time.h>
 #endif /* _WIN32 */
 
 /* Declarations */
@@ -604,26 +605,43 @@ static int unpackOSC_IsNiceString(char *string, char *boundary)
 /* return the time difference in milliseconds between an OSC timetag and now */
 static t_float unpackOSC_DeltaTime(OSCTimeTag tt)
 {
-    OSCTimeTag ttnow;
-    struct timeval tv;
-    struct timezone tz;
     static double onemillion = 1000000.0f;
-    double  ttusec, nowusec, delta;
+    static double onethousand = 1000.0f;
 
     if (tt.fraction == 1 && tt.seconds == 0) return 0.0; /* immediate */
-    gettimeofday(&tv, &tz); /* find now */
-    /* First get the seconds right */
-    ttnow.seconds = (unsigned) SECONDS_FROM_1900_to_1970 +
-        (unsigned) tv.tv_sec -
-        (unsigned) 60 * tz.tz_minuteswest +
-        (unsigned) (tz.tz_dsttime ? 3600 : 0);
-    /* find usec in tt */
-    ttusec = tt.seconds*onemillion + ONE_MILLION_OVER_TWO_TO_THE_32*tt.fraction;
-    nowusec = ttnow.seconds*onemillion + tv.tv_usec;
-    /* subtract now from tt to get delta time */
-    /* if (ttusec < nowusec) return 0.0; */
-    /*negative delays are all right */
-    delta = ttusec - nowusec;
-    return (float)(delta*0.001f);
+    else
+    {
+        OSCTimeTag ttnow;
+        double  ttusec, nowusec, delta;
+#ifdef MSW
+        struct _timeb tb;
+
+        _ftime(&tb); /* find now */
+        /* First get the seconds right */
+        ttnow.seconds = (unsigned) SECONDS_FROM_1900_to_1970 +
+            (unsigned) tb.time;
+        /* find usec in tt */
+        ttusec = tt.seconds*onemillion + ONE_MILLION_OVER_TWO_TO_THE_32*tt.fraction;
+        nowusec = ttnow.seconds*onemillion + tb.millitm*onethousand;
+#else
+        struct timeval tv;
+        struct timezone tz;
+
+        gettimeofday(&tv, &tz); /* find now */
+        /* First get the seconds right */
+        ttnow.seconds = (unsigned) SECONDS_FROM_1900_to_1970 +
+            (unsigned) tv.tv_sec -
+            (unsigned) 60 * tz.tz_minuteswest +
+            (unsigned) (tz.tz_dsttime ? 3600 : 0);
+        /* find usec in tt */
+        ttusec = tt.seconds*onemillion + ONE_MILLION_OVER_TWO_TO_THE_32*tt.fraction;
+        nowusec = ttnow.seconds*onemillion + tv.tv_usec;
+#endif /* ifdef MSW */
+        /* subtract now from tt to get delta time */
+        /* if (ttusec < nowusec) return 0.0; */
+        /*negative delays are all right */
+        delta = ttusec - nowusec;
+        return (float)(delta*0.001f);
+    }
 }
 /* end of unpackOSC.c */
