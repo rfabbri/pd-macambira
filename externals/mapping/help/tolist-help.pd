@@ -1,20 +1,20 @@
-#N canvas 150 194 561 497 10;
+#N canvas 122 268 565 501 10;
 #X floatatom 361 86 5 0 0 0 - - -;
 #X floatatom 410 87 5 0 0 0 - - -;
 #X obj 323 140 listto;
 #X obj 323 239 tolist;
 #X obj 322 310 multi_slider 25;
 #X floatatom 463 89 5 0 0 0 - - -;
-#X text 23 11 built a list from a stream of data;
+#X text 23 41 built a list from a stream of data;
 #X obj 323 114 wave_loop 25 0.4;
 #X obj 323 209 breakpoint_smooth 0.67 0.33;
 #X obj 405 164 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 10 -262130
--1 -1 3400 1;
+-1 -1 0 1;
 #X floatatom 411 183 5 0 0 0 - - -;
 #X msg 323 49 bang;
 #X obj 24 227 tolist;
 #X obj 27 135 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 10 -203904
--1 -1 3700 1;
+-1 -1 0 1;
 #X obj 57 195 bng 25 250 50 0 empty empty empty 0 -6 0 10 -4034 -1
 -1;
 #X text 24 111 add data to the list;
@@ -22,6 +22,8 @@
 #X msg 33 165 bang;
 #X text 69 165 clears the current contents;
 #X text 90 196 output the current contents;
+#X obj 5 2 cnv 15 450 20 empty empty tolist 2 11 1 18 -233017 -66577
+0;
 #X connect 0 0 7 1;
 #X connect 1 0 7 2;
 #X connect 2 0 8 0;

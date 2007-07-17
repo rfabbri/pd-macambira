@@ -1,4 +1,4 @@
-#N canvas 354 263 441 356 10;
+#N canvas 354 263 467 373 10;
 #X floatatom 222 280 5 0 0 0 - - -;
 #X floatatom 150 329 5 0 0 0 - - -;
 #X msg 150 245 0;
@@ -16,6 +16,8 @@ argument;
 ;
 #X obj 137 168 test_n word;
 #X obj 150 303 test_n 2 3;
+#X obj 5 2 cnv 15 450 20 empty empty test_n 2 11 1 18 -233017 -66577
+0;
 #X connect 0 0 13 2;
 #X connect 2 0 13 0;
 #X connect 3 0 13 0;
