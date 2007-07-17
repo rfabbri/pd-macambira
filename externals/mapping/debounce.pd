@@ -1,4 +1,4 @@
-#N canvas 439 311 450 300 10;
+#N canvas 439 311 705 322 10;
 #X obj 27 43 inlet;
 #X obj 27 264 outlet;
 #X obj 27 82 spigot 1;
@@ -6,7 +6,7 @@
 #X msg 161 208 1;
 #X obj 161 183 delay \$1;
 #X obj 213 43 inlet;
-#X obj 27 119 t b b b;
+#X obj 27 119 t a b b;
 #X connect 0 0 2 0;
 #X connect 2 0 7 0;
 #X connect 3 0 2 1;
