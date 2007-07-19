@@ -14,6 +14,7 @@ MP 20060824 added clock_delay call in comport_devicename
 MP 20060924 added comport_enum to list available ports in Windows
 MP 20060925 add devices message to enumerate actual devices, info just outputs current port state
 MP 20061016 write_serial checks for GetOverlappedResult to avoid tx buffer overflow errors
+MP 20070719 added "ports" method to output list of available ports on status outlet
 */
 
 #include "m_pd.h"
@@ -269,6 +270,7 @@ static void comport_output_xonxoff(t_comport *x);
 static void comport_enum(t_comport *x);
 static void comport_info(t_comport *x);
 static void comport_devices(t_comport *x);
+static void comport_ports(t_comport *x);
 static void comport_verbose(t_comport *x, t_floatarg f);
 static void comport_help(t_comport *x);
 void comport_setup(void);
@@ -1356,6 +1358,75 @@ static void comport_enum(t_comport *x)
 #endif  /* _WIN32 */
 }
 
+static void comport_ports(t_comport *x)
+{ /* the same as comport_enum except outputs list of available ports on status outlet */
+    unsigned int    i, j = 0;
+    int             ports[COMPORT_MAX]; /* we don't know how many there might be but 99 is probably safe */
+#ifdef _WIN32
+    HANDLE          fd;
+    char            device_name[10];
+    DWORD           dw;
+
+    for(i = 1; i < COMPORT_MAX; i++)
+    {
+        sprintf(device_name, "\\\\.\\COM%d", i);/* the recommended way to specify COMs above 9 */
+        fd = CreateFile( device_name,
+                GENERIC_READ | GENERIC_WRITE,
+                0,
+                0,
+                OPEN_EXISTING,
+                FILE_FLAG_OVERLAPPED,
+                0);
+        dw = 0L;
+        if(fd == INVALID_HANDLE_VALUE)
+            dw = GetLastError();
+        else
+            CloseHandle(fd);
+        if ((dw == 0)||(dw == ERROR_ACCESS_DENIED)) ports[j++]=i;
+    }
+#else
+    glob_t          glob_buffer;
+    int             fd;
+    struct termios  test;
+
+/* first look for registered devices in the filesystem */
+    switch( glob( x->serial_device_name, 0, NULL, &glob_buffer ) )
+    {
+        case GLOB_NOSPACE:
+            error("[comport] out of memory for \"%s\"",x->serial_device_name);
+            break;
+# ifdef GLOB_ABORTED
+        case GLOB_ABORTED:
+            error("[comport] aborted \"%s\"",x->serial_device_name);
+            break;
+# endif /* GLOB_ABORTED */
+# ifdef GLOB_NOMATCH
+        case GLOB_NOMATCH:
+            error("[comport] no serial devices found for \"%s\"",x->serial_device_name);
+            break;
+# endif /* GLOB_NOMATCH */
+    }
+    for(i = 0; (i < glob_buffer.gl_pathc) && (j < COMPORT_MAX); i++)
+    {
+/* now try to open the device */
+        if((fd = open(glob_buffer.gl_pathv[i], OPENPARAMS)) != INVALID_HANDLE_VALUE)
+        {
+/* now see if it has attributes */
+            if ((tcgetattr(fd, &test)) != -1)
+                ports[j++] = i;/* this one really exists */
+            close (fd);
+        }
+    }
+#endif  /* _WIN32 */
+    if (j)
+    {
+        t_atom *output_atom = getbytes(j*sizeof(t_atom));
+        for (i = 0; i < j; ++i) SETFLOAT(&output_atom[i], ports[i]);
+        outlet_anything( x->x_status_outlet, gensym("ports"), j, output_atom);
+        freebytes(output_atom, j*sizeof(t_atom));
+    }
+}
+
 static void comport_output_print(t_comport *x)
 {
     post("[comport]: available serial ports:");
@@ -1475,6 +1546,7 @@ static void comport_help(t_comport *x)
         "   verbose <level>   ... for debug set verbosity to level\n"
         "   info              ... output info on status outlet\n"
         "   devices           ... post list of available devices\n"
+        "   ports             ... output list of available devices on status outlet\n"
         "   help              ... post this help");
 }
 
@@ -1508,6 +1580,7 @@ void comport_setup(void)
     class_addmethod(comport_class, (t_method)comport_help, gensym("help"), 0);
     class_addmethod(comport_class, (t_method)comport_info, gensym("info"), 0);
     class_addmethod(comport_class, (t_method)comport_devices, gensym("devices"), 0);
+    class_addmethod(comport_class, (t_method)comport_ports, gensym("ports"), 0);
 
 #ifndef _WIN32
     null_tv.tv_sec = 0; /* no wait */
