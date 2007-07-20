@@ -81,6 +81,7 @@ static int sys_nchout = -1;
 static int sys_chinlist[MAXAUDIOINDEV];
 static int sys_choutlist[MAXAUDIOOUTDEV];
 
+int sys_nosleep = 0;  /* skip all "sleep" calls and spin instead */
 t_sample* get_sys_soundout() { return sys_soundout; }
 t_sample* get_sys_soundin() { return sys_soundin; }
 int* get_sys_main_advance() { return &sys_main_advance; }
@@ -397,6 +398,7 @@ static char *(usagemessage[]) = {
 "-rt or -realtime -- use real-time priority\n",
 "-nrt             -- don't use real-time priority\n",
 #endif
+"-nosleep         -- spin, don't sleep (may lower latency on multi-CPUs)\n",
 };
 
 static void sys_parsedevlist(int *np, int *vecp, int max, char *str)
@@ -585,7 +587,7 @@ int sys_argparse(int argc, char **argv)
         }
         else if (!strcmp(*argv, "-sleepgrain") && (argc > 1))
         {
-            sys_sleepgrain = 1000 * atoi(argv[1]);
+            sys_sleepgrain = 1000 * atof(argv[1]);
             argc -= 2; argv += 2;
         }
         else if (!strcmp(*argv, "-nodac"))
@@ -829,6 +831,11 @@ int sys_argparse(int argc, char **argv)
             argc--; argv++;
         }
 #endif
+        else if (!strcmp(*argv, "-nosleep"))
+        {
+            sys_nosleep = 1;
+            argc--; argv++;
+        }
         else if (!strcmp(*argv, "-soundindev") ||
             !strcmp(*argv, "-audioindev"))
         {

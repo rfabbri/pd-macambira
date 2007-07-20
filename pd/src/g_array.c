@@ -1051,7 +1051,7 @@ static void garray_save(t_gobj *z, t_binbuf *b)
                 chunk = ARRAYWRITECHUNKSIZE;
             binbuf_addv(b, "si", gensym("#A"), n2);
             for (i = 0; i < chunk; i++)
-                binbuf_addv(b, "f", ((float *)(array->a_vec))[n2+i]);
+                binbuf_addv(b, "f", ((t_word *)(array->a_vec))[n2+i].w_float);
             binbuf_addv(b, ";");
             n2 += chunk;
         }

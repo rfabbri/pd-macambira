@@ -38,6 +38,10 @@ CFLAGS = @CFLAGS@ $(ARCH_CFLAGS) $(WARN_CFLAGS) $(CPPFLAGS) $(MORECFLAGS)
 
 SYSSRC += @SYSSRC@
 
+ASIOSRC = @ASIOSRC@
+
+ASIOOBJ = $(ASIOSRC:.cpp=.o)
+
 SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
     g_scalar.c g_traversal.c g_guiconnect.c g_readwrite.c g_editor.c \
     g_all_guis.c g_bang.c g_hdial.c g_hslider.c g_mycanvas.c g_numbox.c \
@@ -91,6 +95,9 @@ $(OBJ) : %.o : %.c
 $(GOBJ) : %.o : %.c
 	$(CC) $(CFLAGS) $(GFLAGS) $(GINCLUDE) -c -o $(OBJ_DIR)/$*.o $*.c 
 
+$(ASIOOBJ): %.o : %.cpp
+	$(CXX) $(CFLAGS) $(INCLUDE) -c -o $(OBJ_DIR)/$*.o $*.cpp
+
 pd: $(PDEXEC)
 
 gui: $(BIN_DIR)/$(GUINAME)
@@ -131,6 +138,12 @@ $(BIN_DIR)/libPdTcl.dylib: $(GOBJ) $(GSRC)
 		 -change @TCLTK_FRAMEWORKS_PATH@/Tk.framework/Versions/8.4/Tk \
 		 @executable_path/../Frameworks/Tk.framework/Versions/8.4/Tk \
 		../bin/libPdTcl.dylib
+
+# this is for Windows/MinGW (only?)
+$(BIN_DIR)/pdtcl.dll: $(GOBJ)
+	cd $(BIN_DIR); dllwrap --export-all-symbols --output-def pdtcl.def \
+	--output-lib=pdtcl.a --dllname=$(GUINAME) $(OBJ_DIR)/t_tkcmd.o $(LIB) $(GLIB)
+	strip --strip-unneeded $(BIN_DIR)/pdtcl.dll
 
 externs: 
 	cd ../extra/bonk~;make @EXTERNTARGET@

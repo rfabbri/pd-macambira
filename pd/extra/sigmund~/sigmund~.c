@@ -181,6 +181,23 @@ static void sigmund_tweak(int npts, float *ftreal, float *ftimag,
     }
 }
 
+static void sigmund_remask(int maxbin, int bestindex, float powmask, 
+    float maxpower, float *maskbuf)
+{
+    int bin;
+    int bin1 = (bestindex > 52 ? bestindex-50:2);
+    int bin2 = (maxbin < bestindex + 50 ? bestindex + 50 : maxbin);
+    for (bin = bin1; bin < bin2; bin++)
+    {
+        float bindiff = bin - bestindex;
+        float mymask;
+        mymask = powmask/ (1. + bindiff * bindiff * bindiff * bindiff);
+        if (bindiff < 2 && bindiff > -2)
+            mymask = 2*maxpower;
+        if (mymask > maskbuf[bin])
+            maskbuf[bin] = mymask;
+    } 
+}
 
 static void sigmund_getrawpeaks(int npts, float *insamps,
     int npeak, t_peak *peakv, int *nfound, float *power, float srate, int loud,
@@ -191,16 +208,16 @@ static void sigmund_getrawpeaks(int npts, float *insamps,
     int npts2 = 2*npts, i, bin;
     int count, peakcount = 0;
     float *fp1, *fp2;
-    float *rawpow, *rawreal, *rawimag, *maskbuf;
-    float *bigbuf = alloca(sizeof (float ) * (2*NEGBINS + 5*npts));
+    float *rawpow, *rawreal, *rawimag, *maskbuf, *powbuf;
+    float *bigbuf = alloca(sizeof (float ) * (2*NEGBINS + 6*npts));
     int maxbin = hifreq/fperbin;
-    int altwind = (param3 == 1);
     int tweak = (param3 == 0);
     if (maxbin > npts - NEGBINS)
         maxbin = npts - NEGBINS;
     if (loud) post("tweak %d", tweak);
     maskbuf = bigbuf + npts2;
-    rawreal = maskbuf + npts+NEGBINS;
+    powbuf = maskbuf + npts;
+    rawreal = powbuf + npts+NEGBINS;
     rawimag = rawreal+npts+NEGBINS;
     for (i = 0; i < npts; i++)
         maskbuf[i] = 0;
@@ -236,45 +253,34 @@ static void sigmund_getrawpeaks(int npts, float *insamps,
     rawimag[-2] = -rawimag[2];
     rawimag[-3] = -rawimag[3];
     rawimag[-4] = -rawimag[4];
-
+#if 1
+    for (i = 0, fp1 = rawreal, fp2 = rawimag; i < npts-1; i++, fp1++, fp2++)
+    {
+        float x1 = fp1[1] - fp1[-1], x2 = fp2[1] - fp2[-1]; 
+        powbuf[i] = x1*x1+x2*x2;
+    }
+    powbuf[npts-1] = 0;
+#endif
     for (peakcount = 0; peakcount < npeak; peakcount++)
     {
         float pow1, maxpower = 0, totalpower = 0, windreal, windimag, windpower,
             detune, pidetune, sinpidetune, cospidetune, ampcorrect, ampout,
             ampoutreal, ampoutimag, freqout, freqcount1, freqcount2, powmask;
         int bestindex = -1;
+
         for (bin = 2, fp1 = rawreal+2, fp2 = rawimag+2;
             bin < maxbin; bin++, fp1++, fp2++)
         {
-            float x1, x2, a1, a2, b1, b2, thresh;
-            if (altwind)
-            {
-                x1 = fp1[0] - 0.5*(fp1[-2] +fp1[2]);
-                x2 = fp2[0] - 0.5*(fp2[-2] +fp2[2]);
-                a1 = fp1[4] - 0.5*(fp1[2] +fp1[6]);
-                a2 = fp2[2] - 0.5*(fp2[2] +fp2[6]);
-                b1 = fp1[-4] - 0.5*(fp1[-2] +fp1[-6]);
-                b2 = fp2[-4] - 0.5*(fp2[-2] +fp2[-6]);
-                thresh = param2 * (a1*a1+a2*a2+b1*b1+b2*b2);
-            }
-            else
-            {
-                x1 = fp1[1] - fp1[-1];
-                x2 = fp2[1] - fp2[-1];
-                a1 = fp1[3] - fp1[1];
-                a2 = fp2[3] - fp2[1];
-                b1 = fp1[-1] - fp1[-3];
-                b2 = fp2[-1] - fp2[-3];
-                thresh = param2 * (a1*a1+a2*a2+b1*b1+b2*b2);
-            }
-            pow1 = x1*x1+x2*x2;
+            pow1 = powbuf[bin];
             if (pow1 > maxpower && pow1 > maskbuf[bin])
             {
+                float thresh = param2 * (powbuf[bin-2]+powbuf[bin+2]);
                 if (pow1 > thresh)
                     maxpower = pow1, bestindex = bin;
             }
             totalpower += pow1;
         }
+
         if (totalpower <= 0 || maxpower < 1e-10*totalpower || bestindex < 0)
             break;
         fp1 = rawreal+bestindex;
@@ -284,46 +290,21 @@ static void sigmund_getrawpeaks(int npts, float *insamps,
         if (loud > 2)
             post("maxpower %f, powmask %f, param1 %f",
                 maxpower, powmask, param1);
-        for (bin = 2; bin < maxbin; bin++)
-        {
-            float bindiff = bin - bestindex;
-            float mymask =
-                powmask/ (1. + bindiff * bindiff * bindiff * bindiff);
-            if (bindiff < 2 && bindiff > -2)
-                mymask = 2*maxpower;
-            if (mymask > maskbuf[bin])
-                maskbuf[bin] = mymask;
-        } 
+        sigmund_remask(maxbin, bestindex, powmask, maxpower, maskbuf);
         
         if (loud > 1)
             post("best index %d, total power %f", bestindex, totalpower);
-        if (altwind)
-        {
-            windreal = W_ALPHA * fp1[0] - (0.5 * W_BETA) * (fp1[2] + fp1[-2]);
-            windimag = W_ALPHA * fp2[0] - (0.5 * W_BETA) * (fp2[2] + fp2[-2]);
-            windpower = windreal * windreal + windimag * windimag;
-            detune = (
-                (W_BETA*(rawreal[bestindex-2] - rawreal[bestindex+2])) *
-                (2.0 * W_ALPHA * rawreal[bestindex] - 
-                    W_BETA * (rawreal[bestindex-2] + rawreal[bestindex+2]))
-                        +
-                (W_BETA*(rawimag[bestindex-2] - rawimag[bestindex+2])) *
-                (2.0 * W_ALPHA * rawimag[bestindex] - 
-                    W_BETA * (rawimag[bestindex-2] + rawimag[bestindex+2]))
-                            ) / (4.0 * windpower);
-        }
-        else
-        {
-            windreal = fp1[1] - fp1[-1];
-            windimag = fp2[1] - fp2[-1];
-            windpower = windreal * windreal + windimag * windimag;
-            detune = ((fp1[1] * fp1[1] - fp1[-1]*fp1[-1]) 
-                + (fp2[1] * fp2[1] - fp2[-1]*fp2[-1])) / (2 * windpower);
-            if (loud > 2) post("(-1) %f %f; (1) %f %f",
-                fp1[-1], fp2[-1], fp1[1], fp2[1]);
-            if (loud > 2) post("peak %f %f",
-                fp1[0], fp2[0]);
-        }
+
+        windreal = fp1[1] - fp1[-1];
+        windimag = fp2[1] - fp2[-1];
+        windpower = windreal * windreal + windimag * windimag;
+        detune = ((fp1[1] * fp1[1] - fp1[-1]*fp1[-1]) 
+            + (fp2[1] * fp2[1] - fp2[-1]*fp2[-1])) / (2 * windpower);
+        if (loud > 2) post("(-1) %f %f; (1) %f %f",
+            fp1[-1], fp2[-1], fp1[1], fp2[1]);
+        if (loud > 2) post("peak %f %f",
+            fp1[0], fp2[0]);
+
         if (detune > 0.5)
             detune = 0.5;
         else if (detune < -0.5)
@@ -334,9 +315,7 @@ static void sigmund_getrawpeaks(int npts, float *insamps,
         pidetune = PI * detune;
         sinpidetune = sin(pidetune);
         cospidetune = cos(pidetune);
-        if (altwind)
-            ampcorrect = 1.0 / window_hann_mag(pidetune, sinpidetune);
-        else ampcorrect = 1.0 / window_mag(pidetune, cospidetune);
+        ampcorrect = 1.0 / window_mag(pidetune, cospidetune);
 
         ampout = ampcorrect *sqrt(windpower);
         ampoutreal = ampcorrect *
@@ -844,10 +823,10 @@ static void sigmund_minpower(t_sigmund *x, t_floatarg f);
 static void *sigmund_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_sigmund *x = (t_sigmund *)pd_new(sigmund_class);
+    x->x_npts = NPOINTS_DEF;
     x->x_param1 = 0;
     x->x_param2 = 0.6;
     x->x_param3 = 0;
-    x->x_npts = NPOINTS_DEF;
     x->x_hop = HOP_DEF;
     x->x_mode = MODE_STREAM;
     x->x_npeak = NPEAK_DEF;
@@ -863,7 +842,8 @@ static void *sigmund_new(t_symbol *s, int argc, t_atom *argv)
     x->x_trackv = 0;
     x->x_ntrack = 0;
     x->x_dopitch = x->x_donote = x->x_dotracks = 0;
-    
+    x->x_inbuf = 0;
+
     while (argc > 0)
     {
         t_symbol *firstarg = atom_getsymbolarg(0, argc, argv);
@@ -886,7 +866,7 @@ static void *sigmund_new(t_symbol *s, int argc, t_atom *argv)
 #endif
         else if (!strcmp(firstarg->s_name, "-npts") && argc > 1)
         {
-            sigmund_npts(x, atom_getfloatarg(1, argc, argv));
+            x->x_npts = atom_getfloatarg(1, argc, argv);
             argc -= 2; argv += 2;
         }
         else if (!strcmp(firstarg->s_name, "-hop") && argc > 1)
@@ -1008,21 +988,9 @@ static void *sigmund_new(t_symbol *s, int argc, t_atom *argv)
     }
     x->x_clock = clock_new(&x->x_obj.ob_pd, (t_method)sigmund_clock);
     
-        /* check parameter ranges */
-    if (x->x_npts < NPOINTS_MIN)
-        post("sigmund~: minimum points %d", NPOINTS_MIN),
-            x->x_npts = NPOINTS_MIN;
-    if (x->x_npts != (1 << sigmund_ilog2(x->x_npts)))
-        post("sigmund~: adjusting analysis size to %d points",
-            (x->x_npts = (1 << sigmund_ilog2(x->x_npts))));
-    if (x->x_hop != (1 << sigmund_ilog2(x->x_hop)))
-        post("sigmund~: adjusting hop size to %d points",
-            (x->x_hop = (1 << sigmund_ilog2(x->x_hop))));
-    if (x->x_mode == MODE_STREAM)
-        x->x_inbuf = getbytes(sizeof(*x->x_inbuf) * x->x_npts);
-    else x->x_inbuf = 0;
     x->x_infill = 0;
     x->x_countdown = 0;
+    sigmund_npts(x, x->x_npts);
     notefinder_init(&x->x_notefinder);
     sigmund_clear(x);
     return (x);
@@ -1158,14 +1126,25 @@ static void sigmund_param3(t_sigmund *x, t_floatarg f)
 
 static void sigmund_npts(t_sigmund *x, t_floatarg f)
 {
-    x->x_npts = f;
+    int nwas = x->x_npts, npts = f;
         /* check parameter ranges */
-    if (x->x_npts < NPOINTS_MIN)
+    if (npts < NPOINTS_MIN)
         post("sigmund~: minimum points %d", NPOINTS_MIN),
-            x->x_npts = NPOINTS_MIN;
-    if (x->x_npts != (1 << sigmund_ilog2(x->x_npts)))
+            npts = NPOINTS_MIN;
+    if (npts != (1 << sigmund_ilog2(npts)))
         post("sigmund~: adjusting analysis size to %d points",
-            (x->x_npts = (1 << sigmund_ilog2(x->x_npts))));
+            (npts = (1 << sigmund_ilog2(npts))));
+    if (npts != nwas)
+        x->x_countdown = x->x_infill  = 0;
+    if (x->x_mode == MODE_STREAM)
+    {
+        if (x->x_inbuf)
+            x->x_inbuf = resizebytes(x->x_inbuf,
+                sizeof(*x->x_inbuf) * nwas, sizeof(*x->x_inbuf) * npts);
+        else x->x_inbuf = getbytes(sizeof(*x->x_inbuf) * npts);
+    }
+    else x->x_inbuf = 0;
+    x->x_npts = npts;
 }
 
 static void sigmund_hop(t_sigmund *x, t_floatarg f)
@@ -1261,6 +1240,8 @@ static t_int *sigmund_perform(t_int *w)
     float *in = (float *)(w[2]);
     int n = (int)(w[3]);
 
+    if (x->x_hop % n)
+        return (w+4);
     if (x->x_countdown > 0)
         x->x_countdown -= n;
     else if (x->x_infill != x->x_npts)
@@ -1330,6 +1311,6 @@ void sigmund_tilde_setup(void)
         gensym("print"), 0);
     class_addmethod(sigmund_class, (t_method)sigmund_printnext,
         gensym("printnext"), A_FLOAT, 0);
-    post("sigmund version 0.02");
+    post("sigmund version 0.03");
 }
 

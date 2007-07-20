@@ -17,6 +17,10 @@ turn on paMacCore_ChangeDeviceParameters for mac (pa_mac_core.h)
 Gnome: why don't windows pop up when clicked on?
 
 problems:
+fix declare to update current patch when changed
+objects on GOP don't erase if you edit the GOP while they're showing
+MSTACKSIZE limitation in m_binbuf.c
+add -stack option to make 'regular' stack larger
 TK menu on Windows says "wish"
 activating windows in Gnome?
 help browser broke on Panurge
@@ -51,6 +55,7 @@ real-time spectrum grapher
 document ||, |, etc, better
 
 features:
+clickles connection (hit 'c' key or something)
 messages to suppress menus&accelerators, and invisibilize Pd window
 machine-independent fonts
 callback scheduling on Mac
@@ -96,13 +101,14 @@ editing:
     (also, a way to make multiple connections?)
 
 data:
+make a 2-pass proecss for finding hot spot closes to any given click
+replace list element with binbuf??
 hooks for table mousing, other changes (scalars?)
 data to save as succession of "list" messages that textfile can store, etc.
 implement list field (GOP or subwindow, perhaps GOP could suppress bounds rect?)
-fix blue selection rectangle to update if selected datum is redrawn
 data copy/paste doesn't check templates aren't changed
 arrays of non-existent templates crash
-vget, vset traversal objects
+vget, vset traversal objects, pointer == and select equivalents
 cursor to show (x, y) location
 improve typing at drawnumbers
 sublists should display on parent if desired? (new drawing instruction)
@@ -112,6 +118,7 @@ append doesn't do symbols yet.
 
 more features:
 
+clean out IRIX stuff
 "-march=pentium4 -O2 -mfpmath=sse -msse -msse2 -mmmx" ?
 try to improve for AMD - try "-march=athlon-xp -msse2"
 search for -mcpu=cpu-type in man gcc.

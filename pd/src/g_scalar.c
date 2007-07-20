@@ -195,37 +195,40 @@ static void scalar_getrect(t_gobj *z, t_glist *owner,
     *yp2 = y2; 
 }
 
+static void scalar_drawselectrect(t_scalar *x, t_glist *glist, int state)
+{
+    if (state)
+    {
+        int x1, y1, x2, y2;
+       
+        scalar_getrect(&x->sc_gobj, glist, &x1, &y1, &x2, &y2);
+        x1--; x2++; y1--; y2++;
+        sys_vgui(".x%lx.c create line %d %d %d %d %d %d %d %d %d %d \
+            -width 0 -fill blue -tags select%lx\n",
+                glist_getcanvas(glist), x1, y1, x1, y2, x2, y2, x2, y1, x1, y1,
+                x);
+    }
+    else
+    {
+        sys_vgui(".x%lx.c delete select%lx\n", glist_getcanvas(glist), x);
+    }
+}
+
 static void scalar_select(t_gobj *z, t_glist *owner, int state)
 {
     t_scalar *x = (t_scalar *)z;
-    t_symbol *templatesym = x->sc_template;
     t_template *tmpl;
+    t_symbol *templatesym = x->sc_template;
     t_atom at;
     t_gpointer gp;
     gpointer_init(&gp);
     gpointer_setglist(&gp, owner, x);
     SETPOINTER(&at, &gp);
-    if (state)
-    {
-        int x1, y1, x2, y2;
-        if (tmpl = template_findbyname(templatesym))
-            template_notify(tmpl, gensym("select"), 1, &at);
-        gpointer_unset(&gp);
-        
-        scalar_getrect(z, owner, &x1, &y1, &x2, &y2);
-        x1--; x2++; y1--; y2++;
-        sys_vgui(".x%lx.c create line %d %d %d %d %d %d %d %d %d %d \
-            -width 0 -fill blue -tags select%lx\n",
-                glist_getcanvas(owner), x1, y1, x1, y2, x2, y2, x2, y1, x1, y1,
-                x);
-    }
-    else
-    {
-        sys_vgui(".x%lx.c delete select%lx\n", glist_getcanvas(owner), x);
-        if (tmpl = template_findbyname(templatesym))
-            template_notify(tmpl, gensym("deselect"), 1, &at);
-        
-    }
+    if (tmpl = template_findbyname(templatesym))
+        template_notify(tmpl, (state ? gensym("select") : gensym("deselect")),
+            1, &at);
+    gpointer_unset(&gp);
+    scalar_drawselectrect(x, owner, state);
 }
 
 static void scalar_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -234,6 +237,8 @@ static void scalar_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     t_symbol *templatesym = x->sc_template;
     t_template *template = template_findbyname(templatesym);
     t_symbol *zz;
+    t_atom at[3];
+    t_gpointer gp;
     int xonset, yonset, xtype, ytype, gotx, goty;
     if (!template)
     {
@@ -252,12 +257,13 @@ static void scalar_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     if (goty)
         *(t_float *)(((char *)(x->sc_vec)) + yonset) +=
             dy * (glist_pixelstoy(glist, 1) - glist_pixelstoy(glist, 0));
+    gpointer_init(&gp);
+    gpointer_setglist(&gp, glist, x);
+    SETPOINTER(&at[0], &gp);
+    SETFLOAT(&at[1], (float)dx);
+    SETFLOAT(&at[2], (float)dy);
+    template_notify(template, gensym("displace"), 2, at);
     scalar_redraw(x, glist);
-    if (glist_isselected(glist, z))
-    {
-        scalar_select(z, glist, 0);
-        scalar_select(z, glist, 1);
-    }
 }
 
 static void scalar_activate(t_gobj *z, t_glist *owner, int state)
@@ -298,6 +304,11 @@ static void scalar_vis(t_gobj *z, t_glist *owner, int vis)
         t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
         if (!wb) continue;
         (*wb->w_parentvisfn)(y, owner, x->sc_vec, template, basex, basey, vis);
+    }
+    if (glist_isselected(owner, &x->sc_gobj))
+    {
+        scalar_drawselectrect(x, owner, 0);
+        scalar_drawselectrect(x, owner, 1);
     }
     sys_unqueuegui(x);
 }

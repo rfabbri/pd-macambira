@@ -119,7 +119,7 @@ gui: ..\bin\pdtcl.dll
 
 s_entry_com.obj: s_entry.c
 	copy s_entry.c s_entry_com.c
-	cl /c s_entry_com.c 
+	cl /c -DCOMMANDVERSION s_entry_com.c 
 	del s_entry_com.c
 
 ..\bin\pd.com: s_entry_com.obj ..\bin\pd.lib

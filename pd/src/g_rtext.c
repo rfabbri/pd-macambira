@@ -439,7 +439,10 @@ void rtext_key(t_rtext *x, int keynum, t_symbol *keysym)
         x->x_buf = resizebytes(x->x_buf, x->x_bufsize, newsize);
         x->x_bufsize = newsize;
 
-        if (n == '\n' || isprint(n))
+/* at Guenter's suggestion, use 'n>31' to test wither a character might
+be printable in whatever 8-bit character set we find ourselves. */
+
+        if (n == '\n' || n > 31)
         {
             newsize = x->x_bufsize+1;
             x->x_buf = resizebytes(x->x_buf, x->x_bufsize, newsize);

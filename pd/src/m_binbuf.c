@@ -388,7 +388,7 @@ void binbuf_restore(t_binbuf *x, int argc, t_atom *argv)
 }
 
 
-#define MSTACKSIZE 2048
+#define MSTACKSIZE 10000 /* FIXME -- make this grow as needed */
 
 void binbuf_print(t_binbuf *x)
 {

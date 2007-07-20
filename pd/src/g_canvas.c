@@ -1048,12 +1048,12 @@ void canvas_loadbang(t_canvas *x)
     or something.  Anyway, we just add the 2 pixels back here; seems we
     have to do this for linux but not MSW; not sure about MacOS. */
 
-#ifdef MSW
-#define HORIZBORDER 0
-#define VERTBORDER 0
-#else
+#ifdef __unix__
 #define HORIZBORDER 2
 #define VERTBORDER 2
+#else
+#define HORIZBORDER 4
+#define VERTBORDER 4
 #endif
 
 static void canvas_relocate(t_canvas *x, t_symbol *canvasgeom,

@@ -1129,7 +1129,8 @@ static void curve_vis(t_gobj *z, t_glist *glist,
     int i, n = x->x_npoints;
     t_fielddesc *f = x->x_vec;
     
-    if (!fielddesc_getfloat(&x->x_vis, template, data, 0))
+        /* see comment in plot_vis() */
+    if (vis && !fielddesc_getfloat(&x->x_vis, template, data, 0))
         return;
     if (vis)
     {
@@ -1269,7 +1270,7 @@ static int curve_click(t_gobj *z, t_glist *glist,
             bestn = i;
         }
     }
-    if (besterror > 10)
+    if (besterror > 6)
         return (0);
     if (doit)
     {
@@ -1656,11 +1657,19 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     int nelem;
     char *elem;
     t_fielddesc *xfielddesc, *yfielddesc, *wfielddesc;
-    
+        /* even if the array is "invisible", if its visibility is
+        set by an instance variable you have to explicitly erase it,
+        because the flag could earlier have been on when we were getting
+        drawn.  Rather than look to try to find out whether we're
+        visible we just do the erasure.  At the TK level this should
+        cause no action because the tag matches nobody.  LATER we
+        might want to optimize this somehow.  Ditto the "vis()" routines
+        for other drawing instructions. */
+        
     if (plot_readownertemplate(x, data, template, 
         &elemtemplatesym, &array, &linewidth, &xloc, &xinc, &yloc, &style,
         &vis, &scalarvis, &xfielddesc, &yfielddesc, &wfielddesc) ||
-            ((vis == 0) && tovis) /* FIXME - why is 'tovis' flag necessary? */
+            ((vis == 0) && tovis) /* see above for 'tovis' */
             || array_getfields(elemtemplatesym, &elemtemplatecanvas,
                 &elemtemplate, &elemsize, xfielddesc, yfielddesc, wfielddesc,
                 &xonset, &yonset, &wonset))
@@ -2108,7 +2117,8 @@ static void drawnumber_vis(t_gobj *z, t_glist *glist,
 {
     t_drawnumber *x = (t_drawnumber *)z;
     
-    if (!fielddesc_getfloat(&x->x_vis, template, data, 0))
+        /* see comment in plot_vis() */
+    if (vis && !fielddesc_getfloat(&x->x_vis, template, data, 0))
         return;
     if (vis)
     {

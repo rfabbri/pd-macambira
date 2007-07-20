@@ -1,4 +1,4 @@
-#N canvas 155 0 693 923 12;
+#N canvas 14 5 569 440 12;
 #X declare;
 #X obj 24 150 bang;
 #X text 124 150 - output a bang message;
@@ -295,8 +295,6 @@ to a note-on;
 #X obj 18 4338 append;
 #X text 118 4338 - add an element to a list;
 #X obj 18 4368 sublist;
-#X text 118 4368 - get a pointer into a list which is an element of
-another scalar;
 #X obj 14 4449 scalar;
 #X text 104 4448 - draw a scalar on parent;
 #X obj 15 4479 scope~;
@@ -360,3 +358,4 @@ included in this list are messages \, atoms \, graphs \, etc. which
 aren't typed into object boxes but come straight off the "add" menu.)
 Right-click (or double-click on a Macintosh) on any object to get its
 "help window".;
+#X text 118 4368 - get a pointer into a list within a scalar;

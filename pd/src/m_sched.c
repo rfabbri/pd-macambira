@@ -396,7 +396,7 @@ int m_scheduler( void)
 #endif
 
     sys_clearhist();
-    if (sys_sleepgrain < 1000)
+    if (sys_sleepgrain < 100)
         sys_sleepgrain = sys_schedadvance/4;
     if (sys_sleepgrain < 100)
         sys_sleepgrain = 100;

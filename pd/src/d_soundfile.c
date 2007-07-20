@@ -30,6 +30,10 @@ objects use Posix-like threads.  */
 #ifdef _LARGEFILE64_SOURCE
 # define open open64
 # define lseek lseek64
+#define off_t __off64_t
+#endif
+#ifdef MSW
+#define off_t long
 #endif
 
 /***************** soundfile header structures ************************/
@@ -369,7 +373,8 @@ int open_soundfile_via_fd(int fd, int headersize,
         }
     }
         /* seek past header and any sample frames to skip */
-    sysrtn = lseek(fd, nchannels * bytespersamp * skipframes + headersize, 0);
+    sysrtn = lseek(fd,
+        ((off_t)nchannels) * bytespersamp * skipframes + headersize, 0);
     if (sysrtn != nchannels * bytespersamp * skipframes + headersize)
         return (-1);
      bytelimit -= nchannels * bytespersamp * skipframes;
@@ -958,7 +963,6 @@ static t_soundfiler *soundfiler_new(void)
     usage: read [flags] filename table ...
     flags:
         -skip <frames> ... frames to skip in file
-        -nframes <frames>
         -onset <frames> ... onset in table to read into (NOT DONE YET)
         -raw <headersize channels bytes endian>
         -resize
@@ -970,7 +974,7 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
 {
     int headersize = -1, channels = 0, bytespersamp = 0, bigendian = 0,
         resize = 0, i, j;
-    long skipframes = 0, nframes = 0, finalsize = 0, itemsleft,
+    long skipframes = 0, finalsize = 0, itemsleft,
         maxsize = DEFMAXSIZE, itemsread = 0, bytelimit  = 0x7fffffff;
     int fd = -1;
     char endianness, *filename;
@@ -987,13 +991,6 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s,
         {
             if (argc < 2 || argv[1].a_type != A_FLOAT ||
                 ((skipframes = argv[1].a_w.w_float) < 0))
-                    goto usage;
-            argc -= 2; argv += 2;
-        }
-        else if (!strcmp(flag, "nframes"))
-        {
-            if (argc < 2 || argv[1].a_type != A_FLOAT ||
-                ((nframes = argv[1].a_w.w_float) < 0))
                     goto usage;
             argc -= 2; argv += 2;
         }

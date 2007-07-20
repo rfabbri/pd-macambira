@@ -212,6 +212,7 @@ set untitled_number 1
 set untitled_directory [pwd]
 set saveas_client doggy
 set pd_opendir $untitled_directory
+set pd_savedir $untitled_directory
 set pd_undoaction no
 set pd_redoaction no
 set pd_undocanvas no
@@ -3414,8 +3415,7 @@ proc pdtk_openpanel {target localdir} {
     if {$localdir == ""} {
       set localdir $pd_opendir
     }
-    set filename [tk_getOpenFile \
-        -initialdir $localdir]
+    set filename [tk_getOpenFile -initialdir $localdir]
     if {$filename != ""} {
         set directory [string range $filename 0 \
             [expr [string last / $filename ] - 1]]
@@ -3426,11 +3426,11 @@ proc pdtk_openpanel {target localdir} {
 }
 
 proc pdtk_savepanel {target localdir} {
+    global pd_savedir
     if {$localdir == ""} {
-    	set filename [tk_getSaveFile]
-    } else {
-    	set filename [tk_getSaveFile -initialdir $localdir]
+      set localdir $pd_savedir
     }
+    set filename [tk_getSaveFile -initialdir $localdir]
     if {$filename != ""} {
         pd [concat $target callback [pdtk_enquote $filename] \;]
     }

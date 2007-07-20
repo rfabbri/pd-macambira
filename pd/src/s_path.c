@@ -30,6 +30,13 @@
 #include <fcntl.h>
 #include <ctype.h>
 
+#ifdef _LARGEFILE64_SOURCE
+# define open  open64
+# define lseek lseek64
+# define fstat fstat64
+# define stat  stat64
+#endif
+
 t_namelist *sys_externlist;
 t_namelist *sys_searchpath;
 t_namelist *sys_helppath;

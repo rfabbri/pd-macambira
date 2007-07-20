@@ -67,6 +67,15 @@ static void clip_setup(void)
 #define DUMTAB1SIZE 256
 #define DUMTAB2SIZE 1024
 
+#ifdef MSW
+#define int32 long
+#endif
+
+#if defined(__unix__) || defined(__APPLE__)
+#include <sys/types.h>
+#define int32 int32_t
+#endif
+
 static float rsqrt_exptab[DUMTAB1SIZE], rsqrt_mantissatab[DUMTAB2SIZE];
 
 static void init_rsqrt(void)
@@ -75,8 +84,8 @@ static void init_rsqrt(void)
     for (i = 0; i < DUMTAB1SIZE; i++)
     {
         float f;
-        long l = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
-        *(long *)(&f) = l;
+        int32 l = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
+        *(int32 *)(&f) = l;
         rsqrt_exptab[i] = 1./sqrt(f);   
     }
     for (i = 0; i < DUMTAB2SIZE; i++)

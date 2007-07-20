@@ -3,7 +3,11 @@ that externs can link back to functions defined in pd. */
 
 int sys_main(int argc, char **argv);
 
-#ifdef MSW
+/* 
+ * gcc does not support the __try stuff, only MSVC.  Also, MinGW allows you to
+ * use main() instead of WinMain(). <hans@at.or.at>
+ */
+#if defined(_MSC_VER) && !defined(COMMANDVERSION)
 #include <windows.h>
 #include <stdio.h>
 
@@ -21,11 +25,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
     }
 }
 
-#else /* not MSW */
+#else /* not _MSC_VER ... */
 int main(int argc, char **argv)
 {
     return (sys_main(argc, argv));
 }
-#endif
+#endif /* _MSC_VER */
 
 

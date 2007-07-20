@@ -145,7 +145,7 @@ static int alsaio_setup(t_alsa_dev *dev, int out, int *channels, int *rate,
         hw_params, &tmp_uint);
     check_error(err, "snd_pcm_hw_params_set_channels");
     if (tmp_uint != (unsigned)*channels)
-        post("ALSA: set input channels to %d", tmp_uint);
+        post("ALSA: set %s channels to %d", (out?"output":"input"), tmp_uint);
     *channels = tmp_uint;
     dev->a_channels = *channels;
 
@@ -158,10 +158,8 @@ static int alsaio_setup(t_alsa_dev *dev, int out, int *channels, int *rate,
     post("input sample rate %d", err);
 #endif
 
-        /* set the period - ie frag size */
-        /* LATER try this to get a recommended period size...
-         right now, it trips an assertion failure in ALSA lib */
-
+    /* post("frag size %d, nfrags %d", frag_size, nfrags); */
+        /* set "period size" */
 #ifdef ALSAAPI9
     err = snd_pcm_hw_params_set_period_size_near(dev->a_handle,
         hw_params, (snd_pcm_uframes_t)frag_size, 0);
@@ -171,17 +169,6 @@ static int alsaio_setup(t_alsa_dev *dev, int out, int *channels, int *rate,
         hw_params, &tmp_snd_pcm_uframes, 0);
 #endif
     check_error(err, "snd_pcm_hw_params_set_period_size_near (input)");
-    
-        /* set the number of periods - ie numfrags */
-#ifdef ALSAAPI9
-    err = snd_pcm_hw_params_set_periods_near(dev->a_handle,
-        hw_params, nfrags, 0);
-#else
-    tmp_uint = nfrags;
-    err = snd_pcm_hw_params_set_periods_near(dev->a_handle,
-        hw_params, &tmp_uint, 0);
-#endif
-    check_error(err, "snd_pcm_hw_params_set_periods_near (input)");
 
         /* set the buffer size */
 #ifdef ALSAAPI9
@@ -429,7 +416,6 @@ int alsa_send_dacs(void)
         if (snd_pcm_status_get_avail(alsa_status) < transfersize)
             return SENDDACS_NO;
     }
-
     /* do output */
     for (iodev = 0, fp1 = sys_soundout, ch = 0; iodev < alsa_noutdev; iodev++)
     {

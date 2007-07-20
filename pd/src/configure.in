@@ -20,6 +20,7 @@ AC_SUBST(GUINAME)
 AC_SUBST(GUIFLAGS)
 AC_SUBST(OSNUMBER)
 AC_SUBST(EXTERNTARGET)
+AC_SUBST(ASIOSRC)
 
 dnl other defaults
 
@@ -80,7 +81,10 @@ AC_CHECK_LIB(m, sin,PDLIB="$PDLIB -lm",
 
 dnl Checking for `pthread_create' function in -pthread
 AC_CHECK_LIB(pthread, pthread_create,PDLIB="$PDLIB -lpthread",
-         echo "pthreads required" || exit 1)
+    AC_CHECK_LIB(pthreadGC2, pthread_create, PDLIB="$PDLIB -lpthreadGC2",
+        AC_CHECK_LIB(pthreadGC1, pthread_create, PDLIB="$PDLIB -lpthreadGC1",
+            AC_CHECK_LIB(pthreadGC, pthread_create, PDLIB="$PDLIB -lpthreadGC",
+         echo "pthreads required"; exit 1))))
 
 dnl Check for fftw package
 if test x$fftw == "xyes";
@@ -118,6 +122,11 @@ then
 fi
 if test $foundit == "no";
 then
+    AC_CHECK_HEADER(tcl8.4/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.4";foundit=yes,)
+fi
+if test $foundit == "no";
+then
     AC_CHECK_HEADER(tcl8.3/tcl.h,
     	GUIFLAGS="$GUIFLAGS -I/usr/include/tcl8.3";foundit=yes,)
 fi
@@ -129,27 +138,30 @@ fi
 if test $foundit == "no";
 then
     echo no tcl header found
-    exit -1
+	 echo bolding trying without...
+#    exit -1
 fi
 
-AC_CHECK_LIB(tcl8.7, main,,
-    AC_CHECK_LIB(tcl8.6, main,,
+AC_CHECK_LIB(tcl85, main,,
 	AC_CHECK_LIB(tcl8.5, main,,
+        AC_CHECK_LIB(tcl84, main,,
 	    AC_CHECK_LIB(tcl8.4, main,,
 		AC_CHECK_LIB(tcl8.3, main,,
 		    AC_CHECK_LIB(tcl8.2, main,,
-        		AC_CHECK_LIB(tcl8.0, main,,echo no tcl library found || exit 1)))))))
+        		            AC_CHECK_LIB(tcl8.0, main,,
+                            echo no tcl library found; exit 1)))))))
 
-AC_CHECK_LIB(tk8.7, main,,
-    AC_CHECK_LIB(tk8.6, main,,
+AC_CHECK_LIB(tk85, main,,
 	AC_CHECK_LIB(tk8.5, main,,
+       AC_CHECK_LIB(tk84, main,,
 	    AC_CHECK_LIB(tk8.4, main,,
 		AC_CHECK_LIB(tk8.3, main,,
 		    AC_CHECK_LIB(tk8.2, main,,
-        		AC_CHECK_LIB(tk8.0, main,,echo no tk library found || exit 1)))))))
+        		            AC_CHECK_LIB(tk8.0, main,,
+                            echo no tk library found; exit 1)))))))
 
 
-if test `uname -s` = Linux;
+if test `uname -s` == Linux;
 then
     dnl Ckecking for ALSA
     echo .................... alsa= $alsa
@@ -238,7 +250,7 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
 
 fi
 
-if test `uname -s` = Darwin;
+if test `uname -s` == Darwin;
 then
     LDFLAGS="-Wl -framework CoreAudio \
         -framework AudioUnit -framework AudioToolbox \
@@ -314,6 +326,39 @@ then
     then
         LDFLAGS=$LDFLAGS" -weak_framework Jack"
     fi
+fi
+
+# only Windows uses ASIO, for the rest, set to blank
+ASIOSRC=
+
+if test `uname -s` == MINGW32_NT-5.0;
+then
+    EXT=dll
+    MORECFLAGS="-DUSEAPI_PORTAUDIO -DPA19 -DMSW -DPA_NO_DS -DPD_INTERNAL \
+        -I../portaudio/pa_common -I../portaudio/pablio \
+        -mwindows -mms-bitfields "$MORECFLAGS
+    PDLIB=$PDLIB" -lwsock32 -lwinmm -lole32 -lstdc++"
+
+    SYSSRC="s_audio_pa.c s_audio_pablio.c s_audio_paring.c \
+        s_audio_mmio.c s_midi_mmio.c \
+        ../portaudio/pa_common/pa_allocation.c  \
+        ../portaudio/pa_common/pa_converters.c  \
+        ../portaudio/pa_common/pa_cpuload.c     \
+        ../portaudio/pa_common/pa_dither.c      \
+        ../portaudio/pa_common/pa_front.c       \
+        ../portaudio/pa_common/pa_process.c     \
+        ../portaudio/pa_common/pa_skeleton.c    \
+        ../portaudio/pa_common/pa_stream.c      \
+        ../portaudio/pa_common/pa_trace.c       \
+        ../portaudio/pa_win/pa_win_util.c       \
+        ../portaudio/pa_win/pa_win_hostapis.c   \
+        ../portaudio/pa_win_wmme/pa_win_wmme.c"
+	 ASIOSRC="../portaudio/pa_asio/iasiothiscallresolver.cpp \
+	 ../portaudio/pa_asio/pa_asio.cpp ../asio/asio.cpp \
+	 ../asio/asiodrivers.cpp ../asio/asiolist.cpp"
+    STRIPFLAG="--strip-unneeded"
+    GUINAME="pdtcl.dll"
+    GUIFLAGS=
 fi
 
 # support for jack, on either linux or darwin:

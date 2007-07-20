@@ -23,16 +23,19 @@ that didn't really belong anywhere. */
 #ifdef HAVE_BSTRING_H
 #include <bstring.h>
 #endif
-#ifdef MSW
+#ifdef _WIN32
 #include <io.h>
 #include <fcntl.h>
 #include <process.h>
 #include <winsock.h>
 #include <windows.h>
+# ifdef _MSC_VER
 typedef int pid_t;
+# endif
 typedef int socklen_t;
 #define EADDRINUSE WSAEADDRINUSE
 #endif
+
 #include <stdarg.h>
 #include <signal.h>
 #include <fcntl.h>
@@ -150,13 +153,15 @@ double sys_getrealtime(void)
 #endif
 }
 
+extern int sys_nosleep;
+
 static int sys_domicrosleep(int microsec, int pollem)
 {
     struct timeval timout;
     int i, didsomething = 0;
     t_fdpoll *fp;
     timout.tv_sec = 0;
-    timout.tv_usec = microsec;
+    timout.tv_usec = (sys_nosleep ? 0 : microsec);
     if (pollem)
     {
         fd_set readset, writeset, exceptset;
@@ -1153,8 +1158,8 @@ int sys_startgui(const char *guidir)
             to make it timeshare with the rest of the system.  (Version
             0.33P2 : if there's no GUI, the watchdog pinging is done
             from the scheduler idle routine in this process instead.) */
-
         int pipe9[2], watchpid;
+
         if (pipe(pipe9) < 0)
         {
             seteuid(getuid());      /* lose setuid priveliges */

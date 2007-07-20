@@ -1,5 +1,5 @@
 /*
- * $Id: ringbuffer.c,v 1.17 2007-01-20 04:06:06 millerpuckette Exp $
+ * $Id: ringbuffer.c,v 1.18 2007-07-20 03:25:20 millerpuckette Exp $
  * ringbuffer.c
  * Ring Buffer utility..
  *

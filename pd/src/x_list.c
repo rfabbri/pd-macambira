@@ -50,6 +50,7 @@ typedef struct _alist
 {
     t_pd l_pd;          /* object to point inlets to */
     int l_n;            /* number of items */
+    int l_npointer;     /* number of pointers */
     t_listelem *l_vec;  /* pointer to items */
 } t_alist;
 
@@ -95,7 +96,7 @@ t_class *alist_class;
 static void alist_init(t_alist *x)
 {
     x->l_pd = alist_class;
-    x->l_n = 0;
+    x->l_n = x->l_npointer = 0;
     x->l_vec = 0;
 }
 
@@ -122,11 +123,16 @@ static void alist_list(t_alist *x, t_symbol *s, int argc, t_atom *argv)
         return;
     }
     x->l_n = argc;
+    x->l_npointer = 0;
     for (i = 0; i < argc; i++)
     {
         x->l_vec[i].l_a = argv[i];
         if (x->l_vec[i].l_a.a_type == A_POINTER)
+        {
+            x->l_npointer++;
             gpointer_copy(x->l_vec[i].l_a.a_w.w_gpointer, &x->l_vec[i].l_p);
+            x->l_vec[i].l_a.a_w.w_gpointer = &x->l_vec[i].l_p;
+        }
     }
 }
 
@@ -141,12 +147,17 @@ static void alist_anything(t_alist *x, t_symbol *s, int argc, t_atom *argv)
         return;
     }
     x->l_n = argc+1;
+    x->l_npointer = 0;
     SETSYMBOL(&x->l_vec[0].l_a, s);
     for (i = 0; i < argc; i++)
     {
         x->l_vec[i+1].l_a = argv[i];
         if (x->l_vec[i+1].l_a.a_type == A_POINTER)
+        {
+            x->l_npointer++;            
             gpointer_copy(x->l_vec[i+1].l_a.a_w.w_gpointer, &x->l_vec[i+1].l_p);
+            x->l_vec[i].l_a.a_w.w_gpointer = &x->l_vec[i].l_p;
+        }
     }
 }
 
@@ -155,6 +166,29 @@ static void alist_toatoms(t_alist *x, t_atom *to)
     int i;
     for (i = 0; i < x->l_n; i++)
         to[i] = x->l_vec[i].l_a;
+}
+
+
+static void alist_clone(t_alist *x, t_alist *y)
+{
+    int i;
+    y->l_pd = alist_class;
+    y->l_n = x->l_n;
+    y->l_npointer = x->l_npointer;
+    if (!(y->l_vec = (t_listelem *)getbytes(y->l_n * sizeof(*y->l_vec))))
+    {
+        y->l_n = 0;
+        error("list_alloc: out of memory");
+    }
+    else for (i = 0; i < x->l_n; i++)
+    {
+        y->l_vec[i].l_a = x->l_vec[i].l_a;
+        if (y->l_vec[i].l_a.a_type == A_POINTER)
+        {
+            gpointer_copy(y->l_vec[i].l_a.a_w.w_gpointer, &y->l_vec[i].l_p);
+            y->l_vec[i].l_a.a_w.w_gpointer = &y->l_vec[i].l_p;
+        }
+    }
 }
 
 static void alist_setup(void)
@@ -192,8 +226,19 @@ static void list_append_list(t_list_append *x, t_symbol *s,
     int n, outc = x->x_alist.l_n + argc;
     ATOMS_ALLOCA(outv, outc);
     atoms_copy(argc, argv, outv);
-    alist_toatoms(&x->x_alist, outv+argc);
-    outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+    if (x->x_alist.l_npointer)
+    {
+        t_alist y;
+        alist_clone(&x->x_alist, &y);
+        alist_toatoms(&y, outv+argc);
+        outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+        alist_clear(&y);
+    }
+    else
+    {
+        alist_toatoms(&x->x_alist, outv+argc);
+        outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+    }
     ATOMS_FREEA(outv, outc);
 }
 
@@ -205,8 +250,19 @@ static void list_append_anything(t_list_append *x, t_symbol *s,
     ATOMS_ALLOCA(outv, outc);
     SETSYMBOL(outv, s);
     atoms_copy(argc, argv, outv + 1);
-    alist_toatoms(&x->x_alist, outv + 1 + argc);
-    outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+    if (x->x_alist.l_npointer)
+    {
+        t_alist y;
+        alist_clone(&x->x_alist, &y);
+        alist_toatoms(&y, outv + 1 + argc);
+        outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+        alist_clear(&y);
+    }
+    else
+    {
+        alist_toatoms(&x->x_alist, outv + 1 + argc);
+        outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+    }
     ATOMS_FREEA(outv, outc);
 }
 
@@ -251,11 +307,24 @@ static void list_prepend_list(t_list_prepend *x, t_symbol *s,
     t_atom *outv;
     int n, outc = x->x_alist.l_n + argc;
     ATOMS_ALLOCA(outv, outc);
-    alist_toatoms(&x->x_alist, outv);
     atoms_copy(argc, argv, outv + x->x_alist.l_n);
-    outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+    if (x->x_alist.l_npointer)
+    {
+        t_alist y;
+        alist_clone(&x->x_alist, &y);
+        alist_toatoms(&y, outv);
+        outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+        alist_clear(&y);
+    }
+    else
+    {
+        alist_toatoms(&x->x_alist, outv);
+        outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+    }
     ATOMS_FREEA(outv, outc);
 }
+
+
 
 static void list_prepend_anything(t_list_prepend *x, t_symbol *s,
     int argc, t_atom *argv)
@@ -263,10 +332,21 @@ static void list_prepend_anything(t_list_prepend *x, t_symbol *s,
     t_atom *outv;
     int n, outc = x->x_alist.l_n + argc + 1;
     ATOMS_ALLOCA(outv, outc);
-    alist_toatoms(&x->x_alist, outv);
     SETSYMBOL(outv + x->x_alist.l_n, s);
     atoms_copy(argc, argv, outv + x->x_alist.l_n + 1);
-    outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+    if (x->x_alist.l_npointer)
+    {
+        t_alist y;
+        alist_clone(&x->x_alist, &y);
+        alist_toatoms(&y, outv);
+        outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+        alist_clear(&y);
+    }
+    else
+    {
+        alist_toatoms(&x->x_alist, outv);
+        outlet_list(x->x_obj.ob_outlet, &s_list, outc, outv);
+    }
     ATOMS_FREEA(outv, outc);
 }
 
