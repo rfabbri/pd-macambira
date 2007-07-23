@@ -1914,6 +1914,7 @@ pidip_install: pidip
 #		--author "Yves Degoyon" \
 #		--description "PiDiP is Definitely in Pieces" \
 #		--license "GNU GPLv2"
+	install -d $(objectsdir)
 	install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)
 	install -d $(helpdir)
 	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)
