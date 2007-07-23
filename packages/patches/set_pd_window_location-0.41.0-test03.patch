@@ -1,0 +1,16 @@
+Index: u_main.tk
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
+retrieving revision 1.17.2.20
+diff -u -w -r1.17.2.20 u_main.tk
+--- u_main.tk	11 Jul 2007 21:55:45 -0000	1.17.2.20
++++ u_main.tk	23 Jul 2007 20:42:21 -0000
+@@ -225,6 +225,8 @@
+ pdtk_standardkeybindings .
+ 
+ wm title . "Pd"
++# initial location of Pd window (+x+y)
++wm geometry . +20+70
+ . configure -menu .mbar -width 200 -height 150
+ 
+ ############### set up global variables ################################
