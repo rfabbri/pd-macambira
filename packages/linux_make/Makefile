@@ -74,8 +74,11 @@ DEB_PD_VERSION := $(shell echo $(PD_VERSION) | sed 's|\(.*\)-extended-\(.*\)|\1c
 deb: $(bindir)
 # GNOME menu support
 	install -d $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
-	install -p $(packages_src)/linux_make/pd.png \
+	install -p -m0644 $(packages_src)/linux_make/pd.png \
 		$(DESTDIR)/usr/share/icons/hicolor/128x128/apps/
+	install -d $(DESTDIR)/usr/share/pixmaps
+	install -p -m0644 $(packages_src)/linux_make/pd-48x48.png \
+		$(DESTDIR)/usr/share/pixmaps/pd.png
 	install -d $(DESTDIR)/usr/share/applications/ 
 	install -p $(packages_src)/linux_make/pd-extended.desktop \
 		$(DESTDIR)/usr/share/applications/
