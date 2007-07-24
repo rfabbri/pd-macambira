@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: convert pd messages to strings
  *
- * Copyright (c) 2004 Bryan Jurish.
+ * Copyright (c) 2004 - 2007 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file "COPYING", in this distribution.
@@ -37,7 +37,7 @@
 /*--------------------------------------------------------------------
  * DEBUG
  *--------------------------------------------------------------------*/
-//#define ANY2STRING_DEBUG 1
+#define ANY2STRING_DEBUG 1
 
 #ifdef ANY2STRING_DEBUG
 # define A2SDEBUG(x) x
@@ -78,7 +78,7 @@ typedef struct _any2string
 static void any2string_anything(t_any2string *x, t_symbol *sel, int argc, t_atom *argv)
 {
   t_atom *a;
-  char *text, *s;
+  char *text=NULL, *s, *s_max;
   int len;
 
   A2SDEBUG(post("-------any2string_anything()---------"));
@@ -88,12 +88,13 @@ static void any2string_anything(t_any2string *x, t_symbol *sel, int argc, t_atom
   binbuf_clear(x->x_binbuf);
   A2SDEBUG(post("any2string: binbuf_add()"));
   binbuf_add(x->x_binbuf, argc, argv);
+  A2SDEBUG(startpost("any2string: binbuf_print: "));
   A2SDEBUG(binbuf_print(x->x_binbuf));
 
   A2SDEBUG(post("any2string: binbuf_gettext()"));
   binbuf_gettext(x->x_binbuf, &text, &len);
   A2SDEBUG(post("any2string: binbuf_gettext() = \"%s\" ; len=%d", text, len));
-  text[len] = 0;
+  /*text[len] = 0;*/ /*-- ? avoid errors: free(): invalid next size(fast): [HEX_ADDRESS] */
 
   /*-- get string length --*/
   x->x_argc = len+1;
@@ -111,7 +112,7 @@ static void any2string_anything(t_any2string *x, t_symbol *sel, int argc, t_atom
     x->x_alloc = x->x_argc;
   }
 
-  /*-- add selector --*/
+  /*-- add selector (maybe) --*/
   a=x->x_argv;
   if (sel != &s_float && sel != &s_list && sel != &s_) {
     A2SDEBUG(post("any2string: for {...} //sel"));
@@ -129,7 +130,8 @@ static void any2string_anything(t_any2string *x, t_symbol *sel, int argc, t_atom
 
   /*-- add binbuf text --*/
   A2SDEBUG(post("any2string: for {...}"));
-  for (s=text; *s; s++, a++) {
+  s_max = text+len;
+  for (s=text; s < s_max; s++, a++) {
     A2SDEBUG(post("any2string: for: //SETFLOAT(a,'%c'=%d)", *s, *s));
     SETFLOAT(a,*s);
   }
@@ -139,7 +141,7 @@ static void any2string_anything(t_any2string *x, t_symbol *sel, int argc, t_atom
   SETFLOAT(a,0);
 
   A2SDEBUG(post("any2string: freebytes()"));
-  freebytes(text, strlen(text));
+  freebytes(text, len);
 
   /*
     A2SDEBUG(post("any2string: binbuf_free()"));

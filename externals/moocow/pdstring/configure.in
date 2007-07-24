@@ -4,7 +4,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [pdstring])
-define([THE_PACKAGE_VERSION], [0.03])
+define([THE_PACKAGE_VERSION], [0.04])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -146,7 +146,8 @@ then
   LFLAGS="-export_dynamic -shared"
   if test "$DEBUG" == "no"; then
     #OFLAGS="-O6 -funroll-loops -fomit-frame-pointer -finline-limit-10000000"
-    OFLAGS="-O6 -funroll-loops -fomit-frame-pointer"
+    #OFLAGS="-O2 -funroll-loops -fomit-frame-pointer"
+    OFLAGS="-O2"
   else
     OFLAGS="-g"
   fi
