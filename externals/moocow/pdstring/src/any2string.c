@@ -37,7 +37,7 @@
 /*--------------------------------------------------------------------
  * DEBUG
  *--------------------------------------------------------------------*/
-#define ANY2STRING_DEBUG 1
+/*#define ANY2STRING_DEBUG 1*/
 
 #ifdef ANY2STRING_DEBUG
 # define A2SDEBUG(x) x
