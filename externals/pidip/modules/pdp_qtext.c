@@ -37,7 +37,8 @@
 #include <Imlib2.h>  // imlib2 is required
 
 #define DEFAULT_CAPACITY 10
-#define DEFAULT_FONT "helmetr/16"
+
+#define DEFAULT_FONT "Vera/16"
 
 #define PIDIP_TEXT_MODE_STATIC 0
 #define PIDIP_TEXT_MODE_SCROLL 1
@@ -1071,12 +1072,20 @@ void pdp_qtext_setup(void)
     class_addmethod(pdp_qtext_class, (t_method)pdp_qtext_direction, gensym("direction"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_qtext_class, (t_method)pdp_qtext_mode, gensym("layermode"),  A_SYMBOL, A_NULL);
 
-
     imlib_add_path_to_font_path("/usr/X11R6/lib/X11/fonts/TTF");
+#ifdef __APPLE__
+    imlib_add_path_to_font_path("/System/Library/Fonts");
+    imlib_add_path_to_font_path("/Library/Fonts");
+    imlib_add_path_to_font_path("/sw/share/imlib2/data/fonts");
+    imlib_add_path_to_font_path("/sw/lib/X11/fonts/msttf");
+#else
+    imlib_add_path_to_font_path("/var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType");
+#endif
     font = imlib_load_font(DEFAULT_FONT);
     if ( !font )
     {
        post( "pdp_qtext : severe error : could not load default font : no rendering !!!" );
+	   post( "pdp_text : try installing Bitstream Vera (http://www.gnome.org/fonts/)" );
     }
     imlib_context_set_font( font );
 }
