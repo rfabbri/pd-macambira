@@ -105,8 +105,7 @@ endif
 objectsdir = $(libpddir)/extra
 pddocdir = $(libpddir)/doc
 examplesdir = $(pddocdir)/examples
-#helpdir = $(pddocdir)/5.reference
-helpdir = $(libpddir)/extra
+helpdir = $(pddocdir)/5.reference
 manualsdir = $(pddocdir)/manuals
 readmesdir = $(manualsdir)/READMEs
 
