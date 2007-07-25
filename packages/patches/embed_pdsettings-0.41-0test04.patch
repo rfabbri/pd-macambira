@@ -1,0 +1,32 @@
+Index: s_file.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_file.c,v
+retrieving revision 1.8
+diff -u -w -r1.8 s_file.c
+--- s_file.c	15 Oct 2005 23:14:28 -0000	1.8
++++ s_file.c	25 Jul 2007 00:37:35 -0000
+@@ -42,10 +42,22 @@
+ {
+     char filenamebuf[MAXPDSTRING], *homedir = getenv("HOME");
+     int fd, length;
++	char user_prefs_file[MAXPDSTRING]; // user prefs file
++	char default_prefs_file[MAXPDSTRING]; // default prefs embedded in the package
++    struct stat statbuf;
+ 
+-    if (!homedir)
++
++	snprintf(default_prefs_file, MAXPDSTRING, "%s/default.pdsettings", 
++			 sys_libdir->s_name);
++//	fprintf(stderr,"default_prefs %s\n",default_prefs_file);
++    if (homedir)
++		snprintf(user_prefs_file, MAXPDSTRING, "%s/.pdsettings", homedir);
++	if (stat(user_prefs_file, &statbuf) == 0) 
++		strncpy(filenamebuf, user_prefs_file, MAXPDSTRING);
++	else if (stat(default_prefs_file, &statbuf) == 0)
++		strncpy(filenamebuf, default_prefs_file, MAXPDSTRING);
++	else
+         return;
+-    snprintf(filenamebuf, MAXPDSTRING, "%s/.pdsettings", homedir);
+     filenamebuf[MAXPDSTRING-1] = 0;
+     if ((fd = open(filenamebuf, 0)) < 0)
+     {
