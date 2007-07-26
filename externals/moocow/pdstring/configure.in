@@ -4,7 +4,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [pdstring])
-define([THE_PACKAGE_VERSION], [0.04])
+define([THE_PACKAGE_VERSION], [0.05])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -72,8 +72,31 @@ AC_CHECK_HEADERS([string.h],
 	[/* nonempty includes: compile only */])
 
 
-dnl PD externals
+##------- PD externals
+PD_LIB_EXTERNALS="pdstring"
+PD_OBJ_EXTERNALS="any2string string2any"
+
+AC_ARG_ENABLE(object-externals,
+	AC_HELP_STRING([--enable-object-externals], [Whether to build single-object externals (default=no)]),
+	[want_objext="$enableval"],
+	[want_objext="no"])
+AC_MSG_CHECKING([whether to build single-object externals])
+
+##-- always build lib
 PD_OBJECT_EXTERNALS="pdstring\$(EXEEXT)"
+
+if test "$want_objext" != "no" ; then
+  ##-- single-objects
+  AC_MSG_RESULT(yes)
+  for ext in $PD_OBJ_EXTERNALS ; do
+    PD_OBJECT_EXTERNALS="$PD_OBJECT_EXTERNALS ${ext}\$(EXEEXT)"
+  done
+  AC_DEFINE(PDSTRING_OBJECT_EXTERNALS,1,
+     [Define this if you are building single-object externals])
+else
+  ##-- libs
+  AC_MSG_RESULT(no)
+fi
 AC_SUBST(PD_OBJECT_EXTERNALS)
 
 
@@ -128,7 +151,7 @@ if test "$enable_debug" == "yes" ; then
   AC_DEFINE(ANY2STRING_DEBUG,1,
 	[Define this to include debugging code for the 'string2any' external.])
   AC_DEFINE(STRING2ANY_DEBUG,1,
-	[Define this to include debugging code for 'the any2string' external.])
+	[Define this to include debugging code for the 'any2string' external.])
 else
   AC_MSG_RESULT(no)
   DEBUG="no"

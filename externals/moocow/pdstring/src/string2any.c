@@ -28,6 +28,10 @@
 
 #include <m_pd.h>
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 /* black magic */
 #ifdef NT
 #pragma warning( disable : 4244 )
@@ -37,7 +41,8 @@
 /*--------------------------------------------------------------------
  * DEBUG
  *--------------------------------------------------------------------*/
-//#define STRING2ANY_DEBUG 1
+/*#define STRING2ANY_DEBUG 1*/
+/*#undef STRING2ANY_DEBUG*/
 
 #ifdef STRING2ANY_DEBUG
 # define S2ADEBUG(x) x
@@ -45,12 +50,13 @@
 # define S2ADEBUG(x)
 #endif
 
-#define STRING2ANY_INITIAL_BUFLEN 32
+#define STRING2ANY_DEFAULT_BUFLEN 256
 
 
 /*=====================================================================
  * Constants
  *=====================================================================*/
+static char *string2any_banner = "string2any: pdstring version " PACKAGE_VERSION " by Bryan Jurish";
 
 /*=====================================================================
  * Structures and Types: any2string
@@ -62,34 +68,33 @@ typedef struct _string2any
 {
   t_object       x_obj;
   size_t         x_size;
+  t_float        x_eos;   //-- eos character
   char          *x_text;
   t_binbuf      *x_binbuf;
+  t_inlet       *x_eos_in;
   t_outlet      *x_outlet;
+  t_outlet      *x_outlet_done;
 } t_string2any;
 
 
 /*=====================================================================
- * Constants
- *=====================================================================*/
-
-/*=====================================================================
- * Methods
+ * Utilities
  *=====================================================================*/
 
 /*--------------------------------------------------------------------
- * anything
+ * string2any_atoms()
  */
-static void string2any_anything(t_string2any *x, t_symbol *sel, int argc, t_atom *argv)
+static void string2any_atoms(t_string2any *x, int argc, t_atom *argv)
 {
   char *s;
-  int x_argc;
+  int x_argc, a_argc=argc;
   t_atom *x_argv;
 
   /*-- allocate --*/
-  if (x->x_size <= argc) {
+  if (x->x_size <= (argc+1)) {
     freebytes(x->x_text, x->x_size*sizeof(char));
     x->x_size = argc+1;
-    x->x_text = (char *)getbytes(x->x_size * sizeof(char));
+    x->x_text = (char *)getbytes(x->x_size*sizeof(char));
   }
 
   /*-- get text --*/
@@ -97,12 +102,12 @@ static void string2any_anything(t_string2any *x, t_symbol *sel, int argc, t_atom
     *s = atom_getfloat(argv);
   }
   *s = 0;
-  S2ADEBUG(post("string2any: text: \"%s\"", x->x_text));
+  S2ADEBUG(post("string2any[%p]: text: \"%s\", strlen=%d, argc=%d", x, x->x_text, strlen(x->x_text), a_argc));
 
   /*-- clear and fill binbuf --*/
   binbuf_clear(x->x_binbuf);
-  binbuf_text(x->x_binbuf, x->x_text, strlen(x->x_text));
-  S2ADEBUG(startpost("string2any: buf: "));
+  binbuf_text(x->x_binbuf, x->x_text, a_argc); //-- handle NULs if binbuf will (but it won't) ?
+  S2ADEBUG(post("string2any[%p]: binbuf_print: ", x));
   S2ADEBUG(binbuf_print(x->x_binbuf));
 
   /*-- output --*/
@@ -123,20 +128,70 @@ static void string2any_anything(t_string2any *x, t_symbol *sel, int argc, t_atom
 }
 
 
+/*=====================================================================
+ * Methods
+ *=====================================================================*/
+
+/*--------------------------------------------------------------------
+ * anything
+ */
+static void string2any_anything(t_string2any *x, t_symbol *sel, int argc, t_atom *argv)
+{
+  int i0=0, i;
+
+  /*-- scan & output --*/
+  if (x->x_eos >= 0) {
+    for (i=i0; i < argc; i++) {
+      if (((int)atom_getfloatarg(i,argc,argv))==((int)x->x_eos)) {
+	string2any_atoms(x, i-i0, argv+i0);
+	i0=i+1;
+      }
+    }
+  }
+
+  if (i0 < argc) {
+    string2any_atoms(x, argc-i0, argv+i0);
+  }
+
+  outlet_bang(x->x_outlet_done);
+}
+
+
 /*--------------------------------------------------------------------
  * new
  */
-static void *string2any_new(void)
+static void *string2any_new(t_symbol *sel, int argc, t_atom *argv)
 {
     t_string2any *x = (t_string2any *)pd_new(string2any_class);
 
     //-- defaults
     x->x_binbuf = binbuf_new();
-    x->x_size = STRING2ANY_INITIAL_BUFLEN;
-    x->x_text = (char *)getbytes(x->x_size * sizeof(char));
+    x->x_size   = STRING2ANY_DEFAULT_BUFLEN;
+    x->x_eos    = -1;
+
+    //-- args: 0: bufsize
+    if (argc > 0) {
+      int initial_bufsize = atom_getintarg(0,argc,argv);
+      if (initial_bufsize > 0) x->x_size = initial_bufsize;
+      x->x_eos = -1;   //-- backwards-compatibility hack: no default eos character if only bufsize is specified
+    } 
+    //-- args: 1: separator
+    if (argc > 1) {
+      x->x_eos = atom_getfloatarg(1,argc,argv);
+    }
+
+    //-- allocate
+    x->x_text = (char *)getbytes(x->x_size*sizeof(char));
+
+    //-- inlets
+    x->x_eos_in = floatinlet_new(&x->x_obj, &x->x_eos);
 
     //-- outlets
-    x->x_outlet = outlet_new(&x->x_obj, &s_list);
+    x->x_outlet      = outlet_new(&x->x_obj, &s_list);
+    x->x_outlet_done = outlet_new(&x->x_obj, &s_bang);
+
+    //-- debug
+    S2ADEBUG(post("string2any_new: x=%p, size=%d, eos=%d, binbuf=%p, text=%p", x, x->x_size, x->x_eos, x->x_binbuf, x->x_text));
 
     return (void *)x;
 }
@@ -147,12 +202,36 @@ static void *string2any_new(void)
 static void string2any_free(t_string2any *x)
 {
   if (x->x_text) {
-    freebytes(x->x_text, x->x_size * sizeof(char));
+    freebytes(x->x_text, x->x_size*sizeof(char));
     x->x_text = NULL;
   }
   binbuf_free(x->x_binbuf);
+  inlet_free(x->x_eos_in);
+  outlet_free(x->x_outlet_done);
   outlet_free(x->x_outlet);
   return;
+}
+
+/*--------------------------------------------------------------------
+ * setup: guts
+ */
+void string2any_setup_guts(void)
+{
+  //-- class
+  string2any_class = class_new(gensym("string2any"),
+			       (t_newmethod)string2any_new,
+			       (t_method)string2any_free,
+			       sizeof(t_string2any),
+			       CLASS_DEFAULT,
+			       A_GIMME,                     //-- initial_bufsize, eos_char
+			       0);
+  
+  //-- methods
+  class_addanything(string2any_class, (t_method)string2any_anything);
+
+  
+  //-- help symbol
+  class_sethelpsymbol(string2any_class, gensym("string2any-help.pd"));
 }
 
 /*--------------------------------------------------------------------
@@ -160,22 +239,6 @@ static void string2any_free(t_string2any *x)
  */
 void string2any_setup(void)
 {
-  //-- class
-  string2any_class = class_new(gensym("string2any"),
-			    (t_newmethod)string2any_new,
-			    (t_method)string2any_free,
-			    sizeof(t_string2any),
-			    CLASS_DEFAULT,
-			    0);
-  
-  //-- methods
-  /*class_addmethod(string2any_class, (t_method)string2any_symbol, &s_symbol,
-		  A_DEFSYMBOL, 0);
-  */
-  class_addanything(string2any_class,
-		    (t_method)string2any_anything);
-
-  
-  //-- help symbol
-  class_sethelpsymbol(string2any_class, gensym("pdstring-help.pd"));
+  post(string2any_banner);
+  string2any_setup_guts();
 }

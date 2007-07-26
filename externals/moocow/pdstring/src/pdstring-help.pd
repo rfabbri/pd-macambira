@@ -1,11 +1,9 @@
-#N canvas 381 42 563 311 10;
+#N canvas 191 76 563 311 10;
 #X text 258 284 Bryan Jurish <moocow@ling.uni-potsdam.de>;
 #X floatatom 56 81 8 0 0 0 - - -;
 #X symbolatom 46 59 10 0 0 0 - - -;
 #X text 201 59 ... no special handling for symbols;
 #X text 200 37 anything can be converted to a list...;
-#X obj 383 3 pdstring;
-#X text 54 3 any2string \, string2any : ASCII conversions in;
 #X obj 37 108 any2string;
 #X obj 37 230 string2any;
 #X floatatom 54 178 4 0 0 0 - - -;
@@ -48,12 +46,14 @@
 #X obj 37 254 print string2any-out;
 #X msg 37 38 A B C;
 #X msg 55 199 list 49 50 51;
-#X connect 1 0 7 0;
-#X connect 2 0 7 0;
-#X connect 7 0 15 0;
-#X connect 7 0 8 0;
-#X connect 8 0 16 0;
-#X connect 9 0 8 0;
-#X connect 13 0 12 0;
-#X connect 17 0 7 0;
-#X connect 18 0 8 0;
+#X text 54 3 any2string \, string2any : ASCII conversions in [pdstring]
+lib;
+#X connect 1 0 5 0;
+#X connect 2 0 5 0;
+#X connect 5 0 13 0;
+#X connect 5 0 6 0;
+#X connect 6 0 14 0;
+#X connect 7 0 6 0;
+#X connect 11 0 10 0;
+#X connect 15 0 5 0;
+#X connect 16 0 6 0;

@@ -39,17 +39,17 @@ EXTRA_PROGRAMS = \
 pdexterns_DATA =
 
 ## --- documentation
-pddoc_DATA = pdstring-help.pd
+pddoc_DATA = \
+	pdstring-help.pd \
+	any2string-help.pd \
+	string2any-help.pd
 
 
 #-----------------------------------------------------------------------
 # sources
 #-----------------------------------------------------------------------
 
-pdstring_SOURCES = \
-	any2string.c \
-	string2any.c \
-	pdstring.c
+pdstring_SOURCES = pdstring.c
 
 any2string_SOURCES = any2string.c
 

@@ -54,8 +54,15 @@ typedef struct _pdstring
 /*=====================================================================
  * External declarations
  *=====================================================================*/
-extern void any2string_setup(void);
-extern void string2any_setup(void);
+#ifndef PDSTRING_OBJECT_EXTERNALS
+/*
+extern void any2string_setup_guts(void);
+extern void string2any_setup_guts(void);
+*/
+#include "any2string.c"
+#include "string2any.c"
+
+#endif
 
 /*--------------------------------------------------------------------
  * new
@@ -81,8 +88,10 @@ void pdstring_setup(void)
 {
   post(pdstring_version);
 
-  any2string_setup();
-  string2any_setup();
+#ifndef PDSTRING_OBJECT_EXTERNALS
+  any2string_setup_guts();
+  string2any_setup_guts();
+#endif
 
   pdstring_class = class_new(gensym("pdstring"),
 			     (t_newmethod)pdstring_new,
