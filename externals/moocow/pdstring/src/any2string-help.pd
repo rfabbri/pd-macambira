@@ -29,7 +29,7 @@ For backwards compatibility \, the default EOS character is 0 (zero).
 ;
 #X text 51 5 any2string : convert pd messages to a list of floats;
 #X text 31 75 2 - EOS character (float);
-#X obj 100 438 pdstring-help;
+#X obj 100 438 pdstring;
 #X connect 1 0 0 0;
 #X connect 2 0 1 1;
 #X connect 3 0 1 1;

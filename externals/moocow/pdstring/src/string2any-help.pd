@@ -35,7 +35,7 @@ has been processed.;
 #X msg 54 161 StringThing 97;
 #X text 168 161 ... selector is ignored ...;
 #X text 21 571 SEE ALSO:;
-#X obj 102 570 pdstring-help;
+#X obj 102 570 pdstring;
 #X connect 7 0 8 0;
 #X connect 10 0 7 0;
 #X connect 11 0 7 0;
