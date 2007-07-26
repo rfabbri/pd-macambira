@@ -46,7 +46,7 @@ typedef void t_clock;
 #define HIDIO_MAJOR_VERSION 0
 #define HIDIO_MINOR_VERSION 0
 
-/* static char *version = "$Revision: 1.19 $"; */
+/* static char *version = "$Revision: 1.20 $"; */
 
 /*------------------------------------------------------------------------------
  * MACRO DEFINES
@@ -186,8 +186,10 @@ extern t_int hidio_open_device(t_hidio *x, short device_number);
 extern t_int hidio_close_device(t_hidio *x);
 extern void hidio_build_device_list(void);
 extern void hidio_get_events(t_hidio *x);
+extern void hidio_write_event(t_hidio *x, t_symbol *type, t_symbol *code, 
+							  t_float instance, t_float value);
 extern void hidio_print(t_hidio* x); /* print info to the console */
-extern void hidio_platform_specific_info(t_hidio* x); /* device info on the status outlet */
+extern void hidio_platform_specific_info(t_hidio *x); /* device info on the status outlet */
 extern void hidio_platform_specific_free(t_hidio *x);
 extern void *hidio_platform_specific_new(t_hidio *x);
 extern short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id);
@@ -195,19 +197,6 @@ extern short get_device_number_by_id(unsigned short vendor_id, unsigned short pr
 extern short get_device_number_from_usage(short device_number, 
 										unsigned short usage_page, 
 										unsigned short usage);
-
-/* cross-platform force feedback functions */
-extern void hidio_ff_autocenter(t_hidio *x, t_float value);
-extern void hidio_ff_gain(t_hidio *x, t_float value);
-extern void hidio_ff_motors(t_hidio *x, t_float value);
-extern void hidio_ff_continue(t_hidio *x);
-extern void hidio_ff_pause(t_hidio *x);
-extern void hidio_ff_reset(t_hidio *x);
-extern void hidio_ff_stopall(t_hidio *x);
-
-/* these are just for testing... */
-extern void hidio_ff_fftest (t_hidio *x, t_float value);
-extern void hidio_ff_print(t_hidio *x);
 
 /*==============================================================================
  * event symbols array sizes

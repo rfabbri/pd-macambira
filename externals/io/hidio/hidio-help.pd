@@ -1,8 +1,8 @@
-#N canvas 157 38 886 611 10;
+#N canvas 637 32 886 611 10;
 #X floatatom 27 445 5 0 0 0 - - -;
 #X floatatom 83 445 5 0 0 0 - - -;
-#X obj 191 164 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 25
-25;
+#X obj 191 164 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 25
+;
 #X floatatom 765 335 5 0 0 1 value - -;
 #X symbolatom 631 360 15 0 0 1 event_code - -;
 #X symbolatom 544 377 15 0 0 1 event_type - -;
@@ -14,15 +14,12 @@
 #X text 435 117 refresh device list;
 #X text 537 487 For more info:;
 #X text 266 557 released under the GNU GPL;
-#X text 472 544 $Revision: 1.5 $$Date: 2007-01-01 01:06:11 $;
+#X text 472 544 $Revision: 1.6 $$Date: 2007-07-26 07:31:38 $;
 #X text 473 557 $Author: eighthave $;
-#X msg 436 201 poll 20;
-#X msg 374 201 poll 2;
-#X text 370 186 start polling and set the poll delay in ms;
 #X text 425 33 !!! This software is very much alpha \, so any aspect
 of it could change without notice !!!;
-#X obj 9 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
-66455;
+#X obj 9 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 66455
+;
 #N canvas 278 328 631 544 Event_Codes 0;
 #X text 28 48 (For a complete listing of Linux Input Events \, see
 /usr/include/linux/input.h.);
@@ -240,35 +237,35 @@ of it could change without notice !!!;
 #X floatatom 263 401 6 0 0 0 - - -;
 #X floatatom 313 401 6 0 0 0 - - -;
 #X floatatom 363 401 6 0 0 0 - - -;
-#X obj 39 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
-133004;
-#X obj 69 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
-133004;
-#X obj 99 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+#X obj 39 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 133004
+;
+#X obj 69 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 133004
+;
+#X obj 99 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 66455
+;
+#X obj 129 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 66455;
-#X obj 129 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+#X obj 159 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 66455;
-#X obj 159 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
-66455;
-#X obj 189 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+#X obj 189 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 133004;
-#X obj 219 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+#X obj 219 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 133004;
-#X obj 249 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+#X obj 249 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 66455;
-#X obj 279 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+#X obj 279 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 133004;
-#X obj 309 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+#X obj 309 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 133004;
-#X obj 339 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+#X obj 339 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 66455;
-#X obj 369 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+#X obj 369 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 66455;
-#X obj 399 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 133004
+#X obj 399 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 133004;
-#X obj 429 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+#X obj 429 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 66455;
-#X obj 459 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 66455
+#X obj 459 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 66455;
 #X msg 25 155 debug 9;
 #X msg 298 145 info;
@@ -393,7 +390,6 @@ IDs (it is not case sensitive):;
 #X connect 2 0 4 0;
 #X connect 7 0 4 0;
 #X restore 174 37 pd open by vendor/product ID;
-#X msg 504 201 poll 200;
 #X msg 225 309 key key_255 0 133004;
 #X text 49 543 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
@@ -425,12 +421,11 @@ IDs (it is not case sensitive):;
 #X connect 10 0 8 0;
 #X coords 0 -1 1 1 165 17 1 60 60;
 #X restore 25 134 pd serin;
-#X msg 262 114 open 0;
 #N canvas 162 133 570 420 serin 0;
-#X obj 209 61 cnv 15 15 15 empty \$0-open-canvas 0 4 8 0 14 -233017
+#X obj 286 61 cnv 15 30 15 empty \$0-open-canvas 2 4 8 0 14 -233017
 -1 0;
-#X obj 60 61 hradio 15 1 1 10 empty empty empty 0 -6 0 8 -225271 -1
--1 0;
+#X obj 60 61 hradio 15 1 1 15 empty empty empty 0 -6 0 8 -225271 -1
+-1 2;
 #X obj 60 13 inlet;
 #X msg 200 202 label \$1;
 #X obj 200 180 makefilename %d;
@@ -452,7 +447,7 @@ IDs (it is not case sensitive):;
 #X connect 8 1 9 0;
 #X connect 9 0 7 0;
 #X connect 10 0 8 0;
-#X coords 0 -1 1 1 165 17 1 60 60;
+#X coords 0 -1 1 1 257 17 1 60 60;
 #X restore 262 93 pd serin;
 #X obj 646 486 pddp/open all_about_hid;
 #X obj 306 235 hidio;
@@ -490,7 +485,7 @@ i_key j_key k_key l_key m_key n_key o_key p_key;
 #X obj 189 192 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 292 122 spigot;
-#X obj 333 99 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 333 99 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #X obj 354 45 inlet;
 #X obj 290 162 print RAW;
@@ -507,61 +502,91 @@ i_key j_key k_key l_key m_key n_key o_key p_key;
 #X connect 10 0 9 0;
 #X restore 408 294 pd raw;
 #X floatatom 63 401 6 0 0 0 - - -;
-#X obj 455 295 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 455 295 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
 1;
-#X connect 2 0 65 0;
-#X connect 8 0 65 0;
-#X connect 9 0 65 0;
-#X connect 15 0 65 0;
-#X connect 16 0 65 0;
-#X connect 24 0 65 0;
-#X connect 53 0 65 0;
-#X connect 54 0 65 0;
-#X connect 56 0 65 0;
-#X connect 57 0 65 0;
-#X connect 58 0 65 0;
-#X connect 61 0 53 0;
-#X connect 62 0 65 0;
-#X connect 63 0 62 0;
-#X connect 65 0 75 0;
-#X connect 65 0 67 0;
-#X connect 65 0 66 0;
-#X connect 65 0 73 0;
-#X connect 65 1 55 0;
-#X connect 66 0 59 0;
-#X connect 67 0 5 0;
-#X connect 67 1 4 0;
-#X connect 67 2 68 0;
-#X connect 67 3 3 0;
-#X connect 69 0 76 0;
-#X connect 69 1 32 0;
-#X connect 69 2 33 0;
-#X connect 69 3 34 0;
-#X connect 69 4 35 0;
-#X connect 69 5 36 0;
-#X connect 69 6 37 0;
-#X connect 70 0 0 0;
-#X connect 70 1 1 0;
-#X connect 70 2 23 0;
-#X connect 70 3 31 0;
-#X connect 71 0 74 0;
-#X connect 71 1 70 0;
-#X connect 71 2 69 0;
-#X connect 73 0 71 0;
-#X connect 74 0 19 0;
-#X connect 74 1 38 0;
-#X connect 74 2 39 0;
-#X connect 74 3 40 0;
-#X connect 74 4 41 0;
-#X connect 74 5 42 0;
-#X connect 74 6 43 0;
-#X connect 74 7 44 0;
-#X connect 74 8 45 0;
-#X connect 74 9 46 0;
-#X connect 74 10 47 0;
-#X connect 74 11 48 0;
-#X connect 74 12 49 0;
-#X connect 74 13 50 0;
-#X connect 74 14 51 0;
-#X connect 74 15 52 0;
-#X connect 77 0 75 1;
+#X msg 262 114 open 2;
+#N canvas 0 0 450 300 output 1;
+#X obj 170 265 outlet;
+#X msg 228 233 write 0x11 0x01 0 \$1;
+#X obj 228 212 tgl 15 0 empty empty empty 0 -6 0 10 -262144 -1 -1 0
+1;
+#X obj 213 171 tgl 15 0 empty empty empty 0 -6 0 10 -262144 -1 -1 0
+1;
+#X msg 213 192 write 0x11 0x00 0 \$1;
+#X text 344 190 numlock;
+#X text 359 231 capslock;
+#X msg 163 134 write 0x15 \$1 0 \$2;
+#X obj 161 97 pack symbol float;
+#X symbolatom 171 65 10 0 0 0 - - -;
+#X obj 151 40 makefilename 0x%d;
+#X obj 154 13 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 10 -262144
+-1 -1 1000 1;
+#X obj 260 68 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 10 -262144
+-1 -1 1200 1;
+#X floatatom 277 89 5 0 0 0 - - -;
+#X connect 1 0 0 0;
+#X connect 2 0 1 0;
+#X connect 3 0 4 0;
+#X connect 4 0 0 0;
+#X connect 7 0 0 0;
+#X connect 8 0 7 0;
+#X connect 10 0 9 0;
+#X connect 10 0 8 0;
+#X connect 11 0 10 0;
+#X connect 12 0 8 1;
+#X connect 12 0 13 0;
+#X restore 372 210 pd output support;
+#X connect 2 0 60 0;
+#X connect 8 0 60 0;
+#X connect 9 0 60 0;
+#X connect 21 0 60 0;
+#X connect 50 0 60 0;
+#X connect 51 0 60 0;
+#X connect 53 0 60 0;
+#X connect 54 0 60 0;
+#X connect 57 0 50 0;
+#X connect 58 0 73 0;
+#X connect 60 0 70 0;
+#X connect 60 0 62 0;
+#X connect 60 0 61 0;
+#X connect 60 0 68 0;
+#X connect 60 1 52 0;
+#X connect 61 0 55 0;
+#X connect 62 0 5 0;
+#X connect 62 1 4 0;
+#X connect 62 2 63 0;
+#X connect 62 3 3 0;
+#X connect 64 0 71 0;
+#X connect 64 1 29 0;
+#X connect 64 2 30 0;
+#X connect 64 3 31 0;
+#X connect 64 4 32 0;
+#X connect 64 5 33 0;
+#X connect 64 6 34 0;
+#X connect 65 0 0 0;
+#X connect 65 1 1 0;
+#X connect 65 2 20 0;
+#X connect 65 3 28 0;
+#X connect 66 0 69 0;
+#X connect 66 1 65 0;
+#X connect 66 2 64 0;
+#X connect 68 0 66 0;
+#X connect 69 0 16 0;
+#X connect 69 1 35 0;
+#X connect 69 2 36 0;
+#X connect 69 3 37 0;
+#X connect 69 4 38 0;
+#X connect 69 5 39 0;
+#X connect 69 6 40 0;
+#X connect 69 7 41 0;
+#X connect 69 8 42 0;
+#X connect 69 9 43 0;
+#X connect 69 10 44 0;
+#X connect 69 11 45 0;
+#X connect 69 12 46 0;
+#X connect 69 13 47 0;
+#X connect 69 14 48 0;
+#X connect 69 15 49 0;
+#X connect 72 0 70 1;
+#X connect 73 0 60 0;
+#X connect 74 0 60 0;

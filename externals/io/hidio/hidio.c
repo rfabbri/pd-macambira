@@ -548,7 +548,6 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
 
 	/* init vars */
 	global_debug_level = 9; /* high numbers here means see more messages */
-	x->x_has_ff = 0;
 	x->x_device_open = 0;
 	x->x_started = 0;
 	x->x_delay = DEFAULT_DELAY;
@@ -588,18 +587,11 @@ void hidio_setup(void)
 	class_addmethod(hidio_class,(t_method) hidio_open,gensym("open"),A_GIMME,0);
 	class_addmethod(hidio_class,(t_method) hidio_close,gensym("close"),0);
 	class_addmethod(hidio_class,(t_method) hidio_poll,gensym("poll"),A_DEFFLOAT,0);
-	/* force feedback messages */
-	class_addmethod(hidio_class,(t_method) hidio_ff_autocenter,
-						 gensym("ff_autocenter"),A_DEFFLOAT,0);
-	class_addmethod(hidio_class,(t_method) hidio_ff_gain,gensym("ff_gain"),A_DEFFLOAT,0);
-	class_addmethod(hidio_class,(t_method) hidio_ff_motors,gensym("ff_motors"),A_DEFFLOAT,0);
-	class_addmethod(hidio_class,(t_method) hidio_ff_continue,gensym("ff_continue"),0);
-	class_addmethod(hidio_class,(t_method) hidio_ff_pause,gensym("ff_pause"),0);
-	class_addmethod(hidio_class,(t_method) hidio_ff_reset,gensym("ff_reset"),0);
-	class_addmethod(hidio_class,(t_method) hidio_ff_stopall,gensym("ff_stopall"),0);
-	/* ff tests */
-	class_addmethod(hidio_class,(t_method) hidio_ff_fftest,gensym("fftest"),A_DEFFLOAT,0);
-	class_addmethod(hidio_class,(t_method) hidio_ff_print,gensym("ff_print"),0);
+
+/* test function for output support */
+	class_addmethod(hidio_class,(t_method) hidio_write_event, gensym("write"),
+					A_DEFSYMBOL, A_DEFSYMBOL, A_FLOAT, A_FLOAT ,0);
+
 
 	post("[hidio] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
 		 HIDIO_MAJOR_VERSION, HIDIO_MINOR_VERSION);  
@@ -680,17 +672,6 @@ int main()
 	class_addmethod(c, (method)hidio_open, "open",A_GIMME,0);
 	class_addmethod(c, (method)hidio_close, "close",0);
 	class_addmethod(c, (method)hidio_poll, "poll",A_DEFFLOAT,0);
-   /* force feedback messages */
-	class_addmethod(c, (method)hidio_ff_autocenter, "ff_autocenter",A_DEFFLOAT,0);
-	class_addmethod(c, (method)hidio_ff_gain, "ff_gain",A_DEFFLOAT,0);
-	class_addmethod(c, (method)hidio_ff_motors, "ff_motors",A_DEFFLOAT,0);
-	class_addmethod(c, (method)hidio_ff_continue, "ff_continue",0);
-	class_addmethod(c, (method)hidio_ff_pause, "ff_pause",0);
-	class_addmethod(c, (method)hidio_ff_reset, "ff_reset",0);
-	class_addmethod(c, (method)hidio_ff_stopall, "ff_stopall",0);
-	/* ff tests */
-	class_addmethod(c, (method)hidio_ff_fftest, "fftest",A_DEFFLOAT,0);
-	class_addmethod(c, (method)hidio_ff_print, "ff_print",0);
 	/* perfomrance / system stuff */
 
 	class_addmethod(c, (method)hidio_assist, 		"assist",	 	A_CANT, 0);  
