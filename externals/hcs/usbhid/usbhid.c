@@ -294,7 +294,8 @@ static t_int get_device_string(HIDInterface *hidif, char *device_string)
 {
 	int length;
 	t_int ret = 0;
-	char buffer[STRING_BUFFER_LENGTH];
+	char buffer[STRING_BUFFER_LENGTH] = "";
+	char return_buffer[STRING_BUFFER_LENGTH] = "";
 
 	if ( !hid_is_opened(hidif) ) 
 		return(0);
@@ -306,8 +307,8 @@ static t_int get_device_string(HIDInterface *hidif, char *device_string)
 									   STRING_BUFFER_LENGTH);
 		if (length > 0)
 		{
-			strncat(device_string, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
-			strncat(device_string, " ",1);
+			strncat(return_buffer, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
+			strncat(return_buffer, " ",1);
 			ret = 1;
 		}
 		else
@@ -323,8 +324,8 @@ static t_int get_device_string(HIDInterface *hidif, char *device_string)
 									   STRING_BUFFER_LENGTH);
 		if (length > 0)
 		{
-			strncat(device_string, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
-			strncat(device_string, " ",1);
+			strncat(return_buffer, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
+			strncat(return_buffer, " ",1);
 			ret = 1;
 		}
 		else
@@ -339,11 +340,14 @@ static t_int get_device_string(HIDInterface *hidif, char *device_string)
 									   buffer, 
 									   STRING_BUFFER_LENGTH);
 		if (length > 0)
-			strncat(device_string, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
+			strncat(return_buffer, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
 		else
 			post("(unable to fetch product string)");
 	}
-	
+
+	if (return_buffer)
+		strncpy(device_string, return_buffer, STRING_BUFFER_LENGTH);
+
 	return ret;
 }
 
@@ -435,34 +439,6 @@ static void usbhid_open(t_usbhid *x, t_symbol *vendor_id_hex, t_symbol *product_
 
 
 /* -------------------------------------------------------------------------- */
-static void usbhid_set(t_usbhid *x, t_float length_arg)
-{
-	if(x->debug_level) post("usbhid_set");
-	int packet_bytes = (int)length_arg;
-	char packet[packet_bytes];
-
- 	if ( !hid_is_opened(x->x_hidinterface) )
-	{
-		error("[usbhid] device not open, can't set data");
-		return;
-	}
-	x->x_hid_return = hid_set_output_report(x->x_hidinterface, 
-										   x->x_write_elements, 
-										   x->x_write_element_count, 
-										   packet, 
-										   length_arg);
-	if (x->x_hid_return != HID_RET_SUCCESS) 
-	{
-		error("[usbhid] hid_get_input_report failed with return code %d\n", 
-			  x->x_hid_return);
-		reset_output(x);
-		add_float_to_output(x, x->x_hid_return);
-		outlet_anything(x->x_status_outlet, gensym("setError"), 
-						x->output_count, x->output);
-	}
-}
-
-/* -------------------------------------------------------------------------- */
 static void usbhid_get(t_usbhid *x, t_float length_arg)
 {
 	if(x->debug_level) post("usbhid_get");
@@ -495,6 +471,35 @@ static void usbhid_get(t_usbhid *x, t_float length_arg)
 		add_float_to_output(x,packet[i]);
 	outlet_list(x->x_data_outlet, &s_list, x->output_count, x->output);
 	post("x->x_read_elements %d",x->x_read_elements);
+}
+
+
+/* -------------------------------------------------------------------------- */
+static void usbhid_set(t_usbhid *x, t_float length_arg)
+{
+	if(x->debug_level) post("usbhid_set");
+	int packet_bytes = (int)length_arg;
+	char packet[packet_bytes];
+
+ 	if ( !hid_is_opened(x->x_hidinterface) )
+	{
+		error("[usbhid] device not open, can't set data");
+		return;
+	}
+	x->x_hid_return = hid_set_output_report(x->x_hidinterface, 
+										   x->x_write_elements, 
+										   x->x_write_element_count, 
+										   packet, 
+										   length_arg);
+	if (x->x_hid_return != HID_RET_SUCCESS) 
+	{
+		error("[usbhid] hid_get_input_report failed with return code %d\n", 
+			  x->x_hid_return);
+		reset_output(x);
+		add_float_to_output(x, x->x_hid_return);
+		outlet_anything(x->x_status_outlet, gensym("setError"), 
+						x->output_count, x->output);
+	}
 }
 
 

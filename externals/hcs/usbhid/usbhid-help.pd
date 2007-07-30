@@ -1,9 +1,9 @@
-#N canvas 339 22 633 553 10;
-#X obj 132 376 usbhid;
-#X msg 184 91 close;
-#X msg 184 117 reset;
-#X text 240 307 GARBAGE FOR TESTING;
-#X msg 197 155 print;
+#N canvas 127 169 633 586 10;
+#X obj 132 406 usbhid;
+#X msg 194 120 close;
+#X msg 194 146 reset;
+#X text 240 337 GARBAGE FOR TESTING;
+#X msg 207 184 print;
 #X text 317 72 Gravis/Destroyer Tiltpad;
 #N canvas 0 22 462 312 buttons 0;
 #X obj 99 36 inlet;
@@ -47,21 +47,21 @@
 #X connect 14 0 7 0;
 #X connect 15 0 8 0;
 #X connect 16 0 9 0;
-#X restore 65 515 pd buttons test;
-#X obj 127 462 unpack float float float float;
-#X obj 44 83 metro 400;
-#X obj 46 57 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X restore 65 545 pd buttons test;
+#X obj 127 492 unpack float float float float;
+#X obj 44 113 metro 400;
+#X obj 46 87 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
-#X floatatom 186 499 5 0 0 0 - - -;
-#X floatatom 256 500 5 0 0 0 - - -;
-#X floatatom 336 495 5 0 0 0 - - -;
+#X floatatom 186 529 5 0 0 0 - - -;
+#X floatatom 256 530 5 0 0 0 - - -;
+#X floatatom 336 525 5 0 0 0 - - -;
 #X msg 20 5 open vendorId productId;
 #X msg 176 71 open 0x047D 0x4008;
-#X floatatom 125 496 5 0 0 0 - - -;
-#X msg 239 273 debug \$1;
-#X obj 239 251 hradio 15 1 0 10 empty empty empty 0 -6 0 8 -262144
--1 -1 9;
-#X obj 27 441 print data;
+#X floatatom 125 526 5 0 0 0 - - -;
+#X msg 239 303 debug \$1;
+#X obj 239 281 hradio 15 1 0 10 empty empty empty 0 -6 0 8 -262144
+-1 -1 0;
+#X obj 27 471 print data;
 #N canvas 458 151 458 489 parsing 0;
 #X obj 77 6 inlet;
 #X obj 80 101 route float symbol;
@@ -89,30 +89,32 @@
 #X connect 9 1 10 0;
 #X connect 10 0 2 1;
 #X connect 10 1 11 0;
-#X restore 226 418 pd parsing;
-#X text 8 122 how many bytes to read;
-#X msg 194 136 refresh;
-#X text 259 137 reinit and refresh device list;
-#X text 233 117 resets device (don't really know what that does tho)
+#X restore 226 448 pd parsing;
+#X text 8 152 how many bytes to read;
+#X msg 204 165 refresh;
+#X text 269 166 reinit and refresh device list;
+#X text 243 146 resets device (don't really know what that does tho)
 ;
-#X obj 171 419 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 171 449 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X obj 171 397 route open device;
-#X msg 44 104 get 4;
-#X msg 82 137 get 2;
-#X msg 212 179 descriptor;
-#X text 291 179 get descriptor;
-#X msg 219 213 descriptor 1 30 1 31 1 38;
-#X text 398 212 [descriptor page# usage# ...(;
-#X text 218 197 for writing to the device:;
-#X msg 25 208 set 2;
-#X msg 237 323 close \, open 0x045e 0x0039 \, descriptor;
-#X text 183 382 <- status outlet;
-#X text 21 383 data outlet ->;
+#X obj 171 427 route open device;
+#X msg 44 134 get 4;
+#X msg 82 167 get 2;
+#X msg 212 209 descriptor;
+#X text 291 209 get descriptor;
+#X msg 219 243 descriptor 1 30 1 31 1 38;
+#X text 398 242 [descriptor page# usage# ...(;
+#X text 218 227 for writing to the device:;
+#X msg 25 238 set 2;
+#X msg 237 353 close \, open 0x045e 0x0039 \, descriptor;
+#X text 183 412 <- status outlet;
+#X text 21 413 data outlet ->;
 #X msg 163 49 open 0x046d 0xc01d;
 #X text 305 49 Logitech USB-PS/2 Optical Mouse;
 #X msg 156 25 open 0x1043 0x0015;
 #X text 294 26 CUI v1.0;
+#X msg 181 96 open 0x077d 0x0410;
+#X text 311 97 Griffin Technology PowerMate;
 #X connect 0 0 7 0;
 #X connect 0 0 18 0;
 #X connect 0 1 25 0;
@@ -140,3 +142,4 @@
 #X connect 34 0 0 0;
 #X connect 37 0 0 0;
 #X connect 39 0 0 0;
+#X connect 41 0 0 0;
