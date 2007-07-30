@@ -13,6 +13,17 @@ clean:
 test_locations:
 	make -C $(EXTERNALS_ROOT) test_locations
 
+# for emacs
 etags:
-	etags *.[ch] ../../../pd/src/*.[ch] libhid-svn/*/*.? \
-		/usr/include/*.h /usr/include/sys/*.h
+	etags --language=c *.[ch] ../../../pd/src/*.[ch] \
+		/usr/include/*.h /usr/include/sys/*.h \
+		/sw/include/*.h /sw/include/*/*.h \
+		libhid-svn/*/*.? 
+
+#etags_Darwin:
+#	etags --append /sw/include/*.h /sw/include/*/*.h
+
+etags_Linux:
+	etags --append libhid-svn/*/*.? 
+
+

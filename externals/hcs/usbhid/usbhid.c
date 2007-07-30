@@ -29,6 +29,8 @@
 #include <usb.h>
 #include <hid.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 #include <string.h>
 #include <float.h>
 #include "m_pd.h"
@@ -486,20 +488,72 @@ static void usbhid_set(t_usbhid *x, t_float length_arg)
 		error("[usbhid] device not open, can't set data");
 		return;
 	}
-	x->x_hid_return = hid_set_output_report(x->x_hidinterface, 
+/*	x->x_hid_return = hid_set_output_report(x->x_hidinterface, 
 										   x->x_write_elements, 
 										   x->x_write_element_count, 
 										   packet, 
 										   length_arg);
+*/
 	if (x->x_hid_return != HID_RET_SUCCESS) 
 	{
 		error("[usbhid] hid_get_input_report failed with return code %d\n", 
 			  x->x_hid_return);
 		reset_output(x);
 		add_float_to_output(x, x->x_hid_return);
-		outlet_anything(x->x_status_outlet, gensym("setError"), 
+		outlet_anything(x->x_status_outlet, gensym("set_error"), 
 						x->output_count, x->output);
 	}
+}
+
+
+/* -------------------------------------------------------------------------- */
+static void usbhid_write(t_usbhid *x,  t_symbol *usage_page_symbol, 
+						 t_symbol *usage_symbol, t_float value)
+{
+	if(x->debug_level) post("usbhid_set");
+//	const char* path[] = {0x00010004, 0xff000002};
+	long path_element;
+	int path[] = {0xff000002};
+	unsigned int const depth = 1;
+	unsigned char const SEND_PACKET_LEN = 1;
+	char const PACKET[] = { 0x50 };
+
+ 	if ( !hid_is_opened(x->x_hidinterface) )
+	{
+		error("[usbhid] device not open, can't set data");
+		return;
+	}
+	path_element = (strtol(usage_page_symbol->s_name, NULL, 16) << 16) + 
+		(strtol(usage_symbol->s_name, NULL, 16) & 0x0000ffff);
+	if (path_element == 0) 
+		switch (errno) 
+		{
+		case EINVAL:
+			post("strtol EINVAL error %d", errno);
+			break;
+		case ERANGE:
+			post("strtol ERANGE error %d", errno);
+			break;
+		default:
+			post("strtol error %d", errno);
+		}
+	post("path: 0x%08x", path_element);
+	path[0] = path_element;
+	x->x_hid_return = hid_set_output_report(x->x_hidinterface, 
+											&path_element, 
+											depth, 
+											PACKET,
+											SEND_PACKET_LEN);
+	if (x->x_hid_return != HID_RET_SUCCESS) 
+	{
+		error("[usbhid] hid_set_output_report failed with return code %d", 
+			  x->x_hid_return);
+		reset_output(x);
+		add_float_to_output(x, x->x_hid_return);
+		outlet_anything(x->x_status_outlet, gensym("get_error"), 
+						x->output_count, x->output);
+	}
+	post("wrote");
 }
 
 
@@ -775,10 +829,12 @@ void usbhid_setup(void)
 					A_DEFFLOAT,0);
 	class_addmethod(usbhid_class,(t_method) usbhid_descriptor,gensym("descriptor"),
 					A_GIMME,0);
-	class_addmethod(usbhid_class,(t_method) usbhid_set,gensym("set"),
-					A_DEFFLOAT,0);
 	class_addmethod(usbhid_class,(t_method) usbhid_get,gensym("get"),
 					A_DEFFLOAT,0);
+	class_addmethod(usbhid_class,(t_method) usbhid_set,gensym("set"),
+					A_DEFFLOAT,0);
+	class_addmethod(usbhid_class,(t_method) usbhid_write,gensym("write"),
+					A_DEFSYM, A_DEFSYM, A_DEFFLOAT, 0);
 	class_addmethod(usbhid_class,(t_method) usbhid_open,gensym("open"),
 					A_DEFSYM,A_DEFSYM,0);
 	class_addmethod(usbhid_class,(t_method) usbhid_close,gensym("close"),0);
