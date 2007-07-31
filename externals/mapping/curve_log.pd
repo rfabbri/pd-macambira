@@ -1,4 +1,4 @@
-#N canvas 236 31 428 321 10;
+#N canvas 603 22 438 321 10;
 #X obj 31 8 inlet;
 #X obj 31 245 outlet;
 #X obj 77 122 rmstodb;
@@ -10,9 +10,8 @@
 #X obj 16 172 * -1;
 #X text 79 8 input range: -1 to 1;
 #X text 87 245 output range: -1 to 1;
-#X text 225 284 released under the GNU GPL;
-#X text 8 270 (C) Copyright 2006 Hans-Christoph Steiner <hans@at.or.at>
-;
+#X text 8 270 (C) Copyright 2006-2007 Free Software Foundation;
+#X text 199 287 released under the GNU GPLv3 or later;
 #X connect 0 0 4 0;
 #X connect 2 0 3 0;
 #X connect 3 0 1 0;
