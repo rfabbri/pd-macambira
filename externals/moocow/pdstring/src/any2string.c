@@ -84,7 +84,7 @@ static char *any2string_banner = "any2string: pdstring version " PACKAGE_VERSION
  */
 static void any2string_anything(t_any2string *x, t_symbol *sel, int argc, t_atom *argv)
 {
-  t_atom *a;
+  t_atom *ap;
   char *s, *s_max;
   int len;
 
@@ -129,16 +129,16 @@ static void any2string_anything(t_any2string *x, t_symbol *sel, int argc, t_atom
 
   /*-- atom buffer: binbuf text --*/
   A2SDEBUG(post("any2string[%p]: atom buffer: for {...}", x));
-  a     = x->x_argv;
+  ap    = x->x_argv;
   s_max = x->x_text+len;
-  for (s=x->x_text; s < s_max; s++, a++) {
-    A2SDEBUG(post("any2string[%p]: atom buffer[%d]: SETFLOAT(a,%d='%c')", x, (a-x->x_argv), *s, *s));
-    SETFLOAT(a,*s);
+  for (s=x->x_text; s < s_max; s++, ap++) {
+    A2SDEBUG(post("any2string[%p]: atom buffer[%d]: SETFLOAT(a,%d='%c')", x, (ap-x->x_argv), *s, *s));
+    SETFLOAT(ap,*s);
   }
   A2SDEBUG(post("any2string: atom buffer: DONE"));
 
   /*-- add EOS character (maybe) --*/
-  if (x->x_eos >= 0) { SETFLOAT(a, ((int)x->x_eos)); }
+  if (x->x_eos >= 0) { SETFLOAT(ap, ((int)x->x_eos)); }
 
   A2SDEBUG(post("any2string: outlet_list(..., %d, ...)", x->x_argc));
   outlet_list(x->x_outlet, &s_list, x->x_argc, x->x_argv);
