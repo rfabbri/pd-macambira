@@ -713,6 +713,14 @@ void hidio_get_events(t_hidio *x)
 	}
 }
 
+void hidio_write_event(t_hidio *x, t_symbol *type, t_symbol *code, 
+					   t_float instance, t_float value)
+{
+	debug_post(LOG_DEBUG,"hidio_write_event");
+	
+}
+
+
 t_int hidio_open_device(t_hidio *x, short device_number)
 {
 	debug_post(LOG_DEBUG,"hidio_open_device");
