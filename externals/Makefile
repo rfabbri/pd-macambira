@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = adaptive boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1548,6 +1548,47 @@ mjlib_clean:
 	-rm -f -- $(externals_src)/mjlib/*.o
 	-rm -f -- $(externals_src)/mjlib/*.bak
 	-rm -f -- $(externals_src)/mjlib/*.*~
+
+
+#------------------------------------------------------------------------------#
+# moocow
+MOOCOW_NAME=moocow
+#MOOCOW_OBJECTS := $(shell cat $(externals_src)/moocow/extended/objects)
+MOOCOW_DIR=$(externals_src)/moocow/extended
+
+$(externals_src)/moocow/extended/build.stamp:
+	$(MAKE) -C $(MOOCOW_DIR) build.stamp
+
+moocow: $(MOOCOW_DIR)/build.stamp
+
+moocow_install: moocow
+	install -d $(objectsdir)/$(MOOCOW_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MOOCOW_NAME) \
+		--author "Bryan Jurish <moocow@bbaw.de>" \
+		--description "moocow's externals" \
+		--license "GNU GPL" \
+		--version "CVS.`date +%Y-%m-%d`"
+	install -p $(MOOCOW_DIR)/build/*/*.$(EXTENSION) \
+		$(objectsdir)/$(MOOCOW_NAME)
+	install -d $(helpdir)/$(MOOCOW_NAME)
+	install -p $(MOOCOW_DIR)/build/doc/5.reference/*.pd \
+		$(helpdir)/$(MOOCOW_NAME)
+#	install -d $(manualsdir)/$(MOOCOW_NAME)
+#	install -p $(externals_src)/moocow/manual.txt \
+#		$(manualsdir)/$(MOOCOW_NAME)
+	install -d $(readmesdir)
+	install -p $(MOOCOW_DIR)/README.txt \
+		$(readmesdir)/$(MOOCOW_NAME).txt
+#	install -d $(examplesdir)/$(MOOCOW_NAME)
+#	install -p $(MOOCOW_DIR)/build/examples/*.pd \
+#		$(examplesdir)/$(MOOCOW_NAME)
+
+moocow_clean:
+	$(MAKE) -C $(externals_src)/moocow/extended cvsclean
+	-rm -f -- $(MOOCOW_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(MOOCOW_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/moocow/*.bak
+	-rm -f -- $(externals_src)/moocow/*.*~
 
 
 
