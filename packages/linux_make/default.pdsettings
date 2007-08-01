@@ -40,3 +40,5 @@ loadlib37: flib
 path1: /usr/share/pd
 path2: /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType
 nloadlib: 37
+defeatrt: 0
+flags: -helppath /usr/share/pd
