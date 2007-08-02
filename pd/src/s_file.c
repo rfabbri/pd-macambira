@@ -42,10 +42,20 @@ static void sys_initloadpreferences( void)
 {
     char filenamebuf[MAXPDSTRING], *homedir = getenv("HOME");
     int fd, length;
+    char user_prefs_file[MAXPDSTRING]; /* user prefs file */
+        /* default prefs embedded in the package */
+    char default_prefs_file[MAXPDSTRING];
+    struct stat statbuf;
 
-    if (!homedir)
-        return;
-    snprintf(filenamebuf, MAXPDSTRING, "%s/.pdsettings", homedir);
+    snprintf(default_prefs_file, MAXPDSTRING, "%s/default.pdsettings", 
+        sys_libdir->s_name);
+    if (homedir)
+        snprintf(user_prefs_file, MAXPDSTRING, "%s/.pdsettings", homedir);
+    if (stat(user_prefs_file, &statbuf) == 0) 
+        strncpy(filenamebuf, user_prefs_file, MAXPDSTRING);
+    else if (stat(default_prefs_file, &statbuf) == 0)
+        strncpy(filenamebuf, default_prefs_file, MAXPDSTRING);
+    else return;
     filenamebuf[MAXPDSTRING-1] = 0;
     if ((fd = open(filenamebuf, 0)) < 0)
     {
@@ -215,7 +225,21 @@ static int sys_getpreference(const char *key, char *value, int size)
 {
     char cmdbuf[256];
     int nread = 0, nleft = size;
-    snprintf(cmdbuf, 256, "defaults read org.puredata.pd %s 2> /dev/null\n", key);
+    char embedded_prefs[MAXPDSTRING];
+    char user_prefs[MAXPDSTRING];
+    char *homedir = getenv("HOME");
+    struct stat statbuf;
+   /* the 'defaults' command expects the filename without .plist at the
+        end */
+    snprintf(embedded_prefs, MAXPDSTRING, "%s/../org.puredata.pd",
+        sys_libdir->s_name);
+    snprintf(user_prefs, MAXPDSTRING,
+        "%s/Library/Preferences/org.puredata.pd.plist", homedir);
+    if (stat(user_prefs, &statbuf) == 0)
+        snprintf(cmdbuf, 256, "defaults read org.puredata.pd %s 2> /dev/null\n",
+            key);
+    else snprintf(cmdbuf, 256, "defaults read %s %s 2> /dev/null\n",
+            embedded_prefs, key);
     FILE *fp = popen(cmdbuf, "r");
     while (nread < size)
     {
@@ -272,8 +296,9 @@ void sys_loadpreferences( void)
     if (sys_getpreference("audioapi", prefbuf, MAXPDSTRING)
         && sscanf(prefbuf, "%d", &api) > 0)
             sys_set_audio_api(api);
+            /* JMZ/MB: brackets for initializing */
     if (sys_getpreference("noaudioin", prefbuf, MAXPDSTRING) &&
-        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))) /* JMZ/MB: brackets for initializing */
+        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True")))
             naudioindev = 0;
     else
     {
@@ -290,8 +315,9 @@ void sys_loadpreferences( void)
         if (naudioindev == 0)
             naudioindev = -1;
     }
+        /* JMZ/MB: brackets for initializing */
     if (sys_getpreference("noaudioout", prefbuf, MAXPDSTRING) &&
-        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))) /* JMZ/MB: brackets for initializing */
+        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True")))
             naudiooutdev = 0;
     else
     {
@@ -315,8 +341,9 @@ void sys_loadpreferences( void)
         naudiooutdev, audiooutdev, naudiooutdev, choutdev, rate, advance, 0);
         
         /* load MIDI preferences */
+        /* JMZ/MB: brackets for initializing */
     if (sys_getpreference("nomidiin", prefbuf, MAXPDSTRING) &&
-        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))) /* JMZ/MB: brackets for initializing */
+        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True")))
             nmidiindev = 0;
     else for (i = 0, nmidiindev = 0; i < MAXMIDIINDEV; i++)
     {
@@ -327,8 +354,9 @@ void sys_loadpreferences( void)
             break;
         nmidiindev++;
     }
+        /* JMZ/MB: brackets for initializing */
     if (sys_getpreference("nomidiout", prefbuf, MAXPDSTRING) &&
-        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))) /* JMZ/MB: brackets for initializing */
+        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True")))
             nmidioutdev = 0;
     else for (i = 0, nmidioutdev = 0; i < MAXMIDIOUTDEV; i++)
     {

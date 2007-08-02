@@ -12,6 +12,8 @@ void outmidi_pitchbend(int portno, int channel, int value);
 void outmidi_aftertouch(int portno, int channel, int value);
 void outmidi_polyaftertouch(int portno, int channel, int pitch, int value);
 void outmidi_mclk(int portno);
+void outmidi_byte(int portno, int value);
+
 
 /* ----------------------- midiin and sysexin ------------------------- */
 
@@ -32,8 +34,8 @@ static void *midiin_new( void)
     x->x_outlet1 = outlet_new(&x->x_obj, &s_float);
     x->x_outlet2 = outlet_new(&x->x_obj, &s_float);
     pd_bind(&x->x_obj.ob_pd, midiin_sym);
-#ifndef __linux__
-    pd_error(x, "midiin: works under Linux only");
+#ifdef WIN32
+    pd_error(x, "midiin: windows: not supported");
 #endif
     return (x);
 }
@@ -55,8 +57,8 @@ static void *sysexin_new( void)
     x->x_outlet1 = outlet_new(&x->x_obj, &s_float);
     x->x_outlet2 = outlet_new(&x->x_obj, &s_float);
     pd_bind(&x->x_obj.ob_pd, sysexin_sym);
-#ifndef __linux__
-    pd_error(x, "sysexin: works under Linux only");
+#ifdef WIN32
+    pd_error(x, "sysexin: windows: not supported");
 #endif
     return (x);
 }
@@ -678,7 +680,7 @@ static void *midiout_new(t_floatarg portno)
 
 static void midiout_float(t_midiout *x, t_floatarg f)
 {
-    sys_putmidibyte(x->x_portno - 1, f);
+    outmidi_byte(x->x_portno - 1, f);
 }
 
 static void midiout_setup(void)

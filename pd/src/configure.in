@@ -419,5 +419,15 @@ AC_TRY_LINK( [
 fi
 ## }JMZ: end of large-file support section
 
+if test -d ../obj
+then echo -n
+else mkdir ../obj
+fi
+
+if test -d ../bin
+then echo -n
+else mkdir ../bin
+fi
+
 AC_OUTPUT(makefile)
 

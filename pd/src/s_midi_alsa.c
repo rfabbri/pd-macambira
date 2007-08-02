@@ -47,8 +47,16 @@ void sys_alsa_do_open_midi(int nmidiin, int *midiinvec,
     int client;
     int i;
     snd_seq_client_info_t *alsainfo;
+    /* do we want to connect pd automatically with other devices ?; see below! */
+    /* LATER: think about a flag to enable/disable automatic connection
+     *        (sometimes it could be a pain)
+     */
+    int autoconnect = 1;
     alsa_nmidiin = 0;
     alsa_nmidiout = 0;
+
+    if (nmidiout == 0 && nmidiin == 0) return;
+
     if(nmidiin>MAXMIDIINDEV )
       {
         post("midi input ports reduced to maximum %d", MAXMIDIINDEV);
@@ -73,25 +81,28 @@ void sys_alsa_do_open_midi(int nmidiin, int *midiinvec,
             post("couldn't open alsa sequencer");
             return;
     }
-    for (i=0;i<nmidiout;i++)
+    for (i=0;i<nmidiin;i++)
     {
         int port;
         sprintf(portname,"Pure Data Midi-In %d",i+1);
-        port = snd_seq_create_simple_port(midi_handle,portname,SND_SEQ_PORT_CAP_WRITE |SND_SEQ_PORT_CAP_SUBS_WRITE , SND_SEQ_PORT_TYPE_APPLICATION);
+        port = snd_seq_create_simple_port(midi_handle,portname,
+                                          SND_SEQ_PORT_CAP_WRITE |SND_SEQ_PORT_CAP_SUBS_WRITE, 
+                                          SND_SEQ_PORT_TYPE_APPLICATION);
         alsa_midiinfd[i] = port;        
         if (port < 0) goto error;        
     }
 
-    for (i=0;i<nmidiin;i++)
+    for (i=0;i<nmidiout;i++)
     {
         int port;
         sprintf(portname,"Pure Data Midi-Out %d",i+1);
-        port = snd_seq_create_simple_port(midi_handle,portname,  SND_SEQ_PORT_CAP_SUBS_READ |  SND_SEQ_PORT_CAP_READ, SND_SEQ_PORT_TYPE_APPLICATION);
+        port = snd_seq_create_simple_port(midi_handle,portname,
+                                          SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ, 
+                                          SND_SEQ_PORT_TYPE_APPLICATION);
         alsa_midioutfd[i] = port;       
         if (port < 0) goto error;        
     }
    
-    if (nmidiout == 0 && nmidiin == 0) return;
     snd_seq_client_info_malloc(&alsainfo);
     snd_seq_get_client_info(midi_handle,alsainfo);
     snd_seq_client_info_set_name(alsainfo,"Pure Data");
@@ -103,8 +114,67 @@ void sys_alsa_do_open_midi(int nmidiin, int *midiinvec,
     snd_midi_event_new(20,&midiev);
     alsa_nmidiout = nmidiout;
     alsa_nmidiin = nmidiin;
+
+    /* JMZ: connect all available devices to pd */
+    if (autoconnect)
+      {
+
+        snd_seq_client_info_t *cinfo;
+        snd_seq_port_info_t *pinfo;
+
+        snd_seq_port_subscribe_t *subs;
+        snd_seq_addr_t other, topd, frompd;
+        /* since i don't know how to connect multiple ports
+         * (connect everything to each port, modulo,...),
+         * i only fully connect where we have only one single port
+         */
+        if(alsa_nmidiin)
+          {
+            topd.client  =client;
+            topd.port    =alsa_midiinfd[0];
+          }
+        if(alsa_nmidiout)
+          {
+            frompd.client  =client;
+            frompd.port    =alsa_midioutfd[0];
+          }
+
+        snd_seq_port_subscribe_alloca(&subs);
+        
+        snd_seq_client_info_alloca(&cinfo);
+        snd_seq_port_info_alloca(&pinfo);
+        snd_seq_client_info_set_client(cinfo, -1);
+        while (snd_seq_query_next_client(midi_handle, cinfo) >= 0)
+          {
+            /* reset query info */
+            int client_id=snd_seq_client_info_get_client(cinfo);
+            
+            if((SND_SEQ_CLIENT_SYSTEM != client_id)&&(client != client_id))
+              { /* skipping port 0 and ourself */
+                snd_seq_port_info_set_client(pinfo, client_id);
+                snd_seq_port_info_set_port(pinfo, -1);
+                while (snd_seq_query_next_port(midi_handle, pinfo) >= 0) 
+                  {
+                    other.client=client_id;
+                    other.port  =snd_seq_port_info_get_port(pinfo);
+                    if(1==alsa_nmidiin) /* only autoconnect 1st port */
+                      {
+                        snd_seq_port_subscribe_set_sender(subs, &other);
+                        snd_seq_port_subscribe_set_dest(subs, &topd);
+                        snd_seq_subscribe_port(midi_handle, subs);
+                      }
+                    if(1==alsa_nmidiout) /* only autoconnect 1st port */
+                      {
+                        snd_seq_port_subscribe_set_sender(subs, &frompd);
+                        snd_seq_port_subscribe_set_dest(subs, &other);
+                        snd_seq_subscribe_port(midi_handle, subs);
+                      }
+                  }
+              }
+          }
+      }
     return;
-  error:
+ error:
     sys_setalarm(1000000);
     post("couldn't open alsa MIDI output device");
     return;
@@ -169,10 +239,8 @@ void sys_alsa_putmidibyte(int portno, int byte)
     {
         // repack into 1 byte char and put somewhere to point at
         unsigned char data = (unsigned char)byte;
-        unsigned char *dataptr = malloc(1);
-        memcpy(dataptr,&byte,1);
 
-        snd_seq_ev_set_sysex(&ev,1,dataptr); //...set_variable *should* have worked but didn't
+        snd_seq_ev_set_sysex(&ev,1,&data); //...set_variable *should* have worked but didn't
         snd_seq_ev_set_direct(&ev);
         snd_seq_ev_set_subs(&ev);
         snd_seq_ev_set_source(&ev,alsa_midioutfd[portno]);

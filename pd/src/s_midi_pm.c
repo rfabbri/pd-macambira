@@ -140,7 +140,7 @@ void sys_putmidibyte(int portno, int byte)
         writemidi4(mac_midioutdevlist[portno], byte, 0, 0, 0);
     else if (byte == 0xf0)
     {
-        mess[0] = 0xf7;
+        mess[0] = 0xf0;
         nbytes = 1;
         sysex = 1;
     }
@@ -209,6 +209,38 @@ void sys_putmidibyte(int portno, int byte)
     }
 }
 
+/* this is non-zero if we are in the middle of transmitting sysex */
+
+int nd_sysex_mode=0;
+
+/* send in 4 bytes of sysex data. if one of the bytes is 0xF7 (sysex end) stop and unset nd_sysex_mode */ 
+void nd_sysex_inword(int midiindev, int status, int data1, int data2, int data3)
+{
+    if (nd_sysex_mode) {
+        sys_midibytein(midiindev, status);
+        if (status == 0xF7)
+            nd_sysex_mode = 0;
+    }
+
+    if (nd_sysex_mode) {
+        sys_midibytein(midiindev, data1);
+        if (data1 == 0xF7)
+            nd_sysex_mode = 0;
+    }
+
+    if (nd_sysex_mode) {
+        sys_midibytein(midiindev, data2);
+        if (data2 == 0xF7)
+            nd_sysex_mode = 0;
+    }
+
+    if (nd_sysex_mode) {
+        sys_midibytein(midiindev, data3);
+        if (data3 == 0xF7)
+            nd_sysex_mode = 0;
+    }
+}
+
 void sys_poll_midi(void)
 {
     int i, nmess;
@@ -221,6 +253,7 @@ void sys_poll_midi(void)
             int status = Pm_MessageStatus(buffer.message);
             int data1  = Pm_MessageData1(buffer.message);
             int data2  = Pm_MessageData2(buffer.message);
+            int data3 = ((buffer.message >> 24) & 0xFF);
             int msgtype = (status >> 4) - 8;
             switch (msgtype)
             {
@@ -239,8 +272,12 @@ void sys_poll_midi(void)
                 sys_midibytein(i, data1);
                 break;
             case 7:
-                sys_midibytein(i, status);
+                nd_sysex_mode=1;
+                nd_sysex_inword(i, status, data1, data2, data3);
                 break; 
+            default:
+                if (nd_sysex_mode)
+                    nd_sysex_inword(i, status, data1, data2, data3);
             }
         }
     }

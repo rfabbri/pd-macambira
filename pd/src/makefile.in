@@ -146,14 +146,14 @@ $(BIN_DIR)/pdtcl.dll: $(GOBJ)
 	strip --strip-unneeded $(BIN_DIR)/pdtcl.dll
 
 externs: 
-	cd ../extra/bonk~;make @EXTERNTARGET@
-	cd ../extra/choice;make @EXTERNTARGET@
-	cd ../extra/expr~;make @EXTERNTARGET@
-	cd ../extra/fiddle~;make @EXTERNTARGET@
-	cd ../extra/loop~;make @EXTERNTARGET@
-	cd ../extra/lrshift~;make @EXTERNTARGET@
-	cd ../extra/pique;make @EXTERNTARGET@
-	cd ../extra/sigmund~;make @EXTERNTARGET@
+	make -C ../extra/bonk~    @EXTERNTARGET@
+	make -C ../extra/choice   @EXTERNTARGET@
+	make -C ../extra/expr~    @EXTERNTARGET@
+	make -C ../extra/fiddle~  @EXTERNTARGET@
+	make -C ../extra/loop~    @EXTERNTARGET@
+	make -C ../extra/lrshift~ @EXTERNTARGET@
+	make -C ../extra/pique    @EXTERNTARGET@
+	make -C ../extra/sigmund~ @EXTERNTARGET@
 
 BINARYMODE=@binarymode@
 

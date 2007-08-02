@@ -434,16 +434,16 @@ proc menu_doc_browser {dir} {
 
 proc doc_make_listbox {base dir count} {
 	# check for [file readable]?
-	if { [info tclversion] >= 8.5 } {
+	#if { [info tclversion] >= 8.5 } {
 		# requires Tcl 8.5 but probably deals with special chars better
 #		destroy {expand}[lrange [winfo children $base] [expr {2 * $count}] end]
-	} else {
+	#} else {
 		if { [catch { eval destroy [lrange [winfo children $base] \
 										[expr { 2 * $count }] end] } \
 				  errorMessage] } {
 			puts stderr "doc_make_listbox: error listing $dir\n"
 		}
-	}
+	#}
 	# exportselection 0 looks good, but selection gets easily out-of-sync
 	set current_listbox [listbox "[set b "$base.listbox$count"]-list" -yscrollcommand \
 							 [list "$b-scroll" set] -height 20 -exportselection 0]

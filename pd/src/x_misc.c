@@ -22,7 +22,10 @@
 #endif
 
 #if defined (__APPLE__) || defined (__FreeBSD__)
-#define HZ CLK_TCK
+#define CLOCKHZ CLK_TCK
+#endif
+#if defined (__linux__)
+#define CLOCKHZ sysconf(_SC_CLK_TCK)
 #endif
 
 /* -------------------------- random ------------------------------ */
@@ -230,7 +233,7 @@ static void cputime_bang2(t_cputime *x)
     times(&newcputime);
     elapsedcpu = 1000 * (
         newcputime.tms_utime + newcputime.tms_stime -
-            x->x_setcputime.tms_utime - x->x_setcputime.tms_stime) / HZ;
+            x->x_setcputime.tms_utime - x->x_setcputime.tms_stime) / CLOCKHZ;
     outlet_float(x->x_obj.ob_outlet, elapsedcpu);
 #endif
 #ifdef MSW

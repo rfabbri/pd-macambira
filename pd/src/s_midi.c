@@ -236,6 +236,20 @@ void outmidi_mclk(int portno)
    sys_queuemidimess(portno, 1, 0xf8, 0,0);
 }
 
+void outmidi_byte(int portno, int value)
+{
+#ifdef USEAPI_ALSA
+  if (sys_midiapi == API_ALSA)
+    {
+      sys_alsa_putmidibyte(portno, value);
+    }
+  else
+#endif
+    {
+      sys_putmidibyte(portno, value);
+    }
+}
+
 /* ------------------------- MIDI input queue handling ------------------ */
 typedef struct midiparser
 {

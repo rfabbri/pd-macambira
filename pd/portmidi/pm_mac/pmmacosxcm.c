@@ -5,7 +5,7 @@
  * and subsequent work by Andrew Zeldis and Zico Kolter
  * and Roger B. Dannenberg
  *
- * $Id: pmmacosxcm.c,v 1.21 2007-07-24 04:53:36 millerpuckette Exp $
+ * $Id: pmmacosxcm.c,v 1.22 2007-08-02 00:33:49 millerpuckette Exp $
  */
  
 /* Notes:
@@ -456,6 +456,14 @@ midi_end_sysex(PmInternal *midi, PmTimestamp when)
     if (m->sysex_timestamp < m->last_time) m->sysex_timestamp = m->last_time;
     
     /* now send what's in the buffer */
+    if (m->packet == NULL) {
+        /* if flush has been called in the meantime, packet list is NULL */
+        m->packet = MIDIPacketListInit(m->packetList);
+        /* this can never fail, right? failure would indicate something 
+           unrecoverable */
+        assert(m->packet);
+    }
+
     err = send_packet(midi, m->sysex_buffer, m->sysex_byte_count,
                       m->sysex_timestamp);
     m->sysex_byte_count = 0;
