@@ -12,7 +12,8 @@ SUBDIRS = \
 	../deque \
 	../pdstring \
 	../readdir \
-	../weightmap
+	../weightmap \
+	../../sprinkler
 
 # ../flite ../gfsm
 
@@ -61,16 +62,10 @@ define subdir_template
  $(1)-autogen:
 	(cd $(1); ./autogen.sh) || true
 
- $(1)-configure:
+ $(1)-configure: $(1)-autogen
 	(cd $(1); ./configure $(CONFIGURE_ARGS) $(2)) || true
 
- $(1)/configure: $(1)/configure.in $(1)/Makefile.am $(1)/autogen.sh
-	$(MAKE) $(1)-autogen
-
- $(1)/Makefile: $(1)/configure
-	$(MAKE) $(1)-configure
-
- $(1)/build.stamp: $(1)/Makefile
+ $(1)/build.stamp: $(1)-configure
 	$(MAKE) -C $(1) all install || true
 	touch $$@
 
@@ -87,4 +82,5 @@ $(eval $(call subdir_template,../deque))
 #$(eval $(call subdir_template,../gfsm))
 $(eval $(call subdir_template,../pdstring,--enable-object-externals))
 $(eval $(call subdir_template,../readdir))
+$(eval $(call subdir_template,../../sprinkler))
 $(eval $(call subdir_template,../weightmap))
