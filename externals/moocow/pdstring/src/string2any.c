@@ -91,7 +91,7 @@ static void string2any_atoms(t_string2any *x, int argc, t_atom *argv)
   t_atom *x_argv;
 
   /*-- allocate --*/
-  if (x->x_size <= (argc+1)) {
+  if ( ((int)x->x_size) <= (argc+1) ) {
     freebytes(x->x_text, x->x_size*sizeof(char));
     x->x_size = argc+1;
     x->x_text = (char *)getbytes(x->x_size*sizeof(char));
