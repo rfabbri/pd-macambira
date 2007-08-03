@@ -1551,45 +1551,59 @@ mjlib_clean:
 
 
 #------------------------------------------------------------------------------#
-# moocow
+# MOOCOW
 MOOCOW_NAME=moocow
 #MOOCOW_OBJECTS := $(shell cat $(externals_src)/moocow/extended/objects)
 MOOCOW_DIR=$(externals_src)/moocow/extended
+MOOCOW_BUILD=$(MOOCOW_DIR)/build.moo
+
+##-- pass some variables on to sub-make
+## + we should probably just use make's "export" for this,
+##   maybe even exporting all variables by default...
+MOOCOW_MAKEFLAGS = \
+	CFLAGS="$(CFLAGS)" \
+	pd_src="$(pd_src)"
 
 $(externals_src)/moocow/extended/build.stamp:
-	$(MAKE) -C $(MOOCOW_DIR) build.stamp
+	$(MAKE) -C $(MOOCOW_DIR) $(MOOCOW_MAKEFLAGS) build.stamp \
+	  || echo "moocow: WARNING: build failed"
 
 moocow: $(MOOCOW_DIR)/build.stamp
 
-moocow_install: moocow
+moocow_install:
 	install -d $(objectsdir)/$(MOOCOW_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MOOCOW_NAME) \
 		--author "Bryan Jurish <moocow@bbaw.de>" \
 		--description "moocow's externals" \
 		--license "GNU GPL" \
 		--version "CVS.`date +%Y-%m-%d`"
-	install -p $(MOOCOW_DIR)/build/*/*.$(EXTENSION) \
-		$(objectsdir)/$(MOOCOW_NAME)
+	install -p $(MOOCOW_BUILD)/ext*/*.$(EXTENSION) \
+		$(objectsdir)/$(MOOCOW_NAME) \
+	  || echo 'moocow_install: WARNING: no library externals to install!'
+	install -p $(MOOCOW_BUILD)/ext*/*.pd \
+		$(objectsdir)/$(MOOCOW_NAME) \
+	  || echo 'moocow_install: WARNING: no library patches to install!'
 	install -d $(helpdir)/$(MOOCOW_NAME)
-	install -p $(MOOCOW_DIR)/build/doc/5.reference/*.pd \
-		$(helpdir)/$(MOOCOW_NAME)
+	install -p $(MOOCOW_BUILD)/doc/5.reference/*.pd \
+		$(helpdir)/$(MOOCOW_NAME) \
+	  || echo 'moocow_install: WARNING: no help patches to install!'
 #	install -d $(manualsdir)/$(MOOCOW_NAME)
 #	install -p $(externals_src)/moocow/manual.txt \
-#		$(manualsdir)/$(MOOCOW_NAME)
+#		$(manualsdir)/$(MOOCOW_NAME) \
+#	  || echo 'moocow_install: WARNING: no manuals to install!'
 	install -d $(readmesdir)
 	install -p $(MOOCOW_DIR)/README.txt \
-		$(readmesdir)/$(MOOCOW_NAME).txt
+		$(readmesdir)/$(MOOCOW_NAME).txt \
+	  || echo 'moocow_install: WARNING: no README to install!'
 #	install -d $(examplesdir)/$(MOOCOW_NAME)
-#	install -p $(MOOCOW_DIR)/build/examples/*.pd \
-#		$(examplesdir)/$(MOOCOW_NAME)
+#	install -p $(MOOCOW_BUILD)/examples/*.pd \
+#		$(examplesdir)/$(MOOCOW_NAME) \
+#	  || echo "moocow_install: WARNING: no examples patches to install!"
 
 moocow_clean:
-	$(MAKE) -C $(externals_src)/moocow/extended cvsclean
-	-rm -f -- $(MOOCOW_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(MOOCOW_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/moocow/*.bak
-	-rm -f -- $(externals_src)/moocow/*.*~
-
+	$(MAKE) -C $(externals_src)/moocow/extended distclean
+	-rm -f -- $(MOOCOW_DIR)/*.bak
+	-rm -f -- $(MOOCOW_DIR)/*.*~
 
 
 #------------------------------------------------------------------------------#
