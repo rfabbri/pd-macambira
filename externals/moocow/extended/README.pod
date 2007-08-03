@@ -19,22 +19,38 @@ Issuing the following commands to the shell:
 ... should result in all objects being compiled into extended/build/externs.
 This is intended to be called from externals/Makefile.
 
+
 =head1 SUPPORTED EXTERNALS
 
-This makefile currently supports the following of moocow's externals:
+=head2 Standard Externals
+
+The following externals are built by default:
 
  deque
  pdstring    (just the dummy object, not the library!)
- any2string
- string2any
+  any2string
+  string2any
  readdir
+ sprinkler
  weightmap
 
-The following of moocow's externals are unsupported (for various reasons):
+=head2 Optional Externals
+
+The following externals depend on additional libraries, which may or may
+not be installed on your system.  The build procedures for these externals
+will be called, but may fail:
 
  flite
  gfsm
+
+=head2 Unsupported Externals
+
+The following externals and libraries are unsupported for various reasons:
+
  ratts
+
+See http://www.ling.uni-potsdam.de/~moocow/projects/pd for the "official"
+distributions.
 
 
 =head1 ACKNOWLEDGEMENTS

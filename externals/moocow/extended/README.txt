@@ -17,21 +17,33 @@ USAGE
     externals/Makefile.
 
 SUPPORTED EXTERNALS
-    This makefile currently supports the following of moocow's externals:
+  Standard Externals
+    The following externals are built by default:
 
      deque
      pdstring    (just the dummy object, not the library!)
-     any2string
-     string2any
+      any2string
+      string2any
      readdir
+     sprinkler
      weightmap
 
-    The following of moocow's externals are unsupported (for various
-    reasons):
+  Optional Externals
+    The following externals depend on additional libraries, which may or may
+    not be installed on your system. The build procedures for these
+    externals will be called, but may fail:
 
      flite
      gfsm
+
+  Unsupported Externals
+    The following externals and libraries are unsupported for various
+    reasons:
+
      ratts
+
+    See http://www.ling.uni-potsdam.de/~moocow/projects/pd for the
+    "official" distributions.
 
 ACKNOWLEDGEMENTS
     Pd by Miller Puckette and others.
