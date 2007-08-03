@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = adaptive boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
