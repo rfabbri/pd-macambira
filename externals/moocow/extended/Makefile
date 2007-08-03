@@ -12,10 +12,12 @@ SUBDIRS = \
 	../flite \
 	../gfsm \
 	../deque \
-	../pdstring \
 	../readdir \
-	../../sprinkler \
-	../weightmap
+	../weightmap \
+	../pdstring \
+	../../sprinkler
+
+##-- 'pdstring' and 'sprinkler' are already in 'flatspace' ... should they be moved here?
 
 ##-- local variables
 MOOCOW_DIR    ?=$(shell pwd)
