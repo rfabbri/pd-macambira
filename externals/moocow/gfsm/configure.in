@@ -146,18 +146,32 @@ if test "$PC_HAVE_GFSM" != "yes" ; then
     AC_MSG_WARN([         'PKG_CONFIG_PATH' environment variable?])
     AC_MSG_WARN([----------------------------------------------------------------])
     AC_MSG_WARN([])
-    ac_cv_enable_gfsm="no"
+    ac_cv_have_gfsm="no"
 else
-    ac_cv_enable_gfsm="yes"
+    ac_cv_have_gfsm="yes"
 fi
 
-if test "$ac_cv_enable_gfsm" != "no" ; then
+if test "$ac_cv_have_gfsm" != "no" ; then
   ##-- gfsm: library
   IFLAGS="$IFLAGS `$PKG_CONFIG --cflags-only-I gfsm`"
   LFLAGS="$LFLAGS `$PKG_CONFIG --libs-only-L gfsm`"
   LIBS="$LIBS `$PKG_CONFIG --libs-only-l gfsm`"
 fi
 ## /gfsm
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## gfsm (global)
+AC_ARG_ENABLE(gfsm,
+	AC_HELP_STRING([--disable-gfsm], [Globally disable gfsm support (causes build to fail!)]),
+	[ac_cv_enable_gfsm="$enableval"],
+	[ac_cv_enable_gfsm="yes"])
+
+if test "$ac_cv_enable_gfsm" != "yes" ; then
+	AC_MSG_ERROR([gfsm support disabled by user],1)
+fi
+
+## /gfsm (global)
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
