@@ -54,7 +54,7 @@ static t_class *scrolllist_class;
 
 static int guidebug=0;
 
-static char   *scrolllist_version = "scrolllist: scrolling list of text items : version 0.2, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *scrolllist_version = "scrolllist: scrolling list of text items : version 0.3, written by Yves Degoyon (ydegoyon@free.fr)";
 
 #define MIN(a,b) (a>b?b:a)
 
@@ -523,6 +523,39 @@ static void scrolllist_dialog(t_scrolllist *x, t_symbol *s, int argc, t_atom *ar
    scrolllist_update(x, x->x_glist);
 }
 
+static void scrolllist_bgcolor(t_scrolllist *x, t_symbol *s)
+{
+   scrolllist_erase( x, x->x_glist );
+   scrolllist_draw_erase(x, x->x_glist);
+
+   strcpy( x->x_bgcolor, s->s_name );
+
+   scrolllist_draw_new(x, x->x_glist);
+   scrolllist_update(x, x->x_glist);
+}
+
+static void scrolllist_fgcolor(t_scrolllist *x, t_symbol *s)
+{
+   scrolllist_erase( x, x->x_glist );
+   scrolllist_draw_erase(x, x->x_glist);
+
+   strcpy( x->x_fgcolor, s->s_name );
+
+   scrolllist_draw_new(x, x->x_glist);
+   scrolllist_update(x, x->x_glist);
+}
+
+static void scrolllist_secolor(t_scrolllist *x, t_symbol *s)
+{
+   scrolllist_erase( x, x->x_glist );
+   scrolllist_draw_erase(x, x->x_glist);
+
+   strcpy( x->x_secolor, s->s_name );
+
+   scrolllist_draw_new(x, x->x_glist);
+   scrolllist_update(x, x->x_glist);
+}
+
 static void scrolllist_sort(t_scrolllist* x)
 {
   char **titems;
@@ -977,6 +1010,9 @@ void scrolllist_setup(void)
     class_addmethod(scrolllist_class, (t_method)scrolllist_insert, gensym("insert"), A_SYMBOL, A_DEFFLOAT, A_NULL );
     class_addmethod(scrolllist_class, (t_method)scrolllist_replace, gensym("replace"), A_SYMBOL, A_DEFFLOAT, A_NULL );
     class_addmethod(scrolllist_class, (t_method)scrolllist_add, gensym("add"), A_SYMBOL, A_NULL );
+    class_addmethod(scrolllist_class, (t_method)scrolllist_bgcolor, gensym("bgcolor"), A_SYMBOL, A_NULL );
+    class_addmethod(scrolllist_class, (t_method)scrolllist_fgcolor, gensym("fgcolor"), A_SYMBOL, A_NULL );
+    class_addmethod(scrolllist_class, (t_method)scrolllist_secolor, gensym("secolor"), A_SYMBOL, A_NULL );
     class_addmethod(scrolllist_class, (t_method)scrolllist_delete, gensym("delete"), A_DEFFLOAT, A_NULL );
     class_addmethod(scrolllist_class, (t_method)scrolllist_clear, gensym("clear"), A_NULL );
 

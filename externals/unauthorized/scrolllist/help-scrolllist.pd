@@ -2,8 +2,8 @@
 #X text 574 514 scrolllist 100 200 200;
 #X text 576 527 scrolllist;
 #X text 500 515 Examples :;
-#X text 72 507 Comments and bugs @ ydegoyon@free.fr;
-#X symbolatom 26 481 30 0 0 0 - - -;
+#X text 75 533 Comments and bugs @ ydegoyon@free.fr;
+#X symbolatom 29 507 30 0 0 0 - - -;
 #X text 472 332 Note : you can scroll the list by dragging;
 #X msg 67 79 seek \$1;
 #X floatatom 127 81 5 0 0 0 - - -;
@@ -26,7 +26,7 @@
 #X text 168 73 You can seek in the text list;
 #X text 168 86 It behaves as a circular list;
 #X text 142 104 Sort the text items;
-#X text 248 481 Selected text item;
+#X text 251 507 Selected text item;
 #X text 470 397 with the "Properties" dialog;
 #X text 470 383 You can change all the properties of the object;
 #X msg 612 57 add \$1;
@@ -50,10 +50,10 @@
 #X msg 620 270 rewind;
 #X obj 527 269 l2s;
 #X msg 525 236 add \$1;
-#X obj 748 216 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 748 216 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 747 237 metro 1000;
-#X obj 35 222 scrolllist 25 400 200 {Courier 12 bold} black green #904562
+#X obj 40 273 scrolllist 25 400 200 {Courier 12 bold} blue white #567823
 ;
 #X text 470 343 the mouse in the text area;
 #X msg 33 57 clear;
@@ -62,14 +62,21 @@
 #X text 746 270 read a full text;
 #X msg 481 295 scroll 12;
 #X obj 585 213 loadbang;
-#X obj 73 237 r smsg;
+#X obj 57 275 r smsg;
 #X obj 62 383 s somsg;
-#X obj 26 455 r somsg;
+#X obj 29 481 r somsg;
 #X obj 14 176 s smsg;
 #X obj 557 295 s smsg;
 #X obj 573 176 s smsg;
 #X msg 95 105 sort;
 #X msg 617 295 read ave-lucifer.txt cr;
+#X msg 96 211 bgcolor blue;
+#X msg 196 212 fgcolor white;
+#X msg 304 211 secolor #567823;
+#X text 421 212 change colors;
+#X msg 97 234 bgcolor black;
+#X msg 197 235 fgcolor green;
+#X msg 304 234 secolor red;
 #X connect 6 0 60 0;
 #X connect 7 0 6 0;
 #X connect 9 0 60 0;
@@ -109,3 +116,9 @@
 #X connect 59 0 4 0;
 #X connect 63 0 60 0;
 #X connect 64 0 42 0;
+#X connect 65 0 60 0;
+#X connect 66 0 60 0;
+#X connect 67 0 60 0;
+#X connect 69 0 60 0;
+#X connect 70 0 60 0;
+#X connect 71 0 60 0;
