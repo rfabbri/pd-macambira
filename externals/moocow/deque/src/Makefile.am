@@ -60,14 +60,11 @@ LFLAGS  = @LFLAGS@
 OFLAGS  = @OFLAGS@
 WFLAGS  = -Wall -Winline
 
-#GLIB_IFLAGS = @GLIB_IFLAGS@
-#GLIB_LFLAGS = @GLIB_LFLAGS@
-
-AM_CPPFLAGS = $(IFLAGS) $(GLIB_IFLAGS) $(DFLAGS)
+AM_CPPFLAGS = $(IFLAGS) $(DFLAGS)
 AM_CFLAGS   = $(OFLAGS) $(WFLAGS) $(AFLAGS)
 
 deque_LDFLAGS = $(LFLAGS)
-deque_LDADD   = $(GLIB_LFLAGS)
+deque_LDADD   =
 
 #-----------------------------------------------------------------------
 # Variables: cleanup
@@ -76,7 +73,7 @@ deque_LDADD   = $(GLIB_LFLAGS)
 #MOSTLYCLEANFILES =
 
 ## --- clean: built by 'make'
-CLEANFILES = *$(EXEEXT)
+#CLEANFILES = *$(EXEEXT)
 
 ## --- distclean: built by 'configure'
 DISTCLEANFILES = \
