@@ -73,7 +73,18 @@ AC_CHECK_HEADERS([stdlib.h errno.h],
 
 
 dnl PD externals
-PD_OBJECT_EXTERNALS="deque\$(EXEEXT)"
+AC_MSG_CHECKING([how to hack $AUTOMAKE EXEEXT conventions])
+automake_version=`$AUTOMAKE --version | head -n1 | cut -d' ' -f4`
+case "$automake_version" in
+  1.[[0-4]]*)
+    AC_MSG_RESULT([automake v${automake_version}: on install])
+    PD_OBJECT_EXTERNALS="deque"
+    ;;
+  *)
+    AC_MSG_RESULT([automake v${automake_version}: on build])
+    PD_OBJECT_EXTERNALS="deque\$(EXEEXT)"
+    ;;
+esac
 AC_SUBST(PD_OBJECT_EXTERNALS)
 
 

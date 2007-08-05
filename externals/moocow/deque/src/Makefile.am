@@ -30,8 +30,7 @@ EXEEXT   = .@PDEXT@
 pdexterns_PROGRAMS = @PD_OBJECT_EXTERNALS@
 
 ## --- possible externals
-EXTRA_PROGRAMS = \
-	deque
+EXTRA_PROGRAMS = deque
 
 ## --- patches
 pdexterns_DATA =
@@ -73,7 +72,7 @@ deque_LDADD   =
 #MOSTLYCLEANFILES =
 
 ## --- clean: built by 'make'
-#CLEANFILES = *$(EXEEXT)
+CLEANFILES = *.$(PDEXT)
 
 ## --- distclean: built by 'configure'
 DISTCLEANFILES = \
