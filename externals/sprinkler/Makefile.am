@@ -37,7 +37,7 @@ DISTCLEANFILES = \
 
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = \
-	*$(EXEEXT) \
+	*.$(PDEXT) \
 	.*~ *~ \
 	Makefile Makefile.in \
 	aclocal.m4 \
@@ -155,9 +155,6 @@ IFLAGS  = @IFLAGS@
 LFLAGS  = @LFLAGS@
 OFLAGS  = @OFLAGS@
 WFLAGS  = -Wall -Winline
-
-#GLIB_IFLAGS = @GLIB_IFLAGS@
-#GLIB_LFLAGS = @GLIB_LFLAGS@
 
 AM_CPPFLAGS = $(IFLAGS) $(DFLAGS)
 AM_CFLAGS   = $(OFLAGS) $(WFLAGS) $(AFLAGS)
