@@ -78,11 +78,11 @@ AC_MSG_CHECKING([how to hack automake EXEEXT conventions])
 case "${am__api_version}" in
   1.[[0-4]]*)
     AC_MSG_RESULT([automake v${ap__api_version}: on install])
-    exeext_build=""
+    buildext=""
     ;;
   *)
     AC_MSG_RESULT([automake v${am__api_version}: on build])
-    exeext_build="\$(EXEEXT)"
+    buildext="\$(EXEEXT)"
     ;;
 esac
 
@@ -97,13 +97,13 @@ AC_ARG_ENABLE(object-externals,
 AC_MSG_CHECKING([whether to build single-object externals])
 
 ##-- always build lib
-PD_OBJECT_EXTERNALS="pdstring${exeext_build}"
+PD_OBJECT_EXTERNALS="pdstring${buildext}"
 
 if test "$want_objext" != "no" ; then
   ##-- single-objects
   AC_MSG_RESULT(yes)
   for ext in $PD_OBJ_EXTERNALS ; do
-    PD_OBJECT_EXTERNALS="$PD_OBJECT_EXTERNALS ${ext}${exeext_build}"
+    PD_OBJECT_EXTERNALS="$PD_OBJECT_EXTERNALS ${ext}${buildext}"
   done
   AC_DEFINE(PDSTRING_OBJECT_EXTERNALS,1,
      [Define this if you are building single-object externals])

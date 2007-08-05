@@ -58,14 +58,11 @@ LFLAGS  = @LFLAGS@
 OFLAGS  = @OFLAGS@
 WFLAGS  = -Wall -Winline
 
-#GLIB_IFLAGS = @GLIB_IFLAGS@
-#GLIB_LFLAGS = @GLIB_LFLAGS@
-
-AM_CPPFLAGS = $(IFLAGS) $(GLIB_IFLAGS) $(DFLAGS)
+AM_CPPFLAGS = $(IFLAGS) $(DFLAGS)
 AM_CFLAGS   = $(OFLAGS) $(WFLAGS) $(AFLAGS)
 
 readdir_LDFLAGS = $(LFLAGS)
-readdir_LDADD   = $(GLIB_LFLAGS)
+#readdir_LDADD   =
 
 #-----------------------------------------------------------------------
 # Variables: cleanup
@@ -74,7 +71,7 @@ readdir_LDADD   = $(GLIB_LFLAGS)
 #MOSTLYCLEANFILES =
 
 ## --- clean: built by 'make'
-CLEANFILES = *$(EXEEXT)
+CLEANFILES = *.$(PDEXT)
 
 ## --- distclean: built by 'configure'
 DISTCLEANFILES = \

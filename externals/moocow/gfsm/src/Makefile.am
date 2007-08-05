@@ -66,7 +66,7 @@ gfsm_SOURCES = \
 DEFS    = @DEFS@
 AFLAGS  = @AFLAGS@
 DFLAGS  = @DFLAGS@
-IFLAGS  = @IFLAGS@
+IFLAGS  = @IFLAGS@ -I$(srcdir)
 LFLAGS  = @LFLAGS@
 OFLAGS  = @OFLAGS@
 WFLAGS  = -Wall
@@ -90,7 +90,7 @@ gfsm_LDFLAGS = $(LFLAGS)
 #MOSTLYCLEANFILES =
 
 ## --- clean: built by 'make'
-CLEANFILES = *$(EXEEXT)
+CLEANFILES = *.$(PDEXT)
 
 ## --- distclean: built by 'configure'
 DISTCLEANFILES = \

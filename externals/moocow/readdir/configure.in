@@ -71,7 +71,19 @@ AC_CHECK_HEADERS([dirent.h fcntl.h string.h errno.h],
 
 
 dnl PD externals
-PD_OBJECT_EXTERNALS="readdir\$(EXEEXT)"
+AC_MSG_CHECKING([how to hack automake EXEEXT conventions])
+case "${am__api_version}" in
+  1.[[0-4]]*)
+    AC_MSG_RESULT([automake v${am__api_version}: on install])
+    buildext=""
+    ;;
+  *)
+    AC_MSG_RESULT([automake v${am__api_version}: on build])
+    buildext="\$(EXEEXT)"
+    ;;
+esac
+
+PD_OBJECT_EXTERNALS="readdir${buildext}"
 AC_SUBST(PD_OBJECT_EXTERNALS)
 
 

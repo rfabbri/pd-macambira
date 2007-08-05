@@ -85,7 +85,7 @@ any2string_LDFLAGS = $(LFLAGS)
 #MOSTLYCLEANFILES =
 
 ## --- clean: built by 'make'
-CLEANFILES = *$(EXEEXT)
+CLEANFILES = *.$(PDEXT)
 
 ## --- distclean: built by 'configure'
 DISTCLEANFILES = \

@@ -74,7 +74,7 @@ define subdir_template
 	(cd $(1); sh ./autogen.sh) || true
 
  $(1)-configure: $(1)-autogen
-	(cd $(1); sh ./configure $(CONFIGURE_ARGS) $(2)) || true
+	(cd $(1); sh ./configure $(CONFIGURE_ARGS) $(2); make clean) || true
 
  $(1)/build.stamp: $(1)-configure
 	$(MAKE) $(MOOCOW_MFLAGS) -C $(1) all install || true

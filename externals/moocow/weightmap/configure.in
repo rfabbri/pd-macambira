@@ -71,7 +71,18 @@ AC_CHECK_HEADERS([math.h],
 
 
 dnl PD externals
-PD_OBJECT_EXTERNALS="weightmap\$(EXEEXT)"
+AC_MSG_CHECKING([how to hack automake EXEEXT conventions])
+case "${am__api_version}" in
+  1.[[0-4]]*)
+    AC_MSG_RESULT([automake v${am__api_version}: on install])
+    buildext=""
+    ;;
+  *)
+    AC_MSG_RESULT([automake v${am__api_version}: on build])
+    buildext="\$(EXEEXT)"
+    ;;
+esac
+PD_OBJECT_EXTERNALS="weightmap${buildext}"
 AC_SUBST(PD_OBJECT_EXTERNALS)
 
 
