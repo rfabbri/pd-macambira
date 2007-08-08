@@ -142,14 +142,14 @@ typedef struct pdp_theonice_struct
     vorbis_block     x_vorbis_block;   // vorbis block
     vorbis_comment   x_vorbis_comment; // vorbis comment
     yuv_buffer       x_yuvbuffer;      // yuv buffer
-    int            x_eos;            // end of stream 
+    int              x_eos;            // end of stream 
 
-    int            x_akbps;          // audio bit rate
-    int            x_vkbps;          // video bit rate
+    int              x_akbps;          // audio bit rate
+    int              x_vkbps;          // video bit rate
     t_float          x_aquality;       // audio quality
-    int            x_vquality;       // video quality
-    int            x_abytesout;      // audio bytes written
-    int            x_vbytesout;      // video bytes written
+    int              x_vquality;       // video quality
+    int              x_abytesout;      // audio bytes written
+    int              x_vbytesout;      // video bytes written
     double           x_audiotime;      // audio stream time
     double           x_paudiotime;     // previous value
     double           x_videotime;      // video stream time
@@ -906,6 +906,9 @@ static void pdp_theonice_framerate(t_pdp_theonice *x, t_floatarg fframerate )
   x->x_framerate = (int) fframerate;
 }
 
+static void pdp_theonice_send_video(t_pdp_theonice *x);
+static void pdp_theonice_send_audio(t_pdp_theonice *x);
+
     /* store audio data in PCM format in a buffer for now */
 static t_int *pdp_theonice_perform(t_int *w)
 {
@@ -932,7 +935,7 @@ static t_int *pdp_theonice_perform(t_int *w)
        x->x_audioin_position=(x->x_audioin_position+1)%(MAX_AUDIO_PACKET_SIZE);
        if ( x->x_audioin_position >= MAX_AUDIO_PACKET_SIZE-1 )
        {
-          post( "pdp_theonice~ : reaching end of audio buffer" );
+          post( "pdp_theonice~ : audio x-run" );
        }
     }
   }
@@ -968,6 +971,8 @@ static t_int *pdp_theonice_perform(t_int *w)
     if ( x->x_videotime >= 0. ) outlet_float(x->x_outlet_vtime, x->x_videotime);
   }
 
+  pdp_theonice_send_audio(x);
+
   return (w+5);
 }
 
@@ -980,35 +985,47 @@ static void pdp_theonice_process_yv12(t_pdp_theonice *x)
 {
   t_pdp     *header = pdp_packet_header(x->x_packet0);
   unsigned char *data   = (unsigned char *)pdp_packet_data(x->x_packet0);
-  int     i, ret;
+  int     i;
   int     px, py;
   unsigned char *pY, *pU, *pV;
-  struct timeval tstream;
-  struct timeval etime;
-  int     nbaudiosamples, nbusecs, nbsamples;
   t_float   fframerate=0.0;
-  int ttime, atime;
 
-    if ( ( (int)(header->info.image.width) != x->x_vwidth ) || 
-         ( (int)(header->info.image.height) != x->x_vheight ) )
-    {
-       post( "pdp_theonice~: reallocating ressources" );
-       pdp_theonice_free_ressources( x );
-       pdp_theonice_shutdown_encoder( x );
-       x->x_vwidth = header->info.image.width;
-       x->x_vheight = header->info.image.height;
-       x->x_vsize = x->x_vwidth*x->x_vheight;
-       x->x_tvwidth=((x->x_vwidth + 15) >>4)<<4;
-       x->x_tvheight=((x->x_vheight + 15) >>4)<<4;
-       pdp_theonice_allocate( x );
-       if ( x->x_tzero.tv_sec != 0 )
-       {
-         pdp_theonice_init_encoder( x );
-         pdp_theonice_write_headers( x );
-       }
-    }
+   if ( ( (int)(header->info.image.width) != x->x_vwidth ) || 
+        ( (int)(header->info.image.height) != x->x_vheight ) )
+   {
+      post( "pdp_theonice~: reallocating ressources" );
+      pdp_theonice_free_ressources( x );
+      pdp_theonice_shutdown_encoder( x );
+      x->x_vwidth = header->info.image.width;
+      x->x_vheight = header->info.image.height;
+      x->x_vsize = x->x_vwidth*x->x_vheight;
+      x->x_tvwidth=((x->x_vwidth + 15) >>4)<<4;
+      x->x_tvheight=((x->x_vheight + 15) >>4)<<4;
+      pdp_theonice_allocate( x );
+      if ( x->x_tzero.tv_sec != 0 )
+      {
+        pdp_theonice_init_encoder( x );
+        pdp_theonice_write_headers( x );
+      }
+   }
 
-    x->x_frames++;
+   pY = x->x_yuvbuffer.y;
+   memcpy( (void*)pY, (void*)&data[0], x->x_vsize );
+   pV = x->x_yuvbuffer.v;
+   memcpy( (void*)pV, (void*)&data[x->x_vsize], (x->x_vsize>>2) );
+   pU = x->x_yuvbuffer.u;
+   memcpy( (void*)pU, (void*)&data[x->x_vsize+(x->x_vsize>>2)], (x->x_vsize>>2) );
+      
+   x->x_frames++;
+
+   pdp_theonice_send_video(x);
+}
+
+static void pdp_theonice_send_video(t_pdp_theonice *x)
+{
+  struct timeval etime;
+  int ttime, atime, ret;
+  struct timeval tstream;
 
     if ( x->x_frameswritten == 0 )
     {
@@ -1042,36 +1059,8 @@ static void pdp_theonice_process_yv12(t_pdp_theonice *x)
        return;
     }
 
-    pY = x->x_yuvbuffer.y;
-    memcpy( (void*)pY, (void*)&data[0], x->x_vsize );
-    pV = x->x_yuvbuffer.v;
-    memcpy( (void*)pV, (void*)&data[x->x_vsize], (x->x_vsize>>2) );
-    pU = x->x_yuvbuffer.u;
-    memcpy( (void*)pU, (void*)&data[x->x_vsize+(x->x_vsize>>2)], (x->x_vsize>>2) );
-      
     if ( x->x_socketfd > 0 && x->x_streaming )
     {
-      // calculate the number of audio samples to output
-      if ( gettimeofday(&tstream, NULL) == -1)
-      {
-         post("pdp_theonice~ : could set stop time" );
-      }
-      // calculate time diff in micro seconds
-      nbusecs = ( tstream.tv_usec - x->x_tprevstream.tv_usec ) + 
-                ( tstream.tv_sec - x->x_tprevstream.tv_sec )*1000000;
-      nbaudiosamples = (sys_getsr()*1000000)/nbusecs;
-      memcpy( &x->x_tprevstream, &tstream, sizeof( struct timeval) );
-      
-      if ( x->x_audioin_position > nbaudiosamples )
-      {
-         nbsamples = nbaudiosamples;
-      }
-      else
-      {
-         nbsamples = x->x_audioin_position;
-      }
-      // if ( x->x_audiotime > x->x_videotime ) nbsamples = -1;
-
       if ( ( ret = theora_encode_YUVin( &x->x_theora_state, &x->x_yuvbuffer ) ) != 0 )
       {
          post( "pdp_theonice~ : could not encode yuv image (ret=%d).", ret );
@@ -1109,9 +1098,38 @@ static void pdp_theonice_process_yv12(t_pdp_theonice *x)
          x->x_secondcount++;
       }
 
-      // audio is ahead, don't send no audio
-      if ( nbsamples < 0 ) return;
+    }
+}
 
+static void pdp_theonice_send_audio(t_pdp_theonice *x)
+{
+  int    nbaudiosamples, nbusecs, nbsamples, ret;
+  struct timeval tstream;
+
+    // calculate the number of audio samples to output
+    if ( gettimeofday(&tstream, NULL) == -1)
+    {
+       post("pdp_theonice~ : could set stop time" );
+    }
+    // calculate time diff in micro seconds
+    nbusecs = ( tstream.tv_usec - x->x_tprevstream.tv_usec ) + 
+              ( tstream.tv_sec - x->x_tprevstream.tv_sec )*1000000;
+    nbaudiosamples = (sys_getsr()*1000000)/nbusecs;
+    memcpy( &x->x_tprevstream, &tstream, sizeof( struct timeval) );
+      
+    if ( x->x_audioin_position > nbaudiosamples )
+    {
+       nbsamples = nbaudiosamples;
+    }
+    else
+    {
+       nbsamples = x->x_audioin_position;
+    }
+    // audio is ahead of video, do not send audio
+    if ( x->x_audiotime > x->x_videotime ) return;
+
+    if ( x->x_socketfd > 0 && x->x_streaming )
+    {
       x->x_vbuffer=vorbis_analysis_buffer( &x->x_dsp_state, nbsamples );
       if ( !x->x_vbuffer ) return;
  
@@ -1329,7 +1347,6 @@ void pdp_theonice_tilde_setup(void)
     class_addmethod(pdp_theonice_class, (t_method)pdp_theonice_url, gensym("url"), A_SYMBOL, A_NULL);
     class_addmethod(pdp_theonice_class, (t_method)pdp_theonice_description, gensym("description"), A_GIMME, A_NULL);
     class_addmethod(pdp_theonice_class, (t_method)pdp_theonice_genre, gensym("genre"), A_GIMME, A_NULL);
-
 
 }
 

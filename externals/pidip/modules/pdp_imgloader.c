@@ -83,7 +83,7 @@ static void pdp_imgloader_load(t_pdp_imgloader *x, t_symbol *filename, t_floatar
 {
   Imlib_Load_Error imliberr;
 
-   post( "pdp_imgloader : loading : %s", filename->s_name );
+   // post( "pdp_imgloader : loading : %s", filename->s_name );
 
    if ( x->x_image != NULL ) 
    {
@@ -101,7 +101,7 @@ static void pdp_imgloader_load(t_pdp_imgloader *x, t_symbol *filename, t_floatar
    x->x_imdata = imlib_image_get_data();
    x->x_iwidth = imlib_image_get_width();
    x->x_iheight = imlib_image_get_height();
-   post( "pdp_imgloader : loaded : %s (%dx%d)", filename->s_name, x->x_iwidth, x->x_iheight );
+   // post( "pdp_imgloader : loaded : %s (%dx%d)", filename->s_name, x->x_iwidth, x->x_iheight );
    x->x_xoffset = (int) fx;
    x->x_yoffset = (int) fy;
 
@@ -335,8 +335,8 @@ static void pdp_imgloader_hide(t_pdp_imgloader *x, t_symbol *s, int argc, t_atom
         ( (int)fy2 >= 0 ) && ( (int)fy2 < x->x_vheight ) &&
         ( (int)fy3 >= 0 ) && ( (int)fy3 < x->x_vheight ) )
    {
-     post( "pdp_imgloader : hide : coordinates : %d %d %d %d %d %d",
-                (int)fx1, (int)fy1, (int)fx2, (int)fy2, (int)fx3, (int)fy3 );
+     // post( "pdp_imgloader : hide : coordinates : %d %d %d %d %d %d",
+     //            (int)fx1, (int)fy1, (int)fx2, (int)fy2, (int)fx3, (int)fy3 );
      for ( ti=0; ti<MAX_ZONES; ti++ )
      {
         if ( !x->x_hiddenzones[ti].used )
@@ -408,10 +408,10 @@ static void pdp_imgloader_hide(t_pdp_imgloader *x, t_symbol *s, int argc, t_atom
                 x->x_hiddenzones[ti].y3 = (int) fy1;
               }
 	   }
-	   post( "pdp_imgloader : hiding : [%d,%d]/[%d,%d]/[%d,%d], ", 
-                           x->x_hiddenzones[ti].x1, x->x_hiddenzones[ti].y1,
-                           x->x_hiddenzones[ti].x2, x->x_hiddenzones[ti].y2,
-                           x->x_hiddenzones[ti].x3, x->x_hiddenzones[ti].y3 );
+	   // post( "pdp_imgloader : hiding : [%d,%d]/[%d,%d]/[%d,%d], ", 
+           //                 x->x_hiddenzones[ti].x1, x->x_hiddenzones[ti].y1,
+           //                 x->x_hiddenzones[ti].x2, x->x_hiddenzones[ti].y2,
+           //                 x->x_hiddenzones[ti].x3, x->x_hiddenzones[ti].y3 );
            if ( (x->x_hiddenzones[ti].x2-x->x_hiddenzones[ti].x1) != 0 )
 	   {
              x->x_hiddenzones[ti].a1 = 
@@ -442,12 +442,12 @@ static void pdp_imgloader_hide(t_pdp_imgloader *x, t_symbol *s, int argc, t_atom
 		      ( (float) x->x_hiddenzones[ti].y3 )*( (float) x->x_hiddenzones[ti].x1 ) ) /
 		    ( ( (float) x->x_hiddenzones[ti].x3 ) - ( (float) x->x_hiddenzones[ti].x1 ) );
 	   }
-	   post( "pdp_imgloader : hiding : a1=%f b1=%f",
-			   x->x_hiddenzones[ti].a1, x->x_hiddenzones[ti].b1 );
-	   post( "pdp_imgloader : hiding : a2=%f b2=%f",
-			   x->x_hiddenzones[ti].a2, x->x_hiddenzones[ti].b2 );
-	   post( "pdp_imgloader : hiding : a3=%f b3=%f",
-			   x->x_hiddenzones[ti].a3, x->x_hiddenzones[ti].b3 );
+	   // post( "pdp_imgloader : hiding : a1=%f b1=%f",
+           //        x->x_hiddenzones[ti].a1, x->x_hiddenzones[ti].b1 );
+	   // post( "pdp_imgloader : hiding : a2=%f b2=%f",
+	   //        x->x_hiddenzones[ti].a2, x->x_hiddenzones[ti].b2 );
+	   // post( "pdp_imgloader : hiding : a3=%f b3=%f",
+	   //        x->x_hiddenzones[ti].a3, x->x_hiddenzones[ti].b3 );
 	   pdp_imgloader_update_mask( x );
 	   return;
 	}
@@ -481,10 +481,10 @@ static void pdp_imgloader_rawhide(t_pdp_imgloader *x, t_symbol *s, int argc, t_a
    argv[4].a_w.w_float *= x->x_vwidth;
    argv[5].a_w.w_float *= x->x_vheight;
 
-   post( "pdp_imgloader : rawhide : coordinates : %f %f %f %f %f %f (width=%d) (height=%d)",
-         argv[0].a_w.w_float, argv[1].a_w.w_float, argv[2].a_w.w_float,
-         argv[3].a_w.w_float, argv[4].a_w.w_float, argv[5].a_w.w_float,
-	 x->x_vwidth, x->x_vheight );
+   // post( "pdp_imgloader : rawhide : coordinates : %f %f %f %f %f %f (width=%d) (height=%d)",
+   //       argv[0].a_w.w_float, argv[1].a_w.w_float, argv[2].a_w.w_float,
+   //       argv[3].a_w.w_float, argv[4].a_w.w_float, argv[5].a_w.w_float,
+   //       x->x_vwidth, x->x_vheight );
 
    pdp_imgloader_hide( x, s, argc, argv );
 }
@@ -780,7 +780,6 @@ void pdp_imgloader_setup(void)
     class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_unhide, gensym("unhide"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_operation, gensym("operation"),  A_SYMBOL, A_NULL);
     class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_fit, gensym("fit"),  A_DEFFLOAT, A_NULL);
-
 
 }
 
