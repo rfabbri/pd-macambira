@@ -9,13 +9,15 @@
 ## Variables
 
 SUBDIRS = \
-	../flite \
-	../gfsm \
 	../deque \
 	../readdir \
 	../weightmap \
 	../pdstring \
 	../../sprinkler
+
+SUBDIRS_DONT = \
+	../flite \
+	../gfsm
 
 ##-- 'pdstring' and 'sprinkler' are already in 'flatspace' ... should they be moved here?
 
@@ -95,12 +97,12 @@ endef
 #$(eval $(call subdir_template,../gfsm,--disable-gfsm))
 
 ##-- flite, gfsm: build 'em if you got 'em
-$(eval $(call subdir_template,../flite))
-$(eval $(call subdir_template,../gfsm))
+#$(eval $(call subdir_template,../flite))
+#$(eval $(call subdir_template,../gfsm))
 
 ##-- the usual suspects
-$(eval $(call subdir_template,../deque))
+$(eval $(call subdir_template,../deque,)
 $(eval $(call subdir_template,../pdstring,--enable-object-externals))
-$(eval $(call subdir_template,../readdir))
-$(eval $(call subdir_template,../../sprinkler))
-$(eval $(call subdir_template,../weightmap))
+$(eval $(call subdir_template,../readdir,
+$(eval $(call subdir_template,../../sprinkler,)
+$(eval $(call subdir_template,../weightmap,)
