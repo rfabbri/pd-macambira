@@ -134,7 +134,8 @@ AC_CHECK_LIB(theora, theora_encode_init, , AC_MSG_ERROR(theora library needed! s
 AC_CHECK_LIB(quicktime, lqt_decode_video, , AC_MSG_ERROR(libquicktime not found) )
 
 qt_minor_version="`lqt-config --version | cut -f3 -d'.'`"
-echo "qt version minor : ${qt_minor_version}"
+qt_major_version="`lqt-config --version | cut -f1 -d'.'`"
+echo "qt version minor : ${qt_minor_version} major : ${qt_major_version}"
 if test ${qt_minor_version} == "8";
 then
   IMLIB_CFLAGS="$CFLAGS -DQUICKTIME_NEWER=1"
@@ -152,6 +153,10 @@ then
   IMLIB_CFLAGS="$CFLAGS -DQUICKTIME_NEWER=1"
 fi
 if test ${qt_minor_version} == "12";
+then
+  IMLIB_CFLAGS="$CFLAGS -DQUICKTIME_NEWER=1"
+fi
+if test ${qt_major_version} == "1";
 then
   IMLIB_CFLAGS="$CFLAGS -DQUICKTIME_NEWER=1"
 fi
