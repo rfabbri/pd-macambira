@@ -8,16 +8,14 @@
 ##======================================================================
 ## Variables
 
-SUBDIRS_DONT = \
-	../flite \
-	../gfsm
-
 SUBDIRS = \
-	../deque \
-	../readdir \
-	../weightmap \
-	../pdstring \
-	../../sprinkler
+	flite \
+	gfsm \
+	deque \
+	readdir \
+	weightmap \
+	pdstring \
+	sprinkler
 
 ##-- 'pdstring' and 'sprinkler' are already in 'flatspace' ... should they be moved here?
 
@@ -29,7 +27,8 @@ MOOCOW_MFLAGS ?=DESTDIR=""
 CONFIGURE_ARGS=\
 	CFLAGS="$(CFLAGS)" \
 	--with-pd-include="$(pd_src)/src" \
-	--with-pd-dir="$(MOOCOW_BUILD)"
+	--with-pd-dir="$(MOOCOW_BUILD)" \
+	--disable-dependency-tracking
 
 #	--with-pd-extdir="$(MOOCOW_BUILD)/externs"
 
@@ -42,67 +41,76 @@ pd_src ?= $(CURDIR)/../../../pd
 ## Rules: default
 all: build.stamp
 
-autogen: $(SUBDIRS:=-autogen)
-configure: $(SUBDIRS:=-configure)
-
-build.stamp: $(SUBDIRS:=/build.stamp)
-	touch $@
-
-reamde: README.txt
-README.txt: README.pod
-	pod2text README.pod $@
-
-clean:
-	for d in $(SUBDIRS); do $(MAKE) $(MOOCOW_MFLAGS) -C $$d clean || true; rm -f $$d/build.stamp; done;
-	rm  -f build.stamp config.log
-	rm -rf $(MOOCOW_BUILD)
-
-realclean: clean
-	for d in $(SUBDIRS); do $(MAKE) $(MOOCOW_MFLAGS) -C $$d realclean || true; done;
-
-distclean: clean
-	for d in $(SUBDIRS); do $(MAKE) $(MOOCOW_MFLAGS) -C $$d distclean || true; done;
-
-cvsclean: clean
-	for d in $(SUBDIRS); do $(MAKE) $(MOOCOW_MFLAGS) -C $$d cvsclean || true; done;
-
-
 ##======================================================================
 ## Templates: subdir
 
-## RULES = $(call subdir_template,$(dir_path),$(configure_args))
+## RULES = $(call subdir_template,$(dir_basename),$(dir_path),$(configure_args))
 define subdir_template
- $(1)-autogen: $(1)-distclean
-	(cd $(1); sh ./autogen.sh) || true
-
- $(1)-configure: $(1)-autogen
-	(cd $(1); sh ./configure $(CONFIGURE_ARGS) $(2); make clean) || true
-
- $(1)/build.stamp: $(1)-configure
-	$(MAKE) $(MOOCOW_MFLAGS) -C $(1) all install || true
+$(1).autogen_stamp: 
+	(cd $(2); sh ./autogen.sh) || true
 	touch $$@
 
- $(1)-clean:
-	$(MAKE) -C $(1) clean || true
+$(1).configure_stamp: $(1).autogen_stamp
+	(cd $(2); sh ./configure $(CONFIGURE_ARGS) $(3); make clean) || true
+	touch $$@
 
- $(1)-distclean:
-	$(MAKE) -C $(1) distclean || true
+$(1).build_stamp: $(1).configure_stamp
+	$(MAKE) $(MOOCOW_MFLAGS) -C $(2) all install || true
+	touch $$@
+
+$(1).extclean:
+	rm -f $(1).autogen_stamp $(1).configure_stamp $(1).build_stamp
+
+$(1).clean: $(1).extclean
+	$(MAKE) -C $(2) clean || true
+
+$(1).distclean: $(1).extclean
+	$(MAKE) -C $(2) distclean || true
+
+$(1).cvsclean: $(1).extclean
+	$(MAKE) -C $(2) cvsclean || true
+
 endef
 
 ##======================================================================
 ## Rules: subdirectories
 
 ##-- flite, gfsm: simulate failed builds
-#$(eval $(call subdir_template,../flite,--with-flite-dir=/NOPE))
-#$(eval $(call subdir_template,../gfsm,--disable-gfsm))
+#$(eval $(call subdir_template,flite,../flite,--with-flite-dir=/NOPE))
+#$(eval $(call subdir_template,gfsm,../gfsm,--disable-gfsm))
 
 ##-- flite, gfsm: build 'em if you got 'em
-$(eval $(call subdir_template,../flite,))
-$(eval $(call subdir_template,../gfsm,))
+$(eval $(call subdir_template,flite,../flite,))
+$(eval $(call subdir_template,gfsm,../gfsm,))
 
 ##-- the usual suspects
-$(eval $(call subdir_template,../deque,))
-$(eval $(call subdir_template,../pdstring,--enable-object-externals))
-$(eval $(call subdir_template,../readdir,))
-$(eval $(call subdir_template,../../sprinkler,))
-$(eval $(call subdir_template,../weightmap,))
+$(eval $(call subdir_template,deque,../deque,))
+$(eval $(call subdir_template,pdstring,../pdstring,--enable-object-externals))
+$(eval $(call subdir_template,readdir,../readdir,))
+$(eval $(call subdir_template,sprinkler,../../sprinkler,))
+$(eval $(call subdir_template,weightmap,../weightmap,))
+
+
+##======================================================================
+## Rules: local
+autogen: $(SUBDIRS:=.autogen_stamp)
+configure: $(SUBDIRS:=.configure_stamp)
+
+build.stamp: $(SUBDIRS:=.build_stamp)
+	touch $@
+
+readme: README.txt
+README.txt: README.pod
+	pod2text README.pod $@
+
+extclean: $(SUBDIRS:=.extclean)
+
+clean: $(SUBDIRS:=.clean)
+	rm  -f build.stamp config.log
+	rm -rf $(MOOCOW_BUILD)
+
+realclean: distclean
+
+distclean: $(SUBDIRS:=.distclean) clean
+
+cvsclean: $(SUBDIRS:=.cvsclean) clean

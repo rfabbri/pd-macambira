@@ -188,7 +188,7 @@ then
   if test "$DEBUG" == "no"; then
     #OFLAGS="-O6 -funroll-loops -fomit-frame-pointer -finline-limit-10000000"
     #OFLAGS="-O6 -funroll-loops -fomit-frame-pointer"
-    OFLAGS="-O3"
+    OFLAGS="-O3 -pipe"
   else
     OFLAGS="-g"
   fi
