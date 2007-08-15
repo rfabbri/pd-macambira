@@ -1,0 +1,25 @@
+Index: u_main.tk
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
+retrieving revision 1.25
+diff -u -w -r1.25 u_main.tk
+--- u_main.tk	9 Oct 2006 04:36:12 -0000	1.25
++++ u_main.tk	15 Aug 2007 18:57:49 -0000
+@@ -36,7 +36,7 @@
+     global pd_tearoff
+     set pd_gui2 [string range $argv0 0 [expr [string last \\ $argv0 ] - 1]]
+     regsub -all \\\\ $pd_gui2 / pd_gui3
+-    set pd_guidir $pd_gui3/..
++    set pd_guidir [file normalize $pd_gui3/..]
+     load $pd_guidir/bin/pdtcl.dll
+     set pd_tearoff 1
+ }
+@@ -53,7 +53,7 @@
+     global pd_guidir
+     global pd_tearoff
+     set pd_gui2 [string range $argv0 0 [expr [string last / $argv0 ] - 1]]
+-    set pd_guidir $pd_gui2/..
++    set pd_guidir [file normalize $pd_gui2/..]
+     load $pd_guidir/bin/libPdTcl.dylib
+     set pd_tearoff 0
+     global pd_macready
