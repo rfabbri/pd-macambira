@@ -1,0 +1,34 @@
+#N canvas 10 40 620 460 10;
+#X obj 170 105 float;
+#X text 23 62 Many objects can accept "arguments" to define their behavior.
+Here is a plain [float] object:;
+#X text 26 135 Here is a [float] object with an argument of "5.5":
+;
+#X obj 168 166 float 5.5;
+#X obj 178 266 float 5.5;
+#X obj 178 248 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 178 287 5 0 0 0 - - -;
+#X text 25 197 Here \, the argument of "5.5" makes this [float] store
+the value 5.5 by default. Clicking the bang makes [float] output the
+value that it is currently storing:;
+#X obj 164 389 select 5;
+#X floatatom 216 410 5 0 0 1 everything_else - -;
+#X obj 165 410 bng 15 250 50 0 empty empty matched -52 9 0 12 -262144
+-1 -1;
+#X msg 163 366 5;
+#X msg 132 366 3;
+#X msg 195 366 7;
+#X text 24 313 Some objects need to have some arguments in order to
+do anything useful. For example \, you can tell [select] which number
+to look for with an argument:;
+#X obj 10 10 cnv 15 400 40 empty empty creation_arguments 20 12 0 24
+-228992 -66577 0;
+#X obj 68 454 pddp/pddplink crca;
+#X connect 4 0 6 0;
+#X connect 5 0 4 0;
+#X connect 8 0 10 0;
+#X connect 8 1 9 0;
+#X connect 11 0 8 0;
+#X connect 12 0 8 0;
+#X connect 13 0 8 0;

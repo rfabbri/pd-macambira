@@ -1,4 +1,4 @@
-#N canvas 10 40 632 472 12;
+#N canvas 10 40 620 460 12;
 #X msg 235 167 Hello world!;
 #X text 238 216 <-- connection \, aka "cord";
 #X text 17 32 In Pd \, programming is done with boxes which are connected

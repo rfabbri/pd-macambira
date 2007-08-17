@@ -1,4 +1,4 @@
-#N canvas 0 42 660 464 12;
+#N canvas 10 40 620 460 12;
 #X obj 12 13 cnv 15 400 40 empty empty init_to_zero 10 15 0 24 -228992
 -66577 0;
 #X obj 293 241 +;

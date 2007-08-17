@@ -1,4 +1,4 @@
-#N canvas 10 40 624 464 12;
+#N canvas 10 40 620 460 12;
 #X obj 8 10 cnv 15 600 40 empty empty EXERCISE-make_your_first_patch
 20 12 0 24 -262131 -66577 0;
 #X text 15 71 Its time to make your first patch. Follow the instructions

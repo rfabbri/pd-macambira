@@ -1,0 +1,59 @@
+#N canvas 10 40 620 460 10;
+#X text 10 4 arguments;
+#X obj 158 68 float;
+#X text 11 25 Many objects can accept "arguments" to define their behavior.
+Here is a plain [float] object:;
+#X text 14 98 Here is a [float] object with an argument of "5.5":;
+#X obj 156 129 float 5.5;
+#X obj 166 229 float 5.5;
+#X obj 166 211 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 166 250 5 0 0 0 - - -;
+#X text 13 160 Here \, the argument of "5.5" makes this [float] store
+the value 5.5 by default. Clicking the bang makes [float] output the
+value that it is currently storing:;
+#X floatatom 173 519 5 0 0 0 - - -;
+#X symbolatom 221 518 10 0 0 0 - - -;
+#X obj 126 539 bng 15 250 50 0 empty empty bang -6 23 1 12 -262144
+-1 -1;
+#X obj 126 495 route bang float symbol list;
+#X obj 173 539 bng 15 250 50 0 empty empty float -4 23 1 12 -262144
+-1 -1;
+#X obj 221 539 bng 15 250 50 0 empty empty symbol -12 23 1 12 -262144
+-1 -1;
+#X obj 269 539 bng 15 250 50 0 empty empty list -2 23 1 12 -262144
+-1 -1;
+#X msg 64 463 bang;
+#X msg 105 463 5;
+#X msg 141 463 symbol word;
+#X msg 232 463 list one two three;
+#X text 12 411 Some objects can accept many arguments at the same time.
+For example \, you need to tell [route] what kind of data you want
+\, and it will sort it based on the data type:;
+#X obj 152 352 select 5;
+#X floatatom 204 373 5 0 0 1 everything_else - -;
+#X obj 153 373 bng 15 250 50 0 empty empty matched -52 9 0 12 -262144
+-1 -1;
+#X msg 151 329 5;
+#X msg 120 329 3;
+#X msg 183 329 7;
+#X text 12 276 Some objects need to have some arguments in order to
+do anything useful. For example \, you can tell [select] which number
+to look for with an argument:;
+#X connect 5 0 7 0;
+#X connect 6 0 5 0;
+#X connect 9 0 13 0;
+#X connect 10 0 14 0;
+#X connect 12 0 11 0;
+#X connect 12 1 9 0;
+#X connect 12 2 10 0;
+#X connect 12 3 15 0;
+#X connect 16 0 12 0;
+#X connect 17 0 12 0;
+#X connect 18 0 12 0;
+#X connect 19 0 12 0;
+#X connect 21 0 23 0;
+#X connect 21 1 22 0;
+#X connect 24 0 21 0;
+#X connect 25 0 21 0;
+#X connect 26 0 21 0;

@@ -1,4 +1,4 @@
-#N canvas 28 39 628 462 12;
+#N canvas 10 40 620 460 12;
 #X obj 208 229 import unauthorized Gem;
 #X text 217 160 caught you peeking!!;
 #X text 197 255 (this just makes sure the;
@@ -11,7 +11,7 @@
 #X obj 386 371 nbx 5 24 -1e+37 1e+37 0 0 empty empty Y -15 12 1 18
 -166441 -1 -1 0 256;
 #X text 40 207 this box ------->;
-#N canvas 649 35 635 469 open 0;
+#N canvas 10 40 620 460 open 0;
 #X obj 314 7 cnv 15 300 40 empty empty Y_input 120 20 0 14 -228856
 -66577 0;
 #X obj 8 7 cnv 15 300 40 empty empty X_input 120 20 0 14 -228856 -66577

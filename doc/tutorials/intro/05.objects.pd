@@ -1,4 +1,4 @@
-#N canvas 10 40 624 464 12;
+#N canvas 10 40 620 460 12;
 #X obj 28 151 float;
 #X text 10 61 The fundamental building block of a Pd program is the
 object. Each object is itself like a tiny program that does a very

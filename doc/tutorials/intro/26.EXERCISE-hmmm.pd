@@ -1,4 +1,4 @@
-#N canvas 10 40 624 464 12;
+#N canvas 10 40 620 460 12;
 #N canvas 10 40 620 460 guts 0;
 #X msg 280 45 \; pd filename exercise-patch.pd /tmp \; #N canvas \;
 #X pop 1 \;;
