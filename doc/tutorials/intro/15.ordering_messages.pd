@@ -1,4 +1,4 @@
-#N canvas 10 40 620 460 12;
+#N canvas 10 40 624 464 12;
 #X obj 10 10 cnv 15 400 40 empty empty ordering_messages 20 12 0 24
 -228992 -66577 0;
 #X text 10 393 look here for the result -->;
@@ -7,9 +7,9 @@
 #X text 10 88 The [trigger] object allows you to specify the order
 of messages are sent. If you need to make sure that one thing runs
 before another \, use [trigger]:;
-#X obj 3 174 cnv 15 80 25 empty empty empty 20 12 0 14 -225271 -66577
+#X obj 61 149 cnv 15 50 25 empty empty empty 20 12 0 14 -225271 -66577
 0;
-#X obj 142 149 cnv 15 80 25 empty empty empty 20 12 0 14 -225271 -66577
+#X obj 242 149 cnv 15 50 25 empty empty empty 20 12 0 14 -225271 -66577
 0;
 #X msg 395 249 now;
 #X msg 316 250 this;
@@ -17,11 +17,11 @@ before another \, use [trigger]:;
 #X msg 158 250 sense;
 #X msg 80 250 !;
 #X obj 157 292 symbol;
-#X msg 159 151 bang;
-#X msg 19 177 bang;
+#X msg 249 151 bang;
+#X msg 69 151 bang;
 #X msg 157 316 add2 \$1;
 #X msg 478 248 set;
-#X obj 160 178 trigger bang bang bang bang bang bang;
+#X obj 250 178 trigger bang bang bang bang bang bang;
 #X msg 296 391;
 #X connect 6 0 11 0;
 #X connect 7 0 11 0;
