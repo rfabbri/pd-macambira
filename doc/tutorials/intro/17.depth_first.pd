@@ -17,9 +17,10 @@ bottom-most message in a chain runs first. Everything below a spot
 in a chain is run before. As you'll see from the example below \, the
 [4( message actually runs last \, since everything below it executed
 before it.;
-#X obj 33 430 pddp/pddplink http://crca.ucsd.edu/~msp/Pd_documentation/x2.htm#s3.2
+#X obj 223 430 pddp/pddplink http://crca.ucsd.edu/~msp/Pd_documentation/x2.htm#s3.2
 ;
 #X msg 214 377;
+#X text 205 413 For more info:;
 #X connect 1 0 6 0;
 #X connect 1 1 7 0;
 #X connect 2 0 13 0;
