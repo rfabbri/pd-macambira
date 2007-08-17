@@ -1,4 +1,4 @@
-#N canvas 10 40 624 464 12;
+#N canvas 10 40 620 460 12;
 #X obj 99 238 +;
 #X floatatom 99 267 5 0 0 0 - - -;
 #X msg 99 184 1;
@@ -13,7 +13,7 @@ data on the "hot" inlet.;
 #X text 15 291 Try a number of different combinations to see for yourself:
 ;
 #X text 215 343 <-- "cold" inlet;
-#X text 29 343 "hot" inlet -->;
+#X text 49 343 "hot" inlet -->;
 #X msg 124 315 2;
 #X msg 164 315 3;
 #X msg 234 315 4;

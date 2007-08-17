@@ -1,4 +1,4 @@
-#N canvas 10 40 624 464 12;
+#N canvas 10 40 620 460 12;
 #X obj 10 10 cnv 15 400 40 empty empty metro 20 12 0 24 -228992 -66577
 0;
 #X obj 30 321 metro;

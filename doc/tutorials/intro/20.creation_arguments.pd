@@ -1,4 +1,4 @@
-#N canvas 10 40 628 468 10;
+#N canvas 10 40 620 460 10;
 #X obj 438 85 float;
 #X text 20 72 Many objects can accept "arguments" to define their behavior.
 Here is a plain [float] object:;

@@ -1,4 +1,4 @@
-#N canvas 10 40 624 464 12;
+#N canvas 10 40 620 460 12;
 #X text 12 132 Pd patches are always running and changes take effect
 immediately.;
 #X floatatom 25 277 5 0 0 0 - - -;

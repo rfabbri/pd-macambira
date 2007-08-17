@@ -1,4 +1,4 @@
-#N canvas 10 40 628 468 12;
+#N canvas 10 40 620 460 12;
 #X obj 311 314 cnv 15 300 60 empty empty not_selectors 5 12 0 14 -261234
 -66577 0;
 #X obj 6 314 cnv 15 300 60 empty empty possible_selectors 5 12 0 14

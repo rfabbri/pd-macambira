@@ -1,4 +1,4 @@
-#N canvas 10 40 624 464 12;
+#N canvas 10 40 620 460 12;
 #X obj 165 185 bng 25 250 50 0 empty empty empty -2 -8 1 10 -24198
 -1 -1;
 #X obj 165 225 trigger bang bang bang;
