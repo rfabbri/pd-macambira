@@ -31,7 +31,7 @@ int sys_argparse(int argc, char **argv);
 void sys_findprogdir(char *progname);
 int sys_startgui(const char *guipath);
 int sys_rcfile(void);
-int m_scheduler(void);
+int m_mainloop(void);
 void sys_addhelppath(char *p);
 #ifdef USEAPI_ALSA
 void alsa_adddev(char *name);
@@ -43,6 +43,7 @@ int sys_noloadbang;
 int sys_nogui;
 int sys_hipriority = -1;    /* -1 = don't care; 0 = no; 1 = yes */
 int sys_guisetportnumber;   /* if started from the GUI, this is the port # */
+int sys_nosleep = 0;  /* skip all "sleep" calls and spin instead */
 
 char *sys_guicmd;
 t_symbol *sys_libdir;
@@ -60,6 +61,7 @@ int sys_midioutdevlist[MAXMIDIOUTDEV] = {1};
 char sys_font[100] = "courier"; /* tb: font name */
 static int sys_main_srate;
 static int sys_main_advance;
+static int sys_main_callback;
 static int sys_listplease;
 
 int sys_externalschedlib;
@@ -69,7 +71,7 @@ char sys_extraflagsstring[MAXPDSTRING];
 
 
     /* here the "-1" counts signify that the corresponding vector hasn't been
-    specified in command line arguments; sys_open_audio will detect this
+    specified in command line arguments; sys_set_audio_settings will detect it
     and fill things in. */
 static int sys_nsoundin = -1;
 static int sys_nsoundout = -1;
@@ -81,7 +83,6 @@ static int sys_nchout = -1;
 static int sys_chinlist[MAXAUDIOINDEV];
 static int sys_choutlist[MAXAUDIOOUTDEV];
 
-int sys_nosleep = 0;  /* skip all "sleep" calls and spin instead */
 t_sample* get_sys_soundout() { return sys_soundout; }
 t_sample* get_sys_soundin() { return sys_soundin; }
 int* get_sys_main_advance() { return &sys_main_advance; }
@@ -313,7 +314,7 @@ int sys_main(int argc, char **argv)
         sys_reopen_midi();
         sys_reopen_audio();
             /* run scheduler until it quits */
-        return (m_scheduler());
+        return (m_mainloop());
     }
 }
 
@@ -579,6 +580,11 @@ int sys_argparse(int argc, char **argv)
         {
             sys_main_advance = atoi(argv[1]);
             argc -= 2; argv += 2;
+        }
+        else if (!strcmp(*argv, "-callback"))
+        {
+            sys_main_callback = 1;
+            argc--; argv++;
         }
         else if (!strcmp(*argv, "-blocksize"))
         {
@@ -899,7 +905,7 @@ static void sys_afterargparse(void)
     int i;
     int naudioindev, audioindev[MAXAUDIOINDEV], chindev[MAXAUDIOINDEV];
     int naudiooutdev, audiooutdev[MAXAUDIOOUTDEV], choutdev[MAXAUDIOOUTDEV];
-    int nchindev, nchoutdev, rate, advance;
+    int nchindev, nchoutdev, rate, advance, callback;
     int nmidiindev = 0, midiindev[MAXMIDIINDEV];
     int nmidioutdev = 0, midioutdev[MAXMIDIOUTDEV];
             /* add "extra" library to path */
@@ -935,7 +941,7 @@ static void sys_afterargparse(void)
             else are the default.  Overwrite them with any results
             of argument parsing, and store them again. */
     sys_get_audio_params(&naudioindev, audioindev, chindev,
-        &naudiooutdev, audiooutdev, choutdev, &rate, &advance);
+        &naudiooutdev, audiooutdev, choutdev, &rate, &advance, &callback);
     if (sys_nchin >= 0)
     {
         nchindev = sys_nchin;
@@ -981,8 +987,11 @@ static void sys_afterargparse(void)
         advance = sys_main_advance;
     if (sys_main_srate)
         rate = sys_main_srate;
-    sys_open_audio(naudioindev, audioindev, nchindev, chindev,
-        naudiooutdev, audiooutdev, nchoutdev, choutdev, rate, advance, 0);
+    if (sys_main_callback)
+        callback = sys_main_callback;
+    sys_set_audio_settings(naudioindev, audioindev, nchindev, chindev,
+        naudiooutdev, audiooutdev, nchoutdev, choutdev, rate, advance, 
+        callback);
     sys_open_midi(nmidiindev, midiindev, nmidioutdev, midioutdev, 0);
 }
 

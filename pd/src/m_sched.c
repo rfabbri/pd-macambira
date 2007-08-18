@@ -7,6 +7,9 @@
 #include "m_pd.h"
 #include "m_imp.h"
 #include "s_stuff.h"
+#ifdef MSW
+#include <windows.h>
+#endif
 
     /* LATER consider making this variable.  It's now the LCM of all sample
     rates we expect to see: 32000, 44100, 48000, 88200, 96000. */
@@ -15,7 +18,8 @@
 #define THREAD_LOCKING  
 #include "pthread.h"
 
-
+#define SYS_QUIT_QUIT 1
+#define SYS_QUIT_RESTART 2
 static int sys_quit;
 double sys_time;
 static double sys_time_per_msec = TIMEUNITPERSEC / 1000.;
@@ -326,18 +330,23 @@ void glob_foo(void *dummy, t_symbol *s, int argc, t_atom *argv)
 
 void dsp_tick(void);
 
-static int sched_usedacs = 1;
+static int sched_useaudio = SCHED_AUDIO_POLL;
 static double sched_referencerealtime, sched_referencelogicaltime;
 double sys_time_per_dsp_tick;
 
-void sched_set_using_dacs(int flag)
+void sched_set_using_audio(int flag)
 {
-    sched_usedacs = flag;
-    if (!flag)
+    sched_useaudio = flag;
+    if (flag == SCHED_AUDIO_NONE)
     {
         sched_referencerealtime = sys_getrealtime();
         sched_referencelogicaltime = clock_getlogicaltime();
     }
+        if (flag == SCHED_AUDIO_CALLBACK && sched_useaudio != SCHED_AUDIO_CALLBACK)
+                sys_quit = SYS_QUIT_RESTART;
+        if (flag != SCHED_AUDIO_CALLBACK && sched_useaudio == SCHED_AUDIO_CALLBACK)
+                post("sorry, can't turn off callbacks yet; restart Pd");  /* not right yet! */
+        
     sys_time_per_dsp_tick = (TIMEUNITPERSEC) *
         ((double)sys_schedblocksize) / sys_dacsr;
 }
@@ -385,7 +394,7 @@ nonzero if you actually used the time; otherwise we're really really idle and
 will now sleep. */
 int (*sys_idlehook)(void);
 
-int m_scheduler( void)
+static void m_pollingscheduler( void)
 {
     int idlecount = 0;
     sys_time_per_dsp_tick = (TIMEUNITPERSEC) *
@@ -410,7 +419,7 @@ int m_scheduler( void)
 
         sys_addhist(0);
     waitfortick:
-        if (sched_usedacs)
+        if (sched_useaudio != SCHED_AUDIO_NONE)
         {
 #ifdef THREAD_LOCKING
             /* T.Grill - send_dacs may sleep -> 
@@ -433,6 +442,11 @@ int m_scheduler( void)
                 if (!(idlecount & 31))
                 {
                     static double idletime;
+                                        if (sched_useaudio != SCHED_AUDIO_POLL)
+                                        {
+                                                bug("m_pollingscheduler\n");
+                                                return;
+                                        }
                         /* on 32nd idle, start a clock watch;  every
                         32 ensuing idles, check it */
                     if (idlecount == 32)
@@ -441,7 +455,7 @@ int m_scheduler( void)
                     {
                         post("audio I/O stuck... closing audio\n");
                         sys_close_audio();
-                        sched_set_using_dacs(0);
+                        sched_set_using_audio(SCHED_AUDIO_NONE);
                         goto waitfortick;
                     }
                 }
@@ -475,7 +489,6 @@ int m_scheduler( void)
         {
             sched_pollformeters();
             sys_reportidle();
-
 #ifdef THREAD_LOCKING
             sys_unlock();   /* unlock while we idle */
 #endif
@@ -489,20 +502,61 @@ int m_scheduler( void)
 #ifdef THREAD_LOCKING
             sys_lock();
 #endif
-
             sys_addhist(5);
             sched_didnothing++;
-
         }
     }
 
 #ifdef THREAD_LOCKING
     sys_unlock();
 #endif
-
-    return (0);
 }
 
+void sched_audio_callbackfn(void)
+{
+    sys_setmiditimediff(0, 1e-6 * sys_schedadvance);
+    sys_addhist(1);
+    sched_tick(sys_time + sys_time_per_dsp_tick);
+    sys_addhist(2);
+    sys_pollmidiqueue();
+    sys_addhist(3);
+    sys_pollgui();
+    sys_addhist(5);
+    sched_pollformeters();
+    sys_addhist(0);
+}
+
+static void m_callbackscheduler(void)
+{
+    sys_initmidiqueue();
+    while (1)
+    {
+#ifdef MSW
+    Sleep(1000);
+#else
+	sleep(1);
+#endif
+        if (sys_idlehook)
+            sys_idlehook();
+    }
+}
+
+int m_mainloop(void)
+{
+    while (sys_quit != SYS_QUIT_QUIT)
+    {
+        if (sched_useaudio == SCHED_AUDIO_CALLBACK)
+            m_callbackscheduler();
+        else m_pollingscheduler();
+        if (sys_quit == SYS_QUIT_RESTART)
+        {
+            sys_quit = 0;
+            sys_close_audio();
+            sys_reopen_audio();
+        }
+    }
+    return (0);
+}
 
 /* ------------ thread locking ------------------- */
 
@@ -534,5 +588,5 @@ int sys_trylock(void) {}
 
 void sys_exit(void)
 {
-        sys_quit = 1;
+    sys_quit = SYS_QUIT_QUIT;
 }
