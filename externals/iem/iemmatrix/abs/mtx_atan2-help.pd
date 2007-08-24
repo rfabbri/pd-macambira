@@ -1,0 +1,10 @@
+#N canvas 579 0 622 300 10;
+#X msg 166 52 matrix 1 4 1 1 -1 -1;
+#X msg 325 53 matrix 1 4 1 -1 -1 1;
+#X obj 166 90 mtx_atan2;
+#X obj 166 125 mtx_print;
+#X text 368 248 Franz Zotter 2007;
+#X text 133 15 arcus tangent with range from -pi...+pi;
+#X connect 0 0 2 0;
+#X connect 1 0 2 1;
+#X connect 2 0 3 0;
