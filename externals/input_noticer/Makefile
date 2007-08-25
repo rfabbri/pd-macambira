@@ -6,11 +6,11 @@ clean: ; rm -f *.pd_linux *.o *~
 
 # installs all compiled externals.
 # you'll want to change this to match where your externals live
-install: ; sudo cp *.pd_linux /usr/local/lib/pd/extra
+install: ; sudo cp *.pd_linux /usr/local/lib/pd/extra/ ; sudo cp *help.pd /usr/local/lib/pd/doc/5.reference/
 
 # installs the input_noticer
 # you'll want to change this to match where your externals live
-install_noticer: ; cp input_noticer.pd_linux /usr/local/lib/pd/extra ; cp input_noticer-help.pd /usr/local/lib/pd/doc/5.reference/
+install_noticer: ; sudo cp input_noticer.pd_linux /usr/local/lib/pd/extra ; sudo cp input_noticer-help.pd /usr/local/lib/pd/doc/5.reference/
 
 # ----------------------- LINUX i386 -----------------------
 
