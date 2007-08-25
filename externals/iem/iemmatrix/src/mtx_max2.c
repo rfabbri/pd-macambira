@@ -36,7 +36,7 @@ static void mtx_max2scalar_matrix(t_mtx_binscalar *x, t_symbol *s, int argc, t_a
 
   while(n--){
     buf->a_type = A_FLOAT;
-    buf++->a_w.w_float = (atom_getfloat(ap)<offset)?:offset:atom_getfloat(ap);
+    buf++->a_w.w_float = (atom_getfloat(ap)<offset)?offset:atom_getfloat(ap);
     ap++;
   }
   outlet_anything(x->x_obj.ob_outlet, gensym("matrix"), argc, x->m.atombuffer);
@@ -51,7 +51,7 @@ static void mtx_max2scalar_list(t_mtx_binscalar *x, t_symbol *s, int argc, t_ato
 
   while(n--){
     m->a_type = A_FLOAT;
-    (m++)->a_w.w_float = (atom_getfloat(argv)<offset)?:offset:atom_getfloat(argv);
+    (m++)->a_w.w_float = (atom_getfloat(argv)<offset)?offset:atom_getfloat(argv);
     argv++;
   }
   outlet_list(x->x_obj.ob_outlet, gensym("list"), argc, x->m.atombuffer);
