@@ -36,10 +36,14 @@ struct _MTXRowrfft_
 
 static void deleteMTXRowrfft (MTXRowrfft *x) 
 {
-  free (x->f_re);
-  free (x->f_im);
-  free (x->list_re);
-  free (x->list_im);
+  if (x->f_re)
+     free (x->f_re);
+  if (x->f_im) 
+     free (x->f_im);
+  if (x->list_re)
+     free (x->list_re);
+  if (x->list_im)
+     free (x->list_im);
 }
 
 static void *newMTXRowrfft (t_symbol *s, int argc, t_atom *argv)
