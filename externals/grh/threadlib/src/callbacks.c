@@ -31,14 +31,14 @@ static void h_run_callbacks();
 
 void h_init_callbacks()
 {
-  h_callback_fifo = fifo_init();
+  h_callback_fifo = threadlib_fifo_init();
   h_callback_clock = clock_new(NULL, (t_method)h_run_callbacks);
 }
 
 void h_free_callbacks()
 {
   clock_free(h_callback_clock);
-  fifo_destroy(h_callback_fifo);
+  threadlib_fifo_destroy(h_callback_fifo);
 }
 
 void sys_callback(t_int (*callback) (t_int* argv), t_int* argv, t_int argc)
@@ -51,7 +51,7 @@ void sys_callback(t_int (*callback) (t_int* argv), t_int* argv, t_int argc)
   new->argc = argc;
   new->next = NULL;
 	
-  fifo_put(h_callback_fifo, new);
+  threadlib_fifo_put(h_callback_fifo, new);
   
   // TODO find solution without lock
   sys_lock();
@@ -69,7 +69,7 @@ void h_run_callbacks()
   
   /* append idle callback to ringbuffer */
   
-  while ( (new_callback = (t_sched_callback*) fifo_get(h_callback_fifo)) )
+  while ( (new_callback = (t_sched_callback*) threadlib_fifo_get(h_callback_fifo)) )
   {
     t_sched_callback * next;
     

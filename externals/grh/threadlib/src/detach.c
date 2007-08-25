@@ -62,7 +62,7 @@ static void detach_thread(detach_t* x)
   {
     pthread_cond_wait(&x->x_cond, &x->x_mutex);
 
-    me = (detach_content_t*) fifo_get(x->x_fifo);
+    me = (detach_content_t*) threadlib_fifo_get(x->x_fifo);
 
     while (me != NULL)
     {
@@ -97,7 +97,7 @@ static void detach_thread(detach_t* x)
       if (me->argc)
 	freebytes(me->argv, me->argc * sizeof (t_atom));
       freebytes (me, sizeof(detach_content_t));
-      me = (detach_content_t*) fifo_get(x->x_fifo);
+      me = (detach_content_t*) threadlib_fifo_get(x->x_fifo);
     }
   }
 
@@ -109,9 +109,9 @@ static void detach_thread(detach_t* x)
       freebytes(me->argv, me->argc * sizeof (t_atom));
     freebytes (me, sizeof(detach_content_t));
   }
-  while ( (me = (detach_content_t*) fifo_get(x->x_fifo)) );
+  while ( (me = (detach_content_t*) threadlib_fifo_get(x->x_fifo)) );
 
-  fifo_destroy(x->x_fifo);
+  threadlib_fifo_destroy(x->x_fifo);
   pthread_mutex_destroy(&x->x_mutex);
   pthread_cond_destroy(&x->x_cond);
   return;
@@ -124,7 +124,7 @@ static detach_t * detach_new()
   int status;
 
   x->x_outlet = outlet_new(&x->x_obj, NULL);
-  x->x_fifo = fifo_init();
+  x->x_fifo = threadlib_fifo_init();
 
   /* thread initialisation */
   pthread_mutex_init (&x->x_mutex,NULL);
@@ -146,7 +146,7 @@ static void detach_free(detach_t * x)
 
   me->type = CANCEL;
   me->argc = 0;
-  fifo_put(x->x_fifo, me);
+  threadlib_fifo_put(x->x_fifo, me);
   pthread_cond_broadcast(&x->x_cond);
 }
 
@@ -156,7 +156,7 @@ static void detach_bang(detach_t * x)
   
   me->type = BANG;
   me->argc = 0;
-  fifo_put(x->x_fifo, me);
+  threadlib_fifo_put(x->x_fifo, me);
 
   pthread_cond_broadcast(&x->x_cond);
 }
@@ -169,7 +169,7 @@ static void detach_float(detach_t * x, t_float f)
   me->argc = 1;
   me->argv = getbytes(sizeof(t_atom));
   SETFLOAT(me->argv, f);
-  fifo_put(x->x_fifo, me);
+  threadlib_fifo_put(x->x_fifo, me);
 
   pthread_cond_broadcast(&x->x_cond);
 }
@@ -182,7 +182,7 @@ static void detach_pointer(detach_t * x, t_gpointer* gp)
   me->argc = 1;
   me->argv = getbytes(sizeof(t_atom));
   SETPOINTER(me->argv, gp);
-  fifo_put(x->x_fifo, me);
+  threadlib_fifo_put(x->x_fifo, me);
 
   pthread_cond_broadcast(&x->x_cond);
 }
@@ -195,7 +195,7 @@ static void detach_symbol(detach_t * x, t_symbol * s)
   me->argc = 1;
   me->argv = getbytes(sizeof(t_atom));
   SETSYMBOL(me->argv, s);
-  fifo_put(x->x_fifo, me);
+  threadlib_fifo_put(x->x_fifo, me);
 
   pthread_cond_broadcast(&x->x_cond);
 }
@@ -207,7 +207,7 @@ static void detach_list(detach_t * x, t_symbol * s, int argc, t_atom* argv)
   me->type = LIST;
   me->argc = argc;
   me->argv = copybytes(argv, argc * sizeof(t_atom));
-  fifo_put(x->x_fifo, me);
+  threadlib_fifo_put(x->x_fifo, me);
 
   pthread_cond_broadcast(&x->x_cond);
 }
@@ -220,7 +220,7 @@ static void detach_anything(detach_t * x, t_symbol * s, int argc, t_atom* argv)
   me->argc = argc;
   me->argv = copybytes(argv, argc * sizeof(t_atom));
   me->symbol = s;
-  fifo_put(x->x_fifo, me);
+  threadlib_fifo_put(x->x_fifo, me);
 
   pthread_cond_broadcast(&x->x_cond);
 }

@@ -32,7 +32,7 @@ struct _fifo
 };
 
 
-t_fifo * fifo_init()
+t_fifo * threadlib_fifo_init()
 {
   t_fifo* ret = (t_fifo*) getbytes(sizeof (t_fifo));
   t_fifocell * fifo_begin = (t_fifocell*) getbytes (sizeof (t_fifocell) );
@@ -50,13 +50,13 @@ t_fifo * fifo_init()
   return ret;
 }
 
-void fifo_destroy(t_fifo* fifo)
+void threadlib_fifo_destroy(t_fifo* fifo)
 {
   void * data;
 	
   do
   {
-    data = fifo_get(fifo);
+    data = threadlib_fifo_get(fifo);
   }
   while (data != NULL);
 
@@ -68,7 +68,7 @@ void fifo_destroy(t_fifo* fifo)
 }
 
 /* fifo_put and fifo_get are the only threadsafe functions!!! */
-void fifo_put(t_fifo* fifo, void* data)
+void threadlib_fifo_put(t_fifo* fifo, void* data)
 {
   if (data != NULL)
   {
@@ -90,7 +90,7 @@ void fifo_put(t_fifo* fifo, void* data)
 
 /* this fifo_get returns NULL if the fifo is empty 
  * or locked by another thread */
-void* fifo_get(t_fifo* fifo)
+void* threadlib_fifo_get(t_fifo* fifo)
 {
   t_fifocell * cell;
   void* data;
@@ -121,7 +121,7 @@ void* fifo_get(t_fifo* fifo)
 #else /* THREADLIB_LOCKFREE */
 
 /* 
-   lockfree fifo adapted from the midishare: Copyright © Grame 1999
+   lockfree fifo adapted from the midishare: Copyright ï¿½ Grame 1999
    Grame Research Laboratory, 9, rue du Garet 69001 Lyon - France
    grame@rd.grame.fr
 */
@@ -454,7 +454,7 @@ static void lifo_init(t_lifo* lifo)
   lifo->oc = 0;
 }
 
-t_fifo* fifo_init(void)
+t_fifo* threadlib_fifo_init(void)
 {
   t_fifo* ret = (t_fifo*) getbytes(sizeof(t_fifo));
 	
@@ -465,12 +465,12 @@ t_fifo* fifo_init(void)
 }
 
 
-void fifo_destroy(t_fifo* fifo)
+void threadlib_fifo_destroy(t_fifo* fifo)
 {
   void * data;
   do
   {
-    data = fifo_get(fifo);
+    data = threadlib_fifo_get(fifo);
   }
   while (data != NULL);
 
@@ -478,12 +478,12 @@ void fifo_destroy(t_fifo* fifo)
   return;
 }
 
-void fifo_put(t_fifo* fifo, void* data)
+void threadlib_fifo_put(t_fifo* fifo, void* data)
 {
   lifo_push(&fifo->in, data);
 }
 
-void* fifo_get(t_fifo* fifo)
+void* threadlib_fifo_get(t_fifo* fifo)
 {
   void * data;
   t_lifo *out = &fifo->out;

@@ -73,6 +73,4 @@ void threadlib_setup(void)
   threadlib_class = class_new(gensym("threadlib"), threadlib_new, 0, 
 			      sizeof(t_threadlib), 0, 0);
   class_addmethod(threadlib_class, (t_method)threadlib_help, gensym("help"), 0);
-  
-  return 0;
 }

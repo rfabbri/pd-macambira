@@ -55,12 +55,12 @@ EXTERN_STRUCT _fifo;
 #define t_fifo struct _fifo
 
 /* function prototypes */
-THREADLIB_EXTERN t_fifo * fifo_init(void);
-THREADLIB_EXTERN void fifo_destroy(t_fifo*);
+THREADLIB_EXTERN t_fifo * threadlib_fifo_init(void);
+THREADLIB_EXTERN void threadlib_fifo_destroy(t_fifo*);
 
 /* fifo_put() and fifo_get are the only threadsafe functions!!! */
-THREADLIB_EXTERN void fifo_put(t_fifo*, void*);
-THREADLIB_EXTERN void* fifo_get(t_fifo*);
+THREADLIB_EXTERN void threadlib_fifo_put(t_fifo*, void*);
+THREADLIB_EXTERN void* threadlib_fifo_get(t_fifo*);
 
 
 /* --------- callback FIFO of pd devel ----------- */
