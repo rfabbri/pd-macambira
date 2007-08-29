@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LIBS="Gem cyclone zexy creb cxc ggee iemlib list-abs mapping markex maxlib memento mjlib motex oscx pddp pdogg pixeltango pmpd rradical sigpack smlib toxy unauthorized vbap pan freeverb hcs jmmmp ext13 hardware deprecated flatspace iem_anything pdp pidip flib"
+LIBS="Gem cyclone zexy creb cxc ggee iemlib list-abs mapping markex maxlib memento mjlib motex oscx pddp pdogg pixeltango pmpd rradical sigpack smlib toxy unauthorized vbap pan freeverb hcs jmmmp ext13 hardware deprecated flatspace iem_anything pdp pidip flib ekext"
 
 GNULINUX_FONTPATH="/usr/share/pd /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType"
 MACOSX_FONTPATH="/Library/Pd /System/Library/Fonts /Library/Fonts ~/Library/Fonts /usr/X11R6/lib/X11/fonts/TTF /System/Library/Frameworks/JavaVM.framework/Versions/1.3.1/Home/lib/fonts /sw/lib/X11/fonts/msttf /sw/lib/X11/fonts/intl/TrueType /sw/lib/X11/fonts/applettf"
@@ -14,10 +14,10 @@ MACOSX_FILE=${ROOT_DIR}/darwin_app/org.puredata.pd.plist
 WINDOWS_FILE=${ROOT_DIR}/win32_inno/pd-settings.reg
 
 
-GNULINUX_HEADER='standardpath: 1\nverbose: 0'
+GNULINUX_HEADER='standardpath: 1\nverbose: 0\ndefeatrt: 0\nflags: -helppath /usr/share/pd'
 
 
-MACOSX_HEADER='<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n\t<key>defeatrt</key>\n\t<string>0</string>\n\t<key>flags</key>\n\t<string></string>'
+MACOSX_HEADER='<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n\t<key>defeatrt</key>\n\t<string>0</string>\n\t<key>flags</key>\n\t<string>-helppath /Library/Pd</string>'
 MACOSX_FOOTER='</dict>\n
 </plist>\n'
 
