@@ -36,8 +36,8 @@ Windows Registry Editor Version 5.00
 "loadlib33"="flatspace"
 "loadlib34"="iem_anything"
 "loadlib35"="flib"
+"loadlib36"="ekext"
 ; delete any previous loadlib flags
-"loadlib36"=-
 "loadlib37"=-
 "loadlib38"=-
 "loadlib39"=-

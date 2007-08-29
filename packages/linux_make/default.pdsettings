@@ -1,5 +1,7 @@
 standardpath: 1
 verbose: 0
+defeatrt: 0
+flags: -helppath /usr/share/pd
 loadlib1: Gem
 loadlib2: cyclone
 loadlib3: zexy
@@ -37,8 +39,7 @@ loadlib34: iem_anything
 loadlib35: pdp
 loadlib36: pidip
 loadlib37: flib
+loadlib38: ekext
 path1: /usr/share/pd
 path2: /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType
-nloadlib: 37
-defeatrt: 0
-flags: -helppath /usr/share/pd
+nloadlib: 38
