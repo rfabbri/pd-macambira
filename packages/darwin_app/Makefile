@@ -121,6 +121,7 @@ ifneq (/System,$(findstring /System,$(WISH_FRAMEWORKS_SOURCE)))
 		$(PD_APP_CONTENTS)/Frameworks/Tk.framework/
 	rm -rf $(PD_APP_CONTENTS)/Frameworks/Tcl.framework/{,/Versions/8.4}/{Headers,PrivateHeaders,*_debug,lib*.a,*Config.sh} && \
 	rm -rf $(PD_APP_CONTENTS)/Frameworks/Tk.framework/{,/Versions/8.4}/{Headers,PrivateHeaders,*_debug,lib*.a,*Config.sh}
+	chmod -R u+w $(PD_APP_CONTENTS)/Frameworks
 # from http://tktoolkit.cvs.sourceforge.net/tktoolkit/tk/macosx/GNUmakefile
 	fix_install_id ( ) { \
 	    chmod -R a+w "$$1"; \
