@@ -1290,9 +1290,7 @@ static OSCTimeTag OSCTT_CurrentTimePlusOffset(uint4 offset)
 
     /* First get the seconds right */
     tt.seconds = (unsigned) SECONDS_FROM_1900_to_1970 +
-        (unsigned) tv.tv_sec -
-        (unsigned) 60 * tz.tz_minuteswest +
-        (unsigned) (tz.tz_dsttime ? 3600 : 0)+
+        (unsigned) tv.tv_sec +
         (unsigned) offset/onemillion;
     /* Now get the fractional part. */
     tt.fraction = (unsigned) tv.tv_usec + (unsigned)(offset%onemillion); /* in usec */

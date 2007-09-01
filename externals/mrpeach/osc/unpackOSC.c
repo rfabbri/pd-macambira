@@ -618,8 +618,7 @@ static t_float unpackOSC_DeltaTime(OSCTimeTag tt)
 
         _ftime(&tb); /* find now */
         /* First get the seconds right */
-        ttnow.seconds = (unsigned) SECONDS_FROM_1900_to_1970 +
-            (unsigned) tb.time;
+        ttnow.seconds = (unsigned) SECONDS_FROM_1900_to_1970 + (unsigned) tb.time;
         /* find usec in tt */
         ttusec = tt.seconds*onemillion + ONE_MILLION_OVER_TWO_TO_THE_32*tt.fraction;
         nowusec = ttnow.seconds*onemillion + tb.millitm*onethousand;
@@ -629,10 +628,7 @@ static t_float unpackOSC_DeltaTime(OSCTimeTag tt)
 
         gettimeofday(&tv, &tz); /* find now */
         /* First get the seconds right */
-        ttnow.seconds = (unsigned) SECONDS_FROM_1900_to_1970 +
-            (unsigned) tv.tv_sec -
-            (unsigned) 60 * tz.tz_minuteswest +
-            (unsigned) (tz.tz_dsttime ? 3600 : 0);
+        ttnow.seconds = (unsigned) SECONDS_FROM_1900_to_1970 + (unsigned) tv.tv_sec;
         /* find usec in tt */
         ttusec = tt.seconds*onemillion + ONE_MILLION_OVER_TWO_TO_THE_32*tt.fraction;
         nowusec = ttnow.seconds*onemillion + tv.tv_usec;
