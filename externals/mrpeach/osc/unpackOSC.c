@@ -111,6 +111,12 @@ typedef struct
     uint4 fraction;
 } OSCTimeTag;
 
+typedef union
+{
+    int     i;
+    float   f;
+} intfloat32;
+
 static t_class *unpackOSC_class;
 
 typedef struct _unpackOSC
@@ -378,17 +384,17 @@ static void unpackOSC_PrintTypeTaggedArgs(t_unpackOSC *x, void *v, int n)
                 p += 4;
                 break;
             case 'f':
-                {
-                    int i = ntohl(*((int *) p));
-                    float *floatp = ((float *) (&i));
+            {
+                intfloat32 thisif;
+                thisif.i = ntohl(*((int *) p));
 #ifdef DEBUG
-                    post("float: %f", *floatp);
+                post("float: %f", thisif.f);
 #endif
-                    SETFLOAT(mya+myargc,*floatp);
-                    myargc++;
-                    p += 4;
-                    break;
-                }
+                SETFLOAT(mya+myargc, thisif.f);
+                myargc++;
+                p += 4;
+                break;
+            }
             case 'h': case 't':
 #ifdef DEBUG
                 printf("[A 64-bit int] ");
@@ -458,13 +464,12 @@ static void unpackOSC_PrintTypeTaggedArgs(t_unpackOSC *x, void *v, int n)
 
 static void unpackOSC_PrintHeuristicallyTypeGuessedArgs(t_unpackOSC *x, void *v, int n, int skipComma)
 {
-    int     i, thisi;
-    int     *ints;
-    float   thisf;
-    char    *chars, *string, *nextString;
-    int     myargc= x->x_data_atc;
-    t_atom* mya = x->x_data_at;
-
+    int         i;
+    int         *ints;
+    intfloat32  thisif;
+    char        *chars, *string, *nextString;
+    int         myargc= x->x_data_atc;
+    t_atom*     mya = x->x_data_at;
 
     /* Go through the arguments 32 bits at a time */
     ints = v;
@@ -473,26 +478,25 @@ static void unpackOSC_PrintHeuristicallyTypeGuessedArgs(t_unpackOSC *x, void *v,
     for (i = 0; i < n/4; )
     {
         string = &chars[i*4];
-        thisi = ntohl(ints[i]);
-        /* Reinterpret the (potentially byte-reversed) thisi as a float */
-        thisf = *(((float *) (&thisi)));
+        thisif.i = ntohl(ints[i]);
+        /* Reinterpret the (potentially byte-reversed) thisif as a float */
 
-        if  (thisi >= -1000 && thisi <= 1000000)
+        if (thisif.i >= -1000 && thisif.i <= 1000000)
         {
 #ifdef DEBUG
-            printf("%d ", thisi);
+            printf("%d ", thisif.i);
 #endif
-            SETFLOAT(mya+myargc,(t_float) (thisi));
+            SETFLOAT(mya+myargc,(t_float) (thisif.i));
             myargc++;
             i++;
         }
-        else if (thisf >= -1000.f && thisf <= 1000000.f &&
-            (thisf <=0.0f || thisf >= SMALLEST_POSITIVE_FLOAT))
+        else if (thisif.f >= -1000.f && thisif.f <= 1000000.f &&
+            (thisif.f <=0.0f || thisif.f >= SMALLEST_POSITIVE_FLOAT))
         {
 #ifdef DEBUG
-            printf("%f ",  thisf);
+            printf("%f ",  thisif.f);
 #endif
-            SETFLOAT(mya+myargc,thisf);
+            SETFLOAT(mya+myargc,thisif.f);
             myargc++;
             i++;
         }
