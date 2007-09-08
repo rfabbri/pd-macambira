@@ -1,9 +1,7 @@
-#N canvas 183 209 367 341 10;
+#N canvas 1061 612 371 345 10;
 #X obj 59 48 inlet;
 #X obj 117 246 send \$0-pddp_print;
 #X obj 116 138 zexy/list2symbol;
-#X obj 1 3 cnv 15 98 15 empty \$0-pddp_print empty 2 7 0 14 -262144
--1 0;
 #X text 128 203 reset to blank;
 #X obj 116 170 flatspace/prepend label;
 #X obj 59 90 route bang;
@@ -29,11 +27,13 @@
 #X msg 19 169 bang;
 #X obj 85 0 cnv 15 15 20 empty empty empty 2 7 0 14 -262144 -262144
 0;
-#X connect 0 0 6 0;
-#X connect 2 0 5 0;
-#X connect 5 0 1 0;
-#X connect 6 0 7 0;
-#X connect 6 1 2 0;
-#X connect 7 0 1 0;
-#X connect 8 0 7 0;
+#X obj 1 3 cnv 15 98 15 empty \$0-pddp_print empty 2 7 0 14 -262144
+-1 0;
+#X connect 0 0 5 0;
+#X connect 2 0 4 0;
+#X connect 4 0 1 0;
+#X connect 5 0 6 0;
+#X connect 5 1 2 0;
+#X connect 6 0 1 0;
+#X connect 7 0 6 0;
 #X coords 0 -1 1 1 100 20 1 0 0;
