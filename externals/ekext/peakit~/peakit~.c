@@ -36,6 +36,7 @@ typedef struct _peakit_tilde
 {
   t_object x_obj;
   t_bin_store x_ctl;
+  t_int minmeth;
   t_outlet *peaks_list, *mags_list;
   t_float f_npeaks, f_minmag, f_dummy;
 } t_peakit_tilde;
@@ -52,6 +53,7 @@ t_int *peakit_tilde_perform(t_int *w)
   float s_rate = sys_getsr();
   float bin = s_rate/n;
   float boff = bin/2;
+  float inexp;
   float interp;
   float minus_two = 0;
   float minus_one = 0;
@@ -66,38 +68,44 @@ t_int *peakit_tilde_perform(t_int *w)
   int i, ndx;
 
   /* find peaks in fourier series */
-      for (i = 0; i < n; i++)
-        {
-          alpha = sqrt(real[i] * real[i] + imag[i] * imag[i]);
-          theta = atan2(real[i], imag[i]);
-          t_prev = atom_getfloatarg(i, 16384, store->theta);
-          SETFLOAT (&store->t_prev[i], t_prev);
-          SETFLOAT (&store->theta[i], theta);
-          t_delta = (atom_getfloatarg(i, 16384, store->theta))-(atom_getfloatarg(i, 16384, store->t_prev));
-          SETFLOAT (&store->t_delta[i], t_delta);
-          if (minus_two<minus_one && alpha<minus_one && minus_one>(x->f_minmag/1000))
-			{
-			  SETFLOAT (&store->peaks[npeaks],minus_one);
-    	      SETFLOAT (&store->indices[npeaks],i-1);
-		      npeaks++;
-	        }
-		  minus_two = minus_one;
-		  minus_one = alpha;
-		}
-      for (i = 0; i < npeaks; i++)
-        {
-		  ndx = atom_getfloatarg(i, 8192, store->indices);
- 	      t_delta = atom_getfloatarg(ndx, 16384, store->t_delta); 
-		  theta = atom_getfloatarg(ndx, 8192, store->theta);
-		  t_prev = atom_getfloatarg(ndx, 8192, store->t_prev);
-		  t_delta = (t_delta < -pi) ? (theta+twopi)-t_prev : (t_delta > pi) ? theta-(t_prev+twopi) : t_delta;
-		  //      t_delta = (t_delta < -pi) ? (theta+twopi)-t_prev : (t_delta > pi) ? theta-(t_prev+twopi) : t_delta;  
-		  peakfreq = (ndx * bin + (boff * (t_delta/pi)));
-		  SETFLOAT (&store->peakfreqs[i], peakfreq);
-        } 
-      outlet_list(x->mags_list, gensym("list"), (npeaks - 1), store->peaks);
-      outlet_list(x->peaks_list, gensym("list"), (npeaks - 1), store->peakfreqs);
-    return(w+5);
+  for (i = 0; i < n; i++)
+    {
+      alpha = sqrt(real[i] * real[i] + imag[i] * imag[i]);
+      theta = atan2(real[i], imag[i]);
+      t_prev = atom_getfloatarg(i, 16384, store->theta);
+      SETFLOAT (&store->t_prev[i], t_prev);
+      SETFLOAT (&store->theta[i], theta);
+      t_delta = (atom_getfloatarg(i, 16384, store->theta))-(atom_getfloatarg(i, 16384, store->t_prev));
+      SETFLOAT (&store->t_delta[i], t_delta);
+      inexp = x->f_minmag * 1-(0.1*(log10(boff+i*bin)));
+      if (minus_two<minus_one && alpha<minus_one && minus_one>x->f_minmag && x->minmeth == 0)
+	{
+	  SETFLOAT (&store->peaks[npeaks],minus_one);
+	  SETFLOAT (&store->indices[npeaks],i-1);
+	  npeaks++;
+	}
+      else if (minus_two<minus_one && alpha<minus_one && minus_one>x->f_minmag && x->minmeth == 0)
+      minus_two = minus_one;
+      minus_one = alpha;
+    }
+  for (i = 0; i < npeaks; i++)
+    {
+      ndx = atom_getfloatarg(i, 8192, store->indices);
+      t_delta = atom_getfloatarg(ndx, 16384, store->t_delta);
+      theta = atom_getfloatarg(ndx, 8192, store->theta);
+      t_prev = atom_getfloatarg(ndx, 8192, store->t_prev);
+      t_delta = (t_delta < -pi) ? (theta+twopi)-t_prev : (t_delta > pi) ? theta-(t_prev+twopi) : t_delta;
+      peakfreq = (ndx * bin + (boff * -(t_delta/pi)));
+      SETFLOAT (&store->peakfreqs[i], peakfreq);
+    }
+  outlet_list(x->mags_list, gensym("list"), (npeaks - 1), store->peaks);
+  outlet_list(x->peaks_list, gensym("list"), (npeaks - 1), store->peakfreqs);
+  return(w+5);
+}
+
+void peakit_tilde_iexp(t_peakit_tilde *x, t_floatarg f)
+{
+  x->minmeth = f;
 }
 
 void *peakit_tilde_dsp(t_peakit_tilde *x, t_signal **sp)
@@ -112,6 +120,7 @@ void *peakit_tilde_new(t_floatarg f)
 {
   t_peakit_tilde *x = (t_peakit_tilde *)pd_new(peakit_tilde_class);
   x->f_minmag = f;
+  x->minmeth = 0;
   memset(x->x_ctl.theta, 0, 8192);
   inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
   floatinlet_new(&x->x_obj, &x->f_minmag);
@@ -127,12 +136,12 @@ void peakit_tilde_setup(void)
   0, sizeof(t_peakit_tilde),
   CLASS_DEFAULT, A_DEFFLOAT, 0);
 
-  post("|--<>---<>--<peakit~>-<>--<>----<>--|");
-  post("|--<FFT peaks list>-<>---<>--<>-----|");
-  post("|---<>-<frequencies and magnitudes>-|");
-  post("|-<>-<edward>-<kelly>--<>---<2005>--|");
+  post("|--<>---<>--<peakit~>-<>--<>---<>--|");
+  post("|--<FFT peaks list>-<>--<>---<>----|");
+  post("|-<>-<edward>-<kelly>---<>-<2005>--|");
 
   class_sethelpsymbol(peakit_tilde_class, gensym("help-peakit~"));
   class_addmethod(peakit_tilde_class, (t_method)peakit_tilde_dsp, gensym("dsp"), 0);
+  class_addmethod(peakit_tilde_class, (t_method)peakit_tilde_iexp, &s_float, A_DEFFLOAT, 0);
   CLASS_MAINSIGNALIN(peakit_tilde_class, t_peakit_tilde, f_dummy);
 }
