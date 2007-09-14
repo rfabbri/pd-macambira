@@ -1,0 +1,22 @@
+#N canvas 0 0 520 251 10;
+#X obj 84 137 list_sum;
+#X floatatom 127 166 0 0 0 3 length - -;
+#X floatatom 84 186 0 0 0 3 total - -;
+#X msg 84 55 200.5 498 166.3 81.7 94.4;
+#X msg 150 82 set 2 100;
+#X msg 149 98 set 2 498;
+#X msg 32 106 clear;
+#X msg 149 121 set 5 777;
+#X text 87 40 a list in the inlet calculates the sum of its elements.
+;
+#X text 215 81 individual elements can be set;
+#X text 206 168 list_sum;
+#X text 206 183 calculate the sum of elements in a list.;
+#X text 207 198 Edward Kelly 2007;
+#X connect 0 0 2 0;
+#X connect 0 1 1 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
+#X connect 7 0 0 0;
