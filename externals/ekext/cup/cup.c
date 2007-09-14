@@ -20,6 +20,13 @@ void cup_bang(t_cup *y)
   y->f_count += 1;
 }
 
+void cup_setbang(t_cup *y, t_floatarg f)
+{
+  y->f_count = f;
+  outlet_float(y->count, y->f_count);
+  y->f_count += 1;
+}
+
 void *cup_new(t_floatarg f)
 {
   t_cup *y = (t_cup *)pd_new(cup_class);
@@ -39,4 +46,4 @@ void cup_setup(void)
   class_sethelpsymbol(cup_class, gensym("help-cup"));
   class_addbang(cup_class, cup_bang);
   class_addfloat(cup_class, cup_float);
-}
+  class_addmethod(cup_class, (t_method)cup_setbang, gensym("setbang"), A_DEFFLOAT, 0);}
