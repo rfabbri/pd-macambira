@@ -1,22 +1,41 @@
-#N canvas 0 0 520 251 10;
-#X obj 84 137 list_sum;
-#X floatatom 127 166 0 0 0 3 length - -;
-#X floatatom 84 186 0 0 0 3 total - -;
-#X msg 84 55 200.5 498 166.3 81.7 94.4;
+#N canvas 0 0 707 528 10;
+#X obj 84 255 list_sum;
+#X floatatom 101 358 0 0 0 3 length - -;
+#X floatatom 84 391 0 0 0 3 total - -;
 #X msg 150 82 set 2 100;
 #X msg 149 98 set 2 498;
 #X msg 32 106 clear;
 #X msg 149 121 set 5 777;
-#X text 87 40 a list in the inlet calculates the sum of its elements.
-;
 #X text 215 81 individual elements can be set;
-#X text 206 168 list_sum;
-#X text 206 183 calculate the sum of elements in a list.;
-#X text 207 198 Edward Kelly 2007;
+#X text 206 286 list_sum;
+#X text 205 327 Edward Kelly 2007;
+#X msg 84 55 all 200.5 498 166.3 81.7 94.4;
+#X text 84 36 all in the left inlet calculates the sum of its elements.
+;
+#X msg 173 145 3;
+#X msg 173 162 9;
+#X msg 211 162 4;
+#X msg 211 179 8;
+#X text 200 144 max length;
+#X text 241 162 wrap value;
+#X obj 300 116 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 331 116 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 206 301 calculate the sum of elements in a list \, wrapping
+the list.;
 #X connect 0 0 2 0;
 #X connect 0 1 1 0;
 #X connect 3 0 0 0;
 #X connect 4 0 0 0;
 #X connect 5 0 0 0;
 #X connect 6 0 0 0;
-#X connect 7 0 0 0;
+#X connect 10 0 0 0;
+#X connect 12 0 0 1;
+#X connect 13 0 0 1;
+#X connect 14 0 0 2;
+#X connect 15 0 0 2;
+#X connect 18 0 13 0;
+#X connect 18 0 14 0;
+#X connect 19 0 12 0;
+#X connect 19 0 15 0;

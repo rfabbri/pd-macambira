@@ -29,10 +29,10 @@ typedef struct _list_sum
   t_object x_obj;
   t_contents contents;
   t_float total, highest, maxlen, wrap, reset, accum, remainder, firsttime;
-  t_outlet *sum, *length, *remains, *diff;
+  t_outlet *sum, *length; /*, *remains, *diff;*/
 } t_list_sum;
 
-void list_sum_all(t_list_sum *x, int argc, t_atom *argv)
+void list_sum_all(t_list_sum *x, t_symbol *s, int argc, t_atom *argv)
 {
   argc = argc < 1024 ? argc : 1024;
   int i, j, maxindex;
@@ -98,22 +98,22 @@ void list_sum_set(t_list_sum *x, t_floatarg element, t_floatarg value)
 }
 
 //next: list_sum_follow - clock based?
-void list_sum_follow(t_list_sum *x, t_floatarg index, t_floatarg value)
-{
-  int i = (int) index;
-  if(index == (int)x->reset || x->firsttime == 1)
-    {
-      x->accum = 0;
-      x->remainder = total;
-    }
-  float current = atom_getfloatarg(i, 1024, x->contents.list);
-  float diff = value - current;
-  x->accum += diff;
-  outlet_float(x->diff, x->accum);
-  x->remainder -=current;
-  outlet_float(x->remains, x->remainder);
-  x->firsttime = 0;
-}
+//void list_sum_follow(t_list_sum *x, t_symbol *s, t_floatarg index, t_floatarg value)
+//{
+//  int i = (int) index;
+//  if(index == (int)x->reset || x->firsttime == 1)
+//    {
+//      x->accum = 0;
+//      x->remainder = x->total;
+//      x->firsttime = 0;
+//    }
+//  float current = atom_getfloatarg(i, 1024, x->contents.list);
+//  float diff = value - current;
+//  x->accum += diff;
+//  outlet_float(x->diff, x->accum);
+//  x->remainder -=current;
+//  outlet_float(x->remains, x->remainder);
+//}
 
 
 void list_sum_clear(t_list_sum *x)
@@ -146,6 +146,7 @@ void *list_sum_new(t_symbol *s, int argc, t_atom *argv)
   x->highest = 0;
   x->maxlen = 1024;
   x->wrap = 1024;
+  x->reset = 16;
   x->firsttime = 1;
   for(i=0;i<1024;i++)
     {
@@ -153,11 +154,11 @@ void *list_sum_new(t_symbol *s, int argc, t_atom *argv)
     }
   floatinlet_new(&x->x_obj, &x->maxlen);
   floatinlet_new(&x->x_obj, &x->wrap);
-  floatinlet_new(&x->x_obj, &x->reset);
+  //  floatinlet_new(&x->x_obj, &x->reset);
   x->sum = outlet_new(&x->x_obj, &s_float);
   x->length = outlet_new(&x->x_obj, &s_float);
-  x->remains = outlet_new(&x->x_obj, &s_float);
-  x->diff = outlet_new(&x->x_obj, &s_float);
+  //  x->remains = outlet_new(&x->x_obj, &s_float);
+  //  x->diff = outlet_new(&x->x_obj, &s_float);
   return (void *)x;
 }
 
@@ -170,7 +171,7 @@ void list_sum_setup(void) {
   post("|<<<calculate the sum of a list, with wrapping>>>|");
   post("|<<<<<<<<<edward-------kelly-------2007>>>>>>>>>>|");
   class_sethelpsymbol(list_sum_class, gensym("help-list_sum"));
-  class_addmethod(list_sum_class, (t_method)list_sum_follow, gensym("follow"), A_DEFFLOAT, A_DEFFLOAT, 0);
+  //  class_addmethod(list_sum_class, (t_method)list_sum_follow, gensym("follow"), A_DEFFLOAT, A_DEFFLOAT, 0);
   class_addmethod(list_sum_class, (t_method)list_sum_all, gensym("all"), A_GIMME, 0);
   class_addmethod(list_sum_class, (t_method)list_sum_clear, gensym("clear"), A_DEFFLOAT, 0);
   class_addmethod(list_sum_class, (t_method)list_sum_print, gensym("print"), A_DEFFLOAT, 0);
