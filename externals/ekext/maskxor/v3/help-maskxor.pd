@@ -41,15 +41,15 @@ is GNU software.;
 #X msg 678 114 1 1 0 0 0 1;
 #X msg 721 131 0 1 1 0 2 1 0;
 #X msg 669 190 mode \$1;
-#X obj 669 167 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 669 167 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X text 728 191 ... in mode 1 \, floats are only;
 #X text 729 204 passed through the left outlet;
 #X text 728 217 when the left list contains;
 #X text 727 229 fewer non-zero elements than;
 #X text 727 241 the right list. CHANGED BEHAVIOUR!;
-#X msg 651 65 1 0 0 1 0 0 0 1;
-#X msg 638 49 1 0 0 1 0 1 0 1;
+#X msg 659 70 1 0 0 1 0 0 0 1;
+#X msg 646 54 1 0 0 1 0 1 0 1;
 #X text 847 123 |;
 #X text 847 132 |;
 #X text 847 141 |;
