@@ -1,84 +1,59 @@
-#N canvas 217 31 536 593 10;
-#X obj 114 560 pddp;
-#X obj 8 3 cnv 15 90 578 empty empty empty 20 12 0 14 -233017 -66577
+#N canvas 282 28 573 622 10;
+#X obj 5 574 cnv 15 550 20 empty empty empty 20 12 0 14 -228856 -66577
 0;
-#X floatatom 325 358 5 0 0 0 - - -;
-#X floatatom 484 395 5 0 0 0 - - -;
-#X floatatom 369 462 5 0 0 0 - - -;
-#X msg 304 402 42 7;
-#X obj 366 396 bng 15 250 50 0 empty empty "bang" 0 -6 0 8 -262144
--1 -1;
-#X floatatom 128 422 5 0 0 0 - - -;
-#X msg 128 373 bang;
-#X obj 46 18 float;
-#X obj 492 17 f;
-#X text 111 18 - STORE A FLOATING POINT NUMBER - abbreviation:;
-#X msg 249 402 7 3 4;
-#X obj 369 436 f;
-#X obj 128 397 float 7;
-#X text 113 484 doc/2.control.examples/sendnumber.pd;
-#X text 371 358 Tip: Shift+drag;
-#X text 37 44 INLETS:;
-#X text 37 59 - LEFT:;
-#X text 104 59 Float - A float at the left inlet will update the stored
-value of the object and will send the number immediately to the outlet.
+#X obj 5 -12 cnv 15 550 40 empty empty float 3 12 0 18 -204280 -1 0
 ;
-#X text 104 114 Bang - A bang at the left inlet will force [float]
-to send its value to the outlet.;
-#X text 104 152 List - A list at the left inlet will be truncated to
-include only the first element. The first element in the list will
-update the stored value of the object and will send the number immediately
-to the outlet.;
-#X text 29 220 - RIGHT:;
-#X text 105 220 Float - A float at the right inlet is stored for later
-use. It will be sent to the left outlet when a float or bang is received
-in the left inlet.;
-#X text 29 324 OUTLETS:;
-#X text 13 272 ARGUMENTS:;
-#X text 20 354 EXAMPLES:;
-#X text 22 484 SEE ALSO:;
-#X text 104 272 One - [float] accepts a single float as a creation
-argument which initializes the first value to be sent out the left
-outlet.;
-#X text 104 325 One - outputs the stored floating point value of the
-object.;
-#X text 249 384 lists;
-#X text 106 355 creation argument;
-#N canvas 58 22 401 250 Related_Objects 0;
-#X text 25 11 Native Pd Objects;
-#X text 23 92 Externals and other object libraries;
-#X obj 42 48 int;
-#X obj 109 48 symbol;
-#X text 36 126 [randomF];
-#X restore 114 508 pd Related_Objects;
-#N canvas 57 22 641 622 More_Info 0;
-#X text 43 24 All numbers in Pd are kept in 32-bit floating point and
-can represent real numbers between -8 \, 388608 and 8.388.608.00;
-#X text 11 78 WHAT IS A FLOATING POINT NUMBER?;
-#X text 41 267 The following are examples of floating point numbers:
+#X obj 4 244 cnv 3 550 3 empty empty inlets 15 12 0 13 -228856 -1 0
 ;
-#X text 61 293 3;
-#X text 62 334 -111.5;
-#X text 61 313 0.5;
-#X text 40 387 3e-05 : This example is a computer shorthand for scientific
-notation. It means 3*10-5 (or 10 to the negative 5th power multiplied
-by 3).;
-#X text 41 108 According to Webopedia.com \, "computers are integer
-machines and are capable of representing real numbers only by using
-complex codes." Hence \, real numbers must be 'approximated' by computers
-using the "floating point standard". In such a number \, the decimal
-point can "float" meaning that there is no fixed number of digits preceding
-or following the decimal. A floating point number is therefore a computer's
-approximation of a real number.;
-#X text 43 453 Interesting side-note: In the early 1990's \, the Intel
-80486 was shipped with a math coprocessor to help accelerate the process
-of computing floating point numbers (which previously required a considerable
-amount of CPU power.) Math coprocessors have since found there way
-into nearly every graphics card and CPU available today.;
-#X text 62 358 10000 to 1e-16;
-#X restore 114 534 pd More_Info;
-#X text 158 561 - Dave Sabine \, November 18 \, 2002;
-#N canvas 0 22 454 304 float/list 0;
+#N canvas 407 510 482 332 META 0;
+#X text 12 5 CATEGORY control;
+#X text 12 35 KEYWORDS control number float store;
+#X text 12 65 DESCRIPTION stores a number;
+#X restore 505 576 pd META;
+#X obj 83 156 cnv 10 50 16 empty empty empty 20 12 0 14 -262126 -66577
+0;
+#X obj 346 163 cnv 10 23 16 empty empty empty 20 12 0 14 -262126 -66577
+0;
+#X floatatom 384 135 5 0 0 0 - - -;
+#X floatatom 345 187 5 0 0 0 - - -;
+#X obj 364 135 bng 15 250 50 0 empty empty empty 20 7 0 12 -4034 -1
+-1;
+#X floatatom 85 181 5 0 0 0 - - -;
+#X msg 85 73 bang;
+#X msg 325 79 7 3 4;
+#X obj 345 162 f;
+#X obj 85 156 float 7;
+#X obj 4 394 cnv 3 550 3 empty empty outlet 15 12 0 13 -228856 -1 0
+;
+#X obj 4 444 cnv 3 550 3 empty empty argument 15 12 0 13 -228856 -1
+0;
+#X obj 4 494 cnv 3 550 3 empty empty more_info 15 12 0 13 -228856 -1
+0;
+#X obj 73 350 cnv 17 3 40 empty empty 1 5 9 0 16 -228856 -162280 0
+;
+#X obj 73 264 cnv 17 3 80 empty empty 0 5 9 0 16 -228856 -162280 0
+;
+#X text 103 263 BANG - output the currently stored value;
+#X text 103 350 FLOAT - a float received on the right inlet is stored
+;
+#X obj 465 9 pddp/pddplink http://wiki.puredata.info/en/float -text
+pdpedia: float;
+#X text 103 283 FLOAT - outputs the incoming number and stores it;
+#X text 103 303 LIST - truncates to the first element \, outputs that
+element \, and stores it;
+#X obj 467 -9 float;
+#X obj 527 -9 f;
+#X text 506 -8 or;
+#X msg 105 126 12;
+#X msg 138 126 -0.02;
+#X msg 53 102 555;
+#X msg 344 102 list one 2 3;
+#X text 428 101 does not work!;
+#X text 104 412 FLOAT - outputs the stored value as a float message
+;
+#X obj 105 532 pddp/pddplink http://crca.ucsd.edu/~msp/Pd_documentation/x2.htm#s3.1
+-text Pd manual 2.3.1: anatomy of a message;
+#N canvas 0 22 458 308 float/list 0;
 #X msg 75 133 float 1 2 3;
 #X text 34 22 FLOAT CONVERSION;
 #X msg 95 187 list 1 2 3;
@@ -114,13 +89,69 @@ cut to one element.;
 #X connect 12 4 11 0;
 #X connect 14 0 12 0;
 #X connect 15 0 12 0;
-#X restore 229 533 pd float/list conversion;
-#X obj 263 506 pddp_open all_about_data_types;
-#X connect 2 0 13 0;
-#X connect 3 0 13 1;
-#X connect 5 0 13 0;
-#X connect 6 0 13 0;
-#X connect 8 0 14 0;
-#X connect 12 0 13 0;
-#X connect 13 0 4 0;
-#X connect 14 0 7 0;
+#X restore 391 541 pd float/list conversion;
+#N canvas 57 22 649 630 More_Info 0;
+#X text 43 24 All numbers in Pd are kept in 32-bit floating point and
+can represent real numbers between -8 \, 388608 and 8.388.608.00;
+#X text 11 78 WHAT IS A FLOATING POINT NUMBER?;
+#X text 41 267 The following are examples of floating point numbers:
+;
+#X text 61 293 3;
+#X text 62 334 -111.5;
+#X text 61 313 0.5;
+#X text 40 387 3e-05 : This example is a computer shorthand for scientific
+notation. It means 3*10-5 (or 10 to the negative 5th power multiplied
+by 3).;
+#X text 41 108 According to Webopedia.com \, "computers are integer
+machines and are capable of representing real numbers only by using
+complex codes." Hence \, real numbers must be 'approximated' by computers
+using the "floating point standard". In such a number \, the decimal
+point can "float" meaning that there is no fixed number of digits preceding
+or following the decimal. A floating point number is therefore a computer's
+approximation of a real number.;
+#X text 43 453 Interesting side-note: In the early 1990's \, the Intel
+80486 was shipped with a math coprocessor to help accelerate the process
+of computing floating point numbers (which previously required a considerable
+amount of CPU power.) Math coprocessors have since found there way
+into nearly every graphics card and CPU available today.;
+#X text 62 358 10000 to 1e-16;
+#X restore 390 517 pd More_Info;
+#X obj 105 549 pddp/pddplink http://en.wikipedia.org/wiki/Floating_point
+;
+#X text 120 72 outputs argument;
+#X text 91 101 overrides argument;
+#X text 103 462 [float] accepts a single number as a creation argument
+which sets value that is stored.;
+#N canvas 309 454 609 478 guts 0;
+#X obj 117 95 textfile;
+#X msg 116 24 symbol template-HCS.pd;
+#X msg 116 54 read \$1 \, rewind \, bang;
+#X obj 117 141 trigger bang anything;
+#X obj 58 117 bang;
+#X obj 240 162 route #X;
+#X obj 240 183 route text;
+#X obj 240 250 route DESCRIPTION;
+#X obj 239 276 print;
+#X obj 140 277 print TEXT;
+#X connect 0 0 3 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
+#X connect 3 0 4 0;
+#X connect 3 1 5 0;
+#X connect 4 0 0 0;
+#X connect 5 0 6 0;
+#X connect 7 0 8 0;
+#X restore 454 576 pd guts;
+#X text 16 8 description: stores a number;
+#X text 106 516 all_about_data-types.pd;
+#X text 138 157 stores value;
+#X connect 6 0 12 1;
+#X connect 8 0 12 0;
+#X connect 10 0 13 0;
+#X connect 11 0 12 0;
+#X connect 12 0 7 0;
+#X connect 13 0 9 0;
+#X connect 27 0 13 1;
+#X connect 28 0 13 1;
+#X connect 29 0 13 0;
+#X connect 30 0 12 0;
