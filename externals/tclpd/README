@@ -1,0 +1,71 @@
+
+ Tcl for Pd
+ ==========
+
+this library allows you to to write externals for Pd using the
+Tcl language. despite tot/toxy/widget externals, Tcl code ran
+with tclpd actually runs in server (rather than gui process).
+
+this is a PRE-ALPHA release: it means something work, but don't
+expect to do serious things right now. also expect changes to
+the Tcl API and around.
+
+
+ Data conversion between Tcl <=> Pd
+ ==================================
+
+In pd exists 'atoms'. An atom is a float, a symbol, a list item,
+and such.
+Tcl does not have data types. In Tcl everything is a string,
+also numbers and lists. Just when something needs to be read as
+number, then evaluation comes in.
+This leads to loss of information about atom types. Imagine a
+symbol '456' comes into tclpd, you won't know anymore if "456"
+is a symbol or a float.
+
+Here a little convention comes in action: in tclpd an atom gets
+converted to a two-item list, where first item is atom type,
+and second item is its value.
+
+Some examples of conversion:
+
+ Pd:  456
+ Tcl: {float 456}
+
+ Pd:  symbol foo
+ Tcl: {symbol foo}
+
+ Pd:  list cat dog 123 456 weee
+ Tcl: {{symbol cat} {symbol dog} {float 123} {float 456} {symbol wee}}
+
+
+ Examples
+ ========
+
+I provided small examples.
+after loading pd with option '-lib tcl', just type the filename
+(minus the .tcl extension) to load the Tcl externals examples.
+
+actually there is one simple example: list_change (behaves like
+[change] object, but work with lists only)
+
+examples make use of pdlib.tcl, a little API I wrote to make
+things more cute.
+you are free to not use it (just look in pdlib.tcl to know what
+happens for real) or better: YOU ARE ENCOURAGED to write an OOP
+system for writing externals with tclpd.
+
+
+ Authors
+ =======
+
+ * Federico Ferri <mescalinum@gmail.com>
+ * Mathieu Bouchard <matju@artengine.ca>
+
+
+ License
+ =======
+
+See COPYING file provided with the package.
+
+
