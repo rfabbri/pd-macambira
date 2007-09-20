@@ -1,3 +1,6 @@
+0.12.21 ( codename Sa'ha Pidip )
+  fixed synchronisation in pdp_theonice~
+
 0.12.20 ( codename Lavapies )
   added contributions from Pablo Martin Caedes ( caedes@sindominio.net ) :
   pdp_qtext : a layered texts object, based on pdp_text and using imlib2
