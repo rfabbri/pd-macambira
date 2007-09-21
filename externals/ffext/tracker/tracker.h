@@ -27,6 +27,8 @@ typedef struct _tracker
     t_int x_active_column; // selected item col
     t_int x_ndigits;       // cell width (+1 of margin added automatically)
     t_int x_cursor_pos;    // visual cursor position (row indicator)
+    t_int b_cursor;        // track cursor?
+    t_int b_save_data;     // save data?
     char x_buf[MAX_BUF+1]; // edit buffer
     t_int x_cell_width;    // cell width in pixels  (auto computed)
     t_int x_cell_height;   // cell height in pixels (auto computed)
