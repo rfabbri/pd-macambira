@@ -29,8 +29,9 @@ void sieve_float(t_sieve *x, t_floatarg fin)
   itest = itesta = itestb = iresult = arga = argb = arg = 0;
   float test, testa, testb, fresult;
   test = testa = testb = fresult = 0;
-  x->input = arg = fin;// < 0 ? 0 : fin > LASTENTRY ? LASTENTRY : (int)fin;
-  if (x->mode == 0)
+  x->input = arg = fin;
+  if (x->mode == 0) /* only let through floats when the corresponding 
+                       index contains != 0 */
     {
       test = fin < 0 ? 0 : atom_getfloatarg(arg, MAXENTRIES, x->x_map.map);
       if(test!=0) 
@@ -40,7 +41,8 @@ void sieve_float(t_sieve *x, t_floatarg fin)
 	  outlet_float(x->mapped, arg);
 	}
     }
-  else if (x->mode == 1)
+  else if (x->mode == 1) /* find the nearest float whose (int) index is
+                            != 0 */
     {
       test =  fin < 0 ? 0 : atom_getfloatarg(arg, MAXENTRIES, x->x_map.map);
       if(test!=0)
@@ -66,7 +68,7 @@ void sieve_float(t_sieve *x, t_floatarg fin)
 	    }
 	  switch(itest)
 	    {
-	    case 2:
+	    case 2: /* if we find two at equal distance, output the higher */
 	      if (x->mode == 1)
 		{
 		  outlet_float(x->value, testb);
@@ -87,7 +89,7 @@ void sieve_float(t_sieve *x, t_floatarg fin)
 	    }
 	}
     }
-  else if (x->mode==2)
+  else if (x->mode==2) /* if the index is 0, find the next highest */
     {
       itest = 0;
       test =  fin < 0 ? 0 : atom_getfloatarg(arg, MAXENTRIES, x->x_map.map);
@@ -113,7 +115,7 @@ void sieve_float(t_sieve *x, t_floatarg fin)
 	    }
 	}
     }
-  else if (x->mode == 3)
+  else if (x->mode == 3) /* if the index is 0, find the next lowest */
     {
       itest = 0;
       test =  fin < 0 ? 0 : atom_getfloatarg(arg, MAXENTRIES, x->x_map.map);
@@ -139,7 +141,8 @@ void sieve_float(t_sieve *x, t_floatarg fin)
     }
 }
 
-void sieve_set(t_sieve *x, t_floatarg fmap, t_floatarg fval)
+void sieve_set(t_sieve *x, t_floatarg fmap, t_floatarg fval) /* set one value 
+                                                                in the array */
 {
   float fvaller;
   if(fmap < MAXENTRIES && fmap >= 0)
@@ -152,7 +155,134 @@ void sieve_set(t_sieve *x, t_floatarg fmap, t_floatarg fval)
     }
 }
 
-void sieve_get(t_sieve *x, t_floatarg inv)
+void sieve_delete(t_sieve *x, t_floatarg loc) /* remove a value */
+{
+  int addloc = (int)loc + 1;
+  int maxentry = (int)x->max;
+  int i;
+  float buffer;
+  if(loc<x->max && loc>=0)
+    {
+      for(i=addloc;i<=maxentry;i++)
+	{
+	  buffer = atom_getfloatarg(i,MAXENTRIES,x->x_map.map);
+	  SETFLOAT(&x->x_map.map[i-1],buffer);
+	  if(buffer!=0)
+	    {
+	      SETFLOAT(&x->x_map.nomap[i-1],0);
+	    }
+	  else
+	    {
+	      SETFLOAT(&x->x_map.nomap[i-1],1);
+	    }
+	}
+      SETFLOAT(&x->x_map.map[maxentry],0);
+      x->max--;
+    }
+  else if(loc==x->max)
+    {
+      x->max--;
+      SETFLOAT(&x->x_map.map[maxentry],0);
+    }
+}
+
+void sieve_shunt(t_sieve *x, t_floatarg loc) /* move down 
+                                                and decrement subsequent */
+{
+  int addloc = (int)loc + 1;
+  int maxentry = (int)x->max;
+  int i;
+  float buffer, shunt;
+  if(loc<x->max && loc>=0)
+    {
+      for(i=addloc;i<=maxentry;i++)
+	{
+	  buffer = atom_getfloatarg(i,MAXENTRIES,x->x_map.map);
+	  shunt = buffer - 1;
+	  SETFLOAT(&x->x_map.map[i-1],shunt);
+	  if(shunt!=0)
+	    {
+	      SETFLOAT(&x->x_map.nomap[i-1],0);
+	    }
+	  else
+	    {
+	      SETFLOAT(&x->x_map.nomap[i-1],1);
+	    }
+	}
+      SETFLOAT(&x->x_map.map[maxentry],0);
+      x->max--;
+    }
+  else if(loc==x->max)
+    {
+      x->max--;
+      SETFLOAT(&x->x_map.map[maxentry],0);
+    }
+}
+
+void sieve_shift(t_sieve *x, t_floatarg loc) /* move up and
+                                                increment subsequent */
+{
+  int location = (int)loc;
+  int addloc;
+  int maxentry = (int)x->max+1;
+  int i;
+  float buffer, shift;
+  if(location>=0 && maxentry < MAXENTRIES)
+    {
+      for(i=maxentry;i>=location;i--)
+	{
+	  buffer = atom_getfloatarg(i-1,MAXENTRIES,x->x_map.map);
+	  shift = buffer + 1;
+	  SETFLOAT(&x->x_map.map[i],shift);
+	  if(shift!=0)
+	    {
+	      SETFLOAT(&x->x_map.nomap[i],0);
+	    }
+	  else
+	    {
+	      SETFLOAT(&x->x_map.nomap[i],1);
+	    }
+	}
+      x->max++;
+    }
+}
+
+void sieve_insert(t_sieve *x, t_floatarg loc, t_floatarg val)
+/* insert a value at specific location, moving subsequent values up */
+{
+  int location = (int)loc;
+  int maxentry = (int)x->max+1;
+  int i;
+  float buffer;
+  if(loc>=0 && maxentry < MAXENTRIES)
+    {
+      for(i=maxentry;i>=location;i--)
+	{
+	  buffer = atom_getfloatarg(i-1,MAXENTRIES,x->x_map.map);
+	  SETFLOAT(&x->x_map.map[i],buffer);
+	  if(buffer!=0)
+	    {
+	      SETFLOAT(&x->x_map.nomap[i],0);
+	    }
+	  else
+	    {
+       	      SETFLOAT(&x->x_map.nomap[i],1);
+	    }
+	}
+      x->max++;
+      SETFLOAT(&x->x_map.map[location], val);
+      if(val) 
+	{
+	  SETFLOAT(&x->x_map.nomap[location],0);
+	}
+      else
+	{
+	  SETFLOAT(&x->x_map.nomap[location],1);
+	}
+    }
+}
+
+void sieve_get(t_sieve *x, t_floatarg inv) /* outlet to map or inverse */
 {
   if(inv!=0) 
     {
@@ -164,21 +294,17 @@ void sieve_get(t_sieve *x, t_floatarg inv)
 
 void sieve_clear(t_sieve *x)
 {
-  //memset(x->x_map.map, 0, MAXENTRIES);
   int i;
   for(i=0;i<MAXENTRIES;i++) 
     {
       SETFLOAT(&x->x_map.map[i], 0);
       SETFLOAT(&x->x_map.nomap[i], 1);
     }
-  //memset(x->x_map.nomap, 1, MAXENTRIES);
   x->max = 0;
 }
 
-void sieve_map(t_sieve *x, t_symbol *s, int argc, t_atom *argv)
+void sieve_map(t_sieve *x, t_symbol *s, int argc, t_atom *argv) /* set the whole map */
 {
-  //memset(x->x_map.map, 0, MAXENTRIES);
-  //memset(x->x_map.nomap, 1, MAXENTRIES);
   int i;
   for(i=0;i<MAXENTRIES;i++) 
     {
@@ -236,11 +362,9 @@ void sieve_debug(t_sieve *x)
   nle7 = atom_getfloatarg(7, MAXENTRIES, x->x_map.nomap);
   nle8 = atom_getfloatarg(8, MAXENTRIES, x->x_map.nomap);
   nle9 = atom_getfloatarg(9, MAXENTRIES, x->x_map.nomap);
-  /*	  post("blocksize = %d, scales = %d, vectorsize = %d, offset = %d", 
-	  x->N, x->scales, x->vecsize, x->offset); */
-  post("mode = %d, max = %d", x->mode, x->max);
-  post("first 10 elements = %d, %d, %d, %d, %d, %d, %d, %d, %d, %d", ele0, ele1, ele2, ele3, ele4, ele5, ele6, ele7, ele8, ele9);
-  post("first 10 elements = %d, %d, %d, %d, %d, %d, %d, %d, %d, %d", nle0, nle1, nle2, nle3, nle4, nle5, nle6, nle7, nle8, nle9);
+  post("mode = %f, max = %f", x->mode, x->max);
+  post("first 10 elements = %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", ele0, ele1, ele2, ele3, ele4, ele5, ele6, ele7, ele8, ele9);
+  post("first 10 elements = %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", nle0, nle1, nle2, nle3, nle4, nle5, nle6, nle7, nle8, nle9);
 }  
 
 void *sieve_new(t_floatarg f) 
@@ -249,8 +373,6 @@ void *sieve_new(t_floatarg f)
   x->mode = f;
   x->max = 0;
   x->outmap = 0;
-  //memset(x->x_map.map, 0, MAXENTRIES);
-  //memset(x->x_map.nomap, 1, MAXENTRIES);
   int i;
   for(i=0;i<MAXENTRIES;i++) 
     {
@@ -266,7 +388,6 @@ void *sieve_new(t_floatarg f)
 
 void sieve_setup(void) 
 {
-
   sieve_class = class_new(gensym("sieve"),
   (t_newmethod)sieve_new,
   0, sizeof(t_sieve),
@@ -280,6 +401,10 @@ void sieve_setup(void)
   class_addmethod(sieve_class, (t_method)sieve_map, gensym("map"), A_GIMME, 0);
   class_addmethod(sieve_class, (t_method)sieve_clear, gensym("clear"), A_DEFFLOAT, 0);
   class_addmethod(sieve_class, (t_method)sieve_get, gensym("get"), A_DEFFLOAT, 0);
+  class_addmethod(sieve_class, (t_method)sieve_delete, gensym("delete"), A_DEFFLOAT, 0);
+  class_addmethod(sieve_class, (t_method)sieve_shunt, gensym("shunt"), A_DEFFLOAT, 0);
+  class_addmethod(sieve_class, (t_method)sieve_shift, gensym("shift"), A_DEFFLOAT, 0);
+  class_addmethod(sieve_class, (t_method)sieve_insert, gensym("insert"), A_DEFFLOAT, A_DEFFLOAT, 0);
   class_addmethod(sieve_class, (t_method)sieve_mode, gensym("mode"), A_DEFFLOAT, 0);
   class_addmethod(sieve_class, (t_method)sieve_debug, gensym("debug"), A_DEFFLOAT, 0);
 }
