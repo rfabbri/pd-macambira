@@ -34,6 +34,8 @@ typedef struct _tracker
     t_int x_cell_height;   // cell height in pixels (auto computed)
     t_float** x_data;      // data (2d matrix)
     t_outlet* outlet0;     // outlet
+    t_symbol* s_send;
+    t_symbol* s_recv;
 } t_tracker;
 
 static void tracker_draw_new(t_tracker* x, t_glist* glist);

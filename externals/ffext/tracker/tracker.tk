@@ -8,6 +8,10 @@ proc tracker_apply {id} {
     global $var_graph_height
     set var_saveflag [concat saveflag_$vid]
     global $var_saveflag
+    set var_sym_send [concat sym_send_$vid]
+    global $var_sym_send
+    set var_sym_recv [concat sym_recv_$vid]
+    global $var_sym_recv
  
     set cmd [concat $id resize \
         [eval concat $$var_graph_height] \
@@ -19,6 +23,12 @@ proc tracker_apply {id} {
         [eval concat $$var_saveflag] \
         \;]
     pd $cmd
+
+    set ss [string trim [set $var_sym_send]]
+    if {$ss != {}} {pd [concat $id set_send $ss \;]}
+
+    set rs [string trim [set $var_sym_recv]]
+    if {$rs != {}} {pd [concat $id set_recv $rs \;]}
 }
  
 proc tracker_cancel {id} {
@@ -32,7 +42,7 @@ proc tracker_ok {id} {
     tracker_cancel $id
 }
  
-proc pdtk_tracker_dialog {id width height saveflag} {
+proc pdtk_tracker_dialog {id width height saveflag ss rs} {
     set vid [string trimleft $id .]
  
     set var_graph_width [concat graph_width_$vid]
@@ -41,10 +51,16 @@ proc pdtk_tracker_dialog {id width height saveflag} {
     global $var_graph_height
     set var_saveflag [concat saveflag_$vid]
     global $var_saveflag
+    set var_sym_send [concat sym_send_$vid]
+    global $var_sym_send
+    set var_sym_recv [concat sym_recv_$vid]
+    global $var_sym_recv
 
     set $var_graph_width $width
     set $var_graph_height $height
     set $var_saveflag $saveflag
+    set $var_sym_recv $rs
+    set $var_sym_send $ss
  
     toplevel $id
     wm title $id {tracker}
@@ -85,7 +101,21 @@ proc pdtk_tracker_dialog {id width height saveflag} {
     checkbutton $id.3rangef.saveflag -variable $var_saveflag -text "save contents"
     pack $id.3rangef.lsaveflag $id.3rangef.saveflag -side left
  
+    frame $id.4rangef
+    pack $id.4rangef -side top
+    label $id.4rangef.lwidth -text "Send symbol :"
+    entry $id.4rangef.ss -textvar $var_sym_send -width 10
+    pack $id.4rangef.lwidth $id.4rangef.ss -side left
+ 
+    frame $id.5rangef
+    pack $id.5rangef -side top
+    label $id.5rangef.lwidth -text "Receive symbol :"
+    entry $id.5rangef.rs -textvar $var_sym_recv -width 10
+    pack $id.5rangef.lwidth $id.5rangef.rs -side left
+ 
     bind $id.1rangef.width <KeyPress-Return> [concat tracker_ok $id]
     bind $id.2rangef.height <KeyPress-Return> [concat tracker_ok $id]
+    bind $id.4rangef.ss <KeyPress-Return> [concat tracker_ok $id]
+    bind $id.5rangef.rs <KeyPress-Return> [concat tracker_ok $id]
     focus $id.1rangef.width
 }

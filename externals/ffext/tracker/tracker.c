@@ -176,6 +176,11 @@ static void tracker_save(t_gobj* z, t_binbuf* b) {
         );
     }
 
+    if(*x->s_send->s_name)
+        binbuf_addv(b, "ss", gensym("-send"), x->s_send);
+
+    if(*x->s_recv->s_name)
+        binbuf_addv(b, "ss", gensym("-recv"), x->s_recv);
 
     binbuf_addv(b, ";");
 }
@@ -184,37 +189,14 @@ static void tracker_properties(t_gobj* z, t_glist* owner) {
     char buf[800];
     t_tracker* x = (t_tracker*)z;
 
-    sprintf(buf, "pdtk_tracker_dialog %%s %d %d %d\n",
+    sprintf(buf, "pdtk_tracker_dialog %%s %d %d %d {%s} {%s}\n",
         (int)x->x_columns, (int)x->x_rows,
-        (int)x->b_save_data
+        (int)x->b_save_data,
+        x->s_send->s_name, x->s_recv->s_name
     );
     //post("buf=%s", buf);
     gfxstub_new(&x->x_obj.ob_pd, x, buf);
 }
-
-/*static void tracker_dialog(t_tracker* x, t_symbol* s, int argc, t_atom* argv) {
-    t_canvas* canvas = glist_getcanvas(x->x_glist);
-    int ei;
-    if(!x) {
-        post("tracker: error: trying to set properties on an unexisting object");
-        return;
-    }
-    if(argc != 2) {
-        post("tracker: error in number of arguments (%d)", argc);
-        return;
-    }
-    if(argv[0].a_type != A_FLOAT || argv[1].a_type != A_FLOAT) {
-        post("tracker: error in format of arguments");
-        return;
-    }
-
-    tracker_draw_erase(x, x->x_glist);
-
-    tracker_resize(x, (int)argv[1].a_w.w_float, (int)argv[0].a_w.w_float);
-
-    tracker_draw_new(x, x->x_glist);
-    canvas_fixlinesfor(canvas, (t_text*)x);
-}*/
 
 static void tracker_select(t_gobj* z, t_glist* glist, int selected) {
     t_tracker* x = (t_tracker*)z;
@@ -419,7 +401,23 @@ static void tracker_free(t_tracker* x) {
         freebytes(x->x_data[ei], x->x_columns*sizeof(t_float));
     }
     freebytes(x->x_data, x->x_rows*sizeof(t_float));
-    //pd_unbind(&x->x_obj.ob_pd, keyname_sym);
+}
+
+static void tracker_set_saveflag(t_tracker* x, t_floatarg b) {
+    x->b_save_data = (int)(b == 0 ? 0 : 1);
+}
+
+static void tracker_set_send(t_tracker* x, t_symbol *s) {
+    x->s_send = s;
+}
+
+static void tracker_set_recv(t_tracker* x, t_symbol *s) {
+    if(x->s_recv != gensym(""))
+        pd_unbind(&x->x_obj.ob_pd, x->s_recv);
+
+    x->s_recv = s;
+
+    pd_bind(&x->x_obj.ob_pd, s);
 }
 
 static t_tracker* tracker_new(t_symbol* s, int argc, t_atom* argv) {
@@ -446,6 +444,9 @@ static t_tracker* tracker_new(t_symbol* s, int argc, t_atom* argv) {
     x->b_cursor = 0;
     x->b_save_data = 0;
 
+    x->s_send = gensym("");
+    x->s_recv = gensym("");
+
     int cols = 0, rows = 0;
     int got_data = 0;
     if(argc == 0) {
@@ -455,10 +456,6 @@ static t_tracker* tracker_new(t_symbol* s, int argc, t_atom* argv) {
         tracker_resize(x, rows, cols);
         x->b_save_data = 1;
     } else {
-        //if(argc <= 2) {
-        //    post("tracker: error: wrong # of arguments (<2)");
-        //    return NULL;
-        //}
         #define ARG_CHECK_LOOP_BEGIN while(ei < argc) { if(0) {}
         #define ARG_CHECK_LOOP_END }
         #define MATCH_ARG(sz) else if(argv[ei].a_type == A_SYMBOL && \
@@ -485,6 +482,16 @@ static t_tracker* tracker_new(t_symbol* s, int argc, t_atom* argv) {
         MATCH_ARG_T("-sl", A_SYMBOL)  { ei++; ei++; }
         MATCH_ARG_T("-bd", A_FLOAT)   { ei++; ei++; }
         MATCH_ARG_T("-bd", A_SYMBOL)  { ei++; ei++; }
+        MATCH_ARG_T("-send", A_SYMBOL){
+            ei++;
+            //x->s_send = argv[ei++].a_w.w_symbol;
+            tracker_set_send(x, argv[ei++].a_w.w_symbol);
+        }
+        MATCH_ARG_T("-recv", A_SYMBOL){
+            ei++;
+            //x->s_recv = argv[ei++].a_w.w_symbol;
+            tracker_set_recv(x, argv[ei++].a_w.w_symbol);
+        }
         MATCH_ARG("-data") {
             ei++;
             if((argc - ei) < 2) {
@@ -506,7 +513,8 @@ static t_tracker* tracker_new(t_symbol* s, int argc, t_atom* argv) {
                 x->x_data[j / cols][j % cols] = argv[ei++].a_w.w_float;
             }
             got_data = 1;
-            x->b_save_data = 1;
+            //x->b_save_data = 1;
+            tracker_set_saveflag(x, 1);
         }
         MATCH_FAILED {
             post("tracker: argument error: w_float=%f, w_symbol=%s",
@@ -595,7 +603,11 @@ static void tracker_getrow(t_tracker* x, t_floatarg row) {
     for(ei = 0; ei < x->x_columns; ei++) {
         SETFLOAT(&atombuf[ei], x->x_data[introw][ei]);
     }
+    
     outlet_list(x->outlet0, &s_list, x->x_columns, atombuf);
+    if(x->s_send != gensym(""))
+        pd_list(x->s_send->s_thing, &s_list, x->x_columns, atombuf);
+
     freebytes(atombuf, sizeof(t_atom)*x->x_columns);
 
     if(x->b_cursor) {
@@ -603,10 +615,6 @@ static void tracker_getrow(t_tracker* x, t_floatarg row) {
         if(x->x_cursor_pos < 0) x->x_cursor_pos = 0;
         tracker_draw_update_cursor_pos(x);
     }
-}
-
-static void tracker_set_saveflag(t_tracker* x, t_floatarg b) {
-    x->b_save_data = (int)(b == 0 ? 0 : 1);
 }
 
 static void tracker_toggle_cursor(t_tracker* x, t_floatarg b) {
@@ -653,6 +661,8 @@ static void tracker_getitem(t_tracker* x, t_float row, t_float col) {
     SETFLOAT(&a, x->x_data[introw][intcol]);
 
     outlet_list(x->outlet0, &s_list, 1, &a);
+    if(x->s_send != gensym(""))
+        pd_list(x->s_send->s_thing, &s_list, 1, &a);
 }
 
 static void tracker_setitem(t_tracker* x, t_float row, t_float col, t_float val) {
@@ -689,23 +699,35 @@ keyname_sym = gensym("#keyname");
         0
     );
     class_addlist(tracker_class, tracker_list);
-    class_addmethod(tracker_class, (t_method)tracker_toggle_cursor, gensym("trackrow"), A_FLOAT, 0);
-    class_addmethod(tracker_class, (t_method)tracker_update, gensym("update"), A_GIMME, 0);
-    //class_addmethod(tracker_class, (t_method)tracker_dialog, gensym("dialog"), A_GIMME, 0);
-    class_addmethod(tracker_class, (t_method)tracker_setrow, gensym("setrow"), A_GIMME, 0);
-    class_addmethod(tracker_class, (t_method)tracker_getrow, gensym("getrow"), A_FLOAT, 0);
-    class_addmethod(tracker_class, (t_method)tracker_setitem, gensym("set"), A_FLOAT, A_FLOAT, A_FLOAT, 0);
-    class_addmethod(tracker_class, (t_method)tracker_getitem, gensym("get"), A_FLOAT, A_FLOAT, 0);
-    class_addmethod(tracker_class, (t_method)tracker_gresize, gensym("resize"), A_FLOAT, A_FLOAT, 0);
-    class_addmethod(tracker_class, (t_method)tracker_set_saveflag, gensym("set_saveflag"), A_FLOAT, 0);
-    class_addmethod(tracker_class, (t_method)tracker_file_load, gensym("load"), A_SYMBOL, 0);
-    class_addmethod(tracker_class, (t_method)tracker_file_save, gensym("save"), A_SYMBOL, 0);
+    class_addmethod(tracker_class, (t_method)tracker_toggle_cursor,
+        gensym("trackrow"), A_FLOAT, 0);
+    class_addmethod(tracker_class, (t_method)tracker_update,
+        gensym("update"), A_GIMME, 0);
+    class_addmethod(tracker_class, (t_method)tracker_setrow,
+        gensym("setrow"), A_GIMME, 0);
+    class_addmethod(tracker_class, (t_method)tracker_getrow,
+        gensym("getrow"), A_FLOAT, 0);
+    class_addmethod(tracker_class, (t_method)tracker_setitem,
+        gensym("set"), A_FLOAT, A_FLOAT, A_FLOAT, 0);
+    class_addmethod(tracker_class, (t_method)tracker_getitem,
+        gensym("get"), A_FLOAT, A_FLOAT, 0);
+    class_addmethod(tracker_class, (t_method)tracker_gresize,
+        gensym("resize"), A_FLOAT, A_FLOAT, 0);
+    class_addmethod(tracker_class, (t_method)tracker_set_saveflag,
+        gensym("set_saveflag"), A_FLOAT, 0);
+    class_addmethod(tracker_class, (t_method)tracker_set_send,
+        gensym("set_send"), A_SYMBOL, 0);
+    class_addmethod(tracker_class, (t_method)tracker_set_recv,
+        gensym("set_recv"), A_SYMBOL, 0);
+    class_addmethod(tracker_class, (t_method)tracker_file_load,
+        gensym("load"), A_SYMBOL, 0);
+    class_addmethod(tracker_class, (t_method)tracker_file_save,
+        gensym("save"), A_SYMBOL, 0);
 
     tracker_widgetbehavior.w_getrectfn =    tracker_getrect;
     tracker_widgetbehavior.w_displacefn =   tracker_displace;
     tracker_widgetbehavior.w_selectfn =     tracker_select;
-    //tracker_widgetbehavior.w_activatefn =   NULL;
-    tracker_widgetbehavior.w_activatefn =   tracker_activate;
+    tracker_widgetbehavior.w_activatefn =   NULL;
     tracker_widgetbehavior.w_deletefn =     tracker_delete;
     tracker_widgetbehavior.w_visfn =        tracker_vis;
     tracker_widgetbehavior.w_clickfn =      tracker_click;
