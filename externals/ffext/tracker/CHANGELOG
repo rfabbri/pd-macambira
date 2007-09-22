@@ -1,0 +1,17 @@
+0.1.0 --------------------------------------------------------------------
+  initial version. minimal set of features
+
+0.1.1 --------------------------------------------------------------------
+  fixes to drawing, minor bugs
+
+0.2.0 --------------------------------------------------------------------
+  more features: added keyboard input
+                 new parameter saving
+                 saving data is now optional
+                 file load/save support
+
+0.2.1 --------------------------------------------------------------------
+  fixed makefile. added pd_darwin target
+
+0.2.2 --------------------------------------------------------------------
+  added send/receive symbols support
