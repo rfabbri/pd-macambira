@@ -1,0 +1,73 @@
+#N canvas 525 183 653 599 10;
+#X obj 65 282 tracker -data 10 10 9 8 7 6 5 4 3 2 1 0 10 9 8 7 6 5
+4 3 2 1 11 10 9 8 7 6 5 4 3 2 12 11 10 9 8 7 6 5 4 3 13 12 11 10 9
+8 7 6 5 4 14 13 12 11 10 9 8 7 6 5 15 14 13 12 11 10 9 8 7 6 16 15
+14 13 12 11 10 9 8 7 17 16 15 14 13 12 11 10 9 8 18 17 16 15 14 13
+12 11 10 9;
+#X msg 65 29 setrow 0 10 11 12 13 14 15 16 17 18 19;
+#X msg 79 51 setrow 0 999 999 999 999 999 999 999 999 999 999;
+#X msg 123 147 set 2 3 \$1;
+#X floatatom 123 130 5 0 0 0 - - -;
+#N canvas 0 0 450 300 display_output 0;
+#X obj 60 51 inlet;
+#X obj 60 147 outlet;
+#X obj 60 85 list prepend set;
+#X obj 60 113 list trim;
+#X connect 0 0 2 0;
+#X connect 2 0 3 0;
+#X connect 3 0 1 0;
+#X restore 65 436 pd display_output;
+#X msg 65 467 16 15 14 13 12 11 10 9 8 7 16 15 14 13 12 11 10 9 8 7
+;
+#X msg 99 100 getrow \$1;
+#X obj 99 80 r \$0-row;
+#X obj 477 555 s \$0-row;
+#X obj 477 504 f;
+#X obj 504 504 + 1;
+#X obj 477 528 % 10;
+#X obj 477 473 metro 100;
+#X obj 477 445 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X floatatom 549 528 5 0 0 0 - - -;
+#X text 210 146 <- set single value;
+#X text 172 100 <- output one row;
+#X msg 146 180 get 2 3;
+#X text 212 182 <- output single value;
+#X obj 261 265 r \$0-trk;
+#X obj 419 235 s \$0-trk;
+#X text 59 530 tracker external - by Federico Ferri <mescalinum[at]gmail[dot]com>
+;
+#X msg 419 94 resize 10 10;
+#X text 419 72 resize grid \, as in properties:;
+#X msg 433 119 resize 10 20;
+#X msg 467 168 load test.trk;
+#X msg 165 235 trackrow \$1;
+#X obj 165 217 tgl 15 0 empty \$0-tgl-trk empty 17 7 0 10 -262144 -1
+-1 0 1;
+#X text 234 214 <- toggle row tracking;
+#X text 319 26 <- set whole row;
+#X msg 483 194 save test.trk;
+#X text 475 146 load/save:;
+#X connect 0 0 5 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 4 0 3 0;
+#X connect 5 0 6 0;
+#X connect 7 0 0 0;
+#X connect 8 0 7 0;
+#X connect 10 0 11 0;
+#X connect 10 0 12 0;
+#X connect 11 0 10 1;
+#X connect 12 0 9 0;
+#X connect 13 0 10 0;
+#X connect 14 0 13 0;
+#X connect 15 0 9 0;
+#X connect 18 0 0 0;
+#X connect 20 0 0 0;
+#X connect 23 0 21 0;
+#X connect 25 0 21 0;
+#X connect 26 0 21 0;
+#X connect 27 0 0 0;
+#X connect 28 0 27 0;
+#X connect 31 0 21 0;
