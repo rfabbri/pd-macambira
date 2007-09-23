@@ -655,7 +655,7 @@ static void tracker_getitem(t_tracker* x, t_float row, t_float col) {
     introw = introw % x->x_rows;
     if(introw < 0) introw = 0;
     intcol = (int)col;
-    intcol = introw % x->x_columns;
+    intcol = intcol % x->x_columns;
     if(intcol < 0) intcol = 0;
 
     SETFLOAT(&a, x->x_data[introw][intcol]);
