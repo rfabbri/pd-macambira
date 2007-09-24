@@ -1,0 +1,81 @@
+#N canvas 364 300 1105 584 12;
+#X msg 546 150 rewind;
+#X obj 85 549 textfile;
+#X msg 536 120 bang;
+#X msg 545 204 clear;
+#X msg 545 305 set 2 4 6 8;
+#X obj 25 15 binfile;
+#X text 88 14 read and write binary files;
+#X text 25 144 You can also use this object simply for storing heterogeneous
+sequences of bytes.;
+#X msg 545 231 add 10 20 255;
+#X msg 545 177 read afile.bin;
+#X obj 480 408 binfile;
+#X text 814 548 Martin Peach 2007/09/24;
+#X text 149 548 to read and write text files;
+#X msg 545 331 write afile.bin;
+#X text 612 426 This outlet gives a bang when you hit the end of the
+sequence.;
+#X text 478 502 This outlet gives the bytes in sequence \, or bangs
+if no more bytes.;
+#X text 645 230 add a list of byte-floats to the buffer;
+#X text 630 304 clear the buffer and then add some bytes;
+#X text 590 203 empty the buffer;
+#X text 597 149 set the read pointer to the beginnning of the buffer
+;
+#X text 575 119 output one byte from the buffer as a float;
+#X text 661 330 write the entire buffer to a file;
+#X text 653 176 read a file into the buffer \, replacing any previous
+contents;
+#X obj 480 481 print one;
+#X obj 526 437 bng 15 250 50 0 empty empty empty 17 7 0 10 -258113
+-257985 -1;
+#X obj 495 123 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -257985
+-1;
+#X text 16 548 See also:;
+#X obj 480 53 openpanel;
+#X obj 480 32 bng 15 250 50 0 empty empty read_any_file_into_buffer
+17 7 0 10 -4032 -258113 -1;
+#X msg 480 79 read \$1;
+#X obj 324 216 bng 15 250 50 0 empty empty save_buffer_as_any_file
+17 7 0 10 -4032 -258113 -1;
+#X msg 324 264 write \$1;
+#X obj 324 238 savepanel;
+#X text 514 120 or;
+#X msg 545 257 77 128 129 130;
+#X text 25 38 The binfile object reads and writes binary files to and
+from a buffer in memory. You can read a file and output its contents
+one byte at a time as floats.;
+#X text 25 91 To add bytes to the buffer \, first send "clear" to empty
+the buffer and then "add" to add bytes. Finally \, "write" will save
+the entire buffer as a binary file.;
+#X floatatom 545 282 5 0 0 0 - - -;
+#X text 586 281 add one byte \, same as "add";
+#X text 654 256 add a list of bytes \, same as "add";
+#X msg 545 357 info;
+#X obj 503 455 print info;
+#X obj 543 432 print end;
+#X text 583 454 This outlet gives a list of info from the info message.
+;
+#X text 583 356 output current buffer length and pointer values.;
+#X connect 0 0 10 0;
+#X connect 2 0 10 0;
+#X connect 3 0 10 0;
+#X connect 4 0 10 0;
+#X connect 8 0 10 0;
+#X connect 9 0 10 0;
+#X connect 10 0 23 0;
+#X connect 10 1 41 0;
+#X connect 10 2 24 0;
+#X connect 10 2 42 0;
+#X connect 13 0 10 0;
+#X connect 25 0 10 0;
+#X connect 27 0 29 0;
+#X connect 28 0 27 0;
+#X connect 29 0 10 0;
+#X connect 30 0 32 0;
+#X connect 31 0 10 0;
+#X connect 32 0 31 0;
+#X connect 34 0 10 0;
+#X connect 37 0 10 0;
+#X connect 40 0 10 0;
