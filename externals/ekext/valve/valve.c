@@ -1,10 +1,7 @@
 /* takes a map like 0 1 3 4 7 and a route. if the route and the input are  */
 /* non-zero in the map, then the route is output from the object */
 #include "m_pd.h"
-#include <math.h>
-#include <string.h>
-#define MAXENTRIES 512
-#define LASTENTRY 511
+//#include <math.h>
 
 static t_class *valve_class;
 
@@ -16,7 +13,7 @@ typedef struct _valve
   int bufsize;
 
   t_float input, router, max;
-  t_outlet *routed, *notrouted;
+  t_outlet *routed, *rerouted;
 
   int flush;
 } t_valve;
@@ -48,15 +45,16 @@ void valve_float(t_valve *x, t_floatarg fin)
     argb = (int)testb;
     if(arga && argb) 
       {
+	outlet_float(x->rerouted, x->input);
 	outlet_float(x->routed, x->router);
       }
     else if (!argb)
       {
-	outlet_float(x->notrouted, argb);
+	outlet_float(x->rerouted, 0);
       }
     else if (!arga && argb)
       {
-	outlet_float(x->notrouted, arga);
+	outlet_float(x->rerouted, 0);
       }
   }
 }
@@ -101,7 +99,7 @@ void *valve_new(t_floatarg f)
   floatinlet_new(&x->x_obj, &x->router);
 
   x->routed = outlet_new(&x->x_obj, &s_float);
-  x->notrouted = outlet_new(&x->x_obj, &s_float);
+  x->rerouted = outlet_new(&x->x_obj, &s_float);
   return (void *)x;
 }
 
