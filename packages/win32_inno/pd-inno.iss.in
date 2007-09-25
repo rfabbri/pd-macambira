@@ -64,43 +64,46 @@ Root: HKCR; SubKey: Pure.Data\shell; ValueType: string; ValueData: open; Flags: 
 Root: HKCR; SubKey: Pure.Data\shell\open\command; ValueType: string; ValueData: """{app}\bin\pd.exe"" -listdev ""%1"""; Flags: uninsdeletekey noerror; Tasks: fileassociations
 Root: HKCR; SubKey: .pd; ValueType: string; ValueData: Pure.Data; Flags: noerror uninsdeletekey; Tasks: fileassociations
 Root: HKCR; SubKey: .pd; ValueType: string; ValueName: Content Type; ValueData: text/plain; Flags: noerror uninsdeletekey; Tasks: fileassociations
+;
+; add pd-inno_registry after this comment:
+
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib1; ValueData: libdir; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib2; ValueData: Gem; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib3; ValueData: cyclone; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib4; ValueData: zexy; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib5; ValueData: creb; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib6; ValueData: cxc; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib7; ValueData: iemlib; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib8; ValueData: list-abs; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib9; ValueData: mapping; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib10; ValueData: markex; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib11; ValueData: maxlib; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib12; ValueData: memento; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib13; ValueData: mjlib; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib14; ValueData: motex; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib15; ValueData: oscx; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib16; ValueData: pddp; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib17; ValueData: pdogg; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib18; ValueData: pixeltango; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib19; ValueData: pmpd; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib20; ValueData: rradical; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib21; ValueData: sigpack; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib22; ValueData: smlib; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib23; ValueData: toxy; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib24; ValueData: unauthorized; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib25; ValueData: vbap; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib26; ValueData: pan; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib27; ValueData: freeverb; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib28; ValueData: hcs; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib29; ValueData: jmmmp; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib30; ValueData: ext13; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib31; ValueData: hardware; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib32; ValueData: deprecated; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib33; ValueData: flatspace; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib34; ValueData: iem_anything; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib35; ValueData: flib; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib36; Flags: deletevalue; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib37; Flags: deletevalue; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib7; ValueData: ggee; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib8; ValueData: iemlib; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib9; ValueData: list-abs; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib10; ValueData: mapping; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib11; ValueData: markex; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib12; ValueData: maxlib; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib13; ValueData: memento; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib14; ValueData: mjlib; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib15; ValueData: motex; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib16; ValueData: oscx; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib17; ValueData: pddp; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib18; ValueData: pdogg; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib19; ValueData: pixeltango; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib20; ValueData: pmpd; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib21; ValueData: rradical; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib22; ValueData: sigpack; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib23; ValueData: smlib; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib24; ValueData: toxy; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib25; ValueData: unauthorized; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib26; ValueData: vbap; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib27; ValueData: pan; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib28; ValueData: freeverb; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib29; ValueData: hcs; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib30; ValueData: jmmmp; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib31; ValueData: ext13; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib32; ValueData: hardware; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib33; ValueData: deprecated; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib34; ValueData: flatspace; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib35; ValueData: iem_anything; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib36; ValueData: flib; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib37; ValueData: ekext; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib38; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib39; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib40; Flags: deletevalue; Tasks: libs
@@ -164,7 +167,7 @@ Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib97; Flags: d
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib98; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib99; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib100; Flags: deletevalue; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: path1; ValueData: hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,2f,00,46,00,6f,00,6e,00,74,00,73,00,00,00; Tasks: libs
+"path1"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,2f,00,46,00,6f,00,6e,00,74,00,73,00,00,00
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path2; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path3; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path4; Flags: deletevalue; Tasks: libs
@@ -261,9 +264,9 @@ Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path94; Flags: dele
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path95; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path96; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path97; Flags: deletevalue; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path98; Flags: deletevalue
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path99; Flags: deletevalue
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path100; Flags: deletevalue
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path98; Flags: deletevalue; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path99; Flags: deletevalue; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path100; Flags: deletevalue; Tasks: libs
 
 [_ISTool]
 Use7zip=true
