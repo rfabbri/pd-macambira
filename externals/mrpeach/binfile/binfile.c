@@ -39,6 +39,7 @@ typedef struct t_binfile
     char        x_fPath[MAXPDSTRING];
     char        *x_buf; /* read/write buffer in memory for file contents */
     size_t      x_buf_length; /* current length of buf */
+    size_t      x_length; /* current length of valid data in buf */
     size_t      x_rd_offset; /* current read offset into the buffer */
     size_t      x_wr_offset; /* current write offset into the buffer */
 } t_binfile;
@@ -55,6 +56,8 @@ static void binfile_add(t_binfile *x, t_symbol *s, int argc, t_atom *argv);
 static void binfile_clear(t_binfile *x);
 static void binfile_info(t_binfile *x);
 static void binfile_set(t_binfile *x, t_symbol *s, int argc, t_atom *argv);
+static void binfile_set_read_index(t_binfile *x, t_float offset);
+static void binfile_set_write_index(t_binfile *x, t_float offset);
 static void *binfile_new(t_symbol *s, int argc, t_atom *argv);
 void binfile_setup(void);
 
@@ -73,6 +76,8 @@ void binfile_setup(void)
     class_addmethod(binfile_class, (t_method)binfile_write, gensym("write"), A_DEFSYMBOL, 0);
     class_addmethod(binfile_class, (t_method)binfile_add, gensym("add"), A_GIMME, 0);
     class_addmethod(binfile_class, (t_method)binfile_set, gensym("set"), A_GIMME, 0);
+    class_addmethod(binfile_class, (t_method)binfile_set_read_index, gensym("readat"), A_DEFFLOAT, 0);
+    class_addmethod(binfile_class, (t_method)binfile_set_write_index, gensym("writeat"), A_DEFFLOAT, 0);
     class_addmethod(binfile_class, (t_method)binfile_clear, gensym("clear"), 0);
     class_addmethod(binfile_class, (t_method)binfile_rewind, gensym("rewind"), 0);
     class_addmethod(binfile_class, (t_method)binfile_info, gensym("info"), 0);
@@ -92,6 +97,7 @@ static void *binfile_new(t_symbol *s, int argc, t_atom *argv)
     x->x_fP = NULL;
     x->x_fPath[0] = '\0';
     x->x_buf_length = ALLOC_BLOCK_SIZE;
+    x->x_rd_offset = x->x_wr_offset = x->x_length = 0L;
     /* find the first string in the arg list and interpret it as a path to a file */
     for (i = 0; i < argc; ++i)
     {
@@ -151,8 +157,8 @@ static void binfile_write(t_binfile *x, t_symbol *path)
 
     if (0==(x->x_fP = binfile_open_path(x, path->s_name, "wb")))
         error("binfile: Unable to open %s for writing", path->s_name);
-    bytes_written = fwrite(x->x_buf, 1L, x->x_wr_offset, x->x_fP);
-    if (bytes_written != x->x_wr_offset) post("binfile: %ld bytes written != %ld", bytes_written, x->x_wr_offset);
+    bytes_written = fwrite(x->x_buf, 1L, x->x_length, x->x_fP);
+    if (bytes_written != x->x_length) post("binfile: %ld bytes written != %ld", bytes_written, x->x_length);
     else post("binfile: wrote %ld bytes to %s", bytes_written, path->s_name);
     fclose(x->x_fP);
     x->x_fP = NULL;
@@ -187,8 +193,9 @@ static void binfile_read(t_binfile *x, t_symbol *path)
     rewind(x->x_fP);
     bytes_read = fread(x->x_buf, 1L, file_length, x->x_fP);
     x->x_buf_length = bytes_read;
-    x->x_wr_offset = x->x_buf_length;
-    x->x_rd_offset = 0L;
+    x->x_wr_offset = x->x_buf_length; /* write new data at end of file */
+    x->x_length = x->x_buf_length; /* file length is same as buffer size 7*/
+    x->x_rd_offset = 0L; /* read from start of file */
     fclose (x->x_fP);
     x->x_fP = NULL;
     if (bytes_read != file_length) post("binfile length %ld not equal to bytes read (%ld)", file_length, bytes_read);
@@ -200,10 +207,10 @@ static void binfile_bang(t_binfile *x)
 {
     unsigned char c;
 
-    if (x->x_rd_offset < x->x_wr_offset)
+    if (x->x_rd_offset < x->x_length)
     {
         c = x->x_buf[x->x_rd_offset++];
-        if (x->x_rd_offset == x->x_wr_offset) outlet_bang(x->x_bang_outlet);
+        if (x->x_rd_offset == x->x_length) outlet_bang(x->x_bang_outlet);
         outlet_float(x->x_bin_outlet, (float)c);
     }
     else outlet_bang(x->x_bin_outlet);
@@ -248,6 +255,7 @@ static void binfile_add(t_binfile *x, t_symbol *s, int argc, t_atom *argv)
                 x->x_buf_length += ALLOC_BLOCK_SIZE;
             }
             x->x_buf[x->x_wr_offset++] = j;
+            if (x->x_length < x->x_wr_offset) x->x_length = x->x_wr_offset;
         }
         else
         {
@@ -269,10 +277,30 @@ static void binfile_set(t_binfile *x, t_symbol *s, int argc, t_atom *argv)
     binfile_add(x, s, argc, argv);
 }
 
+static void binfile_set_read_index(t_binfile *x, t_float offset)
+/* set the read offset, always < length */
+{
+    size_t intoffset = offset;
+
+    if (intoffset < x->x_length) x->x_rd_offset = intoffset;
+    else if (x->x_length > 0) x->x_rd_offset = x->x_length-1;
+    else x->x_rd_offset = 0L;
+}
+
+static void binfile_set_write_index(t_binfile *x, t_float offset)
+/* set the write offset, always <= length */
+{
+    size_t intoffset = offset;
+
+    if (intoffset <= x->x_length) x->x_wr_offset = intoffset;
+    else  x->x_wr_offset = x->x_length;
+}
+
 static void binfile_clear(t_binfile *x)
 {
     x->x_wr_offset = 0L;
     x->x_rd_offset = 0L;
+    x->x_length = 0L;
 }
 
 static void binfile_float(t_binfile *x, t_float val)
@@ -294,6 +322,8 @@ static void binfile_info(t_binfile *x)
     t_atom *output_atom = getbytes(sizeof(t_atom));
     SETFLOAT(output_atom, x->x_buf_length);
     outlet_anything( x->x_info_outlet, gensym("buflength"), 1, output_atom);
+    SETFLOAT(output_atom, x->x_length);
+    outlet_anything( x->x_info_outlet, gensym("length"), 1, output_atom);
     SETFLOAT(output_atom, x->x_rd_offset);
     outlet_anything( x->x_info_outlet, gensym("readoffset"), 1, output_atom);
     SETFLOAT(output_atom, x->x_wr_offset);
