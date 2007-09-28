@@ -69,13 +69,19 @@ void maskxor_listl(t_maskxor *x, t_symbol *s, int argc, t_atom *argv)
     x->maskxor = 0;
     x->lengthm = 0;
   }
+  x->lengthm = x->lengthr > x->lengthl ? x->lengthr : x->lengthl;
+  x->maskxor = getbytes(x->lengthm * sizeof(t_atom));
 
-  x->maskxor = copybytes(argv, argc * sizeof(t_atom));
-  x->lengthm = x->lengthl;
-
-  for(i=0;i<argc;i++)
+  for(i=0;i<x->lengthm;i++)
     {
-      listl_element = atom_getfloat(argv+i);
+      if(i>=x->lengthm)
+	{
+	  listl_element = 0;
+	}
+      else
+	{
+	  listl_element = atom_getfloat(argv+i);
+	}
       if(listl_element != 0) 
 	{
 	  x->suml++;
@@ -168,7 +174,7 @@ void maskxor_print(t_maskxor *x)
       post("maskxor element %d = %f",i,element);
     }
   }
-  post("mode = %f",x->mode);
+  post("mode = %f, lengthl = %d, lengthr = %d, lengthm = %d",x->mode,x->lengthl,x->lengthr,x->lengthm);
 }
 
 void *maskxor_new(t_symbol *s, t_floatarg fmode)
