@@ -34,12 +34,22 @@ void cupd_bang(t_cupd *y)
   y->f_prevdir = y->f_dir;
 }
 
+void cupd_setbang(t_cupd *y, t_floatarg f)
+{
+  y->f_count = f;
+  outlet_float(y->count, y->f_count);
+  y->f_count += y->f_dir == 0 ? 1 : -1;
+  y->firstbang = y->floatset = 0;
+  y->f_prevdir = y->f_dir;
+}
+
 void *cupd_new(t_floatarg f)
 {
   t_cupd *y = (t_cupd *)pd_new(cupd_class);
   y->f_dir = f;
   y->f_count = 0;
   y->firstbang = 1;
+  y->floatset = 0;
   floatinlet_new(&y->x_obj, &y->f_dir);
   y->count = outlet_new(&y->x_obj, gensym("float"));
   return(void *)y;
@@ -55,4 +65,4 @@ void cupd_setup(void)
   class_sethelpsymbol(cupd_class, gensym("help-cupd"));
   class_addbang(cupd_class, cupd_bang);
   class_addfloat(cupd_class, cupd_float);
-}
+  class_addmethod(cupd_class, (t_method)cupd_setbang, gensym("setbang"), A_DEFFLOAT, 0);}
