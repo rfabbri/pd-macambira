@@ -552,7 +552,7 @@ devellibs_clean:
 # EKEXT
 EKEXT_NAME=ekext
 EKEXT_OBJECTS := $(wildcard $(externals_src)/ekext/*/*.c) \
-$(wildcard $(externals_src)/ekext/*/*/*.c)
+	$(wildcard $(externals_src)/ekext/l*/*/*.c)
 ekext: $(EKEXT_OBJECTS:.c=.$(EXTENSION))
 
 ekext_install: ekext
