@@ -60,6 +60,7 @@ static void tracker_setitem(t_tracker* x, t_float row, t_float col, t_float val)
 static void tracker_motion(t_tracker* x, t_floatarg dx, t_floatarg dy);
 static void tracker_select_item(t_tracker* x, int r, int c);
 static void tracker_select_movecur(t_tracker* x, int dx, int dy);
+static void tracker_changenotify(t_tracker* x, t_floatarg row, t_floatarg col);
 void tracker_setup(void);
 
 #endif // __G_GRID_H

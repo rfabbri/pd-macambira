@@ -42,7 +42,7 @@ proc tracker_ok {id} {
     tracker_cancel $id
 }
  
-proc pdtk_tracker_dialog {id width height saveflag ss rs} {
+proc pdtk_tracker_dialog {id width height saveflag digitw ss rs} {
     set vid [string trimleft $id .]
  
     set var_graph_width [concat graph_width_$vid]

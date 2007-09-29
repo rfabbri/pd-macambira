@@ -15,3 +15,12 @@
 
 0.2.2 --------------------------------------------------------------------
   added send/receive symbols support
+
+0.2.3 --------------------------------------------------------------------
+  numbers are now aligned to right
+  notification messages are sent from user interaction
+  mouse behavior improved. now dragging faster changes more.
+  added nice makefile for target:
+    Linux
+    MacOS (thanks Steffen)
+    Win32 (thanks tof)

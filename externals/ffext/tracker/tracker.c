@@ -35,19 +35,50 @@ static t_symbol* keyname_sym;
 
 #define MARGIN_X 3
 #define MARGIN_Y 2
+#define CHR_EDIT "<"
+#define CHR_NORM " "
+#define DIGITS_MIN 1
+#define DIGITS_MAX 10
+
+static void tracker_clip_row_col(t_tracker* x, t_int* pr, t_int* pc) {
+    if((*pr) < 0) {
+        (*pr) = x->x_rows - (((-(*pr) - 1) % x->x_rows) + 1);
+    } else {
+        (*pr) = (*pr) % x->x_rows;
+    }
+    if((*pc) < 0) {
+        (*pc) = x->x_columns - (((-(*pc) - 1) % x->x_columns) + 1);
+    } else {
+        (*pc) = (*pc) % x->x_columns;
+    }
+}
+
+static t_float tracker_data_get(t_tracker* x, t_floatarg r, t_floatarg c) {
+    t_int ir = (t_int)r;
+    t_int ic = (t_int)c;
+    tracker_clip_row_col(x, &ir, &ic);
+    return x->x_data[(int)ir][(int)ic];
+}
+
+static void tracker_data_set(t_tracker* x, t_floatarg r, t_floatarg c, t_floatarg d) {
+    t_int ir = (t_int)r;
+    t_int ic = (t_int)c;
+    tracker_clip_row_col(x, &ir, &ic);
+    x->x_data[(int)ir][(int)ic] = d;
+}
 
 static const char* tracker_isedititem(t_tracker* x, int r, int c) {
     if(x->x_active_row == r && x->x_active_row >= 0 &&
        x->x_active_column == c && x->x_active_column >= 0 &&
-       x->x_buf[0]) return ">";
-    else return "";
+       x->x_buf[0]) return CHR_EDIT;
+    else return CHR_NORM;
 }
 
 static int tracker_getdisplayval(t_tracker* x, int r, int c) {
-    if(tracker_isedititem(x, r, c) == ">") {
+    if(tracker_isedititem(x, r, c) == CHR_EDIT) {
         return atoi(x->x_buf);
     } else {
-        return x->x_data[r][c];
+        return tracker_data_get(x, r, c);
     }
 }
 
@@ -60,7 +91,7 @@ static void tracker_draw_new(t_tracker* x, t_glist* glist) {
     sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #dddddd -outline {} -tags {%xCURSOR}\n", canvas, 0, 0, 0, 0, x);
     for(r = 0; r < x->x_rows; r++) {
         for(c = 0; c < x->x_columns; c++) {
-            sys_vgui(".x%x.c create text %d %d -text %d%s -font -*-courier-bold--normal--%d-* -anchor nw -tags {%xTEXT %xTEXT.%d.%d} -fill black\n", canvas, text_xpix(&x->x_obj, glist)+c*x->x_cell_width+MARGIN_X, text_ypix(&x->x_obj, glist)+r*x->x_cell_height+MARGIN_Y, tracker_getdisplayval(x, r, c), tracker_isedititem(x, r, c), glist_getfont(glist), x, x, r, c);
+            sys_vgui(".x%x.c create text %d %d -text {%d%s} -font -*-courier-bold--normal--%d-* -anchor ne -tags {%xTEXT %xTEXT.%d.%d} -fill black\n", canvas, text_xpix(&x->x_obj, glist)+(c+1)*x->x_cell_width+MARGIN_X, text_ypix(&x->x_obj, glist)+r*x->x_cell_height+MARGIN_Y, tracker_getdisplayval(x, r, c), tracker_isedititem(x, r, c), glist_getfont(glist), x, x, r, c);
         }
     }
     //canvas_fixlinesfor(canvas, (t_text*)x);
@@ -72,24 +103,30 @@ static void tracker_draw_update(t_tracker* x) {
     t_canvas* canvas = glist_getcanvas(x->x_glist);
     for(r = 0; r < x->x_rows; r++) {
         for(c = 0; c < x->x_columns; c++) {
-            sys_vgui(".x%x.c itemconfigure %xTEXT.%d.%d -text %d%s\n", canvas, x, r, c, tracker_getdisplayval(x, r, c), tracker_isedititem(x, r, c));
+            sys_vgui(".x%x.c itemconfigure %xTEXT.%d.%d -text {%d%s}\n", canvas, x, r, c, tracker_getdisplayval(x, r, c), tracker_isedititem(x, r, c));
         }
     }
     canvas_fixlinesfor(canvas, (t_text*)x);
 }
 
-static void tracker_draw_update_row(t_tracker* x, int r) {
+static void tracker_draw_update_row(t_tracker* x, t_floatarg r) {
+    t_int ir = (t_int)r;
+    t_int ic = 0;
+    tracker_clip_row_col(x, &ir, &ic);
     int c;
     t_canvas* canvas = glist_getcanvas(x->x_glist);
     for(c = 0; c < x->x_columns; c++) {
-        sys_vgui(".x%x.c itemconfigure %xTEXT.%d.%d -text %d%s\n", canvas, x, r, c, tracker_getdisplayval(x, r, c), tracker_isedititem(x, r, c));
+        sys_vgui(".x%x.c itemconfigure %xTEXT.%d.%d -text {%d%s}\n", canvas, x, ir, c, tracker_getdisplayval(x, r, c), tracker_isedititem(x, r, c));
     }
     canvas_fixlinesfor(canvas, (t_text*)x);
 }
 
-static void tracker_draw_update_single(t_tracker* x, int r, int c) {
+static void tracker_draw_update_single(t_tracker* x, t_floatarg r, t_floatarg c) {
+    t_int ir = (t_int)r;
+    t_int ic = (t_int)c;
+    tracker_clip_row_col(x, &ir, &ic);
     t_canvas* canvas = glist_getcanvas(x->x_glist);
-    sys_vgui(".x%x.c itemconfigure %xTEXT.%d.%d -text %d%s\n", canvas, x, r, c, tracker_getdisplayval(x, r, c), tracker_isedititem(x, r, c));
+    sys_vgui(".x%x.c itemconfigure %xTEXT.%d.%d -text {%d%s}\n", canvas, x, ir, ic, tracker_getdisplayval(x, ir, ic), tracker_isedititem(x, ir, ic));
     canvas_fixlinesfor(canvas, (t_text*)x);
 }
 
@@ -114,7 +151,7 @@ static void tracker_draw_move(t_tracker* x, t_glist* glist) {
     }
     for(r = 0; r < x->x_rows; r++) {
         for(c = 0; c < x->x_columns; c++) {
-            sys_vgui(".x%x.c coords %xTEXT.%d.%d %d %d\n", canvas, x, r, c, text_xpix(&x->x_obj, glist)+c*x->x_cell_width+MARGIN_X, text_ypix(&x->x_obj, glist)+r*x->x_cell_height+MARGIN_Y);
+            sys_vgui(".x%x.c coords %xTEXT.%d.%d %d %d\n", canvas, x, r, c, text_xpix(&x->x_obj, glist)+(c+1)*x->x_cell_width+MARGIN_X, text_ypix(&x->x_obj, glist)+r*x->x_cell_height+MARGIN_Y);
         }
     }
     canvas_fixlinesfor(canvas, (t_text*)x);
@@ -166,7 +203,7 @@ static void tracker_save(t_gobj* z, t_binbuf* b) {
         /* save data: */
         for (ei = 0; ei < x->x_rows; ei++) {
             for (gi = 0; gi < x->x_columns; gi++) {
-                binbuf_addv(b, "i", (int)x->x_data[ei][gi]);
+                binbuf_addv(b, "i", (int)tracker_data_get(x, ei, gi));
             }
         }
     } else {
@@ -189,9 +226,9 @@ static void tracker_properties(t_gobj* z, t_glist* owner) {
     char buf[800];
     t_tracker* x = (t_tracker*)z;
 
-    sprintf(buf, "pdtk_tracker_dialog %%s %d %d %d {%s} {%s}\n",
+    sprintf(buf, "pdtk_tracker_dialog %%s %d %d %d %d {%s} {%s}\n",
         (int)x->x_columns, (int)x->x_rows,
-        (int)x->b_save_data,
+        (int)x->b_save_data, (int)x->x_ndigits,
         x->s_send->s_name, x->s_recv->s_name
     );
     //post("buf=%s", buf);
@@ -260,6 +297,7 @@ static void tracker_key(void* z, t_floatarg fkey) {
             if(x->x_active_row >= 0 && x->x_active_column >= 0) {
                 int oldr,oldc;
                 tracker_setitem(x, x->x_active_row, x->x_active_column, n);
+                tracker_changenotify(x, x->x_active_row, x->x_active_column);
                 tracker_reset_buffer(x);
                 tracker_draw_update_single(x, x->x_active_row, x->x_active_column);
                 //tracker_select_item(x, -1, -1);
@@ -290,14 +328,12 @@ static void tracker_key(void* z, t_floatarg fkey) {
 }
 
 static void tracker_motion(t_tracker* x, t_floatarg dx, t_floatarg dy) {
-    if(x->x_active_row >= 0 && x->x_active_column >= 0) {
-        if(dy == 1) {
-            x->x_data[x->x_active_row][x->x_active_column]--;
-            tracker_draw_update_single(x, x->x_active_row, x->x_active_column);
-        } else if(dy == -1) {
-            x->x_data[x->x_active_row][x->x_active_column]++;
-            tracker_draw_update_single(x, x->x_active_row, x->x_active_column);
-        }
+    if(x->x_active_row >= 0 && x->x_active_column >= 0 && dy != 0) {
+        t_float d = tracker_data_get(x, x->x_active_row, x->x_active_column);
+        d -= dy;
+        tracker_data_set(x, x->x_active_row, x->x_active_column, d);
+        tracker_changenotify(x, x->x_active_row, x->x_active_column);
+        tracker_draw_update_single(x, x->x_active_row, x->x_active_column);
     }
 }
 
@@ -395,6 +431,14 @@ static void tracker_gresize(t_tracker* x, t_floatarg newrows, t_floatarg newcols
     canvas_fixlinesfor(canvas, (t_text*)x);
 }
 
+static void tracker_gdigits(t_tracker* x, t_floatarg d) {
+    x->x_ndigits = (int)d;
+    if(x->x_ndigits < DIGITS_MIN) x->x_ndigits = DIGITS_MIN;
+    if(x->x_ndigits > DIGITS_MAX) x->x_ndigits = DIGITS_MAX;
+    tracker_vis((t_gobj*)x, x->x_glist, 0);
+    tracker_vis((t_gobj*)x, x->x_glist, 1);
+}
+
 static void tracker_free(t_tracker* x) {
     int ei;
     for(ei = 0; ei < x->x_rows; ei++) {
@@ -416,6 +460,7 @@ static void tracker_set_recv(t_tracker* x, t_symbol *s) {
         pd_unbind(&x->x_obj.ob_pd, x->s_recv);
 
     x->s_recv = s;
+    //x->s_recv_r = canvas_realizedollar(glist_getcanvas(x->x_glist), s);
 
     pd_bind(&x->x_obj.ob_pd, s);
 }
@@ -442,20 +487,14 @@ static t_tracker* tracker_new(t_symbol* s, int argc, t_atom* argv) {
     x->x_ndigits = 3;
     x->x_cursor_pos = -1;
     x->b_cursor = 0;
-    x->b_save_data = 0;
+    x->b_save_data = 1;
 
     x->s_send = gensym("");
     x->s_recv = gensym("");
 
-    int cols = 0, rows = 0;
+    int cols = 10, rows = 10;
     int got_data = 0;
-    if(argc == 0) {
-        // set default values
-        cols = 10;
-        rows = 10;
-        tracker_resize(x, rows, cols);
-        x->b_save_data = 1;
-    } else {
+    if(argc > 0) {
         #define ARG_CHECK_LOOP_BEGIN while(ei < argc) { if(0) {}
         #define ARG_CHECK_LOOP_END }
         #define MATCH_ARG(sz) else if(argv[ei].a_type == A_SYMBOL && \
@@ -473,6 +512,12 @@ static t_tracker* tracker_new(t_symbol* s, int argc, t_atom* argv) {
         MATCH_ARG_T("-cols", A_FLOAT) {
             ei++;
             cols = (int)argv[ei++].a_w.w_float;
+        }
+        MATCH_ARG_T("-digits", A_FLOAT) {
+            ei++;
+            x->x_ndigits = (int)argv[ei++].a_w.w_float;
+            if(x->x_ndigits < DIGITS_MIN) x->x_ndigits = DIGITS_MIN;
+            if(x->x_ndigits > DIGITS_MAX) x->x_ndigits = DIGITS_MAX;
         }
         MATCH_ARG_T("-bg", A_FLOAT)   { ei++; ei++; }
         MATCH_ARG_T("-bg", A_SYMBOL)  { ei++; ei++; }
@@ -510,10 +555,9 @@ static t_tracker* tracker_new(t_symbol* s, int argc, t_atom* argv) {
             tracker_resize(x, rows, cols);
             int j;
             for(j = 0; j < (rows * cols); j++) {
-                x->x_data[j / cols][j % cols] = argv[ei++].a_w.w_float;
+                tracker_data_set(x, j / cols, j % cols, argv[ei++].a_w.w_float);
             }
             got_data = 1;
-            //x->b_save_data = 1;
             tracker_set_saveflag(x, 1);
         }
         MATCH_FAILED {
@@ -523,14 +567,11 @@ static t_tracker* tracker_new(t_symbol* s, int argc, t_atom* argv) {
         }
         /*----------------*/ARG_CHECK_LOOP_END
     }
-    if(!got_data) tracker_resize(x, rows, cols);
+    if(!got_data) {
+        tracker_set_saveflag(x, 0);
+        tracker_resize(x, rows, cols);
+    }
 
-    /*if(argc == (2+cols*rows)) {
-        // restore saved data
-        for(ei = 2; ei < argc; ei++) {
-            x->x_data[(ei-2)/cols][(ei-2)%cols] = argv[ei].a_w.w_float;
-        }
-    }*/
     x->x_glist = (t_glist*)canvas_getcurrent();
 
     /* calculate font metrics */
@@ -546,8 +587,10 @@ static t_tracker* tracker_new(t_symbol* s, int argc, t_atom* argv) {
 static void tracker_file_load(t_tracker* x, t_symbol* f) {
     void* binbuf = binbuf_new();
     t_canvas* canvas = glist_getcanvas(x->x_glist);
-    if(binbuf_read_via_canvas(binbuf, f->s_name, canvas, 0))
-        error("tracker: %s: read failed", f->s_name);
+    if(binbuf_read_via_canvas(binbuf, f->s_name, canvas, 0)) {
+        //error("tracker: %s: read failed", f->s_name);
+        return;
+    }
     
     int argc = binbuf_getnatom(binbuf);
     t_atom* argv = binbuf_getvec(binbuf);
@@ -564,8 +607,7 @@ static void tracker_file_load(t_tracker* x, t_symbol* f) {
     int r,c;
     for(r = 0; r < x->x_rows; r++) {
         for(c = 0; c < x->x_columns; c++) {
-            //x->x_data[r][c] = argv[2+r*cols+c].a_w.w_float;
-            x->x_data[r][c] = argv[j++].a_w.w_float;
+            tracker_data_set(x, r, c, argv[j++].a_w.w_float);
         }
     }
     tracker_gresize(x, rows, cols);
@@ -583,7 +625,7 @@ static void tracker_file_save(t_tracker* x, t_symbol* f) {
     binbuf_addv(binbuf, "ii", x->x_rows, x->x_columns);
     for(r = 0; r < x->x_rows; r++) {
         for(c = 0; c < x->x_columns; c++) {
-            binbuf_addv(binbuf, "i", (int)x->x_data[r][c]);
+            binbuf_addv(binbuf, "i", (int)tracker_data_get(x, r, c));
         }
     }
 
@@ -593,28 +635,47 @@ static void tracker_file_save(t_tracker* x, t_symbol* f) {
 }
 
 static void tracker_getrow(t_tracker* x, t_floatarg row) {
-    int ei,introw;
+    int ei;
+    int argc = x->x_columns + 1;
 
-    introw = (int)row;
-    introw = introw % x->x_rows;
-    if(introw < 0) introw = 0;
+    t_atom *atombuf = (t_atom*)getbytes(sizeof(t_atom)*argc);
 
-    t_atom *atombuf = (t_atom*)getbytes(sizeof(t_atom)*x->x_columns);
+    SETSYMBOL(&atombuf[0], gensym("output"));
+
     for(ei = 0; ei < x->x_columns; ei++) {
-        SETFLOAT(&atombuf[ei], x->x_data[introw][ei]);
+        SETFLOAT(&atombuf[ei+1], tracker_data_get(x, row, ei));
     }
     
-    outlet_list(x->outlet0, &s_list, x->x_columns, atombuf);
+    outlet_list(x->outlet0, &s_list, argc, atombuf);
     if(x->s_send != gensym(""))
-        pd_list(x->s_send->s_thing, &s_list, x->x_columns, atombuf);
+        pd_list(x->s_send->s_thing, &s_list, argc, atombuf);
 
-    freebytes(atombuf, sizeof(t_atom)*x->x_columns);
+    freebytes(atombuf, sizeof(t_atom)*(x->x_columns+1));
 
     if(x->b_cursor) {
-        x->x_cursor_pos = ((t_int)row) % x->x_rows;
-        if(x->x_cursor_pos < 0) x->x_cursor_pos = 0;
+        t_int ir = (t_int)row;
+        t_int ic = 0;
+        tracker_clip_row_col(x, &ir, &ic);
+        x->x_cursor_pos = ir;
         tracker_draw_update_cursor_pos(x);
     }
+}
+
+static void tracker_changenotify(t_tracker* x, t_floatarg row, t_floatarg col) {
+    int ei = 0;
+    t_atom *atombuf = (t_atom*)getbytes(sizeof(t_atom)*5);
+
+    SETSYMBOL(&atombuf[ei], gensym("changenotify"));           ei++;
+    SETSYMBOL(&atombuf[ei], gensym("set"));                    ei++;
+    SETFLOAT(&atombuf[ei], row);                               ei++;
+    SETFLOAT(&atombuf[ei], col);                               ei++;
+    SETFLOAT(&atombuf[ei], tracker_data_get(x, row, col));     ei++;
+
+    outlet_list(x->outlet0, &s_list, ei, atombuf);
+    if(x->s_send != gensym(""))
+        pd_list(x->s_send->s_thing, &s_list, ei, atombuf);
+
+    freebytes(atombuf, sizeof(t_atom)*ei);
 }
 
 static void tracker_toggle_cursor(t_tracker* x, t_floatarg b) {
@@ -627,57 +688,32 @@ static void tracker_setrow(t_tracker* x, t_symbol* s, int argc, t_atom* argv) {
         post("tracker: setrow: too few arguments");
         return;
     }
-    int ei,introw;
-    
-    introw = (int)argv[0].a_w.w_float;
-    introw = introw % x->x_rows;
-    if(introw < 0) introw = 0;
-
+    int ei;
     for(ei = 1; ei < argc; ei++) {
-        if((ei-1) >= x->x_columns) break;
+        if((ei - 1) >= x->x_columns) break;
 
         if(argv[ei].a_type == A_FLOAT) {
-            x->x_data[introw][ei-1] = argv[ei].a_w.w_float;
+            tracker_data_set(x, argv[0].a_w.w_float, ei - 1, argv[ei].a_w.w_float);
         } else {
             post("tracker: warning: non-float atom converted to zero-value");
-            x->x_data[introw][ei-1] = 0;
+            tracker_data_set(x, argv[0].a_w.w_float, ei - 1, 0);
         }
     }
-
-    tracker_draw_update_row(x, introw);
+    tracker_draw_update_row(x, argv[0].a_w.w_float);
 }
 
 static void tracker_getitem(t_tracker* x, t_float row, t_float col) {
-    t_atom a;
-    int introw,intcol;
-
-    introw = (int)row;
-    introw = introw % x->x_rows;
-    if(introw < 0) introw = 0;
-    intcol = (int)col;
-    intcol = intcol % x->x_columns;
-    if(intcol < 0) intcol = 0;
-
-    SETFLOAT(&a, x->x_data[introw][intcol]);
-
-    outlet_list(x->outlet0, &s_list, 1, &a);
+    t_atom a[2];
+    SETSYMBOL(&a[0], gensym("output"));
+    SETFLOAT(&a[1], tracker_data_get(x, row, col));
+    outlet_list(x->outlet0, &s_list, 2, &a[0]);
     if(x->s_send != gensym(""))
-        pd_list(x->s_send->s_thing, &s_list, 1, &a);
+        pd_list(x->s_send->s_thing, &s_list, 2, &a[0]);
 }
 
 static void tracker_setitem(t_tracker* x, t_float row, t_float col, t_float val) {
-    int introw,intcol;
-    
-    introw = (int)row;
-    introw = introw % x->x_rows;
-    if(introw < 0) introw = 0;
-    intcol = (int)col;
-    intcol = intcol % x->x_columns;
-    if(intcol < 0) intcol = 0;
-
-    x->x_data[introw][intcol] = val;
-
-    tracker_draw_update_single(x, introw, intcol);
+    tracker_data_set(x, row, col, val);
+    tracker_draw_update_single(x, row, col);
 }
 
 static void tracker_list(t_tracker* x, t_symbol* s, int ac, t_atom* av) {

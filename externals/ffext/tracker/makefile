@@ -1,37 +1,63 @@
 all: pd_linux
+#all: pd_win
+#all: pd_darwin
 
-SUFFIX=pd_linux
-#SUFFIX=pd_darwin
+.SUFFIXES: .pd_linux .pd_darwin .dll .tk .tk2c
 
-$(SUFFIX): tracker.$(SUFFIX)
-tracker.$(SUFFIX): tracker.c tracker.h tracker.tk2c
+PDPATH = /home/pat/pd
 
+
+
+
+# ----------------------- WINDOWS -------------------------
+pd_win: tracker.dll
+tracker.dll: tracker.c tracker.h tracker.tk2c
+
+WINCFLAGS = -Wall -W -Wshadow -Wstrict-prototypes -DPD -DNT -W3 -WX -Werror -Wno-unused -mms-bitfields -Wno-parentheses -Wno-switch -O6 -funroll-loops -fomit-frame-pointer
+WININCLUDE =  -I.. -I../include -I$(PDPATH)/src
+
+WINLDFLAGS = -shared
+
+.c.dll:
+	gcc -mms-bitfields $(WINCFLAGS) $(WININCLUDE) -o $*.o -c $*.c
+	gcc $(WINLDFLAGS) -o $*.dll $*.o $(PDPATH)/bin/pd.dll
+	strip --strip-unneeded $*.dll
+	rm -f $*.o
+
+# ----------------------- LINUX i386 ----------------------
+pd_linux: tracker.pd_linux
+tracker.pd_linux: tracker.c tracker.h tracker.tk2c
+
+LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
+   -Wall -W -Wno-shadow -Wstrict-prototypes \
+   -Wno-unused -Wno-parentheses -Wno-switch
+LINUXINCLUDE = -I/usr/include -I$(PDPATH)/src
+LINUXLDFLAGS = -export_dynamic  -shared
+
+.c.pd_linux:
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
+	$(LD) $(LINUXLDFLAGS) -o $*.pd_linux $*.o -lc -lm
+	strip --strip-unneeded $*.pd_linux
+
+# ----------------------- Darwin (OSX) --------------------
 pd_darwin: tracker.pd_darwin
-tracker.pd_: tracker.c tracker.h tracker.tk2c
+tracker.pd_darwin: tracker.c tracker.h tracker.tk2c
 
-STRIP = strip
-CFLAGS = -DPD -O2  \
-    -Wall -W -Wno-shadow -Wstrict-prototypes \
-    -Wno-unused -Wno-parentheses -Wno-switch
-INCLUDE = -I/usr/include -I../pd/src
-LDFLAGS = 
+DARWINCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
+   -Wall -W -Wno-shadow -Wstrict-prototypes \
+   -Wno-unused -Wno-parentheses -Wno-switch
+DARWININCLUDE = -I/usr/include -I$(PDPATH)/src
+DARWINLDFLAGS = -bundle -undefined suppress -flat_namespace
 
-ifeq ($(SUFFIX),pd_linux)
-	CFLAGS += -DUNIX -funroll-loops -fomit-frame-pointer
-	LDFLAGS += -export_dynamic -shared -lc -lm
-endif
-ifeq ($(SUFFIX),pd_darwin)
-	LDFLAGS += -bundle -undefined suppress -flat_namespace
-	STRIP = false
-endif
+.c.pd_darwin:
+	$(CC) $(CFLAGS) -o $*.o -c $*.c
+	$(LD) $(DARWINLDFLAGS) -o $*.pd_darwin $*.o -lc -lm
 
-.SUFFIXES: .$(SUFFIX) .tk .tk2c
-
+# ----------------------- Miscellaneous -------------------
 .tk.tk2c:
-	./tk2c.bash < $*.tk > $*.tk2c
-.c.$(SUFFIX):
-	$(CC) $(CFLAGS) $(INCLUDE) -o $*.o -c $*.c
-	$(LD) $(LDFLAGS) -o $*.pd_linux $*.o
-	$(STRIP) --strip-unneeded $*.pd_linux
+	sh tk2c.bash < $*.tk > $*.tk2c
+
 clean:
-	$(RM) -f *.o *.pd_* so_locations *.tk2c
+	rm -f *.o *.pd_linux *.pd_darwin *.pd_win *.dll so_locations *.tk2c
+
+
