@@ -185,7 +185,7 @@ void zeroxpos_tilde_setup(void)
   post("|find 1st, 2nd or 3rd etc zero crossing point in frame|");
   post("|````edward¬¬¬¬¬¬¬¬¬¬¬¬kelly``````````````````2005¬¬¬¬|");
 
-  class_sethelpsymbol(zeroxpos_tilde_class, gensym("help-zeroxpos~"));
+
   class_addbang(zeroxpos_tilde_class, zeroxpos_tilde_bang);
   class_addmethod(zeroxpos_tilde_class, (t_method)zeroxpos_tilde_dsp, gensym("dsp"), 0);
   class_addmethod(zeroxpos_tilde_class, (t_method)zeroxpos_tilde_mode, gensym("mode"), A_DEFFLOAT, 0);

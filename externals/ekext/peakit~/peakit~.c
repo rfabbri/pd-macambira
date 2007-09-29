@@ -140,7 +140,7 @@ void peakit_tilde_setup(void)
   post("|--<FFT peaks list>-<>--<>---<>----|");
   post("|-<>-<edward>-<kelly>---<>-<2005>--|");
 
-  class_sethelpsymbol(peakit_tilde_class, gensym("help-peakit~"));
+
   class_addmethod(peakit_tilde_class, (t_method)peakit_tilde_dsp, gensym("dsp"), 0);
   class_addmethod(peakit_tilde_class, (t_method)peakit_tilde_iexp, &s_float, A_DEFFLOAT, 0);
   CLASS_MAINSIGNALIN(peakit_tilde_class, t_peakit_tilde, f_dummy);

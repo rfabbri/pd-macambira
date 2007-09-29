@@ -197,7 +197,7 @@ void lpc_tilde_setup(void)
   post(". & Edward Kelly <morph_2016@yahoo.co.uk> .");
   
   class_addmethod(lpc_tilde_class, (t_method)lpc_tilde_dsp, gensym("dsp"), 0);
-//  class_sethelpsymbol(lpc_tilde_class, gensym("help-lpc~"));
-  class_sethelpsymbol(lpc_tilde_class, gensym("lpc_test"));
+
+
   CLASS_MAINSIGNALIN(lpc_tilde_class, t_lpc_tilde, f_dummy);
 }

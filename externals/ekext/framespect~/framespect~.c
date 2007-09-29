@@ -106,6 +106,6 @@ void framespect_tilde_setup(void)
 
   class_addmethod(framespect_tilde_class, (t_method)framespect_tilde_dsp,
 		  gensym("dsp"), 0);
-  class_sethelpsymbol(framespect_tilde_class, gensym("help-framespect~"));
+
   CLASS_MAINSIGNALIN(framespect_tilde_class, t_framespect_tilde, f);
 }

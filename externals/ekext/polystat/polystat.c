@@ -254,7 +254,7 @@ void polystat_setup(void)
   post("|^^^^^^^^^^^^polystat^^^^^^^^^^^^|");
   post("|->^^^^polyphony statistics^^^^<-|");
   post("|^^^^^^^^Edward Kelly 2006^^^^^^^|");
-  class_sethelpsymbol(polystat_class, gensym("help-polystat"));
+
   class_addfloat(polystat_class, polystat_float);
   class_addmethod(polystat_class, (t_method)polystat_clear, gensym("clear"), A_DEFFLOAT, 0);
   class_addmethod(polystat_class, (t_method)polystat_get, gensym("get"), A_DEFFLOAT, 0);

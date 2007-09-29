@@ -42,7 +42,7 @@ void doubledelta_setup(void)
   0, sizeof(t_doubledelta),
   0, A_DEFFLOAT, 0);
   post("delta & delta-delta values, <morph_2016@yahoo.co.uk>");
-  class_sethelpsymbol(doubledelta_class, gensym("help-ddelta"));
+
   class_addbang(doubledelta_class, doubledelta_bang);
   class_addfloat(doubledelta_class, doubledelta_float);
 }

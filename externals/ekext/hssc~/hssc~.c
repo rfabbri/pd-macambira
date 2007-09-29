@@ -93,6 +93,6 @@ void hssc_tilde_setup(void)
 
   class_addmethod(hssc_tilde_class, (t_method)hssc_tilde_dsp,
 		  gensym("dsp"), 0);
-  class_sethelpsymbol(hssc_tilde_class, gensym("help-hssc~"));
+
   CLASS_MAINSIGNALIN(hssc_tilde_class, t_hssc_tilde, f);
 }

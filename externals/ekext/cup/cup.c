@@ -43,7 +43,7 @@ void cup_setup(void)
   0, sizeof(t_cup),
   0, A_DEFFLOAT, 0);
   post("cup counts up ^_^");
-  class_sethelpsymbol(cup_class, gensym("help-cup"));
+
   class_addbang(cup_class, cup_bang);
   class_addfloat(cup_class, cup_float);
   class_addmethod(cup_class, (t_method)cup_setbang, gensym("setbang"), A_DEFFLOAT, 0);}

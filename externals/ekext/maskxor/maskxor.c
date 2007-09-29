@@ -205,7 +205,7 @@ void maskxor_setup(void)
   post("|..-.--.-..-maskxor.-...--.-..|");
   post("|    exclusive-or mask-map    |");
   post("|.--.- Edward Kelly 2006 ---.-|");
-  class_sethelpsymbol(maskxor_class, gensym("help-maskxor"));
+
   class_addfloat(maskxor_class, maskxor_float);
   class_addmethod(maskxor_class, (t_method)maskxor_listl, gensym("listl"), A_GIMME, 0, 0);
   class_addmethod(maskxor_class, (t_method)maskxor_listr, gensym("listr"), A_GIMME, 0, 0);

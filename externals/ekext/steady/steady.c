@@ -74,7 +74,7 @@ void steady_setup(void) {
   post("|+>max, min and through must not jump more<-|");
   post("|+++++++++>than a specified amount<---------|");
   post("|+++>edward<------->kelly<++++++++>2005<----|");
-  class_sethelpsymbol(steady_class, gensym("help-steady"));
+
   class_addbang(steady_class, steady_bang);
   class_addfloat(steady_class, steady_float);
 }

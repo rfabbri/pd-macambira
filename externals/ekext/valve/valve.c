@@ -114,7 +114,7 @@ void valve_setup(void)
   post("|¬~¬~¬~¬~¬~¬valve~¬~¬~¬~¬~¬~¬|");
   post("|~>^^^integer map router^^^<¬|");
   post("|¬~¬~¬Edward Kelly 2007~¬~¬~¬|");
-  class_sethelpsymbol(valve_class, gensym("help-valve"));
+
   class_addfloat(valve_class, valve_float);
   class_addmethod(valve_class, (t_method)valve_set, gensym("set"), A_DEFFLOAT, A_DEFFLOAT, 0);
   class_addmethod(valve_class, (t_method)valve_map, gensym("map"), A_GIMME, 0);

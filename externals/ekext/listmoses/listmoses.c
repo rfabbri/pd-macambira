@@ -142,7 +142,7 @@ void listmoses_setup(void) {
   post("|<<<<<<<<<<<<<<<<<<<<<listmoses>>>>>>>>>>>>>>>>>>>>>>|");
   post("|<<split two lists according to values of the first>>|");
   post("|<<<<<<<<<<<<edward-------kelly------2005>>>>>>>>>>>>|");
-  class_sethelpsymbol(listmoses_class, gensym("help-listmoses"));
+
   class_addbang(listmoses_class, listmoses_bang);
   class_addlist(listmoses_class, listmoses_list);
   class_addmethod(listmoses_class, (t_method)listmoses_amps, gensym("amps"), A_GIMME, 0);

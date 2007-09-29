@@ -395,7 +395,7 @@ void sieve_setup(void)
   post("|^^^^^^^^^^^^^sieve^^^^^^^^^^^^^|");
   post("|->^^^integer map to floats^^^<-|");
   post("|^^^^^^^Edward Kelly 2006^^^^^^^|");
-  class_sethelpsymbol(sieve_class, gensym("help-sieve"));
+
   class_addfloat(sieve_class, sieve_float);
   class_addmethod(sieve_class, (t_method)sieve_set, gensym("set"), A_DEFFLOAT, A_DEFFLOAT, 0);
   class_addmethod(sieve_class, (t_method)sieve_map, gensym("map"), A_GIMME, 0);

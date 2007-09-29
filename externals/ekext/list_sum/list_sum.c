@@ -170,7 +170,7 @@ void list_sum_setup(void) {
   post("|<<<<<<<<<<<<<<<<<<<<list_sum>>>>>>>>>>>>>>>>>>>>|");
   post("|<<<calculate the sum of a list, with wrapping>>>|");
   post("|<<<<<<<<<edward-------kelly-------2007>>>>>>>>>>|");
-  class_sethelpsymbol(list_sum_class, gensym("help-list_sum"));
+
   //  class_addmethod(list_sum_class, (t_method)list_sum_follow, gensym("follow"), A_DEFFLOAT, A_DEFFLOAT, 0);
   class_addmethod(list_sum_class, (t_method)list_sum_all, gensym("all"), A_GIMME, 0);
   class_addmethod(list_sum_class, (t_method)list_sum_clear, gensym("clear"), A_DEFFLOAT, 0);

@@ -124,8 +124,8 @@ void lpreson_tilde_setup(void)
   post(". & Edward Kelly <morph_2016@yahoo.co.uk> .");
   
   class_addmethod(lpreson_tilde_class, (t_method)lpreson_tilde_dsp, gensym("dsp"), 0);
-//  class_sethelpsymbol(lpreson_tilde_class, gensym("help-lpc~"));
+
   class_addlist(lpreson_tilde_class, lpreson_tilde_list);
-  class_sethelpsymbol(lpreson_tilde_class, gensym("lpc-cross-synthesis.pd"));
+
   CLASS_MAINSIGNALIN(lpreson_tilde_class, t_lpreson_tilde, f_dummy);
 }

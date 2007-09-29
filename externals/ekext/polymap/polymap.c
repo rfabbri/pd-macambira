@@ -198,7 +198,7 @@ void polymap_setup(void)
   post("|. . . . . . . . .polymap. . . . . . . . .|");
   post("|_- polyphonic chain reaction regulator -_|");
   post("| . . . . . .Edward Kelly 2006. . . . . . |");
-  class_sethelpsymbol(polymap_class, gensym("help-polymap"));
+
   class_addmethod(polymap_class, (t_method)polymap_note, gensym("note"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
   class_addmethod(polymap_class, (t_method)polymap_clear, gensym("clear"), A_DEFFLOAT, 0);
   class_addmethod(polymap_class, (t_method)polymap_print, gensym("print"), A_DEFFLOAT, 0);

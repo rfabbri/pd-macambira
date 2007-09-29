@@ -95,6 +95,6 @@ void hasc_tilde_setup(void)
 
   class_addmethod(hasc_tilde_class, (t_method)hasc_tilde_dsp,
 		  gensym("dsp"), 0);
-  class_sethelpsymbol(hasc_tilde_class, gensym("help-hasc~"));
+
   CLASS_MAINSIGNALIN(hasc_tilde_class, t_hasc_tilde, f);
 }

@@ -77,7 +77,7 @@ void simile_tilde_setup(void) {
   post("|~&weighted similarity measurement&~|");
   post("|~~&edward&~~~~~&kelly&~~~~~&2005&~~|");
 
-  class_sethelpsymbol(simile_tilde_class, gensym("help-simile~"));
+
   class_addmethod(simile_tilde_class,
   (t_method)simile_tilde_dsp, gensym("dsp"), 0);
   CLASS_MAINSIGNALIN(simile_tilde_class, t_simile_tilde, x_dummy);

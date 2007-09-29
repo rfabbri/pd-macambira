@@ -63,7 +63,7 @@ void simile_setup(void) {
   post("|------------->simile<--------------|");
   post("|->weighted similarity measurement<-|");
   post("|-->edward<----->kelly<----->2005<--|");
-  class_sethelpsymbol(simile_class, gensym("help-simile"));
+
   class_addbang(simile_class, simile_bang);
   class_addfloat(simile_class, simile_float);
 }

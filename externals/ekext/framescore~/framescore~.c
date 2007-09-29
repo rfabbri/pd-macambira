@@ -96,6 +96,6 @@ void framescore_tilde_setup(void)
 
   class_addmethod(framescore_tilde_class, (t_method)framescore_tilde_dsp,
 		  gensym("dsp"), 0);
-  class_sethelpsymbol(framescore_tilde_class, gensym("help-framescore~"));
+
   CLASS_MAINSIGNALIN(framescore_tilde_class, t_framescore_tilde, f);
 }

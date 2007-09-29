@@ -62,7 +62,7 @@ void cupd_setup(void)
   0, sizeof(t_cupd),
   0, A_DEFFLOAT, 0);
   post("cupd counts up ^_^ and down _^_");
-  class_sethelpsymbol(cupd_class, gensym("help-cupd"));
+
   class_addbang(cupd_class, cupd_bang);
   class_addfloat(cupd_class, cupd_float);
   class_addmethod(cupd_class, (t_method)cupd_setbang, gensym("setbang"), A_DEFFLOAT, 0);}
