@@ -50,7 +50,7 @@ DARWININCLUDE = -I/usr/include -I$(PDPATH)/src
 DARWINLDFLAGS = -bundle -undefined suppress -flat_namespace
 
 .c.pd_darwin:
-	$(CC) $(CFLAGS) -o $*.o -c $*.c
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -o $*.o -c $*.c
 	$(LD) $(DARWINLDFLAGS) -o $*.pd_darwin $*.o -lc -lm
 
 # ----------------------- Miscellaneous -------------------
