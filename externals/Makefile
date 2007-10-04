@@ -124,7 +124,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = adaptive boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -2123,6 +2123,39 @@ smlib_clean:
 	-rm -f -- $(externals_src)/smlib/*.bak
 	-rm -f -- $(externals_src)/smlib/*.*~
 
+
+#------------------------------------------------------------------------------#
+# TOF
+TOF_NAME=tof
+TOF_OBJECTS := $(wildcard $(externals_src)/tof/src/*.c)
+tof: $(TOF_OBJECTS:.c=.$(EXTENSION))
+
+tof_install: tof
+	install -d $(objectsdir)/$(TOF_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(TOF_NAME) \
+		--author "Thomas Ouellet Fredericks" \
+		--description "Various utilities" \
+		--license "http://www.kopimi.se/kopimi/" \
+		--version "1"
+	install -p $(TOF_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(TOF_NAME)
+	install -d $(helpdir)/$(TOF_NAME)
+	install -p $(externals_src)/tof/help/*.pd \
+		$(helpdir)/$(TOF_NAME)
+#	install -d $(manualsdir)/$(TOF_NAME)
+#	install -p $(externals_src)/tof/manual.txt \
+#		$(manualsdir)/$(TOF_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/tof/README \
+		$(readmesdir)/$(TOF_NAME).txt
+#	install -d $(examplesdir)/$(TOF_NAME)
+#	install -p $(externals_src)/tof/examples/*.pd \
+		$(examplesdir)/$(TOF_NAME)
+
+tof_clean:
+	-rm -f -- $(TOF_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(TOF_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/tof/src/*.bak
+	-rm -f -- $(externals_src)/tof/src/*.*~
 
 #------------------------------------------------------------------------------#
 # TOXY
