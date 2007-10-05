@@ -1,0 +1,18 @@
+Index: s_print.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_print.c,v
+retrieving revision 1.3
+diff -u -w -r1.3 s_print.c
+--- s_print.c	18 May 2005 04:28:51 -0000	1.3
++++ s_print.c	5 Oct 2007 15:15:30 -0000
+@@ -77,8 +77,8 @@
+     int i;
+     for (i = 0; i < argc; i++)
+     {
+-        char buf[80];
+-        atom_string(argv+i, buf, 80);
++        char buf[MAXPDSTRING];
++        atom_string(argv+i, buf, MAXPDSTRING);
+         poststring(buf);
+     }
+ }
