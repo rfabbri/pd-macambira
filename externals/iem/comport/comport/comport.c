@@ -66,6 +66,7 @@ typedef struct comport
     t_float        stop_bits; /* holds the current number of stop bits */
     int            xonxoff; /* nonzero if xonxoff handshaking is on */
     int            ctsrts; /* nonzero if ctsrts handshaking is on */
+    int            hupcl; /* nonzero if hang-up on close is on */
     short          rxerrors; /* holds the rx line errors */
     t_clock        *x_clock;
     int            x_hit;
@@ -228,6 +229,7 @@ static int set_ctsrts(t_comport *x, int nr);
 static int set_dtr(t_comport *x, int nr);
 static int set_rts(t_comport *x, int nr);
 static int set_xonxoff(t_comport *x, int nr);
+static int set_hupcl(t_comport *x, int nr);
 static int set_serial(t_comport *x);
 static int write_serial(t_comport *x, unsigned char serial_byte);
 static int comport_get_dsr(t_comport *x);
@@ -253,6 +255,7 @@ static void comport_rtscts(t_comport *x,t_floatarg f);
 static void comport_dtr(t_comport *x,t_floatarg f);
 static void comport_rts(t_comport *x,t_floatarg f);
 static void comport_xonxoff(t_comport *x,t_floatarg f);
+static void comport_hupcl(t_comport *x,t_floatarg f);
 static void comport_close(t_comport *x);
 static void comport_open(t_comport *x, t_floatarg f);
 static void comport_devicename(t_comport *x, t_symbol *s);
@@ -267,6 +270,7 @@ static void comport_output_stop_bits(t_comport *x);
 static void comport_output_data_bits(t_comport *x);
 static void comport_output_rtscts(t_comport *x);
 static void comport_output_xonxoff(t_comport *x);
+static void comport_output_hupcl(t_comport *x);
 static void comport_enum(t_comport *x);
 static void comport_info(t_comport *x);
 static void comport_devices(t_comport *x);
@@ -464,7 +468,7 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
                 errStr = " ";
                 break;
         }
-        post("** ERROR ** could not open device %s:\n failure(%d) %s\n",
+        pd_error(x, "[comport]: could not open device %s:\n failure(%d) %s\n",
         &x->serial_device->s_name[4], dw, errStr);
         return INVALID_HANDLE_VALUE;
     }
@@ -473,7 +477,7 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
 
     if (!GetCommState(fd, &(x->dcb_old)))
     {
-        post("** ERROR ** could not get old dcb of device %s\n",
+        pd_error(x, "[comport]: could not get old dcb of device %s\n",
             &x->serial_device->s_name[4]);
         CloseHandle(fd);
         return INVALID_HANDLE_VALUE;
@@ -483,7 +487,7 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
 
     if (!GetCommState(fd, &(x->dcb)))
     {
-        post("** ERROR ** could not get new dcb of device %s\n",
+        pd_error(x, "[comport]: could not get new dcb of device %s\n",
             &x->serial_device->s_name[4]);
 
         CloseHandle(fd);
@@ -529,7 +533,7 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
     }
     else
     {
-        error("[comport] ** ERROR ** could not set params to control dcb of device %s\n",
+        pd_error(x, "[comport] could not set params to control dcb of device %s\n",
             &x->serial_device->s_name[4]);
         CloseHandle(fd);
         return INVALID_HANDLE_VALUE;
@@ -662,6 +666,9 @@ static long get_baud_ratebits(t_float *baud)
 
     while(i < BAUDRATETABLE_LEN && baudratetable[i] > *baud) i++;
 
+	if(baudratetable[i] != *baud)
+		post("[comport]: %d not valid, using closest value: ", *baud, baudratetable[i]);
+	
     /* nearest Baudrate finding */
     if(i==BAUDRATETABLE_LEN ||  baudspeedbittable[i] < 0)
     {
@@ -669,6 +676,7 @@ static long get_baud_ratebits(t_float *baud)
         i = 8;
     }
     *baud =  baudratetable[i];
+	post("get_baud_ratebits: %f", *baud);
 
     return baudspeedbittable[i];
 }
@@ -677,9 +685,11 @@ static float set_baudrate(t_comport *x, t_float baud)
 {
     struct termios  *tio = &(x->com_termio);
     speed_t            baudbits = get_baud_ratebits(&baud);
-
-    cfsetispeed(tio, baudbits);
-    cfsetospeed(tio, baudbits);
+	post("set_baudrate baudbits: %d", baudbits);
+    if( cfsetispeed(tio, baudbits) != 0 )
+		post("[comport]: ERROR failed to set bitrate: %d", baudbits);
+    if( cfsetospeed(tio, baudbits) != 0 )
+		post("[comport]: ERROR failed to set bitrate: %d", baudbits);
 
     return baud;
 }
@@ -792,6 +802,30 @@ static int set_xonxoff(t_comport *x, int nr)
 
     tio->c_iflag &= ~IXON & ~IXOFF &  ~IXANY;
     return 0;
+}
+
+static int set_hupcl(t_comport *x, int nr)
+{
+	struct termios settings;
+	int result;
+
+	result = tcgetattr(x->comhandle, &settings);
+	if (result < 0)
+    {
+		perror ("error in tcgetattr");
+		return 0;
+    }
+	settings.c_iflag &= ~HUPCL;
+	if(nr)
+		settings.c_iflag |= HUPCL;
+	result = tcsetattr(x->comhandle, TCSANOW, &settings);
+	if (result < 0)
+    {
+		pd_error(x,"[comport] could not set HUPCL");
+		return 0;
+	}
+	x->hupcl = nr;
+	return 1;
 }
 
 static int open_serial(unsigned int com_num, t_comport *x)
@@ -1021,6 +1055,7 @@ static void comport_tick(t_comport *x)
     {
         unsigned char serial_byte;
         fd_set        com_rfds;
+		int count = 0;
 
         FD_ZERO(&com_rfds);
         FD_SET(fd,&com_rfds);
@@ -1030,7 +1065,10 @@ static void comport_tick(t_comport *x)
             err = read(fd,(char *) &serial_byte,1);
             /*  while(    (err = read(fd,(char *) &serial_byte,1)) > 0){ */
             outlet_float(x->x_data_outlet, (t_float) serial_byte);
+			++count;
         }
+//		if( count > 0)
+//			post("--- %d", count);
     }
 #endif
 
@@ -1091,6 +1129,7 @@ that allows COM port numbers to be specified.
     test.stop_bits = 0;/* default 1 stop bit */
     test.ctsrts = 0; /* default no hardware handshaking */
     test.xonxoff = 0; /* default no software handshaking */
+    test.hupcl = 1; /* default hangup on close */
     fd = open_serial((unsigned int)com_num, &test);
 
     /* Now  nothing really bad could happen so we create the class */
@@ -1106,6 +1145,7 @@ that allows COM port numbers to be specified.
     x->stop_bits = test.stop_bits;
     x->ctsrts = test.ctsrts;
     x->xonxoff = test.xonxoff;
+    x->hupcl = test.hupcl;
     x->comhandle = fd; /* holds the comport handle */
 
     if(fd == INVALID_HANDLE_VALUE )
@@ -1361,6 +1401,14 @@ static void comport_xonxoff(t_comport *x,t_floatarg f)
     x->xonxoff = f;
 }
 
+static void comport_hupcl(t_comport *x,t_floatarg f)
+{
+//#ifdef _WIN32
+//#else
+	set_hupcl(x,f);
+//#endif	
+}
+
 static void comport_close(t_comport *x)
 {
     clock_unset(x->x_clock);
@@ -1607,6 +1655,11 @@ static void comport_output_xonxoff(t_comport *x)
     comport_output_status(x, gensym("xonxoff"), x->xonxoff);
 }
 
+static void comport_output_hupcl(t_comport *x)
+{
+    comport_output_status(x, gensym("hupcl"), x->hupcl);
+}
+
 static void comport_output_open_status(t_comport *x)
 {
     if(x->comhandle == INVALID_HANDLE_VALUE)
@@ -1632,6 +1685,7 @@ static void comport_info(t_comport *x)
     comport_output_data_bits(x);
     comport_output_rtscts(x);
     comport_output_xonxoff(x);
+    comport_output_hupcl(x);
 }
 
 /* ---------------- HELPER ------------------------- */
@@ -1662,6 +1716,7 @@ static void comport_help(t_comport *x)
         "   xonxoff <0|1>     ... set xon/xoff off|on\n"
         "   dtr <0|1>         ... set dtr off|on\n"
         "   rts <0|1>         ... set rts off|on\n"
+        "   hupcl <0|1>       ... set hang-up on close off|on\n"
         "   close             ... close device\n"
         "   open <num>        ... open device number num\n"
         "   devicename <d>    ... set device name to d (eg. /dev/ttyS8)\n"
@@ -1695,6 +1750,7 @@ void comport_setup(void)
     class_addmethod(comport_class, (t_method)comport_rts, gensym("rts"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_parity, gensym("parity"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_xonxoff, gensym("xonxoff"), A_FLOAT, 0);
+    class_addmethod(comport_class, (t_method)comport_hupcl, gensym("hupcl"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_close, gensym("close"), 0);
     class_addmethod(comport_class, (t_method)comport_open, gensym("open"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_devicename, gensym("devicename"), A_SYMBOL, 0);
