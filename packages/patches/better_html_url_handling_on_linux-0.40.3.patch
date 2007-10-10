@@ -1,0 +1,27 @@
+Index: u_main.tk
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
+retrieving revision 1.25
+diff -u -w -r1.25 u_main.tk
+--- u_main.tk	9 Oct 2006 04:36:12 -0000	1.25
++++ u_main.tk	10 Oct 2007 05:12:38 -0000
+@@ -386,9 +386,16 @@
+     global pd_nt         
+ 
+     if {$pd_nt == 0} {
+-        exec sh -c \
+-            [format "firefox file:%s || mozilla file:%s " \
+-                $filename $filename] &
++        foreach candidate \
++            { gnome-open xdg-open sensible-browser iceweasel firefox mozilla \
++              galeon konqueror netscape lynx } {
++                  set browser [lindex [auto_execok $candidate] 0]
++                  if {[string length $browser]} {
++                         puts stderr [format "%s %s" $browser $filename]
++                         exec sh -c [format "%s %s" $browser $filename]
++                         break
++                     }
++                 }
+     } elseif {$pd_nt == 2} {
+         puts stderr [format "open %s" $filename]
+             exec sh -c [format "open %s" $filename]
