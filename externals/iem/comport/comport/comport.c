@@ -15,6 +15,7 @@ MP 20060924 added comport_enum to list available ports in Windows
 MP 20060925 add devices message to enumerate actual devices, info just outputs current port state
 MP 20061016 write_serial checks for GetOverlappedResult to avoid tx buffer overflow errors
 MP 20070719 added "ports" method to output list of available ports on status outlet
+MP 20071011 added comport_list and write_serials for list processing based on code by Thomas O Fredericks <tof@danslchamp.org>
 */
 
 #include "m_pd.h"
@@ -95,6 +96,7 @@ typedef struct comport
 
 #define COMPORT_MAX 99
 #define USE_DEVICENAME 9999 /* use the device name instead of the number */
+#define MAX_LIST 1000 /* arbitrary maximum list length for comport_list */
 
 #ifdef _WIN32
 /* we don't use the  table for windos cos we can set the number directly. */
@@ -229,15 +231,16 @@ static int set_ctsrts(t_comport *x, int nr);
 static int set_dtr(t_comport *x, int nr);
 static int set_rts(t_comport *x, int nr);
 static int set_xonxoff(t_comport *x, int nr);
-static int set_hupcl(t_comport *x, int nr);
 static int set_serial(t_comport *x);
 static int write_serial(t_comport *x, unsigned char serial_byte);
+static int write_serials(t_comport *x, unsigned char *serial_buf, size_t buf_length);
 static int comport_get_dsr(t_comport *x);
 static int comport_get_cts(t_comport *x);
 #ifdef _WIN32
 static HANDLE open_serial(unsigned int com_num, t_comport *x);
 static HANDLE close_serial(t_comport *x);
 #else
+static int set_hupcl(t_comport *x, int nr);
 static int open_serial(unsigned int com_num, t_comport *x);
 static int close_serial(t_comport *x);
 static long get_baud_ratebits(t_float *baud);
@@ -245,6 +248,7 @@ static long get_baud_ratebits(t_float *baud);
 static void comport_pollintervall(t_comport *x, t_floatarg g);
 static void comport_tick(t_comport *x);
 static void comport_float(t_comport *x, t_float f);
+static void comport_list(t_comport *x, t_symbol *s, int argc, t_atom *argv);
 static void *comport_new(t_floatarg com_num, t_floatarg fbaud);
 static void comport_free(t_comport *x);
 static void comport_baud(t_comport *x,t_floatarg f);
@@ -617,6 +621,39 @@ static int write_serial(t_comport *x, unsigned char serial_byte)
     return 1;
 }
 
+static int write_serials(t_comport *x, unsigned char *serial_buf, size_t buf_length)
+{
+    OVERLAPPED osWrite = {0};
+    DWORD      dwWritten;
+    DWORD      dwToWrite = (DWORD)buf_length;
+    DWORD      dwErr;
+	DWORD      numTransferred = 0L;
+
+    osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    if (osWrite.hEvent == NULL)
+    {
+        post("Couldn't create event. Transmission aborted.");
+        return 0;
+    }
+
+    if (!WriteFile(x->comhandle, serial_buf, dwToWrite, &dwWritten, &osWrite))
+    {
+        dwErr = GetLastError();
+        if (dwErr != ERROR_IO_PENDING)
+        {
+            post("WriteFile error: %d", (int)dwErr);
+            return 0;
+        }
+    }
+	if (!GetOverlappedResult(x->comhandle, &osWrite, &numTransferred, TRUE))
+	{/* wait for the character(s) to be sent */
+        dwErr = GetLastError();
+		post("WriteFile:GetOverlappedResult error: %d", (int)dwErr);
+	}
+    CloseHandle(osWrite.hEvent);
+    return 1;
+}
+
 static int comport_get_dsr(t_comport *x)
 {
     short  dsr_state = 0;
@@ -974,6 +1011,14 @@ static int write_serial(t_comport *x, unsigned char  serial_byte)
 */
 }
 
+static int write_serials(t_comport *x, unsigned char *serial_buf, size_t buf_length)
+{
+    int result = write(x->comhandle,(char *)serial_buf, buf_length);
+    if (result != buf_length)
+        post ("[comport] write returned %d, errno is %d", result, errno);
+    return result;
+}
+
 static int comport_get_dsr(t_comport *x)
 {
     short  dsr_state = 0;
@@ -1089,6 +1134,25 @@ static void comport_float(t_comport *x, t_float f)
     {
         post("Write error, maybe TX-OVERRUNS on serial line");
     }
+}
+
+static void comport_list(t_comport *x, t_symbol *s, int argc, t_atom *argv)
+{
+    unsigned char   temp_array[MAX_LIST];/* arbitrary maximum list length */
+    int             i, count;
+    int             result;
+
+    count = argc;
+    if (argc > MAX_LIST)
+    {
+        post ("[comport] truncated list of %d elements to %d", argc, count);
+        count = MAX_LIST;
+    }
+    for(i = 0; i < count; i++)
+        temp_array[i] = ((unsigned char)atom_getint(argv+i))&0xFF; /* brutal conv */
+    result = write_serials(x, temp_array, count);
+    if (result < 0)
+        post ("[comport] write returned %d, errno is %d", result, errno);
 }
 
 static void *comport_new(t_floatarg com_num, t_floatarg fbaud)
@@ -1403,10 +1467,9 @@ static void comport_xonxoff(t_comport *x,t_floatarg f)
 
 static void comport_hupcl(t_comport *x,t_floatarg f)
 {
-//#ifdef _WIN32
-//#else
+#ifndef _WIN32
 	set_hupcl(x,f);
-//#endif	
+#endif
 }
 
 static void comport_close(t_comport *x)
@@ -1737,7 +1800,7 @@ void comport_setup(void)
         0, A_DEFFLOAT, A_DEFFLOAT, 0);
 
     class_addfloat(comport_class, (t_method)comport_float);
-
+    class_addlist(comport_class, (t_method)comport_list);
     /*
         class_addbang(comport_class, comport_bang
     */
