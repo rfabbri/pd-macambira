@@ -1,0 +1,50 @@
+#N canvas 324 126 700 531 10;
+#X obj -7 97 alpha 1;
+#X obj -8 74 gemhead 50;
+#X obj -6 350 pix_texture;
+#X obj -6 316 pix_invert;
+#X obj -7 248 pix_gain;
+#X floatatom 17 229 5 0 0 0 - - -;
+#X obj -31 317 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X obj -6 272 pix_2grey;
+#X obj -35 270 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X obj -7 118 pix_rgba;
+#X obj -26 241 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X obj 315 167 gems.win;
+#X obj 318 145 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X obj -8 480 rectangle 5.33333 4;
+#X obj -6 295 gems.sobel;
+#X obj 63 230 hsl 50 15 1 100 1 0 empty empty empty -2 -6 0 8 -258699
+-1 -1 0 1;
+#X text -16 33 Description: Applies a sobel filter to an image. Uses
+two convolution matrix filters.;
+#X obj 106 113 file.path.top;
+#X obj -7 210 gems.movies;
+#X obj 103 331 input.color.grid_;
+#X obj -7 445 color;
+#X msg 106 69 medias/movies/mov1.mov;
+#X msg 395 68 medias/movies/mov0.mov;
+#X connect 0 0 9 0;
+#X connect 1 0 0 0;
+#X connect 2 0 20 0;
+#X connect 3 0 2 0;
+#X connect 4 0 7 0;
+#X connect 5 0 4 1;
+#X connect 6 0 3 0;
+#X connect 7 0 14 0;
+#X connect 8 0 7 0;
+#X connect 9 0 18 0;
+#X connect 10 0 4 0;
+#X connect 12 0 11 0;
+#X connect 14 0 3 0;
+#X connect 15 0 5 0;
+#X connect 17 0 18 1;
+#X connect 18 0 4 0;
+#X connect 19 0 20 1;
+#X connect 20 0 13 0;
+#X connect 21 0 17 0;
+#X connect 22 0 17 0;

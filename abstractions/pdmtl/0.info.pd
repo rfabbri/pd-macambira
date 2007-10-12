@@ -1,0 +1,65 @@
+#N canvas 1373 18 874 639 10;
+#X text 389 17 A collection of abstractions made by Montreal pd users.
+;
+#N canvas 0 0 493 414 open 0;
+#X obj 64 80 inlet;
+#X obj 117 258 file.path.top;
+#X msg 77 319 \; pd open \$1 \$2;
+#X obj 65 284 pack s s;
+#X obj 72 127 t a b;
+#X obj 69 178 symbol;
+#X connect 0 0 4 0;
+#X connect 1 0 3 1;
+#X connect 3 0 2 0;
+#X connect 4 0 5 0;
+#X connect 4 1 1 0;
+#X connect 5 0 3 0;
+#X restore 26 259 pd open;
+#X text 23 182 Click one of the following to browse the pdmtl abstractions.
+;
+#X text 390 94 Website: http://wiki.dataflow.ws/PdMtlAbstractions;
+#X text 391 143 Release: 2.1;
+#X text 390 128 Version: 2007-04-02;
+#X obj 208 585 dollarg;
+#X obj 39 514 msgfile;
+#X obj 28 455 MouseState;
+#X obj 28 583 gemhead;
+#X text 207 562 -- iemlib --;
+#X text 37 493 -- zexy --;
+#X text 26 434 -- cyclone --;
+#X text 26 562 -- Gem --;
+#X obj 208 507 folder_list;
+#X obj 535 524 arraysize;
+#X text 206 434 -- ggee --;
+#X obj 208 455 getdir;
+#X text 366 434 -- iemmatrix --;
+#X text 366 484 -- maxlib --;
+#X obj 368 505 dist;
+#X text 206 486 -- hcs --;
+#X obj 209 532 stat;
+#X text 452 387 Please check out the installation instructions at:
+http://wiki.dataflow.ws/PdMtlAbstractions/Installation;
+#X text 25 297 -- REQUIREMENTS --;
+#X obj 194 84 image medias/pdmtl_logo.gif;
+#X text 25 351 If any of the following externals are not found by Pure
+Data \, either you are missing (or did not install correctly) a library
+\, library folder or an external required by the pdmtl abstractions.
+Names of required libraries are included between the "-- --".;
+#X text 26 329 Pure Data version >= 0.39;
+#X msg 26 208 1.browser.pd;
+#X msg 40 233 2.popup.pd;
+#X text 452 351 Almost all of the requirements can be found in Hans'
+Pd installers (http://at.or.at/hans/pd/installers.html).;
+#X obj 367 556 xgroove~;
+#X text 366 535 -- xsample --;
+#X obj 368 455 mtx_mul;
+#X text 388 40 This collection of abstractions is maintained by tof@danslchamp.org
+\, puredata@11h11.com and alexandre@quessy.net.;
+#X text 522 499 -- not part of a library (i.e. flatspace) --;
+#X obj 533 451 any2string;
+#X obj 533 472 string2any;
+#X text 522 432 -- pdstring --;
+#X text 536 561 -- creb --;
+#X obj 537 582 ead~;
+#X connect 28 0 1 0;
+#X connect 29 0 1 0;

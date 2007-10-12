@@ -1,0 +1,84 @@
+#N canvas 1357 294 1042 637 10;
+#X obj -17 151 bng 15 250 50 0 empty empty empty 0 -6 0 10 -262144
+-1 -1;
+#X msg 85 253 pattern \$1;
+#X floatatom 92 228 5 0 0 0 - - -;
+#X floatatom 481 5 5 0 0 0 bpm - -;
+#X msg 107 275 play;
+#X msg 153 298 stop;
+#X obj 95 593 mix.out_~;
+#X obj 523 497 synth.simple.osc~;
+#X msg 626 475 5 10 0.966 50;
+#X obj 626 454 loadbang;
+#X msg 35 183 read seq.tracker4_0.coll;
+#X msg 53 204 write seq.tracker4_0.coll;
+#X obj -21 375 seq.tracker4;
+#X obj 102 568 fx.limiter~;
+#X obj 481 47 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X msg 291 587 read medias/data/drum.kit.coll;
+#X obj 291 561 loadbang;
+#X obj 291 612 sample.bank;
+#X obj -22 520 sample.drum.machine~;
+#N canvas 0 0 600 324 assign_samples 0;
+#X obj 117 39 loadbang;
+#X obj 138 234 outlet;
+#X msg 85 92 assign 36 0 \, assign 38 1 \, assign 39 2 \, assign 41
+3 \, assign 42 4 \, assign 46 5 \, assign 48 6 \, assign 49 7;
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;
+#X restore 111 496 pd assign_samples;
+#X obj 482 25 seq.timing.master 160;
+#X obj -21 414 route 0 1;
+#X obj 508 237 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text -25 24 Description: A scrollable tracker with an unlimited
+number of patterns of any length.;
+#X text -20 61 Warning: seq.tracker4 requires a seq.timing.master linked
+to the same top patch to function.;
+#X obj 138 332 manuals/sequencing/timing_triggers;
+#X text 1 152 Show editor;
+#X msg 623 241 read seq.tracker4_1.coll;
+#X msg 641 262 write seq.tracker4_1.coll;
+#X obj 548 354 route 1;
+#X text 287 172 All seq.tracker4 linked to the same seq.timing.master
+play synchronized to each other.;
+#X obj 102 154 loadbang;
+#X obj 620 215 loadbang;
+#X obj 567 302 seq.tracker4;
+#X text 102 370 Outlet_1: Combines all channels.;
+#X text 102 385 Outlet_2: Outputs channel 1;
+#X text 102 401 Outlet_3: Outputs channel 2;
+#X text 102 416 etc..;
+#X text 69 445 n.b.: A channel combines three adjacent number boxes
+in the grid.;
+#X connect 0 0 12 0;
+#X connect 1 0 12 0;
+#X connect 2 0 1 0;
+#X connect 3 0 20 0;
+#X connect 4 0 12 0;
+#X connect 5 0 12 0;
+#X connect 7 0 13 0;
+#X connect 7 0 13 1;
+#X connect 8 0 7 1;
+#X connect 9 0 8 0;
+#X connect 10 0 12 0;
+#X connect 11 0 12 0;
+#X connect 12 0 21 0;
+#X connect 13 0 6 0;
+#X connect 13 1 6 1;
+#X connect 15 0 17 0;
+#X connect 16 0 15 0;
+#X connect 18 0 13 0;
+#X connect 18 1 13 1;
+#X connect 19 0 18 1;
+#X connect 20 0 14 0;
+#X connect 21 0 18 0;
+#X connect 22 0 33 0;
+#X connect 25 0 12 0;
+#X connect 27 0 33 0;
+#X connect 28 0 33 0;
+#X connect 29 0 7 0;
+#X connect 31 0 10 0;
+#X connect 32 0 27 0;
+#X connect 33 0 29 0;

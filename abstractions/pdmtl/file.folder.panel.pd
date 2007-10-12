@@ -1,0 +1,7 @@
+#N canvas 0 0 567 413 10;
+#X obj 39 54 inlet;
+#X obj 24 179 outlet;
+#X text 16 9 Sends the pathname of a directory on bang;
+#X obj 37 131 folderpanel;
+#X connect 0 0 3 0;
+#X connect 3 0 1 0;

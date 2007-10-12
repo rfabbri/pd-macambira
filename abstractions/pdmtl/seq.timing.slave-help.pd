@@ -1,0 +1,54 @@
+#N canvas 1336 105 758 770 10;
+#X text 56 41 Description: Follows the timing of seq.timing.master.
+;
+#X obj 384 103 seq.timing.master 123;
+#X obj 384 130 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 58 163 play;
+#X msg 102 162 stop;
+#X floatatom 146 298 5 0 0 1 bpm - -;
+#X floatatom 111 321 5 0 0 1 event - -;
+#X obj 182 273 tgl 15 0 empty empty play_state 17 7 0 10 -262144 -1
+-1 0 1;
+#X obj 218 249 bng 15 250 50 0 empty empty looping 17 7 0 10 -262144
+-1 -1;
+#X floatatom 177 169 5 0 0 0 - - -;
+#X floatatom 245 192 5 0 0 0 - - -;
+#X text 220 167 events per beat (minimum of 1 \, maximum of 24 \, defaults
+to 4);
+#X text 287 192 events in a loop (disable with 0 \, defaults to 0)
+;
+#X msg 66 366 play;
+#X msg 110 365 stop;
+#X floatatom 113 517 5 0 0 1 bpm - -;
+#X floatatom 66 546 5 0 0 1 event - -;
+#X obj 160 491 tgl 15 0 empty empty play_state 17 7 0 10 -262144 -1
+-1 0 1;
+#X obj 208 464 bng 15 250 50 0 empty empty looping 17 7 0 10 -262144
+-1 -1;
+#X text 299 508 Argument_2: Events in a loop (defaults to 0: no looping).
+;
+#X text 298 488 Argument_1: Events per beat (defaults to 4).;
+#X obj 66 434 seq.timing.slave 4 16;
+#X obj 174 390 manuals/sequencing/timing_triggers;
+#X text 170 370 Read the manual on the different trigger methods:;
+#X obj 111 218 seq.timing.slave;
+#X obj 268 446 bng 15 250 50 0 empty empty play_triggered 17 7 0 10
+-262144 -1 -1;
+#X connect 1 0 2 0;
+#X connect 3 0 24 0;
+#X connect 4 0 24 0;
+#X connect 9 0 24 1;
+#X connect 10 0 24 2;
+#X connect 13 0 21 0;
+#X connect 14 0 21 0;
+#X connect 21 0 16 0;
+#X connect 21 1 15 0;
+#X connect 21 2 17 0;
+#X connect 21 3 18 0;
+#X connect 21 4 25 0;
+#X connect 22 0 21 0;
+#X connect 24 0 6 0;
+#X connect 24 1 5 0;
+#X connect 24 2 7 0;
+#X connect 24 3 8 0;

@@ -1,0 +1,31 @@
+#N canvas 161 165 709 372 10;
+#X obj 79 314 mix.out_~;
+#X floatatom 275 180 5 0 0 0 - - -;
+#X obj 274 120 loadbang;
+#X obj 278 160 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 6400 1;
+#X obj 127 94 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 7900 1;
+#X floatatom 135 148 5 0 0 0 - - -;
+#X obj 154 193 line~;
+#X msg 151 171 \$1 5;
+#X obj 31 63 adc~;
+#X text 90 27 Description: Echos.;
+#X text 247 273 Arguments : 1) max delay time (ms) \, 2) feedback strength
+(0 to 127);
+#X msg 275 139 64;
+#X obj 87 220 fx.echo~ 250 0.5;
+#X text 415 162 strength (0-127);
+#X text 123 76 delay (0= minimum delay time \, 127 = maximum delay
+time);
+#X connect 1 0 12 2;
+#X connect 2 0 11 0;
+#X connect 3 0 1 0;
+#X connect 4 0 5 0;
+#X connect 5 0 7 0;
+#X connect 6 0 12 1;
+#X connect 7 0 6 0;
+#X connect 8 0 12 0;
+#X connect 11 0 3 0;
+#X connect 12 0 0 0;
+#X connect 12 0 0 1;

@@ -1,0 +1,23 @@
+#N canvas 431 33 597 584 10;
+#X obj 41 340 gemhead;
+#X msg 103 412 put the text here;
+#X text 61 30 Description: A basic text abstraction.;
+#X obj 373 204 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X text 67 105 Features will be added soon.;
+#X text 64 79 Flags: @rguments;
+#X obj 33 153 gemhead;
+#X obj 33 196 translateXYZ 0 2 0;
+#X msg 134 225 other text;
+#X text 61 52 Comments: wraps Gem's text3d.;
+#X obj 375 227 gems.win;
+#X obj 41 471 gems.text @text pdmtl @font medias/fonts/gutcruncher.ttf
+;
+#X obj 34 266 gems.text @text PDMTL @size 10 @font medias/fonts/pixel.ttf
+;
+#X connect 0 0 11 0;
+#X connect 1 0 11 1;
+#X connect 3 0 10 0;
+#X connect 6 0 7 0;
+#X connect 7 0 12 0;
+#X connect 8 0 12 1;

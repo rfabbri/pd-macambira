@@ -1,0 +1,17 @@
+#N canvas 0 0 718 571 10;
+#X obj 124 152 file.path.split.extension;
+#X msg 117 77 /home/tom/test.txt;
+#X msg 279 84 /home/tom/test;
+#X msg 331 108 /home/tom/test.more.txt;
+#X obj 126 217 print REST_OF_FILENAME;
+#X obj 308 215 print EXTENSION;
+#X msg 372 153 /home/more tom/top.wav;
+#X text 422 218 Bangs if there is no extension!;
+#X text 67 -44 Description: Splits the extension of a file name/path.
+;
+#X connect 0 0 4 0;
+#X connect 0 1 5 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 6 0 0 0;

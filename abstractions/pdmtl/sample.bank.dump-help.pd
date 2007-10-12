@@ -1,0 +1,50 @@
+#N canvas 1437 210 781 637 10;
+#X obj 334 102 sample.bank;
+#X obj 47 188 print;
+#X obj 47 91 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 331 356 sample.bank.dump;
+#X obj 438 283 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 238 414 vsl 15 115 0 175 0 0 \$0slider_s \$0slider_r empty 0
+-8 0 8 -1 -262144 -1 11400 0;
+#X obj 56 412 hradio 15 1 0 12 \$0hr_0_s \$0hr_0_r 0-drum00.wav 2 8
+0 15 -1 -1 -262140 7;
+#X obj 56 427 hradio 15 1 0 12 \$0hr_1_s \$0hr_1_r 1-drum01.wav 2 8
+0 15 -1 -1 -262140 6;
+#X obj 56 442 hradio 15 1 0 12 \$0hr_2_s \$0hr_2_r 2-drum02.wav 2 8
+0 15 -1 -1 -262140 6;
+#X obj 56 457 hradio 15 1 0 12 \$0hr_3_s \$0hr_3_r 3-drum03.wav 2 8
+0 15 -1 -1 -262140 6;
+#X obj 56 472 hradio 15 1 0 12 \$0hr_4_s \$0hr_4_r 4-drum04.wav 2 8
+0 15 -1 -1 -262140 6;
+#X obj 56 487 hradio 15 1 0 12 \$0hr_5_s \$0hr_5_r 5-drum05.wav 2 8
+0 15 -1 -1 -262140 6;
+#X obj 56 502 hradio 15 1 0 12 \$0hr_6_s \$0hr_6_r 6-drum06.wav 2 8
+0 15 -1 -1 -262140 6;
+#X obj 56 517 hradio 15 1 0 12 \$0hr_7_s \$0hr_7_r 7-drum07.wav 2 8
+0 15 -1 -1 -262140 6;
+#X obj 56 396 cnv 15 197 15 empty \$0hider empty 3 9 0 8 -128992 -262144
+0;
+#X obj 47 134 sample.bank.dump;
+#X obj 436 313 t b b;
+#X msg 609 399 clear;
+#X obj 326 475 gui.browser \$0;
+#X obj 325 515 flow.prepend set;
+#X msg 325 548 2-drum02.wav;
+#X obj 335 392 convert.list2symbol -;
+#X msg 334 69 read medias/data/drum.kit.coll;
+#X obj 334 36 loadbang;
+#X connect 2 0 15 0;
+#X connect 3 0 21 0;
+#X connect 3 1 18 1;
+#X connect 4 0 16 0;
+#X connect 15 0 1 0;
+#X connect 16 0 3 0;
+#X connect 16 1 17 0;
+#X connect 17 0 18 1;
+#X connect 18 0 19 0;
+#X connect 19 0 20 0;
+#X connect 21 0 18 1;
+#X connect 22 0 0 0;
+#X connect 23 0 22 0;

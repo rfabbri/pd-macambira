@@ -1,0 +1,123 @@
+#N canvas 254 126 911 653 10;
+#X obj 111 418 gemhead;
+#X msg 149 123 print;
+#X obj 163 23 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 41 83 Description: Renders a GLSL shader.;
+#X obj 531 10 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 189 21 <---- 1 Create Gem window;
+#X text 567 9 <---- 2 Load vertex and fragment;
+#X obj 163 45 gems.win 480 480;
+#X obj 111 561 pix_texture;
+#X obj 141 516 loadbang;
+#X msg 143 536 mode 0;
+#X msg 658 445 mvt2 \$1;
+#X msg 794 457 mvt3 \$1;
+#X msg 524 432 mvt1 \$1;
+#X msg 474 434 K1 \$1;
+#X msg 608 440 K2 \$1;
+#X msg 738 452 K3 \$1;
+#X obj 524 395 / 1000;
+#X obj 523 368 random 6280;
+#X obj 481 317 b;
+#X obj 480 388 line3;
+#X obj 481 339 delay 5;
+#X obj 656 401 / 1000;
+#X obj 655 374 random 6280;
+#X obj 613 323 b;
+#X obj 612 394 line3;
+#X obj 613 345 delay 5;
+#X obj 792 408 / 1000;
+#X obj 791 381 random 6280;
+#X obj 749 330 b;
+#X obj 748 401 line3;
+#X obj 749 352 delay 5;
+#X msg 734 309 3 50;
+#X msg 598 301 2 50;
+#X msg 467 295 5 50;
+#X msg 483 360 0 300;
+#X msg 615 366 0 300;
+#X msg 751 373 0 300;
+#X obj 468 271 metro 500;
+#X obj 472 247 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 602 253 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 598 277 metro 430;
+#X obj 743 256 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 739 280 metro 470;
+#X text 781 253 <- 3;
+#X obj 111 591 rectangle 6 6;
+#X text 42 179 A GLSL shader is composed of a vertex shader \, and
+then of a fragment shader. You need to have those two separate files
+in the same directory (folder) and with the same file name but with
+a different extensions. The two extensions must be ".vert" and ".frag".
+In this case \, the example shader files are "deforme_texture.vert"
+and "deforme_texture.frag". You should look to the OpenGL manual and
+to the GL Shader Language manual to understand how it works. You can
+find many examples of shaders on web sites about game programming and
+3D effects.;
+#X msg 556 174 bang;
+#X text 596 175 <--- 3 Play with the parameters;
+#X text 224 111 You can get the parameters of the shaders by sending
+"print" to the second inlet. Then \, send messages with those selectors
+to the third inlet. The type is usually either a float \, or a vector
+(two or three floats).;
+#X text 441 589 Thanks to Cyrille Henry for the nice patch.;
+#X obj 111 465 gems.glsl.shader medias/shaders/deforme_texture;
+#X obj 111 494 pix_image medias/images/deforme_texture7.jpg;
+#X msg 532 42 open medias/shaders/deforme_texture;
+#X connect 0 0 51 0;
+#X connect 1 0 51 1;
+#X connect 2 0 7 0;
+#X connect 4 0 53 0;
+#X connect 8 0 45 0;
+#X connect 9 0 10 0;
+#X connect 10 0 8 0;
+#X connect 11 0 51 2;
+#X connect 12 0 51 2;
+#X connect 13 0 51 2;
+#X connect 14 0 51 2;
+#X connect 15 0 51 2;
+#X connect 16 0 51 2;
+#X connect 17 0 13 0;
+#X connect 18 0 17 0;
+#X connect 19 0 21 0;
+#X connect 19 0 18 0;
+#X connect 20 0 14 0;
+#X connect 21 0 35 0;
+#X connect 22 0 11 0;
+#X connect 23 0 22 0;
+#X connect 24 0 26 0;
+#X connect 24 0 23 0;
+#X connect 25 0 15 0;
+#X connect 26 0 36 0;
+#X connect 27 0 12 0;
+#X connect 28 0 27 0;
+#X connect 29 0 31 0;
+#X connect 29 0 28 0;
+#X connect 30 0 16 0;
+#X connect 31 0 37 0;
+#X connect 32 0 29 0;
+#X connect 32 0 30 0;
+#X connect 33 0 24 0;
+#X connect 33 0 25 0;
+#X connect 34 0 19 0;
+#X connect 34 0 20 0;
+#X connect 35 0 20 0;
+#X connect 36 0 25 0;
+#X connect 37 0 30 0;
+#X connect 38 0 34 0;
+#X connect 39 0 38 0;
+#X connect 40 0 41 0;
+#X connect 41 0 33 0;
+#X connect 42 0 43 0;
+#X connect 43 0 32 0;
+#X connect 47 0 39 0;
+#X connect 47 0 40 0;
+#X connect 47 0 42 0;
+#X connect 51 0 52 0;
+#X connect 52 0 8 0;
+#X connect 53 0 51 1;

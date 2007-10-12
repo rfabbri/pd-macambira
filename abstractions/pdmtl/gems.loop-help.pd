@@ -1,0 +1,52 @@
+#N canvas 678 347 825 677 10;
+#X obj 169 443 gemhead;
+#X obj 238 235 gemhead;
+#X obj 262 441 rectangle 2.6 2;
+#X obj 217 660 rectangle 2.6 2;
+#X obj 216 607 translateXYZ -2.66 0 0;
+#X obj 261 400 translateXYZ 2.66 0 0;
+#X obj 264 373 pix_texture;
+#X obj 361 230 file.path.top;
+#X obj 403 263 bng 15 250 50 0 empty empty load_your_own_movie 0 -6
+0 8 -262144 -1 -1;
+#X obj 277 474 tgl 15 0 empty empty REC 0 -6 0 8 -258699 -262144 -1
+0 1;
+#X obj 217 632 pix_texture;
+#X floatatom 241 583 5 0 0 1 current_frame - -;
+#X floatatom 309 567 5 0 0 1 frames_recorded - -;
+#X obj 368 549 tgl 15 0 empty empty rec_status 0 -6 0 8 -262144 -1
+-1 0 1;
+#X obj 215 525 gems.loop 32;
+#X obj 552 70 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 552 98 gems.win 320 240;
+#X floatatom 302 494 5 0 0 2 speed - -;
+#X floatatom 358 503 5 0 0 2 frame - -;
+#X text 29 12 Description: Loops an image sequence (frames) with variable
+speed playback and seek function.;
+#X text 27 61 Argument_1:Deternines the maximum number of recorded
+franes.;
+#X text 28 42 Version: 2;
+#X obj 264 304 gems.movies;
+#X msg 336 144 medias/movies/mov0.mov;
+#X msg 374 170 medias/movies/mov1.mov;
+#X connect 0 0 14 0;
+#X connect 1 0 22 0;
+#X connect 2 0 14 1;
+#X connect 4 0 10 0;
+#X connect 5 0 2 0;
+#X connect 6 0 5 0;
+#X connect 7 0 22 1;
+#X connect 8 0 22 1;
+#X connect 9 0 14 2;
+#X connect 10 0 3 0;
+#X connect 14 0 4 0;
+#X connect 14 1 11 0;
+#X connect 14 2 12 0;
+#X connect 14 3 13 0;
+#X connect 15 0 16 0;
+#X connect 17 0 14 3;
+#X connect 18 0 14 4;
+#X connect 22 0 6 0;
+#X connect 23 0 7 0;
+#X connect 24 0 7 0;
