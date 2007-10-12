@@ -1,3 +1,0 @@
-#N canvas 362 301 523 166 10;
-#X text 37 19 Description: Audio effects. Used to modify a signal.
-Control input is based on the Midi float values.;

@@ -1,4 +1,0 @@
-#N canvas 0 0 502 192 10;
-#X text 35 75 Description: Abstractions to facilitate working with
-musical chords and notes. It is mostly a question of arithmetics and
-uses a lot the %12 and musical intervals.;

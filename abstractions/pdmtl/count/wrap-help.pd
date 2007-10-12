@@ -1,6 +1,0 @@
-#N canvas 642 512 450 300 10;
-#X text 43 31 Description: Another name for count/modulo.;
-#X text 41 54 See the count/modulo's help for more information.;
-#X obj 220 106 count/modulo;
-#X obj 82 106 count/wrap;
-#X text 185 103 ==;

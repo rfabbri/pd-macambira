@@ -1,3 +1,0 @@
-#N canvas 0 0 450 300 10;
-#X text 29 53 Description: Soft synthetizers that can handle MIDI-style
-(pitch + velocity) notes as messages.;
