@@ -70,7 +70,7 @@
 #X restore 41 300 pd file_type;
 #X obj 757 486 symbol;
 #X obj 854 583 s \$0top;
-#X obj 476 355 file.path.split;
+#X obj 473 331 file.path.split;
 #X obj 420 809 s \$0top;
 #X obj 146 160 t a a a b;
 #X obj 512 627 scale.symbol -15;
@@ -82,26 +82,26 @@
 #X msg 617 698 1;
 #X obj 283 535 vsl 15 115 0 175 0 0 \$0slider_s \$0slider_r empty 0
 -8 0 8 -1 -262144 -1 11400 0;
-#X obj 101 533 hradio 15 1 0 12 \$0hr_0_s \$0hr_0_r examples 2 8 0
-8 -1 -1 -208050 2;
-#X obj 101 548 hradio 15 1 0 12 \$0hr_1_s \$0hr_1_r include 2 8 0 8
--1 -1 -208050 1;
-#X obj 101 563 hradio 15 1 0 12 \$0hr_2_s \$0hr_2_r manuals 2 8 0 8
--1 -1 -208050 0;
-#X obj 101 578 hradio 15 1 0 12 \$0hr_3_s \$0hr_3_r medias 2 8 0 8
--1 -1 -208050 0;
-#X obj 101 593 hradio 15 1 0 12 \$0hr_4_s \$0hr_4_r empty 2 8 0 8 -1
--1 -262144 0;
-#X obj 101 608 hradio 15 1 0 12 \$0hr_5_s \$0hr_5_r empty 2 8 0 8 -1
--1 -262144 0;
-#X obj 101 623 hradio 15 1 0 12 \$0hr_6_s \$0hr_6_r empty 2 8 0 8 -1
--1 -262144 0;
-#X obj 101 638 hradio 15 1 0 12 \$0hr_7_s \$0hr_7_r empty 2 8 0 8 -1
--1 -262144 0;
+#X obj 101 533 hradio 15 1 0 12 \$0hr_0_s \$0hr_0_r empty 2 8 0 10
+-1 -1 -262144 0;
+#X obj 101 548 hradio 15 1 0 12 \$0hr_1_s \$0hr_1_r empty 2 8 0 10
+-1 -1 -262144 0;
+#X obj 101 563 hradio 15 1 0 12 \$0hr_2_s \$0hr_2_r empty 2 8 0 10
+-1 -1 -262144 0;
+#X obj 101 578 hradio 15 1 0 12 \$0hr_3_s \$0hr_3_r empty 2 8 0 10
+-1 -1 -262144 0;
+#X obj 101 593 hradio 15 1 0 12 \$0hr_4_s \$0hr_4_r empty 2 8 0 10
+-1 -1 -262144 0;
+#X obj 101 608 hradio 15 1 0 12 \$0hr_5_s \$0hr_5_r empty 2 8 0 10
+-1 -1 -262144 0;
+#X obj 101 623 hradio 15 1 0 12 \$0hr_6_s \$0hr_6_r empty 2 8 0 10
+-1 -1 -262144 0;
+#X obj 101 638 hradio 15 1 0 12 \$0hr_7_s \$0hr_7_r empty 2 8 0 10
+-1 -1 -262144 0;
 #X obj 101 517 hradio 15 1 0 11 \$0label_radio_s \$0label_radio_r empty
 2 8 0 8 -1 -1 -262144 0;
-#X obj 101 517 cnv 15 180 15 empty \$0hider .../me/tom/pd/pdmtl 3 9
-0 8 -128992 -262144 0;
+#X obj 101 517 cnv 15 180 15 empty \$0hider empty 3 9 0 8 -128992 -262144
+0;
 #X obj 283 517 hradio 15 1 0 1 empty empty empty 6 8 0 8 -1 -262144
 -262140 0;
 #N canvas 489 110 539 662 coloring 0;
