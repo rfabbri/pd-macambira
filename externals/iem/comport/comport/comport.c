@@ -1014,7 +1014,7 @@ static int write_serial(t_comport *x, unsigned char  serial_byte)
 static int write_serials(t_comport *x, unsigned char *serial_buf, size_t buf_length)
 {
     int result = write(x->comhandle,(char *)serial_buf, buf_length);
-    if (result != buf_length)
+    if (result != (int)buf_length)
         post ("[comport] write returned %d, errno is %d", result, errno);
     return result;
 }
