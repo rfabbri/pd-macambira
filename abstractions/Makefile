@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical rtc-lib puremeasurement timestretch sssad pd-wavelet
+LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pdmtl pixeltango purepd rradical rtc-lib puremeasurement timestretch sssad pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -275,6 +275,29 @@ pddp_install:
 		$(helpdir)/$(PDDP_NAME)
 #	install -d $(manualsdir)/$(PDDP_NAME)
 #	install -d $(examplesdir)/$(PDDP_NAME)
+
+#-------------------------------------------------------------------------------
+# PDMTL
+PDMTL_NAME = pdmtl
+pdmtl_install:
+	install -d $(objectsdir)/$(PDMTL_NAME)
+	install -p $(abstractions_src)/pdmtl/*.pd $(objectsdir)/$(PDMTL_NAME)
+	install -d $(objectsdir)/$(PDMTL_NAME)/include
+	install -p $(abstractions_src)/pdmtl/include/*.pd $(objectsdir)/$(PDMTL_NAME)/include
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDMTL_NAME) \
+		--author "TOF, WIP, AALEX" \
+		--description "A lot of abstractions" \
+		--license "Kopymi" \
+		--version "" 
+	install -d $(helpdir)/$(PDMTL_NAME)
+	install -p $(abstractions_src)/pdmtl/0.info.pd \
+		 $(helpdir)/$(PDMTL_NAME)
+	install -p $(abstractions_src)/pdmtl/1.browser.pd \
+		 $(helpdir)/$(PDMTL_NAME)
+	install -p $(abstractions_src)/pdmtl/2.popup.pd \
+		 $(helpdir)/$(PDMTL_NAME)
+	install -p $(abstractions_src)/pdmtl/3.readme.txt \
+		 $(helpdir)/$(PDMTL_NAME)
 
 
 #-------------------------------------------------------------------------------
