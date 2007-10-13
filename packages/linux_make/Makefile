@@ -107,6 +107,9 @@ deb: $(bindir)
 		$(packages_src)/linux_make/debian/control
 	sed -i 's|^Architecture:.*|Architecture: $(DEB_BUILD_ARCH)|' \
 		$(packages_src)/linux_make/debian/control
+ifeq ($(DEB_BUILD_ARCH),powerpc)
+	sed -i 's|, libavifile-0.7c2||' $(packages_src)/linux_make/debian/control
+endif
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
