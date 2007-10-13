@@ -19,7 +19,7 @@ struct _canvasenvironment
 };
 
 
-static char *version = "$Revision: 1.6 $";
+static char *version = "$Revision: 1.7 $";
 
 /* This loader opens a directory with a -meta.pd file as a library.  In the
  * long run, the idea is that one folder will have all of objects files, all
@@ -94,7 +94,7 @@ static int libdir_loader(t_canvas *canvas, char *classname)
 		close(fd);
 		sys_searchpath = namelist_append(sys_searchpath, dirbuf, 0);
 		post("libdir_loader: added %s to the global classpath", classname);
-		post("\tThis is deprecated behavior.");
+//		post("\tThis is deprecated behavior.");
 	}
 	/* post("libdir_loader loaded fullclassname: '%s'\n", fullclassname); */
     if (sys_verbose) 
