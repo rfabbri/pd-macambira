@@ -24,7 +24,7 @@ OPT_CFLAGS += -mcpu=i686 -march=i386
 #OPT_CFLAGS += -march=pentium4 -msse -msse2 -mfpmath=sse
 endif
 ifeq ($(TARGET_PLATFORM),ppc)
-    OPT_CFLAGS += -pipe -fsigned-char -mpowerpc-gfxopt
+    OPT_CFLAGS += -pipe -fsigned-char -mpowerpc
 endif
 
 GCC_VERSION := $(shell gcc -dumpversion)
