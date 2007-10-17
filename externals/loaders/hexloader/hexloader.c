@@ -54,7 +54,7 @@ typedef struct _hexloader
 } t_hexloader;
 static t_class *hexloader_class;
 
-static char *version = "$Revision: 1.2 $";
+static char *version = "$Revision: 1.3 $";
 
 
 static char*hex_dllextent[] = {
@@ -128,12 +128,172 @@ static  char *patch_extent[]={
  * including abstractions
  */
 
+/* -------------------- utilities --------------------- */
+
+
+/* --- namelist_t: a linked list of names --- */
+
+/* linked list of loaders */
+typedef struct namelist_ {
+    char* name;
+    struct namelist_ *next;
+} namelist_t;
+
+static void namelist_print(char*prefix, namelist_t*names) {
+    for(; names; names=names->next) {
+      if(prefix)startpost("%s:: ", prefix);
+      post("%s",names->name);
+    }
+}
+
+static namelist_t*namelist_add(namelist_t*names, char*name) {
+  namelist_t*dummy=names;
+  namelist_t*last=0;
+
+  //  namelist_print("adder contained:", names);
+
+  if(name==0)return names;
+
+  if(!dummy) {
+    dummy=(namelist_t*)getbytes(sizeof(namelist_t));
+    dummy->next=0;
+    dummy->name=name;
+    return dummy;
+  }
+
+  for(; dummy; dummy=dummy->next) {
+    //    post("checking '%s' vs '%s'", name, dummy->name);
+    if (!strncmp(name, dummy->name, MAXPDSTRING)) {
+      // we already have this entry!
+      //      post("found name %s=%s", name, dummy->name);
+      return names;
+    }
+    last=dummy;
+  }
+  dummy=last;
+
+  dummy->next=(namelist_t*)getbytes(sizeof(namelist_t));
+  dummy=dummy->next;
+  dummy->next=0;
+  dummy->name=name;
+
+  //  namelist_print("adder contains::", names);
+
+  return names;
+}
+
+static namelist_t*namelist_addlist(namelist_t*names, namelist_t*nl) {
+  namelist_t*dummy=0;
+  if(nl==0)return names;
+  if(!names)return nl;
+
+  /* try to add each entry in nl */
+  for(dummy=nl; dummy->next; dummy=dummy->next) {
+    names=namelist_add(names, dummy->name);
+  }
+
+  return names;
+}
+
+static void namelist_clear(namelist_t*names) {
+  namelist_t*dummy=0;
+
+  while(names) {
+    dummy=names->next;
+    names->next=0;
+    names->name=0; /* we dont care since the names are allocated in the symboltable anyhow */
+    freebytes(names, sizeof(namelist_t));
+    names=dummy;
+  }
+}
+
+/* --- filelist_t: a linked list of filenames, each associated with a list of setupfunction names --- */
+
+typedef struct filelist_ {
+  char *name;
+  namelist_t*setupfun;
+  struct filelist_ *next;
+} filelist_t;
+
+static void filelist_print(char*prefix, filelist_t*files) {
+  for(; files; files=files->next) {
+    if(prefix)startpost("%s: ", prefix);
+    post("%s",files->name);
+    namelist_print("\t", files->setupfun);
+  }
+}
+
+static filelist_t*filelist_add(filelist_t*files, char*name, namelist_t*setupfun) {
+  filelist_t *last=0, *dummy=files;
+  if(name==0)return files;
+
+  if(!dummy) {
+    dummy=(filelist_t*)getbytes(sizeof(filelist_t));
+    dummy->next=0;
+    dummy->name=name;
+    dummy->setupfun=namelist_addlist(0, setupfun);
+    return dummy;
+  }
+
+  for(; dummy; dummy=dummy->next) {
+    if (!strncmp(name, dummy->name, MAXPDSTRING)) {
+      // we already have this entry!
+      /* add additional setup-functions to this name */
+      dummy->setupfun=namelist_addlist(dummy->setupfun, setupfun);
+      return files;
+    }
+    last=dummy;
+  }
+  dummy=last;
+
+  /* this is a new entry, add it to the list */
+
+  dummy->next=(filelist_t*)getbytes(sizeof(filelist_t));
+  dummy=dummy->next;
+  dummy->next=0;
+  dummy->name=name;
+  dummy->setupfun=namelist_addlist(0, setupfun);
+
+  return files;
+}
+
+static filelist_t*filelist_addlist(filelist_t*files, filelist_t*nl) {
+  filelist_t*dummy=0;
+  if(nl==0)return files;
+  if(!files)return nl;
+
+  /* try to add each entry in nl */
+  for(dummy=nl; dummy->next; dummy=dummy->next) {
+    files=filelist_add(files, dummy->name, dummy->setupfun);
+  }
+
+  return files;
+}
+
+static void filelist_clear(filelist_t*files) {
+  filelist_t*dummy=0;
+
+  while(files) {
+    dummy=files->next;
+    namelist_clear(files->setupfun);
+    files->setupfun=0;
+    files->name=0; /* we dont care since the files are allocated in the symboltable anyhow */
+    files->next=0;
+    freebytes(files, sizeof(filelist_t));
+    files=dummy;
+  }
+}
+
+
+
+/* ---------------- normalize names ------------------- */
+
 
 /**
  * replace everything but [a-zA-Z0-9_] by "0x%x" 
  * @return the normalized version of org
  */
-static char*hexloader_normalize(char*org)
+static char*hexloader_normalize(char*org, int skipslash)
 {
   char*orgname=org;
   char altname[MAXPDSTRING];
@@ -149,10 +309,12 @@ static char*hexloader_normalize(char*org)
   while(*orgname && i<MAXPDSTRING)
     {
       char c=*orgname;
-      if((c>=48 && c<=57)|| /* [0-9] */
-         (c>=65 && c<=90)|| /* [A-Z] */
-         (c>=97 && c<=122)||/* [a-z] */
-         (c==95)) /* [_] */
+      if((c>='0' && c<='9')|| /* [0-9] */
+         (c>='A' && c<='Z')|| /* [A-Z] */
+         (c>='a' && c<='z')||/* [a-z] */
+         (c=='_') ||        /* [_] */
+         (skipslash && c=='/')
+         )
         {
           altname[i]=c;
           i++;
@@ -167,6 +329,7 @@ static char*hexloader_normalize(char*org)
     }
 
   s=gensym(altname);
+  //  post("normalize=%s", s->s_name);
   return s->s_name;
 }
 
@@ -181,7 +344,8 @@ static char*hexloader_fsnormalize(char*org)
   t_symbol*s=0;
 
   char forbiddenchars[]={ 
-    '/', '\\', ':', '*', '?', '"', '<', '>', '|',
+    //    '/', '\\', ':', '*', '?', '"', '<', '>', '|',
+    '\\', ':', '*', '?', '"', '<', '>', '|',
     0};
 
   int count=0;
@@ -216,80 +380,112 @@ static char*hexloader_fsnormalize(char*org)
     }
 
   s=gensym(altname);
+  //  post("fsnormalize=%s", s->s_name);
   return s->s_name;
 }
 
 
+static filelist_t*hexloader_deslashify(filelist_t*names, char*prefix, char*postfix) {
+  filelist_t*result=names;
+  int i=0;
+  char*cp=0;
+  char buf[MAXPDSTRING];
+  t_symbol*s;
+
+  snprintf(buf, MAXPDSTRING, "%s%s", prefix, postfix);
+  s=gensym(buf);
+
+  result=filelist_add(result, s->s_name, 0);
+
+  for(cp=postfix; *cp; cp++) {
+    if(*cp=='/') {
+      char *postfix2=postfix+i+1;
+      char buf2[MAXPDSTRING];
+
+      snprintf(buf2, MAXPDSTRING, "%s", prefix);
+      strncat(buf2, postfix, i);
+      strcat(buf2, "/");
+      result=hexloader_deslashify(result, buf2, postfix2);
+
+      snprintf(buf2, MAXPDSTRING, "%s", prefix);
+      strncat(buf2, postfix, i);
+      strcat(buf2, "0x2f");
+      result=hexloader_deslashify(result, buf2, postfix2);
+
+    }
+    i++;
+  }
+
+  return result;
+}
+
+
+static namelist_t*hexloader_fsnormalize_list(namelist_t*names, char*org) {
+  char*simple=hexloader_fsnormalize(org);
+  names=namelist_add(names, org);
+  names=namelist_add(names, simple);
+
+  return names;
+}
+
+
+
+/* ---------------- core code ------------------- */
+
+static namelist_t*hexloader_getaltsetups(namelist_t*names, char*name) {
+  char sbuf[MAXPDSTRING];
+  t_symbol*s;
+  snprintf(sbuf, MAXPDSTRING, "%s_setup", name);
+  s=gensym(sbuf);
+  names=namelist_add(names, s->s_name);
+  snprintf(sbuf, MAXPDSTRING, "setup_%s", name);
+  s=gensym(sbuf);
+  names=namelist_add(names, s->s_name);
+  return names;
+}
+static namelist_t*hexloader_getaltsetup(namelist_t*names, char*name) {
+  namelist_t*result=names;
+  char*strippedname=name;
+  char*cp=name;
+
+  while(*cp++) {
+    if(*cp=='/'){
+      strippedname=cp+1;
+    }
+  }
+ 
+  result=hexloader_getaltsetups(result, strippedname);
+  result=hexloader_getaltsetups(result, hexloader_normalize(strippedname, 0));
+  //  post("added to %s\n", name);
+  return result;
+}
+
+static filelist_t*hexloader_fillaltsetupfuns(filelist_t*files) {
+  filelist_t*f;
+  for(f=files; f; f=f->next) {
+    f->setupfun=namelist_addlist(f->setupfun, hexloader_getaltsetup(f->setupfun, f->name));
+  }
+  return files;
+}
+
 /**
- * replace everything but [a-zA-Z0-9_] by "0x%x" 
- * @return a 0-terminated array of all versions we consider to be names
+ * @return a 0-terminated array of all filenames we consider to be alternative names and associated setup-functions
  */
 
-/* linked list of loaders */
-typedef struct namelist_ {
-    char* name;
-    struct namelist_ *next;
-} namelist_t;
+static filelist_t*hexloader_getalternatives(char*org) {
+  filelist_t*files=0;
 
-static namelist_t*namelist_add(namelist_t*names, char*name) {
-  namelist_t*dummy=names;
-  if(name==0)return names;
+  files=filelist_add(files, org, 0);
+  files=filelist_add(files, hexloader_fsnormalize(org), 0);
+  files=filelist_add(files, hexloader_normalize(org, 1),0);
+  files=filelist_add(files, hexloader_normalize(org, 0),0);
+  files=hexloader_deslashify(files, "", org);
 
-  if(!dummy) {
-    dummy=(namelist_t*)getbytes(sizeof(namelist_t));
-    dummy->next=0;
-    dummy->name=name;
-    return dummy;
-  }
+  hexloader_fillaltsetupfuns(files);
+  //  filelist_print("ALTER: ", files);
 
-  while(dummy->next) {
-    if (!strncmp(name, dummy->name, MAXPDSTRING)) {
-      // we already have this entry!
-      return names;
-    }
-
-    dummy=(dummy->next);
-  }
-
-  dummy->next=(namelist_t*)getbytes(sizeof(namelist_t));
-  dummy=dummy->next;
-  dummy->next=0;
-  dummy->name=name;
-
-  return names;
+  return files;
 }
-
-static void namelist_clear(namelist_t*names) {
-  namelist_t*dummy=0;
-
-  while(names) {
-    dummy=names->next;
-    names->next=0;
-    names->name=0; /* we dont care since the names are allocated in the symboltable anyhow */
-    freebytes(names, sizeof(namelist_t));
-    names=dummy;
-  }
-}
-
-static namelist_t*hexloader_getalternatives(char*org) {
-  namelist_t*names=0;
-  names=namelist_add(names, org);
-  names=namelist_add(names, hexloader_normalize(org));
-  names=namelist_add(names, hexloader_fsnormalize(org));
-
-#if 0
-  {
-    namelist_t*dummy=names;
-    while(dummy) {
-      post("alternatives=%s",dummy->name);
-      dummy=dummy->next;
-    }
-  }
-#endif
-
-  return names;
-}
-
 
 static int hexloader_doload(char*filename, char*setupfun) {
 #ifdef __WIN32__
@@ -346,12 +542,7 @@ static int hexloader_loadfile(char*pathname, char*filename, namelist_t*altnames)
   sprintf(fullfile, "%s/%s", pathname, filename);
 
   while(altname) {
-    sprintf(setupfun, "%s_setup", altname->name);
-    if(hexloader_doload(fullfile, setupfun))
-      return 1;
-
-    sprintf(setupfun, "setup_%s", altname->name);
-    if(hexloader_doload(fullfile, setupfun))
+    if(hexloader_doload(fullfile, altname->name))
       return 1;
 
     altname=altname->next;
@@ -360,6 +551,8 @@ static int hexloader_loadfile(char*pathname, char*filename, namelist_t*altnames)
   return 0;
 }
 
+
+static void*hexloader_new(t_symbol *s, int argc, t_atom *argv);
 /**
  * try to open a file (given via pathname+filename) as a patcher
  * TODO: make this work....
@@ -368,26 +561,14 @@ static int hexloader_loadfile(char*pathname, char*filename, namelist_t*altnames)
  * @param altclassname the alternative classname we currently use...
  * @return 1 on success, 0 otherwise
  */
-t_pd pd_objectmaker;    /* factory for creating "object" boxes */
-static int hexloader_loadpatch(char*pathname, char*filename, char*altclassname)
+
+/* this only gets called if we have already found an abstraction-file */
+static int hexloader_loadpatch(char*pathname, char*filename, char*altclassname, char*realclassname)
 {
   char fullfile[MAXPDSTRING];
   sprintf(fullfile, "%s/%s", pathname, filename);
 
-#if 0
-  {
-    t_symbol*s=gensym(altclassname);
-    if(!pd_objectmaker) {
-      post("BUG: no pd_objectmaker found");
-      return 0;
-    }
-    post("hexloader: typedmess %s", s->s_name);
-    new_anything((void*)pd_objectmaker, s, 0, 0);
-    return 1;
-  }
-#endif
-
-  post("BUG: hexloader not loading patch: %s", fullfile);
+  post("BUG: hexloader not loading patch: %s (not yet implemented)", fullfile);
   return 0;
 }
 /**
@@ -415,23 +596,23 @@ static int hexloader_loadpatch(char*pathname, char*filename, char*altclassname)
  * @param classname the name of the object (external, library) to be created
  * @return 1 on success, 0 on failure
  */
-static int hexloader_doloader(t_canvas *canvas, namelist_t*altnames0)
+static int hexloader_doloader(t_canvas *canvas, filelist_t*altnames0, char*classname)
 {
   int fd = -1;
   char dirbuf[MAXPDSTRING];
   char*nameptr;
-  namelist_t*altnames=altnames0;
+  filelist_t*altnames=altnames0;
   
   /* try binaries */
   while(altnames) {
     char*altname=altnames->name;
     int dll_index=0;
     char*dllextent=hex_dllextent[dll_index];
-
     while(dllextent!=0) {
       if ((fd = open_via_path(".", altname, dllextent, dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0) {
         close (fd);
-        if(hexloader_loadfile(dirbuf, nameptr, altnames0)) {
+
+        if(hexloader_loadfile(dirbuf, nameptr, altnames->setupfun)) {
           return 1;
         }
       }
@@ -451,7 +632,7 @@ static int hexloader_doloader(t_canvas *canvas, namelist_t*altnames0)
     while(extent!=0) {
       if ((fd = open_via_path(".", altname, extent, dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0) {
         close (fd);
-        if(hexloader_loadpatch(dirbuf, nameptr, altname)) {
+        if(hexloader_loadpatch(dirbuf, nameptr, altname, classname)) {
           return 1;
         }
       }
@@ -473,7 +654,7 @@ static int hexloader_doloader(t_canvas *canvas, namelist_t*altnames0)
  */
 static int hexloader_loader(t_canvas *canvas, char *classname)
 {
-  namelist_t*altnames=0;
+  filelist_t*altnames=0;
   int result=0;
 
   static int already_loading=0;
@@ -484,21 +665,23 @@ static int hexloader_loader(t_canvas *canvas, char *classname)
   altnames=hexloader_getalternatives(classname);
 
   /* do the loading */
-  result=hexloader_doloader(canvas, altnames);
+  result=hexloader_doloader(canvas, altnames, classname);
 
   /* clean up */
-  namelist_clear(altnames); 
+  filelist_clear(altnames); 
 
   already_loading=0;
   return result;
 }
 
-
-
-static void*hexloader_new(void)
+static void*hexloader_new(t_symbol *s, int argc, t_atom *argv)
 {
-  t_hexloader*x = (t_hexloader*)pd_new(hexloader_class);
-  return x;
+  if(s==gensym("hexloader")) {
+    t_hexloader*x = (t_hexloader*)pd_new(hexloader_class);
+    return (x);
+  }
+
+  return 0;
 }
 
 void hexloader_setup(void)
@@ -516,5 +699,5 @@ void hexloader_setup(void)
   error("\tor a version that has sys_register_loader()");
 #endif
 
-  hexloader_class = class_new(gensym("hexloader"), (t_newmethod)hexloader_new, 0, sizeof(t_hexloader), CLASS_NOINLET, 0);
+  hexloader_class = class_new(gensym("hexloader"), (t_newmethod)hexloader_new, 0, sizeof(t_hexloader), CLASS_NOINLET, A_GIMME, 0);
 }
