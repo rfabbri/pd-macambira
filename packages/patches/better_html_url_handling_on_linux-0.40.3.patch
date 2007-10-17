@@ -18,7 +18,7 @@ diff -u -w -r1.25 u_main.tk
 +                  set browser [lindex [auto_execok $candidate] 0]
 +                  if {[string length $browser]} {
 +                         puts stderr [format "%s %s" $browser $filename]
-+                         exec sh -c [format "%s %s" $browser $filename]
++                         exec -- sh -c [format "%s %s" $browser $filename] &
 +                         break
 +                     }
 +                 }
