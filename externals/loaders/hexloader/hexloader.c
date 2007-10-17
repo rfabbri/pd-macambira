@@ -17,6 +17,9 @@
 #endif
 
 #include "m_pd.h"
+
+#if (PD_MINOR_VERSION >= 40)
+
 #include "s_stuff.h"
 #include "g_canvas.h"
 #include <stdio.h>
@@ -39,6 +42,22 @@
 #endif
 
 
+#define HEXLOADER_PATCHES
+
+#ifdef HEXLOADER_PATCHES
+void canvas_popabstraction(t_canvas *x);
+static void*hexloader_fakenew(t_symbol *s, int argc, t_atom *argv);
+t_pd pd_objectmaker;    /* factory for creating "object" boxes */
+#endif
+
+typedef struct _filepath
+{
+  t_symbol*filename;
+  t_symbol*pathname;
+} t_filepath;
+
+
+
 typedef void (*t_hexloader_setup)(void);
 
 /* definitions taken from s_loader.c  */
@@ -54,7 +73,7 @@ typedef struct _hexloader
 } t_hexloader;
 static t_class *hexloader_class;
 
-static char *version = "$Revision: 1.3 $";
+static char *version = "$Revision: 1.4 $";
 
 
 static char*hex_dllextent[] = {
@@ -127,6 +146,7 @@ static  char *patch_extent[]={
  * this would allow us to use the hexloader stuff for all kinds of other loaders
  * including abstractions
  */
+
 
 /* -------------------- utilities --------------------- */
 
@@ -552,7 +572,7 @@ static int hexloader_loadfile(char*pathname, char*filename, namelist_t*altnames)
 }
 
 
-static void*hexloader_new(t_symbol *s, int argc, t_atom *argv);
+
 /**
  * try to open a file (given via pathname+filename) as a patcher
  * TODO: make this work....
@@ -562,13 +582,25 @@ static void*hexloader_new(t_symbol *s, int argc, t_atom *argv);
  * @return 1 on success, 0 otherwise
  */
 
+
 /* this only gets called if we have already found an abstraction-file */
-static int hexloader_loadpatch(char*pathname, char*filename, char*altclassname, char*realclassname)
+static t_filepath*hexloader_loadpatch(char*pathname, char*filename, char*altclassname, char*realclassname)
 {
   char fullfile[MAXPDSTRING];
   sprintf(fullfile, "%s/%s", pathname, filename);
 
+#ifdef HEXLOADER_PATCHES
+  class_addcreator((t_newmethod)hexloader_fakenew, gensym(realclassname), A_GIMME, 0);
+  {
+    t_filepath*result=getbytes(sizeof(t_filepath));
+    result->filename=gensym(filename);
+    result->pathname=gensym(pathname);
+    return result;
+  }
+  
+#else
   post("BUG: hexloader not loading patch: %s (not yet implemented)", fullfile);
+#endif /* HEXLOADER_PATCHES */
   return 0;
 }
 /**
@@ -596,8 +628,8 @@ static int hexloader_loadpatch(char*pathname, char*filename, char*altclassname, 
  * @param classname the name of the object (external, library) to be created
  * @return 1 on success, 0 on failure
  */
-static int hexloader_doloader(t_canvas *canvas, filelist_t*altnames0, char*classname)
-{
+
+static int hexloader_trylibraries(filelist_t*altnames0) {
   int fd = -1;
   char dirbuf[MAXPDSTRING];
   char*nameptr;
@@ -623,6 +655,14 @@ static int hexloader_doloader(t_canvas *canvas, filelist_t*altnames0, char*class
     altnames=altnames->next;
   }
 
+  return 0;
+}
+static t_filepath*hexloader_trypatches(filelist_t*altnames0, char*classname) {
+  int fd = -1;
+  char dirbuf[MAXPDSTRING];
+  char*nameptr;
+  filelist_t*altnames=altnames0;
+
   /* try patches */
   altnames=altnames0;
   while(altnames) {
@@ -631,17 +671,34 @@ static int hexloader_doloader(t_canvas *canvas, filelist_t*altnames0, char*class
     char*extent=patch_extent[extindex];
     while(extent!=0) {
       if ((fd = open_via_path(".", altname, extent, dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0) {
+        t_symbol*s;
         close (fd);
-        if(hexloader_loadpatch(dirbuf, nameptr, altname, classname)) {
-          return 1;
+        t_filepath*fp=hexloader_loadpatch(dirbuf, nameptr, altname, classname);
+        if(fp) {
+          return fp;
         }
       }
-
       extindex++;
       extent=patch_extent[extindex];
     }
     altnames=altnames->next;
   }
+
+  return 0;
+}
+
+static int hexloader_doloader(t_canvas *canvas, filelist_t*altnames0, char*classname)
+{
+  t_filepath*fp=0;
+  if(hexloader_trylibraries(altnames0))
+    return 1;
+
+  fp=hexloader_trypatches(altnames0, classname);
+  if(fp) {
+    freebytes(fp, sizeof(t_filepath));
+    return 1;
+  }
+
   return 0;
 }
 
@@ -674,14 +731,46 @@ static int hexloader_loader(t_canvas *canvas, char *classname)
   return result;
 }
 
-static void*hexloader_new(t_symbol *s, int argc, t_atom *argv)
-{
-  if(s==gensym("hexloader")) {
-    t_hexloader*x = (t_hexloader*)pd_new(hexloader_class);
-    return (x);
+#ifdef HEXLOADER_PATCHES
+static void*hexloader_fakenew(t_symbol*s, int argc, t_atom*argv) {
+  t_pd*current = s__X.s_thing;
+  t_filepath*fp=0;
+  filelist_t*altnames=0;
+
+  post("hexloader: disguising as '%s'", s->s_name);
+
+  if(!pd_objectmaker) {
+    post("BUG: no pd_objectmaker found");
+    return 0;
   }
 
-  return 0;
+  /* get alternatives */
+  altnames=hexloader_getalternatives(s->s_name);
+  /* do the loading */
+  fp=hexloader_trypatches(altnames, s->s_name);
+  /* clean up */
+  filelist_clear(altnames); 
+
+  if(fp) {
+    canvas_setargs(argc, argv);
+    binbuf_evalfile(fp->filename, fp->pathname);
+    freebytes(fp, sizeof(t_filepath));
+    if (s__X.s_thing != current)
+      canvas_popabstraction((t_canvas *)(s__X.s_thing));
+    canvas_setargs(0, 0);
+    return pd_newest();
+  } else 
+    return 0;
+}
+#endif /* HEXLOADER_PATCHES */
+
+#endif /* PD_MINOR_VERSION>=40 */
+
+
+static void*hexloader_new(t_symbol *s, int argc, t_atom *argv)
+{
+  t_hexloader*x = (t_hexloader*)pd_new(hexloader_class);
+  return (x);
 }
 
 void hexloader_setup(void)
