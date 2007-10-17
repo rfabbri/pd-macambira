@@ -35,7 +35,6 @@ my $stub = "";
 my $template = "";
 my $category = "";
 my $infobox = "";
-my $topLevel = "";  # 
 
 # pdpedia terms
 my $objectclass = "";
@@ -68,42 +67,42 @@ my $status = "";
 
 
 #------------------------------------------------------------------------------#
-# Portuguese
+# Turkish
 
 # wikipedia terms
-$stub = "Esboço";
-$template = "Template";
-$category = "Categoria";
-$infobox = "Infobox";
+$stub = "Taslak";
+$template = "Şablon";
+$category = "Kategori";
+$infobox = "Bilgi Kutusu";
 
 # pdpedia terms
-$objectclass = "Classe do objecto";
+$objectclass = "Nesne Sınıfı";
 
 # page headers
-$inlets = "Entradas";
-$outlets = "Saídas";
-$arguments = "Argumentos";
-$messages = "Mensagens";
+$inlets = "Girişler";
+$outlets = "Çıkışlar";
+$arguments = "Argümanlar";
+$messages = "Mesajlar";
 
 # infobox
-$name = "Nome";
-$description = "Descrição";
-$abbreviation = "Abreviatura";
-$library = "Biblioteca";
-$author = "Autor";
-$developer = "Programador";
-$releaseVersion = "Versão actual";
-$releaseDate = "Data de lançamento";
-$dependencies = "Dependências";
-$license = "Licença";
-$website = "Website";
-$programmingLanguage = "Linguagem de programação";
-$platform = "Plataforma";
-$operatingSystem = "Sistema operativo";
-$language = "Linguagem";
-$dataType = "Tipo de dado";
-$distributions = "Distribuições";
-$status = "Estado";
+$name = "İsim";
+$description = "Açıklama";
+$abbreviation = "Kısaltma";
+$library = "Kütüphane";
+$author = "Yazar";
+$developer = "Geliştirici";
+$releaseVersion = "Versiyon";
+$releaseDate = "Yayım Tarihi";
+$dependencies = "Bağımlılıklar";
+$license = "Lisans";
+$website = "Web Sitesi";
+$programmingLanguage = "Programlama Dili";
+$platform = "Platform";
+$operatingSystem = "İşletim Sistemi";
+$language = "Lisan";
+$dataType = "Veri Tipi";
+$distributions = "Dağıtımlar";
+$status = "Durum";
 
 #------------------------------------------------------------------------------#
 # PARSE CSV
@@ -223,6 +222,11 @@ foreach (`/sw/bin/find /Users/hans/Desktop/TODO/wiki_files_hacked/5.reference/ -
 #	 }
 	 print(OBJECTCLASS "\n\n");
 	 print(OBJECTCLASS "[[en:$pageName]]\n");
+	 print(OBJECTCLASS "[[es:$pageName]]\n");
+	 print(OBJECTCLASS "[[fr:$pageName]]\n");
+	 print(OBJECTCLASS "[[nl:$pageName]]\n");
+	 print(OBJECTCLASS "[[pt:$pageName]]\n");
+	 print(OBJECTCLASS "[[tr:$pageName]]\n");
 	 print(OBJECTCLASS "\n\n");
 	 close(OBJECTCLASS);
 
