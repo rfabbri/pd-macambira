@@ -87,7 +87,7 @@ typedef struct _string2any
 static void string2any_atoms(t_string2any *x, int argc, t_atom *argv)
 {
   char *s;
-  int x_argc, a_argc=argc;
+  int x_argc, a_argc=0;
   t_atom *x_argv;
 
   /*-- allocate --*/
@@ -98,8 +98,10 @@ static void string2any_atoms(t_string2any *x, int argc, t_atom *argv)
   }
 
   /*-- get text --*/
-  for (s=x->x_text; argc > 0; argc--, argv++, s++) {
+  for (s=x->x_text; argc > 0; argc--, a_argc++, argv++, s++) {
     *s = atom_getfloat(argv);
+    S2ADEBUG(post("string2any[%p]: a_argc=%d,*s=%d", x, a_argc, *s));
+    if ((x->x_eos<0 && !*s) || (*s==x->x_eos)) { break; } /*-- hack: look for eos char --*/
   }
   *s = 0;
   S2ADEBUG(post("string2any[%p]: text: \"%s\", strlen=%d, argc=%d", x, x->x_text, strlen(x->x_text), a_argc));
