@@ -221,11 +221,13 @@ foreach (`/sw/bin/find /Users/hans/Desktop/TODO/wiki_files_hacked/5.reference/ -
 #		print(OBJECTCLASS "[[$category:$categoryName]]\n");
 #	 }
 	 print(OBJECTCLASS "\n\n");
+	 print(OBJECTCLASS "[[de:$pageName]]\n");
 	 print(OBJECTCLASS "[[en:$pageName]]\n");
 	 print(OBJECTCLASS "[[es:$pageName]]\n");
 	 print(OBJECTCLASS "[[fr:$pageName]]\n");
 	 print(OBJECTCLASS "[[nl:$pageName]]\n");
 	 print(OBJECTCLASS "[[pt:$pageName]]\n");
+	 print(OBJECTCLASS "[[ru:$pageName]]\n");
 	 print(OBJECTCLASS "[[tr:$pageName]]\n");
 	 print(OBJECTCLASS "\n\n");
 	 close(OBJECTCLASS);
