@@ -131,10 +131,10 @@ ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid hidio pidip wiiremote gem2pdp iem16
+    LIB_TARGETS += hid hidio pdp pidip gem2pdp wiiremote iem16
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid hidio pdp pidip hdspm_mixer gem2pdp iem16
+    LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16
   endif
 endif
 
