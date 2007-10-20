@@ -1119,15 +1119,21 @@ static int CheckTypeTag(OSCbuf *buf, char expectedType)
 
 static int OSC_writeFloatArg(OSCbuf *buf, float arg)
 {
-    int4byte *intp;
+    union intfloat32
+    {
+        int     i;
+        float   f;
+    };
+    union intfloat32 if32;
 
     if(OSC_CheckOverflow(buf, 4))return 1;
 
     if (CheckTypeTag(buf, 'f')) return 9;
 
     /* Pretend arg is a long int so we can use htonl() */
-    intp = ((int4byte *) &arg);
-    *((int4byte *) buf->bufptr) = htonl(*intp);
+    if32.f = arg;
+
+    *((int4byte *) buf->bufptr) = htonl(if32.i);
 
     buf->bufptr += 4;
 
