@@ -36,6 +36,10 @@ PDP_AFLAGS  =
 
 PDP_CFLAGS += $(SDL_CFLAGS) $(PDP_EXTRA_CFLAGS) -DPDP_VERSION=\"$(PDP_VERSION)\"
 
+ifeq ($(shell uname -s),Darwin)
+  PDP_CFLAGS += -fnested-functions
+endif
+
 #PDP_CFLAGS  = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
 #    -Wall -W -Wstrict-prototypes \
 #    -Wno-unused -Wno-parentheses -Wno-switch -DPDP_VERSION=\"$(PDP_VERSION)\" \
