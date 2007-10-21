@@ -48,10 +48,8 @@ FLEXT_MICRO_VERSION := $(shell grep FLEXTMICRO \
 	$(externals_src)/grill/flext/buildsys/version.inc | cut -d '=' -f2)
 FLEXT_VERSION := $(FLEXT_MAJOR_VERSION).$(FLEXT_MINOR_VERSION).$(FLEXT_MICRO_VERSION)
 
-
 GEM_VERSION := $(shell grep "GEM_VERSION" $(gem_src)/src/Base/GemVersion.h | \
 	sed -n 's|.*GEM_VERSION = "\(.*\)".*|\1|p')
-
 
 MAXLIB_VERSION := $(shell grep "define VERSION" \
 	$(externals_src)/maxlib/maxlib.c | cut -d '"' -f 2)
@@ -478,7 +476,8 @@ $(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
 # always run aclocal/autoconf until "configure" is deleted from CVS
 	cd $(gem_src)/src && aclocal
 	cd $(gem_src)/src && autoconf
-	cd $(gem_src)/src && ./configure --without-ffmpeg --with-pd=$(pd_src) --disable-NV
+	cd $(gem_src)/src && ./configure --without-ffmpeg --with-pd=$(pd_src) \
+		--disable-NV
 	$(MAKE) -C $(gem_src)/src
 
 $(gem_src)/src/Gem.pd_darwin:
@@ -606,8 +605,8 @@ ifeq ($(OS_NAME),linux)
 	echo "<p></p>" >> $(README_FILE)
 endif
 ifeq ($(OS_NAME),darwin)
-	echo "<p>To install Pd, drag the $(PACKAGE_NAME).app into your <b>/Applications</b> folder or to the shortcut in the disk image.</p>" >> $(README_FILE)
-	echo "<p>By default, most of the included libraries are loaded at startup.  To change this, set your own preferences in the <b>Startup...</b> Preferences pane usings the <b>Save all settings</b> button.   If you want to start with a blank set of preferences, run this command in the Terminal.app:</p><p><code>touch ~/Library/Preferences/org.puredata.pd.plist</code></p><p>(<code>~</code> means your home folder).</p>" >> $(README_FILE)
+	echo "<p>To install Pd, drag the $(PACKAGE_NAME).app into your <b>/Applications</b> folder or to the shortcut in the disk image.  (<i>You might need to put the old one in the trash before copying this one to <b>/Applications</b></i>)</p>" >> $(README_FILE)	
+	echo "<p>By default, most of the included libraries are loaded at startup.  To change this, set your own preferences in the <b>Startup...</b> Preferences pane usings the <b>Save all settings</b> button.   If you want to start with a blank set of preferences, run this command in the Terminal.app: </p><p><code>touch ~/Library/Preferences/org.puredata.pd.plist</code> (<code>~</code> <i>means your home folder</i>)</p><p>The Preferences panels in Pd are currently buggy, so you might have better luck with the Apple utility, Property List Editor, which is freely available as part of XCode or the Server Tools.</p>" >> $(README_FILE)	
 endif
 ifeq ($(OS_NAME),windows)
 	echo "<p>To install, run the installer.</p>" >> $(README_FILE)
