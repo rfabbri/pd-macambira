@@ -182,6 +182,15 @@ rez_install:
 	cd $(bindir) && /Developer/Tools/Rez -t APPL mac.r -o pd
 
 
+# switch Linux-only pdp_v4l to Mac pdp_ieee1394
+pdp_help_hack:
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(helpdir)/pdp*-help.pd
+	rm -f --  $(helpdir)/pdp*-help.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(examplesdir)/pdp/*.pd
+	rm -f --  $(examplesdir)/pdp/*.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(examplesdir)/pidip/*.pd
+	rm -f --  $(examplesdir)/pidip/*.pd.bak
+
 darwin_app_embed_libs:
 # embed libquicktime plugins
 	install -d $(PD_APP_CONTENTS)/lib/libquicktime
@@ -224,23 +233,8 @@ darwin_app_devel_core: darwin_app_devel_wrapper
 #
 #==============================================================================#
 
-
 #------------------------------------------------------------------------------#
-darwin_app_externals: darwin_app_externals_standard darwin_app_externals_c++ darwin_app_externals_flext
-#darwin_app_externals: darwin_app_externals_standard darwin_app_externals_c++
-
-
-
-
-darwin_app_externals_c++:
-#----------------------------------------------------------------------------
-# CREB
-#	cd $(externals_src)/creb && autoconf && ./configure && cd modules++ && $(MAKE)
-#	install -p -m0644 $(externals_src)/creb/modules++/*.pd_darwin $(objectsdir)
-#----------------------------------------------------------------------------
-# gem2pdp
-#	cd $(externals_src)/gem2pdp && $(MAKE) -f Makefile.darwin
-#	install -p -m0444 $(externals_src)/gem2pdp/*.pd_darwin $(objectsdir)
+darwin_app_externals: darwin_app_externals_standard darwin_app_externals_flext
 
 #==============================================================================#
 #
@@ -251,7 +245,7 @@ darwin_app_externals_c++:
 package: dmg
 
 VOLUME_NAME = Pd-extended
-dmg: 
+dmg: pdp_help_hack
 	hdiutil create -format UDRW -fs HFS+ -srcfolder "$(BUILD_BASE)" \
 		-volname $(VOLUME_NAME) build.dmg
 # detach one with the same name first
