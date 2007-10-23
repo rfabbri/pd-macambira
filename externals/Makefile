@@ -461,12 +461,12 @@ cyclone_install: cyclone
 #	mv $(CYCLONE_OUT_DIR)/cyclone.$(EXTENSION) \
 #		$(CYCLONE_OUT_DIR)/cyclonelib.$(EXTENSION)
 	install -d $(helpdir)/$(CYCLONE_NAME)
-	cd $(externals_src)/miXed/doc/help/cyclone && \
-		install -p *.* $(helpdir)/$(CYCLONE_NAME)
+	install -p $(externals_src)/miXed/doc/help/cyclone/*.* \
+		$(helpdir)/$(CYCLONE_NAME)
 #	install -d $(manualsdir)/$(CYCLONE_NAME)
 	install -d $(examplesdir)/$(CYCLONE_NAME)
-	cd $(externals_src)/miXed/test/cyclone && \
-		install -p *.* $(examplesdir)/$(CYCLONE_NAME)
+	install -p $(externals_src)/miXed/test/cyclone/*.* \
+		$(examplesdir)/$(CYCLONE_NAME)
 
 
 cyclone_clean:
