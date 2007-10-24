@@ -33,7 +33,7 @@ static t_int *iem_sqrt4_tilde_perform(t_int *w)
   {
     t_float f = *in;
     t_float g, h;
-    long l = *(long *)(in);
+    union tabfudge_f tf;
     
     if(f < 0.0f)
     {
@@ -44,7 +44,8 @@ static t_int *iem_sqrt4_tilde_perform(t_int *w)
     }
     else
     {
-      g = iem_sqrt4_tilde_exptab[(l >> 23) & 0xff] * iem_sqrt4_tilde_mantissatab[(l >> 13) & 0x3ff];
+      tf.tf_f = f;
+      g = iem_sqrt4_tilde_exptab[((tf.tf_l) >> 23) & 0xff] * iem_sqrt4_tilde_mantissatab[((tf.tf_l) >> 13) & 0x3ff];
       h = f * (1.5f * g - 0.5f * g * g * g * f);
       *out++ = h;
       *out++ = h;
