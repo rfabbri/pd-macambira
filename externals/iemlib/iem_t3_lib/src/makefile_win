@@ -1,7 +1,9 @@
-all: ..\iem_t3_lib.dll
+TARGET = iem_t3_lib
+
+all: ..\$(TARGET).dll
 
 VIS_CPP_PATH = "C:\Programme\Microsoft Visual Studio\Vc98"
-PD_INST_PATH = "C:\Programme\pd-0.39-2"
+PD_INST_PATH = "C:\Programme\pd"
 PD_WIN_INCLUDE_PATH = /I. /I$(PD_INST_PATH)\src /I$(VIS_CPP_PATH)\include
 PD_WIN_C_FLAGS = /nologo /W3 /WX /DMSW /DNT /DPD /DWIN32 /DWINDOWS /Ox -DPA_LITTLE_ENDIAN
 PD_WIN_L_FLAGS = /nologo
@@ -21,16 +23,16 @@ SRC =	t3_bpe.c \
 	t3_metro.c \
 	t3_sig~.c \
 	t3_timer.c \
-	iem_t3_lib.c
+	$(TARGET).c
 
 OBJ = $(SRC:.c=.obj)
 
 .c.obj:
 	cl $(PD_WIN_C_FLAGS) $(PD_WIN_INCLUDE_PATH) /c $*.c
 
-..\iem_t3_lib.dll: $(OBJ)
-	link $(PD_WIN_L_FLAGS) /dll /export:iem_t3_lib_setup \
-	/out:..\iem_t3_lib.dll $(OBJ) $(PD_WIN_LIB)
+..\$(TARGET).dll: $(OBJ)
+	link $(PD_WIN_L_FLAGS) /dll /export:$(TARGET)_setup \
+	/out:..\$(TARGET).dll $(OBJ) $(PD_WIN_LIB)
 
 clean:
 	del *.obj
