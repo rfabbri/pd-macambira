@@ -62,14 +62,22 @@ upload_build ()
 	 upload_filename=`ls -1 ${archive} | sed "s|.*/\(.*\)\.${archive_format}|\1-${HOSTNAME}.${archive_format}|"`
 	 case $SYSTEM in 
 		  mingw*)
-				test -e ${archive} && /c/cygwin/bin/sh --login -c \
-					 "rsync -a ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}" &&\
-					 echo SUCCESS
+				if [ -e ${archive} ]; then
+					 /c/cygwin/bin/sh --login -c \
+						  "rsync -a ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}" && \
+						  md5sum ${archive} > ${archive}.md5 && \
+						  /c/cygwin/bin/sh --login -c \
+						  "rsync -a ${archive}.md5 rsync://128.238.56.50/upload/${DATE}/${upload_filename}.md5" && \
+						  echo SUCCESS
+				fi
 				;;
 		  *)
-				test -e ${archive} && rsync -a ${archive} \
-					 rsync://128.238.56.50/upload/${DATE}/${upload_filename}  && \
-					 echo SUCCESS
+				if [ -e ${archive} ]; then
+					 rsync -a ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}  && \
+						  md5sum ${archive} > ${archive}.md5 && \
+						  rsync -a ${archive}.md5 rsync://128.238.56.50/upload/${DATE}/${upload_filename}.md5  && \
+						  echo SUCCESS
+				fi
 				;;
 		  esac
 }
