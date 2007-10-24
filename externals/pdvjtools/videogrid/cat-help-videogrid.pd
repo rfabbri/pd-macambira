@@ -1,0 +1,20 @@
+#N canvas 772 365 1148 655 10;
+#X text 24 93 LLISTA STDOUT;
+#X symbolatom 72 324 60 0 0 0 - - -;
+#X obj 26 110 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 24 13 VIDEOGRID;
+#X text 25 29 Objecte per seleccionar amb un sol clic la ubicacio d'un
+video amb el frame afegit al tauler.;
+#X text 154 63 AFEGIR VIDEO;
+#X text 154 113 AFEGIR VIDEOS D'UN DIRECTORI;
+#X text 74 344 PATH DEL VIDEO CLICAT;
+#X obj 72 179 videogrid videogrid2 3 5 #F0F0F0 #0F0F0F /usr/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/lib/pd/extra/videogrid/videos/dscn0243.mov|/usr/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/lib/pd/extra/videogrid/videos/dscn0243.mov|/usr/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/lib/pd/extra/videogrid/videos/dscn0243.mov|/usr/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/lib/pd/extra/videogrid/videos/dscn0243.mov|/usr/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/lib/pd/extra/videogrid/videos/dscn0243.mov|/usr/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/lib/pd/extra/videogrid/videos/dscn0241.mov|
+;
+#X msg 156 127 putimgdir /usr/lib/pd/extra/videogrid/videos;
+#X msg 156 77 putimg /usr/lib/pd/extra/videogrid/videos/dscn0241.mov
+;
+#X connect 2 0 8 0;
+#X connect 8 0 1 0;
+#X connect 9 0 8 0;
+#X connect 10 0 8 0;

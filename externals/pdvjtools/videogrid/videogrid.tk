@@ -1,0 +1,146 @@
+############ procediments per videogrid  -- slario(at)gmail.com [a partir del codi del grid de l'Ives: ydegoyon(at)free.fr]        #########
+
+proc videogrid_apply {id} {
+# strip "." from the TK id to make a variable name suffix 
+     set vid [string trimleft $id .]
+
+# for each variable, make a local variable to hold its name...
+     set var_graph_name [concat graph_name_$vid]
+     global $var_graph_name
+     set var_graph_num_fil [concat graph_num_fil_$vid]
+     global $var_graph_num_fil 
+     set var_graph_num_col [concat graph_num_col_$vid]
+     global $var_graph_num_col
+     set var_graph_color_fons [concat graph_color_fons_$vid]
+     global $var_graph_color_fons
+     set var_graph_color_marc [concat graph_color_marc_$vid]
+     global $var_graph_color_marc
+
+
+     set cmd [concat $id dialog \
+     	[eval concat $$var_graph_name] \
+     	[eval concat $$var_graph_num_fil] \
+     	[eval concat $$var_graph_num_col] \
+     	[eval concat $$var_graph_color_fons] \
+     	[eval concat $$var_graph_color_marc] \
+ 	\;]
+#puts stderr $cmd
+     pd $cmd
+}
+ 
+proc videogrid_cancel {id} {
+     set cmd [concat $id cancel \;]
+#puts stderr $cmd
+     pd $cmd
+}
+ 
+proc videogrid_ok {id} {
+     videogrid_apply $id
+     videogrid_cancel $id
+}
+ 
+proc pdtk_videogrid_dialog {id name num_fil num_col color_fons color_marc} {
+     set vid [string trimleft $id .]
+     set var_graph_name [concat graph_name_$vid]
+     global $var_graph_name
+     set var_graph_num_fil [concat graph_num_fil_$vid]
+     global $var_graph_num_fil
+     set var_graph_num_col [concat graph_num_col_$vid]
+     global $var_graph_num_col
+     set var_graph_color_fons [concat graph_color_fons_$vid]
+     global $var_graph_color_fons
+     set var_graph_color_marc [concat graph_color_marc_$vid]
+     global $var_graph_color_marc
+     
+     set $var_graph_name $name
+     set $var_graph_num_fil $num_fil
+     set $var_graph_num_col $num_col
+     set $var_graph_color_fons $color_fons
+     set $var_graph_color_marc $color_marc
+ 
+     toplevel $id
+     wm title $id {videogrid}
+     wm protocol $id WM_DELETE_WINDOW [concat videogrid_cancel $id]
+ 
+     label $id.label -text {VIDEOGRID PROPERTIES}
+     pack $id.label -side top
+ 
+     frame $id.buttonframe
+     pack $id.buttonframe -side bottom -fill x -pady 2m
+     button $id.buttonframe.cancel -text {Cancel}\
+     	-command "videogrid_cancel $id"
+     button $id.buttonframe.apply -text {Apply}\
+     	-command "videogrid_apply $id"
+     button $id.buttonframe.ok -text {OK}\
+     	-command "videogrid_ok $id"
+     pack $id.buttonframe.cancel -side left -expand 1
+     pack $id.buttonframe.apply -side left -expand 1
+     pack $id.buttonframe.ok -side left -expand 1
+     
+     frame $id.1rangef
+     pack $id.1rangef -side top
+     label $id.1rangef.lname -text "Nom :"
+     entry $id.1rangef.name -textvariable $var_graph_name -width 7
+     pack $id.1rangef.lname $id.1rangef.name -side left
+ 
+     frame $id.2rangef
+     pack $id.2rangef -side top
+     label $id.2rangef.lnum_fil -text "Fils :"
+     entry $id.2rangef.num_fil -textvariable $var_graph_num_fil -width 7
+     pack $id.2rangef.lnum_fil $id.2rangef.num_fil -side left
+ 
+     frame $id.3rangef
+     pack $id.3rangef -side top
+     label $id.3rangef.lnum_col -text "Cols :"
+     entry $id.3rangef.num_col -textvariable $var_graph_num_col -width 7
+     pack $id.3rangef.lnum_col $id.3rangef.num_col -side left
+ 
+     frame $id.4rangef
+     pack $id.4rangef -side top
+     label $id.4rangef.lcolor_fons -text "Color fons :"
+     entry $id.4rangef.color_fons -textvariable $var_graph_color_fons -width 7
+     pack $id.4rangef.lcolor_fons $id.4rangef.color_fons -side left
+
+     frame $id.5rangef
+     pack $id.5rangef -side top
+     label $id.5rangef.lcolor_marc -text "Color marc :"
+     entry $id.5rangef.color_marc -textvariable $var_graph_color_marc -width 7
+     pack $id.5rangef.lcolor_marc $id.5rangef.color_marc -side left
+
+
+     bind $id.1rangef.name <KeyPress-Return> [concat videogrid_ok $id]
+     bind $id.2rangef.num_fil <KeyPress-Return> [concat videogrid_ok $id]
+     bind $id.3rangef.num_col <KeyPress-Return> [concat videogrid_ok $id]
+     bind $id.4rangef.color_fons <KeyPress-Return> [concat videogrid_ok $id]
+     bind $id.5rangef.color_marc <KeyPress-Return> [concat videogrid_ok $id]
+
+     focus $id.1rangef.name
+}
+
+proc table {w content args} {
+    frame $w -bg black
+    set r 0
+    foreach row $content {
+        set fields {}
+        set c 0
+        foreach col $row {
+            # lappend fields [label $w.$r/$c -text $col]
+	    set img [image create photo -file $col]
+	    lappend fields [label $w.$r/$c -image $img]
+            incr c
+        }
+        eval grid $fields -sticky news -padx 1 -pady 1
+        incr r
+    }
+    set w
+}
+
+proc pdtk_videogrid_table {id name num_fil num_col} {
+    table .tauler {
+        {sll80x60.gif 3160x120.gif sll80x60.gif}
+        {sll80x60.gif sll80x60.gif sll80x60.gif}
+        {sll80x60.ppm sll80x60.gif 3160x120.gif}
+    }
+    pack .tauler
+}
+############ FINAL procediments per videogrid  -- slario(at)gmail.com [a partir del codi del grid de l'Ives: ydegoyon(at)free.fr]        #########
