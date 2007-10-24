@@ -52,8 +52,8 @@ pd_linux: entry.pd_linux
 .SUFFIXES: .pd_linux
 
 LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes -Werror \
-    -Wno-unused -Wno-parentheses -Wno-switch
+    -Wall -W -Wshadow -Wstrict-prototypes
+
 
 LINUXINCLUDE =  -I../../src -I../../../pd/src
 
@@ -69,11 +69,10 @@ pd_darwin: entry.pd_darwin
 
 .SUFFIXES: .pd_darwin
 
-DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
-    -Wno-unused -Wno-parentheses -Wno-switch
+DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes
 
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o 
+	cc -bundle -bundle_loader ../../../pd/bin/pd -o $*.pd_darwin $*.o 
 	rm -f $*.o
 

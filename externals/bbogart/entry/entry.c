@@ -20,6 +20,11 @@
 #include <stdio.h>
 #include <string.h>
 
+/* TODO: make one .x%x.c.s%x replacement into x->x_widget_name */
+/* TODO: make one .x%x.c replacement into x->x_canvas_name */
+/* TODO: make "display only" option, to force box to never accept focus */
+/* TODO: make focus option only accept regular and shifted chars, not Cmd, Alt, Ctrl */
+/* TODO: make entry_save include whole classname, including namespace prefix */
 
 
 #ifdef NT
@@ -35,23 +40,42 @@
 #define IOWIDTH 4
 #endif
 
+#define BACKGROUNDCOLOR "grey70"
+
 typedef struct _entry
 {
-     t_object x_obj;
-
-     t_glist * x_glist;
-     int x_rect_width;
-     int x_rect_height;
-     t_symbol*  x_sym;
+    t_object x_obj;
+    
+    t_glist * x_glist;
+    int x_rect_width;
+    int x_rect_height;
+    t_symbol*  x_receive_name_symbol;
 	
-     int x_height;
-     int x_width;
-	 
-     t_symbol* x_bgcolour;
-     t_symbol* x_fgcolour;
-     t_symbol* x_contents;
+/* TODO: these all should be settable by messages */
+    int x_height;
+    int x_width;
 
+    t_int x_mousefocus;
+    t_symbol* x_bgcolour;
+    t_symbol* x_fgcolour;
+    
+/* TODO: these all should be settable by messages
+    t_symbol *x_font_face;
+    t_float x_font_size;
+    t_symbol *x_font_weight;
+
+    t_float x_border;
+    t_float x_highlightthickness;
+    t_symbol *x_relief;
+*/
+    t_symbol* x_contents;
+
+    t_outlet* x_data_outlet;
+    t_outlet* x_status_outlet;
 } t_entry;
+
+
+static t_class *entry_class;
 
 /* widget helper functions */
 
@@ -69,16 +93,28 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime, int nin, int 
      {
 	  int onset = text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH) * i / nplus;
 	  if (firsttime)
+      {
+          /* left outlet, for data */
 	       sys_vgui(".x%x.c create rectangle %d %d %d %d -tags {%xo%d %xo}\n",
 			glist_getcanvas(glist),
 			onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
 			onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height-1,
 			x, i, x);
+          /* right outlet, for key status */
+/*	       sys_vgui(".x%x.c create rectangle %d %d %d %d -tags {%xo%d %xo}\n",
+			glist_getcanvas(glist),
+			onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
+			onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height-1,
+			x, i, x);
+*/
+      }
 	  else
+      {
 	       sys_vgui(".x%x.c coords %xo%d %d %d %d %d\n",
 			glist_getcanvas(glist), x, i,
 			onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
 			onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height-1);
+      }
      }
  /* inlets */
      n = nout; 
@@ -102,7 +138,7 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime, int nin, int 
      DEBUG(post("draw inlet end");)
 }
 
-
+/* currently unused
 static void draw_handle(t_entry *x, t_glist *glist, int firsttime) {
   int onset = text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH+2);
 
@@ -118,11 +154,10 @@ static void draw_handle(t_entry *x, t_glist *glist, int firsttime) {
 	     onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 12,
 	     onset + IOWIDTH-2, text_ypix(&x->x_obj, glist) + x->x_rect_height-4);
 }
+*/
 
 static void create_widget(t_entry *x, t_glist *glist)
 {
-  char text[MAXPDSTRING];
-  int len,i;
   t_canvas *canvas=glist_getcanvas(glist);
   /* I guess this is for fine-tuning of the rect size based on width and height? */
   x->x_rect_width = x->x_width;
@@ -135,9 +170,10 @@ static void create_widget(t_entry *x, t_glist *glist)
 
   sys_vgui("set %xw .x%x.c.s%x ; text $%xw -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
 		x,canvas,x,x,x->x_bgcolour->s_name,x->x_fgcolour->s_name);
-  sys_vgui("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", canvas, x, canvas, x);
-  sys_vgui("namespace eval entry%x {} \n", x);
-  
+  if(x->x_mousefocus)
+      sys_vgui("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
+               canvas, x, canvas, x); 
+  sys_vgui("namespace eval entry%p {} \n", x);
 }
 
 static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
@@ -166,8 +202,6 @@ static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
 
 static void entry_erase(t_entry* x,t_glist* glist)
 {
-     int n;
-
      DEBUG(post("erase");)
      sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
 
@@ -175,8 +209,10 @@ static void entry_erase(t_entry* x,t_glist* glist)
 
      /* inlets and outlets */
      
-     sys_vgui(".x%x.c delete %xi\n",glist_getcanvas(glist),x); /* Added tag for all inlets of one instance */
-     sys_vgui(".x%x.c delete %xo\n",glist_getcanvas(glist),x); /* Added tag for all outlets of one instance */
+/* Added tag for all inlets of one instance */
+     sys_vgui(".x%x.c delete %xi\n",glist_getcanvas(glist),x); 
+     sys_vgui(".x%x.c delete %xo\n",glist_getcanvas(glist),x); 
+/* Added tag for all outlets of one instance */
      sys_vgui(".x%x.c delete  %xhandle\n",glist_getcanvas(glist),x,0);
 }
 	
@@ -223,8 +259,7 @@ static void entry_select(t_gobj *z, t_glist *glist, int state)
 {
      t_entry *x = (t_entry *)z;
      if (state) {
-	  sys_vgui(".x%x.c create rectangle \
-%d %d %d %d -tags %xSEL -outline blue\n",
+	  sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xSEL -outline blue\n",
 		   glist_getcanvas(glist),
 		   text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
 		   text_xpix(&x->x_obj, glist) + x->x_rect_width, text_ypix(&x->x_obj, glist) + x->x_rect_height-2,
@@ -238,10 +273,11 @@ static void entry_select(t_gobj *z, t_glist *glist, int state)
 
 static void entry_activate(t_gobj *z, t_glist *glist, int state)
 {
-/* What does this do, why commented out? 
+/* this is currently unused
     t_text *x = (t_text *)z;
     t_rtext *y = glist_findrtext(glist, x);
-    if (z->g_pd != gatom_class) rtext_activate(y, state);*/
+    if (z->g_pd != gatom_class) rtext_activate(y, state);
+*/
 }
 
 static void entry_delete(t_gobj *z, t_glist *glist)
@@ -294,14 +330,16 @@ static void entry_set(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
 {
   int i;
   t_symbol *tmp;
-  
+
+  tmp = s; /* this gets rid of the unused variable warning */
   sys_vgui(".x%x.c.s%x delete 0.0 end \n", x->x_glist, x);
   for(i=0; i<argc ; i++)
   {
 	tmp = atom_getsymbol(argv+i);
-	sys_vgui("lappend ::entry%x::list %s \n", x, tmp->s_name );
+	sys_vgui("lappend ::entry%p::list %s \n", x, tmp->s_name );
   }
-  sys_vgui(".x%x.c.s%x insert end $::entry%x::list ; unset ::entry%x::list \n", x->x_glist, x, x, x );
+  sys_vgui(".x%x.c.s%x insert end $::entry%p::list ; unset ::entry%p::list \n", 
+           x->x_glist, x, x, x );
 }
 
 /* Clear the contents of the text widget */
@@ -314,7 +352,7 @@ static void entry_clear(t_entry* x)
 /* , t_symbol *s, int argc, t_atom *argv) */
 static void entry_output(t_entry* x, t_symbol *s, int argc, t_atom *argv)
 {
-  outlet_list(x->x_obj.ob_outlet, s, argc, argv );
+  outlet_list(x->x_data_outlet, s, argc, argv );
 }
 
 /* Pass the contents of the text widget onto the entry_output fuction above */
@@ -326,13 +364,23 @@ static void entry_bang_output(t_entry* x)
   /* Without "," and ";" escaping, left here but commented out in case we want to add a kind of "pd terminal" mode in the future.
   sys_vgui("pd [concat entry%p output [.x%x.c.s%x get 0.0 end] \\;]\n", x, x->x_glist, x); */
 
-  sys_vgui("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", x->x_glist, x, x->x_glist, x);
+  if(x->x_mousefocus)
+      sys_vgui("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
+               x->x_glist, x, x->x_glist, x);
 }
-
+ 
+static void entry_keyup(t_entry *x, t_symbol *s)
+{
+    outlet_symbol(x->x_status_outlet, s);
+}
+ 
+static void entry_mousefocus(t_entry *x, t_float f)
+{
+    x->x_mousefocus = (t_int) f;
+}
 
 static void entry_save(t_gobj *z, t_binbuf *b)
 {
-	int i;
     t_entry *x = (t_entry *)z;
 
     binbuf_addv(b, "ssiisiiss", gensym("#X"),gensym("obj"),
@@ -355,20 +403,21 @@ void entry_fgcolour(t_entry* x, t_symbol* fgcol)
 	sys_vgui(".x%x.c.s%x configure -foreground \"%s\" \n", x->x_glist, x, fgcol->s_name);
 }
 
-static t_class *entry_class;
-
+static void entry_free(t_entry *x)
+{
+    pd_unbind(&x->x_obj.ob_pd, x->x_receive_name_symbol);
+}
 
 static void *entry_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_entry *x = (t_entry *)pd_new(entry_class);
-    int i;
     char buf[256];
-
+    
     /*x->x_glist = (t_glist*)NULL;*/
     /*x->x_glist = canvas_getcurrent();*/
 
-    
     x->x_height = 1;
+    x->x_mousefocus = 1; 
 	
 	if (argc < 4)
 	{
@@ -393,19 +442,30 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
      x->x_height = x->x_char_height*5; */
 
     /* Bind the recieve "entry%p" to the widget instance*/
-    sprintf(buf,"entry%p",x);
-    x->x_sym = gensym(buf);
-    pd_bind(&x->x_obj.ob_pd, x->x_sym);
+    snprintf(buf,MAXPDSTRING,"entry%p",x);
+    x->x_receive_name_symbol = gensym(buf);
+    pd_bind(&x->x_obj.ob_pd, x->x_receive_name_symbol);
 	
-    outlet_new(&x->x_obj, &s_float);
+    x->x_data_outlet = outlet_new(&x->x_obj, &s_float);
+    x->x_status_outlet = outlet_new(&x->x_obj, &s_symbol);
     return (x);
 }
 
 void entry_setup(void) {
-    entry_class = class_new(gensym("entry"), (t_newmethod)entry_new, 0,
-				sizeof(t_entry),0,A_GIMME,0);
+    entry_class = class_new(gensym("entry"), (t_newmethod)entry_new, 
+                            (t_method)entry_free, sizeof(t_entry),0,A_GIMME,0);
 				
 	class_addbang(entry_class, (t_method)entry_bang_output);
+
+    class_addmethod(entry_class, (t_method)entry_keyup,
+                    gensym("keyup"),
+                    A_DEFSYMBOL,
+                    0);
+
+    class_addmethod(entry_class, (t_method)entry_mousefocus,
+                    gensym("mousefocus"),
+                    A_DEFFLOAT,
+                    0);
 	
 	class_addmethod(entry_class, (t_method)entry_output,
         gensym("output"),
@@ -436,7 +496,7 @@ void entry_setup(void) {
     class_setsavefn(entry_class,&entry_save);
 #endif
 
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.6 $ $Date: 2005-12-12 18:32:40 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.7 $ $Date: 2007-10-24 00:36:01 $");
 }
 
 
