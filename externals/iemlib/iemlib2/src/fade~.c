@@ -63,7 +63,7 @@ static t_int *fade_tilde_perform(t_int *w)
   t_float *tab = x->x_table, *addr, f1, f2, frac;
   double dphase;
   int normhipart;
-  union tabfudge tf;
+  union tabfudge_d tf;
   
   tf.tf_d = UNITBIT32;
   normhipart = tf.tf_i[HIOFFSET];
@@ -114,7 +114,7 @@ static void fade_tilde_maketable(void)
 {
   int i;
   t_float *fp, phase, fff,phsinc = 0.5*3.141592653 / ((t_float)COSTABSIZE*0.99999);
-  union tabfudge tf;
+  union tabfudge_d tf;
   
   if(!iem_fade_tilde_table_sin)
   {

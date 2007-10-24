@@ -36,7 +36,7 @@ static t_int *iem_cot4_tilde_perform(t_int *w)
   double dphase;
   int normhipart;
   int32 mytfi;
-  union tabfudge tf;
+  union tabfudge_d tf;
   
   tf.tf_d = UNITBIT32;
   normhipart = tf.tf_i[HIOFFSET];
@@ -128,7 +128,7 @@ static void iem_cot4_tilde_maketable(void)
 {
   int i;
   t_float *fp, phase, fff, phsinc = 0.5*3.141592653 / ((t_float)COSTABSIZE);
-  union tabfudge tf;
+  union tabfudge_d tf;
   
   if(!iem_cot4_tilde_table_sin)
   {

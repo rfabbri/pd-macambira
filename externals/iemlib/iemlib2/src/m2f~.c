@@ -40,7 +40,7 @@ static t_int *m2f_tilde_perform(t_int *w)
   t_float *tab = iem_m2f_tilde_table, *addr, f1, f2, frac, iinn;
   double dphase;
   int normhipart;
-  union tabfudge tf;
+  union tabfudge_d tf;
   
   tf.tf_d = UNITBIT32;
   normhipart = tf.tf_i[HIOFFSET];
@@ -92,7 +92,7 @@ static void m2f_tilde_dsp(t_m2f_tilde *x, t_signal **sp)
 
 static void m2f_tilde_maketable(void)
 {
-  union tabfudge tf;
+  union tabfudge_d tf;
   
   if(!iem_m2f_tilde_table)
   {
