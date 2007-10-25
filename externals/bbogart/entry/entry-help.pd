@@ -1,24 +1,41 @@
-#N canvas 200 48 434 445 10;
-#X obj 73 132 entry 150 100 grey95 black;
+#N canvas 200 48 472 591 10;
+#X obj 73 212 entry 150 100 grey black;
 #X obj 11 84 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 32 266 print;
-#X msg 137 75 clear;
-#X msg 141 107 set one two three four five six;
-#X msg 88 274 Can you see what I am;
-#X msg 88 250 set \$1 \$2 \$3 \$4 \$5 \$6;
-#X msg 86 51 fgcolour yellow;
+#X obj 32 346 print;
+#X msg 150 95 clear;
+#X msg 159 117 set one two three four five six;
+#X msg 72 50 fgcolour yellow;
 #X msg 50 23 bgcolour purple;
-#X obj 128 363 entry 150 50 grey70 purple;
-#X text 11 336 The one was created with: entry 150 50 grey70 purple
-;
-#X text 8 305 Creation arguments are: width height bgcolor fgcolor.
+#X obj 128 473 entry 100 100 grey70 purple;
+#X text 8 365 Creation arguments are: width height bgcolor fgcolor.
 The width and height are in pixels.;
+#X obj 261 234 select return;
+#X obj 79 347 pddp/print;
+#X obj 176 143 trigger bang bang;
+#X msg 176 164 clear;
+#X symbolatom 216 319 10 0 0 1 last_key_typed - -;
+#X text 266 262 ^-- hit return to output;
+#X msg 132 430 size 100 100;
+#X msg 219 430 size 400 200;
+#X msg 29 4 bgcolour grey;
+#X msg 84 71 fgcolour black;
+#X text 13 404 The size message currently only takes affect after a
+save and reopen.;
 #X connect 0 0 2 0;
-#X connect 0 0 6 0;
+#X connect 0 0 10 0;
+#X connect 0 1 9 0;
+#X connect 0 1 13 0;
 #X connect 1 0 0 0;
 #X connect 3 0 0 0;
 #X connect 4 0 0 0;
-#X connect 6 0 5 0;
-#X connect 7 0 0 0;
-#X connect 8 0 0 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
+#X connect 9 0 11 0;
+#X connect 11 0 12 0;
+#X connect 11 1 0 0;
+#X connect 12 0 0 0;
+#X connect 15 0 7 0;
+#X connect 16 0 7 0;
+#X connect 17 0 0 0;
+#X connect 18 0 0 0;

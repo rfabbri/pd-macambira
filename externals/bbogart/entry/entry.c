@@ -38,6 +38,8 @@
 
 #define BACKGROUNDCOLOR "grey70"
 
+#define DEBUG(x)
+
 typedef struct _entry
 {
     t_object x_obj;
@@ -86,9 +88,28 @@ static t_symbol *right_symbol;
 static t_symbol *up_symbol;
 static t_symbol *down_symbol;
 
-/* widget helper functions */
+/* function prototypes */
 
-#define DEBUG(x) x
+static void entry_getrect(t_gobj *z, t_glist *owner, int *xp1, int *yp1, int *xp2, int *yp2);
+static void entry_displace(t_gobj *z, t_glist *glist, int dx, int dy);
+static void entry_select(t_gobj *z, t_glist *glist, int state);
+static void entry_activate(t_gobj *z, t_glist *glist, int state);
+static void entry_delete(t_gobj *z, t_glist *glist);
+static void entry_vis(t_gobj *z, t_glist *glist, int vis);
+static void entry_save(t_gobj *z, t_binbuf *b);
+
+
+t_widgetbehavior   entry_widgetbehavior = {
+w_getrectfn:  entry_getrect,
+w_displacefn: entry_displace,
+w_selectfn:   entry_select,
+w_activatefn: entry_activate,
+w_deletefn:   entry_delete,
+w_visfn:      entry_vis,
+w_clickfn:    NULL,
+}; 
+
+/* widget helper functions */
 
 static int calculate_onset(t_entry *x, t_glist *glist, int i, int nplus)
 {
@@ -356,18 +377,6 @@ static void entry_vis(t_gobj *z, t_glist *glist, int vis)
     }
 }
 
-static void entry_save(t_gobj *z, t_binbuf *b);
-
-t_widgetbehavior   entry_widgetbehavior = {
-w_getrectfn:  entry_getrect,
-w_displacefn: entry_displace,
-w_selectfn:   entry_select,
-w_activatefn: entry_activate,
-w_deletefn:   entry_delete,
-w_visfn:      entry_vis,
-w_clickfn:    NULL,
-}; 
-
 /* Function to reset the contents of the entry box */
 static void entry_set(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
 {
@@ -375,7 +384,7 @@ static void entry_set(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
     int i;
     t_symbol *tmp;
 
-    tmp = s; /* this gets rid of the unused variable warning */
+    tmp = s; /* <-- this gets rid of the unused variable warning */
     DEBUG(post("%s delete 0.0 end \n", x->x_widget_name););
     sys_vgui("%s delete 0.0 end \n", x->x_widget_name);
     for(i=0; i<argc ; i++)
@@ -421,7 +430,7 @@ static void entry_bang_output(t_entry* x)
 
 static void entry_keyup(t_entry *x, t_float f)
 {
-    DEBUG(post("entry_keyup"););
+/*     DEBUG(post("entry_keyup");); */
     int keycode = (int) f;
     char buf[10];
     t_symbol *output_symbol;
@@ -462,7 +471,7 @@ static void entry_keyup(t_entry *x, t_float f)
             break;
         default:
             snprintf(buf, 10, "key_%d", keycode);
-            post("keyup: %d", keycode);
+            DEBUG(post("keyup: %d", keycode););
             output_symbol = gensym(buf);
         }
     outlet_symbol(x->x_status_outlet, output_symbol);
@@ -493,6 +502,13 @@ void entry_fgcolour(t_entry* x, t_symbol* fgcol)
 	x->x_fgcolour = fgcol;
 	DEBUG(post("%s configure -foreground \"%s\" \n", x->x_widget_name, x->x_fgcolour->s_name););
 	sys_vgui("%s configure -foreground \"%s\" \n", x->x_widget_name, x->x_fgcolour->s_name);
+}
+
+static void entry_size(t_entry *x, t_float width, t_float height)
+{
+    DEBUG(post("entry_size"););
+    x->x_height = height;
+    x->x_width = width;
 }
 
 static void entry_free(t_entry *x)
@@ -552,6 +568,12 @@ void entry_setup(void) {
                     gensym("keyup"),
                     A_DEFFLOAT,
                     0);
+
+    class_addmethod(entry_class, (t_method)entry_size,
+                    gensym("size"),
+                    A_DEFFLOAT,
+                    A_DEFFLOAT,
+                    0);
 	
 	class_addmethod(entry_class, (t_method)entry_output,
                     gensym("output"),
@@ -590,7 +612,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.12 $ $Date: 2007-10-25 16:39:13 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.13 $ $Date: 2007-10-25 17:07:35 $");
 }
 
 
