@@ -24,6 +24,8 @@
 /* TODO: make focus option only accept regular and shifted chars, not Cmd, Alt, Ctrl */
 /* TODO: make entry_save include whole classname, including namespace prefix */
 /* TODO: set message doesnt work with a loadbang */
+/* TODO: add [append( message to add contents after existing contents, just
+ *      base it on the set method, without the preceeding delete  */
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4244 )
@@ -73,6 +75,17 @@ typedef struct _entry
 
 
 static t_class *entry_class;
+
+
+static t_symbol *backspace_symbol;
+static t_symbol *return_symbol;
+static t_symbol *space_symbol;
+static t_symbol *tab_symbol;
+static t_symbol *escape_symbol;
+static t_symbol *left_symbol;
+static t_symbol *right_symbol;
+static t_symbol *up_symbol;
+static t_symbol *down_symbol;
 
 /* widget helper functions */
 
@@ -190,8 +203,6 @@ static void create_widget(t_entry *x, t_glist *glist)
       sys_vgui("bind %s <Leave> {focus [winfo parent %s]} \n", 
                x->x_widget_name, x->x_widget_name); 
   }
-  post("namespace eval %s {} \n", x->x_receive_name->s_name);
-  sys_vgui("namespace eval %s {} \n", x->x_receive_name->s_name);
 }
 
 static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
@@ -393,8 +404,10 @@ static void entry_output(t_entry* x, t_symbol *s, int argc, t_atom *argv)
 static void entry_bang_output(t_entry* x)
 {
   /* With "," and ";" escaping thanks to JMZ */
-  post("pd [concat entry%lx output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [%s get 0.0 end]] \\;]\n", x, x->x_widget_name);
-  sys_vgui("pd [concat entry%lx output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [%s get 0.0 end]] \\;]\n", x, x->x_widget_name);
+  post("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [%s get 0.0 end]] \\;]\n", 
+       x->x_receive_name->s_name, x->x_widget_name);
+  sys_vgui("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [%s get 0.0 end]] \\;]\n", 
+           x->x_receive_name->s_name, x->x_widget_name);
 
   /* Without "," and ";" escaping, left here but commented out in case we want to add a kind of "pd terminal" mode in the future.
   sys_vgui("pd [concat entry%lx output [%s get 0.0 end] \\;]\n", x, x->x_glist, x); */
@@ -407,10 +420,53 @@ static void entry_bang_output(t_entry* x)
                x->x_widget_name, x->x_widget_name);
   }
 }
- 
-static void entry_keyup(t_entry *x, t_symbol *s)
+
+static void entry_keyup(t_entry *x, t_float f)
 {
-    outlet_symbol(x->x_status_outlet, s);
+    int keycode = (int) f;
+    char buf[10];
+    t_symbol *output_symbol;
+    if( (f > 32 ) && (f < 65288) )
+    {
+        snprintf(buf, 2, "%c", keycode);
+        post("keyup: %c", keycode);
+        output_symbol = gensym(buf);
+    } else
+        switch(keycode)
+        {
+        case 32: /* space */
+            output_symbol = space_symbol;
+            break;
+        case 65293: /* return */
+            output_symbol = return_symbol;
+            break;
+        case 65288: /* backspace */
+            output_symbol = backspace_symbol;
+            break;
+        case 65289: /* tab */
+            output_symbol = tab_symbol;
+            break;
+        case 65307: /* escape */
+            output_symbol = escape_symbol;
+            break;
+        case 65361: /* left */
+            output_symbol = left_symbol;
+            break;
+        case 65363: /* right */
+            output_symbol = right_symbol;
+            break;
+        case 65362: /* up */
+            output_symbol = up_symbol;
+            break;
+        case 65364: /* down */
+            output_symbol = down_symbol;
+            break;
+        default:
+            snprintf(buf, 10, "key_%d", keycode);
+            post("keyup: %d", keycode);
+            output_symbol = gensym(buf);
+        }
+    outlet_symbol(x->x_status_outlet, output_symbol);
 }
  
 static void entry_mousefocus(t_entry *x, t_float f)
@@ -492,13 +548,22 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
     x->x_width = x->x_char_width*7;     tuned for Linux 
      x->x_height = x->x_char_height*5; */
 
-    /* Bind the recieve "entry%lx" to the widget instance*/
-    snprintf(buf,MAXPDSTRING,"entry%lx",(long unsigned int)x);
-    x->x_receive_name = gensym(buf);
-    pd_bind(&x->x_obj.ob_pd, x->x_receive_name);
-	
     x->x_data_outlet = outlet_new(&x->x_obj, &s_float);
     x->x_status_outlet = outlet_new(&x->x_obj, &s_symbol);
+
+    /* Bind the recieve "entry%lx" to the widget instance*/
+    snprintf(buf,MAXPDSTRING,"#entry%lx",(long unsigned int)x);
+    x->x_receive_name = gensym(buf);
+    pd_bind(&x->x_obj.ob_pd, x->x_receive_name);
+
+    post("bind Text <KeyRelease> {pd [concat %s keyup %%K \\;]} \n", 
+         x->x_canvas_name,x->x_receive_name->s_name);
+/*     sys_vgui("bind Text <KeyRelease> {pd [concat test keyup %%A \\;]} \n", */
+/*              x->x_canvas_name,x->x_receive_name->s_name); */
+    sys_vgui("bind Text <KeyRelease> {pd %s keyup %%N \\;} \n", x->x_receive_name->s_name);
+	
+    post("namespace eval entry%lx {} \n", x);
+    sys_vgui("namespace eval entry%lx {} \n", x);
     return (x);
 }
 
@@ -510,7 +575,7 @@ void entry_setup(void) {
 
     class_addmethod(entry_class, (t_method)entry_keyup,
                     gensym("keyup"),
-                    A_DEFSYMBOL,
+                    A_DEFFLOAT,
                     0);
 
     class_addmethod(entry_class, (t_method)entry_mousefocus,
@@ -547,7 +612,17 @@ void entry_setup(void) {
     class_setsavefn(entry_class,&entry_save);
 #endif
 
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.8 $ $Date: 2007-10-24 05:22:45 $");
+    backspace_symbol = gensym("Backspace");
+    return_symbol = gensym("Return");
+	space_symbol = gensym("Space");
+	tab_symbol = gensym("Tab");
+	escape_symbol = gensym("Escape");
+	left_symbol = gensym("Left");
+	right_symbol = gensym("Right");
+	up_symbol = gensym("Up");
+	down_symbol = gensym("Down");
+    
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.9 $ $Date: 2007-10-25 04:45:15 $");
 }
 
 
