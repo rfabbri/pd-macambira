@@ -183,59 +183,72 @@ static void draw_handle(t_entry *x, t_glist *glist, int firsttime) {
 
 static void create_widget(t_entry *x, t_glist *glist)
 {
-  t_canvas *canvas=glist_getcanvas(glist);
-  /* I guess this is for fine-tuning of the rect size based on width and height? */
-  x->x_rect_width = x->x_width;
-  x->x_rect_height =  x->x_height+2;
+    DEBUG(post("create_widget"););
+    t_canvas *canvas=glist_getcanvas(glist);  /* TODO this seems unneeded */
+    /* I guess this is for fine-tuning of the rect size based on width and height? */
+    x->x_rect_width = x->x_width;
+    x->x_rect_height =  x->x_height+2;
   
-  /* Create text widget */
+    /* Create text widget */
+	
+    post("namespace eval entry%lx {} \n", x);
+    sys_vgui("namespace eval entry%lx {} \n", x);
 
-  /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
-  post("destroy %s\n", x->x_widget_name);
-  sys_vgui("destroy %s\n", x->x_widget_name);
+    /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
+    post("destroy %s\n", x->x_widget_name);
+    sys_vgui("destroy %s\n", x->x_widget_name);
 
-  sys_vgui("set %xw %s ; text $%xw -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
-		x,x->x_widget_name,x,x->x_bgcolour->s_name,x->x_fgcolour->s_name);
-  if(x->x_mousefocus) 
-  {
-      post("bind %s <Leave> {focus [winfo parent %s]} \n", 
-               x->x_widget_name, x->x_widget_name); 
-      sys_vgui("bind %s <Leave> {focus [winfo parent %s]} \n", 
-               x->x_widget_name, x->x_widget_name); 
-  }
+    /* TODO "set %xw %s ; text $%xw" should be "text %s",x->x_widget_name */
+    post("set %xw %s ; text $%xw -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
+             x,x->x_widget_name,x,x->x_bgcolour->s_name,x->x_fgcolour->s_name);
+    sys_vgui("set %xw %s ; text $%xw -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
+             x,x->x_widget_name,x,x->x_bgcolour->s_name,x->x_fgcolour->s_name);
+    post("bind Text <KeyRelease> {+pd %s keyup %%N \\;} \n", x->x_receive_name->s_name);
+/*     sys_vgui("bind Text <KeyRelease> {pd [concat test keyup %%A \\;]} \n", */
+/*              x->x_canvas_name,x->x_receive_name->s_name); */
+    sys_vgui("bind Text <KeyRelease> {+pd %s keyup %%N \\;} \n", x->x_receive_name->s_name);
+    if(x->x_mousefocus) 
+    {
+        post("bind %s <Leave> {focus [winfo parent %s]} \n", 
+             x->x_widget_name, x->x_widget_name); 
+        sys_vgui("bind %s <Leave> {focus [winfo parent %s]} \n", 
+                 x->x_widget_name, x->x_widget_name); 
+    }
 }
 
 static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
 {
-  t_canvas *canvas=glist_getcanvas(glist);
-  DEBUG(post("drawme %d",firsttime);)
-     if (firsttime) {
-       DEBUG(post("glist %x canvas %x",x->x_glist,canvas);)
-       create_widget(x,glist);	       
-       x->x_glist = canvas;
-       post("%s create window %d %d -anchor nw -window %s -tags %xS -width %d -height %d \n", 
-		x->x_canvas_name,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),x->x_widget_name,x, x->x_width, x->x_height);
-       sys_vgui("%s create window %d %d -anchor nw -window %s -tags %xS -width %d -height %d \n", 
-		x->x_canvas_name,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),x->x_widget_name,x, x->x_width, x->x_height);
-              
-     }     
-     else {
-         post("%s coords %xS %d %d\n", x->x_canvas_name, x,
-                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
-         sys_vgui("%s coords %xS %d %d\n", x->x_canvas_name, x,
-                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
-     }
-     draw_inlets(x, glist, firsttime, 1,1);
-     //     draw_handle(x, glist, firsttime);
-
+    DEBUG(post("entry_drawme"););
+    t_canvas *canvas=glist_getcanvas(glist);
+    DEBUG(post("drawme %d",firsttime););
+    if (firsttime) 
+    {
+        create_widget(x,glist);	       
+        x->x_glist = canvas;  /* TODO glist != canvas, what's happening here? */
+        post("%s create window %d %d -anchor nw -window %s -tags %xS -width %d -height %d \n", 
+             x->x_canvas_name,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+             x->x_widget_name,x, x->x_width, x->x_height);
+        sys_vgui("%s create window %d %d -anchor nw -window %s -tags %xS -width %d -height %d \n",
+                 x->x_canvas_name,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+                 x->x_widget_name,x, x->x_width, x->x_height);
+    }     
+    else 
+    {
+        post("%s coords %xS %d %d\n", x->x_canvas_name, x,
+             text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
+        sys_vgui("%s coords %xS %d %d\n", x->x_canvas_name, x,
+                 text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
+    }
+    draw_inlets(x, glist, firsttime, 1,1);
+    //     draw_handle(x, glist, firsttime);
 }
 
 
 static void entry_erase(t_entry* x,t_glist* glist)
 {
-     DEBUG(post("erase");)
-     post("destroy %s\n",x->x_widget_name);
-     sys_vgui("destroy %s\n",x->x_widget_name);
+    DEBUG(post("entry_erase"););
+    post("destroy %s\n",x->x_widget_name);
+    sys_vgui("destroy %s\n",x->x_widget_name);
 
      post("%s delete %xS\n", x->x_canvas_name, x);
      sys_vgui("%s delete %xS\n", x->x_canvas_name, x);
@@ -295,6 +308,7 @@ static void entry_displace(t_gobj *z, t_glist *glist,
 
 static void entry_select(t_gobj *z, t_glist *glist, int state)
 {
+    DEBUG(post("entry_select"););
      t_entry *x = (t_entry *)z;
      if (state) {
 	  post("%s create rectangle %d %d %d %d -tags %xSEL -outline blue\n",
@@ -332,6 +346,7 @@ static void entry_delete(t_gobj *z, t_glist *glist)
        
 static void entry_vis(t_gobj *z, t_glist *glist, int vis)
 {
+    DEBUG(post("entry_vis"););
     t_entry* s = (t_entry*)z;
     t_rtext *y;
     DEBUG(post("vis: %d",vis);)
@@ -367,9 +382,9 @@ t_widgetbehavior   entry_widgetbehavior = {
 /* Function to reset the contents of the entry box */
 static void entry_set(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
 {
-    DEBUG(post("entry_new"););
-  int i;
-  t_symbol *tmp;
+    DEBUG(post("entry_set"););
+    int i;
+    t_symbol *tmp;
 
   tmp = s; /* this gets rid of the unused variable warning */
   post("%s delete 0.0 end \n", x->x_widget_name);
@@ -426,10 +441,9 @@ static void entry_keyup(t_entry *x, t_float f)
     int keycode = (int) f;
     char buf[10];
     t_symbol *output_symbol;
-    if( (f > 32 ) && (f < 65288) )
+    if( (keycode > 32 ) && (keycode < 65288) )
     {
         snprintf(buf, 2, "%c", keycode);
-        post("keyup: %c", keycode);
         output_symbol = gensym(buf);
     } else
         switch(keycode)
@@ -556,14 +570,6 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
     x->x_receive_name = gensym(buf);
     pd_bind(&x->x_obj.ob_pd, x->x_receive_name);
 
-    post("bind Text <KeyRelease> {pd [concat %s keyup %%K \\;]} \n", 
-         x->x_canvas_name,x->x_receive_name->s_name);
-/*     sys_vgui("bind Text <KeyRelease> {pd [concat test keyup %%A \\;]} \n", */
-/*              x->x_canvas_name,x->x_receive_name->s_name); */
-    sys_vgui("bind Text <KeyRelease> {pd %s keyup %%N \\;} \n", x->x_receive_name->s_name);
-	
-    post("namespace eval entry%lx {} \n", x);
-    sys_vgui("namespace eval entry%lx {} \n", x);
     return (x);
 }
 
@@ -608,21 +614,19 @@ void entry_setup(void) {
         0);
 								  
     class_setwidget(entry_class,&entry_widgetbehavior);
-#if PD_MINOR_VERSION >= 37
     class_setsavefn(entry_class,&entry_save);
-#endif
 
-    backspace_symbol = gensym("Backspace");
-    return_symbol = gensym("Return");
-	space_symbol = gensym("Space");
-	tab_symbol = gensym("Tab");
-	escape_symbol = gensym("Escape");
-	left_symbol = gensym("Left");
-	right_symbol = gensym("Right");
-	up_symbol = gensym("Up");
-	down_symbol = gensym("Down");
+    backspace_symbol = gensym("backspace");
+    return_symbol = gensym("return");
+	space_symbol = gensym("space");
+	tab_symbol = gensym("tab");
+	escape_symbol = gensym("escape");
+	left_symbol = gensym("left");
+	right_symbol = gensym("right");
+	up_symbol = gensym("up");
+	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.9 $ $Date: 2007-10-25 04:45:15 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.10 $ $Date: 2007-10-25 15:40:31 $");
 }
 
 
