@@ -58,13 +58,13 @@ typedef struct _entry
     t_symbol* x_fgcolour;
     
 /* TODO: these all should be settable by messages
-   t_symbol *x_font_face;
-   t_float x_font_size;
-   t_symbol *x_font_weight;
+    t_symbol *x_font_face;
+    t_float x_font_size;
+    t_symbol *x_font_weight;
 
-   t_float x_border;
-   t_float x_highlightthickness;
-   t_symbol *x_relief;
+    t_float x_border;
+    t_float x_highlightthickness;
+    t_symbol *x_relief;
 */
     t_symbol* x_contents;
 
@@ -90,20 +90,54 @@ static t_symbol *down_symbol;
 
 #define DEBUG(x) x
 
+static int calculate_onset(t_entry *x, t_glist *glist, int i, int nplus)
+{
+    return(text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH) * i / nplus);
+}
+
 
 static void draw_inlets(t_entry *x, t_glist *glist, int firsttime, int nin, int nout)
 {
-    /* outlets */
-    int n = nin;
-    int nplus, i;
-    nplus = (n == 1 ? 1 : n-1);
-    DEBUG(post("draw inlet"););
-    for (i = 0; i < n; i++)
+    DEBUG(post("draw_inlets in: %d  out: %d", nin, nout););
+
+    int nplus, i, onset;
+
+    nplus = (nin == 1 ? 1 : nin-1);
+    /* inlets */
+    for (i = 0; i < nin; i++)
     {
-        int onset = text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH) * i / nplus;
+        onset = calculate_onset(x,glist,i,nplus);
         if (firsttime)
         {
-            /* left outlet, for data */
+            DEBUG(post("%s create rectangle %d %d %d %d -tags {%xi%d %xi}\n",
+                       x->x_canvas_name,
+                       onset, text_ypix(&x->x_obj, glist) - 2,
+                       onset + IOWIDTH, text_ypix(&x->x_obj, glist) - 1,
+                       x, i, x););
+            sys_vgui("%s create rectangle %d %d %d %d -tags {%xi%d %xi}\n",
+                     x->x_canvas_name,
+                     onset, text_ypix(&x->x_obj, glist) - 2,
+                     onset + IOWIDTH, text_ypix(&x->x_obj, glist) - 1,
+                     x, i, x);
+        }
+        else
+        {
+            DEBUG(post("%s coords %xi%d %d %d %d %d\n",
+                       x->x_canvas_name, x, i,
+                       onset, text_ypix(&x->x_obj, glist) - 2,
+                       onset + IOWIDTH, text_ypix(&x->x_obj, glist) - 1););
+            sys_vgui("%s coords %xi%d %d %d %d %d\n",
+                     x->x_canvas_name, x, i,
+                     onset, text_ypix(&x->x_obj, glist) - 2,
+                     onset + IOWIDTH, text_ypix(&x->x_obj, glist)- 1);
+        }
+    }
+    nplus = (nout == 1 ? 1 : nout-1);
+    for (i = 0; i < nout; i++) /* outlets */
+    {
+        onset = calculate_onset(x,glist,i,nplus);
+        if (firsttime)
+        {
             DEBUG(post("%s create rectangle %d %d %d %d -tags {%xo%d %xo}\n",
                        x->x_canvas_name,
                        onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
@@ -114,7 +148,6 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime, int nin, int 
                      onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
                      onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height-1,
                      x, i, x);
-            /* right outlet, for key status */
         }
         else
         {
@@ -126,37 +159,6 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime, int nin, int 
                      x->x_canvas_name, x, i,
                      onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
                      onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height-1);
-        }
-    }
-    /* inlets */
-    n = nout; 
-    nplus = (n == 1 ? 1 : n-1);
-    for (i = 0; i < n; i++)
-    {
-        int onset = text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH) * i / nplus;
-        if (firsttime)
-        {
-            DEBUG(post("%s create rectangle %d %d %d %d -tags {%xi%d %xi}\n",
-                       x->x_canvas_name,
-                       onset, text_ypix(&x->x_obj, glist),
-                       onset + IOWIDTH, text_ypix(&x->x_obj, glist)+1,
-                       x, i, x););
-            sys_vgui("%s create rectangle %d %d %d %d -tags {%xi%d %xi}\n",
-                     x->x_canvas_name,
-                     onset, text_ypix(&x->x_obj, glist),
-                     onset + IOWIDTH, text_ypix(&x->x_obj, glist)+1,
-                     x, i, x);
-        }
-        else
-        {
-            DEBUG(post("%s coords %xi%d %d %d %d %d\n",
-                       x->x_canvas_name, x, i,
-                       onset, text_ypix(&x->x_obj, glist),
-                       onset + IOWIDTH, text_ypix(&x->x_obj, glist)+1););
-            sys_vgui("%s coords %xi%d %d %d %d %d\n",
-                     x->x_canvas_name, x, i,
-                     onset, text_ypix(&x->x_obj, glist),
-                     onset + IOWIDTH, text_ypix(&x->x_obj, glist)+1);
         }
     }
     DEBUG(post("draw inlet end"););
@@ -198,8 +200,10 @@ static void create_widget(t_entry *x, t_glist *glist)
                x->x_widget_name,x->x_bgcolour->s_name,x->x_fgcolour->s_name););
     sys_vgui("text %s -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
              x->x_widget_name,x->x_bgcolour->s_name,x->x_fgcolour->s_name);
-    DEBUG(post("bind Text <KeyRelease> {+pd %s keyup %%N \\;} \n", x->x_receive_name->s_name););
-    sys_vgui("bind Text <KeyRelease> {+pd %s keyup %%N \\;} \n", x->x_receive_name->s_name);
+    DEBUG(post("bind %s <KeyRelease> {+pd %s keyup %%N \\;} \n", 
+               x->x_widget_name, x->x_receive_name->s_name););
+    sys_vgui("bind %s <KeyRelease> {+pd %s keyup %%N \\;} \n", 
+             x->x_widget_name, x->x_receive_name->s_name);
     DEBUG(post("bind %s <Leave> {focus [winfo parent %s]} \n", 
                x->x_widget_name, x->x_widget_name);); 
     sys_vgui("bind %s <Leave> {focus [winfo parent %s]} \n", 
@@ -228,7 +232,7 @@ static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
         sys_vgui("%s coords %xS %d %d\n", x->x_canvas_name, x,
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
     }
-    draw_inlets(x, glist, firsttime, 1,1);
+    draw_inlets(x, glist, firsttime, 1,2);
     //     draw_handle(x, glist, firsttime);
 }
 
@@ -417,9 +421,11 @@ static void entry_bang_output(t_entry* x)
 
 static void entry_keyup(t_entry *x, t_float f)
 {
+    DEBUG(post("entry_keyup"););
     int keycode = (int) f;
     char buf[10];
     t_symbol *output_symbol;
+
     if( (keycode > 32 ) && (keycode < 65288) )
     {
         snprintf(buf, 2, "%c", keycode);
@@ -584,7 +590,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.11 $ $Date: 2007-10-25 16:00:12 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.12 $ $Date: 2007-10-25 16:39:13 $");
 }
 
 
