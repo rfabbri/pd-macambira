@@ -23,6 +23,7 @@
 /* TODO: make "display only" option, to force box to never accept focus */
 /* TODO: make focus option only accept regular and shifted chars, not Cmd, Alt, Ctrl */
 /* TODO: make entry_save include whole classname, including namespace prefix */
+/* TODO: make [size( message redraw object */
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: add [append( message to add contents after existing contents, just
  *      base it on the set method, without the preceeding delete  */
@@ -38,7 +39,7 @@
 
 #define BACKGROUNDCOLOR "grey70"
 
-#define DEBUG(x)
+#define DEBUG(x) x
 
 typedef struct _entry
 {
@@ -377,16 +378,12 @@ static void entry_vis(t_gobj *z, t_glist *glist, int vis)
     }
 }
 
-/* Function to reset the contents of the entry box */
-static void entry_set(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
+static void entry_add(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
 {
-    DEBUG(post("entry_set"););
+    DEBUG(post("entry_add"););
     int i;
-    t_symbol *tmp;
+    t_symbol *tmp = s; /* <-- this gets rid of the unused variable warning */
 
-    tmp = s; /* <-- this gets rid of the unused variable warning */
-    DEBUG(post("%s delete 0.0 end \n", x->x_widget_name););
-    sys_vgui("%s delete 0.0 end \n", x->x_widget_name);
     for(i=0; i<argc ; i++)
     {
         tmp = atom_getsymbol(argv+i);
@@ -397,6 +394,17 @@ static void entry_set(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
                x->x_widget_name, x, x ););
     sys_vgui("%s insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
              x->x_widget_name, x, x );
+}
+
+/* Function to reset the contents of the entry box */
+static void entry_set(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
+{
+    DEBUG(post("entry_set"););
+    int i;
+
+    DEBUG(post("%s delete 0.0 end \n", x->x_widget_name););
+    sys_vgui("%s delete 0.0 end \n", x->x_widget_name);
+    entry_add(x, s, argc, argv);
 }
 
 /* Clear the contents of the text widget */
@@ -585,6 +593,11 @@ void entry_setup(void) {
                     A_GIMME,
                     0);
 								  
+	class_addmethod(entry_class, (t_method)entry_add,
+                    gensym("add"),
+                    A_GIMME,
+                    0);
+								  
 	class_addmethod(entry_class, (t_method)entry_clear,
                     gensym("clear"),
                     0);
@@ -612,7 +625,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.13 $ $Date: 2007-10-25 17:07:35 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.14 $ $Date: 2007-10-26 04:49:50 $");
 }
 
 
