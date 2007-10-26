@@ -48,8 +48,10 @@ LDFLAGS =
 LIBS = -lm
 
 ifeq ($(OS_NAME),darwin)
-  CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix
-  LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
+  CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix \
+    -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc
+  LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib \
+    -arch i386 -arch ppc
   LIBS += -lc 
   DYLIB_LDFLAGS = -dynamiclib -read_only_relocs warning -L/sw/lib
   DYLIB_EXTENSION = dylib
