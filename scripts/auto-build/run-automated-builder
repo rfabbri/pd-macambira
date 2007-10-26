@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# On Mac OS X, there are some handy things in Fink, but don't override the
+# built-in tools
+PATH="${PATH}:/sw/bin:/sw/sbin"
+export PATH
+
 # the source dir where this script is
 SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
 . $SCRIPT_DIR/auto-build-common
