@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LIBS="libdir Gem cyclone zexy creb cxc ggee iemlib list-abs mapping markex maxlib memento mjlib motex oscx pddp pdogg pixeltango pmpd rradical sigpack smlib toxy unauthorized vbap pan freeverb hcs jmmmp ext13 hardware deprecated flatspace iem_anything pdp pidip flib ekext"
+LIBS="libdir Gem cyclone zexy creb cxc iemlib list-abs mapping markex maxlib memento mjlib motex oscx pddp pdogg pixeltango pmpd rradical sigpack smlib toxy unauthorized vbap pan freeverb hcs jmmmp ext13 hardware ggee iem_anything flib ekext flatspace deprecated pdp pidip"
 
 GNULINUX_FONTPATH="/usr/share/pd /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType"
 MACOSX_FONTPATH="/Library/Pd /System/Library/Fonts /Library/Fonts ~/Library/Fonts /usr/X11R6/lib/X11/fonts/TTF /System/Library/Frameworks/JavaVM.framework/Versions/1.3.1/Home/lib/fonts /sw/lib/X11/fonts/msttf /sw/lib/X11/fonts/intl/TrueType /sw/lib/X11/fonts/applettf"
@@ -13,7 +13,7 @@ ROOT_DIR=${SCRIPT_DIR}/../packages
 GNULINUX_FILE=${ROOT_DIR}/linux_make/default.pdsettings
 MACOSX_FILE=${ROOT_DIR}/darwin_app/org.puredata.pd.plist
 WINDOWS_FILE=${ROOT_DIR}/win32_inno/pd-settings.reg
-WINDOWS_INNO_FILE=${ROOT_DIR}/win32_inno/pd-inno_registry.reg
+WINDOWS_INNO_FILE=${ROOT_DIR}/win32_inno/pd-inno.registry.reg
 
 GNULINUX_HEADER='standardpath: 1\nverbose: 0\ndefeatrt: 0\nflags: -helppath /usr/share/pd'
 
@@ -86,7 +86,7 @@ print_windows_fontpath ()
 	 for fontpath in $WINDOWS_FONTPATH; do
 		  ((++j)) 
 		  echo "\"path${j}\"=${fontpath}" >> $WINDOWS_FILE
-		  echo "\"path${j}\"=${fontpath}" >> $WINDOWS_INNO_FILE
+		  echo "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: path${j}; ValueData: ${fontpath}; Tasks: loadlibraries; Flags: uninsdeletekey" >> $WINDOWS_INNO_FILE
 	 done
 }
 
