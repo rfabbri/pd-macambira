@@ -12,8 +12,8 @@
 The width and height are in pixels.;
 #X obj 261 234 select return;
 #X obj 79 347 pddp/print;
-#X obj 176 163 trigger bang bang;
-#X msg 176 184 clear;
+#X obj 176 173 trigger bang bang;
+#X msg 176 194 clear;
 #X symbolatom 216 319 10 0 0 1 last_key_typed - -;
 #X text 266 262 ^-- hit return to output;
 #X msg 132 430 size 100 100;
@@ -23,6 +23,7 @@ The width and height are in pixels.;
 #X text 13 404 The size message currently only takes affect after a
 save and reopen.;
 #X msg 169 127 add seven eight nine;
+#X msg 196 149 add ten eleven.;
 #X connect 0 0 2 0;
 #X connect 0 0 10 0;
 #X connect 0 1 9 0;
@@ -41,3 +42,4 @@ save and reopen.;
 #X connect 17 0 0 0;
 #X connect 18 0 0 0;
 #X connect 20 0 0 0;
+#X connect 21 0 0 0;

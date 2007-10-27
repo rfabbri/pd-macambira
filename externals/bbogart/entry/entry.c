@@ -16,6 +16,7 @@
  * GNU General Public License for more details.                          */
 
 #include <m_pd.h>
+#include <m_imp.h>
 #include <g_canvas.h>
 #include <stdio.h>
 #include <string.h>
@@ -25,8 +26,8 @@
 /* TODO: make entry_save include whole classname, including namespace prefix */
 /* TODO: make [size( message redraw object */
 /* TODO: set message doesnt work with a loadbang */
-/* TODO: add [append( message to add contents after existing contents, just
- *      base it on the set method, without the preceeding delete  */
+/* TODO: make message to add a single character to the existing text  */
+/* TODO: make scrollbar (check .printout.text in u_main.tk) */
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4244 )
@@ -382,14 +383,26 @@ static void entry_add(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
 {
     DEBUG(post("entry_add"););
     int i;
-    t_symbol *tmp = s; /* <-- this gets rid of the unused variable warning */
+    t_symbol *tmp_symbol = s; /* <-- this gets rid of the unused variable warning */
+    t_float tmp_float;
 
     for(i=0; i<argc ; i++)
     {
-        tmp = atom_getsymbol(argv+i);
-        DEBUG(post("lappend ::entry%lx::list %s \n", x, tmp->s_name ););
-        sys_vgui("lappend ::entry%lx::list %s \n", x, tmp->s_name );
+        tmp_symbol = atom_getsymbolarg(i, argc, argv);
+        if(tmp_symbol == &s_)
+        {
+            tmp_float = atom_getfloatarg(i, argc , argv);
+            DEBUG(post("lappend ::entry%lx::list %g \n", x, tmp_float ););
+            sys_vgui("lappend ::entry%lx::list %g \n", x, tmp_float );
+        }
+        else 
+        {
+            DEBUG(post("lappend ::entry%lx::list %s \n", x, tmp_symbol->s_name ););
+            sys_vgui("lappend ::entry%lx::list %s \n", x, tmp_symbol->s_name );
+        }
     }
+    DEBUG(post("append ::entry%lx::list \" \"\n", x););
+    sys_vgui("append ::entry%lx::list \" \"\n", x);
     DEBUG(post("%s insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
                x->x_widget_name, x, x ););
     sys_vgui("%s insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
@@ -490,10 +503,9 @@ static void entry_save(t_gobj *z, t_binbuf *b)
     t_entry *x = (t_entry *)z;
 
     binbuf_addv(b, "ssiisiiss", gensym("#X"),gensym("obj"),
-                x->x_obj.te_xpix, x->x_obj.te_ypix ,  
+                x->x_obj.te_xpix, x->x_obj.te_ypix, 
                 gensym("entry"), x->x_width, x->x_height, x->x_bgcolour, x->x_fgcolour);
     binbuf_addv(b, ";");
-//    post("objectclass: %s", ((t_pd *)x)->);
 }
 
 /* function to change colour of text background */
@@ -625,7 +637,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.14 $ $Date: 2007-10-26 04:49:50 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.15 $ $Date: 2007-10-27 23:50:16 $");
 }
 
 
