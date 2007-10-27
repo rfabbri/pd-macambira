@@ -25,6 +25,9 @@ WISH_CONTENTS = "$(WISH)/Contents"
 # which CPU to compile for
 TARGET_PLATFORM := $(shell uname -p)
 
+# CPU-specific gleaned from:
+# http://developer.apple.com/releasenotes/DeveloperTools/RN-GCC4/
+# http://hpc.sourceforge.net/
 # 10.3 uses gcc 3.3, and 10.3 only runs on PowerPC
 GCC_VERSION := $(shell gcc -dumpversion)
 ifeq ($(GCC_VERSION),3.3)
@@ -41,24 +44,7 @@ OPT_CFLAGS = -march=pentium4 -msse2 -mfpmath=sse \
 	-ftree-vectorize -ftree-vectorizer-verbose=2
 endif
 
-ifeq ($(TARGET_PLATFORM),powerpc)
-# Package default, support older PowerPCs, but G3 is the most common
-#OPT_CFLAGS += -mcpu=powerpc -mtune=G3
-
-# CPU-specific gleaned from:
-# http://developer.apple.com/releasenotes/DeveloperTools/RN-GCC4/
-# http://hpc.sourceforge.net/
-# Generic PowerPC
-#OPT_CFLAGS += -mcpu=powerpc -mpowerpc
-# PowerPC 750 (G3)
-#OPT_CFLAGS += -mcpu=750 -mpowerpc-gfxopt
-# PowerPC 7400 (G4 <= 700Mhz) 
-#OPT_CFLAGS += -fast -fPIC -mcpu=G4 -mtune=G4
-# PowerPC 7450 (G4 >= 533MHz) 
-#OPT_CFLAGS += -fast -fPIC -mcpu=7450 -mtune=7450
-# PowerPC G5 (gcc-4.x)
-#OPT_CFLAGS += -fast -fPIC
-endif
+OPT_FLAGS += -DDEBUG_SOUNDFILE
 
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
