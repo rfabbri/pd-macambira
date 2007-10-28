@@ -28,6 +28,7 @@
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: make message to add a single character to the existing text  */
 /* TODO: make scrollbar (check .printout.text in u_main.tk) */
+/* TODO: make erase_inlets() called by ( !editmode && !firsttime ) */
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4244 )
@@ -50,9 +51,6 @@ typedef struct _entry
     int x_rect_width;
     int x_rect_height;
     t_symbol*  x_receive_name;
-
-    char *x_widget_name;
-    char *x_canvas_name;
 	
 /* TODO: these all should be settable by messages */
     int x_height;
@@ -118,13 +116,13 @@ static int calculate_onset(t_entry *x, t_glist *glist, int i, int nplus)
     return(text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH) * i / nplus);
 }
 
-
 static void draw_inlets(t_entry *x, t_glist *glist, int firsttime, int nin, int nout)
 {
     DEBUG(post("draw_inlets in: %d  out: %d", nin, nout););
 
     int nplus, i, onset;
-
+    t_canvas *canvas = glist_getcanvas(glist);
+    
     nplus = (nin == 1 ? 1 : nin-1);
     /* inlets */
     for (i = 0; i < nin; i++)
@@ -132,26 +130,22 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime, int nin, int 
         onset = calculate_onset(x,glist,i,nplus);
         if (firsttime)
         {
-            DEBUG(post("%s create rectangle %d %d %d %d -tags {%xi%d %xi}\n",
-                       x->x_canvas_name,
-                       onset, text_ypix(&x->x_obj, glist) - 2,
+            DEBUG(post(".x%x.c create rectangle %d %d %d %d -tags {%xi%d %xi}\n",
+                       canvas, onset, text_ypix(&x->x_obj, glist) - 2,
                        onset + IOWIDTH, text_ypix(&x->x_obj, glist) - 1,
                        x, i, x););
-            sys_vgui("%s create rectangle %d %d %d %d -tags {%xi%d %xi}\n",
-                     x->x_canvas_name,
-                     onset, text_ypix(&x->x_obj, glist) - 2,
+            sys_vgui(".x%x.c create rectangle %d %d %d %d -tags {%xi%d %xi}\n",
+                     canvas, onset, text_ypix(&x->x_obj, glist) - 2,
                      onset + IOWIDTH, text_ypix(&x->x_obj, glist) - 1,
                      x, i, x);
         }
         else
         {
-            DEBUG(post("%s coords %xi%d %d %d %d %d\n",
-                       x->x_canvas_name, x, i,
-                       onset, text_ypix(&x->x_obj, glist) - 2,
+            DEBUG(post(".x%x.c coords %xi%d %d %d %d %d\n",
+                       canvas, x, i, onset, text_ypix(&x->x_obj, glist) - 2,
                        onset + IOWIDTH, text_ypix(&x->x_obj, glist) - 1););
-            sys_vgui("%s coords %xi%d %d %d %d %d\n",
-                     x->x_canvas_name, x, i,
-                     onset, text_ypix(&x->x_obj, glist) - 2,
+            sys_vgui(".x%x.c coords %xi%d %d %d %d %d\n",
+                     canvas, x, i, onset, text_ypix(&x->x_obj, glist) - 2,
                      onset + IOWIDTH, text_ypix(&x->x_obj, glist)- 1);
         }
     }
@@ -161,25 +155,23 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime, int nin, int 
         onset = calculate_onset(x,glist,i,nplus);
         if (firsttime)
         {
-            DEBUG(post("%s create rectangle %d %d %d %d -tags {%xo%d %xo}\n",
-                       x->x_canvas_name,
-                       onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
+            DEBUG(post(".x%x.c create rectangle %d %d %d %d -tags {%xo%d %xo}\n",
+                       canvas, onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
                        onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height-1,
                        x, i, x););
-            sys_vgui("%s create rectangle %d %d %d %d -tags {%xo%d %xo}\n",
-                     x->x_canvas_name,
-                     onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
+            sys_vgui(".x%x.c create rectangle %d %d %d %d -tags {%xo%d %xo}\n",
+                     canvas, onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
                      onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height-1,
                      x, i, x);
         }
         else
         {
-            DEBUG(post("%s coords %xo%d %d %d %d %d\n",
-                       x->x_canvas_name, x, i,
+            DEBUG(post(".x%x.c coords %xo%d %d %d %d %d\n",
+                       canvas, x, i, 
                        onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
                        onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height-1););
-            sys_vgui("%s coords %xo%d %d %d %d %d\n",
-                     x->x_canvas_name, x, i,
+            sys_vgui(".x%x.c coords %xo%d %d %d %d %d\n",
+                     canvas, x, i,
                      onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
                      onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height-1);
         }
@@ -192,14 +184,14 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime, int nin, int 
    int onset = text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH+2);
 
    if (firsttime)
-   sys_vgui("%s create rectangle %d %d %d %d -tags %xhandle\n",
-   x->x_canvas_name,
+   sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xhandle\n",
+   glist_getcanvas(glist),
    onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 12,
    onset + IOWIDTH-2, text_ypix(&x->x_obj, glist) + x->x_rect_height-4,
    x);
    else
-   sys_vgui("%s coords %xhandle %d %d %d %d\n",
-   x->x_canvas_name, x, 
+   sys_vgui(".x%x.c coords %xhandle %d %d %d %d\n",
+   glist_getcanvas(glist), x, 
    onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 12,
    onset + IOWIDTH-2, text_ypix(&x->x_obj, glist) + x->x_rect_height-4);
    }
@@ -208,6 +200,7 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime, int nin, int 
 static void create_widget(t_entry *x, t_glist *glist)
 {
     DEBUG(post("create_widget"););
+    t_canvas *canvas=glist_getcanvas(glist);
     /* I guess this is for fine-tuning of the rect size based on width and height? */
     x->x_rect_width = x->x_width;
     x->x_rect_height =  x->x_height+2;
@@ -216,21 +209,21 @@ static void create_widget(t_entry *x, t_glist *glist)
     sys_vgui("namespace eval entry%lx {} \n", x);
 
     /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
-    DEBUG(post("destroy %s\n", x->x_widget_name););
-    sys_vgui("destroy %s\n", x->x_widget_name);
+    DEBUG(post("destroy .x%x.c.s%x\n", canvas, x););
+    sys_vgui("destroy .x%x.c.s%x\n", canvas, x);
 
-    DEBUG(post("text %s -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
-               x->x_widget_name,x->x_bgcolour->s_name,x->x_fgcolour->s_name););
-    sys_vgui("text %s -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
-             x->x_widget_name,x->x_bgcolour->s_name,x->x_fgcolour->s_name);
-    DEBUG(post("bind %s <KeyRelease> {+pd %s keyup %%N \\;} \n", 
-               x->x_widget_name, x->x_receive_name->s_name););
-    sys_vgui("bind %s <KeyRelease> {+pd %s keyup %%N \\;} \n", 
-             x->x_widget_name, x->x_receive_name->s_name);
-    DEBUG(post("bind %s <Leave> {focus [winfo parent %s]} \n", 
-               x->x_widget_name, x->x_widget_name);); 
-    sys_vgui("bind %s <Leave> {focus [winfo parent %s]} \n", 
-             x->x_widget_name, x->x_widget_name); 
+    DEBUG(post("text .x%x.c.s%x -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
+               canvas, x, x->x_bgcolour->s_name,x->x_fgcolour->s_name););
+    sys_vgui("text .x%x.c.s%x -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
+             canvas, x,x->x_bgcolour->s_name,x->x_fgcolour->s_name);
+    DEBUG(post("bind .x%x.c.s%x <KeyRelease> {+pd %s keyup %%N \\;} \n", 
+               canvas, x, x->x_receive_name->s_name););
+    sys_vgui("bind .x%x.c.s%x <KeyRelease> {+pd %s keyup %%N \\;} \n", 
+             canvas, x, x->x_receive_name->s_name);
+    DEBUG(post("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
+               canvas, x, canvas, x);); 
+    sys_vgui("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
+             canvas, x, canvas, x); 
 }
 
 static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
@@ -241,21 +234,25 @@ static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
     if (firsttime) 
     {
         create_widget(x,glist);	       
-        DEBUG(post("%s create window %d %d -anchor nw -window %s -tags %xS -width %d -height %d \n", 
-                   x->x_canvas_name,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
-                   x->x_widget_name,x, x->x_width, x->x_height););
-        sys_vgui("%s create window %d %d -anchor nw -window %s -tags %xS -width %d -height %d \n",
-                 x->x_canvas_name,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
-                 x->x_widget_name,x, x->x_width, x->x_height);
+        DEBUG(post(".x%x.c create window %d %d -anchor nw -window .x%x.c.s%x \
+                    -tags %xS -width %d -height %d \n", canvas,
+                   text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+                   canvas, x, x, x->x_width, x->x_height););
+        sys_vgui(".x%x.c create window %d %d -anchor nw -window .x%x.c.s%x \
+                  -tags %xS -width %d -height %d \n", canvas, 
+                 text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+                 canvas, x,x, x->x_width, x->x_height);
     }     
     else 
     {
-        DEBUG(post("%s coords %xS %d %d\n", x->x_canvas_name, x,
+        DEBUG(post(".x%x.c coords %xS %d %d\n", canvas, x,
                    text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)););
-        sys_vgui("%s coords %xS %d %d\n", x->x_canvas_name, x,
+        sys_vgui(".x%x.c coords %xS %d %d\n", canvas, x,
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
     }
-    draw_inlets(x, glist, firsttime, 1,2);
+/*     post("canvas: %d  glist: %d", canvas->gl_edit, glist->gl_edit); */
+/*     if(canvas->gl_edit) */
+        draw_inlets(x, glist, firsttime, 1,2);
     //     draw_handle(x, glist, firsttime);
 }
 
@@ -263,22 +260,22 @@ static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
 static void entry_erase(t_entry* x,t_glist* glist)
 {
     DEBUG(post("entry_erase"););
-    DEBUG(post("destroy %s\n",x->x_widget_name););
-    sys_vgui("destroy %s\n",x->x_widget_name);
+    t_canvas *canvas = glist_getcanvas(glist);
+    DEBUG(post("destroy .x%x.c.s%x\n", canvas, x););
+    sys_vgui("destroy .x%x.c.s%x\n", canvas, x);
 
-    DEBUG(post("%s delete %xS\n", x->x_canvas_name, x););
-    sys_vgui("%s delete %xS\n", x->x_canvas_name, x);
+    DEBUG(post(".x%x.c delete %xS\n", canvas, x););
+    sys_vgui(".x%x.c delete %xS\n", canvas, x);
 
-    /* inlets and outlets */
-     
+/* inlets and outlets */
 /* Added tag for all inlets of one instance */
-    DEBUG(post("%s delete %xi\n", x->x_canvas_name,x););
-    sys_vgui("%s delete %xi\n", x->x_canvas_name,x); 
-    DEBUG(post("%s delete %xo\n", x->x_canvas_name,x););
-    sys_vgui("%s delete %xo\n", x->x_canvas_name,x); 
+    DEBUG(post(".x%x.c delete %xi\n", canvas,x););
+    sys_vgui(".x%x.c delete %xi\n", canvas,x); 
+    DEBUG(post(".x%x.c delete %xo\n", canvas,x););
+    sys_vgui(".x%x.c delete %xo\n", canvas,x); 
 /* Added tag for all outlets of one instance */
-    DEBUG(post("%s delete  %xhandle\n", x->x_canvas_name,x,0););
-    sys_vgui("%s delete  %xhandle\n", x->x_canvas_name,x,0);
+    DEBUG(post(".x%x.c delete  %xhandle\n", canvas,x,0););
+    sys_vgui(".x%x.c delete  %xhandle\n", canvas,x,0);
 }
 	
 
@@ -286,9 +283,10 @@ static void entry_erase(t_entry* x,t_glist* glist)
 /* ------------------------ text widgetbehaviour----------------------------- */
 
 
-static void entry_getrect(t_gobj *z, t_glist *owner,
+static void entry_getrect(t_gobj *z, t_glist *owner, 
                           int *xp1, int *yp1, int *xp2, int *yp2)
 {
+/*     DEBUG(post("entry_getrect");); */
     int width, height;
     t_entry* s = (t_entry*)z;
 
@@ -300,54 +298,55 @@ static void entry_getrect(t_gobj *z, t_glist *owner,
     *yp2 = text_ypix(&s->x_obj, owner) + height;
 }
 
-static void entry_displace(t_gobj *z, t_glist *glist,
-                           int dx, int dy)
+static void entry_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 {
+    DEBUG(post("entry_displace"););
     t_entry *x = (t_entry *)z;
-    DEBUG(post("displace"););
     x->x_obj.te_xpix += dx;
     x->x_obj.te_ypix += dy;
     if (glist_isvisible(glist))
     {
-        DEBUG(post("%s coords %xSEL %d %d %d %d\n", x->x_canvas_name, x,
+        t_canvas *canvas = glist_getcanvas(glist);
+        DEBUG(post(".x%x.c coords %xSEL %d %d %d %d\n", canvas, x,
                    text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
                    text_xpix(&x->x_obj, glist) + x->x_rect_width, 
                    text_ypix(&x->x_obj, glist) + x->x_rect_height-2););
-        sys_vgui("%s coords %xSEL %d %d %d %d\n", x->x_canvas_name, x,
+        sys_vgui(".x%x.c coords %xSEL %d %d %d %d\n", canvas, x,
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
                  text_xpix(&x->x_obj, glist) + x->x_rect_width, 
                  text_ypix(&x->x_obj, glist) + x->x_rect_height-2);
       
         entry_drawme(x, glist, 0);
-        canvas_fixlinesfor(glist_getcanvas(glist),(t_text*) x);
+        canvas_fixlinesfor(canvas, (t_text*) x);
     }
-    DEBUG(post("displace end");)
-        }
+    DEBUG(post("displace end"););
+}
 
 static void entry_select(t_gobj *z, t_glist *glist, int state)
 {
     DEBUG(post("entry_select"););
     t_entry *x = (t_entry *)z;
     if (state) {
-        DEBUG(post("%s create rectangle %d %d %d %d -tags %xSEL -outline blue\n",
-                   x->x_canvas_name,
+        DEBUG(post(".x%x.c create rectangle %d %d %d %d -tags %xSEL -outline blue\n",
+                   glist_getcanvas(glist),
                    text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
                    text_xpix(&x->x_obj, glist) + x->x_rect_width, text_ypix(&x->x_obj, glist) + x->x_rect_height-2,
                    x););
-        sys_vgui("%s create rectangle %d %d %d %d -tags %xSEL -outline blue\n",
-                 x->x_canvas_name,
+        sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xSEL -outline blue\n",
+                 glist_getcanvas(glist),
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
                  text_xpix(&x->x_obj, glist) + x->x_rect_width, text_ypix(&x->x_obj, glist) + x->x_rect_height-2,
                  x);
     }
     else {
-        DEBUG(post("%s delete %xSEL\n", x->x_canvas_name, x););
-        sys_vgui("%s delete %xSEL\n", x->x_canvas_name, x);
+        DEBUG(post(".x%x.c delete %xSEL\n", glist_getcanvas(glist), x););
+        sys_vgui(".x%x.c delete %xSEL\n", glist_getcanvas(glist), x);
     }
 }
 
 static void entry_activate(t_gobj *z, t_glist *glist, int state)
 {
+    DEBUG(post("entry_activate"););    
 /* this is currently unused
    t_text *x = (t_text *)z;
    t_rtext *y = glist_findrtext(glist, x);
@@ -357,6 +356,7 @@ static void entry_activate(t_gobj *z, t_glist *glist, int state)
 
 static void entry_delete(t_gobj *z, t_glist *glist)
 {
+    DEBUG(post("entry_delete"););    
     t_text *x = (t_text *)z;
     canvas_deletelinesfor(glist_getcanvas(glist), x);
 }
@@ -403,10 +403,10 @@ static void entry_add(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
     }
     DEBUG(post("append ::entry%lx::list \" \"\n", x););
     sys_vgui("append ::entry%lx::list \" \"\n", x);
-    DEBUG(post("%s insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
-               x->x_widget_name, x, x ););
-    sys_vgui("%s insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
-             x->x_widget_name, x, x );
+    DEBUG(post(".x%x.c.s%x insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
+               x->x_glist, x, x, x ););
+    sys_vgui(".x%x.c.s%x insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
+             x->x_glist, x, x, x );
 }
 
 /* Function to reset the contents of the entry box */
@@ -415,16 +415,16 @@ static void entry_set(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
     DEBUG(post("entry_set"););
     int i;
 
-    DEBUG(post("%s delete 0.0 end \n", x->x_widget_name););
-    sys_vgui("%s delete 0.0 end \n", x->x_widget_name);
+    DEBUG(post(".x%x.c.s%x delete 0.0 end \n", x->x_glist, x););
+    sys_vgui(".x%x.c.s%x delete 0.0 end \n", x->x_glist, x);
     entry_add(x, s, argc, argv);
 }
 
 /* Clear the contents of the text widget */
 static void entry_clear(t_entry* x)
 {
-    DEBUG(post("%s delete 0.0 end \n", x->x_widget_name););
-    sys_vgui("%s delete 0.0 end \n", x->x_widget_name);
+    DEBUG(post(".x%x.c.s%x delete 0.0 end \n", x->x_glist, x););
+    sys_vgui(".x%x.c.s%x delete 0.0 end \n", x->x_glist, x);
 }
 
 /* Output the symbol */
@@ -438,15 +438,15 @@ static void entry_output(t_entry* x, t_symbol *s, int argc, t_atom *argv)
 static void entry_bang_output(t_entry* x)
 {
     /* With "," and ";" escaping thanks to JMZ */
-    DEBUG(post("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [%s get 0.0 end]] \\;]\n", 
-               x->x_receive_name->s_name, x->x_widget_name););
-    sys_vgui("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [%s get 0.0 end]] \\;]\n", 
-             x->x_receive_name->s_name, x->x_widget_name);
+    DEBUG(post("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [.x%x.c.s%x get 0.0 end]] \\;]\n", 
+               x->x_receive_name->s_name, x->x_glist, x););
+    sys_vgui("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [.x%x.c.s%x get 0.0 end]] \\;]\n", 
+             x->x_receive_name->s_name, x->x_glist, x);
 
-    DEBUG(post("bind %s <Leave> {focus [winfo parent %s]} \n", 
-               x->x_widget_name, x->x_widget_name););
-    sys_vgui("bind %s <Leave> {focus [winfo parent %s]} \n", 
-             x->x_widget_name, x->x_widget_name);
+    DEBUG(post("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
+               x->x_glist, x, x->x_glist, x););
+    sys_vgui("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
+             x->x_glist, x, x->x_glist, x);
 }
 
 static void entry_keyup(t_entry *x, t_float f)
@@ -512,16 +512,20 @@ static void entry_save(t_gobj *z, t_binbuf *b)
 void entry_bgcolour(t_entry* x, t_symbol* bgcol)
 {
 	x->x_bgcolour = bgcol;
-	DEBUG(post("%s configure -background \"%s\" \n", x->x_widget_name, x->x_bgcolour->s_name););
-	sys_vgui("%s configure -background \"%s\" \n", x->x_widget_name, x->x_bgcolour->s_name);
+	DEBUG(post(".x%x.c.s%x configure -background \"%s\" \n", 
+               x->x_glist, x, x->x_bgcolour->s_name););
+	sys_vgui(".x%x.c.s%x configure -background \"%s\" \n", 
+             x->x_glist, x, x->x_bgcolour->s_name);
 }
 
 /* function to change colour of text foreground */
 void entry_fgcolour(t_entry* x, t_symbol* fgcol)
 {
 	x->x_fgcolour = fgcol;
-	DEBUG(post("%s configure -foreground \"%s\" \n", x->x_widget_name, x->x_fgcolour->s_name););
-	sys_vgui("%s configure -foreground \"%s\" \n", x->x_widget_name, x->x_fgcolour->s_name);
+	DEBUG(post(".x%x.c.s%x configure -foreground \"%s\" \n", 
+               x->x_glist, x, x->x_fgcolour->s_name););
+	sys_vgui(".x%x.c.s%x configure -foreground \"%s\" \n", 
+             x->x_glist, x, x->x_fgcolour->s_name);
 }
 
 static void entry_size(t_entry *x, t_float width, t_float height)
@@ -541,14 +545,6 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
     DEBUG(post("entry_new"););
     t_entry *x = (t_entry *)pd_new(entry_class);
     char buf[MAXPDSTRING];
-
-    x->x_glist = canvas_getcurrent();
-    snprintf(buf, MAXPDSTRING, ".x%lx.c", (long unsigned int) glist_getcanvas(x->x_glist));
-    x->x_canvas_name = getbytes(strlen(buf));
-    strncpy(x->x_canvas_name, buf, strlen(buf));
-    snprintf(buf, MAXPDSTRING, "%s.s%lx", x->x_canvas_name, (long unsigned int) x);
-    x->x_widget_name = getbytes(strlen(buf));
-    strncpy(x->x_widget_name, buf, strlen(buf));
 
     x->x_height = 1;
 	
@@ -637,7 +633,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.15 $ $Date: 2007-10-27 23:50:16 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.16 $ $Date: 2007-10-28 02:09:28 $");
 }
 
 
