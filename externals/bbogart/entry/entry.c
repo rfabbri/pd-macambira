@@ -27,7 +27,7 @@
 /* TODO: make [size( message redraw object */
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: make message to add a single character to the existing text  */
-/* TODO: complete inlet draw/erase logic */
+/* TODO: complete inlet draw/erase logic */
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4244 )
@@ -62,12 +62,9 @@ typedef struct _entry
     t_int x_font_size;
     t_symbol *x_font_weight;
 
-/* TODO: these all should be settable by messages
     t_float x_border;
     t_float x_highlightthickness;
     t_symbol *x_relief;
-*/
-    t_symbol* x_contents;
 
     t_outlet* x_data_outlet;
     t_outlet* x_status_outlet;
@@ -437,6 +434,8 @@ static void entry_add(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
                x->x_glist, x, x, x ););
     sys_vgui(".x%x.c.s%x.text insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
              x->x_glist, x, x, x );
+    DEBUG(post(".x%x.c.s%x.text yview end-2char \n", x->x_glist, x ););
+    sys_vgui(".x%x.c.s%x.text yview end-2char \n", x->x_glist, x );
 }
 
 /* Clear the contents of the text widget */
@@ -467,9 +466,11 @@ static void entry_output(t_entry* x, t_symbol *s, int argc, t_atom *argv)
 static void entry_bang_output(t_entry* x)
 {
     /* With "," and ";" escaping thanks to JMZ */
-    DEBUG(post("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [.x%x.c.s%x get 0.0 end]] \\;]\n", 
+    DEBUG(post("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} \
+                [.x%x.c.s%x.text get 0.0 end]] \\;]\n", 
                x->x_receive_name->s_name, x->x_glist, x););
-    sys_vgui("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [.x%x.c.s%x get 0.0 end]] \\;]\n", 
+    sys_vgui("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} \
+              [.x%x.c.s%x.text get 0.0 end]] \\;]\n", 
              x->x_receive_name->s_name, x->x_glist, x);
 
     DEBUG(post("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
@@ -536,6 +537,41 @@ static void entry_save(t_gobj *z, t_binbuf *b)
                 gensym("entry"), x->x_width, x->x_height, x->x_bgcolour, x->x_fgcolour);
     binbuf_addv(b, ";");
 }
+
+
+static void entry_option_float(t_entry* x, t_symbol *option, t_float value)
+{
+	DEBUG(post(".x%x.c.s%x.text configure -%s %f \n", 
+               x->x_glist, x, option->s_name, value););
+	sys_vgui(".x%x.c.s%x.text configure -%s %f \n", 
+               x->x_glist, x, option->s_name, value);
+}
+
+static void entry_option_symbol(t_entry* x, t_symbol *option, t_symbol *value)
+{
+	DEBUG(post(".x%x.c.s%x.text configure -%s {%s} \n", 
+               x->x_glist, x, option->s_name, value->s_name););
+	sys_vgui(".x%x.c.s%x.text configure -%s {%s} \n", 
+               x->x_glist, x, option->s_name, value->s_name);
+}
+
+static void entry_option(t_entry *x, t_symbol *s, int argc, t_atom *argv)
+{
+    t_symbol *tmp_symbol = s; /* <-- this gets rid of the unused variable warning */
+    t_float tmp_float;
+
+    tmp_symbol = atom_getsymbolarg(1, argc, argv);
+    if(tmp_symbol == &s_)
+    {
+        entry_option_float(x,atom_getsymbolarg(0, argc, argv),
+                           atom_getfloatarg(1, argc, argv));
+    }
+    else
+    {
+        entry_option_symbol(x,atom_getsymbolarg(0, argc, argv),tmp_symbol);
+    }
+}
+
 
 /* function to change colour of text background */
 void entry_bgcolour(t_entry* x, t_symbol* bgcol)
@@ -636,6 +672,11 @@ void entry_setup(void) {
                     A_DEFFLOAT,
                     0);
 
+    class_addmethod(entry_class, (t_method)entry_option,
+                    gensym("option"),
+                    A_GIMME,
+                    0);
+
     class_addmethod(entry_class, (t_method)entry_size,
                     gensym("size"),
                     A_DEFFLOAT,
@@ -689,7 +730,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.17 $ $Date: 2007-10-28 03:54:54 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.18 $ $Date: 2007-10-28 05:20:34 $");
 }
 
 
