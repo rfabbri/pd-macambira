@@ -1,4 +1,4 @@
-#N canvas 172 88 736 664 10;
+#N canvas 172 88 748 676 10;
 #X obj 73 212 entry 150 100 grey black;
 #X obj 11 84 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -72,7 +72,7 @@ save and reopen.;
 #X msg 603 323 lightyellow;
 #X obj 384 218 entry 100 50 grey70 black;
 #X obj 386 167 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 10 -262144
--1 -1 2000 1;
+-1 -1 0 1;
 #X obj 52 601 entry 100 50 grey70 black;
 #X obj 51 556 symbol;
 #X obj 161 636 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/cursors.htm
@@ -94,6 +94,9 @@ save and reopen.;
 #X obj 386 48 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 10 -262144
 -1 -1 0 1;
 #X msg 383 68 option borderwidth \$1;
+#X msg 395 366 scrollbar \$1;
+#X obj 395 346 tgl 15 0 empty empty empty 0 -6 0 10 -262144 -1 -1 0
+1;
 #X connect 0 0 2 0;
 #X connect 0 0 10 0;
 #X connect 0 1 9 0;
@@ -163,3 +166,5 @@ save and reopen.;
 #X connect 84 0 66 0;
 #X connect 85 0 86 0;
 #X connect 86 0 26 0;
+#X connect 87 0 50 0;
+#X connect 88 0 87 0;

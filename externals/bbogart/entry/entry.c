@@ -65,7 +65,8 @@ typedef struct _entry
     t_float x_border;
     t_float x_highlightthickness;
     t_symbol *x_relief;
-
+    t_int x_have_scrollbar;
+    
     t_outlet* x_data_outlet;
     t_outlet* x_status_outlet;
 } t_entry;
@@ -205,6 +206,21 @@ static void erase_inlets(t_entry *x, t_canvas *canvas)
    onset + IOWIDTH-2, text_ypix(&x->x_obj, glist) + x->x_rect_height-4);
    }
 */
+static void draw_scrollbar(t_entry *x)
+{
+    DEBUG(post("pack .x%x.c.s%x.scrollbar -side right -fill y -before .x%x.c.s%x.text \n",
+               x->x_glist, x, x->x_glist, x););
+    sys_vgui("pack .x%x.c.s%x.scrollbar -side right -fill y -before .x%x.c.s%x.text \n",
+             x->x_glist, x, x->x_glist, x);
+    x->x_have_scrollbar = 1;
+}
+
+static void erase_scrollbar(t_entry *x)
+{
+    DEBUG(post("pack forget .x%x.c.s%x.scrollbar \n", x->x_glist, x););
+    sys_vgui("pack forget .x%x.c.s%x.scrollbar \n", x->x_glist, x);
+    x->x_have_scrollbar = 0;
+}
 
 static void create_widget(t_entry *x, t_glist *glist)
 {
@@ -558,7 +574,6 @@ static void entry_option_symbol(t_entry* x, t_symbol *option, t_symbol *value)
 static void entry_option(t_entry *x, t_symbol *s, int argc, t_atom *argv)
 {
     t_symbol *tmp_symbol = s; /* <-- this gets rid of the unused variable warning */
-    t_float tmp_float;
 
     tmp_symbol = atom_getsymbolarg(1, argc, argv);
     if(tmp_symbol == &s_)
@@ -570,6 +585,14 @@ static void entry_option(t_entry *x, t_symbol *s, int argc, t_atom *argv)
     {
         entry_option_symbol(x,atom_getsymbolarg(0, argc, argv),tmp_symbol);
     }
+}
+
+static void entry_scrollbar(t_entry *x, t_float f)
+{
+    if(f > 0)
+        draw_scrollbar(x);
+    else
+        erase_scrollbar(x);
 }
 
 
@@ -634,6 +657,7 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
     x->x_font_face = gensym("helvetica");
     x->x_font_size = 10;
     x->x_font_weight = gensym("normal");
+    x->x_have_scrollbar = 1;
 	
 	if (argc < 4)
 	{
@@ -669,6 +693,11 @@ void entry_setup(void) {
 
     class_addmethod(entry_class, (t_method)entry_keyup,
                     gensym("keyup"),
+                    A_DEFFLOAT,
+                    0);
+
+    class_addmethod(entry_class, (t_method)entry_scrollbar,
+                    gensym("scrollbar"),
                     A_DEFFLOAT,
                     0);
 
@@ -730,7 +759,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.18 $ $Date: 2007-10-28 05:20:34 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.19 $ $Date: 2007-10-28 05:53:09 $");
 }
 
 
