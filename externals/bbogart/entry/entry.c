@@ -27,8 +27,7 @@
 /* TODO: make [size( message redraw object */
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: make message to add a single character to the existing text  */
-/* TODO: make scrollbar (check .printout.text in u_main.tk) */
-/* TODO: make erase_inlets() called by ( !editmode && !firsttime ) */
+/* TODO: complete inlet draw/erase logic */
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4244 )
@@ -51,7 +50,7 @@ typedef struct _entry
     int x_rect_width;
     int x_rect_height;
     t_symbol*  x_receive_name;
-	
+
 /* TODO: these all should be settable by messages */
     int x_height;
     int x_width;
@@ -59,11 +58,11 @@ typedef struct _entry
     t_symbol* x_bgcolour;
     t_symbol* x_fgcolour;
     
-/* TODO: these all should be settable by messages
     t_symbol *x_font_face;
-    t_float x_font_size;
+    t_int x_font_size;
     t_symbol *x_font_weight;
 
+/* TODO: these all should be settable by messages
     t_float x_border;
     t_float x_highlightthickness;
     t_symbol *x_relief;
@@ -179,6 +178,19 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime, int nin, int 
     DEBUG(post("draw inlet end"););
 }
 
+static void erase_inlets(t_entry *x, t_canvas *canvas)
+{
+    DEBUG(post("erase_inlets"););
+/* Added tag for all inlets of one instance */
+    DEBUG(post(".x%x.c delete %xi\n", canvas,x););
+    sys_vgui(".x%x.c delete %xi\n", canvas,x); 
+    DEBUG(post(".x%x.c delete %xo\n", canvas,x););
+    sys_vgui(".x%x.c delete %xo\n", canvas,x); 
+/* Added tag for all outlets of one instance */
+    DEBUG(post(".x%x.c delete  %xhandle\n", canvas,x,0););
+    sys_vgui(".x%x.c delete  %xhandle\n", canvas,x,0);
+}
+
 /* currently unused
    static void draw_handle(t_entry *x, t_glist *glist, int firsttime) {
    int onset = text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH+2);
@@ -212,17 +224,39 @@ static void create_widget(t_entry *x, t_glist *glist)
     DEBUG(post("destroy .x%x.c.s%x\n", canvas, x););
     sys_vgui("destroy .x%x.c.s%x\n", canvas, x);
 
-    DEBUG(post("text .x%x.c.s%x -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
-               canvas, x, x->x_bgcolour->s_name,x->x_fgcolour->s_name););
-    sys_vgui("text .x%x.c.s%x -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
-             canvas, x,x->x_bgcolour->s_name,x->x_fgcolour->s_name);
-    DEBUG(post("bind .x%x.c.s%x <KeyRelease> {+pd %s keyup %%N \\;} \n", 
+
+    DEBUG(post("frame .x%x.c.s%x \n",canvas, x););
+    sys_vgui("frame .x%x.c.s%x \n",canvas, x);
+    DEBUG(post("text .x%x.c.s%x.text -font {%s %d %s} -border 1 \
+              -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \
+              -yscrollcommand {.x%x.c.s%x.scrollbar set} \n",
+               canvas, x, x->x_font_face->s_name, x->x_font_size, 
+               x->x_font_weight->s_name,
+               x->x_bgcolour->s_name,x->x_fgcolour->s_name,
+               canvas, x););
+    sys_vgui("text .x%x.c.s%x.text -font {%s %d %s} -border 1 \
+              -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \
+              -yscrollcommand {.x%x.c.s%x.scrollbar set} \n",
+             canvas, x, x->x_font_face->s_name, x->x_font_size, 
+             x->x_font_weight->s_name,
+             x->x_bgcolour->s_name, x->x_fgcolour->s_name,
+             canvas, x);
+    DEBUG(post("scrollbar .x%x.c.s%x.scrollbar -command {.x%x.c.s%x.text yview} \n",canvas, x, canvas, x););
+    sys_vgui("scrollbar .x%x.c.s%x.scrollbar -command {.x%x.c.s%x.text yview} \n",canvas, x ,canvas, x);
+    DEBUG(post("pack .x%x.c.s%x.scrollbar -side right -fill y \n",canvas, x););
+    sys_vgui("pack .x%x.c.s%x.scrollbar -side right -fill y \n",canvas, x);
+    DEBUG(post("pack .x%x.c.s%x.text -side left -fill both -expand 1 \n",canvas, x););
+    sys_vgui("pack .x%x.c.s%x.text -side left -fill both -expand 1 \n",canvas, x);
+    DEBUG(post("pack .x%x.c.s%x -side bottom -fill both -expand 1 \n",canvas, x););
+    sys_vgui("pack .x%x.c.s%x -side bottom -fill both -expand 1 \n",canvas, x);
+
+    DEBUG(post("bind .x%x.c.s%x.text <KeyRelease> {+pd %s keyup %%N \\;} \n", 
                canvas, x, x->x_receive_name->s_name););
-    sys_vgui("bind .x%x.c.s%x <KeyRelease> {+pd %s keyup %%N \\;} \n", 
+    sys_vgui("bind .x%x.c.s%x.text <KeyRelease> {+pd %s keyup %%N \\;} \n", 
              canvas, x, x->x_receive_name->s_name);
-    DEBUG(post("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
+    DEBUG(post("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
                canvas, x, canvas, x);); 
-    sys_vgui("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
+    sys_vgui("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
              canvas, x, canvas, x); 
 }
 
@@ -233,6 +267,7 @@ static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
     DEBUG(post("drawme %d",firsttime););
     if (firsttime) 
     {
+        x->x_glist = canvas;
         create_widget(x,glist);	       
         DEBUG(post(".x%x.c create window %d %d -anchor nw -window .x%x.c.s%x \
                     -tags %xS -width %d -height %d \n", canvas,
@@ -250,9 +285,11 @@ static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
         sys_vgui(".x%x.c coords %xS %d %d\n", canvas, x,
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
     }
-/*     post("canvas: %d  glist: %d", canvas->gl_edit, glist->gl_edit); */
-/*     if(canvas->gl_edit) */
+    post("canvas: %d  glist: %d", canvas->gl_edit, glist->gl_edit); 
+    if( (x->x_glist->gl_edit) && (canvas == x->x_glist) )
         draw_inlets(x, glist, firsttime, 1,2);
+    else
+        erase_inlets(x, canvas);
     //     draw_handle(x, glist, firsttime);
 }
 
@@ -267,15 +304,7 @@ static void entry_erase(t_entry* x,t_glist* glist)
     DEBUG(post(".x%x.c delete %xS\n", canvas, x););
     sys_vgui(".x%x.c delete %xS\n", canvas, x);
 
-/* inlets and outlets */
-/* Added tag for all inlets of one instance */
-    DEBUG(post(".x%x.c delete %xi\n", canvas,x););
-    sys_vgui(".x%x.c delete %xi\n", canvas,x); 
-    DEBUG(post(".x%x.c delete %xo\n", canvas,x););
-    sys_vgui(".x%x.c delete %xo\n", canvas,x); 
-/* Added tag for all outlets of one instance */
-    DEBUG(post(".x%x.c delete  %xhandle\n", canvas,x,0););
-    sys_vgui(".x%x.c delete  %xhandle\n", canvas,x,0);
+    erase_inlets(x, canvas);
 }
 	
 
@@ -326,21 +355,22 @@ static void entry_select(t_gobj *z, t_glist *glist, int state)
 {
     DEBUG(post("entry_select"););
     t_entry *x = (t_entry *)z;
+    t_canvas *canvas = glist_getcanvas(glist);
     if (state) {
         DEBUG(post(".x%x.c create rectangle %d %d %d %d -tags %xSEL -outline blue\n",
-                   glist_getcanvas(glist),
+                   canvas,
                    text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
-                   text_xpix(&x->x_obj, glist) + x->x_rect_width, text_ypix(&x->x_obj, glist) + x->x_rect_height-2,
-                   x););
+                   text_xpix(&x->x_obj, glist) + x->x_rect_width, 
+                   text_ypix(&x->x_obj, glist) + x->x_rect_height-2, x););
         sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xSEL -outline blue\n",
-                 glist_getcanvas(glist),
+                 canvas,
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
-                 text_xpix(&x->x_obj, glist) + x->x_rect_width, text_ypix(&x->x_obj, glist) + x->x_rect_height-2,
-                 x);
+                 text_xpix(&x->x_obj, glist) + x->x_rect_width, 
+                 text_ypix(&x->x_obj, glist) + x->x_rect_height-2, x);
     }
     else {
-        DEBUG(post(".x%x.c delete %xSEL\n", glist_getcanvas(glist), x););
-        sys_vgui(".x%x.c delete %xSEL\n", glist_getcanvas(glist), x);
+        DEBUG(post(".x%x.c delete %xSEL\n", canvas, x););
+        sys_vgui(".x%x.c delete %xSEL\n", canvas, x);
     }
 }
 
@@ -403,10 +433,17 @@ static void entry_add(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
     }
     DEBUG(post("append ::entry%lx::list \" \"\n", x););
     sys_vgui("append ::entry%lx::list \" \"\n", x);
-    DEBUG(post(".x%x.c.s%x insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
+    DEBUG(post(".x%x.c.s%x.text insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
                x->x_glist, x, x, x ););
-    sys_vgui(".x%x.c.s%x insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
+    sys_vgui(".x%x.c.s%x.text insert end $::entry%lx::list ; unset ::entry%lx::list \n", 
              x->x_glist, x, x, x );
+}
+
+/* Clear the contents of the text widget */
+static void entry_clear(t_entry* x)
+{
+    DEBUG(post(".x%x.c.s%x.text delete 0.0 end \n", x->x_glist, x););
+    sys_vgui(".x%x.c.s%x.text delete 0.0 end \n", x->x_glist, x);
 }
 
 /* Function to reset the contents of the entry box */
@@ -415,16 +452,8 @@ static void entry_set(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
     DEBUG(post("entry_set"););
     int i;
 
-    DEBUG(post(".x%x.c.s%x delete 0.0 end \n", x->x_glist, x););
-    sys_vgui(".x%x.c.s%x delete 0.0 end \n", x->x_glist, x);
+    entry_clear(x);
     entry_add(x, s, argc, argv);
-}
-
-/* Clear the contents of the text widget */
-static void entry_clear(t_entry* x)
-{
-    DEBUG(post(".x%x.c.s%x delete 0.0 end \n", x->x_glist, x););
-    sys_vgui(".x%x.c.s%x delete 0.0 end \n", x->x_glist, x);
 }
 
 /* Output the symbol */
@@ -443,9 +472,9 @@ static void entry_bang_output(t_entry* x)
     sys_vgui("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [.x%x.c.s%x get 0.0 end]] \\;]\n", 
              x->x_receive_name->s_name, x->x_glist, x);
 
-    DEBUG(post("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
+    DEBUG(post("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
                x->x_glist, x, x->x_glist, x););
-    sys_vgui("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
+    sys_vgui("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
              x->x_glist, x, x->x_glist, x);
 }
 
@@ -512,9 +541,9 @@ static void entry_save(t_gobj *z, t_binbuf *b)
 void entry_bgcolour(t_entry* x, t_symbol* bgcol)
 {
 	x->x_bgcolour = bgcol;
-	DEBUG(post(".x%x.c.s%x configure -background \"%s\" \n", 
+	DEBUG(post(".x%x.c.s%x.text configure -background \"%s\" \n", 
                x->x_glist, x, x->x_bgcolour->s_name););
-	sys_vgui(".x%x.c.s%x configure -background \"%s\" \n", 
+	sys_vgui(".x%x.c.s%x.text configure -background \"%s\" \n", 
              x->x_glist, x, x->x_bgcolour->s_name);
 }
 
@@ -522,10 +551,29 @@ void entry_bgcolour(t_entry* x, t_symbol* bgcol)
 void entry_fgcolour(t_entry* x, t_symbol* fgcol)
 {
 	x->x_fgcolour = fgcol;
-	DEBUG(post(".x%x.c.s%x configure -foreground \"%s\" \n", 
+	DEBUG(post(".x%x.c.s%x.text configure -foreground \"%s\" \n", 
                x->x_glist, x, x->x_fgcolour->s_name););
-	sys_vgui(".x%x.c.s%x configure -foreground \"%s\" \n", 
+	sys_vgui(".x%x.c.s%x.text configure -foreground \"%s\" \n", 
              x->x_glist, x, x->x_fgcolour->s_name);
+}
+
+static void entry_fontsize(t_entry *x, t_float font_size)
+{
+    DEBUG(post("entry_fontsize"););
+    post("font size: %f",font_size);
+    if(font_size > 8) 
+    {
+        x->x_font_size = (t_int)font_size;
+        DEBUG(post(".x%x.c.s%x.text configure -font {%s %d %s} \n", 
+                   x->x_glist, x,
+                   x->x_font_face->s_name, x->x_font_size, x->x_font_weight->s_name););
+        sys_vgui(".x%x.c.s%x.text configure -font {%s %d %s} \n", 
+                 x->x_glist, x,
+                 x->x_font_face->s_name, x->x_font_size, 
+                 x->x_font_weight->s_name);
+    }
+    else
+        pd_error(x,"entry: invalid font size: %f",font_size);
 }
 
 static void entry_size(t_entry *x, t_float width, t_float height)
@@ -547,6 +595,9 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
     char buf[MAXPDSTRING];
 
     x->x_height = 1;
+    x->x_font_face = gensym("helvetica");
+    x->x_font_size = 10;
+    x->x_font_weight = gensym("normal");
 	
 	if (argc < 4)
 	{
@@ -588,6 +639,11 @@ void entry_setup(void) {
     class_addmethod(entry_class, (t_method)entry_size,
                     gensym("size"),
                     A_DEFFLOAT,
+                    A_DEFFLOAT,
+                    0);
+
+    class_addmethod(entry_class, (t_method)entry_fontsize,
+                    gensym("fontsize"),
                     A_DEFFLOAT,
                     0);
 	
@@ -633,7 +689,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.16 $ $Date: 2007-10-28 02:09:28 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.17 $ $Date: 2007-10-28 03:54:54 $");
 }
 
 

@@ -1,4 +1,4 @@
-#N canvas 200 48 476 595 10;
+#N canvas 200 48 484 603 10;
 #X obj 73 212 entry 150 100 grey black;
 #X obj 11 84 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -24,6 +24,10 @@ The width and height are in pixels.;
 save and reopen.;
 #X msg 169 127 add seven eight nine;
 #X msg 196 149 add ten eleven.;
+#X msg 26 469 fontsize \$1;
+#X msg 48 442 12;
+#X msg 16 441 9;
+#X msg 81 439 98;
 #X connect 0 0 2 0;
 #X connect 0 0 10 0;
 #X connect 0 1 9 0;
@@ -43,3 +47,7 @@ save and reopen.;
 #X connect 18 0 0 0;
 #X connect 20 0 0 0;
 #X connect 21 0 0 0;
+#X connect 22 0 7 0;
+#X connect 23 0 22 0;
+#X connect 24 0 22 0;
+#X connect 25 0 22 0;
