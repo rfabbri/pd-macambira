@@ -276,7 +276,8 @@ static void probalizer_save(t_gobj *z, t_binbuf *b)
 
    binbuf_addv(b, "ssiisiiiii", gensym("#X"),gensym("obj"),
 		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
-		gensym("probalizer"), x->x_width, x->x_height,
+		atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+        x->x_width, x->x_height,
 		x->x_nvalues, x->x_noccurrences, x->x_save );
    if ( x->x_save ) 
    {

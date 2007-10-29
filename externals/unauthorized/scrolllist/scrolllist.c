@@ -280,7 +280,8 @@ static void scrolllist_save(t_gobj *z, t_binbuf *b)
    // post( "saving scrolllist : %d", x->x_capacity );
    binbuf_addv(b, "ssiisiiissss", gensym("#X"), gensym("obj"),
 		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
-		gensym("scrolllist"), x->x_capacity, x->x_width, x->x_height,
+		atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+        x->x_capacity, x->x_width, x->x_height,
                 gensym(x->x_font), gensym(x->x_bgcolor), 
                 gensym(x->x_fgcolor), gensym(x->x_secolor) );
    binbuf_addv(b, ";");

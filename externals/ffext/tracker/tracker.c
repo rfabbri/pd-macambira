@@ -195,7 +195,7 @@ static void tracker_save(t_gobj* z, t_binbuf* b) {
 
     binbuf_addv(b, "ssiis", gensym("#X"), gensym("obj"),
         (t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
-        gensym("tracker"));
+        atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)));
 
     if(x->b_save_data) {
         int ei,gi;

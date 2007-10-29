@@ -319,7 +319,8 @@ static void knob_save(t_gobj *z, t_binbuf *b)
     ip2 = (int *)(&x->x_gui.x_fsf);
     binbuf_addv(b, "ssiisiiffiisssiiiiiiiii", gensym("#X"),gensym("obj"),
 		(t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-		gensym("knob"), x->x_gui.x_h, x->x_gui.x_h,
+		atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+        x->x_gui.x_h, x->x_gui.x_h,
 		(float)x->x_min, (float)x->x_max,
 		x->x_lin0_log1, (*ip1)&IEM_INIT_ARGS_ALL,
 		srl[0], srl[1], srl[2],

@@ -376,9 +376,10 @@ static void popup_save(t_gobj *z, t_binbuf *b)
 	int i;
     t_popup *x = (t_popup *)z;
 
-    binbuf_addv(b, "ssiisiiss", gensym("#X"),gensym("obj"),
-		x->x_obj.te_xpix, x->x_obj.te_ypix ,  
-		gensym("popup"), x->x_width, x->x_height, x->x_colour, x->x_name);
+    binbuf_addv(b, "ssiisiiss", gensym("#X"), gensym("obj"),
+                x->x_obj.te_xpix, x->x_obj.te_ypix ,  
+                atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+                x->x_width, x->x_height, x->x_colour, x->x_name);
 	/* Loop for menu items */
 	for(i=0 ; i<x->x_num_options ; i++)
 	{
@@ -705,7 +706,7 @@ void popup_setup(void) {
     class_setsavefn(popup_class,&popup_save);
 #endif
 
-	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.17 $ $Date: 2005-06-07 18:09:55 $");
+	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.18 $ $Date: 2007-10-29 18:58:42 $");
 }
 
 

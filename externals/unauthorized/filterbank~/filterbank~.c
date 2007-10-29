@@ -253,7 +253,8 @@ static void filterbank_save(t_gobj *z, t_binbuf *b)
 
    binbuf_addv(b, "ssiisiii", gensym("#X"),gensym("obj"),
 		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
-		gensym("filterbank~"), x->x_lowfreq, x->x_highfreq,
+		atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+        x->x_lowfreq, x->x_highfreq,
                 x->x_nbfilters );
    binbuf_addv(b, ";");
 }

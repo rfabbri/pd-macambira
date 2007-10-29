@@ -322,7 +322,8 @@ static void exciter_save(t_gobj *z, t_binbuf *b)
 
    binbuf_addv(b, "ssiisiiifii", gensym("#X"),gensym("obj"),
 		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
-		gensym("exciter"), x->x_width, x->x_height,
+		atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+        x->x_width, x->x_height,
 		x->x_nbevents, x->x_timegrain,
                 x->x_loop, x->x_save 
                 );

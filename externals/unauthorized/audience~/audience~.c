@@ -367,8 +367,9 @@ static void audience_save(t_gobj *z, t_binbuf *b)
 
    binbuf_addv(b, "ssiisiiiifi", gensym("#X"),gensym("obj"),
 		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
-		gensym("audience~"), x->x_width, x->x_height,
-                x->x_nbinputs, x->x_nboutputs, x->x_attenuation, x->x_applydelay );
+		atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+        x->x_width, x->x_height,
+        x->x_nbinputs, x->x_nboutputs, x->x_attenuation, x->x_applydelay );
    for ( ii=0; ii<x->x_nbinputs; ii++ )
    {
       binbuf_addv(b, "ii", x->x_inputs_x[ii], x->x_inputs_y[ii] );

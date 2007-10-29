@@ -580,7 +580,8 @@ static void imagegrid_save(t_gobj *z, t_binbuf *b)
 
     binbuf_addv(b, "ssiissiisss", gensym("#X"),gensym("obj"),
     x->x_obj.te_xpix, x->x_obj.te_ypix,
-    gensym("imagegrid"),x->x_name,x->x_num_fil,x->x_num_col,x->x_color_fons,x->x_color_marc,gensym(cadenaPathsInicials));
+    atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+    x->x_name,x->x_num_fil,x->x_num_col,x->x_color_fons,x->x_color_marc,gensym(cadenaPathsInicials));
     binbuf_addv(b, ";");
 }
 

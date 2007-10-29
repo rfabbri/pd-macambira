@@ -849,7 +849,8 @@ static void sonogram_save(t_gobj *z, t_binbuf *b)
 
    binbuf_addv(b, "ssiisiii", gensym("#X"),gensym("obj"),
 		(t_int)x->x_xpos, (t_int)x->x_ypos,
-		gensym("sonogram~"), x->x_size, x->x_graphic, x->x_phaso );
+		atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+        x->x_size, x->x_graphic, x->x_phaso );
    binbuf_addv(b, ";");
 }
 

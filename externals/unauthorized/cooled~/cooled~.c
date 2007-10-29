@@ -592,7 +592,8 @@ static void cooled_save(t_gobj *z, t_binbuf *b)
 
    binbuf_addv(b, "ssiisiiii", gensym("#X"),gensym("obj"),
 		(int)x->x_obj.te_xpix, (int)x->x_obj.te_ypix,
-		gensym("cooled~"), x->x_size, x->x_width, x->x_height, x->x_draw );
+		atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+        x->x_size, x->x_width, x->x_height, x->x_draw );
    binbuf_addv(b, ";");
 }
 

@@ -415,7 +415,8 @@ static void pdp_colorgrid_save(t_gobj *z, t_binbuf *b)
    // post( "saving pdp_colorgrid : %s", x->x_name->s_name );
    binbuf_addv(b, "ssiissiffiffiffiiff", gensym("#X"),gensym("obj"),
 		(int)x->x_obj.te_xpix, (int)x->x_obj.te_ypix,
-		gensym("pdp_colorgrid"), x->x_name, x->x_width, x->x_min,
+        atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+        x->x_name, x->x_width, x->x_min,
 		x->x_max, x->x_height,
                 x->y_min, x->y_max,
                 x->x_pdp_colorgrid, x->x_xstep, 

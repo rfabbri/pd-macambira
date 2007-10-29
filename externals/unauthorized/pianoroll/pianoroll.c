@@ -264,7 +264,8 @@ static void pianoroll_save(t_gobj *z, t_binbuf *b)
    // post( "saving pianoroll : %s", x->x_name->s_name );
    binbuf_addv(b, "ssiissiiffiiifi", gensym("#X"),gensym("obj"),
 		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
-		gensym("pianoroll"), x->x_name, x->x_width, x->x_height,
+		atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+        x->x_name, x->x_width, x->x_height,
 		x->x_pmin, x->x_pmax,
                 x->x_nbgrades, x->x_nbsteps,
                 x->x_defvalue, x->x_transpose, x->x_save 

@@ -283,7 +283,8 @@ static void scratcher_save(t_gobj *z, t_binbuf *b)
 
    binbuf_addv(b, "ssiisiiiiff", gensym("#X"),gensym("obj"),
 		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
-		gensym("scratcher~"), x->x_size, x->x_width, x->x_height, 
+		atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+        x->x_size, x->x_width, x->x_height, 
                 x->x_sensibility, x->x_maxspeed, x->x_inertia );
    binbuf_addv(b, ";");
 }
