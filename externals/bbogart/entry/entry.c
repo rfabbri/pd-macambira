@@ -256,8 +256,6 @@ static void create_widget(t_entry *x, t_glist *glist)
              canvas, x);
     DEBUG(post("scrollbar .x%x.c.s%x.scrollbar -command {.x%x.c.s%x.text yview} \n",canvas, x, canvas, x););
     sys_vgui("scrollbar .x%x.c.s%x.scrollbar -command {.x%x.c.s%x.text yview} \n",canvas, x ,canvas, x);
-    DEBUG(post("pack .x%x.c.s%x.scrollbar -side right -fill y \n",canvas, x););
-    sys_vgui("pack .x%x.c.s%x.scrollbar -side right -fill y \n",canvas, x);
     DEBUG(post("pack .x%x.c.s%x.text -side left -fill both -expand 1 \n",canvas, x););
     sys_vgui("pack .x%x.c.s%x.text -side left -fill both -expand 1 \n",canvas, x);
     DEBUG(post("pack .x%x.c.s%x -side bottom -fill both -expand 1 \n",canvas, x););
@@ -488,11 +486,6 @@ static void entry_bang_output(t_entry* x)
     sys_vgui("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} \
               [.x%x.c.s%x.text get 0.0 end]] \\;]\n", 
              x->x_receive_name->s_name, x->x_glist, x);
-
-    DEBUG(post("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
-               x->x_glist, x, x->x_glist, x););
-    sys_vgui("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
-             x->x_glist, x, x->x_glist, x);
 }
 
 static void entry_keyup(t_entry *x, t_float f)
@@ -550,7 +543,8 @@ static void entry_save(t_gobj *z, t_binbuf *b)
 
     binbuf_addv(b, "ssiisiiss", gensym("#X"),gensym("obj"),
                 x->x_obj.te_xpix, x->x_obj.te_ypix, 
-                gensym("entry"), x->x_width, x->x_height, x->x_bgcolour, x->x_fgcolour);
+                gensym("entry"), x->x_width, x->x_height, 
+                x->x_bgcolour, x->x_fgcolour);
     binbuf_addv(b, ";");
 }
 
@@ -652,12 +646,12 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
     DEBUG(post("entry_new"););
     t_entry *x = (t_entry *)pd_new(entry_class);
     char buf[MAXPDSTRING];
-
+    
     x->x_height = 1;
     x->x_font_face = gensym("helvetica");
     x->x_font_size = 10;
     x->x_font_weight = gensym("normal");
-    x->x_have_scrollbar = 1;
+    x->x_have_scrollbar = 0;
 	
 	if (argc < 4)
 	{
@@ -759,7 +753,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.19 $ $Date: 2007-10-28 05:53:09 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.20 $ $Date: 2007-10-29 03:23:07 $");
 }
 
 
