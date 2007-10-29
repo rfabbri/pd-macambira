@@ -265,10 +265,12 @@ static void create_widget(t_entry *x, t_glist *glist)
                canvas, x, x->x_receive_name->s_name););
     sys_vgui("bind .x%x.c.s%x.text <KeyRelease> {+pd %s keyup %%N \\;} \n", 
              canvas, x, x->x_receive_name->s_name);
-    DEBUG(post("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
-               canvas, x, canvas, x);); 
-    sys_vgui("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n", 
-             canvas, x, canvas, x); 
+    DEBUG(post("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n",
+               canvas, x, canvas, x););
+    sys_vgui("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n",
+             canvas, x, canvas, x);
+    DEBUG(post("pdtk_standardkeybindings .x%x.c.s%x.text \n", canvas, x););
+    sys_vgui("pdtk_standardkeybindings .x%x.c.s%x.text \n", canvas, x);
 }
 
 static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
@@ -540,11 +542,11 @@ static void entry_keyup(t_entry *x, t_float f)
 static void entry_save(t_gobj *z, t_binbuf *b)
 {
     t_entry *x = (t_entry *)z;
-
+    
     binbuf_addv(b, "ssiisiiss", gensym("#X"),gensym("obj"),
                 x->x_obj.te_xpix, x->x_obj.te_ypix, 
-                gensym("entry"), x->x_width, x->x_height, 
-                x->x_bgcolour, x->x_fgcolour);
+                atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+                x->x_width, x->x_height, x->x_bgcolour, x->x_fgcolour);
     binbuf_addv(b, ";");
 }
 
@@ -753,7 +755,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.20 $ $Date: 2007-10-29 03:23:07 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.21 $ $Date: 2007-10-29 17:44:23 $");
 }
 
 
