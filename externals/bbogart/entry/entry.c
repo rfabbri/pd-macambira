@@ -21,12 +21,9 @@
 #include <stdio.h>
 #include <string.h>
 
-/* TODO: make "display only" option, to force box to never accept focus */
-/* TODO: make focus option only accept regular and shifted chars, not Cmd, Alt, Ctrl */
-/* TODO: make entry_save include whole classname, including namespace prefix */
+/* TODO: get Ctrl-A working to select all */
 /* TODO: make [size( message redraw object */
 /* TODO: set message doesnt work with a loadbang */
-/* TODO: make message to add a single character to the existing text  */
 /* TODO: complete inlet draw/erase logic */
 
 #ifdef _MSC_VER
@@ -40,7 +37,7 @@
 
 #define BACKGROUNDCOLOR "grey70"
 
-#define DEBUG(x) x
+#define DEBUG(x)
 
 typedef struct _entry
 {
@@ -265,10 +262,6 @@ static void create_widget(t_entry *x, t_glist *glist)
                canvas, x, x->x_receive_name->s_name););
     sys_vgui("bind .x%x.c.s%x.text <KeyRelease> {+pd %s keyup %%N \\;} \n", 
              canvas, x, x->x_receive_name->s_name);
-    DEBUG(post("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n",
-               canvas, x, canvas, x););
-    sys_vgui("bind .x%x.c.s%x.text <Leave> {focus [winfo parent .x%x.c.s%x]} \n",
-             canvas, x, canvas, x);
     DEBUG(post("pdtk_standardkeybindings .x%x.c.s%x.text \n", canvas, x););
     sys_vgui("pdtk_standardkeybindings .x%x.c.s%x.text \n", canvas, x);
 }
@@ -422,9 +415,9 @@ static void entry_vis(t_gobj *z, t_glist *glist, int vis)
     }
 }
 
-static void entry_add(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
+static void entry_append(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
 {
-    DEBUG(post("entry_add"););
+    DEBUG(post("entry_append"););
     int i;
     t_symbol *tmp_symbol = s; /* <-- this gets rid of the unused variable warning */
     t_float tmp_float;
@@ -454,6 +447,41 @@ static void entry_add(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
     sys_vgui(".x%x.c.s%x.text yview end-2char \n", x->x_glist, x );
 }
 
+static void entry_key(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
+{
+    DEBUG(post("entry_key"););
+    t_symbol *tmp_symbol = s; /* <-- this gets rid of the unused variable warning */
+    t_int tmp_int;
+
+    tmp_symbol = atom_getsymbolarg(0, argc, argv);
+    if(tmp_symbol == &s_)
+    {
+        tmp_int = (t_int) atom_getfloatarg(0, argc , argv);
+        if(tmp_int < 10)
+        {
+            DEBUG(post(".x%x.c.s%x.text insert end %d\n", x->x_glist, x, tmp_int););
+            sys_vgui(".x%x.c.s%x.text insert end %d\n", x->x_glist, x, tmp_int);
+        }
+        else if(tmp_int == 10)
+        {
+            DEBUG(post(".x%x.c.s%x.text insert end {\n}\n", x->x_glist, x););
+            sys_vgui(".x%x.c.s%x.text insert end {\n}\n", x->x_glist, x);
+        }
+        else
+        {
+            DEBUG(post(".x%x.c.s%x.text insert end [format \"%c\" %d]\n", x->x_glist, x, tmp_int););
+            sys_vgui(".x%x.c.s%x.text insert end [format \"%c\" %d]\n", x->x_glist, x, tmp_int);
+        }
+    }
+    else 
+    {
+        DEBUG(post(".x%x.c.s%x.text insert end %s\n", x->x_glist, x, tmp_symbol->s_name ););
+        sys_vgui(".x%x.c.s%x.text insert end %s\n", x->x_glist, x, tmp_symbol->s_name );
+    }
+    DEBUG(post(".x%x.c.s%x.text yview end-2char \n", x->x_glist, x ););
+    sys_vgui(".x%x.c.s%x.text yview end-2char \n", x->x_glist, x );
+}
+
 /* Clear the contents of the text widget */
 static void entry_clear(t_entry* x)
 {
@@ -468,7 +496,7 @@ static void entry_set(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
     int i;
 
     entry_clear(x);
-    entry_add(x, s, argc, argv);
+    entry_append(x, s, argc, argv);
 }
 
 /* Output the symbol */
@@ -723,8 +751,13 @@ void entry_setup(void) {
                     A_GIMME,
                     0);
 								  
-	class_addmethod(entry_class, (t_method)entry_add,
-                    gensym("add"),
+	class_addmethod(entry_class, (t_method)entry_append,
+                    gensym("append"),
+                    A_GIMME,
+                    0);
+								  
+	class_addmethod(entry_class, (t_method)entry_key,
+                    gensym("key"),
                     A_GIMME,
                     0);
 								  
@@ -755,7 +788,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.21 $ $Date: 2007-10-29 17:44:23 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.22 $ $Date: 2007-10-30 03:59:52 $");
 }
 
 
