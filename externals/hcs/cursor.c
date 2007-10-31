@@ -22,21 +22,23 @@ typedef struct _cursor
     char *optionv[];
 } t_cursor;
 
+
+static void cursor_bang(t_cursor *x)
+{
+    sys_vgui("pd [concat %s motion [winfo pointerx .] [winfo pointery .] \\;]\n",
+             x->receive_symbol->s_name);
+}
+
 static void cursor_float(t_cursor *x, t_float f)
 {
     if(f > 0)
     {
-        sys_vgui("bind all <ButtonPress> {+pd [concat %s button %%b 1 \\;]}\n",
-            x->receive_symbol->s_name);
-        sys_vgui("bind all <ButtonRelease> {+pd [concat %s button %%b 0 \\;]}\n",
-            x->receive_symbol->s_name);
         sys_vgui("bind all <Motion> {+pd [concat %s motion %%x %%y \\;]}\n",
-            x->receive_symbol->s_name);
-        sys_vgui("bind all <MouseWheel> {+pd [concat %s wheel %%D \\;]}\n",
             x->receive_symbol->s_name);
     }
     else
     {
+        /* TODO figure out how to turn off this binding */
     }
 }
 
@@ -94,6 +96,13 @@ static void *cursor_new(t_symbol *s, int argc, t_atom *argv)
 	x->data_outlet = outlet_new(&x->x_obj, 0);
 	x->status_outlet = outlet_new(&x->x_obj, 0);
 
+    sys_vgui("bind all <ButtonPress> {+pd [concat %s button %%b 1 \\;]}\n",
+             x->receive_symbol->s_name);
+    sys_vgui("bind all <ButtonRelease> {+pd [concat %s button %%b 0 \\;]}\n",
+             x->receive_symbol->s_name);
+    sys_vgui("bind all <MouseWheel> {+pd [concat %s wheel %%D \\;]}\n",
+             x->receive_symbol->s_name);
+
     return(x);
 }
 
@@ -103,18 +112,19 @@ void cursor_setup(void)
         (t_newmethod)cursor_new, (t_method)cursor_free,
         sizeof(t_cursor), 0, 0);
 
+    class_addbang(cursor_class, (t_method)cursor_bang);
     class_addfloat(cursor_class, (t_method)cursor_float);
-
-    class_addmethod(cursor_class, (t_method)cursor_cursor, 
-                    gensym("cursor"), A_DEFSYMBOL, 0);
-    class_addmethod(cursor_class, (t_method)cursor_button_callback, 
-                    gensym("button"), A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_addmethod(cursor_class, (t_method)cursor_motion_callback, 
-                    gensym("motion"), A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_addmethod(cursor_class, (t_method)cursor_wheel_callback, 
-                    gensym("wheel"), A_DEFFLOAT, 0);
 
     button_symbol = gensym("button");
     motion_symbol = gensym("motion");
     wheel_symbol = gensym("wheel");
+
+    class_addmethod(cursor_class, (t_method)cursor_cursor, 
+                    gensym("cursor"), A_DEFSYMBOL, 0);
+    class_addmethod(cursor_class, (t_method)cursor_button_callback, 
+                    button_symbol, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod(cursor_class, (t_method)cursor_motion_callback, 
+                    motion_symbol, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod(cursor_class, (t_method)cursor_wheel_callback, 
+                    wheel_symbol, A_DEFFLOAT, 0);
 }
