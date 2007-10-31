@@ -2,7 +2,7 @@ current: all
 
 .SUFFIXES: .pd_linux
 
-PDSOURCE = /usr/local/src/pd/src
+PDSOURCE ?= /usr/local/src/pd/src
 
 INCLUDE = -I. -I${PDSOURCE}
 
