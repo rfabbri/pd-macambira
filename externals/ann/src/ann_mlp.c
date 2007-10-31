@@ -1,8 +1,9 @@
-/*	nn : Neural Networks for PD
+/*	ann_mlp : Neural Networks for PD
 	by Davide Morelli - info@davidemorelli.it - http://www.davidemorelli.it
 	this software is simply an interface for FANN classes
 	http://fann.sourceforge.net/
 	FANN is obviously needed for compilation
+	USE 1.2 VERSION ONLY
 	this software is licensed under the GNU General Public License
 */
 

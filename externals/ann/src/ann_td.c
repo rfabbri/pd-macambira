@@ -3,6 +3,7 @@
 	this software is simply an interface for FANN classes
 	http://fann.sourceforge.net/
 	FANN is obviously needed for compilation
+	use 1.2 version only
 	this software is licensed under the GNU General Public License
 */
 #include <stdio.h>
