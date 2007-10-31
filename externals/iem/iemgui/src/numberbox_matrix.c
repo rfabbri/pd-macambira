@@ -527,7 +527,8 @@ static void numberbox_matrix_save(t_gobj *z, t_binbuf *b)
   
   binbuf_addv(b, "ssiisiiiiffisssii", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("nbxm"), x->x_n_row, x->x_n_column, x->x_gui.x_w, x->x_gui.x_h,
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    x->x_n_row, x->x_n_column, x->x_gui.x_w, x->x_gui.x_h,
     x->x_min, x->x_max, iem_symargstoint(&x->x_gui.x_isa),
     srl[0], srl[1], x->x_front_color,
     iem_fstyletoint(&x->x_gui.x_fsf), x->x_gui.x_fontsize);
@@ -549,7 +550,8 @@ static void numberbox_matrix_save(t_gobj *z, t_binbuf *b)
   ip2 = (int *)(&x->x_gui.x_fsf);
   binbuf_addv(b, "ssiisiiiiffisssii", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("nbxm"), x->x_n_row, x->x_n_column, x->x_gui.x_w, x->x_gui.x_h,
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    x->x_n_row, x->x_n_column, x->x_gui.x_w, x->x_gui.x_h,
     x->x_min, x->x_max, (*ip1)&IEM_INIT_ARGS_ALL,
     srl[0], srl[1], x->x_front_color,
     (*ip2)&IEM_FSTYLE_FLAGS_ALL, x->x_gui.x_fontsize);

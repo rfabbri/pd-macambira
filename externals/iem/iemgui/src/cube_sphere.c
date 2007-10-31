@@ -261,7 +261,8 @@ static void cube_sphere_save(t_gobj *z, t_binbuf *b)
   int i, j, c, n=x->x_n_src;
   
   binbuf_addv(b, "ssiis", gensym("#X"),gensym("obj"),
-    (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix, gensym("cube_sphere"));
+    (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix, 
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)));
   if(x->x_null)
     binbuf_addv(b, "iii", 0, x->x_radius, x->x_fontsize);
   else

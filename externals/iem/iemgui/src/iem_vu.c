@@ -423,7 +423,8 @@ static void iem_vu_save(t_gobj *z, t_binbuf *b)
   iemgui_save(&x->x_gui, srl, bflcol);
   binbuf_addv(b, "ssiisiissiiiiiiii", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("iem_vu"), /*x->x_gui.x_w+1*/ x->x_gui.x_w, 120,
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    /*x->x_gui.x_w+1*/ x->x_gui.x_w, 120,
     srl[1], srl[2],
     x->x_gui.x_ldx, x->x_gui.x_ldy,
     iem_fstyletoint(&x->x_gui.x_fsf), x->x_gui.x_fontsize,
@@ -442,7 +443,8 @@ static void iem_vu_save(t_gobj *z, t_binbuf *b)
   ip2 = (int *)(&x->x_gui.x_fsf);
   binbuf_addv(b, "ssiisiissiiiiiiii", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("iem_vu"), /*x->x_gui.x_w+1*/ x->x_gui.x_w, 120,
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    /*x->x_gui.x_w+1*/ x->x_gui.x_w, 120,
     srl[1], srl[2],
     x->x_gui.x_ldx, x->x_gui.x_ldy,
     (*ip2)&IEM_FSTYLE_FLAGS_ALL, x->x_gui.x_fontsize,

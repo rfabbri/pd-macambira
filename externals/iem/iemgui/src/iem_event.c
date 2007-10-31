@@ -128,7 +128,8 @@ static void iem_event_save(t_gobj *z, t_binbuf *b)
   
   binbuf_addv(b, "ssiisiiiiss", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("ivnt"), x->x_gui.x_w, x->x_gui.x_h,
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    x->x_gui.x_w, x->x_gui.x_h,
     iem_symargstoint(&x->x_gui.x_isa), iem_fstyletoint(&x->x_gui.x_fsf),
     srl[0], srl[1]);
   binbuf_addv(b, ";");
@@ -149,7 +150,8 @@ static void iem_event_save(t_gobj *z, t_binbuf *b)
   ip2 = (int *)(&x->x_gui.x_fsf);
   binbuf_addv(b, "ssiisiiiiss", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("ivnt"), x->x_gui.x_w, x->x_gui.x_h,
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    x->x_gui.x_w, x->x_gui.x_h,
     (*ip1)&IEM_INIT_ARGS_ALL, (*ip2)&IEM_FSTYLE_FLAGS_ALL,
     srl[0], srl[1]);
   binbuf_addv(b, ";");

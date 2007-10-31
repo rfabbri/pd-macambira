@@ -251,7 +251,9 @@ static void room_sim_3d_save(t_gobj *z, t_binbuf *b)
   int i, j, c, n=x->x_nr_src;
   
   binbuf_addv(b, "ssiis", gensym("#X"),gensym("obj"),
-    (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix, gensym("room_sim_3d"));
+    (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix, 
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf))
+   );
   binbuf_addv(b, "ifffi", x->x_nr_src, x->x_cnvrt_roomlx2pixh, x->x_rho_head, x->x_r_ambi, x->x_fontsize);
   c = x->x_gui.x_bcol;
   j = (((0xfc0000 & c) >> 6)|((0xfc00 & c) >> 4)|((0xfc & c) >> 2));

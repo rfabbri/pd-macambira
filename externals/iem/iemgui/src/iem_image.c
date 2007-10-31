@@ -193,12 +193,14 @@ static void iem_image_save(t_gobj *z, t_binbuf *b)
   if(x->x_gifsym)
     binbuf_addv(b, "ssiissiiss", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("iem_image"), x->x_gifsym, iem_symargstoint(&x->x_gui.x_isa), 
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    x->x_gifsym, iem_symargstoint(&x->x_gui.x_isa), 
     iem_fstyletoint(&x->x_gui.x_fsf), srl[0], srl[1]);
   else
     binbuf_addv(b, "ssiisiiiss", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("iem_image"), 0, iem_symargstoint(&x->x_gui.x_isa), 
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    0, iem_symargstoint(&x->x_gui.x_isa), 
     iem_fstyletoint(&x->x_gui.x_fsf), srl[0], srl[1]);
   binbuf_addv(b, ";");
 }
@@ -219,12 +221,14 @@ static void iem_image_save(t_gobj *z, t_binbuf *b)
   if(x->x_gifsym)
     binbuf_addv(b, "ssiissiiss", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("iem_image"), x->x_gifsym, (*ip1)&IEM_INIT_ARGS_ALL,
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    x->x_gifsym, (*ip1)&IEM_INIT_ARGS_ALL,
     (*ip2)&IEM_FSTYLE_FLAGS_ALL, srl[0], srl[1]);
   else
     binbuf_addv(b, "ssiisiiiss", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("iem_image"), 0, (*ip1)&IEM_INIT_ARGS_ALL,
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    0, (*ip1)&IEM_INIT_ARGS_ALL,
     (*ip2)&IEM_FSTYLE_FLAGS_ALL, srl[0], srl[1]);
   binbuf_addv(b, ";");
 }

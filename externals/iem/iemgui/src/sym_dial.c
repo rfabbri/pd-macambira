@@ -312,7 +312,8 @@ static void sym_dial_save(t_gobj *z, t_binbuf *b)
   iemgui_save(&x->x_gui, srl, bflcol);
   binbuf_addv(b, "ssiisiiiisssiiiiiiiii", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("sdl"), x->x_gui.x_w, x->x_gui.x_h,
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    x->x_gui.x_w, x->x_gui.x_h,
     iem_symargstoint(&x->x_gui.x_isa), x->x_snd_flt0_sym1,
     srl[0], srl[1], srl[2],
     x->x_gui.x_ldx, x->x_gui.x_ldy,
@@ -338,7 +339,8 @@ static void sym_dial_save(t_gobj *z, t_binbuf *b)
   ip2 = (int *)(&x->x_gui.x_fsf);
   binbuf_addv(b, "ssiisiiiisssiiiiiiiii", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("sdl"), x->x_gui.x_w, x->x_gui.x_h,
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    x->x_gui.x_w, x->x_gui.x_h,
     (*ip1)&IEM_INIT_ARGS_ALL, x->x_snd_flt0_sym1,
     srl[0], srl[1], srl[2],
     x->x_gui.x_ldx, x->x_gui.x_ldy,

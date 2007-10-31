@@ -137,7 +137,8 @@ static void hfadl_scale_save(t_gobj *z, t_binbuf *b)
   
   binbuf_addv(b, "ssiisi", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    gensym("hfadl_scale"), -1 - (((0xfc0000 & x->x_gui.x_lcol) >> 6)|
+    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
+    -1 - (((0xfc0000 & x->x_gui.x_lcol) >> 6)|
     ((0xfc00 & x->x_gui.x_lcol) >> 4)|((0xfc & x->x_gui.x_lcol) >> 2)));
   binbuf_addv(b, ";");
 }
