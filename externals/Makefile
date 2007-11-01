@@ -1905,13 +1905,19 @@ pdogg_clean:
 
 #------------------------------------------------------------------------------#
 # PDP
+ifeq ($(ARCH),i386)
+  PDP_OPTIONS = --enable-quicktime --enable-mmx
+else
+  PDP_OPTIONS = --enable-quicktime
+endif
+
 PDP_NAME=pdp
 $(externals_src)/pdp/configure: $(externals_src)/pdp/configure.ac
 	cd $(externals_src)/pdp && autoconf
 
 $(externals_src)/pdp/Makefile.config: $(externals_src)/pdp/Makefile.config.in
-	cd $(externals_src)/pdp && ./configure PD_CPPFLAGS="-I$(pd_src)/src"
-		--disable-quicktime
+	cd $(externals_src)/pdp && ./configure PD_CPPFLAGS="-I$(pd_src)/src" \
+		$(PDP_OPTIONS)
 
 $(externals_src)/pdp/pdp.$(EXTENSION):  $(externals_src)/pdp/configure \
 $(externals_src)/pdp/Makefile.config 
