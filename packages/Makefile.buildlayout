@@ -53,6 +53,17 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   OS_NAME = windows
   EXTENSION = dll
 endif
+# which CPU to compile for
+UNAME := $(shell uname -m)
+ifeq ($(UNAME),i386)
+  ARCH = i386
+endif
+ifeq ($(UNAME),i686)
+  ARCH = i386
+endif
+ifeq ($(UNAME),ppc)
+  ARCH = powerpc
+endif
 
 #==============================================================================#
 #
