@@ -54,14 +54,14 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   EXTENSION = dll
 endif
 # which CPU to compile for
-UNAME := $(shell uname -m)
-ifeq ($(UNAME),i386)
+UNAME_MACHINE := $(shell uname -m)
+ifeq ($(UNAME_MACHINE),i386)
   ARCH = i386
 endif
-ifeq ($(UNAME),i686)
+ifeq ($(UNAME_MACHINE),i686)
   ARCH = i386
 endif
-ifeq ($(UNAME),ppc)
+ifeq ($(UNAME_MACHINE),ppc)
   ARCH = powerpc
 endif
 
