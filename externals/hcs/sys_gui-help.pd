@@ -1,0 +1,4 @@
+#N canvas 0 22 454 304 10;
+#X msg 84 83 blah blah blah;
+#X obj 89 152 sys_gui;
+#X connect 0 0 1 0;
