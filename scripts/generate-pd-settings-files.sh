@@ -86,7 +86,7 @@ print_windows_fontpath ()
 	 for fontpath in $WINDOWS_FONTPATH; do
 		  ((++j)) 
 		  echo "\"path${j}\"=${fontpath}" >> $WINDOWS_FILE
-		  echo "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: path${j}; ValueData: ${fontpath}; Tasks: loadlibraries; Flags: uninsdeletekey" >> $WINDOWS_INNO_FILE
+		  echo "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: path${j}; ValueData: ${fontpath}; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_FILE
 	 done
 }
 
