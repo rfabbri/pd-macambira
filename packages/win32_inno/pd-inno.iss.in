@@ -167,7 +167,7 @@ Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib97; Flags: d
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib98; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib99; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib100; Flags: deletevalue; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: path1; ValueData: hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,2f,00,46,00,6f,00,6e,00,74,00,73,00,00,00; Tasks: loadlibraries; Flags: uninsdeletekey
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: path1; ValueData: hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,2f,00,46,00,6f,00,6e,00,74,00,73,00,00,00; Tasks: libs; Flags: uninsdeletekey
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path2; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path3; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path4; Flags: deletevalue; Tasks: libs
