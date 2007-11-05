@@ -3,6 +3,8 @@
 #include <string.h>
 #include <m_pd.h>
 
+#define DEBUG(x)
+
 static t_class *colorpanel_class;
 
 typedef struct _colorpanel
@@ -14,15 +16,15 @@ typedef struct _colorpanel
 
 static void colorpanel_bang(t_colorpanel *x)
 {
-    post("pd [concat %s callback [tk_colorpanel -initialcolor %s] \\;]\n", 
-             x->x_s->s_name, x->current_color);
-    sys_vgui("pd [concat %s callback [tk_colorpanel -initialcolor %s] \\;]\n", 
+    DEBUG(post("pd [concat %s callback [tk_chooseColor -initialcolor %s] \\;]\n", 
+               x->x_s->s_name, x->current_color););
+    sys_vgui("pd [concat %s callback [tk_chooseColor -initialcolor %s] \\;]\n", 
              x->x_s->s_name, x->current_color);
 }
 
 static void colorpanel_symbol(t_colorpanel *x, t_symbol *s)
 {
-    post("setting initial color: %s", s->s_name);
+    DEBUG(post("setting initial color: %s", s->s_name););
     strncpy(x->current_color, s->s_name, MAXPDSTRING);
     colorpanel_bang(x);
 }
@@ -52,7 +54,7 @@ static void colorpanel_list(t_colorpanel *x, t_symbol *s, int argc, t_atom *argv
         }
     }
     memcpy(x->current_color, color_string, 7);
-    post("setting initial color: %s", x->current_color);
+    DEBUG(post("setting initial color: %s", x->current_color););
     colorpanel_bang(x);
 }
 
@@ -63,10 +65,8 @@ static void colorpanel_callback(t_colorpanel *x, t_symbol *color)
     
     if(color != &s_)
     {
-        post("callback color: %s", color->s_name);
         strncpy(x->current_color, color->s_name, MAXPDSTRING);
         sscanf(x->current_color, "#%02x%02x%02x", &red, &green, &blue);
-        post("current color: %s", x->current_color);
         SETFLOAT(output_atoms, (t_float) red / 255);
         SETFLOAT(output_atoms + 1, (t_float) green / 255);
         SETFLOAT(output_atoms + 2, (t_float) blue / 255);
