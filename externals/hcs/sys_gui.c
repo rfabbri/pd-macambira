@@ -3,6 +3,8 @@
 #include <m_pd.h>
 #include <g_canvas.h>
 
+#define DEBUG(x)
+
 static t_class *sys_gui_class;
 
 typedef struct _sys_gui
@@ -18,7 +20,7 @@ static void sys_gui_bang(t_sys_gui *x)
 
 static void sys_gui_anything(t_sys_gui *x, t_symbol *s, int argc, t_atom *argv)
 {
-    post("sys_gui_anything");
+    DEBUG(post("sys_gui_anything"););
     int i = 0;
     char buf[MAXPDSTRING];
 
@@ -35,7 +37,7 @@ static void sys_gui_anything(t_sys_gui *x, t_symbol *s, int argc, t_atom *argv)
 
 static void sys_gui_list(t_sys_gui *x, t_symbol *s, int argc, t_atom *argv)
 {
-    post("sys_gui_list");
+    DEBUG(post("sys_gui_list"););
     int i = 0;
     char buf[MAXPDSTRING];
 
