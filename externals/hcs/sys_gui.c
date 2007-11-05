@@ -8,48 +8,60 @@ static t_class *sys_gui_class;
 typedef struct _sys_gui
 {
     t_object x_obj;
+    char *send_buffer;
 } t_sys_gui;
 
-
-static void *sys_gui_anything(t_sys_gui *x, t_symbol *s, int argc, t_atom *argv)
+static void sys_gui_bang(t_sys_gui *x)
 {
-    int i = 0;
-    int firsttime = 1;
-    t_symbol *tmp_symbol = s;
-    char tmp_string[MAXPDSTRING];
-    char send_buffer[MAXPDSTRING] = "\0";
-    
-    do {
-        tmp_symbol = atom_getsymbolarg(i, argc, argv);
-        if(tmp_symbol == &s_)
-        {
-            snprintf(tmp_string, MAXPDSTRING, "%g", atom_getfloatarg(i, argc , argv));
-            strncat(send_buffer, tmp_string, MAXPDSTRING);
-        }
-        else 
-        {
-            strncat(send_buffer, tmp_symbol->s_name, MAXPDSTRING);
-        }
-        i++;
-        if(firsttime) firsttime = 0;
-    } while(i<argc);
-    strncat(send_buffer, " ;\n", MAXPDSTRING);
-    post(send_buffer);
-    sys_gui(send_buffer);
+    sys_gui(x->send_buffer);
 }
 
-
-static void *sys_gui_new(t_symbol *s, int argc, t_atom *argv)
+static void sys_gui_anything(t_sys_gui *x, t_symbol *s, int argc, t_atom *argv)
 {
-    t_sys_gui *x = (t_sys_gui *)pd_new(sys_gui_class);
+    post("sys_gui_anything");
+    int i = 0;
+    char buf[MAXPDSTRING];
 
-	outlet_new(&x->x_obj, &s_anything);
+    snprintf(x->send_buffer, MAXPDSTRING, "%s ", s->s_name);
+    for(i=0;i<argc;++i)
+    {
+        atom_string(argv + i, buf, MAXPDSTRING);
+        strncat(x->send_buffer, buf, MAXPDSTRING - strlen(x->send_buffer));
+        strncat(x->send_buffer, " ", MAXPDSTRING - strlen(x->send_buffer));
+    }
+    strncat(x->send_buffer, " ;\n", 3);
+    sys_gui(x->send_buffer);
+}
 
-    return(x);
+static void sys_gui_list(t_sys_gui *x, t_symbol *s, int argc, t_atom *argv)
+{
+    post("sys_gui_list");
+    int i = 0;
+    char buf[MAXPDSTRING];
+
+    for(i=0;i<argc;++i)
+    {
+        atom_string(argv + i, buf, MAXPDSTRING);
+        strncat(x->send_buffer, buf, MAXPDSTRING - strlen(x->send_buffer));
+        strncat(x->send_buffer, " ", MAXPDSTRING - strlen(x->send_buffer));
+    }
+    strncat(x->send_buffer, " ;\n", 3);
+    sys_gui(x->send_buffer);
 }
 
 static void sys_gui_free(t_sys_gui *x)
 {
+    freebytes(x->send_buffer,MAXPDSTRING);
+}
+
+static void *sys_gui_new(t_symbol *s)
+{
+    t_sys_gui *x = (t_sys_gui *)pd_new(sys_gui_class);
+
+	outlet_new(&x->x_obj, &s_anything);
+    x->send_buffer = (char *)getbytes(MAXPDSTRING);
+
+    return(x);
 }
 
 void sys_gui_setup(void)
@@ -59,4 +71,6 @@ void sys_gui_setup(void)
         sizeof(t_sys_gui), 0, 0);
 
     class_addanything(sys_gui_class, (t_method)sys_gui_anything);
+    class_addbang(sys_gui_class, (t_method)sys_gui_bang);
+    class_addlist(sys_gui_class, (t_method)sys_gui_list);
 }
