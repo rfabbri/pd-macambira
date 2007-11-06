@@ -1,4 +1,4 @@
-#N canvas 975 22 489 372 10;
+#N canvas 857 104 568 446 10;
 #X obj 69 304 sys_gui;
 #X msg 69 72 menu_doc_browser;
 #X text 178 70 open the help browser;
@@ -50,6 +50,11 @@ to the Pd GUI process just like C objects do.;
 #X connect 15 1 1 0;
 #X restore 246 212 pd generate web color;
 #X msg 245 236 set obj_box_fill #a3cfb5;
+#X obj 77 395 pddp/pddplink http://pure-data.cvs.sourceforge.net/pure-data/pd/src
+;
+#X text 63 350 You can find things to mess with by looking thru the
+Pd code \, look for things that have "sys_gui" and "sys_vgui". These
+are Tcl/Tk commands from the pd to the Pg GUI process.;
 #X connect 1 0 0 0;
 #X connect 3 0 0 0;
 #X connect 5 0 0 0;
