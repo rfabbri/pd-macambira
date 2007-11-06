@@ -14,7 +14,6 @@ typedef struct _cursor
 {
     t_object x_obj;
     t_symbol *receive_symbol;
-    t_symbol *current_cursor;
     t_canvas *parent_canvas;
     t_outlet *data_outlet;
     t_outlet *status_outlet;
@@ -22,6 +21,12 @@ typedef struct _cursor
     char *optionv[];
 } t_cursor;
 
+
+static void cursor_setmethod(t_cursor *x, t_symbol *s, int argc, t_atom *argv)
+{
+    sys_vgui("set cursor_%s \"%s\"\n", s->s_name, atom_getsymbol(argv)->s_name);
+    canvas_setcursor(x->parent_canvas, 0); /* hack to refresh the cursor */
+}
 
 static void cursor_bang(t_cursor *x)
 {
@@ -40,16 +45,6 @@ static void cursor_float(t_cursor *x, t_float f)
     {
         /* TODO figure out how to turn off this binding */
     }
-}
-
-static void cursor_cursor(t_cursor *x, t_symbol *s)
-{
-    post("setting cursor: %s", s->s_name);
-    x->current_cursor = s;
-    post("set parent%lx [winfo parent .x%lx.c]; $parent%lx configure -cursor %s \n",
-             x, x->parent_canvas, x, s->s_name);
-    sys_vgui("set parent%lx [winfo parent .x%lx.c]; $parent%lx configure -cursor %s \n",
-             x, x->parent_canvas, x, s->s_name);
 }
 
 static void cursor_button_callback(t_cursor *x, t_float button, t_float state)
@@ -81,9 +76,10 @@ static void cursor_wheel_callback(t_cursor *x, t_float f)
 static void cursor_free(t_cursor *x)
 {
     pd_unbind(&x->x_obj.ob_pd, x->receive_symbol);
+    //TODO free the "bind all"
 }
 
-static void *cursor_new(t_symbol *s, int argc, t_atom *argv)
+static void *cursor_new(t_symbol *s)
 {
     char buf[MAXPDSTRING];
     t_cursor *x = (t_cursor *)pd_new(cursor_class);
@@ -119,12 +115,26 @@ void cursor_setup(void)
     motion_symbol = gensym("motion");
     wheel_symbol = gensym("wheel");
 
-    class_addmethod(cursor_class, (t_method)cursor_cursor, 
-                    gensym("cursor"), A_DEFSYMBOL, 0);
     class_addmethod(cursor_class, (t_method)cursor_button_callback, 
                     button_symbol, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addmethod(cursor_class, (t_method)cursor_motion_callback, 
                     motion_symbol, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addmethod(cursor_class, (t_method)cursor_wheel_callback, 
                     wheel_symbol, A_DEFFLOAT, 0);
+
+    /* methods for setting the cursor icon */
+    class_addmethod(cursor_class, (t_method)cursor_setmethod, 
+                    gensym("runmode_nothing"), A_GIMME, 0);
+    class_addmethod(cursor_class, (t_method)cursor_setmethod, 
+                    gensym("runmode_clickme"), A_GIMME, 0);
+    class_addmethod(cursor_class, (t_method)cursor_setmethod, 
+                    gensym("runmode_thicken"), A_GIMME, 0);
+    class_addmethod(cursor_class, (t_method)cursor_setmethod, 
+                    gensym("runmode_addpoint"), A_GIMME, 0);
+    class_addmethod(cursor_class, (t_method)cursor_setmethod, 
+                    gensym("editmode_nothing"), A_GIMME, 0);
+    class_addmethod(cursor_class, (t_method)cursor_setmethod, 
+                    gensym("editmode_connect"), A_GIMME, 0);
+    class_addmethod(cursor_class, (t_method)cursor_setmethod, 
+                    gensym("editmode_disconnect"), A_GIMME, 0);
 }
