@@ -1,0 +1,50 @@
+#N canvas 36 70 917 494 10;
+#X obj 377 470 print postgres;
+#X msg 36 186 sql DROP DATABASE pddbase sqlend;
+#X msg 79 87 sql CREATE DATABASE pddbase sqlend;
+#X text 69 44 1 Create a new database - by first;
+#X text 86 61 connecting to PostgreSQL's default database: 'template1'
+;
+#X text 479 56 to the newly created 'pddbase' database;
+#X text 461 40 2 Create a new table in the database - this time connecting
+;
+#X text 467 114 3 Insert some data. Each click of the message below
+;
+#X text 484 132 inserts a new row into the specified table.;
+#X text 471 228 4 Retrieve all data in the specified table using a
+wild;
+#X text 32 208 click this to destroy the database;
+#X msg 456 79 sql CREATE TABLE datatable(id INTEGER \, duration FLOAT
+\, type VARCHAR \, datetime DATETIME) sqlend;
+#X text 487 242 card '*'. Note each row returned is preceded by an
+index;
+#X text 484 300 Also show the degree of error;
+#X msg 466 318 sql SELECT id \, ABS((duration - 1500)/1500) AS error
+FROM datatable ORDER BY error LIMIT 1 sqlend;
+#X text 470 288 5 Find the 'id' of entry closest to 1500 msec in duration.
+;
+#X msg 466 150 sql INSERT INTO datatable VALUES(22 \, 1023.33 \, 'singing'
+\, datetime('now'::date \, 'now'::time)) sqlend \, sql INSERT INTO
+datatable VALUES(24 \, 1500.1 \, 'coughing' \, datetime('now'::date
+\, 'now'::time)) sqlend \, sql INSERT INTO datatable VALUES(26 \, 2222.11
+\, 'sobbing' \, datetime('now'::date \, 'now'::time)) sqlend;
+#X text 56 350 example of sqlsingle specifying;
+#X text 57 366 host machine and port;
+#X text 9 9 sqlsingle. Follow the numbered steps;
+#X obj 500 393 route 0 1 2 3 4 5 6 7 8;
+#X text 649 392 use route to separate indexed 'tuples';
+#X obj 500 428 unpack 0 0 s s;
+#X text 596 428 use unpack to access individual fields;
+#X msg 470 262 sql select * from datatable WHERE id < 30 sqlend;
+#X obj 96 137 psql template1;
+#X obj 57 330 psql pddbase localhost 5432;
+#X obj 377 365 psql pddbase;
+#X connect 1 0 25 0;
+#X connect 2 0 25 0;
+#X connect 11 0 27 0;
+#X connect 14 0 27 0;
+#X connect 16 0 27 0;
+#X connect 20 0 22 0;
+#X connect 24 0 27 0;
+#X connect 27 0 20 0;
+#X connect 27 0 0 0;
