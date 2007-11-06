@@ -22,6 +22,7 @@
 #include <string.h>
 
 /* TODO: get Ctrl-A working to select all */
+/* TODO: make Ctrl-w bind to window close on parent canvas */
 /* TODO: make [size( message redraw object */
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: complete inlet draw/erase logic */
@@ -291,7 +292,6 @@ static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
         sys_vgui(".x%x.c coords %xS %d %d\n", canvas, x,
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
     }
-    post("canvas: %d  glist: %d", canvas->gl_edit, glist->gl_edit); 
     if( (x->x_glist->gl_edit) && (canvas == x->x_glist) )
         draw_inlets(x, glist, firsttime, 1,2);
     else
@@ -571,11 +571,11 @@ static void entry_save(t_gobj *z, t_binbuf *b)
 {
     t_entry *x = (t_entry *)z;
     
-    binbuf_addv(b, "ssiisiiss", gensym("#X"),gensym("obj"),
+    binbuf_addv(b, "ssiisiiss;", &s__X, gensym("obj"),
                 x->x_obj.te_xpix, x->x_obj.te_ypix, 
                 atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
                 x->x_width, x->x_height, x->x_bgcolour, x->x_fgcolour);
-    binbuf_addv(b, ";");
+/*     binbuf_addv(b, ";"); */
 }
 
 
@@ -788,7 +788,7 @@ void entry_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
     
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.22 $ $Date: 2007-10-30 03:59:52 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.23 $ $Date: 2007-11-06 06:13:16 $");
 }
 
 
