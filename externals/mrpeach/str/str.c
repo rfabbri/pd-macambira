@@ -6,7 +6,7 @@
 #include <errno.h>
 #include "m_pd.h"
 
-#ifndef PD_STRINGS /* PD_STRINGS is not defined in m_pd.h: No PD string support: Make a dummy str object */
+#ifndef PD_BLOBS /* PD_BLOBS is not defined in m_pd.h: No PD blob support: Make a dummy str object */
 typedef struct _str
 {
     t_object        x_obj;
@@ -30,7 +30,7 @@ void str_setup(void)
 {
     str_class = class_new(gensym("str"), (t_newmethod)str_new, 0, sizeof(t_str), 0, 0);
 }
-#else //ifndef PD_STRINGS
+#else //ifndef PD_BLOBS
 /* Make a _real_ str object: */
 
 typedef enum
@@ -56,11 +56,11 @@ typedef struct _str
     t_object        x_obj;
     t_float         x_nsplit;
     str_function    x_function;
-    t_string        x_buf;
-    t_string        x_string_in1;
-    t_string        x_string_in2;
-    t_string        x_string_out1;
-    t_string        x_string_out2;
+    t_blob        x_buf;
+    t_blob        x_string_in1;
+    t_blob        x_string_in2;
+    t_blob        x_string_out1;
+    t_blob        x_string_out2;
     t_atom          *x_atom_list;
     size_t          x_atom_list_end;
     size_t          x_buf_end;
@@ -74,11 +74,11 @@ typedef struct _str
     size_t          x_atom_list_length;
 } t_str;
 
-//typedef struct _string /* pointer to a string */
+//typedef struct _blob /* pointer to a blob */
 //{
-//   unsigned long s_length; /* length of string in bytes */
-//   unsigned char *s_data; /* pointer to 1st byte of string */
-//} t_string;
+//   unsigned long s_length; /* length of blob in bytes */
+//   unsigned char *s_data; /* pointer to 1st byte of blob */
+//} t_blob;
 
 static t_class *str_class;
 
@@ -94,9 +94,9 @@ static void str_float(t_str *x, t_float f);
 static void str_symbol(t_str *x, t_symbol *s);
 static void str_list(t_str *x, t_symbol *s, int argc, t_atom *argv);
 static void str_anything(t_str *x, t_symbol *s, int argc, t_atom *argv);
-static void str_string(t_str *x, t_string *st);
-static void str_set_string(t_string *dest, t_string *src, size_t *len);
-static void str_buf_to_string(t_str *x, t_string *dest);
+static void str_string(t_str *x, t_blob *st);
+static void str_set_string(t_blob *dest, t_blob *src, size_t *len);
+static void str_buf_to_string(t_str *x, t_blob *dest);
 static void str_float_to_buf(t_str *x, t_float f);
 static void str_str_to_buf (t_str *x, t_atom *a);
 static void str_symbol_to_buf(t_str *x, t_atom *a);
@@ -104,7 +104,7 @@ static void str_list_to_buf(t_str *x, t_atom *a, int n);
 static void str_set(t_str *x, t_symbol *s, int argc, t_atom *argv);
 static void str_fread(t_str *x, t_symbol *s, int argc, t_atom *argv);
 static void str_fwrite(t_str *x, t_symbol *s, int argc, t_atom *argv);
-static void str_set_second(t_str *x, t_string *st);
+static void str_set_second(t_str *x, t_blob *st);
 static int str_equal(t_str *x);
 static void str_join(t_str *x);
 static void str_add(t_str *x);
@@ -271,7 +271,7 @@ static void str_list_to_buf(t_str *x, t_atom *a, int n)
 
     for (j = 0; j < n; ++j)
     { /* concatenate all arguments into a single string */
-        if (a[j].a_type == A_STRING)
+        if (a[j].a_type == A_BLOB)
         { /* already a string */
             str_str_to_buf(x, &a[j]);
         }
@@ -292,10 +292,10 @@ static void str_str_to_buf (t_str *x, t_atom *a)
 {
     size_t len, limit, i, j;
     char *cP = (char *)x->x_buf.s_data + x->x_buf_end;
-    t_string *str = atom_getstring(a);
+    t_blob *str = atom_getblob(a);
     if (str == NULL)
     {
-        post ("str_str_to_buf: null string. Need a string to point to....");
+        post ("str_str_to_buf: null blob. Need a blob to point to....");
         return;
     }
     limit = x->x_buf.s_length - x->x_buf_end;
@@ -309,7 +309,7 @@ static void str_symbol_to_buf(t_str *x, t_atom *a)
 /* Convert symbol to string in x->x_buf.s_data at offset x->x_buf_end,
 * increment x->x_buf_end by the number of chars added to x->x_buf.s_data*/
 {                                                                                                                               char *cP = (char *)x->x_buf.s_data + x->x_buf_end;
-    atom_string(a, cP, x->x_buf.s_length-x->x_buf_end);
+    atom_blob(a, cP, x->x_buf.s_length-x->x_buf_end);
     x->x_buf_end += strlen(cP);
 }
 
@@ -334,7 +334,7 @@ static void str_float_to_buf(t_str *x, t_float f)
         x->x_buf_end += sprintf((char *)&x->x_buf.s_data[x->x_buf_end], "%f", f);
  }
 
-static void str_buf_to_string(t_str *x, t_string *dest)
+static void str_buf_to_string(t_str *x, t_blob *dest)
 /* copy x->x_buf_end bytes of x->x_buf.s_data into dest */
 {
     size_t      i, limit;
@@ -350,7 +350,7 @@ static void str_buf_to_string(t_str *x, t_string *dest)
     return;
 }
 
-static void str_set_string(t_string *dest, t_string *src, size_t *len)
+static void str_set_string(t_blob *dest, t_blob *src, size_t *len)
 /* Copy src into dest up to the shorter of dest->s_length and src->s_length
 *  and set len to number of bytes copied */
 {
@@ -457,17 +457,17 @@ static void str_set(t_str *x, t_symbol *s, int argc, t_atom *argv)
     else if ((x->x_function == nth) || (x->x_function == string)) outlet_float(x->x_outlet_2, x->x_string_in1_end);
 }
 
-static void str_set_second(t_str *x, t_string *st)
-{ /* Inlet 2 accepts strings only: Set string_in2 */
+static void str_set_second(t_str *x, t_blob *st)
+{ /* Inlet 2 accepts blobs only: Set string_in2 */
     /*post("x=%p str_set_second(%p): %s %p %lu",
         x, &str_set_second, str_function_names[x->x_function], st, st->s_length);*/
     str_set_string(&x->x_string_in2, st, &x->x_string_in2_end);
     if ((x->x_function == add)||(x->x_function == join)) outlet_float(x->x_outlet_2, x->x_string_in2_end);
 }
 
-static void str_string(t_str *x, t_string *st)
+static void str_string(t_str *x, t_blob *st)
 {
-    /*post("x=%p str_string (%p) string %p %lu", x, &str_string, st, st->s_length);*/
+    /*post("x=%p str_string (%p) blob %p %lu", x, &str_string, st, st->s_length);*/
     str_set_string(&x->x_string_in1, st, &x->x_string_in1_end);
     if (x->x_function == drip) x->x_nsplit = 0L;
     str_do_string(x);
@@ -532,7 +532,7 @@ static void str_do_out0(t_str *x)
     size_t  true_length = x->x_string_in1.s_length;
     x->x_string_in1.s_length = x->x_string_in1_end;
 //    post("str_do_out0: x->x_string_in1.s_data[0] = %d", x->x_string_in1.s_data[0]);
-    outlet_string(x->x_outlet_1, &x->x_string_in1);
+    outlet_blob(x->x_outlet_1, &x->x_string_in1);
     x->x_string_in1.s_length = true_length;
 }
 
@@ -542,7 +542,7 @@ static void str_do_out0(t_str *x)
    size_t  true_length = x->x_string_out1.s_length;
     x->x_string_out1.s_length = x->x_string_out1_end;
 //    post("str_do_out1: x->x_string_out1.s_data[0] = %d", x->x_string_out1.s_data[0]);
-    outlet_string(x->x_outlet_1, &x->x_string_out1);
+    outlet_blob(x->x_outlet_1, &x->x_string_out1);
     x->x_string_out1.s_length = true_length;
 }
 
@@ -552,7 +552,7 @@ static void str_do_out2(t_str *x)
     size_t  true_length = x->x_string_out2.s_length;
     x->x_string_out2.s_length = x->x_string_out2_end;
 //    post("str_do_out2: x->x_string_out2.s_data[0] = %d", x->x_string_out2.s_data[0]);
-    outlet_string(x->x_outlet_2, &x->x_string_out2);
+    outlet_blob(x->x_outlet_2, &x->x_string_out2);
     x->x_string_out2.s_length = true_length;
 }
 
@@ -563,7 +563,7 @@ static void str_do_out3(t_str *x)
 /* so we temporarily replace s_length with string end. */
     size_t  true_length = x->x_string_in2.s_length;
     x->x_string_in2.s_length = x->x_string_in2_end;
-    outlet_string(x->x_outlet_1, &x->x_string_in2);
+    outlet_blob(x->x_outlet_1, &x->x_string_in2);
     x->x_string_in2.s_length = true_length;
 }
 
@@ -682,7 +682,7 @@ static void *str_new(t_symbol *s, int argc, t_atom *argv)
     next = 0; /* index of next argument */
     if (argv[0].a_type == A_SYMBOL)
     { /* the first argument may be a selector */
-        atom_string(&argv[0], (char *)x->x_buf.s_data, MAXPDSTRING);
+        atom_blob(&argv[0], (char *)x->x_buf.s_data, MAXPDSTRING);
         for (i = 0; i < n_functions; ++i)
         {
             if (strcmp((char *)x->x_buf.s_data, str_function_names[i]) == 0)
@@ -712,7 +712,7 @@ static void *str_new(t_symbol *s, int argc, t_atom *argv)
     }
     else if ((x->x_function == join)||(x->x_function == compare)||(x->x_function == add))
     { /* argument goes to string_in2, add a string inlet */
-        x->x_inlet_2 = inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_string, gensym("")); /* gensym("string") */
+        x->x_inlet_2 = inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_blob, gensym("")); /* gensym("blob") */
         str_list_to_buf(x, &argv[next], argc-next);
         x->x_string_in2_end = x->x_buf_end;
         str_buf_to_string(x, &x->x_string_in2);
@@ -737,12 +737,12 @@ void str_setup(void)
     class_addsymbol(str_class, str_symbol);
     class_addlist(str_class, str_list);
     class_addanything(str_class, str_anything);
-    class_addstring(str_class, str_string);
+    class_addblob(str_class, str_string);
     class_addmethod(str_class, (t_method)str_set, gensym("set"), A_GIMME, 0);
     class_addmethod(str_class, (t_method)str_fread, gensym("file_read"), A_GIMME, 0);
     class_addmethod(str_class, (t_method)str_fwrite, gensym("file_write"), A_GIMME, 0);
-    class_addmethod(str_class, (t_method)str_set_second, gensym(""), A_STRING, 0);
+    class_addmethod(str_class, (t_method)str_set_second, gensym(""), A_BLOB, 0);
 }
-#endif // ifndef PD_STRINGS
+#endif // ifndef PD_BLOBS
 /* end str.c */
 
