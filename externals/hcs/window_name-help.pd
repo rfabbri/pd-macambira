@@ -1,0 +1,20 @@
+#N canvas 431 431 476 365 10;
+#X obj 175 202 sys_gui;
+#X symbolatom 290 96 0 0 0 0 - - -;
+#X obj 274 27 loadbang;
+#X obj 175 143 pack float symbol;
+#X obj 110 83 hsl 128 15 0.1 1 1 1 empty empty window_alpha -2 -8 0
+10 -204800 -1 -1 12700 1;
+#X floatatom 107 118 5 0 0 0 - - -;
+#X msg 175 172 wm attributes \$2 -alpha \$1;
+#X text 43 256 for more options:;
+#X obj 62 279 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/wm.htm;
+#X text 164 229 alpha does not work with X11 :(;
+#X obj 274 64 window_name;
+#X connect 2 0 10 0;
+#X connect 3 0 6 0;
+#X connect 4 0 3 0;
+#X connect 4 0 5 0;
+#X connect 6 0 0 0;
+#X connect 10 0 3 1;
+#X connect 10 0 1 0;
