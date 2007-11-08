@@ -68,7 +68,7 @@ static void n_CLNLMS_tilde_tick(t_n_CLNLMS_tilde *x)
 
 static t_float *n_CLNLMS_tilde_check_array(t_symbol *array_sym_name, t_int length)
 {
-  t_int n_points;
+  int n_points;
   t_garray *a;
   t_float *vec;
   
@@ -399,7 +399,8 @@ static void *n_CLNLMS_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
 {
   t_n_CLNLMS_tilde *x = (t_n_CLNLMS_tilde *)pd_new(n_CLNLMS_tilde_class);
   char buffer[400];
-  t_int i, n_order=39, n_io=1;
+  int i;
+  t_int n_order=39, n_io=1;
   t_symbol    *w_name;
   t_float beta=0.1f;
   t_float gamma=0.00001f;

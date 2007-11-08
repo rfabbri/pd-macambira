@@ -21,7 +21,7 @@ noisternig_AT_iem.at; musil_AT_iem.at
 
 /* ----------------------- NLMSCC~ ------------------------------ */
 /* -- Normalized Least Mean Square (linear adaptive FIR-filter) -- */
-/* --   with Coefficient Constraint
+/* --   with Coefficient Constraint  -- */
 /* -- first input:  reference signal -- */
 /* -- second input: desired signal -- */
 /* --  -- */
@@ -61,7 +61,7 @@ static void NLMSCC_tilde_tick(t_NLMSCC_tilde *x)
 
 static t_float *NLMSCC_tilde_check_array(t_symbol *array_sym_name, t_int length)
 {
-    t_int n_points;
+    int n_points;
     t_garray *a;
     t_float *vec;
 

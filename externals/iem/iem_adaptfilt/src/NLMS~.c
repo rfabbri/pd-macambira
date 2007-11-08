@@ -49,7 +49,7 @@ t_class *NLMS_tilde_class;
 
 static t_float *NLMS_tilde_check_array(t_symbol *array_sym_name, t_int length)
 {
-    t_int n_points;
+    int n_points;
     t_garray *a;
     t_float *vec;
 
