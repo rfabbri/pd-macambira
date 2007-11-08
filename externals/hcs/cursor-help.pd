@@ -1,4 +1,4 @@
-#N canvas 309 199 638 505 10;
+#N canvas 121 272 642 509 10;
 #X obj 136 401 pddp/print;
 #X obj 95 342 tgl 15 0 empty empty empty 0 -6 0 10 -262144 -1 -1 0
 1;
@@ -6,10 +6,10 @@
 #X msg 70 318 bang;
 #X text 111 339 poll the mouse pointer position;
 #X text 101 318 get the current mouse position;
-#X obj 163 26 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/cursors.htm
+#X obj 346 278 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/cursors.htm
 ;
-#X text 48 9 Here's a complete list of the available cursors:;
-#X msg 169 229 runmode_clickme dot;
+#X text 231 261 Here's a complete list of the available cursors:;
+#X msg 169 229 runmode_disconnect gumby;
 #X msg 322 151 boat;
 #X msg 282 151 clock;
 #X msg 428 151 dot;
@@ -18,7 +18,7 @@
 #X msg 357 151 coffee_mug;
 #X msg 458 151 pirate;
 #X msg 42 44 runmode_nothing;
-#N canvas 0 22 454 304 make 0;
+#N canvas 0 22 462 312 make 0;
 #X obj 95 9 inlet;
 #X obj 114 258 outlet;
 #X obj 116 168 pack symbol symbol;
@@ -46,15 +46,19 @@
 #X msg 110 120 editmode_nothing;
 #X msg 126 139 runmode_connect;
 #X msg 143 158 runmode_disconnect;
-#X text 201 81 <-- choose your cursor mode;
 #X text 312 128 now pick a cursor:;
 #X obj 169 266 cursor;
 #X text 295 229 <-- this is the actual message to send;
+#X obj 25 244 metro 100;
+#X obj 25 218 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 15 18 set your mouse cursors for this patch:;
+#X text 201 81 <-- choose your cursor mode;
 #X connect 1 0 2 0;
 #X connect 2 0 21 0;
 #X connect 2 1 0 0;
 #X connect 3 0 2 0;
-#X connect 8 0 27 0;
+#X connect 8 0 26 0;
 #X connect 9 0 17 1;
 #X connect 10 0 17 1;
 #X connect 11 0 17 1;
@@ -70,3 +74,5 @@
 #X connect 22 0 17 0;
 #X connect 23 0 17 0;
 #X connect 24 0 17 0;
+#X connect 28 0 2 0;
+#X connect 29 0 28 0;

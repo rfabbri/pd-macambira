@@ -79,7 +79,7 @@ static void cursor_free(t_cursor *x)
     //TODO free the "bind all"
 }
 
-static void *cursor_new(t_symbol *s)
+static void *cursor_new(void)
 {
     char buf[MAXPDSTRING];
     t_cursor *x = (t_cursor *)pd_new(cursor_class);
@@ -92,11 +92,11 @@ static void *cursor_new(t_symbol *s)
 	x->data_outlet = outlet_new(&x->x_obj, 0);
 	x->status_outlet = outlet_new(&x->x_obj, 0);
 
-    sys_vgui("bind all <ButtonPress> {+pd [concat %s button %%b 1 \\;]}\n",
+    sys_vgui("bind . <ButtonPress> {+pd [concat %s button %%b 1 \\;]}\n",
              x->receive_symbol->s_name);
-    sys_vgui("bind all <ButtonRelease> {+pd [concat %s button %%b 0 \\;]}\n",
+    sys_vgui("bind . <ButtonRelease> {+pd [concat %s button %%b 0 \\;]}\n",
              x->receive_symbol->s_name);
-    sys_vgui("bind all <MouseWheel> {+pd [concat %s wheel %%D \\;]}\n",
+    sys_vgui("bind . <MouseWheel> {+pd [concat %s wheel %%D \\;]}\n",
              x->receive_symbol->s_name);
 
     return(x);
