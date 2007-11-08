@@ -68,6 +68,29 @@ static void iem_sel_any_add(t_iem_sel_any *x, t_symbol *s, int ac, t_atom *av)
   }
 }
 
+static void iem_sel_any_set_item_name(t_iem_sel_any *x, t_symbol *s, int ac, t_atom *av)
+{
+  if((ac >= 2) && (IS_A_FLOAT(av, 1)))
+  {
+    int i = (int)atom_getintarg(1, ac, av);
+    
+    if((i >= 0) && (i < x->x_max_ac))
+    {
+      if(IS_A_SYMBOL(av, 0))
+        x->x_any[i] = atom_getsymbolarg(0, ac, av);
+      else if(IS_A_FLOAT(av, 0))
+      {
+        char str[100];
+        
+        sprintf(str, "%g", atom_getfloatarg(0, ac, av));
+        x->x_any[i] = gensym(str);
+      }
+      if(i >= x->x_ac)
+        x->x_ac = i+1;
+    }
+  }
+}
+
 static void iem_sel_any_clear(t_iem_sel_any *x)
 {
   x->x_ac = 0;
@@ -102,6 +125,7 @@ void iem_sel_any_setup(void)
   iem_sel_any_class = class_new(gensym("iem_sel_any"), (t_newmethod)iem_sel_any_new,
     (t_method)iem_sel_any_free, sizeof(t_iem_sel_any), 0, A_DEFFLOAT, 0);
   class_addmethod(iem_sel_any_class, (t_method)iem_sel_any_add, gensym("add"), A_GIMME, 0);
+  class_addmethod(iem_sel_any_class, (t_method)iem_sel_any_set_item_name, gensym("set_item_name"), A_GIMME, 0);
   class_addmethod(iem_sel_any_class, (t_method)iem_sel_any_clear, gensym("clear"), 0);
   class_addfloat(iem_sel_any_class, (t_method)iem_sel_any_float);
 //  class_sethelpsymbol(iem_sel_any_class, gensym("iemhelp/help-iem_sel_any"));
