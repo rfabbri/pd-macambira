@@ -5,6 +5,7 @@ Installation/Compilation instructions for "iemmatrix"
 1) linux (and other autoconf-systems):
 ======================================
 	"cd" into iemmatrix/src/
+	run "aclocal"
 	run "autoconf"
 	run "./configure" (see "./configure --help" for valid options)
 	run "make"
@@ -22,7 +23,8 @@ Installation/Compilation instructions for "iemmatrix"
 ============
 	there is nothing special in the code, so it should compile out of the box:
 	"cd" to iemmatrix/src
-	run "autoconf; ./configure; make" (for further details please see "1) linux")
+	run "aclocal; autoconf; ./configure; make" (for further details please see "1) linux")
+	(e.g. "./configure --with-pd=/Applications/Pd.app/Contents/Resources")
 
 3) irix:
 ========
