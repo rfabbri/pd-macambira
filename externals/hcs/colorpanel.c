@@ -16,8 +16,6 @@ typedef struct _colorpanel
 
 static void colorpanel_bang(t_colorpanel *x)
 {
-    DEBUG(post("pd [concat %s callback [tk_chooseColor -initialcolor %s] \\;]\n", 
-               x->x_s->s_name, x->current_color););
     sys_vgui("pd [concat %s callback [tk_chooseColor -initialcolor %s] \\;]\n", 
              x->x_s->s_name, x->current_color);
 }
