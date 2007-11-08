@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemgui written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iemgui written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2007 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -312,8 +312,7 @@ static void sym_dial_save(t_gobj *z, t_binbuf *b)
   iemgui_save(&x->x_gui, srl, bflcol);
   binbuf_addv(b, "ssiisiiiisssiiiiiiiii", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
-    x->x_gui.x_w, x->x_gui.x_h,
+    gensym("sdl"), x->x_gui.x_w, x->x_gui.x_h,
     iem_symargstoint(&x->x_gui.x_isa), x->x_snd_flt0_sym1,
     srl[0], srl[1], srl[2],
     x->x_gui.x_ldx, x->x_gui.x_ldy,
@@ -339,8 +338,7 @@ static void sym_dial_save(t_gobj *z, t_binbuf *b)
   ip2 = (int *)(&x->x_gui.x_fsf);
   binbuf_addv(b, "ssiisiiiisssiiiiiiiii", gensym("#X"),gensym("obj"),
     (t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
-    atom_getsymbol(binbuf_getvec(x->x_gui.x_obj.te_binbuf)),
-    x->x_gui.x_w, x->x_gui.x_h,
+    gensym("sdl"), x->x_gui.x_w, x->x_gui.x_h,
     (*ip1)&IEM_INIT_ARGS_ALL, x->x_snd_flt0_sym1,
     srl[0], srl[1], srl[2],
     x->x_gui.x_ldx, x->x_gui.x_ldy,
@@ -582,6 +580,32 @@ static void sym_dial_loadbang(t_sym_dial *x)
 }
 
 static void sym_dial_set_item_name(t_sym_dial *x, t_symbol *name, t_float findex)
+{
+  int i = (int)findex;
+  
+  if(i < 0)
+    i = 0;
+  else if(i >= x->x_max_ac)
+  {
+    x->x_syms = (t_symbol **)t_resizebytes(x->x_syms, x->x_max_ac * sizeof(t_symbol *),
+      x->x_max_ac * (2*sizeof(t_symbol *)));
+    x->x_max_ac *= 2;
+  }
+  if(i >= x->x_ac)
+  {
+    t_symbol *default_sym=gensym("no_entry");
+    int j;
+    
+    for(j=x->x_ac; j<i; j++)
+      x->x_syms[j] = default_sym;
+    x->x_ac++;
+  }
+  x->x_syms[i] = gensym(name->s_name);
+  if(i == x->x_index)
+    (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
+}
+
+static void sym_dial_add(t_sym_dial *x, t_float findex, t_symbol *name)
 {
   int i = (int)findex;
   
@@ -910,6 +934,7 @@ void sym_dial_setup(void)
   class_addmethod(sym_dial_class, (t_method)sym_dial_send_sym, gensym("send_sym"), 0);
   class_addmethod(sym_dial_class, (t_method)sym_dial_init, gensym("init"), A_FLOAT, 0);
   class_addmethod(sym_dial_class, (t_method)sym_dial_set_item_name, gensym("set_item_name"), A_SYMBOL, A_FLOAT, 0);
+  class_addmethod(sym_dial_class, (t_method)sym_dial_add, gensym("add"), A_FLOAT, A_SYMBOL, 0);
   //    if(!iemgui_key_sym2)
   //    iemgui_key_sym2 = gensym("#keyname");
   sym_dial_widgetbehavior.w_getrectfn =    sym_dial_getrect;
