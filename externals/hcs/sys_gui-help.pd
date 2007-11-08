@@ -1,17 +1,17 @@
-#N canvas 857 104 568 446 10;
-#X obj 69 304 sys_gui;
-#X msg 69 72 menu_doc_browser;
-#X text 178 70 open the help browser;
-#X msg 93 114 set text_color #f0f;
-#X text 222 114 set variables;
-#X msg 123 161 bang;
-#X obj 246 186 colorpanel;
-#X obj 245 161 bng 17 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X text 275 160 choose a color;
-#X text 143 304 DANGER! You can mess up Pd big time with this!! :D
+#N canvas 449 123 590 584 10;
+#X obj 78 223 sys_gui;
+#X msg 27 61 menu_doc_browser;
+#X text 136 59 open the help browser;
+#X msg 51 93 set text_color #f0f;
+#X text 180 93 set variables;
+#X msg 81 120 bang;
+#X obj 304 115 colorpanel;
+#X obj 303 90 bng 17 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 333 89 choose a color;
+#X text 135 225 DANGER! You can mess up Pd big time with this!! :D
 ;
-#X text 18 28 This objects give you the ability to send raw Tcl directly
+#X text -24 17 This objects give you the ability to send raw Tcl directly
 to the Pd GUI process just like C objects do.;
 #N canvas 0 22 454 304 generate 0;
 #X obj 101 15 inlet;
@@ -48,13 +48,74 @@ to the Pd GUI process just like C objects do.;
 #X connect 14 0 15 0;
 #X connect 15 0 1 0;
 #X connect 15 1 1 0;
-#X restore 246 212 pd generate web color;
-#X msg 245 236 set obj_box_fill #a3cfb5;
-#X obj 77 395 pddp/pddplink http://pure-data.cvs.sourceforge.net/pure-data/pd/src
+#X restore 304 141 pd generate web color;
+#X msg 303 165 set obj_box_fill #a3cfb5;
+#X obj 38 302 pddp/pddplink http://pure-data.cvs.sourceforge.net/pure-data/pd/src
 ;
-#X text 63 350 You can find things to mess with by looking thru the
+#X text 24 257 You can find things to mess with by looking thru the
 Pd code \, look for things that have "sys_gui" and "sys_vgui". These
 are Tcl/Tk commands from the pd to the Pg GUI process.;
+#X obj 170 528 sys_gui;
+#X obj 317 425 loadbang;
+#X obj 317 447 canvas_name;
+#X msg 179 433 black;
+#X msg 136 433 green;
+#X obj 33 392 colorpanel;
+#N canvas 685 90 416 325 generate 0;
+#X obj 81 23 inlet;
+#X obj 82 262 outlet;
+#X obj 83 66 unpack float float float;
+#X obj 83 90 * 255;
+#X obj 83 113 int;
+#X obj 83 136 makefilename %x;
+#X obj 183 90 * 255;
+#X obj 183 113 int;
+#X obj 183 136 makefilename %x;
+#X obj 283 90 * 255;
+#X obj 283 113 int;
+#X obj 283 136 makefilename %x;
+#X obj 83 171 pack symbol symbol symbol;
+#X obj 83 195 zexy/makesymbol #%s%s%s;
+#X connect 0 0 2 0;
+#X connect 2 0 3 0;
+#X connect 2 1 6 0;
+#X connect 2 2 9 0;
+#X connect 3 0 4 0;
+#X connect 4 0 5 0;
+#X connect 5 0 12 0;
+#X connect 6 0 7 0;
+#X connect 7 0 8 0;
+#X connect 8 0 12 1;
+#X connect 9 0 10 0;
+#X connect 10 0 11 0;
+#X connect 11 0 12 2;
+#X connect 12 0 13 0;
+#X connect 13 0 1 0;
+#X restore 33 413 pd generate web color;
+#X obj 33 348 bng 35 250 50 0 empty empty empty 17 7 0 10 -204786 -1
+-1;
+#X text -29 325 change the highlight color:;
+#X msg 170 498 \$3 configure -highlightcolor \$1 -highlightthickness
+\$2;
+#X obj 253 370 hsl 128 15 0 127 0 1 empty empty empty -2 -8 0 10 -262144
+-1 -1 500 1;
+#X obj 250 398 int;
+#X floatatom 282 398 5 0 0 0 - - -;
+#N canvas 1009 401 454 304 pak 0;
+#X obj 25 16 inlet;
+#X obj 167 15 inlet;
+#X obj 305 16 inlet;
+#X obj 122 241 outlet;
+#X obj 83 150 pack symbol 0 symbol;
+#X obj 78 69 trigger bang float;
+#X connect 0 0 4 0;
+#X connect 1 0 5 0;
+#X connect 2 0 4 2;
+#X connect 4 0 3 0;
+#X connect 5 0 4 0;
+#X connect 5 1 4 1;
+#X restore 170 469 pd pak ------------------;
+#X obj 179 410 loadbang;
 #X connect 1 0 0 0;
 #X connect 3 0 0 0;
 #X connect 5 0 0 0;
@@ -62,3 +123,16 @@ are Tcl/Tk commands from the pd to the Pg GUI process.;
 #X connect 7 0 6 0;
 #X connect 11 0 12 0;
 #X connect 12 0 0 0;
+#X connect 16 0 17 0;
+#X connect 17 0 28 2;
+#X connect 18 0 28 0;
+#X connect 19 0 28 0;
+#X connect 20 0 21 0;
+#X connect 21 0 28 0;
+#X connect 22 0 20 0;
+#X connect 24 0 15 0;
+#X connect 25 0 26 0;
+#X connect 25 0 27 0;
+#X connect 26 0 28 1;
+#X connect 28 0 24 0;
+#X connect 29 0 18 0;
