@@ -1,0 +1,12 @@
+#N canvas 512 371 345 212 10;
+#X msg 96 69 query concat [info patchlevel];
+#X obj 96 103 toxy/tot .;
+#X obj 96 126 zexy/symbol2list .;
+#X obj 96 151 outlet;
+#X obj 96 42 bang;
+#X obj 96 16 inlet;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 4 0 0 0;
+#X connect 5 0 4 0;

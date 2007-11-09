@@ -1,0 +1,13 @@
+#N canvas 951 522 454 304 10;
+#X obj 127 117 tcl_version;
+#X msg 127 70 bang;
+#X obj 127 157 unpack float float float;
+#X floatatom 126 186 5 0 0 3 major - -;
+#X floatatom 195 185 5 0 0 3 minor - -;
+#X floatatom 267 186 5 0 0 3 bugfix - -;
+#X text 53 21 get the current Tcl/Tk version:;
+#X connect 0 0 2 0;
+#X connect 1 0 0 0;
+#X connect 2 0 3 0;
+#X connect 2 1 4 0;
+#X connect 2 2 5 0;
