@@ -607,6 +607,51 @@ static void iem_vu_ft1(t_iem_vu *x, t_floatarg peak)
   iem_vu_update_peak(x, x->x_gui.x_glist);
 }
 
+static void iem_vu_set(t_iem_vu *x, t_symbol *s, int ac, t_atom *av)
+{
+  t_float rms=-100.0f, peak=-100.0f;
+  int i;
+  
+  if( (ac >= 2) && IS_A_FLOAT(av,0) && IS_A_FLOAT(av,1) )
+  {
+    rms = (t_float)atom_getfloatarg(0, ac, av);
+	peak = (t_float)atom_getfloatarg(1, ac, av);
+  }
+  else if( (ac == 1) && IS_A_FLOAT(av,0) )
+  {
+    rms = (t_float)atom_getfloatarg(0, ac, av);
+	peak = rms;
+  }
+  if(rms <= IEM_VU_MINDB)
+    x->x_rms = 0;
+  else if(rms >= IEM_VU_MAXDB)
+    x->x_rms = IEM_VU_STEPS;
+  else
+  {
+    int i = (int)(2.0*(rms + IEM_VU_OFFSET));
+    x->x_rms = iem_vu_db2i[i];
+  }
+  i = (int)(100.0*rms + 10000.5);
+  rms = 0.01*(t_float)(i - 10000);
+  x->x_fr = rms;
+  
+  if(peak <= IEM_VU_MINDB)
+    x->x_peak = 0;
+  else if(peak >= IEM_VU_MAXDB)
+    x->x_peak = IEM_VU_STEPS;
+  else
+  {
+    int i = (int)(2.0*(peak + IEM_VU_OFFSET));
+    x->x_peak = iem_vu_db2i[i];
+  }
+  i = (int)(100.0*peak + 10000.5);
+  peak = 0.01*(t_float)(i - 10000);
+  x->x_fp = peak;
+  
+  iem_vu_update_rms(x, x->x_gui.x_glist);
+  iem_vu_update_peak(x, x->x_gui.x_glist);
+}
+
 static void iem_vu_bang(t_iem_vu *x)
 {
   outlet_float(x->x_out_peak, x->x_fp);
@@ -813,8 +858,8 @@ void iem_vu_setup(void)
   class_addbang(iem_vu_class, iem_vu_bang);
   class_addfloat(iem_vu_class, iem_vu_float);
   class_addmethod(iem_vu_class, (t_method)iem_vu_ft1, gensym("ft1"), A_FLOAT, 0);
-  class_addmethod(iem_vu_class, (t_method)iem_vu_dialog, gensym("dialog"),
-    A_GIMME, 0);
+  class_addmethod(iem_vu_class, (t_method)iem_vu_set, gensym("set"), A_GIMME, 0);
+  class_addmethod(iem_vu_class, (t_method)iem_vu_dialog, gensym("dialog"), A_GIMME, 0);
   class_addmethod(iem_vu_class, (t_method)iem_vu_size, gensym("size"), A_GIMME, 0);
   class_addmethod(iem_vu_class, (t_method)iem_vu_scale, gensym("scale"), A_DEFFLOAT, 0);
   class_addmethod(iem_vu_class, (t_method)iem_vu_delta, gensym("delta"), A_GIMME, 0);
