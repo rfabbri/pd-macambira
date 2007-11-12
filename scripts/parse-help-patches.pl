@@ -62,47 +62,49 @@ my $platform = "";
 my $operatingSystem = "";
 my $language = "";
 my $dataType = "";
-my $distributions = "";
+my $distribution = "";
 my $status = "";
+my $caption = "";
 
 
 #------------------------------------------------------------------------------#
-# Turkish
-
 # wikipedia terms
-$stub = "Taslak";
-$template = "Şablon";
-$category = "Kategori";
-$infobox = "Bilgi Kutusu";
+$stub = "Ébauche";
+$template = "Modèle";
+$category = "Catégorie";
+$infobox = "Infobox";
 
 # pdpedia terms
-$objectclass = "Nesne Sınıfı";
+$objectclass = "Classe d'objets";
 
 # page headers
-$inlets = "Girişler";
-$outlets = "Çıkışlar";
-$arguments = "Argümanlar";
-$messages = "Mesajlar";
+$inlets = "Entrées";
+$outlets = "Sorties";
+$arguments = "Arguments";
+$messages = "Messages";
 
 # infobox
-$name = "İsim";
-$description = "Açıklama";
-$abbreviation = "Kısaltma";
-$library = "Kütüphane";
-$author = "Yazar";
-$developer = "Geliştirici";
-$releaseVersion = "Versiyon";
-$releaseDate = "Yayım Tarihi";
-$dependencies = "Bağımlılıklar";
-$license = "Lisans";
-$website = "Web Sitesi";
-$programmingLanguage = "Programlama Dili";
-$platform = "Platform";
-$operatingSystem = "İşletim Sistemi";
-$language = "Lisan";
-$dataType = "Veri Tipi";
-$distributions = "Dağıtımlar";
-$status = "Durum";
+$name = "Nom";
+$description = "Description";
+$abbreviation = "Abréviation";
+$library = "Bibliothèque";
+$author = "Auteur";
+$developer = "Développeur";
+$releaseVersion = "Version";
+$releaseDate = "Date";
+$dependencies = "Dépendances";
+$license = "Licence";
+$website = "Site Web";
+$programmingLanguage = "Langage de programmation";
+$platform = "Plateforme";
+$operatingSystem = "Système d'exploitation";
+$language = "Langue";
+$dataType = "Type de données";
+$distribution = "Distribution";
+
+$status = "État";
+$caption = "Légende";
+$language = "Langue";
 
 #------------------------------------------------------------------------------#
 # PARSE CSV
@@ -206,7 +208,7 @@ foreach (`/sw/bin/find /Users/hans/Desktop/TODO/wiki_files_hacked/5.reference/ -
 	 print(OBJECTCLASS "| $website                = {{$libraryName " . lc(${website}) . "}}\n");
 	 print(OBJECTCLASS "| $releaseVersion         = {{$libraryName " . lc(${releaseVersion}) . "}}\n");
 	 print(OBJECTCLASS "| $releaseDate            = {{$libraryName " . lc(${releaseDate}) . "}}\n");
-	 print(OBJECTCLASS "| $distributions          = {{$libraryName " . lc(${distributions}) . "}}\n");
+	 print(OBJECTCLASS "| $distribution           = {{$libraryName " . lc(${distribution}) . "}}\n");
 	 print(OBJECTCLASS "| $platform               = [[GNU/Linux]], [[Mac OS X]], [[Windows]]\n");
 	 print(OBJECTCLASS "}}\n\n");
 #	 print(OBJECTCLASS "\n$printText\n\n\n");
@@ -224,7 +226,7 @@ foreach (`/sw/bin/find /Users/hans/Desktop/TODO/wiki_files_hacked/5.reference/ -
 	 print(OBJECTCLASS "[[de:$pageName]]\n");
 	 print(OBJECTCLASS "[[en:$pageName]]\n");
 	 print(OBJECTCLASS "[[es:$pageName]]\n");
-	 print(OBJECTCLASS "[[fr:$pageName]]\n");
+#	 print(OBJECTCLASS "[[fr:$pageName]]\n");
 	 print(OBJECTCLASS "[[nl:$pageName]]\n");
 	 print(OBJECTCLASS "[[pt:$pageName]]\n");
 	 print(OBJECTCLASS "[[ru:$pageName]]\n");
