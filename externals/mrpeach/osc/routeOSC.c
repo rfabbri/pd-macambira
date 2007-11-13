@@ -166,7 +166,7 @@ static void *routeOSC_new(t_symbol *s, int argc, t_atom *argv)
 
     if (argc > MAX_NUM)
     {
-        post("* routeOSC: too many arguments: %ld (max %ld)", argc, MAX_NUM);
+        error("* routeOSC: too many arguments: %ld (max %ld)", argc, MAX_NUM);
         return 0;
     }
     x->x_num = 0;
@@ -195,12 +195,12 @@ static void *routeOSC_new(t_symbol *s, int argc, t_atom *argv)
         }
         else if (argv[i].a_type == A_FLOAT)
         {
-            post("* routeOSC: float arguments are not OK.");
+            error("* routeOSC: float arguments are not OK.");
             return 0;
         }
         else
         {
-            post("* routeOSC: unrecognized argument type!");
+            error("* routeOSC: unrecognized argument type!");
             return 0;
         }
     }
@@ -219,19 +219,19 @@ static void routeOSC_set(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
 
 	if (argc > x->x_num)
     {
-        post ("routeOSC: too many paths");
+        pd_error (x, "routeOSC: too many paths");
         return;
     }
     for (i = 0; i < argc; ++i)
     {
         if (argv[i].a_type != A_SYMBOL)
         {
-            post ("routeOSC: path %d not a symbol", i);
+            pd_error (x, "routeOSC: path %d not a symbol", i);
             return;
         }
         if (argv[i].a_w.w_symbol->s_name[0] != '/')
         {
-            post ("routeOSC: path %d doesn't start with /", i);
+            pd_error (x, "routeOSC: path %d doesn't start with /", i);
             return;
         }
     }
@@ -246,22 +246,27 @@ static void routeOSC_set(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
 
 static void routeOSC_list(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
-    if (argc > 0 && argv[0].a_type == A_SYMBOL)
+    if(argc < 1)
     {
+      pd_error(x, "* routeOSC: ignoring empty list...");
+      return;
+    }
+    if (argv[0].a_type == A_SYMBOL)
+    { 
         /* Ignore the fact that this is a "list" */
         routeOSC_doanything(x, argv[0].a_w.w_symbol, argc-1, argv+1);
     }
     else
     {
-        // post("* OSC-route: invalid list beginning with a number");
+        // pd_error(x, "* OSC-route: invalid list beginning with a number");
         // output on unmatched outlet jdl 20020908
         if (argv[0].a_type == A_FLOAT)
         {
-            outlet_float(x->x_outlets[x->x_num], argv[0].a_w.w_float);
+          outlet_float(x->x_outlets[x->x_num], atom_getfloat(argv));
         }
         else
         {
-            post("* routeOSC: unrecognized atom type!");
+          pd_error(x, "* routeOSC: unrecognized atom type!");
         }
     }
 }
@@ -276,7 +281,7 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
     pattern = s->s_name;
     if (pattern[0] != '/')
     {
-        post("* routeOSC: invalid message pattern %s does not begin with /", s->s_name);
+        pd_error(x, "* routeOSC: invalid message pattern %s does not begin with /", s->s_name);
         outlet_anything(x->x_outlets[x->x_num], s, argc, argv);
         return;
     }
@@ -319,7 +324,7 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
                     }
                     else
                     {
-                        post("* routeOSC: unrecognized atom type!");
+                        pd_error(x, "* routeOSC: unrecognized atom type!");
                     }
                 }
             }
@@ -399,7 +404,7 @@ static int PatternMatch (const char *  pattern, const char * test)
             return PatternMatch (pattern, test+1);
         case ']':
         case '}':
-			post("routeOSC: Spurious %c in pattern \".../%s/...\"",pattern[0], theWholePattern);
+			      error("routeOSC: Spurious %c in pattern \".../%s/...\"",pattern[0], theWholePattern);
             return 0;
         case '[':
             return MatchBrackets (pattern,test);
@@ -425,7 +430,7 @@ static int MatchBrackets (const char *pattern, const char *test)
 
     if (pattern[1] == 0) 
     {
-        post("routeOSC: Unterminated [ in pattern \".../%s/...\"", theWholePattern);
+        error("routeOSC: Unterminated [ in pattern \".../%s/...\"", theWholePattern);
         return 0;
     }
     if (pattern[1] == '!')
@@ -437,7 +442,7 @@ static int MatchBrackets (const char *pattern, const char *test)
     {
         if (*p == 0) 
         {
-            post("Unterminated [ in pattern \".../%s/...\"", theWholePattern);
+            error("Unterminated [ in pattern \".../%s/...\"", theWholePattern);
             return 0;
         }
         if (p[1] == '-' && p[2] != 0) 
@@ -462,7 +467,7 @@ advance:
     {
         if (*p == 0) 
         {
-            post("Unterminated [ in pattern \".../%s/...\"", theWholePattern);
+            error("Unterminated [ in pattern \".../%s/...\"", theWholePattern);
             return 0;
         }
         p++;
@@ -478,7 +483,7 @@ static int MatchList (const char *pattern, const char *test)
     {
         if (*restOfPattern == 0) 
         {
-            post("Unterminated { in pattern \".../%s/...\"", theWholePattern);
+            error("Unterminated { in pattern \".../%s/...\"", theWholePattern);
             return 0;
         }
     }
