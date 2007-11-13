@@ -27,7 +27,7 @@
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: complete inlet draw/erase logic */
 /* TODO: unbind text from all key events when selected */
-/* TODO: allow moving by clicking and draging */
+/* TODO: handle scrollbar when resizing */
 /* TODO: sort out x_height/x_width vs. x_rect_height/x_rect_width */
 
 #ifdef _MSC_VER
@@ -41,8 +41,8 @@
 
 #define BACKGROUNDCOLOR "grey70"
 
-#define TKW_HANDLE_HEIGHT 10
-#define TKW_HANDLE_WIDTH 10
+#define TKW_HANDLE_HEIGHT 15
+#define TKW_HANDLE_WIDTH 15
 
 #define SCOPE_SELBDWIDTH     3.0
 #define SCOPE_DEFWIDTH     130  /* CHECKED */
@@ -270,6 +270,7 @@ static void erase_resize_handle(t_entry *x)
 
 static void bind_button_events(t_entry *x)
 {
+    /* mouse buttons */
     sys_vgui("bind %s <Button> {pdtk_canvas_sendclick %s \
 [expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b 0}\n",
              x->text_id, x->canvas_id, x->canvas_id, x->canvas_id);
@@ -287,6 +288,10 @@ static void bind_button_events(t_entry *x)
              x->text_id, x->canvas_id, x->canvas_id, x->canvas_id);
     sys_vgui("bind %s <Control-Button> {pdtk_canvas_rightclick %s \
 [expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             x->text_id, x->canvas_id, x->canvas_id, x->canvas_id);
+    /* mouse motion */
+    sys_vgui("bind %s <Motion> {pdtk_canvas_motion %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] 0}\n",
              x->text_id, x->canvas_id, x->canvas_id, x->canvas_id);
 }
 
@@ -411,12 +416,12 @@ static void entry_select(t_gobj *z, t_glist *glist, int state)
         entry_getrect(z, glist, &x1, &y1, &x2, &y2);
         sys_vgui("%s configure -bg #bdbddd -state disabled\n", x->text_id);
 /* */
-        sys_vgui("%s create rectangle %d %d %d %d -tags {%xSEL %s} -outline blue -width 2\n",
+/*        sys_vgui("%s create rectangle %d %d %d %d -tags {%xSEL %s} -outline blue -width 2\n",
                  x->canvas_id,
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
                  text_xpix(&x->x_obj, glist) + x->x_rect_width, 
                  text_ypix(&x->x_obj, glist) + x->x_rect_height-2, 
-                 x, x->all_tag);
+                 x, x->all_tag);*/
         x->x_selected = 1;
     }
     else if (!state)
@@ -769,6 +774,7 @@ static void entry_resize_click_callback(t_entry *x, t_floatarg f)
 
 static void entry_resize_motion_callback(t_entry *x, t_floatarg f1, t_floatarg f2)
 {
+    DEBUG(post("entry_resize_motion_callback"););
     if (x->x_resizing)
     {
         int dx = (int)f1, dy = (int)f2;
