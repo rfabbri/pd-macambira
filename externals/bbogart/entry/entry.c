@@ -29,6 +29,8 @@
 /* TODO: unbind text from all key events when selected */
 /* TODO: handle scrollbar when resizing */
 /* TODO: sort out x_height/x_width vs. x_rect_height/x_rect_width */
+/* TODO: check Scope~ to see how it loses selection on editmode 0 */
+
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4244 )
@@ -267,6 +269,20 @@ static void erase_resize_handle(t_entry *x)
 {
 }
 
+static void bind_standard_keys(t_entry *x)
+{
+#ifdef __APPLE__
+    sys_vgui("bind %s <Mod1-Key> {pdtk_canvas_ctrlkey %s %%K 0}\n",
+             x->text_id, x->canvas_id);
+    sys_vgui("bind %s <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %s %%K 1}\n",
+             x->text_id, x->canvas_id);
+#else
+    sys_vgui("bind %s <Control-Key> {pdtk_canvas_ctrlkey %s %%K 0}\n",
+             x->text_id, x->canvas_id);
+    sys_vgui("bind %s <Control-Shift-Key> {pdtk_canvas_ctrlkey %s %%K 1}\n",
+             x->text_id, x->canvas_id);
+#endif
+}
 
 static void bind_button_events(t_entry *x)
 {
@@ -310,7 +326,7 @@ static void create_widget(t_entry *x)
 
     sys_vgui("frame %s \n", x->frame_id);
     sys_vgui("text %s -font {%s %d %s} -border 1 \
-    -highlightthickness 2 -relief sunken -bg \"%s\" -fg \"%s\"  \
+    -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\"  \
     -yscrollcommand {%s set} \n",
              x->text_id, 
              x->x_font_face->s_name, x->x_font_size, x->x_font_weight->s_name,
@@ -323,8 +339,8 @@ static void create_widget(t_entry *x)
 
     sys_vgui("bind %s <KeyRelease> {+pd %s keyup %%N \\;} \n", 
              x->text_id, x->x_receive_name->s_name);
-    sys_vgui("pdtk_standardkeybindings %s \n", x->text_id); 
 
+    bind_standard_keys(x);
     bind_button_events(x);
 }
 
@@ -427,7 +443,7 @@ static void entry_select(t_gobj *z, t_glist *glist, int state)
     else if (!state)
     {
         sys_vgui("%s configure -bg grey -state normal\n", x->text_id);
-        sys_vgui("%s delete %xSEL\n", x->canvas_id, x);
+//        sys_vgui("%s delete %xSEL\n", x->canvas_id, x);
         /* activatefn never gets called with 0, so destroy here */
         sys_vgui("destroy %s\n", x->handle_id);
         x->x_selected = 0;
