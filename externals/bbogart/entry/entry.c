@@ -27,7 +27,8 @@
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: complete inlet draw/erase logic */
 /* TODO: unbind text from all key events when selected */
-/* TODO try binding to FocusIn and FocusOut for making selection */
+/* TODO: allow moving by clicking and draging */
+/* TODO: sort out x_height/x_width vs. x_rect_height/x_rect_width */
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4244 )
@@ -64,9 +65,9 @@ typedef struct _entry
     int x_rect_height;
     t_symbol*  x_receive_name;
 
-    int        h_dragon;
-    int        h_dragx;
-    int        h_dragy;
+    int        x_resizing;
+    int        x_resize_x;
+    int        x_resize_y;
 
 /* TODO: these all should be settable by messages */
     int x_height;
@@ -93,7 +94,6 @@ typedef struct _entry
     char *handle_id;      
     char *window_tag;      
     char *all_tag;
-    char *outline_tag;      
     
     t_outlet* x_data_outlet;
     t_outlet* x_status_outlet;
@@ -410,19 +410,6 @@ static void entry_select(t_gobj *z, t_glist *glist, int state)
     {
         entry_getrect(z, glist, &x1, &y1, &x2, &y2);
         sys_vgui("%s configure -bg #bdbddd -state disabled\n", x->text_id);
-        sys_vgui("canvas %s -width %d -height %d -bg #fedc00 -bd 0 -cursor top_left_arrow\n",
-                 x->handle_id, TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT);
-        sys_vgui("%s create window %f %f -anchor nw -width %d -height %d -window %s -tags %s\n",
-                 x->canvas_id, x2 - (TKW_HANDLE_WIDTH - SCOPE_SELBDWIDTH),
-                 y2 - (TKW_HANDLE_HEIGHT - SCOPE_SELBDWIDTH),
-                 TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT,
-                 x->handle_id, x->all_tag);
-        sys_vgui("bind %s <Button> {pd [concat %s resize_click 1 \\;]}\n",
-                 x->handle_id, x->x_receive_name->s_name);
-        sys_vgui("bind %s <ButtonRelease> {pd [concat %s resize_click 0 \\;]}\n",
-                 x->handle_id, x->x_receive_name->s_name);
-        sys_vgui("bind %s <Motion> {pd [concat %s resize_motion %%x %%y \\;]}\n",
-                 x->handle_id, x->x_receive_name->s_name);
 /* */
         sys_vgui("%s create rectangle %d %d %d %d -tags {%xSEL %s} -outline blue -width 2\n",
                  x->canvas_id,
@@ -436,6 +423,7 @@ static void entry_select(t_gobj *z, t_glist *glist, int state)
     {
         sys_vgui("%s configure -bg grey -state normal\n", x->text_id);
         sys_vgui("%s delete %xSEL\n", x->canvas_id, x);
+        /* activatefn never gets called with 0, so destroy here */
         sys_vgui("destroy %s\n", x->handle_id);
         x->x_selected = 0;
     }
@@ -444,11 +432,30 @@ static void entry_select(t_gobj *z, t_glist *glist, int state)
 static void entry_activate(t_gobj *z, t_glist *glist, int state)
 {
     DEBUG(post("entry_activate"););    
-/* this is currently unused
-   t_text *x = (t_text *)z;
-   t_rtext *y = glist_findrtext(glist, x);
-   if (z->g_pd != gatom_class) rtext_activate(y, state);
-*/
+    t_entry *x = (t_entry *)z;
+ 	int x1, y1, x2, y2;
+
+    if(state)
+    {
+        entry_getrect(z, glist, &x1, &y1, &x2, &y2);
+        sys_vgui("canvas %s -width %d -height %d -bg #fedc00 -bd 0 -cursor top_left_arrow\n",
+                 x->handle_id, TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT);
+        sys_vgui("%s create window %f %f -anchor nw -width %d -height %d -window %s -tags {%s RSZ}\n",
+                 x->canvas_id, x2 - (TKW_HANDLE_WIDTH - SCOPE_SELBDWIDTH),
+                 y2 - (TKW_HANDLE_HEIGHT - SCOPE_SELBDWIDTH),
+                 TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT,
+                 x->handle_id, x->all_tag);
+        sys_vgui("%s raise RSZ\n", x->canvas_id);
+        sys_vgui("bind %s <Button> {pd [concat %s resize_click 1 \\;]}\n",
+                 x->handle_id, x->x_receive_name->s_name);
+        sys_vgui("bind %s <ButtonRelease> {pd [concat %s resize_click 0 \\;]}\n",
+                 x->handle_id, x->x_receive_name->s_name);
+        sys_vgui("bind %s <Motion> {pd [concat %s resize_motion %%x %%y \\;]}\n",
+                 x->handle_id, x->x_receive_name->s_name);
+    }
+    else
+    {
+    }
 }
 
 static void entry_delete(t_gobj *z, t_glist *glist)
@@ -712,6 +719,8 @@ static void entry_size(t_entry *x, t_float width, t_float height)
 //    sys_vgui("%s configure -width %d -height %d \n", x->text_id, (int)width, (int)height);
     sys_vgui("%s itemconfigure %s -width %d -height %d \n", 
              x->canvas_id, x->all_tag, (int)width, (int)height);
+    entry_vis(x, x->x_canvas, 0);
+    entry_vis(x, x->x_canvas, 1);
 }
 
 static void entry_click_callback(t_entry *x, t_floatarg f)
@@ -724,43 +733,43 @@ static void entry_click_callback(t_entry *x, t_floatarg f)
 
 static void entry_resize_click_callback(t_entry *x, t_floatarg f)
 {
-/*
     t_canvas *canvas = (glist_isvisible(x->x_glist) ? x->x_canvas : 0);
     int newstate = (int)f;
-    if (x->h_dragon && newstate == 0)
+    if (x->x_resizing && newstate == 0)
     {
-        x->x_width += x->h_dragx;
-        x->x_height += x->h_dragy;
+        x->x_width += x->x_resize_x;
+        x->x_height += x->x_resize_y;
         if (canvas)
         {
-            sys_vgui(".x%x.c delete %s\n", canvas, x->outline_tag);
-            scope_revis(x, canvas);
+            sys_vgui(".x%x.c delete RESIZE_OUTLINE\n", canvas);
+            entry_vis(x,canvas,0);
+            entry_vis(x,canvas,1);
             sys_vgui("destroy %s\n", x->handle_id);
             entry_select((t_gobj *)x, x->x_glist, 1);
+            entry_activate((t_gobj *)x, x->x_glist, 1);
             canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
         }
     }
-    else if (!x->h_dragon && newstate)
+    else if (!x->x_resizing && newstate)
     {
         if (canvas)
         {
             int x1, y1, x2, y2;
             entry_getrect((t_gobj *)x, x->x_glist, &x1, &y1, &x2, &y2);
-            sys_vgui("lower %s\n", x->handle_id);
-            sys_vgui(".x%x.c create rectangle %d %d %d %d -outline blue -width %f -tags %s\n",
-                     canvas, x1, y1, x2, y2, SCOPE_SELBDWIDTH, x->outline_tag);
+//            sys_vgui("lower %s\n", x->handle_id);
+            sys_vgui(".x%x.c create rectangle %d %d %d %d -outline blue -width %f -tags RESIZE_OUTLINE\n",
+                     canvas, x1, y1, x2, y2, SCOPE_SELBDWIDTH);
+            sys_vgui("%s raise RESIZE_OUTLINE\n", canvas);
         }
-        x->h_dragx = 0;
-        x->h_dragy = 0;
+        x->x_resize_x = 0;
+        x->x_resize_y = 0;
     }
-    x->h_dragon = newstate;
-*/
+    x->x_resizing = newstate;
 }
 
 static void entry_resize_motion_callback(t_entry *x, t_floatarg f1, t_floatarg f2)
 {
-/*
-    if (x->h_dragon)
+    if (x->x_resizing)
     {
         int dx = (int)f1, dy = (int)f2;
         int x1, y1, x2, y2, newx, newy;
@@ -771,13 +780,12 @@ static void entry_resize_motion_callback(t_entry *x, t_floatarg f1, t_floatarg f
         {
             t_canvas *canvas = (glist_isvisible(x->x_glist) ? x->x_canvas : 0);
             if (canvas)
-                sys_vgui(".x%x.c coords %s %d %d %d %d\n",
-                         canvas, x->outline_tag, x1, y1, newx, newy);
-            x->h_dragx = dx;
-            x->h_dragy = dy;
+                sys_vgui(".x%x.c coords RESIZE_OUTLINE %d %d %d %d\n",
+                         canvas, x1, y1, newx, newy);
+            x->x_resize_x = dx;
+            x->x_resize_y = dy;
         }
     }
-*/
 }
 
 static void entry_free(t_entry *x)
