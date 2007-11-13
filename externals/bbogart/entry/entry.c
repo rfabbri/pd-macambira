@@ -26,7 +26,6 @@
 /* TODO: make [size( message redraw object */
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: complete inlet draw/erase logic */
-/* TODO: unbind text from all key events when selected */
 /* TODO: handle scrollbar when resizing */
 /* TODO: sort out x_height/x_width vs. x_rect_height/x_rect_width */
 /* TODO: check Scope~ to see how it loses selection on editmode 0 */
@@ -123,7 +122,7 @@ static void entry_select(t_gobj *z, t_glist *glist, int state);
 static void entry_activate(t_gobj *z, t_glist *glist, int state);
 static void entry_delete(t_gobj *z, t_glist *glist);
 static void entry_vis(t_gobj *z, t_glist *glist, int vis);
-static int entry_click(t_gobj *x, struct _glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit);
+//static int entry_click(t_gobj *x, struct _glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit);
 static void entry_save(t_gobj *z, t_binbuf *b);
 
 
@@ -134,7 +133,7 @@ w_selectfn:   entry_select,
 w_activatefn: entry_activate,
 w_deletefn:   entry_delete,
 w_visfn:      entry_vis,
-w_clickfn:    entry_click,
+w_clickfn:    NULL,
 }; 
 
 /* widget helper functions */
@@ -187,6 +186,9 @@ static void set_tk_widget_ids(t_entry *x, t_canvas *canvas)
 static int calculate_onset(t_entry *x, t_glist *glist, 
                            int current_iolet, int total_iolets)
 {
+    post("calculate_onset");
+    post("x_rect_width: %d   x_width: %d", x->x_rect_width, x->x_width);
+    post("x_rect_height: %d   x_height: %d", x->x_rect_height, x->x_height);
     return(text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH)    \
            * current_iolet / (total_iolets == 1 ? 1 : total_iolets - 1));
 }
@@ -315,6 +317,8 @@ static void create_widget(t_entry *x)
 {
     DEBUG(post("create_widget"););
     /* I guess this is for fine-tuning of the rect size based on width and height? */
+    post("x_rect_width: %d   x_width: %d", x->x_rect_width, x->x_width);
+    post("x_rect_height: %d   x_height: %d", x->x_rect_height, x->x_height);
     x->x_rect_width = x->x_width;
     x->x_rect_height =  x->x_height+2;
 
@@ -322,8 +326,6 @@ static void create_widget(t_entry *x)
     
     /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
     sys_vgui("destroy %s\n", x->frame_id);
-    
-
     sys_vgui("frame %s \n", x->frame_id);
     sys_vgui("text %s -font {%s %d %s} -border 1 \
     -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\"  \
@@ -332,16 +334,15 @@ static void create_widget(t_entry *x)
              x->x_font_face->s_name, x->x_font_size, x->x_font_weight->s_name,
              x->x_bgcolour->s_name, x->x_fgcolour->s_name,
              x->scrollbar_id);
-   sys_vgui("scrollbar %s -command {%s yview}\n",
+    sys_vgui("scrollbar %s -command {%s yview}\n",
              x->scrollbar_id, x->text_id);
     sys_vgui("pack %s -side left -fill both -expand 1 \n", x->text_id);
     sys_vgui("pack %s -side bottom -fill both -expand 1 \n", x->frame_id);
 
-    sys_vgui("bind %s <KeyRelease> {+pd %s keyup %%N \\;} \n", 
-             x->text_id, x->x_receive_name->s_name);
-
     bind_standard_keys(x);
     bind_button_events(x);
+    sys_vgui("bind %s <KeyRelease> {+pd %s keyup %%N \\;} \n", 
+             x->text_id, x->x_receive_name->s_name);
 }
 
 static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
@@ -350,9 +351,12 @@ static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
     set_tk_widget_ids(x,glist_getcanvas(glist));	
     if (firsttime) 
     {
-        create_widget(x);	/* TODO: what is this window for? */       
+        post("x_rect_width: %d   x_width: %d", x->x_rect_width, x->x_width);
+        post("x_rect_height: %d   x_height: %d", x->x_rect_height, x->x_height);
+        create_widget(x);	
+        if(x->x_have_scrollbar) draw_scrollbar(x);
         sys_vgui("%s create window %d %d -anchor nw -window %s    \
-                  -tags {%s %s} -width %d -height %d \n", x->canvas_id, 
+                  -tags {%s %s} -width %d -height %d \n", x->canvas_id,
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
                  x->frame_id, x->window_tag, x->all_tag, x->x_width, x->x_height);
     }     
@@ -388,16 +392,13 @@ static void entry_erase(t_entry* x,t_glist* glist)
 static void entry_getrect(t_gobj *z, t_glist *owner, 
                           int *xp1, int *yp1, int *xp2, int *yp2)
 {
-/*    DEBUG(post("entry_getrect");); */ /* this one is very chatty :D */
-    int width, height;
-    t_entry* s = (t_entry*)z;
+//    DEBUG(post("entry_getrect");); /* this one is very chatty :D */
+    t_entry *x = (t_entry*)z;
 
-    width = s->x_rect_width;
-    height = s->x_rect_height;
-    *xp1 = text_xpix(&s->x_obj, owner);
-    *yp1 = text_ypix(&s->x_obj, owner) - 1;
-    *xp2 = text_xpix(&s->x_obj, owner) + width;
-    *yp2 = text_ypix(&s->x_obj, owner) + height;
+    *xp1 = text_xpix(&x->x_obj, owner);
+    *yp1 = text_ypix(&x->x_obj, owner);
+    *xp2 = *xp1 + x->x_rect_width;
+    *yp2 = *yp1 + x->x_rect_height;
 }
 
 static void entry_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -461,12 +462,12 @@ static void entry_activate(t_gobj *z, t_glist *glist, int state)
         entry_getrect(z, glist, &x1, &y1, &x2, &y2);
         sys_vgui("canvas %s -width %d -height %d -bg #fedc00 -bd 0 -cursor top_left_arrow\n",
                  x->handle_id, TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT);
-        sys_vgui("%s create window %f %f -anchor nw -width %d -height %d -window %s -tags {%s RSZ}\n",
+        sys_vgui("%s create window %f %f -anchor nw -width %d -height %d -window %s -tags RSZ\n",
                  x->canvas_id, x2 - (TKW_HANDLE_WIDTH - SCOPE_SELBDWIDTH),
                  y2 - (TKW_HANDLE_HEIGHT - SCOPE_SELBDWIDTH),
                  TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT,
                  x->handle_id, x->all_tag);
-        sys_vgui("%s raise RSZ\n", x->canvas_id);
+        sys_vgui("raise %s\n", x->handle_id);
         sys_vgui("bind %s <Button> {pd [concat %s resize_click 1 \\;]}\n",
                  x->handle_id, x->x_receive_name->s_name);
         sys_vgui("bind %s <ButtonRelease> {pd [concat %s resize_click 0 \\;]}\n",
@@ -503,17 +504,15 @@ static void entry_vis(t_gobj *z, t_glist *glist, int vis)
     }
 }
 
-
+/*
 static int entry_click(t_gobj *x, t_glist *glist, int xpix, int ypix, 
                        int shift, int alt, int dbl, int doit)
 {
     DEBUG(post("entry_click x:%d y:%d ", xpix, ypix););    
-/* this is currently unused
-   t_text *x = (t_text *)z;
-   t_rtext *y = glist_findrtext(glist, x);
-   if (z->g_pd != gatom_class) rtext_activate(y, state);
-*/
+    // this is currently unused
+    return 0;
 }
+*/
 
 static void entry_append(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
 {
@@ -740,10 +739,11 @@ static void entry_size(t_entry *x, t_float width, t_float height)
 //    sys_vgui("%s configure -width %d -height %d \n", x->text_id, (int)width, (int)height);
     sys_vgui("%s itemconfigure %s -width %d -height %d \n", 
              x->canvas_id, x->all_tag, (int)width, (int)height);
-    entry_vis(x, x->x_canvas, 0);
-    entry_vis(x, x->x_canvas, 1);
+    entry_vis((t_gobj *)x, x->x_canvas, 0);
+    entry_vis((t_gobj *)x, x->x_canvas, 1);
 }
 
+/* callback functions */
 static void entry_click_callback(t_entry *x, t_floatarg f)
 {
     if( (x->x_glist->gl_edit) && (x->x_glist == x->x_canvas) )
@@ -762,9 +762,6 @@ static void entry_resize_click_callback(t_entry *x, t_floatarg f)
         x->x_height += x->x_resize_y;
         if (canvas)
         {
-            sys_vgui(".x%x.c delete RESIZE_OUTLINE\n", canvas);
-            entry_vis(x,canvas,0);
-            entry_vis(x,canvas,1);
             sys_vgui("destroy %s\n", x->handle_id);
             entry_select((t_gobj *)x, x->x_glist, 1);
             entry_activate((t_gobj *)x, x->x_glist, 1);
@@ -777,10 +774,6 @@ static void entry_resize_click_callback(t_entry *x, t_floatarg f)
         {
             int x1, y1, x2, y2;
             entry_getrect((t_gobj *)x, x->x_glist, &x1, &y1, &x2, &y2);
-//            sys_vgui("lower %s\n", x->handle_id);
-            sys_vgui(".x%x.c create rectangle %d %d %d %d -outline blue -width %f -tags RESIZE_OUTLINE\n",
-                     canvas, x1, y1, x2, y2, SCOPE_SELBDWIDTH);
-            sys_vgui("%s raise RESIZE_OUTLINE\n", canvas);
         }
         x->x_resize_x = 0;
         x->x_resize_y = 0;
@@ -800,10 +793,14 @@ static void entry_resize_motion_callback(t_entry *x, t_floatarg f1, t_floatarg f
         newy = y2 + dy;
         if (newx > x1 + SCOPE_MINWIDTH && newy > y1 + SCOPE_MINHEIGHT)
         {
-            t_canvas *canvas = (glist_isvisible(x->x_glist) ? x->x_canvas : 0);
-            if (canvas)
-                sys_vgui(".x%x.c coords RESIZE_OUTLINE %d %d %d %d\n",
-                         canvas, x1, y1, newx, newy);
+            if (glist_isvisible(x->x_glist))
+            {
+                sys_vgui("%s itemconfigure %s -width %d -height %d\n",
+                         x->canvas_id, x->window_tag, 
+                         x->x_width + dx, x->x_height + dy);
+//                sys_vgui("%s coords RSZ %d %d\n",
+//                         x->canvas_id, newx, newy);
+            }
             x->x_resize_x = dx;
             x->x_resize_y = dy;
         }
