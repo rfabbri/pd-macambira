@@ -40,51 +40,47 @@
 #define IOWIDTH 4
 #endif
 
-#define BACKGROUNDCOLOR "grey70"
+#define BACKGROUNDCOLOR        "grey70"
 
-#define TKW_HANDLE_HEIGHT 15
-#define TKW_HANDLE_WIDTH 15
+#define TKW_HANDLE_HEIGHT       15
+#define TKW_HANDLE_WIDTH        15
 
-#define SCOPE_SELBDWIDTH     3.0
-#define SCOPE_DEFWIDTH     130  /* CHECKED */
-#define SCOPE_MINWIDTH      66
-#define SCOPE_DEFHEIGHT    130  /* CHECKED */
-#define SCOPE_MINHEIGHT     34
+#define TKW_HANDLE_INSET        -2
+#define ENTRY_DEFAULT_WIDTH     130
+#define ENTRY_DEFAULT_HEIGHT    130
+#define ENTRY_MIN_WIDTH         66
+#define ENTRY_MIN_HEIGHT        34
 
-#define TOTAL_INLETS 1
-#define TOTAL_OUTLETS 2
+#define TOTAL_INLETS            1
+#define TOTAL_OUTLETS           2
 
 #define DEBUG(x) x
 
 typedef struct _entry
 {
-    t_object x_obj;
-    t_canvas *x_canvas;
-    t_glist *x_glist;
-    
-    int x_rect_width;
-    int x_rect_height;
-    t_symbol*  x_receive_name;
+    t_object   x_obj;
+    t_canvas  *x_canvas;
+    t_glist   *x_glist;
 
+    t_symbol  *x_receive_name;
+
+    int        x_height;
+    int        x_width;
     int        x_resizing;
     int        x_resize_x;
     int        x_resize_y;
 
-/* TODO: these all should be settable by messages */
-    int x_height;
-    int x_width;
-
-    t_symbol* x_bgcolour;
-    t_symbol* x_fgcolour;
+    t_symbol  *x_bgcolour;
+    t_symbol  *x_fgcolour;
     
-    t_symbol *x_font_face;
-    t_int x_font_size;
-    t_symbol *x_font_weight;
+    t_symbol  *x_font_face;
+    t_int      x_font_size;
+    t_symbol  *x_font_weight;
 
-    t_float x_border;
-    t_symbol *x_relief;
-    t_int x_have_scrollbar;
-    t_int x_selected;
+    t_float    x_border;
+    t_symbol  *x_relief;
+    t_int      x_have_scrollbar;
+    t_int      x_selected;
     
     /* IDs for Tk widgets */
     char *tcl_namespace;       
@@ -122,7 +118,7 @@ static void entry_select(t_gobj *z, t_glist *glist, int state);
 static void entry_activate(t_gobj *z, t_glist *glist, int state);
 static void entry_delete(t_gobj *z, t_glist *glist);
 static void entry_vis(t_gobj *z, t_glist *glist, int vis);
-//static int entry_click(t_gobj *x, struct _glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit);
+//static int entry_click(t_gobj *z, t_glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit);
 static void entry_save(t_gobj *z, t_binbuf *b);
 
 
@@ -187,9 +183,7 @@ static int calculate_onset(t_entry *x, t_glist *glist,
                            int current_iolet, int total_iolets)
 {
     post("calculate_onset");
-    post("x_rect_width: %d   x_width: %d", x->x_rect_width, x->x_width);
-    post("x_rect_height: %d   x_height: %d", x->x_rect_height, x->x_height);
-    return(text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH)    \
+    return(text_xpix(&x->x_obj, glist) + (x->x_width - IOWIDTH)    \
            * current_iolet / (total_iolets == 1 ? 1 : total_iolets - 1));
 }
 
@@ -207,16 +201,10 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime,
         if (firsttime)
         {
             sys_vgui("%s create rectangle %d %d %d %d -tags {%xi%d %xi %s}\n",
-                     x->canvas_id, onset, text_ypix(&x->x_obj, glist) - 1,
+                     x->canvas_id, onset, text_ypix(&x->x_obj, glist) - 2,
                      onset + IOWIDTH, text_ypix(&x->x_obj, glist),
                      x, i, x, x->all_tag);
         }
-/*        else
-        {
-            sys_vgui("%s coords %xi%d %d %d %d %d\n",
-                     x->canvas_id, x, i, onset, text_ypix(&x->x_obj, glist) - 1,
-                     onset + IOWIDTH, text_ypix(&x->x_obj, glist));
-        }*/
     }
     for (i = 0; i < total_outlets; i++) /* outlets */
     {
@@ -224,17 +212,10 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime,
         if (firsttime)
         {
             sys_vgui("%s create rectangle %d %d %d %d -tags {%xo%d %xo %s}\n",
-                     x->canvas_id, onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 1,
-                     onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height,
+                     x->canvas_id, onset, text_ypix(&x->x_obj, glist) + x->x_height,
+                     onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_height + 2,
                      x, i, x, x->all_tag);
         }
-/*        else
-        {
-            sys_vgui("%s coords %xo%d %d %d %d %d\n",
-                     x->canvas_id, x, i,
-                     onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 1,
-                     onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height);
-                     }*/
     }
     DEBUG(post("draw inlet end"););
 }
@@ -242,12 +223,10 @@ static void draw_inlets(t_entry *x, t_glist *glist, int firsttime,
 static void erase_inlets(t_entry *x)
 {
     DEBUG(post("erase_inlets"););
-/* Added tag for all inlets of one instance */
+/* Added tag for all inlets/outlets of one instance */
     sys_vgui("%s delete %xi\n", x->canvas_id, x); 
     sys_vgui("%s delete %xo\n", x->canvas_id, x); 
-/* Added tag for all outlets of one instance */
-    sys_vgui("%s delete  %xhandle\n", x->canvas_id, x);
-/* TODO are the above even active? */
+
 }
 
 static void draw_scrollbar(t_entry *x)
@@ -317,10 +296,6 @@ static void create_widget(t_entry *x)
 {
     DEBUG(post("create_widget"););
     /* I guess this is for fine-tuning of the rect size based on width and height? */
-    post("x_rect_width: %d   x_width: %d", x->x_rect_width, x->x_width);
-    post("x_rect_height: %d   x_height: %d", x->x_rect_height, x->x_height);
-    x->x_rect_width = x->x_width;
-    x->x_rect_height =  x->x_height+2;
 
     sys_vgui("namespace eval entry%lx {} \n", x);
     
@@ -351,9 +326,8 @@ static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
     set_tk_widget_ids(x,glist_getcanvas(glist));	
     if (firsttime) 
     {
-        post("x_rect_width: %d   x_width: %d", x->x_rect_width, x->x_width);
-        post("x_rect_height: %d   x_height: %d", x->x_rect_height, x->x_height);
         create_widget(x);	
+        draw_inlets(x, glist, firsttime, TOTAL_INLETS, TOTAL_OUTLETS);
         if(x->x_have_scrollbar) draw_scrollbar(x);
         sys_vgui("%s create window %d %d -anchor nw -window %s    \
                   -tags {%s %s} -width %d -height %d \n", x->canvas_id,
@@ -366,11 +340,6 @@ static void entry_drawme(t_entry *x, t_glist *glist, int firsttime)
 //        sys_vgui("%s coords %s %d %d\n", x->canvas_id, x->all_tag,
 //                 text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
     }
-    if(glist->gl_edit) /* this is buggy logic */
-        draw_inlets(x, glist, firsttime, TOTAL_INLETS, TOTAL_OUTLETS);
-    else
-        erase_inlets(x);
-//    glist_drawiofor(glist, x->x_obj, firsttime, );
 }
 
 
@@ -379,7 +348,7 @@ static void entry_erase(t_entry* x,t_glist* glist)
     DEBUG(post("entry_erase: canvas %lx glist %lx", x->x_canvas, glist););
 
     set_tk_widget_ids(x,glist_getcanvas(glist));
-//    erase_inlets(x);
+    erase_inlets(x);
     sys_vgui("destroy %s\n", x->frame_id);
     sys_vgui("%s delete %s\n", x->canvas_id, x->all_tag);
 }
@@ -394,11 +363,10 @@ static void entry_getrect(t_gobj *z, t_glist *owner,
 {
 //    DEBUG(post("entry_getrect");); /* this one is very chatty :D */
     t_entry *x = (t_entry*)z;
-
     *xp1 = text_xpix(&x->x_obj, owner);
     *yp1 = text_ypix(&x->x_obj, owner);
-    *xp2 = *xp1 + x->x_rect_width;
-    *yp2 = *yp1 + x->x_rect_height;
+    *xp2 = *xp1 + x->x_width;
+    *yp2 = *yp1 + x->x_height + 2; // add 2 to give space for outlets
 }
 
 static void entry_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -413,8 +381,8 @@ static void entry_displace(t_gobj *z, t_glist *glist, int dx, int dy)
         sys_vgui("%s move %s %d %d\n", x->canvas_id, x->all_tag, dx, dy);
 /*        sys_vgui("%s coords %s %d %d %d %d\n", x->canvas_id, x->all_tag,
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
-                 text_xpix(&x->x_obj, glist) + x->x_rect_width, 
-                 text_ypix(&x->x_obj, glist) + x->x_rect_height-2);*/
+                 text_xpix(&x->x_obj, glist) + x->x_width, 
+                 text_ypix(&x->x_obj, glist) + x->x_height-2);*/
 //        entry_drawme(x, glist, 0);
         canvas_fixlinesfor(glist_getcanvas(glist), (t_text*) x);
     }
@@ -430,21 +398,15 @@ static void entry_select(t_gobj *z, t_glist *glist, int state)
 //    set_tk_widget_ids(x,glist_getcanvas(glist));
     if( (state) && (!x->x_selected))
     {
-        entry_getrect(z, glist, &x1, &y1, &x2, &y2);
-        sys_vgui("%s configure -bg #bdbddd -state disabled\n", x->text_id);
-/* */
-/*        sys_vgui("%s create rectangle %d %d %d %d -tags {%xSEL %s} -outline blue -width 2\n",
-                 x->canvas_id,
-                 text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
-                 text_xpix(&x->x_obj, glist) + x->x_rect_width, 
-                 text_ypix(&x->x_obj, glist) + x->x_rect_height-2, 
-                 x, x->all_tag);*/
+//        entry_getrect(z, glist, &x1, &y1, &x2, &y2);
+        sys_vgui("%s configure -bg #bdbddd -state disabled -cursor $cursor_editmode_nothing\n",
+                 x->text_id);
         x->x_selected = 1;
     }
     else if (!state)
     {
-        sys_vgui("%s configure -bg grey -state normal\n", x->text_id);
-//        sys_vgui("%s delete %xSEL\n", x->canvas_id, x);
+        sys_vgui("%s configure -bg grey -state normal -cursor xterm\n",
+                 x->text_id);
         /* activatefn never gets called with 0, so destroy here */
         sys_vgui("destroy %s\n", x->handle_id);
         x->x_selected = 0;
@@ -460,11 +422,18 @@ static void entry_activate(t_gobj *z, t_glist *glist, int state)
     if(state)
     {
         entry_getrect(z, glist, &x1, &y1, &x2, &y2);
-        sys_vgui("canvas %s -width %d -height %d -bg #fedc00 -bd 0 -cursor top_left_arrow\n",
+        sys_vgui("canvas %s -width %d -height %d -bg #ddd -bd 0 \
+-highlightthickness 3 -highlightcolor {#f00} -cursor bottom_right_corner\n",
                  x->handle_id, TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT);
-        sys_vgui("%s create window %f %f -anchor nw -width %d -height %d -window %s -tags RSZ\n",
-                 x->canvas_id, x2 - (TKW_HANDLE_WIDTH - SCOPE_SELBDWIDTH),
-                 y2 - (TKW_HANDLE_HEIGHT - SCOPE_SELBDWIDTH),
+        int handle_x1 = x2 - TKW_HANDLE_WIDTH;
+        int handle_y1 = y2 - (TKW_HANDLE_HEIGHT - TKW_HANDLE_INSET);
+        int handle_x2 = x2;
+        int handle_y2 = y2 - TKW_HANDLE_INSET;
+/* no worky */
+/*         sys_vgui("%s create line %d %d %d %d -fill black -tags RESIZE_LINES\n",  */
+/*                  x->handle_id, handle_x2, handle_y1, handle_x1, handle_y2); */
+        sys_vgui("%s create window %d %d -anchor nw -width %d -height %d -window %s -tags RSZ\n",
+                 x->canvas_id, handle_x1, handle_y1,
                  TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT,
                  x->handle_id, x->all_tag);
         sys_vgui("raise %s\n", x->handle_id);
@@ -474,9 +443,6 @@ static void entry_activate(t_gobj *z, t_glist *glist, int state)
                  x->handle_id, x->x_receive_name->s_name);
         sys_vgui("bind %s <Motion> {pd [concat %s resize_motion %%x %%y \\;]}\n",
                  x->handle_id, x->x_receive_name->s_name);
-    }
-    else
-    {
     }
 }
 
@@ -505,11 +471,11 @@ static void entry_vis(t_gobj *z, t_glist *glist, int vis)
 }
 
 /*
-static int entry_click(t_gobj *x, t_glist *glist, int xpix, int ypix, 
+static int entry_click(t_gobj *z, t_glist *glist, int xpix, int ypix, 
                        int shift, int alt, int dbl, int doit)
 {
-    DEBUG(post("entry_click x:%d y:%d ", xpix, ypix););    
-    // this is currently unused
+    t_entry *x = (t_entry *)z;
+    DEBUG(post("entry_click x:%d y:%d edit: %d", xpix, ypix, x->x_canvas->gl_edit););    
     return 0;
 }
 */
@@ -658,7 +624,6 @@ static void entry_save(t_gobj *z, t_binbuf *b)
                 x->x_obj.te_xpix, x->x_obj.te_ypix, 
                 atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
                 x->x_width, x->x_height, x->x_bgcolour, x->x_fgcolour);
-/*     binbuf_addv(b, ";"); */
 }
 
 
@@ -737,10 +702,16 @@ static void entry_size(t_entry *x, t_float width, t_float height)
     x->x_height = height;
     x->x_width = width;
 //    sys_vgui("%s configure -width %d -height %d \n", x->text_id, (int)width, (int)height);
-    sys_vgui("%s itemconfigure %s -width %d -height %d \n", 
-             x->canvas_id, x->all_tag, (int)width, (int)height);
-    entry_vis((t_gobj *)x, x->x_canvas, 0);
-    entry_vis((t_gobj *)x, x->x_canvas, 1);
+    if(glist_isvisible(x->x_glist))
+    {
+        sys_vgui("%s itemconfigure %s -width %d -height %d\n",
+                 x->canvas_id, x->window_tag, x->x_width, x->x_height);
+        canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
+/*         sys_vgui("%s itemconfigure %s -width %d -height %d \n",  */
+/*                  x->canvas_id, x->all_tag, (int)width, (int)height); */
+/*         entry_vis((t_gobj *)x, x->x_canvas, 0); */
+/*         entry_vis((t_gobj *)x, x->x_canvas, 1); */
+    }
 }
 
 /* callback functions */
@@ -762,19 +733,19 @@ static void entry_resize_click_callback(t_entry *x, t_floatarg f)
         x->x_height += x->x_resize_y;
         if (canvas)
         {
-            sys_vgui("destroy %s\n", x->handle_id);
-            entry_select((t_gobj *)x, x->x_glist, 1);
-            entry_activate((t_gobj *)x, x->x_glist, 1);
+            draw_inlets(x, canvas, 1, TOTAL_INLETS, TOTAL_OUTLETS);
             canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
         }
     }
     else if (!x->x_resizing && newstate)
     {
-        if (canvas)
-        {
-            int x1, y1, x2, y2;
-            entry_getrect((t_gobj *)x, x->x_glist, &x1, &y1, &x2, &y2);
-        }
+/* TODO I think this is not used */
+/*         if (canvas) */
+/*         { */
+/*             int x1, y1, x2, y2; */
+/*             entry_getrect((t_gobj *)x, x->x_glist, &x1, &y1, &x2, &y2); */
+/*         } */
+        erase_inlets(x);
         x->x_resize_x = 0;
         x->x_resize_y = 0;
     }
@@ -791,7 +762,7 @@ static void entry_resize_motion_callback(t_entry *x, t_floatarg f1, t_floatarg f
         entry_getrect((t_gobj *)x, x->x_glist, &x1, &y1, &x2, &y2);
         newx = x2 + dx;
         newy = y2 + dy;
-        if (newx > x1 + SCOPE_MINWIDTH && newy > y1 + SCOPE_MINHEIGHT)
+        if (newx > x1 + ENTRY_MIN_WIDTH && newy > y1 + ENTRY_MIN_HEIGHT)
         {
             if (glist_isvisible(x->x_glist))
             {
@@ -828,8 +799,8 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
 	if (argc < 4)
 	{
 		post("entry: You must enter at least 4 arguments. Default values used.");
-		x->x_width = 124;
-		x->x_height = 100;
+		x->x_width = ENTRY_DEFAULT_WIDTH;
+		x->x_height = ENTRY_DEFAULT_HEIGHT;
 		x->x_bgcolour = gensym("grey70");
 		x->x_fgcolour = gensym("black");
 		
