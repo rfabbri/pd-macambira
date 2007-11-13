@@ -48,7 +48,7 @@
 #define TOTAL_INLETS            1
 #define TOTAL_OUTLETS           2
 
-#define DEBUG(x) x
+#define DEBUG(x)
 
 typedef struct _entry
 {
