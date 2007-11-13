@@ -22,13 +22,7 @@
 #include <string.h>
 
 /* TODO: get Ctrl-A working to select all */
-/* TODO: make Ctrl-w bind to window close on parent canvas */
-/* TODO: make [size( message redraw object */
 /* TODO: set message doesnt work with a loadbang */
-/* TODO: complete inlet draw/erase logic */
-/* TODO: handle scrollbar when resizing */
-/* TODO: sort out x_height/x_width vs. x_rect_height/x_rect_width */
-/* TODO: check Scope~ to see how it loses selection on editmode 0 */
 
 
 #ifdef _MSC_VER
@@ -40,7 +34,7 @@
 #define IOWIDTH 4
 #endif
 
-#define BACKGROUNDCOLOR        "grey70"
+#define DEFAULT_COLOR           "grey70"
 
 #define TKW_HANDLE_HEIGHT       15
 #define TKW_HANDLE_WIDTH        15
@@ -67,8 +61,6 @@ typedef struct _entry
     int        x_height;
     int        x_width;
     int        x_resizing;
-    int        x_resize_x;
-    int        x_resize_y;
 
     t_symbol  *x_bgcolour;
     t_symbol  *x_fgcolour;
@@ -133,14 +125,6 @@ w_clickfn:    NULL,
 }; 
 
 /* widget helper functions */
-
-static void get_widget_state(t_entry *x)
-{
-    // build list of options in Tcl
-    // make Tcl foreach loop to get those options and create a list with the results
-    // return results via callback receive as one big list
-}
-
 static void set_tk_widget_ids(t_entry *x, t_canvas *canvas)
 {
     char buf[MAXPDSTRING];
@@ -240,14 +224,6 @@ static void erase_scrollbar(t_entry *x)
 {
     sys_vgui("pack forget %s \n", x->scrollbar_id);
     x->x_have_scrollbar = 0;
-}
-
-static void draw_resize_handle(t_entry *x)
-{
-}
-
-static void erase_resize_handle(t_entry *x)
-{
 }
 
 static void bind_standard_keys(t_entry *x)
@@ -379,6 +355,7 @@ static void entry_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     {
         set_tk_widget_ids(x,glist_getcanvas(glist));
         sys_vgui("%s move %s %d %d\n", x->canvas_id, x->all_tag, dx, dy);
+        sys_vgui("%s move RSZ %d %d\n", x->canvas_id, dx, dy);
 /*        sys_vgui("%s coords %s %d %d %d %d\n", x->canvas_id, x->all_tag,
                  text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
                  text_xpix(&x->x_obj, glist) + x->x_width, 
@@ -392,13 +369,10 @@ static void entry_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 static void entry_select(t_gobj *z, t_glist *glist, int state)
 {
     t_entry *x = (t_entry *)z;
- 	int x1, y1, x2, y2;
     DEBUG(post("entry_select: canvas %lx glist %lx state %d", x->x_canvas, glist, state););
     
-//    set_tk_widget_ids(x,glist_getcanvas(glist));
     if( (state) && (!x->x_selected))
     {
-//        entry_getrect(z, glist, &x1, &y1, &x2, &y2);
         sys_vgui("%s configure -bg #bdbddd -state disabled -cursor $cursor_editmode_nothing\n",
                  x->text_id);
         x->x_selected = 1;
@@ -427,9 +401,9 @@ static void entry_activate(t_gobj *z, t_glist *glist, int state)
                  x->handle_id, TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT);
         int handle_x1 = x2 - TKW_HANDLE_WIDTH;
         int handle_y1 = y2 - (TKW_HANDLE_HEIGHT - TKW_HANDLE_INSET);
-        int handle_x2 = x2;
-        int handle_y2 = y2 - TKW_HANDLE_INSET;
-/* no worky */
+//        int handle_x2 = x2;
+//        int handle_y2 = y2 - TKW_HANDLE_INSET;
+/* no worky, this should draw MAC OS X style lines on the resize handle */
 /*         sys_vgui("%s create line %d %d %d %d -fill black -tags RESIZE_LINES\n",  */
 /*                  x->handle_id, handle_x2, handle_y1, handle_x1, handle_y2); */
         sys_vgui("%s create window %d %d -anchor nw -width %d -height %d -window %s -tags RSZ\n",
@@ -470,7 +444,7 @@ static void entry_vis(t_gobj *z, t_glist *glist, int vis)
     }
 }
 
-/*
+/*  the clickfn is only called in run mode
 static int entry_click(t_gobj *z, t_glist *glist, int xpix, int ypix, 
                        int shift, int alt, int dbl, int doit)
 {
@@ -551,8 +525,6 @@ static void entry_set(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
     entry_append(x, s, argc, argv);
 }
 
-/* Output the symbol */
-/* , t_symbol *s, int argc, t_atom *argv) */
 static void entry_output(t_entry* x, t_symbol *s, int argc, t_atom *argv)
 {
     outlet_list(x->x_data_outlet, s, argc, argv );
@@ -683,7 +655,6 @@ void entry_fgcolour(t_entry* x, t_symbol* fgcol)
 static void entry_fontsize(t_entry *x, t_float font_size)
 {
     DEBUG(post("entry_fontsize"););
-    post("font size: %f",font_size);
     if(font_size > 8) 
     {
         x->x_font_size = (t_int)font_size;
@@ -701,16 +672,11 @@ static void entry_size(t_entry *x, t_float width, t_float height)
     DEBUG(post("entry_size"););
     x->x_height = height;
     x->x_width = width;
-//    sys_vgui("%s configure -width %d -height %d \n", x->text_id, (int)width, (int)height);
     if(glist_isvisible(x->x_glist))
     {
         sys_vgui("%s itemconfigure %s -width %d -height %d\n",
                  x->canvas_id, x->window_tag, x->x_width, x->x_height);
         canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
-/*         sys_vgui("%s itemconfigure %s -width %d -height %d \n",  */
-/*                  x->canvas_id, x->all_tag, (int)width, (int)height); */
-/*         entry_vis((t_gobj *)x, x->x_canvas, 0); */
-/*         entry_vis((t_gobj *)x, x->x_canvas, 1); */
     }
 }
 
@@ -729,8 +695,6 @@ static void entry_resize_click_callback(t_entry *x, t_floatarg f)
     int newstate = (int)f;
     if (x->x_resizing && newstate == 0)
     {
-        x->x_width += x->x_resize_x;
-        x->x_height += x->x_resize_y;
         if (canvas)
         {
             draw_inlets(x, canvas, 1, TOTAL_INLETS, TOTAL_OUTLETS);
@@ -739,15 +703,7 @@ static void entry_resize_click_callback(t_entry *x, t_floatarg f)
     }
     else if (!x->x_resizing && newstate)
     {
-/* TODO I think this is not used */
-/*         if (canvas) */
-/*         { */
-/*             int x1, y1, x2, y2; */
-/*             entry_getrect((t_gobj *)x, x->x_glist, &x1, &y1, &x2, &y2); */
-/*         } */
         erase_inlets(x);
-        x->x_resize_x = 0;
-        x->x_resize_y = 0;
     }
     x->x_resizing = newstate;
 }
@@ -758,22 +714,15 @@ static void entry_resize_motion_callback(t_entry *x, t_floatarg f1, t_floatarg f
     if (x->x_resizing)
     {
         int dx = (int)f1, dy = (int)f2;
-        int x1, y1, x2, y2, newx, newy;
-        entry_getrect((t_gobj *)x, x->x_glist, &x1, &y1, &x2, &y2);
-        newx = x2 + dx;
-        newy = y2 + dy;
-        if (newx > x1 + ENTRY_MIN_WIDTH && newy > y1 + ENTRY_MIN_HEIGHT)
+        if (glist_isvisible(x->x_glist))
         {
-            if (glist_isvisible(x->x_glist))
-            {
-                sys_vgui("%s itemconfigure %s -width %d -height %d\n",
-                         x->canvas_id, x->window_tag, 
-                         x->x_width + dx, x->x_height + dy);
-//                sys_vgui("%s coords RSZ %d %d\n",
-//                         x->canvas_id, newx, newy);
-            }
-            x->x_resize_x = dx;
-            x->x_resize_y = dy;
+            x->x_width += dx;
+            x->x_height += dy;
+            sys_vgui("%s itemconfigure %s -width %d -height %d\n",
+                     x->canvas_id, x->window_tag, 
+                     x->x_width, x->x_height);
+            sys_vgui("%s move RSZ %d %d\n",
+                     x->canvas_id, dx, dy);
         }
     }
 }
@@ -801,7 +750,7 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
 		post("entry: You must enter at least 4 arguments. Default values used.");
 		x->x_width = ENTRY_DEFAULT_WIDTH;
 		x->x_height = ENTRY_DEFAULT_HEIGHT;
-		x->x_bgcolour = gensym("grey70");
+		x->x_bgcolour = gensym(DEFAULT_COLOR);
 		x->x_fgcolour = gensym("black");
 		
 	} else {
