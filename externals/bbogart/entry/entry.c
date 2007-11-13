@@ -121,8 +121,7 @@ static void entry_select(t_gobj *z, t_glist *glist, int state);
 static void entry_activate(t_gobj *z, t_glist *glist, int state);
 static void entry_delete(t_gobj *z, t_glist *glist);
 static void entry_vis(t_gobj *z, t_glist *glist, int vis);
-static void entry_activate(t_gobj *x, struct _glist *glist, int state);
-//static int entry_click(t_gobj *x, struct _glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit);
+static int entry_click(t_gobj *x, struct _glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit);
 static void entry_save(t_gobj *z, t_binbuf *b);
 
 
@@ -133,7 +132,7 @@ w_selectfn:   entry_select,
 w_activatefn: entry_activate,
 w_deletefn:   entry_delete,
 w_visfn:      entry_vis,
-w_clickfn:    NULL,
+w_clickfn:    entry_click,
 }; 
 
 /* widget helper functions */
@@ -271,20 +270,24 @@ static void erase_resize_handle(t_entry *x)
 
 static void bind_button_events(t_entry *x)
 {
-    sys_vgui("bind %s <Button> {pd [concat %s click 1 \\;]}\n",
-             x->text_id, x->x_receive_name->s_name);
-    sys_vgui("bind %s <Button-2> \
-{pdtk_canvas_popup .x%lx [expr %%x + %d] [expr %%y + %d] 0 0} \n",
-             x->text_id, x->x_canvas, x->x_obj.te_xpix, x->x_obj.te_ypix);
-    sys_vgui("bind %s <Control-Button> \
-{pdtk_canvas_popup .x%lx [expr %%x + %d] [expr %%y + %d] 0 0} \n",
-             x->text_id, x->x_canvas, x->x_obj.te_xpix, x->x_obj.te_ypix);
-    sys_vgui("bind %s <Button-3> \
-{pdtk_canvas_popup .x%lx [expr %%x + %d] [expr %%y + %d] 0 0} \n",
-             x->text_id, x->x_canvas, x->x_obj.te_xpix, x->x_obj.te_ypix);
-    sys_vgui("bind %s <Control-Button> \
-{pdtk_canvas_popup .x%lx [expr %%x + %d] [expr %%y + %d] 0 0} \n",
-             x->text_id, x->x_canvas, x->x_obj.te_xpix, x->x_obj.te_ypix);
+    sys_vgui("bind %s <Button> {pdtk_canvas_sendclick %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b 0}\n",
+             x->text_id, x->canvas_id, x->canvas_id, x->canvas_id);
+    sys_vgui("bind %s <ButtonRelease> {pdtk_canvas_mouseup %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             x->text_id, x->canvas_id, x->canvas_id, x->canvas_id);
+    sys_vgui("bind %s <Shift-Button> {pdtk_canvas_click %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b 1}\n",
+             x->text_id, x->canvas_id, x->canvas_id, x->canvas_id);
+    sys_vgui("bind %s <Button-2> {pdtk_canvas_rightclick %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             x->text_id, x->canvas_id, x->canvas_id, x->canvas_id);
+    sys_vgui("bind %s <Button-3> {pdtk_canvas_rightclick %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             x->text_id, x->canvas_id, x->canvas_id, x->canvas_id);
+    sys_vgui("bind %s <Control-Button> {pdtk_canvas_rightclick %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             x->text_id, x->canvas_id, x->canvas_id, x->canvas_id);
 }
 
 static void create_widget(t_entry *x)
@@ -470,6 +473,18 @@ static void entry_vis(t_gobj *z, t_glist *glist, int vis)
         entry_erase(x, glist);
         rtext_free(y);
     }
+}
+
+
+static int entry_click(t_gobj *x, t_glist *glist, int xpix, int ypix, 
+                       int shift, int alt, int dbl, int doit)
+{
+    DEBUG(post("entry_click x:%d y:%d ", xpix, ypix););    
+/* this is currently unused
+   t_text *x = (t_text *)z;
+   t_rtext *y = glist_findrtext(glist, x);
+   if (z->g_pd != gatom_class) rtext_activate(y, state);
+*/
 }
 
 static void entry_append(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
@@ -801,16 +816,14 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
 
     x->x_data_outlet = outlet_new(&x->x_obj, &s_float);
     x->x_status_outlet = outlet_new(&x->x_obj, &s_symbol);
-    post("0");
 
     sprintf(buf,"entry%lx",(long unsigned int)x);
     x->tcl_namespace = getbytes(strlen(buf));
     strcpy(x->tcl_namespace, buf);    
-    post("1");
+
     sprintf(buf,"#%s", x->tcl_namespace);
     x->x_receive_name = gensym(buf);
     pd_bind(&x->x_obj.ob_pd, x->x_receive_name);
-    post("2");
 
     x->x_glist = canvas_getcurrent();
     set_tk_widget_ids(x, x->x_glist);
