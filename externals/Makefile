@@ -21,7 +21,7 @@ export MACOSX_DEPLOYMENT_TARGET = 10.3
 # default target
 default: all
 
-.SUFFIXES: .$(EXTENSION)
+.SUFFIXES: .$(EXTENSION) .$(SHARED_LIB)
 
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
@@ -51,8 +51,7 @@ ifeq ($(OS_NAME),darwin)
   CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix 
   LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
   LIBS += -lc 
-  DYLIB_LDFLAGS = -dynamiclib -read_only_relocs warning -L/sw/lib
-  DYLIB_EXTENSION = dylib
+  DYLIB_LDFLAGS = -dynamiclib -undefined dynamic_lookup -read_only_relocs warning -L/sw/lib
   STRIP = strip -x
 endif
 ifeq ($(OS_NAME),linux)
@@ -60,7 +59,6 @@ ifeq ($(OS_NAME),linux)
   LDFLAGS += -Wl,-export_dynamic  -shared
   LIBS += -lc
   DYLIB_LDFLAGS = $(LDFLAGS)
-  DYLIB_EXTENSION = so
   STRIP = strip --strip-unneeded -R .note -R .comment
 endif
 ifeq ($(OS_NAME),windows)
@@ -78,7 +76,6 @@ ifeq ($(OS_NAME),windows)
   LIBS += -L$(pd_src)/bin  -L$(pd_src)/obj  -lpd \
     -lwsock32 -lpthreadGC2 -lkernel32 -luser32 -lgdi32 -lregex
   DYLIB_LDFLAGS = -shared
-  DYLIB_EXTENSION = dll
   STRIP = strip --strip-unneeded -R .note -R .comment
 endif
 
@@ -2129,6 +2126,44 @@ smlib_clean:
 	-rm -f -- $(externals_src)/smlib/*.bak
 	-rm -f -- $(externals_src)/smlib/*.*~
 
+
+#------------------------------------------------------------------------------#
+# TKWIDGETS
+TKWIDGETS_NAME=tkwidgets
+TKWIDGETS_OBJECTS := $(wildcard $(externals_src)/tkwidgets/*.c)
+TKWIDGETS_SHARED := $(wildcard $(externals_src)/tkwidgets/shared/*.c)
+tkwidgets_shared: $(TKWIDGETS_SHARED:.c=.o)
+	$(CC) $(DYLIB_LDFLAGS) \
+		-o $(externals_src)/tkwidgets/libtkwidgets.$(DYLIB_EXTENSION) \
+		 $(TKWIDGETS_SHARED:.c=.o)
+
+tkwidgets: tkwidgets_shared $(TKWIDGETS_OBJECTS:.c=.$(EXTENSION))
+
+tkwidgets_install: tkwidgets
+	install -d $(objectsdir)/$(TKWIDGETS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(TKWIDGETS_NAME) \
+		--author "Hans-Christoph Steiner and other" \
+		--description "a collection of objects based on Tk widgets" \
+		--license "GPLv2 or later" 
+	install -p $(TKWIDGETS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(TKWIDGETS_NAME)
+	install -d $(helpdir)/$(TKWIDGETS_NAME)
+	install -p $(externals_src)/tkwidgets/*.pd \
+		$(helpdir)/$(TKWIDGETS_NAME)
+#	install -d $(manualsdir)/$(TKWIDGETS_NAME)
+#	install -p $(externals_src)/tkwidgets/manual.txt \
+#		$(manualsdir)/$(TKWIDGETS_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/tkwidgets/README \
+#		$(readmesdir)/$(TKWIDGETS_NAME).txt
+#	install -d $(examplesdir)/$(TKWIDGETS_NAME)
+#	install -p $(externals_src)/tkwidgets/examples/*.pd \
+#		$(examplesdir)/$(TKWIDGETS_NAME)
+
+tkwidgets_clean:
+	-rm -f -- $(TKWIDGETS_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(TKWIDGETS_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/tkwidgets/*.bak
+	-rm -f -- $(externals_src)/tkwidgets/*.*~
 
 #------------------------------------------------------------------------------#
 # TOF
