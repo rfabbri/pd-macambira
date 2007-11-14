@@ -1,7 +1,7 @@
 #N canvas 165 195 721 672 10;
 #X obj 130 117 text 130 60;
 #X msg 47 29 size 100 100;
-#X obj 73 543 text 200 50;
+#X obj 48 540 text 130 60;
 #X msg 130 30 size 400 200;
 #X obj 310 11 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
@@ -19,8 +19,18 @@ find all]];
 #X msg 132 515 font "Lucida Sans" 18 bold;
 #X msg 272 425 size 200 50;
 #X msg 89 490 font Arial 16;
+#X obj 200 612 print QUERY;
+#X floatatom 309 620 5 0 0 0 - - -;
+#X obj 309 596 route highlightthickness font;
+#X obj 396 624 pddp/print;
+#X msg 421 372 width 8;
+#X obj 309 642 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 114 435 query highlightthickness;
+#X msg 143 458 query;
 #X connect 0 1 6 0;
 #X connect 1 0 0 0;
+#X connect 2 1 18 0;
 #X connect 3 0 0 0;
 #X connect 4 0 5 0;
 #X connect 5 0 0 0;
@@ -32,3 +42,9 @@ find all]];
 #X connect 13 0 2 0;
 #X connect 14 0 2 0;
 #X connect 15 0 2 0;
+#X connect 17 0 21 0;
+#X connect 18 0 17 0;
+#X connect 18 1 19 0;
+#X connect 20 0 2 0;
+#X connect 22 0 2 0;
+#X connect 23 0 2 0;

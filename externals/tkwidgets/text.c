@@ -47,6 +47,9 @@ typedef struct _textwidget
 
     t_symbol*  receive_name;
 
+    int        optionc;
+    t_atom*    optionv;
+
     int        x_height;
     int        x_width;
     int        x_resizing;
@@ -149,6 +152,36 @@ w_clickfn:    NULL,
 }; 
 
 /* widget helper functions */
+
+static void save_options(t_textwidget *x, int argc, char** argv)
+{
+    int i;
+    post("total options: %d", argc);
+    for(i = 0; i < argc; i++)
+    {
+//        sys_vgui("lappend ::%s::optionsList %s \n", x->tcl_namespace, argv[i]);
+        sys_vgui("pd [concat %s query_callback %s [%s cget -%s] \\;]\n",
+                 x->receive_name->s_name, argv[i], x->text_id, argv[i]);
+        post("option %d: %s", i, argv[i]);
+    }
+/*     sys_vgui("foreach ::%s::option $::%s::optionsList {\n",x->tcl_namespace,x->tcl_namespace); */
+/*     sys_vgui("pd [concat %s query_callback $::%s::option [%s cget [format \"-%%s\" $::%s::option]] \\;]\n", */
+/*              x->receive_name->s_name, x->tcl_namespace, x->text_id, x->tcl_namespace); */
+//    sys_vgui("puts stderr [concat %s query_callback $::%s::option [%s cget [format \"-%%s\" $::%s::option]] \\;] \n", 
+//             x->receive_name->s_name, x->tcl_namespace, x->text_id, x->tcl_namespace);
+/*     sys_gui("}\n"); */
+/*     sys_vgui("unset ::%s::optionsList \n", x->tcl_namespace);  */
+}
+
+static void query_options(t_textwidget *x, int argc, char** argv)
+{
+    int i;
+    post("total options: %d", argc);
+    for(i = 0; i < argc; i++)
+        sys_vgui("pd [concat %s query_callback %s [%s cget -%s] \\;]\n",
+                 x->receive_name->s_name, argv[i], x->text_id, argv[i]);
+}
+
 static void set_tk_widget_ids(t_textwidget *x, t_canvas *canvas)
 {
     char buf[MAXPDSTRING];
@@ -631,6 +664,15 @@ static void textwidget_option(t_textwidget *x, t_symbol *s, int argc, t_atom *ar
     }
 }
 
+static void textwidget_query(t_textwidget *x, t_symbol *s)
+{
+    post("textwidget_query %s", s->s_name);
+    if(s == &s_)
+        query_options(x, sizeof(textwidget_tk_options)/sizeof(char *), textwidget_tk_options);
+    else
+        query_options(x, 1, &(s->s_name));
+}
+
 static void textwidget_scrollbar(t_textwidget *x, t_float f)
 {
     if(f > 0)
@@ -670,6 +712,21 @@ static void textwidget_size(t_textwidget *x, t_float width, t_float height)
 }
 
 /* callback functions */
+
+static void textwidget_query_callback(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
+{
+    t_symbol *tmp_symbol = atom_getsymbolarg(0, argc, argv);
+    if(tmp_symbol != &s_)
+    {
+        post("tmp_symbol %s argc %d", tmp_symbol->s_name, argc);
+        outlet_anything(x->x_status_outlet, tmp_symbol, argc - 1, argv + 1);
+    }
+    else
+    {
+        post("textwidget_query_callback %s %d", s->s_name, argc);
+    }
+}
+
 static void textwidget_click_callback(t_textwidget *x, t_floatarg f)
 {
     if( (x->x_glist->gl_edit) && (x->x_glist == x->x_canvas) )
@@ -759,14 +816,6 @@ static void *textwidget_new(t_symbol *s, int argc, t_atom *argv)
 
     x->x_glist = canvas_getcurrent();
     set_tk_widget_ids(x, x->x_glist);
-    
-    int i;
-    int option_argc = sizeof(textwidget_tk_options)/sizeof(char *);
-    post("total options: %d", option_argc);
-    for(i = 0; i < option_argc; i++)
-    {
-        post("option %d: %s", i, textwidget_tk_options[i]);
-    }
 
     return (x);
 }
@@ -780,6 +829,8 @@ void text_setup(void) {
 	class_addanything(textwidget_class, (t_method)textwidget_option);
 
 
+    class_addmethod(textwidget_class, (t_method)textwidget_query,
+                    gensym("query"), A_DEFSYMBOL, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_scrollbar,
                     gensym("scrollbar"), A_DEFFLOAT, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_size,
@@ -797,6 +848,8 @@ void text_setup(void) {
 	class_addmethod(textwidget_class, (t_method)textwidget_clear,
                     gensym("clear"), 0);
 /* callbacks */
+    class_addmethod(textwidget_class, (t_method)textwidget_query_callback,
+                    gensym("query_callback"), A_GIMME, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_keyup_callback,
                     gensym("keyup"), A_DEFFLOAT, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_click_callback,
