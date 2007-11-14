@@ -278,7 +278,7 @@ bassemu_install: bassemu
 		--version ""
 	install -p $(BASSEMU_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(BASSEMU_NAME)
 	install -d $(helpdir)/$(BASSEMU_NAME)
-	install -p $(externals_src)/bassemu/*-help.pd \
+	install -p $(externals_src)/bassemu/*.pd \
 		$(helpdir)/$(BASSEMU_NAME)
 #	install -d $(manualsdir)/$(BASSEMU_NAME)
 #	install -p $(externals_src)/bassemu/manual.txt \
