@@ -2,6 +2,14 @@
 
 # WARNING!  This script is really ugly!
 
+# to use:
+#   1) make a folder, like en-import
+#   2) run ../parse-help-patches.pl in it
+#   3) voila!
+#
+# on the server, run:
+#   find en-import/ -type f -name \*.txt | ./wiki_import.sh -s 'Top level'
+
 use strict;
 use warnings;
 use Text::CSV_PP;
@@ -68,43 +76,41 @@ my $caption = "";
 
 
 #------------------------------------------------------------------------------#
-# wikipedia terms
-$stub = "Ébauche";
-$template = "Modèle";
-$category = "Catégorie";
-$infobox = "Infobox";
+# wikipedia terms - Spanish
+$stub = "esbozo";
+$template = "plantilla";
+$category = "categoría";
+$infobox = "infobox";
 
-# pdpedia terms
-$objectclass = "Classe d'objets";
+ # pdpedia terms
+$objectclass = "Clase de objeto";
 
-# page headers
-$inlets = "Entrées";
-$outlets = "Sorties";
-$arguments = "Arguments";
-$messages = "Messages";
+ # page headers
+$inlets = "entradas";
+$outlets = "salidas";
+$arguments = "argumentos";
+$messages = "mensajes";
 
-# infobox
-$name = "Nom";
-$description = "Description";
-$abbreviation = "Abréviation";
-$library = "Bibliothèque";
-$author = "Auteur";
-$developer = "Développeur";
-$releaseVersion = "Version";
-$releaseDate = "Date";
-$dependencies = "Dépendances";
-$license = "Licence";
-$website = "Site Web";
-$programmingLanguage = "Langage de programmation";
-$platform = "Plateforme";
-$operatingSystem = "Système d'exploitation";
-$language = "Langue";
-$dataType = "Type de données";
-$distribution = "Distribution";
+ # infobox
+$name = "nombre";
+$description = "descripción";
+$abbreviation = "abreviación";
+$library = "librería";
+$author = "autor";
+$developer = "desarrollador";
+$releaseVersion = "versión";
+$releaseDate = "fecha de la versión";
+$dependencies = "dependencias";
+$license = "licencia";
+$website = "sitio web";
+$programmingLanguage = "lenguaje de programación";
+$platform = "plataforma";
+$operatingSystem = "sistema operativo";
+$language = "idioma";
+$dataType = "tipo de dato";
+$distribution = "distribuciones";
+$status = "estado";
 
-$status = "État";
-$caption = "Légende";
-$language = "Langue";
 
 #------------------------------------------------------------------------------#
 # PARSE CSV
@@ -215,7 +221,7 @@ foreach (`/sw/bin/find /Users/hans/Desktop/TODO/wiki_files_hacked/5.reference/ -
 	 print(OBJECTCLASS "==$inlets==\n\n\n");
 	 print(OBJECTCLASS "==$outlets==\n\n\n");
 	 print(OBJECTCLASS "==$arguments==\n\n\n");
-	 print(OBJECTCLASS "==$messages==\n\n\n");
+#	 print(OBJECTCLASS "==$messages==\n\n\n");
 	 print(OBJECTCLASS "{{${objectclass}-${stub}}} \n\n");
 	 print(OBJECTCLASS "[[$category:$objectclass]]\n");
 	 print(OBJECTCLASS "[[$category:$libraryName]]\n");
@@ -225,8 +231,8 @@ foreach (`/sw/bin/find /Users/hans/Desktop/TODO/wiki_files_hacked/5.reference/ -
 	 print(OBJECTCLASS "\n\n");
 	 print(OBJECTCLASS "[[de:$pageName]]\n");
 	 print(OBJECTCLASS "[[en:$pageName]]\n");
-	 print(OBJECTCLASS "[[es:$pageName]]\n");
-#	 print(OBJECTCLASS "[[fr:$pageName]]\n");
+#	 print(OBJECTCLASS "[[es:$pageName]]\n");
+	 print(OBJECTCLASS "[[fr:$pageName]]\n");
 	 print(OBJECTCLASS "[[nl:$pageName]]\n");
 	 print(OBJECTCLASS "[[pt:$pageName]]\n");
 	 print(OBJECTCLASS "[[ru:$pageName]]\n");
