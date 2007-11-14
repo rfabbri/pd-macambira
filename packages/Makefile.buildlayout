@@ -40,18 +40,22 @@ UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
   OS_NAME = linux
   EXTENSION = pd_linux
+  DYLIB_EXTENSION = so
 endif
 ifeq ($(UNAME),Darwin)
   OS_NAME = darwin
   EXTENSION = pd_darwin
+  DYLIB_EXTENSION = dylib
 endif
 ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   OS_NAME = windows
   EXTENSION = dll
+  DYLIB_EXTENSION = dll
 endif
 ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   OS_NAME = windows
   EXTENSION = dll
+  DYLIB_EXTENSION = dll
 endif
 # which CPU to compile for
 UNAME_MACHINE := $(shell uname -m)
