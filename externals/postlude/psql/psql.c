@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include "libpq-fe.h" 
 
-#define MAXSQLFIELDS 10
+#define MAXSQLFIELDS 20
 
 /*  postgres datatypes and corresponding 'Oid's */
 
@@ -43,11 +43,11 @@
 #define PGDATETIME 1184
 #define PGVARCHAR 1043
 
-typedef struct psql
-{ 
+typedef struct psql{ 
+
     t_object t_ob;
-    t_outlet *x_outlet1;
-    t_outlet *x_outlet2;
+    t_outlet *x_outlet1,
+             *x_outlet2;
     t_atom get_atom;
     t_symbol *x_sym;
     char sqlStringStore[MAXPDSTRING];
@@ -58,18 +58,13 @@ typedef struct psql
          *dbName;
     char port[20];
     PGconn *conn;
-    t_int connected;
+    t_int connected,
+          in_query;
+
 } t_psql;
 
-static void psql_float(t_psql *x, t_floatarg f)
-{
-    post("psql: %f", f);
-}
+static void psql_SQL (t_psql *x, t_symbol *s){ 
 
-
-static void psql_SQL (t_psql *x, t_symbol *s)
-{ 
-    /*	post("psql_SQL called");*/
     char sqlString[MAXPDSTRING];  
     int argc = 10;
     t_atom argv[argc];
@@ -78,8 +73,8 @@ static void psql_SQL (t_psql *x, t_symbol *s)
     int starttime_fnum;
     int endtime_fnum;
     int spurtorder_fnum;
-    int	   nFields;
-    int	   i, j;
+    int       nFields;
+    int       i, j;
     t_symbol *t_sym;
     PGresult   *res;
     int tupplecount;
@@ -101,9 +96,11 @@ static void psql_SQL (t_psql *x, t_symbol *s)
         x->connected = 1;
 
         res = PQexec(x->conn, x->sqlStringStore);
-        if (PQresultStatus(res) != PGRES_TUPLES_OK && PQresultStatus(res) != PGRES_COMMAND_OK)
+        if (PQresultStatus(res) != PGRES_TUPLES_OK && PQresultStatus(res) != 
+                PGRES_COMMAND_OK)
         {
-            fprintf(stderr, "psql: Action failed. PQresultStatus is %s\n", PQresStatus(PQresultStatus(res)));
+            fprintf(stderr, "psql: Action failed. PQresultStatus is %s\n", 
+                    PQresStatus(PQresultStatus(res)));
         }
 
         else {
@@ -121,9 +118,9 @@ static void psql_SQL (t_psql *x, t_symbol *s)
                 starttime_fnum = PQfnumber(res, "starttime");
                 endtime_fnum = PQfnumber(res, "endtime");
                 spurtorder_fnum = PQfnumber(res, "spurtorder");
+
                 /* fetch the instances */
-                for (i = 0; i < PQntuples(res); i++)
-                {
+                for (i = 0; i < PQntuples(res); i++) {
                     /* merge field of a query instance into a list */
                     SETFLOAT(&argv[0], i);
                     for (j=0; j<nFields; j++)
@@ -142,13 +139,15 @@ static void psql_SQL (t_psql *x, t_symbol *s)
                         else {
                             t_sym = gensym( PQgetvalue(res, i, j));
                             SETSYMBOL(&argv[j+1], t_sym);
-                            post("Undefined PG data type. OID: %d. Stored in list as Symbol", fType);
+                            post(
+                    "Undefined PG data type. OID: %d. Stored in list as Symbol", fType);
                         }
 
                     }
                     t_sym = gensym( "A_FLOAT");
                     outlet_list(x->x_outlet1, t_sym, nFields+1, argv);
                 }
+                outlet_bang(x->x_outlet2);
                 PQclear(res);
             }
         }
@@ -161,20 +160,18 @@ static void psql_close(t_psql *x){
     x->connected = 0;
 }
 
-static void psql_anything(t_psql *x, t_symbol *s, int ac, t_atom *av, t_floatarg f)
-{ 
+static void psql_anything(t_psql *x, t_symbol *s, int ac, t_atom *av, t_floatarg f){ 
     char sqlString[MAXPDSTRING]; 
     int i;
     char buf[MAXPDSTRING];
     char mybuf[MAXPDSTRING];
 
-    /*post("Calling psql_anything");*/
-
-    if(!strcmp(s->s_name,"close"))
+    if(!strcmp(s->s_name,"close") && !x->in_query)
         psql_close(x);
     else{
-        if (strcmp(s->s_name, "sql") != 0)
-        {
+        if (strcmp(s->s_name, "sql")){
+
+
             strcat(x->sqlStringStore,  ", ");
 
             /* replace the truncated first symbol */
@@ -182,28 +179,29 @@ static void psql_anything(t_psql *x, t_symbol *s, int ac, t_atom *av, t_floatarg
             strcat(x->sqlStringStore,  s->s_name); 
             strcat(x->sqlStringStore, " ");
 
-            /*       see if it ends OK  */
-
+            /* see if it ends OK  */
             atom_string(av+ac-1, buf, MAXPDSTRING);
 
-            if (strcmp(buf, "sqlend") == 0)
-            {
+            if (!strcmp(buf, "sqlend")){
+
                 int tc = ac-1;
 
 
-                for (i = 0; i < tc; i++)
-                {
+                for (i = 0; i < tc; i++){
+
                     atom_string(av+i, buf, MAXPDSTRING);
                     strcat(x->sqlStringStore, buf);
                     if (i < tc - 1)
                         strcat(x->sqlStringStore, " ");
+
                 }
 
-                /*post("executing query");*/
                 psql_SQL (x, s);
+
+                x->in_query = 0;
+
             }
-            else
-            {
+            else {
                 for (i = 0; i < ac; i++)
                 {
                     atom_string(av+i, buf, MAXPDSTRING);
@@ -211,16 +209,18 @@ static void psql_anything(t_psql *x, t_symbol *s, int ac, t_atom *av, t_floatarg
                     if (i < ac - 1)
                         strcat(x->sqlStringStore, " ");
                 }
-
             }
 
         }
         else {
-            /*  if s->s_name DOES equal "sql" -  first clear sqlStringStore then check if end of string terminates with "sqlend" */
+            /*  if s->s_name DOES equal "sql" -  first clear sqlStringStore then check 
+             *  if end of string terminates with "sqlend" */
+
+            x->in_query = 1;
 
             strcpy(x->sqlStringStore, "");
             atom_string(av+ac-1, buf, MAXPDSTRING);
-            if (strcmp(buf, "sqlend") != 0)
+            if (strcmp(buf, "sqlend"))
             { 
                 for (i = 0; i < ac; i++)
                 {
@@ -241,12 +241,10 @@ static void psql_anything(t_psql *x, t_symbol *s, int ac, t_atom *av, t_floatarg
                     if (i < ac - 1)
                         strcat(x->sqlStringStore, " ");
                 }
-                /*post("executing query");*/
                 psql_SQL (x, s);
+
+                x->in_query = 0;
             }
-
-
-
         }
 
         atom_string(av+ac-1, buf, MAXPDSTRING);
@@ -259,28 +257,29 @@ static void psql_list(t_psql *x, t_symbol *s, int ac, t_atom *av)
 {
     int i;
     char buf[MAXPDSTRING];
-    /*  post("list"); */
+
     strcat(x->sqlStringStore, ",");
 
-    if (strcmp(x->sqlStringStore, "") != 0)
-    { 
+    if (strcmp(x->sqlStringStore, "")){ 
 
         atom_string(av+ac-1, buf, MAXPDSTRING);
-        if (strcmp(buf, "sqlend") == 0)
-        { 
+        if (strcmp(buf, "sqlend") == 0){ 
+
             ac = ac -1;
-            for (i = 0; i < ac; i++)
-            {
+
+            for (i = 0; i < ac; i++){
                 strcat(x->sqlStringStore, " ");
                 atom_string(av+i, buf, MAXPDSTRING);
                 strcat(x->sqlStringStore, buf);
 
             }
+
+            x->in_query = 0;
+
         }
-        else
-        {
-            for (i = 0; i < ac; i++)
-            {
+        else{
+
+            for (i = 0; i < ac; i++){
                 strcat(x->sqlStringStore, " ");
                 atom_string(av+i, buf, MAXPDSTRING);
                 strcat(x->sqlStringStore, buf);
@@ -293,7 +292,6 @@ static void psql_list(t_psql *x, t_symbol *s, int ac, t_atom *av)
 
 }
 
-
 t_class *psql_class;
 
 static void *psql_new(t_symbol *s, int argc, t_atom *argv)
@@ -301,52 +299,56 @@ static void *psql_new(t_symbol *s, int argc, t_atom *argv)
     t_psql *x = (t_psql *)pd_new(psql_class);
     x->x_sym = gensym("psql");
     x->x_outlet1 = outlet_new(&x->t_ob, &s_list);
+    x->x_outlet2 = outlet_new(&x->t_ob, &s_bang);
+
+    x->in_query = 0;
+
     if(argc == 0)
     {
-        x->pghost = NULL;	  /* host name of the backend server */
-        x->pgport = NULL;		  /* port of the backend server */
-        x->pgoptions = NULL;	  /* special options to start up the backend server */
-        x->pgtty = NULL;		  /* debugging tty for the backend server */
+        x->pghost = NULL;      /* host name of the backend server */
+        x->pgport = NULL;          /* port of the backend server */
+        x->pgoptions = NULL;      /* special options to start up the backend server */
+        x->pgtty = NULL;          /* debugging tty for the backend server */
         x->dbName = "template1";
         post("using dbase template1 on local UNIX socket");
     }
     else if(argc == 1 && argv[0].a_type == A_SYMBOL)
     {
-        x->pghost = NULL;	  /* host name of the backend server */
-        x->pgport = NULL;		  /* port of the backend server */
-        x->pgoptions = NULL;	  /* special options to start up the backend server */
-        x->pgtty = NULL;		  /* debugging tty for the backend server */
+        x->pghost = NULL;      /* host name of the backend server */
+        x->pgport = NULL;          /* port of the backend server */
+        x->pgoptions = NULL;      /* special options to start up the backend server */
+        x->pgtty = NULL;          /* debugging tty for the backend server */
         x->dbName = argv[0].a_w.w_symbol->s_name;
-        /*        post("using %s on localhost", argv[0].a_w.w_symbol->s_name); */
     }
     else if(argc == 3 && argv[0].a_type == A_SYMBOL && argv[1].a_type == A_SYMBOL
             && argv[2].a_type == A_FLOAT)
     {
-        x->pghost = argv[1].a_w.w_symbol->s_name;	  /* host name of the backend server */
+        x->pghost = argv[1].a_w.w_symbol->s_name;   /* host name of the backend server */
         sprintf(x->port, "%d", (int)argv[2].a_w.w_float);
-        x->pgport =  x->port;		  /* port of the backend server */
-        //	strncpy(x->pgport, tmp);		  /* port of the backend server */
-        x->pgoptions = NULL;	  /* special options to start up the backend server */
-        x->pgtty = NULL;		  /* debugging tty for the backend server */
+        x->pgport =  x->port;          /* port of the backend server */
+        //    strncpy(x->pgport, tmp);          /* port of the backend server */
+        x->pgoptions = NULL;      /* special options to start up the backend server */
+        x->pgtty = NULL;          /* debugging tty for the backend server */
         x->dbName = argv[0].a_w.w_symbol->s_name;
-        /*        post("using dbase %s on %s and port %s", x->dbName, x->pghost, x->pgport); */
     }
 
     else
     {
-        x->pghost = NULL;	  /* host name of the backend server */
-        x->pgport = NULL;		  /* port of the backend server */
-        x->pgoptions = NULL;	  /* special options to start up the backend server */
-        x->pgtty = NULL;		  /* debugging tty for the backend server */
+        x->pghost = NULL;      /* host name of the backend server */
+        x->pgport = NULL;          /* port of the backend server */
+        x->pgoptions = NULL;      /* special options to start up the backend server */
+        x->pgtty = NULL;          /* debugging tty for the backend server */
         x->dbName = "template1";
         post("psql: invalid arguments using default template1 dbase on localhost");
     }
 
-    // check postmaster is running on specified port and machine by attempting to x->connect to template1
+    /* check postmaster is running on specified port and machine by attempting to 
+     * x->connect to template1 */
     x->conn = PQsetdb(x->pghost, x->pgport, x->pgoptions, x->pgtty, "template1");
     if (PQstatus(x->conn) == CONNECTION_BAD)
     {
-        fprintf(stderr, "psql: Connection to template1 failed. Perhaps the postmaster is not running on the specified port and machine \n");
+        fprintf(stderr, 
+                "psql: Connection to template1 failed. Perhaps the postmaster is not running on the specified port and machine \n");
         fprintf(stderr, "psql: Connect error is: %s", PQerrorMessage(x->conn));
     }
     else
@@ -354,18 +356,14 @@ static void *psql_new(t_symbol *s, int argc, t_atom *argv)
     return (x);
 }
 
-    static void psql_free(t_psql *x){
-        if(x->connected)
-            psql_close(x);
-    }
+static void psql_free(t_psql *x){
+    if(x->connected)
+        psql_close(x);
+}
 
-void psql_setup(void)
-{
-    /*      post("psql_setup"); */
+void psql_setup(void) {
     psql_class = class_new(gensym("psql"), (t_newmethod)psql_new, (t_method)psql_free,
             sizeof(t_psql),  0, A_GIMME, 0);
     class_addanything(psql_class, psql_anything);
     class_addlist(psql_class, psql_list);
 }
-
-
