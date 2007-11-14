@@ -40,6 +40,8 @@
 
 /* this should be part of the Pd API */
 t_symbol *canvas_getname(t_canvas *canvas);
+void tkwidgets_setcallbackname(void *x, char *widget_name);
+
 // TODO perhaps I should try to use glist_drawiofor() from g_text.c
 void draw_inlets(t_object *x, t_glist *glist, int firsttime, 
                  int total_inlets, int total_outlets);

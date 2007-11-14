@@ -22,6 +22,7 @@
 
 #include "tkwidgets.h"
 #include <stdio.h>
+#include <string.h>
 
 /* this should be part of the Pd API */
 t_symbol *canvas_getname(t_canvas *canvas)
@@ -31,6 +32,21 @@ t_symbol *canvas_getname(t_canvas *canvas)
     return gensym(buf);
 }
 
+/*
+I think I'll probably have to follow Krzsztof and make structs to make this work
+tkwidgets_setcallbackname(void *x, char *widget_name)
+{
+    char buf[MAXPDSTRING];
+
+    sprintf(buf,"%s%lx", widget_name, (long unsigned int)x);
+    x->tcl_namespace = getbytes(strlen(buf));
+    strcpy(x->tcl_namespace, buf);    
+
+    sprintf(buf,"#%s", x->tcl_namespace);
+    x->receive_name = gensym(buf);
+    pd_bind(&x->x_obj.ob_pd, x->receive_name);
+}
+*/  
 
 void draw_inlets(t_object *x, t_glist *glist, int firsttime, 
                  int total_inlets, int total_outlets)

@@ -45,7 +45,7 @@ typedef struct _textwidget
     t_canvas*  x_canvas;
     t_glist*   x_glist;
 
-    t_symbol*  x_receive_name;
+    t_symbol*  receive_name;
 
     int        x_height;
     int        x_width;
@@ -76,7 +76,7 @@ typedef struct _textwidget
 
 static t_class *textwidget_class;
 
-static char *tk_options[] = {
+static char *textwidget_tk_options[] = {
     "autoseparators",
     "background",
     "borderwidth",
@@ -308,7 +308,7 @@ static void create_widget(t_textwidget *x)
     bind_standard_keys(x);
     bind_button_events(x);
     sys_vgui("bind %s <KeyRelease> {+pd %s keyup %%N \\;} \n", 
-             x->text_id, x->x_receive_name->s_name);
+             x->text_id, x->receive_name->s_name);
 }
 
 static void textwidget_drawme(t_textwidget *x, t_glist *glist, int firsttime)
@@ -427,11 +427,11 @@ static void textwidget_activate(t_gobj *z, t_glist *glist, int state)
                  x->handle_id, x->all_tag);
         sys_vgui("raise %s\n", x->handle_id);
         sys_vgui("bind %s <Button> {pd [concat %s resize_click 1 \\;]}\n",
-                 x->handle_id, x->x_receive_name->s_name);
+                 x->handle_id, x->receive_name->s_name);
         sys_vgui("bind %s <ButtonRelease> {pd [concat %s resize_click 0 \\;]}\n",
-                 x->handle_id, x->x_receive_name->s_name);
+                 x->handle_id, x->receive_name->s_name);
         sys_vgui("bind %s <Motion> {pd [concat %s resize_motion %%x %%y \\;]}\n",
-                 x->handle_id, x->x_receive_name->s_name);
+                 x->handle_id, x->receive_name->s_name);
     }
 }
 
@@ -551,7 +551,7 @@ static void textwidget_bang_output(t_textwidget* x)
     /* With "," and ";" escaping thanks to JMZ */
     sys_vgui("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} \
               [%s get 0.0 end]] \\;]\n", 
-             x->x_receive_name->s_name, x->text_id);
+             x->receive_name->s_name, x->text_id);
 }
 
 static void textwidget_keyup_callback(t_textwidget *x, t_float f)
@@ -718,7 +718,7 @@ static void textwidget_resize_motion_callback(t_textwidget *x, t_floatarg f1, t_
 
 static void textwidget_free(t_textwidget *x)
 {
-    pd_unbind(&x->x_obj.ob_pd, x->x_receive_name);
+    pd_unbind(&x->x_obj.ob_pd, x->receive_name);
 }
 
 static void *textwidget_new(t_symbol *s, int argc, t_atom *argv)
@@ -754,18 +754,18 @@ static void *textwidget_new(t_symbol *s, int argc, t_atom *argv)
     strcpy(x->tcl_namespace, buf);    
 
     sprintf(buf,"#%s", x->tcl_namespace);
-    x->x_receive_name = gensym(buf);
-    pd_bind(&x->x_obj.ob_pd, x->x_receive_name);
+    x->receive_name = gensym(buf);
+    pd_bind(&x->x_obj.ob_pd, x->receive_name);
 
     x->x_glist = canvas_getcurrent();
     set_tk_widget_ids(x, x->x_glist);
-
+    
     int i;
-    int option_argc = sizeof(tk_options)/sizeof(char *);
+    int option_argc = sizeof(textwidget_tk_options)/sizeof(char *);
     post("total options: %d", option_argc);
     for(i = 0; i < option_argc; i++)
     {
-        post("option %d: %s", i, tk_options[i]);
+        post("option %d: %s", i, textwidget_tk_options[i]);
     }
 
     return (x);
