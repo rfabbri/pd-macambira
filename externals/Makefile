@@ -121,7 +121,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vbap zexy
+LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -262,6 +262,40 @@ template_clean:
 	-rm -f -- $(TEMPLATE_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/template/*.bak
 	-rm -f -- $(externals_src)/template/*.*~
+
+#------------------------------------------------------------------------------#
+# BASSEMU
+BASSEMU_NAME=bassemu
+BASSEMU_OBJECTS := $(wildcard $(externals_src)/bassemu/*.c)
+bassemu: $(BASSEMU_OBJECTS:.c=.$(EXTENSION))
+
+bassemu_install: bassemu
+	install -d $(objectsdir)/$(BASSEMU_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(BASSEMU_NAME) \
+		--author "" \
+		--description "" \
+		--license "" \
+		--version ""
+	install -p $(BASSEMU_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(BASSEMU_NAME)
+	install -d $(helpdir)/$(BASSEMU_NAME)
+	install -p $(externals_src)/bassemu/*-help.pd \
+		$(helpdir)/$(BASSEMU_NAME)
+#	install -d $(manualsdir)/$(BASSEMU_NAME)
+#	install -p $(externals_src)/bassemu/manual.txt \
+#		$(manualsdir)/$(BASSEMU_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/bassemu/README \
+		$(readmesdir)/$(BASSEMU_NAME).txt
+#	install -d $(examplesdir)/$(BASSEMU_NAME)
+#	install -p $(externals_src)/bassemu/examples/*.pd \
+		$(examplesdir)/$(BASSEMU_NAME)
+
+bassemu_clean:
+	-rm -f -- $(BASSEMU_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(BASSEMU_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/bassemu/*.bak
+	-rm -f -- $(externals_src)/bassemu/*.*~
+
 
 
 #------------------------------------------------------------------------------#
