@@ -76,40 +76,38 @@ my $caption = "";
 
 
 #------------------------------------------------------------------------------#
-# wikipedia terms - Spanish
-$stub = "esbozo";
-$template = "plantilla";
-$category = "categoría";
-$infobox = "infobox";
+# wikipedia terms - Russian/Русский
+my $stub = "Заготовка";
+my $template = "Шаблон";
+my $category = "Категория"; ## или раздел ?
+my $infobox = "Инфорамка";
 
- # pdpedia terms
-$objectclass = "Clase de objeto";
+# термины pdpedia
+my $objectclass = "Объект-класс";
+my $inlets = "Впуски";  ## по словарю а. мюллера
+my $outlets = "Выпуски";
+my $arguments = "Параметры";
+my $messages = "Сообщения";
 
- # page headers
-$inlets = "entradas";
-$outlets = "salidas";
-$arguments = "argumentos";
-$messages = "mensajes";
-
- # infobox
-$name = "nombre";
-$description = "descripción";
-$abbreviation = "abreviación";
-$library = "librería";
-$author = "autor";
-$developer = "desarrollador";
-$releaseVersion = "versión";
-$releaseDate = "fecha de la versión";
-$dependencies = "dependencias";
-$license = "licencia";
-$website = "sitio web";
-$programmingLanguage = "lenguaje de programación";
-$platform = "plataforma";
-$operatingSystem = "sistema operativo";
-$language = "idioma";
-$dataType = "tipo de dato";
-$distribution = "distribuciones";
-$status = "estado";
+# infobox
+my $name = "Название";
+my $description = "Описание";
+my $abbreviation = "Сокращение";
+my $library = "Библиотека";
+my $author = "Автор";
+my $developer = "Разработчик";
+my $releaseVersion = "Версия релиза";
+my $releaseDate = "Дата выпуска";
+my $dependencies = "Зависимости";
+my $license = "Лицензия";
+my $website = "Домашняя страница";
+my $programmingLanguage = "Язык программирования";
+my $platform = "Платформа";
+my $operatingSystem = "Операционная Система";
+my $language = "Язык";
+my $dataType = "Тип данных";
+my $distribution = "Дистрибутивы";
+my $status = "Статус";
 
 
 #------------------------------------------------------------------------------#
@@ -231,11 +229,11 @@ foreach (`/sw/bin/find /Users/hans/Desktop/TODO/wiki_files_hacked/5.reference/ -
 	 print(OBJECTCLASS "\n\n");
 	 print(OBJECTCLASS "[[de:$pageName]]\n");
 	 print(OBJECTCLASS "[[en:$pageName]]\n");
-#	 print(OBJECTCLASS "[[es:$pageName]]\n");
+	 print(OBJECTCLASS "[[es:$pageName]]\n");
 	 print(OBJECTCLASS "[[fr:$pageName]]\n");
 	 print(OBJECTCLASS "[[nl:$pageName]]\n");
 	 print(OBJECTCLASS "[[pt:$pageName]]\n");
-	 print(OBJECTCLASS "[[ru:$pageName]]\n");
+#	 print(OBJECTCLASS "[[ru:$pageName]]\n");
 	 print(OBJECTCLASS "[[tr:$pageName]]\n");
 	 print(OBJECTCLASS "\n\n");
 	 close(OBJECTCLASS);
