@@ -160,6 +160,7 @@ static void store_options(t_textwidget *x)
     post("total options: %d", argc);
     for(i = 0; i < argc; i++)
     {
+        // TODO: only send if there is a value, not when blank
         sys_vgui("lappend ::%s::store_list -%s \n", 
                  x->tcl_namespace, textwidget_tk_options[i]);
         sys_vgui("lappend ::%s::store_list [%s cget -%s] \n", 
@@ -174,14 +175,6 @@ static void store_options(t_textwidget *x)
 static void restore_options(t_textwidget *x)
 {
     // TODO restore options from x->options_binbuf
-}
-
-static void query_options(t_textwidget *x, int argc, char** argv)
-{
-    int i;
-    for(i = 0; i < argc; i++)
-        sys_vgui("pd [concat %s query_callback %s [%s cget -%s] \\;]\n",
-                 x->receive_name->s_name, argv[i], x->text_id, argv[i]);
 }
 
 static void set_tk_widget_ids(t_textwidget *x, t_canvas *canvas)
@@ -321,7 +314,6 @@ static void bind_button_events(t_textwidget *x)
 static void create_widget(t_textwidget *x)
 {
     DEBUG(post("create_widget"););
-    /* I guess this is for fine-tuning of the rect size based on width and height? */
 
     sys_vgui("namespace eval text%lx {} \n", x);
     
@@ -329,11 +321,8 @@ static void create_widget(t_textwidget *x)
     sys_vgui("destroy %s\n", x->frame_id);
     sys_vgui("frame %s \n", x->frame_id);
     sys_vgui("text %s -border 1 \
-    -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\"  \
-    -yscrollcommand {%s set} \n",
-             x->text_id, 
-             DEFAULT_COLOR, "black",
-             x->scrollbar_id);
+    -highlightthickness 1 -relief sunken -bg \"%s\" -yscrollcommand {%s set} \n",
+             x->text_id, DEFAULT_COLOR, x->scrollbar_id);
     sys_vgui("scrollbar %s -command {%s yview}\n",
              x->scrollbar_id, x->text_id);
     sys_vgui("pack %s -side left -fill both -expand 1 \n", x->text_id);
@@ -641,10 +630,12 @@ static void textwidget_save(t_gobj *z, t_binbuf *b)
 {
     t_textwidget *x = (t_textwidget *)z;
     
-    binbuf_addv(b, "ssiisiii;", &s__X, gensym("obj"),
+    binbuf_addv(b, "ssiisiii", &s__X, gensym("obj"),
                 x->x_obj.te_xpix, x->x_obj.te_ypix, 
                 atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
                 x->size_x, x->size_y, x->x_have_scrollbars);
+    binbuf_addbinbuf(b, x->options_binbuf);
+    binbuf_addv(b, ";");
 }
 
 static void textwidget_option(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
@@ -662,6 +653,7 @@ static void textwidget_option(t_textwidget *x, t_symbol *s, int argc, t_atom *ar
         post("argument_buffer: %s", argument_buffer);
         sys_vgui("%s configure -%s {%s} \n", 
                  x->text_id, s->s_name, argument_buffer);
+        store_options(x);
     }
 }
 
@@ -687,7 +679,8 @@ static void textwidget_query(t_textwidget *x, t_symbol *s)
     post("textwidget_query %s", s->s_name);
     if(s == &s_)
     {
-        query_options(x, sizeof(textwidget_tk_options)/sizeof(char *), textwidget_tk_options);
+        query_options(x->receive_name, x->text_id, 
+                      sizeof(textwidget_tk_options)/sizeof(char *), textwidget_tk_options);
         query_scrollbars(x);
         query_size(x);
     }
@@ -696,7 +689,7 @@ static void textwidget_query(t_textwidget *x, t_symbol *s)
     else if(s == size_symbol)
         query_size(x);
     else
-        query_options(x, 1, &(s->s_name));
+        query_options(x->receive_name, x->text_id, 1, &(s->s_name));
 }
 
 static void textwidget_scrollbars(t_textwidget *x, t_float f)

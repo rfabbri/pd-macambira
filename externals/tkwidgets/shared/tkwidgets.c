@@ -32,6 +32,15 @@ t_symbol *canvas_getname(t_canvas *canvas)
     return gensym(buf);
 }
 
+
+void query_options(t_symbol *receive_name, char *widget_id, int argc, char** argv)
+{
+    int i;
+    for(i = 0; i < argc; i++)
+        sys_vgui("pd [concat %s query_callback %s [%s cget -%s] \\;]\n",
+                 receive_name->s_name, argv[i], widget_id, argv[i]);
+}
+
 /*
 I think I'll probably have to follow Krzsztof and make structs to make this work
 tkwidgets_setcallbackname(void *x, char *widget_name)

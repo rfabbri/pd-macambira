@@ -102,6 +102,7 @@ CXXFLAGS = $(CFLAGS)
 %.$(EXTENSION): %.o
 	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) \
 		`test -f $*.libs && cat $*.libs`	\
+		`my_dylib=$(patsubst $(externals_src)/%,%,$(@D)); test -f $(@D)/lib$${my_dylib}.$(DYLIB_EXTENSION) && echo -L$(@D) -l$$my_dylib` \
 		`test -f $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs && \
 			cat $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs`
 	chmod a-x "$*.$(EXTENSION)"

@@ -37,6 +37,23 @@
 #define TKW_HANDLE_WIDTH        15
 #define TKW_HANDLE_INSET        -2
 
+/* sketch for a common struct */
+typedef struct _tkwidgets
+{
+    t_symbol *canvas_id; /* the canvas that is showing this widget */
+    t_symbol *receive_name; /* name to bind to, to receive callbacks */
+    t_symbol *window_id; /* the window that contains the widget */
+    t_symbol *widget_id; /* the core widget */
+    t_symbol *all_tag;   /* the tag for moving/deleting everything */
+    int      resizing;   /* flag to tell when being resized */
+    int      selected;   /* flag for when widget is selected */
+} t_tkwidgets;   
+
+
+
+/* query a tk widget for the state of all its options */
+void query_options(t_symbol *receive_name, char *widget_id, int argc, char** argv);
+
 
 /* this should be part of the Pd API */
 t_symbol *canvas_getname(t_canvas *canvas);
