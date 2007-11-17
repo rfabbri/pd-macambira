@@ -1,11 +1,11 @@
 #N canvas 108 75 628 435 10;
 #X obj 55 230 metro;
 #X obj 5 68 tgl 16 0 \$0/startstop \$1/startstop startstop 0 -6 0 8
--260818 -1 -1 0 127;
+-260818 -1 -1 1 1;
 #X obj 55 257 f;
 #X obj 92 257 + 1;
 #X obj 85 36 nbx 3 16 1 500 0 1 \$0/bpm \$1/bpm bpm 0 -6 0 8 -260818
--1 -1 180 256;
+-1 -1 140 256;
 #X obj 123 123 expr 60000 / $f1;
 #X obj 123 206 / 4;
 #X obj 5 36 nbx 3 16 1 256 0 1 \$0/ticksperbeat \$1/ticksperbeat ticksperbeat
@@ -43,6 +43,11 @@
 #X obj 202 190 r \$1/beat;
 #X obj 3 389 sssad/auto \$0/bpm \$1/bpm;
 #X obj 3 410 sssad/auto \$0/ticksperbeat \$1/ticksperbeat;
+#X obj 332 237 s \$1/beatsperminute;
+#X obj 332 215 f;
+#X obj 332 153 r \$1/tick;
+#X msg 332 174 bang;
+#X obj 348 195 r \$0/bpm;
 #X connect 0 0 2 0;
 #X connect 2 0 3 0;
 #X connect 2 0 19 0;
@@ -75,4 +80,8 @@
 #X connect 35 0 32 0;
 #X connect 36 0 35 0;
 #X connect 37 0 36 0;
+#X connect 41 0 40 0;
+#X connect 42 0 43 0;
+#X connect 43 0 41 0;
+#X connect 44 0 41 1;
 #X coords 0 0 1 1 120 90 1 0 0;

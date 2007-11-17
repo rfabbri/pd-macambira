@@ -1,5 +1,5 @@
 #N canvas 277 36 744 599 10;
-#N canvas 84 0 821 693 fft-analysis 0;
+#N canvas 84 0 821 675 fft-analysis 0;
 #X obj 51 477 *~;
 #X obj 18 477 *~;
 #X obj 18 499 -~;
@@ -29,7 +29,7 @@
 #X obj 127 643 expr 2/(3*$f1);
 #X msg 426 619 set \$1 4;
 #X obj 97 425 q8_rsqrt~;
-#N canvas -22 50 1006 799 read-windows 0;
+#N canvas 0 0 1001 679 read-windows 0;
 #X obj 18 693 *~;
 #X obj 156 300 f;
 #X obj 102 139 /;
@@ -270,7 +270,7 @@ shifts the signal to the left or right depending on its argument.)
 #X connect 58 0 32 0;
 #X connect 58 0 37 0;
 #X restore 14 527 pd fft-analysis;
-#N canvas 260 0 647 768 phase-tables 0;
+#N canvas 260 0 647 675 phase-tables 0;
 #N canvas 0 0 450 300 (subpatch) 0;
 #X array \$0-prev-imag 4096 float 0;
 #X coords 0 1000 4096 -1000 400 300 1;
@@ -365,6 +365,7 @@ are my own.;
 #X obj 458 399 s \$0/window-size;
 #X obj 337 182 r \$0/detune;
 #X obj 337 203 s \$0/transpo;
+#X text 155 41 args: name tablename;
 #X connect 0 0 17 0;
 #X connect 5 0 30 0;
 #X connect 6 0 30 0;

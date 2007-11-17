@@ -56,6 +56,7 @@
 #X obj 144 157 r \$0/position;
 #X obj 2 179 sssad/sssad \$1/position;
 #X obj 2 201 s \$0/position;
+#X obj 53 365 r \$1/note;
 #X connect 1 0 31 0;
 #X connect 2 0 1 0;
 #X connect 3 0 4 0;
@@ -104,4 +105,5 @@
 #X connect 49 0 50 0;
 #X connect 51 0 52 1;
 #X connect 52 0 53 0;
+#X connect 54 0 4 0;
 #X coords 0 -1 1 1 120 60 1 0 0;
