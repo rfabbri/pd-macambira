@@ -27,6 +27,7 @@
 #include "m_imp.h"
 #include "g_canvas.h"
 
+/* I don't know what these do, but they seem to be everywhere */
 #ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
@@ -40,30 +41,48 @@
 /* sketch for a common struct */
 typedef struct _tkwidgets
 {
-    t_symbol *canvas_id; /* the canvas that is showing this widget */
-    t_symbol *receive_name; /* name to bind to, to receive callbacks */
-    t_symbol *window_id; /* the window that contains the widget */
-    t_symbol *widget_id; /* the core widget */
-    t_symbol *all_tag;   /* the tag for moving/deleting everything */
-    int      resizing;   /* flag to tell when being resized */
-    int      selected;   /* flag for when widget is selected */
+    t_canvas* canvas;        /* canvas/glist this widget is currently drawn in*/
+    t_glist*  glist;         /* glist that owns this widget */
+    t_binbuf* options_binbuf;/* binbuf to save options state in */
+    t_symbol* receive_name;  /* name to bind to, to receive callbacks */
+    t_symbol* tcl_namespace; /* namespace to prevent name collisions */
+    t_symbol* canvas_id;     /* the canvas that is showing this widget */
+    t_symbol* frame_id;      /* the frame around the widget and supporters */
+    t_symbol* window_id;     /* the window that contains the widget */
+    t_symbol* widget_id;     /* the core widget */
+    t_symbol* handle_id;     /* the resizing handle */
+    t_symbol* all_tag;       /* the tag for moving/deleting everything */
+    int       resizing;      /* flag to tell when being resized */
+    int       selected;      /* flag for when widget is selected */
 } t_tkwidgets;   
 
-
-
 /* query a tk widget for the state of all its options */
-void query_options(t_symbol *receive_name, char *widget_id, int argc, char** argv);
+void tkwidgets_query_options(t_symbol* receive_name, t_symbol *widget_id, 
+                             int argc, char** argv);
+/* initialize things on new widget */
+void tkwidgets_new(t_tkwidgets* tkw);
 
 
 /* this should be part of the Pd API */
-t_symbol *canvas_getname(t_canvas *canvas);
+t_symbol* canvas_getname(t_canvas *canvas);
+
 void tkwidgets_setcallbackname(void *x, char *widget_name);
 
+t_symbol* tkwidgets_gen_tcl_namespace(t_object* x, t_symbol* widget_name);
+t_symbol* tkwidgets_gen_callback_name(t_symbol* tcl_namespace);
+t_symbol* tkwidgets_gen_canvas_id(t_canvas* canvas);
+t_symbol* tkwidgets_gen_frame_id(t_object* x, t_symbol* canvas_id);
+t_symbol* tkwidgets_gen_widget_id(t_object* x, t_symbol* parent_id);
+t_symbol* tkwidgets_gen_handle_id(t_object *x, t_symbol* parent_id);
+t_symbol* tkwidgets_gen_window_tag(t_object* x, t_symbol* parent_id);
+t_symbol* tkwidgets_gen_all_tag(t_object *x);
+
+
 // TODO perhaps I should try to use glist_drawiofor() from g_text.c
-void draw_inlets(t_object *x, t_glist *glist, int firsttime, 
+void tkwidgets_draw_inlets(t_object *x, t_glist *glist, 
                  int total_inlets, int total_outlets);
-void draw_handle(); // TODO draw resize handle when selected in editmode
-void draw_resize_window(); // TODO draw the resize window while resizing
+void tkwidgets_draw_handle(); // TODO draw resize handle when selected in editmode
+void tkwidgets_draw_resize_window(); // TODO draw the resize window while resizing
 
 
 
@@ -71,4 +90,4 @@ void draw_resize_window(); // TODO draw the resize window while resizing
 
 
 
-#endif /* NOT g_TK_WIDGETS_H */
+#endif /* NOT __TK_WIDGETS_H */
