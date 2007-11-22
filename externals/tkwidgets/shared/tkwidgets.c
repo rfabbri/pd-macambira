@@ -43,39 +43,35 @@ void tkwidgets_query_options(t_symbol *receive_name, t_symbol *widget_id,
                  receive_name->s_name, argv[i], widget_id->s_name, argv[i]);
 }
 
-/* this function queries the widget and sends the data to the store_callback */
+/* this queries the widget for each option listed in the tk_options struct,
+ * builts a list in Tcl-space, then send that list to the store_callback */
 void tkwidgets_store_options(t_symbol *receive_name, t_symbol *tcl_namespace,
                              t_symbol *widget_id, int argc, char **argv)
 {
-    // build list then send the whole shebang to store_callback
     int i;
-    post("tkwidgets_store_options total options: %d", argc);
     for(i = 0; i < argc; i++)
     {
-        // TODO: only send if there is a value, not when blank
         sys_vgui("set ::%s::ret [%s cget -%s]\n",
                  tcl_namespace->s_name, widget_id->s_name, argv[i]);
         sys_vgui("if {[string length $::%s::ret] > 0} {\n",
                  tcl_namespace->s_name);
-        sys_vgui("lappend ::%s::store_list -%s ; lappend ::%s::store_list $::%s::ret}\n", 
+        sys_vgui("lappend ::%s::list -%s; lappend ::%s::list $::%s::ret}\n", 
                  tcl_namespace->s_name, argv[i], 
                  tcl_namespace->s_name, tcl_namespace->s_name);
     }
-    sys_vgui("pd [concat %s store_callback $::%s::store_list \\;]\n",
+    sys_vgui("pd [concat %s store_callback $::%s::list \\;]\n",
              receive_name->s_name, tcl_namespace->s_name);
-    sys_vgui("unset ::%s::store_list \n", tcl_namespace->s_name);  
+    sys_vgui("unset ::%s::list \n", tcl_namespace->s_name);  
 }
 
-void tkwidgets_restore_options(t_symbol *receive_name, t_symbol *widget_id, 
-                             int argc, char** argv)
+void tkwidgets_restore_options(t_symbol *receive_name, t_symbol *tcl_namespace,
+                               t_symbol *widget_id, t_binbuf *options_binbuf)
 {
-    int i;
-    for(i = 0; i < argc; i++)
-    {
-        // TODO parse out -flags and values, and set them here:
-        sys_vgui("%s configure %s\n",
-                 widget_id->s_name, argv[i]);
-    }
+    int length;
+    char *options;
+    binbuf_gettext(options_binbuf, &options, &length);
+    options[length] = 0; //binbuf_gettext() doesn't put a null, so we do
+    sys_vgui("%s configure %s\n", widget_id->s_name, options);
 }
 
 /* -------------------- generate names for various elements ----------------- */
@@ -160,7 +156,7 @@ static int calculate_onset(int x_location, int width,
            * current_iolet / (total_iolets == 1 ? 1 : total_iolets - 1));
 }
 
-void tkwidgets_draw_inlets(t_object *x, t_glist *glist, t_symbol *canvas_id,
+void tkwidgets_draw_iolets(t_object *x, t_glist *glist, t_symbol *canvas_id,
                            t_symbol *iolets_tag, t_symbol *all_tag,
                            int width, int height,
                            int total_inlets, int total_outlets)
@@ -189,7 +185,7 @@ void tkwidgets_draw_inlets(t_object *x, t_glist *glist, t_symbol *canvas_id,
     }
 }
 
-void tkwidgets_erase_inlets(t_symbol* canvas_id, t_symbol* iolets_tag)
+void tkwidgets_erase_iolets(t_symbol* canvas_id, t_symbol* iolets_tag)
 {
     sys_vgui("%s delete %s\n", canvas_id->s_name, iolets_tag); 
 }

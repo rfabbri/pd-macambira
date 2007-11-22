@@ -30,7 +30,8 @@
 /* TODO: remove glist from _erase() args */
 /* TODO: window name "handle1376fc00" already exists in parent */
 /* TODO: figure out window vs. text width/height */
-
+/* TODO: move bind_* to tkwidgets.c */
+/* TODO: erase iolets on resize, they are leaving old ones behind */
 
 #define DEFAULT_COLOR           "grey70"
 
@@ -111,8 +112,6 @@ static char *textwidget_tk_options[] = {
     "undo",
     "width",
     "wrap",
-    "xscrollcommand",
-    "yscrollcommand"
 };
 
 
@@ -237,7 +236,7 @@ static void textwidget_drawme(t_textwidget *x, t_glist *glist)
     DEBUG(post("textwidget_drawme: firsttime %d canvas %lx glist %lx", x->x_canvas, glist););
     set_tkwidgets_ids(x,glist_getcanvas(glist));	
     create_widget(x);	
-    tkwidgets_draw_inlets((t_object*)x, glist, 
+    tkwidgets_draw_iolets((t_object*)x, glist, 
                           x->canvas_id, x->iolets_tag, x->all_tag,
                           x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
     if(x->have_scrollbars) draw_scrollbar(x);
@@ -246,6 +245,8 @@ static void textwidget_drawme(t_textwidget *x, t_glist *glist)
              text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
              x->frame_id->s_name, x->window_tag->s_name, x->all_tag->s_name, 
              x->width, x->height);
+    tkwidgets_restore_options(x->receive_name, x->tcl_namespace,
+                              x->widget_id, x->options_binbuf);
 }     
 
 static void textwidget_erase(t_textwidget* x,t_glist* glist)
@@ -253,7 +254,7 @@ static void textwidget_erase(t_textwidget* x,t_glist* glist)
     DEBUG(post("textwidget_erase: canvas %lx glist %lx", x->x_canvas, glist););
 
     set_tkwidgets_ids(x,glist_getcanvas(glist));
-    tkwidgets_erase_inlets(x->canvas_id, x->iolets_tag);
+    tkwidgets_erase_iolets(x->canvas_id, x->iolets_tag);
     sys_vgui("destroy %s\n", x->frame_id->s_name);
     sys_vgui("%s delete %s\n", x->canvas_id->s_name, x->all_tag->s_name);
 }
@@ -540,7 +541,7 @@ static void textwidget_option(t_textwidget *x, t_symbol *s, int argc, t_atom *ar
                  x->widget_id->s_name, s->s_name, argument_buffer);
         tkwidgets_store_options(x->receive_name, x->tcl_namespace, x->widget_id, 
                                 sizeof(textwidget_tk_options)/sizeof(char *), 
-                                &textwidget_tk_options);
+                                (char **)&textwidget_tk_options);
     }
 }
 
@@ -598,8 +599,8 @@ static void textwidget_size(t_textwidget *x, t_float width, t_float height)
     {
         sys_vgui("%s itemconfigure %s -width %d -height %d\n",
                  x->canvas_id->s_name, x->window_tag->s_name, x->width, x->height);
-        tkwidgets_erase_inlets(x->canvas_id, x->iolets_tag);
-        tkwidgets_draw_inlets((t_object*)x, x->x_glist, 
+        tkwidgets_erase_iolets(x->canvas_id, x->iolets_tag);
+        tkwidgets_draw_iolets((t_object*)x, x->x_glist, 
                               x->canvas_id, x->iolets_tag, x->all_tag,
                               x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
         canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
@@ -611,7 +612,12 @@ static void textwidget_size(t_textwidget *x, t_float width, t_float height)
 static void textwidget_store_callback(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
 {
     if(s != &s_)
+    {
+        binbuf_clear(x->options_binbuf);
         binbuf_restore(x->options_binbuf, argc, argv);
+    }
+    else
+        post("ERROR: does this ever happen?");
 }
 
 static void textwidget_query_callback(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
@@ -640,19 +646,16 @@ static void textwidget_resize_click_callback(t_textwidget *x, t_floatarg f)
 {
     t_canvas *canvas = (glist_isvisible(x->x_glist) ? x->x_canvas : 0);
     int newstate = (int)f;
-    if (x->x_resizing && newstate == 0)
+    if (x->x_resizing && !newstate && canvas)
     {
-        if (canvas)
-        {
-            tkwidgets_draw_inlets((t_object*)x, canvas,
-                                  x->canvas_id, x->iolets_tag, x->all_tag,
-                                  x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
-            canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
-        }
+        tkwidgets_draw_iolets((t_object*)x, canvas,
+                              x->canvas_id, x->iolets_tag, x->all_tag,
+                              x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
+        canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
     }
-    else if (!x->x_resizing && newstate)
+    if (!x->x_resizing && newstate)
     {
-        tkwidgets_erase_inlets(x->canvas_id, x->iolets_tag);
+        tkwidgets_erase_iolets(x->canvas_id, x->iolets_tag);
     }
     x->x_resizing = newstate;
 }
@@ -707,10 +710,7 @@ static void *textwidget_new(t_symbol *s, int argc, t_atom *argv)
 		x->height = atom_getint(argv + 1);
         x->have_scrollbars = atom_getint(argv + 2);
         if(argc > 3) 
-        {
             binbuf_add(x->options_binbuf, argc - 3, argv + 3);
-//TODO            tkwidgets_restore_options(x->receive_name, x->widget_id);
-        }
 	}	
 
     x->tcl_namespace = tkwidgets_gen_tcl_namespace((t_object*)x, s);

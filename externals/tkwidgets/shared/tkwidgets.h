@@ -71,6 +71,8 @@ void tkwidgets_setcallbackname(void *x, char *widget_name);
 /* handle options */
 void tkwidgets_store_options(t_symbol *receive_name, t_symbol *tcl_namespace,
                              t_symbol *widget_id, int argc, char **argv);
+void tkwidgets_restore_options(t_symbol *receive_name, t_symbol *tcl_namespace,
+                               t_symbol *widget_id, t_binbuf *options_binbuf);
 void tkwidgets_query_options(t_symbol *receive_name, t_symbol *widget_id, 
                              int argc, char** argv);
 
@@ -89,11 +91,11 @@ t_symbol* tkwidgets_gen_all_tag(t_object *x);
 
 
 // TODO perhaps I should try to use glist_drawiofor() from g_text.c
-void tkwidgets_draw_inlets(t_object *x, t_glist *glist, t_symbol *canvas_id,
+void tkwidgets_draw_iolets(t_object *x, t_glist *glist, t_symbol *canvas_id,
                            t_symbol *iolets_tag, t_symbol *all_tag,
                            int width, int height,
                            int total_inlets, int total_outlets);
-void tkwidgets_erase_inlets(t_symbol* canvas_id, t_symbol* iolets_tag);
+void tkwidgets_erase_iolets(t_symbol* canvas_id, t_symbol* iolets_tag);
 
 void tkwidgets_draw_handle(); // TODO draw resize handle when selected in editmode
 void tkwidgets_draw_resize_window(); // TODO draw the resize window while resizing
