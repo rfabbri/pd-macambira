@@ -29,6 +29,7 @@
 /* TODO: add scrollbars to query and save */
 /* TODO: remove glist from _erase() args */
 /* TODO: window name "handle1376fc00" already exists in parent */
+/* TODO: figure out window vs. text width/height */
 
 
 #define DEFAULT_COLOR           "grey70"
@@ -134,31 +135,6 @@ static void textwidget_query_callback(t_textwidget *x, t_symbol *s, int argc, t_
 
 
 /* -------------------- widget helper functions ----------------------------- */
-
-static void store_options(t_textwidget *x)
-{
-    // build list then send the whole shebang to store_callback
-    int i;
-    int argc = sizeof(textwidget_tk_options)/sizeof(char *); 
-    post("total options: %d", argc);
-    for(i = 0; i < argc; i++)
-    {
-        // TODO: only send if there is a value, not when blank
-        sys_vgui("lappend ::%s::store_list -%s \n", 
-                 x->tcl_namespace->s_name, textwidget_tk_options[i]);
-        sys_vgui("lappend ::%s::store_list [%s cget -%s] \n", 
-                 x->tcl_namespace->s_name, x->widget_id, textwidget_tk_options[i]);
-        post("option %d: %s", i, textwidget_tk_options[i]);
-    }
-    sys_vgui("pd [concat %s store_callback $::%s::store_list \\;]\n",
-             x->receive_name->s_name, x->tcl_namespace->s_name);
-    sys_vgui("unset ::%s::store_list \n", x->tcl_namespace->s_name);  
-}
-
-static void restore_options(t_textwidget *x)
-{
-    // TODO restore options from x->options_binbuf
-}
 
 static void set_tkwidgets_ids(t_textwidget *x, t_canvas *canvas)
 {
@@ -307,7 +283,7 @@ static void textwidget_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     {
         set_tkwidgets_ids(x,glist_getcanvas(glist));
         sys_vgui("%s move %s %d %d\n", x->canvas_id->s_name, x->all_tag->s_name, dx, dy);
-        sys_vgui("%s move RSZ %d %d\n", x->canvas_id->s_name, dx, dy);
+        sys_vgui("%s move RESIZE %d %d\n", x->canvas_id->s_name, dx, dy);
         canvas_fixlinesfor(glist_getcanvas(glist), (t_text*) x);
     }
     DEBUG(post("displace end"););
@@ -353,7 +329,7 @@ static void textwidget_activate(t_gobj *z, t_glist *glist, int state)
 /* no worky, this should draw MAC OS X style lines on the resize handle */
 /*         sys_vgui("%s create line %d %d %d %d -fill black -tags RESIZE_LINES\n",  */
 /*                  x->handle_id->s_name, handle_x2, handle_y1, handle_x1, handle_y2); */
-        sys_vgui("%s create window %d %d -anchor nw -width %d -height %d -window %s -tags RSZ\n",
+        sys_vgui("%s create window %d %d -anchor nw -width %d -height %d -window %s -tags RESIZE\n",
                  x->canvas_id->s_name, handle_x1, handle_y1,
                  TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT,
                  x->handle_id->s_name, x->all_tag->s_name);
@@ -562,7 +538,9 @@ static void textwidget_option(t_textwidget *x, t_symbol *s, int argc, t_atom *ar
         post("argument_buffer: %s", argument_buffer);
         sys_vgui("%s configure -%s {%s} \n", 
                  x->widget_id->s_name, s->s_name, argument_buffer);
-        store_options(x);
+        tkwidgets_store_options(x->receive_name, x->tcl_namespace, x->widget_id, 
+                                sizeof(textwidget_tk_options)/sizeof(char *), 
+                                &textwidget_tk_options);
     }
 }
 
@@ -646,7 +624,7 @@ static void textwidget_query_callback(t_textwidget *x, t_symbol *s, int argc, t_
     }
     else
     {
-        post("textwidget_query_callback %s %d", s->s_name, argc);
+        post("ERROR: textwidget_query_callback %s %d", s->s_name, argc);
     }
 }
 
@@ -692,7 +670,7 @@ static void textwidget_resize_motion_callback(t_textwidget *x, t_floatarg f1, t_
             sys_vgui("%s itemconfigure %s -width %d -height %d\n",
                      x->canvas_id->s_name, x->window_tag->s_name, 
                      x->width, x->height);
-            sys_vgui("%s move RSZ %d %d\n",
+            sys_vgui("%s move RESIZE %d %d\n",
                      x->canvas_id->s_name, dx, dy);
             canvas_fixlinesfor(x->x_glist, (t_text *)x);
         }
@@ -731,7 +709,7 @@ static void *textwidget_new(t_symbol *s, int argc, t_atom *argv)
         if(argc > 3) 
         {
             binbuf_add(x->options_binbuf, argc - 3, argv + 3);
-            restore_options(x);
+//TODO            tkwidgets_restore_options(x->receive_name, x->widget_id);
         }
 	}	
 

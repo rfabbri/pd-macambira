@@ -32,6 +32,7 @@ t_symbol *canvas_getname(t_canvas *canvas)
     return gensym(buf);
 }
 
+/* -------------------- options handling ------------------------------------ */
 
 void tkwidgets_query_options(t_symbol *receive_name, t_symbol *widget_id, 
                              int argc, char** argv)
@@ -40,6 +41,29 @@ void tkwidgets_query_options(t_symbol *receive_name, t_symbol *widget_id,
     for(i = 0; i < argc; i++)
         sys_vgui("pd [concat %s query_callback %s [%s cget -%s] \\;]\n",
                  receive_name->s_name, argv[i], widget_id->s_name, argv[i]);
+}
+
+/* this function queries the widget and sends the data to the store_callback */
+void tkwidgets_store_options(t_symbol *receive_name, t_symbol *tcl_namespace,
+                             t_symbol *widget_id, int argc, char **argv)
+{
+    // build list then send the whole shebang to store_callback
+    int i;
+    post("tkwidgets_store_options total options: %d", argc);
+    for(i = 0; i < argc; i++)
+    {
+        // TODO: only send if there is a value, not when blank
+        sys_vgui("set ::%s::ret [%s cget -%s]\n",
+                 tcl_namespace->s_name, widget_id->s_name, argv[i]);
+        sys_vgui("if {[string length $::%s::ret] > 0} {\n",
+                 tcl_namespace->s_name);
+        sys_vgui("lappend ::%s::store_list -%s ; lappend ::%s::store_list $::%s::ret}\n", 
+                 tcl_namespace->s_name, argv[i], 
+                 tcl_namespace->s_name, tcl_namespace->s_name);
+    }
+    sys_vgui("pd [concat %s store_callback $::%s::store_list \\;]\n",
+             receive_name->s_name, tcl_namespace->s_name);
+    sys_vgui("unset ::%s::store_list \n", tcl_namespace->s_name);  
 }
 
 void tkwidgets_restore_options(t_symbol *receive_name, t_symbol *widget_id, 
@@ -53,6 +77,8 @@ void tkwidgets_restore_options(t_symbol *receive_name, t_symbol *widget_id,
                  widget_id->s_name, argv[i]);
     }
 }
+
+/* -------------------- generate names for various elements ----------------- */
 
 t_symbol* tkwidgets_gen_tcl_namespace(t_object* x, t_symbol* widget_name)
 {
@@ -124,16 +150,6 @@ t_symbol* tkwidgets_gen_all_tag(t_object *x)
     return gensym(buf);
 }
 
-void tkwidgets_draw_handle()
-{
-    // TODO draw resize handle when selected in editmode
-}
-
-void tkwidgets_draw_resize_window()
-{
-    // TODO draw the resize window while resizing
-}
-
 /* -------------------- inlets/outlets -------------------------------------- */
  
 static int calculate_onset(int x_location, int width,
@@ -178,4 +194,14 @@ void tkwidgets_erase_inlets(t_symbol* canvas_id, t_symbol* iolets_tag)
     sys_vgui("%s delete %s\n", canvas_id->s_name, iolets_tag); 
 }
 
+/* -------------------- gui elements for resizing --------------------------- */
 
+void tkwidgets_draw_handle()
+{
+    // TODO draw resize handle when selected in editmode
+}
+
+void tkwidgets_draw_resize_window()
+{
+    // TODO draw the resize window while resizing
+}

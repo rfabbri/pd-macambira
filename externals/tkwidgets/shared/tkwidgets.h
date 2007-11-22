@@ -68,6 +68,14 @@ t_symbol* canvas_getname(t_canvas *canvas);
 
 void tkwidgets_setcallbackname(void *x, char *widget_name);
 
+/* handle options */
+void tkwidgets_store_options(t_symbol *receive_name, t_symbol *tcl_namespace,
+                             t_symbol *widget_id, int argc, char **argv);
+void tkwidgets_query_options(t_symbol *receive_name, t_symbol *widget_id, 
+                             int argc, char** argv);
+
+
+/* generate ID and tag names for using in Tcl/Tk space */
 t_symbol* tkwidgets_gen_tcl_namespace(t_object* x, t_symbol* widget_name);
 t_symbol* tkwidgets_gen_callback_name(t_symbol* tcl_namespace);
 t_symbol* tkwidgets_gen_canvas_id(t_canvas* canvas);

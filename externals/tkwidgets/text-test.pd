@@ -1,4 +1,4 @@
-#N canvas 171 184 721 672 10;
+#N canvas 137 196 721 672 10;
 #X obj 256 77 text 400 200 1;
 #X msg 47 29 size 100 100;
 #X obj 48 470 text 130 60 0;
