@@ -41,6 +41,9 @@ typedef struct _checkbutton
 
     int         width;
     int         height;
+
+    int         x_resizing;
+    int         x_selected;
     
     /* IDs for Tk widgets */
 	t_symbol*   tcl_namespace;       
@@ -175,6 +178,20 @@ static void checkbutton_getrect(t_gobj *z, t_glist *glist,
     *yp2 = text_ypix(&x->x_obj, glist) + x->height;
 }
 
+static void checkbutton_displace(t_gobj *z, t_glist *glist, int dx, int dy)
+{
+    t_checkbutton *x = (t_checkbutton *)z;
+    x->x_obj.te_xpix += dx;
+    x->x_obj.te_ypix += dy;
+    if (glist_isvisible(glist))
+    {
+        set_tkwidgets_ids(x,glist_getcanvas(glist));
+        sys_vgui("%s move %s %d %d\n", x->canvas_id->s_name, x->all_tag->s_name, dx, dy);
+        sys_vgui("%s move RSZ %d %d\n", x->canvas_id->s_name, dx, dy);
+        canvas_fixlinesfor(glist_getcanvas(glist), (t_text*) x);
+    }
+}
+
 static void checkbutton_delete(t_gobj *z, t_glist *glist)
 {
     t_text *x = (t_text *)z;
@@ -270,7 +287,7 @@ void checkbutton_setup(void)
                     gensym("query_callback"), A_GIMME, 0);
 
     checkbutton_widgetbehavior.w_getrectfn  = checkbutton_getrect;
-    checkbutton_widgetbehavior.w_displacefn = NULL;
+    checkbutton_widgetbehavior.w_displacefn = checkbutton_displace;
     checkbutton_widgetbehavior.w_selectfn   = NULL;
     checkbutton_widgetbehavior.w_activatefn = NULL;
     checkbutton_widgetbehavior.w_deletefn   = checkbutton_delete;
