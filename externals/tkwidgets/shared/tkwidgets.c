@@ -54,13 +54,6 @@ void tkwidgets_restore_options(t_symbol *receive_name, t_symbol *widget_id,
     }
 }
 
-void tkwidgets_set_ids(t_object *x, t_tkwidgets *tkw, t_canvas *canvas)
-{
-
-    tkw->canvas = canvas;
-}
-
-
 t_symbol* tkwidgets_gen_tcl_namespace(t_object* x, t_symbol* widget_name)
 {
     char buf[MAXPDSTRING];
@@ -96,13 +89,6 @@ t_symbol* tkwidgets_gen_widget_id(t_object* x, t_symbol* parent_id)
     return gensym(buf);
 }
 
-t_symbol* tkwidgets_gen_window_id(t_object* x, t_symbol* canvas_id)
-{
-    char buf[MAXPDSTRING];
-    sprintf(buf,"%s.window%lx", canvas_id->s_name, (long unsigned int)x);
-    return gensym(buf);
-}
-
 t_symbol* tkwidgets_gen_handle_id(t_object *x, t_symbol* canvas_id)
 {
     char buf[MAXPDSTRING];
@@ -117,17 +103,25 @@ t_symbol* tkwidgets_gen_scrollbar_id(t_object *x, t_symbol* frame_id)
     return gensym(buf);
 }
 
+t_symbol* tkwidgets_gen_window_tag(t_object* x, t_symbol* canvas_id)
+{
+    char buf[MAXPDSTRING];
+    sprintf(buf,"%s.window%lx", canvas_id->s_name, (long unsigned int)x);
+    return gensym(buf);
+}
+
+t_symbol* tkwidgets_gen_iolets_tag(t_object* x)
+{
+    char buf[MAXPDSTRING];
+    sprintf(buf,"iolets%lx", (long unsigned int)x);
+    return gensym(buf);
+}
+
 t_symbol* tkwidgets_gen_all_tag(t_object *x)
 {
     char buf[MAXPDSTRING];
     sprintf(buf,"all%lx", (long unsigned int)x);
     return gensym(buf);
-}
-
-void tkwidgets_draw_inlets(t_object *x, t_glist *glist, 
-                 int total_inlets, int total_outlets)
-{
-    // TODO perhaps I should try to use glist_drawiofor() from g_text.c
 }
 
 void tkwidgets_draw_handle()
@@ -140,13 +134,48 @@ void tkwidgets_draw_resize_window()
     // TODO draw the resize window while resizing
 }
 
-
-/*
-void query_options()
+/* -------------------- inlets/outlets -------------------------------------- */
+ 
+static int calculate_onset(int x_location, int width,
+                           int current_iolet, int total_iolets)
 {
-    
+    post("calculate_onset");
+    return(x_location + (width - IOWIDTH)                               \
+           * current_iolet / (total_iolets == 1 ? 1 : total_iolets - 1));
+}
+
+void tkwidgets_draw_inlets(t_object *x, t_glist *glist, t_symbol *canvas_id,
+                           t_symbol *iolets_tag, t_symbol *all_tag,
+                           int width, int height,
+                           int total_inlets, int total_outlets)
+{
+    int i, onset;
+    int x_location = text_xpix(x, glist);
+    int y_location = text_ypix(x, glist);
+
+    for (i = 0; i < total_inlets; i++)  /* inlets */
+    {
+        onset = calculate_onset(x_location, width, i, total_inlets);
+        sys_vgui("%s create rectangle %d %d %d %d -tags {%s %s}\n",
+                 canvas_id->s_name, onset, y_location - 2,
+                 onset + IOWIDTH, y_location,
+                 iolets_tag->s_name, all_tag->s_name);
+        sys_vgui("%s raise %s\n", canvas_id->s_name, iolets_tag->s_name);
+    }
+    for (i = 0; i < total_outlets; i++) /* outlets */
+    {
+        onset = calculate_onset(x_location, width, i, total_outlets);
+        sys_vgui("%s create rectangle %d %d %d %d -tags {%s %s}\n",
+                 canvas_id->s_name, onset, y_location + height,
+                 onset + IOWIDTH, y_location + height + 2,
+                 iolets_tag->s_name, all_tag->s_name);
+        sys_vgui("%s raise %s\n", canvas_id->s_name, iolets_tag->s_name);
+    }
+}
+
+void tkwidgets_erase_inlets(t_symbol* canvas_id, t_symbol* iolets_tag)
+{
+    sys_vgui("%s delete %s\n", canvas_id->s_name, iolets_tag); 
 }
 
 
-
-*/

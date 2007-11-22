@@ -1,6 +1,5 @@
 /* [checkbutton] object for dislaying a check box
 
-   Copyright (C) 2002-2004 Guenter Geiger
    Copyright (C) 2007 Hans-Christoph Steiner <hans@at.or.at>
 
    This program is free software; you can redistribute it and/or modify
@@ -23,6 +22,11 @@
 
 #include "shared/tkwidgets.h"
 
+#define DEBUG(x) x
+
+#define TOTAL_INLETS            1
+#define TOTAL_OUTLETS           2
+
 /* ------------------------ class variables --------------------------------- */
 
 static t_class *checkbutton_class;
@@ -30,10 +34,13 @@ static t_widgetbehavior checkbutton_widgetbehavior;
 
 typedef struct _checkbutton
 {
-    t_object     x_obj;
-    t_glist*     x_glist;
-    int          x_width;
-    int          x_height;
+    t_object    x_obj;
+    t_canvas*   x_canvas;      /* canvas this widget is currently drawn in */
+    t_glist*    x_glist;       /* glist that owns this widget */
+    t_binbuf*   options_binbuf;/* binbuf to save options state in */
+
+    int         width;
+    int         height;
     
     /* IDs for Tk widgets */
 	t_symbol*   tcl_namespace;       
@@ -41,6 +48,8 @@ typedef struct _checkbutton
 	t_symbol*   canvas_id;  
 	t_symbol*   widget_id;        
 	t_symbol*   handle_id;      
+    t_symbol*   window_tag;
+	t_symbol*   iolets_tag;
 	t_symbol*   all_tag;
     
     t_outlet*   x_data_outlet;
@@ -86,19 +95,72 @@ static char *checkbutton_tk_options[] = {
     "wraplength"
 };
 
+/* -------------------- function prototypes --------------------------------- */
+
+static void checkbutton_query_callback(t_checkbutton *x, t_symbol *s, int argc, t_atom *argv);
+
 /* -------------------- widget helper functions------------------------------ */
+
+static void set_tkwidgets_ids(t_checkbutton* x, t_canvas* canvas)
+{
+    x->x_canvas = canvas;
+    x->canvas_id = tkwidgets_gen_canvas_id(x->x_canvas);
+    x->widget_id = tkwidgets_gen_widget_id((t_object*)x, x->canvas_id);
+    x->window_tag = tkwidgets_gen_window_tag((t_object*)x, x->canvas_id);
+    x->handle_id = tkwidgets_gen_handle_id((t_object *)x, x->canvas_id);
+}
 
 static void checkbutton_drawme(t_checkbutton *x, t_glist *glist)
 {
-    sys_vgui("checkbutton %s\n", x->widget_id);
+    
+    set_tkwidgets_ids(x,glist_getcanvas(glist));
+    sys_vgui("destroy %s\n", x->widget_id->s_name); /* just in case it exists */
+    sys_vgui("checkbutton %s\n", 
+             x->widget_id->s_name);
+    tkwidgets_draw_inlets((t_object*)x, glist, 
+                          x->canvas_id, x->iolets_tag, x->all_tag,
+                          x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
+    sys_vgui("%s create window %d %d -anchor nw -window %s -tags {%s %s}\n", 
+             x->canvas_id->s_name, 
+             text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+             x->widget_id->s_name,
+             x->window_tag->s_name, x->all_tag->s_name);
 }
 
 
-static void checkbutton_erase(t_checkbutton* x,t_glist* glist)
+static void checkbutton_erase(t_checkbutton* x, t_glist* glist)
 {
-    sys_vgui("%s delete %s\n", x->canvas_id, x->widget_id);
+    set_tkwidgets_ids(x, glist_getcanvas(glist));
+    sys_vgui("destroy %s\n", x->widget_id->s_name);
+    sys_vgui("%s delete %s\n", x->canvas_id->s_name, x->all_tag->s_name);
 }
 
+/* --------------------- query functions ------------------------------------ */
+
+static void query_size(t_checkbutton *x)
+{
+    t_atom coords[3];
+    SETSYMBOL(coords, gensym("size"));
+    SETFLOAT(coords + 1, (t_float)x->width);
+    SETFLOAT(coords + 2, (t_float)x->height);
+    checkbutton_query_callback(x, gensym("query_callback"), 3, coords);
+}
+
+static void checkbutton_query(t_checkbutton *x, t_symbol *s)
+{
+    post("checkbutton_query %s", s->s_name);
+    if(s == &s_)
+    {
+        tkwidgets_query_options(x->receive_name, x->widget_id, 
+                                sizeof(checkbutton_tk_options)/sizeof(char *), 
+                                checkbutton_tk_options);
+        query_size(x);
+    }
+    else if(s == gensym("size"))
+        query_size(x);
+    else
+        tkwidgets_query_options(x->receive_name, x->widget_id, 1, &(s->s_name));
+}
 
 
 /* --------------------- checkbutton widgetbehaviour ------------------------ */
@@ -109,8 +171,8 @@ static void checkbutton_getrect(t_gobj *z, t_glist *glist,
 
     *xp1 = text_xpix(&x->x_obj, glist);
     *yp1 = text_ypix(&x->x_obj, glist);
-    *xp2 = text_xpix(&x->x_obj, glist) + x->x_width;
-    *yp2 = text_ypix(&x->x_obj, glist) + x->x_height;
+    *xp2 = text_xpix(&x->x_obj, glist) + x->width;
+    *yp2 = text_ypix(&x->x_obj, glist) + x->height;
 }
 
 static void checkbutton_delete(t_gobj *z, t_glist *glist)
@@ -128,6 +190,39 @@ static void checkbutton_vis(t_gobj *z, t_glist *glist, int vis)
         checkbutton_erase(s, glist);
 }
 
+/* --------------------------- methods -------------------------------------- */
+
+static void checkbutton_size(t_checkbutton *x, t_float width, t_float height)
+{
+    DEBUG(post("checkbutton_size"););
+    x->height = height;
+    x->width = width;
+    if(glist_isvisible(x->x_glist))
+    {
+        sys_vgui("%s itemconfigure %s -width %d -height %d\n",
+                 x->canvas_id->s_name, x->window_tag->s_name, x->width, x->height);
+//        erase_inlets(x);
+//        tkwidgets_draw_inlets(x, x->x_glist, TOTAL_INLETS, TOTAL_OUTLETS);
+        canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
+    }
+}
+
+/* --------------------------- callback functions --------------------------- */
+
+static void checkbutton_query_callback(t_checkbutton *x, t_symbol *s, int argc, t_atom *argv)
+{
+    t_symbol *tmp_symbol = atom_getsymbolarg(0, argc, argv);
+    if(tmp_symbol != &s_)
+    {
+        post("tmp_symbol %s argc %d", tmp_symbol->s_name, argc);
+        outlet_anything(x->x_status_outlet, tmp_symbol, argc - 1, argv + 1);
+    }
+    else
+    {
+        post("checkbutton_query_callback %s %d", s->s_name, argc);
+    }
+}
+
 /* --------------------------- standard class functions --------------------- */
 
 static void checkbutton_free(t_checkbutton *x)
@@ -141,10 +236,21 @@ static void *checkbutton_new(t_symbol* s, int argc, t_atom *argv)
 
     x->x_glist = (t_glist*) canvas_getcurrent();
 
-    x->x_width = 15;
-    x->x_height = 15;
+    x->width = 15;
+    x->height = 15;
 
-    outlet_new(&x->x_obj, &s_float);
+    x->tcl_namespace = tkwidgets_gen_tcl_namespace((t_object*)x, s);
+    x->receive_name = tkwidgets_gen_callback_name(x->tcl_namespace);
+    pd_bind(&x->x_obj.ob_pd, x->receive_name);
+
+    x->x_glist = canvas_getcurrent();
+    set_tkwidgets_ids(x, x->x_glist);
+    x->iolets_tag = tkwidgets_gen_iolets_tag((t_object*)x);
+    x->all_tag = tkwidgets_gen_all_tag((t_object*)x);
+
+    x->x_data_outlet = outlet_new(&x->x_obj, &s_float);
+    x->x_status_outlet = outlet_new(&x->x_obj, &s_anything);
+
     return (x);
 }
 
@@ -153,6 +259,15 @@ void checkbutton_setup(void)
     checkbutton_class = class_new(gensym("checkbutton"), (t_newmethod)checkbutton_new, 
                             (t_method)checkbutton_free, 
                             sizeof(t_checkbutton), 0, A_GIMME,0);
+
+    class_addmethod(checkbutton_class, (t_method)checkbutton_query,
+                    gensym("query"), A_DEFSYMBOL, 0);
+    class_addmethod(checkbutton_class, (t_method)checkbutton_size,
+                    gensym("size"), A_DEFFLOAT, A_DEFFLOAT, 0);
+
+/* callbacks */
+    class_addmethod(checkbutton_class, (t_method)checkbutton_query_callback,
+                    gensym("query_callback"), A_GIMME, 0);
 
     checkbutton_widgetbehavior.w_getrectfn  = checkbutton_getrect;
     checkbutton_widgetbehavior.w_displacefn = NULL;

@@ -27,6 +27,8 @@
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: add size to query and save */
 /* TODO: add scrollbars to query and save */
+/* TODO: remove glist from _erase() args */
+/* TODO: window name "handle1376fc00" already exists in parent */
 
 
 #define DEFAULT_COLOR           "grey70"
@@ -41,16 +43,19 @@
 
 #define DEBUG(x) x
 
+static t_class *textwidget_class;
+static t_widgetbehavior textwidget_widgetbehavior;
+
 typedef struct _textwidget
 {
     t_object    x_obj;
-    t_canvas*   x_canvas;      /* canvas/glist this widget is currently drawn in*/
+    t_canvas*   x_canvas;      /* canvas this widget is currently drawn in */
     t_glist*    x_glist;       /* glist that owns this widget */
     t_binbuf*   options_binbuf;/* binbuf to save options state in */
 
-    int         size_x;
-    int         size_y;
-    int         x_have_scrollbars;
+    int         width;
+    int         height;
+    int         have_scrollbars;
 
     int         x_resizing;
     int         x_selected;
@@ -63,14 +68,13 @@ typedef struct _textwidget
 	t_symbol*   widget_id;        
     t_symbol*   scrollbar_id;   
 	t_symbol*   handle_id;      
-	t_symbol*   window_id;      
+	t_symbol*   window_tag;      
+	t_symbol*   iolets_tag;
 	t_symbol*   all_tag;
     
     t_outlet*   x_data_outlet;
     t_outlet*   x_status_outlet;
 } t_textwidget;
-
-static t_class *textwidget_class;
 
 static char *textwidget_tk_options[] = {
     "autoseparators",
@@ -124,31 +128,12 @@ static t_symbol *right_symbol;
 static t_symbol *up_symbol;
 static t_symbol *down_symbol;
 
-/* function prototypes */
-
-static void textwidget_getrect(t_gobj *z, t_glist *owner, int *xp1, int *yp1, int *xp2, int *yp2);
-static void textwidget_displace(t_gobj *z, t_glist *glist, int dx, int dy);
-static void textwidget_select(t_gobj *z, t_glist *glist, int state);
-static void textwidget_activate(t_gobj *z, t_glist *glist, int state);
-static void textwidget_delete(t_gobj *z, t_glist *glist);
-static void textwidget_vis(t_gobj *z, t_glist *glist, int vis);
-//static int textwidget_click(t_gobj *z, t_glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit);
-static void textwidget_save(t_gobj *z, t_binbuf *b);
+/* -------------------- function prototypes --------------------------------- */
 
 static void textwidget_query_callback(t_textwidget *x, t_symbol *s, int argc, t_atom *argv);
 
 
-static t_widgetbehavior textwidget_widgetbehavior = {
-w_getrectfn:  textwidget_getrect,
-w_displacefn: textwidget_displace,
-w_selectfn:   textwidget_select,
-w_activatefn: textwidget_activate,
-w_deletefn:   textwidget_delete,
-w_visfn:      textwidget_vis,
-w_clickfn:    NULL,
-}; 
-
-/* widget helper functions */
+/* -------------------- widget helper functions ----------------------------- */
 
 static void store_options(t_textwidget *x)
 {
@@ -182,62 +167,21 @@ static void set_tkwidgets_ids(t_textwidget *x, t_canvas *canvas)
     x->frame_id = tkwidgets_gen_frame_id((t_object*)x, x->canvas_id);
     x->widget_id = tkwidgets_gen_widget_id((t_object*)x, x->frame_id);
     x->scrollbar_id = tkwidgets_gen_scrollbar_id((t_object*)x, x->frame_id);
-    x->window_id = tkwidgets_gen_window_id((t_object*)x, x->frame_id);
+    x->window_tag = tkwidgets_gen_window_tag((t_object*)x, x->frame_id);
     x->handle_id = tkwidgets_gen_handle_id((t_object *)x, x->canvas_id);
-}
-
-static int calculate_onset(t_textwidget *x, t_glist *glist, 
-                           int current_iolet, int total_iolets)
-{
-    post("calculate_onset");
-    return(text_xpix(&x->x_obj, glist) + (x->size_x - IOWIDTH)    \
-           * current_iolet / (total_iolets == 1 ? 1 : total_iolets - 1));
-}
-
-static void textwidget_draw_inlets(t_textwidget *x, t_glist *glist, int firsttime, 
-                        int total_inlets, int total_outlets)
-{
-    DEBUG(post("textwidget_draw_inlets in: %d  out: %d", total_inlets, total_outlets););
-    int i, onset;
-
-    for (i = 0; i < total_inlets; i++)  /* inlets */
-    {
-        onset = calculate_onset(x, glist, i, total_inlets);
-        sys_vgui("%s create rectangle %d %d %d %d -tags {%xi%d %xi %s}\n",
-                 x->canvas_id->s_name, onset, text_ypix(&x->x_obj, glist) - 2,
-                 onset + IOWIDTH, text_ypix(&x->x_obj, glist),
-                 x, i, x, x->all_tag->s_name);
-    }
-    for (i = 0; i < total_outlets; i++) /* outlets */
-    {
-        onset = calculate_onset(x, glist, i, total_outlets);
-        sys_vgui("%s create rectangle %d %d %d %d -tags {%xo%d %xo %s}\n",
-                 x->canvas_id->s_name, onset, text_ypix(&x->x_obj, glist) + x->size_y,
-                 onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->size_y + 2,
-                 x, i, x, x->all_tag->s_name);
-    }
-}
-
-static void erase_inlets(t_textwidget *x)
-{
-    DEBUG(post("erase_inlets"););
-/* Added tag for all inlets/outlets of one instance */
-    sys_vgui("%s delete %xi\n", x->canvas_id->s_name, x); 
-    sys_vgui("%s delete %xo\n", x->canvas_id->s_name, x); 
-
 }
 
 static void draw_scrollbar(t_textwidget *x)
 {
     sys_vgui("pack %s -side right -fill y -before %s \n",
              x->scrollbar_id->s_name, x->widget_id->s_name);
-    x->x_have_scrollbars = 1;
+    x->have_scrollbars = 1;
 }
 
 static void erase_scrollbar(t_textwidget *x)
 {
     sys_vgui("pack forget %s \n", x->scrollbar_id->s_name);
-    x->x_have_scrollbars = 0;
+    x->have_scrollbars = 0;
 }
 
 static void bind_standard_keys(t_textwidget *x)
@@ -312,35 +256,28 @@ static void create_widget(t_textwidget *x)
              x->widget_id->s_name, x->receive_name->s_name);
 }
 
-static void textwidget_drawme(t_textwidget *x, t_glist *glist, int firsttime)
+static void textwidget_drawme(t_textwidget *x, t_glist *glist)
 {
-    DEBUG(post("textwidget_drawme: firsttime %d canvas %lx glist %lx", firsttime, x->x_canvas, glist););
+    DEBUG(post("textwidget_drawme: firsttime %d canvas %lx glist %lx", x->x_canvas, glist););
     set_tkwidgets_ids(x,glist_getcanvas(glist));	
-    if (firsttime) 
-    {
-        create_widget(x);	
-        textwidget_draw_inlets(x, glist, firsttime, TOTAL_INLETS, TOTAL_OUTLETS);
-        if(x->x_have_scrollbars) draw_scrollbar(x);
-        sys_vgui("%s create window %d %d -anchor nw -window %s    \
+    create_widget(x);	
+    tkwidgets_draw_inlets((t_object*)x, glist, 
+                          x->canvas_id, x->iolets_tag, x->all_tag,
+                          x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
+    if(x->have_scrollbars) draw_scrollbar(x);
+    sys_vgui("%s create window %d %d -anchor nw -window %s    \
                   -tags {%s %s} -width %d -height %d \n", x->canvas_id->s_name,
-                 text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
-                 x->frame_id->s_name, x->window_id->s_name, x->all_tag->s_name, x->size_x, x->size_y);
-    }     
-    else 
-    {
-        post("NO MORE COORDS");
-//        sys_vgui("%s coords %s %d %d\n", x->canvas_id->s_name, x->all_tag->s_name,
-//                 text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
-    }
-}
-
+             text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+             x->frame_id->s_name, x->window_tag->s_name, x->all_tag->s_name, 
+             x->width, x->height);
+}     
 
 static void textwidget_erase(t_textwidget* x,t_glist* glist)
 {
     DEBUG(post("textwidget_erase: canvas %lx glist %lx", x->x_canvas, glist););
 
     set_tkwidgets_ids(x,glist_getcanvas(glist));
-    erase_inlets(x);
+    tkwidgets_erase_inlets(x->canvas_id, x->iolets_tag);
     sys_vgui("destroy %s\n", x->frame_id->s_name);
     sys_vgui("%s delete %s\n", x->canvas_id->s_name, x->all_tag->s_name);
 }
@@ -349,7 +286,6 @@ static void textwidget_erase(t_textwidget* x,t_glist* glist)
 
 /* ------------------------ text widgetbehaviour----------------------------- */
 
-
 static void textwidget_getrect(t_gobj *z, t_glist *owner, 
                           int *xp1, int *yp1, int *xp2, int *yp2)
 {
@@ -357,8 +293,8 @@ static void textwidget_getrect(t_gobj *z, t_glist *owner,
     t_textwidget *x = (t_textwidget*)z;
     *xp1 = text_xpix(&x->x_obj, owner);
     *yp1 = text_ypix(&x->x_obj, owner);
-    *xp2 = *xp1 + x->size_x;
-    *yp2 = *yp1 + x->size_y + 2; // add 2 to give space for outlets
+    *xp2 = *xp1 + x->width;
+    *yp2 = *yp1 + x->height + 2; // add 2 to give space for outlets
 }
 
 static void textwidget_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -372,11 +308,6 @@ static void textwidget_displace(t_gobj *z, t_glist *glist, int dx, int dy)
         set_tkwidgets_ids(x,glist_getcanvas(glist));
         sys_vgui("%s move %s %d %d\n", x->canvas_id->s_name, x->all_tag->s_name, dx, dy);
         sys_vgui("%s move RSZ %d %d\n", x->canvas_id->s_name, dx, dy);
-/*        sys_vgui("%s coords %s %d %d %d %d\n", x->canvas_id->s_name, x->all_tag->s_name,
-                 text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
-                 text_xpix(&x->x_obj, glist) + x->size_x, 
-                 text_ypix(&x->x_obj, glist) + x->size_y-2);*/
-//        textwidget_drawme(x, glist, 0);
         canvas_fixlinesfor(glist_getcanvas(glist), (t_text*) x);
     }
     DEBUG(post("displace end"););
@@ -451,7 +382,7 @@ static void textwidget_vis(t_gobj *z, t_glist *glist, int vis)
     t_rtext *y;
     if (vis) {
         y = (t_rtext *) rtext_new(glist, (t_text *)z);
-        textwidget_drawme(x, glist, 1);
+        textwidget_drawme(x, glist);
     }
     else {
         y = glist_findrtext(glist, (t_text *)z);
@@ -611,7 +542,7 @@ static void textwidget_save(t_gobj *z, t_binbuf *b)
     binbuf_addv(b, "ssiisiii", &s__X, gensym("obj"),
                 x->x_obj.te_xpix, x->x_obj.te_ypix, 
                 atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
-                x->size_x, x->size_y, x->x_have_scrollbars);
+                x->width, x->height, x->have_scrollbars);
     binbuf_addbinbuf(b, x->options_binbuf);
     binbuf_addv(b, ";");
 }
@@ -639,7 +570,7 @@ static void query_scrollbars(t_textwidget *x)
 {
     t_atom state[2];
     SETSYMBOL(state, scrollbars_symbol);
-    SETFLOAT(state + 1, (t_float)x->x_have_scrollbars);
+    SETFLOAT(state + 1, (t_float)x->have_scrollbars);
     textwidget_query_callback(x, gensym("query_callback"), 2, state);
 }
 
@@ -647,8 +578,8 @@ static void query_size(t_textwidget *x)
 {
     t_atom coords[3];
     SETSYMBOL(coords, size_symbol);
-    SETFLOAT(coords + 1, (t_float)x->size_x);
-    SETFLOAT(coords + 2, (t_float)x->size_y);
+    SETFLOAT(coords + 1, (t_float)x->width);
+    SETFLOAT(coords + 2, (t_float)x->height);
     textwidget_query_callback(x, gensym("query_callback"), 3, coords);
 }
 
@@ -657,7 +588,7 @@ static void textwidget_query(t_textwidget *x, t_symbol *s)
     post("textwidget_query %s", s->s_name);
     if(s == &s_)
     {
-        tkwidgets_query_options(x->receive_name, x->widget_id->s_name, 
+        tkwidgets_query_options(x->receive_name, x->widget_id, 
                                 sizeof(textwidget_tk_options)/sizeof(char *), 
                                 textwidget_tk_options);
         query_scrollbars(x);
@@ -668,12 +599,13 @@ static void textwidget_query(t_textwidget *x, t_symbol *s)
     else if(s == size_symbol)
         query_size(x);
     else
-        tkwidgets_query_options(x->receive_name, x->widget_id->s_name, 1, &(s->s_name));
+        tkwidgets_query_options(x->receive_name, x->widget_id, 1, &(s->s_name));
 }
 
 static void textwidget_scrollbars(t_textwidget *x, t_float f)
 {
-    if(f > 0)
+    int value = (int) f;
+    if(value > 0)
         draw_scrollbar(x);
     else
         erase_scrollbar(x);
@@ -682,19 +614,21 @@ static void textwidget_scrollbars(t_textwidget *x, t_float f)
 static void textwidget_size(t_textwidget *x, t_float width, t_float height)
 {
     DEBUG(post("textwidget_size"););
-    x->size_y = height;
-    x->size_x = width;
+    x->height = height;
+    x->width = width;
     if(glist_isvisible(x->x_glist))
     {
         sys_vgui("%s itemconfigure %s -width %d -height %d\n",
-                 x->canvas_id->s_name, x->window_id->s_name, x->size_x, x->size_y);
-        erase_inlets(x);
-        textwidget_draw_inlets(x, x->x_glist, 1, TOTAL_INLETS, TOTAL_OUTLETS);
+                 x->canvas_id->s_name, x->window_tag->s_name, x->width, x->height);
+        tkwidgets_erase_inlets(x->canvas_id, x->iolets_tag);
+        tkwidgets_draw_inlets((t_object*)x, x->x_glist, 
+                              x->canvas_id, x->iolets_tag, x->all_tag,
+                              x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
         canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
     }
 }
 
-/* callback functions */
+/* -------------------- callback functions ---------------------------------- */
 
 static void textwidget_store_callback(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
 {
@@ -732,13 +666,15 @@ static void textwidget_resize_click_callback(t_textwidget *x, t_floatarg f)
     {
         if (canvas)
         {
-            textwidget_draw_inlets(x, canvas, 1, TOTAL_INLETS, TOTAL_OUTLETS);
+            tkwidgets_draw_inlets((t_object*)x, canvas,
+                                  x->canvas_id, x->iolets_tag, x->all_tag,
+                                  x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
             canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
         }
     }
     else if (!x->x_resizing && newstate)
     {
-        erase_inlets(x);
+        tkwidgets_erase_inlets(x->canvas_id, x->iolets_tag);
     }
     x->x_resizing = newstate;
 }
@@ -751,17 +687,19 @@ static void textwidget_resize_motion_callback(t_textwidget *x, t_floatarg f1, t_
         int dx = (int)f1, dy = (int)f2;
         if (glist_isvisible(x->x_glist))
         {
-            x->size_x += dx;
-            x->size_y += dy;
+            x->width += dx;
+            x->height += dy;
             sys_vgui("%s itemconfigure %s -width %d -height %d\n",
-                     x->canvas_id->s_name, x->window_id->s_name, 
-                     x->size_x, x->size_y);
+                     x->canvas_id->s_name, x->window_tag->s_name, 
+                     x->width, x->height);
             sys_vgui("%s move RSZ %d %d\n",
                      x->canvas_id->s_name, dx, dy);
             canvas_fixlinesfor(x->x_glist, (t_text *)x);
         }
     }
 }
+
+/* --------------------------- standard class functions --------------------- */
 
 static void textwidget_free(t_textwidget *x)
 {
@@ -781,15 +719,15 @@ static void *textwidget_new(t_symbol *s, int argc, t_atom *argv)
 	if (argc < 3)
 	{
 		post("[text]: less than 3 arguments entered, default values used.");
-		x->size_x = TEXT_DEFAULT_WIDTH;
-		x->size_y = TEXT_DEFAULT_HEIGHT;
-        x->x_have_scrollbars = 0;
+		x->width = TEXT_DEFAULT_WIDTH;
+		x->height = TEXT_DEFAULT_HEIGHT;
+        x->have_scrollbars = 0;
 	} 
     else 
     {
-		x->size_x = atom_getint(argv);
-		x->size_y = atom_getint(argv + 1);
-        x->x_have_scrollbars = atom_getint(argv + 2);
+		x->width = atom_getint(argv);
+		x->height = atom_getint(argv + 1);
+        x->have_scrollbars = atom_getint(argv + 2);
         if(argc > 3) 
         {
             binbuf_add(x->options_binbuf, argc - 3, argv + 3);
@@ -803,6 +741,7 @@ static void *textwidget_new(t_symbol *s, int argc, t_atom *argv)
 
     x->x_glist = canvas_getcurrent();
     set_tkwidgets_ids(x, x->x_glist);
+    x->iolets_tag = tkwidgets_gen_iolets_tag((t_object*)x);
     x->all_tag = tkwidgets_gen_all_tag((t_object*)x);
 
     x->x_data_outlet = outlet_new(&x->x_obj, &s_float);
@@ -819,20 +758,20 @@ void text_setup(void) {
 	class_addbang(textwidget_class, (t_method)textwidget_bang_output);
 	class_addanything(textwidget_class, (t_method)textwidget_option);
 
+	class_addmethod(textwidget_class, (t_method)textwidget_append,
+                    gensym("append"), A_GIMME, 0);
+	class_addmethod(textwidget_class, (t_method)textwidget_clear,
+                    gensym("clear"), 0);
+	class_addmethod(textwidget_class, (t_method)textwidget_key,
+                    gensym("key"), A_GIMME, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_query,
                     gensym("query"), A_DEFSYMBOL, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_scrollbars,
                     gensym("scrollbars"), A_DEFFLOAT, 0);
-    class_addmethod(textwidget_class, (t_method)textwidget_size,
-                    gensym("size"), A_DEFFLOAT, A_DEFFLOAT, 0);
 	class_addmethod(textwidget_class, (t_method)textwidget_set,
                     gensym("set"), A_GIMME, 0);
-	class_addmethod(textwidget_class, (t_method)textwidget_append,
-                    gensym("append"), A_GIMME, 0);
-	class_addmethod(textwidget_class, (t_method)textwidget_key,
-                    gensym("key"), A_GIMME, 0);
-	class_addmethod(textwidget_class, (t_method)textwidget_clear,
-                    gensym("clear"), 0);
+    class_addmethod(textwidget_class, (t_method)textwidget_size,
+                    gensym("size"), A_DEFFLOAT, A_DEFFLOAT, 0);
 /* callbacks */
     class_addmethod(textwidget_class, (t_method)textwidget_store_callback,
                     gensym("store_callback"), A_GIMME, 0);
@@ -848,7 +787,14 @@ void text_setup(void) {
                     gensym("resize_click"), A_FLOAT, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_resize_motion_callback,
                     gensym("resize_motion"), A_FLOAT, A_FLOAT, 0);
-								  
+
+    textwidget_widgetbehavior.w_getrectfn  = textwidget_getrect;
+    textwidget_widgetbehavior.w_displacefn = textwidget_displace;
+    textwidget_widgetbehavior.w_selectfn   = textwidget_select;
+    textwidget_widgetbehavior.w_activatefn = textwidget_activate;
+    textwidget_widgetbehavior.w_deletefn   = textwidget_delete;
+    textwidget_widgetbehavior.w_visfn      = textwidget_vis;
+    textwidget_widgetbehavior.w_clickfn    = NULL;
     class_setwidget(textwidget_class,&textwidget_widgetbehavior);
     class_setsavefn(textwidget_class,&textwidget_save);
 

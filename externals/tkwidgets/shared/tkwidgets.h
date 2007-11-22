@@ -48,7 +48,7 @@ typedef struct _tkwidgets
     t_symbol* tcl_namespace; /* namespace to prevent name collisions */
     t_symbol* canvas_id;     /* the canvas that is showing this widget */
     t_symbol* frame_id;      /* the frame around the widget and supporters */
-    t_symbol* window_id;     /* the window that contains the widget */
+    t_symbol* window_tag;     /* the window that contains the widget */
     t_symbol* widget_id;     /* the core widget */
     t_symbol* handle_id;     /* the resizing handle */
     t_symbol* all_tag;       /* the tag for moving/deleting everything */
@@ -73,14 +73,20 @@ t_symbol* tkwidgets_gen_callback_name(t_symbol* tcl_namespace);
 t_symbol* tkwidgets_gen_canvas_id(t_canvas* canvas);
 t_symbol* tkwidgets_gen_frame_id(t_object* x, t_symbol* canvas_id);
 t_symbol* tkwidgets_gen_widget_id(t_object* x, t_symbol* parent_id);
-t_symbol* tkwidgets_gen_handle_id(t_object *x, t_symbol* parent_id);
-t_symbol* tkwidgets_gen_window_tag(t_object* x, t_symbol* parent_id);
+t_symbol* tkwidgets_gen_handle_id(t_object *x, t_symbol* canvas_id);
+t_symbol* tkwidgets_gen_scrollbar_id(t_object *x, t_symbol* frame_id);
+t_symbol* tkwidgets_gen_window_tag(t_object* x, t_symbol* canvas_id);
+t_symbol* tkwidgets_gen_iolets_tag(t_object* x);
 t_symbol* tkwidgets_gen_all_tag(t_object *x);
 
 
 // TODO perhaps I should try to use glist_drawiofor() from g_text.c
-void tkwidgets_draw_inlets(t_object *x, t_glist *glist, 
-                 int total_inlets, int total_outlets);
+void tkwidgets_draw_inlets(t_object *x, t_glist *glist, t_symbol *canvas_id,
+                           t_symbol *iolets_tag, t_symbol *all_tag,
+                           int width, int height,
+                           int total_inlets, int total_outlets);
+void tkwidgets_erase_inlets(t_symbol* canvas_id, t_symbol* iolets_tag);
+
 void tkwidgets_draw_handle(); // TODO draw resize handle when selected in editmode
 void tkwidgets_draw_resize_window(); // TODO draw the resize window while resizing
 
