@@ -30,8 +30,7 @@
 /* TODO: remove glist from _erase() args */
 /* TODO: window name "handle1376fc00" already exists in parent */
 /* TODO: figure out window vs. text width/height */
-/* TODO: move bind_* to tkwidgets.c */
-/* TODO: erase iolets on resize, they are leaving old ones behind */
+
 
 #define DEFAULT_COLOR           "grey70"
 
@@ -159,55 +158,6 @@ static void erase_scrollbar(t_textwidget *x)
     x->have_scrollbars = 0;
 }
 
-static void bind_standard_keys(t_textwidget *x)
-{
-#ifdef __APPLE__
-    sys_vgui("bind %s <Mod1-Key> {pdtk_canvas_ctrlkey %s %%K 0}\n",
-             x->widget_id->s_name, x->canvas_id->s_name);
-    sys_vgui("bind %s <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %s %%K 1}\n",
-             x->widget_id->s_name, x->canvas_id->s_name);
-#else
-    sys_vgui("bind %s <Control-Key> {pdtk_canvas_ctrlkey %s %%K 0}\n",
-             x->widget_id->s_name, x->canvas_id->s_name);
-    sys_vgui("bind %s <Control-Shift-Key> {pdtk_canvas_ctrlkey %s %%K 1}\n",
-             x->widget_id->s_name, x->canvas_id->s_name);
-#endif
-}
-
-static void bind_button_events(t_textwidget *x)
-{
-    /* mouse buttons */
-    sys_vgui("bind %s <Button> {pdtk_canvas_sendclick %s \
-[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b 0}\n",
-             x->widget_id->s_name, x->canvas_id->s_name, 
-             x->canvas_id->s_name, x->canvas_id->s_name);
-    sys_vgui("bind %s <ButtonRelease> {pdtk_canvas_mouseup %s \
-[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
-             x->widget_id->s_name, x->canvas_id->s_name, 
-             x->canvas_id->s_name, x->canvas_id->s_name);
-    sys_vgui("bind %s <Shift-Button> {pdtk_canvas_click %s \
-[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b 1}\n",
-             x->widget_id->s_name, x->canvas_id->s_name, 
-             x->canvas_id->s_name, x->canvas_id->s_name);
-    sys_vgui("bind %s <Button-2> {pdtk_canvas_rightclick %s \
-[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
-             x->widget_id->s_name, x->canvas_id->s_name, 
-             x->canvas_id->s_name, x->canvas_id->s_name);
-    sys_vgui("bind %s <Button-3> {pdtk_canvas_rightclick %s \
-[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
-             x->widget_id->s_name, x->canvas_id->s_name, 
-             x->canvas_id->s_name, x->canvas_id->s_name);
-    sys_vgui("bind %s <Control-Button> {pdtk_canvas_rightclick %s \
-[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
-             x->widget_id->s_name, x->canvas_id->s_name, 
-             x->canvas_id->s_name, x->canvas_id->s_name);
-    /* mouse motion */
-    sys_vgui("bind %s <Motion> {pdtk_canvas_motion %s \
-[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] 0}\n",
-             x->widget_id->s_name, x->canvas_id->s_name, 
-             x->canvas_id->s_name, x->canvas_id->s_name);
-}
-
 static void create_widget(t_textwidget *x)
 {
     DEBUG(post("create_widget"););
@@ -225,8 +175,9 @@ static void create_widget(t_textwidget *x)
     sys_vgui("pack %s -side left -fill both -expand 1 \n", x->widget_id->s_name);
     sys_vgui("pack %s -side bottom -fill both -expand 1 \n", x->frame_id->s_name);
 
-    bind_standard_keys(x);
-    bind_button_events(x);
+    tkwidgets_bind_key_events(x->canvas_id, x->widget_id);
+    tkwidgets_bind_mouse_events(x->canvas_id, x->widget_id);
+    /* bind to KeyRelease events to send out right outlet one key at a time */
     sys_vgui("bind %s <KeyRelease> {+pd %s keyup %%N \\;} \n", 
              x->widget_id->s_name, x->receive_name->s_name);
 }
@@ -330,6 +281,7 @@ static void textwidget_activate(t_gobj *z, t_glist *glist, int state)
 /* no worky, this should draw MAC OS X style lines on the resize handle */
 /*         sys_vgui("%s create line %d %d %d %d -fill black -tags RESIZE_LINES\n",  */
 /*                  x->handle_id->s_name, handle_x2, handle_y1, handle_x1, handle_y2); */
+/* TODO split out the handle and the handle binding into common functions */
         sys_vgui("%s create window %d %d -anchor nw -width %d -height %d -window %s -tags RESIZE\n",
                  x->canvas_id->s_name, handle_x1, handle_y1,
                  TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT,
@@ -645,19 +597,19 @@ static void textwidget_click_callback(t_textwidget *x, t_floatarg f)
 static void textwidget_resize_click_callback(t_textwidget *x, t_floatarg f)
 {
     t_canvas *canvas = (glist_isvisible(x->x_glist) ? x->x_canvas : 0);
-    int newstate = (int)f;
-    if (x->x_resizing && !newstate && canvas)
+    int button_state = (int)f;
+    if (x->x_resizing && !button_state && canvas)
     {
         tkwidgets_draw_iolets((t_object*)x, canvas,
                               x->canvas_id, x->iolets_tag, x->all_tag,
                               x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
         canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
     }
-    if (!x->x_resizing && newstate)
+    if (!x->x_resizing && button_state)
     {
         tkwidgets_erase_iolets(x->canvas_id, x->iolets_tag);
     }
-    x->x_resizing = newstate;
+    x->x_resizing = button_state;
 }
 
 static void textwidget_resize_motion_callback(t_textwidget *x, t_floatarg f1, t_floatarg f2)

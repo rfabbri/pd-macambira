@@ -187,7 +187,59 @@ void tkwidgets_draw_iolets(t_object *x, t_glist *glist, t_symbol *canvas_id,
 
 void tkwidgets_erase_iolets(t_symbol* canvas_id, t_symbol* iolets_tag)
 {
-    sys_vgui("%s delete %s\n", canvas_id->s_name, iolets_tag); 
+    sys_vgui("%s delete %s\n", canvas_id->s_name, iolets_tag->s_name); 
+}
+
+
+/* -------------------- bind to keys and mouse events ----------------------- */
+
+void tkwidgets_bind_key_events(t_symbol *canvas_id, t_symbol *widget_id)
+{
+#ifdef __APPLE__
+    sys_vgui("bind %s <Mod1-Key> {pdtk_canvas_ctrlkey %s %%K 0}\n",
+             widget_id->s_name, canvas_id->s_name);
+    sys_vgui("bind %s <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %s %%K 1}\n",
+             widget_id->s_name, canvas_id->s_name);
+#else
+    sys_vgui("bind %s <Control-Key> {pdtk_canvas_ctrlkey %s %%K 0}\n",
+             widget_id->s_name, canvas_id->s_name);
+    sys_vgui("bind %s <Control-Shift-Key> {pdtk_canvas_ctrlkey %s %%K 1}\n",
+             widget_id->s_name, canvas_id->s_name);
+#endif
+}
+
+void tkwidgets_bind_mouse_events(t_symbol *canvas_id, t_symbol *widget_id)
+{
+    /* mouse buttons */
+    sys_vgui("bind %s <Button> {pdtk_canvas_sendclick %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b 0}\n",
+             widget_id->s_name, canvas_id->s_name, 
+             canvas_id->s_name, canvas_id->s_name);
+    sys_vgui("bind %s <ButtonRelease> {pdtk_canvas_mouseup %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             widget_id->s_name, canvas_id->s_name, 
+             canvas_id->s_name, canvas_id->s_name);
+    sys_vgui("bind %s <Shift-Button> {pdtk_canvas_click %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b 1}\n",
+             widget_id->s_name, canvas_id->s_name, 
+             canvas_id->s_name, canvas_id->s_name);
+    sys_vgui("bind %s <Button-2> {pdtk_canvas_rightclick %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             widget_id->s_name, canvas_id->s_name, 
+             canvas_id->s_name, canvas_id->s_name);
+    sys_vgui("bind %s <Button-3> {pdtk_canvas_rightclick %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             widget_id->s_name, canvas_id->s_name, 
+             canvas_id->s_name, canvas_id->s_name);
+    sys_vgui("bind %s <Control-Button> {pdtk_canvas_rightclick %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b}\n",
+             widget_id->s_name, canvas_id->s_name, 
+             canvas_id->s_name, canvas_id->s_name);
+    /* mouse motion */
+    sys_vgui("bind %s <Motion> {pdtk_canvas_motion %s \
+[expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] 0}\n",
+             widget_id->s_name, canvas_id->s_name, 
+             canvas_id->s_name, canvas_id->s_name);
 }
 
 /* -------------------- gui elements for resizing --------------------------- */

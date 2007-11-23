@@ -100,9 +100,11 @@ void tkwidgets_erase_iolets(t_symbol* canvas_id, t_symbol* iolets_tag);
 void tkwidgets_draw_handle(); // TODO draw resize handle when selected in editmode
 void tkwidgets_draw_resize_window(); // TODO draw the resize window while resizing
 
-
-
-
+/* bind this widget to Cmd/Ctrl keys and mouse events to support things like
+ * then standard keys and right-click to bring up the Properties/Open/Help
+ * menu when the Tk widgets have focus */
+void tkwidgets_bind_key_events(t_symbol *canvas_id, t_symbol *widget_id);
+void tkwidgets_bind_mouse_events(t_symbol *canvas_id, t_symbol *widget_id);
 
 
 
