@@ -103,6 +103,7 @@ CXXFLAGS = $(CFLAGS)
 	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) \
 		`test -f $*.libs && cat $*.libs`	\
 		`my_dylib=$(patsubst $(externals_src)/%,%,$(@D)); test -f $(@D)/lib$${my_dylib}.$(DYLIB_EXTENSION) && echo -L$(@D) -l$$my_dylib` \
+		`my_obj=$(patsubst $(externals_src)/%,%,$(@D)); test -f $(@D)/shared/$${my_obj}.o && echo $(@D)/shared/$${my_obj}.o` \
 		`test -f $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs && \
 			cat $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs`
 	chmod a-x "$*.$(EXTENSION)"
@@ -2168,9 +2169,9 @@ TKWIDGETS_NAME=tkwidgets
 TKWIDGETS_OBJECTS := $(wildcard $(externals_src)/tkwidgets/*.c)
 TKWIDGETS_SHARED := $(wildcard $(externals_src)/tkwidgets/shared/*.c)
 tkwidgets_shared: $(TKWIDGETS_SHARED:.c=.o)
-	$(CC) $(DYLIB_LDFLAGS) \
-		-o $(externals_src)/tkwidgets/libtkwidgets.$(DYLIB_EXTENSION) \
-		 $(TKWIDGETS_SHARED:.c=.o)
+#	$(CC) $(DYLIB_LDFLAGS) \
+#		-o $(externals_src)/tkwidgets/libtkwidgets.$(DYLIB_EXTENSION) \
+#		 $(TKWIDGETS_SHARED:.c=.o)
 
 tkwidgets: tkwidgets_shared $(TKWIDGETS_OBJECTS:.c=.$(EXTENSION))
 
