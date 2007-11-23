@@ -165,6 +165,7 @@ void tkwidgets_draw_iolets(t_object *x, t_glist *glist, t_symbol *canvas_id,
     int x_location = text_xpix(x, glist);
     int y_location = text_ypix(x, glist);
 
+/* TODO: make inlets draw on top of widget */
     for (i = 0; i < total_inlets; i++)  /* inlets */
     {
         onset = calculate_onset(x_location, width, i, total_inlets);

@@ -120,7 +120,7 @@ static void checkbutton_drawme(t_checkbutton *x, t_glist *glist)
     sys_vgui("destroy %s\n", x->widget_id->s_name); /* just in case it exists */
     sys_vgui("checkbutton %s\n", 
              x->widget_id->s_name);
-    tkwidgets_draw_inlets((t_object*)x, glist, 
+    tkwidgets_draw_iolets((t_object*)x, glist, 
                           x->canvas_id, x->iolets_tag, x->all_tag,
                           x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
     sys_vgui("%s create window %d %d -anchor nw -window %s -tags {%s %s}\n", 
@@ -219,7 +219,7 @@ static void checkbutton_size(t_checkbutton *x, t_float width, t_float height)
         sys_vgui("%s itemconfigure %s -width %d -height %d\n",
                  x->canvas_id->s_name, x->window_tag->s_name, x->width, x->height);
 //        erase_inlets(x);
-//        tkwidgets_draw_inlets(x, x->x_glist, TOTAL_INLETS, TOTAL_OUTLETS);
+//        tkwidgets_draw_iolets(x, x->x_glist, TOTAL_INLETS, TOTAL_OUTLETS);
         canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
     }
 }

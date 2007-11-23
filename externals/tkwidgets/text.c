@@ -25,16 +25,13 @@
 
 /* TODO: get Ctrl-A working to select all */
 /* TODO: set message doesnt work with a loadbang */
-/* TODO: add size to query and save */
-/* TODO: add scrollbars to query and save */
-/* TODO: remove glist from _erase() args */
 /* TODO: window name "handle1376fc00" already exists in parent */
 /* TODO: figure out window vs. text width/height */
 
 
 #define DEFAULT_COLOR           "grey70"
 
-#define TEXT_DEFAULT_WIDTH     130
+#define TEXT_DEFAULT_WIDTH     200
 #define TEXT_DEFAULT_HEIGHT    60
 #define TEXT_MIN_WIDTH         40
 #define TEXT_MIN_HEIGHT        20
@@ -200,11 +197,9 @@ static void textwidget_drawme(t_textwidget *x, t_glist *glist)
                               x->widget_id, x->options_binbuf);
 }     
 
-static void textwidget_erase(t_textwidget* x,t_glist* glist)
+static void textwidget_erase(t_textwidget* x)
 {
-    DEBUG(post("textwidget_erase: canvas %lx glist %lx", x->x_canvas, glist););
-
-    set_tkwidgets_ids(x,glist_getcanvas(glist));
+    DEBUG(post("textwidget_erase: canvas %lx", x->x_canvas););
     tkwidgets_erase_iolets(x->canvas_id, x->iolets_tag);
     sys_vgui("destroy %s\n", x->frame_id->s_name);
     sys_vgui("%s delete %s\n", x->canvas_id->s_name, x->all_tag->s_name);
@@ -315,7 +310,7 @@ static void textwidget_vis(t_gobj *z, t_glist *glist, int vis)
     }
     else {
         y = glist_findrtext(glist, (t_text *)z);
-        textwidget_erase(x, glist);
+        textwidget_erase(x);
         rtext_free(y);
     }
 }
