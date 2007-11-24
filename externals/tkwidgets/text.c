@@ -27,11 +27,9 @@
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: window name "handle1376fc00" already exists in parent */
 /* TODO: figure out window vs. text width/height */
-/* TODO: handle bg color on select/deselect */
+/* TODO: add x scrollbar */
 
-
-#define DEFAULT_COLOR           "grey70"
-
+#define TEXT_DEFAULT_COLOR     "grey90"
 #define TEXT_DEFAULT_WIDTH     200
 #define TEXT_DEFAULT_HEIGHT    60
 #define TEXT_MIN_WIDTH         40
@@ -159,19 +157,6 @@ static void set_tkwidgets_ids(t_textwidget *x, t_canvas *canvas)
     x->handle_id = tkwidgets_gen_handle_id((t_object *)x, x->canvas_id);
 }
 
-static void draw_scrollbar(t_textwidget *x)
-{
-    sys_vgui("pack %s -side right -fill y -before %s \n",
-             x->scrollbar_id->s_name, x->widget_id->s_name);
-    x->have_scrollbars = 1;
-}
-
-static void erase_scrollbar(t_textwidget *x)
-{
-    sys_vgui("pack forget %s \n", x->scrollbar_id->s_name);
-    x->have_scrollbars = 0;
-}
-
 static void create_widget(t_textwidget *x)
 {
     DEBUG(post("create_widget"););
@@ -181,11 +166,8 @@ static void create_widget(t_textwidget *x)
     /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
     sys_vgui("destroy %s\n", x->frame_id->s_name);
     sys_vgui("frame %s \n", x->frame_id->s_name);
-    sys_vgui("text %s -border 1 \
-    -highlightthickness 1 -relief sunken -bg \"%s\" -yscrollcommand {%s set} \n",
-             x->widget_id->s_name, DEFAULT_COLOR, x->scrollbar_id->s_name);
-    sys_vgui("scrollbar %s -command {%s yview}\n",
-             x->scrollbar_id->s_name, x->widget_id->s_name);
+    sys_vgui("text %s -bd 1 -highlightbackground grey70 -highlightthickness 1 -bg %s\n",
+             x->widget_id->s_name, TEXT_DEFAULT_COLOR);
     sys_vgui("pack %s -side left -fill both -expand 1 \n", x->widget_id->s_name);
     sys_vgui("pack %s -side bottom -fill both -expand 1 \n", x->frame_id->s_name);
 
@@ -204,7 +186,8 @@ static void drawme(t_textwidget *x, t_glist *glist)
     tkwidgets_draw_iolets((t_object*)x, glist, 
                           x->canvas_id, x->iolets_tag, x->all_tag,
                           x->width, x->height);
-    if(x->have_scrollbars) draw_scrollbar(x);
+    if(x->have_scrollbars) 
+        tkwidgets_draw_y_scrollbar(x->widget_id, x->scrollbar_id);
     sys_vgui("%s create window %d %d -anchor nw -window %s    \
                   -tags {%s %s} -width %d -height %d \n", x->canvas_id->s_name,
              text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
@@ -259,15 +242,17 @@ static void textwidget_select(t_gobj *z, t_glist *glist, int state)
     
     if( (state) && (!x->x_selected))
     {
-        sys_vgui("%s configure -bg #bdbddd -state disabled -cursor $cursor_editmode_nothing\n",
-                 x->widget_id->s_name);
+        sys_vgui("set ::%s::bg [%s cget -bg]\n", 
+                 x->tcl_namespace->s_name, x->widget_id->s_name);
+        sys_vgui("%s configure -bg %s -state disabled -cursor $cursor_editmode_nothing\n",
+                 x->widget_id->s_name, TKW_SELECTION_COLOR);
         x->x_selected = 1;
     }
     else if (!state)
     {
-        sys_vgui("%s configure -bg grey -state normal -cursor xterm\n",
-                 x->widget_id->s_name);
-        /* activatefn never gets called with 0, so destroy here */
+        sys_vgui("%s configure -bg $::%s::bg -state normal -cursor xterm\n",
+                 x->widget_id->s_name, x->tcl_namespace->s_name);
+        /* activatefn never gets called with 0, so destroy handle here */
         sys_vgui("destroy %s\n", x->handle_id->s_name);
         x->x_selected = 0;
     }
@@ -489,9 +474,15 @@ static void textwidget_scrollbars(t_textwidget *x, t_float f)
 {
     int value = (int) f;
     if(value > 0)
-        draw_scrollbar(x);
+    {
+        x->have_scrollbars = 1;
+        tkwidgets_draw_y_scrollbar(x->widget_id, x->scrollbar_id);
+    }
     else
-        erase_scrollbar(x);
+    {
+        x->have_scrollbars = 0;
+        tkwidgets_erase_y_scrollbar(x->widget_id, x->scrollbar_id);
+    }
 }
 
 static void textwidget_size(t_textwidget *x, t_float width, t_float height)

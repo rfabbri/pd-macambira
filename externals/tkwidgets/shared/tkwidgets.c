@@ -24,14 +24,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/* this should be part of the Pd API */
-t_symbol *canvas_getname(t_canvas *canvas)
-{
-    char buf[MAXPDSTRING];
-    snprintf(buf, MAXPDSTRING, ".x%lx", (unsigned long)glist_getcanvas(canvas));
-    return gensym(buf);
-}
-
 /* -------------------- options handling ------------------------------------ */
 
 void tkwidgets_query_options(t_symbol *receive_name, t_symbol *widget_id, 
@@ -207,6 +199,24 @@ void tkwidgets_erase_iolets(t_symbol* canvas_id, t_symbol* iolets_tag)
     sys_vgui("%s delete %s\n", canvas_id->s_name, iolets_tag->s_name); 
 }
 
+/* -------------------- scrollbars ------------------------------------------ */
+
+void tkwidgets_draw_y_scrollbar(t_symbol *widget_id, t_symbol *scrollbar_id)
+{
+    sys_vgui("scrollbar %s -orient vertical -command {%s yview}\n",
+             scrollbar_id->s_name, widget_id->s_name);
+    sys_vgui("pack %s -side right -fill y -before %s \n",
+             scrollbar_id->s_name, widget_id->s_name);
+    sys_vgui("%s configure -yscrollcommand {%s set}\n",
+             widget_id->s_name, scrollbar_id->s_name);
+}
+
+void tkwidgets_erase_y_scrollbar(t_symbol *widget_id, t_symbol *scrollbar_id)
+{
+    sys_vgui("%s configure -yscrollcommand {}\n", widget_id->s_name);
+    sys_vgui("pack forget %s \n", scrollbar_id->s_name);
+    sys_vgui("destroy %s \n", scrollbar_id->s_name);
+}
 
 /* -------------------- bind to keys and mouse events ----------------------- */
 

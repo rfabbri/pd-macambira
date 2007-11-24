@@ -37,6 +37,8 @@
 #define TOTAL_INLETS            1
 #define TOTAL_OUTLETS           2
 
+#define TKW_SELECTION_COLOR     "#bdbddd"
+
 /* size and offset for the resizing handle */
 #define TKW_HANDLE_HEIGHT       15
 #define TKW_HANDLE_WIDTH        15
@@ -59,18 +61,6 @@ typedef struct _tkwidgets
     int       resizing;      /* flag to tell when being resized */
     int       selected;      /* flag for when widget is selected */
 } t_tkwidgets;   
-
-/* query a tk widget for the state of all its options */
-void tkwidgets_query_options(t_symbol* receive_name, t_symbol *widget_id, 
-                             int argc, char** argv);
-/* initialize things on new widget */
-void tkwidgets_new(t_tkwidgets* tkw);
-
-
-/* this should be part of the Pd API */
-t_symbol* canvas_getname(t_canvas *canvas);
-
-void tkwidgets_setcallbackname(void *x, char *widget_name);
 
 /* handle options */
 void tkwidgets_store_options(t_symbol *receive_name, t_symbol *tcl_namespace,
@@ -98,9 +88,15 @@ void tkwidgets_draw_iolets(t_object *x, t_glist *glist, t_symbol *canvas_id,
                            t_symbol *iolets_tag, t_symbol *all_tag,
                            int width, int height);
 void tkwidgets_erase_iolets(t_symbol* canvas_id, t_symbol* iolets_tag);
+void tkwidgets_draw_y_scrollbar(t_symbol *widget_id, t_symbol *scrollbar_id);
+void tkwidgets_erase_y_scrollbar(t_symbol *widget_id, t_symbol *scrollbar_id);
 
 void tkwidgets_draw_handle(); // TODO draw resize handle when selected in editmode
 void tkwidgets_draw_resize_window(); // TODO draw the resize window while resizing
+
+/* selection */
+
+
 
 /* bind this widget to Cmd/Ctrl keys and mouse events to support things like
  * then standard keys and right-click to bring up the Properties/Open/Help
