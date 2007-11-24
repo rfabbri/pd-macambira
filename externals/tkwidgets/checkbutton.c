@@ -20,6 +20,9 @@
 
 */
 
+/* TODO rectify char and pixel widths/heights ug */
+/* TODO bind to <Configure> so that things are redrawn when the text changes */
+
 #include "shared/tkwidgets.h"
 
 #define DEBUG(x) x
@@ -66,7 +69,7 @@ static char *checkbutton_tk_options[] = {
     "background",
     "bitmap",
     "borderwidth",
-    "command",
+//    "command", /* problematic since it uses names based on pointers */
     "compound",
     "cursor",
     "disabledforeground",
@@ -93,7 +96,7 @@ static char *checkbutton_tk_options[] = {
     "text",
     "textvariable",
     "underline",
-    "variable",
+//    "variable", /* problematic since it uses names based on pointers */
     "width",
     "wraplength"
 };
@@ -117,8 +120,12 @@ static void drawme(t_checkbutton *x, t_glist *glist)
 {
     set_tkwidgets_ids(x,glist_getcanvas(glist));
     sys_vgui("destroy %s\n", x->widget_id->s_name); /* just in case it exists */
-    sys_vgui("checkbutton %s\n", 
-             x->widget_id->s_name);
+    sys_vgui("namespace eval %s {} \n", x->tcl_namespace->s_name);
+    sys_vgui("set ::%s::state 0\n", x->tcl_namespace->s_name);
+    sys_vgui("checkbutton %s -variable ::%s::state \
+-command {pd [concat %s output $::%s::state \\;]}\n", 
+             x->widget_id->s_name, x->tcl_namespace->s_name, 
+             x->receive_name->s_name, x->tcl_namespace->s_name);
     tkwidgets_draw_iolets((t_object*)x, glist, 
                           x->canvas_id, x->iolets_tag, x->all_tag,
                           x->width, x->height);
@@ -192,6 +199,28 @@ static void checkbutton_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     }
 }
 
+static void checkbutton_select(t_gobj *z, t_glist *glist, int state)
+{
+    t_checkbutton *x = (t_checkbutton *)z;
+    DEBUG(post("checkbutton_select: canvas %lx glist %lx state %d", x->x_canvas, glist, state););
+    
+    if( (state) && (!x->x_selected))
+    {
+        sys_vgui("set ::%s::bg [%s cget -bg]\n", 
+                 x->tcl_namespace->s_name, x->widget_id->s_name);
+        sys_vgui("%s configure -bg %s\n",
+                 x->widget_id->s_name, TKW_SELECTION_COLOR);
+        x->x_selected = 1;
+    }
+    else if (!state)
+    {
+        sys_vgui("%s configure -bg $::%s::bg\n",
+                 x->widget_id->s_name, x->tcl_namespace->s_name);
+        /* activatefn never gets called with 0, so destroy handle here */
+        sys_vgui("destroy %s\n", x->handle_id->s_name);
+        x->x_selected = 0;
+    }
+}
 static void checkbutton_delete(t_gobj *z, t_glist *glist)
 {
     t_text *x = (t_text *)z;
@@ -218,6 +247,40 @@ static void checkbutton_save(t_gobj *z, t_binbuf *b)
     binbuf_addv(b, ";");
 }
 
+/* -------------------- methods for atoms ----------------------------------- */
+
+/* this function uses the selector as the Tk option and applies the whole
+ * message directly to the Tk widget itself using Tk's "configure".  This
+ * function is called when "anything" is received. */
+static void checkbutton_set_option(t_checkbutton *x, t_symbol *s, int argc, t_atom *argv)
+{
+    if(s != &s_list)
+    {
+        t_binbuf *argument_binbuf = binbuf_new();
+        char *argument_buffer;
+        int buffer_length;
+        
+        binbuf_add(argument_binbuf, argc, argv);
+        binbuf_gettext(argument_binbuf, &argument_buffer, &buffer_length);
+        binbuf_free(argument_binbuf);
+        argument_buffer[buffer_length] = 0;
+        post("%s configure -%s {%s} \n", 
+                 x->widget_id->s_name, s->s_name, argument_buffer);
+        sys_vgui("%s configure -%s {%s} \n", 
+                 x->widget_id->s_name, s->s_name, argument_buffer);
+        tkwidgets_store_options(x->receive_name, x->tcl_namespace, x->widget_id, 
+                                sizeof(checkbutton_tk_options)/sizeof(char *), 
+                                (char **)&checkbutton_tk_options);
+    }
+}
+
+/* Pass the contents of the text widget onto the textwidget_output_callback
+ * fuction above */
+static void checkbutton_bang_output(t_checkbutton* x)
+{
+    sys_vgui("%s invoke", x->widget_id->s_name);
+}
+
 /* --------------------------- methods for pd space ------------------------- */
 
 static void checkbutton_size(t_checkbutton *x, t_float width, t_float height)
@@ -235,17 +298,69 @@ static void checkbutton_size(t_checkbutton *x, t_float width, t_float height)
 
 /* --------------------------- callback functions --------------------------- */
 
-static void checkbutton_query_callback(t_checkbutton *x, t_symbol *s, int argc, t_atom *argv)
+static void checkbutton_output_callback(t_checkbutton* x, t_float f)
+{
+    outlet_float(x->x_data_outlet, f);
+}
+
+static void checkbutton_query_callback(t_checkbutton *x, t_symbol *s, 
+                                       int argc, t_atom *argv)
 {
     t_symbol *tmp_symbol = atom_getsymbolarg(0, argc, argv);
     if(tmp_symbol != &s_)
-    {
-        post("tmp_symbol %s argc %d", tmp_symbol->s_name, argc);
         outlet_anything(x->x_status_outlet, tmp_symbol, argc - 1, argv + 1);
+    else
+        post("checkbutton_query_callback %s %d", s->s_name, argc);
+}
+
+static void checkbutton_store_callback(t_checkbutton *x, t_symbol *s, 
+                                       int argc, t_atom *argv)
+{
+    if(s != &s_)
+    {
+        binbuf_clear(x->options_binbuf);
+        binbuf_restore(x->options_binbuf, argc, argv);
     }
     else
+        post("ERROR: does this ever happen?");
+}
+
+static void checkbutton_resize_click_callback(t_checkbutton *x, t_floatarg f)
+{
+    t_canvas *canvas = (glist_isvisible(x->x_glist) ? x->x_canvas : 0);
+    int button_state = (int)f;
+    if(x->x_resizing && !button_state && canvas)
     {
-        post("checkbutton_query_callback %s %d", s->s_name, argc);
+        tkwidgets_draw_iolets((t_object*)x, canvas,
+                              x->canvas_id, x->iolets_tag, x->all_tag,
+                              x->width, x->height);
+        canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
+    }
+    else if(!x->x_resizing && button_state)
+    {
+        tkwidgets_erase_iolets(x->canvas_id, x->iolets_tag);
+    }
+    x->x_resizing = button_state;
+}
+
+static void checkbutton_resize_motion_callback(t_checkbutton *x, 
+                                               t_floatarg f1, t_floatarg f2)
+{
+    DEBUG(post("checkbutton_resize_motion_callback"););
+    if (x->x_resizing)
+    {
+        int dx = (int)f1, dy = (int)f2;
+        if (glist_isvisible(x->x_glist))
+        {
+            x->width += dx;
+            x->height += dy;
+            sys_vgui("%s itemconfigure %s -width %d -height %d\n",
+                     x->canvas_id->s_name, x->window_tag->s_name, 
+                     x->width, x->height);
+            sys_vgui("%s move RESIZE %d %d\n",
+                     x->canvas_id->s_name, dx, dy);
+            canvas_fixlinesfor(x->x_glist, (t_text *)x);
+        }
     }
 }
 
@@ -262,8 +377,8 @@ static void *checkbutton_new(t_symbol* s, int argc, t_atom *argv)
 
     x->options_binbuf = binbuf_new();
 
-    x->width = 15;
-    x->height = 15;
+    x->width = 30;
+    x->height = 30;
 
     if(argc > 0) x->width = atom_getint(argv);
     if(argc > 1) x->height = atom_getint(argv + 1);
@@ -289,6 +404,8 @@ void checkbutton_setup(void)
                                   (t_newmethod)checkbutton_new, 
                                   (t_method)checkbutton_free, 
                                   sizeof(t_checkbutton), 0, A_GIMME,0);
+/* methods for atoms */
+	class_addanything(checkbutton_class, (t_method)checkbutton_set_option);
     
 /* methods for pd space */
     class_addmethod(checkbutton_class, (t_method)checkbutton_query,
@@ -297,8 +414,16 @@ void checkbutton_setup(void)
                     gensym("size"), A_DEFFLOAT, A_DEFFLOAT, 0);
 
 /* callbacks */
+	class_addmethod(checkbutton_class, (t_method)checkbutton_output_callback,
+                    gensym("output"), A_DEFFLOAT, 0);
     class_addmethod(checkbutton_class, (t_method)checkbutton_query_callback,
                     gensym("query_callback"), A_GIMME, 0);
+    class_addmethod(checkbutton_class, (t_method)checkbutton_store_callback,
+                    gensym("store_callback"), A_GIMME, 0);
+    class_addmethod(checkbutton_class, (t_method)checkbutton_resize_click_callback,
+                    gensym("resize_click"), A_FLOAT, 0);
+    class_addmethod(checkbutton_class, (t_method)checkbutton_resize_motion_callback,
+                    gensym("resize_motion"), A_FLOAT, A_FLOAT, 0);
 
 /* widget behavior */
     checkbutton_widgetbehavior.w_getrectfn  = checkbutton_getrect;

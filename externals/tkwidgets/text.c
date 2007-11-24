@@ -161,7 +161,7 @@ static void create_widget(t_textwidget *x)
 {
     DEBUG(post("create_widget"););
 
-    sys_vgui("namespace eval text%lx {} \n", x);
+    sys_vgui("namespace eval %s {} \n", x->tcl_namespace->s_name);
     
     /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
     sys_vgui("destroy %s\n", x->frame_id->s_name);
