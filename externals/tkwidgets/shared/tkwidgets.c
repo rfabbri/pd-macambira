@@ -51,11 +51,11 @@ void tkwidgets_store_options(t_symbol *receive_name, t_symbol *tcl_namespace,
     int i;
     for(i = 0; i < argc; i++)
     {
-        sys_vgui("set ::%s::ret [%s cget -%s]\n",
+        sys_vgui("set ::%s::tmp [%s cget -%s]\n",
                  tcl_namespace->s_name, widget_id->s_name, argv[i]);
-        sys_vgui("if {[string length $::%s::ret] > 0} {\n",
+        sys_vgui("if {[string length $::%s::tmp] > 0} {\n",
                  tcl_namespace->s_name);
-        sys_vgui("lappend ::%s::list -%s; lappend ::%s::list $::%s::ret}\n", 
+        sys_vgui("lappend ::%s::list -%s; lappend ::%s::list $::%s::tmp}\n", 
                  tcl_namespace->s_name, argv[i], 
                  tcl_namespace->s_name, tcl_namespace->s_name);
     }
@@ -64,8 +64,7 @@ void tkwidgets_store_options(t_symbol *receive_name, t_symbol *tcl_namespace,
     sys_vgui("unset ::%s::list \n", tcl_namespace->s_name);  
 }
 
-void tkwidgets_restore_options(t_symbol *receive_name, t_symbol *tcl_namespace,
-                               t_symbol *widget_id, t_binbuf *options_binbuf)
+void tkwidgets_restore_options(t_symbol *widget_id, t_binbuf *options_binbuf)
 {
     int length;
     char *options;
@@ -73,6 +72,20 @@ void tkwidgets_restore_options(t_symbol *receive_name, t_symbol *tcl_namespace,
     options[length] = 0; //binbuf_gettext() doesn't put a null, so we do
     sys_vgui("%s configure %s\n", widget_id->s_name, options);
 }
+
+/* output a list of available options for this widget */ 
+void tkwidgets_list_options(t_outlet *status_outlet, int argc, char** argv)
+{
+    int i;
+    t_binbuf *bb = binbuf_new();
+    for(i = 0; i < argc; ++i)
+    {
+        binbuf_addv(bb, "s", gensym(argv[i]));
+    }
+    outlet_anything(status_outlet, gensym("options"), 
+                    binbuf_getnatom(bb), binbuf_getvec(bb));
+}
+
 
 /* -------------------- generate names for various elements ----------------- */
 

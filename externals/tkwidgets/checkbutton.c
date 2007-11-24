@@ -115,7 +115,6 @@ static void set_tkwidgets_ids(t_checkbutton* x, t_canvas* canvas)
 
 static void checkbutton_drawme(t_checkbutton *x, t_glist *glist)
 {
-    
     set_tkwidgets_ids(x,glist_getcanvas(glist));
     sys_vgui("destroy %s\n", x->widget_id->s_name); /* just in case it exists */
     sys_vgui("checkbutton %s\n", 
@@ -128,12 +127,13 @@ static void checkbutton_drawme(t_checkbutton *x, t_glist *glist)
              text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
              x->widget_id->s_name,
              x->window_tag->s_name, x->all_tag->s_name);
+    tkwidgets_bind_key_events(x->canvas_id, x->widget_id);
+    tkwidgets_bind_mouse_events(x->canvas_id, x->widget_id);
 }
 
 
-static void checkbutton_erase(t_checkbutton* x, t_glist* glist)
+static void checkbutton_erase(t_checkbutton* x)
 {
-    set_tkwidgets_ids(x, glist_getcanvas(glist));
     sys_vgui("destroy %s\n", x->widget_id->s_name);
     sys_vgui("%s delete %s\n", x->canvas_id->s_name, x->all_tag->s_name);
 }
@@ -185,8 +185,8 @@ static void checkbutton_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     x->x_obj.te_ypix += dy;
     if (glist_isvisible(glist))
     {
-        set_tkwidgets_ids(x,glist_getcanvas(glist));
-        sys_vgui("%s move %s %d %d\n", x->canvas_id->s_name, x->all_tag->s_name, dx, dy);
+        sys_vgui("%s move %s %d %d\n", 
+                 x->canvas_id->s_name, x->all_tag->s_name, dx, dy);
         sys_vgui("%s move RSZ %d %d\n", x->canvas_id->s_name, dx, dy);
         canvas_fixlinesfor(glist_getcanvas(glist), (t_text*) x);
     }
@@ -204,7 +204,7 @@ static void checkbutton_vis(t_gobj *z, t_glist *glist, int vis)
     if (vis)
         checkbutton_drawme(s, glist);
     else
-        checkbutton_erase(s, glist);
+        checkbutton_erase(s);
 }
 
 /* --------------------------- methods -------------------------------------- */

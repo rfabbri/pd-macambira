@@ -27,6 +27,7 @@
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: window name "handle1376fc00" already exists in parent */
 /* TODO: figure out window vs. text width/height */
+/* TODO: handle bg color on select/deselect */
 
 
 #define DEFAULT_COLOR           "grey70"
@@ -193,8 +194,7 @@ static void textwidget_drawme(t_textwidget *x, t_glist *glist)
              text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
              x->frame_id->s_name, x->window_tag->s_name, x->all_tag->s_name, 
              x->width, x->height);
-    tkwidgets_restore_options(x->receive_name, x->tcl_namespace,
-                              x->widget_id, x->options_binbuf);
+    tkwidgets_restore_options(x->widget_id, x->options_binbuf);
 }     
 
 static void textwidget_erase(t_textwidget* x)
@@ -228,7 +228,7 @@ static void textwidget_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     x->x_obj.te_ypix += dy;
     if (glist_isvisible(glist))
     {
-        set_tkwidgets_ids(x,glist_getcanvas(glist));
+//        set_tkwidgets_ids(x,glist_getcanvas(glist)); /* TODO is this needed here? */
         sys_vgui("%s move %s %d %d\n", x->canvas_id->s_name, x->all_tag->s_name, dx, dy);
         sys_vgui("%s move RESIZE %d %d\n", x->canvas_id->s_name, dx, dy);
         canvas_fixlinesfor(glist_getcanvas(glist), (t_text*) x);
@@ -471,7 +471,9 @@ static void textwidget_save(t_gobj *z, t_binbuf *b)
     binbuf_addv(b, ";");
 }
 
-static void textwidget_option(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
+/* this function uses the selector as the Tk option and applies the whole
+ * message directly to the Tk widget itself using Tk's "configure" */
+static void textwidget_set_option(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
 {
     if(s != &s_list)
     {
@@ -483,13 +485,19 @@ static void textwidget_option(t_textwidget *x, t_symbol *s, int argc, t_atom *ar
         binbuf_gettext(argument_binbuf, &argument_buffer, &buffer_length);
         binbuf_free(argument_binbuf);
         argument_buffer[buffer_length] = 0;
-        post("argument_buffer: %s", argument_buffer);
         sys_vgui("%s configure -%s {%s} \n", 
                  x->widget_id->s_name, s->s_name, argument_buffer);
         tkwidgets_store_options(x->receive_name, x->tcl_namespace, x->widget_id, 
                                 sizeof(textwidget_tk_options)/sizeof(char *), 
                                 (char **)&textwidget_tk_options);
     }
+}
+
+static void textwidget_options(t_textwidget *x)
+{
+    tkwidgets_list_options(x->x_status_outlet,
+                           sizeof(textwidget_tk_options)/sizeof(char *), 
+                           (char **)&textwidget_tk_options);
 }
 
 static void query_scrollbars(t_textwidget *x)
@@ -665,7 +673,7 @@ static void *textwidget_new(t_symbol *s, int argc, t_atom *argv)
     pd_bind(&x->x_obj.ob_pd, x->receive_name);
 
     x->x_glist = canvas_getcurrent();
-    set_tkwidgets_ids(x, x->x_glist);
+//    set_tkwidgets_ids(x, x->x_glist); /* TODO: is this needed here? */
     x->iolets_tag = tkwidgets_gen_iolets_tag((t_object*)x);
     x->all_tag = tkwidgets_gen_all_tag((t_object*)x);
 
@@ -681,7 +689,7 @@ void text_setup(void) {
                                  0, A_GIMME, 0);
 				
 	class_addbang(textwidget_class, (t_method)textwidget_bang_output);
-	class_addanything(textwidget_class, (t_method)textwidget_option);
+	class_addanything(textwidget_class, (t_method)textwidget_set_option);
 
 	class_addmethod(textwidget_class, (t_method)textwidget_append,
                     gensym("append"), A_GIMME, 0);
@@ -689,6 +697,8 @@ void text_setup(void) {
                     gensym("clear"), 0);
 	class_addmethod(textwidget_class, (t_method)textwidget_key,
                     gensym("key"), A_GIMME, 0);
+	class_addmethod(textwidget_class, (t_method)textwidget_options,
+                    gensym("options"), 0);
     class_addmethod(textwidget_class, (t_method)textwidget_query,
                     gensym("query"), A_DEFSYMBOL, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_scrollbars,
@@ -697,6 +707,7 @@ void text_setup(void) {
                     gensym("set"), A_GIMME, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_size,
                     gensym("size"), A_DEFFLOAT, A_DEFFLOAT, 0);
+
 /* callbacks */
     class_addmethod(textwidget_class, (t_method)textwidget_store_callback,
                     gensym("store_callback"), A_GIMME, 0);
