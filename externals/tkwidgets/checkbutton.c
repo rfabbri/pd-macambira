@@ -105,6 +105,7 @@ static char *checkbutton_tk_options[] = {
 /* -------------------- function prototypes --------------------------------- */
 
 static void checkbutton_query_callback(t_checkbutton *x, t_symbol *s, int argc, t_atom *argv);
+static void checkbutton_set(t_checkbutton* x,  t_float f);
 
 /* -------------------- widget helper functions------------------------------ */
 
@@ -286,13 +287,25 @@ static void checkbutton_bang_output(t_checkbutton* x)
  * fuction above */
 static void checkbutton_float_output(t_checkbutton* x, t_float f)
 {
-    /* TODO figure out which matches make sense, in terms of offvalue/onvalue */
-    sys_vgui("if {%g != 0} {%s select} else {%s deselect}\n",
-             f, x->widget_id->s_name, x->widget_id->s_name, x->widget_id->s_name);
+    checkbutton_set(x, f);
     outlet_float(x->x_data_outlet, f);
 }
 
 /* --------------------------- methods for pd space ------------------------- */
+
+static void checkbutton_options(t_checkbutton *x)
+{
+    tkwidgets_list_options(x->x_status_outlet,
+                           sizeof(checkbutton_tk_options)/sizeof(char *), 
+                           (char **)&checkbutton_tk_options);
+}
+
+static void checkbutton_set(t_checkbutton* x,  t_float f)
+{
+    /* TODO figure out which matches make sense, in terms of offvalue/onvalue */
+    sys_vgui("if {%g != 0} {%s select} else {%s deselect}\n",
+             f, x->widget_id->s_name, x->widget_id->s_name, x->widget_id->s_name);
+}
 
 static void checkbutton_size(t_checkbutton *x, t_float width, t_float height)
 {
@@ -421,8 +434,12 @@ void checkbutton_setup(void)
 	class_addfloat(checkbutton_class, (t_method)checkbutton_float_output);
     
 /* methods for pd space */
+	class_addmethod(checkbutton_class, (t_method)checkbutton_options,
+                    gensym("options"), 0);
     class_addmethod(checkbutton_class, (t_method)checkbutton_query,
                     gensym("query"), A_DEFSYMBOL, 0);
+	class_addmethod(checkbutton_class, (t_method)checkbutton_set,
+                    gensym("set"), A_DEFFLOAT, 0);
     class_addmethod(checkbutton_class, (t_method)checkbutton_size,
                     gensym("size"), A_DEFFLOAT, A_DEFFLOAT, 0);
 
