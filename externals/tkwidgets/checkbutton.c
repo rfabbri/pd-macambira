@@ -113,7 +113,7 @@ static void set_tkwidgets_ids(t_checkbutton* x, t_canvas* canvas)
     x->handle_id = tkwidgets_gen_handle_id((t_object *)x, x->canvas_id);
 }
 
-static void checkbutton_drawme(t_checkbutton *x, t_glist *glist)
+static void drawme(t_checkbutton *x, t_glist *glist)
 {
     set_tkwidgets_ids(x,glist_getcanvas(glist));
     sys_vgui("destroy %s\n", x->widget_id->s_name); /* just in case it exists */
@@ -132,7 +132,7 @@ static void checkbutton_drawme(t_checkbutton *x, t_glist *glist)
 }
 
 
-static void checkbutton_erase(t_checkbutton* x)
+static void eraseme(t_checkbutton* x)
 {
     sys_vgui("destroy %s\n", x->widget_id->s_name);
     sys_vgui("%s delete %s\n", x->canvas_id->s_name, x->all_tag->s_name);
@@ -202,12 +202,23 @@ static void checkbutton_vis(t_gobj *z, t_glist *glist, int vis)
 {
     t_checkbutton* s = (t_checkbutton*)z;
     if (vis)
-        checkbutton_drawme(s, glist);
+        drawme(s, glist);
     else
-        checkbutton_erase(s);
+        eraseme(s);
 }
 
-/* --------------------------- methods -------------------------------------- */
+static void checkbutton_save(t_gobj *z, t_binbuf *b)
+{
+    t_checkbutton *x = (t_checkbutton *)z;
+    binbuf_addv(b, "ssiisii", &s__X, gensym("obj"),
+                x->x_obj.te_xpix, x->x_obj.te_ypix, 
+                atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+                x->width, x->height);
+// TODO    binbuf_addbinbuf(b, x->options_binbuf);
+    binbuf_addv(b, ";");
+}
+
+/* --------------------------- methods for pd space ------------------------- */
 
 static void checkbutton_size(t_checkbutton *x, t_float width, t_float height)
 {
@@ -249,10 +260,14 @@ static void *checkbutton_new(t_symbol* s, int argc, t_atom *argv)
 {
     t_checkbutton *x = (t_checkbutton *)pd_new(checkbutton_class);
 
-    x->x_glist = (t_glist*) canvas_getcurrent();
+    x->options_binbuf = binbuf_new();
 
     x->width = 15;
     x->height = 15;
+
+    if(argc > 0) x->width = atom_getint(argv);
+    if(argc > 1) x->height = atom_getint(argv + 1);
+    if(argc > 2) binbuf_add(x->options_binbuf, argc - 2, argv + 2);
 
     x->tcl_namespace = tkwidgets_gen_tcl_namespace((t_object*)x, s);
     x->receive_name = tkwidgets_gen_callback_name(x->tcl_namespace);
@@ -270,10 +285,12 @@ static void *checkbutton_new(t_symbol* s, int argc, t_atom *argv)
 
 void checkbutton_setup(void)
 {
-    checkbutton_class = class_new(gensym("checkbutton"), (t_newmethod)checkbutton_new, 
-                            (t_method)checkbutton_free, 
-                            sizeof(t_checkbutton), 0, A_GIMME,0);
-
+    checkbutton_class = class_new(gensym("checkbutton"), 
+                                  (t_newmethod)checkbutton_new, 
+                                  (t_method)checkbutton_free, 
+                                  sizeof(t_checkbutton), 0, A_GIMME,0);
+    
+/* methods for pd space */
     class_addmethod(checkbutton_class, (t_method)checkbutton_query,
                     gensym("query"), A_DEFSYMBOL, 0);
     class_addmethod(checkbutton_class, (t_method)checkbutton_size,
@@ -283,6 +300,7 @@ void checkbutton_setup(void)
     class_addmethod(checkbutton_class, (t_method)checkbutton_query_callback,
                     gensym("query_callback"), A_GIMME, 0);
 
+/* widget behavior */
     checkbutton_widgetbehavior.w_getrectfn  = checkbutton_getrect;
     checkbutton_widgetbehavior.w_displacefn = checkbutton_displace;
     checkbutton_widgetbehavior.w_selectfn   = NULL;
@@ -291,6 +309,7 @@ void checkbutton_setup(void)
     checkbutton_widgetbehavior.w_visfn      = checkbutton_vis;
     checkbutton_widgetbehavior.w_clickfn    = NULL;
     class_setwidget(checkbutton_class, &checkbutton_widgetbehavior);
+    class_setsavefn(checkbutton_class, &checkbutton_save);
 }
 
 

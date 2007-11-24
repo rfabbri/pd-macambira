@@ -131,6 +131,23 @@ static void textwidget_query_callback(t_textwidget *x, t_symbol *s, int argc, t_
 
 /* -------------------- widget helper functions ----------------------------- */
 
+static void query_scrollbars(t_textwidget *x)
+{
+    t_atom state[2];
+    SETSYMBOL(state, scrollbars_symbol);
+    SETFLOAT(state + 1, (t_float)x->have_scrollbars);
+    textwidget_query_callback(x, gensym("query_callback"), 2, state);
+}
+
+static void query_size(t_textwidget *x)
+{
+    t_atom coords[3];
+    SETSYMBOL(coords, size_symbol);
+    SETFLOAT(coords + 1, (t_float)x->width);
+    SETFLOAT(coords + 2, (t_float)x->height);
+    textwidget_query_callback(x, gensym("query_callback"), 3, coords);
+}
+
 static void set_tkwidgets_ids(t_textwidget *x, t_canvas *canvas)
 {
     x->x_canvas = canvas;
@@ -179,9 +196,9 @@ static void create_widget(t_textwidget *x)
              x->widget_id->s_name, x->receive_name->s_name);
 }
 
-static void textwidget_drawme(t_textwidget *x, t_glist *glist)
+static void drawme(t_textwidget *x, t_glist *glist)
 {
-    DEBUG(post("textwidget_drawme: firsttime %d canvas %lx glist %lx", x->x_canvas, glist););
+    DEBUG(post("drawme: firsttime %d canvas %lx glist %lx", x->x_canvas, glist););
     set_tkwidgets_ids(x,glist_getcanvas(glist));	
     create_widget(x);	
     tkwidgets_draw_iolets((t_object*)x, glist, 
@@ -196,9 +213,9 @@ static void textwidget_drawme(t_textwidget *x, t_glist *glist)
     tkwidgets_restore_options(x->widget_id, x->options_binbuf);
 }     
 
-static void textwidget_erase(t_textwidget* x)
+static void eraseme(t_textwidget* x)
 {
-    DEBUG(post("textwidget_erase: canvas %lx", x->x_canvas););
+    DEBUG(post("eraseme: canvas %lx", x->x_canvas););
     tkwidgets_erase_iolets(x->canvas_id, x->iolets_tag);
     sys_vgui("destroy %s\n", x->frame_id->s_name);
     sys_vgui("%s delete %s\n", x->canvas_id->s_name, x->all_tag->s_name);
@@ -302,27 +319,74 @@ static void textwidget_vis(t_gobj *z, t_glist *glist, int vis)
 {
     t_textwidget *x = (t_textwidget*)z;
     DEBUG(post("textwidget_vis: vis %d canvas %lx glist %lx", vis, x->x_canvas, glist););
-    t_rtext *y;
-    if (vis) {
-        y = (t_rtext *) rtext_new(glist, (t_text *)z);
-        textwidget_drawme(x, glist);
-    }
-    else {
-        y = glist_findrtext(glist, (t_text *)z);
-        textwidget_erase(x);
-        rtext_free(y);
-    }
+    if (vis)
+        drawme(x, glist);
+    else 
+        eraseme(x);
 }
 
-/*  the clickfn is only called in run mode
+/*  the clickfn is only called in run mode and is therefore not useful AFAIK
+ *  for this text widget, unless there is something like click to output words
+ *  implemented, which is what Max/MSP's textedit does */
+/*
 static int textwidget_click(t_gobj *z, t_glist *glist, int xpix, int ypix, 
                        int shift, int alt, int dbl, int doit)
 {
     t_textwidget *x = (t_textwidget *)z;
-    DEBUG(post("textwidget_click x:%d y:%d edit: %d", xpix, ypix, x->x_canvas->gl_edit););    
+    DEBUG(post("textwidget_click x:%d y:%d edit: %d", xpix, ypix, x->x_canvas->gl_edit););
     return 0;
 }
 */
+
+static void textwidget_save(t_gobj *z, t_binbuf *b)
+{
+    t_textwidget *x = (t_textwidget *)z;
+    
+    binbuf_addv(b, "ssiisiii", &s__X, gensym("obj"),
+                x->x_obj.te_xpix, x->x_obj.te_ypix, 
+                atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
+                x->width, x->height, x->have_scrollbars);
+    binbuf_addbinbuf(b, x->options_binbuf);
+    binbuf_addv(b, ";");
+}
+
+
+/* -------------------- methods for atoms ----------------------------------- */
+
+/* this function uses the selector as the Tk option and applies the whole
+ * message directly to the Tk widget itself using Tk's "configure".  This
+ * function is called when "anything" is received. */
+static void textwidget_set_option(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
+{
+    if(s != &s_list)
+    {
+        t_binbuf *argument_binbuf = binbuf_new();
+        char *argument_buffer;
+        int buffer_length;
+        
+        binbuf_add(argument_binbuf, argc, argv);
+        binbuf_gettext(argument_binbuf, &argument_buffer, &buffer_length);
+        binbuf_free(argument_binbuf);
+        argument_buffer[buffer_length] = 0;
+        sys_vgui("%s configure -%s {%s} \n", 
+                 x->widget_id->s_name, s->s_name, argument_buffer);
+        tkwidgets_store_options(x->receive_name, x->tcl_namespace, x->widget_id, 
+                                sizeof(textwidget_tk_options)/sizeof(char *), 
+                                (char **)&textwidget_tk_options);
+    }
+}
+
+/* Pass the contents of the text widget onto the textwidget_output_callback
+ * fuction above */
+static void textwidget_bang_output(t_textwidget* x)
+{
+    /* With "," and ";" escaping thanks to JMZ */
+    sys_vgui("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} \
+              [%s get 0.0 end]] \\;]\n", 
+             x->receive_name->s_name, x->widget_id->s_name);
+}
+
+/* -------------------- methods for pd space -------------------------------- */
 
 static void textwidget_append(t_textwidget* x,  t_symbol *s, int argc, t_atom *argv)
 {
@@ -348,6 +412,12 @@ static void textwidget_append(t_textwidget* x,  t_symbol *s, int argc, t_atom *a
     sys_vgui("%s insert end $::%s::list ; unset ::%s::list \n", 
                x->widget_id->s_name, x->tcl_namespace->s_name, x->tcl_namespace->s_name );
     sys_vgui("%s yview end-2char \n", x->widget_id->s_name );
+}
+
+/* Clear the contents of the text widget */
+static void textwidget_clear(t_textwidget* x)
+{
+    sys_vgui("%s delete 0.0 end \n", x->widget_id->s_name);
 }
 
 static void textwidget_key(t_textwidget* x,  t_symbol *s, int argc, t_atom *argv)
@@ -380,12 +450,6 @@ static void textwidget_key(t_textwidget* x,  t_symbol *s, int argc, t_atom *argv
     sys_vgui("%s yview end-2char \n", x->widget_id->s_name );
 }
 
-/* Clear the contents of the text widget */
-static void textwidget_clear(t_textwidget* x)
-{
-    sys_vgui("%s delete 0.0 end \n", x->widget_id->s_name);
-}
-
 /* Function to reset the contents of the textwidget box */
 static void textwidget_set(t_textwidget* x,  t_symbol *s, int argc, t_atom *argv)
 {
@@ -395,125 +459,11 @@ static void textwidget_set(t_textwidget* x,  t_symbol *s, int argc, t_atom *argv
     textwidget_append(x, s, argc, argv);
 }
 
-/* Pass the contents of the text widget onto the textwidget_output_callback fuction above */
-static void textwidget_bang_output(t_textwidget* x)
-{
-    /* With "," and ";" escaping thanks to JMZ */
-    sys_vgui("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} \
-              [%s get 0.0 end]] \\;]\n", 
-             x->receive_name->s_name, x->widget_id->s_name);
-}
-
-static void textwidget_output_callback(t_textwidget* x, t_symbol *s, int argc, t_atom *argv)
-{
-    outlet_list(x->x_data_outlet, s, argc, argv );
-}
-
-static void textwidget_keyup_callback(t_textwidget *x, t_float f)
-{
-/*     DEBUG(post("textwidget_keyup_callback");); */
-    int keycode = (int) f;
-    char buf[10];
-    t_symbol *output_symbol;
-
-    if( (keycode > 32 ) && (keycode < 65288) )
-    {
-        snprintf(buf, 2, "%c", keycode);
-        output_symbol = gensym(buf);
-    } else
-        switch(keycode)
-        {
-        case 32: /* space */
-            output_symbol = space_symbol;
-            break;
-        case 65293: /* return */
-            output_symbol = return_symbol;
-            break;
-        case 65288: /* backspace */
-            output_symbol = backspace_symbol;
-            break;
-        case 65289: /* tab */
-            output_symbol = tab_symbol;
-            break;
-        case 65307: /* escape */
-            output_symbol = escape_symbol;
-            break;
-        case 65361: /* left */
-            output_symbol = left_symbol;
-            break;
-        case 65363: /* right */
-            output_symbol = right_symbol;
-            break;
-        case 65362: /* up */
-            output_symbol = up_symbol;
-            break;
-        case 65364: /* down */
-            output_symbol = down_symbol;
-            break;
-        default:
-            snprintf(buf, 10, "key_%d", keycode);
-            DEBUG(post("keyup: %d", keycode););
-            output_symbol = gensym(buf);
-        }
-    outlet_symbol(x->x_status_outlet, output_symbol);
-}
-
-static void textwidget_save(t_gobj *z, t_binbuf *b)
-{
-    t_textwidget *x = (t_textwidget *)z;
-    
-    binbuf_addv(b, "ssiisiii", &s__X, gensym("obj"),
-                x->x_obj.te_xpix, x->x_obj.te_ypix, 
-                atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
-                x->width, x->height, x->have_scrollbars);
-    binbuf_addbinbuf(b, x->options_binbuf);
-    binbuf_addv(b, ";");
-}
-
-/* this function uses the selector as the Tk option and applies the whole
- * message directly to the Tk widget itself using Tk's "configure" */
-static void textwidget_set_option(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
-{
-    if(s != &s_list)
-    {
-        t_binbuf *argument_binbuf = binbuf_new();
-        char *argument_buffer;
-        int buffer_length;
-        
-        binbuf_add(argument_binbuf, argc, argv);
-        binbuf_gettext(argument_binbuf, &argument_buffer, &buffer_length);
-        binbuf_free(argument_binbuf);
-        argument_buffer[buffer_length] = 0;
-        sys_vgui("%s configure -%s {%s} \n", 
-                 x->widget_id->s_name, s->s_name, argument_buffer);
-        tkwidgets_store_options(x->receive_name, x->tcl_namespace, x->widget_id, 
-                                sizeof(textwidget_tk_options)/sizeof(char *), 
-                                (char **)&textwidget_tk_options);
-    }
-}
-
 static void textwidget_options(t_textwidget *x)
 {
     tkwidgets_list_options(x->x_status_outlet,
                            sizeof(textwidget_tk_options)/sizeof(char *), 
                            (char **)&textwidget_tk_options);
-}
-
-static void query_scrollbars(t_textwidget *x)
-{
-    t_atom state[2];
-    SETSYMBOL(state, scrollbars_symbol);
-    SETFLOAT(state + 1, (t_float)x->have_scrollbars);
-    textwidget_query_callback(x, gensym("query_callback"), 2, state);
-}
-
-static void query_size(t_textwidget *x)
-{
-    t_atom coords[3];
-    SETSYMBOL(coords, size_symbol);
-    SETFLOAT(coords + 1, (t_float)x->width);
-    SETFLOAT(coords + 2, (t_float)x->height);
-    textwidget_query_callback(x, gensym("query_callback"), 3, coords);
 }
 
 static void textwidget_query(t_textwidget *x, t_symbol *s)
@@ -563,6 +513,77 @@ static void textwidget_size(t_textwidget *x, t_float width, t_float height)
 
 /* -------------------- callback functions ---------------------------------- */
 
+static void textwidget_click_callback(t_textwidget *x, t_floatarg f)
+{
+    if( (x->x_glist->gl_edit) && (x->x_glist == x->x_canvas) )
+    {	
+        textwidget_select((t_gobj *)x, x->x_glist, f);
+    }
+}
+
+static void textwidget_keyup_callback(t_textwidget *x, t_float f)
+{
+/*     DEBUG(post("textwidget_keyup_callback");); */
+    int keycode = (int) f;
+    char buf[10];
+    t_symbol *output_symbol;
+
+    if( (keycode > 32 ) && (keycode < 65288) )
+    {
+        snprintf(buf, 2, "%c", keycode);
+        output_symbol = gensym(buf);
+    } else
+        switch(keycode) /* TODO find a way to make this work with all keysyms */
+        {
+        case 32: /* space */
+            output_symbol = space_symbol;
+            break;
+        case 65293: /* return */
+            output_symbol = return_symbol;
+            break;
+        case 65288: /* backspace */
+            output_symbol = backspace_symbol;
+            break;
+        case 65289: /* tab */
+            output_symbol = tab_symbol;
+            break;
+        case 65307: /* escape */
+            output_symbol = escape_symbol;
+            break;
+        case 65361: /* left */
+            output_symbol = left_symbol;
+            break;
+        case 65363: /* right */
+            output_symbol = right_symbol;
+            break;
+        case 65362: /* up */
+            output_symbol = up_symbol;
+            break;
+        case 65364: /* down */
+            output_symbol = down_symbol;
+            break;
+        default:
+            snprintf(buf, 10, "key_%d", keycode);
+            DEBUG(post("keyup: %d", keycode););
+            output_symbol = gensym(buf);
+        }
+    outlet_symbol(x->x_status_outlet, output_symbol);
+}
+
+static void textwidget_output_callback(t_textwidget* x, t_symbol *s, int argc, t_atom *argv)
+{
+    outlet_list(x->x_data_outlet, s, argc, argv );
+}
+
+static void textwidget_query_callback(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
+{
+    t_symbol *tmp_symbol = atom_getsymbolarg(0, argc, argv);
+    if(tmp_symbol != &s_)
+        outlet_anything(x->x_status_outlet, tmp_symbol, argc - 1, argv + 1);
+    else
+        post("ERROR: textwidget_query_callback %s %d", s->s_name, argc);
+}
+
 static void textwidget_store_callback(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
 {
     if(s != &s_)
@@ -574,40 +595,18 @@ static void textwidget_store_callback(t_textwidget *x, t_symbol *s, int argc, t_
         post("ERROR: does this ever happen?");
 }
 
-static void textwidget_query_callback(t_textwidget *x, t_symbol *s, int argc, t_atom *argv)
-{
-    t_symbol *tmp_symbol = atom_getsymbolarg(0, argc, argv);
-    if(tmp_symbol != &s_)
-    {
-        post("tmp_symbol %s argc %d", tmp_symbol->s_name, argc);
-        outlet_anything(x->x_status_outlet, tmp_symbol, argc - 1, argv + 1);
-    }
-    else
-    {
-        post("ERROR: textwidget_query_callback %s %d", s->s_name, argc);
-    }
-}
-
-static void textwidget_click_callback(t_textwidget *x, t_floatarg f)
-{
-    if( (x->x_glist->gl_edit) && (x->x_glist == x->x_canvas) )
-    {	
-        textwidget_select((t_gobj *)x, x->x_glist, f);
-    }
-}
-
 static void textwidget_resize_click_callback(t_textwidget *x, t_floatarg f)
 {
     t_canvas *canvas = (glist_isvisible(x->x_glist) ? x->x_canvas : 0);
     int button_state = (int)f;
-    if (x->x_resizing && !button_state && canvas)
+    if(x->x_resizing && !button_state && canvas)
     {
         tkwidgets_draw_iolets((t_object*)x, canvas,
                               x->canvas_id, x->iolets_tag, x->all_tag,
                               x->width, x->height);
         canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
     }
-    if (!x->x_resizing && button_state)
+    else if(!x->x_resizing && button_state)
     {
         tkwidgets_erase_iolets(x->canvas_id, x->iolets_tag);
     }
@@ -650,23 +649,15 @@ static void *textwidget_new(t_symbol *s, int argc, t_atom *argv)
 
     x->x_selected = 0;
     x->x_resizing = 0;
-	
-	if (argc < 3)
-	{
-		post("[text]: less than 3 arguments entered, default values used.");
-		x->width = TEXT_DEFAULT_WIDTH;
-		x->height = TEXT_DEFAULT_HEIGHT;
-        x->have_scrollbars = 0;
-	} 
-    else 
-    {
-		x->width = atom_getint(argv);
-		x->height = atom_getint(argv + 1);
-        x->have_scrollbars = atom_getint(argv + 2);
-        if(argc > 3) 
-            binbuf_add(x->options_binbuf, argc - 3, argv + 3);
-	}	
+    x->width = TEXT_DEFAULT_WIDTH;
+    x->height = TEXT_DEFAULT_HEIGHT;
+    x->have_scrollbars = 0;
 
+    if(argc > 0) x->width = atom_getint(argv);
+    if(argc > 1) x->height = atom_getint(argv + 1);
+    if(argc > 2) x->have_scrollbars = atom_getint(argv + 2);
+    if(argc > 3) binbuf_add(x->options_binbuf, argc - 3, argv + 3);
+    
     x->tcl_namespace = tkwidgets_gen_tcl_namespace((t_object*)x, s);
     x->receive_name = tkwidgets_gen_callback_name(x->tcl_namespace);
     pd_bind(&x->x_obj.ob_pd, x->receive_name);
@@ -686,10 +677,12 @@ void text_setup(void) {
     textwidget_class = class_new(gensym("text"), (t_newmethod)textwidget_new, 
                                  (t_method)textwidget_free,sizeof(t_textwidget),
                                  0, A_GIMME, 0);
-				
+
+/* methods for atoms */
 	class_addbang(textwidget_class, (t_method)textwidget_bang_output);
 	class_addanything(textwidget_class, (t_method)textwidget_set_option);
 
+/* methods for pd space */
 	class_addmethod(textwidget_class, (t_method)textwidget_append,
                     gensym("append"), A_GIMME, 0);
 	class_addmethod(textwidget_class, (t_method)textwidget_clear,
@@ -708,21 +701,22 @@ void text_setup(void) {
                     gensym("size"), A_DEFFLOAT, A_DEFFLOAT, 0);
 
 /* callbacks */
-    class_addmethod(textwidget_class, (t_method)textwidget_store_callback,
-                    gensym("store_callback"), A_GIMME, 0);
-    class_addmethod(textwidget_class, (t_method)textwidget_query_callback,
-                    gensym("query_callback"), A_GIMME, 0);
-	class_addmethod(textwidget_class, (t_method)textwidget_output_callback,
-                    gensym("output"), A_GIMME, 0);
-    class_addmethod(textwidget_class, (t_method)textwidget_keyup_callback,
-                    gensym("keyup"), A_DEFFLOAT, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_click_callback,
                     gensym("click"), A_FLOAT, 0);
+    class_addmethod(textwidget_class, (t_method)textwidget_keyup_callback,
+                    gensym("keyup"), A_DEFFLOAT, 0);
+	class_addmethod(textwidget_class, (t_method)textwidget_output_callback,
+                    gensym("output"), A_GIMME, 0);
+    class_addmethod(textwidget_class, (t_method)textwidget_query_callback,
+                    gensym("query_callback"), A_GIMME, 0);
+    class_addmethod(textwidget_class, (t_method)textwidget_store_callback,
+                    gensym("store_callback"), A_GIMME, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_resize_click_callback,
                     gensym("resize_click"), A_FLOAT, 0);
     class_addmethod(textwidget_class, (t_method)textwidget_resize_motion_callback,
                     gensym("resize_motion"), A_FLOAT, A_FLOAT, 0);
 
+/* widget behavior */
     textwidget_widgetbehavior.w_getrectfn  = textwidget_getrect;
     textwidget_widgetbehavior.w_displacefn = textwidget_displace;
     textwidget_widgetbehavior.w_selectfn   = textwidget_select;
@@ -730,8 +724,8 @@ void text_setup(void) {
     textwidget_widgetbehavior.w_deletefn   = textwidget_delete;
     textwidget_widgetbehavior.w_visfn      = textwidget_vis;
     textwidget_widgetbehavior.w_clickfn    = NULL;
-    class_setwidget(textwidget_class,&textwidget_widgetbehavior);
-    class_setsavefn(textwidget_class,&textwidget_save);
+    class_setwidget(textwidget_class, &textwidget_widgetbehavior);
+    class_setsavefn(textwidget_class, &textwidget_save);
 
 /* commonly used symbols */
     size_symbol = gensym("size");
@@ -746,5 +740,3 @@ void text_setup(void) {
 	up_symbol = gensym("up");
 	down_symbol = gensym("down");
 }
-
-
