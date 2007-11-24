@@ -169,28 +169,31 @@ static int calculate_onset(int x_location, int width,
            * current_iolet / (total_iolets == 1 ? 1 : total_iolets - 1));
 }
 
+/* standard method for drawing inlets and outlets.  Currently, the number of
+ * inlets and outlets is set in tkwidgets.h since I think all of the
+ * objectclasses will have the same ones.  If that needs to change, then this
+ * function can use obj_ninlets() and obj_noutlets() */
 void tkwidgets_draw_iolets(t_object *x, t_glist *glist, t_symbol *canvas_id,
                            t_symbol *iolets_tag, t_symbol *all_tag,
-                           int width, int height,
-                           int total_inlets, int total_outlets)
+                           int width, int height)
 {
     int i, onset;
     int x_location = text_xpix(x, glist);
     int y_location = text_ypix(x, glist);
 
 /* TODO: make inlets draw on top of widget */
-    for (i = 0; i < total_inlets; i++)  /* inlets */
+    for (i = 0; i < TOTAL_INLETS; i++)  /* inlets */
     {
-        onset = calculate_onset(x_location, width, i, total_inlets);
+        onset = calculate_onset(x_location, width, i, TOTAL_INLETS);
         sys_vgui("%s create rectangle %d %d %d %d -tags {%s %s}\n",
                  canvas_id->s_name, onset, y_location - 2,
                  onset + IOWIDTH, y_location,
                  iolets_tag->s_name, all_tag->s_name);
         sys_vgui("%s raise %s\n", canvas_id->s_name, iolets_tag->s_name);
     }
-    for (i = 0; i < total_outlets; i++) /* outlets */
+    for (i = 0; i < TOTAL_OUTLETS; i++) /* outlets */
     {
-        onset = calculate_onset(x_location, width, i, total_outlets);
+        onset = calculate_onset(x_location, width, i, TOTAL_OUTLETS);
         sys_vgui("%s create rectangle %d %d %d %d -tags {%s %s}\n",
                  canvas_id->s_name, onset, y_location + height,
                  onset + IOWIDTH, y_location + height + 2,

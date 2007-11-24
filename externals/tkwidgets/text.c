@@ -37,9 +37,6 @@
 #define TEXT_MIN_WIDTH         40
 #define TEXT_MIN_HEIGHT        20
 
-#define TOTAL_INLETS            1
-#define TOTAL_OUTLETS           2
-
 #define DEBUG(x) x
 
 static t_class *textwidget_class;
@@ -109,6 +106,8 @@ static char *textwidget_tk_options[] = {
     "undo",
     "width",
     "wrap",
+//    "xscrollcommand", /* problematic since it uses the canvas_id, etc. */
+//    "yscrollcommand", /* problematic since it uses the canvas_id, etc. */
 };
 
 
@@ -187,7 +186,7 @@ static void textwidget_drawme(t_textwidget *x, t_glist *glist)
     create_widget(x);	
     tkwidgets_draw_iolets((t_object*)x, glist, 
                           x->canvas_id, x->iolets_tag, x->all_tag,
-                          x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
+                          x->width, x->height);
     if(x->have_scrollbars) draw_scrollbar(x);
     sys_vgui("%s create window %d %d -anchor nw -window %s    \
                   -tags {%s %s} -width %d -height %d \n", x->canvas_id->s_name,
@@ -557,7 +556,7 @@ static void textwidget_size(t_textwidget *x, t_float width, t_float height)
         tkwidgets_erase_iolets(x->canvas_id, x->iolets_tag);
         tkwidgets_draw_iolets((t_object*)x, x->x_glist, 
                               x->canvas_id, x->iolets_tag, x->all_tag,
-                              x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
+                              x->width, x->height);
         canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
     }
 }
@@ -605,7 +604,7 @@ static void textwidget_resize_click_callback(t_textwidget *x, t_floatarg f)
     {
         tkwidgets_draw_iolets((t_object*)x, canvas,
                               x->canvas_id, x->iolets_tag, x->all_tag,
-                              x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
+                              x->width, x->height);
         canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
     }
     if (!x->x_resizing && button_state)

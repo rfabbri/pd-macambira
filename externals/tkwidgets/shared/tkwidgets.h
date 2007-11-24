@@ -33,6 +33,10 @@
 #pragma warning( disable : 4305 )
 #endif
 
+/* so far, all of the tkwidgets objects have the same inlets/outlets */
+#define TOTAL_INLETS            1
+#define TOTAL_OUTLETS           2
+
 /* size and offset for the resizing handle */
 #define TKW_HANDLE_HEIGHT       15
 #define TKW_HANDLE_WIDTH        15
@@ -92,8 +96,7 @@ t_symbol* tkwidgets_gen_all_tag(t_object *x);
 // TODO perhaps I should try to use glist_drawiofor() from g_text.c
 void tkwidgets_draw_iolets(t_object *x, t_glist *glist, t_symbol *canvas_id,
                            t_symbol *iolets_tag, t_symbol *all_tag,
-                           int width, int height,
-                           int total_inlets, int total_outlets);
+                           int width, int height);
 void tkwidgets_erase_iolets(t_symbol* canvas_id, t_symbol* iolets_tag);
 
 void tkwidgets_draw_handle(); // TODO draw resize handle when selected in editmode

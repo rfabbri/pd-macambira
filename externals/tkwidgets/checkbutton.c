@@ -121,7 +121,7 @@ static void checkbutton_drawme(t_checkbutton *x, t_glist *glist)
              x->widget_id->s_name);
     tkwidgets_draw_iolets((t_object*)x, glist, 
                           x->canvas_id, x->iolets_tag, x->all_tag,
-                          x->width, x->height, TOTAL_INLETS, TOTAL_OUTLETS);
+                          x->width, x->height);
     sys_vgui("%s create window %d %d -anchor nw -window %s -tags {%s %s}\n", 
              x->canvas_id->s_name, 
              text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
@@ -218,8 +218,6 @@ static void checkbutton_size(t_checkbutton *x, t_float width, t_float height)
     {
         sys_vgui("%s itemconfigure %s -width %d -height %d\n",
                  x->canvas_id->s_name, x->window_tag->s_name, x->width, x->height);
-//        erase_inlets(x);
-//        tkwidgets_draw_iolets(x, x->x_glist, TOTAL_INLETS, TOTAL_OUTLETS);
         canvas_fixlinesfor(x->x_glist, (t_text *)x);  // 2nd inlet
     }
 }
@@ -261,7 +259,6 @@ static void *checkbutton_new(t_symbol* s, int argc, t_atom *argv)
     pd_bind(&x->x_obj.ob_pd, x->receive_name);
 
     x->x_glist = canvas_getcurrent();
-    set_tkwidgets_ids(x, x->x_glist);
     x->iolets_tag = tkwidgets_gen_iolets_tag((t_object*)x);
     x->all_tag = tkwidgets_gen_all_tag((t_object*)x);
 
