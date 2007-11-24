@@ -16,6 +16,13 @@
 #X obj 51 337 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/checkbutton.htm
 ;
 #X msg 141 21 onvalue 5;
+#X msg 347 116 fg blue;
+#X msg 349 138 bg pink;
+#X msg 367 188 anchor w;
+#X msg 116 117 bang;
+#X obj 127 94 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 53 19 offvalue 3;
 #X connect 0 0 6 0;
 #X connect 0 0 8 0;
 #X connect 0 1 2 0;
@@ -27,3 +34,9 @@
 #X connect 10 0 0 0;
 #X connect 11 0 0 0;
 #X connect 13 0 0 0;
+#X connect 14 0 0 0;
+#X connect 15 0 0 0;
+#X connect 16 0 0 0;
+#X connect 17 0 0 0;
+#X connect 18 0 0 0;
+#X connect 19 0 0 0;

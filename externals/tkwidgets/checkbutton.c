@@ -22,6 +22,7 @@
 
 /* TODO rectify char and pixel widths/heights ug */
 /* TODO bind to <Configure> so that things are redrawn when the text changes */
+/* TODO add float method to set state based on == 0 and everything else */
 
 #include "shared/tkwidgets.h"
 
@@ -274,11 +275,21 @@ static void checkbutton_set_option(t_checkbutton *x, t_symbol *s, int argc, t_at
     }
 }
 
-/* Pass the contents of the text widget onto the textwidget_output_callback
+/* Pass the contents of the text widget onto the checkbutton_output_callback
  * fuction above */
 static void checkbutton_bang_output(t_checkbutton* x)
 {
-    sys_vgui("%s invoke", x->widget_id->s_name);
+    sys_vgui("%s invoke\n", x->widget_id->s_name);
+}
+
+/* Pass the contents of the text widget onto the checkbutton_output_callback
+ * fuction above */
+static void checkbutton_float_output(t_checkbutton* x, t_float f)
+{
+    /* TODO figure out which matches make sense, in terms of offvalue/onvalue */
+    sys_vgui("if {%g != 0} {%s select} else {%s deselect}\n",
+             f, x->widget_id->s_name, x->widget_id->s_name, x->widget_id->s_name);
+    outlet_float(x->x_data_outlet, f);
 }
 
 /* --------------------------- methods for pd space ------------------------- */
@@ -406,6 +417,8 @@ void checkbutton_setup(void)
                                   sizeof(t_checkbutton), 0, A_GIMME,0);
 /* methods for atoms */
 	class_addanything(checkbutton_class, (t_method)checkbutton_set_option);
+	class_addbang(checkbutton_class, (t_method)checkbutton_bang_output);
+	class_addfloat(checkbutton_class, (t_method)checkbutton_float_output);
     
 /* methods for pd space */
     class_addmethod(checkbutton_class, (t_method)checkbutton_query,

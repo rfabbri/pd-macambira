@@ -20,6 +20,8 @@
 
 */
 
+/* TODO apply store logic to query so query doesn't send blank options */
+
 #include "tkwidgets.h"
 #include <stdio.h>
 #include <string.h>
