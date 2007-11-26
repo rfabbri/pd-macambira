@@ -459,7 +459,7 @@ void checkbutton_setup(void)
 /* widget behavior */
     checkbutton_widgetbehavior.w_getrectfn  = checkbutton_getrect;
     checkbutton_widgetbehavior.w_displacefn = checkbutton_displace;
-    checkbutton_widgetbehavior.w_selectfn   = NULL;
+    checkbutton_widgetbehavior.w_selectfn   = checkbutton_select;
     checkbutton_widgetbehavior.w_activatefn = NULL;
     checkbutton_widgetbehavior.w_deletefn   = checkbutton_delete;
     checkbutton_widgetbehavior.w_visfn      = checkbutton_vis;
