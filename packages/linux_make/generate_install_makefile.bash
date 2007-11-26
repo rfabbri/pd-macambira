@@ -68,6 +68,8 @@ function uninstall_tree ()
 echo ""
 echo "prefix = /usr/local"
 echo ""
+echo "default:"
+echo -e "\t@echo 'you have to run \"make install\" to install Pd-extended'"
 echo ""
 echo "install:"
 traverse_install_tree $ROOT_DIR
