@@ -23,7 +23,6 @@
 #include <string.h>
 #include "shared/tkwidgets.h"
 
-/* TODO: get Ctrl-A working to select all */
 /* TODO: set message doesnt work with a loadbang */
 /* TODO: window name "handle1376fc00" already exists in parent */
 /* TODO: figure out window vs. text width/height */
@@ -176,6 +175,18 @@ static void create_widget(t_textwidget *x)
     /* bind to KeyRelease events to send out right outlet one key at a time */
     sys_vgui("bind %s <KeyRelease> {+pd %s keyup %%N \\;} \n", 
              x->widget_id->s_name, x->receive_name->s_name);
+/* override the standard Pd bindings for these since they cause trouble */
+#ifdef __APPLE__
+    sys_vgui("bind %s <Mod1-a> {%s tag add sel 1.0 end} \n", 
+             x->widget_id->s_name, x->widget_id->s_name);
+    sys_vgui("bind %s <Mod1-v> {tk_textPaste %s} \n", 
+             x->widget_id->s_name, x->widget_id->s_name);
+#else
+    sys_vgui("bind %s <Control-a> {%s tag add sel 1.0 end} \n", 
+             x->widget_id->s_name, x->widget_id->s_name);
+    sys_vgui("bind %s <Control-v> {tk_textPaste %s} \n", 
+             x->widget_id->s_name, x->widget_id->s_name);
+#endif
 }
 
 static void drawme(t_textwidget *x, t_glist *glist)
