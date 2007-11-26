@@ -183,9 +183,10 @@ static void drawme(t_textwidget *x, t_glist *glist)
     DEBUG(post("drawme: firsttime %d canvas %lx glist %lx", x->x_canvas, glist););
     set_tkwidgets_ids(x,glist_getcanvas(glist));	
     create_widget(x);	
-    tkwidgets_draw_iolets((t_object*)x, glist, 
-                          x->canvas_id, x->iolets_tag, x->all_tag,
-                          x->width, x->height);
+    if(x->x_glist == x->x_canvas) // if GOP, don't draw inlets
+        tkwidgets_draw_iolets((t_object*)x, glist, 
+                              x->canvas_id, x->iolets_tag, x->all_tag,
+                              x->width, x->height);
     if(x->have_scrollbars) 
         tkwidgets_draw_y_scrollbar(x->widget_id, x->scrollbar_id);
     sys_vgui("%s create window %d %d -anchor nw -window %s    \
@@ -199,7 +200,6 @@ static void drawme(t_textwidget *x, t_glist *glist)
 static void eraseme(t_textwidget* x)
 {
     DEBUG(post("eraseme: canvas %lx", x->x_canvas););
-    tkwidgets_erase_iolets(x->canvas_id, x->iolets_tag);
     sys_vgui("destroy %s\n", x->frame_id->s_name);
     sys_vgui("%s delete %s\n", x->canvas_id->s_name, x->all_tag->s_name);
 }

@@ -128,9 +128,10 @@ static void drawme(t_checkbutton *x, t_glist *glist)
 -command {pd [concat %s output $::%s::state \\;]}\n", 
              x->widget_id->s_name, x->tcl_namespace->s_name, 
              x->receive_name->s_name, x->tcl_namespace->s_name);
-    tkwidgets_draw_iolets((t_object*)x, glist, 
-                          x->canvas_id, x->iolets_tag, x->all_tag,
-                          x->width, x->height);
+    if(x->x_glist == x->x_canvas) // if GOP, don't draw inlets
+        tkwidgets_draw_iolets((t_object*)x, glist, 
+                              x->canvas_id, x->iolets_tag, x->all_tag,
+                              x->width, x->height);
     sys_vgui("%s create window %d %d -anchor nw -window %s -tags {%s %s}\n", 
              x->canvas_id->s_name, 
              text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
