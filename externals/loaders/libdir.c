@@ -19,7 +19,7 @@ struct _canvasenvironment
 };
 
 
-static char *version = "$Revision: 1.7 $";
+static char *version = "$Revision: 1.8 $";
 
 /* This loader opens a directory with a -meta.pd file as a library.  In the
  * long run, the idea is that one folder will have all of objects files, all
@@ -38,65 +38,72 @@ static char *version = "$Revision: 1.7 $";
 
 static int libdir_loader(t_canvas *canvas, char *classname)
 {
-    int fd = -1, i;
+    int fd = -1;
+    unsigned int i;
+    char helppathname[MAXPDSTRING];
     char fullclassname[MAXPDSTRING], dirbuf[MAXPDSTRING];
     char reldirbuf[MAXPDSTRING], curdir[MAXPDSTRING], *nameptr;
     t_canvasenvironment *canvasenvironment;
 
 /* look for meta file (classname)/(classname)-meta.pd */
-	strncpy(fullclassname, classname, MAXPDSTRING - 6);
-	strcat(fullclassname, "/");
-	strncat(fullclassname, classname, MAXPDSTRING - strlen(fullclassname) - 6);
-	strcat(fullclassname, "-meta");
-	
-	/* if this is being called from a canvas, then add the library path to the
-	 * canvas-local path */
+    strncpy(fullclassname, classname, MAXPDSTRING - 6);
+    strcat(fullclassname, "/");
+    strncat(fullclassname, classname, MAXPDSTRING - strlen(fullclassname) - 6);
+    strcat(fullclassname, "-meta");
+    
+    /* if this is being called from a canvas, then add the library path to the
+     * canvas-local path */
 #if (PD_MINOR_VERSION >= 40)
-	if(canvas) 
-	{
-		canvasenvironment = canvas_getenv(canvas);
-		if ((fd = canvas_open(0, fullclassname, ".pd",
-								dirbuf, &nameptr, MAXPDSTRING, 0)) < 0) 
-		{
-			return (0);
-		}
-		close(fd);
+    if(canvas) 
+    {
+        canvasenvironment = canvas_getenv(canvas);
+        if ((fd = canvas_open(0, fullclassname, ".pd",
+                                dirbuf, &nameptr, MAXPDSTRING, 0)) < 0) 
+        {
+            return (0);
+        }
+        close(fd);
 
 
-		// G.Holzmann: canvas will look to a relative path to it, so we cannot add
+        // G.Holzmann: canvas will look to a relative path to it, so we cannot add
                 // the absulote dirbuf path, we have to make it relative to the current canvas
-		// (see from line 1561 in g_canvas.c)
+        // (see from line 1561 in g_canvas.c)
 
-		sys_unbashfilename(canvas_getdir(canvas)->s_name, curdir);
-		
-		// count depth of the current dir
-		for(i=0; i<strlen(curdir); i++)
-		{
-			if(curdir[i] == 47) // 47 is "/" in ascii
+        sys_unbashfilename(canvas_getdir(canvas)->s_name, curdir);
+        
+        // count depth of the current dir
+        for(i=0; i<strlen(curdir); i++)
+        {
+            if(curdir[i] == 47) // 47 is "/" in ascii
                           strncat(reldirbuf, "../", MAXPDSTRING);
-		}
-		strncat(reldirbuf, dirbuf, MAXPDSTRING);
+        }
+        strncat(reldirbuf, dirbuf, MAXPDSTRING);
 
 
-		// TODO: have this add to the canvas-local path only
-		canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path, 
-								reldirbuf, 0);
-		post("libdir_loader: added %s to the canvas-local path", classname);
-	}
-	else
+        // TODO: have this add to the canvas-local path only
+        canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path, 
+                                reldirbuf, 0);
+        post("libdir_loader: added %s to the canvas-local path", classname);
+    }
+    else
 #endif
-	{
-		if ((fd = open_via_path(".", fullclassname, ".pd",
-								dirbuf, &nameptr, MAXPDSTRING, 0)) < 0) 
-		{
-			return (0);
-		}
-		close(fd);
-		sys_searchpath = namelist_append(sys_searchpath, dirbuf, 0);
-		post("libdir_loader: added %s to the global classpath", classname);
-//		post("\tThis is deprecated behavior.");
-	}
-	/* post("libdir_loader loaded fullclassname: '%s'\n", fullclassname); */
+    {
+        if ((fd = open_via_path(".", fullclassname, ".pd",
+                                dirbuf, &nameptr, MAXPDSTRING, 0)) < 0) 
+        {
+            return (0);
+        }
+        close(fd);
+        sys_searchpath = namelist_append(sys_searchpath, dirbuf, 0);
+        strncpy(helppathname, sys_libdir->s_name, MAXPDSTRING-30);
+        helppathname[MAXPDSTRING-30] = 0;
+        strcat(helppathname, "/doc/5.reference/");
+        strcat(helppathname, classname);
+        sys_helppath = namelist_append(sys_helppath, helppathname, 0);
+        post("libdir_loader: added %s to the global classpath", classname);
+//        post("\tThis is deprecated behavior.");
+    }
+    /* post("libdir_loader loaded fullclassname: '%s'\n", fullclassname); */
     if (sys_verbose) 
         post("Loaded libdir %s from %s", classname, dirbuf);
 
@@ -109,12 +116,12 @@ void libdir_setup(void)
 #if (PD_MINOR_VERSION >= 40)
     sys_register_loader(libdir_loader);
 #else
-	error("to function, this needs to be compiled against Pd 0.40 or higher,\n");
-	post("\tor a version that has sys_register_loader()");
+    error("to function, this needs to be compiled against Pd 0.40 or higher,\n");
+    post("\tor a version that has sys_register_loader()");
 #endif
     post("libdir loader %s",version);  
     post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
     post("\tcompiled on "__DATE__" at "__TIME__ " ");
-	post("\tcompiled against Pd version %d.%d.%d.%s", PD_MAJOR_VERSION, 
-		 PD_MINOR_VERSION, PD_BUGFIX_VERSION, PD_TEST_VERSION);
+    post("\tcompiled against Pd version %d.%d.%d.%s", PD_MAJOR_VERSION, 
+         PD_MINOR_VERSION, PD_BUGFIX_VERSION, PD_TEST_VERSION);
 }
