@@ -309,7 +309,7 @@ static void str_symbol_to_buf(t_str *x, t_atom *a)
 /* Convert symbol to string in x->x_buf.s_data at offset x->x_buf_end,
 * increment x->x_buf_end by the number of chars added to x->x_buf.s_data*/
 {                                                                                                                               char *cP = (char *)x->x_buf.s_data + x->x_buf_end;
-    atom_blob(a, cP, x->x_buf.s_length-x->x_buf_end);
+    atom_string(a, cP, x->x_buf.s_length-x->x_buf_end);
     x->x_buf_end += strlen(cP);
 }
 
@@ -682,7 +682,7 @@ static void *str_new(t_symbol *s, int argc, t_atom *argv)
     next = 0; /* index of next argument */
     if (argv[0].a_type == A_SYMBOL)
     { /* the first argument may be a selector */
-        atom_blob(&argv[0], (char *)x->x_buf.s_data, MAXPDSTRING);
+        atom_string(&argv[0], (char *)x->x_buf.s_data, MAXPDSTRING);
         for (i = 0; i < n_functions; ++i)
         {
             if (strcmp((char *)x->x_buf.s_data, str_function_names[i]) == 0)
