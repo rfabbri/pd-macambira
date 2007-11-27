@@ -1,29 +1,29 @@
-#N canvas 13 257 467 404 10;
-#X obj 166 173 checkbutton 90 20;
-#X msg 20 111 query;
-#X obj 263 255 print QUERY;
-#X msg 24 80 query size;
-#X obj 144 168 cnv 15 160 80 empty empty empty 20 12 0 14 -233017 -66577
+#N canvas 12 208 467 404 10;
+#X obj 171 211 checkbutton 90 20;
+#X msg 20 131 query;
+#X obj 263 275 print QUERY;
+#X msg 24 100 query size;
+#X obj 144 188 cnv 15 160 80 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 69 259 print DATA;
-#X msg 204 144 cursor gumby;
-#X obj 155 262 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 69 279 print DATA;
+#X msg 204 164 cursor gumby;
+#X obj 155 282 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X msg 192 121 text gumby;
-#X msg 159 53 size 90 20;
-#X msg 184 102 text "blah blah";
+#X msg 192 141 text gumby;
+#X msg 159 73 size 90 20;
+#X msg 184 122 text "blah blah";
 #X obj 51 337 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/checkbutton.htm
 ;
-#X msg 141 21 onvalue 5;
-#X msg 347 116 fg blue;
-#X msg 349 138 bg pink;
-#X msg 367 188 anchor w;
-#X msg 116 117 bang;
-#X obj 127 94 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X msg 141 41 onvalue 5;
+#X msg 347 136 fg blue;
+#X msg 349 158 bg pink;
+#X msg 348 182 anchor w;
+#X msg 116 137 bang;
+#X obj 127 114 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X msg 125 3 offvalue 3;
-#X msg 172 78 options;
-#X msg 29 140 set 5;
+#X msg 125 23 offvalue 3;
+#X msg 172 98 options;
+#X msg 29 160 set 1;
 #X connect 0 0 5 0;
 #X connect 0 0 7 0;
 #X connect 0 1 2 0;

@@ -21,7 +21,7 @@
 */
 
 /* TODO rectify char and pixel widths/heights ug */
-/* TODO bind to <Configure> so that things are redrawn when the text changes */
+/* TODO bind to <Configure> so that things are redrawn when the label changes */
 /* TODO add float method to set state based on == 0 and everything else */
 
 #include "shared/tkwidgets.h"
@@ -102,6 +102,12 @@ static char *checkbutton_tk_options[] = {
     "wraplength"
 };
 
+/* -------------------- common symbols to preload --------------------------- */
+
+static t_symbol *id_symbol;
+static t_symbol *query_callback_symbol;
+static t_symbol *size_symbol;
+
 /* -------------------- function prototypes --------------------------------- */
 
 static void checkbutton_query_callback(t_checkbutton *x, t_symbol *s, int argc, t_atom *argv);
@@ -150,13 +156,22 @@ static void eraseme(t_checkbutton* x)
 
 /* --------------------- query functions ------------------------------------ */
 
+static void query_id(t_checkbutton *x)
+{
+    t_atom id[2];
+    t_symbol *widget_id = x->widget_id;
+    SETSYMBOL(id, id_symbol);
+    SETSYMBOL(id + 1, widget_id);
+    checkbutton_query_callback(x, query_callback_symbol, 2, id);
+}
+
 static void query_size(t_checkbutton *x)
 {
     t_atom coords[3];
-    SETSYMBOL(coords, gensym("size"));
+    SETSYMBOL(coords, size_symbol);
     SETFLOAT(coords + 1, (t_float)x->width);
     SETFLOAT(coords + 2, (t_float)x->height);
-    checkbutton_query_callback(x, gensym("query_callback"), 3, coords);
+    checkbutton_query_callback(x, query_callback_symbol, 3, coords);
 }
 
 static void checkbutton_query(t_checkbutton *x, t_symbol *s)
@@ -167,9 +182,12 @@ static void checkbutton_query(t_checkbutton *x, t_symbol *s)
         tkwidgets_query_options(x->receive_name, x->widget_id, 
                                 sizeof(checkbutton_tk_options)/sizeof(char *), 
                                 checkbutton_tk_options);
+        query_id(x);
         query_size(x);
     }
-    else if(s == gensym("size"))
+    else if(s == id_symbol)
+        query_id(x);
+    else if(s == size_symbol)
         query_size(x);
     else
         tkwidgets_query_options(x->receive_name, x->widget_id, 1, &(s->s_name));
@@ -433,6 +451,11 @@ void checkbutton_setup(void)
 	class_addanything(checkbutton_class, (t_method)checkbutton_set_option);
 	class_addbang(checkbutton_class, (t_method)checkbutton_bang_output);
 	class_addfloat(checkbutton_class, (t_method)checkbutton_float_output);
+
+/* common symbols to preload */
+	id_symbol = gensym("id");
+    query_callback_symbol = gensym("query_callback");
+    size_symbol = gensym("size");
     
 /* methods for pd space */
 	class_addmethod(checkbutton_class, (t_method)checkbutton_options,
@@ -448,7 +471,7 @@ void checkbutton_setup(void)
 	class_addmethod(checkbutton_class, (t_method)checkbutton_output_callback,
                     gensym("output"), A_DEFFLOAT, 0);
     class_addmethod(checkbutton_class, (t_method)checkbutton_query_callback,
-                    gensym("query_callback"), A_GIMME, 0);
+                    query_callback_symbol, A_GIMME, 0);
     class_addmethod(checkbutton_class, (t_method)checkbutton_store_callback,
                     gensym("store_callback"), A_GIMME, 0);
     class_addmethod(checkbutton_class, (t_method)checkbutton_resize_click_callback,
