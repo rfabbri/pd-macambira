@@ -3,10 +3,10 @@
  *   ported to Pd by Hans-Christoph Steiner <hans@at.or.at> from f0.keyboard_layout.c
  */
 
-#ifdef __APPLE__
-
 #include "m_pd.h"
+#ifdef __APPLE__
 #include <Carbon/Carbon.h>
+#endif
 
 static t_class *keyboard_layout_class;
 
@@ -16,22 +16,7 @@ typedef struct _keyboard_layout {
     t_outlet*   x_status_outlet;
 } t_keyboard_layout;
 
-/*
-void keyboard_layout_assist(t_keyboard_layout *x, Object *m, long msg, long arg, char *dst) {
-	if(msg==ASSIST_INLET) {
-		sprintf(dst, "bang to get current, symbol to set");
-	} else if(msg==ASSIST_OUTLET) {
-		switch(arg) {
-			case 0:
-				sprintf(dst, "current keyboard layout (symbol)");
-				break;
-			case 1:
-				sprintf(dst, "dump outlet (for menu)");
-				break;
-		}
-	}
-}
-*/
+#ifdef __APPLE__
 
 //----------------------------------------------------------------------------------------------
 void keyboard_layout_bang(t_keyboard_layout *x) {
@@ -44,7 +29,7 @@ void keyboard_layout_bang(t_keyboard_layout *x) {
 	KLGetKeyboardLayoutProperty(currentLayoutRef, kKLName, (const void **)&keyboardName);
 	CFStringGetCString(keyboardName, cKeyboardName, 100, kCFStringEncodingASCII);
 	
-    outlet_anything(x->x_data_outlet, gensym(cKeyboardName), 0, NULL);
+    outlet_symbol(x->x_data_outlet, gensym(cKeyboardName));
 }
 
 void keyboard_layout_menu(t_keyboard_layout *x) {
@@ -108,10 +93,8 @@ void keyboard_layout_setup(void) {
 
 	class_addmethod(keyboard_layout_class, (t_method)keyboard_layout_menu, 
                     gensym("menu"), 0);
-//	class_addmethod(keyboard_layout_class, (t_method)keyboard_layout_assist, 
-//                    gensym("assist"), A_CANT, 0);
 	
-	post("f0.keyboard_layout v1.1-ub; distributed under GNU GPL license");		//target specific
+	post("f0.keyboard_layout v1.1-ub; distributed under GNU GPL license");
 }
 
 
