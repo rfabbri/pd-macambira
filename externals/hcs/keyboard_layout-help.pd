@@ -1,4 +1,4 @@
-..#N canvas 94 505 576 362 10;
+#N canvas 94 505 576 362 10;
 #X obj 116 144 keyboard_layout;
 #X msg 118 32 bang;
 #X msg 146 63 menu;
