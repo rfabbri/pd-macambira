@@ -1,9 +1,9 @@
-#N canvas 343 45 785 704 10;
+#N canvas 245 42 785 704 10;
 #X obj 52 -43 text 130 60 0;
 #X obj 53 -193 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 12 65 print;
-#X msg 89 -178 clear;
+#X msg 78 -197 clear;
 #X msg 107 -157 set one two three four five six;
 #X obj 36 142 text 130 60 0;
 #X obj 231 3 select return;
@@ -172,6 +172,7 @@ of the character:;
 #X connect 12 0 0 0;
 #X connect 14 0 0 0;
 #X restore 199 -200 pd adding with the key message;
+#X obj 107 -177 loadbang;
 #X connect 0 0 2 0;
 #X connect 0 0 7 0;
 #X connect 0 1 6 0;
@@ -244,3 +245,4 @@ of the character:;
 #X connect 91 0 88 0;
 #X connect 92 0 88 0;
 #X connect 93 0 88 0;
+#X connect 95 0 4 0;

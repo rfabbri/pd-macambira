@@ -23,7 +23,7 @@
 #include <string.h>
 #include "shared/tkwidgets.h"
 
-/* TODO: set message doesnt work with a loadbang */
+/* TODO: append options messages to options_binbuf if not visible */
 /* TODO: window name "handle1376fc00" already exists in parent */
 /* TODO: figure out window vs. text width/height */
 /* TODO: add x scrollbar */
@@ -48,6 +48,7 @@ typedef struct _textwidget
     t_canvas*   x_canvas;      /* canvas this widget is currently drawn in */
     t_glist*    x_glist;       /* glist that owns this widget */
     t_binbuf*   options_binbuf;/* binbuf to save options state in */
+    t_binbuf*   text_binbuf;   /* store text on copy/paste and [loadbang] set*/
 
     int         width;
     int         height;
@@ -206,6 +207,8 @@ static void create_widget(t_textwidget *x)
 
 static void drawme(t_textwidget *x, t_glist *glist)
 {
+    char *buf;
+    int bufsize;
     DEBUG(post("drawme: firsttime %d canvas %lx glist %lx", x->x_canvas, glist););
     set_tkwidgets_ids(x,glist_getcanvas(glist));	
     create_widget(x);	
@@ -221,6 +224,10 @@ static void drawme(t_textwidget *x, t_glist *glist)
              x->frame_id->s_name, x->window_tag->s_name, x->all_tag->s_name, 
              x->width, x->height);
     tkwidgets_restore_options(x->widget_id, x->options_binbuf);
+    binbuf_gettext(x->text_binbuf, &buf, &bufsize);
+    buf[bufsize] = 0; // binbuf_gettext() doesn't terminate the string
+    post("%s insert end {%s}\n", x->widget_id->s_name, buf);
+    sys_vgui("%s insert end {%s}\n", x->widget_id->s_name, buf);
 }     
 
 static void eraseme(t_textwidget* x)
@@ -468,8 +475,16 @@ static void textwidget_set(t_textwidget* x,  t_symbol *s, int argc, t_atom *argv
 {
     DEBUG(post("textwidget_set"););
 
-    textwidget_clear(x);
-    textwidget_append(x, s, argc, argv);
+    if(glist_isvisible(x->x_glist))
+    {
+        textwidget_clear(x);
+        textwidget_append(x, s, argc, argv);
+    }
+    else
+    {
+        binbuf_clear(x->text_binbuf);
+        binbuf_add(x->text_binbuf, argc, argv);
+    }
 }
 
 static void textwidget_options(t_textwidget *x)
@@ -668,6 +683,7 @@ static void *textwidget_new(t_symbol *s, int argc, t_atom *argv)
     t_textwidget *x = (t_textwidget *)pd_new(textwidget_class);
     
     x->options_binbuf = binbuf_new();
+    x->text_binbuf = binbuf_new();
 
     x->x_selected = 0;
     x->x_resizing = 0;
