@@ -74,40 +74,49 @@ my $distribution = "";
 my $status = "";
 my $caption = "";
 
-
 #------------------------------------------------------------------------------#
-# wikipedia terms - Russian/Русский
-my $stub = "Заготовка";
-my $template = "Шаблон";
-my $category = "Категория"; ## или раздел ?
-my $infobox = "Инфорамка";
+# Japanese/Nihongo/日本語
 
-# термины pdpedia
-my $objectclass = "Объект-класс";
-my $inlets = "Впуски";  ## по словарю а. мюллера
-my $outlets = "Выпуски";
-my $arguments = "Параметры";
-my $messages = "Сообщения";
+# wikipedia terms
+my $stub = "スタブ";
+my $template = "テンプレート";
+my $category = "カテゴリー";
+my $infobox = "Infobox";
+my $topLevel = "トップレベル";
+
+
+# pdpedia terms
+my $objectclass = "オブジェクト・クラス";
+
+
+# page headers
+my $inlets = "インレット";
+my $outlets = "アウトレット";
+my $arguments = "引数";
+my $messages = "メッセージ";
+
 
 # infobox
-my $name = "Название";
-my $description = "Описание";
-my $abbreviation = "Сокращение";
-my $library = "Библиотека";
-my $author = "Автор";
-my $developer = "Разработчик";
-my $releaseVersion = "Версия релиза";
-my $releaseDate = "Дата выпуска";
-my $dependencies = "Зависимости";
-my $license = "Лицензия";
-my $website = "Домашняя страница";
-my $programmingLanguage = "Язык программирования";
-my $platform = "Платформа";
-my $operatingSystem = "Операционная Система";
-my $language = "Язык";
-my $dataType = "Тип данных";
-my $distribution = "Дистрибутивы";
-my $status = "Статус";
+my $name = "名前";
+my $description = "説明";
+my $abbreviation = "省略形";
+my $library = "ライブラリ";
+my $author = "作者";
+my $developer = "開発者";
+my $releaseVersion = "リリース・バージョン";
+my $releaseDate = "リリース日付";
+my $dependencies = "依存関係";
+my $license = "ライセンス";
+my $website = "ウェブサイト";
+my $programmingLanguage = "プログラミング言語";
+my $platform = "プラットフォーム";
+my $operatingSystem = "OS";
+my $language = "言語";
+my $dataType = "データ型";
+my $distribution = "ディストリビューション";
+my $status = "ステータス";
+
+
 
 
 #------------------------------------------------------------------------------#
@@ -233,7 +242,7 @@ foreach (`/sw/bin/find /Users/hans/Desktop/TODO/wiki_files_hacked/5.reference/ -
 	 print(OBJECTCLASS "[[fr:$pageName]]\n");
 	 print(OBJECTCLASS "[[nl:$pageName]]\n");
 	 print(OBJECTCLASS "[[pt:$pageName]]\n");
-#	 print(OBJECTCLASS "[[ru:$pageName]]\n");
+	 print(OBJECTCLASS "[[ru:$pageName]]\n");
 	 print(OBJECTCLASS "[[tr:$pageName]]\n");
 	 print(OBJECTCLASS "\n\n");
 	 close(OBJECTCLASS);
