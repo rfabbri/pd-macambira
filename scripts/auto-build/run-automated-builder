@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd /
+
 # On Mac OS X, there are some handy things in Fink, but don't override the
 # built-in tools
 PATH="${PATH}:/sw/bin:/sw/sbin"
@@ -44,3 +46,5 @@ for dir in /home/pd/auto-build/*; do
 	 test -e $dir/scripts/auto-build/${dirname}-auto-builder.sh && \
 		  run_build_script $dirname
 done
+
+echo yay!
