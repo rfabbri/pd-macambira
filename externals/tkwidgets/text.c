@@ -27,6 +27,9 @@
 /* TODO: window name "handle1376fc00" already exists in parent */
 /* TODO: figure out window vs. text width/height */
 /* TODO: add x scrollbar */
+/* TODO: make "insert" function based on the text widget "insert" */
+/* TODO: make [key( support chars > 127 */
+
 
 #define TEXT_DEFAULT_COLOR     "grey90"
 #define TEXT_DEFAULT_WIDTH     200
@@ -109,17 +112,19 @@ static char *textwidget_tk_options[] = {
 
 
 /* common symbols to preload */
+static t_symbol *backspace_symbol;
+static t_symbol *down_symbol;
+static t_symbol *escape_symbol;
+static t_symbol *id_symbol;
+static t_symbol *left_symbol;
+static t_symbol *query_callback_symbol;
+static t_symbol *return_symbol;
+static t_symbol *right_symbol;
 static t_symbol *scrollbars_symbol;
 static t_symbol *size_symbol;
-static t_symbol *backspace_symbol;
-static t_symbol *return_symbol;
 static t_symbol *space_symbol;
 static t_symbol *tab_symbol;
-static t_symbol *escape_symbol;
-static t_symbol *left_symbol;
-static t_symbol *right_symbol;
 static t_symbol *up_symbol;
-static t_symbol *down_symbol;
 
 /* -------------------- function prototypes --------------------------------- */
 
@@ -128,12 +133,22 @@ static void textwidget_query_callback(t_textwidget *x, t_symbol *s, int argc, t_
 
 /* -------------------- widget helper functions ----------------------------- */
 
+
+static void query_id(t_textwidget *x)
+{
+    t_atom id[2];
+    t_symbol *widget_id = x->widget_id;
+    SETSYMBOL(id, id_symbol);
+    SETSYMBOL(id + 1, widget_id);
+    textwidget_query_callback(x, query_callback_symbol, 2, id);
+}
+
 static void query_scrollbars(t_textwidget *x)
 {
     t_atom state[2];
     SETSYMBOL(state, scrollbars_symbol);
     SETFLOAT(state + 1, (t_float)x->have_scrollbars);
-    textwidget_query_callback(x, gensym("query_callback"), 2, state);
+    textwidget_query_callback(x, query_callback_symbol, 2, state);
 }
 
 static void query_size(t_textwidget *x)
@@ -142,7 +157,7 @@ static void query_size(t_textwidget *x)
     SETSYMBOL(coords, size_symbol);
     SETFLOAT(coords + 1, (t_float)x->width);
     SETFLOAT(coords + 2, (t_float)x->height);
-    textwidget_query_callback(x, gensym("query_callback"), 3, coords);
+    textwidget_query_callback(x, query_callback_symbol, 3, coords);
 }
 
 static void set_tkwidgets_ids(t_textwidget *x, t_canvas *canvas)
@@ -420,30 +435,32 @@ static void textwidget_key(t_textwidget* x,  t_symbol *s, int argc, t_atom *argv
 {
     DEBUG(post("textwidget_key"););
     t_symbol *tmp_symbol = s; /* <-- this gets rid of the unused variable warning */
-    t_int tmp_int;
+    char charbuf;
 
     tmp_symbol = atom_getsymbolarg(0, argc, argv);
     if(tmp_symbol == &s_)
+        charbuf = (t_int) atom_getfloatarg(0, argc , argv);
+    else
+        charbuf = tmp_symbol->s_name[0];
+    if(charbuf < 10)
     {
-        tmp_int = (t_int) atom_getfloatarg(0, argc , argv);
-        if(tmp_int < 10)
-        {
-            sys_vgui("%s insert end %d\n", x->widget_id->s_name, tmp_int);
-        }
-        else if(tmp_int == 10)
-        {
-            sys_vgui("%s insert end {\n}\n", x->widget_id->s_name);
-        }
-        else
-        {
-            sys_vgui("%s insert end [format \"%c\" %d]\n", x->widget_id->s_name, tmp_int);
-        }
+        sys_vgui("%s insert end %d\n", x->widget_id->s_name, charbuf);
     }
     else 
     {
-        sys_vgui("%s insert end %s\n", x->widget_id->s_name, tmp_symbol->s_name );
+        switch(charbuf)
+        {
+        case '\\': 
+            sys_vgui("%s insert end \"\\\\\"\n", x->widget_id->s_name); break;
+        case '{': 
+            sys_vgui("%s insert end {\\{}\n", x->widget_id->s_name); break;
+        case '}': 
+            sys_vgui("%s insert end \"}\"\n", x->widget_id->s_name); break;
+        default:
+            sys_vgui("%s insert end {%c}\n", x->widget_id->s_name, charbuf);
+        }
     }
-    sys_vgui("%s yview end-2char \n", x->widget_id->s_name );
+    sys_vgui("%s yview end-2char\n", x->widget_id->s_name );
 }
 
 /* Function to reset the contents of the textwidget box */
@@ -470,9 +487,12 @@ static void textwidget_query(t_textwidget *x, t_symbol *s)
         tkwidgets_query_options(x->receive_name, x->widget_id, 
                                 sizeof(textwidget_tk_options)/sizeof(char *), 
                                 textwidget_tk_options);
+        query_id(x);
         query_scrollbars(x);
         query_size(x);
     }
+    else if(s == id_symbol)
+        query_id(x);
     else if(s == scrollbars_symbol)
         query_scrollbars(x);
     else if(s == size_symbol)
@@ -730,15 +750,17 @@ void text_setup(void) {
     class_setsavefn(textwidget_class, &textwidget_save);
 
 /* commonly used symbols */
+    backspace_symbol = gensym("backspace");
+	down_symbol = gensym("down");
+	escape_symbol = gensym("escape");
+	id_symbol = gensym("id");
+	left_symbol = gensym("left");
+    query_callback_symbol = gensym("query_callback");
+    return_symbol = gensym("return");
+	right_symbol = gensym("right");
     size_symbol = gensym("size");
     scrollbars_symbol = gensym("scrollbars");
-    backspace_symbol = gensym("backspace");
-    return_symbol = gensym("return");
 	space_symbol = gensym("space");
 	tab_symbol = gensym("tab");
-	escape_symbol = gensym("escape");
-	left_symbol = gensym("left");
-	right_symbol = gensym("right");
 	up_symbol = gensym("up");
-	down_symbol = gensym("down");
 }

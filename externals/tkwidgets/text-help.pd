@@ -77,7 +77,7 @@ Black -highlightthickness 1 -insertbackground Black -insertborderwidth
 #X msg 159 250 gumby;
 #X msg 202 250 gobbler;
 #X obj 404 -212 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 10 -262144
--1 -1 200 1;
+-1 -1 0 1;
 #X obj 470 -90 tgl 15 0 empty empty empty 0 -6 0 10 -262144 -1 -1 0
 1;
 #X msg 109 -80 key a;
@@ -99,7 +99,7 @@ Black -highlightthickness 1 -insertbackground Black -insertborderwidth
 #X msg 401 -192 borderwidth \$1;
 #X msg 582 -192 relief \$1;
 #X msg 582 -58 wrap \$1;
-#X msg 328 -70 insertwidth \$1;
+#X msg 329 -70 insertwidth \$1;
 #X msg 557 305 undo \$1;
 #X msg 652 304 state \$1;
 #X msg 113 110 size 200 100;
@@ -141,6 +141,37 @@ TkWidget library;
 #X msg 399 75 #ff0;
 #X msg 435 75 grey;
 #X msg 471 75 black;
+#N canvas 410 182 450 300 adding 0;
+#X obj 90 229 text 200 60 0;
+#X text 53 23 You can add text one character at a time using the "key"
+message. It works either with the character itself or the ASCII value
+of the character:;
+#X msg 90 102 key \$1;
+#X obj 94 77 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X msg 126 202 key ";
+#X msg 169 202 key a;
+#X msg 215 202 key B;
+#X msg 145 102 key 10;
+#X msg 259 202 key [;
+#X msg 145 122 key 32;
+#X text 198 103 carriage return;
+#X text 198 122 space;
+#X msg 145 142 key 100;
+#X text 198 142 letter "d";
+#X msg 145 163 key 92;
+#X text 199 161 backslash;
+#X connect 2 0 0 0;
+#X connect 3 0 2 0;
+#X connect 4 0 0 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
+#X connect 7 0 0 0;
+#X connect 8 0 0 0;
+#X connect 9 0 0 0;
+#X connect 12 0 0 0;
+#X connect 14 0 0 0;
+#X restore 199 -200 pd adding with the key message;
 #X connect 0 0 2 0;
 #X connect 0 0 7 0;
 #X connect 0 1 6 0;
