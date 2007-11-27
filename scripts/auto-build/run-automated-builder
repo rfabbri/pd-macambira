@@ -36,8 +36,10 @@ run_build_script ()
 # send status report if something failed
 	 completion_test=`tail -1 ${LOGFILE}`
 	 if [ "x${completion_test}" != "xSUCCESS" ]; then
+		if [ "x${RECIPIENT}" != "x" ]; then
 		  SUBJECT="autobuild: $distro $HOSTNAME $DATE $TIME"
 		  tail -20 ${LOGFILE} | mail -s "${SUBJECT}" ${RECIPIENT}
+		fi
 	 fi
 }
 
