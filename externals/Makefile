@@ -48,8 +48,9 @@ LDFLAGS =
 LIBS = -lm
 
 ifeq ($(OS_NAME),darwin)
-  CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix 
-  LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
+  CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix
+  LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib \
+		-weak_framework Carbon
   LIBS += -lc 
   DYLIB_LDFLAGS = -dynamiclib -undefined dynamic_lookup -read_only_relocs warning -L/sw/lib
   STRIP = strip -x
