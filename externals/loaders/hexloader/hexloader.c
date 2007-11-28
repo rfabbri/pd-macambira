@@ -73,7 +73,7 @@ typedef struct _hexloader
 } t_hexloader;
 static t_class *hexloader_class;
 
-static char *version = "$Revision: 1.4 $";
+static char *version = "$Revision: 1.5 $";
 
 
 static char*hex_dllextent[] = {
@@ -669,17 +669,19 @@ static t_filepath*hexloader_trypatches(filelist_t*altnames0, char*classname) {
     char*altname=altnames->name;
     int extindex=0;
     char*extent=patch_extent[extindex];
-    while(extent!=0) {
-      if ((fd = open_via_path(".", altname, extent, dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0) {
-        t_symbol*s;
-        close (fd);
-        t_filepath*fp=hexloader_loadpatch(dirbuf, nameptr, altname, classname);
-        if(fp) {
-          return fp;
+    if(strcmp(altname, classname)) { /* we only try if it is worth trying... */
+      while(extent!=0) {
+        if ((fd = open_via_path(".", altname, extent, dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0) {
+          t_symbol*s;
+          close (fd);
+          t_filepath*fp=hexloader_loadpatch(dirbuf, nameptr, altname, classname);
+          if(fp) {
+            return fp;
+          }
         }
+        extindex++;
+        extent=patch_extent[extindex];
       }
-      extindex++;
-      extent=patch_extent[extindex];
     }
     altnames=altnames->next;
   }
@@ -687,6 +689,12 @@ static t_filepath*hexloader_trypatches(filelist_t*altnames0, char*classname) {
   return 0;
 }
 
+
+/**
+ * this is the actual loader:
+ * we first try to load an external with alternative (hexified) names
+ * if this fails, we fall back to load a patch with athese names
+ */
 static int hexloader_doloader(t_canvas *canvas, filelist_t*altnames0, char*classname)
 {
   t_filepath*fp=0;
@@ -701,6 +709,26 @@ static int hexloader_doloader(t_canvas *canvas, filelist_t*altnames0, char*class
 
   return 0;
 }
+
+/**
+ * recursive use of our powers:
+ * try to load the object with alternative (hexified) names using other available loaders
+ * when it comes to us, we just return 0...
+ */
+static int hexloader_callothers(t_canvas *canvas, filelist_t*altnames) {
+  int result=0;
+  while(altnames) {
+    char*altname=altnames->name;
+    verbose(2, "calling sys_load with '%s'", altname);
+    result=sys_load_lib(canvas, altname);
+    if(result==1) {
+      return 1;
+    }
+    altnames=altnames->next;
+  }
+  return 0;
+}
+
 
 /**
  * the loader
@@ -721,8 +749,15 @@ static int hexloader_loader(t_canvas *canvas, char *classname)
   /* get alternatives */
   altnames=hexloader_getalternatives(classname);
 
-  /* do the loading */
-  result=hexloader_doloader(canvas, altnames, classname);
+  /* try other loaders with our power */
+  if(result==0){
+    result=hexloader_callothers(canvas, altnames);
+  }
+
+  /* do the loading ourselves */
+  if(result==0) {
+    result=hexloader_doloader(canvas, altnames, classname);
+  }
 
   /* clean up */
   filelist_clear(altnames); 
@@ -737,10 +772,10 @@ static void*hexloader_fakenew(t_symbol*s, int argc, t_atom*argv) {
   t_filepath*fp=0;
   filelist_t*altnames=0;
 
-  post("hexloader: disguising as '%s'", s->s_name);
+  verbose(1, "hexloader: disguising as '%s'", s->s_name);
 
   if(!pd_objectmaker) {
-    post("BUG: no pd_objectmaker found");
+    error("BUG: no pd_objectmaker found");
     return 0;
   }
 
