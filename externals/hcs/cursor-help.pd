@@ -54,6 +54,9 @@
 1;
 #X text 15 18 set your mouse cursors for this patch:;
 #X text 201 81 <-- choose your cursor mode;
+#X text 237 293 Here are some pictures of the cursors:;
+#X obj 345 309 pddp/pddplink http://www.lehigh.edu/~sol0/ptk/cursors.gif
+;
 #X connect 1 0 2 0;
 #X connect 2 0 21 0;
 #X connect 2 1 0 0;
