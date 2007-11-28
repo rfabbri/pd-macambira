@@ -38,7 +38,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 
-static char *version = "$Revision: 1.4 $";
+static char *version = "$Revision: 1.5 $";
 
 t_int stat_instance_count;
 
@@ -117,6 +117,7 @@ static void reset_output(t_stat *x)
 
 static void stat_output_error(t_stat *x)
 {
+	DEBUG(post("stat_output_error"););
 	t_atom output_atoms[2];
 	switch(errno)
 	{
@@ -170,7 +171,7 @@ static void stat_output_error(t_stat *x)
 		error("[stat]: unknown error %d: %s", errno, x->x_filename->s_name);
 		SETSYMBOL(output_atoms, gensym("unknown"));
 	}
-	SETSYMBOL(output_atoms + 2, x->x_filename);
+	SETSYMBOL(output_atoms + 1, x->x_filename);
 	outlet_anything(x->x_status_outlet, gensym("error"), 2, output_atoms);
 }
 
