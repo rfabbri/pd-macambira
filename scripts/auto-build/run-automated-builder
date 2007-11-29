@@ -49,4 +49,6 @@ for dir in /home/pd/auto-build/*; do
 		  run_build_script $dirname
 done
 
-echo yay!
+# since the above test can cause this script to exit with an error, force it
+# to be happy to prevent getting automated error emails to root
+true 

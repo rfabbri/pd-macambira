@@ -20,7 +20,12 @@ update_distro ()
 
 touch $LOGFILE
 
-update_distro pd-extended
-update_distro pd-extended-release
-update_distro pd-main
-update_distro pd-devel
+for dir in /home/pd/rsync/*; do 
+	 dirname=`echo $dir | sed 's|.*/\(.*\)|\1|'`
+	 test -e $dir/scripts/update-developer-layout.sh && \
+		  update_distro $dirname
+done
+
+# since the above test can cause this script to exit with an error, force it
+# to be happy to prevent getting automated error emails to root
+true 
