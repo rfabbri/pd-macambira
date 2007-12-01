@@ -1,5 +1,5 @@
-#N canvas 88 197 538 519 10;
-#X obj 165 127 text 227 97 1;
+#N canvas 525 280 538 519 10;
+#X obj 169 112 text 227 97 1;
 #X msg 174 40 bang;
 #X msg 289 83 key \$1;
 #X msg 273 48 123;
@@ -10,6 +10,10 @@
 #X obj 177 367 text 200 60 0;
 #X obj 190 283 loadbang;
 #X msg 182 319 set blah blah blah;
+#X msg 425 48 59;
+#X msg 397 47 44;
+#X obj 169 219 pddp/print;
+#X connect 0 0 13 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
 #X connect 3 0 2 0;
@@ -19,3 +23,5 @@
 #X connect 7 0 2 0;
 #X connect 9 0 10 0;
 #X connect 10 0 8 0;
+#X connect 11 0 2 0;
+#X connect 12 0 2 0;

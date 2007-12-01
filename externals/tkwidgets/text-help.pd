@@ -143,24 +143,26 @@ TkWidget library;
 #X msg 471 75 black;
 #N canvas 410 182 450 300 adding 0;
 #X obj 90 229 text 200 60 0;
-#X text 53 23 You can add text one character at a time using the "key"
+#X text 53 3 You can add text one character at a time using the "key"
 message. It works either with the character itself or the ASCII value
 of the character:;
-#X msg 90 102 key \$1;
-#X obj 94 77 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+#X msg 90 82 key \$1;
+#X obj 94 57 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
 #X msg 126 202 key ";
 #X msg 169 202 key a;
 #X msg 215 202 key B;
-#X msg 145 102 key 10;
+#X msg 145 82 key 10;
 #X msg 259 202 key [;
-#X msg 145 122 key 32;
-#X text 198 103 carriage return;
-#X text 198 122 space;
-#X msg 145 142 key 100;
-#X text 198 142 letter "d";
+#X msg 145 102 key 32;
+#X text 198 83 carriage return;
+#X text 198 102 space;
 #X msg 145 163 key 92;
 #X text 199 161 backslash;
+#X msg 145 143 key 59;
+#X text 199 141 semicolon;
+#X msg 145 122 key 44;
+#X text 198 122 comma;
 #X connect 2 0 0 0;
 #X connect 3 0 2 0;
 #X connect 4 0 0 0;
@@ -171,6 +173,7 @@ of the character:;
 #X connect 9 0 0 0;
 #X connect 12 0 0 0;
 #X connect 14 0 0 0;
+#X connect 16 0 0 0;
 #X restore 199 -200 pd adding with the key message;
 #X obj 107 -177 loadbang;
 #X connect 0 0 2 0;
