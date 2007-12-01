@@ -1,4 +1,4 @@
-#N canvas 0 22 454 304 10;
+#N canvas 119 484 463 507 10;
 #X floatatom 243 167 5 0 0 0 - - -;
 #X symbolatom 291 166 10 0 0 0 - - -;
 #X obj 196 187 bng 15 250 50 0 empty empty bang -6 23 1 12 -262144
@@ -27,6 +27,20 @@ converted to other types:;
 elements with a selector of "list" and 2 or more elements. (But don't
 forget! A series whose element is a float has an implied "list" selector!)
 ;
+#X obj 123 373 select;
+#X msg 157 343 list;
+#X msg 122 344 bang;
+#X msg 247 343 list;
+#X msg 212 344 bang;
+#X obj 213 373 print;
+#X msg 73 429 3;
+#X msg 106 428 list 3;
+#X obj 59 471 *;
+#X msg 223 429 3;
+#X msg 256 428 list 3;
+#X obj 208 470 *~;
+#X text 19 311 These two disagree about 0 element lists:;
+#X text 19 401 These two disagree about 1 element lists:;
 #X connect 0 0 4 0;
 #X connect 1 0 5 0;
 #X connect 3 0 2 0;
@@ -43,3 +57,11 @@ forget! A series whose element is a float has an implied "list" selector!)
 #X connect 11 0 13 0;
 #X connect 12 0 14 0;
 #X connect 13 0 15 0;
+#X connect 18 0 17 1;
+#X connect 19 0 17 1;
+#X connect 20 0 22 0;
+#X connect 21 0 22 0;
+#X connect 23 0 25 1;
+#X connect 24 0 25 1;
+#X connect 26 0 28 1;
+#X connect 27 0 28 1;
