@@ -37,7 +37,7 @@ echo "root: $auto_build_root_dir"
 
 
 # let rsync handle the cleanup with --delete
-rsync -av --delete rsync://128.238.56.50/distros/pd-main/ \
+rsync -av --delete rsync://128.238.56.50/distros/desiredata/ \
 	 ${auto_build_root_dir}/
 
 case $SYSTEM in 
