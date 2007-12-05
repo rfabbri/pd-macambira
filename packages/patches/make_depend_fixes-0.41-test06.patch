@@ -1,0 +1,42 @@
+Index: makefile.in
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/makefile.in,v
+retrieving revision 1.17
+diff -u -w -r1.17 makefile.in
+--- makefile.in	2 Aug 2007 00:33:50 -0000	1.17
++++ makefile.in	4 Dec 2007 23:56:34 -0000
+@@ -42,6 +42,9 @@
+ 
+ ASIOOBJ = $(ASIOSRC:.cpp=.o)
+ 
++HEADERS = g_all_guis.h m_imp.h s_audio_alsa.h s_audio_paring.h t_tk.h \
++	g_canvas.h m_pd.h s_audio_pablio.h s_stuff.h
++
+ SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
+     g_scalar.c g_traversal.c g_guiconnect.c g_readwrite.c g_editor.c \
+     g_all_guis.c g_bang.c g_hdial.c g_hslider.c g_mycanvas.c g_numbox.c \
+@@ -197,12 +200,10 @@
+ local-clean:
+ 	-rm -f ../obj/* $(BIN_DIR)/pd $(BIN_DIR)/$(GUINAME) $(BIN_DIR)/pdsend \
+ 	    $(BIN_DIR)/pdreceive $(BIN_DIR)/pd-watchdog m_stamp.c
+-	-rm -f `find ../portaudio -name "*.o"` 
++	-rm -f -- $(OBJ) $(GOBJ)
+ 	-rm -f *~
+ 	-(cd ../doc/6.externs; rm -f *.pd_linux)
+ 	-rm -f makefile.dependencies
+-	touch makefile.dependencies
+-	chmod 666 makefile.dependencies
+ 
+ extra-clean:
+ 	-rm -f `find ../extra/ -name "*.pd_*"`
+@@ -220,8 +221,8 @@
+ 
+ depend: makefile.dependencies
+ 
+-makefile.dependencies: makefile
+-	$(CC) $(CPPFLAGS) -M $(SRC) > makefile.dependencies
++makefile.dependencies: $(SRC) $(HEADERS)
++	$(CC) $(CPPFLAGS) -M $(SRC) $(HEADERS) > makefile.dependencies
+ 
+ uninstall:
+ 	rm -f -r $(libpddir)
