@@ -56,7 +56,7 @@ case $SYSTEM in
 				echo SUCCESS
 		  ;;
 	 *)
-		  package_name="/tmp/pd-${DATE}-${SYSTEM}-${HOSTNAME}-${platform_name}.tar.bz2"
+		  package_name="/tmp/desiredata-${DATE}-${SYSTEM}-${HOSTNAME}-${platform_name}.tar.bz2"
 		  cd ${auto_build_root_dir}/pd/src && \
 				autoconf && \
 				./configure $configure_options && \
