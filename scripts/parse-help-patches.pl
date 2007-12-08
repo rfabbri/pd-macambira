@@ -75,46 +75,45 @@ my $status = "";
 my $caption = "";
 
 #------------------------------------------------------------------------------#
-# Japanese/Nihongo/日本語
+# Français
 
 # wikipedia terms
-my $stub = "スタブ";
-my $template = "テンプレート";
-my $category = "カテゴリー";
-my $infobox = "Infobox";
-my $topLevel = "トップレベル";
-
+$stub = "Ébauche";
+$template = "Modèle";
+$category = "Catégorie";
+$infobox = "Infos";
 
 # pdpedia terms
-my $objectclass = "オブジェクト・クラス";
-
+$objectclass = "Classe d'objets";
 
 # page headers
-my $inlets = "インレット";
-my $outlets = "アウトレット";
-my $arguments = "引数";
-my $messages = "メッセージ";
-
+$inlets = "Entrées";
+$outlets = "Sorties";
+$arguments = "Arguments";
+$messages = "Messages";
 
 # infobox
-my $name = "名前";
-my $description = "説明";
-my $abbreviation = "省略形";
-my $library = "ライブラリ";
-my $author = "作者";
-my $developer = "開発者";
-my $releaseVersion = "リリース・バージョン";
-my $releaseDate = "リリース日付";
-my $dependencies = "依存関係";
-my $license = "ライセンス";
-my $website = "ウェブサイト";
-my $programmingLanguage = "プログラミング言語";
-my $platform = "プラットフォーム";
-my $operatingSystem = "OS";
-my $language = "言語";
-my $dataType = "データ型";
-my $distribution = "ディストリビューション";
-my $status = "ステータス";
+$name = "Nom";
+$description = "Description";
+$abbreviation = "Abréviation";
+$library = "Bibliothèque";
+$author = "Auteur";
+$developer = "Développeur";
+$releaseVersion = "Version";
+$releaseDate = "Date";
+$dependencies = "Dépendances";
+$license = "Licence";
+$website = "Site Web";
+$programmingLanguage = "Langage de programmation";
+$platform = "Plate-forme";
+$operatingSystem = "Système d'exploitation";
+$language = "Langue";
+$dataType = "Type de données";
+$distribution = "Distribution";
+
+$status = "État";
+$caption = "Légende";
+$language = "Langue";
 
 
 
@@ -239,7 +238,9 @@ foreach (`/sw/bin/find /Users/hans/Desktop/TODO/wiki_files_hacked/5.reference/ -
 	 print(OBJECTCLASS "[[de:$pageName]]\n");
 	 print(OBJECTCLASS "[[en:$pageName]]\n");
 	 print(OBJECTCLASS "[[es:$pageName]]\n");
-	 print(OBJECTCLASS "[[fr:$pageName]]\n");
+#	 print(OBJECTCLASS "[[fr:$pageName]]\n");
+	 print(OBJECTCLASS "[[it:$pageName]]\n");
+	 print(OBJECTCLASS "[[ja:$pageName]]\n");
 	 print(OBJECTCLASS "[[nl:$pageName]]\n");
 	 print(OBJECTCLASS "[[pt:$pageName]]\n");
 	 print(OBJECTCLASS "[[ru:$pageName]]\n");
