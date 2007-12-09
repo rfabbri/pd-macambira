@@ -1,8 +1,8 @@
-#N canvas 5 85 797 703 10;
-#X obj 182 516 usbhid;
-#X msg 284 190 close;
-#X msg 284 216 reset;
-#X msg 297 254 print;
+#N canvas 677 22 710 687 10;
+#X obj 177 545 usbhid;
+#X msg 276 167 close;
+#X msg 276 193 reset;
+#X msg 289 231 print;
 #X text 367 72 Gravis/Destroyer Tiltpad;
 #N canvas 0 22 462 312 buttons 0;
 #X obj 99 36 inlet;
@@ -47,7 +47,7 @@
 #X connect 15 0 8 0;
 #X connect 16 0 9 0;
 #X restore 115 655 pd buttons test;
-#X obj 177 602 unpack float float float float;
+#X obj 177 613 unpack float float float float;
 #X obj 94 183 metro 400;
 #X obj 96 157 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
@@ -57,10 +57,10 @@
 #X msg 70 5 open vendorId productId;
 #X msg 226 71 open 0x047D 0x4008;
 #X floatatom 175 636 5 0 0 0 - - -;
-#X msg 329 373 debug \$1;
-#X obj 329 351 hradio 15 1 0 10 empty empty empty 0 -6 0 8 -262144
+#X msg 314 347 debug \$1;
+#X obj 314 325 hradio 15 1 0 10 empty empty empty 0 -6 0 8 -262144
 -1 -1 0;
-#X obj 77 581 print data;
+#X obj 77 592 print data;
 #N canvas 458 151 458 489 parsing 0;
 #X obj 77 6 inlet;
 #X obj 80 101 route float symbol;
@@ -88,24 +88,24 @@
 #X connect 9 1 10 0;
 #X connect 10 0 2 1;
 #X connect 10 1 11 0;
-#X restore 276 558 pd parsing;
+#X restore 271 587 pd parsing;
 #X text 58 222 how many bytes to read;
-#X msg 294 235 refresh;
-#X text 359 236 reinit and refresh device list;
-#X text 333 216 resets device (don't really know what that does tho)
+#X msg 286 212 refresh;
+#X text 351 213 reinit and refresh device list;
+#X text 325 193 resets device (don't really know what that does tho)
 ;
-#X obj 221 559 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 216 588 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
 1;
-#X obj 221 537 route open device;
+#X obj 216 566 route open device;
 #X msg 132 237 get 2;
-#X msg 302 279 descriptor;
-#X text 381 279 get descriptor;
-#X msg 309 313 descriptor 1 30 1 31 1 38;
-#X text 488 312 [descriptor page# usage# ...(;
-#X text 308 297 for writing to the device:;
+#X msg 294 256 descriptor;
+#X text 373 256 get descriptor;
+#X msg 301 290 descriptor 1 30 1 31 1 38;
+#X text 480 289 [descriptor page# usage# ...(;
+#X text 300 274 for writing to the device:;
 #X msg 75 308 set 2;
-#X text 233 522 <- status outlet;
-#X text 71 523 data outlet ->;
+#X text 228 551 <- status outlet;
+#X text 66 552 data outlet ->;
 #X msg 213 49 open 0x046d 0xc01d;
 #X text 355 49 Logitech USB-PS/2 Optical Mouse;
 #X msg 206 25 open 0x1043 0x0015;
@@ -115,14 +115,18 @@
 #X text 375 125 Logitech RumblePad 2 USB;
 #X msg 253 125 open 0x046d 0xc218;
 #X msg 94 204 get 8;
-#X msg 392 431 write 0x0 0x0 \$1;
-#X obj 390 409 int;
-#X obj 394 387 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 10 -262144
+#X obj 332 453 int;
+#X obj 335 434 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 10 -262144
 -1 -1 0 1;
-#X obj 362 562 print ELSE;
-#X msg 451 459 write 0x0001 0x0004 5;
-#X msg 449 479 write 0xff00 0x0001 5;
-#X msg 449 499 write 0xff00 0x0002 5;
+#X obj 357 591 print ELSE;
+#X msg 421 501 write 0x0001 0x0004 5;
+#X msg 419 521 write 0xff00 0x0001 5;
+#X msg 419 541 write 0xff00 0x0002 5;
+#X obj 320 395 int;
+#X obj 323 376 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 10 -262144
+-1 -1 0 1;
+#X msg 320 415 write 0x01 0x04 0x0 0x0 0xff00 0x02 \$1;
+#X msg 332 473 write 0x01 0x04 0x00 0x00 0xff00 0x01 \$1;
 #X connect 0 0 6 0;
 #X connect 0 0 17 0;
 #X connect 0 1 24 0;
@@ -142,7 +146,7 @@
 #X connect 20 0 0 0;
 #X connect 24 0 23 0;
 #X connect 24 1 18 0;
-#X connect 24 2 46 0;
+#X connect 24 2 45 0;
 #X connect 25 0 0 0;
 #X connect 26 0 0 0;
 #X connect 28 0 0 0;
@@ -152,9 +156,12 @@
 #X connect 38 0 0 0;
 #X connect 41 0 0 0;
 #X connect 42 0 0 0;
-#X connect 43 0 0 0;
+#X connect 43 0 52 0;
 #X connect 44 0 43 0;
-#X connect 45 0 44 0;
+#X connect 46 0 0 0;
 #X connect 47 0 0 0;
 #X connect 48 0 0 0;
-#X connect 49 0 0 0;
+#X connect 49 0 51 0;
+#X connect 50 0 49 0;
+#X connect 51 0 0 0;
+#X connect 52 0 0 0;

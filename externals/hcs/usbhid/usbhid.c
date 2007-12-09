@@ -507,42 +507,45 @@ static void usbhid_set(t_usbhid *x, t_float length_arg)
 
 
 /* -------------------------------------------------------------------------- */
-static void usbhid_write(t_usbhid *x,  t_symbol *usage_page_symbol, 
-						 t_symbol *usage_symbol, t_float value)
+static void usbhid_write(t_usbhid *x,  t_symbol *s, int argc, t_atom *argv) 
 {
-	if(x->debug_level) post("usbhid_set");
-//	const char* path[] = {0x00010004, 0xff000002};
-	long path_element;
-	int path[] = {0xff000002};
-	unsigned int const depth = 1;
-	unsigned char const SEND_PACKET_LEN = 1;
-	char const PACKET[] = { 0x50 };
+	if(x->debug_level) post("usbhid_write");
+    int i;
+//	const int path[] = {0x000c0001, 0x000c0001};
+//	int path[] = {0xff000002};
+    int *path;
+//	unsigned int const depth = 2;  // number of 32bit chunks in the path
+//	unsigned char const SEND_PACKET_LEN = 2; // number of bytes in packet
+//	char const PACKET[] = { 0x50 }; // the data to write
+	unsigned int depth;  // number of 32bit chunks in the path
+	unsigned char SEND_PACKET_LEN; // number of bytes in packet
+	char PACKET[] = { 0x50 }; // the data to write
 
  	if ( !hid_is_opened(x->x_hidinterface) )
 	{
 		error("[usbhid] device not open, can't set data");
 		return;
 	}
-	path_element = (strtol(usage_page_symbol->s_name, NULL, 16) << 16) + 
-		(strtol(usage_symbol->s_name, NULL, 16) & 0x0000ffff);
-	if (path_element == 0) 
-		switch (errno) 
-		{
-		case EINVAL:
-			post("strtol EINVAL error %d", errno);
-			break;
-		case ERANGE:
-			post("strtol ERANGE error %d", errno);
-			break;
-		default:
-			post("strtol error %d", errno);
-		}
-	post("path: 0x%08x", path_element);
-	path[0] = path_element;
+
+    path = getbytes(sizeof(int) * (argc - 1));
+    depth = (argc - 1) / 2;
+    for(i = 0; i < argc - 1; ++i)
+    {
+        path[(i+1)/2] = (strtol(atom_getsymbol(argv + i)->s_name, NULL, 16) << 16) + 
+            (strtol(atom_getsymbol(argv + i + 1)->s_name, NULL, 16) & 0x0000ffff);
+        ++i;
+    }
+    SEND_PACKET_LEN = 1;
+    PACKET[0] = (unsigned short) atom_getfloat(argv + argc - 1);
+    post("depth: %d  SEND_PACKET_LEN: %d   PACKET[0]: %d", 
+         depth, SEND_PACKET_LEN, PACKET[0]);
+    for(i = 0; i < (argc - 1) / 2; ++i)
+    {
+        post("path %d: 0x%08x", i, path[i]);
+    }
+    
 	x->x_hid_return = hid_set_output_report(x->x_hidinterface, 
-											&path_element, 
-											depth, 
-											PACKET,
+											path, depth, PACKET,
 											SEND_PACKET_LEN);
 	if (x->x_hid_return != HID_RET_SUCCESS) 
 	{
@@ -611,6 +614,7 @@ static void usbhid_get_descriptor(t_usbhid *x)
 	t_int input_size = 0;
 	t_int output_size = 0;
 	t_int feature_size = 0;
+    char buf[MAXPDSTRING];
 
 	if (!hid_is_opened(x->x_hidinterface)) {
 		error("[usbget] cannot dump tree of unopened HIDinterface.");
@@ -639,17 +643,16 @@ static void usbhid_get_descriptor(t_usbhid *x)
 			}
 			add_float_to_output(x, x->x_hidinterface->hid_data->Size);
 			add_float_to_output(x, x->x_hidinterface->hid_data->Offset);
+            add_symbol_to_output(x, gensym("path"));
+            post("path");
 			for (i = 0; i < x->x_hidinterface->hid_data->Path.Size; ++i) {
-				add_symbol_to_output(x, gensym("usage"));
-				add_float_to_output(x, x->x_hidinterface->hid_data->Path.Node[i].UPage);
-				add_float_to_output(x, x->x_hidinterface->hid_data->Path.Node[i].Usage);
-				post("page: 0x%04x\t%d\t\tusage: 0x%04x\t%d",
-					 x->x_hidinterface->hid_data->Path.Node[i].UPage,
-					 x->x_hidinterface->hid_data->Path.Node[i].UPage,
-					 x->x_hidinterface->hid_data->Path.Node[i].Usage,
-					 x->x_hidinterface->hid_data->Path.Node[i].Usage);
+                sprintf(buf, "0x%04x", x->x_hidinterface->hid_data->Path.Node[i].UPage);
+				add_symbol_to_output(x, gensym(buf));
+                sprintf(buf, "0x%04x", x->x_hidinterface->hid_data->Path.Node[i].Usage);
+				add_symbol_to_output(x, gensym(buf));
+                post("0x%04x%04x",x->x_hidinterface->hid_data->Path.Node[i].UPage,
+                     x->x_hidinterface->hid_data->Path.Node[i].Usage);
 			}
-			post("type: 0x%02x\n", x->x_hidinterface->hid_data->Type);
 			add_symbol_to_output(x, gensym("logical"));
 			add_float_to_output(x, x->x_hidinterface->hid_data->LogMin);
 			add_float_to_output(x, x->x_hidinterface->hid_data->LogMax);
@@ -834,7 +837,7 @@ void usbhid_setup(void)
 	class_addmethod(usbhid_class,(t_method) usbhid_set,gensym("set"),
 					A_DEFFLOAT,0);
 	class_addmethod(usbhid_class,(t_method) usbhid_write,gensym("write"),
-					A_DEFSYM, A_DEFSYM, A_DEFFLOAT, 0);
+					A_GIMME, 0);
 	class_addmethod(usbhid_class,(t_method) usbhid_open,gensym("open"),
 					A_DEFSYM,A_DEFSYM,0);
 	class_addmethod(usbhid_class,(t_method) usbhid_close,gensym("close"),0);
