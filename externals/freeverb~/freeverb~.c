@@ -27,6 +27,7 @@
 #pragma warning( disable : 4091 )
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
+#define inline __inline
 #endif
 
 #ifdef PD
@@ -133,16 +134,37 @@ typedef struct _freeverb
 #endif
 } t_freeverb;
 
-#ifndef IRIX
-#define IS_DENORM_FLOAT(v)              ((((*(unsigned long*)&(v))&0x7f800000)==0)&&((v)!=0.f))
-#define IS_NAN_FLOAT(v)                 (((*(unsigned long*)&(v))&0x7f800000)==0x7f800000)
-#define IS_DENORM_NAN_FLOAT(v)          (IS_DENORM_FLOAT(v)||IS_NAN_FLOAT(v))
-#define FIX_DENORM_NAN_FLOAT(v)         ((v)=IS_DENORM_NAN_FLOAT(v)?0.f:(v))
-#else
-#define FIX_DENORM_NAN_FLOAT(v);
-#endif
+//#ifndef IRIX
+//#define IS_DENORM_FLOAT(v)              ((((*(unsigned long*)&(v))&0x7f800000)==0)&&((v)!=0.f))
+//#define IS_NAN_FLOAT(v)                 (((*(unsigned long*)&(v))&0x7f800000)==0x7f800000)
+//#define IS_DENORM_NAN_FLOAT(v)          (IS_DENORM_FLOAT(v)||IS_NAN_FLOAT(v))
+//#define FIX_DENORM_NAN_FLOAT(v)         ((v)=IS_DENORM_NAN_FLOAT(v)?0.f:(v))
+//#else
+//#define FIX_DENORM_NAN_FLOAT(v);
+//#endif
 
-	/* we need prototypes for Mac for everything */
+typedef union ulf
+{
+    unsigned long   ul;
+    float           f;
+} ulf;
+
+static inline float fix_denorm_nan_float(float v);
+
+static inline float fix_denorm_nan_float(float v)
+{
+#ifndef IRIX
+    ulf u;
+
+    u.f = v;
+    if ((((u.ul & 0x7f800000) == 0L) && (u.f != 0.f)) || ((u.ul & 0x7f800000) == 0x7f800000))
+        /* if the float is denormal or NaN, return 0.0 */
+        return 0.0f;
+#endif //IRIX
+    return v;
+}
+
+/* we need prototypes for Mac for everything */
 static void comb_setdamp(t_freeverb *x, t_floatarg val);
 static void comb_setfeedback(t_freeverb *x, t_floatarg val);
 static inline t_float comb_processL(t_freeverb *x, int filteridx, t_float input);
@@ -171,6 +193,9 @@ static void freeverb_setbypass(t_freeverb *x, t_floatarg value);
 static void freeverb_mute(t_freeverb *x);
 static float freeverb_getdb(float f);
 static void freeverb_print(t_freeverb *x);
+#ifdef PD
+void freeverb_tilde_setup(void);
+#endif
 #ifndef PD
 void freeverb_assist(t_freeverb *x, void *b, long m, long a, char *s);
 #endif
@@ -196,10 +221,12 @@ static inline t_float comb_processL(t_freeverb *x, int filteridx, t_float input)
 	int bufidx = x->x_combidxL[filteridx];
 
 	output = x->x_bufcombL[filteridx][bufidx];
-	FIX_DENORM_NAN_FLOAT(output);
+    //FIX_DENORM_NAN_FLOAT(output);
+    fix_denorm_nan_float(output);
 
-	x->x_filterstoreL[filteridx] = (output*x->x_combdamp2) + (x->x_filterstoreL[filteridx]*x->x_combdamp1);
-	FIX_DENORM_NAN_FLOAT(x->x_filterstoreL[filteridx]);
+    x->x_filterstoreL[filteridx] = (output*x->x_combdamp2) + (x->x_filterstoreL[filteridx]*x->x_combdamp1);
+    //FIX_DENORM_NAN_FLOAT(x->x_filterstoreL[filteridx]);
+    fix_denorm_nan_float(x->x_filterstoreL[filteridx]);
 
 	x->x_bufcombL[filteridx][bufidx] = input + (x->x_filterstoreL[filteridx]*x->x_combfeedback);
 
@@ -214,10 +241,12 @@ static inline t_float comb_processR(t_freeverb *x, int filteridx, t_float input)
 	int bufidx = x->x_combidxR[filteridx];
 
 	output = x->x_bufcombR[filteridx][bufidx];
-	FIX_DENORM_NAN_FLOAT(output);
+    //FIX_DENORM_NAN_FLOAT(output);
+    fix_denorm_nan_float(output);
 
 	x->x_filterstoreR[filteridx] = (output*x->x_combdamp2) + (x->x_filterstoreR[filteridx]*x->x_combdamp1);
-	FIX_DENORM_NAN_FLOAT(x->x_filterstoreR[filteridx]);
+    //FIX_DENORM_NAN_FLOAT(x->x_filterstoreR[filteridx]);
+    fix_denorm_nan_float(x->x_filterstoreR[filteridx]);
 
 	x->x_bufcombR[filteridx][bufidx] = input + (x->x_filterstoreR[filteridx]*x->x_combfeedback);
 
@@ -240,7 +269,8 @@ static inline t_float allpass_processL(t_freeverb *x, int filteridx, t_float inp
 	int bufidx = x->x_allpassidxL[filteridx];
 	
 	bufout = (t_float)x->x_bufallpassL[filteridx][bufidx];
-	FIX_DENORM_NAN_FLOAT(bufout);
+    //FIX_DENORM_NAN_FLOAT(bufout);
+    fix_denorm_nan_float(bufout);
 	
 	output = -input + bufout;
 	x->x_bufallpassL[filteridx][bufidx] = input + (bufout*x->x_allpassfeedback);
@@ -258,7 +288,8 @@ static inline t_float allpass_processR(t_freeverb *x, int filteridx, t_float inp
 	int bufidx = x->x_allpassidxR[filteridx];
 	
 	bufout = (t_float)x->x_bufallpassR[filteridx][bufidx];
-	FIX_DENORM_NAN_FLOAT(bufout);
+    //FIX_DENORM_NAN_FLOAT(bufout);
+    fix_denorm_nan_float(bufout);
 	
 	output = -input + bufout;
 	x->x_bufallpassR[filteridx][bufidx] = input + (bufout*x->x_allpassfeedback);
