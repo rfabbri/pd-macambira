@@ -47,6 +47,7 @@ pddoc_DATA = \
 
 gfsm_SOURCES = \
 	config.h \
+	noconfig.h \
 	atom_alphabet.h atom_alphabet.c \
 	pd_alphabet.h  pd_alphabet.c \
 	\
@@ -59,6 +60,10 @@ gfsm_SOURCES = \
 	\
 	pd_gfsm.h pd_gfsm.c
 
+
+noconfig.h: config.h.in
+	rm -f $@
+	cp $< $@
 
 #----------------------------------------------------------------------
 # external compilation : flags

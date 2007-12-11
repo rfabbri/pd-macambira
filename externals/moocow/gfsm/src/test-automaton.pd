@@ -1,4 +1,4 @@
-#N canvas 31 7 974 447 10;
+#N canvas 169 63 974 447 10;
 #X obj 13 7 gfsm;
 #X obj 22 324 gfsm_automaton;
 #X obj 22 359 print GFSM-1;
@@ -30,15 +30,15 @@
 #X obj 237 97 s \$0-fsm;
 #X obj 349 121 s \$0-fsm;
 #X obj 496 126 s \$0-fsm;
-#X msg 104 148 load test.tfst;
-#X msg 103 188 save tmp.tfst;
-#X msg 229 148 load_bin test.gfst;
+#X msg 102 176 load test.tfst;
+#X msg 101 216 save tmp.tfst;
+#X msg 253 148 load_bin test.gfst;
 #X msg 250 304 save_bin tmp.gfst;
 #X msg 26 202 print;
 #X msg 22 179 clear;
 #X msg 18 158 info;
 #X obj 17 226 s \$0-fsm;
-#X obj 88 246 s \$0-fsm;
+#X obj 86 274 s \$0-fsm;
 #X obj 236 338 s \$0-fsm;
 #X msg 437 170 complement;
 #X msg 450 211 closure \$1;
@@ -66,9 +66,9 @@
 #X msg 631 269 reverse;
 #X msg 631 296 rmepsilon;
 #X msg 634 320 union a2;
-#X msg 103 168 load test2.tfst;
-#X msg 233 169 load_bin test2.gfst;
-#X msg 238 190 load_bin test3.gfst;
+#X msg 101 196 load test2.tfst;
+#X msg 257 169 load_bin test2.gfst;
+#X msg 262 190 load_bin test3.gfst;
 #X obj 46 131 tgl 20 0 \$0-drawmode-s empty mode 0 -6 0 8 -225271 -1
 -1 0 1;
 #X msg 246 74 root;
@@ -128,7 +128,7 @@
 #X obj 113 360 s \$0-fsm-out;
 #X obj 741 16 pool;
 #X msg 94 120 automaton fsm-help;
-#X msg 105 220 load gfsm-help.tfst;
+#X msg 103 248 load gfsm-help.tfst;
 #N canvas 22 7 466 454 draw 0;
 #X obj 361 16 zexy;
 #X obj 26 15 r \$0-draw-s;
@@ -174,12 +174,13 @@
 #X connect 19 0 20 0;
 #X connect 20 0 6 0;
 #X restore 16 251 pd draw;
-#X msg 258 216 load_bin lkptest.gfst;
-#X msg 261 238 load_bin lkpin.gfst;
+#X msg 270 222 load_bin lkptest.gfst;
+#X msg 273 244 load_bin lkpin.gfst;
 #X obj 21 385 gfsm_automaton a1;
 #X obj 22 404 gfsm_automaton a2;
 #X msg 626 245 connect;
 #X msg 739 352 clear;
+#X msg 96 139 automaton lookup-help;
 #X connect 1 0 2 0;
 #X connect 1 0 81 0;
 #X connect 3 0 5 0;
@@ -258,3 +259,4 @@
 #X connect 87 0 38 0;
 #X connect 90 0 53 0;
 #X connect 91 0 53 0;
+#X connect 92 0 5 0;

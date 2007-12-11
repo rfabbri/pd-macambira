@@ -1,5 +1,8 @@
 Change log for PD external 'pd-gfsm'
 
+v0.0403 Tue, 11 Dec 2007 22:33:18 +0100
+   + updated for gfsm-0.0.10-pre1 (noconfig.h, config.h preprocessor magic)
+
 v0.02 Tue, 21 Sep 2004 01:30:45 +0200
    + added 'arc_seek' message to gfsm_state
    + added 'add_weight' message to gfsm_state
