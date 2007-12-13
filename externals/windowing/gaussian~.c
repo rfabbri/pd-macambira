@@ -20,14 +20,34 @@
 */
 
 #include "m_pd.h"
-#include "windowFunctions.h"
 #include <stdlib.h>
-#ifdef NT
+#include <math.h>
+
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
+
 #define DEFDELTA 0.5
 #define DEFBLOCKSIZE 64
+
+/* MSW and OSX don't appear to have single-precision ANSI math */
+#if defined(_WIN32) || defined(__APPLE__)
+#define powf pow
+#endif
+
+void fillGaussian(float *vec, int n, float delta) {
+  int i;
+  float xShift = (float)n / 2;
+  float x;
+  if (delta == 0) {
+    delta = 1;
+  }
+  for (i = 0; i < n; i++) {
+    x = (i - xShift) / xShift;
+    vec[i] = (float)(pow(2, (-1 * (x / delta) * (x / delta))));
+  }
+}
 
 static t_class *gaussian_class;
 

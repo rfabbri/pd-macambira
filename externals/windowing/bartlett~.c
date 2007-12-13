@@ -20,13 +20,25 @@
 */
 
 #include "m_pd.h"
-#include "windowFunctions.h"
 #include <stdlib.h>
-#ifdef NT
+#include <math.h>
+
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
+
 #define DEFBLOCKSIZE 64
+
+void fillBartlett(float *vec, int n) {
+  int i;
+  float xShift = (float)n / 2;
+  float x;
+  for (i = 0; i < n; i++) {
+    x = (i - xShift) / xShift;
+    vec[i] = (float)(1 - fabs(x));
+  }
+}
 
 static t_class *bartlett_class;
 

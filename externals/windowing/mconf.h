@@ -104,6 +104,7 @@ Copyright 1984, 1987, 1989, 1995 by Stephen L. Moshier
 #define EDOM		33
 #define ERANGE		34
 /* Complex numeral.  */
+#if 0
 typedef struct
 	{
 	double r;
@@ -118,7 +119,7 @@ typedef struct
 	long double i;
 	} cmplxl;
 #endif
-
+#endif
 
 /* Type of computer arithmetic */
 
