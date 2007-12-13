@@ -124,17 +124,17 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tkwidgets tof toxy unauthorized vbap zexy
+LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tkwidgets tof toxy unauthorized vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid hidio pdp pidip gem2pdp wiiremote iem16
+    LIB_TARGETS += hid hidio pdp pidip gem2pdp wiiremote iem16 usbhid
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16
+    LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16 postlude
   endif
 endif
 
@@ -2071,6 +2071,7 @@ pmpd_clean:
 POSTLUDE_NAME=postlude
 # flib is separate, so exclude it here
 POSTLUDE_OBJECTS := $(wildcard $(externals_src)/postlude/[a-eg-z]*/src/*.c)
+#	$(externals_src)/postlude/psql/psql.c
 postlude: $(POSTLUDE_OBJECTS:.c=.$(EXTENSION))
 
 postlude_install: postlude
@@ -2436,6 +2437,44 @@ wiiremote_clean:
 	-rm -f -- $(externals_src)/io/wiiremote/*.bak
 	-rm -f -- $(externals_src)/io/wiiremote/*.*~
 
+
+
+#------------------------------------------------------------------------------#
+# WINDOWING
+WINDOWING_NAME=windowing
+WINDOWING_OBJECTS := $(wildcard $(externals_src)/windowing/*.c)
+WINDOWING_SHARED := $(wildcard $(externals_src)/windowing/shared/*.c)
+windowing_shared: $(WINDOWING_SHARED:.c=.o)
+#	$(CC) $(DYLIB_LDFLAGS) \
+#		-o $(externals_src)/windowing/libwindowing.$(DYLIB_EXTENSION) \
+#		 $(WINDOWING_SHARED:.c=.o)
+
+windowing: windowing_shared $(WINDOWING_OBJECTS:.c=.$(EXTENSION))
+
+windowing_install: windowing
+	install -d $(objectsdir)/$(WINDOWING_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(WINDOWING_NAME) \
+		--author "Joe Sarlo" \
+		--license "GPLv2 or later" 
+	install -p $(WINDOWING_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(WINDOWING_NAME)
+	install -d $(helpdir)/$(WINDOWING_NAME)
+	install -p $(externals_src)/windowing/*-help.pd \
+		$(helpdir)/$(WINDOWING_NAME)
+#	install -d $(manualsdir)/$(WINDOWING_NAME)
+#	install -p $(externals_src)/windowing/manual.txt \
+#		$(manualsdir)/$(WINDOWING_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/windowing/README \
+		$(readmesdir)/$(WINDOWING_NAME).txt
+	install -d $(examplesdir)/$(WINDOWING_NAME)
+	install -p $(externals_src)/windowing/examples/*.pd \
+		$(examplesdir)/$(WINDOWING_NAME)
+
+windowing_clean:
+	-rm -f -- $(WINDOWING_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(WINDOWING_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/windowing/*.bak
+	-rm -f -- $(externals_src)/windowing/*.*~
 
 
 #------------------------------------------------------------------------------#
