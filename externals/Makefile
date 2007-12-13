@@ -2080,8 +2080,10 @@ postlude_install: postlude
 		--author "Jamie Bullock" \
 		--license "GNU GPL"
 	install -p $(POSTLUDE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(POSTLUDE_NAME)
+	install -p $(externals_src)/postlude/dssi/doc/output~.pd \
+		$(objectsdir)/$(POSTLUDE_NAME)
 	install -d $(helpdir)/$(POSTLUDE_NAME)
-	install -p $(externals_src)/postlude/*/doc/help-*.pd \
+	install -p $(externals_src)/postlude/*/doc/*-help.pd \
 		$(helpdir)/$(POSTLUDE_NAME)
 #	install -d $(manualsdir)/$(POSTLUDE_NAME)
 #	install -p $(externals_src)/postlude/manual.txt \
@@ -2089,8 +2091,8 @@ postlude_install: postlude
 	install -d $(readmesdir)
 	install -p $(externals_src)/postlude/dssi/README \
 		$(readmesdir)/$(POSTLUDE_NAME)-dssi.txt
-	install -p $(externals_src)/postlude/getpatchname/README \
-		$(readmesdir)/$(POSTLUDE_NAME)-getpatchname.txt
+	install -p $(externals_src)/postlude/psql/README \
+		$(readmesdir)/$(POSTLUDE_NAME)-psql.txt
 	install -d $(examplesdir)/$(POSTLUDE_NAME)
 #	install -p $(externals_src)/postlude/examples/*.pd \
 #		$(examplesdir)/$(POSTLUDE_NAME)
