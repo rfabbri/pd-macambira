@@ -47,6 +47,8 @@ in terms of stopband attenuation and noise bandwidth.;
 #X obj 170 167 tabsend~ \$0-hanning;
 #X text 102 258 SIGNAL: the height (amplitude) of the window is controled
 by the signal on its inlet.;
+#X obj 72 319 cnv 17 3 30 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+-162280 0;
 #X connect 6 0 25 0;
 #X connect 9 0 6 0;
 #X connect 11 0 9 0;

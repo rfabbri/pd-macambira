@@ -1,8 +1,8 @@
-#N canvas 256 141 561 517 10;
+#N canvas 256 141 560 517 10;
 #X obj 4 479 cnv 15 550 20 empty \$0-pddp.cnv.footer empty 20 12 0
 14 -228856 -66577 0;
-#X obj 4 -17 cnv 15 550 40 empty \$0-pddp.cnv.header blackman~ 3 12
-0 18 -204280 -1 0;
+#X obj 4 -17 cnv 15 550 40 empty \$0-pddp.cnv.header welch~ 3 12 0
+18 -204280 -1 0;
 #X obj 3 239 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 15 12 0 13
 -228856 -1 0;
 #X obj 3 299 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlet 15 12 0
@@ -21,33 +21,34 @@
 #X obj 438 -14 import windowing;
 #X msg 36 154 \; pd dsp 1;
 #X text 21 85 height --->;
-#X text 15 6 description: generates a blackman window for each dsp
-block;
 #X obj 127 109 sig~ 1;
-#X obj 127 132 blackman~;
 #N canvas 0 0 450 300 graph3 0;
-#X array \$0-blackman 64 float 0;
+#X array \$0-welch 64 float 0;
 #X coords 0 1 63 -1 200 140 1;
 #X restore 326 65 graph;
-#X text 168 70 0.8*cos(2*pi*x);
-#X text 168 55 0.42+(0.5*cos(pi*x))+;
-#X obj 102 380 pddp/pddplink http://mathworld.wolfram.com/BlackmanFunction.html
--text mathworld link;
-#X text 103 317 SIGNAL: a blackman window with size=dsp blocksize;
-#X obj 435 6 pddp/pddplink http://wiki.puredata.info/en/blackman~ -text
-pdpedia: blackman~;
-#X text 102 394 Windowing functions are used with FFTs. These transform
+#X text 102 406 Windowing functions are used with FFTs. These transform
 the signal block-by-block into a spectral representation whose resolution
 in both the frequency and time domains are proportional to their size
 (as a power-of-two in PD). The different windows have different characteristics
 in terms of stopband attenuation and noise bandwidth.;
 #X text 102 258 SIGNAL: the height (amplitude) of the window is controlled
 by the signal on its inlet.;
-#X obj 127 158 tabsend~ \$0-blackman;
+#X obj 127 158 tabsend~ \$0-welch;
+#X obj 127 132 welch~;
+#X text 169 53 1-abs(x);
+#X obj 102 379 pddp/pddplink http://en.wikipedia.org/wiki/Welch_method
+-text wikipedia: Welch's method;
+#X obj 102 392 pddp/pddplink http://mathworld.wolfram.com/WelchApodizationFunction.html
+-text mathworld link;
+#X text 103 317 SIGNAL: a welch window with size=dsp blocksize;
+#X text 15 6 description: generates a welch window for each dsp block
+;
+#X obj 435 6 pddp/pddplink http://wiki.puredata.info/en/welch~ -text
+pdpedia: welch~;
 #X obj 73 319 cnv 17 3 30 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
-#X connect 7 0 15 0;
+#X connect 7 0 14 0;
 #X connect 8 0 7 0;
 #X connect 9 0 8 0;
-#X connect 15 0 16 0;
-#X connect 16 0 25 0;
+#X connect 14 0 19 0;
+#X connect 19 0 18 0;
