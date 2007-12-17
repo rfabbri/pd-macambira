@@ -91,7 +91,7 @@ static void *tripleRand_new(t_floatarg arg1, t_floatarg arg2, t_floatarg arg3)
 		x->x_range[2] = (float)arg3;
     x->t_out1 = outlet_new(&x->x_obj, 0);
 
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_list, gensym("newVals"));
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("newVals"));
     return (x);
 }
 
@@ -99,6 +99,7 @@ void tripleRand_setup(void)
 {
     tripleRand_class = class_new(gensym("tripleRand"), (t_newmethod)tripleRand_new, 0,
     	sizeof(t_tripleRand), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+
     class_addbang(tripleRand_class, (t_method)tripleRand_bang);
     class_addmethod(tripleRand_class, (t_method)setTripleRandVals,
     	    gensym("newVals"), A_GIMME, A_NULL); 
