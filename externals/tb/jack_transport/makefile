@@ -64,7 +64,7 @@ LINUXCFLAGS = -DPD -O3 -fPIC -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch -g
 
-LINUXINCLUDE =  -I../../../src
+LINUXINCLUDE =  -I../../../pd/src
 
 LSTRIP = strip --strip-unneeded -R .note -R .comment
 
