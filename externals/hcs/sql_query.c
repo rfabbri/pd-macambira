@@ -57,14 +57,14 @@ typedef struct _sql_query
 {
     t_object            x_obj;
 
-    t_binbuf*           x_query_binbuf;     // store query in a binbuf for reuse
+    t_binbuf*           x_query_binbuf;   // binbuf for converting args to string
     
-    struct _proxy_inlet*inlets;             // pointer to array of _proxy_inlets
-    t_atom*             atoms;              // pointer to array of atoms
-    unsigned int        placeholder_count;  // number of items in above arrays
+    struct _proxy_inlet*inlets;           // pointer to array of _proxy_inlets
+    t_atom*             atoms;            // pointer to array of atoms
+    unsigned int        placeholder_count;// number of items in above arrays
 
-    t_outlet*           x_data_outlet;      // for list of data to plug into query
-    t_outlet*           x_query_outlet;     // for SQL query
+    t_outlet*           x_data_outlet;    // for list of data to plug into query
+    t_outlet*           x_query_outlet;   // for SQL query
 } t_sql_query;
     
 
@@ -133,16 +133,13 @@ static void sql_query_anything(t_sql_query *x, t_symbol *s, int argc, t_atom *ar
     sql_query_set_atom(x, 0, s, argv);
 }
 
-static void sql_query_bang(t_sql_query *x)
+static void sql_query_output(t_sql_query *x)
 {
-    DEBUG(post("sql_query_bang"););
-    unsigned int i;
-    char buf[MAXPDSTRING];
-    for(i=0; i < x->placeholder_count; ++i)
-    {
-        atom_string(&x->atoms[i], &buf, MAXPDSTRING);
-        post("output atom %d: %s", i, buf);
-    }
+    DEBUG(post("sql_query_output"););
+    int natom = binbuf_getnatom(x->x_query_binbuf);
+    t_atom *vec = binbuf_getvec(x->x_query_binbuf);
+    outlet_anything(x->x_query_outlet, vec[0].a_w.w_symbol, natom - 1, vec + 1);
+    outlet_list(x->x_data_outlet, &s_list, x->placeholder_count, x->atoms);
 }
 
 static void sql_query_free(t_sql_query *x) 
@@ -204,7 +201,7 @@ void sql_query_setup(void)
                                 0);
 
 	/* add inlet datatype methods */
-	class_addbang(sql_query_class, (t_method) sql_query_bang);
+	class_addbang(sql_query_class, (t_method) sql_query_output);
 	class_addanything(sql_query_class, (t_method) sql_query_anything);
 }
 
