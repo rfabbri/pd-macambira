@@ -114,7 +114,7 @@ static void proxy_inlet_setup(void)
 static void sql_query_set_atom(t_sql_query *x, int atom_num, t_symbol *s, t_atom *a)
 {
     DEBUG(post("sql_query_set_atom"););
-    if( (s == &s_symbol) || (s == &s_list) )
+    if( (s == &s_symbol) || (s == &s_list) || (s == &s_float) )
     {
         char buf[MAXPDSTRING];
         atom_string(a, &buf, MAXPDSTRING);
@@ -123,7 +123,6 @@ static void sql_query_set_atom(t_sql_query *x, int atom_num, t_symbol *s, t_atom
     }
     else
     {
-        post("blah");
         SETSYMBOL(&x->atoms[atom_num], s);
         post("selector set %s", s->s_name);
     }
