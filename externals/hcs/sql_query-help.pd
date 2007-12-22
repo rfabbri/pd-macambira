@@ -1,0 +1,34 @@
+#N canvas 403 84 613 618 10;
+#X obj 118 105 sql_query this is a test? more ?;
+#X obj 362 244 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X floatatom 420 276 5 0 0 0 - - -;
+#X text 395 223 age;
+#N canvas 402 387 450 300 sql 0;
+#X obj 73 37 inlet;
+#X obj 259 37 inlet;
+#X obj 63 251 outlet;
+#X obj 270 267 outlet;
+#X obj 255 78 print COLD;
+#X obj 61 82 print HOT;
+#X connect 0 0 5 0;
+#X connect 1 0 4 0;
+#X restore 267 428 pd sql;
+#X obj 223 495 print RESULTS;
+#X obj 349 496 print STATUS;
+#X obj 325 452 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 347 453 bang when done;
+#X msg 120 232 Chinua;
+#X msg 80 233 Mary;
+#X msg 172 231 symbol Ang;
+#X obj 119 322 sql_query insert into table (name \, age) values (?
+\, ?);
+#X connect 4 0 5 0;
+#X connect 4 1 6 0;
+#X connect 4 1 7 0;
+#X connect 9 0 12 0;
+#X connect 10 0 12 0;
+#X connect 11 0 12 0;
+#X connect 12 0 4 0;
+#X connect 12 1 4 1;
