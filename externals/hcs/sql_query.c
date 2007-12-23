@@ -34,8 +34,8 @@
 
 #include <string.h>
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 #define PLACEHOLDER  '?'
 
@@ -59,7 +59,7 @@ typedef struct _sql_query
 
     t_binbuf*           x_query_binbuf;   // binbuf for converting args to string
     
-    struct _proxy_inlet*inlets;           // pointer to array of _proxy_inlets
+    t_proxy_inlet*      inlets;           // pointer to array of _proxy_inlets
     t_atom*             atoms;            // pointer to array of atoms
     unsigned int        placeholder_count;// number of items in above arrays
 
@@ -71,7 +71,8 @@ typedef struct _sql_query
 /*------------------------------------------------------------------------------
  * FUNCTION PROTOTYPES
  */
-static void sql_query_set_atom(t_sql_query *x, int atom_num, t_symbol *s, t_atom *atom);
+static void sql_query_set_atom(t_sql_query *x, int atom_num, t_symbol *s, 
+                               int argc, t_atom *a);
 
 /*------------------------------------------------------------------------------
  * PROXY INLET FUNCTIONS
@@ -79,19 +80,17 @@ static void sql_query_set_atom(t_sql_query *x, int atom_num, t_symbol *s, t_atom
 
 static void proxy_inlet_new(t_proxy_inlet *p, t_object *owner, unsigned int id) 
 {
+	DEBUG(post("proxy_inlet_new"););
 	p->pd = proxy_inlet_class;
 	p->owner = owner;
     p->id = id;
     inlet_new(owner, &p->pd, 0, 0);
 }
 
-
-
-
 static void proxy_inlet_anything(t_proxy_inlet *p, t_symbol *s, int argc, t_atom *argv)
 {
-	post("proxy_inlet_anything: %s %d", s->s_name, argc);
-    sql_query_set_atom(p->owner, p->id, s, argv);
+	DEBUG(post("proxy_inlet_anything"););
+    sql_query_set_atom(p->owner, p->id, s, argc, argv);
 }
 
 static void proxy_inlet_setup(void) 
@@ -111,26 +110,14 @@ static void proxy_inlet_setup(void)
  * STANDARD CLASS FUNCTIONS
  */
 
-static void sql_query_set_atom(t_sql_query *x, int atom_num, t_symbol *s, t_atom *a)
+static void sql_query_set_atom(t_sql_query *x, int atom_num, t_symbol *s, 
+                               int argc, t_atom *a)
 {
     DEBUG(post("sql_query_set_atom"););
     if( (s == &s_symbol) || (s == &s_list) || (s == &s_float) )
-    {
-        char buf[MAXPDSTRING];
-        atom_string(a, &buf, MAXPDSTRING);
         x->atoms[atom_num] = *a;
-        post("symbol/list set %s", buf);
-    }
     else
-    {
         SETSYMBOL(&x->atoms[atom_num], s);
-        post("selector set %s", s->s_name);
-    }
-}
-
-static void sql_query_anything(t_sql_query *x, t_symbol *s, int argc, t_atom *argv) 
-{
-    sql_query_set_atom(x, 0, s, argv);
 }
 
 static void sql_query_output(t_sql_query *x)
@@ -140,6 +127,12 @@ static void sql_query_output(t_sql_query *x)
     t_atom *vec = binbuf_getvec(x->x_query_binbuf);
     outlet_anything(x->x_query_outlet, vec[0].a_w.w_symbol, natom - 1, vec + 1);
     outlet_list(x->x_data_outlet, &s_list, x->placeholder_count, x->atoms);
+}
+
+static void sql_query_anything(t_sql_query *x, t_symbol *s, int argc, t_atom *argv) 
+{
+    sql_query_set_atom(x, 0, s, argc, argv);
+    sql_query_output(x);
 }
 
 static void sql_query_free(t_sql_query *x) 
@@ -156,6 +149,8 @@ static void *sql_query_new(t_symbol *s, int argc, t_atom *argv)
     char *current = NULL;
 	t_sql_query *x = (t_sql_query *)pd_new(sql_query_class);
 
+    proxy_inlet_setup();
+
     x->x_query_binbuf = binbuf_new();
     binbuf_add(x->x_query_binbuf, argc, argv);
     binbuf_gettext(x->x_query_binbuf, &buf, &bufsize);
@@ -165,23 +160,17 @@ static void *sql_query_new(t_symbol *s, int argc, t_atom *argv)
     current = strchr(buf, PLACEHOLDER);
     while (current != NULL)
     {
-        post("found placeholder %c", PLACEHOLDER);
         x->placeholder_count++;
         current = strchr(current + 1, PLACEHOLDER);
     }
-    post("creating %d inlets", x->placeholder_count);
+    
     x->inlets = getbytes(x->placeholder_count * sizeof(t_proxy_inlet));
-    for(i=1; i< x->placeholder_count; ++i)
-    {
-        proxy_inlet_new(&x->inlets[i], (t_object *)x, x->placeholder_count);
-        post("\tinlet %d", i);
-    }
-
+    for(i = 1; i < x->placeholder_count; ++i)
+        proxy_inlet_new(&x->inlets[i], (t_object *)x, i);
+    
     x->atoms = getbytes(x->placeholder_count * sizeof(t_atom));
-    for(i=0; i< x->placeholder_count; ++i)
-    {
+    for(i = 0; i < x->placeholder_count; ++i)
         SETSYMBOL(&x->atoms[i], &s_);
-    }
 
 	x->x_data_outlet = outlet_new(&x->x_obj, 0);
 	x->x_query_outlet = outlet_new(&x->x_obj, 0);
@@ -191,7 +180,6 @@ static void *sql_query_new(t_symbol *s, int argc, t_atom *argv)
 
 void sql_query_setup(void) 
 {
-	DEBUG(post("sql_query_setup"););
 	sql_query_class = class_new(gensym("sql_query"), 
                                 (t_newmethod)sql_query_new, 
                                 (t_method)sql_query_free, 
