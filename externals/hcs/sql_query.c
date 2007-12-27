@@ -149,8 +149,6 @@ static void *sql_query_new(t_symbol *s, int argc, t_atom *argv)
     char *current = NULL;
 	t_sql_query *x = (t_sql_query *)pd_new(sql_query_class);
 
-    proxy_inlet_setup();
-
     x->x_query_binbuf = binbuf_new();
     binbuf_add(x->x_query_binbuf, argc, argv);
     binbuf_gettext(x->x_query_binbuf, &buf, &bufsize);
@@ -191,5 +189,8 @@ void sql_query_setup(void)
 	/* add inlet datatype methods */
 	class_addbang(sql_query_class, (t_method) sql_query_output);
 	class_addanything(sql_query_class, (t_method) sql_query_anything);
+
+    /* set up proxy inlet class */
+    proxy_inlet_setup();
 }
 
