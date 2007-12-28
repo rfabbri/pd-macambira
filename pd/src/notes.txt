@@ -1,7 +1,10 @@
 ---------------- dolist --------------------
-  binbuf_read_via_canvas in x_qlist.c
+fixed crash bug closing patches with open GOPs
+fixed PC device counting problem (first device invoked by -audiodev 0)
+fixed MSTACKSIZE limitation in m_binbuf.c
+fixed so that if more than one object is selected, clicking prefers to
+    "hit" a selected one (better dragging after "duplicate")
 
-PC device counting problem (first device invoked by -audiodev 0)
 
 test:
 compile on various versions of linux
@@ -12,17 +15,16 @@ windows:
   "-audiodev" with no args in registry can't start up?
 mac:
   clicking on windows seems sometimes not to open them
-what does OSX do when jack is compiled into Pd but not installed??
-turn on paMacCore_ChangeDeviceParameters for mac (pa_mac_core.h)
+  what does OSX do when jack is compiled into Pd but not installed??
+  turn on paMacCore_ChangeDeviceParameters for mac (pa_mac_core.h)
 Gnome: why don't windows pop up when clicked on?
 
 problems:
+check real-time gaps in writesf~
 fix declare to update current patch when changed
 objects on GOP don't erase if you edit the GOP while they're showing
-MSTACKSIZE limitation in m_binbuf.c
 add -stack option to make 'regular' stack larger
 TK menu on Windows says "wish"
-activating windows in Gnome?
 help browser broke on Panurge
 offer both new and old help browser style
 look again at array vis/invis conundrum, g_template.c
@@ -37,7 +39,6 @@ when retyping abstractions, offer to save dirty one
 should linux stop grabbing focus on vis?  Is there a way to detect whether
     the mouse is in a window when it opens?
 arrays that don't fit in bounds don't update (same as red rectangle problem?)
-look in d_resample.pd to understand inlet~ upsampling...
 patcher inlets don't deal with scalars (zbug.pd)
 check if there's a problem loading libs on startup if superuser
 read xx.txt in "bad" gives warnings
@@ -55,7 +56,8 @@ real-time spectrum grapher
 document ||, |, etc, better
 
 features:
-clickles connection (hit 'c' key or something)
+flag to prevent unlocking patches
+clickless connection (hit 'c' key? see Bouchard paper)
 messages to suppress menus&accelerators, and invisibilize Pd window
 machine-independent fonts
 callback scheduling on Mac

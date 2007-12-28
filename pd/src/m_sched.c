@@ -28,6 +28,11 @@ int sys_schedblocksize = DEFDACBLKSIZE;
 int sys_usecsincelastsleep(void);
 int sys_sleepgrain;
 
+void sched_reopenmeplease(void)   /* request from s_audio for deferred reopen */
+{
+    sys_quit = SYS_QUIT_RESTART;
+}
+
 typedef void (*t_clockmethod)(void *client);
 
 struct _clock
@@ -286,7 +291,7 @@ static void sched_pollformeters( void)
     }
     if (sched_meterson)
     {
-        float inmax, outmax;
+        t_sample inmax, outmax;
         sys_getmeters(&inmax, &outmax);
         indb = 0.5 + rmstodb(inmax);
         outdb = 0.5 + rmstodb(outmax);
@@ -311,7 +316,7 @@ static void sched_pollformeters( void)
         sched_diddsp + (int)(sys_dacsr /(double)sys_schedblocksize);
 }
 
-void glob_meters(void *dummy, float f)
+void glob_meters(void *dummy, t_float f)
 {
     if (f == 0)
         sys_getmeters(0, 0);
@@ -342,10 +347,13 @@ void sched_set_using_audio(int flag)
         sched_referencerealtime = sys_getrealtime();
         sched_referencelogicaltime = clock_getlogicaltime();
     }
-        if (flag == SCHED_AUDIO_CALLBACK && sched_useaudio != SCHED_AUDIO_CALLBACK)
+        if (flag == SCHED_AUDIO_CALLBACK &&
+            sched_useaudio != SCHED_AUDIO_CALLBACK)
                 sys_quit = SYS_QUIT_RESTART;
-        if (flag != SCHED_AUDIO_CALLBACK && sched_useaudio == SCHED_AUDIO_CALLBACK)
-                post("sorry, can't turn off callbacks yet; restart Pd");  /* not right yet! */
+        if (flag != SCHED_AUDIO_CALLBACK &&
+            sched_useaudio == SCHED_AUDIO_CALLBACK)
+                post("sorry, can't turn off callbacks yet; restart Pd");
+                    /* not right yet! */
         
     sys_time_per_dsp_tick = (TIMEUNITPERSEC) *
         ((double)sys_schedblocksize) / sys_dacsr;
@@ -529,7 +537,7 @@ void sched_audio_callbackfn(void)
 static void m_callbackscheduler(void)
 {
     sys_initmidiqueue();
-    while (1)
+    while (!sys_quit)
     {
 #ifdef MSW
     Sleep(1000);

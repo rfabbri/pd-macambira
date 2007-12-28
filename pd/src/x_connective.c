@@ -506,7 +506,7 @@ static void route_list(t_route *x, t_symbol *sel, int argc, t_atom *argv)
     int nelement;
     if (x->x_type == A_FLOAT)
     {
-        float f;
+        t_float f;
         if (!argc) return;
         f = atom_getfloat(argv);
         for (nelement = x->x_nelement, e = x->x_vec; nelement--; e++)
@@ -1057,7 +1057,7 @@ static t_class *spigot_class;
 typedef struct _spigot
 {
     t_object x_obj;
-    float x_state;
+    t_float x_state;
 } t_spigot;
 
 static void *spigot_new(t_floatarg f)
@@ -1118,7 +1118,7 @@ typedef struct _moses
 {
     t_object x_ob;
     t_outlet *x_out2;
-    float x_y;
+    t_float x_y;
 } t_moses;
 
 static void *moses_new(t_floatarg f)
@@ -1174,6 +1174,8 @@ static void until_bang(t_until *x)
 
 static void until_float(t_until *x, t_float f)
 {
+    if (f < 0)
+        f = 0;
     x->x_run = 1;
     x->x_count = f;
     while (x->x_run && x->x_count)
@@ -1202,34 +1204,86 @@ typedef struct _makefilename
 {
     t_object x_obj;
     t_symbol *x_format;
+    t_atomtype x_accept;
+    int x_intconvert;
 } t_makefilename;
+
+static void makefilename_scanformat(t_makefilename *x)
+{
+    int num=0, infmt=0;
+    char *str,*chr;
+    if (!x->x_format) return;
+    x->x_accept = A_NULL;
+    for (str=x->x_format->s_name; *str; str++) {
+        if (!infmt && *str=='%') {
+            infmt=1;
+            continue;
+        }
+        if (infmt) {
+            if (strchr("-.#0123456789",*str)!=0)
+                continue;
+            if (*str=='s') {
+                x->x_accept = A_SYMBOL;
+                x->x_intconvert = 0;
+                break;
+            }
+            if (strchr("fgGeE",*str)!=0) {
+                x->x_accept = A_FLOAT;
+                x->x_intconvert = 0;
+                break;
+            }
+            if (strchr("xXdiou",*str)!=0) {
+                x->x_accept = A_FLOAT;
+                x->x_intconvert = 1;
+                break;
+            }
+            infmt=0;
+        }
+    }
+}
 
 static void *makefilename_new(t_symbol *s)
 {
     t_makefilename *x = (t_makefilename *)pd_new(makefilename_class);
-    if (!s->s_name) s = gensym("file.%d");
+    if (!s || !s->s_name) s = gensym("file.%d");
     outlet_new(&x->x_obj, &s_symbol);
     x->x_format = s;
+    x->x_accept = A_NULL;
+    x->x_intconvert = 0;
+    makefilename_scanformat(x);
     return (x);
 }
 
 static void makefilename_float(t_makefilename *x, t_floatarg f)
 {
     char buf[MAXPDSTRING];
+    if (x->x_accept == A_FLOAT) {
+        if (x->x_intconvert)
     sprintf(buf, x->x_format->s_name, (int)f);
+        else
+            sprintf(buf, x->x_format->s_name, f);
+    }
+    else
+        sprintf(buf, x->x_format->s_name, "");
+    if (buf[0]!=0)
     outlet_symbol(x->x_obj.ob_outlet, gensym(buf));
 }
 
 static void makefilename_symbol(t_makefilename *x, t_symbol *s)
 {
     char buf[MAXPDSTRING];
+    if (x->x_accept == A_SYMBOL)
     sprintf(buf, x->x_format->s_name, s->s_name);
+    else
+        sprintf(buf, x->x_format->s_name, 0);
+    if (buf[0]!=0)
     outlet_symbol(x->x_obj.ob_outlet, gensym(buf));
 }
 
 static void makefilename_set(t_makefilename *x, t_symbol *s)
 {
     x->x_format = s;
+    makefilename_scanformat(x);
 }
 
 static void makefilename_setup(void)

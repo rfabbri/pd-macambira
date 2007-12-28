@@ -77,13 +77,13 @@ void postatom(int argc, t_atom *argv)
     int i;
     for (i = 0; i < argc; i++)
     {
-        char buf[80];
-        atom_string(argv+i, buf, 80);
+        char buf[MAXPDSTRING];
+        atom_string(argv+i, buf, MAXPDSTRING);
         poststring(buf);
     }
 }
 
-void postfloat(float f)
+void postfloat(t_float f)
 {
     char buf[80];
     t_atom a;
@@ -118,7 +118,7 @@ void verbose(int level, const char *fmt, ...)
     int i;
     if(level>sys_verbose)return;
     dopost("verbose(");
-    postfloat((float)level);
+    postfloat((t_float)level);
     dopost("):");
     
     va_start(ap, fmt);

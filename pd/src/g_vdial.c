@@ -75,10 +75,10 @@ void vradio_draw_new(t_vradio *x, t_glist *glist)
         x->x_drawn = x->x_on;
     }
     sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor w \
-             -font {%s %d bold} -fill #%6.6x -tags %lxLABEL\n",
+             -font {{%s} -%d %s} -fill #%6.6x -tags %lxLABEL\n",
              canvas, xx11+x->x_gui.x_ldx, yy11b+x->x_gui.x_ldy,
              strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"",
-             x->x_gui.x_font, x->x_gui.x_fontsize,
+             x->x_gui.x_font, x->x_gui.x_fontsize, sys_fontweight,
              x->x_gui.x_lcol, x);
     if(!x->x_gui.x_fsf.x_snd_able)
         sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxOUT%d\n",
@@ -141,8 +141,8 @@ void vradio_draw_config(t_vradio* x, t_glist* glist)
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i;
 
-    sys_vgui(".x%lx.c itemconfigure %lxLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
-             canvas, x, x->x_gui.x_font, x->x_gui.x_fontsize,
+    sys_vgui(".x%lx.c itemconfigure %lxLABEL -font {{%s} -%d %s} -fill #%6.6x -text {%s} \n",
+             canvas, x, x->x_gui.x_font, x->x_gui.x_fontsize, sys_fontweight, 
              x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_lcol,
              strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"");
     for(i=0; i<n; i++)
@@ -265,7 +265,7 @@ static void vradio_properties(t_gobj *z, t_glist *owner)
     iemgui_properties(&x->x_gui, srl);
     if(pd_class(&x->x_gui.x_obj.ob_pd) == vradio_old_class)
         hchange = x->x_change;
-    sprintf(buf, "pdtk_iemgui_dialog %%s vradio \
+    sprintf(buf, "pdtk_iemgui_dialog %%s |vradio| \
             ----------dimensions(pix):----------- %d %d size: 0 0 empty \
             empty 0.0 empty 0.0 empty %d \
             %d new-only new&old %d %d number: %d \
@@ -347,14 +347,14 @@ static void vradio_bang(t_vradio *x)
     {
         if((x->x_change)&&(x->x_on != x->x_on_old))
         {
-            SETFLOAT(x->x_at, (float)x->x_on_old);
+            SETFLOAT(x->x_at, (t_float)x->x_on_old);
             SETFLOAT(x->x_at+1, 0.0);
             outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
             if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
                 pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
         }
         x->x_on_old = x->x_on;
-        SETFLOAT(x->x_at, (float)x->x_on);
+        SETFLOAT(x->x_at, (t_float)x->x_on);
         SETFLOAT(x->x_at+1, 1.0);
         outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
         if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
@@ -382,7 +382,7 @@ static void vradio_fout(t_vradio *x, t_floatarg f)
             /* compatibility with earlier  "vdial" behavior */
         if((x->x_change)&&(i != x->x_on_old))
         {
-            SETFLOAT(x->x_at, (float)x->x_on_old);
+            SETFLOAT(x->x_at, (t_float)x->x_on_old);
             SETFLOAT(x->x_at+1, 0.0);
             outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
             if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
@@ -393,7 +393,7 @@ static void vradio_fout(t_vradio *x, t_floatarg f)
         x->x_on = i;
         (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
         x->x_on_old = x->x_on;
-        SETFLOAT(x->x_at, (float)x->x_on);
+        SETFLOAT(x->x_at, (t_float)x->x_on);
         SETFLOAT(x->x_at+1, 1.0);
         outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
         if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
@@ -426,7 +426,7 @@ static void vradio_float(t_vradio *x, t_floatarg f)
         {
             if(x->x_gui.x_fsf.x_put_in2out)
             {
-                SETFLOAT(x->x_at, (float)x->x_on_old);
+                SETFLOAT(x->x_at, (t_float)x->x_on_old);
                 SETFLOAT(x->x_at+1, 0.0);
                 outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
                 if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
@@ -440,7 +440,7 @@ static void vradio_float(t_vradio *x, t_floatarg f)
         x->x_on_old = x->x_on;
         if(x->x_gui.x_fsf.x_put_in2out)
         {
-            SETFLOAT(x->x_at, (float)x->x_on);
+            SETFLOAT(x->x_at, (t_float)x->x_on);
             SETFLOAT(x->x_at+1, 1.0);
             outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
             if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
@@ -466,7 +466,7 @@ static void vradio_click(t_vradio *x, t_floatarg xpos, t_floatarg ypos,
 {
     int yy =  (int)ypos - text_ypix(&x->x_gui.x_obj, x->x_gui.x_glist);
 
-    vradio_fout(x, (float)(yy / x->x_gui.x_h));
+    vradio_fout(x, (t_float)(yy / x->x_gui.x_h));
 }
 
 static int vradio_newclick(t_gobj *z, struct _glist *glist,
@@ -590,7 +590,7 @@ static void *vradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
     if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
     else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
     else { x->x_gui.x_fsf.x_font_style = 0;
-        strcpy(x->x_gui.x_font, "courier"); }
+        strcpy(x->x_gui.x_font, sys_font); }
     if(num < 1)
         num = 1;
     if(num > IEM_RADIO_MAX)

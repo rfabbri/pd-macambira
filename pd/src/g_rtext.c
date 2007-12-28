@@ -15,10 +15,16 @@
 #include "g_canvas.h"
 #include "t_tk.h"
 
-#define LMARGIN 1
-#define RMARGIN 1
+#define LMARGIN 2
+#define RMARGIN 2
+/* for some reason, it draws text 1 pixel lower on Mac OS X (& linux too?) */
+#ifndef MSW
 #define TMARGIN 2
 #define BMARGIN 2
+#else
+#define TMARGIN 3
+#define BMARGIN 1
+#endif
 
 #define SEND_FIRST 1
 #define SEND_UPDATE 2
@@ -150,7 +156,7 @@ extern int sys_oldtclversion;
 static void rtext_senditup(t_rtext *x, int action, int *widthp, int *heightp,
     int *indexp)
 {
-    float dispx, dispy;
+    t_float dispx, dispy;
     char smallbuf[200], *tempbuf;
     int outchars = 0, nlines = 0, ncolumns = 0,
         pixwide, pixhigh, font, fontwidth, fontheight, findx, findy;

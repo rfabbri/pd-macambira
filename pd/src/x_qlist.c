@@ -18,9 +18,9 @@ typedef struct _qlist
     void *x_binbuf;
     int x_onset;                /* playback position */
     t_clock *x_clock;
-    float x_tempo;
+    t_float x_tempo;
     double x_whenclockset;
-    float x_clockdelay;
+    t_float x_clockdelay;
     t_symbol *x_dir;
     t_canvas *x_canvas;
     int x_reentered;
@@ -100,7 +100,8 @@ static void qlist_donext(t_qlist *x, int drop, int automatic)
             if (ap->a_type != A_SYMBOL) continue;
             else if (!(target = ap->a_w.w_symbol->s_thing))
             {
-                error("qlist: %s: no such object", ap->a_w.w_symbol->s_name);
+                pd_error(x, "qlist: %s: no such object",
+                    ap->a_w.w_symbol->s_name);
                 continue;
             }
             ap++;
@@ -180,10 +181,10 @@ static void qlist_read(t_qlist *x, t_symbol *filename, t_symbol *format)
     if (!strcmp(format->s_name, "cr"))
         cr = 1;
     else if (*format->s_name)
-        error("qlist_read: unknown flag: %s", format->s_name);
+        pd_error(x, "qlist_read: unknown flag: %s", format->s_name);
 
     if (binbuf_read_via_canvas(x->x_binbuf, filename->s_name, x->x_canvas, cr))
-            error("%s: read failed", filename->s_name);
+            pd_error(x, "%s: read failed", filename->s_name);
     x->x_onset = 0x7fffffff;
     x->x_reentered = 1;
 }
@@ -197,9 +198,9 @@ static void qlist_write(t_qlist *x, t_symbol *filename, t_symbol *format)
     if (!strcmp(format->s_name, "cr"))
         cr = 1;
     else if (*format->s_name)
-        error("qlist_read: unknown flag: %s", format->s_name);
+        pd_error(x, "qlist_read: unknown flag: %s", format->s_name);
     if (binbuf_write(x->x_binbuf, buf, "", cr))
-            error("%s: write failed", filename->s_name);
+            pd_error(x, "%s: write failed", filename->s_name);
 }
 
 static void qlist_print(t_qlist *x)
@@ -210,14 +211,14 @@ static void qlist_print(t_qlist *x)
 
 static void qlist_tempo(t_qlist *x, t_float f)
 {
-    float newtempo;
+    t_float newtempo;
     if (f < 1e-20) f = 1e-20;
     else if (f > 1e20) f = 1e20;
     newtempo = 1./f;
     if (x->x_whenclockset != 0)
     {
-        float elapsed = clock_gettimesince(x->x_whenclockset);
-        float left = x->x_clockdelay - elapsed;
+        t_float elapsed = clock_gettimesince(x->x_whenclockset);
+        t_float left = x->x_clockdelay - elapsed;
         if (left < 0) left = 0;
         left *= newtempo / x->x_tempo;
         clock_delay(x->x_clock, left);

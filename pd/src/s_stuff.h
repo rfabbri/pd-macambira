@@ -68,7 +68,7 @@ extern int sys_inchannels;
 extern int sys_outchannels;
 extern int sys_advance_samples; /* scheduler advance in samples */
 extern int sys_blocksize;       /* audio I/O block size in sample frames */
-extern float sys_dacsr;
+extern t_float sys_dacsr;
 extern int sys_schedadvance;
 extern int sys_sleepgrain;
 void sys_set_audio_settings(int naudioindev, int *audioindev,
@@ -83,7 +83,7 @@ int sys_send_dacs(void);
 void sys_reportidle(void);
 void sys_set_priority(int higher);
 void sys_audiobuf(int nbufs);
-void sys_getmeters(float *inmax, float *outmax);
+void sys_getmeters(t_sample *inmax, t_sample *outmax);
 void sys_listdevs(void);
 void sys_setblocksize(int n);
 
@@ -286,9 +286,6 @@ void sys_save_audio_params(
 typedef void (*t_printhook)(const char *s);
 extern t_printhook sys_printhook;  /* set this to override printing */
 extern int sys_printtostderr;
-#ifdef MSW
-#define vsnprintf  _vsnprintf /* jsarlo -- alias this name for msw */
-#endif
 
 /* jsarlo { */
 
@@ -302,7 +299,7 @@ EXTERN int* get_sys_main_advance(void ) ;
 EXTERN double* get_sys_time_per_dsp_tick(void ) ;
 EXTERN int* get_sys_schedblocksize(void ) ;
 EXTERN double* get_sys_time(void ) ;
-EXTERN float* get_sys_dacsr(void ) ;
+EXTERN t_float* get_sys_dacsr(void ) ;
 EXTERN int* get_sys_sleepgrain(void ) ;
 EXTERN int* get_sys_schedadvance(void ) ;
 

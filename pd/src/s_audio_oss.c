@@ -42,8 +42,8 @@ typedef int32_t t_oss_int32;
 
 /* GLOBALS */
 static int linux_meters;        /* true if we're metering */
-static float linux_inmax;       /* max input amplitude */
-static float linux_outmax;      /* max output amplitude */
+static t_sample linux_inmax;       /* max input amplitude */
+static t_sample linux_outmax;      /* max output amplitude */
 static int linux_fragsize = 0;  /* for block mode; block size (sample frames) */
 
 /* our device handles */
@@ -64,7 +64,7 @@ static int linux_noutdevs = 0;
 static int linux_nindevs = 0;
 
     /* exported variables */
-float sys_dacsr;
+t_float sys_dacsr;
 t_sample *sys_soundout;
 t_sample *sys_soundin;
 
@@ -245,8 +245,27 @@ void oss_configure(t_oss_dev *dev, int srate, int dac, int skipblocksize)
 
 static int oss_setchannels(int fd, int wantchannels, char *devname)
 {
-    int param = wantchannels;
-
+    int param;
+    if (sys_verbose)
+        post("setchan %d", wantchannels);
+    if (ioctl(fd, SNDCTL_DSP_CHANNELS, &param) == -1)
+    {
+        if (sys_verbose)
+            error("OSS: SOUND_DSP_READ_CHANNELS failed %s", devname);
+    }
+    else
+    {
+        if (sys_verbose)
+            post("channels originally %d for %s", param, devname);
+        if (param == wantchannels)
+        {
+            if (sys_verbose)
+                post("number of channels doesn't need setting\n");
+            return (wantchannels);
+        }
+    }
+    param = wantchannels;
+whynot:    
     while (param > 1)
     {
         int save = param;
@@ -399,10 +418,12 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
         sys_setalarm(1000000);
 
             /* perhaps it's already open from the above? */
-        if (linux_dacs[n].d_fd >= 0)
+        if (linux_adcs[n].d_fd >= 0)
         {
             fd = linux_adcs[n].d_fd;
             alreadyopened = 1;
+            if (sys_verbose)
+                post("already opened it");
         }
         else
         {
@@ -624,7 +645,7 @@ static void oss_doresync( void)
 
 int oss_send_dacs(void)
 {
-    float *fp1, *fp2;
+    t_sample *fp1, *fp2;
     long fill;
     int i, j, dev, rtnval = SENDDACS_YES;
     char buf[OSS_MAXSAMPLEWIDTH * DEFDACBLKSIZE * OSS_MAXCHPERDEV];
@@ -758,7 +779,7 @@ int oss_send_dacs(void)
         thischan += nchannels;
     }
     memset(sys_soundout, 0,
-        sys_outchannels * (sizeof(float) * DEFDACBLKSIZE));
+        sys_outchannels * (sizeof(t_sample) * DEFDACBLKSIZE));
 
         /* do input */
 

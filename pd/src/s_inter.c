@@ -90,7 +90,6 @@ struct _socketreceiver
 
 extern char *pd_version;
 extern int sys_guisetportnumber;
-extern char sys_font[]; /* tb: typeface */
 
 static int sys_nfdpoll;
 static t_fdpoll *sys_fdpoll;
@@ -849,7 +848,8 @@ void glob_watchdog(t_pd *dummy)
 
 #define FIRSTPORTNUM 5400
 
-static int defaultfontshit[] = {
+#define MAXFONTS 21
+static int defaultfontshit[MAXFONTS] = {
     8, 5, 9, 10, 6, 10, 12, 7, 13, 14, 9, 17, 16, 10, 19, 24, 15, 28,
         24, 15, 28};
 #define NDEFAULTFONT (sizeof(defaultfontshit)/sizeof(*defaultfontshit))
@@ -1237,7 +1237,7 @@ int sys_startgui(const char *guidir)
         sys_guisock = accept(xsock, (struct sockaddr *) &server, 
             (socklen_t *)&len);
 #ifdef OOPS
-        close(xsock);
+        sys_closesocket(xsock);
 #endif
         if (sys_guisock < 0) sys_sockerror("accept");
         if (sys_verbose)
@@ -1257,8 +1257,8 @@ int sys_startgui(const char *guidir)
 #endif
          sys_get_audio_apis(buf);
          sys_get_midi_apis(buf2);
-         sys_vgui("pdtk_pd_startup {%s} %s %s {%s}\n", pd_version, buf, buf2,
-                                  sys_font); 
+         sys_vgui("pdtk_pd_startup {%s} %s %s {%s} %s\n", pd_version, buf, buf2, 
+                  sys_font, sys_fontweight); 
     }
     return (0);
 
@@ -1292,7 +1292,7 @@ void glob_quit(void *dummy)
     sys_vgui("exit\n");
     if (!sys_nogui)
     {
-        close(sys_guisock);
+        sys_closesocket(sys_guisock);
         sys_rmpollfn(sys_guisock);
     }
     sys_bail(0); 

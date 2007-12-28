@@ -15,7 +15,7 @@ static t_class *print_class;
 typedef struct _print
 {
     t_object x_obj;
-    float x_f;
+    t_float x_f;
     t_symbol *x_sym;
     int x_count;
 } t_print;
@@ -23,22 +23,17 @@ typedef struct _print
 static t_int *print_perform(t_int *w)
 {
     t_print *x = (t_print *)(w[1]);
-    t_float *in = (t_float *)(w[2]);
+    t_sample *in = (t_sample *)(w[2]);
     int n = (int)(w[3]);
     if (x->x_count)
     {
-        post("%s:", x->x_sym->s_name);
-        if (n == 1) post("%8g", in[0]);
-        else if (n == 2) post("%8g %8g", in[0], in[1]);
-        else if (n == 4) post("%8g %8g %8g %8g",
-            in[0], in[1], in[2], in[3]);
-        else while (n > 0)
-        {
-            post("%-8.5g %-8.5g %-8.5g %-8.5g %-8.5g %-8.5g %-8.5g %-8.5g",
-                in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7]);
-            n -= 8;
-            in += 8;
+        int i=0;
+        startpost("%s:", x->x_sym->s_name);
+        for(i=0; i<n; i++) {
+          if(i%8==0)endpost();
+          startpost("%-8.5g", in[i]);
         }
+        endpost();
         x->x_count--;
     }
     return (w+4);

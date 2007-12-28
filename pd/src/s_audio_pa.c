@@ -28,6 +28,8 @@ static t_audiocallback pa_callback;
 #define MAX_PA_CHANS 32
 #define MAX_SAMPLES_PER_FRAME MAX_PA_CHANS * DEFDACBLKSIZE
 
+int pa_foo;
+
 static int pa_lowlevel_callback(const void *inputBuffer,
     void *outputBuffer, unsigned long framesPerBuffer,
     const PaStreamCallbackTimeInfo *outTime, PaStreamCallbackFlags myflags, 
@@ -36,10 +38,12 @@ static int pa_lowlevel_callback(const void *inputBuffer,
     int i; 
     unsigned int j;
     float *fbuf, *fp2, *fp3, *soundiop;
-        if (framesPerBuffer != DEFDACBLKSIZE)
-        {
-                fprintf(stderr, "ignoring buffer size %d\n", framesPerBuffer);
-                return;
+    if (pa_foo)
+       fprintf(stderr, "pa_lowlevel_callback\n");
+    if (framesPerBuffer != DEFDACBLKSIZE)
+    {
+        fprintf(stderr, "ignoring buffer size %d\n", (int)framesPerBuffer);
+        return 0;
     }
         if (inputBuffer != NULL)
     {
@@ -51,6 +55,8 @@ static int pa_lowlevel_callback(const void *inputBuffer,
     }
     else memset((void *)pa_soundin, 0,
         framesPerBuffer * pa_inchans * sizeof(float));
+    memset((void *)pa_soundout, 0,
+        framesPerBuffer * pa_outchans * sizeof(float));
     (*pa_callback)();
     if (outputBuffer != NULL)
     {
@@ -60,7 +66,8 @@ static int pa_lowlevel_callback(const void *inputBuffer,
             for (j = 0, fp3 = fp2; j < framesPerBuffer; j++, fp3 += pa_outchans)
                 *fp3 = *soundiop++;
     }
-
+    if (pa_foo)
+        fprintf(stderr, "done pa_lowlevel_callback\n"); 
     return 0;
 }
 
@@ -153,8 +160,7 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
     int j, devno, pa_indev = 0, pa_outdev = 0;
     
     pa_callback = callbackfn;
-    if (callbackfn)
-        fprintf(stderr, "callback enabled\n");
+    /* fprintf(stderr, "open callback %d\n", (callbackfn != 0)); */
     if (!initialized)
     {
         /* Initialize PortAudio  */
@@ -254,6 +260,7 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
 
 void pa_close_audio( void)
 {
+    /* fprintf(stderr, "close\n"); */
     if (pa_inchans || pa_outchans)
         CloseAudioStream( pa_stream );
     pa_inchans = pa_outchans = 0;

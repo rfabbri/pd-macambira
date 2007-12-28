@@ -58,7 +58,13 @@ int sys_nmidiin = -1;
 int sys_midiindevlist[MAXMIDIINDEV] = {1};
 int sys_midioutdevlist[MAXMIDIOUTDEV] = {1};
 
-char sys_font[100] = "courier"; /* tb: font name */
+char sys_font[100] = 
+#ifdef MSW
+    "Courier";
+#else
+    "Courier";
+#endif
+char sys_fontweight[] = "bold  "; /* currently only used for iemguis */
 static int sys_main_srate;
 static int sys_main_advance;
 static int sys_main_callback;
@@ -89,7 +95,7 @@ int* get_sys_main_advance() { return &sys_main_advance; }
 double* get_sys_time_per_dsp_tick() { return &sys_time_per_dsp_tick; }
 int* get_sys_schedblocksize() { return &sys_schedblocksize; }
 double* get_sys_time() { return &sys_time; }
-float* get_sys_dacsr() { return &sys_dacsr; }
+t_float* get_sys_dacsr() { return &sys_dacsr; }
 int* get_sys_sleepgrain() { return &sys_sleepgrain; }
 int* get_sys_schedadvance() { return &sys_schedadvance; }
 
@@ -159,11 +165,7 @@ int sys_fontheight(int fontsize)
 }
 
 int sys_defaultfont;
-#ifdef MSW
-#define DEFAULTFONT 12
-#else
 #define DEFAULTFONT 10
-#endif
 
 static void openit(const char *dirname, const char *filename)
 {
@@ -383,8 +385,9 @@ static char *(usagemessage[]) = {
 "-helppath <path> -- add to help file search path\n",
 "-open <file>     -- open file(s) on startup\n",
 "-lib <file>      -- load object library(s)\n",
-"-font <n>        -- specify default font size in points\n",
-"-typeface <name> -- specify default font (default: courier)\n",
+"-font-size <n>     -- specify default font size in points\n",
+"-font-face <name>  -- specify default font (default: Bitstream Vera Sans Mono)\n",
+"-font-weight <name>-- specify default font weight (normal or bold)\n",
 "-verbose         -- extra printout on startup and when searching for files\n",
 "-version         -- don't run Pd; just print out which version it is \n",
 "-d <n>           -- specify debug level\n",
@@ -744,21 +747,26 @@ int sys_argparse(int argc, char **argv)
             sys_externlist = namelist_append_files(sys_externlist, argv[1]);
             argc -= 2; argv += 2;
         }
-        else if (!strcmp(*argv, "-font") && argc > 1)
+        else if ((!strcmp(*argv, "-font-size") || !strcmp(*argv, "-font")) && argc > 1)
         {
             sys_defaultfont = sys_nearestfontsize(atoi(argv[1]));
             argc -= 2;
             argv += 2;
         }
-                /* tb: font name { */
-        else if (!strcmp(*argv, "-typeface") && argc > 1)
+        else if ((!strcmp(*argv, "-font-face") || !strcmp(*argv, "-typeface")) && argc > 1)
         {
             strncpy(sys_font,*(argv+1),sizeof(sys_font)-1);
             sys_font[sizeof(sys_font)-1] = 0;
             argc -= 2;
             argv += 2;
         }
-                /* } tb */
+        else if (!strcmp(*argv, "-font-weight") && argc > 1)
+        {
+            strncpy(sys_fontweight,*(argv+1),sizeof(sys_fontweight)-1);
+            sys_fontweight[sizeof(sys_fontweight)-1] = 0;
+            argc -= 2;
+            argv += 2;
+        }
         else if (!strcmp(*argv, "-verbose"))
         {
             sys_verbose++;
@@ -814,14 +822,16 @@ int sys_argparse(int argc, char **argv)
         else if (!strcmp(*argv, "-schedlib"))
         {
             sys_externalschedlib = 1;
-            strcpy(sys_externalschedlibname, argv[1]);
+            strncpy(sys_externalschedlibname, argv[1],
+                sizeof(sys_externalschedlibname) - 1);
             argv += 2;
             argc -= 2;
         }
         else if (!strcmp(*argv, "-extraflags"))
         {
             sys_extraflags = 1;
-            strcpy(sys_extraflagsstring, argv[1]);
+            strncpy(sys_extraflagsstring, argv[1],
+                sizeof(sys_extraflagsstring) - 1);
             argv += 2;
             argc -= 2;
         }
