@@ -2,7 +2,7 @@
 #define PA_LINUX_ALSA_H
 
 /*
- * $Id: pa_linux_alsa.h,v 1.1 2007-08-18 23:49:33 millerpuckette Exp $
+ * $Id: pa_linux_alsa.h,v 1.2 2007-12-28 03:28:29 millerpuckette Exp $
  * PortAudio Portable Real-Time Audio Library
  * ALSA-specific extensions
  *
