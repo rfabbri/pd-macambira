@@ -1,6 +1,6 @@
 pool - a hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2006 Thomas Grill (gr@grrrr.org)
+Copyright (c) 2002-2008 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -87,6 +87,7 @@ Version history:
 - fixed handling of non-ASCII-characters
 - XML files are now encoded UTF-8
 - implemented output sorting (ogetall, ogetrec, ogetsub)
+- fixed some potential buffer overrun problems
 
 0.2.1:
 - fixed "cntsub"... directories in current directory have been forgotten

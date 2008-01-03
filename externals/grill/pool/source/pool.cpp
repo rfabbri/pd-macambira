@@ -1,19 +1,21 @@
 /* 
-
 pool - hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2006 Thomas Grill (gr@grrrr.org)
+Copyright (c) 2002-2008 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
+$LastChangedRevision: 26 $
+$LastChangedDate: 2008-01-03 16:14:29 +0100 (Thu, 03 Jan 2008) $
+$LastChangedBy: thomas $
 */
 
 #include "pool.h"
-
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <fstream>
+#include <vector>
 
 #if FLEXT_OS == FLEXT_OS_WIN
 #include <windows.h> // for charset conversion functions
@@ -114,10 +116,10 @@ using namespace std;
 
 
 
-inline I compare(I a,I b) { return a == b?0:(a < b?-1:1); }
-inline I compare(F a,F b) { return a == b?0:(a < b?-1:1); }
+inline int compare(int a,int b) { return a == b?0:(a < b?-1:1); }
+inline int compare(float a,float b) { return a == b?0:(a < b?-1:1); }
 
-static I compare(const S *a,const S *b) 
+static int compare(const t_symbol *a,const t_symbol *b) 
 {
 	if(a == b)
 		return 0;
@@ -125,7 +127,7 @@ static I compare(const S *a,const S *b)
 		return strcmp(flext::GetString(a),flext::GetString(b));
 }
 
-static I compare(const A &a,const A &b) 
+static int compare(const t_atom &a,const t_atom &b) 
 {
 	if(flext::GetType(a) == flext::GetType(b)) {
 		switch(flext::GetType(a)) {
@@ -151,7 +153,7 @@ static I compare(const A &a,const A &b)
 }
 
 
-poolval::poolval(const A &k,AtomList *d):
+poolval::poolval(const t_atom &k,AtomList *d):
 	data(d),nxt(NULL)
 {
 	SetAtom(key,k);
@@ -177,7 +179,7 @@ poolval *poolval::Dup() const
 }
 
 
-pooldir::pooldir(const A &d,pooldir *p,I vcnt,I dcnt):
+pooldir::pooldir(const t_atom &d,pooldir *p,int vcnt,int dcnt):
 	parent(p),nxt(NULL),vals(NULL),dirs(NULL),
 	vbits(Int2Bits(vcnt)),dbits(Int2Bits(dcnt)),
 	vsize(1<<vbits),dsize(1<<dbits)
@@ -193,10 +195,10 @@ pooldir::~pooldir()
     FLEXT_ASSERT(nxt == NULL);
 }
 
-V pooldir::Clear(BL rec,BL dironly)
+void pooldir::Clear(bool rec,bool dironly)
 {
 	if(rec && dirs) { 
-        for(I i = 0; i < dsize; ++i) {
+        for(int i = 0; i < dsize; ++i) {
             pooldir *d = dirs[i].d,*d1; 
             if(d) {
                 do {
@@ -210,7 +212,7 @@ V pooldir::Clear(BL rec,BL dironly)
         }
 	}
 	if(!dironly && vals) { 
-        for(I i = 0; i < vsize; ++i) {
+        for(int i = 0; i < vsize; ++i) {
             poolval *v = vals[i].v,*v1;
             if(v) {
                 do {
@@ -225,7 +227,7 @@ V pooldir::Clear(BL rec,BL dironly)
     }
 }
 
-V pooldir::Reset(BL realloc)
+void pooldir::Reset(bool realloc)
 {
 	Clear(true,false);
 
@@ -242,11 +244,11 @@ V pooldir::Reset(BL realloc)
 		dirs = NULL,vals = NULL;
 }
 
-pooldir *pooldir::AddDir(I argc,const A *argv,I vcnt,I dcnt)
+pooldir *pooldir::AddDir(int argc,const t_atom *argv,int vcnt,int dcnt)
 {
 	if(!argc) return this;
 
-	I c = 1,dix = DIdx(argv[0]);
+	int c = 1,dix = DIdx(argv[0]);
 	pooldir *prv = NULL,*ix = dirs[dix].d;
 	for(; ix; prv = ix,ix = ix->nxt) {
 		c = compare(argv[0],ix->dir);
@@ -266,11 +268,11 @@ pooldir *pooldir::AddDir(I argc,const A *argv,I vcnt,I dcnt)
 	return ix->AddDir(argc-1,argv+1);
 }
 
-pooldir *pooldir::GetDir(I argc,const A *argv,BL rmv)
+pooldir *pooldir::GetDir(int argc,const t_atom *argv,bool rmv)
 {
 	if(!argc) return this;
 
-	I c = 1,dix = DIdx(argv[0]);
+	int c = 1,dix = DIdx(argv[0]);
 	pooldir *prv = NULL,*ix = dirs[dix].d;
 	for(; ix; prv = ix,ix = ix->nxt) {
 		c = compare(argv[0],ix->dir);
@@ -295,7 +297,7 @@ pooldir *pooldir::GetDir(I argc,const A *argv,BL rmv)
 	}
 }
 
-BL pooldir::DelDir(I argc,const A *argv)
+bool pooldir::DelDir(int argc,const t_atom *argv)
 {
 	pooldir *pd = GetDir(argc,argv,true);
 	if(pd && pd != this) {
@@ -306,9 +308,9 @@ BL pooldir::DelDir(I argc,const A *argv)
 		return false;
 }
 
-V pooldir::SetVal(const A &key,AtomList *data,BL over)
+void pooldir::SetVal(const t_atom &key,AtomList *data,bool over)
 {
-    I c = 1,vix = VIdx(key);
+    int c = 1,vix = VIdx(key);
 	poolval *prv = NULL,*ix = vals[vix].v;
 	for(; ix; prv = ix,ix = ix->nxt) {
 		c = compare(key,ix->key);
@@ -345,7 +347,7 @@ V pooldir::SetVal(const A &key,AtomList *data,BL over)
 	}
 }
 
-BL pooldir::SetVali(I rix,AtomList *data)
+bool pooldir::SetVali(int rix,AtomList *data)
 {
     poolval *prv = NULL,*ix = NULL;
     int vix;
@@ -378,9 +380,9 @@ BL pooldir::SetVali(I rix,AtomList *data)
         return false;
 }
 
-poolval *pooldir::RefVal(const A &key)
+poolval *pooldir::RefVal(const t_atom &key)
 {
-	I c = 1,vix = VIdx(key);
+	int c = 1,vix = VIdx(key);
 	poolval *ix = vals[vix].v;
 	for(; ix; ix = ix->nxt) {
 		c = compare(key,ix->key);
@@ -390,9 +392,9 @@ poolval *pooldir::RefVal(const A &key)
 	return c || !ix?NULL:ix;
 }
 
-poolval *pooldir::RefVali(I rix)
+poolval *pooldir::RefVali(int rix)
 {
-	for(I vix = 0; vix < vsize; ++vix) 
+	for(int vix = 0; vix < vsize; ++vix) 
 		if(rix > vals[vix].cnt) rix -= vals[vix].cnt;
 		else {
 			poolval *ix = vals[vix].v;
@@ -402,15 +404,15 @@ poolval *pooldir::RefVali(I rix)
 	return NULL;
 }
 
-flext::AtomList *pooldir::PeekVal(const A &key)
+flext::AtomList *pooldir::PeekVal(const t_atom &key)
 {
 	poolval *ix = RefVal(key);
 	return ix?ix->data:NULL;
 }
 
-flext::AtomList *pooldir::GetVal(const A &key,BL cut)
+flext::AtomList *pooldir::GetVal(const t_atom &key,bool cut)
 {
-	I c = 1,vix = VIdx(key);
+	int c = 1,vix = VIdx(key);
 	poolval *prv = NULL,*ix = vals[vix].v;
 	for(; ix; prv = ix,ix = ix->nxt) {
 		c = compare(key,ix->key);
@@ -436,21 +438,21 @@ flext::AtomList *pooldir::GetVal(const A &key,BL cut)
 	}
 }
 
-I pooldir::CntAll() const
+int pooldir::CntAll() const
 {
-	I cnt = 0;
-	for(I vix = 0; vix < vsize; ++vix) cnt += vals[vix].cnt;
+	int cnt = 0;
+	for(int vix = 0; vix < vsize; ++vix) cnt += vals[vix].cnt;
 	return cnt;
 }
 
-I pooldir::PrintAll(char *buf,int len) const
+int pooldir::PrintAll(char *buf,int len) const
 {
     int offs = strlen(buf);
 
-    I cnt = 0;
-    for(I vix = 0; vix < vsize; ++vix) {
+    int cnt = 0;
+    for(int vix = 0; vix < vsize; ++vix) {
 		poolval *ix = vals[vix].v;
-        for(I i = 0; ix; ++i,ix = ix->nxt) {
+        for(int i = 0; ix; ++i,ix = ix->nxt) {
 			PrintAtom(ix->key,buf+offs,len-offs);
             strcat(buf+offs," , ");
             int l = strlen(buf+offs)+offs;
@@ -465,26 +467,26 @@ I pooldir::PrintAll(char *buf,int len) const
 	return cnt;
 }
 
-I pooldir::GetKeys(AtomList &keys)
+int pooldir::GetKeys(AtomList &keys)
 {
-	I cnt = CntAll();
+	int cnt = CntAll();
 	keys(cnt);
 
-	for(I vix = 0; vix < vsize; ++vix) {
+	for(int vix = 0; vix < vsize; ++vix) {
 		poolval *ix = vals[vix].v;
-		for(I i = 0; ix; ++i,ix = ix->nxt) 
+		for(int i = 0; ix; ++i,ix = ix->nxt) 
 			SetAtom(keys[i],ix->key);
 	}
 	return cnt;
 }
 
-I pooldir::GetAll(A *&keys,Atoms *&lst,BL cut)
+int pooldir::GetAll(t_atom *&keys,Atoms *&lst,bool cut)
 {
-	I cnt = CntAll();
-	keys = new A[cnt];
+	int cnt = CntAll();
+	keys = new t_atom[cnt];
 	lst = new Atoms[cnt];
 
-	for(I i = 0,vix = 0; vix < vsize; ++vix) {
+	for(int i = 0,vix = 0; vix < vsize; ++vix) {
 		poolval *ix = vals[vix].v;
 		for(; ix; ++i) {
 			SetAtom(keys[i],ix->key);
@@ -504,19 +506,19 @@ I pooldir::GetAll(A *&keys,Atoms *&lst,BL cut)
 }
 
 
-I pooldir::CntSub() const
+int pooldir::CntSub() const
 {
-	I cnt = 0;
-	for(I dix = 0; dix < dsize; ++dix) cnt += dirs[dix].cnt;
+	int cnt = 0;
+	for(int dix = 0; dix < dsize; ++dix) cnt += dirs[dix].cnt;
 	return cnt;
 }
 
 
-I pooldir::GetSub(const A **&lst)
+int pooldir::GetSub(const t_atom **&lst)
 {
-	const I cnt = CntSub();
-	lst = new const A *[cnt];
-	for(I i = 0,dix = 0; i < cnt; ++dix) {
+	const int cnt = CntSub();
+	lst = new const t_atom *[cnt];
+	for(int i = 0,dix = 0; i < cnt; ++dix) {
 		pooldir *ix = dirs[dix].d;
 		for(; ix; ix = ix->nxt) lst[i++] = &ix->dir;
 	}
@@ -524,18 +526,18 @@ I pooldir::GetSub(const A **&lst)
 }
 
 
-BL pooldir::Paste(const pooldir *p,I depth,BL repl,BL mkdir)
+bool pooldir::Paste(const pooldir *p,int depth,bool repl,bool mkdir)
 {
-	BL ok = true;
+	bool ok = true;
 
-	for(I vi = 0; vi < p->vsize; ++vi) {
+	for(int vi = 0; vi < p->vsize; ++vi) {
 		for(poolval *ix = p->vals[vi].v; ix; ix = ix->nxt) {
 			SetVal(ix->key,new Atoms(*ix->data),repl);
 		}
 	}
 
 	if(ok && depth) {
-		for(I di = 0; di < p->dsize; ++di) {
+		for(int di = 0; di < p->dsize; ++di) {
 			for(pooldir *dix = p->dirs[di].d; ok && dix; dix = dix->nxt) {
 				pooldir *ndir = mkdir?AddDir(1,&dix->dir):GetDir(1,&dix->dir);
 				if(ndir) { 
@@ -548,12 +550,12 @@ BL pooldir::Paste(const pooldir *p,I depth,BL repl,BL mkdir)
 	return ok;
 }
 
-BL pooldir::Copy(pooldir *p,I depth,BL cut)
+bool pooldir::Copy(pooldir *p,int depth,bool cut)
 {
-	BL ok = true;
+	bool ok = true;
 
 	if(cut) {
-		for(I vi = 0; vi < vsize; ++vi) {
+		for(int vi = 0; vi < vsize; ++vi) {
 			for(poolval *ix = vals[vi].v; ix; ix = ix->nxt)
 				p->SetVal(ix->key,ix->data);
 			vals[vi].cnt = 0;
@@ -561,7 +563,7 @@ BL pooldir::Copy(pooldir *p,I depth,BL cut)
 		}
 	}
 	else {
-		for(I vi = 0; vi < vsize; ++vi) {
+		for(int vi = 0; vi < vsize; ++vi) {
 			for(poolval *ix = vals[vi].v; ix; ix = ix->nxt) {
 				p->SetVal(ix->key,new Atoms(*ix->data));
 			}
@@ -569,7 +571,7 @@ BL pooldir::Copy(pooldir *p,I depth,BL cut)
 	}
 
 	if(ok && depth) {
-		for(I di = 0; di < dsize; ++di) {
+		for(int di = 0; di < dsize; ++di) {
 			for(pooldir *dix = dirs[di].d; ok && dix; dix = dix->nxt) {
 				pooldir *ndir = p->AddDir(1,&dix->dir);
 				if(ndir)
@@ -585,7 +587,7 @@ BL pooldir::Copy(pooldir *p,I depth,BL cut)
 
 static bool _isspace(char c) { return c > 0 && isspace(c); }
 
-static const char *ReadAtom(const char *c,A &a,bool utf8)
+static const char *ReadAtom(const char *c,t_atom &a,bool utf8)
 {
 	// skip leading whitespace (NON-ASCII character are < 0)
 	while(*c && _isspace(*c)) ++c;
@@ -653,9 +655,9 @@ static const char *ReadAtom(const char *c,A &a,bool utf8)
 #if FLEXT_OS == FLEXT_OS_WIN
             wchar_t wtmp[1024];
             int err = MultiByteToWideChar(CP_UTF8,0,tmp,strlen(tmp),wtmp,1024);
-            if(!err) return false;
+            if(!err) return NULL;
             err = WideCharToMultiByte(CP_ACP,0,wtmp,err,tmp,1024,NULL,FALSE);
-            if(!err) return false;
+            if(!err) return NULL;
             tmp[err] = 0;
 			c = tmp;
 #elif FLEXT_OS == FLEXT_OS_MAC
@@ -667,7 +669,7 @@ static const char *ReadAtom(const char *c,A &a,bool utf8)
 
 			TECObjectRef converter;
 			OSStatus status = TECCreateConverter(&converter,inconv,outconv);
-			if(status) return false;
+			if(status) return NULL;
 			
 			ByteCount inlen,outlen;
 			status = TECConvertText(
@@ -679,12 +681,12 @@ static const char *ReadAtom(const char *c,A &a,bool utf8)
 	
 			TECDisposeConverter(converter);
 			c = ctmp;
-			if(status) return false;
+			if(status) return NULL;
 #else
             wchar_t wtmp[1024];
 			size_t len = mbstowcs(wtmp,tmp,1024);
 			if(len < 0) return false;
-			if(!WCStoUTF8(tmp,wtmp,sizeof(tmp))) return false;
+			if(!WCStoUTF8(tmp,wtmp,sizeof(tmp))) return NULL;
 			c = tmp;
 #endif
 		}
@@ -696,35 +698,39 @@ static const char *ReadAtom(const char *c,A &a,bool utf8)
 	return c;
 }
 
-static BL ParseAtoms(C *tmp,flext::AtomList &l,bool utf8)
+static bool ParseAtoms(const char *tmp,flext::AtomList &l,bool utf8)
 {
-    const int MAXATOMS = 1024;
-    int cnt = 0;
-    t_atom atoms[MAXATOMS];
-    for(const char *t = tmp; *t && cnt < MAXATOMS; ++cnt) {
-		t = ReadAtom(t,atoms[cnt],utf8);
-        if(!t) break;
+    FLEXT_ASSERT(tmp);
+    vector<t_atom> atoms;
+    while(*tmp) {
+        t_atom at;
+		tmp = ReadAtom(tmp,at,utf8);
+        if(!tmp) break;
+        atoms.push_back(at);
     }
-    l(cnt,atoms);
-	return true;
+    l(atoms.size(),&atoms[0]);
+    return true;
 }
 
-static BL ParseAtoms(string &s,flext::AtomList &l,bool utf8) 
+static bool ParseAtoms(string &s,flext::AtomList &l,bool utf8) 
 { 
-    return ParseAtoms((C *)s.c_str(),l,utf8); 
+    return ParseAtoms((char *)s.c_str(),l,utf8); 
 }
 
-static bool ReadAtoms(istream &is,flext::AtomList &l,C del,bool utf8)
+static bool ReadAtoms(istream &is,flext::AtomList &l,char del,bool utf8)
 {
-	char tmp[1024];
-	is.getline(tmp,sizeof tmp,del); 
-	if(is.eof() || !is.good()) 
-        return false;
-    else
-        return ParseAtoms(tmp,l,utf8);
+    vector<char> tmp;
+    for(;;) {
+        char c = is.get();
+        if(is.eof() || c == del) break;
+        tmp.push_back(c);
+    }
+    tmp.push_back(0); // end-of-string marker
+
+	return is.good() && ParseAtoms(&tmp[0],l,utf8);
 }
 
-static bool WriteAtom(ostream &os,const A &a,bool utf8)
+static bool WriteAtom(ostream &os,const t_atom &a,bool utf8)
 {
 	if(flext::IsFloat(a))
 		os << flext::GetFloat(a);
@@ -791,17 +797,17 @@ static bool WriteAtom(ostream &os,const A &a,bool utf8)
 
 static void WriteAtoms(ostream &os,const flext::AtomList &l,bool utf8)
 {
-	for(I i = 0; i < l.Count(); ++i) {
+	for(int i = 0; i < l.Count(); ++i) {
 		WriteAtom(os,l[i],utf8);
 		if(i < l.Count()-1) os << ' ';
 	}
 }
 
-BL pooldir::LdDir(istream &is,I depth,BL mkdir)
+bool pooldir::LdDir(istream &is,int depth,bool mkdir)
 {
-	for(I i = 1; !is.eof(); ++i) {
+	for(int i = 1; !is.eof(); ++i) {
 		Atoms d,k,*v = new Atoms;
-		BL r = 
+		bool r = 
             ReadAtoms(is,d,',',false) && 
             ReadAtoms(is,k,',',false) &&
             ReadAtoms(is,*v,'\n',false);
@@ -830,10 +836,10 @@ BL pooldir::LdDir(istream &is,I depth,BL mkdir)
 	return true;
 }
 
-BL pooldir::SvDir(ostream &os,I depth,const AtomList &dir)
+bool pooldir::SvDir(ostream &os,int depth,const AtomList &dir)
 {
-    I cnt = 0;
-	for(I vi = 0; vi < vsize; ++vi) {
+    int cnt = 0;
+	for(int vi = 0; vi < vsize; ++vi) {
 		for(poolval *ix = vals[vi].v; ix; ix = ix->nxt) {
 			WriteAtoms(os,dir,false);
 			os << " , ";
@@ -851,8 +857,8 @@ BL pooldir::SvDir(ostream &os,I depth,const AtomList &dir)
     }
 	if(depth) {
         // save sub-directories
-		I nd = depth > 0?depth-1:-1;
-		for(I di = 0; di < dsize; ++di) {
+		int nd = depth > 0?depth-1:-1;
+		for(int di = 0; di < dsize; ++di) {
 			for(pooldir *ix = dirs[di].d; ix; ix = ix->nxt) {
 				ix->SvDir(os,nd,Atoms(dir).Append(ix->dir));
 			}
@@ -865,7 +871,7 @@ class xmltag {
 public:
     string tag,attr;
     bool Ok() const { return tag.length() > 0; }
-    bool operator ==(const C *t) const { return !tag.compare(t); }
+    bool operator ==(const char *t) const { return !tag.compare(t); }
 
     void Clear() 
     { 
@@ -979,7 +985,7 @@ static void getvalue(istream &is,string &s)
     s = tmp;
 }
 
-BL pooldir::LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d)
+bool pooldir::LdDirXMLRec(istream &is,int depth,bool mkdir,AtomList &d)
 {
     Atoms k,v;
     bool inval = false,inkey = false,indata = false;
@@ -999,7 +1005,7 @@ BL pooldir::LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d)
                     (inval && (inkey || indata)) /* value */
                 )
             ) {
-                BL ret = true;
+                bool ret = true;
                 if(indata) {
                     if(v.Count())
                         post("pool - XML load: value data already given, ignoring new data");
@@ -1121,7 +1127,7 @@ BL pooldir::LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d)
     return true;
 }
 
-BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
+bool pooldir::LdDirXML(istream &is,int depth,bool mkdir)
 {
 	while(!is.eof()) {
         xmltag tag;
@@ -1147,12 +1153,12 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
     return true;
 }
 
-static void indent(ostream &s,I cnt) 
+static void indent(ostream &s,int cnt) 
 {
-    for(I i = 0; i < cnt; ++i) s << '\t';
+    for(int i = 0; i < cnt; ++i) s << '\t';
 }
 
-BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir,I ind)
+bool pooldir::SvDirXML(ostream &os,int depth,const AtomList &dir,int ind)
 {
 	int i,lvls = ind?(dir.Count()?1:0):dir.Count();
 
@@ -1165,7 +1171,7 @@ BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir,I ind)
 		os << "</key>" << endl;
 	}
 
-	for(I vi = 0; vi < vsize; ++vi) {
+	for(int vi = 0; vi < vsize; ++vi) {
 		for(poolval *ix = vals[vi].v; ix; ix = ix->nxt) {
             indent(os,ind+lvls);
             os << "<value><key>";
@@ -1177,8 +1183,8 @@ BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir,I ind)
 	}
 
 	if(depth) {
-		I nd = depth > 0?depth-1:-1;
-		for(I di = 0; di < dsize; ++di) {
+		int nd = depth > 0?depth-1:-1;
+		for(int di = 0; di < dsize; ++di) {
 			for(pooldir *ix = dirs[di].d; ix; ix = ix->nxt) {
 				ix->SvDirXML(os,nd,Atoms(dir).Append(ix->dir),ind+lvls);
 			}

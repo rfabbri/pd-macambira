@@ -1,11 +1,13 @@
 /* 
-
 pool - hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2006 Thomas Grill (gr@grrrr.org)
+Copyright (c) 2002-2008 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
+$LastChangedRevision: 26 $
+$LastChangedDate: 2008-01-03 16:14:29 +0100 (Thu, 03 Jan 2008) $
+$LastChangedBy: thomas $
 */
 
 #include "pool.h"
@@ -24,148 +26,148 @@ class pool:
 	FLEXT_HEADER_S(pool,flext_base,setup)
 
 public:
-	pool(I argc,const A *argv);
+	pool(int argc,const t_atom *argv);
 	virtual ~pool();
 
-	static V setup(t_classid);
+	static void setup(t_classid);
 	
-	virtual BL Init();
+	virtual bool Init();
 
 	pooldata *Pool() { return pl; }
 
 protected:
 
 	// switch to other pool
-	V ms_pool(const AtomList &l);
-	V mg_pool(AtomList &l);
+	void ms_pool(const AtomList &l);
+	void mg_pool(AtomList &l);
 
-    V mg_priv(bool &p) const { p = pl && pl->Private(); }
+    void mg_priv(bool &p) const { p = pl && pl->Private(); }
 
     // print some help message
-    static V m_help() { post("pool " POOL_VERSION " - hierarchical storage object, (C)2002-2006 Thomas Grill"); }
+    static void m_help() { post("pool " POOL_VERSION " - hierarchical storage object, (C)2002-2008 Thomas Grill"); }
 
 	// clear all data in pool
-	V m_reset();
+	void m_reset();
 
 	// handle directories
-	V m_getdir();
+	void m_getdir();
 
-	V m_mkdir(I argc,const A *argv,BL abs = true,BL chg = false); // make (and change) to dir
-	V m_mkchdir(I argc,const A *argv) { m_mkdir(argc,argv,true,true); } // make and change to dir
-	V m_chdir(I argc,const A *argv,BL abs = true);		// change to dir
-	V m_rmdir(I argc,const A *argv,BL abs = true);		// remove dir
-	V m_updir(I argc,const A *argv);		// one or more levels up
+	void m_mkdir(int argc,const t_atom *argv,bool abs = true,bool chg = false); // make (and change) to dir
+	void m_mkchdir(int argc,const t_atom *argv) { m_mkdir(argc,argv,true,true); } // make and change to dir
+	void m_chdir(int argc,const t_atom *argv,bool abs = true);		// change to dir
+	void m_rmdir(int argc,const t_atom *argv,bool abs = true);		// remove dir
+	void m_updir(int argc,const t_atom *argv);		// one or more levels up
 
-    V ms_curdir(const AtomList &l) { m_chdir(l.Count(),l.Atoms()); }
+    void ms_curdir(const AtomList &l) { m_chdir(l.Count(),l.Atoms()); }
 
-	V m_mksub(I argc,const A *argv) { m_mkdir(argc,argv,false); }
-	V m_mkchsub(I argc,const A *argv) { m_mkdir(argc,argv,false,true); }
-	V m_chsub(I argc,const A *argv) { m_chdir(argc,argv,false); }
-	V m_rmsub(I argc,const A *argv) { m_rmdir(argc,argv,false); }
+	void m_mksub(int argc,const t_atom *argv) { m_mkdir(argc,argv,false); }
+	void m_mkchsub(int argc,const t_atom *argv) { m_mkdir(argc,argv,false,true); }
+	void m_chsub(int argc,const t_atom *argv) { m_chdir(argc,argv,false); }
+	void m_rmsub(int argc,const t_atom *argv) { m_rmdir(argc,argv,false); }
 
 	// handle data
-	V m_set(I argc,const A *argv) { set(argc,argv,true); }
-	V m_seti(I argc,const A *argv); // set value at index
-	V m_add(I argc,const A *argv) { set(argc,argv,false); }
-	V m_clr(I argc,const A *argv);
-	V m_clri(I ix); // clear value at index
-	V m_clrall();	// only values
-	V m_clrrec();	// also subdirectories
-	V m_clrsub();	// only subdirectories
-	V m_get(I argc,const A *argv);
-	V m_geti(I ix); // get value at index
-	V m_getall();	// only values
-	V m_getrec(I argc,const A *argv);	// also subdirectories
-	V m_getsub(I argc,const A *argv);	// only subdirectories
-	V m_ogetall(int argc,const A *argv);	// only values (ordered)
-	V m_ogetrec(I argc,const A *argv);	// also subdirectories (ordered)
-	V m_ogetsub(I argc,const A *argv);	// only subdirectories (ordered)
-	V m_cntall();	// only values
-	V m_cntrec(I argc,const A *argv);	// also subdirectories
-	V m_cntsub(I argc,const A *argv);	// only subdirectories
+	void m_set(int argc,const t_atom *argv) { set(argc,argv,true); }
+	void m_seti(int argc,const t_atom *argv); // set value at index
+	void m_add(int argc,const t_atom *argv) { set(argc,argv,false); }
+	void m_clr(int argc,const t_atom *argv);
+	void m_clri(int ix); // clear value at index
+	void m_clrall();	// only values
+	void m_clrrec();	// also subdirectories
+	void m_clrsub();	// only subdirectories
+	void m_get(int argc,const t_atom *argv);
+	void m_geti(int ix); // get value at index
+	void m_getall();	// only values
+	void m_getrec(int argc,const t_atom *argv);	// also subdirectories
+	void m_getsub(int argc,const t_atom *argv);	// only subdirectories
+	void m_ogetall(int argc,const t_atom *argv);	// only values (ordered)
+	void m_ogetrec(int argc,const t_atom *argv);	// also subdirectories (ordered)
+	void m_ogetsub(int argc,const t_atom *argv);	// only subdirectories (ordered)
+	void m_cntall();	// only values
+	void m_cntrec(int argc,const t_atom *argv);	// also subdirectories
+	void m_cntsub(int argc,const t_atom *argv);	// only subdirectories
 
 	// print directories
-	V m_printall();   // print values in current dir
-	V m_printrec(I argc,const A *argv,BL fromroot = false);   // print values recursively
-    V m_printroot() { m_printrec(0,NULL,true); }   // print values recursively from root
+	void m_printall();   // print values in current dir
+	void m_printrec(int argc,const t_atom *argv,bool fromroot = false);   // print values recursively
+    void m_printroot() { m_printrec(0,NULL,true); }   // print values recursively from root
 
 	// cut/copy/paste
-	V m_paste(I argc,const A *argv) { paste(thisTag(),argc,argv,true); } // paste contents of clipboard
-	V m_pasteadd(I argc,const A *argv) { paste(thisTag(),argc,argv,false); } // paste but don't replace
-	V m_clrclip();  // clear clipboard
-	V m_cut(I argc,const A *argv) { copy(thisTag(),argc,argv,true); } // cut value into clipboard
-	V m_copy(I argc,const A *argv) { copy(thisTag(),argc,argv,false); } 	// copy value into clipboard
-	V m_cutall() { copyall(thisTag(),true,0); }   // cut all values in current directory into clipboard
-	V m_copyall() { copyall(thisTag(),false,0); }   // copy all values in current directory into clipboard
-	V m_cutrec(I argc,const A *argv) { copyrec(thisTag(),argc,argv,true); }   // cut directory (and subdirs) into clipboard
-	V m_copyrec(I argc,const A *argv) { copyrec(thisTag(),argc,argv,false); }   // cut directory (and subdirs) into clipboard
+	void m_paste(int argc,const t_atom *argv) { paste(thisTag(),argc,argv,true); } // paste contents of clipboard
+	void m_pasteadd(int argc,const t_atom *argv) { paste(thisTag(),argc,argv,false); } // paste but don't replace
+	void m_clrclip();  // clear clipboard
+	void m_cut(int argc,const t_atom *argv) { copy(thisTag(),argc,argv,true); } // cut value into clipboard
+	void m_copy(int argc,const t_atom *argv) { copy(thisTag(),argc,argv,false); } 	// copy value into clipboard
+	void m_cutall() { copyall(thisTag(),true,0); }   // cut all values in current directory into clipboard
+	void m_copyall() { copyall(thisTag(),false,0); }   // copy all values in current directory into clipboard
+	void m_cutrec(int argc,const t_atom *argv) { copyrec(thisTag(),argc,argv,true); }   // cut directory (and subdirs) into clipboard
+	void m_copyrec(int argc,const t_atom *argv) { copyrec(thisTag(),argc,argv,false); }   // cut directory (and subdirs) into clipboard
 
 	// load/save from/to file
-    V m_load(I argc,const A *argv) { load(argc,argv,false); }
-	V m_save(I argc,const A *argv) { save(argc,argv,false); }
-	V m_loadx(I argc,const A *argv) { load(argc,argv,true); } // XML
-	V m_savex(I argc,const A *argv) { save(argc,argv,true); } // XML
+    void m_load(int argc,const t_atom *argv) { load(argc,argv,false); }
+	void m_save(int argc,const t_atom *argv) { save(argc,argv,false); }
+	void m_loadx(int argc,const t_atom *argv) { load(argc,argv,true); } // XML
+	void m_savex(int argc,const t_atom *argv) { save(argc,argv,true); } // XML
 
 	// load directories
-	V m_lddir(I argc,const A *argv) { lddir(argc,argv,false); }   // load values into current dir
-	V m_ldrec(I argc,const A *argv) { ldrec(argc,argv,false); }   // load values recursively
-	V m_ldxdir(I argc,const A *argv) { lddir(argc,argv,true); }   // load values into current dir (XML)
-	V m_ldxrec(I argc,const A *argv) { ldrec(argc,argv,true); }   // load values recursively (XML)
+	void m_lddir(int argc,const t_atom *argv) { lddir(argc,argv,false); }   // load values into current dir
+	void m_ldrec(int argc,const t_atom *argv) { ldrec(argc,argv,false); }   // load values recursively
+	void m_ldxdir(int argc,const t_atom *argv) { lddir(argc,argv,true); }   // load values into current dir (XML)
+	void m_ldxrec(int argc,const t_atom *argv) { ldrec(argc,argv,true); }   // load values recursively (XML)
 
 	// save directories
-	V m_svdir(I argc,const A *argv) { svdir(argc,argv,false); }   // save values in current dir
-	V m_svrec(I argc,const A *argv) { svrec(argc,argv,false); }   // save values recursively
-	V m_svxdir(I argc,const A *argv) { svdir(argc,argv,true); }   // save values in current dir (XML)
-	V m_svxrec(I argc,const A *argv) { svrec(argc,argv,true); }   // save values recursively (XML)
+	void m_svdir(int argc,const t_atom *argv) { svdir(argc,argv,false); }   // save values in current dir
+	void m_svrec(int argc,const t_atom *argv) { svrec(argc,argv,false); }   // save values recursively
+	void m_svxdir(int argc,const t_atom *argv) { svdir(argc,argv,true); }   // save values in current dir (XML)
+	void m_svxrec(int argc,const t_atom *argv) { svrec(argc,argv,true); }   // save values recursively (XML)
 
 private:
-	static BL KeyChk(const A &a);
-	static BL ValChk(I argc,const A *argv);
-	static BL ValChk(const AtomList &l) { return ValChk(l.Count(),l.Atoms()); }
-	V ToOutAtom(I ix,const A &a);
+	static bool KeyChk(const t_atom &a);
+	static bool ValChk(int argc,const t_atom *argv);
+	static bool ValChk(const AtomList &l) { return ValChk(l.Count(),l.Atoms()); }
+	void ToOutAtom(int ix,const t_atom &a);
 
     static const t_symbol *sym_echo;
     static const t_symbol *sym_error;
 
     enum get_t { get_norm,get_cnt,get_print };
 
-	V set(I argc,const A *argv,BL over);
-	V getdir(const S *tag);
-	int getrec(const S *tag,int level,int order,bool rev,get_t how /*= get_norm*/,const AtomList &rdir);
-	int getsub(const S *tag,int level,int order,bool rev,get_t how /*= get_norm*/,const AtomList &rdir);
+	void set(int argc,const t_atom *argv,bool over);
+	void getdir(const t_symbol *tag);
+	int getrec(const t_symbol *tag,int level,int order,bool rev,get_t how /*= get_norm*/,const AtomList &rdir);
+	int getsub(const t_symbol *tag,int level,int order,bool rev,get_t how /*= get_norm*/,const AtomList &rdir);
 
-	V paste(const S *tag,I argc,const A *argv,BL repl);
-	V copy(const S *tag,I argc,const A *argv,BL cut);
-	V copyall(const S *tag,BL cut,I lvls);
-	V copyrec(const S *tag,I argc,const A *argv,BL cut);
+	void paste(const t_symbol *tag,int argc,const t_atom *argv,bool repl);
+	void copy(const t_symbol *tag,int argc,const t_atom *argv,bool cut);
+	void copyall(const t_symbol *tag,bool cut,int lvls);
+	void copyrec(const t_symbol *tag,int argc,const t_atom *argv,bool cut);
 
-	V load(I argc,const A *argv,BL xml);
-	V save(I argc,const A *argv,BL xml);
-	V lddir(I argc,const A *argv,BL xml);   // load values into current dir
-	V ldrec(I argc,const A *argv,BL xml);   // load values recursively
-	V svdir(I argc,const A *argv,BL xml);   // save values in current dir
-	V svrec(I argc,const A *argv,BL xml);   // save values recursively
+	void load(int argc,const t_atom *argv,bool xml);
+	void save(int argc,const t_atom *argv,bool xml);
+	void lddir(int argc,const t_atom *argv,bool xml);   // load values into current dir
+	void ldrec(int argc,const t_atom *argv,bool xml);   // load values recursively
+	void svdir(int argc,const t_atom *argv,bool xml);   // save values in current dir
+	void svrec(int argc,const t_atom *argv,bool xml);   // save values recursively
 
-	V echodir() { if(echo) getdir(sym_echo); }
+	void echodir() { if(echo) getdir(sym_echo); }
 
-	BL absdir,echo;
-	I vcnt,dcnt;
+	bool absdir,echo;
+	int vcnt,dcnt;
 	pooldata *pl;
 	Atoms curdir;
 	pooldir *clip;
 
-	static const S *holdname; // used during initialization of new object (between constructor and Init method)
+	static const t_symbol *holdname; // used during initialization of new object (between constructor and Init method)
 
     typedef std::map<const t_symbol *,pooldata *> PoolMap;
 	static PoolMap poolmap;
 
-	V SetPool(const S *s);
-	V FreePool();
+	void SetPool(const t_symbol *s);
+	void FreePool();
 
-	static pooldata *GetPool(const S *s);
-	static V RmvPool(pooldata *p);
+	static pooldata *GetPool(const t_symbol *s);
+	static void RmvPool(pooldata *p);
 
-	string MakeFilename(const C *fn) const;
+	string MakeFilename(const char *fn) const;
 
 	FLEXT_CALLVAR_V(mg_pool,ms_pool)
 	FLEXT_ATTRGET_V(curdir)
@@ -246,7 +248,7 @@ const t_symbol *pool::sym_echo,*pool::sym_error;
 const t_symbol *pool::holdname;
 
 
-V pool::setup(t_classid c)
+void pool::setup(t_classid c)
 {
 	post("");
     pool::m_help();
@@ -324,7 +326,7 @@ V pool::setup(t_classid c)
 	FLEXT_CADDMETHOD_(c,0,"svxrec",m_svxrec);
 }
 
-pool::pool(I argc,const A *argv):
+pool::pool(int argc,const t_atom *argv):
 	absdir(true),echo(false),
     pl(NULL),
 	clip(NULL),
@@ -344,7 +346,7 @@ pool::~pool()
 	FreePool();
 }
 
-BL pool::Init()
+bool pool::Init()
 {
 	if(flext_base::Init()) {
 		SetPool(holdname);	
@@ -353,7 +355,7 @@ BL pool::Init()
 	else return false;
 }
 
-V pool::SetPool(const S *s)
+void pool::SetPool(const t_symbol *s)
 {
 	if(s) {
 		if(pl)
@@ -376,7 +378,7 @@ V pool::SetPool(const S *s)
 	}
 }
 
-V pool::FreePool()
+void pool::FreePool()
 {
 	curdir(); // reset current directory
 
@@ -391,9 +393,9 @@ V pool::FreePool()
 	if(clip) { delete clip; clip = NULL; }
 }
 
-V pool::ms_pool(const AtomList &l) 
+void pool::ms_pool(const AtomList &l) 
 {
-	const S *s = NULL;
+	const t_symbol *s = NULL;
 	if(l.Count()) {
 		if(l.Count() > 1) post("%s - pool: superfluous arguments ignored",thisName());
 		s = GetASymbol(l[0]);
@@ -403,28 +405,28 @@ V pool::ms_pool(const AtomList &l)
 	SetPool(s);
 }
 
-V pool::mg_pool(AtomList &l)
+void pool::mg_pool(AtomList &l)
 {
 	if(!pl || pl->Private()) l();
 	else { l(1); SetSymbol(l[0],pl->sym); }
 }
 
-V pool::m_reset() 
+void pool::m_reset() 
 {
     curdir();
 	pl->Reset();
 }
 
 
-V pool::getdir(const S *tag)
+void pool::getdir(const t_symbol *tag)
 {
 	ToSysAnything(3,tag,0,NULL);
 	ToSysList(2,curdir);
 }
 
-V pool::m_getdir() { getdir(thisTag()); }
+void pool::m_getdir() { getdir(thisTag()); }
 
-V pool::m_mkdir(I argc,const A *argv,BL abs,BL chg)
+void pool::m_mkdir(int argc,const t_atom *argv,bool abs,bool chg)
 {
 //    const char *nm = chg?"mkchdir":"mkdir";
 	if(!ValChk(argc,argv))
@@ -444,7 +446,7 @@ V pool::m_mkdir(I argc,const A *argv,BL abs,BL chg)
 	echodir();
 }
 
-V pool::m_chdir(I argc,const A *argv,BL abs)
+void pool::m_chdir(int argc,const t_atom *argv,bool abs)
 {
 	if(!ValChk(argc,argv)) 
 		post("%s - %s: invalid directory name",thisName(),GetString(thisTag()));
@@ -461,9 +463,9 @@ V pool::m_chdir(I argc,const A *argv,BL abs)
 	echodir();
 }
 
-V pool::m_updir(I argc,const A *argv)
+void pool::m_updir(int argc,const t_atom *argv)
 {
-	I lvls = 1;
+	int lvls = 1;
 	if(argc > 0) {
 		if(CanbeInt(argv[0])) {
 			if(argc > 1)
@@ -493,7 +495,7 @@ V pool::m_updir(I argc,const A *argv)
 	echodir();
 }
 
-V pool::m_rmdir(I argc,const A *argv,BL abs)
+void pool::m_rmdir(int argc,const t_atom *argv,bool abs)
 {
 	if(abs) curdir(argc,argv);
 	else curdir.Append(argc,argv);
@@ -505,7 +507,7 @@ V pool::m_rmdir(I argc,const A *argv,BL abs)
 	echodir();
 }
 
-V pool::set(I argc,const A *argv,BL over)
+void pool::set(int argc,const t_atom *argv,bool over)
 {
 	if(!argc || !KeyChk(argv[0])) 
 		post("%s - %s: invalid key",thisName(),GetString(thisTag()));
@@ -519,7 +521,7 @@ V pool::set(I argc,const A *argv,BL over)
 	echodir();
 }
 
-V pool::m_seti(I argc,const A *argv)
+void pool::m_seti(int argc,const t_atom *argv)
 {
 	if(!argc || !CanbeInt(argv[0])) 
 		post("%s - %s: invalid index",thisName(),GetString(thisTag()));
@@ -533,7 +535,7 @@ V pool::m_seti(I argc,const A *argv)
 	echodir();
 }
 
-V pool::m_clr(I argc,const A *argv)
+void pool::m_clr(int argc,const t_atom *argv)
 {
 	if(!argc || !KeyChk(argv[0]))
 		post("%s - %s: invalid key",thisName(),GetString(thisTag()));
@@ -548,7 +550,7 @@ V pool::m_clr(I argc,const A *argv)
 	echodir();
 }
 
-V pool::m_clri(I ix)
+void pool::m_clri(int ix)
 {
 	if(ix < 0)
 		post("%s - %s: invalid index",thisName(),GetString(thisTag()));
@@ -560,7 +562,7 @@ V pool::m_clri(I ix)
 	echodir();
 }
 
-V pool::m_clrall()
+void pool::m_clrall()
 {
 	if(!pl->ClrAll(curdir,false))
 		post("%s - %s: values couldn't be cleared",thisName(),GetString(thisTag()));
@@ -568,7 +570,7 @@ V pool::m_clrall()
 	echodir();
 }
 
-V pool::m_clrrec()
+void pool::m_clrrec()
 {
 	if(!pl->ClrAll(curdir,true))
 		post("%s - %s: values couldn't be cleared",thisName(),GetString(thisTag()));
@@ -576,7 +578,7 @@ V pool::m_clrrec()
 	echodir();
 }
 
-V pool::m_clrsub()
+void pool::m_clrsub()
 {
 	if(!pl->ClrAll(curdir,true,true))
 		post("%s - %s: directories couldn't be cleared",thisName(),GetString(thisTag()));
@@ -584,7 +586,7 @@ V pool::m_clrsub()
 	echodir();
 }
 
-V pool::m_get(I argc,const A *argv)
+void pool::m_get(int argc,const t_atom *argv)
 {
 	if(!argc || !KeyChk(argv[0]))
 		post("%s - %s: invalid key",thisName(),GetString(thisTag()));
@@ -612,7 +614,7 @@ V pool::m_get(I argc,const A *argv)
 	echodir();
 }
 
-V pool::m_geti(I ix)
+void pool::m_geti(int ix)
 {
 	if(ix < 0)
 		post("%s - %s: invalid index",thisName(),GetString(thisTag()));
@@ -640,11 +642,11 @@ V pool::m_geti(I ix)
 
 // ---- some sorting stuff ----------------------------------
 
-inline bool smaller(const A &a,const A &b,int index) { return a < b; }
-inline void swap(A &a,A &b) { A c = a; a = b; b = c; }
+inline bool smaller(const t_atom &a,const t_atom &b,int index) { return a < b; }
+inline void swap(t_atom &a,t_atom &b) { t_atom c = a; a = b; b = c; }
 
-inline bool smaller(const A *a,const A *b,int index) { return *a < *b; }
-inline void swap(A *a,A *b) { A *c = a; a = b; b = c; }
+inline bool smaller(const t_atom *a,const t_atom *b,int index) { return *a < *b; }
+inline void swap(t_atom *a,t_atom *b) { t_atom *c = a; a = b; b = c; }
 
 inline bool smaller(const Atoms &a,const Atoms &b,int index) 
 { 
@@ -728,7 +730,7 @@ int pool::getrec(const t_symbol *tag,int level,int order,bool rev,get_t how,cons
 			ret = pl->PrintAll(gldir);
 			break;
 		case get_norm: {
-			A *k;
+			t_atom *k;
 			Atoms *r;
 			int cnt = pl->GetAll(gldir,k,r);
 			if(!k) {
@@ -755,7 +757,7 @@ int pool::getrec(const t_symbol *tag,int level,int order,bool rev,get_t how,cons
 	}
 
 	if(level != 0) {
-		const A **r;
+		const t_atom **r;
 		int cnt = pl->GetSub(gldir,r);
 		if(!r) 
 			post("%s - %s: error retrieving directories",thisName(),GetString(tag));
@@ -775,7 +777,7 @@ int pool::getrec(const t_symbol *tag,int level,int order,bool rev,get_t how,cons
 	return ret;
 }
 
-V pool::m_getall()
+void pool::m_getall()
 {
 	AtomList l;
 	getrec(thisTag(),0,-1,false,get_norm,l);
@@ -784,7 +786,7 @@ V pool::m_getall()
 	echodir();
 }
 
-V pool::m_ogetall(I argc,const A *argv)
+void pool::m_ogetall(int argc,const t_atom *argv)
 {
 	int index = 0;
 	if(argc) {
@@ -814,7 +816,7 @@ V pool::m_ogetall(I argc,const A *argv)
 	echodir();
 }
 
-V pool::m_getrec(I argc,const A *argv)
+void pool::m_getrec(int argc,const t_atom *argv)
 {
 	int lvls = -1;
 	if(argc) {
@@ -836,7 +838,7 @@ V pool::m_getrec(I argc,const A *argv)
 }
 
 
-V pool::m_ogetrec(I argc,const A *argv)
+void pool::m_ogetrec(int argc,const t_atom *argv)
 {
 	int lvls = -1;
 	if(argc) {
@@ -876,14 +878,14 @@ V pool::m_ogetrec(I argc,const A *argv)
 }
 
 
-int pool::getsub(const S *tag,int level,int order,bool rev,get_t how,const AtomList &rdir)
+int pool::getsub(const t_symbol *tag,int level,int order,bool rev,get_t how,const AtomList &rdir)
 {
 	Atoms gldir(curdir);
 	gldir.Append(rdir);
 	
 	int ret = 0;
 
-	const A **r = NULL;
+	const t_atom **r = NULL;
 	// CntSub is not used here because it doesn't allow checking for valid directory
 	int cnt = pl->GetSub(gldir,r);
 	if(!r) 
@@ -916,7 +918,7 @@ int pool::getsub(const S *tag,int level,int order,bool rev,get_t how,const AtomL
 	return ret;
 }
 
-V pool::m_getsub(int argc,const A *argv)
+void pool::m_getsub(int argc,const t_atom *argv)
 {
 	int lvls = 0;
 	if(argc) {
@@ -938,7 +940,7 @@ V pool::m_getsub(int argc,const A *argv)
 }
 
 
-V pool::m_ogetsub(int argc,const A *argv)
+void pool::m_ogetsub(int argc,const t_atom *argv)
 {
 	int lvls = 0;
 	if(argc) {
@@ -978,10 +980,10 @@ V pool::m_ogetsub(int argc,const A *argv)
 }
 
 
-V pool::m_cntall()
+void pool::m_cntall()
 {
 	AtomList l;
-	I cnt = getrec(thisTag(),0,-1,false,get_cnt,l);
+	int cnt = getrec(thisTag(),0,-1,false,get_cnt,l);
 	ToSysSymbol(3,thisTag());
 	ToSysBang(2);
 	ToSysBang(1);
@@ -990,7 +992,7 @@ V pool::m_cntall()
 	echodir();
 }
 
-V pool::m_cntrec(int argc,const A *argv)
+void pool::m_cntrec(int argc,const t_atom *argv)
 {
 	int lvls = -1;
 	if(argc) {
@@ -1005,7 +1007,7 @@ V pool::m_cntrec(int argc,const A *argv)
 		post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 	
 	AtomList l;
-	I cnt = getrec(thisTag(),lvls,-1,false,get_cnt,l);
+	int cnt = getrec(thisTag(),lvls,-1,false,get_cnt,l);
 	ToSysSymbol(3,thisTag());
 	ToSysBang(2);
 	ToSysBang(1);
@@ -1015,7 +1017,7 @@ V pool::m_cntrec(int argc,const A *argv)
 }
 
 
-V pool::m_cntsub(I argc,const A *argv)
+void pool::m_cntsub(int argc,const t_atom *argv)
 {
 	int lvls = 0;
 	if(argc) {
@@ -1030,7 +1032,7 @@ V pool::m_cntsub(I argc,const A *argv)
 		post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 	
 	AtomList l;
-	I cnt = getsub(thisTag(),lvls,-1,false,get_cnt,l);
+	int cnt = getsub(thisTag(),lvls,-1,false,get_cnt,l);
 	ToSysSymbol(3,thisTag());
 	ToSysBang(2);
 	ToSysBang(1);
@@ -1039,16 +1041,16 @@ V pool::m_cntsub(I argc,const A *argv)
 	echodir();
 }
 
-V pool::m_printall()
+void pool::m_printall()
 {
 	AtomList l;
-	I cnt = getrec(thisTag(),0,-1,false,get_print,l);
+	int cnt = getrec(thisTag(),0,-1,false,get_print,l);
     post("");
 }
 
-V pool::m_printrec(I argc,const A *argv,BL fromroot)
+void pool::m_printrec(int argc,const t_atom *argv,bool fromroot)
 {
-    const S *tag = thisTag();
+    const t_symbol *tag = thisTag();
 	int lvls = -1;
 	
 	if(argc) {
@@ -1066,18 +1068,18 @@ V pool::m_printrec(I argc,const A *argv,BL fromroot)
     if(fromroot) curdir.Clear();
 
 	AtomList l;
-	I cnt = getrec(tag,lvls,-1,false,get_print,l);
+	int cnt = getrec(tag,lvls,-1,false,get_print,l);
     post("");
 
     curdir = svdir;
 }
 
 
-V pool::paste(const S *tag,I argc,const A *argv,BL repl)
+void pool::paste(const t_symbol *tag,int argc,const t_atom *argv,bool repl)
 {
 	if(clip) {
-		BL mkdir = true;
-		I depth = -1;
+		bool mkdir = true;
+		int depth = -1;
 
 		if(argc >= 1) {
 			if(CanbeInt(argv[0])) depth = GetAInt(argv[1]);
@@ -1102,13 +1104,13 @@ V pool::paste(const S *tag,I argc,const A *argv,BL repl)
 }
 
 
-V pool::m_clrclip()
+void pool::m_clrclip()
 {
 	if(clip) { delete clip; clip = NULL; }
 }
 
 
-V pool::copy(const S *tag,I argc,const A *argv,BL cut)
+void pool::copy(const t_symbol *tag,int argc,const t_atom *argv,bool cut)
 {
 	if(!argc || !KeyChk(argv[0]))
 		post("%s - %s: invalid key",thisName(),GetString(tag));
@@ -1127,7 +1129,7 @@ V pool::copy(const S *tag,I argc,const A *argv,BL cut)
 }
 
 
-V pool::copyall(const S *tag,BL cut,I depth)
+void pool::copyall(const t_symbol *tag,bool cut,int depth)
 {
 	m_clrclip();
 	clip = pl->CopyAll(curdir,depth,cut);
@@ -1139,9 +1141,9 @@ V pool::copyall(const S *tag,BL cut,I depth)
 }
 
 
-V pool::copyrec(const S *tag,I argc,const A *argv,BL cut) 
+void pool::copyrec(const t_symbol *tag,int argc,const t_atom *argv,bool cut) 
 {
-	I lvls = -1;
+	int lvls = -1;
 	if(argc > 0) {
 		if(CanbeInt(argv[0])) {
 			if(argc > 1)
@@ -1155,9 +1157,9 @@ V pool::copyrec(const S *tag,I argc,const A *argv,BL cut)
 	copyall(tag,cut,lvls);
 }
 
-V pool::load(I argc,const A *argv,BL xml)
+void pool::load(int argc,const t_atom *argv,bool xml)
 {
-    const C *flnm = NULL;
+    const char *flnm = NULL;
 	if(argc > 0) {
 		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
@@ -1179,9 +1181,9 @@ V pool::load(I argc,const A *argv,BL xml)
 	echodir();
 }
 
-V pool::save(I argc,const A *argv,BL xml)
+void pool::save(int argc,const t_atom *argv,bool xml)
 {
-	const C *flnm = NULL;
+	const char *flnm = NULL;
 	if(argc > 0) {
 		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
@@ -1203,9 +1205,9 @@ V pool::save(I argc,const A *argv,BL xml)
 	echodir();
 }
 
-V pool::lddir(I argc,const A *argv,BL xml)
+void pool::lddir(int argc,const t_atom *argv,bool xml)
 {
-	const C *flnm = NULL;
+	const char *flnm = NULL;
 	if(argc > 0) {
 		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
@@ -1227,11 +1229,11 @@ V pool::lddir(I argc,const A *argv,BL xml)
 	echodir();
 }
 
-V pool::ldrec(I argc,const A *argv,BL xml)
+void pool::ldrec(int argc,const t_atom *argv,bool xml)
 {
-	const C *flnm = NULL;
-	I depth = -1;
-	BL mkdir = true;
+	const char *flnm = NULL;
+	int depth = -1;
+	bool mkdir = true;
 	if(argc >= 1) {
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
 
@@ -1266,9 +1268,9 @@ V pool::ldrec(I argc,const A *argv,BL xml)
 	echodir();
 }
 
-V pool::svdir(I argc,const A *argv,BL xml)
+void pool::svdir(int argc,const t_atom *argv,bool xml)
 {
-	const C *flnm = NULL;
+	const char *flnm = NULL;
 	if(argc > 0) {
 		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
@@ -1290,9 +1292,9 @@ V pool::svdir(I argc,const A *argv,BL xml)
 	echodir();
 }
 
-V pool::svrec(I argc,const A *argv,BL xml)
+void pool::svrec(int argc,const t_atom *argv,bool xml)
 {
-	const C *flnm = NULL;
+	const char *flnm = NULL;
 	if(argc > 0) {
 		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
@@ -1316,21 +1318,21 @@ V pool::svrec(I argc,const A *argv,BL xml)
 
 
 
-BL pool::KeyChk(const t_atom &a)
+bool pool::KeyChk(const t_atom &a)
 {
 	return IsSymbol(a) || IsFloat(a) || IsInt(a);
 }
 
-BL pool::ValChk(I argc,const t_atom *argv)
+bool pool::ValChk(int argc,const t_atom *argv)
 {
-	for(I i = 0; i < argc; ++i) {
+	for(int i = 0; i < argc; ++i) {
 		const t_atom &a = argv[i];
 		if(!IsSymbol(a) && !IsFloat(a) && !IsInt(a)) return false;
 	}
 	return true;
 }
 
-V pool::ToOutAtom(I ix,const t_atom &a)
+void pool::ToOutAtom(int ix,const t_atom &a)
 {
 	if(IsSymbol(a))
 		ToSysSymbol(ix,GetSymbol(a));
@@ -1344,7 +1346,7 @@ V pool::ToOutAtom(I ix,const t_atom &a)
 
 
 
-pooldata *pool::GetPool(const S *s)
+pooldata *pool::GetPool(const t_symbol *s)
 {
     PoolMap::iterator it = poolmap.find(s);
     pooldata *p;   
@@ -1356,7 +1358,7 @@ pooldata *pool::GetPool(const S *s)
 	return p;
 }
 
-V pool::RmvPool(pooldata *p)
+void pool::RmvPool(pooldata *p)
 {
     FLEXT_ASSERT(p->sym);
     PoolMap::iterator it = poolmap.find(p->sym);
@@ -1368,20 +1370,20 @@ V pool::RmvPool(pooldata *p)
 	}
 }
 
-string pool::MakeFilename(const C *fn) const
+string pool::MakeFilename(const char *fn) const
 {
 #if FLEXT_SYS == FLEXT_SYS_PD
     // / and \ must not be mixed!
     // (char *) type casts for BorlandC++
-	C *sl = strchr((C *)fn,'/');
-	if(!sl) sl = strchr((C *)fn,'\\');
+	char *sl = strchr((char *)fn,'/');
+	if(!sl) sl = strchr((char *)fn,'\\');
     if(!sl || (sl != fn 
 #if FLEXT_OS == FLEXT_OS_WIN
         && sl[-1] != ':' // look for drive specification with ":/" or ":\\"
 #endif
     )) {
         // prepend absolute canvas path if filename has no absolute path
-		const C *p = GetString(canvas_getdir(thisCanvas()));
+		const char *p = GetString(canvas_getdir(thisCanvas()));
 		return string(p)+'/'+fn;
 	}
 	else

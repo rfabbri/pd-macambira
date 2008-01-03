@@ -1,15 +1,16 @@
 /* 
-
 pool - hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2006 Thomas Grill (gr@grrrr.org)
+Copyright (c) 2002-2008 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
+$LastChangedRevision: 26 $
+$LastChangedDate: 2008-01-03 16:14:29 +0100 (Thu, 03 Jan 2008) $
+$LastChangedBy: thomas $
 */
 
 #include "pool.h"
-
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -17,7 +18,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 using namespace std;
 
-pooldata::pooldata(const S *s,I vcnt,I dcnt):
+pooldata::pooldata(const t_symbol *s,int vcnt,int dcnt):
 	sym(s),nxt(NULL),refs(0),
 	root(nullatom,NULL,vcnt,dcnt)
 {
@@ -30,9 +31,9 @@ pooldata::~pooldata()
 }
 
 
-const A pooldata::nullatom = { A_NULL };
+const t_atom pooldata::nullatom = { A_NULL };
 
-I pooldata::GetAll(const AtomList &d,A *&keys,Atoms *&lst)
+int pooldata::GetAll(const AtomList &d,t_atom *&keys,Atoms *&lst)
 {
 	pooldir *pd = root.GetDir(d);
 	if(pd)
@@ -43,7 +44,7 @@ I pooldata::GetAll(const AtomList &d,A *&keys,Atoms *&lst)
 	}
 }
 
-I pooldata::PrintAll(const AtomList &d)
+int pooldata::PrintAll(const AtomList &d)
 {
     char tmp[1024];
     d.Print(tmp,sizeof tmp);
@@ -54,7 +55,7 @@ I pooldata::PrintAll(const AtomList &d)
     return cnt;
 }
 
-I pooldata::GetSub(const AtomList &d,const t_atom **&dirs)
+int pooldata::GetSub(const AtomList &d,const t_atom **&dirs)
 {
 	pooldir *pd = root.GetDir(d);
 	if(pd)
@@ -66,13 +67,13 @@ I pooldata::GetSub(const AtomList &d,const t_atom **&dirs)
 }
 
 
-BL pooldata::Paste(const AtomList &d,const pooldir *clip,I depth,BL repl,BL mkdir)
+bool pooldata::Paste(const AtomList &d,const pooldir *clip,int depth,bool repl,bool mkdir)
 {
 	pooldir *pd = root.GetDir(d);
 	return pd && pd->Paste(clip,depth,repl,mkdir);
 }
 
-pooldir *pooldata::Copy(const AtomList &d,const A &key,BL cut)
+pooldir *pooldata::Copy(const AtomList &d,const t_atom &key,bool cut)
 {
 	pooldir *pd = root.GetDir(d);
 	if(pd) {
@@ -89,7 +90,7 @@ pooldir *pooldata::Copy(const AtomList &d,const A &key,BL cut)
 		return NULL;
 }
 
-pooldir *pooldata::CopyAll(const AtomList &d,I depth,BL cut)
+pooldir *pooldata::CopyAll(const AtomList &d,int depth,bool cut)
 {
 	pooldir *pd = root.GetDir(d);
 	if(pd) {
@@ -125,7 +126,7 @@ bool pooldata::LdDir(const AtomList &d,const char *flnm,int depth,bool mkdir)
 {
 	pooldir *pd = root.GetDir(d);
 	if(pd) {
-		char tmp[1024];
+		char tmp[1024]; // CnvFlnm checks for size of string buffer
 		const char *t = CnvFlnm(tmp,flnm,sizeof tmp);
 		if(t) {
 			ifstream file(t);
@@ -137,12 +138,12 @@ bool pooldata::LdDir(const AtomList &d,const char *flnm,int depth,bool mkdir)
 		return false;
 }
 
-BL pooldata::SvDir(const AtomList &d,const C *flnm,I depth,BL absdir)
+bool pooldata::SvDir(const AtomList &d,const char *flnm,int depth,bool absdir)
 {
 	pooldir *pd = root.GetDir(d);
 	if(pd) {
-		C tmp[1024];
-		const C *t = CnvFlnm(tmp,flnm,sizeof tmp);
+		char tmp[1024]; // CnvFlnm checks for size of string buffer
+		const char *t = CnvFlnm(tmp,flnm,sizeof tmp);
 		if(t) {
 			ofstream file(t);
 			Atoms tmp;
@@ -155,15 +156,15 @@ BL pooldata::SvDir(const AtomList &d,const C *flnm,I depth,BL absdir)
 		return false;
 }
 
-BL pooldata::LdDirXML(const AtomList &d,const C *flnm,I depth,BL mkdir)
+bool pooldata::LdDirXML(const AtomList &d,const char *flnm,int depth,bool mkdir)
 {
 	pooldir *pd = root.GetDir(d);
 	if(pd) {
-		C tmp[1024];
-		const C *t = CnvFlnm(tmp,flnm,sizeof tmp);
+		char tmp[1024]; // CnvFlnm checks for size of string buffer
+		const char *t = CnvFlnm(tmp,flnm,sizeof tmp);
 		if(t) {
 			ifstream file(t);
-            BL ret = file.good() != 0;
+            bool ret = file.good() != 0;
             if(ret) {
                 file.getline(tmp,sizeof tmp);
                 ret = !strncmp(tmp,"<?xml",5);
@@ -184,12 +185,12 @@ BL pooldata::LdDirXML(const AtomList &d,const C *flnm,I depth,BL mkdir)
     return false;
 }
 
-BL pooldata::SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir)
+bool pooldata::SvDirXML(const AtomList &d,const char *flnm,int depth,bool absdir)
 {
 	pooldir *pd = root.GetDir(d);
 	if(pd) {
-		C tmp[1024];
-		const C *t = CnvFlnm(tmp,flnm,sizeof tmp);
+		char tmp[1024]; // CnvFlnm checks for size of string buffer
+		const char *t = CnvFlnm(tmp,flnm,sizeof tmp);
 		if(t) {
 			ofstream file(t);
 			Atoms tmp;
@@ -198,7 +199,7 @@ BL pooldata::SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir)
                 file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
                 file << "<!DOCTYPE pool SYSTEM \"http://grrrr.org/ext/pool/pool-0.2.dtd\">" << endl;
                 file << "<pool>" << endl;
-                BL ret = pd->SvDirXML(file,depth,tmp);
+                bool ret = pd->SvDirXML(file,depth,tmp);
                 file << "</pool>" << endl;
                 return ret;
             }

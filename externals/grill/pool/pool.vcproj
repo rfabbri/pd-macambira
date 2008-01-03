@@ -88,7 +88,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;c:\data\pd\pd-cvs\src&quot;;..\flext\source"
+				AdditionalIncludeDirectories="&quot;c:\programme\pd-0.40-2\src&quot;;..\flext\source"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2"
 				StringPooling="TRUE"
 				BasicRuntimeChecks="3"
@@ -111,7 +111,7 @@
 				OutputFile="$(outdir)/pool.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="c:\data\pd\pd-cvs\bin"
+				AdditionalLibraryDirectories="c:\programme\pd-0.40-2\bin"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(outdir)/pool.pdb"
 				ImportLibrary="$(outdir)/pool.lib"

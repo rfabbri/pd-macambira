@@ -1,11 +1,13 @@
 /* 
-
 pool - hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2006 Thomas Grill (gr@grrrr.org)
+Copyright (c) 2002-2008 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
+$LastChangedRevision: 26 $
+$LastChangedDate: 2008-01-03 16:14:29 +0100 (Thu, 03 Jan 2008) $
+$LastChangedBy: thomas $
 */
 
 #ifndef __POOL_H
@@ -23,28 +25,21 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 using namespace std;
 
-typedef void V;
-typedef int I;
-typedef unsigned long UL;
-typedef float F;
-typedef char C;
-typedef bool BL;
-typedef t_atom A;
-typedef t_symbol S;
 
 typedef flext::AtomListStatic<8> Atoms;
+
 
 class poolval:
 	public flext
 {
 public:
-	poolval(const A &key,AtomList *data);
+	poolval(const t_atom &key,AtomList *data);
 	~poolval();
 
 	poolval &Set(AtomList *data);
 	poolval *Dup() const;
 
-	A key;
+	t_atom key;
 	AtomList *data;
 	poolval *nxt;
 };
@@ -53,59 +48,59 @@ class pooldir:
 	public flext
 {
 public:
-	pooldir(const A &dir,pooldir *parent,I vcnt,I dcnt);
+	pooldir(const t_atom &dir,pooldir *parent,int vcnt,int dcnt);
 	~pooldir();
 
-	V Clear(BL rec,BL dironly = false);
-	V Reset(BL realloc = true);
+	void Clear(bool rec,bool dironly = false);
+	void Reset(bool realloc = true);
 
-	BL Empty() const { return !dirs && !vals; }
-	BL HasDirs() const { return dirs != NULL; }
-	BL HasVals() const { return vals != NULL; }
+	bool Empty() const { return !dirs && !vals; }
+	bool HasDirs() const { return dirs != NULL; }
+	bool HasVals() const { return vals != NULL; }
 
-	pooldir *GetDir(I argc,const A *argv,BL cut = false);
-	pooldir *GetDir(const AtomList &d,BL cut = false) { return GetDir(d.Count(),d.Atoms(),cut); }
-	BL DelDir(I argc,const A *argv);
-	BL DelDir(const AtomList &d) { return DelDir(d.Count(),d.Atoms()); }
-	pooldir *AddDir(I argc,const A *argv,I vcnt = 0,I dcnt = 0);
-	pooldir *AddDir(const AtomList &d,I vcnt = 0,I dcnt = 0) { return AddDir(d.Count(),d.Atoms(),vcnt,dcnt); }
+	pooldir *GetDir(int argc,const t_atom *argv,bool cut = false);
+	pooldir *GetDir(const AtomList &d,bool cut = false) { return GetDir(d.Count(),d.Atoms(),cut); }
+	bool DelDir(int argc,const t_atom *argv);
+	bool DelDir(const AtomList &d) { return DelDir(d.Count(),d.Atoms()); }
+	pooldir *AddDir(int argc,const t_atom *argv,int vcnt = 0,int dcnt = 0);
+	pooldir *AddDir(const AtomList &d,int vcnt = 0,int dcnt = 0) { return AddDir(d.Count(),d.Atoms(),vcnt,dcnt); }
 
-	V SetVal(const A &key,AtomList *data,BL over = true);
-	BL SetVali(I ix,AtomList *data);
-	V ClrVal(const A &key) { SetVal(key,NULL); }
-    BL ClrVali(I ix) { return SetVali(ix,NULL); }
-	AtomList *PeekVal(const A &key);
-	AtomList *GetVal(const A &key,BL cut = false);
-	I CntAll() const;
-	I GetAll(A *&keys,Atoms *&lst,BL cut = false);
-	I PrintAll(char *buf,int len) const;
-	I GetKeys(AtomList &keys);
-	I CntSub() const;
-	I GetSub(const A **&dirs);
+	void SetVal(const t_atom &key,AtomList *data,bool over = true);
+	bool SetVali(int ix,AtomList *data);
+	void ClrVal(const t_atom &key) { SetVal(key,NULL); }
+    bool ClrVali(int ix) { return SetVali(ix,NULL); }
+	AtomList *PeekVal(const t_atom &key);
+	AtomList *GetVal(const t_atom &key,bool cut = false);
+	int CntAll() const;
+	int GetAll(t_atom *&keys,Atoms *&lst,bool cut = false);
+	int PrintAll(char *buf,int len) const;
+	int GetKeys(AtomList &keys);
+	int CntSub() const;
+	int GetSub(const t_atom **&dirs);
 
-	poolval *RefVal(const A &key);
-	poolval *RefVali(I ix);
+	poolval *RefVal(const t_atom &key);
+	poolval *RefVali(int ix);
 	
-	BL Paste(const pooldir *p,I depth,BL repl,BL mkdir);
-	BL Copy(pooldir *p,I depth,BL cur);
+	bool Paste(const pooldir *p,int depth,bool repl,bool mkdir);
+	bool Copy(pooldir *p,int depth,bool cur);
 
-	BL LdDir(istream &is,I depth,BL mkdir);
-	BL LdDirXML(istream &is,I depth,BL mkdir);
-	BL SvDir(ostream &os,I depth,const AtomList &dir = AtomList());
-	BL SvDirXML(ostream &os,I depth,const AtomList &dir = AtomList(),I ind = 0);
+	bool LdDir(istream &is,int depth,bool mkdir);
+	bool LdDirXML(istream &is,int depth,bool mkdir);
+	bool SvDir(ostream &os,int depth,const AtomList &dir = AtomList());
+	bool SvDirXML(ostream &os,int depth,const AtomList &dir = AtomList(),int ind = 0);
 
 	int VSize() const { return vsize; }
 	int DSize() const { return dsize; }
 
 protected:
-	int VIdx(const A &v) const { return FoldBits(AtomHash(v),vbits); }
-	int DIdx(const A &d) const { return FoldBits(AtomHash(d),dbits); }
+	int VIdx(const t_atom &v) const { return FoldBits(AtomHash(v),vbits); }
+	int DIdx(const t_atom &d) const { return FoldBits(AtomHash(d),dbits); }
 
-	A dir;
+	t_atom dir;
 	pooldir *nxt;
 
 	pooldir *parent;
-	const I vbits,dbits,vsize,dsize;
+	const int vbits,dbits,vsize,dsize;
 	
 	static unsigned int FoldBits(unsigned long h,int bits);
 	static int Int2Bits(unsigned long n);
@@ -117,7 +112,7 @@ protected:
 	direntry *dirs;
 
 private:
-  	BL LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d);
+  	bool LdDirXMLRec(istream &is,int depth,bool mkdir,AtomList &d);
 };
 
 
@@ -125,33 +120,33 @@ class pooldata:
 	public flext
 {
 public:
-	pooldata(const S *s = NULL,I vcnt = 0,I dcnt = 0);
+	pooldata(const t_symbol *s = NULL,int vcnt = 0,int dcnt = 0);
 	~pooldata();
 
     bool Private() const { return sym == NULL; }
 
-	V Push() { ++refs; }
-	BL Pop() { return --refs > 0; }
+	void Push() { ++refs; }
+	bool Pop() { return --refs > 0; }
 
-    V Reset() { root.Reset(); }
+    void Reset() { root.Reset(); }
 
-    BL MkDir(const AtomList &d,I vcnt = 0,I dcnt = 0) 
+    bool MkDir(const AtomList &d,int vcnt = 0,int dcnt = 0) 
     { 
         root.AddDir(d,vcnt,dcnt); 
         return true; 
     }
 
-    BL ChkDir(const AtomList &d) 
+    bool ChkDir(const AtomList &d) 
     { 
         return root.GetDir(d) != NULL; 
     }
 
-    BL RmDir(const AtomList &d) 
+    bool RmDir(const AtomList &d) 
     { 
         return root.DelDir(d); 
     }
 
-    BL Set(const AtomList &d,const A &key,AtomList *data,BL over = true)
+    bool Set(const AtomList &d,const t_atom &key,AtomList *data,bool over = true)
     {
 	    pooldir *pd = root.GetDir(d);
 	    if(!pd) return false;
@@ -159,7 +154,7 @@ public:
 	    return true;
     }
 
-    BL Seti(const AtomList &d,I ix,AtomList *data)
+    bool Seti(const AtomList &d,int ix,AtomList *data)
     {
 	    pooldir *pd = root.GetDir(d);
 	    if(!pd) return false;
@@ -167,7 +162,7 @@ public:
 	    return true;
     }
 
-	BL Clr(const AtomList &d,const A &key)
+	bool Clr(const AtomList &d,const t_atom &key)
     {
 	    pooldir *pd = root.GetDir(d);
 	    if(!pd) return false;
@@ -175,7 +170,7 @@ public:
 	    return true;
     }
 
-	BL Clri(const AtomList &d,I ix)
+	bool Clri(const AtomList &d,int ix)
     {
 	    pooldir *pd = root.GetDir(d);
 	    if(!pd) return false;
@@ -183,7 +178,7 @@ public:
 	    return true;
     }
 
-	BL ClrAll(const AtomList &d,BL rec,BL dironly = false)
+	bool ClrAll(const AtomList &d,bool rec,bool dironly = false)
     {
 	    pooldir *pd = root.GetDir(d);
 	    if(!pd) return false;
@@ -191,68 +186,68 @@ public:
 	    return true;
     }
 
-	AtomList *Peek(const AtomList &d,const A &key)
+	AtomList *Peek(const AtomList &d,const t_atom &key)
     {
 	    pooldir *pd = root.GetDir(d);
 	    return pd?pd->PeekVal(key):NULL;
     }
 
-	AtomList *Get(const AtomList &d,const A &key)
+	AtomList *Get(const AtomList &d,const t_atom &key)
     {
 	    pooldir *pd = root.GetDir(d);
 	    return pd?pd->GetVal(key):NULL;
     }
 
-	poolval *Ref(const AtomList &d,const A &key)
+	poolval *Ref(const AtomList &d,const t_atom &key)
     {
 	    pooldir *pd = root.GetDir(d);
 	    return pd?pd->RefVal(key):NULL;
     }
 
-	poolval *Refi(const AtomList &d,I ix)
+	poolval *Refi(const AtomList &d,int ix)
     {
 	    pooldir *pd = root.GetDir(d);
 	    return pd?pd->RefVali(ix):NULL;
     }
 
-	I CntAll(const AtomList &d)
+	int CntAll(const AtomList &d)
     {
 	    pooldir *pd = root.GetDir(d);
 	    return pd?pd->CntAll():0;
     }
 
-	I PrintAll(const AtomList &d);
-	I GetAll(const AtomList &d,A *&keys,Atoms *&lst);
+	int PrintAll(const AtomList &d);
+	int GetAll(const AtomList &d,t_atom *&keys,Atoms *&lst);
 
-    I CntSub(const AtomList &d)
+    int CntSub(const AtomList &d)
     {
 	    pooldir *pd = root.GetDir(d);
 	    return pd?pd->CntSub():0;
     }
 
-	I GetSub(const AtomList &d,const t_atom **&dirs);
+	int GetSub(const AtomList &d,const t_atom **&dirs);
 
-	BL Paste(const AtomList &d,const pooldir *clip,I depth = -1,BL repl = true,BL mkdir = true);
-	pooldir *Copy(const AtomList &d,const A &key,BL cut);
-	pooldir *CopyAll(const AtomList &d,I depth,BL cut);
+	bool Paste(const AtomList &d,const pooldir *clip,int depth = -1,bool repl = true,bool mkdir = true);
+	pooldir *Copy(const AtomList &d,const t_atom &key,bool cut);
+	pooldir *CopyAll(const AtomList &d,int depth,bool cut);
 
-	BL LdDir(const AtomList &d,const C *flnm,I depth,BL mkdir = true);
-	BL SvDir(const AtomList &d,const C *flnm,I depth,BL absdir);
-	BL Load(const C *flnm) { AtomList l; return LdDir(l,flnm,-1); }
-	BL Save(const C *flnm) { AtomList l; return SvDir(l,flnm,-1,true); }
-	BL LdDirXML(const AtomList &d,const C *flnm,I depth,BL mkdir = true);
-	BL SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir);
-	BL LoadXML(const C *flnm) { AtomList l; return LdDirXML(l,flnm,-1); }
-	BL SaveXML(const C *flnm) { AtomList l; return SvDirXML(l,flnm,-1,true); }
+	bool LdDir(const AtomList &d,const char *flnm,int depth,bool mkdir = true);
+	bool SvDir(const AtomList &d,const char *flnm,int depth,bool absdir);
+	bool Load(const char *flnm) { AtomList l; return LdDir(l,flnm,-1); }
+	bool Save(const char *flnm) { AtomList l; return SvDir(l,flnm,-1,true); }
+	bool LdDirXML(const AtomList &d,const char *flnm,int depth,bool mkdir = true);
+	bool SvDirXML(const AtomList &d,const char *flnm,int depth,bool absdir);
+	bool LoadXML(const char *flnm) { AtomList l; return LdDirXML(l,flnm,-1); }
+	bool SaveXML(const char *flnm) { AtomList l; return SvDirXML(l,flnm,-1,true); }
 
-	I refs;
-	const S *sym;
+	int refs;
+	const t_symbol *sym;
 	pooldata *nxt;
 
 	pooldir root;
 
 private:
-	static const A nullatom;
+	static const t_atom nullatom;
 };
 
 #endif
