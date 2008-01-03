@@ -28,7 +28,6 @@ struct _MTXfind_
    t_object x_obj;
    int size;
    int outsize;
-   //int find_dimension;
    t_symbol *find_mode;
    int find_direction;
 
@@ -68,8 +67,6 @@ static void mTXSetFindMode (MTXfind *mtx_find_obj, t_symbol *c_dim)
 static void *newMTXFind (t_symbol *s, int argc, t_atom *argv)
 {
    MTXfind *mtx_find_obj = (MTXfind *) pd_new (mtx_find_class);
-//   int c_dim = 0;
-//   int c_dir = 1;
 
    mTXSetFindMode (mtx_find_obj, gensym(":"));
    mTXSetFindDirection (mtx_find_obj, 1);
@@ -237,7 +234,7 @@ static void mTXFindMatrix (MTXfind *mtx_find_obj, t_symbol *s,
    int rows_out;
    int columns_out;
 
-   // size check
+   /* size check */
    if (!size) {
       post("mtx_find: invalid dimensions");
       return;
@@ -259,9 +256,8 @@ static void mTXFindMatrix (MTXfind *mtx_find_obj, t_symbol *s,
    mtx_find_obj->size = size;
    mtx_find_obj->list_out = list_out;
 
-   // main part
+   /* main part */
    list_out += 2;
-   //copyList (size, argv, list_out);
    rows_out = 1;
    if (mtx_find_obj->find_mode == row_sym) {
       if (mtx_find_obj->find_direction == -1)
@@ -339,7 +335,6 @@ void mtx_find_setup (void)
        CLASS_DEFAULT, A_GIMME, 0);
    class_addbang (mtx_find_class, (t_method) mTXFindBang);
    class_addmethod (mtx_find_class, (t_method) mTXFindMatrix, gensym("matrix"), A_GIMME,0);
-//   class_addmethod (mtx_find_class, (t_method) mTXSetFindDimension, gensym("dimension"), A_DEFFLOAT,0);
    class_addmethod (mtx_find_class, (t_method) mTXSetFindMode, gensym("mode"), A_DEFSYMBOL,0);
    class_addmethod (mtx_find_class, (t_method) mTXSetFindDirection, gensym("direction"), A_DEFFLOAT,0);
 

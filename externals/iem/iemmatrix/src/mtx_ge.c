@@ -18,6 +18,6 @@
 #define MTXBIN_GENERIC__OPERATOR >=
 
 /* the operator operates on integers instead of floats */
-//#define MTXBIN_GENERIC__INTEGEROP
+/* #define MTXBIN_GENERIC__INTEGEROP */
 
 #include "mtx_binop_generic.h"

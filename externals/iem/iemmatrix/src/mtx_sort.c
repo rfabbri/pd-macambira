@@ -36,7 +36,6 @@ struct _MTXSort_
    t_atom *list_out2;
    t_atom *list_in;
    t_float *x;
-//   t_float *y;
    t_float *i;
 };
 
@@ -48,8 +47,10 @@ static void deleteMTXSort (MTXSort *mtx_sort_obj)
       freebytes (mtx_sort_obj->list_out2, sizeof(t_atom)*(mtx_sort_obj->size+2));
    if (mtx_sort_obj->x)
       freebytes (mtx_sort_obj->x, sizeof(t_float)*(mtx_sort_obj->size));
-   //if (mtx_sort_obj->y)
-   //   freebytes (mtx_sort_obj->y, sizeof(t_float)*(mtx_sort_obj->size));
+   /*
+     if (mtx_sort_obj->y)
+       freebytes (mtx_sort_obj->y, sizeof(t_float)*(mtx_sort_obj->size));
+   */
    if (mtx_sort_obj->i)
       freebytes (mtx_sort_obj->i, sizeof(t_float)*(mtx_sort_obj->size));
 }
@@ -69,7 +70,7 @@ static void *newMTXSort (t_symbol *s, int argc, t_atom *argv)
 {
    MTXSort *mtx_sort_obj = (MTXSort *) pd_new (mtx_sort_class);
    
-   // defaults:
+   /* defaults: */
    mTXSetSortMode (mtx_sort_obj, gensym(":"));
    mTXSetSortDirection (mtx_sort_obj, 1.0f);
    if (argc>=1) {
@@ -243,11 +244,10 @@ static void mTXSortMatrix (MTXSort *mtx_sort_obj, t_symbol *s,
    t_atom *list_out1 = mtx_sort_obj->list_out1;
    t_atom *list_out2 = mtx_sort_obj->list_out2;
    t_float *x = mtx_sort_obj->x;
-   //t_float *y = mtx_sort_obj->y;
    t_float *i = mtx_sort_obj->i;
    int count;
 
-   // size check
+   /* size check */
    if (!size) {
       post("mtx_sort: invalid dimensions");
       return;
@@ -259,8 +259,9 @@ static void mTXSortMatrix (MTXSort *mtx_sort_obj, t_symbol *s,
    else if ((!x)||(!list_out1)||(!list_out2)/*||(!y)*/) {
       if (!x)
 	 x = (t_float *) getbytes (sizeof (t_float) * (size));
-      //if (!y)
-      //   y = (t_float *) getbytes (sizeof (t_float) * (size));
+      /*if (!y)
+       *   y = (t_float *) getbytes (sizeof (t_float) * (size));
+       */
       if (!i)
 	 i = (t_float *) getbytes (sizeof (t_float) * (size));
       if (!list_out1)
@@ -270,36 +271,32 @@ static void mTXSortMatrix (MTXSort *mtx_sort_obj, t_symbol *s,
    }
    else if (size != mtx_sort_obj->size) {
       x = (t_float *) resizebytes (x,
-	    sizeof (t_float) * (mtx_sort_obj->size),
-	    sizeof (t_float) * (size));
-      //y = (t_float *) resizebytes (y,
-      //    sizeof (t_float) * (mtx_sort_obj->size),
-      //    sizeof (t_float) * (size));
+                                   sizeof (t_float) * (mtx_sort_obj->size),
+                                   sizeof (t_float) * (size));
       i = (t_float *) resizebytes (i,
-	    sizeof (t_float) * (mtx_sort_obj->size),
-	    sizeof (t_float) * (size));
+                                   sizeof (t_float) * (mtx_sort_obj->size),
+                                   sizeof (t_float) * (size));
       list_out1 = (t_atom *) resizebytes (list_out1,
-	    sizeof (t_atom) * (mtx_sort_obj->size+2),
-	    sizeof (t_atom) * (size + 2));
+                                          sizeof (t_atom) * (mtx_sort_obj->size+2),
+                                          sizeof (t_atom) * (size + 2));
       list_out2 = (t_atom *) resizebytes (list_out2,
-	    sizeof (t_atom) * (mtx_sort_obj->size+2),
-	    sizeof (t_atom) * (size + 2));
+                                          sizeof (t_atom) * (mtx_sort_obj->size+2),
+                                          sizeof (t_atom) * (size + 2));
    }
 
    mtx_sort_obj->list_out1 = list_out1;
    mtx_sort_obj->list_out2 = list_out2;
    mtx_sort_obj->x = x;
-  // mtx_sort_obj->y = y;
    mtx_sort_obj->i = i;
    mtx_sort_obj->size = size;
    mtx_sort_obj->rows = rows;
    mtx_sort_obj->columns = columns;
 
-   // generating indexing vector
+   /* generating indexing vector */
    indexingVector (size, columns, mtx_sort_obj->sort_mode, i);
 
-   // main part
-   // reading matrix from inlet
+   /* main part */
+   /* reading matrix from inlet */
    if ((mtx_sort_obj->sort_mode == col_sym)||
 	(mtx_sort_obj->sort_mode == col_sym2)) {
       readFloatFromListModulo (size, columns, list_ptr, x);
@@ -309,7 +306,7 @@ static void mTXSortMatrix (MTXSort *mtx_sort_obj, t_symbol *s,
    else
       readFloatFromList (size, list_ptr, x);
    
-   // calculating sort
+   /* calculating sort */
    if ((mtx_sort_obj->sort_mode != col_sym) &&
 	 (mtx_sort_obj->sort_mode != col_sym2) &&
 	 (mtx_sort_obj->sort_mode != row_sym))
@@ -320,7 +317,7 @@ static void mTXSortMatrix (MTXSort *mtx_sort_obj, t_symbol *s,
    x = mtx_sort_obj->x;
    i = mtx_sort_obj->i;
 
-   // writing matrix to outlet
+   /* writing matrix to outlet */
    if ((mtx_sort_obj->sort_mode == col_sym)||
 	 (mtx_sort_obj->sort_mode == col_sym2)) {
       columns = mtx_sort_obj->columns;
@@ -333,13 +330,13 @@ static void mTXSortMatrix (MTXSort *mtx_sort_obj, t_symbol *s,
       writeFloatIntoList (size, list_out2+2, i);
    }
 
-   // writing indices
+   /* writing indices */
    SETSYMBOL(list_out2, gensym("matrix"));
    SETFLOAT(list_out2, rows);
    SETFLOAT(&list_out2[1], columns);
    outlet_anything(mtx_sort_obj->list_outlet2, gensym("matrix"), 
 	 mtx_sort_obj->size+2, list_out2);
-   // writing sorted values
+   /* writing sorted values */
    SETSYMBOL(list_out1, gensym("matrix"));
    SETFLOAT(list_out1, rows);
    SETFLOAT(&list_out1[1], columns);
@@ -358,7 +355,6 @@ void mtx_sort_setup (void)
    class_addbang (mtx_sort_class, (t_method) mTXSortBang);
    class_addmethod (mtx_sort_class, (t_method) mTXSortMatrix, gensym("matrix"), A_GIMME,0);
    class_addmethod (mtx_sort_class, (t_method) mTXSetSortMode, gensym("mode"), A_DEFSYMBOL,0);
-//   class_addmethod (mtx_sort_class, (t_method) mTXSetSortDimension, gensym("dimension"), A_DEFFLOAT,0);
    class_addmethod (mtx_sort_class, (t_method) mTXSetSortDirection, gensym("direction"), A_DEFFLOAT,0);
 
    row_sym = gensym("row");

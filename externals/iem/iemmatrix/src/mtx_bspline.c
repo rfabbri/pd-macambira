@@ -102,9 +102,7 @@ static void mtx_bspline_matrix2(t_mtx_spline *X, t_symbol *s, int argc, t_atom *
 
   mtx_bspline_resize(X, row, col);
 
-  //for(i=0; i<col*row; i++)post("mtx[%d]=%f", i, atom_getfloat(argv+2+i));
-
-  /* 1st fill the matrix into the arrays */
+    /* 1st fill the matrix into the arrays */
   fp=matrix2float(argv);
 
   dummy=fp;
@@ -141,7 +139,7 @@ static void mtx_bspline_matrix2(t_mtx_spline *X, t_symbol *s, int argc, t_atom *
       w[i]=6.0*((y[j][i+1]-y[j][i])/u[j][i]
 		-(y[j][i]-y[j][i-1])/u[j][i-1]);
 
-    // now solve this tridiagonal matrix
+    /* now solve this tridiagonal matrix */
 
     for(i=1; i<N-1; i++)
       {
@@ -158,7 +156,7 @@ static void mtx_bspline_matrix2(t_mtx_spline *X, t_symbol *s, int argc, t_atom *
 
 static void mtx_bspline_list(t_mtx_spline *x, t_symbol *s, int argc, t_atom *argv)
 {
-  // this should output a matrix, one row for each element of this list
+  /* this should output a matrix, one row for each element of this list */
 }
 static void mtx_bspline_float(t_mtx_spline *X, t_float f)
 {
@@ -215,7 +213,7 @@ void mtx_bspline_setup(void)
 {
   mtx_bspline_class = class_new(gensym("mtx_bspline"), (t_newmethod)mtx_bspline_new, (t_method)mtx_bspline_free,
                             sizeof(t_mtx_spline), 0, A_NULL);
-  //  class_addmethod(mtx_bspline_class, (t_method)mtx_bspline_matrix, gensym("list"), A_GIMME, 0);
+  /*  class_addmethod(mtx_bspline_class, (t_method)mtx_bspline_matrix, gensym("list"), A_GIMME, 0); */
   class_addmethod(mtx_bspline_class, (t_method)mtx_bspline_matrix2, gensym(""), A_GIMME, 0);
   class_addfloat (mtx_bspline_class, mtx_bspline_float);
 }

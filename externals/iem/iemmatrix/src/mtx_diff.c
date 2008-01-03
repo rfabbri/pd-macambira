@@ -150,7 +150,7 @@ static void mTXdiffMatrix (MTXdiff *mtx_diff_obj, t_symbol *s,
    t_float *y = mtx_diff_obj->y;
    int count;
 
-   // size check
+   /* size check */
    if (!size) {
       post("mtx_diff: invalid dimensions");
       return;
@@ -185,8 +185,8 @@ static void mTXdiffMatrix (MTXdiff *mtx_diff_obj, t_symbol *s,
    mtx_diff_obj->x = x;
    mtx_diff_obj->y = y;
 
-   // main part
-   // reading matrix from inlet
+   /* main part */
+   /* reading matrix from inlet */
    if ((mtx_diff_obj->diff_mode == col_sym) || 
 	 (mtx_diff_obj->diff_mode == col_sym2)) {
       readFloatFromListModulo (size, columns, list_ptr, x);
@@ -196,7 +196,7 @@ static void mTXdiffMatrix (MTXdiff *mtx_diff_obj, t_symbol *s,
    else
       readFloatFromList (size, list_ptr, x);
    
-   // calculating diff
+   /* calculating diff */
    if (mtx_diff_obj->diff_direction == -1) {
       if ((mtx_diff_obj->diff_mode == row_sym) ||
 	    (mtx_diff_obj->diff_mode == col_sym) ||
@@ -223,7 +223,7 @@ static void mTXdiffMatrix (MTXdiff *mtx_diff_obj, t_symbol *s,
    x = mtx_diff_obj->x;
    y = mtx_diff_obj->y;
 
-   // writing matrix to outlet
+   /* writing matrix to outlet */
    if ((mtx_diff_obj->diff_mode == col_sym) || 
 	 (mtx_diff_obj->diff_mode == col_sym2)) {
       columns = mtx_diff_obj->columns;

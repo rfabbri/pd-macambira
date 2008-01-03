@@ -103,7 +103,6 @@ static void readFloatFromList (int n, t_atom *l, t_float *f)
 static void mTXrowrfftMatrix (MTXRowrfft *x, t_symbol *s, 
 			      int argc, t_atom *argv)
 {
-  //mTXrowrfftList (x, s, argc-2, argv+2);
   int rows = atom_getint (argv++);
   int columns = atom_getint (argv++);
   int columns_re = (columns>>1)+1; /* N/2+1 samples needed for real part of realfft */
@@ -116,7 +115,7 @@ static void mTXrowrfftMatrix (MTXRowrfft *x, t_symbol *s,
   t_float *f_re = x->f_re;
   t_float *f_im = x->f_im;
 
-  // fftsize check
+  /* fftsize check */
   if (!size)
     post("mtx_rowrfft: invalid dimensions");
   else if (in_size<size)
@@ -127,7 +126,7 @@ static void mTXrowrfftMatrix (MTXRowrfft *x, t_symbol *s,
   else if (columns == (1 << ilog2(columns))) {
     /* ok, do the FFT! */
 
-    // memory things
+    /* memory things */
     f_re=(t_float*)realloc(f_re, sizeof(t_float)*size);
     f_im=(t_float*)realloc(f_im, sizeof(t_float)*size);
     list_re=(t_atom*)realloc(list_re, sizeof(t_atom)*size2);
@@ -140,7 +139,7 @@ static void mTXrowrfftMatrix (MTXRowrfft *x, t_symbol *s,
     x->f_re = f_re;
     x->f_im = f_im;
 
-    // main part
+    /* main part */
     readFloatFromList (size, argv, f_re);
 
     fft_count = rows;

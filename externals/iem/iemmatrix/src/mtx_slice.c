@@ -142,7 +142,7 @@ static void mTXSliceMatrix (MTXslice *mtx_slice_obj, t_symbol *s,
   int startcol = mtx_slice_obj->slice_startcol;
   int slicecols, slicerows, slicesize;
 
-  // size check
+  /* size check */
   if (!size) {
     post("mtx_slice: invalid dimensions");
     return;
@@ -172,7 +172,7 @@ static void mTXSliceMatrix (MTXslice *mtx_slice_obj, t_symbol *s,
   slicecols = stopcol-startcol+1;
   slicesize = slicerows*slicecols;
 
-  // main part
+  /* main part */
   if (slicesize != mtx_slice_obj->slice_size) {
     if (!list_out)
       list_out = (t_atom *) getbytes (sizeof (t_atom) * (slicesize + 2));

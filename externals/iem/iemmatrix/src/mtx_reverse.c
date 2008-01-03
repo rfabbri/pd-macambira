@@ -23,7 +23,7 @@ struct _MTXreverse_
 {
   t_object x_obj;
   int size;
-  int reverse_mode; // 0=col; 1=row
+  int reverse_mode; /* 0=col; 1=row */
 
   t_outlet *list_outlet;
   t_atom *list_out;
@@ -45,7 +45,7 @@ static void mTXSetReverseMode (MTXreverse *mtx_reverse_obj, t_symbol *c_mode)
   case 'r': case 'R': /* "row" */
     mtx_reverse_obj->reverse_mode = 0;
     break;
-  case 'e': case 'E': case '.': // "element" just revert the whole matrix as if it was a list
+  case 'e': case 'E': case '.': /* "element" just revert the whole matrix as if it was a list */
     mtx_reverse_obj->reverse_mode = -1;
     break;
   default:
@@ -113,7 +113,7 @@ static void mTXreverseMatrix (MTXreverse *mtx_reverse_obj, t_symbol *s,
    t_atom *list_out = mtx_reverse_obj->list_out;
    int count;
 
-   // size check
+   /* size check */
    if (!size) {
       error("mtx_reverse: invalid dimensions");
       return;
@@ -135,7 +135,7 @@ static void mTXreverseMatrix (MTXreverse *mtx_reverse_obj, t_symbol *s,
    mtx_reverse_obj->size = size;
    mtx_reverse_obj->list_out = list_out;
    
-   // main part
+   /* main part */
    list_out += 2;
    copyList (size, argv, list_out);
 
@@ -169,7 +169,6 @@ void mtx_reverse_setup (void)
        CLASS_DEFAULT, A_GIMME, 0);
    class_addbang (mtx_reverse_class, (t_method) mTXreverseBang);
    class_addmethod (mtx_reverse_class, (t_method) mTXreverseMatrix, gensym("matrix"), A_GIMME,0);
-//   class_addmethod (mtx_reverse_class, (t_method) mTXSetreverseDimension, gensym("dimension"), A_DEFFLOAT,0);
    class_addmethod (mtx_reverse_class, (t_method) mTXSetReverseMode, gensym("mode"), A_DEFSYMBOL,0);
 }
 

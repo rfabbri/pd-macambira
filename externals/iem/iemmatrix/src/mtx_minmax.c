@@ -27,7 +27,7 @@ struct _MTXminmax_
   int size;
   int outsize;
   int mode;
-  int operator_minimum; // 1 if we are [mtx_min], 0 if we are [mtx_max]
+  int operator_minimum; /* 1 if we are [mtx_min], 0 if we are [mtx_max] */
 
   t_outlet *min_outlet;
   t_outlet *max_outlet;
@@ -142,7 +142,7 @@ static void mTXMinMaxMatrix (MTXminmax *mtx_minmax_obj, t_symbol *s,
   t_atom *minlist_out = mtx_minmax_obj->minlist_out;
   int elements_out;
   
-  // size check
+  /* size check */
   if (!size) {
     post("mtx_minmax: invalid dimensions");
     return;
@@ -171,7 +171,7 @@ static void mTXMinMaxMatrix (MTXminmax *mtx_minmax_obj, t_symbol *s,
   mtx_minmax_obj->minlist_out = minlist_out;
   mtx_minmax_obj->maxlist_out = maxlist_out;
   
-  // main part
+  /* main part */
   
   switch(mtx_minmax_obj->mode){
   case 1:

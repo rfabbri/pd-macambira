@@ -103,7 +103,7 @@ static void matrix_multilde_matrix_set(t_matrix_multilde *x, int argc, t_atom *a
   length = col * row;
   
   if(transpose){
-    // we need to transpose the matrix
+    /* we need to transpose the matrix */
     for(i=0; i<row; i++){
       int j=0;
       for(j=0; j<col; j++){
@@ -125,7 +125,7 @@ static void matrix_multilde_matrix(t_matrix_multilde *x, t_symbol *s, int argc, 
   matrix_multilde_matrix_set(x,argc, argv, 0);
 }
 static void matrix_multilde_matrixT(t_matrix_multilde *x, t_symbol *s, int argc, t_atom *argv){
-  // transpose the matrix before setting it
+  /* transpose the matrix before setting it */
   matrix_multilde_matrix_set(x,argc, argv, 1);
 }
 static void matrix_multilde_element(t_matrix_multilde *x, t_symbol *s, int argc, t_atom *argv)
@@ -325,7 +325,6 @@ static t_int *matrix_multilde_perf8(t_int *w)
 	  *biginc++ = inc * bigmul;
 	}
       x->x_retarget = 0;
-      //post("time = %f ms, ticks = %d, inc = %f", x->x_time_ms, nticks, *inc);
     }
 
   if(x->x_remaining_ticks)

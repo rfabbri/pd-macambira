@@ -118,7 +118,7 @@ static void mTXIndexRightMatrix (MTXindex *mtx_index_obj, t_symbol *s,
    int *index_in = mtx_index_obj->index_in;
    int max;
 
-   // size check
+   /* size check */
    if (!size) {
       post("mtx_index: invalid dimensions");
       return;
@@ -167,7 +167,7 @@ static void mTXIndexMatrix (MTXindex *mtx_index_obj, t_symbol *s,
    int index_columns = mtx_index_obj->index_columns;
    int *indx = mtx_index_obj->index_in;
 
-   // size check
+   /* size check */
    if (!size) {
       post("mtx_index: invalid dimensions");
       return;
@@ -185,7 +185,7 @@ static void mTXIndexMatrix (MTXindex *mtx_index_obj, t_symbol *s,
       post("mtx_index: index with what? no right matrix defined");
       return;
    }
-   // main part
+   /* main part */
    list_out += 2;
    setAtomListConstFloat (mtx_index_obj->index_size, list_out, mtx_index_obj->fill_value);
    writeIndexedValuesIntoList (mtx_index_obj->index_size, indx,list_in,list_out);

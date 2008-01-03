@@ -45,7 +45,7 @@ static void mtx_gauss_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
   const t_matrixfloat singrange = 1.0e-10;
 
   t_matrixfloat *original;
-  t_matrixfloat *a1, *a2;  // dummy pointers
+  t_matrixfloat *a1, *a2;  /* dummy pointers */
 
 
   if(row*col+2>argc){
@@ -57,11 +57,11 @@ static void mtx_gauss_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
     return;
   }
 
-  // reserve memory for outputting afterwards
+  /* reserve memory for outputting afterwards */
   adjustsize(x, row, row);
   original=matrix2float(argv);
 
-  // Gauss elimination
+  /* Gauss elimination */
   for(i=0; i<row; i++) {
     int nz = 0;
     a1=original+i*(col+1);
@@ -73,29 +73,28 @@ static void mtx_gauss_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
       }
       a1+=col;
     }
-    //if(nz)
+    /*if(nz)*/
     {
-      // exchange rows "nz" and "i"
+      /* exchange rows "nz" and "i" */
       if(nz != i)mtx_gauss_xch(original+i*col+i, original+nz*col+i, col-i);
 
-      // 
       for(j=i+1; j<row; j++){
-	t_matrixfloat f=0.;
-	a1=original+i*(col+1);
-	a2=original+j*col+i;
-	if(*a2){
-	  f=*a1 / *a2;
-	  mtx_gauss_mulsub(a1, a2, col-i, f);
-	}
+        t_matrixfloat f=0.;
+        a1=original+i*(col+1);
+        a2=original+j*col+i;
+        if(*a2){
+          f=*a1 / *a2;
+          mtx_gauss_mulsub(a1, a2, col-i, f);
+        }
       }
     }
   }
 
-  // 3. output the matrix
-  // 3a convert the floatbuf to an atombuf;
+  /* 3. output the matrix */
+  /* 3a convert the floatbuf to an atombuf; */
   float2matrix(x->atombuffer, original);
 
-  // 3c output the atombuf;
+  /* 3c output the atombuf; */
   matrix_bang(x);
 }
 

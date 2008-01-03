@@ -38,7 +38,7 @@ typedef struct _MTXRowrifft_
 } MTXRowrifft;
 
 
-// helper functions: these should really go into a separate file!
+/* helper functions: these should really go into a separate file! */
 
 
 static void zeroFloatArray (int n, t_float *f)
@@ -58,7 +58,7 @@ static void readFloatFromList (int n, t_atom *l, t_float *f)
     *f++ = atom_getfloat (l++);
 }
 
-//--------------inverse real fft
+/*--------------inverse real fft */
 
 static void multiplyVector (int n, t_float *f, t_float fac)
 {
@@ -90,8 +90,7 @@ static void *newMTXRowrifft (t_symbol *s, int argc, t_atom *argv)
 static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s, 
 				   int argc, t_atom *argv)
 {
-  //mTXrowrifftList (x, s, argc-2, argv+2);
-  int rows = atom_getint (argv++);
+    int rows = atom_getint (argv++);
   int columns_re = atom_getint (argv++);
   int in_size = argc-2;
   int columns = (columns_re-1)<<1;
@@ -102,7 +101,7 @@ static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s,
   t_float *f_re = x->f_re;
   t_float *f_im = x->f_im;
 
-  // ifftsize check
+  /* ifftsize check */
   if (columns_re < 3)
     post("mtx_rowrifft: matrix must have at least 3 columns");
   else if (!size) 
@@ -113,7 +112,7 @@ static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s,
     post("mtx_rowrifft: too small matrices");
   else if (columns == (1 << ilog2(columns))) {
 
-    // memory things
+    /* memory things */
     f_re=(t_float*)realloc(f_re, sizeof(t_float)*size);
     f_im=(t_float*)realloc(f_im, sizeof(t_float)*size);
     list_re=(t_atom*)realloc(list_re, sizeof(t_atom)*(size+2));
@@ -127,7 +126,7 @@ static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s,
     x->f_re = f_re;
     x->f_im = f_im;
       
-    // main part: reading imaginary part
+    /* main part: reading imaginary part */
     ifft_count = rows;
     x->renorm_fac = 1.0f / columns;
     while (ifft_count--) {
@@ -135,7 +134,7 @@ static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s,
       argv += columns_re;
       f_im += columns;
     }
-    // do nothing else!
+    /* do nothing else! */
   }
   else
     post("mtx_rowrifft: rowvector 2*(size+1) no power of 2!");
@@ -144,7 +143,6 @@ static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s,
 static void mTXrowrifftMatrixHot (MTXRowrifft *x, t_symbol *s, 
 				  int argc, t_atom *argv)
 {
-  //mTXrowrifftList (x, s, argc-2, argv+2);
   int rows = atom_getint (argv++);
   int columns_re = atom_getint (argv++);
   int columns = x->columns;
@@ -157,7 +155,7 @@ static void mTXrowrifftMatrixHot (MTXRowrifft *x, t_symbol *s,
   t_float *f_im = x->f_im;
   t_float renorm_fac = x->renorm_fac;
 
-  // ifftsize check
+  /* ifftsize check */
   if ((rows != x->rows) || 
       (columns_re != x->columns_re))
     post("mtx_rowrifft: matrix dimensions do not match");
@@ -165,7 +163,7 @@ static void mTXrowrifftMatrixHot (MTXRowrifft *x, t_symbol *s,
     post("mtx_rowrifft: sparse matrix not yet supported: use \"mtx_check\"");
   else if (!x->size2)
     post("mtx_rowrifft: invalid right side matrix");
-  else { // main part
+  else { /* main part */
     ifft_count = rows;
     ptr_re += 2;
     while (ifft_count--){ 

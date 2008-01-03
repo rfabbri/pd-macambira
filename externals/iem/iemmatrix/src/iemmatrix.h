@@ -73,7 +73,7 @@
 # include <AvailabilityMacros.h>
 # if defined (MAC_OS_X_VERSION_10_3) && MAC_OS_X_VERSION_MAX_ALLOWED  >= MAC_OS_X_VERSION_10_3
 # else
-//float intrinsics not in math.h, so we define them here
+/* float intrinsics not in math.h, so we define them here */
 #  define sqrtf(v)    (float)sqrt((double)(v))
 #  define cosf(v)     (float)cos((double)(v))
 #  define sinf(v)     (float)sin((double)(v))
@@ -108,16 +108,16 @@ typedef struct _mtx_binscalar
 {
   t_object x_obj;
 
-  t_matrix m; // the output matrix
-  t_float f;  // the second input
+  t_matrix m; /* the output matrix */
+  t_float f;  /* the second input */
 } t_mtx_binscalar;
 
 typedef struct _mtx_binmtx
 {
   t_object x_obj;
 
-  t_matrix m;  // the output matrix
-  t_matrix m2; // the second input
+  t_matrix m;  /* the output matrix */
+  t_matrix m2; /* the second input */
 } t_mtx_binmtx;
 
 

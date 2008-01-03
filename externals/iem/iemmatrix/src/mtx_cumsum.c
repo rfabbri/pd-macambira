@@ -157,7 +157,7 @@ static void mTXCumsumMatrix (MTXCumsum *mtx_cumsum_obj, t_symbol *s,
    t_float *y = mtx_cumsum_obj->y;
    int count;
 
-   // size check
+   /* size check */
    if (!size) {
       post("mtx_cumsum: invalid dimensions");
       return;
@@ -192,8 +192,8 @@ static void mTXCumsumMatrix (MTXCumsum *mtx_cumsum_obj, t_symbol *s,
    mtx_cumsum_obj->x = x;
    mtx_cumsum_obj->y = y;
 
-   // main part
-   // reading matrix from inlet
+   /* main part */
+   /* reading matrix from inlet */
    if ((mtx_cumsum_obj->cumsum_mode == col_sym) ||
 	(mtx_cumsum_obj->cumsum_mode == col_sym2)) {
       readFloatFromListModulo (size, columns, list_ptr, x);
@@ -203,7 +203,7 @@ static void mTXCumsumMatrix (MTXCumsum *mtx_cumsum_obj, t_symbol *s,
    else
       readFloatFromList (size, list_ptr, x);
    
-   // calculating cumsum
+   /* calculating cumsum */
    if (mtx_cumsum_obj->cumsum_direction == -1) {
       if ((mtx_cumsum_obj->cumsum_mode == row_sym) ||
 	    (mtx_cumsum_obj->cumsum_mode == col_sym) ||
@@ -231,7 +231,7 @@ static void mTXCumsumMatrix (MTXCumsum *mtx_cumsum_obj, t_symbol *s,
    x = mtx_cumsum_obj->x;
    y = mtx_cumsum_obj->y;
 
-   // writing matrix to outlet
+   /* writing matrix to outlet */
    if ((mtx_cumsum_obj->cumsum_mode == col_sym) ||
 	(mtx_cumsum_obj->cumsum_mode == col_sym2)) {
       columns = mtx_cumsum_obj->columns;

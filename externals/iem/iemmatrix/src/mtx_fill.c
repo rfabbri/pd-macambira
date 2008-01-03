@@ -103,7 +103,7 @@ static void mTXFillIndexMatrix (MTXfill *mtx_fill_obj, t_symbol *s,
    int list_size = argc - 2;
    int *idx = mtx_fill_obj->index;
 
-   // size check
+   /* size check */
    if (!size) {
       mtx_fill_obj->fill_type = DONT_FILL_JUST_PASS;
       return;
@@ -175,7 +175,7 @@ static void mTXBigMatrix (MTXfill *mtx_fill_obj, t_symbol *s,
    int list_size = argc - 2;
    t_atom *list_out = mtx_fill_obj->list_out;
 
-   // size check
+   /* size check */
    if (!size) {
       post("mtx_fill: invalid dimensions");
       return;
@@ -236,7 +236,7 @@ static void mTXFillScalar (MTXfill *mtx_fill_obj, t_float f)
 	    post("mtx_fill: no matrix defined for filling");
 	    return;
 	 }
-	 // main part
+	 /* main part */
 	 writeFloatIndexedIntoMatrix (mtx_fill_obj->num_idcs_used,
 	       mtx_fill_obj->index, f,list_out+2);
       default:
@@ -264,7 +264,7 @@ static void mTXFillMatrix (MTXfill *mtx_fill_obj, t_symbol *s,
       return;
    }
 
-   // size check
+   /* size check */
    if (!list_size) {
       post("mtx_fill: invalid dimensions");
       return;
@@ -297,7 +297,7 @@ static void mTXFillMatrix (MTXfill *mtx_fill_obj, t_symbol *s,
       return;
    }
    
-   // main part
+   /* main part */
    switch (mtx_fill_obj->fill_type) {
       case FILL_SUBMATRIX:
 	 list_out += columns * (mtx_fill_obj->fill_startrow-1) + 

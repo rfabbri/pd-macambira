@@ -221,7 +221,7 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
    int size_y = mtx_conv_obj->size_y;
    t_atom *list_ptr = mtx_conv_obj->list;
 
-   // fftsize check
+   /* fftsize check */
    if (!size){
       post("mtx_conv: invalid dimensions");
       return;
@@ -232,8 +232,6 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
       post("mtx_conv: no valid filter kernel defined");
       return;
    }
-
-   //   post("1");
 
    if ((mtx_conv_obj->rows != rows)||(mtx_conv_obj->columns != columns)) { 
      if (mtx_conv_obj->x)
@@ -248,7 +246,6 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
      mtx_conv_obj->rows = rows;
      mtx_conv_obj->columns = columns;
    }
-   //post("2");
    rows_y = rows+rows_k-1;
    columns_y = columns+columns_k-1;
    if ((mtx_conv_obj->rows_y != rows_y)||(mtx_conv_obj->columns_y != columns_y)) { 
@@ -277,7 +274,7 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
      }
 
    }
-   // main part
+   /* main part */
    readMatrixFromList (rows, columns, argv, mtx_conv_obj->x); 
 
    convolveMtx (rows, columns, rows_k, columns_k, 
@@ -289,7 +286,6 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
    SETFLOAT(&list_ptr[1], columns_y);
    outlet_anything(mtx_conv_obj->list_outlet, gensym("matrix"), 
                    size_y+2, list_ptr);
-   //post("7");
 }
 
 void mtx_conv_setup (void)

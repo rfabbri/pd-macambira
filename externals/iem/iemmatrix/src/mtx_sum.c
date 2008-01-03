@@ -63,7 +63,6 @@ void mtx_sum_setup(void)
   mtx_sum_class = class_new(gensym("mtx_sum"), (t_newmethod)mtx_sum_new, 
 			     (t_method)matrix_free, sizeof(t_matrix), 0, A_GIMME, 0);
   class_addlist  (mtx_sum_class, mtx_sum_list);
-  //  class_addbang  (mtx_sum_class, matrix_bang);
   class_addmethod(mtx_sum_class, (t_method)mtx_sum_matrix, gensym("matrix"), A_GIMME, 0);
 
 }

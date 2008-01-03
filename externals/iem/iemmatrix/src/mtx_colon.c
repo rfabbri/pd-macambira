@@ -72,7 +72,6 @@ static void mTXColonList (MTXColon *mtx_colon_obj, t_symbol *s,
    }
       
    size = (int)((stopval- startval + step) / step);
-   //post("startval %f stopval %f step %f, size %d",startval, stopval, step, size);
    if (size) {
       if (size!=mtx_colon_obj->size) {
 	 if (list_out) 

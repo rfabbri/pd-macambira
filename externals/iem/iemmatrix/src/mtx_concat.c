@@ -149,7 +149,7 @@ static void mTXConcatMatrix (MTXconcat *mtx_concat_obj, t_symbol *s,
    t_matrix *mtx_in2 = &mtx_concat_obj->mtx_in2;
    t_matrix *mtx_out = &mtx_concat_obj->mtx_out;
 
-   // size check
+   /* size check */
    if (!size) {
       post("mtx_concat: invalid dimensions");
       return;
@@ -161,8 +161,8 @@ static void mTXConcatMatrix (MTXconcat *mtx_concat_obj, t_symbol *s,
    mtx_in1->row = rows;
    mtx_in1->col = columns;
    mtx_in1->atombuffer = argv;
-// alternatively to the above:
-//   matrix_matrix2 (mtx_in1, s, argc, argv);
+   /* alternatively to the above: */
+   /*   matrix_matrix2 (mtx_in1, s, argc, argv); */
 
    if (mtx_concat_obj->concat_mode == 0) {
       mTXConcatDoRowConcatenation(mtx_concat_obj, mtx_in1, mtx_in2, mtx_out);

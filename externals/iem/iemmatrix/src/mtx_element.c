@@ -55,7 +55,7 @@ static void mtx_element_float(t_matrix *x, t_floatarg f)
       ap+=x->col*(x->current_row-1);
       count=x->col;
       while(count--)SETFLOAT(&ap[count], f);
-    } else { // x->current_row==0
+    } else {
       ap+=x->current_col-1;
       count=x->row;
       while(count--)SETFLOAT(&ap[count*x->col], f);

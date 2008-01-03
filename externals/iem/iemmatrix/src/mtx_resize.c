@@ -48,7 +48,7 @@ static void mtx_resize_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
   if (!r)r=row;
   if (!c)c=col;
 
-  if (r==row && c==col) { // no need to change
+  if (r==row && c==col) { /* no need to change */
     outlet_anything(x->x_obj.ob_outlet, gensym("matrix"), argc, argv);
     return;
   }

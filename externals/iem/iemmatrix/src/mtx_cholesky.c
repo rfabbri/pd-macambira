@@ -40,20 +40,20 @@ static void mtx_cholesky_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv
     return;
   }
 
-  // reserve memory for outputting afterwards
+  /* reserve memory for outputting afterwards */
   adjustsize(x, row, row);
-  // 1. get the 2 matrices : orig; invert (create as eye, but will be orig^(-1))
+  /* 1. get the 2 matrices : orig; invert (create as eye, but will be orig^(-1)) */
   cholesky = (t_matrixfloat *)getbytes(sizeof(t_matrixfloat)*row2);
-  // 1a extract values of A to float-buf
+  /* 1a extract values of A to float-buf */
   original=matrix2float(argv);
 
-  // 2 set the cholesky matrix to zero
+  /* 2 set the cholesky matrix to zero */
   for(i=0; i<row2; i++)cholesky[i]=0.;
 
-  // 3 do the cholesky decomposition
+  /* 3 do the cholesky decomposition */
   for(i=0; i<col; i++){
-    // 3a get the diagonal element
-    // l_ii=sqrt(a_ii-sum(k=1..i-1)((l_ik)^2))
+    /* 3a get the diagonal element */
+    /* l_ii=sqrt(a_ii-sum(k=1..i-1)((l_ik)^2)) */
     t_matrixfloat sum=0.;
     t_matrixfloat result=0.f;
 
@@ -65,10 +65,10 @@ static void mtx_cholesky_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv
       post("[mtx_cholesky]: only symmetric and positive definite matrices can be cholesky-decomposed");
       return;
     }
-    result=sqrtf(result); // LATER check whether this is real
+    result=sqrtf(result); /* LATER check whether this is real */
     cholesky[i*(col+1)]=result;
-    // 3b get the other elements within this row/col
-    // l_ji=(a_ji-sum(k=1..i-1)(l_jk*l_ik))/l_ii
+    /* 3b get the other elements within this row/col */
+    /* l_ji=(a_ji-sum(k=1..i-1)(l_jk*l_ik))/l_ii */
     for(j=i+1; j<row; j++){
       sum=0.;
       for(k=0; k<i; k++){
@@ -81,13 +81,13 @@ static void mtx_cholesky_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv
     }
   }
 
-  // 4. output the matrix
-  // 4a convert the floatbuf to an atombuf;
+  /* 4. output the matrix */
+  /* 4a convert the floatbuf to an atombuf; */
   float2matrix(x->atombuffer, cholesky);
-  // 4b destroy the buffers
+  /* 4b destroy the buffers */
   freebytes(original, sizeof(t_matrixfloat)*row2);
 
-  // 4c output the atombuf;
+  /* 4c output the atombuf; */
   matrix_bang(x);
 }
 

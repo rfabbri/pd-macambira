@@ -21,9 +21,9 @@ typedef struct _mtx_pivot
 {
   t_object x_obj;
 
-  t_matrix m;  // the output matrix
-  t_matrix m_pre;  // the pre -multiply matrix
-  t_matrix m_post; // the post-multiply matrix
+  t_matrix m;  /* the output matrix */
+  t_matrix m_pre;  /* the pre -multiply matrix */
+  t_matrix m_post; /* the post-multiply matrix */
 
   t_outlet *pivo, *pre, *post;
 
@@ -79,7 +79,7 @@ static void mtx_pivot_matrix(t_mtx_pivot *x, t_symbol *s, int argc, t_atom *argv
   /* do the pivot thing */
 
   for (k=0; k<min_rowcol; k++){
-    // 1. find max_element
+    /* 1. find max_element */
     t_float tmp = fabsf(buffer[k*(1+col)]);
     pivot_row = pivot_col = k;
 
@@ -96,8 +96,8 @@ static void mtx_pivot_matrix(t_mtx_pivot *x, t_symbol *s, int argc, t_atom *argv
 	}
       }
     }
-    // 2. move tmp el to [k,k]
-    // 2a swap rows
+    /* 2. move tmp el to [k,k] */
+    /* 2a swap rows */
     if (k-pivot_row) {
       t_matrixfloat *oldrow=buffer+col*k;
       t_matrixfloat *newrow=buffer+col*pivot_row;
@@ -112,7 +112,7 @@ static void mtx_pivot_matrix(t_mtx_pivot *x, t_symbol *s, int argc, t_atom *argv
       i_pre[k]=i_pre[pivot_row];
       i_pre[pivot_row]=i;
     }
-    // 2b swap columns
+    /* 2b swap columns */
     if (k-pivot_col) {
       t_matrixfloat *oldcol=buffer+k;
       t_matrixfloat *newcol=buffer+pivot_col;

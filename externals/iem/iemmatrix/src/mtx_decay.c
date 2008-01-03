@@ -179,7 +179,7 @@ static void mTXDecayMatrix (MTXDecay *mtx_decay_obj, t_symbol *s,
    t_float *y = mtx_decay_obj->y;
    int count;
 
-   // size check
+   /* size check */
    if (!size) {
       post("mtx_decay: invalid dimensions");
       return;
@@ -214,8 +214,8 @@ static void mTXDecayMatrix (MTXDecay *mtx_decay_obj, t_symbol *s,
    mtx_decay_obj->x = x;
    mtx_decay_obj->y = y;
 
-   // main part
-   // reading matrix from inlet
+   /* main part */
+   /* reading matrix from inlet */
 
    if ((mtx_decay_obj->decay_mode == col_sym) ||
 	 (mtx_decay_obj->decay_mode == col_sym2)) {
@@ -226,7 +226,7 @@ static void mTXDecayMatrix (MTXDecay *mtx_decay_obj, t_symbol *s,
    else
       readFloatFromList (size, list_ptr, x);
    
-   // calculating decay
+   /* calculating decay */
    if (mtx_decay_obj->decay_direction == -1) {
       if ((mtx_decay_obj->decay_mode == col_sym) ||
 	    (mtx_decay_obj->decay_mode == col_sym2) ||
@@ -254,7 +254,7 @@ static void mTXDecayMatrix (MTXDecay *mtx_decay_obj, t_symbol *s,
    x = mtx_decay_obj->x;
    y = mtx_decay_obj->y;
 
-   // writing matrix to outlet
+   /* writing matrix to outlet */
   if ((mtx_decay_obj->decay_mode == col_sym) ||
 	 (mtx_decay_obj->decay_mode == col_sym2)) {
       columns = mtx_decay_obj->columns;

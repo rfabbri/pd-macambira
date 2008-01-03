@@ -80,13 +80,13 @@ static void writeRepeatIntoMatrix (int repeat_rows, int repeat_cols, int rows, i
    int new_col = columns * repeat_cols;
    t_atom *ptr = y;
 
-   // writing each row repeatedly (repeat_col times) into output array
-   // so that : row1#1 row1#2 ... row1#RN | ... | rowN#1 rowN#2 ... rowN#RN
+   /* writing each row repeatedly (repeat_col times) into output array */
+   /* so that : row1#1 row1#2 ... row1#RN | ... | rowN#1 rowN#2 ... rowN#RN */
    for (row_cnt=rows;row_cnt--;x+=columns) 
       for(col_cnt=repeat_cols;col_cnt--;ptr+=columns) 
 	 copyList (columns, x, ptr);
 
-   // repeating the above written long lines repeat row_repeat times in output array
+   /* repeating the above written long lines repeat row_repeat times in output array */
    for (;--repeat_rows;) 
       for (row_cnt=rows;row_cnt--;y+=new_col,ptr+=new_col) 
 	 copyList (new_col, y, ptr);
@@ -106,7 +106,7 @@ static void mTXRepmatMatrix (MTXrepmat *mtx_repmat_obj, t_symbol *s,
    t_atom *list_in = argv;
    t_atom *list_out = mtx_repmat_obj->list_out;
 
-   // size check
+   /* size check */
    if (!size) {
       post("mtx_repmat: invalid dimensions");
       return;
@@ -129,9 +129,8 @@ static void mTXRepmatMatrix (MTXrepmat *mtx_repmat_obj, t_symbol *s,
 	 list_out = (t_atom*) getbytes (sizeof(t_atom)*(size+2));
       mtx_repmat_obj->list_out = list_out;
       mtx_repmat_obj->size = size;
-      //post("size %d, rows %d, columns %d", size, rows, columns);
    }
-   // main part
+   /* main part */
    
    writeRepeatIntoMatrix (rep_rows, rep_cols, rows, columns,
 	 list_in, list_out+2);
