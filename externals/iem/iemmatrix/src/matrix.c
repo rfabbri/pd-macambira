@@ -217,6 +217,7 @@ void matrix_setup(void)
   matrix_class = class_new(gensym("matrix"), (t_newmethod)matrix_new, 
 			   (t_method)matrix_free, sizeof(t_matrix), 0, A_GIMME, 0);
   class_addcreator((t_newmethod)matrix_new, gensym("mtx"), A_GIMME, 0);
+  class_addcreator((t_newmethod)matrix_new, gensym("iemmatrix"), A_GIMME, 0);
 
   /* the core : functions for matrices */
   class_addmethod  (matrix_class, (t_method)matrix_matrix, gensym("matrix"), A_GIMME, 0);
@@ -250,5 +251,9 @@ void iemtx_matrix_setup(void){
 }
 
 void mtx_matrix_setup(void){
+  matrix_setup();
+}
+
+void iematrix_setup(void){
   matrix_setup();
 }

@@ -7,11 +7,11 @@
 
 void iemmatrix_sources_setup(void)
 {
+	iematrix_setup(); /* matrix.c */
 	iemtx_abs_setup(); /* mtx_abs.c */
 	iemtx_add_setup(); /* mtx_add.c */
 	iemtx_and_setup(); /* mtx_and.c */
 	iemtx_atan_setup(); /* mtx_atan.c */
-	iemtx_binops_setup(); /* mtx_binops.c */
 	iemtx_bitand_setup(); /* mtx_bitand.c */
 	iemtx_bitleft_setup(); /* mtx_bitleft.c */
 	iemtx_bitor_setup(); /* mtx_bitor.c */
@@ -45,16 +45,16 @@ void iemmatrix_sources_setup(void)
 	iemtx_index_setup(); /* mtx_index.c */
 	iemtx_int_setup(); /* mtx_int.c */
 	iemtx_inverse_setup(); /* mtx_inverse.c */
+	iemtx_isequal_setup(); /* mtx_isequal.c */
 	iemtx_le_setup(); /* mtx_le.c */
 	iemtx_log_setup(); /* mtx_log.c */
 	iemtx_lt_setup(); /* mtx_lt.c */
-	iemtx_matrix_setup(); /* mtx_matrix.c */
 	iemtx_max2_setup(); /* mtx_max2.c */
 	iemtx_mean_setup(); /* mtx_mean.c */
 	iemtx_min2_setup(); /* mtx_min2.c */
 	iemtx_minmax_setup(); /* mtx_minmax.c */
-	iemtx_mul_setup(); /* mtx_mul.c */
 	iemtx_mul__setup(); /* mtx_mul~.c */
+	iemtx_mul_setup(); /* mtx_mul.c */
 	iemtx_neq_setup(); /* mtx_neq.c */
 	iemtx_not_setup(); /* mtx_not.c */
 	iemtx_ones_setup(); /* mtx_ones.c */
