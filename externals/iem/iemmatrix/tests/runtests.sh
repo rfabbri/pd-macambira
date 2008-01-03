@@ -18,6 +18,12 @@ function run_nogui() {
  echo "regression-test: ${NUMTESTS} tests total" >>  ${RUNTESTS_LOG}.$$
  
  cat ${RUNTESTS_LOG}.$$ | egrep "^regression-test: " | sed -e 's/^regression-test: //'
+ FAILEDTESTS=$(cat ${RUNTESTS_LOG}.$$ | egrep "^regression-test: .*: failed$" | sed -e 's|^regression-test: ||' -e 's|: failed$||')
+ echo -n "failed tests: "
+ for ft in ${FAILEDTESTS}; do
+   echo -n "${ft} "
+ done
+ echo
 }
 
 function run_withgui() {
