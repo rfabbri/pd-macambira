@@ -1,4 +1,4 @@
-#N canvas 13 81 566 290 10;
+#N canvas 310 132 566 428 10;
 #X text 295 30 updated for;
 #X obj 383 30 iemmatrix 0.2;
 #X obj 432 56 matrix;
@@ -18,6 +18,14 @@
 #X text 30 89 create a turned diagonal matrix;
 #X obj 300 197 mtx_diegg;
 #X obj 103 201 mtx_diegg 7 9 8;
+#X text 58 299 "turned" means rotated by -90deg:;
+#X text 90 339 1 0 0;
+#X text 90 353 0 2 0;
+#X text 90 366 0 0 3;
+#X text 200 353 0 2 0;
+#X text 200 339 0 0 1;
+#X text 200 366 3 0 0;
+#X text 148 353 ==>;
 #X connect 6 0 18 0;
 #X connect 7 0 18 0;
 #X connect 8 0 10 0;

@@ -13,6 +13,9 @@
 #X obj 69 145 mtx_diegg;
 #X msg 69 126 1 2;
 #X obj 69 166 route matrix;
+#X text 265 139 0 1;
+#X text 265 154 2 0;
+#X text 200 145 1 2 -->;
 #X connect 0 0 12 0;
 #X connect 1 2 3 0;
 #X connect 1 3 2 0;
