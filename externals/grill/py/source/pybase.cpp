@@ -6,7 +6,7 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
 $LastChangedRevision: 26 $
-$LastChangedDate: 2008-01-03 17:20:03 +0100 (Thu, 03 Jan 2008) $
+$LastChangedDate: 2008-01-03 18:00:03 +0100 (Thu, 03 Jan 2008) $
 $LastChangedBy: thomas $
 */
 
@@ -678,7 +678,7 @@ void pybase::Reload()
 
     if(reg) {
         PyObject *key;
-        int pos = 0;
+        Py_ssize_t pos = 0;
         while(PyDict_Next(reg,&pos,&key,NULL)) {
             pybase *th = (pybase *)PyLong_AsLong(key);
             FLEXT_ASSERT(th);
@@ -697,7 +697,7 @@ void pybase::Reload()
             SetRegistry(REGNAME,reg);
 
             PyObject *key;
-            int pos = 0;
+            Py_ssize_t pos = 0;
             while(PyDict_Next(reg,&pos,&key,NULL)) {
                 pybase *th = (pybase *)PyLong_AsLong(key);
                 FLEXT_ASSERT(th);

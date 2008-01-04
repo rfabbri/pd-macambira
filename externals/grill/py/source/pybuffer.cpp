@@ -6,7 +6,7 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
 $LastChangedRevision: 26 $
-$LastChangedDate: 2008-01-03 17:20:03 +0100 (Thu, 03 Jan 2008) $
+$LastChangedDate: 2008-01-04 12:24:43 +0100 (Fri, 04 Jan 2008) $
 $LastChangedBy: thomas $
 */
 
@@ -189,44 +189,32 @@ static PyMethodDef buffer_methods[] = {
 
 // support the buffer protocol
 
-#if PY_VERSION_HEX >= 0x02050000
 static Py_ssize_t buffer_readbuffer(PyObject *obj, Py_ssize_t segment, void **ptrptr)
-#else
-static int buffer_readbuffer(PyObject *obj, int segment, void **ptrptr)
-#endif
 {
     flext::buffer *b = ((pySamplebuffer *)obj)->buf;
     ptrptr[0] = b->Data();
     return b->Channels()*b->Frames()*sizeof(t_sample);
 }
 
-#if PY_VERSION_HEX >= 0x02050000
 static Py_ssize_t buffer_writebuffer(PyObject *obj, Py_ssize_t segment, void **ptrptr)
-#else
-static int buffer_writebuffer(PyObject *obj, int segment, void **ptrptr)
-#endif
 {
     flext::buffer *b = ((pySamplebuffer *)obj)->buf;
     ptrptr[0] = b->Data();
     return b->Channels()*b->Frames()*sizeof(t_sample);
 }
 
-#if PY_VERSION_HEX >= 0x02050000
 static Py_ssize_t buffer_segcount(PyObject *obj, Py_ssize_t *lenp)
-#else
-static int buffer_segcount(PyObject *obj, int *lenp)
-#endif
 {
     flext::buffer *b = ((pySamplebuffer *)obj)->buf;
     if(lenp) lenp[0] = b->Channels()*b->Frames()*sizeof(t_sample);
     return 1;
 }
 
-#if PY_VERSION_HEX >= 0x02050000
-static Py_ssize_t buffer_charbuffer(PyObject *obj, Py_ssize_t segment, char **ptrptr)
-#else
-static int buffer_charbuffer(PyObject *obj, int segment, const char **ptrptr)
+static Py_ssize_t buffer_charbuffer(PyObject *obj, Py_ssize_t segment,
+#if PY_VERSION_HEX < 0x02050000
+    const
 #endif
+    char **ptrptr)
 {
     flext::buffer *b = ((pySamplebuffer *)obj)->buf;
     ptrptr[0] = (char *)b->Data();
@@ -240,13 +228,15 @@ static PyBufferProcs buffer_as_buffer = {
     buffer_charbuffer
 };
 
-static int buffer_length(pySamplebuffer *self)
+static Py_ssize_t buffer_length(PyObject *s)
 {
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
     return self->buf?self->buf->Frames():0;
 }
 
-static PyObject *buffer_item(pySamplebuffer *self, int i)
+static PyObject *buffer_item(PyObject *s,Py_ssize_t i)
 {
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
     PyObject *ret;
     if(self->buf) {
 	    if (i < 0 || i >= self->buf->Frames()) {
@@ -281,7 +271,7 @@ PyObject *arrayfrombuffer(PyObject *buf,int c,int n)
         arr = (PyObject *)NA_NewAllFromBuffer(c == 1?1:2,shape,numtype,buf,0,0,NA_ByteOrder(),1,1);
 #else
         void *data;
-        int len;
+        Py_ssize_t len;
         int err = PyObject_AsWriteBuffer(buf,&data,&len);
         if(!err) {
             FLEXT_ASSERT(len <= n*c*sizeof(t_sample));
@@ -301,8 +291,9 @@ PyObject *arrayfrombuffer(PyObject *buf,int c,int n)
     return NULL;
 }
 
-static PyObject *buffer_slice(pySamplebuffer *self,int ilow = 0,int ihigh = 1<<(sizeof(int)*8-2))
+static PyObject *buffer_slice(PyObject *s,Py_ssize_t ilow = 0,Py_ssize_t ihigh = 1<<(sizeof(int)*8-2))
 {
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
     PyObject *ret;
 #ifdef PY_ARRAYS
     if(arrsupport()) {
@@ -336,8 +327,9 @@ static PyObject *buffer_slice(pySamplebuffer *self,int ilow = 0,int ihigh = 1<<(
     return ret;
 }
 
-static int buffer_ass_item(pySamplebuffer *self,int i,PyObject *v)
+static int buffer_ass_item(PyObject *s,Py_ssize_t i,PyObject *v)
 {
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
     int ret;
     if(self->buf) {
 	    if (i < 0 || i >= self->buf->Frames()) {
@@ -368,8 +360,9 @@ static int buffer_ass_item(pySamplebuffer *self,int i,PyObject *v)
 	return ret;
 }
 
-static int buffer_ass_slice(pySamplebuffer *self,int ilow,int ihigh,PyObject *value)
+static int buffer_ass_slice(PyObject *s,Py_ssize_t ilow,Py_ssize_t ihigh,PyObject *value)
 {
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
     int ret;
 #ifdef PY_ARRAYS
     if(arrsupport()) {
@@ -426,9 +419,10 @@ static int buffer_ass_slice(pySamplebuffer *self,int ilow,int ihigh,PyObject *va
     return ret;
 }
 
-static PyObject *buffer_concat(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_concat(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PySequence_Concat(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -439,9 +433,10 @@ static PyObject *buffer_concat(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_repeat(pySamplebuffer *self,int rep)
+static PyObject *buffer_repeat(PyObject *s,Py_ssize_t rep)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PySequence_Repeat(nobj,rep);
         if(ret == nobj) self->dirty = true;
@@ -454,19 +449,19 @@ static PyObject *buffer_repeat(pySamplebuffer *self,int rep)
 
 
 static PySequenceMethods buffer_as_seq = {
-	(inquiry)buffer_length,			/* inquiry sq_length;             __len__ */
-	(binaryfunc)buffer_concat,          /* __add__ */
-	(intargfunc)buffer_repeat,          /* __mul__ */
-	(intargfunc)buffer_item,			/* intargfunc sq_item;            __getitem__ */
-	(intintargfunc)buffer_slice,		 /* intintargfunc sq_slice;        __getslice__ */
-	(intobjargproc)buffer_ass_item,		/* intobjargproc sq_ass_item;     __setitem__ */
-	(intintobjargproc)buffer_ass_slice,	/* intintobjargproc sq_ass_slice; __setslice__ */
+	buffer_length,			/* inquiry sq_length;             __len__ */
+	buffer_concat,          /* __add__ */
+	buffer_repeat,          /* __mul__ */
+	buffer_item,			/* intargfunc sq_item;            __getitem__ */
+	buffer_slice,		 /* intintargfunc sq_slice;        __getslice__ */
+	buffer_ass_item,		/* intobjargproc sq_ass_item;     __setitem__ */
+	buffer_ass_slice,	/* intintobjargproc sq_ass_slice; __setslice__ */
 };
 
-static PyObject *buffer_iter(PyObject *obj)
+static PyObject *buffer_iter(PyObject *s)
 {
-    pySamplebuffer *self = (pySamplebuffer *)obj;
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *it = PyObject_GetIter(nobj);
         Py_DECREF(nobj);
@@ -477,9 +472,10 @@ static PyObject *buffer_iter(PyObject *obj)
 }
 
 
-static PyObject *buffer_add(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_add(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_Add(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -490,9 +486,10 @@ static PyObject *buffer_add(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_subtract(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_subtract(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_Subtract(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -503,9 +500,10 @@ static PyObject *buffer_subtract(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_multiply(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_multiply(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_Multiply(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -516,9 +514,10 @@ static PyObject *buffer_multiply(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_divide(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_divide(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_Divide(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -529,9 +528,10 @@ static PyObject *buffer_divide(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_remainder(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_remainder(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_Remainder(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -542,9 +542,10 @@ static PyObject *buffer_remainder(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_divmod(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_divmod(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_Divmod(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -555,9 +556,10 @@ static PyObject *buffer_divmod(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_power(pySamplebuffer *self,PyObject *op1,PyObject *op2)
+static PyObject *buffer_power(PyObject *s,PyObject *op1,PyObject *op2)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_Power(nobj,op1,op2);
         if(ret == nobj) self->dirty = true;
@@ -568,9 +570,10 @@ static PyObject *buffer_power(pySamplebuffer *self,PyObject *op1,PyObject *op2)
         return NULL;
 }
 
-static PyObject *buffer_negative(pySamplebuffer *self)
+static PyObject *buffer_negative(PyObject *s)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_Negative(nobj);
         if(ret == nobj) self->dirty = true;
@@ -581,9 +584,10 @@ static PyObject *buffer_negative(pySamplebuffer *self)
         return NULL;
 }
 
-static PyObject *buffer_pos(pySamplebuffer *self)
+static PyObject *buffer_pos(PyObject *s)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_Positive(nobj);
         Py_DECREF(nobj);
@@ -593,9 +597,10 @@ static PyObject *buffer_pos(pySamplebuffer *self)
         return NULL;
 }
 
-static PyObject *buffer_absolute(pySamplebuffer *self)
+static PyObject *buffer_absolute(PyObject *s)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_Absolute(nobj);
         if(ret == nobj) self->dirty = true;
@@ -606,7 +611,7 @@ static PyObject *buffer_absolute(pySamplebuffer *self)
         return NULL;
 }
 
-static int buffer_coerce(pySamplebuffer **pm, PyObject **pw) 
+static int buffer_coerce(PyObject **pm, PyObject **pw) 
 {
     if(pySamplebuffer_Check(*pw)) {
         Py_INCREF(*pm);
@@ -617,9 +622,10 @@ static int buffer_coerce(pySamplebuffer **pm, PyObject **pw)
         return 1;
 }
 	
-static PyObject *buffer_inplace_add(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_inplace_add(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_InPlaceAdd(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -630,9 +636,10 @@ static PyObject *buffer_inplace_add(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_inplace_subtract(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_inplace_subtract(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_InPlaceSubtract(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -643,9 +650,10 @@ static PyObject *buffer_inplace_subtract(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_inplace_multiply(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_inplace_multiply(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_InPlaceMultiply(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -656,9 +664,10 @@ static PyObject *buffer_inplace_multiply(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_inplace_divide(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_inplace_divide(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_InPlaceDivide(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -669,9 +678,10 @@ static PyObject *buffer_inplace_divide(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_inplace_remainder(pySamplebuffer *self,PyObject *op)
+static PyObject *buffer_inplace_remainder(PyObject *s,PyObject *op)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_InPlaceRemainder(nobj,op);
         if(ret == nobj) self->dirty = true;
@@ -682,9 +692,10 @@ static PyObject *buffer_inplace_remainder(pySamplebuffer *self,PyObject *op)
         return NULL;
 }
 
-static PyObject *buffer_inplace_power(pySamplebuffer *self,PyObject *op1,PyObject *op2)
+static PyObject *buffer_inplace_power(PyObject *s,PyObject *op1,PyObject *op2)
 {
-    PyObject *nobj = buffer_slice(self);
+    pySamplebuffer *self = reinterpret_cast<pySamplebuffer *>(s);
+    PyObject *nobj = buffer_slice(s);
     if(nobj) {
         PyObject *ret = PyNumber_InPlacePower(nobj,op1,op2);
         if(ret == nobj) self->dirty = true;

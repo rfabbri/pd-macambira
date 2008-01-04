@@ -6,7 +6,7 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
 $LastChangedRevision: 26 $
-$LastChangedDate: 2008-01-03 17:20:03 +0100 (Thu, 03 Jan 2008) $
+$LastChangedDate: 2008-01-04 12:58:11 +0100 (Fri, 04 Jan 2008) $
 $LastChangedBy: thomas $
 */
 
@@ -41,10 +41,14 @@ $LastChangedBy: thomas $
 #include <flcontainers.h>
 #include <string>
 
-#ifdef PY_USE_INOFFICIAL
+#if FLEXT_SYS == FLEXT_SYS_PD && defined(PY_USE_INOFFICIAL)
 extern "C" {
 #include <s_stuff.h>
 }
+#endif
+
+#if PY_VERSION_HEX < 0x02050000
+typedef int Py_ssize_t;
 #endif
 
 #endif
