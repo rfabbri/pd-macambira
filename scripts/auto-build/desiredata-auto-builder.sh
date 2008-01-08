@@ -58,7 +58,7 @@ case $SYSTEM in
 	 *)
 		  package_name="/tmp/desiredata-${DATE}-${SYSTEM}-${HOSTNAME}-${platform_name}.tar.bz2"
 		  cd ${auto_build_root_dir}/pd/src && \
-				aclocal && autoconf && autoheader && \
+				autoconf && \
 				./configure $configure_options && \
 				make  && \
 				cd ../../ && \
