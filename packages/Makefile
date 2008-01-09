@@ -255,7 +255,10 @@ PD_BUILD_FLAGS =
 PD_AUTOCONF = autoconf
 
 $(pd_src)/src/configure: $(pd_src)/src/configure.in
-	cd $(pd_src)/src/ && if [ -f acinclude.m4 ] ; then aclocal ; fi && $(PD_AUTOCONF) && autoheader
+	cd $(pd_src)/src/ && \
+	if [ -f acinclude.m4 ] ; then aclocal ; fi && \
+	$(PD_AUTOCONF) && \
+	if grep -q AC_CONFIG_HEADERS configure.in ; then autoheader ; fi
 
 # this is not used yet because MinGW doesn't use ./configure && make yet
 #$(pd_src)/src/makefile: $(pd_src)/src/makefile.in
