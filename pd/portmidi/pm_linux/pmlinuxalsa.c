@@ -9,6 +9,9 @@
 
 #include "stdlib.h"
 #include "portmidi.h"
+#ifdef NEWBUFFER
+#include "pmutil.h"
+#endif
 #include "pminternal.h"
 #include "pmlinuxalsa.h"
 #include "string.h"
@@ -41,7 +44,8 @@
 extern pm_fns_node pm_linuxalsa_in_dictionary;
 extern pm_fns_node pm_linuxalsa_out_dictionary;
 
-static snd_seq_t *seq; // all input comes here, output queue allocated on seq
+static snd_seq_t *seq = NULL; // all input comes here, 
+                              // output queue allocated on seq
 static int queue, queue_used; /* one for all ports, reference counted */
 
 typedef struct alsa_descriptor_struct {
@@ -208,7 +212,7 @@ static PmError alsa_write_byte(PmInternal *midi, unsigned char byte,
             when = (when - now) + midi->latency;
             if (when < 0) when = 0;
             VERBOSE printf("timestamp %d now %d latency %d, ", 
-                           timestamp, now, midi->latency);
+                           (int) timestamp, (int) now, midi->latency);
             VERBOSE printf("scheduling event after %d\n", when);
             /* message is sent in relative ticks, where 1 tick = 1 ms */
             snd_seq_ev_schedule_tick(&ev, queue, 1, when);
@@ -238,7 +242,6 @@ static PmError alsa_write_byte(PmInternal *midi, unsigned char byte,
 
 static PmError alsa_out_close(PmInternal *midi)
 {
-    int err;
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
     if (!desc) return pmBadPtr;
 
@@ -252,6 +255,7 @@ static PmError alsa_out_close(PmInternal *midi)
     }
     if (midi->latency > 0) alsa_unuse_queue();
     snd_midi_event_free(desc->parser);
+    midi->descriptor = NULL; /* destroy the pointer to signify "closed" */
     pm_free(desc);
     if (pm_hosterror) {
         get_alsa_error_text(pm_hosterror_text, PM_HOST_ERROR_MSG_LEN, 
@@ -329,7 +333,6 @@ static PmError alsa_in_open(PmInternal *midi, void *driverInfo)
 
 static PmError alsa_in_close(PmInternal *midi)
 {
-    int err;
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
     if (!desc) return pmBadPtr;
     if (pm_hosterror = snd_seq_disconnect_from(seq, desc->this_port, 
@@ -351,8 +354,30 @@ static PmError alsa_in_close(PmInternal *midi)
 
 static PmError alsa_abort(PmInternal *midi)
 {
+    /* NOTE: ALSA documentation is vague. This is supposed to 
+     * remove any pending output messages. If you can test and 
+     * confirm this code is correct, please update this comment. -RBD
+     */
+    /* Unfortunately, I can't even compile it -- my ALSA version 
+     * does not implement snd_seq_remove_events_t, so this does
+     * not compile. I'll try again, but it looks like I'll need to
+     * upgrade my entire Linux OS -RBD
+     */
+    /*
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
-    /* This is supposed to flush any pending output. */
+    snd_seq_remove_events_t info;
+    snd_seq_addr_t addr;
+    addr.client = desc->client;
+    addr.port = desc->port;
+    snd_seq_remove_events_set_dest(&info, &addr);
+    snd_seq_remove_events_set_condition(&info, SND_SEQ_REMOVE_DEST);
+    pm_hosterror = snd_seq_remove_events(seq, &info);
+    if (pm_hosterror) {
+        get_alsa_error_text(pm_hosterror_text, PM_HOST_ERROR_MSG_LEN, 
+                            pm_hosterror);
+        return pmHostError;
+    }
+    */
     printf("WARNING: alsa_abort not implemented\n");
     return pmNoError;
 }
@@ -408,10 +433,10 @@ static PmError alsa_write(PmInternal *midi, PmEvent *buffer, long length)
 #endif
 
 
-static PmError alsa_write_flush(PmInternal *midi)
+static PmError alsa_write_flush(PmInternal *midi, PmTimestamp timestamp)
 {
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
-    VERBOSE printf("snd_seq_drain_output: 0x%x\n", seq);
+    VERBOSE printf("snd_seq_drain_output: 0x%x\n", (unsigned int) seq);
     desc->error = snd_seq_drain_output(seq);
     if (desc->error < 0) return pmHostError;
 
@@ -583,25 +608,42 @@ static void handle_event(snd_seq_event_t *ev)
         break;
     case SND_SEQ_EVENT_SYSEX: {
         const BYTE *ptr = (const BYTE *) ev->data.ext.ptr;
-        int i;
-        long msg = 0;
-        int shift = 0;
-        if (!(midi->filters & PM_FILT_SYSEX)) {
-            for (i = 0; i < ev->data.ext.len; i++) {
-                pm_read_byte(midi, *ptr++, timestamp);
-            }
-        }
+        /* assume there is one sysex byte to process */
+        pm_read_bytes(midi, ptr, ev->data.ext.len, timestamp);
         break;
     }
     }
 }
 
+
 static PmError alsa_poll(PmInternal *midi)
 {
     snd_seq_event_t *ev;
-    while (snd_seq_event_input(seq, &ev) >= 0) {
-        if (ev) {
-            handle_event(ev);
+    /* expensive check for input data, gets data from device: */
+    while (snd_seq_event_input_pending(seq, TRUE) > 0) {
+        /* cheap check on local input buffer */
+        while (snd_seq_event_input_pending(seq, FALSE) > 0) {
+            /* check for and ignore errors, e.g. input overflow */
+            /* note: if there's overflow, this should be reported
+             * all the way through to client. Since input from all
+             * devices is merged, we need to find all input devices
+             * and set all to the overflow state.
+             * NOTE: this assumes every input is ALSA based.
+             */
+            int rslt = snd_seq_event_input(seq, &ev);
+            if (rslt >= 0) {
+                handle_event(ev);
+            } else if (rslt == -ENOSPC) {
+                int i;
+                for (i = 0; i < pm_descriptor_index; i++) {
+                    if (descriptors[i].pub.input) {
+                        PmInternal *midi = (PmInternal *) 
+                                descriptors[i].internalDescriptor;
+                        /* careful, device may not be open! */
+                        if (midi) Pm_SetOverflow(midi->queue);
+                    }
+                }
+            }
         }
     }
     return pmNoError;
@@ -677,8 +719,17 @@ PmError pm_linuxalsa_init( void )
     snd_seq_port_info_t *pinfo;
     unsigned int caps;
 
-    err = snd_seq_open(&seq, "default", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
-    if (err < 0) return;
+    /* Previously, the last parameter was SND_SEQ_NONBLOCK, but this 
+     * would cause messages to be dropped if the ALSA buffer fills up.
+     * The correct behavior is for writes to block until there is 
+     * room to send all the data. The client should normally allocate
+     * a large enough buffer to avoid blocking on output. 
+     * Now that blocking is enabled, the seq_event_input() will block
+     * if there is no input data. This is not what we want, so must
+     * call seq_event_input_pending() to avoid blocking.
+     */
+    err = snd_seq_open(&seq, "default", SND_SEQ_OPEN_DUPLEX, 0);
+    if (err < 0) return err;
     
     snd_seq_client_info_alloca(&cinfo);
     snd_seq_port_info_alloca(&pinfo);
@@ -715,10 +766,17 @@ PmError pm_linuxalsa_init( void )
             }
         }
     }
+    return pmNoError;
 }
     
 
 void pm_linuxalsa_term(void)
 {
-    snd_seq_close(seq);
+    if (seq) {
+        snd_seq_close(seq);
+        pm_free(descriptors);
+        descriptors = NULL;
+        pm_descriptor_index = 0;
+        pm_descriptor_max = 0;
+    }
 }

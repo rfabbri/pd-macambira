@@ -5,6 +5,9 @@
    be separate from the main portmidi.c file because it is system
    dependent, and it is separate from, pmlinuxalsa.c, because it
    might need to register non-alsa devices as well.
+
+   NOTE: if you add non-ALSA support, you need to fix :alsa_poll()
+   in pmlinuxalsa.c, which assumes all input devices are ALSA.
  */
 
 #include "stdlib.h"
@@ -19,12 +22,18 @@
 
 PmError pm_init()
 {
+    /* Note: it is not an error for PMALSA to fail to initialize. 
+     * It may be a design error that the client cannot query what subsystems
+     * are working properly other than by looking at the list of available
+     * devices.
+     */
     #ifdef PMALSA
 	pm_linuxalsa_init();
     #endif
     #ifdef PMNULL
         pm_linuxnull_init();
     #endif
+    return pmNoError;
 }
 
 void pm_term(void)

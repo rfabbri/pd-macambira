@@ -11,7 +11,7 @@ extern "C" {
 #define PD_MAJOR_VERSION 0
 #define PD_MINOR_VERSION 41
 #define PD_BUGFIX_VERSION 0
-#define PD_TEST_VERSION "test10"
+#define PD_TEST_VERSION "test11"
 
 /* old name for "MSW" flag -- we have to take it for the sake of many old
 "nmakefiles" for externs, which will define NT and not MSW */
@@ -225,7 +225,7 @@ EXTERN t_symbol s_;
 /* --------- prototypes from the central message system ----------- */
 EXTERN void pd_typedmess(t_pd *x, t_symbol *s, int argc, t_atom *argv);
 EXTERN void pd_forwardmess(t_pd *x, int argc, t_atom *argv);
-EXTERN t_symbol *gensym(char *s);
+EXTERN t_symbol *gensym(const char *s);
 EXTERN t_gotfn getfn(t_pd *x, t_symbol *s);
 EXTERN t_gotfn zgetfn(t_pd *x, t_symbol *s);
 EXTERN void nullfn(void);
@@ -417,6 +417,7 @@ EXTERN char *class_gethelpname(t_class *c);
 EXTERN void class_setdrawcommand(t_class *c);
 EXTERN int class_isdrawcommand(t_class *c);
 EXTERN void class_domainsignalin(t_class *c, int onset);
+EXTERN void class_set_extern_dir(t_symbol *s);
 #define CLASS_MAINSIGNALIN(c, type, field) \
     class_domainsignalin(c, (char *)(&((type *)0)->field) - (char *)0)
 

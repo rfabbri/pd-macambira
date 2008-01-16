@@ -1,11 +1,11 @@
 /*
  * Platform interface to the MacOS X CoreMIDI framework
  * 
- * Jon Parise <jparise@cmu.edu>
+ * Jon Parise <jparise at cmu.edu>
  * and subsequent work by Andrew Zeldis and Zico Kolter
  * and Roger B. Dannenberg
  *
- * $Id: pmmacosxcm.c,v 1.23 2007-08-06 16:39:54 millerpuckette Exp $
+ * $Id: pmmacosxcm.c,v 1.24 2008-01-16 21:54:10 millerpuckette Exp $
  */
  
 /* Notes:
@@ -13,7 +13,7 @@
     values and almost no other state, we store the MIDIEndpointRef on
     descriptors[midi->device_id].descriptor. The only other state we need
     is for errors: we need to know if there is an error and if so, what is
-    the error text. As in pmwinmm.c, we use a structure with two kinds of
+    the error text. We use a structure with two kinds of
     host error: "error" and "callback_error". That way, asynchronous callbacks
     do not interfere with other error information.
     
@@ -23,7 +23,12 @@
 
 #include <stdlib.h>
 
+//#define CM_DEBUG 1
+
 #include "portmidi.h"
+#ifdef NEWBUFFER
+#include "pmutil.h"
+#endif
 #include "pminternal.h"
 #include "porttime.h"
 #include "pmmac.h"
@@ -76,6 +81,9 @@ typedef struct midi_macosxcm_struct {
     MIDIPacket *packet;
     Byte sysex_buffer[SYSEX_BUFFER_SIZE]; /* temp storage for sysex data */
     MIDITimeStamp sysex_timestamp; /* timestamp to use with sysex data */
+    /* allow for running status (is running status possible here? -rbd): -cpr */
+    unsigned char last_command; 
+    long last_msg_length;
 } midi_macosxcm_node, *midi_macosxcm_type;
 
 /* private function declarations */
@@ -129,6 +137,97 @@ static PmTimestamp midi_synchronize(PmInternal *midi)
 }
 
 
+static void
+process_packet(MIDIPacket *packet, PmEvent *event, 
+	       PmInternal *midi, midi_macosxcm_type m)
+{
+    /* handle a packet of MIDI messages from CoreMIDI */
+    /* there may be multiple short messages in one packet (!) */
+    unsigned int remaining_length = packet->length;
+    unsigned char *cur_packet_data = packet->data;
+    while (remaining_length > 0) {
+        if (cur_packet_data[0] == MIDI_SYSEX ||
+            /* are we in the middle of a sysex message? */
+            (m->last_command == 0 &&
+             !(cur_packet_data[0] & MIDI_STATUS_MASK))) {
+            m->last_command = 0; /* no running status */
+            unsigned int amt = pm_read_bytes(midi, cur_packet_data, 
+                                             remaining_length, 
+                                             event->timestamp);
+            remaining_length -= amt;
+            cur_packet_data += amt;
+        } else if (cur_packet_data[0] == MIDI_EOX) {
+            /* this should never happen, because pm_read_bytes should
+             * get and read all EOX bytes*/
+            midi->sysex_in_progress = FALSE;
+            m->last_command = 0;
+        } else if (cur_packet_data[0] & MIDI_STATUS_MASK) {
+            /* compute the length of the next (short) msg in packet */
+	    unsigned int cur_message_length = midi_length(cur_packet_data[0]);
+            if (cur_message_length > remaining_length) {
+#ifdef DEBUG
+                printf("PortMidi debug msg: not enough data");
+#endif
+		/* since there's no more data, we're done */
+		return;
+	    }
+	    m->last_msg_length = cur_message_length;
+	    m->last_command = cur_packet_data[0];
+	    switch (cur_message_length) {
+	    case 1:
+	        event->message = Pm_Message(cur_packet_data[0], 0, 0);
+		break; 
+	    case 2:
+	        event->message = Pm_Message(cur_packet_data[0], 
+					    cur_packet_data[1], 0);
+		break;
+	    case 3:
+	        event->message = Pm_Message(cur_packet_data[0],
+					    cur_packet_data[1], 
+					    cur_packet_data[2]);
+		break;
+	    default:
+                /* PortMIDI internal error; should never happen */
+                assert(cur_message_length == 1);
+	        return; /* give up on packet if continued after assert */
+	    }
+	    pm_read_short(midi, event);
+	    remaining_length -= m->last_msg_length;
+	    cur_packet_data += m->last_msg_length;
+	} else if (m->last_msg_length > remaining_length + 1) {
+	    /* we have running status, but not enough data */
+#ifdef DEBUG
+	    printf("PortMidi debug msg: not enough data in CoreMIDI packet");
+#endif
+	    /* since there's no more data, we're done */
+	    return;
+	} else { /* output message using running status */
+	    switch (m->last_msg_length) {
+	    case 1:
+	        event->message = Pm_Message(m->last_command, 0, 0);
+		break;
+	    case 2:
+	        event->message = Pm_Message(m->last_command, 
+					    cur_packet_data[0], 0);
+		break;
+	    case 3:
+	        event->message = Pm_Message(m->last_command, 
+					    cur_packet_data[0], 
+					    cur_packet_data[1]);
+		break;
+	    default:
+	        /* last_msg_length is invalid -- internal PortMIDI error */
+	        assert(m->last_msg_length == 1);
+	    }
+	    pm_read_short(midi, event);
+	    remaining_length -= (m->last_msg_length - 1);
+	    cur_packet_data += (m->last_msg_length - 1);
+	}
+    }
+}
+
+
+
 /* called when MIDI packets are received */
 static void
 readProc(const MIDIPacketList *newPackets, void *refCon, void *connRefCon)
@@ -141,6 +240,10 @@ readProc(const MIDIPacketList *newPackets, void *refCon, void *connRefCon)
     unsigned long now;
     unsigned int status;
     
+#ifdef CM_DEBUG
+    printf("readProc: numPackets %d: ", newPackets->numPackets);
+#endif
+
     /* Retrieve the context for this connection */
     midi = (PmInternal *) connRefCon;
     m = (midi_macosxcm_type) midi->descriptor;
@@ -155,7 +258,8 @@ readProc(const MIDIPacketList *newPackets, void *refCon, void *connRefCon)
     }
     
     packet = (MIDIPacket *) &newPackets->packet[0];
-    /* printf("readproc packet status %x length %d\n", packet->data[0], packet->length); */
+    /* printf("readproc packet status %x length %d\n", packet->data[0], 
+               packet->length); */
     for (packetIndex = 0; packetIndex < newPackets->numPackets; packetIndex++) {
         /* Set the timestamp and dispatch this message */
         event.timestamp = 
@@ -163,40 +267,28 @@ readProc(const MIDIPacketList *newPackets, void *refCon, void *connRefCon)
                 (UInt64) 1000000;
         status = packet->data[0];
         /* process packet as sysex data if it begins with MIDI_SYSEX, or
-           MIDI_EOX or non-status byte */
-        if (status == MIDI_SYSEX || status == MIDI_EOX ||
-            !(status & MIDI_STATUS_MASK)) {
-            int i = 0;
-            while (i < packet->length) {
-                pm_read_byte(midi, packet->data[i], event.timestamp);
-                i++;
-            }
-        } else {
-            /* Build the PmMessage for the PmEvent structure */
-            switch (packet->length) {
-                case 1:
-                    event.message = Pm_Message(packet->data[0], 0, 0);
-                    break; 
-                case 2:
-                    event.message = Pm_Message(packet->data[0], 
-                                               packet->data[1], 0);
-                    break;
-                case 3:
-                    event.message = Pm_Message(packet->data[0],
-                                               packet->data[1], 
-                                               packet->data[2]);
-                    break;
-                default:
-                    /* Skip packets that are too large to fit in a PmMessage */
-#ifdef DEBUG
-                    printf("PortMidi debug msg: large packet skipped\n");
+           MIDI_EOX or non-status byte with no running status */
+#ifdef CM_DEBUG
+        printf(" %d", packet->length);
 #endif
-                    continue;
-            }
-            pm_read_short(midi, &event);
-        }
+        if (status == MIDI_SYSEX || status == MIDI_EOX || 
+            ((!(status & MIDI_STATUS_MASK)) && !m->last_command)) {
+	    /* previously was: !(status & MIDI_STATUS_MASK)) {
+             * but this could mistake running status for sysex data
+             */
+            /* reset running status data -cpr */
+	    m->last_command = 0;
+	    m->last_msg_length = 0;
+            /* printf("sysex packet length: %d\n", packet->length); */
+            pm_read_bytes(midi, packet->data, packet->length, event.timestamp);
+        } else {
+            process_packet(packet, &event, midi, m);
+	}
         packet = MIDIPacketNext(packet);
     }
+#ifdef CM_DEBUG
+    printf("\n");
+#endif
 }
 
 static PmError
@@ -235,7 +327,9 @@ midi_in_open(PmInternal *midi, void *driverInfo)
     m->sysex_byte_count = 0;
     m->packetList = NULL;
     m->packet = NULL;
-    
+    m->last_command = 0;
+    m->last_msg_length = 0;
+
     macHostError = MIDIPortConnectSource(portIn, endpoint, midi);
     if (macHostError != noErr) {
         pm_hosterror = macHostError;
@@ -304,9 +398,12 @@ midi_out_open(PmInternal *midi, void *driverInfo)
     m->sysex_byte_count = 0;
     m->packetList = (MIDIPacketList *) m->packetBuffer;
     m->packet = NULL;
+    m->last_command = 0;
+    m->last_msg_length = 0;
 
     return pmNoError;
 }
+
 
 static PmError
 midi_out_close(PmInternal *midi)
@@ -328,7 +425,7 @@ midi_abort(PmInternal *midi)
 
 
 static PmError
-midi_write_flush(PmInternal *midi)
+midi_write_flush(PmInternal *midi, PmTimestamp timestamp)
 {
     OSStatus macHostError;
     midi_macosxcm_type m = (midi_macosxcm_type) midi->descriptor;
@@ -370,7 +467,7 @@ send_packet(PmInternal *midi, Byte *message, unsigned int messageLength,
         /* out of space, send the buffer and start refilling it */
         /* make midi->packet non-null to fool midi_write_flush into sending */
         m->packet = (MIDIPacket *) 4; 
-        if ((err = midi_write_flush(midi)) != pmNoError) return err;
+        if ((err = midi_write_flush(midi, timestamp)) != pmNoError) return err;
         m->packet = MIDIPacketListInit(m->packetList);
         assert(m->packet); /* if this fails, it's a programming error */
         m->packet = MIDIPacketListAdd(m->packetList, sizeof(m->packetBuffer),
@@ -455,15 +552,13 @@ midi_end_sysex(PmInternal *midi, PmTimestamp when)
     /* make sure we don't go backward in time */
     if (m->sysex_timestamp < m->last_time) m->sysex_timestamp = m->last_time;
     
-    /* now send what's in the buffer */
-    if (m->packet == NULL) {
         /* if flush has been called in the meantime, packet list is NULL */
+    if (m->packet == NULL) {
         m->packet = MIDIPacketListInit(m->packetList);
-        /* this can never fail, right? failure would indicate something 
-           unrecoverable */
         assert(m->packet);
     }
 
+        /* now send what's in the buffer */
     err = send_packet(midi, m->sysex_buffer, m->sysex_byte_count,
                       m->sysex_timestamp);
     m->sysex_byte_count = 0;
@@ -543,17 +638,145 @@ PmTimestamp timestamp_cm_to_pm(MIDITimeStamp timestamp)
 }
 
 
+//
+// Code taken from http://developer.apple.com/qa/qa2004/qa1374.html
+//////////////////////////////////////
+// Obtain the name of an endpoint without regard for whether it has connections.
+// The result should be released by the caller.
+CFStringRef EndpointName(MIDIEndpointRef endpoint, bool isExternal)
+{
+  CFMutableStringRef result = CFStringCreateMutable(NULL, 0);
+  CFStringRef str;
+  
+  // begin with the endpoint's name
+  str = NULL;
+  MIDIObjectGetStringProperty(endpoint, kMIDIPropertyName, &str);
+  if (str != NULL) {
+    CFStringAppend(result, str);
+    CFRelease(str);
+  }
+  
+  MIDIEntityRef entity = NULL;
+  MIDIEndpointGetEntity(endpoint, &entity);
+  if (entity == NULL)
+    // probably virtual
+    return result;
+  
+  if (CFStringGetLength(result) == 0) {
+    // endpoint name has zero length -- try the entity
+    str = NULL;
+    MIDIObjectGetStringProperty(entity, kMIDIPropertyName, &str);
+    if (str != NULL) {
+      CFStringAppend(result, str);
+      CFRelease(str);
+    }
+  }
+  // now consider the device's name
+  MIDIDeviceRef device = NULL;
+  MIDIEntityGetDevice(entity, &device);
+  if (device == NULL)
+    return result;
+  
+  str = NULL;
+  MIDIObjectGetStringProperty(device, kMIDIPropertyName, &str);
+  if (str != NULL) {
+    // if an external device has only one entity, throw away
+    // the endpoint name and just use the device name
+    if (isExternal && MIDIDeviceGetNumberOfEntities(device) < 2) {
+      CFRelease(result);
+      return str;
+    } else {
+      // does the entity name already start with the device name?
+      // (some drivers do this though they shouldn't)
+      // if so, do not prepend
+        if (CFStringCompareWithOptions( result, /* endpoint name */
+             str /* device name */,
+             CFRangeMake(0, CFStringGetLength(str)), 0) != kCFCompareEqualTo) {
+        // prepend the device name to the entity name
+        if (CFStringGetLength(result) > 0)
+          CFStringInsert(result, 0, CFSTR(" "));
+        CFStringInsert(result, 0, str);
+      }
+      CFRelease(str);
+    }
+  }
+  return result;
+}
+
+// Obtain the name of an endpoint, following connections.
+// The result should be released by the caller.
+static CFStringRef ConnectedEndpointName(MIDIEndpointRef endpoint)
+{
+  CFMutableStringRef result = CFStringCreateMutable(NULL, 0);
+  CFStringRef str;
+  OSStatus err;
+  int i;
+  
+  // Does the endpoint have connections?
+  CFDataRef connections = NULL;
+  int nConnected = 0;
+  bool anyStrings = false;
+  err = MIDIObjectGetDataProperty(endpoint, kMIDIPropertyConnectionUniqueID, &connections);
+  if (connections != NULL) {
+    // It has connections, follow them
+    // Concatenate the names of all connected devices
+    nConnected = CFDataGetLength(connections) / sizeof(MIDIUniqueID);
+    if (nConnected) {
+      const SInt32 *pid = (const SInt32 *)(CFDataGetBytePtr(connections));
+      for (i = 0; i < nConnected; ++i, ++pid) {
+        MIDIUniqueID id = EndianS32_BtoN(*pid);
+        MIDIObjectRef connObject;
+        MIDIObjectType connObjectType;
+        err = MIDIObjectFindByUniqueID(id, &connObject, &connObjectType);
+        if (err == noErr) {
+          if (connObjectType == kMIDIObjectType_ExternalSource  ||
+              connObjectType == kMIDIObjectType_ExternalDestination) {
+            // Connected to an external device's endpoint (10.3 and later).
+            str = EndpointName((MIDIEndpointRef)(connObject), true);
+          } else {
+            // Connected to an external device (10.2) (or something else, catch-all)
+            str = NULL;
+            MIDIObjectGetStringProperty(connObject, kMIDIPropertyName, &str);
+          }
+          if (str != NULL) {
+            if (anyStrings)
+              CFStringAppend(result, CFSTR(", "));
+            else anyStrings = true;
+            CFStringAppend(result, str);
+            CFRelease(str);
+          }
+        }
+      }
+    }
+    CFRelease(connections);
+  }
+  if (anyStrings)
+    return result;
+  
+  // Here, either the endpoint had no connections, or we failed to obtain names for any of them.
+  return EndpointName(endpoint, false);
+}
+
+
 char* cm_get_full_endpoint_name(MIDIEndpointRef endpoint)
 {
+#ifdef OLDCODE
     MIDIEntityRef entity;
     MIDIDeviceRef device;
-    CFStringRef endpointName = NULL, deviceName = NULL, fullName = NULL;
+
+    CFStringRef endpointName = NULL;
+    CFStringRef deviceName = NULL;
+#endif
+    CFStringRef fullName = NULL;
     CFStringEncoding defaultEncoding;
     char* newName;
 
     /* get the default string encoding */
     defaultEncoding = CFStringGetSystemEncoding();
 
+    fullName = ConnectedEndpointName(endpoint);
+    
+#ifdef OLDCODE
     /* get the entity and device info */
     MIDIEndpointGetEntity(endpoint, &entity);
     MIDIEntityGetDevice(entity, &device);
@@ -567,15 +790,17 @@ char* cm_get_full_endpoint_name(MIDIEndpointRef endpoint)
     } else {
         fullName = endpointName;
     }
-    
+#endif    
     /* copy the string into our buffer */
-    newName = (char*)malloc(CFStringGetLength(fullName) + 1);
+    newName = (char *) malloc(CFStringGetLength(fullName) + 1);
     CFStringGetCString(fullName, newName, CFStringGetLength(fullName) + 1,
-                        defaultEncoding);
+                       defaultEncoding);
 
     /* clean up */
+#ifdef OLDCODE
     if (endpointName) CFRelease(endpointName);
     if (deviceName) CFRelease(deviceName);
+#endif
     if (fullName) CFRelease(fullName);
 
     return newName;

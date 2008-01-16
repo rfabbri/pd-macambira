@@ -21,6 +21,9 @@
 #include <windows.h>
 #include <winbase.h>
 #endif
+#ifdef _MSC_VER  /* This is only for Microsoft's compiler, not cygwin, e.g. */
+#define snprintf sprintf_s
+#endif
 
 char *pd_version;
 char pd_compiletime[] = __TIME__;
@@ -172,7 +175,7 @@ static void openit(const char *dirname, const char *filename)
     char dirbuf[MAXPDSTRING], *nameptr;
     int fd = open_via_path(dirname, filename, "", dirbuf, &nameptr,
         MAXPDSTRING, 0);
-    if (fd)
+    if (fd >= 0)
     {
         close (fd);
         glob_evalfile(0, gensym(nameptr), gensym(dirbuf));
@@ -295,7 +298,7 @@ int sys_main(int argc, char **argv)
         HINSTANCE ntdll;
         char filename[MAXPDSTRING];
 
-        sprintf(filename, "%s.dll", sys_externalschedlibname);
+        snprintf(filename, sizeof(filename), "%s.dll", sys_externalschedlibname);
         sys_bashfilename(filename, filename);
         ntdll = LoadLibrary(filename);
         if (!ntdll)
@@ -386,7 +389,7 @@ static char *(usagemessage[]) = {
 "-open <file>     -- open file(s) on startup\n",
 "-lib <file>      -- load object library(s)\n",
 "-font-size <n>     -- specify default font size in points\n",
-"-font-face <name>  -- specify default font (default: Bitstream Vera Sans Mono)\n",
+"-font-face <name>  -- specify default font\n",
 "-font-weight <name>-- specify default font weight (normal or bold)\n",
 "-verbose         -- extra printout on startup and when searching for files\n",
 "-version         -- don't run Pd; just print out which version it is \n",
@@ -747,13 +750,15 @@ int sys_argparse(int argc, char **argv)
             sys_externlist = namelist_append_files(sys_externlist, argv[1]);
             argc -= 2; argv += 2;
         }
-        else if ((!strcmp(*argv, "-font-size") || !strcmp(*argv, "-font")) && argc > 1)
+        else if ((!strcmp(*argv, "-font-size") || !strcmp(*argv, "-font"))
+            && argc > 1)
         {
             sys_defaultfont = sys_nearestfontsize(atoi(argv[1]));
             argc -= 2;
             argv += 2;
         }
-        else if ((!strcmp(*argv, "-font-face") || !strcmp(*argv, "-typeface")) && argc > 1)
+        else if ((!strcmp(*argv, "-font-face") || !strcmp(*argv, "-typeface"))
+            && argc > 1)
         {
             strncpy(sys_font,*(argv+1),sizeof(sys_font)-1);
             sys_font[sizeof(sys_font)-1] = 0;

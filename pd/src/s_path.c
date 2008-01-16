@@ -71,21 +71,29 @@ void sys_unbashfilename(const char *from, char *to)
 
 /*******************  Utility functions used below ******************/
 
-/* copy until delimiter and return position after delimiter in string */
-/* if it was the last substring, return NULL */
-
-static const char* strtokcpy(char *to, const char *from, int delim)
+/*!
+ * \brief copy until delimiter
+ * 
+ * \arg to destination buffer
+ * \arg to_len destination buffer length
+ * \arg from source buffer
+ * \arg delim string delimiter to stop copying on
+ *
+ * \return position after delimiter in string.  If it was the last
+ *         substring, return NULL.
+ */
+static const char *strtokcpy(char *to, size_t to_len, const char *from, char delim)
 {
-    int size = 0;
+    unsigned int i = 0;
 
-    while (from[size] != (char)delim && from[size] != '\0')
-        size++;
+        for (; i < (to_len - 1) && from[i] && from[i] != delim; i++)
+                to[i] = from[i];
+        to[i] = '\0';
 
-    strncpy(to,from,size);
-    to[size] = '\0';
-    if (from[size] == '\0') return NULL;
-    if (size) return from+size+1;
-    else return NULL;
+        if (i && from[i] != '\0')
+                return from + i + 1;
+
+        return NULL;
 }
 
 /* add a single item to a namelist.  If "allowdup" is true, duplicates
@@ -133,7 +141,7 @@ t_namelist *namelist_append_files(t_namelist *listwas, const char *s)
     npos = s;
     do
     {
-        npos = strtokcpy(temp, npos, SEPARATOR);
+        npos = strtokcpy(temp, sizeof(temp), npos, SEPARATOR);
         if (! *temp) continue;
         nl = namelist_append(nl, temp, 0);
     }
@@ -523,16 +531,9 @@ void glob_start_path_dialog(t_pd *dummy)
     int i;
     t_namelist *nl;
 
-    sprintf(buf, "list");
-    for (nl = sys_searchpath, i = 0; nl; nl = nl->nl_next, i++) {
-      if(nl->nl_string){
-        strcat(buf, " \"");
-        strcat(buf, nl->nl_string);
-        strcat(buf, "\"");
-      }
-    }
-    sys_vgui("pd_set pd_path [%s]\n", buf);
-
+    sys_vgui("pd_set pd_path \"\"\n");
+    for (nl = sys_searchpath, i = 0; nl; nl = nl->nl_next, i++)
+        sys_vgui("lappend pd_path \"%s\"\n", nl->nl_string);
     sprintf(buf, "pdtk_path_dialog %%s %d %d\n", sys_usestdpath, sys_verbose);
     gfxstub_new(&glob_pdobject, (void *)glob_start_path_dialog, buf);
 }
@@ -560,16 +561,9 @@ void glob_start_startup_dialog(t_pd *dummy)
     int i;
     t_namelist *nl;
 
-    sprintf(buf, "list");
-    for (nl = sys_externlist, i = 0; nl; nl = nl->nl_next, i++) {
-      if(nl->nl_string){
-        strcat(buf, " \"");
-        strcat(buf, nl->nl_string);
-        strcat(buf, "\"");
-      }
-    }
-    sys_vgui("pd_set pd_startup [%s]\n", buf);
-
+    sys_vgui("pd_set pd_startup \"\"\n");
+    for (nl = sys_externlist, i = 0; nl; nl = nl->nl_next, i++)
+        sys_vgui("lappend pd_startup \"%s\"\n", nl->nl_string);
     sprintf(buf, "pdtk_startup_dialog %%s %d \"%s\"\n", sys_defeatrt,
         sys_flags->s_name);
     gfxstub_new(&glob_pdobject, (void *)glob_start_startup_dialog, buf);

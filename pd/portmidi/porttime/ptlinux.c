@@ -21,7 +21,13 @@ CHANGE LOG
             thread. Simplified implementation notes. 
 
 */
-
+/* stdlib, stdio, unistd, and sys/types were added because they appeared
+ * in a Gentoo patch, but I'm not sure why they are needed. -RBD
+ */
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include "porttime.h"
 #include "sys/time.h"
 #include "sys/resource.h"
@@ -63,8 +69,8 @@ static void *Pt_CallbackProc(void *p)
         select(0, NULL, NULL, NULL, &timeout);
         (*(parameters->callback))(Pt_Time(), parameters->userData);
     }
-    printf("Pt_CallbackProc exiting\n");
-//    free(parameters);
+    /* printf("Pt_CallbackProc exiting\n"); */
+    // free(parameters);
     return NULL;
 }
 
@@ -93,8 +99,9 @@ PtError Pt_Start(int resolution, PtCallback *callback, void *userData)
 
 PtError Pt_Stop()
 {
-    printf("Pt_Stop called\n");
+    /* printf("Pt_Stop called\n"); */
     pt_callback_proc_id++;
+    pthread_join(pt_thread_pid, NULL);
     time_started_flag = FALSE;
     return ptNoError;
 }
