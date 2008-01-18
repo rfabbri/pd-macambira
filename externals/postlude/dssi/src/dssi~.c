@@ -2330,7 +2330,7 @@ void dssi_tilde_setup(void) {
 	    gensym ("activate"),A_DEFFLOAT - 1,0);
     class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_deactivate_plugin,
 	    gensym ("deactivate"),A_DEFFLOAT - 1,0);*/
-    class_sethelpsymbol(dssi_tilde_class, gensym("help-dssi"));
+    class_sethelpsymbol(dssi_tilde_class, gensym("dssi-help"));
     CLASS_MAINSIGNALIN(dssi_tilde_class, t_dssi_tilde, f);
 }
 

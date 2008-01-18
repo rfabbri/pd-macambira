@@ -59,5 +59,5 @@ clean:
 install:
 	cp dssi~.pd_linux $(INSTALLPATH)
 	install -d  $(PDDIR)/doc/5.reference/dssi/
-	install -m 644 doc/help-* $(PDDIR)/doc/5.reference/
+	install -m 644 doc/*-help* $(PDDIR)/doc/5.reference/
 	install -m 644 doc/output~.pd $(PDDIR)/doc/5.reference/dssi/
