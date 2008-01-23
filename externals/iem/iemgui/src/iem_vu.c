@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemgui written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iemgui written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2008 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -91,7 +91,7 @@ static void iem_vu_update_rms(t_iem_vu *x, t_glist *glist)
     
     sys_vgui(".x%x.c coords %xRCOVER %d %d %d %d\n",
       glist_getcanvas(glist), x, xpos, ypos1, xpos+x->x_gui.x_w-1,
-      ypos1 + 3*(IEM_VU_STEPS-x->x_rms));
+      ypos1 + 3*(IEM_VU_STEPS-x->x_rms)+1);
   }
 }
 
@@ -130,7 +130,7 @@ static void iem_vu_cpy(char *src, char *dst, int n)
     *dst++ = *src++;
 }
 
-static void iem_vu_change_bkgd_col(t_iem_vu *x)
+static void iem_vu_change_bkgd_col(t_iem_vu *x, t_glist *glist, int drw_new)
 {
   int i, j;
   char pix_bkgd_col[10];
@@ -166,7 +166,7 @@ static void iem_vu_change_bkgd_col(t_iem_vu *x)
   iem_vu_cpy(pix_bkgd_col, cvec, 8);
   cvec[7] = 0;
   
-  if(glist_isvisible(x->x_gui.x_glist))
+  if(glist_isvisible(glist) || drw_new)
   {
     sys_vgui("%xBKGDIMAGE_PROTO put {%s} -to 0 0\n", x, x->x_bkgd_gif_bord);
     sys_vgui("%xBKGDIMAGE_PROTO put {%s} -to 1 0\n", x, x->x_bkgd_gif_cent);
@@ -189,7 +189,7 @@ static void iem_vu_draw_new(t_iem_vu *x, t_glist *glist)
   sys_vgui("image create photo %xBKGDIMAGE_PROTO -format gif -width %d -height %d\n",
     x, 5, 123);
   sys_vgui("%xBKGDIMAGE_PROTO blank\n", x);
-  iem_vu_change_bkgd_col(x);
+  iem_vu_change_bkgd_col(x, glist, 1);
   
   sys_vgui("image create photo %xBKGDIMAGE -format gif -width %d -height %d\n",
     x, x->x_gui.x_w, x->x_gui.x_h+3);
@@ -210,31 +210,42 @@ static void iem_vu_draw_new(t_iem_vu *x, t_glist *glist)
   }
   sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -outline #%6.6x -tags %xRCOVER\n",
     canvas, xpos, ypos-1, xpos+x->x_gui.x_w-1,
-    ypos-1 + 3*IEM_VU_STEPS, x->x_gui.x_bcol, x->x_gui.x_bcol, x);
-  sys_vgui(".x%x.c create line %d %d %d %d -width %d -fill #%6.6x -tags %xPLED\n",
-    canvas, mid, ypos+10, mid, ypos+10, 2, x->x_gui.x_bcol, x);
-    sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
-      -font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
-      canvas, xpos+x->x_gui.x_ldx, ypos+x->x_gui.x_ldy,
-      strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"",
-      x->x_gui.x_font, x->x_gui.x_fontsize, x->x_gui.x_lcol, x);
-    if(!x->x_gui.x_fsf.x_snd_able)
-    {
-      sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
-        canvas, xpos-1, ypos + x->x_gui.x_h+1,
-        xpos + IOWIDTH-1, ypos + x->x_gui.x_h+2, x, 0);
-      sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
-        canvas, xpos+x->x_gui.x_w-IOWIDTH, ypos + x->x_gui.x_h+1,
-        xpos+x->x_gui.x_w, ypos + x->x_gui.x_h+2, x, 1);
-    }
-    if(!x->x_gui.x_fsf.x_rcv_able)
-    {
-      sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
-        canvas, xpos-1, ypos-2, xpos + IOWIDTH-1, ypos-1, x, 0);
-      sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
-        canvas, xpos+x->x_gui.x_w-IOWIDTH, ypos-2,
-        xpos+x->x_gui.x_w, ypos-1, x, 1);
-    }
+    ypos + 3*(IEM_VU_STEPS-x->x_rms), x->x_gui.x_bcol, x->x_gui.x_bcol, x);
+  
+  if(x->x_peak)
+  {
+    int i=iem_vu_col[x->x_peak];
+    int j=ypos + 3*(IEM_VU_STEPS+1-x->x_peak) - 1;
+    
+    sys_vgui(".x%x.c create line %d %d %d %d -width %d -fill #%6.6x -tags %xPLED\n",
+    canvas, xpos, j, xpos+x->x_gui.x_w, j, 2, my_iemgui_color_hex[i], x);
+  }
+  else
+    sys_vgui(".x%x.c create line %d %d %d %d -width %d -fill #%6.6x -tags %xPLED\n",
+      canvas, mid, ypos+10, mid, ypos+10, 2, x->x_gui.x_bcol, x);
+
+  sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
+    -font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
+    canvas, xpos+x->x_gui.x_ldx, ypos+x->x_gui.x_ldy,
+    strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"",
+    x->x_gui.x_font, x->x_gui.x_fontsize, x->x_gui.x_lcol, x);
+  if(!x->x_gui.x_fsf.x_snd_able)
+  {
+    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
+      canvas, xpos-1, ypos + x->x_gui.x_h+1,
+      xpos + IOWIDTH-1, ypos + x->x_gui.x_h+2, x, 0);
+    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
+      canvas, xpos+x->x_gui.x_w-IOWIDTH, ypos + x->x_gui.x_h+1,
+      xpos+x->x_gui.x_w, ypos + x->x_gui.x_h+2, x, 1);
+  }
+  if(!x->x_gui.x_fsf.x_rcv_able)
+  {
+    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
+      canvas, xpos-1, ypos-2, xpos + IOWIDTH-1, ypos-1, x, 0);
+    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
+      canvas, xpos+x->x_gui.x_w-IOWIDTH, ypos-2,
+      xpos+x->x_gui.x_w, ypos-1, x, 1);
+  }
 }
 
 static void iem_vu_draw_move(t_iem_vu *x, t_glist *glist)
@@ -312,7 +323,7 @@ static void iem_vu_draw_config(t_iem_vu* x, t_glist* glist)
   
   if(glist_isvisible(glist))
   {
-    iem_vu_change_bkgd_col(x);
+    iem_vu_change_bkgd_col(x, glist, 0);
     if(x->x_gui.x_w != x->x_old_width)
     {
       x->x_old_width = x->x_gui.x_w;
