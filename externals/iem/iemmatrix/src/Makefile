@@ -7,11 +7,20 @@ default: all
 
 -include Make.config
 
+VPATH = .:../alias/
+
+## if $(BUILDLIBRARY) is defined, we need to include the aliases
+ifeq "$(BUILDLIBRARY)" ""
+ ALIASOBJECTSOURCES=$(subst ../alias/,,$(sort $(filter %.c, $(wildcard ../alias/*.c))))
+else
+ ALIASOBJECTSOURCES=
+endif
+
 TESTDIR=../tests
 
 HELPERSOURCES=$(LIBRARY_NAME)_sources.c $(LIBRARY_NAME).c
 
-OBJECTSOURCES=$(sort $(filter-out $(HELPERSOURCES), $(filter %.c, $(wildcard *.c))))
+OBJECTSOURCES=$(sort $(filter-out $(HELPERSOURCES), $(filter %.c, $(wildcard *.c)))) $(ALIASOBJECTSOURCES)
 
 SOURCES=$(OBJECTSOURCES) $(HELPERSOURCES)
 
@@ -47,6 +56,13 @@ TARGETS = $(SOURCES:.c=.o)
 
 OBJECTS = $(OBJECTSOURCES:.c=.$(EXT))
 
+
+debug:
+	@echo sources $(SOURCES)
+	@echo alias $(ALIASOBJECTSOURCES)
+	@echo targets $(TARGETS)
+	@echo objects $(OBJECTS)
+
 ## if $(BUILDLIBRARY) is defined, we build everything as a single library
 ## else we build separate externals
 ifneq "$(BUILDLIBRARY)" ""
@@ -65,7 +81,7 @@ $(LIBRARY_NAME): $(TARGETS) $(LIBRARY_NAME)_sources.c $(LIBRARY_NAME)_sources.h
 	$(STRIP) $(STRIPFLAGS) $@.$(EXT)
 
 $(TARGETS): %.o : %.c
-	$(CC) $(LIBRARY_CFLAGS) -c -o $@ $*.c
+	$(CC) $(LIBRARY_CFLAGS) -c -o $@ $<
 
 externals: $(OBJECTS)
 
