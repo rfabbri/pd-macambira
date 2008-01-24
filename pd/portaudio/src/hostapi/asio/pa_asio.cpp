@@ -1,5 +1,5 @@
 /*
- * $Id: pa_asio.cpp,v 1.4 2008-01-16 21:54:09 millerpuckette Exp $
+ * $Id: pa_asio.cpp,v 1.5 2008-01-24 00:39:50 millerpuckette Exp $
  * Portable Audio I/O Library for ASIO Drivers
  *
  * Author: Stephane Letz

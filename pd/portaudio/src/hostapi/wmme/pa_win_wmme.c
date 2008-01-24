@@ -1,5 +1,5 @@
 /*
- * $Id: pa_win_wmme.c,v 1.4 2008-01-16 21:54:09 millerpuckette Exp $
+ * $Id: pa_win_wmme.c,v 1.5 2008-01-24 00:39:51 millerpuckette Exp $
  * pa_win_wmme.c
  * Implementation of PortAudio for Windows MultiMedia Extensions (WMME)       
  *                                                                                         

@@ -20,6 +20,9 @@
 #include "m_pd.h"
 #include "s_stuff.h"
 #include <stdio.h>
+#ifdef _MSC_VER  /* This is only for Microsoft's compiler, not cygwin, e.g. */
+#define snprintf sprintf_s
+#endif
 
 typedef void (*t_xxx)(void);
 
@@ -238,3 +241,37 @@ int sys_load_lib(t_canvas *canvas, char *classname)
     return ok;
 }
 
+int sys_run_scheduler(const char *externalschedlibname,
+    const char *sys_extraflagsstring)
+{
+    typedef int (*t_externalschedlibmain)(const char *);
+    t_externalschedlibmain externalmainfunc;
+    char filename[MAXPDSTRING];
+    snprintf(filename, sizeof(filename), "%s.%s", externalschedlibname,
+        sys_dllextent);
+    sys_bashfilename(filename, filename);
+#ifdef MSW
+    {
+        HINSTANCE ntdll = LoadLibrary(filename);
+        if (!ntdll)
+        {
+            post("%s: couldn't load external scheduler lib ", filename);
+            return (0);
+        }
+        externalmainfunc =
+            (t_externalschedlibmain)GetProcAddress(ntdll, "main");
+    }
+#else
+    {
+        void *dlobj = dlopen(filename, RTLD_NOW | RTLD_GLOBAL);
+        if (!dlobj)
+        {
+            post("%s: %s", filename, dlerror());
+            return (0);
+        }
+        externalmainfunc = (t_externalschedlibmain)dlsym(dlobj,
+            "pd_extern_sched");
+    }
+#endif
+    return((*externalmainfunc)(sys_extraflagsstring));
+}
