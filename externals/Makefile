@@ -131,10 +131,10 @@ ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid hidio pdp pidip gem2pdp wiiremote iem16 usbhid
+    LIB_TARGETS += hid hidio pdp pidip gem2pdp wiiremote iem16 usbhid pdlua
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16 postlude
+    LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16 postlude pdlua
   endif
 endif
 
@@ -1904,6 +1904,32 @@ pddp_install: pddp
 pddp_clean:
 	-$(MAKE) -C $(externals_src)/mixed/pddp $(DEST_PATHS) clean
 
+
+
+#------------------------------------------------------------------------------#
+# PDLUA
+PDLUA_NAME=pdlua
+PDLUA_OBJECTS := $(wildcard $(externals_src)/loaders/pdlua/src/lua.c)
+pdlua: $(PDLUA_OBJECTS:.c=.$(EXTENSION))
+
+pdlua_install: pdlua
+	install -d $(objectsdir)
+	install -p $(PDLUA_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)
+	install -d $(manualsdir)/$(PDLUA_NAME)
+	install -p $(externals_src)/loaders/pdlua/doc/*.txt \
+		$(manualsdir)/$(PDLUA_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/loaders/pdlua/README \
+		$(readmesdir)/$(PDLUA_NAME).txt
+	install -d $(examplesdir)/$(PDLUA_NAME)
+	install -p $(externals_src)/loaders/pdlua/examples/*.* \
+		$(examplesdir)/$(PDLUA_NAME)
+
+pdlua_clean:
+	-rm -f -- $(PDLUA_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(PDLUA_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/loaders/pdlua/*.bak
+	-rm -f -- $(externals_src)/loaders/pdlua/*.*~
 
 
 #------------------------------------------------------------------------------#
