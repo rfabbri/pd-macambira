@@ -56,7 +56,7 @@ ifeq ($(OS_NAME),darwin)
   STRIP = strip -x
 endif
 ifeq ($(OS_NAME),linux)
-  CFLAGS +=  -DUNIX -Dunix -fPIC
+  CFLAGS +=  -DUNIX -Dunix -fPIC -I/usr/include/lua5.1
   LDFLAGS += -Wl,-export_dynamic  -shared
   LIBS += -lc
   DYLIB_LDFLAGS = $(LDFLAGS)
@@ -134,7 +134,7 @@ else
     LIB_TARGETS += hid hidio pdp pidip gem2pdp wiiremote iem16 usbhid pdlua
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16 postlude pdlua
+    LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16 postlude
   endif
 endif
 
@@ -1915,6 +1915,7 @@ pdlua: $(PDLUA_OBJECTS:.c=.$(EXTENSION))
 pdlua_install: pdlua
 	install -d $(objectsdir)
 	install -p $(PDLUA_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)
+	install -p $(externals_src)/loaders/pdlua/src/pd.lua $(objectsdir)
 	install -d $(manualsdir)/$(PDLUA_NAME)
 	install -p $(externals_src)/loaders/pdlua/doc/*.txt \
 		$(manualsdir)/$(PDLUA_NAME)
