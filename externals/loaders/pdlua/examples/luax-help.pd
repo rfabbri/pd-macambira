@@ -1,0 +1,59 @@
+#N canvas 0 22 451 506 10;
+#X obj 33 108 luax helloworld;
+#X floatatom 34 157 5 0 0 0 - - -;
+#X symbolatom 98 158 10 0 0 0 - - -;
+#X msg 181 158 foo a b c;
+#X obj 34 187 luax dispatchertest;
+#X text 31 88 simplest possible example;
+#X text 39 136 try out some methods;
+#X obj 35 271 luax simplecounter;
+#X obj 35 247 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X floatatom 35 300 5 0 0 0 - - -;
+#X obj 185 247 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X floatatom 185 300 5 0 0 0 - - -;
+#X obj 185 271 luax simplecounter 42;
+#X text 40 221 outlets \, arguments \, and state;
+#X obj 37 382 luax shared foo;
+#X obj 187 382 luax shared foo;
+#X obj 187 442 luax shared bar;
+#X obj 37 442 luax shared bar;
+#X obj 60 466 print bar;
+#X obj 58 403 print foo;
+#X obj 187 422 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 37 422 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 37 362 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 187 362 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X floatatom 137 422 5 0 0 0 - - -;
+#X floatatom 137 362 5 0 0 0 - - -;
+#X symbolatom 287 362 10 0 0 0 - - -;
+#X symbolatom 287 422 10 0 0 0 - - -;
+#X text 38 332 shared state between objects;
+#X text 31 16 [luax foo] loads the source file "foo.luax" on each object
+creation. Less efficient than the loader ([foo] loads "foo.lua" just
+once for all time) but more flexible when developing or live-coding.
+;
+#X connect 1 0 4 0;
+#X connect 2 0 4 1;
+#X connect 3 0 4 2;
+#X connect 7 0 9 0;
+#X connect 8 0 7 0;
+#X connect 10 0 12 0;
+#X connect 12 0 11 0;
+#X connect 14 0 19 0;
+#X connect 15 0 19 0;
+#X connect 16 0 18 0;
+#X connect 17 0 18 0;
+#X connect 20 0 16 0;
+#X connect 21 0 17 0;
+#X connect 22 0 14 0;
+#X connect 23 0 15 0;
+#X connect 24 0 17 1;
+#X connect 25 0 14 1;
+#X connect 26 0 15 1;
+#X connect 27 0 16 1;

@@ -1,0 +1,16 @@
+todo
+- document clock support
+- document receive support
+- document send support
+
+done
+- send support
+- add hook for object (post creation)
+- receive support (preferably multiple receives)
+- clock support
+- audit possible bugs relating to self.f = f(self, ...) misuse
+- write docs on foo.lua vs foo.luax
+- change inlet/outlet numbering to start from 1 instead of 0
+- add pd.dofile(file) that searches via Pd's path (actually obj:dofile(file))
+- write docs implementation (eg foo._bar => internal, etc)
+- add more features to lexpr

@@ -1,0 +1,17 @@
+0.3	2007-12-02
+	clock support
+	receive support
+	send support
+	support static builds
+
+0.2	2007-09-25
+	renumbered inlets/outlets: now follow Lua 1,2,... conventions
+	fixed all examples for new numbering
+	more and updated documentation
+	opening via Pd's canvas path with obj:dofile(filename)
+	better error reporting
+	lexpr example
+	bugfix in dispatch (in_3_foo doesn't pass "foo" as an arg any more)
+
+0.1	2007-09-24
+	initial release

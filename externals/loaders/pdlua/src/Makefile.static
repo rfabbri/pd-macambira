@@ -1,0 +1,15 @@
+CFLAGS = -ansi -pedantic -Wall -fPIC -I$(HOME)/include -I./lua-5.1.2/include -L./lua-5.1.2/lib
+
+all: lua.pd_linux
+
+clean:
+	rm -f lua.pd_linux
+
+lua.pd_linux: lua.c lua-5.1.2/INSTALL
+	gcc $(CFLAGS) -static -shared -o lua.pd_linux lua.c -llua
+
+# FIXME: check this works, see about fat/universal binaries
+lua.pd_darwin: lua.c
+	gcc $(CFLAGS) -static -bundle -undefined suppress -flat_namespace -o lua.pd_darwin lua.c -llua
+
+# FIXME: Windows?
