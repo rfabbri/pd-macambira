@@ -1,40 +1,44 @@
 #
 # For docs, check:
-# http://sourceforge.net/docman/display_doc.php?docid=772&group_id=1#docscvsacls
+# 
 #
+unavail
+avail|zmoelnig
 
-# defunct gem directory
-unavail |  | gem
-avail | cclepper,dheck,ggeiger,tigital,zmoelnig | gem
-
-# ACLs at Yves Degoyon's request
-unavail |  | externals/pidip,externals/unauthorized | MAIN
-avail | sevyves,eighthave | externals/pidip,externals/unauthorized | MAIN
-
-# added tigital in accordance to Yves
-unavail |  | externals/gem2pdp | MAIN
-avail | sevyves,tigital,eighthave | externals/gem2pdp | MAIN
-
-
-# T. Grill's cvs automatically syncs with the SourceForge
-# so changes here wouldn't make it to his CVS.
-unavail |  | externals/grill
-avail | xovo | externals/grill
-
-# this code was imported by Hans and not maintained in CVS
-# so changes here would have to be merged
-unavail |  | externals/maxlib | MAIN
-avail | eighthave,olafmatt | externals/maxlib | MAIN
-
-# Thomas joined the SourceForge project and is maintaining this now (yay!)
-unavail |  | externals/iemlib | MAIN
-avail | tmusil,zmoelnig | externals/iemlib | MAIN
-
-# restrict the MAIN branch of "pd" to prevent accidental 
-# commits that should go to devel_0_37 or impd_0_37
-unavail |  | pd | MAIN
-avail | millerpuckette,ggeiger | pd | MAIN
-
-# this line ALWAYS needs to be the last line in this file
-# otherwise, its possible to lock everyone out of the CVS
-avail | adamlindsay,eighthave,fbar,ggeiger,millerpuckette | CVSROOT
+##################
+#
+## defunct gem directory
+#unavail |  | gem
+#avail | cclepper,dheck,ggeiger,tigital,zmoelnig | gem
+#
+## ACLs at Yves Degoyon's request
+#unavail |  | externals/pidip,externals/unauthorized | MAIN
+#avail | sevyves,eighthave | externals/pidip,externals/unauthorized | MAIN
+#
+## added tigital in accordance to Yves
+#unavail |  | externals/gem2pdp | MAIN
+#avail | sevyves,tigital,eighthave | externals/gem2pdp | MAIN
+#
+#
+## T. Grill's cvs automatically syncs with the SourceForge
+## so changes here wouldn't make it to his CVS.
+#unavail |  | externals/grill
+#avail | xovo | externals/grill
+#
+## this code was imported by Hans and not maintained in CVS
+## so changes here would have to be merged
+#unavail |  | externals/maxlib | MAIN
+#avail | eighthave,olafmatt | externals/maxlib | MAIN
+#
+## Thomas joined the SourceForge project and is maintaining this now (yay!)
+#unavail |  | externals/iemlib | MAIN
+#avail | tmusil,zmoelnig | externals/iemlib | MAIN
+#
+## restrict the MAIN branch of "pd" to prevent accidental 
+## commits that should go to devel_0_37 or impd_0_37
+#unavail |  | pd | MAIN
+#avail | millerpuckette,ggeiger | pd | MAIN
+#
+## this line ALWAYS needs to be the last line in this file
+## otherwise, its possible to lock everyone out of the CVS
+#avail | adamlindsay,eighthave,fbar,ggeiger,millerpuckette | CVSROOT
