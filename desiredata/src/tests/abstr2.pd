@@ -1,0 +1,15 @@
+#N canvas 0 0 450 300 10;
+#X obj 19 29 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 39 29 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 59 29 nbx 8 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 8 -262144
+-1 -1 0 256;
+#X obj 19 52 vsl 15 128 0 127 0 0 empty empty empty 0 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 19 11 hsl 128 15 0 127 0 0 empty empty empty 0 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 136 29 vradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
+-1 0;
+#X obj 38 156 hradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
+-1 6;

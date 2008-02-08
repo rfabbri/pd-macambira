@@ -1,0 +1,122 @@
+EXT= @EXT@
+LIBSUFFIX = @LIBSUFFIX@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+includedir = @includedir@
+libdir = @libdir@
+mandir = @mandir@
+# varibles to match packages/Makefile.buildlayout so that they can be easily
+# overridden when building Pd-extended builds. <hans@at.or.at>
+libpddir = $(libdir)/pd
+pddocdir = $(libpddir)/doc
+libpdbindir = $(libpddir)/bin
+
+MORECFLAGS = @MORECFLAGS@
+LDFLAGS = @LDFLAGS@
+LDSOFLAGS = @LDSOFLAGS@
+CPPFLAGS = -DDESIRE -DDONTUSESIMD -DPD @CPPFLAGS@
+CFLAGS = $(CPPFLAGS) @CFLAGS@ $(MORECFLAGS)
+CFLAGS += -Wall -Wextra -Wno-unused-parameter -I.
+CFLAGS += -DINSTALL_PREFIX=\"$(prefix)\"
+
+SRCXX = desire.c kernel.c builtins.c builtins_dsp.c s_path.c s_inter.c s_main.c \
+	m_sched.c s_loader.c d_soundfile.c d_ugen.c s_audio.c s_midi.c @AUDIOSRC@ @MIDISRC@
+SRC = m_fifo.c m_simd.c d_mayer_fft.c d_fftroutine.c
+OBJ = $(SRCXX:.c=.o) $(SRC:.c=.o)
+SO = libpd$(LIBSUFFIX)
+
+#  ------------------ targets ------------------------------------
+
+.PHONY: bin externs all
+
+all: bin externs
+
+bin: pd pd-watchdog pdsend pdreceive
+
+$(SRCXX:.c=.o): %.o: %.c config.log
+	$(CXX) $(CFLAGS) -xc++ -c -o $*.o $*.c
+
+$(SRC:.c=.o): %.o: %.c config.log
+	$(CC) $(CFLAGS) -Wno-parentheses -Wno-switch -Wstrict-prototypes -c -o $*.o $*.c
+
+$(SO): $(OBJ) config.log
+	$(CXX) $(LDSOFLAGS) $(LDFLAGS) $(DBG_CFLAGS) -o $(SO) $(OBJ)
+
+pd: $(OBJ) config.log $(SO) main.c
+	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) $$PWD/$(SO) main.c -o pd
+
+pd-watchdog: s_watchdog.c
+	$(CC) $(CFLAGS) $(STRIPFLAG) -o pd-watchdog s_watchdog.c
+
+pdsend: u_pdsend.c
+	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdsend u_pdsend.c
+
+pdreceive: u_pdreceive.c
+	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdreceive u_pdreceive.c
+
+externs:
+	cd ../extra; for ext in bonk~ choice expr~ fiddle~ loop~ lrshift~ pique sigmund~; do \
+		cd $$ext; make @EXTERNTARGET@ || break; cd ..; done
+
+install:  all
+	install -d $(DESTDIR)$(bindir)
+	install -d $(DESTDIR)$(libpdbindir)
+	for file in defaults.ddrc pkgIndex.tcl pre8.5.tcl poe.tcl bgerror.tcl; do \
+		install $$file $(DESTDIR)$(libpdbindir)/$$file; done
+	cp -r locale $(DESTDIR)$(libpdbindir)
+	cp -r ../icons $(DESTDIR)$(libpddir)
+	install $(BINARYMODE) $(SO) $(DESTDIR)$(libdir)/$(SO)
+	test -w /etc/ld.so.cache && ldconfig || true
+	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) -lpd main.c -o $(DESTDIR)$(bindir)/pd
+	install -m755 desire.tk   $(DESTDIR)$(bindir)/desire
+	install -m755 pdsend      $(DESTDIR)$(bindir)/pdsend
+	install -m755 pdreceive   $(DESTDIR)$(bindir)/pdreceive
+	install -m755 pd-watchdog $(DESTDIR)$(libpdbindir)/pd-watchdog
+	mkdir -p $(DESTDIR)$(pddocdir)
+	cp -pr ../doc/* $(DESTDIR)$(pddocdir)
+	cp -pr ../extra/* $(DESTDIR)$(libpddir)
+	# rm -f $(DESTDIR)$(libpddir)/extra/*/*.o
+	install -d $(DESTDIR)$(includedir)
+	for file in m_pd.h desire.h; do install -m644 $$file $(DESTDIR)$(includedir)/$$file; done
+	install -d $(DESTDIR)$(mandir)/man1
+	for page in pd.1 pdsend.1 pdreceive.1; do \
+		gzip < ../man/$$page > $(DESTDIR)$(mandir)/man1/$$page.gz; chmod 644 $(DESTDIR)$(mandir)/man1/$$page.gz; done
+
+local-clean:
+	-rm -f *.o pd pdsend pdreceive pd-watchdog m_stamp.c
+	-rm -f *~
+	-(cd ../doc/6.externs; rm -f *.pd_linux)
+	-rm -f makefile.deps
+	touch makefile.deps
+	chmod 666 makefile.deps
+
+extra-clean:
+	-rm -f `find ../extra/ -name "*.pd_*"`
+	-rm -f tags
+
+clean: extra-clean local-clean
+
+distclean: clean
+	-rm -f config.cache config.log config.status makefile tags \
+		autom4te.cache/output.* autom4te.cache/traces.* autom4te.cache/requests
+	-rmdir autom4te.cache
+	-rm -rf autom4te-*.cache
+
+tags: $(SRC) $(GSRC); ctags *.[ch]
+
+depend: makefile.deps
+
+makefile.deps: makefile
+	$(CXX) $(CPPFLAGS) -MM $(SRC) $(SRCXX) > makefile.deps
+
+uninstall:
+	rm -f -r $(DESTDIR)$(libpddir)
+	rm -f $(DESTDIR)$(libdir)/libpd*
+	cd $(DESTDIR)$(bindir);     rm pd pdsend pdreceive
+	cd $(DESTDIR)$(includedir); rm m_pd.h desire.h
+	cd $(DESTDIR)$(mandir)/man1; rm pd.1.gz pdsend.1.gz pdreceive.1.gz
+
+include makefile.deps
+
+# echo $$LD_LIBRARY_PATH | sed 's/:/\n/g' | grep -q '^$(DESTDIR)$(libdir)$$'

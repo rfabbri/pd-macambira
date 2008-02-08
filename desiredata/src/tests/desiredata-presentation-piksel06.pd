@@ -1,0 +1,26 @@
+#N canvas 0 0 640 480 10;
+#X text 100 140 Zoomable patches (and def Canvas item);
+#X text 100 160 Client-side selection and clipboard;
+#X text 100 180 Client-side undo and redo: multiple \, atomic \, labeled
+\, history;
+#X text 100 200 Class browser and class name completions;
+#X text 100 220 Internationalization (the Patching-in-Tongues project)
+;
+#X text 100 240 Keyboard-based Navigation and Edition;
+#X text 100 260 Server Preferences (.pdrc Editor);
+#X text 100 280 Client Preferences (.ddrc Editor);
+#X text 100 300 Canvas Actions;
+#X text 100 320 #V for visual attributes;
+#V bg 255 255 0;
+#X text 100 340 Dialog autogeneration with def Dialog add;
+#X text 100 360 ClientClassTreeDialog;
+#X text 100 380 Deconstructors;
+#X text 100 400 desire.h;
+#X text 100 420 what is happening to desire.c these days;
+#X obj 94 31 bng 32 250 50 0 empty empty DesireData-0.39.A 40 15 1
+19 -262088 -1 -1;
+#X text 295 270 tab support in all dialogs;
+#X obj 0 0 + 242;
+#V pretty 1;
+#X text 99 440 scaling of selection or complete patch;
+#X coords 0 0 1 1 0 0 0;

@@ -1,0 +1,15 @@
+#N canvas 451 128 556 360 12;
+#X obj 117 129 biquad~ 0.83774 -0.06338 0.06338 -0.83774 1;
+#X obj 117 103 biquad~ 1.94632 -0.94657 0.94657 -1.94632 1;
+#X obj 98 186 biquad~ -0.02569 0.260502 -0.260502 0.02569 1;
+#X obj 98 212 biquad~ 1.8685 -0.870686 0.870686 -1.8685 1;
+#X obj 98 76 inlet~;
+#X obj 117 158 outlet~;
+#X obj 98 239 outlet~;
+#X text 105 273 This is a pair of all-pass filters whose outputs somehow manage to be about 90 degrees out of phase from each other. I don't know what phase relation they have with the original signal. I adapted this from a 4X patch by Emmanuel Favreau \, circa 1982;
+#X connect 0 0 5 0;
+#X connect 1 0 0 0;
+#X connect 2 0 3 0;
+#X connect 3 0 6 0;
+#X connect 4 0 1 0;
+#X connect 4 0 2 0;

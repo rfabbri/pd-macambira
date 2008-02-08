@@ -1,0 +1,300 @@
+---------------- dolist --------------------
+done:
+plug-in support
+atan2 inlets switched
+queued graphics updates for tables, number boxes
+cut/paste text (needs more testing)
+add standard bindings (ctl-o, etc) to dialogs
+separate audio on/off from nchans
+setuid flag in configure script
+settings saver (registry in Windows; .pdrc in linux; defaults system in OSX?)
+    audio API
+    MIDI -- fix to read MIDI on startup (rest works?)
+    path
+    startup flags
+    libs
+better params:
+    extra flag for path
+    startup flags
+    startup libraries
+printout to pd window
+startup from GUI
+%x to %lx in all "tags" to make 64-bit safe
+portaudio_pd files into src
+t_int to int in binbuf_addv
+64-bit fix to externs makefiles
+new filter objects: cpole~, fpole~, etc.
+put in Wini's RME ALSA code; there are still bugs...
+portaudio fixed for inchans != outchans, e.g., emi emagic (2/6)
+sprout inlets/outlets on objects whose creation failed.
+uploaded to CVS
+bug fix: click on minaturized subpatch fails to "vis" it
+bug fix: CK on Oct. 4 (crash changing font size)
+sched_idle hook
+fixed startup flags, path, etc. so that spaces, "," chars, etc., are allowed
+configure script fixed to handle enable- and disable- correctly
+fixed spaces in "startup" dialog
+
+doc:
+document env~ second argument (and why is it no less than 1/10 of first???)
+vibrato example
+
+problems:
+'[' in numbox label breaks it (Yury Sept. 3)
+soundfiles with 3-byte samples buzz for the first readsf buffer (bug/x.pd)
+read xx.txt in "bad" gives warnings
+writesf -- "open" without "0" misses closing the previous file.
+Also writesf~ acts differently if DSP is off when "open" is sent?
+qlist - 'next 1' seems not to work
+Krzysztof's qlist_next reentrancy bug
+don't draw in/outlets on gui objects in graph-on-parent
+font size should depend on subpatch/abstraction
+moving a bang toward top of window creates problem
+check what happens when going back and forth between graph-on-parent
+get rid of messages causing renaming; try to prevent patches closing themselves.
+dac~/ adc~/ block~ incompatibility
+scofo reports error on reading score1.txt
+rfft~ loses nyquist bin -- see "to hell with it" comment in d_fft.c
+open_via_path() followed by close() fails in windows? [can't reproduce]
+loading e-mailed patches without removing headers crashes pd
+pd $1 bug ($1 is saved as it was evaluated, not as '$1')
+data copy/paste doesn't check templates aren't changed
+figure out why Pd sometimes crashes when you close example after adding fields
+check if _vsnprintf with zero argument in windows works any better...
+
+next release:
+update portmusic to latest
+IEM guis to use queued updates
+pixel font sizes
+pd to find running ones (pd -new to defeat)
+"enter" into object box to create new one (also, changing borders? forking?)
+tab to jump to a connected object (first one?) (shift-tab to back up?)
+tables:
+    if there's just one array, don't do stringent hit check.
+    array click protection (Krzysztof's suggestion)
+    make graph labels persistent and add to dialog
+    object to get/set table size; random; quantile
+    flag to hide array names 
+queued graphics updates for IEMGUIs and scalars
+document tabwrite~_start
+think of a way to embed abstractions in a patch
+make watchdog work for MACOSX
+GOP bounding box object
+IEMGUIs better default font size
+search path to include both calling patch and abstraction, if different
+abstraction reload shouldn't have to vis everyone
+addcomma message to message
+pasting should look at current mouse location
+delete-in-rectangle message to Pds
+put serial object in main dist (see rat@telecoma, Apr. 25; winfried May 22)
+open/save panel to take messages to init directory, and to set extent list
+flags to defeat pre-loading specified classes
+expr to parse exponential notation
+
+
+data:
+arrays of non-existent templates crash
+vget, vset traversal objects
+cursor to show (x, y) location
+better hit detection (getrect is too greedy; try tk's "current" tag for canvas)
+click on points of plot
+typing & dragging drawnumbers
+fix templates to be loaded on demand and belong to a globally known patch
+test and debug list elements of templates
+sublists should display on parent if desired?
+sublists seem not to handle canvas allocation right (get.pd->pointer.pd bug)
+scalar hook to catch the mouse
+protect against "plots" going away while you drag on them
+
+more features:
+
+-Wno-unused to -Wno-unused-paramter and clean up unused automatic variables
+security module system in 2.6 - see the kernel module replacing jackstart
+signal inlets to sense signals; fix +~ etc, vcf~, biquad~, other filters
+mess with RME ALSA some more; ALSA readn doesn't work yet; use mmap?
+try to reduce startup time
+investigate gcc 3.3 warnings; try to reinstate -fstrict-aliasing
+message dialog not to disappear
+why does changing the name of an explode in jupiter patch take so long?
+close-subwindows menu item
+show results of opening audio and MIDI on dialogs
+windows escape from control-C
+settable netsend and netreceive port numbers
+new: abs~, nexttick~, extend threshold~ and snapshot~ (vthreshold~ etc)
+incorporate pddp doc
+try again to fix the font scene
+look at prctl(2) for FP exception handling
+??? have a way to disambiguate externs from different libs???
+netsend separate thread
+netreceive (and netsend?) message to set port number
+think about x and y scale preservation when changing between graph and object
+show outlines of objects even when graph is "open"
+graph_vis() to decorate graphs when they're toplevel (parent_glist == 0)
+get graphs to expand to hold their contents
+suita.chopin.edu.pl/~czaja/miXed/externs/xeq.html -- MIDI file reader
+in glist_delete, consider why this can't be just "vis 0" -- why do we need it?
+closebang
+check that -blocksize really reflects in audiobuf calc for Hammerfall
+makefile to have make install depend on make local.
+Float method for random
+figure out list, message objects
+separate control over alsaindev and alsaoutdev
+put in something for tilde order forcing
+extensible "toolbar" so people can add external GUI objects
+allow spaces in paths
+variable send and receive -- check how max/MSP does it?
+number boxes to darken for typing and/or received messages
+dialog to change lib flag and path
+pique~ and fiddle~ unification (notice pique filtering is different!)
+new message box look
+figure out what to do when "pd sym" conflicts with window title as in Pluton?
+
+MAX compatibilty:
+trigger 1 (on Pd, outputs 0; on Max?)
+
+LATER
+bonk~ file path handling
+unify arrays and garrays
+dialog to give values of $1, ... for the canvas
+bang at end of line~, tabwrite~, etc.
+recording to part of a table
+printout to main window
+should sys_bail kill all "threads" on the way out?
+check a_valid usage
+allow backslashes (or else really disallow them)
+icon & desktop integration
+vreadsf~
+benchmarking
+flash menu when accelerator hits?
+fix edit mode menu item
+fancier text editing
+tools (reassigns meaning of primary click)
+get gui to notice early EOF
+rewrite t_getbytes properly
+obj_new should do a longjmp on out-of-memory
+
+--------------------- source notes --------------------------
+
+0.  structure definition roadmap.  First, the containment tree of things
+that can be sent messages ("pure data").  (note that t_object and t_text,
+and t_graph and t_canvas, should be unified...)
+
+------------ BFFORE 0.35: ---------
+m_pd.h	    t_pd    	    	    anything with a class
+    	    	t_gobj	    	    "graphic object"
+    	    	    t_text  	    text object
+g_canvas.h  
+    	    	    t_glist 	    list of graphic objects
+g_canvas.c  	    	t_canvas    Pd "document"
+
+------------ AFTER 0.35: ---------
+m_pd.h	    t_pd    	    	    anything with a class
+    	    	t_gobj	    	    "graphic object"
+    	    	    t_text  	    patchable object, AKA t_object
+g_canvas.h     	    	t_glist     list of graphic objects, AKA t_canvas
+
+... and other structures:
+g_canvas.h  t_selection -- linked list of gobjs
+    	    t_editor -- editor state, allocated for visible glists
+m_imp.h     t_methodentry -- method handler
+    	    t_widgetbehavior -- class-dependent editing behavior for gobjs
+    	    t_parentwidgetbehavior -- objects' behavior on parent window
+    	    t_class -- method definitions, instance size, flags, etc.
+
+
+1.  C coding style.  The source should pass most "warnings" of C compilers
+(-Wall on linux, for instance; see the makefile.)  Some informalities
+are intentional, for instance the loose use of function prototypes (see
+below) and uncast conversions from longer to shorter numerical formats.
+The code doesn't respect "const" yet.
+
+1.1.  Prefixes in structure elements.  The names of structure elements always
+have a K&R-style prefix, as in ((t_atom)x)->a_type, where the "a_" prefix
+indicates "atom."  This is intended to enhance readability (although the
+convention arose from a limitation of early C compilers.)  Common prefixes are
+"w_" (word), "a_" (atom), "s_" (symbol), "ob_" (object), "te_" (text object),
+"g_" (graphical object), and "gl_" (glist, a list of graphical objects).  Also,
+global symbols sometimes get prefixes, as in "s_float" (the symbol whose string
+is "float).  Typedefs are prefixed by "t_".  Most _private_ structures, i.e.,
+structures whose definitions appear in a ".c" file, are prefixed by "x_".
+
+1.2.   Function arguments.  Many functions take as their first
+argument a pointer named "x", which is a pointer to a structure suggested
+by the function prefix; e.g., canvas_dirty(x, n) where "x" points to a canvas
+(t_canvas *x).
+
+1.3.  Function Prototypes.  Functions which are used in at least two different
+files (besides where they originate) are prototyped in the appropriate include
+file. Functions which are provided in one file and used in one other are
+prototyped right where they are used.  This is just to keep the size of the
+".h" files down for readability's sake.
+
+1.4.  Whacko private terminology.  Some terms are lifted from other historically
+relevant programs, notably "ugen" (which is just a tilde object; see d_ugen.c.)
+
+1.5.  Spacing.  Tabs are 8 spaces; indentation is 4 spaces.  Indenting
+curly brackets are by themselves on their own lines, as in:
+
+    if (x)
+    {
+	x = 0;
+    }
+
+Lines should fit within 80 spaces.
+
+2.  Max patch-level compatibility.  "Import" and "Export" functions are
+provided which aspire to strict compatibility with 0.26 patches (ISPW version),
+but which don't get anywhere close to that yet.  Where possible, features
+appearing on the Mac will comeday also be provided; for instance, the connect
+message on the Mac offers segmented patch cords; these will devolve into
+straight lines in Pd.  Many, many UI objects in Opcode Max will not appear in
+Pd, at least at first.
+
+3.  Compatibility with Max 0.26 "externs", i.e., source-level compatibility. Pd
+objects follow the style of 0.26 objects as closely as possible, making
+exceptions in cases where the 0.26 model is clearly deficient.  These are:
+
+3.1.  Anything involving the MacIntosh "Handle" data type is changed to use
+char * or void * instead.
+
+3.2.  Pd passes true single-precision floating-point arguments to methods;
+Max uses double.
+Typedefs are provided:
+    t_floatarg, t_intarg for arguments passed by the message system
+    t_float, t_int for the "word" union (in atoms, for example.)
+
+3.3.  Badly-named entities got name changes:
+
+    w_long --> w_int (in the "union word" structure)
+
+3.4.  Many library functions are renamed and have different arguments;
+I hope to provide an include file to alias them when compiling Max externs.
+
+4.  Function name prefixes.
+Many function names have prefixes which indicate what "package" they belong
+to.  The exceptions are:
+    typedmess, vmess, getfn, gensym (m_class.c)
+    getbytes, freebytes, resizebytes (m_memory.c)
+    post, error, bug (s_print.c)
+which are all frequently called and which don't fit into simple categories.
+Important packages are:
+(pd-gui:)   pdgui -- everything
+(pd:)	    pd -- functions common to all "pd" objects
+    	    obj -- fuctions common to all "patchable" objects ala Max
+    	    sys -- "system" level functions
+    	    binbuf -- functions manipulating binbufs
+    	    class -- functions manipulating classes
+    	    (other) -- functions common to the named Pd class
+
+5. Source file prefixes. 
+PD:
+s    system interface
+m    message system
+g    graphics stuff
+d    DSP objects
+x    control objects
+z    other
+
+PD-GUI:
+t    TK front end
+

@@ -1,0 +1,42 @@
+Those rules are in no particular order.
+Written by matju, on 2007.07.11 - ...
+
+#000: Tk-specific Tcl code goes in *.tk files; Tk-independent Tcl code is allowed to go in *.tcl files.
+      Exceptions: debug.tcl ...
+
+#001: Long source files are usually better than short files because they are easier to search in, with most editors.
+
+#002: It's better to make classes/procs/defs smaller but not to the extent that there are too many of them.
+
+#003: Accessing an object's privates directly, is likely to cause trouble in the future. All @variables are private, but
+      methods may also be marked as private or protected, by a visible comment where the definition is. (C++ variables are
+      not necessarily like that, mostly because of compatibility with classic pd)
+
+#004: Indentation is whatever you like as long as it's locally consistent. Tab stops (of the tab key) are at multiples of 8,
+      but indentation could be 2, 4, 8. (It's a bad idea to use less than 2 or more than 8). Open-braces don't deserve their
+      own line, but close-braces do, at least because of how the diff program works.
+
+#005: Screen width is assumed to be about 125 characters, not 80. This is especially useful for cutting down the need
+      to wrap lines. Newlines that have to do with linewrap get confused with meaningful newlines. Blank lines should be
+      used sparsely: the more there are blank lines, the less meaningful they are. If you want blank lines everywhere,
+      change the spacing of your font.
+
+#006: Short pieces of code that are quite repetitive but not completely, should be put on one line each and organised into
+      alternating columns of recurrent and non-recurrent material. This highlights patterns in code. e.g.:
+        for (int i=0; i<ninlets ; i++) x->inlets [i]->name = gensprintf( "inlet #%d",i);
+        for (int i=0; i<noutlets; i++) x->outlets[i]->name = gensprintf("outlet #%d",i);
+
+#007(Tcl): an attribute is a reader method named like "some_noun", which has no args and returns a value and/or a writer
+      method named like "some_noun=", which takes one arg (or more?) and returns no value. Together they are seen as
+      manipulating a variable. If the variable directly exists in the object, it should be called "@some_noun". The "="
+      suffix should be only used for that purpose. (we should think about whether to accept multiple args, because other
+      languages with a similar concept only allow one arg in the writer)
+
+#008(Tcl): Nouns like "visibility" that are simpler as adjectives and whose main purpose is to return a yes/no value, can
+      be named like "visible?" and are declined in the same way, e.g. "visible?=" and "@visible?". The "?" suffix should be
+      only used for that purpose.
+
+#009(Tcl): use :: instead of proc global.
+
+#010: make variables as local as it makes sense: don't make them global if they'd fit well in an object; don't put them in
+      an object if they belong inside of a def or proc (fully local).

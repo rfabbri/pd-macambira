@@ -1,0 +1,193 @@
+look {
+  TextBox {
+    bgedit #ffffff
+  }
+  View {
+    language english
+  }
+  Client {
+    console 666
+  }
+  Box {
+    extrapix 1
+  }
+  Canvas {
+    pointer_sense 5
+    bgedit #dddddd
+    bgrun #ffffff
+    grid #ffffff
+    buttonbar 1
+    compbg #ffffff
+    compfg #000000
+    compselectbg #000000
+    compselectfg #ffffff
+    crosshair #ff14ff
+    hairsnap 1
+    hairstate 1
+    gridstate 1
+    grid_size 20
+    snap_grid 1
+    showcomp 10
+    statusbar 1
+    menubar 1
+    scrollbar 0
+  }
+  Comment {
+    bg #cccccc
+    fg #000000
+    frame1 #ffffff
+    frame2 #888888
+    frame3 #cccccc
+  }
+  FutureWire {
+    dash #ee0012
+  }
+  SelRect {
+    rect #ff12ff
+  }
+  Slider {
+    bg #ccebff
+  }
+  TextBox {
+    bgedit {#ffffff}
+    fg {#000000}
+  }
+  View {
+    bg #ffffff
+    fg #000000
+    font {Courier -12}
+    frame1 #99cccc
+    frame2 #668888
+    frame3 #000000
+    selectframe #0080ff
+    tooltip 1
+  }
+  Box {
+    iowidth 7
+    minobjwidth 21
+    inletfg #000000
+    outletfg #000000
+    iopos -1
+  }
+  Wire {
+    dspfg #890098
+    fg #888888
+    fg2 #ee0000
+    thick 1
+    wirearrow 1
+  }
+  KeyboardDialog {
+    font {Courier -10}
+  }
+  Console {
+    font {Courier -10}
+  }
+}
+key {
+  Canvas {
+    Array {}
+    bng Alt+b
+    cnv Alt+c
+    Comment Ctrl+5
+    Graph {}
+    hradio Alt+i
+    hsl Alt+h
+    Message Ctrl+2
+    Number Ctrl+3
+    nbx Alt+n
+    Object Ctrl+1
+    Pdwindow {}
+    Symbol Ctrl+4
+    tgl Alt+t
+    vu Alt+u
+    vradio Alt+d
+    vsl Alt+v
+    about {}
+    audio_off Ctrl+period
+    audio_on Ctrl+slash
+    class_browser {}
+    close Ctrl+w
+    copy Ctrl+c
+    crosshair {}
+    cut Ctrl+x
+    decr_scale Ctrl+UNDERSCORE
+    decr_zoom Ctrl+minus
+    dropper Alt+y
+    duplicate Ctrl+d
+    editmodeswitch Ctrl+e
+    find Ctrl+f
+    find_again Ctrl+g
+    find_last_error {}
+    font_bomb Ctrl+F
+    incr_scale Ctrl+PLUS
+    incr_zoom Ctrl+equal
+    key_nav_down Ctrl+down
+    key_nav_down_shift Ctrl+DOWN
+    key_nav_ioselect Ctrl+tab
+    key_nav_left Ctrl+left
+    key_nav_left_shift Ctrl+LEFT
+    key_nav_right Ctrl+right
+    key_nav_right_shift Ctrl+RIGHT
+    key_nav_up Ctrl+up
+    key_nav_up_shift Ctrl+UP
+    latency_meter {}
+    load_meter {}
+    new_file Ctrl+n
+    open_file Ctrl+o
+    parentwindow {}
+    paste Ctrl+v
+    paths {}
+    popup_help {}
+    popup_open {}
+    popup_properties {}
+    print Ctrl+p
+    quit Ctrl+q
+    redo Ctrl+Z
+    redraw {}
+    reload Ctrl+r
+    save Ctrl+s
+    save_as Ctrl+S
+    select_all Ctrl+a
+    text_editor Ctrl+t
+    tidy_up {}
+    undo Ctrl+z
+    insert_object Ctrl+i
+    chain_object Ctrl+6
+    clear_wires Ctrl+k
+    auto_wire Ctrl+j
+    subpatcherize Alt+s
+    clear_selection Ctrl+A
+    auto_test Ctrl+grave
+    runcommand Alt+x
+    keyprefix Ctrl+QUESTION
+    macro_toggle Alt+m
+    macro_play Ctrl+m
+    macro_copy Ctrl+M
+    id_toggle Ctrl+semicolon
+  }
+  Client {
+    Canvas Alt+c
+    about {}
+    audio_off Ctrl+period
+    audio_on Ctrl+slash
+    audio_settings {}
+    class_browser {}
+    client_class_tree Ctrl+grave
+    client_prefs Ctrl+l
+    find Ctrl+f
+    find_again Ctrl+g
+    find_last_error {}
+    font_bomb {}
+    latency_meter {}
+    load_meter {}
+    midi_settings {}
+    new_file Ctrl+n
+    open_file Ctrl+o
+    paths {}
+    server_prefs Ctrl+p
+    quit Ctrl+q
+    send_message Ctrl+m
+    test_audio_and_midi {}
+    text_editor Ctrl+t
+  }
+}

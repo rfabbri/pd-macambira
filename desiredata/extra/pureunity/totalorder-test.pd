@@ -1,0 +1,11 @@
+#N canvas 118 56 418 157 10;
+#X obj 13 21 inlet;
+#X obj 13 101 outlet;
+#X obj 43 59 partialorder-test \$1 \$2;
+#X obj 13 78 trichotomy-test \$1 \$2;
+#X obj 13 40 t b b;
+#X connect 0 0 4 0;
+#X connect 2 0 1 0;
+#X connect 3 0 1 0;
+#X connect 4 0 3 0;
+#X connect 4 1 2 0;

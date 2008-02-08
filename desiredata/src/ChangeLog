@@ -1,0 +1,233 @@
+$Id: ChangeLog,v 1.1.4.11.2.44 2007-09-06 16:12:01 chunlee Exp $
+
+DesireData 2007.08.22 :
+
+ * added more Bokmål (Norwegian) translations from Gisle Frøysland
+ * added Nihongo (Japanese) translations from Kentaro Fukuchi
+ * added Dansk (Danish) translations from Steffen Leve Poulsen
+ * added History class to unify command history for Listener/Runcommand/TextBox
+ * KeyboardDialog clean up, added font selector for console and virtual keyboard
+ * Appearance settings can be applied at run time
+ * new object/wire indexing system (diff-friendly)
+ * Added keyboard/mouse macro recording, playback, and copy (to clipboard)
+ * [select] has as many inlets as it has arguments
+ * Added [macro] so that a macro can be played back in a patch using messagebox
+ * Added [clipboard] to pull the content of system clipboard
+ * Fixed variable width font support and TextBox code clean up
+ * Added object id display toggle
+ * Added [display] object
+ * Added patch editing commands
+ * Added expand_port
+ * Added profiler (object speed measurements) (not compiled in by default)
+ * Can now use spaces and \{} in IEM labels and some other places.
+ * Added Locale diff tool: localeutils.tcl	
+
+DesireData 2007.08.04 :
+
+ * Unicode locales
+ * fixed type mismatch bug recently introduced in [unpack]...
+ * fixed lost console posts at startup
+ * turned most fprintf() into post() or error()
+ * added Chinese locale from Chun Lee
+ * added Polish locale from Michal Seta
+ * added object creation history
+ * added arrow keys and mouse clicks to KeyboardDialog
+ * added click drag and copy
+ * added background grid
+ * added snap to grid
+ * added new font selector (in client prefs)
+
+DesireData 2007.07.30 :
+
+ * added classes [unpost], [tracecall], [parse], [unparse]
+ * non-constructed objects finally have a dashed box like they used to
+ * most of the rest of the C code switched to C++,PD_PLUSPLUS_FACE
+ * beginning to use C++ standard library components
+ * added event history view (help menu)
+ * added keyboard view
+ * fixed several bugs in copy/paste, undo/redo, subpatches, gop.
+ * added atom_ostream (similar to atom_string)
+ * lifted many string length restrictions
+ * fixed the hexmunge generator (for classnames with special chars)
+ * pd_error() is deprecated
+ * added verror(), added open_via_path2(), canvas_open2(), outlet_atom(), ...
+ * [route] and [select] support mixed floats and symbols
+ * [unpack] supports type "e" meaning any atom ("e" stands for "element")
+ * added variable mouse cursor sensitivity
+ * various fixes on keyboard navigation
+
+DesireData 2007.06.27 (which should have been 2007.01.12) :
+
+ * merged new loader from Miller's pd 0.40-2
+ * merged (but not tested) the rest of the [declare] code from pd 0.40-2
+ * added gensym2 (support for NUL in symbols)
+ * most of the code now uses C++,PD_PLUSPLUS_FACE,class_new2,etc
+ * auto show/hide scrollbars
+ * menu bar can be disabled
+ * new Find widget (FireFox style)
+ * added "subpatcherize" (turn a selection into a subpatch)
+ * IEMGUI can now by controled with keyboard
+ * more general keyboard control
+ * merged t_alist and t_binbuf together and aliased them to t_list
+ * delay uploading until #X restore or #X pop
+ * don't upload all abstractions instances to client (much faster)
+ * introduced zombie objects to deal with dead objects
+ * Command evaluator per canvas window
+ * Added locale for Euskara (Basque) by Ibon Rodriguez Garcia
+ * PureUnity is now part of the DesireData project (but is designed to
+   run also on Miller's 0.40).
+ * added -port option in desire.tk so that server and client may
+   be started separately.
+ * PureUnity has type suffixes for some class families; for each $1 in
+   f,~,# (float,signal,grid) there is [inlet.$1] [outlet.$1] [taa.$1]
+   [op2.$1] [rand.$1] [norm.$1] [swap.$1] [packunpack3.$1]
+ * Other new PureUnity classes: [^] [commutator] [associator]
+   [invertor] [distributor] [tree] [protocols-tree]
+
+DesireData 0.40.pre5 (2006.12.19) (-r desiredata; ./configure && make) :
+
+ * merged changes from Miller's pd 0.40-2 (80% of it)
+ * new canvas method "reply_with" of canvases replaces the implicit
+   reply-matching of pre4. (even less bug-prone)
+ * server-side wires and scalars appear to client just like other objects.
+ * floatatom,symbolatom,[nbx] use normal Tk text edition just like
+   ObjectBox,MessageBox,Comment have done for a while
+ * obsolete t_object fields removed: te_type te_width
+ * global object table (crash protection for bindless .x targets)
+ * variable width font usable in ObjectBoxes and MessageBoxes and Comments.
+ * [hsl] [vsl] support jump-on-click again
+ * lots of bugfixes
+ * -console and -lang moved to Client Preferences dialog
+ * added some more translations by Patrice Colet
+ * removed Find menu in main window
+ * added Find, Find Next, Find Last Error (canvas windows only)
+ * choose between horizontal and vertical in Properties of slider or radio.
+
+DesireData 0.39.A.pre4 (2006.12.07) (-r desiredata; ./configure && make) :
+
+ * major speedup of the GUI (sometimes 3-4 times faster)
+ * lots of bugfixes
+ * logging of the socket into the terminal is now disabled by default
+ * introducing PD_PLUSPLUS_FACE, a new way to use <m_pd.h> and <desire.h>
+ * new branch "desiredata" instead of "devel_0_39".
+ * got rid of #ifdef DESIRE
+ * reply-matching in client-server protocol (less bug-prone)
+ * reversing the connection to what it was supposed to be:
+   the client connects to the server, not the other way around.
+ * the server uses [netreceive] to receive the connection from the GUI
+ * removed support for .pdsettings, .plist, microsoft registry.
+ * cross-platform libpd
+ * new titlebar icon
+ * removed t_guiconnect
+ * removed [scope]
+
+DesireData 0.39.A.pre3 (2006.11.27) (-r devel_0_39; ./configure && make) :
+ * français updated by Patrice Colet
+ * italiano updated by Federico Ferri
+ * tons of bugfixes
+ * better pdrc editor (renamed to server prefs)
+ * removed media menu (split to: help menu, file menu, server prefs)
+ * removed Gdb box, added crash report dialog
+ * renamed objective.tcl to poe.tcl (because the name was already taken)
+ * replaced scons by autoconf and make (starting from Miller's 0.39's files)
+ * removed detection of Tcl (we don't need to use libtcl)
+ * removed the setuid option because no-one needs it; also fixed the
+   setuid security vulnerability in case someone does chmod u+s anyway
+ * Portaudio 18 is no longer supported.
+ * simplified configure.in (detector and makefile generator)
+ * APIs not compiled in show up in "pd -help", with a special mention
+   "(support not compiled in)"; those options don't give you a "unknown
+   option" when trying them, it says "option -foo not compiled in this pd".
+ * switched desire.c to C++, as another way to reduce redundancy in code.
+ * can be compiled without audio support.
+ * can be compiled without MIDI support.
+ * can --disable-portaudio on OSX
+ * added multiple wire connection support
+ * fixed copy/paste on canvas
+ * keyboard navigation pointer makeover
+ * added automatic object insertion support
+
+DesireData 0.39.A.pre2 (2006.11.12) (-r devel_0_39; scons desire=1) :
+ * español updated by Mario Mora
+ * subpatches
+ * GOPs
+ * abstraction instances
+ * multi-line objectboxes, messageboxes and comments
+ * keyboard-based navigation
+ * made desire.c C++ compatible (for future use)
+ * lots of things not written here
+
+DesireData 0.39.A.pre1 (-r devel_0_39; scons desire=1) :
+ * merged into the devel branch; enable with scons desire=1, which
+   disables lots of g_*.c files (and s_print.c) and enables desire.c;
+   use the std devel gui using desire=0.
+ * added an object-oriented programming system in desire.tk (do not
+   confuse with a dataflow system). added proc unknown, which allows
+   subject-verb-complement method-calling in tcl (aka objective.tcl)
+ * run the client to start the server and not the other way around: do wish desire.tk
+ * the client can make the server start via GDB
+ * added Pd box (like Ctrl+M but with history)
+ * added Gdb box
+ * menu translations in 8 languages
+ * classbrowser now show short descriptions in 3 languages
+ * objectbox tooltip now replaced by mini-classbrowser
+ * client conf editor
+ * other stuff I forget to write about
+ * looks for .ddrc
+ * pdrc and ddrc config becomes server and client configuration editor
+ * graphics rendering completely removed from the server
+ * toolbar and status bar can be enabled/disabled
+ * added Patcher->View->Reload: client reloads the patch from the server
+ * localization support (currently 8 languages: english, français, deutsch,
+      català, español, português, bokmål, italiano.)
+ * lots of things not written here
+
+ImpureData 0.37.B :
+ * moving rendering to the TCL side
+ * moving event-handling to the TCL side too
+ * new file u_object.tk
+ * added pd_scanargs(), pd_upload(), sys_mgui().
+ * added color schemes (modifiable in u_main.tk)
+ * switched to a jmaxish look
+ * merged g_vdial.c into g_hdial.c
+ * merged g_vslider.c into g_hslider.c
+ * added Patcher->View->Redraw
+ * added proc populate_menu, proc property_dialog
+ * added ~/.pd.tk loading
+ * inlet tooltips have new look
+ * rewrote all of the property dialogs
+ * added object class name completion (the <Tab> key)
+ * mouse scrollwheel works in patchers
+ * plus/minus button on tcl listener
+ * changed default font and borderwidth
+ * if conf not found in ~ ($HOME),
+     looks in Pd's install directory (eg. /usr/local/lib/pd)
+ * looks for .impdrc before .pdrc
+ * pdrc editor
+ * -help lists unavailable options with note "not compiled in"
+ * sys_vgui() message size limit removed
+ * new peak meters (thanks Carmen)
+ * dropper object outputs symbols of filenames (requires tkdnd)
+ * joe sarlo's VST-plugin i/o scheduler available on windows
+ * error() merged into pd_error()
+     and using strerror() to get meaningful error messages for failed I/O
+ * completely breaking compatibility with Pd's GUI externals
+   (for a good reason)
+
+ImpureData 0.37.A.2 (-r impd_0_37_A_2) :
+ * merged GG's reverting of "quote hack"
+
+ImpureData 0.37.A (-r impd_0_37_A) :
+ * forked from devel_0_37, 2004.02.21
+ * added console for post()
+   * .pdrc: -console <number_of_lines>
+ * added button bar (that does like Ctrl+E & Put menu)
+   * .pdrc: -look <directory_of_icons>
+     (remember you can't use ~ nor $HOME in .pdrc)
+   * includes a selectable windowid (for those who know how to use it)
+ * class list dialog
+   * scans for loaded classes, abstractions/externs dirs
+   * help button fetches help file without needing to instantiate first
+   * filter box helps finding classes quickly
+   * displays some info on the class, like a list of defined methods and such.
+ * statusbar shows cursor position (enable with -statusbar)

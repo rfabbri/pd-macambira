@@ -1,0 +1,73 @@
+to build this program, you need to have those packages:
+
+  gcc (including the libc6 dev package and the g++ package)
+  tcl >= 8.4 (the dev package)
+  tk  >= 8.4 (the dev package)
+  make
+
+then type commands like:
+
+  cd src
+  ./configure
+  make
+  make install
+
+The ./configure program has some options that you can use if for some
+reason you want to disable the use of certain libraries for some reason.
+You may also use it to specify a different installation directory: for
+example you install programs with --prefix=$HOME but then you need to have
+something like this in my Bash configuration (.bashrc and/or .bash_profile):
+
+  export PATH=$HOME/bin:$PATH
+  export    LIBRARY_PATH=$HOME/lib
+  export LD_LIBRARY_PATH=$HOME/lib
+  export     C_INCLUDE_PATH=$HOME/include
+  export CPLUS_INCLUDE_PATH=$HOME/include
+
+to start DesireData, type a command like:
+
+  desire mystuff.pd
+
+You may also make a build without the "make install" step and then start
+pd from the src directory like this:
+
+  cd src
+  wish desire.tk mystuff.pd
+
+If you want to have both DesireData and another kind of PureData on the same
+system, use a different --prefix or else just keep the compiled source
+directories ready for a new "make install" phase each time you want to switch.
+
+Most externals are compatible; almost all exceptions are those that use
+a component called "t_widgetbehavior": [popup], [widget], [playlist],
+[sonogram], [grid], [display].
+
+Most abstractions are compatible too; almost all exceptions are those that
+use "click" messages to fake mouse actions.
+
+There are some options of DesireData that are available as commandline 
+arguments, for example selecting a language (Spanish, German, etc). You
+can get a list of them by typing:
+
+  desire -- -help
+
+Most other configuration can be done through the Preferences items in the
+File menu of the main window, or by editing the corresponding configuration
+files ".pdrc" and ".ddrc" in the home directory.
+
+
+Options that are planned for future versions of DesireData and are currently
+in available in devel_0_39 :
+
+	lockfree = enables lockfree fifos for thread synchronization
+	newhash  = provides a bigger hash table for symbols
+	atomic   = use atomic operations for the internal stack counter
+	threadedsf = broken in 0.39; in 0.38, provides threaded soundfiler
+	daz = Build using DAZ flag on x86-SSE2 cpus (must be set to False for AMD cpus)
+	app_pkg  = install builds application package structure for OSX
+	desire   = enables building of experimental MVC gui
+	simd   = build with simd extensions (x86 only?)
+	pdlib = build pd as a dynamic library
+	optimize = optimize for given cpu-type
+	prefix = install directory prefix
+		

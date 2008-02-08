@@ -1,0 +1,8 @@
+#N canvas 462 350 544 148 10;
+#X obj 23 20 inlet~ f;
+#X obj 23 58 outlet f;
+#X text 101 18 \$1.norm takes a value of type \$1 and produces a nonnegative
+float \, normally using L2-norm formulas;
+#X obj 23 39 env~;
+#X connect 0 0 3 0;
+#X connect 3 0 1 0;
