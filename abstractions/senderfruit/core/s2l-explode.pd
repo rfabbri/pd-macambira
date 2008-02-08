@@ -1,0 +1,10 @@
+#N canvas 583 307 229 180 10;
+#X obj 46 92 symbol2list;
+#X obj 109 41 loadbang;
+#X msg 109 67 symbol;
+#X obj 46 41 inlet;
+#X obj 46 125 outlet;
+#X connect 0 0 4 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 1;
+#X connect 3 0 0 0;

@@ -1,0 +1,17 @@
+#N canvas 765 341 576 286 10;
+#X obj 150 100 cnv 19 19 19 empty empty empty 20 12 0 14 -115257 -66577
+0;
+#X obj 66 168 print;
+#X msg 66 81 30;
+#X obj 66 110 until;
+#X obj 66 44 loadbang;
+#X obj 152 102 bng 15 250 50 0 \$0 \$0r empty 0 -6 0 8 -259744 -154956
+-1;
+#X msg 66 139 ....................((&&&&&&&&&&&&&))......................
+;
+#X connect 2 0 3 0;
+#X connect 3 0 6 0;
+#X connect 4 0 2 0;
+#X connect 5 0 2 0;
+#X connect 6 0 1 0;
+#X coords 0 -1 1 1 19 19 2 150 100;

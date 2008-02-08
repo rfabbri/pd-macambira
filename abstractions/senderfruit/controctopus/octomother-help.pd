@@ -1,0 +1,15 @@
+#N canvas 334 339 595 363 10;
+#X obj 20 178 octomother /uc33 /modular;
+#X obj 184 61 cc-learner /uc33 /Knob1;
+#X obj 275 60 cc-learner /uc33 /Knob2;
+#X obj 362 60 cc-learner /uc33 /Knob3;
+#X text 19 249 call like [octomother /uc33 /modular];
+#X text 8 8 Octomother generates a set of midi-tentacles automatically
+from a set of already-defined cc-learners.;
+#X obj 332 339 pddplink http://proyekto.net;
+#X text 272 326 2008 Luke Iannini \, tag sndrft;
+#X obj 450 60 cc-learner /uc33 /Knob4;
+#X obj 184 146 cc-learner /uc33 /Slider1;
+#X obj 274 146 cc-learner /uc33 /Slider2;
+#X obj 362 146 cc-learner /uc33 /Slider3;
+#X obj 450 146 cc-learner /uc33 /Slider4;

@@ -1,0 +1,31 @@
+#N canvas 731 31 580 522 10;
+#X text 234 238 Inlet 2 changes the lower scaling bound;
+#X text 326 278 Inlet 3 changes the upper scaling bound;
+#X floatatom 235 253 5 0 0 0 - - -;
+#X floatatom 330 294 5 0 0 0 - - -;
+#X floatatom 141 223 5 0 0 0 - - -;
+#X floatatom 141 353 5 0 0 0 - - -;
+#X text 13 77 Obviously \, don't use this for communs that are meant
+to store symbolic or list data (use regular sft.commun for that). (That
+is \, only use this for OSC-control-intended stuff);
+#X text 139 206 Inlet 1 is the standard commun input;
+#X text 194 344 Argument 5 and 6 can be "round" and/or "hide" (the
+order doesn't matter).;
+#X text 454 497 2008 Luke Iannini;
+#X text 10 494 Originally based on [commun-scale] by Frank Barknecht
+;
+#X obj 141 317 sft.commun.sc \$0 /parameter 5 37;
+#X text 13 26 Use sft.commun.sc(ale) so that 0-1 values coming out
+of OSC stuff (like Controctopus) can be rescaled appropriately.;
+#X text 194 374 "hide" hides the parameter from Controctopus sniffing
+(useful to pare down the options to just the most interesting inputs).
+;
+#X text 194 416 "round" rounds up from 0.5 increments so that an integer
+is always output (useful for communs connected to v/hdials and toggles).
+;
+#X text 14 145 sft.commun.sc's first and second args are swapped from
+sft.commun (i.e. \$0 and /parametername);
+#X connect 2 0 11 1;
+#X connect 3 0 11 2;
+#X connect 4 0 11 0;
+#X connect 11 0 5 0;

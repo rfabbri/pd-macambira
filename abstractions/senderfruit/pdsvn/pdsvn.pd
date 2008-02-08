@@ -1,0 +1,795 @@
+#N canvas 470 116 841 688 10;
+#X obj 488 77 getpatchname 1;
+#X obj 425 77 getdir 1;
+#X obj 425 103 list append;
+#X obj 405 21 loadbang;
+#X obj 425 128 list2symbol /;
+#X obj 43 14 cnv 16 60 16 empty \$0svndisplay Zen 3 9 0 8 -228992 -1
+0;
+#X obj 20 156 list;
+#X obj 41 131 r \$0parentFile;
+#X obj 20 201 list trim;
+#X obj 20 345 list split 1;
+#X obj 425 152 s \$0parentFile;
+#X obj 20 493 s \$0svndisplay;
+#X obj 13 35 bng 12 250 50 0 \$0diff \$0diffR Diff 14 7 0 8 -260097
+-1 -1;
+#X obj 238 73 list;
+#X obj 259 48 r \$0parentFile;
+#X obj 238 118 list trim;
+#X obj 238 21 r \$0diff;
+#X obj 238 98 list prepend svn diff;
+#X obj 238 169 print DIFF;
+#X obj 405 44 t b b b;
+#X obj 405 178 s \$0status;
+#X obj 20 82 r \$0status;
+#X obj 81 35 bng 12 250 50 0 \$0commit \$0commitR ci 14 7 0 8 -4032
+-1 -1;
+#X obj 236 222 r \$0commit;
+#N canvas 1039 176 401 328 \$0commitWindow 0;
+#X obj 29 235 cnv 15 150 60 empty empty empty 20 12 0 14 -204786 -66577
+0;
+#X obj 38 246 cnv 15 30 40 empty empty empty 20 12 0 14 -1 -66577 0
+;
+#X obj 48 256 bng 20 250 50 0 \$0confirmCommit \$0confirmCommitR empty
+14 7 0 8 -4032 -13381 -1;
+#X obj 69 247 cnv 15 100 40 empty empty OMMIT 0 20 0 30 -262144 -66577
+0;
+#X obj 218 235 cnv 15 150 60 empty empty empty 20 12 0 14 -204786 -66577
+0;
+#X obj 227 247 cnv 15 30 40 empty empty empty 20 12 0 14 -1 -66577
+0;
+#X obj 237 257 bng 20 250 50 0 \$0cancelCommit \$0cancelCommitR empty
+14 7 0 8 -191407 -1 -1;
+#X obj 258 247 cnv 15 100 40 empty empty ANCEL 0 20 0 30 -262144 -66577
+0;
+#X obj 192 284 bng 12 250 50 0 \$0diff \$0diffR Diff -2 18 0 8 -260097
+-1 -1;
+#X obj 29 26 tkwidgets/text 340 184 0;
+#X obj 29 8 r \$0getLogMessage;
+#X obj 29 8 cnv 17 339 17 empty empty empty 20 12 0 14 -261234 -66577
+0;
+#X obj 29 210 s \$0logPrepare;
+#X obj 29 210 cnv 17 339 17 empty empty empty 20 12 0 14 -261234 -66577
+0;
+#X obj 119 56;
+#X connect 9 0 12 0;
+#X connect 10 0 9 0;
+#X restore 11 58 pd \$0commitWindow;
+#X msg 236 246 vis 1;
+#X msg 20 473 label Modified \, color 16 -1;
+#X msg 310 245 vis 0;
+#X obj 310 222 r \$0cancelCommit;
+#X obj 453 213 r \$0confirmCommit;
+#X obj 236 271 s pd-\$0commitWindow;
+#X obj 20 385 sel M ? A C;
+#X msg 51 433 label Added \, color 17 -1;
+#X msg 67 413 label Conflict \, color 13 -1;
+#X msg 35 453 label Unversioned \, color 5 -1;
+#X obj 453 327 list;
+#X obj 483 327 r \$0parentFile;
+#X obj 453 442 list trim;
+#X obj 453 377 list append -m;
+#X obj 453 421 list append;
+#X obj 467 489 print SVNCommit;
+#X obj 453 243 s \$0getLogMessage;
+#X obj 631 81 list;
+#X obj 652 56 r \$0parentFile;
+#X obj 631 126 list trim;
+#X obj 631 29 r \$0add;
+#X obj 631 106 list prepend svn add;
+#X msg 627 284 capture 1;
+#X obj 669 334 route menusave;
+#X obj 627 258 loadbang;
+#X obj 50 35 bng 12 250 50 0 \$0add \$0addR Add 14 7 0 8 -155243 -1
+-1;
+#X obj 13 13 bng 16 250 50 0 \$0status \$0statusR st 18 9 0 8 -262144
+-1 -1;
+#X obj 13 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 18 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 20 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 21 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 23 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 24 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 25 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 26 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 27 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 28 13 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 13 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 18 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 20 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 21 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 23 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 24 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 25 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 26 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 27 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 28 14 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 18 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 20 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 21 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 23 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 24 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 25 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 26 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 27 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 28 15 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 18 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 20 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 21 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 22 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 23 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 24 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 25 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 26 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 27 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 28 16 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 18 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 19 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 20 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 21 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 23 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 24 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 25 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 26 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 27 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 28 17 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 16 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 17 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 18 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 20 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 21 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 23 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 24 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 25 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 26 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 27 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 28 18 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 14 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 15 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 16 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 17 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 18 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 20 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 21 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 23 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 24 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 25 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 26 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 27 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 28 19 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 14 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 15 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 16 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 17 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 18 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 19 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 20 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 21 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 22 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 23 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 24 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 25 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 26 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 27 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 28 20 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 13 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 18 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 19 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 20 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 21 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 22 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 23 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 24 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 25 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 26 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 27 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 28 21 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 13 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 18 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 20 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 21 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 23 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 24 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 25 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 26 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 27 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 28 22 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 18 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 20 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 21 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 23 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 24 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 25 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 26 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 27 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 28 23 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 18 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 20 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 21 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 23 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 24 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 25 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 26 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 27 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 28 24 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 18 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 20 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 21 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 22 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 23 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 24 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 25 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 26 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 27 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 28 25 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 15 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 18 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 19 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 20 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 21 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 23 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 24 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 25 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 26 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 27 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 28 26 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 14 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 15 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 16 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 17 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 18 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 20 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 21 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 23 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 24 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 25 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 26 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 27 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 28 27 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 13 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 14 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -262144
+-262144 0;
+#X obj 15 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 16 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 17 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 18 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 19 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 20 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 21 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 22 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 23 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 24 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 25 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 26 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 27 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 28 28 cnv 1 1 1 empty jibberishhhh empty 20 12 0 14 -62784 -262144
+0;
+#X obj 658 188 print SVNAdd;
+#X msg 631 438 label Checking... \, color 1 -1;
+#X obj 631 464 s \$0svndisplay;
+#X obj 631 412 r \$0status;
+#N canvas 314 368 289 111 dependencies 0;
+#X text 12 9 Toxy;
+#X text 12 24 Zexy;
+#X text 12 53 getpatchname with parent access modification;
+#X text 12 68 popen;
+#X text 12 38 getdir;
+#X text 12 83 tkwidgets/text;
+#X restore 718 18 pd dependencies;
+#N canvas 283 676 385 456 enquote-log 0;
+#X obj 39 52 s \$0getLogMessage;
+#X obj 39 30 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 112 196 list split 1;
+#X obj 266 230 list-splat -1;
+#X obj 112 379 list append;
+#X obj 112 336 list append;
+#X text 165 105 Quotes the entered log message;
+#X obj 112 407 outlet;
+#X obj 49 77 inlet;
+#X msg 112 281 "\$1;
+#X msg 303 277 \$1";
+#X obj 76 123 list length;
+#X obj 49 101 t a a;
+#X obj 49 160 demultiplex;
+#X msg 49 219 "\$1";
+#X obj 112 140 != 1;
+#X connect 1 0 0 0;
+#X connect 2 0 9 0;
+#X connect 2 1 3 0;
+#X connect 3 0 5 1;
+#X connect 3 1 10 0;
+#X connect 4 0 7 0;
+#X connect 5 0 4 0;
+#X connect 8 0 12 0;
+#X connect 9 0 5 0;
+#X connect 10 0 4 1;
+#X connect 11 0 15 0;
+#X connect 12 0 13 0;
+#X connect 12 1 11 0;
+#X connect 13 0 14 0;
+#X connect 13 1 2 0;
+#X connect 14 0 7 0;
+#X connect 15 0 13 1;
+#X restore 267 411 pd enquote-log;
+#X obj 267 385 r \$0logPrepare;
+#X obj 267 438 s \$0logMessage;
+#X obj 627 310 tot .parent;
+#X obj 20 222 popen;
+#X obj 453 463 popen;
+#X obj 631 147 popen;
+#X obj 20 321 symbol2list;
+#X obj 59 223 print SVNStatus;
+#X obj 453 352 list prepend svn ci;
+#X obj 453 514 symbol2list;
+#X msg 480 601 clear;
+#X obj 480 625 s \$0getLogMessage;
+#X obj 370 597 s \$0status;
+#X obj 20 181 list prepend svn st;
+#X msg 121 345 label Zen \, color 8 -1;
+#X obj 74 272 spigot 1;
+#X msg 47 296 0;
+#X obj 47 243 t b b;
+#X msg 119 244 1;
+#X obj 20 273 t a b;
+#X text 96 295 ^^ voodoo for svn's silent "no changes" and popen's
+left-to-right behavior;
+#X obj 453 537 list split 1;
+#X obj 453 559 sel Committed;
+#X obj 453 580 t b b;
+#N canvas 0 22 450 300 remotelogmessagesconcept 0;
+#X obj 95 -107 r svn;
+#X obj 95 -57 list append >>>;
+#X obj 95 -9 list append;
+#X obj 177 -9 t a;
+#X obj 74 19 list;
+#X obj 74 -111 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 87 41 print log;
+#X obj 95 -83 route clearlog;
+#X obj 158 -32 b;
+#X msg 74 67 TODO to commit-log text widget;
+#X text 41 -189 Haven't quite figured this out yet. Might make an [svnlog]
+object...;
+#X connect 0 0 7 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 2 0 4 1;
+#X connect 3 0 2 1;
+#X connect 4 0 9 0;
+#X connect 4 0 6 0;
+#X connect 5 0 4 0;
+#X connect 7 0 8 0;
+#X connect 7 1 1 0;
+#X connect 8 0 2 1;
+#X restore 631 521 pd remotelogmessagesconcept;
+#X obj 453 303 t b a;
+#X obj 453 275 r \$0logMessage;
+#X obj 669 359 s \$0status;
+#X obj 631 208 s \$0status;
+#X obj 631 168 t b a;
+#X obj 238 139 popen;
+#X obj 56 638 s \$0addR;
+#X msg 21 583 pos 50 35;
+#X msg 91 583 pos 150 35;
+#X obj 27 365 s \$0addable?;
+#X obj 21 553 sel ?;
+#X obj 21 532 r \$0addable?;
+#X connect 0 0 2 1;
+#X connect 1 0 2 0;
+#X connect 2 0 4 0;
+#X connect 3 0 19 0;
+#X connect 4 0 10 0;
+#X connect 6 0 327 0;
+#X connect 7 0 6 1;
+#X connect 8 0 317 0;
+#X connect 9 0 31 0;
+#X connect 9 0 348 0;
+#X connect 13 0 17 0;
+#X connect 14 0 13 1;
+#X connect 15 0 344 0;
+#X connect 16 0 13 0;
+#X connect 17 0 15 0;
+#X connect 19 0 20 0;
+#X connect 19 1 1 0;
+#X connect 19 2 0 0;
+#X connect 21 0 6 0;
+#X connect 23 0 25 0;
+#X connect 25 0 30 0;
+#X connect 26 0 11 0;
+#X connect 27 0 30 0;
+#X connect 28 0 27 0;
+#X connect 29 0 41 0;
+#X connect 31 0 26 0;
+#X connect 31 1 34 0;
+#X connect 31 2 32 0;
+#X connect 31 3 33 0;
+#X connect 32 0 11 0;
+#X connect 33 0 11 0;
+#X connect 34 0 11 0;
+#X connect 35 0 322 0;
+#X connect 36 0 35 1;
+#X connect 37 0 318 0;
+#X connect 38 0 39 0;
+#X connect 39 0 37 0;
+#X connect 42 0 46 0;
+#X connect 43 0 42 1;
+#X connect 44 0 319 0;
+#X connect 45 0 42 0;
+#X connect 46 0 44 0;
+#X connect 47 0 316 0;
+#X connect 48 0 341 0;
+#X connect 49 0 47 0;
+#X connect 309 0 310 0;
+#X connect 311 0 309 0;
+#X connect 313 0 315 0;
+#X connect 314 0 313 0;
+#X connect 316 2 48 0;
+#X connect 317 0 321 0;
+#X connect 317 0 333 0;
+#X connect 317 1 331 0;
+#X connect 318 0 323 0;
+#X connect 318 0 40 0;
+#X connect 319 0 343 0;
+#X connect 320 0 9 0;
+#X connect 322 0 38 0;
+#X connect 323 0 335 0;
+#X connect 324 0 325 0;
+#X connect 327 0 8 0;
+#X connect 328 0 11 0;
+#X connect 329 0 328 0;
+#X connect 330 0 329 1;
+#X connect 331 0 332 0;
+#X connect 331 1 329 0;
+#X connect 332 0 329 1;
+#X connect 333 0 320 0;
+#X connect 333 1 330 0;
+#X connect 335 0 336 0;
+#X connect 336 0 337 0;
+#X connect 337 0 326 0;
+#X connect 337 1 324 0;
+#X connect 339 0 35 0;
+#X connect 339 1 39 1;
+#X connect 340 0 339 0;
+#X connect 343 0 342 0;
+#X connect 343 1 308 0;
+#X connect 344 0 18 0;
+#X connect 346 0 345 0;
+#X connect 347 0 345 0;
+#X connect 349 0 346 0;
+#X connect 349 1 347 0;
+#X connect 350 0 349 0;
+#X coords 0 -1 1 1 96 40 2 10 10;
