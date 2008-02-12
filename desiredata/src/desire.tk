@@ -925,8 +925,9 @@ def Client init_controls {} {
     . configure -menu .mbar
     wm title . "DesireData"
     catch {wm iconphoto . icon_pd}
-    regexp {\d\d\d\d/\d\d/\d\d} $::cvsid version
-    regsub -all "/" $version "." version
+    #regexp {\d\d\d\d/\d\d/\d\d} $::cvsid version
+    #regsub -all "/" $version "." version
+    set version "svn"
     set ::pd_version_client $version
     post "DesireData client version $version with Tcl %s and Tk %s" $::tcl_patchLevel $::tk_patchLevel
 }
@@ -3272,7 +3273,7 @@ def Canvas target {x y f tag} {
 		if {[$class <= Wire]} {if {$@action != "imove"} {return [list "wire" $id]}}
 		if {[$class <= Box]} {
 			if {$@action == "imove"} {
-				foreach tag $stack {
+				foreach tag [$self item_stack $x $y] {
 					set tags2 [$c gettags $tag]
 					if {[regexp {^[xo][0-9a-f]{6,8}} $tags2 id2]} {
 						set class [$id2 class]
@@ -3306,7 +3307,7 @@ def Canvas target {x y f tag} {
 	}
 }
 
-def Canvas identify_closestio {x y f} {
+def Canvas item_stack {x y} {
 	set c [$self widget]
 	set cx [expr {$x*$@zoom}]
 	set cy [expr {$y*$@zoom}]
@@ -3314,9 +3315,14 @@ def Canvas identify_closestio {x y f} {
 	set stack [$c find overlapping [expr {$cx-$sense}] [expr {$cy-$sense}]\
 		                       [expr {$cx+$sense}] [expr {$cy+$sense}]]
 	set stack [lreverse $stack]
+	return $stack
+}
+
+def Canvas identify_closestio {x y f} {
+	set c [$self widget]
 	set ios {}
 	set objs {}
-	foreach tag $stack {
+	foreach tag [$self item_stack $x $y] {
 		set tags [$c gettags $tag]
 		if {[regexp {^[x][0-9a-f]{6,8}[oi][0-9]{1,3}} $tags io]} {
 			foreach item {i o} {
