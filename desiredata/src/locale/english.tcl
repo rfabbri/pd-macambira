@@ -1,6 +1,6 @@
 #!/usr/bin/env tclsh
 # English translations for PureData
-# $Id: english.tcl,v 1.1.2.34.2.22 2007-09-04 11:24:02 chunlee Exp $
+# $Id: english.tcl,v 1.1.2.34.2.22 2007/09/04 11:24:02 chunlee Exp $
 
 ### Menus
 
@@ -570,4 +570,4 @@ say consolefont "console font"
 say keyboarddialogfont "virtual keyboard font"
 say keyboard_view "Virtual keyboard"
 say log_height "Log Height"
-
+say visual_diff "Visual diff"

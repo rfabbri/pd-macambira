@@ -1,7 +1,7 @@
 #!/usr/bin/env tclsh
 # Portuguese translations for DesireData
-# $Id: brasiliano.tcl,v 1.1.2.1 2007-10-05 23:15:45 matju Exp $
-# Author: chgp@riseup.net revision 0.4
+# $Id: brasiliano.tcl,v 1.1.2.1 2007/10/05 23:15:45 matju Exp $
+# Author: Carlos Paulino <chgp@riseup.net> revision 0.4
 
 ### Menus
 
