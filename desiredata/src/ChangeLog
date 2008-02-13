@@ -1,10 +1,15 @@
-$Id: ChangeLog,v 1.1.4.11.2.44 2007-09-06 16:12:01 chunlee Exp $
+$Id: ChangeLog,v 1.1.4.11.2.44 2007/09/06 16:12:01 chunlee Exp $
 
 DesireData 2008.02.13 :
 
+ * moved from CVS to SVN.
  * added more Bokmål (Norwegian) translations from Gisle Frøysland
  * added Nihongo (Japanese) translations from Kentaro Fukuchi
  * added Dansk (Danish) translations from Steffen Leve Poulsen
+ * added Türkçe (Turkish) translations from Koray Tahiroglu
+ * added Nederlands (Dutch) translations from Tim Vets
+ * added Brasiliano (Brasilian Portuguese) translations from chgp
+ * added Russkij (Russian) translations from Ilya Dmitrichenko
  * added History class to unify command history for Listener/Runcommand/TextBox
  * KeyboardDialog clean up, added font selector for console and virtual keyboard
  * Appearance settings can be applied at run time
@@ -20,7 +25,8 @@ DesireData 2008.02.13 :
  * Added expand_port
  * Added profiler (object speed measurements) (not compiled in by default)
  * Can now use spaces and \{} in IEM labels and some other places.
- * Added Locale diff tool: localeutils.tcl	
+ * Added Locale diff tool: localeutils.tcl
+ * Added [>~] [<~] [<=~] [>=~] [==~] [!=~]
 
 DesireData 2007.08.04 :
 

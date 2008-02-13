@@ -1,4 +1,4 @@
-DesireData's TODO list, $Id: TODO,v 1.1.2.28.2.63 2007-09-09 17:45:45 matju Exp $
+DesireData's TODO list, $Id: TODO,v 1.1.2.28.2.63 2007/09/09 17:45:45 matju Exp $
 
 LEGEND:
   [c] client
@@ -6,9 +6,10 @@ LEGEND:
   [b] both
   [x] done
 
+[ ] update translation credits
+
 ------------------8<--------cut-here--------8<------------------
 
-[ ] svn test
 [s] encapsulate wires list
 [s] observable boxes list
 [s] observable wires list
@@ -56,7 +57,7 @@ LEGEND:
 [s] what to do with post() in case of -listdev, etc.?
 [s] turn old [dropper] code into a feature of SymbolBox
 [s] inheritance: [super] "instantiates" other abstraction with same $0; [self] allows sending messages to self; [declare super ...] makes the tree.
-
+[b] pd-dev message to Ed Kelly, October 5.
 [b] GOP problems are back due to recent changes in canvas_map and canvas_vis.
     now that abstractions don't get loaded into the client anymore, GOP can't always be drawn anymore too.
      i mean, because the content of GOP is not uploaded to the client, so the client can't draw anything about it..
