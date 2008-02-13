@@ -3968,12 +3968,12 @@ def Canvas reconnect_brkwires {type brk_quads obj} {
 	
 }
 
-def Canvas expand_port {type k port} {
-	set obj [$@objects get $k]
+def Canvas expand_port {type idx port} {
+	set obj [$@objects get $idx]
 	mset {bx1 by1 bx2 by2} [$obj io_bbox $type $port]
 	mset {ox1 oy1 ox2 oy2} [$obj bbox]
 	mset ys [expr $oy2-$oy1]
-	mset {brk_wires brk_quads} [$self broken_wires $type $k $port $self]
+	mset {brk_wires brk_quads} [$self broken_wires $type $idx $port $self]
 	switch $type {
 		i {mset {nx ny} [$self xy_snap $bx1 [expr $by1-25]]}
 		o {mset {nx ny} [$self xy_snap $bx1 [expr $by1+$ys+25]]}

@@ -1,0 +1,262 @@
+#N canvas 426 124 578 817 10;
+#X text 39 17 DesireData;
+#X text 60 120 Object creation;
+#X text 60 200 Wire connection;
+#X text 100 140 Auto-completion;
+#X text 100 160 Object history;
+#X text 100 220 Multi connection;
+#X text 100 240 Detach wire;
+#X text 60 280 Patch editing;
+#X text 100 300 Canvas zoom;
+#X text 100 320 Object insertion;
+#X text 100 360 Subpatcherize;
+#X text 60 500 Keyboard driven control;
+#X text 100 520 Keyboard navigation;
+#X text 100 540 Key commands;
+#X text 100 580 Keyboard Macro;
+#X text 60 40 General;
+#X text 100 60 Customization;
+#X text 100 80 Localization;
+#X text 100 380 In/outlet expansion;
+#X text 100 400 Fast copy;
+#X text 100 420 Grid \, snap to;
+#X text 100 440 Pointer sensitivity;
+#N canvas 432 483 474 248 example 0;
+#X text 100 60 - Canvas \, object colors;
+#X text 100 100 - Font selection;
+#X text 100 120 - Keyboard shortcuts;
+#X text 100 80 - Menu \, button \, scroll \, status bars;
+#X restore 280 60 pd example;
+#N canvas 334 257 617 645 example 0;
+#X text 100 40 French;
+#X text 100 80 Catalan;
+#X text 100 120 Spanish;
+#X text 100 160 German;
+#X text 100 200 Norwegian;
+#X text 100 240 Portuguese;
+#X text 100 280 Italian;
+#X text 100 320 Basque;
+#X text 100 360 Japanese;
+#X text 100 400 Polish;
+#X text 100 440 Danish;
+#X text 100 480 Chinese;
+#X text 100 520 Dutch;
+#X text 100 560 Turkish;
+#X text 100 600 Russian;
+#X text 240 40 Patrice Colet;
+#X text 240 80 Núria Verges;
+#X text 240 120 Mario Mora \, Ramiro Cosentino;
+#X text 240 160 Max Neupert \, Georg Holzmann \, Thomas Grill;
+#X text 240 200 Gisle Frøysland;
+#X text 240 240 Nuno Godinho;
+#X text 240 280 Davide Morelli \, Federico Ferri;
+#X text 240 320 Ibon Rodriguez Garcia;
+#X text 240 360 Kentaro Fukuchi;
+#X text 240 400 Michal Seta;
+#X text 240 440 Steffen Leve Poulsen;
+#X text 240 480 Chun Lee;
+#X text 240 520 Tim Vets;
+#X text 240 560 Koray Tahiroglu;
+#X text 240 600 Ilya Dmitrichenko;
+#X restore 280 80 pd example;
+#N canvas 357 386 641 323 example 0;
+#X text 20 20 Auto completion;
+#X text 40 60 By hitting Tab key while typing object name \, a popup
+window will appear with the names of possible objects.;
+#X text 40 120 One can continue typing to further eliminate proposed
+object names;
+#X restore 280 140 pd example;
+#N canvas 514 542 496 300 example 0;
+#X text 20 20 Object history;
+#X text 60 40 Object creation history is stored \, so that one can
+quickly create objects in the pase by using the Up and Down key;
+#X restore 280 160 pd example;
+#N canvas 479 532 496 300 example 0;
+#X text 20 20 Multiple connections;
+#X text 40 40 By holding down the Shift key whilst making the connection
+\, one can make multiple connections at once;
+#X obj 200 140 +;
+#X obj 100 220 +;
+#X obj 200 220 +;
+#X obj 300 220 +;
+#X restore 280 220 pd example;
+#N canvas 513 611 496 300 example 0;
+#X text 20 20 Detach wire;
+#X text 40 40 by holding down the Ctrl key while clicking on a wire
+\, one can detatch it and reconnect it elsewhere;
+#X obj 200 120 +;
+#X obj 200 220 +;
+#X obj 300 160 +;
+#X connect 2 0 3 0;
+#X restore 280 240 pd example;
+#N canvas 345 474 485 342 example 0;
+#X text 20 20 Canvas zoom;
+#X text 40 40 By using (default) Ctrl+ and Ctrl- key \, one can zoom
+in/out of a patch for better readibility;
+#X obj 100 120 +;
+#X obj 100 200 +;
+#X obj 200 120 +;
+#X obj 200 200 +;
+#X connect 2 0 5 0;
+#X connect 4 0 3 0;
+#X restore 280 300 pd example;
+#X text 100 340 Object chaining;
+#N canvas 449 514 516 424 example 0;
+#X text 20 20 Object insertion;
+#X text 40 40 One can insert object into a existing path without breaking
+the connection;
+#X text 40 80 1 right click on the selected wire \, then select insert
+;
+#X text 40 120 2 moving desired object into the wire while holding
+down ctrl key.;
+#X text 40 160 3 (default) Ctrl+i shortcut on selected wire;
+#X obj 100 240 +;
+#X obj 100 380 +;
+#X obj 200 300 +;
+#X connect 5 0 6 0;
+#X restore 280 320 pd example;
+#N canvas 239 402 496 300 example 0;
+#X text 20 20 Object chaining;
+#X text 40 40 By hitting Ctrl+6 (default) on a selected object \, one
+can create a new object directly beneath it and automatically connected
+;
+#X obj 100 140 +;
+#X restore 280 340 pd example;
+#N canvas 470 257 517 360 example 0;
+#X text 20 20 Subpatcherize;
+#X text 40 40 One can select a group of object and encaptulate them
+into a subpatch automatically;
+#X obj 60 140 +;
+#X obj 140 140 +;
+#X obj 60 200 +;
+#X obj 140 200 +;
+#X obj 100 260 +;
+#X text 40 100 This feature is experimental;
+#X connect 2 0 4 0;
+#X connect 3 0 5 0;
+#X connect 4 0 6 0;
+#X connect 5 0 6 1;
+#X restore 280 360 pd example;
+#N canvas 670 392 532 419 example 0;
+#X text 20 20 In/outlet expansion;
+#X text 40 40 This feature allows user to extend the in/outlet of a
+selected object without the need to disconnect/reconnect wires;
+#X obj 100 140 +;
+#X obj 200 140 +;
+#X obj 100 260 +;
+#X obj 300 140 +;
+#X obj 100 380 +;
+#X obj 200 380 +;
+#X obj 300 380 +;
+#X connect 2 0 4 0;
+#X connect 3 0 4 0;
+#X connect 4 0 6 0;
+#X connect 4 0 7 0;
+#X connect 4 0 8 0;
+#X connect 5 0 4 0;
+#X restore 280 380 pd example;
+#N canvas 188 196 496 300 example 0;
+#X text 20 20 Fast copy;
+#X text 40 40 Using left click+ctrl+shift key \, one can copy a selected
+region of objects;
+#X obj 60 120 +;
+#X obj 60 200 +;
+#X connect 2 0 3 0;
+#X restore 280 400 pd example;
+#N canvas 184 310 496 300 example 0;
+#X text 20 20 Grid;
+#X text 40 40 A background grid can displayed to aid the positioning
+of objects. The grid size is configurable. Additionally \, objects
+can be snapped to the grid.;
+#X restore 280 420 pd example;
+#N canvas 408 467 496 300 example 0;
+#X text 20 20 Pointer sensitivity;
+#X text 40 40 The mouse pointer sensitivity can be dynamically changed
+to aid various operations when patching.;
+#X obj 60 140 +;
+#X obj 200 140 +;
+#X obj 60 240 +;
+#X obj 200 240 +;
+#X restore 280 440 pd example;
+#N canvas 366 409 625 453 example 0;
+#X text 20 20 Keyboard navigation;
+#X text 40 40 This feature aims to eliminate the needs for mouse when
+editing a patch;
+#X text 40 80 ctrl+arrow keys: navigate;
+#X text 40 100 Tab: switch between objects and wires;
+#X text 40 120 shift+ctrl+arrow keys: add current object into selection
+;
+#X obj 331 412 dac~;
+#X obj 312 339 *~ 0.02;
+#X msg 411 320 0;
+#X obj 432 295 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 415 354 0.2;
+#X obj 454 300 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 225 305 delread~ down;
+#X obj 201 226 delread~ up;
+#X obj 195 332 *~ 0.8;
+#X obj 306 241 osc~ 500;
+#X obj 313 211 osc~ 40;
+#X obj 405 219 +~ 1;
+#X obj 399 246 *~ 500;
+#X floatatom 517 269 5 0 0 0 - - -;
+#X obj 226 278 delwrite~ down 20;
+#X obj 195 356 delwrite~ up 20;
+#X text 503 250 tweak me;
+#X text 40 160 shift+ctrl+a: deselect all;
+#X connect 6 0 5 0;
+#X connect 6 0 5 1;
+#X connect 7 0 6 1;
+#X connect 8 0 7 0;
+#X connect 9 0 6 1;
+#X connect 10 0 9 0;
+#X connect 11 0 13 0;
+#X connect 11 0 6 0;
+#X connect 12 0 19 0;
+#X connect 13 0 20 0;
+#X connect 14 0 19 0;
+#X connect 15 0 16 0;
+#X connect 16 0 17 0;
+#X connect 17 0 14 0;
+#X connect 18 0 11 0;
+#X connect 18 0 12 0;
+#X restore 280 520 pd example;
+#N canvas 247 392 496 300 example 0;
+#X text 20 20 Key commands;
+#X text 40 40 A (emacs style:)) command prompt can be invoked which
+give user access to all canvas function.;
+#X text 40 100 the prompt supports completion \, as well as history
+;
+#X text 40 140 Alt+x to active the prompt;
+#X text 40 160 Ctrl+g to cancell the prompt;
+#X restore 280 540 pd example;
+#X text 100 560 Misc functions;
+#N canvas 199 234 496 300 example 0;
+#X text 20 20 Misc functions;
+#X text 40 40 other keyboard related functions includes multiple wire
+connections \, object creation \, object selection;
+#X restore 280 560 pd example;
+#N canvas 407 352 599 423 example 0;
+#X text 20 20 Keyboard Macro;
+#X text 40 40 User can record a series of keyboard/mouse events as
+macro to be reused.;
+#X text 40 100 Alt+m to start/stop recording;
+#X text 40 120 Ctrl+m to play the last macro;
+#X text 40 140 Ctrl+M to copy the macro to clipboard;
+#X restore 280 580 pd example;
+#X text 100 460 Copy to clipboard;
+#N canvas 707 580 496 300 example 0;
+#X text 20 20 Copy to clipboard;
+#X text 40 40 In desiredata \, object copying (Ctrl+c) will also copy
+the patch into the system clipboard.;
+#X obj 100 160 +;
+#X obj 100 240 +;
+#X obj 200 160 +;
+#X obj 200 240 +;
+#X text 40 100 Inversely \, a .pd file in the clipboard can be poasted
+in the patch;
+#X connect 2 0 5 0;
+#X connect 4 0 3 0;
+#X restore 280 460 pd example;
