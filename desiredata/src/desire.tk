@@ -32,6 +32,8 @@ set cvsid {$Id: desire.tk,v 1.1.2.600.2.419 2007-10-27 00:22:27 matju Exp $}
 
 set debug 0 ;# DON'T TOUCH THIS, make yourself a debug.tcl instead!
 
+if {$tcl_version < 8.5} {puts "Please upgrade to Tcl/Tk 8.5... Thank You.\n(your version is $tcl_version)"; exit 84}
+
 if {[catch {winfo children .}]} {set tk 0} {set tk 1}
 
 set argh0 [file normalize [file join [pwd] $argv0]]

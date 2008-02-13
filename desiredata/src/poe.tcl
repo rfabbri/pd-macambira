@@ -31,7 +31,6 @@
 
 package provide poe 0.1
 
-if {$tcl_version < 8.5} {package require pre8.5}
 set nextid 0
 set _(Class:_class) Class
 set _(Class:_super) {Thing}
