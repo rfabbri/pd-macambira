@@ -8,6 +8,7 @@ LEGEND:
 
 ------------------8<--------cut-here--------8<------------------
 
+[ ] svn test
 [s] encapsulate wires list
 [s] observable boxes list
 [s] observable wires list
