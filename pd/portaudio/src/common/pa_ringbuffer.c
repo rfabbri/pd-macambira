@@ -1,5 +1,5 @@
 /*
- * $Id: pa_ringbuffer.c,v 1.5 2008-01-24 00:39:50 millerpuckette Exp $
+ * $Id: pa_ringbuffer.c 1240 2007-07-17 13:05:07Z bjornroche $
  * Portable Audio I/O Library
  * Ring Buffer utility.
  *

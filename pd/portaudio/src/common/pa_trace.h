@@ -1,7 +1,7 @@
 #ifndef PA_TRACE_H
 #define PA_TRACE_H
 /*
- * $Id: pa_trace.h,v 1.5 2008-01-24 00:39:50 millerpuckette Exp $
+ * $Id: pa_trace.h 1097 2006-08-26 08:27:53Z rossb $
  * Portable Audio I/O Library Trace Facility
  * Store trace information in real-time for later printing.
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: pa_dither.c,v 1.5 2008-01-24 00:39:50 millerpuckette Exp $
+ * $Id: pa_dither.c 1097 2006-08-26 08:27:53Z rossb $
  * Portable Audio I/O Library triangular dither generator
  *
  * Based on the Open Source API proposed by Ross Bencina

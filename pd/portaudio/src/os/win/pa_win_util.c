@@ -1,5 +1,5 @@
 /*
- * $Id: pa_win_util.c,v 1.5 2008-01-24 00:39:51 millerpuckette Exp $
+ * $Id: pa_win_util.c 1197 2007-05-04 13:07:10Z gordon_gidluck $
  * Portable Audio I/O Library
  * Win32 platform-specific support functions
  *
