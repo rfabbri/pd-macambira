@@ -13,8 +13,10 @@
 cvs_root_dir=`echo $0 | sed 's|\(.*\)/.*$|\1|'`/..
 
 cd $cvs_root_dir
-
-for section in abstractions doc extensions externals packages pd scripts Gem GemLibs; do
+echo "Running svn update:"
+svn update
+echo "Running cvs update:"
+for section in Gem GemLibs; do
 	 echo "$section"
 	 cd $section
     cvs up -Pd

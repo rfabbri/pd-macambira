@@ -19,30 +19,22 @@ print_usage ()
     exit
 }
 
+URL="https://pure-data.svn.sourceforge.net/svnroot/pure-data/trunk/"
+
 if [ $# -eq 0 ]; then
-    export CVSROOT=":pserver:anonymous@pure-data.cvs.sourceforge.net:/cvsroot/pure-data"
-    echo "Checking out anonymously. Give your SourceForge ID as an argument otherwise."
-    echo "The anonymous password is: anoncvs"
-    cvs login
+    echo "Checking out anonymously. Give your SourceForge ID if you don't want that."
+	svn checkout $URL pure-data
 elif [ "$1" == "--help" ]; then
     print_usage
 elif [ "$1" == "-h" ]; then
     print_usage
 elif [ $# -eq 1 ]; then
-    export CVSROOT=":ext:${1}@pure-data.cvs.sourceforge.net:/cvsroot/pure-data"
+    svn checkout --username $1 $URL pure-data
 else
     print_usage
 fi
 
-mkdir pure-data
 cd pure-data
-
-for section in abstractions doc extensions externals packages scripts; do
-    cvs checkout $section
-done
-
-# For Pd-extended, "pd" needs to be a specific version currently, not HEAD
-cvs checkout -r stable_0_40 pd
 
 # Gem is still separate
 echo -e "\n\n The password to the Gem anonymous CVS access is blank, so just press Enter\n"
