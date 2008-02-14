@@ -17,7 +17,7 @@ touch $LOGFILE
 
 echo "rsync pure-data" >> $LOGFILE 2>&1
 echo "----------------------------------------------------------------------" >> $LOGFILE 2>&1
-(/usr/bin/rsync -ax $VERBOSE_FLAGS --delete  rsync://pure-data.cvs.sourceforge.net/cvsroot/p/pu/pure-data/ /home/pd/cvsroot/pure-data/  || /usr/bin/logger -i -p local6.warning -t "$0" "rsync pure-data CVS FAILED") >> $LOGFILE 2>&1
+(/usr/bin/rsync -ax $VERBOSE_FLAGS --delete  pure-data.svn.sourceforge.net::svn/pure-data/ /home/pd/svnroot/pure-data/  || /usr/bin/logger -i -p local6.warning -t "$0" "rsync pure-data SVN FAILED") >> $LOGFILE 2>&1
 
 echo "rsync pd-gem" >> $LOGFILE 2>&1
 echo "----------------------------------------------------------------------" >> $LOGFILE 2>&1
@@ -26,5 +26,9 @@ echo "----------------------------------------------------------------------" >>
 echo "chown -R pd.pd /home/pd/cvsroot" >> $LOGFILE 2>&1
 echo "----------------------------------------------------------------------" >> $LOGFILE 2>&1
 chown -R pd.pd /home/pd/cvsroot >> $LOGFILE 2>&1
+
+echo "chown -R pd.pd /home/pd/svnroot" >> $LOGFILE 2>&1
+echo "----------------------------------------------------------------------" >> $LOGFILE 2>&1
+chown -R pd.pd /home/pd/svnroot >> $LOGFILE 2>&1
 
 
