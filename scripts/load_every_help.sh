@@ -10,7 +10,7 @@ bindir=${PD_ROOT}/bin
 
 make_netreceive_patch () 
 {
-	 rm $1
+	 test -f $1 && rm $1
 	 touch $1
 	 echo '#N canvas 222 130 454 304 10;' >> $1
 	 echo "#X obj 111 83 netreceive $PORT_NUMBER 0 old;" >> $1
@@ -18,14 +18,16 @@ make_netreceive_patch ()
 
 open_patch ()
 {
+	 echo "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" >> $LOG_FILE
 	 echo "OPENING: $1 $2" >> $LOG_FILE
 	 echo "; pd open $1 $2;" | ${bindir}/pdsend $PORT_NUMBER localhost tcp
 }
 
 close_patch ()
 {
-	 echo "CLOSING: $1" >> $LOG_FILE
+#	 echo "CLOSING: $1" >> $LOG_FILE
 	 echo "; pd-$1 menuclose;" | ${bindir}/pdsend $PORT_NUMBER localhost tcp
+	 echo "________________________________________________________________________________" >> $LOG_FILE
 }
 
 
