@@ -2,7 +2,7 @@
 #----------------------------------------------------------------#
 # POETCL
 #
-#   Copyright (c) 2005,2006 by Mathieu Bouchard
+#   Copyright (c) 2005,2006,2007,2008 by Mathieu Bouchard
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -133,7 +133,7 @@ if {$have_expand} {
 	set dispatch {
 		set i 0; set class $::_($self:_class)
 		if {[catch {set methods $::__($class:$selector)}]} {set methods [cache_method $class $selector]}
-		eval [concat [list [lindex $methods 0] $self] $args]
+		[lindex $methods 0] $self {*}$args
 	}
 }
 proc setup_dispatcher {self} {
