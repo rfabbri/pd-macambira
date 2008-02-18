@@ -28,6 +28,7 @@
 static t_class *binfile_class;
 
 #define ALLOC_BLOCK_SIZE 65536 /* number of bytes to add when resizing buffer */
+#define PATH_BUF_SIZE 1024 /* maximumn length of a file path */
 
 typedef struct t_binfile
 {
@@ -36,7 +37,8 @@ typedef struct t_binfile
     t_outlet    *x_info_outlet;
     t_outlet    *x_bang_outlet;
     FILE        *x_fP;
-    char        x_fPath[MAXPDSTRING];
+    t_symbol    *x_our_directory;
+    char        x_fPath[PATH_BUF_SIZE];
     char        *x_buf; /* read/write buffer in memory for file contents */
     size_t      x_buf_length; /* current length of buf */
     size_t      x_length; /* current length of valid data in buf */
@@ -96,6 +98,7 @@ static void *binfile_new(t_symbol *s, int argc, t_atom *argv)
     }
     x->x_fP = NULL;
     x->x_fPath[0] = '\0';
+    x->x_our_directory = canvas_getcurrentdir();/* get the current directory to use as the base for relative file paths */
     x->x_buf_length = ALLOC_BLOCK_SIZE;
     x->x_rd_offset = x->x_wr_offset = x->x_length = 0L;
     /* find the first string in the arg list and interpret it as a path to a file */
@@ -140,14 +143,34 @@ static FILE *binfile_open_path(t_binfile *x, char *path, char *mode)
 /* binfile_open_path attempts to open the file for binary mode reading. */
 /* Returns FILE pointer if successful, else 0. */
 {
-    FILE    *fP;
-    char    tryPath[MAXPDSTRING];
+    FILE    *fP = NULL;
+    char    tryPath[PATH_BUF_SIZE];
+    char    slash[] = "/";
 
-    strncpy(tryPath, path, MAXPDSTRING-1); /* copy path into a length-limited buffer */
-    /* ...if it doesn't work we won't mess up x->x_fPath */
-    tryPath[MAXPDSTRING-1] = '\0'; /* just make sure there is a null termination */
-
-    return fopen(tryPath, mode);
+    /* If the first character of the path is a slash then the path is absolute */
+    /* On MSW if the second character of the path is a colon then the path is absolute */
+    if ((path[0] == '/') || (path[0] == '\\') || (path[1] == ':'))
+    {
+        strncpy(tryPath, path, PATH_BUF_SIZE-1); /* copy path into a length-limited buffer */
+        /* ...if it doesn't work we won't mess up x->fPath */
+        tryPath[PATH_BUF_SIZE-1] = '\0'; /* just make sure there is a null termination */
+        fP = fopen(tryPath, mode);
+    }
+    if (fP == NULL)
+    {
+        /* Then try to open the path from the current directory */
+        strncpy(tryPath, x->x_our_directory->s_name, PATH_BUF_SIZE-1); /* copy directory into a length-limited buffer */
+        strncat(tryPath, slash, PATH_BUF_SIZE-1); /* append path to a length-limited buffer */
+        strncat(tryPath, path, PATH_BUF_SIZE-1); /* append path to a length-limited buffer */
+        /* ...if it doesn't work we won't mess up x->fPath */
+        tryPath[PATH_BUF_SIZE-1] = '\0'; /* make sure there is a null termination */
+        fP = fopen(tryPath, mode);
+    }
+    if (fP != NULL)
+        strncpy(x->x_fPath, tryPath, PATH_BUF_SIZE);
+    else
+        x->x_fPath[0] = '\0';
+    return fP;
 }
 
 static void binfile_write(t_binfile *x, t_symbol *path)
