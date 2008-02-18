@@ -1,5 +1,5 @@
-/* midifile.c v 1.2:  An external for Pure Data that reads and writes MIDI files
-*	Copyright (C) 2005  Martin Peach
+/* midifile.c An external for Pure Data that reads and writes MIDI files
+*	Copyright (C) 2005-2008  Martin Peach
 *
 *	This program is free software; you can redistribute it and/or modify
 *	it under the terms of the GNU General Public License as published by
@@ -16,36 +16,19 @@
 *	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 *
 *	Latest version of this file can be found at:
-*	http://puredata.info/Members/martinrp
+*	http://pure-data.svn.sourceforge.net/viewvc/pure-data/trunk/externals/mrpeach/midifile/
 *
-*	To compile for MSWindows machines, make sure that the line
-*	#define MSW is not commented out, or add /D "MSW" in the command line
-*	...otherwise make sure it is commented out.
-*	martinrp@vax2.concordia.ca
-* 20051202 changed help file name to the new way: midifile-help
-* 20060103 implement writing type 0 file. (Need to add running status)
-* 20060104 running status
-* 20060105 sysex write, add verbose for more messages to console, bang output only once at end of file
-* 20060109 don't forget to rewind tracks before a write!
-* ...Cleaned up naming so that all function names begin with midifile
-* verbosity can be 0-3
-* 20060110 output totaltime before end-bang
 */
 
 #include "m_pd.h"
 #include <stdio.h>
 #include <string.h>
 
-#ifdef _MSC_VER 
-#define EXPORT_SHARED __declspec(dllexport)
-#else
-#define EXPORT_SHARED
-#endif
 #define NO_MORE_ELEMENTS 0xFFFFFFFF
 
 static t_class *midifile_class;
 
-#define PATH_BUF_SIZE 256
+#define PATH_BUF_SIZE 1024
 #define MAX_TRACKS 128
 /* track data is allocated as needed but we need to preallocate space for the pointers */
 #define MAX_TRACK_LEN 1024
@@ -83,6 +66,7 @@ typedef struct t_midifile
     t_outlet            *total_time_outlet;
     FILE                *fP;
     FILE                *tmpFP;
+    t_symbol            *our_directory;
     char                fPath[PATH_BUF_SIZE];
     size_t              offset; /* character offset into the file fP */
     int                 track; /* play this track, or all tracks if negative; */
@@ -93,41 +77,41 @@ typedef struct t_midifile
     mf_track_chunk      track_chunk[MAX_TRACKS]; /* Subsequent track chunks. Other kinds of chunk are ignored. */
 } t_midifile;
 
-void midifile_skip_next_track_chunk_data(t_midifile *x, int index);
-void midifile_get_next_track_chunk_data(t_midifile *x, int index);
-size_t midifile_get_next_track_chunk_delta_time(t_midifile *x, int index);
-void midifile_output_long_list (t_outlet *outlet, unsigned char *cP, size_t len, unsigned char first_byte);
-void midifile_dump_track_chunk_data(t_midifile *x, int index);
-char *midifile_read_var_len (char *cP, size_t *delta);
-int midifile_write_variable_length_value (FILE *fP, size_t value);
-unsigned short midifile_combine_bytes(unsigned char data1, unsigned char data2);
-unsigned short midifile_get_multibyte_2(char*n);
-unsigned long midifile_get_multibyte_3(char*n);
-unsigned long midifile_get_multibyte_4(char*n);
-int midifile_read_track_chunk(t_midifile *x, int index);
-int midifile_read_header_chunk(t_midifile *x);
-void midifile_rewind (t_midifile *x);
-void midifile_rewind_tracks(t_midifile *x);
-int midifle_read_chunks(t_midifile *x);
-void midifile_close(t_midifile *x);
-void midifile_free_file(t_midifile *x);
-void midifile_free(t_midifile *x);
-int midifile_open_path(t_midifile *x, char *path, char *mode);
-void midifile_flush(t_midifile *x);
-size_t midifile_write_header(t_midifile *x);
-void midifile_read(t_midifile *x, t_symbol *path);
-void midifile_write(t_midifile *x, t_symbol *path);
-void midifile_bang(t_midifile *x);
-size_t midifile_write_end_of_track(t_midifile *x, size_t end_time);
-void midifile_float(t_midifile *x, t_float ticks);
-void midifile_list(t_midifile *x, t_symbol *s, int argc, t_atom *argv);
-void *midifile_new(t_symbol *s, int argc, t_atom *argv);
-void midifile_verbosity(t_midifile *x, t_floatarg verbosity);
-void midifile_single_track(t_midifile *x, t_floatarg track);
-void midifile_dump(t_midifile *x, t_floatarg track);
-EXPORT_SHARED void midifile_setup(void);
+static void midifile_skip_next_track_chunk_data(t_midifile *x, int index);
+static void midifile_get_next_track_chunk_data(t_midifile *x, int index);
+static size_t midifile_get_next_track_chunk_delta_time(t_midifile *x, int index);
+static void midifile_output_long_list (t_outlet *outlet, unsigned char *cP, size_t len, unsigned char first_byte);
+static void midifile_dump_track_chunk_data(t_midifile *x, int index);
+static char *midifile_read_var_len (char *cP, size_t *delta);
+static int midifile_write_variable_length_value (FILE *fP, size_t value);
+static unsigned short midifile_combine_bytes(unsigned char data1, unsigned char data2);
+static unsigned short midifile_get_multibyte_2(char*n);
+static unsigned long midifile_get_multibyte_3(char*n);
+static unsigned long midifile_get_multibyte_4(char*n);
+static int midifile_read_track_chunk(t_midifile *x, int index);
+static int midifile_read_header_chunk(t_midifile *x);
+static void midifile_rewind (t_midifile *x);
+static void midifile_rewind_tracks(t_midifile *x);
+static int midifle_read_chunks(t_midifile *x);
+static void midifile_close(t_midifile *x);
+static void midifile_free_file(t_midifile *x);
+static void midifile_free(t_midifile *x);
+static int midifile_open_path(t_midifile *x, char *path, char *mode);
+static void midifile_flush(t_midifile *x);
+static size_t midifile_write_header(t_midifile *x);
+static void midifile_read(t_midifile *x, t_symbol *path);
+static void midifile_write(t_midifile *x, t_symbol *path);
+static void midifile_bang(t_midifile *x);
+static size_t midifile_write_end_of_track(t_midifile *x, size_t end_time);
+static void midifile_float(t_midifile *x, t_float ticks);
+static void midifile_list(t_midifile *x, t_symbol *s, int argc, t_atom *argv);
+static void *midifile_new(t_symbol *s, int argc, t_atom *argv);
+static void midifile_verbosity(t_midifile *x, t_floatarg verbosity);
+static void midifile_single_track(t_midifile *x, t_floatarg track);
+static void midifile_dump(t_midifile *x, t_floatarg track);
+void midifile_setup(void);
 
-EXPORT_SHARED void midifile_setup(void)
+void midifile_setup(void)
 {
     midifile_class = class_new (gensym("midifile"),
         (t_newmethod) midifile_new,
@@ -148,7 +132,7 @@ EXPORT_SHARED void midifile_setup(void)
     class_sethelpsymbol(midifile_class, gensym("midifile-help"));
 }
 
-void *midifile_new(t_symbol *s, int argc, t_atom *argv)
+static void *midifile_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_midifile  *x = (t_midifile *)pd_new(midifile_class);
     t_symbol    *pathSymbol;
@@ -161,6 +145,7 @@ void *midifile_new(t_symbol *s, int argc, t_atom *argv)
     }
     x->fP = NULL;
     x->fPath[0] = '\0';
+    x->our_directory = canvas_getcurrentdir();/* get the current directory to use as the base for relative file paths */
     x->track = ALL_TRACKS; /* startup playing anything */
     x->midi_data[0].a_type = x->midi_data[1].a_type = x->midi_data[2].a_type = A_FLOAT;
     x->state = mfReset;
@@ -194,7 +179,7 @@ void *midifile_new(t_symbol *s, int argc, t_atom *argv)
     return (void *)x;
 }
 
-void midifile_close(t_midifile *x)
+static void midifile_close(t_midifile *x)
 {
     if (x->fP != NULL)
     {
@@ -213,7 +198,7 @@ void midifile_close(t_midifile *x)
     outlet_float(x->total_time_outlet, x->total_time);
 }
 
-void midifile_free_file(t_midifile *x)
+static void midifile_free_file(t_midifile *x)
 {
     int i;
 
@@ -227,33 +212,50 @@ void midifile_free_file(t_midifile *x)
     }
 }
 
-void midifile_free(t_midifile *x)
+static void midifile_free(t_midifile *x)
 {
     midifile_free_file(x);
 }
 
-int midifile_open_path(t_midifile *x, char *path, char *mode)
+static int midifile_open_path(t_midifile *x, char *path, char *mode)
 /* path is a string. Up to PATH_BUF_SIZE-1 characters will be copied into x->fPath. */
 /* mode should be "rb" or "wb" */
 /* x->fPath will be used as a file name to open. */
 /* midifile_open_path attempts to open the file for binary mode reading. */
 /* Returns 1 if successful, else 0. */
 {
-    FILE    *fP;
+    FILE    *fP = NULL;
     char    tryPath[PATH_BUF_SIZE];
+    char    slash[] = "/";
 
-    strncpy(tryPath, path, PATH_BUF_SIZE-1); /* copy path into a length-limited buffer */
-    /* ...if it doesn't work we won't mess up x->fPath */
-    tryPath[PATH_BUF_SIZE-1] = '\0'; /* just make sure there is a null termination */
-
-    fP = fopen(tryPath, mode);
+    /* If the first character of the path is a slash then the path is absolute */
+    /* On MSW if the second character of the path is a colon then the path is absolute */
+    if ((path[0] == '/') || (path[0] == '\\') || (path[1] == ':'))
+    {
+        strncpy(tryPath, path, PATH_BUF_SIZE-1); /* copy path into a length-limited buffer */
+        /* ...if it doesn't work we won't mess up x->fPath */
+        tryPath[PATH_BUF_SIZE-1] = '\0'; /* just make sure there is a null termination */
+        if (x->verbosity > 1)post("midifile_open_path (absolute): %s\n", tryPath);
+        fP = fopen(tryPath, mode);
+    }
+    if (fP == NULL)
+    {
+        /* Then try to open the path from the current directory */
+        strncpy(tryPath, x->our_directory->s_name, PATH_BUF_SIZE-1); /* copy path into a length-limited buffer */
+        strncat(tryPath, slash, PATH_BUF_SIZE-1); /* copy path into a length-limited buffer */
+        strncat(tryPath, path, PATH_BUF_SIZE-1); /* copy path into a length-limited buffer */
+        /* ...if it doesn't work we won't mess up x->fPath */
+        tryPath[PATH_BUF_SIZE-1] = '\0'; /* just make sure there is a null termination */
+        if (x->verbosity > 1)post("midifile_open_path (relative): %s\n", tryPath);
+        fP = fopen(tryPath, mode);
+    }
     if (fP == NULL) return 0;
     x->fP = fP;
     strncpy(x->fPath, tryPath, PATH_BUF_SIZE);
     return 1;
 }
 
-void midifile_flush(t_midifile *x)
+static void midifile_flush(t_midifile *x)
 /* write the header to x->fP, copy x->tmpFP into it, and close both files */
 /* flush ends the track */
 {
@@ -277,7 +279,7 @@ void midifile_flush(t_midifile *x)
     midifile_close(x);
 }
 
-size_t midifile_write_header(t_midifile *x)
+static size_t midifile_write_header(t_midifile *x)
 /* write the MThd and MTrk headers to x->fP */
 {
     size_t  j, written = 0L;
@@ -326,7 +328,7 @@ size_t midifile_write_header(t_midifile *x)
     return written;
 }
 
-void midifile_write(t_midifile *x, t_symbol *path)
+static void midifile_write(t_midifile *x, t_symbol *path)
 /* open the file for writing and write the header */
 {
     midifile_free_file(x);
@@ -348,7 +350,7 @@ void midifile_write(t_midifile *x, t_symbol *path)
     else error("midifile: Unable to open %s", path->s_name);
 }
 
-void midifile_read(t_midifile *x, t_symbol *path)
+static void midifile_read(t_midifile *x, t_symbol *path)
 {
     midifile_free_file(x);
     if (midifile_open_path(x, path->s_name, "rb"))
@@ -360,7 +362,7 @@ void midifile_read(t_midifile *x, t_symbol *path)
     else error("midifile: Unable to open %s", path->s_name);
 }
 
-void midifile_bang(t_midifile *x)
+static void midifile_bang(t_midifile *x)
 /* step forward one tick and process all tracks for that tick */
 {
     int     j, result = 1, ended = 0;
@@ -413,7 +415,7 @@ void midifile_bang(t_midifile *x)
 * the number of atoms and a pointer to the list of atoms:
 */
 
-void midifile_list(t_midifile *x, t_symbol *s, int argc, t_atom *argv)
+static void midifile_list(t_midifile *x, t_symbol *s, int argc, t_atom *argv)
 /* add a list containing time and midi packet to the temporary file in MIDI file format */
 {
     int         i, j, k, m, dt_written = 0;
@@ -492,7 +494,7 @@ void midifile_list(t_midifile *x, t_symbol *s, int argc, t_atom *argv)
     x->track_chunk[0].chunk_length += written;
 }
 
-size_t midifile_write_end_of_track(t_midifile *x, size_t end_time)
+static size_t midifile_write_end_of_track(t_midifile *x, size_t end_time)
 /* write End of Track event to x->tmpFP */
 {
     size_t  written = 0L;
@@ -508,7 +510,7 @@ size_t midifile_write_end_of_track(t_midifile *x, size_t end_time)
     return written;
 }
 
-void midifile_float(t_midifile *x, t_float ticks)
+static void midifile_float(t_midifile *x, t_float ticks)
 /* go to a total time of cue_time */
 {
     size_t  cTime = (size_t)ticks;
@@ -553,7 +555,7 @@ void midifile_float(t_midifile *x, t_float ticks)
     }
 }
 
-int midifle_read_chunks(t_midifile *x)
+static int midifle_read_chunks(t_midifile *x)
 {
     int     j, result;
 
@@ -564,7 +566,7 @@ int midifle_read_chunks(t_midifile *x)
     return result;
 }
 
-int midifile_read_header_chunk(t_midifile *x)
+static int midifile_read_header_chunk(t_midifile *x)
 {
     char    *cP = x->header_chunk.chunk_type;
     char    *sP;
@@ -666,7 +668,7 @@ int midifile_read_header_chunk(t_midifile *x)
     return 1;
 }
 
-int midifile_read_track_chunk(t_midifile *x, int index)
+static int midifile_read_track_chunk(t_midifile *x, int index)
 /* read the data part of a track chunk into track_data */
 /* after allocating the space for it */
 {
@@ -719,7 +721,7 @@ int midifile_read_track_chunk(t_midifile *x, int index)
     return 1;
 }
 
-unsigned short midifile_combine_bytes(unsigned char data1, unsigned char data2)
+static unsigned short midifile_combine_bytes(unsigned char data1, unsigned char data2)
 /* make a short from two 7bit MIDI data bytes */
 {
 /*
@@ -731,7 +733,7 @@ unsigned short midifile_combine_bytes(unsigned char data1, unsigned char data2)
     return ((((unsigned short)data2)<< 7) | ((unsigned short)data1));
 }
 
-unsigned long midifile_get_multibyte_4(char*n)
+static unsigned long midifile_get_multibyte_4(char*n)
 /* make a long from 4 consecutive bytes in big-endian format */
 {
     unsigned long a, b, c, d, e;
@@ -743,7 +745,7 @@ unsigned long midifile_get_multibyte_4(char*n)
     return e;
 }
 
-unsigned long midifile_get_multibyte_3(char*n)
+static unsigned long midifile_get_multibyte_3(char*n)
 /* make a long from 3 consecutive bytes in big-endian format */
 {
     unsigned long   a, b, c, d;
@@ -754,7 +756,7 @@ unsigned long midifile_get_multibyte_3(char*n)
     return d;
 }
 
-unsigned short midifile_get_multibyte_2(char*n)
+static unsigned short midifile_get_multibyte_2(char*n)
 /* make a short from 2 consecutive bytes in big-endian format */
 {
     unsigned short  a, b, c;
@@ -765,7 +767,7 @@ unsigned short midifile_get_multibyte_2(char*n)
 }
 
 
-int midifile_write_variable_length_value (FILE *fP, size_t value)
+static int midifile_write_variable_length_value (FILE *fP, size_t value)
 /* return number of characters written to fP */
 {
     size_t  buffer;
@@ -791,7 +793,7 @@ int midifile_write_variable_length_value (FILE *fP, size_t value)
     return i;
 }
 
-char *midifile_read_var_len (char *cP, size_t *delta)
+static char *midifile_read_var_len (char *cP, size_t *delta)
 {
 /* enter with cP pointing to deltatime */
 /* set delta to deltatime */
@@ -813,13 +815,14 @@ char *midifile_read_var_len (char *cP, size_t *delta)
 }
 
 
-void midifile_verbosity(t_midifile *x, t_floatarg verbosity)
+static void midifile_verbosity(t_midifile *x, t_floatarg verbosity)
 /* set verbosity of console output */
 {
-    x->verbosity = verbosity;
+    x->verbosity = (int)verbosity;
+    post ("midifile verbosity is %d", x->verbosity);
 }
 
-void midifile_single_track(t_midifile *x, t_floatarg track)
+static void midifile_single_track(t_midifile *x, t_floatarg track)
 /* play only this track or all tracks if out of range */
 {
     if(x->state != mfReading) return; /* only if we're reading */
@@ -829,7 +832,7 @@ void midifile_single_track(t_midifile *x, t_floatarg track)
     else x->track = track;
 }
 
-void midifile_dump(t_midifile *x, t_floatarg track)
+static void midifile_dump(t_midifile *x, t_floatarg track)
 {
     int index = (int)track;
 
@@ -841,13 +844,13 @@ void midifile_dump(t_midifile *x, t_floatarg track)
             midifile_dump_track_chunk_data(x, index);
 }
 
-void midifile_rewind (t_midifile *x)
+static void midifile_rewind (t_midifile *x)
 {
     if(x->state != mfReading) return; /* only if we're reading */
     midifile_rewind_tracks(x);
 }
 
-void midifile_rewind_tracks(t_midifile *x)
+static void midifile_rewind_tracks(t_midifile *x)
 /* For all tracks, point to start of track_data */
 {
     int i;
@@ -863,7 +866,7 @@ void midifile_rewind_tracks(t_midifile *x)
     outlet_float(x->total_time_outlet, x->total_time);
 }
 
-size_t midifile_get_next_track_chunk_delta_time(t_midifile *x, int index)
+static size_t midifile_get_next_track_chunk_delta_time(t_midifile *x, int index)
 /* return the delta_time of the next event in track[index] */
 {
     unsigned char   *cP, *last_cP;
@@ -878,7 +881,7 @@ size_t midifile_get_next_track_chunk_delta_time(t_midifile *x, int index)
     return delta_time;
 }
 
-void midifile_output_long_list (t_outlet *outlet, unsigned char *cP, size_t len, unsigned char first_byte)
+static void midifile_output_long_list (t_outlet *outlet, unsigned char *cP, size_t len, unsigned char first_byte)
 { /* output a long MIDI message as a list of floats */
     /* first_byte is followed by len bytes at cP */
     size_t          slen;
@@ -903,7 +906,7 @@ void midifile_output_long_list (t_outlet *outlet, unsigned char *cP, size_t len,
     freebytes(slist, slen);
 }
 
-void midifile_dump_track_chunk_data(t_midifile *x, int index)
+static void midifile_dump_track_chunk_data(t_midifile *x, int index)
 /* parse entire track chunk and output it to the main window */
 {
     unsigned char   *cP, *last_cP, *str;
@@ -1134,7 +1137,7 @@ void midifile_dump_track_chunk_data(t_midifile *x, int index)
     }
 }
 
-void midifile_get_next_track_chunk_data(t_midifile *x, int index)
+static void midifile_get_next_track_chunk_data(t_midifile *x, int index)
 /* parse the next track chunk data element and output via the appropriate outlet or post to main window */
 /* Sets the delta_time of the element or NO_MORE_ELEMENTS if no more elements */
 {
@@ -1349,7 +1352,7 @@ void midifile_get_next_track_chunk_data(t_midifile *x, int index)
     else x->track_chunk[index].total_time += delta_time;
 }
 
-void midifile_skip_next_track_chunk_data(t_midifile *x, int index)
+static void midifile_skip_next_track_chunk_data(t_midifile *x, int index)
 /* parse the next track chunk data element and skip it without any output */
 /* Sets the delta_time of the element or NO_MORE_ELEMENTS if no more elements */
 {
