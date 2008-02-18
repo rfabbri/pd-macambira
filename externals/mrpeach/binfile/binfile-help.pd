@@ -1,89 +1,89 @@
-#N canvas 144 281 1220 588 12;
+#N canvas 27 91 1220 588 12;
 #X msg 628 98 rewind;
 #X obj 85 549 textfile;
 #X msg 618 68 bang;
 #X msg 627 152 clear;
 #X msg 627 253 set 2 4 6 8;
 #X obj 25 15 binfile;
-#X text 88 14 read and write binary files;
-#X text 25 144 You can also use this object simply for storing heterogeneous
+#X text 97 14 read and write binary files;
+#X text 12 138 You can also use this object simply for storing heterogeneous
 sequences of bytes.;
 #X msg 627 179 add 10 20 255;
 #X msg 627 125 read afile.bin;
 #X obj 480 408 binfile;
-#X text 814 548 Martin Peach 2007/09/24;
-#X text 149 548 to read and write text files;
+#X text 162 548 to read and write text files;
 #X msg 627 279 write afile.bin;
-#X text 612 426 This outlet gives a bang when you hit the end of the
+#X text 633 426 This outlet gives a bang when you hit the end of the
 sequence.;
 #X text 478 502 This outlet gives the bytes in sequence \, or bangs
 if no more bytes.;
-#X text 712 252 clear the buffer and then add some bytes;
-#X text 672 151 empty the buffer;
-#X text 679 97 set the read pointer to the beginnning of the buffer
+#X text 739 253 clear the buffer and then add some bytes;
+#X text 682 151 empty the buffer;
+#X text 692 98 set the read pointer to the beginnning of the buffer
 ;
-#X text 657 67 output one byte from the buffer as a float;
-#X text 743 278 write the entire buffer to a file;
-#X text 735 124 read a file into the buffer \, replacing any previous
+#X text 670 68 output one byte from the buffer as a float;
+#X text 779 279 write the entire buffer to a file;
+#X text 771 125 read a file into the buffer \, replacing any previous
 contents;
 #X obj 480 481 print one;
 #X obj 526 437 bng 15 250 50 0 empty empty empty 17 7 0 10 -258113
 -257985 -1;
 #X obj 577 71 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -257985
 -1;
-#X text 16 548 See also:;
-#X obj 470 40 openpanel;
-#X obj 470 19 bng 15 250 50 0 empty empty read_any_file_into_buffer
+#X text 84 531 See also:;
+#X obj 569 20 openpanel;
+#X obj 569 5 bng 15 250 50 0 empty empty read_any_file_into_buffer
 17 7 0 10 -4032 -258113 -1;
-#X msg 470 66 read \$1;
-#X obj 383 139 bng 15 250 50 0 empty empty save_buffer_as_any_file
+#X msg 569 46 read \$1;
+#X obj 373 189 bng 15 250 50 0 empty empty save_buffer_as_any_file
 17 7 0 10 -4032 -258113 -1;
-#X msg 383 187 write \$1;
-#X obj 383 161 savepanel;
+#X msg 373 230 write \$1;
+#X obj 373 204 savepanel;
 #X text 596 68 or;
 #X msg 627 205 77 128 129 130;
-#X text 25 38 The binfile object reads and writes binary files to and
+#X text 12 42 The binfile object reads and writes binary files to and
 from a buffer in memory. You can read a file and output its contents
 one byte at a time as floats.;
-#X text 25 91 To add bytes to the buffer \, first send "clear" to empty
+#X text 12 90 To add bytes to the buffer \, first send "clear" to empty
 the buffer and then "add" to add bytes. Finally \, "write" will save
 the entire buffer as a binary file.;
 #X floatatom 627 230 5 0 0 0 - - -;
-#X text 668 229 add one byte \, same as "add";
-#X text 736 204 add a list of bytes \, same as "add";
+#X text 684 230 add one byte \, same as "add";
+#X text 772 205 add a list of bytes \, same as "add";
 #X msg 123 287 info;
 #X obj 503 455 print info;
 #X obj 543 432 print end;
 #X msg 626 334 readat 3;
 #X msg 626 361 writeat 3;
-#X text 705 360 set the write position;
-#X text 696 333 set the read position;
-#X text 583 454 This outlet gives a list of current parameters from
+#X text 714 360 set the write position;
+#X text 705 333 set the read position;
+#X text 604 454 This outlet gives a list of current parameters from
 the info message.;
-#X text 727 171 add a list of byte-floats to the buffer at the current
+#X text 763 172 add a list of byte-floats to the buffer at the current
 write offset;
-#X text 21 269 output current buffer length and pointer values through
+#X text 21 255 output current buffer length and pointer values through
 the middle outlet.;
+#X text 814 548 Martin Peach 2008/02/17;
 #X connect 0 0 10 0;
 #X connect 2 0 10 0;
 #X connect 3 0 10 0;
 #X connect 4 0 10 0;
 #X connect 8 0 10 0;
 #X connect 9 0 10 0;
-#X connect 10 0 22 0;
-#X connect 10 1 40 0;
-#X connect 10 2 23 0;
-#X connect 10 2 41 0;
-#X connect 13 0 10 0;
-#X connect 24 0 10 0;
-#X connect 26 0 28 0;
-#X connect 27 0 26 0;
-#X connect 28 0 10 0;
-#X connect 29 0 31 0;
-#X connect 30 0 10 0;
-#X connect 31 0 30 0;
-#X connect 33 0 10 0;
-#X connect 36 0 10 0;
-#X connect 39 0 10 0;
+#X connect 10 0 21 0;
+#X connect 10 1 39 0;
+#X connect 10 2 22 0;
+#X connect 10 2 40 0;
+#X connect 12 0 10 0;
+#X connect 23 0 10 0;
+#X connect 25 0 27 0;
+#X connect 26 0 25 0;
+#X connect 27 0 10 0;
+#X connect 28 0 30 0;
+#X connect 29 0 10 0;
+#X connect 30 0 29 0;
+#X connect 32 0 10 0;
+#X connect 35 0 10 0;
+#X connect 38 0 10 0;
+#X connect 41 0 10 0;
 #X connect 42 0 10 0;
-#X connect 43 0 10 0;
