@@ -1,8 +1,7 @@
 $Id: ChangeLog,v 1.1.4.11.2.44 2007/09/06 16:12:01 chunlee Exp $
 
-DesireData 2008.02.13 :
+DesireData 2008.02.19 :
 
- * moved from CVS to SVN.
  * added more Bokmål (Norwegian) translations from Gisle Frøysland
  * added Nihongo (Japanese) translations from Kentaro Fukuchi
  * added Dansk (Danish) translations from Steffen Leve Poulsen
@@ -27,6 +26,8 @@ DesireData 2008.02.13 :
  * Can now use spaces and \{} in IEM labels and some other places.
  * Added Locale diff tool: localeutils.tcl
  * Added [>~] [<~] [<=~] [>=~] [==~] [!=~]
+ * moved from CVS to SVN.
+ * officially requiring Tcl version >= 8.5
 
 DesireData 2007.08.04 :
 
