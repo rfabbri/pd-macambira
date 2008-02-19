@@ -30,9 +30,9 @@ SO = libpd$(LIBSUFFIX)
 
 .PHONY: bin externs all
 
-all: bin externs
+all:: bin externs
 
-bin: pd pd-watchdog pdsend pdreceive
+bin:: pd pd-watchdog pdsend pdreceive
 
 $(SRCXX:.c=.o): %.o: %.c config.log
 	$(CXX) $(CFLAGS) -xc++ -c -o $*.o $*.c
@@ -55,11 +55,11 @@ pdsend: u_pdsend.c
 pdreceive: u_pdreceive.c
 	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdreceive u_pdreceive.c
 
-externs:
+externs::
 	cd ../extra; for ext in bonk~ choice expr~ fiddle~ loop~ lrshift~ pique sigmund~; do \
 		cd $$ext; make @EXTERNTARGET@ || break; cd ..; done
 
-install:  all
+install::  all
 	install -d $(DESTDIR)$(bindir)
 	install -d $(DESTDIR)$(libpdbindir)
 	for file in defaults.ddrc pkgIndex.tcl pre8.5.tcl poe.tcl bgerror.tcl; do \
@@ -83,7 +83,7 @@ install:  all
 	for page in pd.1 pdsend.1 pdreceive.1; do \
 		gzip < ../man/$$page > $(DESTDIR)$(mandir)/man1/$$page.gz; chmod 644 $(DESTDIR)$(mandir)/man1/$$page.gz; done
 
-local-clean:
+local-clean::
 	-rm -f *.o pd pdsend pdreceive pd-watchdog m_stamp.c
 	-rm -f *~
 	-(cd ../doc/6.externs; rm -f *.pd_linux)
@@ -91,31 +91,34 @@ local-clean:
 	touch makefile.deps
 	chmod 666 makefile.deps
 
-extra-clean:
+extra-clean::
 	-rm -f `find ../extra/ -name "*.pd_*"`
 	-rm -f tags
 
-clean: extra-clean local-clean
+clean:: extra-clean local-clean
 
-distclean: clean
+distclean:: clean
 	-rm -f config.cache config.log config.status makefile tags \
 		autom4te.cache/output.* autom4te.cache/traces.* autom4te.cache/requests
 	-rmdir autom4te.cache
 	-rm -rf autom4te-*.cache
 
-tags: $(SRC) $(GSRC); ctags *.[ch]
+tags:: $(SRC) $(GSRC); ctags *.[ch]
 
-depend: makefile.deps
+depend:: makefile.deps
 
 makefile.deps: makefile
 	$(CXX) $(CPPFLAGS) -MM $(SRC) $(SRCXX) > makefile.deps
 
-uninstall:
+uninstall::
 	rm -f -r $(DESTDIR)$(libpddir)
 	rm -f $(DESTDIR)$(libdir)/libpd*
 	cd $(DESTDIR)$(bindir);     rm pd pdsend pdreceive
 	cd $(DESTDIR)$(includedir); rm m_pd.h desire.h
 	cd $(DESTDIR)$(mandir)/man1; rm pd.1.gz pdsend.1.gz pdreceive.1.gz
+
+test:: all
+	cd ../extra/pureunity && make test
 
 include makefile.deps
 
