@@ -18,6 +18,7 @@ LEGEND:
 
 ------------------8<--------cut-here--------8<------------------
 
+[ ] do not install .svn folders
 [s] class_setreinit(t_pd *, t_symbol *s, int argc, t_atom *argv)
 [s] fix canvas_merge, canvas_remove_nth, canvas_sort
 [s] recreate abstr instances after abstr save
@@ -33,10 +34,11 @@ LEGEND:
 [s] extraneous space at end of binbuf_gettext
 [s] make t_hash thread-safe (use external iterator)
 [s] take advantage of the support for zero-size arrays in gcc.
-[s] writesf_free has deadlock. (assigned to Sylvain)
+[s] writesf_free has deadlock.
 [b] look into race conditions and locking
 [c] figure out what to do about the existence of [$self look] vs ordinary attributes (pointer_sense= and such)
 [s] [error]
+[s] [netsend] is unreliable: buffer too full drops chunks of messages, not at message boundaries
 [b] localise error messages
 [b] colorised console with hyperlinked error messages
 [c] atomic undo
