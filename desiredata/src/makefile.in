@@ -64,8 +64,6 @@ install::  all
 	install -d $(DESTDIR)$(libpdbindir)
 	for file in defaults.ddrc pkgIndex.tcl pre8.5.tcl poe.tcl bgerror.tcl; do \
 		install $$file $(DESTDIR)$(libpdbindir)/$$file; done
-	cp -r locale $(DESTDIR)$(libpdbindir)
-	cp -r ../icons $(DESTDIR)$(libpddir)
 	install $(BINARYMODE) $(SO) $(DESTDIR)$(libdir)/$(SO)
 	test -w /etc/ld.so.cache && ldconfig || true
 	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) -lpd main.c -o $(DESTDIR)$(bindir)/pd
@@ -73,9 +71,11 @@ install::  all
 	install -m755 pdsend      $(DESTDIR)$(bindir)/pdsend
 	install -m755 pdreceive   $(DESTDIR)$(bindir)/pdreceive
 	install -m755 pd-watchdog $(DESTDIR)$(libpdbindir)/pd-watchdog
-	mkdir -p $(DESTDIR)$(pddocdir)
-	cp -pr ../doc/* $(DESTDIR)$(pddocdir)
-	cp -pr ../extra/* $(DESTDIR)$(libpddir)
+	#mkdir -p $(DESTDIR)$(pddocdir)
+	find locale   -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(libpdbindir)/'{}' ';'
+	find icons    -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(libpddir)/'{}' ';'
+	find ../doc   -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(pddocdir)/'{}' ';'
+	find ../extra -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(libpddir)/'{}' ';'
 	# rm -f $(DESTDIR)$(libpddir)/extra/*/*.o
 	install -d $(DESTDIR)$(includedir)
 	for file in m_pd.h desire.h; do install -m644 $$file $(DESTDIR)$(includedir)/$$file; done
