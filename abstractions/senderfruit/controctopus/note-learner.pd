@@ -39,7 +39,7 @@ Note 32 7 0 11 -260624 -1 -1 0 256;
 #X obj 405 432 r \$1/bangr;
 #X obj 398 410 s \$1/bang;
 #X obj 227 434 s lastPad;
-#X obj 41 411 sft.instance lnote;
+#X obj 41 411 instance lnote;
 #X obj 41 436 s \$0-padNumberR;
 #X obj 722 284 / 127;
 #X obj 404 302 / 127;
