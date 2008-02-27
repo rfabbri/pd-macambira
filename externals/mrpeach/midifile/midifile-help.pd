@@ -1,4 +1,4 @@
-#N canvas 364 491 466 316 12;
+#N canvas 40 557 466 316 12;
 #N canvas 0 0 690 635 midifile_write 0;
 #X obj 15 2 bng 45 250 50 0 empty empty choose 5 23 0 8 -62784 -260818
 -258699;
@@ -63,111 +63,336 @@
 #X connect 32 0 27 0;
 #X connect 33 0 21 0;
 #X restore 76 116 pd midifile_write;
-#N canvas 388 25 825 783 midifile_read 0;
-#X obj 102 332 midifile wowo;
-#X obj 102 285 bng 15 250 50 0 empty empty step 20 10 0 8 -262144 -1
+#N canvas 415 76 819 897 midifile_read 0;
+#X obj 47 206 bng 15 250 50 0 empty empty step 18 7 0 12 -4160 -257985
 -1;
-#X obj 29 201 openpanel;
-#X obj 29 0 bng 45 250 50 0 empty empty choose 5 23 0 8 -62784 -260818
+#X obj 31 45 openpanel;
+#X obj 31 0 bng 45 250 50 0 empty empty choose 3 23 0 12 -62784 -260818
 -258699;
-#X text 525 724 Martin Peach \, 2005;
-#X obj 166 36 tgl 45 0 empty empty play 10 23 0 8 -24198 -1 -258699
+#X obj 166 36 tgl 45 0 empty empty play 10 23 0 12 -24198 -1 -258699
 0 1;
-#X msg 308 279 rewind;
-#X text 363 278 go to start of file;
-#X floatatom 151 370 15 0 0 0 tick - -;
-#X obj 367 176 hradio 15 1 0 16 empty empty track_number 0 -6 0 8 -62784
--241291 -1 0;
+#X msg 254 256 rewind;
+#X text 309 255 go to start of file;
+#X floatatom 97 355 15 0 0 0 tick - -;
+#X obj 367 176 hradio 15 1 0 16 empty empty track_number 0 -6 0 12
+-62784 -241291 -1 0;
 #X msg 367 197 dump \$1;
-#X msg 308 253 68050;
+#X msg 254 230 68050;
 #X msg 234 129 track \$1;
-#X obj 234 80 hradio 15 1 0 16 empty empty track_number 0 -6 0 8 -62784
+#X obj 234 89 hradio 15 1 0 16 empty empty track_number 0 -6 0 12 -62784
 -241291 -1 0;
-#X obj 166 263 metro 2;
-#X msg 241 102 -1;
-#X text 272 101 output all tracks;
-#X text 212 332 creation arguments: midi_file_name;
+#X obj 166 205 metro 2;
+#X text 177 328 creation arguments: midi_file_name;
 #X text 305 129 output only this track;
 #X text 430 196 parse this track to main window;
-#X msg 519 279 0;
-#X floatatom 217 206 15 0 0 0 - - -;
-#X msg 217 180 2.005;
-#X text 351 252 goto tick 68050;
-#X floatatom 66 575 5 0 0 0 note - -;
-#X floatatom 121 606 5 0 0 1 velocity - -;
-#X obj 31 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X msg 465 256 0;
+#X floatatom 219 188 15 0 0 0 - - -;
+#X msg 219 168 2.005;
+#X text 297 229 goto tick 68050;
+#X floatatom 82 416 5 0 0 0 note - -;
+#X floatatom 128 436 5 0 0 1 velocity - -;
+#X obj 31 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
 -1;
-#X obj 201 403 t b b b;
-#X obj 205 470 float;
-#X floatatom 205 492 15 0 0 0 last_tick - -;
-#X text 207 352 bangs at end of file;
-#X obj 31 423 list split 1;
-#X obj 76 545 list split 1;
-#X obj 121 627 / 127;
-#X floatatom 121 651 5 0 0 0 - - -;
-#X obj 86 695 send note_amp;
-#X obj 31 719 send midi_pitch;
-#X obj 86 672 float;
-#X obj 31 630 float;
-#X msg 105 398 144;
-#X floatatom 106 454 5 0 0 0 - - -;
-#X obj 31 478 select 144;
+#X obj 388 375 t b b b;
+#X obj 441 395 float;
+#X floatatom 441 417 15 0 0 0 last_tick - -;
+#X text 207 349 bangs at end of file;
+#X obj 31 376 list split 1;
+#X obj 77 396 list split 1;
+#X obj 86 713 / 127;
+#X obj 86 693 float;
+#X obj 40 693 float;
 #X msg 576 291 verbose \$1;
-#X text 576 247 verbosity defaults to 1;
-#X text 91 12 1: choose a MIDI file to play;
+#X text 621 271 verbosity defaults to 1;
+#X text 93 12 1: choose a MIDI file to play;
 #X text 228 43 2: start playing it;
-#X obj 297 411 print ****;
-#X obj 103 108 spigot;
-#X obj 146 82 tgl 15 0 empty empty empty 0 -6 0 8 -44926 -258699 -258699
+#X obj 377 349 print ****;
+#X obj 81 101 spigot;
+#X obj 126 86 tgl 15 0 empty empty loop 17 6 0 12 -4160 -257985 -66577
 0 1;
-#X text 95 79 loop;
-#X msg 29 239 read \$1;
-#X floatatom 576 265 5 0 0 0 - - -;
-#X connect 0 0 31 0;
-#X connect 0 1 8 0;
-#X connect 0 2 27 0;
-#X connect 0 2 46 0;
-#X connect 1 0 0 0;
-#X connect 2 0 50 0;
-#X connect 3 0 2 0;
-#X connect 5 0 14 0;
-#X connect 6 0 0 0;
-#X connect 8 0 28 1;
-#X connect 9 0 10 0;
-#X connect 10 0 0 0;
-#X connect 11 0 0 0;
-#X connect 12 0 0 0;
-#X connect 13 0 12 0;
-#X connect 14 0 0 0;
-#X connect 15 0 12 0;
-#X connect 20 0 0 0;
-#X connect 21 0 14 1;
-#X connect 22 0 21 0;
-#X connect 24 0 38 1;
-#X connect 25 0 33 0;
-#X connect 26 0 38 0;
-#X connect 26 0 37 0;
-#X connect 27 0 47 0;
-#X connect 27 1 6 0;
-#X connect 27 2 5 0;
-#X connect 27 2 28 0;
-#X connect 28 0 29 0;
-#X connect 31 0 41 0;
-#X connect 31 1 32 0;
-#X connect 32 0 24 0;
-#X connect 32 1 25 0;
-#X connect 33 0 34 0;
-#X connect 34 0 37 1;
-#X connect 37 0 35 0;
-#X connect 38 0 36 0;
-#X connect 39 0 40 0;
-#X connect 40 0 41 1;
-#X connect 41 0 26 0;
-#X connect 42 0 0 0;
-#X connect 47 0 5 0;
-#X connect 48 0 47 1;
-#X connect 50 0 0 0;
-#X connect 51 0 42 0;
+#X msg 31 65 read \$1;
+#X floatatom 576 274 5 0 0 0 - - -;
+#X obj 576 259 hradio 15 1 1 4 empty empty verbosity 0 -6 0 12 -62784
+-241291 -1 1;
+#X obj 40 733 osc~;
+#X obj 234 107 - 1;
+#X text 275 107 -1 = output all tracks;
+#X obj 31 478 select 144 145 146 147 148 149 150 151 152 153 154 155
+156 157 158 159;
+#X text 509 487 note on events;
+#X obj 59 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 88 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 117 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 146 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 175 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 203 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 232 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 261 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -1
+-1;
+#X obj 290 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 319 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 347 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 376 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 405 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 434 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 463 514 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 492 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 520 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 549 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 578 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 607 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 636 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -1
+-1;
+#X obj 664 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -1
+-1;
+#X obj 693 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 722 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -1
+-1;
+#X obj 751 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 780 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 808 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 837 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 866 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 895 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 924 550 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -257985
+-1;
+#X obj 492 514 select 128 129 130 131 132 133 134 135 136 137 138 139
+140 141 142 143;
+#X text 970 523 note off events;
+#X msg 86 733 \$1 10;
+#X obj 86 753 line~;
+#X obj 65 773 *~;
+#X obj 40 662 t b b;
+#X msg 128 673 0;
+#X obj 40 713 mtof;
+#X obj 54 843 dac~;
+#X obj 66 820 *~;
+#X obj 220 713 / 127;
+#X obj 220 693 float;
+#X obj 174 693 float;
+#X obj 174 733 osc~;
+#X msg 220 733 \$1 10;
+#X obj 220 753 line~;
+#X obj 199 773 *~;
+#X obj 174 662 t b b;
+#X msg 262 673 0;
+#X obj 174 713 mtof;
+#X obj 344 713 / 127;
+#X obj 344 693 float;
+#X obj 298 693 float;
+#X obj 298 733 osc~;
+#X msg 344 733 \$1 10;
+#X obj 344 753 line~;
+#X obj 323 773 *~;
+#X obj 299 662 t b b;
+#X msg 386 673 0;
+#X obj 298 713 mtof;
+#X obj 7 645 vsl 15 128 0 1 0 0 empty empty volume 0 -9 0 12 -4160
+-257985 -1 0 1;
+#X obj 467 713 / 127;
+#X obj 467 693 float;
+#X obj 421 693 float;
+#X obj 421 733 osc~;
+#X msg 467 733 \$1 10;
+#X obj 467 753 line~;
+#X obj 446 773 *~;
+#X obj 422 662 t b b;
+#X msg 509 673 0;
+#X obj 421 713 mtof;
+#X obj 588 713 / 127;
+#X obj 588 693 float;
+#X obj 542 693 float;
+#X obj 542 733 osc~;
+#X msg 588 733 \$1 10;
+#X obj 588 753 line~;
+#X obj 567 773 *~;
+#X obj 543 662 t b b;
+#X msg 630 673 0;
+#X obj 542 713 mtof;
+#X obj 123 416 list split 1;
+#X obj 77 436 s note;
+#X obj 124 456 s vel;
+#X obj 31 329 midifile wowo.mid;
+#X obj 327 547 r note;
+#X obj 381 547 r vel;
+#X text 248 859 Martin Peach \, 2008;
+#X msg 358 13 read I_Wanna_Be_Sedated.mid;
+#X connect 0 0 132 0;
+#X connect 1 0 39 0;
+#X connect 2 0 1 0;
+#X connect 3 0 12 0;
+#X connect 4 0 132 0;
+#X connect 6 0 24 1;
+#X connect 7 0 8 0;
+#X connect 8 0 132 0;
+#X connect 9 0 132 0;
+#X connect 10 0 132 0;
+#X connect 11 0 43 0;
+#X connect 12 0 132 0;
+#X connect 16 0 132 0;
+#X connect 17 0 12 1;
+#X connect 18 0 17 0;
+#X connect 23 0 37 0;
+#X connect 23 1 4 0;
+#X connect 23 2 3 0;
+#X connect 23 2 24 0;
+#X connect 24 0 25 0;
+#X connect 27 0 45 0;
+#X connect 27 1 28 0;
+#X connect 28 0 20 0;
+#X connect 28 0 130 0;
+#X connect 28 1 129 0;
+#X connect 29 0 80 0;
+#X connect 30 0 29 0;
+#X connect 31 0 85 0;
+#X connect 32 0 132 0;
+#X connect 37 0 3 0;
+#X connect 38 0 37 1;
+#X connect 39 0 132 0;
+#X connect 40 0 32 0;
+#X connect 41 0 40 0;
+#X connect 42 0 82 0;
+#X connect 43 0 10 0;
+#X connect 45 0 22 0;
+#X connect 45 0 83 0;
+#X connect 45 1 47 0;
+#X connect 45 1 95 0;
+#X connect 45 2 48 0;
+#X connect 45 2 105 0;
+#X connect 45 3 49 0;
+#X connect 45 3 116 0;
+#X connect 45 4 50 0;
+#X connect 45 4 126 0;
+#X connect 45 5 51 0;
+#X connect 45 6 52 0;
+#X connect 45 7 53 0;
+#X connect 45 8 54 0;
+#X connect 45 9 55 0;
+#X connect 45 10 56 0;
+#X connect 45 11 57 0;
+#X connect 45 12 58 0;
+#X connect 45 13 59 0;
+#X connect 45 14 60 0;
+#X connect 45 15 61 0;
+#X connect 45 16 78 0;
+#X connect 78 0 62 0;
+#X connect 78 0 84 0;
+#X connect 78 1 63 0;
+#X connect 78 1 96 0;
+#X connect 78 2 64 0;
+#X connect 78 2 106 0;
+#X connect 78 3 65 0;
+#X connect 78 3 117 0;
+#X connect 78 4 66 0;
+#X connect 78 4 127 0;
+#X connect 78 5 67 0;
+#X connect 78 6 68 0;
+#X connect 78 7 69 0;
+#X connect 78 8 70 0;
+#X connect 78 9 71 0;
+#X connect 78 10 72 0;
+#X connect 78 11 73 0;
+#X connect 78 12 74 0;
+#X connect 78 13 75 0;
+#X connect 78 14 76 0;
+#X connect 78 15 77 0;
+#X connect 80 0 81 0;
+#X connect 81 0 82 1;
+#X connect 82 0 87 0;
+#X connect 83 0 30 0;
+#X connect 83 1 31 0;
+#X connect 84 0 30 1;
+#X connect 85 0 42 0;
+#X connect 87 0 86 0;
+#X connect 87 0 86 1;
+#X connect 88 0 92 0;
+#X connect 89 0 88 0;
+#X connect 90 0 97 0;
+#X connect 91 0 94 0;
+#X connect 92 0 93 0;
+#X connect 93 0 94 1;
+#X connect 94 0 87 0;
+#X connect 95 0 89 0;
+#X connect 95 1 90 0;
+#X connect 96 0 89 1;
+#X connect 97 0 91 0;
+#X connect 98 0 102 0;
+#X connect 99 0 98 0;
+#X connect 100 0 107 0;
+#X connect 101 0 104 0;
+#X connect 102 0 103 0;
+#X connect 103 0 104 1;
+#X connect 104 0 87 0;
+#X connect 105 0 99 0;
+#X connect 105 1 100 0;
+#X connect 106 0 99 1;
+#X connect 107 0 101 0;
+#X connect 108 0 87 1;
+#X connect 109 0 113 0;
+#X connect 110 0 109 0;
+#X connect 111 0 118 0;
+#X connect 112 0 115 0;
+#X connect 113 0 114 0;
+#X connect 114 0 115 1;
+#X connect 115 0 87 0;
+#X connect 116 0 110 0;
+#X connect 116 1 111 0;
+#X connect 117 0 110 1;
+#X connect 118 0 112 0;
+#X connect 119 0 123 0;
+#X connect 120 0 119 0;
+#X connect 121 0 128 0;
+#X connect 122 0 125 0;
+#X connect 123 0 124 0;
+#X connect 124 0 125 1;
+#X connect 125 0 87 0;
+#X connect 126 0 120 0;
+#X connect 126 1 121 0;
+#X connect 127 0 120 1;
+#X connect 128 0 122 0;
+#X connect 129 0 21 0;
+#X connect 129 0 131 0;
+#X connect 132 0 27 0;
+#X connect 132 1 6 0;
+#X connect 132 2 23 0;
+#X connect 132 2 36 0;
+#X connect 133 0 31 1;
+#X connect 133 0 90 1;
+#X connect 133 0 100 1;
+#X connect 133 0 111 1;
+#X connect 133 0 121 1;
+#X connect 134 0 30 1;
+#X connect 134 0 89 1;
+#X connect 134 0 99 1;
+#X connect 134 0 110 1;
+#X connect 134 0 120 1;
+#X connect 136 0 132 0;
 #X restore 76 83 pd midifile_read;
 #X text 228 234 2006 Martin Peach;
 #X text 15 10 midifile reads and writes MIDI files.;
