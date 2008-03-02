@@ -111,7 +111,7 @@ public:
 		}
 	}
 
-	inline void setForce(int n,t_float f) { force[n] = f; }
+	inline void setForce(int n,t_float f) { force[n] += f; }
 	
 	inline void setForce(t_float f[N]) 
 	{ 
