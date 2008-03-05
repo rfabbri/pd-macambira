@@ -2,9 +2,9 @@ This is the readme for "PSO" a Particle Swarm Optimizer object for PD/MAX.
 
 This implimentation of a PSO minimizes towards a user-defined target. It is based on code from Jim Kennedy and Thomas Grill.
 
-PSO is Copyright Ben Bogart 2003,2007
+PSO is Copyright Ben Bogart 2003,2007,2008
 
-If you have any questions/comments you can reach the author at bbogart@goto10.org
+If you have any questions/comments you can reach the author at ben@ekran.org
 
 This program is distributed under the terms of the GNU General Public 
 License 
