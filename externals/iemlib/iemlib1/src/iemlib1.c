@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2008 */
 
 
 #include "m_pd.h"
@@ -32,6 +32,7 @@ void lp1_t_tilde_setup(void);
 void mov_avrg_kern_tilde_setup(void);
 void para_bp2_tilde_setup(void);
 void peakenv_tilde_setup(void);
+void peakenv_hold_tilde_setup(void);
 void prvu_tilde_setup(void);
 void pvu_tilde_setup(void);
 void rvu_tilde_setup(void);
@@ -64,6 +65,7 @@ void iemlib1_setup(void)
   mov_avrg_kern_tilde_setup();
   para_bp2_tilde_setup();
   peakenv_tilde_setup();
+  peakenv_hold_tilde_setup();
   prvu_tilde_setup();
   pvu_tilde_setup();
   rvu_tilde_setup();
@@ -73,6 +75,6 @@ void iemlib1_setup(void)
   v2db_setup();
   vcf_filter_tilde_setup();
   
-	post("iemlib1 (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
+	post("iemlib1 (R-1.17) library loaded!   (c) Thomas Musil 03.2008");
 	post("   musil%ciem.at iem KUG Graz Austria", '@');
 }

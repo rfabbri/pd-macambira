@@ -33,6 +33,7 @@ SRC =	biquad_freq_resp.c \
 		mov_avrg_kern~.c \
 		para_bp2~.c \
 		peakenv~.c \
+		peakenv_hold~.c \
 		prvu~.c \
 		pvu~.c \
 		rvu~.c \

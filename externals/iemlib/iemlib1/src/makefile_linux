@@ -11,7 +11,7 @@ LIB = -ldl -lm -lpthread
 
 CFLAGS = -DPD -DUNIX -W -Werror -Wno-unused \
 	-Wno-parentheses -Wno-switch -O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing \
-        -DDL_OPEN
+        -DDL_OPEN -fPIC
 
 SYSTEM = $(shell uname -m)
 
@@ -33,6 +33,7 @@ SRC = 	biquad_freq_resp.c \
 	mov_avrg_kern~.c \
 	para_bp2~.c \
 	peakenv~.c \
+	peakenv_hold~.c \
 	prvu~.c \
 	pvu~.c \
 	rvu~.c \
