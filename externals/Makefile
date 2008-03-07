@@ -56,7 +56,7 @@ ifeq ($(OS_NAME),darwin)
   STRIP = strip -x
 endif
 ifeq ($(OS_NAME),linux)
-  CFLAGS +=  -DUNIX -Dunix -fPIC -I/usr/include/lua5.1
+  CFLAGS +=  -DUNIX -Dunix -fPIC
   LDFLAGS += -Wl,-export_dynamic  -shared
   LIBS += -lc
   DYLIB_LDFLAGS = $(LDFLAGS)
@@ -128,7 +128,7 @@ LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
-  LIB_TARGETS += 
+  LIB_TARGETS += pdlua
 else
   ifeq ($(OS_NAME),darwin)
     LIB_TARGETS += hid hidio pdp pidip gem2pdp wiiremote iem16 usbhid pdlua
@@ -1909,7 +1909,7 @@ pddp_clean:
 #------------------------------------------------------------------------------#
 # PDLUA
 PDLUA_NAME=pdlua
-PDLUA_OBJECTS := $(wildcard $(externals_src)/loaders/pdlua/src/lua.c)
+PDLUA_OBJECTS := $(externals_src)/loaders/pdlua/src/lua.c
 pdlua: $(PDLUA_OBJECTS:.c=.$(EXTENSION))
 
 pdlua_install: pdlua
