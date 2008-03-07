@@ -67,7 +67,6 @@ enum {
 	WiiClassicControllerPlusButton
 };
 
-
 typedef UInt16 WiiExpansionPortType;
 enum{
 	WiiExpNotAttached,
@@ -131,6 +130,7 @@ typedef struct _WiiRemoteRec
 	Boolean			isLED2Illuminated;
 	Boolean			isLED3Illuminated;
 	Boolean			isLED4Illuminated;
+	Boolean			isExtraOutputEnabled;
 	
 	Boolean			isExpansionPortAttached;
 

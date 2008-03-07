@@ -13,6 +13,8 @@
 #define SETSYM SETSYMBOL
 #define SETLONG SETFLOAT
 #define method t_method
+//#define addbang(x)  class_addbang(wiiremote_class, (x))
+//#define addmess(x)  class_addmessage(class_wiiremote, (x))
 static t_class *wiiremote_class;
 #else /* Max */
 #include "ext.h"
@@ -20,6 +22,7 @@ static t_class *wiiremote_class;
 
 #include "wiiremote.h"
 #include <stdio.h>
+#include <string.h>
 
 #define kInterval	100
 #define	kMaxTrial	100
@@ -39,7 +42,7 @@ typedef struct _akawiiremote
 	Boolean			connected;
 	
 	void			*statusOut;
-	void			*dataOut
+	void			*dataOut;
 } t_akawiiremote;
 
 void *akawiiremote_class;	// the number of instance of this object
@@ -53,6 +56,7 @@ void akawiiremote_irsensor(t_akawiiremote *x, long enable);
 void akawiiremote_vibration(t_akawiiremote *x, long enable);
 void akawiiremote_led(t_akawiiremote *x, long enable1, long enable2, long enable3, long enable4);
 void akawiiremote_expansion(t_akawiiremote *x, long enable);
+void akawiiremote_extraoutput(t_akawiiremote *x, long enable);
 
 void akawiiremote_getbattery(t_akawiiremote *x);
 void akawiiremote_getexpansion(t_akawiiremote *x);
@@ -78,11 +82,11 @@ void main()
 	NumVersion				outSoftwareVersion;
 	BluetoothHCIVersionInfo	outHardwareVersion;
 	
-	post("aka.wiiremote 1.0B6-UB by Masayuki Akamatsu");
+	post("aka.wiiremote 1.0B7-UB by Masayuki Akamatsu");
 
-	if (IOBluetoothGetVersion(&outSoftwareVersion, &outHardwareVersion)==kIOReturnSuccess)
+	if (IOBluetoothGetVersion(&outSoftwareVersion, &outHardwareVersion)==kIOReturnSuccess)	// B7
 	{
-		if (outSoftwareVersion.majorRev < 1 || outSoftwareVersion.minorAndBugRev < 0x63)
+		if (outSoftwareVersion.majorRev < 1 && outSoftwareVersion.minorAndBugRev < 0x63)
 		{
 			error("requires Blutooth version 1.6.3 or later.");
 			return;
@@ -105,18 +109,22 @@ void main()
 								 A_GIMME,0);
 
 	class_addbang(wiiremote_class,(t_method)akawiiremote_bang);
+	class_addmethod(wiiremote_class,(t_method)akawiiremote_address,gensym("address"),A_DEFSYMBOL, 0);
 	class_addmethod(wiiremote_class,(t_method)akawiiremote_connect,gensym("connect"),0);
 	class_addmethod(wiiremote_class,(t_method)akawiiremote_disconnect,gensym("disconnect"),0);
 	class_addmethod(wiiremote_class,(t_method)akawiiremote_motionsensor,gensym("motion"), A_DEFFLOAT, 0);
 	class_addmethod(wiiremote_class,(t_method)akawiiremote_irsensor,gensym("ir"), A_DEFFLOAT, 0);
 	class_addmethod(wiiremote_class,(t_method)akawiiremote_vibration,gensym("vibration"), A_DEFFLOAT, 0);
 	class_addmethod(wiiremote_class,(t_method)akawiiremote_led,gensym("led"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class,(t_method)akawiiremote_expansion,gensym("expansion"), A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class,(t_method)akawiiremote_expansion,gensym("nunchuk"), A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class,(t_method)akawiiremote_extraoutput,gensym("extraoutput"), A_DEFFLOAT, 0);	// B7
 
 	class_addmethod(wiiremote_class,(t_method)akawiiremote_getbattery,gensym("getbattery"),0);
 	class_addmethod(wiiremote_class,(t_method)akawiiremote_getexpansion,gensym("getexpansion"),0);
 	class_addmethod(wiiremote_class,(t_method)akawiiremote_getled,gensym("getled"),0);
-	
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_assist,gensym("assist"),A_CANT,0);
+	class_addmethod(wiiremote_class,(t_method)akawiiremote_getaddress,gensym("getaddress"),0);
+    class_addmethod(wiiremote_class,(t_method)akawiiremote_getcalibration,gensym("getcalibration"), 0);
 #else /* Max */
 	setup((t_messlist **)&akawiiremote_class, (method)akawiiremote_new, (method)akawiiremote_free, (short)sizeof(t_akawiiremote), 0L, A_GIMME, 0);
 
@@ -130,6 +138,7 @@ void main()
 	addmess((method)akawiiremote_led,"led", A_DEFLONG, A_DEFLONG, A_DEFLONG, A_DEFLONG, 0);
 	addmess((method)akawiiremote_expansion,"expansion", A_DEFLONG, 0);
 	addmess((method)akawiiremote_expansion,"nunchuk", A_DEFLONG, 0);
+	addmess((method)akawiiremote_extraoutput,"extraoutput", A_DEFLONG, 0);	// B7
 
 	addmess((method)akawiiremote_getbattery,"getbattery",0);
 	addmess((method)akawiiremote_getexpansion,"getexpansion",0);
@@ -145,15 +154,10 @@ void main()
 
 void akawiiremote_bang(t_akawiiremote *x)
 {
-	t_atom av[5]; 
+	t_atom av[7]; 
 	
 	if (x->wiiremote->device == nil)
 		return;	// do nothing
-	
-//#ifdef PD
-//	outlet_float(x->buttonsOut, (t_float) x->wiiremote->buttonData);
-//#else /* Max */	
-//#endif /* PD */
 
 	if (x->wiiremote->isExpansionPortAttached && x->wiiremote->isExpansionPortEnabled)
 	{
@@ -198,6 +202,18 @@ void akawiiremote_bang(t_akawiiremote *x)
 			SETLONG(av + 2, x->wiiremote->nStickY);
 			outlet_anything(x->dataOut, gensym(nunchukStr), 3, av);
 			
+			if (x->wiiremote->isExtraOutputEnabled)
+			{
+				SETSYM(av, gensym("stick_calibration"));
+				SETLONG(av + 1, x->wiiremote->nunchukJoyStickCalibData.x_min);
+				SETLONG(av + 2, x->wiiremote->nunchukJoyStickCalibData.x_max);
+				SETLONG(av + 3, x->wiiremote->nunchukJoyStickCalibData.x_center);
+				SETLONG(av + 4, x->wiiremote->nunchukJoyStickCalibData.y_min);
+				SETLONG(av + 5, x->wiiremote->nunchukJoyStickCalibData.y_max);
+				SETLONG(av + 6, x->wiiremote->nunchukJoyStickCalibData.y_center);
+				outlet_anything(x->dataOut, gensym(nunchukStr), 7, av);
+			}
+			
 			// Motion Sensor
 			if (x->wiiremote->isMotionSensorEnabled)
 			{
@@ -207,6 +223,18 @@ void akawiiremote_bang(t_akawiiremote *x)
 				SETLONG(av + 3, x->wiiremote->nAccZ);
 				SETLONG(av + 4, x->wiiremote->nOrientation);
 				outlet_anything(x->dataOut, gensym(nunchukStr), 5, av);
+				
+				if (x->wiiremote->isExtraOutputEnabled)
+				{
+					SETSYM(av, gensym("motion_calibration"));
+					SETLONG(av + 1, x->wiiremote->nunchukCalibData.accX_zero);
+					SETLONG(av + 2, x->wiiremote->nunchukCalibData.accY_zero);
+					SETLONG(av + 3, x->wiiremote->nunchukCalibData.accZ_zero);
+					SETLONG(av + 4, x->wiiremote->nunchukCalibData.accX_1g);
+					SETLONG(av + 5, x->wiiremote->nunchukCalibData.accY_1g);
+					SETLONG(av + 6, x->wiiremote->nunchukCalibData.accZ_1g);
+					outlet_anything(x->dataOut, gensym(nunchukStr), 7, av);
+				}
 			}
 		}
 	}
@@ -227,6 +255,31 @@ void akawiiremote_bang(t_akawiiremote *x)
 		SETFLOAT(av + 3, x->wiiremote->angle);
 		SETLONG (av + 4, x->wiiremote->tracking);
 		outlet_anything(x->dataOut, gensym(remoteStr), 5, av);
+		
+		if (x->wiiremote->isExtraOutputEnabled)	// B7
+		{
+			SETSYM(av, gensym("irraw"));
+			SETLONG(av + 1, 0);
+			SETLONG(av + 2, x->wiiremote->irData[0].x);
+			SETLONG(av + 3, x->wiiremote->irData[0].y);
+			SETLONG(av + 4, x->wiiremote->irData[0].s);
+			outlet_anything(x->dataOut, gensym(remoteStr), 5, av);
+			SETLONG(av + 1, 1);
+			SETLONG(av + 2, x->wiiremote->irData[1].x);
+			SETLONG(av + 3, x->wiiremote->irData[1].y);
+			SETLONG(av + 4, x->wiiremote->irData[1].s);
+			outlet_anything(x->dataOut, gensym(remoteStr), 5, av);
+			SETLONG(av + 1, 2);
+			SETLONG(av + 2, x->wiiremote->irData[2].x);
+			SETLONG(av + 3, x->wiiremote->irData[2].y);
+			SETLONG(av + 4, x->wiiremote->irData[2].s);
+			outlet_anything(x->dataOut, gensym(remoteStr), 5, av);
+			SETLONG(av + 1, 3);
+			SETLONG(av + 2, x->wiiremote->irData[3].x);
+			SETLONG(av + 3, x->wiiremote->irData[3].y);
+			SETLONG(av + 4, x->wiiremote->irData[3].s);
+			outlet_anything(x->dataOut, gensym(remoteStr), 5, av);
+		}
 	}
 
 	// Motion Sensor
@@ -238,6 +291,18 @@ void akawiiremote_bang(t_akawiiremote *x)
 		SETLONG(av + 3, x->wiiremote->accZ);
 		SETLONG(av + 4, x->wiiremote->orientation);
 		outlet_anything(x->dataOut, gensym(remoteStr), 5, av);
+
+		if (x->wiiremote->isExtraOutputEnabled)	// B7
+		{
+			SETSYM(av, gensym("motion_calibration"));
+			SETLONG(av + 1, x->wiiremote->wiiCalibData.accX_zero);
+			SETLONG(av + 2, x->wiiremote->wiiCalibData.accY_zero);
+			SETLONG(av + 3, x->wiiremote->wiiCalibData.accZ_zero);
+			SETLONG(av + 4, x->wiiremote->wiiCalibData.accX_1g);
+			SETLONG(av + 5, x->wiiremote->wiiCalibData.accY_1g);
+			SETLONG(av + 6, x->wiiremote->wiiCalibData.accZ_1g);
+			outlet_anything(x->dataOut, gensym(remoteStr), 7, av);
+		}
 	}
 }
 
@@ -255,6 +320,7 @@ void akawiiremote_address(t_akawiiremote *x, t_symbol *s)
 
 void akawiiremote_connect(t_akawiiremote *x)
 {
+    post("akawiiremote_connect");
 	t_atom	status;
 	Boolean	result;
 
@@ -278,6 +344,8 @@ void akawiiremote_foundFunc(t_akawiiremote *x)
 
 void akawiiremote_disconnect(t_akawiiremote *x)
 {
+    post("akawiiremote_disconnect");
+
 	Boolean	result;
 	t_atom	status;
 	
@@ -296,7 +364,6 @@ void akawiiremote_disconnect(t_akawiiremote *x)
 void akawiiremote_motionsensor(t_akawiiremote *x, long enable)
 {
 	Boolean	result;
-	t_atom	status;
 
 	result = wiiremote_motionsensor(x->wiiremote, enable);
 	//SETLONG(&status, result);
@@ -306,17 +373,20 @@ void akawiiremote_motionsensor(t_akawiiremote *x, long enable)
 void akawiiremote_irsensor(t_akawiiremote *x, long enable)
 {
 	Boolean	result;
-	t_atom	status;
 	
 	result = wiiremote_irsensor(x->wiiremote, enable);
 	//SETLONG(&status, result);
 	//outlet_anything(x->statusOut, gensym("ir"), 1, &status);		
 }
 
+void akawiiremote_extraoutput(t_akawiiremote *x, long enable)	// B7
+{
+	x->wiiremote->isExtraOutputEnabled = enable;
+}
+
 void akawiiremote_expansion(t_akawiiremote *x, long enable)
 {
 	Boolean	result;
-	t_atom	status;
 	
 	result = wiiremote_expansion(x->wiiremote, enable);
 	//SETLONG(&status, result);
@@ -326,7 +396,6 @@ void akawiiremote_expansion(t_akawiiremote *x, long enable)
 void akawiiremote_vibration(t_akawiiremote *x, long enable)
 {
 	Boolean	result;
-	t_atom	status;
 	
 	result = wiiremote_vibration(x->wiiremote, enable);
 	//SETLONG(&status, result);
@@ -336,7 +405,6 @@ void akawiiremote_vibration(t_akawiiremote *x, long enable)
 void akawiiremote_led(t_akawiiremote *x, long enable1, long enable2, long enable3, long enable4)
 {
 	Boolean	result;
-	t_atom	status;
 	
 	result = wiiremote_led(x->wiiremote, enable1, enable2, enable3, enable4);
 	//SETLONG(&status, result);
@@ -509,12 +577,27 @@ void akawiiremote_assist(t_akawiiremote *x, void *b, long m, long a, char *s)
 
 void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
 {
+#ifdef PD
+	t_akawiiremote *x = (t_akawiiremote *)pd_new(wiiremote_class);
+    t_symbol *first_argument;
+
+	x->statusOut = outlet_new(&x->x_obj, 0);
+	x->dataOut = outlet_new(&x->x_obj, &s_list);
+
+/* this sets the device name from the object arguments */
+    first_argument = atom_getsymbolarg(0, ac, av);
+    if(first_argument != &s_) 
+        atom_string(av, x->address, MAXPDSTRING-1);
+#else /* Max */	
 	t_akawiiremote *x;
 	
-#ifdef PD
-	x = (t_akawiiremote *)pd_new(wiiremote_class);
-#else /* Max */	
 	x = (t_akawiiremote *)newobject(akawiiremote_class);
+	
+	x->statusOut = outlet_new(x, 0);
+	x->dataOut = outlet_new(x, 0);
+
+	if (ac>0 && av[0].a_type == A_SYM)
+		strcpy(x->address, av[0].a_w.w_sym->s_name);
 #endif /* PD */
 	
 	x->wiiremote = (WiiRemoteRef)getbytes(sizeof(WiiRemoteRec));
@@ -529,22 +612,11 @@ void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
 		x->wiiremote->isLED2Illuminated = false;
 		x->wiiremote->isLED3Illuminated = false;
 		x->wiiremote->isLED4Illuminated = false;
+		x->wiiremote->isExtraOutputEnabled = false;
 	}
 	
 	x->clock = clock_new(x, (method)akawiiremote_clock);
-#ifdef PD
-	if (ac>0 && av[0].a_type == A_SYMBOL)
-		strcpy(x->address, av[0].a_w.w_symbol->s_name);
 
-	x->statusOut = outlet_new(&x->x_obj, 0);
-	x->dataOut = outlet_new(&x->x_obj, 0);
-#else /* Max */	
-	if (ac>0 && av[0].a_type == A_SYM)
-		strcpy(x->address, av[0].a_w.w_sym->s_name);
-	
-	x->statusOut = outlet_new(x, 0);
-	x->dataOut = outlet_new(x, 0);
-#endif /* PD */
 	x->connected = false;
 
 	return x;

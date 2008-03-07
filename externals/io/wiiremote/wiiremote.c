@@ -208,15 +208,16 @@ Boolean readData(WiiRemoteRef wiiremote, unsigned long address, unsigned short l
 
 void checkDevice(WiiRemoteRef wiiremote, IOBluetoothDeviceRef device)
 {
+    post("checkDevice");
 	CFStringRef	name;
 	CFStringRef	address;
-	
+
 	if (wiiremote_isconnected(wiiremote))
 		return;
 	
 	name = IOBluetoothDeviceGetName(device);
 	address = IOBluetoothDeviceGetAddressString(device);
-	if (name != nil && address != nil)
+    if (name != nil && address != nil)
 	{
 		if (CFStringCompare(name, CFSTR("Nintendo RVL-CNT-01"), 0) == kCFCompareEqualTo)
 		{
@@ -233,17 +234,20 @@ void checkDevice(WiiRemoteRef wiiremote, IOBluetoothDeviceRef device)
 
 void myFoundFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOBluetoothDeviceRef device)
 {
+    post("myFoundFunc");
 	checkDevice((WiiRemoteRef)refCon, device);
 }
 
 void myUpdatedFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOBluetoothDeviceRef device, uint32_t devicesRemaining)
 {
+    post("myUpdatedFunc");
+
 	checkDevice((WiiRemoteRef)refCon, device);
 }
 
 void myCompleteFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOReturn error, Boolean aborted)
 {
-	IOReturn	ret;
+    post("myCompleteFunc");
 
 	if (aborted) return; // called by stop ;)
 	
@@ -252,14 +256,10 @@ void myCompleteFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOReturn 
 		wiiremote_stopsearch((WiiRemoteRef)refCon);
 		return;
 	}
-
-	/*
-	 ret = IOBluetoothDeviceInquiryStart(((WiiRemoteRef)refCon)->inquiry);
-	if (ret != kIOReturnSuccess)
-	{
-		wiiremote_stopsearch((WiiRemoteRef)refCon);
-	}
-	*/
+#ifdef PD
+    // PD doesn't use the Carbon loop, so we have to manually control it
+    CFRunLoopStop( CFRunLoopGetCurrent() );
+#endif
 }
 
 //--------------------------------------------------------------------------------------------
@@ -274,11 +274,12 @@ Boolean wiiremote_isconnected(WiiRemoteRef wiiremote)
 	
 Boolean wiiremote_search(WiiRemoteRef wiiremote, char *address)
 {
+    post("wiiremote_search");
 	IOReturn	ret;
 	
 	if (wiiremote->inquiry != nil)
 		return true;
-	
+
 	wiiremote->inquiry = IOBluetoothDeviceInquiryCreateWithCallbackRefCon((void *)wiiremote);
 	IOBluetoothDeviceInquirySetDeviceFoundCallback(wiiremote->inquiry, myFoundFunc);
 	IOBluetoothDeviceInquirySetDeviceNameUpdatedCallback(wiiremote->inquiry, myUpdatedFunc);
@@ -295,11 +296,15 @@ Boolean wiiremote_search(WiiRemoteRef wiiremote, char *address)
 		wiiremote->inquiry = nil;
 		return false;
 	}
+#ifdef PD
+    CFRunLoopRun(); // PD doesn't use the Carbon loop, so we have to manually control it
+#endif
 	return true;
 }
 
 Boolean wiiremote_stopsearch(WiiRemoteRef wiiremote)
 {
+    post("wiiremote_stopsearch");
 	IOReturn	ret;
 
 	if (wiiremote->inquiry == nil)
@@ -841,7 +846,7 @@ Boolean wiiremote_connect(WiiRemoteRef wiiremote)
 
 Boolean wiiremote_disconnect(WiiRemoteRef wiiremote)
 {
-	short	i;	
+	short	i = 0;	
 
 	if (wiiremote->cchan)
 	{
