@@ -339,7 +339,7 @@ boids_clean:
 # BSAYLOR
 BSAYLOR_NAME=bsaylor
 # partconv~.c requires fftw3, which is not part of the build system yet
-BSAYLOR_OBJECTS := $(wildcard $(externals_src)/bsaylor/[a-oq-z]*~.c)
+BSAYLOR_OBJECTS := $(wildcard $(externals_src)/bsaylor/*~.c)
 bsaylor: $(BSAYLOR_OBJECTS:.c=.$(EXTENSION))
 
 bsaylor_install: bsaylor
@@ -2447,9 +2447,9 @@ wiiremote_install: wiiremote
 	install -d $(objectsdir)/$(WIIREMOTE_NAME)
 	install -p $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION) \
 		$(objectsdir)/$(WIIREMOTE_NAME)
-#	install -d $(helpdir)/$(WIIREMOTE_NAME)
-#	install -p $(externals_src)/io/wiiremote/*.pd \
-#		$(helpdir)/$(WIIREMOTE_NAME)
+	install -d $(helpdir)/$(WIIREMOTE_NAME)
+	install -p $(externals_src)/io/wiiremote/*.pd \
+		$(helpdir)/$(WIIREMOTE_NAME)
 #	install -d $(manualsdir)/$(WIIREMOTE_NAME)
 #	install -p $(externals_src)/io/wiiremote/manual.txt \
 #		$(manualsdir)/$(WIIREMOTE_NAME)
