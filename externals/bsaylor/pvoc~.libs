@@ -1,1 +1,1 @@
--lfftw3
+-lfftw3 -lm
