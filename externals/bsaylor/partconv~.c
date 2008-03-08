@@ -34,6 +34,10 @@
 #include <fftw3.h>
 #include "m_pd.h"
 
+#ifdef __VEC__
+#include <altivec.h>
+#endif
+
 #define MAXPARTS 256	// max number of partitions
 
 #ifdef USE_SSE
