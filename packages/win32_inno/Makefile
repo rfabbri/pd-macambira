@@ -71,11 +71,14 @@ dlldir =  $(DESTDIR)$(prefix)/
 lib_install:
 # these get installed into %SystemRoot%\system32 by the installer
 	install -d $(dlldir)
+	install -p $(bin_src)/libfftw3-3.dll  $(dlldir)
+	install -p $(bin_src)/libfftw3f-3.dll  $(dlldir)
 	install -p $(bin_src)/libogg-0.dll  $(dlldir)
 	install -p $(bin_src)/libsndfile-1.dll  $(dlldir)
 	install -p $(bin_src)/libvorbis-0.dll  $(dlldir)
 	install -p $(bin_src)/libvorbisenc-2.dll  $(dlldir)
 	install -p $(bin_src)/libvorbisfile-3.dll  $(dlldir)
+	install -p $(bin_src)/lua51.dll  $(dlldir)
 	install -p $(bin_src)/pthreadGC2.dll  $(dlldir)
 # these stay with pd.exe
 	install -p $(bin_src)/tcl84.dll  $(bindir)
