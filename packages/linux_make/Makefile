@@ -107,6 +107,10 @@ deb: $(bindir)
 		$(packages_src)/linux_make/debian/control
 	sed -i 's|^Architecture:.*|Architecture: $(DEB_BUILD_ARCH)|' \
 		$(packages_src)/linux_make/debian/control
+# auto-generate the dependencies
+	deb_depends := $(shell find $(DESTDIR) -name \*.pd_linux -print0 | xargs -0 ldd | sed -n 's|.*\(lib.*\) =.*|\1|p' |sort -u| xargs dpkg -S | cut -d ':' -f 1 | sort -u | tr '\n' ' ')
+	sed -i 's|^Depends:.*|Depends: $(deb_depends)|' \
+		$(packages_src)/linux_make/debian/control
 ifeq ($(DEB_BUILD_ARCH),powerpc)
 	sed -i 's|, libavifile-0.7c2||' $(packages_src)/linux_make/debian/control
 endif
