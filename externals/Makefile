@@ -131,7 +131,7 @@ ifeq ($(OS_NAME),windows)
   LIB_TARGETS += pdlua
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid hidio pdp pidip gem2pdp wiiremote iem16 usbhid pdlua
+    LIB_TARGETS += hid hidio pdp pidip gem2pdp aka.wiiremote iem16 usbhid pdlua
   else
     # GNU/Linux, BSD, IRIX, etc.
     LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16 postlude
@@ -265,6 +265,50 @@ template_clean:
 	-rm -f -- $(TEMPLATE_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/template/*.bak
 	-rm -f -- $(externals_src)/template/*.*~
+
+
+
+
+#------------------------------------------------------------------------------#
+# AKA.WIIREMOTE
+# this is installed into the "io" library
+AKA.WIIREMOTE_NAME=io
+AKA.WIIREMOTE_SRC := $(wildcard $(externals_src)/io/aka.wiiremote/*.c)
+
+AKA.WIIREMOTE_OBJECTS := $(AKA.WIIREMOTE_SRC:.c=.o)
+$(AKA.WIIREMOTE_OBJECTS) : %.o : %.c
+	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+
+$(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION): $(AKA.WIIREMOTE_OBJECTS) 
+	$(CC) $(LDFLAGS) -o $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION) \
+		$(AKA.WIIREMOTE_OBJECTS) -weak_framework IOBluetooth \
+		-weak_framework CoreFoundation
+#	$(STRIP) $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION)
+
+aka.wiiremote: $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION)
+
+aka.wiiremote_install: aka.wiiremote
+	install -d $(objectsdir)/$(AKA.WIIREMOTE_NAME)
+	install -p $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION) \
+		$(objectsdir)/$(AKA.WIIREMOTE_NAME)
+	install -d $(helpdir)/$(AKA.WIIREMOTE_NAME)
+	install -p $(externals_src)/io/aka.wiiremote/*.pd \
+		$(helpdir)/$(AKA.WIIREMOTE_NAME)
+#	install -d $(manualsdir)/$(AKA.WIIREMOTE_NAME)
+#	install -p $(externals_src)/io/aka.wiiremote/manual.txt \
+#		$(manualsdir)/$(AKA.WIIREMOTE_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/io/aka.wiiremote/COPYRIGHT.txt \
+		$(readmesdir)/$(AKA.WIIREMOTE_NAME).txt
+#	install -d $(examplesdir)/$(AKA.WIIREMOTE_NAME)
+#	install -p $(externals_src)/io/aka.wiiremote/examples/*.pd \
+#		$(examplesdir)/$(AKA.WIIREMOTE_NAME)
+
+aka.wiiremote_clean:
+	-rm -f -- $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION)
+	-rm -f -- $(AKA.WIIREMOTE_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/io/aka.wiiremote/*.bak
+	-rm -f -- $(externals_src)/io/aka.wiiremote/*.*~
 
 #------------------------------------------------------------------------------#
 # BASSEMU
@@ -2423,48 +2467,6 @@ vbap_clean:
 	-rm -f -- $(externals_src)/vbap/*.bak
 	-rm -f -- $(externals_src)/vbap/*.*~
 
-
-
-#------------------------------------------------------------------------------#
-# WIIREMOTE
-# this is installed into the "io" library
-WIIREMOTE_NAME=io
-WIIREMOTE_SRC := $(wildcard $(externals_src)/io/wiiremote/*.c)
-
-WIIREMOTE_OBJECTS := $(WIIREMOTE_SRC:.c=.o)
-$(WIIREMOTE_OBJECTS) : %.o : %.c
-	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
-
-$(externals_src)/io/wiiremote/wiiremote.$(EXTENSION): $(WIIREMOTE_OBJECTS) 
-	$(CC) $(LDFLAGS) -o $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION) \
-		$(WIIREMOTE_OBJECTS) -weak_framework IOBluetooth \
-		-weak_framework CoreFoundation
-#	$(STRIP) $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION)
-
-wiiremote: $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION)
-
-wiiremote_install: wiiremote
-	install -d $(objectsdir)/$(WIIREMOTE_NAME)
-	install -p $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION) \
-		$(objectsdir)/$(WIIREMOTE_NAME)
-	install -d $(helpdir)/$(WIIREMOTE_NAME)
-	install -p $(externals_src)/io/wiiremote/*.pd \
-		$(helpdir)/$(WIIREMOTE_NAME)
-#	install -d $(manualsdir)/$(WIIREMOTE_NAME)
-#	install -p $(externals_src)/io/wiiremote/manual.txt \
-#		$(manualsdir)/$(WIIREMOTE_NAME)
-	install -d $(readmesdir)
-	install -p $(externals_src)/io/wiiremote/COPYRIGHT.txt \
-		$(readmesdir)/$(WIIREMOTE_NAME).txt
-#	install -d $(examplesdir)/$(WIIREMOTE_NAME)
-#	install -p $(externals_src)/io/wiiremote/examples/*.pd \
-#		$(examplesdir)/$(WIIREMOTE_NAME)
-
-wiiremote_clean:
-	-rm -f -- $(externals_src)/io/wiiremote/wiiremote.$(EXTENSION)
-	-rm -f -- $(WIIREMOTE_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/io/wiiremote/*.bak
-	-rm -f -- $(externals_src)/io/wiiremote/*.*~
 
 
 
