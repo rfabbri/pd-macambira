@@ -294,15 +294,9 @@ aka.wiiremote_install: aka.wiiremote
 	install -d $(helpdir)/$(AKA.WIIREMOTE_NAME)
 	install -p $(externals_src)/io/aka.wiiremote/*.pd \
 		$(helpdir)/$(AKA.WIIREMOTE_NAME)
-#	install -d $(manualsdir)/$(AKA.WIIREMOTE_NAME)
-#	install -p $(externals_src)/io/aka.wiiremote/manual.txt \
-#		$(manualsdir)/$(AKA.WIIREMOTE_NAME)
-	install -d $(readmesdir)
-	install -p $(externals_src)/io/aka.wiiremote/COPYRIGHT.txt \
-		$(readmesdir)/$(AKA.WIIREMOTE_NAME).txt
-#	install -d $(examplesdir)/$(AKA.WIIREMOTE_NAME)
-#	install -p $(externals_src)/io/aka.wiiremote/examples/*.pd \
-#		$(examplesdir)/$(AKA.WIIREMOTE_NAME)
+	install -d $(manualsdir)/$(AKA.WIIREMOTE_NAME)
+	install -p $(externals_src)/io/aka.wiiremote/*.txt \
+		$(manualsdir)/$(AKA.WIIREMOTE_NAME)
 
 aka.wiiremote_clean:
 	-rm -f -- $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION)
