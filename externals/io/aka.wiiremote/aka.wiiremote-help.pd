@@ -15,7 +15,7 @@ with your computer (only required for the first use).;
 will start blinking.;
 #X text 49 109 - Click on the [connect( message \, the LEDs will stop
 blinking once its connected;
-#X text 49 139 - Start the [metro] to get updates from [wiiremote]
+#X text 49 139 - Start the [metro] to get updates from [aka.wiiremote]
 ;
 #X obj 399 526 pddp/print;
 #X obj 354 556 pddp/print;
@@ -49,7 +49,7 @@ blinking once its connected;
 #X obj 631 536 dac~;
 #X obj 632 408 pddp/dsp;
 #X obj 640 500 osc~ 100;
-#X obj 303 388 wiiremote 00-1e-35-4c-e6-f1;
+#X obj 303 388 aka.wiiremote 00-1e-35-4c-e6-f1;
 #X connect 0 0 34 0;
 #X connect 1 0 34 0;
 #X connect 2 0 22 0;
