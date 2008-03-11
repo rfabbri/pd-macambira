@@ -1,11 +1,11 @@
 /*
-  Copyright 1999-2005 ImageMagick Studio LLC, a non-profit organization
+  Copyright 1999-2008 ImageMagick Studio LLC, a non-profit organization
   dedicated to making software imaging solutions freely available.
   
   You may not use this file except in compliance with the License.
   obtain a copy of the License at
   
-    http://www.imagemagick.org/www/Copyright.html
+    http://www.imagemagick.org/script/license.php
   
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,16 +13,16 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-  ImageMagick X11 window methods.
+  MagickCore X11 window methods.
 */
-#ifndef _MAGICK_XWINDOW_PRIVATE_H
-#define _MAGICK_XWINDOW_PRIVATE_H
+#ifndef _MAGICKCORE_XWINDOW_PRIVATE_H
+#define _MAGICKCORE_XWINDOW_PRIVATE_H
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
 #endif
 
-#if defined(HasX11)
+#if defined(MAGICKCORE_X11_DELEGATE)
 
 #include <X11/Xos.h>
 #include <X11/Xlib.h>
@@ -31,6 +31,8 @@ extern "C" {
 #include <X11/keysym.h>
 #include <X11/Xresource.h>
 #include <X11/Xutil.h>
+#include "magick/exception.h"
+#include "magick/geometry.h"
 #include "magick/quantize.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
@@ -64,6 +66,25 @@ extern "C" {
 #define MaxNumberPens  11
 #define MaxNumberFonts  11
 #define MaxXWindows  12
+#undef index
+
+#define ThrowXWindowException(severity,tag,context) \
+{ \
+  ExceptionInfo \
+    exception; \
+ \
+  GetExceptionInfo(&exception); \
+  (void) ThrowMagickException(&exception,GetMagickModule(),severity, \
+    tag == (const char *) NULL ? "unknown" : tag,"`%s': %s",context, \
+    strerror(errno)); \
+  CatchException(&exception); \
+  (void) DestroyExceptionInfo(&exception); \
+}
+#define ThrowXWindowFatalException(severity,tag,context) \
+{ \
+   ThrowXWindowException(severity,tag,context); \
+  _exit(1); \
+}
 
 typedef enum
 {
@@ -243,12 +264,15 @@ typedef struct _XResourceInfo
     colormap;
 
   unsigned int
-    border_width,
+    border_width;
+
+  unsigned long
     delay;
 
   MagickBooleanType
     color_recovery,
-    confirm_exit;
+    confirm_exit,
+    confirm_edit;
 
   char
     *display_gamma;
@@ -492,12 +516,11 @@ extern MagickExport int
   XError(Display *,XErrorEvent *);
 
 extern MagickExport MagickBooleanType
-  IsTrue(const char *),
   XAnnotateImage(Display *,const XPixelInfo *,XAnnotateInfo *,Image *),
   XDrawImage(Display *,const XPixelInfo *,XDrawInfo *,Image *),
   XGetWindowColor(Display *,XWindows *,char *),
   XMagickProgressMonitor(const char *,const MagickOffsetType,
-	  const MagickSizeType,void *),
+    const MagickSizeType,void *),
   XMakeImage(Display *,const XResourceInfo *,XWindowInfo *,Image *,unsigned int,
     unsigned int),
   XQueryColorDatabase(const char *,XColor *),
@@ -558,6 +581,15 @@ extern MagickExport XVisualInfo
 extern MagickExport XWindows
   *XInitializeWindows(Display *,XResourceInfo *),
   *XSetWindows(XWindows *);
+
+static inline MagickRealType XPixelIntensity(const XColor *pixel)
+{
+  MagickRealType
+    intensity;
+
+  intensity=0.299*pixel->red+0.587*pixel->green+0.114*pixel->blue;
+  return(intensity);
+}
 
 #endif
 

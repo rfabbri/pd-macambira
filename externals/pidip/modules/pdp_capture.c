@@ -39,6 +39,7 @@
 // trick to handle Image Magick compatibility
 #if MagickLibVersion >= 0x618
 #include "../include/xwindow-private.h"
+#include "../include/quantum-private.h"
 #endif
 
 static char   *pdp_capture_version = "pdp_capture: version 0.1, capture of screen written by Yves Degoyon (ydegoyon@free.fr)";

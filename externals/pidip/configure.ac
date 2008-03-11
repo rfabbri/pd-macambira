@@ -4,7 +4,7 @@ AC_INIT
 AC_CANONICAL_HOST
 AC_CONFIG_HEADER(include/pidip_config.h)
 
-PDP_PIDIP_VERSION="0.12.21"
+PDP_PIDIP_VERSION="0.12.22"
 PD_DIR=/usr/local/pd
 PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
@@ -18,6 +18,7 @@ MAGIC_CFLAGS=
 THEORA_LIBS=
 enable_ffmpeg=no
 enable_mpeg4ip=no
+enable_lcapture=no
 
 # Check for DarwinPorts and/or Fink on Mac OS X/Darwin
 case "$host" in
@@ -63,6 +64,12 @@ then
   else
    PDP_DIR=${pdp_tree}
   fi
+fi
+
+AC_ARG_WITH(enable-capture, [  --enable-capture        capture optional object ( only works with Image Magick <= 6.0.7 )])
+if ! test -z "${enable_capture}"
+then
+  enable_lcapture=yes
 fi
 
 AC_ARG_WITH(ffmpeg, [  --with-ffmpeg=PATH      ffmpeg source tree])
@@ -116,8 +123,7 @@ AC_PATH_GENERIC(imlib2, 1.0.0,
   AC_MSG_ERROR(Cannot find imlib2: Is imlib2-config in the path?) )
 
 AC_CHECK_LIB(Magick, XWindowByProperty, 
-              [ PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_capture.o"
-              AC_DEFINE(HAVE_IMAGE_MAGICK, 1, image magick capture capability)
+              [ PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT"
               MAGICK_LIBS="-L/usr/X11R6/lib -lMagick `Magick-config --libs` `Magick-config --ldflags`"
               MAGICK_CFLAGS="-I/usr/X11R6/include `Magick-config --cflags` " ],
               echo "Image Magick not found : not building pdp_capture", 
@@ -215,6 +221,15 @@ else
   exit -1
 fi
 
+if test $enable_lcapture == yes;
+then
+    PDP_CAPTURE_OBJECT="pdp_capture.o"
+    AC_DEFINE(HAVE_IMAGE_MAGICK, 1, image magick capture capability)
+    PDP_PIDIP_LIBS="$MAGICK_LIBS $PDP_PIDIP_LIBS"
+    PDP_PIDIP_INCLUDES="$MAGICK_CFLAGS $PDP_PIDIP_INCLUDES"
+    echo "building pdp_capture."
+fi
+
 if test $enable_ffmpeg == yes;
 then
   echo -n "looking for ffmpeg sources (required) ... "
@@ -252,8 +267,6 @@ then
 fi
 
 AC_SUBST(PDP_PIDIP_VERSION)
-AC_SUBST(MAGICK_LIBS)
-AC_SUBST(MAGICK_CFLAGS)
 AC_SUBST(IMLIB_LIBS)
 AC_SUBST(IMLIB_CFLAGS)
 AC_SUBST(THEORA_LIBS)
