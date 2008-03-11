@@ -4409,8 +4409,8 @@ if test -z "$GCC"; then
         esac
 else
         case $host in
-        *86-*-linux*)
-                CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O2"
+        *86*-linux*)
+                CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O2 -fPIC"
 					 LDFLAGS="-Wl,-export_dynamic -shared"
 					 					 pd_suffix=pd_linux
 					 LIBS="-lc -lm"

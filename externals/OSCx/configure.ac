@@ -77,8 +77,8 @@ if test -z "$GCC"; then
         esac
 else
         case $host in 
-        *86-*-linux*)
-                CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O2"
+        *86*-linux*)
+                CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O2 -fPIC"
 					 LDFLAGS="-Wl,-export_dynamic -shared"
 					 dnl we could test for bad glibc here, but don't
 					 pd_suffix=pd_linux
