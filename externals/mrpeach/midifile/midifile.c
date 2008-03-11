@@ -100,7 +100,7 @@ static int midifile_open_path(t_midifile *x, char *path, char *mode);
 static void midifile_flush(t_midifile *x);
 static size_t midifile_write_header(t_midifile *x);
 static void midifile_read(t_midifile *x, t_symbol *path);
-static void midifile_write(t_midifile *x, t_symbol *path);
+static void midifile_write(t_midifile *x, t_symbol *s, int argc, t_atom *argv);
 static void midifile_bang(t_midifile *x);
 static size_t midifile_write_end_of_track(t_midifile *x, size_t end_time);
 static void midifile_float(t_midifile *x, t_float ticks);
@@ -124,7 +124,7 @@ void midifile_setup(void)
     class_addlist(midifile_class, midifile_list);
     class_addmethod(midifile_class, (t_method)midifile_read, gensym("read"), A_DEFSYMBOL, 0);
     class_addmethod(midifile_class, (t_method)midifile_flush, gensym("flush"), 0);
-    class_addmethod(midifile_class, (t_method)midifile_write, gensym("write"), A_DEFSYMBOL, 0);
+    class_addmethod(midifile_class, (t_method)midifile_write, gensym("write"), A_GIMME, 0);
     class_addmethod(midifile_class, (t_method)midifile_dump, gensym("dump"), A_DEFFLOAT, 0);
     class_addmethod(midifile_class, (t_method)midifile_single_track, gensym("track"), A_DEFFLOAT, 0);
     class_addmethod(midifile_class, (t_method)midifile_rewind, gensym("rewind"), 0);
@@ -326,11 +326,30 @@ static size_t midifile_write_header(t_midifile *x)
     return written;
 }
 
-static void midifile_write(t_midifile *x, t_symbol *path)
+static void midifile_write(t_midifile *x, t_symbol *s, int argc, t_atom *argv)
 /* open the file for writing and write the header */
 {
+    char        *path;
+    int         frames_per_second = 0;/* default */
+    int         ticks_per_frame = 90; /* default*/
+
+    if ((argc >= 1) && (argv[0].a_type == A_SYMBOL)) path = argv[0].a_w.w_symbol->s_name;
+    else pd_error(x, "midifile_write: No valid path name");
+    if (argc == 2)
+    {
+        if (argv[1].a_type == A_FLOAT) ticks_per_frame = (int)argv[1].a_w.w_float;
+        else pd_error (x, "midifile_write: second argument is not a float");
+    }
+    else if (argc >= 3) /* ignore extra arguments */
+    {
+        if (argv[2].a_type == A_FLOAT) ticks_per_frame = (int)argv[2].a_w.w_float;
+        else pd_error (x, "midifile_write: third argument is not a float");
+        if (argv[1].a_type == A_FLOAT) frames_per_second = (int)argv[1].a_w.w_float;
+        else pd_error (x, "midifile_write: second argument is not a float");
+    }
+    post("midifile_write: path = %s, fps = %d, tpf = %d", path, frames_per_second, ticks_per_frame);
     midifile_free_file(x);
-    if (midifile_open_path(x, path->s_name, "wb"))
+    if (midifile_open_path(x, path, "wb"))
     {
         if (x->verbosity) post("midifile: opened %s", x->fPath);
         x->state = mfWriting;
@@ -340,12 +359,12 @@ static void midifile_write(t_midifile *x, t_symbol *path)
         x->header_chunk.chunk_length = 6L; /* 3 ints to follow */
         x->header_chunk.chunk_format = 0; /* single-track file */
         x->header_chunk.chunk_ntrks = 1; /* one track for type 0 file */
-        x->header_chunk.chunk_division = 90; /* for now */
+        x->header_chunk.chunk_division = (((-frames_per_second)<<8)|ticks_per_frame);
         strncpy (x->track_chunk[0].chunk_type, "MTrk", 4L);
         x->track_chunk[0].chunk_length = 0L; /* for now */
         midifile_rewind_tracks(x);
     }
-    else error("midifile: Unable to open %s", path->s_name);
+    else pd_error(x, "midifile_write: Unable to open %s", path);
 }
 
 static void midifile_read(t_midifile *x, t_symbol *path)
