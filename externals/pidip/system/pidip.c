@@ -79,6 +79,7 @@ extern "C"
     void pdp_icedthe_tilde_setup(void);
     void pdp_fdiff_setup(void);
     void pdp_hue_setup(void);
+    void pdp_dot_setup(void);
 
 #ifdef __APPLE__
        void pdp_ieee1394_setup(void);
@@ -173,6 +174,7 @@ void pidip_setup(void){
     pdp_icedthe_tilde_setup();
     pdp_fdiff_setup();
     pdp_hue_setup();
+    pdp_dot_setup();
 
 #ifdef __APPLE__
        pdp_ieee1394_setup();
