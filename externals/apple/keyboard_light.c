@@ -133,7 +133,7 @@ static void keyboard_light_free(t_keyboard_light* x)
 }
 
 
-static void *keyboard_light_new(void) 
+static void *keyboard_light_new(t_float level, t_float fade_time) 
 {
 	DEBUG(post("keyboard_light_new"););
 	t_keyboard_light *x = (t_keyboard_light *)pd_new(keyboard_light_class);
@@ -165,9 +165,11 @@ static void *keyboard_light_new(void)
 		error("[keyboard_light]: IOServiceOpen(): %d", kernResult);  
 	}
 
-    x->fade_time = 0.;
+    x->fade_time = fade_time;
 	floatinlet_new(&x->x_obj, &x->fade_time);
 	outlet_new(&x->x_obj, &s_float);
+
+    keyboard_light_float(x, level);
 
 	return (x);
 }
@@ -179,7 +181,7 @@ void keyboard_light_setup(void)
                                      (t_method)keyboard_light_free,
                                      sizeof(t_keyboard_light), 
                                      CLASS_DEFAULT, 
-                                     A_DEFFLOAT, 0);
+                                     A_DEFFLOAT, A_DEFFLOAT, 0);
 	/* add inlet datatype methods */
 	class_addbang(keyboard_light_class,(t_method) keyboard_light_output);
 	class_addfloat(keyboard_light_class,(t_method) keyboard_light_float);
