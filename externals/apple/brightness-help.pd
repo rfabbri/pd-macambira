@@ -1,0 +1,11 @@
+#N canvas 293 113 450 300 10;
+#X msg 127 72 bang;
+#X floatatom 127 186 5 0 0 0 - - -;
+#X obj 149 97 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 6800 1;
+#X floatatom 162 121 5 0 0 0 - - -;
+#X obj 127 155 brightness;
+#X connect 0 0 4 0;
+#X connect 2 0 3 0;
+#X connect 2 0 4 0;
+#X connect 4 0 1 0;
