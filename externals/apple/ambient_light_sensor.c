@@ -31,8 +31,6 @@
 #define DEBUG(x)
 //#define DEBUG(x) x 
 
-#define DEFAULT_DELAYTIME 250
-
 /*------------------------------------------------------------------------------
  *  CLASS DEF
  */
@@ -41,9 +39,6 @@ static t_class *ambient_light_sensor_class;
 
 typedef struct _ambient_light_sensor {
     t_object            x_obj;
-    t_clock*            clock;
-    t_float             delaytime;
-
     t_symbol*           sensor_name;
     
     io_service_t        io_service;
@@ -54,17 +49,14 @@ typedef struct _ambient_light_sensor {
 } t_ambient_light_sensor;
 
 
-
 enum {
 	kGetSensorReadingID = 0, // getSensorReading(int *, int *)  
 	kGetLEDBrightnessID = 1, // getLEDBrightness(int, int *)  
 	kSetLEDBrightnessID = 2, // setLEDBrightness(int, int, int *)  
-	kSetLEDFadeID = 3, // setLEDFade(int, int, int, int *)  
+	kSetLEDFadeID = 3,       // setLEDFade(int, int, int, int *)  
 	// other firmware-related functions  
-	// verifyFirmwareID = 4, 
-	// verifyFirmware(int *)  
-	// getFirmwareVersionID = 5, 
-	// getFirmwareVersion(int *)  
+	verifyFirmwareID = 4,    // verifyFirmware(int *)  
+	getFirmwareVersionID = 5,// getFirmwareVersion(int *)  
 	// other flashing-related functions  
 	// ... 
 }; 
@@ -94,7 +86,7 @@ static void ambient_light_sensor_output(t_ambient_light_sensor* x)
         {
             SETFLOAT(output_atoms, left);
             SETFLOAT(output_atoms + 1, right);
-            outlet_anything(x->x_obj.ob_outlet, gensym("light"), 2, output_atoms);
+            outlet_list(x->data_outlet, &s_list, 2, output_atoms);
         }
         else if(kernResult == kIOReturnBusy)
             pd_error(x,"[ambient_light_sensor]: device busy");
@@ -109,38 +101,6 @@ static void ambient_light_sensor_info(t_ambient_light_sensor* x)
     t_atom output_atom;
     SETSYMBOL(&output_atom, x->sensor_name);
     outlet_anything(x->status_outlet, gensym("sensor"), 1, &output_atom);
-    SETFLOAT(&output_atom, x->delaytime);
-    outlet_anything(x->status_outlet, gensym("poll"), 1, &output_atom);
-}
-
-
-static void ambient_light_sensor_tick(t_ambient_light_sensor* x)
-{
-    ambient_light_sensor_output(x);
-    clock_delay(x->clock, x->delaytime);
-}
-
-
-static void ambient_light_sensor_float(t_ambient_light_sensor* x, t_float f)
-{
-	DEBUG(post("ambient_light_sensor_float"););
-    if(f < 1.)
-        clock_unset(x->clock);
-    else if(f > 1.)
-    {
-        x->delaytime = f;
-        clock_delay(x->clock, x->delaytime);
-    }
-    else
-        clock_delay(x->clock, x->delaytime);
-        
-}
-
-
-static void ambient_light_sensor_free(t_ambient_light_sensor* x)
-{
-	DEBUG(post("ambient_light_sensor_free"););
-    clock_free(x->clock);
 }
 
 
@@ -178,9 +138,7 @@ static void *ambient_light_sensor_new(void)
 		error("[ambient_light_sensor]: IOServiceOpen(): %d", kernResult);  
 	}
 
-    x->clock = clock_new(x, (t_method)ambient_light_sensor_tick);
-    x->delaytime = DEFAULT_DELAYTIME;
-	x->data_outlet = outlet_new(&x->x_obj, &s_anything);
+	x->data_outlet = outlet_new(&x->x_obj, &s_list);
 	x->status_outlet = outlet_new(&x->x_obj, &s_anything);
 
 	return (x);
@@ -189,14 +147,13 @@ static void *ambient_light_sensor_new(void)
 void ambient_light_sensor_setup(void) 
 {
 	ambient_light_sensor_class = class_new(gensym("ambient_light_sensor"), 
-                              (t_newmethod)ambient_light_sensor_new,
-                              (t_method)ambient_light_sensor_free,
-                              sizeof(t_ambient_light_sensor), 
-                              CLASS_DEFAULT, 
-                              0);
+                                           (t_newmethod)ambient_light_sensor_new,
+                                           NULL,
+                                           sizeof(t_ambient_light_sensor), 
+                                           CLASS_DEFAULT, 
+                                           0);
 	/* add inlet datatype methods */
 	class_addbang(ambient_light_sensor_class,(t_method) ambient_light_sensor_output);
-	class_addfloat(ambient_light_sensor_class,(t_method) ambient_light_sensor_float);
 	class_addmethod(ambient_light_sensor_class,(t_method) ambient_light_sensor_info, 
                     gensym("info"), 0);
 }
