@@ -131,7 +131,7 @@ ifeq ($(OS_NAME),windows)
   LIB_TARGETS += pdlua
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid hidio pdp pidip gem2pdp aka.wiiremote iem16 usbhid pdlua
+    LIB_TARGETS += hid hidio pdp pidip gem2pdp aka.wiiremote iem16 usbhid pdlua apple
   else
     # GNU/Linux, BSD, IRIX, etc.
     LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16 postlude
@@ -303,6 +303,41 @@ aka.wiiremote_clean:
 	-rm -f -- $(AKA.WIIREMOTE_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/io/aka.wiiremote/*.bak
 	-rm -f -- $(externals_src)/io/aka.wiiremote/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# APPLE
+APPLE_NAME=apple
+APPLE_OBJECTS := $(wildcard $(externals_src)/apple/*.c)
+apple: $(APPLE_OBJECTS:.c=.$(EXTENSION))
+
+apple_install: apple
+	install -d $(objectsdir)/$(APPLE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(APPLE_NAME) \
+		--author "Hans-Christoph Steiner" \
+		--description "support for Apple-specific functions" \
+		--license "GPLv2 or later"
+	install -p $(APPLE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(APPLE_NAME)
+	install -d $(helpdir)/$(APPLE_NAME)
+	install -p $(externals_src)/apple/*-help.pd \
+		$(helpdir)/$(APPLE_NAME)
+#	install -d $(manualsdir)/$(APPLE_NAME)
+#	install -p $(externals_src)/apple/manual.txt \
+#		$(manualsdir)/$(APPLE_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/apple/README \
+#		$(readmesdir)/$(APPLE_NAME).txt
+#	install -d $(examplesdir)/$(APPLE_NAME)
+#	install -p $(externals_src)/apple/examples/*.pd \
+#		$(examplesdir)/$(APPLE_NAME)
+
+apple_clean:
+	-rm -f -- $(APPLE_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(APPLE_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/apple/*.bak
+	-rm -f -- $(externals_src)/apple/*.*~
+
 
 #------------------------------------------------------------------------------#
 # BASSEMU
