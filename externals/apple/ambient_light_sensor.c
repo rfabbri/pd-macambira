@@ -104,6 +104,12 @@ static void ambient_light_sensor_info(t_ambient_light_sensor* x)
 }
 
 
+static void ambient_light_sensor_free(t_ambient_light_sensor* x)
+{
+    IOServiceClose(x->io_connect);
+}
+
+
 static void *ambient_light_sensor_new(void) 
 {
 	DEBUG(post("ambient_light_sensor_new"););
@@ -131,7 +137,6 @@ static void *ambient_light_sensor_new(void)
             pd_error(x,"[ambient_light_sensor]: no sensor found");
     }
 	kernResult = IOServiceOpen(x->io_service, mach_task_self(), 0, &x->io_connect);  
-
     IOObjectRelease(x->io_service);  
 	if (kernResult != KERN_SUCCESS) 
     {
@@ -148,7 +153,7 @@ void ambient_light_sensor_setup(void)
 {
 	ambient_light_sensor_class = class_new(gensym("ambient_light_sensor"), 
                                            (t_newmethod)ambient_light_sensor_new,
-                                           NULL,
+                                           (t_method)ambient_light_sensor_free,
                                            sizeof(t_ambient_light_sensor), 
                                            CLASS_DEFAULT, 
                                            0);
