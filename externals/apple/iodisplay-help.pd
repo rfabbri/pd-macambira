@@ -1,13 +1,28 @@
-#N canvas 293 113 462 312 10;
+#N canvas 738 22 521 540 10;
 #X msg 127 72 bang;
 #X obj 149 97 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 5800 1;
+-1 -1 3100 1;
 #X floatatom 162 121 5 0 0 0 - - -;
+#X text 81 287 some other possibilities (from IOKit/graphics/IOGraphicsTypes.h):
+;
+#X text 114 319 brightness;
+#X text 114 339 contrast;
+#X text 114 359 horizontal-position;
+#X text 114 379 horizontal-size;
+#X text 114 399 vertical-position;
+#X text 114 419 trapezoid;
+#X text 114 439 pincushion;
+#X text 114 459 parallelogram;
+#X text 254 319 rotation;
+#X text 254 339 theatre-mode;
+#X text 254 359 theatre-mode-window;
+#X text 254 379 oscn;
+#X text 254 399 vbst;
+#X text 254 419 commit;
+#X text 254 439 defaults;
+#X obj 128 202 pddp/print;
 #X obj 127 155 iodisplay brightness;
-#X obj 132 191 route brightness;
-#X floatatom 131 225 5 0 0 0 - - -;
-#X connect 0 0 3 0;
+#X connect 0 0 20 0;
 #X connect 1 0 2 0;
-#X connect 1 0 3 0;
-#X connect 3 0 4 0;
-#X connect 4 0 5 0;
+#X connect 1 0 20 0;
+#X connect 20 0 19 0;
