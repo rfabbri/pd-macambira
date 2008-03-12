@@ -1,4 +1,4 @@
-#N canvas 193 46 567 584 10;
+#N canvas 165 58 563 577 10;
 #X obj 4 529 cnv 15 550 20 empty \$0-pddp.cnv.footer empty 20 12 0
 14 -228856 -66577 0;
 #X obj 4 -17 cnv 15 550 40 empty \$0-pddp.cnv.header keyboard_light
@@ -47,7 +47,7 @@
 #X connect 5 0 6 0;
 #X connect 7 0 8 0;
 #X restore 453 531 pd guts;
-#X obj 412 6 pddp/pddplink http://wiki.puredata.info/en/keyboard_light
+#X obj 412 6 pddp/pddplink http://wiki.puredata.info/en/apple/keyboard_light
 -text pdpedia: keyboard_light;
 #X text 15 6 description: query and control the keyboard lights on
 Apples;

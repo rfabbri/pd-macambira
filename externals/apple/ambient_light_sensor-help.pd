@@ -1,15 +1,82 @@
-#N canvas 0 22 474 324 10;
-#X obj 136 147 ambient_light_sensor;
-#X msg 136 94 bang;
-#X obj 130 193 pddp/print;
-#X text 26 23 get the data from the ambient light sensors in Apple
-PowerBooks and MacBooks.;
-#X obj 109 94 tgl 15 0 empty empty empty 0 -6 0 10 -262144 -1 -1 0
-1;
-#X msg 206 96 info;
-#X obj 254 170 print;
-#X connect 0 0 2 0;
-#X connect 0 1 6 0;
-#X connect 1 0 0 0;
+#N canvas 126 300 567 453 10;
+#X obj 4 398 cnv 15 550 20 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -228856 -66577 0;
+#X obj 4 -17 cnv 15 550 40 empty \$0-pddp.cnv.header ambient_light_sensor
+3 12 0 18 -204280 -1 0;
+#X obj 3 189 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlet 15 12 0 13
+-228856 -1 0;
+#N canvas 779 22 494 344 META 0;
+#X text 12 25 KEYWORDS control number float store;
+#X text 12 45 LICENSE GPL;
+#X text 12 65 TEMPLATE template-help.pd v0.1;
+#X text 12 85 PLATFORM windows macosx gnulinux;
+#X text 12 105 DATATYPE float list;
+#X text 12 5 GENRE storage;
+#X text 12 125 LIBRARY internal;
+#X text 12 145 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 165 RELEASE_DATE 2007-08-24;
+#X text 12 185 RELEASE_VERSION 0.40-test05;
+#X restore 504 400 pd META;
+#X obj 3 258 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 15 12 0
+13 -228856 -1 0;
+#X obj 3 338 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 15
+12 0 13 -228856 -1 0;
+#N canvas 309 454 609 478 guts 0;
+#X obj 117 95 textfile;
+#X msg 116 24 symbol template-HCS.pd;
+#X msg 116 54 read \$1 \, rewind \, bang;
+#X obj 117 141 trigger bang anything;
+#X obj 58 117 bang;
+#X obj 240 162 route #X;
+#X obj 240 183 route text;
+#X obj 240 250 route DESCRIPTION;
+#X obj 239 276 print;
+#X obj 140 277 print TEXT;
+#X connect 0 0 3 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
+#X connect 3 0 4 0;
+#X connect 3 1 5 0;
 #X connect 4 0 0 0;
-#X connect 5 0 0 0;
+#X connect 5 0 6 0;
+#X connect 7 0 8 0;
+#X restore 453 400 pd guts;
+#X obj 374 6 pddp/pddplink http://wiki.puredata.info/en/apple/ambient_light_sensor
+-text pdpedia: ambient_light_sensor;
+#X obj 104 364 pddp/pddplink http://www.osxbook.com/book/bonus/chapter10/light/
+;
+#X text 102 208 BANG - output current screen brightness;
+#X text 15 6 description: query the ambient light sensor in Apples
+;
+#X obj 389 -14 apple/ambient_light_sensor;
+#X obj 146 101 ambient_light_sensor;
+#X msg 146 48 bang;
+#X msg 179 73 info;
+#X obj 146 129 unpack;
+#X floatatom 146 155 5 0 0 0 left - -;
+#X floatatom 182 155 5 0 0 1 right - -;
+#X obj 263 153 pddp/print;
+#X text 216 73 output info on right outlet;
+#X obj 263 129 route sensor;
+#X obj 73 73 metro 250;
+#X obj 73 54 tgl 15 0 empty empty empty 0 -6 0 10 -262144 -1 -1 0 1
+;
+#X text 183 46 output sensor values;
+#X text 102 227 "info" - outputs info about the sensor on the right
+outlet;
+#X obj 72 305 cnv 17 3 20 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
+-162280 0;
+#X obj 72 279 cnv 17 3 20 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+-162280 0;
+#X text 103 276 LIST - a list with the values of the left and right
+sensors;
+#X text 103 306 selector series with info about the sensor;
+#X connect 12 0 15 0;
+#X connect 12 1 20 0;
+#X connect 13 0 12 0;
+#X connect 14 0 12 0;
+#X connect 15 0 16 0;
+#X connect 15 1 17 0;
+#X connect 20 0 18 0;
+#X connect 21 0 12 0;
+#X connect 22 0 21 0;
