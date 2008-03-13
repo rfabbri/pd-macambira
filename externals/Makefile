@@ -134,7 +134,7 @@ else
     LIB_TARGETS += hid hidio pdp pidip gem2pdp aka.wiiremote iem16 usbhid pdlua apple
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16 postlude
+    LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16 postlude tclpd
   endif
 endif
 
@@ -2265,6 +2265,33 @@ smlib_clean:
 	-rm -f -- $(externals_src)/smlib/*.o
 	-rm -f -- $(externals_src)/smlib/*.bak
 	-rm -f -- $(externals_src)/smlib/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# TCLPD
+TCLPD_NAME=tclpd
+TCLPD_LIB := $(externals_src)/tclpd/tcl.$(EXTENSION)
+
+$(TCLPD_LIB):
+	cd $(externals_src)/tclpd && make
+
+tclpd: $(TCLPD_LIB)
+
+tclpd_install: tclpd
+	install -d $(objectsdir)
+	install -p $(TCLPD_LIB) $(objectsdir)
+	install -d $(readmesdir)
+	install -p $(externals_src)/tclpd/README \
+		$(readmesdir)/$(TCLPD_NAME).txt
+#	install -d $(examplesdir)/$(TCLPD_NAME)
+#	install -p $(externals_src)/tclpd/examples/*.pd \
+#		$(examplesdir)/$(TCLPD_NAME)
+
+tclpd_clean:
+	-rm -f -- $(TCLPD_LIB)
+	-rm -f -- $(externals_src)/tclpd/*.bak
+	-rm -f -- $(externals_src)/tclpd/*.*~
 
 
 #------------------------------------------------------------------------------#
