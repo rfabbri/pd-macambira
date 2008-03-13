@@ -1,8 +1,9 @@
 #!/usr/bin/make
 
-CPU=athlon-xp
-CFLAGS += -I/usr/include -I. -xc++ -funroll-loops -fno-operator-names -fno-omit-frame-pointer -falign-functions=16 -mtune=$(CPU) -march=$(CPU) -Wall -Wno-unused -Wunused-variable -Wno-strict-aliasing -g -fPIC -I.
-LDSOFLAGS += -lm -L/usr/lib -ltcl8.5 -L/usr/X11R6/lib
+TCL_VERSION := $(shell echo 'puts $$tcl_version' | tclsh)
+INCLUDES =  -I../../pd/src -I/usr/include/tcl$(TCL_VERSION)
+CFLAGS += $(INCLUDES) -xc++ -funroll-loops -fno-operator-names -fno-omit-frame-pointer -falign-functions=16 -O2 -Wall -fPIC
+LDSOFLAGS += -lm -ltcl$(TCL_VERSION)
 CXX = g++
 OS = linux
 LDSHARED = $(CXX) $(PDBUNDLEFLAGS)
@@ -16,7 +17,7 @@ clean::
 
 ifeq ($(OS),darwin)
   PDSUF = .pd_darwin
-  PDBUNDLEFLAGS = -bundle -flat_namespace -undefined suppress
+  PDBUNDLEFLAGS = -bundle -flat_namespace -undefined dynamic_lookup
 else
   ifeq ($(OS),nt)
     PDSUF = .dll
@@ -34,5 +35,4 @@ tcl.pd_linux: tcl_wrap.cxx tcl_extras.cxx tcl_loader.cxx tcl_extras.h Makefile
 		tcl_wrap.cxx tcl_extras.cxx tcl_loader.cxx $(LDSOFLAGS)
 
 tcl_wrap.cxx: tcl.i tcl_extras.h
-	swig -v -c++ -tcl -o tcl_wrap.cxx -I/usr/include -I/usr/local/include tcl.i
-
+	swig -v -c++ -tcl -o tcl_wrap.cxx $(INCLUDES) tcl.i
