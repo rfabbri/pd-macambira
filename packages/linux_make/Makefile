@@ -13,6 +13,9 @@ BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 # directory as $(prefix) otherwise Pd won't be able to find extra, doc, etc.
 prefix = /usr/local
 
+# generates the dependencies for all externals and pd itself
+PACKAGE_DEPENDS := $(shell find $(DESTDIR) \( -name "*.pd_linux" -o -name pd \) -print0 | xargs -0 ldd | sed -n 's|.*\(lib.*\) =.*|\1|p' |sort -u| xargs dpkg -S | cut -d ':' -f 1 | sort -u | tr '\n' ' ')
+
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
@@ -107,9 +110,8 @@ deb: $(bindir)
 		$(packages_src)/linux_make/debian/control
 	sed -i 's|^Architecture:.*|Architecture: $(DEB_BUILD_ARCH)|' \
 		$(packages_src)/linux_make/debian/control
-# auto-generate the dependencies
-	pak_depend := $(shell find $(DESTDIR) -name \*.pd_linux -print0 | xargs -0 ldd | sed -n 's|.*\(lib.*\) =.*|\1|p' |sort -u| xargs dpkg -S | cut -d ':' -f 1 | sort -u | tr '\n' ' ')
-	sed -i 's|^Depends:.*|Depends: $(pak_depend)|' \
+# add auto-generated dependencies
+	sed -i 's|^Depends:.*|Depends: $(PACKAGE_DEPENDS)|' \
 		$(packages_src)/linux_make/debian/control
 ifeq ($(DEB_BUILD_ARCH),powerpc)
 	sed -i 's|, libavifile-0.7c2||' $(packages_src)/linux_make/debian/control
