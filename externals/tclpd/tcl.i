@@ -2,6 +2,8 @@
 %include exception.i
 %include cpointer.i
 
+#define __attribute__(x)
+
 /* functions that are in m_pd.h but don't exist in modern versions of pd */
 %ignore pd_getfilename;
 %ignore pd_getdirname;
