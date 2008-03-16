@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical rtc-lib puremeasurement timestretch sssad pd-wavelet 
+LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch semento senderfruit sssad pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -71,7 +71,20 @@ template_install:
 
 
 
-
+#-------------------------------------------------------------------------------
+# controctopus
+CONTROCTOPUS_NAME = controctopus
+controctopus_install:
+	install -d $(objectsdir)/$(CONTROCTOPUS_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/senderfruit/controctopus/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(CONTROCTOPUS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(CONTROCTOPUS_NAME) \
+		--author "Luke Iannini" \
+		--license "GNU GPL" \
+		--description "objects for learning and mapping midi and OSC controllers to pdpatches with scaling and parameter discovery - requires Semento"
+	install -d $(helpdir)/$(CONTROCTOPUS_NAME)
+	install -p $(abstractions_src)/senderfruit/controctopus/*-help.pd \
+		$(helpdir)/$(CONTROCTOPUS_NAME)
 
 #-------------------------------------------------------------------------------
 # GYRE
@@ -231,6 +244,20 @@ nqpoly_install4:
 	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly4/*.pd | \
 		grep -v '\-help.pd')  $(examplesdir)/$(NQPOLY4_NAME)
 
+#-------------------------------------------------------------------------------
+# nsend
+NSEND_NAME = nsend
+nsend_install:
+	install -d $(objectsdir)/$(NSEND_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/senderfruit/nsend/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(NSEND_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(NSEND_NAME) \
+		--author "Luke Iannini" \
+		--license "GNU GPL" \
+		--description "multiple-inlet/outlet send and receive"
+	install -d $(helpdir)/$(NSEND_NAME)
+	install -p $(abstractions_src)/senderfruit/nsend/*-help.pd \
+		$(helpdir)/$(NSEND_NAME)
 
 #-------------------------------------------------------------------------------
 # nusmuk
@@ -276,7 +303,20 @@ pddp_install:
 #	install -d $(manualsdir)/$(PDDP_NAME)
 #	install -d $(examplesdir)/$(PDDP_NAME)
 
-
+#-------------------------------------------------------------------------------
+# pdsvn
+PDSVN_NAME = pdsvn
+pdsvn_install:
+	install -d $(objectsdir)/$(PDSVN_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/senderfruit/pdsvn/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(PDSVN_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDSVN_NAME) \
+		--author "Luke Iannini" \
+		--license "GNU GPL" \
+		--description "objects for interacting with Subversion from within Pd patches (experimental, but usable)"
+	install -d $(helpdir)/$(PDSVN_NAME)
+	install -p $(abstractions_src)/senderfruit/pdsvn/*-help.pd \
+		$(helpdir)/$(PDSVN_NAME)
 
 #-------------------------------------------------------------------------------
 # pixeltango
@@ -410,7 +450,36 @@ puremeasurement_install:
 	install -d $(readmesdir)
 	install -p $(abstractions_src)/puremeasurement/readme \
 		$(readmesdir)/$(PUREMEASURE_NAME).txt
+		
+#-------------------------------------------------------------------------------
+# semento
+SEMENTO_NAME = semento
+semento_install:
+	install -d $(objectsdir)/$(SEMENTO_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/senderfruit/semento/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(SEMENTO_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(SEMENTO_NAME) \
+		--author "Luke Iannini" \
+		--license "GNU GPL" \
+		--description "an addon for Frank Barknecht's Memento adding local-state saving and support for Controctopus (a controller lib)"
+	install -d $(helpdir)/$(SEMENTO_NAME)
+	install -p $(abstractions_src)/senderfruit/semento/*-help.pd \
+		$(helpdir)/$(SEMENTO_NAME)
 
+#-------------------------------------------------------------------------------
+# senderfruit
+SENDERFRUIT_NAME = senderfruit
+senderfruit_install:
+	install -d $(objectsdir)/$(SENDERFRUIT_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/senderfruit/core/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(SENDERFRUIT_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(SENDERFRUIT_NAME) \
+		--author "Luke Iannini" \
+		--license "GNU GPL" \
+		--description "a large collection of assorted handy utilites"
+	install -d $(helpdir)/$(SENDERFRUIT_NAME)
+	install -p $(abstractions_src)/senderfruit/core/*-help.pd \
+		$(helpdir)/$(SENDERFRUIT_NAME)
 
 #-------------------------------------------------------------------------------
 # TIMESTRETCH
