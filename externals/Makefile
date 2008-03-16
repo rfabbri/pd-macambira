@@ -2289,6 +2289,7 @@ tclpd_install: tclpd
 #		$(examplesdir)/$(TCLPD_NAME)
 
 tclpd_clean:
+	make -C $(externals_src)/tclpd clean
 	-rm -f -- $(TCLPD_LIB)
 	-rm -f -- $(externals_src)/tclpd/*.bak
 	-rm -f -- $(externals_src)/tclpd/*.*~
