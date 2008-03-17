@@ -1,0 +1,19 @@
+#N canvas 730 148 450 312 10;
+#X obj 49 161 *~;
+#X obj 22 -12 vsl 15 128 0 1 0 0 empty empty vol 0 -9 0 10 -4034 -13381
+-13381 3200 1;
+#X obj 50 200 dac~;
+#X obj 53 31 hsl 128 15 0 1 0 1 empty empty scale -2 -8 0 10 -4034
+-13381 -13381 2500 1;
+#X obj 80 66 hsl 128 15 0 0.99 0 0 empty empty alpha -2 -8 0 10 -4034
+-13381 -13381 11400 1;
+#X text 57 -15 rojo~ is a red noise generator;
+#X text 138 242 2008 Martin Peach;
+#X text 137 221 Based on ruido.c by jose manuel berenguer;
+#X obj 50 83 rojo~;
+#X connect 0 0 2 0;
+#X connect 0 0 2 1;
+#X connect 1 0 0 1;
+#X connect 3 0 8 0;
+#X connect 4 0 8 1;
+#X connect 8 0 0 0;
