@@ -319,6 +319,9 @@ apple_install: apple
 		--description "support for Apple-specific functions" \
 		--license "GPLv2 or later"
 	install -p $(APPLE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(APPLE_NAME)
+	install -p $(shell ls -1 $(externals_src)/apple/*.pd | \
+		grep -v '-help.pd' | sed 's|\(.*\)|"\1"|g') \
+		 $(objectsdir)/$(APPLE_NAME)
 	install -d $(helpdir)/$(APPLE_NAME)
 	install -p $(externals_src)/apple/*-help.pd \
 		$(helpdir)/$(APPLE_NAME)
