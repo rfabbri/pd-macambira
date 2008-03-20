@@ -40,8 +40,8 @@ static char *version = "$Revision: 1.12 $";
 
 t_int folder_list_instance_count;
 
-#define DEBUG(x)
-//#define DEBUG(x) x 
+//#define DEBUG(x)
+#define DEBUG(x) x 
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -69,14 +69,14 @@ static void folder_list_output(t_folder_list* x)
 	HANDLE hFind;
 	DWORD errorNumber;
 	LPVOID lpErrorMessage;
-	char fullPathNameBuffer[MAX_PATH+1] = "";
-	char unbashBuffer[MAX_PATH+1] = "";
-	char pathBuffer[MAX_PATH+1] = "";
-	int length;
+	char fullPathNameBuffer[MAX_PATH] = "";
+	char unbashBuffer[MAX_PATH] = "";
+	char outputBuffer[MAX_PATH] = "";
+	char *pathBuffer;
 
 // arg, looks perfect, but only in Windows Vista
 //	GetFinalPathNameByHandle(hFind,fullPathNameBuffer,MAX_PATH,FILE_NAME_NORMALIZED);
-	GetFullPathName(x->x_pattern->s_name,MAX_PATH,fullPathNameBuffer,NULL);
+    GetFullPathName(x->x_pattern->s_name, MAX_PATH, fullPathNameBuffer, NULL);
 	sys_unbashfilename(fullPathNameBuffer,unbashBuffer);
 	
 	hFind = FindFirstFile(x->x_pattern->s_name, &findData);
@@ -85,35 +85,37 @@ static void folder_list_output(t_folder_list* x)
 	   errorNumber = GetLastError();
 	   switch (errorNumber)
 	   {
-		  case ERROR_FILE_NOT_FOUND:
-		  case ERROR_PATH_NOT_FOUND:
-			 error("[folder_list] nothing found for \"%s\"",x->x_pattern->s_name);
-			 break;
-		  default:
-			 FormatMessage(
-				FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-				FORMAT_MESSAGE_FROM_SYSTEM,
-				NULL,
-				errorNumber,
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-				(LPTSTR) &lpErrorMessage,
-				0, NULL );
-			 error("[folder_list] %s", lpErrorMessage);
+       case ERROR_FILE_NOT_FOUND:
+       case ERROR_PATH_NOT_FOUND:
+           pd_error(x,"[folder_list] nothing found for \"%s\"",x->x_pattern->s_name);
+           break;
+       default:
+           FormatMessage(
+               FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+               FORMAT_MESSAGE_FROM_SYSTEM,
+               NULL,
+               errorNumber,
+               MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+               (LPTSTR) &lpErrorMessage,
+               0, NULL );
+           pd_error(x,"[folder_list] %s", (char *)lpErrorMessage);
 	   }
 	   return;
 	} 
+    char* unbashBuffer_position = strrchr(unbashBuffer, '/');
+    if(unbashBuffer_position)
+    {
+        pathBuffer = getbytes(MAX_PATH+1);
+        strncpy(pathBuffer, unbashBuffer, unbashBuffer_position - unbashBuffer);
+    }
 	do {
-		if( strcmp(findData.cFileName, ".") && strcmp(findData.cFileName, "..") ) 
+        // skip "." and ".."
+        if( strcmp(findData.cFileName, ".") && strcmp(findData.cFileName, "..") ) 
 		{
-			length = strlen(unbashBuffer);
-			do 
-			{
-				length--;
-			} while ( *(unbashBuffer + length) == '/' );
-			strncpy(pathBuffer, unbashBuffer, length);
-			pathBuffer[length] = '\0';
-			strcat(pathBuffer,findData.cFileName);
-			outlet_symbol( x->x_obj.ob_outlet, gensym(pathBuffer) );
+            strncpy(outputBuffer, pathBuffer, MAX_PATH);
+			strcat(outputBuffer,"/");
+			strcat(outputBuffer,findData.cFileName);
+			outlet_symbol( x->x_obj.ob_outlet, gensym(outputBuffer) );
 		}
 	} while (FindNextFile(hFind, &findData) != 0);
 	FindClose(hFind);
@@ -124,19 +126,19 @@ static void folder_list_output(t_folder_list* x)
 	DEBUG(post("globbing %s",x->x_pattern->s_name););
 	switch( glob( x->x_pattern->s_name, GLOB_TILDE, NULL, &glob_buffer ) )
 	{
-	   case GLOB_NOSPACE: 
-		  error("[folder_list] out of memory for \"%s\"",x->x_pattern->s_name); 
-		  break;
-#ifdef GLOB_ABORTED
-	   case GLOB_ABORTED: 
-		  error("[folder_list] aborted \"%s\"",x->x_pattern->s_name); 
-		  break;
-#endif
-#ifdef GLOB_NOMATCH
-	   case GLOB_NOMATCH: 
-		  error("[folder_list] nothing found for \"%s\"",x->x_pattern->s_name); 
-		  break;
-#endif
+    case GLOB_NOSPACE: 
+        pd_error(x,"[folder_list] out of memory for \"%s\"",x->x_pattern->s_name); 
+        break;
+# ifdef GLOB_ABORTED
+    case GLOB_ABORTED: 
+        pd_error(x,"[folder_list] aborted \"%s\"",x->x_pattern->s_name); 
+        break;
+# endif
+# ifdef GLOB_NOMATCH
+    case GLOB_NOMATCH: 
+        pd_error(x,"[folder_list] nothing found for \"%s\"",x->x_pattern->s_name); 
+        break;
+# endif
 	}
 	for(i = 0; i < glob_buffer.gl_pathc; i++)
 		outlet_symbol( x->x_obj.ob_outlet, gensym(glob_buffer.gl_pathv[i]) );
@@ -148,13 +150,25 @@ static void folder_list_output(t_folder_list* x)
 static void folder_list_set(t_folder_list* x, t_symbol *s) 
 {
 	DEBUG(post("folder_list_set"););
+    char *patternBuffer;
+    char envVarBuffer[MAX_PATH];
 #ifdef _WIN32
-	char string_buffer[MAX_PATH];
-	ExpandEnvironmentStrings(s->s_name, string_buffer, MAX_PATH);
-	x->x_pattern = gensym(string_buffer);
+    if( (s->s_name[0] == '~') && (s->s_name[1] == '/'))
+    {
+        patternBuffer = getbytes(MAX_PATH);
+        strcpy(patternBuffer,"%USERPROFILE%");
+        strncat(patternBuffer, s->s_name + 1, MAX_PATH - 1);
+        post("set: %s", patternBuffer);
+    }
+    else
+    {
+        patternBuffer = s->s_name;
+    }
+	ExpandEnvironmentStrings(patternBuffer, envVarBuffer, MAX_PATH - 2);
+	x->x_pattern = gensym(envVarBuffer);
 #else
 	x->x_pattern = s;
-#endif	
+#endif
 }
 
 

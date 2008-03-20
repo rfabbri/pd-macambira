@@ -17,7 +17,6 @@
 -d1A";
 #X obj 28 419 print;
 #X msg 91 146 symbol ~/*.*;
-#X msg 97 173 symbol *;
 #X text 187 197 relative paths work;
 #X msg 102 198 symbol ../*;
 #X text 164 124 drive letters work on ReactOS/Windows;
@@ -27,7 +26,7 @@
 #X text 203 99 ReactOS/Windows environment variables work;
 #X text 262 218 nested wildcards work on UNIX;
 #X msg 119 219 symbol /var/*/*.log;
-#X text 165 172 patterns default to path that Pd launched from;
+#X text 173 173 patterns default to path that Pd launched from;
 #X text 329 464 released under the GNU GPL;
 #X text 15 449 (C) Copyright 2006 Hans-Christoph Steiner <hans@at.or.at>
 ;
@@ -37,6 +36,7 @@ cmd.exe rules.;
 #X text 115 380 With no argument \, it defaults to the contents of
 the folder of the current patch \, i.e. "/path/to/current/patch/*".
 ;
+#X msg 97 173 symbol *.pd;
 #X connect 0 0 8 0;
 #X connect 1 0 7 0;
 #X connect 4 0 8 1;
@@ -45,8 +45,8 @@ the folder of the current patch \, i.e. "/path/to/current/patch/*".
 #X connect 8 0 2 0;
 #X connect 8 0 9 0;
 #X connect 13 0 8 0;
-#X connect 14 0 8 0;
-#X connect 16 0 8 0;
-#X connect 18 0 8 0;
-#X connect 20 0 8 0;
-#X connect 23 0 8 0;
+#X connect 15 0 8 0;
+#X connect 17 0 8 0;
+#X connect 19 0 8 0;
+#X connect 22 0 8 0;
+#X connect 28 0 8 0;
