@@ -2610,8 +2610,9 @@ zexy_install: zexy
 	install -d $(helpdir)/$(ZEXY_NAME)
 	install -p $(shell ls -1 $(externals_src)/zexy/abs/*-help.pd | \
 		sed 's|\(.*\)|"\1"|g') $(helpdir)/$(ZEXY_NAME)
+	install -p $(shell ls -1 $(externals_src)/zexy/reference/*-help.pd | \
+		sed 's|\(.*\)|"\1"|g') $(helpdir)/$(ZEXY_NAME)
 	install -p $(externals_src)/zexy/zexy.pd  $(helpdir)
-	install -p $(externals_src)/zexy/examples/*.* $(helpdir)/$(ZEXY_NAME)
 
 zexy_clean:
 	-$(MAKE) -C $(externals_src)/zexy/src clean
