@@ -150,9 +150,9 @@ static void folder_list_output(t_folder_list* x)
 static void folder_list_set(t_folder_list* x, t_symbol *s) 
 {
 	DEBUG(post("folder_list_set"););
+#ifdef _WIN32
     char *patternBuffer;
     char envVarBuffer[MAX_PATH];
-#ifdef _WIN32
     if( (s->s_name[0] == '~') && (s->s_name[1] == '/'))
     {
         patternBuffer = getbytes(MAX_PATH);
@@ -166,9 +166,10 @@ static void folder_list_set(t_folder_list* x, t_symbol *s)
     }
 	ExpandEnvironmentStrings(patternBuffer, envVarBuffer, MAX_PATH - 2);
 	x->x_pattern = gensym(envVarBuffer);
-#else
+#else  // UNIX
+    // TODO translate env vars to a full path
 	x->x_pattern = s;
-#endif
+#endif /* _WIN32 */
 }
 
 
