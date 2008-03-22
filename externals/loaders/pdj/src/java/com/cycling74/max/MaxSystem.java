@@ -171,7 +171,7 @@ public class MaxSystem {
 	}
 	
 	// constants
-	public static String MXJ_VERSION = "pdj 0.8.3";
+	public static String MXJ_VERSION = "pdj 0.8.4";
 	
 	public static final int PATH_STYLE_COLON		= 2;
 	public static final int PATH_STYLE_MAX			= 0;

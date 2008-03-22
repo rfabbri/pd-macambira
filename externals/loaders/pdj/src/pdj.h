@@ -3,11 +3,12 @@
 
 #ifdef DEBUG
    #define ASSERT(v) { if ( v == NULL ) {bug("ouch, assertion failed %s:%d\n", __FILE__, __LINE__);}}
-   #define JASSERT(v) { if ( v == NULL ){(*env)->ExceptionDescribe(env);bug("ouch, assertion failed %s:%d\n", __FILE__, __LINE__);}}
+   #define JASSERT(v) { if ( v == NULL ) {(*env)->ExceptionDescribe(env);bug("ouch, jni assertion failed %s:%d\n", __FILE__, __LINE__);}}
    #undef  DEBUG
    #define DEBUG(X) {X};
 #else 
    #define ASSERT(v)
+   #undef  DEBUG
    #define DEBUG(X)
    #define JASSERT(v)
 #endif
@@ -26,6 +27,12 @@
 #else 
 	#define DIR_SEP "/"
 	#define PATH_SEP ":"
+#endif
+
+#ifdef __LP64__
+	#define JPOINTER_CAST (unsigned long)
+#else 
+	#define JPOINTER_CAST (unsigned int)
 #endif
 
 // the JVM takes 50M; I don't care taking 4K...

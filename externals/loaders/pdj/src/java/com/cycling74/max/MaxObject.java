@@ -806,7 +806,7 @@ public class MaxObject {
 	}
 	
 	/**
-	 * Tries to instanciate a MaxObject.
+	 * Tries to instantiate a MaxObject.
 	 * @param name fq java name
 	 * @param _pdobj_ptr C pointer to pd object
 	 * @param args objects arguments
@@ -844,7 +844,7 @@ public class MaxObject {
             
             pushPdjPointer(_pdobj_ptr);
             
-            // instanciate the object
+            // instantiate the object
 			if ( args.length > 0 ) {
 				try {
 					Object argValue[] = new Object[1];

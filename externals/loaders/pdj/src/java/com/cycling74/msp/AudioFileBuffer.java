@@ -12,7 +12,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import com.cycling74.max.MessageReceiver;
 
 /**
- * Work in progress, target: 0.8.4
+ * Work in progress, target: 0.8.5
  */
 class AudioFileBuffer {
     

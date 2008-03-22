@@ -4,7 +4,7 @@
 
 int jatom2atom(JNIEnv *env, jobject jatom, t_atom *atom) {
 	int type = (*env)->GetIntField(env, jatom, pdjCaching.FIDAtom_type);
-	const jbyte *symbolValue;
+	const char *symbolValue;
 	jstring value;
 	
 	switch(type) {
@@ -121,7 +121,7 @@ jobjectArray atoms2jatoms(JNIEnv *env, int argc, t_atom *argv) {
 
 
 t_symbol *jstring2symbol(JNIEnv *env, jstring strvalue) {
-	const jbyte *tmp = (*env)->GetStringUTFChars(env, strvalue, NULL);
+	const char *tmp = (*env)->GetStringUTFChars(env, strvalue, NULL);
 	t_symbol *value;
 	
 	JASSERT(tmp);

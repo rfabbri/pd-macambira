@@ -20,12 +20,13 @@ t_int *pdj_tilde_perform(t_int *w) {
 	/* call the performer */
 	(*env)->CallVoidMethod(env, pdjt->pdj.obj, pdjt->performer,
 		pdjt->_used_inputs, pdjt->_used_outputs);
-		
+
+	/* set work to output outlets */
+	work = i + 3;
+			
 	/* if an exception occured, stop the dsp processing for this object */
 	if ( (*env)->ExceptionOccurred(env) ) {
 		int tmp;
-
-		work = i + 3;
 		
 		/* insert silence */
 		for (tmp=0;tmp<pdjt->outs_count;tmp++) {
@@ -41,7 +42,6 @@ t_int *pdj_tilde_perform(t_int *w) {
 	}
 	
 	/* copy buffer out */
-	work = i + 3;
 	for (i=0;i<pdjt->outs_count;i++) {
 		t_sample *out = (t_sample *)(w[work+i]);
 		(*env)->GetFloatArrayRegion(env, pdjt->outs[i], 0, sz, out);

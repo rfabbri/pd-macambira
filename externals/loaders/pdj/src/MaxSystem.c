@@ -158,7 +158,7 @@ JNIEXPORT jboolean JNICALL Java_com_cycling74_max_MaxSystem_sendMessageToBoundOb
 
 JNIEXPORT jstring JNICALL Java_com_cycling74_max_MaxSystem_locateFile
   (JNIEnv *env, jclass cls, jstring filename) {
-	const jbyte *file = (*env)->GetStringUTFChars(env, filename, NULL);
+	const char *file = (*env)->GetStringUTFChars(env, filename, NULL);
 	char fullpath[MAXPDSTRING], *pfullpath;
 	FILE *fd;
 	

@@ -9,6 +9,7 @@ public class pdj_test_class extends MaxObject implements Executable {
 		clock = new MaxClock(this);
 
 		declareAttribute("patate");
+		declareIO(2,2);
 	}
 
 	public pdj_test_class(Atom args[]) {
@@ -49,7 +50,7 @@ public class pdj_test_class extends MaxObject implements Executable {
 	}
 
 	protected void inlet(float f) {
-		post("le float " + f);
+		post("le float " + f + "inlet " + getInlet());
 	}
 
 	void wer(Atom[] atom) {

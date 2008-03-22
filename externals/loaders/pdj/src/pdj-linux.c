@@ -4,6 +4,19 @@
 #include <dlfcn.h>
 #include "pdj.h"
 
+// test if this system is amd64
+#ifdef __LP64__
+	#define ARCH "amd64"
+	#define MAPPOS 73
+#else
+	#define ARCH "i386"
+	#define MAPPOS 49
+#endif
+
+/*
+ * This is why it is called getuglylibpath... getting the info from /proc...
+ * if you have a better idea; well I would like to be informed
+ */
 int getuglylibpath(char *path) {
     char buffer[BUFFER_SIZE];
     FILE *f;
@@ -20,7 +33,7 @@ int getuglylibpath(char *path) {
         fgets(buffer, BUFFER_SIZE-1, f);
         if ( strstr(buffer, "pdj.pd_linux") != NULL ) {
             buffer[strlen(buffer) - 14] = 0;
-            strcpy(path, buffer+49);
+            strcpy(path, buffer + MAPPOS);
             fclose(f);
             return 0;
         }
@@ -43,7 +56,7 @@ JNI_CreateJavaVM_func *linkjvm(char *vm_type) {
 	if ( javahome == NULL ) {
 		javahome = getenv("JAVA_HOME");
 	} else {
-		sprintf(work, "%s/jre/lib/i386/%s/libjvm.so", javahome, vm_type);
+		sprintf(work, "%s/jre/lib/" ARCH "/%s/libjvm.so", javahome, vm_type);
 		libVM = dlopen(work, RTLD_LAZY);
 		
 		if ( libVM == NULL ) {
@@ -60,20 +73,20 @@ JNI_CreateJavaVM_func *linkjvm(char *vm_type) {
 		/* using LD_LIBRARY_PATH + putenv doesn't work, load std jvm libs 
 		 * with absolute path. order is important.
 		 */	
-		sprintf(work, "%s/jre/lib/i386/%s/libjvm.so", javahome, vm_type);
+		sprintf(work, "%s/jre/lib/" ARCH "/%s/libjvm.so", javahome, vm_type);
 		dlopen(work, RTLD_LAZY);
 				
-		sprintf(work, "%s/jre/lib/i386/libverify.so", javahome);
+		sprintf(work, "%s/jre/lib/" ARCH "/libverify.so", javahome);
 		dlopen(work, RTLD_LAZY);
 			
-		sprintf(work, "%s/jre/lib/i386/libjava.so", javahome);
+		sprintf(work, "%s/jre/lib/" ARCH "/libjava.so", javahome);
 		dlopen(work, RTLD_LAZY);
 		
-		sprintf(work, "%s/jre/lib/i386/libmlib_image.so", javahome);
+		sprintf(work, "%s/jre/lib/" ARCH "/libmlib_image.so", javahome);
 		dlopen(work, RTLD_LAZY);
 
 		/* ELF should support dynamic LD_LIBRARY_PATH :( :( :( */
-		sprintf(work, "%s/jre/lib/i386/libjava.so", javahome);
+		sprintf(work, "%s/jre/lib/" ARCH "/libjava.so", javahome);
 		libVM = dlopen(work, RTLD_LAZY);		
 	}		
 	

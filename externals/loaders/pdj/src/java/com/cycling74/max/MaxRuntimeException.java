@@ -5,11 +5,15 @@ package com.cycling74.max;
  */
 public class MaxRuntimeException extends RuntimeException {
 
+    public MaxRuntimeException() {
+    }
+    
     public MaxRuntimeException(String msg) {
         super(msg);
     }
 
-    public MaxRuntimeException() {
-    }
+	public MaxRuntimeException(Exception e) {
+		super(e);
+	}
 
 }

@@ -4,7 +4,7 @@
 
 
 static t_pdj *getMaxObject(JNIEnv *env, jobject obj) {
-  	t_pdj *ret = (t_pdj *) (*env)->GetLongField(env, obj, 
+  	t_pdj *ret = (t_pdj *) JPOINTER_CAST (*env)->GetLongField(env, obj, 
   			pdjCaching.FIDMaxObject_pdobj_ptr);
   	
   	if ( ret == NULL ) 
@@ -27,8 +27,7 @@ JNIEXPORT jlong JNICALL Java_com_cycling74_max_MaxObject_newInlet
   	}
   	
   	proxy = (t_inlet_proxy *) pd_new(inlet_proxy);
-  	pdj->nb_inlet++;
-  	proxy->idx = pdj->nb_inlet;
+  	proxy->idx = pdj->nb_inlet++;
   	proxy->peer = pdj;
   		
   	return (jlong) inlet_new(&pdj->x_obj, &proxy->x_obj.ob_pd, 0, 0); 
@@ -53,28 +52,28 @@ JNIEXPORT jlong JNICALL Java_com_cycling74_max_MaxObject_newOutlet
 
 JNIEXPORT void JNICALL Java_com_cycling74_max_MaxObject_doOutletBang
   (JNIEnv *env, jobject obj, jlong outlet) {
-  	t_outlet *x = (t_outlet *) ((unsigned int) outlet);
+  	t_outlet *x = (t_outlet *) (JPOINTER_CAST outlet);
   	outlet_bang(x);
 }
 
 
 JNIEXPORT void JNICALL Java_com_cycling74_max_MaxObject_doOutletFloat
   (JNIEnv *env, jobject obj, jlong outlet , jfloat value) {
-  	t_outlet *x = (t_outlet *) ((unsigned int) outlet);
+  	t_outlet *x = (t_outlet *) (JPOINTER_CAST outlet);
   	outlet_float(x, value);
 }
 
 
 JNIEXPORT void JNICALL Java_com_cycling74_max_MaxObject_doOutletSymbol
   (JNIEnv *env, jobject obj, jlong outlet, jstring value) {
-  	t_outlet *x = (t_outlet *) ((unsigned int) outlet);
+  	t_outlet *x = (t_outlet *) (JPOINTER_CAST outlet);
   	outlet_symbol(x, jstring2symbol(env, value));
 }
 
 
 JNIEXPORT void JNICALL Java_com_cycling74_max_MaxObject_doOutletAnything
   (JNIEnv *env, jobject obj, jlong outlet, jstring str, jobjectArray value) {
-  	t_outlet *x = (t_outlet *) ((unsigned int) outlet);
+  	t_outlet *x = (t_outlet *) (JPOINTER_CAST outlet);
   	t_atom args[MAX_ATOMS_STACK];
   	int argc;
 

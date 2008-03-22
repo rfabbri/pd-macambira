@@ -1,6 +1,5 @@
 package com.e1.pdj;
 
-import java.io.*;
 import com.cycling74.max.MaxSystem;
 
 public class JikesCompiler extends GenericCompiler {

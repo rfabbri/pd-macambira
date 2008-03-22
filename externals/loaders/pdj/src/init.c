@@ -1,5 +1,5 @@
 /**
- * This code is very ugly and needs rewrite. PERIOD.
+ * initialization
  */
  
 #include <stdio.h>
@@ -97,7 +97,7 @@ static void load_properties() {
 }
 
 
-static void copyToJavaSystemProperties(JNIEnv *env) {
+void copyToJavaSystemProperties(JNIEnv *env) {
 	jclass system = (*env)->FindClass(env, "java/lang/System");		
 	jmethodID id = (*env)->GetStaticMethodID(env, system, "setProperty", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 	int i;
@@ -232,8 +232,8 @@ static int linkClasses(JNIEnv *env) {
 }
 
 
-void buildVMOptions(jint *nb, JavaVMOption *options) {
-	static char cp[BUFFER_SIZE], pdj_cp[BUFFER_SIZE];
+static void buildVMOptions(jint *nb, JavaVMOption *options) {
+	static char cp[BUFFER_SIZE];
 	char installPath[BUFFER_SIZE];
 	char *prop;
 	char *token, *work;
@@ -316,7 +316,7 @@ JNIEnv *init_jvm(void) {
 	vm_args.options = opt;
     vm_args.version = JNI_VERSION_1_4;
     vm_args.ignoreUnrecognized = JNI_FALSE; 
-		
+				
 	vm_type = pdj_getProperty("pdj.vm_type");
 	if ( vm_type == NULL ) {
 		error("pdj: unknown vm_type, using client");
@@ -332,12 +332,12 @@ JNIEnv *init_jvm(void) {
 		error("pdj: unable to create JVM: JNI_CreateJavaVM = %d", rc);
 		return NULL;
 	}
-
-	copyToJavaSystemProperties(jni_env);
-	if ( initIDCaching(jni_env) != 0) {
+	    
+	if ( initIDCaching(jni_env) != 0 ) {
 		return NULL;
 	}
 	
+	copyToJavaSystemProperties(jni_env);
 	if ( linkClasses(jni_env) != 0 ) {
 		return NULL;
 	}

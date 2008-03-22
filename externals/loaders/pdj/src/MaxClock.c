@@ -11,7 +11,7 @@ typedef struct _clockCtnr {
 
 
 static t_clockCtnr *getClock(JNIEnv *env, jobject obj) {
-  	return (t_clockCtnr *) (*env)->GetLongField(env, obj, pdjCaching.FIDMaxClock_clock_ptr);
+  	return (t_clockCtnr *) JPOINTER_CAST (*env)->GetLongField(env, obj, pdjCaching.FIDMaxClock_clock_ptr);
 }
 
 

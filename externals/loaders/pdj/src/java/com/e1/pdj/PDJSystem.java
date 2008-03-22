@@ -7,6 +7,7 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.io.*;
 
+import java.awt.GraphicsEnvironment;
 /**
  * Startup class for pdj.
  */
@@ -50,7 +51,7 @@ public class PDJSystem {
 		// this is a hack to be sure that statics of MaxSystem are loaded
 		// before everything
 		Class cls = MaxSystem.class;
-
+		
 		String osname = System.getProperty("os.name");
 
 		if ( osname.indexOf("Linux") != -1 ) {
@@ -71,20 +72,13 @@ public class PDJSystem {
 
 		if ( osname.indexOf("OS X") != -1 ) {
 			// maps PD object as a JVM native library
-			try {
-				Runtime.getRuntime().load(pdjHome + "/pdj.pd_darwin");
-			} catch (UnsatisfiedLinkError e ) {
-				Runtime.getRuntime().load(pdjHome + "/pdj.pd_imac");
-			}
+			Runtime.getRuntime().load(pdjHome + "/pdj.d_fat");
 			loaded = 1;
- 
-            // this will initialize the AWT component in another thread
-            new Thread(new Runnable() {
-            		public void run() {
-                    Class clz = Component.class;
-            		}
-    			}).start();
 
+            if ( System.getenv("PDJ_USE_AWT") != null ) {
+			    GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+			    Toolkit.getDefaultToolkit();
+            }
 			GenericCompiler.rtJar = "/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar:";
 
 			return;
