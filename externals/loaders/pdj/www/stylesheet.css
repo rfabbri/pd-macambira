@@ -1,0 +1,35 @@
+body {
+	margin:5px;
+	padding:5px;
+	background-color:white;
+	font-size : 11px;
+	font-family : verdana, arial, helvetica, sans-serif;
+	width: 785px;
+	color:black;
+	}
+h1 {
+	font-size : 28px;
+	padding:5px;
+	border:1px dashed black;	
+}
+
+h2 { 
+	font-size : 16px;
+	padding:2px;
+}	
+
+h3 {
+	font-size : 16px;
+	padding:2px;
+}
+
+a {
+	color:#09C;
+	font-size:11px;
+	text-decoration:none;
+	font-weight:600;
+	font-family:verdana, arial, helvetica, sans-serif;
+	}
+a:link {color:#09c;}
+a:visited {color:#07a;}
+a:hover {background-color:white;}

@@ -1,0 +1,42 @@
+#N canvas 699 369 461 376 10;
+#N canvas 0 0 450 300 graph1 0;
+#X array signal-debug 441 float 0;
+#X coords 0 1.02 440 -1.02 400 150 1;
+#X restore 17 -91 graph;
+#X obj 18 -264 osc~ 440;
+#X obj 17 -183 *~;
+#X obj 49 -182 *~;
+#X obj 33 -208 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 65 -208 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 17 -143 tabwrite~ signal-debug;
+#X obj 202 -185 metro 250;
+#X obj 202 -208 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 81 -182 *~;
+#X obj 97 -208 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 84 -264 phasor~ 440;
+#X obj 172 -264 osc~ 880;
+#X obj 246 -255 nbx 5 14 0.01 1 1 0 empty empty empty 0 -6 0 10 -262144
+-1 -1 0.01 256;
+#X obj 184 -229 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144
+-1 -1;
+#X obj 18 -230 pdj~ pdj_test_tilde;
+#X connect 1 0 15 0;
+#X connect 2 0 6 0;
+#X connect 3 0 6 0;
+#X connect 4 0 2 1;
+#X connect 5 0 3 1;
+#X connect 7 0 6 0;
+#X connect 8 0 7 0;
+#X connect 9 0 6 0;
+#X connect 10 0 9 1;
+#X connect 11 0 15 1;
+#X connect 12 0 15 2;
+#X connect 13 0 15 3;
+#X connect 14 0 15 3;
+#X connect 15 0 2 0;
+#X connect 15 1 3 0;
+#X connect 15 2 9 0;

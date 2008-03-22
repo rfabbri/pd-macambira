@@ -1,0 +1,174 @@
+###########################################################################
+pdj - java plugin interface to pure-data
+###########################################################################
+
+RELEASE 0.8.3 / September 2007
+
+
+PDJ enables you to write java code to interact with pure-data objects. The
+API is totally based on Cycling74 Max/MSP 'mxj' object implementation. This 
+will enable java mxj objects to run on pure-data with pdj. You can also 
+create signal/tilde (~) objects.
+
+This is a work in progress and some of features are missing and some might 
+not even be ported.		
+	    
+IMPLEMENTED:
+
+	* MaxClock 100%
+	* MSPBuffer 100%
+	* Callback 100%
+	* MaxObject 100%
+	* Atom 98%
+	* MaxSystem 90%
+	* MaxQelem 90%
+	* MSPObject 85% (missing signal in/outlet detection)
+	* MSPPerformable 100%
+	* MaxPatcher 5%
+
+TODO:
+
+	* MSPObject connection status
+	* MaxBox/MaxPatcher object; inspiration from dyn~ (kudo Mr. Grill!)
+
+LIMITATION:
+
+	* Signal inlets cannot be hot inlets for receiving atom message.
+	  This means that if you create a signal inlet and send an atom
+	  to this inlet, pdj won't be able to process it; float or symbol.
+	  This looks like a work as designed in pd.
+
+BUGS:
+
+	* OS X: cannot use AWT classes with OS X because of a weird bug
+	  that locks the thread when the GUI libraries are loaded. 
+	  -> http://lists.apple.com/archives/java-dev/2004/Mar/msg00910.html
+	  this solution has been tested but the loadLibrary still hang.
+
+WORKAROUNDS: 
+
+	* on most cases you don't have to put the JVM libs dir to the 
+	  LD_LIBRARY_PATH. If you have a UnsatisfiedLinkError, add it 
+	  before you start PD. 
+	* on some machines, the System.out redirection can crash PD. If
+	  it is the case, you can disable it in the pdj.properties file;
+	  check the property: pdj.redirect-pdio.
+
+REQUIEREMENTS:
+	
+	* pure-data 0.38.x or better
+	* java JDK version 1.4.x or better; use 1.5 if you can !
+	* works on linux, windows
+	
+REQUIEREMENTS FOR BUILDING:
+
+	* apache ant 1.6.x or better
+	* c compiler
+
+INSTALLATION:
+
+	* if you are using the source distribution, build it before
+	  -> download java sdk from java.sun.com (unless you are using OS X)
+	  -> download apache ant for ant.apache.org
+	  -> edit file <your platform>-build.properties
+	  -> in the root directory of pdj, run 'ant package'
+	* add the pdj external (pdj.pd_linux/pd.dll/pd.pd_dawrin) directory
+	  to your pd path (very important on OS X)
+	* the other files of the original binary directory must be in 
+	  the same directory
+	* double check dist/pdj.properties to be sure that the JAVA 
+	  environment parameters are right
+	* === OS X WARNING ====
+	  I am working on a universal binary of pdj. This is planned on version
+	  0.8.4. If you really need a OS X build, email me.
+
+USAGE:
+
+	* put your .java file in the /classes directory
+	* create a pdj object with the name of the java class; if
+	  you have not compiled it before, pdj will do it for you
+
+CHANGELOG:
+	--- VERSION 0.8.3 ---
+	* Atom.getInt() on a float now works.
+	* corrected some classpath definition issues with windows
+	* bypass the java compilation with pdj.compiler=null
+	* remove dependencies task for cpptasks.jar (now part of distribution)
+	* FIXED: comment on property pdj.vm_args failed to initialize VM
+	* BUG: cannot link with OS X and cpptasks. Planned on 0.8.4
+
+	--- VERSION 0.8.2 ---
+	* if javac is set, using the javac compiler from the JAVA_HOME first
+	* optimizations (main thread JVM and symbol method resolution)
+	* FIXED: using pdj.classpath with directories
+	* FIXED: search path on file in the current directory
+	* FIXED: leak with open_path and casting warnings
+	* build for Intel Mac
+	* getting better at attribute support
+	
+	--- VERSION 0.8.1 ---
+	* added MaxPatcher object to get patch path
+	* FIXED: to match mxj: method with args[] will always be called first
+
+	--- VERSION 0.8 ---
+	* pdj~ object support (MSPSignal/MSPObject/MSPPerformable)
+	* The JVM can now be server or in client mode (windows/linux only)
+	* JVM selection for OS X
+	* FIXED: working jikes compiler on OS X
+	* FIXED: declareIO inlets count
+	* FIXED: windows: System.out CR/LF errors on the PD console
+    
+	--- VERSION 0.7.1 ---
+	* OS X support with distribution
+	* FIXED: MaxSystem.locateFile now works
+
+	--- VERSION 0.7 ---
+	* Better JVM resolution on win32 (eg: with the registry)
+	* Full implementation of MSPBuffer
+	* Added Atom methods with unit tests
+	* Windows binaries distribution
+	* FIXED: now filtering { and } with post() not to lock PD
+	* FIXED: anything gets called on a undefined bang/float/list method
+	* FIXED: defined inlet(int) without inlet(float) now works... :-\
+	
+	--- VERSION 0.6.1 ---
+	* FIXED: outlet(Atom) and outlet(Atom[]) resolution error
+
+	--- VERSION 0.6 ---
+	* MaxObject constructor with arguments
+	* partial attribute support; automatic field setter/getter
+	* added method bail on MaxObject
+	* strict declaration of inlets/outlets (with info outlet)
+	* System.out and System.err linked to the pd console
+	* outlet(atom[]) checks type before calling the right func.
+
+	--- VERSION 0.5 ---
+	* method inlet resolution (bang->float->list->anything) now works
+	* windows support (premilinary support)
+	* auto-compiling class of every .java in /class (max -1; pdj +1)
+
+	--- VERSION 0.4 ---
+	* more javadoc and documentation... but could be better
+	* multiple inlet operations
+	* loadbang now works
+	
+	--- VERSION 0.3 ---
+	* added a small and cheap javadoc. the original MXJ should be the
+	  reference.
+	* partial MSPBuffer support
+	* Atom and MaxObject now supports Atom arrays
+	
+	--- VERSION 0.2 ---
+	* added classpath of $PDJ_HOME/classes and $PDJ_HOME/lib/* by default
+	* 95 % Dynamic JVM resolution with the JAVA_HOME; via dlsym (see BUGS)
+	* MaxSystem.deferLow(...) works ! :-\
+	* added an help patch
+
+THANKS:
+
+	* Thomas Grill
+	* patrick a 11h11
+	* pd-mtl crew !
+
+(c) Pascal Gauthier 2004-2007, under BSD like license
+asb2m10@users.sourceforge.net

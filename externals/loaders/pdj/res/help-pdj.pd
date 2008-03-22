@@ -1,0 +1,63 @@
+#N canvas 338 130 812 533 12;
+#X text 17 7 pdj - JAVA PLUGIN EXTERNAL;
+#X obj 18 327 pdj help_class;
+#X text 16 49 The pdj object enables you to write Java external with
+Max/MSP API mxj.;
+#X obj 18 410 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-262144 -1 -1 0 256;
+#X floatatom 18 97 5 0 0 0 - - -;
+#X text 81 95 <-- the method inlet(float) will be called;
+#X text 230 204 <-- the method callme(Atom []) will be called;
+#X msg 50 241 dynamic_method;
+#X text 203 238 <-- the method dynamic_method() will be called;
+#X msg 61 276 idontexists 10;
+#X text 222 275 <-- since idontexists is not in help_class \, an error
+will be thrown;
+#X msg 37 204 callme hola ouain;
+#X text 73 162 symbols sended to the java class will be resolved by
+the method name defined in the user class.;
+#X obj 32 126 bng 30 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 80 132 <-- the method bang() will be called;
+#X text 16 25 ======================================================
+;
+#X obj 139 373 print help_class outlet1;
+#N canvas 297 319 715 331 attributes 0;
+#X obj 19 229 pdj help_class @attr1 10;
+#X msg 39 127 get attr1;
+#X msg 19 92 attr1 \$1;
+#X floatatom 19 66 5 0 0 0 - - -;
+#X obj 254 260 print info-outlet;
+#X text 144 126 <-- using get with attribute name will output the value
+using the info outlet (the last outlet);
+#X text 18 8 Attributes are used to access fields in a class. To do
+this \, you can use the method declareAttribute in the constructor.
+;
+#X text 109 69 <-- calling the attribute with his name will set the
+attribute(field) value;
+#X text 48 172 you can also declare a attribute within a class by using
+@ in the constructor arguments. You must also provide a initial value
+to this field.;
+#X text 17 288 attribute value will always be sended to the last outlet
+of the object that is called the info-outlet.;
+#X connect 0 2 4 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 2 0;
+#X restore 656 40 pd attributes;
+#X text 652 7 *** see also :;
+#X text 169 321 first argument is the classname to find in classpath.
+additionnal arguments are given to the class constructor.;
+#X text 682 504 VERSION 0.8;
+#X text 99 406 see help_class.java in classes folder to see how this
+example is handled.;
+#X text 13 454 CLASSPATH INFORMATION : by default \, (whereis pdj)/lib/*.jar
+and /classes is added to the classpath. edit pdj.properties to add
+more .jar or directories to the pdj or system classpath;
+#X connect 1 0 3 0;
+#X connect 1 1 16 0;
+#X connect 4 0 1 0;
+#X connect 7 0 1 0;
+#X connect 9 0 1 0;
+#X connect 11 0 1 0;
+#X connect 13 0 1 0;

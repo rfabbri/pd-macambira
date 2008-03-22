@@ -1,0 +1,250 @@
+<project name="pdj" default="package" basedir=".">
+
+	<property file="build.properties"/>
+	<property file="${os.name}-build.properties"/>
+	
+	<!-- ============================================================== -->
+
+	<property name="jdk.include" value="${jdk.home}/include"/>
+	<property name="pd.include" value="${pd.home}/src"/>
+
+	<!-- java classes that uses a native interface -->
+	<property name="native.classes" value="
+		com.cycling74.max.MaxObject,
+		com.cycling74.max.MaxClock,
+	 	com.cycling74.max.MaxSystem,
+		com.cycling74.msp.MSPBuffer,
+		com.cycling74.msp.MSPObject"/>
+
+	<target name="clean" depends="-init">
+		<delete dir="${dist.dir}"/>
+		<delete dir="${work.dir}"/>
+		<delete dir="${javadoc.dir}"/>
+		<delete>
+			<fileset dir="." 
+				includes="**/history.xml,**/dependencies.xml,index.html"/>
+		</delete>
+	</target>
+	
+	<target name="-init">
+		<mkdir dir="${classes.dir}"/>
+		<mkdir dir="${dist.dir}"/>
+		<taskdef resource="cpptasks.tasks" classpath="lib/ant/cpptasks.jar"/>
+		<typedef resource="cpptasks.types" classpath="lib/ant/cpptasks.jar"/>
+		<available classname="junit.framework.Test" property="isJunitFound"/>
+	</target>
+	
+	<target name="cl-java" depends="-init">
+		<javac destdir="${classes.dir}" srcdir="${java.src.dir}" debug="true"
+			target="1.4" source="1.4">
+			<exclude name="**/test/**" unless="isJunitFound"/>
+			<exclude name="**/*Test.java" unless="isJunitFound"/>
+		</javac>		
+		<jar jarfile="${pdj.jar}" basedir="${classes.dir}">
+			<exclude name="*.class"/>
+			<exclude name="**/test/**" unless="isJunitFound"/>
+			<exclude name="**/*Test.class" unless="isJunitFound"/>
+		</jar>
+
+		<uptodate property="javah.up2date"
+			srcfile="${pdj.jar}" targetfile="${javah.file}"/>
+	</target>
+	
+	<target name="javah" depends="cl-java" unless="javah.up2date">
+		<javah class="${native.classes}" classpath="${pdj.jar}"
+			outputFile="${javah.file}" force="true"/>
+	</target>
+	
+	<target name="-linux-rename" if="isLinux">
+		<move file="${dist.dir}/libpdj.so" tofile="${dist.dir}/pdj.pd_linux"/>
+	</target>
+	
+    <target name="-osx-rename" if="isOSX">
+		<move file="${dist.dir}/libpdj.${pdj.archBuild}.bundle" tofile="${pdj.outfile}"/>
+    </target>
+    
+	<target name="cl" depends="javah">
+		<cc debug="true" objdir="${work.dir}" outtype="${linker.type}" 
+            outfile="${pdj.outfile}" name="${compiler}">
+			
+			<fileset dir="${src.dir}" includes="*.c">
+				<exclude name="pdj-linux.c" unless="isLinux"/>
+				<exclude name="pdj-win32.c" unless="isWin32"/>
+				<exclude name="pdj-osx.c"   unless="isOSX"/>
+			</fileset>
+		  
+			<!-- compiler args -->
+			<defineset define="DEBUG"/>
+			<defineset define="PROFILER"/>
+			<defineset define="PD"/>
+			<defineset define="NT" if="isWin32"/>
+			
+			<compilerarg value="-Wall" if="isLinux"/>
+            <compilerarg value="-fno-common" if="isOSX"/>
+            <compilerarg value="-fPIC" if="isOSX"/>
+	    	<compilerarg value="-arch" if="isOSX"/>
+	   		<compilerarg value="i386" if="isOSX"/>
+            <compilerarg value="-arch" if="isOSX"/>
+	   		<compilerarg value="ppc" if="isOSX"/>
+            
+			<!-- includes files -->
+			<includepath location="${jdk.include}"/>
+			<includepath location="${jdk.include}/linux" if="isLinux"/>
+			<includepath location="${jdk.include}/win32" if="isWin32"/>
+			<includepath location="${pd.include}"/>
+			<includepath location="${work.dir}"/>
+            
+            <!-- linker specific -->
+            <libset dir="${pd.home}/bin" libs="pd" if="isWin32"/>
+            <libset if="isWin32" libs="Advapi32"/>
+            <linkerarg value="/export:pdj_setup" if="isWin32"/>
+
+			<linkerarg value="-export-dynamic" if="isLinux"/>
+			<linkerarg value="-Xlinker" if="isLinux"/>
+			
+			<!-- OS X :-\ -->
+			<linkerarg value="-arch" if="isOSX"/>
+			<linkerarg value="-arch" if="isOSX"/>
+	        <linkerarg value="i386" if="isOSX"/>
+			<linkerarg value="-arch" if="isOSX"/>
+	        <linkerarg value="ppc" if="isOSX"/>
+
+            <linkerarg value="-framework" if="isOSX"/>
+            <linkerarg value="JavaVM" if="isOSX"/>
+            <linkerarg value="-framework" if="isOSX"/>
+            <linkerarg value="CoreFoundation" if="isOSX"/>
+            <linkerarg value="-flat_namespace" if="isOSX"/>
+            <linkerarg value="-framework" if="isOSX"/>
+            <linkerarg value="AppKit" if="isOSX"/>
+            <linkerarg value="-undefined" if="isOSX"/>
+            <linkerarg value="suppress" if="isOSX"/>
+
+            <linkerarg value="-bundle" if="isOSX"/>
+            <linkerarg value="-Xlinker" if="isOSX"/>
+           
+        </cc>
+       
+		<antcall target="-linux-rename"/>
+        <antcall target="-osx-rename"/>
+	</target>
+	
+	<target name="package" depends="cl">
+		<copy todir="${dist.dir}">
+			<fileset dir="res"/>
+		</copy>
+			
+		<copy todir="${dist.dir}/classes">
+			<!-- include the default package (examples) source -->
+			<fileset dir="src/java" includes="*.java"/>
+			<fileset dir="${classes.dir}" includes="*.class"/>
+		</copy>
+
+	</target>
+	
+	<target name="test" depends="package">
+		<exec dir="${dist.dir}" executable="${pd.home}/bin/pd">
+			<arg line="-lib pdj ${pdj.test-patch}"/>
+		</exec>
+	</target>
+
+	<target name="test-dsp" depends="package">
+		<exec dir="${dist.dir}" executable="${pd.home}/bin/pd">
+			<arg line="-lib pdj ${pdj-tilde.test-patch}"/>
+		</exec>
+	</target>
+	
+	<target name="test-mxdublin" depends="package">
+		<ant antfile="../mxdublin/build.xml" target="package" dir="../mxdublin"/>
+			
+		<exec dir="${dist.dir}" executable="${pd.home}/bin/pd">
+			<env key="AWT_TOOLKIT" value="MToolkit"/>
+			<arg line="-lib pdj ../../mxdublin/res/test/test-mxdublin.pd"/>
+		</exec>
+	</target>
+
+	<target name="test-mxdublin-help" depends="package">
+		<ant antfile="../mxdublin/build.xml" target="package" 
+			dir="../mxdublin"/>
+		<exec dir="${dist.dir}" executable="${pd.home}/bin/pd">
+			<arg line="-lib pdj ../../mxdublin/res/examples/help-mxdublin.pd"/>
+		</exec>
+	</target>
+	
+	<target name="test-helpatch" depends="package">
+		<exec dir="${dist.dir}" executable="${pd.home}/bin/pd" >
+			<arg line="-lib pdj ../res/help-pdj.pd"/>
+		</exec>
+	</target>
+
+	<target name="dist" depends="clean">
+		<tar destfile="../pdj-${pdj.version}.tar.gz" compression="gzip">
+			<tarfileset dir="." prefix="pdj-${pdj.version}">
+				<exclude name="CVS"/>
+			</tarfileset>
+		</tar>
+	</target>
+		
+	<target name="javadoc" depends="cl-java">
+		<mkdir dir="${javadoc.dir}"/>
+		<javadoc source="src" destdir="${javadoc.dir}" 
+			     windowtitle="pdj-MXJ API">
+			<fileset dir="src/java">
+				<include name="com/cycling74/max/*.java"/>
+				<include name="com/cycling74/msp/*.java"/>
+				<exclude name="*.java"/>
+				<exclude name="**/test/**"/>
+				<exclude name="**/*Test.java"/>
+			</fileset>
+			<link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
+		    <doctitle><![CDATA[<h1>The MXJ Java API for pure-data</h1>
+		    <p>This API is based on MXJ for Max/MSP.</p>]]></doctitle>
+		    <bottom><![CDATA[This API is based on mxj for <a  
+		    	href="http://www.cycling74.com/products/maxmsp.html">
+		    	Max/MSP</a> by Cycling74. Please see original MXJ
+			    implementation.]]></bottom>
+		</javadoc>
+	</target>
+	
+	<target name="dist-www" depends="javadoc">
+		<tar destfile="../pdj-web.tar.gz" compression="gzip">
+			<tarfileset dir="www">
+				<exclude name="CVS"/>
+				<exclude name=".*"/>
+			</tarfileset>
+		</tar>
+	</target>
+	
+	<target name="dist-win32" depends="package,javadoc">
+		<zip destfile="${dist.dir}/pdj-${pdj.version}-win32.zip">
+			<zipfileset dir="www/api" includes="**" prefix="javadoc"/>
+			<fileset dir="${dist.dir}">
+				<include name="classes/**"/>
+				<include name="*.jar"/>
+				<include name="*.pd"/>
+				<include name="*.properties"/>
+				<include name="*.dll"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="README"/>
+				<include name="LICENSE"/>
+			</fileset>
+		</zip>
+	</target>
+    
+	<target name="dist-osx" depends="package,javadoc">
+		<zip destfile="../pdj-${pdj.version}-${pdj.archBuild}.zip">
+			<zipfileset dir="www/api" includes="**" prefix="javadoc"/>
+			<fileset dir="${dist.dir}">
+				<include name="classes/**"/>
+				<include name="*.jar"/>
+				<include name="*.pd"/>
+				<include name="*.properties"/>
+				<include name="*.${pdj.archBuild}"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="README"/>
+				<include name="LICENSE"/>
+			</fileset>
+		</zip>
+	</target>
+</project>
