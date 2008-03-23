@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdmtl pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch semento senderfruit sssad pd-wavelet 
+LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch semento senderfruit sssad pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -305,19 +305,19 @@ pddp_install:
 
 #-------------------------------------------------------------------------------
 # pdmtl
-PDMTL_NAME = pdmtl
-pdmtl_install:
-	install -d $(objectsdir)/$(PDMTL_NAME)
-	svn export --force $(abstractions_src)/pdmtl \
-		$(objectsdir)/$(PDMTL_NAME)
-    # mv $(shell find $(objectsdir)/$(PDMTL_NAME)/medias/ -mindepth 2 -type f) $(objectsdir)/$(PDMTL_NAME)/medias/
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDMTL_NAME) \
-		--author "PD Montreal List" \
-		--license "GNU GPL" \
-		--description "PD Montreal Abstractions"
-	install -d $(helpdir)/$(PDMTL_NAME)
-	install -p $(abstractions_src)/pdmtl/0.info.pd $(abstractions_src)/pdmtl/1.browser.pd \
-		$(helpdir)/$(PDMTL_NAME)
+# PDMTL_NAME = pdmtl
+# pdmtl_install:
+#   install -d $(objectsdir)/$(PDMTL_NAME)
+#   svn export --force $(abstractions_src)/pdmtl \
+#       $(objectsdir)/$(PDMTL_NAME)
+#     # mv $(shell find $(objectsdir)/$(PDMTL_NAME)/medias/ -mindepth 2 -type f) $(objectsdir)/$(PDMTL_NAME)/medias/
+#   $(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDMTL_NAME) \
+#       --author "PD Montreal List" \
+#       --license "GNU GPL" \
+#       --description "PD Montreal Abstractions"
+#   install -d $(helpdir)/$(PDMTL_NAME)
+#   install -p $(abstractions_src)/pdmtl/0.info.pd $(abstractions_src)/pdmtl/1.browser.pd \
+#       $(helpdir)/$(PDMTL_NAME)
 
 #-------------------------------------------------------------------------------
 # pdsvn
