@@ -12,8 +12,8 @@
  Based on Pure Data by Miller Puckette and others
  Based on pmpd by Cyrille Henry 
 
- Contact : Nicolas Montgermont, nicolas@basseslumieres.org
-	   Cyrille Henry, Cyrille.Henry@la-kitchen.fr
+ Contact : Nicolas Montgermont, nicolas_montgermont @ yahoo dot fr
+	   Cyrille Henry, Cyrille.Henry @ la-kitchen dot fr
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
