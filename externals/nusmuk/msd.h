@@ -1200,6 +1200,31 @@ protected:
 		}
 	}
 
+	// set mass of mass(s) named Id or number No
+	void m_setM(int argc,t_atom *argv) 
+	{
+		if (argc != 2) {
+			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
+			return;
+		}
+
+		const t_float ma = GetAFloat(argv[1]);
+
+		if(IsSymbol(argv[0])) {
+			typename IDMap<t_mass *>::iterator it;
+			//typename IDMap<t_link *>::iterator it;
+			for(it = massids.find(GetSymbol(argv[0])); it; ++it)
+				it.data()->M = ma;
+		}
+		else	{
+			t_mass *m = mass.find(GetAInt(argv[0]));
+			if(m)
+				m->M = ma;
+			else
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+		}
+	}
+	
 	// set damping of link(s) named Id
 	void m_setD2(int argc,t_atom *argv) 
 	{
@@ -1867,6 +1892,7 @@ private:
 		FLEXT_CADDMETHOD_(c,0,"setK",m_setK);
 		FLEXT_CADDMETHOD_(c,0,"setD",m_setD);
 		FLEXT_CADDMETHOD_(c,0,"setL",m_setL);
+		FLEXT_CADDMETHOD_(c,0,"setM",m_setM);
 		FLEXT_CADDMETHOD_(c,0,"setD2",m_setD2);
 		FLEXT_CADDMETHOD_(c,0,"mass",m_mass);
 		FLEXT_CADDMETHOD_(c,0,"link",m_link);
@@ -1917,6 +1943,7 @@ private:
 	FLEXT_CALLBACK_V(m_setK)
 	FLEXT_CALLBACK_V(m_setD)
 	FLEXT_CALLBACK_V(m_setL)
+	FLEXT_CALLBACK_V(m_setM)
 	FLEXT_CALLBACK_V(m_setD2)
 	FLEXT_CALLBACK_V(m_get)
 	FLEXT_CALLBACK_V(m_delete_link)
