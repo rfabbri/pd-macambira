@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: convert pd messages to strings (dynamic allocation)
  *
- * Copyright (c) 2004 - 2007 Bryan Jurish.
+ * Copyright (c) 2004 - 2008 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file "COPYING", in this distribution.
@@ -222,7 +222,7 @@ void any2string_setup_guts(void)
 
   
   //-- help symbol
-  class_sethelpsymbol(any2string_class, gensym("any2string-help.pd"));
+  //class_sethelpsymbol(any2string_class, gensym("any2string-help.pd")); //-- breaks pd-extended help lookup
 }
 
 /*--------------------------------------------------------------------

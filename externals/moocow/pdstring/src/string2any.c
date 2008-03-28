@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: convert strings to pd messages
  *
- * Copyright (c) 2004 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file "COPYING", in this distribution.
@@ -233,7 +233,7 @@ void string2any_setup_guts(void)
 
   
   //-- help symbol
-  class_sethelpsymbol(string2any_class, gensym("string2any-help.pd"));
+  //class_sethelpsymbol(string2any_class, gensym("string2any-help.pd")); //-- breaks pd-extended help lookup
 }
 
 /*--------------------------------------------------------------------

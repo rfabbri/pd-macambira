@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: pd string conversions : library
  *
- * Copyright (c) 2004-2006 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file "COPYING", in this distribution.
@@ -104,5 +104,5 @@ void pdstring_setup(void)
   class_addmethod(pdstring_class, (t_method)pdstring_help, gensym("help"), A_NULL);
 
   //-- help symbol
-  class_sethelpsymbol(pdstring_class, gensym("pdstring-help.pd"));
+  //class_sethelpsymbol(pdstring_class, gensym("pdstring-help.pd")); //-- breaks pd-extended help lookup
 }
