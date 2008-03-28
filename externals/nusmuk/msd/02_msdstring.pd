@@ -2,7 +2,7 @@
 #X obj 24 54 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262131 -1
 -1;
 #X text 49 54 reset;
-#N canvas 0 22 454 304 creation_structure 0;
+#N canvas 0 22 610 333 creation_structure 0;
 #X obj 52 15 loadbang;
 #X obj 135 20 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262131 -1
 -1;
@@ -80,26 +80,25 @@
 #X obj 135 42 t b b b b;
 #X text 252 82 CREATION : 2 masses fixes (fix) \, 80 mobiles (corde)
 \, 80 liens (souple) \, 78 tLink (D2);
-#X obj 135 160 s msdin;
 #X msg 135 132 Xmax 100 \, Xmin -100;
 #X obj 247 23 inlet;
 #X obj 121 213 loadbang;
 #X obj 121 237 s load;
+#X obj 135 160 s \$0-msdin;
 #X connect 0 0 6 0;
 #X connect 1 0 6 0;
-#X connect 2 0 8 0;
-#X connect 4 0 8 0;
-#X connect 5 0 8 0;
-#X connect 6 0 9 0;
+#X connect 2 0 12 0;
+#X connect 4 0 12 0;
+#X connect 5 0 12 0;
+#X connect 6 0 8 0;
 #X connect 6 1 5 0;
 #X connect 6 2 4 0;
 #X connect 6 3 2 0;
-#X connect 9 0 8 0;
-#X connect 10 0 6 0;
-#X connect 11 0 12 0;
+#X connect 8 0 12 0;
+#X connect 9 0 6 0;
+#X connect 10 0 11 0;
 #X restore 24 76 pd creation_structure;
 #N canvas 508 227 516 328 compute 0;
-#X obj 274 162 print msd;
 #X obj 27 30 gemhead;
 #N canvas 735 244 537 479 corde 0;
 #X obj 139 41 inlet;
@@ -176,7 +175,6 @@
 #X obj 186 219 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 27 136 msd --------------------------------;
-#X obj 95 100 r msdin;
 #X obj 27 53 t b b b b b b b;
 #X obj 27 195 route massesPos massesSpeeds massesForces;
 #X text 208 240 Afficher les vitesses en haut;
@@ -227,27 +225,27 @@
 #X restore 215 278 pd forces;
 #X msg 27 75 bang \, get massesPos \, get massesSpeeds \, get massesForces
 ;
-#X connect 1 0 7 0;
-#X connect 4 0 3 1;
-#X connect 5 0 8 0;
-#X connect 5 1 0 0;
-#X connect 6 0 5 0;
-#X connect 7 0 15 0;
-#X connect 7 1 5 0;
-#X connect 7 2 5 0;
-#X connect 7 3 5 0;
-#X connect 7 4 5 0;
-#X connect 7 5 5 0;
-#X connect 7 6 5 0;
-#X connect 8 0 2 0;
-#X connect 8 1 3 0;
-#X connect 8 2 14 0;
-#X connect 11 0 14 1;
-#X connect 11 0 3 1;
-#X connect 12 0 13 0;
-#X connect 15 0 5 0;
+#X obj 95 100 r \$0-msdin;
+#X connect 0 0 5 0;
+#X connect 3 0 2 1;
+#X connect 4 0 6 0;
+#X connect 5 0 13 0;
+#X connect 5 1 4 0;
+#X connect 5 2 4 0;
+#X connect 5 3 4 0;
+#X connect 5 4 4 0;
+#X connect 5 5 4 0;
+#X connect 5 6 4 0;
+#X connect 6 0 1 0;
+#X connect 6 1 2 0;
+#X connect 6 2 12 0;
+#X connect 9 0 12 1;
+#X connect 9 0 2 1;
+#X connect 10 0 11 0;
+#X connect 13 0 4 0;
+#X connect 14 0 4 0;
 #X restore 24 165 pd compute;
-#X obj 24 143 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 24 143 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 307 151 hsl 128 15 0 30 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
@@ -264,7 +262,7 @@
 #X msg 206 231 36 \$1 \, 37 \$1 \, 38 \$1 \, 45 \$1 \, 46 \$1 \, 47
 \$1;
 #X obj 206 207 / 3;
-#X obj 173 286 s msdin;
+#X obj 173 286 s \$0-msdin;
 #X connect 0 0 3 0;
 #X connect 0 0 4 0;
 #X connect 0 0 7 0;
@@ -292,24 +290,24 @@
 ;
 #X text 44 142 display forces (green) and speeds (red);
 #N canvas 0 22 450 300 forces 0;
-#X obj 167 157 s msdin;
 #X msg 167 134 forceX corde \$1;
 #X obj 167 89 inlet;
 #X obj 167 112 / 300;
-#X connect 1 0 0 0;
-#X connect 2 0 3 0;
-#X connect 3 0 1 0;
+#X obj 167 157 s \$0-msdin;
+#X connect 0 0 3 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
 #X restore 304 56 pd forces;
 #X obj 307 34 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 2500 1;
+-1 -1 0 1;
 #N canvas 0 22 450 300 general_damping 0;
 #X msg 172 143 setD D2 \$1;
-#X obj 172 166 s msdin;
 #X obj 172 121 / 5;
 #X obj 173 100 inlet;
-#X connect 0 0 1 0;
-#X connect 2 0 0 0;
-#X connect 3 0 2 0;
+#X obj 172 166 s \$0-msdin;
+#X connect 0 0 3 0;
+#X connect 1 0 0 0;
+#X connect 2 0 1 0;
 #X restore 304 171 pd general_damping;
 #X text 302 74 Send forces in the middle;
 #X text 302 16 Send forces;
