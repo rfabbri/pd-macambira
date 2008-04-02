@@ -5,7 +5,7 @@ clean: ; rm -f *.pd_linux *.o
 
 # ----------------------- WINDOWS -----------------------
 
-pd_win: breakpoints.dll breakpoints~.dll destroysend.dll folderpanel.dll getdollarzero.dll
+pd_win: breakpoints.dll breakpoints~.dll destroysend.dll folderpanel.dll getdollarzero.dll phasorshot~.dll
 
 .SUFFIXES: .dll
 
@@ -27,7 +27,7 @@ LDFLAGS = -shared
 
 # ----------------------- LINUX i386 -----------------------
 
-pd_linux: breakpoints.pd_linux breakpoints~.pd_linux destroysend.pd_linux folderpanel.pd_linux getdollarzero.pd_linux
+pd_linux: breakpoints.pd_linux breakpoints~.pd_linux destroysend.pd_linux folderpanel.pd_linux getdollarzero.pd_linux phasorshot~.pd_linux
 
 .SUFFIXES: .pd_linux
 
@@ -47,7 +47,7 @@ LINUXINCLUDE =  -I$(PDPATH)/src
 
 # ----------------------- Mac OSX -----------------------
 
-pd_darwin: breakpoints~.pd_darwin breakpoints.pd_darwin destroysend.pd_darwin folderpanel.pd_darwin getdollarzero.pd_darwin
+pd_darwin: breakpoints~.pd_darwin breakpoints.pd_darwin destroysend.pd_darwin folderpanel.pd_darwin getdollarzero.pd_darwin .pd_darwin
 
 .SUFFIXES: .pd_darwin
 
