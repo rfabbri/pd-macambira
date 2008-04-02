@@ -7,7 +7,7 @@
 #define abs fabs
 #endif
 
-#define BACKGROUNDCOLOR "grey"
+#define BACKGROUNDCOLOR "grey86"
 #define LINECOLOR "grey30"
 #ifndef BACKGROUNDWIDTH
 #define BACKGROUNDWIDTH "1"
