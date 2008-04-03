@@ -147,6 +147,7 @@ void breakpoints_init(t_breakpoints *x,int argc,t_atom* argv)
         } else {
           if (x->max > 0) {
             x->min = 0;
+             if (x->max < 1) x->max =1;
           } else {
             x->max = 0;
           }
@@ -426,7 +427,8 @@ void breakpoints_setup(void)
     breakpoints_widgetbehavior.w_getrectfn =   breakpoints_getrect;
     breakpoints_widgetbehavior.w_displacefn =    breakpoints_displace;
     breakpoints_widgetbehavior.w_selectfn = breakpoints_select;
-    breakpoints_widgetbehavior.w_activatefn =   breakpoints_activate;
+    breakpoints_widgetbehavior.w_activatefn = NULL;
+    //breakpoints_widgetbehavior.w_activatefn =   breakpoints_activate;
     breakpoints_widgetbehavior.w_deletefn =   breakpoints_delete;
     breakpoints_widgetbehavior.w_visfn =   breakpoints_vis;
     breakpoints_widgetbehavior.w_clickfn = (t_clickfn) breakpoints_newclick;

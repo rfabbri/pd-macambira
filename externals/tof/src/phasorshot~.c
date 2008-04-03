@@ -100,11 +100,8 @@ void phasorshot_tick(t_phasorshot *x)
 
     while (n--)
     {
-        //wrap
-        if (x->loop) { 
-          tf.tf_i[HIOFFSET] = normhipart; 
-        } else {
-          if ( tf.tf_d >= UNITBIT32 + 1 ) {
+        // BANG when bounds are reached
+         if ( tf.tf_d >= UNITBIT32 + 1 ) {
             tf.tf_d = UNITBIT32 + 1;
             if (x->state != 1) clock_delay(x->x_clock, 0L);
             x->state = 1;
@@ -112,11 +109,13 @@ void phasorshot_tick(t_phasorshot *x)
             tf.tf_d = UNITBIT32;
             if (x->state != 0) clock_delay(x->x_clock, 0L);
             x->state = 0;
-
           } else {
             x->state = -1;
           }
-        }
+          
+        //wrap
+        if (x->loop)  tf.tf_i[HIOFFSET] = normhipart; 
+    
         dphase += *in++ * conv; //increment
         //dphase = UNITBIT32 + 1; //set to one
         *out++ = tf.tf_d - UNITBIT32;
@@ -126,7 +125,7 @@ void phasorshot_tick(t_phasorshot *x)
     //wrap
         if (x->loop) { 
           tf.tf_i[HIOFFSET] = normhipart; 
-          x->state = -1;
+          //x->state = -1;
         } else {
           if ( tf.tf_d > UNITBIT32 + 1 ) {
             tf.tf_d = UNITBIT32 + 1;
@@ -150,13 +149,15 @@ void phasorshot_tick(t_phasorshot *x)
     if (f < 0) f = 0;
     if (f > 1) f = 1;
     x->x_phase = f;
+    if ( f == 1) x->state = 1;
+    if ( f == 0) x->state = 0;
 
 }
 
  void phasorshot_loop(t_phasorshot *x, t_float f)
 {
     x->loop = f;
-    if (!f) x->state = -1;
+    //if (!f) x->state = -1;
 }
 
 

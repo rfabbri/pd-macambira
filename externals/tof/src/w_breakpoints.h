@@ -68,7 +68,7 @@ static void draw_inlets(t_breakpoints *x, t_glist *glist, int firsttime, int nin
 static int breakpoints_next_doodle(t_breakpoints *x, struct _glist *glist,
                               int xpos,int ypos)
 {
-     int ret = -1;
+    // int ret = -1;
      float xscale,yscale;
      int dxpos,dypos;
      float minval = 100000.0;
@@ -311,7 +311,7 @@ void breakpoints_drawme(t_breakpoints *x, t_glist *glist, int firsttime)
 
 void breakpoints_erase(t_breakpoints* x,t_glist* glist)
 {
-     int n;
+     //int n;
      sys_vgui(".x%x.c delete %xS\n",
 	      glist_getcanvas(glist), x);
 
@@ -364,13 +364,14 @@ static void breakpoints_select(t_gobj *z, t_glist *glist, int state)
 	     x, (state? "blue" : BACKGROUNDCOLOR));
 }
 
-
+/* 
 static void breakpoints_activate(t_gobj *z, t_glist *glist, int state)
 {
-/*    t_text *x = (t_text *)z;
+   t_text *x = (t_text *)z;
     t_rtext *y = glist_findrtext(glist, x);
-    if (z->g_pd != gatom_class) rtext_activate(y, state);*/
+    if (z->g_pd != gatom_class) rtext_activate(y, state);
 }
+*/
 
 static void breakpoints_delete(t_gobj *z, t_glist *glist)
 {
