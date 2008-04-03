@@ -7025,7 +7025,7 @@ static void openit(const char *dirname, const char *filename) {
     char *dirbuf;
     char *nameptr;
     int fd = open_via_path2(dirname,filename,"",&dirbuf,&nameptr,0);
-    if (!fd) {error("%s: can't open", filename); return;}
+    if (fd<0) {error("%s: can't open", filename); return;}
     close(fd);
     glob_evalfile(0, gensym(nameptr), gensym(dirbuf));
     free(dirbuf);
