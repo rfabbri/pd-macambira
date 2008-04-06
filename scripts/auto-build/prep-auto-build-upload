@@ -1,24 +1,33 @@
 #!/bin/sh
+
 # prepare a directory per date for the auto-builders to upload to
 
-# the source dir where this script is
-SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
-. $SCRIPT_DIR/auto-build-common
-
-# the name of this script
+HOSTNAME=`hostname`
+SYSTEM=`uname -s`
+DATE=`date +%Y-%m-%d`
+TIME=`date +%H.%M.%S`
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
 LOGFILE=/home/pd/logs/${DATE}_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
 
-BUILD_ROOT="/var/www/auto-build"
-TODAYS_ROOT="${BUILD_ROOT}/${DATE}"
+#BUILD_ROOT="/var/www/auto-build"
 
-chown -R root.root "${BUILD_ROOT}"        >> $LOGFILE 2>&1
-mkdir "${TODAYS_ROOT}"                    >> $LOGFILE 2>&1
-mkdir "${TODAYS_ROOT}/logs"               >> $LOGFILE 2>&1
-chown -R nobody.nogroup "${TODAYS_ROOT}"  >> $LOGFILE 2>&1
+prep_project()
+{
+	 PROJECT=$1
+	 BUILD_ROOT="$2"
+	 TODAYS_ROOT="${BUILD_ROOT}/${DATE}"
+	 chown -R root.root "${BUILD_ROOT}"        >> $LOGFILE 2>&1
+	 mkdir "${TODAYS_ROOT}"                    >> $LOGFILE 2>&1
+	 mkdir "${TODAYS_ROOT}/logs"               >> $LOGFILE 2>&1
+	 chown -R nobody.nogroup "${TODAYS_ROOT}"  >> $LOGFILE 2>&1
+	 
+	 rm -f -- ${BUILD_ROOT}/latest             >> $LOGFILE 2>&1
+	 ln -s ${TODAYS_ROOT} ${BUILD_ROOT}/latest >> $LOGFILE 2>&1
+	 
+	 chown -R ${PROJECT}.${PROJECT} /home/${PROJECT}/  >> $LOGFILE 2>&1
+	 chmod -R u+rw /home/${PROJECT}/                   >> $LOGFILE 2>&1
+}
 
-rm -f -- ${BUILD_ROOT}/latest             >> $LOGFILE 2>&1
-ln -s ${TODAYS_ROOT} ${BUILD_ROOT}/latest >> $LOGFILE 2>&1
 
-chown -R pd.pd /home/pd/                  >> $LOGFILE 2>&1
-chmod -R u+rw /home/pd/                   >> $LOGFILE 2>&1
+prep_project pd /var/www/auto-build
+prep_project arduino /var/www/arduino
