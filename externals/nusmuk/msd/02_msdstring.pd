@@ -245,34 +245,41 @@
 #X connect 13 0 4 0;
 #X connect 14 0 4 0;
 #X restore 24 165 pd compute;
-#X obj 24 143 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 24 143 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X obj 307 151 hsl 128 15 0 30 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 1;
+-1 -1 6500 1;
 #X text 303 134 Amortissement general;
 #X obj 307 93 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
 #N canvas 0 22 611 439 milieu 0;
-#X obj 174 107 / 120;
+#X obj 174 147 / 120;
 #X obj 174 84 inlet;
-#X msg 173 258 forceX \$1 \$2;
-#X msg 174 135 41 \$1 \, 42 \$1;
-#X obj 191 161 / 1.5;
-#X msg 191 185 39 \$1 \, 40 \$1 \, 43 \$1 \, 44 \$1;
-#X msg 206 231 36 \$1 \, 37 \$1 \, 38 \$1 \, 45 \$1 \, 46 \$1 \, 47
+#X msg 173 298 forceX \$1 \$2;
+#X msg 174 175 41 \$1 \, 42 \$1;
+#X obj 191 201 / 1.5;
+#X msg 191 225 39 \$1 \, 40 \$1 \, 43 \$1 \, 44 \$1;
+#X msg 206 271 36 \$1 \, 37 \$1 \, 38 \$1 \, 45 \$1 \, 46 \$1 \, 47
 \$1;
-#X obj 206 207 / 3;
-#X obj 173 286 s \$0-msdin;
+#X obj 206 247 / 3;
+#X obj 173 326 s \$0-msdin;
+#X obj 398 76 t f f;
+#X obj 401 107 -;
+#X obj 400 131 * 10;
 #X connect 0 0 3 0;
 #X connect 0 0 4 0;
 #X connect 0 0 7 0;
-#X connect 1 0 0 0;
+#X connect 1 0 9 0;
 #X connect 2 0 8 0;
 #X connect 3 0 2 0;
 #X connect 4 0 5 0;
 #X connect 5 0 2 0;
 #X connect 6 0 2 0;
 #X connect 7 0 6 0;
+#X connect 9 0 10 1;
+#X connect 9 1 10 0;
+#X connect 10 0 11 0;
+#X connect 11 0 0 0;
 #X restore 304 116 pd milieu;
 #N canvas 0 22 450 300 gem 0;
 #X obj 179 135 gemwin;
@@ -299,7 +306,7 @@
 #X connect 2 0 0 0;
 #X restore 304 56 pd forces;
 #X obj 307 34 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 1;
+-1 -1 2300 1;
 #N canvas 0 22 450 300 general_damping 0;
 #X msg 172 143 setD D2 \$1;
 #X obj 172 121 / 5;
