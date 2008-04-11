@@ -18,10 +18,10 @@ run_build_script ()
 {
 	 distro=$1
 
-	 LOGFILE=/home/pd/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${SCRIPT}.txt
+	 LOGFILE=${HOME}/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${SCRIPT}.txt
 	 touch ${LOGFILE} 
 
-	 sh /home/pd/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh >> $LOGFILE 2>&1
+	 sh ${HOME}/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh >> $LOGFILE 2>&1
 
 	 case $SYSTEM in 
 		  mingw*)
@@ -43,7 +43,7 @@ run_build_script ()
 	 fi
 }
 
-for dir in /home/pd/auto-build/*; do 
+for dir in ${HOME}/auto-build/*; do 
 	 dirname=`echo $dir | sed 's|.*/\(.*\)|\1|'`
 	 test -e $dir/scripts/auto-build/${dirname}-auto-builder.sh && \
 		  run_build_script $dirname
