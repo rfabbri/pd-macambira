@@ -43,14 +43,6 @@ run_build_script ()
 	 fi
 }
 
-# temporary hack to update Mac OS X Fink builds
-case $SYSTEM in 
-	 darwin)
-		  echo "Updating Fink on Mac OS X"
-		  fink -y update-all
-		  ;;
-esac
-
 for dir in ${HOME}/auto-build/*; do 
 	 dirname=`echo $dir | sed 's|.*/\(.*\)|\1|'`
 	 test -e $dir/scripts/auto-build/${dirname}-auto-builder.sh && \
