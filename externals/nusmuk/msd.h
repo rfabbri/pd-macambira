@@ -1171,7 +1171,59 @@ protected:
 				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
 		}
 	}
+	
+	// set max lenght of link(s) named Id or number No
+	void m_setLmax(int argc,t_atom *argv) 
+	{
+		if (argc != 2) {
+			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
+			return;
+		}
 
+		const t_float lon = GetAFloat(argv[1]);
+
+		if(IsSymbol(argv[0])) {
+			typename IDMap<t_link *>::iterator it;
+			for(it = linkids.find(GetSymbol(argv[0])); it; ++it) {
+				it.data()->long_max = lon;
+			}
+		}
+		else	{
+			t_link *l = link.find(GetAInt(argv[0]));
+			if(l) {
+				l->long_max = lon;
+			}
+			else
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+		}
+	}
+
+	// set min lenght of link(s) named Id or number No
+	void m_setLmin(int argc,t_atom *argv) 
+	{
+		if (argc != 2) {
+			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
+			return;
+		}
+
+		const t_float lon = GetAFloat(argv[1]);
+
+		if(IsSymbol(argv[0])) {
+			typename IDMap<t_link *>::iterator it;
+			for(it = linkids.find(GetSymbol(argv[0])); it; ++it) {
+				it.data()->long_min = lon;
+			}
+		}
+		else	{
+			t_link *l = link.find(GetAInt(argv[0]));
+			if(l) {
+				l->long_min = lon;
+			}
+			else
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+		}
+	}
+	
 	// set initial lenght of link(s) named Id or number No
 	void m_setL(int argc,t_atom *argv) 
 	{
@@ -1892,6 +1944,8 @@ private:
 		FLEXT_CADDMETHOD_(c,0,"setK",m_setK);
 		FLEXT_CADDMETHOD_(c,0,"setD",m_setD);
 		FLEXT_CADDMETHOD_(c,0,"setL",m_setL);
+		FLEXT_CADDMETHOD_(c,0,"setLMin",m_setLmin);
+		FLEXT_CADDMETHOD_(c,0,"setLMax",m_setLmax);
 		FLEXT_CADDMETHOD_(c,0,"setM",m_setM);
 		FLEXT_CADDMETHOD_(c,0,"setD2",m_setD2);
 		FLEXT_CADDMETHOD_(c,0,"mass",m_mass);
@@ -1943,6 +1997,8 @@ private:
 	FLEXT_CALLBACK_V(m_setK)
 	FLEXT_CALLBACK_V(m_setD)
 	FLEXT_CALLBACK_V(m_setL)
+	FLEXT_CALLBACK_V(m_setLmin)
+	FLEXT_CALLBACK_V(m_setLmax)
 	FLEXT_CALLBACK_V(m_setM)
 	FLEXT_CALLBACK_V(m_setD2)
 	FLEXT_CALLBACK_V(m_get)
