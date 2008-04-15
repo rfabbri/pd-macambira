@@ -72,10 +72,10 @@ upload_build ()
 	 case $SYSTEM in 
 		  mingw*)
 				if [ -e ${archive} ]; then
-					 /c/cygwin/bin/sh --login -c \
+					 /c/cygwin/bin/sh -c \
 						  "rsync -a ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}" && \
 						  md5sum ${archive} > ${archive}.md5 && \
-						  /c/cygwin/bin/sh --login -c \
+						  /c/cygwin/bin/sh -c \
 						  "rsync -a ${archive}.md5 rsync://128.238.56.50/upload/${DATE}/${upload_filename}.md5" && \
 						  echo SUCCESS
 				fi
