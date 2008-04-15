@@ -1,0 +1,87 @@
+Index: s_audio_jack.c
+===================================================================
+--- s_audio_jack.c	(Revision 9698)
++++ s_audio_jack.c	(Arbeitskopie)
+@@ -13,7 +13,7 @@
+ 
+ 
+ #define MAX_CLIENTS 100
+-#define NUM_JACK_PORTS 32
++#define NUM_JACK_PORTS 1024
+ #define BUF_JACK 4096
+ static jack_nframes_t jack_out_max;
+ #define JACK_OUT_MAX  64
+@@ -100,8 +100,9 @@
+ static void
+ jack_shutdown (void *arg)
+ {
+-        /* Ignore for now */
+-  //    exit (1);
++  fprintf(stderr, "jack: JACK server shut down\n");
++  sys_close_audio();
++  jack_client = NULL;
+ }
+ 
+ static int jack_xrun(void* arg) {
+@@ -228,6 +229,7 @@
+         int client_iterator = 0;
+         int new_jack = 0;
+         int srate;
++        jack_status_t status;
+ 
+         jack_dio_error = 0;
+         
+@@ -243,13 +245,28 @@
+                 inchans = NUM_JACK_PORTS;
+         }
+ 
+-        /* try to become a client of the JACK server (we allow two pd's)*/
++        /* try to become a client of the JACK server */
++        /* if no JACK server exists, start a default one (jack_client_open() does that for us... */
+         if (!jack_client) {
+           do {
+             sprintf(port_name,"pure_data_%d",client_iterator);
+             client_iterator++;
+-          } while (((jack_client = jack_client_new (port_name)) == 0) && client_iterator < 2);
+-        
++
++            jack_client = jack_client_open (port_name, JackNullOption, &status, NULL);
++            if (status & JackServerFailed) {
++              fprintf(stderr,"unable to connect to JACK server\n");
++              jack_client=NULL;
++              break;
++            }
++          } while (status & JackNameNotUnique);
++
++          if(status) {
++            if (status & JackServerStarted) {
++              fprintf(stderr, "started JACK server\n");
++            } else {
++              fprintf(stderr, "jack returned status %d\n", status);
++            }
++          }
+           
+           if (!jack_client) { // jack spits out enough messages already, do not warn
+             sys_inchannels = sys_outchannels = 0;
+@@ -305,11 +322,21 @@
+         for (j = 0; j < inchans; j++) {
+                 sprintf(port_name, "input%d", j);
+                 if (!input_port[j]) input_port[j] = jack_port_register (jack_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
++                if (!input_port[j]) {
++                  fprintf (stderr, "jack: can only register %d input ports (instead of requested %d)\n", j, inchans);
++                  sys_inchannels = inchans = j;
++                  break;
++                }
+         }
+ 
+         for (j = 0; j < outchans; j++) {
+                 sprintf(port_name, "output%d", j);
+                 if (!output_port[j]) output_port[j] = jack_port_register (jack_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
++                if (!output_port[j]) {
++                  fprintf (stderr, "jack: can only register %d output ports (instead of requested %d)\n", j, outchans);
++                  sys_outchannels = outchans = j;
++                  break;
++                }
+         } 
+         outport_count = outchans;
+ 
