@@ -41,7 +41,7 @@ echo "root: $auto_build_root_dir"
 # let rsync handle the cleanup with --delete
 case $SYSTEM in
 	mingw*)
-		/c/cygwin/bin/sh --login -c \
+		/c/cygwin/bin/sh -c \
 			"rsync -a --delete rsync://128.238.56.50/distros/pd-extended/ ${auto_build_root_dir}/"
 		;;
 	*)
