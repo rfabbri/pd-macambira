@@ -64,7 +64,7 @@ upload_build ()
     build_folder=$2
     archive_format=$3
 
-	 archive="${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format}"
+	archive=`ls -1 ${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format} | tail -1`
     
     echo "upload specs $1 $2 $3"
     echo "Uploading $archive"
