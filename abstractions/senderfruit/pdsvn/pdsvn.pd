@@ -4,8 +4,8 @@
 #X obj 425 103 list append;
 #X obj 405 21 loadbang;
 #X obj 425 128 list2symbol /;
-#X obj 43 14 cnv 16 60 16 empty \$0svndisplay Zen 3 9 0 8 -228992 -1
-0;
+#X obj 43 14 cnv 16 60 16 empty \$0svndisplay Modified 3 9 0 8 -24198
+-1 0;
 #X obj 20 156 list;
 #X obj 41 131 r \$0parentFile;
 #X obj 20 201 list trim;
@@ -81,7 +81,7 @@
 #X msg 627 284 capture 1;
 #X obj 669 334 route menusave;
 #X obj 627 258 loadbang;
-#X obj 50 35 bng 12 250 50 0 \$0add \$0addR Add 14 7 0 8 -155243 -1
+#X obj 50 35 bng 12 250 50 0 0nullS \$0addR ... 14 7 0 8 -262144 -1
 -1;
 #X obj 13 13 bng 16 250 50 0 \$0status \$0statusR st 18 9 0 8 -262144
 -1 -1;
@@ -702,12 +702,16 @@ object...;
 #X obj 631 208 s \$0status;
 #X obj 631 168 t b a;
 #X obj 238 139 popen;
-#X obj 56 638 s \$0addR;
-#X msg 21 583 pos 50 35;
-#X msg 91 583 pos 150 35;
+#X obj 21 668 s \$0addR;
 #X obj 27 365 s \$0addable?;
 #X obj 21 553 sel ?;
 #X obj 21 532 r \$0addable?;
+#X obj 21 572 \$0;
+#X obj 48 632 \$0;
+#X obj 48 612 t b;
+#X msg 21 592 send \$1add \, color -9.69207e+06 -1 -1 \, label Add
+;
+#X msg 48 651 send \$1nullS \, color 0 -1 -1 \, label ...;
 #X connect 0 0 2 1;
 #X connect 1 0 2 0;
 #X connect 2 0 4 0;
@@ -717,7 +721,7 @@ object...;
 #X connect 7 0 6 1;
 #X connect 8 0 317 0;
 #X connect 9 0 31 0;
-#X connect 9 0 348 0;
+#X connect 9 0 346 0;
 #X connect 13 0 17 0;
 #X connect 14 0 13 1;
 #X connect 15 0 344 0;
@@ -787,9 +791,12 @@ object...;
 #X connect 343 0 342 0;
 #X connect 343 1 308 0;
 #X connect 344 0 18 0;
-#X connect 346 0 345 0;
-#X connect 347 0 345 0;
-#X connect 349 0 346 0;
-#X connect 349 1 347 0;
-#X connect 350 0 349 0;
+#X connect 347 0 349 0;
+#X connect 347 1 351 0;
+#X connect 348 0 347 0;
+#X connect 349 0 352 0;
+#X connect 350 0 353 0;
+#X connect 351 0 350 0;
+#X connect 352 0 345 0;
+#X connect 353 0 345 0;
 #X coords 0 -1 1 1 96 40 2 10 10;
