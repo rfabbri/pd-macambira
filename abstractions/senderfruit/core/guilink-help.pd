@@ -1,0 +1,15 @@
+#N canvas 36 238 450 300 10;
+#X obj 54 95 guilink \$0 frequency;
+#X obj 241 61 vsl 15 128 1 20000 1 0 \$0frequency \$0frequencyR empty
+0 -9 0 10 -203904 -1 -1 0 1;
+#X obj 269 114 nbx 5 14 1 20000 1 0 \$0frequencyD \$0frequencyDR empty
+0 -8 0 10 -203904 -1 -1 1 256;
+#X text 18 9 guilink: link two gui elements so that they reflect each
+other's settings;
+#X obj 71 146 r \$0parameter;
+#X floatatom 71 177 6 0 0 0 - - -;
+#X text 14 217 Uses a uniform naming scheme. The "master" control is
+uses \$0parameter as its sendname and \$0parameterR as its receivename.
+The "slave" control uses \$0parameterD (for Display) as its sendname
+and \$0paramterDR for its receivename;
+#X connect 4 0 5 0;
