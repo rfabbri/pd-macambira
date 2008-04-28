@@ -13,7 +13,7 @@ AppPublisherURL=http://puredata.org
 AppSupportURL=http://puredata.org/community/lists/
 AppUpdatesURL=http://puredata.org/downloads/
 DefaultDirName={pf}\pd
-DefaultGroupName=Pure Data
+DefaultGroupName=Pd-extended
 LicenseFile=..\..\externals\maxlib\LICENSE
 
 Compression=lzma/ultra
@@ -32,11 +32,11 @@ Name: libs; Description: Reset Libraries and Paths
 Filename: {app}\pd.url; Section: InternetShortcut; Key: URL; String: http://puredata.org
 
 [Icons]
-Name: {group}\Pure Data; Filename: {app}\bin\pd.exe; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
+Name: {group}\Pd-extended; Filename: {app}\bin\pd.exe; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
 Name: {group}\puredata.org; Filename: {app}\pd.url
-Name: {group}\Uninstall Pure Data; Filename: {uninstallexe}
-Name: {userdesktop}\Pure Data; Filename: {app}\bin\pd.exe; Tasks: desktopicon; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Pure Data; Filename: {app}\bin\pd.exe; Tasks: quicklaunchicon; WorkingDir: {app}; IconFilename: {app}\lib\pd.ico; IconIndex: 0
+Name: {group}\Uninstall Pd-extended; Filename: {uninstallexe}
+Name: {userdesktop}\Pd-extended; Filename: {app}\bin\pd.exe; Tasks: desktopicon; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Pd-extended; Filename: {app}\bin\pd.exe; Tasks: quicklaunchicon; WorkingDir: {app}; IconFilename: {app}\lib\pd.ico; IconIndex: 0
 Name: {group}\Documentation\Pd Manual; Filename: {app}\doc\1.manual\index.htm
 Name: {group}\Documentation\Pd Drums Tutorial; Filename: {app}\doc\tutorials\footils\pddrums\pddrums.html
 Name: {group}\Documentation\Gem Manual; Filename: {app}\doc\gem\00.manual\index.html
@@ -50,7 +50,7 @@ Name: {group}\GrIPD; Filename: {app}\gripd\gripd.exe
 
 ;[Run]
 ; NOTE: The following entry contains an English phrase ("Launch"). You are free to translate it into another language if required.
-;Filename: {app}\bin\pd.exe; Description: Launch Pure Data; Flags: nowait postinstall skipifsilent
+;Filename: {app}\bin\pd.exe; Description: Launch Pd-extended; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
 Type: files; Name: {app}\pd.url
