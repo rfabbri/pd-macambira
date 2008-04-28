@@ -1,0 +1,47 @@
+Index: m_glob.c
+===================================================================
+--- m_glob.c	(revision 9721)
++++ m_glob.c	(working copy)
+@@ -11,7 +11,7 @@
+ /* These "glob" routines, which implement messages to Pd, are from all
+ over.  Some others are prototyped in m_imp.h as well. */
+ 
+-void glob_setfilename(void *dummy, t_symbol *name, t_symbol *dir);
++void glob_setfilename_gimme(void *dummy, t_symbol *s, int argc, t_atom *argv);
+ void glob_verifyquit(void *dummy, t_floatarg f);
+ void glob_dsp(void *dummy, t_symbol *s, int argc, t_atom *argv);
+ void glob_meters(void *dummy, t_floatarg f);
+@@ -74,8 +74,8 @@
+         CLASS_DEFAULT, A_NULL);
+     class_addmethod(glob_pdobject, (t_method)glob_initfromgui, gensym("init"),
+         A_GIMME, 0);
+-    class_addmethod(glob_pdobject, (t_method)glob_setfilename, gensym("filename"),
+-        A_SYMBOL, A_SYMBOL, 0);
++    class_addmethod(glob_pdobject, (t_method)glob_setfilename_gimme, 
++        gensym("filename"), A_GIMME, 0);
+     class_addmethod(glob_pdobject, (t_method)glob_evalfile, gensym("open"),
+         A_SYMBOL, A_SYMBOL, 0);
+     class_addmethod(glob_pdobject, (t_method)glob_quit, gensym("quit"), 0);
+Index: g_canvas.c
+===================================================================
+--- g_canvas.c	(revision 9726)
++++ g_canvas.c	(working copy)
+@@ -138,6 +138,18 @@
+     canvas_newdirectory = dirsym;
+ }
+ 
++void glob_setfilename_gimme(void *dummy, t_symbol *s, int argc, t_atom *argv)
++{
++    int bufsize;
++    char *buf;
++    t_binbuf *b = binbuf_new();
++    canvas_newfilename = atom_getsymbolarg(0, argc, argv);
++    binbuf_add(b, argc - 1, argv + 1);
++    binbuf_gettext(b, &buf, &bufsize);
++    buf[bufsize] = 0;
++    canvas_newdirectory = gensym(buf);
++}
++
+ t_canvas *canvas_getcurrent(void)
+ {
+     return ((t_canvas *)pd_findbyclass(&s__X, canvas_class));
