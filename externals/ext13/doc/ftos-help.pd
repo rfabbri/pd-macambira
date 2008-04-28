@@ -1,0 +1,12 @@
+#N canvas 161 221 450 300 10;
+#X obj 174 130 ftos;
+#X msg 180 68 bang;
+#X floatatom 106 63 5 0 0 0 - - -;
+#X symbolatom 174 173 10 0 0 0 - - -;
+#X text 118 30 convert a float to a symbol;
+#X obj 160 203 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X connect 0 0 3 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 5 0;
