@@ -1,0 +1,76 @@
+Index: g_editor.c
+===================================================================
+--- g_editor.c	(revision 9725)
++++ g_editor.c	(working copy)
+@@ -1343,6 +1343,7 @@
+                     glist_getcanvas(x),
+                         lx1, ly1, lx2, ly2,
+                             (obj_issignaloutlet(ob1, closest1) ? 2 : 1), oc);
++                canvas_dirty(x, 1);
+                 canvas_setundo(x, canvas_undo_connect,
+                     canvas_undo_set_connect(x, 
+                         canvas_getindex(x, &ob1->ob_g), closest1,
+@@ -1990,6 +1991,7 @@
+              x->gl_editor->e_selectline_outno,
+              x->gl_editor->e_selectline_index2,
+              x->gl_editor->e_selectline_inno);
++        canvas_dirty(x, 1);
+         canvas_setundo(x, canvas_undo_disconnect,
+             canvas_undo_set_disconnect(x,
+                 x->gl_editor->e_selectline_index1,
+Index: g_editor.c
+===================================================================
+--- g_editor.c	(revision 9733)
++++ g_editor.c	(working copy)
+@@ -963,6 +963,7 @@
+     }
+         /* LATER avoid doing 2 redraws here (possibly one inside setgraph) */
+     canvas_setgraph(x, graphme, 0);
++    canvas_dirty(x, 1);
+     if (x->gl_havewindow)
+         canvas_redraw(x);
+     else if (glist_isvisible(x->gl_owner))
+Index: g_all_guis.c
+===================================================================
+--- g_all_guis.c	(revision 9721)
++++ g_all_guis.c	(working copy)
+@@ -633,6 +633,7 @@
+         fs = 4;
+     iemgui->x_fontsize = fs;
+     iemgui_verify_snd_ne_rcv(iemgui);
++    canvas_dirty(iemgui->x_glist, 1);
+     return(oldsndrcvable);
+ }
+ 
+Index: g_text.c
+===================================================================
+--- g_text.c	(revision 9721)
++++ g_text.c	(working copy)
+@@ -760,6 +760,7 @@
+     x->a_symto = symto;
+     x->a_expanded_to = canvas_realizedollar(x->a_glist, x->a_symto);
+     gobj_vis(&x->a_text.te_g, x->a_glist, 1);
++    canvas_dirty(x->a_glist, 1);
+ 
+     /* glist_retext(x->a_glist, &x->a_text); */
+ }
+Index: g_array.c
+===================================================================
+--- g_array.c	(revision 9721)
++++ g_array.c	(working copy)
+@@ -385,6 +385,7 @@
+         gl = glist_addglist(parent, &s_, 0, 1,
+             (size > 1 ? size-1 : size), -1, 0, 0, 0, 0);
+     a = graph_array(gl, sharptodollar(name), &s_float, size, flags);
++    canvas_dirty(parent, 1);
+ }
+ 
+     /* this is called from the properties dialog window for an existing array */
+@@ -453,6 +454,7 @@
+ 
+         garray_setsaveit(x, (saveit != 0));
+         garray_redraw(x);
++        canvas_dirty(x->x_glist, 1);
+     }
+ }
+ 
