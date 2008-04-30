@@ -39,7 +39,7 @@ TARGETS = $(SOURCES:.c=.pd_linux)
 
 .SUFFIXES: .pd_linux
 
-LINUXCFLAGS = -DUNIX -DPD -O2 -funroll-loops -fomit-frame-pointer \
+LINUXCFLAGS = -DUNIX -DPD -O2 -funroll-loops -fomit-frame-pointer -fPIC \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch
 
