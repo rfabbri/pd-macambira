@@ -1,7 +1,7 @@
-#N canvas 479 25 563 764 10;
+#N canvas 244 22 563 764 10;
 #X obj 4 369 cnv 15 550 15 empty empty empty 20 12 0 14 -158509 -66577
 0;
-#X obj 5 779 cnv 15 550 30 empty empty empty 20 12 0 14 -158509 -66577
+#X obj 5 729 cnv 15 550 30 empty empty empty 20 12 0 14 -158509 -66577
 0;
 #X obj 8 6 cnv 15 550 30 empty empty empty 20 12 0 14 -233017 -66577
 0;
@@ -15,9 +15,9 @@
 0;
 #X obj 7 76 cnv 15 550 15 empty empty empty 20 12 0 14 -158509 -66577
 0;
-#X obj 5 729 cnv 15 550 15 empty empty empty 20 12 0 14 -158509 -66577
+#X obj 5 679 cnv 15 550 15 empty empty empty 20 12 0 14 -158509 -66577
 0;
-#X obj 5 749 cnv 15 550 30 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 5 699 cnv 15 550 30 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #N canvas 76 31 777 741 More_Info 0;
 #X text 94 17 MSD : mass - spring - damper model;
@@ -37,7 +37,7 @@ of creation number \, the masses linked are defined with their Id.
 -1;
 #X obj 449 277 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#N canvas 0 0 450 300 (subpatch) 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array rigidity1 4 float 1;
 #A 0 -1 0 1 2;
 #X array zero 4 float 1;
@@ -126,7 +126,7 @@ yticks 0 0.2 5;
 #X connect 29 0 25 0;
 #X restore 430 703 pd figure;
 #X text 121 318 Rigidity;
-#N canvas 0 0 450 300 (subpatch) 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array rigidity2 23 float 1;
 #A 0 0 0 -2.5 -2.34 -2.167 -2 -1.833 -1.667 -1.5 0 0 0 0 0 1.5 1.667
 1.833 2 2.167 2.34 2.5 0 0;
@@ -138,7 +138,7 @@ yticks 0 0.2 5;
 #X text 117 532 Rigidity with Lmin and Lmax;
 #X text 220 710 Lmin;
 #X text 282 711 Lmax;
-#N canvas 0 0 450 300 (subpatch) 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array rigidity3 51 float 1;
 #A 0 -4.47214 -4.3589 -4.24264 -4.12311 -4 -3.87298 -3.74166 -3.60555
 -3.4641 -3.31662 -3.16228 -3 -2.82843 -2.64575 -2.44949 -2.23607 -2
@@ -153,7 +153,7 @@ yticks 0 0.2 5;
 #X restore 557 346 graph;
 #X text 630 499 L0;
 #X text 562 325 Rigidity with power = 1/2;
-#N canvas 0 0 450 300 (subpatch) 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array rigidity4 51 float 1;
 #A 0 -400 -361 -324 -289 -256 -225 -196 -169 -144 -121 -100 -81 -64
 -49 -36 -25 -16 -9 -4 -1 0 1 4 9 16 25 36 49 64 81 100 121 144 169
@@ -177,13 +177,13 @@ parameters : length \, rigidity \, damping and power.;
 message. The lenght is initialised to the distance between the two
 masses at the creation.;
 #X connect 5 0 6 0;
-#X restore 16 785 pd More_Info;
+#X restore 16 735 pd More_Info;
 #X text 12 76 Examples:;
 #X text 9 369 Inlets:;
 #X text 19 388 - Left:;
 #X text 10 526 Arguments:;
 #X text 11 562 Outlets:;
-#X text 19 729 See Also:;
+#X text 19 679 See Also:;
 #X text 74 48 Full Name:;
 #N canvas 58 22 262 70 Related_Objects 0;
 #X obj 3 10 cnv 15 250 15 empty empty empty 20 12 0 14 -158509 -66577
@@ -193,12 +193,12 @@ masses at the creation.;
 #X text 5 10 Externals and libraries;
 #X obj 44 37 msd2D;
 #X obj 140 37 msd3D;
-#X restore 122 785 pd Related_Objects;
+#X restore 122 735 pd Related_Objects;
 #X text 12 8 HELP: msd;
 #X obj 157 48 msd;
 #X text 12 18 DESCRIPTION: Mass spring damper physical modeling in
 1D.;
-#X obj 18 296 msd;
+#X obj 17 319 msd;
 #N canvas 541 387 524 302 init 0;
 #X msg 89 187 Xmax 127 \, Xmin 0;
 #X obj 89 215 t a;
@@ -226,8 +226,8 @@ souple 3 2 1 0.5;
 #X connect 8 0 1 0;
 #X connect 9 0 1 0;
 #X restore 17 156 pd init;
-#X obj 18 321 s \$0-out;
-#X obj 18 272 r \$0-in;
+#X obj 17 344 s \$0-out;
+#X obj 17 295 r \$0-in;
 #X obj 261 184 vsl 15 127 0 127 0 0 empty empty Drag-----> -70 60 1
 10 -262144 -1 -1 0 1;
 #X obj 292 184 vsl 15 127 0 127 0 0 empty empty empty 0 -8 0 8 -262144
@@ -242,11 +242,11 @@ souple 3 2 1 0.5;
 #X connect 0 0 1 0;
 #X connect 1 0 3 0;
 #X connect 3 0 2 0;
-#X restore 17 208 pd compute;
-#X obj 17 181 tgl 20 0 empty empty ON/OFF 25 10 1 10 -262144 -1 -1
+#X restore 17 194 pd compute;
+#X obj 17 177 tgl 15 0 empty empty ON/OFF 25 10 1 10 -262144 -1 -1
 0 1;
 #X obj 261 107 r \$0-out;
-#X obj 17 126 bng 20 250 50 0 empty empty Reset 25 10 1 10 -262144
+#X obj 17 139 bng 15 250 50 0 empty empty reset 25 10 1 10 -262144
 -1 -1;
 #X obj 261 131 route massesPosL;
 #X obj 311 184 vsl 15 127 0 127 0 0 empty empty empty 0 -8 0 8 -262144
@@ -319,7 +319,7 @@ are send or with the special message [infosL( which dump the complete
 state of the model.;
 #X text 101 420 Messages - Different messages are used to control the
 msd object. They are of three types :;
-#X text 9 751 CATEGORY: control;
+#X text 9 701 CATEGORY: control;
 #N canvas 475 181 557 516 dynamic 0;
 #X obj 5 3 cnv 15 550 15 empty empty empty 20 12 0 14 -233017 -66577
 0;
@@ -365,7 +365,7 @@ msd object. They are of three types :;
 #X text 10 25 Dynamic settings messages allows the user to redefine
 internal parameters of links and masses.;
 #X restore 12 478 pd dynamic settings;
-#N canvas 191 75 634 669 attributes______ 1;
+#N canvas 191 75 634 669 attributes______ 0;
 #X obj 11 95 cnv 15 100 35 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X obj 5 75 cnv 15 590 15 empty empty empty 20 12 0 14 -158509 -66577
@@ -421,9 +421,9 @@ massesSpeeds / massesSpeedsName / massesForces / massesForces / linksPos
 #X text 336 626 [massesPosName name_1 x1(;
 #X text 336 611 [massesPosName name_2 x2(;
 #X restore 12 499 pd attributes______;
-#X text 9 761 KEYWORDS: physical model mass spring damper link;
-#X text 267 786 - Nicolas Montgermont \, May 12 \, 2005;
-#X text 111 729 01_msdtest.pd;
+#X text 9 711 KEYWORDS: physical model mass spring damper link;
+#X text 267 736 - Nicolas Montgermont \, May 12 \, 2005;
+#X text 111 679 01_msdtest.pd;
 #X connect 22 0 24 0;
 #X connect 25 0 22 0;
 #X connect 26 0 29 0;
