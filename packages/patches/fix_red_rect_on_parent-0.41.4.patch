@@ -1,0 +1,11 @@
+--- pd2patch-orig/g_graph.c	2008-03-15 01:03:00.000000000 +0100
++++ pd2patch-leben/g_graph.c	2008-04-29 01:53:17.000000000 +0200
+@@ -43,7 +43,7 @@
+         && pd_checkobject(&y->g_pd))
+     {
+         x->gl_goprect = 1;
+-        canvas_drawredrect(x, 1);
++        if(x->gl_havewindow) canvas_drawredrect(x, 1);
+     }
+     if (glist_isvisible(x))
+         gobj_vis(y, x, 1);
