@@ -104,8 +104,8 @@ tests:  all
 install: install-bin install-doc install-abs
 
 install-bin:
-	-install -d $(INSTALL_BIN)
-	-install -m 644 $(LIBRARY_NAME).$(EXT) $(INSTALL_BIN)
+	-install -d $(INSTALL_DOC)
+	-install -m 644 $(LIBRARY_NAME).$(EXT) $(INSTALL_DOC)
 
 install-doc:
 	-install -d $(INSTALL_DOC)
