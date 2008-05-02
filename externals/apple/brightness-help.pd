@@ -50,9 +50,8 @@
 #X msg 197 39 bang;
 #X floatatom 197 153 5 0 0 0 - - -;
 #X obj 216 73 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 2100 1;
+-1 -1 0 1;
 #X floatatom 229 97 5 0 0 0 - - -;
-#X obj 197 122 brightness;
 #X text 15 6 description: query and control screen brightness on Apples
 ;
 #X obj 426 -14 apple/brightness;
@@ -63,7 +62,8 @@
 #X text 102 208 BANG - output current screen brightness;
 #X text 102 228 FLOAT - set the screen brightness (between 0 and 1)
 ;
-#X connect 10 0 14 0;
+#X obj 197 122 apple/brightness;
+#X connect 10 0 20 0;
 #X connect 12 0 13 0;
-#X connect 12 0 14 0;
-#X connect 14 0 11 0;
+#X connect 12 0 20 0;
+#X connect 20 0 11 0;
