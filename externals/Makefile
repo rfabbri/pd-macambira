@@ -1564,7 +1564,7 @@ mapping_install: mapping
 	install -d $(readmesdir)
 	install -p $(externals_src)/mapping/README.txt \
 		$(readmesdir)/$(MAPPING_NAME).txt
-	install -d $(examplesdir)/$(MAPPING_NAME)
+#	install -d $(examplesdir)/$(MAPPING_NAME)
 #	install -p $(externals_src)/mapping/examples/*.pd \
 #		$(examplesdir)/$(MAPPING_NAME)
 
