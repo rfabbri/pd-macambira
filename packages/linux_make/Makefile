@@ -14,9 +14,7 @@ BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 prefix = /usr/local
 
 # generates the dependencies for all externals and pd itself
-PACKAGE_BINARIES := $(shell find $(DESTDIR) \( -name "*.pd_linux" -o -name pd \) )
-PACKAGE_DEPENDS := $(shell dpkg-shlibdeps -O $(PACKAGE_BINARIES) | cut -b0-15 --complement )
-
+PACKAGE_DEPENDS := $(shell find $(DESTDIR) \( -name "*.pd_linux" -or -name pd-gui -or -wholename \*bin/pd \) -print0 | xargs -0 dpkg-shlibdeps -O | cut -b0-15 --complement )
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
@@ -111,15 +109,11 @@ deb: $(bindir)
 		$(packages_src)/linux_make/debian/control
 	sed -i 's|^Architecture:.*|Architecture: $(DEB_BUILD_ARCH)|' \
 		$(packages_src)/linux_make/debian/control
-# add auto-generated dependencies
-	sed -i 's!^Depends:.*!Depends: $(PACKAGE_DEPENDS)!' \
-		$(packages_src)/linux_make/debian/control
-ifeq ($(DEB_BUILD_ARCH),powerpc)
-	sed -i 's|, libavifile-0.7c2||' $(packages_src)/linux_make/debian/control
-endif
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
+# add auto-generated dependencies
+	sed -i 's!^\(Depends:.*\)!\1 $(PACKAGE_DEPENDS)!' $(DESTDIR)/DEBIAN/control
 	fakeroot dpkg-deb --build $(DESTDIR) $(packages_src)/linux_make/$(PACKAGE_NAME).deb
 
 tarbz2: installer_makefile installer_readme
@@ -202,6 +196,8 @@ test_locations:
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
+	@echo --------------------------------------------------
+	@echo "PACKAGE_DEPENDS 	$(PACKAGE_DEPENDS)"
 	@echo --------------------------------------------------
 	autoconf --version
 	@echo --------------------------------------------------

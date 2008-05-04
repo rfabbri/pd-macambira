@@ -1,9 +1,9 @@
 Package: pd-extended
-Version: 
+Version: 0.40.3cvs20080503-1
 Section: sound
 Priority: optional
-Architecture: any
-Depends: xterm | x-terminal-emulator, ttf-bitstream-vera, x-ttcidfont-conf, ${shlibs:Depends}
+Architecture: i386
+Depends: xterm | x-terminal-emulator, ttf-bitstream-vera, x-ttcidfont-conf,
 Replaces: puredata, pd-externals, gem, pd-pdp, pd-zexy
 Conflicts: puredata, pd-externals, gem, pd-pdp, pd-zexy
 Provides: pd
