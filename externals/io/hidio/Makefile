@@ -15,7 +15,7 @@ test_locations:
 
 # for emacs
 etags:
-	etags ../../../pd/src/*.h *.[ch] linux/input.h /usr/include/stdlib.h \
+	etags ../../../pd/src/*.[ch] *.[ch] linux/input.h /usr/include/stdlib.h \
 		/usr/include/time.h /usr/include/stdio.h
 	make etags_`uname -s`
 
