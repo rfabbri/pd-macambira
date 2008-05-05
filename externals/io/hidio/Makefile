@@ -26,6 +26,8 @@ etags_Darwin:
 		/System/Library/Frameworks/CoreServices.framework/Headers/*.h  \
 		/System/Library/Frameworks/IOKit.framework/Headers/*.[ch] \
 		/System/Library/Frameworks/IOKit.framework/Headers/hid*/*.[ch] \
+		/Users/hans/Documents/Research/HID/example\ code/CrossHID/*/*.h \
+		/Users/hans/Documents/Research/HID/example\ code/CrossHID/*/*.cpp \
 		/usr/include/mach/*.h
 
 etags_Linux:

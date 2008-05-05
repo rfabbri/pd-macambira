@@ -98,7 +98,7 @@ static char *convertEventsFromDarwinToLinux(pRecElement element);
 static void convert_axis_to_symbols(pRecElement pCurrentHIDElement, 
 									t_hid_element *new_element, int array_index)
 {
-	if (pCurrentHIDElement->relative) 
+	if (pCurrentHIDElement->relative)
 	{ 
 		new_element->type = ps_relative; 
 		new_element->name = relative_symbols[array_index];
@@ -395,7 +395,7 @@ static void hidio_build_element_list(t_hidio *x)
 	pRecElement pCurrentHIDElement;
 	pRecDevice pCurrentHIDDevice = device_pointer[x->x_device_number];
 	t_hid_element *new_element;
-  
+
 	element_count[x->x_device_number] = 0;
 	if( HIDIsValidDevice(pCurrentHIDDevice) ) 
 	{
@@ -403,8 +403,7 @@ static void hidio_build_element_list(t_hidio *x)
 		 * try queuing the whole device, then removing specific elements from
 		 * the queue */
 		HIDQueueDevice(pCurrentHIDDevice);
-		pCurrentHIDElement = HIDGetFirstDeviceElement( pCurrentHIDDevice,
-													   kHIDElementTypeInput );
+		pCurrentHIDElement = HIDGetFirstDeviceElement( pCurrentHIDDevice, kHIDElementTypeIO );
 
 		/* TODO: axes should be the first elements in the array since they
 		 * produce many more events than buttons.  This will save loop cycles
@@ -476,7 +475,7 @@ static void hidio_build_element_list(t_hidio *x)
 						pCurrentHIDElement->min,pCurrentHIDElement->max);
 			element[x->x_device_number][element_count[x->x_device_number]] = new_element;
 			++element_count[x->x_device_number];
-			pCurrentHIDElement = HIDGetNextDeviceElement(pCurrentHIDElement, kHIDElementTypeInput);
+			pCurrentHIDElement = HIDGetNextDeviceElement(pCurrentHIDElement, kHIDElementTypeIO);
 		}
 	}
 }
@@ -652,7 +651,7 @@ void hidio_platform_specific_info(t_hidio *x)
 
 void hidio_get_events(t_hidio *x)
 {
-	unsigned int       i,j;
+	unsigned int       i;
 	pRecDevice         pCurrentHIDDevice;
 	t_hid_element      *current_element;
 	IOHIDEventStruct   event;
@@ -676,12 +675,13 @@ void hidio_get_events(t_hidio *x)
 //		debug_post(LOG_DEBUG,"output this: %s %s %d prev %d",current_element->type->s_name,
 //			 current_element->name->s_name, current_element->value, 
 //			 current_element->previous_value);
-		timestamp =  * (uint64_t *) &(event.timestamp);
-		difference = calculate_event_latency(timestamp,0);
-		debug_post(LOG_DEBUG,"timestamp: %llu %llu", timestamp, difference);
-		now =  mach_absolute_time();
+		timestamp =  * (uint64_t *) &(event.timestamp);	
 /*
 // temp hack for measuring latency
+        difference = calculate_event_latency(timestamp,0);
+		debug_post(LOG_DEBUG,"timestamp: %llu %llu", timestamp, difference);
+		now =  mach_absolute_time();
+
 		difference = calculate_event_latency(now, timestamp);
 		if( latency_i < LATENCY_MAX)
 		{
@@ -717,7 +717,19 @@ void hidio_write_event(t_hidio *x, t_symbol *type, t_symbol *code,
 					   t_float instance, t_float value)
 {
 	debug_post(LOG_DEBUG,"hidio_write_event");
-	
+	IOHIDEventStruct event;
+    pRecDevice  pCurrentHIDDevice = device_pointer[x->x_device_number];
+	pRecElement elem = HIDGetFirstDeviceElement(pCurrentHIDDevice, kHIDElementTypeOutput);
+    int cookie = (int) instance;
+    while(elem && ((int)elem->cookie != cookie))
+		elem = HIDGetNextDeviceElement(elem, kHIDElementTypeOutput);	
+    
+    post("element usage page and usage: 0x%04x 0x%04x", elem->usagePage, elem->usage);
+	event.elementCookie = (IOHIDElementCookie)cookie;
+	event.value = (SInt32)value;
+    post("elem->cookie, cookie, event.value, value: %d %d %d %f",
+         elem->cookie, cookie, event.value, value);
+	HIDSetElementValue(pCurrentHIDDevice, elem, &event);	
 }
 
 
