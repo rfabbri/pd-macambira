@@ -186,8 +186,12 @@ extern t_int hidio_open_device(t_hidio *x, short device_number);
 extern t_int hidio_close_device(t_hidio *x);
 extern void hidio_build_device_list(void);
 extern void hidio_get_events(t_hidio *x);
-extern void hidio_write_event(t_hidio *x, t_symbol *type, t_symbol *code, 
-							  t_float instance, t_float value);
+extern void hidio_write_event_symbol_int(t_hidio *x, t_symbol *type, t_int code, 
+                                           t_int instance, t_int value);
+extern void hidio_write_event_symbols(t_hidio *x, t_symbol *type, t_symbol *code, 
+                                      t_int instance, t_int value);
+extern void hidio_write_event_ints(t_hidio *x, t_int type, t_int code, 
+                                     t_int instance, t_int value);
 extern void hidio_print(t_hidio* x); /* print info to the console */
 extern void hidio_platform_specific_info(t_hidio *x); /* device info on the status outlet */
 extern void hidio_platform_specific_free(t_hidio *x);

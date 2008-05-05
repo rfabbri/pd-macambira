@@ -713,10 +713,44 @@ void hidio_get_events(t_hidio *x)
 	}
 }
 
-void hidio_write_event(t_hidio *x, t_symbol *type, t_symbol *code, 
-					   t_float instance, t_float value)
+void hidio_write_event_symbol_int(t_hidio *x, t_symbol *type, t_int code, 
+                                    t_int instance, t_int value)
 {
-	debug_post(LOG_DEBUG,"hidio_write_event");
+	debug_post(LOG_DEBUG,"hidio_write_event_symbol_float");
+}
+
+void hidio_write_event_symbols(t_hidio *x, t_symbol *type, t_symbol *code, 
+                              t_int instance, t_int value)
+{
+    /* TODO handle multiple instances of the same usage, i.e. arrays */
+	debug_post(LOG_DEBUG,"hidio_write_event_symbols");
+    int i;
+    t_hid_element *current_element;
+	IOHIDEventStruct event;
+    int cookie = (int) instance;
+    pRecDevice  pCurrentHIDDevice = device_pointer[x->x_device_number];
+    pRecElement pCurrentHIDElement;
+    for(i=0; i<element_count[x->x_device_number]; i++)
+    {
+        current_element = element[x->x_device_number][i];
+        if((current_element->type == type) && (current_element->name == code))
+        {
+            pCurrentHIDElement = current_element->pHIDElement;
+            break;
+        }
+    }
+    post("element usage page and usage: 0x%04x 0x%04x", pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
+	event.elementCookie = (IOHIDElementCookie)pCurrentHIDElement->cookie;
+	event.value = (SInt32)value;
+    post("pCurrentHIDElement->cookie, cookie, event.value, value: %d %d %d %f",
+         pCurrentHIDElement->cookie, cookie, event.value, value);
+	HIDSetElementValue(pCurrentHIDDevice, pCurrentHIDElement, &event);	
+}
+
+void hidio_write_event_ints(t_hidio *x, t_int type, t_int code, 
+                              t_int instance, t_int value)
+{
+	debug_post(LOG_DEBUG,"hidio_write_event_floats");
 	IOHIDEventStruct event;
     pRecDevice  pCurrentHIDDevice = device_pointer[x->x_device_number];
 	pRecElement elem = HIDGetFirstDeviceElement(pCurrentHIDDevice, kHIDElementTypeOutput);

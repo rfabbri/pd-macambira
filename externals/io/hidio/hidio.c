@@ -302,6 +302,45 @@ void hidio_output_event(t_hidio *x, t_hid_element *output_element)
 						output_element->output_message);
 }
 
+void hidio_write_event(t_hidio *x, t_symbol *s, int argc, t_atom *argv)
+{
+    debug_post(LOG_DEBUG,"hidio_write_event_symbols");
+    t_symbol *first_argument;
+	t_symbol *second_argument;
+    
+	if(argc == 4)
+	{
+		first_argument = atom_getsymbolarg(0,argc,argv);
+		if(first_argument == &s_) 
+		{ // first float arg means all float message
+			debug_post(LOG_DEBUG,"first_argument == &s_");
+            hidio_write_event_ints(x, atom_getintarg(0,argc,argv), atom_getintarg(1,argc,argv),
+                                     atom_getintarg(2,argc,argv), atom_getintarg(3,argc,argv));
+		}
+        else
+        {
+            second_argument = atom_getsymbolarg(1,argc,argv);
+            if(second_argument == &s_) 
+            { // symbol page and float usage
+                debug_post(LOG_DEBUG,"second_argument == &s_");
+                hidio_write_event_symbol_int(x, first_argument, 
+                                             atom_getintarg(1,argc,argv),
+                                             atom_getintarg(2,argc,argv), 
+                                             atom_getintarg(3,argc,argv));
+            }
+            else
+            { // symbol page and usage
+                hidio_write_event_symbols(x, first_argument, second_argument,
+                                          atom_getintarg(2,argc,argv), atom_getintarg(3,argc,argv));
+            }
+        }
+        
+    }
+    else  
+    {
+        pd_error(x, "[hidio] write message format not supported");
+    }
+}
 
 /* stop polling the device */
 static void hidio_stop_poll(t_hidio* x) 
@@ -589,8 +628,7 @@ void hidio_setup(void)
 	class_addmethod(hidio_class,(t_method) hidio_poll,gensym("poll"),A_DEFFLOAT,0);
 
 /* test function for output support */
-	class_addmethod(hidio_class,(t_method) hidio_write_event, gensym("write"),
-					A_DEFSYMBOL, A_DEFSYMBOL, A_FLOAT, A_FLOAT ,0);
+	class_addmethod(hidio_class,(t_method) hidio_write_event, gensym("write"), A_GIMME ,0);
 
 
 	post("[hidio] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
