@@ -1,15 +1,16 @@
-Package: pd-extended
-Version: 0.40.3cvs20080503-1
+Source: pd-extended
+Version: 0.40.3cvs20080505-1
 Section: sound
 Priority: optional
+Maintainer: Hans-Christoph Steiner <hans@at.or.at>
+Package: pd-extended
 Architecture: i386
-Depends: xterm | x-terminal-emulator, ttf-bitstream-vera, x-ttcidfont-conf,
+Depends: xterm | x-terminal-emulator, ttf-bitstream-vera, x-ttcidfont-conf, 
 Replaces: puredata, pd-externals, gem, pd-pdp, pd-zexy
-Conflicts: puredata, pd-externals, gem, pd-pdp, pd-zexy
+Conflicts: pd, pd-externals, gem, pd-pdp, pd-zexy
 Provides: pd
 Recommends: liblame0, qjackctl
 Suggests: xmms
-Maintainer: Hans-Christoph Steiner <hans@at.or.at>
 Description: Pure Data with patches and a large collection of externals
  Pd (aka Pure Data) is a real-time graphical programming environment for
  audio, video, and graphical processing. It is the third major branch of the

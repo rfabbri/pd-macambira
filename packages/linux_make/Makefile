@@ -14,7 +14,7 @@ BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 prefix = /usr/local
 
 # generates the dependencies for all externals and pd itself
-PACKAGE_DEPENDS := $(shell find $(DESTDIR) \( -name "*.pd_linux" -or -name pd-gui -or -wholename \*bin/pd \) -print0 | xargs -0 dpkg-shlibdeps -O | cut -b0-15 --complement )
+PACKAGE_DEPENDS := $(shell find $(DESTDIR) \( -name "*.pd_linux" -or -name pd-gui -or -wholename \*bin/pd \) -print0 | xargs -0 dpkg-shlibdeps -O | cut -b1-15 --complement )
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
