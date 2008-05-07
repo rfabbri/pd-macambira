@@ -72,7 +72,7 @@ t_symbol* hidio_convert_linux_buttons_to_numbers(__u16 linux_code)
 		snprintf(hidio_code, MAXPDSTRING,"btn_%d",linux_code - BTN_WHEEL);
 	    else return 0;
 	}
-    return gensym(hidio_code ? hidio_code : "?");
+    return gensym(*hidio_code ? hidio_code : "?");
 }
 
 /* Georg Holzmann: implementation of the keys */
@@ -274,7 +274,7 @@ void hidio_print_device_list(void)
     for(i=0;i<128;++i) 
 	{
 	    snprintf(dev_handle_name, MAXPDSTRING, "/dev/input/event%d", i);
-	    if(dev_handle_name) 
+	    if(*dev_handle_name) 
 		{
 		    /* open the device read-only, non-exclusive */
 		    fd = open (dev_handle_name, O_RDONLY | O_NONBLOCK);
@@ -451,7 +451,7 @@ t_int hidio_open_device(t_hidio *x, short device_number)
     x->x_device_number = device_number;
     snprintf(block_device,MAXPDSTRING,"/dev/input/event%d",x->x_device_number);
 
-    if(block_device) 
+    if(*block_device) 
 	{
 	    /* open the device read-only, non-exclusive */
 	    //        x->x_fd = open(block_device, O_RDONLY | O_NONBLOCK);
@@ -589,8 +589,24 @@ short get_device_number_from_usage(short device_number,
     return -1;
 }
 
+void hidio_write_event_symbol_int(t_hidio *x, t_symbol *type, t_int code, 
+                                    t_int instance, t_int value)
+{
+	debug_post(LOG_DEBUG,"hidio_write_event_symbol_int");
+}
+void hidio_write_event_symbols(t_hidio *x, t_symbol *type, t_symbol *code, 
+                              t_int instance, t_int value)
+{
+	debug_post(LOG_DEBUG,"hidio_write_event_symbols");
+}
 
-void hidio_write_event(t_hidio *x, t_symbol *type, t_symbol *code, 
+void hidio_write_event_ints(t_hidio *x, t_int type, t_int code, 
+                              t_int instance, t_int value)
+{
+	debug_post(LOG_DEBUG,"hidio_write_event_ints");
+}
+
+void hidio_write_event_JMZ(t_hidio *x, t_symbol *type, t_symbol *code, 
 		       t_float instance, t_float value)
 {
     struct input_event write_event;
