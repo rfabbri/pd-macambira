@@ -18,10 +18,8 @@ CPPEXTERN_NEW(gem2pdp)
 
 gem2pdp :: gem2pdp(void)
 {
-  m_x = GemMan::m_xoffset;
-  m_y = GemMan::m_yoffset;
-  m_width = GemMan::m_width;
-  m_height = GemMan::m_height;
+  GemMan::getOffset(&m_x, &m_y);
+  GemMan::getDimen(&m_width, &m_height);
   m_image = NULL;
   m_pdpoutlet = outlet_new(this->x_obj, &s_anything);
 }
@@ -47,10 +45,8 @@ void gem2pdp :: bangMess()
   }
 
   // update image dimensions
-  m_x = GemMan::m_xoffset;
-  m_y = GemMan::m_yoffset;
-  m_width = GemMan::m_width;
-  m_height = GemMan::m_height;
+  GemMan::getOffset(&m_x, &m_y);
+  GemMan::getDimen(&m_width, &m_height);
   pbuffers = GemMan::m_buffer;
   GemMan::m_buffer = 1;
   GemMan::render(idontknowwhatitis);
