@@ -128,13 +128,13 @@ LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
-  LIB_TARGETS += pdlua
+  LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid hidio pdp pidip gem2pdp aka.wiiremote iem16 usbhid pdlua apple
+    LIB_TARGETS += hid pdp pidip gem2pdp aka.wiiremote iem16 apple
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid hidio pdp pidip gem2pdp hdspm_mixer iem16 postlude tclpd
+    LIB_TARGETS += hid pdp pidip gem2pdp hdspm_mixer iem16 postlude tclpd
   endif
 endif
 
