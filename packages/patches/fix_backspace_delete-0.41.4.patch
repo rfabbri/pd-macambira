@@ -2,20 +2,21 @@ Index: g_editor.c
 ===================================================================
 --- g_editor.c	(revision 9725)
 +++ g_editor.c	(working copy)
-@@ -1468,9 +1468,16 @@
-         gotkeysym = av[1].a_w.w_symbol;
+@@ -1469,8 +1469,18 @@
      else if (av[1].a_type == A_FLOAT)
      {
--        char buf[3];
+         char buf[3];
 -        sprintf(buf, "%c", (int)(av[1].a_w.w_float));
 -        gotkeysym = gensym(buf);
-+        if ((int)(av[1].a_w.w_float) == 8)
-+            gotkeysym = gensym("BackSpace");
-+        else if ((int)(av[1].a_w.w_float) == 127)
-+            gotkeysym = gensym("Delete");
-+        else
++        switch((int)(av[1].a_w.w_float))
 +        {
-+            char buf[3];
++        case 8:  gotkeysym = gensym("BackSpace"); break;
++        case 9:  gotkeysym = gensym("Tab"); break;
++        case 10: gotkeysym = gensym("Return"); break;
++        case 27: gotkeysym = gensym("Escape"); break;
++        case 32: gotkeysym = gensym("Space"); break;
++        case 127:gotkeysym = gensym("Delete"); break;
++        default:
 +            sprintf(buf, "%c", (int)(av[1].a_w.w_float));
 +            gotkeysym = gensym(buf);
 +        }
@@ -39,7 +40,7 @@ Index: u_main.tk
      bind $name.c <Motion> {pdtk_canvas_motion %W %x %y 0}
      bind $name.c <Control-Motion> {pdtk_canvas_motion %W %x %y 2}
      if {$pd_nt == 2} {
-@@ -1603,44 +1603,21 @@
+@@ -1603,44 +1603,33 @@
      pdtk_canvas_checkgeometry [canvastosym $name]
  }
  
@@ -62,6 +63,18 @@ Index: u_main.tk
 +	if {$key == "BackSpace"} {
 +		set iso ""
 +		set key 8
++	} elseif {$key == "Tab"} {
++       set iso ""
++		set key 9
++	} elseif {$key == "Return"} {
++        set iso ""
++		set key 10
++	} elseif {$key == "Escape"} {
++        set iso ""
++		set key 27
++	} elseif {$key == "Space"} {
++        set iso ""
++		set key 32
 +	} elseif {$key == "Delete" || $key == "KP_Delete"} {
 +        set iso ""
 +		set key 127
