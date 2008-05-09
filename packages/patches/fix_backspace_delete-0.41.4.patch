@@ -1,0 +1,95 @@
+Index: g_editor.c
+===================================================================
+--- g_editor.c	(revision 9725)
++++ g_editor.c	(working copy)
+@@ -1468,9 +1468,16 @@
+         gotkeysym = av[1].a_w.w_symbol;
+     else if (av[1].a_type == A_FLOAT)
+     {
+-        char buf[3];
+-        sprintf(buf, "%c", (int)(av[1].a_w.w_float));
+-        gotkeysym = gensym(buf);
++        if ((int)(av[1].a_w.w_float) == 8)
++            gotkeysym = gensym("BackSpace");
++        else if ((int)(av[1].a_w.w_float) == 127)
++            gotkeysym = gensym("Delete");
++        else
++        {
++            char buf[3];
++            sprintf(buf, "%c", (int)(av[1].a_w.w_float));
++            gotkeysym = gensym(buf);
++        }
+     }
+     else gotkeysym = gensym("?");
+     fflag = (av[0].a_type == A_FLOAT ? av[0].a_w.w_float : 0);
+Index: u_main.tk
+===================================================================
+--- u_main.tk	(revision 9725)
++++ u_main.tk	(working copy)
+@@ -1254,9 +1254,9 @@
+         bind $name.c <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
+         bind $name.c <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
+     }
+-    bind $name.c <Key> {pdtk_canvas_key %W %K %A 0}
+-    bind $name.c <Shift-Key> {pdtk_canvas_key %W %K %A 1}
+-    bind $name.c <KeyRelease> {pdtk_canvas_keyup %W %K %A}
++    bind $name.c <Key> {pdtk_canvas_sendkey %W 1 %K %A 0}
++    bind $name.c <Shift-Key> {pdtk_canvas_sendkey %W 1 %K %A 1}
++    bind $name.c <KeyRelease> {pdtk_canvas_sendkey %W 0 %K %A 0}
+     bind $name.c <Motion> {pdtk_canvas_motion %W %x %y 0}
+     bind $name.c <Control-Motion> {pdtk_canvas_motion %W %x %y 2}
+     if {$pd_nt == 2} {
+@@ -1603,44 +1603,21 @@
+     pdtk_canvas_checkgeometry [canvastosym $name]
+ }
+ 
+-proc pdtk_canvas_key {name key iso shift} {
+-#    puts stderr [concat down key= $key iso= $iso]
+-#    .controls.switches.meterbutton configure -text $key
+-#  HACK for MAC OSX -- backspace seems different; I don't understand why.
+-#  invesigate this LATER...
++proc pdtk_canvas_sendkey {name state key iso shift} {
+     global pd_nt
+-    if {$pd_nt == 2} {
+-        if {$key == "BackSpace"} {
+-            set key 8
+-            set keynum 8
+-        }
+-        if {$key == "Delete"} {
+-            set key 8
+-            set keynum 8
+-        }
++	if {$key == "BackSpace"} {
++		set iso ""
++		set key 8
++	} elseif {$key == "Delete" || $key == "KP_Delete"} {
++        set iso ""
++		set key 127
+     }
+-    if {$key == "KP_Delete"} {
+-        set key 127
+-        set keynum 127
+-    }
+     if {$iso != ""} {
+-        scan $iso %c keynum 
+-        pd [canvastosym $name] key 1 $keynum $shift\;
+-    } else {
+-        pd [canvastosym $name] key 1 $key $shift\;
++        scan $iso %c key
+     }
++	pd [canvastosym $name] key $state $key $shift \;
+ }
+ 
+-proc pdtk_canvas_keyup {name key iso} {
+-#    puts stderr [concat up key= $key iso= $iso]
+-    if {$iso != ""} {
+-        scan $iso %c keynum 
+-        pd [canvastosym $name] key 0 $keynum 0 \;
+-    } else {
+-        pd [canvastosym $name] key 0 $key 0 \;
+-    }
+-}
+-
+ proc pdtk_canvas_ctrlkey {name key shift} {
+ # first get rid of ".c" suffix; we'll refer to the toplevel instead
+     set topname [string trimright $name .c]
