@@ -4,19 +4,21 @@
 
 CWD := $(shell pwd)
 
-DESTDIR = $(CWD)/build/
+DESTDIR = $(CWD)/build
 cvs_root_dir := $(shell cd $(CWD)/../.. && pwd)
 BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
+include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
 # for command-line UNIX versions, you need to install Pd into the same
 # directory as $(prefix) otherwise Pd won't be able to find extra, doc, etc.
-prefix = /usr/local
-
-# generates the dependencies for all externals and pd itself
-PACKAGE_DEPENDS := $(shell find $(DESTDIR) \( -name "*.pd_linux" -or -name pd-gui -or -wholename \*bin/pd \) -print0 | xargs -0 dpkg-shlibdeps -O | cut -b1-15 --complement )
-
-include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
+ifeq ($(PACKAGE_TYPE),deb)
+  prefix = /usr
+  # generates the dependencies for all externals and pd itself
+  PACKAGE_DEPENDS := $(shell find $(DESTDIR) \( -name "*.pd_linux" -or -name pd-gui -or -wholename \*bin/pd \) -print0 | xargs -0 dpkg-shlibdeps -O | cut -b1-15 --complement )
+else
+  prefix = /usr/local
+endif
 
 TARGET_PLATFORM := $(shell uname -m)
 ifeq ($(TARGET_PLATFORM),i686)
@@ -61,18 +63,21 @@ install:
 #
 #==============================================================================#
 
-# if machine has dpkg-deb, build a Debian package
-DPKG := $(shell test -x /usr/bin/dpkg-deb && echo YES)
-ifeq ($(DPKG),YES)
-  package: deb
-else
-  package: tarbz2
-endif
+package: $(PACKAGE_TYPE)
 
 PACKAGE_NAME = Pd-$(PD_VERSION)
 
-DEB_BUILD_ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
-DEB_PD_VERSION := $(shell echo $(PD_VERSION) | sed 's|\(.*\)-extended-\(.*\)|\1cvs\2-1|')
+
+tarbz2: installer_makefile installer_readme
+	install -p $(packages_src)/linux_make/default.pdsettings $(libpddir)
+	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
+	cd $(DESTDIR) && \
+		tar cjf $(PACKAGE_NAME).tar.bz2  $(PACKAGE_NAME)
+	mv $(DESTDIR)$(PACKAGE_NAME) $(DESTDIR)$(prefix)
+
+
+deb: DEB_BUILD_ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
+deb: DEB_PD_VERSION := $(shell echo $(PD_VERSION) | sed 's|\(.*\)-extended-\(.*\)|\1cvs\2-1|')
 deb: $(bindir)
 # GNOME menu support
 	install -d $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
@@ -96,32 +101,25 @@ deb: $(bindir)
 	ln -s $(prefix)/lib/pd/default.pdsettings \
 		$(DESTDIR)/etc/pd-extended/default.pdsettings
 	install -p $(packages_src)/linux_make/default.pdsettings $(libpddir)
-# folder to install libs into
-	install -d -m0775 $(DESTDIR)/usr/share/pd
+# globla folder for user installed files
+	install -d -m0777 $(DESTDIR)/usr/share/pd
 # emacs mode for .pd files
 	install -d $(DESTDIR)/usr/share/emacs/site-lisp/
 	install -p $(scripts_src)/pd-mode.el $(DESTDIR)/usr/share/emacs/site-lisp/
 # Pd-related scripts
 	install -p $(scripts_src)/pd-diff $(bindir)
 	install -p $(scripts_src)/config-switcher.sh $(bindir)
-# set build architecture and version for the package
-	sed -i 's|^Version:.*|Version: $(DEB_PD_VERSION)|' \
-		$(packages_src)/linux_make/debian/control
-	sed -i 's|^Architecture:.*|Architecture: $(DEB_BUILD_ARCH)|' \
-		$(packages_src)/linux_make/debian/control
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
+# set build architecture and version for the package
+	sed -i 's|^Version:.*|Version: $(DEB_PD_VERSION)|' \
+		$(DESTDIR)/DEBIAN/control
+	sed -i 's|^Architecture:.*|Architecture: $(DEB_BUILD_ARCH)|' \
+		$(DESTDIR)/DEBIAN/control
 # add auto-generated dependencies
 	sed -i 's!^\(Depends:.*\)!\1 $(PACKAGE_DEPENDS)!' $(DESTDIR)/DEBIAN/control
 	fakeroot dpkg-deb --build $(DESTDIR) $(packages_src)/linux_make/$(PACKAGE_NAME).deb
-
-tarbz2: installer_makefile installer_readme
-	install -p $(packages_src)/linux_make/default.pdsettings $(libpddir)
-	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
-	cd $(DESTDIR) && \
-		tar cjf $(PACKAGE_NAME).tar.bz2  $(PACKAGE_NAME)
-	mv $(DESTDIR)$(PACKAGE_NAME) $(DESTDIR)$(prefix)
 
 
 INSTALLER_README_FILE = $(DESTDIR)$(prefix)/README.txt
@@ -186,6 +184,7 @@ test_locations:
 	@echo "PD-EXTENDED_VERSION: $(PD-EXTENDED_VERSION)"
 	@echo "CWD $(CWD)"
 	@echo "DESTDIR $(DESTDIR)"
+	@echo "PACKAGE_TYPE $(PACKAGE_TYPE)"
 	@echo "PREFIX $(prefix)"
 	@echo "BINDIR  $(bindir)"
 	@echo "LIBDIR  $(libdir)"
