@@ -156,10 +156,12 @@ darwin_app_devel_wrapper: Info.plist
 
 #------------------------------------------------------------------------------#
 # generate Info.plist using PD_APP_NAME and PD_VERSION
+Info.plist: CFBUNDLEVERSION_DATE := $(shell date +%Y.%m.%d)
 Info.plist: Info.plist.in 
 	cat Info.plist.in | \
 		sed 's/PD_APP_NAME/$(PD_APP_NAME)/' | \
-		sed 's/PD_VERSION/$(PD_VERSION)/' > \
+		sed 's/CFBUNDLESHORTVERSIONSTRING/$(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)/' | \
+		sed 's/CFBUNDLEVERSION/$(CFBUNDLEVERSION_DATE)/' > \
 		Info.plist
 
 # tigital's Gem window focus black magic

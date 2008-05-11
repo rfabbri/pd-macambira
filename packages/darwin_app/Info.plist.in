@@ -29,11 +29,13 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
-	<string>????</string>
+	<string>PdPd</string>
 	<key>CFBundleIconFile</key>
 	<string>pd.icns</string>
+	<key>CFBundleShortVersionString</key>
+	<string>CFBUNDLESHORTVERSIONSTRING</string>
 	<key>CFBundleVersion</key>
-	<string>PD_VERSION</string>
+	<string>CFBUNDLEVERSION</string>
         <key>LSUIPresentationMode</key>
         <integer>0</integer>
         <key>LSUIElement</key>
