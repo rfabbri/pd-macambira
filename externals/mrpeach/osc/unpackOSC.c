@@ -285,7 +285,9 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
         x->x_data_atc = unpackOSC_path(x, messageName);
         if (x->x_data_atc == 1) unpackOSC_Smessage(x, (void *)args, x->x_raw_c-messageLen);
     }
-    if (x->x_data_atc >= 1) outlet_list(x->x_data_out, &s_list, x->x_data_atc, x->x_data_at);
+    /*if (x->x_data_atc >= 1) outlet_list(x->x_data_out, &s_list, x->x_data_atc, x->x_data_at);*/
+    if (x->x_data_atc >= 1)
+        outlet_anything(x->x_data_out, atom_getsymbol(x->x_data_at), x->x_data_atc-1, x->x_data_at+1);
     x->x_data_atc = 0;
 }
 
