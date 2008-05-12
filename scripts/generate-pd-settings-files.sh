@@ -2,8 +2,8 @@
 
 LIBS="libdir Gem cyclone zexy creb cxc iemlib list-abs mapping markex maxlib memento mjlib motex oscx pddp pdogg pixeltango pmpd rradical sigpack smlib toxy unauthorized vbap pan freeverb hcs jmmmp ext13 hardware ggee iem_anything flib ekext flatspace deprecated pdp pidip"
 
-GNULINUX_FONTPATH="/usr/share/pd /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType"
-MACOSX_FONTPATH="/Library/Pd /System/Library/Fonts /Library/Fonts ~/Library/Fonts /usr/X11R6/lib/X11/fonts/TTF /System/Library/Frameworks/JavaVM.framework/Versions/1.3.1/Home/lib/fonts /sw/lib/X11/fonts/msttf /sw/lib/X11/fonts/intl/TrueType /sw/lib/X11/fonts/applettf"
+GNULINUX_FONTPATH="~/pd /usr/share/pd /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType"
+MACOSX_FONTPATH="~/Library/Pd /Library/Pd /System/Library/Fonts /Library/Fonts ~/Library/Fonts /usr/X11R6/lib/X11/fonts/TTF /System/Library/Frameworks/JavaVM.framework/Versions/1.3.1/Home/lib/fonts /sw/lib/X11/fonts/msttf /sw/lib/X11/fonts/intl/TrueType /sw/lib/X11/fonts/applettf"
 # TODO this needs to be changed to add to a user dir like %USERPROFILE% (like /Library/Pd)
 WINDOWS_FONTPATH="hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,2f,00,46,00,6f,00,6e,00,74,00,73,00,00,00"
 
@@ -11,7 +11,7 @@ SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
 ROOT_DIR=${SCRIPT_DIR}/../packages
 
 GNULINUX_FILE=${ROOT_DIR}/linux_make/default.pdsettings
-MACOSX_FILE=${ROOT_DIR}/darwin_app/org.puredata.pd.plist
+MACOSX_FILE=${ROOT_DIR}/darwin_app/org.puredata.pd.default.plist
 WINDOWS_FILE=${ROOT_DIR}/win32_inno/pd-settings.reg
 WINDOWS_INNO_FILE=${ROOT_DIR}/win32_inno/pd-inno.registry.reg
 
