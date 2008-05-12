@@ -2,24 +2,6 @@
 
 - check code to make it all use single-precision/libmx functions on Mac OSX.
 
-
-- create background image for .dmg
-
-
-- fix app permissions so that you can drop a new app on top of an old one to
-  upgrade
-
-
-- make sure that org.puredata.pd.plist is rw in the .dmg (possible?)
-
-
-- check out using TclTkBI package for all of the tcl deps.  It should have all
-  of the binaries necessary for extensions/gui/ix
-
-     - research Tcl "auto_path"
-
-	  - according to tigital, not all of the gui/ix deps are ported to Aqua...
-
 - review permissions so that you can build on top on existing builds (its the
   Frameworks, just chmod -R +w after installingx)
 
@@ -41,12 +23,6 @@ http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles
 		 - Pd window has method which disables menus
 		 - flash menu when accelerator hits
 		 - fix edit mode menu item (make it a checkbox or change to "play mode"
-
-
-- redo key mapping system
-		 - make Cmd-Delete also delete, as well as just Delete, so that my
-		   Finder key command habits work in Pd as well
-		 - make Cmd-click work like Ctrl-click
 
 
 - Pd should then test to see if Jack is available before switching to it,

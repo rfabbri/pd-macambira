@@ -199,7 +199,7 @@ darwin_app_core: darwin_app_wrapper
 		ln -s ../bin/pd.tk AppMain.tcl
 # support for Info Panel Plugins mgmt
 	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
-	install -p -m0666 org.puredata.pd.plist "$(PD_APP_CONTENTS)/"
+	install -p -m0644 org.puredata.pd.default.plist "$(PD_APP_CONTENTS)/"
 
 
 #------------------------------------------------------------------------------#
