@@ -241,15 +241,7 @@ Index: s_path.c
 ===================================================================
 --- s_path.c	(revision 9725)
 +++ s_path.c	(working copy)
-@@ -250,16 +280,16 @@
- int sys_open_absolute(const char *name, const char* ext,
-     char *dirresult, char **nameresult, unsigned int size, int bin, int *fdp)
- {
--    if (name[0] == '/' 
-+    if (name[0] == '/' || name[0] == '~'
- #ifdef MSW
--        || (name[1] == ':' && name[2] == '/')
-+        || name[0] == '%' || (name[1] == ':' && name[2] == '/')
+@@ -256,10 +256,10 @@
  #endif
              )
      {
@@ -263,7 +255,7 @@ Index: s_path.c
          strncpy(dirbuf, name, dirlen);
          dirbuf[dirlen] = 0;
          *fdp = sys_trytoopenone(dirbuf, name+(dirlen+1), ext,
-@@ -326,32 +356,32 @@
+@@ -326,32 +326,32 @@
      search attempts. */
  void open_via_helppath(const char *name, const char *dir)
  {
@@ -304,7 +296,7 @@ Index: s_path.c
              goto gotone;
      post("sorry, couldn't find help patch for \"%s\"", name);
      return;
-@@ -379,7 +409,7 @@
+@@ -379,7 +379,7 @@
      int rcargc;
      char* rcargv[NUMARGS];
      char* buffer;
@@ -313,7 +305,7 @@ Index: s_path.c
      int retval = 1; /* that's what we will return at the end; for now, let's think it'll be an error */
   
      /* initialize rc-arg-array so we can safely clean up at the end */
-@@ -391,7 +421,7 @@
+@@ -391,7 +391,7 @@
      
      *fname = '\0'; 
  
