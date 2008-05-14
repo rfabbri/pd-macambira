@@ -1,0 +1,32 @@
+Index: u_main.tk
+===================================================================
+--- u_main.tk	(revision 9725)
++++ u_main.tk	(working copy)
+@@ -3332,7 +3332,7 @@
+ #    if {$font < 13} {set fontname [format -*-courier-bold----%d-* $font]}
+ #    if {$font >= 13} {set fontname [format -*-courier-----%d-* $font]}
+ 
+-        global pd_fontlist 
++        global pd_fontlist pd_nt
+         switch -- $font {
+                 8  { set typeface [lindex $pd_fontlist 0] }
+                 9  { set typeface [lindex $pd_fontlist 1] }
+@@ -3346,9 +3346,16 @@
+                 36 { set typeface [lindex $pd_fontlist 9] }
+         }
+ 
+-    $canvasname create text $x $y \
+-        -font $typeface \
++    $canvasname create text $x $y -font $typeface \
+         -tags $myname -text $text -fill $color  -anchor nw 
++	$canvasname bind $myname <Home> [concat $canvasname icursor $myname 0]
++	$canvasname bind $myname <End> [concat $canvasname icursor $myname end]
++	if {$pd_nt == 2} { # emacs bindings for Mac OS X
++		$canvasname bind $myname <Control-a> \
++			[concat $canvasname icursor $myname 0]
++		$canvasname bind $myname <Control-e> \
++			[concat $canvasname icursor $myname end]
++	}
+ #    pd [concat $myname size [$canvasname bbox $myname] \;]
+ }
+ 
