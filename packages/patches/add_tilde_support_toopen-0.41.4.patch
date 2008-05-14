@@ -1,8 +1,8 @@
 Index: s_path.c
 ===================================================================
---- s_path.c	(revision 9773)
+--- s_path.c	(revision 9725)
 +++ s_path.c	(working copy)
-@@ -30,6 +30,10 @@
+@@ -22,6 +22,10 @@
  #include <io.h>
  #endif
  
@@ -13,7 +13,7 @@ Index: s_path.c
  #include <string.h>
  #include "m_pd.h"
  #include "m_imp.h"
-@@ -70,6 +70,30 @@
+@@ -69,6 +73,30 @@
      *to = 0;
  }
  
@@ -44,16 +44,20 @@ Index: s_path.c
  /*******************  Utility functions used below ******************/
  
  /*!
-@@ -199,7 +223,7 @@
+@@ -196,9 +224,11 @@
+     char *dirresult, char **nameresult, unsigned int size, int bin)
+ {
      int fd;
++    char buf[FILENAME_MAX];
      if (strlen(dir) + strlen(name) + strlen(ext) + 4 > size)
          return (-1);
 -    strcpy(dirresult, dir);
-+    sys_expandpath(dir, dirresult);
++    sys_expandpath(dir, buf);
++    strcpy(dirresult, buf);
      if (*dirresult && dirresult[strlen(dirresult)-1] != '/')
          strcat(dirresult, "/");
      strcat(dirresult, name);
-@@ -251,9 +275,9 @@
+@@ -250,9 +280,9 @@
  int sys_open_absolute(const char *name, const char* ext,
      char *dirresult, char **nameresult, unsigned int size, int bin, int *fdp)
  {
