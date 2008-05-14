@@ -14,7 +14,6 @@
 
 #include "breakpoints~.h"
 
-#define BACKGROUNDWIDTH "1"
 #include "w_breakpoints.h"
 
 static t_class *breakpoints_class;
@@ -296,7 +295,7 @@ static void *breakpoints_new(t_symbol *s,int argc,t_atom* argv)
 {
      t_breakpoints *x = (t_breakpoints *)pd_new(breakpoints_class);
      
-     
+     x->borderwidth = 1;
      
      x->x_f = 0;
      x->args = STATES;

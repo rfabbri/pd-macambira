@@ -9,9 +9,7 @@
 
 #define BACKGROUNDCOLOR "grey86"
 #define LINECOLOR "grey30"
-#ifndef BACKGROUNDWIDTH
-#define BACKGROUNDWIDTH "1"
-#endif
+
 #define BORDER 2
 
 
@@ -238,11 +236,11 @@ static void breakpoints_create(t_breakpoints *x, t_glist *glist)
      ypos = (int) text_ypix(&x->x_obj,glist);
      x->w.numclock = clock_new(x, (t_method) breakpoints_delnum);     
      sys_vgui(".x%x.c create rectangle \
-%d %d %d %d  -tags %xS -fill "BACKGROUNDCOLOR" -width "BACKGROUNDWIDTH"\n",
+%d %d %d %d  -tags %xS -fill "BACKGROUNDCOLOR" -width %d\n",
 	      glist_getcanvas(glist),
 	      xpos-BORDER, ypos-BORDER,
 	      xpos + x->w.width+2*BORDER, ypos + x->w.height+2*BORDER,
-	      x);
+	      x,x->borderwidth);
      
      xscale = x->w.width/x->duration[x->last_state];
      yscale = x->w.height;

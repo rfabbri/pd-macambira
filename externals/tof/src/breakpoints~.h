@@ -33,6 +33,7 @@ typedef struct _breakpoints
      t_int    args; /* get rid of that */
      t_int resizing;
      t_int resizeable;
+	t_int borderwidth;
 
      t_symbol* r_sym; //receive symbol
      t_symbol* s_sym; //send symbol
