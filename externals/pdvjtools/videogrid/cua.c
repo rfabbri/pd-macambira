@@ -127,7 +127,7 @@ int cuaBuida(Cua *cua)
 void eliminarCua(Cua *cua)
 {
     while (!cuaBuida(cua)) desencuar(cua); 
-    printf("Cua eliminada\a\n");
+    printf("Cua eliminada\n");
 }
 
 /* funció que retorna el nombre de nodes de la cua */
@@ -160,5 +160,5 @@ void escriuCua(Cua *cua)
         
     }
     else
-        printf("Cua buida\a\n");
+        printf("Cua buida\n");
 }

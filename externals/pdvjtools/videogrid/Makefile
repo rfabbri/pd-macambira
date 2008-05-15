@@ -31,7 +31,7 @@ LINUXINCLUDE =  -I$(PD_SRC) -I/usr/include/
 # ----------------------------------------------------------
 
 install:
-	cp help-*.pd ../../doc/5.reference
+	cp *-help.pd ../../doc/5.reference
 
 clean:
 	rm -f *.o *.pd_* so_locations
