@@ -1061,9 +1061,9 @@ hcs_install: hcs
 #	install -d $(readmesdir)
 #	install -p $(externals_src)/hcs/README \
 #		$(readmesdir)/$(HCS_NAME).txt
-#	install -d $(examplesdir)/$(HCS_NAME)
-#	install -p $(externals_src)/hcs/examples/*.pd \
-#g		$(examplesdir)/$(HCS_NAME)
+	install -d $(examplesdir)/$(HCS_NAME)
+	install -p $(externals_src)/hcs/examples/*.pd \
+		$(examplesdir)/$(HCS_NAME)
 
 hcs_clean:
 	-rm -f -- $(HCS_OBJECTS:.c=.$(EXTENSION))
