@@ -1,19 +1,25 @@
-#N canvas 296 99 580 404 10;
+#N canvas 439 199 580 378 10;
 #X text 24 13 IMAGEGRID;
-#X symbolatom 72 324 60 0 0 0 - - -;
-#X obj 26 110 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#X symbolatom 79 304 60 0 0 0 - - -;
+#X obj 79 67 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 72 183 imagegrid imagegrid1 3 5 #F0F0F0 #0F0F0F ;
-#X text 154 113 ADD IMAGES FROM FOLDER;
-#X text 154 63 ADD A IMAGE;
-#X text 24 93 LIST STDOUT;
-#X text 74 344 LOCATION OF THE SELECTED IMAGE;
+#X text 184 110 ADD IMAGES FROM FOLDER;
+#X text 184 60 ADD A IMAGE;
+#X text 77 50 LIST STDOUT;
+#X text 81 324 LOCATION OF THE SELECTED IMAGE;
 #X text 25 29 Object to select the path location of an image added
 in the grid.;
-#X msg 155 127 putimgdir /usr/local/lib/pd/extra/imagegrid/images;
-#X msg 156 77 putimg /usr/local/lib/pd/extra/imagegrid/images/logo100.gif
+#X msg 185 124 putimgdir /usr/local/lib/pd/extra/imagegrid/images;
+#X msg 186 74 putimg /usr/local/lib/pd/extra/imagegrid/images/logo100.gif
 ;
-#X connect 2 0 3 0;
-#X connect 3 0 1 0;
-#X connect 9 0 3 0;
-#X connect 10 0 3 0;
+#X msg -19 98 clear;
+#X obj 78 156 imagegrid imagegrid1 3 5 #F0F0F0 #0a0b0c #F1882B;
+#X floatatom 27 77 5 0 0 0 - - -;
+#X msg 27 97 seek \$1;
+#X connect 2 0 11 0;
+#X connect 8 0 11 0;
+#X connect 9 0 11 0;
+#X connect 10 0 11 0;
+#X connect 11 0 1 0;
+#X connect 12 0 13 0;
+#X connect 13 0 11 0;

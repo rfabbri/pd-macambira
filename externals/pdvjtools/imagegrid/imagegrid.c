@@ -1,3 +1,4 @@
+
 /*
 imagegrid external for Puredata
 Copyright (C) 2007  Sergi Lario
@@ -41,6 +42,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define W_CELL 60
 #define H_CELL 40
 
+/* definició del gruix en pixels del marc del tauler */
+#define GRUIX 2
+
 /* crear un apuntador al nou objecte */
 static t_class *imagegrid_class;
 /* indica el nombre de imagegrid creats - utilitzat per diferenciar el nom d'instàncies d'objectes del mateix tipus */
@@ -78,6 +82,10 @@ typedef struct _imagegrid {
     t_symbol *x_color_marc;
     /* mutex per evitar concurrencia sobre la cua al accedir diferents threads*/
     pthread_mutex_t x_lock;
+    /* v 0.2 -- posicó de la cel·la seleccionada */
+    int x_pos_selected;
+    /* v 0.2 -- color de seleccio */
+    t_symbol *x_color_grasp;
 
 } t_imagegrid;
 
@@ -85,14 +93,14 @@ typedef struct _imagegrid {
 /* calcula la posició x del tauler a partir de la posició de l'element de la cua (d'esquerra a dreta) */
 int getX(t_imagegrid* x, int posCua){
     int c = x->x_num_col;
-    int xpos = (posCua % c) * W_CELL;
+    int xpos = (posCua % c) * W_CELL + ((posCua % c) + 1) * GRUIX;
     return(xpos + 1);
 }
 
 /* calcula la posició y del tauler a partir de la posició de l'element de la cua (de dalt a baix) */
 int getY(t_imagegrid* x, int posCua){
     int c = x->x_num_col;
-    int ypos = (posCua / c) * H_CELL;
+    int ypos = (posCua / c) * H_CELL + ((posCua / c) + 1) * GRUIX;
     return(ypos + 1);
 }
 
@@ -114,7 +122,7 @@ void eliminar_imatges_temporals(int maxim){
         }
         contador++;
     }
-    post("Imagegrid: Imatges temporals eliminades\n",path_total);
+    /* post("Imagegrid: Imatges temporals eliminades\n",path_total); */
 }
 
 int format_adequat(path nomF){
@@ -181,22 +189,20 @@ void imagegrid_afegir_imatge(t_imagegrid *x, path entrada)
         strcat(ig_path,nNstr);
         strcat(ig_path,".");
         strcat(ig_path,FORMAT_MINIATURA);
-        /*printf("Creacio de la imatge %s ...",ig_path);*/
+        /* post("Creacio de la imatge %s ...",ig_path); */
         sys_vgui("image create photo img%x%d -file %s\n",x,nN,ig_path);
-        /* printf("1. Creacio de la imatge %s ...",ig_path); */
         sys_vgui(".x%x.c create image %d %d -image img%x%d -tags %xS%d\n",
              glist_getcanvas(x->x_glist),
-             text_xpix(&x->x_obj, x->x_glist) + getX(x,nN) + (W_CELL/2), 
+             text_xpix(&x->x_obj, x->x_glist) + getX(x,nN) + (W_CELL/2),
              text_ypix(&x->x_obj, x->x_glist) + getY(x,nN) + (H_CELL/2),
              x,nN,x,nN);
-        /* printf("2. Creacio de la imatge %s ...",ig_path); */
         if(nN == 0){
             x->x_tauler_primer = x->x_cua.final;
             /* post("Ara el primer del tauler es %s\n",x->x_tauler_primer->pathFitxer); */
         }
         /* printf("SURT de la creacio de la imatge %s ...",ig_path); */
     }else{
-        post("Imagegrid: El format del fitxer %s és incompatible.",entrada);
+        post("Imagegrid: Incompatible file format (%s).\n",entrada);
     }
     /*
     sys_vgui("image create photo img%x -file %s\n",x,entrada);
@@ -215,7 +221,7 @@ void imagegrid_drawme(t_imagegrid *x, t_glist *glist, int firsttime)
         sys_vgui(".x%x.c create rectangle %d %d %d %d -fill %s -tags %xGRID -outline %s\n",
             glist_getcanvas(glist),
             text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
-            text_xpix(&x->x_obj, glist) + (x->x_num_col * W_CELL) + 1, text_ypix(&x->x_obj, glist) + (x->x_num_fil * H_CELL) + 1,
+            text_xpix(&x->x_obj, glist) + (x->x_num_col * W_CELL) + 1 + (x->x_num_col * GRUIX) + GRUIX, text_ypix(&x->x_obj, glist) + (x->x_num_fil * H_CELL) + 1 + (x->x_num_fil * GRUIX) + GRUIX,
             x->x_color_fons->s_name, x,x->x_color_marc->s_name);
 
         canvas_fixlinesfor(glist_getcanvas(glist), (t_text*)x);
@@ -242,10 +248,10 @@ void imagegrid_drawme(t_imagegrid *x, t_glist *glist, int firsttime)
                 actual = actual->seguent;
                 nN++;
             }while(actual);
-        }
+        }		
     }
     else { 
-        sys_vgui(".x%x.c coords %xGRID %d %d %d %d\n", glist_getcanvas(glist), x, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),text_xpix(&x->x_obj, glist) + (x->x_num_col*W_CELL) + 1, text_ypix(&x->x_obj, glist) + (x->x_num_fil*H_CELL) + 1);
+        sys_vgui(".x%x.c coords %xGRID %d %d %d %d\n", glist_getcanvas(glist), x, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),text_xpix(&x->x_obj, glist) + (x->x_num_col*W_CELL) + 1 + (x->x_num_col * GRUIX) + GRUIX, text_ypix(&x->x_obj, glist) + (x->x_num_fil*H_CELL) + 1 + (x->x_num_fil * GRUIX) + GRUIX);
         if(!cuaBuida(&x->x_cua))
         {
             int contador = 0;
@@ -261,33 +267,71 @@ void imagegrid_drawme(t_imagegrid *x, t_glist *glist, int firsttime)
             sprintf(buf, "pdtk_imagegrid_table %%s %s %d %d\n", x->x_name->s_name, x->x_num_fil, x->x_num_col);
             gfxstub_new(&x->x_obj.ob_pd, x, buf); */
         }
+        if (x->x_pos_selected > -1){
+        sys_vgui(".x%x.c coords %xGRASP %d %d %d %d\n", glist_getcanvas(glist), x, 
+        text_xpix(&x->x_obj, x->x_glist) + getX(x,x->x_pos_selected), text_ypix(&x->x_obj, x->x_glist) + getY(x,x->x_pos_selected),
+        text_xpix(&x->x_obj, x->x_glist) + getX(x,x->x_pos_selected) + W_CELL, text_ypix(&x->x_obj, x->x_glist) + getY(x,x->x_pos_selected) + H_CELL);
+	}
+	sys_vgui(".x%x.c delete %xLINIA\n", glist_getcanvas(x->x_glist), x);
     }
+
+    int xI = text_xpix(&x->x_obj, glist);
+    int yI = text_ypix(&x->x_obj, glist);
+    int xF = xI + (x->x_num_col * W_CELL) + ((x->x_num_col + 1) * GRUIX);
+    int yF = yI + (x->x_num_fil * H_CELL) + ((x->x_num_fil + 1) * GRUIX);
+    int vlines = 0;
+    int xi = 0;
+    while(vlines < x->x_num_col){
+	xi = xI + getX(x,vlines) - GRUIX + 1;
+	sys_vgui(".x%x.c create line %d %d %d %d -fill %s -width %d -tag %xLINIA\n", glist_getcanvas(x->x_glist), xi, yI, xi, yF, x->x_color_marc->s_name,GRUIX,x);
+	vlines++;
+    }
+    xi = xi + W_CELL + GRUIX;
+    sys_vgui(".x%x.c create line %d %d %d %d -fill %s -width %d -tag %xLINIA\n", glist_getcanvas(x->x_glist), xi, yI, xi, yF, x->x_color_marc->s_name,GRUIX,x);
+    int hlines = 0;
+    int yi = 0;
+    while(hlines < x->x_num_fil){
+	yi = yI + ((H_CELL + GRUIX) * hlines) + 2;
+	sys_vgui(".x%x.c create line %d %d %d %d -fill %s -width %d -tag %xLINIA\n", glist_getcanvas(x->x_glist), xI, yi, xF, yi, x->x_color_marc->s_name,GRUIX,x);
+	hlines++;
+    }
+    yi = yi + H_CELL + GRUIX;
+    sys_vgui(".x%x.c create line %d %d %d %d -fill %s -width %d -tag %xLINIA\n", glist_getcanvas(x->x_glist), xI, yi, xF, yi, x->x_color_marc->s_name,GRUIX,x);
 }
 
-/* borra imagegrid */
-void imagegrid_erase(t_imagegrid* x,t_glist* glist)
+/* borra imagegrid v 0.2 -- int toclear */
+void imagegrid_erase(t_imagegrid* x,t_glist* glist, int toclear)
 {
     int maxim = x->x_num_fil * x->x_num_col;
     path path_total;
-    char contador_str[2];
+    char contador_str[BYTES_NUM_TEMP];
     /* post("Entra a erase"); */
     /* elimina les imatges */
     int contador = 0;
     while(contador < numNodes(&x->x_cua)){
+	
         sys_vgui(".x%x.c delete %xS%d\n", glist_getcanvas(x->x_glist), x, contador);
         strcpy(path_total,PATH_TEMPORAL);
         sprintf(contador_str,"%d", contador);
         strcat(path_total,contador_str);
         strcat(path_total,".");
-        strcat(path_total,FORMAT_MINIATURA);
+        strcat(path_total,FORMAT_MINIATURA);	
         if(unlink(path_total)){
             /* post("Imatge temporal %s eliminada\n",path_total); */
-        }
+        } 
         contador++;
     }
 
-    /* elimina el grid */
-    sys_vgui(".x%x.c delete %xGRID\n", glist_getcanvas(glist), x);
+    /* elimina el grid v 0.2 -- excepte quan es fa un clear */
+    if(toclear == 0){
+    	sys_vgui(".x%x.c delete %xGRID\n", glist_getcanvas(glist), x);
+	sys_vgui(".x%x.c delete %xLINIA\n", glist_getcanvas(x->x_glist), x);
+    }
+    /* v 0.2 -- elimina el marc de la casella seleccionada */
+    if(x->x_pos_selected > -1){	
+	sys_vgui(".x%x.c delete %xGRASP\n", glist_getcanvas(glist), x);
+        x->x_pos_selected = -1;
+    }
     eliminar_imatges_temporals(maxim);
 }
 
@@ -309,7 +353,7 @@ void imagegrid_putimg(t_imagegrid *x, t_symbol *entrada)
     
     fitxer = fopen(e,"r");
     if (!fitxer) {
-        post("Imagegrid: Problema amb l'obertura del fitxer %s\n",e);
+        post("Imagegrid: Problem opening file %s.\n",e);
     }
     else {
         /* post("s'encua la imatge %s\n", e); */
@@ -329,14 +373,14 @@ void *imagegrid_putimgdir_thread(t_imagegrid *x)
     int maxim;
     if ((dirp = opendir(x->x_dir_canvi)) == NULL)
     {
-        post("Imagegrid: No es pot obrir el directori %s\n", x->x_dir_canvi);
+        post("Imagegrid: Can not open folder %s.\n", x->x_dir_canvi);
     }else{
         maxim = x->x_num_fil * x->x_num_col;
         strcpy(directoriAnterior, x->x_dir_actual);
         strcpy(x->x_dir_actual, x->x_dir_canvi);
         /* si es el mateix directori entrat l'ultim busca la ultima imatge afegida per a seguir a encuant a partir d'ella en endavant */
         if(strcmp(directoriAnterior, x->x_dir_actual) == 0){
-            post("Imagegrid: Repeteix directori %s\n", x->x_dir_actual);
+            /* post("Imagegrid: Repeteix directori %s\n", x->x_dir_actual); */
             while ( (direntp = readdir( dirp )) != NULL ){
                 /* es descarta el mateix directori, el directori anterior i tot el que no sigui un fitxer regular */
                 if((strcmp(direntp->d_name,"..") != 0)&&(strcmp(direntp->d_name,".") != 0)&&(direntp->d_type == DT_REG)){
@@ -365,7 +409,7 @@ void *imagegrid_putimgdir_thread(t_imagegrid *x)
             }
         }else{
             /* directori diferent omple la cua començant pel primer fitxer */
-            post("Imagegrid: Nou directori %s \n", x->x_dir_actual);
+            /* post("Imagegrid: Nou directori %s \n", x->x_dir_actual); */
             while ( (direntp = readdir( dirp )) != NULL ){
                 /* es descarta el mateix directori, el directori anterior i tot el que no sigui un fitxer regular */
                 if((strcmp(direntp->d_name,"..") != 0)&&(strcmp(direntp->d_name,".") != 0)&&(direntp->d_type == DT_REG)){
@@ -416,43 +460,96 @@ void imagegrid_putimgdir(t_imagegrid *x, t_symbol *entrada)
     pthread_mutex_destroy(&x->x_lock);
 }
 
+
+/* v 0.2 -- mètode de la classe que desmarca la cel·la seleccionada */
+static void imagegrid_ungrasp_selected(t_imagegrid *x)
+{
+    /* post("Ungrasp selected thumb %d", x->x_pos_selected); */
+    if(x->x_pos_selected > -1) {
+        sys_vgui(".x%x.c delete %xGRASP\n", glist_getcanvas(x->x_glist), x);
+        x->x_pos_selected = -1;
+    }
+}
+
+/* v 0.2 -- mètode de la classe que marca la cel·la seleccionada */
+static void imagegrid_grasp_selected(t_imagegrid *x, int pos)
+{
+    /*printf("Grasp selected thumb %d", pos);*/
+    if(pos != x->x_pos_selected) {
+	imagegrid_ungrasp_selected(x);
+        /* post("Grasp selected thumb %d", pos); */
+        x->x_pos_selected = pos;
+        /* nem per aqui ---- */
+	sys_vgui(".x%x.c create rectangle %d %d %d %d -fill {} -tags %xGRASP -outline %s -width %d\n",
+            glist_getcanvas(x->x_glist),
+            text_xpix(&x->x_obj, x->x_glist) + getX(x,x->x_pos_selected), text_ypix(&x->x_obj, x->x_glist) + getY(x,x->x_pos_selected),
+            text_xpix(&x->x_obj, x->x_glist) + getX(x,x->x_pos_selected) + W_CELL, text_ypix(&x->x_obj, x->x_glist) + getY(x,x->x_pos_selected) + H_CELL,
+            x,x->x_color_grasp->s_name, GRUIX + 1);
+        canvas_fixlinesfor(glist_getcanvas(x->x_glist), (t_text*)x);
+    }
+}
+
+/* v 0.2 -- mètode de la classe que dispara l'element del taules en la posicio N [seek N( */
+void imagegrid_seek(t_imagegrid *x, t_floatarg postauler)
+{
+    /* post("seek a %d\n",postauler); */
+    path pathSortida;
+    Node *actual;
+    int contador = 0;
+    int maxim = x->x_num_fil * x->x_num_col;
+    /* obtenir el path per enviar a la sortida */
+    if((!cuaBuida(&x->x_cua))&&(postauler < numNodes(&x->x_cua))&&(postauler >= 0 )){
+        if(x->x_tauler_primer){
+            actual = x->x_tauler_primer;
+            while(contador <= postauler){
+                if(contador == postauler){
+                    strcpy(pathSortida,actual->pathFitxer);
+                }
+                if(actual->seguent == NULL){
+                    actual = x->x_cua.davanter;
+                }else{
+                    actual = actual->seguent;
+                }
+                contador++;
+            }
+            outlet_symbol(x->x_sortida, gensym(pathSortida));
+            /* post("Esta a imagegrid_click amb %d %d a la posicio %d\n", x_pos, y_pos, postauler);*/
+            /* v 0.2 -- marcar casella */
+            imagegrid_grasp_selected(x, postauler);
+        }
+    }
+}
+
 static int imagegrid_click(t_gobj *z, struct _glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
     t_imagegrid* x = (t_imagegrid *)z;
     int x_pos = xpix - text_xpix(&x->x_obj, x->x_glist);
     int y_pos = ypix - text_ypix(&x->x_obj, x->x_glist);
-    int xa, ya, postauler, contador, maxim;
-    path pathSortida;
-    Node *actual;
+    int xa, ya, postauler;
     if (doit) 
     {
-        /* obtenir la posicio en el tauler */
-        xa = x_pos / W_CELL;
-        ya = (y_pos / H_CELL) * x->x_num_col;
-        postauler = ya + xa;
-        /* obtenir el path per enviar a la sortida */
-        if((!cuaBuida(&x->x_cua))&&(postauler < numNodes(&x->x_cua))){
-            contador = 0;
-            maxim = x->x_num_fil * x->x_num_col;
-            if(x->x_tauler_primer){
-                actual = x->x_tauler_primer;
-                while(contador <= postauler){
-                    if(contador == postauler){
-                        strcpy(pathSortida,actual->pathFitxer); 
-                    }
-                    if(actual->seguent == NULL){
-                        actual = x->x_cua.davanter;
-                    }else{
-                        actual = actual->seguent;
-                    }
-                    contador++;
-                }
-                outlet_symbol(x->x_sortida, gensym(pathSortida));
-            }
-        }
+        /* obtenir la posicio en el tauler */ 
+	// -- v 0.2 -- midoficacio pel gruix del marc //
+	xa = ((x_pos) / (W_CELL + GRUIX + 1));
+        ya = ((y_pos) / (H_CELL + GRUIX + 1)) * x->x_num_col;
+        postauler = ya + xa;	
+	// -- v 0.2 -- seleciona la casella disparant el path //
+        imagegrid_seek(x, postauler);
     }
     return (1);
 }
+
+/* v 0.2 -- mètode de la classe que buida el tauler amb el missatge [clear ( */
+void imagegrid_clear(t_imagegrid *x)
+{
+    imagegrid_erase(x, x->x_glist,1);
+    eliminarCua(&x->x_cua);
+    x->x_ultima_img = 0;
+    x->x_dir_pos = 0;
+    x->x_tauler_primer = NULL;
+    imagegrid_drawme(x, x->x_glist, 0);
+}
+
 
 static void imagegrid_getrect(t_gobj *z, t_glist *glist,int *xp1, int *yp1, int *xp2, int *yp2)
 {
@@ -462,9 +559,9 @@ static void imagegrid_getrect(t_gobj *z, t_glist *glist,int *xp1, int *yp1, int 
     fils = x->x_num_fil;
     *xp1 = text_xpix(&x->x_obj, glist);
     *yp1 = text_ypix(&x->x_obj, glist);
-    *xp2 = text_xpix(&x->x_obj, glist) + (cols*W_CELL);
-    *yp2 = text_ypix(&x->x_obj, glist) + (fils*H_CELL);
-  /*  post("Esta amb el ratoli en el punt %d %d %d %d o son els vetexs de la caixa... es/bd", xp1, yp1, xp2, yp2); */
+    *xp2 = text_xpix(&x->x_obj, glist) + (cols*W_CELL) + ((cols + 1) * GRUIX);
+    *yp2 = text_ypix(&x->x_obj, glist) + (fils*H_CELL) + ((fils + 1) * GRUIX);
+    /* post("Esta amb el ratoli en el punt %d %d %d %d o son els vetexs de la caixa... es/bd", xp1, yp1, xp2, yp2); */
 }
 
 static void imagegrid_displace(t_gobj *z, t_glist *glist,int dx, int dy)
@@ -476,7 +573,7 @@ static void imagegrid_displace(t_gobj *z, t_glist *glist,int dx, int dy)
     sys_vgui(".x%x.c coords %xGRID %d %d %d %d\n",
              glist_getcanvas(glist), x,
              text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
-             text_xpix(&x->x_obj, glist) + (x->x_num_col*W_CELL), text_ypix(&x->x_obj, glist) + (x->x_num_fil*H_CELL));
+             text_xpix(&x->x_obj, glist) + (x->x_num_col*W_CELL) + 1 + (x->x_num_col * GRUIX) + GRUIX, text_ypix(&x->x_obj, glist) + (x->x_num_fil*H_CELL) + 1 + (x->x_num_fil * GRUIX) + GRUIX);
     imagegrid_drawme(x, glist, 0);
     canvas_fixlinesfor(glist_getcanvas(glist),(t_text*) x);
 }
@@ -509,7 +606,7 @@ static void imagegrid_vis(t_gobj *z, t_glist *glist, int vis)
     if (vis)
         imagegrid_drawme(s, glist, 1);
     else
-       imagegrid_erase(s,glist);
+       imagegrid_erase(s,glist,0);
 }
 
 
@@ -581,61 +678,90 @@ static void imagegrid_save(t_gobj *z, t_binbuf *b)
     binbuf_addv(b, "ssiissiisss", gensym("#X"),gensym("obj"),
     x->x_obj.te_xpix, x->x_obj.te_ypix,
     atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
-    x->x_name,x->x_num_fil,x->x_num_col,x->x_color_fons,x->x_color_marc,gensym(cadenaPathsInicials));
+    x->x_name,x->x_num_fil,x->x_num_col,x->x_color_fons,x->x_color_marc,x->x_color_grasp,gensym(cadenaPathsInicials));
     binbuf_addv(b, ";");
 }
 
 static void imagegrid_properties(t_gobj *z, t_glist *owner)
 {
-    char buf[800];
+    char buf[900];
     t_imagegrid *x=(t_imagegrid *)z;
 
     /* post("Es crida a pdtk_imagegrid dialog passant nom = %s\n fils = %d \t cols = %d \t color fons = %s \t color marc = %s\n", x->x_name->s_name, x->x_num_fil, x->x_num_col, x->x_color_fons->s_name, x->x_color_marc->s_name); */
-    sprintf(buf, "pdtk_imagegrid_dialog %%s %s %d %d %s %s\n",
-            x->x_name->s_name, x->x_num_fil, x->x_num_col, x->x_color_fons->s_name, x->x_color_marc->s_name);
+    sprintf(buf, "pdtk_imagegrid_dialog %%s %s %d %d %s %s %s\n",
+            x->x_name->s_name, x->x_num_fil, x->x_num_col, x->x_color_fons->s_name, x->x_color_marc->s_name, x->x_color_grasp->s_name);
     /* post("imagegrid_properties : %s", buf ); */
     gfxstub_new(&x->x_obj.ob_pd, x, buf);
 }
 
 static void imagegrid_dialog(t_imagegrid *x, t_symbol *s, int argc, t_atom *argv)
 {
-    int maxim, nfil, ncol, maxdigit;
+    int maxim, maxdigit;
+    int nfil = 0;
+    int ncol = 0;
     if ( !x ) {
-        post("Imagegrid: error_ intent de modificar le propietats d'un objecte inexistent\n");
+        post("Imagegrid: error_ Attempt to alter the properties of an object that does not exist.\n");
     }
-    if ( argc != 5 )
-    {
-        post("Imagegrid: error_ sobre el nombre d'arguments ( 5 enlloc de %d )\n",argc);
-        return;
+    switch (argc) {
+	case 3:
+		/* versio inicial */
+		if (argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT || argv[2].a_type != A_FLOAT) 
+    		{
+        		post("Imagegrid: error_ Some of the values are inconsistent in its data type.\n");
+        		return;
+    		}
+		x->x_name = argv[0].a_w.w_symbol;
+    		nfil = (int)argv[1].a_w.w_float;
+    		ncol = (int)argv[2].a_w.w_float;
+	break;
+	case 5:
+		/* versio 0.1 */
+		if (argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT || argv[2].a_type != A_FLOAT || argv[3].a_type != A_SYMBOL || argv[4].a_type != A_SYMBOL) 
+    		{
+        		post("Imagegrid: error_ Some of the values are inconsistent in its data type.\n");
+        		return;
+    		}
+		x->x_name = argv[0].a_w.w_symbol;
+    		nfil = (int)argv[1].a_w.w_float;
+    		ncol = (int)argv[2].a_w.w_float;
+    		x->x_color_fons = argv[3].a_w.w_symbol;
+    		x->x_color_marc = argv[4].a_w.w_symbol;
+	break;
+	case 6:
+		/* versio 0.2 */
+		if (argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT || argv[2].a_type != A_FLOAT || argv[3].a_type != A_SYMBOL || argv[4].a_type != A_SYMBOL || argv[5].a_type != A_SYMBOL) 
+    		{
+        		post("Imagegrid: error_ Some of the values are inconsistent in its data type.\n");
+        		return;
+    		}
+		x->x_name = argv[0].a_w.w_symbol;
+    		nfil = (int)argv[1].a_w.w_float;
+    		ncol = (int)argv[2].a_w.w_float;
+    		x->x_color_fons = argv[3].a_w.w_symbol;
+    		x->x_color_marc = argv[4].a_w.w_symbol;
+		x->x_color_grasp = argv[5].a_w.w_symbol;
+	break;	
+	default:
+	    /* no fa res */
+	break;
     }
-    if (argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT || argv[2].a_type != A_FLOAT || argv[3].a_type != A_SYMBOL || argv[4].a_type != A_SYMBOL) 
-    {
-        post("Imagegrid: error_ algun dels arguments no es del tipus adequat\n");
-        return;
-    }
-    x->x_name = argv[0].a_w.w_symbol;
-    nfil = (int)argv[1].a_w.w_float;
-    ncol = (int)argv[2].a_w.w_float;
-    x->x_color_fons = argv[3].a_w.w_symbol;
-    x->x_color_marc = argv[4].a_w.w_symbol;
     /* el màxim es fixa pel nombre de digits utilitzats pel nom de la imatge temporal */
     maxdigit = pow(10,BYTES_NUM_TEMP);
     if((nfil*ncol) <= maxdigit){
-        if((nfil*ncol) > 0){
+       	if((nfil*ncol) > 0){
             x->x_num_fil = nfil;
             x->x_num_col = ncol;
         }else{
-            post("Imagegrid: El nombre de files i columnes són inferiors al mímin permès: 1 casella\n",maxdigit);
+            post("Imagegrid: The number of rows and columns is less than the minimum allowed: 1 cell.\n",maxdigit);
         }
     }else{
-        post("Imagegrid: El nombre de files i columnes excedeixen del màxim permès: un total de %d caselles\n",maxdigit);
+        post("Imagegrid: The number of rows and columns exceeds the maximum allowed: a total of %d cells.\n",maxdigit);
     }
-    
-    post("Imagegrid: Valors modificats_ nom = %s\n fils = %d \t cols = %d\n", x->x_name->s_name, x->x_num_fil, x->x_num_col);
+    /* post("Imagegrid: Modified values\n name = %s\n rows = %d \t cols = %d.\n", x->x_name->s_name, x->x_num_fil, x->x_num_col); */
     /* elimina els nodes no representables amb la nova configuració */
     maxim = x->x_num_fil * x->x_num_col;
     int extret;
-    imagegrid_erase(x, x->x_glist);
+    imagegrid_erase(x, x->x_glist,0);
     /* si hi ha més nodes a la cua que el maxim */
     while((numNodes(&x->x_cua)) >  maxim){
         /* desencuem */
@@ -678,13 +804,13 @@ static void *imagegrid_new(t_symbol* name, int argc, t_atom *argv)
     x->x_sortida = outlet_new(&x->x_obj,&s_symbol);
     /* s'obté el canvas de pd */
     x->x_glist = (t_glist*) canvas_getcurrent();
-    
     /* posició en el tauler de la última imatge afegida */
     x->x_ultima_img = 0;
     /* posició de l'últim fitxer del directori encuat */
     x->x_dir_pos = 0;
     /* apuntador al primer element en el tauler */
     x->x_tauler_primer = NULL;
+    x->x_pos_selected = -1;
     /* fixa el nom de l'objecte */
     char nom[15];
     sprintf(nom, "imagegrid%d", ++imagegridcount);
@@ -694,59 +820,83 @@ static void *imagegrid_new(t_symbol* name, int argc, t_atom *argv)
     pd_bind(&x->x_obj.ob_pd, x->x_name);
     /* crea la cua de nodes */
     crearCua(&x->x_cua);
-    post("NOU imagegrid: s'han entrat %d arguments\n", argc);
-     
-    if (argc != 0)
-    {
-        post("NOU imagegrid: s'obre un objecte existent o amb arguments definits\n"); 
-        /* x->x_name */
-        x->x_num_fil = (int)atom_getintarg(1, argc, argv);
-        x->x_num_col = (int)atom_getintarg(2, argc, argv);
-        x->x_color_fons = argv[3].a_w.w_symbol;
-        x->x_color_marc = argv[4].a_w.w_symbol;
-        post("!!!NOU imagegrid: s'han entrat %d arguments\n", argc);
-        if(argc == 6){
-            /* llegir la cadena de paths | afegir els paths a la cua */
-            char *cadenaPaths;
-            cadenaPaths = (char *)malloc(51200*sizeof(char));
-            strcpy(cadenaPaths,(char *)argv[5].a_w.w_symbol->s_name);
-            /* printf("Es carreguen els paths %s --- %s **** %s\n", cadenaPaths, argv[5].a_w.w_symbol->s_name,argv[3].a_w.w_symbol->s_name); */
-            /* split */
-            
-            char *token;
-            t_symbol *tt;
-            for ( token = strtok(argv[5].a_w.w_symbol->s_name,"|");
-                  token != NULL;
-                  token = strtok(NULL,"|") ){
-                      tt = gensym(token);
-            
-                      /* printf("AFEGINT CARREGANT %s\n",tt->s_name); */
-                      /* imagegrid_putimg(x,tt); */
-                      /* DE MOMENT NO AFEGEIX ELS PATHS */
-                      /* imagegrid_afegir_imatge(x,tt->s_name); */
-            }
-            /*
-            token = strtok(cadenaPaths,"|");
-            while(token){
-                tt = gensym(token);
-                printf("AFEGINT CARREGANT %s\n",tt->s_name);
-                imagegrid_putimg(x,tt);
-                token = strtok(NULL,"|");
-            }
-            */
-            free(cadenaPaths);
-        }
-    }else{
-        /* crea un objecte nou */
-        post("NOU imagegrid: es crea un objecte nou\n");
-        /* fixa el nombre de files */
-        x->x_num_fil = 3;
-        /* fixa el nombre de columnes */
-        x->x_num_col = 5;
-        
-        /* colors de fons i de marc*/
-        x->x_color_fons = gensym("#F0F0F0");
-        x->x_color_marc = gensym("#0F0F0F");
+    post("NEW imagegrid: created with %d parameters.\n", argc);
+
+    switch (argc) {
+	case 3:
+		/* versio inicial */
+		x->x_num_fil = (int)atom_getintarg(1, argc, argv);
+        	x->x_num_col = (int)atom_getintarg(2, argc, argv);
+		x->x_color_fons = gensym("#F0F0F0");
+            	x->x_color_marc = gensym("#0F0F0F");
+            	x->x_color_grasp = gensym("#F1882B");
+	break;
+	case 5:
+		/* versio 0.1 */
+		x->x_num_fil = (int)atom_getintarg(1, argc, argv);
+        	x->x_num_col = (int)atom_getintarg(2, argc, argv);
+        	x->x_color_fons = argv[3].a_w.w_symbol;
+        	x->x_color_marc = argv[4].a_w.w_symbol;
+		x->x_color_grasp = gensym("#F1882B");
+	break;
+	case 6:
+		/* versio 0.2 */
+ 		x->x_num_fil = (int)atom_getintarg(1, argc, argv);
+        	x->x_num_col = (int)atom_getintarg(2, argc, argv);
+        	x->x_color_fons = argv[3].a_w.w_symbol;
+        	x->x_color_marc = argv[4].a_w.w_symbol;
+        	x->x_color_grasp = argv[5].a_w.w_symbol;
+	break;
+	case 7:
+		/* versio 0.1 - paths dels  elsements del tauler */
+ 		x->x_num_fil = (int)atom_getintarg(1, argc, argv);
+        	x->x_num_col = (int)atom_getintarg(2, argc, argv);
+        	x->x_color_fons = argv[3].a_w.w_symbol;
+        	x->x_color_marc = argv[4].a_w.w_symbol;
+        	x->x_color_grasp = argv[5].a_w.w_symbol;
+		/*
+		// -- llegir la cadena de paths | afegir els paths a la cua //
+		// -- ATENCIO! NO AFEGEIX ELS PATHS !!! //
+            	char *cadenaPaths;
+            	cadenaPaths = (char *)malloc(51200*sizeof(char));
+            	strcpy(cadenaPaths,(char *)argv[6].a_w.w_symbol->s_name);
+            	// -- printf("Es carreguen els paths %s --- %s **** %s\n", cadenaPaths, argv[5].a_w.w_symbol->s_name,argv[3].a_w.w_symbol->s_name); //
+            	// -- split //
+            	char *token;
+            	t_symbol *tt;
+            	for ( token = strtok(argv[6].a_w.w_symbol->s_name,"|");
+                	token != NULL;
+                  	token = strtok(NULL,"|") ){
+                        	tt = gensym(token);
+                      		// -- printf("AFEGINT CARREGANT %s\n",tt->s_name); //
+                      		// -- imagegrid_putimg(x,tt); //
+                      		// -- ATENCIO! NO AFEGEIX ELS PATHS !!! //
+                      		// -- imagegrid_afegir_imatge(x,tt->s_name); //
+            	}
+            	
+            	token = strtok(cadenaPaths,"|");
+            	while(token){
+                	tt = gensym(token);
+                	printf("AFEGINT CARREGANT %s\n",tt->s_name);
+                	imagegrid_putimg(x,tt);
+                	token = strtok(NULL,"|");
+            	}
+            	free(cadenaPaths);
+            	*/
+	break;
+		
+	default:
+	    /* crea un objecte nou per defecte */
+            /* post("NEW imagegrid created.\n"); */
+            /* fixa el nombre de files */
+            x->x_num_fil = 3;
+            /* fixa el nombre de columnes */
+            x->x_num_col = 5;
+            /* colors de fons i de marc*/
+            x->x_color_fons = gensym("#F0F0F0");
+            x->x_color_marc = gensym("#0F0F0F");
+            x->x_color_grasp = gensym("#F1882B");
+	break;
     }
     /* printf("S'ha instanciat un imagegrid anomenat %s amb les caracteristiques seguents:",x->x_name->s_name);
     printf("Nombre de files %d - Nombre de columnes: %d", x->x_num_fil, x->x_num_col); */
@@ -757,7 +907,7 @@ static void *imagegrid_new(t_symbol* name, int argc, t_atom *argv)
 static void imagegrid_destroy(t_imagegrid *x){
     /* elimina el contingut de la cua */
     eliminarCua(&x->x_cua);
-    post("Imagegrid eliminat");
+    post("Imagegrid destroyed.\n");
 }
 
 /* generacio d'una nova classe */
@@ -810,6 +960,10 @@ void imagegrid_setup(void)
     class_addmethod(imagegrid_class, (t_method)imagegrid_dialog, gensym("dialog"), A_GIMME, 0);
     /* afegeix un metode per l'obtencio de la posicio del clic del ratolí */
     class_addmethod(imagegrid_class, (t_method)imagegrid_click, gensym("click"), A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
+    /* v 0.2 -- afegeix un metode netejar el contigut del tauler */
+    class_addmethod(imagegrid_class, (t_method)imagegrid_clear, gensym("clear"), 0);
+    /* v 0.2 -- afegeix un metode seek #num per disparar */
+    class_addmethod(imagegrid_class, (t_method)imagegrid_seek, gensym("seek"), A_FLOAT, 0);
     /* inicia el comportament de imagegrid */
     imagegrid_setwidget();
 

@@ -15,7 +15,8 @@ proc imagegrid_apply {id} {
      global $var_graph_color_fons
      set var_graph_color_marc [concat graph_color_marc_$vid]
      global $var_graph_color_marc
-
+     set var_graph_color_grasp [concat graph_color_grasp_$vid]
+     global $var_graph_color_grasp
 
      set cmd [concat $id dialog \
      	[eval concat $$var_graph_name] \
@@ -23,6 +24,7 @@ proc imagegrid_apply {id} {
      	[eval concat $$var_graph_num_col] \
      	[eval concat $$var_graph_color_fons] \
      	[eval concat $$var_graph_color_marc] \
+     	[eval concat $$var_graph_color_grasp] \
  	\;]
 #puts stderr $cmd
      pd $cmd
@@ -39,7 +41,7 @@ proc imagegrid_ok {id} {
      imagegrid_cancel $id
 }
  
-proc pdtk_imagegrid_dialog {id name num_fil num_col color_fons color_marc} {
+proc pdtk_imagegrid_dialog {id name num_fil num_col color_fons color_marc color_grasp} {
      set vid [string trimleft $id .]
      set var_graph_name [concat graph_name_$vid]
      global $var_graph_name
@@ -51,12 +53,15 @@ proc pdtk_imagegrid_dialog {id name num_fil num_col color_fons color_marc} {
      global $var_graph_color_fons
      set var_graph_color_marc [concat graph_color_marc_$vid]
      global $var_graph_color_marc
+     set var_graph_color_grasp [concat graph_color_grasp_$vid]
+     global $var_graph_color_grasp
      
      set $var_graph_name $name
      set $var_graph_num_fil $num_fil
      set $var_graph_num_col $num_col
      set $var_graph_color_fons $color_fons
      set $var_graph_color_marc $color_marc
+     set $var_graph_color_grasp $color_grasp
  
      toplevel $id
      wm title $id {imagegrid}
@@ -79,13 +84,13 @@ proc pdtk_imagegrid_dialog {id name num_fil num_col color_fons color_marc} {
      
      frame $id.1rangef
      pack $id.1rangef -side top
-     label $id.1rangef.lname -text "Nom :"
+     label $id.1rangef.lname -text "Name :"
      entry $id.1rangef.name -textvariable $var_graph_name -width 7
      pack $id.1rangef.lname $id.1rangef.name -side left
  
      frame $id.2rangef
      pack $id.2rangef -side top
-     label $id.2rangef.lnum_fil -text "Fils :"
+     label $id.2rangef.lnum_fil -text "Rows :"
      entry $id.2rangef.num_fil -textvariable $var_graph_num_fil -width 7
      pack $id.2rangef.lnum_fil $id.2rangef.num_fil -side left
  
@@ -97,22 +102,28 @@ proc pdtk_imagegrid_dialog {id name num_fil num_col color_fons color_marc} {
  
      frame $id.4rangef
      pack $id.4rangef -side top
-     label $id.4rangef.lcolor_fons -text "Color fons :"
+     label $id.4rangef.lcolor_fons -text "Bg Color :"
      entry $id.4rangef.color_fons -textvariable $var_graph_color_fons -width 7
      pack $id.4rangef.lcolor_fons $id.4rangef.color_fons -side left
 
      frame $id.5rangef
      pack $id.5rangef -side top
-     label $id.5rangef.lcolor_marc -text "Color marc :"
+     label $id.5rangef.lcolor_marc -text "Border Color :"
      entry $id.5rangef.color_marc -textvariable $var_graph_color_marc -width 7
      pack $id.5rangef.lcolor_marc $id.5rangef.color_marc -side left
 
+     frame $id.6rangef
+     pack $id.6rangef -side top
+     label $id.6rangef.lcolor_grasp -text "Sel Color :"
+     entry $id.6rangef.color_grasp -textvariable $var_graph_color_grasp -width 7
+     pack $id.6rangef.lcolor_grasp $id.6rangef.color_grasp -side left
 
      bind $id.1rangef.name <KeyPress-Return> [concat imagegrid_ok $id]
      bind $id.2rangef.num_fil <KeyPress-Return> [concat imagegrid_ok $id]
      bind $id.3rangef.num_col <KeyPress-Return> [concat imagegrid_ok $id]
      bind $id.4rangef.color_fons <KeyPress-Return> [concat imagegrid_ok $id]
      bind $id.5rangef.color_marc <KeyPress-Return> [concat imagegrid_ok $id]
+     bind $id.6rangef.color_grasp <KeyPress-Return> [concat imagegrid_ok $id]
 
      focus $id.1rangef.name
 }
