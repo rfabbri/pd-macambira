@@ -41,6 +41,8 @@ loadlib36: flatspace
 loadlib37: deprecated
 loadlib38: pdp
 loadlib39: pidip
-path1: /usr/share/pd
-path2: /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType
 nloadlib: 39
+path1: ~/pd
+path2: /usr/share/pd
+path3: /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType
+npath: 3

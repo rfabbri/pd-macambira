@@ -49,9 +49,10 @@ print_gnulinux_fontpath ()
 		  ((++i)) 
 		  echo "path${i}: ${fontpath}" >> $GNULINUX_FILE
 	 done
+	 echo "npath: ${i}" >> $GNULINUX_FILE
 }
 
-print_gnulinux_footer ()
+print_gnulinux_nloadlib ()
 {
 	 echo "nloadlib: $1" >> $GNULINUX_FILE
 }
@@ -71,6 +72,14 @@ print_macosx_fontpath ()
 		  echo -e "\t<key>path${i}</key>" >> $MACOSX_FILE
 		  echo -e "\t<string>${fontpath}</string>" >> $MACOSX_FILE
 	 done
+	 echo -e "\t<key>npath</key>" >> $MACOSX_FILE
+	 echo -e "\t<string>${i}</string>" >> $MACOSX_FILE
+}
+
+print_macosx_nloadlib ()
+{
+	echo -e "\t<key>nloadlib</key>" >> $MACOSX_FILE
+	echo -e "\t<string>${1}</string>" >> $MACOSX_FILE
 }
 
 # Windows ---------------------------------------------------------------------#
@@ -88,6 +97,8 @@ print_windows_fontpath ()
 		  echo "\"path${j}\"=${fontpath}" >> $WINDOWS_FILE
 		  echo "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: path${j}; ValueData: ${fontpath}; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_FILE
 	 done
+	 echo "\"npath\"=${j}" >> $WINDOWS_FILE
+	 echo "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: npath; ValueData: ${j}; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_FILE
 }
 
 print_windows_delete ()
@@ -96,6 +107,11 @@ print_windows_delete ()
 	 echo "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: ${1}${2}; Flags: deletevalue; Tasks: libs"  >> $WINDOWS_INNO_FILE
 }
 
+print_windows_nloadlib ()
+{
+	 echo "\"nloadlib\"=${1}" >> $WINDOWS_FILE
+	 echo "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: nloadlib; ValueData: ${1}; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_FILE
+}
 #==============================================================================#
 
 echo "Running for GNU/Linux and Darwin:"
@@ -108,8 +124,8 @@ for lib in $LIBS; do
 done
 echo " "
 
-# the .pdsettings file needs a terminator with the lib count
-linux_end_count=$i
+print_gnulinux_nloadlib $i
+print_macosx_nloadlib $i
 
 # run separately so some libs can be excluded on Windows
 echo "Running for Windows:"
@@ -126,6 +142,7 @@ for lib in $LIBS; do
 	 esac
 done
 echo " "
+print_windows_nloadlib $i
 
 # print lines to delete existing loadlib flags
 echo "; delete any previous loadlib flags" >> $WINDOWS_FILE
@@ -144,9 +161,8 @@ while [ $i -lt 100 ]; do
 	 print_windows_delete path $i
 done
 
-# the .pd-settings file needs an end tag for the loadlib statements
+# the .pd-settings file needs an end tag for the path statements
 print_gnulinux_fontpath
-print_gnulinux_footer $linux_end_count
 
 print_macosx_fontpath
 echo -e $MACOSX_FOOTER >> $MACOSX_FILE

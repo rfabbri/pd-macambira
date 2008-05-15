@@ -38,6 +38,7 @@ Windows Registry Editor Version 5.00
 "loadlib35"="ekext"
 "loadlib36"="flatspace"
 "loadlib37"="deprecated"
+"nloadlib"=37
 ; delete any previous loadlib flags
 "loadlib38"=-
 "loadlib39"=-
@@ -103,6 +104,7 @@ Windows Registry Editor Version 5.00
 "loadlib99"=-
 "loadlib100"=-
 "path1"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,2f,00,46,00,6f,00,6e,00,74,00,73,00,00,00
+"npath"=1
 ; delete all existing path flags
 "path2"=-
 "path3"=-
