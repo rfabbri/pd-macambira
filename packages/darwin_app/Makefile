@@ -40,7 +40,7 @@ endif
 
 # Mac/Intels only run 10.4, so always gcc 4.x
 ifeq ($(TARGET_PLATFORM),i386)
-OPT_CFLAGS = -march=pentium4 -msse2 -mfpmath=sse \
+OPT_CFLAGS = -fast -fPIC -march=pentium4 -msse2 -mfpmath=sse \
 	-ftree-vectorize -ftree-vectorizer-verbose=2
 endif
 
