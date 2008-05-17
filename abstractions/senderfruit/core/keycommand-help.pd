@@ -1,0 +1,24 @@
+#N canvas 932 55 326 225 10;
+#X text 12 9 [keycommand] - assign a keyboard key to a receiver;
+#X obj 42 82 keycommand a \$0go;
+#X obj 42 102 keycommand s \$0do-it;
+#X obj 42 122 keycommand d \$0now;
+#X obj 42 142 keycommand f \$0comeon;
+#X obj 212 82 r \$0go;
+#X obj 212 102 r \$0do-it;
+#X obj 212 122 r \$0now;
+#X obj 212 142 r \$0comeon;
+#X obj 294 99 bng 15 250 50 0 empty empty empty 17 7 0 10 -258113 -257985
+-1;
+#X obj 294 119 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -4160
+-1;
+#X obj 294 139 bng 15 250 50 0 empty empty empty 17 7 0 10 -159808
+-4034 -1;
+#X obj 294 159 bng 15 250 50 0 empty empty empty 17 7 0 10 -260097
+-4032 -1;
+#X text 187 183 2008 Luke Iannini;
+#X text 187 198 proyekto.net;
+#X connect 5 0 9 0;
+#X connect 6 0 10 0;
+#X connect 7 0 11 0;
+#X connect 8 0 12 0;
