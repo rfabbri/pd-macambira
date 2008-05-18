@@ -3,8 +3,8 @@
 
 # path to pd
 ## change this according to your setup!
-#PDROOT=../../../pd
-PDROOT=/Net/iem/Benutzer/zmoelnig/src/pd-0.41-0test08
+PDROOT?=../../../pd
+#PDROOT=/Net/iem/Benutzer/zmoelnig/src/pd-0.41-0test08
 
 # here we find the sources of pd (and evtl. the pd.lib)
 PDSRCDIR=$(PDROOT)/src

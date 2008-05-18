@@ -42,7 +42,15 @@
 #endif
 
 
-#define HEXLOADER_PATCHES
+/* for now hexloading abstractions does not work very well, 
+ * as it chokes when the hexloaded abstractions has nested abstractions
+ * 
+ * if you really want to enable hexloading patches, 
+ * do so via the Makefile by defining HEXLOADER_PATCHES
+ *
+ */
+//#define HEXLOADER_PATCHES
+
 
 #ifdef HEXLOADER_PATCHES
 void canvas_popabstraction(t_canvas *x);
@@ -562,6 +570,7 @@ static int hexloader_loadfile(char*pathname, char*filename, namelist_t*altnames)
   sprintf(fullfile, "%s/%s", pathname, filename);
 
   while(altname) {
+    verbose(2, "hexloader trying %s (%s)", fullfile, altname->name);
     if(hexloader_doload(fullfile, altname->name))
       return 1;
 
