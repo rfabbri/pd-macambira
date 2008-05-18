@@ -608,7 +608,7 @@ static t_filepath*hexloader_loadpatch(char*pathname, char*filename, char*altclas
   }
   
 #else
-  post("BUG: hexloader not loading patch: %s (not yet implemented)", fullfile);
+  error("BUG: hexloader not loading abstraction: %s (not yet implemented)", fullfile);
 #endif /* HEXLOADER_PATCHES */
   return 0;
 }
