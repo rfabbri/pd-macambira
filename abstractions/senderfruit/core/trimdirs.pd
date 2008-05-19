@@ -1,4 +1,4 @@
-#N canvas 694 125 474 478 10;
+#N canvas 694 125 471 382 10;
 #X obj 185 137 symbol2list /;
 #X obj 185 176 list-splat -1;
 #X obj 156 282 list2symbol /;
@@ -16,13 +16,6 @@
 #X obj 344 109 * -1;
 #X obj 402 21 inlet;
 #X obj 185 20 inlet;
-#X text 32 376 Trims the last [n] directories from the end of a path.
-;
-#X text 33 390 With [trimdirs 1] \, /Users/Me/Pd/Synths becomes /Users/Me/Pd
-;
-#X text 32 404 Handles spaces just fine.;
-#X text 357 434 Luke Iannini 2008;
-#X text 357 446 proyekto.net;
 #X obj 156 343 outlet;
 #X obj 344 137 sel 0;
 #X obj 185 87 demultiplex;
@@ -32,10 +25,9 @@
 #X obj 185 110 s \$0passthrough;
 #X obj 170 314 r \$0passthrough;
 #X obj 344 82 abs;
-#X text 32 418 No/0 argument passes input through unchanged;
 #X connect 0 0 1 0;
 #X connect 1 0 3 0;
-#X connect 2 0 22 0;
+#X connect 2 0 17 0;
 #X connect 3 0 4 0;
 #X connect 3 1 11 1;
 #X connect 4 0 5 0;
@@ -46,18 +38,18 @@
 #X connect 9 0 6 1;
 #X connect 10 0 9 0;
 #X connect 11 0 2 0;
-#X connect 12 0 30 0;
+#X connect 12 0 25 0;
 #X connect 13 0 12 0;
-#X connect 14 0 23 0;
-#X connect 15 0 30 0;
-#X connect 16 0 24 0;
-#X connect 23 0 27 0;
-#X connect 23 1 25 0;
-#X connect 24 0 28 0;
-#X connect 24 1 0 0;
-#X connect 25 0 1 1;
-#X connect 25 1 26 0;
-#X connect 26 0 24 1;
-#X connect 27 0 24 1;
-#X connect 29 0 22 0;
-#X connect 30 0 14 0;
+#X connect 14 0 18 0;
+#X connect 15 0 25 0;
+#X connect 16 0 19 0;
+#X connect 18 0 22 0;
+#X connect 18 1 20 0;
+#X connect 19 0 23 0;
+#X connect 19 1 0 0;
+#X connect 20 0 1 1;
+#X connect 20 1 21 0;
+#X connect 21 0 19 1;
+#X connect 22 0 19 1;
+#X connect 24 0 17 0;
+#X connect 25 0 14 0;
