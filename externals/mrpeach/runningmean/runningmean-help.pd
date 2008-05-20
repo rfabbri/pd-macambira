@@ -1,26 +1,31 @@
-#N canvas 537 273 534 300 10;
-#X obj 147 219 runningmean 128;
-#X text 16 13 runningmean outputs the running mean of n floats.;
-#X msg 147 54 clear;
-#X msg 147 80 length 10;
-#X msg 234 106 22;
-#X text 185 54 clear the array to zero;
-#X text 209 80 set length (also clears the array);
-#X text 260 105 set length (also clears the array);
-#X text 247 221 argument sets initial length;
-#X floatatom 147 250 5 0 0 0 - - -;
-#X obj 17 74 bng 15 250 50 0 empty empty empty 17 7 0 10 -257985 -1
+#N canvas 537 273 624 278 10;
+#X obj 141 181 runningmean 128;
+#X msg 141 117 clear;
+#X msg 167 138 length 10;
+#X msg 228 159 22;
+#X text 179 117 clear the array to zero;
+#X text 233 138 set length (also clears the array);
+#X floatatom 141 212 5 0 0 0 - - -;
+#X obj 11 36 bng 15 250 50 0 empty empty empty 17 7 0 10 -257985 -1
 -1;
-#X text 35 73 bang outputs current mean;
-#X msg 82 137 1;
-#X msg 104 159 2;
-#X text 306 244 Martin Peach 2008_05_16;
-#X text 112 137 incoming numbers are added to the array;
-#X text 111 249 mean:;
-#X connect 0 0 9 0;
+#X text 29 35 bang outputs current mean;
+#X msg 76 99 1;
+#X msg 98 121 2;
+#X text 455 239 Martin Peach 2008_05_16;
+#X text 105 211 mean:;
+#X text 254 158 another way to set length (also clears the array);
+#X text 63 69 Incoming floats are added to the array. The mean is recalculated
+for each incoming float;
+#X text 237 181 Argument sets initial length. Default (no argument)
+is 128;
+#X text 199 201 Length can be changed to any positive value greater
+than or equal to the length set by the creation argumwent;
+#X text 10 4 [runningmean] outputs the running mean of the last n floats
+to arrive on the left inlet.;
+#X connect 0 0 6 0;
+#X connect 1 0 0 0;
 #X connect 2 0 0 0;
-#X connect 3 0 0 0;
-#X connect 4 0 0 1;
+#X connect 3 0 0 1;
+#X connect 7 0 0 0;
+#X connect 9 0 0 0;
 #X connect 10 0 0 0;
-#X connect 12 0 0 0;
-#X connect 13 0 0 0;
