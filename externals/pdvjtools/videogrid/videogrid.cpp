@@ -1,8 +1,8 @@
 
 /*
-videogrid external for Puredata
-Copyright (C) 2007  Sergi Lario
-sll :: slario-at-gmail.com
+videogrid external for Puredatai
+Lluis Gomez i Bigorda :: lluis-at-hangar.org
+Sergi Lario Loyo      :: slario-at-gmail.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
