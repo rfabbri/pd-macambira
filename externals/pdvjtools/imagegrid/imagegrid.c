@@ -30,9 +30,224 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* incloure estructures de dades i capceleres de funcions gàfiques bàsiques de pd */
 #include "g_canvas.h"
 /* incloure estructures de dades i capceleres de funcions per a gestionar una cua */
-#include "cua.h"
+/*#include "cua.h"*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* nombre de caracters per el nom del path del fitxer */
+#define BYTESNOMFITXER 512
+
+typedef char path[BYTESNOMFITXER];
+
+/* estructures i tipus de dades de la cua */
+
+/* estructura de dades: un node de la cua */
+struct node
+{
+    /* nom del path de la imatge */
+    path pathFitxer;
+    /* apuntador al següent node en cua */
+    struct node *seguent;
+};
+
+/* definició del tipus node */
+typedef struct node Node;
+
+/* definició del tipus de cua */
+typedef struct
+{
+    Node *davanter;
+    Node *final;
+}Cua;
+
+
+/* declaracions de les funcions */
+
+/* crea una cua */
+void crearCua(Cua *cua);
+/* encuara un element al final de la cua */
+void encuar (Cua *cua, path x);
+/* elimina un element de la cua */
+int desencuar (Cua *cua);
+/* retorna si la cua és buida */
+int cuaBuida(Cua *cua);
+/* elimina el contingut de la cua */
+void eliminarCua(Cua *cua);
+/* retorna el nombre de nodes de la cua */
+int numNodes(Cua *cua);
+/* escriu el contingut de la cua */
+void escriuCua(Cua *cua);
+
+/* funcions cua */
+/* implementació de les funcions */
+void crearCua(Cua *cua)
+{
+    cua->davanter=cua->final=NULL;
+}
+
+/* funció que encua el node al final de la cua */
+void encuar (Cua *cua, path x)
+{
+    Node *nou;
+    nou=(Node*)malloc(sizeof(Node));
+    strcpy(nou->pathFitxer,x);
+    nou->seguent=NULL;
+    if(cuaBuida(cua))
+    {
+        cua->davanter=nou;
+    }
+    else
+        cua->final->seguent=nou;
+    cua->final=nou;
+}
+
+/* elimina l'element del principi de la cua */
+int desencuar (Cua *cua)
+{
+    if(!cuaBuida(cua))
+    {
+        Node *nou;
+        nou=cua->davanter;
+        cua->davanter=cua->davanter->seguent;
+        free(nou);
+        return 1;
+    }
+    else
+    {
+    	/* printf("Cua buida\a\n"); */
+    	return 0;
+    }
+       
+}
+
+/* funció que retorna si la cua és buida */
+int cuaBuida(Cua *cua)
+{
+    return (cua->davanter==NULL);
+}
+
+/* elimina el contingut de la cua */
+void eliminarCua(Cua *cua)
+{
+    while (!cuaBuida(cua)) desencuar(cua); 
+    printf("Cua eliminada\n");
+}
+
+/* funció que retorna el nombre de nodes de la cua */
+int numNodes(Cua *cua)
+{
+    int contador=0;
+    Node *actual;
+    actual=cua->davanter;
+    if(actual) contador=1;
+    while((actual)&&(actual != cua->final)){
+         contador ++;
+         actual = actual->seguent;
+    }
+    return (contador);
+}
+
+/* funció que escriu la cua de nodes per la sortida estàndard */
+void escriuCua(Cua *cua)
+{
+    if(!cuaBuida(cua))
+    {
+        Node *actual;
+        actual=cua->davanter;
+        printf("CUA DE NODES\n[");
+        do{
+            printf("#%s#",actual->pathFitxer);
+            actual = actual->seguent;
+        }while(actual);
+        printf("]\n");
+        
+    }
+    else
+        printf("Cua buida\n");
+}
+
+
 /* incloure estructures de dades i capceleres de funcions per convertir imatges a diferents formats */
-#include "magickconverter.h"
+/*#include "magickconverter.h"*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+/*#include <wand/MagickWand.h>*/
+#include <wand/magick-wand.h>
+
+#define BYTESNOMFITXERIMATGE 512
+#define BYTESTIPUSFROMAT 4
+
+#define FORMAT_MINIATURA "ppm"
+#define PATH_TEMPORAL "/tmp/imgrid_"
+#define BYTES_NUM_TEMP 4
+
+#define ThrowWandException(wand) \
+{ \
+    char \
+    *description; \
+    \
+    ExceptionType \
+    severity; \
+    \
+    description=MagickGetException(wand,&severity); \
+    (void) fprintf(stderr,"%s %s %ld %s\n",GetMagickModule(),description); \
+    description=(char *) MagickRelinquishMemory(description); \
+    exit(-1); \
+}
+
+typedef char pathimage[BYTESNOMFITXERIMATGE];
+
+typedef char tipus_format[BYTESTIPUSFROMAT];
+
+void convertir(pathimage pathFitxer, tipus_format f, int W, int H, int posi);
+
+/* funcions per convertir */
+
+
+void convertir(pathimage pathFitxer, tipus_format f, int W, int H, int posi){
+
+    MagickBooleanType
+            status;
+    MagickWand
+            *magick_wand;
+    pathimage ig_path = PATH_TEMPORAL;
+    char posi_str[BYTES_NUM_TEMP];
+
+    /*printf("\nEl path %s i el format %s\n",pathFitxer,f);*/
+
+    /*
+    Read an image.
+    */
+    MagickWandGenesis();
+    magick_wand=NewMagickWand();
+    status=MagickReadImage(magick_wand,pathFitxer);
+    if (status == MagickFalse)
+        ThrowWandException(magick_wand);
+    /*
+    Turn the images into a thumbnail sequence.
+    */
+    MagickResetIterator(magick_wand);
+    while (MagickNextImage(magick_wand) != MagickFalse)
+        MagickResizeImage(magick_wand,W,H,LanczosFilter,1.0);
+    /*
+    Write the image as 'f' and destroy it.
+    */
+    sprintf(posi_str, "%d", posi);
+    strcat(ig_path,posi_str);
+    strcat(ig_path,".");
+    strcat(ig_path,f);
+ 
+    /* printf("\nEl nou path %s i el format %s\n",ig_path,f); */
+    status=MagickWriteImages(magick_wand,ig_path,MagickTrue);
+    if (status == MagickFalse)
+        ThrowWandException(magick_wand);
+    magick_wand=DestroyMagickWand(magick_wand);
+    MagickWandTerminus();
+}
+
 /* incloure estructures de dades i capceleres de funcions per traballar amb threads */
 #include "pthread.h"
 
@@ -89,6 +304,136 @@ typedef struct _imagegrid {
 
 } t_imagegrid;
 
+
+void load_tkprocs(void){
+	// ########### procediments per imagegrid -- slario(at)gmail.com [a partir del codi del grid de l'Ives: ydegoyon(at)free.fr] #########
+	sys_gui("proc imagegrid_apply {id} {\n");
+	// strip "." from the TK id to make a variable name suffix
+	sys_gui("set vid [string trimleft $id .]\n");
+	// for each variable, make a local variable to hold its name...
+	sys_gui("set var_graph_name [concat graph_name_$vid]\n");
+	sys_gui("global $var_graph_name\n");
+	sys_gui("set var_graph_num_fil [concat graph_num_fil_$vid]\n");
+	sys_gui("global $var_graph_num_fil\n");
+	sys_gui("set var_graph_num_col [concat graph_num_col_$vid]\n");
+	sys_gui("global $var_graph_num_col\n");
+	sys_gui("set var_graph_color_fons [concat graph_color_fons_$vid]\n");
+	sys_gui("global $var_graph_color_fons\n");
+	sys_gui("set var_graph_color_marc [concat graph_color_marc_$vid]\n");
+	sys_gui("global $var_graph_color_marc\n");
+	sys_gui("set var_graph_color_grasp [concat graph_color_grasp_$vid]\n");
+	sys_gui("global $var_graph_color_grasp\n");
+	sys_gui("set cmd [concat $id dialog [eval concat $$var_graph_name] [eval concat $$var_graph_num_fil] [eval concat $$var_graph_num_col] [eval concat $$var_graph_color_fons] [eval concat $$var_graph_color_marc] [eval concat $$var_graph_color_grasp] \\;]\n");
+	// puts stderr $cmd
+	sys_gui("pd $cmd\n");
+	sys_gui("}\n");
+	sys_gui("proc imagegrid_cancel {id} {\n");
+	sys_gui("set cmd [concat $id cancel \\;]\n");
+	// puts stderr $cmd
+	sys_gui("pd $cmd\n");
+	sys_gui("}\n");
+	sys_gui("proc imagegrid_ok {id} {\n");
+	sys_gui("imagegrid_apply $id\n");
+	sys_gui("imagegrid_cancel $id\n");
+	sys_gui("}\n");
+	sys_gui("proc pdtk_imagegrid_dialog {id name num_fil num_col color_fons color_marc color_grasp} {\n");
+	sys_gui("set vid [string trimleft $id .]\n");
+	sys_gui("set var_graph_name [concat graph_name_$vid]\n");
+	sys_gui("global $var_graph_name\n");
+	sys_gui("set var_graph_num_fil [concat graph_num_fil_$vid]\n");
+	sys_gui("global $var_graph_num_fil\n");
+	sys_gui("set var_graph_num_col [concat graph_num_col_$vid]\n");
+	sys_gui("global $var_graph_num_col\n");
+	sys_gui("set var_graph_color_fons [concat graph_color_fons_$vid]\n");
+	sys_gui("global $var_graph_color_fons\n");
+	sys_gui("set var_graph_color_marc [concat graph_color_marc_$vid]\n");
+	sys_gui("global $var_graph_color_marc\n");
+	sys_gui("set var_graph_color_grasp [concat graph_color_grasp_$vid]\n");
+	sys_gui("global $var_graph_color_grasp\n");
+	sys_gui("set $var_graph_name $name\n");
+	sys_gui("set $var_graph_num_fil $num_fil\n");
+	sys_gui("set $var_graph_num_col $num_col\n");
+	sys_gui("set $var_graph_color_fons $color_fons\n");
+	sys_gui("set $var_graph_color_marc $color_marc\n");
+	sys_gui("set $var_graph_color_grasp $color_grasp\n");
+	sys_gui("toplevel $id\n");
+	sys_gui("wm title $id {imagegrid}\n");
+	sys_gui("wm protocol $id WM_DELETE_WINDOW [concat imagegrid_cancel $id]\n");
+	sys_gui("label $id.label -text {IMAGEGRID PROPERTIES}\n");
+	sys_gui("pack $id.label -side top\n");
+	sys_gui("frame $id.buttonframe\n");
+	sys_gui("pack $id.buttonframe -side bottom -fill x -pady 2m\n");
+	sys_gui("button $id.buttonframe.cancel -text {Cancel} -command \"imagegrid_cancel $id\"\n");
+	sys_gui("button $id.buttonframe.apply -text {Apply} -command \"imagegrid_apply $id\"\n");
+	sys_gui("button $id.buttonframe.ok -text {OK} -command \"imagegrid_ok $id\"\n");
+	sys_gui("pack $id.buttonframe.cancel -side left -expand 1\n");
+	sys_gui("pack $id.buttonframe.apply -side left -expand 1\n");
+	sys_gui("pack $id.buttonframe.ok -side left -expand 1\n");
+	sys_gui("frame $id.1rangef\n");
+	sys_gui("pack $id.1rangef -side top\n");
+	sys_gui("label $id.1rangef.lname -text \"Nom :\"\n");
+	sys_gui("entry $id.1rangef.name -textvariable $var_graph_name -width 7\n");
+	sys_gui("pack $id.1rangef.lname $id.1rangef.name -side left\n");
+	sys_gui("frame $id.2rangef\n");
+	sys_gui("pack $id.2rangef -side top\n");
+	sys_gui("label $id.2rangef.lnum_fil -text \"Fils :\"\n");
+	sys_gui("entry $id.2rangef.num_fil -textvariable $var_graph_num_fil -width 7\n");
+	sys_gui("pack $id.2rangef.lnum_fil $id.2rangef.num_fil -side left\n");
+	sys_gui("frame $id.3rangef\n");
+	sys_gui("pack $id.3rangef -side top\n");
+	sys_gui("label $id.3rangef.lnum_col -text \"Cols :\"\n");
+	sys_gui("entry $id.3rangef.num_col -textvariable $var_graph_num_col -width 7\n");
+	sys_gui("pack $id.3rangef.lnum_col $id.3rangef.num_col -side left\n");
+	sys_gui("frame $id.4rangef\n");
+	sys_gui("pack $id.4rangef -side top\n");
+	sys_gui("label $id.4rangef.lcolor_fons -text \"Color fons :\"\n");
+	sys_gui("entry $id.4rangef.color_fons -textvariable $var_graph_color_fons -width 7\n");
+	sys_gui("pack $id.4rangef.lcolor_fons $id.4rangef.color_fons -side left\n");
+	sys_gui("frame $id.5rangef\n");
+	sys_gui("pack $id.5rangef -side top\n");
+	sys_gui("label $id.5rangef.lcolor_marc -text \"Color marc :\"\n");
+	sys_gui("entry $id.5rangef.color_marc -textvariable $var_graph_color_marc -width 7\n");
+	sys_gui("pack $id.5rangef.lcolor_marc $id.5rangef.color_marc -side left\n");
+	sys_gui("frame $id.6rangef\n");
+	sys_gui("pack $id.6rangef -side top\n");
+	sys_gui("label $id.6rangef.lcolor_grasp -text \"Color grasp :\"\n");
+	sys_gui("entry $id.6rangef.color_grasp -textvariable $var_graph_color_grasp -width 7\n");
+	sys_gui("pack $id.6rangef.lcolor_grasp $id.6rangef.color_grasp -side left\n");
+	sys_gui("bind $id.1rangef.name <KeyPress-Return> [concat imagegrid_ok $id]\n");
+	sys_gui("bind $id.2rangef.num_fil <KeyPress-Return> [concat imagegrid_ok $id]\n");
+	sys_gui("bind $id.3rangef.num_col <KeyPress-Return> [concat imagegrid_ok $id]\n");
+	sys_gui("bind $id.4rangef.color_fons <KeyPress-Return> [concat imagegrid_ok $id]\n");
+	sys_gui("bind $id.5rangef.color_marc <KeyPress-Return> [concat imagegrid_ok $id]\n");
+	sys_gui("bind $id.6rangef.color_grasp <KeyPress-Return> [concat imagegrid_ok $id]\n");
+	sys_gui("focus $id.1rangef.name\n");
+	sys_gui("}\n");
+	sys_gui("proc table {w content args} {\n");
+	sys_gui("frame $w -bg black\n");
+	sys_gui("set r 0\n");
+	sys_gui("foreach row $content {\n");
+	sys_gui("set fields {}\n");
+	sys_gui("set c 0\n");
+	sys_gui("foreach col $row {\n");
+	// lappend fields [label $w.$r/$c -text $col]
+	sys_gui("set img [image create photo -file $col]\n");
+	sys_gui("lappend fields [label $w.$r/$c -image $img]\n");
+	sys_gui("incr c\n");
+	sys_gui("}\n");
+	sys_gui("eval grid $fields -sticky news -padx 1 -pady 1\n");
+	sys_gui("incr r\n");
+	sys_gui("}\n");
+	sys_gui("set w\n");
+	sys_gui("}\n");
+	sys_gui("proc pdtk_imagegrid_table {id name num_fil num_col} {\n");
+	sys_gui("table .tauler {\n");
+	sys_gui("{sll80x60.gif 3160x120.gif sll80x60.gif}\n");
+	sys_gui("{sll80x60.gif sll80x60.gif sll80x60.gif}\n");
+	sys_gui("{sll80x60.ppm sll80x60.gif 3160x120.gif}\n");
+	sys_gui("}\n");
+	sys_gui("pack .tauler\n");
+	sys_gui("}\n");
+
+}
 
 /* calcula la posició x del tauler a partir de la posició de l'element de la cua (d'esquerra a dreta) */
 int getX(t_imagegrid* x, int posCua){
@@ -917,7 +1262,8 @@ static void imagegrid_destroy(t_imagegrid *x){
 void imagegrid_setup(void)
 {
     /* post("Entra a setup per generar la classe imagegrid"); */
-    #include "imagegrid.tk2c"
+    /* #include "imagegrid.tk2c" */
+	load_tkprocs();
     /*
                      sense pas d'arguments
     imagegrid_class = class_new(gensym("imagegrid"),
