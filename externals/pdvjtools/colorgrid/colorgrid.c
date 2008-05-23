@@ -16,7 +16,6 @@
 #include "m_imp.h"
 #include "g_canvas.h"
 #include "t_tk.h"
-#include "g_colorgrid.h"
 
 #ifdef NT
 #include <io.h>
@@ -28,6 +27,103 @@
 #define DEFAULT_COLORGRID_WIDTH 256
 #define DEFAULT_COLORGRID_HEIGHT 50
 #define DEFAULT_COLORGRID_NBLINES 10
+
+typedef struct _colorgrid
+{
+    t_object x_obj;
+    t_glist *x_glist;
+    t_symbol *x_name; 
+    t_outlet *x_xoutlet; 
+    t_outlet *x_youtlet; 
+    t_outlet *x_zoutlet; 
+    int x_null; 	/* To dissable resize                             */
+    int x_height; 	/* height of the colorgrid                        */
+    t_float x_min; 	/* minimum value of x                        */
+    t_float x_max; 	/* max value of x                            */
+    int x_width; 	/* width of the colorgrid                         */
+    t_float y_min; 	/* minimum value of y                        */
+    t_float y_max; 	/* max value of y                            */
+    t_float x_current; 	/* x coordinate of current position          */
+    t_float y_current; 	/* y coordinate of current position          */
+    int x_selected; 	/* stores selected state                     */
+    int x_point; 	/* indicates if a point is plotted           */
+    int x_colorgrid; 	/* indicates if a colorgrid is requested          */
+    t_float x_xstep; 	/* sets the step ( grain ) for x             */
+    t_float x_ystep; 	/* sets the step ( grain ) for y             */
+    int x_xlines; 	/* number of vertical lines                  */
+    int x_ylines; 	/* number of horizontal lines                */
+    t_symbol*  x_fname;
+} t_colorgrid;
+
+void load_tk_procs () {
+	// ########### colorgrid procedures -- ydegoyon@free.fr #########
+	// package require Img
+	sys_gui("package require base64\n");
+	sys_gui("proc colorgrid_apply {id} {\n");
+	// strip "." from the TK id to make a variable name suffix
+	sys_gui("set vid [string trimleft $id .]\n");
+	// for each variable, make a local variable to hold its name...
+	sys_gui("set var_graph_colorgrid [concat graph_colorgrid_$vid]\n");
+	sys_gui("global $var_graph_colorgrid\n");
+	sys_gui("set var_graph_xlines [concat graph_xlines_$vid]\n");
+	sys_gui("global $var_graph_xlines\n");
+	sys_gui("set var_graph_ylines [concat graph_ylines_$vid]\n");
+	sys_gui("global $var_graph_ylines\n");
+	sys_gui("set cmd [concat $id dialog [eval concat $$var_graph_xlines] [eval concat $$var_graph_ylines] [eval concat $$var_graph_colorgrid] \\;]\n");
+	// puts stderr $cmd
+	sys_gui("pd $cmd\n");
+	sys_gui("}\n");
+	sys_gui("proc colorgrid_cancel {id} {\n");
+	sys_gui("set cmd [concat $id cancel \\;]\n");
+	// puts stderr $cmd
+	sys_gui("pd $cmd\n");
+	sys_gui("}\n");
+	sys_gui("proc colorgrid_ok {id} {\n");
+	sys_gui("colorgrid_apply $id\n");
+	sys_gui("colorgrid_cancel $id\n");
+	sys_gui("}\n");
+	sys_gui("proc pdtk_colorgrid_dialog {id xlines ylines colorgrid} {\n");
+	sys_gui("set vid [string trimleft $id .]\n");
+	sys_gui("set var_graph_colorgrid [concat graph_colorgrid_$vid]\n");
+	sys_gui("global $var_graph_colorgrid\n");
+	sys_gui("set var_graph_xlines [concat graph_xlines_$vid]\n");
+	sys_gui("global $var_graph_xlines\n");
+	sys_gui("set var_graph_ylines [concat graph_ylines_$vid]\n");
+	sys_gui("global $var_graph_ylines\n");
+	sys_gui("set $var_graph_colorgrid $colorgrid\n");
+	sys_gui("set $var_graph_xlines $xlines\n");
+	sys_gui("set $var_graph_ylines $ylines\n");
+	sys_gui("toplevel $id\n");
+	sys_gui("wm title $id {colorgrid}\n");
+	sys_gui("wm protocol $id WM_DELETE_WINDOW [concat colorgrid_cancel $id]\n");
+	sys_gui("label $id.label -text {COLORGRID PROPERTIES}\n");
+	sys_gui("pack $id.label -side top\n");
+	sys_gui("frame $id.buttonframe\n");
+	sys_gui("pack $id.buttonframe -side bottom -fill x -pady 2m\n");
+	sys_gui("button $id.buttonframe.cancel -text {Cancel} -command \"colorgrid_cancel $id\"\n");
+	sys_gui("button $id.buttonframe.apply -text {Apply} -command \"colorgrid_apply $id\"\n");
+	sys_gui("button $id.buttonframe.ok -text {OK} -command \"colorgrid_ok $id\"\n");
+	sys_gui("pack $id.buttonframe.cancel -side left -expand 1\n");
+	sys_gui("pack $id.buttonframe.apply -side left -expand 1\n");
+	sys_gui("pack $id.buttonframe.ok -side left -expand 1\n");
+	sys_gui("frame $id.42rangef\n");
+	sys_gui("pack $id.42rangef -side top\n");
+	sys_gui("label $id.42rangef.lxlines -text \"X sections :\"\n");
+	sys_gui("entry $id.42rangef.xlines -textvariable $var_graph_xlines -width 7\n");
+	sys_gui("pack $id.42rangef.lxlines $id.42rangef.xlines -side left\n");
+	sys_gui("frame $id.72rangef\n");
+	sys_gui("pack $id.72rangef -side top\n");
+	sys_gui("label $id.72rangef.lylines -text \"Y sections :\"\n");
+	sys_gui("entry $id.72rangef.ylines -textvariable $var_graph_ylines -width 7\n");
+	sys_gui("pack $id.72rangef.lylines $id.72rangef.ylines -side left\n");
+	sys_gui("checkbutton $id.showcolorgrid -text {Show Grid} -variable $var_graph_colorgrid -anchor w\n");
+	sys_gui("pack $id.showcolorgrid -side top\n");
+	sys_gui("bind $id.42rangef.xlines <KeyPress-Return> [concat colorgrid_ok $id]\n");
+	sys_gui("bind $id.72rangef.ylines <KeyPress-Return> [concat colorgrid_ok $id]\n");
+	sys_gui("focus $id.42rangef.xlines\n");
+	sys_gui("}\n");
+	// ########### colorgrid procedures END -- lluis@artefacte.org #########
+}
 
 t_widgetbehavior colorgrid_widgetbehavior;
 static t_class *colorgrid_class;
@@ -85,12 +181,12 @@ static void colorgrid_draw_update(t_colorgrid *x, t_glist *glist)
           COLORGRID_SYS_VGUI3(".x%x.c delete %xPOINT\n", canvas, x);
        }
         
-       if ( x->x_current < text_xpix(&x->x_obj, x->x_glist) ) xpoint = text_xpix(&x->x_obj, x->x_glist);
-       if ( x->x_current > text_xpix(&x->x_obj, x->x_glist) + x->x_width - pointsize ) 
-			xpoint = text_xpix(&x->x_obj, x->x_glist) + x->x_width - pointsize;
-       if ( x->y_current < text_ypix(&x->x_obj, x->x_glist) ) ypoint = text_ypix(&x->x_obj, x->x_glist);
-       if ( x->y_current > text_ypix(&x->x_obj, x->x_glist) + x->x_height - pointsize ) 
-			ypoint = text_ypix(&x->x_obj, x->x_glist) + x->x_height - pointsize;
+       if ( x->x_current < x->x_obj.te_xpix ) xpoint = x->x_obj.te_xpix;
+       if ( x->x_current > x->x_obj.te_xpix + x->x_width - pointsize ) 
+			xpoint = x->x_obj.te_xpix + x->x_width - pointsize;
+       if ( x->y_current < x->x_obj.te_ypix ) ypoint = x->x_obj.te_ypix;
+       if ( x->y_current > x->x_obj.te_ypix + x->x_height - pointsize ) 
+			ypoint = x->x_obj.te_ypix + x->x_height - pointsize;
        // draw the selected point
        COLORGRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -outline {} -fill #FF0000 -tags %xPOINT\n",
 	     canvas, xpoint, ypoint, xpoint+5, ypoint+5, x);
@@ -970,46 +1066,46 @@ zNL4zNH4zND4zM/4zM74zM341dX41dX41tX419X42NX42dX42tX42tX429X4\
 
     //post("%s",tagRoot);
 
-    COLORGRID_SYS_VGUI3("image create photo img%x -data {%s}\n",x,fdata);
+    COLORGRID_SYS_VGUI3("image create photo img%x -data [base64::decode {%s}]\n",x,fdata);
     
     COLORGRID_SYS_VGUI6(".x%x.c create image %d %d -image img%x -tags %sS\n", canvas,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),x,tagRoot);
     COLORGRID_SYS_VGUI5(".x%x.c coords %sS %d %d \n",
 	     canvas, tagRoot,
-	     text_xpix(&x->x_obj, x->x_glist) + 128, text_ypix(&x->x_obj, x->x_glist) + 25);
+	     x->x_obj.te_xpix + 128, x->x_obj.te_ypix + 25);
 				  
     COLORGRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so0\n",
-	     canvas, text_xpix(&x->x_obj, x->x_glist), text_ypix(&x->x_obj, x->x_glist) + x->x_height+1,
-	     text_xpix(&x->x_obj, x->x_glist)+7, text_ypix(&x->x_obj, x->x_glist) + x->x_height+2,
+	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix + x->x_height+1,
+	     x->x_obj.te_xpix+7, x->x_obj.te_ypix + x->x_height+2,
 	     tagRoot);
     COLORGRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so1\n",
-	     canvas, text_xpix(&x->x_obj, x->x_glist)+x->x_width-7, text_ypix(&x->x_obj, x->x_glist) + x->x_height+1,
-	     text_xpix(&x->x_obj, x->x_glist)+x->x_width, text_ypix(&x->x_obj, x->x_glist) + x->x_height+2,
+	     canvas, x->x_obj.te_xpix+x->x_width-7, x->x_obj.te_ypix + x->x_height+1,
+	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix + x->x_height+2,
 	     tagRoot);
     COLORGRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so2\n",
-	     canvas, text_xpix(&x->x_obj, x->x_glist)+x->x_width-131, text_ypix(&x->x_obj, x->x_glist) + x->x_height+1,
-	     text_xpix(&x->x_obj, x->x_glist)+x->x_width-126, text_ypix(&x->x_obj, x->x_glist) + x->x_height+2,
+	     canvas, x->x_obj.te_xpix+x->x_width-131, x->x_obj.te_ypix + x->x_height+1,
+	     x->x_obj.te_xpix+x->x_width-126, x->x_obj.te_ypix + x->x_height+2,
 	     tagRoot);
 
     if ( x->x_colorgrid ) 
     {
-       int xlpos = text_xpix(&x->x_obj, x->x_glist)+x->x_width/x->x_xlines;
-       int ylpos = text_ypix(&x->x_obj, x->x_glist)+x->x_height/x->x_ylines;
+       int xlpos = x->x_obj.te_xpix+x->x_width/x->x_xlines;
+       int ylpos = x->x_obj.te_ypix+x->x_height/x->x_ylines;
        int xcount = 1;
        int ycount = 1;
-       while ( xlpos < text_xpix(&x->x_obj, x->x_glist)+x->x_width )
+       while ( xlpos < x->x_obj.te_xpix+x->x_width )
        {
          COLORGRID_SYS_VGUI9(".x%x.c create line %d %d %d %d -fill #FFFFFF -tags %xLINE%d%d\n",
-	     canvas, xlpos, text_ypix(&x->x_obj, x->x_glist),
-	     xlpos, text_ypix(&x->x_obj, x->x_glist)+x->x_height,
+	     canvas, xlpos, x->x_obj.te_ypix,
+	     xlpos, x->x_obj.te_ypix+x->x_height,
 	     x, xcount, 0 );
          xlpos+=x->x_width/x->x_xlines;
          xcount++;
        }
-       while ( ylpos < text_ypix(&x->x_obj, x->x_glist)+x->x_height )
+       while ( ylpos < x->x_obj.te_ypix+x->x_height )
        {
          COLORGRID_SYS_VGUI9(".x%x.c create line %d %d %d %d -fill #FFFFFF -tags %xLINE%d%d\n",
-	     canvas, text_xpix(&x->x_obj, x->x_glist), ylpos,
-	     text_xpix(&x->x_obj, x->x_glist)+x->x_width, ylpos,
+	     canvas, x->x_obj.te_xpix, ylpos,
+	     x->x_obj.te_xpix+x->x_width, ylpos,
 	     x, 0, ycount);
          ylpos+=x->x_height/x->x_ylines;
          ycount++;
@@ -1026,46 +1122,46 @@ static void colorgrid_draw_move(t_colorgrid *x, t_glist *glist)
     tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x)); 
     COLORGRID_SYS_VGUI7(".x%x.c coords %xCOLORGRID %d %d %d %d\n",
 	     canvas, x,
-	     text_xpix(&x->x_obj, x->x_glist), text_ypix(&x->x_obj, x->x_glist),
-	     text_xpix(&x->x_obj, x->x_glist)+x->x_width, text_ypix(&x->x_obj, x->x_glist)+x->x_height);
+	     x->x_obj.te_xpix, x->x_obj.te_ypix,
+	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix+x->x_height);
     COLORGRID_SYS_VGUI5(".x%x.c coords %sS %d %d \n",
 	     canvas, tagRoot,
-	     text_xpix(&x->x_obj, x->x_glist) + 128, text_ypix(&x->x_obj, x->x_glist) + 25);
+	     x->x_obj.te_xpix + 128, x->x_obj.te_ypix + 25);
     COLORGRID_SYS_VGUI7(".x%x.c coords %so0 %d %d %d %d\n",
 	     canvas, tagRoot,
-	     text_xpix(&x->x_obj, x->x_glist), text_ypix(&x->x_obj, x->x_glist) + x->x_height+1,
-	     text_xpix(&x->x_obj, x->x_glist)+7, text_ypix(&x->x_obj, x->x_glist) + x->x_height+2 );
+	     x->x_obj.te_xpix, x->x_obj.te_ypix + x->x_height+1,
+	     x->x_obj.te_xpix+7, x->x_obj.te_ypix + x->x_height+2 );
     COLORGRID_SYS_VGUI7(".x%x.c coords %so1 %d %d %d %d\n",
 	     canvas, tagRoot,
-	     text_xpix(&x->x_obj, x->x_glist)+x->x_width-7, text_ypix(&x->x_obj, x->x_glist) + x->x_height+1,
-	     text_xpix(&x->x_obj, x->x_glist)+x->x_width, text_ypix(&x->x_obj, x->x_glist) + x->x_height+2 );
+	     x->x_obj.te_xpix+x->x_width-7, x->x_obj.te_ypix + x->x_height+1,
+	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix + x->x_height+2 );
     COLORGRID_SYS_VGUI7(".x%x.c coords %so2 %d %d %d %d\n",
 	     canvas, tagRoot,
-	     text_xpix(&x->x_obj, x->x_glist)+x->x_width-131, text_ypix(&x->x_obj, x->x_glist) + x->x_height+1,
-	     text_xpix(&x->x_obj, x->x_glist)+x->x_width-126, text_ypix(&x->x_obj, x->x_glist) + x->x_height+2 );
+	     x->x_obj.te_xpix+x->x_width-131, x->x_obj.te_ypix + x->x_height+1,
+	     x->x_obj.te_xpix+x->x_width-126, x->x_obj.te_ypix + x->x_height+2 );
     if ( x->x_point ) 
     {
        colorgrid_draw_update(x, glist);
     }
     if ( x->x_colorgrid ) 
     {
-       int xlpos = text_xpix(&x->x_obj, x->x_glist)+x->x_width/x->x_xlines;
-       int ylpos = text_ypix(&x->x_obj, x->x_glist)+x->x_height/x->x_ylines;
+       int xlpos = x->x_obj.te_xpix+x->x_width/x->x_xlines;
+       int ylpos = x->x_obj.te_ypix+x->x_height/x->x_ylines;
        int xcount = 1;
        int ycount = 1;
-       while ( xlpos < text_xpix(&x->x_obj, x->x_glist)+x->x_width )
+       while ( xlpos < x->x_obj.te_xpix+x->x_width )
        {
          COLORGRID_SYS_VGUI9(".x%x.c coords %xLINE%d%d %d %d %d %d\n",
-	     canvas, x, xcount, 0, xlpos, text_ypix(&x->x_obj, x->x_glist),
-	     xlpos, text_ypix(&x->x_obj, x->x_glist) + x->x_height);
+	     canvas, x, xcount, 0, xlpos, x->x_obj.te_ypix,
+	     xlpos, x->x_obj.te_ypix + x->x_height);
          xlpos+=x->x_width/x->x_xlines;
          xcount++;
        }
-       while ( ylpos < text_ypix(&x->x_obj, x->x_glist)+x->x_height )
+       while ( ylpos < x->x_obj.te_ypix+x->x_height )
        {
          COLORGRID_SYS_VGUI9(".x%x.c coords %xLINE%d%d %d %d %d %d\n",
-	     canvas, x, 0, ycount, text_xpix(&x->x_obj, x->x_glist), ylpos,
-	     text_xpix(&x->x_obj, x->x_glist) + x->x_width, ylpos);
+	     canvas, x, 0, ycount, x->x_obj.te_xpix, ylpos,
+	     x->x_obj.te_xpix + x->x_width, ylpos);
          ylpos+=x->x_height/x->x_ylines;
          ycount++;
        }
@@ -1195,12 +1291,12 @@ static void colorgrid_output_current(t_colorgrid* x)
   t_float xvalue, yvalue, rvalue, gvalue, bvalue;
   t_float xmodstep, ymodstep;
 
-  xvalue = x->x_min + (x->x_current - text_xpix(&x->x_obj, x->x_glist)) * (x->x_max-x->x_min) / x->x_width ;
+  xvalue = x->x_min + (x->x_current - x->x_obj.te_xpix) * (x->x_max-x->x_min) / x->x_width ;
   if (xvalue < x->x_min ) xvalue = x->x_min;
   if (xvalue > x->x_max ) xvalue = x->x_max;
   xmodstep = ((float)((int)(xvalue*10000) % (int)(x->x_xstep*10000))/10000.);
   xvalue = xvalue - xmodstep;
-  yvalue = x->y_max - (x->y_current - text_ypix(&x->x_obj, x->x_glist) ) * (x->y_max-x->y_min) / x->x_height ;
+  yvalue = x->y_max - (x->y_current - x->x_obj.te_ypix ) * (x->y_max-x->y_min) / x->x_height ;
   if (yvalue < x->y_min ) yvalue = x->y_min;
   if (yvalue > x->y_max ) yvalue = x->y_max;
   ymodstep = ((float)((int)(yvalue*10000) % (int)(x->x_ystep*10000))/10000.);
@@ -1262,10 +1358,10 @@ static void colorgrid_getrect(t_gobj *z, t_glist *owner,
 {
    t_colorgrid* x = (t_colorgrid*)z;
 
-   *xp1 = text_xpix(&x->x_obj, x->x_glist);
-   *yp1 = text_ypix(&x->x_obj, x->x_glist);
-   *xp2 = text_xpix(&x->x_obj, x->x_glist)+x->x_width;
-   *yp2 = text_ypix(&x->x_obj, x->x_glist)+x->x_height;
+   *xp1 = x->x_obj.te_xpix;
+   *yp1 = x->x_obj.te_ypix;
+   *xp2 = x->x_obj.te_xpix+x->x_width;
+   *yp2 = x->x_obj.te_ypix+x->x_height;
 }
 
 static void colorgrid_save(t_gobj *z, t_binbuf *b)
@@ -1275,8 +1371,7 @@ static void colorgrid_save(t_gobj *z, t_binbuf *b)
    // post( "saving colorgrid : %s", x->x_name->s_name );
    binbuf_addv(b, "ssiissiffiffiffiiff", gensym("#X"),gensym("obj"),
 		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
-        atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
-        x->x_name, x->x_width, x->x_min,
+		gensym("colorgrid"), x->x_name, x->x_width, x->x_min,
 		x->x_max, x->x_height,
                 x->y_min, x->y_max,
                 x->x_colorgrid, x->x_xstep, 
@@ -1346,8 +1441,8 @@ static void colorgrid_delete(t_gobj *z, t_glist *glist)
 static void colorgrid_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 {
     t_colorgrid *x = (t_colorgrid *)z;
-    int xold = text_xpix(&x->x_obj, x->x_glist);
-    int yold = text_ypix(&x->x_obj, x->x_glist);
+    int xold = x->x_obj.te_xpix;
+    int yold = x->x_obj.te_ypix;
 
     // post( "colorgrid_displace dx=%d dy=%d", dx, dy );
 
@@ -1355,7 +1450,7 @@ static void colorgrid_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     x->x_current += dx;
     x->x_obj.te_ypix += dy;
     x->y_current += dy;
-    if(xold != text_xpix(&x->x_obj, x->x_glist) || yold != text_ypix(&x->x_obj, x->x_glist))
+    if(xold != x->x_obj.te_xpix || yold != x->x_obj.te_ypix)
     {
 	colorgrid_draw_move(x, x->x_glist);
     }
@@ -1407,8 +1502,8 @@ static void colorgrid_goto(t_colorgrid *x, t_floatarg newx, t_floatarg newy)
 
     // post( "colorgrid_set x=%f y=%f", newx, newy );
 
-    x->x_current = newx + text_xpix(&x->x_obj, x->x_glist);
-    x->y_current = newy + text_ypix(&x->x_obj, x->x_glist);
+    x->x_current = newx + x->x_obj.te_xpix;
+    x->y_current = newy + x->x_obj.te_ypix;
     if(xold != x->x_current || yold != x->y_current)
     {
         colorgrid_output_current(x);
@@ -1428,8 +1523,8 @@ static void colorgrid_xgoto(t_colorgrid *x, t_floatarg newx, t_floatarg newy)
 
     // post( "colorgrid_set x=%f y=%f", newx, newy );
 
-    x->x_current = newx + text_xpix(&x->x_obj, x->x_glist);
-    x->y_current = newy + text_ypix(&x->x_obj, x->x_glist);
+    x->x_current = newx + x->x_obj.te_xpix;
+    x->y_current = newy + x->x_obj.te_ypix;
     if(xold != x->x_current || yold != x->y_current)
     {
         colorgrid_draw_update(x, x->x_glist);
@@ -1538,7 +1633,7 @@ static void colorgrid_free(t_colorgrid *x)
 
 void colorgrid_setup(void)
 {
-#include "colorgrid.tk2c"
+    load_tk_procs();
     post ( colorgrid_version );
     colorgrid_class = class_new(gensym("colorgrid"), (t_newmethod)colorgrid_new,
 			      (t_method)colorgrid_free, sizeof(t_colorgrid), 0, A_GIMME, 0);
@@ -1558,5 +1653,5 @@ void colorgrid_setup(void)
     class_setwidget(colorgrid_class, &colorgrid_widgetbehavior);
     class_setpropertiesfn(colorgrid_class, colorgrid_properties);
     class_setsavefn(colorgrid_class, colorgrid_save);
-    class_sethelpsymbol(colorgrid_class, gensym("help-colorgrid.pd"));
+    class_sethelpsymbol(colorgrid_class, gensym("colorgrid-help.pd"));
 }
