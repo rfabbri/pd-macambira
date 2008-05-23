@@ -94,8 +94,9 @@ static void scan_plugins(t_pdp_freeframe *x, char *plugindir)
        x->x_filename_count = 0;
 }
 
-void ff_loadplugins(t_pdp_freeframe *x, char *plugindir)
+void ff_loadplugins(t_pdp_freeframe *x, t_symbol *plugindirsymbol)
 {
+    char* plugindir = plugindirsymbol->s_name;
     char libname[PATH_MAX];
     plugMainType *plugmain;
     unsigned instance, numparameters;
@@ -428,7 +429,7 @@ void *pdp_freeframe_new(t_floatarg f)
     //load the plugins
     x->x_plugin_count = 0;
     x->x_infosok = 0;
-    ff_loadplugins(x, FF_PLUGIN_DIR);
+    //ff_loadplugins(x, FF_PLUGIN_DIR);
 
     pdp_freeframe_plugin(x, f);
 
@@ -452,6 +453,7 @@ void pdp_freeframe_setup(void)
     class_addmethod(pdp_freeframe_class, (t_method)pdp_freeframe_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_freeframe_class, (t_method)pdp_freeframe_plugin, gensym("plugin"),  A_FLOAT, A_NULL);   
     class_addmethod(pdp_freeframe_class, (t_method)pdp_freeframe_param, gensym("param"),  A_FLOAT, A_FLOAT, A_NULL);   
+    class_addmethod(pdp_freeframe_class, (t_method)ff_loadplugins, gensym("plugindir"),  A_SYMBOL, A_NULL);   
 
 
 }
