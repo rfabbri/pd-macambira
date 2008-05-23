@@ -3,19 +3,22 @@
 #X obj 26 110 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X text 24 13 VIDEOGRID;
-#X obj 72 178 videogrid videogrid1 3 5 #F0F0F0 #0F0F0F /usr/local/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0248.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0248.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0248.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0248.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0248.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0241.mov|/usr/local/lib/pd/extra/videogrid/videos/dscn0248.mov|
-;
 #X text 154 63 ADD VIDEO;
 #X text 154 113 ADD VIDEOS FROM FOLDER;
 #X text 25 29 Object to select the path location of a video quiktime
 added in the grid \, in form of image of its first frame.;
 #X text 74 344 LOCATION OF THE SELECTED VIDEO;
 #X text 24 93 LIST STDOUT;
-#X msg 156 77 putvideo /usr/local/lib/pd/extra/videogrid/videos/dscn0241.mov
-;
 #X msg 156 127 putvideodir /usr/local/lib/pd/extra/videogrid/videos
 ;
-#X connect 1 0 3 0;
-#X connect 3 0 0 0;
-#X connect 9 0 3 0;
-#X connect 10 0 3 0;
+#X obj 83 159 videogrid videogrid2 3 5 #F0F0F0 #0F0F0F #F1882B;
+#X msg 156 77 putvideo \$1;
+#X obj 268 74 openpanel;
+#X obj 348 73 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X connect 1 0 9 0;
+#X connect 8 0 9 0;
+#X connect 9 0 0 0;
+#X connect 10 0 9 0;
+#X connect 11 0 10 0;
+#X connect 12 0 11 0;

@@ -1,4 +1,5 @@
-PD_SRC=../../src
+PD_SRC=../../../pd/src
+FFMPEG_HEADERS=-I/usr/include/ffmpeg
 
 NAME=videogrid
 CSYM=videogrid
@@ -19,19 +20,15 @@ LINUXCFLAGS = -fPIC -DPD -DUNIX -DICECAST -O2 -funroll-loops -fomit-frame-pointe
 LINUXINCLUDE =  -I$(PD_SRC) -I/usr/include/
 
 .c.pd_linux:
-	cc -fPIC -c -ansi -O -Wall -Wmissing-prototypes cua.c
-	cc -fPIC -c -O -Wall -Wmissing-prototypes -o qtconverter.o -c qtconverter.c
+	g++  $(FFMPEG_HEADERS) -fPIC -c -O -o videogrid.o videogrid.cpp
 # 	./tk2c.bash < $*.tk > $*.tk2c
-	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o cua.o qtconverter.o -lc -lm -lquicktime
-	strip --strip-unneeded $*.pd_linux
-	rm -f $*.o ../$*.pd_linux
-	ln -s $*/$*.pd_linux ..
+	g++ $(FFMPEG_HEADERS) -export_dynamic  -shared -o videogrid.pd_linux videogrid.o -lavformat -lavcodec -lavutil -lavcodec -lavutil -lquicktime -lgsm -lz -lm
+	rm -f $*.o 
 
 # ----------------------------------------------------------
 
 install:
-	cp *-help.pd ../../doc/5.reference
+	cp *-help.pd ../../../doc/5.reference
 
 clean:
 	rm -f *.o *.pd_* so_locations
