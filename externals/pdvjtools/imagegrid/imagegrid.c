@@ -1,8 +1,7 @@
 
 /*
 imagegrid external for Puredata
-Copyright (C) 2007  Sergi Lario
-sll :: slario-at-gmail.com
+Sergi Lario 	:: slario-at-gmail.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
