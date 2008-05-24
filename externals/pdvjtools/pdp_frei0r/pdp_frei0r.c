@@ -87,6 +87,8 @@ typedef struct pdp_frei0r_struct
     int x_plugin; 
     int x_infosok; 
 
+    t_symbol *plugindir;
+
     PLUGIN *plugins;
     
 } t_pdp_frei0r;
@@ -111,10 +113,10 @@ static void scan_plugins(t_pdp_frei0r *x, char *plugindir)
     }
 }
 
-void fr_loadplugins(t_pdp_frei0r *x, char *plugindir)
+void fr_loadplugins(t_pdp_frei0r *x, t_symbol *plugindirsymbol)
 {
+    char* plugindir = plugindirsymbol->s_name;
     char libname[PATH_MAX];
-    unsigned instance, numparameters;
     int i;
     char *pluginname;
     void *plugin_handle;
@@ -233,6 +235,13 @@ void fr_freeplugins(t_pdp_frei0r *x)
     x->plugins = NULL;
 }
 
+static void pdp_frei0r_plugindir(t_pdp_frei0r *x, t_symbol *s)
+{
+    x->plugindir = s;
+    if( s != &s_)
+        fr_loadplugins(x, x->plugindir);
+}
+
 static void pdp_frei0r_process_rgba(t_pdp_frei0r *x)
 {
     t_pdp     *newheader = pdp_packet_header(x->x_packet2);
@@ -257,7 +266,7 @@ static void pdp_frei0r_process_rgba(t_pdp_frei0r *x)
     	x->x_size = x->x_width*x->x_height;
 
     	//load the plugins
-    	fr_loadplugins(x, FR_PLUGIN_DIR);
+    	fr_loadplugins(x, x->plugindir);
     }
     
     newheader->info.image.encoding = lheader->info.image.encoding;
@@ -420,7 +429,7 @@ static void pdp_frei0r_plugin(t_pdp_frei0r *x, t_floatarg f)
       post( "frei0r : plugin out of range : %d", (t_int)f );
       return;
     }
-    post ("pdp_freeframe :: %s selected, %d parameters", x->plugins[x->x_plugin].name, x->plugins[x->x_plugin].numparameters);
+    post ("pdp_frei0r :: %s selected, %d parameters", x->plugins[x->x_plugin].name, x->plugins[x->x_plugin].numparameters);
     outlet_symbol(x->x_pname, gensym( x->plugins[x->x_plugin].name ) );
     outlet_float(x->x_nparams, (float)x->plugins[x->x_plugin].numparameters);
     for ( pi=0; pi<x->plugins[x->x_plugin].numparameters; pi++ )
@@ -602,7 +611,20 @@ void *pdp_frei0r_new(t_floatarg f)
     //load the plugins
     x->x_plugin_count = 0;
     x->x_infosok = 0;
-    fr_loadplugins(x, FR_PLUGIN_DIR);
+    
+    char fr_plugin_dir[FILENAME_MAX];
+    char *home = getenv("HOME");
+    int home_len;
+    if(home != NULL)
+    {
+        home_len = strlen(home);
+        if(home_len >= FILENAME_MAX)
+            home_len = FILENAME_MAX - 1;
+        memcpy(fr_plugin_dir, home, home_len);
+        fr_plugin_dir[home_len] = '\0';
+        strncpy(fr_plugin_dir, "/.frf", FILENAME_MAX - home_len);
+        pdp_frei0r_plugindir(x, gensym(fr_plugin_dir));
+    }
 
     //select plugin
     pdp_frei0r_plugin(x, f);
@@ -629,6 +651,7 @@ void pdp_frei0r_setup(void)
     class_addmethod(pdp_frei0r_class, (t_method)pdp_frei0r_input_2, gensym("pdp2"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_frei0r_class, (t_method)pdp_frei0r_plugin, gensym("plugin"),  A_FLOAT, A_NULL);   
     class_addmethod(pdp_frei0r_class, (t_method)pdp_frei0r_param, gensym("param"),  A_GIMME, A_NULL);   
+    class_addmethod(pdp_frei0r_class, (t_method)pdp_frei0r_plugindir, gensym("plugindir"),  A_SYMBOL, A_NULL);   
 
 }
 

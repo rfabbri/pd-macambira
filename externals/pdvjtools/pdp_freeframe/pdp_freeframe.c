@@ -192,7 +192,8 @@ void ff_freeplugins(t_pdp_freeframe *x)
 static void pdp_freeframe_plugindir(t_pdp_freeframe *x, t_symbol *s)
 {
     x->plugindir = s;
-    ff_loadplugins(x, x->plugindir);
+    if( s != &s_)
+        ff_loadplugins(x, x->plugindir);
 }
 
 static void pdp_freeframe_process_rgb(t_pdp_freeframe *x)
