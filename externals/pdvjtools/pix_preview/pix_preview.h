@@ -78,6 +78,8 @@ protected:
 	
 	//////////
 	void			trigger();
+	int getx();
+	int gety();
 
 	//////////
 	// The color outlet
@@ -109,7 +111,20 @@ protected:
 	
 	t_widgetbehavior   image_widgetbehavior;
 
-	static void image_drawme(pix_preview *x, t_glist *glist, int firsttime);
+
+
+
+private:
+	
+	//////////
+	// Static member callbacks
+	static void		triggerMessCallback(void *dump);
+	static void		GREYMessCallback(void *dump);
+	static void		RGBAMessCallback(void *dump);
+	static void		RGBMessCallback(void *dump);
+
+
+	static void image_drawme(pix_preview *x, t_glist *glist, int firsttime, int m_xsize, int m_ysize);
 
 	static void image_erase(pix_preview* x,t_glist* glist);
 	
@@ -128,16 +143,6 @@ protected:
 	static void image_delete(t_gobj *z, t_glist *glist);
        
 	static void image_vis(t_gobj *z, t_glist *glist, int vis);
-
-
-private:
-	
-	//////////
-	// Static member callbacks
-	static void		triggerMessCallback(void *dump);
-	static void		GREYMessCallback(void *dump);
-	static void		RGBAMessCallback(void *dump);
-	static void		RGBMessCallback(void *dump);
 
 };
 
