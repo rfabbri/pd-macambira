@@ -1,25 +1,25 @@
 #N canvas 0 0 996 665 10;
 #X obj 43 335 pdp_freeframe;
-#X floatatom 149 338 5 0 0 0 - - -;
+#X floatatom 337 104 5 0 0 0 - - -;
 #X obj 46 115 pdp_qt;
 #X obj 46 45 metro 40;
 #X msg 46 -17 bang;
 #X msg 107 45 loop 1;
 #X obj 41 507 pdp_xv;
-#X obj 46 247 pdp_scale 320 240;
-#X obj 194 336 hradio 15 1 0 44 empty empty empty 0 -6 0 8 -262144
+#X obj 46 179 pdp_scale 320 240;
+#X obj 382 102 hradio 15 1 0 44 empty empty empty 0 -6 0 8 -262144
 -1 -1 0;
-#X obj 261 171 hsl 128 15 0 1 0 0 empty vparam3 empty -2 -6 0 8 -262144
+#X obj 391 228 hsl 128 15 0 1 0 0 empty vparam3 empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 401 171 hsl 128 15 0 1 0 0 empty vparam4 empty -2 -6 0 8 -262144
+#X obj 531 228 hsl 128 15 0 1 0 0 empty vparam4 empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 541 171 hsl 128 15 0 1 0 0 empty vparam5 empty -2 -6 0 8 -262144
+#X obj 671 228 hsl 128 15 0 1 0 0 empty vparam5 empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X msg 258 191 param 3 \$1;
-#X msg 398 190 param 4 \$1;
-#X msg 539 190 param 5 \$1;
-#X text 195 317 Select the plugin;
-#X text 258 72 Adjust plugin parameters.;
+#X msg 388 248 param 3 \$1;
+#X msg 528 247 param 4 \$1;
+#X msg 669 247 param 5 \$1;
+#X text 384 82 Select the plugin;
+#X text 388 129 Adjust plugin parameters.;
 #X msg 164 45 open \$1;
 #X obj 164 23 openpanel;
 #X text 95 -17 Load a mov file;
@@ -27,34 +27,30 @@
 #X text 249 488 <-- plugin name;
 #X floatatom 115 466 5 0 0 0 - - -;
 #X text 163 464 <-- number of parameters;
-#X obj 46 176 pdp_spigot;
-#X obj 119 148 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
-1;
-#X obj 89 215 pdp_scale 192 168;
 #X obj 241 47 pdp_v4l;
 #X obj 241 20 metro 40;
 #X msg 241 -8 bang;
 #X text 214 438 <-- parameter name;
 #X text 241 410 <-- parameter type;
 #X text 257 381 <-- parameter default;
-#X obj 263 112 hsl 128 15 0 1 0 0 empty vparam0 empty -2 -6 0 8 -262144
+#X obj 393 169 hsl 128 15 0 1 0 0 empty vparam0 empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 401 112 hsl 128 15 0 1 0 0 empty vparam1 empty -2 -6 0 8 -262144
--1 -1 2391 1;
-#X obj 542 112 hsl 128 15 0 1 0 0 empty vparam2 empty -2 -6 0 8 -262144
+#X obj 531 169 hsl 128 15 0 1 0 0 empty vparam1 empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 261 234 hsl 128 15 0 1 0 0 empty vparam6 empty -2 -6 0 8 -262144
+#X obj 672 169 hsl 128 15 0 1 0 0 empty vparam2 empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 402 234 hsl 128 15 0 1 0 0 empty vparam7 empty -2 -6 0 8 -262144
+#X obj 391 291 hsl 128 15 0 1 0 0 empty vparam6 empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 544 234 hsl 128 15 0 1 0 0 empty vparam8 empty -2 -6 0 8 -262144
+#X obj 532 291 hsl 128 15 0 1 0 0 empty vparam7 empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X msg 260 131 param 0 \$1;
-#X msg 398 131 param 1 \$1;
-#X msg 539 131 param 2 \$1;
-#X msg 260 254 param 6 \$1;
-#X msg 399 253 param 7 \$1;
-#X msg 541 253 param 8 \$1;
+#X obj 674 291 hsl 128 15 0 1 0 0 empty vparam8 empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X msg 390 188 param 0 \$1;
+#X msg 528 188 param 1 \$1;
+#X msg 669 188 param 2 \$1;
+#X msg 390 311 param 6 \$1;
+#X msg 529 310 param 7 \$1;
+#X msg 671 310 param 8 \$1;
 #N canvas 0 0 996 665 pname 0;
 #X obj 51 119 l2s;
 #X obj 80 119 l2s;
@@ -108,15 +104,15 @@
 #X connect 21 0 18 0;
 #X connect 21 0 19 0;
 #X restore 146 438 pd pname;
-#X symbolatom 260 93 18 0 0 0 - ffparam0 -;
-#X symbolatom 399 92 18 0 0 0 - ffparam1 -;
-#X symbolatom 538 92 18 0 0 0 - ffparam2 -;
-#X symbolatom 261 154 18 0 0 0 - ffparam3 -;
-#X symbolatom 400 153 18 0 0 0 - ffparam4 -;
-#X symbolatom 539 153 18 0 0 0 - ffparam5 -;
-#X symbolatom 261 214 18 0 0 0 - ffparam6 -;
-#X symbolatom 400 213 18 0 0 0 - ffparam7 -;
-#X symbolatom 539 213 18 0 0 0 - ffparam8 -;
+#X symbolatom 390 150 18 0 0 0 - ffparam0 -;
+#X symbolatom 529 149 18 0 0 0 - ffparam1 -;
+#X symbolatom 668 149 18 0 0 0 - ffparam2 -;
+#X symbolatom 391 211 18 0 0 0 - ffparam3 -;
+#X symbolatom 530 210 18 0 0 0 - ffparam4 -;
+#X symbolatom 669 210 18 0 0 0 - ffparam5 -;
+#X symbolatom 391 271 18 0 0 0 - ffparam6 -;
+#X symbolatom 530 270 18 0 0 0 - ffparam7 -;
+#X symbolatom 669 270 18 0 0 0 - ffparam8 -;
 #N canvas 0 0 996 665 default 0;
 #X obj 97 86 route 0 1 2 3 4 5 6 7 8;
 #X obj 97 51 inlet;
@@ -154,20 +150,24 @@
 #X connect 4 0 13 0;
 #X connect 5 0 4 0;
 #X restore 180 380 pd default;
-#X text 487 440 FreeFrame host for Pure Data Packet version 0.3;
-#X text 489 455 by Lluis Gomez i Bigorda (lluis@artefacte.org);
-#X text 508 468 & Yves Degoyon (ydegoyon@free.fr);
-#X text 489 483 using GPL code from http://freeframe.sf.net;
-#X text 489 498 and Pete Warden http://petewarden.com;
+#X text 493 440 FreeFrame host for Pure Data Packet version 0.3;
+#X text 495 455 by Lluis Gomez i Bigorda (lluis@artefacte.org);
+#X text 514 468 & Yves Degoyon (ydegoyon@free.fr);
+#X text 495 483 using GPL code from http://freeframe.sf.net;
+#X text 495 498 and Pete Warden http://petewarden.com;
 #X obj 164 410 print type;
+#X msg 344 46 pluginsdir /usr/lib/FreeFrame;
+#X text 341 -10 You need the FreeFrame plugins to use with this object.
+Install them from http://sourceforge.net/projects/freeframe/ And then
+use this message to load.;
 #X connect 0 0 6 0;
 #X connect 0 1 20 0;
 #X connect 0 2 22 0;
-#X connect 0 3 45 0;
-#X connect 0 4 61 0;
-#X connect 0 5 55 0;
+#X connect 0 3 42 0;
+#X connect 0 4 58 0;
+#X connect 0 5 52 0;
 #X connect 1 0 0 1;
-#X connect 2 0 24 0;
+#X connect 2 0 7 0;
 #X connect 3 0 2 0;
 #X connect 4 0 3 0;
 #X connect 4 0 5 0;
@@ -183,24 +183,21 @@
 #X connect 14 0 0 0;
 #X connect 17 0 2 0;
 #X connect 18 0 17 0;
-#X connect 22 0 45 1;
-#X connect 22 0 55 1;
+#X connect 22 0 42 1;
+#X connect 22 0 52 1;
 #X connect 24 0 7 0;
-#X connect 24 1 26 0;
-#X connect 25 0 24 1;
-#X connect 26 0 0 0;
-#X connect 27 0 24 0;
-#X connect 28 0 27 0;
-#X connect 29 0 28 0;
+#X connect 25 0 24 0;
+#X connect 26 0 25 0;
+#X connect 30 0 36 0;
+#X connect 31 0 37 0;
+#X connect 32 0 38 0;
 #X connect 33 0 39 0;
 #X connect 34 0 40 0;
 #X connect 35 0 41 0;
-#X connect 36 0 42 0;
-#X connect 37 0 43 0;
-#X connect 38 0 44 0;
+#X connect 36 0 0 0;
+#X connect 37 0 0 0;
+#X connect 38 0 0 0;
 #X connect 39 0 0 0;
 #X connect 40 0 0 0;
 #X connect 41 0 0 0;
-#X connect 42 0 0 0;
-#X connect 43 0 0 0;
-#X connect 44 0 0 0;
+#X connect 59 0 0 0;
