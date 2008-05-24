@@ -279,7 +279,7 @@ void pix_preview :: trigger()
   unsigned char *data, *line;
   stringstream sx,sy;
 
-	//fprintf (stderr,"%d %d %d %d %d %d",xsize, ysize,m_xsize,  m_ysize,oldimagex,oldimagey);
+	fprintf (stderr,"%d %d %d %d %d %d \n",xsize, ysize,m_xsize,  m_ysize,oldimagex,oldimagey);
 
 	std::string pnm;
 	std::string pnm64;
@@ -293,9 +293,10 @@ void pix_preview :: trigger()
 
 	//fprintf (stderr,"%s",pnm.c_str());
 	
-        /*/escriu el contingut de data a un arxiu.
-  	FILE * fp = fopen("/tmp/pixdump01.pnm", "w");
-        fprintf (fp, "P6\n%d %d\n255\n", m_xsize, m_ysize);*/
+        /*/escriu el contingut de data a un arxiu.*/
+	char* ig_path = "/tmp/pixdump01.pnm";
+  	FILE * fp = fopen(ig_path, "w");
+        fprintf (fp, "P6\n%d %d\n255\n", m_xsize, m_ysize);
   data = line = m_data;
   switch(m_csize){
   case 4:
@@ -329,12 +330,15 @@ void pix_preview :: trigger()
 	int r, g, b, a;
 	r = (int)data[chRed];
                 pnm += (char)r;
+                fprintf (fp, "%c", (char)r);
 	i++;
 	g = (int)data[chGreen];
                 pnm += (char)g;
+                fprintf (fp, "%c", (char)g);
 	i++;
 	b = (int)data[chBlue];
                 pnm += (char)b;
+                fprintf (fp, "%c", (char)b);
 	i++;
 	a = (int)data[chAlpha];
 	i++;
@@ -346,17 +350,25 @@ void pix_preview :: trigger()
       line = m_data + (int)(m_ystep*n);
       data = line;
     }
+        fclose (fp);
+
 	
 	//std::cout << "NOT encoded: " << pnm << std::endl;
 
-	pnm64 = base64_encode(reinterpret_cast<const unsigned char*>(pnm.c_str()), pnm.length());
+	//pnm64 = base64_encode(reinterpret_cast<const unsigned char*>(pnm.c_str()), pnm.length());
 	//std::cout << "encoded: " << pnm64 << std::endl;
 
 
 		
 	//m_glist = (t_glist *) canvas_getcurrent();
+	
 
-	sys_vgui("img%x put {%s}\n", this->x_obj, reinterpret_cast<const unsigned char*>(pnm64.c_str()) );
+	//sys_vgui("img%x put {%s}\n", this->x_obj, reinterpret_cast<const unsigned char*>(pnm64.c_str()) );
+    	image_drawme((pix_preview *)this->x_obj, (t_glist *) this->getCanvas(), 0, m_xsize, m_ysize);
+//	sys_vgui(".x%x.c coords %xS %d %d\n",
+//		   this->getCanvas(), this->x_obj,
+//		   text_xpix(this->x_obj, (t_glist *)this->getCanvas()) + (m_xsize/2), text_ypix(this->x_obj, (t_glist *)this->getCanvas()) + (m_ysize/2));
+		   //fprintf (stderr, "%x %x - %d %d\n",x,(t_object*)x, text_xpix((t_object*)x, glist), text_ypix((t_object*)x, glist));
 	
     break;
   case 2:
@@ -419,8 +431,9 @@ void pix_preview :: triggerMessCallback(void *data)
 
 
 
-void pix_preview :: image_drawme(pix_preview *x, t_glist *glist, int firsttime)
+void pix_preview :: image_drawme(pix_preview *x, t_glist *glist, int firsttime, int m_xsize, int m_ysize)
 {
+	char* ig_path = "/tmp/pixdump01.pnm";
        if (firsttime) {
 
 	  sys_vgui("image create photo img%x -data {%s}\n",x,fdata);
@@ -429,10 +442,15 @@ void pix_preview :: image_drawme(pix_preview *x, t_glist *glist, int firsttime)
 	  //fprintf (stderr, "%x %x - %d %d \n",x,(t_object*)x, text_xpix((t_object*)x, glist), text_ypix((t_object*)x, glist));
      }     
      else {
-	  sys_vgui(".x%x.c coords %xS \
+            sys_vgui(".x%x.c delete %xS\n", glist_getcanvas(glist), x);
+            sys_vgui(".x%x.c delete img%x\n", glist_getcanvas(glist), x);
+        sys_vgui("image create photo img%x -file %s\n",x,ig_path);
+        sys_vgui(".x%x.c create image %d %d -image img%x -tags %xS\n",
+		   glist_getcanvas(glist),text_xpix((t_object*)x, glist)+(m_xsize/2), text_ypix((t_object*)x, glist)+(m_ysize/2),x,x);
+	  //sys_vgui(".x%x.c coords %xS \
 %d %d\n",
-		   glist_getcanvas(glist), x,
-		   text_xpix((t_object*)x, glist), text_ypix((t_object*)x, glist));
+	//	   glist_getcanvas(glist), x,
+	//	   text_xpix((t_object*)x, glist), text_ypix((t_object*)x, glist));
 		   //fprintf (stderr, "%x %x - %d %d\n",x,(t_object*)x, text_xpix((t_object*)x, glist), text_ypix((t_object*)x, glist));
      }
 
@@ -476,7 +494,7 @@ void pix_preview :: image_displace(t_gobj *z, t_glist *glist,
 		   text_xpix(x, glist), text_ypix(x, glist),
 		   text_xpix(x, glist) + 25, text_ypix(x, glist) + 25);
 
-    image_drawme((pix_preview *)x, glist, 0);
+    //image_drawme((pix_preview *)x, glist, 0);
     canvas_fixlinesfor(glist_getcanvas(glist),(t_text*) x);
 }
 
@@ -515,6 +533,6 @@ void pix_preview :: image_vis(t_gobj *z, t_glist *glist, int vis)
 {
     pix_preview* s = (pix_preview*)z;
     if (vis)
-	 image_drawme(s, glist, 1);
+	 image_drawme(s, glist, 1, 28, 28);
 }
 
