@@ -34,8 +34,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "pthread.h"
 
 /*ffmpeg includes*/
-#include <avcodec.h>
-#include <avformat.h>
+#include <ffmpeg/avcodec.h>
+#include <ffmpeg/avformat.h>
 
 /*libquicktime includes*/
 //#include <quicktime/lqt.h>

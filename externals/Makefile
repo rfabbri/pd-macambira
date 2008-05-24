@@ -43,20 +43,20 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 # this variable is to support old "win" directories, rather than "windows"
 BUILDSRC_OS_NAME = $(OS_NAME)
 
-CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS)
+CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS) -I$(gem_src)/src
 LDFLAGS =  
 LIBS = -lm
 
 ifeq ($(OS_NAME),darwin)
-  CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix
-  LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib \
-		-weak_framework Carbon
+  CFLAGS += -I/sw/include -I$(externals_src)/pdp/include -DMACOSX -DUNIX -Dunix
+  LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -undefined dynamic_lookup \
+		-L/sw/lib -weak_framework Carbon
   LIBS += -lc 
   DYLIB_LDFLAGS = -dynamiclib -undefined dynamic_lookup -read_only_relocs warning -L/sw/lib
   STRIP = strip -x
 endif
 ifeq ($(OS_NAME),linux)
-  CFLAGS +=  -DUNIX -Dunix -fPIC
+  CFLAGS += -I$(externals_src)/pdp/include -DUNIX -Dunix -fPIC
   LDFLAGS += -Wl,-export_dynamic  -shared
   LIBS += -lc
   DYLIB_LDFLAGS = $(LDFLAGS)
@@ -2087,6 +2087,45 @@ pdp_clean:
 	-find $(externals_src)/pdp -name '*.bak' | xargs rm -f --
 	-rm -f -- $(externals_src)/pdp/Makefile.config
 	-rm -f -- $(externals_src)/pdp/configure
+
+
+
+#------------------------------------------------------------------------------#
+# PDVJTOOLS
+PDVJTOOLS_NAME=pdvjtools
+PDVJTOOLS_OBJECTS := $(wildcard $(externals_src)/pdvjtools/*/*.c)
+PDVJTOOLS_CPP_OBJECTS := $(wildcard $(externals_src)/pdvjtools/*/*.cpp)
+pdvjtools: $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION)) \
+$(PDVJTOOLS_CPP_OBJECTS:.cpp=.$(EXTENSION))
+
+pdvjtools_install: pdvjtools
+	install -d $(objectsdir)/$(PDVJTOOLS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDVJTOOLS_NAME) \
+		--author "" \
+		--description "Pure Data Video Junk"
+	install -p $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(PDVJTOOLS_NAME)
+	install -d $(helpdir)/$(PDVJTOOLS_NAME)
+	install -p $(externals_src)/pdvjtools/*/*-help.pd \
+		$(helpdir)/$(PDVJTOOLS_NAME)
+	install -d $(manualsdir)/$(PDVJTOOLS_NAME)
+	install -p $(externals_src)/pdvjtools/pdp_freeframe/INSTALL \
+		$(manualsdir)/$(PDVJTOOLS_NAME)/pdp_freeframe_INSTALL
+	install -p $(externals_src)/pdvjtools/pdp_frei0r/INSTALL \
+		$(manualsdir)/$(PDVJTOOLS_NAME)/pdp_frei0r_INSTALL
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/pdvjtools/README \
+#		$(readmesdir)/$(PDVJTOOLS_NAME).txt
+#	install -d $(examplesdir)/$(PDVJTOOLS_NAME)
+#	install -p $(externals_src)/pdvjtools/examples/*.pd \
+#		$(examplesdir)/$(PDVJTOOLS_NAME)
+
+pdvjtools_clean:
+	-rm -f -- $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(PDVJTOOLS_CPP_OBJECTS:.cpp=.$(EXTENSION))
+	-rm -f -- $(PDVJTOOLS_OBJECTS:.c=.o)
+	-rm -f -- $(PDVJTOOLS_CPP_OBJECTS:.cpp=.o)
+	-rm -f -- $(externals_src)/pdvjtools/*.bak
+	-rm -f -- $(externals_src)/pdvjtools/*.*~
 
 
 
