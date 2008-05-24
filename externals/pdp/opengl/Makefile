@@ -24,7 +24,7 @@ pdp_opengl.pd_linux: subdirs
 
 pdp_opengl.pd_darwin: subdirs
 	rm -f pdp_opengl.pd_linux
-	$(CC) -o pdp_opengl.pd_pd_darwin ../modules/*/*.o ../system/pdp.o ../system/*/*.o ../puredata/*.o modules/*.o system/*.o $(PDP_LIBS) -bundle -undefined error -twolevel_namespace -bundle_loader $(PD_EXECUTABLE)
+	$(CC) -o pdp_opengl.pd_pd_darwin ../modules/*/*.o ../system/pdp.o ../system/*/*.o ../puredata/*.o modules/*.o system/*.o $(PDP_LIBS) -bundle -undefined dynamic_lookup -bundle_loader $(PD_EXECUTABLE)
 
 
 # $(CC) -o pdp_opengl.pd_pd_darwin modules/*.o system/*.o $(LDFLAGS) -g -dynamic -bundle -flat_namespace -undefined suppress
