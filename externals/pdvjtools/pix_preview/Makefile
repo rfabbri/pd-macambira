@@ -27,8 +27,8 @@ clean:
 distro: clean all
 	rm *.o
 
-.cpp.o:
-	g++ $(GEM2PNM_CPPFLAGS) $(GEM2PNM_INCLUDE) -o $*.o -c $*.cpp
+.cc.o:
+	g++ $(GEM2PNM_CPPFLAGS) $(GEM2PNM_INCLUDE) -o $*.o -c $*.cc
 
 .c.o:
 	gcc $(GEM2PNM_CPPFLAGS) $(GEM2PNM_INCLUDE) -o $*.o -c $*.c
