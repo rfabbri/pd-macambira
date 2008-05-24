@@ -8,8 +8,6 @@ short story: don't, use pdp_control's memlimit for limiting pdp's memory usage.
 
 todo 0.12.5:
 
-* fix sdl so it doesn't open window when object is created
-
 * find nasty 3dp bug
 * fix pdp_glx BadMatch bug (crashes on OSX) : fixed in pf
 * platform independent [pdp_vdac] [pdp_vadc]

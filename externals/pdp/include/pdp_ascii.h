@@ -1,6 +1,6 @@
 /*
  *   Pure Data Packet header file. ascii packet type.
- *   Copyright (c) by Tom Schouten <pdp@zzz.kotnet.org>
+ *   Copyright (c) by Tom Schouten <tom@zwizwa.be>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by

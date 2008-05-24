@@ -1,7 +1,7 @@
 PDP - Pure Data Packet v0.12.4
 a packet processing library for pure data
 
-Copyright (c) by Tom Schouten <pdp@goto10.org>
+Copyright (c) by Tom Schouten <tom@zwizwa.be>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -152,8 +152,9 @@ now :)
 Some Remarks: 
 
 * New versions of this package can be found at
-http://zwizwa.goto10.org/pd/pdp
+http://zwizwa.be/pd/pdp
 Experimental relases are in the subdirectory test/
+But best to track the darcs archive at http://zwizwa.be/darcs/pdp-12
 
 * If you have libquicktime and quicktime4linux installed, this can 
 give problems with the configure script. Consider removing 

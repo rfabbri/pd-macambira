@@ -29,6 +29,8 @@ image processors:
 pdp_abs		absolute value
 pdp_add		adds two images
 pdp_and		bitwize and
+pdp_array2grey	convert pd array to greyscale image
+pdp_grey2array	convert greyscale image to pd array
 pdp_bitdepth	set bit depth
 pdp_bitmask	apply a bit mask
 pdp_bq		spatial biquad filter

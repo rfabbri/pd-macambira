@@ -1,6 +1,6 @@
 /*
  *   Pure Data Packet module.
- *   Copyright (c) 2003 by Tom Schouten <pdp@zzz.kotnet.org>
+ *   Copyright (c) 2003 by Tom Schouten <tom@zwizwa.be>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -29,18 +29,76 @@ typedef struct _pdp_array
 {
     t_object x_obj;
     t_symbol *x_array_sym;
-    t_outlet *x_outlet; // for array->pdp
-    t_int x_rows;
+    t_outlet *x_outlet0; // for array->pdp
+    t_int x_rows; // transposed
+
+    /* packet creation */
+    t_int x_width;
+    t_int x_height;
+
+    /* only valid after "get array" */
+    float *x_vec;
+    int x_nbpoints;
+    
+
 
     /* the packet */
     int x_packet0;
 
 } t_pdp_array;
 
+static void get_array(t_pdp_array *x){
+    t_garray *a;
+
+    x->x_vec = 0;
+
+    /* dump to array if possible */
+    if (!x->x_array_sym) return;
+
+    /* check if array is valid */
+    if (!(a = (t_garray *)pd_findbyclass(x->x_array_sym, garray_class))){
+	post("pdp_array: %s: no such array", x->x_array_sym->s_name);
+	return;
+    }
+
+    /* get data */
+    if (!garray_getfloatarray(a, &x->x_nbpoints, &x->x_vec)){
+	post("pdp_array: %s: bad template", x->x_array_sym->s_name);
+	return;
+    }    
+}
+
 
 static void pdp_array_bang(t_pdp_array *x)
 {
-    post("not implemented");
+    PDP_ASSERT(-1 == x->x_packet0);
+    x->x_packet0 = pdp_packet_new_image_grey(x->x_width, x->x_height);
+    if (-1 != x->x_packet0){
+	t_pdp *header = pdp_packet_header(x->x_packet0);
+	short int *data = (short int*)pdp_packet_data(x->x_packet0);
+	get_array(x);
+	if (x->x_vec){
+	    int i;
+	    int w = header->info.image.width;
+	    int h = header->info.image.height;
+	    int N = w*h;
+	    N = (x->x_nbpoints < N) ? x->x_nbpoints : N;
+
+	    /* scan rows */
+	    if (1 || x->x_rows){
+		// FIXME: saturation
+		for (i=0; i<N; i++) {
+		    float max = (float)0x8000;
+		    float f = x->x_vec[i] * max;
+		    int l = (int)f;
+		    l = (l > 0x8000)  ?  0x7fff : l;
+		    l = (l < -0x8000) ? -0x8000 : l;
+		    data[i] = (short int)l;
+		}
+	    }
+	}
+	pdp_packet_pass_if_valid(x->x_outlet0, &x->x_packet0);
+    }
 }
 
 
@@ -58,49 +116,34 @@ static void pdp_array_input_0(t_pdp_array *x, t_symbol *s, t_floatarg f)
 
     /* process */
     if (s == gensym("process")){
-	float *vec;
-	int nbpoints;
 	t_garray *a;
 	t_pdp *header = pdp_packet_header(x->x_packet0);
 	short int *data = pdp_packet_data(x->x_packet0);
 	if (!header || !data) return;
 
-	/* dump to array if possible */
-	if (!x->x_array_sym){
-	}
-
-	/* check if array is valid */
-	else if (!(a = (t_garray *)pd_findbyclass(x->x_array_sym, garray_class))){
-	    post("pdp_array: %s: no such array", x->x_array_sym->s_name);
-	}
-	/* get data */
-	else if (!garray_getfloatarray(a, &nbpoints, &vec)){
-	    post("pdp_array: %s: bad template", x->x_array_sym->s_name);
-	}
-	/* scale and dump in array */
-	else{
+	
+	get_array(x);
+	if (x->x_vec){
 	    int i;
 	    int w = header->info.image.width;
 	    int h = header->info.image.height;
 	    int N = w*h;
-	    N = (nbpoints < N) ? nbpoints : N;
+	    N = (x->x_nbpoints < N) ? x->x_nbpoints : N;
 
 	    /* scan rows */
 	    if (x->x_rows){
 		for (i=0; i<N; i++) 
-		    vec[i] = (float)data[i] * (1.0f / (float)0x8000);
+		    x->x_vec[i] = (float)data[i] * (1.0f / (float)0x8000);
 	    }
 	    /* scan columns */
 	    else{
 		for (i=0; i<N; i++) {
-		    int x = i / h;
-		    int y = i % h;
-		    vec[i] = (float)data[x+(h-y-1)*w] * (1.0f / (float)0x8000);
+		    int xx = i / h;
+		    int yy = i % h;
+		    x->x_vec[i] = (float)data[xx+(h-yy-1)*w] * (1.0f / (float)0x8000);
 		}
 	    }
-	    //garray_redraw(a);
 	}
-
     }
 }
 
@@ -127,6 +170,9 @@ void *pdp_array2grey_new(t_symbol *s, t_symbol *r)
 {
     t_pdp_array *x = (t_pdp_array *)pd_new(pdp_array2grey_class);
     pdp_array_array(x, s);
+    x->x_outlet0 = outlet_new(&x->x_obj, &s_anything);
+    x->x_width = 320;
+    x->x_height = 240;
     return (void *)x;
 }
 

@@ -104,18 +104,20 @@ lavtrans -o clip.mov -f q clip.avi
 Mplayer/Mencoder
 ----------------
 
-The MPlayer project uses libavcodec, and even distributes a copy with the MPlayer source.
-You'll need mencoder mainly if you want to use an encoder that's not in the
-ffmpeg package (lavcodec), or what to do some format conversion that's not
-supported by ffmpeg directly. Of course mplayer is handy for inspecting raw files.
-To play a raw video stream try:
+The MPlayer project uses libavcodec, and even distributes a copy with
+the MPlayer source.  You'll need mencoder mainly if you want to use an
+encoder that's not in the ffmpeg package (lavcodec), or what to do
+some format conversion that's not supported by ffmpeg directly. Of
+course mplayer is handy for inspecting raw files.  To play a raw video
+stream try:
 
 mplayer -rawvideo on:w=320:h=240:fps=25 video.i420
 
 To encode video only using the ffmpeg (lavc) mjpeg codec
 (it is possible to use yv12 here, using the format=yv12 option)
 
-mencoder -rawvideo on:w=320:h=240:fps=25 video.i420 -ovc lavc -lavcopts vcodec=mjpeg -o clip.avi
+mencoder -rawvideo on:w=320:h=240:fps=25 video.i420 -ovc lavc \
+	 -lavcopts vcodec=mjpeg -o clip.avi
 
 
 

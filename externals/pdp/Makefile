@@ -38,9 +38,11 @@ buildclean:
 	make -C puredata clean
 	make -C modules clean
 
-clean: buildclean
+backupclean:
+	rm -f *~ */*~ */*/*~
+
+clean: buildclean backupclean
 	rm -f pdp.pd_linux
-	rm -f *~
 
 distroclean: buildclean
 	make -C scaf clean

@@ -25,7 +25,7 @@ have to be the same to be combined (i.e. mixed);
 #X text 349 559 dim sets the window dimensions;
 #X msg 210 510 create;
 #X msg 210 531 destroy;
-#X text 208 447 pdp_glx ouputs video in a window using the xVideo extension.
+#X text 208 447 pdp_glx ouputs video in a window using the GLX extension.
 if your graphics card/driver supports it you can have multiple output
 windows. if a pdp message is received and a window is not open \, one
 is created automaticly.;

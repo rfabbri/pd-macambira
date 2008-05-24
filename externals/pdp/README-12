@@ -6,7 +6,7 @@ In order not to annoy people using the old PDP with my new and exciting
 insights about forth, I declare this version to be the `stable' PDP 12.
 The DEC PDP 13 never existed, so this might have been a sign...
 
-For people interested in packet forth, check http://zwizwa.goto10.org
+For people interested in packet forth, check http://zwizwa.be/packetforth
 for more information. Stable PDP might include some additions from PF
 later on, but main focus right now is stability.
 
