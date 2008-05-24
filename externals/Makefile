@@ -134,7 +134,7 @@ else
     LIB_TARGETS += hid pdp pidip gem2pdp aka.wiiremote iem16 apple
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip gem2pdp hdspm_mixer iem16 postlude tclpd
+    LIB_TARGETS += hid pdp pidip gem2pdp hdspm_mixer iem16 postlude tclpd pdvjtools
   endif
 endif
 
