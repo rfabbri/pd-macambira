@@ -2094,9 +2094,9 @@ pdp_clean:
 # PDVJTOOLS
 PDVJTOOLS_NAME=pdvjtools
 PDVJTOOLS_OBJECTS := $(wildcard $(externals_src)/pdvjtools/*/*.c)
-PDVJTOOLS_CPP_OBJECTS := $(wildcard $(externals_src)/pdvjtools/*/*.cpp)
+PDVJTOOLS_CPP_OBJECTS := $(wildcard $(externals_src)/pdvjtools/*/*.cc)
 pdvjtools: $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION)) \
-$(PDVJTOOLS_CPP_OBJECTS:.cpp=.$(EXTENSION))
+$(PDVJTOOLS_CPP_OBJECTS:.cc=.$(EXTENSION))
 
 pdvjtools_install: pdvjtools
 	install -d $(objectsdir)/$(PDVJTOOLS_NAME)
@@ -2121,9 +2121,9 @@ pdvjtools_install: pdvjtools
 
 pdvjtools_clean:
 	-rm -f -- $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(PDVJTOOLS_CPP_OBJECTS:.cpp=.$(EXTENSION))
+	-rm -f -- $(PDVJTOOLS_CPP_OBJECTS:.cc=.$(EXTENSION))
 	-rm -f -- $(PDVJTOOLS_OBJECTS:.c=.o)
-	-rm -f -- $(PDVJTOOLS_CPP_OBJECTS:.cpp=.o)
+	-rm -f -- $(PDVJTOOLS_CPP_OBJECTS:.cc=.o)
 	-rm -f -- $(externals_src)/pdvjtools/*.bak
 	-rm -f -- $(externals_src)/pdvjtools/*.*~
 
