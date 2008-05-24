@@ -480,14 +480,23 @@ int format_adequat(path nomF){
           t1 = strtok(NULL,".") )
         strcpy(extensio,t1);
     if(strcmp(extensio,"bmp")==0) retorn = 1;
+	if(strcmp(extensio,"BMP")==0) retorn = 1;
     if(strcmp(extensio,"eps")==0) retorn = 1;
+	if(strcmp(extensio,"EPS")==0) retorn = 1;
     if(strcmp(extensio,"gif")==0) retorn = 1;
+	if(strcmp(extensio,"GIF")==0) retorn = 1;
     if(strcmp(extensio,"jpg")==0) retorn = 1;
+	if(strcmp(extensio,"JPG")==0) retorn = 1;
     if(strcmp(extensio,"jpeg")==0) retorn = 1;
+	if(strcmp(extensio,"JPEG")==0) retorn = 1;
     if(strcmp(extensio,"png")==0) retorn = 1;
+	if(strcmp(extensio,"PNG")==0) retorn = 1;
     if(strcmp(extensio,"ppm")==0) retorn = 1;
+	if(strcmp(extensio,"PPM")==0) retorn = 1;
     if(strcmp(extensio,"tif")==0) retorn = 1;
+	if(strcmp(extensio,"TIF")==0) retorn = 1;
     if(strcmp(extensio,"tiff")==0) retorn = 1;
+	if(strcmp(extensio,"TIFF")==0) retorn = 1;
 
     return (retorn);
 }
