@@ -62,9 +62,9 @@ extern "C" {
 
 #elif defined(__linux__) || defined(__APPLE__)
 
-typedef unsigned int DWORD;
-typedef void *LPVOID;
-typedef unsigned char BYTE;
+    typedef unsigned int DWORD;
+    typedef void *LPVOID;
+    typedef unsigned char BYTE;
 
 #endif
 
@@ -127,59 +127,59 @@ typedef unsigned char BYTE;
  *	FreeFrame types
  */
 
-typedef struct PlugInfoStructTag {
-	DWORD	APIMajorVersion;
-	DWORD	APIMinorVersion;
-	BYTE	uniqueID[4];			/* 4 chars uniqueID - not null terminated */
-	BYTE	pluginName[16];			/* 16 chars plugin friendly name - not null terminated */
-	DWORD	pluginType;			/* Effect or source */
-} PlugInfoStruct;
+    typedef struct PlugInfoStructTag {
+        DWORD	APIMajorVersion;
+        DWORD	APIMinorVersion;
+        BYTE	uniqueID[4];			/* 4 chars uniqueID - not null terminated */
+        BYTE	pluginName[16];			/* 16 chars plugin friendly name - not null terminated */
+        DWORD	pluginType;			/* Effect or source */
+    } PlugInfoStruct;
 
-typedef struct PlugExtendedInfoStructTag {
-	DWORD PluginMajorVersion;
-	DWORD PluginMinorVersion;
-	char* Description;
-	char* About;
-	DWORD FreeFrameExtendedDataSize;
-	void* FreeFrameExtendedDataBlock;
-} PlugExtendedInfoStruct;
+    typedef struct PlugExtendedInfoStructTag {
+        DWORD PluginMajorVersion;
+        DWORD PluginMinorVersion;
+        char* Description;
+        char* About;
+        DWORD FreeFrameExtendedDataSize;
+        void* FreeFrameExtendedDataBlock;
+    } PlugExtendedInfoStruct;
 
-typedef struct VideoInfoStructTag {
-	DWORD frameWidth;			/* width of frame in pixels */
-	DWORD frameHeight;			/* height of frame in pixels */
-	DWORD bitDepth;				/* enumerated indicator of bit depth of video */
-						/* 0 = 16 bit 5-6-5   1 = 24bit packed   2 = 32bit */
-	DWORD orientation;			/* video frame orientation meaningful values:
-						   1 = origin at top left 2 = origin at bottom left */
+    typedef struct VideoInfoStructTag {
+        DWORD frameWidth;			/* width of frame in pixels */
+        DWORD frameHeight;			/* height of frame in pixels */
+        DWORD bitDepth;				/* enumerated indicator of bit depth of video */
+        /* 0 = 16 bit 5-6-5   1 = 24bit packed   2 = 32bit */
+        DWORD orientation;			/* video frame orientation meaningful values:
+                                       1 = origin at top left 2 = origin at bottom left */
 	
-} VideoInfoStruct;
+    } VideoInfoStruct;
 
-typedef struct ProcessFrameCopyStructTag {
-	DWORD numInputFrames;
-	void** InputFrames;
-	void* OutputFrame;
-} ProcessFrameCopyStruct;
+    typedef struct ProcessFrameCopyStructTag {
+        DWORD numInputFrames;
+        void** InputFrames;
+        void* OutputFrame;
+    } ProcessFrameCopyStruct;
 
-typedef struct SetParameterStructTag {
-	DWORD index;
-	float value;
-} SetParameterStruct;
+    typedef struct SetParameterStructTag {
+        DWORD index;
+        float value;
+    } SetParameterStruct;
 
-typedef union {
-	DWORD ivalue;
-	float fvalue;
-	char *svalue;
-} ParameterValue;
+    typedef union {
+        DWORD ivalue;
+        float fvalue;
+        char *svalue;
+    } ParameterValue;
 
-typedef union plugMainUnionTag {
-	DWORD ivalue;
-	float fvalue;
-	VideoInfoStruct *VISvalue;
-	PlugInfoStruct *PISvalue;
-	char *svalue;
-} plugMainUnion;
+    typedef union plugMainUnionTag {
+        DWORD ivalue;
+        float fvalue;
+        VideoInfoStruct *VISvalue;
+        PlugInfoStruct *PISvalue;
+        char *svalue;
+    } plugMainUnion;
 
-typedef plugMainUnion plugMainType(DWORD, LPVOID, DWORD);
+    typedef plugMainUnion plugMainType(DWORD, LPVOID, DWORD);
 
 /*
  *	Function prototypes
@@ -204,20 +204,20 @@ typedef plugMainUnion plugMainType(DWORD, LPVOID, DWORD);
 
 #ifdef _WIN32
 
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, DWORD lpReserved );
+    BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, DWORD lpReserved );
 
-__declspec(dllexport) LPVOID __stdcall plugMain(DWORD functionCode, LPVOID pParam, DWORD reserved);
+    __declspec(dllexport) LPVOID __stdcall plugMain(DWORD functionCode, LPVOID pParam, DWORD reserved);
 
-typedef __declspec(dllimport) LPVOID (__stdcall *FF_Main_FuncPtr)(DWORD, LPVOID, DWORD);
+    typedef __declspec(dllimport) LPVOID (__stdcall *FF_Main_FuncPtr)(DWORD, LPVOID, DWORD);
 
 #elif __linux__
 
-plugMainUnion plugMain(DWORD functionCode, LPVOID pParam, DWORD reserved);
+    plugMainUnion plugMain(DWORD functionCode, LPVOID pParam, DWORD reserved);
 
 
 #elif __APPLE__
 
-typedef LPVOID (*FF_Main_FuncPtr)(DWORD, LPVOID, DWORD);
+    typedef LPVOID (*FF_Main_FuncPtr)(DWORD, LPVOID, DWORD);
 
 #endif
 
