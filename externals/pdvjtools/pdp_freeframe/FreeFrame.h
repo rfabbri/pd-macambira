@@ -51,7 +51,7 @@ extern "C" {
  *	includes
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #if _MSC_VER > 1000
 #pragma once
@@ -60,15 +60,10 @@ extern "C" {
 #define WIN32_LEAN_AND_MEAN		/* Exclude rarely-used stuff from Windows headers */
 #include <windows.h>
 
-#elif defined LINUX
+#elif defined(__linux__) || defined(__APPLE__)
 
 typedef unsigned int DWORD;
 typedef void *LPVOID;
-typedef unsigned char BYTE;
-
-#elif defined MACOS
-
-typedef unsigned int DWORD;
 typedef unsigned char BYTE;
 
 #endif
@@ -207,7 +202,7 @@ typedef plugMainUnion plugMainType(DWORD, LPVOID, DWORD);
  *
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, DWORD lpReserved );
 
@@ -215,12 +210,12 @@ __declspec(dllexport) LPVOID __stdcall plugMain(DWORD functionCode, LPVOID pPara
 
 typedef __declspec(dllimport) LPVOID (__stdcall *FF_Main_FuncPtr)(DWORD, LPVOID, DWORD);
 
-#elif LINUX
+#elif __linux__
 
 plugMainUnion plugMain(DWORD functionCode, LPVOID pParam, DWORD reserved);
 
 
-#elif MACOS
+#elif __APPLE__
 
 typedef LPVOID (*FF_Main_FuncPtr)(DWORD, LPVOID, DWORD);
 

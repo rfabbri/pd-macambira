@@ -70,6 +70,7 @@ typedef struct pdp_freeframe_struct
     int x_plugin; 
     int x_infosok; 
     char x_pdetails[FREEFRAME_PARAM_DETAILS_LENGTH]; 
+    t_symbol *plugindir;
 
     PLUGIN *plugins;
     
@@ -188,6 +189,12 @@ void ff_freeplugins(t_pdp_freeframe *x)
     x->plugins = NULL;
 }
 
+static void pdp_freeframe_plugindir(t_pdp_freeframe *x, t_symbol *s)
+{
+    x->plugindir = s;
+    ff_loadplugins(x, x->plugindir);
+}
+
 static void pdp_freeframe_process_rgb(t_pdp_freeframe *x)
 {
     t_pdp     *header = pdp_packet_header(x->x_packet0);
@@ -213,7 +220,7 @@ static void pdp_freeframe_process_rgb(t_pdp_freeframe *x)
     	x->x_size = x->x_width*x->x_height;
     
     	//load the plugins
-    	ff_loadplugins(x, FF_PLUGIN_DIR);
+        ff_loadplugins(x, x->plugindir);
     }
     
     newheader->info.image.encoding = header->info.image.encoding;
@@ -429,8 +436,20 @@ void *pdp_freeframe_new(t_floatarg f)
     //load the plugins
     x->x_plugin_count = 0;
     x->x_infosok = 0;
-    //ff_loadplugins(x, FF_PLUGIN_DIR);
 
+    char ff_plugin_dir[FILENAME_MAX];
+    char *home = getenv("HOME");
+    int home_len;
+    if(home != NULL)
+    {
+        home_len = strlen(home);
+        if(home_len >= FILENAME_MAX)
+            home_len = FILENAME_MAX - 1;
+        memcpy(ff_plugin_dir, home, home_len);
+        ff_plugin_dir[home_len] = '\0';
+        strncpy(ff_plugin_dir, "/.frf", FILENAME_MAX - home_len);
+        pdp_freeframe_plugindir(x, gensym(ff_plugin_dir));
+    }
     pdp_freeframe_plugin(x, f);
 
     return (void *)x;
@@ -453,7 +472,7 @@ void pdp_freeframe_setup(void)
     class_addmethod(pdp_freeframe_class, (t_method)pdp_freeframe_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_freeframe_class, (t_method)pdp_freeframe_plugin, gensym("plugin"),  A_FLOAT, A_NULL);   
     class_addmethod(pdp_freeframe_class, (t_method)pdp_freeframe_param, gensym("param"),  A_FLOAT, A_FLOAT, A_NULL);   
-    class_addmethod(pdp_freeframe_class, (t_method)ff_loadplugins, gensym("plugindir"),  A_SYMBOL, A_NULL);   
+    class_addmethod(pdp_freeframe_class, (t_method)pdp_freeframe_plugindir, gensym("plugindir"),  A_SYMBOL, A_NULL);   
 
 
 }
