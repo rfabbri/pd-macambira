@@ -2052,12 +2052,11 @@ PDP_NAME=pdp
 $(externals_src)/pdp/configure: $(externals_src)/pdp/configure.ac
 	cd $(externals_src)/pdp && autoconf
 
-$(externals_src)/pdp/Makefile.config: $(externals_src)/pdp/Makefile.config.in
+$(externals_src)/pdp/Makefile.config: $(externals_src)/pdp/configure $(externals_src)/pdp/Makefile.config.in
 	cd $(externals_src)/pdp && ./configure PD_CPPFLAGS="-I$(pd_src)/src" \
 		$(PDP_OPTIONS)
 
-$(externals_src)/pdp/pdp.$(EXTENSION):  $(externals_src)/pdp/configure \
-$(externals_src)/pdp/Makefile.config 
+$(externals_src)/pdp/pdp.$(EXTENSION): $(externals_src)/pdp/Makefile.config 
 	$(MAKE) -C $(externals_src)/pdp PD_EXECUTABLE="$(pd_src)/bin/pd"
 
 pdp: $(externals_src)/pdp/pdp.$(EXTENSION)
@@ -2095,7 +2094,7 @@ pdp_clean:
 PDVJTOOLS_NAME=pdvjtools
 PDVJTOOLS_OBJECTS := $(wildcard $(externals_src)/pdvjtools/*/*.c)
 PDVJTOOLS_CPP_OBJECTS := $(wildcard $(externals_src)/pdvjtools/*/*.cc)
-pdvjtools: $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION)) \
+pdvjtools: $(externals_src)/pdp/Makefile.config $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION)) \
 $(PDVJTOOLS_CPP_OBJECTS:.cc=.$(EXTENSION))
 
 pdvjtools_install: pdvjtools
