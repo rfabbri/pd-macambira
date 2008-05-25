@@ -1,0 +1,35 @@
+PD_DIR = @PD_DIR@
+GEM_DIR = @GEM_DIR@
+
+LIBS = @LIBS@
+GEM_OPENCV_VERSION = @GEM_OPENCV_VERSION@
+
+# build flags
+
+GEM_OPENCV_INCLUDE =  -I$(PD_DIR)/src -I.  -I$(GEM_DIR)/src -I$(PD_DIR)/src
+GEM_OPENCV_CPPFLAGS  = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
+    -Wall -W -Wno-unused -Wno-parentheses -Wno-switch \
+    -DGEM_OPENCV_VERSION=\"$(GEM_OPENCV_VERSION)\" -g
+
+all: pix_preview.pd_linux
+
+
+pix_preview.pd_linux: pix_preview.o 
+	rm -f pix_preview.pd_linux
+	gcc -export_dynamic -shared -o pix_preview.pd_linux pix_preview.o $(LIBS)
+
+clean:
+	rm -f *.o
+	rm -f pix_preview.pd_linux
+
+distro: clean all
+	rm *.o
+
+.cpp.o:
+	g++ $(GEM_OPENCV_CPPFLAGS) $(GEM_OPENCV_INCLUDE) -o $*.o -c $*.cpp
+
+.c.o:
+	gcc $(GEM_OPENCV_CPPFLAGS) $(GEM_OPENCV_INCLUDE) -o $*.o -c $*.c
+
+install:
+	cp -f --remove-destination *.pd $(PD_DIR)/doc/5.reference
