@@ -475,6 +475,7 @@ extern "C"
         class_addmethod(pdp_freeframe_class, (t_method)pdp_freeframe_plugin, gensym("plugin"),  A_FLOAT, A_NULL);   
         class_addmethod(pdp_freeframe_class, (t_method)pdp_freeframe_param, gensym("param"),  A_FLOAT, A_FLOAT, A_NULL);   
         class_addmethod(pdp_freeframe_class, (t_method)pdp_freeframe_plugindir, gensym("plugindir"),  A_SYMBOL, A_NULL);   
+        class_addmethod(pdp_freeframe_class, (t_method)pdp_freeframe_plugindir, gensym("pluginsdir"),  A_SYMBOL, A_NULL);   
 
 
     }
