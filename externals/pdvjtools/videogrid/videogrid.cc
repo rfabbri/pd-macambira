@@ -1,4 +1,6 @@
 
+extern "C"
+{ 
 /*
 videogrid external for Puredatai
 Lluis Gomez i Bigorda :: lluis-at-hangar.org
@@ -36,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*ffmpeg includes*/
 #include <ffmpeg/avcodec.h>
 #include <ffmpeg/avformat.h>
+#include <ffmpeg/avutil.h>
 
 /*libquicktime includes*/
 //#include <quicktime/lqt.h>
@@ -71,9 +74,7 @@ typedef char pathimage[BYTESNOMFITXERIMATGE];
 
 typedef char tipus_format[BYTESTIPUSFROMAT];
 
-#ifdef __cplusplus
-extern "C" int convertir_img_ff(pathimage pathFitxer, tipus_format f, int W, int H, int posi);
-#endif
+int convertir_img_ff(pathimage pathFitxer, tipus_format f, int W, int H, int posi);
 
 void SaveFrame(AVFrame *pFrame, int width, int height, int W, int H, int posi)
 {
@@ -1507,8 +1508,6 @@ static void videogrid_destroy(t_videogrid *x){
 /* al carregar la nova llibreria my_lib pd intenta cridar la funció my_lib_setup */  
 /* aquesta crea la nova classe i les seves propietats només un sol cop */
 
-extern "C"
-{ 
 void videogrid_setup(void)
 {
     load_tk_procs();
