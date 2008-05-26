@@ -217,8 +217,7 @@ extern short get_device_number_from_usage(short device_number,
 
 /*==============================================================================
  * symbol pointers for pre-generated event symbols
- *==============================================================================
- */
+ *============================================================================*/
 
 extern t_symbol *ps_absolute, *ps_button, *ps_key, *ps_led, *ps_pid, *ps_relative;
 
@@ -231,6 +230,16 @@ extern t_symbol *relative_symbols[RELATIVE_ARRAY_MAX];
 
 extern void generate_event_symbols();
 extern void generate_type_symbols();
+
+
+/*==============================================================================
+ * macros for compiling for Max/MSP using the Pd API
+ *============================================================================*/
+
+#ifndef PD /* Max */
+# define SETSYMBOL(atom, s)  atom_setsym(atom, s)
+# define SETFLOAT(atom, f)   atom_setlong(atom, (long)f)
+#endif /* NOT PD */
 
 
 #endif  /* NOT _HIDIO_H */
