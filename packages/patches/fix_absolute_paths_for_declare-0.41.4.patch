@@ -1,0 +1,174 @@
+Index: m_pd.h
+===================================================================
+--- m_pd.h	(revision 9862)
++++ m_pd.h	(working copy)
+@@ -457,6 +457,7 @@
+ 
+ /* ------------  system interface routines ------------------- */
+ EXTERN int sys_isreadablefile(const char *name);
++EXTERN int sys_isabsolutepath(const char *dir);
+ EXTERN void sys_bashfilename(const char *from, char *to);
+ EXTERN void sys_unbashfilename(const char *from, char *to);
+ EXTERN int open_via_path(const char *name, const char *ext, const char *dir,
+Index: s_main.c
+===================================================================
+--- s_main.c	(revision 9862)
++++ s_main.c	(working copy)
+@@ -491,28 +491,29 @@
+     sys_libdir = gensym(sbuf2);
+     sys_guidir = &s_;   /* in MSW the guipath just depends on the libdir */
+ #else
+-    strncpy(sbuf, sbuf2, MAXPDSTRING-30);
++    realpath(sbuf2, sbuf);
++    strncpy(sbuf2, sbuf, MAXPDSTRING-30);
+     sbuf[MAXPDSTRING-30] = 0;
+-    strcat(sbuf, "/lib/pd");
+-    if (stat(sbuf, &statbuf) >= 0)
++    strcat(sbuf2, "/lib/pd");
++    if (stat(sbuf2, &statbuf) >= 0)
+     {
+             /* complicated layout: lib dir is the one we just stat-ed above */
+-        sys_libdir = gensym(sbuf);
++        sys_libdir = gensym(sbuf2);
+             /* gui lives in .../lib/pd/bin */
+-        strncpy(sbuf, sbuf2, MAXPDSTRING-30);
++        strncpy(sbuf2, sbuf, MAXPDSTRING-30);
+         sbuf[MAXPDSTRING-30] = 0;
+-        strcat(sbuf, "/lib/pd/bin");
+-        sys_guidir = gensym(sbuf);
++        strcat(sbuf2, "/lib/pd/bin");
++        sys_guidir = gensym(sbuf2);
+     }
+     else
+     {
+             /* simple layout: lib dir is the parent */
+-        sys_libdir = gensym(sbuf2);
++        sys_libdir = gensym(sbuf);
+             /* gui lives in .../bin */
+-        strncpy(sbuf, sbuf2, MAXPDSTRING-30);
++        strncpy(sbuf2, sbuf, MAXPDSTRING-30);
+         sbuf[MAXPDSTRING-30] = 0;
+-        strcat(sbuf, "/bin");
+-        sys_guidir = gensym(sbuf);
++        strcat(sbuf2, "/bin");
++        sys_guidir = gensym(sbuf2);
+     }
+ #endif
+ }
+Index: s_path.c
+===================================================================
+--- s_path.c	(revision 9862)
++++ s_path.c	(working copy)
+@@ -69,6 +69,24 @@
+     *to = 0;
+ }
+ 
++/* test if path is absolute or relative, based on leading /, env vars, ~, etc */
++int sys_isabsolutepath(const char *dir)
++{
++    if (dir[0] == '/' || dir[0] == '~'
++#ifdef MSW
++        || dir[0] == '%' || (dir[1] == ':' && dir[2] == '/')
++#endif
++        )
++    {
++        return 1;
++    }
++    else
++    {
++        return 0;            
++    }
++}
++
++
+ /*******************  Utility functions used below ******************/
+ 
+ /*!
+@@ -250,11 +268,7 @@
+ int sys_open_absolute(const char *name, const char* ext,
+     char *dirresult, char **nameresult, unsigned int size, int bin, int *fdp)
+ {
+-    if (name[0] == '/' 
+-#ifdef MSW
+-        || (name[1] == ':' && name[2] == '/')
+-#endif
+-            )
++    if (sys_isabsolutepath(name))
+     {
+         char dirbuf[MAXPDSTRING];
+         int dirlen = (strrchr(name, '/') - name);
+Index: g_canvas.c
+===================================================================
+--- g_canvas.c	(revision 9862)
++++ g_canvas.c	(working copy)
+@@ -1475,6 +1479,22 @@
+     }
+ }
+ 
++static void canvas_completepath(char *from, char *to)
++{
++    if (sys_isabsolutepath(from))
++    {
++        to[0] = '\0';
++    }
++    else
++    {   // if not absolute path, append Pd lib dir
++        strncpy(to, sys_libdir->s_name, FILENAME_MAX-4);
++        to[FILENAME_MAX-3] = '\0';
++        strcat(to, "/");
++    }
++    strncat(to, from, FILENAME_MAX-strlen(to));
++    to[FILENAME_MAX-1] = '\0';
++}
++
+ static void canvas_declare(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
+ {
+     int i;
+@@ -1496,12 +1516,7 @@
+         }
+         else if ((argc > i+1) && !strcmp(flag, "-stdpath"))
+         {
+-            strncpy(strbuf, sys_libdir->s_name, MAXPDSTRING-3);
+-            strbuf[MAXPDSTRING-4] = 0;
+-            strcat(strbuf, "/");
+-            strncpy(strbuf, atom_getsymbolarg(i+1, argc, argv)->s_name,
+-                MAXPDSTRING-strlen(strbuf));
+-            strbuf[MAXPDSTRING-1] = 0;
++            canvas_completepath(atom_getsymbolarg(i+1, argc, argv)->s_name, strbuf);
+             e->ce_path = namelist_append(e->ce_path, strbuf, 0);
+             i++;
+         }
+@@ -1512,12 +1527,7 @@
+         }
+         else if ((argc > i+1) && !strcmp(flag, "-stdlib"))
+         {
+-            strncpy(strbuf, sys_libdir->s_name, MAXPDSTRING-3);
+-            strbuf[MAXPDSTRING-4] = 0;
+-            strcat(strbuf, "/");
+-            strncpy(strbuf, atom_getsymbolarg(i+1, argc, argv)->s_name,
+-                MAXPDSTRING-strlen(strbuf));
+-            strbuf[MAXPDSTRING-1] = 0;
++            canvas_completepath(atom_getsymbolarg(i+1, argc, argv)->s_name, strbuf);
+             sys_load_lib(0, strbuf);
+             i++;
+         }
+@@ -1564,9 +1574,16 @@
+         for (nl = y->gl_env->ce_path; nl; nl = nl->nl_next)
+         {
+             char realname[MAXPDSTRING];
+-            strncpy(realname, dir, MAXPDSTRING);
+-            realname[MAXPDSTRING-3] = 0;
+-            strcat(realname, "/");
++            if (sys_isabsolutepath(nl->nl_string))
++            {
++                realname[0] = '\0';
++            }
++            else
++            {   /* if not absolute path, append Pd lib dir */
++                strncpy(realname, dir, MAXPDSTRING);
++                realname[MAXPDSTRING-3] = 0;
++                strcat(realname, "/");
++            }
+             strncat(realname, nl->nl_string, MAXPDSTRING-strlen(realname));
+             realname[MAXPDSTRING-1] = 0;
+             if ((fd = sys_trytoopenone(realname, name, ext,
