@@ -69,8 +69,8 @@ void gem2pdp :: bangMess()
   GemMan::getDimen(&m_width, &m_height);
 #endif
   pbuffers = GemMan::m_buffer;
-  GemMan::m_buffer = 1;
-  GemMan::render(idontknowwhatitis);
+  // GemMan::m_buffer = 1;
+  // GemMan::render(idontknowwhatitis);
   // post("gem2pdp : got dimensions : x=%d y=%d w=%d h=%d", m_x, m_y, m_width, m_height);
         
   if (m_width <= 0 || m_height <= 0)
@@ -142,8 +142,8 @@ void gem2pdp :: bangMess()
    pdp_packet_pass_if_valid(m_pdpoutlet, &m_packet0);
 
    // restore buffer state
-   GemMan::m_buffer = pbuffers;
-   GemMan::render(idontknowwhatitis);
+   // GemMan::m_buffer = pbuffers;
+   // GemMan::render(idontknowwhatitis);
 
    // post("gem2pdp : read image"); 
 }
@@ -167,8 +167,8 @@ void gem2pdp :: bangMessCallback(void *data)
   GetMyClass(data)->bangMess();
 }
 
-// stubs just to make gem happy
 void gem2pdp :: render(GemState *state)
 {
+  GemMan::render(state);
   return;
 }

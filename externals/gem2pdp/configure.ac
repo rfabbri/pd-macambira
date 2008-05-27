@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT
-GEM2PDP_VERSION=0.6
+GEM2PDP_VERSION=0.7
 
 if test -d /usr/local/pd; 
 then
