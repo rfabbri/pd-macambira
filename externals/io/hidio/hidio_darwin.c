@@ -497,7 +497,7 @@ static void hidio_print_element_list(t_hidio *x)
 		return;
 	}
 	post("[hidio] found %d elements:",element_count[x->x_device_number]);
-	post("\n  TYPE\tCODE\t#\tEVENT NAME");
+	post("\n TYPE\t\tCODE\t#\tcookie\tEVENT NAME");
 	post("-----------------------------------------------------------");
 	for(i=0; i<element_count[x->x_device_number]; i++)
 	{
@@ -506,8 +506,9 @@ static void hidio_print_element_list(t_hidio *x)
 		HIDGetTypeName((IOHIDElementType) pCurrentHIDElement->type, type_name);
 		HIDGetUsageName(pCurrentHIDElement->usagePage, 
 						pCurrentHIDElement->usage, usage_name);
-		post("  %s\t%s\t%d\t%s, %s", current_element->type->s_name,
+		post("  %s\t%s\t%d\t%d\t%s, %s", current_element->type->s_name,
 			 current_element->name->s_name,(int) current_element->instance,
+             pCurrentHIDElement->cookie,
 			 type_name, usage_name);
 	}
 	post("");
@@ -713,13 +714,21 @@ void hidio_get_events(t_hidio *x)
 	}
 }
 
+
+/* switch to transactions */
+
+void hidio_write_packet(void)
+{
+}
+
+
 void hidio_write_event_symbol_int(t_hidio *x, t_symbol *type, t_int code, 
                                     t_int instance, t_int value)
 {
 	debug_post(LOG_DEBUG,"hidio_write_event_symbol_float");
 }
 
-void hidio_write_event_symbols(t_hidio *x, t_symbol *type, t_symbol *code, 
+void hidio_write_event_symbols(t_hidio *x, t_symbol *type, t_symbol *name, 
                               t_int instance, t_int value)
 {
     /* TODO handle multiple instances of the same usage, i.e. arrays */
@@ -727,13 +736,14 @@ void hidio_write_event_symbols(t_hidio *x, t_symbol *type, t_symbol *code,
     int i;
     t_hid_element *current_element;
 	IOHIDEventStruct event;
-    int cookie = (int) instance;
     pRecDevice  pCurrentHIDDevice = device_pointer[x->x_device_number];
     pRecElement pCurrentHIDElement;
     for(i=0; i<element_count[x->x_device_number]; i++)
     {
         current_element = element[x->x_device_number][i];
-        if((current_element->type == type) && (current_element->name == code))
+        if((current_element->type == type) 
+           && (current_element->name == name)
+           && (current_element->instance == instance))
         {
             pCurrentHIDElement = current_element->pHIDElement;
             break;
@@ -742,12 +752,12 @@ void hidio_write_event_symbols(t_hidio *x, t_symbol *type, t_symbol *code,
     post("element usage page and usage: 0x%04x 0x%04x", pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
 	event.elementCookie = (IOHIDElementCookie)pCurrentHIDElement->cookie;
 	event.value = (SInt32)value;
-    post("pCurrentHIDElement->cookie, cookie, event.value, value: %d %d %d %f",
-         pCurrentHIDElement->cookie, cookie, event.value, value);
+    post("pCurrentHIDElement->cookie %d, event.elementCookie %d, event.value %d, value %d",
+         pCurrentHIDElement->cookie, event.elementCookie, event.value, value);
 	HIDSetElementValue(pCurrentHIDDevice, pCurrentHIDElement, &event);	
 }
 
-void hidio_write_event_ints(t_hidio *x, t_int type, t_int code, 
+void hidio_write_event_ints(t_hidio *x, t_int type, t_int name, 
                               t_int instance, t_int value)
 {
 	debug_post(LOG_DEBUG,"hidio_write_event_floats");

@@ -437,6 +437,30 @@ void hidio_print(t_hidio* x)
     hidio_print_element_list(x);
 }
 
+void hidio_write_packet(void)
+{
+	debug_post(LOG_DEBUG,"hidio_write_packet");
+}
+
+
+void hidio_write_event_symbol_int(t_hidio *x, t_symbol *type, t_int code, 
+                                    t_int instance, t_int value)
+{
+	debug_post(LOG_DEBUG,"hidio_write_event_symbol_int");
+}
+
+void hidio_write_event_symbols(t_hidio *x, t_symbol *type, t_symbol *code, 
+                              t_int instance, t_int value)
+{
+	debug_post(LOG_DEBUG,"hidio_write_event_symbols");
+}
+
+void hidio_write_event_ints(t_hidio *x, t_int type, t_int code, 
+                              t_int instance, t_int value)
+{
+	debug_post(LOG_DEBUG,"hidio_write_event_ints");
+}
+
 
 t_int hidio_open_device(t_hidio *x, short device_number)
 {
