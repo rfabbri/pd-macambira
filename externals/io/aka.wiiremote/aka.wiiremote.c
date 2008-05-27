@@ -15,9 +15,12 @@
 #define method t_method
 //#define addbang(x)  class_addbang(wiiremote_class, (x))
 //#define addmess(x)  class_addmessage(class_wiiremote, (x))
-static t_class *wiiremote_class;
+// a CFRunLoop is needed for Pd since the 'pd' process is not a Carbon app
+static t_class *akawiiremote_class;
 #else /* Max */
 #include "ext.h"
+
+void *akawiiremote_class;	// the number of instance of this object
 #endif /* PD */
 
 #include "wiiremote.h"
@@ -45,7 +48,11 @@ typedef struct _akawiiremote
 	void			*dataOut;
 } t_akawiiremote;
 
-void *akawiiremote_class;	// the number of instance of this object
+#ifdef PD
+static IONotificationPortRef  gNotifyPort;
+static io_iterator_t          gAddedIter;
+static CFRunLoopRef           gRunLoop;
+#endif
 
 void akawiiremote_bang(t_akawiiremote *x);
 void akawiiremote_address(t_akawiiremote *x, t_symbol *s);
@@ -74,7 +81,7 @@ char	nunchukStr[] = "nunchuk";
 char	classicStr[] = "classic";
 
 #ifdef PD
-void wiiremote_setup()
+void setup_aka0x2ewiiremote()
 #else /* Max */
 void main()
 #endif /* PD */
@@ -101,30 +108,30 @@ void main()
 #ifdef PD
 	post("\tPd port by Hans-Christoph Steiner");
 
-	wiiremote_class = class_new(gensym("wiiremote"), 
+	akawiiremote_class = class_new(gensym("aka.wiiremote"), 
 								 (t_newmethod)akawiiremote_new, 
 								 (t_method)akawiiremote_free,
 								 sizeof(t_akawiiremote),
 								 CLASS_DEFAULT,
 								 A_GIMME,0);
 
-	class_addbang(wiiremote_class,(t_method)akawiiremote_bang);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_address,gensym("address"),A_DEFSYMBOL, 0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_connect,gensym("connect"),0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_disconnect,gensym("disconnect"),0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_motionsensor,gensym("motion"), A_DEFFLOAT, 0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_irsensor,gensym("ir"), A_DEFFLOAT, 0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_vibration,gensym("vibration"), A_DEFFLOAT, 0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_led,gensym("led"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_expansion,gensym("expansion"), A_DEFFLOAT, 0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_expansion,gensym("nunchuk"), A_DEFFLOAT, 0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_extraoutput,gensym("extraoutput"), A_DEFFLOAT, 0);	// B7
+	class_addbang(akawiiremote_class,(t_method)akawiiremote_bang);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_address,gensym("address"),A_DEFSYMBOL, 0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_connect,gensym("connect"),0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_disconnect,gensym("disconnect"),0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_motionsensor,gensym("motion"), A_DEFFLOAT, 0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_irsensor,gensym("ir"), A_DEFFLOAT, 0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_vibration,gensym("vibration"), A_DEFFLOAT, 0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_led,gensym("led"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_expansion,gensym("expansion"), A_DEFFLOAT, 0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_expansion,gensym("nunchuk"), A_DEFFLOAT, 0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_extraoutput,gensym("extraoutput"), A_DEFFLOAT, 0);	// B7
 
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_getbattery,gensym("getbattery"),0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_getexpansion,gensym("getexpansion"),0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_getled,gensym("getled"),0);
-	class_addmethod(wiiremote_class,(t_method)akawiiremote_getaddress,gensym("getaddress"),0);
-    class_addmethod(wiiremote_class,(t_method)akawiiremote_getcalibration,gensym("getcalibration"), 0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_getbattery,gensym("getbattery"),0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_getexpansion,gensym("getexpansion"),0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_getled,gensym("getled"),0);
+	class_addmethod(akawiiremote_class,(t_method)akawiiremote_getaddress,gensym("getaddress"),0);
+    class_addmethod(akawiiremote_class,(t_method)akawiiremote_getcalibration,gensym("getcalibration"), 0);
 #else /* Max */
 	setup((t_messlist **)&akawiiremote_class, (method)akawiiremote_new, (method)akawiiremote_free, (short)sizeof(t_akawiiremote), 0L, A_GIMME, 0);
 
@@ -578,7 +585,7 @@ void akawiiremote_assist(t_akawiiremote *x, void *b, long m, long a, char *s)
 void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
 {
 #ifdef PD
-	t_akawiiremote *x = (t_akawiiremote *)pd_new(wiiremote_class);
+	t_akawiiremote *x = (t_akawiiremote *)pd_new(akawiiremote_class);
     t_symbol *first_argument;
 
 	x->statusOut = outlet_new(&x->x_obj, 0);
@@ -588,6 +595,24 @@ void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
     first_argument = atom_getsymbolarg(0, ac, av);
     if(first_argument != &s_) 
         atom_string(av, x->address, MAXPDSTRING-1);
+
+    IOReturn result = kIOReturnSuccess;
+    mach_port_t masterPort = NULL;
+    result = IOMasterPort (bootstrap_port, &masterPort);
+    if (kIOReturnSuccess != result)
+        pd_error("IOMasterPort error with bootstrap_port, error %d", result);
+    else
+    {
+		// Create a notification port and add its run loop event source to our run loop
+		// This is how async notifications get set up.
+        CFRunLoopSourceRef		runLoopSource;
+        
+        gNotifyPort = IONotificationPortCreate(masterPort);
+        runLoopSource = IONotificationPortGetRunLoopSource(gNotifyPort);
+
+        gRunLoop = CFRunLoopGetCurrent();
+        CFRunLoopAddSource(gRunLoop, runLoopSource, kCFRunLoopDefaultMode);
+    }
 #else /* Max */	
 	t_akawiiremote *x;
 	
