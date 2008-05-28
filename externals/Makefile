@@ -279,13 +279,13 @@ AKA.WIIREMOTE_OBJECTS := $(AKA.WIIREMOTE_SRC:.c=.o)
 $(AKA.WIIREMOTE_OBJECTS) : %.o : %.c
 	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
 
-$(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION): $(AKA.WIIREMOTE_OBJECTS) 
+$(externals_src)/io/aka.wiiremote/akawiiremote.$(EXTENSION): $(AKA.WIIREMOTE_OBJECTS) 
 	$(CC) $(LDFLAGS) -o $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION) \
 		$(AKA.WIIREMOTE_OBJECTS) -weak_framework IOBluetooth \
 		-weak_framework CoreFoundation
 #	$(STRIP) $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION)
 
-aka.wiiremote: $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION)
+aka.wiiremote: $(externals_src)/io/aka.wiiremote/akawiiremote.$(EXTENSION)
 
 aka.wiiremote_install: aka.wiiremote
 	install -d $(objectsdir)/$(AKA.WIIREMOTE_NAME)
