@@ -81,7 +81,7 @@ char	nunchukStr[] = "nunchuk";
 char	classicStr[] = "classic";
 
 #ifdef PD
-void setup_aka0x2ewiiremote()
+void akawiiremote_setup()
 #else /* Max */
 void main()
 #endif /* PD */
@@ -108,7 +108,7 @@ void main()
 #ifdef PD
 	post("\tPd port by Hans-Christoph Steiner");
 
-	akawiiremote_class = class_new(gensym("aka.wiiremote"), 
+	akawiiremote_class = class_new(gensym("akawiiremote"), 
 								 (t_newmethod)akawiiremote_new, 
 								 (t_method)akawiiremote_free,
 								 sizeof(t_akawiiremote),
@@ -597,10 +597,10 @@ void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
         atom_string(av, x->address, MAXPDSTRING-1);
 
     IOReturn result = kIOReturnSuccess;
-    mach_port_t masterPort = NULL;
+    mach_port_t masterPort = (mach_port_t) NULL;
     result = IOMasterPort (bootstrap_port, &masterPort);
     if (kIOReturnSuccess != result)
-        pd_error("IOMasterPort error with bootstrap_port, error %d", result);
+        pd_error(x, "[akawiiremote] IOMasterPort error with bootstrap_port, error %d", result);
     else
     {
 		// Create a notification port and add its run loop event source to our run loop
