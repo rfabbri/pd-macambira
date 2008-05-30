@@ -1,6 +1,6 @@
 /*
  *   Pure Data Packet system implementation. : low level format conversion code
- *   Copyright (c) by Tom Schouten <tom@zwizwa.be>
+ *   Copyright (c) by Tom Schouten <pdp@zzz.kotnet.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -509,6 +509,66 @@ static void llconv_yuyv_packed_u8s16(unsigned char* ucsource, short int *sidest,
 
 }
 
+
+
+/* convert yuvu packed 8 bit unsigned to yv12 planar 16bit signed */
+/* search for bithacks */
+static void llconv_uyvy_packed_u8s16(unsigned char* ucsource, short int *sidest, unsigned int w, unsigned int h)
+{
+    unsigned int i, j;
+    unsigned int *source = (unsigned int *)ucsource;
+
+    unsigned int *dest = (unsigned int *)sidest;
+    unsigned int uoffset = (w*h)>>1;
+    unsigned int voffset = (w*h + ((w*h) >> 2)) >> 1;
+
+    for(j=0; j < (h*w)>>1; j +=(w)){
+	for(i=0; i< (w>>1); i+=2){
+	    unsigned int y,u,v;
+	    unsigned int v00, v01, v10, v11;
+	    v00 = source[i+j];
+	    v01 = source[i+j+1];
+	    v10 = source[i+j+(w>>1)];
+	    v11 = source[i+j+(w>>1)+1];
+	    
+	    // save luma
+	    dest[i+j]          = ((v00 & 0xff00ff00)>>1);
+	    v11 = source[i+j+(w>>1)+1];
+	    
+	    // save luma
+	    dest[i+j]          = ((v00 & 0xff00ff00)>>1);
+	    dest[i+j+1]        = ((v01 & 0xff00ff00)>>1);
+	    dest[i+j+(w>>1)]   = ((v10 & 0xff00ff00)>>1);
+	    dest[i+j+(w>>1)+1] = ((v11 & 0xff00ff00)>>1);
+
+	    // compute chroma
+
+	    
+	    v00 = (v00 & 0x00ff00ff) << 7;
+	    v01 = (v01 & 0x00ff00ff) << 7;
+	    v10 = (v10 & 0x00ff00ff) << 7;
+	    v11 = (v11 & 0x00ff00ff) << 7;
+	    
+	    // average 2 scan lines
+	    v00 += v10;
+	    v01 += v11;
+
+	    // combine TWO VALUES IN ONE WORD (32bits) 
+	    v = (v01 << 16) | (v00 & 0x0000ffff);
+	    u = (v01 & 0xffff0000) | (v00 >> 16);
+
+	    // flip sign bits for u,v FOR PDP FORMAT
+	    u ^= 0x80008000;
+	    v ^= 0x80008000;
+
+	    // save chroma
+	    dest[uoffset + (i>>1) + (j>>2)] = u;
+	    dest[voffset + (i>>1) + (j>>2)] = v;
+	}
+    }
+
+}
+
 #define CONVERT(x,y) ((x) + ((y)<<16))
 
 void pdp_llconv(void *src, int stype, void *dst, int dtype, int w, int h)
@@ -528,6 +588,10 @@ void pdp_llconv(void *src, int stype, void *dst, int dtype, int w, int h)
 
     case CONVERT( RIF_YUYV_P____U8, RIF_YVU__P411_S16 ):
 	llconv_yuyv_packed_u8s16((unsigned char*)src, (short int *)dst, w, h);
+	break;
+
+    case CONVERT( RIF_UYVY_P____U8, RIF_YVU__P411_S16 ):
+	llconv_uyvy_packed_u8s16((unsigned char*)src, (short int *)dst, w, h);
 	break;
 
     case CONVERT( RIF_RGB__P____U8, RIF_YVU__P411_U8 ):

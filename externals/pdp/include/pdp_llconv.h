@@ -1,6 +1,6 @@
 /*
  *   Pure Data Packet system implementation. : low level format conversion code
- *   Copyright (c) by Tom Schouten <tom@zwizwa.be>
+ *   Copyright (c) by Tom Schouten <pdp@zzz.kotnet.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ enum RIF {
 	RIF_YUV__P411_U8,
 	RIF_YVU__P411_S16,
 	RIF_YVU__P444_S16,
+	RIF_UYVY_P____U8,
 	RIF_YUYV_P____U8,
         RIF_RGB__P____U8,
 	RIF_RGBA_P____U8,
