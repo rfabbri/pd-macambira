@@ -4,7 +4,7 @@ AC_INIT
 AC_CANONICAL_HOST
 AC_CONFIG_HEADER(include/pidip_config.h)
 
-PDP_PIDIP_VERSION="0.12.22"
+PDP_PIDIP_VERSION="0.12.23"
 PD_DIR=/usr/local/pd
 PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
@@ -223,12 +223,18 @@ fi
 
 if test $enable_lcapture == yes;
 then
-    PDP_CAPTURE_OBJECT="pdp_capture.o"
+    PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_capture.o"
     AC_DEFINE(HAVE_IMAGE_MAGICK, 1, image magick capture capability)
     PDP_PIDIP_LIBS="$MAGICK_LIBS $PDP_PIDIP_LIBS"
     PDP_PIDIP_INCLUDES="$MAGICK_CFLAGS $PDP_PIDIP_INCLUDES"
     echo "building pdp_capture."
 fi
+
+AC_CHECK_HEADER(linux/videodev2.h,
+                PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_v4l2.o"
+                AC_DEFINE(HAVE_V4L2, 1, build pdp_v4l2),
+                echo "   linux/videodev2.h not found: not building pdp_v4l2")
+
 
 if test $enable_ffmpeg == yes;
 then

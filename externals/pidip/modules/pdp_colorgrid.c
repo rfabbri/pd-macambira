@@ -313,7 +313,7 @@ static void pdp_colorgrid_hsv2rgb(t_float hue, t_float saturation, t_float value
 
 static void pdp_colorgrid_output_current(t_pdp_colorgrid* x)
 {
-  t_float ox=0, oy=0, hue, saturation, value, red, green, blue ;
+  t_float ox=0, oy=0, hue, saturation, value, red=0, green=0, blue=0 ;
 
 /* These values need to be the same as those that produced the spectrum image:*/
 

@@ -81,8 +81,12 @@ extern "C"
     void pdp_hue_setup(void);
     void pdp_dot_setup(void);
 
+#ifdef HAVE_V4L2
+    void pdp_v4l2_setup(void);
+#endif
+
 #ifdef __APPLE__
-       void pdp_ieee1394_setup(void);
+    void pdp_ieee1394_setup(void);
 #endif
 
 #ifdef HAVE_IMAGE_MAGICK
@@ -175,6 +179,10 @@ void pidip_setup(void){
     pdp_fdiff_setup();
     pdp_hue_setup();
     pdp_dot_setup();
+
+#ifdef HAVE_V4L2
+    pdp_v4l2_setup();
+#endif
 
 #ifdef __APPLE__
        pdp_ieee1394_setup();
