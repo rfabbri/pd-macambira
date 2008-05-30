@@ -48,6 +48,10 @@ LDFLAGS =
 LIBS = -lm
 
 ifeq ($(OS_NAME),darwin)
+# 10.4 Tiger
+  FAT_FLAGS = -arch ppc -arch ppc64 -arch i386
+# 10.5 Leopard
+#  FAT_FLAGS = -arch ppc -arch ppc7400 -arch ppc64 -arch i386 -arch x86_64
   CFLAGS += -I/sw/include -I$(externals_src)/pdp/include -DMACOSX -DUNIX -Dunix
   LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -undefined dynamic_lookup \
 		-L/sw/lib -weak_framework Carbon
@@ -277,10 +281,10 @@ AKA.WIIREMOTE_SRC := $(wildcard $(externals_src)/io/aka.wiiremote/*.c)
 
 AKA.WIIREMOTE_OBJECTS := $(AKA.WIIREMOTE_SRC:.c=.o)
 $(AKA.WIIREMOTE_OBJECTS) : %.o : %.c
-	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+	$(CC) $(CFLAGS) $(FAT_FLAGS) -o "$*.o" -c "$*.c"
 
 $(externals_src)/io/aka.wiiremote/akawiiremote.$(EXTENSION): $(AKA.WIIREMOTE_OBJECTS) 
-	$(CC) $(LDFLAGS) -o $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION) \
+	$(CC) $(FAT_FLAGS) $(LDFLAGS) -o $(externals_src)/io/aka.wiiremote/akawiiremote.$(EXTENSION) \
 		$(AKA.WIIREMOTE_OBJECTS) -weak_framework IOBluetooth \
 		-weak_framework CoreFoundation
 #	$(STRIP) $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION)
@@ -1228,7 +1232,7 @@ hidio: $(externals_src)/io/hidio/hidio.$(EXTENSION)
 hidio_install: hidio
 	install -d $(objectsdir)/$(HIDIO_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(HIDIO_NAME) \
-		--author "David Merrill <dmerrill@media.mit.edu>, Hans-Christoph Steiner <hans@at.or.at>, Olaf Matthes <olaf@nullmedium.de>" \
+		--author "Hans-Christoph Steiner <hans@at.or.at>, Olaf Matthes <olaf@nullmedium.de>, David Merrill <dmerrill@media.mit.edu>" \
 		--description "I/O for USB HID and other supported devices" \
 		--license "GNU GPLv2" \
 		--version "0.0"
@@ -2103,6 +2107,8 @@ pdvjtools_install: pdvjtools
 		--author "" \
 		--description "Pure Data Video Junk"
 	install -p $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(PDVJTOOLS_NAME)
+	install -p $(PDVJTOOLS_CPP_OBJECTS:.cc=.$(EXTENSION)) \
+		$(objectsdir)/$(PDVJTOOLS_NAME)
 	install -d $(helpdir)/$(PDVJTOOLS_NAME)
 	install -p $(externals_src)/pdvjtools/*/*-help.pd \
 		$(helpdir)/$(PDVJTOOLS_NAME)
