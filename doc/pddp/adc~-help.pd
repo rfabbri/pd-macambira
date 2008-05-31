@@ -1,8 +1,7 @@
-#N canvas 2 1 611 606 12;
-#X obj 104 540 pddp;
+#N canvas 578 22 544 568 12;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#N canvas 85 2 593 609 More_Info 0;
+#N canvas 85 22 593 609 More_Info 0;
 #X text 16 13 MULTI-CHANNEL AUDIO;
 #X text 32 40 All sound cards are capable of at least two channels
 of audio. Pd supports these two channels by default and uses your system's
@@ -27,7 +26,7 @@ may change in the Pd's future...;
 #X text 38 480 With the right hardware \, Pd can manage audio input
 and output with lower than 10 milliseconds of latency.;
 #X restore 104 514 pd More_Info;
-#N canvas 85 2 395 244 Related_Objects 0;
+#N canvas 85 22 395 244 Related_Objects 0;
 #X text 25 8 Native Pd Objects;
 #X text 25 92 Externals and other object libraries;
 #X obj 45 46 dac~;
@@ -41,7 +40,7 @@ and output with lower than 10 milliseconds of latency.;
 #X obj 33 20 adc~;
 #X text 30 53 PURPOSE:;
 #X text 108 18 - AUDIO INPUT: ANALOG/DIGITAL CONVERTER SIGNAL;
-#X text 152 541 - Dave Sabine \, May 6 \, 2003;
+#X text 112 541 - Dave Sabine \, May 6 \, 2003;
 #X text 104 53 [adc~] is an acronym meaning "Analog/Digital Converter
 Signal" and is Pd's interface to access the audio information arriving
 at your soundcard(s).;

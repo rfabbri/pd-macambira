@@ -1,8 +1,7 @@
-#N canvas 3 0 619 592 12;
-#X obj 104 540 pddp;
+#N canvas 847 22 553 572 12;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#N canvas 129 0 415 237 More_Info 0;
+#N canvas 129 22 415 237 More_Info 0;
 #N canvas 131 29 532 435 sample_rate 0;
 #X text 12 24 SAMPLE RATE;
 #X text 29 46 [adc~] and [dac~] always operate at the sample rate that
@@ -57,20 +56,20 @@ receive audio signal with your soundcard. You can manually disable
 the [dac~] and [adc~] objects separately using the "-nodac" and "-noadc"
 switch \, or disable both using the "-nosound" switch.;
 #X restore 41 152 pd defeating_audio_computation;
-#X restore 104 514 pd More_Info;
-#N canvas 85 2 399 248 Related_Objects 0;
+#X restore 104 488 pd More_Info;
+#N canvas 85 22 399 248 Related_Objects 0;
 #X text 25 8 Native Pd Objects;
 #X text 25 118 Externals and other object libraries;
-#X obj 57 35 bilge;
 #X text 35 143 [shoutcast~];
 #X text 35 166 [oggcast~];
-#X obj 115 35 send~;
-#X obj 169 35 receive~;
+#X obj 55 35 send~;
+#X obj 109 35 receive~;
 #X obj 58 66 throw~;
 #X obj 121 66 catch~;
 #X obj 185 66 block~;
 #X obj 249 66 switch~;
-#X restore 104 488 pd Related_Objects;
+#X text 35 196 [mp3cast~];
+#X restore 104 462 pd Related_Objects;
 #X text 14 84 ARGUMENTS:;
 #X text 22 219 EXAMPLES:;
 #X text 21 463 SEE ALSO:;
@@ -80,7 +79,7 @@ switch \, or disable both using the "-nosound" switch.;
 #X text 30 47 PURPOSE:;
 #X text 104 47 [adc~] and [dac~] provide real-time audio input and
 output for Pd \, respectively \, whether analog or digital.;
-#X text 152 541 - Dave Sabine \, May 5 \, 2003;
+#X text 102 515 - Dave Sabine \, May 5 \, 2003;
 #X text 104 83 Both of these objects accept arguments (numbers) which
 indicate which audio channels are to be used by Pd. By default \, these
 objects are stereo and communicate on audio channels 1 and 2 (left
@@ -104,5 +103,3 @@ or appears as zero by [adc~].;
 #X text 14 344 IMPORTANT:;
 #X text 108 419 Also \, these objects do not operate unless Pd is instructed
 to "Compute Audio".;
-#X obj 104 464 help-adc~;
-#X obj 190 464 help-dac~;
