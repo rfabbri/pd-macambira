@@ -33,6 +33,9 @@
 #include "m_pd.h"
 
 #include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -72,7 +75,7 @@ methods for jack-ports
 void jackports_input(t_jackports *x, t_symbol *s,int argc, t_atom *argv)
 {
 	if (jc){
-	char ** ports;
+	const char ** ports;
 
 	int l = 0;
 	int n = 0;
@@ -287,7 +290,7 @@ void jackconnect_query(t_jackconnect *x)
 {
 	if (jc) {
 
-		char **ports;
+		const char **ports;
 		int n=0;
 		jackconnect_getnames(x);
 		
