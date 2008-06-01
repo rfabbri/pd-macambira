@@ -1,7 +1,9 @@
 0.12.23 ( codename My Mum's Cam )
   added pdp_v4l2 : video 4 linux 2 object
-  ( code template from pdp_v4l and xawtv ( v4l2 driver ),
-    thanks to Tom Schouten & Gerd Knorr <kraxel@bytesex.org> )
+    code template from pdp_v4l and xawtv ( v4l2 driver ),
+    thanks to Tom Schouten & Gerd Knorr <kraxel@bytesex.org>
+  added pdp_ieee1394 : finally, the firewire camera object for linux 
+    written by Lluis Gomez i Bigorda ( <lluisgomez@hangar.org> )
 
 0.12.22 ( codename Visual Junk )
   added pdp_dot : matrix printer effect

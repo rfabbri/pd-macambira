@@ -20,10 +20,11 @@ enable_ffmpeg=no
 enable_mpeg4ip=no
 enable_lcapture=no
 
+echo $host
 # Check for DarwinPorts and/or Fink on Mac OS X/Darwin
 case "$host" in
   *-darwin* | *-macos10*)
-	  PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_ieee1394.o"
+     PDP_CAPTURE_OBJECT="pdp_ieee1394.o"
      if test -d /sw ; then
        # Fink
        PATH="/sw/bin:/sw/sbin:$PATH"
@@ -234,6 +235,12 @@ AC_CHECK_HEADER(linux/videodev2.h,
                 PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_v4l2.o"
                 AC_DEFINE(HAVE_V4L2, 1, build pdp_v4l2),
                 echo "   linux/videodev2.h not found: not building pdp_v4l2")
+
+AC_CHECK_HEADER(libdv/dv.h,
+                PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_ieee1394l.o"
+                PDP_PIDIP_LIBS="-ldv $PDP_PIDIP_LIBS"
+                AC_DEFINE(HAVE_LIBDV, 1, build pdp_ieee1394 for linux),
+                echo "   libdv/dv.h not found: not building pdp_ieee1394")
 
 
 if test $enable_ffmpeg == yes;

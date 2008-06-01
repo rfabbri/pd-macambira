@@ -85,6 +85,10 @@ extern "C"
     void pdp_v4l2_setup(void);
 #endif
 
+#ifdef HAVE_LIBDV
+    void pdp_ieee1394_setup(void);
+#endif
+
 #ifdef __APPLE__
     void pdp_ieee1394_setup(void);
 #endif
@@ -182,6 +186,10 @@ void pidip_setup(void){
 
 #ifdef HAVE_V4L2
     pdp_v4l2_setup();
+#endif
+
+#ifdef HAVE_LIBDV
+    pdp_ieee1394_setup();
 #endif
 
 #ifdef __APPLE__
