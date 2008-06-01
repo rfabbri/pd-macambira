@@ -66,7 +66,7 @@ LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
-PDSRCDIR=../../../src
+PDSRCDIR=../../pd/src
 LINUXINCLUDE =  -I$(PDSRCDIR)
 
 .c.pd_linux:
@@ -76,10 +76,22 @@ LINUXINCLUDE =  -I$(PDSRCDIR)
 	rm -f $*.o ../$*.pd_linux
 	ln -s $*/$*.pd_linux ..
 
-# ----------------------------------------------------------
+# ----------------------- Mac OSX -----------------------
 
-install:
-	cp help-*.pd ../../doc/5.reference
+pd_darwin: $(NAME).pd_darwin
+
+.SUFFIXES: .pd_darwin
+
+DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch
+
+.c.pd_darwin:
+	$(CC) $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
+	$(CC) -bundle -bundle_loader ../../pd/bin/pd -undefined dynamic_lookup \
+		-o $*.pd_darwin $*.o 
+	rm -f $*.o
+
+# ----------------------------------------------------------
 
 clean:
 	rm -f *.o *.pd_* so_locations *~
