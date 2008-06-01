@@ -98,7 +98,7 @@ Czaja to build comprehensive documentation for Pd.;
 #X text 393 354 RELATED OBJECTS;
 #X obj 413 373 line~;
 #N canvas 0 22 456 306 related_objects_from_other_libraries 0;
-#X obj 23 21 tripleline;
+#X obj 23 21 tripleLine;
 #X obj 105 20 t3_line~;
 #X obj 171 20 fade~;
 #X obj 219 21 step;
