@@ -37,7 +37,7 @@ by Olaf Matthes);
 #X obj 8 31 midiin;
 #X restore 20 392 pd other_midi_objects;
 #X text 18 337 related object;
-#X obj 282 412 pddp_open all_about_midi_flags;
+#X obj 282 412 pddp/pddplink all_about_midi_flags.pd -text all_about_midi_flags;
 #X text 18 412 for an explanation of MIDI usage in Pd see:;
 #X floatatom 20 266 5 0 0;
 #X text 111 263 <-- pitch bend values on channel 2;

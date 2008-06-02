@@ -45,7 +45,7 @@ or implicitly defined data.;
 #X obj 446 390 select;
 #X obj -5 -2 cnv 15 850 20 empty empty all_about_data_types 20 10 1
 18 -233017 -66577 0;
-#X obj 811 -1 pddp;
+#X obj 811 -1 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X text -9 291 "anything";
 #X text -9 407 "list";
 #X text -9 393 "float";
@@ -94,9 +94,9 @@ objects is stores that value \, which can be later output using a bang.
 #X text 239 627 released under the GNU GPL;
 #X text 435 614 $Revision: 1.5 $$Date: 2005-07-28 19:45:58 $;
 #X text 436 627 $Author: eighthave $;
-#X obj 490 518 pddp_open all_about_lists_vs_anythings;
-#X obj 490 539 pddp_open all_about_symbol_construction;
-#X obj 490 560 pddp_open all_about_data_structures;
+#X obj 490 518 pddp/pddplink all_about_lists_vs_anythings.pd -text all_about_lists_vs_anythings;
+#X obj 490 539 pddp/pddplink all_about_symbol_construction.pd -text all_about_symbol_construction;
+#X obj 490 560 pddp/pddplink all_about_data_structures.pd -text all_about_data_structures;
 #X text 515 88 (aka [bng]);
 #X text 3 304 "anything" allows anything to pass through unchanged.
 It is not a data type tho.;

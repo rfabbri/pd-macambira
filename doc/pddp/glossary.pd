@@ -1,7 +1,7 @@
 #N canvas 169 86 628 485 10;
 #X obj 2 2 cnv 15 620 20 empty empty glossary 2 11 1 18 -195568 -66577
 0;
-#X msg 586 4 pddp;
+#X obj 586 4 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X text 20 27 anything;
 #X text 20 57 atom;
 #X text 160 57 the most basic element of data in Pd;

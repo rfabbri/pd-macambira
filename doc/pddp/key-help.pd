@@ -1,5 +1,5 @@
 #N canvas 274 90 707 580 12;
-#X obj 107 541 pddp;
+#X obj 107 541 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X text 104 74 This object does not accept arguments of any type.;
@@ -150,7 +150,7 @@ non-printing keys like shift or "F1".;
 events which can depend on the stacking order of windows and/or the
 pointer location. This is dependent on the system.;
 #X text 155 542 - Dave Sabine \, July 11 \, 2003;
-#X obj 281 514 pddp_open all_about_hid;
+#X obj 281 514 pddp/pddplink all_about_hid.pd -text all_about_hid;
 #X text 105 515 for more on HIDs:;
 #X connect 17 0 18 0;
 #X connect 18 0 25 0;

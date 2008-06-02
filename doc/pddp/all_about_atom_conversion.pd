@@ -1,7 +1,7 @@
 #N canvas 91 99 882 611 10;
 #X obj 4 2 cnv 15 850 20 empty empty all_about_atom_conversion 20 10
 1 18 -233017 -66577 0;
-#X obj 821 3 pddp;
+#X obj 821 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X obj 47 364 list2int;
 #X obj 111 363 l2i;
 #X obj 113 389 a2l;
@@ -24,8 +24,8 @@
 #X obj 75 293 pipe;
 #X text 499 46 a set that is not a "list" has an undefined type:;
 #X text 7 39 SPECIAL CASES OF "LISTS".;
-#X obj 513 560 pddp_open all_about_data_types;
-#X obj 513 517 pddp_open all_about_lists_vs_anythings;
+#X obj 513 560 pddp/pddplink all_about_data_types.pd -text all_about_data_types;
+#X obj 513 517 pddp/pddplink all_about_lists_vs_anythings.pd -text all_about_lists_vs_anythings;
 #X obj 514 135 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
 -1;
 #X obj 563 135 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1

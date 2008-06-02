@@ -44,4 +44,4 @@ MIDI):;
 #X text 21 667 -nomidi -- do not use any MIDI;
 #X obj 4 4 cnv 15 500 20 empty empty all_about_midi_flags 20 10 1 18
 -233017 -66577 0;
-#X obj 471 5 pddp;
+#X obj 471 5 pddp/pddplink http://puredata.info/dev/pddp -text pddp;

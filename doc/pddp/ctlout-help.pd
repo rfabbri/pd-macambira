@@ -34,7 +34,7 @@ by Olaf Matthes);
 #X text 41 402 an experimental MIDI sequencer;
 #X obj 8 31 midiin;
 #X restore 89 430 pd other_midi_objects;
-#X obj 285 469 pddp_open all_about_midi_flags;
+#X obj 285 469 pddp/pddplink all_about_midi_flags.pd -text all_about_midi_flags;
 #X text 21 469 for an explanation of MIDI usage in Pd see:;
 #X obj 18 16 ctlout;
 #X text 14 43 The [ctlout] objects sends control messages to the MIDI

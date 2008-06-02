@@ -1,7 +1,7 @@
 #N canvas 233 2 471 650 10;
 #X obj 40 15 noteout;
 #X obj 41 343 noteout;
-#X obj 287 506 pddp_open all_about_midi_flags;
+#X obj 287 506 pddp/pddplink all_about_midi_flags.pd -text all_about_midi_flags;
 #X text 18 505 for an explanation of MIDI usage in Pd see:;
 #X text 13 43 The [noteout] objects writes a note-on MIDI message to
 the output port.;

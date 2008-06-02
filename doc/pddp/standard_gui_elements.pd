@@ -13,7 +13,7 @@ which consistently represents various ideas. Also \, having GUI objects
 highlighted by color signals the user that they should play with that
 object \, while plain white objects are part of the implementation.
 ;
-#X obj 418 3 pddp;
+#X obj 418 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X text 175 447 click on these for more info:;
 #X text 248 523 updated for Pd version 0.37.1;
 #N canvas 0 22 458 308 related_objects 0;

@@ -22,7 +22,7 @@ a score. Pd's "data structures" are the system devised for this purpose.
 #X text 33 257 for manipulating data structures:;
 #X obj 4 -3 cnv 15 750 20 empty empty all_about_data_structures 2 10
 1 18 -233017 -66577 0;
-#X obj 719 -1 pddp;
+#X obj 719 -1 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X obj 35 219 struct;
 #X obj 129 277 set;
 #N canvas 0 22 454 304 display 0;

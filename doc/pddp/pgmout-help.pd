@@ -44,7 +44,7 @@ by Olaf Matthes);
 #X obj 16 411 xeq;
 #X text 41 402 an experimental MIDI sequencer;
 #X restore 109 316 pd other_midi_objects;
-#X obj 295 354 pddp_open all_about_midi_flags;
+#X obj 295 354 pddp/pddplink all_about_midi_flags.pd -text all_about_midi_flags;
 #X text 25 353 for an explanation of MIDI usage in Pd see:;
 #X text 92 166 Outlets: None. Sends directly to the MIDI port;
 #X floatatom 25 205 5 0 0;

@@ -82,7 +82,7 @@ receive functionality.;
 #X restore 639 471 pd special-send-and-receives;
 #X obj 4 4 cnv 15 850 20 empty empty all_about_send_n_receive 20 10
 1 18 -233017 -66577 0;
-#X obj 821 5 pddp;
+#X obj 821 5 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X obj 16 290 send one_send;
 #X obj 16 334 receive one_send;
 #X obj 19 272 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144

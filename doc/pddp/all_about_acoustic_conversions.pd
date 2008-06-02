@@ -558,7 +558,7 @@ is:;
 #X obj 254 485 snapshot~;
 #X obj 5 2 cnv 15 850 20 empty empty all_about_acoustic_conversions
 20 10 1 18 -233017 -66577 0;
-#X obj 821 3 pddp;
+#X obj 821 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X text 439 41 Please note: I have no idea why it's necessary for Pd
 to measure decibels \, rms \, or power. It seems to me that RMS and
 Power are extremely important in the analog world (so that an engineer

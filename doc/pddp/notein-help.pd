@@ -56,7 +56,7 @@ by Olaf Matthes);
 #X text 11 41 The [notein] object reads incoming MIDI notes and reports
 their note number \, velocity and channel number. Without the argument
 it reads from all MIDI channels (omni).;
-#X obj 280 526 pddp_open all_about_midi_flags;
+#X obj 280 526 pddp/pddplink all_about_midi_flags.pd -text all_about_midi_flags;
 #X text 14 526 for an explanation of MIDI usage in Pd see:;
 #X text 13 312 Arguments: the MIDI channel number from which to read
 (with no argument it listens to all channels):;

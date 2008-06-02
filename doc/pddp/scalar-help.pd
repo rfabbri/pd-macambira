@@ -3,7 +3,7 @@
 #X restore 164 67 pd scalar-window;
 #X obj 2 2 cnv 15 450 20 empty empty "scalar" 2 11 1 18 -233017 -66577
 0;
-#X obj 418 3 pddp;
+#X obj 418 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X obj 256 498 all_about_data_structures;
 #X text 221 481 for more info \, click on this:;
 #X text 29 227 - You can cut \, copy \, paste \, and duplicate "scalars".

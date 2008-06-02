@@ -1,7 +1,7 @@
 #N canvas 22 63 884 614 10;
 #X obj 5 2 cnv 15 850 20 empty empty all_about_hid 20 10 1 18 -233017
 -66577 0;
-#X obj 821 3 pddp;
+#X obj 821 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X text 5 29 "HID" stands for "Human Interface Device". A HID is any
 device that is meant to allow humans to interact with a computer. Usually
 \, HIDs are mice \, keyboards \, joysticks \, tablets \, gamepads \,

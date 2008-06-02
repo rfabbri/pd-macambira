@@ -7,7 +7,7 @@
 #X text 434 483 for looping samples:;
 #X obj 0 2 cnv 15 850 20 empty empty all_about_looping 20 10 1 18 -233017
 -66577 0;
-#X obj 816 3 pddp;
+#X obj 816 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X obj 461 127 counter;
 #X obj 519 127 gem_counter;
 #X obj 604 127 cxc.counter;

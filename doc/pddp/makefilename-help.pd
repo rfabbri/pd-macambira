@@ -1,5 +1,5 @@
 #N canvas 173 51 581 575 10;
-#X obj 104 539 pddp;
+#X obj 104 539 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X text 104 483 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm

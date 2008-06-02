@@ -39,8 +39,8 @@
 ;
 #X text 72 83 A "list" of one "float" is converted to a "float";
 #X text 50 63 An empty "list" is converted to a "bang";
-#X obj 520 514 pddp_open all_about_atom_conversion;
-#X obj 821 3 pddp;
+#X obj 520 514 pddp/pddplink all_about_atom_conversion.pd -text all_about_atom_conversion;
+#X obj 821 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X text 11 400 Sets of mixed atoms are defined based on what the "selector"
 (the first element of a set). If the "selector" is a "float" \, then
 the set is a "list". If the "selector" is the word "list" \, then the

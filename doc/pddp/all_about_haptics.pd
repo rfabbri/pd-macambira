@@ -7,7 +7,7 @@
 #X obj 13 547 ff-constant;
 #X obj 4 4 cnv 15 500 20 empty empty all_about_haptics 20 10 1 18 -233017
 -66577 0;
-#X obj 471 5 pddp;
+#X obj 471 5 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X obj 12 304 ifeel;
 #X text 20 33 "Haptic" means relating to the sense of touch. Haptic
 feedback relates to the sense of touch at the skin level \, and the

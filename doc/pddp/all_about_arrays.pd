@@ -722,5 +722,5 @@ for [table] \, [tabread] \, [tabwrite] \, [soundfiler] \, [tabsend~]
 \, [tabreceive~] \, [tabplay~] \, etc.;
 #X obj 4 4 cnv 15 500 20 empty empty all_about_arrays 20 10 1 18 -233017
 -66577 0;
-#X obj 471 5 pddp;
+#X obj 471 5 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X text 316 528 updated for Pd 0.38-2;

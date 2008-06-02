@@ -1,7 +1,7 @@
 #N canvas 180 74 863 635 10;
 #X obj 0 2 cnv 15 850 20 empty empty all_about_symbol_construction
 20 10 1 18 -233017 -66577 0;
-#X obj 816 3 pddp;
+#X obj 816 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X text 17 601 by Hans-Christoph Steiner <hans@at.or.at>;
 #X text 629 603 updated for Pd version 0.37.1;
 #X obj 452 550 sprintf;

@@ -57,7 +57,7 @@ is:;
 #X obj 150 32 gem_counter;
 #X obj 250 32 modulo_counter;
 #X restore 454 440 pd related_objects_from_other_libraries;
-#X obj 486 513 pddp_open all_about_looping;
+#X obj 486 513 pddp/pddplink all_about_looping.pd -text all_about_looping;
 #X text 450 490 For more info:;
 #X msg 496 110 bang;
 #X obj 496 131 until;
@@ -75,7 +75,7 @@ to prevent Pd from looping infinitely.;
 Czaja to build comprehensive documentation for Pd.;
 #X obj 2 2 cnv 15 870 20 empty empty [until] 20 10 1 18 -233017 -66577
 0;
-#X obj 821 3 pddp;
+#X obj 821 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X connect 7 0 9 0;
 #X connect 8 0 7 0;
 #X connect 12 0 13 0;

@@ -53,7 +53,7 @@ by Olaf Matthes);
 #X obj 16 411 xeq;
 #X text 41 402 an experimental MIDI sequencer;
 #X restore 105 333 pd other_midi_objects;
-#X obj 298 380 pddp_open all_about_midi_flags;
+#X obj 298 380 pddp/pddplink all_about_midi_flags.pd -text all_about_midi_flags;
 #X text 25 379 for an explanation of MIDI usage in Pd see:;
 #X text 120 180 Left - program change number;
 #X text 66 17 - read incoming program change messages from the MIDI
