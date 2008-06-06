@@ -1,33 +1,36 @@
-#N canvas 731 31 580 522 10;
-#X text 240 248 Inlet 2 changes the lower scaling bound;
-#X text 338 278 Inlet 3 changes the upper scaling bound;
-#X floatatom 241 263 5 0 0 0 - - -;
-#X floatatom 342 294 5 0 0 0 - - -;
-#X floatatom 141 243 5 0 0 0 - - -;
-#X floatatom 141 353 5 0 0 0 - - -;
-#X text 13 77 Obviously \, don't use this for communs that are meant
-to store symbolic or list data (use regular sft.commun for that). (That
-is \, only use this for OSC-control-intended stuff);
-#X text 139 226 Inlet 1 is the standard commun input;
-#X text 194 344 Argument 5 and 6 can be "round" and/or "hide" (the
-order doesn't matter).;
-#X text 454 497 2008 Luke Iannini;
-#X text 10 494 Originally based on [commun-scale] by Frank Barknecht
+#N canvas 731 31 478 597 10;
+#X text 130 258 Inlet 2 changes the lower scaling bound;
+#X text 228 288 Inlet 3 changes the upper scaling bound;
+#X floatatom 131 273 5 0 0 0 - - -;
+#X floatatom 232 304 5 0 0 0 - - -;
+#X floatatom 31 253 5 0 0 0 - - -;
+#X floatatom 31 363 5 0 0 0 - - -;
+#X text 29 236 Inlet 1 is the standard commun input;
+#X text 340 552 2008 Luke Iannini;
+#X text 2 573 Originally based on [commun-scale] by Frank Barknecht
 ;
 #X text 13 26 Use sft.commun.sc(ale) so that 0-1 values coming out
 of OSC stuff (like Controctopus) can be rescaled appropriately.;
-#X text 194 374 "hide" hides the parameter from Controctopus sniffing
-(useful to pare down the options to just the most interesting inputs).
-;
-#X text 194 416 "round" rounds up from 0.5 increments so that an integer
-is always output (useful for communs connected to v/hdials and toggles).
-;
 #X text 14 145 sft.commun.sc's first and second args are swapped from
 sft.commun (i.e. \$0 and /parametername);
 #X text 15 182 Optionally prepend a unique ID to the parameter when
 using with an abstraction that will have multiple copies;
-#X obj 141 317 sft.commun.sc \$0 \$3/parameter 5 37;
-#X connect 2 0 16 1;
-#X connect 3 0 16 2;
-#X connect 4 0 16 0;
-#X connect 16 0 5 0;
+#X obj 31 327 sft.commun.sc \$0 \$3/parameter 5 37;
+#X text 13 109 Don't use this for communs that are meant to store symbolic
+or list data (use regular sft.commun for that).;
+#X text 34 404 * Argument 5 and 6 can be "round" and/or "hide" (the
+order doesn't matter).;
+#X text 34 434 * "hide" hides the parameter from Controctopus sniffing
+(useful to pare down the options to just the most interesting inputs).
+;
+#X text 34 476 * "round" rounds up from 0.5 increments so that an integer
+is always output (useful for communs connected to v/hdials and toggles).
+;
+#X text 14 62 0-1 data should be directed to /paramatername-normalized.
+The address /parametername still exists and will output arbitrary data.
+;
+#X text 328 537 made more confusing by;
+#X connect 2 0 12 1;
+#X connect 3 0 12 2;
+#X connect 4 0 12 0;
+#X connect 12 0 5 0;
