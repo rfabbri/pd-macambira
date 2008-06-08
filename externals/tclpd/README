@@ -3,12 +3,34 @@
  ==========
 
 this library allows you to to write externals for Pd using the
-Tcl language. despite tot/toxy/widget externals, Tcl code ran
-with tclpd actually runs in server (rather than gui process).
+Tcl language.
+The API is the standard pd C API, so if you wrote an external in C in
+the past, you know where to start.
+(Otherwise you can read the Pd-External-HOWTO)
 
-this is a PRE-ALPHA release: it means something work, but don't
-expect to do serious things right now. also expect changes to
-the Tcl API and around.
+
+ The client/server thing
+ =======================
+
+Pd is split into two processes: the gui, and the core.
+A pd external with no gui generally just runs in the core.
+A pd gui external is split in two pieces: the gui and the non-gui part.
+The non-gui part actually makes audio/file IO, while the gui part is
+just a frontend to the non-gui one, displaying its state, and allowing
+the user to interact with it.
+
+Tclpd runs the Tcl code in the core process.
+
+You might have been familiar with tot/toxy/widget externals.
+Such externals run in the gui process (client). That was fine for writing
+gui only external, but, for instance, you cannot do a metronome or
+anything which is timing accurate, or heavy IO, as that is not the
+purpose of the gui process.
+
+Theoretically, Tclpd could also do gui stuff. Communication to the gui
+is done with the sys_vgui proc (communication in the opposite directions
+is done via pd message and receivers).
+Just I didn't design a framework for doing this, so it's up to you.
 
 
  Data conversion between Tcl <=> Pd
