@@ -1,7 +1,7 @@
 #!/usr/bin/make
 
 TCL_VERSION := $(shell echo 'puts $$tcl_version' | tclsh)
-INCLUDES =  -I../../pd/src -I/usr/include/tcl$(TCL_VERSION)
+INCLUDES =  -I../../pd/src -I/usr/include -I/usr/include/tcl$(TCL_VERSION)
 CFLAGS += $(INCLUDES) -xc++ -funroll-loops -fno-operator-names -fno-omit-frame-pointer -falign-functions=16 -O2 -Wall -fPIC
 LDSOFLAGS += -lm -ltcl$(TCL_VERSION)
 CXX = g++
