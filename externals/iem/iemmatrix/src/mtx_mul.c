@@ -197,8 +197,7 @@ void mtx_mul_setup(void)
 
   mtx_mulscalar_class = class_new(gensym("mtx_mul"), 0, (t_method)mtx_binscalar_free,
                                   sizeof(t_mtx_binscalar), 0, 0);
-  class_addcreator(0, gensym("mtx_*"), 0, 0);
-  class_addcreator(0, gensym("mtx_.*"), 0, 0);
+
   class_addmethod(mtx_mulscalar_class, (t_method)mtx_mulscalar_matrix, gensym("matrix"), A_GIMME, 0);
   class_addlist  (mtx_mulscalar_class, mtx_mulscalar_list);
   class_addbang  (mtx_mulscalar_class, mtx_binscalar_bang);

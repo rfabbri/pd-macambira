@@ -260,8 +260,6 @@ void MTXBIN_APPEND(_setup) (void)
                                      (t_method)mtx_binmtx_free,
                                      sizeof(t_mtx_binmtx), 0, A_GIMME, 0);
 
-  class_addcreator((t_newmethod)mtxbin_new, gensym(MTXBIN_SHORTNAME), A_GIMME,0);
-
   class_addmethod(MTXBIN_APPEND(_class), (t_method)mtxbin_matrix, gensym("matrix"), A_GIMME, 0);
   class_addmethod(MTXBIN_APPEND(_class), (t_method)mtx_bin_matrix2, gensym(""), A_GIMME, 0);
   class_addfloat (MTXBIN_APPEND(_class), mtxbin_float);
@@ -269,7 +267,6 @@ void MTXBIN_APPEND(_setup) (void)
 
   MTXBIN_APPEND(_scalarclass) = class_new(gensym(MTXBIN_LONGNAME), 0, (t_method)mtx_binscalar_free,
                                   sizeof(t_mtx_binscalar), 0, 0);
-  class_addcreator(0, gensym(MTXBIN_SHORTNAME), 0, 0);
   class_addmethod(MTXBIN_APPEND(_scalarclass),
                   (t_method)mtxbin_scalar_matrix, gensym("matrix"), A_GIMME, 0);
   class_addlist  (MTXBIN_APPEND(_scalarclass), mtxbin_scalar_list);
@@ -277,6 +274,8 @@ void MTXBIN_APPEND(_setup) (void)
 
   class_sethelpsymbol(MTXBIN_APPEND(_class), gensym(MTXBIN_REALHELPNAME));
   class_sethelpsymbol(MTXBIN_APPEND(_scalarclass), gensym(MTXBIN_REALHELPNAME));
+
+  class_addcreator((t_newmethod)mtxbin_new, gensym(MTXBIN_SHORTNAME), A_GIMME,0);
 }
 
 void MTXBIN_IEMSETUP(MTXBIN_GENERIC__NAME)  (void)
