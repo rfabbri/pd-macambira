@@ -1,1 +1,1 @@
--lavcodec -lavformat -lavutil -lquicktime
+-lavcodec -lavformat -lavutil -lswscale -lquicktime
