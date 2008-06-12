@@ -35,10 +35,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* incloure estructures de dades i capceleres de funcions per traballar amb threads */
 #include "pthread.h"
 
+/*some linux distros need this to compile ffmpeg correctly as cpp*/
+#define __STDC_CONSTANT_MACROS 1 
+
 /*ffmpeg includes*/
 #include <ffmpeg/avcodec.h>
 #include <ffmpeg/avformat.h>
 #include <ffmpeg/avutil.h>
+#include <ffmpeg/swscale.h>
 
 /*libquicktime includes*/
 //#include <quicktime/lqt.h>
@@ -139,6 +143,8 @@ int convertir_img_ff(pathimage pathFitxer, tipus_format f, int W, int H, int pos
     int             frameFinished;
     int             numBytes;
     uint8_t         *buffer;
+    static int sws_flags = SWS_BICUBIC;
+    struct SwsContext *img_convert_ctx;
 
     int nN = posi;
 
@@ -215,9 +221,19 @@ int convertir_img_ff(pathimage pathFitxer, tipus_format f, int W, int H, int pos
             if(frameFinished)
             {
                 // Convert the image from its native format to RGB
-                img_convert((AVPicture *)pFrameRGB, PIX_FMT_RGB24, 
-                    (AVPicture*)pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, 
-                    pCodecCtx->height);
+                //img_convert((AVPicture *)pFrameRGB, PIX_FMT_RGB24, 
+                //    (AVPicture*)pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, 
+                //    pCodecCtx->height);
+       		img_convert_ctx = sws_getContext(    pCodecCtx->width, pCodecCtx->height,
+                          		pCodecCtx->pix_fmt,
+                                        pCodecCtx->width, pCodecCtx->height,
+                                        PIX_FMT_RGB24,
+                                        sws_flags, NULL, NULL, NULL);
+
+       		sws_scale (img_convert_ctx, pFrame->data, pFrame->linesize,
+           			0, pCodecCtx->height,
+           			pFrameRGB->data, pFrameRGB->linesize);
+       		sws_freeContext(img_convert_ctx);
 
                 // Save the frame to disk
                     SaveFrame(pFrameRGB, pCodecCtx->width, pCodecCtx->height, W, H, posi);
@@ -239,9 +255,19 @@ int convertir_img_ff(pathimage pathFitxer, tipus_format f, int W, int H, int pos
             if(frameFinished)
             {
                 // Convert the image from its native format to RGB
-                img_convert((AVPicture *)pFrameRGB, PIX_FMT_RGB24, 
-                    (AVPicture*)pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, 
-                    pCodecCtx->height);
+                //img_convert((AVPicture *)pFrameRGB, PIX_FMT_RGB24, 
+                //    (AVPicture*)pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, 
+                //    pCodecCtx->height);
+       		img_convert_ctx = sws_getContext(    pCodecCtx->width, pCodecCtx->height,
+                          		pCodecCtx->pix_fmt,
+                                        pCodecCtx->width, pCodecCtx->height,
+                                        PIX_FMT_RGB24,
+                                        sws_flags, NULL, NULL, NULL);
+
+       		sws_scale (img_convert_ctx, pFrame->data, pFrame->linesize,
+           			0, pCodecCtx->height,
+           			pFrameRGB->data, pFrameRGB->linesize);
+       		sws_freeContext(img_convert_ctx);
 
                 // Save the frame to disk
                     SaveFrame(pFrameRGB, pCodecCtx->width, pCodecCtx->height, W, H, posi);
