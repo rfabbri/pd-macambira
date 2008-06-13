@@ -17,13 +17,8 @@
 
 #include "dmx4pd.h"
 
-#include <fcntl.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
-
-
-#include <dmx/dmx.h>
 
 static t_class *dmxout_class;
 

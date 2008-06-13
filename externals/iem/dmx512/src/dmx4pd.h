@@ -25,6 +25,11 @@
 
 
 #include "m_pd.h"
+#include <dmx/dmx.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 
 #define DMX4PD_POSTBANNER                                               \
