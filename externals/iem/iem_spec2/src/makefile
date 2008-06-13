@@ -13,7 +13,7 @@ LIB = -ldl -lm -lpthread
 
 CFLAGS = -DPD -DUNIX -W -Wno-unused \
 	-Wno-parentheses -Wno-switch -O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing \
-        -DDL_OPEN
+        -DDL_OPEN -fPIC
 
 SYSTEM = $(shell uname -m)
 
