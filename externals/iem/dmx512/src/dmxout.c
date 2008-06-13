@@ -152,5 +152,5 @@ void dmxout_setup(void)
   class_addfloat(dmxout_class, dmxout_float);
 
 
-  post("DMX4PD (%s): (c) 2008 IOhannes m zmölnig - iem @ kug", DMX4PD_VERSION);
+  post("DMX4PD (ver.%s): (c) 2008 IOhannes m zmölnig - iem @ kug", DMX4PD_VERSION);
 }

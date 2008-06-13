@@ -5,7 +5,7 @@ include Make.version
 Make.config: Make.config.in configure
 	./configure
 
-include Make.config
+-include Make.config
 
 .SUFFIXES: .$(EXT)
 
@@ -16,10 +16,13 @@ OBJECTS = $(SOURCES:.c=.$(EXT))
 all: $(OBJECTS)
 
 clean:
-	-rm -f *.o *.d
+	-rm -f *.o *.d 
 
 binclean:
-	-rm -f *.$(EXT)
+	-rm -f *.$(EXT) *.dll *.pd_linux *.pd_darwin *.l_i386 *.l_ia64 *.d_ppc *.d_fat 
+
+mrproper: distclean
+	-rm Make.config configure *.d.*
 
 distclean: clean binclean
 	-rm -f *~ _* config.*
@@ -44,13 +47,15 @@ distbin: distclean all clean
 everything: clean all install distclean
 
 
-$(TARGETS): %.o : %.c
+$(TARGETS): %.o : %.c Make.config
 	$(CC) $(DMX4PD_CFLAGS) -DDMX4PD_VERSION="\"$(VERSION)\"" -c -o $@ $*.c
 
 $(OBJECTS): %.$(EXT) : %.o
 	$(LD) $(LFLAGS) -o $@ $*.o $(LIBS)
 	$(STRIP) $(STRIPFLAGS) $@
 
+
+ifeq (,$(findstring clean, $(MAKECMDGOALS)))
 ## dependencies: as proposed by the GNU-make documentation
 ## see http://www.gnu.org/software/make/manual/html_node/make_47.html#SEC51
 -include $(SOURCES:.c=.d)
@@ -62,3 +67,4 @@ $(OBJECTS): %.$(EXT) : %.o
 
 configure: configure.ac
 	autoconf
+endif
