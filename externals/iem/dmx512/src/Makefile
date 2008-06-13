@@ -2,10 +2,16 @@ default: all
 
 include Make.version
 
+
 Make.config: Make.config.in configure
 	./configure
 
 -include Make.config
+
+#VERSIONDEFINE = _$(strip $(VERSION))_
+ifneq ($(strip $(VERSION)),)
+VERSIONDEFINE = -DDMX4PD_VERSION="\"rev.$(VERSION)\""
+endif
 
 .SUFFIXES: .$(EXT)
 
@@ -48,7 +54,7 @@ everything: clean all install distclean
 
 
 $(TARGETS): %.o : %.c Make.config
-	$(CC) $(DMX4PD_CFLAGS) -DDMX4PD_VERSION="\"$(VERSION)\"" -c -o $@ $*.c
+	$(CC) $(DMX4PD_CFLAGS) $(VERSIONDEFINE) -c -o $@ $*.c
 
 $(OBJECTS): %.$(EXT) : %.o
 	$(LD) $(LFLAGS) -o $@ $*.o $(LIBS)

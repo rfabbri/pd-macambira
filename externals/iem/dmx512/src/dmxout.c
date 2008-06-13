@@ -64,7 +64,7 @@ static void dmxout_close(t_dmxout*x)
 static void dmxout_open(t_dmxout*x, t_symbol*s_devname)
 {
   int argc=2;
-  char *args[2] = {"--dmx", s_devname->s_name};
+  const char *args[2] = {"--dmx", s_devname->s_name};
   const char**argv=args;
   char*devname="";
   int fd;
@@ -138,7 +138,7 @@ static void *dmxout_new(t_symbol*s, int argc, t_atom*argv)
 
 static void *dmxout_free(t_dmxout*x)
 {
-
+  dmxout_close(x);
 }
 
 
@@ -151,6 +151,7 @@ void dmxout_setup(void)
 
   class_addfloat(dmxout_class, dmxout_float);
 
-
-  post("DMX4PD (ver.%s): (c) 2008 IOhannes m zmölnig - iem @ kug", DMX4PD_VERSION);
+#ifdef DMX4PD_POSTBANNER
+  DMX4PD_POSTBANNER
+#endif
 }

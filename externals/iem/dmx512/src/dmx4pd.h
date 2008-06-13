@@ -26,9 +26,11 @@
 
 #include "m_pd.h"
 
-#define DMX4PD_POSTBANNER                                               \
-  post("DMX4PD ver %s: (c) 2008 IOhannes m zmölnig - iem @ kug", DMX4PD_VERSION);
 
+#define DMX4PD_POSTBANNER                                               \
+  {                                                                     \
+    post("DMX4PD ("DMX4PD_VERSION"): (c) 2008 IOhannes m zmölnig - iem @ kug"); \
+  }
 
 
 #endif /* INCLUDE_DMX4PD_H__ */
