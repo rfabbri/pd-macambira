@@ -18,7 +18,7 @@ all: $(OBJECTS)
 clean:
 	-rm -f *.o *.d 
 
-binclean:
+binclean: clean
 	-rm -f *.$(EXT) *.dll *.pd_linux *.pd_darwin *.l_i386 *.l_ia64 *.d_ppc *.d_fat 
 
 mrproper: distclean
