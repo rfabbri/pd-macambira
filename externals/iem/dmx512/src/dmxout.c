@@ -33,20 +33,6 @@ typedef struct _dmxout
 
 } t_dmxout;
 
-
-static void dmxout_doout(t_dmxout*x, short port, unsigned char value)
-{
-  dmx_t buffer[1] = {value};
-  if(x->x_device<=0) {
-    pd_error(x, "no DMX universe found");
-    return;
-  }
-
-  lseek (x->x_device, sizeof(buffer)*port, SEEK_SET);  /* set to the current channel */
-  write (x->x_device, buffer, sizeof(buffer)); /* write the channel */
-}
-
-
 static void dmxout_close(t_dmxout*x)
 {
   if(x->x_device>=0) {
@@ -76,6 +62,18 @@ static void dmxout_open(t_dmxout*x, t_symbol*s_devname)
     dmxout_close(x);
     x->x_device=fd;
   }
+}
+
+static void dmxout_doout(t_dmxout*x, short port, unsigned char value)
+{
+  dmx_t buffer[1] = {value};
+  if(x->x_device<=0) {
+    pd_error(x, "no DMX universe found");
+    return;
+  }
+
+  lseek (x->x_device, sizeof(buffer)*port, SEEK_SET);  /* set to the current channel */
+  write (x->x_device, buffer, sizeof(buffer)); /* write the channel */
 }
 
 
