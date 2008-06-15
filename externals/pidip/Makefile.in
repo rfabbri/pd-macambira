@@ -65,10 +65,6 @@ distro: clean all
 	cp /mnt/c/ydegoyon.free.fr/pidip-$(PDP_PIDIP_VERSION).tar.gz /mnt/c/Yves/Software
 	rm -rf /tmp/pidip-$(PDP_PIDIP_VERSION)
 
-pdp_colorgrid.o: pdp_colorgrid.c
-	./tk2c.bash < $*.tk > $*.tk2c
-	PWD=`pwd`; cc -DPWD=\"$(PWD)\" $(PDP_PIDIP_INCLUDES) $(PDP_PIDIP_CFLAGS) -o $*.o -c $*.c
-
 .c.o:
 	gcc $(PDP_PIDIP_INCLUDES) $(PDP_PIDIP_CFLAGS) -o $*.o -c $*.c
 
