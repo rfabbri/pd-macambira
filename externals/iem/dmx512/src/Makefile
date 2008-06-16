@@ -67,7 +67,7 @@ ifeq (,$(findstring clean, $(MAKECMDGOALS)))
 -include $(SOURCES:.c=.d)
 %.d: %.c
 	@set -e; rm -f $@; \
-	 $(CC) $(MAKEDEP_FLAGS) $(CFLAGS) $< > $@.$$$$; \
+	 $(CC) $(MAKEDEP_FLAGS) $(DMX4PD_CFLAGS) $< > $@.$$$$; \
 	 sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	 rm -f $@.$$$$
 

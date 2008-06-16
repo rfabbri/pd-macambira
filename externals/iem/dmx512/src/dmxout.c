@@ -21,6 +21,7 @@
 #include <string.h>
 
 static t_class *dmxout_class;
+static t_class *dmxout_class2;
 
 typedef struct _dmxout
 {
@@ -30,6 +31,7 @@ typedef struct _dmxout
 
   int      x_device;
   t_float  x_port;
+  int  x_portrange;
 
 } t_dmxout;
 
@@ -64,16 +66,21 @@ static void dmxout_open(t_dmxout*x, t_symbol*s_devname)
   }
 }
 
-static void dmxout_doout(t_dmxout*x, short port, unsigned char value)
+static void dmxout_doout(t_dmxout*x, short baseport, short portrange, dmx_t*values)
 {
-  dmx_t buffer[1] = {value};
   if(x->x_device<=0) {
     pd_error(x, "no DMX universe found");
     return;
   }
 
-  lseek (x->x_device, sizeof(buffer)*port, SEEK_SET);  /* set to the current channel */
-  write (x->x_device, buffer, sizeof(buffer)); /* write the channel */
+  lseek (x->x_device, sizeof(dmx_t)*baseport, SEEK_SET);  /* set to the current channel */
+  write (x->x_device, values, portrange*sizeof(dmx_t)); /* write the channel */
+}
+
+static void dmxout_doout1(t_dmxout*x, short port, unsigned char value)
+{
+  dmx_t buffer[1] = {value};
+  dmxout_doout(x, port, 1, buffer);
 }
 
 
@@ -90,42 +97,86 @@ static void dmxout_float(t_dmxout*x, t_float f)
     return;
   }
 
-  dmxout_doout(x, port, val);
+  dmxout_doout1(x, port, val);
+}
+
+static void dmxout_list(t_dmxout*x, t_symbol*s, int argc, t_atom*argv)
+{
+  int count=(argc<x->x_portrange)?argc:x->x_portrange;
+  dmx_t*buffer=(dmx_t*)getbytes(count*sizeof(dmx_t));
+  int i=0;
+
+  int errors=0;
+
+  for(i=0; i<count; i++) {
+    t_float f=atom_getfloat(argv+i);
+    if(f<0. || f>255.) {
+      errors++;
+      if(f<0.)f=0.;
+      if(f>255)f=255;
+    }
+    buffer[i]=(unsigned char)f;
+  }
+  if(errors) {
+    pd_error(x, "%d valu%s out of bound [0..255]", errors, (1==errors)?"e":"es");
+  }
+
+  dmxout_doout(x, x->x_port, count, buffer);
+}
+
+static void dmxout_port(t_dmxout*x, t_float f_baseport, t_floatarg f_portrange)
+{
+  short baseport =(short)f_baseport;
+  short portrange=(short)f_portrange;
+
+
+  if(baseport<0 || baseport>=512) {
+    pd_error(x, "port %f out of bounds [0..512]", f_baseport);
+    baseport =0;
+  }
+  x->x_port = baseport;
+
+  if(portrange<0) {
+    pd_error(x, "portrange %f<0! setting to 1", portrange);
+    portrange=1;
+  } else if (portrange==0) {
+    portrange=x->x_portrange;
+  }
+
+  if (baseport+portrange>512) {
+    pd_error(x, "upper port exceeds 512! clamping");
+    portrange=512-baseport;
+  }
+  x->x_portrange=portrange;
 }
 
 static void *dmxout_new(t_symbol*s, int argc, t_atom*argv)
 {
-  t_dmxout *x = (t_dmxout *)pd_new(dmxout_class);
-
-  t_symbol*devname=gensym("");
-
-  x->x_portinlet=floatinlet_new(&x->x_obj, &x->x_port);
-
-  x->x_device=-1;
-  x->x_port  =0;
+  t_floatarg baseport=0.f, portrange=0.f;
+  t_dmxout *x = 0;
 
   switch(argc) {
-  case 0: break;
+  case 2:
+    x=(t_dmxout *)pd_new(dmxout_class2);
+    x->x_portinlet=inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("port"));
+    baseport=atom_getfloat(argv);
+    portrange=atom_getfloat(argv+1);
+    dmxout_port(x, baseport, portrange);
+    break;
   case 1:
-    if(A_FLOAT==argv->a_type) {
-      x->x_port=atom_getfloat(argv);
-    } else {
-      devname=atom_getsymbol(argv);
-    }
+    baseport=atom_getfloat(argv);
+  case 0:
+    x=(t_dmxout *)pd_new(dmxout_class);
+    x->x_portinlet=floatinlet_new(&x->x_obj, &x->x_port);
+    x->x_port  = baseport;
+    x->x_portrange = -1;
     break;
   default:
-    if((A_FLOAT==(argv+0)->a_type) && (A_SYMBOL==(argv+1)->a_type)) {
-      x->x_port=atom_getfloat(argv+0);
-      devname=atom_getsymbol(argv+1);
-    } else if(A_FLOAT==(argv+1)->a_type && A_SYMBOL==(argv+0)->a_type) {
-      x->x_port=atom_getfloat(argv+1);
-      devname=atom_getsymbol (argv+0);
-    }
-    break;
+    return 0;
   }
+  x->x_device=-1;
 
-
-  dmxout_open(x, devname);
+  dmxout_open(x, gensym(""));
   return (x);
 }
 
@@ -143,6 +194,17 @@ void dmxout_setup(void)
                            A_GIMME, A_NULL);
 
   class_addfloat(dmxout_class, dmxout_float);
+
+  dmxout_class2 = class_new(gensym("dmxout"), (t_newmethod)dmxout_new, (t_method)dmxout_free,
+			    sizeof(t_dmxout), 
+			    0,
+			    A_GIMME, A_NULL);
+
+  class_addlist(dmxout_class2, dmxout_list);
+
+
+  class_addmethod(dmxout_class2, (t_method)dmxout_port, gensym("port"), 
+		  A_FLOAT, A_DEFFLOAT, A_NULL);
 
 #ifdef DMX4PD_POSTBANNER
   DMX4PD_POSTBANNER
