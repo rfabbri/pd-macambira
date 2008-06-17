@@ -16,8 +16,13 @@ LEGEND:
 [s] gop filter
 [s] triad
 
+[ ] glerm says:
+    deleting object does not work
+    backspace key problem in virtual keyboard
+
 ------------------8<--------cut-here--------8<------------------
 
+[ ] right-click on an [s] or [r] would have an option "Find Matching Sends & Receives"
 [ ] do not install .svn folders
 [s] class_setreinit(t_pd *, t_symbol *s, int argc, t_atom *argv)
 [s] fix canvas_merge, canvas_remove_nth, canvas_sort
@@ -54,6 +59,7 @@ LEGEND:
 [c] new way to do View get_canvas
 [b] too much duplication of inlets vs outlets
 [s] too much duplication of adc vs dac (see s_audio.c)
+[ ] pd-extended's [tcl_version]
 [c] implement multiple cascaded languages (use listbox+up+down)
 [c] def Menuable raise {} {wm withdraw $w; wm deiconify $w
 [s] what to do with post() in case of -listdev, etc.?
@@ -455,4 +461,86 @@ later, if needed, by its name like, you start to build some mixer patch .. and t
 so you can put all associated objects in the "ext.fx" group ... whenever it gets so messed up that you forgot what is
 what, you can just select the groupt you want, and see/move/whatever the involved objects the group name could also act
 as a template for the name of a subpatch, if one decides to finally put them into one ....
+
+#--------#--------#--------#--------#--------#--------#--------#--------#--------
+
+[PD] interface wishlist
+tim info at timvets.net
+Sun Feb 17 18:01:34 CET 2008
+
+Hello,
+here's my current Pd GUI wishlist, things that could streamline my work 
+flow, things that don't seem logical to me...etc:
+
+I wish:
+-going in and out of edit mode was reflected by the cursor turning into 
+a hand or arrow immediately, not requiring the user to move it first, 
+who, if newbie, can get confused if he/she hasn't moved the mouse.
+(this is the case on some versions I use in class, specifically 
+pd-extended OSX I think)
+-shift-click-and-drag on a number box would also work after you already 
+clicked. Another idea: ctrl-click-drag to increment in steps of 10 or 100.
+-home, end, shift+left/right, ctrl+left/right, ctrl+shift+left/right 
+would work within object boxes just like in a text editor.
+-click+drag a single object or messagebox wouldn't automatically 
+activate text entry mode but the object itself stays the selection, so 
+that you can move it again or use arrow keys for repositioning without 
+having to deselect+reselect first.
+-for a multiple connections facility, to connect all outlets of object a 
+to all inlets of object b, and variations on that. (I think max has had 
+this for a while, and maybe desiredata ?).
+-'subpatcherize'
+-that when deleting all text in a comment and clicking outside it, the 
+comment would be deleted, so that if you save the patch, close it, and 
+reopen it, there doesn't appear the word 'comment' everywhere you left a 
+'blank' comment this way. Alternatively it could become 'comment' upon 
+finalizing an empty comment, so that you can still see, select and 
+delete it.
+-the file browser (openpanel/savepanel) would support keystrokes to 
+navigate: alt+up one dir up, tab to toggle focus between text entry and 
+graphical area (where folders and files are displayed)...etc
+-opening the filebrowser wouldn't cause the Pd main window to pop in 
+front of all the patcher windows after it is closed.
+-one object could be finalized by clicking the outlet of another object, 
+so that you can immediately connect it. The extra click outside the 
+object to finalize it first is unnecessary. When I click the outlet of 
+another object, it is obvious that I am done typing the name of the 
+current one.
+
+Tim
+
+marius schebella marius.schebella at gmail.com
+Sun Feb 17 18:43:28 CET 2008
+
+Hi,
+this list is great! I would like to add the one again that I posted 
+yesterday (sorry for double posting, but this thread subject is better)
+
+- when only one object is selected and you start typing (any other than 
+arrows) it should be possible to write into the object without an 
+additional click into the object. I often use ctrl+d to duplicate an 
+object and then arrow keys to place it on the canvas, and then I would 
+like to just start typing into the object.
+- when there is more than one object selected and I click into one 
+object, but do not drag, then that object could switch to type-entry 
+mode. right now I have to unselect all objects by clicking into the 
+canvas and then click into the box to start text entry.
+- exiting entry mode with enter would actually be nice, too. (for 
+messages cr could be shift+enter (the cr is overwritten anyway).
+- more actions could be triggered by keyboard shortcuts?
+-  the alt click and drag function. you click on an object and as soon 
+as you start dragging that object is duplicated, but at the same time 
+you already have the new object at the cursor position and can place it 
+fast at a new spot.
+
+I want to point out that in many cases this would mean different 
+behaviour between clicking, and clicking+dragging.
+
+plus new: keyboardshortcuts to bring the pd window to the front (to 
+watch console output.
+- and also change the cursor to arrow when you hit the command key to 
+imply that clicking on messages or numbers has different behaviour (play 
+mode) when you hit apple (or ctrl on win/lin?).
+
+marius.
 
