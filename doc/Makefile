@@ -195,9 +195,9 @@ tutorials_install: $(manualsdir)
 	install -p $(doc_src)/tutorials/networking/*.* $(manualsdir)/3.Networking
 	install -p $(abstractions_src)/pddp/+pager.pd $(manualsdir)/3.Networking
 # physical
-	install -d $(manualsdir)/4.Physical
-	install -p $(doc_src)/tutorials/physical/*.* $(manualsdir)/4.Physical
-	install -p $(abstractions_src)/pddp/+pager.pd $(manualsdir)/4.Physical
+#	install -d $(manualsdir)/4.Physical
+#	install -p $(doc_src)/tutorials/physical/*.* $(manualsdir)/4.Physical
+#	install -p $(abstractions_src)/pddp/+pager.pd $(manualsdir)/4.Physical
 
 tutorials_clean:
 	-rm -f -- $(manualsdir)/PdDrums/*.*
