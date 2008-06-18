@@ -148,7 +148,6 @@ static void set_tk_widget_ids(t_entry *x, t_canvas *canvas)
     sprintf(buf,"%s.window%lx", x->canvas_id, (long unsigned int)x);
     x->window_tag = getbytes(strlen(buf));
     strcpy(x->window_tag, buf);    /* Tk ID for the resizing "window" */
-    post("");
 
     sprintf(buf,"%s.handle%lx", x->canvas_id, (long unsigned int)x);
     x->handle_id = getbytes(strlen(buf));
@@ -166,7 +165,7 @@ static void set_tk_widget_ids(t_entry *x, t_canvas *canvas)
 static int calculate_onset(t_entry *x, t_glist *glist, 
                            int current_iolet, int total_iolets)
 {
-    post("calculate_onset");
+    DEBUG(post("calculate_onset"););
     return(text_xpix(&x->x_obj, glist) + (x->x_width - IOWIDTH)    \
            * current_iolet / (total_iolets == 1 ? 1 : total_iolets - 1));
 }
