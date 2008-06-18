@@ -1,9 +1,9 @@
 #N canvas 10 40 620 460 12;
-#X obj 208 229 import unauthorized Gem;
+#X obj 208 229 import Gem;
 #X text 217 160 caught you peeking!!;
 #X text 197 255 (this just makes sure the;
 #X text 200 271 right libraries are loaded);
-#X obj 193 124 grid grid1 200 0 199 200 0 199 1 1 1 10 10 245 211;
+#X obj 193 124 unauthorized/grid grid1 200 0 199 200 0 199 1 1 1 10 10 245 211;
 #X obj 25 55 pddp/dsp;
 #X text 140 11 Its all just data. Use it however you want!;
 #X obj 193 372 nbx 5 24 -1e+37 1e+37 0 0 empty empty X -15 12 1 18

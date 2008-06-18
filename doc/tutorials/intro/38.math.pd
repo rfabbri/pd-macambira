@@ -1,4 +1,6 @@
 #N canvas 10 40 620 460 10;
+#X declare -lib hexloader -lib maxlib -lib zexy -lib iemlib -lib iemmatrix 
+-lib markex;
 #X obj 637 350 +~;
 #X obj 641 499 trigger;
 #X text 25 8 ARITHMETIC;
@@ -215,7 +217,7 @@ a number with every number or "bang" that is sent to the left inlet.
 #X obj 201 67 >~;
 #X obj 228 25 &&~;
 #X obj 228 46 ||~;
-#X obj 228 67 matrix~;
+#X obj 228 67 mtx_*~;
 #X obj 280 25 mavg;
 #X obj 280 46 mean;
 #X obj 280 68 divide;

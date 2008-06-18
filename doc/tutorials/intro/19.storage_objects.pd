@@ -1,5 +1,5 @@
 #N canvas 10 40 620 460 12;
-#X obj 277 25 import iemlib;
+#X obj 277 25 import libdir iemlib;
 #X obj 122 89 symbol;
 #X obj 63 89 bang;
 #X obj 303 89 f;

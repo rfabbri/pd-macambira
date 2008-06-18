@@ -1,5 +1,5 @@
 #N canvas 10 40 620 460 10;
-#X obj 420 33 import cyclone unauthorized;
+#X obj 420 33 import libdir cyclone flatspace;
 #X obj 11 57 cnv 15 600 650 empty empty empty 20 12 0 14 -262131 -66577
 0;
 #X obj 11 348 cnv 15 400 100 empty empty empty 20 12 0 14 -261696 -66577
@@ -27,10 +27,10 @@
 \, which you can select from the "Put" menu.;
 #X text 17 356 There are also some OS-native GUI elements available
 ;
-#X obj 49 404 button OK;
+#X obj 49 404 ggee/button OK;
 #X obj 147 408 popup 124 25 #ffffff popup option;
-#X obj 333 404 ticker ;
-#X obj 324 529 envgen 200 140 1 0  ;
+#X obj 333 404 ggee/ticker ;
+#X obj 324 529 ggee/envgen 200 140 1 0  ;
 #X obj 491 454 knob 32 32 0 127 0 0 empty empty empty 0 -8 32 8 -262144
 -1 -1 0 1;
 #X text 485 428 [knob];
@@ -49,9 +49,9 @@
 #X obj 441 112 Scope~ 130 130 256 3 128 -1 1 0 0 0 0 102 255 51 135
 135 135 0;
 #X text 337 98 [nbx];
-#X obj 461 299 gcanvas 80 80;
+#X obj 461 299 ggee/gcanvas 80 80;
 #X text 472 274 [gcanvas];
-#X obj 51 472 grid grid1 200 0 199 200 0 199 1 1 1 10 10 133 520;
+#X obj 51 472 unauthorized/grid grid1 200 0 199 200 0 199 1 1 1 10 10 133 520;
 #X text 71 453 [unauthorized/grid];
 #X floatatom 462 386 5 0 0 0 - - -;
 #X floatatom 534 387 5 0 0 0 - - -;
