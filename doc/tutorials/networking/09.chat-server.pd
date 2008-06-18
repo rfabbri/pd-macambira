@@ -1,4 +1,5 @@
-#N canvas 769 55 458 308 10;
+#N canvas 10 40 620 460 10;
+#X declare -lib libdir;
 #X obj 258 13 import maxlib cyclone zexy;
 #X obj 141 112 netserver 47292;
 #X obj 68 83 prepend broadcast;

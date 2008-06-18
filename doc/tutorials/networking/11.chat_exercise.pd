@@ -1,7 +1,8 @@
-#N canvas 123 124 644 464 10;
+#N canvas 10 40 620 460 10;
+#X declare -lib libdir;
+#X obj 437 59 import maxlib cyclone zexy;
 #X obj 8 10 cnv 15 400 40 empty empty chat_exercise 20 12 0 24 -225271
 -66577 0;
-#X obj 437 59 import maxlib cyclone zexy;
 #X obj 129 89 prepend broadcast;
 #X obj 202 191 prepend;
 #X obj 246 169 makesymbol client%s_%s;

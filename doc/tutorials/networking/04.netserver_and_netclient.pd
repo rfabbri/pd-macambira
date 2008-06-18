@@ -1,4 +1,6 @@
-#N canvas 15 58 644 464 10;
+#N canvas 10 40 620 460 10;
+#X declare -lib libdir;
+#X obj 463 52 import maxlib;
 #X obj 8 10 cnv 15 400 40 empty empty netserver_and_netclient 20 12
 0 24 -228992 -66577 0;
 #X floatatom 61 243 5 0 0 0 - - -;
@@ -33,20 +35,20 @@
 #X text 13 71 [netserver] and [netclient] gives you a bi-directional
 connection so you can send data back and forth thru it. Also \, [netserver]
 helps you manage multiple connections.;
-#X connect 6 0 24 0;
-#X connect 6 1 8 0;
-#X connect 7 0 6 0;
-#X connect 9 0 6 0;
-#X connect 10 0 14 0;
-#X connect 10 1 12 0;
-#X connect 11 0 10 0;
-#X connect 13 0 10 0;
-#X connect 15 0 9 0;
-#X connect 16 0 13 0;
-#X connect 17 0 1 0;
-#X connect 17 1 2 0;
-#X connect 17 2 4 0;
-#X connect 17 3 3 0;
-#X connect 18 0 6 0;
-#X connect 19 0 10 0;
-#X connect 20 0 17 0;
+#X connect 7 0 25 0;
+#X connect 7 1 9 0;
+#X connect 8 0 7 0;
+#X connect 10 0 7 0;
+#X connect 11 0 15 0;
+#X connect 11 1 13 0;
+#X connect 12 0 11 0;
+#X connect 14 0 11 0;
+#X connect 16 0 10 0;
+#X connect 17 0 14 0;
+#X connect 18 0 2 0;
+#X connect 18 1 3 0;
+#X connect 18 2 5 0;
+#X connect 18 3 4 0;
+#X connect 19 0 7 0;
+#X connect 20 0 11 0;
+#X connect 21 0 18 0;

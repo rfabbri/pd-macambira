@@ -1,4 +1,6 @@
-#N canvas 115 56 644 464 10;
+#N canvas 10 40 620 460 10;
+#X declare -lib libdir;
+#X obj 493 25 import oscx;
 #X obj 8 10 cnv 15 400 40 empty empty OSC 20 12 0 24 -228992 -66577
 0;
 #X obj 80 298 sendOSC;
@@ -25,19 +27,19 @@ designed to replace MIDI \, but it has caught on instead for inter-application
 communication.;
 #X text 21 361 On the most basic level \, it works very similarly to
 [netsend] and [netreceive].;
-#X connect 1 0 2 0;
-#X connect 1 1 4 0;
-#X connect 3 0 1 0;
-#X connect 5 0 1 0;
-#X connect 6 0 5 0;
-#X connect 7 0 10 0;
-#X connect 10 0 1 0;
-#X connect 11 0 15 0;
-#X connect 12 0 1 0;
-#X connect 13 0 14 0;
-#X connect 14 0 1 0;
-#X connect 15 0 8 0;
-#X connect 15 0 9 0;
-#X connect 15 1 16 0;
-#X connect 15 1 18 0;
-#X connect 15 2 17 0;
+#X connect 2 0 3 0;
+#X connect 2 1 5 0;
+#X connect 4 0 2 0;
+#X connect 6 0 2 0;
+#X connect 7 0 6 0;
+#X connect 8 0 11 0;
+#X connect 11 0 2 0;
+#X connect 12 0 16 0;
+#X connect 13 0 2 0;
+#X connect 14 0 15 0;
+#X connect 15 0 2 0;
+#X connect 16 0 9 0;
+#X connect 16 0 10 0;
+#X connect 16 1 17 0;
+#X connect 16 1 19 0;
+#X connect 16 2 18 0;
