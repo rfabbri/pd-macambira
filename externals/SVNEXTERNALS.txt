@@ -20,3 +20,4 @@
 
 ## example:
 # gridflow https://gridflow.ca/svn/trunk/
+gridflow http://gridflow.ca/svn/trunk/
