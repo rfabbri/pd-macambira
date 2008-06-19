@@ -39,15 +39,11 @@ dnl Replace `main' with a function in -lstk:
 dnl AC_CHECK_LIB(stk, main, STK=yes)
 
 
+AC_CHECK_LIB(dmx4l, DMXsleep)
 AC_CHECK_LIB(dmx4linux, DMXsleep)
-if test "x$ac_cv_lib_dmx4linux_DMXsleep" = "xyes"; then
-  DMX4LINUX_LFLAGS="-ldmx4linux"
-fi
-
-dnl AC_CHECK_LIB(asound, snd_seq_close)
-dnl if test "x$ac_cv_lib_asound_snd_seq_close" = "xyes"; then
-dnl  DFLAGS="-DHAVE_ALSA ${DFLAGS}"
-dnl fi
+#if test "x$ac_cv_lib_dmx4linux_DMXsleep" = "xyes"; then
+#  DMX4LINUX_LFLAGS="-ldmx4linux"
+#fi
 
 if test "x$includedir" != "x"; then
  for id in $includedir

@@ -38,11 +38,14 @@ and run
 finally become root and do
 # make install
 
+after all has gone well, load the appropriate kernel modules
 
-load the appropriate kernel modules
+
+btw, it is always a good idea to read the readme that comes with dmx4linux...
 
 
 B. permissions
+==============
 the dmx device-files created by udev will be owned by root.root and not be 
 read/writeable by anyone but root.
 in order to use them as an ordinary user, become root and create a group 
@@ -55,9 +58,26 @@ the next time you load a dmx-driver
 if you have problems, try plugging your device out and in again
 
 
+C. compiling the Pd-objects
+===========================
+so now it is time to get the Pd-objects going.
+for this change into the "./src" directory of the iem/dmx512/ folder
+(this might well be the folder that holds this README.txt you are currently
+reading)
 
+if you have obtained the source-code via subversion, you will first have to run
+% autoconf
 
+(this should not be needed if you downloaded the sources as a release tarball;
+that is: if the person who created the tarball has not forgotten to do it for you)
 
+then run
+% configure
+% make
+
+you should now have 2 binary files in the src/ folder called [dmxin] and [dmxout]
+
+go on and use em!
 
 
 
