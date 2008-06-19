@@ -49,5 +49,22 @@
 	<integer>0</integer>
 	<key>LSUIPresentationMode</key>
 	<integer>0</integer>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<string>public.plain-text</string>
+			<key>UTTypeIdentifier</key>
+			<string>org.puredata.pd-patch</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>pd</string>
+					<string>pat</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
 </dict>
 </plist>
