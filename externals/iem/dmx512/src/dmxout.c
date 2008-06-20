@@ -33,7 +33,15 @@ typedef struct _dmxout
   t_float  x_port;
   int  x_portrange;
 
+  dmx_t x_values[512];
+
 } t_dmxout;
+
+static void dmxout_clearbuf(t_dmxout*x)
+{
+  int i=0;
+  for(i=0; i<512; i++) x->x_values[i]=0;
+}
 
 static void dmxout_close(t_dmxout*x)
 {
@@ -49,7 +57,7 @@ static void dmxout_open(t_dmxout*x, t_symbol*s_devname)
   int argc=2;
   const char *args[2] = {"--dmx", s_devname->s_name};
   const char**argv=args;
-  char*devname="";
+  const char*devname="";
   int fd;
 
   if(s_devname && s_devname->s_name)
@@ -57,8 +65,14 @@ static void dmxout_open(t_dmxout*x, t_symbol*s_devname)
 
   //  strncpy(args[0], "--dmx", MAXPDSTRING);
   //  strncpy(args[1], devname, MAXPDSTRING);
+  devname=DMXdev(&argc, argv);
+  if(!devname){
+  	pd_error(x, "couldn't find DMX device");
+	return;
+  }
+  verbose(1, "[dmxout] opening %s", devname);
 
-  fd = open (DMXdev(&argc, argv), O_WRONLY);
+  fd = open (devname, O_WRONLY);
 
   if(fd!=-1) {
     dmxout_close(x);
@@ -66,21 +80,29 @@ static void dmxout_open(t_dmxout*x, t_symbol*s_devname)
   }
 }
 
-static void dmxout_doout(t_dmxout*x, short baseport, short portrange, dmx_t*values)
+static void dmxout_doout(t_dmxout*x, dmx_t values[512])
 {
+  int i;
   if(x->x_device<=0) {
     pd_error(x, "no DMX universe found");
     return;
   }
+#if 0
+  for(i=0; i<512; i++) {
+    post("dmx[%d]=%03d", i, values[i]);
+  }
+  endpost();
+#endif
 
-  lseek (x->x_device, sizeof(dmx_t)*baseport, SEEK_SET);  /* set to the current channel */
-  write (x->x_device, values, portrange*sizeof(dmx_t)); /* write the channel */
+  lseek (x->x_device, 0, SEEK_SET);  /* set to the current channel */
+  write (x->x_device, values, 512); /* write the channel */
 }
 
 static void dmxout_doout1(t_dmxout*x, short port, unsigned char value)
 {
-  dmx_t buffer[1] = {value};
-  dmxout_doout(x, port, 1, buffer);
+  dmxout_clearbuf(x);
+  x->x_values[port]=value;
+  dmxout_doout(x, x->x_values);
 }
 
 
@@ -103,10 +125,17 @@ static void dmxout_float(t_dmxout*x, t_float f)
 static void dmxout_list(t_dmxout*x, t_symbol*s, int argc, t_atom*argv)
 {
   int count=(argc<x->x_portrange)?argc:x->x_portrange;
-  dmx_t*buffer=(dmx_t*)getbytes(count*sizeof(dmx_t));
   int i=0;
-
   int errors=0;
+
+  int port=x->x_port;
+  if((port+count)>=512) {
+    if(count>512)count=512;
+    port=512-count;
+  }
+
+  dmxout_clearbuf(x);
+
 
   for(i=0; i<count; i++) {
     t_float f=atom_getfloat(argv+i);
@@ -115,13 +144,13 @@ static void dmxout_list(t_dmxout*x, t_symbol*s, int argc, t_atom*argv)
       if(f<0.)f=0.;
       if(f>255)f=255;
     }
-    buffer[i]=(unsigned char)f;
+    x->x_values[port+i]=(unsigned char)f;
   }
   if(errors) {
     pd_error(x, "%d valu%s out of bound [0..255]", errors, (1==errors)?"e":"es");
   }
 
-  dmxout_doout(x, x->x_port, count, buffer);
+  dmxout_doout(x, x->x_values);
 }
 
 static void dmxout_port(t_dmxout*x, t_float f_baseport, t_floatarg f_portrange)
