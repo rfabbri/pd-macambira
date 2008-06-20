@@ -200,6 +200,8 @@ darwin_app_core: darwin_app_wrapper
 # support for Info Panel Plugins mgmt
 	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
 	install -p -m0644 org.puredata.pd.default.plist "$(PD_APP_CONTENTS)/"
+# create directory to put Spotlight Importers into
+	install -d -m0755 "$(PD_APP_CONTENTS)/Library/Spotlight"
 
 
 #------------------------------------------------------------------------------#
