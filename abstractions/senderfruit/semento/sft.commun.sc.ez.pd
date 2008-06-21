@@ -3,11 +3,11 @@
 #X obj 106 95 s \$1\$3R;
 #X text 47 201 Receives from \$0paramName and sends to \$0paramNameR
 ;
-#X text 46 153 [sft.commun.sc.ez \$0 \$3 paramName 0 5000 btn* hide*]
-;
 #X text 330 223 *optional;
 #X obj 106 66 sft.commun.sc \$1 \$2/\$3 \$4 \$5 \$6 \$7;
 #X text 47 171 \$3 is uniqueID like /chptrA. In Bathyscaphe that's
 \$3 \, in FXS it's \$2.;
-#X connect 0 0 5 0;
-#X connect 5 0 1 0;
+#X text 46 153 [sft.commun.sc.ez \$0 \$3 paramName 0 5000 round* hide*]
+;
+#X connect 0 0 4 0;
+#X connect 4 0 1 0;
