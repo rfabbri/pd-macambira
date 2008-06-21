@@ -62,7 +62,7 @@ install: darwin_app
 devel_install: darwin_app_devel
 
 #------------------------------------------------------------------------------#
-darwin_app: darwin_app_core extended_install rez_install darwin_app_embed_libs
+darwin_app: darwin_app_core extended_install rez_install darwin_app_embed_libs spotlight_importer_install
 	@echo " "
 	@echo "Pd.app build succeeded!"
 
@@ -70,7 +70,7 @@ extended_install:
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) extended_install
 
 #------------------------------------------------------------------------------#
-darwin_app_devel: darwin_app_devel_core rez_install
+darwin_app_devel: darwin_app_devel_core rez_install spotlight_importer_install
 	@echo " "
 	@echo "Pd_devel.app build succeeded!"
 
@@ -163,6 +163,11 @@ Info.plist: Info.plist.in
 		sed 's/CFBUNDLESHORTVERSIONSTRING/$(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)/' | \
 		sed 's/CFBUNDLEVERSION/$(CFBUNDLEVERSION_DATE)/' > \
 		Info.plist
+		
+spotlight_importer_install:
+	cd spotlight_importer && xcodebuild
+	install -d -m0755 "$(PD_APP_CONTENTS)/Library/Spotlight"
+	cp -Rp spotlight_importer/build/Release/PureData.mdimporter "$(PD_APP_CONTENTS)/Library/Spotlight"
 
 # tigital's Gem window focus black magic
 rez_install:
@@ -201,7 +206,7 @@ darwin_app_core: darwin_app_wrapper
 	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
 	install -p -m0644 org.puredata.pd.default.plist "$(PD_APP_CONTENTS)/"
 # create directory to put Spotlight Importers into
-	install -d -m0755 "$(PD_APP_CONTENTS)/Library/Spotlight"
+	
 
 
 #------------------------------------------------------------------------------#
@@ -283,11 +288,14 @@ clean: package_clean
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
 
 
-package_clean: darwin_app_clean
+package_clean: darwin_app_clean spotlight_importer_clean
 	-chmod -R u+w -- $(BUILD_BASE)
 	-rm -rf -- $(BUILD_BASE)
 	-rm Info.plist
 	-rm -f -- "$(CWD)/$(PACKAGE_NAME)/ReadMe.html"
+
+spotlight_importer_clean:
+	-rm -rf -- spotlight_importer/build
 
 devel_clean: darwin_app_devel_clean
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
@@ -296,6 +304,7 @@ devel_clean: darwin_app_devel_clean
 darwin_app_clean:
 	-chmod -R u+w $(PD_APP_CONTENTS)/Frameworks
 	-rm -rf -- $(PD_APP_CONTENTS)/Frameworks
+	-rm -rf -- $(PD_APP_CONTENTS)/Library
 	-rm -f -- $(PD_APP_CONTENTS)/Plugins $(PD_APP_CONTENTS)/Info.plist
 	-rm -f -- "$(PD_APP_CONTENTS)/MacOS/$(PD_APP_NAME)"
 	-rmdir  $(PD_APP_CONTENTS)/MacOS
