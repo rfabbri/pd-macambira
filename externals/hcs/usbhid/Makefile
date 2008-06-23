@@ -15,13 +15,12 @@ test_locations:
 
 # for emacs
 etags:
-	etags *.[ch] ../../../pd/src/*.[ch] \
-		~/code/libhid-svn/*/*.[ch] \
-		/sw/include/hid*.h /sw/include/usb*.h \
-		/System/Library/Frameworks/IOKit.framework/Headers/hid/*.h \
-		/Users/hans/Documents/Research/HID/example\ code/CrossHID/*/*.h \
-		/Users/hans/Documents/Research/HID/example\ code/CrossHID/*/*.cpp \
-		../hid/HID\ Utilities\ Source/*.[ch]
+	cd $(EXTERNALS_ROOT) && \
+		etags --append \
+			~/code/libhid-svn/*/*.[ch] \
+			~/code/libusb/*.[ch] \
+			/Users/hans/Documents/Research/HID/example\ code/CrossHID/*/*.h \
+			/Users/hans/Documents/Research/HID/example\ code/CrossHID/*/*.cpp
 
 #etags_Darwin:
 #	etags --append /sw/include/*.h /sw/include/*/*.h
