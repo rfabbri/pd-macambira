@@ -192,6 +192,8 @@ extern void hidio_write_event_symbols(t_hidio *x, t_symbol *type, t_symbol *code
                                       t_int instance, t_int value);
 extern void hidio_write_event_ints(t_hidio *x, t_int type, t_int code, 
                                      t_int instance, t_int value);
+extern void hidio_devices(t_hidio* x); /* print device list to the console */
+extern void hidio_elements(t_hidio* x); /* print element list to the console */
 extern void hidio_print(t_hidio* x); /* print info to the console */
 extern void hidio_platform_specific_info(t_hidio *x); /* device info on the status outlet */
 extern void hidio_platform_specific_free(t_hidio *x);

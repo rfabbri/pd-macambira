@@ -79,6 +79,9 @@ t_symbol *led_symbols[LED_ARRAY_MAX];
 t_symbol *pid_symbols[PID_ARRAY_MAX];
 t_symbol *relative_symbols[RELATIVE_ARRAY_MAX];
 
+/* TODO consider issuing a pd_error if more than one instance is attached to
+ * one given device */
+
 /*------------------------------------------------------------------------------
  * FUNCTION PROTOTYPES
  */
@@ -637,6 +640,8 @@ void hidio_setup(void)
     class_addmethod(hidio_class,(t_method) hidio_debug,gensym("debug"),A_DEFFLOAT,0);
     class_addmethod(hidio_class,(t_method) hidio_build_device_list,gensym("refresh"),0);
 /* TODO: [print( should be dumped for [devices( and [elements( messages */
+    class_addmethod(hidio_class,(t_method) hidio_devices,gensym("devices"),0);
+    class_addmethod(hidio_class,(t_method) hidio_elements,gensym("elements"),0);
     class_addmethod(hidio_class,(t_method) hidio_print,gensym("print"),0);
     class_addmethod(hidio_class,(t_method) hidio_info,gensym("info"),0);
     class_addmethod(hidio_class,(t_method) hidio_open,gensym("open"),A_GIMME,0);
@@ -721,6 +726,8 @@ int main()
     class_addmethod(c, (method)hidio_debug, "debug",A_DEFFLOAT,0);
     class_addmethod(c, (method)hidio_build_device_list, "refresh",0);
 /* TODO: [print( should be dumped for [devices( and [elements( messages */
+    class_addmethod(c, (method)hidio_devices, "devices",0);
+    class_addmethod(c, (method)hidio_elements, "elements",0);
     class_addmethod(c, (method)hidio_print, "print",0);
     class_addmethod(c, (method)hidio_info, "info",0);
     class_addmethod(c, (method)hidio_open, "open",A_GIMME,0);

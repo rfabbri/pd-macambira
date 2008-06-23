@@ -480,9 +480,10 @@ static void hidio_build_element_list(t_hidio *x)
 	}
 }
 
-static void hidio_print_element_list(t_hidio *x)
+
+void hidio_elements(t_hidio *x)
 {
-//	debug_post(LOG_DEBUG,"hidio_print_element_list");
+//	debug_post(LOG_DEBUG,"hidio_elements");
 	int i;
 	pRecElement	pCurrentHIDElement;
 	pRecDevice pCurrentHIDDevice;
@@ -496,7 +497,9 @@ static void hidio_print_element_list(t_hidio *x)
 		error("[hidio]: device %d is not a valid device\n",x->x_device_number);
 		return;
 	}
-	post("[hidio] found %d elements:",element_count[x->x_device_number]);
+    post("__________________________________________________");
+	post("[hidio] found %d elements in '%s' '%s' (device #%d)", element_count[x->x_device_number],
+         pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product, x->x_device_number);
 	post("\n TYPE\t\tCODE\t#\tcookie\tEVENT NAME");
 	post("-----------------------------------------------------------");
 	for(i=0; i<element_count[x->x_device_number]; i++)
@@ -506,7 +509,7 @@ static void hidio_print_element_list(t_hidio *x)
 		HIDGetTypeName((IOHIDElementType) pCurrentHIDElement->type, type_name);
 		HIDGetUsageName(pCurrentHIDElement->usagePage, 
 						pCurrentHIDElement->usage, usage_name);
-		post("  %s\t%s\t%d\t%d\t%s, %s", current_element->type->s_name,
+		post(" %s\t%s\t%d\t%d\t%s, %s", current_element->type->s_name,
 			 current_element->name->s_name,(int) current_element->instance,
              pCurrentHIDElement->cookie,
 			 type_name, usage_name);
@@ -540,18 +543,19 @@ void hidio_ff_print( t_hidio *x )
 }
 
 
-static void hidio_print_device_list(t_hidio *x) 
+void hidio_devices(t_hidio *x) 
 {
 	char device_type_buffer[256];
 	t_int i, numdevs;
 	unsigned int j;
 	pRecDevice pCurrentHIDDevice = NULL;
 
+	if( !HIDHaveDeviceList() ) hidio_build_device_list();
 	if( HIDHaveDeviceList() )
 	{
 		numdevs = (t_int) HIDCountDevices();
 		
-		post("");
+		post("\n[hidio]: current device list:");
 		/* display device list in console */
 		for(i=0; i < numdevs; i++)
 		{
@@ -865,10 +869,10 @@ void hidio_build_device_list(void)
 void hidio_print(t_hidio *x)
 {
 	if( !HIDHaveDeviceList() ) hidio_build_device_list();
-	hidio_print_device_list(x);
+	hidio_devices(x);
 	if(x->x_device_open) 
 	{
-		hidio_print_element_list(x);
+		hidio_elements(x);
 		hidio_ff_print(x);
 	}
 }
