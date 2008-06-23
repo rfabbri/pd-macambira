@@ -5,7 +5,7 @@ clean: ; rm -f *.pd_linux *.o
 
 # ----------------------- NT -----------------------
 
-pd_nt: tabosc4c~.dll tabread4c~.dll
+pd_nt: tabosc4c~.dll tabosc4cloop~.dll tabread4c~.dll tabosc4h~.dll
 
 .SUFFIXES: .dll
 
@@ -26,7 +26,7 @@ PDNTLIB = $(PDNTLDIR)\libc.lib \
 
 # ----------------------- IRIX 5.x -----------------------
 
-pd_irix5: tabosc4c~.pd_irix5 tabread4c~.pd_irix5
+pd_irix5: tabosc4c~.pd_irix5 tabosc4cloop~.pd_irix5 tabread4c~.pd_irix5 tabosc4h~.pd_irix5
 
 .SUFFIXES: .pd_irix5
 
@@ -42,7 +42,7 @@ SGIINCLUDE =  -I../../../pd/src/
 
 # ----------------------- IRIX 6.x -----------------------
 
-pd_irix6: tabosc4c~.pd_irix6 tabread4c~.pd_irix6
+pd_irix6: tabosc4c~.pd_irix6 tabosc4cloop~.pd_irix6 tabread4c~.pd_irix6 tabosc4h~.pd_irix6
 
 .SUFFIXES: .pd_irix6
 
@@ -57,7 +57,7 @@ SGICFLAGS6 = -n32 -DPD -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
 
 # ----------------------- LINUX i386 -----------------------
 
-pd_linux: tabosc4c~.pd_linux tabread4c~.pd_linux  tabosc4cloop~.pd_linux
+pd_linux: tabosc4c~.pd_linux tabread4c~.pd_linux tabosc4cloop~.pd_linux tabosc4h~.pd_linux
 
 .SUFFIXES: .pd_linux
 
@@ -76,7 +76,7 @@ LINUXINCLUDE = -I../../../pd/src/
 # ----------------------- Mac OS X (Darwin) -----------------------
 
 
-pd_darwin:  tabosc4c~.pd_darwin tabread4c~.pd_darwin
+pd_darwin:  tabosc4cloop~.pd_darwin tabosc4h~.pd_darwin tabosc4c~.pd_darwin tabread4c~.pd_darwin
 
 .SUFFIXES: .pd_darwin
 

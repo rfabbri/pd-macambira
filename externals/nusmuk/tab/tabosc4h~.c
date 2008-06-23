@@ -1,6 +1,9 @@
-// tabosc4c~
+// tabosc4h~
 // can replace with tabosc4~
-// most of this code comes from pd. just the interpolation shematic is diferent.
+//
+// 99% comes from pd. just the interpolation shematic is diferent and comes from :
+// http://local.wasp.uwa.edu.au/~pbourke/other/interpolation/
+
 
 /* 
 This software is copyrighted by Miller Puckette and others.  The following
@@ -40,7 +43,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "m_pd.h"
 
-/******************** tabosc4c~ ***********************/
+/******************** tabosc4h~ ***********************/
 
 /* this is all copied from d_osc.c... what include file could this go in? */
 #define UNITBIT32 1572864.  /* 3*2^19; bit 32 has place value 1 */
@@ -85,15 +88,24 @@ THE POSSIBILITY OF SUCH DAMAGE.
 #define int32 int32_t
 #endif /* __unix__ or __APPLE__*/
 
+#ifndef min
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
+#ifndef max
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
+
 union tabfudge
 {
     double tf_d;
     int32 tf_i[2];
 };
 
-static t_class *tabosc4c_tilde_class;
+static t_class *tabosc4h_tilde_class;
 
-typedef struct _tabosc4c_tilde
+typedef struct _tabosc4h_tilde
 {
     t_object x_obj;
     t_float x_fnpoints;
@@ -103,11 +115,12 @@ typedef struct _tabosc4c_tilde
     t_float x_f;
     double x_phase;
     t_float x_conv;
-} t_tabosc4c_tilde;
+	t_float x_tension;
+} t_tabosc4h_tilde;
 
-static void *tabosc4c_tilde_new(t_symbol *s)
+static void *tabosc4h_tilde_new(t_symbol *s, t_floatarg tension)
 {
-    t_tabosc4c_tilde *x = (t_tabosc4c_tilde *)pd_new(tabosc4c_tilde_class);
+    t_tabosc4h_tilde *x = (t_tabosc4h_tilde *)pd_new(tabosc4h_tilde_class);
     x->x_arrayname = s;
     x->x_vec = 0;
     x->x_fnpoints = 512.;
@@ -115,18 +128,20 @@ static void *tabosc4c_tilde_new(t_symbol *s)
     outlet_new(&x->x_obj, gensym("signal"));
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("ft1"));
     x->x_f = 0;
+	x->x_tension = min(1,max(-1,tension));
     return (x);
 }
 
-static t_int *tabosc4c_tilde_perform(t_int *w)
+static t_int *tabosc4h_tilde_perform(t_int *w)
 {
-    t_tabosc4c_tilde *x = (t_tabosc4c_tilde *)(w[1]);
+    t_tabosc4h_tilde *x = (t_tabosc4h_tilde *)(w[1]);
     t_sample *in = (t_sample *)(w[2]);
     t_sample *out = (t_sample *)(w[3]);
     int n = (int)(w[4]);
     int normhipart;
     union tabfudge tf;
-    double a0,a1,a2; // CH
+    double a0,a1,a2,a3; // CH
+    double m0,m1,mu,mu2,mu3; // CH
     t_float fnpoints = x->x_fnpoints;
     int mask = fnpoints - 1;
     t_float conv = fnpoints * x->x_conv;
@@ -152,15 +167,25 @@ static t_int *tabosc4c_tilde_perform(t_int *w)
         b = addr[1].w_float;
         c = addr[2].w_float;
         d = addr[3].w_float;
-//        cminusb = c-b;
-//        *out++ = b + frac * (
-//			cminusb - 0.1666667f * (1.-frac) * ( 
-//				(d - a - 3.0f * cminusb) * frac + (d + 2.0f*a - 3.0f*b) ) );
+ //       cminusb = c-b;
+ //       *out++ = b + frac * (cminusb - 0.1666667f * (1.-frac) * ( (d - a - 3.0f * cminusb) * frac + (d + 2.0f*a - 3.0f*b) ) );
 // CH
-	a0 = d - c - a + b;
-	a1 = a - b - a0;
-	a2 = c - a;
-    *out++ = ((a0*frac+a1)*frac+a2)*frac+b;
+	mu = frac;
+	mu2 = mu * mu;
+	mu3 = mu2 * mu;
+
+    m0  = (b-a)*(1-x->x_tension)/2;
+    m0 += (c-b)*(1-x->x_tension)/2;
+    m1  = (c-b)*(1-x->x_tension)/2;
+    m1 += (d-c)*(1-x->x_tension)/2;
+
+    a0 =  2*mu3 - 3*mu2 + 1;
+    a1 =    mu3 - 2*mu2 + mu;
+    a2 =    mu3 -   mu2;
+    a3 = -2*mu3 + 3*mu2;
+ 
+   *out++ = a0*b+a1*m0+a2*m1+a3*c;
+
     }
 #endif
 
@@ -176,7 +201,7 @@ static t_int *tabosc4c_tilde_perform(t_int *w)
     return (w+5);
 }
 
-void tabosc4c_tilde_set(t_tabosc4c_tilde *x, t_symbol *s)
+void tabosc4h_tilde_set(t_tabosc4h_tilde *x, t_symbol *s)
 {
     t_garray *a;
     int npoints, pointsinarray;
@@ -185,12 +210,12 @@ void tabosc4c_tilde_set(t_tabosc4c_tilde *x, t_symbol *s)
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))
     {
         if (*s->s_name)
-            pd_error(x, "tabosc4c~: %s: no such array", x->x_arrayname->s_name);
+            pd_error(x, "tabosc4h~: %s: no such array", x->x_arrayname->s_name);
         x->x_vec = 0;
     }
     else if (!garray_getfloatwords(a, &pointsinarray, &x->x_vec))
     {
-        pd_error(x, "%s: bad template for tabosc4c~", x->x_arrayname->s_name);
+        pd_error(x, "%s: bad template for tabosc4h~", x->x_arrayname->s_name);
         x->x_vec = 0;
     }
     else if ((npoints = pointsinarray - 3) != (1 << ilog2(pointsinarray - 3)))
@@ -208,31 +233,38 @@ void tabosc4c_tilde_set(t_tabosc4c_tilde *x, t_symbol *s)
     }
 }
 
-static void tabosc4c_tilde_ft1(t_tabosc4c_tilde *x, t_float f)
+static void tabosc4h_tilde_ft1(t_tabosc4h_tilde *x, t_float f)
 {
     x->x_phase = f;
 }
 
-static void tabosc4c_tilde_dsp(t_tabosc4c_tilde *x, t_signal **sp)
+static void tabosc4h_tilde_tension(t_tabosc4h_tilde *x, t_float f)
+{
+    x->x_tension = min(1,max(-1,f));
+}
+
+static void tabosc4h_tilde_dsp(t_tabosc4h_tilde *x, t_signal **sp)
 {
     x->x_conv = 1. / sp[0]->s_sr;
-    tabosc4c_tilde_set(x, x->x_arrayname);
+    tabosc4h_tilde_set(x, x->x_arrayname);
 
-    dsp_add(tabosc4c_tilde_perform, 4, x,
+    dsp_add(tabosc4h_tilde_perform, 4, x,
         sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 
-void tabosc4c_tilde_setup(void)
+void tabosc4h_tilde_setup(void)
 {
-    tabosc4c_tilde_class = class_new(gensym("tabosc4c~"),
-        (t_newmethod)tabosc4c_tilde_new, 0,
-        sizeof(t_tabosc4c_tilde), 0, A_DEFSYM, 0);
-    CLASS_MAINSIGNALIN(tabosc4c_tilde_class, t_tabosc4c_tilde, x_f);
-    class_addmethod(tabosc4c_tilde_class, (t_method)tabosc4c_tilde_dsp,
+    tabosc4h_tilde_class = class_new(gensym("tabosc4h~"),
+        (t_newmethod)tabosc4h_tilde_new, 0,
+        sizeof(t_tabosc4h_tilde), 0, A_DEFSYM, A_DEFFLOAT, 0);
+    CLASS_MAINSIGNALIN(tabosc4h_tilde_class, t_tabosc4h_tilde, x_f);
+    class_addmethod(tabosc4h_tilde_class, (t_method)tabosc4h_tilde_dsp,
         gensym("dsp"), 0);
-    class_addmethod(tabosc4c_tilde_class, (t_method)tabosc4c_tilde_set,
+    class_addmethod(tabosc4h_tilde_class, (t_method)tabosc4h_tilde_set,
         gensym("set"), A_SYMBOL, 0);
-    class_addmethod(tabosc4c_tilde_class, (t_method)tabosc4c_tilde_ft1,
+    class_addmethod(tabosc4h_tilde_class, (t_method)tabosc4h_tilde_ft1,
         gensym("ft1"), A_FLOAT, 0);
+    class_addmethod(tabosc4h_tilde_class, (t_method)tabosc4h_tilde_tension,
+        gensym("tension"), A_FLOAT, 0);
 }
 

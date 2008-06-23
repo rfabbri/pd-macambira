@@ -1,7 +1,7 @@
-#N canvas 106 72 743 605 10;
+#N canvas 252 101 743 661 10;
 #N canvas 0 0 450 300 (subpatch) 0;
-#X array array99 10 float 0;
-#X coords 0 1 9 -1 250 200 1;
+#X array array99 11 float 0;
+#X coords 0 1 10 -1 250 200 1;
 #X restore 461 80 graph;
 #X obj 69 195 line~;
 #X obj 36 139 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
@@ -23,11 +23,12 @@
 #X array test_cubic 44100 float 0;
 #X coords 0 1 44099 -1 250 200 1;
 #X restore 34 312 graph;
-#X text 49 530 tabread4c~ is a drop in remplacement for tabrad4~ \,
-but offer a true 4 points cubic interpolation. So \, quality is better
-than the standart interpolation;
 #X msg 63 77 \; array99 resize 10 \; array99 0 -0.5 -0.5 -0.5 0.5 0.5
 0.5 -0.5 0 0 \; pd dsp 1 \;;
+#X text 43 531 tabread4c~ is a drop in remplacement for tabrad4~ \,
+but offer a 4 points cubic interpolation with tengent continuity. So
+\, in some case \, quality is better than the standart interpolation
+;
 #X connect 1 0 4 0;
 #X connect 2 0 3 0;
 #X connect 2 0 7 0;
@@ -40,4 +41,4 @@ than the standart interpolation;
 #X connect 7 0 6 0;
 #X connect 8 0 9 0;
 #X connect 11 0 2 0;
-#X connect 11 1 15 0;
+#X connect 11 1 14 0;

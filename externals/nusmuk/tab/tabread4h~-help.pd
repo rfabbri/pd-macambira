@@ -1,0 +1,33 @@
+#N canvas 413 327 814 475 10;
+#X text 27 173 signal input x(n);
+#X msg 727 51 \; pd dsp 0;
+#N canvas 0 0 450 300 (subpatch) 0;
+#X array array99 11 float 0;
+#X coords 0 1 10 -1 250 200 1;
+#X restore 514 173 graph;
+#X text 127 21 4-point-interpolating table lookup;
+#X msg 452 50 \; readout 1 \; array99 resize 10 \; array99 0 -0.5 -0.5
+-0.5 0.5 0.5 0.5 \; pd dsp 1 \;;
+#X msg 40 144 set array99;
+#X text 122 144 "set" message permits you to switch between arrays
+;
+#X text 145 194 creation argument initializes array name;
+#X text 509 27 click here to test;
+#X text 7 58 Tabread4~ is used to build samplers and other table lookup
+algorithms. The interpolation scheme is 4-point polynomial.;
+#X text 616 460 updated for Pd version 0.29;
+#X obj 15 120 line~;
+#X obj 149 87 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 458 6 table save1 44100;
+#X obj 16 224 tabwrite~ save1;
+#X floatatom 25 31 5 0 0 0 - - -;
+#X msg 15 97 0 \, 10 1000;
+#X obj 16 194 tabread4h~ array99;
+#X connect 5 0 17 0;
+#X connect 11 0 17 0;
+#X connect 12 0 16 0;
+#X connect 12 0 14 0;
+#X connect 15 0 11 0;
+#X connect 16 0 11 0;
+#X connect 17 0 14 0;

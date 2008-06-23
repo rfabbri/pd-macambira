@@ -65,8 +65,8 @@
 #X obj 41 92 tabosc4cloop~ array99;
 #X msg 251 39 \; array99 resize 8 \; array99 0 0 0 -0.5 -0.5 1 -1 0.5
 0.5 \; pd dsp 1 \;;
-#X text 42 346 just like tabosc4c~ \, but does not need to copy the
-last 3 point in the beggining. So \, table must be a power of 2;
+#X text 42 345 just like tabosc4c~ \, but does not need to copy the
+first 3 point in the end. So \, table must be a power of 2;
 #X connect 0 0 1 0;
 #X connect 1 0 9 0;
 #X connect 3 0 10 0;

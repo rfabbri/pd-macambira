@@ -1,4 +1,4 @@
-#N canvas 79 60 755 582 12;
+#N canvas 298 40 774 479 12;
 #X floatatom 41 42 9 0 0 0 - - -;
 #X obj 41 63 sig~ 100;
 #N canvas 0 0 450 300 (subpatch) 0;
@@ -77,9 +77,10 @@
 #X obj 178 123 tabosc4c~ array99;
 #X msg 437 75 \; array99 resize 11 \; array99 0 0 0 -0.5 -0.5 1 -1
 0.5 -1 0 0 0 \; pd dsp 1 \;;
-#X text 52 419 tabosc4c~ is a drop in remplacement for tabosc4~ \,
-but offer a true 4 points cubic interpolation. So \, quality is better
-than the standart interpolation;
+#X text 40 395 tabosc4c~ is a drop in remplacement for tabosc4~ \,
+but offer a 4 points cubic interpolation with tengent continuity. So
+\, in some case \, quality is better than the standart interpolation
+;
 #X connect 0 0 1 0;
 #X connect 1 0 9 0;
 #X connect 1 0 20 0;
