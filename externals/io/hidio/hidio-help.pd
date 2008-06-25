@@ -1,4 +1,4 @@
-#N canvas 219 36 843 580 10;
+#N canvas 207 22 843 580 10;
 #X floatatom 27 445 5 0 0 0 - - -;
 #X floatatom 83 445 5 0 0 0 - - -;
 #X obj 191 164 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 25
@@ -8,7 +8,7 @@
 #X symbolatom 544 377 15 0 0 1 event_type - -;
 #X obj 2 2 cnv 15 600 20 empty empty hidio 2 11 1 18 -233017 -66577
 0;
-#X text 224 324 outlet message format:;
+#X text 284 344 outlet message format:;
 #X msg 374 130 close;
 #X msg 374 109 refresh;
 #X text 435 107 refresh device list;
@@ -18,7 +18,7 @@
 #X text 473 557 $Author: eighthave $;
 #X text 425 33 !!! This software is very much alpha \, so any aspect
 of it could change without notice !!!;
-#X obj 9 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 66455
+#X obj 9 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
 #X floatatom 140 445 5 0 0 0 - - -;
 #X msg 374 151 print;
@@ -35,37 +35,37 @@ of it could change without notice !!!;
 #X floatatom 263 401 6 0 0 0 - - -;
 #X floatatom 313 401 6 0 0 0 - - -;
 #X floatatom 363 401 6 0 0 0 - - -;
-#X obj 39 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 133004
+#X obj 39 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
-#X obj 69 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 133004
+#X obj 69 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
-#X obj 99 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 66455
+#X obj 99 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
-#X obj 129 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-66455;
-#X obj 159 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-66455;
-#X obj 189 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-133004;
-#X obj 219 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-133004;
-#X obj 249 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-66455;
-#X obj 279 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-133004;
-#X obj 309 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-133004;
-#X obj 339 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-66455;
-#X obj 369 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-66455;
-#X obj 399 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-133004;
-#X obj 429 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-66455;
-#X obj 459 508 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
-66455;
-#X msg 25 155 debug 9;
+#X obj 129 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 159 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 189 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 219 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 249 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 279 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 309 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 339 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 369 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 399 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 429 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 459 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X msg 25 155 debug 0;
 #X msg 298 135 info;
 #N canvas 743 25 411 235 see 0;
 #N canvas 108 318 543 264 route 0;
@@ -188,14 +188,14 @@ IDs (it is not case sensitive):;
 #X connect 2 0 4 0;
 #X connect 7 0 4 0;
 #X restore 174 37 pd open by vendor/product ID;
-#X msg 225 309 button button_2 0 0;
+#X msg 285 329 key e 0 0;
 #X text 49 543 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #N canvas 162 133 570 420 serin 0;
-#X obj 209 61 cnv 15 15 15 empty \$0-debug-canvas 9 4 8 0 14 -233017
+#X obj 209 61 cnv 15 15 15 empty \$0-debug-canvas 0 4 8 0 14 -233017
 -1 0;
 #X obj 60 61 hradio 15 1 1 10 empty empty empty 0 -6 0 8 -261689 -1
--1 9;
+-1 0;
 #X obj 60 13 inlet;
 #X msg 200 202 label \$1;
 #X obj 200 180 makefilename %d;
@@ -220,10 +220,10 @@ IDs (it is not case sensitive):;
 #X coords 0 -1 1 1 165 17 1 60 60;
 #X restore 25 134 pd serin;
 #N canvas 162 133 570 420 serin 0;
-#X obj 286 61 cnv 15 30 15 empty \$0-open-canvas 6 4 8 0 14 -233017
+#X obj 286 61 cnv 15 30 15 empty \$0-open-canvas 1 4 8 0 14 -233017
 -1 0;
 #X obj 60 61 hradio 15 1 1 15 empty empty empty 0 -6 0 8 -225271 -1
--1 6;
+-1 1;
 #X obj 60 13 inlet;
 #X msg 200 202 label \$1;
 #X obj 200 180 makefilename %d;
@@ -249,12 +249,12 @@ IDs (it is not case sensitive):;
 #X restore 262 83 pd serin;
 #X obj 646 486 pddp/open all_about_hid;
 #X obj 306 244 hidio;
-#X obj 226 290 flatspace/prepend set;
+#X obj 286 310 flatspace/prepend set;
 #X obj 544 315 unpack symbol symbol float float;
 #X floatatom 683 336 2 0 0 1 instance - -;
 #X obj 65 368 route x y z rx ry rz slider dial;
 #X obj 10 314 route key relative absolute;
-#X text 218 341 [event_type event_code instance value(;
+#X text 278 361 [event_type event_code instance value(;
 #N canvas 0 22 454 304 remove 0;
 #X obj 134 12 inlet;
 #X obj 109 60 unpack symbol symbol float float;
@@ -267,9 +267,7 @@ IDs (it is not case sensitive):;
 #X connect 1 3 2 2;
 #X connect 2 0 3 0;
 #X connect 3 0 4 0;
-#X restore 10 293 pd remove instance numbers;
-#X obj 9 466 route a_key b_key c_key d_key e_key f_key g_key h_key
-i_key j_key k_key l_key m_key n_key o_key p_key;
+#X restore 99 272 pd remove instance numbers;
 #N canvas 114 93 487 366 raw 0;
 #X obj 144 45 inlet;
 #X obj 88 104 route DESKTOP;
@@ -297,11 +295,11 @@ i_key j_key k_key l_key m_key n_key o_key p_key;
 #X connect 8 0 11 0;
 #X connect 9 0 8 1;
 #X connect 10 0 9 0;
-#X restore 408 294 pd raw;
+#X restore 315 284 pd raw;
 #X floatatom 63 401 6 0 0 0 - - -;
-#X obj 455 295 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 362 285 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X msg 262 104 open 6;
+#X msg 262 104 open 1;
 #N canvas 766 107 771 427 output 0;
 #X obj 286 341 outlet;
 #X msg 112 70 255;
@@ -405,6 +403,87 @@ i_key j_key k_key l_key m_key n_key o_key p_key;
 #X msg 374 172 devices;
 #X msg 374 193 elements;
 #X text 437 194 print a list of elements for the current device;
+#X obj 9 478 route a b c d e f g h i j k l m n o p;
+#N canvas 840 22 558 266 key_0 0;
+#X obj 17 17 inlet;
+#X obj 17 54 route key;
+#X obj 17 86 route key_0;
+#X obj 17 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
+;
+#X obj 47 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 133004
+;
+#X obj 77 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 133004
+;
+#X obj 107 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 137 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 167 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 197 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 227 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 257 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 287 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 317 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 347 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 377 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 407 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 437 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 467 206 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 17 114 route 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 0;
+#X msg 381 142 0;
+#X text 177 31 On some platforms \, you key a duplicate set of key
+messages where the key type is key_0 and the value is the number of
+the key pressed.;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 2 0 19 0;
+#X connect 19 0 3 0;
+#X connect 19 1 4 0;
+#X connect 19 2 5 0;
+#X connect 19 3 6 0;
+#X connect 19 4 7 0;
+#X connect 19 5 8 0;
+#X connect 19 6 9 0;
+#X connect 19 7 10 0;
+#X connect 19 8 11 0;
+#X connect 19 9 12 0;
+#X connect 19 10 13 0;
+#X connect 19 11 14 0;
+#X connect 19 12 15 0;
+#X connect 19 13 16 0;
+#X connect 19 14 17 0;
+#X connect 19 15 18 0;
+#X connect 19 16 20 0;
+#X connect 20 0 3 0;
+#X connect 20 0 4 0;
+#X connect 20 0 18 0;
+#X connect 20 0 17 0;
+#X connect 20 0 16 0;
+#X connect 20 0 15 0;
+#X connect 20 0 14 0;
+#X connect 20 0 13 0;
+#X connect 20 0 12 0;
+#X connect 20 0 11 0;
+#X connect 20 0 10 0;
+#X connect 20 0 9 0;
+#X connect 20 0 8 0;
+#X connect 20 0 7 0;
+#X connect 20 0 6 0;
+#X connect 20 0 5 0;
+#X restore 103 293 pd key_0 key mapping;
+#X text 14 462 (following the USB standard \, US keycodes are used)
+;
 #X connect 2 0 57 0;
 #X connect 8 0 57 0;
 #X connect 9 0 57 0;
@@ -414,8 +493,8 @@ i_key j_key k_key l_key m_key n_key o_key p_key;
 #X connect 50 0 57 0;
 #X connect 51 0 57 0;
 #X connect 54 0 47 0;
-#X connect 55 0 69 0;
-#X connect 57 0 66 0;
+#X connect 55 0 68 0;
+#X connect 57 0 65 0;
 #X connect 57 0 59 0;
 #X connect 57 0 58 0;
 #X connect 57 0 64 0;
@@ -425,40 +504,41 @@ i_key j_key k_key l_key m_key n_key o_key p_key;
 #X connect 59 1 4 0;
 #X connect 59 2 60 0;
 #X connect 59 3 3 0;
-#X connect 61 0 67 0;
+#X connect 61 0 66 0;
 #X connect 61 1 26 0;
 #X connect 61 2 27 0;
 #X connect 61 3 28 0;
 #X connect 61 4 29 0;
 #X connect 61 5 30 0;
 #X connect 61 6 31 0;
-#X connect 62 0 65 0;
-#X connect 62 1 71 0;
+#X connect 62 0 76 0;
+#X connect 62 1 70 0;
 #X connect 62 2 61 0;
 #X connect 64 0 62 0;
-#X connect 65 0 16 0;
-#X connect 65 1 32 0;
-#X connect 65 2 33 0;
-#X connect 65 3 34 0;
-#X connect 65 4 35 0;
-#X connect 65 5 36 0;
-#X connect 65 6 37 0;
-#X connect 65 7 38 0;
-#X connect 65 8 39 0;
-#X connect 65 9 40 0;
-#X connect 65 10 41 0;
-#X connect 65 11 42 0;
-#X connect 65 12 43 0;
-#X connect 65 13 44 0;
-#X connect 65 14 45 0;
-#X connect 65 15 46 0;
-#X connect 68 0 66 1;
+#X connect 64 0 77 0;
+#X connect 67 0 65 1;
+#X connect 68 0 57 0;
 #X connect 69 0 57 0;
-#X connect 70 0 57 0;
-#X connect 71 0 0 0;
-#X connect 71 1 1 0;
-#X connect 71 2 17 0;
-#X connect 71 4 25 0;
-#X connect 71 5 72 0;
+#X connect 70 0 0 0;
+#X connect 70 1 1 0;
+#X connect 70 2 17 0;
+#X connect 70 4 25 0;
+#X connect 70 5 71 0;
+#X connect 73 0 57 0;
 #X connect 74 0 57 0;
-#X connect 75 0 57 0;
+#X connect 76 0 16 0;
+#X connect 76 1 32 0;
+#X connect 76 2 33 0;
+#X connect 76 3 34 0;
+#X connect 76 4 35 0;
+#X connect 76 5 36 0;
+#X connect 76 6 37 0;
+#X connect 76 7 38 0;
+#X connect 76 8 39 0;
+#X connect 76 9 40 0;
+#X connect 76 10 41 0;
+#X connect 76 11 42 0;
+#X connect 76 12 43 0;
+#X connect 76 13 44 0;
+#X connect 76 14 45 0;
+#X connect 76 15 46 0;

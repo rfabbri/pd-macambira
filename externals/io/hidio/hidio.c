@@ -45,7 +45,7 @@
 #define DEBUG(x)
 //#define DEBUG(x) x 
 
-unsigned short global_debug_level = 0;
+unsigned short global_debug_level = 0; /* high numbers means more messages */
 
 /*------------------------------------------------------------------------------
  *  GLOBAL VARIABLES
@@ -233,7 +233,6 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
         if(first_argument == _sym_nothing) 
 #endif /* PD */
         { // single float arg means device #
-            post("first_argument == &s_");
 #ifdef PD
             device_number = (short) atom_getfloatarg(0,argc,argv);
 #else
@@ -435,12 +434,13 @@ static void hidio_close(t_hidio *x)
 
  /* just to be safe, stop it first */
      hidio_stop_poll(x);
- 
+
      if(! hidio_close_device(x))
      {
          debug_post(LOG_INFO,"[hidio] closed device %d",x->x_device_number);
          x->x_device_open = 0;
      }
+     output_open_status(x);
 }
 
 
@@ -483,11 +483,12 @@ static void hidio_open(t_hidio *x, t_symbol *s, int argc, t_atom *argv)
             else
             {
                 x->x_device_number = -1;
-                error("[hidio] can not open device %d",new_device_number);
+                pd_error(x, "[hidio] can not open device %d",new_device_number);
             }
         }
     }
-    else debug_post(LOG_WARNING,"[hidio] device does not exist");
+    else 
+        debug_error(x, LOG_WARNING,"[hidio] device does not exist");
     /* always output open result so you can test for success in Pd space */
     output_open_status(x);
 }
@@ -605,7 +606,6 @@ static void *hidio_new(t_symbol *s, int argc, t_atom *argv)
 #endif /* PD */
 
     /* init vars */
-    global_debug_level = 9; /* high numbers here means see more messages */
     x->x_device_open = 0;
     x->x_started = 0;
     x->x_delay = DEFAULT_DELAY;
@@ -642,7 +642,6 @@ void hidio_setup(void)
 /* TODO: [print( should be dumped for [devices( and [elements( messages */
     class_addmethod(hidio_class,(t_method) hidio_devices,gensym("devices"),0);
     class_addmethod(hidio_class,(t_method) hidio_elements,gensym("elements"),0);
-    class_addmethod(hidio_class,(t_method) hidio_print,gensym("print"),0);
     class_addmethod(hidio_class,(t_method) hidio_info,gensym("info"),0);
     class_addmethod(hidio_class,(t_method) hidio_open,gensym("open"),A_GIMME,0);
     class_addmethod(hidio_class,(t_method) hidio_close,gensym("close"),0);
@@ -652,7 +651,7 @@ void hidio_setup(void)
     class_addmethod(hidio_class,(t_method) hidio_write_event, gensym("write"), A_GIMME ,0);
 
 
-    post("[hidio] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
+    post("[hidio] %d.%d: © 2004-2008 by Hans-Christoph Steiner & Olaf Matthes",
          HIDIO_MAJOR_VERSION, HIDIO_MINOR_VERSION);  
     post("\tcompiled on "__DATE__" at "__TIME__ " ");
     
@@ -748,7 +747,7 @@ int main()
     hidio_class = c;
 
     finder_addclass("Devices", "hidio");
-    post("hidio %d.%d: © 2006 by Hans-Christoph Steiner & Olaf Matthes",
+    post("hidio %d.%d: © 2004-2008 by Hans-Christoph Steiner & Olaf Matthes",
          HIDIO_MAJOR_VERSION, HIDIO_MINOR_VERSION);
     post("hidio: compiled on "__DATE__" at "__TIME__ " ");
     

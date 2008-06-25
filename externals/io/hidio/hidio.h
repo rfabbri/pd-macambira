@@ -44,7 +44,7 @@ typedef void t_clock;
 
 
 #define HIDIO_MAJOR_VERSION 0
-#define HIDIO_MINOR_VERSION 0
+#define HIDIO_MINOR_VERSION 1
 
 /* static char *version = "$Revision: 1.20 $"; */
 

@@ -865,19 +865,6 @@ void hidio_build_device_list(void)
 	debug_post(LOG_WARNING,"[hidio] completed device list.");
 }
 
-/* TODO: this should be dumped for [devices( and [elements( messages */
-void hidio_print(t_hidio *x)
-{
-	if( !HIDHaveDeviceList() ) hidio_build_device_list();
-	hidio_devices(x);
-	if(x->x_device_open) 
-	{
-		hidio_elements(x);
-		hidio_ff_print(x);
-	}
-}
-
-
 void hidio_platform_specific_free(t_hidio *x)
 {
 	int j;
