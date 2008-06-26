@@ -126,7 +126,7 @@ static t_int *tabosc4c_tilde_perform(t_int *w)
     int n = (int)(w[4]);
     int normhipart;
     union tabfudge tf;
-    double a0,a1,a2; // CH
+    double a3,a1,a2; // CH
     t_float fnpoints = x->x_fnpoints;
     int mask = fnpoints - 1;
     t_float conv = fnpoints * x->x_conv;
@@ -157,10 +157,17 @@ static t_int *tabosc4c_tilde_perform(t_int *w)
 //			cminusb - 0.1666667f * (1.-frac) * ( 
 //				(d - a - 3.0f * cminusb) * frac + (d + 2.0f*a - 3.0f*b) ) );
 // CH
-	a0 = d - c - a + b;
-	a1 = a - b - a0;
-	a2 = c - a;
-    *out++ = ((a0*frac+a1)*frac+a2)*frac+b;
+//	a0 = d - c - a + b;
+//	a1 = a - b - a0;
+//	a2 = c - a;
+//    *out++ = ((a0*frac+a1)*frac+a2)*frac+b;
+
+	// 4-point, 3rd-order Hermite (x-form)
+	a1 = 0.5f * (c - a);
+	a2 = a - 2.5 * b + 2.f * c - 0.5f * d;
+	a3 = 0.5f * (d - a) + 1.5f * (b - c);
+
+	*out++ =  ((a3 * frac + a2) * frac + a1) * frac + b;
     }
 #endif
 
