@@ -1,4 +1,4 @@
-#N canvas 207 22 843 580 10;
+#N canvas 213 77 843 580 10;
 #X floatatom 27 445 5 0 0 0 - - -;
 #X floatatom 83 445 5 0 0 0 - - -;
 #X obj 191 164 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 25
@@ -16,7 +16,7 @@
 #X text 266 557 released under the GNU GPL;
 #X text 472 544 $Revision: 1.6 $$Date: 2007-07-26 07:31:38 $;
 #X text 473 557 $Author: eighthave $;
-#X text 425 33 !!! This software is very much alpha \, so any aspect
+#X text 425 34 !!! This software is very much alpha \, so any aspect
 of it could change without notice !!!;
 #X obj 9 510 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
@@ -174,7 +174,7 @@ type vendorID productID;
 #X connect 16 0 5 0;
 #X connect 17 0 5 0;
 #X restore 203 59 pd open by device type;
-#N canvas 88 102 470 320 open 0;
+#N canvas 94 154 470 320 open 0;
 #X text 217 82 Gravis/Destroyer Tiltpad;
 #X msg 76 81 open 0x047D 0x4008;
 #X msg 73 53 open 0x046d 0xc01d;
@@ -184,9 +184,12 @@ type vendorID productID;
 IDs (it is not case sensitive):;
 #X text 221 111 Overtone CUI v1.0;
 #X msg 80 110 open 0x1043 0x0015;
+#X msg 84 139 open 0x06a3 0xff12;
+#X text 222 137 Saitek Cyborgforce;
 #X connect 1 0 4 0;
 #X connect 2 0 4 0;
 #X connect 7 0 4 0;
+#X connect 8 0 4 0;
 #X restore 174 37 pd open by vendor/product ID;
 #X msg 285 329 key e 0 0;
 #X text 49 543 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>

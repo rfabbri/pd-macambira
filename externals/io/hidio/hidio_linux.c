@@ -139,10 +139,9 @@ t_symbol* hidio_convert_linux_keys(__u16 linux_code)
 
 
 
-
-void hidio_print_element_list(t_hidio *x)
+void hidio_elements(t_hidio *x)
 {
-    debug_post(LOG_DEBUG,"hidio_print_element_list");
+    debug_post(LOG_DEBUG,"hidio_elements");
     unsigned long element_bitmask[EV_MAX][NBITS(KEY_MAX)];
     //    char event_type_string[256];
     //    char event_code_string[256];
@@ -263,9 +262,9 @@ void hidio_print_element_list(t_hidio *x)
 }
 
 
-void hidio_print_device_list(void)
+void hidio_devices(t_hidio *x)
 {
-    debug_post(LOG_DEBUG,"hidio_print_device_list");
+    debug_post(LOG_DEBUG,"hidio_devices");
     int i,fd;
     char device_output_string[MAXPDSTRING] = "Unknown";
     char dev_handle_name[MAXPDSTRING] = "/dev/input/event0";
@@ -307,77 +306,79 @@ static void hidio_build_element_list(t_hidio *x)
     t_hid_element *new_element = NULL;
     t_int i, j;
   
+    if( x->x_fd < 0 ) 
+        return;
+
     element_count[x->x_device_number] = 0;
-    if( x->x_fd ) 
-	{
-	    /* get bitmask representing supported elements (axes, keys, etc.) */
-	    memset(element_bitmask, 0, sizeof(element_bitmask));
-	    if( ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), element_bitmask[0]) < 0 )
-		perror("[hidio] error: evdev ioctl: element_bitmask");
-	    memset(abs_bitmask, 0, sizeof(abs_bitmask));
-	    if( ioctl(x->x_fd, EVIOCGBIT(EV_ABS, sizeof(abs_bitmask)), abs_bitmask) < 0 ) 
-		perror("[hidio] error: evdev ioctl: abs_bitmask");
-	    for( i = 1; i < EV_MAX; i++ ) 
-		{
-		    if(test_bit(i, element_bitmask[0])) 
-			{
-			    /* get bitmask representing supported button types */
-			    ioctl(x->x_fd, EVIOCGBIT(i, KEY_MAX), element_bitmask[i]);
-			    /* cycle through all possible event codes (axes, keys, etc.) 
-			     * testing to see which are supported.
-			     * i = i   j = j
-			     */
-			    for(j = 0; j < KEY_MAX; j++) 
-				{
-				    new_element = getbytes(sizeof(t_hid_element));
-				    if( (i == EV_ABS) && (test_bit(j, abs_bitmask)) )
-					{
-					    /* this means that the bit is set in the axes list */
-					    if(ioctl(x->x_fd, EVIOCGABS(j), &abs_features)) 
-						perror("evdev EVIOCGABS ioctl");
-					    new_element->min = abs_features.minimum;
-					    new_element->max = abs_features.maximum;
-					}
-				    else
-					{
-					    new_element->min = 0;
-					    new_element->max = 0;
-					}
-				    if(test_bit(j, element_bitmask[i])) 
-					{
-					    new_element->linux_type = i; /* the int from linux/input.h */
-					    new_element->type = gensym(ev[i] ? ev[i] : "?"); /* the symbol */
-					    new_element->linux_code = j;
-					    if((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
-						{
-						    new_element->name = hidio_convert_linux_buttons_to_numbers(j);
-						}
-					    else
-						{
-						    new_element->name = gensym(event_names[i][j] ? event_names[i][j] : "?");
-						}
-					    if( i == EV_REL )
-						new_element->relative = 1;
-					    else
-						new_element->relative = 0;
-					    SETSYMBOL(new_element->output_message, new_element->name); 
-					    SETFLOAT(new_element->output_message + 1, new_element->instance);
-					    // fill in the t_hid_element struct here
-					    post("x->x_device_number: %d   element_count[]: %d",
-						 x->x_device_number, element_count[x->x_device_number]);
-					    post("linux_type/linux_code: %d/%d  type/name: %s/%s    max: %d   min: %d ", 
-						 new_element->linux_type, new_element->linux_code, 
-						 new_element->type->s_name, new_element->name->s_name,
-						 new_element->max, new_element->min);
-					    post("\tpolled: %d   relative: %d",
-						 new_element->polled, new_element->relative);
-					    element[x->x_device_number][element_count[x->x_device_number]] = new_element;
-					    ++element_count[x->x_device_number];
-					}
-				}
-			}        
-		}
-	}
+
+    /* get bitmask representing supported elements (axes, keys, etc.) */
+    memset(element_bitmask, 0, sizeof(element_bitmask));
+    if( ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), element_bitmask[0]) < 0 )
+        perror("[hidio] error: evdev ioctl: element_bitmask");
+    memset(abs_bitmask, 0, sizeof(abs_bitmask));
+    if( ioctl(x->x_fd, EVIOCGBIT(EV_ABS, sizeof(abs_bitmask)), abs_bitmask) < 0 ) 
+        perror("[hidio] error: evdev ioctl: abs_bitmask");
+    for( i = 1; i < EV_MAX; i++ ) 
+    {
+        if(test_bit(i, element_bitmask[0])) 
+        {
+            /* get bitmask representing supported elements */
+            ioctl(x->x_fd, EVIOCGBIT(i, KEY_MAX), element_bitmask[i]);
+            /* cycle through all possible event codes (axes, keys, etc.) 
+             * testing to see which are supported.
+             */
+            for(j = 0; j < KEY_MAX; j++) 
+            {
+                if(test_bit(j, element_bitmask[i])) 
+                {
+                    new_element = getbytes(sizeof(t_hid_element));
+                    if( (i == EV_ABS) && (j < ABS_MAX) && (test_bit(j, abs_bitmask)) )
+                    {
+                        if(ioctl(x->x_fd, EVIOCGABS(j), &abs_features) < 0) 
+                        {
+                            post("[hidio]: EVIOCGABS ioctl error for element: 0x%03x", j, j);
+                            perror("[hidio]: EVIOCGABS ioctl error:");
+                        }
+                        new_element->min = abs_features.minimum;
+                        new_element->max = abs_features.maximum;
+                    }
+                    else
+                    {
+                        new_element->min = 0;
+                        new_element->max = 0;
+                    }
+                    new_element->linux_type = i; /* the int from linux/input.h */
+                    new_element->type = gensym(ev[i] ? ev[i] : "?"); /* the symbol */
+                    new_element->linux_code = j;
+                    if((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
+                    {
+                        new_element->name = hidio_convert_linux_buttons_to_numbers(j);
+                    }
+                    else
+                    {
+                        new_element->name = gensym(event_names[i][j] ? event_names[i][j] : "?");
+                    }
+                    if( i == EV_REL )
+                        new_element->relative = 1;
+                    else
+                        new_element->relative = 0;
+                    SETSYMBOL(new_element->output_message, new_element->name);
+                    SETFLOAT(new_element->output_message + 1, new_element->instance);
+                    // fill in the t_hid_element struct here
+                    post("x->x_device_number: %d   element_count[]: %d",
+                         x->x_device_number, element_count[x->x_device_number]);
+                    post("linux_type/linux_code: %d/%d  type/name: %s/%s    max: %d   min: %d ",
+                         new_element->linux_type, new_element->linux_code,
+                         new_element->type->s_name, new_element->name->s_name,
+                         new_element->max, new_element->min);
+                    post("\tpolled: %d   relative: %d",
+                         new_element->polled, new_element->relative);
+                    element[x->x_device_number][element_count[x->x_device_number]] = new_element;
+                    ++element_count[x->x_device_number];
+                }
+            }
+        }        
+    }
 }
 
 /* ------------------------------------------------------------------------------ */
@@ -407,8 +408,8 @@ void hidio_get_events(t_hidio *x)
 		    for( i=0; i < element_count[x->x_device_number]; ++i )
 			{
 			    output_element = element[x->x_device_number][i];
-			    if( (hidio_input_event.type == output_element->linux_type) && \
-				(hidio_input_event.code == output_element->linux_code) )
+			    if( (hidio_input_event.code == output_element->linux_code) && \
+                    (hidio_input_event.type == output_element->linux_type) )
 				{
 				    output_element->value = hidio_input_event.value;
 				    debug_post(9,"i: %d  linux_type: %d  linux_code: %d", i, 
@@ -430,12 +431,6 @@ void hidio_get_events(t_hidio *x)
     return;
 }
 
-
-void hidio_print(t_hidio* x)
-{
-    hidio_print_device_list();
-    hidio_print_element_list(x);
-}
 
 void hidio_write_packet(void)
 {
@@ -582,7 +577,7 @@ void hidio_platform_specific_info(t_hidio* x)
     char productid_string[7];
     t_atom *output_atom = getbytes(sizeof(t_atom));
   
-    ioctl(x->x_fd, EVIOCGID);
+    ioctl(x->x_fd, EVIOCGID, &my_id);
     snprintf(vendorid_string,7,"0x%04x", my_id.vendor);
     SETSYMBOL(output_atom, gensym(vendorid_string));
     outlet_anything( x->x_status_outlet, gensym("vendorID"), 
@@ -601,6 +596,23 @@ void hidio_platform_specific_info(t_hidio* x)
         
 short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
 {
+	int i, fd;
+    char dev_handle_name[FILENAME_MAX];
+    struct input_id my_id;
+
+	for(i=0;i<MAX_DEVICES;++i) 
+    {
+        snprintf(dev_handle_name, FILENAME_MAX, "/dev/input/event%d", i);
+		/* open the device read-only, non-exclusive */
+		fd = open (dev_handle_name, O_RDONLY | O_NONBLOCK);
+		/* test if device open */
+		if(fd > -1 ) 
+		{
+			ioctl(fd, EVIOCGID, &my_id);
+			if( (vendor_id == my_id.vendor) && (product_id == my_id.product) )
+				return i;
+		}
+	}
     
     return -1;
 }
@@ -611,23 +623,6 @@ short get_device_number_from_usage(short device_number,
 {
 
     return -1;
-}
-
-void hidio_write_event_symbol_int(t_hidio *x, t_symbol *type, t_int code, 
-                                    t_int instance, t_int value)
-{
-	debug_post(LOG_DEBUG,"hidio_write_event_symbol_int");
-}
-void hidio_write_event_symbols(t_hidio *x, t_symbol *type, t_symbol *code, 
-                              t_int instance, t_int value)
-{
-	debug_post(LOG_DEBUG,"hidio_write_event_symbols");
-}
-
-void hidio_write_event_ints(t_hidio *x, t_int type, t_int code, 
-                              t_int instance, t_int value)
-{
-	debug_post(LOG_DEBUG,"hidio_write_event_ints");
 }
 
 void hidio_write_event_JMZ(t_hidio *x, t_symbol *type, t_symbol *code, 
