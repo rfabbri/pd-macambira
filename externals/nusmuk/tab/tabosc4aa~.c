@@ -143,13 +143,13 @@ static t_int *tabosc4aa_tilde_perform(t_int *w)
 #if 1
     while (n--)
     {
-        t_sample frac,  a,  b,  c,  d, cminusb, temp, filter_out;
+        t_sample frac,  a,  b,  c,  d, cminusb, temp, sum, filter_out;
 
-		temp = 0;
-		for (i=0;i<8;i++)
+		sum = 0;
+		for (i=0;i<4;i++)
 		{
 	        tf.tf_d = dphase;
-    	    dphase += *in/8 * conv;
+    	    dphase += *in/4 * conv;
     	    addr = tab + (tf.tf_i[HIOFFSET] & mask);
     	    tf.tf_i[HIOFFSET] = normhipart;
     	    frac = tf.tf_d - UNITBIT32;
@@ -168,15 +168,16 @@ static t_int *tabosc4aa_tilde_perform(t_int *w)
 //			temp = cut_filter(x, temp);
 //	t_sample filter_out;
 
-			filter_out = 0.0147491 * temp + 0.0294982 * x->x_last_in + 0.0147491 * x->x_prev_in + 1.60425 * x->x_last_out - 0.663244 * x->x_prev_out; 
+			filter_out = 0.0603297 * temp + 0.120659 * x->x_last_in + 0.0603297 * x->x_prev_in + 1.1565 * x->x_last_out - 0.397817 * x->x_prev_out; 
 
 			x->x_prev_in = x->x_last_in;
 			x->x_last_in = temp;
 			x->x_prev_out = x->x_last_out;
 			x->x_last_out = filter_out;
+			sum += filter_out;
 
 		}
-		*out++ = filter_out;
+		*out++ = sum/4;
 		*in++;
     }
 #endif
