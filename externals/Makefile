@@ -138,7 +138,7 @@ else
     LIB_TARGETS += hid pdp pidip gem2pdp aka.wiiremote iem16 apple
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip gem2pdp hdspm_mixer iem16 postlude tclpd pdvjtools
+    LIB_TARGETS += hid pdp pidip gem2pdp hdspm_mixer iem16 postlude tclpd pdvjtools sixaxis
   endif
 endif
 
@@ -2281,6 +2281,40 @@ sigpack_clean:
 	-rm -f -- $(externals_src)/sigpack/source/*.o
 	-rm -f -- $(externals_src)/sigpack/*/*.bak
 	-rm -f -- $(externals_src)/sigpack/*/*.*~
+
+
+#------------------------------------------------------------------------------#
+# SIXAXIS
+SIXAXIS_NAME=io
+SIXAXIS_OBJECTS = $(externals_src)/io/sixaxis/sixaxis.c
+sixaxis: $(SIXAXIS_OBJECTS:.c=.$(EXTENSION))
+
+sixaxis_install: sixaxis
+	install -d $(objectsdir)/$(SIXAXIS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(SIXAXIS_NAME) \
+		--author "Hans-Christoph Steiner" \
+		--description "supports the Sony SIXAXIS controller's accelerometer" \
+		--license "GNU GPL" \
+		--version "0.1"
+	install -p $(SIXAXIS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(SIXAXIS_NAME)
+	install -d $(helpdir)/$(SIXAXIS_NAME)
+	install -p $(externals_src)/io/sixaxis/*.pd \
+		$(helpdir)/$(SIXAXIS_NAME)
+#	install -d $(manualsdir)/$(SIXAXIS_NAME)
+#	install -p $(externals_src)/io/sixaxis/manual.txt \
+#		$(manualsdir)/$(SIXAXIS_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/io/sixaxis/README \
+#		$(readmesdir)/$(SIXAXIS_NAME).txt
+#	install -d $(examplesdir)/$(SIXAXIS_NAME)
+#	install -p $(externals_src)/io/sixaxis/examples/*.pd \
+#		$(examplesdir)/$(SIXAXIS_NAME)
+
+sixaxis_clean:
+	-rm -f -- $(SIXAXIS_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(SIXAXIS_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/io/sixaxis/*.bak
+	-rm -f -- $(externals_src)/io/sixaxis/*.*~
 
 
 #------------------------------------------------------------------------------#
