@@ -57,6 +57,9 @@ in theory this should be enough to allow you access to your dmx devices
 the next time you load a dmx-driver 
 if you have problems, try plugging your device out and in again
 
+if you don't care for a clean setup, you could also just grant everyone read/write permissions.
+this might be a security risk.
+
 
 C. compiling the Pd-objects
 ===========================
