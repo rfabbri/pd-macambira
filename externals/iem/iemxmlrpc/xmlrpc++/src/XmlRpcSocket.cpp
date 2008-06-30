@@ -22,6 +22,8 @@ extern "C" {
 # include <netdb.h>
 # include <errno.h>
 # include <fcntl.h>
+
+# include <string.h>
 }
 #endif  // _WINDOWS
 
