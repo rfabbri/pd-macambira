@@ -33,9 +33,9 @@
 
 
 #define DMX4PD_POSTBANNER                                               \
-  {                                                                     \
+  do {									\
     post("DMX4PD ("DMX4PD_VERSION"): (c) 2008 IOhannes m zmölnig - iem @ kug"); \
-  }
+  } while(0)
 
 
 #endif /* INCLUDE_DMX4PD_H__ */

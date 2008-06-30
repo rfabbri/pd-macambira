@@ -65,6 +65,7 @@ static void dmxout_open(t_dmxout*x, t_symbol*s_devname)
 
   //  strncpy(args[0], "--dmx", MAXPDSTRING);
   //  strncpy(args[1], devname, MAXPDSTRING);
+  verbose(2, "[dmxout]: trying to open '%s'", args[1]);
   devname=DMXdev(&argc, argv);
   if(!devname){
   	pd_error(x, "couldn't find DMX device");
@@ -77,6 +78,8 @@ static void dmxout_open(t_dmxout*x, t_symbol*s_devname)
   if(fd!=-1) {
     dmxout_close(x);
     x->x_device=fd;
+  } else {
+    error("failed to open DMX-device '%s'",devname);
   }
 }
 
@@ -217,12 +220,17 @@ static void *dmxout_free(t_dmxout*x)
 
 void dmxout_setup(void)
 {
+#ifdef DMX4PD_POSTBANNER
+  DMX4PD_POSTBANNER;
+#endif
+
   dmxout_class = class_new(gensym("dmxout"), (t_newmethod)dmxout_new, (t_method)dmxout_free,
                            sizeof(t_dmxout), 
                            0,
                            A_GIMME, A_NULL);
 
   class_addfloat(dmxout_class, dmxout_float);
+  class_addmethod(dmxout_class, (t_method)dmxout_open, gensym("open"), A_SYMBOL, A_NULL);
 
   dmxout_class2 = class_new(gensym("dmxout"), (t_newmethod)dmxout_new, (t_method)dmxout_free,
 			    sizeof(t_dmxout), 
@@ -235,7 +243,5 @@ void dmxout_setup(void)
   class_addmethod(dmxout_class2, (t_method)dmxout_port, gensym("port"), 
 		  A_FLOAT, A_DEFFLOAT, A_NULL);
 
-#ifdef DMX4PD_POSTBANNER
-  DMX4PD_POSTBANNER
-#endif
+  class_addmethod(dmxout_class2, (t_method)dmxout_open, gensym("open"), A_SYMBOL, A_NULL);
 }
