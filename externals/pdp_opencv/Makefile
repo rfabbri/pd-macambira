@@ -1,16 +1,61 @@
-current: all
+PD_DIR = ../../pd
+PDP_DIR = ../pdp
 
-include Makefile.config
+GEM_OPENCV_VERSION = 0.1
 
-PDP_MOD = pdp_opencv_threshold.o pdp_opencv_edge.o pdp_opencv_distrans.o pdp_opencv_laplace.o pdp_opencv_motempl.o pdp_opencv_morphology.o pdp_opencv_haarcascade.o pdp_opencv_contours_convexity.o pdp_opencv_contours_boundingrect.o pdp_opencv_bgsubstract.o pdp_opencv_lk.o pdp_opencv_floodfill.o pdp_opencv.o 
+# build flags
+
+INCLUDES =  -I$(PD_DIR)/src -I.  -I$(PDP_DIR)/include -I$(PD_DIR)/src
+CPPFLAGS  = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
+    -Wall -W -Wno-unused -Wno-parentheses -Wno-switch \
+    -DGEM_OPENCV_VERSION=\"$(GEM_OPENCV_VERSION)\" -g
 
 
-# build basic image processing modules (derived from base class)
-all: $(PDP_MOD)
-	$(CC) -export_dynamic -shared -o pdp_opencv.pd_linux *.o $(PDP_LIBS) `pkg-config --cflags --libs opencv`
+UNAME := $(shell uname -s)
+ifeq ($(UNAME),Linux)
+ INCLUDES += `pkg-config --cflags opencv`
+ LDFLAGS =  -export_dynamic -shared
+ LIBS = `pkg-config --libs opencv`
+ EXTENSION = pd_linux
+endif
+ifeq ($(UNAME),Darwin)
+ OPENCV_DIR = ../pix_opencv/opencv-1.0.0
+ INCLUDES += -I$(OPENCV_DIR)/cv/include -I$(OPENCV_DIR)/cxcore/include -I$(OPENCV_DIR)/cvaux/include -I/sw/include
+ LDFLAGS =  -bundle -undefined dynamic_lookup
+ LIBS =  -lm $(OPENCV_DIR)/build/cv/src/.libs/lib_cv.a -L/sw/lib
+ EXTENSION = pd_darwin
+endif
+ifeq (MINGW,$(findstring MINGW,$(UNAME)))
+ OPENCV_DIR = opencv-1.0.0
+ INCLUDES += -I$(OPENCV_DIR)/cv/include -I$(OPENCV_DIR)/cxcore/include -I$(OPENCV_DIR)/cvaux/include
+ CPPFLAGS += -mms-bitfields -DMSW -DNT $(WINDOWS_HACKS)
+ LDFLAGS += -shared
+ LIBS = -L$(pd_src)/bin -L$(pd_src)/obj -lpd -lkernel32 -luser32 -lgdi32 \
+	-lm $(OPENCV_DIR)/build/cv/src/.libs/lib_cv.a
+endif
+
+.SUFFIXES = $(EXTENSION)
+
+SOURCES = pdp_opencv_threshold.c pdp_opencv_edge.c pdp_opencv_distrans.c pdp_opencv_laplace.c pdp_opencv_motempl.c pdp_opencv_morphology.c pdp_opencv_haarcascade.c pdp_opencv_contours_convexity.c pdp_opencv_contours_boundingrect.c pdp_opencv_bgsubstract.c pdp_opencv_lk.c pdp_opencv_floodfill.c
+
+all: $(SOURCES:.c=.$(EXTENSION))
+
+%.$(EXTENSION): %.o
+	gcc $(LDFLAGS) -o $*.$(EXTENSION) $*.o $(LIBS)
+
+.cc.o:
+	g++ $(CPPFLAGS) $(INCLUDES) -o $*.o -c $*.cc
+
+.c.o:
+	gcc $(CPPFLAGS) $(INCLUDES) -o $*.o -c $*.c
+
+install:
+	cp -f --remove-destination *.pd $(PD_DIR)/doc/5.reference
 
 clean:
-	rm -f *~
-	rm -f *.o
-	rm -f *.pd_linux
+	rm -f pix_opencv*.o
+	rm -f pix_opencv*.$(EXTENSION)
+
+distro: clean all
+	rm *.o
 
