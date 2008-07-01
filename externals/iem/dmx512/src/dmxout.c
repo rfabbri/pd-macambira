@@ -23,6 +23,8 @@
 static t_class *dmxout_class;
 static t_class *dmxout_class2;
 
+#define NUM_DMXVALUES 512
+
 typedef struct _dmxout
 {
   t_object x_obj;
@@ -33,14 +35,14 @@ typedef struct _dmxout
   t_float  x_port;
   int  x_portrange;
 
-  dmx_t x_values[512];
+  dmx_t x_values[NUM_DMXVALUES];
 
 } t_dmxout;
 
 static void dmxout_clearbuf(t_dmxout*x)
 {
   int i=0;
-  for(i=0; i<512; i++) x->x_values[i]=0;
+  for(i=0; i<NUM_DMXVALUES; i++) x->x_values[i]=0;
 }
 
 static void dmxout_close(t_dmxout*x)
@@ -83,7 +85,7 @@ static void dmxout_open(t_dmxout*x, t_symbol*s_devname)
   }
 }
 
-static void dmxout_doout(t_dmxout*x, dmx_t values[512])
+static void dmxout_doout(t_dmxout*x, dmx_t values[NUM_DMXVALUES])
 {
   int i;
   if(x->x_device<=0) {
@@ -91,14 +93,14 @@ static void dmxout_doout(t_dmxout*x, dmx_t values[512])
     return;
   }
 #if 0
-  for(i=0; i<512; i++) {
+  for(i=0; i<NUM_DMXVALUES; i++) {
     post("dmx[%d]=%03d", i, values[i]);
   }
   endpost();
 #endif
 
   lseek (x->x_device, 0, SEEK_SET);  /* set to the current channel */
-  write (x->x_device, values, 512); /* write the channel */
+  write (x->x_device, values, NUM_DMXVALUES); /* write the channel */
 }
 
 static void dmxout_doout1(t_dmxout*x, short port, unsigned char value)
@@ -117,8 +119,8 @@ static void dmxout_float(t_dmxout*x, t_float f)
     pd_error(x, "value %f out of bounds [0..255]", f);
     return;
   }
-  if(x->x_port<0. || x->x_port>512.) {
-    pd_error(x, "port %f out of bounds [0..512]", x->x_port);
+  if(x->x_port<0. || x->x_port>NUM_DMXVALUES) {
+    pd_error(x, "port %f out of bounds [0..%d]", x->x_port, NUM_DMXVALUES);
     return;
   }
 
@@ -132,9 +134,9 @@ static void dmxout_list(t_dmxout*x, t_symbol*s, int argc, t_atom*argv)
   int errors=0;
 
   int port=x->x_port;
-  if((port+count)>=512) {
-    if(count>512)count=512;
-    port=512-count;
+  if((port+count)>=NUM_DMXVALUES) {
+    if(count>NUM_DMXVALUES)count=NUM_DMXVALUES;
+    port=NUM_DMXVALUES-count;
   }
 
   dmxout_clearbuf(x);
@@ -162,8 +164,8 @@ static void dmxout_port(t_dmxout*x, t_float f_baseport, t_floatarg f_portrange)
   short portrange=(short)f_portrange;
 
 
-  if(baseport<0 || baseport>=512) {
-    pd_error(x, "port %f out of bounds [0..512]", f_baseport);
+  if(baseport<0 || baseport>=NUM_DMXVALUES) {
+    pd_error(x, "port %f out of bounds [0..%d]", f_baseport, NUM_DMXVALUES);
     baseport =0;
   }
   x->x_port = baseport;
@@ -175,9 +177,9 @@ static void dmxout_port(t_dmxout*x, t_float f_baseport, t_floatarg f_portrange)
     portrange=x->x_portrange;
   }
 
-  if (baseport+portrange>512) {
-    pd_error(x, "upper port exceeds 512! clamping");
-    portrange=512-baseport;
+  if (baseport+portrange>NUM_DMXVALUES) {
+    pd_error(x, "upper port exceeds %d! clamping", NUM_DMXVALUES);
+    portrange=NUM_DMXVALUES-baseport;
   }
   x->x_portrange=portrange;
 }
