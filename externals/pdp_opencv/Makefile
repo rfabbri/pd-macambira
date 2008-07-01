@@ -19,7 +19,8 @@ ifeq ($(UNAME),Linux)
  EXTENSION = pd_linux
 endif
 ifeq ($(UNAME),Darwin)
- OPENCV_DIR = ../pix_opencv/opencv-1.0.0
+ export MACOSX_DEPLOYMENT_TARGET = 10.3
+ OPENCV_DIR = /Users/pd/opencv-1.0.0
  INCLUDES += -I$(OPENCV_DIR)/cv/include -I$(OPENCV_DIR)/cxcore/include -I$(OPENCV_DIR)/cvaux/include -I/sw/include
  LDFLAGS =  -bundle -undefined dynamic_lookup
  LIBS =  -lm $(OPENCV_DIR)/build/cv/src/.libs/lib_cv.a -L/sw/lib
