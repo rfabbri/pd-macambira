@@ -22,9 +22,9 @@
 #X obj 31 55 route grab grab_on force bang;
 #X obj 31 88 unpack f f f;
 #X msg 111 159 posZ grab \$1;
-#X msg 59 378 reset \, mass center 0 1 0 0 0 \, mass out 1 1 0.5 0
-0 \, link lnk center out \$1 0 \, nLink damp center out 0 \$2 0 1 0
-\, nLink damp center out 0 \$2 1 0 0 \, nLink damp center out 0 \$2
+#X msg 60 378 reset \, mass center 0 1 0 0 0 \, mass out 1 1 0.5 0
+0 \, link lnk center out \$1 0 \, tLink damp center out 0 \$2 0 1 0
+\, tLink damp center out 0 \$2 1 0 0 \, tLink damp center out 0 \$2
 0 0 1 \, mass grab 0 1 0 0 0 \, link lgrab out grab 0 0;
 #X connect 0 0 19 0;
 #X connect 1 0 3 0;

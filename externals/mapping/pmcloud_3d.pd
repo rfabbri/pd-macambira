@@ -5,7 +5,7 @@
 #X msg 643 95 setK lnk \$1;
 #X obj 736 49 inlet;
 #X obj 554 44 inlet;
-#N canvas 880 117 639 733 create_clouds 0;
+#N canvas 801 117 639 733 create_clouds 0;
 #X obj 70 30 loadbang;
 #X obj 175 649 t a;
 #X obj 173 677 outlet;
@@ -55,8 +55,8 @@
 #X connect 7 1 4 0;
 #X connect 8 0 0 0;
 #X restore 85 126 pd loop;
-#X msg 48 504 nLink damp fixe cloud 0 \$1 0 0 1 \, nLink damp fixe
-cloud 0 \$1 0 1 0 \, nLink damp fixe cloud 0 \$1 1 0 0;
+#X msg 48 504 tLink damp fixe cloud 0 \$1 0 0 1 \, tLink damp fixe
+cloud 0 \$1 0 1 0 \, tLink damp fixe cloud 0 \$1 1 0 0;
 #X connect 0 0 3 0;
 #X connect 1 0 2 0;
 #X connect 3 1 12 0;
