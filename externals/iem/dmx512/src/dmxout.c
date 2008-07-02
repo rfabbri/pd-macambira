@@ -1,6 +1,6 @@
 /******************************************************
  *
- * dmxout - implementation file
+ * dmxout_threaded - implementation file
  *
  * copyleft (c) IOhannes m zmölnig
  *
@@ -20,40 +20,84 @@
 #include <string.h>
 #include <stdio.h>
 
-static t_class *dmxout_class;
-static t_class *dmxout_class2;
+#include <pthread.h>
+
+
+static t_class *dmxout_threaded_class;
+static t_class *dmxout_threaded_class2;
 
 #define NUM_DMXVALUES 512
 
-typedef struct _dmxout
+static pthread_t g_thread_id;
+static pthread_mutex_t *g_mutex;
+static dmx_t g_values[NUM_DMXVALUES];
+static int g_device;
+static int g_thread_running, g_thread_continue;
+
+typedef struct _dmxout_threaded
 {
   t_object x_obj;
 
   t_inlet *x_portinlet;
-
-  int      x_device;
   t_float  x_port;
   int  x_portrange;
 
-  dmx_t x_values[NUM_DMXVALUES];
-} t_dmxout;
 
-static void dmxout_clearbuf(t_dmxout*x)
-{
-  int i=0;
-  for(i=0; i<NUM_DMXVALUES; i++) x->x_values[i]=0;
-}
+} t_dmxout_threaded;
 
-static void dmxout_close(t_dmxout*x)
+
+static void *dmxout_threaded_thread(void*you)
 {
-  if(x->x_device>=0) {
-    close(x->x_device);
+  pthread_mutex_t *mutex=g_mutex;
+  struct timeval timout;
+
+  g_thread_running=1;
+
+  while(g_thread_continue) {
+    timout.tv_sec = 0;
+    timout.tv_usec=100;
+    select(0,0,0,0,&timout);
+
+    pthread_mutex_lock(g_mutex);
+    if(g_device>0) {
+      lseek (g_device, 0, SEEK_SET);  /* set to the current channel */
+      write (g_device, g_values, NUM_DMXVALUES); /* write the channel */
+    }
+    pthread_mutex_unlock(g_mutex);
   }
-  x->x_device=-1;
+  g_thread_running=0;
+  printf("quit thread");
+
+  return NULL;
+}
+
+static void dmxout_threaded_close()
+{
+  if(g_device>=0) {
+    close(g_device);
+  }
+  g_device=-1;
+
+  if(g_thread_running) {
+    /* terminate the current thread! */
+    void*dummy=0;
+    int counter=0;
+    g_thread_continue=0;
+    pthread_join(g_thread_id, &dummy);
+    while(g_thread_running) {
+      counter++;
+    }
+  }
+  g_thread_id=0;
+  if(g_mutex) {
+    pthread_mutex_destroy(g_mutex);
+    freebytes(g_mutex, sizeof(pthread_mutex_t));
+    g_mutex=NULL;
+  }
 }
 
 
-static void dmxout_open(t_dmxout*x, t_symbol*s_devname)
+static void dmxout_threaded_open(t_symbol*s_devname)
 {
   int argc=2;
   const char *args[2] = {"--dmx", s_devname->s_name};
@@ -61,51 +105,56 @@ static void dmxout_open(t_dmxout*x, t_symbol*s_devname)
   const char*devname="";
   int fd;
 
-  dmxout_close(x);
+  dmxout_threaded_close();
 
   if(s_devname && s_devname->s_name)
     devname=s_devname->s_name;
 
   //  strncpy(args[0], "--dmx", MAXPDSTRING);
   //  strncpy(args[1], devname, MAXPDSTRING);
-  verbose(2, "[dmxout]: trying to open '%s'", args[1]);
+  verbose(2, "[dmxout_threaded]: trying to open '%s'", args[1]);
   devname=DMXdev(&argc, argv);
   if(!devname){
-  	pd_error(x, "couldn't find DMX device");
+  	error("couldn't find DMX device");
 	return;
   }
-  verbose(1, "[dmxout] opening %s", devname);
+  verbose(1, "[dmxout_threaded] opening %s", devname);
 
-  fd = open (devname, O_WRONLY | O_NONBLOCK);
+  fd = open (devname, O_WRONLY);
 
   if(fd!=-1) {
-    x->x_device=fd;
-    dmxout_clearbuf(x);
+    g_device=fd;
+
+    g_thread_running=0;
+    g_thread_continue=0;
+    g_mutex=(pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
+    if ( pthread_mutex_init(g_mutex, NULL) < 0 ) {
+      error("couldn't create mutex");
+    } else {
+      g_thread_continue = 1;
+      pthread_create(&g_thread_id, 0, dmxout_threaded_thread, NULL);
+    }
   } else {
-    pd_error(x, "failed to open DMX-device '%s'",devname);
+    error("failed to open DMX-device '%s'",devname);
   }
 }
 
-static void dmxout_doout(t_dmxout*x) {
-  int device = x->x_device;
-  if(device<=0) {
+static void dmxout_threaded_doout(t_dmxout_threaded*x) {
+  if(g_device<=0) {
     pd_error(x, "no DMX universe found");
     return;
   }
-
-  lseek (device, 0, SEEK_SET);  /* set to the current channel */
-  write (device, x->x_values, NUM_DMXVALUES); /* write the channel */
 }
 
 
-static void dmxout_doout1(t_dmxout*x, short port, unsigned char value)
+static void dmxout_threaded_doout1(t_dmxout_threaded*x, short port, unsigned char value)
 {
-  x->x_values[port]=value;
-  dmxout_doout(x);
+  g_values[port]=value;
+  dmxout_threaded_doout(x);
 }
 
 
-static void dmxout_float(t_dmxout*x, t_float f)
+static void dmxout_threaded_float(t_dmxout_threaded*x, t_float f)
 {
   unsigned char val=(unsigned char)f;
   short port = (short)x->x_port;
@@ -118,10 +167,10 @@ static void dmxout_float(t_dmxout*x, t_float f)
     return;
   }
 
-  dmxout_doout1(x, port, val);
+  dmxout_threaded_doout1(x, port, val);
 }
 
-static void dmxout_list(t_dmxout*x, t_symbol*s, int argc, t_atom*argv)
+static void dmxout_threaded_list(t_dmxout_threaded*x, t_symbol*s, int argc, t_atom*argv)
 {
   int count=(argc<x->x_portrange)?argc:x->x_portrange;
   int i=0;
@@ -140,16 +189,16 @@ static void dmxout_list(t_dmxout*x, t_symbol*s, int argc, t_atom*argv)
       if(f<0.)f=0.;
       if(f>255)f=255;
     }
-    x->x_values[port+i]=(unsigned char)f;
+    g_values[port+i]=(unsigned char)f;
   }
   if(errors) {
     pd_error(x, "%d valu%s out of bound [0..255]", errors, (1==errors)?"e":"es");
   }
 
-  dmxout_doout(x);
+  dmxout_threaded_doout(x);
 }
 
-static void dmxout_port(t_dmxout*x, t_float f_baseport, t_floatarg f_portrange)
+static void dmxout_threaded_port(t_dmxout_threaded*x, t_float f_baseport, t_floatarg f_portrange)
 {
   short baseport =(short)f_baseport;
   short portrange=(short)f_portrange;
@@ -175,23 +224,23 @@ static void dmxout_port(t_dmxout*x, t_float f_baseport, t_floatarg f_portrange)
   x->x_portrange=portrange;
 }
 
-static void *dmxout_new(t_symbol*s, int argc, t_atom*argv)
+static void *dmxout_threaded_new(t_symbol*s, int argc, t_atom*argv)
 {
   t_floatarg baseport=0.f, portrange=0.f;
-  t_dmxout *x = 0;
+  t_dmxout_threaded *x = 0;
 
   switch(argc) {
   case 2:
-    x=(t_dmxout *)pd_new(dmxout_class2);
+    x=(t_dmxout_threaded *)pd_new(dmxout_threaded_class2);
     x->x_portinlet=inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("port"));
     baseport=atom_getfloat(argv);
     portrange=atom_getfloat(argv+1);
-    dmxout_port(x, baseport, portrange);
+    dmxout_threaded_port(x, baseport, portrange);
     break;
   case 1:
     baseport=atom_getfloat(argv);
   case 0:
-    x=(t_dmxout *)pd_new(dmxout_class);
+    x=(t_dmxout_threaded *)pd_new(dmxout_threaded_class);
     x->x_portinlet=floatinlet_new(&x->x_obj, &x->x_port);
     x->x_port  = baseport;
     x->x_portrange = -1;
@@ -199,42 +248,55 @@ static void *dmxout_new(t_symbol*s, int argc, t_atom*argv)
   default:
     return 0;
   }
-  x->x_device=-1;
-
-  dmxout_open(x, gensym(""));
   return (x);
 }
 
-static void *dmxout_free(t_dmxout*x)
+static void *dmxout_threaded_free(t_dmxout_threaded*x)
 {
-  dmxout_close(x);
+  //  dmxout_threaded_close();
+}
+
+static void dmxout_threaded_init(void) {
+  int i=0;
+  g_thread_id=0;
+  g_mutex=NULL;
+  for(i=0; i<NUM_DMXVALUES; i++) g_values[i]=0;
+
+  g_device=-1;
+  g_thread_running=0;
+  g_thread_continue=0;
+
+  dmxout_threaded_open(gensym(""));
+
+  post("running thread %d for device %d", g_thread_id, g_device);
 }
 
 
-void dmxout_setup(void)
+void dmxout_threaded_setup(void)
 {
+
 #ifdef DMX4PD_POSTBANNER
   DMX4PD_POSTBANNER;
 #endif
 
-  dmxout_class = class_new(gensym("dmxout"), (t_newmethod)dmxout_new, (t_method)dmxout_free,
-                           sizeof(t_dmxout), 
+  dmxout_threaded_class = class_new(gensym("dmxout_threaded"), (t_newmethod)dmxout_threaded_new, (t_method)dmxout_threaded_free,
+                           sizeof(t_dmxout_threaded), 
                            0,
                            A_GIMME, A_NULL);
 
-  class_addfloat(dmxout_class, dmxout_float);
-  class_addmethod(dmxout_class, (t_method)dmxout_open, gensym("open"), A_SYMBOL, A_NULL);
+  class_addfloat(dmxout_threaded_class, dmxout_threaded_float);
 
-  dmxout_class2 = class_new(gensym("dmxout"), (t_newmethod)dmxout_new, (t_method)dmxout_free,
-			    sizeof(t_dmxout), 
+  dmxout_threaded_class2 = class_new(gensym("dmxout_threaded"), (t_newmethod)dmxout_threaded_new, (t_method)dmxout_threaded_free,
+			    sizeof(t_dmxout_threaded), 
 			    0,
 			    A_GIMME, A_NULL);
 
-  class_addlist(dmxout_class2, dmxout_list);
+  class_addlist(dmxout_threaded_class2, dmxout_threaded_list);
 
 
-  class_addmethod(dmxout_class2, (t_method)dmxout_port, gensym("port"), 
+  class_addmethod(dmxout_threaded_class2, (t_method)dmxout_threaded_port, gensym("port"), 
 		  A_FLOAT, A_DEFFLOAT, A_NULL);
 
-  class_addmethod(dmxout_class2, (t_method)dmxout_open, gensym("open"), A_SYMBOL, A_NULL);
+
+  dmxout_threaded_init();
 }
