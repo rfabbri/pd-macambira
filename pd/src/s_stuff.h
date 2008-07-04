@@ -49,6 +49,7 @@ EXTERN int sys_hostfontsize(int fontsize);
 
 extern int sys_defaultfont;
 extern t_symbol *sys_libdir;    /* library directory for auxilliary files */
+extern t_symbol *sys_guidir;    /* directory holding pd_gui (also pd, u_pdsend, etc) */
 
 /* s_loader.c */
 int sys_load_lib(t_canvas *canvas, char *filename);
@@ -172,6 +173,7 @@ void sys_setalarm(int microsec);
 void sys_setvirtualalarm( void);
 #endif
 
+#define API_NONE 0
 #define API_ALSA 1
 #define API_OSS 2
 #define API_MMIO 3

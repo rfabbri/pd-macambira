@@ -1338,7 +1338,7 @@ void canvas_savedeclarationsto(t_canvas *x, t_binbuf *b)
     }
 }
 
-static void canvas_completepath(char *from, char *to)
+static void canvas_completepath(char *from, char *to, int bufsize)
 {
     if (sys_isabsolutepath(from))
     {
@@ -1346,12 +1346,12 @@ static void canvas_completepath(char *from, char *to)
     }
     else
     {   // if not absolute path, append Pd lib dir
-        strncpy(to, sys_libdir->s_name, FILENAME_MAX-4);
-        to[FILENAME_MAX-3] = '\0';
+        strncpy(to, sys_libdir->s_name, bufsize-4);
+        to[bufsize-3] = '\0';
         strcat(to, "/");
     }
-    strncat(to, from, FILENAME_MAX-strlen(to));
-    to[FILENAME_MAX-1] = '\0';
+    strncat(to, from, bufsize-strlen(to));
+    to[bufsize-1] = '\0';
 }
 
 static void canvas_declare(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
@@ -1375,7 +1375,8 @@ static void canvas_declare(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
         }
         else if ((argc > i+1) && !strcmp(flag, "-stdpath"))
         {
-            canvas_completepath(atom_getsymbolarg(i+1, argc, argv)->s_name, strbuf);
+            canvas_completepath(atom_getsymbolarg(i+1, argc, argv)->s_name,
+                strbuf, MAXPDSTRING);
             e->ce_path = namelist_append(e->ce_path, strbuf, 0);
             i++;
         }
@@ -1386,7 +1387,8 @@ static void canvas_declare(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
         }
         else if ((argc > i+1) && !strcmp(flag, "-stdlib"))
         {
-            canvas_completepath(atom_getsymbolarg(i+1, argc, argv)->s_name, strbuf);
+            canvas_completepath(atom_getsymbolarg(i+1, argc, argv)->s_name,
+                strbuf, MAXPDSTRING);
             sys_load_lib(0, strbuf);
             i++;
         }

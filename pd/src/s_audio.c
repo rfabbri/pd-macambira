@@ -192,10 +192,6 @@ void sys_set_audio_settings(int naudioindev, int *audioindev, int nchindev,
     int indevs = 0, outdevs = 0, canmulti = 0, cancallback = 0;
     audio_getdevs(indevlist, &indevs, outdevlist, &outdevs, &canmulti,
         &cancallback, MAXNDEV, DEVDESCSIZE);
-    if (sys_externalschedlib)
-    {
-        return;
-    }
 
     if (rate < 1)
         rate = DEFAULTSRATE;
@@ -426,7 +422,9 @@ void sys_reopen_audio( void)
             chindev, naudiooutdev, audiooutdev, naudiooutdev, choutdev, rate);
     else
 #endif
-        post("unknown audio API specified");
+    if (sys_audioapi == API_NONE)
+        ;
+    else post("unknown audio API specified");
     if (outcome)    /* failed */
     {
         audio_state = 0;

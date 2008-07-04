@@ -1,4 +1,6 @@
 ---------------- dolist --------------------
+done: 
+
 test:
 compile on various versions of linux
 windows:
@@ -115,6 +117,8 @@ sublists should display on parent if desired? (new drawing instruction)
 test and debug list elements of templates
 sublists seem not to handle canvas allocation right (get.pd->pointer.pd bug)
 append doesn't do symbols yet.
+-n flag for drawnumbers
+non-clickable arrays (plus arrays that respond more easily than default)
 
 more features:
 

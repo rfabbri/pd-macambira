@@ -769,19 +769,22 @@ badarg:
         s->s_name, c->c_name->s_name);
 }
 
+    /* convenience routine giving a stdarg interface to typedmess().  Only
+    ten args supported; it seems unlikely anyone will need more since
+    longer messages are likely to be programmatically generated anyway. */
 void pd_vmess(t_pd *x, t_symbol *sel, char *fmt, ...)
 {
     va_list ap;
-    t_atom arg[MAXPDARG], *at =arg;
+    t_atom arg[10], *at = arg;
     int nargs = 0;
     char *fp = fmt;
 
     va_start(ap, fmt);
     while (1)
     {
-        if (nargs > MAXPDARG)
+        if (nargs >= 10)
         {
-            pd_error(x, "pd_vmess: only %d allowed", MAXPDARG);
+            pd_error(x, "pd_vmess: only 10 allowed");
             break;
         }
         switch(*fp++)
