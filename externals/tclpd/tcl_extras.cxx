@@ -1,6 +1,7 @@
 #include "tcl_extras.h"
 #include <map>
 #include <string>
+#include <string.h>
 
 using namespace std;
 
