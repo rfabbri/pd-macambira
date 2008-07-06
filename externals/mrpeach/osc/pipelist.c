@@ -1,4 +1,5 @@
 /* pipelist.c 20070711 Martin Peach based on pipe from x_time.c */
+/* 20080706 added anything method for meta-messages */
 #include "m_pd.h" 
 /* -------------------------- pipe -------------------------- */
 
@@ -24,7 +25,9 @@ typedef struct _pipelist
 static void *pipelist_new(t_symbol *s, int argc, t_atom *argv);
 static void pipelist_hang_free(t_hang *h);
 static void pipelist_hang_tick(t_hang *h);
+static void pipelist_any_hang_tick(t_hang *h);
 static void pipelist_list(t_pipelist *x, t_symbol *s, int ac, t_atom *av);
+static void pipelist_anything(t_pipelist *x, t_symbol *s, int ac, t_atom *av);
 static void pipelist_flush(t_pipelist *x);
 static void pipelist_clear(t_pipelist *x);
 void pipelist_setup(void);
@@ -82,6 +85,27 @@ static void pipelist_hang_tick(t_hang *h)
     pipelist_hang_free(h);
 }
 
+static void pipelist_any_hang_tick(t_hang *h)
+{
+    t_pipelist  *x = h->h_owner;
+    t_hang      *h2, *h3;
+
+    /* excise h from the linked list of hangs */
+    if (x->x_hang == h) x->x_hang = h->h_next;
+    else for (h2 = x->x_hang; ((h3 = h2->h_next)!=NULL); h2 = h3)
+    {
+        if (h3 == h)
+        {
+            h2->h_next = h3->h_next;
+            break;
+        }
+    }
+    /* output h's atoms */
+    outlet_anything(x->x_pipelistout, h->h_atoms[0].a_w.w_symbol, h->h_n-1, &h->h_atoms[1]);
+    /* free h */
+    pipelist_hang_free(h);
+}
+
 static void pipelist_list(t_pipelist *x, t_symbol *s, int ac, t_atom *av)
 {
     if (x->x_deltime > 0)
@@ -102,7 +126,29 @@ static void pipelist_list(t_pipelist *x, t_symbol *s, int ac, t_atom *av)
         clock_delay(h->h_clock, (x->x_deltime >= 0 ? x->x_deltime : 0));
     }
     /* otherwise just pass the list straight through  */
-    /*else outlet_list(x->x_pipelistout, &s_list, ac, av);*/
+    else outlet_list(x->x_pipelistout, &s_list, ac, av);
+}
+
+static void pipelist_anything(t_pipelist *x, t_symbol *s, int ac, t_atom *av)
+{
+    if (x->x_deltime > 0)
+    { /* if delay is real, save the list for output in delay milliseconds */
+        t_hang *h;
+        int i;
+
+        h = (t_hang *)getbytes(sizeof(t_hang));
+        h->h_n = ac+1;
+        h->h_atoms = (t_atom *)getbytes(h->h_n*sizeof(t_atom));
+        SETSYMBOL(&h->h_atoms[0], s);
+        for (i = 1; i < h->h_n; ++i)
+            h->h_atoms[i] = av[i-1];
+        h->h_next = x->x_hang;
+        x->x_hang = h;
+        h->h_owner = x;
+        h->h_clock = clock_new(h, (t_method)pipelist_any_hang_tick);
+        clock_delay(h->h_clock, (x->x_deltime >= 0 ? x->x_deltime : 0));
+    }
+    /* otherwise just pass it straight through  */
     else outlet_anything(x->x_pipelistout, s, ac, av);
 }
 
@@ -127,7 +173,7 @@ void pipelist_setup(void)
         (t_newmethod)pipelist_new, (t_method)pipelist_clear,
         sizeof(t_pipelist), 0, A_GIMME, 0);
     class_addlist(pipelist_class, pipelist_list);
-    class_addanything(pipelist_class, pipelist_list);
+    class_addanything(pipelist_class, pipelist_anything);
     class_addmethod(pipelist_class, (t_method)pipelist_flush, gensym("flush"), 0);
     class_addmethod(pipelist_class, (t_method)pipelist_clear, gensym("clear"), 0);
 }
