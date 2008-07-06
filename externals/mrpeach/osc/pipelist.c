@@ -102,7 +102,8 @@ static void pipelist_list(t_pipelist *x, t_symbol *s, int ac, t_atom *av)
         clock_delay(h->h_clock, (x->x_deltime >= 0 ? x->x_deltime : 0));
     }
     /* otherwise just pass the list straight through  */
-    else outlet_list(x->x_pipelistout, &s_list, ac, av);
+    /*else outlet_list(x->x_pipelistout, &s_list, ac, av);*/
+    else outlet_anything(x->x_pipelistout, s, ac, av);
 }
 
 static void pipelist_flush(t_pipelist *x)
@@ -126,6 +127,7 @@ void pipelist_setup(void)
         (t_newmethod)pipelist_new, (t_method)pipelist_clear,
         sizeof(t_pipelist), 0, A_GIMME, 0);
     class_addlist(pipelist_class, pipelist_list);
+    class_addanything(pipelist_class, pipelist_list);
     class_addmethod(pipelist_class, (t_method)pipelist_flush, gensym("flush"), 0);
     class_addmethod(pipelist_class, (t_method)pipelist_clear, gensym("clear"), 0);
 }
