@@ -1,0 +1,27 @@
+#N canvas 228 478 660 293 10;
+#X obj 31 66 -~ 0.5;
+#X obj 76 96 *~ 2;
+#X obj 32 181 -~;
+#X obj 32 117 wrap~;
+#X obj 76 156 *~ 0.5;
+#X obj 33 209 -~ 0.5;
+#X obj 445 88 /~;
+#X obj 444 63 sig~ 22050;
+#X obj 31 19 inlet~;
+#X obj 33 233 outlet~;
+#X obj 76 118 expr~ sin($v1*$v2) * (1/(0.00000001 + abs($v1)*$v2) -
+1/(0.00000001 + $v2));
+#X obj 32 45 phasor~ \$1;
+#X connect 0 0 1 0;
+#X connect 0 0 3 0;
+#X connect 1 0 10 0;
+#X connect 2 0 5 0;
+#X connect 3 0 2 0;
+#X connect 4 0 2 0;
+#X connect 5 0 9 0;
+#X connect 6 0 10 1;
+#X connect 7 0 6 0;
+#X connect 8 0 6 1;
+#X connect 8 0 11 0;
+#X connect 10 0 4 0;
+#X connect 11 0 0 0;
