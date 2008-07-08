@@ -1,0 +1,10 @@
+#N canvas 0 0 476 213 10;
+#X text 29 30 GridFlow is a plug-in for PureData that introduces the
+frid (#) data type into the PD environment. GridFlow allows you to
+work with live video \, still images and video files in a rel-time
+environment.;
+#X text 32 97 This section deals with the particular objects related
+to GridFlow. GridFlow uses the usual PD "control" objects \, as well
+as a set of GridFlow specific objects. Before we get into the tutorials
+we will explain the grid "#" \, the most important concept in GridFlow.
+;

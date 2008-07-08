@@ -1,0 +1,6 @@
+GFSOURCE=$(dirname $(dirname $(which "$0")))
+echo $1@cvs.gridflow.ca:/home/cvs/gridflow > CVS/Root
+for file in $(find $GFSOURCE -name Root)
+do
+  cp CVS/Root $file
+done

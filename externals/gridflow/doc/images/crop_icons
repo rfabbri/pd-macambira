@@ -1,0 +1,12 @@
+if [ "z$1" = "zall" ]; then
+  foo="\@*.png format*.png"
+else
+  foo="$1"
+fi
+
+for z in $foo; do \
+	echo $z
+	pngtopnm $z | pnmcrop | pnmtopng -background black -transparent =red -compress 9 > $z.new
+	mv $z.new $z
+done
+

@@ -1,0 +1,71 @@
+#N canvas 221 110 894 498 10;
+#N canvas 0 22 450 300 this 0;
+#X obj 192 128 inlet;
+#X obj 192 171 outlet;
+#X text 8 7 If you're looking at this you're just going to confuse
+yourself!;
+#X connect 0 0 1 0;
+#X restore 499 380 pd this is an object;
+#X text 509 358 <- This is a connection;
+#X msg 499 319 10;
+#X text 13 348 Objects are like filters \, they change the way messages
+flow through them.;
+#X text 13 153 You can think of a patch as plumbing. The way water
+flows through the plumbing of your house \, messages flow through the
+connections in your patch. Objects change the flow of the messages
+to allow different things to happen. Messages always go into objects
+at the top \, called the inlet \, and always come out at the bottom
+\, called the outlet. In PD messages flow from top to bottom.;
+#X text 458 236 This is a very simple example of a patch \, the message
+"10" can be sent through the "pd this is an object" and can be seen
+being passed out the outlet.;
+#X floatatom 499 416 5 0 0 0 - - -;
+#X text 539 415 <- This number box shows the float message;
+#X text 553 334 and watch the output!;
+#X obj 8 6 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 13 252 You can work with PD in two ways \, the first is in
+"edit mode". Edit-mode is where you create your patch by adding objects
+and the connections between them. "Run mode" is when you're done with
+the construction of your patch \, and you wish to send messages through
+it. In run-mode your cursor is an arrow (as it is right now since we
+are in run-mode) \, in edit-mode your cursor is a pointing hand.;
+#X text 458 136 Messages are what allow objects to communicate with
+one and other. Messages can change the way an object acts \, and/or
+express the work the object is doing. Messages come in different types.
+They can contain words \, numbers and groups of these. The main types
+of messages we will be dealing with are floats (numbers). You can click
+on a message \, when in run-mode \, to send it through your patch.
+;
+#X obj 448 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 448 290 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 8 447 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 668 449 Copyright Ben Bogart 2005 \; (See COPYING.TXT for details)
+;
+#X text 12 20 DESCRIPTION: What is a patch? An object? A message?;
+#N canvas 0 22 466 316 META 0;
+#X text 12 5 CATEGORY: tutorial;
+#X text 12 15 KEYWORDS: metaphor object message GUI introduction;
+#X restore 16 453 pd META;
+#X text 457 67 GUI objects allow you to interact with your PD patch
+as it is running. They allow you to change what your patch is doing
+without reconnecting the objects. The simplest GUI object is the "Message"
+that simply contains a message you want to send in your patch.;
+#X text 453 290 A patch that connects a GUI to an object to a second
+GUI.;
+#X text 531 320 <- This GUI sends a float message (click on it);
+#X text 13 66 When working with PD you are dealing primarily with objects
+\, GUI (Graphical User Interface) objects \, connections and messages.
+These are the building blocks of PD programming. When you connect objects
+\, GUI objects \, and messages you are creating a "patch". Patching
+is making something complex out of smaller building blocks.;
+#X text 13 46 The "patch" \, "objects" and "connections";
+#X text 453 46 "GUI objects" and "messages";
+#X text 12 8 1 Introduction to Pure-Data & its Metaphors;
+#X connect 0 0 6 0;
+#X connect 2 0 0 0;

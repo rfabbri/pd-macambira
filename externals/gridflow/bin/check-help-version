@@ -1,0 +1,49 @@
+#!/usr/bin/tclsh
+
+set argh0 [file normalize [file join [pwd] $argv0]]
+source [file dirname $argh0]/pd-tools.tcl
+
+set report {}
+
+proc find_version_strings {lines i} {
+  global filename report
+  lappend toplefts [list patate poil] ;# temporary dummy value so that subpatches are represented in the correct order
+  set j $i
+  set versions {}
+  while {$i < [llength $lines]} {
+    set list [split [lindex $lines $i] " "]
+    switch -- [lindex $list 1] {
+	text {
+		set comment [join [lrange $list 4 end] " "]
+		if {[regexp {^GridFlow (\d\.\d\.\d)} $comment v0 v1]} {
+			lappend versions $v1
+		}
+	}
+	connect {incr i; continue}
+	restore {break}
+    }
+    # recurse into subpatches (disabled because not necessary; can treat the file as one flat patch anyway)
+    ### if {[string compare [lindex $list 0] "#N"]==0} {set i [find_version_strings $lines [expr $i+1]]}
+    incr i
+  }
+  lappend report [list $filename [lsort $versions]]
+  return $i
+}
+
+foreach filename $argv {
+  set lines [pd_read_file $filename]
+  find_version_strings $lines 1
+}
+
+set env(PRINT_CLASS_LIST) yes
+set f [open "| pd -nogui -send {pd quit} 2&>1" r+]
+while {![eof $f]} {
+	if {[regexp {^class_new (.*)} [gets $f] m0 m1]} {
+		puts $m1
+	}
+}
+
+foreach line [lsort -decreasing -index 1 $report] {
+  foreach {filename versions} $line {}
+  puts [format "%40s: %s" $filename $versions]
+}

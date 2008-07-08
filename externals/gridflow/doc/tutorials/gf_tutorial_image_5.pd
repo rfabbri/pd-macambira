@@ -1,0 +1,52 @@
+#N canvas 559 20 560 533 10;
+#X obj 2 37 cnv 15 550 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 2 2 cnv 15 550 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 2 501 cnv 15 550 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 16 7 2 Introduction to Images;
+#X text 14 36 2.3 Patch Example 3;
+#X text 2 58 Altering a grid using numop with slider and metro. This
+combination allows you to scroll through values and modify a grid in
+real time.;
+#X obj 19 338 cnv 15 38 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 225 207 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 280 294 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 314 306 the slider;
+#X obj 223 122 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 224 162 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 21 252 #in;
+#X obj 54 295 hsl 128 15 0 255 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 0 1;
+#X obj 53 228 metro 33.3;
+#X obj 53 206 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1
+;
+#X floatatom 72 326 5 0 0 0 - - -;
+#X obj 50 165 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 21 398 #out window;
+#X msg 21 121 open scissors.jpg;
+#X obj 21 338 # + 0;
+#X text 159 122 <-- step #1 : click here to load the image;
+#X text 161 206 <-- step #2 : start the metro;
+#X text 160 162 <-- step #2 : click here to view the image;
+#X text 223 184 or;
+#X text 216 294 <-- step #3 : try altering the argument by using;
+#X text 11 509 GridFlow 0.9.0;
+#X text 4 443 These examples use the [# +] numop. There are several
+numeric operators \; they can be found in the numeric operator help
+patch (right click on the [# + 0] and select help to view them).;
+#X connect 12 0 20 0;
+#X connect 13 0 16 0;
+#X connect 13 0 20 1;
+#X connect 14 0 12 0;
+#X connect 15 0 14 0;
+#X connect 17 0 12 0;
+#X connect 19 0 12 0;
+#X connect 20 0 18 0;

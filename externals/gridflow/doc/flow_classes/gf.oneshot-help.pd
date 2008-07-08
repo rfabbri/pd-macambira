@@ -1,0 +1,51 @@
+#N canvas 161 29 505 543 10;
+#X obj 5 435 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 3 260 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 3 283 cnv 15 73 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 4 524 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 5 456 cnv 15 65 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 3 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 205 262 Inlets (2);
+#X text 6 284 Inlet 0;
+#X obj 3 352 cnv 15 73 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 6 353 Inlet 1;
+#X text 5 316 ANY;
+#X text 8 490 ANY;
+#X obj 127 159 cnv 15 72 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X text 29 34 Like [spigot] \, but turns itself off after each message
+\, so you have to turn it on again to making it pass another message.
+;
+#X text 206 437 Outlets (1);
+#X text 9 457 Outlet;
+#X msg 195 126 1;
+#X obj 171 126 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X msg 127 88 test;
+#X obj 127 219 print;
+#X floatatom 168 90 5 0 0 0 - - -;
+#X floatatom 171 220 5 0 0 0 - - -;
+#X text 232 126 <-- both will reset the object;
+#X text 5 385 BANG;
+#X text 74 489 Outputs incoming message.;
+#X text 194 525 Arguments (none);
+#X text 77 315 Incoming message can be Grids \, Symbols \, Integers
+\, Lists \, etc.;
+#X text 76 385 Resets the object so that the next mesage will be passed
+through.;
+#X obj 127 159 gf.oneshot;
+#X obj 12 1 gf.oneshot;
+#X text 393 1 GridFlow 0.9.4;
+#X connect 16 0 28 1;
+#X connect 17 0 28 1;
+#X connect 18 0 28 0;
+#X connect 20 0 28 0;
+#X connect 28 0 19 0;
+#X connect 28 0 21 0;

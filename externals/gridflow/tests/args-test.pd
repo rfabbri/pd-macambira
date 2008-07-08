@@ -1,0 +1,23 @@
+#N canvas 128 60 450 464 10;
+#X obj 14 36 args-2-test a 1 b 2 c 3 d 4 \, canadiens 5 \, nordiques
+2;
+#X text 12 257 o5: bang;
+#X text 12 270 o4: 23;
+#X text 12 101 o5: list c 3 d 4;
+#X text 12 114 o4: 2;
+#X text 12 127 o3: symbol b;
+#X text 12 140 o2: 1;
+#X text 12 153 o1: symbol a;
+#X text 12 166 o6: canadiens 5;
+#X text 12 179 o6: nordiques 2;
+#X text 12 192 o5: bang;
+#X text 12 205 o4: 23;
+#X text 12 231 o2: 1;
+#X text 12 244 o1: symbol a;
+#X text 12 283 o3: symbol bar;
+#X text 12 296 o2: 42;
+#X text 12 309 o1: symbol foo;
+#X obj 14 56 args-2-test a 1 (a b c);
+#X obj 14 76 args-2-test;
+#X text 15 14 order of those 3 objects is important;
+#X text 12 218 o3: list a b c;

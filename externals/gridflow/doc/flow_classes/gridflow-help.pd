@@ -1,0 +1,11 @@
+#N canvas 624 183 400 205 10;
+#X text 22 53 dummy object for controlling the profiler;
+#X msg 48 95 profiler_reset;
+#X msg 59 115 profiler_dump;
+#X text 321 18 gridflow;
+#X obj 24 146 gridflow;
+#X text 21 22 gridflow;
+#X msg 168 95 \; gridflow profiler_reset;
+#X msg 168 115 \; gridflow profiler_dump;
+#X connect 1 0 4 0;
+#X connect 2 0 4 0;

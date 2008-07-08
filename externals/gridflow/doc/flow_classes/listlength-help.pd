@@ -1,0 +1,52 @@
+#N canvas 687 0 504 509 10;
+#X obj 1 273 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 10 218 LIST;
+#X obj 1 168 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 191 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 215 275 Outlets (1);
+#X obj 2 353 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 294 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 398 1 GridFlow 0.8.4;
+#X text 2 192 Inlet 0;
+#X text 2 295 Outlet 0;
+#X obj 1 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 10 0 listlength;
+#X text 398 2 GridFlow 0.8.4;
+#X text 8 26 The [listlength] outputs the number of elements in the
+incoming list.;
+#X text 221 169 Inlets (1);
+#X text 61 320 Outputs the number of elements in the list.;
+#X text 9 380 No argument;
+#X text 211 354 Arguments (0);
+#X text 9 380 No argument;
+#X obj 3 411 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 219 412 See also;
+#X obj 10 445 listappend;
+#X obj 99 445 listelement;
+#X obj 198 446 listfind;
+#X obj 291 446 listflatten;
+#X obj 11 472 listmake;
+#X obj 99 471 listprepend;
+#X obj 199 472 listreverse;
+#X obj 292 472 listsublist;
+#X floatatom 206 142 5 0 0 0 - - -;
+#X obj 139 140 print;
+#X msg 139 63 1 3 hello 8 13;
+#X obj 139 102 cnv 15 73 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 139 102 listlength;
+#X msg 246 78 1 12 a b c d e f g h i j k l;
+#X text 58 218 The length of the list passed to the left inlet will
+be returned in the outlet.;
+#X text 8 319 INT;
+#X connect 31 0 33 0;
+#X connect 33 0 29 0;
+#X connect 33 0 30 0;
+#X connect 34 0 33 0;

@@ -1,0 +1,42 @@
+#N canvas 412 64 630 462 10;
+#X obj 274 276 #polygon_radial_map;
+#X text 70 40 makes a 1-D panoramic (polar) rendering of a polygon.
+;
+#X text 69 57 if you want to make standardized (translation-independent)
+renderings of polygons \, first substract [#polygon_moment] (or a variant
+thereof) from the polygon.;
+#X obj 274 371 #outer * (255 255 255);
+#X obj 274 390 #out window;
+#X obj 24 193 t b a;
+#X obj 24 240 #draw_polygon put (255 224 200);
+#X msg 24 221 240 320 3 # 0 60 90;
+#X obj 274 333 #for 128 0 -1;
+#X obj 24 259 #out window;
+#X obj 274 140 #t;
+#X obj 304 141 #polygon_moment;
+#X obj 323 162 display;
+#X obj 274 166 # -;
+#X obj 288 188 display;
+#X msg 24 116 4 2 # 30 30 30 250 120 200 170 90;
+#X obj 274 295 t a a;
+#X obj 274 314 #finished;
+#X obj 274 352 #outer <;
+#X connect 0 0 16 0;
+#X connect 3 0 4 0;
+#X connect 5 0 7 0;
+#X connect 5 1 6 2;
+#X connect 6 0 9 0;
+#X connect 7 0 6 0;
+#X connect 8 0 18 0;
+#X connect 10 0 13 0;
+#X connect 10 1 11 0;
+#X connect 11 0 12 0;
+#X connect 11 0 13 1;
+#X connect 13 0 0 0;
+#X connect 13 0 14 0;
+#X connect 15 0 5 0;
+#X connect 15 0 10 0;
+#X connect 16 0 17 0;
+#X connect 16 1 18 1;
+#X connect 17 0 8 0;
+#X connect 18 0 3 0;

@@ -1,0 +1,64 @@
+#N canvas 630 27 508 642 10;
+#X obj 1 433 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 10 255 LIST;
+#X obj 1 205 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 228 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 215 435 Outlets (1);
+#X obj 2 513 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 454 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 398 1 GridFlow 0.8.4;
+#X text 2 229 Inlet 0;
+#X text 2 455 Outlet 0;
+#X obj 1 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 3 571 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 219 572 See also;
+#X obj 10 605 listappend;
+#X obj 99 605 listelement;
+#X obj 198 606 listfind;
+#X obj 291 606 listflatten;
+#X obj 11 630 listmake;
+#X obj 99 629 listprepend;
+#X obj 199 630 listreverse;
+#X obj 292 630 listsublist;
+#X msg 153 89 1 3 hello 8 13;
+#X obj 153 153 cnv 15 57 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X msg 162 113 1 12 a b c d e f g h i j k l;
+#X obj 154 177 display;
+#X obj 2 283 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 3 285 Inlet 1;
+#X text 3 314 INTEGER;
+#X text 65 255 Accepts a list.;
+#X text 65 314 The index in the list to start the sublist at.;
+#X obj 1 346 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 2 373 INTEGER;
+#X text 2 348 Inlet 2;
+#X text 66 373 The number of items wanted from the list starting at
+the index specified.;
+#X text 212 513 Arguments (2);
+#X text 8 479 LIST;
+#X text 64 480 Outputs the sublist as specified by the inlets or the
+arguments.;
+#X text 6 538 Integers specifying index and length of the sublist;
+#X text 9 23 The [listsublist] outputs consecutive elements of the
+list \, as selected by index (inlet 1 or arg 1) and length (inlet 2
+or arg 2). A negative index will start from the end of the list (like
+-1 means last element in the list).;
+#X floatatom 204 135 5 0 0 0 - - -;
+#X text 398 2 GridFlow 0.9.0;
+#X text 221 206 Inlets (3);
+#X obj 153 153 listmake;
+#X obj 3 -1 listmake;
+#X connect 21 0 42 0;
+#X connect 23 0 42 0;
+#X connect 39 0 42 1;
+#X connect 42 0 24 0;

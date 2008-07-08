@@ -1,0 +1,129 @@
+#N canvas 287 295 576 286 10;
+#X obj 50 265 outlet;
+#X obj 239 124 hradio 18 1 0 4 \$0-channel \$0-channel _0__1__2__3_
+0 -4 0 8 -241291 -258699 -1 0;
+#X obj 413 63 hsl 128 15 0 65535 0 0 \$0-brightness \$0-brightness
+brightness 8 8 0 8 -260818 -1 -1 0 1;
+#X obj 413 103 hsl 128 15 0 65535 0 0 \$0-hue \$0-hue hue 8 8 0 8 -260818
+-1 -1 0 1;
+#X obj 413 43 hsl 128 15 0 65535 0 0 \$0-contrast \$0-contrast contrast
+8 8 0 8 -260818 -1 -1 0 1;
+#X obj 413 123 hsl 128 15 0 65635 0 0 \$0-whiteness \$0-whiteness whiteness
+8 8 0 8 -260818 -1 -1 0 1;
+#X text 119 245 <-- open to access more camera controls;
+#N canvas 170 20 420 404 camera 0;
+#X obj 9 362 outlet;
+#X obj 9 8 inlet;
+#X msg 66 153 contrast \$1;
+#X msg 66 213 whiteness \$1;
+#X msg 66 133 brightness \$1;
+#X msg 171 383 size 120 160;
+#X msg 190 363 size 240 320;
+#X msg 209 343 size 480 640;
+#X msg 72 277 channel \$1;
+#X obj 176 133 r \$0-brightness;
+#X obj 176 153 r \$0-contrast;
+#X obj 176 213 r \$0-whiteness;
+#X obj 171 299 r \$0-size;
+#X obj 182 277 r \$0-channel;
+#X obj 176 193 r \$0-hue;
+#X msg 66 193 hue \$1;
+#X msg 66 173 colour \$1;
+#X obj 176 173 r \$0-colour;
+#X obj 171 319 sel 0 1 2;
+#X obj 67 55 s \$0-brightness;
+#X obj 77 75 s \$0-contrast;
+#X obj 197 55 s \$0-colour;
+#X obj 207 75 s \$0-hue;
+#X obj 217 95 s \$0-whiteness;
+#X obj 32 245 t a;
+#X obj 9 35 route symbol brightness contrast colour hue whiteness;
+#X msg 9 109 open videodev \$1 \, get;
+#X connect 1 0 25 0;
+#X connect 2 0 24 0;
+#X connect 3 0 24 0;
+#X connect 4 0 24 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
+#X connect 7 0 0 0;
+#X connect 8 0 0 0;
+#X connect 9 0 4 0;
+#X connect 10 0 2 0;
+#X connect 11 0 3 0;
+#X connect 12 0 18 0;
+#X connect 13 0 8 0;
+#X connect 14 0 15 0;
+#X connect 15 0 24 0;
+#X connect 16 0 24 0;
+#X connect 17 0 16 0;
+#X connect 18 0 5 0;
+#X connect 18 1 6 0;
+#X connect 18 2 7 0;
+#X connect 24 0 0 0;
+#X connect 25 0 26 0;
+#X connect 25 1 19 0;
+#X connect 25 2 20 0;
+#X connect 25 3 21 0;
+#X connect 25 4 22 0;
+#X connect 25 5 23 0;
+#X connect 25 6 0 0;
+#X connect 26 0 0 0;
+#X restore 50 245 pd camera;
+#X msg 83 196 colorspace YUV420P;
+#X text 218 196 <-- click here if your webcam uses this colorspace
+;
+#X obj 103 222 #yuv_to_rgb;
+#X text 185 222 <-- add this after [#in] to translate the colorspaces
+;
+#X obj 413 83 hsl 128 15 0 65535 0 0 \$0-colour \$0-colour colour 8
+8 0 8 -260818 -1 -1 0 1;
+#X text 98 266 plug this to #in;
+#X obj 241 53 vradio 15 1 0 3 \$0-size \$0-size empty 0 -6 0 8 -241291
+-258699 -1 0;
+#X text 259 53 120 \, 160;
+#X text 259 69 240 \, 320;
+#X text 259 84 480 \, 640;
+#X text 239 38 select size;
+#X text 239 101 select channel;
+#X obj 10 245 inlet;
+#X obj 354 44 nbx 5 14 0 65535 0 0 \$0-contrast \$0-contrast empty
+0 -6 0 10 -260818 -1 -1 0 256;
+#X obj 354 64 nbx 5 14 0 65535 0 0 \$0-brightness \$0-brightness empty
+0 -6 0 10 -260818 -1 -1 0 256;
+#X obj 354 84 nbx 5 14 0 65535 0 0 \$0-colour \$0-colour empty 0 -6
+0 10 -260818 -1 -1 0 256;
+#X obj 354 104 nbx 5 14 0 65535 0 0 \$0-hue \$0-hue empty 0 -6 0 10
+-260818 -1 -1 0 256;
+#X obj 354 124 nbx 5 14 0 65535 0 0 \$0-whiteness \$0-whiteness empty
+0 -6 0 10 -260818 -1 -1 0 256;
+#X msg 50 28 symbol /dev/video0;
+#X msg 50 48 symbol /dev/video1;
+#X msg 50 68 symbol /dev/video2;
+#X msg 50 88 symbol /dev/video3;
+#X text 17 6 Select a camera;
+#X obj 31 28 bng 15 250 50 0 empty empty empty 0 -6 0 8 -241291 -1
+-1;
+#X obj 31 48 bng 15 250 50 0 empty empty empty 0 -6 0 8 -241291 -1
+-1;
+#X obj 31 68 bng 15 250 50 0 empty empty empty 0 -6 0 8 -241291 -1
+-1;
+#X obj 31 88 bng 15 250 50 0 empty empty empty 0 -6 0 8 -241291 -1
+-1;
+#X msg 81 133 transfer mmap;
+#X msg 81 153 transfer read;
+#X msg 83 176 colorspace RGB24;
+#X text 70 115 Special options:;
+#X connect 7 0 0 0;
+#X connect 8 0 7 0;
+#X connect 20 0 7 0;
+#X connect 26 0 7 0;
+#X connect 27 0 7 0;
+#X connect 28 0 7 0;
+#X connect 29 0 7 0;
+#X connect 31 0 26 0;
+#X connect 32 0 27 0;
+#X connect 33 0 28 0;
+#X connect 34 0 29 0;
+#X connect 35 0 7 0;
+#X connect 36 0 7 0;
+#X connect 37 0 7 0;

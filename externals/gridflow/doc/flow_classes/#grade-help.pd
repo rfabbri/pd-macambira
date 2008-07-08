@@ -1,0 +1,20 @@
+#N canvas 375 101 649 221 10;
+#X text 143 15 splits a dim[a... \, b] grid into dim[b] vectors that
+each contain numbers from 0 to b-1 indicating the ordering of the values.
+the result is a dim[a... \, b] grid.;
+#X floatatom 19 74 5 0 0 0 - - -;
+#X floatatom 60 74 5 0 0 0 - - -;
+#X floatatom 101 74 5 0 0 0 - - -;
+#X floatatom 142 74 5 0 0 0 - - -;
+#X text 585 14 gridflow;
+#X text 146 175 (behaves unstable in 0.7.0);
+#X obj 19 106 #pack 4;
+#X obj 19 139 #grade;
+#X obj 19 168 #print;
+#X text 14 15 #grade;
+#X connect 1 0 7 0;
+#X connect 2 0 7 1;
+#X connect 3 0 7 2;
+#X connect 4 0 7 3;
+#X connect 7 0 8 0;
+#X connect 8 0 9 0;

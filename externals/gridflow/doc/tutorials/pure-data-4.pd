@@ -1,0 +1,87 @@
+#N canvas 183 61 890 531 10;
+#X obj 8 6 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 96 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 8 487 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 668 489 Copyright Ben Bogart 2005 \; (See COPYING.TXT for details)
+;
+#N canvas 0 22 478 328 META 0;
+#X text 12 5 CATEGORY: tutorial;
+#X text 12 15 KEYWORDS: metro counter random;
+#X restore 16 493 pd META;
+#X text 12 20 DESCRIPTION: Learning "metro" \, "counter" & "random"
+;
+#X text 13 96 Using the "metro" object:;
+#X text 21 47 In this section we will learn three new objects \, "metro"
+\, "counter" \, and "random". Metro sends a bang at regular intervals
+\, just like a metronome.;
+#X obj 164 142 metro 250;
+#X obj 164 123 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 164 163 bng 15 100 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 222 123 5 0 0 0 - - -;
+#X text 21 187 You can turn a Metro on and off by sending it a "1"
+or "0" message. Because a toggle sends 0/1 messages \, we can simply
+connect it directly. Metro also accepts an argument (words or numbers
+wirtten after the object name). This argument is how fast the metro
+should send out bangs (in milliseconds). You can always change the
+speed of the metro by sending it number messages through the rightmost
+inlet.;
+#X obj 8 306 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 13 306 Using the "random" object:;
+#X text 21 277 For more info see the metro-help.pd patch.;
+#X obj 168 385 bng 15 100 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 168 425 print;
+#X obj 168 404 random 100;
+#X floatatom 233 385 5 0 0 0 - - -;
+#X text 20 327 The Random object returns a number between 0 and the
+(number) argument when it receives a bang message in the leftmost inlet.
+You can also change the upper limit by sending a message to the rightmost
+inlet.;
+#X obj 448 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 453 46 Using the "random" object:;
+#X obj 559 154 bng 15 100 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 590 154 3 1 3 0 - - -;
+#X floatatom 621 174 3 0 0 0 - - -;
+#X floatatom 652 194 3 0 0 0 - - -;
+#X obj 652 234 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 559 234 8 0 0 0 - - -;
+#X obj 559 213 counter 0 10 1;
+#X text 21 447 For more info see the random-help.pd patch.;
+#X text 461 77 "counter" is simply an object that counts. It can count
+up \, count down and count up and then down. Where it starts and where
+it stops are all definable. This is the counter that in included with
+Gem \, it is not compatible with other counter objects.;
+#X text 461 274 The first argument for counter is the lower limit (number
+to start counting at). The second is the upper limit to count to. The
+third argument is the direction in which to count. "1" means forward
+\, "2" means backward and "3" means forward and then backward. You
+can also use the three rightmost inlets to change the behaviour of
+counter. The rightmost inlet is the upper limit \, the second right-most
+the lower limit \, and the third right-most as the direction. The rightmost
+outlet sends out a bang message when the counter loops.;
+#X text 681 193 Rightmost inlet;
+#X text 651 173 Second Rightmost inlet;
+#X text 621 153 Third Rightmost inlet;
+#X text 461 407 For more info see the counter-help.pd patch.;
+#X text 12 8 4 Introduction to PD - More objects;
+#X connect 8 0 10 0;
+#X connect 9 0 8 0;
+#X connect 11 0 8 1;
+#X connect 16 0 18 0;
+#X connect 18 0 17 0;
+#X connect 19 0 18 1;
+#X connect 23 0 29 0;
+#X connect 24 0 29 1;
+#X connect 25 0 29 2;
+#X connect 26 0 29 3;
+#X connect 29 0 28 0;
+#X connect 29 1 27 0;

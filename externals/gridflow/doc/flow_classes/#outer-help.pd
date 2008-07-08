@@ -1,0 +1,70 @@
+#N canvas 23 44 613 383 10;
+#X obj 19 39 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 19 130 spigot;
+#X obj 100 130 spigot;
+#X obj 67 130 == 0;
+#X obj 67 39 tgl 15 0 empty empty empty 0 -6 0 8 -233017 -1 -1 0 1
+;
+#X text 171 178 @outer does the same two-input operation between every
+possible pair of the left-side grid and the right side grid. @inner
+treats both input grids like @fold does \, then does a @outer on the
+other dimensions \, such that every two-input operation is like a @fold.
+this is a very powerful operation that can be used to do rotations
+\, rgb->yuv \, color conversions \, etc.;
+#X text 88 40 select pattern;
+#X text 17 296 combine channelless picture with gamma factors (r \,
+g \, b);
+#X obj 19 89 until;
+#X msg 19 68 128;
+#X obj 60 89 float 1;
+#X obj 115 89 + 1;
+#X obj 171 90 until;
+#X obj 212 90 float 1;
+#X obj 267 90 + 1;
+#X msg 171 69 4;
+#X text 665 16 gridflow;
+#X text 8 328 see also:;
+#X obj 19 277 @out window;
+#X text 18 10 #outer;
+#X obj 129 333 @join;
+#X obj 171 333 #finished;
+#X obj 76 333 #scan +;
+#X obj 241 333 #cast;
+#X obj 283 333 #ravel;
+#X obj 331 333 #grade;
+#X obj 380 333 #perspective;
+#X obj 171 111 #import (3);
+#X obj 171 132 # * 128;
+#X obj 19 109 #import (128);
+#X obj 19 162 #outer +;
+#X obj 100 161 #outer ^;
+#X obj 100 181 # * 2;
+#X obj 19 255 #outer gamma;
+#X connect 0 0 9 0;
+#X connect 0 0 15 0;
+#X connect 1 0 30 0;
+#X connect 1 0 30 1;
+#X connect 2 0 31 0;
+#X connect 2 0 31 1;
+#X connect 3 0 2 1;
+#X connect 4 0 1 1;
+#X connect 4 0 3 0;
+#X connect 8 0 10 0;
+#X connect 9 0 8 0;
+#X connect 10 0 11 0;
+#X connect 10 0 29 0;
+#X connect 11 0 10 1;
+#X connect 12 0 13 0;
+#X connect 13 0 14 0;
+#X connect 13 0 27 0;
+#X connect 14 0 13 1;
+#X connect 15 0 12 0;
+#X connect 27 0 28 0;
+#X connect 28 0 33 1;
+#X connect 29 0 1 0;
+#X connect 29 0 2 0;
+#X connect 30 0 33 0;
+#X connect 31 0 32 0;
+#X connect 32 0 33 0;
+#X connect 33 0 18 0;

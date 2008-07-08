@@ -1,0 +1,65 @@
+#N canvas 271 30 511 573 10;
+#X obj 109 154 cnv 15 130 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 6 398 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 4 210 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 4 233 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 9 234 Inlet_0;
+#X text 206 212 Inlets (2);
+#X text 215 400 Outlets (1);
+#X obj 5 480 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 221 481 Arguments (1);
+#X obj 5 329 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 6 419 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 10 420 Inlet_0;
+#X text 10 330 Inlet_1;
+#X text 7 259 GRID;
+#X text 7 357 GRID;
+#X text 11 443 GRID;
+#X obj 5 552 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 86 37 rearrange a grid's values according to new dimensions
+;
+#X obj 21 36 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1 -1
+;
+#X text 834 99 gridflow;
+#X obj 21 59 fork;
+#X obj 21 103 #in;
+#X obj 111 183 #out window;
+#X obj 7 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X msg 44 81 open working.jpg;
+#X text 19 550 see also:;
+#X obj 99 553 #ravel;
+#X obj 149 553 #perspective;
+#X obj 21 184 #out window;
+#X obj 21 127 t a a;
+#X obj 22 0 #redim ( 2 );
+#X obj 111 154 #redim (120 160 3);
+#X text 72 444 Outputs the redimensioned data as a grid.;
+#X text 24 511 Accepts a grid as a creation argument \, here (120 160
+3).;
+#X msg 232 131 240 320 3;
+#X text 65 257 Accepts a grid which elements are serialized. If the
+resulting grid must be larger \, the sequence is repeated as much as
+necessary. It is truncated if it must be smaller. The elements are
+then deserialized to form the resulting grid.;
+#X text 71 357 Accepts grids that is a dimension list.;
+#X text 399 1 GridFlow 0.8.4;
+#X msg 200 101 400 400 3;
+#X connect 18 0 20 0;
+#X connect 20 0 21 0;
+#X connect 20 1 24 0;
+#X connect 21 0 29 0;
+#X connect 24 0 21 0;
+#X connect 29 0 28 0;
+#X connect 29 1 31 0;
+#X connect 31 0 22 0;
+#X connect 34 0 31 1;
+#X connect 38 0 31 1;

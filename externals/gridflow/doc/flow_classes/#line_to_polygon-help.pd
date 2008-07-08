@@ -1,0 +1,12 @@
+#N canvas 184 260 450 300 10;
+#X obj 51 156 #draw_polygon put (255 255 255);
+#X obj 51 175 #out window;
+#X msg 51 137 240 320 3 #;
+#X obj 279 165 display;
+#X msg 263 118 2 2 # 10 10 229 309;
+#X obj 263 137 #line_to_polygon 4;
+#X connect 0 0 1 0;
+#X connect 2 0 0 0;
+#X connect 4 0 5 0;
+#X connect 5 0 0 2;
+#X connect 5 0 3 0;

@@ -1,0 +1,71 @@
+#N canvas 68 0 507 631 10;
+#X obj 4 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 6 526 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 4 327 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 4 350 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 9 351 Inlet_0;
+#X text 206 329 Inlets (2);
+#X text 215 528 Outlets (1);
+#X obj 3 425 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 5 549 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 9 550 Inlet_0;
+#X text 8 426 Inlet_1;
+#X obj 14 0 #fade;
+#X obj 253 276 #out window;
+#X msg 140 155 open b001.jpg;
+#X obj 131 111 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 131 183 #in;
+#X obj 131 130 t b b;
+#X obj 227 205 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X floatatom 296 231 5 0 0 0 - - -;
+#X obj 131 89 metro 500;
+#X obj 131 70 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 253 113 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 253 185 #in;
+#X obj 253 132 t b b;
+#X msg 262 157 open r001.jpg;
+#X obj 253 91 metro 500;
+#X obj 253 72 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X text 9 25 Crossfade between two images.;
+#X obj 253 250 cnv 15 37 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 253 250 #fade;
+#X text 11 385 GRID;
+#X text 69 383 Accepts two grids that are blended into each other over
+time.;
+#X text 8 457 INTEGER;
+#X text 73 456 An integer in the rightmost inlet will indicate the
+amount of one image being blended with the other. (ex: Integer 5 will
+take 20% (one fifth) of the first image and blend it with 80% of the
+next image.;
+#X text 76 587 Outputs the fading images.;
+#X text 13 584 GRID;
+#X text 399 1 GridFlow 0.8.4;
+#X connect 13 0 15 0;
+#X connect 14 0 16 0;
+#X connect 15 0 29 0;
+#X connect 16 0 15 0;
+#X connect 16 1 13 0;
+#X connect 17 0 29 0;
+#X connect 18 0 29 1;
+#X connect 19 0 14 0;
+#X connect 20 0 19 0;
+#X connect 21 0 23 0;
+#X connect 22 0 29 0;
+#X connect 23 0 22 0;
+#X connect 23 1 24 0;
+#X connect 24 0 22 0;
+#X connect 25 0 21 0;
+#X connect 26 0 25 0;
+#X connect 29 0 12 0;

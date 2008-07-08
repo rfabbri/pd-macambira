@@ -1,0 +1,73 @@
+#N canvas 412 35 508 791 10;
+#X obj 1 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 607 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 296 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 319 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 215 609 Outlets (1);
+#X obj 1 688 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 210 687 Arguments (1);
+#X obj 0 484 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 628 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 2 320 Inlet 0;
+#X text 1 485 Inlet 1;
+#X text 221 297 Inlets (2);
+#X text 2 629 Outlet 0;
+#X obj 10 0 #convolve;
+#X obj 16 87 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1 -1
+;
+#X msg 228 135 1 1 1 1 1 1 1 1 1;
+#X obj 228 113 loadbang;
+#X text 27 718 here ^ is the parallel operator \, fold is indicated
+by + and 0 is its base.;
+#X obj 16 112 fork;
+#X obj 228 157 #redim (3 3);
+#X obj 16 158 #in;
+#X obj 16 241 #out window;
+#X obj 0 757 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 55 756 see also:;
+#X obj 126 760 #contrast;
+#X obj 195 760 #posterize;
+#X obj 271 760 #solarize;
+#X obj 340 760 #layer;
+#X obj 16 183 cnv 15 219 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 16 183 #convolve \, op ^ \, fold + \, seed 0;
+#X text 14 27 [#convolve] is used to perform various transformations
+on images such as blurring \, sharpening \, finding edges \, embossing
+\, cellular automata and many others.;
+#X text 29 346 GRID;
+#X text 28 660 GRID;
+#X text 23 512 GRID;
+#X text 70 514 This is the convolution grid and it gets stored in the
+other object. If rows2 and/or columns 2 are odd numbers \, then the
+centre of convolution is the middle of the convolution grid. If they
+are even numbers \, then the chosen centre will be slightly more to
+the left and/or to the top \, because the actual middle is between
+celle of the grid.;
+#X text 73 347 splits the incoming grid into dim(rest...) parts \,
+for each of those parts at (xy \, x). a rectangle of such parts \,
+centered around (y \, x) is combined with the convolution grid like
+a [#] of operation op_para. then each such result is folded like [#fold]
+of operation op_fold and specified base. the results are assembled
+into a grid that is sent to the outlet. near the borders of the grid
+\, coordinates wrap around. this means the whole grid has to be received
+before production of the next grid starts.;
+#X msg 39 135 open scissors.jpg;
+#X text 398 1 GridFlow 0.9.0;
+#X connect 14 0 18 0;
+#X connect 15 0 19 0;
+#X connect 16 0 15 0;
+#X connect 18 0 20 0;
+#X connect 18 1 36 0;
+#X connect 19 0 29 1;
+#X connect 20 0 29 0;
+#X connect 29 0 21 0;
+#X connect 36 0 20 0;

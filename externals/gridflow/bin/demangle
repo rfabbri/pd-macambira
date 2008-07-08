@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+f = File.popen "gdb", "r+"
+f.puts "maintenance demangle #{ARGV[0]}", "quit"
+puts f.read.split("\n")[-2].sub(/^\(gdb\) /,"")

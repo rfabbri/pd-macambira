@@ -1,0 +1,30 @@
+#N canvas 442 305 506 373 10;
+#X obj 39 93 ascii;
+#X floatatom 39 61 5 0 0 0 - - -;
+#X obj 39 124 print;
+#X msg 86 60 42;
+#X obj 1 -2 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 398 -2 GridFlow 0.9.3;
+#X obj 11 -2 ascii;
+#X obj 1 176 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 199 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 2 200 Inlet 0;
+#X text 215 176 Inlets (1);
+#X text 5 225 INT;
+#X obj 1 282 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 215 284 Outlets (1);
+#X obj 1 303 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 2 304 Outlet 0;
+#X text 8 332 FLOAT;
+#X text 135 94 write integer as decimal in ascii codes;
+#X text 84 225 number to be converted into ascii codes;
+#X text 82 332 a sequence of floats corresponding to the ascii codes
+of the input integer;
+#X connect 0 0 2 0;
+#X connect 1 0 0 0;
+#X connect 3 0 0 0;

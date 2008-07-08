@@ -1,0 +1,58 @@
+#N canvas 38 23 507 568 10;
+#X obj 1 334 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 10 235 LIST;
+#X obj 1 185 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 208 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 215 336 Outlets (1);
+#X obj 2 414 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 355 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 2 209 Inlet 0;
+#X text 2 356 Outlet 0;
+#X obj -3 -1 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 3 472 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 219 473 See also;
+#X obj 10 506 listappend;
+#X obj 99 506 listelement;
+#X obj 198 507 listfind;
+#X obj 291 507 listflatten;
+#X obj 11 533 listmake;
+#X obj 99 532 listprepend;
+#X obj 199 533 listreverse;
+#X obj 292 533 listsublist;
+#X msg 80 87 1 3 hello 8 13;
+#X obj 80 131 cnv 15 170 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X msg 248 85 1 12 a b c d e f g h i j k l;
+#X obj 81 155 display;
+#X obj 2 271 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 3 273 Inlet 1;
+#X text 8 380 LIST;
+#X msg 257 106 200 201 202 203 204 205 206;
+#X text 66 235 Accepts a list to be appended to initial list.;
+#X text 9 297 LIST;
+#X text 221 186 Inlets (2);
+#X text 65 381 Outputs the resulting list.;
+#X text 213 413 Arguments (n);
+#X text 7 441 ANY;
+#X text 62 442 This optional argument can contain the initial list
+;
+#X obj 10 0 listappend;
+#X obj 80 132 listappend 1 2 3 4 5 6 7;
+#X text 11 22 The [listappend] combines two lists together. It takes
+the initial list (List1)(passed as an argument or to inlet 1) and appends
+to it the list passed to inlet 0 (List0). [listappend] combines List0
+followed by List1 in a new list.;
+#X text 65 297 Accepts initial list to appended.;
+#X text 392 0 GridFlow 0.9.0;
+#X connect 20 0 36 0;
+#X connect 22 0 36 1;
+#X connect 27 0 36 1;
+#X connect 36 0 23 0;

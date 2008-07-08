@@ -1,0 +1,45 @@
+#N canvas 1083 158 509 668 10;
+#X obj 4 1 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 401 2 GridFlow 0.9.0;
+#X text 5 0 [opencv];
+#X obj 2 629 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 2 629 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 2 629 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 2 629 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 8 630 see also :;
+#X text 91 629 #numop-help.pd;
+#X obj 22 135 #print;
+#X msg 22 69 2 2 # 0 1 2 3;
+#X obj 22 100 cv.Add (2 2 # 0 1 2 3);
+#X obj 22 260 #print;
+#X msg 22 194 2 2 # 0 1 2 3;
+#X obj 22 387 #print;
+#X msg 22 321 2 2 # 0 1 2 3;
+#X obj 22 514 #print;
+#X msg 22 448 2 2 # 0 1 2 3;
+#X obj 22 225 cv.Sub (2 2 # 0 1 2 3);
+#X obj 22 352 cv.Mul (2 2 # 0 1 2 3);
+#X obj 22 479 cv.Div (2 2 # 0 1 2 3);
+#X msg 151 448 2 2 # 0 1 42 666;
+#X msg 151 321 2 2 # 0 1 42 666;
+#X msg 151 194 2 2 # 0 1 42 666;
+#X msg 151 69 2 2 # 0 1 42 666;
+#X text 274 479 rounds down;
+#X text 87 0 numeric operators;
+#X connect 10 0 11 0;
+#X connect 11 0 9 0;
+#X connect 13 0 18 0;
+#X connect 15 0 19 0;
+#X connect 17 0 20 0;
+#X connect 18 0 12 0;
+#X connect 19 0 14 0;
+#X connect 20 0 16 0;
+#X connect 21 0 20 1;
+#X connect 22 0 19 1;
+#X connect 23 0 18 1;
+#X connect 24 0 11 1;

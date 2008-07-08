@@ -1,0 +1,43 @@
+#N canvas 694 45 580 451 10;
+#X obj 119 273 listelement 1;
+#X floatatom 119 292 5 0 0 0 - - -;
+#X floatatom 246 217 5 0 0 0 - - -;
+#X obj 119 254 route position;
+#X obj 119 177 #in;
+#X obj -13 0 cnv 15 580 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj -16 417 cnv 15 580 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 0 13 Copyright 2003 Alexandre Castonguay;
+#X text -4 38 Use the mouse position to scratch the video \, a touchscreen
+works well.;
+#X obj 119 235 #out window;
+#X text 290 215 <-- frame number;
+#X text 223 272 <-- get x values;
+#X obj 92 130 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X text 0 0 scratch_video.pd;
+#X text 16 424 GridFlow 0.9.0;
+#X obj 119 334 s frame_number;
+#X obj 119 86 r frame_number;
+#X floatatom 78 338 5 0 0 0 - - -;
+#X msg 197 141 open violoncelle.mov;
+#X msg 237 82 get;
+#X obj 169 194 route frames;
+#X floatatom 169 216 5 0 0 0 - - -;
+#X text 336 140 320 x 240 \, 128 frames;
+#X obj 119 311 / 2.8;
+#X connect 0 0 1 0;
+#X connect 1 0 23 0;
+#X connect 3 0 0 0;
+#X connect 4 0 9 0;
+#X connect 4 1 2 0;
+#X connect 4 1 20 0;
+#X connect 9 0 3 0;
+#X connect 12 0 4 0;
+#X connect 16 0 4 0;
+#X connect 18 0 4 0;
+#X connect 19 0 4 0;
+#X connect 20 0 21 0;
+#X connect 23 0 15 0;
+#X connect 23 0 17 0;

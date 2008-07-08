@@ -1,0 +1,63 @@
+#N canvas 257 0 660 624 10;
+#X obj 3 -37 cnv 15 653 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 3 -72 cnv 15 653 30 empty empty empty 20 12 0 14 -233017 -355
+0;
+#X obj 3 517 cnv 15 653 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 268 271 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 152 134 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 88 133 <-- step #2 : start the metro;
+#X obj 203 363 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 246 465 cnv 15 20 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 111 159 the metro refreshes the display window so you don't
+have to reload the grid every time it's altered.;
+#X text 204 271 <-- step #1 : load the image;
+#X text 245 464 Tip: try replacing this number box with a slider.;
+#X text 139 363 <-- step #3 : change the grid's vertical parameters
+;
+#X obj 247 405 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 15 -38 2.2 Resizing an image;
+#X text 10 82 [# pack] lets you resize grids by altering the vertical
+and horizontal parameters.;
+#X text 10 34 If you want to make your image four times its size \,
+you would have to insert a 4 into the object \; [#scale_by 4].;
+#X text 9 -10 [#scale_by] resizes grids by multiplying its parameters
+(width and height). To resize an image proportionatly a specific scaling
+size must be identified within the object.;
+#X text 183 405 <-- step #4 : change the grid's horizontal parameters
+;
+#X text 17 -67 2 Introduction to Images;
+#X obj 16 177 metro 10;
+#X obj 16 135 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X floatatom 74 368 5 1 4 0 - - -;
+#X obj 16 482 #out window;
+#X obj 53 295 #in;
+#X msg 53 272 load bluemarble.jpg;
+#X obj 74 431 #pack 2;
+#X obj 16 319 #store;
+#X obj 16 319 #store;
+#X obj 53 249 loadbang;
+#X obj 17 458 cnv 15 63 15 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 16 457 #scale_by;
+#X floatatom 118 406 5 0 0 0 - - -;
+#X text 11 524 GridFlow 0.8.4;
+#X connect 19 0 26 0;
+#X connect 19 0 27 0;
+#X connect 20 0 19 0;
+#X connect 21 0 25 0;
+#X connect 23 0 26 1;
+#X connect 23 0 27 1;
+#X connect 24 0 23 0;
+#X connect 25 0 30 1;
+#X connect 27 0 30 0;
+#X connect 28 0 24 0;
+#X connect 30 0 22 0;
+#X connect 31 0 25 1;

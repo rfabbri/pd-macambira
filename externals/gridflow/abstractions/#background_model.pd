@@ -1,0 +1,93 @@
+#N canvas 563 12 770 687 10;
+#X text 415 -1 sliding buffer;
+#X obj 104 302 # sq-;
+#X obj 104 370 # /;
+#X text 57 293 input;
+#X obj 104 393 #fold +;
+#X text 171 302 <-- (input-mean)exp2;
+#X text 170 287 mean;
+#X text 369 -28 takes a grid as input;
+#X text 569 557 getModel;
+#X text 569 577 clearModel;
+#X obj 183 544 tgl 15 0 empty empty binaryFlag 0 -6 0 8 -24198 -1 -1
+1 1;
+#X text 568 534 adaptBackground (const image src \, const channel8
+mask);
+#X obj 104 578 shunt;
+#X text 195 194 <-- output is an average;
+#X text 201 215 <-- recentre les coordonnees selon la moyenne;
+#X obj 103 -136 inlet;
+#X obj 104 659 outlet;
+#X obj 190 512 inlet binary_flag;
+#X obj 282 -22 t a b;
+#X floatatom 312 20 5 0 0 0 - - -;
+#X msg 312 37 put_at ( \$1 0 0 0 );
+#X text 314 66 <-- this \$1 corresponds to the first argument given
+to the abstraction. The \$1 in the "put_at" message box is simply the
+indice from the counter.;
+#X text 282 145 <-- the number of frames that will establish the backgroundModel
+;
+#X obj 103 -95 t a b a;
+#X obj 126 121 #t;
+#X text 260 262 variance = standard deviation \, squared;
+#X text 523 210 (X - EX)squared;
+#X text 146 344 <-- variance;
+#X text 145 368 <-- squeeze;
+#X text 173 390 <-- applies the pythagore theorem;
+#X text 158 316 <-- fudge factor because we are not in float \, could
+try as float throughout instead;
+#X obj 250 566 inlet output_threshold;
+#X text 254 608 <-- checks to see if the value is within 0-255;
+#X text 158 660 <-- output is greyscale (channel8 in lti parlance)
+;
+#X text 124 468 <-- "malanowis distance" of each pixel to the background
+;
+#X text 297 -50 ------------ addBackground ----------;
+#X obj 104 416 #redim ( \$2 \$3 1);
+#X obj 126 69 #store ( \$1 \$2 \$3 \$4 #);
+#X obj 147 -56 spigot;
+#X obj 190 -83 inlet addBackground;
+#X text 242 416 <-- adds a channel;
+#X obj 217 283 outlet variance;
+#X obj 265 177 outlet Mean;
+#X obj 312 0 count 0 \$1;
+#X obj 126 200 # sq-;
+#X obj 176 119 #fold + \, seed ( \$2 \$3 \$4 #);
+#X obj 176 147 # / \$1;
+#X obj 127 235 #fold + \, seed ( \$2 \$3 \$4 #);
+#X obj 165 260 # / \$1;
+#X obj 135 607 # > 128;
+#X obj 134 628 # * 255;
+#X connect 1 0 2 0;
+#X connect 2 0 4 0;
+#X connect 4 0 36 0;
+#X connect 10 0 12 1;
+#X connect 12 0 16 0;
+#X connect 12 1 49 0;
+#X connect 15 0 23 0;
+#X connect 17 0 10 0;
+#X connect 18 0 37 1;
+#X connect 18 1 43 0;
+#X connect 19 0 20 0;
+#X connect 20 0 37 1;
+#X connect 23 0 1 0;
+#X connect 23 1 37 0;
+#X connect 23 2 38 0;
+#X connect 24 0 44 0;
+#X connect 24 1 45 0;
+#X connect 31 0 49 1;
+#X connect 36 0 12 0;
+#X connect 37 0 24 0;
+#X connect 38 0 18 0;
+#X connect 39 0 38 1;
+#X connect 43 0 19 0;
+#X connect 44 0 47 0;
+#X connect 45 0 46 0;
+#X connect 46 0 1 1;
+#X connect 46 0 42 0;
+#X connect 46 0 44 1;
+#X connect 47 0 48 0;
+#X connect 48 0 2 1;
+#X connect 48 0 41 0;
+#X connect 49 0 50 0;
+#X connect 50 0 16 0;

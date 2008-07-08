@@ -1,0 +1,58 @@
+#N canvas 76 32 504 500 10;
+#X obj 1 331 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 181 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 204 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 412 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 210 411 Arguments (1);
+#X obj 1 271 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 352 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 2 205 Inlet 0;
+#X text 2 272 Inlet 1;
+#X text 221 182 Inlets (2);
+#X obj -1 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 10 0 shunt;
+#X obj 165 117 cnv 15 52 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 166 117 shunt 4;
+#X floatatom 121 151 5 0 0 0 - - -;
+#X floatatom 163 151 5 0 0 0 - - -;
+#X floatatom 205 151 5 0 0 0 - - -;
+#X floatatom 247 151 5 0 0 0 - - -;
+#X floatatom 166 85 5 0 0 0 - - -;
+#X obj 210 85 hradio 15 1 0 4 empty empty empty 0 -6 0 8 -260818 -1
+-1 0;
+#X text 272 84 <-- select output here;
+#X text 65 84 vary this -->;
+#X obj 346 119 shunt;
+#X text 63 295 The integer passed to inlet 1 determines which outlet
+is active.;
+#X text 6 229 ANY;
+#X text 61 229 Incoming message can be Grids \, Symbols \, Integers
+\, Lists \, etc.;
+#X text 65 439 [shunt] accepts an integer as a creation argument which
+defines the number of outlets desired. If [shunt] is created without
+an argument \, it will have 2 outlets.;
+#X text 215 333 Outlets (n);
+#X text 2 353 Outlets;
+#X text 10 380 ANY;
+#X text 64 380 Outputs incoming message value according to the selector
+value.;
+#X text 6 295 INTEGER;
+#X text 10 438 INTEGER;
+#X text 7 29 The [shunt] routes any type of data to its active outlet.
+The number of outlets is defined by the argument at creation and the
+active outlet is defined by its right most inlet.;
+#X text 398 2 GridFlow 0.9.0;
+#X connect 13 0 14 0;
+#X connect 13 1 15 0;
+#X connect 13 2 16 0;
+#X connect 13 3 17 0;
+#X connect 18 0 13 0;
+#X connect 19 0 13 1;

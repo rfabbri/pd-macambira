@@ -1,0 +1,74 @@
+#N canvas 30 36 505 533 10;
+#X obj 1 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 339 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 241 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 264 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 6 265 Inlet_0;
+#X text 203 340 Outlets (1);
+#X obj 1 443 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 205 442 Arguments (1);
+#X obj 1 360 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 14 219 #print;
+#X obj 14 199 cnv 15 93 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 14 199 #cast float64;
+#X obj 269 218 #print;
+#X obj 126 218 #print;
+#X obj 269 198 cnv 15 79 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 269 198 #cast uint8;
+#X obj 126 198 cnv 15 79 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 126 198 #cast int32;
+#X text 203 243 Inlets (1);
+#X text 16 295 GRID;
+#X floatatom 14 181 5 0 0 0 - - -;
+#X msg 126 177 9.8764 9 -32 0.3;
+#X obj 269 158 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 306 79 nbx 8 14 -1e+37 1e+37 0 1 empty empty empty 0 -6 0 10
+-262144 -1 -1 2.1416 256;
+#X obj 356 96 nbx 8 14 -1e+37 1e+37 0 1 empty empty empty 0 -6 0 10
+-262144 -1 -1 45 256;
+#X obj 306 154 #redim ( 2 2 );
+#X obj 269 177 #store;
+#X obj 306 133 #pack 3 float32;
+#X obj 14 161 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X text 73 472 Number types are: uint8 \, int16 \, int32 \, int64 \,
+float32 \, float64. see doc/architecture.html for more info.;
+#X obj 126 157 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X text 12 26 Changes an entity of one data type into another. Returns
+a grid of the same dimensions containing all the same values after
+type conversion. While casting to a smaller type \, overflowing values
+will be truncated.;
+#X text 75 388 Returns a grid of the same dimensions containing all
+the same values after type conversion.;
+#X obj 406 113 nbx 8 14 -1e+37 1e+37 0 1 empty empty empty 0 -6 0 10
+-262144 -1 -1 45 256;
+#X text 0 361 Outlet_0;
+#X obj 11 0 #cast i;
+#X text 395 1 GridFlow 0.9.0;
+#X text 74 295 Any grid;
+#X text 16 389 GRID;
+#X connect 11 0 9 0;
+#X connect 15 0 12 0;
+#X connect 17 0 13 0;
+#X connect 20 0 11 0;
+#X connect 21 0 17 0;
+#X connect 22 0 26 0;
+#X connect 23 0 27 0;
+#X connect 24 0 27 1;
+#X connect 25 0 26 1;
+#X connect 26 0 15 0;
+#X connect 27 0 25 0;
+#X connect 28 0 20 0;
+#X connect 30 0 21 0;
+#X connect 33 0 27 2;

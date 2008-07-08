@@ -1,0 +1,64 @@
+#N canvas 376 138 1022 422 10;
+#X obj 1 14 cnv 15 460 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 4 14 1.2 How to create a grid.;
+#X obj 1 14 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 5 14 1.2 Creating a grid using the [#import] object.;
+#X text 5 40 GridFlow can create a grid from a list of numbers. The
+[#import] object permits you to set the desired amount of rows and
+columns. A message box must be connected to tell the grid which numbers
+to display.;
+#X text 6 109 Steps to create a grid:;
+#X text 7 134 1 - Create a list of numbers using a message box (the
+numbers must be seperated by a space). The list can have as many numbers
+as you want but only the amount defined by [#import] will be displayed.
+As you click on the message box the numbers will appear in the grid.
+Note how the numbers are positioned in the grid from left to right
+and from the top to the bottom.;
+#X text 7 229 2 - Create the [#import] object and indicate the parameters
+you want as grid dimensions. By indicating 3 3 in brackets following
+[#import] \, you are creating a grid that has 3 rows and 3 columns.
+A 3 by 3 grid will displays 9 numbers.;
+#X text 8 291 3 - Connect the objects to a [display] object or a [print]
+object to see the resulting grid. You can alter your grid without actually
+seeing the image.;
+#X obj 1 -30 cnv 15 1020 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 1 -30 cnv 15 780 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 6 -23 1 Introduction to Grids;
+#X obj 1 356 cnv 15 1020 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 479 285 display;
+#X msg 547 154 reset;
+#X obj 476 15 cnv 15 545 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 476 15 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 673 50 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 478 223 cnv 15 92 15 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 478 222 #import (3 3);
+#X msg 478 51 1 2 3 4 5 6 7 8 9;
+#X msg 535 99 1 2 3 4;
+#X text 483 15 1.2 Patch example.;
+#X text 610 155 <-- resets the grid to only display the numbers from
+the list;
+#X obj 652 217 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 610 97 <-- click here three times to see how [#import] only
+outputs a grid once it recieves the number of values associated with
+its dimensions;
+#X text 590 217 <-- step 2: click here to create a grid that has 3
+rows and 3 columns (try changing these numbers to alter the dimensions
+of the grid).;
+#X text 592 287 <-- the display object outputs results.;
+#X text 611 50 <-- step 1: click here to view the numbers from the
+list in a grid.;
+#X text 9 363 GridFlow 0.9.0;
+#X connect 14 0 19 0;
+#X connect 19 0 13 0;
+#X connect 20 0 19 0;
+#X connect 21 0 19 0;

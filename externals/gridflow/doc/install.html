@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><!-- $Id: install.html 3754 2008-06-02 19:24:20Z matju $ -->
+<title>GridFlow 0.9.3 - Installation</title><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" href="gridflow.css" type="text/css"></head><body leftmargin="0" topmargin="0" bgcolor="#ffffff" marginheight="0" marginwidth="0">
+
+<table width="100%" cellspacing="10"><tr><td>
+<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr>
+  <td>             <img src="images/header1.png" alt="GridFlow" width="384"  height="64"></td>
+  <td width="100%"><img src="images/header2.png" alt="GridFlow" width="100%" height="64"></td>
+  <td>             <img src="images/header3.png" alt="GridFlow" width="32"   height="64"></td>
+</table>
+</td></tr></table>
+<blockquote>
+
+<table bgcolor="white" border="0" cellspacing="2" width="100%">
+<tr><td bgcolor="black"><img src="images/black.png" height="2" width="1"></td></tr>
+<tr><td><h4>GridFlow 0.9.3 - Installation</h4>
+<ul>
+<li><h5><a href="#Hardware_and_Software_you_Probably_Need">Hardware and Software you Probably Need</a></h4>
+<li><h5><a href="#Downloading_from_SVN">Downloading from SVN</a></h4>
+<li><h5><a href="#Installation_instructions_%28incl._compilation%29">Installation instructions (incl. compilation)</a></h4>
+<li><h5><a href="#Other_Tips">Other Tips</a></h4>
+</ul>
+</td></tr>
+
+<tr><td bgcolor="black"><img src="images/black.png" height="2" width="1"></td></tr>
+<tr><td><h4><a name="Hardware_and_Software_you_Probably_Need">Hardware and Software you Probably Need</a></h4>
+
+<p><b>Computer/Processor:</b> GridFlow is mainly made on PC. This includes AMD K6/K7/K8 (Athlon/Opteron/etc), Intel P2/P3/P4 and other Pentiums, Intel CoreDuo, etc.; the absolute minimum is 386. However, GridFlow has also been seen working on Macintosh (G3/G4/G5), Corel NetWinder, and SPARCstation.</p>
+
+<p><b>Operating System:</b> GridFlow is mainly made on Ubuntu. We have also used Debian, SuSE and Mandrake. We suppose that it would work on FreeBSD, NetBSD or OpenBSD if someone tried. MacOSX support is a bit trickier but it should work on 10.3 (haven't tried lately). It also worked on Solaris when I tried it. Microsoft Windows is not supported, but if you do want to try to add support for that, try CygWin and/or MinGW.</p>
+
+<p><b>Required Software:</b><ul>
+	<li>Ruby 1.8 or 1.9</li>
+	<li>PureData 0.39 or later, or DesireData</li>
+	<li>GNU C++ Compiler (g++) version 3.x or 4.x</li>
+	<li>GNU Make</li>
+	<li>SVN</li>
+	<li>Developer Tools CD dec 2002 (if MacOS 10.2)</li>
+	<li>XCODE (if MacOS 10.3)</li>
+	<li>FINK (if MacOS 10)</li></ul>
+
+<p><b>Multimedia Components (optional):</b><ul>
+	<li>libSDL (Simple Directmedia Layer)</li>
+	<li>libjpeg</li>
+	<li>libpng</li>
+	<li>libmpeg3 (.mpg reader, HeroineWarrior's)</li>
+	<li>libquicktime (.mov reader/writer, Burkhard Plaum's or HeroineWarrior's) </li>
+	<li>libmpeg (.mpg reader, Greg Ward's, old)</li>
+	<li>Apple QuickTime (.mov reader/writer)</li>
+	<li>Ascii Art Library (aalib)</li>
+	<li>PCI video digitizer card  (and Video4linux 1 driver)</li>
+	<li>USB camera (and Video4linux 1 driver)</li>
+	<li>FFTW3</li>
+	<li>Apple X11 (<a href="http://www.apple.com/support/downloads/x11formacosx.html">for OSX 10.3</a> or
+		       <a href="http://www.apple.com/support/downloads/x11update2006113.html">for OSX 10.4</a>)</li>
+</ul>
+
+<tr><td bgcolor="black"><img src="images/black.png" height="2" width="1"></td></tr>
+<tr><td><h4><a name="Downloading_from_SVN">Downloading from SVN</a></h4>
+<p>The SVN has the absolute latest version of GridFlow, but it's not guaranteed to be working, whereas 
+the actual releases are more tested.</p>
+<p>However you may have various reasons to use the SVN edition, so here's how:</p>
+<p>Make sure you have the <kbd>svn</kbd> program installed.</p>
+<ul>
+<li><kbd>cd pd/extra</kbd>
+<li><kbd>svn checkout http://gridflow.ca/svn/trunk</kbd>
+<li><kbd>mv trunk gridflow</kbd></ul>
+<p>And the subsequent times, you only do this:<ul>
+<li><kbd>cd pd/extra/gridflow</kbd></p>
+<li><kbd>svn update</kbd></ul></p></td></tr>
+
+<tr><td bgcolor="black"><img src="images/black.png" height="2" width="1"></td></tr>
+<tr><td><h4><a name="Installation_instructions_(incl._compilation)">Installation instructions (incl. compilation)</a></h4>
+<ol>
+	<ul><li> Install Ruby.</li>
+	<li>Download GridFlow from the website and uncompress it, or get it from the SVN server.</li>
+	<li>Run <kbd>./configure</kbd> from the <kbd>gridflow</kbd> directory. Make sure it detects all the components
+	you want to use with GridFlow. In MacOS you would normally use FINK to install those extra components: <kbd>ruby libjpeg libjpeg-shlibs libpng-shlibs libpng3 libpng3-shlibs libmpeg libmpeg-shlibs</kbd> </li>
+
+	<li>In Debian (lenny), do <kbd>
+		apt-get install libjpeg62-dev libpng12-dev libmpeg3-dev libquicktime-dev fftw3-dev \
+				libaa1-dev libsdl1.2-dev libnetpbm10-dev libx11-dev libxt-dev \
+				ruby nasm libglib1.2-dev
+	</kbd></li>
+
+	<li>Note: you may have to set <kbd>CPLUS_INCLUDE_PATH</kbd> to indicate where to find *.h files, and you 
+may have to set both <kbd>LIBRARY_PATH</kbd> and <kbd>LD_LIBRARY_PATH</kbd> to indicate where to find 
+*.so  or *.aor *.dylib or *.bundle or *.dll or *.lib files.</li>
+	<li>Note: you can do <kbd>./configure --help</kbd> to get a list of supported 
+options. You can use them to ignore the presence of troublesome libraries 
+and select debugging level. With <kbd>--use-compiler</kbd> you should use a version of <kbd>g++</kbd>, not 
+directly a version of <kbd>gcc</kbd>, else you get <kbd>undefined symbol</kbd> problems. Some versions of gcc/g++ 
+are troublesome.</li>
+	<li>Run <kbd>make</kbd> to produce the executables <kbd>gridflow.so</kbd> and <kbd>gridflow.pd_linux</kbd> or similar</li> <ul>
+	<li>Loading GridFlow:<ul>
+		<li>PureData : With a text editor, modify or create <kbd>~/.pdrc</kbd> and write <kbd>-lib gridflow</kbd>. </li> 
+		<li>DesireData : In "Server Preferences", add <kbd>gridflow</kbd> to the list of libraries.</li> </ul>
+Note that on MacOS the dot-files are invisible in the Finder but you do <kbd>cd ~/Desktop; ln -s ../.pdrc "PureData Configuration"</kbd> to make an alias on the Desktop. 
+Note also that on Windows the dot-files are even more trouble.</li> </ul></td></tr>
+
+<tr><td bgcolor="black"><img src="images/black.png" height="2" width="1"></td></tr>
+<tr><td><h4><a name="Other_Tips">Other Tips</a></h4>
+<ul>
+	<li><b>1</b> : you just did a SVN update and now the program does not compile, or 
+crashes, or changes didn't go through. <ul>
+		<li>If a new directory is created, you need to do <kbd>cvs update -d</kbd>. 
+	  Many people just add that option to their configuration of the SVN software.</li>
+		<li>When some kinds of changes have happened, you may have to rerun the <kbd>configure</kbd> 
+	program before redoing <kbd>make</kbd>. If you had previously reconfigured with specific options, 
+	don't forget to use them again in this case.</li>
+		<li>Maybe matju forgot to upload part of an important change. Tell him.</li> </ul></li>
+	<li>PureData Crashing: <ul>
+		<li>you can start the debugger like <kbd>gdb $(which pd) core.24255</kbd> where the latter part
+			is the name of a RAM dump file. You can enable those dumps using the shell command <kbd>ulimit -c unlimited</kbd>.
+			To avoid dumping, you can also start Pd from within the debugger 
+			using <kbd>gdb `which pd`</kbd> then <kbd>run</kbd> then cause the crash.</li>
+		<li>In GDB, after a crash, you can use the <kbd>where</kbd> to find out what Pd was doing at the moment 
+			of the crash. If instead Pd is frozen, you can force it to crash using Ctrl+C in the terminal. </li>
+		<li>To quit GDB use the <kbd>quit</kbd> command. (really.)</li> </ul></li> </ul></td></tr>
+
+<tr><td bgcolor="black"><img src="images/black.png" height="2" width="1"></td></tr><tr><td>
+<p><font size="-1">
+GridFlow 0.9.3 Documentation<br>
+Copyright © 2001-2008 by Mathieu Bouchard
+<a href="mailto:matju@artengine.ca">matju@artengine.ca</a>
+</font></p>
+</td></tr></tbody></table>
+</blockquote></body></html>

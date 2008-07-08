@@ -1,0 +1,22 @@
+#N canvas 0 0 558 326 10;
+#X obj 39 218 mysql;
+#X obj 52 278 rubyprint;
+#X msg 66 159 symbol test;
+#X obj 70 252 print mysql;
+#X msg 39 91 connect server_url mysql_user some_password database_name
+;
+#X msg 53 121 query select thing from some_table;
+#X msg 162 143 query select * from some_table order by rand() limit
+1;
+#X msg 60 187 query insert into some_table (something) values (' \$1
+');
+#X text 39 26 http://tmtm.org/en/mysql;
+#X text 37 9 [mysql] requires mysql-ruby from Tomita Masahiro;
+#X text 39 43 no recompiling required \; -);
+#X connect 0 0 1 0;
+#X connect 0 0 3 0;
+#X connect 2 0 7 0;
+#X connect 4 0 0 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
+#X connect 7 0 0 0;

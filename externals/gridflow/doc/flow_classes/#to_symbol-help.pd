@@ -1,0 +1,46 @@
+#N canvas 721 295 503 549 10;
+#X obj 1 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 0 428 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 0 323 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 0 346 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 214 430 Outlets (1);
+#X obj 0 526 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 0 449 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 1 347 Inlet 0;
+#X text 1 450 Outlet 0;
+#X text 214 323 Inlets (1);
+#X obj 11 233 cnv 15 63 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X text 5 374 GRID;
+#X obj 46 164 display;
+#X text 209 525 Arguments (0);
+#X obj 174 292 display;
+#X text 3 477 LIST;
+#X symbolatom 353 294 12 0 0 0 - - -;
+#X text 59 374 Accepts a grid that will be transformed into a symbol.
+;
+#X text 57 477 The grid is transformed into a single message containing
+a symbol.;
+#X text 11 32 Produces a symbol from grid data in its input. The values
+are expected to be valid ASCII codes \, but no check will be performed
+for that \, and additionally \, no check will be made that the generated
+symbol only contains characters that can be put in a symbol.;
+#X msg 11 111 72 101 108 108 111 32 87 111 114 108 100 33;
+#X obj 11 138 #import (3 2 2);
+#X text 324 111 <-- create the grid here;
+#X text 397 0 GridFlow 0.9.0;
+#X obj 2 0 #to_symbol;
+#X obj 11 233 #to_symbol;
+#X obj 11 292 print converted_grid;
+#X connect 20 0 21 0;
+#X connect 21 0 12 0;
+#X connect 21 0 25 0;
+#X connect 25 0 14 0;
+#X connect 25 0 16 0;
+#X connect 25 0 26 0;
