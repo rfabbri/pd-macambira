@@ -1,11 +1,11 @@
-#N canvas 624 76 774 681 12;
+#N canvas 635 121 774 681 12;
 #X floatatom 41 42 9 0 0 0 - - -;
 #N canvas 0 0 450 300 (subpatch) 0;
 #X array array99 11 float 0;
 #X coords 0 1 10 -1 250 200 1;
 #X restore 436 180 graph;
 #X obj 437 48 loadbang;
-#X floatatom 41 -1 5 0 0 0 - - -;
+#X floatatom 41 -1 5 0 135 0 - - -;
 #X obj 41 19 mtof;
 #X floatatom 77 307 0 0 0 0 - - -;
 #N canvas 159 26 706 447 output 0;
@@ -76,7 +76,6 @@
 but offer a 4 points cubic interpolation with tengent continuity. So
 \, in some case \, quality is better than the standart interpolation
 ;
-#X obj 42 123 tabosc4aa~ array99;
 #X obj 179 122 tabosc4~ array99;
 #X obj 157 498 oscillo~;
 #X text 279 17 tabosc4~;
@@ -198,10 +197,12 @@ but offer a 4 points cubic interpolation with tengent continuity. So
 #X restore 205 288 pd osc~;
 #X msg 305 230 reset \, create \, 1;
 #X msg 311 252 0 \, destroy;
-#X obj 305 274 gemwin 60;
 #X msg 41 60 \$1 100;
 #X obj 41 83 line~;
-#X connect 0 0 27 0;
+#X obj 42 123 tabosc4aa~ array99;
+#X obj 305 274 gemwin 20;
+#X floatatom 106 4 5 0 0 0 - - -;
+#X connect 0 0 25 0;
 #X connect 2 0 16 0;
 #X connect 3 0 4 0;
 #X connect 4 0 0 0;
@@ -209,8 +210,8 @@ but offer a 4 points cubic interpolation with tengent continuity. So
 #X connect 6 0 5 0;
 #X connect 7 0 6 2;
 #X connect 8 0 6 0;
-#X connect 8 0 20 0;
-#X connect 8 0 23 0;
+#X connect 8 0 19 0;
+#X connect 8 0 22 0;
 #X connect 9 0 13 0;
 #X connect 10 0 9 0;
 #X connect 11 0 12 0;
@@ -218,14 +219,15 @@ but offer a 4 points cubic interpolation with tengent continuity. So
 #X connect 13 0 11 0;
 #X connect 13 0 14 1;
 #X connect 14 0 6 0;
-#X connect 14 0 20 0;
-#X connect 14 0 23 0;
+#X connect 14 0 19 0;
+#X connect 14 0 22 0;
 #X connect 15 0 18 1;
-#X connect 15 0 19 1;
-#X connect 18 0 14 0;
-#X connect 19 0 8 0;
-#X connect 24 0 26 0;
+#X connect 15 0 27 1;
+#X connect 18 0 8 0;
+#X connect 23 0 28 0;
+#X connect 24 0 28 0;
 #X connect 25 0 26 0;
-#X connect 27 0 28 0;
-#X connect 28 0 18 0;
-#X connect 28 0 19 0;
+#X connect 26 0 18 0;
+#X connect 26 0 27 0;
+#X connect 27 0 14 0;
+#X connect 29 0 4 0;

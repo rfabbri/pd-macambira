@@ -57,7 +57,7 @@ SGICFLAGS6 = -n32 -DPD -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
 
 # ----------------------- LINUX i386 -----------------------
 
-pd_linux: tabosc4c~.pd_linux tabread4c~.pd_linux tabosc4cloop~.pd_linux tabosc4h~.pd_linux tabosc4l~.pd_linux tabosc4aa~.pd_linux
+pd_linux: tabosc4c~.pd_linux tabosc4cloop~.pd_linux tabosc4aa~.pd_linux tabread4c~.pd_linux tabread6c~.pd_linux
 
 .SUFFIXES: .pd_linux
 
