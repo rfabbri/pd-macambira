@@ -113,7 +113,7 @@ static t_int *tabread6c_tilde_perform(t_int *w)
 		f = wp[3].w_float;
 // CH
 
-	a0 = c;
+/*	a0 = c;
 	a1 = ( 1./12.)*a - ( 2./3. )*b               + ( 2./3. )*d - ( 1./12.)*e;
 	a2 = (-1./24.)*a + ( 2./3. )*b - ( 5./4. )*c + ( 2./3. )*d - ( 1./24.)*e;
 	a3 = (-3./8. )*a + (13./8. )*b - (35./12.)*c + (11./4. )*d - (11./8. )*e + ( 7./24.)*f;
@@ -121,6 +121,23 @@ static t_int *tabread6c_tilde_perform(t_int *w)
 	a5 = (-5./24.)*a + (25./24.)*b - (25./12.)*c + (25./12.)*d - (25./24.)*e + ( 5./24.)*f;
 
 	*out++ =  ((((a5 * frac + a4 ) * frac + a3) * frac + a2) * frac + a1) * frac + a0;
+*/
+// same but optimized :
+
+	t_sample a3plusa4plusa5 = 0.25f*c+0.125f*e-(1./3.)*d-(1./24.)*a;
+	t_sample fminusa = f-a;
+	t_sample eminusb = e-b;
+	t_sample dminusc = d-c;
+
+	a5 = (5./24.)*((fminusa-5.f*eminusb+10.f*dminusc));
+	a4 = (8./3.)*eminusb-0.5f*fminusa-5.5f*dminusc-a3plusa4plusa5;
+	a3 = a3plusa4plusa5-a4-a5;
+	a2 = (2./3.)*(d+b)-(1./24.)*(a+e)-1.25f*c;
+	a1 = (2./3.)*(d-b)+(1./12.)*(a-e);
+	a0 = c;
+
+	*out++ =  ((((a5 * frac + a4 ) * frac + a3) * frac + a2) * frac + a1)
+* frac + a0;
      
     }
     return (w+5);
