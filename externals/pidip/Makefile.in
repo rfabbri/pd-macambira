@@ -16,7 +16,7 @@ PDP_PIDIP_TARBALL = $(PDP_PIDIP_DISTRO).tar.gz
 
 PDP_PIDIP_CFLAGS  = $(MPEG4IP_CFLAGS) $(IMLIB_CFLAGS) \
     -DPD -DX_DISPLAY_MISSING -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
-    -Wall -W -Wstrict-prototypes \
+    -fPIC -Wall -W -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch \
     -DPDP_PIDIP_VERSION=\"$(PDP_PIDIP_VERSION)\" -g
 
