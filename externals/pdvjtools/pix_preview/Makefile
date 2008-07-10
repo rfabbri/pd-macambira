@@ -9,7 +9,7 @@ GEM2PNM_TARBALL = $(GEM2PNM_DISTRO).tar.gz
 # build flags
 
 GEM2PNM_INCLUDE =  -I$(PD_DIR)/src -I.  -I$(GEM_DIR)/src -I$(PD_DIR)/src
-GEM2PNM_CPPFLAGS  = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
+GEM2PNM_CPPFLAGS  = -fPIC -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
     -Wall -W -Wno-unused -Wno-parentheses -Wno-switch \
     -DGEM2PNM_VERSION=\"$(GEM2PNM_VERSION)\" -g
 
