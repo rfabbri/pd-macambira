@@ -6,7 +6,7 @@ GEM_OPENCV_VERSION = 0.1
 # build flags
 
 INCLUDES =  -I$(PD_DIR)/src -I.  -I$(GEM_DIR)/src -I$(PD_DIR)/src
-CPPFLAGS  = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
+CPPFLAGS  = -fPIC -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
     -Wall -W -Wno-unused -Wno-parentheses -Wno-switch \
     -DGEM_OPENCV_VERSION=\"$(GEM_OPENCV_VERSION)\" -g
 
