@@ -10,7 +10,7 @@ pd_linux: $(NAME).pd_linux
 
 .SUFFIXES: .pd_linux
 
-LINUXCFLAGS = -DPD -DUNIX -DICECAST -O2 -funroll-loops -fomit-frame-pointer \
+LINUXCFLAGS = -fPIC -DPD -DUNIX -DICECAST -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wno-shadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch #-Werror
 
