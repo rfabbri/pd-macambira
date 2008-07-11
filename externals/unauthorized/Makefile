@@ -120,7 +120,7 @@ SGICFLAGS6 = -n32 -DPD -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
 pd_linux: $(TARGETS)
 
 LINUXCFLAGS = -DPD -DUNIX -DICECAST -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wno-shadow -Wstrict-prototypes -g \
+    -fPIC -Wall -W -Wno-shadow -Wstrict-prototypes -g \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 LINUXINCLUDE =  -I../../src -I../../pd/src
