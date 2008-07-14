@@ -1,31 +1,33 @@
-#N canvas 829 154 575 657 10;
+#N canvas 863 301 575 657 10;
 #X obj 141 91 cnv 15 158 78 empty empty \$1\$2->\$3 4 14 0 10 -86277
 -260097 0;
 #X obj 65 56 r \$0popup;
 #X obj 203 508 s PDOSC;
 #X obj 203 480 prepent;
-#N canvas 259 247 494 344 init 0;
+#N canvas 259 247 595 362 init 0;
 #X obj 41 141 s \$0assgnList;
 #X msg 41 119 a b c d e f g h i j k l m n o p;
 #X msg 288 122 1;
 #X obj 288 143 s \$0channelR;
-#X msg 160 243 options;
-#X obj 160 265 s \$0popup;
+#X obj 160 295 s \$0popup;
 #X obj 41 97 initbang;
 #X obj 288 101 initbang;
 #X obj 160 187 initbang;
 #X msg 160 209 bgcolour #ee0000;
 #X msg 160 226 name $#++#$~~~~~>;
+#X obj 170 249 savebang;
+#X msg 160 274 options press 'get' to load parameters;
 #X connect 1 0 0 0;
 #X connect 2 0 3 0;
-#X connect 4 0 5 0;
-#X connect 6 0 1 0;
-#X connect 7 0 2 0;
-#X connect 8 0 10 0;
+#X connect 5 0 1 0;
+#X connect 6 0 2 0;
+#X connect 7 0 9 0;
+#X connect 7 0 8 0;
+#X connect 7 0 11 0;
 #X connect 8 0 4 0;
-#X connect 8 0 9 0;
-#X connect 9 0 5 0;
-#X connect 10 0 5 0;
+#X connect 9 0 4 0;
+#X connect 10 0 11 0;
+#X connect 11 0 4 0;
 #X restore 31 361 pd init;
 #X obj 288 187 s \$0popOut;
 #X obj 288 64 r \$0setPopup;
@@ -130,8 +132,6 @@
 #X restore 31 293 pd 16channelOuts;
 #X obj 145 24 list-extend;
 #X obj 145 45 prepent options;
-#X obj 281 151 bng 8 250 50 0 \$0getParams \$0getParamsR get 0 12 1
-7 -249808 -1 -262144;
 #X obj 11 507 r \$0getParams;
 #X obj 203 363 r \$1\$2;
 #X obj 381 364 t b a;
@@ -152,47 +152,14 @@
 #X obj 49 530 s \$1/clearParams;
 #X obj 203 442 spigot 0;
 #X obj 248 403 r \$0omni;
-#X obj 145 118 popup 150 25 #ee0000 $#++#$~~~~~> /k2000h-fxs-position
-/filter-fxs-position /reson-\$3-whichModder /cutoff-\$3-whichModder
-/filterA/reson /filterA/smoothing /filterA/cutoff /cloudel-fxs-position
-/cloudelA/clockToggle /cloudelA/rndRange5 /cloudelA/rndRange4 /cloudelA/rndRange3
-/cloudelA/rndRange2 /cloudelA/rndRange1 /freqshift1-fxs-position /verb3-fxs-position
-/wet-whichModder /dry-whichModder /crossover-whichModder /damping-whichModder
-/liveness-whichModder /verb3A/dry /verb3A/wet /verb3A/crossover /verb3A/damping
-/verb3A/liveness /zxh-fxs-position /zxh-\$3-whichModder /zxhA/zhzxhness
-/tanhB/amplify /tanhB-fxs-position /tanhA/amplify /tanhA-fxs-position
-/CMix /BMix /AMix /CLev /DLev /BLev /ALev /dryLev /array3 /array2 /array1
-/bpmA/bpmDivBy /bpmA/bpmDivC /bpmA/bpmDivB /bpmA/bpmDivA /cfmB/rxnSpeed
-/cfmB/matrixModAmt /cfmB/invertMatrix /cfmB/algo /cfmB/envModAmt /cfmB/randomizeTgl
-/cfmB/fb2MatrixTgl /cfmB/fb1MatrixTgl /cfmB/freq2MatrixTgl /cfmB/freq1MatrixTgl
-/cfmB/fb2ModTgl /cfmB/fb1ModTgl /cfmB/freq2ModTgl /cfmB/freq1ModTgl
-/cfmB/fb2 /cfmB/fb1 /cfmB/freq2 /cfmB/freq1 /envC/vol /envC/velocityTgl
-/envC/panRight /envC/panLeft /envC/releaseTime /envC/sustain /envC/decayTime
-/envC/holdTime /envC/attackTime /envB/vol /envB/velocityTgl /envB/panRight
-/envB/panLeft /envB/releaseTime /envB/sustain /envB/decayTime /envB/holdTime
-/envB/attackTime /polyposcA/sinLFOTo? /polyposcA/squLFOTo? /polyposcA/sawLFOTo?
-/polyposcA/wobLFOTo? /polyposcA/envModTo? /polyposcA/envMod /polyposcA/LFOFree?
-/polyposcA/wobFree? /polyposcA/triOn? /polyposcA/squOn? /polyposcA/sawOn?
-/polyposcA/sinOn? /polyposcA/envModBaseFreq /polyposcA/envModFilt /polyposcA/envModLFOFreq
-/polyposcA/envModLFOLev /polyposcA/filtSmooth /polyposcA/wobbleFreq
-/polyposcA/filtQ /polyposcA/filtFreq /polyposcA/wobbleLev /polyposcA/baseFreq
-/physicadA-centerNote /physicadA-sample /physicadA-xfade /physicadA-rndrange
-/physicadA-rndtgl /physicadA-slices2 /physicadA-slices1 /trim /begin
-/xzone /touchtype /chptrA/xtype /chptrA/xshape /chptrA/loop /chptrA/interp
-/chptrA/keepLength /chptrA/speedsl /chptrA/speedmult /sample /cfmA/rxnSpeed
-/cfmA/matrixModAmt /cfmA/invertMatrix /cfmA/algo /cfmA/envModAmt /cfmA/randomizeTgl
-/cfmA/fb2MatrixTgl /cfmA/fb1MatrixTgl /cfmA/freq2MatrixTgl /cfmA/freq1MatrixTgl
-/cfmA/fb2ModTgl /cfmA/fb1ModTgl /cfmA/freq2ModTgl /cfmA/freq1ModTgl
-/cfmA/fb2 /cfmA/fb1 /cfmA/freq2 /cfmA/freq1 /envA/vol /envA/velocityTgl
-/envA/panRight /envA/panLeft /envA/releaseTime /envA/sustain /envA/decayTime
-/envA/holdTime /envA/attackTime /auto /toggle /length;
-#X obj 157 146 hradio 10 1 0 8 \$0chRow1 \$0chRow1R empty 0 -8 0 10
+#X obj 145 141 popup 150 25 #ee0000 $#++#$~~~~~> option;
+#X obj 157 114 hradio 10 1 0 8 \$0chRow1 \$0chRow1R empty 0 -8 0 10
 -118016 -62784 -166441 0;
-#X obj 157 156 hradio 10 1 0 8 \$0chRow2 \$0chRow2R empty 0 -8 0 10
+#X obj 157 123 hradio 10 1 0 8 \$0chRow2 \$0chRow2R empty 0 -8 0 10
 -118016 -118016 -166441 0;
-#X obj 240 149 cnv 15 37 15 empty \$0channelDisp Ch.1 2 7 0 10 -66577
+#X obj 238 117 cnv 15 35 15 empty \$0channelDisp Ch.1 2 7 0 10 -66577
 -225280 0;
-#X obj 145 150 hradio 12 1 0 1 \$0chRow0 \$0chRow0R empty 0 -8 0 10
+#X obj 145 118 hradio 12 1 0 1 \$0chRow0 \$0chRow0R empty 0 -8 0 10
 -166441 -166441 -166441 0;
 #N canvas 0 65 921 562 3RowRadio 0;
 #X obj 258 324 r \$0chRow1;
@@ -286,7 +253,6 @@
 #X obj 31 478 s \$0channelR;
 #X obj 31 433 r \$1/showChannel;
 #X obj 31 456 clip 0 16;
-#X obj 407 39 nr;
 #X obj 26 550 loadbang;
 #X obj 26 573 list append \$3 1;
 #X msg 26 597 symbol \$1\$2/getParams;
@@ -296,40 +262,45 @@
 #X obj 191 619 s \$0paramsList;
 #X obj 191 599 iem_r;
 #X msg 191 577 set \$1\$2/paramsList;
-#X connect 1 0 34 0;
+#X obj 279 116 cnv 15 15 30 empty empty empty 20 12 0 14 -258113 -66577
+0;
+#X obj 282 120 bng 9 250 50 0 \$0getParams \$0getParamsR get -2 14
+2 11 -249808 -159808 -1;
+#X obj 420 4 menubar;
+#X connect 1 0 33 0;
 #X connect 3 0 2 0;
-#X connect 6 0 34 1;
+#X connect 6 0 33 1;
 #X connect 12 0 13 0;
 #X connect 13 0 8 0;
-#X connect 13 0 34 0;
-#X connect 15 0 29 0;
-#X connect 16 0 32 0;
-#X connect 17 0 18 0;
-#X connect 17 1 20 1;
-#X connect 17 1 26 0;
-#X connect 18 0 20 0;
-#X connect 19 0 17 0;
+#X connect 13 0 33 0;
+#X connect 14 0 28 0;
+#X connect 15 0 31 0;
+#X connect 16 0 17 0;
+#X connect 16 1 19 1;
+#X connect 16 1 25 0;
+#X connect 17 0 19 0;
+#X connect 18 0 16 0;
+#X connect 19 0 20 0;
 #X connect 20 0 21 0;
-#X connect 21 0 22 0;
-#X connect 22 0 3 1;
-#X connect 23 0 18 0;
-#X connect 26 0 27 0;
-#X connect 27 0 24 0;
-#X connect 29 0 28 0;
-#X connect 29 1 31 0;
-#X connect 30 0 12 1;
-#X connect 32 0 3 0;
-#X connect 33 0 32 1;
-#X connect 34 0 10 0;
-#X connect 34 1 5 0;
-#X connect 41 0 42 0;
-#X connect 42 0 40 0;
-#X connect 44 0 45 0;
-#X connect 45 0 46 0;
-#X connect 46 0 28 1;
-#X connect 47 0 12 0;
-#X connect 48 0 49 0;
-#X connect 49 0 52 0;
-#X connect 51 0 50 0;
-#X connect 52 0 51 0;
+#X connect 21 0 3 1;
+#X connect 22 0 17 0;
+#X connect 25 0 26 0;
+#X connect 26 0 23 0;
+#X connect 28 0 27 0;
+#X connect 28 1 30 0;
+#X connect 29 0 12 1;
+#X connect 31 0 3 0;
+#X connect 32 0 31 1;
+#X connect 33 0 10 0;
+#X connect 33 1 5 0;
+#X connect 40 0 41 0;
+#X connect 41 0 39 0;
+#X connect 42 0 43 0;
+#X connect 43 0 44 0;
+#X connect 44 0 27 1;
+#X connect 45 0 12 0;
+#X connect 46 0 47 0;
+#X connect 47 0 50 0;
+#X connect 49 0 48 0;
+#X connect 50 0 49 0;
 #X coords 0 -1 1 1 160 80 2 140 90;
