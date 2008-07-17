@@ -1,13 +1,10 @@
-#N canvas 863 301 575 657 10;
-#X obj 141 91 cnv 15 158 78 empty empty \$1\$2->\$3 4 14 0 10 -86277
+#N canvas 745 148 532 641 10;
+#X obj 141 161 cnv 15 158 78 empty empty \$1\$2->\$3 4 14 0 10 -86277
 -260097 0;
-#X obj 65 56 r \$0popup;
-#X obj 203 508 s PDOSC;
-#X obj 203 480 prepent;
+#X obj 65 126 r \$0popup;
 #N canvas 259 247 595 362 init 0;
 #X obj 41 141 s \$0assgnList;
 #X msg 41 119 a b c d e f g h i j k l m n o p;
-#X msg 288 122 1;
 #X obj 288 143 s \$0channelR;
 #X obj 160 295 s \$0popup;
 #X obj 41 97 initbang;
@@ -17,20 +14,21 @@
 #X msg 160 226 name $#++#$~~~~~>;
 #X obj 170 249 savebang;
 #X msg 160 274 options press 'get' to load parameters;
+#X msg 288 122 0;
 #X connect 1 0 0 0;
-#X connect 2 0 3 0;
-#X connect 5 0 1 0;
-#X connect 6 0 2 0;
-#X connect 7 0 9 0;
-#X connect 7 0 8 0;
-#X connect 7 0 11 0;
-#X connect 8 0 4 0;
-#X connect 9 0 4 0;
-#X connect 10 0 11 0;
-#X connect 11 0 4 0;
+#X connect 4 0 1 0;
+#X connect 5 0 11 0;
+#X connect 6 0 8 0;
+#X connect 6 0 7 0;
+#X connect 6 0 10 0;
+#X connect 7 0 3 0;
+#X connect 8 0 3 0;
+#X connect 9 0 10 0;
+#X connect 10 0 3 0;
+#X connect 11 0 2 0;
 #X restore 31 361 pd init;
-#X obj 288 187 s \$0popOut;
-#X obj 288 64 r \$0setPopup;
+#X obj 288 257 s \$0popOut;
+#X obj 288 134 r \$0setPopup;
 #N canvas 667 135 255 293 memento 0;
 #X obj 14 10 sft.originator \$1 \$0;
 #X obj 14 55 r \$0assgnList;
@@ -46,7 +44,7 @@
 #X connect 6 0 7 0;
 #X connect 7 0 4 0;
 #X restore 31 339 pd memento;
-#X obj 156 69 s \$0params;
+#X obj 156 139 s \$0params;
 #N canvas 55 208 632 552 listops 0;
 #X obj 35 207 list-idx;
 #X obj 35 119 r \$0channel;
@@ -71,7 +69,7 @@
 #X obj 35 483 s \$0setPopup;
 #X obj 35 443 list;
 #X obj 142 379 s \$0popup;
-#X msg 142 357 name $#++#$;
+#X msg 142 357 name No-Destination;
 #X connect 0 0 19 0;
 #X connect 1 0 3 0;
 #X connect 2 0 0 0;
@@ -111,7 +109,7 @@
 #X connect 21 0 20 0;
 #X connect 23 0 22 0;
 #X restore 31 315 pd listops;
-#X obj 145 187 route bang;
+#X obj 145 257 route bang;
 #N canvas 935 166 242 368 16channelOuts 0;
 #X obj 18 23 rchannel-multi \$0 \$1 \$2 \$3 \$4 1;
 #X obj 18 43 rchannel-multi \$0 \$1 \$2 \$3 \$4 2;
@@ -130,37 +128,24 @@
 #X obj 18 323 rchannel-multi \$0 \$1 \$2 \$3 \$4 16;
 #X obj 18 243 rchannel-multi \$0 \$1 \$2 \$3 \$4 12;
 #X restore 31 293 pd 16channelOuts;
-#X obj 145 24 list-extend;
-#X obj 145 45 prepent options;
-#X obj 11 507 r \$0getParams;
-#X obj 203 363 r \$1\$2;
-#X obj 381 364 t b a;
-#X obj 327 395 symbol /none;
-#X obj 381 343 r \$1/demux;
-#X obj 327 418 list prepend 1;
-#X obj 327 439 list prepend \$3;
-#X msg 327 463 \$1\$2\$3;
-#X obj 327 283 r \$0popOut;
-#X obj 427 439 s \$0demuxDisplay;
-#X obj 280 96 cnv 15 15 15 empty \$0demuxDisplay 1 1 9 0 11 -261234
+#X obj 166 61 list-extend;
+#X obj 145 115 prepent options;
+#X obj 189 405 r \$0getParams;
+#X obj 280 166 cnv 15 15 15 empty \$0demuxDisplay 1 1 9 0 11 -261234
 -33289 0;
-#X obj 427 395 list-l2s;
-#X obj 427 418 prepent label;
-#X obj 11 620 s;
-#X obj 11 530 t b b;
-#X obj 231 23 r \$1/clearParams;
-#X obj 49 530 s \$1/clearParams;
-#X obj 203 442 spigot 0;
-#X obj 248 403 r \$0omni;
-#X obj 145 141 popup 150 25 #ee0000 $#++#$~~~~~> option;
-#X obj 157 114 hradio 10 1 0 8 \$0chRow1 \$0chRow1R empty 0 -8 0 10
--118016 -62784 -166441 0;
-#X obj 157 123 hradio 10 1 0 8 \$0chRow2 \$0chRow2R empty 0 -8 0 10
--118016 -118016 -166441 0;
-#X obj 238 117 cnv 15 35 15 empty \$0channelDisp Ch.1 2 7 0 10 -66577
--225280 0;
-#X obj 145 118 hradio 12 1 0 1 \$0chRow0 \$0chRow0R empty 0 -8 0 10
+#X obj 208 577 s;
+#X obj 240 61 r \$1/clearParams;
+#X obj 228 452 s \$1/clearParams;
+#X obj 145 211 popup 150 25 #ee0000 No-Destination /noiseA/release-normalized
+/noiseA/filterCut-normalized;
+#X obj 157 184 hradio 10 1 0 8 \$0chRow1 \$0chRow1R empty 0 -8 0 10
 -166441 -166441 -166441 0;
+#X obj 157 193 hradio 10 1 0 8 \$0chRow2 \$0chRow2R empty 0 -8 0 10
+-166441 -166441 -166441 0;
+#X obj 238 187 cnv 15 35 15 empty \$0channelDisp Omni 2 7 0 10 -66577
+-260818 0;
+#X obj 145 188 hradio 12 1 0 1 \$0chRow0 \$0chRow0R empty 0 -8 0 10
+-260818 -62784 -166441 0;
 #N canvas 0 65 921 562 3RowRadio 0;
 #X obj 258 324 r \$0chRow1;
 #X obj 508 334 r \$0chRow2;
@@ -253,54 +238,86 @@
 #X obj 31 478 s \$0channelR;
 #X obj 31 433 r \$1/showChannel;
 #X obj 31 456 clip 0 16;
-#X obj 26 550 loadbang;
-#X obj 26 573 list append \$3 1;
-#X msg 26 597 symbol \$1\$2/getParams;
-#X obj 145 4 r \$0paramsList;
-#X obj 191 530 loadbang;
-#X obj 191 553 list append \$3 1;
-#X obj 191 619 s \$0paramsList;
-#X obj 191 599 iem_r;
-#X msg 191 577 set \$1\$2/paramsList;
-#X obj 279 116 cnv 15 15 30 empty empty empty 20 12 0 14 -258113 -66577
+#X obj 223 477 loadbang;
+#X msg 223 554 symbol \$1\$2/getParams;
+#X obj 166 41 r \$0paramsList;
+#X obj 279 186 cnv 15 15 30 empty empty empty 20 12 0 14 -258113 -66577
 0;
-#X obj 282 120 bng 9 250 50 0 \$0getParams \$0getParamsR get -2 14
+#X obj 282 190 bng 9 250 50 0 \$0getParams \$0getParamsR get -2 14
 2 11 -249808 -159808 -1;
-#X obj 420 4 menubar;
-#X connect 1 0 33 0;
+#N canvas 0 22 398 329 omniOut 0;
+#X obj -274 246 s PDOSC;
+#X obj -274 218 prepent;
+#X obj -274 101 r \$1\$2;
+#X obj -96 102 t b a;
+#X obj -150 133 symbol /none;
+#X obj -96 81 r \$1/demux;
+#X obj -150 156 list prepend 1;
+#X obj -150 177 list prepend \$3;
+#X msg -150 201 \$1\$2\$3;
+#X obj -150 21 r \$0popOut;
+#X obj -50 177 s \$0demuxDisplay;
+#X obj -50 133 list-l2s;
+#X obj -50 156 prepent label;
+#X obj -274 180 spigot 0;
+#X obj -229 141 r \$0omni;
+#X connect 1 0 0 0;
+#X connect 2 0 13 0;
+#X connect 3 0 4 0;
+#X connect 3 1 6 1;
+#X connect 3 1 11 0;
+#X connect 4 0 6 0;
+#X connect 5 0 3 0;
+#X connect 6 0 7 0;
+#X connect 7 0 8 0;
+#X connect 8 0 1 1;
+#X connect 9 0 4 0;
+#X connect 11 0 12 0;
+#X connect 12 0 10 0;
+#X connect 13 0 1 0;
+#X connect 14 0 13 1;
+#X restore 134 293 pd omniOut;
+#N canvas 0 22 385 257 receiveParams 0;
+#X obj 38 17 loadbang;
+#X obj 38 40 list append \$3 1;
+#X obj 38 106 s \$0paramsList;
+#X obj 38 86 iem_r;
+#X msg 38 64 set \$1\$2/paramsList;
+#X text 11 144 this is equivalent to (if \$1 is /sfs) [r /sfs1/paramsList]
+\; the iem_r is required since I'm assuming \$11 (\$1-1) would be interpreted
+as dollar-eleven;
+#X text 14 201 a similar trick is used in the parent for getParams
+;
+#X connect 0 0 1 0;
+#X connect 1 0 4 0;
 #X connect 3 0 2 0;
-#X connect 6 0 33 1;
-#X connect 12 0 13 0;
-#X connect 13 0 8 0;
-#X connect 13 0 33 0;
-#X connect 14 0 28 0;
-#X connect 15 0 31 0;
-#X connect 16 0 17 0;
-#X connect 16 1 19 1;
-#X connect 16 1 25 0;
-#X connect 17 0 19 0;
-#X connect 18 0 16 0;
-#X connect 19 0 20 0;
-#X connect 20 0 21 0;
-#X connect 21 0 3 1;
-#X connect 22 0 17 0;
-#X connect 25 0 26 0;
-#X connect 26 0 23 0;
-#X connect 28 0 27 0;
-#X connect 28 1 30 0;
-#X connect 29 0 12 1;
-#X connect 31 0 3 0;
-#X connect 32 0 31 1;
-#X connect 33 0 10 0;
-#X connect 33 1 5 0;
-#X connect 40 0 41 0;
-#X connect 41 0 39 0;
-#X connect 42 0 43 0;
-#X connect 43 0 44 0;
-#X connect 44 0 27 1;
-#X connect 45 0 12 0;
-#X connect 46 0 47 0;
-#X connect 47 0 50 0;
-#X connect 49 0 48 0;
-#X connect 50 0 49 0;
-#X coords 0 -1 1 1 160 80 2 140 90;
+#X connect 4 0 3 0;
+#X restore 190 377 pd receiveParams;
+#X obj 145 89 list;
+#X obj 145 15 r \$0doneGettingParams;
+#X obj 189 428 t b b b;
+#X obj 189 601 s \$0doneGettingParams;
+#X obj 223 500 list append \$3;
+#X obj 223 531 list append 1;
+#X connect 1 0 17 0;
+#X connect 4 0 17 1;
+#X connect 10 0 33 1;
+#X connect 11 0 6 0;
+#X connect 11 0 17 0;
+#X connect 12 0 35 0;
+#X connect 15 0 10 1;
+#X connect 17 0 8 0;
+#X connect 17 1 3 0;
+#X connect 24 0 25 0;
+#X connect 25 0 23 0;
+#X connect 26 0 37 0;
+#X connect 27 0 14 1;
+#X connect 28 0 10 0;
+#X connect 33 0 11 0;
+#X connect 34 0 33 0;
+#X connect 35 0 36 0;
+#X connect 35 1 14 0;
+#X connect 35 2 16 0;
+#X connect 37 0 38 0;
+#X connect 38 0 27 0;
+#X coords 0 -1 1 1 160 80 2 140 160;
