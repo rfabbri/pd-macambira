@@ -26,6 +26,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#define DEBUG(x)
+//#define DEBUG(x) x
+
 /* -------------------- options handling ------------------------------------ */
 
 void tkwidgets_query_options(t_symbol *receive_name, t_symbol *widget_id, 
@@ -158,7 +161,7 @@ t_symbol* tkwidgets_gen_all_tag(t_object *x)
 static int calculate_onset(int x_location, int width,
                            int current_iolet, int total_iolets)
 {
-    post("calculate_onset");
+    DEBUG(post("calculate_onset"););
     return(x_location + (width - IOWIDTH)                               \
            * current_iolet / (total_iolets == 1 ? 1 : total_iolets - 1));
 }
