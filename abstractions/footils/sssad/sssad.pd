@@ -1,23 +1,26 @@
 #N canvas 584 398 564 509 10;
 #X obj 153 54 inlet;
-#X obj 153 417 outlet;
+#X obj 220 450 outlet;
 #X obj 153 395 list;
-#X obj 176 161 r SSSAD;
+#X obj 178 161 r SSSAD;
 #X obj 218 134 s SSSAD;
 #X obj 218 112 list prepend \$1;
-#X obj 176 189 list trim;
+#X obj 178 189 list trim;
 #X obj 218 54 inlet;
 #X obj 56 308 r SSSAD_ADMIN;
 #X obj 56 356 b;
 #X obj 56 334 route set;
 #X obj 153 81 b;
-#X obj 176 252 route \$1;
-#X obj 191 282 s \$0-sssad-data;
-#X obj 241 335 _sssad/singleton \$1.SSAD sssad-persistence \$1 \$0;
-#X obj 241 362 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 178 252 route \$1;
+#X obj 193 282 s \$0-sssad-data;
+#X obj 241 335 _sssad/singleton \$1.SSAD sssad-persistence \$1 \$0
+;
+#X obj 241 362 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
 1;
+#X obj 153 424 route bang;
+#X text 237 423 filter out empty lists;
 #X connect 0 0 11 0;
-#X connect 2 0 1 0;
+#X connect 2 0 16 0;
 #X connect 3 0 6 0;
 #X connect 5 0 4 0;
 #X connect 6 0 12 0;
@@ -29,3 +32,4 @@
 #X connect 12 0 2 1;
 #X connect 12 0 13 0;
 #X connect 14 0 15 0;
+#X connect 16 1 1 0;
