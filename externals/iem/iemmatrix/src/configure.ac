@@ -1,6 +1,10 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(iemmatrix.c)
 
+AC_CONFIG_HEADER(config.h)
+DFLAGS="${DFLAGS} -DHAVE_CONFIG_H"
+
+
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -63,7 +67,7 @@ AC_CHECK_LIB(m, main)
 dnl Replace `main' with a function in -lpthread:
 dnl AC_CHECK_LIB(pthread, main)
 dnl Replace `main' with a function in -lstk:
-dnl AC_CHECK_LIB(stk, main, STK=yes)
+AC_CHECK_LIB(fftw3, fftw_destroy_plan)
 
 
 if test "x$with_pd" != "x"; then
@@ -92,7 +96,7 @@ AC_CHECK_LIB(pd, nullfn)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(stdlib.h stdio.h string.h math.h time.h sys/time.h)
+AC_CHECK_HEADERS(stdlib.h stdio.h string.h math.h time.h sys/time.h fftw3.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
@@ -208,7 +212,7 @@ then
 	-OPT:roundoff=3 -OPT:IEEE_arithmetic=3 -OPT:cray_ivdep=true \
         -shared -rdata_shared"
   EXT=pd_irix6
-  dnl DFLAGS="-DUNIX -DIRIX6"
+  dnl DFLAGS="-DUNIX -DIRIX6 ${DFLAGS}"
   STRIPFLAGS="--strip-unneeded"
   if test "$enable_lpt" = "yes"; then
     AC_MSG_ERROR("lpt not supported on this platform");
@@ -224,7 +228,7 @@ then
   LDFLAGS="-o32 -DUNIX -DIRIX -O2 
          -shared -rdata_shared"
   EXT=pd_irix5
-  dnl DFLAGS="-DUNIX -DIRIX5"
+  dnl DFLAGS="-DUNIX -DIRIX5 ${DFLAGS}"
   STRIPFLAGS="--strip-unneeded"
   if test "$enable_lpt" = "yes"; then
     AC_MSG_ERROR("lpt not supported on this platform");
