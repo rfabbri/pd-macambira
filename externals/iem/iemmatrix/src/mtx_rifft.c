@@ -15,9 +15,9 @@
 #include "iemmatrix.h"
 #include <stdlib.h>
 
-static t_class *mtx_rowrifft_class;
+static t_class *mtx_rifft_class;
 
-typedef struct _MTXRowrifft_
+typedef struct _MTXRifft_
 {
   t_object x_obj;
   int rows;
@@ -35,7 +35,7 @@ typedef struct _MTXRowrifft_
    
   t_atom *list_re;
   t_atom *list_im;
-} MTXRowrifft;
+} MTXRifft;
 
 
 /* helper functions: these should really go into a separate file! */
@@ -78,16 +78,16 @@ static void ifftPrepareReal (int n, t_float *re, t_float *im)
 }
 
 
-static void *newMTXRowrifft (t_symbol *s, int argc, t_atom *argv)
+static void *newMTXRifft (t_symbol *s, int argc, t_atom *argv)
 {
-  MTXRowrifft *x = (MTXRowrifft *) pd_new (mtx_rowrifft_class);
+  MTXRifft *x = (MTXRifft *) pd_new (mtx_rifft_class);
   inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("matrix"),gensym(""));
   x->list_re_out = outlet_new (&x->x_obj, gensym("matrix"));
   return ((void *) x);
 } 
 
 
-static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s, 
+static void mTXRifftMatrixCold (MTXRifft *x, t_symbol *s, 
 				   int argc, t_atom *argv)
 {
     int rows = atom_getint (argv++);
@@ -103,13 +103,13 @@ static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s,
 
   /* ifftsize check */
   if (columns_re < 3)
-    post("mtx_rowrifft: matrix must have at least 3 columns");
+    post("mtx_rifft: matrix must have at least 3 columns");
   else if (!size) 
-    post("mtx_rowrifft: invalid dimensions");
+    post("mtx_rifft: invalid dimensions");
   else if (in_size < size2)
-    post("mtx_rowrifft: sparse matrix not yet supported: use \"mtx_check\"");
+    post("mtx_rifft: sparse matrix not yet supported: use \"mtx_check\"");
   else if (columns<4)
-    post("mtx_rowrifft: too small matrices");
+    post("mtx_rifft: too small matrices");
   else if (columns == (1 << ilog2(columns))) {
 
     /* memory things */
@@ -137,10 +137,10 @@ static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s,
     /* do nothing else! */
   }
   else
-    post("mtx_rowrifft: rowvector 2*(size+1) no power of 2!");
+    post("mtx_rifft: rowvector 2*(size+1) no power of 2!");
 }
 
-static void mTXrowrifftMatrixHot (MTXRowrifft *x, t_symbol *s, 
+static void mTXRifftMatrixHot (MTXRifft *x, t_symbol *s, 
 				  int argc, t_atom *argv)
 {
   int rows = atom_getint (argv++);
@@ -158,11 +158,11 @@ static void mTXrowrifftMatrixHot (MTXRowrifft *x, t_symbol *s,
   /* ifftsize check */
   if ((rows != x->rows) || 
       (columns_re != x->columns_re))
-    post("mtx_rowrifft: matrix dimensions do not match");
+    post("mtx_rifft: matrix dimensions do not match");
   else if (in_size<size2)
-    post("mtx_rowrifft: sparse matrix not yet supported: use \"mtx_check\"");
+    post("mtx_rifft: sparse matrix not yet supported: use \"mtx_check\"");
   else if (!x->size2)
-    post("mtx_rowrifft: invalid right side matrix");
+    post("mtx_rifft: invalid right side matrix");
   else { /* main part */
     ifft_count = rows;
     ptr_re += 2;
@@ -188,7 +188,7 @@ static void mTXrowrifftMatrixHot (MTXRowrifft *x, t_symbol *s,
   }
 }
 
-static void mTXrowrifftBang (MTXRowrifft *x)
+static void mTXRifftBang (MTXRifft *x)
 {
   if (x->list_re)
     outlet_anything(x->list_re_out, gensym("matrix"), 
@@ -196,7 +196,7 @@ static void mTXrowrifftBang (MTXRowrifft *x)
 }
 
 
-static void deleteMTXRowrifft (MTXRowrifft *x) 
+static void deleteMTXRifft (MTXRifft *x) 
 {
   if (x->f_re)
      free(x->f_re);
@@ -208,19 +208,19 @@ static void deleteMTXRowrifft (MTXRowrifft *x)
      free(x->list_im);
 }
 
-static void mtx_rowrifft_setup (void)
+static void mtx_rifft_setup (void)
 {
-  mtx_rowrifft_class = class_new 
-    (gensym("mtx_rowrifft"),
-     (t_newmethod) newMTXRowrifft,
-     (t_method) deleteMTXRowrifft,
-     sizeof (MTXRowrifft),
+  mtx_rifft_class = class_new 
+    (gensym("mtx_rifft"),
+     (t_newmethod) newMTXRifft,
+     (t_method) deleteMTXRifft,
+     sizeof (MTXRifft),
      CLASS_DEFAULT, A_GIMME, 0);
-  class_addbang (mtx_rowrifft_class, (t_method) mTXrowrifftBang);
-  class_addmethod (mtx_rowrifft_class, (t_method) mTXrowrifftMatrixHot, gensym("matrix"), A_GIMME,0);
-  class_addmethod (mtx_rowrifft_class, (t_method) mTXrowrifftMatrixCold, gensym(""), A_GIMME,0);
+  class_addbang (mtx_rifft_class, (t_method) mTXRifftBang);
+  class_addmethod (mtx_rifft_class, (t_method) mTXRifftMatrixHot, gensym("matrix"), A_GIMME,0);
+  class_addmethod (mtx_rifft_class, (t_method) mTXRifftMatrixCold, gensym(""), A_GIMME,0);
 }
 
-void iemtx_rowrifft_setup(void){
-  mtx_rowrifft_setup();
+void iemtx_rifft_setup(void){
+  mtx_rifft_setup();
 }

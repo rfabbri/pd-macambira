@@ -15,10 +15,10 @@
 #include "iemmatrix.h"
 #include <stdlib.h>
 
-static t_class *mtx_rowrfft_class;
+static t_class *mtx_rfft_class;
 
-typedef struct _MTXRowrfft_ MTXRowrfft;
-struct _MTXRowrfft_
+typedef struct _MTXRfft_ MTXRfft;
+struct _MTXRfft_
 {
   t_object x_obj;
   int size;
@@ -34,7 +34,7 @@ struct _MTXRowrfft_
   t_atom *list_im;
 };
 
-static void deleteMTXRowrfft (MTXRowrfft *x) 
+static void deleteMTXRfft (MTXRfft *x) 
 {
   if (x->f_re)
      free (x->f_re);
@@ -46,9 +46,9 @@ static void deleteMTXRowrfft (MTXRowrfft *x)
      free (x->list_im);
 }
 
-static void *newMTXRowrfft (t_symbol *s, int argc, t_atom *argv)
+static void *newMTXRfft (t_symbol *s, int argc, t_atom *argv)
 {
-  MTXRowrfft *x = (MTXRowrfft *) pd_new (mtx_rowrfft_class);
+  MTXRfft *x = (MTXRfft *) pd_new (mtx_rfft_class);
   x->list_re_out = outlet_new (&x->x_obj, gensym("matrix"));
   x->list_im_out = outlet_new (&x->x_obj, gensym("matrix"));
 
@@ -59,7 +59,7 @@ static void *newMTXRowrfft (t_symbol *s, int argc, t_atom *argv)
   return ((void *) x);
 } 
 
-static void mTXrowrfftBang (MTXRowrfft *x)
+static void mTXRfftBang (MTXRfft *x)
 {
   if (x->list_im) {
     outlet_anything(x->list_im_out, gensym("matrix"), x->size2, x->list_im);
@@ -100,7 +100,7 @@ static void readFloatFromList (int n, t_atom *l, t_float *f)
     *f++ = atom_getfloat (l++);
 }
 
-static void mTXrowrfftMatrix (MTXRowrfft *x, t_symbol *s, 
+static void mTXRfftMatrix (MTXRfft *x, t_symbol *s, 
 			      int argc, t_atom *argv)
 {
   int rows = atom_getint (argv++);
@@ -117,11 +117,11 @@ static void mTXrowrfftMatrix (MTXRowrfft *x, t_symbol *s,
 
   /* fftsize check */
   if (!size)
-    post("mtx_rowrfft: invalid dimensions");
+    post("mtx_rfft: invalid dimensions");
   else if (in_size<size)
-    post("mtx_rowrfft: sparse matrix not yet supported: use \"mtx_check\"");
+    post("mtx_rfft: sparse matrix not yet supported: use \"mtx_check\"");
   else if (columns < 4){
-    post("mtx_rowrfft: matrix must have at least 4 columns");
+    post("mtx_rfft: matrix must have at least 4 columns");
   }
   else if (columns == (1 << ilog2(columns))) {
     /* ok, do the FFT! */
@@ -175,18 +175,18 @@ static void mTXrowrfftMatrix (MTXRowrfft *x, t_symbol *s,
 
 }
 
-void mtx_rowrfft_setup (void)
+void mtx_rfft_setup (void)
 {
-  mtx_rowrfft_class = class_new 
-    (gensym("mtx_rowrfft"),
-     (t_newmethod) newMTXRowrfft,
-     (t_method) deleteMTXRowrfft,
-     sizeof (MTXRowrfft),
+  mtx_rfft_class = class_new 
+    (gensym("mtx_rfft"),
+     (t_newmethod) newMTXRfft,
+     (t_method) deleteMTXRfft,
+     sizeof (MTXRfft),
      CLASS_DEFAULT, A_GIMME, 0);
-  class_addbang (mtx_rowrfft_class, (t_method) mTXrowrfftBang);
-  class_addmethod (mtx_rowrfft_class, (t_method) mTXrowrfftMatrix, gensym("matrix"), A_GIMME,0);
+  class_addbang (mtx_rfft_class, (t_method) mTXRfftBang);
+  class_addmethod (mtx_rfft_class, (t_method) mTXRfftMatrix, gensym("matrix"), A_GIMME,0);
 }
 
-void iemtx_rowrfft_setup(void){
-  mtx_rowrfft_setup();
+void iemtx_rfft_setup(void){
+  mtx_rfft_setup();
 }
