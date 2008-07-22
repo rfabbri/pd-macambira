@@ -538,12 +538,9 @@ void akawiiremote_clock(t_akawiiremote *x)
 	t_atom	status;
 	
 	connection = wiiremote_isconnected(x->wiiremote);
-	
+
 	if (x->connected == false && connection == true)	// if the device is connected...
 	{
-#ifdef PD
-		CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true);
-#endif
 		wiiremote_getstatus(x->wiiremote);
 		x->connected = true;
 		SETLONG(&status, 1);
