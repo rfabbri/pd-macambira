@@ -37,11 +37,13 @@ void iemmatrix_sources_setup(void)
 	iemtx_eq_setup(); /* mtx_eq.c */
 	iemtx_exp_setup(); /* mtx_exp.c */
 	iemtx_eye_setup(); /* mtx_eye.c */
+	iemtx_fft_setup(); /* mtx_fft.c */
 	iemtx_fill_setup(); /* mtx_fill.c */
 	iemtx_find_setup(); /* mtx_find.c */
 	iemtx_gauss_setup(); /* mtx_gauss.c */
 	iemtx_ge_setup(); /* mtx_ge.c */
 	iemtx_gt_setup(); /* mtx_gt.c */
+	iemtx_ifft_setup(); /* mtx_ifft.c */
 	iemtx_index_setup(); /* mtx_index.c */
 	iemtx_int_setup(); /* mtx_int.c */
 	iemtx_inverse_setup(); /* mtx_inverse.c */
@@ -53,8 +55,8 @@ void iemmatrix_sources_setup(void)
 	iemtx_mean_setup(); /* mtx_mean.c */
 	iemtx_min2_setup(); /* mtx_min2.c */
 	iemtx_minmax_setup(); /* mtx_minmax.c */
-	iemtx_mul__setup(); /* mtx_mul~.c */
 	iemtx_mul_setup(); /* mtx_mul.c */
+	iemtx_mul__setup(); /* mtx_mul~.c */
 	iemtx_neq_setup(); /* mtx_neq.c */
 	iemtx_not_setup(); /* mtx_not.c */
 	iemtx_ones_setup(); /* mtx_ones.c */
@@ -68,11 +70,11 @@ void iemmatrix_sources_setup(void)
 	iemtx_repmat_setup(); /* mtx_repmat.c */
 	iemtx_resize_setup(); /* mtx_resize.c */
 	iemtx_reverse_setup(); /* mtx_reverse.c */
+	iemtx_rfft_setup(); /* mtx_rfft.c */
+	iemtx_rifft_setup(); /* mtx_rifft.c */
 	iemtx_rmstodb_setup(); /* mtx_rmstodb.c */
 	iemtx_roll_setup(); /* mtx_roll.c */
 	iemtx_row_setup(); /* mtx_row.c */
-	iemtx_rowrfft_setup(); /* mtx_rowrfft.c */
-	iemtx_rowrifft_setup(); /* mtx_rowrifft.c */
 	iemtx_scroll_setup(); /* mtx_scroll.c */
 	iemtx_sin_setup(); /* mtx_sin.c */
 	iemtx_size_setup(); /* mtx_size.c */

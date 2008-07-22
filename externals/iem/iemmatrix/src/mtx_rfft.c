@@ -15,7 +15,15 @@
 #include "iemmatrix.h"
 #include <stdlib.h>
 
+#ifdef DHAVE_FFTW3
+#include <fftw3.h>
+#endif
+
 static t_class *mtx_rfft_class;
+
+#ifdef DHAVE_FFTW3
+enum ComplexPart { REALPART=0,  IMAGPART=1};
+#endif
 
 typedef struct _MTXRfft_ MTXRfft;
 struct _MTXRfft_
@@ -23,9 +31,16 @@ struct _MTXRfft_
   t_object x_obj;
   int size;
   int size2;
-
+#ifdef DHAVE_FFTW3
+  int fftn;
+  int rows;
+  fftw_plan *fftplan;
+  fftw_complex *f_out;
+  double *f_in;
+#else
   t_float *f_re;
   t_float *f_im;
+#endif
 
   t_outlet *list_re_out;
   t_outlet *list_im_out;
@@ -36,10 +51,23 @@ struct _MTXRfft_
 
 static void deleteMTXRfft (MTXRfft *x) 
 {
+#if DHAVE_FFTW3
+  int n;
+  if (x->fftplan) {
+     for (n=0; n<x->rows; n++) 
+	fftw_destroy_plan(x->fftplan[n]);
+     free(x->fftplan);
+  }
+  if (x->f_out)
+     free(x->f_out);
+  if (x->f_in)
+     free(x->f_in);
+#else
   if (x->f_re)
      free (x->f_re);
   if (x->f_im) 
      free (x->f_im);
+#endif
   if (x->list_re)
      free (x->list_re);
   if (x->list_im)
@@ -51,9 +79,16 @@ static void *newMTXRfft (t_symbol *s, int argc, t_atom *argv)
   MTXRfft *x = (MTXRfft *) pd_new (mtx_rfft_class);
   x->list_re_out = outlet_new (&x->x_obj, gensym("matrix"));
   x->list_im_out = outlet_new (&x->x_obj, gensym("matrix"));
-
   x->size=x->size2=0;
+#ifdef DHAVE_FFTW3
+  x->fftn=0;
+  x->rows=0;
+  x->f_in=0;
+  x->f_out=0;
+  x->fftplan=0;
+#else
   x->f_re=x->f_im=0;
+#endif
   x->list_re=x->list_im=0;
   
   return ((void *) x);
@@ -94,11 +129,25 @@ static void writeFloatIntoList (int n, t_atom *l, t_float *f)
   for (;n--;f++, l++) 
     SETFLOAT (l, *f);
 }
+
 static void readFloatFromList (int n, t_atom *l, t_float *f) 
 {
   while (n--) 
     *f++ = atom_getfloat (l++);
 }
+
+#ifdef DHAVE_FFTW3
+static void writeFFTWComplexPartIntoList (int n, t_atom *l, fftw_complex *f, enum ComplexPart p) 
+{
+  for (;n--;f++, l++) 
+    SETFLOAT (l, ((t_float)*f[p]));
+}
+static void readDoubleFromList (int n, t_atom *l, double *f) 
+{
+  while (n--) 
+    *f++ = (double)atom_getfloat (l++);
+}
+#endif
 
 static void mTXRfftMatrix (MTXRfft *x, t_symbol *s, 
 			      int argc, t_atom *argv)
@@ -112,8 +161,13 @@ static void mTXRfftMatrix (MTXRfft *x, t_symbol *s,
   int fft_count;
   t_atom *list_re = x->list_re;
   t_atom *list_im = x->list_im;
+#ifdef DHAVE_FFTW3
+  fftw_complex *f_out = x->f_out;
+  double *f_in = x->f_in;
+#else
   t_float *f_re = x->f_re;
   t_float *f_im = x->f_im;
+#endif
 
   /* fftsize check */
   if (!size)
@@ -127,8 +181,30 @@ static void mTXRfftMatrix (MTXRfft *x, t_symbol *s,
     /* ok, do the FFT! */
 
     /* memory things */
+#ifdef DHAVE_FFTW3
+    if ((x->rows!=rows)||(columns!=x->fftn)){
+       f_out=(fftw_complex*)realloc(f_out, sizeof(fftw_complex)*(size2-2));
+       f_in=(double*)realloc(f_in, sizeof(double)*size);
+       x->f_in = f_in;
+       x->f_out = f_out;
+       for (fft_count=0; fft_count<x->rows; fft_count++) {
+          fftw_destroy_plan(x->fftplan[fft_count]);
+       }
+       x->fftplan = (fftw_plan*)realloc(x->fftplan, sizeof(fftplan)*rows);
+       for (fft_count=0; fft_count<rows; fft_count++, f_in+=columns, f_out+=columns_re) {
+	  x->fftplan[fft_count] = fftw_plan_dft_r2c_1d (columns,f_in,f_out,FFTW_ESTIMATE);
+       }
+       x->fftn=columns;
+       x->rows=rows;
+       f_in=x->f_in;
+       f_out=x->f_out;
+    }
+#else
     f_re=(t_float*)realloc(f_re, sizeof(t_float)*size);
     f_im=(t_float*)realloc(f_im, sizeof(t_float)*size);
+    x->f_re = f_re;
+    x->f_im = f_im;
+#endif
     list_re=(t_atom*)realloc(list_re, sizeof(t_atom)*size2);
     list_im=(t_atom*)realloc(list_im, sizeof(t_atom)*size2);
 
@@ -136,22 +212,30 @@ static void mTXRfftMatrix (MTXRfft *x, t_symbol *s,
     x->size2 = size2;
     x->list_im = list_im;
     x->list_re = list_re;
-    x->f_re = f_re;
-    x->f_im = f_im;
 
     /* main part */
+#ifdef DHAVE_FFTW3
+    readDoubleFromList (size, argv, f_in);
+#else
     readFloatFromList (size, argv, f_re);
+#endif
 
-    fft_count = rows;
     list_re += 2;
     list_im += 2;
-    while (fft_count--){ 
+    for (fft_count=0;fft_count<rows;fft_count++){ 
+#if DHAVE_FFTW3
+      fftw_execute(x->fftplan[fft_count]);
+      writeFFTWComplexPartIntoList(columns_re,list_re,f_out,REALPART);
+      writeFFTWComplexPartIntoList(columns_re,list_im,f_out,IMAGPART);
+      f_out+=columns_re;
+#else
       mayer_realfft (columns, f_re);
       fftRestoreImag (columns, f_re, f_im);
       writeFloatIntoList (columns_re, list_re, f_re);
       writeFloatIntoList (columns_re, list_im, f_im);
       f_im += columns;
       f_re += columns;
+#endif
       list_re += columns_re;
       list_im += columns_re;
     }
