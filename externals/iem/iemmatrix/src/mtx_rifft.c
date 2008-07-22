@@ -33,13 +33,12 @@ typedef struct _MTXRifft_
   int columns_re;
   int size;
   int size2;
+  t_float renorm_fac;
 #ifdef HAVE_FFTW3_H  
   fftw_plan *fftplan;
   fftw_complex *f_in;
   double *f_out;
 #else
-  t_float renorm_fac;
-
   t_float *f_re;
   t_float *f_im;
 #endif
@@ -94,14 +93,24 @@ static void ifftPrepareReal (int n, t_float *re, t_float *im)
 #ifdef HAVE_FFTW3_H
 static void readFFTWComplexPartFromList (int n, t_atom *l, fftw_complex *f, enum ComplexPart p) 
 {
-  for (;n--;f++, l++) 
-    *f[p] = (double) atom_getfloat (l);
+  for (;n--;) 
+    f[n][p] = (double) atom_getfloat (l+n);
 }
-static void writeDoubleIntoList (int n, t_atom *l, double *f) 
+static void writeDoubleIntoList (int n, t_atom *l, double *d) 
 {
-  while (n--) 
-    SETFLOAT (l++,((t_float)(*f++)));
+   t_float f;
+  while (n--) { 
+    f=(t_float) d[n];
+    SETFLOAT (l+n,f);
+  }
 }
+static void multiplyDoubleVector (int n, double *f, t_float fac)
+{
+   double fd=(double)fac;
+  while (n--)
+    *f++ *= (double)fd;
+}
+
 #endif
 
 static void *newMTXRifft (t_symbol *s, int argc, t_atom *argv)
@@ -152,6 +161,8 @@ static void mTXRifftMatrixCold (MTXRifft *x, t_symbol *s,
       x->fftplan=(fftw_plan*)realloc(x->fftplan,sizeof(fftw_plan)*rows);
       f_in=(fftw_complex*)realloc(f_in,sizeof(fftw_complex)*size2);
       f_out=(double*)realloc(f_out,sizeof(double)*size);
+      list_re=(t_atom*)realloc(list_re, sizeof(t_atom)*(size+2));
+      x->list_re = list_re;
       x->f_out = f_out;
       x->f_in = f_in;
       for (ifft_count=0;ifft_count<rows;ifft_count++) {
@@ -167,22 +178,20 @@ static void mTXRifftMatrixCold (MTXRifft *x, t_symbol *s,
     f_im=(t_float*)realloc(f_im, sizeof(t_float)*size);
     x->f_re = f_re;
     x->f_im = f_im;
+    list_re=(t_atom*)realloc(list_re, sizeof(t_atom)*(size+2));
+    x->list_re = list_re;
 #endif
 
-    list_re=(t_atom*)realloc(list_re, sizeof(t_atom)*(size+2));
     x->size = size;
     x->size2 = size2;
     x->rows = rows;
     x->columns = columns;
     x->columns_re = columns_re;
-    x->list_re = list_re;
       
     /* main part: reading imaginary part */
     ifft_count = rows;
-#ifndef HAVE_FFTW3_H
     x->renorm_fac = 1.0f / columns;
-#endif
-    while (ifft_count--) {
+    for (ifft_count=0;ifft_count<rows;ifft_count++) {
 #ifdef HAVE_FFTW3_H
       readFFTWComplexPartFromList(columns_re, argv, f_in, IMAGPART);
       f_in += columns_re;
@@ -210,12 +219,11 @@ static void mTXRifftMatrixHot (MTXRifft *x, t_symbol *s,
   int ifft_count;
 #ifdef HAVE_FFTW3_H
   fftw_complex *f_in = x->f_in;
-  double *f_out = x->f_out;
 #else
   t_float *f_re = x->f_re;
   t_float *f_im = x->f_im;
-  t_float renorm_fac = x->renorm_fac;
 #endif
+  t_float renorm_fac = x->renorm_fac;
 
   /* ifftsize check */
   if ((rows != x->rows) || 
@@ -235,7 +243,6 @@ static void mTXRifftMatrixHot (MTXRifft *x, t_symbol *s,
       readFloatFromList (columns_re, argv, f_re);
       ifftPrepareReal (columns, f_re, f_im);
       mayer_realifft (columns, f_re);
-      multiplyVector (columns, f_re, renorm_fac);
       f_im += columns;
       f_re += columns;
 #endif
@@ -249,8 +256,10 @@ static void mTXRifftMatrixHot (MTXRifft *x, t_symbol *s,
     SETFLOAT(x->list_re, rows);
     SETFLOAT(x->list_re+1, x->columns);
 #ifdef HAVE_FFTW3_H
-    writeDoubleIntoList (size, x->list_re+2, f_out);
+    multiplyDoubleVector (size, x->f_out, renorm_fac);
+    writeDoubleIntoList (size, x->list_re+2, x->f_out);
 #else
+    multiplyVector (size, f_re, renorm_fac);
     writeFloatIntoList  (size, x->list_re+2, f_re);
 #endif
     outlet_anything(x->list_re_out, gensym("matrix"), size+2, x->list_re);

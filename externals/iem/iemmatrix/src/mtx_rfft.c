@@ -137,10 +137,13 @@ static void readFloatFromList (int n, t_atom *l, t_float *f)
 }
 
 #ifdef HAVE_FFTW3_H
-static void writeFFTWComplexPartIntoList (int n, t_atom *l, fftw_complex *f, enum ComplexPart p) 
+static void writeFFTWComplexPartIntoList (int n, t_atom *l, fftw_complex *c, enum ComplexPart p) 
 {
-  for (;n--;f++, l++) 
-    SETFLOAT (l, ((t_float)*f[p]));
+   t_float f;
+  while (n--) {
+     f=(t_float)c[n][p];
+    SETFLOAT (l+n, f);
+  }
 }
 static void readDoubleFromList (int n, t_atom *l, double *f) 
 {
