@@ -2,6 +2,8 @@
 // Copyright by Masayuki Akamatsu
 // Based on "DarwiinRemote" by Hiroaki Kimura
 
+#define BLUETOOTH_VERSION_USE_CURRENT // gets rid of deprecated warnings
+
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOBluetooth/Bluetooth.h>
 #include <IOBluetooth/IOBluetoothUserLib.h>
