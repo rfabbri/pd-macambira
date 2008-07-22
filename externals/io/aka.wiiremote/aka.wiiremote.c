@@ -10,6 +10,7 @@
 
 #ifdef PD
 #include "m_pd.h"
+#include "m_imp.h"
 #define SETSYM SETSYMBOL
 #define SETLONG SETFLOAT
 #define method t_method
@@ -47,12 +48,6 @@ typedef struct _akawiiremote
 	void			*statusOut;
 	void			*dataOut;
 } t_akawiiremote;
-
-#ifdef PD
-static IONotificationPortRef  gNotifyPort;
-static io_iterator_t          gAddedIter;
-static CFRunLoopRef           gRunLoop;
-#endif
 
 void akawiiremote_bang(t_akawiiremote *x);
 void akawiiremote_address(t_akawiiremote *x, t_symbol *s);
@@ -165,7 +160,9 @@ void akawiiremote_bang(t_akawiiremote *x)
 	
 	if (x->wiiremote->device == nil)
 		return;	// do nothing
-
+#ifdef PD
+    CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true);
+#endif
 	if (x->wiiremote->isExpansionPortAttached && x->wiiremote->isExpansionPortEnabled)
 	{
 		// Classic Controller
@@ -544,6 +541,9 @@ void akawiiremote_clock(t_akawiiremote *x)
 	
 	if (x->connected == false && connection == true)	// if the device is connected...
 	{
+#ifdef PD
+		CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true);
+#endif
 		wiiremote_getstatus(x->wiiremote);
 		x->connected = true;
 		SETLONG(&status, 1);
@@ -595,24 +595,6 @@ void *akawiiremote_new(t_symbol *s, short ac, t_atom *av)
     first_argument = atom_getsymbolarg(0, ac, av);
     if(first_argument != &s_) 
         atom_string(av, x->address, MAXPDSTRING-1);
-
-    IOReturn result = kIOReturnSuccess;
-    mach_port_t masterPort = (mach_port_t) NULL;
-    result = IOMasterPort (bootstrap_port, &masterPort);
-    if (kIOReturnSuccess != result)
-        pd_error(x, "[akawiiremote] IOMasterPort error with bootstrap_port, error %d", result);
-    else
-    {
-		// Create a notification port and add its run loop event source to our run loop
-		// This is how async notifications get set up.
-        CFRunLoopSourceRef		runLoopSource;
-        
-        gNotifyPort = IONotificationPortCreate(masterPort);
-        runLoopSource = IONotificationPortGetRunLoopSource(gNotifyPort);
-
-        gRunLoop = CFRunLoopGetCurrent();
-        CFRunLoopAddSource(gRunLoop, runLoopSource, kCFRunLoopDefaultMode);
-    }
 #else /* Max */	
 	t_akawiiremote *x;
 	

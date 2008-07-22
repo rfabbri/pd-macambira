@@ -19,6 +19,7 @@ typedef unsigned char darr[];
 Boolean	requestUpdates(WiiRemoteRef wiiremote);
 void myEventListener(IOBluetoothL2CAPChannelRef channel, void *refCon, IOBluetoothL2CAPChannelEvent *event);
 
+#define DEBUG(x)
 
 //--------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------
@@ -73,6 +74,7 @@ void wiiremote_init(WiiRemoteRef wiiremote)
 
 Boolean	openCChan(WiiRemoteRef wiiremote)
 {
+    DEBUG(post("openCChan"););
 	short		i;
 	IOReturn	ret;
 	
@@ -97,6 +99,7 @@ Boolean	openCChan(WiiRemoteRef wiiremote)
 
 Boolean	openIChan(WiiRemoteRef wiiremote)
 {
+    DEBUG(post("openCChan"););
 	short		i;
 	IOReturn	ret;
 	
@@ -208,7 +211,7 @@ Boolean readData(WiiRemoteRef wiiremote, unsigned long address, unsigned short l
 
 void checkDevice(WiiRemoteRef wiiremote, IOBluetoothDeviceRef device)
 {
-    post("checkDevice");
+    DEBUG(post("checkDevice"););
 	CFStringRef	name;
 	CFStringRef	address;
 
@@ -234,20 +237,21 @@ void checkDevice(WiiRemoteRef wiiremote, IOBluetoothDeviceRef device)
 
 void myFoundFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOBluetoothDeviceRef device)
 {
-    post("myFoundFunc");
+    DEBUG(post("myFoundFunc"););
 	checkDevice((WiiRemoteRef)refCon, device);
 }
 
 void myUpdatedFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOBluetoothDeviceRef device, uint32_t devicesRemaining)
 {
-    post("myUpdatedFunc");
+    DEBUG(post("myUpdatedFunc"););
 
 	checkDevice((WiiRemoteRef)refCon, device);
 }
 
 void myCompleteFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOReturn error, Boolean aborted)
 {
-    post("myCompleteFunc");
+    IOReturn        ret;
+    DEBUG(post("myCompleteFunc"););
 
 	if (aborted) return; // called by stop ;)
 	
@@ -256,8 +260,15 @@ void myCompleteFunc(void *refCon, IOBluetoothDeviceInquiryRef inquiry, IOReturn 
 		wiiremote_stopsearch((WiiRemoteRef)refCon);
 		return;
 	}
+/*  
+    ret = IOBluetoothDeviceInquiryStart(((WiiRemoteRef)refCon)->inquiry);
+    if (ret != kIOReturnSuccess)
+    {
+        wiiremote_stopsearch((WiiRemoteRef)refCon);
+    }
+*/
 #ifdef PD
-    // PD doesn't use the Carbon loop, so we have to manually control it
+    // PD doesn't use a CFRunLoop, so we have to manually control it
     CFRunLoopStop( CFRunLoopGetCurrent() );
 #endif
 }
@@ -274,7 +285,7 @@ Boolean wiiremote_isconnected(WiiRemoteRef wiiremote)
 	
 Boolean wiiremote_search(WiiRemoteRef wiiremote, char *address)
 {
-    post("wiiremote_search");
+    DEBUG(post("wiiremote_search"););
 	IOReturn	ret;
 	
 	if (wiiremote->inquiry != nil)
@@ -297,14 +308,14 @@ Boolean wiiremote_search(WiiRemoteRef wiiremote, char *address)
 		return false;
 	}
 #ifdef PD
-    CFRunLoopRun(); // PD doesn't use the Carbon loop, so we have to manually control it
+    // PD doesn't use a CFRunLoop, so we have to manually control it
+    CFRunLoopRun();
 #endif
 	return true;
 }
 
 Boolean wiiremote_stopsearch(WiiRemoteRef wiiremote)
 {
-    post("wiiremote_stopsearch");
 	IOReturn	ret;
 
 	if (wiiremote->inquiry == nil)
@@ -703,6 +714,7 @@ void handleButtonReport(WiiRemoteRef wiiremote, unsigned char *dp, size_t dataLe
 
  void myDataListener(IOBluetoothL2CAPChannelRef channel, void *dataPointer, UInt16 dataLength, void *refCon)
 {
+    DEBUG(post("myDataListener"););
 	WiiRemoteRef	wiiremote = (WiiRemoteRef)refCon;
 	unsigned char* dp = (unsigned char*)dataPointer;
 
@@ -738,6 +750,7 @@ void handleButtonReport(WiiRemoteRef wiiremote, unsigned char *dp, size_t dataLe
 
 void myEventListener(IOBluetoothL2CAPChannelRef channel, void *refCon, IOBluetoothL2CAPChannelEvent *event)
 {
+    DEBUG(post("myEventListener"););
 	if (event->eventType == kIOBluetoothL2CAPChannelEventTypeData)
 	{
 		// In thise case:
@@ -846,7 +859,7 @@ Boolean wiiremote_connect(WiiRemoteRef wiiremote)
 
 Boolean wiiremote_disconnect(WiiRemoteRef wiiremote)
 {
-	short	i = 0;	
+	short	i;	
 
 	if (wiiremote->cchan)
 	{
