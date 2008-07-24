@@ -30,11 +30,11 @@ through them with the tentacle-pager:;
 #X obj 540 307 tentacle-pager /uc33;
 #X obj 245 220 midi-tentacle /uc33 /Slider1 /modular;
 #X obj 535 433 polaroid /uc33 \$0A;
-#X obj 518 505 sft.originator /uc33 \$0A;
-#X obj 76 622 sft.commun.sc.ez \$0B /littlesynthA filterCut 0 20000
+#X obj 518 505 originator-p /uc33 \$0A;
+#X obj 76 622 commun-c-scale-ez \$0B /littlesynthA filterCut 0 20000
 ;
-#X obj 76 642 sft.commun.sc.ez \$0B /littlesynthA release 0 5000;
-#X obj 76 602 sft.originator /modular \$0B;
+#X obj 76 642 commun-c-scale-ez \$0B /littlesynthA release 0 5000;
+#X obj 76 602 originator-p /modular \$0B;
 #X text 668 495 [2];
 #X obj -303 -19 cnv 15 300 30 empty empty Controctopus_Basic_Overview
 20 12 0 14 -1721 -262144 0;
@@ -61,7 +61,7 @@ to represent \, or click the red button to "Learn" the controller (click
 #X text 413 129 The pdgui knobs and sliders work like virtual versions
 of your hardware (helpful for testing). Look at their properties to
 see how they interface with cc-learner.;
-#X text 64 324 "/modular" is the group (as defined by sft.originator)
+#X text 64 324 "/modular" is the group (as defined by originator-p)
 that I want to address;
 #X text 435 358 [1] Though "Omni" is a special page that necessarily
 blocks all other channels (but they'll still remember their assignment

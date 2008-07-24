@@ -4,12 +4,12 @@
 #X obj 112 112 + 1;
 #X obj 112 133 s /uc33/demux;
 #X obj 101 205 midi-tentacle-multi /uc33 /Knob1 /drummr;
-#X obj 32 385 sft.originator /drummr1 \$0A;
-#X obj 32 405 sft.commun.sc.ez \$0A /noiseA filterCut 0 20000;
-#X obj 32 425 sft.commun.sc.ez \$0A /noiseA release 0 5000;
-#X obj 329 385 sft.originator /drummr2 \$0B;
-#X obj 329 405 sft.commun.sc.ez \$0B /noiseA filterCut 0 20000;
-#X obj 329 425 sft.commun.sc.ez \$0B /noiseA release 0 5000;
+#X obj 32 385 originator-p /drummr1 \$0A;
+#X obj 32 405 commun-c-scale-ez \$0A /noiseA filterCut 0 20000;
+#X obj 32 425 commun-c-scale-ez \$0A /noiseA release 0 5000;
+#X obj 329 385 originator-p /drummr2 \$0B;
+#X obj 329 405 commun-c-scale-ez \$0B /noiseA filterCut 0 20000;
+#X obj 329 425 commun-c-scale-ez \$0B /noiseA release 0 5000;
 #X text 289 240 midi-tentacle-multi allows you to address multiple
 identical sequentially-named groups \, like /synthsystem1 \, /synthsystem2
 \, ... /synthsystemN.;

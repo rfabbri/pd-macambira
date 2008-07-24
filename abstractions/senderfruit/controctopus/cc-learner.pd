@@ -86,8 +86,8 @@
 #X obj 10 517 s \$0channel;
 #X obj 51 31 cnv 12 75 12 empty empty \$2 2 7 0 11 -83692 -262144 0
 ;
-#X obj 32 129 sft.commun \$2-cc \$0;
-#X obj 32 151 sft.commun \$2-device \$0;
+#X obj 32 129 commun-c \$2-cc \$0;
+#X obj 32 151 commun-c \$2-device \$0;
 #X obj 315 98 t a;
 #X obj 268 98 t a;
 #X obj 352 69 t a;
@@ -95,7 +95,7 @@
 #X obj 198 28 unpack f f f;
 #X obj 493 65 s \$0channel;
 #X obj 222 493 outlet;
-#X obj 39 327 sft.originator \$1 \$0;
+#X obj 39 327 originator-p \$1 \$0;
 #X obj 51 98 cnv 10 75 10 empty empty \$1 1 6 0 8 -66577 -171136 0
 ;
 #X connect 0 0 43 0;
