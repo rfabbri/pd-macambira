@@ -9,15 +9,15 @@
 #X text 340 552 2008 Luke Iannini;
 #X text 2 573 Originally based on [commun-scale] by Frank Barknecht
 ;
-#X text 13 26 Use sft.commun.sc(ale) so that 0-1 values coming out
+#X text 13 26 Use commun-c-scale(ale) so that 0-1 values coming out
 of OSC stuff (like Controctopus) can be rescaled appropriately.;
-#X text 14 145 sft.commun.sc's first and second args are swapped from
-sft.commun (i.e. \$0 and /parametername);
+#X text 14 145 commun-c-scale's first and second args are swapped from
+commun-c (i.e. \$0 and /parametername);
 #X text 15 182 Optionally prepend a unique ID to the parameter when
 using with an abstraction that will have multiple copies;
-#X obj 31 327 sft.commun.sc \$0 \$3/parameter 5 37;
+#X obj 31 327 commun-c-scale \$0 \$3/parameter 5 37;
 #X text 13 109 Don't use this for communs that are meant to store symbolic
-or list data (use regular sft.commun for that).;
+or list data (use regular commun-c for that).;
 #X text 34 404 * Argument 5 and 6 can be "round" and/or "hide" (the
 order doesn't matter).;
 #X text 34 434 * "hide" hides the parameter from Controctopus sniffing
