@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch semento senderfruit sssad pd-wavelet 
+LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch memento-p senderfruit sssad pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -204,6 +204,20 @@ memento_install:
 	install -p $(abstractions_src)/rradical/memento/examples/*.* \
 		$(examplesdir)/$(MEMENTO_NAME)
 
+#-------------------------------------------------------------------------------
+# memento-p
+MEMENTO-P_NAME = memento-p
+memento-p_install:
+	install -d $(objectsdir)/$(MEMENTO-P_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/senderfruit/memento-p/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(MEMENTO-P_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MEMENTO-P_NAME) \
+		--author "Luke Iannini" \
+		--license "GNU GPL" \
+		--description "an addon for Frank Barknecht's Memento adding local-state saving and support for Controctopus (a controller lib)"
+	install -d $(helpdir)/$(MEMENTO-P_NAME)
+	install -p $(abstractions_src)/senderfruit/memento-p/*-help.pd \
+		$(helpdir)/$(MEMENTO-P_NAME)
 
 #-------------------------------------------------------------------------------
 # nqpoly
@@ -467,20 +481,6 @@ puremeasurement_install:
 	install -p $(abstractions_src)/puremeasurement/readme \
 		$(readmesdir)/$(PUREMEASURE_NAME).txt
 		
-#-------------------------------------------------------------------------------
-# semento
-SEMENTO_NAME = semento
-semento_install:
-	install -d $(objectsdir)/$(SEMENTO_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/senderfruit/semento/*.pd | \
-		grep -v '\-help.pd')  $(objectsdir)/$(SEMENTO_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(SEMENTO_NAME) \
-		--author "Luke Iannini" \
-		--license "GNU GPL" \
-		--description "an addon for Frank Barknecht's Memento adding local-state saving and support for Controctopus (a controller lib)"
-	install -d $(helpdir)/$(SEMENTO_NAME)
-	install -p $(abstractions_src)/senderfruit/semento/*-help.pd \
-		$(helpdir)/$(SEMENTO_NAME)
 
 #-------------------------------------------------------------------------------
 # senderfruit
