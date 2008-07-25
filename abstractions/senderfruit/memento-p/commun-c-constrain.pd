@@ -1,6 +1,6 @@
 #N canvas 286 32 505 662 10;
 #X obj 12 11 inlet;
-#X obj 108 565 outlet;
+#X obj 108 585 outlet;
 #X text 5 93 RRADICAL_MEMENTO is also in originator;
 #X obj 108 538 list;
 #X obj 132 318 expr_scale 0 1 \$3 \$4;
@@ -11,7 +11,7 @@
 #X obj 45 370 expr_scale 0 1 \$3 \$4;
 #X obj 156 11 inlet;
 #X obj 286 11 inlet;
-#X text 63 590 Use to constrain input to a smaller subset of the full
+#X text 63 610 Use to constrain input to a smaller subset of the full
 range. Input as relative to 0-1. Reports back what the result will
 be when scaled fully;
 #X obj 156 59 s \$0boundLowFull;
@@ -153,8 +153,9 @@ selector \, you can return the names);
 #X restore 297 181 pd receiveMultiplier;
 #X obj 81 391 r \$0multiplier;
 #X obj 45 408 *;
+#X obj 108 562 route bang;
 #X connect 0 0 28 0;
-#X connect 3 0 1 0;
+#X connect 3 0 40 0;
 #X connect 4 0 6 0;
 #X connect 4 0 9 3;
 #X connect 5 0 6 1;
@@ -187,3 +188,4 @@ selector \, you can return the names);
 #X connect 31 0 30 0;
 #X connect 38 0 39 1;
 #X connect 39 0 7 0;
+#X connect 40 1 1 0;
