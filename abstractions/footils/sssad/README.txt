@@ -9,11 +9,13 @@ Author(s)
 
 [sssad] was written by Frank Barknecht <fbar@footils.org> and was inspired from
 a discussion about Max's [pv] and [pvar] objects on pd-list brought up by "Item
-State"
+State". Filtering out duplicates when saving data uses an approach by Enrique Erne.
 
-Internally it uses [singleton] which goes back to an idea by Enrique Erne and
+Older versions internally it used the helper abstractions in the "_sssad/"
+subdirectory: [singleton] which goes back to an idea by Enrique Erne and
 IOhannes m zmoelnig plus [list_argument] which was ripped of from
-Hans-Christoph Steiner's [float_argument]
+Hans-Christoph Steiner's [float_argument]. Those are not used anymore and only
+kept for historic reasons, and will be delted when they've found another place.
 
 License
 =======
