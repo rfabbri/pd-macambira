@@ -10,7 +10,7 @@
 #X obj 16 284 route set;
 #X obj 123 51 b;
 #X obj 197 221 route \$1;
-#X obj 507 423 s SSSAD_ADMIN;
+#X obj 574 442 s SSSAD_ADMIN;
 #X obj 507 156 r SSSAD_ADMIN;
 #X obj 507 304 b;
 #X obj 507 248 spigot;
@@ -26,7 +26,7 @@
 #X obj 190 420 outlet;
 #X obj 123 394 route bang;
 #X text 207 393 filter out empty lists;
-#X obj 507 393 list prepend persist \$1;
+#X obj 574 412 list prepend persist \$1;
 #X obj 123 365 list append;
 #X text 195 108 on SSSAD we eavesdrop the communication;
 #X text 656 247 <- only the first instance responds to "save";
@@ -34,6 +34,8 @@
 #X text 129 498 2007/2008 fbar;
 #X text 780 93 Enhancement by Enrique Erne;
 #X obj 507 363 list append;
+#X obj 507 386 route bang;
+#X text 591 385 filter out empty lists here \, too.;
 #X connect 0 0 9 0;
 #X connect 1 0 4 0;
 #X connect 3 0 2 0;
@@ -60,4 +62,5 @@
 #X connect 26 0 11 0;
 #X connect 27 0 24 0;
 #X connect 30 0 13 0;
-#X connect 33 0 26 0;
+#X connect 33 0 34 0;
+#X connect 34 1 26 0;
