@@ -77,7 +77,7 @@ tarbz2: installer_makefile installer_readme
 
 
 deb: DEB_BUILD_ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
-deb: DEB_PD_VERSION := $(shell echo $(PD_VERSION) | sed 's|\(.*\)-extended-\(.*\)|\1cvs\2-1|')
+deb: DEB_PD_VERSION := $(shell echo $(PD_VERSION) | sed 's|\(.*\)-extended-\(.*\)|\1~cvs\2-1|')
 deb: $(bindir)
 # GNOME menu support
 	install -d $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
