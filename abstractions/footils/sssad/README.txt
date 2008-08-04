@@ -10,12 +10,25 @@ Author(s)
 [sssad] was written by Frank Barknecht <fbar@footils.org> and was inspired from
 a discussion about Max's [pv] and [pvar] objects on pd-list brought up by "Item
 State". Filtering out duplicates when saving data uses an approach by Enrique Erne.
+More help came from Luke Iannini.
 
 Older versions internally it used the helper abstractions in the "_sssad/"
 subdirectory: [singleton] which goes back to an idea by Enrique Erne and
 IOhannes m zmoelnig plus [list_argument] which was ripped of from
 Hans-Christoph Steiner's [float_argument]. Those are not used anymore and only
 kept for historic reasons, and will be delted when they've found another place.
+
+Changelog
+=========
+
+Check "svn log" for full details. 
+
+Some milesstones:
+
+* 2008-08-04: added non-global send/receive pair that uses $2. Now requires Pd >= 0.40 
+* 2008-07-29: no saving of uninitialized data
+* 2008-07-27: removed dependency on singleton.pd as suggested by Enrique Erne
+* 2008-07-21: filter out empty lists
 
 License
 =======
