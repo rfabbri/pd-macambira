@@ -19,35 +19,34 @@
 #X obj 81 35 bng 12 250 50 0 \$0commit \$0commitR ci 14 7 0 8 -4032
 -1 -1;
 #X obj 25 604 r \$0commit;
-#N canvas 1039 176 401 328 \$0commitWindow 0;
-#X obj 29 235 cnv 15 150 60 empty empty empty 20 12 0 14 -204786 -66577
+#N canvas 861 433 432 320 \$0commitWindow 0;
+#X obj -11 235 cnv 15 150 60 empty empty empty 20 12 0 14 -204786 -66577
 0;
-#X obj 38 246 cnv 15 30 40 empty empty empty 20 12 0 14 -1 -66577 0
+#X obj -2 246 cnv 15 30 40 empty empty empty 20 12 0 14 -1 -66577 0
 ;
-#X obj 48 256 bng 20 250 50 0 \$0confirmCommit \$0confirmCommitR empty
+#X obj 8 256 bng 20 250 50 0 \$0confirmCommit \$0confirmCommitR empty
 14 7 0 8 -4032 -13381 -1;
-#X obj 69 247 cnv 15 100 40 empty empty OMMIT 0 20 0 30 -262144 -66577
+#X obj 29 247 cnv 15 100 40 empty empty OMMIT 0 20 0 30 -262144 -66577
 0;
-#X obj 218 235 cnv 15 150 60 empty empty empty 20 12 0 14 -204786 -66577
+#X obj 178 235 cnv 15 150 60 empty empty empty 20 12 0 14 -204786 -66577
 0;
-#X obj 227 247 cnv 15 30 40 empty empty empty 20 12 0 14 -1 -66577
+#X obj 187 247 cnv 15 30 40 empty empty empty 20 12 0 14 -1 -66577
 0;
-#X obj 237 257 bng 20 250 50 0 \$0cancelCommit \$0cancelCommitR empty
+#X obj 197 257 bng 20 250 50 0 \$0cancelCommit \$0cancelCommitR empty
 14 7 0 8 -191407 -1 -1;
-#X obj 258 247 cnv 15 100 40 empty empty ANCEL 0 20 0 30 -262144 -66577
+#X obj 218 247 cnv 15 100 40 empty empty ANCEL 0 20 0 30 -262144 -66577
 0;
-#X obj 192 284 bng 12 250 50 0 \$0diff \$0diffR Diff -2 18 0 8 -260097
+#X obj 152 284 bng 12 250 50 0 \$0diff \$0diffR Diff -2 18 0 8 -260097
 -1 -1;
-#X obj 29 26 tkwidgets/text 340 184 0;
-#X obj 29 8 r \$0getLogMessage;
-#X obj 29 8 cnv 17 339 17 empty empty empty 20 12 0 14 -261234 -66577
+#X obj -11 8 r \$0getLogMessage;
+#X obj -11 8 cnv 17 339 17 empty empty empty 20 12 0 14 -261234 -66577
 0;
-#X obj 29 210 s \$0logPrepare;
-#X obj 29 210 cnv 17 339 17 empty empty empty 20 12 0 14 -261234 -66577
+#X obj -11 210 s \$0logPrepare;
+#X obj -11 210 cnv 17 339 17 empty empty empty 20 12 0 14 -261234 -66577
 0;
-#X obj 119 56;
-#X connect 9 0 12 0;
-#X connect 10 0 9 0;
+#X obj -11 26 entry 340 184 white black;
+#X connect 9 0 13 0;
+#X connect 13 0 11 0;
 #X restore 112 11 pd \$0commitWindow;
 #X msg 25 628 vis 1;
 #X msg 20 473 label Modified \, color 16 -1;
@@ -703,54 +702,14 @@ for "project" beaming (pdsvn-dir);
 #X obj 498 21 r \$0upDirs;
 #X obj 41 131 r \$0parentDir;
 #X obj 682 46 r \$0unversionedFile;
-#N canvas 460 273 437 532 \$0statusWindow 0;
-#X msg 40 30 X      /Users/LukeIannini/PureData/sft/Semento;
-#X msg 40 60 X      /Users/LukeIannini/PureData/sft/Core;
-#X msg 40 90 X      /Users/LukeIannini/PureData/sft/PdSVN;
-#X obj 10 120 bng 17 250 50 0 11622add3 11622null Add 2 -6 0 8 -146753
--1 -1;
-#X msg 40 120 ?      /Users/LukeIannini/PureData/sft/Icon;
-#X msg 40 150 X      /Users/LukeIannini/PureData/sft/nsend;
-#X msg 40 180 X      /Users/LukeIannini/PureData/sft/Controctopus;
-#X obj 10 210 bng 17 250 50 0 11622add6 11622null Add 2 -6 0 8 -146753
--1 -1;
-#X msg 40 210 ?      /Users/LukeIannini/PureData/sft/Works/Icon;
-#X msg 40 240 M      /Users/LukeIannini/PureData/sft/Works/Bathyscaphe1.pd
-;
-#X msg 40 270 M      /Users/LukeIannini/PureData/sft/FXSCore/sft.fxs.stacker.pd
-;
-#X msg 40 315 M      /Users/LukeIannini/PureData/sft/FXSCore/sft.fxs.modsinV-help.pd
-;
-#X msg 40 360 M      /Users/LukeIannini/PureData/sft/sft.structenberg.pd
-;
-#X msg 40 390 M      /Users/LukeIannini/PureData/sft/Corals/sft.coral.pd
-;
-#X msg 40 420 M      /Users/LukeIannini/PureData/sft/FXS/sft.fxs.filter.pd
-;
-#X msg 40 450 ;
-#X msg 40 480 Performing status on external item at '/Users/LukeIannini/PureData/sft/Controctopus'
-;
-#X msg 40 525 ;
-#X msg 40 555 Performing status on external item at '/Users/LukeIannini/PureData/sft/Core'
-;
-#X msg 40 600 ;
-#X msg 40 630 Performing status on external item at '/Users/LukeIannini/PureData/sft/nsend'
-;
-#X msg 40 675 ;
-#X msg 40 705 Performing status on external item at '/Users/LukeIannini/PureData/sft/PdSVN'
-;
-#X msg 40 750 ;
-#X msg 40 780 Performing status on external item at '/Users/LukeIannini/PureData/sft/Semento'
-;
-#X msg 40 825 M      /Users/LukeIannini/PureData/sft/Semento/sft.commun.sc.pd
-;
+#N canvas 378 186 437 532 \$0statusWindow 0;
 #X restore 112 31 pd \$0statusWindow;
-#N canvas 600 206 773 589 liststatus 0;
+#N canvas 463 226 925 581 liststatus 0;
 #X obj 28 91 r \$0SVNStatus;
-#X obj 203 37 r \$0clearStatusWindow;
-#X msg 244 54 clear;
-#X obj 244 77 s pd-\$0statusWindow;
-#X msg 203 64 0;
+#X obj 203 17 r \$0clearStatusWindow;
+#X msg 244 34 clear;
+#X obj 244 57 s pd-\$0statusWindow;
+#X msg 203 44 0;
 #X obj 97 166 f;
 #X obj 125 166 + 1;
 #X obj 28 332 list prepend;
@@ -762,7 +721,7 @@ for "project" beaming (pdsvn-dir);
 #X obj 505 43 r \$0process;
 #X obj 505 73 s2l-explode;
 #X obj 584 116 list length;
-#X obj 203 97 s \$0listStatusReset;
+#X obj 203 77 s \$0listStatusReset;
 #X obj 112 145 r \$0listStatusReset;
 #X obj 584 226 f;
 #X obj 612 226 +;
@@ -792,179 +751,11 @@ for "project" beaming (pdsvn-dir);
 #X obj 526 391 list prepend svn add;
 #X obj 553 473 print SVNAdd;
 #X obj 526 432 popen;
-#X obj 526 493 s \$0status;
+#X obj 526 523 s \$0status;
 #X obj 526 453 t b a;
 #N canvas 202 112 718 723 \$0add-receivers 0;
-#X obj 0 0 r 11622add0;
-#X obj 20 20 r 11622filename0;
-#X obj 0 40 list;
-#X obj 0 60 s 11622fileAdder;
-#X obj 20 20 r 11622add1;
-#X obj 40 40 r 11622filename1;
-#X obj 20 60 list;
-#X obj 20 80 s 11622fileAdder;
-#X obj 40 40 r 11622add2;
-#X obj 60 60 r 11622filename2;
-#X obj 40 80 list;
-#X obj 40 100 s 11622fileAdder;
-#X obj 60 60 r 11622add3;
-#X obj 80 80 r 11622filename3;
-#X obj 60 100 list;
-#X obj 60 120 s 11622fileAdder;
-#X obj 80 80 r 11622add4;
-#X obj 100 100 r 11622filename4;
-#X obj 80 120 list;
-#X obj 80 140 s 11622fileAdder;
-#X obj 100 100 r 11622add5;
-#X obj 120 120 r 11622filename5;
-#X obj 100 140 list;
-#X obj 100 160 s 11622fileAdder;
-#X obj 120 120 r 11622add6;
-#X obj 140 140 r 11622filename6;
-#X obj 120 160 list;
-#X obj 120 180 s 11622fileAdder;
-#X obj 140 140 r 11622add7;
-#X obj 160 160 r 11622filename7;
-#X obj 140 180 list;
-#X obj 140 200 s 11622fileAdder;
-#X obj 160 160 r 11622add8;
-#X obj 180 180 r 11622filename8;
-#X obj 160 200 list;
-#X obj 160 220 s 11622fileAdder;
-#X obj 180 180 r 11622add9;
-#X obj 200 200 r 11622filename9;
-#X obj 180 220 list;
-#X obj 180 240 s 11622fileAdder;
-#X obj 200 200 r 11622add10;
-#X obj 220 220 r 11622filename10;
-#X obj 200 240 list;
-#X obj 200 260 s 11622fileAdder;
-#X obj 220 220 r 11622add11;
-#X obj 240 240 r 11622filename11;
-#X obj 220 260 list;
-#X obj 220 280 s 11622fileAdder;
-#X obj 240 240 r 11622add12;
-#X obj 260 260 r 11622filename12;
-#X obj 240 280 list;
-#X obj 240 300 s 11622fileAdder;
-#X obj 260 260 r 11622add13;
-#X obj 280 280 r 11622filename13;
-#X obj 260 300 list;
-#X obj 260 320 s 11622fileAdder;
-#X obj 280 280 r 11622add14;
-#X obj 300 300 r 11622filename14;
-#X obj 280 320 list;
-#X obj 280 340 s 11622fileAdder;
-#X obj 300 300 r 11622add15;
-#X obj 320 320 r 11622filename15;
-#X obj 300 340 list;
-#X obj 300 360 s 11622fileAdder;
-#X obj 320 320 r 11622add16;
-#X obj 340 340 r 11622filename16;
-#X obj 320 360 list;
-#X obj 320 380 s 11622fileAdder;
-#X obj 340 340 r 11622add17;
-#X obj 360 360 r 11622filename17;
-#X obj 340 380 list;
-#X obj 340 400 s 11622fileAdder;
-#X obj 360 360 r 11622add18;
-#X obj 380 380 r 11622filename18;
-#X obj 360 400 list;
-#X obj 360 420 s 11622fileAdder;
-#X obj 380 380 r 11622add19;
-#X obj 400 400 r 11622filename19;
-#X obj 380 420 list;
-#X obj 380 440 s 11622fileAdder;
-#X obj 400 400 r 11622add20;
-#X obj 420 420 r 11622filename20;
-#X obj 400 440 list;
-#X obj 400 460 s 11622fileAdder;
-#X obj 420 420 r 11622add21;
-#X obj 440 440 r 11622filename21;
-#X obj 420 460 list;
-#X obj 420 480 s 11622fileAdder;
-#X obj 440 440 r 11622add22;
-#X obj 460 460 r 11622filename22;
-#X obj 440 480 list;
-#X obj 440 500 s 11622fileAdder;
-#X obj 460 460 r 11622add23;
-#X obj 480 480 r 11622filename23;
-#X obj 460 500 list;
-#X obj 460 520 s 11622fileAdder;
-#X connect 0 0 2 0;
-#X connect 1 0 2 1;
-#X connect 2 0 3 0;
-#X connect 4 0 6 0;
-#X connect 5 0 6 1;
-#X connect 6 0 7 0;
-#X connect 8 0 10 0;
-#X connect 9 0 10 1;
-#X connect 10 0 11 0;
-#X connect 12 0 14 0;
-#X connect 13 0 14 1;
-#X connect 14 0 15 0;
-#X connect 16 0 18 0;
-#X connect 17 0 18 1;
-#X connect 18 0 19 0;
-#X connect 20 0 22 0;
-#X connect 21 0 22 1;
-#X connect 22 0 23 0;
-#X connect 24 0 26 0;
-#X connect 25 0 26 1;
-#X connect 26 0 27 0;
-#X connect 28 0 30 0;
-#X connect 29 0 30 1;
-#X connect 30 0 31 0;
-#X connect 32 0 34 0;
-#X connect 33 0 34 1;
-#X connect 34 0 35 0;
-#X connect 36 0 38 0;
-#X connect 37 0 38 1;
-#X connect 38 0 39 0;
-#X connect 40 0 42 0;
-#X connect 41 0 42 1;
-#X connect 42 0 43 0;
-#X connect 44 0 46 0;
-#X connect 45 0 46 1;
-#X connect 46 0 47 0;
-#X connect 48 0 50 0;
-#X connect 49 0 50 1;
-#X connect 50 0 51 0;
-#X connect 52 0 54 0;
-#X connect 53 0 54 1;
-#X connect 54 0 55 0;
-#X connect 56 0 58 0;
-#X connect 57 0 58 1;
-#X connect 58 0 59 0;
-#X connect 60 0 62 0;
-#X connect 61 0 62 1;
-#X connect 62 0 63 0;
-#X connect 64 0 66 0;
-#X connect 65 0 66 1;
-#X connect 66 0 67 0;
-#X connect 68 0 70 0;
-#X connect 69 0 70 1;
-#X connect 70 0 71 0;
-#X connect 72 0 74 0;
-#X connect 73 0 74 1;
-#X connect 74 0 75 0;
-#X connect 76 0 78 0;
-#X connect 77 0 78 1;
-#X connect 78 0 79 0;
-#X connect 80 0 82 0;
-#X connect 81 0 82 1;
-#X connect 82 0 83 0;
-#X connect 84 0 86 0;
-#X connect 85 0 86 1;
-#X connect 86 0 87 0;
-#X connect 88 0 90 0;
-#X connect 89 0 90 1;
-#X connect 90 0 91 0;
-#X connect 92 0 94 0;
-#X connect 93 0 94 1;
-#X connect 94 0 95 0;
 #X restore 27 41 pd \$0add-receivers;
-#X obj 283 54 s pd-\$0add-receivers;
+#X obj 283 34 s pd-\$0add-receivers;
 #X obj 489 171 list split 6;
 #X obj 172 390 t b a;
 #X obj 172 456 s;
@@ -1103,6 +894,10 @@ for "project" beaming (pdsvn-dir);
 #X obj 97 186 t a a;
 #X obj 489 218 s \$0filename;
 #X obj 231 379 r \$0filename;
+#X obj 526 499 del 1;
+#X text 563 500 prevent add button from immediately clearing status
+window;
+#X text 640 513 (causes a pd crash);
 #X connect 0 0 11 0;
 #X connect 1 0 2 0;
 #X connect 1 0 4 0;
@@ -1152,7 +947,7 @@ for "project" beaming (pdsvn-dir);
 #X connect 41 0 44 0;
 #X connect 42 0 41 0;
 #X connect 44 0 46 0;
-#X connect 46 0 45 0;
+#X connect 46 0 62 0;
 #X connect 46 1 43 0;
 #X connect 49 1 56 0;
 #X connect 50 0 52 0;
@@ -1166,6 +961,7 @@ for "project" beaming (pdsvn-dir);
 #X connect 59 1 30 0;
 #X connect 59 1 57 0;
 #X connect 61 0 52 1;
+#X connect 62 0 45 0;
 #X restore 277 472 pd liststatus;
 #X obj 59 223 s \$0SVNStatus;
 #X obj 20 99 t b b;
