@@ -1,6 +1,6 @@
     README for pd external package 'pdstring'
 
-    Last updated for pdstring v0.02
+    Last updated for pdstring v0.06
 
 DESCRIPTION
     The 'pdstring' package contains objects for converting to and from
@@ -16,6 +16,10 @@ INSTALLATION
 
 BUILD OPTIONS
     The 'configure' script supports the following options, among others:
+
+    * --help
+        Output a brief usage summary of the 'configure' script, including a
+        list of supported options and influential environment variables.
 
     * --enable-debug , --disable-debug
         Whether to enable verbose debugging messages. Default=no.

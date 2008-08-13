@@ -2,7 +2,7 @@
 
 README for pd external package 'pdstring'
 
-Last updated for pdstring v0.02
+Last updated for pdstring v0.06
 
 =head1 DESCRIPTION
 
@@ -23,6 +23,12 @@ Issue the following commands to the shell:
 The 'configure' script supports the following options, among others:
 
 =over 4
+
+=item * --help
+
+Output a brief usage summary of the 'configure' script,
+including a list of supported options and influential
+environment variables.
 
 =item * --enable-debug , --disable-debug
 
