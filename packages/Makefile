@@ -479,15 +479,16 @@ $(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
 # always run aclocal/autoconf until "configure" is deleted from CVS
 	cd $(gem_src)/src && aclocal
 	cd $(gem_src)/src && autoconf
-	cd $(gem_src)/src && ./configure --without-ffmpeg --with-pd=$(pd_src) \
-		--disable-NV
+	cd $(gem_src)/src && ./configure \
+		--without-ffmpeg --with-pd=$(pd_src) --disable-NV
 	$(MAKE) -C $(gem_src)/src
 
 $(gem_src)/src/Gem.pd_darwin:
 # always run aclocal/autoconf until "configure" is deleted from CVS
 	cd $(gem_src)/src && aclocal
 	cd $(gem_src)/src && autoconf
-	cd $(gem_src)/src && ./configure --without-x --without-ImageMagick \
+	cd $(gem_src)/src && ./configure \
+		--without-x --without-ImageMagick \
 		--without-tiff --without-jpeg --without-mpeg --without-mpeg3 \
 		--without-ieee1394 --without-aviplay --without-avifile --without-ffmpeg \
 		--with-ftgl-includes=/sw/include --with-ftgl-libs=/sw/lib \
@@ -502,8 +503,10 @@ gem_install: gem $(helpdir)
 	install -p $(gem_src)/abstractions/*-help.pd $(helpdir)/$(GEM_NAME)
 	install -d $(objectsdir)/$(GEM_NAME)
 ifneq ($(OS_NAME),windows)
-	install -p $(gem_src)/src/Gem.$(EXTENSION)   $(objectsdir)
+	install -p $(gem_src)/src/Gem.$(EXTENSION)   $(objectsdir)/$(GEM_NAME)/
 endif
+# kludge to get helpfiles working since the HELPSYMBOL stuff changed
+	install -p $(gem_src)/help/*.*   $(objectsdir)/$(GEM_NAME)/
 	install -p $(shell ls -1 $(gem_src)/abstractions/*.* | \
 		grep -v '\-help.pd')  $(objectsdir)/$(GEM_NAME)
 	install -d $(manualsdir)/$(GEM_NAME)
@@ -609,24 +612,61 @@ ifeq ($(OS_NAME),linux)
 	echo "<p></p>" >> $(README_FILE)
 endif
 ifeq ($(OS_NAME),darwin)
-	echo "<p>To install Pd, drag the $(PACKAGE_NAME).app into your <b>/Applications</b> folder or to the shortcut in the disk image.  (<i>You might need to put the old one in the trash before copying this one to <b>/Applications</b></i>)</p>" >> $(README_FILE)	
-	echo "<p>By default, most of the included libraries are loaded at startup.  To change this, set your own preferences in the <b>Startup...</b> Preferences pane usings the <b>Save all settings</b> button.   If you want to start with a blank set of preferences, run this command in the Terminal.app: </p><p><code>touch ~/Library/Preferences/org.puredata.pd.plist</code> (<code>~</code> <i>means your home folder</i>)</p><p>The Preferences panels in Pd are currently buggy, so you might have better luck with the Apple utility, Property List Editor, which is freely available as part of XCode or the Server Tools.</p>" >> $(README_FILE)	
+	echo "<p>To install Pd, drag the $(PD_APP_NAME).app into your <b>/Applications</b> folder or to the shortcut in the disk image.  (<i>You might need to put the old one in the trash before copying this one to <b>/Applications</b></i>)</p>" >> $(README_FILE)	
+	echo "<p>By default, most of the included libraries are loaded at startup.  To change this, set your own preferences in the <b>Startup...</b> Preferences pane usings the <b>Save all settings</b> button.   If you want to start with a blank set of preferences, run this command in the Terminal.app: </p><p><code>touch ~/Library/Preferences/org.puredata.pd.plist</code> (<code>~</code> <i>means your home folder</i>)</p><p>The Preferences panels in Pd are currently buggy, so you might have better luck with the Apple utilities: <code>defaults read org.puredata.pd</code>, or, <b>Property List Editor</b>, which is freely available as part of <a href=\"http://developer.apple.com/tools/xcode/download/\" target=\"_blank\">XCode</a> or the <a href=\"http://www.apple.com/support/downloads/serveradmintools104.html\" target=\"_blank\">Server Tools</a>.</p>" >> $(README_FILE)
+	echo "If you want to use PDP on Mac OS X 10.4/Tiger or 10.3/Panther, you will need to install X11 (X11 comes installed with 10.5/Leopard).  It comes on the install CD/DVD that your computer came with.  For more detail, see <a href=\"http://www.simplehelp.net/2006/10/22/how-to-install-x11-in-os-x/\" target=\"_blank\">How to install X11 in OS X</a> or <a href=\"http://puredata.info/docs/faq/macosx\" target=\"_blank\">How do I install Pd on MacOS X?</a>." >> $(README_FILE)
 endif
 ifeq ($(OS_NAME),windows)
 	echo "<p>To install, run the installer.</p>" >> $(README_FILE)
 	echo "<p>To make sure that all of the included libraries are loaded when Pd runs, " >> $(README_FILE)
 	echo "double-click <code>C:\Program Files\pd\pd-settings.reg</code> to import the settings to the registry.  WARNING: this will overwrite any existing Pd preferences!</p>" >> $(README_FILE)
 endif
+	echo "<h3>License</h3>" >> $(README_FILE)	
+	echo "<p>" >> $(README_FILE)
+	echo 'This package is released under the <a href="http://www.gnu.org/copyleft/gpl.html" target="gpl">GNU GPL</a>.  The Pd core and some other included code is originally available with a <a href="http://pure-data.cvs.sourceforge.net/pure-data/pd/LICENSE.txt">BSD license</a> from the Pd CVS on SourceForge.' >> $(README_FILE)
+	echo "</p>" >> $(README_FILE)
+	echo "<h3>Installing Externals, Objects, and Help files</h3>" >> $(README_FILE)
+	echo "<p>" >> $(README_FILE)
+	echo "If you would like to install other externals, objects, help files, etc. there are special folders that Pd-extended uses." >> $(README_FILE)
+	echo "<dl>" >> $(README_FILE)
+	echo "<dt>User-specific</dt>" >> $(README_FILE)
+ifeq ($(OS_NAME),darwin)
+	echo "<dd>~/Library/Pd</dd>" >> $(README_FILE)
+endif
+ifeq ($(OS_NAME),linux)
+	echo "<dd>~/pd/</dd>" >> $(README_FILE)
+endif
+ifeq ($(OS_NAME),windows)
+	echo "<dd>%UserProfile%\Application Data\Pd</dd>" >> $(README_FILE)
+endif
+	echo "<dt>Global</dt>" >> $(README_FILE)
+ifeq ($(OS_NAME),darwin)
+	echo "<dd>/Library/Pd</dd>" >> $(README_FILE)
+endif
+ifeq ($(OS_NAME),linux)
+	echo "<dd>/usr/share/pd</dd>" >> $(README_FILE)
+endif
+ifeq ($(OS_NAME),windows)
+	echo "<dd>%ProgramFiles%\Common Files\Pd</dd>" >> $(README_FILE)
+endif
+	echo "</dl>" >> $(README_FILE)
+	echo "</p>" >> $(README_FILE)
+	echo "<h3>Patented Algorithms</h3>" >> $(README_FILE)
+	echo "<p>" >> $(README_FILE)
+	echo "This package may contain software that is covered by patents in certain countries, like the U.S. and Germany.  In order to use this software you must have the proper license.  Below is a list of the known software packages that are covered by patents in some countries:" >> $(README_FILE)
+	echo "</p>" >> $(README_FILE)
+	echo "<ul>" >> $(README_FILE)
+	echo '<li><a href="http://en.wikipedia.org/wiki/MP3" target="license">MP3 aka MPEG-1 Part 3 Layer 3</a></li>' >> $(README_FILE)
+	echo '<li><a href="http://en.wikipedia.org/wiki/MPEG-2" target="license">MPEG-2</a></li>' >> $(README_FILE)
+	echo '<li><a href="http://en.wikipedia.org/wiki/MPEG-4#Licensing" target="license">MPEG-4</a></li>' >> $(README_FILE)
+	echo "</ul>" >> $(README_FILE)
+	echo '<p>Please consider trying to get rid of software patents in your country: <a href="http://www.nosoftwarepatents.com" target="nsp">http://www.nosoftwarepatents.com</a></p>' >> $(README_FILE)
 	echo "<h3>Pure Data CVS Developers</h3>" >> $(README_FILE)	
 # this may seem whack, but it generates the list of developers from the SourceForge site:
 	curl 'http://sourceforge.net/project/memberlist.php?group_id=55736' | grep -A2 -e '<td>' | sed 's|\(href="\)|target="w" \1http://sourceforge.net|' >> $(README_FILE)
 	echo "</p>" >> $(README_FILE)
 	echo "<p>" >> $(README_FILE)
 	echo "Many others not listed have contributed their time and effort, this is just a list of the current developers in the SourceForge project.  But really, every Pd user is a developer and is encouraged to contribute to the CVS repository." >> $(README_FILE)
-	echo "</p>" >> $(README_FILE)
-	echo "<h3>License</h3>" >> $(README_FILE)	
-	echo "<p>" >> $(README_FILE)
-	echo 'This package is released under the <a href="http://www.gnu.org/copyleft/gpl.html" target="gpl">GNU GPL</a>.  The Pd core and some other included code is originally available with a <a href="http://pure-data.cvs.sourceforge.net/pure-data/pd/LICENSE.txt">BSD license</a> from the Pd CVS on SourceForge.' >> $(README_FILE)
 	echo "</p>" >> $(README_FILE)
 	echo "<h3>Included Versions</h3>" >> $(README_FILE)	
 	echo "<p>These externals are all included from the Pd CVS repository:</p>" >> $(README_FILE)
@@ -649,16 +689,6 @@ endif
 	echo "<li>unauthorized: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<li>zexy: $(ZEXY_VERSION)" >> $(README_FILE)
 	echo "</ul>" >> $(README_FILE)
-	echo "<h3>Patented Algorithms</h3>" >> $(README_FILE)
-	echo "<p>" >> $(README_FILE)
-	echo "This package may contain software that is covered by patents in certain countries, like the U.S. and Germany.  In order to use this software you must have the proper license.  Below is a list of the known software packages that are covered by patents in some countries:" >> $(README_FILE)
-	echo "</p>" >> $(README_FILE)
-	echo "<ul>" >> $(README_FILE)
-	echo '<li><a href="http://en.wikipedia.org/wiki/MP3" target="license">MP3 aka MPEG-1 Part 3 Layer 3</a></li>' >> $(README_FILE)
-	echo '<li><a href="http://en.wikipedia.org/wiki/MPEG-2" target="license">MPEG-2</a></li>' >> $(README_FILE)
-	echo '<li><a href="http://en.wikipedia.org/wiki/MPEG-4#Licensing" target="license">MPEG-4</a></li>' >> $(README_FILE)
-	echo "</ul>" >> $(README_FILE)
-	echo '<p>Please consider trying to get rid of software patents in your country: <a href="http://www.nosoftwarepatents.com" target="nsp">http://www.nosoftwarepatents.com</a></p>' >> $(README_FILE)
 	echo "(this package was built on `date`) <BR>" >> $(README_FILE)
 	echo "</body></html>" >> $(README_FILE)
 

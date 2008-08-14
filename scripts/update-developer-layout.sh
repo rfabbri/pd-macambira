@@ -16,7 +16,7 @@ cd $cvs_root_dir
 echo "Running svn update:"
 svn update
 echo "Running cvs update:"
-for section in Gem GemLibs; do
+for section in Gem; do
 	 echo "$section"
 	 cd $section
     cvs up -Pd

@@ -1,7 +1,7 @@
 standardpath: 1
 verbose: 0
 defeatrt: 0
-flags: -helppath /usr/share/pd
+flags: -helppath ~/pd -helppath /usr/share/pd
 loadlib1: libdir
 loadlib2: Gem
 loadlib3: cyclone
@@ -32,17 +32,15 @@ loadlib27: freeverb
 loadlib28: hcs
 loadlib29: jmmmp
 loadlib30: ext13
-loadlib31: hardware
-loadlib32: ggee
-loadlib33: iem_anything
-loadlib34: flib
-loadlib35: ekext
-loadlib36: flatspace
-loadlib37: deprecated
-loadlib38: pdp
-loadlib39: pidip
-nloadlib: 39
-path1: ~/pd
-path2: /usr/share/pd
+loadlib31: ggee
+loadlib32: iem_anything
+loadlib33: flib
+loadlib34: ekext
+loadlib35: flatspace
+loadlib36: pdp
+loadlib37: pidip
+nloadlib: 37
+path1: ~/pd-externals
+path2: /usr/local/lib/pd-externals
 path3: /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType
 npath: 3

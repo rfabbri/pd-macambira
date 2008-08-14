@@ -65,7 +65,9 @@ Root: HKCR; SubKey: Pure.Data\shell\open\command; ValueType: string; ValueData: 
 Root: HKCR; SubKey: .pd; ValueType: string; ValueData: Pure.Data; Flags: noerror uninsdeletekey; Tasks: fileassociations
 Root: HKCR; SubKey: .pd; ValueType: string; ValueName: Content Type; ValueData: text/plain; Flags: noerror uninsdeletekey; Tasks: fileassociations
 ;
-; add pd-inno_registry after this comment:
+; STARTHERE: add pd-inno_registry after this comment:
+
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: flags; ValueData: -helppath %UserProfile%/applic~1/Pd -helppath %ProgramFiles%/common~1/pd; Tasks: libs; Flags: uninsdeletekey
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib1; ValueData: libdir; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib2; ValueData: Gem; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib3; ValueData: cyclone; Tasks: libs
@@ -96,14 +98,14 @@ Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib27; ValueD
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib28; ValueData: hcs; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib29; ValueData: jmmmp; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib30; ValueData: ext13; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib31; ValueData: hardware; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib32; ValueData: ggee; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib33; ValueData: iem_anything; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib34; ValueData: flib; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib35; ValueData: ekext; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib36; ValueData: flatspace; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib37; ValueData: deprecated; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: nloadlib; ValueData: 37; Tasks: libs; Flags: uninsdeletekey
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib31; ValueData: ggee; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib32; ValueData: iem_anything; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib33; ValueData: flib; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib34; ValueData: ekext; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib35; ValueData: flatspace; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: nloadlib; ValueData: 35; Tasks: libs; Flags: uninsdeletekey
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib36; Flags: deletevalue; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib37; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib38; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib39; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib40; Flags: deletevalue; Tasks: libs
@@ -167,10 +169,10 @@ Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib97; Flags: d
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib98; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib99; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib100; Flags: deletevalue; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: path1; ValueData: hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,2f,00,46,00,6f,00,6e,00,74,00,73,00,00,00; Tasks: libs; Flags: uninsdeletekey
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: npath; ValueData: 1; Tasks: libs; Flags: uninsdeletekey
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path2; Flags: deletevalue; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path3; Flags: deletevalue; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: expandsz; ValueName: path1; ValueData: %USERPROFILE%/Application Data/Pd; Tasks: libs; Flags: uninsdeletekey
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: expandsz; ValueName: path2; ValueData: %ProgramFiles%/Common Files/Pd; Tasks: libs; Flags: uninsdeletekey
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: expandsz; ValueName: path3; ValueData: %SystemRoot%/Fonts; Tasks: libs; Flags: uninsdeletekey
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: npath; ValueData: 3; Tasks: libs; Flags: uninsdeletekey
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path4; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path5; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path6; Flags: deletevalue; Tasks: libs

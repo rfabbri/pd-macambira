@@ -163,7 +163,7 @@ Info.plist: Info.plist.in
 		sed 's/CFBUNDLESHORTVERSIONSTRING/$(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)/' | \
 		sed 's/CFBUNDLEVERSION/$(CFBUNDLEVERSION_DATE)/' > \
 		Info.plist
-		
+
 spotlight_importer_install:
 	cd spotlight_importer && xcodebuild
 	install -d -m0755 "$(PD_APP_CONTENTS)/Library/Spotlight"
@@ -175,14 +175,20 @@ rez_install:
 	cd $(bindir) && /Developer/Tools/Rez -t APPL mac.r -o pd
 
 
-# switch Linux-only pdp_v4l to Mac pdp_ieee1394
+# switch Linux-only pdp_v4l to Mac-only pdp_ieee1394
 pdp_help_hack:
 	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(helpdir)/pdp*-help.pd
 	rm -f --  $(helpdir)/pdp*-help.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(helpdir)/pdp/*.pd
+	rm -f --  $(helpdir)/pdp/*.pd
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(helpdir)/pidip/*.pd
+	rm -f --  $(helpdir)/pidip/*.pd
 	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(examplesdir)/pdp/*.pd
 	rm -f --  $(examplesdir)/pdp/*.pd.bak
 	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(examplesdir)/pidip/*.pd
 	rm -f --  $(examplesdir)/pidip/*.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(examplesdir)/3dp/*.pd
+	rm -f --  $(examplesdir)/3dp/*.pd.bak
 
 darwin_app_embed_libs:
 # embed libquicktime plugins
@@ -206,7 +212,7 @@ darwin_app_core: darwin_app_wrapper
 	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
 	install -p -m0644 org.puredata.pd.default.plist "$(PD_APP_CONTENTS)/"
 # create directory to put Spotlight Importers into
-	
+
 
 
 #------------------------------------------------------------------------------#

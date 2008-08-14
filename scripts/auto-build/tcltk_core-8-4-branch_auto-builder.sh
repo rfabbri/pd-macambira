@@ -28,8 +28,8 @@ case $SYSTEM in
 		  BUILD_DIR=macosx
 		  echo "Configuring to use $BUILD_DIR on Darwin/Mac OS X"
 		  export PATH=/bin:/sbin:/usr/bin:/usr/sbin
-		  export CFLAGS="-arch ppc -arch ppc64 -arch i386 -arch x86_64 \
-           -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"
+#		  export CFLAGS="-arch ppc -arch ppc64 -arch i386 -arch x86_64 \
+#           -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"
 		  make -C tcl/${BUILD_DIR} deploy
 		  make -C tk/${BUILD_DIR} deploy
 		  ;;

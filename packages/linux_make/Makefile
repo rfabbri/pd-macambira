@@ -4,7 +4,8 @@
 
 CWD := $(shell pwd)
 
-DESTDIR = $(CWD)/build
+# DESTDIR needs the trailing slash
+DESTDIR = $(CWD)/build/
 cvs_root_dir := $(shell cd $(CWD)/../.. && pwd)
 BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
@@ -23,7 +24,7 @@ endif
 TARGET_PLATFORM := $(shell uname -m)
 ifeq ($(TARGET_PLATFORM),i686)
 # Generic x86 (tune for Pentium III, since that's more common these days)
-OPT_CFLAGS += -mcpu=i686 -march=i386
+OPT_CFLAGS += -mtune=i686 -march=i386
 #OPT_CFLAGS += -march=pentium3 -msse -mfpmath=sse
 #OPT_CFLAGS += -march=pentium4 -msse -msse2 -mfpmath=sse
 endif

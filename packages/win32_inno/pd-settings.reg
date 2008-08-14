@@ -1,6 +1,7 @@
 Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Pd]
+"flags"="-helppath %UserProfile%/applic~1/Pd -helppath %ProgramFiles%/common~1/pd"
 "loadlib1"="libdir"
 "loadlib2"="Gem"
 "loadlib3"="cyclone"
@@ -31,15 +32,15 @@ Windows Registry Editor Version 5.00
 "loadlib28"="hcs"
 "loadlib29"="jmmmp"
 "loadlib30"="ext13"
-"loadlib31"="hardware"
-"loadlib32"="ggee"
-"loadlib33"="iem_anything"
-"loadlib34"="flib"
-"loadlib35"="ekext"
-"loadlib36"="flatspace"
-"loadlib37"="deprecated"
-"nloadlib"=37
+"loadlib31"="ggee"
+"loadlib32"="iem_anything"
+"loadlib33"="flib"
+"loadlib34"="ekext"
+"loadlib35"="flatspace"
+"nloadlib"=35
 ; delete any previous loadlib flags
+"loadlib36"=-
+"loadlib37"=-
 "loadlib38"=-
 "loadlib39"=-
 "loadlib40"=-
@@ -103,11 +104,11 @@ Windows Registry Editor Version 5.00
 "loadlib98"=-
 "loadlib99"=-
 "loadlib100"=-
-"path1"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,2f,00,46,00,6f,00,6e,00,74,00,73,00,00,00
-"npath"=1
+"path1"=hex(2):25,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,00,46,00,69,00,6c,00,65,00,73,00,25,00,2f,00,43,00,6f,00,6d,00,6d,00,6f,00,6e,00,20,00,46,00,69,00,6c,00,65,00,73,00,2f,00,50,00,64,00,00,00
+"path2"=hex(2):25,00,55,00,53,00,45,00,52,00,50,00,52,00,4f,00,46,00,49,00,4c,00,45,00,25,00,2f,00,41,00,70,00,70,00,6c,00,69,00,63,00,61,00,74,00,69,00,6f,00,6e,00,20,00,44,00,61,00,74,00,61,00,2f,00,50,00,64,00,00,00
+"path3"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,2f,00,46,00,6f,00,6e,00,74,00,73,00,00,00
+"npath"=3
 ; delete all existing path flags
-"path2"=-
-"path3"=-
 "path4"=-
 "path5"=-
 "path6"=-
@@ -205,3 +206,4 @@ Windows Registry Editor Version 5.00
 "path98"=-
 "path99"=-
 "path100"=-
+; delete all existing path flags
