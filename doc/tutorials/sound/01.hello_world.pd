@@ -1,4 +1,4 @@
-#N canvas 15 58 630 399 10;
+#N canvas 10 40 620 460 10;
 #X obj 292 20 import cyclone;
 #X obj 533 20 pddp/dsp;
 #X obj 8 10 cnv 15 400 40 empty empty hello_world 20 12 0 24 -228992

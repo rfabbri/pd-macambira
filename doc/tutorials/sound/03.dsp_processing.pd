@@ -1,4 +1,4 @@
-#N canvas 406 233 640 460 10;
+#N canvas 10 40 620 460 10;
 #X obj 466 72 import pddp rradical;
 #X obj 541 21 pddp/dsp;
 #X obj 11 8 cnv 15 400 40 empty empty dsp_processing 20 12 0 24 -228992
