@@ -41,7 +41,7 @@
 #X connect 11 0 14 0;
 #X connect 11 1 10 0;
 #X connect 14 0 9 0;
-#X restore 391 283 pd output range;
+#X restore 391 286 pd output range;
 #N canvas 463 201 389 220 track 0;
 #X obj 168 22 inlet;
 #X obj 38 135 outlet;
@@ -98,6 +98,7 @@
 #X obj 16 198 trigger list bang;
 #X obj 5 347 trigger bang bang;
 #X obj 5 60 route save load reset;
+#X msg 200 58 0;
 #X connect 1 0 29 0;
 #X connect 3 0 4 0;
 #X connect 3 1 15 0;
@@ -131,5 +132,7 @@
 #X connect 28 1 22 0;
 #X connect 29 0 28 0;
 #X connect 29 1 27 0;
+#X connect 29 1 30 0;
 #X connect 29 2 15 2;
 #X connect 29 3 17 0;
+#X connect 30 0 17 1;
