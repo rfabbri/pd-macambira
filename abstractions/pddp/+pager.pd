@@ -39,7 +39,7 @@
 #X obj 157 378 hcs/split_path;
 #X obj 271 458 hcs/split_path;
 #N canvas 760 129 484 296 generate 0;
-#X obj 70 70 flatspace/getdir;
+#X obj 70 70 ggee/getdir;
 #X obj 70 167 hcs/folder_list;
 #X obj 68 209 select +pager.pd;
 #X obj 70 101 trigger symbol symbol;
