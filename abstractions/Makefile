@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch memento-p senderfruit semento pd-wavelet 
+LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch memento-p senderfruit pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
