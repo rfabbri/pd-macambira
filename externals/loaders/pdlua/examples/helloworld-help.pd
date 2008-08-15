@@ -1,5 +1,0 @@
-#N canvas 43 60 518 125 10;
-#X obj 16 36 helloworld;
-#X obj 16 56 helloworld;
-#X obj 16 76 helloworld;
-#X obj 16 16 helloworld;

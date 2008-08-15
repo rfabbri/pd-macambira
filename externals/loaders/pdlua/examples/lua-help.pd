@@ -1,9 +1,0 @@
-#N canvas 0 22 534 259 10;
-#X obj 17 131 lua;
-#X msg 17 21 load hello;
-#X msg 44 58;
-#X text 118 58 << more methods will come (maybe);
-#X text 118 132 << global interface to pdlua;
-#X text 118 20 << load and run a Lua file (searches Pd's path);
-#X connect 1 0 0 0;
-#X connect 2 0 0 0;
