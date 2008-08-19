@@ -1,4 +1,4 @@
-#N canvas 1370 779 524 276 10;
+#N canvas 766 282 203 271 10;
 #X obj 44 35 inlet;
 #X obj 44 199 spigot;
 #X msg 44 154 1;
@@ -9,10 +9,6 @@
 #X obj 44 233 outlet;
 #X obj 132 166 inlet;
 #X obj 131 142 outlet;
-#X text 142 33 [setabng]'s right xlets should be cross-connected to
-a [bng] object. Sending a [set( message to the left inlet of setabng
-will blink the [bng] without transmitting to setabng's left outlet.
-;
 #X connect 0 0 6 0;
 #X connect 1 0 7 0;
 #X connect 2 0 1 1;
