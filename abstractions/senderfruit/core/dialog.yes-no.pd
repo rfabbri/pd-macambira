@@ -1,0 +1,47 @@
+#N canvas 560 416 536 385 10;
+#N canvas 156 873 303 111 \$0.dialog-box 0;
+#X obj -8 -8 cnv 15 300 30 empty \$0.line1 Really-replace-defaults?
+20 12 0 14 -233017 -66577 0;
+#X obj -8 23 cnv 15 300 30 empty \$0.line2 empty 20 12 0 14 -233017
+-66577 0;
+#X obj 54 61 bng 30 250 50 0 \$0.yes-s \$0.yes-r Yes. 35 15 0 10 -4032
+-1 -1;
+#X obj 164 61 bng 30 250 50 0 \$0.no-s \$0.no-r No. 35 15 0 10 -86853
+-1 -1;
+#X restore 352 30 pd \$0.dialog-box;
+#X obj 11 82 inlet;
+#X obj 13 189 r \$0.yes-s;
+#X obj 53 209 r \$0.no-s;
+#X msg 13 233 1;
+#X msg 11 109 vis 1;
+#X msg 53 233 vis 0;
+#X obj 13 282 outlet;
+#X obj 298 111 loadbang;
+#X obj 298 133 list append \$1;
+#X obj 298 158 s2l-explode;
+#X obj 298 184 list split 30;
+#X obj 298 294 list-l2s;
+#X obj 335 215 list-l2s;
+#X obj 298 319 prepent label;
+#X obj 335 236 prepent label;
+#X obj 298 345 s \$0.line1;
+#X obj 335 258 s \$0.line2;
+#X obj 53 255 s pd-\$0.dialog-box;
+#X obj 11 136 s pd-\$0.dialog-box;
+#X connect 1 0 5 0;
+#X connect 2 0 4 0;
+#X connect 2 0 6 0;
+#X connect 3 0 6 0;
+#X connect 4 0 7 0;
+#X connect 5 0 19 0;
+#X connect 6 0 18 0;
+#X connect 8 0 9 0;
+#X connect 9 0 10 0;
+#X connect 10 0 11 0;
+#X connect 11 0 12 0;
+#X connect 11 1 13 0;
+#X connect 11 2 12 0;
+#X connect 12 0 14 0;
+#X connect 13 0 15 0;
+#X connect 14 0 16 0;
+#X connect 15 0 17 0;
