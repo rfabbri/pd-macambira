@@ -1,0 +1,15 @@
+#N canvas 244 335 182 200 10;
+#X obj 39 131 list-idx;
+#X obj 60 87 dollarg;
+#X obj 39 109 list;
+#X obj 60 66 loadbang;
+#X obj 39 23 inlet;
+#X obj 39 44 t b a;
+#X obj 39 156 outlet;
+#X connect 0 0 6 0;
+#X connect 1 0 2 1;
+#X connect 2 0 0 0;
+#X connect 3 0 1 0;
+#X connect 4 0 5 0;
+#X connect 5 0 2 0;
+#X connect 5 1 0 1;
