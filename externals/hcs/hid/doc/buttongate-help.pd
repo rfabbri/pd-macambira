@@ -1,5 +1,6 @@
 #N canvas 345 96 463 514 10;
-#X obj 5 2 cnv 15 450 20 empty empty [buttongate] 2 11 1 18 -233017
+#X declare -lib hid;
+#X obj 5 2 cnv 15 450 20 empty empty buttongate 2 11 1 18 -233017
 -66577 0;
 #X obj 160 287 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -9,7 +10,7 @@
 #X text 27 470 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 244 484 released under the GNU GPL;
-#X obj 223 417 pddp_open all_about_hid;
+#X obj 223 417 pddp/pddplink ../all_about_hid.pd -text all_about_hid;
 #X text 114 418 For more info:;
 #X text 17 38 [buttongate] is a simple gate controlled by a HID button.
 You must specify the device and the button which controls the gate.
@@ -29,7 +30,7 @@ optional control messages to the HID.;
 #X text 23 348 Keyboard keys can also be used to control this object.
 You can get the [hid] keycode from here:;
 #X obj 324 368 ev_key-list;
-#X msg 422 3 pddp;
+#X obj 422 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X connect 2 0 3 0;
 #X connect 3 0 4 0;
 #X connect 4 0 10 0;

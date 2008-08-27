@@ -1,5 +1,5 @@
 #N canvas 358 102 478 344 10;
-#X obj 2 -8 cnv 15 450 20 empty empty [track_max] 2 11 1 18 -233017
+#X obj 2 -8 cnv 15 450 20 empty empty track_max 2 11 1 18 -233017
 -66577 0;
 #X floatatom 97 79 5 0 0 0 - - -;
 #X msg 155 61 bang;

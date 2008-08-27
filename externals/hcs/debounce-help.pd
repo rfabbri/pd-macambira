@@ -1,5 +1,5 @@
 #N canvas 429 170 470 540 10;
-#X obj 2 2 cnv 15 450 20 empty empty [debounce] 2 11 1 18 -233017 -66577
+#X obj 2 2 cnv 15 450 20 empty empty debounce 2 11 1 18 -233017 -66577
 0;
 #X msg 418 3 pddp;
 #X text 234 467 released under the GNU GPL;

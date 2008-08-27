@@ -157,12 +157,15 @@ static void *window_new(t_symbol *s)
     return (x);
 }
 
-void window_tilde_setup(void)
+void bwin_tilde_setup(void)
 {
-    window_class = class_new(gensym("bwin~"), (t_newmethod)window_new, (t_method)window_free,
-    	sizeof(t_window), 0, A_DEFSYMBOL, A_NULL);
+    window_class = class_new(gensym("bwin~"), 
+			     (t_newmethod)window_new, (t_method)window_free,
+			     sizeof(t_window), 0, A_DEFSYMBOL, A_NULL);
     CLASS_MAINSIGNALIN(window_class, t_window, x_f);
-    class_addmethod(window_class, (t_method)window_dsp, gensym("dsp"), A_NULL);
-    class_addmethod(window_class, (t_method)window_type, gensym("type"), A_SYMBOL, A_DEFFLOAT, A_NULL);
+    class_addmethod(window_class, (t_method)window_dsp,
+		    gensym("dsp"), A_NULL);
+    class_addmethod(window_class, (t_method)window_type,
+		    gensym("type"), A_SYMBOL, A_DEFFLOAT, A_NULL);
 }
 

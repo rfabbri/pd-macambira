@@ -17,13 +17,19 @@
 #include "g_canvas.h"
 #include "t_tk.h"
 
-#ifdef NT
+#ifdef _WIN32
 #include <io.h>
 #else
 #include <unistd.h>
 #endif
 
-#define COLORGRID_IMG "/usr/local/lib/pd/externs/pdp_colorgrid/pdp_colorgrid.pnm"
+#ifdef __APPLE__
+# define COLORGRID_IMG "/Applications/Pd-extended.app/Contents/Resources/doc/examples/pidip/images/colorgrid.pnm"
+#endif
+#ifdef __gnu_linux__
+# define COLORGRID_IMG "/usr/lib/pd/doc/examples/pidip/images/colorgrid.pnm"
+#endif
+
 #define DEFAULT_COLORGRID_WIDTH 256
 #define DEFAULT_COLORGRID_HEIGHT 50
 #define DEFAULT_COLORGRID_NBLINES 10
@@ -132,7 +138,7 @@ static int pdp_colorgridcount=0;
 static int guidebug=0;
 static int pointsize = 5;
 
-static char   *pdp_colorgrid_version = "pdp_colorgrid: version 0.4, written by Yves Degoyon (ydegoyon@free.fr) & Lluis Gomez i Bigorda (lluis@artefacte.org)";
+static char   *pdp_colorgrid_version = "pdp_colorgrid: version 0.4\nby Yves Degoyon (ydegoyon@free.fr) & Lluis Gomez i Bigorda (lluis@artefacte.org)";
 
 #define COLORGRID_SYS_VGUI2(a,b) if (guidebug) \
                          post(a,b);\

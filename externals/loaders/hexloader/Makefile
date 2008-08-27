@@ -3,7 +3,7 @@
 
 # path to pd
 ## change this according to your setup!
-PDROOT?=../../../pd
+PDROOT=../../../pd
 #PDROOT=/Net/iem/Benutzer/zmoelnig/src/pd-0.41-0test08
 
 # here we find the sources of pd (and evtl. the pd.lib)
@@ -15,7 +15,7 @@ PDLIBDIR=$(PDROOT)/bin
 EXTENSION=$(MAKECMDGOALS)
 
 
-DEFINES=-DPD
+DEFINES=-DPD -DMISSING_LOADER_T
 
 # if no filename-extension is supplied by the user
 # try to guess one, based on what "uname" tells us
@@ -92,7 +92,7 @@ DARWINCFLAGS = $(DEFINES) -O2 -Wall -W -Wshadow -Wstrict-prototypes \
 
 DARWININCLUDE = -I$(PDSRCDIR)
 
-DARWINLDFLAGS = -bundle -undefined suppress -flat_namespace
+DARWINLDFLAGS = -bundle -undefined dynamic_lookup
 
 %.pd_darwin: %.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) $(DARWINLDFLAGS) -o $*.pd_darwin $*.c

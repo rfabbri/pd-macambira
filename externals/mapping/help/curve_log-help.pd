@@ -1,5 +1,5 @@
 #N canvas 127 78 484 351 10;
-#X obj 5 2 cnv 15 450 20 empty empty [curve_log] 2 11 1 18 -233017
+#X obj 5 2 cnv 15 450 20 empty empty curve_log 2 11 1 18 -233017
 -66577 0;
 #X msg 422 3 pddp;
 #X floatatom 25 123 8 0 0 0 - - -;

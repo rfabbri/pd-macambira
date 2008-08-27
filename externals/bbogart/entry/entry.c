@@ -1,3 +1,4 @@
+
 /* text entry widget for PD                                              *
  * Based on button from GGEE by Guenter Geiger                           *
  * Copyright Ben Bogart 2004 ben@ekran.org                               * 
@@ -49,6 +50,7 @@
 #define TOTAL_OUTLETS           2
 
 #define DEBUG(x)
+//#define DEBUG(x) x
 
 typedef struct _entry
 {
@@ -133,32 +135,32 @@ static void set_tk_widget_ids(t_entry *x, t_canvas *canvas)
 
     /* Tk ID for the current canvas that this object is drawn in */
     sprintf(buf,".x%lx.c", (long unsigned int) canvas);
-    x->canvas_id = getbytes(strlen(buf));
+    x->canvas_id = getbytes(strlen(buf) + 1);
     strcpy(x->canvas_id, buf);
 
     /* Tk ID for the "frame" the other things are drawn in */
     sprintf(buf,"%s.frame%lx", x->canvas_id, (long unsigned int)x);
-    x->frame_id = getbytes(strlen(buf));
+    x->frame_id = getbytes(strlen(buf) + 1);
     strcpy(x->frame_id, buf);
 
     sprintf(buf,"%s.text%lx", x->frame_id, (long unsigned int)x);
-    x->text_id = getbytes(strlen(buf));
+    x->text_id = getbytes(strlen(buf) + 1);
     strcpy(x->text_id, buf);    /* Tk ID for the "text", the meat! */
 
     sprintf(buf,"%s.window%lx", x->canvas_id, (long unsigned int)x);
-    x->window_tag = getbytes(strlen(buf));
+    x->window_tag = getbytes(strlen(buf) + 1);
     strcpy(x->window_tag, buf);    /* Tk ID for the resizing "window" */
 
     sprintf(buf,"%s.handle%lx", x->canvas_id, (long unsigned int)x);
-    x->handle_id = getbytes(strlen(buf));
+    x->handle_id = getbytes(strlen(buf) + 1);
     strcpy(x->handle_id, buf);    /* Tk ID for the resizing "handle" */
 
     sprintf(buf,"%s.scrollbar%lx", x->frame_id, (long unsigned int)x);
-    x->scrollbar_id = getbytes(strlen(buf));
+    x->scrollbar_id = getbytes(strlen(buf) + 1);
     strcpy(x->scrollbar_id, buf);    /* Tk ID for the optional "scrollbar" */
 
     sprintf(buf,"all%lx", (long unsigned int)x);
-    x->all_tag = getbytes(strlen(buf));
+    x->all_tag = getbytes(strlen(buf) + 1);
     strcpy(x->all_tag, buf);    /* Tk ID for the optional "scrollbar" */
 }
 
@@ -475,7 +477,7 @@ static void entry_append(t_entry* x,  t_symbol *s, int argc, t_atom *argv)
     }
     sys_vgui("append ::%s::list \" \"\n", x->tcl_namespace);
     sys_vgui("%s insert end $::%s::list ; unset ::%s::list \n", 
-               x->canvas_id, x->tcl_namespace, x->tcl_namespace );
+               x->text_id, x->tcl_namespace, x->tcl_namespace );
     sys_vgui("%s yview end-2char \n", x->text_id );
 }
 
@@ -743,8 +745,8 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
     x->x_font_weight = gensym("normal");
     x->x_have_scrollbar = 0;
     x->x_selected = 0;
-	
-	if (argc < 4)
+
+    if (argc < 4)
 	{
 		post("entry: You must enter at least 4 arguments. Default values used.");
 		x->x_width = ENTRY_DEFAULT_WIDTH;
@@ -758,13 +760,13 @@ static void *entry_new(t_symbol *s, int argc, t_atom *argv)
 		x->x_height = atom_getint(argv+1);
 		x->x_bgcolour = atom_getsymbol(argv+2);
 		x->x_fgcolour = atom_getsymbol(argv+3);
-	}	
+    }
 
     x->x_data_outlet = outlet_new(&x->x_obj, &s_float);
     x->x_status_outlet = outlet_new(&x->x_obj, &s_symbol);
 
     sprintf(buf,"entry%lx",(long unsigned int)x);
-    x->tcl_namespace = getbytes(strlen(buf));
+    x->tcl_namespace = getbytes(strlen(buf) + 1);
     strcpy(x->tcl_namespace, buf);    
 
     sprintf(buf,"#%s", x->tcl_namespace);

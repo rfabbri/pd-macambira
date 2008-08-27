@@ -1,5 +1,5 @@
 #N canvas 918 327 496 504 10;
-#X obj 5 2 cnv 15 450 20 empty empty one->two 2 11 1 18 -233017 -66577
+#X obj 5 2 cnv 15 450 20 empty empty one2two 2 11 1 18 -233017 -66577
 0;
 #X msg 422 3 pddp;
 #X text 273 457 released under the GNU GPL;
@@ -30,8 +30,8 @@ right inlet:;
 #X floatatom 211 333 5 0 0 0 - - -;
 #X obj 214 314 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 143 352 one->two 0.2;
-#X obj 153 139 one->two;
+#X obj 143 352 one2two 0.2;
+#X obj 153 139 one2two;
 #X connect 3 0 21 0;
 #X connect 4 0 6 0;
 #X connect 5 0 3 0;

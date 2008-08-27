@@ -1,12 +1,12 @@
 #N canvas 567 104 476 357 10;
-#X obj 5 2 cnv 15 450 20 empty empty [curve_exp] 2 11 1 18 -233017 -66577
+#X obj 5 2 cnv 15 450 20 empty empty curve_exp 2 11 1 18 -233017 -66577
 0;
 #X msg 422 3 pddp;
 #X text 27 300 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 244 314 released under the GNU GPL;
 #X text 98 271 For more info:;
-#X obj 202 269 pddp_open all_about_curve_mapping;
+#X obj 202 269 pddp/pddplink ../all_about_curve_mapping.pd -text all_about_curve_mapping;
 #X floatatom 25 123 8 0 0 0 - - -;
 #X floatatom 25 184 8 0 0 0 - - -;
 #X obj 28 201 hsl 200 15 0 1 0 0 empty empty empty 22 8 1 12 -262144

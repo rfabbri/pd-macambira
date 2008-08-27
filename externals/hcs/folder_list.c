@@ -40,8 +40,8 @@ static char *version = "$Revision: 1.12 $";
 
 t_int folder_list_instance_count;
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF

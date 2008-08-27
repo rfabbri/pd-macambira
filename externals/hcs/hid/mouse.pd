@@ -14,8 +14,8 @@
 #X msg 257 84 open \$1;
 #X obj 257 61 f \$1;
 #X obj 257 37 loadbang;
-#X obj 25 323 autoscale -1 1;
-#X obj 179 323 autoscale -1 1;
+#X obj 25 323 mapping/autoscale -1 1;
+#X obj 179 323 mapping/autoscale -1 1;
 #X obj 137 288 route rel_x rel_y rel_wheel;
 #X obj 398 313 print MOUSE_UNIMPLEMENTED_EVENT;
 #X text 413 139 this is for once this feature is implemented;

@@ -1,5 +1,5 @@
 #N canvas 525 201 462 476 10;
-#X obj 5 2 cnv 15 450 20 empty empty [keygate] 2 11 1 18 -233017 -66577
+#X obj 5 2 cnv 15 450 20 empty empty keygate 2 11 1 18 -233017 -66577
 0;
 #X obj 160 257 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -9,7 +9,7 @@
 #X text 33 416 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 250 430 released under the GNU GPL;
-#X obj 237 369 pddp_open mapping-about;
+#X obj 237 369 pddp/pddplink ../mapping-about.pd -text mapping-about;
 #X text 128 370 For more info:;
 #X text 15 207 data to be gated -->;
 #X obj 281 258 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1

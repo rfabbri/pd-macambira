@@ -38,7 +38,7 @@
 #define DEBUG(x)
 //#define DEBUG(x) x 
 
-unsigned short global_debug_level = 0;
+unsigned short global_debug_level = 0; /* higher numbers means more messages */
 
 static t_class *hid_class;
 
@@ -177,7 +177,6 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 		first_argument = atom_getsymbolarg(0,argc,argv);
 		if(first_argument == &s_) 
 		{ // single float arg means device #
-			post("first_argument == &s_");
 			device_number = (short) atom_getfloatarg(0,argc,argv);
 			if(device_number < 0) device_number = -1;
 			debug_print(LOG_DEBUG,"[hid] setting device# to %d",device_number);
@@ -346,7 +345,10 @@ static void hid_open(t_hid *x, t_symbol *s, int argc, t_atom *argv)
 			if(hid_open_device(x,device_number))
 				error("[hid] can not open device %d",device_number);
 			else
+            {
 				x->x_device_open = 1;
+				x->x_device_number = device_number;
+            }
 		}
 	}
 	else debug_print(LOG_WARNING,"[hid] device does not exist");
@@ -453,7 +455,6 @@ static void *hid_new(t_symbol *s, int argc, t_atom *argv)
 #endif
 
   /* init vars */
-  global_debug_level = 9; /* high numbers here means see more messages */
   x->x_has_ff = 0;
   x->x_device_open = 0;
   x->x_started = 0;

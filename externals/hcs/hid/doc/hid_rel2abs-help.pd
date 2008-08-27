@@ -1,7 +1,8 @@
 #N canvas 435 259 469 312 10;
-#X obj 5 2 cnv 15 450 20 empty empty [hid_invert] 2 11 1 18 -233017
+#X declare -lib hid;
+#X obj 5 2 cnv 15 450 20 empty empty hid_invert 2 11 1 18 -233017
 -66577 0;
-#X msg 422 3 pddp;
+#X obj 422 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X text 27 270 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 244 284 released under the GNU GPL;
@@ -16,10 +17,10 @@
 #X floatatom 153 207 5 0 0 0 - - -;
 #X floatatom 252 208 5 0 0 0 - - -;
 #X floatatom 211 208 5 0 0 0 - - -;
-#X obj 252 174 hid_rel2abs 0 100;
-#X obj 73 175 hid_rel2abs -10 10;
+#X obj 252 174 hid/hid_rel2abs 0 100;
+#X obj 73 175 hid/hid_rel2abs -10 10;
 #X text 98 240 For more info:;
-#X obj 202 238 pddp_open all_about_hid_mapping;
+#X obj 202 238 pddp/pddplink ../all_about_hid_mapping.pd -text all_about_hid_mapping;
 #X msg 73 129 reset;
 #X msg 284 129 reset;
 #X connect 5 0 10 0;

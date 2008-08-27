@@ -22,12 +22,12 @@ typedef struct _keyboard_layout {
 void keyboard_layout_bang(t_keyboard_layout *x) {
 	//OSStatus err;
 	KeyboardLayoutRef currentLayoutRef;
-	CFStringRef keyboardName;
+	const void *keyboardName;
 	char cKeyboardName[100];
 	
 	KLGetCurrentKeyboardLayout(&currentLayoutRef);
 	KLGetKeyboardLayoutProperty(currentLayoutRef, kKLName, (const void **)&keyboardName);
-	CFStringGetCString(keyboardName, cKeyboardName, 100, kCFStringEncodingASCII);
+	CFStringGetCString((CFStringRef)keyboardName, cKeyboardName, 100, kCFStringEncodingASCII);
 	
     outlet_symbol(x->x_data_outlet, gensym(cKeyboardName));
 }
@@ -35,7 +35,7 @@ void keyboard_layout_bang(t_keyboard_layout *x) {
 void keyboard_layout_menu(t_keyboard_layout *x) {
 	//OSStatus err;
 	KeyboardLayoutRef currentLayoutRef;
-	CFStringRef keyboardName;
+	const void *keyboardName;
 	char cKeyboardName[100];
 	CFIndex countOfLayouts;
 	CFIndex i;
@@ -48,7 +48,7 @@ void keyboard_layout_menu(t_keyboard_layout *x) {
 	for(i= 0; i<countOfLayouts; i++) {
 		KLGetKeyboardLayoutAtIndex(i, &currentLayoutRef);
 		KLGetKeyboardLayoutProperty(currentLayoutRef, kKLName, (const void **)&keyboardName);
-		CFStringGetCString(keyboardName, cKeyboardName, 100, kCFStringEncodingASCII);
+		CFStringGetCString((CFStringRef)keyboardName, cKeyboardName, 100, kCFStringEncodingASCII);
 		
 		SETSYMBOL(&name, gensym(cKeyboardName));
 // TODO this should probably output [menu append( so other messages work too
@@ -59,13 +59,13 @@ void keyboard_layout_menu(t_keyboard_layout *x) {
 void keyboard_layout_anything(t_keyboard_layout *x, t_symbol *s, short argc, t_atom *argv) {
 	//OSStatus err;
 	KeyboardLayoutRef currentLayoutRef;
-	CFStringRef keyboardName;
+	const void *keyboardName;
 	char cKeyboardName[100];
 	
 	keyboardName= CFStringCreateWithCString(NULL, s->s_name, kCFStringEncodingASCII);
 	KLGetKeyboardLayoutWithName(keyboardName, &currentLayoutRef);
 	KLGetKeyboardLayoutProperty(currentLayoutRef, kKLName, (const void **)&keyboardName);
-	CFStringGetCString(keyboardName, cKeyboardName, 100, kCFStringEncodingASCII);
+	CFStringGetCString((CFStringRef)keyboardName, cKeyboardName, 100, kCFStringEncodingASCII);
 	KLSetCurrentKeyboardLayout(currentLayoutRef);
 	//outlet_anything(x->t_out, s, 0, NULL);
 	keyboard_layout_bang(x);

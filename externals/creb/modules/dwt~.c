@@ -190,9 +190,9 @@ static void dwt_permutation(t_dwt *x, t_int n){
 
   /* debug */
   for(k=0; k<n; k++)
-    printf("clutter[%ld] = %ld\n", k, ctl->c_clutter[k]);
+    printf("clutter[%d] = %d\n", (int)k, (int)ctl->c_clutter[k]);
   for(k=0; k<n; k++)
-    printf("unclutter[%ld] = %ld\n", k, ctl->c_unclutter[k]);
+    printf("unclutter[%d] = %d\n", (int)k, (int)ctl->c_unclutter[k]);
 
   exit(1);
 }

@@ -1,11 +1,12 @@
 #N canvas 135 352 479 396 10;
+#X declare -lib hid;
 #X text 27 340 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 244 354 released under the GNU GPL;
 #X floatatom 101 195 5 0 0 0 - - -;
 #X floatatom 101 251 5 0 0 0 - - -;
 #X text 98 303 For more info:;
-#X obj 202 301 pddp_open all_about_hid_mapping;
+#X obj 202 301 pddp/pddplink ../all_about_hid_mapping.pd -text all_about_hid_mapping;
 #X obj 193 194 hsl 85 18 0.1 10 1 1 empty empty average_count 0 9 1
 12 -228992 -1 -1 3500 0;
 #X floatatom 189 223 5 0 0 0 - - -;
@@ -14,10 +15,10 @@
 -1 -1 0 1;
 #X obj 104 164 hsl 250 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 5 2 cnv 15 450 20 empty empty [hid_average] 2 11 1 18 -233017
+#X obj 5 2 cnv 15 450 20 empty empty hid_average 2 11 1 18 -233017
 -66577 0;
-#X msg 422 3 pddp;
-#X obj 101 221 hid_average;
+#X obj 422 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
+#X obj 101 221 hid/hid_average;
 #X text 18 36 Smooths a stream of numbers using weighted averaging.
 By default \, the average is the last 10 values. You can set this using
 the right inlet.;

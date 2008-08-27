@@ -33,7 +33,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 #endif
-#ifdef __WIN32__
+#ifdef _WIN32
 # include <io.h>
 # include <windows.h>
 #endif
@@ -68,10 +68,12 @@ typedef struct _filepath
 
 typedef void (*t_hexloader_setup)(void);
 
-/* definitions taken from s_loader.c  */
+#ifdef MISSING_LOADER_T
+/* definitions taken from s_loader.c, since they weren't in header orignally */
 typedef int (*loader_t)(t_canvas *canvas, char *classname);
 void sys_register_loader(loader_t loader);
 void class_set_extern_dir(t_symbol *s);
+#endif
 
 /* ==================================================== */
 

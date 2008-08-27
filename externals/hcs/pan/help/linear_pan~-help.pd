@@ -1,5 +1,6 @@
 #N canvas 503 335 477 320 10;
-#X obj 5 2 cnv 15 450 20 empty empty [linearpan~] 2 11 1 18 -233017
+#X declare -lib pan;
+#X obj 5 2 cnv 15 450 20 empty empty linearpan~ 2 11 1 18 -233017
 -66577 0;
 #X msg 422 3 pddp;
 #X text 27 270 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>

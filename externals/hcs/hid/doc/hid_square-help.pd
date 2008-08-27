@@ -1,19 +1,20 @@
 #N canvas 556 145 476 357 10;
-#X obj 5 2 cnv 15 450 20 empty empty [hid_square] 2 11 1 18 -233017
+#X declare -lib hid;
+#X obj 5 2 cnv 15 450 20 empty empty hid_square 2 11 1 18 -233017
 -66577 0;
-#X msg 422 3 pddp;
+#X obj 422 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X text 27 300 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 244 314 released under the GNU GPL;
 #X text 98 271 For more info:;
-#X obj 202 269 pddp_open all_about_hid_mapping;
+#X obj 202 269 pddp/pddplink ../all_about_hid_mapping.pd -text all_about_hid_mapping;
 #X floatatom 25 123 8 0 0 0 - - -;
 #X floatatom 25 184 8 0 0 0 - - -;
 #X obj 28 201 hsl 200 15 0 1 0 0 empty empty empty 22 8 1 12 -262144
 -1 -1 0 1;
 #X obj 28 103 hsl 200 15 0 1 0 0 empty empty empty 22 8 1 12 -261681
 -1 -1 0 1;
-#X obj 25 153 hid_square;
+#X obj 25 153 hid/hid_square;
 #N canvas 0 22 450 300 graph1 0;
 #X array hid_square 100 float 0;
 #X coords 0 1 99 0 100 100 1;
@@ -32,7 +33,7 @@
 #X obj 57 13 loadbang;
 #X obj 57 207 / 100;
 #X text 99 207 [hid] output range: 0 to 1;
-#X obj 56 233 hid_square;
+#X obj 56 233 hid/hid_square;
 #X obj 56 283 tabwrite hid_square;
 #X connect 0 0 1 0;
 #X connect 1 0 3 0;

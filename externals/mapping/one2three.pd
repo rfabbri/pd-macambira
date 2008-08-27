@@ -3,8 +3,8 @@
 #X obj 26 278 outlet;
 #X obj 137 279 outlet;
 #X obj 253 280 outlet;
-#X obj 26 154 one->two;
-#X obj 137 221 one->two;
+#X obj 26 154 one2two;
+#X obj 137 221 one2two;
 #X obj 85 28 inlet;
 #X obj 101 51 loadbang;
 #X obj 86 98 clip 0 1;

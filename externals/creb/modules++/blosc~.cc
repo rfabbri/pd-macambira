@@ -29,15 +29,6 @@
 #include "DSPIcomplex.h"
 #include "DSPIfilters.h"
 
-/* work around old bug in Apple compilers <hans@at.or.at> */
-//#if MAC_OS_X_VERSION < MAC_OS_X_VERSION_10_4 // arg, this didn't work
-#ifndef isnan
-extern "C" int isnan(double);
-#endif
-#ifndef isinf
-extern "C" int isinf(double);
-#endif
-
 typedef unsigned long long u64;
 typedef unsigned long u32;
 
@@ -99,7 +90,7 @@ static inline u32 _float_to_phase(float f){return ((u32)(f * 4294967296.0f)) & ~
 /* flat table: better for linear interpolation */
 static inline float _play_voice_lint(float *table, t_int *index, float frac, float scale)
 {
-    t_int i = *index;
+    int i = *index;
 
     /* perform linear interpolation */
     float f = (((1.0f - frac) * table[i]) + (table[i+1] * frac)) * scale;
@@ -616,7 +607,7 @@ static inline void _fft(float *real, float *imag, int size)
     for (i=0; i<size; i++){
 	real[i] *= scale;
 	imag[i] *= scale;
-	if (isnan(real[i])) post("fftpanic %d", i);
+	// if (isnan(real[i])) post("fftpanic %d", i);
     }
     mayer_fft(size, real, imag);
 }
@@ -628,7 +619,7 @@ static inline void _ifft(float *real, float *imag, int size)
     for (i=0; i<size; i++){
 	real[i] *= scale;
 	imag[i] *= scale;
-	if (isnan(real[i])) post("ifftpanic %d", i);
+	// if (isnan(real[i])) post("ifftpanic %d", i);
     }
     mayer_ifft(size, real, imag);
 }
@@ -705,8 +696,8 @@ static void build_tables(void)
 	//real[i] *= 0.5f * (1.0f + WALPHA) + 0.5f * (1.0f - WALPHA) * (cos(tw)); 
 
 	/* check for nan */
-	if (isnan(real[i])) post("sinc NaN panic %d", i);
-	if (isinf(real[i])) post("sinc Inf panic %d", i);
+	//if (isnan(real[i])) post("sinc NaN panic %d", i);
+	//if (isinf(real[i])) post("sinc Inf panic %d", i);
 
     }
 

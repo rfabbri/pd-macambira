@@ -1,9 +1,10 @@
 #N canvas 168 428 470 338 10;
+#X declare -lib pan;
 #X obj 77 187 gpan~;
 #X obj 54 155 osc~ 300;
 #X obj 114 155 osc~ 400;
 #X obj 129 246 dac~;
-#X obj 5 2 cnv 15 450 20 empty empty [gpan~] 2 11 1 18 -233017 -66577
+#X obj 5 2 cnv 15 450 20 empty empty gpan~ 2 11 1 18 -233017 -66577
 0;
 #X msg 422 3 pddp;
 #X msg 190 101 0;

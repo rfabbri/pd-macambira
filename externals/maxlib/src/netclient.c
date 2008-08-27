@@ -47,10 +47,11 @@
 
 #define INBUFSIZE 4096	/* maximum numbers of characters to read */
 
-static char *version = "netclient v0.3, written by Olaf Matthes <olaf.matthes@gmx.de>";
+static char *version = "netclient v0.3.1, written by Olaf Matthes <olaf.matthes@gmx.de>";
 
 static t_class *netclient_class;
 static t_binbuf *inbinbuf;
+static int netclient_instance_count;
 
 typedef struct _netclient
 {
@@ -70,10 +71,6 @@ typedef struct _netclient
 	pthread_t x_threadid;            /* id of child thread */
 	pthread_attr_t x_threadattr;     /* attributes of child thread */
 } t_netclient;
-
-#ifdef USE_CIRCULAR
-static t_binbuf *inbinbuf;
-#endif
 
 	/* one lonlely prototype */
 static void netclient_rcv(t_netclient *x);
@@ -243,16 +240,12 @@ static void netclient_rcv(t_netclient *x)
 {
 	int fd = x->x_fd;
 	int ret;
-    char resp[INBUFSIZE];
 	fd_set readset;
 	fd_set exceptset;
     struct timeval ztout;
 		/* output data */
-	t_binbuf *binbuf;
-    t_atom messbuf[1024];
     int msg, natom;
     t_atom *at;
-	int i;
 	
 	if(x->x_connectstate)
 	{
@@ -340,7 +333,8 @@ static void *netclient_new(t_floatarg udpflag)
     x->x_outdata = outlet_new(&x->x_obj, &s_anything);	/* received data */
     x->x_outconnect = outlet_new(&x->x_obj, &s_float);	/* connection state */
     x->x_clock = clock_new(x, (t_method)netclient_tick);
-	inbinbuf = binbuf_new();
+    if(netclient_instance_count == 0)
+        inbinbuf = binbuf_new();
     x->x_fd = -1;
     x->x_protocol = (udpflag != 0 ? SOCK_DGRAM : SOCK_STREAM);
 		/* prepare child thread */
@@ -348,6 +342,7 @@ static void *netclient_new(t_floatarg udpflag)
        post("netclient: warning: could not prepare child thread" );
     if(pthread_attr_setdetachstate(&x->x_threadattr, PTHREAD_CREATE_DETACHED) < 0)
        post("netclient: warning: could not prepare child thread" );
+	netclient_instance_count++;
     return (x);
 }
 
@@ -355,7 +350,9 @@ static void netclient_free(t_netclient *x)
 {
     netclient_disconnect(x);
     clock_free(x->x_clock);
-	binbuf_free(inbinbuf);
+	netclient_instance_count--;
+    if(netclient_instance_count == 0)
+        binbuf_free(inbinbuf);
 }
 
 #ifndef MAXLIB

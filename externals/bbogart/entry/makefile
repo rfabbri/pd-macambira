@@ -1,7 +1,7 @@
 current:
 	echo make pd_linux, pd_nt, pd_irix5, or pd_irix6
 
-clean: ; rm -f entry.pd_{linux,nt,irix?,darwin} *.o
+clean: ; rm -f entry.pd_* *.dll *.o
 
 # ----------------------- NT -----------------------
 
@@ -51,7 +51,7 @@ pd_linux: entry.pd_linux
 
 .SUFFIXES: .pd_linux
 
-LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
+LINUXCFLAGS = -g -DPD -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes
 
 
@@ -69,7 +69,7 @@ pd_darwin: entry.pd_darwin
 
 .SUFFIXES: .pd_darwin
 
-DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes
+DARWINCFLAGS = -g -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes
 
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c

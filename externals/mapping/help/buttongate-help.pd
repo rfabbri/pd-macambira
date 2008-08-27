@@ -1,5 +1,5 @@
 #N canvas 345 96 463 514 10;
-#X obj 5 2 cnv 15 450 20 empty empty [buttongate] 2 11 1 18 -233017
+#X obj 5 2 cnv 15 450 20 empty empty buttongate 2 11 1 18 -233017
 -66577 0;
 #X obj 160 287 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -9,7 +9,7 @@
 #X text 27 470 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 244 484 released under the GNU GPL;
-#X obj 223 417 pddp_open mapping-about;
+#X obj 223 417 pddp/pddplink ../mapping-about.pd -text mapping-about;
 #X text 114 418 For more info:;
 #X text 17 38 [buttongate] is a simple gate controlled by a HID button.
 You must specify the device and the button which controls the gate.

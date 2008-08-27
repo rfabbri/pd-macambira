@@ -26,6 +26,7 @@
 
 #include "pdp.h"
 #include "pdp_llconv.h"
+#include "s_stuff.h" // need to get sys_libdir for libquicktime plugins
 
 
 #define min(x,y) ((x<y)?(x):(y))
@@ -967,6 +968,19 @@ void pdp_qt_setup(void)
     pdp_qt_setup_common(pdp_qt_tilde_class);
 
     class_addmethod(pdp_qt_tilde_class, (t_method)pdp_qt_dsp, gensym("dsp"), 0);
+
+#ifdef __APPLE__
+    /* this is necessary for pdp_qt to find the embedded libquicktime plugins */
+    char buf[FILENAME_MAX];
+    char realpath_buf[FILENAME_MAX];
+    strncpy(buf, sys_libdir->s_name, FILENAME_MAX - 20);
+    strcat(buf, "/../lib/libquicktime");
+    if(realpath(buf, realpath_buf))
+    {
+        post("[pdp_qt]: setting LIBQUICKTIME_PLUGIN_DIR to:\n   %s", realpath_buf);
+        setenv("LIBQUICKTIME_PLUGIN_DIR", realpath_buf, 0); // 0 means don't overwrite existing value
+    }
+#endif
 }
 
 #ifdef __cplusplus

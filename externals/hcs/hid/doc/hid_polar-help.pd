@@ -1,13 +1,14 @@
 #N canvas 601 232 482 455 10;
-#X obj 5 2 cnv 15 450 20 empty empty [hid_polar] 2 11 1 18 -233017
+#X declare -lib hid;
+#X obj 5 2 cnv 15 450 20 empty empty hid_polar 2 11 1 18 -233017
 -66577 0;
-#X msg 422 3 pddp;
+#X obj 422 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X text 244 411 released under the GNU GPL;
 #X floatatom 100 248 5 0 0 0 - - -;
 #X floatatom 100 335 7 0 0 0 radius-> - -;
 #X text 124 370 For more info:;
-#X obj 228 368 pddp_open all_about_hid_mapping;
-#X obj 100 295 hid_polar;
+#X obj 228 368 pddp/pddplink ../all_about_hid_mapping.pd -text all_about_hid_mapping;
+#X obj 100 295 hid/hid_polar;
 #X text 27 397 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X obj 101 161 hsl 128 15 0 1 0 0 empty empty x-axis 133 7 1 10 -225280
@@ -25,9 +26,9 @@
 #X text 17 29 Converts cartesian coordinates(x \, y) to polar coordinates
 (radius \, angle). The angle is in radians (-pi to pi). The angle 0
 is at cartesian (1 \, 0.5) or to the right.;
-#X obj 361 293 hid_spiral;
-#X obj 245 293 hid2rad;
-#X obj 303 293 hid2deg;
+#X obj 361 293 hid/hid_spiral;
+#X obj 245 293 hid/hid2rad;
+#X obj 303 293 hid/hid2deg;
 #X connect 3 0 7 0;
 #X connect 7 0 4 0;
 #X connect 7 1 11 0;

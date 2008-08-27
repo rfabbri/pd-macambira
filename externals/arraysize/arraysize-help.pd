@@ -11,7 +11,7 @@
 #X msg 22 112 bang;
 #X obj 22 139 arraysize;
 #X msg 65 112 set test;
-#X obj 228 264 pddp_open all_about_arrays;
+#X obj 228 264 pddp/pddplink ../all_about_arrays.pd -text all_about_arrays;
 #X text 124 263 For more info:;
 #X floatatom 22 245 5 0 0 0 - - -;
 #X msg 22 194 bang;

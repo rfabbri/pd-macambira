@@ -30,7 +30,7 @@
 #define NBITS(x) (((x)/BITS_PER_LONG)+1)
 #define LONG(x) ((x)/BITS_PER_LONG)
 #define test_bit(bit, array)	((array[LONG(bit)] >> (bit%BITS_PER_LONG)) & 1)
-
+#define ISBITSET(x,i) ((x[i>>3] & (1<<(i&7)))!=0)
 
 /*
  * from an email from Vojtech:
@@ -65,7 +65,7 @@ t_symbol* hid_convert_linux_buttons_to_numbers(__u16 linux_code)
             snprintf(hid_code, MAXPDSTRING,"btn_%d",linux_code - BTN_WHEEL);
 	else return 0;
     }
-    return gensym(hid_code ? hid_code : "?");
+    return gensym(hid_code);
 }
 
 /* Georg Holzmann: implementation of the keys */
@@ -261,30 +261,27 @@ void hid_print_device_list(void)
     debug_print(LOG_DEBUG,"hid_print_device_list");
     int i,fd;
     char device_output_string[MAXPDSTRING] = "Unknown";
-    char dev_handle_name[MAXPDSTRING] = "/dev/input/event0";
+    char dev_handle_name[FILENAME_MAX] = "/dev/input/event0";
 
     post("");
-    for(i=0;i<128;++i) 
+    for(i=0;i<MAX_DEVICES;++i) 
     {
-        snprintf(dev_handle_name, MAXPDSTRING, "/dev/input/event%d", i);
-        if(dev_handle_name) 
-        {
-            /* open the device read-only, non-exclusive */
-            fd = open (dev_handle_name, O_RDONLY | O_NONBLOCK);
-            /* test if device open */
-            if(fd < 0 ) 
-            { 
-                fd = -1;
-            } 
-            else 
-            {
-                /* get name of device */
-                ioctl(fd, EVIOCGNAME(sizeof(device_output_string)), device_output_string);
-                post("Device %d: '%s' on '%s'", i, device_output_string, dev_handle_name);
+        snprintf(dev_handle_name, FILENAME_MAX, "/dev/input/event%d", i);
+		/* open the device read-only, non-exclusive */
+		fd = open (dev_handle_name, O_RDONLY | O_NONBLOCK);
+		/* test if device open */
+		if(fd < 0 ) 
+		{ 
+			fd = -1;
+		} 
+		else 
+		{
+			/* get name of device */
+			ioctl(fd, EVIOCGNAME(sizeof(device_output_string)), device_output_string);
+			post("Device %d: '%s' on '%s'", i, device_output_string, dev_handle_name);
 			  
-                close (fd);
-            }
-        } 
+			close (fd);
+		}
     }
     post("");	
 }
@@ -300,34 +297,39 @@ static void hid_build_element_list(t_hid *x)
     t_hid_element *new_element = NULL;
     t_int i, j;
   
+    if( x->x_fd < 0 ) 
+        return;
+
     element_count[x->x_device_number] = 0;
-    if( x->x_fd ) 
+
+    /* get bitmask representing supported elements (axes, keys, etc.) */
+    memset(element_bitmask, 0, sizeof(element_bitmask));
+    if( ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), element_bitmask[0]) < 0 )
+        perror("[hid] error: evdev ioctl: element_bitmask");
+    memset(abs_bitmask, 0, sizeof(abs_bitmask));
+    if( ioctl(x->x_fd, EVIOCGBIT(EV_ABS, sizeof(abs_bitmask)), abs_bitmask) < 0 ) 
+        perror("[hid] error: evdev ioctl: abs_bitmask");
+    for( i = 1; i < EV_MAX; i++ ) 
     {
-        /* get bitmask representing supported elements (axes, keys, etc.) */
-        memset(element_bitmask, 0, sizeof(element_bitmask));
-        if( ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), element_bitmask[0]) < 0 )
-            perror("[hid] error: evdev ioctl: element_bitmask");
-        memset(abs_bitmask, 0, sizeof(abs_bitmask));
-        if( ioctl(x->x_fd, EVIOCGBIT(EV_ABS, sizeof(abs_bitmask)), abs_bitmask) < 0 ) 
-            perror("[hid] error: evdev ioctl: abs_bitmask");
-        for( i = 1; i < EV_MAX; i++ ) 
+        if(test_bit(i, element_bitmask[0])) 
         {
-            if(test_bit(i, element_bitmask[0])) 
+            /* get bitmask representing supported elements */
+            ioctl(x->x_fd, EVIOCGBIT(i, KEY_MAX), element_bitmask[i]);
+            /* cycle through all possible event codes (axes, keys, etc.) 
+             * testing to see which are supported.
+             */
+            for(j = 0; j < KEY_MAX; j++) 
             {
-                /* get bitmask representing supported button types */
-                ioctl(x->x_fd, EVIOCGBIT(i, KEY_MAX), element_bitmask[i]);
-                /* cycle through all possible event codes (axes, keys, etc.) 
-                 * testing to see which are supported.
-                 * i = i   j = j
-                 */
-                for(j = 0; j < KEY_MAX; j++) 
+                if(test_bit(j, element_bitmask[i])) 
                 {
-					new_element = getbytes(sizeof(t_hid_element));
-                    if( (i == EV_ABS) && (test_bit(j, abs_bitmask)) )
+                    new_element = getbytes(sizeof(t_hid_element));
+                    if( (i == EV_ABS) && (j < ABS_MAX) && (test_bit(j, abs_bitmask)) )
                     {
-                        /* this means that the bit is set in the axes list */
-                        if(ioctl(x->x_fd, EVIOCGABS(j), &abs_features)) 
-                            perror("evdev EVIOCGABS ioctl");
+                        if(ioctl(x->x_fd, EVIOCGABS(j), &abs_features) < 0) 
+                        {
+                            post("[hid]: EVIOCGABS ioctl error for element: 0x%03x", j, j);
+                            perror("[hid]: EVIOCGABS ioctl error:");
+                        }
                         new_element->min = abs_features.minimum;
                         new_element->max = abs_features.maximum;
                     }
@@ -336,38 +338,26 @@ static void hid_build_element_list(t_hid *x)
                         new_element->min = 0;
                         new_element->max = 0;
                     }
-                    if(test_bit(j, element_bitmask[i])) 
+                    new_element->linux_type = i; /* the int from linux/input.h */
+                    new_element->type = gensym(ev[i] ? ev[i] : "?"); /* the symbol */
+                    new_element->linux_code = j;
+                    if((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
                     {
-						new_element->linux_type = i; /* the int from linux/input.h */
-						new_element->type = gensym(ev[i] ? ev[i] : "?"); /* the symbol */
-                        new_element->linux_code = j;
-                        if((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
-                        {
-                            new_element->name = hid_convert_linux_buttons_to_numbers(j);
-                        }
-                        else
-                        {
-                            new_element->name = gensym(event_names[i][j] ? event_names[i][j] : "?");
-                        }
-                        if( i == EV_REL )
-                            new_element->relative = 1;
-                        else
-                            new_element->relative = 0;
-                        // fill in the t_hid_element struct here
-                        post("x->x_device_number: %d   element_count[]: %d",
-                             x->x_device_number, element_count[x->x_device_number]);
-                        post("linux_type/linux_code: %d/%d  type/name: %s/%s    max: %d   min: %d ", 
-                             new_element->linux_type, new_element->linux_code, 
-                             new_element->type->s_name, new_element->name->s_name,
-                             new_element->max, new_element->min);
-                        post("\tpolled: %d   relative: %d",
-                             new_element->polled, new_element->relative);
-                        element[x->x_device_number][element_count[x->x_device_number]] = new_element;
-                        ++element_count[x->x_device_number];
+                        new_element->name = hid_convert_linux_buttons_to_numbers(j);
                     }
+                    else
+                    {
+                        new_element->name = gensym(event_names[i][j] ? event_names[i][j] : "?");
+                    }
+                    if( i == EV_REL )
+                        new_element->relative = 1;
+                    else
+                        new_element->relative = 0;
+                    element[x->x_device_number][element_count[x->x_device_number]] = new_element;
+                    ++element_count[x->x_device_number];
                 }
-            }        
-        }
+            }
+        }        
     }
 }
 
@@ -377,8 +367,6 @@ static void hid_build_element_list(t_hid *x)
 
 void hid_get_events(t_hid *x)
 {
-    debug_print(9,"hid_get_events");
-
 /* for debugging, counts how many events are processed each time hid_read() is called */
     DEBUG(t_int event_counter = 0;);
     unsigned short i;
@@ -434,27 +422,24 @@ t_int hid_open_device(t_hid *x, short device_number)
     debug_print(LOG_DEBUG,"hid_open_device");
 
     char device_name[MAXPDSTRING] = "Unknown";
-    char block_device[MAXPDSTRING] = "/dev/input/event0";
+    char block_device[FILENAME_MAX] = "/dev/input/event0";
     struct input_event hid_input_event;
 
     x->x_fd = -1;
   
     x->x_device_number = device_number;
-    snprintf(block_device,MAXPDSTRING,"/dev/input/event%d",x->x_device_number);
+    snprintf(block_device,FILENAME_MAX,"/dev/input/event%d",x->x_device_number);
 
-    if(block_device) 
-    {
-        /* open the device read-only, non-exclusive */
-        x->x_fd = open(block_device, O_RDONLY | O_NONBLOCK);
-        /* test if device open */
-        if(x->x_fd < 0 ) 
-        { 
-            error("[hid] open %s failed",block_device);
-            x->x_fd = -1;
-            return 1;
-        }
-    } 
-  
+	/* open the device read-only, non-exclusive */
+	x->x_fd = open(block_device, O_RDONLY | O_NONBLOCK);
+	/* test if device open */
+	if(x->x_fd < 0 ) 
+	{ 
+		error("[hid] open %s failed",block_device);
+		x->x_fd = -1;
+		return 1;
+	}
+	
     /* read input_events from the HID_DEVICE stream 
      * It seems that is just there to flush the input event queue
      */
@@ -465,7 +450,6 @@ t_int hid_open_device(t_hid *x, short device_number)
     post ("[hid] opened device %d (%s): %s",
           x->x_device_number,block_device,device_name);
 
-    post("pre hid_build_element_list");
     hid_build_element_list(x);
 
     return (0);
@@ -496,7 +480,7 @@ void hid_build_device_list(void)
     unsigned int i;
     unsigned int last_active_device = 0;
     char device_name[MAXPDSTRING] = "Unknown";
-    char block_device[MAXPDSTRING] = "/dev/input/event0";
+    char block_device[FILENAME_MAX] = "/dev/input/event0";
     struct input_event  x_input_event; 
     
     debug_print(LOG_DEBUG,"hid_build_device_list");
@@ -551,7 +535,7 @@ void hid_platform_specific_info(t_hid* x)
     char product_id_string[7];
     t_atom *output_atom = getbytes(sizeof(t_atom));
 
-    ioctl(x->x_fd, EVIOCGID);
+    ioctl(x->x_fd, EVIOCGID, &my_id);
     snprintf(vendor_id_string,7,"0x%04x", my_id.vendor);
     SETSYMBOL(output_atom, gensym(vendor_id_string));
     outlet_anything( x->x_status_outlet, gensym("vendorID"), 
@@ -570,6 +554,23 @@ void hid_platform_specific_info(t_hid* x)
         
 short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
 {
+	int i, fd;
+    char dev_handle_name[FILENAME_MAX];
+    struct input_id my_id;
+
+	for(i=0;i<MAX_DEVICES;++i) 
+    {
+        snprintf(dev_handle_name, FILENAME_MAX, "/dev/input/event%d", i);
+		/* open the device read-only, non-exclusive */
+		fd = open (dev_handle_name, O_RDONLY | O_NONBLOCK);
+		/* test if device open */
+		if(fd > -1 ) 
+		{
+			ioctl(fd, EVIOCGID, &my_id);
+			if( (vendor_id == my_id.vendor) && (product_id == my_id.product) )
+				return i;
+		}
+	}
     
     return -1;
 }

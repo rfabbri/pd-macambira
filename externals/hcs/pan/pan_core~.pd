@@ -23,7 +23,7 @@
 #X obj 116 356 f;
 #X obj 86 379 pack f f;
 #X msg 86 399 \$1 \$2;
-#X obj 307 215 blocksize_in_ms;
+#X obj 307 215 hcs/blocksize_in_ms;
 #X obj 86 117 inlet;
 #X text 10 17 [pan_core~];
 #X connect 0 0 2 0;

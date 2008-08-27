@@ -658,7 +658,8 @@ static void pdp_qtext_font(t_pdp_qtext *x, t_symbol *sfont  )
     font = imlib_load_font(sfont->s_name);
     if ( !font )
     {
-       post( "pdp_qtext : could not load font : >%s<", sfont->s_name );
+       pd_error( x, "[%s] error: could not load font: '%s'", 
+                 class_getname(*(t_pd *)x), sfont->s_name );
        return;
     }
     imlib_context_set_font( font );
@@ -670,8 +671,9 @@ static void pdp_qtext_allocate(t_pdp_qtext *x)
    x->x_image = imlib_create_image( x->x_vwidth, x->x_vheight );
    if ( x->x_image == NULL )
    {
-      post( "pdp_qtext : severe error : could not allocate image !!" );
-      return;
+       pd_error( x, "[%s] error: could not allocate image!!", 
+                 class_getname(*(t_pd *)x) );
+       return;
    }
    imlib_context_set_image(x->x_image);
 }
@@ -1084,8 +1086,8 @@ void pdp_qtext_setup(void)
     font = imlib_load_font(DEFAULT_FONT);
     if ( !font )
     {
-       post( "pdp_qtext : severe error : could not load default font : no rendering !!!" );
-	   post( "pdp_text : try installing Bitstream Vera (http://www.gnome.org/fonts/)" );
+        error( "[pdp_qtext] error: could not load default font, no text rendering!" );
+        post( "\tinstall Bitstream Vera, it's free! (http://www.gnome.org/fonts/)" );
     }
     imlib_context_set_font( font );
 }

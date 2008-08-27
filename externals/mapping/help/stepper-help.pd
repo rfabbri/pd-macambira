@@ -1,5 +1,5 @@
 #N canvas 263 162 512 393 10;
-#X obj 5 2 cnv 15 450 20 empty empty [stepper] 2 11 1 18 -233017 -66577
+#X obj 5 2 cnv 15 450 20 empty empty stepper 2 11 1 18 -233017 -66577
 0;
 #X msg 422 3 pddp;
 #X text 27 320 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>

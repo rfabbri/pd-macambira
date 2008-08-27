@@ -8,6 +8,13 @@ static t_symbol *button_symbol;
 static t_symbol *motion_symbol;
 static t_symbol *wheel_symbol;
 
+//TODO add reset method for cursor icons, this should probably be done in pd.tk
+
+// TODO figure out some way to get
+//t_int hidio_instance_count;
+/* this is used to test for the first instance to execute */
+//double last_execute_time;
+
 static t_class *cursor_class;
 
 typedef struct _cursor
@@ -16,11 +23,22 @@ typedef struct _cursor
     t_symbol *receive_symbol;
     t_canvas *parent_canvas;
     t_outlet *data_outlet;
-    t_outlet *status_outlet;
+//    t_outlet *status_outlet; // not used (yet?)
     t_int optionc;
     char *optionv[];
 } t_cursor;
 
+
+/* idea from #tcl for a Tcl unbind
+proc unbind {tag event script} {
+     set bind ""
+     foreach x [split [bind $tag $event] "\n"] {
+         if {$x != $script} {lappend bind $x}
+     }
+     bind $tag $event {}
+     foreach x $bind {bind $tag $event $x}
+ }
+*/
 
 static void cursor_setmethod(t_cursor *x, t_symbol *s, int argc, t_atom *argv)
 {
@@ -34,6 +52,9 @@ static void cursor_bang(t_cursor *x)
              x->receive_symbol->s_name);
 }
 
+/* TODO this needs some kind of working unbind to be useful, otherwise when an
+ * instance is deleted, you get reams of "error: #123123 no such object"
+ * messages in the Pd Window.
 static void cursor_float(t_cursor *x, t_float f)
 {
     if(f > 0)
@@ -43,9 +64,12 @@ static void cursor_float(t_cursor *x, t_float f)
     }
     else
     {
-        /* TODO figure out how to turn off this binding */
+        // TODO figure out how to turn off this binding
+        sys_vgui("bind all <Motion> {+pd [concat %s motion %%x %%y \\;]}\n",
+            x->receive_symbol->s_name);
     }
 }
+*/
 
 static void cursor_button_callback(t_cursor *x, t_float button, t_float state)
 {
@@ -90,14 +114,16 @@ static void *cursor_new(void)
     x->receive_symbol = gensym(buf);
     pd_bind(&x->x_obj.ob_pd, x->receive_symbol);
 	x->data_outlet = outlet_new(&x->x_obj, 0);
-	x->status_outlet = outlet_new(&x->x_obj, 0);
+//	x->status_outlet = outlet_new(&x->x_obj, 0);
 
+/* not working yet
     sys_vgui("bind . <ButtonPress> {+pd [concat %s button %%b 1 \\;]}\n",
              x->receive_symbol->s_name);
     sys_vgui("bind . <ButtonRelease> {+pd [concat %s button %%b 0 \\;]}\n",
              x->receive_symbol->s_name);
     sys_vgui("bind . <MouseWheel> {+pd [concat %s wheel %%D \\;]}\n",
              x->receive_symbol->s_name);
+*/
 
     return(x);
 }
@@ -109,7 +135,7 @@ void cursor_setup(void)
         sizeof(t_cursor), 0, 0);
 
     class_addbang(cursor_class, (t_method)cursor_bang);
-    class_addfloat(cursor_class, (t_method)cursor_float);
+/*     class_addfloat(cursor_class, (t_method)cursor_float); */
 
     button_symbol = gensym("button");
     motion_symbol = gensym("motion");

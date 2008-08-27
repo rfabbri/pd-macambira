@@ -135,10 +135,10 @@ ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid pdp pidip gem2pdp aka.wiiremote iem16 apple
+    LIB_TARGETS += hid pdp pidip gem2pdp iem16 apple pdp_opengl
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip gem2pdp hdspm_mixer iem16 postlude tclpd pdvjtools sixaxis
+    LIB_TARGETS += hid pdp pidip gem2pdp hdspm_mixer iem16 postlude tclpd pdvjtools sixaxis pdp_opengl
   endif
 endif
 
@@ -418,7 +418,6 @@ boids_clean:
 #------------------------------------------------------------------------------#
 # BSAYLOR
 BSAYLOR_NAME=bsaylor
-# partconv~.c requires fftw3, which is not part of the build system yet
 BSAYLOR_OBJECTS := $(wildcard $(externals_src)/bsaylor/*~.c)
 bsaylor: $(BSAYLOR_OBJECTS:.c=.$(EXTENSION))
 
@@ -433,6 +432,7 @@ bsaylor_install: bsaylor
 	install -d $(helpdir)/$(BSAYLOR_NAME)
 	install -p $(externals_src)/bsaylor/help/*.pd \
 		$(helpdir)/$(BSAYLOR_NAME)
+	install -p $(externals_src)/bsaylor/*.wav $(helpdir)/$(BSAYLOR_NAME)
 #	install -d $(manualsdir)/$(BSAYLOR_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/bsaylor/README.txt \
@@ -488,17 +488,15 @@ corelibs_clean:
 #------------------------------------------------------------------------------#
 # CREB
 CREB_NAME=creb
-# ead* are compiled separately
 CREB_OBJECTS := $(wildcard $(externals_src)/creb/modules/*.c)
-# loopsampler.cc doesn't compile, so omit
-CREB_CXXOBJECTS := $(wildcard $(externals_src)/creb/modules++/[a-km-z]*.cc)
+CREB_CXXOBJECTS := $(wildcard $(externals_src)/creb/modules++/*.cc)
 
 creb: $(CREB_OBJECTS:.c=.$(EXTENSION)) $(CREB_CXXOBJECTS:.cc=.$(EXTENSION))
 
 creb_install: creb
 	install -d $(objectsdir)/$(CREB_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(CREB_NAME) \
-		--author "Tom Schouten <creb@zzz.kotnet.org>" \
+		--author "Tom Schouten <tom@zwizwa.be>" \
 		--description "This is a collection of pd externals. My bag of tricks." \
 		--license "GNU GPL 2" \
 		--version "0.9.2"
@@ -507,17 +505,17 @@ creb_install: creb
 		$(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) 		$(objectsdir)/$(CREB_NAME)
 	install -d $(helpdir)/$(CREB_NAME)
 	install -p $(externals_src)/creb/doc/*.* $(helpdir)/$(CREB_NAME)
-	install -d $(manualsdir)/$(CREB_NAME)
-	install -p $(externals_src)/creb/doc/reference.txt $(manualsdir)/$(CREB_NAME)
+	install -d $(readmesdir)
+	install -p $(externals_src)/creb/doc/reference.txt \
+		$(readmesdir)/$(CREB_NAME).txt
 	install -d $(examplesdir)/$(CREB_NAME)
 	install -p $(externals_src)/creb/doc/examples/*.* $(examplesdir)/$(CREB_NAME)
 
 creb_clean:
 	-rm -f -- $(CREB_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(CREB_ENVELOPE_UTIL:.c=.$(EXTENSION))
-	-rm -f -- $(CREB_EA_OBJECTS:.c=.$(EXTENSION)) 
 	-rm -f -- $(CREB_OBJECTS:.c=.o)
-	-rm -f -- $(CREB_ENVELOPE_UTIL:.c=.o) $(CREB_EA_OBJECTS:.c=.o)
+	-rm -f -- $(CREB_CXXOBJECTS:.cc=.$(EXTENSION))
+	-rm -f -- $(CREB_CXXOBJECTS:.cc=.o)
 	-rm -f -- $(externals_src)/creb/*/*.bak
 	-rm -f -- $(externals_src)/creb/*/*.*~
 
@@ -1011,7 +1009,6 @@ hardware_install: hardware
 #	install -p $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) \
 #		$(objectsdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/lanbox/lanbox.pd \
-		$(externals_src)/hardware/arduino/arduino.pd \
 		$(objectsdir)/$(HARDWARE_NAME)
 	install -d $(helpdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/*/*-help.pd \
@@ -1023,9 +1020,8 @@ hardware_install: hardware
 	install -p $(externals_src)/hardware/README.txt \
 		$(readmesdir)/$(HARDWARE_NAME).txt
 	install -d $(examplesdir)/$(HARDWARE_NAME)
-	install -p $(externals_src)/hardware/*/examples/*.pd \
-		$(externals_src)/hardware/arduino/arduino-test.pd \
-		$(examplesdir)/$(HARDWARE_NAME)
+#	install -p $(externals_src)/hardware/*/examples/*.pd \
+#		$(examplesdir)/$(HARDWARE_NAME)
 
 hardware_clean:
 	-rm -f -- $(externals_src)/hardware/*/*.$(EXTENSION)
@@ -1048,10 +1044,6 @@ hcs_install: hcs
 		--license "GNU GPL" \
 		--version ""
 	install -p $(HCS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(HCS_NAME)
-# temp kludge: install [classpath] and [import] into global namespace since
-# they are used for loading libraries
-	install -p $(externals_src)/hcs/classpath.$(EXTENSION) \
-		$(externals_src)/hcs/import.$(EXTENSION) $(objectsdir)
 	install -p $(shell ls -1 $(externals_src)/hcs/*.pd | \
 			 grep -v '\-help.pd') $(objectsdir)/$(HCS_NAME)
 # hmm, these don't have a home yet...
@@ -1059,9 +1051,9 @@ hcs_install: hcs
 	install -d $(helpdir)/$(HCS_NAME)
 	install -p $(externals_src)/hcs/*-help.pd \
 		$(helpdir)/$(HCS_NAME)
-	install -d $(manualsdir)/$(HCS_NAME)
-	install -p $(externals_src)/hcs/README* $(externals_src)/hcs/TODO \
-		$(manualsdir)/$(HCS_NAME)
+#	install -d $(manualsdir)/$(HCS_NAME)
+#	install -p $(externals_src)/hcs/README* $(externals_src)/hcs/TODO \
+#		$(manualsdir)/$(HCS_NAME)
 #	install -d $(readmesdir)
 #	install -p $(externals_src)/hcs/README \
 #		$(readmesdir)/$(HCS_NAME).txt
@@ -1308,7 +1300,7 @@ iem_bin_ambi_install: iem_bin_ambi
 	install -d $(helpdir)/$(IEM_BIN_AMBI_NAME)
 	install -p $(externals_src)/iem/iem_bin_ambi/help/*.pd \
 		$(helpdir)/$(IEM_BIN_AMBI_NAME)
-	install -d $(manualsdir)/$(IEM_BIN_AMBI_NAME)
+#	install -d $(manualsdir)/$(IEM_BIN_AMBI_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_bin_ambi/READ_ME.txt \
 		$(readmesdir)/$(IEM_BIN_AMBI_NAME).txt
@@ -1526,9 +1518,10 @@ jasch_lib_clean:
 #------------------------------------------------------------------------------#
 # LOADERS
 LOADERS_NAME=
-LOADERS_OBJECTS := $(wildcard $(externals_src)/loaders/*.c)
+LOADERS_OBJECTS := $(wildcard $(externals_src)/loaders/*.c)  \
+	$(externals_src)/loaders/hexloader/hexloader.c
 loaders: $(LOADERS_OBJECTS:.c=.$(EXTENSION))
-
+	echo $(LOADERS_OBJECTS)
 loaders_install: loaders
 	install -d $(objectsdir)/$(LOADERS_NAME)
 	install -p $(LOADERS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(LOADERS_NAME)
@@ -1539,7 +1532,7 @@ loaders_install: loaders
 #	install -p $(externals_src)/loaders/README.txt $(manualsdir)/$(LOADERS_NAME)
 
 loaders_clean:
-	-rm -f -- $(externals_src)/loaders/*.$(EXTENSION)
+	-rm -f -- $(LOADERS_OBJECTS:.c=.$(EXTENSION))
 	-rm -f -- $(externals_src)/loaders/*.o
 	-rm -f -- $(externals_src)/loaders/*.bak
 	-rm -f -- $(externals_src)/loaders/*.*~
@@ -1743,7 +1736,7 @@ moonlib_install: moonlib
 	install -d $(readmesdir)
 	install -p $(externals_src)/moonlib/README.txt \
 		$(readmesdir)/$(MOONLIB_NAME).txt
-	install -d $(examplesdir)/$(MOONLIB_NAME)
+#	install -d $(examplesdir)/$(MOONLIB_NAME)
 #	install -p $(externals_src)/moonlib/examples/*.pd \
 #		$(examplesdir)/$(MOONLIB_NAME)
 
@@ -2074,7 +2067,8 @@ pdp_install: pdp
 	install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)
 #	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)
-#	install -d $(helpdir)/$(PDP_NAME)
+	install -d $(helpdir)/$(PDP_NAME)
+	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)
 	install -d $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/reference.txt $(manualsdir)/$(PDP_NAME)
@@ -2091,6 +2085,42 @@ pdp_clean:
 	-rm -f -- $(externals_src)/pdp/Makefile.config
 	-rm -f -- $(externals_src)/pdp/configure
 
+
+#------------------------------------------------------------------------------#
+# PDP_OPENGL
+PDP_OPENGL_NAME=3dp
+PDP_OPENGL_BINARY := $(externals_src)/pdp/opengl/pdp_opengl.$(EXTENSION)
+$(PDP_OPENGL_BINARY): $(externals_src)/pdp/Makefile.config
+	make -C $(externals_src)/pdp/opengl
+
+pdp_opengl: $(PDP_OPENGL_BINARY)
+	echo $(PDP_OPENGL_BINARY)
+
+pdp_opengl_install: pdp_opengl
+	install -d $(objectsdir)/$(PDP_OPENGL_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDP_OPENGL_NAME) \
+		--author "Tom Schouten" \
+		--description "opengl extensions for pdp" \
+		--license "GPL v2 or later"
+	install -p $(PDP_OPENGL_BINARY) $(objectsdir)
+	install -p $(externals_src)/pdp/opengl/abstractions/*.pd \
+		$(objectsdir)/$(PDP_OPENGL_NAME)
+	install -d $(helpdir)
+	install -p $(externals_src)/pdp/opengl/doc/objects/*.pd $(helpdir)
+	install -d $(readmesdir)
+	install -p $(externals_src)/pdp/opengl/README \
+		$(readmesdir)/$(PDP_OPENGL_NAME).txt
+	install -d $(examplesdir)/$(PDP_OPENGL_NAME)
+	install -p $(externals_src)/pdp/opengl/doc/examples/*.pd \
+		$(examplesdir)/$(PDP_OPENGL_NAME)
+	install -p $(externals_src)/pdp/opengl/test/*.pd \
+		$(examplesdir)/$(PDP_OPENGL_NAME)
+
+pdp_opengl_clean:
+	make -C $(externals_src)/pdp/opengl clean
+	-rm -f -- $(PDP_OPENGL_BINARY)
+	-rm -f -- $(externals_src)/pdp_opengl/*.bak
+	-rm -f -- $(externals_src)/pdp_opengl/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -2158,7 +2188,8 @@ pidip_install: pidip
 #		--license "GNU GPLv2"
 	install -d $(objectsdir)
 	install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)
-	install -d $(helpdir)
+	install -d $(helpdir)/$(PIDIP_NAME)
+	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)
 	install -d $(examplesdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/patches/*.* $(examplesdir)/$(PIDIP_NAME)
@@ -2986,7 +3017,6 @@ flashserver_install: flashserver
 	install -d $(readmesdir)
 	install -p $(externals_src)/olafmatt/flashserver/README \
 		$(readmesdir)/$(FLASHSERVER_NAME).txt
-	install -d $(examplesdir)/$(FLASHSERVER_NAME)
 
 flashserver_clean:
 	-rm -f -- $(FLASHSERVER_OBJECTS:.c=.$(EXTENSION))
@@ -3142,9 +3172,6 @@ earplug_install: earplug
 	install -d $(helpdir)/$(EARPLUG_NAME)
 	install -p $(externals_src)/earplug~/*-help.pd \
 		$(helpdir)/$(EARPLUG_NAME)
-	install -d $(examplesdir)/$(EARPLUG_NAME)
-	install -p $(externals_src)/earplug~/*-help.pd \
-		   $(examplesdir)/$(EARPLUG_NAME)
 
 earplug_clean:
 	-rm -f -- $(EARPLUG_OBJECTS:.c=.$(EXTENSION))
@@ -3162,6 +3189,28 @@ earplug_clean:
 
 # make the symlinks necessary to simulate the installed environment
 devsymlinks: 
+
+TAGS: etags
+
+etags:
+	etags $(pd_src)/src/*.[ch] 
+	find $(externals_src) -type f -name '*.[ch]' -exec etags -a '{}' \;
+	find $(externals_src) -type f -name '*.cc' -exec etags -a '{}' \;
+	find $(externals_src) -type f -name '*.cpp' -exec etags -a '{}' \;
+	find $(extensions_src) -type f -name '*.[ch]' -exec etags -a '{}' \;
+	find /usr/include -type f -name \*.h -exec etags -a '{}' \;
+	make etags_`uname -s`
+
+etags_Darwin:
+	etags -a $(externals_src)/hcs/hid/HID\ Utilities\ Source/*.[ch]
+	find /System/Library/Frameworks  -type f -name \*.h -exec etags -a '{}' \;
+	find /Library/Frameworks  -type f -name \*.h -exec etags -a '{}' \;
+	find /sw/include -type f -name \*.h -exec etags -a '{}' \;
+
+etags_Linux:
+
+etags_MINGW:
+	find /usr/local/include/ -type f -name \*.h -exec etags -a '{}' \;
 
 
 #==============================================================================#

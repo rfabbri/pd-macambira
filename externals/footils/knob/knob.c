@@ -648,10 +648,8 @@ static void *knob_new(t_symbol *s, int argc, t_atom *argv)
     t_symbol *srl[3];
     int w=IEM_KNOB_DEFAULTSIZE, h=IEM_KNOB_DEFAULTSIZE;
     int lilo=0, ldx=0, ldy=-8;
-    int fs=8, iinit=0, ifstyle=0, v=0, steady=1;
+    int fs=8, v=0, steady=1;
     double min=0.0, max=(double)(IEM_SL_DEFAULTSIZE-1);
-    t_iem_init_symargs *init=(t_iem_init_symargs *)(&iinit);
-    t_iem_fstyle_flags *fstyle=(t_iem_fstyle_flags *)(&ifstyle);
     char str[144];
 
     //srl[0] = gensym("empty");
