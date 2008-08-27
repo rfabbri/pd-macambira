@@ -1,0 +1,18 @@
+#N canvas 315 28 551 341 10;
+#X obj 261 152 setenv;
+#X msg 261 54 bang;
+#X symbolatom 260 199 0 0 0 0 - - -;
+#X msg 59 51 bang;
+#X msg 294 120 symbol SHELL;
+#X msg 381 120 symbol PATH;
+#X msg 461 120 symbol HOME;
+#X obj 59 134 unsetenv HOME;
+#X msg 134 107 symbol SHELL;
+#X text 107 51 bang unsets;
+#X connect 0 0 2 0;
+#X connect 1 0 0 0;
+#X connect 3 0 7 0;
+#X connect 4 0 0 1;
+#X connect 5 0 0 1;
+#X connect 6 0 0 1;
+#X connect 8 0 7 1;
