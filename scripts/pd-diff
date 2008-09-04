@@ -1,5 +1,49 @@
 #!/bin/sh
 
+# difference between two Pd patches
+
+# the problem here is, that there exists a many-to-1 relation between
+# Pd-file and patch
+
+# e.g. objects might have a different creation order without affecting 
+# the functionality of a patch
+# otoh, creation order might have implications as well
+# nevertheless, creation order has an impact on the Pd-file, since connections
+# between objects are made using indices; therefore a change in the creation order 
+# of the objects will be reflected on several places within the Pd-file!
+
+# furthermore, in most cases the position of an object within the patch does not 
+# have any significance
+# the noteable built-in exceptions are [inlet] and [outlet]
+
+
+
+# these weirdnesses make it hard to effectively find out whether a patch description 
+# differs substantially from another one
+# in practice, traditional diff will only tell you that _something_ has changed, 
+# but it is hard to interprete its output in a meaningful way
+
+# even harder it is to build a merger of Pd-files (for concurrent development)
+
+
+## originally draft for this differ (as i deduce it from hcs's code)
+# 
+# 2 pass evaluation:
+#  - find diffs in the object-list without position information
+#  - count connections in each patch and compare them
+
+
+# TODO
+#  - more algorithms for diffing features
+#  - modularity (allow user to chose diff-algorithms)
+#  - better tempfile algorithm (ideally there wouldn't be any tempfiles at all)
+#  - cleanup at the end (no tempfiles should be left behind)
+#  - ensure that this script is portable
+#    (probably switch from "shell" (bash) to another language, like tcl
+
+
+
+
 DATE=$(date '+%Y-%m-%d_%H.%M.%S')
 TMPDIR=/tmp/pd-diff
 
