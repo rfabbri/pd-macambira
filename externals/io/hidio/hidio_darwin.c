@@ -830,6 +830,7 @@ t_int hidio_open_device(t_hidio *x, short device_number)
 }
 
 
+// TODO: return the same as POSIX open()/close() - 0=success, -1=fail
 t_int hidio_close_device(t_hidio *x)
 {
 	debug_post(LOG_DEBUG,"hidio_close_device");

@@ -435,11 +435,10 @@ static void hidio_close(t_hidio *x)
  /* just to be safe, stop it first */
      hidio_stop_poll(x);
 
-     if(! hidio_close_device(x))
-     {
-         debug_post(LOG_INFO,"[hidio] closed device %d",x->x_device_number);
-         x->x_device_open = 0;
-     }
+     if(hidio_close_device(x) != 0)
+         debug_error(x, LOG_ERR,"[hidio] error closing device %d",x->x_device_number);
+     debug_post(LOG_DEBUG,"[hidio] closed device %d",x->x_device_number);
+     x->x_device_open = 0;
      output_open_status(x);
 }
 
@@ -565,6 +564,7 @@ static void hidio_int(t_hidio* x, long l)
 
 static void hidio_debug(t_hidio *x, t_float f)
 {
+    debug_post(LOG_INFO,"[hidio] set global debug level to %d", (int)f);
     global_debug_level = f;
 }
 
