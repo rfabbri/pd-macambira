@@ -2,7 +2,7 @@
 
 int ev_total = 32;  /* # of elements in array */
 char *ev[32] = {
-       "syn","key","rel","abs","msc","ev_5",
+       "syn","key","relative","absolute","msc","ev_5",
        "ev_6","ev_7","ev_8","ev_9","ev_10","ev_11",
        "ev_12","ev_13","ev_14","ev_15","ev_16","led",
        "snd","ev_19","rep","ff","pwr","ff_status",
@@ -104,39 +104,37 @@ char *ev_syn[512] = {
 
 int ev_key_total = 512;  /* # of elements in array */
 char *ev_key[512] = {
-       "key_reserved","key_esc","key_1","key_2","key_3","key_4",
-       "key_5","key_6","key_7","key_8","key_9","key_0",
-       "key_minus","key_equal","key_backspace","key_tab","key_q","key_w",
-       "key_e","key_r","key_t","key_y","key_u","key_i",
-       "key_o","key_p","key_leftbrace","key_rightbrace","key_enter","key_leftctrl",
-       "key_a","key_s","key_d","key_f","key_g","key_h",
-       "key_j","key_k","key_l","key_semicolon","key_apostrophe","key_grave",
-       "key_leftshift","key_backslash","key_z","key_x","key_c","key_v",
-       "key_b","key_n","key_m","key_comma","key_dot","key_slash",
-       "key_rightshift","key_kpasterisk","key_leftalt","key_space","key_capslock","key_f1",
-       "key_f2","key_f3","key_f4","key_f5","key_f6","key_f7",
-       "key_f8","key_f9","key_f10","key_numlock","key_scrolllock","key_kp7",
-       "key_kp8","key_kp9","key_kpminus","key_kp4","key_kp5","key_kp6",
-       "key_kpplus","key_kp1","key_kp2","key_kp3","key_kp0","key_kpdot",
-       "key_84","key_zenkakuhankaku","key_102nd","key_f11","key_f12","key_ro",
-       "key_katakana","key_hiragana","key_henkan","key_katakanahiragana","key_muhenkan","key_kpjpcomma",
-       "key_kpenter","key_rightctrl","key_kpslash","key_sysrq","key_rightalt","key_linefeed",
-       "key_home","key_up","key_pageup","key_left","key_right","key_end",
-       "key_down","key_pagedown","key_insert","key_delete","key_macro","key_mute",
-       "key_volumedown","key_volumeup","key_power","key_kpequal","key_kpplusminus","key_pause",
-       "key_120","key_kpcomma","key_hanguel","key_hanja","key_yen","key_leftmeta",
-       "key_rightmeta","key_compose","key_stop","key_again","key_props","key_undo",
+       "key_reserved","escape","1_key","2_key","3_key","4_key",
+       "5_key","6_key","7_key","8_key","9_key","0_key",
+       "hyphen","equalsign","deleteorbackspace","tab","q","w",
+       "e","r","t","y","u","i",
+       "o","p","key_leftbrace","key_rightbrace","key_enter","leftcontrol",
+       "a","s","d","f","g","h",
+       "j","k","l","semicolon","key_apostrophe","key_grave",
+       "leftshift","backslash","z","x","c","v",
+       "b","n","m","comma","period","slash",
+       "rightshift","keypad_asterisk","leftalt","spacebar","capslock","F1",
+       "F2","F3","F4","F5","F6","F7","F8","F9","F10","numlock","scrolllock","keypad_7",
+       "keypad_8","keypad_9","keypad_minus","keypad_4","keypad_5","keypad_6",
+       "keypad_plus","keypad_1","keypad_2","keypad_3","keypad_0","keypad_dot",
+       "key_84","key_zenkakuhankaku","key_102nd","F11","F12","key_ro",
+       "key_katakana","key_hiragana","key_henkan","key_katakanahiragana","key_muhenkan","keypad_jpcomma",
+       "keypad_enter","rightcontrol","keypad_slash","key_sysrq","rightalt","key_linefeed",
+       "home","uparrow","pageup","leftarrow","rightarrow","end",
+       "downarrow","pagedown","insert","delete","macro","mute",
+       "volumedown","volumeup","power","keypad_equal","keypad_plusminus","pause",
+       "key_120","keypad_comma","key_hanguel","key_hanja","key_yen","leftgui",
+       "rightgui","compose","stop","key_again","key_props","key_undo",
        "key_front","key_copy","key_open","key_paste","key_find","key_cut",
        "key_help","key_menu","key_calc","key_setup","key_sleep","key_wakeup",
        "key_file","key_sendfile","key_deletefile","key_xfer","key_prog1","key_prog2",
        "key_www","key_msdos","key_coffee","key_direction","key_cyclewindows","key_mail",
-       "key_bookmarks","key_computer","key_back","key_forward","key_closecd","key_ejectcd",
+       "key_bookmarks","key_computer","key_back","key_forward","closecd","ejectcd",
        "key_ejectclosecd","key_nextsong","key_playpause","key_previoussong","key_stopcd","key_record",
        "key_rewind","key_phone","key_iso","key_config","key_homepage","key_refresh",
-       "key_exit","key_move","key_edit","key_scrollup","key_scrolldown","key_kpleftparen",
-       "key_kprightparen","key_181","key_182","key_f13","key_f14","key_f15",
-       "key_f16","key_f17","key_f18","key_f19","key_f20","key_f21",
-       "key_f22","key_f23","key_f24","key_195","key_196","key_197",
+       "key_exit","key_move","key_edit","key_scrollup","key_scrolldown","keypad_leftparen",
+       "keypad_rightparen","key_181","key_182","F13","F14","F15",
+       "F16","F17","F18","F19","F20","F21","F22","F23","F24","key_195","key_196","key_197",
        "key_198","key_199","key_playcd","key_pausecd","key_prog3","key_prog4",
        "key_204","key_suspend","key_close","key_play","key_fastforward","key_bassboost",
        "key_print","key_hp","key_camera","key_sound","key_question","key_email",
@@ -146,9 +144,9 @@ char *ev_key[512] = {
        "key_234","key_235","key_236","key_237","key_238","key_239",
        "key_unknown","key_241","key_242","key_243","key_244","key_245",
        "key_246","key_247","key_248","key_249","key_250","key_251",
-       "key_252","key_253","key_254","key_255","btn_0","btn_1",
-       "btn_2","btn_3","btn_4","btn_5","btn_6","btn_7",
-       "btn_8","btn_9","key_266","key_267","key_268","key_269",
+       "key_252","key_253","key_254","key_255","button_0","button_1",
+       "button_2","button_3","button_4","button_5","button_6","button_7",
+       "button_8","button_9","key_266","key_267","key_268","key_269",
        "key_270","key_271","btn_left","btn_right","btn_middle","btn_side",
        "btn_extra","btn_forward","btn_back","btn_task","key_280","key_281",
        "key_282","key_283","key_284","key_285","key_286","key_287",
@@ -193,22 +191,24 @@ char *ev_key[512] = {
  };
 
 
+/* relative */
 int ev_rel_total = 16;  /* # of elements in array */
 char *ev_rel[16] = {
-       "rel_x","rel_y","rel_z","rel_rx","rel_ry","rel_rz",
-       "rel_hwheel","rel_dial","rel_wheel","rel_misc","rel_10","rel_11",
+       "x","y","z","rx","ry","rz",
+       "rel_hwheel","dial","wheel","rel_misc","rel_10","rel_11",
        "rel_12","rel_13","rel_14","rel_15"
  };
 
 
+/* absolute */
 int ev_abs_total = 64;  /* # of elements in array */
 char *ev_abs[64] = {
-       "abs_x","abs_y","abs_z","abs_rx","abs_ry","abs_rz",
-       "abs_throttle","abs_rudder","abs_wheel","abs_gas","abs_brake","abs_11",
-       "abs_12","abs_13","abs_14","abs_15","abs_hat0x","abs_hat0y",
-       "abs_hat1x","abs_hat1y","abs_hat2x","abs_hat2y","abs_hat3x","abs_hat3y",
-       "abs_pressure","abs_distance","abs_tilt_x","abs_tilt_y","abs_tool_width","abs_29",
-       "abs_30","abs_31","abs_volume","abs_33","abs_34","abs_35",
+       "x","y","z","rx","ry","rz",
+       "throttle","rudder","wheel","gas","brake","abs_11",
+       "abs_12","abs_13","abs_14","abs_15","hat0x","hat0y",
+       "hat1x","hat1y","hat2x","hat2y","hat3x","hat3y",
+       "pressure","distance","tilt_x","tilt_y","tool_width","abs_29",
+       "abs_30","abs_31","volume","abs_33","abs_34","abs_35",
        "abs_36","abs_37","abs_38","abs_39","abs_misc","abs_41",
        "abs_42","abs_43","abs_44","abs_45","abs_46","abs_47",
        "abs_48","abs_49","abs_50","abs_51","abs_52","abs_53",
@@ -226,8 +226,8 @@ char *ev_msc[8] = {
 
 int ev_led_total = 16;  /* # of elements in array */
 char *ev_led[16] = {
-       "led_numl","led_capsl","led_scrolll","led_compose","led_kana","led_sleep",
-       "led_suspend","led_mute","led_misc","led_mail","led_charging","led_11",
+       "numlock","capslock","scrolllock","compose","kana","sleep",
+       "suspend","mute","led_misc","mail","charging","led_11",
        "led_12","led_13","led_14","led_15"
  };
 
@@ -260,10 +260,10 @@ char *ev_ff[128] = {
        "ff_60","ff_61","ff_62","ff_63","ff_64","ff_65",
        "ff_66","ff_67","ff_68","ff_69","ff_70","ff_71",
        "ff_72","ff_73","ff_74","ff_75","ff_76","ff_77",
-       "ff_78","ff_79","ff_rumble","ff_periodic","ff_constant","ff_spring",
-       "ff_friction","ff_damper","ff_inertia","ff_ramp","ff_square","ff_triangle",
-       "ff_sine","ff_saw_up","ff_saw_down","ff_custom","ff_94","ff_95",
-       "ff_gain","ff_autocenter","ff_98","ff_99","ff_100","ff_101",
+       "ff_78","ff_79","rumble","periodic","constant","spring",
+       "friction","damper","inertia","ramp","square","triangle",
+       "sine","saw_up","saw_down","ff_custom","ff_94","ff_95",
+       "gain","autocenter","ff_98","ff_99","ff_100","ff_101",
        "ff_102","ff_103","ff_104","ff_105","ff_106","ff_107",
        "ff_108","ff_109","ff_110","ff_111","ff_112","ff_113",
        "ff_114","ff_115","ff_116","ff_117","ff_118","ff_119",

@@ -55,88 +55,26 @@
 
 t_symbol* hidio_convert_linux_buttons_to_numbers(__u16 linux_code)
 {
-    char hidio_code[MAXPDSTRING];
+    char hidio_code[MAXPDSTRING] = "\0";
     if(linux_code >= 0x100) 
 	{
 	    if(linux_code < BTN_MOUSE)         /* numbered buttons */
-		snprintf(hidio_code, MAXPDSTRING,"btn_%d",linux_code - BTN_MISC);  
+            snprintf(hidio_code, MAXPDSTRING,"button_%d",linux_code - BTN_MISC);  
 	    else if(linux_code < BTN_JOYSTICK) /* mouse buttons */
-		snprintf(hidio_code, MAXPDSTRING,"btn_%d",linux_code - BTN_MOUSE);
+            snprintf(hidio_code, MAXPDSTRING,"button_%d",linux_code - BTN_MOUSE);
 	    else if(linux_code < BTN_GAMEPAD)  /* joystick buttons */
-		snprintf(hidio_code, MAXPDSTRING,"btn_%d",linux_code - BTN_JOYSTICK);
+            snprintf(hidio_code, MAXPDSTRING,"button_%d",linux_code - BTN_JOYSTICK);
 	    else if(linux_code < BTN_DIGI)     /* gamepad buttons */
-		snprintf(hidio_code, MAXPDSTRING,"btn_%d",linux_code - BTN_GAMEPAD);
+            snprintf(hidio_code, MAXPDSTRING,"button_%d",linux_code - BTN_GAMEPAD);
 	    else if(linux_code < BTN_WHEEL)    /* tablet buttons */
-		snprintf(hidio_code, MAXPDSTRING,"btn_%d",linux_code - BTN_DIGI);
+            snprintf(hidio_code, MAXPDSTRING,"button_%d",linux_code - BTN_DIGI);
 	    else if(linux_code < KEY_OK)       /* wheel buttons */
-		snprintf(hidio_code, MAXPDSTRING,"btn_%d",linux_code - BTN_WHEEL);
-	    else return 0;
+            snprintf(hidio_code, MAXPDSTRING,"button_%d",linux_code - BTN_WHEEL);
+	    else 
+            return gensym("?");
 	}
-    return gensym(*hidio_code ? hidio_code : "?");
+    return gensym(hidio_code);
 }
-
-/* Georg Holzmann: implementation of the keys */
-/* JMZ: use t_symbol instead of char[] (s.a.) AND 
- * appended "key_" in the array so we don't have to append it each time AND
- * made the table static
- */
-t_symbol* hidio_convert_linux_keys(__u16 linux_code)
-{  
-    if(linux_code > 226)
-	return 0;
-
-    static char key_names[227][32] =
-	{ 
-	    "key_reserved", "key_esc", "key_1", "key_2", "key_3", "key_4", 
-	    "key_5", "key_6", "key_7", "key_8", "key_9", "key_0", "key_minus", 
-	    "key_equal", "key_backspace", "key_tab", "key_q", "key_w", 
-	    "key_e", "key_r", "key_t", "key_y", "key_u", "key_i", "key_o", 
-	    "key_p","key_leftbrace", "key_rightbrace", "key_enter", 
-	    "key_leftctrl", "key_a","key_s", "key_d", "key_f", "key_g", 
-	    "key_h", "key_j", "key_k", "key_l", "key_semicolon",
-	    "key_apostrophe", "key_grave", "key_leftshift", "key_backslash", 
-	    "key_z","key_x", "key_c", "key_v", "key_b", "key_n", "key_m", 
-	    "key_comma", "key_dot", "key_slash","key_rightshift", 
-	    "key_kpasterisk", "key_leftalt", "key_space", "key_capslock",
-	    "key_f1", "key_f2", "key_f3", "key_f4", "key_f5", "key_f6", 
-	    "key_f7", "key_f8", "key_f9", "key_f10","key_numlock", 
-	    "key_scrolllock", "key_kp7", "key_kp8", "key_kp9", "key_kpminus",
-	    "key_kp4", "key_kp5", "key_kp6", "key_kpplus", "key_kp1", "key_kp2",
-	    "key_kp3", "key_kp3",  "key_kpdot","key_103rd", "key_f13", 
-	    "key_102nd", "key_f11", "key_f12", "key_f14", "key_f15", "key_f16",
-	    "key_f17", "key_f18", "key_f19", "key_f20", "key_kpenter", 
-	    "key_rightctrl", "key_kpslash","key_sysrq", "key_rightalt", 
-	    "key_linefeed", "key_home", "key_up", "key_pageup", "key_left",
-	    "key_right", "key_end", "key_down", "key_pagedown", "key_insert", 
-	    "key_delete", "key_macro","key_mute", "key_volumedown", 
-	    "key_volumeup", "key_power", "key_kpequal", "key_kpplusminus",
-	    "key_pause", "key_f21", "key_f22", "key_f23", "key_f24", 
-	    "key_kpcomma", "key_leftmeta","key_rightmeta", "key_compose",
-	    "key_stop", "key_again", "key_props", "key_undo", "key_front", 
-	    "key_copy", "key_open","key_paste", "key_find","key_cut","key_help", 
-	    "key_menu", "key_calc", "key_setup", "key_sleep", "key_wakeup",
-	    "key_file", "key_sendfile", "key_deletefile","key_xfer","key_prog1",
-	    "key_prog2", "key_www","key_msdos", "key_coffee", "key_direction", 
-	    "key_cyclewindows", "key_mail", "key_bookmarks","key_computer", 
-	    "key_back", "key_forward", "key_colsecd", "key_ejectcd", 
-	    "key_ejectclosecd","key_nextsong","key_playpause","key_previoussong",
-	    "key_stopcd", "key_record","key_rewind", "key_phone", "key_iso", 
-	    "key_config", "key_homepage", "key_refresh", "key_exit","key_move", 
-	    "key_edit", "key_scrollup", "key_scrolldown", "key_kpleftparen", 
-	    "key_kprightparen","key_intl1", "key_intl2", "key_intl3","key_intl4", 
-	    "key_intl5", "key_intl6", "key_intl7","key_intl8", "key_intl9", 
-	    "key_lang1", "key_lang2", "key_lang3", "key_lang4", "key_lang5",
-	    "key_lang6", "key_lang7", "key_lang8", "key_lang9", "key_playcd", 
-	    "key_pausecd", "key_prog3","key_prog4", "key_suspend", "key_close", 
-	    "key_play", "key_fastforward", "key_bassboost","key_print", "key_hp",
-	    "key_camera", "key_sound", "key_question", "key_email", "key_chat",
-	    "key_search", "key_connect", "key_finance", "key_sport", "key_shop", 
-	    "key_alterase","key_cancel", "key_brightnessdown", "key_brightnessup", 
-	    "key_media"
-	};
-    return gensym(key_names[linux_code]);   // TODO: this should just return the char *
-}
-
 
 
 void hidio_elements(t_hidio *x)
@@ -352,6 +290,7 @@ static void hidio_build_element_list(t_hidio *x)
                     new_element->linux_code = j;
                     if((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
                     {
+                        new_element->type = ps_button;
                         new_element->name = hidio_convert_linux_buttons_to_numbers(j);
                     }
                     else
@@ -462,13 +401,19 @@ t_int hidio_open_device(t_hidio *x, short device_number)
     debug_post(LOG_DEBUG,"hidio_open_device");
 
     char device_name[MAXPDSTRING] = "Unknown";
-    char block_device[MAXPDSTRING] = "/dev/input/event0";
+    char block_device[FILENAME_MAX] = "/dev/input/event0";
     struct input_event hidio_input_event;
 
     x->x_fd = -1;
-  
+    
+    if(device_number < 0) 
+    {
+        pd_error(x,"[hidio] invalid device number: %d", device_number);
+        return EXIT_FAILURE;
+    }
+        
     x->x_device_number = device_number;
-    snprintf(block_device,MAXPDSTRING,"/dev/input/event%d",x->x_device_number);
+    snprintf(block_device, FILENAME_MAX, "/dev/input/event%d", x->x_device_number);
 
     if(*block_device) 
 	{
