@@ -1,4 +1,4 @@
-#N canvas 246 251 576 362 10;
+#N canvas 66 49 576 362 10;
 #X obj 124 207 sys_gui;
 #X symbolatom 239 101 0 0 0 0 - - -;
 #X obj 223 32 loadbang;
@@ -7,8 +7,8 @@
 10 -204800 -1 -1 12700 1;
 #X floatatom 56 123 5 0 0 0 - - -;
 #X msg 124 177 wm attributes \$2 -alpha \$1;
-#X text 141 279 for more options:;
-#X obj 172 297 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/wm.htm
+#X text 210 274 for more options:;
+#X obj 241 292 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/wm.htm
 ;
 #X text 113 234 alpha does not work with X11 :(;
 #X obj 223 69 window_name;
@@ -19,6 +19,88 @@
 #X msg 383 177 wm resizable \$1 0 0;
 #X text 352 84 turn off resizing of this window:;
 #X text 13 37 change alpha of this window:;
+#N canvas 69 91 729 228 Mac 0;
+#X obj 25 163 sys_gui;
+#X obj 124 74 window_name;
+#X obj 25 102 pack float symbol;
+#X msg 25 133 wm attributes \$2 -transparent \$1;
+#X obj 124 49 loadbang;
+#X obj 25 60 tgl 30 0 empty empty empty 17 7 0 10 -204786 -1 -1 0 1
+;
+#X text 43 13 turn off window shadow;
+#X obj 265 163 sys_gui;
+#X obj 364 74 window_name;
+#X obj 265 102 pack float symbol;
+#X obj 364 49 loadbang;
+#X obj 265 60 tgl 30 0 empty empty empty 17 7 0 10 -204786 -1 -1 0
+1;
+#X msg 265 133 wm attributes \$2 -fullscreen \$1;
+#X text 263 13 make this window fullscreen;
+#X obj 495 163 sys_gui;
+#X obj 594 74 window_name;
+#X obj 495 102 pack float symbol;
+#X obj 594 49 loadbang;
+#X obj 495 60 tgl 30 0 empty empty empty 17 7 0 10 -204786 -1 -1 0
+1;
+#X text 479 15 make this window on top of all others;
+#X msg 495 133 wm attributes \$2 -topmost \$1;
+#X connect 1 0 2 1;
+#X connect 2 0 3 0;
+#X connect 3 0 0 0;
+#X connect 4 0 1 0;
+#X connect 5 0 2 0;
+#X connect 8 0 9 1;
+#X connect 9 0 12 0;
+#X connect 10 0 8 0;
+#X connect 11 0 9 0;
+#X connect 12 0 7 0;
+#X connect 15 0 16 1;
+#X connect 16 0 20 0;
+#X connect 17 0 15 0;
+#X connect 18 0 16 0;
+#X connect 20 0 14 0;
+#X restore 60 277 pd Mac OS X tricks;
+#N canvas 69 91 729 228 Windows 0;
+#X obj 25 163 sys_gui;
+#X obj 124 74 window_name;
+#X obj 25 102 pack float symbol;
+#X obj 124 49 loadbang;
+#X obj 25 60 tgl 30 0 empty empty empty 17 7 0 10 -204786 -1 -1 0 1
+;
+#X obj 265 163 sys_gui;
+#X obj 364 74 window_name;
+#X obj 265 102 pack float symbol;
+#X obj 364 49 loadbang;
+#X obj 265 60 tgl 30 0 empty empty empty 17 7 0 10 -204786 -1 -1 0
+1;
+#X obj 495 163 sys_gui;
+#X obj 594 74 window_name;
+#X obj 495 102 pack float symbol;
+#X obj 594 49 loadbang;
+#X obj 495 60 tgl 30 0 empty empty empty 17 7 0 10 -204786 -1 -1 0
+1;
+#X text 479 15 make this window on top of all others;
+#X msg 495 133 wm attributes \$2 -topmost \$1;
+#X msg 265 133 wm attributes \$2 -toolwindow \$1;
+#X text 263 13 make this window a "toolwindow";
+#X text 23 13 make this a "disabled" window;
+#X msg 25 133 wm attributes \$2 -disabled \$1;
+#X connect 1 0 2 1;
+#X connect 2 0 20 0;
+#X connect 3 0 1 0;
+#X connect 4 0 2 0;
+#X connect 6 0 7 1;
+#X connect 7 0 17 0;
+#X connect 8 0 6 0;
+#X connect 9 0 7 0;
+#X connect 11 0 12 1;
+#X connect 12 0 16 0;
+#X connect 13 0 11 0;
+#X connect 14 0 12 0;
+#X connect 16 0 10 0;
+#X connect 17 0 5 0;
+#X connect 20 0 0 0;
+#X restore 60 297 pd Windows tricks;
 #X connect 2 0 10 0;
 #X connect 3 0 6 0;
 #X connect 4 0 3 0;
