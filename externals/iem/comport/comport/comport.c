@@ -17,6 +17,7 @@ MP 20061016 write_serial checks for GetOverlappedResult to avoid tx buffer overf
 MP 20070719 added "ports" method to output list of available ports on status outlet
 MP 20071011 added comport_list and write_serials for list processing based on code by Thomas O Fredericks <tof@danslchamp.org>
 MP 20071113 modified non-windows open_serial to set the index of the port when it's opened by name
+MP 20080916 fixed Windows version stop bits to set and display 1, 1.5 or 2 for "stopbits" input of 1, 1.5 or 2
 */
 
 #include "m_pd.h"
@@ -224,10 +225,10 @@ t_class *comport_class;
 
 static void comport_pollintervall(t_comport *x, t_floatarg g);
 static void comport_tick(t_comport *x);
-static float set_baudrate(t_comport *x,t_float baud);
+static float set_baudrate(t_comport *x, t_float baud);
 static float set_bits(t_comport *x, int nr);
 static float set_parity(t_comport *x,int n);
-static float set_stopflag(t_comport *x, int nr);
+static float set_stopflag(t_comport *x, t_float nr);
 static int set_ctsrts(t_comport *x, int nr);
 static int set_dtr(t_comport *x, int nr);
 static int set_rts(t_comport *x, int nr);
@@ -333,16 +334,26 @@ static float set_parity(t_comport *x,int n)
 }
 
 
-/* activate second stop bit with 1, 0(default)*/
-static float set_stopflag(t_comport *x, int nr)
+/* Windows lets you have three different stop bit styles: 1,1.5 and 2 */
+/* The message argument is the number of stop bits */
+static float set_stopflag(t_comport *x, t_float nr)
 {
     if(nr == 1)
     {
-        x->dcb.StopBits = 1; /*  0,1,2 = 1, 1.5, 2  */
-        return 1;
+        x->dcb.StopBits = 0; /*  ONESTOPBIT = 0  */
+        return nr;
     }
-    else x->dcb.StopBits = 0; /*  0,1,2 = 1, 1.5, 2  */
-
+    if(nr == 2)
+    {
+        x->dcb.StopBits = 2; /*  TWOSTOPBITS = 2  */
+        return nr;
+    }
+    if(nr == 1.5)
+    {
+        x->dcb.StopBits = 1; /*  ONE5STOPBITS = 1  */
+        return nr;
+    }
+    post("comport stopbit number (%f) out of range (0, 1.5, 2)", nr);
     return 0;
 }
 
@@ -408,7 +419,10 @@ static int set_serial(t_comport *x)
     x->baud = x->dcb.BaudRate;
     x->data_bits = x->dcb.ByteSize;
     x->parity_bit = x->dcb.fParity;
-    x->stop_bits = x->dcb.StopBits;
+/* ONESTOPBIT=0, ONE5STOPBITS=1, TWOSTOPBITS=2*/
+    if(x->dcb.StopBits == 0) x->stop_bits = 1;
+    else if(x->dcb.StopBits == 1) x->stop_bits = 1.5;
+    else if(x->dcb.StopBits == 2) x->stop_bits = 2;
     x->xonxoff = (x->dcb.fOutX)?1:0;
     x->ctsrts = (x->dcb.fOutxCtsFlow)?1:0;
     return 0;
@@ -1204,7 +1218,11 @@ that allows COM port numbers to be specified.
     test.baud = fbaud;
     test.data_bits = 8; /* default 8 data bits */
     test.parity_bit = 0;/* default no parity bit */
+#ifdef _WIN32
+    test.stop_bits = 1;/* default 1 stop bit */
+#else
     test.stop_bits = 0;/* default 1 stop bit */
+#endif /* _WIN32 */
     test.ctsrts = 0; /* default no hardware handshaking */
     test.xonxoff = 0; /* default no software handshaking */
     test.hupcl = 1; /* default hangup on close */
@@ -1353,27 +1371,29 @@ static void comport_parity(t_comport *x,t_floatarg f)
     x->parity_bit = f;
 }
 
-static void comport_stopbit(t_comport *x,t_floatarg f)
+static void comport_stopbit(t_comport *x, t_floatarg f)
 {
-    f = set_stopflag(x,f);
+    f = set_stopflag(x, f);
 
     if(x->comhandle == INVALID_HANDLE_VALUE)return;
 
     if(set_serial(x) == 0)
     {
-        error("[comport] ** ERROR ** could not set extra stopbit of device %s\n",
 #ifdef _WIN32
-            &x->serial_device->s_name[4]);
+        error("[comport] ** ERROR ** could not set stopbits of device %s to %f\n",
+            &x->serial_device->s_name[4], f);
 #else
+        error("[comport] ** ERROR ** could not set extra stopbit of device %s\n",
             x->serial_device->s_name);
 #endif
         return;
     }
     else if(x->verbose > 0)
-        post("[comport] set extra stopbit of %s to %f\n",
 #ifdef _WIN32
+        post("[comport] set stopbits of %s to %f\n",
             &x->serial_device->s_name[4], f);
 #else
+        post("[comport] set extra stopbit of %s to %f\n",
             x->serial_device->s_name, f);
 #endif
     x->stop_bits = f;
@@ -1714,7 +1734,11 @@ static void comport_output_parity_bit(t_comport *x)
 
 static void comport_output_stop_bits(t_comport *x)
 {
+#ifdef _WIN32
+    comport_output_status(x, gensym("stop"), x->stop_bits);
+#else
     comport_output_status(x, gensym("stop"), x->stop_bits+1);
+#endif
 }
 
 static void comport_output_data_bits(t_comport *x)
