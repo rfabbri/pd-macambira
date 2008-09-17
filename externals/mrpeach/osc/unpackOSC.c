@@ -99,9 +99,6 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 
 /* ----------------------------- was dumpOSC ------------------------- */
 
-#define MAX_PATH_AT 50
-/* MAX_PATH_AT = maximum number of elements in OSC path */
-
 /* You may have to redefine this typedef if ints on your system
   aren't 4 bytes. */
 typedef unsigned int uint4;
@@ -128,6 +125,7 @@ typedef struct _unpackOSC
     int         x_data_atc;/* number of symbols to be output */
     char        x_raw[MAX_MESG];/* bytes making up the entire OSC message */
     int         x_raw_c;/* number of bytes in OSC message */
+    int         x_bundle_flag;/* non-zero if we are processing a bundle */
 } t_unpackOSC;
 
 void unpackOSC_setup(void);
@@ -150,6 +148,7 @@ static void *unpackOSC_new(void)
     x->x_data_out = outlet_new(&x->x_obj, &s_list);
     x->x_delay_out = outlet_new(&x->x_obj, &s_float);
     x->x_raw_c = x->x_data_atc = 0;
+    x->x_bundle_flag = 0;
     return (x);
 }
 
@@ -217,6 +216,8 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
             return;
         }
 
+        x->x_bundle_flag = 1;
+
         /* Print the time tag */
 #ifdef DEBUG
         printf("unpackOSC: [ %lx%08lx\n", ntohl(*((unsigned long *)(buf+8))),
@@ -256,6 +257,8 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
         {
             post("unpackOSC: This can't happen");
         }
+
+        x->x_bundle_flag = 0; /* end of bundle */
 #ifdef DEBUG
         printf("]\n");
 #endif
@@ -282,8 +285,13 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
 #endif
         messageLen = args-messageName;
         /* put the OSC path into a single symbol */
-        x->x_data_atc = unpackOSC_path(x, messageName);
-        if (x->x_data_atc == 1) unpackOSC_Smessage(x, (void *)args, x->x_raw_c-messageLen);
+        x->x_data_atc = unpackOSC_path(x, messageName); /* returns 1 if path OK, else 0  */
+        if (x->x_data_atc == 1)
+        {
+            unpackOSC_Smessage(x, (void *)args, x->x_raw_c-messageLen);
+            if (0 == x->x_bundle_flag)
+                outlet_float(x->x_delay_out, 0); /* no delay for message not in a bundle */
+        }
     }
     /*if (x->x_data_atc >= 1) outlet_list(x->x_data_out, &s_list, x->x_data_atc, x->x_data_at);*/
     if (x->x_data_atc >= 1)
