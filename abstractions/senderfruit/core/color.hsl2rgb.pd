@@ -1,4 +1,5 @@
 #N canvas 662 22 695 753 10;
+#X declare -lib list-abs;
 #X obj 121 143 moses 0.5;
 #X obj 190 79 v \$0h;
 #X obj 224 79 v \$0s;
@@ -79,6 +80,7 @@
 #X connect 5 1 4 0;
 #X connect 6 0 1 0;
 #X restore 97 424 pd restrict;
+#X obj 372 52 import list-abs;
 #X connect 0 0 10 0;
 #X connect 0 1 15 0;
 #X connect 4 0 1 0;

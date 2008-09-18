@@ -1,4 +1,5 @@
 #N canvas 718 533 518 301 10;
+#X declare -lib list-abs;
 #X obj 105 261 outlet;
 #X obj 327 29 inlet;
 #X obj 107 13 inlet;
@@ -12,6 +13,7 @@
 #X obj 107 34 list;
 #X obj 107 56 sel stop;
 #X obj 152 77 sel 0;
+#X obj 375 29 import list-abs;
 #X connect 1 0 5 1;
 #X connect 2 0 10 0;
 #X connect 3 0 7 0;

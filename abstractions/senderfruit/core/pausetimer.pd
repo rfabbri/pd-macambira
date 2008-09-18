@@ -1,4 +1,5 @@
 #N canvas 424 138 374 392 10;
+#X declare -lib iemlib;
 #X obj -1 23 inlet;
 #X obj 217 230 timer;
 #X obj 217 287 f;
@@ -30,6 +31,7 @@
 #X obj 55 347 +;
 #X obj 121 341 r \$0reset;
 #X msg 88 342 0;
+#X obj 199 57 import iemlib;
 #X connect 0 0 15 0;
 #X connect 1 0 4 0;
 #X connect 2 0 3 0;

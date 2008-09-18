@@ -1,4 +1,7 @@
 #N canvas 266 442 628 346 10;
+#X declare -lib toxy;
+#X declare -lib hcs;
+#X declare -lib list-abs;
 #N canvas 781 650 305 105 \$0.dialog-box 0;
 #X obj 2 2 cnv 15 300 30 empty \$0.line1 Are_you_sure? 20 12 0 14 -262144
 -1 0;
@@ -28,6 +31,7 @@
 #X obj 31 67 s pd-\$0.dialog-box;
 #X obj 31 45 dialog.under-cursor 305 105 1440 900;
 #X obj 344 62 list-onearg \$1 Are_you_sure?;
+#X obj 481 22 import list-abs;
 #X connect 1 0 18 0;
 #X connect 2 0 4 0;
 #X connect 2 0 5 0;

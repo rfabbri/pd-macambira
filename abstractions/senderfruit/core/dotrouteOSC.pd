@@ -1,4 +1,5 @@
 #N canvas 0 22 350 222 10;
+#X declare -lib zexy;
 #X obj 123 68 loadbang;
 #X obj 123 88 list append \$1;
 #X obj 48 190 outlet;
@@ -8,6 +9,7 @@
 #X obj 94 47 inlet;
 #X obj 123 128 list2symbol /;
 #X obj 123 108 symbol2list .;
+#X obj 193 35 import zexy;
 #X connect 0 0 1 0;
 #X connect 1 0 8 0;
 #X connect 3 0 2 0;

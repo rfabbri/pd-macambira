@@ -1,4 +1,5 @@
 #N canvas 259 345 452 502 10;
+#X declare -lib hcs;
 #X obj 308 42 inlet;
 #X obj 57 174 expr cos($f1 * 3.14159 / 2);
 #X obj 247 175 expr sin($f1 * 3.14159 / 2);
@@ -27,6 +28,7 @@
 #X obj 310 319 loadbang;
 #X obj 310 351 blocksize_in_ms;
 #X obj 310 385 s \$0block-ms;
+#X obj 66 113 import hcs;
 #X connect 0 0 3 0;
 #X connect 1 0 11 0;
 #X connect 2 0 8 0;

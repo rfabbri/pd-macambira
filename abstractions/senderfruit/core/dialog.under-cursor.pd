@@ -1,4 +1,6 @@
 #N canvas 518 38 492 494 10;
+#X declare -lib toxy;
+#X declare -lib hcs;
 #X obj 38 10 inlet;
 #X obj 38 53 cursor;
 #X obj 38 74 route motion;
@@ -28,6 +30,7 @@
 #X obj 262 106 screendimens;
 #X obj 262 127 unpack f f;
 #X obj 38 31 t b;
+#X obj 351 21 import hcs;
 #X connect 0 0 28 0;
 #X connect 1 0 2 0;
 #X connect 2 0 4 0;

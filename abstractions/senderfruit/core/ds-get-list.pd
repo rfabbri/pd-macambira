@@ -1,4 +1,6 @@
 #N canvas 539 101 566 566 10;
+#X declare -lib list-abs;
+#X declare -lib iemlib -lib list-abs;
 #N canvas 936 317 494 366 builder 1;
 #X obj 182 56 dollarg;
 #X obj 182 30 initbang;
@@ -40,6 +42,7 @@
 #X msg -6 282 connect 4 0 5 0;
 #X obj 202 158 list trim;
 #X obj 202 135 list prepend obj 10 100 get;
+#X obj 310 29 import iemlib list-abs;
 #X connect 0 0 10 0;
 #X connect 0 1 8 1;
 #X connect 1 0 0 0;

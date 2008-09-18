@@ -1,4 +1,7 @@
 #N canvas 231 105 422 404 10;
+#X declare -lib list-abs;
+#X declare -lib list-abs;
+#X declare -lib list-abs;
 #X obj 76 184 pack f f f;
 #X obj 133 47 t b b b;
 #X obj 185 184 pack f f f;
@@ -19,6 +22,7 @@
 #X obj 318 147 + 100;
 #X obj 318 115 + 600;
 #X obj 152 100 float_argument \$1 900;
+#X obj 261 25 import list-abs;
 #X connect 0 0 9 0;
 #X connect 1 0 6 0;
 #X connect 1 1 19 0;
