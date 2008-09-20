@@ -697,6 +697,7 @@ static void glist_doreload(t_glist *gl, t_symbol *name, t_symbol *dir,
 {
     t_gobj *g;
     int i, nobj = glist_getindex(gl, 0);  /* number of objects */
+    int hadwindow = gl->gl_havewindow;
     for (g = gl->gl_list, i = 0; g && i < nobj; i++)
     {
         if (g != except && pd_class(&g->g_pd) == canvas_class &&
@@ -709,8 +710,7 @@ static void glist_doreload(t_glist *gl, t_symbol *name, t_symbol *dir,
                 replacement will be at the end of the list, so we don't
                 do g = g->g_next in this case. */
             int j = glist_getindex(gl, g);
-            int hadwindow = gl->gl_havewindow;
-            if (!hadwindow)
+            if (!gl->gl_havewindow)
                 canvas_vis(glist_getcanvas(gl), 1);
             glist_noselect(gl);
             glist_select(gl, g);
@@ -720,8 +720,6 @@ static void glist_doreload(t_glist *gl, t_symbol *name, t_symbol *dir,
             canvas_undo(gl);
             glist_noselect(gl);
             g = glist_nth(gl, j);
-            if (!hadwindow)
-                canvas_vis(glist_getcanvas(gl), 0);
         }
         else
         {
@@ -730,15 +728,23 @@ static void glist_doreload(t_glist *gl, t_symbol *name, t_symbol *dir,
              g = g->g_next;
         }
     }
+    if (!hadwindow && gl->gl_havewindow)
+        canvas_vis(glist_getcanvas(gl), 0);
 }
+
+    /* this flag stops canvases from being marked "dirty" if we have to touch
+    them to reload an abstraction; also suppress window list update */
+int glist_amreloadingabstractions = 0;
 
     /* call canvas_doreload on everyone */
 void canvas_reload(t_symbol *name, t_symbol *dir, t_gobj *except)
 {
     t_canvas *x;
+    glist_amreloadingabstractions = 1;
         /* find all root canvases */
     for (x = canvas_list; x; x = x->gl_next)
         glist_doreload(x, name, dir, except);
+    glist_amreloadingabstractions = 0;
 }
 
 /* ------------------------ event handling ------------------------ */
@@ -1896,9 +1902,9 @@ static void canvas_menufont(t_canvas *x)
     gfxstub_new(&x2->gl_pd, &x2->gl_pd, buf);
 }
 
-static int canvas_find_index1, canvas_find_index2;
+static int canvas_find_index1, canvas_find_index2, canvas_find_wholeword;
 static t_binbuf *canvas_findbuf;
-int binbuf_match(t_binbuf *inbuf, t_binbuf *searchbuf);
+int binbuf_match(t_binbuf *inbuf, t_binbuf *searchbuf, int wholeword);
 
     /* find an atom or string of atoms */
 static int canvas_dofind(t_canvas *x, int *myindex1p)
@@ -1913,7 +1919,8 @@ static int canvas_dofind(t_canvas *x, int *myindex1p)
             t_object *ob = 0;
             if (ob = pd_checkobject(&y->g_pd))
             {
-                if (binbuf_match(ob->ob_binbuf, canvas_findbuf))
+                if (binbuf_match(ob->ob_binbuf, canvas_findbuf,
+                    canvas_find_wholeword))
                 {
                     if (myindex1 > canvas_find_index1 ||
                         myindex1 == canvas_find_index1 &&
@@ -1943,25 +1950,16 @@ static int canvas_dofind(t_canvas *x, int *myindex1p)
     return (0);
 }
 
-static void canvas_find(t_canvas *x, t_symbol *s, int ac, t_atom *av)
+static void canvas_find(t_canvas *x, t_symbol *s, t_floatarg wholeword)
 {
-    int myindex1 = 0, i;
-    for (i = 0; i < ac; i++)
-    {
-        if (av[i].a_type == A_SYMBOL)
-        {
-            if (!strcmp(av[i].a_w.w_symbol->s_name, "_semi_"))
-                SETSEMI(&av[i]);
-            else if (!strcmp(av[i].a_w.w_symbol->s_name, "_comma_"))
-                SETCOMMA(&av[i]);
-        }
-    }
+    int myindex1 = 0;
+    t_symbol *decodedsym = sys_decodedialog(s);
     if (!canvas_findbuf)
         canvas_findbuf = binbuf_new();
-    binbuf_clear(canvas_findbuf);
-    binbuf_add(canvas_findbuf, ac, av);
+    binbuf_text(canvas_findbuf, decodedsym->s_name, strlen(decodedsym->s_name));
     canvas_find_index1 = 0;
     canvas_find_index2 = -1;
+    canvas_find_wholeword = wholeword;
     canvas_whichfind = x;
     if (!canvas_dofind(x, &myindex1))
     {
@@ -2635,7 +2633,7 @@ void g_editor_setup(void)
     class_addmethod(canvas_class, (t_method)canvas_font,
         gensym("font"), A_FLOAT, A_FLOAT, A_FLOAT, A_NULL);
     class_addmethod(canvas_class, (t_method)canvas_find,
-        gensym("find"), A_GIMME, A_NULL);
+        gensym("find"), A_SYMBOL, A_FLOAT, A_NULL);
     class_addmethod(canvas_class, (t_method)canvas_find_again,
         gensym("findagain"), A_NULL);
     class_addmethod(canvas_class, (t_method)canvas_find_parent,

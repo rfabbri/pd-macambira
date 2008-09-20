@@ -270,8 +270,11 @@ int sys_open_absolute(const char *name, const char* ext,
 {
     if (sys_isabsolutepath(name))
     {
-        char dirbuf[MAXPDSTRING];
-        int dirlen = (strrchr(name, '/') - name);
+        char dirbuf[MAXPDSTRING], *z = strrchr(name, '/');
+        int dirlen;
+        if (!z)
+            return (0);
+        dirlen = z - name;
         if (dirlen > MAXPDSTRING-1) 
             dirlen = MAXPDSTRING-1;
         strncpy(dirbuf, name, dirlen);
@@ -419,9 +422,9 @@ int sys_rcfile(void)
 
     for (i = 1; i < NUMARGS-1; i++)
     {
-        if (fscanf(file, "%999s", buf) < 0)
+        if (fscanf(file, "%998s", buf) < 0)
             break;
-        buf[1000] = 0;
+        buf[999] = 0;
         if (!(rcargv[i] = malloc(strlen(buf) + 1)))
             goto cleanup;
         strcpy(rcargv[i], buf);
@@ -437,7 +440,7 @@ int sys_rcfile(void)
     fclose(file);
     if (sys_verbose)
     {
-        if (rcargv)
+        if (rcargc)
         {
             post("startup args from RC file:");
             for (i = 1; i < rcargc; i++)

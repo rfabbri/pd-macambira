@@ -14,6 +14,8 @@
 #include <portaudio.h>
 #include "s_audio_pablio.h"
 
+#define MAX_PA_CHANS 32
+#define MAX_SAMPLES_PER_FRAME (MAX_PA_CHANS * DEFDACBLKSIZE)
     /* LATER try to figure out how to handle default devices in portaudio;
     the way s_audio.c handles them isn't going to work here. */
 
@@ -24,9 +26,6 @@ static PABLIO_Stream  *pa_stream;
 static int pa_inchans, pa_outchans;
 static float *pa_soundin, *pa_soundout;
 static t_audiocallback pa_callback;
-
-#define MAX_PA_CHANS 32
-#define MAX_SAMPLES_PER_FRAME MAX_PA_CHANS * DEFDACBLKSIZE
 
 int pa_foo;
 
