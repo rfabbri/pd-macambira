@@ -787,8 +787,9 @@ static float set_parity(t_comport *x,int n)
 
 
 /* activate second stop bit with 1, 0(default)*/
-static float set_stopflag(t_comport *x, int nr)
+static float set_stopflag(t_comport *x, t_float f_nr)
 {
+    int nr = (int)f_nr;
     struct termios *tio = &(x->com_termio);
 
     if(nr == 1)
