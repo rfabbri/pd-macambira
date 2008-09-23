@@ -14,10 +14,18 @@ SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
 # the name of this script
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
 
+mailbody_on_failure () {
+ tail -20 ${LOGFILE}
+ echo ""
+ echo "the full logfile can be viewed at"
+ echo "http://autobuild.puredata.info/auto-build/${DATE}/logs/${LOGFILE}"
+}
+
 run_build_script ()
 {
 	 distro=$1
 
+	## LATER: make the uploaded ${LOGFILE} (name) be consistent with the uploaded package-file (name)
 	 LOGFILE=${HOME}/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${SCRIPT}.txt
 	 touch ${LOGFILE} 
 
@@ -38,7 +46,8 @@ run_build_script ()
 	 if [ "x${completion_test}" != "xSUCCESS" ]; then
 		if [ "x${RECIPIENT}" != "x" ]; then
 		  SUBJECT="autobuild: $distro $HOSTNAME $DATE $TIME"
-		  tail -20 ${LOGFILE} | mail -s "${SUBJECT}" ${RECIPIENT}
+		  mailbody_on_failure | mail -s "${SUBJECT}" ${RECIPIENT}
+		  #tail -20 ${LOGFILE} | mail -s "${SUBJECT}" ${RECIPIENT}
 		fi
 	 fi
 }
