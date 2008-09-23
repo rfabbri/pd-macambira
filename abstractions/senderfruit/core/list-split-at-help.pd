@@ -1,4 +1,6 @@
 #N canvas 741 82 388 382 10;
+#X declare -lib list-abs;
+#X declare -lib list-abs;
 #X obj 49 128 list-split-at /;
 #X msg 161 128 symbol |;
 #X msg 161 158 symbol /;
@@ -22,6 +24,7 @@ encountering a delimiter;
 #X msg 49 227;
 #X text 271 289 2008 Luke Iannini;
 #X text 271 303 proyekto.net;
+#X obj 256 36 import list-abs;
 #X connect 0 0 3 0;
 #X connect 0 1 6 0;
 #X connect 1 0 0 1;
