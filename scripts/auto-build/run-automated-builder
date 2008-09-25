@@ -18,7 +18,7 @@ mailbody_on_failure () {
  tail -20 ${LOGFILE}
  echo ""
  echo "the full logfile can be viewed at"
- echo "http://autobuild.puredata.info/auto-build/${DATE}/logs/${LOGFILE}"
+ echo "http://autobuild.puredata.info/auto-build/${DATE}/logs/${LOGFILE##*/}"
 }
 
 run_build_script ()
