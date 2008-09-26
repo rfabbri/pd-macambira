@@ -2127,7 +2127,8 @@ pdp_opengl_clean:
 # PDVJTOOLS
 PDVJTOOLS_NAME=pdvjtools
 PDVJTOOLS_OBJECTS := $(wildcard $(externals_src)/pdvjtools/*/*.c)
-PDVJTOOLS_CPP_OBJECTS := $(wildcard $(externals_src)/pdvjtools/*/*.cc)
+# exclude videogrid for now since it doesn't build with ffmpeg from Debian/stable
+PDVJTOOLS_CPP_OBJECTS := $(wildcard $(externals_src)/pdvjtools/[^v]*/*.cc)
 pdvjtools: $(externals_src)/pdp/Makefile.config $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION)) \
 $(PDVJTOOLS_CPP_OBJECTS:.cc=.$(EXTENSION))
 
