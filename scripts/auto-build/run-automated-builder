@@ -15,7 +15,9 @@ SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
 
 mailbody_on_failure () {
- tail -20 ${LOGFILE}
+ ## this is a somewhat simplistic expression to detect error-lines
+ cat ${LOGFILE} | grep " error: " | tail -20
+# tail -20 ${LOGFILE}
  echo ""
  echo "the full logfile can be viewed at"
  echo "http://autobuild.puredata.info/auto-build/${DATE}/logs/${LOGFILE##*/}"
