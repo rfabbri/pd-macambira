@@ -31,11 +31,13 @@
 
 #include <math.h>
 #include <string.h>
-#include <fftw3.h>
+#ifdef HAVE_FFTW3_H
+# include <fftw3.h>
+#endif /* FFTW3 */
 #include "m_pd.h"
 
 #ifdef __VEC__
-#include <altivec.h>
+# include <altivec.h>
 #endif
 
 #define MAXPARTS 256	// max number of partitions
@@ -48,9 +50,11 @@ static t_class *partconv_class;
 
 struct sumbuffer {
 	int index;
+#ifdef HAVE_FFTW3_H
 	fftwf_complex *fd;
 	float *td;
 	fftwf_plan plan;
+#endif /* FFTW3 */
 	int readpos;
 	struct sumbuffer *next, *prev;
 };
@@ -67,6 +71,7 @@ typedef struct _partconv {
 	int ir_prepared;
 	int pd_blocksize;
 
+#ifdef HAVE_FFTW3_H
 	// partitions of impulse response
 	fftwf_plan irpart_plan;
 	float *irpart_td[MAXPARTS];
@@ -78,6 +83,8 @@ typedef struct _partconv {
 	int inbufpos;
 	float *input_td;
 	fftwf_complex *input_fd;
+#endif /* FFTW3 */
+
 
 	// circular array/list of buffers for accumulating results of convolution
 	struct sumbuffer sumbufs[MAXPARTS+2];
@@ -127,6 +134,7 @@ static t_int *partconv_perform(t_int *w)
 	t_float *in = (t_float *)(w[2]);
 	t_float *out = (t_float *)(w[3]);
 	int n = (int)(w[4]);
+#ifdef HAVE_FFTW3_H
 	int i;
 	int j;
 	int k;	// bin
@@ -140,7 +148,7 @@ static t_int *partconv_perform(t_int *w)
 	v4sf *cursumbuf_fd;
 	v4sf *input_fd;
 	v4sf *irpart_fd;
-#else
+#elif defined HAVE_FFTW3_H
 	fftwf_complex *cursumbuf_fd;
 	fftwf_complex *input_fd;
 	fftwf_complex *irpart_fd;
@@ -165,9 +173,7 @@ static t_int *partconv_perform(t_int *w)
 		x->curpart = 0;
 		memcpy(x->input_td, x->inbuf, x->partsize * sizeof(float));  // copy 'gathering' input buffer into 'transform' buffer
 		memset(&(x->input_td[x->partsize]), 0, (x->paddedsize - x->partsize) * sizeof(float));  // pad
-
 		fftwf_execute(x->input_plan);  // transform the input
-
 		// everything has been read out of prev sumbuf, so clear it
 		memset(x->sumbuf->prev->td, 0,  x->paddedsize * sizeof(float));
 
@@ -184,7 +190,7 @@ static t_int *partconv_perform(t_int *w)
 	for (p = x->curpart; p < endpart; p++) {
 		// multiply the input block by the partition, accumulating the result in the appropriate sumbuf
 #ifdef USE_SSE
-#include "sse-conv.inc.c"
+# include "sse-conv.inc.c"
 #else
 		cursumbuf_fd = x->sumbufs[(x->sumbuf->index + p) % x->nsumbufs].fd;
 		input_fd = x->input_fd;
@@ -226,6 +232,10 @@ static t_int *partconv_perform(t_int *w)
 	x->sumbuf->prev->readpos += n;
 
 	x->curcall++;
+#else /* !FFTW3 */
+  while(n-->0)
+    *out++=*in++;
+#endif
 
 	return (w+5);
 }
@@ -234,8 +244,8 @@ static t_int *partconv_perform(t_int *w)
 
 static void partconv_free(t_partconv *x)
 {
+#ifdef HAVE_FFTW3_H
 	int i;
-
 	fftwf_free(x->inbuf);
 	for (i = 0; i < x->nparts; i++)
 		fftwf_free(x->irpart_td[i]);
@@ -245,6 +255,7 @@ static void partconv_free(t_partconv *x)
 		fftwf_free(x->sumbufs[i].fd);
 		fftwf_destroy_plan(x->sumbufs[i].plan);
 	}
+#endif /* FFTW3 */
 }
 
 static void partconv_set(t_partconv *x, t_symbol *s)
@@ -267,7 +278,7 @@ static void partconv_set(t_partconv *x, t_symbol *s)
 		pd_error(x, "%s: bad template", x->arrayname->s_name);
 		return;
 	}
-
+#ifdef HAVE_FFTW3_H
 	// if the IR has already been prepared, free everything first
 	if (x->ir_prepared == 1) {
 		partconv_free(x);
@@ -328,6 +339,7 @@ static void partconv_set(t_partconv *x, t_symbol *s)
 
 	post("partconv~: using %s in %d partitions with FFT-size %d", x->arrayname->s_name, x->nparts, x->fftsize);
 	x->ir_prepared = 1;
+#endif /* FFTW3 */
 }
 
 static void partconv_dsp(t_partconv *x, t_signal **sp)
@@ -347,7 +359,7 @@ static void *partconv_new(t_symbol *s, int argc, t_atom *argv)
 	outlet_new(&x->x_obj, gensym("signal"));
 
 	if (argc != 2) {
-		post("argc = %d", argc);
+    //		post("argc = %d", argc);
 		error("partconv~: usage: [partconv~ <arrayname> <partsize>]\n\t- partition size must be a power of 2 >= blocksize");
 		return NULL;
 	}
@@ -372,6 +384,11 @@ static void *partconv_new(t_symbol *s, int argc, t_atom *argv)
 	x->nbins = x->fftsize / 2 + 1;
 	x->ir_prepared = 0;
 	x->pd_blocksize = sys_getblksize();
+
+#ifndef HAVE_FFTW3_H
+  pd_error(x, "partconv~: compiled without FFTW3 support! this is a dummy!");
+#endif
+
 
 	return (x);
 }
