@@ -18,6 +18,7 @@ SUBDIRS = \
 	sprinkler
 
 ##-- 'pdstring' and 'sprinkler' are already in 'flatspace' ... should they be moved here?
+##    -> 2008-08: removed any2string,string2any,pdstring from flatspace
 
 ##-- local variables
 MOOCOW_DIR    ?=$(shell pwd)
