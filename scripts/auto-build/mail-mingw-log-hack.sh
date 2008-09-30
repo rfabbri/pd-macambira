@@ -23,7 +23,6 @@ for logfile in $(ls -1 /var/www/auto-build/${DATE}/logs/${DATE}_*_mingw*.txt); d
 		if [ "x${RECIPIENT}" != "x" ]; then
 		  SUBJECT="autobuild: $distro $HOSTNAME $DATE $TIME"
 		  mailbody_on_failure "${logfile}" | mail -s "autobuild: $logfile" ${RECIPIENT}
-#		  tail -20 ${logfile} | mail -s "autobuild: $logfile" ${RECIPIENT}
 		fi
 	 fi
 done

@@ -8,11 +8,11 @@ PATH="${PATH}:/sw/bin:/sw/sbin"
 export PATH
 
 # the source dir where this script is
-SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
+SCRIPT_DIR=$(echo $0 | sed 's|\(.*\)/.*$|\1|')
 . $SCRIPT_DIR/auto-build-common
 
 # the name of this script
-SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
+SCRIPT=$(echo $0| sed 's|.*/\(.*\)|\1|g')
 
 mailbody_on_failure () {
  ## this is a somewhat simplistic expression to detect error-lines
@@ -27,7 +27,7 @@ run_build_script ()
 {
 	 distro=$1
 
-	## LATER: make the uploaded ${LOGFILE} (name) be consistent with the uploaded package-file (name)
+         ## LATER: make the uploaded ${LOGFILE} (name) be consistent with the uploaded package-file (name)
 	 LOGFILE=${HOME}/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${SCRIPT}.txt
 	 touch ${LOGFILE} 
 
@@ -44,7 +44,7 @@ run_build_script ()
 	 esac
 
 # send status report if something failed
-	 completion_test=`tail -1 ${LOGFILE}`
+	 completion_test=$(tail -1 ${LOGFILE})
 	 if [ "x${completion_test}" != "xSUCCESS" ]; then
 		if [ "x${RECIPIENT}" != "x" ]; then
 		  SUBJECT="autobuild: $distro $HOSTNAME $DATE $TIME"
@@ -55,7 +55,7 @@ run_build_script ()
 }
 
 for dir in ${HOME}/auto-build/*; do 
-	 dirname=`echo $dir | sed 's|.*/\(.*\)|\1|'`
+	 dirname=$(echo $dir | sed 's|.*/\(.*\)|\1|')
 	 test -e $dir/scripts/auto-build/${dirname}-auto-builder.sh && \
 		  run_build_script $dirname
 done

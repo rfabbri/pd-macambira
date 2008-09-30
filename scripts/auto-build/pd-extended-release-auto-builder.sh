@@ -2,11 +2,11 @@
 # this script is the first attempt to have an automated updater and builder
 
 # the source dir where this script is
-SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
+SCRIPT_DIR=$(echo $0 | sed 's|\(.*\)/.*$|\1|')
 . $SCRIPT_DIR/auto-build-common
 
 # the name of this script
-SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
+SCRIPT=$(echo $0| sed 's|.*/\(.*\)|\1|g')
 
 BUILD_DIR=.
 case $SYSTEM in 
@@ -34,8 +34,8 @@ esac
 
 
 # convert into absolute path
-cd `echo $0 | sed 's|\(.*\)/.*$|\1|'`/../..
-auto_build_root_dir=`pwd`
+cd $(echo $0 | sed 's|\(.*\)/.*$|\1|')/../..
+auto_build_root_dir=$(pwd)
 echo "root: $auto_build_root_dir" 
 
 # let rsync handle the cleanup with --delete
@@ -63,11 +63,11 @@ upload_build ()
     build_folder=$2
     archive_format=$3
 	
-	archive=`ls -1 ${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format} | tail -1`
+	archive=$(ls -1 ${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format} | tail -1)
     
     echo "upload specs $1 $2 $3"
     echo "Uploading $archive"
-	upload_filename=`ls -1 ${archive} | sed "s|.*/\(.*\)\.${archive_format}|\1-${HOSTNAME}.${archive_format}|"`
+	upload_filename=$(ls -1 ${archive} | sed "s|.*/\(.*\)\.${archive_format}|\1-${HOSTNAME}.${archive_format}|")
 	if [ -e ${archive} ]; then
 		case $SYSTEM in 
 			mingw*)
@@ -76,12 +76,14 @@ upload_build ()
 					md5sum ${archive} > ${archive}.md5 && \
 					/c/cygwin/bin/sh -c \
 					"rsync -a ${archive}.md5 rsync://128.238.56.50/upload/${DATE}/${upload_filename}.md5" && \
+                                        echo "successfully uploaded: ${upload_filename}" && \
 					echo SUCCESS
 				;;
 			*)
 				rsync -a ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}  && \
 					md5sum ${archive} > ${archive}.md5 && \
 					rsync -a ${archive}.md5 rsync://128.238.56.50/upload/${DATE}/${upload_filename}.md5  && \
+                                        echo "successfully uploaded: ${upload_filename}" && \
 					echo SUCCESS
 				;;
 		esac
