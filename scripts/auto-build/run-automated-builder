@@ -16,7 +16,7 @@ SCRIPT=$(echo $0| sed 's|.*/\(.*\)|\1|g')
 
 mailbody_on_failure () {
  ## this is a somewhat simplistic expression to detect error-lines
- cat ${LOGFILE} | grep " error: " | tail -20
+ cat ${LOGFILE} | grep -i "error: " | tail -20
 # tail -20 ${LOGFILE}
  echo ""
  echo "the full logfile can be viewed at"
