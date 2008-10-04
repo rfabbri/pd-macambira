@@ -1,5 +1,5 @@
 #N canvas 0 0 625 631 12;
-#X obj 104 572 pddp;
+#X obj 104 572 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X obj 8 8 cnv 15 90 586 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X text 37 47 INLETS:;

@@ -10,7 +10,7 @@
 #X obj 126 291 +;
 #X floatatom 126 315 5 0 0 0 - - -;
 #X obj 126 241 t b b;
-#X obj 104 540 pddp;
+#X obj 104 540 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X obj 21 18 loadbang;
