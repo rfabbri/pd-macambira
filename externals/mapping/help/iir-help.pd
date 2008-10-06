@@ -1,5 +1,5 @@
 #N canvas 127 104 683 513 10;
-#X floatatom 264 204 5 0 0 0 - - -;
+#X floatatom 266 204 5 0 0 0 - - -;
 #X text 22 11 data;
 #X obj 27 172 t f f;
 #X msg 67 100 0;
@@ -7,9 +7,9 @@
 #X obj 440 294 timeroll;
 #X obj 234 294 timeroll;
 #X obj 234 234 iir 5;
-#X obj 28 294 timeroll;
+#X obj 27 294 timeroll;
 #X obj 27 30 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 3000 1;
+-1 -1 0 1;
 #X text 504 276 high-pass;
 #X text 240 276 low-pass;
 #X text 83 441 original;
@@ -18,6 +18,10 @@
 ;
 #X text 89 27 [iir] computes a infinite impulse response low-pass filter.
 ;
+#X msg 234 124 reset;
+#X msg 242 147 reset 10;
+#X text 293 126 reset internal state;
+#X text 313 145 reset internal state to a specific value;
 #X connect 0 0 7 1;
 #X connect 2 0 8 0;
 #X connect 2 1 7 0;
@@ -26,3 +30,5 @@
 #X connect 7 0 6 0;
 #X connect 7 1 5 0;
 #X connect 9 0 2 0;
+#X connect 16 0 7 0;
+#X connect 17 0 7 0;
