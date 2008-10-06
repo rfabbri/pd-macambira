@@ -1,6 +1,10 @@
 NAME=knn
 CSYM=knn
 
+LIBDIR=/usr/local/lib
+PDDIR=$(LIBDIR)/pd
+INSTALLPATH=$(PDDIR)/extra/
+
 current: pd_linux
 
 # ----------------------- NT -----------------------
@@ -73,5 +77,30 @@ LINUXINCLUDE =  -I/usr/lib/pd/include/
 	rm $*.o
 	cp $*.pd_linux ../.
 
+
+
+# ----------------------- Darwin -----------------------
+
+pd_darwin: $(NAME).pd_darwin
+
+.SUFFIXES: .pd_darwin
+
+DARWINCFLAGS = -DPD -O3 -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch -L/usr/local/lib/
+
+DARWININCLUDE = $(LINUXINCLUDE)
+
+.c.pd_darwin:
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c $(NAME).c
+	$(CC) -bundle -undefined suppress -flat_namespace -o $(NAME).pd_darwin $(NAME).o
+	rm -f *.o
+
+# ----------------------- Generic -----------------------
+
 clean:
 	rm -f *.o *.pd_* so_locations
+
+install:
+	cp $(NAME).pd_* $(INSTALLPATH)
+	install -d  $(PDDIR)/doc/5.reference/getpatchname/
+	install -m 644 help-* $(PDDIR)/doc/5.reference/
