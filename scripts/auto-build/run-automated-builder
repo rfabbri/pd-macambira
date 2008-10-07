@@ -1,5 +1,12 @@
 #!/bin/sh
 
+
+## TODO: 
+# - change the logfile name
+# - use a wrapper for rsync to handle platform specifics
+# - check whether rsync (or any other upload mechanism) is present
+    and mail accordingly
+
 cd /
 
 # On Mac OS X, there are some handy things in Fink, but don't override the
@@ -19,7 +26,7 @@ mailbody_on_failure () {
  cat ${LOGFILE} | grep -i "error: " | tail -20
 # tail -20 ${LOGFILE}
  echo ""
- echo "the full logfile can be viewed at"
+ echo "the full logfile - if it has been succesfully uploaded - can be viewed at:"
  echo "http://autobuild.puredata.info/auto-build/${DATE}/logs/${LOGFILE##*/}"
 }
 
