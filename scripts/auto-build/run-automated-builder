@@ -5,7 +5,7 @@
 # - change the logfile name
 # - use a wrapper for rsync to handle platform specifics
 # - check whether rsync (or any other upload mechanism) is present
-    and mail accordingly
+#   and mail accordingly
 
 cd /
 
