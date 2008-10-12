@@ -1,4 +1,4 @@
-#N canvas 228 478 660 293 10;
+#N canvas 108 88 346 329 10;
 #X obj 41 196 *~ 0.3;
 #X obj 42 231 dac~;
 #X floatatom 42 58 5 0 0 0 - - -;
@@ -9,7 +9,7 @@
 #X msg 42 98 \$1 33;
 #X obj 146 122 line~;
 #X msg 146 99 \$1 33;
-#X text 159 18 pwm~ is a band-limited square oscillator.;
+#X text 40 17 pwm~ is a band-limited square oscillator.;
 #X msg 146 60 0.5;
 #X connect 0 0 1 0;
 #X connect 0 0 1 1;
