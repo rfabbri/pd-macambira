@@ -35,7 +35,7 @@ OPT_CFLAGS += -O3 -funroll-loops -fomit-frame-pointer -march=powerpc -mtune=G3
 else
 # auto-vectorization in GCC 4.x for CPUs with SIMD
 OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 \
-	-fast -fPIC -march=7450 -mtune=7450
+	-fast -fPIC -mcpu=7450 -mtune=7450
 endif
 
 # Mac/Intels only run 10.4, so always gcc 4.x
