@@ -158,7 +158,7 @@ int convertir_img_ff(pathimage pathFitxer, tipus_format f, int W, int H, int pos
 
     // Retrieve stream information
     if(av_find_stream_info(pFormatCtx)<0)
-        return -1; // Couldn't find stream information
+        return -1;  // Couldn't find stream information
 
     // Dump information about file onto standard error
     dump_format(pFormatCtx, 0, pathFitxer, false);
@@ -749,8 +749,8 @@ int format_adequat_v(path nomF){
           t1 != NULL;
           t1 = strtok(NULL,".") )
         strcpy(extensio,t1);
-    if(strcmp(extensio,"mov")==0) retorn = 1;
     /*
+    if(strcmp(extensio,"mov")==0) retorn = 1;
     if(strcmp(extensio,"eps")==0) retorn = 1;
     if(strcmp(extensio,"gif")==0) retorn = 1;
     if(strcmp(extensio,"jpg")==0) retorn = 1;
@@ -788,46 +788,52 @@ void videogrid_afegir_imatge(t_videogrid *x, path entrada)
             }
             sys_vgui(".x%x.c delete %xS%d\n", glist_getcanvas(x->x_glist), x, pos);
         }
-        /* encua el nou node */
-        encuar(&x->x_cua, entrada);
-        /* si no és el primer element a encuar incrementem la posicio de la última imatge insertada */
-        if(numNodes(&x->x_cua) != 1) x->x_ultima_img ++;
-        /* si assoleix el maxim torna a començar, inicialitzant la posició en el tauler de la última imatge insertada */
-        if(x->x_ultima_img == maxim) x->x_ultima_img = 0;
+
 
         /*
         Quicktime per les conversions
         */
+	int fferror=0;
         int nN = x->x_ultima_img;
     	if (format_adequat_v(entrada) == 1) {
 		convertir_img(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
 	} else {
-		convertir_img_ff(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
+		fferror=convertir_img_ff(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
 	}
+	post ("%d",fferror);
+	if (fferror>=0) {
+		
+	        /* encua el nou node */
+	        encuar(&x->x_cua, entrada);
+	        /* si no és el primer element a encuar incrementem la posicio de la última imatge insertada */
+	        if(numNodes(&x->x_cua) != 1) x->x_ultima_img ++;
+	        /* si assoleix el maxim torna a començar, inicialitzant la posició en el tauler de la última imatge insertada */
+	        if(x->x_ultima_img == maxim) x->x_ultima_img = 0;
 
-        sprintf(nNstr, "%d", nN);
-        strcat(ig_path,nNstr);
-        strcat(ig_path,".");
-        strcat(ig_path,FORMAT_MINIATURA);
-        /*printf("Creacio de la imatge %s ...",ig_path);*/
-        sys_vgui("image create photo img%x%d -file %s\n",x,nN,ig_path);
-        /* printf("1. Creacio de la imatge %s ...",ig_path); */
-        sys_vgui(".x%x.c create image %d %d -image img%x%d -tags %xS%d\n",
-             glist_getcanvas(x->x_glist),
-             text_xpix(&x->x_obj, x->x_glist) + getX(x,nN) + (W_CELL/2), 
-             text_ypix(&x->x_obj, x->x_glist) + getY(x,nN) + (H_CELL/2),
-             x,nN,x,nN);
-        /* printf("2. Creacio de la imatge %s ...",ig_path); */
-        if(nN == 0){
-            x->x_tauler_primer = x->x_cua.final;
-            /* post("Ara el primer del tauler es %s\n",x->x_tauler_primer->pathFitxer); */
-        }
-        /* printf("SURT de la creacio de la imatge %s ...",ig_path); */
-    /*
-    sys_vgui("image create photo img%x -file %s\n",x,entrada);
-    sys_vgui(".x%x.c create image %d %d -image img%x -tags %xS\n", 
-    glist_getcanvas(glist),text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),x,x);
-    */
+	        sprintf(nNstr, "%d", nN);
+	        strcat(ig_path,nNstr);
+	        strcat(ig_path,".");
+	        strcat(ig_path,FORMAT_MINIATURA);
+	        /*printf("Creacio de la imatge %s ...",ig_path);*/
+	        sys_vgui("image create photo img%x%d -file %s\n",x,nN,ig_path);
+	        /* printf("1. Creacio de la imatge %s ...",ig_path); */
+	        sys_vgui(".x%x.c create image %d %d -image img%x%d -tags %xS%d\n",
+	             glist_getcanvas(x->x_glist),
+	             text_xpix(&x->x_obj, x->x_glist) + getX(x,nN) + (W_CELL/2), 
+	             text_ypix(&x->x_obj, x->x_glist) + getY(x,nN) + (H_CELL/2),
+	             x,nN,x,nN);
+	        /* printf("2. Creacio de la imatge %s ...",ig_path); */
+	        if(nN == 0){
+	            x->x_tauler_primer = x->x_cua.final;
+	            /* post("Ara el primer del tauler es %s\n",x->x_tauler_primer->pathFitxer); */
+	        }
+	        /* printf("SURT de la creacio de la imatge %s ...",ig_path); */
+	    /*
+	    sys_vgui("image create photo img%x -file %s\n",x,entrada);
+	    sys_vgui(".x%x.c create image %d %d -image img%x -tags %xS\n", 
+	    glist_getcanvas(glist),text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),x,x);
+	    */
+	}
 }
 
 /* dibuixa videogrid */
