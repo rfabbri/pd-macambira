@@ -1543,7 +1543,7 @@ static void videogrid_destroy(t_videogrid *x){
 void videogrid_setup(void)
 {
     load_tk_procs();
-    post("videogrid: version 0.3, written by Sergi Lario (slario@gmail.com) & Lluis Gomez i Bigorda (lluis@artefacte.org"); 
+    post("videogrid: version 0.2, written by Sergi Lario (slario@gmail.com) & Lluis Gomez i Bigorda (lluis@artefacte.org)"); 
 
     /*
                      sense pas d'arguments
