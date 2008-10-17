@@ -1,4 +1,4 @@
-#N canvas 323 160 563 400 10;
+#N canvas 539 405 563 400 10;
 #X symbolatom 116 317 60 0 0 0 - - -;
 #X obj 26 110 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
@@ -9,7 +9,7 @@
 added in the grid \, in form of image of its first frame.;
 #X text 74 344 LOCATION OF THE SELECTED VIDEO;
 #X text 24 93 LIST STDOUT;
-#X obj 116 171 videogrid videogrid1 3 5 #F0F0F0 #0F0F0F #F1882B;
+#X obj 114 169 videogrid videogrid1 3 5 #F0F0F0 #0F0F0F #F1882B;
 #X msg 156 77 putvideo \$1;
 #X obj 268 74 openpanel;
 #X obj 348 73 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
@@ -19,6 +19,7 @@ added in the grid \, in form of image of its first frame.;
 #X floatatom 19 185 5 0 0 0 - - -;
 #X msg 156 127 putvideodir /home/medialab/opendijous/pd/Gem/examples/data/
 ;
+#X msg 276 360 putvideodir /home/medialab/Desktop/primo;
 #X connect 1 0 8 0;
 #X connect 8 0 0 0;
 #X connect 9 0 8 0;
@@ -28,3 +29,4 @@ added in the grid \, in form of image of its first frame.;
 #X connect 13 0 8 0;
 #X connect 14 0 13 0;
 #X connect 15 0 8 0;
+#X connect 16 0 8 0;

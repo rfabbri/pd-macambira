@@ -1543,7 +1543,8 @@ static void videogrid_destroy(t_videogrid *x){
 void videogrid_setup(void)
 {
     load_tk_procs();
-    /* post("Entra a setup per generar la classe videogrid"); */
+    post("videogrid: version 0.3, written by Sergi Lario (slario@gmail.com) & Lluis Gomez i Bigorda (lluis@artefacte.org"); 
+
     /*
                      sense pas d'arguments
     videogrid_class = class_new(gensym("videogrid"),
