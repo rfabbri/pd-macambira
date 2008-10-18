@@ -2096,12 +2096,17 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
 	 *argstr,
 	 *dll_arg,
 	 *dll_name,
-	 *plugin_label;
+         *dll_path,
+	 *plugin_label,
+         dll_dir[MAXPDSTRING];
+
 #if DEBUG
     post("argc = %d", argc);
 #endif
     int i,
-	stop;
+	stop,
+        fd;
+    size_t pathlen;
 
     stop = 0;
 
@@ -2136,29 +2141,58 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
 #endif
 
 	if(x->dll_arg != NULL){
+            /* First try to load as is: this will work if dll_arg is an
+             * absolute path, or the name of a library that is in DSSI_PATH
+             * or LADSPA_PATH environment variables */
 	    x->dll_handle = loadLADSPAPluginLibrary(x->dll_arg);
 	    x->dll_path = (char *)x->dll_arg;
+            /* If that didn't work, search for it in the 'canvas' path, which
+             * includes the Pd search dirs and any 'extra' paths set with
+             * [declare] */
+            fd = canvas_open(x->x_canvas, x->dll_arg, "",
+                    dll_dir, &dll_name, MAXPDSTRING, 0);
+
+            if (fd >= 0)
+            {
+#if DEBUG
+                post("plugin directory is %s, filename is %s", 
+                        dll_dir, dll_name);
+#endif
+                pathlen = strlen(dll_dir);
+                dll_path = &dll_dir[pathlen];
+                sprintf(dll_path, "/%s", dll_name);
+                dll_path = dll_dir;
+                x->dll_handle = loadLADSPAPluginLibrary(dll_path);
+            }
+            else
+                error("dssi~: can't find plugin library in Pd paths, " 
+                        "try using [declare] to specify the path.");
+
 	}
 
 	if (x->dll_handle != NULL){
 	    tmpstr = (char *)malloc((strlen(x->dll_arg) + 1) * sizeof(char));
 	    strcpy(tmpstr, x->dll_arg);  
-	    if(strstr(tmpstr, ".so")){
-		dll_name = strtok((char *)tmpstr, "/");
-		while(strstr(dll_name, ".so") == NULL)
-		    dll_name = strtok(NULL, "/");
-		x->dll_name = (char *)malloc(sizeof(char) * 
-			(strlen(dll_name) + 1)); 
-		strcpy(x->dll_name, dll_name);  
+            /* Don't bother working out the dll name if we used canvas_open() 
+             * to get the path */
+            if(dll_name == NULL){
+                if(strstr(tmpstr, ".so")){
+                    dll_name = strtok((char *)tmpstr, "/");
+                    while(strstr(dll_name, ".so") == NULL)
+                        dll_name = strtok(NULL, "/");
+                    x->dll_name = (char *)malloc(sizeof(char) * 
+                            (strlen(dll_name) + 1)); 
+                    strcpy(x->dll_name, dll_name);  
 #if DEBUG	
-		post("library name = %s", x->dll_name);
+                    post("library name = %s", x->dll_name);
 #endif
-		free(tmpstr);
-	    }
-	    else{
-		post("dssi~: invalid library name; must end in .so");
-		return (void *) x;
-	    }
+                    free(tmpstr);
+                }
+                else{
+                    post("dssi~: invalid library name; must end in .so");
+                    return (void *) x;
+                }
+            }
 	    if(x->desc_func = (DSSI_Descriptor_Function)dlsym(x->dll_handle,			"dssi_descriptor")){
 		x->is_DSSI = 1;
 		x->descriptor = (DSSI_Descriptor *)x->desc_func(0);
@@ -2289,6 +2323,7 @@ static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
     x->time_ref = (t_int)clock_getlogicaltime;
     x->blksize = sys_getblksize();
     x->dsp = 0;
+    x->x_canvas = canvas_getcurrent();
  
     pthread_mutex_init(&x->midiEventBufferMutex, NULL);
     return dssi_tilde_load_plugin(x, argc, argv);

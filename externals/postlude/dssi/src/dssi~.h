@@ -40,7 +40,7 @@
 #define DX7_DUMP_SIZE_BULK 	4096+8
 
 
-#define VERSION 0.95
+#define VERSION 0.97
 #define EVENT_BUFSIZE 1024
 #define OSC_BASE_MAX 1024
 #define TYPE_STRING_SIZE 20 /* Max size of event type string (must be two more bytes than needed) */
@@ -122,6 +122,7 @@ typedef struct _dssi_tilde {
   char *dll_arg,  /*arg given by user - either path or dll name*/
        	*plugin_label;
   char	     *dll_path; /*absolute path to plugin */
+  t_canvas *x_canvas; /* pointer to the canvas the object is instantiated on */
   void *dll_handle;
   char *project_dir; /* project dircetory */
   LADSPA_Handle *instanceHandles; /*was handle*/
