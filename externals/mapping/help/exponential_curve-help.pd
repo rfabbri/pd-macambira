@@ -75,7 +75,7 @@
 #X connect 23 0 21 0;
 #X restore 265 348 pd receive from gcanvas;
 #X obj 138 9 receive \$0-x-slider;
-#X obj 54 108 speedlim 100;
+#X obj 54 108 cyclone/speedlim 100;
 #X obj 53 313 exponential_curve;
 #X connect 0 0 15 0;
 #X connect 1 0 3 0;
