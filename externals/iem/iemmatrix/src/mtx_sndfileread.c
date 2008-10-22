@@ -98,12 +98,12 @@
 //          };
 //
 
-static t_class *mtx_sndfile_class;
+static t_class *mtx_sndfileread_class;
 
-typedef struct mtx_sndfile
+typedef struct mtx_sndfileread
 {
   t_object x_ob;
-  SNDFILE *x_sndfile;
+  SNDFILE *x_sndfileread;
   SF_INFO x_sfinfo;
   t_outlet *x_message_outlet;
   t_outlet *x_readybang_outlet;
@@ -112,14 +112,14 @@ typedef struct mtx_sndfile
   t_atom *x_outlist;
   int num_chan;
   int num_frames;
-} t_mtx_sndfile;
+} t_mtx_sndfileread;
 
 
-static void mtx_sndfile_close (t_mtx_sndfile *x)
+static void mtx_sndfileread_close (t_mtx_sndfileread *x)
 {
-  if(x->x_sndfile)
-    sf_close (x->x_sndfile);
-  x->x_sndfile=0;
+  if(x->x_sndfileread)
+    sf_close (x->x_sndfileread);
+  x->x_sndfileread=0;
 
   if(x->x_outlist)
     freebytes(x->x_outlist, sizeof(t_atom)*(2+x->num_chan*x->num_frames));
@@ -130,13 +130,13 @@ static void mtx_sndfile_close (t_mtx_sndfile *x)
   x->x_float=0;
 }
 
-static void mtx_sndfile_open (t_mtx_sndfile *x, t_symbol *s, t_symbol*type)
+static void mtx_sndfileread_open (t_mtx_sndfileread *x, t_symbol *s, t_symbol*type)
 {
   char filenamebuf[MAXPDSTRING], *filenamebufptr;
   char*dirname=canvas_getdir(x->x_canvas)->s_name;
   int fd;
 
-  mtx_sndfile_close(x);
+  mtx_sndfileread_close(x);
 
   /* directory, filename, extension, dirresult, nameresult, unsigned int size, int bin */
   if ((fd=open_via_path(dirname,
@@ -144,20 +144,20 @@ static void mtx_sndfile_open (t_mtx_sndfile *x, t_symbol *s, t_symbol*type)
     pd_error(x, "%s: failed to open %s", s->s_name, filenamebuf);
     return;
   }
-  if (!(x->x_sndfile = sf_open_fd (fd, SFM_READ, &x->x_sfinfo, 1))) {
+  if (!(x->x_sndfileread = sf_open_fd (fd, SFM_READ, &x->x_sfinfo, 1))) {
     pd_error(x, "%s: failed to open %s", s->s_name, filenamebuf);
-    mtx_sndfile_close(x);
+    mtx_sndfileread_close(x);
     return;
   }
   x->num_chan = x->x_sfinfo.channels;
 }
 
-static void mtx_sndfile_frame (t_mtx_sndfile *x)
+static void mtx_sndfileread_frame (t_mtx_sndfileread *x)
 {
   int n;
   t_atom *ptr;
   
-  if ((!x->x_sndfile)||(x->num_chan<=0)) {
+  if ((!x->x_sndfileread)||(x->num_chan<=0)) {
      pd_error(x, "no or damaged file opened for reading");
      return;
   }
@@ -176,8 +176,8 @@ static void mtx_sndfile_frame (t_mtx_sndfile *x)
      x->num_frames=1;
   }
   
-  if (sf_readf_float(x->x_sndfile, x->x_float, (sf_count_t)1)<1) {
-     mtx_sndfile_close(x);
+  if (sf_readf_float(x->x_sndfileread, x->x_float, (sf_count_t)1)<1) {
+     mtx_sndfileread_close(x);
      outlet_bang(x->x_readybang_outlet);
   }
   else {
@@ -192,14 +192,14 @@ static void mtx_sndfile_frame (t_mtx_sndfile *x)
 
 }
 
-static void mtx_sndfile_frames (t_mtx_sndfile *x, t_float f)
+static void mtx_sndfileread_frames (t_mtx_sndfileread *x, t_float f)
 {
   int n,n2,c;
   sf_count_t frames_read;
   int num_frames=(int)f;
   t_atom *ptr;
  
-  if ((!x->x_sndfile)||(x->num_chan<=0)) {
+  if ((!x->x_sndfileread)||(x->num_chan<=0)) {
      pd_error(x, "no or damaged file opened for reading");
      return;
   }
@@ -218,10 +218,10 @@ static void mtx_sndfile_frames (t_mtx_sndfile *x, t_float f)
      x->num_frames=num_frames;
   }
 
-  if ((frames_read=sf_readf_float(x->x_sndfile, 
+  if ((frames_read=sf_readf_float(x->x_sndfileread, 
 	      x->x_float,
 	      (sf_count_t)num_frames))<1) {
-     mtx_sndfile_close(x);
+     mtx_sndfileread_close(x);
      outlet_bang(x->x_readybang_outlet);
   }
   else {
@@ -235,40 +235,40 @@ static void mtx_sndfile_frames (t_mtx_sndfile *x, t_float f)
      }
      outlet_anything(x->x_message_outlet,gensym("matrix"),frames_read*x->num_chan+2,x->x_outlist);
      if (frames_read<num_frames) {
-	mtx_sndfile_close(x);
+	mtx_sndfileread_close(x);
 	outlet_bang(x->x_readybang_outlet);
      }
   }
 
 }
 
-static void mtx_sndfile_free (t_mtx_sndfile *x)
+static void mtx_sndfileread_free (t_mtx_sndfileread *x)
 {
-  mtx_sndfile_close(x);
+  mtx_sndfileread_close(x);
   outlet_free (x->x_message_outlet);
   outlet_free (x->x_readybang_outlet);
 }
 
-static void *mtx_sndfile_new(void)
+static void *mtx_sndfileread_new(void)
 {
-  t_mtx_sndfile *x = (t_mtx_sndfile *)pd_new(mtx_sndfile_class);
+  t_mtx_sndfileread *x = (t_mtx_sndfileread *)pd_new(mtx_sndfileread_class);
   x->x_message_outlet = outlet_new(&x->x_ob, &s_list);
   x->x_readybang_outlet = outlet_new(&x->x_ob, &s_bang);
-  x->x_sndfile=0;
+  x->x_sndfileread=0;
   x->num_chan=0;
   x->num_frames=0;
   x->x_canvas = canvas_getcurrent();
   return (void *)x;
 }
 
-void mtx_sndfile_setup(void)
+void mtx_sndfileread_setup(void)
 {
-  mtx_sndfile_class = class_new(gensym("mtx_sndfile"), (t_newmethod)mtx_sndfile_new, 
-                                (t_method) mtx_sndfile_free, sizeof(t_mtx_sndfile), 0, 0);
-  class_addmethod(mtx_sndfile_class, (t_method)mtx_sndfile_open, gensym("open"), A_SYMBOL, A_DEFSYM, 0);
-  class_addmethod(mtx_sndfile_class, (t_method)mtx_sndfile_close, gensym("close"), A_NULL, 0);
-  class_addbang(mtx_sndfile_class, (t_method)mtx_sndfile_frame);
-  class_addfloat(mtx_sndfile_class, (t_method)mtx_sndfile_frames);
+  mtx_sndfileread_class = class_new(gensym("mtx_sndfileread"), (t_newmethod)mtx_sndfileread_new, 
+                                (t_method) mtx_sndfileread_free, sizeof(t_mtx_sndfileread), 0, 0);
+  class_addmethod(mtx_sndfileread_class, (t_method)mtx_sndfileread_open, gensym("open"), A_SYMBOL, A_DEFSYM, 0);
+  class_addmethod(mtx_sndfileread_class, (t_method)mtx_sndfileread_close, gensym("close"), A_NULL, 0);
+  class_addbang(mtx_sndfileread_class, (t_method)mtx_sndfileread_frame);
+  class_addfloat(mtx_sndfileread_class, (t_method)mtx_sndfileread_frames);
 
 }
 
