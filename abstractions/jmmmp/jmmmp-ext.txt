@@ -45,4 +45,5 @@ Non-working or discarded abstractions:
 
 aufnahme~ - Multichannel audio saver (1 to 8 channels)
 bcf2000 - Store and recall presets for Behringer BCF2000
+-dsp01 - replaced by dsp01
 datei-l - replaced with datei-o
