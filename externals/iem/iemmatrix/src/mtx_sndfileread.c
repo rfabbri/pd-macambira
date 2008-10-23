@@ -1,6 +1,7 @@
-#include <stdio.h>
-#include <sndfile.h>
-#include "m_pd.h"
+#ifdef HAVE_SNDFILE_H
+# include <sndfile.h>
+#endif
+#include "iemmatrix.h"
 
 #ifdef __WIN32__
 # include <io.h>
@@ -103,8 +104,10 @@ static t_class *mtx_sndfileread_class;
 typedef struct mtx_sndfileread
 {
   t_object x_ob;
+#ifdef HAVE_SNDFILE_H
   SNDFILE *x_sndfileread;
   SF_INFO x_sfinfo;
+#endif
   t_outlet *x_message_outlet;
   t_outlet *x_readybang_outlet;
   t_canvas *x_canvas;
@@ -117,9 +120,11 @@ typedef struct mtx_sndfileread
 
 static void mtx_sndfileread_close (t_mtx_sndfileread *x)
 {
+#ifdef HAVE_SNDFILE_H
   if(x->x_sndfileread)
     sf_close (x->x_sndfileread);
   x->x_sndfileread=0;
+#endif
 
   if(x->x_outlist)
     freebytes(x->x_outlist, sizeof(t_atom)*(2+x->num_chan*x->num_frames));
@@ -132,6 +137,7 @@ static void mtx_sndfileread_close (t_mtx_sndfileread *x)
 
 static void mtx_sndfileread_open (t_mtx_sndfileread *x, t_symbol *s, t_symbol*type)
 {
+#ifdef HAVE_SNDFILE_H
   char filenamebuf[MAXPDSTRING], *filenamebufptr;
   char*dirname=canvas_getdir(x->x_canvas)->s_name;
   int fd;
@@ -150,10 +156,14 @@ static void mtx_sndfileread_open (t_mtx_sndfileread *x, t_symbol *s, t_symbol*ty
     return;
   }
   x->num_chan = x->x_sfinfo.channels;
+#else
+  pd_error(x,"mtx_sndfileread: compiled without libsndfile: no file opened!");
+#endif
 }
 
 static void mtx_sndfileread_frame (t_mtx_sndfileread *x)
 {
+#ifdef HAVE_SNDFILE_H
   int n;
   t_atom *ptr;
   
@@ -189,11 +199,15 @@ static void mtx_sndfileread_frame (t_mtx_sndfileread *x)
      }
      outlet_anything(x->x_message_outlet,gensym("matrix"),x->num_chan+2,x->x_outlist);
   }
+#else
+  pd_error(x,"mtx_sndfileread: compiled without libsndfile: no file opened for reading!");
+#endif
 
 }
 
 static void mtx_sndfileread_frames (t_mtx_sndfileread *x, t_float f)
 {
+#ifdef HAVE_SNDFILE_H
   int n,n2,c;
   sf_count_t frames_read;
   int num_frames=(int)f;
@@ -239,7 +253,9 @@ static void mtx_sndfileread_frames (t_mtx_sndfileread *x, t_float f)
 	outlet_bang(x->x_readybang_outlet);
      }
   }
-
+#else
+  pd_error(x,"mtx_sndfileread: compiled without libsndfile: no file opened!");
+#endif
 }
 
 static void mtx_sndfileread_free (t_mtx_sndfileread *x)
@@ -254,7 +270,11 @@ static void *mtx_sndfileread_new(void)
   t_mtx_sndfileread *x = (t_mtx_sndfileread *)pd_new(mtx_sndfileread_class);
   x->x_message_outlet = outlet_new(&x->x_ob, &s_list);
   x->x_readybang_outlet = outlet_new(&x->x_ob, &s_bang);
+#ifdef HAVE_SNDFILE_H
   x->x_sndfileread=0;
+#else
+  pd_error(x,"mtx_sndfileread won't work: compiled without libsndfile!");
+#endif
   x->num_chan=0;
   x->num_frames=0;
   x->x_canvas = canvas_getcurrent();
@@ -269,6 +289,13 @@ void mtx_sndfileread_setup(void)
   class_addmethod(mtx_sndfileread_class, (t_method)mtx_sndfileread_close, gensym("close"), A_NULL, 0);
   class_addbang(mtx_sndfileread_class, (t_method)mtx_sndfileread_frame);
   class_addfloat(mtx_sndfileread_class, (t_method)mtx_sndfileread_frames);
+#ifndef HAVE_SNDFILE_H
+  post("mtx_sndfileread won't work: compiled without libsndfile!");
+#endif
+}
 
+void iemtx_sndfileread_setup (void)
+{
+   mtx_sndfileread_setup();
 }
 

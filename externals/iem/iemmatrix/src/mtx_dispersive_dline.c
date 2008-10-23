@@ -39,7 +39,7 @@ outlet: C rows and L colums matrix with current state of the dispersive delay
 
 */
 
-#include "m_pd.h"
+#include "iemmatrix.h"
 
 static t_class *mtx_dispersive_dline_class;
 
@@ -239,4 +239,9 @@ void mtx_dispersive_dline_setup(void)
 	gensym("lambda"), A_DEFFLOAT,0); 
  
   class_addmethod(mtx_dispersive_dline_class, (t_method)mtx_dispersive_dline_helper, gensym("help"), 0);
+}
+
+void iemtx_dispersive_dline_setup(void)
+{
+    mtx_dispersive_dline_setup();
 }
