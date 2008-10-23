@@ -17,7 +17,7 @@ void *newMtxPackTilde (t_floatarg f)
    int num_chan=1;
    mtx_pack_tilde *x = (mtx_pack_tilde*) pd_new(mtx_pack_tilde_class);
    num_chan=(int)f;
-   if ((num_chan<0) || (num_chan>MTX_PACK_MAXCHANNELS)) {
+   if ((num_chan<1) || (num_chan>MTX_PACK_MAXCHANNELS)) {
       num_chan=1;
    }
    x->num_chan=num_chan;
