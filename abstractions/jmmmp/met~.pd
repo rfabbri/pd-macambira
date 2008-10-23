@@ -24,7 +24,7 @@
 #X obj 101 112 init 1;
 #X obj 34 113 vu 10 120 empty empty -1 -8 0 8 -1 -262144 0 0;
 #X msg 96 190 color \$1;
-#X text 12 417 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 417 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
@@ -50,7 +50,7 @@ copyright notice \, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
-#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 435 pd license;
 #X text 11 8 [met~] - Level meter with amplitude control;
 #X text 260 45 Inlets;

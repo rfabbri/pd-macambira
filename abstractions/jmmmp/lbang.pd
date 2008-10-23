@@ -5,7 +5,7 @@
 #X obj 70 120 outlet;
 #X text 216 51 Inlets;
 #X text 216 101 Outlets;
-#X text 12 171 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 171 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
@@ -31,7 +31,7 @@ copyright notice \, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
-#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 189 pd license;
 #X text 12 10 [lbang] - loadbang which can be triggered more often
 ;

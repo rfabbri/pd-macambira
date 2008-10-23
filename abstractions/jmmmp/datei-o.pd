@@ -5,13 +5,12 @@
 #X obj 31 61 hradio 15 1 0 4 empty empty empty 0 6 0 8 -262144 -1 -1
 0;
 #X obj 31 81 bang;
-#X obj 31 61 cnv 15 60 15 empty aa Datei_L 6 7 0 8 -233017 -66577 0
-;
+#X obj 31 61 cnv 15 60 15 empty aa Datei_O 6 8 0 11 -233017 -66577
+0;
 #X obj 61 81 inlet;
 #X obj 61 101 route bang;
 #X obj 116 121 symbol;
-#X text 13 6 [datei-l] - Sends the message "open ../../";
-#X text 12 210 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 210 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
@@ -37,7 +36,7 @@ copyright notice \, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
-#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 228 pd license;
 #X text 210 50 Inlets;
 #X text 210 100 Outlets;
@@ -45,6 +44,7 @@ in the documentation and/or other materials provided with the distribution.
 #X text 210 170 - Click on it;
 #X text 210 70 - Bang / File name;
 #X text 210 120 - Message;
+#X text 13 6 [datei-o] - Sends the message "open ../../";
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 3 0 4 0;

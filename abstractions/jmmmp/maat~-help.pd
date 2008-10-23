@@ -1,10 +1,9 @@
-#N canvas 277 106 415 427 10;
+#N canvas 277 106 415 410 10;
 #X text 81 196 <- 0dB;
-#X text 12 357 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
-;
+#X text 12 357 (C) 2006 João Pais - jmmmpais@googlemail.com;
 #X text 12 377 Released under the BSD License;
-#X text 230 85 Inlets;
-#X text 230 195 Outlets;
+#X text 230 105 Inlets;
+#X text 230 215 Outlets;
 #N canvas 0 0 396 219 signal 0;
 #X obj 47 75 random 7;
 #X obj 47 54 metrum 400 1;
@@ -29,14 +28,14 @@
 #X connect 10 0 2 0;
 #X restore 16 105 pd signal;
 #X obj 16 316 outlet~;
-#X floatatom 63 316 5 0 0 0 - - -;
+#X floatatom 73 316 5 0 0 0 - - -;
 #X obj 40 133 bng 13 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X text 58 130 <- Mute / Unmute;
-#X text 100 316 Signal level;
-#X text 230 255 - Signal level (0-1);
-#X text 230 165 - Level (0-127);
-#X text 230 145 - Mute / Unmute (bang);
+#X text 110 316 Signal level;
+#X text 230 275 - Signal level (0-1);
+#X text 230 185 - Level (0-127);
+#X text 230 165 - Mute / Unmute (bang);
 #X msg 61 153 0;
 #X msg 89 153 127;
 #X text 118 153 Control level;
@@ -44,10 +43,10 @@
 #X text 11 8 [mat~] - Level meter with amplitude control \, stereo
 ;
 #X obj 35 336 outlet~;
-#X text 230 105 - Left signal;
-#X text 230 125 - Right signal;
-#X text 230 215 - Amplified left signal;
-#X text 230 235 - Amplified right signal;
+#X text 230 125 - Left signal;
+#X text 230 145 - Right signal;
+#X text 230 235 - Amplified left signal;
+#X text 230 255 - Amplified right signal;
 #X text 11 38 Controls the amplitude of a stereo signal with values
 between 0 and 127 Lighter as met~.;
 #X obj 16 85 dsp01;

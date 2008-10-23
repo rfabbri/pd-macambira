@@ -1378,7 +1378,7 @@ max \, linlog \, init \, log_height \, set;
 a GUI obejct \, the parameters can't be automatically actualised to
 the chosen object. This behaviour might be a bit strange at first to
 cope with.;
-#X text 16 784 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 16 784 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
@@ -1487,7 +1487,7 @@ in the documentation and/or other materials provided with the distribution.
 9 0 10 -233017 -1 -1 0 256;
 #X obj 290 428 nbx 4 13 0 255 0 0 \$0-blue-n \$0-blue-n-i empty -53
 9 0 10 -233017 -1 -1 0 256;
-#X obj 20 -1 cnv 15 142 25 empty empty Gui-Editor 6 13 0 16 -195568
+#X obj 20 -1 cnv 15 142 25 empty empty Gui-Editor 9 13 0 20 -195568
 -1 0;
 #X obj 179 317 hradio 14 1 0 3 \$0-back-lab empty Backgd/Front/Label
 47 7 0 8 -233017 -1 -1 0;
@@ -1588,7 +1588,7 @@ Non-zero_value -102 7 0 8 -233017 -1 -1 0 256;
 0;
 #X obj 217 0 hradio 17 1 0 6 \$0-instr-vis-1 empty empty 0 -6 0 8 -262144
 -1 -1 2;
-#X obj 218 1 cnv 15 100 15 empty empty Instructions 2 8 0 10 -233017
+#X obj 218 1 cnv 15 100 15 empty empty Instructions 8 8 0 11 -233017
 -1 0;
 #X connect 41 0 63 0;
 #X connect 64 0 41 0;

@@ -11,7 +11,7 @@
 #X obj 88 151 spigot;
 #X obj 88 171 print oscD;
 #X obj 12 151 f+ 1;
-#X text 12 251 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 251 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
@@ -37,7 +37,7 @@ copyright notice \, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
-#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 269 pd license;
 #X text 196 110 Outlets;
 #X text 196 40 Arguments;

@@ -1,4 +1,4 @@
-#N canvas 393 81 437 333 10;
+#N canvas 393 81 445 341 10;
 #X obj 19 135 outlet;
 #X obj 19 54 ctlin \$1;
 #X obj 99 54 inlet midi-sim;
@@ -14,7 +14,7 @@
 #X text 236 170 - Controller simulation;
 #X text 236 220 - Scaled float;
 #X text 236 100 - Upper range;
-#X text 12 271 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 271 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
@@ -40,13 +40,14 @@ copyright notice \, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
-#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 289 pd license;
 #X obj 19 115 expr_scale 0 127 \$2 \$3;
-#X obj 109 135 outlet;
-#X obj 100 165 ctlout \$4;
+#X obj 109 165 outlet;
+#X obj 100 195 ctlout \$4;
 #X text 236 240 - Direct MIDI input;
 #X text 236 120 - MIDI feedback;
+#X obj 133 145 i;
 #X connect 1 0 4 0;
 #X connect 1 0 16 0;
 #X connect 1 0 17 0;
@@ -56,6 +57,8 @@ in the documentation and/or other materials provided with the distribution.
 #X connect 2 0 17 0;
 #X connect 2 0 18 0;
 #X connect 3 0 16 0;
+#X connect 3 0 21 0;
 #X connect 4 0 3 0;
 #X connect 16 0 0 0;
+#X connect 21 0 17 0;
 #X coords 0 -1 1 1 59 26 1 131 89;

@@ -1,9 +1,9 @@
-#N canvas 72 189 348 301 10;
-#X obj 90 102 tgl 13 0 empty empty empty 0 -6 0 8 -233017 -1 -1 1 1
+#N canvas 72 189 352 305 10;
+#X obj 90 102 tgl 13 0 empty empty empty 0 -6 0 8 -233017 -1 -1 0 1
 ;
 #X obj 90 142 outlet;
 #X obj 106 102 nbx 4 13 1 1e+037 0 0 empty empty empty 0 -6 0 10 -233017
--1 -1 690 256;
+-1 -1 1 256;
 #X obj 90 122 metro;
 #X obj 86 40 loadbang;
 #X obj 111 80 \$1;
@@ -12,7 +12,7 @@
 #X obj 126 60 inlet;
 #X obj 46 60 inlet;
 #X obj 140 142 outlet;
-#X text 12 247 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 247 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
@@ -38,7 +38,7 @@ copyright notice \, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
-#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 265 pd license;
 #X text 206 100 Inlets;
 #X text 206 120 - On / Off;
@@ -49,7 +49,7 @@ in the documentation and/or other materials provided with the distribution.
 #X text 206 210 - Velocity (ms);
 #X text 206 30 Arguments;
 #X text 206 50 - Velocity (ms);
-#X text 206 70 - Initial state;
+#X text 206 70 - Initial state (0/1);
 #X connect 0 0 3 0;
 #X connect 2 0 3 1;
 #X connect 2 0 10 0;

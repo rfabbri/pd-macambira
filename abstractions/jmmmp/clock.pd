@@ -66,7 +66,7 @@
 #X obj 73 110 bng 10 250 50 0 empty empty empty 0 -6 0 8 -195568 -1
 -1;
 #X msg 73 80 set \$1;
-#X text 12 267 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 267 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #X obj 73 124 t b 0 b;
 #X text 12 4 [clock] - Chronometer with display in seconds;
@@ -94,7 +94,7 @@ copyright notice \, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
-#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 285 pd license;
 #X text 270 50 Inlets;
 #X text 270 70 - On / Off;

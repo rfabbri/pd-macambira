@@ -1,5 +1,5 @@
 #N canvas 125 122 364 221 10;
-#X text 12 157 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 157 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #X text 12 177 Released under the BSD License;
 #X text 12 40 [mk] shows the controller number and MIDI value.;

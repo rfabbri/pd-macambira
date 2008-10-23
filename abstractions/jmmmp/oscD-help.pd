@@ -1,5 +1,5 @@
 #N canvas 114 117 407 303 10;
-#X text 12 247 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 247 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #X text 12 267 Released under the BSD License;
 #X text 12 10 [oscD] - Counts received OSC messages;

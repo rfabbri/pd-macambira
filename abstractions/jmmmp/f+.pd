@@ -6,7 +6,7 @@
 #X obj 15 182 f \$1;
 #X obj 45 182 +;
 #X obj 98 122 expr if($f1 == 0 \, 1 \, $f1);
-#X text 12 247 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 247 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
@@ -32,7 +32,7 @@ copyright notice \, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
-#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X text 8 7 Copyright 2006 \, Joã Pais;
 #X restore 15 265 pd license;
 #X text 11 10 [f+] - Counter with variable increment;
 #X text 279 38 Arguments;

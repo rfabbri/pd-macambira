@@ -4,7 +4,7 @@
 -233017 -1 -1 0 256;
 #X obj 59 71 nbx 3 15 -1e+037 1e+037 0 0 empty empty empty 0 -6 0 10
 -233017 -1 -1 0 256;
-#X text 12 111 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 111 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
@@ -30,7 +30,7 @@ copyright notice \, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
-#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 129 pd license;
 #X text 12 10 [mk] - Fast control of MIDI inputs;
 #X text 146 40 GUI;

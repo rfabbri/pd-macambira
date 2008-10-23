@@ -1,16 +1,16 @@
-#N canvas 332 246 352 284 10;
+#N canvas 332 246 352 263 10;
 #X obj 31 121 openpanel;
 #X obj 31 161 outlet;
 #X obj 31 61 hradio 15 1 0 4 empty empty empty 0 6 0 8 -262144 -1 -1
 0;
 #X obj 31 81 bang;
-#X obj 31 61 cnv 15 60 15 empty empty Datei_R 2 9 0 10 -233017 -1 0
+#X obj 31 61 cnv 15 60 15 empty empty Datei_R 6 8 0 11 -233017 -1 0
 ;
 #X obj 61 81 inlet;
 #X obj 61 101 route bang;
 #X obj 116 121 symbol;
 #X msg 31 141 read \$1;
-#X text 12 210 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 210 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
@@ -36,7 +36,7 @@ copyright notice \, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
-#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 228 pd license;
 #X text 210 50 Inlets;
 #X text 210 100 Outlets;

@@ -28,7 +28,7 @@
 #X text 401 163 without "send" prefix;
 #X text 391 183 - On / Off;
 #X text 12 10 [oscS] - Interface for sendOSC;
-#X text 12 291 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 291 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
@@ -54,7 +54,7 @@ copyright notice \, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
-#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 309 pd license;
 #X connect 0 0 3 0;
 #X connect 0 0 4 0;

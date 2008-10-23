@@ -5,7 +5,7 @@
 #X msg 92 99 0;
 #X msg 102 119 100;
 #X text 12 10 [clock] - Chronometer with display in seconds;
-#X text 12 247 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+#X text 12 247 (C) 2006 João Pais - jmmmpais@googlemail.com
 ;
 #X text 12 267 Released under the BSD License;
 #X text 260 50 Inlets;

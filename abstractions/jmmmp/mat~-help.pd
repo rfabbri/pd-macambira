@@ -1,7 +1,6 @@
-#N canvas 277 106 407 419 10;
+#N canvas 277 106 387 410 10;
 #X text 51 196 <- 0dB;
-#X text 12 357 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
-;
+#X text 12 357 (C) 2006 João Pais - jmmmpais@googlemail.com;
 #X text 12 377 Released under the BSD License;
 #X text 230 85 Inlets;
 #X text 230 175 Outlets;
