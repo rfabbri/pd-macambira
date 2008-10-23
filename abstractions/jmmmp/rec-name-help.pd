@@ -1,0 +1,79 @@
+#N canvas 0 0 777 523 10;
+#X obj 36 199 rec-name;
+#X text 410 230 Inlets;
+#X text 410 300 Outlets;
+#X text 410 370 GUI;
+#X text 410 250 - Bang / Toggle (Recording);
+#X text 410 320 - message to writesf~;
+#X text 410 340 - message to readsf~;
+#X text 410 390 - Click on the either toggle to start/stop recording
+or playback;
+#X obj 36 155 bng 13 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 52 155 tgl 13 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 119 175 bng 13 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 135 175 tgl 13 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 36 229 print REC;
+#X obj 119 249 print PLAY;
+#X obj 36 366 writesf~ 2;
+#X obj 119 366 readsf~ 2;
+#X obj 119 386 dac~;
+#N canvas 0 0 430 450 license 0;
+#X text 8 47 All rights reserved.;
+#X text 8 227 The names of its contributors may not be used to endorse
+or promote products derived from this software without specific prior
+written permission.;
+#X text 8 87 Redistribution and use in source and binary forms \, with
+or without modification \, are permitted provided that the following
+conditions are met:;
+#X text 8 127 Redistributions of source code must retain the above
+copyright notice \, this list of conditions and the following disclaimer.
+;
+#X text 8 297 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES \, INCLUDING
+\, BUT NOT LIMITED TO \, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT \, INDIRECT
+\, INCIDENTAL \, SPECIAL \, EXEMPLARY \, OR CONSEQUENTIAL DAMAGES (INCLUDING
+\, BUT NOT LIMITED TO \, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES
+;
+#X text 8 167 Redistributions in binary form must reproduce the above
+copyright notice \, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the distribution.
+;
+#X text 8 27 jmmmpais@googlemail.com;
+#X text 8 7 Copyright 2007 \, João Pais;
+#X restore 15 485 pd license;
+#X obj 36 336 rec-name;
+#X text 16 437 NOTE: needs [time] \, [date] and [makesymbol] from Zexy
+;
+#X text 13 6 [rec-name] - Automatic naming for a record/playback engine.
+;
+#X text 12 467 (C) 2007 João Pais - jmmmpais@googlemail.com;
+#X text 70 152 Bang or Toggle: creates a file and starts recording
+;
+#X text 153 173 Bang or Toggle: playback the file that was just recorded
+;
+#X text 13 36 [rec-name] automatically creates the string *DATE*_*TIME*.wav.
+This string can be connected with the writesf~ and readsf~ objects.
+;
+#X text 37 296 One example of a complete recording / playback circuit.
+(only the audio inputs are missing);
+#X text 410 270 - Bang / Toggle (Playback) / Sample playback index
+;
+#X text 13 76 This abstraction can be quite useful when making several
+recordings (or takes) one after the other. The files are named automatically
+\, avoiding the constant inputting of a filename.;
+#X connect 0 0 12 0;
+#X connect 0 1 13 0;
+#X connect 8 0 0 0;
+#X connect 9 0 0 0;
+#X connect 10 0 0 1;
+#X connect 11 0 0 1;
+#X connect 15 0 16 0;
+#X connect 15 1 16 1;
+#X connect 18 0 14 0;
+#X connect 18 1 15 0;
