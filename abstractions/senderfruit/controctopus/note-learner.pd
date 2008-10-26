@@ -1,10 +1,11 @@
-#N canvas 339 313 1051 667 10;
+#N canvas 377 506 1051 667 10;
+#X declare -lib nsend -lib list-abs -lib creb;
 #X obj 358 266 select;
 #X obj 385 327 f;
 #X obj 358 389 pack;
 #X obj 358 297 t b b;
 #X obj 102 293 nbx 2 14 1 128 0 0 \$0-padNumber \$0-padNumberR Pad
-32 7 0 11 -154432 -1 -1 1 256;
+32 7 0 11 -154432 -1 -1 65 256;
 #X obj 102 276 nbx 2 14 0 127 0 0 \$0-noteNumber \$0-noteNumberLearn
 Note 32 7 0 11 -260624 -1 -1 0 256;
 #X obj 442 406 outlet;
@@ -21,7 +22,7 @@ Note 32 7 0 11 -260624 -1 -1 0 256;
 #X obj 358 229 spigot;
 #X obj 152 263 nbx 2 13 1 64 0 0 \$0devNo \$1/devNo empty 0 -6 0 10
 -110565 -1 -1 1 256;
-#X msg 733 461 1;
+#X msg 733 461 65;
 #X obj 733 493 pack;
 #X msg 792 444 set \$1;
 #X obj 801 336 r \$0-noteNumber;
@@ -175,6 +176,8 @@ Note 32 7 0 11 -260624 -1 -1 0 256;
 #X obj 43 316 sssadie/sssad-lg \$1 \$2/channel;
 #X floatatom 352 192 5 0 0 0 - - -;
 #X obj 1002 524 print;
+#X text 762 34 creb for [count] \, TODO remove;
+#X obj 736 16 import nsend list-abs creb;
 #X connect 0 0 3 0;
 #X connect 1 0 2 1;
 #X connect 1 0 58 0;
