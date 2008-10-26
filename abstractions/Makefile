@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch memento-p senderfruit pd-wavelet 
+LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch memento-p sfruit pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -76,15 +76,30 @@ template_install:
 CONTROCTOPUS_NAME = controctopus
 controctopus_install:
 	install -d $(objectsdir)/$(CONTROCTOPUS_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/senderfruit/controctopus/*.pd | \
+	install -p $(shell ls -1 $(abstractions_src)/sfruit/controctopus/*.pd | \
 		grep -v '\-help.pd')  $(objectsdir)/$(CONTROCTOPUS_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(CONTROCTOPUS_NAME) \
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
-		--description "objects for learning and mapping midi and OSC controllers to pdpatches with scaling and parameter discovery - requires Semento"
+		--description "objects for learning and mapping midi and OSC controllers to pdpatches with scaling and parameter discovery - requires memento-p"
 	install -d $(helpdir)/$(CONTROCTOPUS_NAME)
-	install -p $(abstractions_src)/senderfruit/controctopus/*-help.pd \
+	install -p $(abstractions_src)/sfruit/controctopus/*-help.pd \
 		$(helpdir)/$(CONTROCTOPUS_NAME)
+
+#-------------------------------------------------------------------------------
+# ds-abs
+ds-abs_NAME = ds-abs
+ds-abs_install:
+	install -d $(objectsdir)/$(ds-abs_NAME)
+	install -p $(abstractions_src)/sfruit/ds-abs/*.pd $(objectsdir)/$(ds-abs_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(ds-abs_NAME) \
+		--author "Luke Iannini" \
+		--description "" \
+		--license "GNU GPL" \
+		--version "a comprehensive collection of objects for working with data structures" 
+	install -d $(helpdir)/$(ds-abs_NAME)
+	install -p $(abstractions_src)/sfruit/ds-abs/help/*-help.pd \
+		 $(helpdir)/$(ds-abs_NAME)
 
 #-------------------------------------------------------------------------------
 # GYRE
@@ -209,14 +224,14 @@ memento_install:
 MEMENTO-P_NAME = memento-p
 memento-p_install:
 	install -d $(objectsdir)/$(MEMENTO-P_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/senderfruit/memento-p/*.pd | \
+	install -p $(shell ls -1 $(abstractions_src)/sfruit/memento-p/*.pd | \
 		grep -v '\-help.pd')  $(objectsdir)/$(MEMENTO-P_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MEMENTO-P_NAME) \
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
 		--description "an addon for Frank Barknecht's Memento adding local-state saving and support for Controctopus (a controller lib)"
 	install -d $(helpdir)/$(MEMENTO-P_NAME)
-	install -p $(abstractions_src)/senderfruit/memento-p/*-help.pd \
+	install -p $(abstractions_src)/sfruit/memento-p/*-help.pd \
 		$(helpdir)/$(MEMENTO-P_NAME)
 
 #-------------------------------------------------------------------------------
@@ -263,14 +278,14 @@ nqpoly_install4:
 NSEND_NAME = nsend
 nsend_install:
 	install -d $(objectsdir)/$(NSEND_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/senderfruit/nsend/*.pd | \
+	install -p $(shell ls -1 $(abstractions_src)/sfruit/nsend/*.pd | \
 		grep -v '\-help.pd')  $(objectsdir)/$(NSEND_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(NSEND_NAME) \
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
 		--description "multiple-inlet/outlet send and receive"
 	install -d $(helpdir)/$(NSEND_NAME)
-	install -p $(abstractions_src)/senderfruit/nsend/*-help.pd \
+	install -p $(abstractions_src)/sfruit/nsend/*-help.pd \
 		$(helpdir)/$(NSEND_NAME)
 
 #-------------------------------------------------------------------------------
@@ -338,14 +353,14 @@ pddp_install:
 PDSVN_NAME = pdsvn
 pdsvn_install:
 	install -d $(objectsdir)/$(PDSVN_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/senderfruit/pdsvn/*.pd | \
+	install -p $(shell ls -1 $(abstractions_src)/sfruit/pdsvn/*.pd | \
 		grep -v '\-help.pd')  $(objectsdir)/$(PDSVN_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDSVN_NAME) \
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
 		--description "objects for interacting with Subversion from within Pd patches (experimental, but usable)"
 	install -d $(helpdir)/$(PDSVN_NAME)
-	install -p $(abstractions_src)/senderfruit/pdsvn/*-help.pd \
+	install -p $(abstractions_src)/sfruit/pdsvn/*-help.pd \
 		$(helpdir)/$(PDSVN_NAME)
 
 #-------------------------------------------------------------------------------
@@ -483,19 +498,19 @@ puremeasurement_install:
 
 
 #-------------------------------------------------------------------------------
-# senderfruit
-SENDERFRUIT_NAME = senderfruit
-senderfruit_install:
-	install -d $(objectsdir)/$(SENDERFRUIT_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/senderfruit/core/*.pd | \
-		grep -v '\-help.pd')  $(objectsdir)/$(SENDERFRUIT_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(SENDERFRUIT_NAME) \
+# sfruit
+SFRUIT_NAME = sfruit
+sfruit_install:
+	install -d $(objectsdir)/$(SFRUIT_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/sfruit/sfruit/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(SFRUIT_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(SFRUIT_NAME) \
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
 		--description "a large collection of assorted handy utilites"
-	install -d $(helpdir)/$(SENDERFRUIT_NAME)
-	install -p $(abstractions_src)/senderfruit/core/*-help.pd \
-		$(helpdir)/$(SENDERFRUIT_NAME)
+	install -d $(helpdir)/$(SFRUIT_NAME)
+	install -p $(abstractions_src)/sfruit/sfruit/*-help.pd \
+		$(helpdir)/$(SFRUIT_NAME)
 
 #-------------------------------------------------------------------------------
 # TIMESTRETCH
