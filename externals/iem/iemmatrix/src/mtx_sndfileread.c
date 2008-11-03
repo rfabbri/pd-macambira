@@ -1,7 +1,9 @@
+
+#include "iemmatrix.h"
+
 #ifdef HAVE_SNDFILE_H
 # include <sndfile.h>
 #endif
-#include "iemmatrix.h"
 
 #ifdef __WIN32__
 # include <io.h>
@@ -289,9 +291,6 @@ void mtx_sndfileread_setup(void)
   class_addmethod(mtx_sndfileread_class, (t_method)mtx_sndfileread_close, gensym("close"), A_NULL, 0);
   class_addbang(mtx_sndfileread_class, (t_method)mtx_sndfileread_frame);
   class_addfloat(mtx_sndfileread_class, (t_method)mtx_sndfileread_frames);
-#ifndef HAVE_SNDFILE_H
-  post("mtx_sndfileread won't work: compiled without libsndfile!");
-#endif
 }
 
 void iemtx_sndfileread_setup (void)

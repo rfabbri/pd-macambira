@@ -66,8 +66,11 @@ dnl Replace `main' with a function in -lm:
 AC_CHECK_LIB(m, main)
 dnl Replace `main' with a function in -lpthread:
 dnl AC_CHECK_LIB(pthread, main)
-dnl Replace `main' with a function in -lstk:
+dnl Replace `main' with a function in -lfftw3:
 AC_CHECK_LIB(fftw3, fftw_destroy_plan)
+
+dnl for soundfile reading (and writing, if we do that...)
+AC_CHECK_LIB(sndfile, sf_close)
 
 
 if test "x$with_pd" != "x"; then
@@ -96,7 +99,7 @@ AC_CHECK_LIB(pd, nullfn)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(stdlib.h stdio.h string.h math.h time.h sys/time.h fftw3.h)
+AC_CHECK_HEADERS(stdlib.h stdio.h string.h math.h time.h sys/time.h fftw3.h sndfile.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
