@@ -29,6 +29,7 @@ void iemtx_decay_setup(void); /* mtx_decay.c */
 void iemtx_diag_setup(void); /* mtx_diag.c */
 void iemtx_diegg_setup(void); /* mtx_diegg.c */
 void iemtx_diff_setup(void); /* mtx_diff.c */
+void iemtx_dispersive_dline_setup(void); /* mtx_dispersive_dline.c */
 void iemtx_distance2_setup(void); /* mtx_distance2.c */
 void iemtx_egg_setup(void); /* mtx_egg.c */
 void iemtx_element_setup(void); /* mtx_element.c */
@@ -53,12 +54,13 @@ void iemtx_max2_setup(void); /* mtx_max2.c */
 void iemtx_mean_setup(void); /* mtx_mean.c */
 void iemtx_min2_setup(void); /* mtx_min2.c */
 void iemtx_minmax_setup(void); /* mtx_minmax.c */
-void iemtx_mul_setup(void); /* mtx_mul.c */
 void iemtx_mul__setup(void); /* mtx_mul~.c */
+void iemtx_mul_setup(void); /* mtx_mul.c */
 void iemtx_neq_setup(void); /* mtx_neq.c */
 void iemtx_not_setup(void); /* mtx_not.c */
 void iemtx_ones_setup(void); /* mtx_ones.c */
 void iemtx_or_setup(void); /* mtx_or.c */
+void iemtx_pack__setup(void); /* mtx_pack~.c */
 void iemtx_pivot_setup(void); /* mtx_pivot.c */
 void iemtx_pow_setup(void); /* mtx_pow.c */
 void iemtx_powtodb_setup(void); /* mtx_powtodb.c */
@@ -77,11 +79,13 @@ void iemtx_scroll_setup(void); /* mtx_scroll.c */
 void iemtx_sin_setup(void); /* mtx_sin.c */
 void iemtx_size_setup(void); /* mtx_size.c */
 void iemtx_slice_setup(void); /* mtx_slice.c */
+void iemtx_sndfileread_setup(void); /* mtx_sndfileread.c */
 void iemtx_sort_setup(void); /* mtx_sort.c */
 void iemtx_sub_setup(void); /* mtx_sub.c */
 void iemtx_sum_setup(void); /* mtx_sum.c */
 void iemtx_trace_setup(void); /* mtx_trace.c */
 void iemtx_transpose_setup(void); /* mtx_transpose.c */
+void iemtx_unpack__setup(void); /* mtx_unpack~.c */
 void iemtx_zeros_setup(void); /* mtx_zeros.c */
 #endif /* IEMMATRIX_SOURCES_H__ */
 
