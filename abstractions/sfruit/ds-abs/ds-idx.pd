@@ -1,5 +1,5 @@
 #N canvas 692 40 319 298 10;
-#X declare -lib list-abs;
+
 #X obj 64 28 inlet;
 #X obj 166 134 list append \$1;
 #X obj 166 157 prepent traverse;
@@ -16,7 +16,7 @@
 #X obj 91 114 spigot 1;
 #X obj 136 65 loadbang;
 #X text 192 69 until protection;
-#X obj 146 34 import list-abs;
+#X obj 146 34 import-disabled list-abs;
 #X connect 0 0 3 0;
 #X connect 1 0 2 0;
 #X connect 2 0 4 0;
