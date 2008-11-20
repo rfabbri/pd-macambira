@@ -1,8 +1,8 @@
 #N canvas 0 22 622 415 10;
-#X declare -lib list-abs;
-#X declare -lib list-abs;
-#X declare -lib list-abs;
-#X obj 451 20 import list-abs;
+
+
+
+#X obj 451 20 import-disabled list-abs;
 #X obj 47 208 prepent set;
 #X msg 47 124 a b c;
 #X msg 91 124 d e f;

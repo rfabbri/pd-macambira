@@ -1,7 +1,7 @@
 #N canvas 231 105 359 415 10;
-#X declare -lib list-abs;
-#X declare -lib list-abs;
-#X declare -lib list-abs;
+
+
+
 #X obj 76 184 pack f f f;
 #X obj 76 57 t b b b;
 #X obj 185 184 pack f f f;
@@ -22,7 +22,7 @@
 #X obj 185 321 color.rgb2pd24;
 #X obj 185 267 color.hsl2rgb;
 #X obj 76 122 t a a;
-#X obj 192 21 import list-abs;
+#X obj 192 21 import-disabled list-abs;
 #X connect 0 0 13 0;
 #X connect 1 0 6 0;
 #X connect 1 1 7 0;

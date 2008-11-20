@@ -1,5 +1,5 @@
 #N canvas 286 157 803 191 10;
-#X declare -lib iemlib -lib list-abs;
+
 #X obj 1 67 namecanvas \$0self;
 #N canvas 34 277 750 385 constructor 0;
 #X obj 266 103 s \$0totalArgs;
@@ -223,7 +223,7 @@
 #X obj 227 39 initbang;
 #N canvas 122 62 611 204 \$0canvas 1;
 #X restore 30 243 pd \$0canvas;
-#X obj 378 17 import iemlib list-abs;
+#X obj 378 17 import-disabled iemlib list-abs;
 #X obj 30 263 saveclear pd-\$0canvas;
 #X connect 1 0 13 0;
 #X connect 1 1 2 0;

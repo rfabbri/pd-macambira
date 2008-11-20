@@ -1,5 +1,5 @@
 #N canvas 368 88 344 571 10;
-#X declare -lib zexy -lib list-abs -lib mrpeach;
+
 #X obj 207 43 namecanvas \$0self;
 #N canvas 208 132 808 593 constructor 0;
 #X obj 401 113 symbol2list /;
@@ -39,7 +39,7 @@
 #X obj 401 69 sel 0;
 #X obj 401 23 initbang;
 #X msg 319 86 symbol /null;
-#X obj 553 20 import zexy list-abs mrpeach;
+#X obj 553 20 import-disabled zexy list-abs mrpeach;
 #X msg 377 489 obj 30 \$1 routeOSC \$2;
 #X obj 259 433 + 2;
 #X obj 292 433 + 3;

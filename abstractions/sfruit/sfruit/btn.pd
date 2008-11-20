@@ -1,5 +1,5 @@
 #N canvas 361 196 433 465 10;
-#X declare -lib list-abs;
+
 #X text -117 -87 at size 11 letters are 7px wide;
 #X obj -50 348 hradio 15 1 0 4 \$0radio \$0radioR empty 0 -8 0 10 -262144
 -1 -1 0;

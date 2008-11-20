@@ -1,6 +1,6 @@
 #N canvas 871 193 484 396 10;
-#X declare -lib zexy;
-#X declare -lib zexy;
+
+
 #X obj 57 226 list append \$1;
 #X obj 57 251 s \$2;
 #X obj 101 101 bng 15 250 50 0 \$0.storebang-s \$0.storebang-r empty
@@ -17,7 +17,7 @@
 #X obj 189 261 * 4.5;
 #X obj 189 184 list2symbol;
 #X obj 189 211 s2l-explode;
-#X obj 329 170 import zexy;
+#X obj 329 170 import-disabled zexy;
 #X connect 0 0 1 0;
 #X connect 3 0 0 0;
 #X connect 5 0 11 0;

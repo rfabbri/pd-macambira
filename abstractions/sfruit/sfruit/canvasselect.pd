@@ -1,6 +1,6 @@
 #N canvas 0 22 450 300 10;
-#X declare -lib iemguts -lib list-abs;
-#X obj 9 14 import iemguts list-abs;
+
+#X obj 9 14 import-disabled iemguts list-abs;
 #X obj 203 154 list-map;
 #X obj 176 174 list-map;
 #X obj 176 132 t a a;

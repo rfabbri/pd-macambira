@@ -1,5 +1,5 @@
 #N canvas 0 25 331 384 10;
-#X declare -lib list-abs;
+
 #X obj 41 42 inlet;
 #X obj 41 64 s2l-explode;
 #X obj 41 85 list split \$1;
@@ -15,7 +15,7 @@
 #X obj 41 180 t b;
 #X obj 74 181 t b;
 #X obj 41 158 sel \$1;
-#X obj 186 68 import list-abs;
+#X obj 186 68 import-disabled list-abs;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 2 0 11 0;

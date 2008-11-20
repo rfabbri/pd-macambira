@@ -1,5 +1,5 @@
 #N canvas 694 125 471 382 10;
-#X declare -lib zexy -lib list-abs;
+
 #X obj 185 137 symbol2list /;
 #X obj 185 176 list-splat -1;
 #X obj 156 282 list2symbol /;
@@ -26,7 +26,7 @@
 #X obj 185 110 s \$0passthrough;
 #X obj 170 314 r \$0passthrough;
 #X obj 344 82 abs;
-#X obj 303 253 import zexy list-abs;
+#X obj 303 253 import-disabled zexy list-abs;
 #X connect 0 0 1 0;
 #X connect 1 0 3 0;
 #X connect 2 0 17 0;

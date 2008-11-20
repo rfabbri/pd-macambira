@@ -1,5 +1,5 @@
 #N canvas 301 700 450 300 10;
-#X declare -lib iemlib -lib list-abs;
+
 #X obj 79 160 list-idx-many 2 4 6;
 #X obj 79 190 print;
 #X msg 79 114 a b c d e f g;

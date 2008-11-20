@@ -1,5 +1,5 @@
 #N canvas 0 22 630 440 10;
-#X declare -lib list-abs -lib iemlib;
+
 #X obj 33 221 list-idx-list in the town where I was born lived a man
 who sailed to sea;
 #X obj 33 98 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1 1

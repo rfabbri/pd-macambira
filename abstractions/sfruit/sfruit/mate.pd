@@ -1,5 +1,5 @@
 #N canvas 0 22 450 300 10;
-#X declare -lib moonlib -lib ggee;
+
 #X obj 284 110 getdir 1;
 #X obj 284 163 list2symbol /;
 #X obj 284 75 t b b;
@@ -16,7 +16,7 @@
 #X msg 144 137 mate \$1;
 #X obj 101 101 bng 15 250 50 0 \$0edit \$0editR T 4 8 0 12 -139998
 -262144 -262144;
-#X obj 62 50 import moonlib ggee;
+#X obj 62 50 import-disabled moonlib ggee;
 #X connect 0 0 4 0;
 #X connect 0 0 8 0;
 #X connect 1 0 6 0;

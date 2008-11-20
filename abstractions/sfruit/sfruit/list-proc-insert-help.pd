@@ -1,7 +1,7 @@
 #N canvas 246 385 587 311 10;
-#X declare -lib list-abs;
-#X declare -lib list-abs;
-#X declare -lib list-abs;
+
+
+
 #X obj 58 181 list-proc-insert;
 #X msg 58 96 a b c d e f g;
 #X obj 182 181 list-len;
@@ -38,7 +38,7 @@ to the original list.;
 #X restore 310 185 pd how_to_append;
 #X text 7 6 list-proc-insert: call user-defined process on incoming
 list and insert result into original list at position POS.;
-#X obj 416 30 import list-abs;
+#X obj 416 30 import-disabled list-abs;
 #X connect 0 0 5 0;
 #X connect 0 1 2 0;
 #X connect 1 0 0 0;

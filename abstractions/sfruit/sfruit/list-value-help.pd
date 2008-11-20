@@ -1,11 +1,11 @@
 #N canvas 439 39 591 371 10;
-#X declare -lib list-abs;
+
 #X msg 111 152 a b c;
 #X obj 263 156 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X obj 263 199 list-value cheese;
 #X obj 111 200 list-value cheese;
-#X obj 439 23 import list-abs;
+#X obj 439 23 import-disabled list-abs;
 #X obj 263 272 prepent set;
 #X msg 159 152 e f g;
 #X text 17 22 [list-value] - [v]/[value] for lists \, or anything else.

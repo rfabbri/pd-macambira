@@ -1,6 +1,6 @@
 #N canvas 356 354 434 358 10;
-#X declare -lib iemlib;
-#X declare -lib iemguts;
+
+
 #X obj 284 188 loadbang;
 #X msg 284 213 10;
 #X obj 121 14 r \$0.y-size-s;
@@ -13,7 +13,7 @@
 #X obj 150 34 r \$0.x-off-s;
 #X obj 179 54 r \$0.y-off-s;
 #X msg 92 101 donecanvasdialog 1 -1 2 0 -1 1 1 \$1 \$2 \$3 \$4;
-#X obj 325 55 import iemguts;
+#X obj 325 55 import-disabled iemguts;
 #X obj 92 133 sendcanvas 1;
 #X obj 1 41 nbx 3 14 0 1e+37 0 0 \$0.x-size-s \$0.x-size-r x-size 40
 7 0 10 -262144 -1 -1 0 256;
