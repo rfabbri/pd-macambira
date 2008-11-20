@@ -1,13 +1,14 @@
 #N canvas 228 148 514 657 10;
+
 #X obj 141 161 cnv 15 158 78 empty empty \$1\$2->\$3 4 14 0 10 -86277
 -260097 0;
 #X obj 145 188 popup 150 25 #ee0000 No-Destination press 'get' to load
 parameters;
 #X obj 65 126 r \$0popup;
 #X obj 157 216 hradio 10 1 0 8 \$0chRow1 \$0chRow1R empty 0 -8 0 10
--166441 -166441 -166441 2;
+-166441 -166441 -166441 0;
 #X obj 157 226 hradio 10 1 0 8 \$0chRow2 \$0chRow2R empty 0 -8 0 10
--166441 -166441 -166441 5;
+-166441 -166441 -166441 0;
 #X obj 240 219 cnv 15 37 15 empty \$0channelDisp Omni 2 7 0 10 -66577
 -260818 0;
 #N canvas 259 247 434 288 init 0;
@@ -132,22 +133,22 @@ parameters;
 7 -249808 -1 -262144;
 #X obj 31 527 r \$0getParams;
 #N canvas 713 160 242 368 16channelOuts 0;
-#X obj 18 23 rchannel \$0 \$1 \$2 \$3 \$4 1;
-#X obj 18 43 rchannel \$0 \$1 \$2 \$3 \$4 2;
-#X obj 18 63 rchannel \$0 \$1 \$2 \$3 \$4 3;
-#X obj 18 83 rchannel \$0 \$1 \$2 \$3 \$4 4;
-#X obj 18 103 rchannel \$0 \$1 \$2 \$3 \$4 5;
-#X obj 18 123 rchannel \$0 \$1 \$2 \$3 \$4 6;
-#X obj 18 143 rchannel \$0 \$1 \$2 \$3 \$4 7;
-#X obj 18 163 rchannel \$0 \$1 \$2 \$3 \$4 8;
-#X obj 18 183 rchannel \$0 \$1 \$2 \$3 \$4 9;
-#X obj 18 203 rchannel \$0 \$1 \$2 \$3 \$4 10;
-#X obj 18 223 rchannel \$0 \$1 \$2 \$3 \$4 11;
-#X obj 18 263 rchannel \$0 \$1 \$2 \$3 \$4 13;
-#X obj 18 283 rchannel \$0 \$1 \$2 \$3 \$4 14;
-#X obj 18 303 rchannel \$0 \$1 \$2 \$3 \$4 15;
-#X obj 18 323 rchannel \$0 \$1 \$2 \$3 \$4 16;
-#X obj 18 243 rchannel \$0 \$1 \$2 \$3 \$4 12;
+#X obj 18 23 rchannel \$0 \$1 \$2 \$3 1;
+#X obj 18 43 rchannel \$0 \$1 \$2 \$3 2;
+#X obj 18 63 rchannel \$0 \$1 \$2 \$3 3;
+#X obj 18 83 rchannel \$0 \$1 \$2 \$3 4;
+#X obj 18 103 rchannel \$0 \$1 \$2 \$3 5;
+#X obj 18 123 rchannel \$0 \$1 \$2 \$3 6;
+#X obj 18 143 rchannel \$0 \$1 \$2 \$3 7;
+#X obj 18 163 rchannel \$0 \$1 \$2 \$3 8;
+#X obj 18 183 rchannel \$0 \$1 \$2 \$3 9;
+#X obj 18 203 rchannel \$0 \$1 \$2 \$3 10;
+#X obj 18 223 rchannel \$0 \$1 \$2 \$3 11;
+#X obj 18 263 rchannel \$0 \$1 \$2 \$3 13;
+#X obj 18 283 rchannel \$0 \$1 \$2 \$3 14;
+#X obj 18 303 rchannel \$0 \$1 \$2 \$3 15;
+#X obj 18 323 rchannel \$0 \$1 \$2 \$3 16;
+#X obj 18 243 rchannel \$0 \$1 \$2 \$3 12;
 #X restore 31 293 pd 16channelOuts;
 #X obj 241 64 r \$1/clearParams;
 #X obj 145 220 hradio 12 1 0 1 \$0chRow0 \$0chRow0R empty 0 -8 0 10
@@ -268,6 +269,7 @@ parameters;
 #X connect 7 0 6 1;
 #X restore 134 293 pd omniOut;
 #X obj 65 152 popup-fix;
+#X text 159 328 [midi-tentacle /controller /control /system-name];
 #X connect 1 0 31 1;
 #X connect 1 1 7 0;
 #X connect 2 0 31 0;
