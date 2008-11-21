@@ -4,7 +4,9 @@
 
 #include "m_pd.h"
 
-/* #define USE_GETFLOATWORDS *//* if garray_getfloatwords is implemented */
+#if (PD_MINOR_VERSION > 40)
+#define USE_GETFLOATWORDS *//* if garray_getfloatwords is implemented */
+#endif
 /* garray_getfloatwords uses t_word but doesn't exist in some versions of pd */
 /* garray_getfloatarray uses t_float but is not 64-bit */
 
