@@ -3172,6 +3172,7 @@ earplug_install: earplug
 	install -p $(externals_src)/earplug~/earplug_data.txt $(objectsdir)/$(EARPLUG_NAME)
 	install -d $(helpdir)/$(EARPLUG_NAME)
 	install -p $(externals_src)/earplug~/*-help.pd \
+		$(externals_src)/earplug~/*.txt \
 		$(helpdir)/$(EARPLUG_NAME)
 
 earplug_clean:
