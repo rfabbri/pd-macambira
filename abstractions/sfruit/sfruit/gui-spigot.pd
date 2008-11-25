@@ -1,0 +1,8 @@
+#N canvas 281 332 308 216 10;
+#X obj 86 64 inlet;
+#X obj 86 94 spigot 1;
+#X obj 131 64 r GUI_UPDATE;
+#X obj 86 119 outlet;
+#X connect 0 0 1 0;
+#X connect 1 0 3 0;
+#X connect 2 0 1 1;
