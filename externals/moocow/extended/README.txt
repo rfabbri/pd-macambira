@@ -1,6 +1,6 @@
     README for externals/moocow/extended/ build hacks.
 
-    Last updated Thu, 02 Aug 2007 00:48:50 +0200
+    Last updated Fri, 28 Nov 2008 22:00:13 +0100
 
 DESCRIPTION
     This directory is for pd-extended compatible builds of (some of)

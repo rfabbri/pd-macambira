@@ -43,53 +43,241 @@ pd_src ?= $(CURDIR)/../../../pd
 all: build.stamp
 
 ##======================================================================
-## Templates: subdir
+## Rules: subdirectory: dummy
 
-## RULES = $(call subdir_template,$(dir_basename),$(dir_path),$(configure_args))
-define subdir_template
-$(1).autogen_stamp: 
-	(cd $(2); sh ./autogen.sh) || true
-	touch $$@
+DUMMY_DIR            ?=../dummy
+DUMMY_CONFIGURE_ARGS ?=--disable-shared
+dummy.autogen_stamp: 
+	(cd $(DUMMY_DIR); sh ./autogen.sh) || true
+	touch $@
 
-$(1).configure_stamp: $(1).autogen_stamp
-	(cd $(2); sh ./configure $(CONFIGURE_ARGS) $(3); make clean) || true
-	touch $$@
+dummy.configure_stamp: dummy.autogen_stamp
+	(cd $(DUMMY_DIR); sh ./configure $(CONFIGURE_ARGS) $(DUMMY_CONFIGURE_ARGS); make clean) || true
+	touch $@
 
-$(1).build_stamp: $(1).configure_stamp
-	$(MAKE) $(MOOCOW_MFLAGS) -C $(2) all install || true
-	touch $$@
+dummy.build_stamp: dummy.configure_stamp
+	$(MAKE) $(MOOCOW_MFLAGS) -C $(DUMMY_DIR) all install || true
+	touch $@
 
-$(1).extclean:
-	rm -f $(1).autogen_stamp $(1).configure_stamp $(1).build_stamp
+dummy.extclean:
+	rm -f dummy.autogen_stamp dummy.configure_stamp dummy.build_stamp
 
-$(1).clean: $(1).extclean
-	$(MAKE) -C $(2) clean || true
+dummy.clean: dummy.extclean
+	$(MAKE) -C $(DUMMY_DIR) clean || true
 
-$(1).distclean: $(1).extclean
-	$(MAKE) -C $(2) distclean || true
+dummy.distclean: dummy.extclean
+	$(MAKE) -C $(DUMMY_DIR) distclean || true
 
-$(1).cvsclean: $(1).extclean
-	$(MAKE) -C $(2) cvsclean || true
-
-endef
+dummy.cvsclean: dummy.extclean
+	$(MAKE) -C $(DUMMY_DIR) cvsclean || true
 
 ##======================================================================
-## Rules: subdirectories
+## Rules: subdirectory: flite
 
-##-- flite, gfsm: simulate failed builds
-#$(eval $(call subdir_template,flite,../flite,--with-flite-dir=/NOPE))
-#$(eval $(call subdir_template,gfsm,../gfsm,--disable-gfsm))
+FLITE_DIR            ?=../flite
+#FLITE_CONFIGURE_ARGS ?=--with-flite-dir=/NOPE
+#FLITE_CONFIGURE_ARGS ?=
 
-##-- flite, gfsm: build 'em if you got 'em
-$(eval $(call subdir_template,flite,../flite,))
-$(eval $(call subdir_template,gfsm,../gfsm,))
+flite.autogen_stamp: 
+	(cd $(FLITE_DIR); sh ./autogen.sh) || true
+	touch $@
 
-##-- the usual suspects
-$(eval $(call subdir_template,deque,../deque,))
-$(eval $(call subdir_template,pdstring,../pdstring,--enable-object-externals))
-$(eval $(call subdir_template,readdir,../readdir,))
-$(eval $(call subdir_template,sprinkler,../../sprinkler,))
-$(eval $(call subdir_template,weightmap,../weightmap,))
+flite.configure_stamp: flite.autogen_stamp
+	(cd $(FLITE_DIR); sh ./configure $(CONFIGURE_ARGS) $(FLITE_CONFIGURE_ARGS); make clean) || true
+	touch $@
+
+flite.build_stamp: flite.configure_stamp
+	$(MAKE) $(MOOCOW_MFLAGS) -C $(FLITE_DIR) all install || true
+	touch $@
+
+flite.extclean:
+	rm -f flite.autogen_stamp flite.configure_stamp flite.build_stamp
+
+flite.clean: flite.extclean
+	$(MAKE) -C $(FLITE_DIR) clean || true
+
+flite.distclean: flite.extclean
+	$(MAKE) -C $(FLITE_DIR) distclean || true
+
+flite.cvsclean: flite.extclean
+	$(MAKE) -C $(FLITE_DIR) cvsclean || true
+
+##======================================================================
+## Rules: subdirectory: gfsm
+
+GFSM_DIR            ?=../gfsm
+#GFSM_CONFIGURE_ARGS ?=--disable-gfsm
+#GFSM_CONFIGURE_ARGS ?=
+
+gfsm.autogen_stamp: 
+	(cd $(GFSM_DIR); sh ./autogen.sh) || true
+	touch $@
+
+gfsm.configure_stamp: gfsm.autogen_stamp
+	(cd $(GFSM_DIR); sh ./configure $(CONFIGURE_ARGS) $(GFSM_CONFIGURE_ARGS); make clean) || true
+	touch $@
+
+gfsm.build_stamp: gfsm.configure_stamp
+	$(MAKE) $(MOOCOW_MFLAGS) -C $(GFSM_DIR) all install || true
+	touch $@
+
+gfsm.extclean:
+	rm -f gfsm.autogen_stamp gfsm.configure_stamp gfsm.build_stamp
+
+gfsm.clean: gfsm.extclean
+	$(MAKE) -C $(GFSM_DIR) clean || true
+
+gfsm.distclean: gfsm.extclean
+	$(MAKE) -C $(GFSM_DIR) distclean || true
+
+gfsm.cvsclean: gfsm.extclean
+	$(MAKE) -C $(GFSM_DIR) cvsclean || true
+
+##======================================================================
+## Rules: subdirectory: deque
+
+DEQUE_DIR            ?=../deque
+DEQUE_CONFIGURE_ARGS ?=
+deque.autogen_stamp: 
+	(cd $(DEQUE_DIR); sh ./autogen.sh) || true
+	touch $@
+
+deque.configure_stamp: deque.autogen_stamp
+	(cd $(DEQUE_DIR); sh ./configure $(CONFIGURE_ARGS) $(DEQUE_CONFIGURE_ARGS); make clean) || true
+	touch $@
+
+deque.build_stamp: deque.configure_stamp
+	$(MAKE) $(MOOCOW_MFLAGS) -C $(DEQUE_DIR) all install || true
+	touch $@
+
+deque.extclean:
+	rm -f deque.autogen_stamp deque.configure_stamp deque.build_stamp
+
+deque.clean: deque.extclean
+	$(MAKE) -C $(DEQUE_DIR) clean || true
+
+deque.distclean: deque.extclean
+	$(MAKE) -C $(DEQUE_DIR) distclean || true
+
+deque.cvsclean: deque.extclean
+	$(MAKE) -C $(DEQUE_DIR) cvsclean || true
+
+##======================================================================
+## Rules: subdirectory: pdstring
+
+PDSTRING_DIR            ?=../pdstring
+PDSTRING_CONFIGURE_ARGS ?=--enable-object-externals
+pdstring.autogen_stamp: 
+	(cd $(PDSTRING_DIR); sh ./autogen.sh) || true
+	touch $@
+
+pdstring.configure_stamp: pdstring.autogen_stamp
+	(cd $(PDSTRING_DIR); sh ./configure $(CONFIGURE_ARGS) $(PDSTRING_CONFIGURE_ARGS); make clean) || true
+	touch $@
+
+pdstring.build_stamp: pdstring.configure_stamp
+	$(MAKE) $(MOOCOW_MFLAGS) -C $(PDSTRING_DIR) all install || true
+	touch $@
+
+pdstring.extclean:
+	rm -f pdstring.autogen_stamp pdstring.configure_stamp pdstring.build_stamp
+
+pdstring.clean: pdstring.extclean
+	$(MAKE) -C $(PDSTRING_DIR) clean || true
+
+pdstring.distclean: pdstring.extclean
+	$(MAKE) -C $(PDSTRING_DIR) distclean || true
+
+pdstring.cvsclean: pdstring.extclean
+	$(MAKE) -C $(PDSTRING_DIR) cvsclean || true
+
+##======================================================================
+## Rules: subdirectory: readdir
+
+READDIR_DIR            ?=../readdir
+READDIR_CONFIGURE_ARGS ?=
+readdir.autogen_stamp: 
+	(cd $(READDIR_DIR); sh ./autogen.sh) || true
+	touch $@
+
+readdir.configure_stamp: readdir.autogen_stamp
+	(cd $(READDIR_DIR); sh ./configure $(CONFIGURE_ARGS) $(READDIR_CONFIGURE_ARGS); make clean) || true
+	touch $@
+
+readdir.build_stamp: readdir.configure_stamp
+	$(MAKE) $(MOOCOW_MFLAGS) -C $(READDIR_DIR) all install || true
+	touch $@
+
+readdir.extclean:
+	rm -f readdir.autogen_stamp readdir.configure_stamp readdir.build_stamp
+
+readdir.clean: readdir.extclean
+	$(MAKE) -C $(READDIR_DIR) clean || true
+
+readdir.distclean: readdir.extclean
+	$(MAKE) -C $(READDIR_DIR) distclean || true
+
+readdir.cvsclean: readdir.extclean
+	$(MAKE) -C $(READDIR_DIR) cvsclean || true
+
+##======================================================================
+## Rules: subdirectory: sprinkler
+##  + one directory higher in the tree than usual...
+
+SPRINKLER_DIR            ?=../../sprinkler
+SPRINKLER_CONFIGURE_ARGS ?=
+sprinkler.autogen_stamp: 
+	(cd $(SPRINKLER_DIR); sh ./autogen.sh) || true
+	touch $@
+
+sprinkler.configure_stamp: sprinkler.autogen_stamp
+	(cd $(SPRINKLER_DIR); sh ./configure $(CONFIGURE_ARGS) $(SPRINKLER_CONFIGURE_ARGS); make clean) || true
+	touch $@
+
+sprinkler.build_stamp: sprinkler.configure_stamp
+	$(MAKE) $(MOOCOW_MFLAGS) -C $(SPRINKLER_DIR) all install || true
+	touch $@
+
+sprinkler.extclean:
+	rm -f sprinkler.autogen_stamp sprinkler.configure_stamp sprinkler.build_stamp
+
+sprinkler.clean: sprinkler.extclean
+	$(MAKE) -C $(SPRINKLER_DIR) clean || true
+
+sprinkler.distclean: sprinkler.extclean
+	$(MAKE) -C $(SPRINKLER_DIR) distclean || true
+
+sprinkler.cvsclean: sprinkler.extclean
+	$(MAKE) -C $(SPRINKLER_DIR) cvsclean || true
+
+##======================================================================
+## Rules: subdirectory: weightmap
+
+WEIGHTMAP_DIR            ?=../weightmap
+WEIGHTMAP_CONFIGURE_ARGS ?=
+weightmap.autogen_stamp: 
+	(cd $(WEIGHTMAP_DIR); sh ./autogen.sh) || true
+	touch $@
+
+weightmap.configure_stamp: weightmap.autogen_stamp
+	(cd $(WEIGHTMAP_DIR); sh ./configure $(CONFIGURE_ARGS) $(WEIGHTMAP_CONFIGURE_ARGS); make clean) || true
+	touch $@
+
+weightmap.build_stamp: weightmap.configure_stamp
+	$(MAKE) $(MOOCOW_MFLAGS) -C $(WEIGHTMAP_DIR) all install || true
+	touch $@
+
+weightmap.extclean:
+	rm -f weightmap.autogen_stamp weightmap.configure_stamp weightmap.build_stamp
+
+weightmap.clean: weightmap.extclean
+	$(MAKE) -C $(WEIGHTMAP_DIR) clean || true
+
+weightmap.distclean: weightmap.extclean
+	$(MAKE) -C $(WEIGHTMAP_DIR) distclean || true
+
+weightmap.cvsclean: weightmap.extclean
+	$(MAKE) -C $(WEIGHTMAP_DIR) cvsclean || true
 
 
 ##======================================================================
