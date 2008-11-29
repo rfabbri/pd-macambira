@@ -1,0 +1,80 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification
+#-----------------------------------------------------------------------------
+program "gfsmprint"
+#program_version "0.01"
+
+purpose	"Convert binary format gfsm files to text"
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details ""
+
+#-----------------------------------------------------------------------------
+# Files
+#-----------------------------------------------------------------------------
+#rcfile "/etc/gfsmrc"
+#rcfile "~/.gfsmrc"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "BINFILE" "Stored binary gfsm file" \
+    details="
+If unspecified, standard input will be read
+"
+
+argument "TXTFILE" "Output text file" \
+    details="
+If unspecified, output will be written to standard output.
+"
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+#group "Basic Options"
+
+string "ilabels" i "Specify input (lower) labels file." \
+   arg="LABELS"
+
+string "olabels" o "Specify output (upper) labels file." \
+   arg="LABELS"
+
+string "slabels" s "Specify state labels file." \
+   arg="LABELS"
+
+int "compress" z "Specify compression level of output file." \
+    arg="LEVEL" \
+    default="0" \
+    details="
+Specify zlib compression level of output file. -1 indicates
+the library default compression level, 0 (default) indicates no zlib compression at all,
+and 9 indicates the best possible compression.
+"
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+#addenda ""
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+None known.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+#acknowledge `cat acknowledge.pod`
+
+seealso "
+L<gfsmutils>
+"

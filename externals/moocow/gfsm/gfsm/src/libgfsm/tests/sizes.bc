@@ -1,0 +1,70 @@
+##-*- Mode: Shell-Script -*-
+
+##-- tagh size (carrot)
+tagh_carrot_n_states = 5345565;
+tagh_carrot_n_finals = 1;
+tagh_carrot_n_arcs   = 9407741;
+
+##-- test constants (tagh, carrot)
+n_states = tagh_carrot_n_states;
+n_finals = tagh_carrot_n_finals;
+n_arcs = tagh_carrot_n_arcs;
+
+##-- basic type sizes
+size_ptr   = 4;
+size_int32 = 4;
+size_float = 4;
+size_arc   = 12;
+size_arc_src = 16;
+size_weight = size_float;
+
+##-- vanilla automaton sizes
+define size_vanilla_arcs(n_arcs)              { return n_arcs*(size_arc+size_ptr); }
+define size_vanilla_states(n_states,n_finals) {
+   return (n_states*(size_int32+size_ptr)) + (n_finals*(size_float+size_int32));
+}
+define size_vanilla_full(n_states,n_finals,n_arcs) {
+  return size_vanilla_states(n_states,n_finals) + size_vanilla_arcs(n_arcs);
+}
+size_vanilla = size_vanilla_full(n_states,n_finals,n_arcs) / 2^20; ##== 184MB
+
+##-- basic index type sizes
+define size_arctab_ptr(n_arcs) { return (n_arcs*size_ptr); }
+define size_arctab(n_arcs)     { return (n_arcs*size_arc); }
+define size_arcfirst(n_states) { return (n_states*size_ptr); }
+define size_finaltab(n_states) { return (n_states*size_weight); }
+define size_bitvec(n_bits)     { return (n_bits/8); }
+
+##-- arcindex_ptr: auxilliary index: { arc*[] arc_ptrs_sorted; arc** first; }
+define size_arcindex_ptr_full(n_states,n_finals,n_arcs) {
+  return size_arctab_ptr(n_arcs) + size_arcfirst(n_states);
+}
+size_arcindex_ptr = size_arcindex_ptr_full(n_states,n_finals,n_arcs)/2^20; ##== 56MB
+
+##-- arcindex_tab: copy index: { arc[] arcs_sorted; arc* first; }
+define size_arcindex_tab_full(n_states,n_finals,n_arcs) {
+  return size_arctab(n_arcs) + size_arcfirst(n_states);
+}
+size_arcindex_tab = size_arcindex_tab_full(n_states,n_finals,n_arcs) / 2^20;
+
+##-- fsmtab: copy index: { arc[] arcs_sorted; arc* first; weight[] finals; }
+##   --> SMALLEST, likely also MOST EFFICIENT!
+##   + w/  finals: 149MB (vs. vanilla 184MB)
+##   + w/o finals: 129MB
+define size_fsmtab_full(n_states,n_finals,n_arcs) {
+  return size_arctab(n_arcs) + size_arcfirst(n_states) + size_finaltab(n_states) + size_bitvec(n_states);
+}
+size_fsmtab = size_fsmtab_full(n_states,n_finals,n_arcs) / 2^20; ##== 149MB
+
+##-- fsmbitab: bi-indexed: { arc[] arcs; int32~arc*[] first; weight[] finals; int32[] ix_lo; int32[] ix_hi; }
+define size_ixtab(n_arcs) { return n_arcs*size_int32; }
+define size_fsmbitab_full(n_states,n_finals,n_arcs) {
+  return size_fsmtab_full(n_states,n_finals,n_arcs) + 2*size_ixtab(n_arcs);
+}
+size_fsmbitab = size_fsmbitab_full(n_states,n_finals,n_arcs) / 2^20; ##== 220MB
+
+##-- fsmbitab2: bi-indexed: { arc[] arcs~ix_lo; int32~arc*[] first; weight[] finals; int32[] ix_hi; }
+define size_fsmbitab2_full(n_states,n_finals,n_arcs) {
+  return size_fsmtab_full(n_states,n_finals,n_arcs) + size_ixtab(n_arcs);
+}
+size_fsmbitab2 = size_fsmbitab2_full(n_states,n_finals,n_arcs) / 2^20; ##== 185MB

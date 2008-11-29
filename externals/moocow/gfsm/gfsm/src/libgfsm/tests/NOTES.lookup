@@ -1,0 +1,26 @@
+lookup (NITERS=524288)
+ real	0m3.410s
+ user	0m3.403s
+ sys	0m0.002s
+
+ -> iters/s = 153750.147 = 153.75 K
+
+ : lookup @ 153.75 K iters/s
+
+lookup + paths (NITERS=524288)
+ real	0m5.880s
+ user	0m5.873s
+ sys	0m0.002s
+
+ -> iters/s = 89164.626 = 89.16 K
+
+ : paths @ (52488/(5.88-3.41)) = 21250.2 = 21.25 K iters/s
+
+lookup + paths + strings (NITERS=524288)
+ real	0m9.013s
+ user	0m9.005s
+ sys	0m0.002s
+
+ -> iters/s = 58170.199 = 58.17 K
+
+  : strings @ (52488/(9.013-5.88)) = 16753.27 = 16.75 K iters/s

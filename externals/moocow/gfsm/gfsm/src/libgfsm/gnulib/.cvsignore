@@ -1,0 +1,13 @@
+.*~
+*~
+*.o
+*.lo
+*.a
+*.la
+*.so
+
+Makefile
+Makefile.in
+
+orig
+.libs

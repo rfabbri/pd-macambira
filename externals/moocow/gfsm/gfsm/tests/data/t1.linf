@@ -1,0 +1,14 @@
+Filename                : -
+Semiring                : tropical
+Transducer?             : y
+Weighted?               : y
+Deterministic?          : n
+Sort Mode               : none
+Initial state           : 0
+# of states             : 4
+# of final states       : 1
+# of arcs               : 3
+# of i/o epsilon arcs   : 0
+# of input epsilon arcs : 1
+# of output epsilon arcs: 1
+cyclic?                 : n

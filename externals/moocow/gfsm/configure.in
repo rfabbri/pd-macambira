@@ -4,7 +4,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [pd-gfsm])
-define([THE_PACKAGE_VERSION], [0.0403])
+define([THE_PACKAGE_VERSION], [0.05])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -38,6 +38,9 @@ AC_PROG_CC
 dnl AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PREFIX_DEFAULT(/usr/local)
+
+dnl v--- needed if Makefile.am uses _LTLIBRARIES targets
+AC_PROG_LIBTOOL
 
 dnl
 dnl Substitutions
@@ -126,18 +129,48 @@ if test -z "$ac_cv_pkgconfigdir" ; then
 fi
 pkgconfigdir="$ac_cv_pkgconfigdir"
 AC_SUBST(pkgconfigdir)
+AC_SUBST(PKG_CONFIG)
 dnl
 dnl pkg-config
 dnl ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## gfsm:local
+AC_ARG_ENABLE([static-gfsm],
+	AC_HELP_STRING([--enable-static-gfsm], [Use local static libgfsm rather than system library (default=yes)]),
+	[ac_cv_enable_static_gfsm="$enableval"],
+	[ac_cv_enable_static_gfsm="yes"])
+
+AC_MSG_CHECKING([whether to build static local libgfsm])
+if test "$ac_cv_enable_static_gfsm" = "yes"; then
+ AC_MSG_RESULT(yes)
+ AC_CONFIG_SUBDIRS(gfsm)
+ PD_GFSM_SUBDIRS="gfsm"
+
+ IFLAGS="$IFLAGS -I\$(top_srcdir)/gfsm/src/libgfsm -I\$(top_builddir)/gfsm/src/libgfsm \`\$(PKG_CONFIG) --cflags-only-I \$(top_srcdir)/gfsm/gfsm.pc\`"
+ LFLAGS="$LFLAGS -L\$(top_builddir)/gfsm/src/libgfsm \`\$(PKG_CONFIG) --cflags-only-I \$(top_srcdir)/gfsm/gfsm.pc\`"
+ LIBS="$LIBS \$(top_builddir)/gfsm/src/libgfsm/libgfsm.la \`\$(PKG_CONFIG) --libs-only-l \$(top_srcdir)/gfsm/gfsm.pc | sed -e's/\-lgfsm//g'\`"
+
+ AC_DEFINE(PD_GFSM_WHICH, ["static"], [Which version of gfsm are we using?])
+else
+ PD_GFSM_SUBDIRS=""
+ AC_MSG_RESULT(no)
+fi
+AC_SUBST(PD_GFSM_SUBDIRS)
+
+AC_DEFINE_UNQUOTED(PD_GFSM_DATE, "`date`", [Date this external was configured])
+AC_DEFINE_UNQUOTED(PD_GFSM_USER, "$USER", [User who configured this external])
+## /gfsm:local
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-## gfsm (pkg-config)
-PKG_CHECK_MODULES(GFSM, gfsm >= 0.0.8,
+## gfsm:system (pkg-config)
+if test "$ac_cv_enable_static_gfsm" = "no"; then
+ PKG_CHECK_MODULES(GFSM, gfsm >= 0.0.8,
 	[PC_HAVE_GFSM="yes"],
 	[PC_HAVE_GFSM=""])
 
-if test "$PC_HAVE_GFSM" != "yes" ; then
+ if test "$PC_HAVE_GFSM" != "yes" ; then
     AC_MSG_WARN([])
     AC_MSG_WARN([----------------------------------------------------------------])
     AC_MSG_WARN([                   gfsm library not found!])
@@ -147,21 +180,23 @@ if test "$PC_HAVE_GFSM" != "yes" ; then
     AC_MSG_WARN([----------------------------------------------------------------])
     AC_MSG_WARN([])
     ac_cv_have_gfsm="no"
-else
+ else
     ac_cv_have_gfsm="yes"
-fi
+ fi
 
-if test "$ac_cv_have_gfsm" != "no" ; then
+ if test "$ac_cv_have_gfsm" != "no" ; then
   ##-- gfsm: library
   IFLAGS="$IFLAGS `$PKG_CONFIG --cflags-only-I gfsm`"
   LFLAGS="$LFLAGS `$PKG_CONFIG --libs-only-L gfsm`"
   LIBS="$LIBS `$PKG_CONFIG --libs-only-l gfsm`"
+  AC_DEFINE(PD_GFSM_WHICH, ["system"], [Which version of gfsm are we using?])
+ fi
 fi
-## /gfsm
+## /gfsm:system
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-## gfsm (global)
+## gfsm:any
 AC_ARG_ENABLE(gfsm,
 	AC_HELP_STRING([--disable-gfsm], [Globally disable gfsm support (causes build to fail!)]),
 	[ac_cv_enable_gfsm="$enableval"],
@@ -170,10 +205,8 @@ AC_ARG_ENABLE(gfsm,
 if test "$ac_cv_enable_gfsm" != "yes" ; then
 	AC_MSG_ERROR([gfsm support disabled by user],1)
 fi
-
-## /gfsm (global)
+## /gfsm:any
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 
 dnl --------------------------------------------------------------------
 dnl BEGIN import from pd configure.in

@@ -11,6 +11,8 @@ MY_AHDIRS="."
 MY_AMDIRS="."
 MY_ACDIRS="."
 
+MY_AGDIRS="./gfsm"
+
 test -z "$ACLOCAL" && ACLOCAL=aclocal
 test -z "$AUTOHEADER" && AUTOHEADER=autoheader
 test -z "$AUTOMAKE" && AUTOMAKE=automake
@@ -41,6 +43,13 @@ if test -n "$MY_ACDIRS"; then
  for d in $MY_ACDIRS ; do
     echo "(cd $d ; $AUTOCONF)"
     (cd $d ; $AUTOCONF)
+ done
+fi
+
+if test -n "$MY_AGDIRS"; then
+ for d in $MY_AGDIRS ; do
+    echo "(cd $d ; ./autogen.sh)"
+    (cd $d ; ./autogen.sh)
  done
 fi
 

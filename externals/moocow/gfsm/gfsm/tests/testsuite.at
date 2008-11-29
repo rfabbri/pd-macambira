@@ -1,0 +1,10 @@
+## -*- Mode: Autotest -*-
+##
+## File: testsuite.at
+## Package: gfsm
+## Description: autotest test-suite script
+##
+
+AT_INIT([gfsmutils])
+
+##-- nothing else happens here

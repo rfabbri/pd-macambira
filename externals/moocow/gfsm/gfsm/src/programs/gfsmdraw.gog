@@ -1,0 +1,138 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification
+#-----------------------------------------------------------------------------
+program "gfsmdraw"
+#program_version "0.01"
+
+purpose	"Generate graph specifications from binary gfsm files"
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details "
+gfsmdraw reads a binary GFSM file file and produces a graph specification
+in either dot(1) or vcg(1) format.
+"
+
+#-----------------------------------------------------------------------------
+# Files
+#-----------------------------------------------------------------------------
+#rcfile "/etc/gfsmrc"
+#rcfile "~/.gfsmrc"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "BINFILE" "Stored binary gfsm file" \
+    details="
+If unspecified, standard input will be read
+"
+
+#-----------------------------------------------------------------------------
+# Common Options
+#-----------------------------------------------------------------------------
+group "Common Options"
+
+string "ilabels" i "Specify input (lower) labels file." \
+   arg="LABELS"
+
+string "olabels" o "Specify output (upper) labels file." \
+   arg="LABELS"
+
+string "slabels" s "Specify state labels file." \
+   arg="LABELS"
+
+string "title" t "Specify output title." \
+   arg="TITLE" \
+   details="Default is input filename."
+
+flag "vertical" v "Draw vertically." \
+   details="Default mode is top-to-bottom"
+
+string "output"  F "Output graph specification." \
+   arg="DOTFILE" \
+   details="
+Default behavior is to write to stdout.
+"
+
+#-----------------------------------------------------------------------------
+# dot Options
+#-----------------------------------------------------------------------------
+group "dot Options"
+
+flag "dot" d "Request dot output (default)"
+
+float "width" W "Specify output width (default=bbox)." \
+   arg="WIDTH" \
+   default="8.5"
+float "height" H "Specify output height (default=bbox)." \
+   arg="HEIGHT" \
+   default="11"
+
+int "fontsize" f "Set output font size." \
+   arg="POINTS" \
+   default="14"
+string "font" - "Set output font name." \
+   arg="FONT"
+
+float "nodesep" n "Set min node separation." \
+   default="0.25"
+float "ranksep" r "Set min rank separation." \
+   default="0.40"
+
+flag "portrait" p "Generate in portrait mode." \
+   details="Default mode is landscape."
+
+#-----------------------------------------------------------------------------
+# VCG Options
+#-----------------------------------------------------------------------------
+group "VCG Options"
+
+flag "vcg" g "Request VCG output."
+
+int "xspace" x "Set xspace graph parameter." \
+  default="40"
+int "yspace" y "Set yspace graph parameter." \
+  default="20"
+
+string "state-shape" - "Set shape for state nodes." \
+  arg="SHAPE" \
+  default="box"
+
+string "state-color" - "Set default state color." \
+  arg="COLOR" \
+  default="white"
+
+string "final-color" - "Set color for final states." \
+  arg="COLOR" \
+  default="lightgrey"
+
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+#addenda ""
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+None known.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+#acknowledge `cat acknowledge.pod`
+
+seealso "
+L<gfsmutils>,
+dot(1),
+vcg(1),
+xvcg(1)
+"

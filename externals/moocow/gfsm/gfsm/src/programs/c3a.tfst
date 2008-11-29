@@ -1,0 +1,8 @@
+0	1	a	a
+1	0	<eps>	A
+0	2	b	b
+2	0	<eps>	B
+0
+0	0	<eps>	<eps1>
+1	1	<eps>	<eps1>
+2	2	<eps>	<eps1>

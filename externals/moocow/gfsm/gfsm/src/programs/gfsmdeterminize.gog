@@ -1,0 +1,70 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification
+#-----------------------------------------------------------------------------
+program "gfsmdeterminize"
+#program_version "0.01"
+
+purpose	"Determinize a finite state machine"
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details ""
+
+#-----------------------------------------------------------------------------
+# Files
+#-----------------------------------------------------------------------------
+#rcfile "/etc/gfsmrc"
+#rcfile "~/.gfsmrc"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "BINFILE" "Stored binary gfsm file" \
+    details="
+If unspecified, standard input will be read
+"
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+#group "Basic Options"
+
+int "compress" z "Specify compression level of output file." \
+    arg="LEVEL" \
+    default="-1" \
+    details="
+Specify zlib compression level of output file. -1 (default) indicates
+the default compression level, 0 (zero) indicates no zlib compression at all,
+and 9 indicates the best possible compression.
+"
+
+string "output" F "Specifiy output file (default=stdout)." \
+    arg="FILE" \
+    default="-"
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+#addenda ""
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+None known.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+#acknowledge `cat acknowledge.pod`
+
+seealso "
+L<gfsmutils>
+"

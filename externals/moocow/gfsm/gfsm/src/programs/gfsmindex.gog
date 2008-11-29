@@ -1,0 +1,75 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification
+#-----------------------------------------------------------------------------
+program "gfsmindex"
+#program_version "0.01"
+
+purpose	"Convert between indexed and un-indexed binary gfsm automata"
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details ""
+
+#-----------------------------------------------------------------------------
+# Files
+#-----------------------------------------------------------------------------
+#rcfile "/etc/gfsmrc"
+#rcfile "~/.gfsmrc"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "FSMFILE" "Stored binary gfsm automaton file or index" \
+    details="
+If unspecified, standard input will be read.
+"
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+#group "Basic Options"
+
+flag "unindex"  u "Convert indexed automaton to unindexed format" \
+  details="
+Default behavior is to convert a plain unindexed automaton to an indexed automaton.
+"
+
+int "compress" z "Specify compression level of output file." \
+    arg="LEVEL" \
+    default="-1" \
+    details="
+Specify zlib compression level of output file. -1 (default) indicates
+the default compression level, 0 (zero) indicates no zlib compression at all,
+and 9 indicates the best possible compression.
+"
+
+string "output" F "Specifiy output file (default=stdout)." \
+    arg="FILE" \
+    default="-"
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+#addenda ""
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+None known.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+#acknowledge `cat acknowledge.pod`
+
+seealso "
+L<gfsmutils>
+"

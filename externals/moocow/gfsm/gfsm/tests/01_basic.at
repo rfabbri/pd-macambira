@@ -1,0 +1,54 @@
+## -*- Mode: Autotest -*-
+##
+## File: basic.at
+## Package: gfsm
+## Description: autotest test-suite script: basic tests
+##
+
+AT_BANNER([basic automaton manipulation])
+
+##--------------------------------------------------------------
+## Test: compile+print: null
+AT_SETUP([compile+print.null])
+AT_KEYWORDS([basic compile print info])
+
+##-- compile: null
+AT_CHECK([[$progdir/gfsmcompile $tdata/null.tfst -F null.gfst]],0,[],[])
+
+##-- print: null
+AT_CHECK([[$progdir/gfsmprint null.gfst]],0,[],[ignore])
+
+##-- info: null
+rm -f expout; ln $tdata/null.inf expout
+AT_CHECK([[$progdir/gfsminfo < null.gfst]],0,expout)
+
+AT_CLEANUP
+
+##--------------------------------------------------------------
+## Test: compile+print: simple
+AT_SETUP([compile+print.simple])
+AT_KEYWORDS([basic compile print info])
+
+AT_CHECK([[$progdir/gfsmcompile $tdata/basic1.tfst -F basic1.gfst]],0)
+
+rm -f expout; ln $tdata/basic1.tfst expout
+AT_CHECK([[$progdir/gfsmprint basic1.gfst]],0,expout,[])
+
+rm -f expout; ln $tdata/basic1.inf expout
+AT_CHECK([[$progdir/gfsminfo < basic1.gfst]],0,expout,[])
+
+AT_CLEANUP
+
+##--------------------------------------------------------------
+## Test: compile+print: with labels
+AT_SETUP([compile+print.labels])
+AT_KEYWORDS([basic compile print info alphabet])
+AT_CHECK([[$progdir/gfsmcompile -i $tdata/test.lab -o $tdata/test.lab $tdata/basic2.labs.tfst -F basic2.gfst]],0)
+
+rm -f expout; ln $tdata/basic2.labs.tfst expout
+AT_CHECK([[$progdir/gfsmprint -i $tdata/test.lab -o $tdata/test.lab basic2.gfst]],0,expout,[])
+
+rm -f expout; ln $tdata/basic2.labs.inf expout
+AT_CHECK([[$progdir/gfsminfo < basic2.gfst]],0,expout,[])
+
+AT_CLEANUP

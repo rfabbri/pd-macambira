@@ -1,0 +1,102 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification
+#-----------------------------------------------------------------------------
+program "gfsmcompile"
+#program_version "0.01"
+
+purpose	"Compile text format gfsm files to binary"
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details ""
+
+#-----------------------------------------------------------------------------
+# Files
+#-----------------------------------------------------------------------------
+#rcfile "/etc/mootrc"
+#rcfile "~/.mootrc"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "TXTFILE" "Input text file" \
+    details="
+If unspecified, standard input will be read
+"
+
+#argument "BINFILE" "Output binary gfsm file" \
+#    details="
+#If unspecified, output will be written to standard output.
+#"
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+#group "Basic Options"
+
+flag   "acceptor" a "Compile as acceptor (default=transducer)" \
+  default=0
+
+string "ilabels" i "Specify input (lower) labels file." \
+   arg="LABELS"
+
+string "olabels" o "Specify output (upper) labels file." \
+   arg="LABELS"
+
+string "slabels" S "Specify state labels file." \
+   arg="LABELS"
+
+string "semiring" s "Specify semiring type." \
+   arg="SRTYPE" \
+   default="tropical" \
+   details="
+Specify one of the following:
+
+ boolean
+ log
+ plog
+ real
+ trivial
+ tropical
+
+"
+
+int "compress" z "Specify compression level of output file." \
+    arg="LEVEL" \
+    default="-1" \
+    details="
+Specify zlib compression level of output file. -1 (default) indicates
+the default compression level, 0 (zero) indicates no zlib compression at all,
+and 9 indicates the best possible compression.
+"
+
+string "output" F "Specifiy output file (default=stdout)." \
+    arg="FILE" \
+    default="-"
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+#addenda ""
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+None known.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+#acknowledge `cat acknowledge.pod`
+
+seealso "
+L<gfsmutils>
+"

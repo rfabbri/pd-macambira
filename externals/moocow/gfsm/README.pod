@@ -2,7 +2,7 @@
 
 README for pd external package 'gfsm'
 
-Last updated for pd-gfsm v0.04
+Last updated for pd-gfsm v0.05
 
 =head1 DESCRIPTION
 
@@ -16,9 +16,13 @@ pd-gfsm provides Pd bindings for the GFSM  finite-state machine library.
 
 Available from http://crca.ucsd.edu/~msp/software.html
 
-=item libgfsm >= v0.0.8-pre6
+=item libgfsm >= v0.0.8-pre6 (optional)
 
-Available from http://www.ling.uni-potsdam.de/~moocow/projects/gfsm
+A local copy of the libgfsm source tree is included with this distribution,
+and should be built and used by default.
+
+Newer versions should be
+available from http://www.ling.uni-potsdam.de/~moocow/projects/gfsm
 
 =back
 

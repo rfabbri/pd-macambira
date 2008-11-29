@@ -1,0 +1,76 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification
+#-----------------------------------------------------------------------------
+program "gfsmstrings"
+#program_version "0.01"
+
+purpose	"Serialize binary acyclic gfsm files to lists of strings"
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+#details ""
+
+#-----------------------------------------------------------------------------
+# Files
+#-----------------------------------------------------------------------------
+#rcfile "/etc/gfsmrc"
+#rcfile "~/.gfsmrc"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+argument "BINFILE" "Stored binary gfsm file" \
+    details="
+If unspecified, standard input will be read.
+"
+
+#-----------------------------------------------------------------------------
+# Common Options
+#-----------------------------------------------------------------------------
+group "Common Options"
+
+string "ilabels" i "Specify input (lower) labels file." \
+   arg="LABELS"
+
+string "olabels" o "Specify output (upper) labels file." \
+   arg="LABELS"
+
+flag "att" a "Output in AT&T regex format." \
+   default=0
+
+flag "viterbi" v "Treat input automaton as a Viterbi trellis." \
+   default=0
+
+string "output"  F "Output file." \
+   arg="TXTFILE" \
+   details="
+Default behavior is to write to stdout.
+"
+
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+#addenda ""
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+None known.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+#acknowledge `cat acknowledge.pod`
+
+seealso "
+L<gfsmutils>,
+"

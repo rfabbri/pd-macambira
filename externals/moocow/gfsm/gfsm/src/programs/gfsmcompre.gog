@@ -1,0 +1,94 @@
+# -*- Mode: Shell-Script -*-
+#
+# Getopt::Gen specification
+#-----------------------------------------------------------------------------
+program "gfsmcompre"
+#program_version "0.01"
+
+purpose	"Compile an automaton from a regular expression"
+author  "Bryan Jurish <moocow@ling.uni-potsdam.de>"
+on_reparse "warn"
+
+#-----------------------------------------------------------------------------
+# Details
+#-----------------------------------------------------------------------------
+details ""
+
+#-----------------------------------------------------------------------------
+# Files
+#-----------------------------------------------------------------------------
+#rcfile "/etc/mootrc"
+#rcfile "~/.mootrc"
+
+#-----------------------------------------------------------------------------
+# Arguments
+#-----------------------------------------------------------------------------
+#argument "LABELID..." "Input label IDs" \
+#    details="
+#In ASCII decimal notation.
+#"
+
+#-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+#group "Basic Options"
+
+string "labels" l "Basic label alphabet" \
+  arg="LABFILE"
+
+string "regex"  s "Regular expression to compile" \
+  arg="REGEX"
+
+flag   "string" x "Compile as string, not regex" \
+  default=0
+
+string "semiring" r "Specify semiring type" \
+  arg="SRTYPE" \
+  default="tropical" \
+  details="
+Specify one of the following:
+
+ boolean
+ log
+ plog
+ real
+ trivial
+ tropical
+
+"
+
+int "compress" z "Specify compression level of output file." \
+    arg="LEVEL" \
+    default="-1" \
+    details="
+Specify zlib compression level of output file. -1 (default) indicates
+the default compression level, 0 (zero) indicates no zlib compression at all,
+and 9 indicates the best possible compression.
+"
+
+string "output" F "Specifiy output file (default=stdout)." \
+    arg="FILE" \
+    default="-"
+
+#-----------------------------------------------------------------------------
+# Addenda
+#-----------------------------------------------------------------------------
+#addenda ""
+
+#-----------------------------------------------------------------------------
+# Bugs
+#-----------------------------------------------------------------------------
+bugs "
+
+None known.
+
+"
+
+#-----------------------------------------------------------------------------
+# Footer
+#-----------------------------------------------------------------------------
+#acknowledge `cat acknowledge.pod`
+
+seealso "
+L<gfsmutils>
+"

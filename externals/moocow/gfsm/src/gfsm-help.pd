@@ -1,6 +1,6 @@
 #N canvas 0 0 436 289 10;
 #X obj 66 7 gfsm;
-#X text 126 241 Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 138 257 Bryan Jurish <moocow@ling.uni-potsdam.de>;
 #X text 21 43 EXTERNALS:;
 #X obj 41 72 gfsm_alphabet;
 #X obj 41 98 gfsm_automaton;
@@ -13,3 +13,5 @@
 #X text 99 8 : finite state machine external library;
 #X obj 40 150 gfsm_markov;
 #X text 161 151 trainable Markov chain;
+#X text 38 227 http://www.ling.uni-potsdam.de/~moocow/projects/gfsm
+;

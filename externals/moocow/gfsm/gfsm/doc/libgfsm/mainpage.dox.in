@@ -1,0 +1,102 @@
+/* -*- Mode: C++ -*- */
+/** 
+\mainpage libgfsm : finite state utility library
+
+\author Bryan Jurish <moocow@ling.uni-potsdam.de>
+
+\version @VERSION@
+
+<b>Project URL:</b> http://www.ling.uni-potsdam.de/~moocow/projects/gfsm
+
+\section Intro Introduction
+
+libgfsm is an abstract C library for the manipulation of finite
+state machines using <A HREF="http://www.gtk.org">glib</A>
+for basic data structures.  libgfsm currently supports AT&T style
+weighted transducer text input and label definition files, a
+number of common algebraic operations on finite
+state machines, as well as a low-level automaton interface.
+
+\section building Building gfsm
+
+Run the \a configure script in the distribution directory, and then call \a make:
+
+\verbatim
+bash:~$ cd gfsm-XX.YY.ZZ
+
+bash:~/gfsm-XX.YY.ZZ$ ./configure
+> checking build system type... i686-pc-linux-gnu
+> checking host system type... i686-pc-linux-gnu
+> checking target system type... i686-pc-linux-gnu
+> checking for a BSD-compatible install... /usr/bin/install -c
+...
+> config.status: linking ./src/programs/gfsmunion.gog to doc/programs/gfsmunion.gog
+> config.status: executing depfiles commands
+
+bash:~/gfsm-XX.YY.ZZ$ make
+> Making all in config
+...
+> make[1]: Nothing to be done for `all-am'.
+> make: Leaving directory `/home/moocow/gfsm-XX.YY.ZZ'
+
+bash:~/gfsm-XX.YY.ZZ$ make install
+> Making install in config
+...
+> make: Leaving directory `/home/moocow/gfsm-XX.YY.ZZ'
+
+\endverbatim
+
+libgfsm will install itself in /usr/local by default.
+
+See the file \a INSTALL in the gfsm distribution root directory
+for more details.
+
+
+\section knowgfsm Getting to know gfsm
+
+- Have a look at gfsmAutomaton.h , gfsmArc.h , and gfsmState.h
+  to get familiar with the basic automaton API and data structures,
+  ::gfsmAutomaton , ::gfsmArc , and ::gfsmState .
+
+- Have a look at gfsmAlgebra.h to see the basic algebraic operations
+  on automata provided by gfsm.
+
+- Have a look at the gfsmAutomatonIO.h documentation to learn how to
+  load and save automata to named files, or even to abstract I/O handles.
+
+- Have a look at gfsmAlphabet.h for details on fun things you can
+  do with alphabets, including defining your own.
+
+- Have a look at gfsmSemiring.h for details on the built-in semirings, as
+  well as an API for creating your own user-defined semiring for
+  weighted automaton operations.
+
+- Have a look at gfsmRegexCompiler.h if you need a basic regular expression compiler.
+
+.
+
+\section usinggfsm Using gfsm
+
+- Include the main gfsm header in your code:
+
+  \code
+#include <gfsm.h>
+int main(void) {
+  do_stuff();
+  return 0;
+}
+  \endcode
+
+- Compile and link your program against libgfsm:
+
+  \verbatim
+bash$ gcc `pkg-config --cflags gfsm` -o myprog.o -c myprog.c 
+bash$ gcc -o myprog myprog.o `pkg-config --libs gfsm`
+  \endverbatim
+
+- ... and things ought to work
+
+.
+
+*/
+

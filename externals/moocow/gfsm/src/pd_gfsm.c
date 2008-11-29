@@ -3,7 +3,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state automata for Pd
  *
- * Copyright (c) 2004-2006 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
@@ -72,7 +72,8 @@ void gfsm_setup(void)
   //-- banner
   post("");
   post("gfsm: finite state machine externals v%s by Bryan Jurish", PACKAGE_VERSION);
-  //post("fsm: based on code by Helmut Schmid");
+  post("gfsm: using " PD_GFSM_WHICH " libgfsm v%s", gfsm_version_string);
+  post("gfsm: compiled by " PD_GFSM_USER " on " PD_GFSM_DATE);
 
   //-- library
   pd_gfsm_alphabet_setup();
