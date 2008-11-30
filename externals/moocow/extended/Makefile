@@ -24,6 +24,7 @@ SUBDIRS = \
 MOOCOW_DIR    ?=$(shell pwd)
 MOOCOW_BUILD  ?=$(MOOCOW_DIR)/build.moo
 MOOCOW_MFLAGS ?=DESTDIR=""
+MOOCOW_BUILD_VERSION ?=0.02
 
 CONFIGURE_ARGS=\
 	CFLAGS="$(CFLAGS)" \
@@ -40,7 +41,7 @@ pd_src ?= $(CURDIR)/../../../pd
 
 ##======================================================================
 ## Rules: default
-all: build.stamp
+all: config build.stamp
 
 ##======================================================================
 ## Rules: subdirectory: dummy
@@ -285,7 +286,11 @@ weightmap.cvsclean: weightmap.extclean
 autogen: $(SUBDIRS:=.autogen_stamp)
 configure: $(SUBDIRS:=.configure_stamp)
 
+config:
+	@echo "MOOCOW_BUILD_VERSION=$(MOOCOW_BUILD_VERSION)"
+
 build.stamp: $(SUBDIRS:=.build_stamp)
+	rm -rf $(MOOCOW_BUILD)/noinstall
 	touch $@
 
 readme: README.txt
