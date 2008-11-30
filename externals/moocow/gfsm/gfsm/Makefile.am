@@ -22,7 +22,7 @@ SUBDIRS = config src $(GFSM_SUBDIRS)
 SUFFIXES = .pc .pod .txt .html
 
 ## --- package config data
-pkgconfig_DATA = @PACKAGE@.pc
+#pkgconfig_DATA = @PACKAGE@.pc
 
 ##-- for gnulib
 ACLOCAL_AMFLAGS = -I m4
@@ -80,15 +80,15 @@ if HAVE_POD2HTML
 	pod2html --outfile $@ $<
 endif
 
-pkgdoc_DATA = \
-	$(PODS:.pod=.txt) \
-	$(PODS:.pod=.html)
+#pkgdoc_DATA = \
+#	$(PODS:.pod=.txt) \
+#	$(PODS:.pod=.html)
 
 #-----------------------------------------------------------------------
 # Additional Variables & Rules: magic
 #-----------------------------------------------------------------------
 
-pkgdoc_DATA += gfsm.magic
+#pkgdoc_DATA += gfsm.magic
 
 ##-- phony
 .PHONY: install-magic unintall-magic

@@ -38,13 +38,14 @@ DISTCLEANFILES = \
 
 ## -- maintainerclean: built by maintainer / by hand
 MAINTAINERCLEANFILES = *~ \
-	$(PODS:.pod=.txt) \
 	Makefile Makefile.in \
 	aclocal.m4 \
 	configure \
 	install-sh \
 	stamp-h.in \
 	config.h.in
+
+#	$(PODS:.pod=.txt)
 
 maintainer-clean-local:
 	rm -rf autom4te.cache

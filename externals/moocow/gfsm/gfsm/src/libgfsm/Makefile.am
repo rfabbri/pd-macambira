@@ -21,7 +21,8 @@ SUBDIRS = gnulib
 
 ## --- libtool libraries
 #lib_LTLIBRARIES = ${lib_1}.la ... ${lib_N}.la
-lib_LTLIBRARIES = libgfsm.la
+#lib_LTLIBRARIES = libgfsm.la
+noinst_LTLIBRARIES = libgfsm.la
 
 ## --- shared data in @pkgdatadir@
 #pkgdata_DATA = ${data_1} ... ${data_N}
@@ -97,7 +98,8 @@ sources_argh = \
 
 ## --- installable headers: @includedir@/@pkgname@
 #pkginclude_HEADERS = ${hfile_1} ... ${hfile_N}
-pkginclude_HEADERS = \
+#pkginclude_HEADERS =
+noinst_HEADERS = \
 	gfsmAssert.h \
 	gfsmConfig.h \
 	gfsmConfigNoAuto.h \
