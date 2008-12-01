@@ -1,20 +1,4 @@
 #N canvas 311 44 1053 650 10;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #X obj 336 251 select;
 #X obj 363 337 f;
 #X obj 336 506 pack;
@@ -22,7 +6,7 @@
 #X obj 102 293 nbx 2 14 1 128 0 0 \$0.pad.s \$0.pad.r Pad 32 7 0 11
 -154432 -1 -1 1 256;
 #X obj 102 276 nbx 2 14 0 127 0 0 \$0.note.s \$0.note.r Note 32 7 0
-11 -260624 -1 -1 0 256;
+11 -260624 -1 -1 36 256;
 #X obj 420 523 outlet;
 #X obj 137 263 bng 13 250 50 0 \$0.learn-on empty empty 0 -6 0 8 -259541
 -1 -1;
@@ -61,21 +45,21 @@ empty 0 -6 0 10 -110565 -1 -1 1 256;
 #X obj 180 14 inlet;
 #X obj 24 197 f 0;
 #X obj 51 197 + 1;
-#X obj 77 197 mod \$1;
 #X msg 73 141 0;
 #X obj 24 281 s \$0.lite1;
 #X obj 104 281 s \$0.lite2;
 #X obj 184 281 s \$0.lite3;
+#X obj 77 197 mod 3;
 #X connect 1 0 3 0;
 #X connect 1 0 7 0;
 #X connect 1 0 10 0;
 #X connect 2 0 9 0;
 #X connect 3 0 2 1;
 #X connect 4 0 12 0;
-#X connect 5 0 16 0;
-#X connect 5 1 17 0;
-#X connect 5 2 18 0;
-#X connect 6 0 15 0;
+#X connect 5 0 15 0;
+#X connect 5 1 16 0;
+#X connect 5 2 17 0;
+#X connect 6 0 14 0;
 #X connect 6 1 7 0;
 #X connect 7 0 4 0;
 #X connect 10 0 3 0;
@@ -83,9 +67,9 @@ empty 0 -6 0 10 -110565 -1 -1 1 256;
 #X connect 11 0 2 0;
 #X connect 12 0 13 0;
 #X connect 12 0 5 0;
-#X connect 13 0 14 0;
+#X connect 13 0 18 0;
 #X connect 14 0 12 1;
-#X connect 15 0 12 1;
+#X connect 18 0 12 1;
 #X restore 241 104 pd midi-learn;
 #X obj 336 104 t a;
 #X obj 365 104 t a;
@@ -256,9 +240,9 @@ empty 0 -6 0 10 -110565 -1 -1 1 256;
 #X obj 132 19 r \$1/devNo;
 #X obj 132 46 s \$0.device-number.r;
 #X obj 41 436 s \$0.pad.r;
-#X obj 66 533 sssadie/sssadiez \$1 \$2 channel 0 256 \$0;
-#X obj 66 553 sssadie/sssadiez \$1 \$2 note 0 256 \$0;
-#X obj 66 573 sssadie/sssadiez \$1 \$2 pad 0 256 \$0;
+#X obj 26 553 sssadie/sssadiez \$1 \$2 note 0 256 \$0;
+#X obj 26 573 sssadie/sssadiez \$1 \$2 pad 0 256 \$0;
+#X obj 26 533 sssadie/sssadiez \$1 \$2 device-number 0 256 \$0;
 #X connect 0 0 3 0;
 #X connect 1 0 35 0;
 #X connect 1 0 44 0;
