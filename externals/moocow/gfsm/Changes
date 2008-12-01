@@ -1,8 +1,9 @@
 Change log for PD external 'pd-gfsm'
 
-v0.05 Sun, 30 Nov 2008 00:08:06 +0100
+v0.05 Mon, 01 Dec 2008 09:41:35 +0100
    + added local copy of gfsm source tree in gfsm/ subdir (for pd-extended auto-builds)
    + external builds now use static local libgfsm by default (insulates vs. API change, etc.)
+   + added ./configure argument --enable-system-gfsm: link to system (vs. local) libgfsm
 
 v0.0403 Tue, 11 Dec 2007 22:33:18 +0100
    + updated for gfsm-0.0.10-pre1 (noconfig.h, config.h preprocessor magic)
