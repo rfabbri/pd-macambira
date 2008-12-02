@@ -1,0 +1,17 @@
+#N canvas 258 96 687 438 10;
+#X obj 74 139 list-shellsort;
+#X msg 74 78 893 0 227 3 -221 3 88 42 8.78276e+06 -23447;
+#X text 74 35 [list-shellsort] - sort a list of floats into ascending
+order using a shellsort.;
+#X text 295 103 <== symbols filtered out;
+#X msg 110 105 dog 93 pig 9388 dog -38;
+#X obj 294 164 list-sort;
+#X text 290 142 also see:;
+#X text 73 258 2008 Matt Barber;
+#X obj 74 167 prepent set;
+#X msg 74 191 -38 93 9388;
+#X text 292 190 It's a bit slower \, but does descending sorts.;
+#X connect 0 0 8 0;
+#X connect 1 0 0 0;
+#X connect 4 0 0 0;
+#X connect 8 0 9 0;
