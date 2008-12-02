@@ -360,9 +360,11 @@ fi
 
 if test "$ac_cv_enable_glib" != "no" ; then
   ##-- glib: library
-  CFLAGS="$CFLAGS $GLIB_CFLAGS"
+  #CFLAGS="$CFLAGS $GLIB_CFLAGS"
+  CFLAGS="$CFLAGS `$PKG_CONFIG --cflags glib-2.0`"
   LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L glib-2.0`"
   gfsm_LIBS="$gfsm_LIBS `$PKG_CONFIG --libs-only-l glib-2.0`"
+  AC_MSG_NOTICE([(DEBUG): CFLAGS="$CFLAGS"])
 fi
 ##
 ## /glib
