@@ -1,0 +1,15 @@
+#N canvas 313 376 504 442 10;
+#X text 201 227 frame;
+#X text 212 265 bang when done;
+#X text 91 265 audio out;
+#X text 45 20 Plays a sound file til it ends \, synced up to the frame
+clock. Should stay in sync when randomly accessing different frame
+numbers.;
+#X text 146 216 array;
+#X text 146 227 name;
+#X text 201 217 start;
+#X text 134 311 arguments: arrayname startframe#;
+#X obj 115 112 fsclock 1000;
+#X text 35 232 frame clock;
+#X obj 115 243 fstabplay~ \$0-array;
+#X connect 8 0 10 0;
