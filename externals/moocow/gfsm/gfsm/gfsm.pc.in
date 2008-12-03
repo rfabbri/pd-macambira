@@ -14,7 +14,7 @@ docdir=@docdir@
 pkgdocdir=@pkgdocdir@
 
 build_options=@CONFIG_OPTIONS@
-cflags=@CFLAGS@
+cflags=@CFLAGS@ @gfsm_CFLAGS@
 cppflags=-I@spkgincludedir@ @CPPFLAGS@
 ldadd=-lgfsm @gfsm_LIBS@
 

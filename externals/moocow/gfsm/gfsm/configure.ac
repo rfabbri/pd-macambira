@@ -360,11 +360,11 @@ fi
 
 if test "$ac_cv_enable_glib" != "no" ; then
   ##-- glib: library
-  #CFLAGS="$CFLAGS $GLIB_CFLAGS"
-  CFLAGS="$CFLAGS `$PKG_CONFIG --cflags glib-2.0`"
-  LDFLAGS="$LDFLAGS `$PKG_CONFIG --libs-only-L glib-2.0`"
+  ## + we use "gfsm_CFLAGS" here because CFLAGS gets clobbered if
+  ##   we're called from a higher-level Makefile (e.g. pd-extended)
+  gfsm_CFLAGS="$gfsm_CFLAGS `$PKG_CONFIG --cflags glib-2.0`"
+  gfsm_LDFLAGS="$gfsm_LDFLAGS `$PKG_CONFIG --libs-only-L glib-2.0`"
   gfsm_LIBS="$gfsm_LIBS `$PKG_CONFIG --libs-only-l glib-2.0`"
-  AC_MSG_NOTICE([(DEBUG): CFLAGS="$CFLAGS"])
 fi
 ##
 ## /glib
@@ -849,6 +849,8 @@ AC_CONFIG_LINKS(src/libgfsm/gfsmConfigNoAuto.h:src/libgfsm/gfsmConfigAuto.h.in)
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## configuration options
 AC_SUBST(CONFIG_OPTIONS)
+AC_SUBST(gfsm_CFLAGS)
+AC_SUBST(gfsm_LDFLAGS)
 AC_SUBST(gfsm_LIBS)
 ## /config options
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

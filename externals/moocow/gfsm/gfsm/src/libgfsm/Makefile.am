@@ -197,12 +197,18 @@ gfsmRegexCompiler.o: gfsmRegexCompiler.c gfsmRegexCompiler.h gfsmRegex.lex.c gfs
 ## compile flags
 ##-----------------------------------------------------------------------
 
-## --- preprocessor flags
+##--- preprocessor flags
 #AM_CPPFLAGS =
 AM_CPPFLAGS = -I. -I$(SRCDIR)/gnulib
 
-## --- compiler flags (cc)
-AM_CFLAGS = $(gfsm_WFLAGS) $(gfsm_OFLAGS)
+##--- compiler flags (cc)
+AM_CFLAGS = $(gfsm_WFLAGS) $(gfsm_CFLAGS) $(gfsm_OFLAGS)
+
+##--- linker flags
+AM_LDFLAGS = $(gfsm_LDFLAGS)
+
+##--- libraries
+AM_LIBS = $(gfsm_LIBS)
 
 ##-----------------------------------------------------------------------
 ## Additional variable: library versioning
@@ -233,7 +239,7 @@ LIBREV = $(GFSM_VERSION_MINOR)
 #${lib_i}_la_LIBADD  = -lotherlib
 
 libgfsm_la_LDFLAGS = -version-info $(LIBCUR):$(LIBREV):$(LIBAGE)
-libgfsm_la_LIBADD  = gnulib/libgnu.la @gfsm_LIBS@ $(LIBS)
+#libgfsm_la_LIBADD  = gnulib/libgnu.la @gfsm_LIBS@ $(LIBS)
 
 ##-----------------------------------------------------------------------
 ## Variables: cleanup
