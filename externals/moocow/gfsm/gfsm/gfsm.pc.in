@@ -10,8 +10,8 @@ libdir=@libdir@
 
 PACKAGE=@PACKAGE@
 datadir=@datadir@
-docdir=@docdir@
-pkgdocdir=@pkgdocdir@
+#docdir=@docdir@
+#pkgdocdir=@pkgdocdir@
 
 build_options=@CONFIG_OPTIONS@
 cflags=@CFLAGS@ @gfsm_CFLAGS@
