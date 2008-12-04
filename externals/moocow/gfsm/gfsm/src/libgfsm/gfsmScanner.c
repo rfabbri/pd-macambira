@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library
  *
- * Copyright (c) 2005 Bryan Jurish.
+ * Copyright (c) 2005-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@
 
 #include <gfsmScanner.h>
 #include <gfsmUtils.h>
+#include <gfsmCommon.h>
 #include <string.h>
 
 /*======================================================================
@@ -177,7 +178,7 @@ void gfsm_scanner_scan_string(gfsmScanner *scanner, const char *str)
  */
 
 //--------------------------------------------------------------
-int gfsm_scanner_yywrap(gfsmScanner *scanner)
+int gfsm_scanner_yywrap(GFSM_UNUSED gfsmScanner *scanner)
 { return 1; }
 
 

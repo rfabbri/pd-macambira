@@ -3,7 +3,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library
  *
- * Copyright (c) 2004 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@
 #include <glib.h>
 #include <gfsmUtils.h>
 #include <gfsmError.h>
+#include <gfsmCommon.h>
 #include <string.h>
 #include <errno.h>
 
@@ -41,7 +42,7 @@ gint gfsm_int_compare(gconstpointer a, gconstpointer b)
 /*--------------------------------------------------------------
  * int_compare_data()
  */
-gint gfsm_int_compare_data(gconstpointer a, gconstpointer b, gpointer data)
+gint gfsm_int_compare_data(gconstpointer a, gconstpointer b, GFSM_UNUSED gpointer data)
 {
   return (GPOINTER_TO_INT(b) - GPOINTER_TO_INT(a));
 }
@@ -61,7 +62,7 @@ gint gfsm_uint_compare(gconstpointer a, gconstpointer b)
 /*--------------------------------------------------------------
  * uint_compare_data()
  */
-gint gfsm_uint_compare_data(gconstpointer a, gconstpointer b, gpointer data)
+gint gfsm_uint_compare_data(gconstpointer a, gconstpointer b, GFSM_UNUSED gpointer data)
 {
   return gfsm_uint_compare_code(a,b);
 }
@@ -72,7 +73,7 @@ gint gfsm_uint_compare_data(gconstpointer a, gconstpointer b, gpointer data)
 /*--------------------------------------------------------------
  * gfsm_hash_clear_func()
  */
-gboolean gfsm_hash_clear_func (gpointer key, gpointer value, gpointer user_data)
+gboolean gfsm_hash_clear_func (GFSM_UNUSED gpointer key, GFSM_UNUSED gpointer value, GFSM_UNUSED gpointer user_data)
 { return TRUE; };
 	      
 

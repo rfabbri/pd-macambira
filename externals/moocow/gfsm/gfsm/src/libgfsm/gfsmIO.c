@@ -335,7 +335,7 @@ ssize_t gfsmio_getdelim(gfsmIOHandle *ioh, char **lineptr, size_t *n, int delim)
     int c = -2;
     GString *gs=NULL;
 
-    while ( *n > 0 && i < (*n-1) && (c=gfsmio_getc(ioh)) != GFSMIO_EOF ) {
+    while ( *n > 0 && i < (((ssize_t)(*n))-1) && (c=gfsmio_getc(ioh)) != GFSMIO_EOF ) {
       (*lineptr)[i++] = c;
 #ifdef GFSM_DEBUG_GETDELIM
       fprintf(stderr, "---> getdelim(i=%d) got char %d ~ '%c' to linebuf\n", i, (char)c, c);//--DEBUG
@@ -502,13 +502,13 @@ gboolean gfsmio_eof_zfile(gzFile zf)
  * gzFile: Read Methods
  */
 gboolean gfsmio_read_zfile(gzFile zf, void *buf, size_t nbytes)
-{ return zf ? (gzread(zf,buf,nbytes)==nbytes) : FALSE; }
+{ return zf ? (gzread(zf,buf,nbytes)==(int)nbytes) : FALSE; }
 
 /*--------------------------------------------------------------
  * gzFile: Write Methods
  */
 gboolean gfsmio_write_zfile(gzFile zf, const void *buf, size_t nbytes)
-{ return zf ? (gzwrite(zf, buf, nbytes)==nbytes) : FALSE; }
+{ return zf ? (gzwrite(zf, buf, nbytes)==(int)nbytes) : FALSE; }
 
 #endif /* GFSM_ZLIB_ENABLED */
 

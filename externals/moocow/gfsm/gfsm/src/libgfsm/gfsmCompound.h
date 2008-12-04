@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library: basic compound types
  *
- * Copyright (c) 2004-2007 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

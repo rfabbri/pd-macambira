@@ -3,7 +3,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library: automata: inline definitions
  *
- * Copyright (c) 2004-2007 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -184,7 +184,7 @@ void gfsm_automaton_reserve_states(gfsmAutomaton *fsm, gfsmStateId n_states)
  * reserve_arcs()
  */
 GFSM_INLINE
-void gfsm_automaton_reserve_arcs(gfsmAutomaton *fsm, guint n_arcs)
+void gfsm_automaton_reserve_arcs(GFSM_UNUSED gfsmAutomaton *fsm, GFSM_UNUSED guint n_arcs)
 {
   return;
 }
@@ -323,7 +323,7 @@ gfsmState *gfsm_automaton_open_state_force(gfsmAutomaton *fsm, gfsmStateId qid)
  * close_state()
  */
 GFSM_INLINE
-void gfsm_automaton_close_state(gfsmAutomaton *fsm, gfsmState *qp)
+void gfsm_automaton_close_state(GFSM_UNUSED gfsmAutomaton *fsm, GFSM_UNUSED gfsmState *qp)
 {
   //gfsm_state_close(qp);
   return;

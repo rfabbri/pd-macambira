@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library: automata: visualization
  *
- * Copyright (c) 2004 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -47,7 +47,7 @@ gboolean gfsm_automaton_draw_vcg_file_full (gfsmAutomaton *fsm,
 					    const gchar   *state_shape,
 					    const gchar   *state_color,
 					    const gchar   *final_color,
-					    gfsmError    **errp)
+					    GFSM_UNUSED gfsmError **errp)
 {
   gfsmStateId id;
   GString     *gstr = g_string_new("");
@@ -176,7 +176,7 @@ gboolean gfsm_automaton_draw_dot_file_full (gfsmAutomaton *fsm,
 					    gboolean       vertical,
 					    float          nodesep,
 					    float          ranksep,
-					    gfsmError    **errp)
+					    GFSM_UNUSED gfsmError **errp)
 {
   gfsmStateId id;
   GString     *gstr = g_string_new("");

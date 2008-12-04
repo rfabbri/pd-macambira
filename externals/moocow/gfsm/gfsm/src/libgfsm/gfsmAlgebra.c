@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library
  *
- * Copyright (c) 2004-2007 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -1621,7 +1621,7 @@ gfsmAutomaton *gfsm_automaton_reverse_old(gfsmAutomaton *fsm)
 /*--------------------------------------------------------------
  * sigma()
  */
-gboolean gfsm_automaton_sigma_foreach_func_(gfsmAlphabet *abet, gpointer key, gfsmLabelVal lab, gfsmAutomaton *fsm)
+gboolean gfsm_automaton_sigma_foreach_func_(GFSM_UNUSED gfsmAlphabet *abet, GFSM_UNUSED gpointer key, gfsmLabelVal lab, gfsmAutomaton *fsm)
 {
   gfsm_automaton_add_arc(fsm,0,1,lab,lab,fsm->sr->one);
   return FALSE;

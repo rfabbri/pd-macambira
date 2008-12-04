@@ -1,7 +1,10 @@
 Change log for PD external 'pd-gfsm'
 
-v0.05 Mon, 01 Dec 2008 09:41:35 +0100
+v0.05 Thu, 04 Dec 2008 15:18:22 +0100
+   + added ./autogen.sh-generated stuff to SVN, for pd-extended auto-builds
+     - pkg-config autoconf macros e.g. PKG_CHECK_MODULES are missing on darwin
    + added local copy of gfsm source tree in gfsm/ subdir (for pd-extended auto-builds)
+     - removed extraneous (non-library) directories doc/, src/programs, tests/
    + external builds now use static local libgfsm by default (insulates vs. API change, etc.)
    + added ./configure argument --enable-system-gfsm: link to system (vs. local) libgfsm
 

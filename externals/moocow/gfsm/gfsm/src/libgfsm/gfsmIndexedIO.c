@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library: indexed automata: I/O
  *
- * Copyright (c) 2007 Bryan Jurish.
+ * Copyright (c) 2007-2008 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER
  * OF ALL WARRANTIES, see the file "COPYING" in this distribution.
@@ -312,7 +312,7 @@ gboolean gfsm_indexed_automaton_print_handle (gfsmIndexedAutomaton *xfsm,
 					      gfsmAlphabet  *lo_alphabet,
 					      gfsmAlphabet  *hi_alphabet,
 					      gfsmAlphabet  *state_alphabet,
-					      gfsmError     **errp)
+					      GFSM_UNUSED gfsmError **errp)
 {
   gfsmStateId qid;
   gfsmArcRange range;

@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library: common definitions
  *
- * Copyright (c) 2004-2007 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,16 @@
 
 #include <gfsmConfig.h>
 #include <glib.h>
+
+/*======================================================================
+ * Defines
+ */
+#ifdef __GNUC__
+# define GFSM_UNUSED __attribute__((unused))
+#else
+# define GFSM_UNUSED
+#endif
+
 
 /*======================================================================
  * Basic Types

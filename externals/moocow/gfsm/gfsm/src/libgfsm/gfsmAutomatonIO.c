@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library: automata: I/O
  *
- * Copyright (c) 2004-2007 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER
  * OF ALL WARRANTIES, see the file "COPYING" in this distribution.
@@ -546,7 +546,7 @@ gboolean gfsm_automaton_compile_handle (gfsmAutomaton *fsm,
 					gfsmAlphabet  *lo_alphabet,
 					gfsmAlphabet  *hi_alphabet,
 					gfsmAlphabet  *state_alphabet,
-					gfsmError     **errp)
+					GFSM_UNUSED gfsmError **errp)
 {
   gfsmStateId q1, q2;
   gfsmLabelId lo, hi;
@@ -741,7 +741,7 @@ gboolean gfsm_automaton_print_handle (gfsmAutomaton *fsm,
 				      gfsmAlphabet  *lo_alphabet,
 				      gfsmAlphabet  *hi_alphabet,
 				      gfsmAlphabet  *state_alphabet,
-				      gfsmError     **errp)
+				      GFSM_UNUSED gfsmError **errp)
 {
   guint i;
   GString *gs = g_string_new("");

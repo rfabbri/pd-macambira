@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library: memory utilities: inline definitions
  *
- * Copyright (c) 2004 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -120,7 +120,7 @@ GFSM_INLINE
 void gfsm_gstring_assign_bytes (GString *gstr, const gchar *src, gsize len)
 {
   g_string_truncate(gstr, 0);
-  g_string_append_len(gstr, src, gstr->len);
+  g_string_append_len(gstr, src, len);
 }
 
 /*----------------------------------------------------------------------

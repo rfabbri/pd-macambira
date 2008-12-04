@@ -12,7 +12,7 @@
 
 ## --- recursion subdirectories
 #SUBDIRS = libgfsm programs
-SUBDIRS = libgfsm $(GFSM_SRC_SUBDIRS)
+SUBDIRS = libgfsm
 
 #-----------------------------------------------------------------------
 # Variables: cleanup

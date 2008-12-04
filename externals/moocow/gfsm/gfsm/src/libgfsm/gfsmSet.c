@@ -3,7 +3,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library
  *
- * Copyright (c) 2004-2007 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@
  *=============================================================================*/
 
 #include <gfsmSet.h>
+#include <gfsmCommon.h>
 
 //-- no-inline definitions
 #ifndef GFSM_INLINE_ENABLED
@@ -62,7 +63,7 @@ void gfsm_set_clear(gfsmSet *set)
 /*--------------------------------------------------------------
  * union_func()
  */
-gboolean gfsm_set_union_func(gpointer key, gpointer value, gfsmSetUnionData *data)
+gboolean gfsm_set_union_func(gpointer key, GFSM_UNUSED gpointer value, gfsmSetUnionData *data)
 {
   if (!data->dupfunc) {
     //-- no memory hairiness: just insert
@@ -77,7 +78,7 @@ gboolean gfsm_set_union_func(gpointer key, gpointer value, gfsmSetUnionData *dat
 /*--------------------------------------------------------------
  * difference_func()
  */
-gboolean gfsm_set_difference_func(gpointer key, gpointer value, gfsmSet *set1)
+gboolean gfsm_set_difference_func(gpointer key, GFSM_UNUSED gpointer value, gfsmSet *set1)
 {
   gfsm_set_remove(set1,key);
   return FALSE;
@@ -107,7 +108,7 @@ gfsmSet *gfsm_set_intersection(gfsmSet *set1, gfsmSet *set2)
 /*--------------------------------------------------------------
  * to_slist_foreach_func()
  */
-gboolean gfsm_set_to_slist_foreach_func(gpointer key, gpointer value, GSList **dst)
+gboolean gfsm_set_to_slist_foreach_func(gpointer key, GFSM_UNUSED gpointer value, GSList **dst)
 {
   *dst = g_slist_prepend(*dst, key);
   return FALSE; //-- don't stop iterating
@@ -116,7 +117,7 @@ gboolean gfsm_set_to_slist_foreach_func(gpointer key, gpointer value, GSList **d
 /*--------------------------------------------------------------
  * to_ptr_array_foreach_func()
  */
-gboolean gfsm_set_to_ptr_array_foreach_func(gpointer key, gpointer value, GPtrArray *dst)
+gboolean gfsm_set_to_ptr_array_foreach_func(gpointer key, GFSM_UNUSED gpointer value, GPtrArray *dst)
 {
   g_ptr_array_add(dst,key);
   return FALSE;

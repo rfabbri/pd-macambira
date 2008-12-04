@@ -1,10 +1,9 @@
-
 /*=============================================================================*\
  * File: gfsmIndexed.hi
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library: indexed automaton: inline definitions
  *
- * Copyright (c) 2007 Bryan Jurish.
+ * Copyright (c) 2007-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -224,7 +223,7 @@ gfsmStateId gfsm_indexed_automaton_ensure_state(gfsmIndexedAutomaton *xfsm, gfsm
 
 //----------------------------------------
 GFSM_INLINE
-void gfsm_indexed_automaton_remove_state(gfsmIndexedAutomaton *fsm, gfsmStateId qid)
+void gfsm_indexed_automaton_remove_state(GFSM_UNUSED gfsmIndexedAutomaton *fsm, GFSM_UNUSED gfsmStateId qid)
 { return; }
 
 

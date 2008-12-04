@@ -223,9 +223,9 @@ void gfsm_alphabet_clear(gfsmAlphabet *a)
  * gfsm_alphabet_foreach_remove_func()
  */
 gboolean gfsm_alphabet_foreach_remove_func(gfsmAlphabet *a,
-					   gpointer      key,
+					   GFSM_UNUSED gpointer key,
 					   gfsmLabelVal   lab,
-					   gpointer      data)
+					   GFSM_UNUSED gpointer data)
 {
   gfsm_alphabet_remove_label(a,lab);
   return FALSE;
@@ -280,7 +280,7 @@ gboolean gfsm_alphabet_foreach (gfsmAlphabet            *a,
 /*--------------------------------------------------------------
  * strdup()
  */
-gpointer gfsm_alphabet_strdup(gfsmAlphabet *a, const gchar *str)
+gpointer gfsm_alphabet_strdup(GFSM_UNUSED gfsmAlphabet *a, const gchar *str)
 { return g_strdup(str); }
 
 /*======================================================================
@@ -315,7 +315,7 @@ gfsmLabelVal gfsm_alphabet_size(gfsmAlphabet *a)
 /*--------------------------------------------------------------
  * foreach_size_func()
  */
-gboolean gfsm_alphabet_foreach_size_func(gfsmAlphabet *a,
+gboolean gfsm_alphabet_foreach_size_func(GFSM_UNUSED gfsmAlphabet *a,
 					 gpointer      key,
 					 gfsmLabelVal  lab,
 					 guint        *np)
@@ -558,9 +558,9 @@ gfsmAlphabet *gfsm_alphabet_union(gfsmAlphabet *a1, gfsmAlphabet *a2)
 /*--------------------------------------------------------------
  * union_func()
  */
-gboolean gfsm_alphabet_foreach_union_func(gfsmAlphabet *src,
+gboolean gfsm_alphabet_foreach_union_func(GFSM_UNUSED gfsmAlphabet *src,
 					  gpointer      src_key,
-					  gfsmLabelVal   src_id,
+					  GFSM_UNUSED gfsmLabelVal  src_id,
 					  gfsmAlphabet *dst)
 {
   gfsm_alphabet_get_label(dst,src_key);      
@@ -570,8 +570,8 @@ gboolean gfsm_alphabet_foreach_union_func(gfsmAlphabet *src,
 /*--------------------------------------------------------------
  * gfsm_alphabet_labels_to_array_func()
  */
-gboolean gfsm_alphabet_labels_to_array_func(gfsmAlphabet *alph,
-					    gpointer      key,
+gboolean gfsm_alphabet_labels_to_array_func(GFSM_UNUSED gfsmAlphabet *alph,
+					    GFSM_UNUSED gpointer      key,
 					    gfsmLabelVal  lab,
 					    GPtrArray    *ary)
 {
@@ -656,7 +656,7 @@ void gfsm_alphabet_key2string(gfsmAlphabet *a, gpointer key, GString *gstr)
 /*--------------------------------------------------------------
  * load_handle()
  */
-gboolean gfsm_alphabet_load_handle (gfsmAlphabet *a, gfsmIOHandle *ioh, gfsmError **errp)
+gboolean gfsm_alphabet_load_handle (gfsmAlphabet *a, gfsmIOHandle *ioh, GFSM_UNUSED gfsmError **errp)
 {
   int c;
   gpointer    key;
@@ -968,7 +968,7 @@ GString *gfsm_alphabet_labels_to_gstring(gfsmAlphabet *abet,
 {
   gfsmLabelVal lab;
   const gchar  *sym;
-  int i;
+  guint i;
 
   //-- setup GString
   if (gstr==NULL) {

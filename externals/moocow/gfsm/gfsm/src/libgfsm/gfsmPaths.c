@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library
  *
- * Copyright (c) 2005-2007 Bryan Jurish.
+ * Copyright (c) 2005-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@
 //--------------------------------------------------------------
 gfsmLabelVector *gfsm_label_vector_copy(gfsmLabelVector *dst, gfsmLabelVector *src)
 {
-  int i;
+  guint i;
   g_ptr_array_set_size(dst, src->len);
   for (i=0; i < src->len; i++) {
     g_ptr_array_index(dst,i) = g_ptr_array_index(src,i);
@@ -148,7 +148,7 @@ void gfsm_path_pop(gfsmPath *p, gfsmLabelVal lo, gfsmLabelVal hi)
 //--------------------------------------------------------------
 int gfsm_label_vector_compare(const gfsmLabelVector *v1, const gfsmLabelVector *v2)
 {
-  int i;
+  guint i;
   gfsmLabelVal lab1, lab2;
   if (v1==v2) return 0;
 
@@ -275,7 +275,7 @@ GSList *gfsm_paths_to_strings(gfsmSet *paths,
 			      gfsmSemiring *sr,
 			      gboolean warn_on_undefined,
 			      gboolean att_style,
-			      GSList *strings)
+			      GFSM_UNUSED GSList *strings)
 {
   gfsmPathsToStringsOptions opts =
     {
@@ -294,7 +294,7 @@ GSList *gfsm_paths_to_strings(gfsmSet *paths,
 
 //--------------------------------------------------------------
 gboolean _gfsm_paths_to_strings_foreach_func(gfsmPath *path,
-					     gpointer value_dummy,
+					     GFSM_UNUSED gpointer value_dummy,
 					     gfsmPathsToStringsOptions *opts)
 {
   GString *gs = gfsm_path_to_gstring(path, NULL,

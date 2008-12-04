@@ -3,7 +3,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [gfsm])
-define([THE_PACKAGE_VERSION], [0.0.10-pre8])
+define([THE_PACKAGE_VERSION], [0.0.10-pre8-pd])
 define([THE_PACKAGE_MAINTAINER],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_MAINTAINER)
@@ -409,15 +409,8 @@ fi
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## perl
-AC_ARG_VAR(PERL, [Path to your perl interpreter, "no" to disable])
-if test -z "$PERL" ; then
-  AC_PATH_PROG(PERL,[perl],[no])
-fi
-if test -z "$PERL" -o "$PERL" = "no"; then
-  AC_MSG_WARN([perl missing or disabled])
-  AC_MSG_WARN([- generation of alternate documentation formats disabled.])
-  PERL=no
-fi
+## --> REMOVED for pd-local libgfsm
+PERL=""
 AC_SUBST(PERL)
 ## /perl
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -425,388 +418,53 @@ AC_SUBST(PERL)
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## optgen.perl & Getopt::Gen
+## --> REMOVED for pd-local libgfsm
 ##
-AC_ARG_VAR(OPTGEN_PERL, [Path to the 'optgen.perl' script; "no" to disable])
-
-##-- test for working optgen.perl
-AC_MSG_CHECKING([whether Getopt::Gen works])
-  if test "$PERL" != "no" && $PERL -MGetopt::Gen -e'exit 0;' >>config.log 2>&1; then
-  AC_MSG_RESULT(yes)
-else
-  AC_MSG_RESULT(no)
-  AC_MSG_WARN([Getopt::Gen (or something it depends on) is broken!])
-  AC_MSG_WARN([- you probably need to fix your Parse::Lex module])
-  OPTGEN_PERL="no"
-fi
-
-if test -z "$OPTGEN_PERL" ; then
-  AC_PATH_PROG(OPTGEN_PERL,[optgen.perl],[no])
-fi
-
-AC_MSG_NOTICE([setting OPTGEN_PERL=$OPTGEN_PERL])
+OPTGEN_PERL="no"
 AC_SUBST(OPTGEN_PERL)
-
-if test "$OPTGEN_PERL" = "no" ; then
-  AC_MSG_WARN([optgen.perl script is missing, broken, or disabled.])
-  AC_MSG_WARN([- regeneration of command-line parsers from .gog specifications disabled.])
-  AC_MSG_WARN([- regeneration of POD documentation from .gog specifications disabled.])
-fi
-AM_CONDITIONAL(HAVE_OPTGEN, [test "$OPTGEN_PERL" != "no"])
-##
 ## /optgen.perl
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## Documentation
-##
-AC_ARG_WITH(docdir,
-	AC_HELP_STRING([--with-docdir=DIR],
-		[install documentation in DIR/AC_PACKAGE_NAME (default=DATADIR/doc)]),
-	[docdir="$withval"],
-	[docdir="\${datadir}/doc"])
-pkgdocdir="\${docdir}/\${PACKAGE}"
-pkgdocprogdir="\${docdir}/\${PACKAGE}/programs"
-pkgdoctutdir="\${docdir}/\${PACKAGE}/tutorial"
-pkgdoclibdir="\${docdir}/\${PACKAGE}/lib\${PACKAGE}"
-
-AC_SUBST(docdir)
-AC_SUBST(pkgdocdir)
-AC_SUBST(pkgdocprogdir)
-AC_SUBST(pkgdoctutdir)
-AC_SUBST(pkgdoclibdir)
-
-AC_ARG_WITH(doc-formats,
-	AC_HELP_STRING([--with-doc-formats=LIST],
-		       [Build documentation formats in LIST. \
-                        Available formats: txt, man, html, dvi, ps, pdf, none.
-	                Default='man html'. Requires Perl, pod2xxx.]),
-	[ac_cv_doc_formats="$withval"])
-AC_ARG_ENABLE(doc,
-	AC_HELP_STRING([--disable-doc],[Synonym for --with-doc-formats="none"]),
-	[enable_doc="$enableval"],[enable_doc="yes"])
-
-AC_MSG_CHECKING([which documentation formats to build])
-## -- set default doc formats if unspecified
-if test -z "$ac_cv_doc_formats" ; then
-  ac_cv_doc_formats="man html"
-fi
-
-## -- un-comma-tize the doc-formats
-gfsm_doc_formats=`echo "$ac_cv_doc_formats" | sed 's/\,/ /g'`
-
-if test "$enable_doc" != "yes" ; then
- ##-- disable all docs
- gfsm_doc_formats="none"
-fi
-AC_MSG_RESULT($gfsm_doc_formats)
-#echo ">> post RESULT"
-
-##-- doxygen: var
-AC_ARG_VAR(DOXYGEN,[Path to doxygen documentation generator; "no" to disable])
-
-if test "$gfsm_doc_formats" != "none" ; then
-
-  ##-- doxygen: prog
-  ##
-  if test -z "$DOXYGEN" ; then
-    AC_PATH_PROG(DOXYGEN,doxygen,[no])
-  fi
-  AC_MSG_NOTICE([setting DOXYGEN=$DOXYGEN])
-  ##
-  if test -z "$DOXYGEN" -o "$DOXYGEN" = "no"; then
-    AC_MSG_WARN([doxygen missing or disabled])
-    AC_MSG_WARN([- generation of library documentation disabled])
-    DOXYGEN=no
-  fi
-  ##
-  ##--/doxygen:prog
-
-  ##-- doxygen: filter: doc/lib*/'doxy-filter.perl'
-  ##
-  AC_ARG_VAR(DOXY_FILTER,[doxygen input filter; "no" to disable (default)])
-  AC_MSG_CHECKING([for doxygen input filter])
-  if test -z "$DOXY_FILTER"; then
-    DOXY_FILTER="no"
-    #DOXY_SRCDIR="`find ${srcdir}/doc/ -name 'lib*' -print | head -n1`"
-    #if test -d "$DOXY_SRCDIR" -a -f "$DOXY_SRCDIR/doxy-filter.perl" -a "$PERL" != "no" ; then
-    #  DOXY_SRCDIR=`cd "$DOXY_SRCDIR"; pwd`
-    #  DOXY_FILTER="$PERL $DOXY_SRCDIR/doxy-filter.perl"
-    #else
-    #  DOXY_FILTER="no"
-    #fi
-  fi
-  AC_MSG_RESULT([$DOXY_FILTER])
-  ##
-  if test "$DOXY_FILTER" != "no"; then
-    AC_MSG_CHECKING([whether doxygen input filter works])
-    if test -n "$DOXY_FILTER" && $DOXY_FILTER </dev/null 2>&1 >>config.log ; then
-      AC_MSG_RESULT([yes])
-    else
-      AC_MSG_RESULT([no])
-      DOXY_FILTER="no"
-    fi
-  fi
-  AC_MSG_NOTICE([setting DOXY_FILTER=$DOXY_FILTER])
-  ##
-  if test "$DOXY_FILTER" != "no"; then
-    DOXY_INPUT_FILTER="$DOXY_FILTER"
-  else
-    DOXY_INPUT_FILTER=""
-  fi
-  AC_SUBST(DOXY_FILTER)
-  AC_SUBST(DOXY_INPUT_FILTER)
-  ##
-  ##--/doxygen:filter
-
-  ##-- doxygen: sources
-  AC_SUBST(DOXYGEN_SOURCES)
-
-  ##-- docs:pod2x
-  ##
+## --> REMOVED for pd-local libgfsm
   AC_ARG_VAR(POD2TEXT, [Path to perl 'pod2text' script; "no" for none])
-  AC_ARG_VAR(POD2MAN,  [Path to perl 'pod2man' script; "no" for none])
   AC_ARG_VAR(POD2HTML, [Path to perl 'pod2html' script; "no" for none])
-  AC_ARG_VAR(POD2LATEX,[Path to perl 'pod2latex' script; "no" for none])
+
   if test -z "$POD2TEXT" ; then
-     AC_PATH_PROG(POD2TEXT,pod2text,[no])
-  fi
-  if test -z "$POD2MAN"  ; then
-     AC_PATH_PROG(POD2MAN,pod2man,[no])
+    AC_PATH_PROG(POD2TEXT,pod2text,[no])
   fi
   if test -z "$POD2HTML" ; then
-     AC_PATH_PROG(POD2HTML,pod2html,[no])
+    AC_PATH_PROG(POD2HTML,pod2html,[no])
   fi
-  if test -z "$POD2LATEX"; then
-     AC_PATH_PROG(POD2LATEX,pod2latex,[no])
-  fi
+
   AC_SUBST(POD2TEXT)
-  AC_SUBST(POD2MAN)
   AC_SUBST(POD2HTML)
-  AC_SUBST(POD2LATEX)
-  ##
-  ##--/docs:pod2x
-
-  ##-- docs: .gog sources
-  ##
-  DOC_MAN1_GOGS="\
-	gfsmarcsort.gog \
-	gfsmarith.gog \
-	gfsmclosure.gog \
-	gfsmcompile.gog \
-	gfsmcomplement.gog \
-	gfsmcompose.gog \
-	gfsmcompre.gog \
-	gfsmconcat.gog \
-	gfsmconnect.gog \
-	gfsmconvert.gog \
-	gfsmdeterminize.gog \
-	gfsmdifference.gog \
-	gfsmdraw.gog \
-	gfsmheader.gog \
-	gfsminfo.gog \
-	gfsmintersect.gog \
-	gfsminvert.gog \
-	gfsmlabels.gog \
-	gfsmlookup.gog \
-	gfsmoptional.gog \
-	gfsmprint.gog \
-	gfsmproduct.gog \
-	gfsmproject.gog \
-	gfsmrenumber.gog \
-	gfsmreplace.gog \
-	gfsmreverse.gog \
-	gfsmrmepsilon.gog \
-	gfsmsigma.gog \
-	gfsmstrings.gog \
-	gfsmunion.gog \
-	gfsmviterbi.gog \
-	gfsmindex.gog \
-	"
- DOC_MAN1_GOGS="$DOC_MAN1_GOGS"
-  for g in $DOC_MAN1_GOGS ; do
-    AC_CONFIG_LINKS(doc/programs/${g}:src/programs/${g})  
-  done
-  DOC_GOGS="$DOC_MAN1_GOGS"
-  AC_SUBST(DOC_MAN1_GOGS)
-  AC_SUBST(DOC_GOGS)
-  dnl AC_CONFIG_LINKS(doc/programs/acknowledge.pod:src/programs/acknowledge.pod)
-  ##
-  ##--/docs: .gog sources
-
-  ##-- docs: index-skeleton (section 1)
-  DOC_PROG_INDEX_SKEL="gfsmutils.skel"
-  AC_SUBST(DOC_PROG_INDEX_SKEL)
-
-  ##-- docs: section 5 (static pods)
-  DOC_MAN5_PODS=""
-  AC_SUBST(DOC_MAN5_PODS)
-
-  ##-- docs: pods (all)
-  DOC_PODS="gfsmutils.pod $DOC_MAN5_PODS `echo \"$DOC_MAN1_GOGS\" | sed 's/\.gog/\.pod/g'`"
-  AC_SUBST(DOC_PODS)
-
-  ##-- set "CONFIG_DOC_WANT_*" variables
-  ##   + test with automake conditionals "DOC_WANT_*"
-  CONFIG_DOC_WANT_TXT="no"
-  CONFIG_DOC_WANT_MAN="no"
-  CONFIG_DOC_WANT_HTML="no"
-  CONFIG_DOC_WANT_LATEX="no"
-  CONFIG_DOC_WANT_DVI="no"
-  CONFIG_DOC_WANT_PS="no"
-  CONFIG_DOC_WANT_PDF="no"
-  
-  ##-- docs: parse user request
-  ##
-  for fmt in $gfsm_doc_formats ; do
-    case "$fmt" in
-      txt)
-        CONFIG_DOC_WANT_TXT="yes"
-	;;
-      man)
-        CONFIG_DOC_WANT_MAN="yes"
-	;;
-      html)
-        CONFIG_DOC_WANT_HTML="yes"
-	;;
-      dvi)
-        CONFIG_DOC_WANT_LATEX="yes"
-        CONFIG_DOC_WANT_DVI="yes"
-	;;
-      ps)
-	CONFIG_DOC_WANT_LATEX="yes"
-        CONFIG_DOC_WANT_PS="yes"
-	;;
-      pdf)
-        CONFIG_DOC_WANT_LATEX="yes"
-	CONFIG_DOC_WANT_PDF="yes"
-	;;
-      *)
-	AC_MSG_WARN(ignoring unknown documentation format: $fmt)
-	;;
-    esac; # case "$fmt" in ...
-  done; # for fmt in $gfsm_doc_formats ...
-  ##
-  ##--/docs: parse user request
-
-  ##-- docs: requested: automake conditionals: indicator values
-  AC_SUBST(CONFIG_DOC_WANT_TXT)
-  AC_SUBST(CONFIG_DOC_WANT_MAN)
-  AC_SUBST(CONFIG_DOC_WANT_HTML)
-  AC_SUBST(CONFIG_DOC_WANT_LATEX)
-  AC_SUBST(CONFIG_DOC_WANT_DVI)
-  AC_SUBST(CONFIG_DOC_WANT_PS)
-  AC_SUBST(CONFIG_DOC_WANT_PDF)
-
-  ##-- docs: doxygen vars (compatibility)
-  DOXY_WANT_MAN="$CONFIG_DOC_WANT_MAN"
-  DOXY_WANT_HTML="$CONFIG_DOC_WANT_HTML"
-  DOXY_WANT_LATEX="$CONFIG_DOC_WANT_LATEX"
-  DOXY_WANT_HTMLHELP="NO"
-  AC_SUBST(DOXY_WANT_HTML)
-  AC_SUBST(DOXY_WANT_MAN)
-  AC_SUBST(DOXY_WANT_LATEX)
-
-  ##-- docs: doxygen: defines
-  AC_SUBST(DOXY_DEFINES)
-
-  ##-- doxygen: external tag-files (this needs an overhaul!)
-  ##
-  #for ext in gfsmm ; do
-  #  extdocdir="`$PKG_CONFIG --variable=pkgdocdir ${ext}`"
-  #  if test -n "$extdocdir" -a "$extdocdir" != "no" ; then
-  #    exttagfiles="`find $extdocdir -name '*.tag'`"
-  #    for exttag in $exttagfiles ; do
-  #      exttagdir="`dirname $exttag`/html"
-  #      if test -d "$exttagdir" ; then
-  #        DOXY_TAGFILES="$DOXY_TAGFILES $exttag=$exttagdir"
-  #      fi
-  #    done
-  #  fi
-  #done 
-  AC_SUBST(DOXY_TAGFILES)   
-  ##
-  ##--/doxyxgen: tag-files
-  
-fi; # if "$gfsm_doc_formats" != "none" ...
-
-##-- conditionals
-AM_CONDITIONAL(HAVE_DOXYGEN,     [test -n "$DOXYGEN"     -a "$DOXYGEN"     != "no"])
-AM_CONDITIONAL(HAVE_DOXY_FILTER, [test -n "$DOXY_FILTER" -a "$DOXY_FILTER" != "no"])
 
 AM_CONDITIONAL(HAVE_POD2TEXT,    [test -n "$POD2TEXT"  -a "$POD2TEXT"  != "no"])
-AM_CONDITIONAL(HAVE_POD2MAN,     [test -n "$POD2MAN"   -a "$POD2MAN"   != "no"]) 
 AM_CONDITIONAL(HAVE_POD2HTML,    [test -n "$POD2HTML"  -a "$POD2HTML"  != "no"])
-AM_CONDITIONAL(HAVE_POD2LATEX,   [test -n "$POD2LATEX" -a "$POD2LATEX" != "no"])
-
-AM_CONDITIONAL(DOC_WANT_TXT,     [test -n "$CONFIG_DOC_WANT_TXT"   -a "$CONFIG_DOC_WANT_TXT"   != "no"])
-AM_CONDITIONAL(DOC_WANT_MAN,     [test -n "$CONFIG_DOC_WANT_MAN"   -a "$CONFIG_DOC_WANT_MAN"   != "no"])
-AM_CONDITIONAL(DOC_WANT_HTML,    [test -n "$CONFIG_DOC_WANT_HTML"  -a "$CONFIG_DOC_WANT_HTML"  != "no"])
-AM_CONDITIONAL(DOC_WANT_LATEX,   [test -n "$CONFIG_DOC_WANT_LATEX" -a "$CONFIG_DOC_WANT_LATEX" != "no"])
-AM_CONDITIONAL(DOC_WANT_DVI,     [test -n "$CONFIG_DOC_WANT_DVI"   -a "$CONFIG_DOC_WANT_DVI"   != "no"])
-AM_CONDITIONAL(DOC_WANT_PS,      [test -n "$CONFIG_DOC_WANT_PS"    -a "$CONFIG_DOC_WANT_PS"    != "no"])
-AM_CONDITIONAL(DOC_WANT_PDF,     [test -n "$CONFIG_DOC_WANT_PDF"   -a "$CONFIG_DOC_WANT_PDF"   != "no"])
-
-##
 ## /Documentation
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## subdirs
-AC_ARG_ENABLE(programs,
-	AC_HELP_STRING([--disable-programs],[Disable building of command-line utility suite]),
-	[enable_programs="$enableval"],[enable_programs="yes"])
-
+## --> REMOVED for pd-local libgfsm
+##
 GFSM_SUBDIRS=""
 GFSM_SRC_SUBDIRS=""
-
-AC_MSG_CHECKING([whether to build any documentation])
-if test "$enable_doc" = "yes"; then
- AC_MSG_RESULT(yes)
- GFSM_SUBDIRS="doc"
-else
- AC_MSG_RESULT(no)
-fi
-
-AC_MSG_CHECKING([whether to build command-line utility suite])
-if test "$enable_programs" = "yes"; then
- AC_MSG_RESULT(yes)
- GFSM_SUBDIRS="$GFSM_SUBDIRS tests"
- GFSM_SRC_SUBDIRS="programs"
-else
-  AC_MSG_RESULT(no)
-fi
-
 AC_SUBST(GFSM_SUBDIRS)
 AC_SUBST(GFSM_SRC_SUBDIRS)
 ## /subdirs
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-#---------------------------------------------------------------
-# Binary distribution
-BINDIST_RELEASE=0
-
-## -- hack: canonicalize package-name to lower-case (for debian)
-BINDIST_PKGNAME=`echo "$PACKAGE" | tr '[[:upper:]]' '[[:lower:]]'`
-
-## -- hack: downgrade ix86 -> i386
-case "$target_cpu" in
-  i[[3-9]]86)
-	BINDIST_CPU=i386
-	;;
-  *)
-	BINDIST_CPU="$target_cpu"
-	;;
-esac
-BINDIST_OS="$target_os"
-
-AC_SUBST(BINDIST_PKGNAME)
-AC_SUBST(BINDIST_RELEASE)
-AC_SUBST(BINDIST_CPU)
-AC_SUBST(BINDIST_OS)
-# Binary distribution
-#---------------------------------------------------------------
+##---------------------------------------------------------------
+## Binary distribution
+## --> REMOVED for pd-local libgfsm
+##
+## Binary distribution
+##---------------------------------------------------------------
 
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -836,7 +494,8 @@ AC_SUBST(gfsm_WFLAGS)
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## autotest
-AC_CONFIG_TESTDIR(tests,tests)
+## --> REMOVED for pd-local libgfsm
+dnl AC_CONFIG_TESTDIR(tests,tests)
 ## /autotest
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -860,15 +519,15 @@ dnl output
 dnl
 AC_CONFIG_FILES(src/libgfsm/gnulib/Makefile)
 AC_CONFIG_FILES(src/libgfsm/Makefile)
-AC_CONFIG_FILES(src/programs/Makefile)
+dnl AC_CONFIG_FILES(src/programs/Makefile)
 dnl AC_CONFIG_FILES(src/programs/gfsmconfig, [chmod 0755 src/programs/gfsmconfig])
 AC_CONFIG_FILES(src/Makefile)
-AC_CONFIG_FILES(doc/libgfsm/mainpage.dox doc/libgfsm/libgfsm.doxy doc/libgfsm/Makefile)
-AC_CONFIG_FILES(doc/programs/Makefile)
+dnl AC_CONFIG_FILES(doc/libgfsm/mainpage.dox doc/libgfsm/libgfsm.doxy doc/libgfsm/Makefile)
+dnl AC_CONFIG_FILES(doc/programs/Makefile)
 dnl AC_CONFIG_FILES(doc/tutorial/Makefile)
-AC_CONFIG_FILES(doc/Makefile)
+dnl AC_CONFIG_FILES(doc/Makefile)
 AC_CONFIG_FILES(config/Makefile)
-AC_CONFIG_FILES(tests/atlocal tests/Makefile)
+dnl AC_CONFIG_FILES(tests/atlocal tests/Makefile)
 AC_CONFIG_FILES(Makefile)
 AC_CONFIG_FILES(gfsm.pc)
 AC_OUTPUT

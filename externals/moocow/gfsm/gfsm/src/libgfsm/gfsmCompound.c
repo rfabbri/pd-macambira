@@ -3,7 +3,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state machine library: compound states
  *
- * Copyright (c) 2004-2007 Bryan Jurish.
+ * Copyright (c) 2004-2008 Bryan Jurish.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ gint gfsm_labelpair_compare(gfsmLabelPair lp1, gfsmLabelPair lp2)
 /*--------------------------------------------------------------
  * labelpair_compare_with_data()
  */
-gint gfsm_labelpair_compare_with_data(gfsmLabelPair lp1, gfsmLabelPair lp2, gpointer data)
+gint gfsm_labelpair_compare_with_data(gfsmLabelPair lp1, gfsmLabelPair lp2, GFSM_UNUSED gpointer data)
 { return gfsm_labelpair_compare_inline(lp1,lp2); }
 
 
