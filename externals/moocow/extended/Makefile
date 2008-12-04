@@ -24,7 +24,7 @@ SUBDIRS = \
 MOOCOW_DIR    ?=$(shell pwd)
 MOOCOW_BUILD  ?=$(MOOCOW_DIR)/build.moo
 MOOCOW_MFLAGS ?=DESTDIR=""
-MOOCOW_BUILD_VERSION ?=0.02
+MOOCOW_BUILD_VERSION ?=0.03
 
 CONFIGURE_ARGS=\
 	CFLAGS="$(CFLAGS)" \
@@ -41,7 +41,7 @@ pd_src ?= $(CURDIR)/../../../pd
 
 ##======================================================================
 ## Rules: default
-all: config build.stamp
+all: build.stamp
 
 ##======================================================================
 ## Rules: subdirectory: dummy
@@ -111,7 +111,7 @@ GFSM_DIR            ?=../gfsm
 #GFSM_CONFIGURE_ARGS ?=
 
 gfsm.autogen_stamp: 
-	(cd $(GFSM_DIR); sh ./autogen.sh) || true
+#	(cd $(GFSM_DIR); sh ./autogen.sh) || true
 	touch $@
 
 gfsm.configure_stamp: gfsm.autogen_stamp
@@ -287,9 +287,9 @@ autogen: $(SUBDIRS:=.autogen_stamp)
 configure: $(SUBDIRS:=.configure_stamp)
 
 config:
-	@echo "MOOCOW_BUILD_VERSION=$(MOOCOW_BUILD_VERSION)"
+	@echo "(moocow:debug) MOOCOW_BUILD_VERSION=$(MOOCOW_BUILD_VERSION)"
 
-build.stamp: $(SUBDIRS:=.build_stamp)
+build.stamp: config $(SUBDIRS:=.build_stamp)
 	rm -rf $(MOOCOW_BUILD)/noinstall
 	touch $@
 

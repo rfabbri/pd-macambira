@@ -280,7 +280,7 @@ static void pd_gfsm_alphabet_obj_outlet_pair(t_pd_gfsm_alphabet_obj *x, t_float 
 /*--------------------------------------------------------------------
  * pd_gfsm_alphabet_obj: insert
  */
-static void pd_gfsm_alphabet_obj_insert(t_pd_gfsm_alphabet_obj *x, t_symbol *s, int argc, t_atom *argv)
+static void pd_gfsm_alphabet_obj_insert(t_pd_gfsm_alphabet_obj *x, GFSM_UNUSED t_symbol *s, int argc, t_atom *argv)
 {
   if (argc < 1) {
     error("pd_gfsm_alphabet_obj_insert(): no atom to insert?");
@@ -294,7 +294,7 @@ static void pd_gfsm_alphabet_obj_insert(t_pd_gfsm_alphabet_obj *x, t_symbol *s, 
 /*--------------------------------------------------------------------
  * pd_gfsm_alphabet_obj: atom2label
  */
-static void pd_gfsm_alphabet_obj_atom2label(t_pd_gfsm_alphabet_obj *x, t_symbol *s, int argc, t_atom *argv)
+static void pd_gfsm_alphabet_obj_atom2label(t_pd_gfsm_alphabet_obj *x, GFSM_UNUSED t_symbol *s, int argc, t_atom *argv)
 {
   if (argc < 1) {
     error("pd_gfsm_alphabet_obj_atom2label(): no arguments?");
@@ -308,7 +308,7 @@ static void pd_gfsm_alphabet_obj_atom2label(t_pd_gfsm_alphabet_obj *x, t_symbol 
 /*--------------------------------------------------------------------
  * pd_gfsm_alphabet_obj: atom2label_force
  */
-static void pd_gfsm_alphabet_obj_atom2label_force(t_pd_gfsm_alphabet_obj *x, t_symbol *s, int argc, t_atom *argv)
+static void pd_gfsm_alphabet_obj_atom2label_force(t_pd_gfsm_alphabet_obj *x, GFSM_UNUSED t_symbol *s, int argc, t_atom *argv)
 {
   if (argc < 1) {
     error("pd_gfsm_alphabet_obj_atom2label_force(): no arguments?");
@@ -351,7 +351,7 @@ static void pd_gfsm_alphabet_obj_label2atom_force(t_pd_gfsm_alphabet_obj *x, t_f
 /*--------------------------------------------------------------------
  * pd_gfsm_alphabet_obj: rmatom()
  */
-static void pd_gfsm_alphabet_obj_rmatom(t_pd_gfsm_alphabet_obj *x, t_symbol *sel, int argc, t_atom *argv)
+static void pd_gfsm_alphabet_obj_rmatom(t_pd_gfsm_alphabet_obj *x, GFSM_UNUSED t_symbol *sel, int argc, t_atom *argv)
 {
   if (argc < 1) return;
   gfsm_alphabet_remove_key(x->x_alphabet_pd->x_alphabet, argv);

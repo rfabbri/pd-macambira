@@ -78,7 +78,7 @@ gboolean gfsm_pd_atom_equal(t_atom *a1, t_atom *a2)
 /*--------------------------------------------------------------
  * dup()
  */
-t_atom *gfsm_pd_atom_dup(gfsmPdAtomAlphabet *alph, t_atom *a)
+t_atom *gfsm_pd_atom_dup(GFSM_UNUSED gfsmPdAtomAlphabet *alph, t_atom *a)
 {
   //return (a ? copybytes(a, sizeof(t_atom)) : NULL);
   return (a ? gfsm_mem_dup_n(a,sizeof(t_atom)) : NULL);

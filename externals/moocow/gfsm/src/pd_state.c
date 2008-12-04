@@ -48,7 +48,7 @@ static t_class *pd_gfsm_state_class;
 /*--------------------------------------------------------------------
  * new()
  */
-static void *pd_gfsm_state_new(t_symbol *sel, int argc, t_atom *argv)
+static void *pd_gfsm_state_new(GFSM_UNUSED t_symbol *sel, int argc, t_atom *argv)
 {
   t_symbol *name = &s_;
   t_pd_gfsm_state *x = (t_pd_gfsm_state *)pd_new(pd_gfsm_state_class);

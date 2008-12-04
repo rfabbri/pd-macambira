@@ -75,6 +75,7 @@ typedef struct _pd_gfsm_automaton_obj
  */
 #define atom_getboolarg(which,argc,argv) (atom_getintarg(which,argc,argv)==0 ? FALSE : TRUE)
 #define GIMME_ARGS t_symbol *sel, int argc, t_atom *argv
+#define GIMME_ARGS_NOCV t_symbol *sel, GFSM_UNUSED int argc, GFSM_UNUSED t_atom *argv
 
 /*----------------------------------------------------------------------
  * utilities

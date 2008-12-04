@@ -61,7 +61,7 @@ static void *pd_gfsm_dummy_new(void)
 /*--------------------------------------------------------------------
  * pd_gfsm_dummy: free()
  */
-static void pd_gfsm_dummy_free(t_pd_gfsm_dummy *x)
+static void pd_gfsm_dummy_free(GFSM_UNUSED t_pd_gfsm_dummy *x)
 {}
 
 /*--------------------------------------------------------------------

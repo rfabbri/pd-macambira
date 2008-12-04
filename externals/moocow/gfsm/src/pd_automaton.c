@@ -197,12 +197,12 @@ void pd_gfsm_automaton_obj_outlet_labels(t_pd_gfsm_automaton_obj *x, t_symbol *s
 
   if (labs->len > 0) {
     int i;
-    if (x->x_argc < labs->len) {
+    if (x->x_argc < (int)labs->len) {
       size_t newsize = labs->len * sizeof(t_atom);
       x->x_argv = resizebytes(x->x_argv, x->x_argc*sizeof(t_atom), newsize);
       x->x_argc = labs->len;
     }
-    for (i=0; i < labs->len; i++) {
+    for (i=0; i < (int)labs->len; i++) {
       SETFLOAT(x->x_argv+i, (gfsmLabelVal)g_ptr_array_index(labs,i));
     }
     outlet_anything(x->x_valout, sel, labs->len, x->x_argv);
@@ -608,7 +608,7 @@ static void pd_gfsm_automaton_obj_info(t_pd_gfsm_automaton_obj *x)
 /*--------------------------------------------------------------------
  * automaton_obj: draw_dot()
  */
-static void pd_gfsm_automaton_obj_draw_dot(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+static void pd_gfsm_automaton_obj_draw_dot(t_pd_gfsm_automaton_obj *x, GFSM_UNUSED GIMME_ARGS)
 {
   t_pd_gfsm_alphabet_pd *ialph=NULL, *oalph=NULL, *salph=NULL;
   t_symbol
@@ -714,13 +714,13 @@ static void pd_gfsm_automaton_obj_lookup(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
     //-- ensure labels exists, is cleared, & is sufficiently allocated
     if (!x->x_labels) {
       x->x_labels = g_ptr_array_sized_new(argc-1);
-    } else if (argc > x->x_labels->len) {
+    } else if (argc > (int)x->x_labels->len) {
       g_ptr_array_set_size(x->x_labels, argc);
     }
     x->x_labels->len = 0;
 
     //-- get labels
-    for (i=1; i < argc; i++) {
+    for (i=1; (int)i < argc; i++) {
       gfsmLabelVal lab = atom_getfloat(argv+i);
       //if (lab==gfsmEpsilon) continue; //-- ignore epsilons (?)
       g_ptr_array_add(x->x_labels, (gpointer)lab);
@@ -752,7 +752,7 @@ static void pd_gfsm_automaton_obj_lookup(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
 /*--------------------------------------------------------------------
  * paths_unsafe()
  */
-static void pd_gfsm_automaton_obj_paths_unsafe(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+static void pd_gfsm_automaton_obj_paths_unsafe(t_pd_gfsm_automaton_obj *x, GIMME_ARGS_NOCV)
 {
   //-- clear set first
   if (x->x_paths_s) gfsm_set_clear(x->x_paths_s);
@@ -778,7 +778,7 @@ static void pd_gfsm_automaton_obj_paths_unsafe(t_pd_gfsm_automaton_obj *x, GIMME
 /*--------------------------------------------------------------------
  * paths_safe()
  */
-static void pd_gfsm_automaton_obj_paths_safe(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+static void pd_gfsm_automaton_obj_paths_safe(t_pd_gfsm_automaton_obj *x, GIMME_ARGS_NOCV)
 {
   gfsmAutomaton *fsm = x->x_automaton_pd->x_automaton;
 
@@ -795,7 +795,7 @@ static void pd_gfsm_automaton_obj_paths_safe(t_pd_gfsm_automaton_obj *x, GIMME_A
 /*--------------------------------------------------------------------
  * path_first()
  */
-static void pd_gfsm_automaton_obj_path_first(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+static void pd_gfsm_automaton_obj_path_first(t_pd_gfsm_automaton_obj *x, GIMME_ARGS_NOCV)
 {
   x->x_paths_i = 0;
   if (x->x_paths_a && x->x_paths_i < x->x_paths_a->len) {
@@ -808,9 +808,9 @@ static void pd_gfsm_automaton_obj_path_first(t_pd_gfsm_automaton_obj *x, GIMME_A
 /*--------------------------------------------------------------------
  * path_next()
  */
-static void pd_gfsm_automaton_obj_path_next(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+static void pd_gfsm_automaton_obj_path_next(t_pd_gfsm_automaton_obj *x, GIMME_ARGS_NOCV)
 {
-  if (x->x_paths_a && x->x_paths_i >= 0 && x->x_paths_i+1 < x->x_paths_a->len) {
+  if (x->x_paths_a && x->x_paths_i+1 < x->x_paths_a->len) { /*&& x->x_paths_i >= 0 : always true*/
     x->x_paths_i++;
     pd_gfsm_automaton_obj_outlet_float(x, sel, x->x_paths_i);
   } else {
@@ -824,7 +824,7 @@ static void pd_gfsm_automaton_obj_path_next(t_pd_gfsm_automaton_obj *x, GIMME_AR
 static void pd_gfsm_automaton_obj_path_nth(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
 {
   int ni = argc > 0 ? atom_getfloat(argv) : 0;
-  if (x->x_paths_a && ni >= 0 && ni < x->x_paths_a->len) {
+  if (x->x_paths_a && ni >= 0 && (guint)ni < x->x_paths_a->len) {
     x->x_paths_i = ni;
     pd_gfsm_automaton_obj_outlet_float(x, sel, x->x_paths_i);
   } else {
@@ -835,9 +835,9 @@ static void pd_gfsm_automaton_obj_path_nth(t_pd_gfsm_automaton_obj *x, GIMME_ARG
 /*--------------------------------------------------------------------
  * path_lo()
  */
-static void pd_gfsm_automaton_obj_path_lo(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+static void pd_gfsm_automaton_obj_path_lo(t_pd_gfsm_automaton_obj *x, GIMME_ARGS_NOCV)
 {
-  if (x->x_paths_a && x->x_paths_i >= 0 && x->x_paths_i < x->x_paths_a->len) {
+  if (x->x_paths_a && x->x_paths_i < x->x_paths_a->len) { /*&& x->x_paths_i >= 0*/
     gfsmPath *p = (gfsmPath*)g_ptr_array_index(x->x_paths_a,x->x_paths_i);
     pd_gfsm_automaton_obj_outlet_labels(x, sel, p->lo);
   }
@@ -849,9 +849,9 @@ static void pd_gfsm_automaton_obj_path_lo(t_pd_gfsm_automaton_obj *x, GIMME_ARGS
 /*--------------------------------------------------------------------
  * path_hi()
  */
-static void pd_gfsm_automaton_obj_path_hi(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+static void pd_gfsm_automaton_obj_path_hi(t_pd_gfsm_automaton_obj *x, GIMME_ARGS_NOCV)
 {
-  if (x->x_paths_a && x->x_paths_i >= 0 && x->x_paths_i < x->x_paths_a->len) {
+  if (x->x_paths_a && x->x_paths_i < x->x_paths_a->len) { /*&& x->x_paths_i >= 0*/
     gfsmPath *p = (gfsmPath*)g_ptr_array_index(x->x_paths_a,x->x_paths_i);
     pd_gfsm_automaton_obj_outlet_labels(x, sel, p->hi);
   }
@@ -863,9 +863,9 @@ static void pd_gfsm_automaton_obj_path_hi(t_pd_gfsm_automaton_obj *x, GIMME_ARGS
 /*--------------------------------------------------------------------
  * path_w()
  */
-static void pd_gfsm_automaton_obj_path_w(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+static void pd_gfsm_automaton_obj_path_w(t_pd_gfsm_automaton_obj *x, GIMME_ARGS_NOCV)
 {
-  if (x->x_paths_a && x->x_paths_i >= 0 && x->x_paths_i < x->x_paths_a->len) {
+  if (x->x_paths_a && x->x_paths_i < x->x_paths_a->len) { /*&& x->x_paths_i >= 0*/
     gfsmPath *p = (gfsmPath*)g_ptr_array_index(x->x_paths_a,x->x_paths_i);
     pd_gfsm_automaton_obj_outlet_float(x, sel, p->w);
   }
