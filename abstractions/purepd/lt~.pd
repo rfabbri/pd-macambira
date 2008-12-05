@@ -11,6 +11,7 @@
 #X obj 89 95 - 1;
 #X obj 23 126 -~;
 #X msg 251 26 version 1.0.0;
+#X obj 89 25 inlet;
 #X connect 0 0 10 0;
 #X connect 2 0 6 0;
 #X connect 3 0 1 0;
@@ -20,3 +21,4 @@
 #X connect 8 0 9 0;
 #X connect 9 0 10 1;
 #X connect 10 0 3 0;
+#X connect 12 0 8 0;
