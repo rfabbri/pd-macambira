@@ -576,7 +576,7 @@ gfsmAutomaton *gfsm_automaton_connect(gfsmAutomaton *fsm)
   gfsmBitVector *wanted;
 
   //-- sanity check
-  if (!fsm) return fsm;
+  if (!fsm || gfsm_automaton_n_states(fsm)==0) return fsm;
 
   wanted = gfsm_bitvector_sized_new(fsm->states->len);
   gfsm_automaton_connect_fw(fsm, wanted);
