@@ -1,10 +1,7 @@
 #N canvas 266 442 628 346 10;
-
-
-
-#N canvas 781 650 305 105 \$0.dialog-box 0;
-#X obj 2 2 cnv 15 300 30 empty \$0.line1 Are_you_sure? 20 12 0 14 -262144
--1 0;
+#N canvas 0 201 305 105 \$0.dialog-box 0;
+#X obj 2 2 cnv 15 300 30 empty \$0.line1 empty 20 12 0 14 -262144 -1
+0;
 #X obj 2 33 cnv 15 300 30 empty \$0.line2 empty 20 12 0 14 -262144
 -1 0;
 #X obj 74 71 bng 30 250 50 0 \$0.yes-s \$0.yes-r Yes. 35 15 0 10 -4032
@@ -14,9 +11,9 @@
 #X restore 49 308 pd \$0.dialog-box;
 #X obj 31 22 inlet;
 #X obj 33 159 r \$0.yes-s;
-#X obj 73 179 r \$0.no-s;
+#X obj 103 159 r \$0.no-s;
 #X msg 33 203 1;
-#X msg 73 203 vis 0;
+#X msg 103 233 vis 0;
 #X obj 33 252 outlet;
 #X obj 344 40 loadbang;
 #X obj 344 87 s2l-explode;
@@ -27,15 +24,17 @@
 #X obj 381 165 prepent label;
 #X obj 344 274 s \$0.line1;
 #X obj 381 187 s \$0.line2;
-#X obj 73 225 s pd-\$0.dialog-box;
+#X obj 103 255 s pd-\$0.dialog-box;
 #X obj 31 67 s pd-\$0.dialog-box;
 #X obj 31 45 dialog.under-cursor 305 105 1440 900;
 #X obj 344 62 list-onearg \$1 Are_you_sure?;
 #X obj 481 22 import-disabled list-abs;
+#X msg 64 203 0;
 #X connect 1 0 18 0;
 #X connect 2 0 4 0;
 #X connect 2 0 5 0;
 #X connect 3 0 5 0;
+#X connect 3 0 21 0;
 #X connect 4 0 6 0;
 #X connect 5 0 16 0;
 #X connect 7 0 19 0;
@@ -49,3 +48,4 @@
 #X connect 13 0 15 0;
 #X connect 18 0 17 0;
 #X connect 19 0 8 0;
+#X connect 21 0 6 0;
