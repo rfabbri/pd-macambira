@@ -205,20 +205,20 @@ static void pdp_v4l2_wait_frame(t_pdp_v4l2* x)
     FD_SET (x->x_tvfd, &fds);
 
     // Timeout. 
-    tv.tv_sec = 2;
+    tv.tv_sec = 5;
     tv.tv_usec = 0;
 
     ret = select (x->x_tvfd + 1, &fds, NULL, NULL, &tv);
 
     if (-1 == ret) {
        if (EINTR == errno) return;
-       post ( "pdp_v4l2 : select timeout : thread exiting");
-       exit (-1);
+       post ( "pdp_v4l2 : select timeout : closing device");
+       pdp_v4l2_close(x);
     }
     if (0 == ret) 
     {
-       post ( "pdp_v4l2 : select timeout : thread exiting");
-       exit (-1);
+       post ( "pdp_v4l2 : select timeout : closing device");
+       pdp_v4l2_close(x);
     }
 }
 
