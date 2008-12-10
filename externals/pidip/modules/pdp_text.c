@@ -384,7 +384,6 @@ static void pdp_text_font(t_pdp_text *x, t_symbol *sfont  )
                  class_getname(*(t_pd *)x), sfont->s_name );
        return;
     }
-    imlib_context_set_font( font );
     x->x_font = font;
 }
 
@@ -447,6 +446,7 @@ static void pdp_text_process_yv12(t_pdp_text *x)
        imlib_context_set_angle( x->x_angle[ti] );
        imlib_context_set_color( x->x_r[ti], x->x_g[ti], x->x_b[ti], 255 );
 
+       imlib_context_set_font( x->x_font );
        imlib_get_text_size( x->x_text_array[ti], &text_width, &text_height);
 
        imlib_text_draw( x->x_xoffsets[ti] - (0.5*text_width) + (cos(x->x_angle[ti]) * x->x_scroll[ti]), 
