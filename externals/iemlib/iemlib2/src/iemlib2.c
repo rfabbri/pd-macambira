@@ -17,11 +17,13 @@ static void *iemlib2_new(void)
 }
 
 void add2_comma_setup(void);
+void aspeedlim_setup(void);
 void bpe_setup(void);
 void dollarg_setup(void);
 void exp_inc_setup(void);
 void fade_tilde_setup(void);
 void float24_setup(void);
+void iem_alisttosym_setup(void);
 void iem_anything_setup(void);
 void iem_append_setup(void);
 void iem_blocksize_tilde_setup(void);
@@ -33,6 +35,7 @@ void iem_route_setup(void);
 void iem_samplerate_tilde_setup(void);
 void iem_sel_any_setup(void);
 void iem_send_setup(void);
+void iem_symtoalist_setup(void);
 void init_setup(void);
 void LFO_noise_tilde_setup(void);
 void list2send_setup(void);
@@ -61,11 +64,13 @@ void iemlib2_setup(void)
   iemlib2_class = class_new(gensym("iemlib2"), iemlib2_new, 0, sizeof(t_object), CLASS_NOINLET, 0);
   
   add2_comma_setup();
+  aspeedlim_setup();
   bpe_setup();
   dollarg_setup();
   exp_inc_setup();
   fade_tilde_setup();
   float24_setup();
+  iem_alisttosym_setup();
   iem_anything_setup();
   iem_append_setup();
   iem_blocksize_tilde_setup();
@@ -77,6 +82,7 @@ void iemlib2_setup(void)
   iem_samplerate_tilde_setup();
   iem_sel_any_setup();
   iem_send_setup();
+  iem_symtoalist_setup();
   init_setup();
   LFO_noise_tilde_setup();
   list2send_setup();
@@ -98,6 +104,6 @@ void iemlib2_setup(void)
   unsymbol_setup();
   wrap_setup();
     
-  post("iemlib2 (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
+  post("iemlib2 (R-1.17) library loaded!   (c) Thomas Musil 11.2008");
 	post("   musil%ciem.at iem KUG Graz Austria", '@');
 }

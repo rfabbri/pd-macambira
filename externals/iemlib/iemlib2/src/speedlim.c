@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2008 */
 
 
 #include "m_pd.h"
@@ -21,7 +21,6 @@ typedef struct _speedlim
   int       x_output_is_locked;
   int       x_there_was_n_event;
   t_float   x_curval;
-  t_float   x_lastout;
 } t_speedlim;
 
 static void speedlim_stop(t_speedlim *x)
