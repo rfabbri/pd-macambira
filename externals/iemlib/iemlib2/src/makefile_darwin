@@ -19,6 +19,7 @@ SYSTEM = $(shell uname -m)
 # the sources
 
 SRC = 	add2_comma.c \
+	aspeedlim.c \
 	bpe.c \
 	dollarg.c \
 	exp_inc.c \

@@ -17,6 +17,7 @@ PD_WIN_LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames /NODEFAULTLIB:kernel /NOD
 	$(PD_INST_PATH)\bin\pd.lib
 
 SRC =	add2_comma.c \
+	aspeedlim.c \
 	bpe.c \
 	dollarg.c \
 	exp_inc.c \
