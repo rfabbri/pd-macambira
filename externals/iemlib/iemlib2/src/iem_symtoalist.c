@@ -8,6 +8,7 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2008 
 #include "iemlib.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 
 /* ------------------------ iem_symtoalist --------------------- */
