@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2008 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -17,8 +17,9 @@ iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 
 #define SFI_HEADER_CHANNELS 4
 #define SFI_HEADER_BYTES_PER_SAMPLE 5
 #define SFI_HEADER_ENDINESS 6
+#define SFI_HEADER_FORMAT_CODE 7
 
-#define SFI_HEADER_SIZE 7
+#define SFI_HEADER_SIZE 8
 
 
 
@@ -143,16 +144,17 @@ soundfile_info_fmt:
       cvec += 4;
       ss = soundfile_info_str2short(cvec);
       /* format */
-      if(ss != 1)            /* PCM = 1 */
+      if((ss != 1) && (ss != 3) && (ss != 6) && (ss != 7))            /* PCM = 1 ; IEEE-FLOAT = 3 ; ALAW = 6 ; MULAW = 7 */
       {
-        post("soundfile_info_read-error:  %s is not PCM-format coded", completefilename);
+        post("soundfile_info_read-error:  %s has unknown format code", completefilename);
         goto soundfile_info_end;
       }
+      SETFLOAT(x->x_atheader+SFI_HEADER_FORMAT_CODE, (t_float)ss);
       header_size += 2;
       cvec += 2;
       ss = soundfile_info_str2short(cvec);
       /* channels */
-      if((ss < 1) || (ss > 100))
+      if((ss < 1) || (ss > 1000))
       {
         post("soundfile_info_read-error:  %s has no common channel-number", completefilename);
         goto soundfile_info_end;

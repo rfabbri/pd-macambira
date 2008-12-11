@@ -75,6 +75,6 @@ void iemlib1_setup(void)
   v2db_setup();
   vcf_filter_tilde_setup();
   
-	post("iemlib1 (R-1.17) library loaded!   (c) Thomas Musil 03.2008");
+	post("iemlib1 (R-1.17) library loaded!   (c) Thomas Musil 11.2008");
 	post("   musil%ciem.at iem KUG Graz Austria", '@');
 }
