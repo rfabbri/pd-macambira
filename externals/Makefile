@@ -1264,7 +1264,7 @@ iem_ambi_install: iem_ambi
 	install -p $(IEM_AMBI_OBJECTS:.c=.$(EXTENSION)) \
 		$(objectsdir)/$(IEM_AMBI_NAME)
 	install -d $(helpdir)/$(IEM_AMBI_NAME)
-	install -p $(externals_src)/iem/iem_ambi/help/*.pd \
+	install -p $(externals_src)/iem/iem_ambi/*.pd \
 		$(helpdir)/$(IEM_AMBI_NAME)
 #	install -d $(manualsdir)/$(IEM_AMBI_NAME)
 	install -d $(readmesdir)
@@ -1298,7 +1298,7 @@ iem_bin_ambi_install: iem_bin_ambi
 		--version ""
 	install -p $(IEM_BIN_AMBI_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEM_BIN_AMBI_NAME)
 	install -d $(helpdir)/$(IEM_BIN_AMBI_NAME)
-	install -p $(externals_src)/iem/iem_bin_ambi/help/*.pd \
+	install -p $(externals_src)/iem/iem_bin_ambi/*.pd \
 		$(helpdir)/$(IEM_BIN_AMBI_NAME)
 #	install -d $(manualsdir)/$(IEM_BIN_AMBI_NAME)
 	install -d $(readmesdir)
@@ -1469,7 +1469,7 @@ iem_matrix_install: iem_matrix
 		--version ""
 	install -p $(IEM_MATRIX_OBJ:.o=.$(EXTENSION)) $(objectsdir)/$(IEM_MATRIX_NAME)
 	install -d $(helpdir)/$(IEM_MATRIX_NAME)
-	install -p $(externals_src)/iem/iem_matrix/help/*.pd \
+	install -p $(externals_src)/iem/iem_matrix/*.pd \
 		$(helpdir)/$(IEM_MATRIX_NAME)
 
 iem_matrix_clean:
@@ -2881,7 +2881,7 @@ iem_delay_install: iem_delay
 		--version ""
 	install -p $(IEMDELAY_SRC:.c=.$(EXTENSION)) $(objectsdir)/$(IEMDELAY_NAME)
 	install -d $(helpdir)/$(IEMDELAY_NAME)
-	install -p $(externals_src)/iem/iem_delay/help/*.pd \
+	install -p $(externals_src)/iem/iem_delay/*.pd \
 		$(helpdir)/$(IEMDELAY_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_delay/READ_ME.txt \
@@ -2911,7 +2911,7 @@ iem_roomsim_install: iem_roomsim
 		--version ""
 	install -p $(IEMROOM_SRC:.c=.$(EXTENSION)) $(objectsdir)/$(IEMROOM_NAME)
 	install -d $(helpdir)/$(IEMROOM_NAME)
-	install -p $(externals_src)/iem/iem_roomsim/help/*.pd \
+	install -p $(externals_src)/iem/iem_roomsim/*.pd \
 		$(helpdir)/$(IEMROOM_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_roomsim/READ_ME.txt \
@@ -2941,7 +2941,7 @@ iem_spec2_install: iem_spec2
 		--version ""
 	install -p $(IEMSPEC2_SRC:.c=.$(EXTENSION)) $(objectsdir)/$(IEMSPEC2_NAME)
 	install -d $(helpdir)/$(IEMSPEC2_NAME)
-	install -p $(externals_src)/iem/iem_spec2/help/*.pd \
+	install -p $(externals_src)/iem/iem_spec2/*.pd \
 		$(helpdir)/$(IEMSPEC2_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_spec2/READ_ME.txt \
@@ -2984,7 +2984,7 @@ iem_tab_install: iem_tab
 		--version ""
 	install -p $(IEMTAB_TARGETS) $(objectsdir)/$(IEMTAB_NAME)
 	install -d $(helpdir)/$(IEMTAB_NAME)
-	install -p $(externals_src)/iem/iem_tab/help/*.pd \
+	install -p $(externals_src)/iem/iem_tab/*.pd \
 		$(helpdir)/$(IEMTAB_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_tab/READ_ME.txt \
