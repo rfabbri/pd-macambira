@@ -3094,7 +3094,7 @@ iemgui_install: iemgui
 		--version ""
 	install -p $(IEMGUI_TARGETS) $(objectsdir)/$(IEMGUI_NAME)
 	install -d $(helpdir)/$(IEMGUI_NAME)
-	install -p $(externals_src)/iem/iemgui/help/*.pd \
+	install -p $(externals_src)/iem/iemgui/*.pd \
 		$(helpdir)/$(IEMGUI_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iemgui/READ_ME.txt \
