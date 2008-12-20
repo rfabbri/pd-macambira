@@ -35,7 +35,7 @@ LINUXINCLUDE = -I/usr/include -I$(PDPATH)/src
 LINUXLDFLAGS = -export_dynamic  -shared
 
 .c.pd_linux:
-	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
+	$(CC) $(LINUXCFLAGS) $(CFLAGS) $(LINUXINCLUDE) -fPIC -o $*.o -c $*.c
 	$(LD) $(LINUXLDFLAGS) -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 
