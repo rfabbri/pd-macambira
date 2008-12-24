@@ -12,13 +12,11 @@ datei-o - Sends the message "open ../../"
 datei-r - Sends the message "read ../../"
 datei-w - Sends the message "write ../../"
 dsp01 - DSP switch
-farben30 - PD GUI color scheme
-farben-data-s - Data structures' color scheme
 f+ - Counter with variable increment
 gui-edit - edit standard GUI objects fast
 lbang - loadbang which can be triggered more often
 liner~ - practical implementation of [line~]
-liner~ - practical implementation of signal envelopping
+liner+~ - practical implementation of signal envelopping
 mat~ - Level meter with amplitude control
 maat~ - Level meter with amplitude control, stereo
 met~ - Level meter with amplitude control (with VU, too CPU expensive for me)
