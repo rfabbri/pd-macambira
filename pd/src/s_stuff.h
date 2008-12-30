@@ -49,10 +49,13 @@ EXTERN int sys_hostfontsize(int fontsize);
 
 extern int sys_defaultfont;
 extern t_symbol *sys_libdir;    /* library directory for auxilliary files */
-extern t_symbol *sys_guidir;    /* directory holding pd_gui (also pd, u_pdsend, etc) */
+extern t_symbol *sys_guidir;    /* directory holding pd_gui, u_pdsend, etc */
 
 /* s_loader.c */
-int sys_load_lib(t_canvas *canvas, char *filename);
+
+typedef int (*loader_t)(t_canvas *canvas, char *classname); /* callback type */
+EXTERN int sys_load_lib(t_canvas *canvas, char *filename);
+EXTERN void sys_register_loader(loader_t loader);
 
 /* s_audio.c */
 

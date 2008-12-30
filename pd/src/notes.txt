@@ -1,5 +1,5 @@
 ---------------- dolist --------------------
-done: 
+close patch with dirty GOP abstraction can't vis the abstraction to query
 
 test:
 compile on various versions of linux
@@ -15,6 +15,7 @@ mac:
 Gnome: why don't windows pop up when clicked on?
 
 problems:
+saving as "x.pd" on mac writes to "x.pd.pd"
 if .pdsettings asks for an alsa device out of range, dialog
   comes up with empty list
 find asdf$1 (e.g.) doesn't work
@@ -29,7 +30,6 @@ look again at array vis/invis conundrum, g_template.c
 TK commands to nonexistent windows? (occasionally still happens)
 still can't detect when a window is moved or resized
 open_via_path call in d_soundfile.c isn't threadsafe
-crashed Pd putting vec and template in wrong order in array element of struct
 floor, ciel functions in expr misdeclared
 graph names don't appear until graph moved? (invis/vis on new array/rename)
 don't filter locked click() through getrect

@@ -51,7 +51,6 @@ void canvas_reflecttitle(t_canvas *x);
 static void canvas_addtolist(t_canvas *x);
 static void canvas_takeofflist(t_canvas *x);
 static void canvas_pop(t_canvas *x, t_floatarg fvis);
-void canvas_create_editor(t_glist *x, int createit);
 
 /* --------- functions to handle the canvas environment ----------- */
 
@@ -513,8 +512,6 @@ t_glist *glist_addglist(t_glist *g, t_symbol *sym,
     if (!menu)
         pd_pushsym(&x->gl_pd);
     glist_add(g, &x->gl_gobj);
-    if (glist_isvisible(g))
-        canvas_create_editor(x, 1);
     return (x);
 }
 
@@ -605,7 +602,8 @@ void canvas_reflecttitle(t_canvas *x)
             canvas_getdir(x)->s_name);
 }
 
-void canvas_dirty(t_canvas *x, t_int n)
+    /* mark a glist dirty or clean */
+void canvas_dirty(t_canvas *x, t_floatarg n)
 {
     t_canvas *x2 = canvas_getrootfor(x);
     if (glist_amreloadingabstractions)
@@ -613,7 +611,8 @@ void canvas_dirty(t_canvas *x, t_int n)
     if ((unsigned)n != x2->gl_dirty)
     {
         x2->gl_dirty = n;
-        canvas_reflecttitle(x2);
+        if (glist_isvisible(x2))
+            canvas_reflecttitle(x2);
     }
 }
 
@@ -663,15 +662,8 @@ void canvas_map(t_canvas *x, t_floatarg f)
     {
         if (glist_isvisible(x))
         {
-                /* just clear out the whole canvas... */
+                /* just clear out the whole canvas */
             sys_vgui(".x%lx.c delete all\n", x);
-#if 0
-                /* alternatively, we could have erased them one by one...
-            for (y = x->gl_list; y; y = y->g_next)
-                gobj_vis(y, x, 0);
-                    ... but we should go through and erase the lines as well
-                    if we do it that way. */
-#endif
             x->gl_mapped = 0;
         }
     }
@@ -695,14 +687,14 @@ void glist_menu_open(t_glist *x)
     {
         t_glist *gl2 = x->gl_owner;
         if (!gl2) 
-            bug("canvas_vis");  /* shouldn't happen but don't get too upset. */
+            bug("glist_menu_open");  /* shouldn't happen but not dangerous */
         else
         {
                 /* erase ourself in parent window */
             gobj_vis(&x->gl_gobj, gl2, 0);
                     /* get rid of our editor (and subeditors) */
             if (x->gl_editor)
-                canvas_create_editor(x, 0);
+                canvas_destroy_editor(x);
             x->gl_havewindow = 1;
                     /* redraw ourself in parent window (blanked out this time) */
             gobj_vis(&x->gl_gobj, gl2, 1);
@@ -744,7 +736,8 @@ void canvas_free(t_canvas *x)
     glist_noselect(x);
     while (y = x->gl_list)
         glist_delete(x, y);
-    canvas_vis(x, 0);
+    if (x == glist_getcanvas(x))
+        canvas_vis(x, 0);
 
     if (strcmp(x->gl_name->s_name, "Pd"))
         pd_unbind(&x->gl_pd, canvas_makebindsym(x->gl_name));
@@ -1558,6 +1551,8 @@ void g_canvas_setup(void)
         gensym("menu-open"), A_NULL);
     class_addmethod(canvas_class, (t_method)canvas_map,
         gensym("map"), A_FLOAT, A_NULL);
+    class_addmethod(canvas_class, (t_method)canvas_dirty,
+        gensym("dirty"), A_FLOAT, A_NULL);
     class_setpropertiesfn(canvas_class, (t_propertiesfn)canvas_properties);
 
 /* ---------------------- list handling ------------------------ */

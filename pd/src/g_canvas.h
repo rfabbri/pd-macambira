@@ -401,7 +401,8 @@ EXTERN void glist_redraw(t_glist *x);
 EXTERN void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     char *tag, int x1, int y1, int x2, int y2);
 EXTERN void glist_eraseiofor(t_glist *glist, t_object *ob, char *tag);
-EXTERN void canvas_create_editor(t_glist *x, int createit);
+EXTERN void canvas_create_editor(t_glist *x);
+EXTERN void canvas_destroy_editor(t_glist *x);
 void canvas_deletelinesforio(t_canvas *x, t_text *text,
     t_inlet *inp, t_outlet *outp);
 extern int glist_amreloadingabstractions; /* stop GUI changes while reloading */ 
@@ -466,7 +467,7 @@ EXTERN void canvas_setcurrent(t_canvas *x);
 EXTERN void canvas_unsetcurrent(t_canvas *x);
 EXTERN t_symbol *canvas_realizedollar(t_canvas *x, t_symbol *s);
 EXTERN t_canvas *canvas_getrootfor(t_canvas *x);
-EXTERN void canvas_dirty(t_canvas *x, t_int n);
+EXTERN void canvas_dirty(t_canvas *x, t_floatarg n);
 EXTERN int canvas_getfont(t_canvas *x);
 typedef int (*t_canvasapply)(t_canvas *x, t_int x1, t_int x2, t_int x3);
 
