@@ -1,4 +1,4 @@
-#N canvas 185 89 559 602 10;
+#N canvas 226 22 559 602 10;
 #X obj 30 173 cnv 15 18 15 empty \$0dispcol1 empty 20 12 0 14 -128992
 -262144 0;
 #X obj 218 73 * -65536;
@@ -27,8 +27,8 @@
 #X obj 70 106 vsl 15 60 0 255 0 0 \$0blue \$0blueR empty 0 -8 0 8 -64
 -1 -1 2938 1;
 #X obj 279 526 list trim;
-#X obj 52 90 hradio 10 1 0 3 \$0layer \$0layerr back 0 -4 0 8 -1 -262144
--1 0;
+#X obj 52 90 hradio 10 1 0 3 \$0layer \$0layerr label 0 -4 0 8 -1 -262144
+-1 2;
 #X obj 361 224 r \$0layer;
 #X obj 218 47 int;
 #X obj 281 47 int;
@@ -36,7 +36,7 @@
 #X obj 218 21 r \$0red;
 #X obj 281 21 r \$0green;
 #X obj 351 21 r \$0blue;
-#X obj 30 85 bng 15 250 50 0 \$0nullS \$0nullR empty 0 -6 0 8 -260033
+#X obj 41 96 bng 8 250 50 0 \$0nullS \$0nullR empty 0 -6 0 8 -260033
 -1 -1;
 #X obj 35 288 r \$0layer;
 #X obj 35 313 sel 0 1 2;
@@ -91,6 +91,12 @@
 #X restore 81 536 pd init;
 #X obj 30 26 inlet;
 #X obj 30 51 unpack f f f;
+#X obj 133 150 colorpanel;
+#X obj 133 171 list-map;
+#X obj 187 171 * 255;
+#X obj 32 82 bng 12 250 50 0 \$0.colorpanel.s \$0.colorpanel.r C 3
+7 0 8 -212800 -1 -1;
+#X obj 133 126 r \$0.colorpanel.s;
 #X connect 1 0 7 0;
 #X connect 2 0 5 0;
 #X connect 3 0 4 0;
@@ -153,4 +159,9 @@
 #X connect 55 0 20 0;
 #X connect 55 1 21 0;
 #X connect 55 2 22 0;
+#X connect 56 0 57 0;
+#X connect 57 0 55 0;
+#X connect 57 1 58 0;
+#X connect 58 0 57 1;
+#X connect 60 0 56 0;
 #X coords 0 -1 1 1 56 109 2 30 80;
