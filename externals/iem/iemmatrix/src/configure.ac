@@ -72,6 +72,11 @@ AC_CHECK_LIB(fftw3, fftw_destroy_plan)
 dnl for soundfile reading (and writing, if we do that...)
 AC_CHECK_LIB(sndfile, sf_close)
 
+dnl for gnu scientific library -lgsl:
+dnl AC_CHECK_LIB([m], [cos])
+AC_CHECK_LIB([gslcblas], [cblas_dgemm])
+AC_CHECK_LIB([gsl], [gsl_blas_dgemm])
+
 
 if test "x$with_pd" != "x"; then
  if test -d "${with_pd}/src"; then
@@ -99,7 +104,7 @@ AC_CHECK_LIB(pd, nullfn)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(stdlib.h stdio.h string.h math.h time.h sys/time.h fftw3.h sndfile.h)
+AC_CHECK_HEADERS(stdlib.h stdio.h string.h math.h time.h sys/time.h fftw3.h sndfile.h gsl/gsl_linalg.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
