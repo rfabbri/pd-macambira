@@ -3,8 +3,9 @@
  *
  *  objects for manipulating simple matrices
  *  mostly refering to matlab/octave matrix functions
+ *  this functions depends on the GNU scientific library
  *
- * Copyright (c) 2008, Franz Zotter
+ * Copyright (c) 2009, Franz Zotter
  * IEM, Graz, Austria
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
@@ -149,16 +150,16 @@ static void mTXSvdMatrix (MTXSvd *x, t_symbol *s,
     SETFLOAT((x->list_u),(float) x->rows);
     SETFLOAT((x->list_u+1),(float) x->columns);
     for (n=0;n<in_size;n++)
-       SETFLOAT((x->list_u+2+n), x->u->data[n]);
+       SETFLOAT((x->list_u+2+n), (float) x->u->data[n]);
 
     for (n=0;n<x->columns;n++)
-       SETFLOAT((x->list_s+n), x->s->data[n]);
+       SETFLOAT((x->list_s+n),(float) x->s->data[n]);
 
     SETFLOAT((x->list_v),(float) x->columns);
     SETFLOAT((x->list_v+1),(float) x->columns);
     in_size=x->columns*x->columns;
     for (n=0;n<in_size;n++)
-       SETFLOAT((x->list_v+n+2), x->v->data[n]);
+       SETFLOAT((x->list_v+n+2), (float) x->v->data[n]);
 
     mTXSvdBang(x);
   }
