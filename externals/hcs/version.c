@@ -52,9 +52,9 @@ static void version_output(t_version* x)
 	DEBUG(post("version_output"););
 
 	t_atom version_data[6];
-	SETFLOAT(version_data, (float) PD_MAJOR_VERSION);
-	SETFLOAT(version_data + 1, (float) PD_MINOR_VERSION);
-	SETFLOAT(version_data + 2, (float) PD_BUGFIX_VERSION);
+	SETFLOAT(version_data, (t_float) PD_MAJOR_VERSION);
+	SETFLOAT(version_data + 1, (t_float) PD_MINOR_VERSION);
+	SETFLOAT(version_data + 2, (t_float) PD_BUGFIX_VERSION);
 	SETSYMBOL(version_data + 3, gensym(PD_TEST_VERSION));
 	SETSYMBOL(version_data + 4, gensym(__DATE__));
 	SETSYMBOL(version_data + 5, gensym(__TIME__));
