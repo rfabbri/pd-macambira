@@ -138,7 +138,7 @@ static void *rawout_thread(void *y)
 
     /* open pipe */
     if (-1 == (pipefd = open(x->x_pipe->s_name, O_WRONLY|O_NONBLOCK|O_APPEND))){
-	if (-1 == (pipefd = open(x->x_pipe->s_name, O_WRONLY|O_CREAT))){
+      if (-1 == (pipefd = open(x->x_pipe->s_name, O_WRONLY|O_CREAT, 0600))){
 	    perror(me);
 	    goto exit;
 	}
