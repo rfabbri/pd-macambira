@@ -14,6 +14,8 @@ cvs_root_dir := $(shell cd $(CWD)/.. && pwd)
 DESTDIR = $(CWD)/build/
 BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
+CURL := curl --connect-timeout 600 --max-time 3600
+
 # default target
 all:
 	@echo "this currently does nothing"
@@ -66,29 +68,29 @@ template_clean:
 EXTERNALS-HOWTO_NAME = Externals-HOWTO
 externals-howto_install: $(manualsdir)
 	install -d $(manualsdir)/$(EXTERNALS-HOWTO_NAME)
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/pd-externals-HOWTO.pdf > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/pd-externals-HOWTO.pdf > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/pd-externals-HOWTO.pdf
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/HOWTO-externals-en.html > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/HOWTO-externals-en.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/HOWTO-externals-en.html
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node1.html > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/node1.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node1.html
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node2.html > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/node2.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node2.html
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node3.html > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/node3.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node3.html
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node4.html > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/node4.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node4.html
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node5.html > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/node5.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node5.html
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node6.html > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/node6.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node6.html
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node7.html > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/node7.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node7.html
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node8.html > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/node8.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node8.html
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node9.html > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/node9.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node9.html
-	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node10.html > \
+	-$(CURL) http://iem.kug.ac.at/pd/externals-HOWTO/node10.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node10.html
 
 externals-howto_clean:
