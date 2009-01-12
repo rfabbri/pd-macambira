@@ -32,6 +32,7 @@ void iemtx_diff_setup(void); /* mtx_diff.c */
 void iemtx_dispersive_dline_setup(void); /* mtx_dispersive_dline.c */
 void iemtx_distance2_setup(void); /* mtx_distance2.c */
 void iemtx_egg_setup(void); /* mtx_egg.c */
+void iemtx_eig_setup(void); /* mtx_eig.c */
 void iemtx_element_setup(void); /* mtx_element.c */
 void iemtx_eq_setup(void); /* mtx_eq.c */
 void iemtx_exp_setup(void); /* mtx_exp.c */
