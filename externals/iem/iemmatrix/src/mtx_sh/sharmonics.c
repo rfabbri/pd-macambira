@@ -56,7 +56,15 @@ static void sharmonics_multcheby12(SHWorkSpace *ws) {
    const int yincr=(ws->nmax+1)*(ws->nmax+1);
 
    for (n=0,ny0=0; n<=ws->nmax; n++) {
-      for (m=0; m<=n; m++) {
+      m=0;
+      ly0=0;
+      lt0=nt0;
+      for (l=0; l<ws->l; l++) {
+         ws->y[ly0+ny0+m]*= ws->wc->t[lt0+m];
+         ly0+=yincr;
+         lt0+=tincr;
+      }
+      for (m=1; m<=n; m++) {
 	 ly0=0;
 	 lt0=nt0;
 	 for (l=0; l<ws->l; l++) {
