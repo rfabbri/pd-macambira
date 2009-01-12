@@ -56,8 +56,8 @@ void iemmatrix_sources_setup(void)
 	iemtx_mean_setup(); /* mtx_mean.c */
 	iemtx_min2_setup(); /* mtx_min2.c */
 	iemtx_minmax_setup(); /* mtx_minmax.c */
-	iemtx_mul__setup(); /* mtx_mul~.c */
 	iemtx_mul_setup(); /* mtx_mul.c */
+	iemtx_mul__setup(); /* mtx_mul~.c */
 	iemtx_neq_setup(); /* mtx_neq.c */
 	iemtx_not_setup(); /* mtx_not.c */
 	iemtx_ones_setup(); /* mtx_ones.c */
@@ -78,6 +78,7 @@ void iemmatrix_sources_setup(void)
 	iemtx_roll_setup(); /* mtx_roll.c */
 	iemtx_row_setup(); /* mtx_row.c */
 	iemtx_scroll_setup(); /* mtx_scroll.c */
+	iemtx_sh_setup(); /* mtx_sh.c */
 	iemtx_sin_setup(); /* mtx_sin.c */
 	iemtx_size_setup(); /* mtx_size.c */
 	iemtx_slice_setup(); /* mtx_slice.c */
@@ -85,6 +86,7 @@ void iemmatrix_sources_setup(void)
 	iemtx_sort_setup(); /* mtx_sort.c */
 	iemtx_sub_setup(); /* mtx_sub.c */
 	iemtx_sum_setup(); /* mtx_sum.c */
+	iemtx_svd_setup(); /* mtx_svd.c */
 	iemtx_trace_setup(); /* mtx_trace.c */
 	iemtx_transpose_setup(); /* mtx_transpose.c */
 	iemtx_unpack__setup(); /* mtx_unpack~.c */

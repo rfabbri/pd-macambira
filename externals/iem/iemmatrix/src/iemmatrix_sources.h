@@ -54,8 +54,8 @@ void iemtx_max2_setup(void); /* mtx_max2.c */
 void iemtx_mean_setup(void); /* mtx_mean.c */
 void iemtx_min2_setup(void); /* mtx_min2.c */
 void iemtx_minmax_setup(void); /* mtx_minmax.c */
-void iemtx_mul__setup(void); /* mtx_mul~.c */
 void iemtx_mul_setup(void); /* mtx_mul.c */
+void iemtx_mul__setup(void); /* mtx_mul~.c */
 void iemtx_neq_setup(void); /* mtx_neq.c */
 void iemtx_not_setup(void); /* mtx_not.c */
 void iemtx_ones_setup(void); /* mtx_ones.c */
@@ -76,6 +76,7 @@ void iemtx_rmstodb_setup(void); /* mtx_rmstodb.c */
 void iemtx_roll_setup(void); /* mtx_roll.c */
 void iemtx_row_setup(void); /* mtx_row.c */
 void iemtx_scroll_setup(void); /* mtx_scroll.c */
+void iemtx_sh_setup(void); /* mtx_sh.c */
 void iemtx_sin_setup(void); /* mtx_sin.c */
 void iemtx_size_setup(void); /* mtx_size.c */
 void iemtx_slice_setup(void); /* mtx_slice.c */
@@ -83,6 +84,7 @@ void iemtx_sndfileread_setup(void); /* mtx_sndfileread.c */
 void iemtx_sort_setup(void); /* mtx_sort.c */
 void iemtx_sub_setup(void); /* mtx_sub.c */
 void iemtx_sum_setup(void); /* mtx_sum.c */
+void iemtx_svd_setup(void); /* mtx_svd.c */
 void iemtx_trace_setup(void); /* mtx_trace.c */
 void iemtx_transpose_setup(void); /* mtx_transpose.c */
 void iemtx_unpack__setup(void); /* mtx_unpack~.c */

@@ -1,4 +1,4 @@
-#N canvas 0 0 450 300 12;
+#N canvas 0 0 450 375 12;
 #X obj 99 140 mtx_pack~ 3;
 #X obj 98 115 sig~ 1;
 #X obj 161 115 sig~ 2;
@@ -16,6 +16,8 @@
 #X text 42 52 of multiple inputs into a matrix;
 #X text 214 268 [iemmatrix];
 #X text 238 248 Franz Zotter \, 2008;
+#X text 165 297 see aso;
+#X obj 258 304 mtx_unpack~;
 #X connect 0 0 4 0;
 #X connect 0 0 9 1;
 #X connect 1 0 0 0;
