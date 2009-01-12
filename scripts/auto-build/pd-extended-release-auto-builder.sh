@@ -42,10 +42,10 @@ echo "root: $auto_build_root_dir"
 case $SYSTEM in
 	mingw*)
 		/c/cygwin/bin/sh -c \
-			"rsync -a --delete rsync://128.238.56.50/distros/pd-extended/ ${auto_build_root_dir}/"
+			"rsync -a --delete rsync://128.238.56.50/distros/pd-extended-release/ ${auto_build_root_dir}/"
 		;;
 	*)
-		rsync -a --delete rsync://128.238.56.50/distros/pd-extended/ ${auto_build_root_dir}/
+		rsync -a --delete rsync://128.238.56.50/distros/pd-extended-release/ ${auto_build_root_dir}/
 		;;
 esac
 
