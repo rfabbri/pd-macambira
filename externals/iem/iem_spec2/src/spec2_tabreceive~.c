@@ -76,7 +76,7 @@ static t_int *spec2_tabreceive_tilde_perf16(t_int *w)
       out += 16;
       n -= 16;
     }
-    out[0] = iemarray_getfkiat(vec, 0);
+    out[0] = iemarray_getfloat(vec, 0);
   }
   else
   {
