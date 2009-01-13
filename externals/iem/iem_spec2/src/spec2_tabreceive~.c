@@ -28,14 +28,20 @@ static t_int *spec2_tabreceive_tilde_perform(t_int *w)
   t_float *out = (t_float *)(w[2]);
   int n = w[3]+1;
   iemarray_t *vec = x->x_vec;
-  
   if(vec)
-    while(n--)
+    while(n--) {
+#ifdef __x86_64__
+      t_word wp=*vec++;
+      *out++=wp.w_float;
+#else
       *out++ = *vec++;
-    else
-      while(n--)
-        *out++ = 0.0f;
-      return(w+4);
+#endif
+    }
+  else
+    while(n--)
+      *out++ = 0.0f;
+  return(w+4);
+
 }
 
 static t_int *spec2_tabreceive_tilde_perf16(t_int *w)
@@ -49,28 +55,28 @@ static t_int *spec2_tabreceive_tilde_perf16(t_int *w)
   {
     while(n)
     {
-      out[0] = vec[0];
-      out[1] = vec[1];
-      out[2] = vec[2];
-      out[3] = vec[3];
-      out[4] = vec[4];
-      out[5] = vec[5];
-      out[6] = vec[6];
-      out[7] = vec[7];
-      out[8] = vec[8];
-      out[9] = vec[9];
-      out[10] = vec[10];
-      out[11] = vec[11];
-      out[12] = vec[12];
-      out[13] = vec[13];
-      out[14] = vec[14];
-      out[15] = vec[15];
-      
+      out[0] = iemarray_getfloat(vec, 0);
+      out[1] = iemarray_getfloat(vec, 1);
+      out[2] = iemarray_getfloat(vec, 2);
+      out[3] = iemarray_getfloat(vec, 3);
+      out[4] = iemarray_getfloat(vec, 4);
+      out[5] = iemarray_getfloat(vec, 5);
+      out[6] = iemarray_getfloat(vec, 6);
+      out[7] = iemarray_getfloat(vec, 7);
+      out[8] = iemarray_getfloat(vec, 8);
+      out[9] = iemarray_getfloat(vec, 9);
+      out[10] = iemarray_getfloat(vec, 10);
+      out[11] = iemarray_getfloat(vec, 11);
+      out[12] = iemarray_getfloat(vec, 12);
+      out[13] = iemarray_getfloat(vec, 13);
+      out[14] = iemarray_getfloat(vec, 14);
+      out[15] = iemarray_getfloat(vec, 15);
+
       vec += 16;
       out += 16;
       n -= 16;
     }
-    out[0] = vec[0];
+    out[0] = iemarray_getfkiat(vec, 0);
   }
   else
   {

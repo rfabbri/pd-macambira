@@ -39,7 +39,8 @@ static t_int *spec2_tab_conv_tilde_perform(t_int *w)
   t_float *out = (t_float *)(w[2]);
   t_spec2_tab_conv_tilde *x = (t_spec2_tab_conv_tilde *)(w[3]);
   t_float sum=0.0f;
-  t_float *vec1, *vec2, *vec3, *win;
+  t_float *vec1, *vec2, *vec3;
+  iemarray_t*win;
   int i, m, n = (int)(w[4])+1;
   int j, ws=x->x_winsize;
   
@@ -61,7 +62,7 @@ static t_int *spec2_tab_conv_tilde_perform(t_int *w)
   {
     sum = 0.0f;
     for(j=0; j<ws; j++)
-      sum += win[j] * vec2[j];
+      sum += iemarray_getfloat(win, j) * vec2[j];
     out[i] = sum;
     vec2++;
   }
@@ -125,7 +126,7 @@ static void *spec2_tab_conv_tilde_new(t_symbol *s, int argc, t_atom *argv)
     argv++;
     x->x_winsize = (int)(atom_getint(argv));
     x->x_spec = (t_float *)0;
-    x->x_beg_array = (t_float *)0;
+    x->x_beg_array = (iemarray_t *)0;
     x->x_blocksize = 0;
     x->x_has_changed = 1;
     outlet_new(&x->x_obj, &s_signal);
