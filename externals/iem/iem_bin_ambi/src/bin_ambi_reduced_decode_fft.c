@@ -794,7 +794,7 @@ static void bin_ambi_reduced_decode_fft_calc_pinv(t_bin_ambi_reduced_decode_fft 
 	{
 		if (!(a = (t_garray *)pd_findbyclass(x->x_s_fade_out_hrir, garray_class)))
 			error("%s: no such array", x->x_s_fade_out_hrir->s_name);
-		else if (!garray_getfloatarray(a, &npoints, &fadevec))
+		else if (!iemarray_getarray(a, &npoints, &fadevec))
 			error("%s: bad template for bin_ambi_reduced_decode_fft", x->x_s_fade_out_hrir->s_name);
 		else if (npoints < x->x_fftsize)
 			error("%s: bad array-size: %d", x->x_s_fade_out_hrir->s_name, npoints);
@@ -864,7 +864,7 @@ static void bin_ambi_reduced_decode_fft_check_HRIR_arrays(t_bin_ambi_reduced_dec
 	hrir = x->x_s_hrir[index];
 	if (!(a = (t_garray *)pd_findbyclass(hrir, garray_class)))
 		error("%s: no such array", hrir->s_name);
-	else if (!garray_getfloatarray(a, &npoints, &vec_hrir))
+	else if (!iemarray_getarray(a, &npoints, &vec_hrir))
 		error("%s: bad template for bin_ambi_reduced_decode_fft", hrir->s_name);
 	else
 	{
@@ -918,13 +918,13 @@ static void bin_ambi_reduced_decode_fft_check_HRTF_arrays(t_bin_ambi_reduced_dec
 
 	if (!(a = (t_garray *)pd_findbyclass(hrtf_re, garray_class)))
 		error("%s: no such array", hrtf_re->s_name);
-	else if (!garray_getfloatarray(a, &npoints, &vec_hrtf_re))
+	else if (!iemarray_getarray(a, &npoints, &vec_hrtf_re))
 		error("%s: bad template for bin_ambi_reduced_decode_fft", hrtf_re->s_name);
 	else if (npoints < fftsize)
 		error("%s: bad array-size: %d", hrtf_re->s_name, npoints);
 	else if (!(a = (t_garray *)pd_findbyclass(hrtf_im, garray_class)))
 		error("%s: no such array", hrtf_im->s_name);
-	else if (!garray_getfloatarray(a, &npoints, &vec_hrtf_im))
+	else if (!iemarray_getarray(a, &npoints, &vec_hrtf_im))
 		error("%s: bad template for bin_ambi_reduced_decode_fft", hrtf_im->s_name);
 	else if (npoints < fftsize)
 		error("%s: bad array-size: %d", hrtf_im->s_name, npoints);

@@ -633,7 +633,7 @@ static void bin_ambi_reduced_decode_fir2_calc_pinv(t_bin_ambi_reduced_decode_fir
 	{
 		if (!(a = (t_garray *)pd_findbyclass(x->x_s_fade_out_hrir, garray_class)))
 			error("%s: no such array", x->x_s_fade_out_hrir->s_name);
-		else if (!garray_getfloatarray(a, &npoints, &fadevec))
+		else if (!iemarray_getarray(a, &npoints, &fadevec))
 			error("%s: bad template for bin_ambi_reduced_decode_fir2", x->x_s_fade_out_hrir->s_name);
 		else if (npoints < x->x_firsize)
 			error("%s: bad array-size: %d", x->x_s_fade_out_hrir->s_name, npoints);
@@ -734,7 +734,7 @@ static void bin_ambi_reduced_decode_fir2_check_HRIR_arrays(t_bin_ambi_reduced_de
 	hrir = x->x_s_hrir[index];
 	if (!(a = (t_garray *)pd_findbyclass(hrir, garray_class)))
 		error("%s: no such array", hrir->s_name);
-	else if (!garray_getfloatarray(a, &npoints, &vec_hrir))
+	else if (!iemarray_getarray(a, &npoints, &vec_hrir))
 		error("%s: bad template for bin_ambi_reduced_decode_fir2", hrir->s_name);
 	else
 	{
@@ -787,7 +787,7 @@ static void bin_ambi_reduced_decode_fir2_check_HRIR_RED_arrays(t_bin_ambi_reduce
 
 	if (!(a = (t_garray *)pd_findbyclass(hrir_red, garray_class)))
 		error("%s: no such array", hrir_red->s_name);
-	else if (!garray_getfloatarray(a, &npoints, &vec_hrir_red))
+	else if (!iemarray_getarray(a, &npoints, &vec_hrir_red))
 		error("%s: bad template for bin_ambi_reduced_decode_fir2", hrir_red->s_name);
 	else if (npoints < firsize)
 		error("%s: bad array-size: %d", hrir_red->s_name, npoints);

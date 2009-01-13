@@ -768,13 +768,13 @@ static void bin_ambi_reduced_decode_fir_calc_pinv(t_bin_ambi_reduced_decode_fir 
 {
 	t_garray *a;
 	int npoints;
-	t_float *fadevec;
+	iemarray_t *fadevec;
 
 	if((int)(x->x_beg_fade_out_hrir) == 0)
 	{
 		if (!(a = (t_garray *)pd_findbyclass(x->x_s_fade_out_hrir, garray_class)))
 			error("%s: no such array", x->x_s_fade_out_hrir->s_name);
-		else if (!garray_getfloatarray(a, &npoints, &fadevec))
+		else if (!iemarray_getarray(a, &npoints, &fadevec))
 			error("%s: bad template for bin_ambi_reduced_decode_fir", x->x_s_fade_out_hrir->s_name);
 		else if (npoints < x->x_firsize)
 			error("%s: bad array-size: %d", x->x_s_fade_out_hrir->s_name, npoints);
@@ -833,7 +833,8 @@ static void bin_ambi_reduced_decode_fir_check_HRIR_LS_arrays(t_bin_ambi_reduced_
 	t_garray *a;
 	int npoints;
 	t_symbol *hrir;
-	t_float *vec_hrir, *vec, *vec_fade_out_hrir;
+	iemarray_t *vec_hrir;
+  t_float *vec, *vec_fade_out_hrir;
 	float decr, sum;
 
 	if(index < 0)
@@ -844,7 +845,7 @@ static void bin_ambi_reduced_decode_fir_check_HRIR_LS_arrays(t_bin_ambi_reduced_
 	hrir = x->x_s_hrir[index];
 	if (!(a = (t_garray *)pd_findbyclass(hrir, garray_class)))
 		error("%s: no such array", hrir->s_name);
-	else if (!garray_getfloatarray(a, &npoints, &vec_hrir))
+	else if (!iemarray_getarray(a, &npoints, &vec_hrir))
 		error("%s: bad template for bin_ambi_reduced_decode_fir", hrir->s_name);
 	else
 	{
@@ -885,7 +886,7 @@ static void bin_ambi_reduced_decode_fir_check_HRIR_RED_arrays(t_bin_ambi_reduced
 	t_garray *a;
 	int npoints;
 	int firsize = x->x_firsize;
-	t_float *vec_hrir_red;
+	iemarray_t *vec_hrir_red;
 	t_symbol *hrir_red;
 
 	if(index < 0)
@@ -897,7 +898,7 @@ static void bin_ambi_reduced_decode_fir_check_HRIR_RED_arrays(t_bin_ambi_reduced
 
 	if (!(a = (t_garray *)pd_findbyclass(hrir_red, garray_class)))
 		error("%s: no such array", hrir_red->s_name);
-	else if (!garray_getfloatarray(a, &npoints, &vec_hrir_red))
+	else if (!iemarray_getarray(a, &npoints, &vec_hrir_red))
 		error("%s: bad template for bin_ambi_reduced_decode_fir", hrir_red->s_name);
 	else if (npoints < firsize)
 		error("%s: bad array-size: %d", hrir_red->s_name, npoints);
