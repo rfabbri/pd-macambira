@@ -53,10 +53,10 @@ typedef struct _bin_ambi_reduced_decode_fft2
   int             *x_sym_flag;
   BIN_AMBI_COMPLEX  *x_spec;
   BIN_AMBI_COMPLEX  *x_sin_cos;
-  t_float         *x_beg_fade_out_hrir;
+  iemarray_t         *x_beg_fade_out_hrir;
   t_float         *x_beg_hrir;
-  t_float         **x_beg_hrtf_re;
-  t_float         **x_beg_hrtf_im;
+  iemarray_t         **x_beg_hrtf_re;
+  iemarray_t         **x_beg_hrtf_im;
   t_symbol        **x_hrir_filename;
   t_symbol        **x_s_hrir;
   t_symbol        **x_s_hrtf_re;
@@ -645,12 +645,12 @@ static void bin_ambi_reduced_decode_fft2_calc_pinv(t_bin_ambi_reduced_decode_fft
 {
   t_garray *a;
   int npoints;
-  t_float *fadevec;
+  iemarray_t *fadevec;
   int i, n;
   double *dv3=x->x_prod3;
   double *dv2=x->x_prod2;
   
-  if((int)(x->x_beg_fade_out_hrir) == 0)
+  if(x->x_beg_fade_out_hrir == 0)
   {
     if (!(a = (t_garray *)pd_findbyclass(x->x_s_fade_out_hrir, garray_class)))
       error("%s: no such array", x->x_s_fade_out_hrir->s_name);
@@ -745,7 +745,8 @@ static void bin_ambi_reduced_decode_fft2_check_HRIR_arrays(t_bin_ambi_reduced_de
   t_garray *a;
   int npoints;
   t_symbol *hrir;
-  t_float *vec_hrir, *vec, *vec_fade_out_hrir;
+  t_float*vec;
+  iemarray_t *vec_hrir, *vec_fade_out_hrir;
   t_float decr, sum;
   
   if(index < 0)
@@ -767,11 +768,11 @@ static void bin_ambi_reduced_decode_fft2_check_HRIR_arrays(t_bin_ambi_reduced_de
     vec = x->x_beg_hrir;
     vec += index * fftsize;
     
-    if((int)(x->x_beg_fade_out_hrir))
+    if(x->x_beg_fade_out_hrir)
     {
       vec_fade_out_hrir = x->x_beg_fade_out_hrir;
       for(j=0; j<fs2; j++)
-        vec[j] = vec_hrir[j]*vec_fade_out_hrir[j];
+        vec[j] = iemarray_getfloat(vec_hrir, j)*iemarray_getfloat(vec_fade_out_hrir, j);
     }
     else
     {
@@ -779,13 +780,13 @@ static void bin_ambi_reduced_decode_fft2_check_HRIR_arrays(t_bin_ambi_reduced_de
       n = fs2 * 3;
       n /= 4;
       for(j=0; j<n; j++)
-        vec[j] = vec_hrir[j];
+        vec[j] =iemarray_getfloat(vec_hrir,j);
       sum = 1.0f;
       decr = 4.0f / (t_float)fs2;
       for(j=n, k=0; j<fs2; j++, k++)
       {
         sum -= decr;
-        vec[j] = vec_hrir[j] * sum;
+        vec[j] = iemarray_getfloat(vec_hrir,j) * sum;
       }
     }
   }
@@ -797,7 +798,7 @@ static void bin_ambi_reduced_decode_fft2_check_HRTF_arrays(t_bin_ambi_reduced_de
   t_garray *a;
   int npoints;
   int fftsize = x->x_fftsize;
-  t_float *vec_hrtf_re, *vec_hrtf_im;
+  iemarray_t *vec_hrtf_re, *vec_hrtf_im;
   t_symbol *hrtf_re, *hrtf_im;
   
   if(index < 0)
@@ -835,7 +836,8 @@ static void bin_ambi_reduced_decode_fft2_calc_reduced(t_bin_ambi_reduced_decode_
   BIN_AMBI_COMPLEX old1, old2, w;
   BIN_AMBI_COMPLEX *sincos = x->x_sin_cos;
   BIN_AMBI_COMPLEX *val = x->x_spec;/*weighted decoder-matrix with n_ls lines and n_ambi columns*/
-  t_float *vec_hrir, *vec_hrtf_re, *vec_hrtf_im;
+  t_float *vec_hrir;
+  iemarray_t*vec_hrtf_re, *vec_hrtf_im;
   double *dv, *db=x->x_prod3;
   int n_ambi = x->x_n_ambi;
   int n_ls = x->x_n_real_ls;
@@ -919,15 +921,15 @@ static void bin_ambi_reduced_decode_fft2_calc_reduced(t_bin_ambi_reduced_decode_
     }
     for(i = 0; i<fs2; i++)
     {
-      vec_hrtf_re[i] = val[i].real;
-      vec_hrtf_im[i] = val[i].imag;
+      iemarray_getfloat(vec_hrtf_re, i) = val[i].real;
+      iemarray_getfloat(vec_hrtf_im, i) = val[i].imag;
     }
-    vec_hrtf_re[fs2] = val[fs2].real;
-    vec_hrtf_im[fs2] = 0.0f;
+    iemarray_getfloat(vec_hrtf_re, fs2) = val[fs2].real;
+    iemarray_getfloat(vec_hrtf_im, fs2) = 0.0f;
     for(i = fs2+1; i < fftsize; i++)
     {
-      vec_hrtf_re[i] = 0.0f;
-      vec_hrtf_im[i] = 0.0f;
+      iemarray_getfloat(vec_hrtf_re, i) = 0.0f;
+      iemarray_getfloat(vec_hrtf_im, i) = 0.0f;
     }
   }
 }
@@ -1310,10 +1312,10 @@ static void *bin_ambi_reduced_decode_fft2_new(t_symbol *s, int argc, t_atom *arg
     x->x_spec       = (BIN_AMBI_COMPLEX *)getbytes(x->x_fftsize * sizeof(BIN_AMBI_COMPLEX));
     x->x_sin_cos    = (BIN_AMBI_COMPLEX *)getbytes(x->x_fftsize * sizeof(BIN_AMBI_COMPLEX));
     
-    x->x_beg_fade_out_hrir  = (t_float *)0;
+    x->x_beg_fade_out_hrir  = 0;
     x->x_beg_hrir           = (t_float *)getbytes(x->x_fftsize * x->x_n_real_ls * sizeof(t_float));
-    x->x_beg_hrtf_re        = (t_float **)getbytes(x->x_n_ambi * sizeof(t_float *));
-    x->x_beg_hrtf_im        = (t_float **)getbytes(x->x_n_ambi * sizeof(t_float *));
+    x->x_beg_hrtf_re        = (iemarray_t **)getbytes(x->x_n_ambi * sizeof(iemarray_t *));
+    x->x_beg_hrtf_im        = (iemarray_t **)getbytes(x->x_n_ambi * sizeof(iemarray_t *));
     
     x->x_sqrt3        = sqrt(3.0);
     x->x_sqrt5_2      = sqrt(5.0) / 2.0;
