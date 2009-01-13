@@ -13,7 +13,7 @@ static t_class *spec2_tabreceive_tilde_class;
 typedef struct _spec2_tabreceive_tilde
 {
   t_object  x_obj;
-  t_float   *x_vec;
+  iemarray_t*x_vec;
   t_symbol  *x_arrayname;
 } t_spec2_tabreceive_tilde;
 
@@ -27,7 +27,7 @@ static t_int *spec2_tabreceive_tilde_perform(t_int *w)
   t_spec2_tabreceive_tilde *x = (t_spec2_tabreceive_tilde *)(w[1]);
   t_float *out = (t_float *)(w[2]);
   int n = w[3]+1;
-  t_float *vec = x->x_vec;
+  iemarray_t *vec = x->x_vec;
   
   if(vec)
     while(n--)
@@ -43,7 +43,7 @@ static t_int *spec2_tabreceive_tilde_perf16(t_int *w)
   t_spec2_tabreceive_tilde *x = (t_spec2_tabreceive_tilde *)(w[1]);
   t_float *out = (t_float *)(w[2]);
   int n = w[3];
-  t_float *vec = x->x_vec;
+  iemarray_t *vec = x->x_vec;
   
   if(vec)
   {
@@ -112,7 +112,7 @@ static void spec2_tabreceive_tilde_dsp(t_spec2_tabreceive_tilde *x, t_signal **s
     if(*x->x_arrayname->s_name)
       error("spec2_tabreceive~: %s: no such array", x->x_arrayname->s_name);
   }
-  else if(!garray_getfloatarray(a, &vecsize, &x->x_vec))
+  else if(!iemarray_getarray(a, &vecsize, &x->x_vec))
     error("%s: bad template for spec2_tabreceive~", x->x_arrayname->s_name);
   else 
   {

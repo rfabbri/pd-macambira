@@ -13,7 +13,7 @@ static t_class *spec2_tabreceive_enable_tilde_class;
 typedef struct _spec2_tabreceive_enable_tilde
 {
   t_object  x_obj;
-  t_float   *x_vec;
+  iemarray_t *x_vec;
   t_symbol  *x_arrayname;
   int       x_enable;
 } t_spec2_tabreceive_enable_tilde;
@@ -123,7 +123,7 @@ static void spec2_tabreceive_enable_tilde_dsp(t_spec2_tabreceive_enable_tilde *x
     if(*x->x_arrayname->s_name)
       error("spec2_tabreceive_enable~: %s: no such array", x->x_arrayname->s_name);
   }
-  else if(!garray_getfloatarray(a, &vecsize, &x->x_vec))
+  else if(!iemarray_getarray(a, &vecsize, &x->x_vec))
     error("%s: bad template for spec2_tabreceive_enable~", x->x_arrayname->s_name);
   else 
   {

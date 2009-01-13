@@ -12,7 +12,7 @@ typedef struct spec2_tab_conv_tilde
 {
   t_object  x_obj;
   t_float   *x_spec;
-  t_float   *x_beg_array;
+  iemarray_t   *x_beg_array;
   int       x_blocksize;
   int       x_winsize;
   int       x_has_changed;
@@ -82,7 +82,7 @@ static void spec2_tab_conv_tilde_dsp(t_spec2_tab_conv_tilde *x, t_signal **sp)
       if(*x->x_sym_array->s_name)
         error("spec2_tab_conv~: %s: no such array", x->x_sym_array->s_name);
     }
-    else if(!garray_getfloatarray(a, &n_points, &x->x_beg_array))
+    else if(!iemarray_getarray(a, &n_points, &x->x_beg_array))
       error("%s: bad template for spec2_tab_conv~", x->x_sym_array->s_name);
     else 
     {

@@ -99,4 +99,16 @@ union tabfudge_f
 
 #endif
 
+/* on 64bit systems we cannot use garray_getfloatarray... */
+#if (defined __x86_64__)
+# define iemarray_t t_word
+# define iemarray_getarray garray_getfloatwords
+# define iemarray_getfloat(pointer, index) (pointer[index].w_float)
+#else
+# define iemarray_t t_float
+# define iemarray_getarray garray_getfloatarray
+# define iemarray_getfloat(pointer, index) (pointer[index])
+#endif
+
+
 #endif
