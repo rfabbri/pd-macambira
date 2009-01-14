@@ -13,7 +13,7 @@
  "LICENSE.txt"
 */
 
-#include "mtx_sh/chebyshev12.h"
+#include "mtx_spherical_harmonics/chebyshev12.h"
 
 Cheby12WorkSpace *chebyshev12_alloc(const size_t nmax, const size_t l) {
    Cheby12WorkSpace *wc;

@@ -14,7 +14,7 @@
 
 */
 
-#include "mtx_sh/legendre_a.h"
+#include "mtx_spherical_harmonics/legendre_a.h"
 
 static void legendre_first_recurrence (double *sintheta, LegendreWorkSpace *wl) {
    int n,l,l0;

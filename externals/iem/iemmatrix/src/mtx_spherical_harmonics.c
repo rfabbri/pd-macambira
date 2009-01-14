@@ -15,12 +15,12 @@
 
 #include "iemmatrix.h"
 #include <stdlib.h>
-#include "mtx_sh/sharmonics.c"
-#include "mtx_sh/legendre_a.c"
-#include "mtx_sh/chebyshev12.c"
-#include "mtx_sh/sharmonics_normalization.c"
+#include "mtx_spherical_harmonics/sharmonics.c"
+#include "mtx_spherical_harmonics/legendre_a.c"
+#include "mtx_spherical_harmonics/chebyshev12.c"
+#include "mtx_spherical_harmonics/sharmonics_normalization.c"
 
-static t_class *mtx_sh_class;
+static t_class *mtx_spherical_harmonics_class;
 
 typedef struct _MTXSh_ MTXSh;
 struct _MTXSh_
@@ -61,7 +61,7 @@ static void deleteMTXShdata (MTXSh *x)
 static void *newMTXSh (t_symbol *s, int argc, t_atom *argv)
 {
   int nmax;
-  MTXSh *x = (MTXSh *) pd_new (mtx_sh_class);
+  MTXSh *x = (MTXSh *) pd_new (mtx_spherical_harmonics_class);
   x->list_sh_out = outlet_new (&x->x_obj, gensym("matrix"));
   x->list_sh = 0; 
   x->phi = 0; 
@@ -69,7 +69,7 @@ static void *newMTXSh (t_symbol *s, int argc, t_atom *argv)
   x->ws = 0; 
   x->l=0;
   nmax=(int) atom_getfloat(argv);
-  post("mtx_sh order %d",nmax);
+  post("mtx_spherical_harmonics order %d",nmax);
   if (nmax<0)
      nmax=0;
   x->nmax=nmax;
@@ -96,11 +96,11 @@ static void mTXShMatrix (MTXSh *x, t_symbol *s,
 
   /* size check */
   if (!size) 
-    post("mtx_sh: invalid dimensions");
+    post("mtx_spherical_harmonics: invalid dimensions");
   else if (in_size<size) 
-    post("mtx_sh: sparse matrix not yet supported: use \"mtx_check\"");
+    post("mtx_spherical_harmonics: sparse matrix not yet supported: use \"mtx_check\"");
   else if ((rows!=2)||(columns<1))
-     post("mtx_sh: 2 X L matrix expected with phi and theta vector, but got more rows/no entries");
+     post("mtx_spherical_harmonics: 2 X L matrix expected with phi and theta vector, but got more rows/no entries");
   else {
      if (x->l!=columns) {
         deleteMTXShdata(x);
@@ -123,24 +123,24 @@ static void mTXShMatrix (MTXSh *x, t_symbol *s,
         mTXShBang(x);
      }
      else 
-        post("mtx_sh: memory error, no operation");
+        post("mtx_spherical_harmonics: memory error, no operation");
   }
 
 
 }
 
-void mtx_sh_setup (void)
+void mtx_spherical_harmonics_setup (void)
 {
-  mtx_sh_class = class_new 
-    (gensym("mtx_sh"),
+  mtx_spherical_harmonics_class = class_new 
+    (gensym("mtx_spherical_harmonics"),
      (t_newmethod) newMTXSh,
      (t_method) deleteMTXShdata,
      sizeof (MTXSh),
      CLASS_DEFAULT, A_GIMME, 0);
-  class_addbang (mtx_sh_class, (t_method) mTXShBang);
-  class_addmethod (mtx_sh_class, (t_method) mTXShMatrix, gensym("matrix"), A_GIMME,0);
+  class_addbang (mtx_spherical_harmonics_class, (t_method) mTXShBang);
+  class_addmethod (mtx_spherical_harmonics_class, (t_method) mTXShMatrix, gensym("matrix"), A_GIMME,0);
 }
 
-void iemtx_sh_setup(void){
-  mtx_sh_setup();
+void iemtx_spherical_harmonics_setup(void){
+  mtx_spherical_harmonics_setup();
 }

@@ -12,7 +12,7 @@
  * "LICENSE.txt"
  */
 
-#include "mtx_sh/sharmonics_normalization.h"
+#include "mtx_spherical_harmonics/sharmonics_normalization.h"
 
 SHNorml *sharmonics_normalization_new (const size_t nmax) {
    SHNorml *wn;

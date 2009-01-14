@@ -12,7 +12,7 @@
  * "LICENSE.txt"
  */
 
-#include "mtx_sh/sharmonics.h"
+#include "mtx_spherical_harmonics/sharmonics.h"
 
 // HELPER ROUTINES
 
