@@ -85,7 +85,7 @@ static void deleteMTXusvw (MTXSvd *x)
 static void deleteMTXSvd (MTXSvd *x) 
 {
 #ifdef HAVE_LIBGSL
-   deleteMTXSvd(x);
+   deleteMTXusvw(x);
 #endif
 }
 
