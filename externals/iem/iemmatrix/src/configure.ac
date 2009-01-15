@@ -76,7 +76,7 @@ dnl for gnu scientific library -lgsl:
 dnl AC_CHECK_LIB([m], [cos])
 AC_CHECK_LIB([gslcblas], [cblas_dgemm])
 AC_CHECK_LIB([gsl], [gsl_blas_dgemm])
-AC_CHECK_FUNCS([gsl], [gsl_eigen_nonsymm], )
+AC_CHECK_LIB([gsl], [gsl_eigen_nonsymm],AC_DEFINE(HAVE_GSL_EIGEN_NONSYMM,1,[can gsl compute complex eigenvalues?]))
 
 
 if test "x$with_pd" != "x"; then

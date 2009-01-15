@@ -10,5 +10,9 @@
 /* do we have libgsl installed? */
 #undef HAVE_LIBGSL
 
+/* can libgsl compute complex eigenvalues? */
+#undef HAVE_GSL_EIGEN_NONSYMM
+
+
 
 #endif /* CONFIG_H_ */
