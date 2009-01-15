@@ -26,7 +26,7 @@ typedef struct _MTXEig_ MTXEig;
 struct _MTXEig_
 {
   t_object x_obj;
-#ifdef HAVE_LIBGSL
+#ifdef HAVE_LIBGSL_EIGEN_NONSYMM
   gsl_matrix *a;
   gsl_matrix_complex *q;
   gsl_vector_complex *l;
@@ -45,7 +45,7 @@ struct _MTXEig_
   enum WithEigenVectors withevs;
 };
 
-#ifdef HAVE_LIBGSL
+#ifdef HAVE_LIBGSL_EIGEN_NONSYMM
 static void allocMTXqlw (MTXEig *x) 
 {
      x->a=(gsl_matrix*)gsl_matrix_alloc(x->size,x->size);
@@ -103,7 +103,7 @@ static void deleteMTXqlw (MTXEig *x)
 
 static void deleteMTXEig (MTXEig *x) 
 {
-#ifdef HAVE_LIBGSL
+#ifdef HAVE_LIBGSL_EIGEN_NONSYMM 
    deleteMTXqlw(x);
 #endif
 }
@@ -124,7 +124,7 @@ static void *newMTXEig (t_symbol *s, int argc, t_atom *argv)
   x->list_l_im = 0;
   x->list_q_re = 0; 
   x->list_q_im = 0; 
-#ifdef HAVE_LIBGSL
+#ifdef HAVE_LIBGSL_EIGEN_NONSYMM
   x->a=0;
   x->q=0;
   x->l=0;
@@ -159,7 +159,7 @@ static void mTXEigMatrix (MTXEig *x, t_symbol *s,
   int n,m;
   float f;
 
-#ifdef HAVE_LIBGSL
+#ifdef HAVE_LIBGSL_EIGEN_NONSYMM
   gsl_complex c;
   /* size check */
   if (!size) 
@@ -205,7 +205,7 @@ static void mTXEigMatrix (MTXEig *x, t_symbol *s,
     mTXEigBang(x);
   }
 #else
-    post("mtx_eig: implementation requires gsl");
+    post("mtx_eig: implementation requires more recent gsl version to handle nonsymmetric matrices");
 #endif
 
 }

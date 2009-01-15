@@ -76,6 +76,7 @@ dnl for gnu scientific library -lgsl:
 dnl AC_CHECK_LIB([m], [cos])
 AC_CHECK_LIB([gslcblas], [cblas_dgemm])
 AC_CHECK_LIB([gsl], [gsl_blas_dgemm])
+AC_CHECK_FUNCS([gsl], [gsl_eigen_nonsymm], )
 
 
 if test "x$with_pd" != "x"; then
