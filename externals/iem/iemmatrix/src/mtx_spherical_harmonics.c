@@ -107,10 +107,9 @@ static void mTXShMatrix (MTXSh *x, t_symbol *s,
         x->l=columns;
         allocMTXdata(x);
      }
-     
      for (n=0;n<x->l;n++) {
         x->phi[n]=(double) atom_getfloat(argv+n);
-        x->theta[n]=(double) atom_getfloat(argv+columns);
+        x->theta[n]=(double) atom_getfloat(argv+columns+n);
      }
   
      if (x->ws!=0) {
