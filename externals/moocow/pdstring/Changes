@@ -1,5 +1,9 @@
 Change log for PD external 'pdstring'
 
+v0.07
+   + changed default output of [any2string] to "unsigned char"
+     - fixes sourceforge bug #2501709, reported by Roman Haefeli
+
 v0.06
    + fixed asymmetricity bug (thanks to iohannes for the report)
 

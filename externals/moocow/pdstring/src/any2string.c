@@ -1,10 +1,10 @@
 /* -*- Mode: C -*- */
 /*=============================================================================*\
- * File: any2string_dynamic.c
+ * File: any2string.c
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: convert pd messages to strings (dynamic allocation)
  *
- * Copyright (c) 2004 - 2008 Bryan Jurish.
+ * Copyright (c) 2004 - 2009 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file "COPYING", in this distribution.
@@ -85,7 +85,7 @@ static char *any2string_banner = "any2string: pdstring version " PACKAGE_VERSION
 static void any2string_anything(t_any2string *x, t_symbol *sel, int argc, t_atom *argv)
 {
   t_atom *ap;
-  char *s, *s_max;
+  unsigned char *s, *s_max;
   int len;
 
   A2SDEBUG(post("-------any2string_anything(%p,...)---------", x));
@@ -130,8 +130,8 @@ static void any2string_anything(t_any2string *x, t_symbol *sel, int argc, t_atom
   /*-- atom buffer: binbuf text --*/
   A2SDEBUG(post("any2string[%p]: atom buffer: for {...}", x));
   ap    = x->x_argv;
-  s_max = x->x_text+len;
-  for (s=x->x_text; s < s_max; s++, ap++) {
+  s_max = ((unsigned char *)x->x_text)+len;
+  for (s=((unsigned char *)x->x_text); s < s_max; s++, ap++) {
     A2SDEBUG(post("any2string[%p]: atom buffer[%d]: SETFLOAT(a,%d='%c')", x, (ap-x->x_argv), *s, *s));
     SETFLOAT(ap,*s);
   }
@@ -167,7 +167,7 @@ static void *any2string_new(t_symbol *sel, int argc, t_atom *argv)
     }
 
     //-- allocate
-    x->x_text   = (char *)getbytes(x->x_alloc*sizeof(char));
+    x->x_text   = getbytes(x->x_alloc*sizeof(char));
     x->x_argc   = 0;
     x->x_argv   = (t_atom *)getbytes(x->x_alloc*sizeof(t_atom));
     x->x_binbuf = binbuf_new();

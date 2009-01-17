@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: pd string conversions : library
  *
- * Copyright (c) 2004-2008 Bryan Jurish.
+ * Copyright (c) 2004-2009 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file "COPYING", in this distribution.
@@ -38,7 +38,6 @@
 /*=====================================================================
  * Constants
  *=====================================================================*/
-static char *pdstring_version = "\npdstring version " PACKAGE_VERSION " by Bryan Jurish";
 
 /*=====================================================================
  * Structures and Types: pdstring [dummy]
@@ -78,7 +77,9 @@ static void *pdstring_new(void)
  */
 static void pdstring_help(t_pdstring *x)
 {
-  post(pdstring_version);
+  post("");
+  post("pdstring: byte-string externals version " PACKAGE_VERSION " by Bryan Jurish");
+  post("pdstring: compiled by " PDSTRING_USER " on " PDSTRING_DATE);
 }
 
 /*=====================================================================
@@ -86,7 +87,7 @@ static void pdstring_help(t_pdstring *x)
  *=====================================================================*/
 void pdstring_setup(void)
 {
-  post(pdstring_version);
+  pdstring_help(NULL);
 
 #ifndef PDSTRING_OBJECT_EXTERNALS
   any2string_setup_guts();

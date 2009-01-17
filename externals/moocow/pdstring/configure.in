@@ -4,7 +4,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [pdstring])
-define([THE_PACKAGE_VERSION], [0.06])
+define([THE_PACKAGE_VERSION], [0.07])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -172,7 +172,12 @@ else
 fi
 AC_SUBST(DEBUG)
 
-
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## compiled
+AC_DEFINE_UNQUOTED(PDSTRING_DATE,  "`date`",         [Date this external was configured])
+AC_DEFINE_UNQUOTED(PDSTRING_USER,  "$USER",          [User who configured this external])
+## /compiled
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 dnl
 dnl machine-dependent variables
