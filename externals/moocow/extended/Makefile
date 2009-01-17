@@ -24,7 +24,7 @@ SUBDIRS = \
 MOOCOW_DIR    ?=$(shell pwd)
 MOOCOW_BUILD  ?=$(MOOCOW_DIR)/build.moo
 MOOCOW_MFLAGS ?=DESTDIR=""
-MOOCOW_BUILD_VERSION ?=0.03
+MOOCOW_BUILD_VERSION ?=2009-01-17
 
 CONFIGURE_ARGS=\
 	CFLAGS="$(CFLAGS)" \
@@ -169,7 +169,7 @@ deque.cvsclean: deque.extclean
 PDSTRING_DIR            ?=../pdstring
 PDSTRING_CONFIGURE_ARGS ?=--enable-object-externals
 pdstring.autogen_stamp: 
-	(cd $(PDSTRING_DIR); sh ./autogen.sh) || true
+#	(cd $(PDSTRING_DIR); sh ./autogen.sh) || true
 	touch $@
 
 pdstring.configure_stamp: pdstring.autogen_stamp
