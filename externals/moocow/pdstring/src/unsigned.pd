@@ -1,0 +1,14 @@
+#N canvas 206 54 450 300 10;
+#X floatatom 105 86 5 0 0 1 byte_value - -;
+#X obj 105 116 string2any;
+#X obj 119 146 print s2a;
+#X obj 105 176 any2string;
+#X floatatom 105 208 5 0 0 0 - - -;
+#X msg 56 37 -10;
+#X msg 94 37 246;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 1 0 3 0;
+#X connect 3 0 4 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
