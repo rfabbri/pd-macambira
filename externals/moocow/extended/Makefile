@@ -8,14 +8,16 @@
 ##======================================================================
 ## Variables
 
+SUBDIRS_TEST = sprinkler
 SUBDIRS = \
 	flite \
 	gfsm \
 	deque \
 	readdir \
 	weightmap \
-	pdstring \
-	sprinkler
+	pdstring
+
+#	sprinkler
 
 ##-- 'pdstring' and 'sprinkler' are already in 'flatspace' ... should they be moved here?
 ##    -> 2008-08: removed any2string,string2any,pdstring from flatspace
@@ -223,9 +225,9 @@ readdir.cvsclean: readdir.extclean
 
 ##======================================================================
 ## Rules: subdirectory: sprinkler
-##  + one directory higher in the tree than usual...
+##  + (used to be one directory higher in the tree than usual...)
 
-SPRINKLER_DIR            ?=../../sprinkler
+SPRINKLER_DIR            ?=../sprinkler
 SPRINKLER_CONFIGURE_ARGS ?=
 sprinkler.autogen_stamp: 
 	(cd $(SPRINKLER_DIR); sh ./autogen.sh) || true
