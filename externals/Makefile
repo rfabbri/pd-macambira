@@ -1406,12 +1406,14 @@ iemlib_clean:
 
 #------------------------------------------------------------------------------#
 # IEMMATRIX
+## oh this is all sh!t: please use iemmatrix's build-system instead
 IEMMATRIX_NAME=iemmatrix
-IEMMATRIX_SRC := $(wildcard $(externals_src)/iem/iemmatrix/src/m[at]*.c)
-IEMMATRIX_ALIAS := $(wildcard $(externals_src)/iem/iemmatrix/alias/*.c)
+IEMMATRIX_ROOT := $(externals_src)/iem/iemmatrix
+IEMMATRIX_SRC := $(wildcard $(IEMMATRIX_ROOT)/src/m[at]*.c)
+IEMMATRIX_ALIAS := $(wildcard $(IEMMATRIX_ROOT)/alias/*.c)
 IEMMATRIX_OBJ := $(IEMMATRIX_SRC:.c=.o) $(IEMMATRIX_ALIAS:.c=.o)
-IEMMATRIX_SHARED := $(wildcard $(externals_src)/iem/iemmatrix/src/iemmatrix_binops.c) \
-                    $(wildcard $(externals_src)/iem/iemmatrix/src/iemmatrix_utility.c)
+IEMMATRIX_SHARED := $(wildcard $(IEMMATRIX_ROOT)/src/iemmatrix_binops.c) \
+                    $(wildcard $(IEMMATRIX_ROOT)/src/iemmatrix_utility.c)
 
 iemmatrix: $(IEMMATRIX_OBJ:.o=.$(EXTENSION))
 
@@ -1422,7 +1424,7 @@ $(IEMMATRIX_OBJ:.o=.$(EXTENSION)) : %.$(EXTENSION) : $(IEMMATRIX_OBJ) $(IEMMATRI
 	#rm -f -- "$*.o"
 
 $(IEMMATRIX_OBJ) $(IEMMATRIX_SHARED:.c=.o) : %.o : %.c
-	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c" -I$(IEMMATRIX_ROOT)/src
 
 iemmatrix_install: iemmatrix
 	install -d $(objectsdir)/$(IEMMATRIX_NAME)
