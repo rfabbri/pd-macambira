@@ -8,16 +8,14 @@
 ##======================================================================
 ## Variables
 
-SUBDIRS_TEST = sprinkler
 SUBDIRS = \
 	flite \
 	gfsm \
 	deque \
 	readdir \
 	weightmap \
-	pdstring
-
-#	sprinkler
+	pdstring \
+	sprinkler
 
 ##-- 'pdstring' and 'sprinkler' are already in 'flatspace' ... should they be moved here?
 ##    -> 2008-08: removed any2string,string2any,pdstring from flatspace
@@ -26,7 +24,7 @@ SUBDIRS = \
 MOOCOW_DIR    ?=$(shell pwd)
 MOOCOW_BUILD  ?=$(MOOCOW_DIR)/build.moo
 MOOCOW_MFLAGS ?=DESTDIR=""
-MOOCOW_BUILD_VERSION ?=2009-01-17
+MOOCOW_BUILD_VERSION ?=2009-01-17.002
 
 CONFIGURE_ARGS=\
 	CFLAGS="$(CFLAGS)" \
@@ -230,7 +228,7 @@ readdir.cvsclean: readdir.extclean
 SPRINKLER_DIR            ?=../sprinkler
 SPRINKLER_CONFIGURE_ARGS ?=
 sprinkler.autogen_stamp: 
-	(cd $(SPRINKLER_DIR); sh ./autogen.sh) || true
+#	(cd $(SPRINKLER_DIR); sh ./autogen.sh) || true
 	touch $@
 
 sprinkler.configure_stamp: sprinkler.autogen_stamp

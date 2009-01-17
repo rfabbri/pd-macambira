@@ -186,7 +186,8 @@ then
   LFLAGS="-export_dynamic -shared"
   if test "$DEBUG" = "no"; then
     #OFLAGS="-O6 -funroll-loops -fomit-frame-pointer -finline-limit-10000000"
-    OFLAGS="-O3 -funroll-loops -fomit-frame-pointer -pipe"
+    #OFLAGS="-O3 -funroll-loops -fomit-frame-pointer -pipe"
+    OFLAGS="-O2 -pipe"
   else
     OFLAGS="-g"
   fi

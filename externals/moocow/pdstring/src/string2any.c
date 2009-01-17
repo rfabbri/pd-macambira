@@ -227,6 +227,9 @@ void string2any_setup_guts(void)
 			       CLASS_DEFAULT,
 			       A_GIMME,                     //-- initial_bufsize, eos_char
 			       0);
+
+  //-- alias
+  class_addcreator((t_newmethod)string2any_new, gensym("bytes2any"), A_GIMME, 0);
   
   //-- methods
   class_addanything(string2any_class, (t_method)string2any_anything);

@@ -216,14 +216,17 @@ void any2string_setup_guts(void)
 			       CLASS_DEFAULT,
 			       A_GIMME,                   //-- initial_bufsize, eos_char
 			       0);
+
+  //-- alias
+  class_addcreator((t_newmethod)any2string_new, gensym("any2bytes"), A_GIMME, 0);
   
   //-- methods
   class_addanything(any2string_class, (t_method)any2string_anything);
-
   
   //-- help symbol
   //class_sethelpsymbol(any2string_class, gensym("any2string-help.pd")); //-- breaks pd-extended help lookup
 }
+
 
 /*--------------------------------------------------------------------
  * setup
