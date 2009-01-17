@@ -125,7 +125,8 @@ EXTRA_DIST = \
 	autogen.sh \
 	configure \
 	README.cvs \
-	gfsm.magic
+	gfsm.magic \
+	configure.gnu
 
 #COPYING
 

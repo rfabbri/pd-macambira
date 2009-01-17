@@ -175,9 +175,9 @@ if test "$ac_cv_enable_system_gfsm" != "yes"; then
  PD_GFSM_SUBDIRS="gfsm"
 
  ##-- gfsm:local: flags
- IFLAGS="$IFLAGS -I\$(top_srcdir)/gfsm/src/libgfsm -I\$(top_builddir)/gfsm/src/libgfsm \`\$(PKG_CONFIG) --cflags-only-I \$(top_srcdir)/gfsm/gfsm.pc\`"
- LFLAGS="$LFLAGS -L\$(top_builddir)/gfsm/src/libgfsm \`\$(PKG_CONFIG) --cflags-only-I \$(top_srcdir)/gfsm/gfsm.pc\`"
- LIBS="$LIBS \$(top_builddir)/gfsm/src/libgfsm/libgfsm.la \`\$(PKG_CONFIG) --libs-only-l \$(top_srcdir)/gfsm/gfsm.pc | sed -e's/\-lgfsm//g'\`"
+ IFLAGS="$IFLAGS -I\$(top_srcdir)/gfsm/src/libgfsm -I\$(top_builddir)/gfsm/src/libgfsm \`\$(PKG_CONFIG) --cflags-only-I \$(top_builddir)/gfsm/gfsm.pc\`"
+ LFLAGS="$LFLAGS -L\$(top_builddir)/gfsm/src/libgfsm \`\$(PKG_CONFIG) --cflags-only-I \$(top_builddir)/gfsm/gfsm.pc\`"
+ LIBS="$LIBS \$(top_builddir)/gfsm/src/libgfsm/libgfsm.la \`\$(PKG_CONFIG) --libs-only-l \$(top_builddir)/gfsm/gfsm.pc | sed -e's/\-lgfsm//g'\`"
 
  PD_GFSM_WHICH="static local"
 
