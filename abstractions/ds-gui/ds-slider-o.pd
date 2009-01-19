@@ -1,87 +1,110 @@
-#N struct 1003.advslider float a;
-#N canvas 888 176 475 427 10;
-#N canvas 110 22 704 719 advslider 0;
-#X obj 31 23 struct \$0.advslider float a;
-#X obj 31 50 route click change;
-#X msg 121 568 traverse pd-\$1.gop \, bang;
-#X obj 121 589 pointer;
-#X obj 57 615 append \$0.advslider a;
-#X obj 40 498 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#N struct 1003.advslider float a float frequency float midinote;
+#N canvas 946 115 475 427 10;
+#N canvas 493 22 723 750 advslider 1;
+#X obj 284 412 route click change;
+#X msg 121 588 traverse pd-\$1.gop \, bang;
+#X obj 121 609 pointer;
+#X obj 57 635 append \$0.advslider a;
+#X obj 40 518 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 74 551 \$0;
-#X obj 91 103 get \$0.advslider a;
-#X obj 91 122 outlet;
-#X obj 59 497 loadbang;
-#X obj 40 521 t b b b b;
-#X msg 119 521 clear;
-#X obj 165 521 s pd-\$0.gop;
-#X obj 40 639 \$0;
-#X msg 57 590 0;
-#X msg 40 661 \; pd-\$1.gop donecanvasdialog 0 -1 2 0 0 130 260 130
+#X obj 74 571 \$0;
+#X obj 304 485 get \$0.advslider a;
+#X obj 257 565 outlet;
+#X obj 59 517 loadbang;
+#X obj 40 541 t b b b b;
+#X msg 119 541 clear;
+#X obj 165 541 s pd-\$0.gop;
+#X obj 40 659 \$0;
+#X msg 57 610 0;
+#X msg 40 681 \; pd-\$1.gop donecanvasdialog 0 -1 2 0 0 130 260 130
 260 0 0 \;;
-#X obj 304 7 filledpolygon 955 553 3 50 0 80 0 80 210 50 210;
-#X obj 304 29 filledpolygon 595 535 3 50 a(0:200) 60 a(0:200) 65 a(0:200)
+#X obj 324 27 filledpolygon 955 553 3 50 0 80 0 80 210 50 210;
+#X obj 324 49 filledpolygon 595 535 3 50 a(0:200) 60 a(0:200) 65 a(0:200)
 70 a(0:200) 80 a(0:200) 80 a(0:200)(10:210) 70 a(0:200)(10:210) 65
 a(0:200)(10:210) 60 a(0:200)(10:210) 50 a(0:200)(10:210);
-#X obj 304 91 drawnumber a 55 a(0:200) 133;
-#X obj 176 153 r \$0.overlay?;
-#X obj 120 76 s \$0.slider-moved;
+#X obj 324 111 drawnumber a 55 a(0:200) 133;
+#X obj 205 174 r \$0.overlay?;
+#X obj 285 461 s \$0.slider-moved;
 #X obj 20 166 r \$0.slider-moved;
 #X obj 20 264 s \$0.overlay?;
 #X msg 20 240 1;
 #X msg 54 241 0;
 #X obj 20 193 t b b b;
 #X msg 71 193 stop;
-#X obj 285 130 drawpolygon 339 2 65 a(0:200)(5:205) 55 a(0:200)(15:215)
+#X obj 305 150 drawpolygon 339 2 65 a(0:200)(5:205) 55 a(0:200)(15:215)
 75 a(0:200)(15:215) 65 a(0:200)(5:205);
 #X obj 85 241 loadbang;
-#X obj 285 171 filledcurve 449 339 2 65 a(0:200)(15:215) 11 a(0:200)(15:215)
+#X obj 305 191 filledcurve 449 339 2 65 a(0:200)(15:215) 11 a(0:200)(15:215)
 1 a(0:200)(25:225) 1 a(0:200)(50:250) 11 a(0:200)(60:260) 119 a(0:200)(60:260)
 130 a(0:200)(50:250) 130 a(0:200)(25:225) 119 a(0:200)(15:215) 65 a(0:200)(15:215)
 ;
-#X obj 285 244 drawnumber a 15 a(0:200)(32:232) 889 new-value=;
-#X obj 54 216 del 300;
-#X msg 480 91 0;
-#X obj 511 91 loadbang;
-#X obj 285 264 filledpolygon a(0:200)(0:999) 978 3 a(0:200)(0:110)
-a(0:200)(45:245) a(0:200)(10:110) a(0:200)(45:245) a(0:200)(20:130)
-a(0:200)(100:250) a(0:200)(0:110) a(0:200)(50:250);
-#X connect 0 0 1 0;
-#X connect 1 0 7 0;
-#X connect 1 0 20 0;
-#X connect 1 1 7 0;
-#X connect 1 1 20 0;
-#X connect 2 0 3 0;
-#X connect 3 0 4 1;
-#X connect 5 0 10 0;
-#X connect 6 0 2 0;
-#X connect 7 0 8 0;
-#X connect 9 0 10 0;
-#X connect 10 0 13 0;
-#X connect 10 1 14 0;
-#X connect 10 2 6 0;
-#X connect 10 3 11 0;
-#X connect 11 0 12 0;
-#X connect 13 0 15 0;
-#X connect 14 0 4 0;
-#X connect 19 0 27 0;
-#X connect 19 0 29 0;
-#X connect 19 0 30 0;
-#X connect 19 0 34 0;
-#X connect 21 0 25 0;
-#X connect 23 0 22 0;
+#X msg 500 111 0;
+#X obj 531 111 loadbang;
+#X obj 285 437 t a a a;
+#X obj 284 385 struct \$0.advslider float a float frequency float midinote
+;
+#X obj 305 274 drawnumber frequency 15 a(0:200)(25:225) 889 frequency=
+;
+#X obj 305 294 drawnumber midinote 15 a(0:200)(38:238) 889 MIDI-note=
+;
+#X obj 304 587 set \$0.advslider frequency;
+#X obj 304 611 ftom;
+#X obj 304 647 set \$0.advslider midinote;
+#X obj 304 565 * 100;
+#X obj 304 509 - 200;
+#X obj 304 532 abs;
+#X obj -23 40 filledpolygon a(0:200)(0:999) 978 3 a(0:200)(0:110) a(0:200)(45:245)
+a(0:200)(10:110) a(0:200)(45:245) a(0:200)(20:130) a(0:200)(100:250)
+a(0:200)(0:110) a(0:200)(50:250);
+#X msg -23 21 0;
+#X obj -23 2 loadbang;
+#X obj 54 216 del 500;
+#X connect 0 0 31 0;
+#X connect 0 1 31 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 1;
+#X connect 4 0 9 0;
+#X connect 5 0 1 0;
+#X connect 6 0 39 0;
+#X connect 8 0 9 0;
+#X connect 9 0 12 0;
+#X connect 9 1 13 0;
+#X connect 9 2 5 0;
+#X connect 9 3 10 0;
+#X connect 10 0 11 0;
+#X connect 12 0 14 0;
+#X connect 13 0 3 0;
+#X connect 18 0 26 0;
+#X connect 18 0 28 0;
+#X connect 18 0 33 0;
+#X connect 18 0 34 0;
+#X connect 20 0 24 0;
+#X connect 22 0 21 0;
+#X connect 23 0 21 0;
 #X connect 24 0 22 0;
-#X connect 25 0 23 0;
-#X connect 25 1 31 0;
-#X connect 25 2 26 0;
-#X connect 26 0 31 0;
-#X connect 28 0 24 0;
-#X connect 31 0 24 0;
-#X connect 32 0 18 0;
-#X connect 33 0 32 0;
-#X restore 220 49 pd advslider;
+#X connect 24 1 44 0;
+#X connect 24 2 25 0;
+#X connect 25 0 44 0;
+#X connect 27 0 23 0;
+#X connect 29 0 17 0;
+#X connect 30 0 29 0;
+#X connect 31 0 19 0;
+#X connect 31 1 6 0;
+#X connect 31 2 35 1;
+#X connect 31 2 37 1;
+#X connect 32 0 0 0;
+#X connect 36 0 37 0;
+#X connect 38 0 35 0;
+#X connect 38 0 36 0;
+#X connect 38 0 7 0;
+#X connect 39 0 40 0;
+#X connect 40 0 38 0;
+#X connect 42 0 41 0;
+#X connect 43 0 42 0;
+#X connect 44 0 23 0;
+#X restore 221 59 pd advslider;
 #N canvas 72 231 364 527 \$0.gop 0;
-#X scalar 1003.advslider 0 \;;
+#X scalar 1003.advslider 18 18200 133.443 \;;
 #X coords 0 0 130 260 130 260 1;
 #X restore 50 100 pd \$0.gop;
 #X obj 221 109 outlet;
@@ -110,8 +133,6 @@ a(0:200)(100:250) a(0:200)(0:110) a(0:200)(50:250);
 #X obj 71 304 color.rgbset;
 #X restore 198 316 pd \$0.properties;
 #X obj 203 248 s pd-\$0.properties;
-#X obj 345 91 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
--1 -1 0 1;
 #X connect 0 0 2 0;
 #X connect 3 0 4 0;
 #X connect 4 0 6 0;
