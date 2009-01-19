@@ -216,7 +216,6 @@ flatspace_install: flatspace $(helpdir) $(objectsdir)
 			$(externals_src)/plugin~/*.pd \
 			$(externals_src)/rhythm_estimator/*.p? \
 			$(externals_src)/signal/*/*.pd \
-			$(externals_src)/sprinkler/sprinkler-help.pd \
 			$(externals_src)/vst/*.pd \
 				$(helpdir)/$(FLATSPACE_NAME)
 

@@ -1,4 +1,4 @@
-/* src/config.h.in.  Generated from configure.ac by autoheader.  */
+/* src/config.h.in.  Generated from configure.in by autoheader.  */
 
 /* Define this to include debugging code for the 'string2any' external. */
 #undef ANY2STRING_DEBUG
@@ -24,14 +24,8 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Date this external was configured */
-#undef PDSTRING_DATE
-
 /* Define this if you are building single-object externals */
 #undef PDSTRING_OBJECT_EXTERNALS
-
-/* User who configured this external */
-#undef PDSTRING_USER
 
 /* Define this to include debugging code for the 'any2string' external. */
 #undef STRING2ANY_DEBUG
