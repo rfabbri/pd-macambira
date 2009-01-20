@@ -162,7 +162,7 @@ EXTRA_DIST = \
 	Makefile.in \
 	depcomp \
 	install-sh \
-	mkinstalldirs \
+	$(wildcard mkinstalldirs) \
 	missing
 
 all: all-am

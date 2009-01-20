@@ -49,7 +49,7 @@ all: build.stamp
 DUMMY_DIR            ?=../dummy
 DUMMY_CONFIGURE_ARGS ?=--disable-shared
 dummy.autogen_stamp: 
-	(cd $(DUMMY_DIR); sh ./autogen.sh) || true
+#	(cd $(DUMMY_DIR); sh ./autogen.sh) || true
 	touch $@
 
 dummy.configure_stamp: dummy.autogen_stamp
@@ -80,7 +80,7 @@ FLITE_DIR            ?=../flite
 #FLITE_CONFIGURE_ARGS ?=
 
 flite.autogen_stamp: 
-	(cd $(FLITE_DIR); sh ./autogen.sh) || true
+#	(cd $(FLITE_DIR); sh ./autogen.sh) || true
 	touch $@
 
 flite.configure_stamp: flite.autogen_stamp
@@ -140,7 +140,7 @@ gfsm.cvsclean: gfsm.extclean
 DEQUE_DIR            ?=../deque
 DEQUE_CONFIGURE_ARGS ?=
 deque.autogen_stamp: 
-	(cd $(DEQUE_DIR); sh ./autogen.sh) || true
+#	(cd $(DEQUE_DIR); sh ./autogen.sh) || true
 	touch $@
 
 deque.configure_stamp: deque.autogen_stamp
@@ -198,7 +198,7 @@ pdstring.cvsclean: pdstring.extclean
 READDIR_DIR            ?=../readdir
 READDIR_CONFIGURE_ARGS ?=
 readdir.autogen_stamp: 
-	(cd $(READDIR_DIR); sh ./autogen.sh) || true
+#	(cd $(READDIR_DIR); sh ./autogen.sh) || true
 	touch $@
 
 readdir.configure_stamp: readdir.autogen_stamp
@@ -257,7 +257,7 @@ sprinkler.cvsclean: sprinkler.extclean
 WEIGHTMAP_DIR            ?=../weightmap
 WEIGHTMAP_CONFIGURE_ARGS ?=
 weightmap.autogen_stamp: 
-	(cd $(WEIGHTMAP_DIR); sh ./autogen.sh) || true
+#	(cd $(WEIGHTMAP_DIR); sh ./autogen.sh) || true
 	touch $@
 
 weightmap.configure_stamp: weightmap.autogen_stamp

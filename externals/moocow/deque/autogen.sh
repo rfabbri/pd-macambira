@@ -32,8 +32,8 @@ fi
 
 if test -n "$MY_AMDIRS"; then
  for d in $MY_AMDIRS ; do
-    echo "(cd $d ; $AUTOMAKE -a)"
-    (cd $d ; $AUTOMAKE -a)
+    echo "(cd $d ; $AUTOMAKE -a -c)"
+    (cd $d ; $AUTOMAKE -a -c)
  done
 fi
 

@@ -47,6 +47,7 @@ EXTRA_DIST = \
 	Makefile.in \
 	depcomp \
 	install-sh \
+	$(wildcard mkinstalldirs) \
 	missing
 
 #	config.guess

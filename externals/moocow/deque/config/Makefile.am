@@ -38,6 +38,7 @@ MAINTAINERCLEANFILES = \
 	ylwrap
 
 
+
 ##-----------------------------------------------------------------------
 ## Variables: distribution
 ##-----------------------------------------------------------------------
@@ -47,7 +48,7 @@ EXTRA_DIST = \
 	Makefile.in \
 	depcomp \
 	install-sh \
-	mkinstalldirs \
+	$(wildcard mkinstalldirs) \
 	missing
 
 #	config.guess
