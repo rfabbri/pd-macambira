@@ -59,7 +59,6 @@ all:
 	$(MAKE) -C $(packages_src) $(DEST_PATHS)
 
 install: darwin_app
-devel_install: darwin_app_devel
 
 #------------------------------------------------------------------------------#
 darwin_app: darwin_app_core extended_install rez_install darwin_app_embed_libs spotlight_importer_install
@@ -68,11 +67,6 @@ darwin_app: darwin_app_core extended_install rez_install darwin_app_embed_libs s
 
 extended_install:
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) extended_install
-
-#------------------------------------------------------------------------------#
-darwin_app_devel: darwin_app_devel_core rez_install spotlight_importer_install
-	@echo " "
-	@echo "Pd_devel.app build succeeded!"
 
 #------------------------------------------------------------------------------#
 # this target is for when you already have a pre-built Pd.app and you
@@ -126,29 +120,6 @@ ifneq (/System,$(findstring /System,$(WISH_FRAMEWORKS_SOURCE)))
 endif # NOT /System
 # set up app wrapper
 	install -d "$(PD_APP_CONTENTS)/Resources/Scripts"
-	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
-	install -m0644 -p *.icns  "$(PD_APP_CONTENTS)/Resources"
-	mv "$(PD_APP_CONTENTS)/MacOS/${WISH_NAME}" \
-		"$(PD_APP_CONTENTS)/MacOS/${PD_APP_NAME}"
-
-#------------------------------------------------------------------------------#
-# 
-darwin_app_devel_wrapper: Info.plist
-# copy Wish Shell.app from default install location
-# note: use the "standalone" Wish shell to make a "standalone" pd app
-	install -d "$(PD_APP_CONTENTS)/MacOS"
-	install -m0755 -p \
-		"$(WISH_CONTENTS)/MacOS/$(WISH_NAME)" \
-		"$(PD_APP_CONTENTS)/MacOS"
-	install -d "$(PD_APP_CONTENTS)/Resources"
-	install -m0644 -p \
-		"$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
-		"$(PD_APP_CONTENTS)/Resources"
-	install -d "$(PD_APP_CONTENTS)/Frameworks"
-	cp -Rp "$(WISH_CONTENTS)/Frameworks" "$(PD_APP_CONTENTS)"
-# set up app wrapper
-	install -d "$(PD_APP_CONTENTS)/Resources/Scripts"
-	install -d "$(PD_APP_CONTENTS)/Resources/bin"
 	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
 	install -m0644 -p *.icns  "$(PD_APP_CONTENTS)/Resources"
 	mv "$(PD_APP_CONTENTS)/MacOS/${WISH_NAME}" \
@@ -213,29 +184,6 @@ darwin_app_core: darwin_app_wrapper
 	install -p -m0644 org.puredata.pd.default.plist "$(PD_APP_CONTENTS)/"
 # create directory to put Spotlight Importers into
 
-
-
-#------------------------------------------------------------------------------#
-darwin_app_devel_core: darwin_app_devel_wrapper
-	cd $(packages_src) && \
-		$(MAKE) $(DEST_PATHS) PD_CONFIGURE_FLAGS=--enable-jack devel_install 
-	cd "$(PD_APP_CONTENTS)/Resources/Scripts" && \
-		ln -s ../bin/pd.tk AppMain.tcl
-# support for Info Panel Plugins mgmt
-	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
-# run script to move help-*.pd files to *-help.pd according to the standard
-	cd $(pddocdir) && \
-		$(scripts_src)/convert-help-to-standard.sh
-
-
-#==============================================================================#
-#
-## CVS SOURCES
-#
-#==============================================================================#
-
-#------------------------------------------------------------------------------#
-darwin_app_externals: darwin_app_externals_standard darwin_app_externals_flext
 
 #==============================================================================#
 #
@@ -302,10 +250,6 @@ package_clean: darwin_app_clean spotlight_importer_clean
 
 spotlight_importer_clean:
 	-rm -rf -- spotlight_importer/build
-
-devel_clean: darwin_app_devel_clean
-	$(MAKE) -C $(packages_src) $(DEST_PATHS) clean
-	-rm Info.plist
 
 darwin_app_clean:
 	-chmod -R u+w $(PD_APP_CONTENTS)/Frameworks

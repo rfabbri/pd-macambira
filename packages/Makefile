@@ -15,8 +15,7 @@ BUILDLAYOUT_DIR = $(CWD)
 
 
 ## default target
-all: pd abstractions doc gem externals flext
-#all: pd++
+all: pd abstractions doc gem externals
 	@echo "Complete build succeeded!"
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
@@ -39,14 +38,6 @@ CYCLONE_BUILD := $(shell grep CYCLONE_BUILD \
 	cut -d '"' -f 2)
 CYCLONE_VERSION := $(CYCLONE_MAJOR_VERSION) $(CYCLONE_RELEASE) $(CYCLONE_BUILD)
 
-
-FLEXT_MAJOR_VERSION := $(shell grep FLEXTMAJOR \
-	$(externals_src)/grill/flext/buildsys/version.inc | cut -d '=' -f2)
-FLEXT_MINOR_VERSION := $(shell grep FLEXTMINOR \
-	$(externals_src)/grill/flext/buildsys/version.inc | cut -d '=' -f2)
-FLEXT_MICRO_VERSION := $(shell grep FLEXTMICRO \
-	$(externals_src)/grill/flext/buildsys/version.inc | cut -d '=' -f2)
-FLEXT_VERSION := $(FLEXT_MAJOR_VERSION).$(FLEXT_MINOR_VERSION).$(FLEXT_MICRO_VERSION)
 
 GEM_VERSION := $(shell grep "GEM_VERSION" $(gem_src)/src/Base/GemVersion.h | \
 	sed -n 's|.*GEM_VERSION = "\(.*\)".*|\1|p')
@@ -117,125 +108,6 @@ externals:
 
 
 #------------------------------------------------------------------------------
-# flext
-flext:
-# temp hack -HCS
-	test -f $(externals_src)/grill/flext/buildsys/mac/pd/config-gcc.def || \
-		cp $(externals_src)/grill/flext/buildsys/mac/pd/config-gcc.def \
-			$(externals_src)/grill/flext/buildsys/config-mac-pd-gcc.txt
-# end temp hack
-# tigital 8/30/2005 added
-	cd $(externals_src)/grill/flext && \
-		( \
-        test -f buildsys/config-mac-pd-gcc.txt || \
-          ( \
-            cp buildsys/mac/pd/config-gcc.def buildsys/config-mac-pd-gcc.txt && \
-            echo Copied template sys config file \
-          ) \
-      ) && \
-		( \
-			cat buildsys/config-mac-pd-gcc.txt | \
-				sed "s|^PDPATH=.*|PDPATH=$(pd_src)|" > buildsys/config-mac-pd-gcc.txt \
-		) && \
-		( \
-			cat package.txt | sed "s|^PRECOMPILE=.*|PRECOMPILE=|" > package.txt \
-		) && \
-		( \
-			cat buildsys/mac/pd/gnumake-gcc-ext.inc | \
-				sed "s|^LDFLAG\S +=.*|LDFLAG\S += -bundle -bundle_loader $(pd_src)/bin/pd|" > buildsys/mac/pd/gnumake-gcc-ext.inc \
-		) && \
-			( \
-			cat buildsys/mac/pd/gnumake-gcc-flext.inc | \
-				sed "s|^LDFLAG\S +=.*|LDFLAG\S += -dynamiclib -undefined dynamic_lookup |" > buildsys/mac/pd/gnumake-gcc-flext.inc \
-		) && \
-		( \
-			test -f config.txt || \
-			( \
-				cp -f build/config-mac.def config.txt && \
-				echo Copied template flext config file \
-			) \
-		) && \
-		MACOSX_DEPLOYMENT_TARGET=10.3 bash build.sh pd gcc build-release-shared FLEXTLIB=@executable_path/../extra FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
-	ln -sf $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.dylib
-	install -p $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)
-	ln -sf libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)/libflext-pd.dylib
-	install -d $(examplesdir)
-	cp -rp $(externals_src)/grill/flext/tutorial $(examplesdir)/flext
-#	install -d $(manualsdir)/flext
-	install -p	$(externals_src)/grill/flext/readme.txt   \
-		$(readmesdir)/flext.txt
-# FLEXTERNALS
-#########
-# dyn~
-	cd $(externals_src)/grill/dynext && bash ../flext/build.sh pd gcc build-release-shared FLEXTLIB=../flext/pd-darwin/release-shared FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
-	install -p $(externals_src)/grill/dynext/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-	install -p $(externals_src)/grill/dynext/pd/*.pd $(helpdir)
-#	install -d $(manualsdir)/dynext
-	install -p $(externals_src)/grill/dynext/readme.txt   \
-		$(readmesdir)/dynext.txt
-#########
-# pool
-	cd $(externals_src)/grill/pool && bash ../flext/build.sh pd gcc build-release-shared FLEXTLIB=../flext/pd-darwin/release-shared FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
-	install -p $(externals_src)/grill/pool/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-	install -p $(externals_src)/grill/pool/pool-help.pd $(helpdir)
-#	install -d $(manualsdir)/pool
-	install -p $(externals_src)/grill/pool/readme.txt   \
-		$(readmesdir)/pool.txt
-#########
-# py/pyext
-#	cd $(externals_src)/grill/py && \
-#		( \
-#			cp -f build/config-mac.def config.txt \
-#		) && \
-#		bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-#	install -p $(externals_src)/grill/py/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-# this wasn't building for me -HCS 2005-06-09
-	install -d $(manualsdir)/py/examples
-	install -d $(manualsdir)/py/scripts
-	install -p $(externals_src)/grill/py/pd/*.pd $(manualsdir)/py/examples
-	install -p $(externals_src)/grill/py/scripts/*.py $(manualsdir)/py/scripts
-	install -p $(externals_src)/grill/py/readme.txt
-		$(readmesdir)/py.txt
-#	install -d $(INSTALL_PREFIX)/Library/Frameworks
-#	cp -R /Library/Frameworks/Python.framework $(INSTALL_PREFIX)/Library/Frameworks
-#########
-# vasp
-#  fails without the dir
-#	test -d ../../vasp/pd-darwin || mkdir -p ../../vasp/pd-darwin 
-#	cd $(externals_src)/grill/vasp/ && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-#	install -p $(externals_src)/grill/vasp/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-# this wasn't building for me -HCS 2005-06-09
-	install -p $(externals_src)/grill/vasp/pd-help/*.pd $(helpdir)
-#	install -d $(manualsdir)/vasp
-	install -p $(externals_src)/grill/vasp/readme.txt   \
-		$(readmesdir)/vasp.txt
-	install -d $(examplesdir)/vasp
-	install -p $(externals_src)/grill/vasp/pd-ex/*.* $(examplesdir)/vasp
-#########
-# xsample
-	cd $(externals_src)/grill/xsample && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-	install -p $(externals_src)/grill/xsample/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-	install -p $(externals_src)/grill/xsample/pd/*.pd $(helpdir)
-#	install -d $(manualsdir)/xsample
-	install -p $(externals_src)/grill/xsample/readme.txt \
-		$(readmesdir)/xsample.txt
-########## FOOTILS #########
-# syncgrain
-#	cd $(externals_src)/footils/syncgrain/ && $(MAKE) -f makefile.pd-darwin
-#	install -p $(externals_src)/footils/syncgrain/pd-darwin/*.pd_darwin \
-#		$(objectsdir)
-	install -p $(externals_src)/footils/syncgrain/pd/*.* $(helpdir)
-
-# nusmuk
-	-cd $(externals_src)/nusmuk/msd && $(externals_src)/grill/flext/build.sh \
-		pd gcc
-	-cd $(externals_src)/nusmuk/msd2D && $(externals_src)/grill/flext/build.sh \
-		pd gcc
-	-cd $(externals_src)/nusmuk/msd3D && $(externals_src)/grill/flext/build.sh \
-		pd gcc
-
-
-#------------------------------------------------------------------------------
 # pd
 
 ifeq ($(OS_NAME),darwin)
@@ -286,7 +158,7 @@ pd++:
 
 # this is used for installing into a pre-build Pd binary
 extended_install: abstractions_install doc_install extensions_install \
-gem_install externals_install flext_install readme_install welcome_install \
+gem_install externals_install readme_install welcome_install \
 license_install noncvs_install
 
 
@@ -321,145 +193,6 @@ extensions_install:
 # externals_install
 externals_install: 
 	$(MAKE) -C $(externals_src) $(DEST_PATHS) install
-
-
-
-#------------------------------------------------------------------------------
-# flext_install
-flext_install:
-# FLEXT
-# temp hack -HCS
-#	test -f $(externals_src)/grill/flext/buildsys/mac/pd/config-gcc.def || \
-#		cp $(externals_src)/grill/flext/buildsys/mac/pd/config-gcc.def \
-#			$(externals_src)/grill/flext/buildsys/config-mac-pd-gcc.txt
-# end temp hack
-# tigital 8/30/2005 added
-#	cd $(externals_src)/grill/flext && \
-#		( \
-#        test -f buildsys/config-mac-pd-gcc.txt || \
-#          ( \
-#            cp buildsys/mac/pd/config-gcc.def buildsys/config-mac-pd-gcc.txt && \
-#            echo Copied template sys config file \
-#          ) \
-#      ) && \
-#		( \
-#			cat buildsys/config-mac-pd-gcc.txt | \
-#				sed "s/^PDPATH=.*/PDPATH=$(pd_src)/" > buildsys/config-mac-pd-gcc.txt \
-#		) && \
-#		( \
-#			cat package.txt | sed "s/^PRECOMPILE=.*/PRECOMPILE=/" > package.txt \
-#		) && \
-#		( \
-#			cat buildsys/mac/pd/gnumake-gcc-ext.inc | \
-#				sed "s/^LDFLAG\S +=.*/LDFLAG\S += -bundle -bundle_loader $(pd_src)\/bin\/pd/" > buildsys/mac/pd/gnumake-gcc-ext.inc \
-#		) && \
-#			( \
-#			cat buildsys/mac/pd/gnumake-gcc-flext.inc | \
-#				sed "s/^LDFLAG\S +=.*/LDFLAG\S += -dynamiclib -undefined dynamic_lookup /" > buildsys/mac/pd/gnumake-gcc-flext.inc \
-#		) && \
-#		( \
-#			test -f config.txt || \
-#			( \
-#				cp -f build/config-mac.def config.txt && \
-#				echo Copied template flext config file \
-#			) \
-#		) && \
-#		MACOSX_DEPLOYMENT_TARGET=10.3 bash build.sh pd gcc build-release-shared FLEXTLIB=@executable_path/../extra FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
-#	ln -sf $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.dylib
-#	install -p $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)
-#	ln -sf libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)/libflext-pd.dylib
-	install -d $(manualsdir)/flext
-	cp -rp $(externals_src)/grill/flext/tutorial $(manualsdir)/flext
-	install -p $(externals_src)/grill/flext/gpl.txt  \
-		$(externals_src)/grill/flext/readme.txt   \
-		$(externals_src)/grill/flext/license.txt  \
-		$(manualsdir)/flext
-# FLEXTERNALS
-#------------------------------------------------------------------------------#
-# dyn~
-#	-cd $(externals_src)/grill/dynext && \
-#		bash ../flext/build.sh pd gcc build-release-shared \
-#			FLEXTLIB=../flext/pd-darwin/release-shared \
-#			FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
-	-install -p $(externals_src)/grill/dynext/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
-	install -p $(externals_src)/grill/dynext/pd/*.pd $(helpdir)
-	install -d $(manualsdir)/dynext
-	install -p $(externals_src)/grill/dynext/gpl.txt  \
-		$(externals_src)/grill/dynext/readme.txt   \
-		$(externals_src)/grill/dynext/license.txt  \
-		$(manualsdir)/dynext
-#########
-# pool
-#	-cd $(externals_src)/grill/pool && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-	-install -p $(externals_src)/grill/pool/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
-	install -p $(externals_src)/grill/pool/pool-help.pd $(helpdir)
-	install -d $(manualsdir)/pool
-	install -p $(externals_src)/grill/pool/gpl.txt \
-		$(externals_src)/grill/pool/readme.txt   \
-		$(externals_src)/grill/pool/license.txt \
-		$(manualsdir)/pool
-#########
-# py/pyext
-#	cd $(externals_src)/grill/py && \
-#		( \
-#			cp -f build/config-mac.def config.txt \
-#		) && \
-#		bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-#	install -p $(externals_src)/grill/py/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
-# this wasn't building for me -HCS 2005-06-09
-	install -d $(examplesdir)/py/examples
-	install -d $(examplesdir)/py/scripts
-	install -p $(externals_src)/grill/py/pd/*.pd $(examplesdir)/py/examples
-	install -p $(externals_src)/grill/py/scripts/*.py $(examplesdir)/py/scripts
-	install -d $(manualsdir)/py/scripts
-	install -p $(externals_src)/grill/py/gpl.txt  \
-		$(externals_src)/grill/py/readme.txt $(externals_src)/grill/py/license.txt \
-		$(manualsdir)/py
-#	install -d $(prefix)/Library/Frameworks
-#	cp -R /Library/Frameworks/Python.framework $(prefix)/Library/Frameworks
-#########
-# vasp
-#  fails without the dir
-#	test -d ../../vasp/pd-darwin || mkdir -p ../../vasp/pd-darwin 
-#	cd $(externals_src)/grill/vasp/ && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-#	install -p $(externals_src)/grill/vasp/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
-# this wasn't building for me -HCS 2005-06-09
-	install -d $(helpdir)/vasp
-	install -p $(externals_src)/grill/vasp/pd-help/*.pd $(helpdir)/vasp
-	install -d $(manualsdir)/vasp
-	install -p $(externals_src)/grill/vasp/gpl.txt  \
-		$(externals_src)/grill/vasp/readme.txt   \
-		$(externals_src)/grill/vasp/license.txt  \
-		$(externals_src)/grill/vasp/changes.txt  \
-		$(externals_src)/grill/vasp/todo.txt     \
-		$(manualsdir)/vasp
-	install -d $(examplesdir)/vasp
-	cp -rp $(externals_src)/grill/vasp/pd-ex $(examplesdir)/vasp
-#########
-# xsample
-#	cd $(externals_src)/grill/xsample && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-#	install -p $(externals_src)/grill/xsample/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
-	install -p $(externals_src)/grill/xsample/pd/*.pd $(helpdir)
-	install -d $(manualsdir)/xsample
-	install -p $(externals_src)/grill/xsample/gpl.txt \
-		$(externals_src)/grill/xsample/readme.txt \
-		$(externals_src)/grill/xsample/license.txt \
-		$(manualsdir)/xsample
-########## FOOTILS #########
-# syncgrain
-#	cd $(externals_src)/footils/syncgrain/ && $(MAKE) -f makefile.pd-darwin
-#	install -p $(externals_src)/footils/syncgrain/pd-darwin/*.$(EXTENSION) \
-#		$(objectsdir)
-	install -p $(externals_src)/footils/syncgrain/pd/*.* $(helpdir)
-########## NUSMUK ##########
-# nusmuk
-#	cd $(externals_src)/nusmuk/msd && $(externals_src)/grill/flext/build.sh \
-#		pd gcc install
-#	cd $(externals_src)/nusmuk/msd2D && $(externals_src)/grill/flext/build.sh \
-#		pd gcc install
-#	cd $(externals_src)/nusmuk/msd3D && $(externals_src)/grill/flext/build.sh \
-#		pd gcc install
-#TODO: need to add nusmuk/editor
 
 
 #------------------------------------------------------------------------------
@@ -538,14 +271,6 @@ noncvs_install:
 PD_NAME=Pd
 pd_install: pd
 	$(MAKE) -C $(pd_src)/src $(DEST_PATHS) $(PD_BUILD_FLAGS) install
-	install -d $(manualsdir)/$(PD_NAME)
-	install -p $(pd_src)/src/notes.txt $(manualsdir)/$(PD_NAME)
-
-#------------------------------------------------------------------------------
-# pd_devel_install
-##PD_NAME=Pd++  # this breaks Pd-extended compilation!
-# it should use its own variable, like PDDEVEL_NAME <hans@at.or.at>
-pd_devel_install: pd++
 	install -d $(manualsdir)/$(PD_NAME)
 	install -p $(pd_src)/src/notes.txt $(manualsdir)/$(PD_NAME)
 
@@ -673,7 +398,6 @@ endif
 	echo "<ul>" >> $(README_FILE)
 	echo "<li>pure data: $(PD_VERSION) " >> $(README_FILE)
 	echo "<li>cyclone: $(CYCLONE_VERSION)" >> $(README_FILE)
-	echo "<li>flext: $(FLEXT_VERSION)" >> $(README_FILE)
 	echo "<li>gem: $(GEM_VERSION)" >> $(README_FILE)
 	echo "<li>iemlib: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<li>maxlib: $(MAXLIB_VERSION)" >> $(README_FILE)
@@ -931,15 +655,6 @@ externals_clean:
 	-$(MAKE) -C $(externals_src) $(DEST_PATHS) clean
 
 
-flext_clean:
-	-cd $(externals_src)/footils/syncgrain && make -f makefile.pd-darwin clean
-	-cd $(externals_src)/grill && \
-		rm -- flext/buildsys/config-mac-pd-gcc.txt config.txt flext/config.txt \
-			flext/source/libflext.a */pd-darwin/*.o */pd-darwin/*/*.o \
-		 	*/pd-darwin/*/*.pd_darwin */pd-darwin/*.pd_darwin \
-			*/pd-darwin/release-shared/*.dylib */pd-darwin/release-shared/*.opp
-
-
 gem_clean:
 	-$(MAKE) -C $(gem_src)/src clean
 
@@ -949,7 +664,7 @@ pd_clean:
 
 
 # these targets are all from Makefile.buildlayout: install_clean cruft_clean
-clean: abstractions_clean doc_clean externals_clean flext_clean gem_clean \
+clean: abstractions_clean doc_clean externals_clean gem_clean \
 pd_clean 
 	echo "Complete clean finished."
 
