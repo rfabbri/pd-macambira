@@ -10,13 +10,11 @@ for root, dirs, files in os.walk('/var/www/auto-build/'):
         dirs.sort()
         if 'latest' in dirs:
                 dirs.remove('latest')
-        if 'test' in dirs:
-                dirs.remove('test')
         for name in files:
                 m = re.search('^Pd-[01]\.[0-9][0-9].*[^5]$', name)
                 if m:
                         commonbuildname = re.sub('-20[01][0-9][01][0-9][0-9][0-9]', '', name)
-                        commonbuildpath = os.path.join('/var/www/auto-build/test', commonbuildname)
+                        commonbuildpath = os.path.join('/var/www/auto-build/latest', commonbuildname)
                         buildtarball = os.path.join(root, m.string)
                         #print "link: ", buildtarball, commonbuildpath
                         try:
