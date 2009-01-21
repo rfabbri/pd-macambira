@@ -49,11 +49,11 @@ pddoc_DATA = \
 # sources
 #-----------------------------------------------------------------------
 
-pdstring_SOURCES = pdstring.c
+pdstring_SOURCES = pdstring.c mooPdUtils.h
 
-any2string_SOURCES = any2string.c
+any2string_SOURCES = any2string.c mooPdUtils.h
 
-string2any_SOURCES = string2any.c
+string2any_SOURCES = string2any.c mooPdUtils.h
 
 #-----------------------------------------------------------------------
 # external compilation : flags

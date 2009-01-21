@@ -202,7 +202,7 @@ pddoc_DATA = weightmap-help.pd
 # sources
 #-----------------------------------------------------------------------
 weightmap_SOURCES = \
-	weightmap.c
+	weightmap.c mooPdUtils.h
 
 AM_CPPFLAGS = $(IFLAGS) $(DFLAGS)
 AM_CFLAGS = $(OFLAGS) $(WFLAGS) $(AFLAGS)

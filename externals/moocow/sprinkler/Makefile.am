@@ -143,7 +143,7 @@ pddoc_DATA = sprinkler-help.pd
 #-----------------------------------------------------------------------
 
 sprinkler_SOURCES = \
-	sprinkler.c
+	sprinkler.c mooPdUtils.h
 
 #-----------------------------------------------------------------------
 # external compilation : flags

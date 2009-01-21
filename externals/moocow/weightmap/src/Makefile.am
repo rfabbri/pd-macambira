@@ -45,7 +45,7 @@ pddoc_DATA = weightmap-help.pd
 #-----------------------------------------------------------------------
 
 weightmap_SOURCES = \
-	weightmap.c
+	weightmap.c mooPdUtils.h
 
 #-----------------------------------------------------------------------
 # external compilation : flags

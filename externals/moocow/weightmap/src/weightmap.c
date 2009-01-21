@@ -6,9 +6,7 @@
  *
  *   - inspired in part by Yves Degoyon's 'probalizer' object
  *
-
- *
- * Copyright (c) 2002-2006 Bryan Jurish.
+ * Copyright (c) 2002-2009 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
@@ -32,6 +30,7 @@
 
 
 #include <m_pd.h>
+#include "mooPdUtils.h"
 
 /* black magic */
 #ifdef NT
@@ -108,7 +107,7 @@ void weightmap_float(t_weightmap *x, t_floatarg f) {
 /*--------------------------------------------------------------------
  * map : set selected values (no resize)
  *--------------------------------------------------------------------*/
-void weightmap_map(t_weightmap *x, t_symbol *s, int argc, t_atom *argv) {
+void weightmap_map(t_weightmap *x, MOO_UNUSED t_symbol *s, int argc, t_atom *argv) {
   int i, idx;
   float wt;
 
@@ -154,9 +153,8 @@ void weightmap_zero(t_weightmap *x) {
 /*--------------------------------------------------------------------
  * set : set the entire weight-vector in one go (with possible resize)
  *--------------------------------------------------------------------*/
-void weightmap_set(t_weightmap *x, t_symbol *s, int argc, t_atom *argv) {
+void weightmap_set(t_weightmap *x, MOO_UNUSED t_symbol *s, int argc, t_atom *argv) {
   int i;
-  float wt;
   
   if (x->x_nvalues != argc) {
     // set number of elements

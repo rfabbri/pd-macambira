@@ -202,6 +202,7 @@ pddoc_DATA = deque-help.pd
 # sources
 #-----------------------------------------------------------------------
 deque_SOURCES = \
+	mooPdUtils.h \
 	squeue.c squeue.h \
 	dsqueue.c dsqueue.h \
 	deque.c

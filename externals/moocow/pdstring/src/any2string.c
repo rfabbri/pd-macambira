@@ -26,6 +26,7 @@
 
 #include <string.h>
 #include <m_pd.h>
+#include "mooPdUtils.h"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -148,7 +149,7 @@ static void any2string_anything(t_any2string *x, t_symbol *sel, int argc, t_atom
 /*--------------------------------------------------------------------
  * new
  */
-static void *any2string_new(t_symbol *sel, int argc, t_atom *argv)
+static void *any2string_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
 {
     t_any2string *x = (t_any2string *)pd_new(any2string_class);
 

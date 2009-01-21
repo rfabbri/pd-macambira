@@ -24,6 +24,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *=============================================================================*/
 #include <m_pd.h>
+#include "mooPdUtils.h"
 
 /* black magic */
 #ifdef NT
@@ -75,7 +76,7 @@ static void *pdstring_new(void)
 /*--------------------------------------------------------------------
  * help
  */
-static void pdstring_help(t_pdstring *x)
+static void pdstring_help(MOO_UNUSED t_pdstring *x)
 {
   post("");
   post("pdstring: byte-string externals version " PACKAGE_VERSION " by Bryan Jurish");

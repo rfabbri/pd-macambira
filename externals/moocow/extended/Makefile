@@ -35,7 +35,7 @@ CONFIGURE_ARGS=\
 #	--with-pd-extdir="$(MOOCOW_BUILD)/externs"
 
 ##-- defaults
-CFLAGS ?= -g -O2
+CFLAGS ?= -g -O2 -Wall -Winline -W
 pd_src ?= $(CURDIR)/../../../pd
 
 

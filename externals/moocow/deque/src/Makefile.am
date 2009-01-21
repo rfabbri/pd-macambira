@@ -44,6 +44,7 @@ pddoc_DATA = deque-help.pd
 #-----------------------------------------------------------------------
 
 deque_SOURCES = \
+	mooPdUtils.h \
 	squeue.c squeue.h \
 	dsqueue.c dsqueue.h \
 	deque.c

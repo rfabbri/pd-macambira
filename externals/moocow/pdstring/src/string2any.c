@@ -137,7 +137,7 @@ static void string2any_atoms(t_string2any *x, int argc, t_atom *argv)
 /*--------------------------------------------------------------------
  * anything
  */
-static void string2any_anything(t_string2any *x, t_symbol *sel, int argc, t_atom *argv)
+static void string2any_anything(t_string2any *x, MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
 {
   int i0=0, i;
 
@@ -162,7 +162,7 @@ static void string2any_anything(t_string2any *x, t_symbol *sel, int argc, t_atom
 /*--------------------------------------------------------------------
  * new
  */
-static void *string2any_new(t_symbol *sel, int argc, t_atom *argv)
+static void *string2any_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
 {
     t_string2any *x = (t_string2any *)pd_new(string2any_class);
 

@@ -11,7 +11,7 @@
  *   + formerly 'forward.c'
  *
  *
- * Copyright (c) 2002,2004 Bryan Jurish.
+ * Copyright (c) 2002-2009 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
@@ -34,6 +34,7 @@
  *=============================================================================*/
 
 #include <m_pd.h>
+#include "mooPdUtils.h"
 
 /* black magic */
 #ifdef NT
@@ -144,7 +145,7 @@ static void sprinkler_anything(t_sprinkler *x, t_symbol *dst, int argc, t_atom *
   outlet_anything(x->x_thru, dst, argc, argv);
 }
 
-static void sprinkler_list(t_sprinkler *x, t_symbol *s, int argc, t_atom *argv)
+static void sprinkler_list(t_sprinkler *x, MOO_UNUSED t_symbol *s, int argc, t_atom *argv)
 {
 #ifdef SPRINKLER_DEBUG
   post("sprinkler_debug : sprinkler_list : argc=%d", argc);
@@ -156,7 +157,7 @@ static void sprinkler_list(t_sprinkler *x, t_symbol *s, int argc, t_atom *argv)
 /*--------------------------------------------------------------------
  * newmethod, freemethod
  */
-void *sprinkler_new(t_symbol *s)
+void *sprinkler_new(MOO_UNUSED t_symbol *s)
 {
     t_sprinkler *x = (t_sprinkler *)pd_new(sprinkler_class);
     x->x_thru = outlet_new(&x->x_obj, &s_anything);
