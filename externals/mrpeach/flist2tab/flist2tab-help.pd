@@ -1,0 +1,25 @@
+#N canvas 437 577 450 300 10;
+#X obj 241 227 table pig;
+#X obj 170 200 flist2tab pig;
+#X obj 147 160 any2string;
+#X msg 147 137 Hello;
+#X floatatom 245 159 5 0 0 0 - - -;
+#X msg 61 74 81 28 0 33 55 1 2 3;
+#X text 10 -15 flist2tab loads floats or lists of floats into a table
+;
+#X text 10 1 at an offset determined by a float in the second inlet.
+;
+#X text 10 17 Negative offsets will be ignored.;
+#X obj 170 227 table twig;
+#X msg 91 104 set twig;
+#X text 148 103 set the working table;
+#X text 258 200 argument is table name;
+#X text 257 257 2009 1 21 Martin Peach;
+#X text 10 33 Offsets greater than the table length cause the table
+to be resized to fit.;
+#X text 279 159 default offset is 0;
+#X connect 2 0 1 0;
+#X connect 3 0 2 0;
+#X connect 4 0 1 1;
+#X connect 5 0 1 0;
+#X connect 10 0 1 0;
