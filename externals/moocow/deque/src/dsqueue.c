@@ -153,7 +153,7 @@ dsqueue_iter_t dsqueue_iter_last(dsqueue_t *dsq) {
 
 /// Returns an iterator for the next datum in the queue, or
 /// NULL if already at end-of-queue.
-dsqueue_iter_t dsqueue_iter_next(MOO_UNSUED dsqueue_t *dsq, dsqueue_iter_t dsqi) {
+dsqueue_iter_t dsqueue_iter_next(MOO_UNUSED dsqueue_t *dsq, dsqueue_iter_t dsqi) {
   while (dsqi.block) {
     dsqi.sqi = squeue_iter_next(dsqi.block->sq, dsqi.sqi);
     if (dsqi.sqi) break;
@@ -164,7 +164,7 @@ dsqueue_iter_t dsqueue_iter_next(MOO_UNSUED dsqueue_t *dsq, dsqueue_iter_t dsqi)
 
 /// Returns an iterator for the previous datum in the queue,
 /// or NULL if already at beginning-of-queue.
-dsqueue_iter_t dsqueue_iter_prev(MOO_UNSUED dsqueue_t *dsq, dsqueue_iter_t dsqi) {
+dsqueue_iter_t dsqueue_iter_prev(MOO_UNUSED dsqueue_t *dsq, dsqueue_iter_t dsqi) {
   while (dsqi.block) {
     dsqi.sqi = squeue_iter_prev(dsqi.block->sq, dsqi.sqi);
     if (dsqi.sqi) break;
@@ -174,7 +174,7 @@ dsqueue_iter_t dsqueue_iter_prev(MOO_UNSUED dsqueue_t *dsq, dsqueue_iter_t dsqi)
 }
 
 /// Returns a true value if p is a valid iterator value, false otherwise.
-char dsqueue_iter_valid(MOO_UNSUED dsqueue_t *dsq, dsqueue_iter_t dsqi) {
+char dsqueue_iter_valid(MOO_UNUSED dsqueue_t *dsq, dsqueue_iter_t dsqi) {
   return (dsqi.block && dsqi.sqi && 
 	  squeue_iter_valid(dsqi.block->sq, dsqi.sqi));
 }
