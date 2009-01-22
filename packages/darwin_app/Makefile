@@ -61,7 +61,7 @@ all:
 install: darwin_app
 
 #------------------------------------------------------------------------------#
-darwin_app: darwin_app_core extended_install rez_install darwin_app_embed_libs spotlight_importer_install
+darwin_app: darwin_app_core extended_install rez_install darwin_app_embed_libs
 	@echo " "
 	@echo "Pd.app build succeeded!"
 
@@ -151,9 +151,9 @@ pdp_help_hack:
 	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(helpdir)/pdp*-help.pd
 	rm -f --  $(helpdir)/pdp*-help.pd.bak
 	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(helpdir)/pdp/*.pd
-	rm -f --  $(helpdir)/pdp/*.pd
+	rm -f --  $(helpdir)/pdp/*.pd.bak
 	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(helpdir)/pidip/*.pd
-	rm -f --  $(helpdir)/pidip/*.pd
+	rm -f --  $(helpdir)/pidip/*.pd.bak
 	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(examplesdir)/pdp/*.pd
 	rm -f --  $(examplesdir)/pdp/*.pd.bak
 	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(examplesdir)/pidip/*.pd
