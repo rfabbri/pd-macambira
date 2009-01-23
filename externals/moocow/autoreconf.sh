@@ -2,22 +2,32 @@
 
 subdirs=(deque flite gfsm pdstring readdir sprinkler weightmap)
 
+#ar_args="--install --verbose --force --symlink"
+ar_args="--install --verbose --force"
+#ar_args="--install --verbose"
+
 if test -n "$*" ; then
   dirs=("$@")
-elif test "`basename \"$PWD\"`" = "moocow" ; then
-  for d in "${subdirs[@]}"; do
-    $0 "$d"
-  done
-elif test "`basename \"$PWD\"`" = "extended" ; then
-  for d in "${subdirs[@]}"; do
-    $0 "../$d"
-  done
 else
-  dirs=(.)
+  case "$PWD" in
+    *[/-]moocow)
+      for d in "${subdirs[@]}"; do
+        $0 "$d"
+      done
+      ;;
+    */extended)
+      for d in "${subdirs[@]}"; do
+        $0 "../$d"
+      done
+      ;;
+    *)
+      dirs=(.)
+      ;;
+  esac
 fi
 
 if test -n "$dirs"; then
   echo "$0: dirs=(${dirs[@]})"
-  exec autoreconf --install --force --verbose "${dirs[@]}"
+  exec autoreconf $ar_args "${dirs[@]}"
   #--symlink
 fi
