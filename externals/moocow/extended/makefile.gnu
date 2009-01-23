@@ -88,7 +88,7 @@ $(eval $(call subdir_template,gfsm,../gfsm,))
 $(eval $(call subdir_template,deque,../deque,))
 $(eval $(call subdir_template,pdstring,../pdstring,--enable-object-externals))
 $(eval $(call subdir_template,readdir,../readdir,))
-$(eval $(call subdir_template,sprinkler,../../sprinkler,))
+$(eval $(call subdir_template,sprinkler,../sprinkler,))
 $(eval $(call subdir_template,weightmap,../weightmap,))
 
 
