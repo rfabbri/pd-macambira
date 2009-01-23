@@ -4,7 +4,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [pdstring])
-define([THE_PACKAGE_VERSION], [0.07])
+define([THE_PACKAGE_VERSION], [0.08])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -88,7 +88,7 @@ esac
 
 ##------- PD externals: hack EXEEXT?
 PD_LIB_EXTERNALS="pdstring"
-PD_OBJ_EXTERNALS="any2string string2any"
+PD_OBJ_EXTERNALS="any2bytes bytes2any"
 
 AC_ARG_ENABLE(object-externals,
 	AC_HELP_STRING([--enable-object-externals], [Whether to build single-object externals (default=no)]),
@@ -162,10 +162,10 @@ AC_ARG_ENABLE([debug],
 if test "$enable_debug" = "yes" ; then
   AC_MSG_RESULT(yes)
   DEBUG="yes"
-  AC_DEFINE(ANY2STRING_DEBUG,1,
-	[Define this to include debugging code for the 'string2any' external.])
-  AC_DEFINE(STRING2ANY_DEBUG,1,
-	[Define this to include debugging code for the 'any2string' external.])
+  AC_DEFINE(ANY2BYTES_DEBUG,1,
+	[Define this to include debugging code for the 'bytes2any' external.])
+  AC_DEFINE(BYTES2ANY_DEBUG,1,
+	[Define this to include debugging code for the 'any2bytes' external.])
 else
   AC_MSG_RESULT(no)
   DEBUG="no"

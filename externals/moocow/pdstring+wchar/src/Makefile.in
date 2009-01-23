@@ -50,8 +50,8 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 pdexterns_PROGRAMS = @PD_OBJECT_EXTERNALS@
-EXTRA_PROGRAMS = pdstring$(EXEEXT) any2string$(EXEEXT) \
-	string2any$(EXEEXT)
+EXTRA_PROGRAMS = pdstring$(EXEEXT) any2bytes$(EXEEXT) \
+	bytes2any$(EXEEXT)
 subdir = src
 SUBDIRS =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -67,15 +67,15 @@ am__installdirs = "$(DESTDIR)$(pdexternsdir)" "$(DESTDIR)$(pddocdir)" \
 	"$(DESTDIR)$(pdexternsdir)"
 pdexternsPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(pdexterns_PROGRAMS)
-am_any2string_OBJECTS = any2string.$(OBJEXT)
-any2string_OBJECTS = $(am_any2string_OBJECTS)
-any2string_LDADD = $(LDADD)
+am_any2bytes_OBJECTS = any2bytes.$(OBJEXT)
+any2bytes_OBJECTS = $(am_any2bytes_OBJECTS)
+any2bytes_LDADD = $(LDADD)
+am_bytes2any_OBJECTS = bytes2any.$(OBJEXT)
+bytes2any_OBJECTS = $(am_bytes2any_OBJECTS)
+bytes2any_LDADD = $(LDADD)
 am_pdstring_OBJECTS = pdstring.$(OBJEXT)
 pdstring_OBJECTS = $(am_pdstring_OBJECTS)
 pdstring_LDADD = $(LDADD)
-am_string2any_OBJECTS = string2any.$(OBJEXT)
-string2any_OBJECTS = $(am_string2any_OBJECTS)
-string2any_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -83,10 +83,10 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(any2string_SOURCES) $(pdstring_SOURCES) \
-	$(string2any_SOURCES)
-DIST_SOURCES = $(any2string_SOURCES) $(pdstring_SOURCES) \
-	$(string2any_SOURCES)
+SOURCES = $(any2bytes_SOURCES) $(bytes2any_SOURCES) \
+	$(pdstring_SOURCES)
+DIST_SOURCES = $(any2bytes_SOURCES) $(bytes2any_SOURCES) \
+	$(pdstring_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -207,24 +207,24 @@ SUFFIXES = .@PDEXT@
 pdexterns_DATA = 
 pddoc_DATA = \
 	pdstring-help.pd \
-	any2string-help.pd \
-	string2any-help.pd
+	any2bytes-help.pd \
+	bytes2any-help.pd
 
 
 #-----------------------------------------------------------------------
 # sources
 #-----------------------------------------------------------------------
 pdstring_SOURCES = pdstring.c mooPdUtils.h
-any2string_SOURCES = any2string.c mooPdUtils.h
-string2any_SOURCES = string2any.c mooPdUtils.h
+any2bytes_SOURCES = any2bytes.c mooPdUtils.h
+bytes2any_SOURCES = bytes2any.c mooPdUtils.h
 
 #GLIB_IFLAGS = @GLIB_IFLAGS@
 #GLIB_LFLAGS = @GLIB_LFLAGS@
 AM_CPPFLAGS = $(IFLAGS) $(GLIB_IFLAGS) $(DFLAGS)
 AM_CFLAGS = $(OFLAGS) $(WFLAGS) $(AFLAGS)
 pdstring_LDFLAGS = $(LFLAGS)
-string2any_LDFLAGS = $(LFLAGS)
-any2string_LDFLAGS = $(LFLAGS)
+bytes2any_LDFLAGS = $(LFLAGS)
+any2bytes_LDFLAGS = $(LFLAGS)
 
 #-----------------------------------------------------------------------
 # Variables: cleanup
@@ -332,15 +332,15 @@ uninstall-pdexternsPROGRAMS:
 
 clean-pdexternsPROGRAMS:
 	-test -z "$(pdexterns_PROGRAMS)" || rm -f $(pdexterns_PROGRAMS)
-any2string$(EXEEXT): $(any2string_OBJECTS) $(any2string_DEPENDENCIES) 
-	@rm -f any2string$(EXEEXT)
-	$(LINK) $(any2string_LDFLAGS) $(any2string_OBJECTS) $(any2string_LDADD) $(LIBS)
+any2bytes$(EXEEXT): $(any2bytes_OBJECTS) $(any2bytes_DEPENDENCIES) 
+	@rm -f any2bytes$(EXEEXT)
+	$(LINK) $(any2bytes_LDFLAGS) $(any2bytes_OBJECTS) $(any2bytes_LDADD) $(LIBS)
+bytes2any$(EXEEXT): $(bytes2any_OBJECTS) $(bytes2any_DEPENDENCIES) 
+	@rm -f bytes2any$(EXEEXT)
+	$(LINK) $(bytes2any_LDFLAGS) $(bytes2any_OBJECTS) $(bytes2any_LDADD) $(LIBS)
 pdstring$(EXEEXT): $(pdstring_OBJECTS) $(pdstring_DEPENDENCIES) 
 	@rm -f pdstring$(EXEEXT)
 	$(LINK) $(pdstring_LDFLAGS) $(pdstring_OBJECTS) $(pdstring_LDADD) $(LIBS)
-string2any$(EXEEXT): $(string2any_OBJECTS) $(string2any_DEPENDENCIES) 
-	@rm -f string2any$(EXEEXT)
-	$(LINK) $(string2any_LDFLAGS) $(string2any_OBJECTS) $(string2any_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -348,9 +348,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/any2string.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/any2bytes.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bytes2any.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pdstring.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/string2any.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

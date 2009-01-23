@@ -32,8 +32,8 @@ pdexterns_PROGRAMS = @PD_OBJECT_EXTERNALS@
 ## --- possible externals
 EXTRA_PROGRAMS = \
 	pdstring \
-	any2string \
-	string2any
+	any2bytes \
+	bytes2any
 
 ## --- patches
 pdexterns_DATA =
@@ -41,8 +41,8 @@ pdexterns_DATA =
 ## --- documentation
 pddoc_DATA = \
 	pdstring-help.pd \
-	any2string-help.pd \
-	string2any-help.pd
+	any2bytes-help.pd \
+	bytes2any-help.pd
 
 
 #-----------------------------------------------------------------------
@@ -51,9 +51,9 @@ pddoc_DATA = \
 
 pdstring_SOURCES = pdstring.c mooPdUtils.h
 
-any2string_SOURCES = any2string.c mooPdUtils.h
+any2bytes_SOURCES = any2bytes.c mooPdUtils.h
 
-string2any_SOURCES = string2any.c mooPdUtils.h
+bytes2any_SOURCES = bytes2any.c mooPdUtils.h
 
 #-----------------------------------------------------------------------
 # external compilation : flags
@@ -74,9 +74,9 @@ AM_CFLAGS   = $(OFLAGS) $(WFLAGS) $(AFLAGS)
 
 pdstring_LDFLAGS = $(LFLAGS)
 
-string2any_LDFLAGS = $(LFLAGS)
+bytes2any_LDFLAGS = $(LFLAGS)
 
-any2string_LDFLAGS = $(LFLAGS)
+any2bytes_LDFLAGS = $(LFLAGS)
 
 #-----------------------------------------------------------------------
 # Variables: cleanup

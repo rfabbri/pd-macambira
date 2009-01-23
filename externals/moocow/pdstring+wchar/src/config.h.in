@@ -1,7 +1,10 @@
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define this to include debugging code for the 'string2any' external. */
-#undef ANY2STRING_DEBUG
+/* Define this to include debugging code for the 'bytes2any' external. */
+#undef ANY2BYTES_DEBUG
+
+/* Define this to include debugging code for the 'any2bytes' external. */
+#undef BYTES2ANY_DEBUG
 
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
@@ -32,9 +35,6 @@
 
 /* User who configured this external */
 #undef PDSTRING_USER
-
-/* Define this to include debugging code for the 'any2string' external. */
-#undef STRING2ANY_DEBUG
 
 /* Version number of package */
 #undef VERSION

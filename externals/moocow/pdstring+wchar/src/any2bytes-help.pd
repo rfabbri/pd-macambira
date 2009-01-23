@@ -1,12 +1,9 @@
 #N canvas 90 20 636 478 10;
-#X obj 25 400 print any2string-help;
-#X obj 25 314 any2string 128 -1;
 #X msg 109 197 0;
 #X msg 77 197 -1;
 #X text 19 47 INLETS:;
 #X text 31 61 1 - pd messages;
 #X text 247 49 OUTLETS:;
-#X text 263 63 1 - lists of ASCII-valued floats;
 #X floatatom 44 147 8 0 0 0 - - -;
 #X symbolatom 34 125 10 0 0 0 - - -;
 #X text 189 125 ... no special handling for symbols;
@@ -21,19 +18,23 @@ text buffer). This should get re-allocated when necessary. Specify
 #X text 320 458 Bryan Jurish <moocow@ling.uni-potsdam.de>;
 #X text 19 439 SEE ALSO:;
 #X msg 139 197 42;
-#X text 21 29 SYNTAX: any2string [INITIAL_BUFSIZE [EOS_CHAR]];
 #X text 184 194 The second inlet sets the terminating EOS ("end-of-string")
 character. This value gets implicitly appended to all output lists.
 Specify a negative value here to avoid implicit EOS characters entirely.
 For backwards compatibility \, the default EOS character is 0 (zero).
 ;
-#X text 51 5 any2string : convert pd messages to a list of floats;
 #X text 31 75 2 - EOS character (float);
 #X obj 100 438 pdstring;
-#X connect 1 0 0 0;
-#X connect 2 0 1 1;
-#X connect 3 0 1 1;
-#X connect 8 0 1 0;
-#X connect 9 0 1 0;
-#X connect 13 0 1 0;
-#X connect 18 0 1 1;
+#X obj 25 314 any2bytes 128 -1;
+#X obj 25 400 print any2bytes-help;
+#X text 21 29 SYNTAX: any2bytes [INITIAL_BUFSIZE [EOS_CHAR]];
+#X text 263 63 1 - lists of byte-valued floats;
+#X text 49 5 any2bytes : convert pd messages to a list of byte values
+;
+#X connect 0 0 19 1;
+#X connect 1 0 19 1;
+#X connect 5 0 19 0;
+#X connect 6 0 19 0;
+#X connect 10 0 19 0;
+#X connect 15 0 19 1;
+#X connect 19 0 20 0;
