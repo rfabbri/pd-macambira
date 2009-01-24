@@ -26,11 +26,13 @@
 
 #include <string.h>
 #include <m_pd.h>
-#include "mooPdUtils.h"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include "mooPdUtils.h"
+#include "pdstringUtils.c"
 
 /* black magic */
 #ifdef NT
@@ -50,8 +52,7 @@
 # define S2ADEBUG(x)
 #endif
 
-#define BYTES2ANY_DEFAULT_BUFLEN 256
-
+#define BYTES2ANY_DEFAULT_BUFLEN PDSTRING_DEFAULT_BUFLEN
 
 /*=====================================================================
  * Constants
@@ -67,9 +68,8 @@ static t_class *bytes2any_class;
 typedef struct _bytes2any
 {
   t_object       x_obj;
-  size_t         x_size;
-  t_float        x_eos;   //-- eos character
-  char          *x_text;
+  t_pdstring_bytes x_bytes; //-- byte buffer: {b_buf~x_text,b_len~?,b_alloc~x_size}
+  t_float        x_eos;     //-- eos byte value
   t_binbuf      *x_binbuf;
   t_inlet       *x_eos_in;
   t_outlet      *x_outlet;
@@ -86,31 +86,11 @@ typedef struct _bytes2any
  */
 static void bytes2any_atoms(t_bytes2any *x, int argc, t_atom *argv)
 {
-  char *s;
-  int x_argc, a_argc=0;
+  t_pdstring_atoms src = {argv,argc,argc};
+  pdstring_atoms2bytes(&(x->x_bytes), &src, x->x_eos);
+  pdstring_bytes2any(NULL, &(x->x_bytes), x->x_binbuf);
+  int x_argc;
   t_atom *x_argv;
-
-  /*-- allocate --*/
-  if ( ((int)x->x_size) <= (argc+1) ) {
-    freebytes(x->x_text, x->x_size*sizeof(char));
-    x->x_size = argc+1;
-    x->x_text = (char *)getbytes(x->x_size*sizeof(char));
-  }
-
-  /*-- get text --*/
-  for (s=x->x_text; argc > 0; argc--, a_argc++, argv++, s++) {
-    *s = atom_getfloat(argv);
-    S2ADEBUG(post("bytes2any[%p]: a_argc=%d,*s=%d", x, a_argc, *s));
-    if ((x->x_eos<0 && !*s) || (*s==x->x_eos)) { break; } /*-- hack: look for eos char --*/
-  }
-  *s = 0;
-  S2ADEBUG(post("bytes2any[%p]: text: \"%s\", strlen=%d, argc=%d", x, x->x_text, strlen(x->x_text), a_argc));
-
-  /*-- clear and fill binbuf --*/
-  binbuf_clear(x->x_binbuf);
-  binbuf_text(x->x_binbuf, x->x_text, a_argc); //-- handle NULs if binbuf will (but it won't) ?
-  S2ADEBUG(post("bytes2any[%p]: binbuf_print: ", x));
-  S2ADEBUG(binbuf_print(x->x_binbuf));
 
   /*-- output --*/
   x_argc = binbuf_getnatom(x->x_binbuf);
@@ -165,16 +145,16 @@ static void bytes2any_anything(t_bytes2any *x, MOO_UNUSED t_symbol *sel, int arg
 static void *bytes2any_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
 {
     t_bytes2any *x = (t_bytes2any *)pd_new(bytes2any_class);
+    int bufsize    = BYTES2ANY_DEFAULT_BUFLEN;
 
     //-- defaults
     x->x_binbuf = binbuf_new();
-    x->x_size   = BYTES2ANY_DEFAULT_BUFLEN;
     x->x_eos    = -1;
 
     //-- args: 0: bufsize
     if (argc > 0) {
       int initial_bufsize = atom_getintarg(0,argc,argv);
-      if (initial_bufsize > 0) x->x_size = initial_bufsize;
+      if (initial_bufsize > 0) bufsize = initial_bufsize;
       x->x_eos = -1;   //-- backwards-compatibility hack: no default eos character if only bufsize is specified
     } 
     //-- args: 1: separator
@@ -182,8 +162,8 @@ static void *bytes2any_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
       x->x_eos = atom_getfloatarg(1,argc,argv);
     }
 
-    //-- allocate
-    x->x_text = (char *)getbytes(x->x_size*sizeof(char));
+    //-- allocate x_bytes
+    pdstring_bytes_init(&x->x_bytes, bufsize);
 
     //-- inlets
     x->x_eos_in = floatinlet_new(&x->x_obj, &x->x_eos);
@@ -203,10 +183,8 @@ static void *bytes2any_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
  */
 static void bytes2any_free(t_bytes2any *x)
 {
-  if (x->x_text) {
-    freebytes(x->x_text, x->x_size*sizeof(char));
-    x->x_text = NULL;
-  }
+  if (x->x_bytes.b_buf)
+    freebytes(x->x_bytes.b_buf, x->x_bytes.b_alloc*sizeof(unsigned char));
   binbuf_free(x->x_binbuf);
   inlet_free(x->x_eos_in);
   outlet_free(x->x_outlet_done);

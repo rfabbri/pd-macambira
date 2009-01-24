@@ -26,11 +26,13 @@
 
 #include <string.h>
 #include <m_pd.h>
-#include "mooPdUtils.h"
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include "mooPdUtils.h"
+#include "pdstringUtils.c"
 
 /* black magic */
 #ifdef NT
@@ -49,7 +51,7 @@
 # define A2SDEBUG(x)
 #endif
 
-#define ANY2BYTES_DEFAULT_BUFLEN 256
+#define ANY2BYTES_DEFAULT_BUFLEN PDSTRING_DEFAULT_BUFLEN
 
 
 /*=====================================================================

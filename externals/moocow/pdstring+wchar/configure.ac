@@ -88,7 +88,7 @@ esac
 
 ##------- PD externals: hack EXEEXT?
 PD_LIB_EXTERNALS="pdstring"
-PD_OBJ_EXTERNALS="any2bytes bytes2any"
+PD_OBJ_EXTERNALS="any2bytes bytes2any bytes2wchars"
 
 AC_ARG_ENABLE(object-externals,
 	AC_HELP_STRING([--enable-object-externals], [Whether to build single-object externals (default=no)]),
