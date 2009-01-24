@@ -70,3 +70,16 @@ Index: g_readwrite.c
              canvas_savetofile(x2, x2->gl_name, canvas_getdir(x2));
      else canvas_menusaveas(x2);
  }
+Index: u_main.tk
+===================================================================
+--- u_main.tk	(revision 10609)
++++ u_main.tk	(working copy)
+@@ -521,7 +521,7 @@
+     set directory [string range $filename 0 [expr [string last / $filename] - 1]]
+     set pd_opendir $directory
+     set basename [string range $filename [expr [string last / $filename] + 1] end]
+-    if {[string last .pd $filename] >= 0} {
++    if {[regexp -nocase -- "\.(pd|pat|mxt)$" $filename]} {
+         pd "pd open [pdtk_enquote $basename] [pdtk_enquote $directory] ;"
+     }
+ }
