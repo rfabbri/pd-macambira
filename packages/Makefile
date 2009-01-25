@@ -246,9 +246,8 @@ endif
 	install -p $(gem_src)/doc/*.* $(manualsdir)/$(GEM_NAME)
 	install -d $(manualsdir)/$(GEM_NAME)/manual
 # in Gem 0.92, $(gem_src)/manual moved to $(gem_src)/doc/manual
-	test -d $(gem_src)/manual && \
-		install -p $(gem_src)/manual/*.* $(manualsdir)/$(GEM_NAME)/manual
-	test -d $(gem_src)/doc/manual && \
+	(test -d $(gem_src)/manual && \
+		install -p $(gem_src)/manual/*.* $(manualsdir)/$(GEM_NAME)/manual) || \
 		install -p $(gem_src)/doc/manual/*.* $(manualsdir)/$(GEM_NAME)/manual
 	for dir in $(shell ls -1 $(gem_src)/examples | grep -v CVS); do \
 		echo "installing $$dir"; \
