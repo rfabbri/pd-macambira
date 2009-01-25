@@ -1,24 +1,7 @@
-/*-----------------------------------------------------------------
-LOG
-GEM - Graphics Environment for Multimedia
-
-Get pixel information
-	
-Copyright (c) 1997-1998 Mark Danks. mark@danks.org
-Copyright (c) Günther Geiger. geiger@epy.co.at
-Copyright (c) 2001-2002 IOhannes m zmoelnig. forum::für::umläute. IEM. zmoelnig@iem.kug.ac.at
-Copyright (c) 2002 James Tittle & Chris Clepper
-For information on usage and redistribution, and for a DISCLAIMER OF ALL
-WARRANTIES, see the file, "GEM.LICENSE.TERMS" in this distribution.
-	 
------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------
 pix_preview
 
-  0409:forum::für::umläute:2000
-  IOhannes m zmoelnig
-  mailto:zmoelnig@iem.kug.ac.at
 -----------------------------------------------------------------*/
 
 #ifndef INCLUDE_PIX_DUMP_H_
@@ -28,12 +11,13 @@ pix_preview
 
 /*needed for base64 conversion*/
 #include <string>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 std::string base64_encode(unsigned char const* , unsigned int len);
-
-
-
-
 
 
 /*-----------------------------------------------------------------
@@ -62,6 +46,7 @@ public:
 	// Constructor
 	pix_preview(t_floatarg fx, t_floatarg fy);
 	int x_width, x_height;
+	static int counter;
 	
 protected:
 	
@@ -80,6 +65,7 @@ protected:
 	void			trigger();
 	int getx();
 	int gety();
+    	void	    	connectMess();
 
 	//////////
 	// The color outlet
@@ -95,6 +81,8 @@ protected:
 	
 	int           oldimagex;
 	int           oldimagey;
+	int           widgetwidth;
+	int           widgetheight;
 	
 	//////////
 	// navigation
@@ -111,7 +99,11 @@ protected:
 	
 	t_widgetbehavior   image_widgetbehavior;
 
-
+	int s;
+	int connected;
+	struct addrinfo *res;
+	struct addrinfo hints;
+	int 		whoami;
 
 
 private:
@@ -122,6 +114,7 @@ private:
 	static void		GREYMessCallback(void *dump);
 	static void		RGBAMessCallback(void *dump);
 	static void		RGBMessCallback(void *dump);
+    	static void 		connectMessCallback(void *dump);
 
 
 	static void image_drawme(pix_preview *x, t_glist *glist, int firsttime, int m_xsize, int m_ysize);
