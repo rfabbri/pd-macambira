@@ -2,7 +2,7 @@
 extern "C"
 { 
 /*
-videogrid external for Puredatai
+videogrid external for Puredata
 Lluis Gomez i Bigorda :: lluis-at-hangar.org
 Sergi Lario Loyo      :: slario-at-gmail.com
 
@@ -27,26 +27,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 #include <math.h>
 
-/* incloure les definicions de variables i 
-   prototipus de dades i de funcions de puredata */
+/* 
+ * incloure les definicions de variables i prototipus de dades i de funcions de puredata 
+*/
 #include "m_pd.h"
-/* incloure estructures de dades i capceleres de funcions gàfiques bàsiques de pd */
+/* 
+ * incloure estructures de dades i capceleres de funcions gàfiques bàsiques de pd 
+*/
 #include "g_canvas.h"
-/* incloure estructures de dades i capceleres de funcions per traballar amb threads */
+/* 
+ * incloure estructures de dades i capceleres de funcions per traballar amb threads 
+*/
 #include "pthread.h"
 
-/*some linux distros need this to compile ffmpeg correctly as cpp*/
+/* some linux distros need this to compile ffmpeg correctly as cpp */
 #define __STDC_CONSTANT_MACROS 1 
 
-/*ffmpeg includes*/
+/* ffmpeg includes */
 #include <ffmpeg/avcodec.h>
 #include <ffmpeg/avformat.h>
 #include <ffmpeg/avutil.h>
 #include <ffmpeg/swscale.h>
 
-/*libquicktime includes*/
-//#include <quicktime/lqt.h>
-//#include <quicktime/colormodels.h>
+/* libquicktime includes */
+// #include <quicktime/lqt.h>
+// #include <quicktime/colormodels.h>
 #include <lqt/lqt.h>
 #include <lqt/colormodels.h>
 
@@ -64,7 +69,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define BYTESNOMFITXER 512
 
 /* 8bits clamp rgb values */
-
 #define CLAMP8(x) (((x)<0) ? 0 : ((x>255)? 255 : (x)))
 
 #define BYTESNOMFITXERIMATGE 512
@@ -86,15 +90,13 @@ void SaveFrame(AVFrame *pFrame, int width, int height, int W, int H, int posi)
     char szFilename[32];
     int nN = posi;
 
-            /*int cont=0;*/
-            
-            char nNstr[BYTES_NUM_TEMP];
-            pathimage  ig_path = PATH_TEMPORAL;
+    char nNstr[BYTES_NUM_TEMP];
+    pathimage  ig_path = PATH_TEMPORAL;
 
-            sprintf(nNstr, "%d", nN);
-            strcat(ig_path,nNstr);
-            strcat(ig_path,".");
-            strcat(ig_path,FORMAT_MINIATURA);
+    sprintf(nNstr, "%d", nN);
+    strcat(ig_path,nNstr);
+    strcat(ig_path,".");
+    strcat(ig_path,FORMAT_MINIATURA);
 
     // Open file
     sprintf(szFilename, ig_path);
@@ -105,26 +107,25 @@ void SaveFrame(AVFrame *pFrame, int width, int height, int W, int H, int posi)
     // Write header
     fprintf(pFile, "P6\n%d %d\n255\n", W, H);
 
-
-            int w = width;
-            int h = height;
-            float k = (width/W);
-            float l = (height/H);
-            int i,j,y,x,realx;
+    int w = width;
+    int h = height;
+    float k = (width/W);
+    float l = (height/H);
+    int i,j,y,x,realx;
 
     // Write pixel data
     for(y=0; y<H; y=y++) {
         for(x=0; x<W; x=x++) {
-		realx = ((x*k)+(3-((int)(x*k)%3)))*3;
-		fwrite((pFrame->data[0]+(int)(y*l)*pFrame->linesize[0])+realx, 1, 3, pFile);
+	    realx = ((x*k)+(3-((int)(x*k)%3)))*3;
+	    fwrite((pFrame->data[0]+(int)(y*l)*pFrame->linesize[0])+realx, 1, 3, pFile);
 	}
    }
 
-    //        for (i=0;i<(l*H);i=i+l) {
-    //            for (j=0;j<(k*W);j=j+k) {
-    //                fwrite(pFrame->data[0]+(i*pFrame->linesize[0]+j), 1, 3, pFile);
-    //            }
-     //       }
+   //        for (i=0;i<(l*H);i=i+l) {
+   //            for (j=0;j<(k*W);j=j+k) {
+   //                fwrite(pFrame->data[0]+(i*pFrame->linesize[0]+j), 1, 3, pFile);
+   //            }
+   //       }
 
     // Close file
     fclose(pFile);
@@ -313,7 +314,6 @@ int convertir_img(pathimage pathFitxer, tipus_format f, int W, int H, int posi){
     int nN = posi;
     int x_vwidth = 0;
     int x_vheight = 0;
-    /* convertir(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN); */
     qt = quicktime_open(pathFitxer, 1, 0);
 
     if (!(qt)){
@@ -337,8 +337,7 @@ int convertir_img(pathimage pathFitxer, tipus_format f, int W, int H, int posi){
         qt_cmodel = BC_YUV420P;
         x_vwidth  = quicktime_video_width(qt,0);
         x_vheight = quicktime_video_height(qt,0);
-	
-	
+		
         free(qt_frame);
         qt_frame = (unsigned char*)malloc(x_vwidth*x_vheight*4);
 	
@@ -356,19 +355,17 @@ int convertir_img(pathimage pathFitxer, tipus_format f, int W, int H, int posi){
  
     switch(qt_cmodel){
         case BC_YUV420P:
-            printf(" ");
+            /* printf(" "); */
             /* post("videogrid: qt colormodel : BC_YUV420P"); */
 	
-	/* per a fer la miniatura
-	   cada k colomnes pillem una
-	   cada l files pillem una */
+	    /* per a fer la miniatura
+	       cada k colomnes pillem una
+	       cada l files pillem una */
             int w = x_vwidth;
             int h = x_vheight;
             int k = (w/W);
             int l = (h/H);
 
-            /*int cont=0;*/
-            
             char nNstr[BYTES_NUM_TEMP];
             pathimage  ig_path = PATH_TEMPORAL;
 
@@ -376,8 +373,8 @@ int convertir_img(pathimage pathFitxer, tipus_format f, int W, int H, int posi){
             strcat(ig_path,nNstr);
             strcat(ig_path,".");
             strcat(ig_path,FORMAT_MINIATURA);
-        /*    printf("Creacio de la imatge %s ...",ig_path); */
-	/* escriu el contingut de data a un arxiu. */
+            /* printf("Creacio de la imatge %s ...",ig_path); */
+	    /* escriu el contingut de data a un arxiu. */
             FILE *fp = fopen(ig_path, "w");
             fprintf (fp, "P6\n%d %d\n255\n", W, H);
 
@@ -395,7 +392,7 @@ int convertir_img(pathimage pathFitxer, tipus_format f, int W, int H, int posi){
                 }
             }
 
-	/* escriu el contingut de data a un arxiu.*/
+	    /* escriu el contingut de data a un arxiu.*/
             fclose (fp);
     }
     return 0;
@@ -494,7 +491,7 @@ int cuaBuida(Cua *cua)
 void eliminarCua(Cua *cua)
 {
     while (!cuaBuida(cua)) desencuar(cua); 
-    printf("Cua eliminada\n");
+    /* printf("Cua eliminada\n"); */
 }
 
 /* funció que retorna el nombre de nodes de la cua */
@@ -511,23 +508,23 @@ int numNodes(Cua *cua)
     return (contador);
 }
 
-/* funció que escriu la cua de nodes per la sortida estàndard */
+/* funció que escriu la cua de nodes */
 void escriuCua(Cua *cua)
 {
     if(!cuaBuida(cua))
     {
         Node *actual;
         actual=cua->davanter;
-        printf("CUA DE NODES\n[");
+        post("THUMBS INSIDE\n[");
         do{
-            printf("#%s#",actual->pathFitxer);
+            post("#%s#",actual->pathFitxer);
             actual = actual->seguent;
         }while(actual);
-        printf("]\n");
+        post("]\n");
         
     }
     else
-        printf("Cua buida\n");
+        post("EMPTY: NO THUMBS INSIDE\n");
 }
 
 
@@ -741,6 +738,7 @@ void eliminar_imatges_temporals(int maxim){
 
 int format_adequat_v(path nomF){
     int retorn = 0;
+    /*
     path  ig_path = "";
     strcat(ig_path,nomF);
     char *t1;
@@ -749,7 +747,6 @@ int format_adequat_v(path nomF){
           t1 != NULL;
           t1 = strtok(NULL,".") )
         strcpy(extensio,t1);
-    /*
     if(strcmp(extensio,"mov")==0) retorn = 1;
     if(strcmp(extensio,"eps")==0) retorn = 1;
     if(strcmp(extensio,"gif")==0) retorn = 1;
@@ -760,7 +757,6 @@ int format_adequat_v(path nomF){
     if(strcmp(extensio,"tif")==0) retorn = 1;
     if(strcmp(extensio,"tiff")==0) retorn = 1;
     */
-
     return (retorn);
 }
 
@@ -770,70 +766,59 @@ void videogrid_afegir_imatge(t_videogrid *x, path entrada)
     int maxim;
     char nNstr[BYTES_NUM_TEMP];
     int pos = 0;
-    /* escriu l'argument entrat */
-        /* post("Afegint la imatge %s ...",entrada); */
-        maxim = x->x_num_fil * x->x_num_col;
-        path  ig_path = PATH_TEMPORAL;
+    maxim = x->x_num_fil * x->x_num_col;
+    path  ig_path = PATH_TEMPORAL;
 
-        /* si hi ha tants nodes a la cua com el maxim */
-        if((numNodes(&x->x_cua)) >=  maxim){
-            /* desencua */
-            int extret;
-            extret = desencuar(&x->x_cua);
-            /* obtenir la posició en la cua del nou node */
-            if(x->x_ultima_img == maxim-1) {
-                pos = 0;
-            }else{
-                pos = x->x_ultima_img+1;
-            }
-            sys_vgui(".x%x.c delete %xS%d\n", glist_getcanvas(x->x_glist), x, pos);
+    /* si hi ha tants nodes a la cua com el maxim */
+    if((numNodes(&x->x_cua)) >=  maxim){
+        /* desencua */
+        int extret;
+        extret = desencuar(&x->x_cua);
+        /* obtenir la posició en la cua del nou node */
+        if(x->x_ultima_img == maxim - 1) {
+            pos = 0;
+        }else{
+            pos = x->x_ultima_img + 1;
         }
+        sys_vgui(".x%x.c delete %xS%d\n", glist_getcanvas(x->x_glist), x, x->x_ultima_img);
+    }
 
-
-        /*
-        Quicktime per les conversions
+    /* FFMPEG o Quicktime per les conversions */
+    int fferror=0;
+    int nN = x->x_ultima_img;
+    if (format_adequat_v(entrada) == 1) {
+        /* ara no entra: format_adequat_v = 0 sempre */
+        convertir_img(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
+    } else {
+	fferror=convertir_img_ff(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
+    }
+    /* post ("%d",fferror); */
+    if (fferror>=0) {		
+        /* encua el nou node */
+	encuar(&x->x_cua, entrada);
+	/* si no és el primer element a encuar incrementem la posicio de la última imatge insertada */
+	if(numNodes(&x->x_cua) != 0) x->x_ultima_img ++;
+	/* 
+         * si assoleix el maxim torna a començar, 
+         * inicialitzant la posició en el tauler de la última imatge insertada 
         */
-	int fferror=0;
-        int nN = x->x_ultima_img;
-    	if (format_adequat_v(entrada) == 1) {
-		convertir_img(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
-	} else {
-		fferror=convertir_img_ff(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
-	}
-	post ("%d",fferror);
-	if (fferror>=0) {
-		
-	        /* encua el nou node */
-	        encuar(&x->x_cua, entrada);
-	        /* si no és el primer element a encuar incrementem la posicio de la última imatge insertada */
-	        if(numNodes(&x->x_cua) != 1) x->x_ultima_img ++;
-	        /* si assoleix el maxim torna a començar, inicialitzant la posició en el tauler de la última imatge insertada */
-	        if(x->x_ultima_img == maxim) x->x_ultima_img = 0;
+	if(x->x_ultima_img == maxim) x->x_ultima_img = 0;
 
-	        sprintf(nNstr, "%d", nN);
-	        strcat(ig_path,nNstr);
-	        strcat(ig_path,".");
-	        strcat(ig_path,FORMAT_MINIATURA);
-	        /*printf("Creacio de la imatge %s ...",ig_path);*/
-	        sys_vgui("image create photo img%x%d -file %s\n",x,nN,ig_path);
-	        /* printf("1. Creacio de la imatge %s ...",ig_path); */
-	        sys_vgui(".x%x.c create image %d %d -image img%x%d -tags %xS%d\n",
-	             glist_getcanvas(x->x_glist),
-	             text_xpix(&x->x_obj, x->x_glist) + getX(x,nN) + (W_CELL/2), 
-	             text_ypix(&x->x_obj, x->x_glist) + getY(x,nN) + (H_CELL/2),
-	             x,nN,x,nN);
-	        /* printf("2. Creacio de la imatge %s ...",ig_path); */
-	        if(nN == 0){
-	            x->x_tauler_primer = x->x_cua.final;
-	            /* post("Ara el primer del tauler es %s\n",x->x_tauler_primer->pathFitxer); */
-	        }
-	        /* printf("SURT de la creacio de la imatge %s ...",ig_path); */
-	    /*
-	    sys_vgui("image create photo img%x -file %s\n",x,entrada);
-	    sys_vgui(".x%x.c create image %d %d -image img%x -tags %xS\n", 
-	    glist_getcanvas(glist),text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),x,x);
-	    */
+	sprintf(nNstr, "%d", nN);
+	strcat(ig_path,nNstr);
+	strcat(ig_path,".");
+	strcat(ig_path,FORMAT_MINIATURA);
+	
+	sys_vgui("image create photo img%x%d -file %s\n",x,nN,ig_path);
+	sys_vgui(".x%x.c create image %d %d -image img%x%d -tags %xS%d\n", 
+		glist_getcanvas(x->x_glist),
+	        text_xpix(&x->x_obj, x->x_glist) + getX(x,nN) + (W_CELL/2), 
+	        text_ypix(&x->x_obj, x->x_glist) + getY(x,nN) + (H_CELL/2),
+	        x,nN,x,nN);
+	if(nN == 0){
+	    x->x_tauler_primer = x->x_cua.final;
 	}
+    }
 }
 
 /* dibuixa videogrid */
@@ -866,7 +851,7 @@ void videogrid_drawme(t_videogrid *x, t_glist *glist, int firsttime)
                 strcat(ig_path,FORMAT_MINIATURA);
                 /* post("reestablint la imatge %s", actual->pathFitxer); */
                 // videogrid_afegir_imatge(x,actual->pathFitxer);
-                convertir_img(actual->pathFitxer,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
+                convertir_img_ff(actual->pathFitxer,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
                 sys_vgui("image create photo img%x%d -file %s\n",x,nN,ig_path);
                 sys_vgui(".x%x.c create image %d %d -image img%x%d -tags %xS%d\n", 
                          glist_getcanvas(x->x_glist),text_xpix(&x->x_obj, x->x_glist) + getX(x,nN) + (W_CELL/2), text_ypix(&x->x_obj, x->x_glist) + getY(x,nN) + (H_CELL/2),x,nN,x,nN);
@@ -973,18 +958,13 @@ void videogrid_putvideo(t_videogrid *x, t_symbol *entrada)
     FILE *fitxer;
     path e;
     strcpy(e,entrada->s_name);
-    /* post("putvideo de %s\n", e); */
-    
     fitxer = fopen(e,"r");
     if (!fitxer) {
         post("Videogrid: Problem opening file %s.\n",e);
     }
     else {
-        /* post("s'encua la imatge %s\n", e); */
         videogrid_afegir_imatge(x,e);
-        /*outlet_symbol(x->x_sortida, entrada);*/
     }
-    /* post("putvideo amb img = %s\n", e); */
 }
 
 /* mètode de la classe que es dispara al rebre una entrada de missatge amb [putvideodir +string( com a paràmetre */
@@ -1003,7 +983,10 @@ void *videogrid_putvideodir_thread(void *z)
         maxim = x->x_num_fil * x->x_num_col;
         strcpy(directoriAnterior, x->x_dir_actual);
         strcpy(x->x_dir_actual, x->x_dir_canvi);
-        /* si es el mateix directori entrat l'ultim busca la ultima imatge afegida per a seguir a encuant a partir d'ella en endavant */
+     /* 
+      * si es el mateix directori entrat l'ultim busca la ultima imatge afegida 
+      * per a seguir a encuant a partir d'ella en endavant 
+     */
         if(strcmp(directoriAnterior, x->x_dir_actual) == 0){
             /* post("Videogrid: Repeteix directori %s\n", x->x_dir_actual); */
             while ( (direntp = readdir( dirp )) != NULL ){
@@ -1187,7 +1170,7 @@ static void videogrid_getrect(t_gobj *z, t_glist *glist,int *xp1, int *yp1, int 
     *yp1 = text_ypix(&x->x_obj, glist);
     *xp2 = text_xpix(&x->x_obj, glist) + (cols*W_CELL) + ((cols + 1) * GRUIX);
     *yp2 = text_ypix(&x->x_obj, glist) + (fils*H_CELL) + ((fils + 1) * GRUIX);
-  /*  post("Esta amb el ratoli en el punt %d %d %d %d o son els vetexs de la caixa... es/bd", xp1, yp1, xp2, yp2); */
+    /* post("Esta amb el ratoli en el punt %d %d %d %d o son els vetexs de la caixa... es/bd", xp1, yp1, xp2, yp2); */
 }
 
 static void videogrid_displace(t_gobj *z, t_glist *glist,int dx, int dy)
@@ -1378,7 +1361,7 @@ static void videogrid_dialog(t_videogrid *x, t_symbol *s, int argc, t_atom *argv
             x->x_num_fil = nfil;
             x->x_num_col = ncol;
         }else{
-            post("Videogrid: The number of rows and columns is less than the minimum allowed: 1 cell.\n",maxdigit);
+            post("Videogrid: The number of rows and columns is less than the minimum allowed: 1 cell.\n");
         }
     }else{
         post("Videogrid: The number of rows and columns exceeds the maximum allowed: a total of %d cells.\n",maxdigit);
@@ -1503,7 +1486,7 @@ static void *videogrid_new(t_symbol* name, int argc, t_atom *argv)
             	token = strtok(cadenaPaths,"|");
             	while(token){
                 	tt = gensym(token);
-                	printf("AFEGINT CARREGANT %s\n",tt->s_name);
+                	// printf("AFEGINT CARREGANT %s\n",tt->s_name);
                 	imagegrid_putimg(x,tt);
                 	token = strtok(NULL,"|");
             	}
@@ -1524,14 +1507,16 @@ static void *videogrid_new(t_symbol* name, int argc, t_atom *argv)
             x->x_color_grasp = gensym("#F1882B");
 	break;
     }
-    /* printf("S'ha instanciat un videogrid anomenat %s amb les caracteristiques seguents:",x->x_name->s_name);
-    printf("Nombre de files %d - Nombre de columnes: %d", x->x_num_fil, x->x_num_col); */
+/* 
+ * printf("S'ha instanciat un videogrid anomenat %s amb les caracteristiques seguents:",x->x_name->s_name);
+ * printf("Nombre de files %d - Nombre de columnes: %d", x->x_num_fil, x->x_num_col); 
+*/
 
     return (x);
 }
 
 static void videogrid_destroy(t_videogrid *x){
-    /* elimina el contingut de la cua */
+/* elimina el contingut de la cua */
     eliminarCua(&x->x_cua);
     post("Videogrid destroyed.\n");
 }
@@ -1543,19 +1528,9 @@ static void videogrid_destroy(t_videogrid *x){
 void videogrid_setup(void)
 {
     load_tk_procs();
-    post("videogrid: version 0.2, written by Sergi Lario (slario@gmail.com) & Lluis Gomez i Bigorda (lluis@artefacte.org)"); 
+    post("videogrid: version 0.2");
+    post("written by Sergi Lario (slario@gmail.com) & Lluis Gomez i Bigorda (lluis@artefacte.org)"); 
 
-    /*
-                     sense pas d'arguments
-    videogrid_class = class_new(gensym("videogrid"),
-        (t_newmethod)videogrid_new,
-        (t_method)videogrid_destroy, 
-        sizeof(t_videogrid),
-        CLASS_DEFAULT,
-        A_DEFSYM,
-        0);
-                    amb pas d'arguments:
-    */
     videogrid_class = class_new(gensym("videogrid"),
         (t_newmethod)videogrid_new,
         (t_method)videogrid_destroy,
@@ -1563,44 +1538,42 @@ void videogrid_setup(void)
         CLASS_DEFAULT,
         A_GIMME,
         0);
-    /*  class_new crea la nova classe retornant un punter al seu prototipus,
-        el primer argument es el nom simbolic de la classe,
-        el segon i tercer corresponen al constructor i destructor de la classe respectivament,
-        (el constructor instancia un objecte i inicialitza les seves dades cada cop que es crea un objecte
-        el destructor allibera la memoria reservada al destruid l'objecte per qualsevol causa)
-        el quart correspon a la mida de l'estructura de dades, per tal de poder reservar la memoria necessària,
-        el cinquè influeix en el mòde de representació gràfica del objectes. Per defecte CLASS_DEFAULT o ``0',
-        la resta d'arguments defineixen els arguments de l'objecte i el seu tipus, la llista acaba  amb 0 
-    */
 
-    /* afegeix el mètode helloworld_bang a la classe helloworld_class */
+/*  
+ *  class_new crea la nova classe retornant un punter al seu prototipus,
+ *  el primer argument es el nom simbolic de la classe,
+ *  el segon i tercer corresponen al constructor i destructor de la classe respectivament,
+ *  (el constructor instancia un objecte i inicialitza les seves dades cada cop que es crea un objecte
+ *  el destructor allibera la memoria reservada al destruir l'objecte per qualsevol causa)
+ *  el quart correspon a la mida de l'estructura de dades, per tal de poder reservar la memoria necessària,
+ *  el cinquè influeix en el mòde de representació gràfica del objectes. Per defecte CLASS_DEFAULT o '0',
+ *  la resta d'arguments defineixen els arguments de l'objecte i el seu tipus, la llista acaba  amb 0 
+*/
+
     class_addbang(videogrid_class, videogrid_bang);
 
-    /* afegeix el mètode videogrid_putvideo a la classe videogrid per a entrades de missatge 
-        que inicien amb putvideo i una cadena string com a argument */	
-    class_addmethod(videogrid_class,(t_method)videogrid_putvideo,gensym("putvideo"), A_DEFSYMBOL, 0);
+    class_addmethod(videogrid_class, (t_method)videogrid_putvideo,gensym("putvideo"), A_DEFSYMBOL, 0);
 
-    /*  afegeix el mètode videogrid_putvideodir a la classe videogrid per a entrades de missatge 
-        que inicien amb putvideodir i una cadena string com a argument */	
-    class_addmethod(videogrid_class,(t_method)videogrid_putvideodir,gensym("putvideodir"), A_DEFSYMBOL, 0);
-    /* afegeix un metode per a modificar el valor de les propietats de l'objecte */
+    class_addmethod(videogrid_class, (t_method)videogrid_putvideodir,gensym("putvideodir"), A_DEFSYMBOL, 0);
+    
     class_addmethod(videogrid_class, (t_method)videogrid_dialog, gensym("dialog"), A_GIMME, 0);
-    /* afegeix un metode per l'obtencio de la posicio del clic del ratolí */
+
     class_addmethod(videogrid_class, (t_method)videogrid_click, gensym("click"), A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
-        /* v 0.2 -- afegeix un metode netejar el contigut del tauler */
+
     class_addmethod(videogrid_class, (t_method)videogrid_clear, gensym("clear"), A_GIMME, 0);
-    /* v 0.2 -- afegeix un metode seek #num per disparar */
+    
     class_addmethod(videogrid_class, (t_method)videogrid_seek, gensym("seek"), A_FLOAT, 0);
-    /* inicia el comportament de videogrid */
+
+/* inicia el comportament de videogrid */
+    
     videogrid_setwidget();
 
 #if PD_MINOR_VERSION >= 37
-    class_setsavefn(videogrid_class,&videogrid_save);
+    class_setsavefn(videogrid_class, &videogrid_save);
     class_setpropertiesfn(videogrid_class, videogrid_properties);
 #endif
 
-    /* afegeix el mètode videogrid_widgetbehavior al la classe videogrid per a la creació de l'element visual */
-    class_setwidget(videogrid_class,&videogrid_widgetbehavior);
+    class_setwidget(videogrid_class, &videogrid_widgetbehavior);
     class_sethelpsymbol(videogrid_class, gensym("videogrid.pd"));
 }
 }
