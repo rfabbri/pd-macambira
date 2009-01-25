@@ -72,7 +72,7 @@
  *=====================================================================*/
 
 static char *locale_banner =
-  "\nlocale: version " PACKAGE_VERSION " by Bryan Jurish : C99 locale support\n"
+  "\nlocale: C99 locale support version " PACKAGE_VERSION " by Bryan Jurish\n"
     "locale: compiled by " PDMOOEXT_USER " on " PDMOOEXT_DATE ;
 
 static t_class *locale_class;

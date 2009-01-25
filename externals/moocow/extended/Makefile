@@ -9,13 +9,14 @@
 ## Variables
 
 SUBDIRS = \
+	locale \
+	pdstring \
 	flite \
-	gfsm \
 	deque \
 	readdir \
 	weightmap \
-	pdstring \
-	sprinkler
+	sprinkler \
+	gfsm
 
 ##-- 'pdstring' and 'sprinkler' are already in 'flatspace' ... should they be moved here?
 ##    -> 2008-08: removed any2string,string2any,pdstring from flatspace
@@ -24,7 +25,7 @@ SUBDIRS = \
 MOOCOW_DIR    ?=$(shell pwd)
 MOOCOW_BUILD  ?=$(MOOCOW_DIR)/build.moo
 MOOCOW_MFLAGS ?=DESTDIR=""
-MOOCOW_BUILD_VERSION ?=2009-01-23.000
+MOOCOW_BUILD_VERSION ?=2009-01-25.000
 
 CONFIGURE_ARGS=\
 	CFLAGS="$(CFLAGS)" \
@@ -168,6 +169,37 @@ deque.distclean: deque.extclean
 
 deque.cvsclean: deque.extclean
 	$(MAKE) -C $(DEQUE_DIR) cvsclean || $(ONFAIL)
+
+##======================================================================
+## Rules: subdirectory: locale
+
+LOCALE_DIR            ?=../locale
+#LOCALE_CONFIGURE_ARGS ?=
+#LOCALE_CONFIGURE_ARGS ?=
+
+locale.autogen_stamp: 
+#	(cd $(LOCALE_DIR); sh ./autogen.sh) || $(ONFAIL)
+	touch $@
+
+locale.configure_stamp: locale.autogen_stamp
+	(cd $(LOCALE_DIR); sh ./configure $(CONFIGURE_ARGS) $(LOCALE_CONFIGURE_ARGS); make clean) || $(ONFAIL)
+	touch $@
+
+locale.build_stamp: locale.configure_stamp
+	$(MAKE) $(MOOCOW_MFLAGS) -C $(LOCALE_DIR) all install || $(ONFAIL)
+	touch $@
+
+locale.extclean:
+	rm -f locale.autogen_stamp locale.configure_stamp locale.build_stamp
+
+locale.clean: locale.extclean
+	$(MAKE) -C $(LOCALE_DIR) clean || $(ONFAIL)
+
+locale.distclean: locale.extclean
+	$(MAKE) -C $(LOCALE_DIR) distclean || $(ONFAIL)
+
+locale.cvsclean: locale.extclean
+	$(MAKE) -C $(LOCALE_DIR) cvsclean || $(ONFAIL)
 
 ##======================================================================
 ## Rules: subdirectory: pdstring
