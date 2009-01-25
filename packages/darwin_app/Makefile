@@ -119,7 +119,7 @@ ifneq (/System,$(findstring /System,$(WISH_FRAMEWORKS_SOURCE)))
 	fix_install_name "$(PD_APP_CONTENTS)/MacOS/$(WISH_NAME)" Tk
 endif # NOT /System
 # set up app wrapper
-	install -d "$(PD_APP_CONTENTS)/Resources/Scripts"
+	install -d "$(PD_APP_CONTENTS)/Resources"
 	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
 	install -m0644 -p *.icns  "$(PD_APP_CONTENTS)/Resources"
 	mv "$(PD_APP_CONTENTS)/MacOS/${WISH_NAME}" \
@@ -177,8 +177,11 @@ darwin_app_core: darwin_app_wrapper
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) \
 		PD_CONFIGURE_FLAGS="--enable-jack --disable-fat" \
 		pd_install 
-	cd "$(PD_APP_CONTENTS)/Resources/Scripts" && \
-		ln -s ../bin/pd.tk AppMain.tcl
+	install -d "$(PD_APP_CONTENTS)/Resources"
+	cd "$(PD_APP_CONTENTS)/Resources" && \
+		ln -s bin Scripts
+	cd "$(PD_APP_CONTENTS)/Resources" && \
+		test -e AppMain.tcl || ln -s pd.tk AppMain.tcl
 # support for Info Panel Plugins mgmt
 	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
 	install -p -m0644 org.puredata.pd.default.plist "$(PD_APP_CONTENTS)/"
@@ -258,8 +261,9 @@ darwin_app_clean:
 	-rm -f -- $(PD_APP_CONTENTS)/Plugins $(PD_APP_CONTENTS)/Info.plist
 	-rm -f -- "$(PD_APP_CONTENTS)/MacOS/$(PD_APP_NAME)"
 	-rmdir  $(PD_APP_CONTENTS)/MacOS
-	-rm -f -- $(PD_APP_CONTENTS)/Resources/Scripts/AppMain.tcl
-	-rmdir $(PD_APP_CONTENTS)/Resources/Scripts
+	-rm -f -- $(PD_APP_CONTENTS)/Resources/bin/*.tk
+	-rm -f -- $(PD_APP_CONTENTS)/Resources/bin/*.tcl
+	-rm -f -- $(PD_APP_CONTENTS)/Resources/Scripts
 	-rm -f -- "$(PD_APP_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
 		"$(PD_APP_CONTENTS)/Resources/pd*.icns"
 	-rmdir  $(PD_APP_CONTENTS)/Resources
