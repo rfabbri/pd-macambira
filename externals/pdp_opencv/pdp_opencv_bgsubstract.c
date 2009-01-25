@@ -52,7 +52,7 @@ typedef struct pdp_opencv_bgsubstract_struct
     int x_set; 
     int x_threshold; 
 
-    IplImage *image, *prev_gray, *gray, *grayLow, *grayUp, *diff_8U;
+    IplImage *image, *prev_image, *gray, *grayLow, *grayUp, *diff_8U;
     
 } t_pdp_opencv_bgsubstract;
 
@@ -79,7 +79,7 @@ static void pdp_opencv_bgsubstract_process_rgb(t_pdp_opencv_bgsubstract *x)
     	cvReleaseImage(&x->gray);
     	cvReleaseImage(&x->grayLow);
     	cvReleaseImage(&x->grayUp);
-    	cvReleaseImage(&x->prev_gray);
+    	cvReleaseImage(&x->prev_image);
     	cvReleaseImage(&x->diff_8U);
     
 	//create the orig image with new size
@@ -88,7 +88,7 @@ static void pdp_opencv_bgsubstract_process_rgb(t_pdp_opencv_bgsubstract *x)
     	x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
     	x->grayLow = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
     	x->grayUp = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
-        x->prev_gray = cvCreateImage( cvSize(x->image->width,x->image->height), 8, 1 );
+        x->prev_image = cvCreateImage( cvSize(x->image->width,x->image->height), 8, 3 );
         x->diff_8U = cvCreateImage( cvSize(x->image->width,x->image->height), 8, 1 );
     }
     
@@ -101,20 +101,48 @@ static void pdp_opencv_bgsubstract_process_rgb(t_pdp_opencv_bgsubstract *x)
     // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( x->image->imageData, data, x->x_size*3 );
 
-    cvCvtColor( x->image, x->gray, CV_BGR2GRAY );
+    //cvCvtColor( x->image, x->gray, CV_BGR2GRAY );
 
     if (x->x_set) {
-    	memcpy( x->prev_gray->imageData, x->gray->imageData, x->x_size );
+    	memcpy( x->prev_image->imageData, data, x->x_size*3 );
 	x->x_set=0;
     } 
 
-    cvSubS (x->prev_gray,cvScalar(x->x_threshold,x->x_threshold,x->x_threshold,x->x_threshold),x->grayLow,NULL);
-    cvAddS (x->prev_gray,cvScalar(x->x_threshold,x->x_threshold,x->x_threshold,x->x_threshold),x->grayUp,NULL);
-    cvInRange (x->gray, x->grayLow, x->grayUp, x->diff_8U);
+    //cvSubS (x->prev_image,cvScalar(x->x_threshold,x->x_threshold,x->x_threshold,x->x_threshold),x->grayLow,NULL);
+    //cvAddS (x->prev_image,cvScalar(x->x_threshold,x->x_threshold,x->x_threshold,x->x_threshold),x->grayUp,NULL);
+    //cvInRange (x->gray, x->grayLow, x->grayUp, x->diff_8U);
 
-    cvNot (x->diff_8U,x->diff_8U);
+    //cvNot (x->diff_8U,x->diff_8U);
 
-    cvCvtColor(x->diff_8U,x->image,CV_GRAY2BGR);
+    //cvCvtColor(x->diff_8U,x->image,CV_GRAY2BGR);
+
+  int h,w,hlength, chRed, chGreen, chBlue;
+  long src,pixsize;
+
+  chRed   =0;
+  chGreen =1;
+  chBlue  =2;
+  
+  src = 0;
+
+
+  for (h=0; h<x->image->height; h++){
+    for(w=0; w<x->image->width; w++){
+      if (((x->image->imageData[src+chRed  ] > x->prev_image->imageData[src+chRed  ] - x->x_threshold)&&
+	   (x->image->imageData[src+chRed  ] < x->prev_image->imageData[src+chRed  ] + x->x_threshold))&&
+	  ((x->image->imageData[src+chGreen] > x->prev_image->imageData[src+chGreen] - x->x_threshold)&&
+	   (x->image->imageData[src+chGreen] < x->prev_image->imageData[src+chGreen] + x->x_threshold))&&
+	  ((x->image->imageData[src+chBlue ] > x->prev_image->imageData[src+chBlue ] - x->x_threshold)&&
+	   (x->image->imageData[src+chBlue ] < x->prev_image->imageData[src+chBlue ] + x->x_threshold)))
+	{
+	  x->image->imageData[src+chRed] = 0;
+	  x->image->imageData[src+chGreen] = 0;
+	  x->image->imageData[src+chBlue] = 0;
+	}
+      src+=3;
+    }
+  }
+
   
     memcpy( newdata, x->image->imageData, x->x_size*3 );
  
@@ -201,7 +229,7 @@ static void pdp_opencv_bgsubstract_free(t_pdp_opencv_bgsubstract *x)
     	cvReleaseImage(&x->gray);
     	cvReleaseImage(&x->grayLow);
     	cvReleaseImage(&x->grayUp);
-    	cvReleaseImage(&x->prev_gray);
+    	cvReleaseImage(&x->prev_image);
     	cvReleaseImage(&x->diff_8U);
 }
 
@@ -233,7 +261,7 @@ void *pdp_opencv_bgsubstract_new(t_floatarg f)
     x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
     x->grayLow = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
     x->grayUp = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
-    x->prev_gray = cvCreateImage( cvSize(x->image->width,x->image->height), 8, 1 );
+    x->prev_image = cvCreateImage( cvSize(x->image->width,x->image->height), 8, 3 );
     x->diff_8U = cvCreateImage( cvSize(x->image->width,x->image->height), 8, 1 );
 
     return (void *)x;

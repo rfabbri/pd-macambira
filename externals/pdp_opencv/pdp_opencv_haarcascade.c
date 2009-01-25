@@ -47,6 +47,7 @@ typedef struct pdp_opencv_haarcascade_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
+    t_outlet *x_outlet1;
     t_outlet *x_dataout;
     int x_packet0;
     int x_packet1;
@@ -149,6 +150,7 @@ static void pdp_opencv_haarcascade_process_rgb(t_pdp_opencv_haarcascade *x)
 				x->scale_factor, x->min_neighbors, x->mode, cvSize(x->min_size, x->min_size) );
         //t = (double)cvGetTickCount() - t;
         //printf( "detection time = %gms\n", t/((double)cvGetTickFrequency()*1000.) );
+    outlet_float(x->x_outlet1, (float)faces->total);
         for( i = 0; i < (faces ? faces->total : 0); i++ )
         {
             CvRect* r = (CvRect*)cvGetSeqElem( faces, i );
@@ -293,6 +295,7 @@ void *pdp_opencv_haarcascade_new(t_floatarg f)
     t_pdp_opencv_haarcascade *x = (t_pdp_opencv_haarcascade *)pd_new(pdp_opencv_haarcascade_class);
 
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
+    x->x_outlet1 = outlet_new(&x->x_obj, &s_anything); 
     x->x_dataout = outlet_new(&x->x_obj, &s_anything); 
 
     x->x_packet0 = -1;
