@@ -32,7 +32,7 @@
 #endif
 
 #include "mooPdUtils.h"
-#include "pdstringUtils.c"
+#include "pdstringUtils.h"
 
 /* black magic */
 #ifdef NT
@@ -87,8 +87,8 @@ typedef struct _bytes2any
 static void bytes2any_atoms(t_bytes2any *x, int argc, t_atom *argv)
 {
   t_pdstring_atoms src = {argv,argc,argc};
-  pdstring_atoms2bytes(&(x->x_bytes), &src, x->x_eos);
-  pdstring_bytes2any(NULL, &(x->x_bytes), x->x_binbuf);
+  pdstring_atoms2bytes(x, &(x->x_bytes), &src, x->x_eos);
+  pdstring_bytes2any(x, NULL, &(x->x_bytes), x->x_binbuf);
   int x_argc;
   t_atom *x_argv;
 
@@ -183,8 +183,7 @@ static void *bytes2any_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
  */
 static void bytes2any_free(t_bytes2any *x)
 {
-  if (x->x_bytes.b_buf)
-    freebytes(x->x_bytes.b_buf, x->x_bytes.b_alloc*sizeof(unsigned char));
+  pdstring_bytes_clear(&x->x_bytes);
   binbuf_free(x->x_binbuf);
   inlet_free(x->x_eos_in);
   outlet_free(x->x_outlet_done);

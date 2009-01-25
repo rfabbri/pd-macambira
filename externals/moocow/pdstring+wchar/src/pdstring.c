@@ -58,6 +58,7 @@ typedef struct _pdstring
 # include "any2bytes.c"
 # include "bytes2any.c"
 # include "bytes2wchars.c"
+# include "wchars2bytes.c"
 #endif
 
 /*--------------------------------------------------------------------
@@ -90,6 +91,7 @@ void pdstring_setup(void)
   any2bytes_setup_guts();
   bytes2any_setup_guts();
   bytes2wchars_setup_guts();
+  wchars2bytes_setup_guts();
 #endif
 
   pdstring_class = class_new(gensym("pdstring"),

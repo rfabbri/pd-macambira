@@ -1,8 +1,8 @@
 /* -*- Mode: C -*- */
 /*=============================================================================*\
- * File: bytes2wchars.c
+ * File: wchars2bytes.c
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
- * Description: convert byte-valued atom lists to wchar_t-valued atom lists
+ * Description: convert wchar_t-valued atom lists to byte-valued atom lists
  *
  * Copyright (c) 2009 Bryan Jurish.
  *
@@ -49,42 +49,24 @@
 /*=====================================================================
  * Constants
  *=====================================================================*/
-static char *bytes2wchars_banner = "bytes2wchars: pdstring version " PACKAGE_VERSION " by Bryan Jurish";
+static char *wchars2bytes_banner = "wchars2bytes: pdstring version " PACKAGE_VERSION " by Bryan Jurish";
 
-#define BYTES2WCHARS_DEFAULT_BUFLEN PDSTRING_DEFAULT_BUFLEN
+#define WCHARS2BYTES_DEFAULT_BUFLEN PDSTRING_DEFAULT_BUFLEN
 
 /*=====================================================================
  * Structures and Types: any2string
  *=====================================================================*/
 
-static t_class *bytes2wchars_class;
+static t_class *wchars2bytes_class;
 
-typedef struct _bytes2wchars
+typedef struct _wchars2bytes
 {
   t_object          x_obj;
-  t_pdstring_bytes  x_bytes;  //-- byte buffer
   t_pdstring_wchars x_wchars; //-- wide character buffer
+  t_pdstring_bytes  x_bytes;  //-- byte buffer
   t_pdstring_atoms  x_atoms;  //-- atoms to output
   t_outlet         *x_outlet;
-} t_bytes2wchars;
-
-
-/*=====================================================================
- * Utilities
- *=====================================================================*/
-
-/*--------------------------------------------------------------------
- * bytes2wchars_atoms()
- */
-static void bytes2wchars_atoms(t_bytes2wchars *x, int argc, t_atom *argv)
-{
-  t_pdstring_atoms src = {argv,argc,0};
-
-  /*-- convert atoms -> bytes -> wchars -> atoms --*/
-  pdstring_atoms2bytes (x, &x->x_bytes, &src, PDSTRING_EOS_NONE);
-  pdstring_bytes2wchars(x, &x->x_wchars, &x->x_bytes);
-  pdstring_wchars2atoms(x, &x->x_atoms, &x->x_wchars);
-}
+} t_wchars2bytes;
 
 
 /*=====================================================================
@@ -94,11 +76,15 @@ static void bytes2wchars_atoms(t_bytes2wchars *x, int argc, t_atom *argv)
 /*--------------------------------------------------------------------
  * anything
  */
-static void bytes2wchars_anything(t_bytes2wchars *x, MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
+static void wchars2bytes_anything(t_wchars2bytes *x, MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
 {
-  bytes2wchars_atoms(x, argc, argv);
+  //-- convert arg_atoms -> wchars -> bytes -> atoms 
+  t_pdstring_atoms arg_atoms = {argv,argc,0};
+  pdstring_atoms2wchars(x, &x->x_wchars, &arg_atoms, PDSTRING_EOS_NONE);
+  pdstring_wchars2bytes(x, &x->x_bytes, &x->x_wchars);
+  pdstring_bytes2atoms (x, &x->x_atoms, &x->x_bytes, PDSTRING_EOS_NONE);
 
-  /*-- output --*/
+  //-- output
   outlet_anything(x->x_outlet, &s_list, x->x_atoms.a_len, x->x_atoms.a_buf);
 }
 
@@ -106,9 +92,9 @@ static void bytes2wchars_anything(t_bytes2wchars *x, MOO_UNUSED t_symbol *sel, i
 /*--------------------------------------------------------------------
  * new
  */
-static void *bytes2wchars_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
+static void *wchars2bytes_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
 {
-    t_bytes2wchars *x = (t_bytes2wchars *)pd_new(bytes2wchars_class);
+    t_wchars2bytes *x = (t_wchars2bytes *)pd_new(wchars2bytes_class);
     int bufsize = PDSTRING_DEFAULT_BUFLEN;
 
     //-- args: 0: bufsize
@@ -118,12 +104,12 @@ static void *bytes2wchars_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
     } 
 
     //-- allocate
-    pdstring_bytes_init(&x->x_bytes, bufsize);
     pdstring_wchars_init(&x->x_wchars, bufsize);
-    pdstring_atoms_init(&x->x_atoms, bufsize);
+    pdstring_bytes_init (&x->x_bytes,  bufsize);
+    pdstring_atoms_init (&x->x_atoms,  bufsize);
 
     //-- outlets
-    x->x_outlet      = outlet_new(&x->x_obj, &s_list);
+    x->x_outlet = outlet_new(&x->x_obj, &s_list);
 
     return (void *)x;
 }
@@ -131,10 +117,10 @@ static void *bytes2wchars_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
 /*--------------------------------------------------------------------
  * free
  */
-static void bytes2wchars_free(t_bytes2wchars *x)
+static void wchars2bytes_free(t_wchars2bytes *x)
 {
+  pdstring_wchars_clear(&x->x_wchars); 
   pdstring_bytes_clear(&x->x_bytes);
-  pdstring_wchars_clear(&x->x_wchars);
   pdstring_atoms_clear(&x->x_atoms);
   outlet_free(x->x_outlet);
   return;
@@ -143,29 +129,29 @@ static void bytes2wchars_free(t_bytes2wchars *x)
 /*--------------------------------------------------------------------
  * setup: guts
  */
-void bytes2wchars_setup_guts(void)
+void wchars2bytes_setup_guts(void)
 {
   //-- class
-  bytes2wchars_class = class_new(gensym("bytes2wchars"),
-				 (t_newmethod)bytes2wchars_new,
-				 (t_method)bytes2wchars_free,
-				 sizeof(t_bytes2wchars),
+  wchars2bytes_class = class_new(gensym("wchars2bytes"),
+				 (t_newmethod)wchars2bytes_new,
+				 (t_method)wchars2bytes_free,
+				 sizeof(t_wchars2bytes),
 				 CLASS_DEFAULT,
 				 A_GIMME,                   //-- initial_bufsize
 				 0);
 
   //-- methods
-  class_addanything(bytes2wchars_class, (t_method)bytes2wchars_anything);
+  class_addanything(wchars2bytes_class, (t_method)wchars2bytes_anything);
   
   //-- help symbol
-  //class_sethelpsymbol(bytes2wchars_class, gensym("bytes2wchars-help.pd")); //-- breaks pd-extended help lookup
+  //class_sethelpsymbol(wchars2bytes_class, gensym("wchars2bytes-help.pd")); //-- breaks pd-extended help lookup
 }
 
 /*--------------------------------------------------------------------
  * setup
  */
-void bytes2wchars_setup(void)
+void wchars2bytes_setup(void)
 {
-  post(bytes2wchars_banner);
-  bytes2wchars_setup_guts();
+  post(wchars2bytes_banner);
+  wchars2bytes_setup_guts();
 }

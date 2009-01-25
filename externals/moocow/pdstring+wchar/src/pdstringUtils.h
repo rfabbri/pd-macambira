@@ -1,8 +1,8 @@
 /* -*- Mode: C -*- */
 /*=============================================================================*\
- * File: pdstringUtils.c
+ * File: pdstringUtils.h
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
- * Description: pdstring: common utilities
+ * Description: pdstring: common utilities (static include)
  *
  * Copyright (c) 2009 Bryan Jurish.
  *
@@ -24,8 +24,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *=============================================================================*/
 
-#ifndef PDSTRING_UTILS_C
-#define PDSTRING_UTILS_C
+#ifndef PDSTRING_UTILS_H
+#define PDSTRING_UTILS_H
 
 #include <string.h>
 #include <m_pd.h>
@@ -393,7 +393,7 @@ static int pdstring_wchars2bytes(void *x, t_pdstring_bytes *dst, t_pdstring_wcha
     int nbytes = wctomb((char*)dst->b_buf+bi, src->w_buf[wi]);
     if (nbytes <= 0) {
       if (nbytes < 0) {
-	pd_error(x,"pdstring_wchars2bytes(): malformed wide string \"%S\" at wchar_t '%C' - forcing literal value", src->w_buf, src->w_buf[wi]);
+	pd_error(x,"pdstring_wchars2bytes(): malformed wide character (%u) - bashing to byte", src->w_buf[wi]);
       }
       dst->b_buf[bi] = src->w_buf[wi];
       nbytes = 1;
@@ -449,4 +449,4 @@ static void pdstring_wchars2atoms(void *x, t_pdstring_atoms *dst, t_pdstring_wch
 }
 
 
-#endif /* PDSTRING_UTILS_C */
+#endif /* PDSTRING_UTILS_H */

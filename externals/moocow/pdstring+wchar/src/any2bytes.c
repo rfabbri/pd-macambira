@@ -32,7 +32,7 @@
 #endif
 
 #include "mooPdUtils.h"
-#include "pdstringUtils.c"
+#include "pdstringUtils.h"
 
 /* black magic */
 #ifdef NT
@@ -62,14 +62,12 @@ static t_class *any2bytes_class;
 typedef struct _any2bytes
 {
   t_object       x_obj;
-  int            x_alloc;
-  int            x_argc;
-  t_float        x_eos;      //-- EOS character to add (<0 for none)
-  char          *x_text;
-  t_atom        *x_argv;
-  t_binbuf      *x_binbuf;
-  t_inlet       *x_eos_in;
-  t_outlet      *x_outlet;
+  t_pdstring_bytes x_bytes;  //-- byte buffer
+  t_pdstring_atoms x_atoms;  //-- atom buffer (for output)
+  t_float          x_eos;      //-- EOS character to add (<0 for none)
+  t_binbuf        *x_binbuf;
+  t_inlet         *x_eos_in;
+  t_outlet        *x_outlet;
 } t_any2bytes;
 
 
@@ -87,66 +85,15 @@ static char *any2bytes_banner = "any2bytes: pdstring version " PACKAGE_VERSION "
  */
 static void any2bytes_anything(t_any2bytes *x, t_symbol *sel, int argc, t_atom *argv)
 {
-  t_atom *ap;
-  unsigned char *s, *s_max;
-  int len;
+  //-- convert any -> bytes -> atoms
+  t_pdstring_atoms arg_atoms = {argv,argc,0};
+  pdstring_bytes_clear(&x->x_bytes);
+  pdstring_any2bytes(x, &x->x_bytes, sel, &arg_atoms, x->x_binbuf);
+  pdstring_bytes2atoms(x, &x->x_atoms, &x->x_bytes, x->x_eos);
 
-  A2SDEBUG(post("-------any2bytes_anything(%p,...)---------", x));
-
-  /*-- set up binbuf --*/
-  A2SDEBUG(post("any2bytes[%p]: binbuf_clear()", x));
-  binbuf_clear(x->x_binbuf);
-
-  /*-- binbuf_add(): selector --*/
-  if (sel != &s_float && sel != &s_list && sel != &s_) {
-    t_atom a;
-    A2SDEBUG(post("any2bytes[%p]: binbuf_add(): selector: '%s'", x, sel->s_name));
-    SETSYMBOL((&a), sel);
-    binbuf_add(x->x_binbuf, 1, &a);
-  }
-  A2SDEBUG(else { post("any2bytes[%p]: selector: '%s': IGNORED", x, sel->s_name); });
-
-  /*-- binbuf_add(): arg list --*/
-  A2SDEBUG(post("any2bytes[%p]: binbuf_add(): arg list", x));
-  binbuf_add(x->x_binbuf, argc, argv);
-  A2SDEBUG(post("any2bytes[%p]: binbuf_print: ", x));
-  A2SDEBUG(binbuf_print(x->x_binbuf));
-
-  A2SDEBUG(post("any2bytes[%p]: binbuf_gettext()", x));
-  binbuf_gettext(x->x_binbuf, &(x->x_text), &len);
-  A2SDEBUG(post("any2bytes[%p]: binbuf_gettext() = \"%s\" ; len=%d", x, x->x_text, len));
-  /*text[len] = 0;*/ /*-- ? avoid errors: "free(): invalid next size(fast): 0x..." */
-
-  /*-- get output atom-list length --*/
-  x->x_argc = len;
-  if (x->x_eos >= 0) { x->x_argc++; }
-  A2SDEBUG(post("any2bytes[%p]: argc=%d", x, x->x_argc));
-
-  /*-- (re-)allocate (maybe) --*/
-  if (x->x_alloc < x->x_argc) {
-    A2SDEBUG(post("any2bytes[%p]: reallocate(%d->%d)", x, x->x_alloc, x->x_argc));
-    freebytes(x->x_argv, x->x_alloc*sizeof(t_atom));
-    x->x_argv = (t_atom*)getbytes(x->x_argc * sizeof(t_atom));
-    x->x_alloc = x->x_argc;
-  }
-
-  /*-- atom buffer: binbuf text --*/
-  A2SDEBUG(post("any2bytes[%p]: atom buffer: for {...}", x));
-  ap    = x->x_argv;
-  s_max = ((unsigned char *)x->x_text)+len;
-  for (s=((unsigned char *)x->x_text); s < s_max; s++, ap++) {
-    A2SDEBUG(post("any2bytes[%p]: atom buffer[%d]: SETFLOAT(a,%d='%c')", x, (ap-x->x_argv), *s, *s));
-    SETFLOAT(ap,*s);
-  }
-  A2SDEBUG(post("any2bytes: atom buffer: DONE"));
-
-  /*-- add EOS character (maybe) --*/
-  if (x->x_eos >= 0) { SETFLOAT(ap, ((int)x->x_eos)); }
-
-  A2SDEBUG(post("any2bytes: outlet_list(..., %d, ...)", x->x_argc));
-  outlet_list(x->x_outlet, &s_list, x->x_argc, x->x_argv);
+  //-- output
+  outlet_list(x->x_outlet, &s_list, x->x_atoms.a_len, x->x_atoms.a_buf);
 }
-
 
 /*--------------------------------------------------------------------
  * new
@@ -154,15 +101,15 @@ static void any2bytes_anything(t_any2bytes *x, t_symbol *sel, int argc, t_atom *
 static void *any2bytes_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
 {
     t_any2bytes *x = (t_any2bytes *)pd_new(any2bytes_class);
+    int bufsize = ANY2BYTES_DEFAULT_BUFLEN;
 
     //-- defaults
-    x->x_eos      = 0;       
-    x->x_alloc    = ANY2BYTES_DEFAULT_BUFLEN;
+    x->x_eos      = 0;
 
     //-- args: 0: bufsize
     if (argc > 0) {
-      int bufsize = atom_getintarg(0, argc, argv);
-      if (bufsize > 0) { x->x_alloc = bufsize; }
+      int initial_bufsize = atom_getintarg(0, argc, argv);
+      if (initial_bufsize > 0) { bufsize = initial_bufsize; }
     }
     //-- args: 1: eos
     if (argc > 1) {
@@ -170,9 +117,8 @@ static void *any2bytes_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
     }
 
     //-- allocate
-    x->x_text   = getbytes(x->x_alloc*sizeof(char));
-    x->x_argc   = 0;
-    x->x_argv   = (t_atom *)getbytes(x->x_alloc*sizeof(t_atom));
+    pdstring_bytes_init(&x->x_bytes, 0); //-- x_bytes gets clobbered by binbuf_gettext()
+    pdstring_atoms_init(&x->x_atoms, bufsize);
     x->x_binbuf = binbuf_new();
 
     //-- inlets
@@ -182,7 +128,7 @@ static void *any2bytes_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
     x->x_outlet = outlet_new(&x->x_obj, &s_list);
 
     //-- report
-    A2SDEBUG(post("any2bytes_new(): x=%p, alloc=%d, eos=%d, text=%p, argv=%p, binbuf=%p", x, x->x_alloc, x->x_eos, x->x_text, x->x_argv, x->x_binbuf));
+    A2SDEBUG(post("any2bytes_new(): x=%p, eos=%d, binbuf=%p", x, x->x_eos, x->x_binbuf));
 
     return (void *)x;
 }
@@ -192,14 +138,8 @@ static void *any2bytes_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
  */
 static void any2bytes_free(t_any2bytes *x)
 {
-  if (x->x_text) {
-    freebytes(x->x_text, x->x_alloc*sizeof(char));
-    x->x_text = NULL;
-  }
-  if (x->x_argv) {
-    freebytes(x->x_argv, x->x_alloc*sizeof(t_atom));
-    x->x_argv = NULL;
-  }
+  pdstring_bytes_clear(&x->x_bytes);
+  pdstring_atoms_clear(&x->x_atoms);
   binbuf_free(x->x_binbuf);
   inlet_free(x->x_eos_in);
   outlet_free(x->x_outlet);

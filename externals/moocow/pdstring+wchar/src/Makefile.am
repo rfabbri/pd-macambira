@@ -33,27 +33,41 @@ pdexterns_PROGRAMS = @PD_OBJECT_EXTERNALS@
 EXTRA_PROGRAMS = \
 	pdstring \
 	any2bytes \
-	bytes2any
+	bytes2any \
+	bytes2wchars \
+	wchars2bytes
 
 ## --- patches
-pdexterns_DATA =
+pdexterns_DATA = \
+	any2wchars.pd \
+	wchars2any.pd
 
 ## --- documentation
 pddoc_DATA = \
 	pdstring-help.pd \
 	any2bytes-help.pd \
-	bytes2any-help.pd
+	bytes2any-help.pd \
+	bytes2wchars-help.pd \
+	wchars2bytes-help.pd \
+	any2wchars-help.pd \
+	wchars2any-help.pd
 
 
 #-----------------------------------------------------------------------
 # sources
 #-----------------------------------------------------------------------
 
-pdstring_SOURCES = pdstring.c mooPdUtils.h
+any2bytes_SOURCES = any2bytes.c mooPdUtils.h pdstringUtils.h
 
-any2bytes_SOURCES = any2bytes.c mooPdUtils.h
+bytes2any_SOURCES = bytes2any.c mooPdUtils.h pdstringUtils.h
 
-bytes2any_SOURCES = bytes2any.c mooPdUtils.h
+bytes2wchars_SOURCES = bytes2wchars.c mooPdUtils.h pdstringUtils.h
+
+wchars2bytes_SOURCES = wchars2bytes.c mooPdUtils.h pdstringUtils.h
+
+pdstring_SOURCES = pdstring.c mooPdUtils.h pdstringUtils.h
+
+pdstring.$(OBJECT): $(any2bytes_SOURCES) $(bytes2any_SOURCES) $(bytes2wchars_SOURCES) $(wchars2bytes_SOURCES)
 
 #-----------------------------------------------------------------------
 # external compilation : flags
@@ -77,6 +91,10 @@ pdstring_LDFLAGS = $(LFLAGS)
 bytes2any_LDFLAGS = $(LFLAGS)
 
 any2bytes_LDFLAGS = $(LFLAGS)
+
+bytes2wchars_LDFLAGS = $(LFLAGS)
+
+wchars2bytes_LDFLAGS = $(LFLAGS)
 
 #-----------------------------------------------------------------------
 # Variables: cleanup

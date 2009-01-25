@@ -10,10 +10,10 @@
 #X text 188 103 anything can be converted to a list...;
 #X text 190 147 ... but "float" selector is silently dropped;
 #X msg 25 104 A B C;
-#X text 193 312 First argument: initial buffer size (length of object-local
+#X text 182 312 First argument: initial buffer size (length of object-local
 text buffer). This should get re-allocated when necessary. Specify
 0 (zero) to use the default value.;
-#X text 195 367 Second argument: initial EOS character. See above.
+#X text 184 367 Second argument: initial EOS character. See above.
 ;
 #X text 320 458 Bryan Jurish <moocow@ling.uni-potsdam.de>;
 #X text 19 439 SEE ALSO:;

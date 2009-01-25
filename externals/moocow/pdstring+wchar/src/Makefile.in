@@ -51,7 +51,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 pdexterns_PROGRAMS = @PD_OBJECT_EXTERNALS@
 EXTRA_PROGRAMS = pdstring$(EXEEXT) any2bytes$(EXEEXT) \
-	bytes2any$(EXEEXT)
+	bytes2any$(EXEEXT) bytes2wchars$(EXEEXT) wchars2bytes$(EXEEXT)
 subdir = src
 SUBDIRS =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -73,9 +73,15 @@ any2bytes_LDADD = $(LDADD)
 am_bytes2any_OBJECTS = bytes2any.$(OBJEXT)
 bytes2any_OBJECTS = $(am_bytes2any_OBJECTS)
 bytes2any_LDADD = $(LDADD)
+am_bytes2wchars_OBJECTS = bytes2wchars.$(OBJEXT)
+bytes2wchars_OBJECTS = $(am_bytes2wchars_OBJECTS)
+bytes2wchars_LDADD = $(LDADD)
 am_pdstring_OBJECTS = pdstring.$(OBJEXT)
 pdstring_OBJECTS = $(am_pdstring_OBJECTS)
 pdstring_LDADD = $(LDADD)
+am_wchars2bytes_OBJECTS = wchars2bytes.$(OBJEXT)
+wchars2bytes_OBJECTS = $(am_wchars2bytes_OBJECTS)
+wchars2bytes_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -84,9 +90,11 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(any2bytes_SOURCES) $(bytes2any_SOURCES) \
-	$(pdstring_SOURCES)
+	$(bytes2wchars_SOURCES) $(pdstring_SOURCES) \
+	$(wchars2bytes_SOURCES)
 DIST_SOURCES = $(any2bytes_SOURCES) $(bytes2any_SOURCES) \
-	$(pdstring_SOURCES)
+	$(bytes2wchars_SOURCES) $(pdstring_SOURCES) \
+	$(wchars2bytes_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -204,19 +212,28 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 SUFFIXES = .@PDEXT@
-pdexterns_DATA = 
+pdexterns_DATA = \
+	any2wchars.pd \
+	wchars2any.pd
+
 pddoc_DATA = \
 	pdstring-help.pd \
 	any2bytes-help.pd \
-	bytes2any-help.pd
+	bytes2any-help.pd \
+	bytes2wchars-help.pd \
+	wchars2bytes-help.pd \
+	any2wchars-help.pd \
+	wchars2any-help.pd
 
 
 #-----------------------------------------------------------------------
 # sources
 #-----------------------------------------------------------------------
-pdstring_SOURCES = pdstring.c mooPdUtils.h
-any2bytes_SOURCES = any2bytes.c mooPdUtils.h
-bytes2any_SOURCES = bytes2any.c mooPdUtils.h
+any2bytes_SOURCES = any2bytes.c mooPdUtils.h pdstringUtils.h
+bytes2any_SOURCES = bytes2any.c mooPdUtils.h pdstringUtils.h
+bytes2wchars_SOURCES = bytes2wchars.c mooPdUtils.h pdstringUtils.h
+wchars2bytes_SOURCES = wchars2bytes.c mooPdUtils.h pdstringUtils.h
+pdstring_SOURCES = pdstring.c mooPdUtils.h pdstringUtils.h
 
 #GLIB_IFLAGS = @GLIB_IFLAGS@
 #GLIB_LFLAGS = @GLIB_LFLAGS@
@@ -225,6 +242,8 @@ AM_CFLAGS = $(OFLAGS) $(WFLAGS) $(AFLAGS)
 pdstring_LDFLAGS = $(LFLAGS)
 bytes2any_LDFLAGS = $(LFLAGS)
 any2bytes_LDFLAGS = $(LFLAGS)
+bytes2wchars_LDFLAGS = $(LFLAGS)
+wchars2bytes_LDFLAGS = $(LFLAGS)
 
 #-----------------------------------------------------------------------
 # Variables: cleanup
@@ -338,9 +357,15 @@ any2bytes$(EXEEXT): $(any2bytes_OBJECTS) $(any2bytes_DEPENDENCIES)
 bytes2any$(EXEEXT): $(bytes2any_OBJECTS) $(bytes2any_DEPENDENCIES) 
 	@rm -f bytes2any$(EXEEXT)
 	$(LINK) $(bytes2any_LDFLAGS) $(bytes2any_OBJECTS) $(bytes2any_LDADD) $(LIBS)
+bytes2wchars$(EXEEXT): $(bytes2wchars_OBJECTS) $(bytes2wchars_DEPENDENCIES) 
+	@rm -f bytes2wchars$(EXEEXT)
+	$(LINK) $(bytes2wchars_LDFLAGS) $(bytes2wchars_OBJECTS) $(bytes2wchars_LDADD) $(LIBS)
 pdstring$(EXEEXT): $(pdstring_OBJECTS) $(pdstring_DEPENDENCIES) 
 	@rm -f pdstring$(EXEEXT)
 	$(LINK) $(pdstring_LDFLAGS) $(pdstring_OBJECTS) $(pdstring_LDADD) $(LIBS)
+wchars2bytes$(EXEEXT): $(wchars2bytes_OBJECTS) $(wchars2bytes_DEPENDENCIES) 
+	@rm -f wchars2bytes$(EXEEXT)
+	$(LINK) $(wchars2bytes_LDFLAGS) $(wchars2bytes_OBJECTS) $(wchars2bytes_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -350,7 +375,9 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/any2bytes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bytes2any.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bytes2wchars.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pdstring.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wchars2bytes.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -681,6 +708,8 @@ uninstall-info: uninstall-info-recursive
 	uninstall-pddocDATA uninstall-pdexternsDATA \
 	uninstall-pdexternsPROGRAMS
 
+
+pdstring.$(OBJECT): $(any2bytes_SOURCES) $(bytes2any_SOURCES) $(bytes2wchars_SOURCES) $(wchars2bytes_SOURCES)
 
 maintainer-clean-local:
 	rm -rf autom4te.cache

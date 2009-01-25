@@ -3543,7 +3543,7 @@ esac
 
 ##------- PD externals: hack EXEEXT?
 PD_LIB_EXTERNALS="pdstring"
-PD_OBJ_EXTERNALS="any2bytes bytes2any bytes2wchars"
+PD_OBJ_EXTERNALS="any2bytes bytes2any bytes2wchars wchars2bytes"
 
 # Check whether --enable-object-externals was given.
 if test "${enable_object_externals+set}" = set; then
