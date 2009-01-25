@@ -355,19 +355,20 @@ void pix_preview :: trigger()
 	
 	//std::cout << "NOT encoded: " << pnm << std::endl;
 
-	//pnm64 = base64_encode(reinterpret_cast<const unsigned char*>(pnm.c_str()), pnm.length());
+	pnm64 = base64_encode(reinterpret_cast<const unsigned char*>(pnm.c_str()), pnm.length());
+	
 	//std::cout << "encoded: " << pnm64 << std::endl;
 
 
 		
-	//m_glist = (t_glist *) canvas_getcurrent();
+	m_glist = (t_glist *) canvas_getcurrent();
 	
 
-	//sys_vgui("img%x put {%s}\n", this->x_obj, reinterpret_cast<const unsigned char*>(pnm64.c_str()) );
-    	image_drawme((pix_preview *)this->x_obj, (t_glist *) this->getCanvas(), 0, m_xsize, m_ysize);
-//	sys_vgui(".x%x.c coords %xS %d %d\n",
-//		   this->getCanvas(), this->x_obj,
-//		   text_xpix(this->x_obj, (t_glist *)this->getCanvas()) + (m_xsize/2), text_ypix(this->x_obj, (t_glist *)this->getCanvas()) + (m_ysize/2));
+	sys_vgui("img%x configure -data {%s}\n", this->x_obj, reinterpret_cast<const unsigned char*>(pnm64.c_str()) );
+//    	image_drawme((pix_preview *)this->x_obj, (t_glist *) this->getCanvas(), 0, m_xsize, m_ysize);
+	sys_vgui(".x%x.c coords %xS %d %d\n",
+		   this->getCanvas(), this->x_obj,
+		   text_xpix(this->x_obj, (t_glist *)this->getCanvas()) + (m_xsize/2), text_ypix(this->x_obj, (t_glist *)this->getCanvas()) + (m_ysize/2));
 		   //fprintf (stderr, "%x %x - %d %d\n",x,(t_object*)x, text_xpix((t_object*)x, glist), text_ypix((t_object*)x, glist));
 	
     break;

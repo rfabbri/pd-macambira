@@ -1,5 +1,5 @@
-PD_DIR = /usr/src/pd-0.40-2
-GEM_DIR = /usr/src/Gem
+PD_DIR = ../../../pd
+GEM_DIR = ../../../Gem
 
 LIBS =  -lm
 GEM2PNM_VERSION = 0.6
