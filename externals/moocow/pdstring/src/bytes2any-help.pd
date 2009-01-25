@@ -1,19 +1,13 @@
-#N canvas 121 48 612 604 10;
-#X text 59 7 string2any : convert lists of floats to pd messages;
-#X text 13 30 SYNTAX: string2any [INITIAL_BUFSIZE [EOS_CHAR]];
+#N canvas 507 20 612 604 10;
 #X text 13 52 INLETS:;
-#X text 27 68 1 - ASCII-valued float lists;
 #X text 309 54 OUTLETS:;
 #X text 325 68 1 - pd messages;
 #X text 325 82 2 - bang on done;
-#X obj 24 350 string2any 128 0;
-#X obj 24 529 print string2any-help;
-#X obj 131 454 print string2any-help-done;
 #X msg 24 113 97 32 98 32 99;
 #X msg 39 135 97 0 98 0 99;
-#X msg 99 206 0;
-#X msg 67 206 -1;
-#X msg 131 206 32;
+#X msg 92 206 0;
+#X msg 60 206 -1;
+#X msg 124 206 32;
 #X text 166 202 The second inlet sets the message-separating EOS ("end-of-string")
 character. If this character is encountered in an input list \, the
 list is "split" at that point \, and two separate messages are output
@@ -32,15 +26,22 @@ has been processed.;
 #X text 306 580 Bryan Jurish <moocow@ling.uni-potsdam.de>;
 #X text 27 83 2 - EOS character (float);
 #X text 161 121 lists of floats are converted to pd messages.;
-#X msg 54 161 StringThing 97;
 #X text 168 161 ... selector is ignored ...;
 #X text 21 571 SEE ALSO:;
 #X obj 102 570 pdstring;
-#X connect 7 0 8 0;
-#X connect 7 1 9 0;
-#X connect 10 0 7 0;
-#X connect 11 0 7 0;
-#X connect 12 0 7 1;
-#X connect 13 0 7 1;
-#X connect 14 0 7 1;
-#X connect 23 0 7 0;
+#X text 27 68 1 - byte-valued float lists;
+#X text 59 7 bytes2any : convert lists of byte values to pd messages
+;
+#X text 13 30 SYNTAX: bytes2any [INITIAL_BUFSIZE [EOS_CHAR]];
+#X obj 124 454 print bytes2any-help-done;
+#X obj 24 529 print bytes2any-help;
+#X msg 54 161 StringThing 97;
+#X obj 24 350 bytes2any 128 0;
+#X connect 4 0 26 0;
+#X connect 5 0 26 0;
+#X connect 6 0 26 1;
+#X connect 7 0 26 1;
+#X connect 8 0 26 1;
+#X connect 25 0 26 0;
+#X connect 26 0 24 0;
+#X connect 26 1 23 0;

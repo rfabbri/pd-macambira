@@ -1,0 +1,42 @@
+#N canvas 101 18 612 604 10;
+#X text 13 52 INLETS:;
+#X text 309 54 OUTLETS:;
+#X text 325 68 1 - pd messages;
+#X text 325 82 2 - bang on done;
+#X msg 24 113 97 32 98 32 99;
+#X msg 39 135 97 0 98 0 99;
+#X msg 92 206 0;
+#X msg 60 206 -1;
+#X msg 124 206 32;
+#X text 163 350 First argument: initial buffer size (length of object-local
+text buffer). This should get re-allocated when necessary. Specify
+0 (zero) to use the default value.;
+#X text 165 405 Second argument: initial EOS character. See above.
+;
+#X text 159 477 Right outlet gives a bang after the entire input list
+has been processed.;
+#X text 189 531 Parsed pd messages are sent to the left outlet.;
+#X text 306 580 Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 27 83 2 - EOS character (float);
+#X text 161 121 lists of floats are converted to pd messages.;
+#X text 168 161 ... selector is ignored ...;
+#X text 21 571 SEE ALSO:;
+#X obj 102 570 pdstring;
+#X text 13 30 SYNTAX: wchars2any [INITIAL_BUFSIZE [EOS_CHAR]];
+#X obj 131 454 print wchars2any-help-done;
+#X obj 24 529 print wchars2any-help;
+#X msg 54 161 StringThing 97;
+#X obj 24 350 wchars2any 128 0;
+#X text 59 7 wchars2any : convert lists of wchar_t values to pd messages
+;
+#X text 27 68 1 - wchar_t-valued float lists;
+#X text 166 202 The second inlet is as for [bytes2any];
+#X obj 169 570 locale;
+#X connect 4 0 23 0;
+#X connect 5 0 23 0;
+#X connect 6 0 23 1;
+#X connect 7 0 23 1;
+#X connect 8 0 23 1;
+#X connect 22 0 23 0;
+#X connect 23 0 21 0;
+#X connect 23 1 20 0;
