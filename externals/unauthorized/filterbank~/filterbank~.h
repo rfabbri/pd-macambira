@@ -43,7 +43,7 @@
 #include "m_pd.h"
 #include "m_imp.h"
 #include "g_canvas.h"
-#include "t_tk.h"
+
 
 /* this code is borrowed from pd's object : bp~ */
 

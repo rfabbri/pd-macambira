@@ -6,7 +6,7 @@
 
 #include "m_pd.h"
 #include "g_canvas.h"
-#include "t_tk.h"
+
 
 typedef struct s_pd_obj_seg
 {

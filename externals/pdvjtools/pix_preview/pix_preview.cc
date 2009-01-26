@@ -23,7 +23,7 @@ using namespace std;
 #include "m_pd.h"
 #include "m_imp.h"
 #include "g_canvas.h"
-#include "t_tk.h"
+
 
 #include "pix_preview.h"
 

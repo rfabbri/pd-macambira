@@ -55,7 +55,7 @@
 #include "m_pd.h"
 #include "m_imp.h"
 #include "g_canvas.h"
-#include "t_tk.h"
+
 
 static int guidebug=0;
 static int ignorevisible=1; // ignore visible test
