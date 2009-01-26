@@ -1,6 +1,6 @@
 #!/bin/sh
 
-subdirs=(deque flite gfsm pdstring readdir sprinkler weightmap)
+subdirs=(deque flite gfsm locale pdstring readdir sprinkler weightmap)
 
 #ar_args="--install --verbose --force --symlink"
 ar_args="--install --verbose --force"

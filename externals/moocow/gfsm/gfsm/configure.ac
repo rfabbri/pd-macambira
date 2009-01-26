@@ -24,6 +24,16 @@ AM_CONFIG_HEADER([src/libgfsm/gfsmConfigAuto.h])
 dnl default prefix
 AC_PREFIX_DEFAULT(/usr/local)
 
+dnl ----- maintainer mode
+dnl  + enables "maintainer mode" only with ./configure --enable-maintainer-mode
+dnl    - causes make __never__ to invoke 'config/missing', e.g. any autotools
+dnl    - basically a hack to avoid version mismatches in autoconf, automake, etc.
+dnl      for autobuilds from SVN
+dnl  + maintainer should call ./configure --enable-maintainer-mode, and must keep
+dnl    SVN sources consistent
+AM_MAINTAINER_MODE
+dnl -----/maintainer mode
+
 #-------------------------------------------------------------
 # save user's *FLAGS
 #USER_LIBS="$LIBS"
