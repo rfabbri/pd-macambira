@@ -57,8 +57,12 @@ typedef struct _pdstring
 #ifndef PDSTRING_OBJECT_EXTERNALS
 # include "any2bytes.c"
 # include "bytes2any.c"
+
 # include "bytes2wchars.c"
 # include "wchars2bytes.c"
+
+//# include "bytes2array.c"
+//# include "array2bytes.c"
 #endif
 
 /*--------------------------------------------------------------------
@@ -92,6 +96,8 @@ void pdstring_setup(void)
   bytes2any_setup_guts();
   bytes2wchars_setup_guts();
   wchars2bytes_setup_guts();
+  //bytes2array_setup_guts();
+  //array2bytes_setup_guts();
 #endif
 
   pdstring_class = class_new(gensym("pdstring"),
