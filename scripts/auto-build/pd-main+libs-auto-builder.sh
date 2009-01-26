@@ -43,10 +43,11 @@ rsync -a --delete rsync://128.238.56.50/distros/pd-main+libs/ \
 	 ${auto_build_root_dir}/
 
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
-make -C "${auto_build_root_dir}/packages" set_version
+make -C "${auto_build_root_dir}/packages" set_version PD-EXTENDED_VERSION_PREFIX=vanilla+libs
 make test_locations
 make package_clean
-make install && make package
+make install PD-EXTENDED_VERSION_PREFIX=vanilla+libs
+make package PD-EXTENDED_VERSION_PREFIX=vanilla+libs
 
 
 upload_build ()

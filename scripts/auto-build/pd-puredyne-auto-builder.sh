@@ -46,7 +46,8 @@ cd "${auto_build_root_dir}/packages/$BUILD_DIR"
 #make -C "${auto_build_root_dir}/packages" set_version
 make test_locations
 make package_clean
-make install && make package
+make install PD-EXTENDED_VERSION_PREFIX=puredyne
+make package PD-EXTENDED_VERSION_PREFIX=puredyne
 
 
 upload_build ()

@@ -53,11 +53,12 @@ case $SYSTEM in
 esac
 
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
-make -C "${auto_build_root_dir}/packages" set_version
+make -C "${auto_build_root_dir}/packages" set_version PD-EXTENDED_VERSION_PREFIX=devel
 make test_locations
 mount
 make package_clean
-make install && make package
+make install PD-EXTENDED_VERSION_PREFIX=devel
+make package PD-EXTENDED_VERSION_PREFIX=devel
 
 
 upload_build ()
