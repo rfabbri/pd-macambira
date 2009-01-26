@@ -17,6 +17,7 @@ prep_project()
 	 BUILD_ROOT="$2"
 	 TODAYS_ROOT="${BUILD_ROOT}/${DATE}"
 	 chown -R root.root "${BUILD_ROOT}"        >> $LOGFILE 2>&1
+	 chown -R pd "${BUILD_ROOT}/latest"        >> $LOGFILE 2>&1
 	 mkdir "${TODAYS_ROOT}"                    >> $LOGFILE 2>&1
 	 mkdir "${TODAYS_ROOT}/logs"               >> $LOGFILE 2>&1
 	 chown -R nobody.nogroup "${TODAYS_ROOT}"  >> $LOGFILE 2>&1
