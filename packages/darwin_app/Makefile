@@ -61,7 +61,7 @@ all:
 install: darwin_app
 
 #------------------------------------------------------------------------------#
-darwin_app: darwin_app_core extended_install rez_install darwin_app_embed_libs
+darwin_app: darwin_app_core extended_install rez_install darwin_app_embed_libs spotlight_importer_install
 	@echo " "
 	@echo "Pd.app build succeeded!"
 
@@ -177,10 +177,10 @@ darwin_app_core: darwin_app_wrapper
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) \
 		PD_CONFIGURE_FLAGS="--enable-jack --disable-fat" \
 		pd_install 
-	install -d "$(PD_APP_CONTENTS)/Resources"
+	install -d "$(PD_APP_CONTENTS)/Resources/bin"
 	cd "$(PD_APP_CONTENTS)/Resources" && \
 		ln -s bin Scripts
-	cd "$(PD_APP_CONTENTS)/Resources" && \
+	cd "$(PD_APP_CONTENTS)/Resources/bin" && \
 		test -e AppMain.tcl || ln -s pd.tk AppMain.tcl
 # support for Info Panel Plugins mgmt
 	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
