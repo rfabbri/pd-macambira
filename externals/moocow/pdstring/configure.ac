@@ -4,7 +4,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [pdstring])
-define([THE_PACKAGE_VERSION], [0.08])
+define([THE_PACKAGE_VERSION], [0.09])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -36,6 +36,7 @@ dnl Programs, prefix
 dnl
 AC_PROG_CC
 AC_PROG_INSTALL
+AC_PROG_LN_S
 AC_PREFIX_DEFAULT(/usr/local)
 
 dnl
@@ -96,32 +97,25 @@ case "${am__api_version}" in
     ;;
 esac
 
-##------- PD externals: hack EXEEXT?
-PD_LIB_EXTERNALS="pdstring"
-PD_OBJ_EXTERNALS="any2bytes bytes2any bytes2wchars wchars2bytes"
-
+##------- Enable single-object externals?
 AC_ARG_ENABLE(object-externals,
 	AC_HELP_STRING([--enable-object-externals], [Whether to build single-object externals (default=no)]),
 	[want_objext="$enableval"],
 	[want_objext="no"])
 AC_MSG_CHECKING([whether to build single-object externals])
 
-##-- always build lib
-PD_OBJECT_EXTERNALS="pdstring${buildext}"
-
 if test "$want_objext" != "no" ; then
   ##-- single-objects
   AC_MSG_RESULT(yes)
-  for ext in $PD_OBJ_EXTERNALS ; do
-    PD_OBJECT_EXTERNALS="$PD_OBJECT_EXTERNALS ${ext}${buildext}"
-  done
   AC_DEFINE(PDSTRING_OBJECT_EXTERNALS,1,
      [Define this if you are building single-object externals])
 else
-  ##-- libs
+  ##-- lib only
   AC_MSG_RESULT(no)
 fi
-AC_SUBST(PD_OBJECT_EXTERNALS)
+
+##-- add automake conditional for object externals
+AM_CONDITIONAL(WANT_OBJECT_EXTERNALS, [test "$want_objext" != "no"])
 
 
 dnl
@@ -182,12 +176,18 @@ else
 fi
 AC_SUBST(DEBUG)
 
+if test "$GCC" = "yes"; then
+   WFLAGS="-Wall -Winline -W -Wno-unused"
+fi
+
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## compiled
 AC_DEFINE_UNQUOTED(PDSTRING_DATE,  "`date`",         [Date this external was configured])
 AC_DEFINE_UNQUOTED(PDSTRING_USER,  "$USER",          [User who configured this external])
 ## /compiled
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## BEGIN machine-dependent variables

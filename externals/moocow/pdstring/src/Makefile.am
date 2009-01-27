@@ -27,7 +27,16 @@ EXEEXT   = .@PDEXT@
 #-----------------------------------------------------------------------
 
 ## --- externals
-pdexterns_PROGRAMS = @PD_OBJECT_EXTERNALS@
+pdexterns_PROGRAMS = pdstring
+if WANT_OBJECT_EXTERNALS
+ pdexterns_PROGRAMS += \
+	any2bytes \
+	bytes2any \
+	bytes2wchars \
+	wchars2bytes \
+	printbytes \
+	printwchars
+endif
 
 ## --- possible externals
 EXTRA_PROGRAMS = \
@@ -35,7 +44,9 @@ EXTRA_PROGRAMS = \
 	any2bytes \
 	bytes2any \
 	bytes2wchars \
-	wchars2bytes
+	wchars2bytes \
+	printbytes \
+	printwchars
 
 ## --- patches
 pdexterns_DATA = \
@@ -52,22 +63,52 @@ pddoc_DATA = \
 	any2wchars-help.pd \
 	wchars2any-help.pd
 
+	printbytes-help.pd 
+	printwchars-help.pd
+
 
 #-----------------------------------------------------------------------
 # sources
 #-----------------------------------------------------------------------
 
-any2bytes_SOURCES = any2bytes.c mooPdUtils.h pdstringUtils.h
+any2bytes_SOURCES = any2bytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
 
-bytes2any_SOURCES = bytes2any.c mooPdUtils.h pdstringUtils.h
+bytes2any_SOURCES = bytes2any.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
 
-bytes2wchars_SOURCES = bytes2wchars.c mooPdUtils.h pdstringUtils.h
+bytes2wchars_SOURCES = bytes2wchars.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
 
-wchars2bytes_SOURCES = wchars2bytes.c mooPdUtils.h pdstringUtils.h
+wchars2bytes_SOURCES = wchars2bytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
 
-pdstring_SOURCES = pdstring.c mooPdUtils.h pdstringUtils.h
+printbytes_SOURCES = printbytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
 
-pdstring.$(OBJECT): $(any2bytes_SOURCES) $(bytes2any_SOURCES) $(bytes2wchars_SOURCES) $(wchars2bytes_SOURCES)
+printwchars_SOURCES = printwchars.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
+
+pdstring_SOURCES = pdstring.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
+
+#-----------------------------------------------------------------------
+# aliases via install hook
+#-----------------------------------------------------------------------
+
+if WANT_OBJECT_EXTERNALS
+all-local:
+	rm -f any2string.$(PDEXT)
+	rm -f string2any.$(PDEXT)
+	$(LN_S) any2bytes.$(PDEXT) any2string.$(PDEXT)
+	$(LN_S) bytes2any.$(PDEXT) string2any.$(PDEXT)
+endif
+
+install-data-hook:
+	rm -f $(pdexternsdir)/any2string.$(PDEXT)
+	rm -f $(pdexternsdir)/string2any.$(PDEXT)
+if WANT_OBJECT_EXTERNALS
+	$(LN_S) any2bytes.$(PDEXT) $(pdexternsdir)/any2string.$(PDEXT)
+	$(LN_S) bytes2any.$(PDEXT) $(pdexternsdir)/string2any.$(PDEXT)
+endif
+
+uninstall-local:
+	rm -f $(pdexternsdir)/any2string.$(PDEXT)
+	rm -f $(pdexternsdir)/string2any.$(PDEXT)
+
 
 #-----------------------------------------------------------------------
 # external compilation : flags
@@ -78,7 +119,7 @@ DFLAGS  = @DFLAGS@
 IFLAGS  = @IFLAGS@
 LFLAGS  = @LFLAGS@
 OFLAGS  = @OFLAGS@
-WFLAGS  = -Wall -Winline
+WFLAGS  = @WFLAGS@
 
 #GLIB_IFLAGS = @GLIB_IFLAGS@
 #GLIB_LFLAGS = @GLIB_LFLAGS@
@@ -86,15 +127,11 @@ WFLAGS  = -Wall -Winline
 AM_CPPFLAGS = $(IFLAGS) $(GLIB_IFLAGS) $(DFLAGS)
 AM_CFLAGS   = $(OFLAGS) $(WFLAGS) $(AFLAGS)
 
-pdstring_LDFLAGS = $(LFLAGS)
+AM_LDFLAGS ?= $(LFLAGS)
 
-bytes2any_LDFLAGS = $(LFLAGS)
-
-any2bytes_LDFLAGS = $(LFLAGS)
-
-bytes2wchars_LDFLAGS = $(LFLAGS)
-
-wchars2bytes_LDFLAGS = $(LFLAGS)
+#pdstring_LDFLAGS = $(LFLAGS)
+#bytes2any_LDFLAGS = $(LFLAGS)
+##string2any_LDFLAGS = $(bytes2any_LDFLAGS)
 
 #-----------------------------------------------------------------------
 # Variables: cleanup

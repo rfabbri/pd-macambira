@@ -71,6 +71,8 @@ typedef struct _any2bytes
 } t_any2bytes;
 
 
+static int ANY2BYTES_INITIALIZED = 0;
+
 /*=====================================================================
  * Constants
  *=====================================================================*/
@@ -151,14 +153,16 @@ static void any2bytes_free(t_any2bytes *x)
  */
 void any2bytes_setup_guts(void)
 {
+  if (ANY2BYTES_INITIALIZED) return;
+
   //-- class
   any2bytes_class = class_new(gensym("any2bytes"),
-			       (t_newmethod)any2bytes_new,
-			       (t_method)any2bytes_free,
-			       sizeof(t_any2bytes),
-			       CLASS_DEFAULT,
-			       A_GIMME,                   //-- initial_bufsize, eos_char
-			       0);
+			      (t_newmethod)any2bytes_new,
+			      (t_method)any2bytes_free,
+			      sizeof(t_any2bytes),
+			      CLASS_DEFAULT,
+			      A_GIMME,                   //-- initial_bufsize, eos_char
+			      0);
 
   //-- alias
   class_addcreator((t_newmethod)any2bytes_new, gensym("any2string"), A_GIMME, 0);
@@ -168,6 +172,9 @@ void any2bytes_setup_guts(void)
   
   //-- help symbol
   //class_sethelpsymbol(any2bytes_class, gensym("any2bytes-help.pd")); //-- breaks pd-extended help lookup
+
+  //-- set flag
+  ANY2BYTES_INITIALIZED = 1;
 }
 
 
@@ -178,4 +185,13 @@ void any2bytes_setup(void)
 {
   post(any2bytes_banner);
   any2bytes_setup_guts();
+}
+
+/*--------------------------------------------------------------------
+ * setup (any2string alias)
+ */
+void any2string_setup(void) {
+  post("any2string_setup(): WARNING: names are in flux!");
+  post("any2string_setup(): Prefer [any2bytes] over [any2string].");
+  any2bytes_setup();
 }

@@ -49,9 +49,18 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-pdexterns_PROGRAMS = @PD_OBJECT_EXTERNALS@
+pdexterns_PROGRAMS = pdstring$(EXEEXT) $(am__EXEEXT_1)
+@WANT_OBJECT_EXTERNALS_TRUE@am__append_1 = \
+@WANT_OBJECT_EXTERNALS_TRUE@	any2bytes \
+@WANT_OBJECT_EXTERNALS_TRUE@	bytes2any \
+@WANT_OBJECT_EXTERNALS_TRUE@	bytes2wchars \
+@WANT_OBJECT_EXTERNALS_TRUE@	wchars2bytes \
+@WANT_OBJECT_EXTERNALS_TRUE@	printbytes \
+@WANT_OBJECT_EXTERNALS_TRUE@	printwchars
+
 EXTRA_PROGRAMS = pdstring$(EXEEXT) any2bytes$(EXEEXT) \
-	bytes2any$(EXEEXT) bytes2wchars$(EXEEXT) wchars2bytes$(EXEEXT)
+	bytes2any$(EXEEXT) bytes2wchars$(EXEEXT) wchars2bytes$(EXEEXT) \
+	printbytes$(EXEEXT) printwchars$(EXEEXT)
 subdir = src
 SUBDIRS =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -63,23 +72,37 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
+@WANT_OBJECT_EXTERNALS_TRUE@am__EXEEXT_1 = any2bytes$(EXEEXT) \
+@WANT_OBJECT_EXTERNALS_TRUE@	bytes2any$(EXEEXT) \
+@WANT_OBJECT_EXTERNALS_TRUE@	bytes2wchars$(EXEEXT) \
+@WANT_OBJECT_EXTERNALS_TRUE@	wchars2bytes$(EXEEXT) \
+@WANT_OBJECT_EXTERNALS_TRUE@	printbytes$(EXEEXT) \
+@WANT_OBJECT_EXTERNALS_TRUE@	printwchars$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(pdexternsdir)" "$(DESTDIR)$(pddocdir)" \
 	"$(DESTDIR)$(pdexternsdir)"
 pdexternsPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(pdexterns_PROGRAMS)
-am_any2bytes_OBJECTS = any2bytes.$(OBJEXT)
+am_any2bytes_OBJECTS = any2bytes.$(OBJEXT) pdstringUtils.$(OBJEXT)
 any2bytes_OBJECTS = $(am_any2bytes_OBJECTS)
 any2bytes_LDADD = $(LDADD)
-am_bytes2any_OBJECTS = bytes2any.$(OBJEXT)
+am_bytes2any_OBJECTS = bytes2any.$(OBJEXT) pdstringUtils.$(OBJEXT)
 bytes2any_OBJECTS = $(am_bytes2any_OBJECTS)
 bytes2any_LDADD = $(LDADD)
-am_bytes2wchars_OBJECTS = bytes2wchars.$(OBJEXT)
+am_bytes2wchars_OBJECTS = bytes2wchars.$(OBJEXT) \
+	pdstringUtils.$(OBJEXT)
 bytes2wchars_OBJECTS = $(am_bytes2wchars_OBJECTS)
 bytes2wchars_LDADD = $(LDADD)
-am_pdstring_OBJECTS = pdstring.$(OBJEXT)
+am_pdstring_OBJECTS = pdstring.$(OBJEXT) pdstringUtils.$(OBJEXT)
 pdstring_OBJECTS = $(am_pdstring_OBJECTS)
 pdstring_LDADD = $(LDADD)
-am_wchars2bytes_OBJECTS = wchars2bytes.$(OBJEXT)
+am_printbytes_OBJECTS = printbytes.$(OBJEXT) pdstringUtils.$(OBJEXT)
+printbytes_OBJECTS = $(am_printbytes_OBJECTS)
+printbytes_LDADD = $(LDADD)
+am_printwchars_OBJECTS = printwchars.$(OBJEXT) pdstringUtils.$(OBJEXT)
+printwchars_OBJECTS = $(am_printwchars_OBJECTS)
+printwchars_LDADD = $(LDADD)
+am_wchars2bytes_OBJECTS = wchars2bytes.$(OBJEXT) \
+	pdstringUtils.$(OBJEXT)
 wchars2bytes_OBJECTS = $(am_wchars2bytes_OBJECTS)
 wchars2bytes_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -91,9 +114,11 @@ CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(any2bytes_SOURCES) $(bytes2any_SOURCES) \
 	$(bytes2wchars_SOURCES) $(pdstring_SOURCES) \
+	$(printbytes_SOURCES) $(printwchars_SOURCES) \
 	$(wchars2bytes_SOURCES)
 DIST_SOURCES = $(any2bytes_SOURCES) $(bytes2any_SOURCES) \
 	$(bytes2wchars_SOURCES) $(pdstring_SOURCES) \
+	$(printbytes_SOURCES) $(printwchars_SOURCES) \
 	$(wchars2bytes_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -150,6 +175,7 @@ LDFLAGS = @LDFLAGS@
 LFLAGS = @LFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
@@ -169,12 +195,13 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 # Flags and variables
 #-----------------------------------------------------------------------
 PDEXT = @PDEXT@
-PD_OBJECT_EXTERNALS = @PD_OBJECT_EXTERNALS@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-WFLAGS = -Wall -Winline
+WANT_OBJECT_EXTERNALS_FALSE = @WANT_OBJECT_EXTERNALS_FALSE@
+WANT_OBJECT_EXTERNALS_TRUE = @WANT_OBJECT_EXTERNALS_TRUE@
+WFLAGS = @WFLAGS@
 ac_ct_CC = @ac_ct_CC@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -232,21 +259,21 @@ pddoc_DATA = \
 #-----------------------------------------------------------------------
 # sources
 #-----------------------------------------------------------------------
-any2bytes_SOURCES = any2bytes.c mooPdUtils.h pdstringUtils.h
-bytes2any_SOURCES = bytes2any.c mooPdUtils.h pdstringUtils.h
-bytes2wchars_SOURCES = bytes2wchars.c mooPdUtils.h pdstringUtils.h
-wchars2bytes_SOURCES = wchars2bytes.c mooPdUtils.h pdstringUtils.h
-pdstring_SOURCES = pdstring.c mooPdUtils.h pdstringUtils.h
+any2bytes_SOURCES = any2bytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
+bytes2any_SOURCES = bytes2any.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
+bytes2wchars_SOURCES = bytes2wchars.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
+wchars2bytes_SOURCES = wchars2bytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
+printbytes_SOURCES = printbytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
+printwchars_SOURCES = printwchars.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
+pdstring_SOURCES = pdstring.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
 
 #GLIB_IFLAGS = @GLIB_IFLAGS@
 #GLIB_LFLAGS = @GLIB_LFLAGS@
 AM_CPPFLAGS = $(IFLAGS) $(GLIB_IFLAGS) $(DFLAGS)
 AM_CFLAGS = $(OFLAGS) $(WFLAGS) $(AFLAGS)
-pdstring_LDFLAGS = $(LFLAGS)
-bytes2any_LDFLAGS = $(LFLAGS)
-any2bytes_LDFLAGS = $(LFLAGS)
-bytes2wchars_LDFLAGS = $(LFLAGS)
-wchars2bytes_LDFLAGS = $(LFLAGS)
+
+#pdstring_LDFLAGS = $(LFLAGS)
+#bytes2any_LDFLAGS = $(LFLAGS)
 
 #-----------------------------------------------------------------------
 # Variables: cleanup
@@ -366,6 +393,12 @@ bytes2wchars$(EXEEXT): $(bytes2wchars_OBJECTS) $(bytes2wchars_DEPENDENCIES)
 pdstring$(EXEEXT): $(pdstring_OBJECTS) $(pdstring_DEPENDENCIES) 
 	@rm -f pdstring$(EXEEXT)
 	$(LINK) $(pdstring_LDFLAGS) $(pdstring_OBJECTS) $(pdstring_LDADD) $(LIBS)
+printbytes$(EXEEXT): $(printbytes_OBJECTS) $(printbytes_DEPENDENCIES) 
+	@rm -f printbytes$(EXEEXT)
+	$(LINK) $(printbytes_LDFLAGS) $(printbytes_OBJECTS) $(printbytes_LDADD) $(LIBS)
+printwchars$(EXEEXT): $(printwchars_OBJECTS) $(printwchars_DEPENDENCIES) 
+	@rm -f printwchars$(EXEEXT)
+	$(LINK) $(printwchars_LDFLAGS) $(printwchars_OBJECTS) $(printwchars_LDADD) $(LIBS)
 wchars2bytes$(EXEEXT): $(wchars2bytes_OBJECTS) $(wchars2bytes_DEPENDENCIES) 
 	@rm -f wchars2bytes$(EXEEXT)
 	$(LINK) $(wchars2bytes_LDFLAGS) $(wchars2bytes_OBJECTS) $(wchars2bytes_LDADD) $(LIBS)
@@ -380,6 +413,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bytes2any.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bytes2wchars.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pdstring.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pdstringUtils.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/printbytes.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/printwchars.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wchars2bytes.Po@am__quote@
 
 .c.o:
@@ -607,7 +643,8 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(PROGRAMS) $(DATA) config.h
+@WANT_OBJECT_EXTERNALS_FALSE@all-local:
+all-am: Makefile $(PROGRAMS) $(DATA) config.h all-local
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(pdexternsdir)" "$(DESTDIR)$(pddocdir)" "$(DESTDIR)$(pdexternsdir)"; do \
@@ -662,6 +699,8 @@ info-am:
 
 install-data-am: install-pddocDATA install-pdexternsDATA \
 	install-pdexternsPROGRAMS
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 
 install-exec-am:
 
@@ -689,30 +728,53 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-pddocDATA \
+uninstall-am: uninstall-info-am uninstall-local uninstall-pddocDATA \
 	uninstall-pdexternsDATA uninstall-pdexternsPROGRAMS
 
 uninstall-info: uninstall-info-recursive
 
-.PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am check check-am \
-	clean clean-generic clean-pdexternsPROGRAMS clean-recursive \
-	ctags ctags-recursive distclean distclean-compile \
-	distclean-generic distclean-hdr distclean-recursive \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-man \
-	install-pddocDATA install-pdexternsDATA \
-	install-pdexternsPROGRAMS install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-local \
-	maintainer-clean-recursive mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-recursive pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am uninstall-info-am \
-	uninstall-pddocDATA uninstall-pdexternsDATA \
-	uninstall-pdexternsPROGRAMS
+.PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am all-local check \
+	check-am clean clean-generic clean-pdexternsPROGRAMS \
+	clean-recursive ctags ctags-recursive distclean \
+	distclean-compile distclean-generic distclean-hdr \
+	distclean-recursive distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-data-hook install-exec install-exec-am \
+	install-info install-info-am install-man install-pddocDATA \
+	install-pdexternsDATA install-pdexternsPROGRAMS install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic \
+	maintainer-clean-local maintainer-clean-recursive mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-recursive \
+	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
+	uninstall-info-am uninstall-local uninstall-pddocDATA \
+	uninstall-pdexternsDATA uninstall-pdexternsPROGRAMS
 
 
-pdstring.$(OBJECT): $(any2bytes_SOURCES) $(bytes2any_SOURCES) $(bytes2wchars_SOURCES) $(wchars2bytes_SOURCES)
+	printbytes-help.pd 
+	printwchars-help.pd
+
+#-----------------------------------------------------------------------
+# aliases via install hook
+#-----------------------------------------------------------------------
+
+@WANT_OBJECT_EXTERNALS_TRUE@all-local:
+@WANT_OBJECT_EXTERNALS_TRUE@	rm -f any2string.$(PDEXT)
+@WANT_OBJECT_EXTERNALS_TRUE@	rm -f string2any.$(PDEXT)
+@WANT_OBJECT_EXTERNALS_TRUE@	$(LN_S) any2bytes.$(PDEXT) any2string.$(PDEXT)
+@WANT_OBJECT_EXTERNALS_TRUE@	$(LN_S) bytes2any.$(PDEXT) string2any.$(PDEXT)
+
+install-data-hook:
+	rm -f $(pdexternsdir)/any2string.$(PDEXT)
+	rm -f $(pdexternsdir)/string2any.$(PDEXT)
+@WANT_OBJECT_EXTERNALS_TRUE@	$(LN_S) any2bytes.$(PDEXT) $(pdexternsdir)/any2string.$(PDEXT)
+@WANT_OBJECT_EXTERNALS_TRUE@	$(LN_S) bytes2any.$(PDEXT) $(pdexternsdir)/string2any.$(PDEXT)
+
+uninstall-local:
+	rm -f $(pdexternsdir)/any2string.$(PDEXT)
+	rm -f $(pdexternsdir)/string2any.$(PDEXT)
+
+AM_LDFLAGS ?= $(LFLAGS)
 
 maintainer-clean-local:
 	rm -rf autom4te.cache

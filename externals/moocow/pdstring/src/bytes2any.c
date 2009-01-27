@@ -55,9 +55,11 @@
 #define BYTES2ANY_DEFAULT_BUFLEN PDSTRING_DEFAULT_BUFLEN
 
 /*=====================================================================
- * Constants
+ * Constants & Globals
  *=====================================================================*/
 static char *bytes2any_banner = "bytes2any: pdstring version " PACKAGE_VERSION " by Bryan Jurish";
+
+static int BYTES2ANY_INITIALIZED = 0;
 
 /*=====================================================================
  * Structures and Types: any2string
@@ -196,6 +198,8 @@ static void bytes2any_free(t_bytes2any *x)
  */
 void bytes2any_setup_guts(void)
 {
+  if (BYTES2ANY_INITIALIZED) return;
+
   //-- class
   bytes2any_class = class_new(gensym("bytes2any"),
 			       (t_newmethod)bytes2any_new,
@@ -206,14 +210,16 @@ void bytes2any_setup_guts(void)
 			       0);
 
   //-- alias
-  class_addcreator((t_newmethod)bytes2any_new, gensym("bytes2any"), A_GIMME, 0);
+  class_addcreator((t_newmethod)bytes2any_new, gensym("string2any"), A_GIMME, 0);
   
   //-- methods
   class_addanything(bytes2any_class, (t_method)bytes2any_anything);
 
-  
   //-- help symbol
   //class_sethelpsymbol(bytes2any_class, gensym("bytes2any-help.pd")); //-- breaks pd-extended help lookup
+
+  //-- set flag
+  BYTES2ANY_INITIALIZED = 1;
 }
 
 /*--------------------------------------------------------------------
@@ -223,4 +229,13 @@ void bytes2any_setup(void)
 {
   post(bytes2any_banner);
   bytes2any_setup_guts();
+}
+
+/*--------------------------------------------------------------------
+ * setup (string2any alias)
+ */
+void string2any_setup(void) {
+  post("string2any_setup(): WARNING: names are in flux!");
+  post("string2any_setup(): Prefer [bytes2any] over [string2any].");
+  bytes2any_setup();
 }
