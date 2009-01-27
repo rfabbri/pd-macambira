@@ -291,9 +291,9 @@ license_install:
 	touch $(LICENSE_FILE)
 	echo "<html><body>" >> "$(LICENSE_FILE)"
 	echo "<h3>(Parts of this package can be used under " >> "$(LICENSE_FILE)"
-	echo "<a href="Pd-LICENSE.txt">Pd&quot;s BSD license</a>)</h3>" >> "$(LICENSE_FILE)"
+	echo "<a href="Pd-LICENSE.txt">Pd&#146;s BSD license</a>)</h3>" >> "$(LICENSE_FILE)"
 	echo "<font size=\"-1\">" >> "$(LICENSE_FILE)"
-	cat "$(externals_src)/creb/COPYING" | sed -e 's/^$$/\<P\>/g' >> "$(LICENSE_FILE)"
+	cat "$(packages_src)/gpl-3.0.txt" | sed -e 's/^$$/\<P\>/g' >> "$(LICENSE_FILE)"
 	echo "</font></body></html>" >> $(LICENSE_FILE)
 # Pd's license file
 	install -p "$(pd_src)/LICENSE.txt" "$(manualsdir)/$(PD_NAME)/Pd-LICENSE.txt"
