@@ -43,7 +43,7 @@ rsync -a --delete rsync://128.238.56.50/distros/pd-puredyne/ \
 	 ${auto_build_root_dir}/
 
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
-#make -C "${auto_build_root_dir}/packages" set_version
+make -C "${auto_build_root_dir}/packages" set_version PD-EXTENDED_VERSION_PREFIX=puredyne
 make test_locations
 make package_clean
 make install PD-EXTENDED_VERSION_PREFIX=puredyne
