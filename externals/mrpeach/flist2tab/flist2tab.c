@@ -19,6 +19,7 @@ typedef struct _flist2tab
     t_symbol    *x_arrayname;
     t_float     x_ft1;
     t_float     x_offset;
+    t_outlet    *x_sizeout;
 } t_flist2tab;
 
 static void flist2tab_list(t_flist2tab *x, t_symbol *s, int argc, t_atom *argv);
@@ -80,6 +81,8 @@ static void flist2tab_list(t_flist2tab *x, t_symbol *s, int argc, t_atom *argv)
                 vec[i+offset] = argv[i].a_w.w_float;
 #endif
         }
+        /* output the size of the array */
+        outlet_float(x->x_sizeout, npoints);
     }
 }
 
@@ -119,6 +122,8 @@ static void flist2tab_float(t_flist2tab *x, t_float f)
         vec[offset] = f;
 #endif
         garray_redraw(a);
+        /* output the size of the array */
+        outlet_float(x->x_sizeout, npoints);
     }
 }
 
@@ -132,6 +137,7 @@ static void *flist2tab_new(t_symbol *s)
     t_flist2tab *x = (t_flist2tab *)pd_new(flist2tab_class);
     x->x_offset = 0;
     x->x_arrayname = s;
+    x->x_sizeout = outlet_new(&x->x_obj, &s_float);
     floatinlet_new(&x->x_obj, &x->x_offset);
     return (x);
 }
