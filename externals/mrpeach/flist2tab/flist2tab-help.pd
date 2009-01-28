@@ -1,23 +1,26 @@
-#N canvas 437 577 450 300 10;
-#X obj 241 227 table pig;
-#X obj 170 200 flist2tab pig;
-#X obj 147 160 any2string;
-#X msg 147 137 Hello;
-#X floatatom 245 159 5 0 0 0 - - -;
-#X msg 61 74 81 28 0 33 55 1 2 3;
-#X text 10 -15 flist2tab loads floats or lists of floats into a table
+#N canvas 437 577 420 300 10;
+#X obj -12 175 table pig;
+#X obj 115 203 flist2tab pig;
+#X obj 92 163 any2string;
+#X msg 92 140 Hello;
+#X floatatom 190 162 5 0 0 0 - - -;
+#X msg 6 77 81 28 0 33 55 1 2 3;
+#X text -45 -12 flist2tab loads floats or lists of floats into a table
 ;
-#X text 10 1 at an offset determined by a float in the second inlet.
+#X text -45 4 at an offset determined by a float in the second inlet.
 ;
-#X text 10 17 Negative offsets will be ignored.;
-#X obj 170 227 table twig;
-#X msg 91 104 set twig;
-#X text 148 103 set the working table;
-#X text 258 200 argument is table name;
-#X text 257 257 2009 1 21 Martin Peach;
-#X text 10 33 Offsets greater than the table length cause the table
+#X text -45 20 Negative offsets will be ignored.;
+#X obj -12 152 table twig;
+#X msg 36 107 set twig;
+#X text 93 106 set the working table;
+#X text 203 203 argument is table name;
+#X text -45 36 Offsets greater than the table length cause the table
 to be resized to fit.;
-#X text 279 159 default offset is 0;
+#X text 224 162 default offset is 0;
+#X floatatom 62 220 7 0 0 0 - - -;
+#X text 108 220 Array size is output after each input.;
+#X text 202 260 2009_01_28 Martin Peach;
+#X connect 1 0 15 0;
 #X connect 2 0 1 0;
 #X connect 3 0 2 0;
 #X connect 4 0 1 1;
