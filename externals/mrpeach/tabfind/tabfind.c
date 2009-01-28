@@ -19,6 +19,7 @@ typedef struct _tabfind
     t_int       x_nth; /* which match to find */
 } t_tabfind;
 
+static void tabfind_bang(t_tabfind *x);
 static void tabfind_float(t_tabfind *x, t_float f);
 static void tabfind_list(t_tabfind *x, t_symbol *s, int argc, t_atom *argv);
 static void tabfind_nth(t_tabfind *x, t_float nth);
@@ -88,6 +89,10 @@ static void tabfind_list(t_tabfind *x, t_symbol *s, int argc, t_atom *argv)
     }
 }
 
+static void tabfind_bang(t_tabfind *x)
+{
+}
+
 static void tabfind_float(t_tabfind *x, t_float f)
 {
     /* find the nth occurrence of the float f in the array */
@@ -143,6 +148,7 @@ void tabfind_setup(void)
 {
     tabfind_class = class_new(gensym("tabfind"), (t_newmethod)tabfind_new,
         0, sizeof(t_tabfind), 0, A_DEFSYM, 0);
+    class_addbang(tabfind_class, (t_method)tabfind_bang);
     class_addfloat(tabfind_class, (t_method)tabfind_float);
     class_addlist(tabfind_class, (t_method)tabfind_list); 
     class_addmethod(tabfind_class, (t_method)tabfind_nth, gensym("nth"), A_FLOAT, 0);
