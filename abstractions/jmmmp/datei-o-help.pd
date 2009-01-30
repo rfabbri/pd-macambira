@@ -1,4 +1,4 @@
-#N canvas 38 28 454 293 10;
+#N canvas 110 129 454 293 10;
 #X text 310 50 Inlets;
 #X text 310 100 Outlets;
 #X text 310 150 GUI;
@@ -16,8 +16,7 @@
 #X obj 22 160 print Datei_O;
 #X text 12 237 (C) 2006 João Pais - jmmmpais@googlemail.com;
 #X text 12 257 Released under the BSD License;
-#X text 13 206 This patch belongs to the group datei-o \, datei-r \,
-datei-w.;
+#X text 12 207 Related objects: [datei-r] [datei-w];
 #X connect 6 0 12 0;
 #X connect 8 0 12 0;
 #X connect 12 0 14 0;

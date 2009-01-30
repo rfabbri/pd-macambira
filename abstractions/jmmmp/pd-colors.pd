@@ -27,7 +27,7 @@ in the documentation and/or other materials provided with the distribution.
 #X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 140 pd license;
 #X text 12 122 (C) 2008 João Pais - jmmmpais@googlemail.com;
-#X text 112 15 PD Color Palettes;
+#X text 102 15 PD Color Palettes;
 #X text 15 59 Data Structures palette;
 #X text 15 47 Click the Bng for;
 #X text 185 47 Click the patch for;

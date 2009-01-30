@@ -1,4 +1,4 @@
-#N canvas 393 81 445 341 10;
+#N canvas 393 81 445 319 10;
 #X obj 19 135 outlet;
 #X obj 19 54 ctlin \$1;
 #X obj 99 54 inlet midi-sim;
@@ -9,13 +9,10 @@
 #X text 236 150 Inlets;
 #X text 236 200 Outlets;
 #X text 236 40 Arguments;
-#X text 236 60 - Input controller;
 #X text 236 80 - Lower range;
 #X text 236 170 - Controller simulation;
 #X text 236 220 - Scaled float;
 #X text 236 100 - Upper range;
-#X text 12 271 (C) 2006 João Pais - jmmmpais@googlemail.com
-;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
 #X text 8 227 The names of its contributors may not be used to endorse
@@ -44,21 +41,25 @@ in the documentation and/or other materials provided with the distribution.
 #X restore 15 289 pd license;
 #X obj 19 115 expr_scale 0 127 \$2 \$3;
 #X obj 109 165 outlet;
-#X obj 100 195 ctlout \$4;
 #X text 236 240 - Direct MIDI input;
-#X text 236 120 - MIDI feedback;
 #X obj 133 145 i;
+#X obj 99 225 ctlout \$1;
+#X obj 99 205 spigot \$4;
+#X text 235 120 - MIDI feedback on/off (1/0);
+#X text 236 60 - Controller channel;
+#X text 12 271 (C) 2009 João Pais - jmmmpais@googlemail.com;
 #X connect 1 0 4 0;
-#X connect 1 0 16 0;
-#X connect 1 0 17 0;
-#X connect 1 0 18 0;
+#X connect 1 0 14 0;
+#X connect 1 0 15 0;
+#X connect 1 0 19 0;
 #X connect 2 0 4 0;
-#X connect 2 0 16 0;
-#X connect 2 0 17 0;
-#X connect 2 0 18 0;
-#X connect 3 0 16 0;
-#X connect 3 0 21 0;
+#X connect 2 0 14 0;
+#X connect 2 0 15 0;
+#X connect 2 0 19 0;
+#X connect 3 0 14 0;
+#X connect 3 0 17 0;
 #X connect 4 0 3 0;
-#X connect 16 0 0 0;
-#X connect 21 0 17 0;
+#X connect 14 0 0 0;
+#X connect 17 0 15 0;
+#X connect 19 0 18 0;
 #X coords 0 -1 1 1 59 26 1 131 89;

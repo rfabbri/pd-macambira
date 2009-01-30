@@ -1,4 +1,4 @@
-#N canvas 340 87 592 458 10;
+#N canvas 340 87 581 451 10;
 #X obj 11 41 cnv 15 100 69 empty empty Stoppuhr 6 10 0 9 -195568 -1
 0;
 #X obj 85 374 textfile;
@@ -13,10 +13,10 @@
 #X obj 159 271 s \$0-sekt;
 #X msg 15 251 label \$1;
 #X obj 15 271 s \$0-tot;
-#X obj 15 86 cnv 15 92 20 empty \$0-sekt 0'3''422 6 11 0 10 -233017
--1 0;
-#X obj 15 61 cnv 15 92 20 empty \$0-tot 0'17''396 6 11 0 10 -233017
--1 0;
+#X obj 15 86 cnv 15 92 20 empty \$0-sekt empty 6 11 0 10 -233017 -1
+0;
+#X obj 15 61 cnv 15 92 20 empty \$0-tot empty 6 11 0 10 -233017 -1
+0;
 #N canvas 530 20 265 164 Kontrolle 0;
 #X text 10 55 Space - Reset;
 #X text 12 75 m - new section;
@@ -31,11 +31,11 @@
 #X obj 159 159 inlet;
 #X obj 12 129 tastin;
 #X obj 15 231 stoppuhr-clock;
-#X obj 94 281 outlet;
-#X obj 94 261 * 0.001;
+#X obj 96 271 outlet;
+#X obj 96 251 * 0.001;
 #X obj 159 231 stoppuhr-clock;
-#X obj 238 281 outlet;
-#X obj 238 261 * 0.001;
+#X obj 240 271 outlet;
+#X obj 240 251 * 0.001;
 #X obj 229 159 inlet offset;
 #X text 346 100 Inlets;
 #X text 346 170 Outlets;
@@ -82,8 +82,10 @@ in the documentation and/or other materials provided with the distribution.
 #X obj 78 307 * 0.001;
 #X obj 165 347 datei-w;
 #X msg 118 57 \; pd-Kontrolle vis \$1;
-#X obj 95 45 tgl 12 0 empty empty empty 0 -6 0 8 -166441 -1 -1 1 1
+#X obj 95 45 tgl 12 0 empty empty empty 0 -6 0 8 -166441 -1 -1 0 1
 ;
+#X msg 270 321 label;
+#X obj 270 301 loadbang;
 #X connect 2 0 1 0;
 #X connect 3 0 1 0;
 #X connect 4 0 22 0;
@@ -120,4 +122,7 @@ in the documentation and/or other materials provided with the distribution.
 #X connect 43 0 41 0;
 #X connect 44 0 1 0;
 #X connect 46 0 45 0;
+#X connect 47 0 10 0;
+#X connect 47 0 12 0;
+#X connect 48 0 47 0;
 #X coords 0 -1 1 1 100 69 1 11 41;

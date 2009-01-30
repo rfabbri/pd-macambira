@@ -16,8 +16,7 @@
 #X text 111 160 Message;
 #X text 12 237 (C) 2006 João Pais - jmmmpais@googlemail.com;
 #X text 12 257 Released under the BSD License;
-#X text 13 206 This patch belongs to the group datei-o \, datei-r \,
-datei-w.;
+#X text 12 208 Related objects: [datei-o] [datei-w];
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 3 0 1 0;

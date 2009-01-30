@@ -1,12 +1,12 @@
-#N canvas 539 156 376 360 10;
-#X text 12 327 Released under the BSD License;
+#N canvas 330 116 376 384 10;
+#X text 12 357 Released under the BSD License;
 #X obj 27 89 dsp01;
 #X obj 26 248 snaps~;
 #X text 78 147 Ramp duration in ms;
 #X msg 79 167 20;
 #X msg 79 207 1000;
 #X msg 79 187 400;
-#X text 12 307 (C) 2008 João Pais - jmmmpais@googlemail.com;
+#X text 12 337 (C) 2008 João Pais - jmmmpais@googlemail.com;
 #N canvas 0 0 396 219 floats 0;
 #X obj 47 95 outlet;
 #X obj 47 75 random 100;
@@ -30,6 +30,7 @@
 #X text 11 9 [liner+~] - Practical implementation of signal envelopping
 ;
 #X text 24 268 Scaled signal;
+#X text 12 307 Related objects: [liner~];
 #X connect 4 0 10 2;
 #X connect 5 0 10 2;
 #X connect 6 0 10 2;

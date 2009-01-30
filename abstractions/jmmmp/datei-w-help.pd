@@ -7,8 +7,6 @@
 #X text 310 120 - Message;
 #X msg 22 50 bang;
 #X text 120 80 Takes the file string;
-#X text 12 237 (C) 2006 João Pais - jmmmpais@googlemail.com;
-#X text 12 257 Released under the BSD License;
 #X msg 32 80 filename.ext;
 #X text 60 50 Opens up dialog;
 #X text 92 120 <- Or click on it;
@@ -16,9 +14,10 @@
 #X obj 22 120 datei-w;
 #X text 12 6 [datei-w] - Sends the message "write ../../";
 #X obj 22 160 print Datei_W;
-#X text 13 206 This patch belongs to the group datei-o \, datei-r \,
-datei-w.;
-#X connect 6 0 14 0;
-#X connect 10 0 14 0;
-#X connect 14 0 16 0;
+#X text 12 237 (C) 2006 João Pais - jmmmpais@googlemail.com;
+#X text 12 257 Released under the BSD License;
+#X text 12 207 Related objects: [datei-o] [datei-r];
+#X connect 6 0 12 0;
+#X connect 8 0 12 0;
+#X connect 12 0 14 0;
 #X coords 0 0 1 1 62 17 0;

@@ -1,7 +1,7 @@
-#N canvas 277 106 415 410 10;
+#N canvas 277 106 415 447 10;
 #X text 81 196 <- 0dB;
-#X text 12 357 (C) 2006 João Pais - jmmmpais@googlemail.com;
-#X text 12 377 Released under the BSD License;
+#X text 12 397 (C) 2006 João Pais - jmmmpais@googlemail.com;
+#X text 12 417 Released under the BSD License;
 #X text 230 105 Inlets;
 #X text 230 215 Outlets;
 #N canvas 0 0 396 219 signal 0;
@@ -50,6 +50,7 @@
 #X text 11 38 Controls the amplitude of a stereo signal with values
 between 0 and 127 Lighter as met~.;
 #X obj 16 85 dsp01;
+#X text 12 367 Related objects: [mat~] [met~];
 #X connect 5 0 17 0;
 #X connect 5 0 17 1;
 #X connect 5 1 17 3;

@@ -7,6 +7,7 @@ Released under the BSD license (more information in each abstraction).
 
 This package has several base utilities that make coding a bit easier (at least for me). It is composed of the following abstractions:
 
+array-edit - edit properties of arrays and populate them following several formulas
 clock - Chronometer with display in seconds
 datei-o - Sends the message "open ../../"
 datei-r - Sends the message "read ../../"
@@ -43,5 +44,5 @@ Non-working or discarded abstractions:
 
 aufnahme~ - Multichannel audio saver (1 to 8 channels)
 bcf2000 - Store and recall presets for Behringer BCF2000
--dsp01 - replaced by dsp01
+-dsp - replaced by dsp01
 datei-l - replaced with datei-o

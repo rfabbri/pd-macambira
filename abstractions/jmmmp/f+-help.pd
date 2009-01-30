@@ -1,6 +1,5 @@
-#N canvas 84 86 653 493 10;
-#X text 11 427 (C) 2006 João Pais - jmmmpais@googlemail.com
-;
+#N canvas 84 86 653 478 10;
+#X text 11 427 (C) 2006 João Pais - jmmmpais@googlemail.com;
 #X text 11 447 Released under the BSD License;
 #X text 11 10 [f+] - Counter with variable increment;
 #X msg 25 56 bang;

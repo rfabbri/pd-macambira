@@ -1,6 +1,6 @@
 #N canvas 108 117 718 384 10;
-#X text 12 317 (C) 2006 João Pais - jmmmpais@googlemail.com;
-#X text 12 337 Released under the BSD License;
+#X text 12 327 (C) 2006 João Pais - jmmmpais@googlemail.com;
+#X text 12 347 Released under the BSD License;
 #X text 476 70 Inlets;
 #X text 476 140 Outlets;
 #X text 12 10 [stoppuhr] - Chronometer with two layers;
@@ -29,6 +29,7 @@
 ;
 #X text 125 165 Click the right button to open the documentation window.
 ;
+#X text 12 295 Related objects: [clock] [uhr];
 #X connect 11 0 5 0;
 #X connect 11 1 6 0;
 #X connect 12 0 11 0;
