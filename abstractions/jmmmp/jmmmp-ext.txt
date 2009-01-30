@@ -9,6 +9,7 @@ This package has several base utilities that make coding a bit easier. It is com
 array-edit - edit properties of arrays and populate them following several formulas
 but - Monochrome bang button
 clock - Chronometer with display in seconds
+dacm~ - Mono dac~ for lazy people
 datei-o - Sends the message "open ../../"
 datei-r - Sends the message "read ../../"
 datei-w - Sends the message "write ../../"
@@ -43,7 +44,7 @@ It is recomended to use these abstractions with Pd-extended, since I don't keep 
 
 Non-working or discarded abstractions:
 
-aufnahme~ - Multichannel audio saver (1 to 8 channels)
+aufnahme~ - Multichannel audio recorder (1 to 8 channels)
 bcf2000 - Store and recall presets for Behringer BCF2000
 -dsp - replaced by dsp01
 datei-l - replaced with datei-o

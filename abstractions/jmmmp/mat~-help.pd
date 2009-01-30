@@ -46,7 +46,7 @@
 #X text 11 38 Controls the amplitude of a signal with values between
 0 and 127 Lighter as met~.;
 #X obj 16 85 dsp01;
-#X text 12 357 Related objects: [maat~] [met~];
+#X text 12 357 Related objects: [maat~] [met~] [dacm~];
 #X connect 5 0 19 0;
 #X connect 5 1 19 2;
 #X connect 8 0 19 1;

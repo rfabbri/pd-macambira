@@ -49,7 +49,7 @@ but doesn't look as nice.;
 #X msg 89 153 127;
 #X text 118 153 Control level;
 #X obj 16 85 dsp01;
-#X text 12 397 Related objects: [maat~] [mat~];
+#X text 12 397 Related objects: [maat~] [mat~] [dacm~];
 #X connect 6 0 9 0;
 #X connect 6 1 9 2;
 #X connect 9 0 7 0;

@@ -1,0 +1,19 @@
+#N canvas 71 205 407 362 10;
+#X text 12 327 Released under the BSD License;
+#X text 12 277 Related objects: [maat~] [mat~] [dacm~];
+#X text 11 8 [dacm~] - Mono dac~ for lazy people;
+#X text 220 155 Inlets;
+#X text 220 175 - Audio signal;
+#X text 220 205 Arguments;
+#X text 220 225 - Number of channels;
+#X text 11 40 Connects the audio input to how many dac channels you
+specify \, making a mono output.;
+#X obj 76 196 dacm~ 4;
+#X text 11 70 In case you don't give any arguments \, it assumes that
+you work with 2 channels. So \, [dacm~] == [dacm~ 2].;
+#X text 11 100 Only inconvenient: if you use more than one object \,
+the console will report some "connection failed" messages. But everything
+will work.;
+#X text 12 307 (C) 2009 João Pais - jmmmpais@googlemail.com;
+#X text 28 171 look inside to make sure;
+#X coords 0 0 1 1 31 130 0;

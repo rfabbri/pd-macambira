@@ -50,7 +50,7 @@
 #X text 11 38 Controls the amplitude of a stereo signal with values
 between 0 and 127 Lighter as met~.;
 #X obj 16 85 dsp01;
-#X text 12 367 Related objects: [mat~] [met~];
+#X text 12 367 Related objects: [mat~] [met~] [dacm~];
 #X connect 5 0 17 0;
 #X connect 5 0 17 1;
 #X connect 5 1 17 3;
