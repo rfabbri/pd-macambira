@@ -1,11 +1,10 @@
 Abstractions from João Pais
 
-
-(c) 2005-8 João Pais - jmmmpais@googlemail.com
+(c) 2005-9 João Pais - jmmmpais@googlemail.com
 Released under the BSD license (more information in each abstraction).
 
 
-This package has several base utilities that make coding a bit easier (at least for me). It is composed of the following abstractions:
+This package has several base utilities that make coding a bit easier. It is composed of the following abstractions:
 
 array-edit - edit properties of arrays and populate them following several formulas
 but - Monochrome bang button
@@ -31,6 +30,7 @@ pd-colors - Pd color palettes (Data Structures + Tcl/Tk)
 rec-name - Automatic naming for a record/playback engine
 sguigot - spigot GUI implementation
 snaps~ - snapshot~ GUI implementation
+spectrogram~ - Spectrogram with 512 bins resolution
 stoppuhr - Chronometer with two layers
 tastin - Gate for keyboard input
 uhr - Shows the time
@@ -38,7 +38,7 @@ uhr - Shows the time
 
 It is recomended to use these abstractions with Pd-extended, since I don't keep track of which externals are used. Some abstractions use other ones of this package, so it is also better to have always the whole package in one place.
 
-2008.10.21
+2009.01.30
 
 
 Non-working or discarded abstractions:
