@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -38,7 +38,7 @@ typedef struct _bin_ambi_calc_HRTF
 	BIN_AMBI_COMPLEX	*x_spec;
 	BIN_AMBI_COMPLEX	*x_sin_cos;
 	iemarray_t			*x_beg_fade_out_hrir;
-	float				*x_beg_hrir;
+	t_float				*x_beg_hrir;
 	iemarray_t			**x_beg_hrtf_re;
 	iemarray_t			**x_beg_hrtf_im;
 	t_symbol			**x_hrir_filename;
@@ -54,13 +54,13 @@ static t_class *bin_ambi_calc_HRTF_class;
 static void bin_ambi_calc_HRTF_init_cos(t_bin_ambi_calc_HRTF *x)
 {
 	int i, fftsize = x->x_fftsize;
-	float f, g;
+	t_float f, g;
 	BIN_AMBI_COMPLEX *sincos = x->x_sin_cos;
 
-	g = 2.0f * 3.1415926538f / (float)fftsize;
+	g = 2.0f * 3.1415926538f / (t_float)fftsize;
 	for(i=0; i<fftsize; i++)
 	{
-		f = g * (float)i;
+		f = g * (t_float)i;
 		(*sincos).real = cos(f);
 		(*sincos).imag = -sin(f);/*FFT*/
 		sincos++;
@@ -248,7 +248,7 @@ n_ambi  columns;
 n_ambi    rows;
 */
 
-static void bin_ambi_calc_HRTF_load_HRIR(t_bin_ambi_calc_HRTF *x, float findex)
+static void bin_ambi_calc_HRTF_load_HRIR(t_bin_ambi_calc_HRTF *x, t_float findex)
 {
 	int index=(int)findex - 1;
 	int p;
@@ -277,7 +277,7 @@ static void bin_ambi_calc_HRTF_load_HRIR(t_bin_ambi_calc_HRTF *x, float findex)
 	outlet_list(x->x_obj.ob_outlet, &s_list, 2, x->x_at);
 }
 
-static void bin_ambi_calc_HRTF_check_arrays(t_bin_ambi_calc_HRTF *x, float findex)
+static void bin_ambi_calc_HRTF_check_arrays(t_bin_ambi_calc_HRTF *x, t_float findex)
 {
 	int index=(int)findex - 1;
 	int j, k, n;
@@ -289,7 +289,7 @@ static void bin_ambi_calc_HRTF_check_arrays(t_bin_ambi_calc_HRTF *x, float finde
 	iemarray_t *vec_fade_out_hrir;
 	iemarray_t *vec_hrir, *vec_hrtf_re, *vec_hrtf_im;
 	t_symbol *hrir, *hrtf_re, *hrtf_im;
-	float decr, sum;
+	t_float decr, sum;
 
 	if(index < 0)
 		index = 0;
@@ -342,7 +342,7 @@ static void bin_ambi_calc_HRTF_check_arrays(t_bin_ambi_calc_HRTF *x, float finde
 			for(j=0; j<n; j++)
 			  vec[j] = iemarray_getfloat(vec_hrir,j);
 			sum = 1.0f;
-			decr = 4.0f / (float)fs2;
+			decr = 4.0f / (t_float)fs2;
 			for(j=n, k=0; j<fs2; j++, k++)
 			{
 				sum -= decr;
@@ -352,7 +352,7 @@ static void bin_ambi_calc_HRTF_check_arrays(t_bin_ambi_calc_HRTF *x, float finde
 	}
 }
 
-static void bin_ambi_calc_HRTF_calc_fft(t_bin_ambi_calc_HRTF *x, float findex)
+static void bin_ambi_calc_HRTF_calc_fft(t_bin_ambi_calc_HRTF *x, t_float findex)
 {
 	int index=(int)findex - 1;
 	int i, j, k, w_index, w_inc, i_inc, v_index, fs1, fs2;
@@ -425,16 +425,14 @@ static void bin_ambi_calc_HRTF_calc_fft(t_bin_ambi_calc_HRTF *x, float findex)
 			val[i] = old1;
 		}
 	}
-
-	iemarray_getfloat(vec_hrtf_re,0) = val[0].real;
-	iemarray_getfloat(vec_hrtf_im,0) = 0.0f;
-	for( i = 1; i < fs2; i++ )
-	{
-	  iemarray_getfloat(vec_hrtf_re,i) = 2.0f*val[i].real;
-	  iemarray_getfloat(vec_hrtf_im,i) = 2.0f*val[i].imag;
-	}
-	iemarray_getfloat(vec_hrtf_re,fs2) = 0.0f;
-	iemarray_getfloat(vec_hrtf_im,fs2) = 0.0f;
+  iemarray_setfloat(vec_hrtf_re, 0, val[0].real);
+  for(i = 1; i<fs2; i++)
+  {
+    iemarray_setfloat(vec_hrtf_re, i, 2.0f*val[i].real);
+    iemarray_setfloat(vec_hrtf_im, i, 2.0f*val[i].imag);
+  }
+  iemarray_setfloat(vec_hrtf_re, fs2, val[fs2].real);
+  iemarray_setfloat(vec_hrtf_im, fs2, 0.0f);
 }
 
 static void bin_ambi_calc_HRTF_free(t_bin_ambi_calc_HRTF *x)
@@ -450,9 +448,9 @@ static void bin_ambi_calc_HRTF_free(t_bin_ambi_calc_HRTF *x)
 	freebytes(x->x_spec, x->x_fftsize * sizeof(BIN_AMBI_COMPLEX));
 	freebytes(x->x_sin_cos, x->x_fftsize * sizeof(BIN_AMBI_COMPLEX));
 
-	freebytes(x->x_beg_hrir, x->x_fftsize * x->x_n_ls * sizeof(float));
-	freebytes(x->x_beg_hrtf_re, x->x_n_ls * sizeof(float *));
-	freebytes(x->x_beg_hrtf_im, x->x_n_ls * sizeof(float *));
+	freebytes(x->x_beg_hrir, x->x_fftsize * x->x_n_ls * sizeof(t_float));
+	freebytes(x->x_beg_hrtf_re, x->x_n_ls * sizeof(t_float *));
+	freebytes(x->x_beg_hrtf_im, x->x_n_ls * sizeof(t_float *));
 }
 
 /*
@@ -540,7 +538,7 @@ static void *bin_ambi_calc_HRTF_new(t_symbol *s, int argc, t_atom *argv)
 		x->x_sin_cos		= (BIN_AMBI_COMPLEX *)getbytes(x->x_fftsize * sizeof(BIN_AMBI_COMPLEX));
 
 		x->x_beg_fade_out_hrir	= 0;
-		x->x_beg_hrir						= (float *)getbytes(x->x_fftsize * x->x_n_ls * sizeof(float));
+		x->x_beg_hrir						= (t_float *)getbytes(x->x_fftsize * x->x_n_ls * sizeof(t_float));
 		x->x_beg_hrtf_re				= (iemarray_t **)getbytes(x->x_n_ls * sizeof(iemarray_t *));
 		x->x_beg_hrtf_im				= (iemarray_t **)getbytes(x->x_n_ls * sizeof(iemarray_t *));
 

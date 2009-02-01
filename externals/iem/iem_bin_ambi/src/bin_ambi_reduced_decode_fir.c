@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -53,7 +53,7 @@ typedef struct _bin_ambi_reduced_decode_fir
 	int						*x_phi_sym;
 	int						*x_sym_flag;
 	iemarray_t			*x_beg_fade_out_hrir;
-	float				*x_beg_hrir;
+	t_float				*x_beg_hrir;
 	iemarray_t			**x_beg_hrir_red;
 	t_symbol			**x_hrir_filename;
 	t_symbol			**x_s_hrir;
@@ -76,7 +76,7 @@ typedef struct _bin_ambi_reduced_decode_fir
 
 static t_class *bin_ambi_reduced_decode_fir_class;
 
-static void bin_ambi_reduced_decode_fir_quant(t_bin_ambi_reduced_decode_fir *x, double *delta_deg2rad, double *phi_deg2rad, int index)
+static void bin_ambi_reduced_decode_fir_quant(t_bin_ambi_reduced_decode_fir *x, double *delta_deg2rad, double *phi_deg2rad, int xindex)
 {
 	double q = 1.0;
 	double d = *delta_deg2rad;
@@ -172,8 +172,8 @@ static void bin_ambi_reduced_decode_fir_quant(t_bin_ambi_reduced_decode_fir *x, 
 	p = (double)i;
 	*phi_deg2rad = p;
 
-	x->x_delta[index] = (int)(*delta_deg2rad);
-	x->x_phi[index] = i;
+	x->x_delta[xindex] = (int)(*delta_deg2rad);
+	x->x_phi[xindex] = i;
 
 	*delta_deg2rad *= x->x_pi_over_180;
 	*phi_deg2rad *= x->x_pi_over_180;
@@ -183,7 +183,7 @@ static void bin_ambi_reduced_decode_fir_do_2d(t_bin_ambi_reduced_decode_fir *x, 
 {
 	double delta=0.0, phi;
 	double *dw = x->x_transp;
-	int index;
+	int xindex;
 	int order=x->x_n_order;
 
 	if(argc < 2)
@@ -191,23 +191,23 @@ static void bin_ambi_reduced_decode_fir_do_2d(t_bin_ambi_reduced_decode_fir *x, 
 		post("bin_ambi_reduced_decode_fir ERROR: ls-input needs 1 index and 1 angle: ls_index + phi [degree]");
 		return;
 	}
-	index = (int)atom_getint(argv++) - 1;
+	xindex = (int)atom_getint(argv++) - 1;
 	phi = (double)atom_getfloat(argv);
 
-	if(index < 0)
-		index = 0;
+	if(xindex < 0)
+		xindex = 0;
 	if(mode == BIN_AMBI_LS_IND)
 	{
-		if(index >= x->x_n_ind_ls)
-			index = x->x_n_ind_ls - 1;
+		if(xindex >= x->x_n_ind_ls)
+			xindex = x->x_n_ind_ls - 1;
 	}
 	else if(mode == BIN_AMBI_LS_MRG)
 	{
 		if(x->x_n_mrg_mir_ls)
 		{
-			if(index >= x->x_n_mrg_mir_ls)
-				index = x->x_n_mrg_mir_ls - 1;
-			index += x->x_n_ind_ls;
+			if(xindex >= x->x_n_mrg_mir_ls)
+				xindex = x->x_n_mrg_mir_ls - 1;
+			xindex += x->x_n_ind_ls;
 		}
 		else
 			return;
@@ -216,10 +216,10 @@ static void bin_ambi_reduced_decode_fir_do_2d(t_bin_ambi_reduced_decode_fir *x, 
 	{
 		if(x->x_n_mrg_mir_ls)
 		{
-			if(index >= x->x_n_mrg_mir_ls)
-				index = x->x_n_mrg_mir_ls - 1;
-			index += x->x_n_ind_ls;
-			index += x->x_n_mrg_mir_ls;
+			if(xindex >= x->x_n_mrg_mir_ls)
+				xindex = x->x_n_mrg_mir_ls - 1;
+			xindex += x->x_n_ind_ls;
+			xindex += x->x_n_mrg_mir_ls;
 		}
 		else
 			return;
@@ -228,10 +228,10 @@ static void bin_ambi_reduced_decode_fir_do_2d(t_bin_ambi_reduced_decode_fir *x, 
 	{
 		if(x->x_n_ph_ls)
 		{
-			if(index >= x->x_n_ph_ls)
-				index = x->x_n_ph_ls - 1;
-			index += x->x_n_ind_ls;
-			index += 2*x->x_n_mrg_mir_ls;
+			if(xindex >= x->x_n_ph_ls)
+				xindex = x->x_n_ph_ls - 1;
+			xindex += x->x_n_ind_ls;
+			xindex += 2*x->x_n_mrg_mir_ls;
 		}
 		else
 			return;
@@ -239,9 +239,9 @@ static void bin_ambi_reduced_decode_fir_do_2d(t_bin_ambi_reduced_decode_fir *x, 
 	else
 		return;
 
-	bin_ambi_reduced_decode_fir_quant(x, &delta, &phi, index);
+	bin_ambi_reduced_decode_fir_quant(x, &delta, &phi, xindex);
 
-	dw += index * x->x_n_ambi;
+	dw += xindex * x->x_n_ambi;
 
 	*dw++ = 1.0;
 	*dw++ = cos(phi);
@@ -318,7 +318,7 @@ static void bin_ambi_reduced_decode_fir_do_3d(t_bin_ambi_reduced_decode_fir *x, 
 	double delta, phi;
 	double cd, sd, cd2, cd3, sd2, csd, cp, sp, cp2, sp2, cp3, sp3, cp4, sp4;
 	double *dw = x->x_transp;
-	int index;
+	int xindex;
 	int order=x->x_n_order;
 
 	if(argc < 3)
@@ -326,24 +326,24 @@ static void bin_ambi_reduced_decode_fir_do_3d(t_bin_ambi_reduced_decode_fir *x, 
 		post("bin_ambi_reduced_decode_fir ERROR: ls-input needs 1 index and 2 angles: ls index + delta [degree] + phi [degree]");
 		return;
 	}
-	index = (int)atom_getint(argv++) - 1;
+	xindex = (int)atom_getint(argv++) - 1;
 	delta = atom_getfloat(argv++);
 	phi = atom_getfloat(argv);
 
-	if(index < 0)
-		index = 0;
+	if(xindex < 0)
+		xindex = 0;
 	if(mode == BIN_AMBI_LS_IND)
 	{
-		if(index >= x->x_n_ind_ls)
-			index = x->x_n_ind_ls - 1;
+		if(xindex >= x->x_n_ind_ls)
+			xindex = x->x_n_ind_ls - 1;
 	}
 	else if(mode == BIN_AMBI_LS_MRG)
 	{
 		if(x->x_n_mrg_mir_ls)
 		{
-			if(index >= x->x_n_mrg_mir_ls)
-				index = x->x_n_mrg_mir_ls - 1;
-			index += x->x_n_ind_ls;
+			if(xindex >= x->x_n_mrg_mir_ls)
+				xindex = x->x_n_mrg_mir_ls - 1;
+			xindex += x->x_n_ind_ls;
 		}
 		else
 			return;
@@ -352,10 +352,10 @@ static void bin_ambi_reduced_decode_fir_do_3d(t_bin_ambi_reduced_decode_fir *x, 
 	{
 		if(x->x_n_mrg_mir_ls)
 		{
-			if(index >= x->x_n_mrg_mir_ls)
-				index = x->x_n_mrg_mir_ls - 1;
-			index += x->x_n_ind_ls;
-			index += x->x_n_mrg_mir_ls;
+			if(xindex >= x->x_n_mrg_mir_ls)
+				xindex = x->x_n_mrg_mir_ls - 1;
+			xindex += x->x_n_ind_ls;
+			xindex += x->x_n_mrg_mir_ls;
 		}
 		else
 			return;
@@ -364,10 +364,10 @@ static void bin_ambi_reduced_decode_fir_do_3d(t_bin_ambi_reduced_decode_fir *x, 
 	{
 		if(x->x_n_ph_ls)
 		{
-			if(index >= x->x_n_ph_ls)
-				index = x->x_n_ph_ls - 1;
-			index += x->x_n_ind_ls;
-			index += 2*x->x_n_mrg_mir_ls;
+			if(xindex >= x->x_n_ph_ls)
+				xindex = x->x_n_ph_ls - 1;
+			xindex += x->x_n_ind_ls;
+			xindex += 2*x->x_n_mrg_mir_ls;
 		}
 		else
 			return;
@@ -375,14 +375,14 @@ static void bin_ambi_reduced_decode_fir_do_3d(t_bin_ambi_reduced_decode_fir *x, 
 	else
 		return;
 	
-	bin_ambi_reduced_decode_fir_quant(x, &delta, &phi, index);
+	bin_ambi_reduced_decode_fir_quant(x, &delta, &phi, xindex);
 
 	cd = cos(delta);
 	sd = sin(delta);
 	cp = cos(phi);
 	sp = sin(phi);
 	
-	dw += index * x->x_n_ambi;
+	dw += xindex * x->x_n_ambi;
 
 	*dw++ = 1.0;
 
@@ -726,7 +726,7 @@ static void bin_ambi_reduced_decode_fir_inverse(t_bin_ambi_reduced_decode_fir *x
 		nz = bin_ambi_reduced_decode_fir_eval_which_element_of_col_not_zero(x, i, i);
 		if(nz < 0)
 		{
-			post("bin_ambi_reduced_decode_fir ERROR: matrix not regular !!!!");
+			post("bin_ambi_reduced_decode_fir ERROR: matrix singular !!!!");
 			x->x_seq_ok = 0;
 			return;
 		}
@@ -795,38 +795,38 @@ n_ambi  columns;
 n_ambi    rows;
 */
 
-static void bin_ambi_reduced_decode_fir_load_HRIR(t_bin_ambi_reduced_decode_fir *x, float findex)
+static void bin_ambi_reduced_decode_fir_load_HRIR(t_bin_ambi_reduced_decode_fir *x, t_float findex)
 {
-	int index=(int)findex - 1;
+	int xindex=(int)findex - 1;
 	int p;
 	char buf[60];
 
-	if(index < 0)
-		index = 0;
-	if(index >= (x->x_n_ind_ls + x->x_n_mrg_mir_ls))
-		index = x->x_n_ind_ls + x->x_n_mrg_mir_ls - 1;
+	if(xindex < 0)
+		xindex = 0;
+	if(xindex >= (x->x_n_ind_ls + x->x_n_mrg_mir_ls))
+		xindex = x->x_n_ind_ls + x->x_n_mrg_mir_ls - 1;
 
-	p = x->x_phi[index];
+	p = x->x_phi[xindex];
 
 	if(p)/*change*/
 		p = 360 - p;
 
 	if(p < 10)
-		sprintf(buf, "L%de00%da.wav", x->x_delta[index], p);
+		sprintf(buf, "L%de00%da.wav", x->x_delta[xindex], p);
 	else if(p < 100)
-		sprintf(buf, "L%de0%da.wav", x->x_delta[index], p);
+		sprintf(buf, "L%de0%da.wav", x->x_delta[xindex], p);
 	else
-		sprintf(buf, "L%de%da.wav", x->x_delta[index], p);
-	x->x_hrir_filename[index] = gensym(buf);
+		sprintf(buf, "L%de%da.wav", x->x_delta[xindex], p);
+	x->x_hrir_filename[xindex] = gensym(buf);
 
-	SETSYMBOL(x->x_at, x->x_hrir_filename[index]);
-	SETSYMBOL(x->x_at+1, x->x_s_hrir[index]);
+	SETSYMBOL(x->x_at, x->x_hrir_filename[xindex]);
+	SETSYMBOL(x->x_at+1, x->x_s_hrir[xindex]);
 	outlet_list(x->x_obj.ob_outlet, &s_list, 2, x->x_at);
 }
 
-static void bin_ambi_reduced_decode_fir_check_HRIR_LS_arrays(t_bin_ambi_reduced_decode_fir *x, float findex)
+static void bin_ambi_reduced_decode_fir_check_HRIR_LS_arrays(t_bin_ambi_reduced_decode_fir *x, t_float findex)
 {
-	int index=(int)findex - 1;
+	int xindex=(int)findex - 1;
 	int j, k, n;
 	int firsize = x->x_firsize;
 	int fs2=firsize/2;
@@ -836,14 +836,14 @@ static void bin_ambi_reduced_decode_fir_check_HRIR_LS_arrays(t_bin_ambi_reduced_
 	iemarray_t *vec_hrir;
 	t_float *vec;
 	iemarray_t *vec_fade_out_hrir;
-	float decr, sum;
+	t_float decr, sum;
 
-	if(index < 0)
-		index = 0;
-	if(index >= (x->x_n_ind_ls + x->x_n_mrg_mir_ls))
-		index = x->x_n_ind_ls + x->x_n_mrg_mir_ls - 1;
+	if(xindex < 0)
+		xindex = 0;
+	if(xindex >= (x->x_n_ind_ls + x->x_n_mrg_mir_ls))
+		xindex = x->x_n_ind_ls + x->x_n_mrg_mir_ls - 1;
 
-	hrir = x->x_s_hrir[index];
+	hrir = x->x_s_hrir[xindex];
 	if (!(a = (t_garray *)pd_findbyclass(hrir, garray_class)))
 		error("%s: no such array", hrir->s_name);
 	else if (!iemarray_getarray(a, &npoints, &vec_hrir))
@@ -855,7 +855,7 @@ static void bin_ambi_reduced_decode_fir_check_HRIR_LS_arrays(t_bin_ambi_reduced_
 			post("bin_ambi_reduced_decode_fir-WARNING: %s-array-size: %d < FFT-size: %d", hrir->s_name, npoints, firsize);
 		}
 		vec = x->x_beg_hrir;
-		vec += index * firsize;
+		vec += xindex * firsize;
 	
 		if(x->x_beg_fade_out_hrir)
 		{
@@ -871,7 +871,7 @@ static void bin_ambi_reduced_decode_fir_check_HRIR_LS_arrays(t_bin_ambi_reduced_
 			for(j=0; j<n; j++)
 			  vec[j] = iemarray_getfloat(vec_hrir,j);
 			sum = 1.0f;
-			decr = 4.0f / (float)fs2;
+			decr = 4.0f / (t_float)fs2;
 			for(j=n, k=0; j<fs2; j++, k++)
 			{
 				sum -= decr;
@@ -881,21 +881,21 @@ static void bin_ambi_reduced_decode_fir_check_HRIR_LS_arrays(t_bin_ambi_reduced_
 	}
 }
 
-static void bin_ambi_reduced_decode_fir_check_HRIR_RED_arrays(t_bin_ambi_reduced_decode_fir *x, float findex)
+static void bin_ambi_reduced_decode_fir_check_HRIR_RED_arrays(t_bin_ambi_reduced_decode_fir *x, t_float findex)
 {
-	int index=(int)findex - 1;
+	int xindex=(int)findex - 1;
 	t_garray *a;
 	int npoints;
 	int firsize = x->x_firsize;
 	iemarray_t *vec_hrir_red;
 	t_symbol *hrir_red;
 
-	if(index < 0)
-		index = 0;
-	if(index >= x->x_n_ambi)
-		index = x->x_n_ambi - 1;
+	if(xindex < 0)
+		xindex = 0;
+	if(xindex >= x->x_n_ambi)
+		xindex = x->x_n_ambi - 1;
 
-	hrir_red = x->x_s_hrir_red[index];
+	hrir_red = x->x_s_hrir_red[xindex];
 
 	if (!(a = (t_garray *)pd_findbyclass(hrir_red, garray_class)))
 		error("%s: no such array", hrir_red->s_name);
@@ -905,48 +905,46 @@ static void bin_ambi_reduced_decode_fir_check_HRIR_RED_arrays(t_bin_ambi_reduced
 		error("%s: bad array-size: %d", hrir_red->s_name, npoints);
 	else
 	{
-	  x->x_beg_hrir_red[index] = vec_hrir_red;
+	  x->x_beg_hrir_red[xindex] = vec_hrir_red;
 	}
 }
 
-static void bin_ambi_reduced_decode_fir_calc_reduced(t_bin_ambi_reduced_decode_fir *x, float findex)
+static void bin_ambi_reduced_decode_fir_calc_reduced(t_bin_ambi_reduced_decode_fir *x, t_float findex)
 {
-	int index=(int)findex - 1;
+	int xindex=(int)findex - 1;
 	int i, j;
 	int firsize = x->x_firsize;
 	t_float *vec_hrir;
-	iemarray_t*vec_hrir_red;
+	iemarray_t *vec_hrir_red;
 	double *dv;
 	int n_ambi = x->x_n_ambi;
 	int n_ls = x->x_n_ind_ls + x->x_n_mrg_mir_ls;
-	float mul;
+	t_float mul;
 
 	if(x->x_seq_ok)
 	{
-		if(index < 0)
-			index = 0;
-		if(index >= n_ambi)
-			index = n_ambi - 1;
+		if(xindex < 0)
+			xindex = 0;
+		if(xindex >= n_ambi)
+			xindex = n_ambi - 1;
 
-		vec_hrir_red = x->x_beg_hrir_red[index];
+		vec_hrir_red = x->x_beg_hrir_red[xindex];
 
-		dv = x->x_prod3 + index;
-		mul = (float)(*dv);
+		dv = x->x_prod3 + xindex;
+		mul = (t_float)(*dv);
 		vec_hrir = x->x_beg_hrir;
 		for(i=0; i<firsize; i++)/*first step of acumulating the HRIRs*/
-		{
-		  iemarray_getfloat(vec_hrir_red,i) = mul * vec_hrir[i];
-		}
+		  iemarray_setfloat(vec_hrir_red, i, mul*vec_hrir[i]);
 
 		for(j=1; j<n_ls; j++)
 		{
 			dv += n_ambi;
-			mul = (float)(*dv);
+			mul = (t_float)(*dv);
 			vec_hrir = x->x_beg_hrir;
 			vec_hrir += j * firsize;
 			for(i=0; i<firsize; i++)
 			{
-			  iemarray_getfloat(vec_hrir_red,i) += mul * vec_hrir[i];
+			  iemarray_setfloat(vec_hrir_red, i, iemarray_getfloat(vec_hrir_red, i)+mul*vec_hrir[i]);
 			}
 		}
 	}
@@ -1073,7 +1071,7 @@ static void bin_ambi_reduced_decode_fir_calc_sym(t_bin_ambi_reduced_decode_fir *
 					SETFLOAT(x->x_at, 1.0f);
 				else if(plus_minus[i] == '-')
 					SETFLOAT(x->x_at, 2.0f);
-				SETFLOAT(x->x_at+1, (float)(i+1));
+				SETFLOAT(x->x_at+1, (t_float)(i+1));
 				outlet_list(x->x_out_sign_sum, &s_list, 2, x->x_at);
 			}
 		}
@@ -1152,8 +1150,8 @@ static void bin_ambi_reduced_decode_fir_free(t_bin_ambi_reduced_decode_fir *x)
 	freebytes(x->x_phi_sym, (x->x_n_ind_ls+x->x_n_mrg_mir_ls) * sizeof(int));
 	freebytes(x->x_sym_flag, (x->x_n_ind_ls+x->x_n_mrg_mir_ls) * sizeof(int));
 
-	freebytes(x->x_beg_hrir, x->x_firsize * (x->x_n_ind_ls+x->x_n_mrg_mir_ls) * sizeof(float));
-	freebytes(x->x_beg_hrir_red, x->x_n_ambi * sizeof(float *));
+	freebytes(x->x_beg_hrir, x->x_firsize * (x->x_n_ind_ls+x->x_n_mrg_mir_ls) * sizeof(t_float));
+	freebytes(x->x_beg_hrir_red, x->x_n_ambi * sizeof(iemarray_t *));
 }
 
 /*
@@ -1310,7 +1308,7 @@ static void *bin_ambi_reduced_decode_fir_new(t_symbol *s, int argc, t_atom *argv
 		x->x_sym_flag		= (int *)getbytes((x->x_n_ind_ls+x->x_n_mrg_mir_ls) * sizeof(int));
 
 		x->x_beg_fade_out_hrir	= 0;
-		x->x_beg_hrir						= (float *)getbytes(x->x_firsize * (x->x_n_ind_ls+x->x_n_mrg_mir_ls) * sizeof(float));
+		x->x_beg_hrir						= (t_float *)getbytes(x->x_firsize * (x->x_n_ind_ls+x->x_n_mrg_mir_ls) * sizeof(t_float));
 		x->x_beg_hrir_red				= (iemarray_t **)getbytes(x->x_n_ambi * sizeof(iemarray_t *));
 		
 		x->x_sqrt3				= sqrt(3.0);
