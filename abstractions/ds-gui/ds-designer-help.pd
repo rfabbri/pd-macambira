@@ -1,0 +1,6 @@
+#N canvas 346 399 450 300 10;
+#X obj 48 133 ds-designer;
+#X text 9 20 ds-designer: a tool for drawing complex shapes with [drawpolygon]/[filledpolygon]/[drawcurve]/[filledcurve]
+;
+#X text 252 252 2009 Luke Iannini;
+#X text 257 267 proyekto.net;
