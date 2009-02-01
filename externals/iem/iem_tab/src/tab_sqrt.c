@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -11,6 +11,23 @@ iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 
 #define TABDUMTAB1SIZE 256
 #define TABDUMTAB2SIZE 1024
 
+/* -------------------------- tab_sqrt ------------------------------ */
+/*   x_beg_mem_dst[i] = sqrt(x_beg_mem_src1[i])   */
+
+typedef struct _tab_sqrt
+{
+  t_object  x_obj;
+  int       x_size_src1;
+  int       x_size_dst;
+  int       x_offset_src1;
+  int       x_offset_dst;
+  iemarray_t   *x_beg_mem_src1;
+  iemarray_t   *x_beg_mem_dst;
+  t_symbol  *x_sym_scr1;
+  t_symbol  *x_sym_dst;
+} t_tab_sqrt;
+
+static t_class *tab_sqrt_class;
 static t_float tab_rsqrt_exptab[TABDUMTAB1SIZE], tab_rsqrt_mantissatab[TABDUMTAB2SIZE];
 
 static void init_tab_rsqrt(void)
@@ -34,24 +51,6 @@ static void init_tab_rsqrt(void)
   }
 }
 
-
-/* -------------------------- tab_sqrt ------------------------------ */
-
-typedef struct _tab_sqrt
-{
-  t_object  x_obj;
-  int       x_size_src1;
-  int       x_size_dst;
-  int       x_offset_src1;
-  int       x_offset_dst;
-  t_float   *x_beg_mem_src1;
-  t_float   *x_beg_mem_dst;
-  t_symbol  *x_sym_scr1;
-  t_symbol  *x_sym_dst;
-} t_tab_sqrt;
-
-static t_class *tab_sqrt_class;
-
 static void tab_sqrt_src(t_tab_sqrt *x, t_symbol *s)
 {
   x->x_sym_scr1 = s;
@@ -66,7 +65,7 @@ static void tab_sqrt_bang(t_tab_sqrt *x)
 {
   int i, n;
   int ok_src, ok_dst;
-  t_float *vec_src, *vec_dst;
+  iemarray_t *vec_src, *vec_dst;
   
   ok_src = iem_tab_check_arrays(gensym("tab_sqrt"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
   ok_dst = iem_tab_check_arrays(gensym("tab_sqrt"), x->x_sym_dst, &x->x_beg_mem_dst, &x->x_size_dst, 0);
@@ -83,18 +82,18 @@ static void tab_sqrt_bang(t_tab_sqrt *x)
     {
       t_garray *a;
       
-      while(n--)
+      for(i=0; i<n; i++)
       {
-        t_float f = *vec_src;
-        long l = *(long *)(vec_src++);
+        t_float f = iemarray_getfloat(vec_src, i);
+        long l = *(long *)(&f);
         
         if(f < 0.0f)
-          *vec_dst++ = 0.0f;
+          iemarray_setfloat(vec_dst, i, 0.0f);
         else
         {
           t_float g = tab_rsqrt_exptab[(l >> 23) & 0xff] * tab_rsqrt_mantissatab[(l >> 13) & 0x3ff];
           
-          *vec_dst++ = f*g*(1.5f - 0.5f * g * g * f);
+          iemarray_setfloat(vec_dst, i, f*g*(1.5f - 0.5f * g * g * f));
         }
       }
       outlet_bang(x->x_obj.ob_outlet);
@@ -109,7 +108,7 @@ static void tab_sqrt_list(t_tab_sqrt *x, t_symbol *s, int argc, t_atom *argv)
   int beg_src, beg_dst;
   int i, n;
   int ok_src, ok_dst;
-  t_float *vec_src, *vec_dst;
+  iemarray_t *vec_src, *vec_dst;
   
   if((argc >= 3) &&
     IS_A_FLOAT(argv,0) &&
@@ -137,18 +136,18 @@ static void tab_sqrt_list(t_tab_sqrt *x, t_symbol *s, int argc, t_atom *argv)
       {
         t_garray *a;
         
-        while(n--)
+        for(i=0; i<n; i++)
         {
-          t_float f = *vec_src;
-          long l = *(long *)(vec_src++);
+          t_float f = iemarray_getfloat(vec_src, i);
+          long l = *(long *)(&f);
           
           if(f < 0.0f)
-            *vec_dst++ = 0.0f;
+            iemarray_setfloat(vec_dst, i, 0.0f);
           else
           {
             t_float g = tab_rsqrt_exptab[(l >> 23) & 0xff] * tab_rsqrt_mantissatab[(l >> 13) & 0x3ff];
             
-            *vec_dst++ = f*g*(1.5f - 0.5f * g * g * f);
+            iemarray_setfloat(vec_dst, i, f*g*(1.5f - 0.5f * g * g * f));
           }
         }
         outlet_bang(x->x_obj.ob_outlet);

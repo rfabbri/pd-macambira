@@ -1,13 +1,15 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
 #include "iem_tab.h"
 
 /* -------------------------- tab_complex_inv ------------------------------ */
+/*   x_beg_mem_dst_re[i] = x_beg_mem_src1_re[i] / (x_beg_mem_src1_re[i]*x_beg_mem_src1_re[i] + x_beg_mem_src1_im[i]*x_beg_mem_src1_im[i])   */
+/*   x_beg_mem_dst_im[i] = -x_beg_mem_src1_im[i] / (x_beg_mem_src1_re[i]*x_beg_mem_src1_re[i] + x_beg_mem_src1_im[i]*x_beg_mem_src1_im[i])   */
 
 typedef struct _tab_complex_inv
 {
@@ -20,10 +22,10 @@ typedef struct _tab_complex_inv
   int       x_offset_dst_re;
   int       x_offset_src1_im;
   int       x_offset_dst_im;
-  t_float   *x_beg_mem_src1_re;
-  t_float   *x_beg_mem_dst_re;
-  t_float   *x_beg_mem_src1_im;
-  t_float   *x_beg_mem_dst_im;
+  iemarray_t   *x_beg_mem_src1_re;
+  iemarray_t   *x_beg_mem_dst_re;
+  iemarray_t   *x_beg_mem_src1_im;
+  iemarray_t   *x_beg_mem_dst_im;
   t_symbol  *x_sym_scr1_re;
   t_symbol  *x_sym_dst_re;
   t_symbol  *x_sym_scr1_im;
@@ -57,8 +59,8 @@ static void tab_complex_inv_bang(t_tab_complex_inv *x)
   int i, n;
   int ok_src1_re, ok_dst_re;
   int ok_src1_im, ok_dst_im;
-  t_float *vec_src1_re, *vec_dst_re;
-  t_float *vec_src1_im, *vec_dst_im;
+  iemarray_t *vec_src1_re, *vec_dst_re;
+  iemarray_t *vec_src1_im, *vec_dst_im;
   
   ok_src1_re = iem_tab_check_arrays(gensym("tab_complex_inv"), x->x_sym_scr1_re, &x->x_beg_mem_src1_re, &x->x_size_src1_re, 0);
   ok_dst_re = iem_tab_check_arrays(gensym("tab_complex_inv"), x->x_sym_dst_re, &x->x_beg_mem_dst_re, &x->x_size_dst_re, 0);
@@ -88,11 +90,11 @@ static void tab_complex_inv_bang(t_tab_complex_inv *x)
       {
         t_float re, im, abs;
         
-        re = vec_src1_re[i];
-        im = vec_src1_im[i];
+        re = iemarray_getfloat(vec_src1_re, i);
+        im = iemarray_getfloat(vec_src1_im, i);
         abs = 1.0f / (re*re + im*im);
-        vec_dst_re[i] = re*abs;
-        vec_dst_im[i] = -im*abs;
+        iemarray_setfloat(vec_dst_re, i, re*abs);
+        iemarray_setfloat(vec_dst_im, i, -im*abs);
       }
       outlet_bang(x->x_obj.ob_outlet);
       a = (t_garray *)pd_findbyclass(x->x_sym_dst_re, garray_class);
@@ -110,8 +112,8 @@ static void tab_complex_inv_list(t_tab_complex_inv *x, t_symbol *s, int argc, t_
   int beg_src1_im, beg_dst_im;
   int ok_src1_re, ok_dst_re;
   int ok_src1_im, ok_dst_im;
-  t_float *vec_src1_re, *vec_dst_re;
-  t_float *vec_src1_im, *vec_dst_im;
+  iemarray_t *vec_src1_re, *vec_dst_re;
+  iemarray_t *vec_src1_im, *vec_dst_im;
   
   if((argc >= 5) &&
     IS_A_FLOAT(argv,0) &&
@@ -156,11 +158,11 @@ static void tab_complex_inv_list(t_tab_complex_inv *x, t_symbol *s, int argc, t_
         {
           t_float re, im, abs;
           
-          re = vec_src1_re[i];
-          im = vec_src1_im[i];
+          re = iemarray_getfloat(vec_src1_re, i);
+          im = iemarray_getfloat(vec_src1_im, i);
           abs = 1.0f / (re*re + im*im);
-          vec_dst_re[i] = re*abs;
-          vec_dst_im[i] = -im*abs;
+          iemarray_setfloat(vec_dst_re, i, re*abs);
+          iemarray_setfloat(vec_dst_im, i, -im*abs);
         }
         outlet_bang(x->x_obj.ob_outlet);
         a = (t_garray *)pd_findbyclass(x->x_sym_dst_re, garray_class);
@@ -185,7 +187,6 @@ static void *tab_complex_inv_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_tab_complex_inv *x = (t_tab_complex_inv *)pd_new(tab_complex_inv_class);
   t_symbol  *src1_re, *src2_re, *dst_re, *src1_im, *src2_im, *dst_im;
-  t_float time;
   
   if((argc >= 4) &&
     IS_A_SYMBOL(argv,0) &&

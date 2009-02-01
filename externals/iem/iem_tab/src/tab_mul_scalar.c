@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -9,6 +9,7 @@ iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 
 
 
 /* -------------------------- tab_mul_scalar ------------------------------ */
+/*   x_beg_mem_dst[i] = x_beg_mem_src1[i]*m   */
 
 typedef struct _tab_mul_scalar
 {
@@ -17,8 +18,8 @@ typedef struct _tab_mul_scalar
   int       x_size_dst;
   int       x_offset_src1;
   int       x_offset_dst;
-  t_float   *x_beg_mem_src1;
-  t_float   *x_beg_mem_dst;
+  iemarray_t   *x_beg_mem_src1;
+  iemarray_t   *x_beg_mem_dst;
   t_symbol  *x_sym_scr1;
   t_symbol  *x_sym_dst;
 } t_tab_mul_scalar;
@@ -34,7 +35,7 @@ static void tab_mul_scalar_float(t_tab_mul_scalar *x, t_floatarg m)
 {
   int i, n;
   int ok_src1, ok_dst;
-  t_float *vec_src1, *vec_dst;
+  iemarray_t *vec_src1, *vec_dst;
   
   ok_src1 = iem_tab_check_arrays(gensym("tab_mul_scalar"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
   ok_dst = iem_tab_check_arrays(gensym("tab_mul_scalar"), x->x_sym_dst, &x->x_beg_mem_dst, &x->x_size_dst, 0);
@@ -71,7 +72,8 @@ static void tab_mul_scalar_list(t_tab_mul_scalar *x, t_symbol *s, int argc, t_at
   int beg_src1, beg_dst;
   int i, n;
   int ok_src1, ok_dst;
-  t_float *vec_src1, *vec_dst, m;
+  t_float m;
+  iemarray_t *vec_src1, *vec_dst;
   
   if((argc >= 4) &&
     IS_A_FLOAT(argv,0) &&

@@ -1,5 +1,5 @@
-#N canvas 116 92 794 421 10;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 116 92 798 425 10;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array src 100 float 1;
 #A 0 -0.442858 -0.414287 -0.385715 -0.342858 -0.314287 -0.257144 -0.128572
 -0.0428573 0.128572 0.228572 0.285715 0.328572 0.400001 0.414287 0.457144
@@ -30,11 +30,10 @@
 #X msg 59 188 50 20;
 #X floatatom 120 305 5 0 0 0 - - -;
 #X text 75 364 IEM KUG;
-#X text 59 352 musil;
+#X text 54 352 musil;
 #X text 89 352 @;
-#X text 95 352 iem.at;
+#X text 97 352 iem.at;
 #X text 58 374 Graz \, Austria;
-#X text 10 341 (c) Thomas Musil 2000 - 2006;
 #X text 90 29 <bang> calc sum of all array elements;
 #X text 182 234 initial arguments:;
 #X text 65 260 <bang> output;
@@ -46,6 +45,8 @@
 #X text 118 118 sum value;
 #X text 43 150 list of 2 floats:;
 #X text 55 160 1.) src onset;
+#X msg 391 84 \; src const 0.5;
+#X text 10 341 (c) Thomas Musil 2000 - 2009;
 #X connect 1 0 5 0;
 #X connect 4 0 7 0;
 #X connect 5 0 2 0;

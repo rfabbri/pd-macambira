@@ -1,5 +1,5 @@
-#N canvas 116 92 782 409 10;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 369 22 790 417 10;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array src 100 float 1;
 #A 0 -0.442858 -0.414287 -0.385715 -0.342858 -0.314287 -0.257144 -0.128572
 -0.0428573 0.128572 0.228572 0.285715 0.328572 0.400001 0.414287 0.457144
@@ -17,7 +17,7 @@
 0.357144 0.357144 0.342858 0.328572;
 #X coords 0 1 99 -1 200 140 1;
 #X restore 534 10 graph;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array dst 100 float 0;
 #X coords 0 1 99 -1 200 140 1;
 #X restore 534 166 graph;
@@ -36,11 +36,10 @@
 #X obj 61 78 tab_abs src dst;
 #X obj 59 264 tab_abs src dst;
 #X text 78 365 IEM KUG;
-#X text 62 353 musil;
+#X text 57 353 musil;
 #X text 92 353 @;
-#X text 98 353 iem.at;
+#X text 100 353 iem.at;
 #X text 61 375 Graz \, Austria;
-#X text 13 342 (c) Thomas Musil 2000 - 2006;
 #X text 12 3 tab_abs;
 #X text 90 29 <bang> copy absolute-value from src to dst;
 #X text 56 165 1.) src onset;
@@ -53,6 +52,7 @@
 #X text 188 83 the minimum of both array lengths);
 #X text 56 185 3.) n samples to copy;
 #X text 190 185 absolute value;
+#X text 13 342 (c) Thomas Musil 2000 - 2009;
 #X connect 2 0 11 0;
 #X connect 5 0 12 0;
 #X connect 9 0 12 0;

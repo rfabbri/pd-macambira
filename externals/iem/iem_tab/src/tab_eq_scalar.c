@@ -1,13 +1,17 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
 #include "iem_tab.h"
 
 /* -------------------------- tab_eq_scalar ------------------------------ */
+/*  if(x_beg_mem_src1[i] == compare)   */
+/*    x_beg_mem_dst[i] = 1.0f;      */
+/*  else                            */
+/*    x_beg_mem_dst[i] += 0.0f;     */
 
 typedef struct _tab_eq_scalar
 {
@@ -16,8 +20,8 @@ typedef struct _tab_eq_scalar
   int       x_size_dst;
   int       x_offset_src1;
   int       x_offset_dst;
-  t_float   *x_beg_mem_src1;
-  t_float   *x_beg_mem_dst;
+  iemarray_t   *x_beg_mem_src1;
+  iemarray_t   *x_beg_mem_dst;
   t_symbol  *x_sym_scr1;
   t_symbol  *x_sym_dst;
 } t_tab_eq_scalar;
@@ -33,7 +37,7 @@ static void tab_eq_scalar_float(t_tab_eq_scalar *x, t_floatarg compare)
 {
   int i, n;
   int ok_src1, ok_dst;
-  t_float *vec_src1, *vec_dst;
+  iemarray_t *vec_src1, *vec_dst;
   
   ok_src1 = iem_tab_check_arrays(gensym("tab_eq_scalar"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
   ok_dst = iem_tab_check_arrays(gensym("tab_eq_scalar"), x->x_sym_dst, &x->x_beg_mem_dst, &x->x_size_dst, 0);
@@ -53,10 +57,10 @@ static void tab_eq_scalar_float(t_tab_eq_scalar *x, t_floatarg compare)
       
       for(i=0; i<n; i++)
       {
-        if(vec_src1[i] == compare)
-          vec_dst[i] = 1.0f;
+        if(iemarray_getfloat(vec_src1, i) == compare)
+          iemarray_setfloat(vec_dst, i, 1.0f);
         else
-          vec_dst[i] = 0.0f;
+          iemarray_setfloat(vec_dst, i, 0.0f);
       }
       outlet_bang(x->x_obj.ob_outlet);
       a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
@@ -75,7 +79,8 @@ static void tab_eq_scalar_list(t_tab_eq_scalar *x, t_symbol *s, int argc, t_atom
   int beg_src1, beg_dst;
   int i, n;
   int ok_src1, ok_dst;
-  t_float *vec_src1, *vec_dst, compare;
+  iemarray_t *vec_src1, *vec_dst;
+  t_float compare;
   
   if((argc >= 4) &&
     IS_A_FLOAT(argv,0) &&
@@ -107,10 +112,10 @@ static void tab_eq_scalar_list(t_tab_eq_scalar *x, t_symbol *s, int argc, t_atom
         
         for(i=0; i<n; i++)
         {
-          if(vec_src1[i] == compare)
-            vec_dst[i] = 1.0f;
+          if(iemarray_getfloat(vec_src1, i) == compare)
+            iemarray_setfloat(vec_dst, i, 1.0f);
           else
-            vec_dst[i] = 0.0f;
+            iemarray_setfloat(vec_dst, i, 0.0f);
         }
         outlet_bang(x->x_obj.ob_outlet);
         a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);

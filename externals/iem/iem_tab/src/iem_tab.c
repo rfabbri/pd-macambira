@@ -1,12 +1,12 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
 
-int iem_tab_check_arrays(t_symbol *obj_name, t_symbol *array_name, t_float **beg_mem, int *array_size, int max_index)
+int iem_tab_check_arrays(t_symbol *obj_name, t_symbol *array_name, iemarray_t **beg_mem, int *array_size, int max_index)
 {
   int ok=1;
   t_garray *a;
@@ -16,7 +16,7 @@ int iem_tab_check_arrays(t_symbol *obj_name, t_symbol *array_name, t_float **beg
     error("%s: no such array", array_name->s_name);
     ok = 0;
   }
-  else if(!garray_getfloatarray(a, array_size, beg_mem))
+  else if(!iemarray_getarray(a, array_size, beg_mem))
   {
     error("%s: bad template for %s", array_name->s_name, obj_name->s_name);
     ok = 0;
@@ -64,6 +64,7 @@ void tab_find_exact_peaks_setup(void);
 void tab_find_peaks_setup(void);
 void tab_ge_setup(void);
 void tab_ge_scalar_setup(void);
+void tab_get_size_setup(void);
 void tab_gt_setup(void);
 void tab_gt_scalar_setup(void);
 void tab_ifft_setup(void);
@@ -114,6 +115,7 @@ void iem_tab_setup(void)
   tab_ge_scalar_setup();
   tab_gt_setup();
   tab_gt_scalar_setup();
+  tab_get_size_setup();
   tab_ifft_setup();
   tab_le_setup();
   tab_le_scalar_setup();
@@ -134,7 +136,7 @@ void iem_tab_setup(void)
   tab_sub_setup();
   tab_sum_setup();
   
-  post("iem_tab (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
+  post("iem_tab (R-1.18) library loaded!   (c) Thomas Musil 01.2009");
   post("   musil%ciem.at iem KUG Graz Austria", '@');
 }
 

@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -17,9 +17,9 @@ typedef struct _tab_cross_corr
   int       x_size_src2;
   int       x_size_dst;
   int       x_n;
-  t_float   *x_beg_mem_src1;
-  t_float   *x_beg_mem_src2;
-  t_float   *x_beg_mem_dst;
+  iemarray_t   *x_beg_mem_src1;
+  iemarray_t   *x_beg_mem_src2;
+  iemarray_t   *x_beg_mem_dst;
   t_float   x_factor;
   t_symbol  *x_sym_scr1;
   t_symbol  *x_sym_scr2;
@@ -36,7 +36,8 @@ static void tab_cross_corr_tick(t_tab_cross_corr *x)
   x->x_counter++;
   if(x->x_counter < x->x_n)
   {
-    t_float *vec_src1, *vec_src2, *vec_dst, sum;
+    iemarray_t *vec_src1, *vec_src2, *vec_dst;
+    t_float sum;
     int j, m;
     
     vec_src1 = x->x_beg_mem_src1 + x->x_counter;
@@ -46,9 +47,9 @@ static void tab_cross_corr_tick(t_tab_cross_corr *x)
     sum = 0.0f;
     for(j=0; j<m; j++)
     {
-      sum += vec_src1[j]*vec_src2[j];
+      sum += iemarray_getfloat(vec_src1, j)*iemarray_getfloat(vec_src2, j);
     }
-    vec_dst[0] = sum*x->x_factor;
+    iemarray_setfloat(vec_dst, 0, sum*x->x_factor);
     clock_delay(x->x_clock, x->x_delay);
   }
   else
@@ -62,12 +63,12 @@ static void tab_cross_corr_tick(t_tab_cross_corr *x)
   }
 }
 
-static void tab_cross_corr_time(t_tab_cross_corr *x, t_floatarg time)
+static void tab_cross_corr_time(t_tab_cross_corr *x, t_floatarg dtime)
 {
-  if(time < 0.0f)
-    time = 0.0f;
+  if(dtime < 0.0f)
+    dtime = 0.0f;
   
-  x->x_delay = time;
+  x->x_delay = dtime;
 }
 
 static void tab_cross_corr_factor(t_tab_cross_corr *x, t_floatarg factor)
@@ -94,7 +95,7 @@ static void tab_cross_corr_bang(t_tab_cross_corr *x)
 {
   int i, j, m, n;
   int ok_src1, ok_src2, ok_dst;
-  t_float *vec_src1, *vec_src2, *vec_dst;
+  iemarray_t *vec_src1, *vec_src2, *vec_dst;
   t_float sum, f;
   
   ok_src1 = iem_tab_check_arrays(gensym("tab_cross_corr"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
@@ -127,9 +128,9 @@ static void tab_cross_corr_bang(t_tab_cross_corr *x)
           sum = 0.0f;
           for(j=0; j<m; j++)
           {
-            sum += vec_src1[i+j]*vec_src2[j];
+            sum += iemarray_getfloat(vec_src1, i+j)*iemarray_getfloat(vec_src2, j);
           }
-          vec_dst[i] = sum*f;
+          iemarray_setfloat(vec_dst, i, sum*f);
         }
         outlet_bang(x->x_obj.ob_outlet);
         a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
@@ -145,10 +146,9 @@ static void tab_cross_corr_bang(t_tab_cross_corr *x)
         sum = 0.0f;
         for(j=0; j<m; j++)
         {
-          sum += vec_src1[j]*vec_src2[j];
+          sum += iemarray_getfloat(vec_src1, j)*iemarray_getfloat(vec_src2, j);
         }
-        vec_dst[0] = sum*f;
-        
+        iemarray_setfloat(vec_dst, 0, sum*f);
         clock_delay(x->x_clock, x->x_delay);
       }
     }
@@ -164,20 +164,20 @@ static void *tab_cross_corr_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_tab_cross_corr *x = (t_tab_cross_corr *)pd_new(tab_cross_corr_class);
   t_symbol  *src1, *src2, *dst;
-  t_float time, factor;
+  t_float dtime=0.0f, factor=1.0f;
   
+  if((argc >= 5) && IS_A_FLOAT(argv,4))
+    dtime = (t_float)atom_getfloatarg(4, argc, argv);
+  if((argc >= 4) && IS_A_FLOAT(argv,3))
+    factor = (t_float)atom_getfloatarg(3, argc, argv);
   if((argc >= 3) &&
     IS_A_SYMBOL(argv,0) &&
     IS_A_SYMBOL(argv,1) &&
-    IS_A_SYMBOL(argv,2) &&
-    IS_A_FLOAT(argv,3) &&
-    IS_A_FLOAT(argv,4))
+    IS_A_SYMBOL(argv,2))
   {
     src1 = (t_symbol *)atom_getsymbolarg(0, argc, argv);
     src2 = (t_symbol *)atom_getsymbolarg(1, argc, argv);
     dst = (t_symbol *)atom_getsymbolarg(2, argc, argv);
-    factor = (t_float)atom_getfloatarg(3, argc, argv);
-    time = (t_float)atom_getfloatarg(4, argc, argv);
   }
   else
   {
@@ -186,10 +186,10 @@ static void *tab_cross_corr_new(t_symbol *s, int argc, t_atom *argv)
     return(0);
   }
   
-  if(time < 0.0f)
-    time = 0.0f;
+  if(dtime < 0.0f)
+    dtime = 0.0f;
   
-  x->x_delay = time;
+  x->x_delay = dtime;
   x->x_factor = factor;
   x->x_sym_scr1 = src1;
   x->x_sym_scr2 = src2;

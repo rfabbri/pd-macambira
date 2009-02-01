@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -9,6 +9,8 @@ iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 
 #include <math.h>
 
 /* -------------------------- tab_carth2polar ------------------------------ */
+/*   x_beg_mem_dst_mag[i] = sqrt(x_beg_mem_src_re[i]*x_beg_mem_src_re[i] + x_beg_mem_src_im[i]*x_beg_mem_src_im[i])   */
+/*   x_beg_mem_dst_arg[i] = atan2(x_beg_mem_src_im[i], x_beg_mem_src_re[i])   */
 
 typedef struct _tab_carth2polar
 {
@@ -21,10 +23,10 @@ typedef struct _tab_carth2polar
   int       x_offset_dst_mag;
   int       x_offset_src_im;
   int       x_offset_dst_arg;
-  t_float   *x_beg_mem_src_re;
-  t_float   *x_beg_mem_dst_mag;
-  t_float   *x_beg_mem_src_im;
-  t_float   *x_beg_mem_dst_arg;
+  iemarray_t   *x_beg_mem_src_re;
+  iemarray_t   *x_beg_mem_dst_mag;
+  iemarray_t   *x_beg_mem_src_im;
+  iemarray_t   *x_beg_mem_dst_arg;
   t_symbol  *x_sym_src_re;
   t_symbol  *x_sym_dst_mag;
   t_symbol  *x_sym_src_im;
@@ -58,8 +60,8 @@ static void tab_carth2polar_bang(t_tab_carth2polar *x)
   int i, n;
   int ok_src_re, ok_dst_mag;
   int ok_src_im, ok_dst_arg;
-  t_float *vec_src_re, *vec_dst_mag;
-  t_float *vec_src_im, *vec_dst_arg;
+  iemarray_t *vec_src_re, *vec_dst_mag;
+  iemarray_t *vec_src_im, *vec_dst_arg;
   
   ok_src_re = iem_tab_check_arrays(gensym("tab_carth2polar"), x->x_sym_src_re, &x->x_beg_mem_src_re, &x->x_size_src_re, 0);
   ok_dst_mag = iem_tab_check_arrays(gensym("tab_carth2polar"), x->x_sym_dst_mag, &x->x_beg_mem_dst_mag, &x->x_size_dst_mag, 0);
@@ -90,12 +92,14 @@ static void tab_carth2polar_bang(t_tab_carth2polar *x)
       {
         t_float re, im, mag, arg;
         
-        re = vec_src_re[i];
-        im = vec_src_im[i];
+        re = iemarray_getfloat(vec_src_re, i);
+        im = iemarray_getfloat(vec_src_im, i);
         mag = sqrt(re*re + im*im);
         arg = atan2(im, re) * rcp_two_pi;
         vec_dst_mag[i] = mag;
         vec_dst_arg[i] = arg;
+        iemarray_setfloat(vec_dst_mag, i, mag);
+        iemarray_setfloat(vec_dst_arg, i, arg);
       }
       outlet_bang(x->x_obj.ob_outlet);
       a = (t_garray *)pd_findbyclass(x->x_sym_dst_mag, garray_class);
@@ -113,8 +117,8 @@ static void tab_carth2polar_list(t_tab_carth2polar *x, t_symbol *s, int argc, t_
   int beg_src_im, beg_dst_arg;
   int ok_src_re, ok_dst_mag;
   int ok_src_im, ok_dst_arg;
-  t_float *vec_src_re, *vec_dst_mag;
-  t_float *vec_src_im, *vec_dst_arg;
+  iemarray_t *vec_src_re, *vec_dst_mag;
+  iemarray_t *vec_src_im, *vec_dst_arg;
   
   if((argc >= 5) &&
     IS_A_FLOAT(argv,0) &&
@@ -160,12 +164,12 @@ static void tab_carth2polar_list(t_tab_carth2polar *x, t_symbol *s, int argc, t_
         {
           t_float re, im, mag, arg;
           
-          re = vec_src_re[i];
-          im = vec_src_im[i];
+          re = iemarray_getfloat(vec_src_re, i);
+          im = iemarray_getfloat(vec_src_im, i);
           mag = sqrt(re*re + im*im);
           arg = atan2(im, re) * rcp_two_pi;
-          vec_dst_mag[i] = mag;
-          vec_dst_arg[i] = arg;
+          iemarray_setfloat(vec_dst_mag, i, mag);
+          iemarray_setfloat(vec_dst_arg, i, arg);
         }
         outlet_bang(x->x_obj.ob_outlet);
         a = (t_garray *)pd_findbyclass(x->x_sym_dst_mag, garray_class);
@@ -190,7 +194,6 @@ static void *tab_carth2polar_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_tab_carth2polar *x = (t_tab_carth2polar *)pd_new(tab_carth2polar_class);
   t_symbol  *src_re, *dst_mag, *src_im, *dst_arg;
-  t_float time;
   
   if((argc >= 4) &&
     IS_A_SYMBOL(argv,0) &&

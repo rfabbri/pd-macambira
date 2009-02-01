@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 
 #include "m_pd.h"
@@ -18,8 +18,8 @@ typedef struct _tab_reverse
   int       x_size_dst;
   int       x_offset_src1;
   int       x_offset_dst;
-  t_float   *x_beg_mem_src1;
-  t_float   *x_beg_mem_dst;
+  iemarray_t   *x_beg_mem_src1;
+  iemarray_t   *x_beg_mem_dst;
   t_symbol  *x_sym_scr1;
   t_symbol  *x_sym_dst;
 } t_tab_reverse;
@@ -38,9 +38,10 @@ static void tab_reverse_dst(t_tab_reverse *x, t_symbol *s)
 
 static void tab_reverse_bang(t_tab_reverse *x)
 {
-  int i, j, n;
+  int i, j, n, n2;
   int ok_src, ok_dst;
-  t_float *vec_src, *vec_dst;
+  iemarray_t *vec_src, *vec_dst;
+  t_float f;
   
   ok_src = iem_tab_check_arrays(gensym("tab_reverse"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
   ok_dst = iem_tab_check_arrays(gensym("tab_reverse"), x->x_sym_dst, &x->x_beg_mem_dst, &x->x_size_dst, 0);
@@ -53,12 +54,17 @@ static void tab_reverse_bang(t_tab_reverse *x)
       n = x->x_size_dst;
     vec_src = x->x_beg_mem_src1;
     vec_dst = x->x_beg_mem_dst;
+    n2 = n/2;
     if(n)
     {
       t_garray *a;
       
-      for(i=0, j=n-1; i<n; i++, j--)
-        vec_dst[i] = vec_src[j];
+      for(i=0, j=n-1; i<n2; i++, j--)
+      {
+        f = iemarray_getfloat(vec_src, i);
+        iemarray_setfloat(vec_dst, i, iemarray_getfloat(vec_src, j));
+        iemarray_setfloat(vec_dst, j, f);
+      }
       outlet_bang(x->x_obj.ob_outlet);
       a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
       garray_redraw(a);
@@ -69,9 +75,10 @@ static void tab_reverse_bang(t_tab_reverse *x)
 static void tab_reverse_list(t_tab_reverse *x, t_symbol *s, int argc, t_atom *argv)
 {
   int beg_src, beg_dst;
-  int i, j, n;
+  int i, j, n, n2;
   int ok_src, ok_dst;
-  t_float *vec_src, *vec_dst;
+  iemarray_t *vec_src, *vec_dst;
+  t_float f;
   
   if((argc >= 3) &&
     IS_A_FLOAT(argv,0) &&
@@ -95,12 +102,17 @@ static void tab_reverse_list(t_tab_reverse *x, t_symbol *s, int argc, t_atom *ar
     {
       vec_src = x->x_beg_mem_src1 + beg_src;
       vec_dst = x->x_beg_mem_dst + beg_dst;
+      n2 = n/2;
       if(n)
       {
         t_garray *a;
         
-        for(i=0, j=n-1; i<n; i++, j--)
-          vec_dst[i] = vec_src[j];
+        for(i=0, j=n-1; i<n2; i++, j--)
+        {
+          f = iemarray_getfloat(vec_src, i);
+          iemarray_setfloat(vec_dst, i, iemarray_getfloat(vec_src, j));
+          iemarray_setfloat(vec_dst, j, f);
+        }
         outlet_bang(x->x_obj.ob_outlet);
         a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
         garray_redraw(a);

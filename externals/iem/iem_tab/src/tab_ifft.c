@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -9,6 +9,7 @@ iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 
 #include <math.h>
 
 /* -------------------------- tab_ifft ------------------------------ */
+/*  complex inverse FFT  */
 
 typedef struct _tab_ifft
 {
@@ -22,10 +23,10 @@ typedef struct _tab_ifft
   int       x_offset_dst_re;
   int       x_offset_dst_im;
   int       x_fftsize;
-  t_float   *x_beg_mem_src_re;
-  t_float   *x_beg_mem_src_im;
-  t_float   *x_beg_mem_dst_re;
-  t_float   *x_beg_mem_dst_im;
+  iemarray_t   *x_beg_mem_src_re;
+  iemarray_t   *x_beg_mem_src_im;
+  iemarray_t   *x_beg_mem_dst_re;
+  iemarray_t   *x_beg_mem_dst_im;
   TAB_COMPLEX   *x_sin_cos;
   t_symbol  *x_sym_src_re;
   t_symbol  *x_sym_src_im;
@@ -100,7 +101,7 @@ static void tab_ifft_bang(t_tab_ifft *x)
   int fs2 = fftsize / 2;
   TAB_COMPLEX w;
   TAB_COMPLEX *sincos = x->x_sin_cos;
-  t_float *vec_src_re, *vec_src_im, *vec_dst_re, *vec_dst_im;
+  iemarray_t *vec_src_re, *vec_src_im, *vec_dst_re, *vec_dst_im;
   t_float old1_re, old1_im, old2_re, old2_im, g;
   
   ok_src_re = iem_tab_check_arrays(gensym("tab_ifft"), x->x_sym_src_re, &x->x_beg_mem_src_re, &x->x_size_src_re, fftsize);
@@ -119,8 +120,8 @@ static void tab_ifft_bang(t_tab_ifft *x)
     
     for(j=0; j<fftsize; j++)
     {
-      vec_dst_re[j] = vec_src_re[j];
-      vec_dst_im[j] = vec_src_im[j];
+      iemarray_setfloat(vec_dst_re, j, iemarray_getfloat(vec_src_re, j));
+      iemarray_setfloat(vec_dst_im, j, iemarray_getfloat(vec_src_im, j));
     }
     
     i_inc = fs2;
@@ -133,15 +134,16 @@ static void tab_ifft_bang(t_tab_ifft *x)
         w_index = 0;
         for(k=0; k<i_inc; k++)
         {
-          old1_re = vec_dst_re[v_index];
-          old1_im = vec_dst_im[v_index];
-          old2_re = vec_dst_re[v_index+i_inc];
-          old2_im = vec_dst_im[v_index+i_inc];
+          old1_re = iemarray_getfloat(vec_dst_re, v_index);
+          old1_im = iemarray_getfloat(vec_dst_im, v_index);
+          old2_re = iemarray_getfloat(vec_dst_re, v_index+i_inc);
+          old2_im = iemarray_getfloat(vec_dst_im, v_index+i_inc);
+          
           w = sincos[w_index];
-          vec_dst_re[v_index+i_inc] = (old1_re - old2_re)*w.real - (old1_im - old2_im)*w.imag;
-          vec_dst_im[v_index+i_inc] = (old1_im - old2_im)*w.real + (old1_re - old2_re)*w.imag;
-          vec_dst_re[v_index] = old1_re + old2_re;
-          vec_dst_im[v_index] = old1_im + old2_im;
+          iemarray_setfloat(vec_dst_re, v_index+i_inc, (old1_re - old2_re)*w.real - (old1_im - old2_im)*w.imag);
+          iemarray_setfloat(vec_dst_im, v_index+i_inc, (old1_im - old2_im)*w.real + (old1_re - old2_re)*w.imag);
+          iemarray_setfloat(vec_dst_re, v_index, old1_re + old2_re);
+          iemarray_setfloat(vec_dst_im, v_index, old1_im + old2_im);
           w_index += w_inc;
           v_index++;
         }
@@ -163,12 +165,12 @@ static void tab_ifft_bang(t_tab_ifft *x)
       j = j + k;
       if(i < j)
       {
-        old1_re = vec_dst_re[j];
-        old1_im = vec_dst_im[j];
-        vec_dst_re[j] = vec_dst_re[i];
-        vec_dst_im[j] = vec_dst_im[i];
-        vec_dst_re[i] = old1_re;
-        vec_dst_im[i] = old1_im;
+        old1_re = iemarray_getfloat(vec_dst_re, j);
+        old1_im = iemarray_getfloat(vec_dst_im, j);
+        iemarray_setfloat(vec_dst_re, j, iemarray_getfloat(vec_dst_re, i));
+        iemarray_setfloat(vec_dst_im, j, iemarray_getfloat(vec_dst_im, i));
+        iemarray_setfloat(vec_dst_re, i, old1_re);
+        iemarray_setfloat(vec_dst_im, i, old1_im);
       }
     }
     
@@ -188,8 +190,8 @@ static void tab_ifft_bang(t_tab_ifft *x)
     g = 1.0f / (t_float)fftsize;
     for(i = 0; i < fftsize; i++)
     {
-      vec_dst_re[i] *= g;
-      vec_dst_im[i] *= g;
+      iemarray_setfloat(vec_dst_re, i, iemarray_getfloat(vec_dst_re, i)*g);
+      iemarray_setfloat(vec_dst_im, i, iemarray_getfloat(vec_dst_im, i)*g);
     }
     
     outlet_bang(x->x_obj.ob_outlet);
@@ -211,7 +213,7 @@ static void tab_ifft_list(t_tab_ifft *x, t_symbol *s, int argc, t_atom *argv)
   int fs2 = fftsize / 2;
   TAB_COMPLEX w;
   TAB_COMPLEX *sincos = x->x_sin_cos;
-  t_float *vec_src_re, *vec_src_im, *vec_dst_re, *vec_dst_im;
+  iemarray_t *vec_src_re, *vec_src_im, *vec_dst_re, *vec_dst_im;
   t_float old1_re, old1_im, old2_re, old2_im, g;
   
   if((argc >= 4) &&
@@ -249,8 +251,8 @@ static void tab_ifft_list(t_tab_ifft *x, t_symbol *s, int argc, t_atom *argv)
       
       for(j=0; j<fftsize; j++)
       {
-        vec_dst_re[j] = vec_src_re[j];
-        vec_dst_im[j] = vec_src_im[j];
+        iemarray_setfloat(vec_dst_re, j, iemarray_getfloat(vec_src_re, j));
+        iemarray_setfloat(vec_dst_im, j, iemarray_getfloat(vec_src_im, j));
       }
       
       i_inc = fs2;
@@ -263,15 +265,16 @@ static void tab_ifft_list(t_tab_ifft *x, t_symbol *s, int argc, t_atom *argv)
           w_index = 0;
           for(k=0; k<i_inc; k++)
           {
-            old1_re = vec_dst_re[v_index];
-            old1_im = vec_dst_im[v_index];
-            old2_re = vec_dst_re[v_index+i_inc];
-            old2_im = vec_dst_im[v_index+i_inc];
+            old1_re = iemarray_getfloat(vec_dst_re, v_index);
+            old1_im = iemarray_getfloat(vec_dst_im, v_index);
+            old2_re = iemarray_getfloat(vec_dst_re, v_index+i_inc);
+            old2_im = iemarray_getfloat(vec_dst_im, v_index+i_inc);
+            
             w = sincos[w_index];
-            vec_dst_re[v_index+i_inc] = (old1_re - old2_re)*w.real - (old1_im - old2_im)*w.imag;
-            vec_dst_im[v_index+i_inc] = (old1_im - old2_im)*w.real + (old1_re - old2_re)*w.imag;
-            vec_dst_re[v_index] = old1_re + old2_re;
-            vec_dst_im[v_index] = old1_im + old2_im;
+            iemarray_setfloat(vec_dst_re, v_index+i_inc, (old1_re - old2_re)*w.real - (old1_im - old2_im)*w.imag);
+            iemarray_setfloat(vec_dst_im, v_index+i_inc, (old1_im - old2_im)*w.real + (old1_re - old2_re)*w.imag);
+            iemarray_setfloat(vec_dst_re, v_index, old1_re + old2_re);
+            iemarray_setfloat(vec_dst_im, v_index, old1_im + old2_im);
             w_index += w_inc;
             v_index++;
           }
@@ -293,12 +296,12 @@ static void tab_ifft_list(t_tab_ifft *x, t_symbol *s, int argc, t_atom *argv)
         j = j + k;
         if(i < j)
         {
-          old1_re = vec_dst_re[j];
-          old1_im = vec_dst_im[j];
-          vec_dst_re[j] = vec_dst_re[i];
-          vec_dst_im[j] = vec_dst_im[i];
-          vec_dst_re[i] = old1_re;
-          vec_dst_im[i] = old1_im;
+          old1_re = iemarray_getfloat(vec_dst_re, j);
+          old1_im = iemarray_getfloat(vec_dst_im, j);
+          iemarray_setfloat(vec_dst_re, j, iemarray_getfloat(vec_dst_re, i));
+          iemarray_setfloat(vec_dst_im, j, iemarray_getfloat(vec_dst_im, i));
+          iemarray_setfloat(vec_dst_re, i, old1_re);
+          iemarray_setfloat(vec_dst_im, i, old1_im);
         }
       }
       
@@ -318,8 +321,8 @@ static void tab_ifft_list(t_tab_ifft *x, t_symbol *s, int argc, t_atom *argv)
       g = 1.0f / (t_float)fftsize;
       for(i = 0; i < fftsize; i++)
       {
-        vec_dst_re[i] *= g;
-        vec_dst_im[i] *= g;
+        iemarray_setfloat(vec_dst_re, i, iemarray_getfloat(vec_dst_re, i)*g);
+        iemarray_setfloat(vec_dst_im, i, iemarray_getfloat(vec_dst_im, i)*g);
       }
       
       outlet_bang(x->x_obj.ob_outlet);

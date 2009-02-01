@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 
 #include "m_pd.h"
@@ -9,6 +9,10 @@ iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 
 #include "iem_tab.h"
 
 /* -------------------------- tab_ne ------------------------------ */
+/*     if(x_beg_mem_src1[i] != x_beg_mem_src2[i])   */
+/*       x_beg_mem_dst[i] = 1.0f;      */
+/*     else                            */
+/*       x_beg_mem_dst[i] = 0.0f;      */
 
 typedef struct _tab_ne
 {
@@ -19,9 +23,9 @@ typedef struct _tab_ne
   int       x_offset_src1;
   int       x_offset_src2;
   int       x_offset_dst;
-  t_float   *x_beg_mem_src1;
-  t_float   *x_beg_mem_src2;
-  t_float   *x_beg_mem_dst;
+  iemarray_t   *x_beg_mem_src1;
+  iemarray_t   *x_beg_mem_src2;
+  iemarray_t   *x_beg_mem_dst;
   t_symbol  *x_sym_scr1;
   t_symbol  *x_sym_scr2;
   t_symbol  *x_sym_dst;
@@ -48,7 +52,7 @@ static void tab_ne_bang(t_tab_ne *x)
 {
   int i, n;
   int ok_src1, ok_src2, ok_dst;
-  t_float *vec_src1, *vec_src2, *vec_dst;
+  iemarray_t *vec_src1, *vec_src2, *vec_dst;
   
   ok_src1 = iem_tab_check_arrays(gensym("tab_ne"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
   ok_src2 = iem_tab_check_arrays(gensym("tab_ne"), x->x_sym_scr2, &x->x_beg_mem_src2, &x->x_size_src2, 0);
@@ -72,10 +76,10 @@ static void tab_ne_bang(t_tab_ne *x)
       
       for(i=0; i<n; i++)
       {
-        if(vec_src1[i] != vec_src2[i])
-          vec_dst[i] = 1.0f;
+        if(iemarray_getfloat(vec_src1, i) != iemarray_getfloat(vec_src2, i))
+          iemarray_setfloat(vec_dst, i, 1.0f);
         else
-          vec_dst[i] = 0.0f;
+          iemarray_setfloat(vec_dst, i, 0.0f);
       }
       outlet_bang(x->x_obj.ob_outlet);
       a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
@@ -89,7 +93,7 @@ static void tab_ne_list(t_tab_ne *x, t_symbol *s, int argc, t_atom *argv)
   int beg_src1, beg_src2, beg_dst;
   int i, n;
   int ok_src1, ok_src2, ok_dst;
-  t_float *vec_src1, *vec_src2, *vec_dst;
+  iemarray_t *vec_src1, *vec_src2, *vec_dst;
   
   if((argc >= 4) &&
     IS_A_FLOAT(argv,0) &&
@@ -125,10 +129,10 @@ static void tab_ne_list(t_tab_ne *x, t_symbol *s, int argc, t_atom *argv)
         
         for(i=0; i<n; i++)
         {
-          if(vec_src1[i] != vec_src2[i])
-            vec_dst[i] = 1.0f;
+          if(iemarray_getfloat(vec_src1, i) != iemarray_getfloat(vec_src2, i))
+            iemarray_setfloat(vec_dst, i, 1.0f);
           else
-            vec_dst[i] = 0.0f;
+            iemarray_setfloat(vec_dst, i, 0.0f);
         }
         outlet_bang(x->x_obj.ob_outlet);
         a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
@@ -151,7 +155,6 @@ static void *tab_ne_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_tab_ne *x = (t_tab_ne *)pd_new(tab_ne_class);
   t_symbol  *src1, *src2, *dst;
-  t_float time;
   
   if((argc >= 3) &&
     IS_A_SYMBOL(argv,0) &&

@@ -38,6 +38,7 @@ SRC = tab_abs.c \
 	tab_ge_scalar.c \
 	tab_gt.c \
 	tab_gt_scalar.c \
+	tab_get_size.c \
 	tab_ifft.c \
 	tab_le.c \
 	tab_le_scalar.c \

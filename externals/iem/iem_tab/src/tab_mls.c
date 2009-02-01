@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -15,7 +15,7 @@ typedef struct _tab_mls
   t_object  x_obj;
   int       x_size_dst;
   int       x_offset_dst;
-  t_float   *x_beg_mem_dst;
+  iemarray_t   *x_beg_mem_dst;
   t_symbol  *x_sym_dst;
 } t_tab_mls;
 
@@ -30,7 +30,7 @@ static int tab_mls_exp2(int mls_order)
   return(j);
 }
 
-static void tab_mls_calc(t_float *vec, int mls_order)
+static void tab_mls_calc(iemarray_t *vec, int mls_order)
 {
   int i, j;
   int work1=1, work2, exor;
@@ -126,12 +126,12 @@ static void tab_mls_calc(t_float *vec, int mls_order)
     }
     if(exor & 1)
     {
-      vec[i] = 1.0f;
+      iemarray_setfloat(vec, i, 1.0f);
       work1 = work2 | source;
     }
     else
     {
-      vec[i] = -1.0f;
+      iemarray_setfloat(vec, i, -1.0f);
       work1 = work2;
     }
   }
@@ -170,7 +170,8 @@ static void tab_mls_list(t_tab_mls *x, t_symbol *s, int argc, t_atom *argv)
   int beg_dst;
   int i, n;
   int ok_dst;
-  t_float *vec_dst, c;
+  t_float c;
+  iemarray_t *vec_dst;
   
   if((argc >= 3) &&
     IS_A_FLOAT(argv,0) &&
@@ -195,7 +196,7 @@ static void tab_mls_list(t_tab_mls *x, t_symbol *s, int argc, t_atom *argv)
         t_garray *a;
         
         for(i=0; i<n; i++)
-          vec_dst[i] = c;
+          iemarray_setfloat(vec_dst, i, c);
         outlet_bang(x->x_obj.ob_outlet);
         a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
         garray_redraw(a);

@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 
 #include "m_pd.h"
@@ -15,7 +15,7 @@ typedef struct _tab_min_index
   t_object  x_obj;
   int       x_size_src1;
   int       x_offset_src1;
-  t_float   *x_beg_mem_src1;
+  iemarray_t   *x_beg_mem_src1;
   t_symbol  *x_sym_scr1;
   void      *x_bang_out;
   void      *x_min_out;
@@ -33,7 +33,7 @@ static void tab_min_index_bang(t_tab_min_index *x)
 {
   int i, n;
   int ok_src, min_index=0;
-  t_float *vec_src;
+  iemarray_t *vec_src;
   t_float min=1.0e37;
   
   ok_src = iem_tab_check_arrays(gensym("tab_min_index"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
@@ -46,9 +46,9 @@ static void tab_min_index_bang(t_tab_min_index *x)
     {
       for(i=0; i<n; i++)
       {
-        if(vec_src[i] < min)
+        if(iemarray_getfloat(vec_src, i) < min)
         {
-          min = vec_src[i];
+          min = iemarray_getfloat(vec_src, i);
           min_index = i;
         }
       }
@@ -64,7 +64,7 @@ static void tab_min_index_list(t_tab_min_index *x, t_symbol *s, int argc, t_atom
   int beg_src;
   int i, n;
   int ok_src, min_index=0;
-  t_float *vec_src;
+  iemarray_t *vec_src;
   t_float min=1.0e37;
   
   if((argc >= 2) &&
@@ -87,9 +87,9 @@ static void tab_min_index_list(t_tab_min_index *x, t_symbol *s, int argc, t_atom
       {
         for(i=0; i<n; i++)
         {
-          if(vec_src[i] < min)
+          if(iemarray_getfloat(vec_src, i) < min)
           {
-            min = vec_src[i];
+            min = iemarray_getfloat(vec_src, i);
             min_index = i + beg_src;
           }
         }

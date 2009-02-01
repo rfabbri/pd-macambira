@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -17,7 +17,7 @@ typedef struct _tab_find_exact_peaks
   t_object  x_obj;
   int       x_size_src1;
   int       x_offset_src1;
-  t_float   *x_beg_mem_src1;
+  iemarray_t   *x_beg_mem_src1;
   int       x_work_alloc;
   int       *x_beg_mem_work1;
   t_float   *x_beg_mem_work2;
@@ -94,8 +94,9 @@ static void tab_find_exact_peaks_src(t_tab_find_exact_peaks *x, t_symbol *s)
 static void tab_find_exact_peaks_bang(t_tab_find_exact_peaks *x)
 {
   int i, n, w, ww;
-  int ok_src, peak_index=0, sort_index=0;
-  t_float *vec_src, *vec_work2;
+  int ok_src, peak_index=0;
+  t_float *vec_work2;
+  iemarray_t *vec_src;
   int *vec_work1;
   t_float max=-1.0e37;
   int max_peaks=x->x_n_peaks;
@@ -145,10 +146,10 @@ static void tab_find_exact_peaks_bang(t_tab_find_exact_peaks *x)
             
             for(i=beg; i<end; i++)
             {
-              diff_low = vec_src[i-low_bord] - abs_min_height_diff;
-              diff_high = vec_src[i+high_bord] - abs_min_height_diff;
-              if((vec_src[i-low_bord-1] < diff_low) && !vec_work1[i-low_bord] && 
-                (vec_src[i+high_bord+1] < diff_high) && !vec_work1[i+high_bord])
+              diff_low = iemarray_getfloat(vec_src, i-low_bord) - abs_min_height_diff;
+              diff_high = iemarray_getfloat(vec_src, i+high_bord) - abs_min_height_diff;
+              if((iemarray_getfloat(vec_src, i-low_bord-1) < diff_low) && !vec_work1[i-low_bord] && 
+                (iemarray_getfloat(vec_src, i+high_bord+1) < diff_high) && !vec_work1[i+high_bord])
               {
                 for(j=i-low_bord; j<=i+high_bord; j++)
                   vec_work1[j] = 1;
@@ -174,7 +175,7 @@ static void tab_find_exact_peaks_bang(t_tab_find_exact_peaks *x)
             peak_index = (i + j) / 2;
             if(sort_index <= max_peaks)
             {
-              outlet_float(x->x_peak_value_out, vec_src[i]);
+              outlet_float(x->x_peak_value_out, iemarray_getfloat(vec_src, i));
               outlet_float(x->x_peak_index_out, (t_float)peak_index);
               outlet_float(x->x_sort_index_out, sort_index);
               sort_index++;
@@ -207,15 +208,15 @@ static void tab_find_exact_peaks_bang(t_tab_find_exact_peaks *x)
             
             for(i=beg; i<end; i++)
             {
-              diff_low = vec_src[i-low_bord] - abs_min_height_diff;
-              diff_high = vec_src[i+high_bord] - abs_min_height_diff;
-              if((vec_src[i-low_bord-1] < diff_low) && !vec_work1[i-low_bord] && 
-                (vec_src[i+high_bord+1] < diff_high) && !vec_work1[i+high_bord])
+              diff_low = iemarray_getfloat(vec_src, i-low_bord) - abs_min_height_diff;
+              diff_high = iemarray_getfloat(vec_src, i+high_bord) - abs_min_height_diff;
+              if((iemarray_getfloat(vec_src, i-low_bord-1) < diff_low) && !vec_work1[i-low_bord] && 
+                (iemarray_getfloat(vec_src, i+high_bord+1) < diff_high) && !vec_work1[i+high_bord])
               {
                 for(j=i-low_bord; j<=i+high_bord; j++)
                 {
                   vec_work1[j] = 1;
-                  vec_work2[j] = vec_src[j];
+                  vec_work2[j] = iemarray_getfloat(vec_src, j);
                 }
                 //post("a[%d]=%g, a[%d]=%g",i-low_bord,vec_src[i-low_bord],i+high_bord,vec_src[i+high_bord]);
               }

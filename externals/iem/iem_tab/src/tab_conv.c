@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 
 #include "m_pd.h"
@@ -9,7 +9,14 @@ iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 
 #include "iem_tab.h"
 
 
-/* -------------------------- tab_conv ------------------------------ */
+/* ---------------------------- tab_conv ------------------------------- */
+/*   for(i=0; i<x_size_src1; i++)                                        */
+/*   {                                                                   */
+/*     sum = 0.0f;                                                       */
+/*     for(j=0; j<x_size_src2; j++)                                      */
+/*       sum += x_beg_mem_src1[i+j-x_size_src2/2] * x_beg_mem_src2[j];   */
+/*     x_beg_mem_dst[i] = sum;                                           */
+/*   }                                                                   */
 
 typedef struct _tab_conv
 {
@@ -20,15 +27,19 @@ typedef struct _tab_conv
   int       x_offset_src1;
   int       x_offset_src2;
   int       x_offset_dst;
-  t_float   *x_beg_mem_src1;
-  t_float   *x_beg_mem_src2;
-  t_float   *x_beg_mem_dst;
+  iemarray_t   *x_beg_mem_src1;
+  iemarray_t   *x_beg_mem_src2;
+  iemarray_t   *x_beg_mem_dst;
   t_symbol  *x_sym_scr1;
   t_symbol  *x_sym_scr2;
   t_symbol  *x_sym_dst;
 } t_tab_conv;
 
 static t_class *tab_conv_class;
+
+static void tab_conv_tick(t_tab_conv *x)
+{
+}
 
 static void tab_conv_src1(t_tab_conv *x, t_symbol *s)
 {
@@ -49,7 +60,7 @@ static void tab_conv_bang(t_tab_conv *x)
 {
   int i, j, k, l, min_s2, plu_s2, n;
   int ok_src1, ok_src2, ok_dst;
-  t_float *vec_src1, *vec_src2, *vec_dst;
+  iemarray_t *vec_src1, *vec_src2, *vec_dst;
   t_float sum=0.0f;
   
   ok_src1 = iem_tab_check_arrays(gensym("tab_conv"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
@@ -80,9 +91,9 @@ static void tab_conv_bang(t_tab_conv *x)
           {
             k = j + i;
             if((k >= 0) && (k < n))
-              sum += vec_src1[k] * vec_src2[l];
+              sum += iemarray_getfloat(vec_src1, k) * iemarray_getfloat(vec_src2, l);
           }
-          vec_dst[i] = sum;
+          iemarray_setfloat(vec_dst, i, sum);
         }
         outlet_bang(x->x_obj.ob_outlet);
         a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
@@ -98,7 +109,7 @@ static void tab_conv_list(t_tab_conv *x, t_symbol *s, int argc, t_atom *argv)
   int n_src1, n_src2;
   int i, j, k, l, min_s2, plu_s2;
   int ok_src1, ok_src2, ok_dst;
-  t_float *vec_src1, *vec_src2, *vec_dst;
+  iemarray_t *vec_src1, *vec_src2, *vec_dst;
   t_float sum=0.0f;
   
   if((argc >= 5) &&
@@ -148,9 +159,9 @@ static void tab_conv_list(t_tab_conv *x, t_symbol *s, int argc, t_atom *argv)
             {
               k = j + i;
               if((k >= 0) && (k < n_src1))
-                sum += vec_src1[k] * vec_src2[l];
+                sum += iemarray_getfloat(vec_src1, k) * iemarray_getfloat(vec_src2, l);
             }
-            vec_dst[i] = sum;
+            iemarray_setfloat(vec_dst, i, sum);
           }
           outlet_bang(x->x_obj.ob_outlet);
           a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
@@ -174,7 +185,6 @@ static void *tab_conv_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_tab_conv *x = (t_tab_conv *)pd_new(tab_conv_class);
   t_symbol  *src1, *src2, *dst;
-  t_float time;
   
   if((argc >= 3) &&
     IS_A_SYMBOL(argv,0) &&

@@ -1,7 +1,8 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_tab written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
+/*   x_beg_mem_dst[i] = x_beg_mem_src1[i]   */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -16,8 +17,8 @@ typedef struct _tab_copy
   int       x_size_dst;
   int       x_offset_src1;
   int       x_offset_dst;
-  t_float   *x_beg_mem_src1;
-  t_float   *x_beg_mem_dst;
+  iemarray_t   *x_beg_mem_src1;
+  iemarray_t   *x_beg_mem_dst;
   t_symbol  *x_sym_scr1;
   t_symbol  *x_sym_dst;
 } t_tab_copy;
@@ -38,7 +39,7 @@ static void tab_copy_bang(t_tab_copy *x)
 {
   int i, n;
   int ok_src, ok_dst;
-  t_float *vec_src, *vec_dst;
+  iemarray_t *vec_src, *vec_dst;
   
   ok_src = iem_tab_check_arrays(gensym("tab_copy"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
   ok_dst = iem_tab_check_arrays(gensym("tab_copy"), x->x_sym_dst, &x->x_beg_mem_dst, &x->x_size_dst, 0);
@@ -56,7 +57,7 @@ static void tab_copy_bang(t_tab_copy *x)
       t_garray *a;
       
       for(i=0; i<n; i++)
-        vec_dst[i] = vec_src[i];
+        iemarray_setfloat(vec_dst, i, iemarray_getfloat(vec_src, i));
       outlet_bang(x->x_obj.ob_outlet);
       a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
       garray_redraw(a);
@@ -69,7 +70,7 @@ static void tab_copy_list(t_tab_copy *x, t_symbol *s, int argc, t_atom *argv)
   int beg_src, beg_dst;
   int i, n;
   int ok_src, ok_dst;
-  t_float *vec_src, *vec_dst;
+  iemarray_t *vec_src, *vec_dst;
   
   if((argc >= 3) &&
     IS_A_FLOAT(argv,0) &&
@@ -98,7 +99,7 @@ static void tab_copy_list(t_tab_copy *x, t_symbol *s, int argc, t_atom *argv)
         t_garray *a;
         
         for(i=0; i<n; i++)
-          vec_dst[i] = vec_src[i];
+          iemarray_setfloat(vec_dst, i, iemarray_getfloat(vec_src, i));
         outlet_bang(x->x_obj.ob_outlet);
         a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
         garray_redraw(a);
