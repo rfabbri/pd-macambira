@@ -1,6 +1,6 @@
-#N struct 1003.advslider float a float frequency float midinote;
+#N struct 1007.advslider float a float frequency float midinote;
 #N canvas 946 115 475 427 10;
-#N canvas 493 22 723 750 advslider 1;
+#N canvas 493 22 723 750 advslider 0;
 #X obj 284 412 route click change;
 #X msg 121 588 traverse pd-\$1.gop \, bang;
 #X obj 121 609 pointer;
@@ -104,32 +104,28 @@ a(0:200)(0:110) a(0:200)(50:250);
 #X connect 44 0 23 0;
 #X restore 221 59 pd advslider;
 #N canvas 72 231 364 527 \$0.gop 0;
-#X scalar 1003.advslider 18 18200 133.443 \;;
+#X scalar 1007.advslider 0 0 0 \;;
 #X coords 0 0 130 260 130 260 1;
 #X restore 50 100 pd \$0.gop;
 #X obj 221 109 outlet;
 #X obj 203 200 propertybang;
 #X msg 203 224 vis 1;
-#N canvas 34 46 245 497 \$0.properties 0;
-#X obj 31 36 nbx 5 14 -1e+37 1e+37 0 0 empty empty width 0 -8 0 10
--262144 -1 -1 0 256;
-#X obj 111 36 nbx 5 14 -1e+37 1e+37 0 0 empty empty height 0 -8 0 10
--262144 -1 -1 0 256;
-#X obj 31 96 nbx 5 14 -1e+37 1e+37 0 0 empty empty bottom 0 -8 0 10
--262144 -1 -1 0 256;
-#X obj 111 96 nbx 5 14 -1e+37 1e+37 0 0 empty empty top 0 -8 0 10 -262144
--1 -1 0 256;
-#X symbolatom 16 261 30 0 0 2 label - -;
-#X obj 78 436 bng 40 250 50 0 empty empty OK 10 20 0 20 -204800 -1
--1;
-#X symbolatom 76 141 20 0 0 2 send-name - -;
-#X symbolatom 76 191 20 0 0 2 receive-name - -;
-#X obj 13 141 tgl 15 0 empty empty $ 17 7 0 12 -262144 -1 -1 0 1;
-#X obj 39 141 nbx 1 15 0 9 0 0 empty empty empty 0 -8 0 10 -262144
--1 -1 0 256;
-#X obj 13 191 tgl 15 0 empty empty $ 17 7 0 12 -262144 -1 -1 0 1;
-#X obj 39 191 nbx 1 15 0 9 0 0 empty empty empty 0 -8 0 10 -262144
--1 -1 0 256;
+#N canvas 34 46 224 489 \$0.properties 1;
+#X obj 31 36 nbx 5 14 -1e+37 1e+37 0 0 \$0.width.s \$0.width.r width
+0 -8 0 10 -262144 -1 -1 0 256;
+#X obj 111 36 nbx 5 14 -1e+37 1e+37 0 0 \$0.height.s \$0.height.r height
+0 -8 0 10 -262144 -1 -1 0 256;
+#X obj 31 96 nbx 5 14 -1e+37 1e+37 0 0 \$0.bottom.s \$0.bottom.r bottom
+0 -8 0 10 -262144 -1 -1 0 256;
+#X obj 111 96 nbx 5 14 -1e+37 1e+37 0 0 \$0.top.s \$0.top.r top 0 -8
+0 10 -262144 -1 -1 0 256;
+#X symbolatom 16 261 30 0 0 2 label #0.label.r #0.label.s;
+#X obj 78 436 bng 40 250 50 0 \$0.ok.s \$0.ok.r OK 10 20 0 20 -204800
+-1 -1;
+#X symbolatom 36 141 20 0 0 2 send-name #0.send-name.r #0.send-name.s
+;
+#X symbolatom 36 191 20 0 0 2 receive-name #0.receive-name.r #0.receive-name.s
+;
 #X obj 71 304 color.rgbset;
 #X restore 198 316 pd \$0.properties;
 #X obj 203 248 s pd-\$0.properties;
