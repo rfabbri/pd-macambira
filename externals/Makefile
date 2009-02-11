@@ -2680,6 +2680,41 @@ windowing_clean:
 
 
 #------------------------------------------------------------------------------#
+# XBEE
+# this is installed into the "io" library
+XBEE_NAME=io
+XBEE_SRC := $(wildcard $(externals_src)/io/xbee/*.c)
+
+XBEE_OBJECTS := $(XBEE_SRC:.c=.o)
+$(XBEE_OBJECTS) : %.o : %.c
+	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+
+$(externals_src)/io/xbee/xbee_test.$(EXTENSION): $(XBEE_OBJECTS) 
+	$(CC) $(LDFLAGS) -o $(externals_src)/io/xbee/xbee_test.$(EXTENSION) \
+		$(XBEE_OBJECTS)
+#	$(STRIP) $(externals_src)/io/xbee/xbee_test.$(EXTENSION)
+
+xbee: $(externals_src)/io/xbee/xbee_test.$(EXTENSION)
+
+xbee_install: xbee
+	install -d $(objectsdir)/$(XBEE_NAME)
+	install -p $(externals_src)/io/xbee/xbee_test.$(EXTENSION) \
+		$(objectsdir)/$(XBEE_NAME)
+	install -d $(helpdir)/$(XBEE_NAME)
+	install -p $(externals_src)/io/xbee/*.pd \
+		$(helpdir)/$(XBEE_NAME)
+	install -d $(manualsdir)/$(XBEE_NAME)
+	install -p $(externals_src)/io/xbee/*.txt \
+		$(manualsdir)/$(XBEE_NAME)
+
+xbee_clean:
+	-rm -f -- $(externals_src)/io/xbee/xbee_test.$(EXTENSION)
+	-rm -f -- $(XBEE_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/io/xbee/*.bak
+	-rm -f -- $(externals_src)/io/xbee/*.*~
+
+
+#------------------------------------------------------------------------------#
 # Zexy
 ZEXY_NAME = zexy
 ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-vxy0]*.c) \
