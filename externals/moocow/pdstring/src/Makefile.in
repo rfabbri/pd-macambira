@@ -64,6 +64,7 @@ EXTRA_PROGRAMS = pdstring$(EXEEXT) any2bytes$(EXEEXT) \
 subdir = src
 SUBDIRS =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/any2bytes-help.pd $(srcdir)/bytes2any-help.pd \
 	$(srcdir)/config.h.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -71,7 +72,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = any2string-help.pd string2any-help.pd
 @WANT_OBJECT_EXTERNALS_TRUE@am__EXEEXT_1 = any2bytes$(EXEEXT) \
 @WANT_OBJECT_EXTERNALS_TRUE@	bytes2any$(EXEEXT) \
 @WANT_OBJECT_EXTERNALS_TRUE@	bytes2wchars$(EXEEXT) \
@@ -244,16 +245,22 @@ target_alias = @target_alias@
 SUFFIXES = .@PDEXT@
 pdexterns_DATA = \
 	any2wchars.pd \
-	wchars2any.pd
+	wchars2any.pd \
+	any2string.pd \
+	string2any.pd
 
 pddoc_DATA = \
 	pdstring-help.pd \
+	any2string-help.pd \
+	string2any-help.pd \
 	any2bytes-help.pd \
 	bytes2any-help.pd \
 	bytes2wchars-help.pd \
 	wchars2bytes-help.pd \
 	any2wchars-help.pd \
-	wchars2any-help.pd
+	wchars2any-help.pd \
+	printbytes-help.pd \
+	printwchars-help.pd
 
 
 #-----------------------------------------------------------------------
@@ -751,9 +758,6 @@ uninstall-info: uninstall-info-recursive
 	uninstall-pdexternsDATA uninstall-pdexternsPROGRAMS
 
 
-	printbytes-help.pd 
-	printwchars-help.pd
-
 #-----------------------------------------------------------------------
 # aliases via install hook
 #-----------------------------------------------------------------------
@@ -761,14 +765,14 @@ uninstall-info: uninstall-info-recursive
 @WANT_OBJECT_EXTERNALS_TRUE@all-local:
 @WANT_OBJECT_EXTERNALS_TRUE@	rm -f any2string.$(PDEXT)
 @WANT_OBJECT_EXTERNALS_TRUE@	rm -f string2any.$(PDEXT)
-@WANT_OBJECT_EXTERNALS_TRUE@	$(LN_S) any2bytes.$(PDEXT) any2string.$(PDEXT)
-@WANT_OBJECT_EXTERNALS_TRUE@	$(LN_S) bytes2any.$(PDEXT) string2any.$(PDEXT)
+#	$(LN_S) any2bytes.$(PDEXT) any2string.$(PDEXT)
+#	$(LN_S) bytes2any.$(PDEXT) string2any.$(PDEXT)
 
 install-data-hook:
 	rm -f $(pdexternsdir)/any2string.$(PDEXT)
 	rm -f $(pdexternsdir)/string2any.$(PDEXT)
-@WANT_OBJECT_EXTERNALS_TRUE@	$(LN_S) any2bytes.$(PDEXT) $(pdexternsdir)/any2string.$(PDEXT)
-@WANT_OBJECT_EXTERNALS_TRUE@	$(LN_S) bytes2any.$(PDEXT) $(pdexternsdir)/string2any.$(PDEXT)
+#	$(LN_S) any2bytes.$(PDEXT) $(pdexternsdir)/any2string.$(PDEXT)
+#	$(LN_S) bytes2any.$(PDEXT) $(pdexternsdir)/string2any.$(PDEXT)
 
 uninstall-local:
 	rm -f $(pdexternsdir)/any2string.$(PDEXT)

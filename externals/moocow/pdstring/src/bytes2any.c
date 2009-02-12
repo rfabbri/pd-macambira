@@ -210,7 +210,9 @@ void bytes2any_setup_guts(void)
 			       0);
 
   //-- alias
+#ifndef PDSTRING_OBJECT_EXTERNALS
   class_addcreator((t_newmethod)bytes2any_new, gensym("string2any"), A_GIMME, 0);
+#endif
   
   //-- methods
   class_addanything(bytes2any_class, (t_method)bytes2any_anything);
@@ -231,6 +233,11 @@ void bytes2any_setup(void)
   bytes2any_setup_guts();
 }
 
+#if 0
+/*--
+  this (with symlink install) causes pd-extended 0.41.4 20090209 to puke.
+  bug report by hcs, Thu, 12 Feb 2009
+*/
 /*--------------------------------------------------------------------
  * setup (string2any alias)
  */
@@ -239,3 +246,4 @@ void string2any_setup(void) {
   post("string2any_setup(): Prefer [bytes2any] over [string2any].");
   bytes2any_setup();
 }
+#endif

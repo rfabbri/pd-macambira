@@ -165,7 +165,9 @@ void any2bytes_setup_guts(void)
 			      0);
 
   //-- alias
+#ifndef PDSTRING_OBJECT_EXTERNALS
   class_addcreator((t_newmethod)any2bytes_new, gensym("any2string"), A_GIMME, 0);
+#endif
   
   //-- methods
   class_addanything(any2bytes_class, (t_method)any2bytes_anything);
@@ -187,6 +189,11 @@ void any2bytes_setup(void)
   any2bytes_setup_guts();
 }
 
+#if 0
+/*--
+  this (with symlink install) causes pd-extended 0.41.4 20090209 to puke.
+  bug report by hcs, Thu, 12 Feb 2009
+*/
 /*--------------------------------------------------------------------
  * setup (any2string alias)
  */
@@ -195,3 +202,4 @@ void any2string_setup(void) {
   post("any2string_setup(): Prefer [any2bytes] over [any2string].");
   any2bytes_setup();
 }
+#endif

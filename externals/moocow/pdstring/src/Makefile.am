@@ -51,19 +51,22 @@ EXTRA_PROGRAMS = \
 ## --- patches
 pdexterns_DATA = \
 	any2wchars.pd \
-	wchars2any.pd
+	wchars2any.pd \
+	any2string.pd \
+	string2any.pd
 
 ## --- documentation
 pddoc_DATA = \
 	pdstring-help.pd \
+	any2string-help.pd \
+	string2any-help.pd \
 	any2bytes-help.pd \
 	bytes2any-help.pd \
 	bytes2wchars-help.pd \
 	wchars2bytes-help.pd \
 	any2wchars-help.pd \
-	wchars2any-help.pd
-
-	printbytes-help.pd 
+	wchars2any-help.pd \
+	printbytes-help.pd \
 	printwchars-help.pd
 
 
@@ -93,16 +96,16 @@ if WANT_OBJECT_EXTERNALS
 all-local:
 	rm -f any2string.$(PDEXT)
 	rm -f string2any.$(PDEXT)
-	$(LN_S) any2bytes.$(PDEXT) any2string.$(PDEXT)
-	$(LN_S) bytes2any.$(PDEXT) string2any.$(PDEXT)
+#	$(LN_S) any2bytes.$(PDEXT) any2string.$(PDEXT)
+#	$(LN_S) bytes2any.$(PDEXT) string2any.$(PDEXT)
 endif
 
 install-data-hook:
 	rm -f $(pdexternsdir)/any2string.$(PDEXT)
 	rm -f $(pdexternsdir)/string2any.$(PDEXT)
 if WANT_OBJECT_EXTERNALS
-	$(LN_S) any2bytes.$(PDEXT) $(pdexternsdir)/any2string.$(PDEXT)
-	$(LN_S) bytes2any.$(PDEXT) $(pdexternsdir)/string2any.$(PDEXT)
+#	$(LN_S) any2bytes.$(PDEXT) $(pdexternsdir)/any2string.$(PDEXT)
+#	$(LN_S) bytes2any.$(PDEXT) $(pdexternsdir)/string2any.$(PDEXT)
 endif
 
 uninstall-local:

@@ -4,7 +4,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [pdstring])
-define([THE_PACKAGE_VERSION], [0.09])
+define([THE_PACKAGE_VERSION], [0.10])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -261,4 +261,6 @@ dnl
 CFLAGS="$UCFLAGS"
 CPPFLAGS="$UCPPFLAGS"
 
+AC_CONFIG_LINKS([src/any2string-help.pd:src/any2bytes-help.pd])
+AC_CONFIG_LINKS([src/string2any-help.pd:src/bytes2any-help.pd])
 AC_OUTPUT(config/Makefile src/Makefile Makefile)
