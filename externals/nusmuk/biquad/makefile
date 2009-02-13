@@ -85,7 +85,7 @@ DARWINCFLAGS = -DPD -DUNIX -DMACOSX -O2 \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
-DARWININCLUDE =  -I/. -I../../../pd/src -I../../../pd/obj
+DARWININCLUDE =  -I/. -I../../../pd/src -I../../../pd/obj -I/Applications/Pd-extended.app/Contents/Resources/include
 
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -o $*.o -c $*.c
