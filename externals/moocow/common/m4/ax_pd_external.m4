@@ -291,7 +291,7 @@ AC_DEFUN([AX_PD_EXTERNAL],
   if test "$ENABLE_DEBUG" = "no" -a -z "$UCFLAGS"; then
     ##-- only set OFLAGS if user CFLAGS are empty
     PDEXT_OFLAGS="-O2 -pipe" 
-  else
+  elif test "$ENABLE_DEBUG" = "yes"; then
     PDEXT_OFLAGS="-g"
   fi
   PDEXT_OFLAGS="$PDEXT_OFLAGS -fPIC"
@@ -308,7 +308,7 @@ AC_DEFUN([AX_PD_EXTERNAL],
   if test "$ENABLE_DEBUG" = "no" -a -z "$UCFLAGS"; then
     ##-- only set OFLAGS if user CFLAGS are empty
     PDEXT_OFLAGS="-O2"
-  else
+  elif test "$ENABLE_DEBUG" = "yes"; then
     PDEXT_OFLAGS="-g"
   fi
   PDEXT=pd_darwin
@@ -347,7 +347,7 @@ AC_DEFUN([AX_PD_EXTERNAL],
 
  ##-- add defaults to user flags
  CPPFLAGS="$UCPPFLAGS $PDEXT_IFLAGS $PDEXT_DFLAGS"
- CFLAGS="$UCFLAGS $PDEXT_FLAGS $PDEXT_AFLAGS $PDEXT_WFLAGS"
+ CFLAGS="$UCFLAGS $PDEXT_OFLAGS $PDEXT_AFLAGS $PDEXT_WFLAGS"
  LDFLAGS="$ULDFLAGS $PDEXT_LFLAGS" 
 
  ## END platform-dependent variables
