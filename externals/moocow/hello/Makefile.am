@@ -60,4 +60,5 @@ all-local: $(PODS:.pod=.txt)
 #-----------------------------------------------------------------------
 
 ## --- extra distribution files
-#EXTRA_DIST  += $(PODS:.pod=.txt)
+#EXTRA_DIST  += $(PODS) $(PODS:.pod=.txt) ##-- included by default
+EXTRA_DIST  += $(PODS:.pod=.html)

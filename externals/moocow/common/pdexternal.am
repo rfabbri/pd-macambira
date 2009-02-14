@@ -19,7 +19,7 @@
 ##-----------------------------------------------------------------------
 ## Additional suffixes
 
-PDEXT    = @PDEXT@
+DEXT    = @PDEXT@
 EXEEXT   = .@PDEXT@
 
 ## --- pseudo-deps for '.SUFFIXES'
@@ -30,6 +30,7 @@ SUFFIXES = .@PDEXT@ .pod .txt .html
 
 ##--- extra distribution files
 EXTRA_DIST = \
+	$(PODS) \
 	$(PODS:.pod=.txt) \
 	$(pddoc_DATA) \
 	$(pdext_DATA) \
