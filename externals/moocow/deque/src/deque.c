@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: double-ended message queue for pd
  *
- * Copyright (c) 2003,2004 Bryan Jurish.  All Rights Reserved.
+ * Copyright (c) 2003-2009 Bryan Jurish.  All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,12 +12,6 @@
  * any later version.
  *=============================================================================*/
 
-
-/* black magic */
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #ifndef _M_PD_H
 # include <m_pd.h>
@@ -283,8 +277,9 @@ static void pd_deque_free(t_pd_deque *x) {
  *--------------------------------------------------------------------*/
 void deque_setup(void) {
   /* banner */
-  post("\ndeque version %s by Bryan Jurish <moocow@ling.uni-potsdam.de>",
-       PACKAGE_VERSION);
+  post("");
+  post("deque: double-ended message queue v" PACKAGE_VERSION " by Bryan Jurish");
+  post("deque: compiled by " PACKAGE_BUILD_USER " on " PACKAGE_BUILD_DATE);
 
   /* register class */
   pd_deque_class = class_new(gensym("deque"),              // name 
@@ -313,4 +308,3 @@ void deque_setup(void) {
   /* --- help --- */
   class_sethelpsymbol(pd_deque_class, gensym("deque-help.pd"));
 }
-
