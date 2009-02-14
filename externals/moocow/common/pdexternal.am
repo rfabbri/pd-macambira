@@ -37,6 +37,8 @@ EXTRA_DIST = \
 	$(pdexterns_DATA) \
 	$(pdexec_DATA) \
 	$(wildcard COPYING) \
+	$(wildcard Changes) \
+	$(wildcard ChangeLog) \
 	$(wildcard README.cvs) \
 	$(wildcard depcomp) \
 	$(wildcard install-sh) \
