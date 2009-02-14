@@ -14,5 +14,7 @@
 # define MOO_UNUSED
 #endif
 
+/*-- PDEXT_UNUSED : alias for MOO_UNUSED --*/
+#define PDEXT_UNUSED MOO_UNUSED
 
 #endif /* _MOO_PD_UTILS_H */
