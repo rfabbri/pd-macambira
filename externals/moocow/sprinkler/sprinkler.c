@@ -34,13 +34,12 @@
  *=============================================================================*/
 
 #include <m_pd.h>
-#include "mooPdUtils.h"
 
-/* black magic */
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
+#ifdef HAVE_CONFIG_H
+# include "config.h"
 #endif
+
+#include "mooPdUtils.h"
 
 /*--------------------------------------------------------------------
  * DEBUG
@@ -62,7 +61,9 @@ static char sprinkler_errbuf[EBUFSIZE];
  *=====================================================================*/
 
 static char *sprinkler_banner =
-"\nsprinkler version %s by Bryan Jurish : dynamic message dissemination";
+"\n"
+"sprinkler: dynamic message dissemination v" PACKAGE_VERSION " by Bryan Jurish\n"
+"sprinkler: compiled by " PACKAGE_BUILD_USER " on " PACKAGE_BUILD_DATE;
 
 static t_class *sprinkler_class;
 
@@ -173,7 +174,8 @@ void sprinkler_free(t_sprinkler *x) {
  *--------------------------------------------------------------------*/
 void sprinkler_setup(void)
 {
-  post(sprinkler_banner, PACKAGE_VERSION);
+  post(sprinkler_banner);
+
   sprinkler_class = class_new(gensym("sprinkler"),
 			      (t_newmethod)sprinkler_new,
 			      (t_method)sprinkler_free,
@@ -182,18 +184,18 @@ void sprinkler_setup(void)
 
 #ifdef NON_MAX_FORWARD
   //-- add aliases [forward] and [fw]
-  post("sprinkler : non-MAX [forward] alias enabled");
+  post("sprinkler: non-MAX [forward] alias enabled");
   class_addcreator((t_newmethod)sprinkler_new, gensym("forward"), A_DEFSYM, 0);
   class_addcreator((t_newmethod)sprinkler_new, gensym("fw"), A_DEFSYM, 0);
 #endif
 
 #ifdef ALL_FORWARDMESS
   //-- report new semantics
-  post("sprinkler : will use pd_forwardmess() for all messages");
+  post("sprinkler: will use pd_forwardmess() for all messages");
 #endif
 
 #ifdef SPRINKLER_DEBUG
-  post("sprinkler : debugging enabled");
+  post("sprinkler: debugging enabled");
 #endif
   
   //-- methods

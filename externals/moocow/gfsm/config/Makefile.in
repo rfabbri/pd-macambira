@@ -14,11 +14,10 @@
 
 @SET_MAKE@
 
-#MOSTLYCLEANFILES = 
+#ACLOCAL_AMFLAGS = -I m4 
 
-#CLEANFILES = 
-
-#DISTCLEANFILES = 
+#AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip
+#AUTOMAKE_OPTIONS = foreign
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -41,11 +40,13 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(top_srcdir)/pdexternal.am config.guess config.sub depcomp \
+	install-sh ltmain.sh missing
 subdir = config
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in config.guess \
-	config.sub depcomp install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pd_external.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -55,7 +56,6 @@ SOURCES =
 DIST_SOURCES =
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
-AFLAGS = @AFLAGS@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
@@ -75,29 +75,26 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
-DEBUG = @DEBUG@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
-DFLAGS = @DFLAGS@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-EXEEXT = @EXEEXT@
+ENABLE_DEBUG = @ENABLE_DEBUG@
+EXEEXT = .@PDEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
 GFSM_CFLAGS = @GFSM_CFLAGS@
 GFSM_LIBS = @GFSM_LIBS@
 GREP = @GREP@
-IFLAGS = @IFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
-LFLAGS = @LFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -108,7 +105,6 @@ MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
 OBJEXT = @OBJEXT@
-OFLAGS = @OFLAGS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -117,16 +113,22 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PDEXT = @PDEXT@
+PDEXT_AFLAGS = @PDEXT_AFLAGS@
+PDEXT_DFLAGS = @PDEXT_DFLAGS@
+PDEXT_IFLAGS = @PDEXT_IFLAGS@
+PDEXT_LFLAGS = @PDEXT_LFLAGS@
+PDEXT_OFLAGS = @PDEXT_OFLAGS@
+PDEXT_WFLAGS = @PDEXT_WFLAGS@
 PD_GFSM_SUBDIRS = @PD_GFSM_SUBDIRS@
 PKG_CONFIG = @PKG_CONFIG@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
-SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-WFLAGS = @WFLAGS@
+WANT_OBJECT_EXTERNALS_FALSE = @WANT_OBJECT_EXTERNALS_FALSE@
+WANT_OBJECT_EXTERNALS_TRUE = @WANT_OBJECT_EXTERNALS_TRUE@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
@@ -166,8 +168,11 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pd_buildext = @pd_buildext@
 pddir = @pddir@
 pddocdir = @pddocdir@
+pdexecdir = @pdexecdir@
+pdextdir = @pdextdir@
 pdexternsdir = @pdexternsdir@
 pdfdir = @pdfdir@
 pdincludedir = @pdincludedir@
@@ -180,9 +185,41 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-MAINTAINERCLEANFILES = \
-	*~ .*~ \
-	compile Makefile Makefile.in \
+DEXT = @PDEXT@
+SUFFIXES = .@PDEXT@ .pod .txt .html
+EXTRA_DIST = \
+	$(PODS) \
+	$(PODS:.pod=.txt) \
+	$(pddoc_DATA) \
+	$(pdext_DATA) \
+	$(pdexterns_DATA) \
+	$(pdexec_DATA) \
+	$(wildcard COPYING) \
+	$(wildcard Changes) \
+	$(wildcard ChangeLog) \
+	$(wildcard README.cvs) \
+	$(wildcard depcomp) \
+	$(wildcard install-sh) \
+	$(wildcard ltmain.sh) \
+	$(wildcard mising) \
+	$(wildcard mkinstalldirs)
+
+
+#all-local: $(PODS:.pod=.txt)
+CLEANFILES = *.$(PDEXT)
+DISTCLEANFILES = \
+	config.log	\
+	config.cache	\
+	config.status
+
+MAINTAINERCLEANFILES = *~ \
+	$(PODS:.pod=.txt) \
+	Makefile \
+	Makefile.in \
+	aclocal.m4 \
+	compile \
+	configure \
+	config.h.in \
 	config.guess \
 	config.sub \
 	depcomp \
@@ -190,20 +227,15 @@ MAINTAINERCLEANFILES = \
 	ltmain.sh \
 	missing \
 	mkinstalldirs \
+	stamp-h.in \
 	texinfo.tex \
 	ylwrap
-
-EXTRA_DIST = \
-	Makefile.in \
-	depcomp \
-	install-sh \
-	$(wildcard mkinstalldirs) \
-	missing
 
 all: all-am
 
 .SUFFIXES:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+.SUFFIXES: .@PDEXT@ .pod .txt .html
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/pdexternal.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -250,6 +282,7 @@ CTAGS:
 
 
 distdir: $(DISTFILES)
+	$(mkdir_p) $(distdir)/..
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -297,9 +330,11 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -335,7 +370,8 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 	-rm -f Makefile
-maintainer-clean-am: distclean-am maintainer-clean-generic
+maintainer-clean-am: distclean-am maintainer-clean-generic \
+	maintainer-clean-local
 
 mostlyclean: mostlyclean-am
 
@@ -357,24 +393,27 @@ uninstall-am: uninstall-info-am
 	install-data install-data-am install-exec install-exec-am \
 	install-info install-info-am install-man install-strip \
 	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am \
-	uninstall-info-am
+	maintainer-clean-generic maintainer-clean-local mostlyclean \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	uninstall uninstall-am uninstall-info-am
 
 
-#	config.guess
-#	config.sub
-#	ltmain.sh
-#	texinfo.tex
+.pod.txt:
+	pod2text $< $@
 
-#DIST_SUBDIRS = $(SUBDIRS)
+.pod.html:
+	pod2html $< --outfile=$@
 
-#-----------------------------------------------------------------------
-# Rules: cleanup
-#-----------------------------------------------------------------------
+maintainer-clean-local:
+	rm -rf autom4te.cache
+
 .PHONY: cvsclean cvsclean-hook
 
 cvsclean: maintainer-clean ;
+
+#-----------------------------------------------------------------------
+# Includes
+#-----------------------------------------------------------------------
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

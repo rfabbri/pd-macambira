@@ -28,7 +28,8 @@ if [ -d "$logdir" -a "$force" != "force" ]; then
   echo "$0: NOT retrieving logs from $logurl"
 else
   echo "$0: retrieving logs from $logurl to $logdir"
-  wget $wget_quiet_flags -r -np -A ".html,_pd-extended_run-automated-builder.txt" "$logurl/"
+  test "$force" = "force" || ncflag="-nc"
+  wget $wget_quiet_flags -r -np $ncflag -A ".html,_pd-extended_run-automated-builder.txt" "$logurl/"
 fi
 
 ##-- parse logs

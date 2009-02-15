@@ -175,7 +175,7 @@ static void *bytes2any_new(MOO_UNUSED t_symbol *sel, int argc, t_atom *argv)
     x->x_outlet_done = outlet_new(&x->x_obj, &s_bang);
 
     //-- debug
-    S2ADEBUG(post("bytes2any_new: x=%p, size=%d, eos=%d, binbuf=%p, text=%p", x, x->x_size, x->x_eos, x->x_binbuf, x->x_text));
+    S2ADEBUG(post("bytes2any_new: x=%p, binbuf=%p, bytes.alloc=%d", x, x->x_eos, x->x_binbuf, x->x_bytes.b_alloc));
 
     return (void *)x;
 }
@@ -210,7 +210,7 @@ void bytes2any_setup_guts(void)
 			       0);
 
   //-- alias
-#ifndef PDSTRING_OBJECT_EXTERNALS
+#ifndef WANT_OBJECT_EXTERNALS
   class_addcreator((t_newmethod)bytes2any_new, gensym("string2any"), A_GIMME, 0);
 #endif
   

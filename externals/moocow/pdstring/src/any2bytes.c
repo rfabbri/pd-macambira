@@ -165,7 +165,7 @@ void any2bytes_setup_guts(void)
 			      0);
 
   //-- alias
-#ifndef PDSTRING_OBJECT_EXTERNALS
+#ifndef WANT_OBJECT_EXTERNALS
   class_addcreator((t_newmethod)any2bytes_new, gensym("any2string"), A_GIMME, 0);
 #endif
   

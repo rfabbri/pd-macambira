@@ -22,9 +22,10 @@
 # Process this file with Automake to create Makefile.in.
 #-----------------------------------------------------------------------
 
-#-----------------------------------------------------------------------
-# Options & Subdirectories
-#-----------------------------------------------------------------------
+#ACLOCAL_AMFLAGS = -I m4 
+
+#AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip
+#AUTOMAKE_OPTIONS = foreign
 
 
 srcdir = @srcdir@
@@ -47,19 +48,22 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-pdexterns_PROGRAMS = @PD_OBJECT_EXTERNALS@
+DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
+	$(srcdir)/sprinkler-help.pd.in $(top_srcdir)/configure \
+	$(top_srcdir)/pdexternal.am COPYING depcomp install-sh missing
+pdexterns_PROGRAMS = sprinkler$(EXEEXT)
 EXTRA_PROGRAMS = sprinkler$(EXEEXT)
 subdir = .
-DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/sprinkler-help.pd.in \
-	$(top_srcdir)/configure
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pd_external.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(install_sh) -d
+CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = sprinkler-help.pd
 am__installdirs = "$(DESTDIR)$(pdexternsdir)" "$(DESTDIR)$(pddocdir)" \
 	"$(DESTDIR)$(pdexternsdir)"
@@ -68,8 +72,8 @@ PROGRAMS = $(pdexterns_PROGRAMS)
 am_sprinkler_OBJECTS = sprinkler.$(OBJEXT)
 sprinkler_OBJECTS = $(am_sprinkler_OBJECTS)
 sprinkler_LDADD = $(LDADD)
-DEFAULT_INCLUDES = -I. -I$(srcdir)
-depcomp = $(SHELL) $(top_srcdir)/config/depcomp
+DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -100,7 +104,6 @@ GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
 ACLOCAL = @ACLOCAL@
-AFLAGS = @AFLAGS@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
@@ -114,28 +117,22 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
-DEBUG = @DEBUG@
-
-#-----------------------------------------------------------------------
-# external compilation : flags
-#-----------------------------------------------------------------------
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
-DFLAGS = @DFLAGS@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
+ENABLE_DEBUG = @ENABLE_DEBUG@
 EXEEXT = .@PDEXT@
-IFLAGS = @IFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
-LFLAGS = @LFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
@@ -143,7 +140,6 @@ MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
 NON_MAX_FORWARD = @NON_MAX_FORWARD@
 OBJEXT = @OBJEXT@
-OFLAGS = @OFLAGS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -151,12 +147,13 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-
-#-----------------------------------------------------------------------
-# Flags and variables
-#-----------------------------------------------------------------------
 PDEXT = @PDEXT@
-PD_OBJECT_EXTERNALS = @PD_OBJECT_EXTERNALS@
+PDEXT_AFLAGS = @PDEXT_AFLAGS@
+PDEXT_DFLAGS = @PDEXT_DFLAGS@
+PDEXT_IFLAGS = @PDEXT_IFLAGS@
+PDEXT_LFLAGS = @PDEXT_LFLAGS@
+PDEXT_OFLAGS = @PDEXT_OFLAGS@
+PDEXT_WFLAGS = @PDEXT_WFLAGS@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SPRINKLER_ALIAS_1 = @SPRINKLER_ALIAS_1@
@@ -164,7 +161,8 @@ SPRINKLER_ALIAS_2 = @SPRINKLER_ALIAS_2@
 SPRINKLER_COMPAT_TEXT = @SPRINKLER_COMPAT_TEXT@
 STRIP = @STRIP@
 VERSION = @VERSION@
-WFLAGS = -Wall -Winline
+WANT_OBJECT_EXTERNALS_FALSE = @WANT_OBJECT_EXTERNALS_FALSE@
+WANT_OBJECT_EXTERNALS_TRUE = @WANT_OBJECT_EXTERNALS_TRUE@
 ac_ct_CC = @ac_ct_CC@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -192,8 +190,11 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pd_buildext = @pd_buildext@
 pddir = @pddir@
 pddocdir = @pddocdir@
+pdexecdir = @pdexecdir@
+pdextdir = @pdextdir@
 pdexternsdir = @pdexternsdir@
 pdfdir = @pdfdir@
 pdincludedir = @pdincludedir@
@@ -204,34 +205,41 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+DEXT = @PDEXT@
+SUFFIXES = .@PDEXT@ .pod .txt .html
+EXTRA_DIST = \
+	$(PODS) \
+	$(PODS:.pod=.txt) \
+	$(pddoc_DATA) \
+	$(pdext_DATA) \
+	$(pdexterns_DATA) \
+	$(pdexec_DATA) \
+	$(wildcard COPYING) \
+	$(wildcard Changes) \
+	$(wildcard ChangeLog) \
+	$(wildcard README.cvs) \
+	$(wildcard depcomp) \
+	$(wildcard install-sh) \
+	$(wildcard ltmain.sh) \
+	$(wildcard mising) \
+	$(wildcard mkinstalldirs)
 
-#AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip
-AUTOMAKE_OPTIONS = foreign
 
-#SUBDIRS = config src
-SUFFIXES = .pod .txt .@PDEXT@
-
-#-----------------------------------------------------------------------
-# Variables: cleanup
-#-----------------------------------------------------------------------
-#MOSTLYCLEANFILES =
-
-#CLEANFILES =
+#all-local: $(PODS:.pod=.txt)
+CLEANFILES = *.$(PDEXT)
 DISTCLEANFILES = \
 	config.log	\
 	config.cache	\
 	config.status
 
-MAINTAINERCLEANFILES = \
-	*.$(PDEXT) \
-	.*~ *~ \
-	Makefile Makefile.in \
+MAINTAINERCLEANFILES = *~ \
+	$(PODS:.pod=.txt) \
+	Makefile \
+	Makefile.in \
 	aclocal.m4 \
-	configure \
-	install-sh \
-	stamp-h.in \
-	config.h.in \
 	compile \
+	configure \
+	config.h.in \
 	config.guess \
 	config.sub \
 	depcomp \
@@ -239,48 +247,44 @@ MAINTAINERCLEANFILES = \
 	ltmain.sh \
 	missing \
 	mkinstalldirs \
+	stamp-h.in \
 	texinfo.tex \
 	ylwrap
 
 
-#CVSCLEAN_SUBDIRS = $(SUBDIRS)
+#-----------------------------------------------------------------------
+# Includes
+#-----------------------------------------------------------------------
 
-#CVSCLEANFILES = Makefile.in Makefile
+#-----------------------------------------------------------------------
+# Options & Subdirectories
+#-----------------------------------------------------------------------
+ACLOCAL_AMFLAGS = -I m4 
+
+#AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip
+AUTOMAKE_OPTIONS = foreign
+
+#SUBDIRS = config src
 
 #-----------------------------------------------------------------------
 # Additional Variables & Rules: PODS
 #-----------------------------------------------------------------------
 PODS = README.pod
-
-#-----------------------------------------------------------------------
-# Variables: distribution
-#-----------------------------------------------------------------------
-#sprinkler_LDADD   =
-
-#-----------------------------------------------------------------------
-# Variables: distribution
-#-----------------------------------------------------------------------
-EXTRA_DIST = $(PODS:.pod=.txt) autogen.sh configure README.cvs \
-	GnuGPL.txt Makefile.in $(pddoc_DATA) $(pdexterns_DATA)
 pdexterns_DATA = 
 pddoc_DATA = sprinkler-help.pd
 
 #-----------------------------------------------------------------------
 # sources
 #-----------------------------------------------------------------------
-sprinkler_SOURCES = \
-	sprinkler.c mooPdUtils.h
-
-AM_CPPFLAGS = $(IFLAGS) $(DFLAGS)
-AM_CFLAGS = $(OFLAGS) $(WFLAGS) $(AFLAGS)
-sprinkler_LDFLAGS = $(LFLAGS)
-all: all-am
+sprinkler_SOURCES = sprinkler.c mooPdUtils.h
+all: config.h
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .pod .txt .@PDEXT@ .c .o .obj
+.SUFFIXES: .@PDEXT@ .pod .txt .html .c .o .obj
 am--refresh:
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/pdexternal.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -311,6 +315,23 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(srcdir) && $(AUTOCONF)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+
+config.h: stamp-h1
+	@if test ! -f $@; then \
+	  rm -f stamp-h1; \
+	  $(MAKE) stamp-h1; \
+	else :; fi
+
+stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
+	@rm -f stamp-h1
+	cd $(top_builddir) && $(SHELL) ./config.status config.h
+$(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+	cd $(top_srcdir) && $(AUTOHEADER)
+	rm -f stamp-h1
+	touch $@
+
+distclean-hdr:
+	-rm -f config.h stamp-h1
 sprinkler-help.pd: $(top_builddir)/config.status $(srcdir)/sprinkler-help.pd.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-pdexternsPROGRAMS: $(pdexterns_PROGRAMS)
@@ -407,11 +428,11 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS:  $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) config.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -423,11 +444,11 @@ TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	    $$tags $$unique; \
 	fi
 ctags: CTAGS
-CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS:  $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) config.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -448,7 +469,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/.
+	$(mkdir_p) $(distdir)/. $(distdir)/m4
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -574,7 +595,7 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS) $(DATA) all-local
+all-am: Makefile $(PROGRAMS) $(DATA) config.h all-local
 installdirs:
 	for dir in "$(DESTDIR)$(pdexternsdir)" "$(DESTDIR)$(pddocdir)" "$(DESTDIR)$(pdexternsdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
@@ -596,6 +617,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -614,7 +636,7 @@ distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-tags
+	distclean-hdr distclean-tags
 
 dvi: dvi-am
 
@@ -664,12 +686,13 @@ uninstall-am: uninstall-info-am uninstall-pddocDATA \
 	clean clean-generic clean-pdexternsPROGRAMS ctags dist \
 	dist-all dist-bzip2 dist-gzip dist-shar dist-tarZ dist-zip \
 	distcheck distclean distclean-compile distclean-generic \
-	distclean-tags distcleancheck distdir distuninstallcheck dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-man install-pddocDATA \
-	install-pdexternsDATA install-pdexternsPROGRAMS install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
+	distclean-hdr distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-pddocDATA install-pdexternsDATA \
+	install-pdexternsPROGRAMS install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic maintainer-clean-local mostlyclean \
 	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-info-am \
@@ -677,36 +700,20 @@ uninstall-am: uninstall-info-am uninstall-pddocDATA \
 	uninstall-pdexternsPROGRAMS
 
 
-#	$(PODS:.pod=.txt)
+.pod.txt:
+	pod2text $< $@
+
+.pod.html:
+	pod2html $< --outfile=$@
 
 maintainer-clean-local:
 	rm -rf autom4te.cache
 
-.pod.txt:
-	pod2text $< $@
-
-all-local: $(PODS:.pod=.txt)
-
-#DIST_SUBDIRS = $(SUBDIRS)
-
-#DISTHOOK_DIRS = foo
-#DISTHOOK_FILES = foo/bar.txt foo/baz.txt
-#dist-hook:
-#	for d in $(DISTHOOK_DIRS); do\
-#	  mkdir -p $(distdir)/$$d ;\
-#	done
-#	for f in $(DISTHOOK_FILES); do\
-#	  cp -p $(srcdir)/$$f $(distdir)/$$f ;\
-#	done
-
-#dist-bz2: dist-bzip2 ;
-
-#-----------------------------------------------------------------------
-# Rules: cleanup
-#-----------------------------------------------------------------------
 .PHONY: cvsclean cvsclean-hook
 
 cvsclean: maintainer-clean ;
+
+all-local: $(PODS:.pod=.txt)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

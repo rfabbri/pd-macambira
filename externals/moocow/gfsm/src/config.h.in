@@ -36,6 +36,12 @@
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 
+/* Date this package was configured */
+#undef PACKAGE_BUILD_DATE
+
+/* User who configured this package */
+#undef PACKAGE_BUILD_USER
+
 /* Define to the full name of this package. */
 #undef PACKAGE_NAME
 
@@ -48,12 +54,6 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Date this external was configured */
-#undef PD_GFSM_DATE
-
-/* User who configured this external */
-#undef PD_GFSM_USER
-
 /* Which version of gfsm are we using? */
 #undef PD_GFSM_WHICH
 
@@ -62,3 +62,6 @@
 
 /* Version number of package */
 #undef VERSION
+
+/* Define this if you are building single-object externals */
+#undef WANT_OBJECT_EXTERNALS

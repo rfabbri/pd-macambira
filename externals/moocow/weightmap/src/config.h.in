@@ -9,6 +9,12 @@
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 
+/* Date this package was configured */
+#undef PACKAGE_BUILD_DATE
+
+/* User who configured this package */
+#undef PACKAGE_BUILD_USER
+
 /* Define to the full name of this package. */
 #undef PACKAGE_NAME
 
@@ -23,6 +29,9 @@
 
 /* Version number of package */
 #undef VERSION
+
+/* Define this if you are building single-object externals */
+#undef WANT_OBJECT_EXTERNALS
 
 /* Define this to include debugging code for the 'weightmap' external. */
 #undef WEIGHTMAP_DEBUG

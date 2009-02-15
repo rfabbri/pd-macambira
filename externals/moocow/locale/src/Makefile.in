@@ -15,18 +15,15 @@
 @SET_MAKE@
 
 # File: ./src/Makefile.am
-# Package: rawfile
+# Package: (pd external)
 # Description:
 #   + src-level automake file
-#
-# Process this file with Automake to create Makefile.in.
 #-----------------------------------------------------------------------
 
-#-----------------------------------------------------------------------
-# Options & Subdirectories
-#-----------------------------------------------------------------------
+#ACLOCAL_AMFLAGS = -I m4 
 
-#SUBDIRS = 
+#AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip
+#AUTOMAKE_OPTIONS = foreign
 
 
 srcdir = @srcdir@
@@ -49,14 +46,14 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-pdexterns_PROGRAMS = @PD_OBJECT_EXTERNALS@
-EXTRA_PROGRAMS = locale$(EXEEXT)
-subdir = src
-SUBDIRS =
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/config.h.in
+	$(srcdir)/config.h.in $(top_srcdir)/pdexternal.am
+pdexterns_PROGRAMS = locale$(EXEEXT) uselocale$(EXEEXT)
+EXTRA_PROGRAMS = locale$(EXEEXT) uselocale$(EXEEXT)
+subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pd_external.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -69,6 +66,9 @@ PROGRAMS = $(pdexterns_PROGRAMS)
 am_locale_OBJECTS = locale.$(OBJEXT)
 locale_OBJECTS = $(am_locale_OBJECTS)
 locale_LDADD = $(LDADD)
+am_uselocale_OBJECTS = uselocale.$(OBJEXT)
+uselocale_OBJECTS = $(am_uselocale_OBJECTS)
+uselocale_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -76,14 +76,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(locale_SOURCES)
-DIST_SOURCES = $(locale_SOURCES)
-RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
-	html-recursive info-recursive install-data-recursive \
-	install-exec-recursive install-info-recursive \
-	install-recursive installcheck-recursive installdirs-recursive \
-	pdf-recursive ps-recursive uninstall-info-recursive \
-	uninstall-recursive
+SOURCES = $(locale_SOURCES) $(uselocale_SOURCES)
+DIST_SOURCES = $(locale_SOURCES) $(uselocale_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -97,7 +91,6 @@ ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
-AFLAGS = @AFLAGS@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
@@ -111,35 +104,28 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
-DEBUG = @DEBUG@
-
-#-----------------------------------------------------------------------
-# external compilation : flags
-#-----------------------------------------------------------------------
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
-DFLAGS = @DFLAGS@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
+ENABLE_DEBUG = @ENABLE_DEBUG@
 EXEEXT = .@PDEXT@
-IFLAGS = @IFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
-LFLAGS = @LFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
 OBJEXT = @OBJEXT@
-OFLAGS = @OFLAGS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -147,17 +133,19 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-
-#-----------------------------------------------------------------------
-# Flags and variables
-#-----------------------------------------------------------------------
 PDEXT = @PDEXT@
-PD_OBJECT_EXTERNALS = @PD_OBJECT_EXTERNALS@
+PDEXT_AFLAGS = @PDEXT_AFLAGS@
+PDEXT_DFLAGS = @PDEXT_DFLAGS@
+PDEXT_IFLAGS = @PDEXT_IFLAGS@
+PDEXT_LFLAGS = @PDEXT_LFLAGS@
+PDEXT_OFLAGS = @PDEXT_OFLAGS@
+PDEXT_WFLAGS = @PDEXT_WFLAGS@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-WFLAGS = -Wall -Winline
+WANT_OBJECT_EXTERNALS_FALSE = @WANT_OBJECT_EXTERNALS_FALSE@
+WANT_OBJECT_EXTERNALS_TRUE = @WANT_OBJECT_EXTERNALS_TRUE@
 ac_ct_CC = @ac_ct_CC@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
@@ -185,8 +173,11 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pd_buildext = @pd_buildext@
 pddir = @pddir@
 pddocdir = @pddocdir@
+pdexecdir = @pdexecdir@
+pdextdir = @pdextdir@
 pdexternsdir = @pdexternsdir@
 pdfdir = @pdfdir@
 pdincludedir = @pdincludedir@
@@ -197,25 +188,27 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-SUFFIXES = .@PDEXT@
-pdexterns_DATA = 
-pddoc_DATA = locale-help.pd
+DEXT = @PDEXT@
+SUFFIXES = .@PDEXT@ .pod .txt .html
+EXTRA_DIST = \
+	$(PODS) \
+	$(PODS:.pod=.txt) \
+	$(pddoc_DATA) \
+	$(pdext_DATA) \
+	$(pdexterns_DATA) \
+	$(pdexec_DATA) \
+	$(wildcard COPYING) \
+	$(wildcard Changes) \
+	$(wildcard ChangeLog) \
+	$(wildcard README.cvs) \
+	$(wildcard depcomp) \
+	$(wildcard install-sh) \
+	$(wildcard ltmain.sh) \
+	$(wildcard mising) \
+	$(wildcard mkinstalldirs)
 
-#-----------------------------------------------------------------------
-# sources
-#-----------------------------------------------------------------------
-locale_SOURCES = \
-	locale.c
 
-AM_CPPFLAGS = $(IFLAGS) $(DFLAGS)
-AM_CFLAGS = $(OFLAGS) $(WFLAGS) $(AFLAGS)
-locale_LDFLAGS = $(LFLAGS)
-#locale_LDADD   =
-
-#-----------------------------------------------------------------------
-# Variables: cleanup
-#-----------------------------------------------------------------------
-#MOSTLYCLEANFILES =
+#all-local: $(PODS:.pod=.txt)
 CLEANFILES = *.$(PDEXT)
 DISTCLEANFILES = \
 	config.log	\
@@ -224,32 +217,37 @@ DISTCLEANFILES = \
 
 MAINTAINERCLEANFILES = *~ \
 	$(PODS:.pod=.txt) \
-	Makefile Makefile.in \
+	Makefile \
+	Makefile.in \
 	aclocal.m4 \
+	compile \
 	configure \
+	config.h.in \
+	config.guess \
+	config.sub \
+	depcomp \
 	install-sh \
+	ltmain.sh \
+	missing \
+	mkinstalldirs \
 	stamp-h.in \
-	config.h.in
+	texinfo.tex \
+	ylwrap
 
-
-#CVSCLEAN_SUBDIRS = $(SUBDIRS)
-
-#CVSCLEANFILES = Makefile.in Makefile
+pdexterns_DATA = 
+pddoc_DATA = locale-help.pd
 
 #-----------------------------------------------------------------------
-# Variables: distribution
+# sources
 #-----------------------------------------------------------------------
-EXTRA_DIST = \
-	$(pddoc_DATA) \
-	$(pdexterns_DATA)
-
-DIST_SUBDIRS = $(SUBDIRS)
+locale_SOURCES = locale.c
+uselocale_SOURCES = uselocale.c
 all: config.h
-	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .@PDEXT@ .c .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+.SUFFIXES: .@PDEXT@ .pod .txt .html .c .o .obj
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/pdexternal.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -321,6 +319,9 @@ clean-pdexternsPROGRAMS:
 locale$(EXEEXT): $(locale_OBJECTS) $(locale_DEPENDENCIES) 
 	@rm -f locale$(EXEEXT)
 	$(LINK) $(locale_LDFLAGS) $(locale_OBJECTS) $(locale_LDADD) $(LIBS)
+uselocale$(EXEEXT): $(uselocale_OBJECTS) $(uselocale_DEPENDENCIES) 
+	@rm -f uselocale$(EXEEXT)
+	$(LINK) $(uselocale_LDFLAGS) $(uselocale_OBJECTS) $(uselocale_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -329,6 +330,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/locale.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uselocale.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -379,77 +381,6 @@ uninstall-pdexternsDATA:
 	  rm -f "$(DESTDIR)$(pdexternsdir)/$$f"; \
 	done
 
-# This directory's subdirectories are mostly independent; you can cd
-# into them and run `make' without going through this Makefile.
-# To change the values of `make' variables: instead of editing Makefiles,
-# (1) if the variable is set in `config.status', edit `config.status'
-#     (which will cause the Makefiles to be regenerated when you run `make');
-# (2) otherwise, pass the desired values on the `make' command line.
-$(RECURSIVE_TARGETS):
-	@failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	target=`echo $@ | sed s/-recursive//`; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    dot_seen=yes; \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done; \
-	if test "$$dot_seen" = "no"; then \
-	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
-	fi; test -z "$$fail"
-
-mostlyclean-recursive clean-recursive distclean-recursive \
-maintainer-clean-recursive:
-	@failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	case "$@" in \
-	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
-	  *) list='$(SUBDIRS)' ;; \
-	esac; \
-	rev=''; for subdir in $$list; do \
-	  if test "$$subdir" = "."; then :; else \
-	    rev="$$subdir $$rev"; \
-	  fi; \
-	done; \
-	rev="$$rev ."; \
-	target=`echo $@ | sed s/-recursive//`; \
-	for subdir in $$rev; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done && test -z "$$fail"
-tags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
-	done
-ctags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) ctags); \
-	done
-
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
@@ -460,23 +391,10 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
+TAGS:  $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
-	  include_option=--etags-include; \
-	  empty_fix=.; \
-	else \
-	  include_option=--include; \
-	  empty_fix=; \
-	fi; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test ! -f $$subdir/TAGS || \
-	      tags="$$tags $$include_option=$$here/$$subdir/TAGS"; \
-	  fi; \
-	done; \
 	list='$(SOURCES) $(HEADERS) config.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
@@ -489,7 +407,7 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
 	    $$tags $$unique; \
 	fi
 ctags: CTAGS
-CTAGS: ctags-recursive $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
+CTAGS:  $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
@@ -512,6 +430,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
+	$(mkdir_p) $(distdir)/..
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -538,38 +457,22 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test -d "$(distdir)/$$subdir" \
-	    || $(mkdir_p) "$(distdir)/$$subdir" \
-	    || exit 1; \
-	    distdir=`$(am__cd) $(distdir) && pwd`; \
-	    top_distdir=`$(am__cd) $(top_distdir) && pwd`; \
-	    (cd $$subdir && \
-	      $(MAKE) $(AM_MAKEFLAGS) \
-	        top_distdir="$$top_distdir" \
-	        distdir="$$distdir/$$subdir" \
-	        distdir) \
-	      || exit 1; \
-	  fi; \
-	done
 check-am: all-am
-check: check-recursive
+check: check-am
 all-am: Makefile $(PROGRAMS) $(DATA) config.h
-installdirs: installdirs-recursive
-installdirs-am:
+installdirs:
 	for dir in "$(DESTDIR)$(pdexternsdir)" "$(DESTDIR)$(pddocdir)" "$(DESTDIR)$(pdexternsdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
-install: install-recursive
-install-exec: install-exec-recursive
-install-data: install-data-recursive
-uninstall: uninstall-recursive
+install: install-am
+install-exec: install-exec-am
+install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-recursive
+installcheck: installcheck-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
 	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
@@ -588,23 +491,23 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
-clean: clean-recursive
+clean: clean-am
 
 clean-am: clean-generic clean-pdexternsPROGRAMS mostlyclean-am
 
-distclean: distclean-recursive
+distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-tags
 
-dvi: dvi-recursive
+dvi: dvi-am
 
 dvi-am:
 
-html: html-recursive
+html: html-am
 
-info: info-recursive
+info: info-am
 
 info-am:
 
@@ -613,71 +516,57 @@ install-data-am: install-pddocDATA install-pdexternsDATA \
 
 install-exec-am:
 
-install-info: install-info-recursive
+install-info: install-info-am
 
 install-man:
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-recursive
+maintainer-clean: maintainer-clean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic \
 	maintainer-clean-local
 
-mostlyclean: mostlyclean-recursive
+mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
-pdf: pdf-recursive
+pdf: pdf-am
 
 pdf-am:
 
-ps: ps-recursive
+ps: ps-am
 
 ps-am:
 
 uninstall-am: uninstall-info-am uninstall-pddocDATA \
 	uninstall-pdexternsDATA uninstall-pdexternsPROGRAMS
 
-uninstall-info: uninstall-info-recursive
-
-.PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am check check-am \
-	clean clean-generic clean-pdexternsPROGRAMS clean-recursive \
-	ctags ctags-recursive distclean distclean-compile \
-	distclean-generic distclean-hdr distclean-recursive \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-man \
-	install-pddocDATA install-pdexternsDATA \
-	install-pdexternsPROGRAMS install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-local \
-	maintainer-clean-recursive mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-recursive pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am uninstall-info-am \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-pdexternsPROGRAMS ctags distclean distclean-compile \
+	distclean-generic distclean-hdr distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-exec install-exec-am \
+	install-info install-info-am install-man install-pddocDATA \
+	install-pdexternsDATA install-pdexternsPROGRAMS install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic maintainer-clean-local mostlyclean \
+	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-info-am \
 	uninstall-pddocDATA uninstall-pdexternsDATA \
 	uninstall-pdexternsPROGRAMS
 
 
+.pod.txt:
+	pod2text $< $@
+
+.pod.html:
+	pod2html $< --outfile=$@
+
 maintainer-clean-local:
 	rm -rf autom4te.cache
 
-#DISTHOOK_DIRS = foo
-#DISTHOOK_FILES = foo/bar.txt foo/baz.txt
-#dist-hook:
-#	for d in $(DISTHOOK_DIRS); do\
-#	  mkdir -p $(distdir)/$$d ;\
-#	done
-#	for f in $(DISTHOOK_FILES); do\
-#	  cp -p $(srcdir)/$$f $(distdir)/$$f ;\
-#	done
-
-#dist-bz2: dist-bzip2 ;
-
-#-----------------------------------------------------------------------
-# Rules: cleanup
-#-----------------------------------------------------------------------
 .PHONY: cvsclean cvsclean-hook
 
 cvsclean: maintainer-clean ;

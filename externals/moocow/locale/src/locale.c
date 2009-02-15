@@ -2,7 +2,7 @@
 /*=============================================================================*\
  * File: locale.c
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
- * Description: general directory access object
+ * Description: C99 locale support
  *
  * Copyright (c) 2009 Bryan Jurish.
  *
@@ -31,12 +31,6 @@
 #include <stddef.h>
 
 #include <m_pd.h>
-
-/* black magic */
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -73,7 +67,7 @@
 
 static char *locale_banner =
   "\nlocale: C99 locale support version " PACKAGE_VERSION " by Bryan Jurish\n"
-    "locale: compiled by " PDMOOEXT_USER " on " PDMOOEXT_DATE ;
+    "locale: compiled by " PACKAGE_BUILD_USER " on " PACKAGE_BUILD_DATE ;
 
 static t_class *locale_class;
 
@@ -261,6 +255,7 @@ static t_symbol *cat2sym(t_object *obj, int cat)
 static void locale_bang(t_locale *x)
 {
   setlocale(LC_ALL,"");
+  setlocale(LC_NUMERIC,"C");
 }
 
 /*--------------------------------------------------------------------
@@ -287,7 +282,7 @@ static void locale_get(t_locale *x, t_symbol *catsym)
 static void locale_set(t_locale *x, t_symbol *catsym, t_symbol *valsym)
 {
   int cat;
-  if (catsym==&s_ && valsym==&s_) { locale_bang(x); return; }
+  if (catsym==&s_ && valsym==&s_) { setlocale(LC_ALL,""); return; }
   cat = sym2cat((t_object*)x,catsym);
   setlocale(cat,valsym->s_name);
 }

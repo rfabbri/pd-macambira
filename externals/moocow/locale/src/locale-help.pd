@@ -19,10 +19,10 @@ results. In particular \, setting LC_NUMERIC (possibly via LC_ALL or
 LANG) to a locale whose floats are comma-separated rather than dot-separated
 (e.g. de_DE) can confuse Pd's underlying float-parsing mechanism.;
 #X msg 66 173 bang;
-#X text 226 173 "bang" : alias for "set";
 #X text 224 69 "set CATEGORY VALUE" : set CATEGORY to VALUE;
 #X msg 64 151 which;
 #X text 226 153 "which" : list supported categories;
+#X text 226 173 "bang" : alias for "set \, set LC_NUMERIC C";
 #X connect 1 0 2 0;
 #X connect 4 0 1 0;
 #X connect 6 0 1 0;
@@ -30,4 +30,4 @@ LANG) to a locale whose floats are comma-separated rather than dot-separated
 #X connect 8 0 1 0;
 #X connect 11 0 1 0;
 #X connect 15 0 1 0;
-#X connect 18 0 1 0;
+#X connect 17 0 1 0;

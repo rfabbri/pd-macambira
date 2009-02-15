@@ -30,19 +30,12 @@
 
 
 #include <m_pd.h>
-#include "mooPdUtils.h"
-
-/* black magic */
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #include <math.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include "mooPdUtils.h"
 
 /*--------------------------------------------------------------------
  * DEBUG
@@ -60,7 +53,10 @@
  * Structures and Types
  *=====================================================================*/
 
-static char *weightmap_banner = "weightmap version %s by Bryan Jurish : map probabilities to associated integers";
+static char *weightmap_banner =
+"\n"
+"weightmap: stochastic selection v" PACKAGE_VERSION " by Bryan Jurish\n"
+"weightmap: compiled by " PACKAGE_BUILD_USER " on " PACKAGE_BUILD_DATE "";
 
 static t_class *weightmap_class;
 
@@ -120,7 +116,7 @@ void weightmap_map(t_weightmap *x, MOO_UNUSED t_symbol *s, int argc, t_atom *arg
     idx = atom_getint(argv+i);
     if (idx <= 0 || idx > x->x_nvalues) {
       // sanity check: index-range
-      error("weightmap : map : index out of range : %d", idx);
+      pd_error(x,"weightmap : map : index out of range : %d", idx);
       continue;
     }
     idx--;
@@ -167,7 +163,7 @@ void weightmap_set(t_weightmap *x, MOO_UNUSED t_symbol *s, int argc, t_atom *arg
     }
     x->x_weights = (t_float *)getbytes(x->x_nvalues*sizeof(t_float));
     if (!x->x_weights) {
-      error("weightmap : failed to allocate new weight vector");
+      pd_error(x,"weightmap : failed to allocate new weight vector");
       return;
     }
   }
@@ -209,7 +205,7 @@ void weightmap_resize(t_weightmap *x, t_floatarg f) {
   // allocate new weight-vector
   x->x_weights = (t_float *)getbytes(x->x_nvalues*sizeof(t_float));
   if (!x->x_weights) {
-    error("weightmap : resize : failed to allocate new weight vector");
+    pd_error(x,"weightmap : resize : failed to allocate new weight vector");
     return;
   }
 
@@ -241,7 +237,7 @@ void weightmap_max(t_weightmap *x, t_floatarg f) {
   if (f > 0) {
     x->x_wmax = f;
   } else {
-    error("weightmap : invalid maximum weight : %f", f);
+    pd_error(x,"weightmap : invalid maximum weight : %f", f);
   }
 }
 
@@ -261,7 +257,7 @@ void weightmap_dump(t_weightmap *x) {
   // allocate dump-list
   dumpus = (t_atom *)getbytes(x->x_nvalues*sizeof(t_atom));
   if (!dumpus) {
-    error("weightmap : failed to allocate dump list");
+    pd_error(x,"weightmap : failed to allocate dump list");
     return;
   }
 
@@ -306,7 +302,7 @@ static void *weightmap_new(t_floatarg f, t_floatarg max)
   // allocate weight-vector
   x->x_weights = (t_float *)getbytes(x->x_nvalues*sizeof(t_float));
   if (!x->x_weights) {
-    error("weightmap : failed to allocate weight vector");
+    pd_error(x,"weightmap : failed to allocate weight vector");
     return NULL;
   }
 
@@ -340,7 +336,8 @@ static void weightmap_free(t_weightmap *x) {
  * setup
  *--------------------------------------------------------------------*/
 void weightmap_setup(void) {
-  post(weightmap_banner, PACKAGE_VERSION);
+  post(weightmap_banner);
+
   weightmap_class = class_new(gensym("weightmap"),          /* name */
 			      (t_newmethod)weightmap_new,   /* newmethod */
 			      (t_method)weightmap_free,     /* freemethod */

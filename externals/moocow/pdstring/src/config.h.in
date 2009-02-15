@@ -15,6 +15,12 @@
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 
+/* Date this package was configured */
+#undef PACKAGE_BUILD_DATE
+
+/* User who configured this package */
+#undef PACKAGE_BUILD_USER
+
 /* Define to the full name of this package. */
 #undef PACKAGE_NAME
 
@@ -27,14 +33,8 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Date this external was configured */
-#undef PDSTRING_DATE
-
-/* Define this if you are building single-object externals */
-#undef PDSTRING_OBJECT_EXTERNALS
-
-/* User who configured this external */
-#undef PDSTRING_USER
-
 /* Version number of package */
 #undef VERSION
+
+/* Define this if you are building single-object externals */
+#undef WANT_OBJECT_EXTERNALS

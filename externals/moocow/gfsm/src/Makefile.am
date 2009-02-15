@@ -7,24 +7,20 @@
 #-----------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
+# Includes
+#-----------------------------------------------------------------------
+include $(top_srcdir)/pdexternal.am
+
+#-----------------------------------------------------------------------
 # Options & Subdirectories
 #-----------------------------------------------------------------------
 
 ## --- recursion subdirectories
 #SUBDIRS = 
 
-## --- pseudo-deps for '.SUFFIXES'
-SUFFIXES = .@PDEXT@
-
-#-----------------------------------------------------------------------
-# Flags and variables
-#-----------------------------------------------------------------------
-PDEXT    = @PDEXT@
-EXEEXT   = .@PDEXT@
-
-#-----------------------------------------------------------------------
-# pd externals (hacked _PROGRAMS target)
-#-----------------------------------------------------------------------
+##-----------------------------------------------------------------------
+## Pd Externals: hacked _PROGRAMS
+##-----------------------------------------------------------------------
 
 ## --- externals
 pdexterns_PROGRAMS = gfsm
@@ -64,94 +60,3 @@ gfsm_SOURCES = \
 noconfig.h: config.h.in
 	rm -f $@
 	cp $< $@
-
-#----------------------------------------------------------------------
-# external compilation : flags
-#-----------------------------------------------------------------------
-DEFS    = @DEFS@
-AFLAGS  = @AFLAGS@
-DFLAGS  = @DFLAGS@
-IFLAGS  = @IFLAGS@ -I$(srcdir)
-LFLAGS  = @LFLAGS@
-OFLAGS  = @OFLAGS@
-WFLAGS  = -Wall
-
-AM_CPPFLAGS = $(IFLAGS) $(DFLAGS)
-AM_CFLAGS   = $(OFLAGS) $(WFLAGS) $(AFLAGS)
-AM_CXXFLAGS = $(OFLAGS) $(WFLAGS) $(AFLAGS)
-
-gfsm_LDFLAGS = $(LFLAGS)
-#gfsm_LDADD   =
-
-#-----------------------------------------------------------------------
-# additional hacks
-#-----------------------------------------------------------------------
-#(none)
-
-#-----------------------------------------------------------------------
-# Variables: cleanup
-#-----------------------------------------------------------------------
-## --- mostlyclean: built by 'make' & commonly rebuilt
-#MOSTLYCLEANFILES =
-
-## --- clean: built by 'make'
-CLEANFILES = *.$(PDEXT)
-
-## --- distclean: built by 'configure'
-DISTCLEANFILES = \
-	config.log	\
-	config.cache	\
-	config.status
-
-## -- maintainerclean: built by maintainer / by hand
-MAINTAINERCLEANFILES = *~ \
-	$(PODS:.pod=.txt) \
-	Makefile Makefile.in \
-	aclocal.m4 \
-	configure \
-	install-sh \
-	stamp-h.in \
-	config.h.in
-
-maintainer-clean-local:
-	rm -rf autom4te.cache
-
-#CVSCLEAN_SUBDIRS = $(SUBDIRS)
-
-#CVSCLEANFILES = Makefile.in Makefile
-
-
-#-----------------------------------------------------------------------
-# Variables: distribution
-#-----------------------------------------------------------------------
-
-## --- extra distribution files
-EXTRA_DIST = \
-	$(pddoc_DATA) \
-	$(pdexterns_DATA)
-
-
-## --- recursion subdirectories for 'make dist'
-DIST_SUBDIRS = $(SUBDIRS)
-
-## --- dist-hook: when another 'Makefile.am' is overkill
-#DISTHOOK_DIRS = foo
-#DISTHOOK_FILES = foo/bar.txt foo/baz.txt
-#dist-hook:
-#	for d in $(DISTHOOK_DIRS); do\
-#	  mkdir -p $(distdir)/$$d ;\
-#	done
-#	for f in $(DISTHOOK_FILES); do\
-#	  cp -p $(srcdir)/$$f $(distdir)/$$f ;\
-#	done
-
-#dist-bz2: dist-bzip2 ;
-
-
-#-----------------------------------------------------------------------
-# Rules: cleanup
-#-----------------------------------------------------------------------
-.PHONY: cvsclean cvsclean-hook
-
-cvsclean: maintainer-clean ;
-

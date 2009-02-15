@@ -4,7 +4,7 @@ AC_PREREQ(2.5)
 
 ##-- Some handy macros
 define([THE_PACKAGE_NAME],    [hello])
-define([THE_PACKAGE_VERSION], [0.01])
+define([THE_PACKAGE_VERSION], [0.01-1])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -13,8 +13,8 @@ AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
 AC_CONFIG_MACRO_DIR(m4)
 
 ##-- source & aux
-dnl AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_AUX_DIR(.)
+dnl AC_CONFIG_AUX_DIR(config)
 
 ##-- save user's CFLAGS,CPPFLAGS
 UCPPFLAGS="$CPPFLAGS"
@@ -24,6 +24,7 @@ ULDFLAGS="$LDFLAGS"
 ##-- use automake, autoheader
 AM_INIT_AUTOMAKE(THE_PACKAGE_NAME, THE_PACKAGE_VERSION)
 AM_CONFIG_HEADER(config.h)
+dnl AM_CONFIG_HEADER(src/config.h)
 
 ##-- Default prefix
 AC_PREFIX_DEFAULT(/usr/local)
@@ -42,7 +43,7 @@ dnl -----/maintainer mode
 dnl AC_ISC_POSIX
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-## Pd external checks
+## Pd external common
 AX_PD_EXTERNAL
 ## /pd external common
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -51,6 +52,14 @@ AX_PD_EXTERNAL
 ## Local: headers
 AC_MSG_NOTICE([performing local configuration actions])
 ## /local: headers
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## Local: debug
+if test "$enable_debug" = "yes"; then
+  AC_DEFINE(LOCAL_DEBUG,1,[Define this to enable local debugging])
+fi
+## /local: debug
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ##-- local: restore user's CFLAGS (now done by AX_PD_EXTERNAL)

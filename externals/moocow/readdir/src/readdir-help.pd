@@ -1,4 +1,4 @@
-#N canvas 356 19 535 566 10;
+#N canvas 438 13 535 566 10;
 #X msg 89 227 close;
 #X msg 52 79 bang;
 #X msg 83 160 tell;

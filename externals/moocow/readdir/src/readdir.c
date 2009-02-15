@@ -4,7 +4,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: general directory access object
  *
- * Copyright (c) 2003 Bryan Jurish.
+ * Copyright (c) 2003-2009 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
@@ -33,12 +33,6 @@
 
 #include <m_pd.h>
 
-/* black magic */
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -62,7 +56,10 @@ static char readdir_errbuf[EBUFSIZE];
  * Structures and Types
  *=====================================================================*/
 
-static char *readdir_banner = "\nreaddir version %s by Bryan Jurish : simple directory accessor";
+static char *readdir_banner =
+  "\n"
+  "readdir: simple directory accessor v" PACKAGE_VERSION " by Bryan Jurish\n"
+  "readdir: compiled by " PACKAGE_BUILD_USER " on " PACKAGE_BUILD_DATE ;
 
 static t_class *readdir_class;
 
@@ -190,6 +187,9 @@ static void readdir_tell(t_readdir *x)
 {
   off_t off = 0;
   if (x->x_dir) off = telldir(x->x_dir);
+#ifdef READDIR_DEBUG
+  post("readdir_tell(): off: %%d=%d, %%f=%f\n", off, (t_float)off);
+#endif
   outlet_float(x->x_ent_outlet, (t_float)off);
 }
 
@@ -241,9 +241,9 @@ static void readdir_free(t_readdir *x)
  */
 void readdir_setup(void)
 {
-  post(readdir_banner, PACKAGE_VERSION);
+  post(readdir_banner);
 #ifdef READDIR_DEBUG
-  post("readdir : debugging enabled");
+  post("readdir: debugging enabled");
 #endif
 
   //-- constants

@@ -15,24 +15,38 @@ if (@ARGV) {
 $ismoo=0;
 %class2n =qw();
 %packages =qw();
+$nfailed = 0;
 while (<>) {
-  if (m|[Ee]ntering directory\b.*\/moocow\/extended(?!\/)|) { #/
-    $ismoo=1;
-    next;
-  }
+  if (
+      m|[Ee]ntering directory\b.*\/moocow\/extended(?!\/)|
+      ||
+      m|^make -C .*\/moocow\/extended\s|
+     )
+    {
+      $ismoo = 1;
+      next;
+    }
   next if (!$ismoo);
 
-  if (m/^\(moocow/i || m/MOOCOW_BUILD_VERSION/) {
+  if (m/MOOCOW_BUILD_VERSION/ || m/^\(moocow/i) {
+    $ismoo = 1;
     print "DEBUG: $_";
+    $nfailed++ if ($_ =~ /sub-target failed/);
   }
-  elsif (m|[Ee]ntering directory\b.*\/moocow\/([^\/]*)$|) {
-    $extdir = $1;
-    chomp($extdir);
-    $extdir =~ s/\'$//;
-    #print "DIR: $extdir\n";
-  }
-  elsif (m|install(?:.*?)\s+(\S+)\s+(?:\S*)/moocow/extended/build.moo/(.*)$|) {
-    ($file,$instdir) = ($1,$2);
+  elsif (
+	 m|[Ee]ntering directory\b.*\/moocow\/([^\/]*)\s|
+	 ||
+	 m|^\(cd \.\./(\S+);|
+	)
+    {
+      $extdir = $1;
+      chomp($extdir);
+      $extdir =~ s/\'$//;
+      #print "DIR: $extdir\n";
+    }
+  elsif (m|install(.*?)\s+(\S+)\s+(?:\S*)/moocow/extended/build.moo/(.*)$|) {
+    ($opts,$file,$instdir) = ($1,$2,$3);
+    next if ($file eq '-d' || $opts =~ /\s\-d\b/);
     $file    =~ s/[\'\"]//g;
     $instdir =~ s/[\'\"]//g;
     $instdir =~ s/$file$//;
@@ -55,7 +69,14 @@ while (<>) {
     $packages{$extdir}=1;
     print sprintf("INSTALL %-3s %10s %-20s %-12s %s\n", $class, $extdir, $base, $ext, $instdir);
   }
-  elsif (/[Ll]eaving directory\b.*\/moocow\/extended(?!\/)/) { $ismoo=0; } #/
+  elsif (
+	 m|[Ll]eaving directory\b.*\/moocow\/extended(?!\/)|
+	 ||
+	 m|^make -C (?!.*\/moocow\/)|
+	)
+    {
+      $ismoo=0;
+    } #/
 }
 
 ##-- summarize
@@ -63,7 +84,7 @@ while (<>) {
 @summary =
   (sprintf("%-32s: ", $arch),
    join(', ',
-	(sprintf("%2d packages", scalar(keys(%packages)))),
+	(sprintf("%2d packages, %2d failed", scalar(keys(%packages)), $nfailed)),
 	(map { sprintf("%2d", ($class2n{$_}||0))." ".($class2name{$_}||$_) } qw(EXT PAT DOC UNK)),
        ),
    "\n",

@@ -54,7 +54,7 @@ typedef struct _pdstring
 /*=====================================================================
  * External declarations
  *=====================================================================*/
-#ifndef PDSTRING_OBJECT_EXTERNALS
+#ifndef WANT_OBJECT_EXTERNALS
 # include "any2bytes.c"
 # include "bytes2any.c"
 
@@ -84,7 +84,7 @@ static void pdstring_help(MOO_UNUSED t_pdstring *x)
 {
   post("");
   post("pdstring: byte-string externals version " PACKAGE_VERSION " by Bryan Jurish");
-  post("pdstring: compiled by " PDSTRING_USER " on " PDSTRING_DATE);
+  post("pdstring: compiled by " PACKAGE_BUILD_USER " on " PACKAGE_BUILD_DATE);
 }
 
 /*=====================================================================
@@ -94,7 +94,7 @@ void pdstring_setup(void)
 {
   pdstring_help(NULL);
 
-#ifndef PDSTRING_OBJECT_EXTERNALS
+#ifndef WANT_OBJECT_EXTERNALS
   any2bytes_setup_guts();
   bytes2any_setup_guts();
 
