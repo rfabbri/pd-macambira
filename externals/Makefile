@@ -554,7 +554,7 @@ CYCLONE_NAME=cyclone
 # cyclone is compiled straight into $(OUT_DIR)
 CYCLONE_OUT_DIR=$(objectsdir)/$(CYCLONE_NAME)
 cyclone: $(bindir)
-
+	$(MAKE) -C $(externals_src)/miXed/cyclone
 
 cyclone_install: cyclone
 	install -d $(objectsdir)/$(CYCLONE_NAME)
@@ -562,6 +562,12 @@ cyclone_install: cyclone
 		--author "Kzrysztof Czaja" \
 		--license "BSD" \
 		--description "a library for porting and running Max/MSP patches in Pd"
+	install -p $(externals_src)/miXed/bin/cyclone.$(EXTENSION) \
+		$(externals_src)/miXed/bin/hammer.$(EXTENSION) \
+		$(externals_src)/miXed/bin/sickle.$(EXTENSION) \
+		$(externals_src)/miXed/bin/maxmode.$(EXTENSION) \
+		$(objectsdir)/$(CYCLONE_NAME)
+# kludge to build as one-file-per-class using the miXed build system
 	cd $(externals_src)/miXed/cyclone && $(MAKE) OUT_DIR=$(CYCLONE_OUT_DIR)
 # install "cyclist" command line app with pd
 # this doesn't build in the right place yet
