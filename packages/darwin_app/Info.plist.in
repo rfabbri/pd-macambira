@@ -11,6 +11,9 @@
 			<array>
 				<string>pd</string>
 				<string>pat</string>
+				<string>mxt</string>
+				<string>mxb</string>
+				<string>help</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>pd-file.icns</string>
