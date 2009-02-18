@@ -562,21 +562,17 @@ cyclone_install: cyclone
 		--author "Kzrysztof Czaja" \
 		--license "BSD" \
 		--description "a library for porting and running Max/MSP patches in Pd"
+# kludge to build as one-file-per-class using the miXed build system
+	cd $(externals_src)/miXed/cyclone && $(MAKE) OUT_DIR=$(CYCLONE_OUT_DIR)
+# install "maxmode" libraries into subdir, so they don't override the libdir
+	install -d $(objectsdir)/$(CYCLONE_NAME)/maxmode
 	install -p $(externals_src)/miXed/bin/cyclone.$(EXTENSION) \
 		$(externals_src)/miXed/bin/hammer.$(EXTENSION) \
 		$(externals_src)/miXed/bin/sickle.$(EXTENSION) \
 		$(externals_src)/miXed/bin/maxmode.$(EXTENSION) \
-		$(objectsdir)/$(CYCLONE_NAME)
-# kludge to build as one-file-per-class using the miXed build system
-	cd $(externals_src)/miXed/cyclone && $(MAKE) OUT_DIR=$(CYCLONE_OUT_DIR)
+		$(objectsdir)/$(CYCLONE_NAME)/maxmode
 # install "cyclist" command line app with pd
-# this doesn't build in the right place yet
-#	install -p -m0755 $(CYCLONE_OUT_DIR)/cyclist $(bindir) && \
-#		rm $(CYCLONE_OUT_DIR)/cyclist
 	-install -p -m0755 $(externals_src)/miXed/bin/cyclist $(bindir)
-# rename cyclone lib since it will pre-empt libdir functionality
-#	mv $(CYCLONE_OUT_DIR)/cyclone.$(EXTENSION) \
-#		$(CYCLONE_OUT_DIR)/cyclonelib.$(EXTENSION)
 	install -d $(helpdir)/$(CYCLONE_NAME)
 	install -p $(externals_src)/miXed/doc/help/cyclone/*.* \
 		$(helpdir)/$(CYCLONE_NAME)
