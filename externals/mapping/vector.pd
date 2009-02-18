@@ -19,7 +19,7 @@
 #X obj 29 159 float;
 #X obj 76 127 trigger bang float;
 #X obj 233 267 mapping/radians2mapping;
-#X obj 153 197 zexy/abs/cart2pol;
+#X obj 153 197 zexy/cart2pol;
 #X connect 0 0 16 0;
 #X connect 4 0 17 0;
 #X connect 7 0 1 0;
