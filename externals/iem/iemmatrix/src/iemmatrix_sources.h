@@ -77,12 +77,12 @@ void iemtx_rmstodb_setup(void); /* mtx_rmstodb.c */
 void iemtx_roll_setup(void); /* mtx_roll.c */
 void iemtx_row_setup(void); /* mtx_row.c */
 void iemtx_scroll_setup(void); /* mtx_scroll.c */
-void iemtx_sh_setup(void); /* mtx_sh.c */
 void iemtx_sin_setup(void); /* mtx_sin.c */
 void iemtx_size_setup(void); /* mtx_size.c */
 void iemtx_slice_setup(void); /* mtx_slice.c */
 void iemtx_sndfileread_setup(void); /* mtx_sndfileread.c */
 void iemtx_sort_setup(void); /* mtx_sort.c */
+void iemtx_spherical_harmonics_setup(void); /* mtx_spherical_harmonics.c */
 void iemtx_sub_setup(void); /* mtx_sub.c */
 void iemtx_sum_setup(void); /* mtx_sum.c */
 void iemtx_svd_setup(void); /* mtx_svd.c */
