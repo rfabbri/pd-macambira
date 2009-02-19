@@ -569,6 +569,8 @@ typedef struct _videogrid {
     int x_pos_selected;
     /* v 0.2 -- color de seleccio */
     t_symbol *x_color_grasp;
+    /* v 0.2.1 -- llista de formats */
+    t_symbol *x_format_list;
 
 } t_videogrid;
 
@@ -590,7 +592,9 @@ void load_tk_procs () {
 	sys_gui("global $var_graph_color_marc\n");
 	sys_gui("set var_graph_color_grasp [concat graph_color_grasp_$vid]\n");
 	sys_gui("global $var_graph_color_grasp\n");
-	sys_gui("set cmd [concat $id dialog [eval concat $$var_graph_name] [eval concat $$var_graph_num_fil] [eval concat $$var_graph_num_col] [eval concat $$var_graph_color_fons] [eval concat $$var_graph_color_marc] [eval concat $$var_graph_color_grasp] \\;]\n");
+	sys_gui("set var_graph_format_list [concat graph_format_list_$vid]\n");
+        sys_gui("global $var_graph_format_list\n");
+	sys_gui("set cmd [concat $id dialog [eval concat $$var_graph_name] [eval concat $$var_graph_num_fil] [eval concat $$var_graph_num_col] [eval concat $$var_graph_color_fons] [eval concat $$var_graph_color_marc] [eval concat $$var_graph_color_grasp] [eval concat $$var_graph_format_list] \\;]\n");
 	// puts stderr $cmd
 	sys_gui("pd $cmd\n");
 	sys_gui("}\n");
@@ -603,7 +607,7 @@ void load_tk_procs () {
 	sys_gui("videogrid_apply $id\n");
 	sys_gui("videogrid_cancel $id\n");
 	sys_gui("}\n");
-	sys_gui("proc pdtk_videogrid_dialog {id name num_fil num_col color_fons color_marc color_grasp} {\n");
+	sys_gui("proc pdtk_videogrid_dialog {id name num_fil num_col color_fons color_marc color_grasp format_list} {\n");
 	sys_gui("set vid [string trimleft $id .]\n");
 	sys_gui("set var_graph_name [concat graph_name_$vid]\n");
 	sys_gui("global $var_graph_name\n");
@@ -617,12 +621,15 @@ void load_tk_procs () {
 	sys_gui("global $var_graph_color_marc\n");
 	sys_gui("set var_graph_color_grasp [concat graph_color_grasp_$vid]\n");
 	sys_gui("global $var_graph_color_grasp\n");
+	sys_gui("set var_graph_format_list [concat graph_format_list_$vid]\n");
+        sys_gui("global $var_graph_format_list\n");
 	sys_gui("set $var_graph_name $name\n");
 	sys_gui("set $var_graph_num_fil $num_fil\n");
 	sys_gui("set $var_graph_num_col $num_col\n");
 	sys_gui("set $var_graph_color_fons $color_fons\n");
 	sys_gui("set $var_graph_color_marc $color_marc\n");
 	sys_gui("set $var_graph_color_grasp $color_grasp\n");
+	sys_gui("set $var_graph_format_list $format_list\n");
 	sys_gui("toplevel $id\n");
 	sys_gui("wm title $id {videogrid}\n");
 	sys_gui("wm protocol $id WM_DELETE_WINDOW [concat videogrid_cancel $id]\n");
@@ -666,12 +673,18 @@ void load_tk_procs () {
 	sys_gui("label $id.6rangef.lcolor_grasp -text \"Sel Color :\"\n");
 	sys_gui("entry $id.6rangef.color_grasp -textvariable $var_graph_color_grasp -width 7\n");
 	sys_gui("pack $id.6rangef.lcolor_grasp $id.6rangef.color_grasp -side left\n");
+	sys_gui("frame $id.7rangef\n");
+        sys_gui("pack $id.7rangef -side top\n");
+        sys_gui("label $id.7rangef.lformat_list -text \"Format list ':' separated :\"\n");
+        sys_gui("entry $id.7rangef.format_list -textvariable $var_graph_format_list -width 7\n");
+        sys_gui("pack $id.7rangef.lformat_list $id.7rangef.format_list -side left\n");
 	sys_gui("bind $id.1rangef.name <KeyPress-Return> [concat videogrid_ok $id]\n");
 	sys_gui("bind $id.2rangef.num_fil <KeyPress-Return> [concat videogrid_ok $id]\n");
 	sys_gui("bind $id.3rangef.num_col <KeyPress-Return> [concat videogrid_ok $id]\n");
 	sys_gui("bind $id.4rangef.color_fons <KeyPress-Return> [concat videogrid_ok $id]\n");
 	sys_gui("bind $id.5rangef.color_marc <KeyPress-Return> [concat videogrid_ok $id]\n");
 	sys_gui("bind $id.6rangef.color_grasp <KeyPress-Return> [concat videogrid_ok $id]\n");
+	sys_gui("bind $id.7rangef.format_list <KeyPress-Return> [concat videogrid_ok $id]\n");
 	sys_gui("focus $id.1rangef.name\n");
 	sys_gui("}\n");
 	sys_gui("proc table {w content args} {\n");
@@ -736,17 +749,30 @@ void eliminar_imatges_temporals(int maxim){
     /* post("Videogrid: Imatges temporals eliminades\n",path_total); */
 }
 
-int format_adequat_v(path nomF){
+int format_adequat_v(path nomF, t_symbol *format_list){
     int retorn = 0;
-    /*
+    
     path  ig_path = "";
     strcat(ig_path,nomF);
+    path fl;
+    strcpy(fl,format_list->s_name);
     char *t1;
+    char *ext;
     path extensio = "";
     for ( t1 = strtok(ig_path,".");
           t1 != NULL;
           t1 = strtok(NULL,".") )
         strcpy(extensio,t1);
+
+    for ( ext = strtok(fl,":");
+	  ext != NULL;
+          ext = strtok(NULL,":") ) {
+	if(strcmp(extensio,ext)==0) {
+		retorn = 1;
+		ext = NULL;
+	}
+    }
+    /*
     if(strcmp(extensio,"mov")==0) retorn = 1;
     if(strcmp(extensio,"eps")==0) retorn = 1;
     if(strcmp(extensio,"gif")==0) retorn = 1;
@@ -786,9 +812,11 @@ void videogrid_afegir_imatge(t_videogrid *x, path entrada)
     /* FFMPEG o Quicktime per les conversions */
     int fferror=0;
     int nN = x->x_ultima_img;
-    if (format_adequat_v(entrada) == 1) {
+    if (format_adequat_v(entrada, x->x_format_list) == 0) {
         /* ara no entra: format_adequat_v = 0 sempre */
-        convertir_img(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
+        /* convertir_img(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN); */
+        fferror = 0;
+
     } else {
 	fferror=convertir_img_ff(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
     }
@@ -1284,10 +1312,10 @@ static void videogrid_save(t_gobj *z, t_binbuf *b)
         /* printf("%s",cadenaPathsInicials); */
     }
 
-    binbuf_addv(b, "ssiissiisss", gensym("#X"),gensym("obj"),
+    binbuf_addv(b, "ssiissiisssss", gensym("#X"),gensym("obj"),
     x->x_obj.te_xpix, x->x_obj.te_ypix,
     atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
-    x->x_name,x->x_num_fil,x->x_num_col,x->x_color_fons,x->x_color_marc,x->x_color_grasp,gensym(cadenaPathsInicials));
+    x->x_name,x->x_num_fil,x->x_num_col,x->x_color_fons,x->x_color_marc,x->x_color_grasp,x->x_format_list,gensym(cadenaPathsInicials));
     binbuf_addv(b, ";");
 }
 
@@ -1297,8 +1325,8 @@ static void videogrid_properties(t_gobj *z, t_glist *owner)
     t_videogrid *x=(t_videogrid *)z;
 
     /* post("Es crida a pdtk_videogrid dialog passant nom = %s\n fils = %d \t cols = %d \t color fons = %s \t color marc = %s\n", x->x_name->s_name, x->x_num_fil, x->x_num_col, x->x_color_fons->s_name, x->x_color_marc->s_name); */
-    sprintf(buf, "pdtk_videogrid_dialog %%s %s %d %d %s %s %s\n",
-            x->x_name->s_name, x->x_num_fil, x->x_num_col, x->x_color_fons->s_name, x->x_color_marc->s_name, x->x_color_grasp->s_name);
+    sprintf(buf, "pdtk_videogrid_dialog %%s %s %d %d %s %s %s %s\n",
+            x->x_name->s_name, x->x_num_fil, x->x_num_col, x->x_color_fons->s_name, x->x_color_marc->s_name, x->x_color_grasp->s_name, x->x_format_list->s_name);
     /* post("videogrid_properties : %s", buf ); */
     gfxstub_new(&x->x_obj.ob_pd, x, buf);
 }
@@ -1335,10 +1363,26 @@ static void videogrid_dialog(t_videogrid *x, t_symbol *s, int argc, t_atom *argv
     		ncol = (int)argv[2].a_w.w_float;
     		x->x_color_fons = argv[3].a_w.w_symbol;
     		x->x_color_marc = argv[4].a_w.w_symbol;
+                x->x_format_list = gensym("mov:mpg");
 	break;
+
 	case 6:
-		/* versio 0.2 */
-		if (argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT || argv[2].a_type != A_FLOAT || argv[3].a_type != A_SYMBOL || argv[4].a_type != A_SYMBOL || argv[5].a_type != A_SYMBOL) 
+                /* versio 0.2 */
+                if (argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT || argv[2].a_type != A_FLOAT || argv[3].a_type != A_SYMBOL || argv[4].a_type != A_SYMBOL || argv[5].a_type != A_SYMBOL)
+                {
+                        post("Videogrid: error_ Some of the values are inconsistent in its data type.\n");
+                        return;
+                }
+                x->x_name = argv[0].a_w.w_symbol;
+                nfil = (int)argv[1].a_w.w_float;
+                ncol = (int)argv[2].a_w.w_float;
+                x->x_color_fons = argv[3].a_w.w_symbol;
+                x->x_color_marc = argv[4].a_w.w_symbol;
+                x->x_color_grasp = argv[5].a_w.w_symbol;
+		x->x_format_list = gensym("mov:mpg");
+	case 7:
+		/* versio 0.2.1 */
+		if (argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT || argv[2].a_type != A_FLOAT || argv[3].a_type != A_SYMBOL || argv[4].a_type != A_SYMBOL || argv[5].a_type != A_SYMBOL || argv[6].a_type != A_SYMBOL) 
     		{
         		post("Videogrid: error_ Some of the values are inconsistent in its data type.\n");
         		return;
@@ -1349,6 +1393,7 @@ static void videogrid_dialog(t_videogrid *x, t_symbol *s, int argc, t_atom *argv
     		x->x_color_fons = argv[3].a_w.w_symbol;
     		x->x_color_marc = argv[4].a_w.w_symbol;
 		x->x_color_grasp = argv[5].a_w.w_symbol;
+		x->x_format_list = argv[6].a_w.w_symbol;
 	break;	
 	default:
 	    /* no fa res */
@@ -1439,6 +1484,7 @@ static void *videogrid_new(t_symbol* name, int argc, t_atom *argv)
 		x->x_color_fons = gensym("#F0F0F0");
             	x->x_color_marc = gensym("#0F0F0F");
             	x->x_color_grasp = gensym("#F1882B");
+		x->x_format_list = gensym("mov:mpg");
 	break;
 	case 5:
 		/* versio 0.1 */
@@ -1447,6 +1493,7 @@ static void *videogrid_new(t_symbol* name, int argc, t_atom *argv)
         	x->x_color_fons = argv[3].a_w.w_symbol;
         	x->x_color_marc = argv[4].a_w.w_symbol;
 		x->x_color_grasp = gensym("#F1882B");
+		x->x_format_list = gensym("mov:mpg");
 	break;
 	case 6:
 		/* versio 0.2 */
@@ -1455,14 +1502,27 @@ static void *videogrid_new(t_symbol* name, int argc, t_atom *argv)
         	x->x_color_fons = argv[3].a_w.w_symbol;
         	x->x_color_marc = argv[4].a_w.w_symbol;
         	x->x_color_grasp = argv[5].a_w.w_symbol;
+		x->x_format_list = gensym("mov:mpg");
 	break;
+	
 	case 7:
+                /* versio 0.2.1 */
+                x->x_num_fil = (int)atom_getintarg(1, argc, argv);
+                x->x_num_col = (int)atom_getintarg(2, argc, argv);
+                x->x_color_fons = argv[3].a_w.w_symbol;
+                x->x_color_marc = argv[4].a_w.w_symbol;
+                x->x_color_grasp = argv[5].a_w.w_symbol;
+		x->x_format_list = argv[6].a_w.w_symbol;
+        break;
+
+	case 8:
 		/* versio 0.1 - paths dels  elsements del tauler */
  		x->x_num_fil = (int)atom_getintarg(1, argc, argv);
         	x->x_num_col = (int)atom_getintarg(2, argc, argv);
         	x->x_color_fons = argv[3].a_w.w_symbol;
         	x->x_color_marc = argv[4].a_w.w_symbol;
         	x->x_color_grasp = argv[5].a_w.w_symbol;
+		x->x_format_list = gensym("mov:mpg");
 		/*
 		// -- llegir la cadena de paths | afegir els paths a la cua //
 		// -- ATENCIO! NO AFEGEIX ELS PATHS !!! //
@@ -1505,6 +1565,7 @@ static void *videogrid_new(t_symbol* name, int argc, t_atom *argv)
             x->x_color_fons = gensym("#F0F0F0");
             x->x_color_marc = gensym("#0F0F0F");
             x->x_color_grasp = gensym("#F1882B");
+	    x->x_format_list = gensym("mov:mpg");
 	break;
     }
 /* 
@@ -1528,7 +1589,7 @@ static void videogrid_destroy(t_videogrid *x){
 void videogrid_setup(void)
 {
     load_tk_procs();
-    post("videogrid: version 0.2");
+    post("videogrid: version 0.2.1");
     post("written by Sergi Lario (slario@gmail.com) & Lluis Gomez i Bigorda (lluis@artefacte.org)"); 
 
     videogrid_class = class_new(gensym("videogrid"),
