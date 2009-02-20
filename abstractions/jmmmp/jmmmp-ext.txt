@@ -30,6 +30,7 @@ oscS - Interface for sendOSC
 pd-colors - Pd color palettes (Data Structures + Tcl/Tk)
 rec-name - Automatic naming for a record/playback engine
 sguigot - spigot GUI implementation
+sliders - GUI for incoming midi data
 snaps~ - snapshot~ GUI implementation
 spectrogram~ - Spectrogram with 512 bins resolution
 stoppuhr - Chronometer with two layers
@@ -39,7 +40,7 @@ uhr - Shows the time
 
 It is recomended to use these abstractions with Pd-extended, since I don't keep track of which externals are used. Some abstractions use other ones of this package, so it is also better to have always the whole package in one place.
 
-2009.01.30
+2009.02.20
 
 
 Non-working or discarded abstractions:

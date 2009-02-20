@@ -19,7 +19,7 @@
 #X text 265 120 - MIDI feedback on/off (1/0);
 #X text 266 60 - Controller channel;
 #X text 12 307 (C) 2009 João Pais - jmmmpais@googlemail.com;
-#X text 12 277 Related objects: [mk];
+#X text 12 277 Related objects: [mk] [sliders];
 #X connect 1 0 6 0;
 #X connect 6 0 2 0;
 #X connect 6 1 7 0;

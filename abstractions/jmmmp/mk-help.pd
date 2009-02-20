@@ -7,4 +7,4 @@
 #X text 196 120 - MIDI value;
 #X obj 26 95 mk;
 #X text 12 10 [mk] - Fast visual control of MIDI inputs;
-#X text 12 157 Related objects: [m-i];
+#X text 12 157 Related objects: [m-i] [sliders];
