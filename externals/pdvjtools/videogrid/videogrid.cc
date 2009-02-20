@@ -59,8 +59,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&& VIDEOGRID &&&&&&&&&&&&&&&&&&&&&&&&&&&&& */
 
 /* definició de l'amplada i l'alçada d'una casella */
-#define W_CELL 60
-#define H_CELL 40
+/*
+#define w_cell 60
+#define h_cell 40
+//v 0.2.1 -- passen a ser propietats de l'objecte
+*/
 
 /* definició del gruix en pixels del marc del tauler */
 #define GRUIX 2
@@ -210,7 +213,8 @@ int convertir_img_ff(pathimage pathFitxer, tipus_format f, int W, int H, int pos
         pCodecCtx->width, pCodecCtx->height);
 
     // Read frames and save first five frames to disk
-    av_read_frame(pFormatCtx, &packet);
+    av_read_frame(pFormatCtx, &packet);sys_gui("bind $id.8rangef.w_cell <KeyPress-Return> [concat videogrid_ok $id]\n");
+        sys_gui("bind $id.9rangef.h_cell <KeyPress-Return> [concat videogrid_ok $id]\n");
         // Is this a packet from the video stream?
         if(packet.stream_index==videoStream)
         {
@@ -545,6 +549,10 @@ typedef struct _videogrid {
     int x_num_fil;
     /* nombre de columnes */
     int x_num_col;
+    /* width del thumbnail  */
+    int x_w_cell;
+    /* height del thumbnail */
+    int x_h_cell;
     /* posició de la última imatge en el tauler */
     int x_ultima_img;
     /* path del directori actual */
@@ -594,7 +602,11 @@ void load_tk_procs () {
 	sys_gui("global $var_graph_color_grasp\n");
 	sys_gui("set var_graph_format_list [concat graph_format_list_$vid]\n");
         sys_gui("global $var_graph_format_list\n");
-	sys_gui("set cmd [concat $id dialog [eval concat $$var_graph_name] [eval concat $$var_graph_num_fil] [eval concat $$var_graph_num_col] [eval concat $$var_graph_color_fons] [eval concat $$var_graph_color_marc] [eval concat $$var_graph_color_grasp] [eval concat $$var_graph_format_list] \\;]\n");
+	sys_gui("set var_graph_w_cell [concat graph_w_cell_$vid]\n");
+        sys_gui("global $var_graph_w_cell\n");
+        sys_gui("set var_graph_h_cell [concat graph_h_cell_$vid]\n");
+        sys_gui("global $var_graph_h_cell\n");
+	sys_gui("set cmd [concat $id dialog [eval concat $$var_graph_name] [eval concat $$var_graph_num_fil] [eval concat $$var_graph_num_col] [eval concat $$var_graph_color_fons] [eval concat $$var_graph_color_marc] [eval concat $$var_graph_color_grasp] [eval concat $$var_graph_format_list] [eval concat $$var_graph_w_cell] [eval concat $$var_graph_h_cell]\\;]\n");
 	// puts stderr $cmd
 	sys_gui("pd $cmd\n");
 	sys_gui("}\n");
@@ -607,7 +619,7 @@ void load_tk_procs () {
 	sys_gui("videogrid_apply $id\n");
 	sys_gui("videogrid_cancel $id\n");
 	sys_gui("}\n");
-	sys_gui("proc pdtk_videogrid_dialog {id name num_fil num_col color_fons color_marc color_grasp format_list} {\n");
+	sys_gui("proc pdtk_videogrid_dialog {id name num_fil num_col color_fons color_marc color_grasp format_list w_cell h_cell } {\n");
 	sys_gui("set vid [string trimleft $id .]\n");
 	sys_gui("set var_graph_name [concat graph_name_$vid]\n");
 	sys_gui("global $var_graph_name\n");
@@ -623,6 +635,10 @@ void load_tk_procs () {
 	sys_gui("global $var_graph_color_grasp\n");
 	sys_gui("set var_graph_format_list [concat graph_format_list_$vid]\n");
         sys_gui("global $var_graph_format_list\n");
+        sys_gui("set var_graph_w_cell [concat graph_w_cell_$vid]\n");
+        sys_gui("global $var_graph_w_cell\n");
+        sys_gui("set var_graph_h_cell [concat graph_h_cell_$vid]\n");
+        sys_gui("global $var_graph_h_cell\n");
 	sys_gui("set $var_graph_name $name\n");
 	sys_gui("set $var_graph_num_fil $num_fil\n");
 	sys_gui("set $var_graph_num_col $num_col\n");
@@ -630,6 +646,8 @@ void load_tk_procs () {
 	sys_gui("set $var_graph_color_marc $color_marc\n");
 	sys_gui("set $var_graph_color_grasp $color_grasp\n");
 	sys_gui("set $var_graph_format_list $format_list\n");
+        sys_gui("set $var_graph_w_cell $w_cell\n");
+        sys_gui("set $var_graph_h_cell $h_cell\n");
 	sys_gui("toplevel $id\n");
 	sys_gui("wm title $id {videogrid}\n");
 	sys_gui("wm protocol $id WM_DELETE_WINDOW [concat videogrid_cancel $id]\n");
@@ -678,6 +696,16 @@ void load_tk_procs () {
         sys_gui("label $id.7rangef.lformat_list -text \"Format list ':' separated :\"\n");
         sys_gui("entry $id.7rangef.format_list -textvariable $var_graph_format_list -width 7\n");
         sys_gui("pack $id.7rangef.lformat_list $id.7rangef.format_list -side left\n");
+	sys_gui("frame $id.8rangef\n");
+        sys_gui("pack $id.8rangef -side top\n");
+        sys_gui("label $id.8rangef.lw_cell -text \"Thumb W :\"\n");
+        sys_gui("entry $id.8rangef.w_cell -textvariable $var_graph_w_cell -width 7\n");
+        sys_gui("pack $id.8rangef.lw_cell $id.8rangef.w_cell -side left\n");
+	sys_gui("frame $id.9rangef\n");
+        sys_gui("pack $id.9rangef -side top\n");
+        sys_gui("label $id.9rangef.lh_cell -text \"Thumb H :\"\n");
+        sys_gui("entry $id.9rangef.h_cell -textvariable $var_graph_h_cell -width 7\n");
+        sys_gui("pack $id.9rangef.lh_cell $id.9rangef.h_cell -side left\n");
 	sys_gui("bind $id.1rangef.name <KeyPress-Return> [concat videogrid_ok $id]\n");
 	sys_gui("bind $id.2rangef.num_fil <KeyPress-Return> [concat videogrid_ok $id]\n");
 	sys_gui("bind $id.3rangef.num_col <KeyPress-Return> [concat videogrid_ok $id]\n");
@@ -685,6 +713,12 @@ void load_tk_procs () {
 	sys_gui("bind $id.5rangef.color_marc <KeyPress-Return> [concat videogrid_ok $id]\n");
 	sys_gui("bind $id.6rangef.color_grasp <KeyPress-Return> [concat videogrid_ok $id]\n");
 	sys_gui("bind $id.7rangef.format_list <KeyPress-Return> [concat videogrid_ok $id]\n");
+	sys_gui("bind $id.8rangef.w_cell <KeyPress-Return> [concat videogrid_ok $id]\n");
+        sys_gui("bind $id.9rangef.h_cell <KeyPress-Return> [concat videogrid_ok $id]\n");
+
+//        sys_gui("bind $id.8rangef.w_cell <KeyPress-Return> [concat videogrid_ok $id]\n");
+//        sys_gui("bind $id.9rangef.h_cell <KeyPress-Return> [concat videogrid_ok $id]\n");
+
 	sys_gui("focus $id.1rangef.name\n");
 	sys_gui("}\n");
 	sys_gui("proc table {w content args} {\n");
@@ -717,14 +751,14 @@ void load_tk_procs () {
 /* calcula la posició x del tauler a partir de la posició de l'element de la cua (d'esquerra a dreta) */
 int getX(t_videogrid* x, int posCua){
     int c = x->x_num_col;
-    int xpos = (posCua % c) * W_CELL + ((posCua % c) + 1) * GRUIX;
+    int xpos = (posCua % c) * x->x_w_cell + ((posCua % c) + 1) * GRUIX;
     return(xpos + 1);
 }
 
 /* calcula la posició y del tauler a partir de la posició de l'element de la cua (de dalt a baix) */
 int getY(t_videogrid* x, int posCua){
     int c = x->x_num_col;
-    int ypos = (posCua / c) * H_CELL + ((posCua / c) + 1) * GRUIX;
+    int ypos = (posCua / c) * x->x_h_cell + ((posCua / c) + 1) * GRUIX;
     return(ypos + 1);
 }
 
@@ -814,11 +848,11 @@ void videogrid_afegir_imatge(t_videogrid *x, path entrada)
     int nN = x->x_ultima_img;
     if (format_adequat_v(entrada, x->x_format_list) == 0) {
         /* ara no entra: format_adequat_v = 0 sempre */
-        /* convertir_img(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN); */
+        /* convertir_img(entrada,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN); */
         fferror = 0;
 
     } else {
-	fferror=convertir_img_ff(entrada,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
+	fferror=convertir_img_ff(entrada,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN);
     }
     /* post ("%d",fferror); */
     if (fferror>=0) {		
@@ -840,8 +874,8 @@ void videogrid_afegir_imatge(t_videogrid *x, path entrada)
 	sys_vgui("image create photo img%x%d -file %s\n",x,nN,ig_path);
 	sys_vgui(".x%x.c create image %d %d -image img%x%d -tags %xS%d\n", 
 		glist_getcanvas(x->x_glist),
-	        text_xpix(&x->x_obj, x->x_glist) + getX(x,nN) + (W_CELL/2), 
-	        text_ypix(&x->x_obj, x->x_glist) + getY(x,nN) + (H_CELL/2),
+	        text_xpix(&x->x_obj, x->x_glist) + getX(x,nN) + (x->x_w_cell/2), 
+	        text_ypix(&x->x_obj, x->x_glist) + getY(x,nN) + (x->x_h_cell/2),
 	        x,nN,x,nN);
 	if(nN == 0){
 	    x->x_tauler_primer = x->x_cua.final;
@@ -859,7 +893,7 @@ void videogrid_drawme(t_videogrid *x, t_glist *glist, int firsttime)
         sys_vgui(".x%x.c create rectangle %d %d %d %d -fill %s -tags %xGRID -outline %s\n",
             glist_getcanvas(glist),
             text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
-            text_xpix(&x->x_obj, glist) + (x->x_num_col * W_CELL) + 1 + (x->x_num_col * GRUIX) + GRUIX, text_ypix(&x->x_obj, glist) + (x->x_num_fil * H_CELL) + 1 + (x->x_num_fil * GRUIX) + GRUIX,
+            text_xpix(&x->x_obj, glist) + (x->x_num_col * x->x_w_cell) + 1 + (x->x_num_col * GRUIX) + GRUIX, text_ypix(&x->x_obj, glist) + (x->x_num_fil * x->x_h_cell) + 1 + (x->x_num_fil * GRUIX) + GRUIX,
             x->x_color_fons->s_name, x,x->x_color_marc->s_name);
 
         canvas_fixlinesfor(glist_getcanvas(glist), (t_text*)x);
@@ -879,17 +913,17 @@ void videogrid_drawme(t_videogrid *x, t_glist *glist, int firsttime)
                 strcat(ig_path,FORMAT_MINIATURA);
                 /* post("reestablint la imatge %s", actual->pathFitxer); */
                 // videogrid_afegir_imatge(x,actual->pathFitxer);
-                convertir_img_ff(actual->pathFitxer,FORMAT_MINIATURA, W_CELL, H_CELL, nN);
+                convertir_img_ff(actual->pathFitxer,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN);
                 sys_vgui("image create photo img%x%d -file %s\n",x,nN,ig_path);
                 sys_vgui(".x%x.c create image %d %d -image img%x%d -tags %xS%d\n", 
-                         glist_getcanvas(x->x_glist),text_xpix(&x->x_obj, x->x_glist) + getX(x,nN) + (W_CELL/2), text_ypix(&x->x_obj, x->x_glist) + getY(x,nN) + (H_CELL/2),x,nN,x,nN);
+                         glist_getcanvas(x->x_glist),text_xpix(&x->x_obj, x->x_glist) + getX(x,nN) + (x->x_w_cell/2), text_ypix(&x->x_obj, x->x_glist) + getY(x,nN) + (x->x_h_cell/2),x,nN,x,nN);
                 actual = actual->seguent;
                 nN++;
             }while(actual);
         }
     }
     else { 
-        sys_vgui(".x%x.c coords %xGRID %d %d %d %d\n", glist_getcanvas(glist), x, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),text_xpix(&x->x_obj, glist) + (x->x_num_col*W_CELL) + 1 + (x->x_num_col * GRUIX) + GRUIX, text_ypix(&x->x_obj, glist) + (x->x_num_fil*H_CELL) + 1 + (x->x_num_fil * GRUIX) + GRUIX);
+        sys_vgui(".x%x.c coords %xGRID %d %d %d %d\n", glist_getcanvas(glist), x, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),text_xpix(&x->x_obj, glist) + (x->x_num_col*x->x_w_cell) + 1 + (x->x_num_col * GRUIX) + GRUIX, text_ypix(&x->x_obj, glist) + (x->x_num_fil*x->x_h_cell) + 1 + (x->x_num_fil * GRUIX) + GRUIX);
         if(!cuaBuida(&x->x_cua))
         {
             int contador = 0;
@@ -897,7 +931,7 @@ void videogrid_drawme(t_videogrid *x, t_glist *glist, int firsttime)
                 sys_vgui(".x%x.c coords %xS%d \
                         %d %d\n",
                 glist_getcanvas(glist), x, contador,
-                text_xpix(&x->x_obj, x->x_glist) + getX(x,contador) + (W_CELL/2), text_ypix(&x->x_obj, x->x_glist) + getY(x,contador) + (H_CELL/2));
+                text_xpix(&x->x_obj, x->x_glist) + getX(x,contador) + (x->x_w_cell/2), text_ypix(&x->x_obj, x->x_glist) + getY(x,contador) + (x->x_h_cell/2));
                 contador++;
             }
             
@@ -908,14 +942,14 @@ void videogrid_drawme(t_videogrid *x, t_glist *glist, int firsttime)
 	if (x->x_pos_selected > -1){
         sys_vgui(".x%x.c coords %xGRASP %d %d %d %d\n", glist_getcanvas(glist), x, 
         text_xpix(&x->x_obj, x->x_glist) + getX(x,x->x_pos_selected), text_ypix(&x->x_obj, x->x_glist) + getY(x,x->x_pos_selected),
-        text_xpix(&x->x_obj, x->x_glist) + getX(x,x->x_pos_selected) + W_CELL, text_ypix(&x->x_obj, x->x_glist) + getY(x,x->x_pos_selected) + H_CELL);
+        text_xpix(&x->x_obj, x->x_glist) + getX(x,x->x_pos_selected) + x->x_w_cell, text_ypix(&x->x_obj, x->x_glist) + getY(x,x->x_pos_selected) + x->x_h_cell);
 	}
 	sys_vgui(".x%x.c delete %xLINIA\n", glist_getcanvas(x->x_glist), x);
     }
     int xI = text_xpix(&x->x_obj, glist);
     int yI = text_ypix(&x->x_obj, glist);
-    int xF = xI + (x->x_num_col * W_CELL) + ((x->x_num_col + 1) * GRUIX);
-    int yF = yI + (x->x_num_fil * H_CELL) + ((x->x_num_fil + 1) * GRUIX);
+    int xF = xI + (x->x_num_col * x->x_w_cell) + ((x->x_num_col + 1) * GRUIX);
+    int yF = yI + (x->x_num_fil * x->x_h_cell) + ((x->x_num_fil + 1) * GRUIX);
     int vlines = 0;
     int xi = 0;
     while(vlines < x->x_num_col){
@@ -923,16 +957,16 @@ void videogrid_drawme(t_videogrid *x, t_glist *glist, int firsttime)
 	sys_vgui(".x%x.c create line %d %d %d %d -fill %s -width %d -tag %xLINIA\n", glist_getcanvas(x->x_glist), xi, yI, xi, yF, x->x_color_marc->s_name,GRUIX,x);
 	vlines++;
     }
-    xi = xi + W_CELL + GRUIX;
+    xi = xi + x->x_w_cell + GRUIX;
     sys_vgui(".x%x.c create line %d %d %d %d -fill %s -width %d -tag %xLINIA\n", glist_getcanvas(x->x_glist), xi, yI, xi, yF, x->x_color_marc->s_name,GRUIX,x);
     int hlines = 0;
     int yi = 0;
     while(hlines < x->x_num_fil){
-	yi = yI + ((H_CELL + GRUIX) * hlines) + 2;
+	yi = yI + ((x->x_h_cell + GRUIX) * hlines) + 2;
 	sys_vgui(".x%x.c create line %d %d %d %d -fill %s -width %d -tag %xLINIA\n", glist_getcanvas(x->x_glist), xI, yi, xF, yi, x->x_color_marc->s_name,GRUIX,x);
 	hlines++;
     }
-    yi = yi + H_CELL + GRUIX;
+    yi = yi + x->x_h_cell + GRUIX;
     sys_vgui(".x%x.c create line %d %d %d %d -fill %s -width %d -tag %xLINIA\n", glist_getcanvas(x->x_glist), xI, yi, xF, yi, x->x_color_marc->s_name,GRUIX,x);
 }
 
@@ -1120,7 +1154,7 @@ static void videogrid_grasp_selected(t_videogrid *x, int pos)
 	sys_vgui(".x%x.c create rectangle %d %d %d %d -fill {} -tags %xGRASP -outline %s -width %d\n",
             glist_getcanvas(x->x_glist),
             text_xpix(&x->x_obj, x->x_glist) + getX(x,x->x_pos_selected), text_ypix(&x->x_obj, x->x_glist) + getY(x,x->x_pos_selected),
-            text_xpix(&x->x_obj, x->x_glist) + getX(x,x->x_pos_selected) + W_CELL, text_ypix(&x->x_obj, x->x_glist) + getY(x,x->x_pos_selected) + H_CELL,
+            text_xpix(&x->x_obj, x->x_glist) + getX(x,x->x_pos_selected) + x->x_w_cell, text_ypix(&x->x_obj, x->x_glist) + getY(x,x->x_pos_selected) + x->x_h_cell,
             x,x->x_color_grasp->s_name, GRUIX + 1);
         canvas_fixlinesfor(glist_getcanvas(x->x_glist), (t_text*)x);
     }
@@ -1167,8 +1201,8 @@ static int videogrid_click(t_gobj *z, struct _glist *glist, int xpix, int ypix, 
     {
         /* obtenir la posicio en el tauler */ 
 	// -- v 0.2 -- midoficacio pel gruix del marc //
-	xa = ((x_pos) / (W_CELL + GRUIX + 1));
-        ya = ((y_pos) / (H_CELL + GRUIX + 1)) * x->x_num_col;
+	xa = ((x_pos) / (x->x_w_cell + GRUIX + 1));
+        ya = ((y_pos) / (x->x_h_cell + GRUIX + 1)) * x->x_num_col;
         postauler = ya + xa;	
 	// -- v 0.2 -- seleciona la casella disparant el path //
         videogrid_seek(x, postauler);
@@ -1196,8 +1230,8 @@ static void videogrid_getrect(t_gobj *z, t_glist *glist,int *xp1, int *yp1, int 
     fils = x->x_num_fil;
     *xp1 = text_xpix(&x->x_obj, glist);
     *yp1 = text_ypix(&x->x_obj, glist);
-    *xp2 = text_xpix(&x->x_obj, glist) + (cols*W_CELL) + ((cols + 1) * GRUIX);
-    *yp2 = text_ypix(&x->x_obj, glist) + (fils*H_CELL) + ((fils + 1) * GRUIX);
+    *xp2 = text_xpix(&x->x_obj, glist) + (cols*x->x_w_cell) + ((cols + 1) * GRUIX);
+    *yp2 = text_ypix(&x->x_obj, glist) + (fils*x->x_h_cell) + ((fils + 1) * GRUIX);
     /* post("Esta amb el ratoli en el punt %d %d %d %d o son els vetexs de la caixa... es/bd", xp1, yp1, xp2, yp2); */
 }
 
@@ -1210,7 +1244,7 @@ static void videogrid_displace(t_gobj *z, t_glist *glist,int dx, int dy)
     sys_vgui(".x%x.c coords %xGRID %d %d %d %d\n",
              glist_getcanvas(glist), x,
              text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
-             text_xpix(&x->x_obj, glist) + (x->x_num_col*W_CELL) + 1 + (x->x_num_col * GRUIX) + GRUIX, text_ypix(&x->x_obj, glist) + (x->x_num_fil*H_CELL) + 1 + (x->x_num_fil * GRUIX) + GRUIX);
+             text_xpix(&x->x_obj, glist) + (x->x_num_col*x->x_w_cell) + 1 + (x->x_num_col * GRUIX) + GRUIX, text_ypix(&x->x_obj, glist) + (x->x_num_fil*x->x_h_cell) + 1 + (x->x_num_fil * GRUIX) + GRUIX);
     videogrid_drawme(x, glist, 0);
     canvas_fixlinesfor(glist_getcanvas(glist),(t_text*) x);
 }
@@ -1312,10 +1346,10 @@ static void videogrid_save(t_gobj *z, t_binbuf *b)
         /* printf("%s",cadenaPathsInicials); */
     }
 
-    binbuf_addv(b, "ssiissiisssss", gensym("#X"),gensym("obj"),
+    binbuf_addv(b, "ssiissiissssiis", gensym("#X"),gensym("obj"),
     x->x_obj.te_xpix, x->x_obj.te_ypix,
     atom_getsymbol(binbuf_getvec(x->x_obj.te_binbuf)),
-    x->x_name,x->x_num_fil,x->x_num_col,x->x_color_fons,x->x_color_marc,x->x_color_grasp,x->x_format_list,gensym(cadenaPathsInicials));
+    x->x_name,x->x_num_fil,x->x_num_col,x->x_color_fons,x->x_color_marc,x->x_color_grasp,x->x_format_list,x->x_w_cell,x->x_h_cell,gensym(cadenaPathsInicials));
     binbuf_addv(b, ";");
 }
 
@@ -1325,8 +1359,8 @@ static void videogrid_properties(t_gobj *z, t_glist *owner)
     t_videogrid *x=(t_videogrid *)z;
 
     /* post("Es crida a pdtk_videogrid dialog passant nom = %s\n fils = %d \t cols = %d \t color fons = %s \t color marc = %s\n", x->x_name->s_name, x->x_num_fil, x->x_num_col, x->x_color_fons->s_name, x->x_color_marc->s_name); */
-    sprintf(buf, "pdtk_videogrid_dialog %%s %s %d %d %s %s %s %s\n",
-            x->x_name->s_name, x->x_num_fil, x->x_num_col, x->x_color_fons->s_name, x->x_color_marc->s_name, x->x_color_grasp->s_name, x->x_format_list->s_name);
+    sprintf(buf, "pdtk_videogrid_dialog %%s %s %d %d %s %s %s %s %i %i\n",
+            x->x_name->s_name, x->x_num_fil, x->x_num_col, x->x_color_fons->s_name, x->x_color_marc->s_name, x->x_color_grasp->s_name, x->x_format_list->s_name, x->x_w_cell,x->x_h_cell);
     /* post("videogrid_properties : %s", buf ); */
     gfxstub_new(&x->x_obj.ob_pd, x, buf);
 }
@@ -1364,6 +1398,8 @@ static void videogrid_dialog(t_videogrid *x, t_symbol *s, int argc, t_atom *argv
     		x->x_color_fons = argv[3].a_w.w_symbol;
     		x->x_color_marc = argv[4].a_w.w_symbol;
                 x->x_format_list = gensym("mov:mpg");
+		x->x_w_cell = 60;
+		x->x_h_cell = 40;
 	break;
 
 	case 6:
@@ -1380,6 +1416,8 @@ static void videogrid_dialog(t_videogrid *x, t_symbol *s, int argc, t_atom *argv
                 x->x_color_marc = argv[4].a_w.w_symbol;
                 x->x_color_grasp = argv[5].a_w.w_symbol;
 		x->x_format_list = gensym("mov:mpg");
+		x->x_w_cell = 60;
+                x->x_h_cell = 40;
 	case 7:
 		/* versio 0.2.1 */
 		if (argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT || argv[2].a_type != A_FLOAT || argv[3].a_type != A_SYMBOL || argv[4].a_type != A_SYMBOL || argv[5].a_type != A_SYMBOL || argv[6].a_type != A_SYMBOL) 
@@ -1394,7 +1432,28 @@ static void videogrid_dialog(t_videogrid *x, t_symbol *s, int argc, t_atom *argv
     		x->x_color_marc = argv[4].a_w.w_symbol;
 		x->x_color_grasp = argv[5].a_w.w_symbol;
 		x->x_format_list = argv[6].a_w.w_symbol;
+		x->x_w_cell = 60;
+                x->x_h_cell = 40;
 	break;	
+
+	case 9:
+                /* versio 0.2.2 */
+                if (argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT || argv[2].a_type != A_FLOAT || argv[3].a_type != A_SYMBOL || argv[4].a_type != A_SYMBOL || argv[5].a_type != A_SYMBOL || argv[6].a_type != A_SYMBOL || argv[7].a_type != A_FLOAT || argv[8].a_type != A_FLOAT)
+                {
+                        post("Videogrid: error_ Some of the values are inconsistent in its data type.\n");
+                        return;
+                }
+                x->x_name = argv[0].a_w.w_symbol;
+                nfil = (int)argv[1].a_w.w_float;
+                ncol = (int)argv[2].a_w.w_float;
+                x->x_color_fons = argv[3].a_w.w_symbol;
+                x->x_color_marc = argv[4].a_w.w_symbol;
+                x->x_color_grasp = argv[5].a_w.w_symbol;
+                x->x_format_list = argv[6].a_w.w_symbol;
+                x->x_w_cell = (int)argv[7].a_w.w_float;
+                x->x_h_cell = (int)argv[8].a_w.w_float;
+        break;
+
 	default:
 	    /* no fa res */
 	break;
@@ -1494,6 +1553,8 @@ static void *videogrid_new(t_symbol* name, int argc, t_atom *argv)
         	x->x_color_marc = argv[4].a_w.w_symbol;
 		x->x_color_grasp = gensym("#F1882B");
 		x->x_format_list = gensym("mov:mpg");
+		x->x_w_cell = 60;
+		x->x_h_cell = 40;
 	break;
 	case 6:
 		/* versio 0.2 */
@@ -1503,6 +1564,8 @@ static void *videogrid_new(t_symbol* name, int argc, t_atom *argv)
         	x->x_color_marc = argv[4].a_w.w_symbol;
         	x->x_color_grasp = argv[5].a_w.w_symbol;
 		x->x_format_list = gensym("mov:mpg");
+		x->x_w_cell = 60;
+                x->x_h_cell = 40;
 	break;
 	
 	case 7:
@@ -1513,9 +1576,23 @@ static void *videogrid_new(t_symbol* name, int argc, t_atom *argv)
                 x->x_color_marc = argv[4].a_w.w_symbol;
                 x->x_color_grasp = argv[5].a_w.w_symbol;
 		x->x_format_list = argv[6].a_w.w_symbol;
+		x->x_w_cell = 60;
+                x->x_h_cell = 40;
         break;
 
-	case 8:
+	case 9:
+                /* versio 0.2.2 */
+                x->x_num_fil = (int)atom_getintarg(1, argc, argv);
+                x->x_num_col = (int)atom_getintarg(2, argc, argv);
+                x->x_color_fons = argv[3].a_w.w_symbol;
+                x->x_color_marc = argv[4].a_w.w_symbol;
+                x->x_color_grasp = argv[5].a_w.w_symbol;
+                x->x_format_list = argv[6].a_w.w_symbol;
+                x->x_w_cell = (int)atom_getintarg(7, argc, argv);
+                x->x_h_cell = (int)atom_getintarg(8, argc, argv);
+        break;
+
+	case 10:
 		/* versio 0.1 - paths dels  elsements del tauler */
  		x->x_num_fil = (int)atom_getintarg(1, argc, argv);
         	x->x_num_col = (int)atom_getintarg(2, argc, argv);
@@ -1523,6 +1600,8 @@ static void *videogrid_new(t_symbol* name, int argc, t_atom *argv)
         	x->x_color_marc = argv[4].a_w.w_symbol;
         	x->x_color_grasp = argv[5].a_w.w_symbol;
 		x->x_format_list = gensym("mov:mpg");
+		x->x_w_cell = 60;
+                x->x_h_cell = 40;
 		/*
 		// -- llegir la cadena de paths | afegir els paths a la cua //
 		// -- ATENCIO! NO AFEGEIX ELS PATHS !!! //
@@ -1566,6 +1645,8 @@ static void *videogrid_new(t_symbol* name, int argc, t_atom *argv)
             x->x_color_marc = gensym("#0F0F0F");
             x->x_color_grasp = gensym("#F1882B");
 	    x->x_format_list = gensym("mov:mpg");
+	    x->x_w_cell = 60;
+            x->x_h_cell = 40;
 	break;
     }
 /* 
