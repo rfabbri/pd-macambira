@@ -12,6 +12,11 @@
 #include <stdlib.h> /* for random() */
 #include <time.h> /* for clock() */
 
+#ifdef _WIN32 /* Windows doesn't have these named correctly ;) */
+# define random rand
+# define srandom srand
+#endif
+
 #define MAXSIZE 1024
 #define DEFAULT_DIM 16
 
