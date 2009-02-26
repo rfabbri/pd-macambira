@@ -160,6 +160,8 @@
 #X text 341 -10 You need the FreeFrame plugins to use with this object.
 Install them from http://sourceforge.net/projects/freeframe/ And then
 use this message to load.;
+#X msg 551 46 pluginsdir /data/plugins_video/ubuntustudio/FreeFrame1.0-05/plugins_binary
+;
 #X connect 0 0 6 0;
 #X connect 0 1 20 0;
 #X connect 0 2 22 0;
@@ -201,3 +203,4 @@ use this message to load.;
 #X connect 40 0 0 0;
 #X connect 41 0 0 0;
 #X connect 59 0 0 0;
+#X connect 61 0 0 0;

@@ -1,3 +1,4 @@
+
 TARGET := $(shell pwd | sed 's|.*/\(.*\)$$|\1|')
 EXTERNALS_ROOT := $(shell pwd | sed 's|^\(/.*externals\).*|\1|')
 

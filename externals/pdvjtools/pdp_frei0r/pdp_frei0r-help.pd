@@ -280,7 +280,7 @@ Promesberger and Martin Bayer;
 #X text 498 575 at startup ( check pd window );
 #X text 13 290 WARNING : sizes of inputs;
 #X text 12 302 _must_ be the same;
-#X msg 290 18 plugindir /usr/local/lib/frei0r;
+#X msg 290 18 plugindir /usr/local/lib/frei0r-1;
 #X connect 0 0 75 3;
 #X connect 1 0 0 0;
 #X connect 2 0 5 0;
