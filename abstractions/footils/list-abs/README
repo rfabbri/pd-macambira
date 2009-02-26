@@ -1,139 +1,44 @@
 list-abs
 --------
 
-These are abstractions implementing common list operations. Included are in
-alphabetical order:
+A collection of list-processing abstractions for Pd. 
 
-list-abs.pd
+For a list of included objects open list-abs-intro.pd or list-abs-intro.txt
 
-  change floats in a lists to their absolute values.
+Maintainer: Frank Barknecht <fbar a footils.org>
 
-list-add.pd
+-- 
 
-  Add the floats in two lists element by element.
+Copyright:
 
-list-accum.pd
+This software is copyrighted by Miller Puckette and others.  The following
+terms apply to all files associated with the software unless explicitly
+disclaimed in individual files.
 
-  sum all floats in a list.
+The authors hereby grant permission to use, copy, modify, distribute,
+and license this software and its documentation for any purpose, provided
+that existing copyright notices are retained in all copies and that this
+notice is included verbatim in any distributions. No written agreement,
+license, or royalty fee is required for any of the authorized uses.
+Modifications to this software may be copyrighted by their authors
+and need not follow the licensing terms described here, provided that
+the new terms are clearly indicated on the first page of each file where
+they apply.
 
-list-clip.pd
+IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY
+FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+ARISING OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY
+DERIVATIVES THEREOF, EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
 
-  restrict the floats in a list between two borders. Applies [clip] on list
-  floats.
+THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE
+IS PROVIDED ON AN "AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE
+NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+MODIFICATIONS.
 
-list-delete.pd
-
-  delete element at position POS from list.
-
-list-demux.pd
-
-  route lists to different outlets (like demux in zexy). Not an abstraction,
-  just a patch illustrating the idiom.
-
-list-drip.pd
-
-  serialize a list automatically (like drip in zexy).
-
-list-drip2.pd
-
-  serialize two lists in sync as long as first list lasts.
-
-list-dripslow.pd
-
-  serialize a list on demand: each bang will output the next element.
-
-list-emath.pd
-
-  do elementwise math operations on list. Like list-math, but for two lists
-  instead of list and scalar. Also see list-mult, list-sub and list-add, which
-  are wrappers around list-emath.
-
-list-equalize.pd
-
-  scale a list so that all float elements sum up to 1
-
-list-insert.pd
-
-  insert LIST before element at position POS
-
-list-inter.pd
-
-  element-wise linear interpolation between two (float) lists.
-  list-inter-example-gem.pd shows a more complicated usage example, but
-  requires gem for visualisation.
-
-list-l2s.pd
-
-  Concatenate a list into a single symbol using ARG1 as delimiter. Delimiter
-  can be set through second inlet.
-
-list-lastx.pd
-
-  get a list containing the last x atoms received. (Previously known as
-  "last-x.pd")
-
-list-len.pd
-
-  calculate length of a list.
-
-list-makefilename.pd
-
-  apply [makefilename] on list elements, if they are symbols.
-
-list-math.pd
-
-  apply [expr OP] with OP in (+,-,*,/) on list elements, if they are floats.
-
-list-minmax.pd
-
-  find minimum and maximum float in a list.
-
-list-moses.pd
-
-  A [moses] for lists: Route incoming list according to how an element compares
-  against a test float. It's possible to set the position of the element to
-  compare using a zero-based index. (Not to be confused with the [listmoses]
-  external which does something completely different!)
-
-list-mult.pd
-
-  multiply the floats in two lists element by element.
-
-list-normalize.pd
-
-  normalize a list to (-1,1) like you can normalize a Pd array.
-
-list-rev.pd
-
-  reverse a list.
-
-list-rot.pd
-
-  rotate a list (move X elements from front to back). 
-
-list-sieve.pd
-
-  let only those incoming floats pass, that have been found in a test list.
-
-list-splat.pd
-
-  an advanced [list split] which also accepts negative indices to split off
-  elements from the back of a list. Otherwise compatible to [list split] so it
-  can be used as a drop-in replacement.
-
-list-sub.pd
-
-  substract the floats in two lists element by element.
-
-sroute.pd
-
-  a settable [route] object for a single selector.
-
-take-two.pd
-
-  take a list as input and print all combinations of length two without repetition.
-
-triple-scale.pd
-
-  this actually is not using [list]: Interpolate between two (x,y,z)-points.
-  Also see [list-inter], which is more powerful.
+RESTRICTED RIGHTS: Use, duplication or disclosure by the government
+is subject to the restrictions as set forth in subparagraph (c) (1) (ii)
+of the Rights in Technical Data and Computer Software Clause as DFARS
+252.227-7013 and FAR 52.227-19.
