@@ -33,20 +33,26 @@ mailbody_on_failure () {
 run_build_script ()
 {
 	 distro=$1
+	 chroot=$2
 
+	 BUILDSCRIPT="${BUILDSCRIPT}"
          ## LATER: make the uploaded ${LOGFILE} (name) be consistent with the uploaded package-file (name)
-	 LOGFILE=${HOME}/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${SCRIPT}.txt
-	 touch ${LOGFILE} 
+	 LOGFILE="${HOME}/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${BUILDSCRIPT}.txt"
+	 touch "${LOGFILE}" 
 
-	 sh ${HOME}/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh >> $LOGFILE 2>&1
-
+	 if [ -d /var/chroot/$chroot ]; then
+		 dchroot -c $chroot -d "$BUILDSCRIPT" >> "$LOGFILE" 2>&1
+	 else
+		 sh "$BUILDSCRIPT" >> "$LOGFILE" 2>&1
+	 fi
+	 
 	 case $SYSTEM in 
 		  mingw*)
 				/c/cygwin/bin/sh -c \
 					 "rsync -a ${LOGFILE} rsync://128.238.56.50/upload/${DATE}/logs/"
 				;;
 		  *)
-				rsync -a ${LOGFILE} rsync://128.238.56.50/upload/${DATE}/logs/
+				rsync -a "$LOGFILE" rsync://128.238.56.50/upload/${DATE}/logs/
 				;;
 	 esac
 
@@ -61,10 +67,15 @@ run_build_script ()
 	 fi
 }
 
-for dir in ${HOME}/auto-build/*; do 
-	 dirname=$(echo $dir | sed 's|.*/\(.*\)|\1|')
-	 test -e $dir/scripts/auto-build/${dirname}-auto-builder.sh && \
-		  run_build_script $dirname
+for distrodir in ${HOME}/auto-build/*; do 
+	 distro=$(echo $distrodir | sed 's|.*/\(.*\)|\1|')
+	 if [ -e $distrodir/scripts/auto-build/${distro}-auto-builder.sh ]; then
+		 run_build_script $distro IGNORE_CHROOT_USE_SYSTEM
+		 for chrootdir in /var/chroot/*; do 
+			 chroot=$(echo $chrootdir | sed 's|.*/\(.*\)|\1|')
+			 run_build_script $distro $chroot
+		 done
+	 fi
 done
 
 # since the above test can cause this script to exit with an error, force it
