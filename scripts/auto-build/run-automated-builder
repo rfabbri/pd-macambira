@@ -35,9 +35,9 @@ run_build_script ()
 	 distro=$1
 	 chroot=$2
 
-	 BUILDSCRIPT="${BUILDSCRIPT}"
+	 BUILDSCRIPT="${HOME}/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh"
          ## LATER: make the uploaded ${LOGFILE} (name) be consistent with the uploaded package-file (name)
-	 LOGFILE="${HOME}/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${BUILDSCRIPT}.txt"
+	 LOGFILE="${HOME}/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${SCRIPT}.txt"
 	 touch "${LOGFILE}" 
 
 	 if [ -d /var/chroot/$chroot ]; then
