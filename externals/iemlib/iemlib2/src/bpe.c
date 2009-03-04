@@ -34,7 +34,7 @@ static void bpe_stop(t_bpe *x)
 static void bpe_tick(t_bpe *x)
 {
   t_atom *vec = x->x_beg;
-  t_float val, time;
+  t_float val, ftime;
   
   if(x->x_curindex >= x->x_curnum)
   {
@@ -45,27 +45,27 @@ static void bpe_tick(t_bpe *x)
   {
     vec += x->x_curindex;
     val = atom_getfloat(vec++);
-    time = atom_getfloat(vec);
-    outlet_float(x->x_out_time, time);
+    ftime = atom_getfloat(vec);
+    outlet_float(x->x_out_time, ftime);
     outlet_float(x->x_out_val, val);
     x->x_curindex += 2;
-    clock_delay(x->x_clock, time);
+    clock_delay(x->x_clock, ftime);
   }
 }
 
 static void bpe_bang(t_bpe *x)
 {
   t_atom *vec = x->x_beg;
-  t_float val, time;
+  t_float val, ftime;
   
   if(x->x_curnum)
   {
     x->x_curindex = 2;
     val = atom_getfloat(vec++);
-    time = atom_getfloat(vec);
-    outlet_float(x->x_out_time, time);
+    ftime = atom_getfloat(vec);
+    outlet_float(x->x_out_time, ftime);
     outlet_float(x->x_out_val, val);
-    clock_delay(x->x_clock, time);
+    clock_delay(x->x_clock, ftime);
   }
 }
 

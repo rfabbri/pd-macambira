@@ -101,15 +101,15 @@ static void iem_sel_any_free(t_iem_sel_any *x)
   freebytes(x->x_any, x->x_max_ac * sizeof(t_symbol *));
 }
 
-static void *iem_sel_any_new(t_floatarg fmax)
+static void *iem_sel_any_new(t_floatarg ffmax)
 {
   t_iem_sel_any *x = (t_iem_sel_any *)pd_new(iem_sel_any_class);
   int i;
   t_symbol *default_sym=gensym("no_entry");
   
-  if(fmax <= 0.0)
-    fmax = 10.0;
-  x->x_max_ac = (int)fmax;
+  if(ffmax <= 0.0)
+    ffmax = 10.0;
+  x->x_max_ac = (int)ffmax;
   x->x_any = (t_symbol **)getbytes(x->x_max_ac * sizeof(t_symbol *));
   x->x_ac = 0;
   x->x_set = gensym("set");
