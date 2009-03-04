@@ -37,10 +37,6 @@ typedef struct _tab_conv
 
 static t_class *tab_conv_class;
 
-static void tab_conv_tick(t_tab_conv *x)
-{
-}
-
 static void tab_conv_src1(t_tab_conv *x, t_symbol *s)
 {
   x->x_sym_scr1 = s;
@@ -58,9 +54,9 @@ static void tab_conv_dst(t_tab_conv *x, t_symbol *s)
 
 static void tab_conv_bang(t_tab_conv *x)
 {
-  int i, j, k, l, min_s2, plu_s2, n;
+  int i, j, k, l, m, n, p, q;
   int ok_src1, ok_src2, ok_dst;
-  iemarray_t *vec_src1, *vec_src2, *vec_dst;
+  iemarray_t *vec_sig, *vec_ir, *vec_dst;
   t_float sum=0.0f;
   
   ok_src1 = iem_tab_check_arrays(gensym("tab_conv"), x->x_sym_scr1, &x->x_beg_mem_src1, &x->x_size_src1, 0);
@@ -69,37 +65,134 @@ static void tab_conv_bang(t_tab_conv *x)
   
   if(ok_src1 && ok_src2 && ok_dst)
   {
-    if(x->x_size_src1 < x->x_size_dst)
-      n = x->x_size_src1;
-    else
-      n = x->x_size_dst;
-    if(x->x_size_src2 < n)
+    t_garray *a;
+    
+    if((x->x_size_src1+x->x_size_src2-1) <= x->x_size_dst)// ok, the last part of dst is zero
     {
-      vec_src1 = x->x_beg_mem_src1;
-      vec_src2 = x->x_beg_mem_src2;
-      vec_dst = x->x_beg_mem_dst;
-      if(n)
+      if(x->x_size_src1 > x->x_size_src2)//  src2(t-tau) is impuls response
       {
-        t_garray *a;
-        
-        min_s2 = -x->x_size_src2 / 2;
-        plu_s2 = min_s2 + x->x_size_src2;
-        for(i=0; i<n; i++)
-        {
-          sum = 0.0f;
-          for(j=min_s2, l=0; j<plu_s2; j++, l++)
-          {
-            k = j + i;
-            if((k >= 0) && (k < n))
-              sum += iemarray_getfloat(vec_src1, k) * iemarray_getfloat(vec_src2, l);
-          }
-          iemarray_setfloat(vec_dst, i, sum);
-        }
-        outlet_bang(x->x_obj.ob_outlet);
-        a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
-        garray_redraw(a);
+        vec_sig = x->x_beg_mem_src1;
+        vec_ir = x->x_beg_mem_src2;
+        n = x->x_size_src1;
+        m = x->x_size_src2;
+      }
+      else//  src1(t-tau) is impuls response
+      {
+        vec_sig = x->x_beg_mem_src2;
+        vec_ir = x->x_beg_mem_src1;
+        n = x->x_size_src2;
+        m = x->x_size_src1;
+      }
+      vec_dst = x->x_beg_mem_dst;
+      
+      for(i=1; i<m; i++)
+      {
+        sum = 0.0f;
+        for(j=0; j<i; j++)
+          sum += iemarray_getfloat(vec_sig, -j) * iemarray_getfloat(vec_ir, j);
+        iemarray_setfloat(vec_dst, 0, sum);
+        vec_sig++;
+        vec_dst++;
+      }
+      
+      l = n - m + 1;
+      for(i=0; i<l; i++)
+      {
+        sum = 0.0f;
+        for(j=0; j<m; j++)
+          sum += iemarray_getfloat(vec_sig, -j) * iemarray_getfloat(vec_ir, j);
+        iemarray_setfloat(vec_dst, 0, sum);
+        vec_sig++;
+        vec_dst++;
+      }
+      
+      for(i=m-1, k=0; i>0; i--, k++)
+      {
+        sum = 0.0f;
+        for(j=1; j<=i; j++)
+          sum += iemarray_getfloat(vec_sig, -j) * iemarray_getfloat(vec_ir, j+k);
+        iemarray_setfloat(vec_dst, 0, sum);
+        vec_dst++;
       }
     }
+    else
+    {
+      if(x->x_size_src1 > x->x_size_src2)//  src2(t-tau) is impuls response
+      {
+        vec_sig = x->x_beg_mem_src1;
+        vec_ir = x->x_beg_mem_src2;
+        n = x->x_size_src1;
+        m = x->x_size_src2;
+      }
+      else//  src1(t-tau) is impuls response
+      {
+        vec_sig = x->x_beg_mem_src2;
+        vec_ir = x->x_beg_mem_src1;
+        n = x->x_size_src2;
+        m = x->x_size_src1;
+      }
+      vec_dst = x->x_beg_mem_dst;
+      p = x->x_size_dst;
+      q = 0;
+      
+      for(i=1; i<m; i++)
+      {
+        sum = 0.0f;
+        for(j=0; j<i; j++)
+          sum += iemarray_getfloat(vec_sig, -j) * iemarray_getfloat(vec_ir, j);
+        iemarray_setfloat(vec_dst, 0, sum);
+        vec_sig++;
+        vec_dst++;
+        q++;
+        if(q >= p)
+          goto tab_conv_bang_end;
+      }
+      
+      l = n - m + 1;
+      for(i=0; i<l; i++)
+      {
+        sum = 0.0f;
+        for(j=0; j<m; j++)
+          sum += iemarray_getfloat(vec_sig, -j) * iemarray_getfloat(vec_ir, j);
+        iemarray_setfloat(vec_dst, 0, sum);
+        vec_sig++;
+        vec_dst++;
+        q++;
+        if(q >= p)
+          goto tab_conv_bang_end;
+      }
+      
+      for(i=m-1, k=0; i>0; i--, k++)
+      {
+        sum = 0.0f;
+        for(j=1; j<=i; j++)
+          sum += iemarray_getfloat(vec_sig, -j) * iemarray_getfloat(vec_ir, j+k);
+        iemarray_setfloat(vec_dst, 0, sum);
+        vec_dst++;
+        q++;
+        if(q >= p)
+          goto tab_conv_bang_end;
+      }
+      for(i=m-1; i>0; i--)
+      {
+        sum = 0.0f;
+        for(j=0, k=i-1; j<i; j++, k--)
+        {
+          sum += iemarray_getfloat(vec_sig, j) * iemarray_getfloat(vec_ir, k);
+          post("dst_%d=sig_%d*ir_%d=%g*%g",q,j+q,k,iemarray_getfloat(vec_sig, j),iemarray_getfloat(vec_ir, k));
+        }
+        iemarray_setfloat(vec_dst, 0, sum);
+        vec_sig++;
+        vec_dst++;
+        q++;
+        if(q >= p)
+          goto tab_conv_bang_end;
+      }
+    }
+tab_conv_bang_end:
+    outlet_bang(x->x_obj.ob_outlet);
+    a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
+    garray_redraw(a);
   }
 }
 
@@ -107,9 +200,9 @@ static void tab_conv_list(t_tab_conv *x, t_symbol *s, int argc, t_atom *argv)
 {
   int beg_src1, beg_src2, beg_dst;
   int n_src1, n_src2;
-  int i, j, k, l, min_s2, plu_s2;
+  int i, j, k, l, m, n, p;
   int ok_src1, ok_src2, ok_dst;
-  iemarray_t *vec_src1, *vec_src2, *vec_dst;
+  iemarray_t *vec_sig, *vec_ir, *vec_dst;
   t_float sum=0.0f;
   
   if((argc >= 5) &&
@@ -141,33 +234,125 @@ static void tab_conv_list(t_tab_conv *x, t_symbol *s, int argc, t_atom *argv)
     
     if(ok_src1 && ok_src2 && ok_dst)
     {
-      if(n_src2 < n_src1)
+      t_garray *a;
+      
+      if((x->x_size_src1+x->x_size_src2-1) <= x->x_size_dst)// ok, the last part of dst is zero
       {
-        vec_src1 = x->x_beg_mem_src1 + beg_src1;
-        vec_src2 = x->x_beg_mem_src2 + beg_src2;
-        vec_dst = x->x_beg_mem_dst + beg_dst;
-        if(n_src1)
+        if(x->x_size_src1 > x->x_size_src2)//  src2(t-tau) is impuls response
         {
-          t_garray *a;
-          
-          min_s2 = -n_src2 / 2;
-          plu_s2 = min_s2 + n_src2;
-          for(i=0; i<n_src1; i++)
-          {
-            sum = 0.0f;
-            for(j=min_s2, l=0; j<plu_s2; j++, l++)
-            {
-              k = j + i;
-              if((k >= 0) && (k < n_src1))
-                sum += iemarray_getfloat(vec_src1, k) * iemarray_getfloat(vec_src2, l);
-            }
-            iemarray_setfloat(vec_dst, i, sum);
-          }
-          outlet_bang(x->x_obj.ob_outlet);
-          a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
-          garray_redraw(a);
+          vec_sig = x->x_beg_mem_src1;
+          vec_ir = x->x_beg_mem_src2;
+          n = x->x_size_src1;
+          m = x->x_size_src2;
+        }
+        else//  src1(t-tau) is impuls response
+        {
+          vec_sig = x->x_beg_mem_src2;
+          vec_ir = x->x_beg_mem_src1;
+          n = x->x_size_src2;
+          m = x->x_size_src1;
+        }
+        vec_dst = x->x_beg_mem_dst;
+        
+        l = m - 1;
+        for(i=0; i<l; i++)
+        {
+          sum = 0.0f;
+          for(j=0, k=i-1; j<i; j++, k--)
+            sum += iemarray_getfloat(vec_sig, j) * iemarray_getfloat(vec_ir, k);
+          iemarray_setfloat(vec_dst, 0, sum);
+          vec_sig++;
+          vec_dst++;
+        }
+        
+        l = n - m + 1;
+        for(i=0; i<l; i++)
+        {
+          sum = 0.0f;
+          for(j=0, k=m-1; j<m; j++, k--)
+            sum += iemarray_getfloat(vec_sig, j) * iemarray_getfloat(vec_ir, k);
+          iemarray_setfloat(vec_dst, 0, sum);
+          vec_sig++;
+          vec_dst++;
+        }
+        
+        l = m - 1;
+        for(i=l-1; i>=0; i--)
+        {
+          sum = 0.0f;
+          for(j=0, k=i-1; j<i; j++, k--)
+            sum += iemarray_getfloat(vec_sig, j) * iemarray_getfloat(vec_ir, k);
+          iemarray_setfloat(vec_dst, 0, sum);
+          vec_sig++;
+          vec_dst++;
         }
       }
+      else
+      {
+        if(x->x_size_src1 > x->x_size_src2)//  src2(t-tau) is impuls response
+        {
+          vec_sig = x->x_beg_mem_src1;
+          vec_ir = x->x_beg_mem_src2;
+          n = x->x_size_src1;
+          m = x->x_size_src2;
+        }
+        else//  src1(t-tau) is impuls response
+        {
+          vec_sig = x->x_beg_mem_src2;
+          vec_ir = x->x_beg_mem_src1;
+          n = x->x_size_src2;
+          m = x->x_size_src1;
+        }
+        vec_dst = x->x_beg_mem_dst;
+        p = x->x_size_dst;
+        k = 0;
+        
+        l = m - 1;
+        for(i=0; i<l; i++)
+        {
+          sum = 0.0f;
+          for(j=0, k=i-1; j<i; j++, k--)
+            sum += iemarray_getfloat(vec_sig, j) * iemarray_getfloat(vec_ir, k);
+          iemarray_setfloat(vec_dst, 0, sum);
+          vec_sig++;
+          vec_dst++;
+          k++;
+          if(k >= p)
+            goto tab_conv_list_end;
+        }
+        
+        l = n - m + 1;
+        for(i=0; i<l; i++)
+        {
+          sum = 0.0f;
+          for(j=0, k=m-1; j<m; j++, k--)
+            sum += iemarray_getfloat(vec_sig, j) * iemarray_getfloat(vec_ir, k);
+          iemarray_setfloat(vec_dst, 0, sum);
+          vec_sig++;
+          vec_dst++;
+          k++;
+          if(k >= p)
+            goto tab_conv_list_end;
+        }
+        
+        l = m - 1;
+        for(i=l-1; i>=0; i--)
+        {
+          sum = 0.0f;
+          for(j=0, k=i-1; j<i; j++, k--)
+            sum += iemarray_getfloat(vec_sig, j) * iemarray_getfloat(vec_ir, k);
+          iemarray_setfloat(vec_dst, 0, sum);
+          vec_sig++;
+          vec_dst++;
+          k++;
+          if(k >= p)
+            goto tab_conv_list_end;
+        }
+      }
+tab_conv_list_end:
+      outlet_bang(x->x_obj.ob_outlet);
+      a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
+      garray_redraw(a);
     }
   }
   else
@@ -222,7 +407,7 @@ void tab_conv_setup(void)
   tab_conv_class = class_new(gensym("tab_conv"), (t_newmethod)tab_conv_new, (t_method)tab_conv_free,
     sizeof(t_tab_conv), 0, A_GIMME, 0);
   class_addbang(tab_conv_class, (t_method)tab_conv_bang);
-  class_addlist(tab_conv_class, (t_method)tab_conv_list);
+ // class_addlist(tab_conv_class, (t_method)tab_conv_list);
   class_addmethod(tab_conv_class, (t_method)tab_conv_src1, gensym("src1"), A_DEFSYMBOL, 0);
   class_addmethod(tab_conv_class, (t_method)tab_conv_src2, gensym("src2"), A_DEFSYMBOL, 0);
   class_addmethod(tab_conv_class, (t_method)tab_conv_dst, gensym("dst"), A_DEFSYMBOL, 0);
