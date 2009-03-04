@@ -49,7 +49,7 @@ run_build_script ()
 	 case $SYSTEM in 
 		  mingw*)
 				/c/cygwin/bin/sh -c \
-					 "rsync -a ${LOGFILE} rsync://128.238.56.50/upload/${DATE}/logs/"
+					 "rsync --archive --copy-links ${LOGFILE} rsync://128.238.56.50/upload/${DATE}/logs/"
 				;;
 		  *)
 				rsync -a "$LOGFILE" rsync://128.238.56.50/upload/${DATE}/logs/

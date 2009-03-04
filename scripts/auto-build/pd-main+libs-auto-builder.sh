@@ -64,7 +64,7 @@ upload_build ()
 	 case $SYSTEM in 
 		  mingw*)
 				test -e ${archive} && /c/cygwin/bin/sh -c \
-					 "rsync -a ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}" && \
+					 "rsync --archive --copy-links ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}" && \
 					 echo "successfully uploaded: ${upload_filename}" && \
 					 echo SUCCESS
 				;;

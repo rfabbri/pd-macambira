@@ -45,7 +45,7 @@ echo "root: $auto_build_root_dir"
 case $SYSTEM in
 	mingw*)
 		/c/cygwin/bin/sh -c \
-			"rsync -a --delete rsync://128.238.56.50/distros/pd-devel/ ${auto_build_root_dir}/"
+			"rsync --archive --copy-links --delete rsync://128.238.56.50/distros/pd-devel/ ${auto_build_root_dir}/"
 		;;
 	*)
 		rsync -a --delete rsync://128.238.56.50/distros/pd-devel/ ${auto_build_root_dir}/
@@ -76,10 +76,10 @@ upload_build ()
 		case $SYSTEM in 
 			mingw*)
 				/c/cygwin/bin/sh -c \
-					"rsync -a ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}" && \
+					"rsync --archive --copy-links ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}" && \
 					md5sum ${archive} > ${archive}.md5 && \
 					/c/cygwin/bin/sh -c \
-					"rsync -a ${archive}.md5 rsync://128.238.56.50/upload/${DATE}/${upload_filename}.md5" && \
+					"rsync --archive --copy-links ${archive}.md5 rsync://128.238.56.50/upload/${DATE}/${upload_filename}.md5" && \
 					echo "successfully uploaded: ${upload_filename}" && \
 					echo SUCCESS
 				;;
