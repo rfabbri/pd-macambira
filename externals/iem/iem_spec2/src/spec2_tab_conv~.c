@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_spec2 written by Thomas Musil (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_spec2 written by Thomas Musil (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -24,11 +24,10 @@ t_class *spec2_tab_conv_tilde_class;
 
 static void spec2_tab_conv_tilde_set(t_spec2_tab_conv_tilde *x, t_symbol *s, int argc, t_atom *argv)
 {
-  if(argc >= 2)
+  if((argc >= 2) && IS_A_SYMBOL(argv, 0) && IS_A_FLOAT(argv, 1))
   {
     x->x_sym_array = (t_symbol *)(atom_getsymbol(argv));
-    argv++;
-    x->x_winsize = (int)(atom_getint(argv));
+    x->x_winsize = (int)(atom_getint(argv+1));
     x->x_has_changed = 1;
   }
 }
@@ -120,11 +119,10 @@ static void *spec2_tab_conv_tilde_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_spec2_tab_conv_tilde *x = (t_spec2_tab_conv_tilde *)pd_new(spec2_tab_conv_tilde_class);
   
-  if(argc >= 2)
+  if((argc >= 2) && IS_A_SYMBOL(argv,0) && IS_A_FLOAT(argv,1))
   {
     x->x_sym_array = (t_symbol *)(atom_getsymbol(argv));
-    argv++;
-    x->x_winsize = (int)(atom_getint(argv));
+    x->x_winsize = (int)(atom_getint(argv+1));
     x->x_spec = (t_float *)0;
     x->x_beg_array = (iemarray_t *)0;
     x->x_blocksize = 0;

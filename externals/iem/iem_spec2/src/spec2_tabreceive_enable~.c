@@ -1,12 +1,12 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_spec2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_spec2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
 
-/* ------------------------ spec2_tabreceive_enable_tilde~ ------------------------- */
+/* ------------------------ spec2_tabreceive_enable~ ------------------------- */
 
 static t_class *spec2_tabreceive_enable_tilde_class;
 
@@ -37,18 +37,20 @@ static t_int *spec2_tabreceive_enable_tilde_perform(t_int *w)
 {
   t_spec2_tabreceive_enable_tilde *x = (t_spec2_tabreceive_enable_tilde *)(w[1]);
   t_float *out = (t_float *)(w[2]);
-  int n = w[3]+1;
+  int n = w[3]+1, i;
   iemarray_t *vec = x->x_vec;
   
   if(vec && x->x_enable)
-    while(n--) {
-      *out++ = iemarray_getfloat(vec, 0);
-      vec++;
-    }
-    else
-      while(n--)
-        *out++ = 0.0f;
-      return(w+4);
+  {
+    for(i=0; i<n; i++)
+      out[i] = iemarray_getfloat(vec, i);
+  }
+  else
+  {
+    while(n--)
+      *out++ = 0.0f;
+  }
+  return(w+4);
 }
 
 static t_int *spec2_tabreceive_enable_tilde_perf16(t_int *w)

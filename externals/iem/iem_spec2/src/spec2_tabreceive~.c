@@ -1,19 +1,19 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_spec2 written by Thomas Musil (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_spec2 written by Thomas Musil (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #include "m_pd.h"
 #include "iemlib.h"
 
-/* ------------------------ spec2_tabreceive_tilde~ ------------------------- */
+/* ------------------------ spec2_tabreceive~ ------------------------- */
 
 static t_class *spec2_tabreceive_tilde_class;
 
 typedef struct _spec2_tabreceive_tilde
 {
   t_object  x_obj;
-  iemarray_t*x_vec;
+  iemarray_t *x_vec;
   t_symbol  *x_arrayname;
 } t_spec2_tabreceive_tilde;
 
@@ -26,22 +26,20 @@ static t_int *spec2_tabreceive_tilde_perform(t_int *w)
 {
   t_spec2_tabreceive_tilde *x = (t_spec2_tabreceive_tilde *)(w[1]);
   t_float *out = (t_float *)(w[2]);
-  int n = w[3]+1;
+  int n = w[3]+1, i;
   iemarray_t *vec = x->x_vec;
+  
   if(vec)
-    while(n--) {
-#ifdef __x86_64__
-      t_word wp=*vec++;
-      *out++=wp.w_float;
-#else
-      *out++ = *vec++;
-#endif
-    }
+  {
+    for(i=0; i<n; i++)
+      out[i] = iemarray_getfloat(vec, i);
+  }
   else
+  {
     while(n--)
       *out++ = 0.0f;
+  }
   return(w+4);
-
 }
 
 static t_int *spec2_tabreceive_tilde_perf16(t_int *w)
@@ -104,7 +102,6 @@ static t_int *spec2_tabreceive_tilde_perf16(t_int *w)
     }
     out[0] = 0.0f;
   }
-  
   return(w+4);
 }
 

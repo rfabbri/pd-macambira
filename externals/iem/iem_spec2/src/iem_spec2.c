@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_spec2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iem_spec2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 
 #include "m_pd.h"
@@ -71,6 +71,6 @@ void iem_spec2_setup(void)
   spec2_tabreceive_enable_tilde_setup();
   spec2_tabreceive_tilde_setup();
   
-  post("iem_spec2 (R-1.17) library loaded!   (c) Thomas Musil 11.2006");
+  post("iem_spec2 (R-1.18) library loaded!   (c) Thomas Musil 01.2009");
   post("   musil%ciem.at iem KUG Graz Austria", '@');
 }
