@@ -16,6 +16,10 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <string.h>
+#include <stdlib.h>
+
+#include <sys/timeb.h>
+
 #ifdef linux
 #include <unistd.h>
 #endif
@@ -315,6 +319,39 @@ static void som_cinit(t_som *x, t_symbol *s, int argc, t_atom *argv){
       }
     } else 
       error("som_init: you should pass a list of expected mean-values for each sensor to the SOM");
+  }
+}
+
+static void som_rinit(t_som *x, t_symbol *s, int argc, t_atom *argv)
+{ /* initialize the neuron-weights to time-seeded random values*/
+  int i, j;
+  float m,r;
+  struct timeb mytime;
+
+  ftime(&mytime); // get current time
+  srand(mytime.time*1000+mytime.millitm); // Seed with time (in millisecs)
+
+  switch (argc) {
+  case 0:
+    for (i=0; i<x->num_neurons; i++) {
+      for (j=0; j<x->num_sensors; j++) {
+	r = (float)rand()/RAND_MAX;
+	x->weights[i][j]=r;
+      }
+    }
+  case 1:
+    m = atom_getfloat(argv);
+    for (i=0; i<x->num_neurons; i++) {
+      for (j=0; j<x->num_sensors; j++) {
+	r = (float)rand()/RAND_MAX*m;
+	x->weights[i][j]=r;
+      }
+    }
+    break;
+  default:
+    if (argc > 1) {
+      error("som_rinit: Pass a single float (random value multiplier).");
+     }
   }
 }
 
@@ -743,6 +780,7 @@ static void som_setup(void)
   class_addmethod(som_class, (t_method)som_makenewsom, gensym("new"), A_GIMME, 0);
   class_addmethod(som_class, (t_method)som_init, gensym("init"), A_GIMME, 0);
   class_addmethod(som_class, (t_method)som_cinit, gensym("cinit"), A_GIMME, 0);
+  class_addmethod(som_class, (t_method)som_rinit, gensym("rinit"), A_GIMME, 0);
 
   class_addmethod(som_class, (t_method)som_learn, gensym("learn"), A_GIMME, 0);
   class_addmethod(som_class, (t_method)som_neighbour, gensym("neighbour"), A_GIMME, 0);
