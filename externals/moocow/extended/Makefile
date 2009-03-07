@@ -25,7 +25,7 @@ SUBDIRS = \
 MOOCOW_DIR    ?=$(shell pwd)
 MOOCOW_BUILD  ?=$(MOOCOW_DIR)/build.moo
 MOOCOW_MFLAGS ?=DESTDIR=""
-MOOCOW_BUILD_VERSION ?=2009-03-07.001
+MOOCOW_BUILD_VERSION ?=2009-03-07.002
 
 CONFIGURE_ARGS=\
 	CFLAGS="$(CFLAGS)" \
@@ -46,6 +46,10 @@ ONFAIL ?= echo "(MOOCOW) Warning: sub-target failed: '$@'"
 CFLAGS ?= -g -O2 -Wall -Winline -W
 pd_src ?= $(CURDIR)/../../../pd
 
+##-- LN_S : make a symlink (for common code)
+#LN_S ?= ln -s
+LN_S ?= cp -a
+
 ##======================================================================
 ## Rules: default
 all: build.stamp
@@ -56,7 +60,8 @@ all: build.stamp
 DUMMY_DIR            ?=../dummy
 DUMMY_CONFIGURE_ARGS ?=--disable-shared
 dummy.autogen_stamp: 
-	(cd $(DUMMY_DIR); sh ./prepare-svn.sh) || $(ONFAIL)
+	test -e $(DUMMY_DIR)/common || $(LN_S) ../common $(DUMMY_DIR)/common || $(ONFAIL)
+#	(cd $(DUMMY_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
 #	(cd $(DUMMY_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -88,7 +93,8 @@ FLITE_DIR            ?=../flite
 #FLITE_CONFIGURE_ARGS ?=
 
 flite.autogen_stamp: 
-	(cd $(FLITE_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
+	test -e $(FLITE_DIR)/common || $(LN_S) ../common $(FLITE_DIR)/common || $(ONFAIL)
+#	(cd $(FLITE_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
 #	(cd $(FLITE_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -120,7 +126,8 @@ GFSM_DIR            ?=../gfsm
 #GFSM_CONFIGURE_ARGS ?=
 
 gfsm.autogen_stamp: 
-	(cd $(GFSM_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
+	test -e $(GFSM_DIR)/common || $(LN_S) ../common $(GFSM_DIR)/common || $(ONFAIL)
+#	(cd $(GFSM_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
 #	(cd $(GFSM_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -150,7 +157,8 @@ gfsm.cvsclean: gfsm.extclean
 DEQUE_DIR            ?=../deque
 DEQUE_CONFIGURE_ARGS ?=
 deque.autogen_stamp: 
-	(cd $(DEQUE_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
+	test -e $(DEQUE_DIR)/common || $(LN_S) ../common $(DEQUE_DIR)/common || $(ONFAIL)
+#	(cd $(DEQUE_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
 #	(cd $(DEQUE_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -182,7 +190,8 @@ LOCALE_DIR            ?=../locale
 #LOCALE_CONFIGURE_ARGS ?=
 
 locale.autogen_stamp: 
-	(cd $(LOCALE_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
+	test -e $(LOCALE_DIR)/common || $(LN_S) ../common $(LOCALE_DIR)/common || $(ONFAIL)
+#	(cd $(LOCALE_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
 #	(cd $(LOCALE_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -212,7 +221,8 @@ locale.cvsclean: locale.extclean
 PDSTRING_DIR            ?=../pdstring
 PDSTRING_CONFIGURE_ARGS ?=--enable-object-externals
 pdstring.autogen_stamp: 
-	(cd $(PDSTRING_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
+	test -e $(PDSTRING_DIR)/common || $(LN_S) ../common $(PDSTRING_DIR)/common || $(ONFAIL)
+#	(cd $(PDSTRING_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
 #	(cd $(PDSTRING_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -242,7 +252,8 @@ pdstring.cvsclean: pdstring.extclean
 READDIR_DIR            ?=../readdir
 READDIR_CONFIGURE_ARGS ?=
 readdir.autogen_stamp: 
-	(cd $(READDIR_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
+	test -e $(READDIR_DIR)/common || $(LN_S) ../common $(READDIR_DIR)/common || $(ONFAIL)
+#	(cd $(READDIR_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
 #	(cd $(READDIR_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -273,7 +284,8 @@ readdir.cvsclean: readdir.extclean
 SPRINKLER_DIR            ?=../sprinkler
 SPRINKLER_CONFIGURE_ARGS ?=
 sprinkler.autogen_stamp: 
-	(cd $(SPRINKLER_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
+	test -e $(SPRINKLER_DIR)/common || $(LN_S) ../common $(SPRINKLER_DIR)/common || $(ONFAIL)
+#	(cd $(SPRINKLER_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
 #	(cd $(SPRINKLER_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -303,7 +315,8 @@ sprinkler.cvsclean: sprinkler.extclean
 WEIGHTMAP_DIR            ?=../weightmap
 WEIGHTMAP_CONFIGURE_ARGS ?=
 weightmap.autogen_stamp: 
-	(cd $(WEIGHTMAP_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
+	test -e $(WEIGHTMAP_DIR)/common || $(LN_S) ../common $(WEIGHTMAP_DIR)/common || $(ONFAIL)
+#	(cd $(WEIGHTMAP_DIR); sh ./svn-prepare.sh copy) || $(ONFAIL)
 #	(cd $(WEIGHTMAP_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
