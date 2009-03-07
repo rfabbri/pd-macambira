@@ -1615,9 +1615,7 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
                         pathlen = strlen(mydir);
                         temp = &mydir[pathlen];
                         sprintf(temp, "/%s", filename);
-                        //post("%s", filepath);
                         fp = fopen(filepath, "rb");
-                        return 0;
                     }
                     else{
                         post("dssi~: unable to get file descriptor");
