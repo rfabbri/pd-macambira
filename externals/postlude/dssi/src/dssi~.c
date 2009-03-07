@@ -1176,7 +1176,7 @@ static void dssi_tilde_load_gui(t_dssi_tilde *x, int instance){
 #endif
 
     if(!(dp = opendir(gui_base))){
-        post("dssi~: can't open %s, unable to find GUI", gui_base);
+        post("dssi~: unable to find GUI in %s, continuing without...", gui_base);
         return;
     }
     else {
