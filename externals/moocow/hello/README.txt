@@ -45,25 +45,29 @@ HOWTO
     use GNU autotools to manage your own Pd external package.
 
   Files
-    $(top_srcdir)/m4
-        The directory m4/ should be copied to your top-level package
-        directory. See "ax_pd_external.m4" for details.
+    $(top_srcdir)/common
+        The directory common/ includes common code for the autotools
+        packages. Copy it to your top-level package directory.
 
-    $(top_srcdir)/pdexternal.am
-        The file pdexternal.am should be copied to your top-level package
-        directory See "pdexternal.am" for details.
+    $(top_srcdir)/common/m4
+        Contains m4 macros for autotools. See "ax_pd_external.m4" for
+        details.
 
-    $(srcdir)/mooPdUtils.h (optional)
-        The file mooPdUtils.h may be copied to your source-level directory.
+    $(top_srcdir)/common/pdexternal.am
+        May be included in your package's Makefile.am. See "pdexternal.am"
+        for details.
+
+    $(top_srcdir)/common/mooPdUtils.h (optional)
+        The file mooPdUtils.h may be included by your C source files.
         Currently, this only provides a PDEXT_UNUSED macro to avoid annoying
         gcc warnings under -W.
 
   Running aclocal
-    You must pass the "-I m4" flag to aclocal when you call it. For
+    You must pass the "-I common/m4" flag to aclocal when you call it. For
     maintainer-mode rebuilding and autoreconf, you should add the following
     to your top-level Makefile.am:
 
-     ACLOCAL_AMFLAGS = -I m4
+     ACLOCAL_AMFLAGS = -I $(top_srcdir)/common/m4
 
     See the example package's autogen.sh for a useful wrapper script.
 
@@ -83,7 +87,7 @@ HOWTO
     See the example package's configure.ac for a complete working example.
 
   Makefile.am
-    You probably want to include $(top_srcdir)/pdexternal.am in your
+    You probably want to include $(top_srcdir)/common/pdexternal.am in your
     Makefile.am(s). This will allow you to build Pd externals as "_PROGRAMS"
     targets. In particular, pdext_PROGRAMS targets will be built as
     externals and installed in PDEXT_DIR (see above).
@@ -110,10 +114,10 @@ HOWTO
          pddoc_DATA = hello-help.pd
 
   ax_pd_external.m4
-    The AX_PD_EXTERNAL macro defined in m4/ax_pd_external.m4 is intended to
-    perform all common autoconf-level checks and substitutions necessary for
-    building Pd external packages on various systems. Among other things,
-    this includes:
+    The AX_PD_EXTERNAL macro defined in common/m4/ax_pd_external.m4 is
+    intended to perform all common autoconf-level checks and substitutions
+    necessary for building Pd external packages on various systems. Among
+    other things, this includes:
 
     *   Providing --with-FEATURE and --enable-FEATURE arguments such as
         --with-pd-dir (see "CONFIGURATION OPTIONS", above).

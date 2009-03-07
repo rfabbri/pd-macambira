@@ -100,22 +100,28 @@ how to use GNU autotools to manage your own Pd external package.</p>
 </p>
 <h2><a name="files">Files</a></h2>
 <dl>
-<dt><strong><a name="item___top_srcdir__m4">$(top_srcdir)/m4</a></strong></dt>
+<dt><strong><a name="item___top_srcdir__common">$(top_srcdir)/common</a></strong></dt>
 
 <dd>
-<p>The directory m4/ should be copied to your top-level package directory.
+<p>The directory common/ includes common code for the autotools packages.
+Copy it to your top-level package directory.</p>
+</dd>
+<dt><strong><a name="item___top_srcdir__common_m4">$(top_srcdir)/common/m4</a></strong></dt>
+
+<dd>
+<p>Contains m4 macros for autotools.
 See <a href="#ax_pd_external_m4">ax_pd_external.m4</a> for details.</p>
 </dd>
-<dt><strong><a name="item___top_srcdir__pdexternal_am">$(top_srcdir)/pdexternal.am</a></strong></dt>
+<dt><strong><a name="item___top_srcdir__common_pdexternal_am">$(top_srcdir)/common/pdexternal.am</a></strong></dt>
 
 <dd>
-<p>The file pdexternal.am should be copied to your top-level package directory
+<p>May be included in your package's Makefile.am.
 See <a href="#pdexternal_am">pdexternal.am</a> for details.</p>
 </dd>
-<dt><strong><a name="item_h">$(srcdir)/mooPdUtils.h (optional)</a></strong></dt>
+<dt><strong><a name="item_h">$(top_srcdir)/common/mooPdUtils.h (optional)</a></strong></dt>
 
 <dd>
-<p>The file mooPdUtils.h may be copied to your source-level directory.
+<p>The file mooPdUtils.h may be included by your C source files.
 Currently, this only provides a PDEXT_UNUSED macro to avoid annoying
 gcc warnings under -W.</p>
 </dd>
@@ -123,11 +129,11 @@ gcc warnings under -W.</p>
 <p>
 </p>
 <h2><a name="running_aclocal">Running aclocal</a></h2>
-<p>You must pass the ``-I m4'' flag to aclocal when you call it.
+<p>You must pass the ``-I common/m4'' flag to aclocal when you call it.
 For maintainer-mode rebuilding and autoreconf, you should add
 the following to your top-level Makefile.am:</p>
 <pre>
- ACLOCAL_AMFLAGS = -I m4</pre>
+ ACLOCAL_AMFLAGS = -I $(top_srcdir)/common/m4</pre>
 <p>See the example package's autogen.sh for a useful wrapper script.</p>
 <p>
 </p>
@@ -148,7 +154,7 @@ variables:</p>
 <p>
 </p>
 <h2><a name="makefile_am">Makefile.am</a></h2>
-<p>You probably want to include $(top_srcdir)/pdexternal.am in
+<p>You probably want to include $(top_srcdir)/common/pdexternal.am in
 your Makefile.am(s).  This will allow you to build Pd externals
 as ``_PROGRAMS'' targets.  In particular, pdext_PROGRAMS targets
 will be built as externals and installed in PDEXT_DIR (see above).</p>
@@ -183,7 +189,7 @@ following to Makefile.am:</p>
 <p>
 </p>
 <h2><a name="ax_pd_external_m4">ax_pd_external.m4</a></h2>
-<p>The AX_PD_EXTERNAL macro defined in m4/ax_pd_external.m4
+<p>The AX_PD_EXTERNAL macro defined in common/m4/ax_pd_external.m4
 is intended to perform all common autoconf-level
 checks and substitutions necessary for building Pd external packages on
 various systems.  Among other things, this includes:</p>
