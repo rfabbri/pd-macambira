@@ -36,8 +36,8 @@ void unloadLADSPAPluginLibrary(void * pvLADSPAPluginLibrary);
    informative error messages. */
 const LADSPA_Descriptor *
 findLADSPAPluginDescriptor(void * pvLADSPAPluginLibrary,
-			   const char * pcPluginLibraryFilename,
-			   const char * pcPluginLabel);
+        const char * pcPluginLibraryFilename,
+        const char * pcPluginLabel);
 
 /*****************************************************************************/
 
@@ -60,7 +60,7 @@ typedef void LADSPAPluginSearchCallbackFunction
    library, the callback function is called to process it. This
    function leaves items passed to the callback function open. */
 void LADSPAPluginSearch(LADSPAPluginSearchCallbackFunction fCallbackFunction,
-			void* user_data);
+        void* user_data);
 
 /*****************************************************************************/
 
