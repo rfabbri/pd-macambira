@@ -25,7 +25,7 @@ SUBDIRS = \
 MOOCOW_DIR    ?=$(shell pwd)
 MOOCOW_BUILD  ?=$(MOOCOW_DIR)/build.moo
 MOOCOW_MFLAGS ?=DESTDIR=""
-MOOCOW_BUILD_VERSION ?=2009-02-15.000
+MOOCOW_BUILD_VERSION ?=2009-03-07.000
 
 CONFIGURE_ARGS=\
 	CFLAGS="$(CFLAGS)" \
@@ -56,6 +56,7 @@ all: build.stamp
 DUMMY_DIR            ?=../dummy
 DUMMY_CONFIGURE_ARGS ?=--disable-shared
 dummy.autogen_stamp: 
+	(cd $(DUMMY_DIR); sh ./prepare-svn.sh) || $(ONFAIL)
 #	(cd $(DUMMY_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -87,6 +88,7 @@ FLITE_DIR            ?=../flite
 #FLITE_CONFIGURE_ARGS ?=
 
 flite.autogen_stamp: 
+	(cd $(FLITE_DIR); sh ./svn-prepare.sh) || $(ONFAIL)
 #	(cd $(FLITE_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -118,6 +120,7 @@ GFSM_DIR            ?=../gfsm
 #GFSM_CONFIGURE_ARGS ?=
 
 gfsm.autogen_stamp: 
+	(cd $(GFSM_DIR); sh ./svn-prepare.sh) || $(ONFAIL)
 #	(cd $(GFSM_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -147,6 +150,7 @@ gfsm.cvsclean: gfsm.extclean
 DEQUE_DIR            ?=../deque
 DEQUE_CONFIGURE_ARGS ?=
 deque.autogen_stamp: 
+	(cd $(DEQUE_DIR); sh ./svn-prepare.sh) || $(ONFAIL)
 #	(cd $(DEQUE_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -178,6 +182,7 @@ LOCALE_DIR            ?=../locale
 #LOCALE_CONFIGURE_ARGS ?=
 
 locale.autogen_stamp: 
+	(cd $(LOCALE_DIR); sh ./svn-prepare.sh) || $(ONFAIL)
 #	(cd $(LOCALE_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -207,6 +212,7 @@ locale.cvsclean: locale.extclean
 PDSTRING_DIR            ?=../pdstring
 PDSTRING_CONFIGURE_ARGS ?=--enable-object-externals
 pdstring.autogen_stamp: 
+	(cd $(PDSTRING_DIR); sh ./svn-prepare.sh) || $(ONFAIL)
 #	(cd $(PDSTRING_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -236,6 +242,7 @@ pdstring.cvsclean: pdstring.extclean
 READDIR_DIR            ?=../readdir
 READDIR_CONFIGURE_ARGS ?=
 readdir.autogen_stamp: 
+	(cd $(READDIR_DIR); sh ./svn-prepare.sh) || $(ONFAIL)
 #	(cd $(READDIR_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -266,6 +273,7 @@ readdir.cvsclean: readdir.extclean
 SPRINKLER_DIR            ?=../sprinkler
 SPRINKLER_CONFIGURE_ARGS ?=
 sprinkler.autogen_stamp: 
+	(cd $(SPRINKLER_DIR); sh ./svn-prepare.sh) || $(ONFAIL)
 #	(cd $(SPRINKLER_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 
@@ -295,6 +303,7 @@ sprinkler.cvsclean: sprinkler.extclean
 WEIGHTMAP_DIR            ?=../weightmap
 WEIGHTMAP_CONFIGURE_ARGS ?=
 weightmap.autogen_stamp: 
+	(cd $(WEIGHTMAP_DIR); sh ./svn-prepare.sh) || $(ONFAIL)
 #	(cd $(WEIGHTMAP_DIR); sh ./autogen.sh) || $(ONFAIL)
 	touch $@
 

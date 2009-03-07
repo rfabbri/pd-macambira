@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------
 # Includes
 #-----------------------------------------------------------------------
-include $(top_srcdir)/pdexternal.am
+include $(top_srcdir)/common/pdexternal.am
 
 #-----------------------------------------------------------------------
 # pd externals (hacked _PROGRAMS target)
@@ -32,7 +32,12 @@ pddoc_DATA = deque-help.pd
 #-----------------------------------------------------------------------
 
 deque_SOURCES = \
-	mooPdUtils.h \
+	$(top_srcdir)/common/mooPdUtils.h \
 	squeue.c squeue.h \
 	dsqueue.c dsqueue.h \
 	deque.c
+
+#-----------------------------------------------------------------------
+# flags
+#-----------------------------------------------------------------------
+AM_CPPFLAGS = -I$(top_srcdir)/common

@@ -50,13 +50,14 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(srcdir)/sprinkler-help.pd.in $(top_srcdir)/configure \
-	$(top_srcdir)/pdexternal.am COPYING depcomp install-sh missing
+	$(srcdir)/sprinkler-help.pd.in \
+	$(top_srcdir)/common/pdexternal.am $(top_srcdir)/configure \
+	COPYING depcomp install-sh missing
 pdexterns_PROGRAMS = sprinkler$(EXEEXT)
 EXTRA_PROGRAMS = sprinkler$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pd_external.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/common/m4/ax_pd_external.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -259,7 +260,7 @@ MAINTAINERCLEANFILES = *~ \
 #-----------------------------------------------------------------------
 # Options & Subdirectories
 #-----------------------------------------------------------------------
-ACLOCAL_AMFLAGS = -I m4 
+ACLOCAL_AMFLAGS = -I common/m4
 
 #AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip
 AUTOMAKE_OPTIONS = foreign
@@ -276,7 +277,8 @@ pddoc_DATA = sprinkler-help.pd
 #-----------------------------------------------------------------------
 # sources
 #-----------------------------------------------------------------------
-sprinkler_SOURCES = sprinkler.c mooPdUtils.h
+sprinkler_SOURCES = sprinkler.c common/mooPdUtils.h
+AM_CPPFLAGS = -I$(top_srcdir)/common
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -284,7 +286,7 @@ all: config.h
 .SUFFIXES: .@PDEXT@ .pod .txt .html .c .o .obj
 am--refresh:
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/pdexternal.am $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/common/pdexternal.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -469,7 +471,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/m4
+	$(mkdir_p) $(distdir)/. $(distdir)/common $(distdir)/common/m4
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

@@ -6,11 +6,16 @@
 # Process this file with Automake to create Makefile.in.
 #-----------------------------------------------------------------------
 
+#-----------------------------------------------------------------------
+# Includes
+#-----------------------------------------------------------------------
+include $(top_srcdir)/common/pdexternal.am
+
 ##-----------------------------------------------------------------------
 ## Options & Subdirectories
 
 ##-- aclocal options (top level only)
-ACLOCAL_AMFLAGS = -I m4 
+ACLOCAL_AMFLAGS = -I common/m4 
 
 ## --- automake options (top level only)
 #AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip
@@ -18,11 +23,6 @@ AUTOMAKE_OPTIONS = foreign
 
 ## --- recursion subdirectories
 SUBDIRS = config src
-
-#-----------------------------------------------------------------------
-# Includes
-#-----------------------------------------------------------------------
-include $(top_srcdir)/pdexternal.am
 
 #-----------------------------------------------------------------------
 # Additional Variables & Rules: PODS

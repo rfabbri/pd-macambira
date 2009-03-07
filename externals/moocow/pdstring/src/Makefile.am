@@ -11,7 +11,7 @@
 #-----------------------------------------------------------------------
 
 ##--- common includes
-include $(top_srcdir)/pdexternal.am
+include $(top_srcdir)/common/pdexternal.am
 
 ##--- recursion subdirectories
 #SUBDIRS = 
@@ -42,13 +42,14 @@ EXTRA_PROGRAMS = \
 	printbytes \
 	printwchars
 
-any2bytes_SOURCES = any2bytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-bytes2any_SOURCES = bytes2any.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-bytes2wchars_SOURCES = bytes2wchars.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-wchars2bytes_SOURCES = wchars2bytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-printbytes_SOURCES = printbytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-printwchars_SOURCES = printwchars.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-pdstring_SOURCES = pdstring.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
+MOOPDUTILS_H = $(top_srcdir)/common/mooPdUtils.h
+any2bytes_SOURCES = any2bytes.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+bytes2any_SOURCES = bytes2any.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+bytes2wchars_SOURCES = bytes2wchars.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+wchars2bytes_SOURCES = wchars2bytes.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+printbytes_SOURCES = printbytes.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+printwchars_SOURCES = printwchars.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+pdstring_SOURCES = pdstring.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
 
 #-----------------------------------------------------------------------
 # patches, etc.
@@ -95,19 +96,7 @@ uninstall-local:
 	rm -f $(pdexternsdir)/string2any.$(PDEXT)
 
 #-----------------------------------------------------------------------
-# external compilation : flags
-#  + now handled by AX_PD_EXTERNAL
+# Paths, etc.
 #-----------------------------------------------------------------------
 
-#-----------------------------------------------------------------------
-# Variables: cleanup
-#  + should be handled by pdexternal.am
-
-#-----------------------------------------------------------------------
-# Variables: distribution
-#  + should be handled by pdexternal.am
-
-#-----------------------------------------------------------------------
-# Rules: cleanup
-#  + should be handled by pdexternal.am
-
+AM_CPPFLAGS = -I$(top_srcdir)/common

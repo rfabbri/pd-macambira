@@ -49,12 +49,12 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/config.h.in $(top_srcdir)/pdexternal.am
+	$(srcdir)/config.h.in $(top_srcdir)/common/pdexternal.am
 pdexterns_PROGRAMS = deque$(EXEEXT)
 EXTRA_PROGRAMS = deque$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pd_external.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/common/m4/ax_pd_external.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -240,17 +240,22 @@ pddoc_DATA = deque-help.pd
 # sources
 #-----------------------------------------------------------------------
 deque_SOURCES = \
-	mooPdUtils.h \
+	$(top_srcdir)/common/mooPdUtils.h \
 	squeue.c squeue.h \
 	dsqueue.c dsqueue.h \
 	deque.c
 
+
+#-----------------------------------------------------------------------
+# flags
+#-----------------------------------------------------------------------
+AM_CPPFLAGS = -I$(top_srcdir)/common
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .@PDEXT@ .pod .txt .html .c .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/pdexternal.am $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/common/pdexternal.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -431,7 +436,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/..
+	$(mkdir_p) $(distdir)/../common
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

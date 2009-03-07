@@ -11,7 +11,7 @@ MY_AHDIRS="."
 MY_AMDIRS="."
 MY_ACDIRS="."
 
-test -z "$ACLOCAL" && ACLOCAL="aclocal -I m4"
+test -z "$ACLOCAL" && ACLOCAL="aclocal -I common/m4"
 test -z "$AUTOHEADER" && AUTOHEADER=autoheader
 test -z "$AUTOMAKE" && AUTOMAKE=automake
 test -z "$AUTOCONF" && AUTOCONF=autoconf

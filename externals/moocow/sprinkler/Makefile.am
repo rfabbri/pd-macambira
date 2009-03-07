@@ -9,14 +9,14 @@
 #-----------------------------------------------------------------------
 # Includes
 #-----------------------------------------------------------------------
-include $(top_srcdir)/pdexternal.am
+include $(top_srcdir)/common/pdexternal.am
 
 #-----------------------------------------------------------------------
 # Options & Subdirectories
 #-----------------------------------------------------------------------
 
 ##-- aclocal options (top level only)
-ACLOCAL_AMFLAGS = -I m4 
+ACLOCAL_AMFLAGS = -I common/m4
 
 ## --- automake options
 #AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip
@@ -53,4 +53,6 @@ pddoc_DATA = sprinkler-help.pd
 # sources
 #-----------------------------------------------------------------------
 
-sprinkler_SOURCES = sprinkler.c mooPdUtils.h
+sprinkler_SOURCES = sprinkler.c common/mooPdUtils.h
+
+AM_CPPFLAGS = -I$(top_srcdir)/common

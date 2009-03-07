@@ -54,7 +54,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/any2bytes-help.pd $(srcdir)/bytes2any-help.pd \
-	$(srcdir)/config.h.in $(top_srcdir)/pdexternal.am
+	$(srcdir)/config.h.in $(top_srcdir)/common/pdexternal.am
 pdexec_PROGRAMS = pdstring$(EXEEXT) $(am__EXEEXT_1)
 @WANT_OBJECT_EXTERNALS_TRUE@am__append_1 = \
 @WANT_OBJECT_EXTERNALS_TRUE@	any2bytes \
@@ -69,7 +69,7 @@ EXTRA_PROGRAMS = pdstring$(EXEEXT) any2bytes$(EXEEXT) \
 	printbytes$(EXEEXT) printwchars$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pd_external.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/common/m4/ax_pd_external.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -86,26 +86,32 @@ am__installdirs = "$(DESTDIR)$(pdexecdir)" "$(DESTDIR)$(pddocdir)" \
 	"$(DESTDIR)$(pdexternsdir)"
 pdexecPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(pdexec_PROGRAMS)
-am_any2bytes_OBJECTS = any2bytes.$(OBJEXT) pdstringUtils.$(OBJEXT)
+am__objects_1 =
+am_any2bytes_OBJECTS = any2bytes.$(OBJEXT) $(am__objects_1) \
+	pdstringUtils.$(OBJEXT)
 any2bytes_OBJECTS = $(am_any2bytes_OBJECTS)
 any2bytes_LDADD = $(LDADD)
-am_bytes2any_OBJECTS = bytes2any.$(OBJEXT) pdstringUtils.$(OBJEXT)
+am_bytes2any_OBJECTS = bytes2any.$(OBJEXT) $(am__objects_1) \
+	pdstringUtils.$(OBJEXT)
 bytes2any_OBJECTS = $(am_bytes2any_OBJECTS)
 bytes2any_LDADD = $(LDADD)
-am_bytes2wchars_OBJECTS = bytes2wchars.$(OBJEXT) \
+am_bytes2wchars_OBJECTS = bytes2wchars.$(OBJEXT) $(am__objects_1) \
 	pdstringUtils.$(OBJEXT)
 bytes2wchars_OBJECTS = $(am_bytes2wchars_OBJECTS)
 bytes2wchars_LDADD = $(LDADD)
-am_pdstring_OBJECTS = pdstring.$(OBJEXT) pdstringUtils.$(OBJEXT)
+am_pdstring_OBJECTS = pdstring.$(OBJEXT) $(am__objects_1) \
+	pdstringUtils.$(OBJEXT)
 pdstring_OBJECTS = $(am_pdstring_OBJECTS)
 pdstring_LDADD = $(LDADD)
-am_printbytes_OBJECTS = printbytes.$(OBJEXT) pdstringUtils.$(OBJEXT)
+am_printbytes_OBJECTS = printbytes.$(OBJEXT) $(am__objects_1) \
+	pdstringUtils.$(OBJEXT)
 printbytes_OBJECTS = $(am_printbytes_OBJECTS)
 printbytes_LDADD = $(LDADD)
-am_printwchars_OBJECTS = printwchars.$(OBJEXT) pdstringUtils.$(OBJEXT)
+am_printwchars_OBJECTS = printwchars.$(OBJEXT) $(am__objects_1) \
+	pdstringUtils.$(OBJEXT)
 printwchars_OBJECTS = $(am_printwchars_OBJECTS)
 printwchars_LDADD = $(LDADD)
-am_wchars2bytes_OBJECTS = wchars2bytes.$(OBJEXT) \
+am_wchars2bytes_OBJECTS = wchars2bytes.$(OBJEXT) $(am__objects_1) \
 	pdstringUtils.$(OBJEXT)
 wchars2bytes_OBJECTS = $(am_wchars2bytes_OBJECTS)
 wchars2bytes_LDADD = $(LDADD)
@@ -277,13 +283,14 @@ MAINTAINERCLEANFILES = *~ \
 	texinfo.tex \
 	ylwrap
 
-any2bytes_SOURCES = any2bytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-bytes2any_SOURCES = bytes2any.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-bytes2wchars_SOURCES = bytes2wchars.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-wchars2bytes_SOURCES = wchars2bytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-printbytes_SOURCES = printbytes.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-printwchars_SOURCES = printwchars.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
-pdstring_SOURCES = pdstring.c mooPdUtils.h pdstringUtils.h pdstringUtils.c
+MOOPDUTILS_H = $(top_srcdir)/common/mooPdUtils.h
+any2bytes_SOURCES = any2bytes.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+bytes2any_SOURCES = bytes2any.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+bytes2wchars_SOURCES = bytes2wchars.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+wchars2bytes_SOURCES = wchars2bytes.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+printbytes_SOURCES = printbytes.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+printwchars_SOURCES = printwchars.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
+pdstring_SOURCES = pdstring.c $(MOOPDUTILS_H) pdstringUtils.h pdstringUtils.c
 
 #-----------------------------------------------------------------------
 # patches, etc.
@@ -307,12 +314,17 @@ pddoc_DATA = \
 	printbytes-help.pd \
 	printwchars-help.pd
 
+
+#-----------------------------------------------------------------------
+# Paths, etc.
+#-----------------------------------------------------------------------
+AM_CPPFLAGS = -I$(top_srcdir)/common
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .@PDEXT@ .pod .txt .html .c .o .obj
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/pdexternal.am $(am__configure_deps)
+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/common/pdexternal.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -516,7 +528,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/..
+	$(mkdir_p) $(distdir)/../common
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -675,23 +687,6 @@ install-data-hook:
 uninstall-local:
 	rm -f $(pdexternsdir)/any2string.$(PDEXT)
 	rm -f $(pdexternsdir)/string2any.$(PDEXT)
-
-#-----------------------------------------------------------------------
-# external compilation : flags
-#  + now handled by AX_PD_EXTERNAL
-#-----------------------------------------------------------------------
-
-#-----------------------------------------------------------------------
-# Variables: cleanup
-#  + should be handled by pdexternal.am
-
-#-----------------------------------------------------------------------
-# Variables: distribution
-#  + should be handled by pdexternal.am
-
-#-----------------------------------------------------------------------
-# Rules: cleanup
-#  + should be handled by pdexternal.am
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

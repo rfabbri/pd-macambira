@@ -4,4 +4,4 @@
 ##   + automake file for 'config' package-subdir
 ##-----------------------------------------------------------------------
 
-include $(top_srcdir)/pdexternal.am
+include $(top_srcdir)/common/pdexternal.am

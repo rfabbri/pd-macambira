@@ -32,5 +32,10 @@ else
 fi
 
 ##-- copy or link in common dir
-rm -rf "$COMMON_DST";
-$CP "$COMMON_SRC" "$COMMON_DST";
+runcmd() {
+  echo "$0[`basename \`pwd\``]:" "$@"
+  $@
+}
+
+runcmd rm -rf "$COMMON_DST";
+runcmd $CP "$COMMON_SRC" "$COMMON_DST";

@@ -28,6 +28,9 @@ fi
 
 if test -n "$dirs"; then
   echo "$0: dirs=(${dirs[@]})"
+  for d in "${dirs[@]}"; do
+    test -x "$d/svn-prepare.sh" && (cd "$d"; sh ./svn-prepare.sh)
+  done
   exec autoreconf $ar_args "${dirs[@]}"
   #--symlink
 fi

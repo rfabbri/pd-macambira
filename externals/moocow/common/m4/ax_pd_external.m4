@@ -13,7 +13,7 @@
 #
 # Pd directories
 #   AC_ARG_WITH(pd-dir)     : default: "\${prefix}/pd"
-#   AC_ARG_WITH(pd-include) : sets IFLAGS, AM_IFLAGS
+#   AC_ARG_WITH(pd-include) : sets PDEXT_IFLAGS, AM_IFLAGS
 #   AC_ARG_WITH(pd-extdir)  : default $pddir/externs
 #   AC_SUBST(pddir)
 #   AC_SUBST(pddocdir)
@@ -148,7 +148,7 @@ AC_DEFUN([AX_PD_EXTERNAL],
 	[pdincludedir="$withval"],
 	[pdincludedir=""])
  if test -n "$pdincludedir" ; then
-  IFLAGS="$IFLAGS -I$pdincludedir"
+  PDEXT_IFLAGS="$PDEXT_IFLAGS -I$pdincludedir"
  fi
  AC_SUBST(pdincludedir)
 
@@ -194,7 +194,7 @@ AC_DEFUN([AX_PD_EXTERNAL],
 
  ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
  ## check: m_pd.h
- CPPFLAGS="$CPPFLAGS $IFLAGS"
+ CPPFLAGS="$CPPFLAGS $PDEXT_IFLAGS"
  AC_CHECK_HEADER(m_pd.h,[],
 	AC_MSG_ERROR([could not find Pd header file 'm_pd.h' - bailing out]),
 	[/* nonempty includes: compile only */])
