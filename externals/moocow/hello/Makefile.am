@@ -9,14 +9,14 @@
 #-----------------------------------------------------------------------
 # Includes
 #-----------------------------------------------------------------------
-include $(top_srcdir)/pdexternal.am
+include $(top_srcdir)/common/pdexternal.am
 
 ##-----------------------------------------------------------------------
 ## Options & Subdirectories
 ##-----------------------------------------------------------------------
 
 ##-- aclocal options (top level only)
-ACLOCAL_AMFLAGS = -I m4 
+ACLOCAL_AMFLAGS = -I common/m4
 
 ## --- automake options (top level only)
 #AUTOMAKE_OPTIONS = foreign dist-bzip2 dist-zip
@@ -38,8 +38,8 @@ endif
 EXTRA_PROGRAMS = goodbye
 
 ##-- sources
-hello_SOURCES = hello.c mooPdUtils.h
-goodbye_SOURCES = goodbye.c mooPdUtils.h
+hello_SOURCES = hello.c common/mooPdUtils.h
+goodbye_SOURCES = goodbye.c common/mooPdUtils.h
 
 ##-- patches
 pdexterns_DATA = heynow.pd
