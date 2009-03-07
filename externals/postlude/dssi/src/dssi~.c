@@ -1607,7 +1607,7 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
                     strcpy(key, "patches0");
 
                     /* FIX: duplicates code from load_plugin() */
-                    fd = canvas_open(x->x_canvas, "", "",
+                    fd = canvas_open(x->x_canvas, filename, "",
                             mydir, &filename, MAXPDSTRING, 0);
 
                     if(fd >= 0){
@@ -1615,9 +1615,12 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
                         pathlen = strlen(mydir);
                         temp = &mydir[pathlen];
                         sprintf(temp, "/%s", filename);
-                        post("%s", filepath);
+                        //post("%s", filepath);
+                        fp = fopen(filepath, "rb");
                         return 0;
-                        /* fp = fopen(filepath, "rb");  */
+                    }
+                    else{
+                        post("dssi~: unable to get file descriptor");
                     }
 
                     /*From dx7_voice_data by Sean Bolton */
