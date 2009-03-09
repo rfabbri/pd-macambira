@@ -13,9 +13,11 @@ if (@ARGV) {
   $arch = 'unknown';
 }
 $ismoo=0;
-%class2n =qw();
-%packages =qw();
-$nfailed = 0;
+%file2i  = qw(); ##-- $filename => \%info
+%pkg2i   = qw(); ##-- $pkg => { $filename=>\%info, ... }
+%class2i = qw(); ##-- $class => { $filename=>\%info, ... }
+@files   = qw(); ##-- filenames, for ordering
+%failed_msgs = qw();
 while (<>) {
   if (
       m|[Ee]ntering directory\b.*\/moocow\/extended(?!\/)|
@@ -31,7 +33,9 @@ while (<>) {
   if (m/MOOCOW_BUILD_VERSION/ || m/^\(moocow/i) {
     $ismoo = 1;
     print "DEBUG: $_";
-    $nfailed++ if ($_ =~ /sub-target failed/);
+    if ($_ =~ /sub-target failed/) {
+      $failed_msgs{$_}=1;
+    }
   }
   elsif (
 	 m|[Ee]ntering directory\b.*\/moocow\/([^\/]*)\s|
@@ -65,9 +69,13 @@ while (<>) {
     elsif ($instdir =~ m/\b(?:externs|extra)\b/) {
       $class = 'EXT';
     }
-    $class2n{$class}++;
-    $packages{$extdir}=1;
-    print sprintf("INSTALL %-3s %10s %-20s %-12s %s\n", $class, $extdir, $base, $ext, $instdir);
+    $filebase = "${base}${ext}";
+    $fileinfo = { file=>$filebase, class=>$class, extdir=>$extdir, base=>$base, ext=>$ext, instdir=>$instdir };
+    $file2i{$filebase} = $fileinfo;
+    $class2i{$class}{$filebase} = $fileinfo;
+    $pkg2i{$extdir}{$filebase} = $fileinfo;
+    push(@files, $filebase);
+    #print sprintf("INSTALL %-3s %10s %-20s %-12s %s\n", $class, $extdir, $base, $ext, $instdir);
   }
   elsif (
 	 m|[Ll]eaving directory\b.*\/moocow\/extended(?!\/)|
@@ -79,12 +87,25 @@ while (<>) {
     } #/
 }
 
+##-- print files
+%fdone = qw();
+foreach $f (@files) {
+  next if ($fdone{$f});
+  $fdone{$f} = 1;
+  $info = $file2i{$f};
+  print sprintf("INSTALL %-3s %10s %-20s %-12s %s\n", @$info{qw(class extdir base ext instdir)});
+}
+
+##-- get summary info
+%class2n = map {$_=>scalar(keys(%{$class2i{$_}}))} keys(%class2i);
+$nfailed = scalar(keys(%failed_msgs));
+
 ##-- summarize
 %class2name = (EXT=>'externals', PAT=>'patches', DOC=>'docs', UNK=>'unknown');
 @summary =
   (sprintf("%-32s: ", $arch),
    join(', ',
-	(sprintf("%2d packages, %2d failed", scalar(keys(%packages)), $nfailed)),
+	(sprintf("%2d packages, %2d failed", scalar(keys(%pkg2i)), $nfailed)),
 	(map { sprintf("%2d", ($class2n{$_}||0))." ".($class2name{$_}||$_) } qw(EXT PAT DOC UNK)),
        ),
    "\n",
