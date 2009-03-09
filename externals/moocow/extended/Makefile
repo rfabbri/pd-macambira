@@ -48,7 +48,7 @@ pd_src ?= $(CURDIR)/../../../pd
 
 ##-- LN_S : make a symlink (for common code)
 #LN_S ?= ln -s
-LN_S ?= cp -a
+LN_S ?= cp -R
 
 ##======================================================================
 ## Rules: default

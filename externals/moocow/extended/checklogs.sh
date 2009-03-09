@@ -1,6 +1,6 @@
 #!/bin/sh
 
-## Usage: getlogs.sh [DATE [FORCE]]
+## Usage: checklogs.sh [DATE [FORCE]]
 
 proto="http"
 baseurl="autobuild.pure-data.info/auto-build"
@@ -9,6 +9,16 @@ baseurl="autobuild.pure-data.info/auto-build"
 #wget_quiet_flags="-nv"
 wget_quiet_flags=""
 
+##-- help
+USAGE="$0 [DATE [FORCE]]"
+case "$1" in
+  -h|-help|--help|-\?)
+   echo "Usage: $USAGE"
+   exit 0
+   ;;
+esac
+
+##-- args
 logdate="$1"
 test $# -gt 0 && shift
 test -z "$logdate" -o "$logdate" = "-" && logdate=`date +%Y-%m-%d`
