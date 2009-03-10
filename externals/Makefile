@@ -2067,12 +2067,13 @@ pdp_install: pdp
 #		--author "Tom Schouten" \
 #		--description "Pure Data Packet" \
 #		--license "GNU GPL"
+	install -d $(objectsdir)
 	install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)
 #	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)
 	install -d $(helpdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)/$(PDP_NAME)
-	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)
+	install -p $(externals_src)/pdp/doc/objects/*.* $(objectsdir)
 	install -d $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/reference.txt $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/introduction/*.* \
@@ -2108,8 +2109,9 @@ pdp_opengl_install: pdp_opengl
 	install -p $(PDP_OPENGL_BINARY) $(objectsdir)
 	install -p $(externals_src)/pdp/opengl/abstractions/*.pd \
 		$(objectsdir)/$(PDP_OPENGL_NAME)
-	install -d $(helpdir)
-	install -p $(externals_src)/pdp/opengl/doc/objects/*.pd $(helpdir)
+	install -d $(helpdir)/$(PDP_OPENGL_NAME)
+	install -p $(externals_src)/pdp/opengl/doc/objects/*.pd $(objectsdir)
+	install -p $(externals_src)/pdp/opengl/doc/objects/*.pd $(objectsdir)/$(PDP_OPENGL_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/pdp/opengl/README \
 		$(readmesdir)/$(PDP_OPENGL_NAME).txt
@@ -2194,7 +2196,7 @@ pidip_install: pidip
 	install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)
 	install -d $(helpdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)/$(PIDIP_NAME)
-	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)
+	install -p $(externals_src)/pidip/doc/*.pd $(objectsdir)
 	install -d $(examplesdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/patches/*.* $(examplesdir)/$(PIDIP_NAME)
 #	install -d $(manualsdir)/$(PIDIP_NAME)
@@ -2230,7 +2232,6 @@ pmpd_install: pmpd
 		--description "Physical Modelling for Pd"
 	-install -p $(externals_src)/pmpd/*.$(EXTENSION) $(objectsdir)/$(PMPD_NAME)
 	install -d $(helpdir)/$(PMPD_NAME)
-	install -p $(externals_src)/pmpd/help/*.pd $(helpdir)
 	install -p $(externals_src)/pmpd/help/*.pd $(helpdir)/$(PMPD_NAME)
 	install -d $(manualsdir)/$(PMPD_NAME)
 	install -d $(manualsdir)/$(PMPD_NAME)
