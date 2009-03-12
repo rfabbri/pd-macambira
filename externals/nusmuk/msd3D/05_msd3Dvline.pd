@@ -1,4 +1,4 @@
-#N canvas 711 237 465 154 10;
+#N canvas 600 228 703 389 10;
 #N canvas 530 297 450 300 gem 0;
 #X obj 101 220 gemwin;
 #X msg 120 102 0 \, destroy;
@@ -17,7 +17,7 @@
 #X connect 6 1 1 0;
 #X connect 7 0 0 0;
 #X restore 14 85 pd gem;
-#X obj 14 62 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+#X obj 14 62 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1 1
 ;
 #X text 33 60 gem on/off;
 #N canvas 0 22 563 316 creation 0;
@@ -68,7 +68,7 @@ Zmin -6;
 #X connect 5 0 3 1;
 #X connect 6 0 3 0;
 #X restore 60 116 pd getmmasses;
-#N canvas 259 464 942 390 massrender 0;
+#N canvas 446 323 942 390 massrender 0;
 #X obj 286 2 inlet;
 #X obj 306 144 pack f f f f;
 #X obj 306 99 % 30;
@@ -180,11 +180,11 @@ Zmin -6;
 #X connect 8 0 4 0;
 #X connect 11 0 2 1;
 #X connect 11 0 4 0;
-#X restore 150 106 pd sinus;
-#X obj 153 85 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+#X restore 190 146 pd sinus;
+#X obj 193 125 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
-#X text 149 66 add sinusoidal force;
-#X text 290 67 add constant force;
+#X text 189 106 add sinusoidal force;
+#X text 330 107 add constant force;
 #N canvas 0 22 450 300 constant 0;
 #X msg 176 111 forceZ filet \$1;
 #X obj 176 33 tgl 20 0 empty empty empty 0 -6 0 8 -262131 -1 -1 0 1
@@ -199,11 +199,114 @@ Zmin -6;
 #X connect 3 0 2 0;
 #X connect 5 0 1 0;
 #X connect 5 0 2 1;
-#X restore 292 105 pd constant;
-#X obj 295 85 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+#X restore 332 145 pd constant;
+#X obj 335 125 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
 #X text 151 26 vertical lines under various forces;
+#N canvas 0 22 450 300 sinus 0;
+#X obj 116 195 sin;
+#X obj 116 215 *;
+#X obj 116 135 counter 0 360;
+#X obj 116 54 tgl 20 0 empty empty empty 0 -6 0 8 -262131 -1 -1 0 8
+;
+#X obj 116 155 / 3.6;
+#X obj 116 175 * 6.28319;
+#X obj 116 112 metro 35;
+#X obj 116 264 s \$0-msdin;
+#X obj 163 51 inlet;
+#X msg 116 243 forceX filet \$1;
+#X obj 163 83 / 30;
+#X connect 0 0 1 0;
+#X connect 1 0 9 0;
+#X connect 2 0 4 0;
+#X connect 3 0 6 0;
+#X connect 4 0 5 0;
+#X connect 5 0 0 0;
+#X connect 6 0 2 0;
+#X connect 8 0 3 0;
+#X connect 8 0 10 0;
+#X connect 9 0 7 0;
+#X connect 10 0 1 1;
+#X restore 190 216 pd sinus;
+#X obj 193 195 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X text 189 176 add sinusoidal force;
+#X text 330 177 add constant force;
+#N canvas 0 22 450 300 constant 0;
+#X obj 176 33 tgl 20 0 empty empty empty 0 -6 0 8 -262131 -1 -1 0 10
+;
+#X obj 176 84 f;
+#X obj 176 60 metro 65;
+#X obj 176 152 s \$0-msdin;
+#X obj 225 28 inlet;
+#X msg 176 131 forceX filet \$1;
+#X obj 176 107 / 100;
+#X connect 0 0 2 0;
+#X connect 1 0 6 0;
+#X connect 2 0 1 0;
+#X connect 4 0 0 0;
+#X connect 4 0 1 1;
+#X connect 5 0 3 0;
+#X connect 6 0 5 0;
+#X restore 332 215 pd constant;
+#X obj 335 195 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X text 128 120 on Z;
+#X text 128 193 on Y;
+#N canvas 0 22 450 300 sinus 0;
+#X obj 116 205 sin;
+#X obj 116 225 *;
+#X obj 116 145 counter 0 360;
+#X obj 116 54 tgl 20 0 empty empty empty 0 -6 0 8 -262131 -1 -1 0 3
+;
+#X obj 116 165 / 3.6;
+#X obj 116 185 * 6.28319;
+#X obj 116 122 metro 35;
+#X obj 116 287 s \$0-msdin;
+#X obj 163 51 inlet;
+#X msg 116 266 forceY filet \$1;
+#X obj 163 78 / 30;
+#X connect 0 0 1 0;
+#X connect 1 0 9 0;
+#X connect 2 0 4 0;
+#X connect 3 0 6 0;
+#X connect 4 0 5 0;
+#X connect 5 0 0 0;
+#X connect 6 0 2 0;
+#X connect 8 0 3 0;
+#X connect 8 0 10 0;
+#X connect 9 0 7 0;
+#X connect 10 0 1 1;
+#X restore 190 276 pd sinus;
+#X obj 193 255 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X text 189 236 add sinusoidal force;
+#X text 330 237 add constant force;
+#N canvas 0 22 450 300 constant 0;
+#X obj 176 33 tgl 20 0 empty empty empty 0 -6 0 8 -262131 -1 -1 0 12
+;
+#X obj 176 84 f;
+#X obj 176 60 metro 65;
+#X obj 176 172 s \$0-msdin;
+#X obj 225 28 inlet;
+#X msg 176 151 forceY filet \$1;
+#X obj 176 113 / 127;
+#X connect 0 0 2 0;
+#X connect 1 0 6 0;
+#X connect 2 0 1 0;
+#X connect 4 0 0 0;
+#X connect 4 0 1 1;
+#X connect 5 0 3 0;
+#X connect 6 0 5 0;
+#X restore 332 275 pd constant;
+#X obj 335 255 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X text 128 253 on X;
 #X connect 1 0 0 0;
 #X connect 5 0 3 0;
 #X connect 8 0 7 0;
 #X connect 12 0 11 0;
+#X connect 15 0 14 0;
+#X connect 19 0 18 0;
+#X connect 23 0 22 0;
+#X connect 27 0 26 0;
