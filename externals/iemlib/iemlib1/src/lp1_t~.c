@@ -80,36 +80,36 @@ static t_int *lp1_t_tilde_perf8(t_int *w)
   t_float *out = (t_float *)(w[2]);
   t_lp1_t_tilde *x = (t_lp1_t_tilde *)(w[3]);
   int i, n = (t_int)(w[4]);
-  t_float yn[9];
+  t_float ynn[9];
   t_float c0=x->c0, c1=x->c1;
   
   lp1_t_tilde_dsp_tick(x);
-  yn[0] = x->yn1;
+  ynn[0] = x->yn1;
   for(i=0; i<n; i+=8, in+=8, out+=8)
   {
-    yn[1] = in[0]*c0 + yn[0]*c1;
-    out[0] = yn[1];
-    yn[2] = in[1]*c0 + yn[1]*c1;
-    out[1] = yn[2];
-    yn[3] = in[2]*c0 + yn[2]*c1;
-    out[2] = yn[3];
-    yn[4] = in[3]*c0 + yn[3]*c1;
-    out[3] = yn[4];
-    yn[5] = in[4]*c0 + yn[4]*c1;
-    out[4] = yn[5];
-    yn[6] = in[5]*c0 + yn[5]*c1;
-    out[5] = yn[6];
-    yn[7] = in[6]*c0 + yn[6]*c1;
-    out[6] = yn[7];
-    yn[8] = in[7]*c0 + yn[7]*c1;
-    out[7] = yn[8];
-    yn[0] = yn[8];
+    ynn[1] = in[0]*c0 + ynn[0]*c1;
+    out[0] = ynn[1];
+    ynn[2] = in[1]*c0 + ynn[1]*c1;
+    out[1] = ynn[2];
+    ynn[3] = in[2]*c0 + ynn[2]*c1;
+    out[2] = ynn[3];
+    ynn[4] = in[3]*c0 + ynn[3]*c1;
+    out[3] = ynn[4];
+    ynn[5] = in[4]*c0 + ynn[4]*c1;
+    out[4] = ynn[5];
+    ynn[6] = in[5]*c0 + ynn[5]*c1;
+    out[5] = ynn[6];
+    ynn[7] = in[6]*c0 + ynn[6]*c1;
+    out[6] = ynn[7];
+    ynn[8] = in[7]*c0 + ynn[7]*c1;
+    out[7] = ynn[8];
+    ynn[0] = ynn[8];
   }
   /* NAN protect */
-  if(IEM_DENORMAL(yn[0]))
-    yn[0] = 0.0f;
+  if(IEM_DENORMAL(ynn[0]))
+    ynn[0] = 0.0f;
   
-  x->yn1 = yn[0];
+  x->yn1 = ynn[0];
   return(w+5);
 }
 

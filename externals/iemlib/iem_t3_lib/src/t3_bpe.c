@@ -35,7 +35,7 @@ static void t3_bpe_tick(t_t3_bpe *x)
 {
   t_atom *vec = x->x_beg;
   t_float val;
-  double dticks, time;
+  double dticks, dtime;
   int iticks;
   
   if(x->x_curindex >= x->x_curnum)
@@ -48,12 +48,12 @@ static void t3_bpe_tick(t_t3_bpe *x)
     x->x_hit = 0;
     vec += x->x_curindex;
     val = atom_getfloat(vec++);
-    time = (double)atom_getfloat(vec);
-    outlet_float(x->x_out_time, time);
+    dtime = (double)atom_getfloat(vec);
+    outlet_float(x->x_out_time, dtime);
     x->x_at[1].a_w.w_float = val;
     x->x_at[0].a_w.w_float = x->x_t3_bang;
     outlet_list(x->x_obj.ob_outlet, &s_list, 2, x->x_at);
-    dticks = (time + x->x_t3_bang)/x->x_ticks2ms;
+    dticks = (dtime + x->x_t3_bang)/x->x_ticks2ms;
     iticks = (int)dticks;
     x->x_t3_bang = (dticks - (double)iticks)*x->x_ticks2ms;
     if(!x->x_hit)

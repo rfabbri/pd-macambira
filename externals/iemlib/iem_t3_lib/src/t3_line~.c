@@ -175,7 +175,7 @@ static void t3_line_tilde_list(t_t3_line_tilde *x, t_symbol *s, int ac, t_atom *
   if((ac >= 2)&&IS_A_FLOAT(av,0)&&IS_A_FLOAT(av,1))
   {
     int t3_bang_samps, ticks;
-    double time;
+    double dtime;
     
     x->x_inlet_val = (double)atom_getfloatarg(1, ac, av);
     t3_bang_samps = (int)((t_float)atom_getfloatarg(0, ac, av)*x->x_ms2samps);
@@ -185,10 +185,10 @@ static void t3_line_tilde_list(t_t3_line_tilde *x, t_symbol *s, int ac, t_atom *
     x->x_t3_bang_samps = t3_bang_samps - x->x_n * ticks;
     if((ac >= 3)&&IS_A_FLOAT(av,2))
     {
-      time = (double)atom_getfloatarg(2, ac, av);
-      if(time < 0.0)
-        time = 0.0;
-      x->x_inlet_time = time;
+      dtime = (double)atom_getfloatarg(2, ac, av);
+      if(dtime < 0.0)
+        dtime = 0.0;
+      x->x_inlet_time = dtime;
     }
     if(ticks < 1)
       t3_line_tilde_tick(x);
@@ -197,11 +197,11 @@ static void t3_line_tilde_list(t_t3_line_tilde *x, t_symbol *s, int ac, t_atom *
   }
 }
 
-static void t3_line_tilde_ft1(t_t3_line_tilde *x, t_float time)
+static void t3_line_tilde_ft1(t_t3_line_tilde *x, t_float ftime)
 {
-  if(time < 0.0)
-    time = 0.0;
-  x->x_inlet_time = (double)time;
+  if(ftime < 0.0)
+    ftime = 0.0;
+  x->x_inlet_time = (double)ftime;
 }
 
 static void t3_line_tilde_stop(t_t3_line_tilde *x)
