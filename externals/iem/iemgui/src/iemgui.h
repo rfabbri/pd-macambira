@@ -32,6 +32,7 @@ typedef union _my_iemgui_3u4
 } t_my_iemgui_3u4;
 
 extern char my_iemgui_black_vscale_gif[];
+extern char my_iemgui_black_test___gif[];
 extern char my_iemgui_black_hlscale_gif[];
 extern char my_iemgui_black_hrscale_gif[];
 extern char my_iemgui_base64[];

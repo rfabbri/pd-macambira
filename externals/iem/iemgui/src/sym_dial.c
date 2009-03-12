@@ -459,10 +459,10 @@ static void sym_dial_set(t_sym_dial *x, t_symbol *s, int ac, t_atom *av)
     }
     else if(IS_A_SYMBOL(av, 0))
     {
-      t_symbol *s=atom_getsymbolarg(0, ac, av);
+      t_symbol *sy=atom_getsymbolarg(0, ac, av);
       for(i=0; i<x->x_ac; i++)
       {
-        if(x->x_syms[i] == s)
+        if(x->x_syms[i] == sy)
           break;
       }
       x->x_index = i;
@@ -656,7 +656,7 @@ static void *sym_dial_new(t_symbol *s, int argc, t_atom *argv)
   int bflcol[]={-262144, -1, -1};
   int w=6, h=14, ac=0, i, j;
   int snd_fs=0, f=0, ldx=59, ldy=7;
-  int fs=9, index=0;
+  int fs=9, iindex=0;
   char str[144];
   
   iem_inttosymargs(&x->x_gui.x_isa, 0);
@@ -684,7 +684,7 @@ static void *sym_dial_new(t_symbol *s, int argc, t_atom *argv)
     bflcol[0] = (int)atom_getintarg(11, argc, argv);
     bflcol[1] = (int)atom_getintarg(12, argc, argv);
     bflcol[2] = (int)atom_getintarg(13, argc, argv);
-    index = atom_getintarg(14, argc, argv);
+    iindex = atom_getintarg(14, argc, argv);
     ac = (int)atom_getintarg(15, argc, argv);
     if((ac+16) == argc)
     {
@@ -710,7 +710,7 @@ static void *sym_dial_new(t_symbol *s, int argc, t_atom *argv)
     x->x_max_ac = 10;
     x->x_syms = (t_symbol **)getbytes(x->x_max_ac * sizeof(t_symbol *));
     x->x_syms[0] = gensym("sdl");
-    index = 0;
+    iindex = 0;
   }
   
   x->x_gui.x_draw = (t_iemfunptr)sym_dial_draw;
@@ -718,7 +718,7 @@ static void *sym_dial_new(t_symbol *s, int argc, t_atom *argv)
   x->x_gui.x_fsf.x_rcv_able = 1;
   x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
   if(x->x_gui.x_isa.x_loadinit)
-    x->x_index = index;
+    x->x_index = iindex;
   else
     x->x_index = 0;
   if(snd_fs != 0)
@@ -767,7 +767,7 @@ static void *sym_dial_new(t_symbol *s, int argc, t_atom *argv)
   t_symbol *srl[3];
   int w=6, h=14, ac=0, i, j;
   int snd_fs=0, f=0, ldx=59, ldy=7;
-  int fs=9, iinit=0, ifstyle=0, index=0;
+  int fs=9, iinit=0, ifstyle=0, iindex=0;
   t_iem_init_symargs *init=(t_iem_init_symargs *)(&iinit);
   t_iem_fstyle_flags *fstyle=(t_iem_fstyle_flags *)(&ifstyle);
   char str[144];
@@ -821,7 +821,7 @@ static void *sym_dial_new(t_symbol *s, int argc, t_atom *argv)
     bflcol[0] = (int)atom_getintarg(11, argc, argv);
     bflcol[1] = (int)atom_getintarg(12, argc, argv);
     bflcol[2] = (int)atom_getintarg(13, argc, argv);
-    index = atom_getintarg(14, argc, argv);
+    iindex = atom_getintarg(14, argc, argv);
     ac = (int)atom_getintarg(15, argc, argv);
     if((ac+16) == argc)
     {
@@ -846,7 +846,7 @@ static void *sym_dial_new(t_symbol *s, int argc, t_atom *argv)
     x->x_max_ac = 10;
     x->x_syms = (t_symbol **)getbytes(x->x_max_ac * sizeof(t_symbol *));
     x->x_syms[0] = gensym("sdl");
-    index = 0;
+    iindex = 0;
   }
   
   x->x_gui.x_draw = (t_iemfunptr)sym_dial_draw;
@@ -857,7 +857,7 @@ static void *sym_dial_new(t_symbol *s, int argc, t_atom *argv)
   x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
   x->x_gui.x_isa = *init;
   if(x->x_gui.x_isa.x_loadinit)
-    x->x_index = index;
+    x->x_index = iindex;
   else
     x->x_index = 0;
   if(snd_fs != 0) snd_fs = 1;

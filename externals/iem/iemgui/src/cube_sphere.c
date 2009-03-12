@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemgui written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iemgui written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2008 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -21,7 +21,7 @@ iemgui written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 *
 #include <unistd.h>
 #endif
 
-#define IEMGUI_CUBE_SPHERE_MAX 200
+#define IEMGUI_CUBE_SPHERE_MAX 10000
 
 /* ---------- cube_sphere my gui-canvas for a window ---------------- */
 
@@ -494,7 +494,7 @@ static void cube_sphere_size(t_cube_sphere *x, t_floatarg size)
 
 static void cube_sphere_vis(t_cube_sphere *x, t_symbol *s, int argc, t_atom *argv)
 {
-  int index, n=x->x_n_src;
+  int iindex, n=x->x_n_src;
   int xpos=text_xpix(&x->x_gui.x_obj, x->x_gui.x_glist);
   int ypos=text_ypix(&x->x_gui.x_obj, x->x_gui.x_glist);
   int newstate, oldstate;
@@ -505,48 +505,48 @@ static void cube_sphere_vis(t_cube_sphere *x, t_symbol *s, int argc, t_atom *arg
     post("cube_sphere ERROR: vis-input needs 1 index + 1 visual state");
     return;
   }
-  index = (int)atom_getint(argv++) - 1;
+  iindex = (int)atom_getint(argv++) - 1;
   
-  if((index >= 0) && (index < n))
+  if((iindex >= 0) && (iindex < n))
   {
     newstate = ((int)atom_getint(argv) ? 1 : 0);
-    oldstate = x->x_vis_src[index];
+    oldstate = x->x_vis_src[iindex];
     
     if(newstate && !oldstate)
     {
       if(glist_isvisible(x->x_gui.x_glist))
       sys_vgui(".x%x.c create text %d %d -text {%d} -anchor c \
       -font {times %d bold} -fill #%6.6x -tags %xSRC%d\n",
-      canvas, xpos+x->x_pix_src_x[index], ypos+x->x_pix_src_y[index], index+1, x->x_fontsize,
-      x->x_col_src[index], x, index);
+      canvas, xpos+x->x_pix_src_x[iindex], ypos+x->x_pix_src_y[iindex], iindex+1, x->x_fontsize,
+      x->x_col_src[iindex], x, iindex);
     }
     else if(!newstate && oldstate)
     {
       if(glist_isvisible(x->x_gui.x_glist))
-        sys_vgui(".x%x.c delete %xSRC%d\n", canvas, x, index);
+        sys_vgui(".x%x.c delete %xSRC%d\n", canvas, x, iindex);
     }
-    x->x_vis_src[index] = newstate;
+    x->x_vis_src[iindex] = newstate;
   }
-  else if(index < 0)
+  else if(iindex < 0)
   {// if index is -1 : all
     newstate = ((int)atom_getint(argv) ? 1 : 0);
-    for(index=0; index<n; index++)
+    for(iindex=0; iindex<n; iindex++)
     {
-      oldstate = x->x_vis_src[index];
+      oldstate = x->x_vis_src[iindex];
       if(newstate && !oldstate)
       {
         if(glist_isvisible(x->x_gui.x_glist))
         sys_vgui(".x%x.c create text %d %d -text {%d} -anchor c \
         -font {times %d bold} -fill #%6.6x -tags %xSRC%d\n",
-        canvas, xpos+x->x_pix_src_x[index], ypos+x->x_pix_src_y[index], index+1, x->x_fontsize,
-        x->x_col_src[index], x, index);
+        canvas, xpos+x->x_pix_src_x[iindex], ypos+x->x_pix_src_y[iindex], iindex+1, x->x_fontsize,
+        x->x_col_src[iindex], x, iindex);
       }
       else if(!newstate && oldstate)
       {
         if(glist_isvisible(x->x_gui.x_glist))
-          sys_vgui(".x%x.c delete %xSRC%d\n", canvas, x, index);
+          sys_vgui(".x%x.c delete %xSRC%d\n", canvas, x, iindex);
       }
-      x->x_vis_src[index] = newstate;
+      x->x_vis_src[iindex] = newstate;
     }
   }
 }

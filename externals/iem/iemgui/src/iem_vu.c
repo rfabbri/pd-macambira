@@ -588,8 +588,8 @@ static void iem_vu_float(t_iem_vu *x, t_floatarg rms)
     x->x_rms = IEM_VU_STEPS;
   else
   {
-    int i = (int)(2.0*(rms + IEM_VU_OFFSET));
-    x->x_rms = iem_vu_db2i[i];
+    int ii = (int)(2.0*(rms + IEM_VU_OFFSET));
+    x->x_rms = iem_vu_db2i[ii];
   }
   i = (int)(100.0*rms + 10000.5);
   rms = 0.01*(t_float)(i - 10000);
@@ -608,8 +608,8 @@ static void iem_vu_ft1(t_iem_vu *x, t_floatarg peak)
     x->x_peak = IEM_VU_STEPS;
   else
   {
-    int i = (int)(2.0*(peak + IEM_VU_OFFSET));
-    x->x_peak = iem_vu_db2i[i];
+    int ii = (int)(2.0*(peak + IEM_VU_OFFSET));
+    x->x_peak = iem_vu_db2i[ii];
   }
   i = (int)(100.0*peak + 10000.5);
   peak = 0.01*(t_float)(i - 10000);
@@ -626,12 +626,12 @@ static void iem_vu_set(t_iem_vu *x, t_symbol *s, int ac, t_atom *av)
   if( (ac >= 2) && IS_A_FLOAT(av,0) && IS_A_FLOAT(av,1) )
   {
     rms = (t_float)atom_getfloatarg(0, ac, av);
-	peak = (t_float)atom_getfloatarg(1, ac, av);
+    peak = (t_float)atom_getfloatarg(1, ac, av);
   }
   else if( (ac == 1) && IS_A_FLOAT(av,0) )
   {
     rms = (t_float)atom_getfloatarg(0, ac, av);
-	peak = rms;
+    peak = rms;
   }
   if(rms <= IEM_VU_MINDB)
     x->x_rms = 0;
@@ -639,8 +639,8 @@ static void iem_vu_set(t_iem_vu *x, t_symbol *s, int ac, t_atom *av)
     x->x_rms = IEM_VU_STEPS;
   else
   {
-    int i = (int)(2.0*(rms + IEM_VU_OFFSET));
-    x->x_rms = iem_vu_db2i[i];
+    int ii = (int)(2.0*(rms + IEM_VU_OFFSET));
+    x->x_rms = iem_vu_db2i[ii];
   }
   i = (int)(100.0*rms + 10000.5);
   rms = 0.01*(t_float)(i - 10000);
@@ -652,8 +652,8 @@ static void iem_vu_set(t_iem_vu *x, t_symbol *s, int ac, t_atom *av)
     x->x_peak = IEM_VU_STEPS;
   else
   {
-    int i = (int)(2.0*(peak + IEM_VU_OFFSET));
-    x->x_peak = iem_vu_db2i[i];
+    int ii = (int)(2.0*(peak + IEM_VU_OFFSET));
+    x->x_peak = iem_vu_db2i[ii];
   }
   i = (int)(100.0*peak + 10000.5);
   peak = 0.01*(t_float)(i - 10000);
