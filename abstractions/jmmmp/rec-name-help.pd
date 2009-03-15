@@ -1,4 +1,4 @@
-#N canvas 0 0 777 523 10;
+#N canvas 0 0 765 492 10;
 #X obj 36 199 rec-name;
 #X text 410 230 Inlets;
 #X text 410 300 Outlets;
@@ -22,11 +22,9 @@ or playback;
 #X obj 119 366 readsf~ 2;
 #X obj 119 386 dac~;
 #X obj 36 336 rec-name;
-#X text 16 437 NOTE: needs [time] \, [date] and [makesymbol] from Zexy
-;
 #X text 13 6 [rec-name] - Automatic naming for a record/playback engine.
 ;
-#X text 12 467 (C) 2007 João Pais - jmmmpais@googlemail.com;
+#X text 12 437 (C) 2007 João Pais - jmmmpais@googlemail.com;
 #X text 70 152 Bang or Toggle: creates a file and starts recording
 ;
 #X text 153 173 Bang or Toggle: playback the file that was just recorded
@@ -41,7 +39,7 @@ This string can be connected with the writesf~ and readsf~ objects.
 #X text 13 76 This abstraction can be quite useful when making several
 recordings (or takes) one after the other. The files are named automatically
 \, avoiding the constant inputting of a filename.;
-#X text 12 487 Released under the BSD License;
+#X text 12 457 Released under the BSD License;
 #X connect 0 0 12 0;
 #X connect 0 1 13 0;
 #X connect 8 0 0 0;
