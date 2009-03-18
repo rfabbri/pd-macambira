@@ -664,8 +664,8 @@ void *pdp_rec_new(void)
     x->x_qtfile = NULL;
     x->x_framerate = DEFAULT_FRAME_RATE;
     x->x_forced_framerate = 0;
-    x->x_compressor = (char*) getbytes( strlen(QUICKTIME_JPEG)+1 );    
-    strcpy( x->x_compressor, QUICKTIME_JPEG );
+    x->x_compressor = (char*) getbytes( strlen(QUICKTIME_DIVX)+1 );    
+    strcpy( x->x_compressor, QUICKTIME_DIVX );
 
      /* audio defaults */
     x->x_acompressor = (char*) getbytes( strlen(QUICKTIME_TWOS)+1 );    
