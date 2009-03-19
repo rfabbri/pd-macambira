@@ -59,8 +59,7 @@ LINUXINCLUDE =  -I../../src -I../../../pd/src
 
 .c.pd_linux:
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
-	strip --strip-unneeded $*.pd_linux
+	ld -shared -o $*.pd_linux $*.o -lc -lm
 	rm $*.o
 
 # ----------------------- Mac OSX -----------------------
