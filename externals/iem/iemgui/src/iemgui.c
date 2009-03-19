@@ -80,11 +80,11 @@ static void *iemgui_new(void)
   return (x);
 }
 
-//void simularca_2d_setup(void);
-//void simularca_3d_setup(void);
+//  void simularca_2d_setup(void);
+//  void simularca_3d_setup(void);
 void room_sim_2d_setup(void);
 void room_sim_3d_setup(void);
-//void simularca_3d_no_z_clip_setup(void);
+//  void simularca_3d_no_z_clip_setup(void);
 void cube_sphere_setup(void);
 void sym_dial_setup(void);
 void iem_image_setup(void);
@@ -92,10 +92,10 @@ void iem_vu_setup(void);
 void hfadl_scale_setup(void);
 void hfadr_scale_setup(void);
 void vfad_scale_setup(void);
-void vfad_test_setup(void);
+//  void vfad_test_setup(void);
 void numberbox_matrix_setup(void);
 void iem_event_setup(void);
-//void toggle_matrix_setup(void);
+//  void toggle_matrix_setup(void);
 
 /* ------------------------ setup routine ------------------------- */
 
@@ -113,7 +113,7 @@ void iemgui_setup(void)
   hfadl_scale_setup();
   hfadr_scale_setup();
   vfad_scale_setup();
-  vfad_test_setup();
+  //  vfad_test_setup();
   numberbox_matrix_setup();
   iem_event_setup();
   //  toggle_matrix_setup();
