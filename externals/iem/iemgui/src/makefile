@@ -42,7 +42,7 @@ OBJ = $(SRC:.c=.o)
 #
 
 clean:
-	rm ..\$(TARGET)
+	rm ../$(TARGET)
 	rm *.o
 
 all: $(OBJ)
