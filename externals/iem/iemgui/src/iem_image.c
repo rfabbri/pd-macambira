@@ -26,6 +26,7 @@ typedef struct _iem_image
   t_iemgui  x_gui;
   t_symbol  *x_gifsym;
   t_atom    x_at_out[2];
+  int       x_have_image;
 } t_iem_image;
 
 static t_symbol *iem_image_calc_size(t_iem_image *x)
@@ -99,13 +100,15 @@ static void iem_image_draw_new(t_iem_image *x, t_glist *glist)
   int ypos=text_ypix(&x->x_gui.x_obj, glist);
   t_canvas *canvas=glist_getcanvas(glist);
   t_symbol *correct_name;
-  
+
   if(correct_name = iem_image_calc_size(x))
   {
     sys_vgui("image create photo %xPHOTOIMAGE -file {%s} -format gif -width %d -height %d\n",
       x, correct_name->s_name, x->x_gui.x_w, x->x_gui.x_h);
     sys_vgui(".x%x.c create image %d %d -image %xPHOTOIMAGE -tags %xPHOTO\n",
       canvas, xpos+x->x_gui.x_w/2, ypos+x->x_gui.x_h/2, x, x);
+
+    x->x_have_image=1;
   } 
   
   if(x->x_gui.x_fsf.x_selected)
@@ -119,7 +122,7 @@ static void iem_image_draw_move(t_iem_image *x, t_glist *glist)
   int ypos=text_ypix(&x->x_gui.x_obj, glist);
   t_canvas *canvas=glist_getcanvas(glist);
   
-  if(x->x_gifsym)
+  if(x->x_have_image)
     sys_vgui(".x%x.c coords %xPHOTO %d %d\n", canvas, x, xpos+x->x_gui.x_w/2, ypos+x->x_gui.x_h/2);
   if(x->x_gui.x_fsf.x_selected)
     sys_vgui(".x%x.c coords %xBASE %d %d %d %d\n",
@@ -133,10 +136,11 @@ static void iem_image_draw_erase(t_iem_image* x, t_glist* glist)
   
   if(x->x_gui.x_fsf.x_selected)
     sys_vgui(".x%x.c delete %xBASE\n", canvas, x);
-  if(x->x_gifsym)
+  if(x->x_have_image)
   {
     sys_vgui("image delete %xPHOTOIMAGE\n", x);
-    sys_vgui(".x%x.c delete %xPHOTO\n", canvas, x);
+    sys_vgui(".x%x.c delete %xPHOTO\n", canvas, x);    
+    x->x_have_image=0;
   }
 }
 
@@ -271,7 +275,6 @@ static void *iem_image_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_iem_image *x = (t_iem_image *)pd_new(iem_image_class);
   t_symbol *gifsym=(t_symbol *)0;
-  
   x->x_gui.x_snd = gensym("empty");
   x->x_gui.x_rcv = gensym("empty");
   x->x_gui.x_lab = gensym("empty");
@@ -293,7 +296,7 @@ static void *iem_image_new(t_symbol *s, int argc, t_atom *argv)
     iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(2, argc, argv));
     iemgui_new_getnames(&x->x_gui, 3, argv);
   }
-  
+
   x->x_gui.x_draw = (t_iemfunptr)iem_image_draw;
   x->x_gui.x_fsf.x_snd_able = 1;
   x->x_gui.x_fsf.x_rcv_able = 1;
@@ -307,6 +310,7 @@ static void *iem_image_new(t_symbol *s, int argc, t_atom *argv)
   x->x_gui.x_w = 100;
   x->x_gui.x_h = 60;
   x->x_gifsym = gifsym;
+  x->x_have_image=0;
   x->x_gui.x_fsf.x_selected = 0;
   iemgui_verify_snd_ne_rcv(&x->x_gui);
   outlet_new(&x->x_gui.x_obj, &s_list);
