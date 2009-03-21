@@ -200,7 +200,6 @@ static void plugin_tilde_dsp (Pd_Plugin_Tilde* x, t_signal** sp)
 
 static t_int* plugin_tilde_perform (t_int* w)
 {
-    unsigned i = 0;
     Pd_Plugin_Tilde* x = NULL;
     t_float** audio_inputs = NULL;
     t_float** audio_outputs = NULL;
@@ -544,7 +543,6 @@ int plugin_tilde_ladspa_open_plugin (Pd_Plugin_Tilde* x,
 				 const char* lib_name,
 				 unsigned long sample_rate)
 {
-    unsigned port_index;
 
     /* precondition(s) */
     assert (x != NULL);
@@ -835,11 +833,6 @@ void plugin_tilde_ladspa_set_control_input_by_index (Pd_Plugin_Tilde* x,
     unsigned port_index = 0;
     unsigned ctrl_input_count = 0;
     int found_port = 0; /* boolean */
-    int bounded_from_below = 0;
-    int bounded_from_above = 0;
-    int bounded = 0;
-    float lower_bound = 0;
-    float upper_bound = 0;
  
     /* precondition(s) */
     assert (x != NULL);
