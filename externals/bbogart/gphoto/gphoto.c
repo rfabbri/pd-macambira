@@ -60,10 +60,10 @@ void *listConfig(void *threadArgs) {
 	// INIT camera (without context)	
 	gp_ret = gp_camera_init (camera, NULL); 
 	if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
-	if (gp_ret == -105) {post("gphoto: Are you sure the camera is supported, connected and powered on?"); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret == -105) {sys_lock(); post("gphoto: Are you sure the camera is supported, connected and powered on?"); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	gp_ret = gp_camera_get_config (camera, &config, NULL); // get config from camera
-	if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	numsections = gp_widget_count_children(config);
 	for (i=0; i<numsections; i++) {
@@ -76,13 +76,11 @@ void *listConfig(void *threadArgs) {
 			for (j=0; j<numchildren; j++) {
 				gp_widget_get_child (child, j, &child2);
 				gp_widget_get_name (child2, &childName);
-				gp_widget_get_type (child2, &type);	
-				
+				gp_widget_get_type (child2, &type);
+
 				sys_lock();
 				outlet_symbol(((gphoto_gimme_struct *)threadArgs)->gphoto->x_obj.ob_outlet, gensym(childName));
 				sys_unlock();
-
-				//post("gphoto: Config Child: %s\n", childName); // send through outlet?
 			}
 		}
 	}
@@ -93,6 +91,11 @@ void *listConfig(void *threadArgs) {
 
 	// We are done  and other messsages can now be sent.
 	((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0;
+
+	// Send bang out 2nd outlet when operation is done.
+	sys_lock();
+	outlet_bang(((gphoto_gimme_struct *)threadArgs)->gphoto->doneOutlet);
+	sys_unlock();	
 
 	return(NULL);
 }
@@ -139,35 +142,23 @@ void *getConfig(void *threadArgs) {
 	key = atom_getsymbol( ((gphoto_gimme_struct *)threadArgs)->argv ); // config key
 
 	gp_ret = gp_camera_new (&camera);		
-	if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	// INIT camera (without context)	
 	gp_ret = gp_camera_init (camera, NULL); 
-	if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
-	if (gp_ret == -105) {post("gphoto: Are you sure the camera is supported, connected and powered on?"); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock();}
+	if (gp_ret == -105) {sys_lock(); post("gphoto: Are you sure the camera is supported, connected and powered on?"); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	gp_ret = gp_camera_get_config (camera, &config, NULL); // get config from camera
-	if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	gp_ret = gp_widget_get_child_by_name (config, key->s_name, &child); // get item from config
-	if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
-
-/*		post("types:");
-	post("GP_WIDGET_TOGGLE: %d",   GP_WIDGET_TOGGLE);
-	post("GP_WIDGET_TEXT: %d",   GP_WIDGET_TEXT);
-	post("GP_WIDGET_RANGE: %d",   GP_WIDGET_RANGE);
-	post("GP_WIDGET_RADIO: %d",   GP_WIDGET_RADIO);
-	post("GP_WIDGET_MENU: %d",   GP_WIDGET_MENU);
-	post("GP_WIDGET_BUTTON: %d",   GP_WIDGET_BUTTON);
-	post("GP_WIDGET_DATE: %d",   GP_WIDGET_DATE);
-	post("GP_WIDGET_WINDOW: %d",   GP_WIDGET_WINDOW);
-	post("GP_WIDGET_SECTION: %d",   GP_WIDGET_SECTION);
-*/
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	gp_ret = gp_widget_get_type (child, &type);
 	if (gp_ret != 0) {
-		error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));
-		error("gphoto: Invalid config key.");
+		sys_lock; error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));
+		error("gphoto: Invalid config key."); sys_unlock();
 	} else {
 		switch (type) {
 			case GP_WIDGET_TOGGLE:
@@ -243,43 +234,47 @@ void *setConfig(void *threadArgs) {
 	sys_unlock();
 
 	gp_ret = gp_camera_new (&camera);		
-	if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock();}
 
 	// INIT camera (without context)	
 	gp_ret = gp_camera_init (camera, NULL); 
-	if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
-	if (gp_ret == -105) {error("gphoto: Are you sure the camera is supported, connected and powered on?"); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock();}
+	if (gp_ret == -105) {sys_lock(); error("gphoto: Are you sure the camera is supported, connected and powered on?"); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	gp_ret = gp_camera_get_config (camera, &config, NULL); // get config from camera
-	if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	gp_ret = gp_widget_get_child_by_name (config, key->s_name, &child); // get item from config
-	if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	gp_ret = gp_widget_get_type (child, &type);
 	if (gp_ret != 0) {
-		error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));
-		error("gphoto: Invalid config key.");
+		sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));
+		error("gphoto: Invalid config key."); sys_unlock(); 
 	} else {
 		switch (type) {
 			case GP_WIDGET_TOGGLE:
+				sys_lock(); 
 				intValue = atom_getint( ((gphoto_gimme_struct *)threadArgs)->argv+1 );
+				sys_unlock(); 
 
 				gp_ret = gp_widget_set_value (child, &intValue); //  set widget value
-				if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
+				if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); }
 
 				gp_ret = gp_camera_set_config (camera, config, NULL); // set new config
-				if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
+				if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); }
 				break;
 
 			case GP_WIDGET_RANGE:
+				sys_lock(); 
 				floatValue = atom_getfloat( ((gphoto_gimme_struct *)threadArgs)->argv+1 );
+				sys_unlock(); 
 
 				gp_ret = gp_widget_set_value (child, &floatValue); //  set widget value
-				if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
+				if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); }
 
 				gp_ret = gp_camera_set_config (camera, config, NULL); // set new config
-				if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
+				if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); }
 
 				break;
 		}
@@ -335,31 +330,33 @@ void *captureImage(void *threadArgs) {
 	CameraFile *camerafile;
 	CameraFilePath camera_file_path;
 	t_symbol *filename;
-	
+
+	sys_lock(); 
 	filename = atom_getsymbol( ((gphoto_gimme_struct *)threadArgs)->argv ); // destination filename
+	sys_unlock(); 
 
 	gp_ret = gp_camera_new (&camera);	
-	if (gp_ret != 0) {error("1gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	// INIT camera (without context)	
 	gp_ret = gp_camera_init (camera, NULL); 
-	if (gp_ret != 0) {error("2gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
-	if (gp_ret == -105) {post("gphoto: Are you sure the camera is supported, connected and powered on?"); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); }
+	if (gp_ret == -105) {sys_lock(); post("gphoto: Are you sure the camera is supported, connected and powered on?"); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	gp_ret = gp_camera_capture(camera, GP_CAPTURE_IMAGE, &camera_file_path, NULL); 
-	if (gp_ret != 0) {error("3gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	fd = open( filename->s_name, O_CREAT | O_WRONLY, 0644); // create file descriptor
 
 	gp_ret = gp_file_new_from_fd(&camerafile, fd); // create gphoto file from descriptor
-	if (gp_ret != 0) {error("4gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	gp_ret = gp_camera_file_get(camera, camera_file_path.folder, camera_file_path.name,
 		     GP_FILE_TYPE_NORMAL, camerafile, NULL); // get file from camera
-	if (gp_ret != 0) {error("5gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 	
 	gp_ret = gp_camera_file_delete(camera, camera_file_path.folder, camera_file_path.name, NULL);
-	if (gp_ret != 0) {error("6gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	// Free memory
 	gp_camera_unref(camera);
