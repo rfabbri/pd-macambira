@@ -730,6 +730,11 @@ void plugin_tilde_ladspa_connect_audio (Pd_Plugin_Tilde* x,
     unsigned input_count = 0;
     unsigned output_count = 0;
 
+    if (x->plugin_library_filename == NULL) {
+        post("plugin~: plugin not found");
+        return;
+    }
+
     /* Allocate out-of-place memory if needed */
     if (plugin_tilde_ladspa_alloc_outofplace_memory (x, num_samples)) {
 	post("plugin~: out of memory");
