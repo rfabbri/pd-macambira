@@ -37,16 +37,16 @@ esac
 
 # convert into absolute path
 cd "${SCRIPT_DIR}/../.."
-auto_build_root_dir="$(pwd)"
+auto_build_root_dir=`pwd`
 echo "build root: $auto_build_root_dir" 
 rsync_distro "$auto_build_root_dir"
 
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
 make -C "${auto_build_root_dir}/packages" set_version
 make test_locations
+echo "mounts ----------------------------------------"
 mount
 print_ip_address
-exit
 make package_clean
 make install && make package
 

@@ -72,7 +72,7 @@ rsync_distro()
 			/c/cygwin/bin/sh -c "$RSYNC_COMMAND"
 			;;
 		*)
-			echo $RSYNC_COMMAND
+			$RSYNC_COMMAND
 			;;
 	esac
 }
