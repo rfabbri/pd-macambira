@@ -23,8 +23,10 @@ SCRIPT=$(echo $0| sed 's|.*/\(.*\)|\1|g')
 
 mailbody_on_failure () {
  ## this is a somewhat simplistic expression to detect error-lines
+ echo "last 20 errors ----------------------------------------"
  cat ${LOGFILE} | grep -i "error: " | tail -20
-# tail -20 ${LOGFILE}
+ echo "last 5 lines ----------------------------------------"
+ tail -5 ${LOGFILE}
  echo ""
  echo "the full logfile - if it has been succesfully uploaded - can be viewed at:"
  echo "http://autobuild.puredata.info/auto-build/${DATE}/logs/${LOGFILE##*/}"
@@ -61,8 +63,7 @@ run_build_script ()
 	 if [ "x${completion_test}" != "xSUCCESS" ]; then
 		if [ "x${RECIPIENT}" != "x" ]; then
 		  SUBJECT="autobuild: $distro $HOSTNAME $DATE $TIME"
-		  mailbody_on_failure | mail -s "${SUBJECT}" ${RECIPIENT}
-		  #tail -20 ${LOGFILE} | mail -s "${SUBJECT}" ${RECIPIENT}
+		  mailbody_on_failure | $MAIL_COMMAND -s "${SUBJECT}" ${RECIPIENT}
 		fi
 	 fi
 }

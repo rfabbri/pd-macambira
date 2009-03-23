@@ -36,26 +36,17 @@ esac
 
 
 # convert into absolute path
-## shouldn't this use the ${SCRIPT_DIR} variable rather than call an external program?
-cd $(echo $0 | sed 's|\(.*\)/.*$|\1|')/../..
-auto_build_root_dir=$(pwd)
-echo "root: $auto_build_root_dir" 
-
-# let rsync handle the cleanup with --delete
-case $SYSTEM in
-	mingw*)
-		/c/cygwin/bin/sh -c \
-			"rsync --archive --no-links --copy-links --delete rsync://128.238.56.50/distros/pd-extended/ ${auto_build_root_dir}/"
-		;;
-	*)
-		rsync -a --delete rsync://128.238.56.50/distros/pd-extended/ ${auto_build_root_dir}/
-		;;
-esac
+cd "${SCRIPT_DIR}/../.."
+auto_build_root_dir="$(pwd)"
+echo "build root: $auto_build_root_dir" 
+rsync_distro "$auto_build_root_dir"
 
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
 make -C "${auto_build_root_dir}/packages" set_version
 make test_locations
 mount
+print_ip_address
+exit
 make package_clean
 make install && make package
 
