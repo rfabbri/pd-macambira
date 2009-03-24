@@ -64,15 +64,8 @@ static int libdir_loader(t_canvas *canvas, char *classname)
             return (0);
         }
         close(fd);
-        /* add Pd's base path to the path to make it an absolute path.  This
-         * needs to be an absolute path because relative paths in the ce_path
-         * are interpreted as relative to the parent path's current
-         * directory. hans@eds.org */
-        sys_unbashfilename(sys_libdir->s_name, pathbuf);
-        strcat(pathbuf, "/extra/");
-        strncat(pathbuf, classname, FILENAME_MAX - strlen(pathbuf));
         canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path, 
-                                                     pathbuf, 0);
+                                                     dirbuf, 0);
         post("libdir_loader: added '%s' to the canvas-local objectclass path", classname);
     }
     else
@@ -110,7 +103,6 @@ void libdir_setup(void)
     post("\tor a version that has sys_register_loader()");
 #endif
     post("libdir loader %s",version);  
-    post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
     post("\tcompiled on "__DATE__" at "__TIME__ " ");
     post("\tcompiled against Pd version %d.%d.%d.%s", PD_MAJOR_VERSION, 
          PD_MINOR_VERSION, PD_BUGFIX_VERSION, PD_TEST_VERSION);
