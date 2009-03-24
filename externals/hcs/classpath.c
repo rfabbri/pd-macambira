@@ -79,7 +79,7 @@ static void classpath_output(t_classpath* x)
 }
 
 
-static void classpath_reset(t_classpath* x) 
+static void classpath_rewind(t_classpath* x) 
 {
 	DEBUG(post("classpath_output"););
 	char buffer[MAXPDSTRING];
@@ -116,7 +116,7 @@ static void *classpath_new()
 	x->x_data_outlet = outlet_new(&x->x_obj, &s_symbol);
 	x->x_status_outlet = outlet_new(&x->x_obj, 0);
 
-	classpath_reset(x);
+	classpath_rewind(x);
 
 	return (x);
 }
@@ -140,8 +140,8 @@ void classpath_setup(void)
 	class_addbang(classpath_class,(t_method) classpath_output);
 	
 	/* add inlet message methods */
-	class_addmethod(classpath_class,(t_method) classpath_reset,
-					gensym("reset"), 0);
+	class_addmethod(classpath_class,(t_method) classpath_rewind,
+					gensym("rewind"), 0);
 	class_addmethod(classpath_class,(t_method) classpath_add,gensym("add"), 
 					A_DEFSYMBOL, 0);
 }
