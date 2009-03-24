@@ -1,4 +1,4 @@
-#N canvas 66 49 576 362 10;
+#N canvas 78 51 576 362 10;
 #X obj 124 207 sys_gui;
 #X symbolatom 239 101 0 0 0 0 - - -;
 #X obj 223 32 loadbang;
@@ -12,14 +12,9 @@
 ;
 #X text 113 234 alpha does not work with X11 :(;
 #X obj 223 69 window_name;
-#X obj 383 207 sys_gui;
-#X obj 383 148 window_name;
-#X obj 383 114 bng 25 250 50 0 empty empty empty 17 7 0 10 -204786
--1 -1;
-#X msg 383 177 wm resizable \$1 0 0;
-#X text 352 84 turn off resizing of this window:;
+#X obj 375 248 sys_gui;
 #X text 13 37 change alpha of this window:;
-#N canvas 69 91 729 228 Mac 0;
+#N canvas 83 292 729 228 Mac 0;
 #X obj 25 163 sys_gui;
 #X obj 124 74 window_name;
 #X obj 25 102 pack float symbol;
@@ -60,7 +55,7 @@
 #X connect 18 0 16 0;
 #X connect 20 0 14 0;
 #X restore 60 277 pd Mac OS X tricks;
-#N canvas 69 91 729 228 Windows 0;
+#N canvas 67 329 729 228 Windows 0;
 #X obj 25 163 sys_gui;
 #X obj 124 74 window_name;
 #X obj 25 102 pack float symbol;
@@ -101,6 +96,98 @@
 #X connect 17 0 5 0;
 #X connect 20 0 0 0;
 #X restore 60 297 pd Windows tricks;
+#N canvas 809 137 450 300 get 0;
+#X symbolatom 42 235 0 0 0 0 - - -;
+#X obj 42 191 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X symbolatom 126 235 0 0 0 0 - - -;
+#X obj 126 191 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#N canvas 0 22 450 300 subname 0;
+#X obj 117 21 inlet;
+#X obj 119 265 outlet;
+#X obj 107 137 window_name;
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;
+#X restore 126 214 pd subname;
+#X symbolatom 209 235 0 0 0 0 - - -;
+#X obj 209 191 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#N canvas 496 269 450 300 get 0;
+#X obj 117 21 inlet;
+#X obj 119 265 outlet;
+#X obj 109 137 window_name 1;
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;
+#X restore 209 214 pd get parent;
+#X symbolatom 73 128 0 0 0 0 - - -;
+#X obj 73 84 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 47 36 You can get the canvas name of other patches that this
+one is embedded in by setting the argument to the level:;
+#X text 78 147 ^-- this is the same as the top level of this help patch
+;
+#X symbolatom 299 235 0 0 0 0 - - -;
+#X obj 299 191 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#N canvas 496 269 450 300 get 0;
+#X obj 117 21 inlet;
+#X obj 119 265 outlet;
+#X obj 109 137 window_name 2;
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;
+#X restore 299 214 pd get parent of parent;
+#X obj 73 107 window_name 1;
+#X obj 42 214 window_name;
+#X connect 1 0 16 0;
+#X connect 3 0 4 0;
+#X connect 4 0 2 0;
+#X connect 6 0 7 0;
+#X connect 7 0 5 0;
+#X connect 9 0 15 0;
+#X connect 13 0 14 0;
+#X connect 14 0 12 0;
+#X connect 15 0 8 0;
+#X connect 16 0 0 0;
+#X restore 336 39 pd get from different levels;
+#N canvas 1197 96 450 300 get 0;
+#X symbolatom 73 259 0 0 0 0 - - -;
+#X obj 73 215 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X symbolatom 72 176 0 0 0 0 - - -;
+#X obj 72 132 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#N canvas 0 22 450 300 test 0;
+#X symbolatom 188 150 0 0 0 0 - - -;
+#X obj 188 106 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 188 129 window_name;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
+#X restore 221 155 pd test;
+#X obj 220 77 namecanvas myname;
+#X symbolatom 73 99 0 0 0 0 - - -;
+#X obj 73 55 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 53 14 You can also use the canvas receive symbol to get the
+canvas_name:;
+#X obj 72 155 window_name pd-test;
+#X obj 73 78 window_name myname;
+#X obj 73 238 window_name pd-window_name-help.pd;
+#X connect 1 0 11 0;
+#X connect 3 0 9 0;
+#X connect 7 0 10 0;
+#X connect 9 0 2 0;
+#X connect 10 0 6 0;
+#X connect 11 0 0 0;
+#X restore 336 64 pd get by canvas receive symbol;
+#X text 341 114 turn on/off resizing of this window:;
+#X obj 474 177 window_name;
+#X obj 375 197 pack float symbol;
+#X obj 474 157 loadbang;
+#X obj 375 155 tgl 30 0 empty empty empty 17 7 0 10 -204786 -1 -1 1
+1;
+#X msg 375 222 wm resizable \$2 \$1 \$1;
 #X connect 2 0 10 0;
 #X connect 3 0 6 0;
 #X connect 4 0 3 0;
@@ -108,6 +195,8 @@
 #X connect 6 0 0 0;
 #X connect 10 0 3 1;
 #X connect 10 0 1 0;
-#X connect 12 0 14 0;
-#X connect 13 0 12 0;
-#X connect 14 0 11 0;
+#X connect 18 0 19 1;
+#X connect 19 0 22 0;
+#X connect 20 0 18 0;
+#X connect 21 0 19 0;
+#X connect 22 0 11 0;
