@@ -1460,10 +1460,16 @@ extern "C"
         sys_gui("set $var_graph_w_cell $w_cell\n");
         sys_gui("set $var_graph_h_cell $h_cell\n");
         sys_gui("toplevel $id\n");
-        sys_gui("wm title $id {videogrid}\n");
+        sys_gui("wm title $id {** videogrid **}\n");
+        sys_gui("wm resizable $id 0 0\n");
         sys_gui("wm protocol $id WM_DELETE_WINDOW [concat videogrid_cancel $id]\n");
-        sys_gui("label $id.label -text {VIDEOGRID PROPERTIES}\n");
+
+        /* sys_gui("label $id.label -text {VIDEOGRID PROPERTIES}\n"); */
+        /* sys_gui("pack $id.label -side top\n"); */
+
+        sys_gui("label $id.label -text { properties }\n");
         sys_gui("pack $id.label -side top\n");
+
         sys_gui("frame $id.buttonframe\n");
         sys_gui("pack $id.buttonframe -side bottom -fill x -pady 2m\n");
         sys_gui("button $id.buttonframe.cancel -text {Cancel} -command \"videogrid_cancel $id\"\n");
@@ -1472,51 +1478,62 @@ extern "C"
         sys_gui("pack $id.buttonframe.cancel -side left -expand 1\n");
         sys_gui("pack $id.buttonframe.apply -side left -expand 1\n");
         sys_gui("pack $id.buttonframe.ok -side left -expand 1\n");
+
         sys_gui("frame $id.1rangef\n");
         sys_gui("pack $id.1rangef -side top\n");
-        sys_gui("label $id.1rangef.lname -text \"Name :\"\n");
-        sys_gui("entry $id.1rangef.name -textvariable $var_graph_name -width 7\n");
+        sys_gui("label $id.1rangef.lname -text \"Name :\" -anchor nw\n");
+        sys_gui("entry $id.1rangef.name -textvariable $var_graph_name -width 20\n");
         sys_gui("pack $id.1rangef.lname $id.1rangef.name -side left\n");
+
         sys_gui("frame $id.2rangef\n");
         sys_gui("pack $id.2rangef -side top\n");
-        sys_gui("label $id.2rangef.lnum_fil -text \"Rows :\"\n");
-        sys_gui("entry $id.2rangef.num_fil -textvariable $var_graph_num_fil -width 7\n");
+        sys_gui("label $id.2rangef.lnum_fil -text \"Rows :\" -width 15 -anchor nw\n");
+        sys_gui("entry $id.2rangef.num_fil -textvariable $var_graph_num_fil -width 10\n");
         sys_gui("pack $id.2rangef.lnum_fil $id.2rangef.num_fil -side left\n");
+
         sys_gui("frame $id.3rangef\n");
         sys_gui("pack $id.3rangef -side top\n");
-        sys_gui("label $id.3rangef.lnum_col -text \"Cols :\"\n");
-        sys_gui("entry $id.3rangef.num_col -textvariable $var_graph_num_col -width 7\n");
+        sys_gui("label $id.3rangef.lnum_col -text \"Cols :\" -width 15 -anchor nw\n");
+        sys_gui("entry $id.3rangef.num_col -textvariable $var_graph_num_col -width 10\n");
         sys_gui("pack $id.3rangef.lnum_col $id.3rangef.num_col -side left\n");
+
         sys_gui("frame $id.4rangef\n");
         sys_gui("pack $id.4rangef -side top\n");
-        sys_gui("label $id.4rangef.lcolor_fons -text \"Bg Color :\"\n");
-        sys_gui("entry $id.4rangef.color_fons -textvariable $var_graph_color_fons -width 7\n");
+        sys_gui("label $id.4rangef.lcolor_fons -text \"Bg Color :\" -width 15 -anchor nw\n");
+        sys_gui("entry $id.4rangef.color_fons -textvariable $var_graph_color_fons -width 10\n");
         sys_gui("pack $id.4rangef.lcolor_fons $id.4rangef.color_fons -side left\n");
+
         sys_gui("frame $id.5rangef\n");
         sys_gui("pack $id.5rangef -side top\n");
-        sys_gui("label $id.5rangef.lcolor_marc -text \"Border Color :\"\n");
-        sys_gui("entry $id.5rangef.color_marc -textvariable $var_graph_color_marc -width 7\n");
+        sys_gui("label $id.5rangef.lcolor_marc -text \"Border Color :\" -width 15 -anchor nw\n");
+        sys_gui("entry $id.5rangef.color_marc -textvariable $var_graph_color_marc -width 10\n");
         sys_gui("pack $id.5rangef.lcolor_marc $id.5rangef.color_marc -side left\n");
+
         sys_gui("frame $id.6rangef\n");
         sys_gui("pack $id.6rangef -side top\n");
-        sys_gui("label $id.6rangef.lcolor_grasp -text \"Sel Color :\"\n");
-        sys_gui("entry $id.6rangef.color_grasp -textvariable $var_graph_color_grasp -width 7\n");
+        sys_gui("label $id.6rangef.lcolor_grasp -text \"Sel Color :\" -width 15 -anchor nw\n");
+        sys_gui("entry $id.6rangef.color_grasp -textvariable $var_graph_color_grasp -width 10\n");
         sys_gui("pack $id.6rangef.lcolor_grasp $id.6rangef.color_grasp -side left\n");
+
         sys_gui("frame $id.7rangef\n");
         sys_gui("pack $id.7rangef -side top\n");
-        sys_gui("label $id.7rangef.lformat_list -text \"Format list ':' separated :\"\n");
-        sys_gui("entry $id.7rangef.format_list -textvariable $var_graph_format_list -width 7\n");
-        sys_gui("pack $id.7rangef.lformat_list $id.7rangef.format_list -side left\n");
+        sys_gui("label $id.7rangef.lformat_list -text \"Format list ':' separated :\" -width 32 -anchor nw\n");
+        sys_gui("entry $id.7rangef.format_list -textvariable $var_graph_format_list -width 30\n");
+        sys_gui("pack $id.7rangef.lformat_list -fill x\n");
+        sys_gui("pack $id.7rangef.format_list -fill x\n");
+
         sys_gui("frame $id.8rangef\n");
         sys_gui("pack $id.8rangef -side top\n");
-        sys_gui("label $id.8rangef.lw_cell -text \"Thumb W :\"\n");
-        sys_gui("entry $id.8rangef.w_cell -textvariable $var_graph_w_cell -width 7\n");
+        sys_gui("label $id.8rangef.lw_cell -text \"Thumb W :\" -width 15 -anchor nw\n");
+        sys_gui("entry $id.8rangef.w_cell -textvariable $var_graph_w_cell -width 10\n");
         sys_gui("pack $id.8rangef.lw_cell $id.8rangef.w_cell -side left\n");
+
         sys_gui("frame $id.9rangef\n");
         sys_gui("pack $id.9rangef -side top\n");
-        sys_gui("label $id.9rangef.lh_cell -text \"Thumb H :\"\n");
-        sys_gui("entry $id.9rangef.h_cell -textvariable $var_graph_h_cell -width 7\n");
+        sys_gui("label $id.9rangef.lh_cell -text \"Thumb H :\" -width 15 -anchor nw\n");
+        sys_gui("entry $id.9rangef.h_cell -textvariable $var_graph_h_cell -width 10\n");
         sys_gui("pack $id.9rangef.lh_cell $id.9rangef.h_cell -side left\n");
+
         sys_gui("bind $id.1rangef.name <KeyPress-Return> [concat videogrid_ok $id]\n");
         sys_gui("bind $id.2rangef.num_fil <KeyPress-Return> [concat videogrid_ok $id]\n");
         sys_gui("bind $id.3rangef.num_col <KeyPress-Return> [concat videogrid_ok $id]\n");
