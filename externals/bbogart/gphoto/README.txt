@@ -27,6 +27,5 @@ Put the binary in your extra folder.
 Put the helpfile in your 5.reference folder.
 
 TODO: 
-* Change listConfig to output a list of configuration names.
 * Add a getConfigDetail function to get the range, step, etc info on each config name.
 * Add getFile and getFiles functions for PTP file transfer functionality.

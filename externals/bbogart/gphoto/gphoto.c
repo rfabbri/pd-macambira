@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <m_pd.h>
 #include <fcntl.h>
 #include <pthread.h>
@@ -33,6 +34,7 @@ typedef struct gphoto_struct {
 	t_object x_obj;
 	t_outlet *doneOutlet;
 	int busy;
+	pthread_attr_t threadAttr; //thread attributes
 
 } gphoto_struct;
 
@@ -43,6 +45,154 @@ typedef struct gphoto_gimme_struct {
 	int argc;
 	t_atom *argv;
 } gphoto_gimme_struct;
+
+void *getConfigDetail(void *threadArgs) {
+	int gp_ret;
+	const char *textVal;
+	const int *toggleVal;
+	const float rangeVal;
+	const char *label, *info;
+	float rangeMax, rangeMin, rangeIncr;
+	float floatVal;
+	int intVal, i;
+
+	t_symbol *key;
+
+	Camera *camera;
+	CameraWidget *config = NULL;
+	CameraWidget *child = NULL;
+	CameraWidgetType type;
+
+	key = atom_getsymbol( ((gphoto_gimme_struct *)threadArgs)->argv ); // config key
+
+	gp_ret = gp_camera_new (&camera);		
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+
+	// INIT camera (without context)	
+	gp_ret = gp_camera_init (camera, NULL); 
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock();}
+	if (gp_ret == -105) {
+		sys_lock(); 
+		error("gphoto: Are you sure the camera is supported, connected and powered on?");
+		sys_unlock(); 
+		gp_camera_unref(camera);
+		((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0; // no longer busy if we got an error.
+		return(NULL);
+	}
+
+	gp_ret = gp_camera_get_config (camera, &config, NULL); // get config from camera
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+
+	gp_ret = gp_widget_get_child_by_name (config, key->s_name, &child); // get item from config
+	if (gp_ret != 0) {
+		sys_lock();
+		error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));
+		sys_unlock();
+		((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0; // no longer busy if we got an error.
+		gp_camera_unref(camera);
+		return(NULL);
+	}
+
+	gp_ret = gp_widget_get_type (child, &type);
+	if (gp_ret != 0) {
+		sys_lock; error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));
+		error("gphoto: Invalid config key."); sys_unlock();
+	} else {
+		switch (type) {
+			case GP_WIDGET_RADIO:
+				gp_ret = gp_widget_get_label (child, &label);
+				sys_lock();
+				post("gphoto: Label: %s", label);
+				post("gphoto: Type: Radio");
+				sys_unlock();
+				for (i=0; i<gp_widget_count_choices(child); i++) {
+					gp_ret = gp_widget_get_choice(child,i,&textVal);
+					sys_lock();
+					post("gphoto: Choice #%d:\t%s",i , textVal);
+					sys_unlock();
+				}
+				gp_ret = gp_widget_get_value(child, &textVal);
+				sys_lock();
+				post("gphoto: Current Value: %s", textVal);
+				sys_unlock();
+				break;
+			case GP_WIDGET_TOGGLE:
+				gp_ret = gp_widget_get_label (child, &label);
+				gp_ret = gp_widget_get_value(child, &intVal);
+				sys_lock();
+				post("gphoto: Label: %s", label);
+				post("gphoto: Type: Toggle");
+				post("gphoto: Current Value: %d", intVal);
+				sys_unlock();
+				break;
+			case GP_WIDGET_TEXT:
+				gp_ret = gp_widget_get_label (child, &label);
+				gp_ret = gp_widget_get_value(child, &textVal);
+				sys_lock();				
+				post("gphoto: Label: %s", label);
+				post("gphoto: Type: Text");
+				post("gphoto: Current Value: %d", textVal);
+				sys_lock();
+				break;
+			case GP_WIDGET_RANGE:
+				gp_ret = gp_widget_get_label (child, &label);
+				gp_ret = gp_widget_get_range(child, &rangeMin, &rangeMax, &rangeIncr);
+				gp_ret = gp_widget_get_value(child, &floatVal);
+				if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock();}
+				sys_lock();
+				post("gphoto: Label: %s", label);
+				post("gphoto: Type: Range");
+				post("gphoto: Minimum Value: %f", rangeMin);
+				post("gphoto: Maximum Value: %f", rangeMax);
+				post("gphoto: Increment: %f", rangeIncr);
+				post("gphoto: Current Value: %f", floatVal);
+				sys_lock();
+				break;
+		}
+	}
+
+	// Free memory (not child?)
+	gp_widget_unref (config);
+	gp_camera_unref (camera);
+
+	// We are done  and other messsages can now be sent.
+	((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0;
+
+	// Send bang out 2nd outlet when operation is done.
+	sys_lock();
+	outlet_bang(((gphoto_gimme_struct *)threadArgs)->gphoto->doneOutlet);
+	sys_unlock();	
+
+	return(NULL);	
+}
+
+// Wrap getConfigDetail
+static void wrapGetConfigDetail(gphoto_struct *gphoto, t_symbol *s, int argc, t_atom *argv) {
+	int ret;
+	pthread_t thread1;
+
+	if (!gphoto->busy) {
+
+		// instance of structure
+		gphoto_gimme_struct *threadArgs = (gphoto_gimme_struct *)malloc(sizeof(gphoto_gimme_struct));
+
+		// packaging arguments into structure
+		threadArgs->gphoto = gphoto;
+		threadArgs->s = s;
+		threadArgs->argc = argc;
+		threadArgs->argv = argv;
+
+		// We're busy
+		gphoto->busy = 1;
+
+		// Create thread
+		ret = pthread_create( &thread1, &gphoto->threadAttr, getConfigDetail, threadArgs);
+	} else {
+		error("gphoto: ERROR: Already executing a command, try again later.");
+	}
+
+	return;
+}
 
 // list configuration
 void *listConfig(void *threadArgs) {
@@ -60,7 +210,14 @@ void *listConfig(void *threadArgs) {
 	// INIT camera (without context)	
 	gp_ret = gp_camera_init (camera, NULL); 
 	if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
-	if (gp_ret == -105) {sys_lock(); post("gphoto: Are you sure the camera is supported, connected and powered on?"); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret == -105) {
+		sys_lock(); 
+		error("gphoto: Are you sure the camera is supported, connected and powered on?");
+		sys_unlock(); 
+		gp_camera_unref(camera);
+		((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0; // no longer busy if we got an error.
+		return(NULL);
+	}
 
 	gp_ret = gp_camera_get_config (camera, &config, NULL); // get config from camera
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
@@ -117,7 +274,7 @@ static void wrapListConfig(gphoto_struct *gphoto) {
 		gphoto->busy = 1;
 
 		// Create thread
-		ret = pthread_create( &thread1, NULL, listConfig, threadArgs);
+		ret = pthread_create( &thread1, &gphoto->threadAttr, listConfig, threadArgs);
 	} else {
 		error("gphoto: ERROR: Already executing a command, try again later.");
 	}
@@ -147,13 +304,27 @@ void *getConfig(void *threadArgs) {
 	// INIT camera (without context)	
 	gp_ret = gp_camera_init (camera, NULL); 
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock();}
-	if (gp_ret == -105) {sys_lock(); post("gphoto: Are you sure the camera is supported, connected and powered on?"); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret == -105) {
+		sys_lock(); 
+		error("gphoto: Are you sure the camera is supported, connected and powered on?");
+		sys_unlock(); 
+		gp_camera_unref(camera);
+		((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0; // no longer busy if we got an error.
+		return(NULL);
+	}
 
 	gp_ret = gp_camera_get_config (camera, &config, NULL); // get config from camera
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	gp_ret = gp_widget_get_child_by_name (config, key->s_name, &child); // get item from config
-	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {
+		sys_lock();
+		error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));
+		sys_unlock();
+		((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0; // no longer busy if we got an error.
+		gp_camera_unref(camera);
+		return(NULL);
+	}
 
 	gp_ret = gp_widget_get_type (child, &type);
 	if (gp_ret != 0) {
@@ -161,18 +332,30 @@ void *getConfig(void *threadArgs) {
 		error("gphoto: Invalid config key."); sys_unlock();
 	} else {
 		switch (type) {
+			case GP_WIDGET_RADIO:
+				gp_ret = gp_widget_get_value(child, &textVal);
+				sys_lock();
+				outlet_symbol(((gphoto_gimme_struct *)threadArgs)->gphoto->x_obj.ob_outlet, gensym(textVal));
+				sys_unlock();
+				break;
 			case GP_WIDGET_TOGGLE:
 				gp_ret = gp_widget_get_value (child, &toggleVal); //  get widget value
+				sys_lock();
 				outlet_float(((gphoto_gimme_struct *)threadArgs)->gphoto->x_obj.ob_outlet, (int) toggleVal);
+				sys_unlock();
 				break;
 			case GP_WIDGET_TEXT:
 				gp_ret = gp_widget_get_value (child, &textVal);
+				sys_lock();				
 				outlet_symbol(((gphoto_gimme_struct *)threadArgs)->gphoto->x_obj.ob_outlet, gensym(textVal));
+				sys_lock();
 				break;
 			case GP_WIDGET_RANGE:
 				gp_ret = gp_widget_get_value (child, &rangeVal);
 				if (gp_ret != 0) {error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));}
+				sys_lock();
 				outlet_float(((gphoto_gimme_struct *)threadArgs)->gphoto->x_obj.ob_outlet, rangeVal);
+				sys_lock();
 				break;
 		}
 	}
@@ -212,7 +395,7 @@ static void wrapGetConfig(gphoto_struct *gphoto, t_symbol *s, int argc, t_atom *
 		gphoto->busy = 1;
 
 		// Create thread
-		ret = pthread_create( &thread1, NULL, getConfig, threadArgs);
+		ret = pthread_create( &thread1, &gphoto->threadAttr, getConfig, threadArgs);
 	} else {
 		error("gphoto: ERROR: Already executing a command, try again later.");
 	}
@@ -223,7 +406,8 @@ static void wrapGetConfig(gphoto_struct *gphoto, t_symbol *s, int argc, t_atom *
 void *setConfig(void *threadArgs) {
 	int gp_ret, intValue;
 	float floatValue;
-	t_symbol *key;
+	t_symbol *key, *textValue;
+	char charkey[MAXPDSTRING];
 	Camera *camera;
 	CameraWidget *config = NULL;
 	CameraWidget *child = NULL;
@@ -239,13 +423,27 @@ void *setConfig(void *threadArgs) {
 	// INIT camera (without context)	
 	gp_ret = gp_camera_init (camera, NULL); 
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock();}
-	if (gp_ret == -105) {sys_lock(); error("gphoto: Are you sure the camera is supported, connected and powered on?"); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret == -105) {
+		sys_lock(); 
+		error("gphoto: Are you sure the camera is supported, connected and powered on?");
+		sys_unlock(); 
+		gp_camera_unref(camera);
+		((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0; // no longer busy if we got an error.
+		return(NULL);
+	}
 
 	gp_ret = gp_camera_get_config (camera, &config, NULL); // get config from camera
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	gp_ret = gp_widget_get_child_by_name (config, key->s_name, &child); // get item from config
-	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret != 0) {
+		sys_lock();
+		error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret));
+		sys_unlock();
+		((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0; // no longer busy if we got an error.
+		gp_camera_unref(camera);
+		return(NULL);
+	}
 
 	gp_ret = gp_widget_get_type (child, &type);
 	if (gp_ret != 0) {
@@ -253,6 +451,21 @@ void *setConfig(void *threadArgs) {
 		error("gphoto: Invalid config key."); sys_unlock(); 
 	} else {
 		switch (type) {
+			// same method as TOGGLE type
+			case GP_WIDGET_RADIO:				
+				sys_lock(); 
+				textValue = atom_getsymbol( ((gphoto_gimme_struct *)threadArgs)->argv+1 );
+				post("argument: %s", textValue->s_name);
+				strcpy(charkey,(char *)textValue->s_name);
+				post("charkey: %s", charkey);				
+				sys_unlock();
+
+				gp_ret = gp_widget_set_value (child, &charkey); //  set widget value
+				if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); }
+
+				gp_ret = gp_camera_set_config (camera, config, NULL); // set new config
+				if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); }
+				break;
 			case GP_WIDGET_TOGGLE:
 				sys_lock(); 
 				intValue = atom_getint( ((gphoto_gimme_struct *)threadArgs)->argv+1 );
@@ -316,7 +529,7 @@ static void wrapSetConfig(gphoto_struct *gphoto, t_symbol *s, int argc, t_atom *
 		gphoto->busy = 1;
 
 		// Create thread
-		ret = pthread_create( &thread1, NULL, setConfig, threadArgs);
+		ret = pthread_create( &thread1, &gphoto->threadAttr, setConfig, threadArgs);
 	} else {
 		error("gphoto: ERROR: Already executing a command, try again later.");
 	}
@@ -341,7 +554,14 @@ void *captureImage(void *threadArgs) {
 	// INIT camera (without context)	
 	gp_ret = gp_camera_init (camera, NULL); 
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); }
-	if (gp_ret == -105) {sys_lock(); post("gphoto: Are you sure the camera is supported, connected and powered on?"); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+	if (gp_ret == -105) {
+		sys_lock(); 
+		error("gphoto: Are you sure the camera is supported, connected and powered on?");
+		sys_unlock(); 
+		gp_camera_unref(camera);
+		((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0; // no longer busy if we got an error.
+		return(NULL);
+	}
 
 	gp_ret = gp_camera_capture(camera, GP_CAPTURE_IMAGE, &camera_file_path, NULL); 
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
@@ -354,22 +574,23 @@ void *captureImage(void *threadArgs) {
 	gp_ret = gp_camera_file_get(camera, camera_file_path.folder, camera_file_path.name,
 		     GP_FILE_TYPE_NORMAL, camerafile, NULL); // get file from camera
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
-	
+
 	gp_ret = gp_camera_file_delete(camera, camera_file_path.folder, camera_file_path.name, NULL);
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
 
 	// Free memory
-	gp_camera_unref(camera);
+	gp_camera_free(camera);
 
 	// We are done  and other messsages can now be sent.
 	((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0;
-	
+
 	// Send bang out 2nd outlet when operation is done.
 	sys_lock();
 	outlet_bang(((gphoto_gimme_struct *)threadArgs)->gphoto->doneOutlet);
 	sys_unlock();
 
-	return(NULL);	
+	pthread_exit(NULL);
+	//return(NULL); // needed?
 }
 
 // Wrap captureImage
@@ -377,6 +598,8 @@ void *captureImage(void *threadArgs) {
 static void wrapCaptureImage(gphoto_struct *gphoto, t_symbol *s, int argc, t_atom *argv) {
 	int ret;
 	pthread_t thread1;
+
+post("busy state: %d", gphoto->busy);
 
 	if (!gphoto->busy) {
 
@@ -393,10 +616,18 @@ static void wrapCaptureImage(gphoto_struct *gphoto, t_symbol *s, int argc, t_ato
 		gphoto->busy = 1;
 
 		// Create thread
-		ret = pthread_create( &thread1, NULL, captureImage, threadArgs);
+		ret = pthread_create( &thread1, &gphoto->threadAttr, captureImage, threadArgs);
+		post("pthread return: %d", ret);
 	} else {
 		error("gphoto: ERROR: Already executing a command, try again later.");
 	}
+}
+
+// Reset internal state to accept new commands.
+static void reset(gphoto_struct *gphoto) {
+	gphoto->busy = 0;
+
+	return;
 }
 
 static void *gphoto_new(void) {
@@ -406,15 +637,27 @@ static void *gphoto_new(void) {
 
 	// Initially the external is not "busy"
 	gphoto->busy = 0;
+
+	// When we create a thread, make sure it is deatched.
+	pthread_attr_init(&gphoto->threadAttr);
+	pthread_attr_setdetachstate(&gphoto->threadAttr, PTHREAD_CREATE_DETACHED);
 	
 	return (void *)gphoto;
 }
 
+static void *gphoto_destroy(gphoto_struct *gphoto) {
+	pthread_attr_destroy(&gphoto->threadAttr);
+
+	return(NULL);
+}
+
 void gphoto_setup(void) {
-	gphoto_class = class_new(gensym("gphoto"), (t_newmethod) gphoto_new, 0, sizeof(gphoto_struct), 0, CLASS_DEFAULT, 0);
+	gphoto_class = class_new(gensym("gphoto"), (t_newmethod) gphoto_new, (t_method) gphoto_destroy, sizeof(gphoto_struct), 0, CLASS_DEFAULT, 0);
 	class_addmethod(gphoto_class, (t_method) wrapGetConfig, gensym("getconfig"), A_GIMME, 0);
-	class_addmethod(gphoto_class, (t_method) wrapCaptureImage, gensym("capture"), A_GIMME, 0);
+	class_addmethod(gphoto_class, (t_method) wrapGetConfigDetail, gensym("configdetail"), A_GIMME, 0);
+	class_addmethod(gphoto_class, (t_method) wrapCaptureImage, gensym("captureimage"), A_GIMME, 0);
 	class_addmethod(gphoto_class, (t_method) wrapSetConfig, gensym("setconfig"), A_GIMME, 0);
 	class_addmethod(gphoto_class, (t_method) wrapListConfig, gensym("listconfig"), 0);
+	class_addmethod(gphoto_class, (t_method) reset, gensym("reset"), 0);
 }
 
