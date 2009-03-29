@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <m_pd.h>
 #include <fcntl.h>
@@ -35,7 +36,7 @@ typedef struct gphoto_struct {
 	t_outlet *doneOutlet;
 	int busy;
 	pthread_attr_t threadAttr; //thread attributes
-
+	int capturing;
 } gphoto_struct;
 
 // Struct to store A_GIMME data passed to thread.
@@ -630,6 +631,123 @@ static void reset(gphoto_struct *gphoto) {
 	return;
 }
 
+void *captureImages(void *threadArgs) {
+	int gp_ret, fd;
+	Camera *camera;
+	CameraFile *camerafile;
+	CameraFilePath camera_file_path;
+	t_symbol *format;
+	char filename[MAXPDSTRING];
+	int count;
+	int sleepTime;
+
+	sys_lock(); 
+	format = atom_getsymbol( ((gphoto_gimme_struct *)threadArgs)->argv ); // destination filename
+	sleepTime = atom_getint ( ((gphoto_gimme_struct *)threadArgs)->argv+1 ); // loop sleep delay
+	post("format: %s", format->s_name);
+	post("sleeptime: %d", sleepTime);
+	sys_unlock(); 
+
+	gp_ret = gp_camera_new (&camera);	
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+
+	// INIT camera (without context)	
+	gp_ret = gp_camera_init (camera, NULL); 
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); }
+	if (gp_ret == -105) {
+		sys_lock(); 
+		error("gphoto: Are you sure the camera is supported, connected and powered on?");
+		sys_unlock(); 
+		gp_camera_unref(camera);
+		((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0; // no longer busy if we got an error.
+		return(NULL);
+	}
+
+	count = 0;
+	while (((gphoto_gimme_struct *)threadArgs)->gphoto->capturing) {
+
+		// Create filename from format. This does not check if the format string is suitable.
+		sprintf(&filename, format->s_name, count);
+
+		gp_ret = gp_camera_capture(camera, GP_CAPTURE_IMAGE, &camera_file_path, NULL); 
+		if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+
+		fd = open( filename, O_CREAT | O_WRONLY, 0644); // create file descriptor
+
+		gp_ret = gp_file_new_from_fd(&camerafile, fd); // create gphoto file from descriptor
+		if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+
+		gp_ret = gp_camera_file_get(camera, camera_file_path.folder, camera_file_path.name, GP_FILE_TYPE_NORMAL, camerafile, NULL); // get file from camera
+		if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+
+		gp_ret = gp_camera_file_delete(camera, camera_file_path.folder, camera_file_path.name, NULL);
+		if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
+
+		close(fd); // close file descriptor
+
+		// Send bang out 2nd outlet for each iteration.
+		sys_lock();
+		outlet_bang(((gphoto_gimme_struct *)threadArgs)->gphoto->doneOutlet);
+		sys_unlock();
+
+		sleep(sleepTime);
+		count++;
+	}
+
+	// Free memory
+	gp_camera_free(camera);
+
+	// We are done  and other messsages can now be sent.
+	((gphoto_gimme_struct *)threadArgs)->gphoto->busy = 0;
+
+	pthread_exit(NULL);
+}
+
+// Wrap captureImage
+// TODO is there a way to have one wrapper for all funcs?
+static void wrapCaptureImages(gphoto_struct *gphoto, t_symbol *s, int argc, t_atom *argv) {
+	int ret;
+	pthread_t thread1;
+
+	if (strcmp(atom_getsymbol(argv)->s_name, "stop") == 0) {
+
+		gphoto->capturing = 0; // Stop Capturing.
+		gphoto->busy = 0; // No longer busy
+		post("cap stop");
+
+	} else if (!gphoto->busy) {
+
+		if (argc != 2) {
+			error("gphoto: ERROR: usage: captureimages [filename-format] [sleeptime (seconds)]");
+		} else {
+
+			post("cap start");
+			gphoto->capturing = 1; // Now capturing.
+
+			// instance of structure
+			gphoto_gimme_struct *threadArgs = (gphoto_gimme_struct *)malloc(sizeof(gphoto_gimme_struct));
+
+			// packaging arguments into structure
+			threadArgs->gphoto = gphoto;
+			threadArgs->s = s;
+			threadArgs->argc = argc;
+			threadArgs->argv = argv;
+
+			// We're busy
+			gphoto->busy = 1;
+
+			// Create thread
+			ret = pthread_create( &thread1, &gphoto->threadAttr, captureImages, threadArgs);
+		}
+
+	} else {
+
+		error("gphoto: ERROR: Already executing a command, try again later.");
+	}
+
+	return;
+}
+
 static void *gphoto_new(void) {
 	gphoto_struct *gphoto = (gphoto_struct *) pd_new(gphoto_class);
 	outlet_new(&gphoto->x_obj, NULL);
@@ -656,6 +774,7 @@ void gphoto_setup(void) {
 	class_addmethod(gphoto_class, (t_method) wrapGetConfig, gensym("getconfig"), A_GIMME, 0);
 	class_addmethod(gphoto_class, (t_method) wrapGetConfigDetail, gensym("configdetail"), A_GIMME, 0);
 	class_addmethod(gphoto_class, (t_method) wrapCaptureImage, gensym("captureimage"), A_GIMME, 0);
+	class_addmethod(gphoto_class, (t_method) wrapCaptureImages, gensym("captureimages"), A_GIMME, 0);
 	class_addmethod(gphoto_class, (t_method) wrapSetConfig, gensym("setconfig"), A_GIMME, 0);
 	class_addmethod(gphoto_class, (t_method) wrapListConfig, gensym("listconfig"), 0);
 	class_addmethod(gphoto_class, (t_method) reset, gensym("reset"), 0);
