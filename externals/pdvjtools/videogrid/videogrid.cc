@@ -1393,7 +1393,7 @@ extern "C"
     /* tk help windows */
 
 
-    void load_tk_procs () {
+    void load_tk_procs_videogrid () {
         // ########### procediments per videogrid -- slario(at)gmail.com [a partir del codi del grid de l'Ives: ydegoyon(at)free.fr] #########
         sys_gui("proc videogrid_apply {id} {\n");
         // strip "." from the TK id to make a variable name suffix
@@ -1751,7 +1751,7 @@ extern "C"
 
     void videogrid_setup(void)
     {
-        load_tk_procs();
+        load_tk_procs_videogrid();
         post("videogrid: version 0.2.1");
         post("written by Sergi Lario (slario@gmail.com) & Lluis Gomez i Bigorda (lluis@artefacte.org)");
 
