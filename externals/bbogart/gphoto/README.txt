@@ -26,6 +26,6 @@ USAGE:
 Put the binary in your extra folder.
 Put the helpfile in your 5.reference folder.
 
-TODO: 
-* Add a getConfigDetail function to get the range, step, etc info on each config name.
+TODO:
+* Add a function to wrap gp_error results, and set busy to 0.
 * Add getFile and getFiles functions for PTP file transfer functionality.

@@ -644,9 +644,15 @@ void *captureImages(void *threadArgs) {
 	sys_lock(); 
 	format = atom_getsymbol( ((gphoto_gimme_struct *)threadArgs)->argv ); // destination filename
 	sleepTime = atom_getint ( ((gphoto_gimme_struct *)threadArgs)->argv+1 ); // loop sleep delay
-	post("format: %s", format->s_name);
-	post("sleeptime: %d", sleepTime);
-	sys_unlock(); 
+	sys_unlock();
+
+	// we don't want a delay of 0! (1 ok?)
+	if (sleepTime <=0) {
+		sleepTime = 1;
+		sys_lock();
+		error("gphoto: ERROR: The minimum sleep value is 1 second. Sleep set to 1 second.")
+		sys_unlock();
+	} 
 
 	gp_ret = gp_camera_new (&camera);	
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(camera); return(NULL);}
@@ -713,7 +719,6 @@ static void wrapCaptureImages(gphoto_struct *gphoto, t_symbol *s, int argc, t_at
 
 		gphoto->capturing = 0; // Stop Capturing.
 		gphoto->busy = 0; // No longer busy
-		post("cap stop");
 
 	} else if (!gphoto->busy) {
 
@@ -721,7 +726,6 @@ static void wrapCaptureImages(gphoto_struct *gphoto, t_symbol *s, int argc, t_at
 			error("gphoto: ERROR: usage: captureimages [filename-format] [sleeptime (seconds)]");
 		} else {
 
-			post("cap start");
 			gphoto->capturing = 1; // Now capturing.
 
 			// instance of structure
