@@ -650,7 +650,7 @@ void *captureImages(void *threadArgs) {
 	if (sleepTime <=0) {
 		sleepTime = 1;
 		sys_lock();
-		error("gphoto: ERROR: The minimum sleep value is 1 second. Sleep set to 1 second.")
+		error("gphoto: ERROR: The minimum sleep value is 1 second. Sleep set to 1 second.");
 		sys_unlock();
 	} 
 
