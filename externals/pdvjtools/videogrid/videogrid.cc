@@ -214,8 +214,8 @@ extern "C"
                 pCodecCtx->width, pCodecCtx->height);
 
             // Read frames and save first five frames to disk
-            av_read_frame(pFormatCtx, &packet);sys_gui("bind $id.8rangef.w_cell <KeyPress-Return> [concat videogrid_ok $id]\n");
-            sys_gui("bind $id.9rangef.h_cell <KeyPress-Return> [concat videogrid_ok $id]\n");
+            av_read_frame(pFormatCtx, &packet);
+
             // Is this a packet from the video stream?
             if(packet.stream_index==videoStream)
             {
