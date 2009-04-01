@@ -1,3 +1,0 @@
-!ifdef SIMD
-DEFS=$(DEFS) /DFLEXT_USE_SIMD
-!endif
