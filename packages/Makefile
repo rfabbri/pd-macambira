@@ -122,10 +122,11 @@ endif
 
 PD_BUILD_FLAGS = 
 
-# Pd needs autoconf 2.5x, which is labeled differently on different machines
-#PD_AUTOCONF := ${shell ( test -x "`which autoconf-2.59`" && echo autoconf-2.59 ) || echo autoconf }
+HAVE_AUTOGEN_SH := $(wildcard $(pd_src)/autogen.sh)
+# test for the new build system
+ifeq ($(HAVE_AUTOGEN_SH)),)
+# old build system
 PD_AUTOCONF = autoconf
-
 $(pd_src)/src/configure: $(pd_src)/src/configure.in
 	cd $(pd_src)/src/ && \
 	if [ -f acinclude.m4 ] ; then aclocal ; fi && \
@@ -142,13 +143,15 @@ pd: $(pd_src)/src/configure
 		make OPT_CFLAGS="" depend  && \
 		make $(DEST_PATHS) $(PD_BUILD_FLAGS)
 
-pd++:
-# the next line doesn't work?
-#	echo $$MACOSX_DEPLOYMENT_TARGET=10.3
-	-cd $(pd_src) && scons app_pkg=yes desire=no prefix=$(DESTDIR)\
-		portaudiopath=../../../../dev/portaudio \
-		portmidipath=../../../../dev/portmidi \
-		atomic=yes threadedsf=no debug=yes install
+else
+# new autotools build system
+pd:
+	cd $(pd_src) \
+		&& ./autogen.sh \
+		&& ./configure $(PD_CONFIGURE_FLAGS) \
+		&& make $(DEST_PATHS) $(PD_BUILD_FLAGS)
+endif
+
 
 #==============================================================================#
 #
@@ -694,4 +697,4 @@ test_locations:
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
-
+	@echo "HAVE_AUTOGEN_SH $(HAVE_AUTOGEN_SH)"
