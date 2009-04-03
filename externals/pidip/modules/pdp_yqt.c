@@ -78,6 +78,7 @@ typedef struct pdp_yqt_struct
     int    x_outbuffersize;
     t_float  *x_outl;
     t_float  *x_outr;
+    t_float  **x_outs;
 
 } t_pdp_yqt;
 
@@ -175,6 +176,9 @@ static void pdp_yqt_open(t_pdp_yqt *x, t_symbol *name)
 		x->x_audio_rate = quicktime_sample_rate(x->qt, 0),
 		quicktime_audio_compressor(x->qt, 0) );
        x->x_resampling_factor = ( sys_getsr() / x->x_audio_rate );
+       x->x_outreadposition = 0;
+       x->x_outwriteposition = 0;
+       x->x_outunread = 0;
     }
 
 }
@@ -218,6 +222,9 @@ static void pdp_yqt_bang(t_pdp_yqt *x)
         {
            // post("pdp_yqt : resetting audio position");
            if ( x->x_audio ) quicktime_set_audio_position(x->qt, 0, 0);
+           x->x_outreadposition = 0;
+           x->x_outwriteposition = 0;
+           x->x_outunread = 0;
         }
     }
 
@@ -255,41 +262,6 @@ static void pdp_yqt_bang(t_pdp_yqt *x)
     
     outlet_float(x->x_curframe, (float)pos);
 
-    // fills in the audio buffer with a chunk if necessary
-    if ( x->x_audio && x->x_outunread < MIN_AUDIO_INPUT )
-    {
-      int csize, rsize;
-
-       // watch remaining size
-       rsize = (int ) ( quicktime_audio_length(x->qt, 0) - quicktime_audio_position(x->qt, 0) );
-       csize = ( rsize < DECODE_PACKET_SIZE ) ? rsize : DECODE_PACKET_SIZE;
-
-       // post("pdp_yqt : decode one chunk (size=%d)", csize );
-       if ( ( quicktime_decode_audio(x->qt, NULL, x->x_outl, csize, 1) <0 ) ||
-            ( !x->x_mono && ( quicktime_decode_audio(x->qt, NULL, x->x_outl, csize, 2) <0 ) ) )
-       {
-	   post("pdp_yqt : could not decode audio data" );
-       } else {
-         for ( i=0; i<csize; i++ )
-         {
-            if ( x->x_outunread >= x->x_outbuffersize-2 )
-            {
-                post( "pdp_yqt: decode audio : too much input ... ignored" );
-                continue;
-            }
-            for ( j=0; j<x->x_resampling_factor; j++ )
-            {
-               *(x->x_outbuffer+x->x_outwriteposition) = x->x_outl[i];
-               x->x_outwriteposition = (x->x_outwriteposition + 1)%x->x_outbuffersize;
-               *(x->x_outbuffer+x->x_outwriteposition) =
-                   ((x->x_mono)? x->x_outl[i] : x->x_outr[i] );
-               x->x_outwriteposition = (x->x_outwriteposition + 1)%x->x_outbuffersize;
-               x->x_outunread+=2;
-            }
-         }
-       }
-    }
-
     pdp_packet_pass_if_valid(x->x_outlet0, &object);
 
 }
@@ -303,8 +275,7 @@ static void pdp_yqt_loop(t_pdp_yqt *x, t_floatarg loop)
 static void pdp_yqt_frame_cold(t_pdp_yqt *x, t_floatarg frameindex)
 {
     int frame = (int)frameindex;
-    int length;
-
+    int length, sample;
 
     if (!(x->initialized)) return;
 
@@ -315,6 +286,14 @@ static void pdp_yqt_frame_cold(t_pdp_yqt *x, t_floatarg frameindex)
 
     // post("pdp_yqt : frame cold : setting video position to : %d", frame );
     quicktime_set_video_position(x->qt, frame, 0);
+    if ( x->x_audio )
+    {
+      sample = x->x_audio_rate*((float)frame/(float)quicktime_frame_rate (x->qt, 0));
+      quicktime_set_audio_position(x->qt, sample, 0 );
+      x->x_outreadposition = 0;
+      x->x_outwriteposition = 0;
+      x->x_outunread = 0;
+    }
 }
 
 static void pdp_yqt_frame(t_pdp_yqt *x, t_floatarg frameindex)
@@ -359,11 +338,14 @@ void *pdp_yqt_new(void)
     x->x_outbuffersize = OUTPUT_BUFFER_SIZE;
     x->x_outl = (t_float*) getbytes(DECODE_PACKET_SIZE*sizeof(t_float));
     x->x_outr = (t_float*) getbytes(DECODE_PACKET_SIZE*sizeof(t_float));
+    x->x_outs = (t_float**) getbytes( 2*sizeof(t_float*));
+    x->x_outs[0] = x->x_outl;
+    x->x_outs[1] = x->x_outr;
     x->x_outbuffer = (t_float*) getbytes(OUTPUT_BUFFER_SIZE*sizeof(t_float));
 
-    if ( !x->x_outl || !x->x_outr || !x->x_outbuffer )
+    if ( !x->x_outl || !x->x_outr || !x->x_outbuffer || !x->x_outs )
     {
-       post( "mp3amp~: could not allocate buffers" );
+       post( "pdp_yqt: not allocate buffers" );
        return NULL;
     }
     memset( x->x_outl, 0x0, DECODE_PACKET_SIZE*sizeof(t_float) );
@@ -386,9 +368,43 @@ static t_int *pdp_yqt_perform(t_int *w)
      int ret;
      int i = 0;
 
+    // fills in the audio buffer with a chunk if necessary
+    if ( (x->initialized) && (quicktime_video_position(x->qt,0)>0) && x->x_audio && ( x->x_outunread < n ) )
+    {
+      int csize, rsize, i, j;
+
+       // watch remaining size
+       rsize = (int ) ( quicktime_audio_length(x->qt, 0) - quicktime_audio_position(x->qt, 0) );
+       csize = ( rsize < DECODE_PACKET_SIZE ) ? rsize : DECODE_PACKET_SIZE;
+
+       // post("pdp_yqt : decode one chunk (size=%d)", csize );
+       if ( ( lqt_decode_audio(x->qt, NULL, x->x_outs, csize) <0 ) )
+       {
+	   post("pdp_yqt : could not decode audio data" );
+       } else {
+         for ( i=0; i<csize; i++ )
+         {
+            if ( x->x_outunread >= x->x_outbuffersize-2 )
+            {
+                post( "pdp_yqt: decode audio : too much input ... ignored" );
+                continue;
+            }
+            for ( j=0; j<x->x_resampling_factor; j++ )
+            {
+               *(x->x_outbuffer+x->x_outwriteposition) = x->x_outl[i];
+               x->x_outwriteposition = (x->x_outwriteposition + 1)%x->x_outbuffersize;
+               *(x->x_outbuffer+x->x_outwriteposition) =
+                   ((x->x_mono)? x->x_outl[i] : x->x_outr[i] );
+               x->x_outwriteposition = (x->x_outwriteposition + 1)%x->x_outbuffersize;
+               x->x_outunread+=2;
+            }
+         }
+       }
+    }
+
      while( n-- )
      {
-        if ( x->x_audio && x->x_outunread > 0 )
+        if ( x->x_audio && x->x_outunread >= 2 )
         {
           *out1++=*(x->x_outbuffer+x->x_outreadposition);
           x->x_outreadposition = (x->x_outreadposition + 1)%x->x_outbuffersize;
@@ -398,8 +414,12 @@ static t_int *pdp_yqt_perform(t_int *w)
         }
         else
         {
+          // should not happen 
+          // post( "pdp_yqt: null audio samples" );
           *out1++=0.;
+          // *out1++=*(x->x_outbuffer+x->x_outreadposition);
           *out2++=0.;
+          // *out2++=*(x->x_outbuffer+x->x_outreadposition);
         }
      }
 
@@ -431,7 +451,7 @@ void pdp_yqt_setup(void)
     class_addmethod(pdp_yqt_class, (t_method)pdp_yqt_frame_cold, gensym("frame_cold"), A_FLOAT, A_NULL);
     class_addmethod(pdp_yqt_class, nullfn, gensym("signal"), 0);
     class_addmethod(pdp_yqt_class, (t_method)pdp_yqt_dsp, gensym("dsp"), 0);
-
+    class_sethelpsymbol( pdp_yqt_class, gensym("pdp_yqt.pd") );
 
 }
 
