@@ -10,6 +10,7 @@
 URL="https://pure-data.svn.sourceforge.net/svnroot/pure-data/trunk/"
 GEMURL="https://pd-gem.svn.sourceforge.net/svnroot/pd-gem/trunk/"
 PDAUTH=""
+SVNOPTIONS="--ignore-externals"
 
 print_usage ()
 {
@@ -33,13 +34,13 @@ else
 fi
 
 echo "checking out pure-data"
-svn checkout $PDAUTH $URL pure-data
+svn checkout $SVNOPTIONS $PDAUTH $URL pure-data
 
 cd pure-data
 
 for section in Gem videoIO; do
          echo "checking out Gem::${section}"
-         svn checkout ${PDAUTH} ${GEMURL}/${section} ${section}
+         svn checkout SVNOPTIONS ${PDAUTH} ${GEMURL}/${section} ${section}
 done
 
 
