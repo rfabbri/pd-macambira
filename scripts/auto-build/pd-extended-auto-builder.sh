@@ -66,7 +66,7 @@ upload_build ()
 		case $SYSTEM in 
 			mingw*)
 				/c/cygwin/bin/sh -c \
-					"rsync --archive --no-links --copy-links --chmod=0644 ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}" && \
+					"rsync --archive --no-links --copy-links --chmod=a+r ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}" && \
 					md5sum ${archive} > ${archive}.md5 && \
 					/c/cygwin/bin/sh -c \
 					"rsync --archive --no-links --copy-links ${archive}.md5 rsync://128.238.56.50/upload/${DATE}/${upload_filename}.md5" && \
@@ -74,7 +74,7 @@ upload_build ()
 					echo SUCCESS
 				;;
 			*)
-				rsync -a --chmod=0644 ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}  && \
+				rsync -a --chmod=a+r ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}  && \
 					md5sum ${archive} > ${archive}.md5 && \
 					rsync -a ${archive}.md5 rsync://128.238.56.50/upload/${DATE}/${upload_filename}.md5  && \
 					echo "successfully uploaded: ${upload_filename}" && \
