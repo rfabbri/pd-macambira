@@ -124,7 +124,14 @@ PD_BUILD_FLAGS =
 
 HAVE_AUTOGEN_SH := $(wildcard $(pd_src)/autogen.sh)
 # test for the new build system
-ifeq ($(HAVE_AUTOGEN_SH)),)
+ifeq (autogen.sh, $(findstring autogen.sh,$(HAVE_AUTOGEN_SH)))
+# new autotools build system
+pd:
+	cd $(pd_src) \
+		&& ./autogen.sh \
+		&& ./configure $(PD_CONFIGURE_FLAGS) \
+		&& make $(DEST_PATHS) $(PD_BUILD_FLAGS)
+else
 # old build system
 PD_AUTOCONF = autoconf
 $(pd_src)/src/configure: $(pd_src)/src/configure.in
@@ -143,13 +150,6 @@ pd: $(pd_src)/src/configure
 		make OPT_CFLAGS="" depend  && \
 		make $(DEST_PATHS) $(PD_BUILD_FLAGS)
 
-else
-# new autotools build system
-pd:
-	cd $(pd_src) \
-		&& ./autogen.sh \
-		&& ./configure $(PD_CONFIGURE_FLAGS) \
-		&& make $(DEST_PATHS) $(PD_BUILD_FLAGS)
 endif
 
 
@@ -697,4 +697,4 @@ test_locations:
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
-	@echo "HAVE_AUTOGEN_SH $(HAVE_AUTOGEN_SH)"
+	@echo "HAVE_AUTOGEN_SH --$(HAVE_AUTOGEN_SH)--"
