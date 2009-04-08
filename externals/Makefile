@@ -1549,11 +1549,6 @@ mapping: $(MAPPING_OBJECTS:.c=.$(EXTENSION))
 
 mapping_install: mapping
 	install -d $(objectsdir)/$(MAPPING_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MAPPING_NAME) \
-		--author "Cyrille Henry and Hans-Christoph Steiner" \
-		--description "objects for mapping data to control" \
-		--license "GNU GPL" \
-		--version ""
 # no compiled objects yet...
 #	install -p $(MAPPING_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MAPPING_NAME)
 	install -p $(externals_src)/mapping/*.pd $(objectsdir)/$(MAPPING_NAME)
