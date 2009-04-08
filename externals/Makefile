@@ -1553,7 +1553,7 @@ mapping_install: mapping
 #	install -p $(MAPPING_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MAPPING_NAME)
 	install -p $(externals_src)/mapping/*.pd $(objectsdir)/$(MAPPING_NAME)
 	install -d $(helpdir)/$(MAPPING_NAME)
-	install -p $(externals_src)/mapping/help/*.pd \
+	install -p $(externals_src)/mapping/*-help.pd \
 		$(helpdir)/$(MAPPING_NAME)
 #	install -d $(manualsdir)/$(MAPPING_NAME)
 	install -d $(readmesdir)
