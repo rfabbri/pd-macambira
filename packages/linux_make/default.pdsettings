@@ -1,7 +1,7 @@
 standardpath: 1
 verbose: 0
 defeatrt: 0
-flags: -helppath ~/pd -helppath /usr/share/pd
+flags:
 loadlib1: libdir
 loadlib2: Gem
 loadlib3: cyclone
@@ -40,7 +40,5 @@ loadlib35: flatspace
 loadlib36: pdp
 loadlib37: pidip
 nloadlib: 37
-path1: ~/pd-externals
-path2: /usr/local/lib/pd-externals
-path3: /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType
-npath: 3
+path1: /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType
+npath: 1

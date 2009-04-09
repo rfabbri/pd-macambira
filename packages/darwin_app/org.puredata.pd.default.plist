@@ -83,27 +83,17 @@
 	<key>nloadlib</key>
 	<string>37</string>
 	<key>path1</key>
-	<string>~/Library/Pd</string>
-	<key>path2</key>
-	<string>/Library/Pd</string>
-	<key>path3</key>
 	<string>/System/Library/Fonts</string>
-	<key>path4</key>
+	<key>path2</key>
 	<string>/Library/Fonts</string>
-	<key>path5</key>
+	<key>path3</key>
 	<string>~/Library/Fonts</string>
-	<key>path6</key>
+	<key>path4</key>
 	<string>/usr/X11R6/lib/X11/fonts/TTF</string>
-	<key>path7</key>
-	<string>/System/Library/Frameworks/JavaVM.framework/Versions/1.3.1/Home/lib/fonts</string>
-	<key>path8</key>
-	<string>/sw/lib/X11/fonts/msttf</string>
-	<key>path9</key>
-	<string>/sw/lib/X11/fonts/intl/TrueType</string>
-	<key>path10</key>
-	<string>/sw/lib/X11/fonts/applettf</string>
+	<key>path5</key>
+	<string>/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/lib/fonts</string>
 	<key>npath</key>
-	<string>10</string>
+	<string>5</string>
 </dict>
 
 </plist>

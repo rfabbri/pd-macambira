@@ -67,7 +67,7 @@ Root: HKCR; SubKey: .pd; ValueType: string; ValueName: Content Type; ValueData: 
 ;
 ; STARTHERE: add pd-inno_registry after this comment:
 
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: flags; ValueData: -helppath %UserProfile%/applic~1/Pd -helppath %ProgramFiles%/common~1/pd; Tasks: libs; Flags: uninsdeletekey
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: flags; ValueData: ; Tasks: libs; Flags: uninsdeletekey
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib1; ValueData: libdir; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib2; ValueData: Gem; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib3; ValueData: cyclone; Tasks: libs
@@ -169,10 +169,10 @@ Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib97; Flags: d
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib98; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib99; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: loadlib100; Flags: deletevalue; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: expandsz; ValueName: path1; ValueData: %USERPROFILE%/Application Data/Pd; Tasks: libs; Flags: uninsdeletekey
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: expandsz; ValueName: path2; ValueData: %ProgramFiles%/Common Files/Pd; Tasks: libs; Flags: uninsdeletekey
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: expandsz; ValueName: path3; ValueData: %SystemRoot%/Fonts; Tasks: libs; Flags: uninsdeletekey
-Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: npath; ValueData: 3; Tasks: libs; Flags: uninsdeletekey
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: expandsz; ValueName: path1; ValueData: %SystemRoot%/Fonts; Tasks: libs; Flags: uninsdeletekey
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: npath; ValueData: 1; Tasks: libs; Flags: uninsdeletekey
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path2; Flags: deletevalue; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path3; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path4; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path5; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path6; Flags: deletevalue; Tasks: libs
