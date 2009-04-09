@@ -23,8 +23,13 @@ Installation/Compilation instructions for "iemmatrix"
 ============
 	there is nothing special in the code, so it should compile out of the box:
 	"cd" to iemmatrix/src
-	run "aclocal; autoconf; ./configure; make" (for further details please see "1) linux")
-	(e.g. "./configure --with-pd=/Applications/Pd.app/Contents/Resources")
+	run "./bootstrap.sh; ./configure; make" (for further details please see "1) linux")
+	building with a special version of Pd:
+		to build iemmatrix with your special version of Pd, you should specify the path to your Pd ressources
+		(e.g. "./configure --with-pd=/Applications/Pd.app/Contents/Resources")
+	fat-binaries
+		if you want to build a multi-arch binary you have to specify this as well
+		(e.g. "./configure --enable-fat-binary=i386,ppc --with-extension=d_fat")
 
 3) irix:
 ========
