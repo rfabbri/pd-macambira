@@ -73,15 +73,15 @@ all: $(OBJECTS)
 endif
 
 $(OBJECTS): %.$(EXT) : %.o
-	$(LD) $(LFLAGS) -o $@ $*.o $(LIBS)
+	$(LD) $(LFLAGS) $(AFLAGS) -o $@ $*.o $(LIBS)
 	$(STRIP) $(STRIPFLAGS) $@
 
 $(LIBRARY_NAME): $(TARGETS) $(LIBRARY_NAME)_sources.c $(LIBRARY_NAME)_sources.h
-	$(LD) $(LFLAGS) -o $@.$(EXT) *.o $(LIBS)
+	$(LD) $(LFLAGS) $(AFLAGS) -o $@.$(EXT) *.o $(LIBS)
 	$(STRIP) $(STRIPFLAGS) $@.$(EXT)
 
 $(TARGETS): %.o : %.c
-	$(CC) $(LIBRARY_CFLAGS) -c -o $@ $<
+	$(CC) $(LIBRARY_CFLAGS) $(AFLAGS) -c -o $@ $<
 
 externals: $(OBJECTS)
 

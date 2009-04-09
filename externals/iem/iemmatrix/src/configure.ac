@@ -123,6 +123,12 @@ else
 fi
 
 
+
+### can we build fat-binaries
+AC_CHECK_FAT(ARCH_FLAGS)
+AC_SUBST(ARCH_FLAGS)
+
+
 dnl isn't there a better way to check for good linker/stripper ?
 
 dnl if we don't have $LD set, we set it to $(CC)
@@ -165,22 +171,12 @@ dnl
 dnl  OK, checks which machines are here now
 dnl this needs some rethinking when cross-compiling (?)
 dnl
-AC_CHECK_LDFLAGS([-export_dynamic -shared])
+AC_CHECK_LDFLAGS([-shared])
 
 if test `uname -s` = Linux; 
 then
   EXT=pd_linux	
   STRIPFLAGS="--strip-unneeded"
-  if test "$enable_icc" = "yes"; then
-    CC=icc
-  fi
-
-  if test $CC = "icc"
-  then
-    LD=$CC
-    AC_CHECK_LDFLAGS([-ip -ipo_obj])
-    AC_CHECK_CFLAGS([-ip -ipo_obj])
-  fi
 fi
 
 dnl This should use '-bundle_loader /path/to/pd/bin/pd' instead of'-undefined suppress'
