@@ -270,6 +270,7 @@ Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path97; Flags: dele
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path98; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path99; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path100; Flags: deletevalue; Tasks: libs
+; ENDHERE: add pd-inno_registry before this comment:
 
 [_ISTool]
 Use7zip=true
