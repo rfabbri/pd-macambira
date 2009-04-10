@@ -11,17 +11,17 @@
 #X text 29 35 bang outputs current mean;
 #X msg 76 99 1;
 #X msg 98 121 2;
-#X text 455 239 Martin Peach 2008_05_16;
 #X text 105 211 mean:;
 #X text 254 158 another way to set length (also clears the array);
 #X text 63 69 Incoming floats are added to the array. The mean is recalculated
 for each incoming float;
 #X text 237 181 Argument sets initial length. Default (no argument)
 is 128;
-#X text 199 201 Length can be changed to any positive value greater
-than or equal to the length set by the creation argumwent;
 #X text 10 4 [runningmean] outputs the running mean of the last n floats
 to arrive on the left inlet.;
+#X text 199 201 Length can be changed to any positive value less than
+or equal to the length set by the creation argumwent;
+#X text 455 239 Martin Peach 2009/04/10;
 #X connect 0 0 6 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
