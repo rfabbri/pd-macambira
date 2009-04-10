@@ -1,0 +1,9 @@
+#N canvas 337 290 528 329 10;
+#X msg 46 78 bang;
+#X obj 30 153 pddp/print;
+#X obj 42 109 get-audio-dialog;
+#X obj 10 158 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;
+#X connect 2 0 3 0;

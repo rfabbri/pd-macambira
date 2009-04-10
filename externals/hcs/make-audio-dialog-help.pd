@@ -1,0 +1,13 @@
+#N canvas 699 277 450 300 10;
+#X msg 59 115 bang;
+#X obj 59 147 get-audio-dialog;
+#X msg 59 203 \; pd audio-dialog 0 0 0 0 2 0 0 0 0 0 0 0 2 0 0 0 44100
+50 0;
+#X obj 59 176 make-audio-dialog;
+#X text 40 23 [make-audio-dialog] takes the audio-dialog message from
+[get-audio-dialog] and generates a clickable message box that will
+set the audio settings. This message box is also suitable for use with
+a [loadbang];
+#X connect 0 0 1 0;
+#X connect 1 0 3 0;
+#X connect 3 0 2 0;
