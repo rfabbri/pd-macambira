@@ -1,7 +1,7 @@
 #N canvas 119 64 638 465 10;
-#X obj 74 370 cursor;
-#X msg 74 335 bang;
-#X text 105 335 get the current mouse position;
+#X obj 57 348 cursor;
+#X msg 66 323 bang;
+#X text 97 323 get the current mouse position;
 #X obj 338 383 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/cursors.htm
 ;
 #X text 223 366 Here's a complete list of the available cursors:;
@@ -34,12 +34,11 @@
 #X msg 59 63 runmode_clickme;
 #X msg 75 82 runmode_thicken;
 #X msg 92 101 runmode_addpoint;
-#X obj 74 399 pddp/print;
 #X msg 110 120 editmode_nothing;
-#X obj 169 286 cursor;
-#X text 342 258 <-- this is the actual message to send;
-#X obj 56 308 metro 100;
-#X obj 56 286 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 169 266 cursor;
+#X text 342 238 <-- this is the actual message to send;
+#X obj 48 296 metro 100;
+#X obj 48 274 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X text 15 18 set your mouse cursors for this patch:;
 #X text 229 398 Here are some pictures of the cursors:;
@@ -47,10 +46,16 @@
 ;
 #X msg 126 139 editmode_connect;
 #X msg 143 158 editmode_disconnect;
-#X msg 169 259 editmode_disconnect pirate;
+#X msg 169 239 editmode_disconnect pirate;
 #X text 290 55 first pick a cursor:;
 #X text 189 80 <-- then choose your cursor mode;
-#X connect 0 0 17 0;
+#X obj 57 396 route x y;
+#X obj 57 371 route motion;
+#X floatatom 44 420 5 0 0 0 x - -;
+#X floatatom 82 420 5 0 0 1 y - -;
+#X obj 25 325 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X connect 0 0 31 0;
 #X connect 1 0 0 0;
 #X connect 5 0 13 1;
 #X connect 6 0 13 1;
@@ -60,13 +65,17 @@
 #X connect 10 0 13 1;
 #X connect 11 0 13 1;
 #X connect 12 0 13 0;
-#X connect 13 0 28 0;
+#X connect 13 0 27 0;
 #X connect 14 0 13 0;
 #X connect 15 0 13 0;
 #X connect 16 0 13 0;
-#X connect 18 0 13 0;
-#X connect 21 0 0 0;
-#X connect 22 0 21 0;
+#X connect 17 0 13 0;
+#X connect 20 0 0 0;
+#X connect 21 0 20 0;
+#X connect 25 0 13 0;
 #X connect 26 0 13 0;
-#X connect 27 0 13 0;
-#X connect 28 0 19 0;
+#X connect 27 0 18 0;
+#X connect 30 0 32 0;
+#X connect 30 1 33 0;
+#X connect 31 0 30 0;
+#X connect 34 0 0 0;

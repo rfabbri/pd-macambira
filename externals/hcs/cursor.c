@@ -1,3 +1,6 @@
+/* TODO add reset method for cursor icons, this should probably be done in
+pd.tk, or cursor reset method could be done in help patch */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,15 +8,14 @@
 #include <g_canvas.h>
 
 static t_symbol *button_symbol;
-static t_symbol *motion_symbol;
 static t_symbol *wheel_symbol;
+static t_symbol *motion_symbol;
+static t_symbol *x_symbol;
+static t_symbol *y_symbol;
+static t_symbol *cursor_receive_symbol;
 
-//TODO add reset method for cursor icons, this should probably be done in pd.tk
-
-// TODO figure out some way to get
-//t_int hidio_instance_count;
-/* this is used to test for the first instance to execute */
-//double last_execute_time;
+t_int cursor_instance_count;
+t_int cursor_instances_polling;
 
 static t_class *cursor_class;
 
@@ -28,17 +30,59 @@ typedef struct _cursor
     char *optionv[];
 } t_cursor;
 
+/* idea from #tcl for a Tcl unbind */
 
-/* idea from #tcl for a Tcl unbind
-proc unbind {tag event script} {
-     set bind ""
-     foreach x [split [bind $tag $event] "\n"] {
-         if {$x != $script} {lappend bind $x}
-     }
-     bind $tag $event {}
-     foreach x $bind {bind $tag $event $x}
- }
-*/
+static void create_unbind (void)
+{
+    sys_gui("if {[info commands ::hcs_cursor_class::unbind] ne {::hcs_cursor_class::unbind}} {");
+    sys_gui("  proc ::hcs_cursor_class::unbind {tag event script} {\n");
+    sys_gui("    set bind {}\n");
+    sys_gui("    foreach x [split [bind $tag $event] \"\n\"] {\n");
+    sys_gui("      if {$x != $script} {lappend bind $x}\n");
+    sys_gui("    }\n");
+    sys_gui("    bind $tag $event {}\n");
+    sys_gui("    foreach x $bind {bind $tag $event $x}\n");
+    sys_gui("  }\n");
+    sys_gui("}\n");
+}
+
+static void create_namespace(void)
+{
+    sys_gui("if { [namespace exists ::hcs_cursor_class]} {\n");
+    sys_gui("  puts stderr {ERROR: ::hcs_cursor_class namespace exists!}\n");
+    sys_gui("} else {\n");
+    sys_gui("  namespace eval ::hcs_cursor_class {\n");
+    sys_gui("    variable send_to_pd 0\n");
+    sys_gui("    variable last_x 0\n");
+    sys_gui("    variable last_y 0\n");
+    sys_gui("  }\n");
+    sys_gui("}\n");
+}
+
+static void create_button_proc(void)
+{
+}
+
+static void create_mousewheel_proc(void)
+{
+}
+
+static void create_motion_proc(void)
+{
+    /* create proc and bind it, if it doesn't exist */
+//    sys_gui("if {[info commands ::hcs_cursor_class::motion] ne {::hcs_cursor_class::motion}} {");
+    sys_gui ("  proc ::hcs_cursor_class::motion {x y} {\n");
+//    sys_gui ("    if {{$::hcs_cursor_class::send_to_pd > 0} {\n");
+//    sys_gui ("      if { $x != $::hcs_cursor_class::last_x \\\n");
+//    sys_gui ("        || $y != $::hcs_cursor_class::last_y} {\n");
+    sys_vgui("        pd [concat %s motion $x $y \\;]\n",
+             cursor_receive_symbol->s_name);
+//    sys_gui ("      }\n");
+//    sys_gui ("    }\n");
+    sys_gui ("  }\n");
+//    sys_gui ("}\n");
+    sys_gui ("\n");
+}
 
 static void cursor_setmethod(t_cursor *x, t_symbol *s, int argc, t_atom *argv)
 {
@@ -52,24 +96,28 @@ static void cursor_bang(t_cursor *x)
              x->receive_symbol->s_name);
 }
 
-/* TODO this needs some kind of working unbind to be useful, otherwise when an
- * instance is deleted, you get reams of "error: #123123 no such object"
- * messages in the Pd Window.
 static void cursor_float(t_cursor *x, t_float f)
 {
     if(f > 0)
     {
-        sys_vgui("bind all <Motion> {+pd [concat %s motion %%x %%y \\;]}\n",
-            x->receive_symbol->s_name);
+        // TODO make sure the procs are setup
+        // TODO bind to the global cursor receive symbol
+        pd_bind(&x->x_obj.ob_pd, cursor_receive_symbol);
+        cursor_instances_polling++;
+        /* if this is the first instance to start polling, set up the bind */
+        if (cursor_instances_polling == 1)
+            sys_gui ("bind all <Motion> {+::hcs_cursor_class::motion %x %y}\n");
     }
     else
     {
-        // TODO figure out how to turn off this binding
-        sys_vgui("bind all <Motion> {+pd [concat %s motion %%x %%y \\;]}\n",
-            x->receive_symbol->s_name);
+        // TODO unbind from the global cursor receive symbol
+        pd_unbind(&x->x_obj.ob_pd, cursor_receive_symbol);
+        cursor_instances_polling--;
+         /* if no more objects are listening, stop sending the events */
+        if (cursor_instances_polling == 0)
+            sys_gui ("unbind all <Motion> {::hcs_cursor_class::motion %x %y}\n");
     }
 }
-*/
 
 static void cursor_button_callback(t_cursor *x, t_float button, t_float state)
 {
@@ -84,7 +132,10 @@ static void cursor_motion_callback(t_cursor *x, t_float x_position, t_float y_po
 {
     t_atom output_atoms[2];
     
-    SETFLOAT(output_atoms, x_position);
+    SETSYMBOL(output_atoms, x_symbol);
+    SETFLOAT(output_atoms + 1, x_position);
+    outlet_anything(x->data_outlet, motion_symbol, 2, output_atoms);
+    SETSYMBOL(output_atoms, y_symbol);
     SETFLOAT(output_atoms + 1, y_position);
     outlet_anything(x->data_outlet, motion_symbol, 2, output_atoms);
 }
@@ -99,8 +150,10 @@ static void cursor_wheel_callback(t_cursor *x, t_float f)
 
 static void cursor_free(t_cursor *x)
 {
-    pd_unbind(&x->x_obj.ob_pd, x->receive_symbol);
-    //TODO free the "bind all"
+    cursor_float(x, 0);
+    /* TODO free the "bind all" somehow so that the tcl procs aren't
+     * continuing to work even tho no cursor objects are receiving the data */
+    cursor_instance_count--;
 }
 
 static void *cursor_new(void)
@@ -116,6 +169,9 @@ static void *cursor_new(void)
 	x->data_outlet = outlet_new(&x->x_obj, 0);
 //	x->status_outlet = outlet_new(&x->x_obj, 0);
 
+    
+    create_namespace();
+    create_motion_proc();
 /* not working yet
     sys_vgui("bind . <ButtonPress> {+pd [concat %s button %%b 1 \\;]}\n",
              x->receive_symbol->s_name);
@@ -124,6 +180,7 @@ static void *cursor_new(void)
     sys_vgui("bind . <MouseWheel> {+pd [concat %s wheel %%D \\;]}\n",
              x->receive_symbol->s_name);
 */
+    cursor_instance_count++;
 
     return(x);
 }
@@ -135,11 +192,14 @@ void cursor_setup(void)
         sizeof(t_cursor), 0, 0);
 
     class_addbang(cursor_class, (t_method)cursor_bang);
-/*     class_addfloat(cursor_class, (t_method)cursor_float); */
+    class_addfloat(cursor_class, (t_method)cursor_float);
 
     button_symbol = gensym("button");
-    motion_symbol = gensym("motion");
     wheel_symbol = gensym("wheel");
+    motion_symbol = gensym("motion");
+    x_symbol = gensym("x");
+    y_symbol = gensym("y");
+    cursor_receive_symbol = gensym("#hcs_cursor_class_receive");
 
     class_addmethod(cursor_class, (t_method)cursor_button_callback, 
                     button_symbol, A_DEFFLOAT, A_DEFFLOAT, 0);
