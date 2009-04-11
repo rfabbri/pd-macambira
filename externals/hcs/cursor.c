@@ -34,11 +34,15 @@ typedef struct _cursor
 
 static void create_unbind (void)
 {
-    sys_gui("if {[info commands ::hcs_cursor_class::unbind] ne {::hcs_cursor_class::unbind}} {");
+    sys_gui("if { [info commands ::hcs_cursor_class::unbind] ne {::hcs_cursor_class::unbind}} {");
+    sys_gui("  puts stderr {creating ::hcs_cursor_class::unbind}\n");
     sys_gui("  proc ::hcs_cursor_class::unbind {tag event script} {\n");
     sys_gui("    set bind {}\n");
     sys_gui("    foreach x [split [bind $tag $event] \"\n\"] {\n");
-    sys_gui("      if {$x != $script} {lappend bind $x}\n");
+    sys_gui("      if {$x != $script} {\n");
+    sys_gui("        lappend bind $x\n");
+    sys_gui("        puts stderr {rebind $x $script}\n");
+    sys_gui("      }\n");
     sys_gui("    }\n");
     sys_gui("    bind $tag $event {}\n");
     sys_gui("    foreach x $bind {bind $tag $event $x}\n");
@@ -49,7 +53,7 @@ static void create_unbind (void)
 static void create_namespace(void)
 {
     sys_gui("if { [namespace exists ::hcs_cursor_class]} {\n");
-    sys_gui("  puts stderr {ERROR: ::hcs_cursor_class namespace exists!}\n");
+    sys_gui("  puts stderr {WARNING: ::hcs_cursor_class namespace exists!}\n");
     sys_gui("} else {\n");
     sys_gui("  namespace eval ::hcs_cursor_class {\n");
     sys_gui("    variable send_to_pd 0\n");
@@ -70,7 +74,8 @@ static void create_mousewheel_proc(void)
 static void create_motion_proc(void)
 {
     /* create proc and bind it, if it doesn't exist */
-//    sys_gui("if {[info commands ::hcs_cursor_class::motion] ne {::hcs_cursor_class::motion}} {");
+    sys_gui("if {[info commands ::hcs_cursor_class::motion] ne {::hcs_cursor_class::motion}} {");
+    sys_gui ("  puts stderr {creating ::hcs_cursor_class::motion}\n");
     sys_gui ("  proc ::hcs_cursor_class::motion {x y} {\n");
 //    sys_gui ("    if {{$::hcs_cursor_class::send_to_pd > 0} {\n");
 //    sys_gui ("      if { $x != $::hcs_cursor_class::last_x \\\n");
@@ -80,7 +85,7 @@ static void create_motion_proc(void)
 //    sys_gui ("      }\n");
 //    sys_gui ("    }\n");
     sys_gui ("  }\n");
-//    sys_gui ("}\n");
+    sys_gui ("}\n");
     sys_gui ("\n");
 }
 
@@ -105,8 +110,11 @@ static void cursor_float(t_cursor *x, t_float f)
         pd_bind(&x->x_obj.ob_pd, cursor_receive_symbol);
         cursor_instances_polling++;
         /* if this is the first instance to start polling, set up the bind */
-        if (cursor_instances_polling == 1)
+        post("cursor_instances_polling %d", cursor_instances_polling);
+        if (cursor_instances_polling == 1) {
+            post("bind all <Motion>");
             sys_gui ("bind all <Motion> {+::hcs_cursor_class::motion %x %y}\n");
+        }
     }
     else
     {
@@ -114,8 +122,11 @@ static void cursor_float(t_cursor *x, t_float f)
         pd_unbind(&x->x_obj.ob_pd, cursor_receive_symbol);
         cursor_instances_polling--;
          /* if no more objects are listening, stop sending the events */
-        if (cursor_instances_polling == 0)
-            sys_gui ("unbind all <Motion> {::hcs_cursor_class::motion %x %y}\n");
+        post("cursor_instances_polling %d", cursor_instances_polling);
+        if (cursor_instances_polling == 0) {
+            post("unbind all <Motion>");
+            sys_gui ("::hcs_cursor_class::unbind all <Motion> {::hcs_cursor_class::motion %x %y}\n");
+        }
     }
 }
 
@@ -169,9 +180,6 @@ static void *cursor_new(void)
 	x->data_outlet = outlet_new(&x->x_obj, 0);
 //	x->status_outlet = outlet_new(&x->x_obj, 0);
 
-    
-    create_namespace();
-    create_motion_proc();
 /* not working yet
     sys_vgui("bind . <ButtonPress> {+pd [concat %s button %%b 1 \\;]}\n",
              x->receive_symbol->s_name);
@@ -223,4 +231,8 @@ void cursor_setup(void)
                     gensym("editmode_connect"), A_GIMME, 0);
     class_addmethod(cursor_class, (t_method)cursor_setmethod, 
                     gensym("editmode_disconnect"), A_GIMME, 0);
+
+    create_namespace();
+    create_unbind();
+    create_motion_proc();
 }
