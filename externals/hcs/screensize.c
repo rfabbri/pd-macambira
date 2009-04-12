@@ -1,9 +1,6 @@
 /* this object just asks Tcl for the screen resolution and outputs it */
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <m_pd.h>
-#include <g_canvas.h>
 
 static t_class *screensize_class;
 
