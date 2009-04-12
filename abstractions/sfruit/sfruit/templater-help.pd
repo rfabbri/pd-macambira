@@ -12,8 +12,6 @@ are defined in the template file \, with no offset.;
 #X text 522 320 2008 Luke Iannini;
 #X text 522 335 proyekto.net;
 #X msg 17 281 obj 10 10 templater tmetro \, loadbang;
-#X text 282 253 for the moment \, one must manually delete the [templater]
-object immediately after spawning it.;
 #X text 89 229 try me!;
 #X text 40 301 (delete existing to try another);
 #N canvas 514 43 411 356 creating-templates 0;
@@ -36,8 +34,11 @@ shows the placement of objects within the "modcount" template.;
 #X connect 0 0 2 0;
 #X connect 1 0 0 0;
 #X restore 301 323 pd creating-templates;
-#X text 283 291 subpatches are not yet supported;
 #X text 266 32 [templater] - create and connect a set of pd objects
 in the current patch based on a template file.;
+#X text 282 244 thanks to the new canvasdelete \, templater will disappear
+after creating its template.;
+#X text 283 291 subpatches are not yet supported (and may be impossible)
+;
 #X connect 1 0 0 0;
 #X connect 7 0 0 0;
