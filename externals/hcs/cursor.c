@@ -16,7 +16,6 @@ static t_symbol *x_symbol;
 static t_symbol *y_symbol;
 static t_symbol *cursor_receive_symbol;
 
-t_int cursor_instance_count;
 t_int cursor_instances_polling;
 
 static t_class *cursor_class;
@@ -25,7 +24,6 @@ typedef struct _cursor
 {
     t_object x_obj;
     t_int    am_polling;
-    t_clock  *x_clock;
     t_symbol *receive_symbol;
     t_canvas *parent_canvas;
     t_outlet *data_outlet;
@@ -38,6 +36,7 @@ static void create_namespace(void)
     sys_gui("  puts stderr {WARNING: ::hcs_cursor_class namespace exists!}\n");
     sys_gui("} else {\n");
     sys_gui("  namespace eval ::hcs_cursor_class {\n");
+    sys_gui("    variable continue_pollmotion 0\n");
     sys_gui("    variable last_x 0\n");
     sys_gui("    variable last_y 0\n");
     sys_gui("  }\n");
@@ -81,7 +80,8 @@ static void create_button_proc(void)
 {
     sys_gui ("if { ! [::hcs_cursor_class::proc_test button]} {");
     sys_gui ("  proc ::hcs_cursor_class::button {button state} {\n");
-    sys_vgui("        pd [concat %s button $button $state \\;]\n",
+    sys_gui ("    puts stderr \"button $button $state\"\n");
+    sys_vgui("    pd [concat %s button $button $state \\;]\n",
              cursor_receive_symbol->s_name);
     sys_gui ("  }\n");
     sys_gui ("}\n");
@@ -91,7 +91,8 @@ static void create_mousewheel_proc(void)
 {
     sys_gui ("if { ! [::hcs_cursor_class::proc_test mousewheel]} {");
     sys_gui ("  proc ::hcs_cursor_class::mousewheel {delta} {\n");
-    sys_vgui("        pd [concat %s mousewheel $delta \\;]\n",
+    sys_gui ("    puts stderr \"mousewheel $delta\"\n");
+    sys_vgui("    pd [concat %s mousewheel $delta \\;]\n",
              cursor_receive_symbol->s_name);
     sys_gui ("  }\n");
     sys_gui ("}\n");
@@ -99,14 +100,27 @@ static void create_mousewheel_proc(void)
 
 static void create_motion_proc(void)
 {
-    /* create proc and bind it, if it doesn't exist */
     sys_gui("if { ![::hcs_cursor_class::proc_test motion]} {\n");
     sys_gui ("  proc ::hcs_cursor_class::motion {x y} {\n");
-//    sys_gui ("      if { $x != $::hcs_cursor_class::last_x \\\n");
-//    sys_gui ("        || $y != $::hcs_cursor_class::last_y} {\n");
+    sys_gui ("    if { $x != $::hcs_cursor_class::last_x \\\n");
+    sys_gui ("      || $y != $::hcs_cursor_class::last_y} {\n");
     sys_vgui("        pd [concat %s motion $x $y \\;]\n",
              cursor_receive_symbol->s_name);
-//    sys_gui ("      }\n");
+    sys_gui ("        set ::hcs_cursor_class::last_x $x\n");
+    sys_gui ("        set ::hcs_cursor_class::last_y $y\n");
+    sys_gui ("    }\n");
+    sys_gui ("  }\n");
+    sys_gui ("}\n");
+}
+
+static void create_pollmotion_proc(void)
+{
+    sys_gui ("if { ![::hcs_cursor_class::proc_test pollmotion]} {\n");
+    sys_gui ("  proc ::hcs_cursor_class::pollmotion {} {\n");
+    sys_vgui("    ::hcs_cursor_class::motion [winfo pointerx .] [winfo pointery .]\n");
+    sys_gui ("    if {$::hcs_cursor_class::continue_pollmotion != 0} { \n");
+    sys_gui ("      after 10 ::hcs_cursor_class::pollmotion\n");
+    sys_gui ("    }\n");
     sys_gui ("  }\n");
     sys_gui ("}\n");
 }
@@ -116,47 +130,45 @@ static void cursor_setmethod(t_cursor *x, t_symbol *s, int argc, t_atom *argv)
     sys_vgui("set cursor_%s \"%s\"\n", s->s_name, atom_getsymbol(argv)->s_name);
     canvas_setcursor(x->parent_canvas, 0); /* hack to refresh the cursor */
 }
-
+ 
 static void cursor_bang(t_cursor *x)
 {
     sys_vgui("pd [concat %s motion [winfo pointerxy .] \\;]\n",
              x->receive_symbol->s_name);
-    if(x->am_polling)
-        clock_delay(x->x_clock, POLLTIME);
 }
 
 static void cursor_float(t_cursor *x, t_float f)
 {
+    /* "bind all <Motion> only gives data when over windows, so its commented
+     * out. See the cursor_bang function to see the pointer x,y data getting */
     if(f == 0) {
-        // TODO unbind from the global cursor receive symbol
-        pd_unbind(&x->x_obj.ob_pd, cursor_receive_symbol);
-        if (x->am_polling) 
+        if (x->am_polling) {
+            x->am_polling = 0;
             cursor_instances_polling--;
-        x->am_polling = 0;
-        clock_unset(x->x_clock);
-         /* if no more objects are listening, stop sending the events */
-        post("subtract cursor_instances_polling %d", cursor_instances_polling);
-        if (cursor_instances_polling == 0) {
-            sys_gui("::hcs_cursor_class::unbind all <ButtonPress> {::hcs_cursor_class::button %b 1}\n");
-            sys_gui("::hcs_cursor_class::unbind all <ButtonRelease> {::hcs_cursor_class::button %b 0}\n");
-            sys_gui("::hcs_cursor_class::unbind all <MouseWheel> {::hcs_cursor_class::mousewheel %D}\n");
-//            sys_gui("::hcs_cursor_class::unbind all <Motion> {::hcs_cursor_class::motion %x %y}\n");
+            /* if no more objects are listening, stop sending the events */
+            post("cursor_instances_polling-- %d", cursor_instances_polling);
+            if (cursor_instances_polling == 0) {
+                sys_gui("set ::hcs_cursor_class::continue_pollmotion 0 \n");
+                sys_gui("::hcs_cursor_class::unbind all <ButtonPress> {::hcs_cursor_class::button %b 1}\n");
+                sys_gui("::hcs_cursor_class::unbind all <ButtonRelease> {::hcs_cursor_class::button %b 0}\n");
+                sys_gui("::hcs_cursor_class::unbind all <MouseWheel> {::hcs_cursor_class::mousewheel %D}\n");
+            }
+            pd_unbind(&x->x_obj.ob_pd, cursor_receive_symbol);
         }
     } else {
-        // TODO make sure the procs are setup
-        // TODO bind to the global cursor receive symbol
-        pd_bind(&x->x_obj.ob_pd, cursor_receive_symbol);
-        if ( ! x->am_polling) 
+        if ( ! x->am_polling) {
+            x->am_polling = 1;
+            pd_bind(&x->x_obj.ob_pd, cursor_receive_symbol);
             cursor_instances_polling++;
-        x->am_polling = 1;
-        clock_delay(x->x_clock, POLLTIME);
-        /* if this is the first instance to start polling, set up the bind */
-        post("add cursor_instances_polling %d", cursor_instances_polling);
-        if (cursor_instances_polling == 1) {
-            sys_gui("bind all <ButtonPress> {+::hcs_cursor_class::button %b 1}\n");
-            sys_gui("bind all <ButtonRelease> {+::hcs_cursor_class::button %b 0}\n");
-            sys_gui("bind all <MouseWheel> {+::hcs_cursor_class::mousewheel %D}\n");
-//            sys_gui("bind all <Motion>     {+::hcs_cursor_class::motion %x %y}\n");
+            /* if this is the first instance to start, set up Tcl binding and polling */
+            post("cursor_instances_polling++ %d", cursor_instances_polling);
+            if (cursor_instances_polling == 1) {
+                sys_gui("set ::hcs_cursor_class::continue_pollmotion 1 \n");
+                sys_gui("::hcs_cursor_class::pollmotion \n");
+                sys_gui("bind all <ButtonPress> {+::hcs_cursor_class::button %b 1}\n");
+                sys_gui("bind all <ButtonRelease> {+::hcs_cursor_class::button %b 0}\n");
+                sys_gui("bind all <MouseWheel> {+::hcs_cursor_class::mousewheel %D}\n");
+            }
         }
     }
 }
@@ -181,7 +193,7 @@ static void cursor_motion_callback(t_cursor *x, t_float x_position, t_float y_po
     SETFLOAT(output_atoms + 1, y_position);
     outlet_anything(x->data_outlet, motion_symbol, 2, output_atoms);
 }
-
+ 
 static void cursor_mousewheel_callback(t_cursor *x, t_float f)
 {
     t_atom output_atom;
@@ -193,10 +205,6 @@ static void cursor_mousewheel_callback(t_cursor *x, t_float f)
 static void cursor_free(t_cursor *x)
 {
     cursor_float(x, 0);
-    /* TODO free the "bind all" somehow so that the tcl procs aren't
-     * continuing to work even tho no cursor objects are receiving the data */
-    cursor_instance_count--;
-    clock_free(x->x_clock);
 }
 
 static void *cursor_new(void)
@@ -213,9 +221,6 @@ static void *cursor_new(void)
 	//x->status_outlet = outlet_new(&x->x_obj, 0);
 
     x->am_polling = 0;
-    x->x_clock = clock_new(x, (t_method)cursor_bang);
-    
-    cursor_instance_count++;
 
     return(x);
 }
@@ -264,6 +269,7 @@ void cursor_setup(void)
     create_proc_test();
     create_unbind();
     create_motion_proc();
+    create_pollmotion_proc();
     create_mousewheel_proc();
     create_button_proc();
 }
