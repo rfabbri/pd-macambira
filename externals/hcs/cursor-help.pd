@@ -1,12 +1,7 @@
-#N canvas 119 64 638 465 10;
-#X obj 57 348 cursor;
-#X msg 66 323 bang;
-#X text 97 323 get the current mouse position;
-#X obj 338 383 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/cursors.htm
+#N canvas 72 22 659 523 10;
+#X obj 388 293 pddp/pddplink http://tcl.tk/man/tcl8.4/TkCmd/cursors.htm
 ;
-#X text 223 366 Here's a complete list of the available cursors:;
-#X msg 335 124 boat;
-#X msg 295 124 clock;
+#X text 273 276 Here's a complete list of the available cursors:;
 #X msg 441 124 dot;
 #X msg 518 124 gumby;
 #X msg 561 124 gobbler;
@@ -37,45 +32,63 @@
 #X msg 110 120 editmode_nothing;
 #X obj 169 266 cursor;
 #X text 342 238 <-- this is the actual message to send;
-#X obj 48 296 metro 100;
-#X obj 48 274 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
-1;
 #X text 15 18 set your mouse cursors for this patch:;
-#X text 229 398 Here are some pictures of the cursors:;
-#X obj 337 414 pddp/pddplink http://www.lehigh.edu/~sol0/ptk/cursors.gif
+#X text 279 309 Here are some pictures of the cursors:;
+#X obj 387 325 pddp/pddplink http://www.lehigh.edu/~sol0/ptk/cursors.gif
 ;
 #X msg 126 139 editmode_connect;
 #X msg 143 158 editmode_disconnect;
-#X msg 169 239 editmode_disconnect pirate;
+#X msg 169 239 runmode_clickme gumby;
 #X text 290 55 first pick a cursor:;
 #X text 189 80 <-- then choose your cursor mode;
-#X obj 57 396 route x y;
-#X obj 57 371 route motion;
-#X floatatom 44 420 5 0 0 0 x - -;
-#X floatatom 82 420 5 0 0 1 y - -;
-#X obj 25 325 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 46 390 cursor;
+#X msg 55 367 bang;
+#X obj 46 448 route x y;
+#X floatatom 33 472 5 0 0 0 x - -;
+#X floatatom 71 472 5 0 0 1 y - -;
+#X obj 46 342 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X connect 0 0 31 0;
-#X connect 1 0 0 0;
-#X connect 5 0 13 1;
-#X connect 6 0 13 1;
-#X connect 7 0 13 1;
-#X connect 8 0 13 1;
-#X connect 9 0 13 1;
-#X connect 10 0 13 1;
-#X connect 11 0 13 1;
-#X connect 12 0 13 0;
-#X connect 13 0 27 0;
-#X connect 14 0 13 0;
-#X connect 15 0 13 0;
-#X connect 16 0 13 0;
-#X connect 17 0 13 0;
-#X connect 20 0 0 0;
-#X connect 21 0 20 0;
-#X connect 25 0 13 0;
-#X connect 26 0 13 0;
-#X connect 27 0 18 0;
-#X connect 30 0 32 0;
-#X connect 30 1 33 0;
-#X connect 31 0 30 0;
-#X connect 34 0 0 0;
+#X floatatom 135 488 5 0 0 1 mousewheel - -;
+#X obj 46 414 route motion mousewheel button;
+#X text 65 339 turn on to get mouse motion and buttons;
+#X obj 164 440 route 1 2 3;
+#X obj 164 460 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 185 460 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 206 460 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 227 459 <-- mouse buttons;
+#X text 86 366 or bang to get the current mouse position;
+#N canvas 583 22 481 747 image 0;
+#X obj 240 373 ggee/image cursor.gif;
+#X restore 509 309 pd image of all cursors;
+#X msg 328 124 clock;
+#X msg 288 124 arrow;
+#X connect 2 0 8 1;
+#X connect 3 0 8 1;
+#X connect 4 0 8 1;
+#X connect 5 0 8 1;
+#X connect 6 0 8 1;
+#X connect 7 0 8 0;
+#X connect 8 0 20 0;
+#X connect 9 0 8 0;
+#X connect 10 0 8 0;
+#X connect 11 0 8 0;
+#X connect 12 0 8 0;
+#X connect 18 0 8 0;
+#X connect 19 0 8 0;
+#X connect 20 0 13 0;
+#X connect 23 0 30 0;
+#X connect 24 0 23 0;
+#X connect 25 0 26 0;
+#X connect 25 1 27 0;
+#X connect 28 0 23 0;
+#X connect 30 0 25 0;
+#X connect 30 1 29 0;
+#X connect 30 2 32 0;
+#X connect 32 0 33 0;
+#X connect 32 1 34 0;
+#X connect 32 2 35 0;
+#X connect 39 0 8 1;
+#X connect 40 0 8 1;

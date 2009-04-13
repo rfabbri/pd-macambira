@@ -1052,6 +1052,8 @@ hcs_install: hcs
 	install -d $(helpdir)/$(HCS_NAME)
 	install -p $(externals_src)/hcs/*-help.pd \
 		$(helpdir)/$(HCS_NAME)
+	install -p $(externals_src)/hcs/*.gif \
+		$(helpdir)/$(HCS_NAME)
 #	install -d $(manualsdir)/$(HCS_NAME)
 #	install -p $(externals_src)/hcs/README* $(externals_src)/hcs/TODO \
 #		$(manualsdir)/$(HCS_NAME)
