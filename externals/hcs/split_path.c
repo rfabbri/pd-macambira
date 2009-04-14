@@ -13,7 +13,7 @@
 
 static char *version = "$Revision: 1.1 $";
 
-t_int strip_path_instance_count;
+t_int split_path_instance_count;
 
 /* ------------------------ split_path ----------------------------- */
 
@@ -60,12 +60,12 @@ static void *split_path_new()
     t_split_path *x = (t_split_path *)pd_new(split_path_class);
 	x->x_path_outlet = (t_outlet *)outlet_new(&x->x_obj, &s_symbol);
 	x->x_filename_outlet = (t_outlet *)outlet_new(&x->x_obj, &s_symbol);
-	if(!strip_path_instance_count) 
+	if(!split_path_instance_count) 
 	{
-		post("[strip_path] %s",version);  
+		post("[split_path] %s",version);  
 		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
 	}
-	strip_path_instance_count++;
+	split_path_instance_count++;
 	return (x);
 }
 
