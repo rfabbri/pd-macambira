@@ -334,19 +334,26 @@ pddp_install:
 
 #-------------------------------------------------------------------------------
 # pdmtl
-# PDMTL_NAME = pdmtl
-# pdmtl_install:
-#   install -d $(objectsdir)/$(PDMTL_NAME)
-#   svn export --force $(abstractions_src)/pdmtl \
-#       $(objectsdir)/$(PDMTL_NAME)
-#     # mv $(shell find $(objectsdir)/$(PDMTL_NAME)/medias/ -mindepth 2 -type f) $(objectsdir)/$(PDMTL_NAME)/medias/
-#   $(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDMTL_NAME) \
-#       --author "PD Montreal List" \
-#       --license "GNU GPL" \
-#       --description "PD Montreal Abstractions"
-#   install -d $(helpdir)/$(PDMTL_NAME)
-#   install -p $(abstractions_src)/pdmtl/0.info.pd $(abstractions_src)/pdmtl/1.browser.pd \
-#       $(helpdir)/$(PDMTL_NAME)
+PDMTL_NAME = pdmtl
+pdmtl_install:
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDMTL_NAME) \
+		--author "Thomas Fredericks, Alexandre Quessy and 11h11" \
+		--license "GNU GPL" \
+		--description "Pure Data Montreal Abstractions"
+	install -d $(objectsdir)/$(PDMTL_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/$(PDMTL_NAME)/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(PDMTL_NAME)
+	install -d $(objectsdir)/$(PDMTL_NAME)/include
+	install -p $(abstractions_src)/$(PDMTL_NAME)/include/*.pd  \
+		$(objectsdir)/$(PDMTL_NAME)/include
+	install -p $(abstractions_src)/$(PDMTL_NAME)/include/*.py  \
+		$(objectsdir)/$(PDMTL_NAME)/include
+	install -p $(abstractions_src)/$(PDMTL_NAME)/include/*.keys  \
+		$(objectsdir)/$(PDMTL_NAME)/include
+	install -d $(helpdir)/$(PDMTL_NAME)
+	install -p $(abstractions_src)/$(PDMTL_NAME)/*-help.pd \
+		$(helpdir)/$(PDMTL_NAME)
+	install -d $(helpdir)/$(PDMTL_NAME)/medias
 
 #-------------------------------------------------------------------------------
 # pdsvn
