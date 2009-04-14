@@ -38,32 +38,33 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <stdlib.h>
 #ifdef WIN32
-#include <io.h>	/* for 'write' in pute-function only */
-#include <winsock.h>
-#include <winbase.h>
+# include <io.h>	/* for 'write' in pute-function only */
+# include <winsock.h>
+# include <winbase.h>
 #else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <sys/time.h>
-#include <unistd.h>
-#define SOCKET_ERROR -1
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <netinet/tcp.h>
+# include <arpa/inet.h>
+# include <netdb.h>
+# include <sys/time.h>
+# include <unistd.h>
+# define SOCKET_ERROR -1
 #endif
 
 #ifdef _MSC_VER
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
+# pragma warning( disable : 4244 )
+# pragma warning( disable : 4305 )
 #endif
 
 #ifdef WIN32
-#define     sys_closesocket closesocket
-#define     pdogg_strdup(s) _strdup(s)
+# define     sys_closesocket closesocket
+# define     pdogg_strdup(s) _strdup(s)
 #else
-#define     sys_closesocket close
-#define     pdogg_strdup(s) strdup(s)
+# define     sys_closesocket close
+# define     pdogg_strdup(s) strdup(s)
 #endif
 
 /************************* oggcast~ object ******************************/
