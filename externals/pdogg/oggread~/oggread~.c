@@ -317,6 +317,9 @@ static void oggread_open(t_oggread *x, t_symbol *filename)
 			post("oggread~: error: could not open \"%s\" as an OggVorbis file", filename->s_name);
 			ov_clear(&x->x_ov);
 			post("oggread~: file closed due to error");
+      x->x_fd=-1;
+      x->x_eos=1;
+      return;
 		}
 
 			/* print details about each logical bitstream in the input */
@@ -328,7 +331,7 @@ static void oggread_open(t_oggread *x, t_symbol *filename)
 		}
 		else
 		{
-			post("oggread~: file \"%s\" was not seekable"
+			post("oggread~: file \"%s\" was not seekable\n"
 			"oggread~: first logical bitstream information:", filename->s_name);
 		}
 
