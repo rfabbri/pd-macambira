@@ -25,7 +25,7 @@ say file "Fichier"
   say canvasclose "Fermer"
   say canvasquit "Quitter"
   
-say edit "édition"
+say edit "Édition"
   say undo "Défaire"
   say redo "Refaire"
   say cut "Couper"
