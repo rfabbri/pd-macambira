@@ -1,5 +1,0 @@
-echo $1@pure-data.cvs.sourceforge.net:/cvsroot/pure-data > CVS/Root
-for file in $(find -name Root)
-do
-  cp CVS/Root $file
-done
