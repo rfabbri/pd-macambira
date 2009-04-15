@@ -47,7 +47,7 @@ package require poe
 if {$tk} {package require bgerror}
 
 catch {package require Tclx}
-#if {[catch {source /home/matju/src/pd-desiredata/pd/src/profile_dd.tcl}]} {error_dump}
+#if {[catch {source /home/matju/src/svn-pd/desiredata/src/profile_dd.tcl}]} {error_dump}
 if {[file exists debug.tcl]} {source debug.tcl}
 
 proc which {file} {
@@ -209,8 +209,8 @@ if {$have_expand} {
   def Observable changed              {args} {foreach x $@subscribers {$x notice   $self {expand}$args}}
   def Observable child_changed {origin args} {foreach x $@subscribers {$x notice $origin {expand}$args}}
 } else {
-  def Observable changed              {args} {foreach x $@subscribers {eval [concat [list $x notice   $self] $args]}}
-  def Observable child_changed {origin args} {foreach x $@subscribers {eval [concat [list $x notice $origin] $args]}}
+  def Observable changed              {args} {foreach x $@subscribers {$x notice   $self {*}$args}}
+  def Observable child_changed {origin args} {foreach x $@subscribers {$x notice $origin {*}$args}}
 }
 def Observable subscribers {} {return $@subscribers}
 
@@ -763,7 +763,7 @@ set langfile locale/[switch -regexp -- $language {
   ^(pl|polski)$       {set encoding utf-8; list polski}
   ^(dk|dansk)$        {list dansk}
   ^(ja|japanese|nihongo)$ {list nihongo}
-  ^(br|brasiliano)$   {list brasiliano}
+  ^(br|brasiliano|brasileiro)$ {list brasiliano}
   ^(tr|turkce)$       {set encoding utf-8; list turkce}
   ^(nl|nederlands)$   {list nederlands}
   ^(ru|russkij)$      {set encoding utf-8; list russkij}
@@ -1138,9 +1138,8 @@ set image_filetypes {
 	{"all files" "*"}
 }
 
-#only works with tcltk 8.5
-catch {tk_getOpenFile -load-once}
-if {$tcl_version>=8.5} {
+catch {tk_getOpenFile -load-once} ;#only works with tcltk 8.5
+catch {
 	set ::tk::dialog::file::showHiddenBtn 1
 	set ::tk::dialog::file::showHiddenVar 0
 }
@@ -1348,25 +1347,14 @@ set item {
 	lappend tags $self
 	set tags [concat $tags [$self classtags]]
 }
-if {$have_expand} {
-    append item {
+append item [correct_splat {
 	if {![llength [$c gettags $ss]]} {
-		$c create $type $coords -tags $tags {expand}$args
+		$c create $type $coords -tags $tags {*}$args
 	} {
-		$c itemconfigure $ss {expand}$args
-		$c coords        $ss {expand}$coords
+		$c itemconfigure $ss {*}$args
+		$c coords        $ss {*}$coords
 	}
-    }
-} else {
-    append item {
-	if {![llength [$c gettags $ss]]} {
-		eval [concat [list $c create $type $coords -tags $tags] $args]
-	} {
-		eval [concat [list $c itemconfigure $ss] $args]
-		eval [concat [list $c coords        $ss] $coords]
-	}
-    }
-}
+}]
 def View item {suffixes type coords args} $item
 
 def View item_delete {{suffix all}} {
