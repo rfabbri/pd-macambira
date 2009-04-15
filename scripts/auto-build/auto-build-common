@@ -39,10 +39,12 @@ fi
 # cygwin/Mingw don't have 'mail', but do have 'email' which is close enough.
 # To get around the troubles with mail servers, we'll contact the SMTP server
 # of the mailing lists directly (mail.iem.at).
-if [ -x `which email` ]; then
-	MAIL_COMMAND="email --smtp-server mail.iem.at"
+if [ -x /usr/bin/mail ]; then
+	MAIL_COMMAND=/usr/bin/mail
+elif [ -x /bin/mail ]; then
+	MAIL_COMMAND=/bin/mail
 else
-	MAIL_COMMAND=mail
+	MAIL_COMMAND="email --smtp-server mail.iem.at"
 fi
 
 
