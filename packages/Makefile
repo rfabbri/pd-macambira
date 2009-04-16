@@ -350,6 +350,9 @@ endif
 ifeq ($(OS_NAME),windows)
 	echo "<p>To make sure that all of the included libraries are loaded when Pd runs, " >> $(README_FILE)
 	echo "double-click <code>C:\Program Files\pd\pd-settings.reg</code> to import the settings to the registry.  WARNING: this will overwrite any existing Pd preferences!</p>" >> $(README_FILE)
+	echo "<h3>ASIO4ALL</h3>" >> $(README_FILE)	
+	echo "<p><a href=\"http://www.asio4all.com/\" target=\"_blank\">ASIO4ALL</a> is a cost-free <a href=\"http://en.wikipedia.org/wiki/Audio_Stream_Input/Output\" target=\"_blank\">ASIO</a> audio driver.  Is it highly recommended for use with Pd.  Download and install it, then when you launch Pd, choose the <strong>ASIO</strong> option from the <strong>Media</strong> menu.  Using ASIO4ALL should mean less crashes and troubles, as well as better audio performance." >> $(README_FILE)
+	echo "</p>" >> $(README_FILE)
 endif
 	echo "<h3>Installing Externals, Objects, and Help files</h3>" >> $(README_FILE)
 	echo "<p>" >> $(README_FILE)
