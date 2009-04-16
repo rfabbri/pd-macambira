@@ -1962,6 +1962,10 @@ def Canvas bind {eventtype selector args} {
 	}
 }
 
+def Canvas osx_scroll {axis diff} {
+		$self scroll $axis [expr -abs($diff)/%diff]
+}
+
 def Canvas new_binds {} {
     # mouse buttons
     $self bind <Button>                   click_wrap %x %y %b 0
@@ -1987,8 +1991,8 @@ def Canvas new_binds {} {
 	$self bind <Shift-Button-4> scroll x -1
     	$self bind <Shift-Button-5> scroll x +1
     } default {
-	$self bind <MouseWheel>       scroll y \[expr -abs(%D)/%D\]
-	$self bind <Shift-MouseWheel> scroll x \[expr -abs(%D)/%D\]
+	$self bind <MouseWheel>       scroll y %D
+	$self bind <Shift-MouseWheel> scroll x %D
     }}
     $self bind <ButtonRelease>     	 unclick_wrap %x %y %b 0
     $self bind <Shift-ButtonRelease>     unclick_wrap %x %y %b 1
