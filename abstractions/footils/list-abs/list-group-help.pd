@@ -16,6 +16,7 @@
 buffer;
 #X text 233 287 argument sets number of elements to group;
 #X text 63 373 It's a clone of [zl group];
+#X text 30 12 DON'T USE YET - STILL BUGGY!!!!!;
 #X connect 0 0 6 0;
 #X connect 1 0 6 0;
 #X connect 3 0 6 1;
