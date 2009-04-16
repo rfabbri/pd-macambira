@@ -371,7 +371,7 @@ ifeq ($(OS_NAME),windows)
 	echo "<dt>Only for the current user account</dt>" >> $(README_FILE)
 	echo "<dd><a href=\"file:///%UserProfile%/Application%20Data\">%UserProfile%\Application Data\Pd</a></dd>" >> $(README_FILE)
 	echo "<dt>For all user accounts on the computer</dt>" >> $(README_FILE)
-	echo "<dd><a href=\"file:///%ProgramFiles%/Common%20Files/\">%ProgramFiles%\Common Files\Pd</a></dd>" >> $(README_FILE)
+	echo "<dd><a href=\"file:///%CommonProgramFiles%/\">%ProgramFiles%\Common Files\Pd</a></dd>" >> $(README_FILE)
 endif
 ifeq ($(OS_NAME),darwin)
 endif
