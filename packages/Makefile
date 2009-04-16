@@ -373,12 +373,6 @@ ifeq ($(OS_NAME),windows)
 	echo "<dt>For all user accounts on the computer</dt>" >> $(README_FILE)
 	echo "<dd><a href=\"file:///%CommonProgramFiles%/\">%ProgramFiles%\Common Files\Pd</a></dd>" >> $(README_FILE)
 endif
-ifeq ($(OS_NAME),darwin)
-endif
-ifeq ($(OS_NAME),linux)
-endif
-ifeq ($(OS_NAME),windows)
-endif
 	echo "</dl>" >> $(README_FILE)
 	echo "</p>" >> $(README_FILE)
 	echo "<h3>License</h3>" >> $(README_FILE)	
