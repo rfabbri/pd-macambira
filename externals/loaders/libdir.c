@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
+/* this object requires Pd 0.40.3 or later */
+
 /* WARNING: KLUDGE!  */
 /*
  * this struct is not publically defined (its in g_canvas.c) so I need to
@@ -39,9 +41,8 @@ static char *version = "$Revision: 1.8 $";
 static int libdir_loader(t_canvas *canvas, char *classname)
 {
     int fd = -1;
-    unsigned int i;
     char helppathname[FILENAME_MAX];
-    char fullclassname[FILENAME_MAX], dirbuf[FILENAME_MAX], pathbuf[FILENAME_MAX];
+    char fullclassname[FILENAME_MAX], dirbuf[FILENAME_MAX];
     char *nameptr;
     t_canvasenvironment *canvasenvironment;
 
@@ -53,7 +54,6 @@ static int libdir_loader(t_canvas *canvas, char *classname)
     
     /* if this is being called from a canvas, then add the library path to the
      * canvas-local path */
-#if (PD_MINOR_VERSION >= 40)
     if(canvas) 
     {
         canvasenvironment = canvas_getenv(canvas);
@@ -64,12 +64,14 @@ static int libdir_loader(t_canvas *canvas, char *classname)
             return (0);
         }
         close(fd);
+        if(! sys_isabsolutepath(dirbuf))
         canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path, 
                                                      dirbuf, 0);
-        post("libdir_loader: added '%s' to the canvas-local objectclass path", classname);
+        if(sys_verbose)
+            post("libdir_loader: added '%s' to the canvas-local objectclass path",
+                 classname);
     }
     else
-#endif
     {
         if ((fd = open_via_path(".", fullclassname, ".pd",
                                 dirbuf, &nameptr, FILENAME_MAX, 0)) < 0) 
@@ -83,7 +85,8 @@ static int libdir_loader(t_canvas *canvas, char *classname)
         strcat(helppathname, "/doc/5.reference/");
         strcat(helppathname, classname);
         sys_helppath = namelist_append(sys_helppath, helppathname, 0);
-        post("libdir_loader: added '%s' to the global objectclass path", classname);
+        post("libdir_loader: added '%s' to the global objectclass path", 
+             classname);
 //        post("\tThis is deprecated behavior.");
     }
     /* post("libdir_loader loaded fullclassname: '%s'\n", fullclassname); */
@@ -96,12 +99,7 @@ static int libdir_loader(t_canvas *canvas, char *classname)
 void libdir_setup(void)
 {
 /* relies on t.grill's loader functionality, fully added in 0.40 */
-#if (PD_MINOR_VERSION >= 40)
     sys_register_loader(libdir_loader);
-#else
-    error("ERROR: to function, libdir needs to be compiled against Pd 0.40 or higher,\n");
-    post("\tor a version that has sys_register_loader()");
-#endif
     post("libdir loader %s",version);  
     post("\tcompiled on "__DATE__" at "__TIME__ " ");
     post("\tcompiled against Pd version %d.%d.%d.%s", PD_MAJOR_VERSION, 
