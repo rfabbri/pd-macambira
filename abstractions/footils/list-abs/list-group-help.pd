@@ -1,0 +1,26 @@
+#N canvas 311 152 696 459 10;
+#X msg 118 117 list a b;
+#X msg 132 142 list c d e f;
+#X obj 118 316 print group;
+#X msg 199 245 3;
+#X msg 152 195 list a b c d e;
+#X msg 152 216 list f g;
+#X obj 118 288 list-group 2;
+#X text 55 45 list-group - group items into lists of the same size
+;
+#X text 150 171 remaining items are stored and used for the next group:
+;
+#X floatatom 209 265 5 0 0 0 - - -;
+#X floatatom 73 250 5 0 0 0 - - -;
+#X text 257 240 change group size - changing will also empty the internal
+buffer;
+#X text 233 287 argument sets number of elements to group;
+#X text 63 373 It's a clone of [zl group];
+#X connect 0 0 6 0;
+#X connect 1 0 6 0;
+#X connect 3 0 6 1;
+#X connect 4 0 6 0;
+#X connect 5 0 6 0;
+#X connect 6 0 2 0;
+#X connect 9 0 6 1;
+#X connect 10 0 6 0;
