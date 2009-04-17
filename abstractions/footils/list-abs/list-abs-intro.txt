@@ -28,6 +28,7 @@ list-idx -  Get element at position idx.
 list-insert -  insert LIST before element at position POS
 list-inter -  elementwise linear interpolation between
 list-inter-many -  Elementwise linear interpolation between several float lists
+list-iter - group lists into sub-lists with size-limit
 list-l2s -  Concatenate a list into a single symbol using ARG1 as delimiter
 list-lastx -  make a list of the last x floats.
 list-len -  calculate length of a list (use [list length] if available)

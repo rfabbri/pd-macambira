@@ -10,12 +10,15 @@
 ;
 #X floatatom 209 245 5 0 0 0 - - -;
 #X floatatom 73 230 5 0 0 0 - - -;
-#X text 257 220 change group size - changing will also empty the internal
-buffer;
-#X text 233 267 argument sets number of elements to group;
 #X text 63 353 It's a clone of [zl group];
 #X obj 118 296 print list-group;
+#X text 233 267 argument sets number of elements to group (default:
+1);
+#X text 257 220 change group size (at least 1) - changing will also
+empty the internal buffer;
 #X obj 118 268 list-group 2;
+#X text 94 382 Also see;
+#X obj 161 382 list-iter;
 #X connect 0 0 13 0;
 #X connect 1 0 13 0;
 #X connect 2 0 13 1;
@@ -23,4 +26,4 @@ buffer;
 #X connect 4 0 13 0;
 #X connect 7 0 13 1;
 #X connect 8 0 13 0;
-#X connect 13 0 12 0;
+#X connect 13 0 10 0;
