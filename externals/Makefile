@@ -1393,6 +1393,8 @@ iemlib_install: iemlib
 	install -p $(externals_src)/iemlib/*.pdf $(externals_src)/iemlib/*.txt \
 		$(externals_src)/iemlib/iemabs/*.txt \
 		$(manualsdir)/$(IEMLIB_NAME)
+# kludge to get a single working output~ straight in 'extra'
+	-rm -f -- $(objectsdir)/$(IEMLIB_NAME)/output~.pd
 
 
 iemlib_clean: 
