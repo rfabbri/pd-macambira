@@ -694,6 +694,7 @@ void *captureImages(void *threadArgs) {
 		// Send bang out 2nd outlet for each iteration.
 		sys_lock();
 		outlet_bang(((gphoto_gimme_struct *)threadArgs)->gphoto->doneOutlet);
+		outlet_float(((gphoto_gimme_struct *)threadArgs)->gphoto->x_obj.ob_outlet, count);
 		sys_unlock();
 
 		sleep(sleepTime);
