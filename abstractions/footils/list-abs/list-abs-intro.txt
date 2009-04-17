@@ -21,7 +21,7 @@ list-fifo-delim -  This object is obsolete! Use [list-fifo] instead!
 list-fifo -  stores incoming (list-)messages
 list-filter -  filter out list elemnent by a condition
 list-find -  Find position(s) of a value in a list.
-list-group - group items into lists of the same size DON'T USE YET STILL BUGGY!!!
+list-group - group items into lists of the same size
 list-geometric-mean -  Calculates the geometric mean of a list (of floats)
 list-harmonic-mean -  Calculates the harmonic mean of a list (of floats)
 list-idx -  Get element at position idx.
