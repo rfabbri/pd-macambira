@@ -31,6 +31,9 @@ Name: libs; Description: Reset Libraries and Paths
 [INI]
 Filename: {app}\pd.url; Section: InternetShortcut; Key: URL; String: http://puredata.info
 Filename: {app}\asio4all.url; Section: InternetShortcut; Key: URL; String: http://asio4all.com
+Filename: {app}\puredata.url; Section: InternetShortcut; Key: URL; String: http://en.flossmanuals.net/puredata
+Filename: {app}\techniques.url; Section: InternetShortcut; Key: URL; String: http://crca.ucsd.edu/~msp/techniques.htm
+Filename: {app}\pd-tutorial.url; Section: InternetShortcut; Key: URL; String: http://www.pd-tutorial.com/
 
 [Icons]
 Name: {group}\Pd-extended; Filename: {app}\bin\pd.exe; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
@@ -41,8 +44,9 @@ Name: {userdesktop}\Pd-extended; Filename: {app}\bin\pd.exe; Tasks: desktopicon;
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Pd-extended; Filename: {app}\bin\pd.exe; Tasks: quicklaunchicon; WorkingDir: {app}; IconFilename: {app}\lib\pd.ico; IconIndex: 0
 Name: {group}\Documentation\Pd Manual; Filename: {app}\doc\1.manual\index.htm
 Name: {group}\Documentation\Pd Drums Tutorial; Filename: {app}\doc\tutorials\footils\pddrums\pddrums.html
-Name: {group}\Documentation\Gem Manual; Filename: {app}\doc\gem\00.manual\index.html
-Name: {group}\Documentation\Gem Primer; Filename: {app}\doc\gem\GemPrimer.pdf
+Name: {group}\Documentation\Pure Data FLOSSmanual; Filename: {app}\puredata.url
+Name: {group}\Documentation\Programming Electronic Music in Pd; Filename: {app}\pd-tutorial.url
+Name: {group}\Documentation\Theory and Techniques of Electronic Music; Filename: {app}\techniques.url
 ;-----------------------------------------------------------------------------
 ; GRIPD
 #ifexist "build\gripd\gripd.exe"
