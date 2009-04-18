@@ -110,7 +110,7 @@ btn_8 btn_9;
 the output of axis data. Move each element of the device thru its full
 range to calibrate it.;
 #X obj 335 215 unpack s f;
-#X obj 407 375 pddp/pddplink ../all_about_hid_mapping.pd -text all_about_hid_mapping;
+
 #X text 422 177 (remember to calibrate all parts;
 #X text 430 190 of the joystick first);
 #X msg 394 120 print;

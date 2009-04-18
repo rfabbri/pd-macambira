@@ -9,7 +9,7 @@
 #X floatatom 101 199 5 0 0 0 - - -;
 #X floatatom 101 255 5 0 0 0 - - -;
 #X text 98 312 For more info:;
-#X obj 202 310 pddp/pddplink ../all_about_hid_mapping.pd -text all_about_hid_mapping;
+
 #X obj 101 225 hid/hid_lowpass;
 #X obj 193 198 hsl 75 18 1 100 1 1 empty empty refresh(Hz) 4 9 1 12
 -228992 -1 -1 3700 0;

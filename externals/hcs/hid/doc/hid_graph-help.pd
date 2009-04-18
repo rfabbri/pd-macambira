@@ -7,7 +7,7 @@
 ;
 #X text 244 424 released under the GNU GPL;
 #X text 98 381 For more info:;
-#X obj 202 379 pddp/pddplink ../all_about_hid_mapping.pd -text all_about_hid_mapping;
+
 #X msg 19 150 reset;
 #X floatatom 95 163 5 0 0 0 - - -;
 #X floatatom 94 314 5 0 0 0 - - -;

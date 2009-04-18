@@ -6,7 +6,7 @@
 #X floatatom 101 195 5 0 0 0 - - -;
 #X floatatom 101 251 5 0 0 0 - - -;
 #X text 98 303 For more info:;
-#X obj 202 301 pddp/pddplink ../all_about_hid_mapping.pd -text all_about_hid_mapping;
+
 #X obj 193 194 hsl 85 18 0.1 10 1 1 empty empty average_count 0 9 1
 12 -228992 -1 -1 3500 0;
 #X floatatom 189 223 5 0 0 0 - - -;
