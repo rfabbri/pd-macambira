@@ -266,7 +266,10 @@ noncvs_install:
 	-install -p $(packages_src)/noncvs/$(OS_NAME)/bin/*.* $(bindir)
 	-install -p $(packages_src)/noncvs/$(OS_NAME)/doc/5.reference/*.* $(helpdir)
 	-install -p $(packages_src)/noncvs/$(OS_NAME)/extra/*.* $(objectsdir)
-	-install -p $(packages_src)/noncvs/$(OS_NAME)/extra/Gem/*.* $(objectsdir)/Gem
+ifeq ($(OS_NAME),windows)
+	-install -p $(packages_src)/noncvs/windows/extra/Gem/*.* \
+		$(objectsdir)/$(GEM_NAME)/
+endif
 	-test -d $(packages_src)/noncvs/$(OS_NAME)/gripd && \
 		install -d $(DESTDIR)$(prefix)/gripd
 	-install -p $(packages_src)/noncvs/$(OS_NAME)/gripd/*.* \
