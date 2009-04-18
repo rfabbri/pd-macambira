@@ -1,20 +1,20 @@
-#N canvas 56 46 659 461 10;
-#X symbolatom 211 268 6 0 0 1 code - -;
-#X obj 130 106 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
+#N canvas 163 22 660 430 10;
+#X symbolatom 211 280 6 0 0 1 code - -;
+#X obj 130 118 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
 1;
-#X floatatom 339 268 5 0 0 1 value - -;
-#X floatatom 140 268 5 0 0 3 wheel - -;
-#X floatatom 85 268 7 0 0 3 Y - -;
-#X floatatom 31 268 7 0 0 3 X - -;
-#X obj 193 335 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X floatatom 339 280 5 0 0 1 value - -;
+#X floatatom 140 280 5 0 0 3 wheel - -;
+#X floatatom 85 280 7 0 0 3 Y - -;
+#X floatatom 31 280 7 0 0 3 X - -;
+#X obj 193 347 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 232 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 1
+#X obj 232 346 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 271 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 271 346 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X msg 175 83 open 0;
-#X msg 180 102 open 1;
-#X msg 185 121 open 2;
+#X msg 175 95 open 0;
+#X msg 180 114 open 1;
+#X msg 185 133 open 2;
 #N canvas 94 191 532 519 mouse-noise 0;
 #X obj 26 18 inlet;
 #X obj 199 314 noise~;
@@ -24,7 +24,6 @@
 #X obj 139 488 dac~;
 #X obj 386 13 inlet;
 #X text 448 14 open msgs;
-#X obj 132 149 hid/mouse \$1;
 #X text 340 169 get button value only;
 #X obj 199 336 *~;
 #X obj 312 207 / 2;
@@ -53,115 +52,111 @@
 #X text 11 224 mute on finish;
 #X obj 26 43 trigger float float bang;
 #X obj 312 318 float;
-#X connect 0 0 35 0;
-#X connect 1 0 10 0;
+#X obj 132 149 hid/mouse;
+#X connect 0 0 34 0;
+#X connect 1 0 9 0;
 #X connect 2 0 3 1;
-#X connect 3 0 12 0;
-#X connect 6 0 8 0;
-#X connect 8 0 20 0;
-#X connect 8 1 27 0;
-#X connect 8 2 24 0;
-#X connect 8 3 18 0;
-#X connect 10 0 3 1;
-#X connect 11 0 10 1;
-#X connect 12 0 5 0;
-#X connect 12 1 5 1;
-#X connect 13 0 12 1;
-#X connect 14 0 13 0;
-#X connect 15 0 22 0;
-#X connect 16 0 15 1;
-#X connect 16 0 36 1;
-#X connect 17 0 29 0;
-#X connect 18 1 11 0;
-#X connect 19 0 3 0;
-#X connect 20 0 19 0;
-#X connect 21 0 2 0;
-#X connect 22 0 23 0;
-#X connect 23 0 25 0;
-#X connect 23 0 36 0;
-#X connect 24 0 15 0;
-#X connect 25 0 14 0;
-#X connect 26 0 21 0;
-#X connect 27 0 28 0;
-#X connect 28 0 17 0;
-#X connect 29 0 26 0;
-#X connect 30 0 31 0;
-#X connect 31 0 12 1;
-#X connect 32 0 33 0;
-#X connect 33 0 20 0;
-#X connect 35 0 32 0;
-#X connect 35 1 8 0;
-#X connect 35 2 4 0;
-#X connect 36 0 15 1;
-#X restore 407 176 pd mouse-noise 1;
-#X obj 407 119 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
+#X connect 3 0 11 0;
+#X connect 6 0 36 0;
+#X connect 9 0 3 1;
+#X connect 10 0 9 1;
+#X connect 11 0 5 0;
+#X connect 11 1 5 1;
+#X connect 12 0 11 1;
+#X connect 13 0 12 0;
+#X connect 14 0 21 0;
+#X connect 15 0 14 1;
+#X connect 15 0 35 1;
+#X connect 16 0 28 0;
+#X connect 17 1 10 0;
+#X connect 18 0 3 0;
+#X connect 19 0 18 0;
+#X connect 20 0 2 0;
+#X connect 21 0 22 0;
+#X connect 22 0 24 0;
+#X connect 22 0 35 0;
+#X connect 23 0 14 0;
+#X connect 24 0 13 0;
+#X connect 25 0 20 0;
+#X connect 26 0 27 0;
+#X connect 27 0 16 0;
+#X connect 28 0 25 0;
+#X connect 29 0 30 0;
+#X connect 30 0 11 1;
+#X connect 31 0 32 0;
+#X connect 32 0 19 0;
+#X connect 34 0 31 0;
+#X connect 34 1 36 0;
+#X connect 34 2 4 0;
+#X connect 35 0 14 1;
+#X connect 36 0 19 0;
+#X connect 36 1 26 0;
+#X connect 36 2 23 0;
+#X connect 36 3 17 0;
+#X restore 407 188 pd mouse-noise;
+#X obj 407 131 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
 1;
-#X text 354 95 turn this on to make some noise with the mouse;
-#X obj 211 241 unpack symbol float;
-#X text 282 284 buttons;
-#X obj 310 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X text 354 107 turn this on to make some noise with the mouse;
+#X obj 211 253 unpack symbol float;
+#X text 282 296 buttons;
+#X obj 310 346 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 349 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 349 346 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 388 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 388 346 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 427 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 427 346 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 466 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 466 346 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
 #X obj 2 2 cnv 15 650 20 empty empty mouse 2 11 1 18 -233017 -66577
 0;
-#X obj 505 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 505 346 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X text 11 422 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X obj 496 396 pddp/pddplink ../all_about_hid.pd -text all_about_hid
 ;
-#X text 228 436 released under the GNU GPL;
-#X text 424 436 $Author: eighthave $;
-#X text 424 423 $Revision: 1.13 $;
-#X obj 466 382 pddp/pddplink ../all_about_hid.pd -text all_about_hid
-;
-#X text 357 383 For more info:;
-#X obj 544 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X text 387 397 For more info:;
+#X obj 544 346 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 193 314 route btn_0 btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7
+#X obj 193 326 route btn_0 btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7
 btn_8;
 #X text 12 36 Use a mouse device with Pd. This object auto-calibrates
 the output of axis data. Move the device around as fast as possible
 in each axis to calibrate it.;
-#X text 13 111 turn on polling:;
-#X msg 180 146 refresh;
-#X obj 130 171 hid/mouse 0;
+#X text 13 123 turn on polling:;
+#X msg 180 158 refresh;
 #X obj 619 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
 ;
-#X msg 500 148 open \$1;
-#X obj 500 128 hradio 15 1 1 8 \$0-device-number empty choose_a_device
-0 -6 1 9 -262144 -1 -1 6;
-#X obj 474 128 nbx 1 14 -1e+37 1e+37 0 0 empty \$0-device-number empty
-0 -6 0 14 -166441 -1 -1 6 256;
-#X msg 76 142 print;
-#X connect 1 0 35 0;
-#X connect 9 0 35 0;
-#X connect 10 0 35 0;
-#X connect 11 0 35 0;
+#X msg 500 160 open \$1;
+#X obj 500 140 hradio 15 1 1 8 \$0-device-number empty choose_a_device
+0 -6 1 9 -262144 -1 -1 1;
+#X obj 474 140 nbx 1 14 -1e+37 1e+37 0 0 empty \$0-device-number empty
+0 -6 0 14 -166441 -1 -1 1 256;
+#X msg 76 154 print;
+#X obj 130 183 hid/mouse 1;
+#X connect 1 0 36 0;
+#X connect 9 0 36 0;
+#X connect 10 0 36 0;
+#X connect 11 0 36 0;
 #X connect 13 0 12 0;
 #X connect 15 0 0 0;
 #X connect 15 1 2 0;
-#X connect 31 0 6 0;
-#X connect 31 1 7 0;
-#X connect 31 2 8 0;
-#X connect 31 3 17 0;
-#X connect 31 4 18 0;
-#X connect 31 5 19 0;
-#X connect 31 6 20 0;
-#X connect 31 7 21 0;
-#X connect 31 8 23 0;
-#X connect 31 9 30 0;
-#X connect 34 0 35 0;
-#X connect 35 0 5 0;
-#X connect 35 1 4 0;
-#X connect 35 2 3 0;
-#X connect 35 3 15 0;
-#X connect 35 3 31 0;
-#X connect 37 0 12 1;
-#X connect 38 0 37 0;
-#X connect 40 0 35 0;
+#X connect 27 0 6 0;
+#X connect 27 1 7 0;
+#X connect 27 2 8 0;
+#X connect 27 3 17 0;
+#X connect 27 4 18 0;
+#X connect 27 5 19 0;
+#X connect 27 6 20 0;
+#X connect 27 7 21 0;
+#X connect 27 8 23 0;
+#X connect 27 9 26 0;
+#X connect 30 0 36 0;
+#X connect 32 0 12 1;
+#X connect 33 0 32 0;
+#X connect 35 0 36 0;
+#X connect 36 0 5 0;
+#X connect 36 1 4 0;
+#X connect 36 2 3 0;
+#X connect 36 3 15 0;
+#X connect 36 3 27 0;
