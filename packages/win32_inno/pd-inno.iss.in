@@ -14,7 +14,7 @@ AppSupportURL=http://puredata.org/community/lists/
 AppUpdatesURL=http://puredata.org/downloads/
 DefaultDirName={pf}\pd
 DefaultGroupName=Pd-extended
-LicenseFile=..\..\externals\maxlib\LICENSE
+LicenseFile=..\gpl-3.0.txt
 
 Compression=lzma/ultra
 ChangesAssociations=true
@@ -29,11 +29,13 @@ Name: fileassociations; Description: Reset File Associations
 Name: libs; Description: Reset Libraries and Paths
 
 [INI]
-Filename: {app}\pd.url; Section: InternetShortcut; Key: URL; String: http://puredata.org
+Filename: {app}\pd.url; Section: InternetShortcut; Key: URL; String: http://puredata.info
+Filename: {app}\asio4all.url; Section: InternetShortcut; Key: URL; String: http://asio4all.com
 
 [Icons]
 Name: {group}\Pd-extended; Filename: {app}\bin\pd.exe; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
 Name: {group}\puredata.org; Filename: {app}\pd.url
+Name: {group}\ASIO4ALL; Filename: {app}\asio4all.url
 Name: {group}\Uninstall Pd-extended; Filename: {uninstallexe}
 Name: {userdesktop}\Pd-extended; Filename: {app}\bin\pd.exe; Tasks: desktopicon; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Pd-extended; Filename: {app}\bin\pd.exe; Tasks: quicklaunchicon; WorkingDir: {app}; IconFilename: {app}\lib\pd.ico; IconIndex: 0
@@ -51,9 +53,11 @@ Name: {group}\GrIPD; Filename: {app}\gripd\gripd.exe
 ;[Run]
 ; NOTE: The following entry contains an English phrase ("Launch"). You are free to translate it into another language if required.
 ;Filename: {app}\bin\pd.exe; Description: Launch Pd-extended; Flags: nowait postinstall skipifsilent
+Filename: {app}\asio4all.url; Description: open ASIO4ALL website; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
 Type: files; Name: {app}\pd.url
+Type: files; Name: {app}\asio4all.url
 
 [Registry]
 Root: HKCR; SubKey: Pure.Data; ValueType: dword; ValueName: EditFlags; ValueData: $00000000; Flags: noerror uninsdeletekey; Tasks: fileassociations
