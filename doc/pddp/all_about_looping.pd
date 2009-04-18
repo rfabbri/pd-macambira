@@ -1,32 +1,32 @@
-#N canvas 255 95 868 635 10;
-#X text 460 79 looping objects:;
-#X obj 462 101 until;
-#X obj 520 101 loop;
-#X obj 437 504 susloop~;
-#X obj 506 504 loop~;
-#X text 434 483 for looping samples:;
-#X obj 0 2 cnv 15 850 20 empty empty all_about_looping 20 10 1 18 -233017
+#N canvas 35 22 757 548 10;
+#X text 440 49 looping objects:;
+#X obj 442 71 until;
+#X obj 500 71 loop;
+#X obj 417 474 susloop~;
+#X obj 486 474 loop~;
+#X text 414 453 for looping samples:;
+#X obj 0 2 cnv 15 750 20 empty empty all_about_looping 20 10 1 18 -233017
 -66577 0;
-#X obj 816 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
-#X obj 461 127 counter;
-#X obj 519 127 gem_counter;
-#X obj 604 127 cxc.counter;
-#X obj 442 551 pdp_loop;
-#X obj 513 551 pdp_qtloop~;
-#X obj 551 504 loopsampler;
-#X obj 429 424 test-loop~;
-#X obj 695 126 for++;
-#X obj 90 167 +;
-#X floatatom 119 170 5 0 0 0 - - -;
-#X msg 89 138 1;
-#X obj 169 186 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 716 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+;
+#X obj 441 97 counter;
+#X obj 499 97 gem_counter;
+#X obj 584 97 cxc.counter;
+#X obj 422 521 pdp_loop;
+#X obj 493 521 pdp_qtloop~;
+#X obj 531 474 loopsampler;
+#X obj 675 96 for++;
+#X obj 82 167 +;
+#X floatatom 111 170 5 0 0 0 - - -;
+#X msg 81 138 1;
+#X obj 161 186 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 128 138 0;
-#X obj 90 209 t f f;
-#X text 214 302 X;
-#X text 76 306 Y;
-#X obj 60 289 t b f;
-#N canvas 0 22 450 300 graph2 0;
+#X msg 120 138 0;
+#X obj 82 209 t f f;
+#X text 206 302 X;
+#X text 68 306 Y;
+#X obj 52 289 t b f;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array \$0-array 100 float 1;
 #A 0 0 0.946674 0.967388 0.983095 0.993714 0.999191 0.999497 0.99463
 0.984615 0.969505 0.949378 0.924337 0.894513 0.860059 0.821154 0.778
@@ -46,77 +46,73 @@
 0.000796274 0.000796274 0.000796274;
 #X coords 0 1 99 -1 300 100 1;
 #X restore 82 405 graph;
-#X obj 90 314 tabwrite \$0-array;
-#X obj 90 186 moses 100;
-#X obj 89 111 bng 20 250 50 0 empty empty start 0 -6 1 10 -4033 -1
+#X obj 82 314 tabwrite \$0-array;
+#X obj 82 186 moses 100;
+#X obj 81 111 bng 20 250 50 0 empty empty start 0 -6 1 10 -4033 -1
 -1;
-#X text 166 166 <-- counter;
-#X text 188 186 <-- split at array size to stop;
-#X text 216 199 and reset counter to 0;
-#X text 57 336 ^--bang for next step;
-#X obj 60 249 expr abs(cos( min (1.57 \, ($f1 / $f2 - 0.4)) ) );
-#X obj 263 227 hsl 128 15 1 127 0 1 empty empty change_graph_shape
+#X text 158 166 <-- counter;
+#X text 180 186 <-- split at array size to stop;
+#X text 208 199 and reset counter to 0;
+#X text 49 336 ^--bang for next step;
+#X obj 52 249 expr abs(cos( min (1.57 \, ($f1 / $f2 - 0.4)) ) );
+#X obj 255 227 hsl 128 15 1 127 0 1 empty empty change_graph_shape
 -130 8 1 12 -208896 -1 -1 1300 0;
 #X text 13 362 In this example \, the "bang" from [t b f] continues
 the loop. The [moses 100] ends the loop.;
-#X text 155 138 <-- stop;
-#X text 430 466 There are also specific loops for samples and video:
+#X text 147 138 <-- stop;
+#X text 410 436 There are also specific loops for samples and video:
 ;
-#X text 437 530 video looping:;
-#X obj 639 504 xgroove~;
-#X obj 619 373 readsf~;
-#X obj 619 306 spigot;
-#X obj 656 284 tgl 15 0 empty empty allow_looping 17 7 0 10 -4033 -1
+#X text 417 500 video looping:;
+#X obj 619 474 xgroove~;
+#X obj 539 343 readsf~;
+#X obj 539 276 spigot;
+#X obj 576 254 tgl 15 0 empty empty allow_looping 17 7 0 10 -4033 -1
 -1 0 1;
-#X text 429 251 For the most basic looping of samples \, you can use
+#X text 409 181 For the most basic looping of samples \, you can use
 [readsf~]:;
-#X msg 628 350 open ../sound/voice.wav;
-#X text 664 393 ^- "bang"ed when complete;
-#X msg 592 350 1;
-#X obj 611 405 dac~;
-#X obj 592 328 t b b;
-#X obj 592 285 bng 20 250 50 0 empty empty start 0 -6 1 10 -4033 -1
+#X msg 548 320 open ../sound/voice.wav;
+#X text 584 363 ^- "bang"ed when complete;
+#X msg 512 320 1;
+#X obj 531 375 dac~;
+#X obj 512 298 t b b;
+#X obj 512 255 bng 20 250 50 0 empty empty start 0 -6 1 10 -4033 -1
 -1;
-#X text 226 608 released under the GNU GPL;
-#X text 9 594 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
-;
-#X text 629 603 updated for Pd version 0.38.2;
-#X obj 38 201 bang;
+#X text 31 525 updated for Pd version 0.38.2;
+#X obj 30 201 bang;
 #X text 2 137 continue -->;
 #X text 7 29 Programming with Pd is a different way of thinking that
 standard procedural or object-oriented programming. Looping illustrates
 this. Instead of setting up a C-like [counter] or [for++] \, set up
 a condition to continue the loop \, and a condition that stops the
 loop.;
-#X text 429 395 other examples:;
-#X obj 705 504 count~;
-#X obj 557 101 modulo_counter;
-#X obj 665 101 count;
-#X obj 709 101 countund;
-#X connect 16 0 17 0;
-#X connect 16 0 27 0;
-#X connect 17 0 16 1;
-#X connect 18 0 16 0;
-#X connect 19 0 20 0;
-#X connect 20 0 17 0;
-#X connect 20 0 16 1;
-#X connect 21 0 33 0;
-#X connect 21 1 26 1;
-#X connect 24 0 53 0;
-#X connect 24 1 26 0;
-#X connect 27 0 21 0;
-#X connect 27 1 19 0;
-#X connect 28 0 18 0;
-#X connect 33 0 24 0;
-#X connect 34 0 33 1;
+#X obj 685 474 count~;
+#X obj 537 71 modulo_counter;
+#X obj 645 71 count;
+#X obj 689 71 countund;
+#X connect 15 0 16 0;
+#X connect 15 0 26 0;
+#X connect 16 0 15 1;
+#X connect 17 0 15 0;
+#X connect 18 0 19 0;
+#X connect 19 0 16 0;
+#X connect 19 0 15 1;
+#X connect 20 0 32 0;
+#X connect 20 1 25 1;
+#X connect 23 0 50 0;
+#X connect 23 1 25 0;
+#X connect 26 0 20 0;
+#X connect 26 1 18 0;
+#X connect 27 0 17 0;
+#X connect 32 0 23 0;
+#X connect 33 0 32 1;
+#X connect 39 0 46 0;
+#X connect 39 0 46 1;
+#X connect 39 1 40 0;
 #X connect 40 0 47 0;
-#X connect 40 0 47 1;
-#X connect 40 1 41 0;
-#X connect 41 0 48 0;
-#X connect 42 0 41 1;
-#X connect 44 0 40 0;
-#X connect 46 0 40 0;
-#X connect 48 0 46 0;
-#X connect 48 1 44 0;
-#X connect 49 0 48 0;
-#X connect 53 0 18 0;
+#X connect 41 0 40 1;
+#X connect 43 0 39 0;
+#X connect 45 0 39 0;
+#X connect 47 0 45 0;
+#X connect 47 1 43 0;
+#X connect 48 0 47 0;
+#X connect 50 0 17 0;

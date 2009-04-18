@@ -1,67 +1,72 @@
-#N canvas 91 99 882 611 10;
-#X obj 4 2 cnv 15 850 20 empty empty all_about_atom_conversion 20 10
+#N canvas 32 32 763 478 10;
+#X obj 4 2 cnv 15 750 20 empty empty all_about_atom_conversion 20 10
 1 18 -233017 -66577 0;
-#X obj 821 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
-#X obj 47 364 list2int;
-#X obj 111 363 l2i;
-#X obj 113 389 a2l;
-#X obj 46 390 any2list;
-#X obj 46 340 lister;
-#X obj 46 416 list2symbol;
-#X obj 46 437 symbol2list;
-#X obj 135 416 l2s;
-#X obj 135 436 s2l;
-#X obj 179 417 tosymbol;
-#X obj 179 436 fromsymbol;
-#X obj 548 410 glue;
-#X obj 609 437 pack;
-#X obj 608 411 list2symbol;
-#X obj 718 410 tosymbol;
-#X text 525 384 making "lists" from untyped inputs:;
-#X obj 484 410 repack;
-#X obj 47 318 list;
-#X obj 46 293 any;
-#X obj 75 293 pipe;
-#X text 499 46 a set that is not a "list" has an undefined type:;
-#X text 7 39 SPECIAL CASES OF "LISTS".;
-#X obj 513 560 pddp/pddplink all_about_data_types.pd -text all_about_data_types;
-#X obj 513 517 pddp/pddplink all_about_lists_vs_anythings.pd -text all_about_lists_vs_anythings;
-#X obj 514 135 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
--1;
-#X obj 563 135 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1
--1;
-#X obj 612 135 bng 15 250 50 0 empty empty symbol 0 21 1 9 -262144
--1 -1;
-#X msg 516 73 list this is a set with a cast;
-#X msg 523 92 this is a set withOUT a cast;
-#X obj 711 135 bng 15 250 50 0 empty empty list 0 21 1 9 -262144 -1
--1;
-#X obj 761 135 bng 15 250 50 0 empty empty UNDEFINED 0 21 1 9 -262144
--1 -1;
-#X obj 514 115 route bang float symbol pointer list;
-#X obj 662 135 bng 15 250 50 0 empty empty pointer 0 21 1 9 -262144
--1 -1;
-#X msg 10 63 list;
-#X symbolatom 32 129 10 0 0 0 - - -;
-#X msg 17 83 list 25;
-#X msg 24 103 list foo;
-#X text 87 104 A "list" of one "symbol" is converted to a "symbol"
+#X obj 721 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
 ;
-#X text 72 83 A "list" of one "float" is converted to a "float";
-#X text 50 63 An empty "list" is converted to a "bang";
-#X obj 11 169 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
+#X obj 27 354 list2int;
+#X obj 91 353 l2i;
+#X obj 93 379 a2l;
+#X obj 26 380 any2list;
+#X obj 26 330 lister;
+#X obj 26 406 list2symbol;
+#X obj 26 427 symbol2list;
+#X obj 115 406 l2s;
+#X obj 115 426 s2l;
+#X obj 159 407 tosymbol;
+#X obj 159 426 fromsymbol;
+#X obj 508 290 glue;
+#X obj 569 317 pack;
+#X obj 568 291 list2symbol;
+#X obj 678 290 tosymbol;
+#X text 485 264 making "lists" from untyped inputs:;
+#X obj 444 290 repack;
+#X obj 27 308 list;
+#X obj 26 283 any;
+#X obj 55 283 pipe;
+#X text 439 66 a set that is not a "list" has an undefined type:;
+#X text 17 39 SPECIAL CASES OF "LISTS".;
+#X obj 473 420 pddp/pddplink all_about_data_types.pd -text all_about_data_types
+;
+#X obj 473 397 pddp/pddplink all_about_lists_vs_anythings.pd -text
+all_about_lists_vs_anythings;
+#X obj 454 155 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
 -1;
-#X obj 60 169 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1
+#X obj 503 155 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1
 -1;
-#X obj 109 169 bng 15 250 50 0 empty empty symbol 0 21 1 9 -262144
+#X obj 552 155 bng 15 250 50 0 empty empty symbol 0 21 1 9 -262144
 -1 -1;
-#X obj 208 169 bng 15 250 50 0 empty empty list 0 21 1 9 -262144 -1
+#X msg 456 93 list this is a set with a cast;
+#X msg 463 112 this is a set withOUT a cast;
+#X obj 651 155 bng 15 250 50 0 empty empty list 0 21 1 9 -262144 -1
 -1;
-#X obj 258 169 bng 15 250 50 0 empty empty UNDEFINED 0 21 1 9 -262144
+#X obj 701 155 bng 15 250 50 0 empty empty UNDEFINED 0 21 1 9 -262144
 -1 -1;
-#X obj 11 149 route bang float symbol pointer list;
-#X obj 159 169 bng 15 250 50 0 empty empty pointer 0 21 1 9 -262144
+#X obj 454 135 route bang float symbol pointer list;
+#X obj 602 155 bng 15 250 50 0 empty empty pointer 0 21 1 9 -262144
 -1 -1;
+#X msg 20 63 list;
+#X symbolatom 42 129 10 0 0 0 - - -;
+#X msg 27 83 list 25;
+#X msg 34 103 list foo;
+#X text 97 104 A "list" of one "symbol" is converted to a "symbol"
+;
+#X text 82 83 A "list" of one "float" is converted to a "float";
+#X text 60 63 An empty "list" is converted to a "bang";
+#X obj 21 169 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
+-1;
+#X obj 70 169 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1
+-1;
+#X obj 119 169 bng 15 250 50 0 empty empty symbol 0 21 1 9 -262144
+-1 -1;
+#X obj 218 169 bng 15 250 50 0 empty empty list 0 21 1 9 -262144 -1
+-1;
+#X obj 268 169 bng 15 250 50 0 empty empty UNDEFINED 0 21 1 9 -262144
+-1 -1;
+#X obj 21 149 route bang float symbol pointer list;
+#X obj 169 169 bng 15 250 50 0 empty empty pointer 0 21 1 9 -262144
+-1 -1;
+#X text 13 233 There are many ways to store \, manipulate. and convert
+atoms and lists. Here is a sampling;
 #X connect 15 0 14 0;
 #X connect 29 0 33 0;
 #X connect 30 0 33 0;

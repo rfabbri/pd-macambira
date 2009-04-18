@@ -1,4 +1,4 @@
-#N canvas 252 88 514 634 10;
+#N canvas 147 26 511 606 10;
 #X obj 12 346 ff-gain;
 #X obj 12 385 ff-autocenter;
 #X obj 12 425 ff-spring;
@@ -7,19 +7,20 @@
 #X obj 13 547 ff-constant;
 #X obj 4 4 cnv 15 500 20 empty empty all_about_haptics 20 10 1 18 -233017
 -66577 0;
-#X obj 471 5 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
+#X obj 471 5 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+;
 #X obj 12 304 ifeel;
 #X text 20 33 "Haptic" means relating to the sense of touch. Haptic
 feedback relates to the sense of touch at the skin level \, and the
 feeling of forces in the muscles and joints. Vibrations stimulate the
 sense of touch while various forces stimulate the muscles.;
-#X text 20 110 There are many haptic devices available \, from a US$35
+#X text 20 110 There are many haptic devices available \, from a US\$35
 Logitech iFeel mouse \, to the massive \, extremely expensive haptic
 devices used for remote control surgery. Immersion \, Inc. has almost
 a monopoly on this technology due to a number of patents. These objects
 all work with Immersion technology \, generally known as "TouchSense".
 ;
-#X text 15 606 updated for Pd version 0.37.1;
+#X text 15 576 updated for Pd version 0.37.1;
 #X text 107 301 Control the pulses and vibrations of a TouchSense (aka
 iFeel) mouse;
 #X text 110 349 Set the overall gain for all force effects;
@@ -38,6 +39,3 @@ and others make TouchSense game controllers.;
 #X text 21 261 Currently \, these objects only work on GNU/Linux. For
 info on how to get it working \, see: http://at.or.at/hans/haptics
 ;
-#X text 88 585 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
-;
-#X text 305 599 released under the GNU GPL;

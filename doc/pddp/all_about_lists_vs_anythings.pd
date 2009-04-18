@@ -1,10 +1,10 @@
-#N canvas 268 58 889 635 10;
+#N canvas 63 22 763 581 10;
 #X msg 95 298 1 2 3;
 #X obj 125 329 route list;
 #X msg 62 278 list 1 2 3;
 #X msg 10 63 list;
 #X symbolatom 32 129 10 0 0 0 - - -;
-#X obj 4 2 cnv 15 850 20 empty empty all_about_lists_vs_anythings 20
+#X obj 4 2 cnv 15 750 20 empty empty all_about_lists_vs_anythings 20
 10 1 18 -233017 -66577 0;
 #X text 7 39 SPECIAL CASES OF "LISTS".;
 #X obj 125 348 bng 15 250 50 0 empty empty list -20 7 1 10 -262144
@@ -13,15 +13,15 @@
 -1 -1;
 #X msg 184 277 list this is a set with a cast;
 #X msg 191 296 this is a set withOUT a cast;
-#X obj 484 135 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
+#X obj 441 135 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
 -1;
-#X obj 533 135 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1
+#X obj 490 135 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1
 -1;
-#X obj 582 135 bng 15 250 50 0 empty empty symbol 0 21 1 9 -262144
+#X obj 539 135 bng 15 250 50 0 empty empty symbol 0 21 1 9 -262144
 -1 -1;
-#X msg 486 73 list this is a set with a cast;
-#X msg 493 92 this is a set withOUT a cast;
-#X obj 681 135 bng 15 250 50 0 empty empty list 0 21 1 9 -262144 -1
+#X msg 443 73 list this is a set with a cast;
+#X msg 450 92 this is a set withOUT a cast;
+#X obj 638 135 bng 15 250 50 0 empty empty list 0 21 1 9 -262144 -1
 -1;
 #X obj 120 527 route list;
 #X obj 120 546 bng 15 250 50 0 empty empty list -20 7 1 10 -262144
@@ -39,33 +39,30 @@
 ;
 #X text 72 83 A "list" of one "float" is converted to a "float";
 #X text 50 63 An empty "list" is converted to a "bang";
-#X obj 520 514 pddp/pddplink all_about_atom_conversion.pd -text all_about_atom_conversion;
-#X obj 821 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
+#X obj 477 514 pddp/pddplink all_about_atom_conversion.pd -text all_about_atom_conversion
+;
+#X obj 721 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+;
 #X text 11 400 Sets of mixed atoms are defined based on what the "selector"
 (the first element of a set). If the "selector" is a "float" \, then
 the set is a "list". If the "selector" is the word "list" \, then the
 set is a "list". If the "selector" is a "symbol" \, then the set is
 NOT a "list":;
-#X text 22 575 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
-;
-#X text 239 589 released under the GNU GPL;
-#X text 445 576 $Revision: 1.8 $$Date: 2006-02-06 04:31:31 $;
-#X text 446 589 $Author: matju $;
-#X text 673 551 updated for Pd 0.38-2;
-#X obj 731 135 bng 15 250 50 0 empty empty UNDEFINED 0 21 1 9 -262144
+#X text 600 551 updated for Pd 0.38-2;
+#X obj 688 135 bng 15 250 50 0 empty empty UNDEFINED 0 21 1 9 -262144
 -1 -1;
-#X msg 502 286 1 1;
-#X obj 495 312 +;
-#X floatatom 495 334 5 0 0 0 - - -;
-#X msg 467 286 1 3;
-#X text 459 46 A set that is not a "list" has an undefined type:;
-#X msg 494 267 list 1 2;
-#X text 445 208 If you send a "list" of arguments to the first inlet
+#X msg 459 286 1 1;
+#X obj 452 312 +;
+#X floatatom 452 334 5 0 0 0 - - -;
+#X msg 424 286 1 3;
+#X text 416 46 A set that is not a "list" has an undefined type:;
+#X msg 451 267 list 1 2;
+#X text 402 208 If you send a "list" of arguments to the first inlet
 of an object \, the elements of that "list" will be applied to the
 respective inlet. This does not apply to sets that are NOT "lists".
 ;
-#X text 443 192 "LISTS" MAP TO INLETS;
-#X text 450 367 WORKING WITH MIXED SETS;
+#X text 400 192 "LISTS" MAP TO INLETS;
+#X text 407 367 WORKING WITH MIXED SETS;
 #X text 11 381 SETS OF MIXED "ATOMS";
 #X text 9 218 A message having more than one atom starting with a "float"
 is implicitly considered a list. A message having more than one atom
@@ -198,12 +195,12 @@ symbol] outputs a symbol from its left outlet.;
 #X connect 53 0 54 0;
 #X connect 54 0 48 0;
 #X connect 54 1 49 0;
-#X restore 486 453 pd has some odd cases of list handling;
-#X text 450 389 When working with sets that might be either "lists"
+#X restore 443 453 pd has some odd cases of list handling;
+#X text 407 389 When working with sets that might be either "lists"
 or undefined \, use [prepend]. Many of the "list" handling objects
 in Pd have odd quirks which can make things difficult.;
-#X obj 484 115 route bang float symbol pointer list;
-#X obj 632 135 bng 15 250 50 0 empty empty pointer 0 21 1 9 -262144
+#X obj 441 115 route bang float symbol pointer list;
+#X obj 589 135 bng 15 250 50 0 empty empty pointer 0 21 1 9 -262144
 -1 -1;
 #X obj 11 169 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
 -1;
@@ -222,33 +219,33 @@ in Pd have odd quirks which can make things difficult.;
 #X connect 1 0 7 0;
 #X connect 1 1 8 0;
 #X connect 2 0 1 0;
-#X connect 3 0 59 0;
+#X connect 3 0 55 0;
 #X connect 9 0 1 0;
 #X connect 10 0 1 0;
-#X connect 14 0 52 0;
-#X connect 15 0 52 0;
+#X connect 14 0 48 0;
+#X connect 15 0 48 0;
 #X connect 17 0 18 0;
 #X connect 17 1 19 0;
 #X connect 20 0 17 0;
 #X connect 21 0 17 0;
 #X connect 23 0 17 0;
 #X connect 24 0 17 0;
-#X connect 25 0 59 0;
+#X connect 25 0 55 0;
 #X connect 26 0 4 0;
-#X connect 26 0 59 0;
-#X connect 39 0 40 0;
-#X connect 40 0 41 0;
-#X connect 42 0 40 0;
-#X connect 44 0 40 0;
-#X connect 52 0 11 0;
-#X connect 52 1 12 0;
-#X connect 52 2 13 0;
-#X connect 52 3 53 0;
-#X connect 52 4 16 0;
-#X connect 52 5 38 0;
-#X connect 59 0 54 0;
-#X connect 59 1 55 0;
-#X connect 59 2 56 0;
-#X connect 59 3 60 0;
-#X connect 59 4 57 0;
-#X connect 59 5 58 0;
+#X connect 26 0 55 0;
+#X connect 35 0 36 0;
+#X connect 36 0 37 0;
+#X connect 38 0 36 0;
+#X connect 40 0 36 0;
+#X connect 48 0 11 0;
+#X connect 48 1 12 0;
+#X connect 48 2 13 0;
+#X connect 48 3 49 0;
+#X connect 48 4 16 0;
+#X connect 48 5 34 0;
+#X connect 55 0 50 0;
+#X connect 55 1 51 0;
+#X connect 55 2 52 0;
+#X connect 55 3 56 0;
+#X connect 55 4 53 0;
+#X connect 55 5 54 0;

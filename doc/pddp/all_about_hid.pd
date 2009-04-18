@@ -1,24 +1,20 @@
-#N canvas 22 63 884 614 10;
-#X obj 5 2 cnv 15 850 20 empty empty all_about_hid 20 10 1 18 -233017
+#N canvas 21 40 773 566 10;
+#X obj 5 2 cnv 15 750 20 empty empty all_about_hid 20 10 1 18 -233017
 -66577 0;
-#X obj 821 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
+#X obj 725 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+;
 #X text 5 29 "HID" stands for "Human Interface Device". A HID is any
 device that is meant to allow humans to interact with a computer. Usually
 \, HIDs are mice \, keyboards \, joysticks \, tablets \, gamepads \,
 etc. There a number of unusual HIDs \, like the Griffin PowerMate on
 the low end \, or the SensAble PHANTOM 6DOF on the high end.;
-#X obj 595 437 gemmouse;
+#X obj 545 437 gemmouse;
 #X text 0 214 KEYBOARDS;
 #X obj 11 233 key;
 #X obj 43 233 keyup;
-#X obj 431 437 gemkeyboard;
-#X obj 517 437 gemkeyname;
+#X obj 381 437 gemkeyboard;
+#X obj 467 437 gemkeyname;
 #X obj 88 233 keyname;
-#X text 16 557 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
-;
-#X text 233 571 released under the GNU GPL;
-#X text 429 558 $Revision: 1.6 $$Date: 2005-12-19 21:00:31 $;
-#X text 430 571 $Author: eighthave $;
 #N canvas 0 22 671 475 deprecated 0;
 #X text 35 38 The use of these objects is deprecated since the functionality
 that they provide is available in the [hid] object \, which is a unified
@@ -42,34 +38,34 @@ that they provide is available in the [hid] object \, which is a unified
 #X text 26 97 GEM;
 #X obj 33 117 gemtablet;
 #X obj 104 117 gemorb;
-#X restore 438 533 pd deprecated HID objects;
-#X text 425 415 USING HIDs WITH GEM;
-#X text 435 478 There are quite a few objects that support HIDs from
+#X restore 388 533 pd deprecated HID objects;
+#X text 375 415 USING HIDs WITH GEM;
+#X text 385 478 There are quite a few objects that support HIDs from
 many different sources. Here are a bunch whose functionality is available
 in the [hid] object \, so it is recommended that you do not use these
 objects any more.;
-#X text 436 176 device type;
-#X text 674 160 latency;
-#X text 765 176 (Hz);
-#X text 685 176 (ms);
-#X text 435 186 --------------------------------------------------------
+#X text 386 176 device type;
+#X text 624 160 latency;
+#X text 715 176 (Hz);
+#X text 635 176 (ms);
+#X text 385 186 --------------------------------------------------------
 ;
-#X text 685 201 15.5;
-#X text 765 201 64;
-#X text 685 216 8-10;
-#X text 765 216 100-125;
-#X text 435 231 USB mice on GNU/Linux;
-#X text 685 231 1-10;
-#X text 765 231 100-1000;
-#X text 435 246 USB wireless mice;
-#X text 685 246 12-20;
-#X text 765 246 50-80;
-#X text 434 334 While it does not make sense to use a poll rate that
+#X text 635 201 15.5;
+#X text 715 201 64;
+#X text 635 216 8-10;
+#X text 715 216 100-125;
+#X text 385 231 USB mice on GNU/Linux;
+#X text 635 231 1-10;
+#X text 715 231 100-1000;
+#X text 385 246 USB wireless mice;
+#X text 635 246 12-20;
+#X text 715 246 50-80;
+#X text 384 334 While it does not make sense to use a poll rate that
 is much faster than the refresh rate of the device \, it does make
 sense to make the poll rate somewhat faster. If you poll at the same
 rate as the device refreshes \, you could get up to double the latency
 \, i.e. if [hid] polls right before the event is reported.;
-#X text 425 461 DEPRECATED OBJECTS;
+#X text 375 461 DEPRECATED OBJECTS;
 #X text 5 117 When talking about HIDs \, "DOF" is often mentioned.
 "DOF" stands for "degrees of freedom". A degree of freedom is one dimension
 in which that HID can give information. A mouse generally had 2DOFs:
@@ -81,27 +77,27 @@ The PHANTOM 6DOF device has six degrees of freedom: X \, Y \, Z movement
 #X text 159 424 [joystick];
 #X text 243 424 [tablet];
 #X text 313 424 [gamepad];
-#X text 435 201 ADB (Apple Desktop Bus) devices;
-#X text 435 303 P5 Glove;
-#X text 685 303 22;
-#X text 765 303 45;
-#X text 765 289 40;
-#X text 685 289 25;
+#X text 385 201 ADB (Apple Desktop Bus) devices;
+#X text 385 303 P5 Glove;
+#X text 635 303 22;
+#X text 715 303 45;
+#X text 715 289 40;
+#X text 635 289 25;
 #X text 12 424 [keyboard];
-#X text 685 275 5-25;
-#X text 765 275 40-200;
-#X text 435 261 Generic USB Devices;
-#X text 685 261 10;
-#X text 765 261 100;
-#X text 435 275 PS/2 mice;
-#X text 435 289 Serial mice;
-#X text 425 23 LATENCY AND POLLING;
-#X text 425 156 REFRESH RATES OF VARIOUS DEVICES;
+#X text 635 275 5-25;
+#X text 715 275 40-200;
+#X text 385 261 Generic USB Devices;
+#X text 635 261 10;
+#X text 715 261 100;
+#X text 385 275 PS/2 mice;
+#X text 385 289 Serial mice;
+#X text 375 23 LATENCY AND POLLING;
+#X text 375 156 REFRESH RATES OF VARIOUS DEVICES;
 #X text 11 369 Basically any device that is supported by the various
 HID layers on each OS is supported by the [hid] object. So any of those
 devices can be used as controllers with Pd. There already exists a
 number of objects for more common HIDs:;
-#X text 434 39 An essential detail to making an usable instrument is
+#X text 384 39 An essential detail to making an usable instrument is
 the latency between when you perform an action and the sound it produces.
 If the latency is too large \, it will make the instrument annoying
 to play \, or even unplayable. So the aim is to have as low latency
@@ -109,7 +105,7 @@ as possible. To put it into perspective \, if you were playing an electric
 guitar and the amp was 3m (10ft) away from you \, there would be a
 9ms delay between when you plucked the string and when you heard the
 sound.;
-#X text 435 314 --------------------------------------------------------
+#X text 385 314 --------------------------------------------------------
 ;
 #X text 3 453 PLATFORM-SPECIFIC HID OBJECTS;
 #X text 15 470 To get full access to some devices \, you need to use
@@ -121,9 +117,9 @@ They only receive key events when Pd has focus \; they output alternating
 1s and 0s to represent auto-repeat \; [key] and [heyup] are limited
 to the 'printing' characters. [keyname] reports Shift \, Ctrl \, Alt
 \, Meta \, etc.;
-#X text 435 216 USB mice on Windows or MacOS X;
+#X text 385 216 USB mice on Windows or MacOS X;
 #X text 85 527 [darwinhid];
 #X text 166 527 [windowshid];
-#X text 742 160 refresh rate;
+#X text 692 160 refresh rate;
 #X text 12 527 [linuxhid];
 #X obj 11 347 hid;

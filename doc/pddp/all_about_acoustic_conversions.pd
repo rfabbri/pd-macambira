@@ -1,9 +1,9 @@
-#N canvas 48 140 862 639 10;
-#X obj 12 82 mtof;
-#X floatatom 12 105 0 0 0 0 - - -;
-#X obj 12 129 ftom;
-#X floatatom 12 150 0 0 0 0 - - -;
-#X text 47 82 -- MIDI note number to frequency converter.;
+#N canvas 13 30 762 530 10;
+#X obj 22 62 mtof;
+#X floatatom 22 85 0 0 0 0 - - -;
+#X obj 22 109 ftom;
+#X floatatom 22 130 0 0 0 0 - - -;
+#X text 57 62 -- MIDI note number to frequency converter.;
 #N canvas 37 22 899 659 understanding_mtof 0;
 #X text 20 13 [mtof] will convert MIDI note numbers to Wave Freqeuency.
 This object exists in Pd for the sake of convenience and speed of processing.
@@ -193,8 +193,8 @@ achive microtonal pitches.;
 #X connect 39 0 38 0;
 #X connect 49 0 31 1;
 #X connect 50 0 34 1;
-#X restore 175 99 pd understanding_mtof;
-#X text 47 129 -- Frequency to MIDI note number converter.;
+#X restore 185 79 pd understanding_mtof;
+#X text 57 109 -- Frequency to MIDI note number converter.;
 #N canvas 118 22 919 630 understanding_ftom 0;
 #X floatatom 38 86 5 0 0 0 - - -;
 #X floatatom 38 131 5 0 0 0 - - -;
@@ -297,13 +297,13 @@ microtonal control?;
 #X connect 34 0 36 1;
 #X connect 35 0 36 0;
 #X connect 36 0 37 0;
-#X restore 174 145 pd understanding_ftom;
-#X floatatom 12 61 0 0 0 0 - - -;
-#X floatatom 12 231 0 0 0 0 - - -;
-#X floatatom 12 276 0 0 0 0 - - -;
-#X floatatom 12 187 0 0 0 0 - - -;
-#X obj 12 208 dbtorms;
-#X obj 12 255 rmstodb;
+#X restore 184 125 pd understanding_ftom;
+#X floatatom 22 41 0 0 0 0 - - -;
+#X floatatom 22 211 0 0 0 0 - - -;
+#X floatatom 22 256 0 0 0 0 - - -;
+#X floatatom 22 167 0 0 0 0 - - -;
+#X obj 22 188 dbtorms;
+#X obj 22 235 rmstodb;
 #N canvas 65 78 423 452 understanding_dbtorms 0;
 #N canvas 0 22 452 302 What_is_a_decibel? 0;
 #X text 24 94 The difficulty in measuring the volume of an instrument
@@ -364,14 +364,14 @@ produces exponential values between 0 and 1;
 #X connect 15 0 4 0;
 #X connect 16 0 6 0;
 #X connect 16 1 7 0;
-#X restore 155 227 pd understanding_dbtorms;
-#X text 66 209 -- Decibels to RMS converter.;
-#X text 66 256 -- RMS to Decibels converter.;
-#X floatatom 12 357 0 0 0 0 - - -;
-#X floatatom 12 402 0 0 0 0 - - -;
-#X floatatom 12 313 0 0 0 0 - - -;
-#X obj 12 334 dbtopow;
-#X obj 12 381 powtodb;
+#X restore 165 207 pd understanding_dbtorms;
+#X text 76 189 -- Decibels to RMS converter.;
+#X text 76 236 -- RMS to Decibels converter.;
+#X floatatom 22 337 0 0 0 0 - - -;
+#X floatatom 22 382 0 0 0 0 - - -;
+#X floatatom 22 293 0 0 0 0 - - -;
+#X obj 22 314 dbtopow;
+#X obj 22 361 powtodb;
 #N canvas 349 60 423 452 understanding_rmstodb 0;
 #N canvas 0 22 452 302 What_is_a_decibel? 0;
 #X text 24 94 The difficulty in measuring the volume of an instrument
@@ -430,9 +430,9 @@ also be produced.;
 #X connect 15 0 9 0;
 #X connect 15 0 10 0;
 #X connect 16 0 15 0;
-#X restore 153 273 pd understanding_rmstodb;
-#X text 66 335 -- Decibels to power converter.;
-#X text 66 382 -- power to Decibels converter.;
+#X restore 163 253 pd understanding_rmstodb;
+#X text 76 315 -- Decibels to power converter.;
+#X text 76 362 -- power to Decibels converter.;
 #N canvas 460 106 429 458 understanding_dbtopow 0;
 #N canvas 0 22 452 302 What_is_a_decibel? 0;
 #X text 24 94 The difficulty in measuring the volume of an instrument
@@ -478,7 +478,7 @@ are considered overflow or underflow and are clipped/ignored.;
 #X connect 7 0 8 0;
 #X connect 8 0 10 0;
 #X connect 10 0 2 0;
-#X restore 154 354 pd understanding_dbtopow;
+#X restore 164 334 pd understanding_dbtopow;
 #N canvas 348 60 429 458 understanding_powtodb 0;
 #N canvas 0 22 452 302 What_is_a_decibel? 0;
 #X text 24 94 The difficulty in measuring the volume of an instrument
@@ -525,16 +525,16 @@ and are clipped/ignored.;
 #X connect 9 0 10 0;
 #X connect 10 0 11 0;
 #X connect 11 0 3 0;
-#X restore 154 401 pd understanding_powtodb;
-#X text 13 439 RELATED OBJECTS;
-#X obj 14 458 dbtopow~;
-#X obj 68 458 dbtorms~;
-#X obj 123 458 rmstodb~;
-#X obj 178 458 powtodb~;
-#X obj 233 458 mtof~;
-#X obj 270 458 ftom~;
-#X obj 14 483 expr;
-#X obj 46 483 expr~;
+#X restore 164 381 pd understanding_powtodb;
+#X text 23 419 RELATED OBJECTS;
+#X obj 24 438 dbtopow~;
+#X obj 78 438 dbtorms~;
+#X obj 133 438 rmstodb~;
+#X obj 188 438 powtodb~;
+#X obj 243 438 mtof~;
+#X obj 280 438 ftom~;
+#X obj 24 463 expr;
+#X obj 56 463 expr~;
 #N canvas 0 22 452 302 other_objects_from_related_libraries 0;
 #X obj 26 39 db2v;
 #X obj 65 38 f2note;
@@ -551,15 +551,16 @@ is:;
 ;
 #X text 15 183 or;
 #X text 16 197 iem.kug.ac.at/pdb/;
-#X restore 14 518 pd other_objects_from_related_libraries;
-#X obj 90 483 rmstopow~;
-#X obj 154 485 powtorms~;
-#X obj 220 485 sig~;
-#X obj 254 485 snapshot~;
-#X obj 5 2 cnv 15 850 20 empty empty all_about_acoustic_conversions
+#X restore 24 498 pd other_objects_from_related_libraries;
+#X obj 100 463 rmstopow~;
+#X obj 164 465 powtorms~;
+#X obj 230 465 sig~;
+#X obj 264 465 snapshot~;
+#X obj 5 2 cnv 15 750 20 empty empty all_about_acoustic_conversions
 20 10 1 18 -233017 -66577 0;
-#X obj 821 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
-#X text 439 41 Please note: I have no idea why it's necessary for Pd
+#X obj 721 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+;
+#X text 389 41 Please note: I have no idea why it's necessary for Pd
 to measure decibels \, rms \, or power. It seems to me that RMS and
 Power are extremely important in the analog world (so that an engineer
 doesn't blow up a transistor)...but in Pd \, these things are just
@@ -568,9 +569,6 @@ I would really appreciate if somebody could help me understand these
 concepts and finish this document. Why are these objects present in
 Pd? WHY should they be used and what benefits to they produce in a
 digital process?;
-#X text 14 574 This document was updated for Pd version 0.35 test 29
-by Dave Sabine as part of a project called pddp proposed to build comprehensive
-documentation for Pd.;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;
