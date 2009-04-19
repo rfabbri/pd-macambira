@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 subdirs=(deque flite gfsm locale pdstring readdir sprinkler weightmap)
 
@@ -30,6 +30,7 @@ if test -n "$dirs"; then
   echo "$0: dirs=(${dirs[@]})"
   for d in "${dirs[@]}"; do
     test -x "$d/svn-prepare.sh" && (cd "$d"; sh ./svn-prepare.sh)
+    test -w "$d/README.svn" && cp -af "$d"/../common/README.svn "$d"
   done
   exec autoreconf $ar_args "${dirs[@]}"
   #--symlink
