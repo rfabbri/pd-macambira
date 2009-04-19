@@ -29,6 +29,7 @@ MOOCOW_BUILD_VERSION ?=2009-04-19.001
 
 CONFIGURE_ARGS=\
 	CFLAGS="$(CFLAGS)" \
+	LDFLAGS="$(LDFLAGS) -L\"$(pd_src)/bin\"" \
 	--with-pd-include="$(pd_src)/src" \
 	--with-pd-dir="$(MOOCOW_BUILD)" \
 	--disable-dependency-tracking
@@ -39,7 +40,7 @@ CONFIGURE_ARGS=\
 ##  + set to 'true' to ignore failed sub-targets (for robust autobuild)
 ##  + set to 'false' to turn failed builds into make errors (maintainer only)
 #ONFAIL ?= true
-#ONFAIL ?= false
+ONFAIL ?= false
 ONFAIL ?= echo "(MOOCOW) Warning: sub-target failed: '$@'"
 
 ##-- defaults
