@@ -34,7 +34,7 @@ dnl    - basically a hack to avoid version mismatches in autoconf, automake, etc
 dnl      for autobuilds from SVN
 dnl  + maintainer should call ./configure --enable-maintainer-mode, and must keep
 dnl    SVN sources consistent
-dnl AM_MAINTAINER_MODE
+AM_MAINTAINER_MODE
 dnl -----/maintainer mode
 
 ##-- other flags (?)
