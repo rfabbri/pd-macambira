@@ -272,6 +272,9 @@ AC_DEFUN([AX_PD_EXTERNAL],
    Darwin)
      AC_MSG_RESULT(darwin)
      ;;
+   MINGW32_NT-5.1)
+     AC_MSG_RESULT(win32)
+     ;;
    IRIX64)
      AC_MSG_RESULT(irix64)
      ;;
