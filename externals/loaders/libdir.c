@@ -64,9 +64,9 @@ static int libdir_loader(t_canvas *canvas, char *classname)
             return (0);
         }
         close(fd);
-        if(! sys_isabsolutepath(dirbuf))
-        canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path, 
-                                                     dirbuf, 0);
+        if(sys_isabsolutepath(dirbuf)) // only include actual full paths
+            canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path, 
+                                                         dirbuf, 0);
         if(sys_verbose)
             post("libdir_loader: added '%s' to the canvas-local objectclass path",
                  classname);
