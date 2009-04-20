@@ -1,9 +1,21 @@
-#N canvas 337 290 528 329 10;
-#X msg 46 78 bang;
-#X obj 30 153 pddp/print;
-#X obj 42 109 get-audio-dialog;
-#X obj 10 158 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#N canvas 65 159 611 344 10;
+#X msg 34 111 bang;
+#X obj 73 174 pddp/print;
+#X obj 53 179 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X connect 0 0 2 0;
-#X connect 2 0 1 0;
-#X connect 2 0 3 0;
+#X obj 34 203 prepend set;
+#X obj 34 278 send pd;
+#X msg 34 249;
+#X obj 34 142 get-audio-dialog;
+#X text 246 249 <-- this message will be saved as part of your patch.
+click it or [loadbang] it to configure the Audio settings. Make sure
+it is attached to a [send pd] so that Pd gets the message.;
+#X text 153 93 Open the Audio Settings and click OK to get the data
+\, then click bang to use them in the patch;
+#X text 9 23 get the Audio settings to save as part of the patch.;
+#X connect 0 0 6 0;
+#X connect 3 0 5 0;
+#X connect 5 0 4 0;
+#X connect 6 0 1 0;
+#X connect 6 0 2 0;
+#X connect 6 0 3 0;

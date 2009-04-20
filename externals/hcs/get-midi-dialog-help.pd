@@ -1,0 +1,21 @@
+#N canvas 101 310 611 344 10;
+#X msg 34 111 bang;
+#X obj 73 174 pddp/print;
+#X obj 53 179 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 9 23 get the MIDI settings to save as part of the patch.;
+#X text 153 93 Open the MIDI Settings and click OK to get the data
+\, then click bang to use them in the patch;
+#X obj 34 142 get-midi-dialog;
+#X obj 34 203 prepend set;
+#X obj 34 278 send pd;
+#X text 246 249 <-- this message will be saved as part of your patch.
+click it or [loadbang] it to configure the MIDI settings. Make sure
+it is attached to a [send pd] so that Pd gets the message.;
+#X msg 34 249;
+#X connect 0 0 5 0;
+#X connect 5 0 1 0;
+#X connect 5 0 2 0;
+#X connect 5 0 6 0;
+#X connect 6 0 9 0;
+#X connect 9 0 7 0;
