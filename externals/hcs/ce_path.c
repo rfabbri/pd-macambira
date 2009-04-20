@@ -23,7 +23,7 @@ struct _canvasenvironment
     t_namelist *ce_path;   /* search path */
 };
 
-//static char *version = "$Revision: 1.2 $";
+static char *version = "$Revision: 1.2 $";
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
@@ -36,7 +36,7 @@ t_class *ce_path_class;
 typedef struct _ce_path
 {
     t_object            x_obj;
-    t_canvasenvironment *x_canvasenvironment;
+    t_canvas            *x_canvas;
     t_namelist          *x_current;
     t_outlet            *x_data_outlet;
     t_outlet            *x_status_outlet;
@@ -63,20 +63,29 @@ static void ce_path_output(t_ce_path* x)
 
 static void ce_path_rewind(t_ce_path* x) 
 {
-    x->x_current = x->x_canvasenvironment->ce_path;
+    t_canvasenvironment *e = canvas_getenv(x->x_canvas);
+    x->x_current = e->ce_path;
 }
 
 
-static void *ce_path_new(void)
+static void *ce_path_new(t_floatarg f)
 {
     t_ce_path *x = (t_ce_path *)pd_new(ce_path_class);
+    t_glist *glist = (t_glist *)canvas_getcurrent();
+    t_canvas *canvas = (t_canvas *)glist_getcanvas(glist);
+    
+    int depth = (int)f;
+    if(depth < 0) depth = 0;
+    while(depth && canvas) {
+        canvas = canvas->gl_owner;
+        depth--;
+    }
+    x->x_canvas = canvas;
+    ce_path_rewind(x);
 
     x->x_data_outlet = outlet_new(&x->x_obj, &s_symbol);
     x->x_status_outlet = outlet_new(&x->x_obj, 0);
 
-    x->x_canvasenvironment = canvas_getenv(canvas_getcurrent());
-    ce_path_rewind(x);
-    
     return (x);
 }
 
@@ -86,7 +95,7 @@ void ce_path_setup(void)
                              NULL,
                              sizeof(t_ce_path), 
                              CLASS_DEFAULT, 
-                             0, 
+                             A_DEFFLOAT, 
                              0);
     /* add inlet atom methods */
     class_addbang(ce_path_class, (t_method) ce_path_output);
@@ -94,4 +103,9 @@ void ce_path_setup(void)
     /* add inlet selector methods */
     class_addmethod(ce_path_class, (t_method) ce_path_rewind,
                     gensym("rewind"), 0);
+
+    post("[ce_path] %s", version);  
+    post("\tcompiled on "__DATE__" at "__TIME__ " ");
+    post("\tcompiled against Pd version %d.%d.%d", PD_MAJOR_VERSION, 
+         PD_MINOR_VERSION, PD_BUGFIX_VERSION);
 }
