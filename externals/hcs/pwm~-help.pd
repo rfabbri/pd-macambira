@@ -1,5 +1,5 @@
-#N canvas 122 138 523 408 10;
-#N canvas 0 22 450 300 graph1 0;
+#N canvas 138 51 523 408 10;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array \$0-pwm~ 100 float 0;
 #X coords 0 1.1 100 -0.1 200 100 1;
 #X restore 58 236 graph;
@@ -7,12 +7,12 @@
 #X text 355 21 <-- Click to start;
 #X text 194 193 <-- graph the output;
 #X text 302 287 see also:;
-#X obj 311 20 tgl 25 0 empty empty start 0 -6 1 9 -24198 -1 -1 1 1
+#X obj 311 20 tgl 25 0 empty empty start 0 -6 1 9 -24198 -1 -1 0 1
 ;
 #X msg 311 48 \; pd dsp \$1 \; metro \$1;
 #X obj 376 287 pwm;
 #X obj 71 66 hsl 128 15 0 1 0 1 empty empty pulse_width -2 -6 1 12
--225280 -1 -1 5400 0;
+-225280 -1 -1 10700 0;
 #X floatatom 80 88 5 0 0 0 - - -;
 #X text 139 112 argument = pwm rate in Hz;
 #X obj 67 112 pwm~ 2000;
