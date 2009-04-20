@@ -1,0 +1,18 @@
+#N canvas 150 177 450 300 10;
+#X obj 146 25 osc~ 270;
+#X obj 139 232 dac~;
+#X obj 309 24 pddp/dsp;
+#X obj 189 75 hsl 128 17 0 1 0 0 empty empty amount 6 9 0 10 -262144
+-1 -1 8500 1;
+#X floatatom 197 94 5 0 0 0 - - -;
+#X obj 230 122 hsl 128 17 0.01 10 1 0 empty empty frequency 6 9 0 10
+-262144 -1 -1 7200 1;
+#X floatatom 238 141 5 0 0 0 - - -;
+#X obj 146 151 tremolo~ 0.5 7;
+#X connect 0 0 7 0;
+#X connect 3 0 4 0;
+#X connect 3 0 7 1;
+#X connect 5 0 6 0;
+#X connect 5 0 7 2;
+#X connect 7 0 1 0;
+#X connect 7 0 1 1;
