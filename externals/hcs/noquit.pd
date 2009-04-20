@@ -1,0 +1,30 @@
+#N canvas 343 307 534 352 10;
+#X obj 124 283 sys_gui;
+#X obj 85 49 inlet;
+#X obj 86 75 route bang float;
+#X text 38 12 this disables/enables the menu_quit proc in the GUI to
+prevent quitting;
+#X obj 132 98 select 0;
+#X obj 191 165 bang;
+#X obj 123 165 bang;
+#X obj 284 121 print ERROR: no method for;
+#X msg 192 229 proc menu_quit "" menu_really_quit;
+#X msg 123 190 proc menu_quit "" [list pdtk_post "- noquit enabled
+-"];
+#X obj 191 98 route reset quit;
+#X obj 237 165 send pd;
+#X msg 237 142 verifyquit;
+#X connect 1 0 2 0;
+#X connect 2 0 6 0;
+#X connect 2 1 4 0;
+#X connect 2 2 10 0;
+#X connect 4 0 5 0;
+#X connect 4 1 6 0;
+#X connect 5 0 8 0;
+#X connect 6 0 9 0;
+#X connect 8 0 0 0;
+#X connect 9 0 0 0;
+#X connect 10 0 5 0;
+#X connect 10 1 12 0;
+#X connect 10 2 7 0;
+#X connect 12 0 11 0;

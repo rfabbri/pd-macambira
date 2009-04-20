@@ -1,0 +1,19 @@
+#N canvas 154 41 431 325 10;
+#X obj 134 232 noquit;
+#X obj 134 127 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 151 151 bang;
+#X msg 167 175 reset;
+#X msg 178 198 quit;
+#X text 188 152 disable quitting;
+#X text 209 173 re-enable quitting;
+#X text 158 126 enable/disable quitting;
+#X text 34 58 disable quitting for installations \, performances \,
+etc.;
+#X obj 9 7 cnv 15 400 30 empty empty noquit 20 16 0 14 -261682 -66577
+0;
+#X text 219 197 quit now;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
