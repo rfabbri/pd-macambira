@@ -68,7 +68,7 @@ rsync_distro()
 # let rsync handle the cleanup with --delete
 	DISTRO=$(basename $1)
 	echo "rsyncing $DISTRO to ${1}:"
-	RSYNC_COMMAND="rsync -a --delete rsync://128.238.56.50/distros/${DISTRO}/ ${1}/"
+	RSYNC_COMMAND="rsync -a --delete-before rsync://128.238.56.50/distros/${DISTRO}/ ${1}/"
 	case $SYSTEM in
 		mingw*)
 			/c/cygwin/bin/sh -c "$RSYNC_COMMAND"
