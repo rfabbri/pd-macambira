@@ -54,7 +54,7 @@ Name: {group}\GrIPD; Filename: {app}\gripd\gripd.exe
 #endif
 
 
-;[Run]
+[Run]
 ; NOTE: The following entry contains an English phrase ("Launch"). You are free to translate it into another language if required.
 ;Filename: {app}\bin\pd.exe; Description: Launch Pd-extended; Flags: nowait postinstall skipifsilent
 Filename: {app}\asio4all.url; Description: open ASIO4ALL website; Flags: nowait postinstall skipifsilent
