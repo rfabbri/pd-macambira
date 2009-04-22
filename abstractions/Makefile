@@ -415,10 +415,9 @@ purepd_install:
 	install -d $(objectsdir)/$(PUREPD_NAME)
 	install -p $(abstractions_src)/purepd/*.pd \
 		 $(objectsdir)/$(PUREPD_NAME)
-# temp hack, to make these available to anything until they get settled into a
-# proper lib <hans@at.or.at>
-	install -p $(abstractions_src)/purepd/*_argument.pd \
-		 $(objectsdir)
+	install -d $(helpdir)/$(PUREPD_NAME)
+	install -p $(abstractions_src)/purepd/*-help.pd \
+		 $(helpdir)/$(PUREPD_NAME)
 
 purepd_clean:
 	rm -f -- $(objectsdir)/$(PUREPD_NAME)/*.*
