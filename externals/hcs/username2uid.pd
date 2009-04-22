@@ -1,12 +1,12 @@
 #N canvas 496 159 353 422 10;
-#X obj 19 213 passwd;
+#X obj 19 213 hcs/passwd;
 #X obj 18 12 inlet;
 #X obj 61 12 inlet;
 #X obj 18 322 outlet;
 #X obj 108 31 loadbang;
 #X obj 56 59 purepd/any_argument \$1;
 #X obj 57 93 route float;
-#X obj 129 114 passwd;
+#X obj 129 114 hcs/passwd;
 #X obj 226 323 outlet;
 #X obj 129 135 list;
 #X obj 129 155 list split 3;

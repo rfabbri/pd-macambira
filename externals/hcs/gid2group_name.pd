@@ -7,7 +7,7 @@
 #X obj 82 183 outlet;
 #X obj 18 118 list;
 #X obj 18 147 list split 1;
-#X obj 18 85 group;
+#X obj 18 85 hcs/group;
 #X connect 0 0 8 0;
 #X connect 2 0 4 0;
 #X connect 3 0 4 0;

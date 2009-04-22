@@ -8,8 +8,8 @@
 #X obj 226 323 outlet;
 #X obj 129 135 list;
 #X obj 18 241 list;
-#X obj 19 213 group;
-#X obj 129 114 group;
+#X obj 19 213 hcs/group;
+#X obj 129 114 hcs/group;
 #X obj 129 155 list split 2;
 #X obj 129 176 list split 1;
 #X obj 18 261 list split 2;

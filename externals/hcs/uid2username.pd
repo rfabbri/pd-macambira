@@ -1,5 +1,5 @@
 #N canvas 217 216 510 229 10;
-#X obj 18 85 passwd;
+#X obj 18 85 hcs/passwd;
 #X obj 18 12 inlet;
 #X obj 19 183 outlet;
 #X obj 66 12 inlet;
