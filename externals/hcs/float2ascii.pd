@@ -8,7 +8,7 @@
 #X msg 126 273 ASCII character \$1 is not allowed in Pd!!;
 #X msg 125 243 123;
 #X msg 155 243 125;
-#X obj 42 334 purepd/purepd_error float->ascii;
+#X obj 42 334 purepd/purepd_error float2ascii;
 #X obj 203 95 moses 128;
 #X msg 7 161 \$1 outside of ASCII range (0-127);
 #X connect 0 0 1 0;

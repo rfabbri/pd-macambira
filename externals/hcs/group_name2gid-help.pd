@@ -16,8 +16,8 @@
 #X msg 57 49 symbol wheel;
 #X msg 76 81 symbol staff;
 #X text 12 14 convert a group name to a GID.;
-#X obj 272 201 group_name->gid staff;
-#X obj 56 190 group_name->gid;
+#X obj 272 201 group_name2gid staff;
+#X obj 56 190 group_name2gid;
 #X msg 361 166 symbol postfix;
 #X connect 1 0 15 0;
 #X connect 2 0 15 1;

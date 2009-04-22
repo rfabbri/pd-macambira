@@ -13,10 +13,10 @@
 #X obj 89 63 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
 #X floatatom 87 93 5 0 0 0 - - -;
-#X obj 85 160 gid->group_name;
+#X obj 85 160 gid2group_name;
 #X obj 417 193 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 301 171 gid->group_name 0;
+#X obj 301 171 gid2group_name 0;
 #X connect 0 0 11 0;
 #X connect 2 0 13 0;
 #X connect 7 0 11 1;

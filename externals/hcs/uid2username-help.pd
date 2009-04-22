@@ -13,8 +13,8 @@
 #X obj 60 93 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 300 1;
 #X floatatom 58 123 5 0 0 0 - - -;
-#X obj 56 190 uid->username;
-#X obj 272 201 uid->username 0;
+#X obj 56 190 uid2username;
+#X obj 272 201 uid2username 0;
 #X connect 0 0 11 0;
 #X connect 2 0 12 0;
 #X connect 7 0 11 1;

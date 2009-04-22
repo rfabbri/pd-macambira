@@ -17,12 +17,12 @@
 #X text 46 31 try it on any file (it doesn't change anything \, just
 reads data from the file system).;
 #X text 117 146 <-- set filename by cold inlet or object argument;
-#X obj 270 405 gid->group_name;
+#X obj 270 405 gid2group_name;
 #X symbolatom 270 434 0 0 0 3 group_name - -;
 #X obj 163 194 symbol;
 #X floatatom 98 365 0 0 0 3 hard_links - -;
 #X symbolatom 174 434 0 0 0 3 username - -;
-#X obj 174 405 uid->username;
+#X obj 174 405 uid2username;
 #X obj 81 147 stat;
 #X obj 9 203 list;
 #X obj 9 223 list split 9;
