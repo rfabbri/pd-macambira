@@ -38,8 +38,8 @@
 
 static char *version = "$Revision: 1.1 $";
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -127,5 +127,10 @@ void helppath_setup(void)
 					gensym("reset"), 0);
 	class_addmethod(helppath_class,(t_method) helppath_add,gensym("add"), 
 					A_DEFSYMBOL, 0);
+
+    post("[helppath] %s", version);  
+    post("\tcompiled on "__DATE__" at "__TIME__ " ");
+    post("\tcompiled against Pd version %d.%d.%d", PD_MAJOR_VERSION, 
+         PD_MINOR_VERSION, PD_BUGFIX_VERSION);
 }
 
