@@ -1,0 +1,9 @@
+#N canvas 625 186 450 300 10;
+#X obj 183 165 tkconsole;
+#X obj 183 142 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 24 18 The Tcl/Tk Wish Shell \, which Pd's GUI is built on top
+of \, provides an interactive console. In this console you can run
+Tcl code on the live GUI. This object makes it easy to show and hide
+the Tk console.;
+#X connect 1 0 0 0;
