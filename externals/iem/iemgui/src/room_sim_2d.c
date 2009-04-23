@@ -788,7 +788,7 @@ void room_sim_2d_setup(void)
 {
   room_sim_2d_class = class_new(gensym("room_sim_2d"), (t_newmethod)room_sim_2d_new,
     (t_method)room_sim_2d_ff, sizeof(t_room_sim_2d), 0, A_GIMME, 0);
-  class_addcreator((t_newmethod)room_sim_2d_new, gensym("room_sim_2d"), A_GIMME, 0);
+//  class_addcreator((t_newmethod)room_sim_2d_new, gensym("room_sim_2d"), A_GIMME, 0);
   class_addmethod(room_sim_2d_class, (t_method)room_sim_2d_click, gensym("click"),
     A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
   class_addmethod(room_sim_2d_class, (t_method)room_sim_2d_motion, gensym("motion"),

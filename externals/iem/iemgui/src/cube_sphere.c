@@ -755,7 +755,7 @@ void cube_sphere_setup(void)
 {
   cube_sphere_class = class_new(gensym("cube_sphere"), (t_newmethod)cube_sphere_new,
     (t_method)cube_sphere_ff, sizeof(t_cube_sphere), 0, A_GIMME, 0);
-  class_addcreator((t_newmethod)cube_sphere_new, gensym("cube_sphere"), A_GIMME, 0);
+//  class_addcreator((t_newmethod)cube_sphere_new, gensym("cube_sphere"), A_GIMME, 0);
   class_addmethod(cube_sphere_class, (t_method)cube_sphere_click, gensym("click"),
     A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
   class_addmethod(cube_sphere_class, (t_method)cube_sphere_motion, gensym("motion"),
