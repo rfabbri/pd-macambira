@@ -348,7 +348,7 @@ ifeq ($(OS_NAME),linux)
 endif
 ifeq ($(OS_NAME),darwin)
 	echo "<p>To install Pd, drag the $(PD_APP_NAME).app into your <b>/Applications</b> folder or to the shortcut in the disk image.  (<i>You might need to put the old one in the trash before copying this one to <b>/Applications</b></i>)</p>" >> $(README_FILE)	
-	echo "<p>By default, most of the included libraries are loaded at startup.  To change this, set your own preferences in the <b>Startup...</b> Preferences pane usings the <b>Save all settings</b> button.   If you want to start with a blank set of preferences, run this command in the Terminal.app: </p><p><code>touch ~/Library/Preferences/org.puredata.pd.plist</code> (<code>~</code> <i>means your home folder</i>)</p><p>The Preferences panels in Pd are currently buggy, so you might have better luck with the Apple utilities: <code>defaults read org.puredata.pd</code>, or, <b>Property List Editor</b>, which is freely available as part of <a href=\"http://developer.apple.com/tools/xcode/download/\" target=\"_blank\">XCode</a> or the <a href=\"http://www.apple.com/support/downloads/serveradmintools104.html\" target=\"_blank\">Server Tools</a>.</p>" >> $(README_FILE)
+	echo "<p>By default, most of the included libraries are loaded at startup.  To change this, set your own preferences in the <b>Startup...</b> Preferences pane usings the <b>Save all settings</b> button.   If you want to start with the default preferences, throw away the Pd preferences file <strong>~/Library/Preferences/org.puredata.pd.plist</strong> (<code>~</code> <i>means your home folder</i>), or run this command in the Terminal.app: </p><p><code>rm ~/Library/Preferences/org.puredata.pd.plist</code></p><p>The Preferences panels in Pd are currently buggy, so you might have better luck with the Apple utilities: <code>defaults read org.puredata.pd</code>, or, <b>Property List Editor</b>, which is freely available as part of <a href=\"http://developer.apple.com/tools/xcode/download/\" target=\"_blank\">XCode</a> or the <a href=\"http://www.apple.com/support/downloads/serveradmintools104.html\" target=\"_blank\">Server Tools</a>.</p>" >> $(README_FILE)
 	echo "If you want to use PDP on Mac OS X 10.4/Tiger or 10.3/Panther, you will need to install X11 (X11 comes installed with 10.5/Leopard).  It comes on the install CD/DVD that your computer came with.  For more detail, see <a href=\"http://www.simplehelp.net/2006/10/22/how-to-install-x11-in-os-x/\" target=\"_blank\">How to install X11 in OS X</a> or <a href=\"http://puredata.info/docs/faq/macosx\" target=\"_blank\">How do I install Pd on MacOS X?</a>." >> $(README_FILE)
 endif
 ifeq ($(OS_NAME),windows)
@@ -381,6 +381,9 @@ ifeq ($(OS_NAME),windows)
 	echo "<dd><a href=\"file:///%CommonProgramFiles%/\">%ProgramFiles%\Common Files\Pd</a></dd>" >> $(README_FILE)
 endif
 	echo "</dl>" >> $(README_FILE)
+	echo "</p>" >> $(README_FILE)
+	echo "<h3>Flext Binaries have been removed from Pd-extended</h3>" >> $(README_FILE)	
+	echo "<p>As of release 0.41.4 of Pd-extended, the whole package is built from source every night.  That means that some objects have been removed from the package because they were not being built from source (objects like [pool], [msd], [flashserver], etc.).  You can download these objects from the original authors or <a href=\"http://puredata.info/docs/faq/how-do-i-download-the-flext-binaries-that-used-to-be-included-in-pd-extended\" target=\"_blank\">get the files from the 0.40.3 Pd-extended release</a>." >> $(README_FILE)
 	echo "</p>" >> $(README_FILE)
 	echo "<h3>License</h3>" >> $(README_FILE)	
 	echo "<p>" >> $(README_FILE)
