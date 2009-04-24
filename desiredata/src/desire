@@ -1,2 +1,2 @@
 #!/bin/bash
-wish desire.tk
+wish desire.tk "$@"
