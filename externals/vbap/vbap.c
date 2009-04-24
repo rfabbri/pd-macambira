@@ -14,24 +14,25 @@ See copyright in file with name COPYRIGHT  */
 #include "s_stuff.h"
 
 // Function prototypes
-void new_spread_dir(t_vbap *x, float spreaddir[3], float vscartdir[3], float spread_base[3]);
-void new_spread_base(t_vbap *x, float spreaddir[3], float vscartdir[3]);
+static void new_spread_dir(t_vbap *x, float spreaddir[3], float vscartdir[3], float spread_base[3]);
+static void new_spread_base(t_vbap *x, float spreaddir[3], float vscartdir[3]);
 static void *vbap_class;				
-void vect_cross_prod(float v1[3], float v2[3],float v3[3]);
-void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x);
-void vbap_bang(t_vbap *x);
-void vbap_matrix(t_vbap *x, Symbol *s, int ac, Atom *av);
-/* these are for getting data from a cold inlet on Max/MSP, in Pd you use floatinlet_new() in new()
+static void vect_cross_prod(float v1[3], float v2[3],float v3[3]);
+static void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x);
+static void vbap_bang(t_vbap *x);
+static void vbap_matrix(t_vbap *x, Symbol *s, int ac, Atom *av);
+#ifndef PD /* Max */
+/* these are for getting data from a cold inlet on Max/MSP, in Pd you use floatinlet_new() in new() */
 void vbap_ft1(t_vbap *x, double n);
 void vbap_ft2(t_vbap *x, double n);
 void vbap_in3(t_vbap *x, long n);
 void vbap_ft4(t_vbap *x, double g);
-*/
-void spread_it(t_vbap *x, float *final_gs);
-void *vbap_new(float azi, float ele, float spread);
-void vbap(float g[3], long ls[3], t_vbap *x);
-void angle_to_cart(float azi, float ele, float res[3]);
-void cart_to_angle(float cvec[3], float avec[3]);
+#endif
+static void spread_it(t_vbap *x, float *final_gs);
+static void *vbap_new(float azi, float ele, float spread);
+static void vbap(float g[3], long ls[3], t_vbap *x);
+static void angle_to_cart(float azi, float ele, float res[3]);
+static void cart_to_angle(float cvec[3], float avec[3]);
 
 /*****************************************************
 	 INCLUDE ALL define_loudspeakers functions directly into VBAP
@@ -139,7 +140,7 @@ void vbap_ft4(t_vbap *x, double g) { x->x_gain = g; }
 /*--------------------------------------------------------------------------*/
 // create new instance of object... 
 #ifdef PD
-void *vbap_new(t_float azi, t_float ele, t_float spread)
+static void *vbap_new(t_float azi, t_float ele, t_float spread)
 {
 	t_vbap *x = (t_vbap *)newobject(vbap_class);
 
@@ -181,7 +182,7 @@ void *vbap_new(float azi,float ele)
 }
 
 
-void angle_to_cart(float azi, float ele, float res[3])
+static void angle_to_cart(float azi, float ele, float res[3])
 // converts angular coordinates to cartesian
 { 
   res[0] = cos(azi * atorad) * cos( ele * atorad);
@@ -189,7 +190,7 @@ void angle_to_cart(float azi, float ele, float res[3])
   res[2] = sin( ele * atorad);
 }
 
-void cart_to_angle(float cvec[3], float avec[3])
+static void cart_to_angle(float cvec[3], float avec[3])
 // converts cartesian coordinates to angular
 {
   //float tmp, tmp2, tmp3, tmp4;
@@ -224,7 +225,7 @@ void cart_to_angle(float cvec[3], float avec[3])
 }
 
 
-void vbap(float g[3], long ls[3], t_vbap *x)
+static void vbap(float g[3], long ls[3], t_vbap *x)
 {
   /* calculates gain factors using loudspeaker setup and given direction */
   float power;
@@ -335,7 +336,7 @@ void vbap(float g[3], long ls[3], t_vbap *x)
 }
 
 
-void vect_cross_prod(float v1[3], float v2[3],
+static void vect_cross_prod(float v1[3], float v2[3],
                 float v3[3]) 
 // vector cross product            
 {
@@ -350,7 +351,7 @@ void vect_cross_prod(float v1[3], float v2[3],
   v3[2] /= length;
 }
 
-void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x)
+static void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x)
 // calculates gains to be added to previous gains, used in
 // multiple direction panning (source spreading)
 {
@@ -416,7 +417,7 @@ void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x)
 }
 
 
-void new_spread_dir(t_vbap *x, float spreaddir[3], float vscartdir[3], float spread_base[3])
+static void new_spread_dir(t_vbap *x, float spreaddir[3], float vscartdir[3], float spread_base[3])
 // subroutine for spreading
 {
 	float beta,gamma;
@@ -446,7 +447,7 @@ void new_spread_dir(t_vbap *x, float spreaddir[3], float vscartdir[3], float spr
   	spreaddir[2] /= power;
 }
 
-void new_spread_base(t_vbap *x, float spreaddir[3], float vscartdir[3])
+static void new_spread_base(t_vbap *x, float spreaddir[3], float vscartdir[3])
 // subroutine for spreading
 {
 	float d;
@@ -463,7 +464,7 @@ void new_spread_base(t_vbap *x, float spreaddir[3], float vscartdir[3])
   	x->x_spread_base[2] /= power;
 }
 
-void spread_it(t_vbap *x, float *final_gs)
+static void spread_it(t_vbap *x, float *final_gs)
 // apply the sound signal to multiple panning directions
 // that causes some spreading.
 // See theory in paper V. Pulkki "Uniform spreading of amplitude panned
@@ -538,7 +539,7 @@ void spread_it(t_vbap *x, float *final_gs)
 }	
 	
 
-void vbap_bang(t_vbap *x)			
+static void vbap_bang(t_vbap *x)			
 // top level, vbap gains are calculated and outputted	
 {
 	Atom at[MAX_LS_AMOUNT]; 
@@ -585,7 +586,7 @@ void vbap_bang(t_vbap *x)
 
 /*--------------------------------------------------------------------------*/
 
-void vbap_matrix(t_vbap *x, Symbol *s, int ac, Atom *av)
+static void vbap_matrix(t_vbap *x, Symbol *s, int ac, Atom *av)
 // read in loudspeaker matrices
 {
 	int datapointer = 0; 

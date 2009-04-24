@@ -39,7 +39,7 @@ void main(void)
 # endif /* PD */
 #endif /* ! VBAP_OBJECT */
 
-void def_ls_bang(t_def_ls *x)						/* x = reference to this instance of the object */ 
+static void def_ls_bang(t_def_ls *x)						/* x = reference to this instance of the object */ 
 {   // calculate and print out chosen loudspeaker sets and corresponding  matrices
 	
 	if(x->x_ls_read == 1)
@@ -87,7 +87,7 @@ void def_ls_int(t_def_ls *x, long n)		// x = the instance of the object, n = the
 }
 */
 
-void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, Atom *av)
+static void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, Atom *av)
 // when loudspeaker triplets come in a message
 {
 	t_ls_set *trip_ptr,  *tmp_ptr, *prev;
@@ -143,7 +143,7 @@ void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, Atom *av)
 
 
 
-void def_ls_read_directions(t_def_ls *x, t_symbol *s, int ac, Atom *av)
+static void def_ls_read_directions(t_def_ls *x, t_symbol *s, int ac, Atom *av)
 // when loudspeaker directions come in a message
 {
 	if (x->x_ls_read)
@@ -164,7 +164,7 @@ void def_ls_read_directions(t_def_ls *x, t_symbol *s, int ac, Atom *av)
 
 /*--------------------------------------------------------------------------*/
 
-void ls_angles_to_cart(t_ls *ls)
+static void ls_angles_to_cart(t_ls *ls)
 // convert angular direction to cartesian
 {
   float azi = ls->azi;
@@ -175,7 +175,7 @@ void ls_angles_to_cart(t_ls *ls)
 }
 
 /* create new instance of object... MUST send it an int even if you do nothing with this int!! */
-void *def_ls_new(t_symbol *s, int ac, Atom *av)	
+static void *def_ls_new(t_symbol *s, int ac, Atom *av)	
 {
 	// s is object name (we ignore it)
 	t_def_ls *x = (t_def_ls *)newobject(def_ls_class);
@@ -199,7 +199,7 @@ void vbap_def_ls(t_def_ls *x, t_symbol *s, int ac, Atom *av)
 }
 
 /** Initialize the object content from parameters : ls-directions list */
-void initContent_ls_directions(t_def_ls *x,int ac,Atom*av)
+static void initContent_ls_directions(t_def_ls *x,int ac,Atom*av)
 {
 	x->x_ls_read = 0;
 	
@@ -260,7 +260,7 @@ void initContent_ls_directions(t_def_ls *x,int ac,Atom*av)
 	x->x_ls_set = NULL;
 }
 
-void choose_ls_triplets(t_def_ls *x) 
+static void choose_ls_triplets(t_def_ls *x) 
      /* Selects the loudspeaker triplets, and
       calculates the inversion matrices for each selected triplet.
      A line (connection) is drawn between each loudspeaker. The lines
@@ -451,7 +451,7 @@ int any_ls_inside_triplet(int a, int b, int c,t_ls lss[MAX_LS_AMOUNT],int ls_amo
   return any_ls_inside;
 }
 
-void add_ldsp_triplet(int i, int j, int k, t_def_ls *x)
+static void add_ldsp_triplet(int i, int j, int k, t_def_ls *x)
      /* adds i,j,k triplet to structure*/
 {
   struct t_ls_set *trip_ptr, *prev;
@@ -520,7 +520,7 @@ float vol_p_side_lgth(int i, int j,int k, t_ls  lss[MAX_LS_AMOUNT] )
     return 0.0;
 }
 
-void ls_cross_prod(t_ls v1,t_ls v2, 
+static void ls_cross_prod(t_ls v1,t_ls v2, 
                 t_ls *res) 
 // vector cross product
 {
@@ -536,7 +536,7 @@ void ls_cross_prod(t_ls v1,t_ls v2,
 }
 
 
-int lines_intersect(int i,int j,int k,int l,t_ls  lss[MAX_LS_AMOUNT])
+static int lines_intersect(int i,int j,int k,int l,t_ls  lss[MAX_LS_AMOUNT])
      /* checks if two lines intersect on 3D sphere 
        */
 {
@@ -584,7 +584,7 @@ int lines_intersect(int i,int j,int k,int l,t_ls  lss[MAX_LS_AMOUNT])
   }
 }
 
-void  calculate_3x3_matrixes(t_def_ls *x)
+static void  calculate_3x3_matrixes(t_def_ls *x)
      /* Calculates the inverse matrices for 3D */
 {  
   float invdet;
@@ -663,7 +663,7 @@ void  calculate_3x3_matrixes(t_def_ls *x)
 
 
 
-void choose_ls_tuplets(t_def_ls *x)
+static void choose_ls_tuplets(t_def_ls *x)
      /* selects the loudspeaker pairs, calculates the inversion
         matrices and stores the data to a global array*/
 {
@@ -803,7 +803,7 @@ for (i=0;i<ls_amount;i++)
 }
   
 
-int calc_2D_inv_tmatrix(float azi1,float azi2, float inv_mat[4],float mat[4])
+static int calc_2D_inv_tmatrix(float azi1,float azi2, float inv_mat[4],float mat[4])
 // calculate inverse 2x2 matrix
 {
   float x1,x2,x3,x4; /* x1 x3 */
