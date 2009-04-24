@@ -187,9 +187,9 @@ flatspace_install: flatspace $(helpdir) $(objectsdir)
 		--description "This is a collection of externals in a flat namespace" \
 		--license "GNU GPL"
 	install -p $(FLATSPACE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(FLATSPACE_NAME)
-	install -d $(helpdir)/$(FLATSPACE_NAME)
-# all standard objs' help files
-#    it had to be broken up because the list is soo long
+# all standard objs' help files, it had to be broken up because the list is
+# soo long.  They are installed only inside of the libdir since this is so
+# messy.  We don't these help patches to come up for other objects
 	install -p \
 			$(externals_src)/arraysize/*.pd \
 			$(externals_src)/beatpipe/*.pd \
@@ -197,27 +197,18 @@ flatspace_install: flatspace $(helpdir) $(objectsdir)
 			$(externals_src)/control/*/*.pd \
 			$(externals_src)/bbogart/chaos/tools/*.pd \
 			$(externals_src)/bbogart/*/*.pd \
-			$(externals_src)/creb/doc/*.pd \
-				$(helpdir)/$(FLATSPACE_NAME)
+				$(objectsdir)/$(FLATSPACE_NAME)
 	install -p \
-			$(externals_src)/dfx/*/*.pd \
-			$(externals_src)/ggee/*/*-help.pd \
-			$(externals_src)/ggee/*/*.gif \
 			$(externals_src)/ff/*.pd \
-			$(externals_src)/hcs/*-help.pd \
-				$(helpdir)/$(FLATSPACE_NAME)
+			$(externals_src)/hcs/folder_list-help.pd \
+			$(externals_src)/hcs/split_path-help.pd \
+				$(objectsdir)/$(FLATSPACE_NAME)
 	install -p \
-			$(externals_src)/hcs/*/doc/*.pd \
 			$(externals_src)/iem/comport/*/*-help.pd \
 			$(externals_src)/nusmuk/line3/*.pd \
-				$(helpdir)/$(FLATSPACE_NAME)
-	install -p \
-			$(externals_src)/pdogg/*/*.pd \
 			$(externals_src)/plugin~/*.pd \
 			$(externals_src)/rhythm_estimator/*.p? \
-			$(externals_src)/signal/*/*.pd \
-			$(externals_src)/vst/*.pd \
-				$(helpdir)/$(FLATSPACE_NAME)
+				$(objectsdir)/$(FLATSPACE_NAME)
 
 
 flatspace_clean:
