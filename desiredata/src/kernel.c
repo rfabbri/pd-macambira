@@ -471,7 +471,7 @@ static void inlet_wrong(t_inlet *x, t_symbol *s) {
 
 void inlet_settip(t_inlet* i,t_symbol* s) {i->tip = s;}
 
-char* inlet_tip(t_inlet* i,int num) {
+const char *inlet_tip(t_inlet* i,int num) {
   if (num < 0) return "???";
   while (num-- && i) i = i->next;
   if (i && i->tip) return i->tip->name;
@@ -1243,7 +1243,7 @@ void new_anything(void *dummy, t_symbol *s, int argc, t_atom *argv) {
     } else newest = 0;
 }
 
-#define MAKESYM(CSYM,S) t_symbol CSYM = {S,0,0,1,0xdeadbeef};
+#define MAKESYM(CSYM,S) t_symbol CSYM = {(char *)(S),0,0,1,0xdeadbeef};
 MAKESYM(s_pointer ,"pointer")
 MAKESYM(s_float   ,"float")
 MAKESYM(s_symbol  ,"symbol")
@@ -1368,11 +1368,11 @@ void pd_typedmess(t_pd *x, t_symbol *s, int argc, t_atom *argv) {
 	ENTER(s); pd_typedmess_2(x,s,argc,argv); LEAVE;
 }
 
-void pd_vmess(t_pd *x, t_symbol *sel, char *fmt, ...) {
+void pd_vmess(t_pd *x, t_symbol *sel, const char *fmt, ...) {
     va_list ap;
     t_atom arg[MAXPDARG], *at =arg;
     int nargs = 0;
-    char *fp = fmt;
+    const char *fp = fmt;
     va_start(ap, fmt);
     while (1) {
         if (nargs > MAXPDARG) {
@@ -1506,7 +1506,7 @@ void binbuf_clear(t_binbuf *x) {
 }
 
 /* called just after a doublequote in version 1 parsing */
-char *binbuf_text_quoted(t_binbuf *x, char *t, char *end) {
+const char *binbuf_text_quoted(t_binbuf *x, const char *t, char *end) {
 	ostringstream buf;
 	while (t!=end) {
 		char c = *t++;
@@ -1536,7 +1536,7 @@ char *binbuf_text_quoted(t_binbuf *x, char *t, char *end) {
    returns pointer to end of atom text */
 /* this one is for pd format version 1 */
 /* TODO: double-quotes, braces, test backslashes&dollars */
-char *binbuf_text_matju(t_binbuf *x, char *t, char *end) {
+const char *binbuf_text_matju(t_binbuf *x, const char *t, const char *end) {
 	int doll=0;
 	while (t!=end && isspace(*t)) t++;
 	if (t==end) return t;
@@ -1565,7 +1565,7 @@ char *binbuf_text_matju(t_binbuf *x, char *t, char *end) {
 }
 
 /* this one is for pd format version 0 */
-char *binbuf_text_miller(t_binbuf *x, char *t, char *end) {
+const char *binbuf_text_miller(t_binbuf *x, const char *t, const char *end) {
     ostringstream buf;
     /* it's an atom other than a comma or semi */
     int q = 0, slash = 0, lastslash = 0, dollar = 0;
@@ -1612,16 +1612,16 @@ char *binbuf_text_miller(t_binbuf *x, char *t, char *end) {
 
 int sys_syntax = 0;
 
-void binbuf_text(t_binbuf *x, char *t, size_t size) {
-	char *end=t+size;
+void binbuf_text(t_binbuf *x, const char *t, size_t size) {
+	const char *end=t+size;
 	binbuf_clear(x);
 	while (t!=end) t = sys_syntax ? binbuf_text_matju(x,t,end) : binbuf_text_miller(x,t,end);
 	binbuf_capa(x,x->n);
 }
 
-void pd_eval_text(char *t, size_t size) {
+void pd_eval_text(const char *t, size_t size) {
 	t_binbuf *x = binbuf_new();
-	char *end = t+size;
+	const char *end = t+size;
 	while (t!=end) {
 		t = sys_syntax ? binbuf_text_matju(x,t,end) : binbuf_text_miller(x,t,end);
 		if (x->n && x->v[x->n-1].a_type == A_SEMI) {
@@ -1684,7 +1684,7 @@ void binbuf_addv(t_binbuf *x, const char *fmt, ...) {
     va_list ap;
     t_atom arg[MAXADDMESSV], *at =arg;
     int nargs = 0;
-    char *fp = fmt;
+    const char *fp = fmt;
     va_start(ap, fmt);
     while (1) {
         if (nargs >= MAXADDMESSV) {
@@ -1982,7 +1982,7 @@ static int binbuf_doopen(char *s, int mode) {
     return open(namebuf, mode);
 }
 
-static FILE *binbuf_dofopen(const char *s, char *mode) {
+static FILE *binbuf_dofopen(const char *s, const char *mode) {
     char namebuf[strlen(s)+1];
     sys_bashfilename(s, namebuf);
     return fopen(namebuf, mode);

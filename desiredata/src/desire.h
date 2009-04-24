@@ -264,7 +264,7 @@ EXTERN t_symbol *s_empty;
 
 /* from kernel.c */
 EXTERN void gobj_save(t_gobj *x, t_binbuf *b);
-EXTERN void pd_eval_text(char *t, size_t size);
+EXTERN void pd_eval_text(const char *t, size_t size);
 EXTERN int sys_syntax;
 
 /* from desire.c */

@@ -1304,7 +1304,7 @@ static t_pd *garray_arraytemplatecanvas;
 /* create invisible, built-in canvases to determine the templates for floats
 and float-arrays. */
 
-void pd_eval_text2(char *s) {pd_eval_text(s,strlen(s));}
+void pd_eval_text2(const char *s) {pd_eval_text(s,strlen(s));}
 
 extern "C" void garray_init () {
     hack = 0; /* invisible canvases must be, uh, invisible */
@@ -2368,7 +2368,7 @@ static int canvas_scanbinbuf(int natoms, t_atom *vec, int *p_indexout, int *p_ne
     return i-indexwas;
 }
 static int canvas_readscalar(t_canvas *x, int natoms, t_atom *vec, int *p_nextmsg, int selectit);
-static void canvas_readerror(int natoms, t_atom *vec, int message, int nline, char *s) {
+static void canvas_readerror(int natoms, t_atom *vec, int message, int nline, const char *s) {
     error(s);
     startpost("line was:");
     postatom(nline, vec + message);
@@ -5738,7 +5738,7 @@ static void iemgui_color(t_iemgui *x, t_symbol *s, int ac, t_atom *av) {
 }
 
 #define NEXT p=va_arg(val,void*); /*printf("p=%p\n",p);*/
-int pd_vscanargs(int argc, t_atom *argv, char *fmt, va_list val) {
+int pd_vscanargs(int argc, t_atom *argv, const char *fmt, va_list val) {
     int optional=0;
     int i,j=0;
     for (i=0; fmt[i]; i++) {
@@ -5798,7 +5798,7 @@ break2:
    made declarative, by storing a list of &(0->blah) relative offsets
    into each struct...
 */
-int pd_vsaveargs(t_binbuf *b, char *fmt, va_list val) {
+int pd_vsaveargs(t_binbuf *b, const char *fmt, va_list val) {
     t_atom a;
     int i;
     for (i=0; ; i++) {
@@ -5827,7 +5827,7 @@ err:
     return 0;
 }
 
-int pd_scanargs(int argc, t_atom *argv, char *fmt, ...) {
+int pd_scanargs(int argc, t_atom *argv, const char *fmt, ...) {
 	int i;
 	va_list val;
 	va_start(val,fmt);
@@ -5836,7 +5836,7 @@ int pd_scanargs(int argc, t_atom *argv, char *fmt, ...) {
 	return i;
 }
 
-int pd_saveargs(t_binbuf *b, char *fmt, ...) {
+int pd_saveargs(t_binbuf *b, const char *fmt, ...) {
 	int i;
 	va_list val;
 	va_start(val,fmt);

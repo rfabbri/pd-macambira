@@ -444,7 +444,7 @@ EXTERN t_binbuf *binbuf_new(void);
 EXTERN void binbuf_free(t_binbuf *x);
 EXTERN t_binbuf *binbuf_duplicate(t_binbuf *y);
 
-EXTERN void binbuf_text(t_binbuf *x, char *text, size_t size);
+EXTERN void binbuf_text(t_binbuf *x, const char *text, size_t size);
 EXTERN void binbuf_gettext(t_binbuf *x, char **bufp, int *lengthp);
 EXTERN char *binbuf_gettext2(t_binbuf *x);
 EXTERN void binbuf_clear(t_binbuf *x);
