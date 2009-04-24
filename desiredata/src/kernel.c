@@ -1988,7 +1988,7 @@ static FILE *binbuf_dofopen(const char *s, const char *mode) {
     return fopen(namebuf, mode);
 }
 
-int binbuf_read(t_binbuf *b, char *filename, char *dirname, int flags) {
+int binbuf_read(t_binbuf *b, const char *filename, char *dirname, int flags) {
     long length;
     char *buf;
     char *namebuf=0;
@@ -2014,7 +2014,7 @@ int binbuf_read(t_binbuf *b, char *filename, char *dirname, int flags) {
 }
 
 /* read a binbuf from a file, via the search patch of a canvas */
-int binbuf_read_via_canvas(t_binbuf *b, char *filename, t_canvas *canvas, int flags) {
+int binbuf_read_via_canvas(t_binbuf *b, const char *filename, t_canvas *canvas, int flags) {
     char *buf, *bufptr;
     int fd = canvas_open2(canvas, filename, "", &buf, &bufptr, 0);
     if (fd<0) {error("%s: can't open", filename); return 1;}
@@ -2023,7 +2023,7 @@ int binbuf_read_via_canvas(t_binbuf *b, char *filename, t_canvas *canvas, int fl
 }
 
 /* old version */
-int binbuf_read_via_path(t_binbuf *b, char *filename, char *dirname, int flags) {
+int binbuf_read_via_path(t_binbuf *b, char const *filename, char *dirname, int flags) {
     char *buf, *bufptr;
     int fd = open_via_path2(dirname, filename, "", &buf, &bufptr, 0);
     if (fd<0) {error("%s: can't open", filename); return 1;}
@@ -2037,7 +2037,7 @@ int binbuf_read_via_path(t_binbuf *b, char *filename, char *dirname, int flags) 
 static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd);
 
 /* write a binbuf to a text file.  If "crflag" is set we suppress semicolons. */
-int binbuf_write(t_binbuf *x, char *filename, char *dir, int crflag) {
+int binbuf_write(t_binbuf *x, const char *filename, char *dir, int crflag) {
     char sbuf[WBUFSIZE];
     ostringstream fbuf;
     char *bp = sbuf, *ep = sbuf + WBUFSIZE;
