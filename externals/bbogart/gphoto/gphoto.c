@@ -691,6 +691,8 @@ void *captureImages(void *threadArgs) {
 
 		close(fd); // close file descriptor
 
+		gp_file_free(camerafile);
+
 		// Send bang out 2nd outlet for each iteration.
 		sys_lock();
 		outlet_bang(((gphoto_gimme_struct *)threadArgs)->gphoto->doneOutlet);
