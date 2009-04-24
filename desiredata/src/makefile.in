@@ -62,7 +62,7 @@ externs::
 install::  all
 	install -d $(DESTDIR)$(bindir)
 	install -d $(DESTDIR)$(libpdbindir)
-	for file in defaults.ddrc pkgIndex.tcl pre8.5.tcl poe.tcl bgerror.tcl; do \
+	for file in defaults.ddrc pkgIndex.tcl poe.tcl bgerror.tcl; do \
 		install $$file $(DESTDIR)$(libpdbindir)/$$file; done
 	install $(BINARYMODE) $(SO) $(DESTDIR)$(libdir)/$(SO)
 	test -w /etc/ld.so.cache && ldconfig || true
@@ -71,12 +71,10 @@ install::  all
 	install -m755 pdsend      $(DESTDIR)$(bindir)/pdsend
 	install -m755 pdreceive   $(DESTDIR)$(bindir)/pdreceive
 	install -m755 pd-watchdog $(DESTDIR)$(libpdbindir)/pd-watchdog
-	#mkdir -p $(DESTDIR)$(pddocdir)
 	find locale   -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(libpdbindir)/'{}' ';'
 	find icons    -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(libpddir)/'{}' ';'
 	find ../doc   -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(pddocdir)/'{}' ';'
 	find ../extra -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(libpddir)/'{}' ';'
-	# rm -f $(DESTDIR)$(libpddir)/extra/*/*.o
 	install -d $(DESTDIR)$(includedir)
 	for file in m_pd.h desire.h; do install -m644 $$file $(DESTDIR)$(includedir)/$$file; done
 	install -d $(DESTDIR)$(mandir)/man1
@@ -89,7 +87,7 @@ local-clean::
 	-(cd ../doc/6.externs; rm -f *.pd_linux)
 	-rm -f makefile.deps
 	touch makefile.deps
-	chmod 666 makefile.deps
+	#chmod 666 makefile.deps # what was this for??
 
 extra-clean::
 	-rm -f `find ../extra/ -name "*.pd_*"`
@@ -113,8 +111,8 @@ makefile.deps: makefile
 uninstall::
 	rm -f -r $(DESTDIR)$(libpddir)
 	rm -f $(DESTDIR)$(libdir)/libpd*
-	cd $(DESTDIR)$(bindir);     rm pd pdsend pdreceive
-	cd $(DESTDIR)$(includedir); rm m_pd.h desire.h
+	cd $(DESTDIR)$(bindir);      rm pd pdsend pdreceive
+	cd $(DESTDIR)$(includedir);  rm m_pd.h desire.h
 	cd $(DESTDIR)$(mandir)/man1; rm pd.1.gz pdsend.1.gz pdreceive.1.gz
 
 test:: all
