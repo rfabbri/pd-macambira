@@ -25,11 +25,11 @@ SUBDIRS = \
 MOOCOW_DIR    ?=$(shell pwd)
 MOOCOW_BUILD  ?=$(MOOCOW_DIR)/build.moo
 MOOCOW_MFLAGS ?=DESTDIR=""
-MOOCOW_BUILD_VERSION ?=2009-04-19.001
+MOOCOW_BUILD_VERSION ?=2009-04-24.001
 
 CONFIGURE_ARGS=\
 	CFLAGS="$(CFLAGS)" \
-	LDFLAGS="$(LDFLAGS) -L\"$(pd_src)/bin\"" \
+	LDFLAGS="$(LDFLAGS) -L$(pd_src)/bin" \
 	--with-pd-include="$(pd_src)/src" \
 	--with-pd-dir="$(MOOCOW_BUILD)" \
 	--disable-dependency-tracking
