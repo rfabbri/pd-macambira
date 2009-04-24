@@ -168,7 +168,7 @@ EXTERN t_namelist *sys_messagelist;
 EXTERN t_socketreceiver *socketreceiver_new(t_pd *owner, int fd,
     t_socketnotifier notifier, t_socketreceivefn socketreceivefn, int udp);
 EXTERN void socketreceiver_read(t_socketreceiver *x, int fd);
-EXTERN void sys_sockerror(char *s);
+EXTERN void sys_sockerror(const char *s);
 EXTERN void sys_closesocket(int fd);
 
 typedef void (*t_fdpollfn)(void *ptr, int fd);
