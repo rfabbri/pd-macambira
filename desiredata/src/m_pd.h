@@ -229,7 +229,10 @@ typedef enum {
     A_DOLLAR, A_DOLLSYM, /* radioactive elements of the second kind */
     A_GIMME, /* non-type: represents varargs */
     A_CANT, /* bottom type: type constraint is impossible */
-    A_ATOM  /* top type:    type constraint doesn't constrain */
+    A_LIST  /* t_list *, the 4th stable element (future use) */
+    /* 14 = A_GRID for GridFlow */
+    /* 15 = A_GRIDOUT for GridFlow */
+    /* 16 could be A_ATOM, top type:    type constraint doesn't constrain */
 }  t_atomtype;
 
 #define A_DEFSYMBOL A_DEFSYM    /* better name for this */
