@@ -281,7 +281,7 @@ t_queue *queue_new () {
 
 static bool debug_queue=0;
 
-static void pd_print (t_pd *self, char *header) {
+static void pd_print (t_pd *self, const char *header) {
 	if (self->_class->gobj && (object_table->get(self)&1)==0) {printf("%s %p dead\n",header,self); return;}
 	if (self->_class->patchable) {
 		t_binbuf *b = ((t_text *)self)->binbuf;
