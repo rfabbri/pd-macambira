@@ -1,4 +1,4 @@
-/* $Id: kernel.c,v 1.1.2.92 2007-09-09 21:34:56 matju Exp $
+/* $Id: kernel.c,v 1.1.2.92 2007/09/09 21:34:56 matju Exp $
  * Copyright 2006-2007 Mathieu Bouchard.
  * Copyright (c) 1997-2006 Miller Puckette.
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
@@ -230,7 +230,7 @@ void pd_free(t_pd *x) {
     if (c->patchable) {
 	t_object *y = (t_object *)x;
 	while (y->outlet) outlet_free(y->outlet);
-	while (y->inlet)   inlet_free(y->inlet);
+	while (y-> inlet)  inlet_free(y-> inlet);
 	if (y->binbuf)    binbuf_free(y->binbuf);
     }
     /* schedule for deletion if need to keep the allocation around */
@@ -1601,6 +1601,7 @@ char *binbuf_text_miller(t_binbuf *x, char *t, char *end) {
        stripped so we assume all "$" chars are real dollars.  In fact, we only know at least one was. */
     if (dollar) {
         const char *b = buf.str().data();
+        //printf("b=%s\n",b);
 	if (*b != '$') dollar = 0;
 	for (b++; *b; b++) if (!isdigit(*b)) dollar = 0;
 	if (dollar) binbuf_addv(x,"$",atoi(buf.str().data()+1));
@@ -1679,7 +1680,7 @@ void binbuf_add(t_binbuf *x, int argc, t_atom *argv) {
 }
 
 #define MAXADDMESSV 100
-void binbuf_addv(t_binbuf *x, char *fmt, ...) {
+void binbuf_addv(t_binbuf *x, const char *fmt, ...) {
     va_list ap;
     t_atom arg[MAXADDMESSV], *at =arg;
     int nargs = 0;

@@ -299,7 +299,7 @@ void sys_set_priority(int higher) {
 
 /* ------------------ receiving incoming messages over sockets ------------- */
 
-void sys_sockerror(char *s) {
+void sys_sockerror(const char *s) {
 #ifdef _WIN32
     int err = WSAGetLastError();
     if (err == 10054) return;
@@ -456,7 +456,7 @@ int max(int a, int b) { return ((a)>(b)?(a):(b)); }
 
 std::ostringstream lost_posts;
 
-void sys_vgui(char *fmt, ...) {
+void sys_vgui(const char *fmt, ...) {
     t_socketreceiver *self = sys_socketreceiver;
     va_list ap;
     va_start(ap, fmt);
@@ -484,7 +484,7 @@ void sys_vgui(char *fmt, ...) {
     self->bytessincelastping += msglen;
 }
 
-void sys_gui(char *s) {sys_vgui("%s", s);}
+void sys_gui(const char *s) {sys_vgui("%s", s);}
 
 static int sys_flushtogui(t_socketreceiver *self) {
     int writesize = self->ohead-self->otail;
