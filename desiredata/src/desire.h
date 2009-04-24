@@ -299,7 +299,7 @@ EXTERN void word_restore(t_word *wp, t_template *tmpl, int argc, t_atom *argv);
 EXTERN t_scalar *scalar_new(t_canvas *owner, t_symbol *templatesym);
 EXTERN void word_free(t_word *wp, t_template *tmpl);
 EXTERN void scalar_redraw(t_scalar *x, t_canvas *canvas);
-//EXTERN int pd_pickle(t_foo *foo, char *fmt, ...);
+//EXTERN int pd_pickle(t_foo *foo, const char *fmt, ...);
 EXTERN void pd_set_newest (t_pd *x);
 EXTERN const char *inlet_tip(t_inlet* i,int num);
 

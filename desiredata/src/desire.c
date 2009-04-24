@@ -2435,7 +2435,7 @@ static int canvas_readscalar(t_canvas *x, int natoms, t_atom *vec, int *p_nextms
     return 1;
 }
 
-static void canvas_readfrombinbuf(t_canvas *x, t_binbuf *b, char *filename, int selectem) {
+static void canvas_readfrombinbuf(t_canvas *x, t_binbuf *b, const char *filename, int selectem) {
     int message, nextmsg = 0;
     int natoms = binbuf_getnatom(b);
     t_atom *vec = binbuf_getvec(b);
@@ -5197,8 +5197,8 @@ struct t_nbx : t_iemgui {
 };
 
 struct t_foo { int argc; t_atom *argv; t_binbuf *b; };
-static int pd_pickle(t_foo *foo, char *fmt, ...);
-static int pd_savehead(t_binbuf *b, t_iemgui *x, char *name);
+static int pd_pickle(t_foo *foo, const char *fmt, ...);
+static int pd_savehead(t_binbuf *b, t_iemgui *x, const char *name);
 
 static t_class *radio_class, *slider_class;
 static t_symbol *sym_hdl, *sym_hradio, *sym_vdl, *sym_vradio, *sym_vsl, *sym_vslider;
@@ -5845,7 +5845,7 @@ int pd_saveargs(t_binbuf *b, const char *fmt, ...) {
 	return i;
 }
 
-int pd_pickle(t_foo *foo, char *fmt, ...) {
+int pd_pickle(t_foo *foo, const char *fmt, ...) {
 	va_list val;
 	va_start(val,fmt);
 	int r = foo->b ?
@@ -5855,7 +5855,7 @@ int pd_pickle(t_foo *foo, char *fmt, ...) {
 	return r;
 }
 
-static int pd_savehead(t_binbuf *b, t_iemgui *x, char *name) {
+static int pd_savehead(t_binbuf *b, t_iemgui *x, const char *name) {
     binbuf_addv(b, "ttiit","#X","obj", (t_int)x->x, (t_int)x->y, name);
     return 1;
 }
