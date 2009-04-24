@@ -1,11 +1,16 @@
-/* Copyright (c) 2006-2007 Mathieu Bouchard.
+/* $Id$
+   This file is part of DesireData.
+
+   Copyright (c) 2006,2007,2009 Mathieu Bouchard.
    Copyright (c) 1997-1999 Miller Puckette.
    For information on usage and redistribution, and for a DISCLAIMER OF ALL
-   WARRANTIES, see the file, "LICENSE.txt", in this distribution.  */
-
-/* PD_PLUSPLUS_FACE is not considered as part of the main interface for externals,
+   WARRANTIES, see the file, "LICENSE.txt", in this distribution.
+*/
+/*
+   PD_PLUSPLUS_FACE is not considered as part of the main interface for externals,
    even though it has become the main interface for internals. please don't rely on
-   it outside of the desiredata source code */
+   it outside of the desiredata source code (yet).
+*/
 
 #ifndef __m_pd_h_
 
@@ -443,7 +448,7 @@ EXTERN void binbuf_gettext(t_binbuf *x, char **bufp, int *lengthp);
 EXTERN char *binbuf_gettext2(t_binbuf *x);
 EXTERN void binbuf_clear(t_binbuf *x);
 EXTERN void binbuf_add(t_binbuf *x, int argc, t_atom *argv);
-EXTERN void binbuf_addv(t_binbuf *x, char *fmt, ...);
+EXTERN void binbuf_addv(t_binbuf *x, const char *fmt, ...);
 EXTERN void binbuf_addbinbuf(t_binbuf *x, t_binbuf *y);
 EXTERN void binbuf_addsemi(t_binbuf *x);
 EXTERN void binbuf_restore(t_binbuf *x, int argc, t_atom *argv);
