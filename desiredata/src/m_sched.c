@@ -182,7 +182,7 @@ static int oss_resyncphase = 0;
 static int oss_nresync = 0;
 static t_resync oss_resync[NRESYNC];
 
-static char *(oss_errornames[]) = {
+static const char *(oss_errornames[]) = {
 "unknown",
 "ADC blocked",
 "DAC blocked",
