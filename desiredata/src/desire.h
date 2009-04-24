@@ -301,7 +301,7 @@ EXTERN void word_free(t_word *wp, t_template *tmpl);
 EXTERN void scalar_redraw(t_scalar *x, t_canvas *canvas);
 //EXTERN int pd_pickle(t_foo *foo, char *fmt, ...);
 EXTERN void pd_set_newest (t_pd *x);
-char* inlet_tip(t_inlet* i,int num);
+EXTERN const char *inlet_tip(t_inlet* i,int num);
 
 extern t_hash<t_pd *,long> *object_table;
 extern t_hash<t_symbol *,t_class *> *class_table;

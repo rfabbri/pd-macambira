@@ -380,7 +380,7 @@ EXTERN t_symbol *symprintf(const char *s, ...);
 EXTERN t_gotfn  getfn(t_pd *x, t_symbol *s);
 EXTERN t_gotfn zgetfn(t_pd *x, t_symbol *s);
 EXTERN void nullfn(void);
-EXTERN void pd_vmess(t_pd *x, t_symbol *s, char *fmt, ...);
+EXTERN void pd_vmess(t_pd *x, t_symbol *s, const char *fmt, ...);
 #define mess0(x,s)           (getfn((x),(s))((x)))
 #define mess1(x,s,a)         (getfn((x),(s))((x),(a)))
 #define mess2(x,s,a,b)       (getfn((x),(s))((x),(a),(b)))
