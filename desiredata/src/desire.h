@@ -268,8 +268,8 @@ EXTERN void pd_eval_text(char *t, size_t size);
 EXTERN int sys_syntax;
 
 /* from desire.c */
-EXTERN int pd_scanargs(int argc, t_atom *argv, char *fmt, ...);
-EXTERN int pd_saveargs(t_binbuf *b, char *fmt, ...);
+EXTERN int pd_scanargs(int argc, t_atom *argv, const char *fmt, ...);
+EXTERN int pd_saveargs(t_binbuf *b, const char *fmt, ...);
 EXTERN void pd_upload(t_gobj *self);
 EXTERN void sys_mgui(void *self,   const char *sel, const char *fmt, ...);
 EXTERN void canvas_add(t_canvas *x, t_gobj *g, int index=-1);
