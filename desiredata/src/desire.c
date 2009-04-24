@@ -111,6 +111,7 @@ t_boxes *boxes_new() {
 }
 
 void boxes_notice(t_boxes *self, t_gobj *origin, int argc, t_atom *argv) {
+        gobj_changed3(self,origin,argc,argv);
 }
 
 void boxes_free(t_boxes *self) {self->~t_boxes();}
