@@ -232,12 +232,13 @@ typedef enum {
     A_SEMI, A_COMMA, /* radioactive elements of the first kind */
     A_DEFFLOAT, A_DEFSYM, /* pseudo-types for optional (DEFault) arguments */
     A_DOLLAR, A_DOLLSYM, /* radioactive elements of the second kind */
-    A_GIMME, /* non-type: represents varargs */
-    A_CANT, /* bottom type: type constraint is impossible */
-    A_LIST  /* t_list *, the 4th stable element (future use) */
-    /* 14 = A_GRID for GridFlow */
-    /* 15 = A_GRIDOUT for GridFlow */
-    /* 16 could be A_ATOM, top type:    type constraint doesn't constrain */
+    A_GIMME,   /* non-type: represents varargs */
+    A_CANT,    /* bottom type: type constraint is impossible */
+/* regular pd stops here, before #12 */
+    A_ATOM,    /* top type:    type constraint doesn't constrain */
+    A_LIST,    /* t_list *, the 4th stable element (future use) */
+    A_GRID,    /* reserved for GridFlow */
+    A_GRIDOUT, /* reserved for GridFlow */
 }  t_atomtype;
 
 #define A_DEFSYMBOL A_DEFSYM    /* better name for this */
