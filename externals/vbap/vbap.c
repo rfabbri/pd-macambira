@@ -3,7 +3,7 @@
 written by Ville Pulkki 1999-2003
 Helsinki University of Technology 
 and 
-University of California at Berkeley
+University of California at Berkeley 
 
 See copyright in file with name COPYRIGHT  */
 
@@ -16,7 +16,7 @@ See copyright in file with name COPYRIGHT  */
 // Function prototypes
 void new_spread_dir(t_vbap *x, float spreaddir[3], float vscartdir[3], float spread_base[3]);
 void new_spread_base(t_vbap *x, float spreaddir[3], float vscartdir[3]);
-void *vbap_class;				
+static void *vbap_class;				
 void vect_cross_prod(float v1[3], float v2[3],float v3[3]);
 void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x);
 void vbap_bang(t_vbap *x);
@@ -28,7 +28,7 @@ void vbap_in3(t_vbap *x, long n);
 void vbap_ft4(t_vbap *x, double g);
 */
 void spread_it(t_vbap *x, float *final_gs);
-void *vbap_new(float azi,float ele);
+void *vbap_new(float azi, float ele, float spread);
 void vbap(float g[3], long ls[3], t_vbap *x);
 void angle_to_cart(float azi, float ele, float res[3]);
 void cart_to_angle(float cvec[3], float avec[3]);
@@ -76,7 +76,8 @@ void vbap_assist(t_vbap *x, void *b, long m, long a, char *s)
 #ifdef PD
 void vbap_setup(void)
 {
-	vbap_class = class_new(gensym("vbap"), (t_newmethod)vbap_new, 0, (short)sizeof(t_vbap), 0, A_GIMME, 0); 
+	vbap_class = class_new(gensym("vbap"), (t_newmethod)vbap_new, 0, (short)sizeof(t_vbap), 0, 
+                           A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0); 
 
 	class_addbang(vbap_class, (t_method)vbap_bang);	
 /* these are for getting data from a cold inlet on Max/MSP, in Pd you use floatinlet_new() in new()
@@ -98,7 +99,8 @@ void vbap_setup(void)
 #else /* MAX */
 void main(void)
 {
-	setup((t_messlist **)&vbap_class, (method)vbap_new, 0L, (short)sizeof(t_vbap), 0L, A_DEFLONG,A_DEFLONG, 0); 
+	setup((t_messlist **)&vbap_class, (method)vbap_new, 0L, (short)sizeof(t_vbap), 0L, 
+          A_DEFLONG,A_DEFLONG,A_DEFLONG, 0); 
 
 	addbang((method)vbap_bang);	
 	addftx((method)vbap_ft1, 1);
@@ -136,21 +138,24 @@ void vbap_ft4(t_vbap *x, double g) { x->x_gain = g; }
 
 /*--------------------------------------------------------------------------*/
 // create new instance of object... 
-void *vbap_new(float azi,float ele)
+#ifdef PD
+void *vbap_new(t_float azi, t_float ele, t_float spread)
 {
 	t_vbap *x = (t_vbap *)newobject(vbap_class);
 
-#ifdef PD
 	floatinlet_new(&x->x_obj, &x->x_azi);
 	floatinlet_new(&x->x_obj, &x->x_ele);
 	floatinlet_new(&x->x_obj, &x->x_spread);
 
-	x->x_outlet4 = outlet_new(&x->x_obj, gensym("float"));
-	x->x_outlet3 = outlet_new(&x->x_obj, gensym("float"));
-	x->x_outlet2 = outlet_new(&x->x_obj, gensym("float"));
-	x->x_outlet1 = outlet_new(&x->x_obj, gensym("float"));
-	x->x_outlet0 = outlet_new(&x->x_obj, gensym("list"));
+	x->x_outlet0 = outlet_new(&x->x_obj, &s_float);
+	x->x_outlet1 = outlet_new(&x->x_obj, &s_float);
+	x->x_outlet2 = outlet_new(&x->x_obj, &s_float);
+	x->x_outlet3 = outlet_new(&x->x_obj, &s_float);
 #else /* Max */
+void *vbap_new(float azi,float ele)
+{
+	t_vbap *x = (t_vbap *)newobject(vbap_class);
+
 	floatin(x,4);	
 	floatin(x,3);	
 	floatin(x,2);					
@@ -166,12 +171,11 @@ void *vbap_new(float azi,float ele)
 	x->x_spread_base[0] = 0.0;
 	x->x_spread_base[1] = 1.0;
 	x->x_spread_base[2] = 0.0;
-	x->x_spread = 0;
+	x->x_spread = spread;
 	x->x_lsset_available =0;
 
 	x->x_azi = azi;
 	x->x_ele = ele;
-	x->x_gain = 1.0;
 
 	return(x);					/* return a reference to the object instance */
 }
@@ -319,7 +323,7 @@ void vbap(float g[3], long ls[3], t_vbap *x)
  	 	} else new_cartdir[2] = 0;
  	 	cart_to_angle(new_cartdir,new_angle_dir);
  	 	x->x_azi = (new_angle_dir[0] );
-		post("uus azi %g",x->x_azi );
+		post("[vbap] use azimuth %g",x->x_azi );
  	 	x->x_ele = (new_angle_dir[1]);
  	 }
   //}
@@ -558,14 +562,20 @@ void vbap_bang(t_vbap *x)
 		}
 		for(i=0;i<x->x_ls_amount;i++) 
 		{
+#ifdef PD
+			SETFLOAT(&at[0], (t_float)i);	
+			SETFLOAT(&at[1], (t_float)final_gs[i]);
+			outlet_list(x->x_obj.ob_outlet, &s_list, 2, at);
+#else /* Max */
 			SETLONG(&at[0], i);	
-			SETFLOAT(&at[1], final_gs[i]*x->x_gain); // gain is applied here
+			SETFLOAT(&at[1], final_gs[i]*x->x_gain); // freeverb gain is applied here
 			outlet_list(x->x_outlet0, 0L, 2, at);
+#endif /* PD */
 		}
 		outlet_float(x->x_outlet1, x->x_azi); 
 		outlet_float(x->x_outlet2, x->x_ele); 
 		outlet_int(x->x_outlet3, x->x_spread); 
-		outlet_int(x->x_outlet4, x->x_gain); 
+		//outlet_int(x->x_outlet4, x->x_gain); 
 	}
 	else
 		error("vbap: Configure loudspeakers first!");

@@ -1,53 +1,66 @@
-#N canvas 91 360 953 497 10;
-#X obj 112 257 vbap 0 0;
-#X obj 134 319 print;
-#X obj 62 113 define_loudspeakers 3 -45 0 45 0 0 45 180 45;
-#X msg 62 87 bang;
-#X text 442 79 1 Use define_loudspeakers to list the speaker positions.
-The example here defines loudspeakers in three dimensions (the first
-parameter). For each speaker \, define its azimuth and elevation. Here
-we have speakers front left and right with no elevation (-45 0 45 0)
-and front and back with 45 degrees of elevation (0 45 180 45). Send
-the data to vbap.;
-#X floatatom 129 223 5 0 0 0 - - -;
-#X floatatom 173 223 5 0 0 0 - - -;
-#X floatatom 217 223 5 0 0 0 - - -;
-#X msg 112 179 bang;
-#X obj 112 356 route 0 1 2 3;
-#X floatatom 112 415 10 0 0 0 - - -;
-#X floatatom 191 415 10 0 0 0 - - -;
-#X floatatom 270 415 10 0 0 0 - - -;
-#X floatatom 349 415 10 0 0 0 - - -;
-#X text 442 169 In two dimensions \, only specify the azimuth. (for
+#N canvas 121 22 818 496 10;
+#X floatatom 129 208 5 0 0 2 - - -;
+#X floatatom 167 227 5 0 0 2 - - -;
+#X msg 101 158 bang;
+#X obj 102 396 route 0 1 2 3;
+#X floatatom 102 445 10 0 0 0 - - -;
+#X floatatom 181 445 10 0 0 0 - - -;
+#X floatatom 260 445 10 0 0 0 - - -;
+#X floatatom 339 445 10 0 0 0 - - -;
+#X text 441 159 In two dimensions \, only specify the azimuth. (for
 example "define_loudspeakers 2 -45 45 0 180";
-#X text 151 201 azimuth \, elevation and spread;
-#X text 444 352 For an example of how to use vbap with matrix~ from
-zexy-library \, see vbap-demo.pd.;
-#X text 63 21 VBAP and define_loudspeakers;
-#X text 444 300 The spread-parameter can be used to prevent a situation
+#X text 53 21 VBAP and define_loudspeakers;
+#X text 442 281 The spread-parameter can be used to prevent a situation
 where sound is coming from one speaker only \, which would make speaker
 positions "visible". The range is 0 to 100;
-#X floatatom 152 286 5 0 0 0 - - -;
-#X floatatom 196 286 5 0 0 0 - - -;
-#X floatatom 240 286 5 0 0 0 - - -;
-#X text 178 306 actual location;
-#X text 444 222 2 For vbap \, give azimuth and elevation for the desired
+#X floatatom 199 369 0 0 0 3 actual_azimuth - -;
+#X floatatom 211 335 0 0 0 3 actual_elevation - -;
+#X floatatom 221 314 7 0 0 1 actual_spreading - -;
+#X text 443 202 2 For vbap \, give azimuth and elevation for the desired
 location. Bang the first inlet and vbap will output gain-factors for
 each speaker and the actual location produced. This can be different
 from the desired one depending where your speakers are.;
-#X obj 600 390 vbap-demo;
-#X connect 0 0 1 0;
-#X connect 0 0 9 0;
-#X connect 0 1 19 0;
-#X connect 0 2 20 0;
-#X connect 0 3 21 0;
-#X connect 2 0 0 0;
-#X connect 3 0 2 0;
-#X connect 5 0 0 1;
-#X connect 6 0 0 2;
-#X connect 7 0 0 3;
-#X connect 8 0 0 0;
-#X connect 9 0 10 0;
-#X connect 9 1 11 0;
-#X connect 9 2 12 0;
-#X connect 9 3 13 0;
+#X obj 599 370 vbap-demo;
+#X msg 25 115 define_loudspeakers 2 -45 45 -135 135;
+#X text 24 64 loudspeaker position definition can also be sent directly
+to a vbap object. This changes the setup information only in a single
+vbap object.;
+#X text 443 332 For an example of how to use vbap with [matrix~] from
+zexy-library \, see vbap-demo.pd.;
+#X text 441 59 1 Use the define_loudspeakers object or message to list
+the speaker positions. The example here defines loudspeakers in three
+dimensions (the first parameter). For each speaker \, define its azimuth
+and elevation. Here we have speakers front left and right with no elevation
+(-45 0 45 0) and front and back with 45 degrees of elevation (0 45
+180 45). Send the data to vbap.;
+#X msg 51 135 define_loudspeakers 3 -45 45 -135 135 32 5 94 34 34 11
+;
+#X obj 132 192 hsl 100 13 0 360 0 0 empty empty azimuth 10 7 0 10 -262144
+-1 -1 3800 1;
+#X obj 170 210 hsl 100 13 0 360 0 0 empty empty elevation 10 7 0 10
+-262144 -1 -1 5100 1;
+#X floatatom 207 247 5 0 0 2 - - -;
+#X obj 210 230 hsl 100 13 0 360 0 0 empty empty spread 10 7 0 10 -262144
+-1 -1 2500 1;
+#X text 135 158 to output updated values;
+#X obj 102 277 vbap 90 0 30;
+#X text 450 417 You can also use [vbap] to control Cyclone's [matrix~]
+;
+#X obj 543 440 cyclone/matrix~ 1 4 1;
+#X connect 0 0 26 1;
+#X connect 1 0 26 2;
+#X connect 2 0 26 0;
+#X connect 3 0 4 0;
+#X connect 3 1 5 0;
+#X connect 3 2 6 0;
+#X connect 3 3 7 0;
+#X connect 16 0 26 0;
+#X connect 20 0 26 0;
+#X connect 21 0 0 0;
+#X connect 22 0 1 0;
+#X connect 23 0 26 3;
+#X connect 24 0 23 0;
+#X connect 26 0 3 0;
+#X connect 26 1 11 0;
+#X connect 26 2 12 0;
+#X connect 26 3 13 0;
