@@ -108,7 +108,7 @@ static void which_bang(t_which *x)
     sys_lock();
 
     x->x_canvas = canvas_getcurrent();
-post("canvas is %p", x->x_canvas);
+    post("which_bang: canvas is %p", x->x_canvas);
 //post("name is %s", x->x_object_name->s_name);
 //post("ext is %s", sys_dllextent);
 //post("ext2 is %s", sys_dllextent2);
@@ -128,8 +128,7 @@ post("canvas is %p", x->x_canvas);
         outlet_symbol(x->x_obj.te_outlet, gensym("not found"));
         return;
     }
-    result = _filelength(fd);
-    result = close(fd);/* this is crashing pd in WinXP: why? */
+    result = close(fd);
 //post("dirbuf: %s", dirbuf);
 //post("nameptr: %s", nameptr);
     /* rebuild the absolute pathname */
@@ -151,7 +150,7 @@ static void *which_new(t_symbol *s, int argc, t_atom *argv)
     if ((argc >= 1)&&(argv[0].a_type == A_SYMBOL)) x->x_object_name = argv[0].a_w.w_symbol;
     outlet_new(&x->x_obj, &s_anything);
     x->x_canvas = canvas_getcurrent();/* canvas_getcurrent only seems to work in the _new function: why? */
-    post("canvas is %p", x->x_canvas);
+    post("which_new: canvas is %p", x->x_canvas);
     return (x);
 }
 
