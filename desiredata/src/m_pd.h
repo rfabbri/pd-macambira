@@ -884,8 +884,8 @@ EXTERN int value_getfloat(t_symbol *s, t_float *f);
 EXTERN int value_setfloat(t_symbol *s, t_float f);
 
 /* ------- GUI interface - functions to send strings to TK --------- */
-EXTERN void sys_vgui(char *fmt, ...);
-EXTERN void sys_gui(char *s);
+EXTERN void sys_vgui(const char *fmt, ...);
+EXTERN void sys_gui(const char *s);
 
 extern t_class *glob_pdobject;  /* object to send "pd" messages */
 
