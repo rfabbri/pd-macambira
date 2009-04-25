@@ -35,6 +35,12 @@ set nextid 0
 set _(Class:_class) Class
 set _(Class:_super) {Thing}
 set have_expand [expr ![catch {set a {foo bar}; list {expand}$a}]]
+
+proc correct_splat {code} {
+  if {!$::have_expand} {return $code}
+  regsub {{*}} $code {{expand}}
+}
+
 proc proc* {name args body} {
 	set argl {}
 	foreach arg $args {set arg [lindex $arg 0]; lappend argl "$arg=\$$arg"}
