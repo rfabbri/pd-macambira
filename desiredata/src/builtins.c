@@ -544,7 +544,7 @@ static void qlist_write(t_qlist *x, t_symbol *filename, t_symbol *format) {
     char *buf = canvas_makefilename(x->canvas,filename->name,0,0);
     if (!strcmp(format->name, "cr")) cr = 1;
     else if (*format->name) error("qlist_read: unknown flag: %s", format->name);
-    if (binbuf_write(x->binbuf, buf, "", cr)) error("%s: write failed", filename->name);
+    if (binbuf_write(x->binbuf,buf,"",cr)) error("%s: write failed", filename->name);
     free(buf);
 }
 static void qlist_print(t_qlist *x) {
@@ -666,7 +666,8 @@ static void alist_anything(t_binbuf *x, t_symbol *s, int argc, t_atom *argv) {
 }
 static void alist_toatoms(t_binbuf *x, t_atom *to) {for (size_t i=0; i<x->n; i++) to[i] = x->v[i];}
 
-t_class *list_append_class;  struct t_list_append : t_object {t_binbuf *alist;};
+//t_class *list_any_class;     struct t_list_any     : t_object {t_binbuf *alist;};
+t_class *list_append_class;  struct t_list_append  : t_object {t_binbuf *alist;};
 t_class *list_prepend_class; struct t_list_prepend : t_object {t_binbuf *alist;};
 t_class *list_split_class;   struct t_list_split : t_object {t_float f;};
 t_class *list_trim_class;    struct t_list_trim : t_object {};
@@ -1086,10 +1087,10 @@ static void *any_new(t_symbol *s,int argc, t_atom *argv) {
 
 static void any_anything(t_any *x, t_symbol *s, int argc, t_atom *argv) {
     t_atom *outv; int outc = x->alist->n+argc+1; ATOMS_ALLOCA(outv, outc);
-    if (argv[0].a_type == A_FLOAT && s->name == "list" || s->name == "float") {
+    if (argv[0].a_type == A_FLOAT && *s=="list" || *s=="float") {
       alist_list(x->alist, 0, argc, argv); outlet_anything(x->outlet, &s_list, argc, argv);return;
     }
-    if (argv[0].a_type == A_SYMBOL || s->name != "list" || s->name != "float") {
+    if (argv[0].a_type == A_SYMBOL || *s!="list" || *s!="float") {
       alist_anything(x->alist, s, argc, argv); outlet_anything(x->outlet, s, argc, argv);
     }
 }
