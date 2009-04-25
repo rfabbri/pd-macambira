@@ -158,6 +158,10 @@ typedef struct _symbol {
     struct _symbol *next; /* brochette of all symbols (only for permanent symbols) */
     size_t refcount;      /* refcount<0 means that the symbol is permanent */
     size_t n;             /* size of name (support for NUL characters) */
+#ifdef PD_PLUSPLUS_FACE
+    bool operator == (const char *s) const {return strcmp(this->name,s)==0;}
+    bool operator != (const char *s) const {return strcmp(this->name,s);}
+#endif
 } t_symbol;
 #define s_name  name
 #define s_thing thing
@@ -457,10 +461,10 @@ EXTERN void binbuf_print(t_binbuf *x);
 EXTERN int binbuf_getnatom(t_binbuf *x);
 EXTERN t_atom *binbuf_getvec(t_binbuf *x);
 EXTERN void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv);
-EXTERN int binbuf_read(           t_binbuf *b, const char *filename, char *dirname,    int flags);
-EXTERN int binbuf_read_via_canvas(t_binbuf *b, const char *filename, t_canvas *canvas, int flags);
-EXTERN int binbuf_read_via_path(  t_binbuf *b, const char *filename, char *dirname,    int flags);
-EXTERN int binbuf_write(          t_binbuf *x, const char *filename, char *dir,        int flags);
+EXTERN int binbuf_read(           t_binbuf *b, const char *filename, const char *dirname, int flags);
+EXTERN int binbuf_read_via_canvas(t_binbuf *b, const char *filename, t_canvas *canvas,    int flags);
+EXTERN int binbuf_read_via_path(  t_binbuf *b, const char *filename, const char *dirname, int flags);
+EXTERN int binbuf_write(          t_binbuf *x, const char *filename, const char *dir,     int flags);
 EXTERN void binbuf_evalfile(t_symbol *name, t_symbol *dir);
 EXTERN t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew);
 
