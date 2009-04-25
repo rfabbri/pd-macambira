@@ -1,11 +1,10 @@
-#N canvas 56 355 470 550 10;
+#N canvas 50 213 470 550 10;
 #N canvas 0 22 462 312 scalar-window 0;
 #X restore 164 67 pd scalar-window;
 #X obj 2 2 cnv 15 450 20 empty empty "scalar" 2 11 1 18 -233017 -66577
 0;
-#X obj 418 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
-#X obj 256 498 all_about_data_structures;
-#X text 221 481 for more info \, click on this:;
+#X obj 418 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+;
 #X text 29 227 - You can cut \, copy \, paste \, and duplicate "scalars".
 ;
 #X text 29 136 - You can edit the contents of a "scalar" within the
@@ -20,7 +19,6 @@ it \, hit "OK" and your changes will take effect.;
 structures.;
 #X text 305 532 updated for Pd 0.37.1;
 #X text 4 104 There are numerous ways to manually edit "scalars":;
-#X text 4 521 by Hans-Christoph Steiner <hans@at.or.at>;
 #X text 30 311 - Move breakpoints: Click near the breakpoint at the
 center of the width of the array \, but not so close that the mouse
 cursor changes to the resize cursor. The mouse cursor will change to
@@ -34,3 +32,6 @@ The mouse cursor will change to an outline of a + (plus symbol).;
 to the left of the breakpoint at the center of the width of the array.
 The mouse cursor will change to same black X as when deleting cords.
 ;
+#X text 15 483 for more info see 4.data.structures and the related
+docs:;
+#X obj 49 502 pddp/pddplink ../1.manual/x2.htm;
