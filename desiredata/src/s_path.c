@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <ctype.h>
+#include <vector>
 
 extern t_namelist *sys_externlist;
 t_namelist *sys_searchpath;
@@ -247,59 +248,44 @@ gotone:
 extern "C" int sys_argparse(int argc, char **argv);
 
 #define NUMARGS 1000
+#define foreach(ITER,COLL) for(typeof(COLL.begin()) ITER = COLL.begin(); ITER != (COLL).end(); ITER++)
 
 extern "C" int sys_parsercfile(char *filename) {
-    int rcargc;
-    char* rcargv[NUMARGS];
+    std::vector<char*> argv;
     char buf[1000];
     char c[MAXPDSTRING];
     int retval = 1; /* that's what we will return at the end; for now, let's think it'll be an error */
-    /* initialize rc-arg-array so we can safely clean up at the end */
-    for (int i=1; i<NUMARGS-1; i++) rcargv[i]=0;
     /* parse a startup file */
     FILE* file = fopen(filename, "r");
     if (!file) return 1;
     post("reading startup file: %s", filename);
-    rcargv[0] = ".";    /* this no longer matters to sys_argparse() */
-    /* tb: comments in pdrc file { */
-    int i=1;
+    /* tb originally introduced comments in pdrc file. desire.tk doesn't support them. */
     while ((fgets(c,MAXPDSTRING,file)) != 0) {
 	if (c[strlen(c)-1] !='\n') {
-		//it is unlikely that this is ever the case
 		error("startup file contains a line that's too long");
 		while(fgetc(file) != '\n') {}
 	}
 	if (c[0] != '#') {
+		long j=0;
 		long n;
-		while (sscanf(c,"%999s%ln",buf,&n) != EOF) {
-			buf[999] = 0;
-			if (!(rcargv[i] = (char *)malloc(strlen(buf) + 1))) goto cleanup;
-			strcpy(rcargv[i], buf);
-			strcpy(buf,c+n);
-			strcpy(c,buf);
-			++i;
-		}
+		while (sscanf(c+j,"%999s%ln",buf,&n) != EOF) {argv.push_back(strdup(buf)); j+=n;}
 	}
     }
-    /* } tb */
-    if (i >= NUMARGS-1) error("startup file too long; extra args dropped");
-    rcargv[i] = 0;
-    rcargc = i;
     /* parse the options */
     fclose(file);
     if (sys_verbose) {
-        if (rcargv) {
+        if (argv.size()) {
             post("startup args from RC file:");
-            for (i = 1; i < rcargc; i++) post("%s", rcargv[i]);
+            foreach(a,argv) post("%s",*a);
         } else post("no RC file arguments found");
     }
-    if (sys_argparse(rcargc-1, rcargv+1)) {
+    if (sys_argparse(argv.size(),argv.data())) {
         post("error parsing RC arguments");
 	goto cleanup;
     }
     retval=0; /* we made it without an error */
   cleanup: /* prevent memleak */
-    for (i=1; i<NUMARGS-1; i++) if (rcargv[i]) free(rcargv[i]);
+    foreach(a,argv) free(*a);
     return retval;
 }
 
