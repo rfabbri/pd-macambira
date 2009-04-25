@@ -427,9 +427,7 @@ int sys_argparse(int argc, char **argv) {
         }
         if (ARG("-alsaadd",2)) {
 #ifdef USEAPI_ALSA
-            if (argc > 1)
-                alsa_adddev(argv[1]);
-            else goto usage;
+            if (argc>1) alsa_adddev(argv[1]); else goto usage;
 #else
 	    NOT_HERE;
 #endif
@@ -566,7 +564,7 @@ int sys_argparse(int argc, char **argv) {
           NEXT(2);
         }
         if (ARG("-sounddev",2) || ARG("-audiodev",2)) {
-          sys_parsedevlist(&sys_nsoundin, sys_soundindevlist, MAXAUDIOINDEV, argv[1]);
+          sys_parsedevlist(&sys_nsoundin,  sys_soundindevlist,  MAXAUDIOINDEV,  argv[1]);
           sys_parsedevlist(&sys_nsoundout, sys_soundoutdevlist, MAXAUDIOOUTDEV, argv[1]);
           if (!sys_nsoundout) goto usage;
           NEXT(2);
@@ -615,7 +613,7 @@ static void sys_afterargparse() {
     nchoutdev = sys_nchout>=0 ? sys_nchout : audio_out.ndev;
     if (sys_nchin >=0) {for (int i=0; i< nchindev; i++)  audio_in.chdev[i] = sys_chinlist[i];}
     if (sys_nchout>=0) {for (int i=0; i<nchoutdev; i++) audio_out.chdev[i] = sys_choutlist[i];}
-    if (sys_nsoundin>=0)  {audio_in.ndev  = sys_nsoundin; for (int i=0; i< audio_in.ndev; i++)  audio_in.dev[i] = sys_soundindevlist[i];}
+    if (sys_nsoundin >=0) {audio_in.ndev  = sys_nsoundin; for (int i=0; i< audio_in.ndev; i++)  audio_in.dev[i] = sys_soundindevlist[i];}
     if (sys_nsoundout>=0) {audio_out.ndev = sys_nsoundout;for (int i=0; i<audio_out.ndev; i++) audio_out.dev[i] = sys_soundoutdevlist[i];}
     if (sys_nmidiin >=0) {nmidiindev  = sys_nmidiin;  for (int i=0; i<  nmidiindev; i++)   midiindev[i] = sys_midiindevlist[i];}
     if (sys_nmidiout>=0) {nmidioutdev = sys_nmidiout; for (int i=0; i< nmidioutdev; i++)  midioutdev[i] = sys_midioutdevlist[i];}
