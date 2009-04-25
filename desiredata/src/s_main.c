@@ -47,7 +47,7 @@ extern "C" int sys_parsercfile(char*filename);
 void sys_start_sfthread();
 #endif /* THREDED_SF */
 
-char pd_version[] = "DesireData 2007.08.22";
+char pd_version[] = "DesireData 2009.04.24";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 
@@ -90,26 +90,22 @@ char *sys_extraflagsstring;
 /* IOhannes { */
 /* here the "-1" counts signify that the corresponding vector hasn't been
    specified in command line arguments; sys_open_audio will detect this and fill things in. */
-static int sys_nsoundin = -1;
-static int sys_nsoundout = -1;
-static int sys_soundindevlist[MAXAUDIOINDEV];
-static int sys_soundoutdevlist[MAXAUDIOOUTDEV];
-static int sys_nchin = -1;
-static int sys_nchout = -1;
-static int sys_chinlist[MAXAUDIOINDEV];
-static int sys_choutlist[MAXAUDIOOUTDEV];
+static int sys_nsoundin = -1;  static int  sys_soundindevlist[MAXAUDIOINDEV];
+static int sys_nsoundout = -1; static int sys_soundoutdevlist[MAXAUDIOOUTDEV];
+static int sys_nchin = -1;     static int        sys_chinlist[MAXAUDIOINDEV];
+static int sys_nchout = -1;    static int       sys_choutlist[MAXAUDIOOUTDEV];
 /* } IOhannes */
 
 /* jsarlo { */
-t_sample* get_sys_soundout() { return sys_soundout; }
-t_sample* get_sys_soundin()  { return sys_soundin; }
-int* get_sys_main_advance() { return &sys_main_advance; }
-double* get_sys_time_per_dsp_tick() { return &sys_time_per_dsp_tick; }
-int* get_sys_schedblocksize() { return &sys_schedblocksize; }
-double* get_sys_time() { return &sys_time; }
-float* get_sys_dacsr() { return &sys_dacsr; }
-int* get_sys_sleepgrain() { return &sys_sleepgrain; }
-int* get_sys_schedadvance() { return &sys_schedadvance; }
+t_sample *get_sys_soundout()          {return sys_soundout;}
+t_sample *get_sys_soundin()           {return sys_soundin;}
+int *     get_sys_main_advance()      {return &sys_main_advance;}
+double *  get_sys_time_per_dsp_tick() {return &sys_time_per_dsp_tick;} 
+int *     get_sys_schedblocksize()    {return &sys_schedblocksize;}
+double *  get_sys_time()              {return &sys_time;}
+float *   get_sys_dacsr()             {return &sys_dacsr;}
+int *     get_sys_sleepgrain()        {return &sys_sleepgrain;}
+int *     get_sys_schedadvance()      {return &sys_schedadvance;}
 /* } jsarlo */
 
 static void sys_afterargparse();
@@ -179,7 +175,7 @@ extern "C" int sys_main(int argc, char **argv) {
     return r;
 }
 
-static char *(usagemessage[]) = {
+static const char *(usagemessage[]) = {
 "usage: pd [-flags] [file]...","",
 "audio configuration flags:",
 "-r <n>           -- specify sample rate",
