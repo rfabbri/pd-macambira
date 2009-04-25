@@ -2347,3 +2347,61 @@ void pd_init() {
     garray_init();
 }
 };
+
+#ifndef HAVE_ASPRINTF
+int asprintf(char **str, const char *fmt, ...)
+{
+        va_list ap;
+        int ret;
+        *str = NULL;
+        va_start(ap, fmt);
+        ret = vasprintf(str, fmt, ap);
+        va_end(ap);
+
+        return ret;
+}
+#endif /* HAVE_ASPRINTF */
+#ifndef HAVE_VASPRINTF
+int vasprintf(char **str, const char *fmt, va_list ap)
+{
+        int ret = -1;
+        va_list ap2;
+        char *string, *newstr;
+        size_t len;
+
+        VA_COPY(ap2, ap);
+        if ((string = (char *)malloc(INIT_SZ)) == NULL)
+                goto fail;
+
+        ret = vsnprintf(string, INIT_SZ, fmt, ap2);
+        if (ret >= 0 && ret < INIT_SZ) { /* succeeded with initial alloc */
+                *str = string;
+        } else if (ret == INT_MAX || ret < 0) { /* Bad length */
+                goto fail;
+        } else {        /* bigger than initial, realloc allowing for nul */
+                len = (size_t)ret + 1;
+                if ((newstr = (char *)realloc(string, len)) == NULL) {
+                        free(string);
+                        goto fail;
+                } else {
+                        va_end(ap2);
+                        VA_COPY(ap2, ap);
+                        ret = vsnprintf(newstr, len, fmt, ap2);
+                        if (ret >= 0 && (size_t)ret < len) {
+                                *str = newstr;
+                        } else { /* failed with realloc'ed string, give up */
+                                free(newstr);
+                                goto fail;
+                        }
+                }
+        }
+        va_end(ap2);
+        return (ret);
+
+fail:
+        *str = NULL;
+        errno = ENOMEM;
+        va_end(ap2);
+        return (-1);
+}
+#endif /* HAVE_VASPRINTF */
