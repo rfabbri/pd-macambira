@@ -272,8 +272,10 @@ AC_DEFUN([AX_PD_EXTERNAL],
    Darwin)
      AC_MSG_RESULT(darwin)
      ;;
-   MINGW32_NT-5.1)
+   MINGW32_NT-*)
+     ##-- build farm: `uname -s` = MINGW32_NT-5.1
      AC_MSG_RESULT(win32)
+     uname_s="MINGW32_NT" ##-- normalize
      ;;
    IRIX64)
      AC_MSG_RESULT(irix64)
@@ -336,7 +338,7 @@ AC_DEFUN([AX_PD_EXTERNAL],
 
  ##-- win32 via minGW/MSYS
  ##   + courtesy of pd-extended build system, SVN externals/Makefile
- if test "$uname_s" = "MINGW32_NT-5.1"; 
+ if test "$uname_s" = "MINGW32_NT";  #MINGW32_NT-5.1
  then
   PDEXT_DFLAGS="\
 	-D'O_NONBLOCK=1' -D'srand48(n)=srand((n))' \

@@ -25,10 +25,16 @@ SUBDIRS = \
 MOOCOW_DIR    ?=$(shell pwd)
 MOOCOW_BUILD  ?=$(MOOCOW_DIR)/build.moo
 MOOCOW_MFLAGS ?=DESTDIR=""
-MOOCOW_BUILD_VERSION ?=2009-04-24.001
+MOOCOW_BUILD_VERSION ?=2009-04-25.001
 
+##-- arguments to be passed to sh ./configure
+## + we use "`echo $(CFLAGS)`" to remove ugly quotes from the CFLAGS variable,
+##   since autoconf doesn't parse these correctly (problem on win32 e.g. -D'O_NONBLOCK=1')
+#	CFLAGS="`echo $(CFLAGS)`" ##-- works
+#	CFLAGS="$(subst ',,$(CFLAGS))" ##-- works
+#	CFLAGS="$(shell echo $(CFLAGS))" ##-- works
 CONFIGURE_ARGS=\
-	CFLAGS="$(CFLAGS)" \
+	CFLAGS="`echo $(CFLAGS)`" \
 	LDFLAGS="$(LDFLAGS) -L$(pd_src)/bin" \
 	--with-pd-include="$(pd_src)/src" \
 	--with-pd-dir="$(MOOCOW_BUILD)" \
@@ -40,11 +46,13 @@ CONFIGURE_ARGS=\
 ##  + set to 'true' to ignore failed sub-targets (for robust autobuild)
 ##  + set to 'false' to turn failed builds into make errors (maintainer only)
 #ONFAIL ?= true
-ONFAIL ?= false
+#ONFAIL ?= false
 ONFAIL ?= echo "(MOOCOW) Warning: sub-target failed: '$@'"
 
 ##-- defaults
-CFLAGS ?= -g -O2 -Wall -Winline -W
+CFLAGS ?= -g -O2 -Wall -Winline -W -D
+#CFLAGS ?= -g -O2 -Wall -Winline -W -D'UglyQuotedMacro(x)=x'
+
 pd_src ?= $(CURDIR)/../../../pd
 
 ##-- LN_S : make a symlink (for common code)
@@ -67,7 +75,7 @@ dummy.autogen_stamp:
 	touch $@
 
 dummy.configure_stamp: dummy.autogen_stamp
-	(cd $(DUMMY_DIR); sh ./configure $(CONFIGURE_ARGS) $(DUMMY_CONFIGURE_ARGS); make clean) || $(ONFAIL)
+	(cd $(DUMMY_DIR) && sh ./configure $(CONFIGURE_ARGS) $(DUMMY_CONFIGURE_ARGS) && make clean) || $(ONFAIL)
 	touch $@
 
 dummy.build_stamp: dummy.configure_stamp
@@ -100,7 +108,7 @@ flite.autogen_stamp:
 	touch $@
 
 flite.configure_stamp: flite.autogen_stamp
-	(cd $(FLITE_DIR); sh ./configure $(CONFIGURE_ARGS) $(FLITE_CONFIGURE_ARGS); make clean) || $(ONFAIL)
+	(cd $(FLITE_DIR) && sh ./configure $(CONFIGURE_ARGS) $(FLITE_CONFIGURE_ARGS) && make clean) || $(ONFAIL)
 	touch $@
 
 flite.build_stamp: flite.configure_stamp
@@ -133,7 +141,7 @@ gfsm.autogen_stamp:
 	touch $@
 
 gfsm.configure_stamp: gfsm.autogen_stamp
-	(cd $(GFSM_DIR); sh ./configure $(CONFIGURE_ARGS) $(GFSM_CONFIGURE_ARGS); make clean) || $(ONFAIL)
+	(cd $(GFSM_DIR) && sh ./configure $(CONFIGURE_ARGS) $(GFSM_CONFIGURE_ARGS) && make clean) || $(ONFAIL)
 	touch $@
 
 gfsm.build_stamp: gfsm.configure_stamp
@@ -164,7 +172,7 @@ deque.autogen_stamp:
 	touch $@
 
 deque.configure_stamp: deque.autogen_stamp
-	(cd $(DEQUE_DIR); sh ./configure $(CONFIGURE_ARGS) $(DEQUE_CONFIGURE_ARGS); make clean) || $(ONFAIL)
+	(cd $(DEQUE_DIR) && sh ./configure $(CONFIGURE_ARGS) $(DEQUE_CONFIGURE_ARGS) && make clean) || $(ONFAIL)
 	touch $@
 
 deque.build_stamp: deque.configure_stamp
@@ -197,7 +205,7 @@ locale.autogen_stamp:
 	touch $@
 
 locale.configure_stamp: locale.autogen_stamp
-	(cd $(LOCALE_DIR); sh ./configure $(CONFIGURE_ARGS) $(LOCALE_CONFIGURE_ARGS); make clean) || $(ONFAIL)
+	(cd $(LOCALE_DIR) && sh ./configure $(CONFIGURE_ARGS) $(LOCALE_CONFIGURE_ARGS) && make clean) || $(ONFAIL)
 	touch $@
 
 locale.build_stamp: locale.configure_stamp
@@ -228,7 +236,7 @@ pdstring.autogen_stamp:
 	touch $@
 
 pdstring.configure_stamp: pdstring.autogen_stamp
-	(cd $(PDSTRING_DIR); sh ./configure $(CONFIGURE_ARGS) $(PDSTRING_CONFIGURE_ARGS); make clean) || $(ONFAIL)
+	(cd $(PDSTRING_DIR) && sh ./configure $(CONFIGURE_ARGS) $(PDSTRING_CONFIGURE_ARGS) && make clean) || $(ONFAIL)
 	touch $@
 
 pdstring.build_stamp: pdstring.configure_stamp
@@ -259,7 +267,7 @@ readdir.autogen_stamp:
 	touch $@
 
 readdir.configure_stamp: readdir.autogen_stamp
-	(cd $(READDIR_DIR); sh ./configure $(CONFIGURE_ARGS) $(READDIR_CONFIGURE_ARGS); make clean) || $(ONFAIL)
+	(cd $(READDIR_DIR) && sh ./configure $(CONFIGURE_ARGS) $(READDIR_CONFIGURE_ARGS) && make clean) || $(ONFAIL)
 	touch $@
 
 readdir.build_stamp: readdir.configure_stamp
@@ -291,7 +299,7 @@ sprinkler.autogen_stamp:
 	touch $@
 
 sprinkler.configure_stamp: sprinkler.autogen_stamp
-	(cd $(SPRINKLER_DIR); sh ./configure $(CONFIGURE_ARGS) $(SPRINKLER_CONFIGURE_ARGS); make clean) || $(ONFAIL)
+	(cd $(SPRINKLER_DIR) && sh ./configure $(CONFIGURE_ARGS) $(SPRINKLER_CONFIGURE_ARGS) && make clean) || $(ONFAIL)
 	touch $@
 
 sprinkler.build_stamp: sprinkler.configure_stamp
@@ -322,7 +330,7 @@ weightmap.autogen_stamp:
 	touch $@
 
 weightmap.configure_stamp: weightmap.autogen_stamp
-	(cd $(WEIGHTMAP_DIR); sh ./configure $(CONFIGURE_ARGS) $(WEIGHTMAP_CONFIGURE_ARGS); make clean) || $(ONFAIL)
+	(cd $(WEIGHTMAP_DIR) && sh ./configure $(CONFIGURE_ARGS) $(WEIGHTMAP_CONFIGURE_ARGS) && make clean) || $(ONFAIL)
 	touch $@
 
 weightmap.build_stamp: weightmap.configure_stamp
