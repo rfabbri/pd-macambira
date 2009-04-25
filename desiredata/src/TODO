@@ -22,6 +22,7 @@ LEGEND:
 
 ------------------8<--------cut-here--------8<------------------
 
+[ ] add -stdout as alternative to -stderr
 [ ] right-click on an [s] or [r] would have an option "Find Matching Sends & Receives"
 [ ] do not install .svn folders
 [s] class_setreinit(t_pd *, t_symbol *s, int argc, t_atom *argv)
