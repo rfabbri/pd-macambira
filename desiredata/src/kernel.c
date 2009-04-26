@@ -7,7 +7,7 @@
 /* IOhannes :
  * changed the canvas_restore in "g_canvas.c", so that it might accept $args as well (like "pd $0_test")
  * so you can make multiple & distinguishable templates
- * 1511:forum::für::umläute:2001
+ * 1511:forum::fï¿½r::umlï¿½ute:2001
  * change marked with IOhannes
  */
 
@@ -2362,6 +2362,26 @@ int asprintf(char **str, const char *fmt, ...)
 }
 #endif /* HAVE_ASPRINTF */
 #ifndef HAVE_VASPRINTF
+#include <stdio.h>
+#include <errno.h>
+#include <limits.h>
+#include <stdarg.h>
+#include <stdlib.h>
+
+#ifndef VA_COPY
+# ifdef HAVE_VA_COPY
+#  define VA_COPY(dest, src) va_copy(dest, src)
+# else
+#  ifdef HAVE___VA_COPY
+#   define VA_COPY(dest, src) __va_copy(dest, src)
+#  else
+#   define VA_COPY(dest, src) (dest) = (src)
+#  endif
+# endif
+#endif
+
+#define INIT_SZ 128
+
 int vasprintf(char **str, const char *fmt, va_list ap)
 {
         int ret = -1;

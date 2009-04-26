@@ -55,25 +55,6 @@ extern "C" {
 
 #ifndef HAVE_VASPRINTF
 #define HAVE_VASPRINTF
-#include <stdio.h>
-#include <errno.h>
-#include <limits.h>
-#include <stdarg.h>
-#include <stdlib.h>
-
-#ifndef VA_COPY
-# ifdef HAVE_VA_COPY
-#  define VA_COPY(dest, src) va_copy(dest, src)
-# else
-#  ifdef HAVE___VA_COPY
-#   define VA_COPY(dest, src) __va_copy(dest, src)
-#  else
-#   define VA_COPY(dest, src) (dest) = (src)
-#  endif
-# endif
-#endif
-
-#define INIT_SZ 128
 extern int vasprintf(char **str, const char *fmt, va_list ap);
 #endif
 
