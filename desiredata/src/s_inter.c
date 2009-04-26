@@ -578,7 +578,9 @@ int sys_startgui() {
     if (sys_hipriority == -1) sys_hipriority = !getuid() || !geteuid();
 #endif
     if (sys_hipriority) sys_setpriority();
+#ifndef  MSW
     setuid(getuid());
+#endif /* MSW */
     return 0;
 }
 
