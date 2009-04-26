@@ -312,7 +312,7 @@ void sys_findprogdir(char *progname) {
     char *sbuf;
 #ifdef MSW
     int len = GetModuleFileName(NULL, sbuf, 0);
-    sbuf = malloc(len+1);
+    sbuf = (char *)malloc(len+1);
     GetModuleFileName(NULL, sbuf, len);
     sbuf[len] = 0;
     sys_unbashfilename(sbuf,sbuf);
