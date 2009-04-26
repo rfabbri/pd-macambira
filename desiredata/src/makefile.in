@@ -66,7 +66,7 @@ install::  all
 		install $$file $(DESTDIR)$(libpdbindir)/$$file; done
 	install $(BINARYMODE) $(SO) $(DESTDIR)$(libdir)/$(SO)
 	test -w /etc/ld.so.cache && ldconfig || true
-	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) -L. -lpd main.c -o $(DESTDIR)$(bindir)/pd
+	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) -lpd main.c -o $(DESTDIR)$(bindir)/pd
 	install -m755 desire.tk   $(DESTDIR)$(bindir)/desire
 	install -m755 pdsend      $(DESTDIR)$(bindir)/pdsend
 	install -m755 pdreceive   $(DESTDIR)$(bindir)/pdreceive
