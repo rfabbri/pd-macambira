@@ -232,13 +232,13 @@ static void netsend_connect(t_netsend *x, t_symbol *hostname, t_floatarg fportno
     if (!hp) {error("bad host?"); return;}
 #if 0
     int intarg = 0;
-    if (setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &intarg, sizeof(intarg)) < 0)
+    if (setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, (char*)&intarg, sizeof(intarg)) < 0)
             error("setsockopt (SO_RCVBUF) failed");
 #endif
     /* for stream (TCP) sockets, specify "nodelay" */
     if (x->protocol == SOCK_STREAM) {
         int intarg = 1;
-        if (setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &intarg, sizeof(intarg)) < 0)
+        if (setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char*)&intarg, sizeof(intarg)) < 0)
                 error("setsockopt (TCP_NODELAY) failed");
     }
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
@@ -365,7 +365,7 @@ extern "C" t_text *netreceive_new(t_symbol *compatflag, t_floatarg fportno, t_fl
 #if 1
     /* ask OS to allow another Pd to reopen this port after we close it. */
     intarg = 1;
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &intarg, sizeof(intarg)) < 0)
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (char*)&intarg, sizeof(intarg)) < 0)
             post("setsockopt (SO_REUSEADDR) failed");
 #endif
 #if 0
@@ -376,7 +376,7 @@ extern "C" t_text *netreceive_new(t_symbol *compatflag, t_floatarg fportno, t_fl
     /* Stream (TCP) sockets are set NODELAY */
     if (!udp) {
         intarg = 1;
-        if (setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &intarg, sizeof(intarg)) < 0)
+        if (setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char*)&intarg, sizeof(intarg)) < 0)
                 post("setsockopt (TCP_NODELAY) failed");
     }
     /* assign server port number */
