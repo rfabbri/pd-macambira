@@ -25,16 +25,17 @@ SUBDIRS = \
 MOOCOW_DIR    ?=$(shell pwd)
 MOOCOW_BUILD  ?=$(MOOCOW_DIR)/build.moo
 MOOCOW_MFLAGS ?=DESTDIR=""
-MOOCOW_BUILD_VERSION ?=2009-04-25.002
+MOOCOW_BUILD_VERSION ?=2009-04-27.001
 
 ##-- arguments to be passed to sh ./configure
 ## + we use "`echo $(CFLAGS)`" to remove ugly quotes from the CFLAGS variable,
 ##   since autoconf doesn't parse these correctly (problem on win32 e.g. -D'O_NONBLOCK=1')
+#	CFLAGS="$(CFLAGS)"   ##-- ?
 #	CFLAGS="`echo $(CFLAGS)`" ##-- works
 #	CFLAGS="$(subst ',,$(CFLAGS))" ##-- works
 #	CFLAGS="$(shell echo $(CFLAGS))" ##-- works
 CONFIGURE_ARGS=\
-	CFLAGS="`echo $(CFLAGS)`" \
+	CFLAGS="$(CFLAGS)" \
 	LDFLAGS="$(LDFLAGS) -L$(pd_src)/bin -L$(pd_src)/obj" \
 	--with-pd-include="$(pd_src)/src" \
 	--with-pd-dir="$(MOOCOW_BUILD)" \
@@ -50,8 +51,8 @@ CONFIGURE_ARGS=\
 ONFAIL ?= echo "(MOOCOW) Warning: sub-target failed: '$@'"
 
 ##-- defaults
-CFLAGS ?= -g -O2 -Wall -Winline -W
-#CFLAGS ?= -g -O2 -Wall -Winline -W -D'UglyQuotedMacro(x)=x'
+#CFLAGS ?= -g -O2 -Wall -Winline -W
+CFLAGS ?= -g -O0 -Wall -Winline -W -D'mooUglyQuotedMacro(x)=x' -DmooSafeMacro=1
 
 pd_src ?= $(CURDIR)/../../../pd
 

@@ -17,9 +17,7 @@ AC_CONFIG_AUX_DIR(config)
 dnl AC_CONFIG_AUX_DIR(.)
 
 ##-- save user's CFLAGS,CPPFLAGS
-UCPPFLAGS="$CPPFLAGS"
-UCFLAGS="$CFLAGS"
-ULDFLAGS="$LDFLAGS"
+AX_PD_EARLY()
 
 ##-- use automake, autoheader
 AM_INIT_AUTOMAKE(THE_PACKAGE_NAME, THE_PACKAGE_VERSION)
@@ -100,9 +98,11 @@ fi
 ## /gfsm:select
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## gfsm:flags
 ##
+AX_PD_LATE()
 AC_MSG_CHECKING([which libgfsm to use])
 
 if test "$ac_cv_enable_system_gfsm" != "yes"; then
@@ -150,9 +150,5 @@ fi
 ## /gfsm:any
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-##-- restore user's CFLAGS (?)
-#CFLAGS="$UCFLAGS"
-#CPPFLAGS="$UCPPFLAGS"
-#CXXFLAGS="$UCXXFLAGS"
-
+dnl AX_PD_LATE()
 AC_OUTPUT(config/Makefile src/Makefile Makefile)

@@ -1,15 +1,19 @@
+#-*- Mode: autoconf -*-
 #
 # SYNOPSIS
 #
-#   TODO: AX_PD_EXTERNAL()
+#   AX_PD_EARLY()     ##-- call this early on
+#   AX_PD_EXTERNAL()  ##-- call this soon-ish
+#   AX_PD_LATE()      ##-- call this after running your own tests
 #
 # DESCRIPTION
 #
-#   This macro provides tests, options, & flags for building a Pd
-#   external.
+#   The AX_PD_EXTERNAL macro provides tests, options, & flags for
+#   building a Pd external.
 #
-# User flags (should already be set at call time)
-#   UCFLAGS, UCPPFLAGS, ULDFLAGS
+# CAVEATS:
+#   
+#   You should call AX_PD_EARLY() before calling AC_PROG_CC()
 #
 # Pd directories
 #   AC_ARG_WITH(pd-dir)     : default: "\${prefix}/pd"
@@ -50,6 +54,12 @@
 #   PDEXT         : platform-specific external extension (without leading ".")
 #   LIBS          : additional libs required for building pd externals (win32 only)
 #
+# Flag parsing:
+#   CFLAGS         : has CPPFLAGS filtered out
+#   CPPFLAGS       : has CFLAGS appended and unsafe flags filtered out
+#   EXTRA_CPPFLAGS : gets "unsafe" user CPPFLAGS appended (quotes etc.)
+#   AM_CPPFLAGS    : gets \${EXTRA_CPPFLAGS} appended (make-side)
+#
 # EXEEXT hacks:
 #  AC_SUBST(pd_buildext)
 #   
@@ -67,16 +77,12 @@
 #   modification, are permitted in any medium without royalty provided
 #   the copyright notice and this notice are preserved.
 
+##==============================================================================
 AC_DEFUN([AX_PD_EXTERNAL],
 [
  ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
  ## prerequisites
  AC_PREREQ(2.5)
-
- ##-- save user's CFLAGS,CPPFLAGS (do this before calling AX_PD_EXTERNAL!)
- #test -z "$UCPPFLAGS" && UCPPFLAGS="$CPPFLAGS"
- #test -z "$UCFLAGS"   &&   UCFLAGS="$CFLAGS"
- #test -z "$ULDFLAGS"   && ULDFLAGS="$LDFLAGS"
 
  ##-- Programs, prefix
  AC_PROG_CC
@@ -371,11 +377,46 @@ AC_DEFUN([AX_PD_EXTERNAL],
  AC_SUBST(PDEXT_OFLAGS)
  AC_SUBST(PDEXT_WFLAGS)
 
- ##-- add defaults to user flags
+ ## END platform-dependent variables
+ ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+])
+
+##==============================================================================
+AC_DEFUN([AX_PD_EARLY],
+[
+ ##-- parse user's CFLAGS,CPPFLAGS
+ dnl AC_MSG_NOTICE([parsing user *FLAGS])
+ dnl AC_MSG_NOTICE([(input) CFLAGS=$CFLAGS])
+ dnl AC_MSG_NOTICE([(input) CPPFLAGS=$CPPFLAGS])
+
+ AX_DISTRIBUTE_CFLAGS([$CFLAGS],CPPFLAGS,cflags)
+ AX_SAFE_CFLAGS([$CPPFLAGS],cppflags,EXTRA_CPPFLAGS)
+ CFLAGS="$cflags"
+ CPPFLAGS="$cppflags"
+
+ dnl AC_MSG_NOTICE([(output) CFLAGS=$CFLAGS])
+ dnl AC_MSG_NOTICE([(output) CPPFLAGS=$CPPFLAGS])
+ dnl AC_MSG_NOTICE([(output) EXTRA_CPPFLAGS=$EXTRA_CPPFLAGS])
+ AM_CPPFLAGS="\${EXTRA_CPPFLAGS}"
+ AC_SUBST(EXTRA_CPPFLAGS)
+ AC_SUBST(AM_CPPFLAGS)
+
+ ##-- save (hacked) user's CFLAGS,CPPFLAGS
+ UCPPFLAGS="$CPPFLAGS"
+ UCFLAGS="$CFLAGS"
+ ULDFLAGS="$LDFLAGS"
+])
+
+##==============================================================================
+AC_DEFUN([AX_PD_LATE],
+[
+ ##-- add platform defaults to user flags
  CPPFLAGS="$UCPPFLAGS $PDEXT_IFLAGS $PDEXT_DFLAGS"
  CFLAGS="$UCFLAGS $PDEXT_OFLAGS $PDEXT_AFLAGS $PDEXT_WFLAGS"
  LDFLAGS="$ULDFLAGS $PDEXT_LFLAGS" 
 
- ## END platform-dependent variables
- ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ AC_MSG_NOTICE([set       CPPFLAGS="$CPPFLAGS"])
+ AC_MSG_NOTICE([set EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS"])
+ AC_MSG_NOTICE([set         CFLAGS="$CFLAGS])
+ AC_MSG_NOTICE([set        LDFLAGS="$LDFLAGS"])
 ])

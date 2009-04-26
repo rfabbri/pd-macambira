@@ -52,7 +52,8 @@ pdexterns_PROGRAMS = weightmap$(EXEEXT)
 EXTRA_PROGRAMS = weightmap$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/common/m4/ax_pd_external.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/common/m4/ax_hack_cflags.m4 \
+	$(top_srcdir)/common/m4/ax_pd_external.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -91,6 +92,7 @@ ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
+AM_CPPFLAGS = -I$(top_srcdir)/common
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -108,6 +110,7 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 ENABLE_DEBUG = @ENABLE_DEBUG@
 EXEEXT = .@PDEXT@
+EXTRA_CPPFLAGS = @EXTRA_CPPFLAGS@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -238,7 +241,6 @@ pddoc_DATA = weightmap-help.pd
 # sources
 #-----------------------------------------------------------------------
 weightmap_SOURCES = weightmap.c $(top_srcdir)/common/mooPdUtils.h
-AM_CPPFLAGS = -I$(top_srcdir)/common
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 

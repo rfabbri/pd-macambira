@@ -16,11 +16,6 @@ AC_CONFIG_MACRO_DIR(m4)
 AC_CONFIG_AUX_DIR(config)
 dnl AC_CONFIG_AUX_DIR(.)
 
-##-- save user's CFLAGS,CPPFLAGS
-UCPPFLAGS="$CPPFLAGS"
-UCFLAGS="$CFLAGS"
-ULDFLAGS="$LDFLAGS"
-
 ##-- use automake, autoheader
 AM_INIT_AUTOMAKE(THE_PACKAGE_NAME, THE_PACKAGE_VERSION)
 AM_CONFIG_HEADER(src/config.h)
@@ -43,6 +38,7 @@ dnl AC_ISC_POSIX
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## Pd external checks
+AX_PD_EARLY
 AX_PD_EXTERNAL
 ## /pd external common
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -87,4 +83,5 @@ fi
 #CFLAGS="$UCFLAGS"
 #CPPFLAGS="$UCPPFLAGS"
 
+AX_PD_LATE() ##-- pd external: late
 AC_OUTPUT(config/Makefile src/Makefile Makefile)
