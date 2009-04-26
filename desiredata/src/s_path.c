@@ -250,6 +250,15 @@ extern "C" int sys_argparse(int argc, char **argv);
 #define NUMARGS 1000
 #define foreach(ITER,COLL) for(typeof(COLL.begin()) ITER = COLL.begin(); ITER != (COLL).end(); ITER++)
 
+static int sys_argparse(std::vector<char *> args) {
+    size_t argc = args.size();
+    char **argv = (char **)malloc(argc*sizeof(char *));
+    for (size_t i=0; i<argc; i++) argv[i] = args[i];
+    int r = sys_argparse(argc,argv);
+    free(argv);
+    return r;
+}
+
 extern "C" int sys_parsercfile(char *filename) {
     std::vector<char*> argv;
     char buf[1000];
@@ -279,7 +288,8 @@ extern "C" int sys_parsercfile(char *filename) {
             foreach(a,argv) post("%s",*a);
         } else post("no RC file arguments found");
     }
-    if (sys_argparse(argv.size(),argv.data())) {
+//    if (sys_argparse(argv.size(),argv.data())) {
+    if (sys_argparse(argv)) {
         post("error parsing RC arguments");
 	goto cleanup;
     }
