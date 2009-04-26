@@ -106,6 +106,16 @@ if test `uname -s | cut -f1 -d_` = CYGWIN; then
     LDSOFLAGS="-shared"
 fi
 
+if test `uname -s | cut -f1 -d_` = MINGW; then
+    LDFLAGS="-Wl,-export-dynamic "
+    EXT=dll
+    LIBSUFFIX=.dll
+    CPPFLAGS=" -DMSW -DDL_OPEN   -DUNISTD"
+    MORECFLAGS="-fno-strict-aliasing"
+    STRIPFLAG=-s
+    LDSOFLAGS="-shared"
+fi
+
 if test `uname -m` = x86_64; then
     MORECFLAGS=$MORECFLAGS" -fPIC"
 fi
