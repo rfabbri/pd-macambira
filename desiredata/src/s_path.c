@@ -252,10 +252,10 @@ extern "C" int sys_argparse(int argc, char **argv);
 
 static int sys_argparse(std::vector<char *> args) {
     size_t argc = args.size();
-    char **argv = (char **)malloc(argc*sizeof(char *));
+    char **argv = new char *[argc];
     for (size_t i=0; i<argc; i++) argv[i] = args[i];
     int r = sys_argparse(argc,argv);
-    free(argv);
+    delete[] argv;
     return r;
 }
 
