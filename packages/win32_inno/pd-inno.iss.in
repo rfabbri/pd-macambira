@@ -57,11 +57,14 @@ Name: {group}\GrIPD; Filename: {app}\gripd\gripd.exe
 [Run]
 ; NOTE: The following entry contains an English phrase ("Launch"). You are free to translate it into another language if required.
 ;Filename: {app}\bin\pd.exe; Description: Launch Pd-extended; Flags: nowait postinstall skipifsilent
-Filename: {app}\asio4all.url; Description: open ASIO4ALL website; Flags: nowait postinstall skipifsilent
+Filename: rundll32 url.dll,FileProtocolHandler http://asio4all.com; Description: open ASIO4ALL website; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
 Type: files; Name: {app}\pd.url
 Type: files; Name: {app}\asio4all.url
+Type: files; Name: {app}\puredata.url
+Type: files; Name: {app}\pd-tutorial.url
+Type: files; Name: {app}\techniques.url
 
 [Registry]
 Root: HKCR; SubKey: Pure.Data; ValueType: dword; ValueName: EditFlags; ValueData: $00000000; Flags: noerror uninsdeletekey; Tasks: fileassociations
