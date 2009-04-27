@@ -2292,7 +2292,6 @@ def Canvas hsl     {} {$self new_object obj hsl}
 def Canvas vradio  {} {$self new_object obj vradio}
 def Canvas hradio  {} {$self new_object obj hradio}
 def Canvas vu      {} {$self new_object obj vu}
-def Canvas dropper {} {$self new_object obj dropper}
 def Canvas cnv     {} {$self new_object obj cnv}
 
 def Canvas Graph   {} {$self editmode= 1; netsend [list .x$self graph    ]}
@@ -2310,7 +2309,7 @@ def Canvas init_menus {} {
     $m.view add checkbutton -label [say visual_diff] -selectcolor grey0 -command [list $self visual_diff] \
     	-accelerator [accel_munge "Ctrl+e"] -indicatoron 1
     $self populate_menu view {get_elapsed {} reload redraw}
-    $self populate_menu put {Object Message Number Symbol Comment {} bng tgl nbx vsl hsl vradio hradio vu dropper cnv {} Graph Array}
+    $self populate_menu put {Object Message Number Symbol Comment {} bng tgl nbx vsl hsl vradio hradio vu cnv {} Graph Array}
     $self populate_menu window {{}}
     $m.edit add checkbutton -label [say edit_mode] -selectcolor grey0 -command [list $self editmodeswitch] \
     	-accelerator [accel_munge "Ctrl+e"] -indicatoron 1
@@ -2682,6 +2681,17 @@ def TextBox draw_edit {} {
 	$self item text window [l+ [lmap / $@textoffset $z] [$self xy]] -window $t -anchor nw -tags "${self}text $self text"
 	$t insert 1.0 $@text
 	$t configure -pady 0 -padx 0
+	# dnd bindtarget $c.${self}text text/uri-list <Drop> {}
+	# tkdnd::drop_target register $c.${self}text
+	#set w .[$self get_canvas]
+	#tkdnd::drop_target register $w *
+	#bind $w <<Drop>>           {post %s "Drop           %e %W %X %Y %ST %TT %a %A %CST %CTT %t %T %b %D"}
+	#bind $w <<Drop:DND_Files>> {post %s "Drop:DND_Files %e %W %X %Y %ST %TT %a %A %CST %CTT %t %T %b %D"}
+	#bind $w <<DropEnter>>      {post %s "DropEnter      %e %W %X %Y %ST %TT %a %A %CST %CTT %t %T %b %D"}
+	#bind $w <<DropPosition>>   {post %s "DropPosition   %e %W %X %Y %ST %TT %a %A %CST %CTT %t %T %b %D"}
+	#bind $w <<DropLeave>>      {post %s "DropLeave      %e %W %X %Y %ST %TT %a %A %CST %CTT %t %T %b %D"}
+
+	# "pd \"x[list ${self}] symbol \[ enquote %D \] ;\""
 	$self resize
 	focus $t
 }
@@ -2777,7 +2787,6 @@ def TextBox clear {} {
 	set c [$self cwidget]
 	set t $c.${self}text
 	$t delete 1.0 1.end
-
 }
 
 def TextBox text {} {return $@text}
@@ -5437,7 +5446,6 @@ set fields(hsl)    [eval list $fields1    w h min max is_log isa   $fields2 val 
 set fields(hradio) [eval list $fields1    w change           isa n $fields2 on]
 set fields(vu)     [eval list $fields1    w h        rcv lab ldx ldy fstyle fs bcol lcol scale isa]
 set fields(cnv)    [eval list $fields1 hh w h    snd rcv lab ldx ldy fstyle fs bcol lcol       isa]
-set fields(dropper) [eval list $fields1 w isa $fields2]
 set fields(vsl)    $fields(hsl)
 set fields(vradio) $fields(hradio)
 set fields(hdl)    $fields(hradio)
@@ -5470,7 +5478,6 @@ classinfo nbx      NumBox
 classinfo hsl      Slider
 classinfo vsl      Slider
 classinfo vu       Vu
-classinfo dropper  Dropper
 classinfo hradio   Radio
 classinfo vradio   Radio
 classinfo hdl      Radio
@@ -6008,7 +6015,7 @@ def ArrayPropertiesDialog init {of} {
 	wm title $id "[say array] [say popup_properties]"
 	$self add .$self {name entry} {n entry}
 	pack [checkbutton .$self.saveme -text "save contents" -variable @saveit -anchor w] -side top
-	if {$newone != 0} {
+	if {$newone} {
 		pack [frame .$self.radio] -side top
 		foreach {i label} {0 "in new graph" 1 "in last graph"} {
 			pack [radiobutton .$self.radio.radio$i -value $i -variable @otherflag -text $label] -side top -anchor w
@@ -6525,39 +6532,12 @@ def Vu set {i j} {
 	$self changed
 }
 
-catch {
+if {![catch {
 	package require tkdnd
 	dnd bindtarget . text/uri-list <Drop> {open_file %D}
+}]} {
+	puts "warning: tkdnd package not found"
 }
-
-class_new Dropper {View}
-
-# somewhat broken...
-def Dropper draw {} {
-	set c [$@canvas widget]
-	set isnew [expr [llength [$c gettags ${self}BASE]] == 0]
-	mset {x1 y1} [$self xy]
-	set xs $@w
-	set colour [parse_color $@fcol]
-	set lcolour [parse_color $@lcol]
-	super
-	if {$isnew} {
-		canvas $c.${self}DROP -width $xs -height $xs -bg $colour \
-		    -highlightbackground $lcolour -highlightcolor $colour
-		$c create window [expr $x1+7] [expr $y1-2] -window $c.${self}DROP -anchor nw -tags $c.${self}window
-		if {[catch {
-			dnd bindtarget $c.${self}DROP text/uri-list <Drop> "pd \"x[list ${self}] symbol \[ enquote %D \] ;\""
-		}]} {
-			post "dropper: dnd not installed"
-		}
-	} {
-		$c coords $@canvas.${self}window [expr $x1 + 7] [expr $y1 - 2]
-		$c.${self}DROP configure -width $xs -height $xs -bg $colour \
-		    -highlightbackground $lcolour -highlightcolor $colour
-	}
-}
-
-def Dropper erase {} {destroy $@canvas.${self}DROP; super}
 
 class_new Cnv {Labelled IEMGUI Box}
 
@@ -6604,7 +6584,7 @@ def Array draw {} {
 		set i 0
 		foreach val $@data {
 			if {!$val} {set val 0.0}
-			set y [expr $c_height - (((double($val)+abs($yfrom))/($yto-($yfrom)) * $c_height))]
+			set y [expr $c_height - (((double($val)+abs($yfrom))/($yto-$yfrom) * $c_height))]
 			set x1 [expr $width * $i]
 			set x2 [expr $x1 + $width]
 			set line [list $x1 $y $x2 $y]
@@ -6619,8 +6599,8 @@ def Array draw {} {
 		foreach val $@data {
 			if {!$val} {set val 0.0}
 			#set val2 [lindex $@data [expr $i+1]]
-			set y [expr  ($pixheight - ((double($val)+abs($yfrom))/($yto-($yfrom)) * $pixheight)) + $y_off]
-			#set y2 [expr  ($pixheight - ((double($val2)+abs($yfrom))/($yto-($yfrom)) * $pixheight)) + $y_off]
+			set y [expr  ($pixheight - ((double($val)+abs($yfrom))/($yto-$yfrom) * $pixheight)) + $y_off]
+			#set y2 [expr  ($pixheight - ((double($val2)+abs($yfrom))/($yto-$yfrom) * $pixheight)) + $y_off]
 			set x1 [expr ($width * $i) + $x_off]
 			set x2 [expr $x1 + $width]
 			set line [list $x1 $y $x2 $y]
@@ -6635,8 +6615,8 @@ def Array draw {} {
 		#	#if {!$val} {set val 0.0}
 		#	set val [lindex $@data [expr $i]]
 		#	set val2 [lindex $@data [expr $i+1]]
-		#	set y [expr  ($pixheight - ((double($val)+abs($yfrom))/($yto-($yfrom)) * $pixheight)) + $y_off]
-		#	set y2 [expr  ($pixheight - ((double($val2)+abs($yfrom))/($yto-($yfrom)) * $pixheight)) + $y_off]
+		#	set y [expr  ($pixheight - ((double($val)+abs($yfrom))/($yto-$yfrom) * $pixheight)) + $y_off]
+		#	set y2 [expr  ($pixheight - ((double($val2)+abs($yfrom))/($yto-$yfrom) * $pixheight)) + $y_off]
 		#	set x1 [expr ($width * $i) + $x_off]
 		#	set x2 [expr $x1 + $width]
 		#	set line [list $x1 $y $x2 $y2]
@@ -6665,14 +6645,14 @@ def Array motion {x y f target} {
 		set x1 [expr $width * $i]
 		set x2 [expr $x1 + $width]
 		set line [list $x1 $y $x2 $y]
-		set val [expr (($c_height-$y)/$c_height) * ($yto-($yfrom)) + ($yfrom)]
+		set val [expr (($c_height-$y)/$c_height) * ($yto-$yfrom) + $yfrom]
 		netsend [list .$self $i $val]
 	} else {
 		mset {xfrom yto xto yfrom pixwidth pixheight} [$@canvas get_mess]
 		mset {x_off y_off} [$@canvas xy]
 		set width [expr $pixwidth / $@length]
 		set i [format %d [expr int(($x-$x_off)/$width)]]
-		set val [expr (($pixheight-$y+$y_off)/$pixheight) * ($yto-($yfrom)) + ($yfrom)]
+		set val [expr (($pixheight-$y+$y_off)/$pixheight) * ($yto-$yfrom) + $yfrom]
 		netsend [list .$self $i $val]
 	}
 }
@@ -6685,7 +6665,7 @@ def Array array_set {data_list} {
 			lappend @data [lindex $data_list $i]
 		}
 	} else {
-		puts "error....."
+		puts "error..."
 	}
 }
 
@@ -6797,7 +6777,6 @@ set butt {
 	{Graph   graph  {graph}}
 	{Array   array  {menuarray 0}}
 }
-#	{dropper dropper    {pd %W dropper 0}}
 
 proc button_bar_add {x y} {
 	global butt
