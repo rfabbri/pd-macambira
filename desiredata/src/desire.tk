@@ -2951,7 +2951,7 @@ def Canvas ins {i constructor} {
 	set last [lindex $parts end]
 	set parts [lrange $parts 0 end-1]
 	foreach part $parts {netsend $part}
-	netsend [concat [list .$self object_insert [dex $@objects $i]] $last] ;# bork bork bork
+	netsend [concat [list .$self object_insert $i] $last] ;# bork bork bork
 	$@history add [list $self del $i]
 }
 
