@@ -7058,7 +7058,7 @@ def ClassBrowser init {name x y textbox} {
 def ClassBrowser fill_box {s} {
 	global class_list
 	$@listbox delete 0 end
-	foreach class $class_list {
+	foreach class [lsort $class_list] {
 		if {[string length $s]==0 || [string first $s $class]>=0} {
 			set t "\[$class\]"
 			if {[can_say $class]} {append t "  [say $class]"}
