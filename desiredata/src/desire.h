@@ -54,11 +54,11 @@ extern "C" {
 /* ----------------------- (v)asprintf missing on mingw... ---------------------------------------------------*/
 
 #ifndef HAVE_VASPRINTF
-extern int vasprintf(char **str, const char *fmt, va_list ap);
+extern int vasprintf(char **str, const char *fmt, va_list ap) throw ();
 #endif
 
 #ifndef HAVE_ASPRINTF
-extern int asprintf(char **str, const char *fmt, ...);
+extern int asprintf(char **str, const char *fmt, ...) throw ();
 #endif
 
 /* ----------------------- m_imp.h ---------------------------------------------------*/

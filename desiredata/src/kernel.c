@@ -2350,15 +2350,13 @@ void pd_init() {
 
 #ifndef HAVE_ASPRINTF
 #define HAVE_ASPRINTF
-int asprintf(char **str, const char *fmt, ...)
-{
+int asprintf(char **str, const char *fmt, ...) throw () {
         va_list ap;
         int ret;
         *str = NULL;
         va_start(ap, fmt);
         ret = vasprintf(str, fmt, ap);
         va_end(ap);
-
         return ret;
 }
 #endif /* HAVE_ASPRINTF */
@@ -2384,17 +2382,14 @@ int asprintf(char **str, const char *fmt, ...)
 
 #define INIT_SZ 128
 
-int vasprintf(char **str, const char *fmt, va_list ap)
-{
+int vasprintf(char **str, const char *fmt, va_list ap) throw () {
         int ret = -1;
         va_list ap2;
         char *string, *newstr;
         size_t len;
-
         VA_COPY(ap2, ap);
         if ((string = (char *)malloc(INIT_SZ)) == NULL)
                 goto fail;
-
         ret = vsnprintf(string, INIT_SZ, fmt, ap2);
         if (ret >= 0 && ret < INIT_SZ) { /* succeeded with initial alloc */
                 *str = string;
@@ -2418,12 +2413,11 @@ int vasprintf(char **str, const char *fmt, va_list ap)
                 }
         }
         va_end(ap2);
-        return (ret);
-
+        return ret;
 fail:
         *str = NULL;
         errno = ENOMEM;
         va_end(ap2);
-        return (-1);
+        return -1;
 }
 #endif /* HAVE_VASPRINTF */
