@@ -1981,6 +1981,7 @@ void canvas_add_debug(t_canvas *x, t_gobj *y) {
 }
 
 void canvas_add(t_canvas *x, t_gobj *y, int index) {
+    post("canvas_add index=%d next_o_index=%d",index,x->next_o_index);
     gobj_setcanvas(y,x);
     if (index<0) y->dix->index = x->next_o_index++;
     else         y->dix->index = index;
@@ -5559,20 +5560,8 @@ static void canvas_object_help(t_canvas *x, t_symbol *name) {
 	free(buf);
 }
 
-static long canvas_children_count(t_canvas *x) {
-	long n=0;
-	canvas_each(y,x) n++;
-	return n;
-}
-
-static long canvas_children_last(t_canvas *x) {
-	long n=0;
-	canvas_each(y,x) n=x->dix->index;
-	return n;
-}
-
 static void canvas_reorder_last(t_canvas *x, int dest) {
-	int i = canvas_children_last(x);
+	int i = x->boxes->last()->dix->index;
 	t_gobj *foo = x->boxes->get(i);
 	x->boxes->remove(i);
 	fprintf(stderr,"canvas_reorder_last(x=%p,dest=%d) i=%d\n",x,dest,i);
@@ -5584,13 +5573,10 @@ static void canvas_reorder_last(t_canvas *x, int dest) {
 
 /* this supposes that $2=#X */
 static void canvas_object_insert(t_canvas *x, t_symbol *s, int argc, t_atom *argv) {
-	//t_text *o;
-	//t_binbuf *b;
 	if (argc<1) {error("not enough args"); return;}
 	if (argv[0].a_type != A_FLOAT) {error("$1 must be float"); return;}
 	int i = atom_getint(argv);
 	if (argv[2].a_type != A_SYMBOL) {error("$2 must be symbol"); return;}
-	post("will insert object at position %d",i);
 	s = argv[2].a_symbol;
 	pd_typedmess(x,s,argc-3,argv+3);
 	canvas_reorder_last(x,i);
