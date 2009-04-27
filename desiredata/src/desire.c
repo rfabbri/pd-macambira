@@ -99,6 +99,7 @@ public:
 		iter++;
 		return iter == map.end() ? 0 : iter->second;
 	}
+	t_gobj *get(int i) {return map.find(i)==map.end() ? 0 : map[i];}
 	void add(t_gobj *x) {map.insert(KV(x->dix->index,x)); invariant();}
 	void remove(int i) {map.erase(i); invariant();}
 	void remove_by_value(t_gobj *x) {map.erase(x->dix->index); invariant();}
@@ -1030,40 +1031,6 @@ void canvas_redrawallfortemplatecanvas(t_canvas *x, int action) {
         //canvas_redrawallfortemplate(tmpl, action);
     }
     //canvas_redrawallfortemplate(0, action);
-}
-
-//#define canvas_each2(CHILD,CANVAS) for(CHILD=&(CANVAS)->list; *CHILD; CHILD=&(*CHILD)->next())
-/* just a raw remove, no other business */
-/* doesn't work (why?) */
-static t_gobj *canvas_remove_nth(t_canvas *x, int n) {
-/*
-    t_gobj **y;
-    canvas_each2(y,x) {
-      fprintf(stderr,"n=%i *y=%p\n",n,*y);
-      if (!n) {
-        t_gobj *z = *y;
-	*y = z->next();
-	z->next() = 0;
-	return z;
-      } else n--;
-    }
-    return 0;
-*/
-}
-
-/* just a raw insert, no other business */
-/* doesn't work (why?) */
-static void canvas_insert_nth(t_canvas *x, int n, t_gobj *nu) {
-/*
-    t_gobj **y;
-    canvas_each2(y,x) if (!n) {
-        t_gobj *z = *y;
-	*y = nu;
-	nu->next() = z;
-	return;
-    } else n--;
-    *y = nu;
-*/
 }
 
 void canvas_disconnect(t_canvas *x, float from_, float outlet, float to_, float inlet) {
@@ -5598,17 +5565,24 @@ static long canvas_children_count(t_canvas *x) {
 	return n;
 }
 
+static long canvas_children_last(t_canvas *x) {
+	long n=0;
+	canvas_each(y,x) n=x->dix->index;
+	return n;
+}
+
 static void canvas_reorder_last(t_canvas *x, int dest) {
-	int n = canvas_children_count(x);
-	t_gobj *foo = canvas_remove_nth(x,n-1);
-	fprintf(stderr,"canvas_reorder_last(x=%p,dest=%d) n=%d\n",x,dest,n);
+	int i = canvas_children_last(x);
+	t_gobj *foo = x->boxes->get(i);
+	x->boxes->remove(i);
+	fprintf(stderr,"canvas_reorder_last(x=%p,dest=%d) i=%d\n",x,dest,i);
 	fprintf(stderr,"foo=%p\n",foo);
-	if (!foo) {bug("canvas_remove_nth returned NULL"); return;}
-	canvas_insert_nth(x,dest,foo);
+	if (!foo) {bug("couldn't remove box #%d",i); return;}
+	foo->dix->index = dest;
+	x->boxes->add(foo);
 }
 
 /* this supposes that $2=#X */
-#if 0
 static void canvas_object_insert(t_canvas *x, t_symbol *s, int argc, t_atom *argv) {
 	//t_text *o;
 	//t_binbuf *b;
@@ -5617,7 +5591,6 @@ static void canvas_object_insert(t_canvas *x, t_symbol *s, int argc, t_atom *arg
 	int i = atom_getint(argv);
 	if (argv[2].a_type != A_SYMBOL) {error("$2 must be symbol"); return;}
 	s = argv[2].a_symbol;
-	x->next_add = i;
 	if (s == gensym("obj")) {
 	        /* b = binbuf_new(); binbuf_restore(b, argc-5, argv+5);
     		canvas_objtext(x,atom_getintarg(3,argc,argv),atom_getintarg(4,argc,argv),0,b); */
@@ -5627,11 +5600,9 @@ static void canvas_object_insert(t_canvas *x, t_symbol *s, int argc, t_atom *arg
 	} else if (s == gensym("symbolatom")) {		canvas_floatatom(x,s,argc-3,argv+3);
 	} else if (s == gensym("text")) {		canvas_text(x,gensym("text"),argc-3,argv+3);
 	} else post("UNSUPPORTED object_insert: %s",s->name);
-	/* canvas_reorder_last(x,i); */
- 	x->next_add = -1;
+	canvas_reorder_last(x,i);
 /*err: pd_popsym(x);*/
 }
-#endif
 
 static void g_text_setup() {
     t_class *c;
@@ -6755,7 +6726,7 @@ static void g_canvas_setup() {
 // dd-specific
     class_addmethod2(c,canvas_object_moveto,"object_moveto","sff");
     class_addmethod2(c,canvas_object_delete,"object_delete","s");
-    //class_addmethod2(c,canvas_object_insert,"object_insert","*");
+    class_addmethod2(c,canvas_object_insert,"object_insert","*");
     class_addmethod2(c,canvas_object_get_tips,"object_get_tips","s");
     class_addmethod2(c,canvas_object_help,"object_help","s");
     class_addmethod2(c,canvas_text_setto,"text_setto","*");
