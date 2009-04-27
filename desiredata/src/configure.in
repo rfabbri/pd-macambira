@@ -57,6 +57,10 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(gettimeofday select socket strerror)
 AC_FUNC_ALLOCA
 
+dnl added for win32 (for patko)
+AC_CHECK_FUNCS(asprintf)
+AC_CHECK_FUNCS(vasprintf)
+
 # audio APIs may accumulate, but there must be only one MIDI API (??)
 AUDIOSRC=""
 MIDISRC="s_midi_none.c"

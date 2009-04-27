@@ -1,5 +1,5 @@
 
 #undef HAVE_ALLOCA
-
 #undef HAVE_ALLOCA_H
-
+#undef HAVE_ASPRINTF
+#undef HAVE_VASPRINTF
