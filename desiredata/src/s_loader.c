@@ -145,7 +145,7 @@ gotone:
         post("%s: couldn't load", filename);
         goto forgetit;
     }
-    makeout = (t_xxx)GetProcAddress(ntdll);
+    makeout = (t_xxx)GetProcAddress(ntdll,"ntdll");
 #endif
     if (!makeout) {
         post("%s: can't find symbol '%s' in library", filename, symname);
