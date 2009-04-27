@@ -5590,16 +5590,9 @@ static void canvas_object_insert(t_canvas *x, t_symbol *s, int argc, t_atom *arg
 	if (argv[0].a_type != A_FLOAT) {error("$1 must be float"); return;}
 	int i = atom_getint(argv);
 	if (argv[2].a_type != A_SYMBOL) {error("$2 must be symbol"); return;}
+	post("will insert object at position %d",i);
 	s = argv[2].a_symbol;
-	if (s == gensym("obj")) {
-	        /* b = binbuf_new(); binbuf_restore(b, argc-5, argv+5);
-    		canvas_objtext(x,atom_getintarg(3,argc,argv),atom_getintarg(4,argc,argv),0,b); */
-							canvas_obj(x,s,argc-3,argv+3);
-	} else if (s == gensym("restore")) {    	canvas_restore(x,s,argc-3,argv+3);
-	} else if (s == gensym("floatatom")) {		canvas_floatatom(x,s,argc-3,argv+3);
-	} else if (s == gensym("symbolatom")) {		canvas_floatatom(x,s,argc-3,argv+3);
-	} else if (s == gensym("text")) {		canvas_text(x,gensym("text"),argc-3,argv+3);
-	} else post("UNSUPPORTED object_insert: %s",s->name);
+	pd_typedmess(x,s,argc-3,argv+3);
 	canvas_reorder_last(x,i);
 /*err: pd_popsym(x);*/
 }
