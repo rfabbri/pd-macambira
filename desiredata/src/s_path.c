@@ -299,7 +299,6 @@ extern "C" int sys_parsercfile(char *filename) {
     return retval;
 }
 
-#ifndef MSW
 #define STARTUPNAME ".pdrc"
 extern "C" int sys_rcfile () {
     char *fname, *home = getenv("HOME");
@@ -308,7 +307,6 @@ extern "C" int sys_rcfile () {
     free(fname);
     return r;
 }
-#endif /* MSW */
 
 void sys_doflags() {
     int beginstring = 0, state = 0, len = strlen(sys_flags->s_name);
