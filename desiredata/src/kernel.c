@@ -2349,6 +2349,7 @@ void pd_init() {
 };
 
 #ifndef HAVE_ASPRINTF
+#define HAVE_ASPRINTF
 int asprintf(char **str, const char *fmt, ...)
 {
         va_list ap;
@@ -2362,6 +2363,7 @@ int asprintf(char **str, const char *fmt, ...)
 }
 #endif /* HAVE_ASPRINTF */
 #ifndef HAVE_VASPRINTF
+#define HAVE_VASPRINTF
 #include <stdio.h>
 #include <errno.h>
 #include <limits.h>
