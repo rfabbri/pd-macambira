@@ -268,7 +268,8 @@ static const char *(usagemessage[]) = {
 "-version         -- don't run Pd; just print out which version it is",
 "-d <n>           -- specify debug level",
 "-noloadbang      -- suppress all loadbangs",
-"-stderr          -- send printout to standard error instead of GUI",
+"-stdout          -- send printout to standard output (1>) instead of GUI",
+"-stderr          -- send printout to standard error  (2>) instead of GUI",
 "-guiport <n>     -- set port that the GUI should connect to",
 "-send \"msg...\"   -- send a message at startup, after patches are loaded",
 #ifdef UNISTD
@@ -519,15 +520,14 @@ int sys_argparse(int argc, char **argv) {
         if (ARG("-version",1)) {sys_version = 1; NEXT(1);}
         if (ARG("-noloadbang",1)) {sys_noloadbang = 1; NEXT(1);}
         if (ARG("-nogui",1)) {
-		sys_printtostderr = 1;
 		fprintf(stderr,"Warning: -nogui is obsolete: nowadays it does just like -stderr instead\n");
-		NEXT(1);
-	}
+		sys_printtofh = 2; NEXT(1);}
         if (ARG("-guiport",2)) {
 		if (sscanf(argv[1], "%d", &sys_guisetportnumber)<1) goto usage;
 		NEXT(2);
 	}
-        if (ARG("-stderr",1)) {sys_printtostderr = 1; NEXT(1);}
+        if (ARG("-stdout",1)) {sys_printtofh = 1; NEXT(1);}
+        if (ARG("-stderr",1)) {sys_printtofh = 2; NEXT(1);}
         if (ARG("-guicmd",2)) {
 		fprintf(stderr,"Warning: -guicmd ignored");
 		NEXT(2);
