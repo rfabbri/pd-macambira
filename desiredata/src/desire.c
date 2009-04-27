@@ -7184,11 +7184,11 @@ extern "C" void glob_init () {
 /* formerly s_print.c */
 
 t_printhook sys_printhook;
-int sys_printtofh = -1; /* send to console by default */
+FILE *sys_printtofh = 0; /* send to console by default */
 
 static void dopost(const char *s) {
     if (sys_printhook) sys_printhook(s);
-    else if (sys_printtofh<0) fprintf(stderr, "%s", s);
+    else if (sys_printtofh) fprintf(sys_printtofh, "%s", s);
     else {
         std::ostringstream t;
         for(int i=0; s[i]; i++) {

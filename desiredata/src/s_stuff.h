@@ -267,7 +267,7 @@ void sys_save_audio_params(t_audiodevs *in, t_audiodevs *out, int   rate, int  d
 /* s_file.c */
 typedef void (*t_printhook)(const char *s);
 extern t_printhook sys_printhook;  /* set this to override printing */
-extern int sys_printtofh;
+extern FILE *sys_printtofh;
 #ifdef MSW
 #define vsnprintf  _vsnprintf /* jsarlo -- alias this name for msw */
 #endif

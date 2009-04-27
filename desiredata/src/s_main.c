@@ -521,13 +521,13 @@ int sys_argparse(int argc, char **argv) {
         if (ARG("-noloadbang",1)) {sys_noloadbang = 1; NEXT(1);}
         if (ARG("-nogui",1)) {
 		fprintf(stderr,"Warning: -nogui is obsolete: nowadays it does just like -stderr instead\n");
-		sys_printtofh = 2; NEXT(1);}
+		sys_printtofh = stderr; NEXT(1);}
         if (ARG("-guiport",2)) {
 		if (sscanf(argv[1], "%d", &sys_guisetportnumber)<1) goto usage;
 		NEXT(2);
 	}
-        if (ARG("-stdout",1)) {sys_printtofh = 1; NEXT(1);}
-        if (ARG("-stderr",1)) {sys_printtofh = 2; NEXT(1);}
+        if (ARG("-stdout",1)) {sys_printtofh = stdout; NEXT(1);}
+        if (ARG("-stderr",1)) {sys_printtofh = stderr; NEXT(1);}
         if (ARG("-guicmd",2)) {
 		fprintf(stderr,"Warning: -guicmd ignored");
 		NEXT(2);
