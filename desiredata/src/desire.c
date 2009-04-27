@@ -5174,11 +5174,6 @@ struct t_cnv : t_iemgui {
     int      vis_w, vis_h;
 };
 
-struct t_dropper : t_iemgui {
-    t_symbol *s;
-    t_symbol *ds;
-};
-
 struct t_vu : t_iemgui {
     int      led_size;
     int      peak,rms;
