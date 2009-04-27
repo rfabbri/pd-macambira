@@ -1198,7 +1198,7 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s, int argc, t_atom *argv
         int vecsize;
         if (argv[i].a_type != A_SYMBOL) goto usage;
         garrays[i] = (t_garray *)pd_findbyclass(argv[i].a_symbol, garray_class);
-	if (!garrays) {
+	if (!garrays[i]) {
             error("%s: no such table", argv[i].a_symbol->name);
             goto done;
         } else if (!garray_getfloatarray(garrays[i], &vecsize, &vecs[i]))
