@@ -496,6 +496,7 @@ EXTERN void pd_float(   t_pd *x, t_float f);
 EXTERN void pd_symbol(  t_pd *x, t_symbol *s);
 EXTERN void pd_string(  t_pd *x, const char *s); /* makes a refcounted symbol (copying s) */
 EXTERN void pd_list(    t_pd *x, t_symbol *s, int argc, t_atom *argv);
+#define pd_anything pd_typedmess
 
 #ifdef PD_PLUSPLUS_FACE
 #define pd_class(x) ((x)->_class)
