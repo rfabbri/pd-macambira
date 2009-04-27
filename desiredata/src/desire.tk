@@ -549,6 +549,13 @@ if {$tk} {
 		image create bitmap $name -data "#define z_width $w\n#define z_height $h
 			static unsigned char z_bits[] = { $values };"
 	}
+
+
+	set main [string toupper [info script] 0 0]
+	bind $main    <FocusIn> {set ::current_window %W}
+	bind Toplevel <FocusIn> {set ::current_window %W}
+	proc tk_messageBox2 {args} {tk_messageBox -parent $::current_window {*}$args}
+
 	# it's unfortunate but we seem to have to turn off global bindings
 	# for Text objects to get control-s and control-t to do what we want for
 	# "text" dialogs below. Also we have to get rid of tab's changing the focus.
@@ -958,7 +965,7 @@ proc poll_sock {} {
 		set cmd [gets $sock]
 		if {[eof $sock]} {
 			if {!$cmdline(gdb)} {
-				tk_messageBox -message "connection ended by server.\n(crash? try: desire -gdb)" -type ok
+				tk_messageBox2 -message "connection ended by server.\n(crash? try: desire -gdb)" -type ok
 			}
 			set sock {}
 			return
@@ -1171,12 +1178,12 @@ def Client send_message {} {
 }
 
 def Client quit {} {
-	set answer [tk_messageBox -message "Do you really wish to quit?" -type yesno -icon question]
+	set answer [tk_messageBox2 -message "Do you really wish to quit?" -type yesno -icon question]
 	switch -- $answer {yes {netsend [list pd quit]; exit}}
 }
 
 def Client abort_server {} {
-	set answer [tk_messageBox -message "Do you really wish to abort?" -type yesno -icon question]
+	set answer [tk_messageBox2 -message "Do you really wish to abort?" -type yesno -icon question]
 	switch -- $answer {yes {exec kill -ABRT $::server_pid}}
 }
 
@@ -1504,7 +1511,7 @@ def Canvas close {} {
 		netsend [list .$self close]
 		return
 	}
-	switch [tk_messageBox -message [say save_changes?] -icon question -type yesnocancel -default cancel] {
+	switch [tk_messageBox2 -message [say save_changes?] -icon question -type yesnocancel -default cancel] {
 		yes    {$self save; netsend [list .$self close]}
 		no     {            netsend [list .$self close]}
 		cancel {}
@@ -1550,7 +1557,7 @@ def Canvas print {} {
 def Canvas quit {}         {$::main quit}
 def Canvas abort_server {} {$::main abort_server}
 
-proc wonder {} {tk_messageBox -message [say ask_cool] -type yesno -icon question}
+proc wonder {} {tk_messageBox2 -message [say ask_cool] -type yesno -icon question}
 
 def Canvas eval% {code} {
 	mset {x y} $@curpos
@@ -8879,7 +8886,7 @@ proc pdtk_savepanel {target localdir} {
 #proc bgerror {err} {
 #	global errorInfo
 #	set info [error_dump]
-#	tk_messageBox -message "$err: $info" -type ok
+#	tk_messageBox2 -message "$err: $info" -type ok
 #}
 
 class_new OopsDialog {Dialog}
