@@ -55,4 +55,4 @@ pddoc_DATA = sprinkler-help.pd
 
 sprinkler_SOURCES = sprinkler.c common/mooPdUtils.h
 
-AM_CPPFLAGS = -I$(top_srcdir)/common
+AM_CPPFLAGS += -I$(top_srcdir)/common

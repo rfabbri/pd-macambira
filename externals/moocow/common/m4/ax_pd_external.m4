@@ -347,8 +347,8 @@ AC_DEFUN([AX_PD_EXTERNAL],
  if test "$uname_s" = "MINGW32_NT";  #MINGW32_NT-5.1
  then
   PDEXT_DFLAGS="\
-	-DO_NONBLOCK=1 -Dsrand48(n)=srand((n)) \
-        -Ddrand48()=((double)rand()/RAND_MAX) -Dbzero(p,n)=memset(p,0,n) \
+	-D'O_NONBLOCK=1' -D'srand48(n)=srand((n))' \
+        -D'drand48()=((double)rand()/RAND_MAX)' -D'bzero(p,n)=memset(p,0,n)' \
 	"
   PDEXT_LFLAGS="-shared -L${pddir}/bin -L${pddir}/obj"
   PDEXT_CFLAGS="-mms-bitfields -DMSW -DNT"
@@ -385,21 +385,30 @@ AC_DEFUN([AX_PD_EXTERNAL],
 AC_DEFUN([AX_PD_EARLY],
 [
  ##-- parse user's CFLAGS,CPPFLAGS
- dnl AC_MSG_NOTICE([parsing user *FLAGS])
- dnl AC_MSG_NOTICE([(input) CFLAGS=$CFLAGS])
- dnl AC_MSG_NOTICE([(input) CPPFLAGS=$CPPFLAGS])
+ AC_MSG_NOTICE([pre-processing user CFLAGS...])
+ AC_MSG_NOTICE([got   CFLAGS="$CFLAGS"])
+ AC_MSG_NOTICE([got CPPFLAGS="$CPPFLAGS"])
 
+ cflags=
+ cppflags=
  AX_DISTRIBUTE_CFLAGS([$CFLAGS],CPPFLAGS,cflags)
  AX_SAFE_CFLAGS([$CPPFLAGS],cppflags,EXTRA_CPPFLAGS)
  CFLAGS="$cflags"
  CPPFLAGS="$cppflags"
 
- dnl AC_MSG_NOTICE([(output) CFLAGS=$CFLAGS])
- dnl AC_MSG_NOTICE([(output) CPPFLAGS=$CPPFLAGS])
- dnl AC_MSG_NOTICE([(output) EXTRA_CPPFLAGS=$EXTRA_CPPFLAGS])
- AM_CPPFLAGS="\${EXTRA_CPPFLAGS}"
+ ##-- trim whitespace
+ CFLAGS=`echo $CFLAGS`
+ CPPFLAGS=`echo $CPPFLAGS`
+ EXTRA_CPPFLAGS=`echo $EXTRA_CPPFLAGS`
+ #LDFLAGS=`echo $LDFLAGS`
+
+ AC_MSG_NOTICE([setting distributed CFLAGS...])
+ AC_MSG_NOTICE([set       CPPFLAGS="$CPPFLAGS"])
+ AC_MSG_NOTICE([set EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS"])
+ AC_MSG_NOTICE([set         CFLAGS="$CFLAGS"])
+ #AM_CPPFLAGS="\${EXTRA_CPPFLAGS}"
  AC_SUBST(EXTRA_CPPFLAGS)
- AC_SUBST(AM_CPPFLAGS)
+ dnl AC_SUBST(AM_CPPFLAGS)
 
  ##-- save (hacked) user's CFLAGS,CPPFLAGS
  UCPPFLAGS="$CPPFLAGS"
@@ -411,12 +420,26 @@ AC_DEFUN([AX_PD_EARLY],
 AC_DEFUN([AX_PD_LATE],
 [
  ##-- add platform defaults to user flags
- CPPFLAGS="$UCPPFLAGS $PDEXT_IFLAGS $PDEXT_DFLAGS"
- CFLAGS="$UCFLAGS $PDEXT_OFLAGS $PDEXT_AFLAGS $PDEXT_WFLAGS"
- LDFLAGS="$ULDFLAGS $PDEXT_LFLAGS" 
+ CPPFLAGS="$CPPFLAGS $PDEXT_IFLAGS $PDEXT_DFLAGS"
+ CFLAGS="$CFLAGS $PDEXT_OFLAGS $PDEXT_AFLAGS $PDEXT_WFLAGS"
+ LDFLAGS="$LDFLAGS $PDEXT_LFLAGS" 
+
+ ##-- ... and re-hack
+ cflags=
+ cppflags=
+ AX_DISTRIBUTE_CFLAGS([$CFLAGS],CPPFLAGS,cflags)
+ AX_SAFE_CFLAGS([$CPPFLAGS],cppflags,EXTRA_CPPFLAGS)
+ CFLAGS="$cflags"
+ CPPFLAGS="$cppflags"
+
+ ##-- trim whitespace
+ CFLAGS=`echo $CFLAGS`
+ CPPFLAGS=`echo $CPPFLAGS`
+ EXTRA_CPPFLAGS=`echo $EXTRA_CPPFLAGS`
+ LDFLAGS=`echo $LDFLAGS`
 
  AC_MSG_NOTICE([set       CPPFLAGS="$CPPFLAGS"])
  AC_MSG_NOTICE([set EXTRA_CPPFLAGS="$EXTRA_CPPFLAGS"])
- AC_MSG_NOTICE([set         CFLAGS="$CFLAGS])
+ AC_MSG_NOTICE([set         CFLAGS="$CFLAGS"])
  AC_MSG_NOTICE([set        LDFLAGS="$LDFLAGS"])
 ])

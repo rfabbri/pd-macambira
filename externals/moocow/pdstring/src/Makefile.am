@@ -99,4 +99,4 @@ uninstall-local:
 # Paths, etc.
 #-----------------------------------------------------------------------
 
-AM_CPPFLAGS = -I$(top_srcdir)/common
+AM_CPPFLAGS += -I$(top_srcdir)/common

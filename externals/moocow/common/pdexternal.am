@@ -26,6 +26,10 @@ EXEEXT   = .@PDEXT@
 SUFFIXES = .@PDEXT@ .pod .txt .html
 
 ##-----------------------------------------------------------------------
+## Additional flags
+AM_CPPFLAGS = $(EXTRA_CPPFLAGS)
+
+##-----------------------------------------------------------------------
 ## Distribution
 
 ##--- extra distribution files

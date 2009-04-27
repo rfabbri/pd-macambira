@@ -36,4 +36,4 @@ pddoc_DATA = weightmap-help.pd
 
 weightmap_SOURCES = weightmap.c $(top_srcdir)/common/mooPdUtils.h
 
-AM_CPPFLAGS = -I$(top_srcdir)/common
+AM_CPPFLAGS += -I$(top_srcdir)/common

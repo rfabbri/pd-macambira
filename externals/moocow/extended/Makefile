@@ -25,7 +25,7 @@ SUBDIRS = \
 MOOCOW_DIR    ?=$(shell pwd)
 MOOCOW_BUILD  ?=$(MOOCOW_DIR)/build.moo
 MOOCOW_MFLAGS ?=DESTDIR=""
-MOOCOW_BUILD_VERSION ?=2009-04-27.001
+MOOCOW_BUILD_VERSION ?=2009-04-27.002
 
 ##-- arguments to be passed to sh ./configure
 ## + we use "`echo $(CFLAGS)`" to remove ugly quotes from the CFLAGS variable,
@@ -52,7 +52,7 @@ ONFAIL ?= echo "(MOOCOW) Warning: sub-target failed: '$@'"
 
 ##-- defaults
 #CFLAGS ?= -g -O2 -Wall -Winline -W
-CFLAGS ?= -g -O0 -Wall -Winline -W -D'mooUglyQuotedMacro(x)=x' -DmooSafeMacro=1
+CFLAGS ?= -g -O0 -Wall -D'mooUglyQuotedMacro(x)=x' -DmooSafeMacro=1
 
 pd_src ?= $(CURDIR)/../../../pd
 
