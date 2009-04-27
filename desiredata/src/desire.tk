@@ -407,12 +407,11 @@ def CommandHistory can't {} {
 
 # runs the restore procedure for the last item in the root undo queue.
 def CommandHistory undo {} {
-	global errorInfo
 	if {![$self can_perform? [lindex $@undo_stack end]]} {error "Can't undo this!"}
 	set backup $@undo_stack
 	set @undo_stack $@redo_stack
 	set @redo_stack {}
-	#set err [catch {$self perform [lindex $backup end]}]; if {$err} {set err $errorInfo}
+	#set err [catch {$self perform [lindex $backup end]}]; if {$err} {set err $::errorInfo}
 	$self perform [lindex $backup end]
 	set @redo_stack $@undo_stack
 	set @undo_stack [lrange $backup 0 end-1]
@@ -421,11 +420,10 @@ def CommandHistory undo {} {
 }
 
 def CommandHistory redo {} {
-	global errorInfo
 	if {![$self can_perform? [lindex $@undo_stack end]]} {error "Can't redo this!"}
 	set backup $@redo_stack
 	set @redo_stack {}
-	set err [catch {$self perform [lindex $backup end]}]; if {$err} {set err $errorInfo}
+	set err [catch {$self perform [lindex $backup end]}]; if {$err} {set err $::errorInfo}
 	$self perform [lindex $backup end]
 	set @redo_stack [lrange $backup 0 end-1]
 	$self changed
@@ -449,12 +447,11 @@ def CommandHistory perform {action} {
 	switch -- [lindex $action 0] {
 	  do      {eval [lindex $action 1]}
 	  can't   {error "can't undo this!"}
-	  default {foreach x [lindex $action 1] {$self perform $x}}
+	  default {foreach x [lreverse [lindex $action 1]] {$self perform $x}}
 	}
 }
 
 def CommandHistory atomically {what code} {
-	global errorInfo
 	set ubackup @undo_stack; set @undo_stack {}
 	set rbackup @redo_stack; set @redo_stack {}
 	uplevel 2 $code
@@ -974,8 +971,7 @@ proc poll_sock {} {
 		if {$::debug} {if {[string first pdtk_post $cmd]!=0} {puts "[VTmagenta]-> $cmd[VTgrey]"}}
 		append sock_lobby "\n$cmd"
 		if {[catch {eval $sock_lobby}]} {
-			global errorCode errorInfo
-			switch -regexp -- $errorInfo { "^missing close-brace" {
+			switch -regexp -- $::errorInfo { "^missing close-brace" {
 				#puts "waiting for the end of: [string range $sock_lobby 0 40]"
 				continue
 			}}
@@ -2951,7 +2947,7 @@ def Canvas ins {i constructor} {
 	set last [lindex $parts end]
 	set parts [lrange $parts 0 end-1]
 	foreach part $parts {netsend $part}
-	netsend [concat [list .$self object_insert $i] $last] ;# bork bork bork
+	netsend [concat [list .$self object_insert $i] $last]
 	$@history add [list $self del $i]
 }
 
@@ -8863,7 +8859,6 @@ proc pdtk_savepanel {target localdir} {
 # To err is human.
 
 #proc bgerror {err} {
-#	global errorInfo
 #	set info [error_dump]
 #	tk_messageBox2 -message "$err: $info" -type ok
 #}
