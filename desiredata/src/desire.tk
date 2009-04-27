@@ -1153,7 +1153,7 @@ catch {
 
 def Client open_file {} {
     global pd_opendir patch_filetypes
-    set filename [tk_getOpenFile -defaultextension .pd -filetypes $patch_filetypes -initialdir $pd_opendir]
+    set filename [tk_getOpenFile -parent $::current_window -defaultextension .pd -filetypes $patch_filetypes -initialdir $pd_opendir]
     if {$filename != ""} {$self open_file_really $filename}
 }
 
@@ -1540,7 +1540,7 @@ def Canvas save {} {
 
 def Canvas save_as {} {
 	$self checkgeometry
-	set filename [tk_getSaveFile -filetypes $::patch_filetypes]
+	set filename [tk_getSaveFile -parent $::current_window -filetypes $::patch_filetypes]
 	if {$filename != ""} {
 		set @file   [string range $filename [expr [string last / $filename]+1] end]
 		set @folder [string range $filename 0 [expr [string last / $filename]-1]]
@@ -1551,7 +1551,7 @@ def Canvas save_as {} {
 }
 
 def Canvas print {} {
-    set filename [tk_getSaveFile -initialfile pd.ps -defaultextension .ps -filetypes { {{postscript} {.ps}} }]
+    set filename [tk_getSaveFile -parent $::current_window -initialfile pd.ps -defaultextension .ps -filetypes { {{postscript} {.ps}} }]
     if {$filename != ""} {[$self widget] postscript -file $filename}
 }
 def Canvas quit {}         {$::main quit}
@@ -1567,7 +1567,7 @@ def Canvas eval% {code} {
 }
 
 def Client documentation {} {
-    set filename [tk_getOpenFile -defaultextension .pd -filetypes { {{documentation} {.pd .txt .htm}} } -initialdir $::docdir]
+    set filename [tk_getOpenFile -parent $::current_window -defaultextension .pd -filetypes { {{documentation} {.pd .txt .htm}} } -initialdir $::docdir]
     if {$filename != ""} {
         if {[string first .txt $filename] >= 0} {
             menu_opentext $filename
@@ -8840,7 +8840,7 @@ def Canvas deconstruct_to {stream args} {
 
 proc pdtk_openpanel {target localdir} {
     if {$localdir == ""} {set localdir $::pd_opendir}
-    set filename [tk_getOpenFile -initialdir $localdir]
+    set filename [tk_getOpenFile -parent $::current_window -initialdir $localdir]
     if {$filename != ""} {
         set directory [string range $filename 0 [expr [string last / $filename]-1]]
         set pd_opendir $directory
@@ -8850,9 +8850,9 @@ proc pdtk_openpanel {target localdir} {
 
 proc pdtk_savepanel {target localdir} {
     if {$localdir == ""} {
-    	set filename [tk_getSaveFile]
+    	set filename [tk_getSaveFile -parent $::current_window]
     } else {
-    	set filename [tk_getSaveFile -initialdir $localdir]
+    	set filename [tk_getSaveFile -parent $::current_window -initialdir $localdir]
     }
     if {$filename != ""} {
         netsend [list $target callback [enquote $filename]]
@@ -8932,7 +8932,8 @@ def Canvas visual_diff {} {
 	    post %s $t
 	    if {[file exist $t]} {set initialfile $filename.$suffix; break}
         }
-	set filename [tk_getOpenFile -defaultextension .pd -filetypes $::image_filetypes -initialdir [$self folder] -initialfile $initialfile]
+	set filename [tk_getOpenFile -parent $::current_window -defaultextension .pd \
+		-filetypes $::image_filetypes -initialdir [$self folder] -initialfile $initialfile]
 	if {$filename == ""} {return}
 	image create photo image_$self -file $filename
 	$self blink_image
