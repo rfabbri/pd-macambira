@@ -2973,6 +2973,7 @@ def Canvas del {i} {
 def Canvas wires {} {return $@wires}
 
 def Canvas delete_selection {} {
+    $@history atomically [list delete_selection] {
 	if {![$@objectsel size] && ![$@wiresel size]} {return}
 	#this keynav should be better sorted out
 	if {$@keynav} {
@@ -3001,6 +3002,7 @@ def Canvas delete_selection {} {
 	}
 	$@objectsel clear
 	$@wiresel   clear
+    }
 }
 
 def View position= {xy1} {mset [list @x1 @y1] $xy1; $self changed x1 y1}
