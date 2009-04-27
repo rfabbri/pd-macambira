@@ -328,7 +328,6 @@ void FAR PASCAL midiInputHandler(HMIDIIN hMidiIn, WORD wMsg, DWORD dwInstance, D
 
 void msw_open_midiin(int nmidiin, int *midiinvec) {
     UINT  wRtn;
-    char szErrorText[256];
     unsigned int i;
     unsigned int ndev = 0;
     /* Allocate a circular buffer for low-level MIDI input.  This buffer is filled by the low-level callback function
@@ -405,7 +404,9 @@ void sys_putmidibyte(int portno, int byte) {
 void sys_poll_midi() {
     static EVENT msw_nextevent;
     static int msw_isnextevent;
+#ifdef MIDI_TIMESTAMP
     static double msw_nexteventtime;
+#endif
     while (1) {
         if (!msw_isnextevent) {
             if (!GetEvent(lpInputBuffer, &msw_nextevent)) break;
