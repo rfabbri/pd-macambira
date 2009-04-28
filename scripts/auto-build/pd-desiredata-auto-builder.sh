@@ -17,4 +17,6 @@ echo "build root: $auto_build_root_dir"
 rsync_distro "$auto_build_root_dir"
 
 cd "${auto_build_root_dir}/desiredata/src"
-./configure && make
+./configure \
+	&& make \
+	&& echo SUCCESS
