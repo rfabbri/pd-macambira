@@ -187,8 +187,7 @@ if test x$jack = xyes; then
           if test x$jack = "xrun"; then LDFLAGS=$LDFLAGS" -lrt -ljack"; fi
       fi
       if test `uname -s` = Darwin; then
-          LDFLAGS=$LDFLAGS" -framework Jack"      # 0.39
-          LDFLAGS=$LDFLAGS" -weak_framework Jack" # 0.40
+          LDFLAGS=$LDFLAGS" -weak_framework Jackmp" # 0.40
       else
           LIBS="$LIBS -ljack"
       fi
