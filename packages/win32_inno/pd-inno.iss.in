@@ -57,7 +57,8 @@ Name: {group}\GrIPD; Filename: {app}\gripd\gripd.exe
 [Run]
 ; NOTE: The following entry contains an English phrase ("Launch"). You are free to translate it into another language if required.
 ;Filename: {app}\bin\pd.exe; Description: Launch Pd-extended; Flags: nowait postinstall skipifsilent
-Filename: rundll32 url.dll,FileProtocolHandler http://asio4all.com; Description: open ASIO4ALL website; Flags: nowait postinstall skipifsilent
+; failed attempt at getting this url to open after the install is complete
+;Filename: rundll32 url.dll,FileProtocolHandler http://asio4all.com; Description: open ASIO4ALL website; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
 Type: files; Name: {app}\pd.url
