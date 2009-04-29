@@ -1,3 +1,8 @@
+cvs_root_dir = ../..
+pd_src = $(cvs_root_dir)/pd
+INCLUDE = -I$(pd_src)/src
+GFLAGS = -DINSTALL_PREFIX=\"$(prefix)\"
+
 EXT= @EXT@
 LIBSUFFIX = @LIBSUFFIX@
 prefix = @prefix@
@@ -20,6 +25,17 @@ CFLAGS = $(CPPFLAGS) @CFLAGS@ $(MORECFLAGS)
 CFLAGS += -Wall -Wextra -Wno-unused-parameter -I.
 CFLAGS += -DINSTALL_PREFIX=\"$(prefix)\"
 
+
+# --------------------- win32 ---------------------------
+WATCHDOG = @WATCHDOG@
+WLIB = @WLIB@
+WEXE = @WEXE@ 
+EXE = @EXE@
+PDSEND = @PDSEND@
+PDRECEIVE = @PDRECEIVE@
+# variables to build on mingw <colet.patrice@free.fr>
+#-----------------------------------------------------------
+
 SRCXX = desire.c kernel.c builtins.c builtins_dsp.c s_path.c s_inter.c s_main.c \
 	m_sched.c s_loader.c d_soundfile.c d_ugen.c s_audio.c s_midi.c @AUDIOSRC@ @MIDISRC@
 SRC = m_fifo.c m_simd.c d_mayer_fft.c d_fftroutine.c
@@ -32,7 +48,7 @@ SO = libpd$(LIBSUFFIX)
 
 all:: bin externs
 
-bin:: pd pd-watchdog pdsend pdreceive
+bin:: pd $(WATCHDOG) pdsend pdreceive
 
 $(SRCXX:.c=.o): %.o: %.c config.log
 	$(CXX) $(CFLAGS) -xc++ -c -o $*.o $*.c
@@ -41,7 +57,7 @@ $(SRC:.c=.o): %.o: %.c config.log
 	$(CC) $(CFLAGS) -Wno-parentheses -Wno-switch -Wstrict-prototypes -c -o $*.o $*.c
 
 $(SO): $(OBJ) config.log
-	$(CXX) $(LDSOFLAGS) $(LDFLAGS) $(DBG_CFLAGS) -o $(SO) $(OBJ)
+	$(CXX) $(LDSOFLAGS) $(LDFLAGS) $(DBG_CFLAGS) -I../src -o $(SO) $(OBJ) $(WLIB)
 
 pd: $(OBJ) config.log $(SO) main.c
 	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) $$PWD/$(SO) main.c -o pd
@@ -49,11 +65,16 @@ pd: $(OBJ) config.log $(SO) main.c
 pd-watchdog: s_watchdog.c
 	$(CC) $(CFLAGS) $(STRIPFLAG) -o pd-watchdog s_watchdog.c
 
+pd.com: main.o
+	$(CC) $(LDFLAGS) $(DBG_CFLAGS) $(CFLAGS) -o pd.com main.o \
+		$(LIBS) -L../src -lpd
+		strip --strip-unneeded -R .note -R .comment pd.com
+
 pdsend: u_pdsend.c
-	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdsend u_pdsend.c
+	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdsend u_pdsend.c $(PDSEND)
 
 pdreceive: u_pdreceive.c
-	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdreceive u_pdreceive.c
+	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdreceive u_pdreceive.c $(PDRECEIVE)
 
 externs::
 	cd ../extra; for ext in bonk~ choice expr~ fiddle~ loop~ lrshift~ pique sigmund~; do \
@@ -66,11 +87,12 @@ install::  all
 		install $$file $(DESTDIR)$(libpdbindir)/$$file; done
 	install $(BINARYMODE) $(SO) $(DESTDIR)$(libdir)/$(SO)
 	test -w /etc/ld.so.cache && ldconfig || true
-	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) -lpd main.c -o $(DESTDIR)$(bindir)/pd
-	install -m755 desire.tk   $(DESTDIR)$(bindir)/desire
-	install -m755 pdsend      $(DESTDIR)$(bindir)/pdsend
-	install -m755 pdreceive   $(DESTDIR)$(bindir)/pdreceive
-	install -m755 pd-watchdog $(DESTDIR)$(libpdbindir)/pd-watchdog
+	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) main.c -o $(DESTDIR)$(bindir)/pd $(WSTRIP)
+	install -m755 desire.tk   $(DESTDIR)$(bindir)/desire.tk
+	install -m755 desire   $(DESTDIR)$(bindir)/desire
+	install -m755 pdsend$(EXE)      $(DESTDIR)$(bindir)/pdsend$(EXE)
+	install -m755 pdreceive$(EXE)   $(DESTDIR)$(bindir)/pdreceive$(EXE)
+	install -m755 $(WATCHDOG) $(DESTDIR)$(libpdbindir)/$(WATCHDOG)
 	find locale   -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(libpdbindir)/'{}' ';'
 	find icons    -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(libpddir)/'{}' ';'
 	find ../doc   -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(pddocdir)/'{}' ';'
@@ -82,9 +104,9 @@ install::  all
 		gzip < ../man/$$page > $(DESTDIR)$(mandir)/man1/$$page.gz; chmod 644 $(DESTDIR)$(mandir)/man1/$$page.gz; done
 
 local-clean::
-	-rm -f *.o pd pdsend pdreceive pd-watchdog m_stamp.c
+	-rm -f *.o pd$(EXE) pdsend$(EXE) pdreceive$(EXE) $(WATCHDOG) m_stamp.c
 	-rm -f *~
-	-(cd ../doc/6.externs; rm -f *.pd_linux)
+	-(cd ../doc/6.externs; rm -f *.$(EXT))
 	-rm -f makefile.deps
 	touch makefile.deps
 	#chmod 666 makefile.deps # what was this for??
