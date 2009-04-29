@@ -21,7 +21,7 @@
  * on Windows: <malloc.h> (probably this is already included?)
  * on linux: <alloca.h> (might be true for osX too, no way to check right now...)
  */
-#zinclude <malloc.h>
+# include <malloc.h>
 #else
 # include <alloca.h>
 #endif
