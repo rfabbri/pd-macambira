@@ -14,6 +14,9 @@ make_netreceive_patch ()
 	 touch $1
 	 echo '#N canvas 222 130 454 304 10;' >> $1
 	 echo "#X obj 111 83 netreceive $PORT_NUMBER 0 old;" >> $1
+	 echo "#X obj 111 103 loadbang;" >> $1
+	 echo "#X obj 111 123 print ----;" >> $1
+	 echo "#X connect 1 0 2 0;" >> $1
 }
 
 open_patch ()
@@ -30,22 +33,31 @@ close_patch ()
 	 echo "________________________________________________________________________________" >> $LOG_FILE
 }
 
+launch_pd ()
+{
+	${bindir}/pd -nogui -stderr -open $NETRECEIVE_PATCH >> $LOG_FILE 2>&1 &
+}
 
+quit_pd ()
+{
+	 echo "; pd quit;" | ${bindir}/pdsend $PORT_NUMBER localhost tcp
+}
 
 make_netreceive_patch $NETRECEIVE_PATCH
 
 touch $LOG_FILE
-${bindir}/pd -nogui -stderr -open $NETRECEIVE_PATCH >> $LOG_FILE 2>&1 &
-
-#wait for pd to start
-sleep 30
 
 for file in `find $helpdir -name '*.pd'`; do
 	 filename=`echo $file|sed 's|.*/\(.*\.pd\)$|\1|'`
 	 dir=`echo $file|sed 's|\(.*\)/.*\.pd$|\1|'`
+	 sleep 1
+	 launch_pd
+	 sleep 10
 	 open_patch $filename $dir
 	 sleep 1
 	 close_patch $filename
+	 sleep 1
+	 quit_pd
 done
 
 echo "COMPLETED!" >> $LOG_FILE
