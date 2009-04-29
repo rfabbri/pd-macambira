@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import subprocess, sys, socket, time, os, re
+import subprocess, sys, socket, time, os, re, time, smtplib
 
 try:
     pdrootdir = sys.argv[1]
@@ -70,7 +70,8 @@ def remove_ignorelines(list):
         'Olaf.*Matthes',
         '[a-z]+ v0\.[0-9]',
         'IOhannes m zm',
-        'part of zexy-'
+        'part of zexy-',
+        'based on sync from jMax'
         ]
     for ignore in ignorelines:
         try:
@@ -80,11 +81,12 @@ def remove_ignorelines(list):
     for line in list:
         for pattern in ignorepatterns:
             m = re.search('.*' + pattern + '.*', line)
-            if m:
+            while m:
                 try:
                     list.remove(m.string)
+                    m = re.search('.*' + pattern + '.*', line)
                 except ValueError:
-                    pass
+                    break
     return list
 
 
@@ -92,7 +94,7 @@ def remove_ignorelines(list):
 
 make_netreceive_patch(netreceive_patch)
 
-mailoutput = []
+logoutput = []
 for root, dirs, files in os.walk(docdir):
     #dirs.remove('.svn')
 #    print "root: " + root
@@ -111,10 +113,27 @@ for root, dirs, files in os.walk(docdir):
                 line = p.stdout.readline()
             patchoutput = remove_ignorelines(patchoutput)
             if len(patchoutput) > 0:
-                print 'loading: ' + name
-                mailoutput.append('__________________________________________________')
-                mailoutput.append('loading: ' + name)
-                mailoutput.append('--------------------------------------------------')
-                mailoutput.append(patchoutput)
-                for line in patchoutput:
-                    print '--' + line + '--'
+#                print 'loading: ' + name
+                logoutput.append('\n\n__________________________________________________\n')
+                logoutput.append('loading: ' + name + '\n')
+#                logoutput.append('--------------------------------------------------\n')
+                logoutput += patchoutput
+#                for line in patchoutput:
+#                    print '--' + line + '--'
+
+date = time.strftime('20%y-%m-%d_%H.%M.%S', time.localtime(time.time()))
+
+outputfile = '/tmp/load_every_help-' + date + '.log'
+fd = open(outputfile, 'w')
+fd.writelines(logoutput)
+fd.close()
+
+fromaddr = 'pd@pdlab.idmi.poly.edu'
+toaddr = 'hans@at.or.at'
+mailoutput = []
+mailoutput.append('From: ' + fromaddr + '\n')
+mailoutput.append('To: ' + toaddr + '\n')
+mailoutput.append('Subject: load_every_help ' + date + '\n')
+server = smtplib.SMTP('in1.smtp.messagingengine.com')
+server.sendmail(fromaddr, toaddr, ''.join(mailoutput + logoutput))
+server.quit()
