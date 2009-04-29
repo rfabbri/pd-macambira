@@ -10,7 +10,7 @@ except IndexError:
 
 
 bindir = pdrootdir + '/bin'
-docdir = pdrootdir + '/doc/5.reference/maxlib'
+docdir = pdrootdir + '/doc'
 pdexe = bindir + '/pd'
 pdsendexe = bindir + '/pdsend'
 
@@ -121,19 +121,42 @@ for root, dirs, files in os.walk(docdir):
 #                for line in patchoutput:
 #                    print '--' + line + '--'
 
-date = time.strftime('20%y-%m-%d_%H.%M.%S', time.localtime(time.time()))
+now = time.localtime(time.time())
+date = time.strftime('20%y-%m-%d', now)
+datestamp = time.strftime('20%y-%m-%d_%H.%M.%S', now)
 
-outputfile = '/tmp/load_every_help-' + date + '.log'
+outputfilename = 'load_every_help-' + datestamp + '.log'
+outputfile = '/tmp/' + outputfilename
 fd = open(outputfile, 'w')
 fd.writelines(logoutput)
 fd.close()
 
+
+# make the email report
 fromaddr = 'pd@pdlab.idmi.poly.edu'
 toaddr = 'hans@at.or.at'
 mailoutput = []
 mailoutput.append('From: ' + fromaddr + '\n')
 mailoutput.append('To: ' + toaddr + '\n')
-mailoutput.append('Subject: load_every_help ' + date + '\n')
+mailoutput.append('Subject: load_every_help ' + datestamp + '\n\n\n')
+mailoutput.append('______________________________________________________________________\n\n')
+mailoutput.append('Complete log:\n')
+mailoutput.append('http://autobuild.puredata.info/auto-build/' + date + '/'
+                  + outputfilename + '\n')
+
+
+# upload the log file to the autobuild website
+rsyncfile = 'rsync://128.238.56.50/upload/' + date + '/' + outputfilename
+try:
+    p = subprocess.Popen(['rsync', '-ax', outputfilename, rsyncfile],
+                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT).wait()
+except:
+    mailoutput.append('rsync upload of the log failed!\n')
+    mailoutput.append(''.join(p.stdout.readlines()))
+
+
+
+mailoutput.append('______________________________________________________________________\n\n')
 server = smtplib.SMTP('in1.smtp.messagingengine.com')
 server.sendmail(fromaddr, toaddr, ''.join(mailoutput + logoutput))
 server.quit()
