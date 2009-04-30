@@ -39,11 +39,7 @@ def make_netreceive_patch(filename):
 
 def send_to_socket(message):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.connect(('localhost', PORT))
-    except:
-        # TODO for now just ignore socket errors....
-        pass
+    s.connect(('localhost', PORT))
     s.send(message)
     s.close()
 
@@ -132,13 +128,16 @@ for root, dirs, files in os.walk(docdir):
         m = re.search(".*\.pd$", name)
         if m:
             print 'checking ' + name
+            patchoutput = []
             patch = os.path.join(root, m.string)
             p = launch_pd()
-            open_patch(patch)
-            time.sleep(1)
-            close_patch(patch)
-            quit_pd(p)
-            patchoutput = []
+            try:
+                open_patch(patch)
+                time.sleep(1)
+                close_patch(patch)
+                quit_pd(p)
+            except socket.error:
+                patchoutput.append('socket.error')                 
             while True:
                 line = p.stdout.readline()
                 m = re.search('EOF on socket', line)
