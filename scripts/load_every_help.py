@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import subprocess, sys, socket, time, os, re, time, smtplib
+import subprocess, sys, socket, time, os, re, time, smtplib, signal
 
 try:
     pdrootdir = sys.argv[1]
@@ -24,7 +24,12 @@ def make_netreceive_patch(filename):
     fd.write('#X obj 111 83 netreceive ' + str(PORT) + ' 0 old;')
     fd.write('#X obj 111 103 loadbang;')
     fd.write('#X obj 111 123 print netreceive_patch;')
+# it would be nice to have this patch tell us when it is closed...
+#    fd.write('#X obj 211 160 tof/destroysend pd;')
+#    fd.write('#X obj 211 160 closebang;')
+#    fd.write('#X obj 211 180 print CLOSE;')
     fd.write('#X connect 1 0 2 0;')
+#    fd.write('#X connect 3 0 4 0;')
     fd.close()
 
 def send_to_socket(message):
@@ -53,6 +58,20 @@ def launch_pd():
     while line != 'netreceive_patch: bang\n':
         line = p.stdout.readline()
     return p
+
+def quit_pd(process):
+    send_to_pd('quit')
+    time.sleep(1)
+    try:
+        os.kill(process.pid, signal.SIGTERM)
+    except OSError:
+        pass
+    time.sleep(1)
+    try:
+        os.kill(process.pid, signal.SIGKILL)
+    except OSError:
+        pass
+
 
 #---------- list of lines to ignore ----------#
 def remove_ignorelines(list):
@@ -101,11 +120,13 @@ for root, dirs, files in os.walk(docdir):
     for name in files:
         m = re.search(".*\.pd$", name)
         if m:
+            print 'checking ' + name
             patch = os.path.join(root, m.string)
             p = launch_pd()
             open_patch(patch)
+            time.sleep(1)
             close_patch(patch)
-            send_to_pd('quit')
+            quit_pd(p)
             patchoutput = []
             line = p.stdout.readline()
             while line != 'EOF on socket 10\n':
@@ -113,7 +134,7 @@ for root, dirs, files in os.walk(docdir):
                 line = p.stdout.readline()
             patchoutput = remove_ignorelines(patchoutput)
             if len(patchoutput) > 0:
-#                print 'loading: ' + name
+#                print 'found log messages: ' + name
                 logoutput.append('\n\n__________________________________________________\n')
                 logoutput.append('loading: ' + name + '\n')
 #                logoutput.append('--------------------------------------------------\n')
@@ -134,7 +155,7 @@ fd.close()
 
 # make the email report
 fromaddr = 'pd@pdlab.idmi.poly.edu'
-toaddr = 'hans@at.or.at'
+toaddr = 'hans@eds.org'
 mailoutput = []
 mailoutput.append('From: ' + fromaddr + '\n')
 mailoutput.append('To: ' + toaddr + '\n')
@@ -157,6 +178,6 @@ except:
 
 
 mailoutput.append('______________________________________________________________________\n\n')
-server = smtplib.SMTP('in1.smtp.messagingengine.com')
+server = smtplib.SMTP('mail.eds.org')
 server.sendmail(fromaddr, toaddr, ''.join(mailoutput + logoutput))
 server.quit()
