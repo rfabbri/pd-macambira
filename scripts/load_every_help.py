@@ -39,7 +39,11 @@ def make_netreceive_patch(filename):
 
 def send_to_socket(message):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('localhost', PORT))
+    try:
+        s.connect(('localhost', PORT))
+    except:
+        # TODO for now just ignore socket errors....
+        pass
     s.send(message)
     s.close()
 
