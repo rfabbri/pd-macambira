@@ -2,7 +2,7 @@ current: all
 
 .SUFFIXES: .d_fat
 
-PD_INSTALL_PATH = "/Applications/Pd.app/Contents/Resources"
+PD_INSTALL_PATH ?= "/Applications/Pd.app/Contents/Resources"
 
 INCLUDE = -I. -I$(PD_INSTALL_PATH)/src
 
