@@ -8,14 +8,19 @@ except IndexError:
     print 'only one arg: root dir of pd'
     sys.exit(2)
 
-
-bindir = pdrootdir + '/bin'
-docdir = pdrootdir + '/doc'
-pdexe = bindir + '/pd'
-pdsendexe = bindir + '/pdsend'
-
 PORT = 55555
 netreceive_patch = '/tmp/.____pd_netreceive____.pd'
+
+def find_pdexe(rootdir):
+    # start with the Windows/Mac OS X location
+    exe = pdrootdir + '/bin/pd'
+    if not os.path.isfile(exe):
+        # try the GNU/Linux location
+        exe = pdrootdir+'../../bin/pd'
+        if not os.path.isfile(exe):
+            print "ERROR: can't find pd executable"
+            exit
+    return os.path.realpath(exe)
 
 
 def make_netreceive_patch(filename):
@@ -51,6 +56,7 @@ def close_patch(filename):
 
 
 def launch_pd():
+    pdexe = find_pdexe(pdrootdir)
     p = subprocess.Popen([pdexe, '-nogui', '-stderr', '-open', netreceive_patch],
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT, 
                          close_fds=True);
@@ -114,6 +120,7 @@ def remove_ignorelines(list):
 make_netreceive_patch(netreceive_patch)
 
 logoutput = []
+docdir = pdrootdir + '/doc'
 for root, dirs, files in os.walk(docdir):
     #dirs.remove('.svn')
 #    print "root: " + root
@@ -128,10 +135,13 @@ for root, dirs, files in os.walk(docdir):
             close_patch(patch)
             quit_pd(p)
             patchoutput = []
-            line = p.stdout.readline()
-            while line != 'EOF on socket 10\n':
-                patchoutput.append(line) 
+            while True:
                 line = p.stdout.readline()
+                m = re.search('EOF on socket', line)
+                if not m:
+                    patchoutput.append(line) 
+                else:
+                    break
             patchoutput = remove_ignorelines(patchoutput)
             if len(patchoutput) > 0:
 #                print 'found log messages: ' + name
