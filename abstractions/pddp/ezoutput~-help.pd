@@ -1,5 +1,5 @@
 #N canvas 103 48 450 300 10;
-#X obj 104 118 osc~ 200;
+#X obj 104 118 osc~ 480;
 #X obj 241 122 noise~;
 #X text 38 28 a GUI replacement for [dac~] with controls for "compute
 audio" \, volume \, and a mute button.;
