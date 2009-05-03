@@ -163,8 +163,8 @@ pdp_help_hack:
 
 darwin_app_embed_libs:
 # embed libquicktime plugins
-	install -d $(PD_APP_CONTENTS)/lib/libquicktime
-	install -p /sw/lib/libquicktime/*.so $(PD_APP_CONTENTS)/lib/libquicktime
+	install -d $(PD_APP_CONTENTS)/lib/libquicktime1
+	install -p /sw/lib/libquicktime1/*.so $(PD_APP_CONTENTS)/lib/libquicktime1
 	./embed-MacOSX-dependencies.sh $(PD_APP_CONTENTS)
 
 # shortcut to install the readme on non-Extended builds

@@ -974,7 +974,7 @@ void pdp_qt_setup(void)
     char buf[FILENAME_MAX];
     char realpath_buf[FILENAME_MAX];
     strncpy(buf, sys_libdir->s_name, FILENAME_MAX - 20);
-    strcat(buf, "/../lib/libquicktime");
+    strcat(buf, "/../lib/libquicktime1");
     if(realpath(buf, realpath_buf))
     {
         post("[pdp_qt]: setting LIBQUICKTIME_PLUGIN_DIR to:\n   %s", realpath_buf);
