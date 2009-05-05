@@ -1,8 +1,10 @@
-bug: go to ~/rep/rand, start pd, use open panel to open ../mark/mark.pd - crash
 
 ---------------- dolist --------------------
 
-test:
+doc:
+exp~, abs~ fixes
+pd~ -ninsig 0 bug fixed
+
 compile on various versions of linux
 windows:
   modal dialogs confuse watchdog
