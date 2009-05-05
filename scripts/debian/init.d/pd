@@ -1,32 +1,24 @@
-#!/bin/bash -e
-#
-#  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-#
-#
-# This is a SysV-style startup script for Pd.  It has been used on Debian
-# extensively but should work on other SysV platforms.
-#
-# .hc <hans@at.or.at>
-#
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          pd
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0
+# Short-Description: Pure Data
+# Description:       Pure Data realtime graphical programming environment.
+### END INIT INFO
 
-set -e
+# Author: Hans-Christoph Steiner <hans@eds.org>
 
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+# Do NOT "set -e"
+
+# PATH should only include /usr/* if it runs after the mountnfs.sh script
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Pure Data"
 NAME=pd
 DAEMON=/usr/bin/$NAME
+#DAEMON_ARGS="--options args"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -35,41 +27,26 @@ RUNPDDAEMON=no
 USER=nobody
 #PORT=34985
 
-# TODO: write daemon.pd patch which is always started and provides basic
-# commands, like start, stop, quit, dsp, etc. over a TCP port
-
-# TODO: figure out how to have a log of the stderr/console output
-
-# Read config file if it is present.
-if [ -r /etc/default/$NAME ]
-then
-	. /etc/default/$NAME
-fi
-
-# Gracefully exit if the package has been removed.
-test -x $DAEMON || exit 0
-
-if [ "$RUNPDDAEMON" != "yes" ];then
-	echo "Pd not configured to run as a daemon. Edit /etc/default/$NAME."
-	exit 1
-fi
-
-if [ "x$USER" = "x" ]
-then
-  echo "Error: empty USER name"
-  exit 1
-fi
-
 # this is meant for running Pd as a server, so it turns off everything
 PARAMS="-nogui -noaudio -nomidi $OPTIONS"
 
-# for the log file
-DATE=`date +20%y-%m-%d_%H.%M.%S`
+# Exit if the package is not installed
+[ -x "$DAEMON" ] || exit 0
+
+# Read configuration variable file if it is present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+. /lib/lsb/init-functions
 
 #
-#	Function that starts the daemon/service.
+# Function that starts the daemon/service
 #
-d_start() {
+do_start() {
 # if you want a log, use this line (until Pd gets syslog support)
 #	 /bin/su - $USER -c "$DAEMON $PARAMS" > /tmp/pd-$DATE.log 2>&1 &
 	start-stop-daemon -v --start --quiet --background --make-pidfile \
@@ -77,65 +54,97 @@ d_start() {
 }
 
 #
-#	Function that stops the daemon/service.
+# Function that stops the daemon/service
 #
-d_stop() {
-	start-stop-daemon --stop --quiet --pidfile $PIDFILE \
-		--user $USER --name $NAME --retry 5
-# if you used the /bin/su command in d_start(), you need this to stop Pd:
-#	 /usr/bin/killall -KILL pd || echo "Warning: $DESC was not running"
+do_stop()
+{
+	# Return
+	#   0 if daemon has been stopped
+	#   1 if daemon was already stopped
+	#   2 if daemon could not be stopped
+	#   other if a failure occurred
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+	RETVAL="$?"
+	[ "$RETVAL" = 2 ] && return 2
+	# Wait for children to finish too if this is a daemon that forks
+	# and if the daemon is only ever run from this initscript.
+	# If the above conditions are not satisfied then add some other code
+	# that waits for the process to drop all resources that could be
+	# needed by services started subsequently.  A last resort is to
+	# sleep for some time.
+	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
+	[ "$?" = 2 ] && return 2
+	# Many daemons don't delete their pidfiles when they exit.
+	rm -f $PIDFILE
+	return "$RETVAL"
 }
 
 #
-#	Function that sends a SIGHUP to the daemon/service.
+# Function that sends a SIGHUP to the daemon/service
 #
-d_reload() {
-	start-stop-daemon --stop --quiet --pidfile $PIDFILE \
-		--name $NAME --signal 1
+do_reload() {
+	#
+	# If the daemon can reload its configuration without
+	# restarting (for example, when it is sent a SIGHUP),
+	# then implement that here.
+	#
+	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name $NAME
+	return 0
 }
 
 case "$1" in
   start)
-	echo -n "Starting $DESC: $NAME"
-	d_start
-	echo "."
+	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+	do_start
+	case "$?" in
+		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+	esac
 	;;
   stop)
-	echo -n "Stopping $DESC: $NAME "
-	d_stop
-	echo "."
+	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+	do_stop
+	case "$?" in
+		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+	esac
 	;;
-  #reload)
+  #reload|force-reload)
 	#
-	#	If the daemon can reload its config files on the fly
-	#	for example by sending it SIGHUP, do it here.
+	# If do_reload() is not implemented then leave this commented out
+	# and leave 'force-reload' as an alias for 'restart'.
 	#
-	#	If the daemon responds to changes in its config file
-	#	directly anyway, make this a do-nothing entry.
-	#
-	# echo -n "Reloading $DESC configuration..."
-	# start-stop-daemon --stop --signal 1 --quiet --pidfile \
-	#	/var/run/$NAME.pid --exec $DAEMON
-	# echo "done."
-  #;;
+	#log_daemon_msg "Reloading $DESC" "$NAME"
+	#do_reload
+	#log_end_msg $?
+	#;;
   restart|force-reload)
 	#
-	#	If the "reload" option is implemented, move the "force-reload"
-	#	option to the "reload" entry above. If not, "force-reload" is
-	#	just the same as "restart".
+	# If the "reload" option is implemented then remove the
+	# 'force-reload' alias
 	#
-	echo -n "Restarting $DESC: $NAME"
-	d_stop
-	sleep 1
-	d_start
-	echo "."
+	log_daemon_msg "Restarting $DESC" "$NAME"
+	do_stop
+	case "$?" in
+	  0|1)
+		do_start
+		case "$?" in
+			0) log_end_msg 0 ;;
+			1) log_end_msg 1 ;; # Old process is still running
+			*) log_end_msg 1 ;; # Failed to start
+		esac
+		;;
+	  *)
+	  	# Failed to stop
+		log_end_msg 1
+		;;
+	esac
 	;;
   *)
-	N=/etc/init.d/$NAME
-	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
-	echo "Usage: $N {start|stop|restart|force-reload}" >&2
-	exit 1
+	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+	exit 3
 	;;
 esac
 
-exit 0
+:
