@@ -2052,18 +2052,18 @@ $(externals_src)/pdp/pdp.$(EXTENSION): $(externals_src)/pdp/Makefile.config
 pdp: $(externals_src)/pdp/pdp.$(EXTENSION)
 
 pdp_install: pdp
-#	install -d $(objectsdir)/$(PDP_NAME)
+	install -d $(objectsdir)/$(PDP_NAME)
 #	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDP_NAME) \
 #		--author "Tom Schouten" \
 #		--description "Pure Data Packet" \
 #		--license "GNU GPL"
 	install -d $(objectsdir)
-	install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)
+	install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)/$(PDP_NAME)
 #	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)
 	install -d $(helpdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)/$(PDP_NAME)
-	install -p $(externals_src)/pdp/doc/objects/*.* $(objectsdir)
+	install -p $(externals_src)/pdp/doc/objects/*.* $(objectsdir)/$(PDP_NAME)
 	install -d $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/reference.txt $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/introduction/*.* \
@@ -2177,16 +2177,15 @@ $(externals_src)/pidip/Makefile
 pidip: $(externals_src)/pidip/pidip.$(EXTENSION)
 
 pidip_install: pidip
-#	install -d $(objectsdir)/$(PIDIP_NAME)
+	install -d $(objectsdir)/$(PIDIP_NAME)
 #	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PIDIP_NAME) \
 #		--author "Yves Degoyon" \
 #		--description "PiDiP is Definitely in Pieces" \
 #		--license "GNU GPLv2"
-	install -d $(objectsdir)
-	install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)
+	install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)/$(PIDIP_NAME)
 	install -d $(helpdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)/$(PIDIP_NAME)
-	install -p $(externals_src)/pidip/doc/*.pd $(objectsdir)
+	install -p $(externals_src)/pidip/doc/*.pd $(objectsdir)/$(PIDIP_NAME)
 	install -d $(examplesdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/patches/*.* $(examplesdir)/$(PIDIP_NAME)
 #	install -d $(manualsdir)/$(PIDIP_NAME)
