@@ -126,8 +126,6 @@ fi
 
 ### can we build fat-binaries
 AC_CHECK_FAT(ARCH_FLAGS)
-AC_SUBST(ARCH_FLAGS)
-
 
 dnl isn't there a better way to check for good linker/stripper ?
 

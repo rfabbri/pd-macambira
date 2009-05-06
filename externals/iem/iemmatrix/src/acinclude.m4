@@ -3,28 +3,22 @@ dnl This file is free software; IOhannes m zmölnig
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
 
-# AC_CHECK_CXXFLAGS(ADDITIONAL-CXXFLAGS, ACTION-IF-FOUND, ACTION-IF-NOT-FOUND)
+# AC_CHECK_CPPFLAGS(ADDITIONAL-CPPFLAGS, ACTION-IF-FOUND, ACTION-IF-NOT-FOUND)
 #
-# checks whether the $(CXX) compiler accepts the ADDITIONAL-CXXFLAGS
-# if so, they are added to the CXXFLAGS
-AC_DEFUN([AC_CHECK_CXXFLAGS],
+# checks whether the $(C) compiler accepts the ADDITIONAL-CPPFLAGS
+# if so, they are added to the CPPFLAGS
+AC_DEFUN([AC_CHECK_CPPFLAGS],
 [
-  AC_MSG_CHECKING([whether $CXX accepts "$1"])
-cat > conftest.c++ << EOF
-int main(){
-  return 0;
-}
-EOF
-if $CXX $CPPFLAGS $CXXFLAGS -o conftest.o conftest.c++ [$1] > /dev/null 2>&1
-then
-  AC_MSG_RESULT([yes])
-  CXXFLAGS="${CXXFLAGS} [$1]"
-  [$2]
-else
-  AC_MSG_RESULT([no])
-  [$3]
-fi
-])# AC_CHECK_CXXFLAGS
+  AC_MSG_CHECKING([whether $CPP accepts "$1"])
+  temp_check_cppflags="${CPPFLAGS}"
+  CPPFLAGS="$1 ${CPPFLAGS}"
+  AC_PREPROC_IFELSE(
+        [AC_LANG_SOURCE([[int main(void){return 0;}]])],
+        [AC_MSG_RESULT([yes])],
+        [AC_MSG_RESULT([no]); CPPFLAGS="${temp_check_cppflags}"])
+])# AC_CHECK_CPPFLAGS
+
+
 
 # AC_CHECK_CFLAGS(ADDITIONAL-CFLAGS, ACTION-IF-FOUND, ACTION-IF-NOT-FOUND)
 #
@@ -42,12 +36,37 @@ if $CC $CFLAGS [$1] -o conftest.o conftest.c > /dev/null 2>&1
 then
   AC_MSG_RESULT([yes])
   CFLAGS="${CFLAGS} [$1]"
+  AC_CHECK_CPPFLAGS([$1])
   [$2]
 else
   AC_MSG_RESULT([no])
   [$3]
 fi
 ])# AC_CHECK_CFLAGS
+
+# AC_CHECK_CXXFLAGS(ADDITIONAL-CXXFLAGS, ACTION-IF-FOUND, ACTION-IF-NOT-FOUND)
+#
+# checks whether the $(CXX) (c++) compiler accepts the ADDITIONAL-CXXFLAGS
+# if so, they are added to the CXXFLAGS
+AC_DEFUN([AC_CHECK_CXXFLAGS],
+[
+  AC_MSG_CHECKING([whether $CXX accepts "$1"])
+cat > conftest.c++ << EOF
+int main(){
+  return 0;
+}
+EOF
+if $CXX $CPPFLAGS $CXXFLAGS -o conftest.o conftest.c++ [$1] > /dev/null 2>&1
+then
+  AC_MSG_RESULT([yes])
+  CXXFLAGS="${CXXFLAGS} [$1]"
+  AC_CHECK_CPPFLAGS([$1])
+  [$2]
+else
+  AC_MSG_RESULT([no])
+  [$3]
+fi
+])# AC_CHECK_CXXFLAGS
 
 # AC_CHECK_FRAMEWORK(FRAMEWORK, ACTION-IF-FOUND, ACTION-IF-NOT-FOUND)
 #
@@ -131,15 +150,11 @@ if test "$fat_binary" != no; then
    done
 
    if test "x$[]Name" != "x"; then
-    tmp_arch_cflags="$CFLAGS"
     AC_CHECK_CFLAGS($[]Name,,[]Name="")
-    CFLAGS="$tmp_arch_cflags"
    fi
 
    if test "x$[]Name" != "x"; then
-    tmp_arch_ldflags="$LDFLAGS"
     AC_CHECK_LDFLAGS($[]Name,,[]Name="")
-    LDFLAGS="$tmp_arch_ldflags"
    fi
 
    undefine([Name])
