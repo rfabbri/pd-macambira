@@ -977,7 +977,8 @@ void pdp_qt_setup(void)
     strcat(buf, "/../lib/libquicktime1");
     if(realpath(buf, realpath_buf))
     {
-        post("[pdp_qt]: setting LIBQUICKTIME_PLUGIN_DIR to:\n   %s", realpath_buf);
+        if(sys_verbose)
+            post("[pdp_qt]: setting LIBQUICKTIME_PLUGIN_DIR to:\n   %s", realpath_buf);
         setenv("LIBQUICKTIME_PLUGIN_DIR", realpath_buf, 0); // 0 means don't overwrite existing value
     }
 #endif
