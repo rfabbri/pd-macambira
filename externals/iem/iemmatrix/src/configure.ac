@@ -52,10 +52,6 @@ dnl LATER: find a more generic way to generate the .._LIBRARY define
 fi
 
 
-dnl check for "-mms-bitfields" cflag
-dnl it would make things so easy: AC_CHECK_FLAG([-mms-bitfields],,)
-AC_CHECK_CFLAGS([-mms-bitfields])
-
 
 dnl Checks for libraries.
 dnl Replace `main' with a function in -lc:
@@ -126,6 +122,10 @@ fi
 
 ### can we build fat-binaries
 AC_CHECK_FAT(ARCH_FLAGS)
+
+dnl check for "-mms-bitfields" cflag
+AC_CHECK_CFLAGS([-mms-bitfields])
+
 
 dnl isn't there a better way to check for good linker/stripper ?
 
