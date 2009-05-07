@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# this script is no longer maintained, instead use the 'sources tree and this script:
+# https://pure-data.svn.sourceforge.net/svnroot/pure-data/sources/build-libs-on-mingw.sh
+
 # This script builds everything needed to build Pd-extended on MinGW.  You
 # need to download all of the source files listed on
 # http://puredata.org/docs/developer/win first, put them all into one
@@ -10,7 +13,7 @@
 # c:\MinGW  /usr/local
 
 # This ensures that everything will be installed in the right
-# place. <hans@at.or.at>
+# place. <hans@eds.org>
 
 # pthreads
 testfile=/usr/local/bin/pthreadGC2.dll
@@ -104,9 +107,11 @@ if [ -e "$testfile" ]; then
 	 echo "$testfile exists, skipping..."
 else
 	 echo "Building everything for $testfile"
-	 tar xzf lame-3.9*.tar.gz
-	 cd lame-3.9*
-	 ./configure && make && make install
+	 tar xzf lame-398-2.tar.gz
+	 cd lame-398-2
+	 ./configure --disable-frontend \
+		 && make \
+		 && make install
 	 cd ..
 fi
 
@@ -142,14 +147,15 @@ if [ -e "$testfile" ]; then
 	 echo "$testfile exists, skipping..."
 else
 	 echo "Building everything for $testfile"
-	 tar xzf libsndfile-*.tar.gz
-	 cd libsndfile-*
-	 ./configure --disable-flac && make && make check && make install
+	 tar xzf libsndfile-1.0.19.tar.gz
+	 cd libsndfile-1.0.19
+	 ./configure --disable-alsa --enable-sqlite 
+		 && make && make check && make install
 	 cd ..
 fi
 
-# fftw
-testfile=/usr/local/lib/libsndfile.a
+# fftw3
+testfile=/usr/local/lib/libfftw3.a
 if [ -e "$testfile" ]; then 
 	 echo "$testfile exists, skipping..."
 else
