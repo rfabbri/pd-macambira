@@ -1,4 +1,5 @@
 #N canvas 143 0 760 635 10;
+#X declare -lib bsaylor;
 #X obj 265 611 dac~;
 #X obj 304 561 vsl 8 64 0 1 0 1 empty empty empty 0 -8 0 8 -260818
 -1 -1 3200 1;
@@ -9,7 +10,7 @@
 #X array sample 62079 float 0;
 #X coords 0 1 62078 -1 560 100 1;
 #X restore 77 52 graph;
-#X msg 346 506 read -resize /usr/local/lib/pd/doc/sound/voice.wav sample
+#X msg 346 506 read -resize ../../sound/voice.wav sample
 ;
 #X obj 346 526 soundfiler;
 #X obj 346 547 s length;
