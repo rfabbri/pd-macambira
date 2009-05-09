@@ -3,8 +3,8 @@
 #include "m_pd.h"
 #include <math.h>
 #include <string.h>
-#define MAXENTRIES 512
-#define LASTENTRY 511
+#define MAXENTRIES 2048
+#define LASTENTRY 2047
 
 static t_class *sieve_class;
 

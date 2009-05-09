@@ -1,5 +1,5 @@
 /*
- *  hssc~ : Highest Absolute Spectral Component, according to amplitude threshold 
+ *  hasc~ : Highest Apparent Spectral Component, according to amplitude threshold 
  *  Copyright (C) 2005 Edward Kelly <morph_2016@yahoo.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -90,7 +90,7 @@ void hasc_tilde_setup(void)
 				     CLASS_DEFAULT, A_DEFFLOAT, 0);
 
   post("|===============hasc~=================|");
-  post("|=highest absolute spectral component=|");
+  post("|=highest apparent spectral component=|");
   post("|=====edward======kelly======2005=====|");
 
   class_addmethod(hasc_tilde_class, (t_method)hasc_tilde_dsp,

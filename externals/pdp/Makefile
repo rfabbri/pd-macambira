@@ -26,11 +26,11 @@ darwin:	pdp_all
 
 linux: pdp_all
 	rm -f pdp.pd_linux
-	$(CC) -export_dynamic -shared -o pdp.pd_linux modules/*/*.o system/pdp.o system/*/*.o puredata/*.o $(PDP_LIBS)
+	$(CC) --export_dynamic -shared -o pdp.pd_linux modules/*/*.o system/pdp.o system/*/*.o puredata/*.o $(PDP_LIBS)
 
 linux_mmx: pdp_all
 	rm -f pdp.pd_linux
-	$(CC) -export_dynamic -shared -o pdp.pd_linux modules/*/*.o system/pdp.o system/*/*.o puredata/*.o $(PDP_LIBS)
+	$(CC) --export_dynamic -shared -o pdp.pd_linux modules/*/*.o system/pdp.o system/*/*.o puredata/*.o $(PDP_LIBS)
 
 buildclean:
 	make -C include clean
