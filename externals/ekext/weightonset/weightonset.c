@@ -25,11 +25,15 @@ void weightonset_float (t_weightonset *x, t_floatarg fin)
       SETFLOAT(&x->x_datachunk.data[len], fin);
       if(x->length < x->attack)
 	{
-	  x->increment = 1 / (x->attack + 1);
-	  x->accumulator += fin*(x->length + 1)*x->increment; 
-// x->increment*len substitutes for the divider
-// during the attack phase
-	  x->divaccum += x->increment*(x->length + 1);
+	  int i;
+	  float weight = 1;
+	  x->increment = x->length - x->attack;
+	  for(i=0;i<x->increment;i++)
+	    {
+	      weight = weight*x->multiplier;
+	    }
+	  x->accumulator += fin*weight; 
+	  x->divaccum += weight;
 	  x->weighted = x->accumulator / x->divaccum;
 	  outlet_float(x->waverage, x->weighted);
 	}
