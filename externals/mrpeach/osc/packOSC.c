@@ -699,7 +699,7 @@ static int packOSC_writetypedmessage
 
     if (returnVal)
     {
-        post("packOSC: Problem writing address.");
+        post("packOSC: Problem writing address. (%d)", returnVal);
         return returnVal;
     }
     for (j = i = 0; (typeStr[i+1]!= 0) || (j < numArgs); j++, i++)
@@ -712,30 +712,33 @@ static int packOSC_writetypedmessage
             returnVal = OSC_writeNullArg(buf, typeStr[i+1]);
             ++i;
         }
-        switch (args[j].type)
-        {
-            case INT_osc:
+        if (j < numArgs)
+		{
+			switch (args[j].type)
+	        {
+	            case INT_osc:
 #ifdef DEBUG
-                post("packOSC_writetypedmessage: int [%d]", args[j].datum.i);
+	                post("packOSC_writetypedmessage: int [%d]", args[j].datum.i);
 #endif
-                returnVal = OSC_writeIntArg(buf, args[j].datum.i);
-                break;
-            case FLOAT_osc:
+	                returnVal = OSC_writeIntArg(buf, args[j].datum.i);
+	                break;
+	            case FLOAT_osc:
 #ifdef DEBUG
-                post("packOSC_writetypedmessage: float [%f]", args[j].datum.f);
+	                post("packOSC_writetypedmessage: float [%f]", args[j].datum.f);
 #endif
-                returnVal = OSC_writeFloatArg(buf, args[j].datum.f);
-                break;
-            case STRING_osc:
+	                returnVal = OSC_writeFloatArg(buf, args[j].datum.f);
+	                break;
+	            case STRING_osc:
 #ifdef DEBUG
-                post("packOSC_writetypedmessage: string [%s]", args[j].datum.s);
+	                post("packOSC_writetypedmessage: string [%s]", args[j].datum.s);
 #endif
-                returnVal = OSC_writeStringArg(buf, args[j].datum.s);
-                break;
-            default:
+	                returnVal = OSC_writeStringArg(buf, args[j].datum.s);
+	                break;
+	            default:
 
-                break; /* types with no data */
-        }
+	                break; /* types with no data */
+	        }
+		}
     }
     return returnVal;
 }
@@ -1093,13 +1096,16 @@ static int OSC_writeAddressAndTypes(OSCbuf *buf, char *name, char *types)
 
 static int CheckTypeTag(OSCbuf *buf, char expectedType)
 {
+	char c;
+
     if (buf->typeStringPtr)
     {
-        if (*(buf->typeStringPtr) != expectedType)
+		c = *(buf->typeStringPtr);
+        if (c != expectedType)
         {
-            if (expectedType == '\0')
+			if (expectedType == '\0')
             {
-                post("packOSC: According to the type tag I expected more arguments.");
+                post("packOSC: According to the type tag (%c) I expected more arguments.", c);
             }
             else if (*(buf->typeStringPtr) == '\0')
             {
@@ -1144,7 +1150,7 @@ static int OSC_writeFloatArg(OSCbuf *buf, float arg)
 static int OSC_writeIntArg(OSCbuf *buf, int4byte arg)
 {
     if(OSC_CheckOverflow(buf, 4))return 1;
-    if (CheckTypeTag(buf, 'i')) return 9;
+	if (CheckTypeTag(buf, 'i')) return 9;
 
     *((int4byte *) buf->bufptr) = htonl(arg);
     buf->bufptr += 4;
