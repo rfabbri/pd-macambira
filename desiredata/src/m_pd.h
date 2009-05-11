@@ -86,6 +86,9 @@ public:
 };
 #endif
 
+/* needed for all those strcmp.h in here */
+#include <string.h>
+
 extern "C" {
 #endif
 
