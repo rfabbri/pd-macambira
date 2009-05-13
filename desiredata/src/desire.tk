@@ -142,6 +142,7 @@ proc luniq {a} {
 }
 
 # one-dimensional intervals (left-closed, right-open); not much in use at the moment, not that they wouldn't deserve to!
+# (slightly buggy)
 proc inside      {x x0 x1} {return [expr $x>=$x0 && $x<$x1]}
 proc overlap {y0 y1 x0 x1} {return [expr [inside $y0 $x0 $x1] || [inside $y1 $x0 $x1]]}
 
@@ -412,7 +413,9 @@ def CommandHistory undo {} {
 	set @undo_stack $@redo_stack
 	set @redo_stack {}
 	#set err [catch {$self perform [lindex $backup end]}]; if {$err} {set err $::errorInfo}
-	$self perform [lindex $backup end]
+	$self atomically [list atomic_undo] {
+		$self perform [lindex $backup end]
+	}
 	set @redo_stack $@undo_stack
 	set @undo_stack [lrange $backup 0 end-1]
 	$self changed
@@ -424,7 +427,9 @@ def CommandHistory redo {} {
 	set backup $@redo_stack
 	set @redo_stack {}
 	set err [catch {$self perform [lindex $backup end]}]; if {$err} {set err $::errorInfo}
-	$self perform [lindex $backup end]
+	$self atomically [list atomic_redo] {
+		$self perform [lindex $backup end]
+	}
 	set @redo_stack [lrange $backup 0 end-1]
 	$self changed
 	#if {$err} {post %s $err; error "redo: $err"}
@@ -3399,7 +3404,6 @@ def StatusBar draw {x y} {
     set zoom [$@canvas zoom]
     set x [expr [$c canvasx $x]/$zoom]
     set y [expr [$c canvasy $y]/$zoom]
-    #set tags [$c gettags [lindex [$c find overlapping [expr $x-2] [expr $y-2] [expr $x+2] [expr $y+2]] end]]
     set target [$@canvas identify_target $x $y -1]
     mset {type id detail} $target
     set t $target
@@ -3414,7 +3418,11 @@ def StatusBar draw {x y} {
     if {[string length [$@canvas focus]]} {set t "focus: [$@canvas focus]"}
     $f.px     configure -text [format "%4d" [expr round($x)]]
     $f.py     configure -text [format "%4d" [expr round($y)]]
-    $f.what   configure -text $t
+    if {$::debug} {
+      $f.what   configure -text [$c gettags [lindex [$c find overlapping [expr $x-2] [expr $y-2] [expr $x+2] [expr $y+2]] end]]
+    } {
+      $f.what   configure -text $t
+    }
     $f.action configure -text $action
     $f.sel    configure -text [llength [$@canvas selection]]
     $f.focus  configure -text [$@canvas focus]
@@ -6215,6 +6223,7 @@ def Radio bbox {} {
 def Radio draw {} {
 	mset {x1 y1 x2 y2} [$self bbox]
 	super
+	$self item_delete BUT ;# would be cool if this didn't delete stuff that we're about to redraw.
 	for {set i 0} {$i<$@n} {incr i} {
 		$self item [list BUT$i BUT] rectangle \
 		    [list [expr $x1+3] [expr $y1+3] [expr $x1+$@w-3] [expr $y1+$@w-3]] \
@@ -8526,6 +8535,7 @@ Credits:
     Deutsch (German): Max Neupert, Georg Holzmann, Thomas Grill
     Norsk Bokmål (Norwegian): Gisle Frøysland
     Português (Portuguese): Nuno Godinho
+    Português do Brasil (Brazilian Portuguese): Carlos Paulino
     Italiano (Italian): Davide Morelli, Federico Ferri
     Euskara (Basque): Ibon Rodriguez Garcia
     Nihongo (Japanese): Kentaro Fukuchi
