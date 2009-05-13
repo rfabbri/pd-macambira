@@ -751,7 +751,7 @@ for {set i 0} {$i < $argc} {incr i} {
 set encoding ""
 set langoptions {
 	english francais deutsch catala espanol portugues italiano bokmal
-	euskara polski dansk chinese nihongo brasiliano turkce nederlands
+	euskara polski dansk chinese nihongo brasileiro turkce nederlands
 	russkij
 
 }
@@ -772,7 +772,7 @@ set langfile locale/[switch -regexp -- $language {
   ^(pl|polski)$       {set encoding utf-8; list polski}
   ^(dk|dansk)$        {list dansk}
   ^(ja|japanese|nihongo)$ {list nihongo}
-  ^(br|brasiliano|brasileiro)$ {list brasiliano}
+  ^(br|brasiliano|brasileiro)$ {list brasileiro}
   ^(tr|turkce)$       {set encoding utf-8; list turkce}
   ^(nl|nederlands)$   {list nederlands}
   ^(ru|russkij)$      {set encoding utf-8; list russkij}
@@ -832,7 +832,7 @@ def Console init {c} {
 	pack $c -fill both -expand yes
 	$c.2 set 0.0 1.0
 	switch $::OS { osx {
-		bind $c.1 <MouseWheel> {$c.1 yview scroll [expr -2-abs(%D)/%D] units}
+		bind $c.1 <MouseWheel> {$c.1 yview scroll [expr {-2-abs(%D)/%D}] units}
 	}}
 	set @lines 0
 }
@@ -1971,7 +1971,7 @@ def Canvas bind {eventtype selector args} {
 }
 
 def Canvas osx_scroll {axis diff} {
-		$self scroll $axis [expr -abs($diff)/%diff]
+	$self scroll $axis [expr -abs($diff)/%diff]
 }
 
 def Canvas new_binds {} {
