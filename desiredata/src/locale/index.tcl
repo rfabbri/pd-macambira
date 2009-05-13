@@ -5,13 +5,13 @@ say deutsch    "Deutsch"
 say bokmal     "Norsk Bokmål"
 say italiano   "Italiano"
 say portugues  "Português"
+say brasileiro "Português Do Brasil"
 say catala     "Català"
 say euskara    "Euskara"
 say polski     "Polski"
 say dansk      "Dansk"
 say nederlands "Nederlands"
 say turkce     "Türkçe"
-say brasiliano "Brasiliano"
 
 # those were made using:
 # iconv -f utf-8 -t ucs-2 | od -tx2 -An | sed 's/ /\\u/g'
