@@ -832,7 +832,7 @@ def Console init {c} {
 	pack $c -fill both -expand yes
 	$c.2 set 0.0 1.0
 	switch $::OS { osx {
-		bind $c.1 <MouseWheel> {$c.1 yview scroll [expr {-2-abs(%D)/%D}] units}
+		bind $c.1 <MouseWheel> [list $c.1 yview scroll [expr {-2-abs(%D)/%D}] units]
 	}}
 	set @lines 0
 }
