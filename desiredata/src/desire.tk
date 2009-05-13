@@ -1970,9 +1970,7 @@ def Canvas bind {eventtype selector args} {
 	}
 }
 
-def Canvas osx_scroll {axis diff} {
-	$self scroll $axis [expr -abs($diff)/%diff]
-}
+def Canvas osx_scroll {axis diff} {$self scroll $axis [expr -abs($diff)/$diff]}
 
 def Canvas new_binds {} {
     # mouse buttons
