@@ -40,13 +40,7 @@
 #if defined (__APPLE__) || defined (__FreeBSD__)
 #define HZ CLK_TCK
 #endif
-#ifndef HAVE_ALLOCA
-#ifdef _WIN32
-#define HAVE_ALLOCA 0   /* LATER this should be set by configure script! */
-#else
-#define HAVE_ALLOCA 1   /* LATER this should be set by configure script! */
-#endif
-#endif
+#include "config.h"
 
 #define a_float   a_w.w_float
 #define a_symbol  a_w.w_symbol
