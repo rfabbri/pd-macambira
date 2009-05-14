@@ -251,7 +251,7 @@ static void comport_pollintervall(t_comport *x, t_floatarg g);
 static void comport_tick(t_comport *x);
 static void comport_float(t_comport *x, t_float f);
 static void comport_list(t_comport *x, t_symbol *s, int argc, t_atom *argv);
-static void *comport_new(t_floatarg com_num, t_floatarg fbaud);
+static void *comport_new(t_symbol *s, int argc, t_atom *argv);
 static void comport_free(t_comport *x);
 static void comport_baud(t_comport *x,t_floatarg f);
 static void comport_bits(t_comport *x,t_floatarg f);
@@ -1184,34 +1184,37 @@ static void comport_list(t_comport *x, t_symbol *s, int argc, t_atom *argv)
         post ("[comport] write returned %d, errno is %d", result, errno);
 }
 
-static void *comport_new(t_floatarg com_num, t_floatarg fbaud)
+static void *comport_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_comport test;
     t_comport *x;
     HANDLE    fd;
+    const char *serial_device_prefix;
+    t_float com_num = 0;
+    t_float fbaud = 9600;
 
-/* for UNIX, this is a glob pattern for matching devices  */
 #ifdef _WIN32
-/*
-According to http://msdn2.microsoft.com/en-us/library/aa363858.aspx 
-To specify a COM port number greater than 9,
-use the following syntax: "\\\\.\\COM10".
-This syntax works for all port numbers and hardware
-that allows COM port numbers to be specified.
-*/
-    const char *serial_device_prefix = "\\\\.\\COM";
-#else
-# ifdef __APPLE__
-    const char *serial_device_prefix = "/dev/tty.*";
-# else
-#  ifdef IRIX
-    const char *serial_device_prefix = "/dev/ttyd*";
-#  else
-    const char *serial_device_prefix = "/dev/tty[SU]*";
-#  endif /* IRIX */
-# endif /* __APPLE__ */
+/* According to http://msdn2.microsoft.com/en-us/library/aa363858.aspx To
+specify a COM port number greater than 9, use the following syntax:
+"\\\\.\\COM10".  This syntax works for all port numbers and hardware that
+allows COM port numbers to be specified. */
+    serial_device_prefix = "\\\\.\\COM";
 #endif /* _WIN32 */
+/* for UNIX, this is a glob pattern for matching devices  */
+#ifdef __APPLE__
+    serial_device_prefix = "/dev/tty.*";
+#endif /* __APPLE__ */
+#ifdef IRIX
+    serial_device_prefix = "/dev/ttyd*";
+#endif /* IRIX */
+#ifdef __linux__
+    serial_device_prefix = "/dev/tty[SU]*";
+#endif /* __linux__ */
 
+    if(argc > 0 && argv->a_type == A_FLOAT)
+        com_num = atom_getfloatarg(0,argc,argv);
+    if(argc > 1 && argv->a_type == A_FLOAT)
+        fbaud = atom_getfloatarg(1,argc,argv);
 
 /*	 Open the Comport for RD and WR and get a handle */
 /* this line should use a real serial device */
@@ -1247,8 +1250,7 @@ that allows COM port numbers to be specified.
 
     if(fd == INVALID_HANDLE_VALUE )
     {
-        /* postings in open routine */
-        post("[comport] invalid handle for %s", x->serial_device_prefix);
+        pd_error(x, "[comport] opening serial port %d failed!", com_num);
     }
     else
     {
@@ -1836,7 +1838,7 @@ void comport_setup(void)
 {
     comport_class = class_new(gensym("comport"), (t_newmethod)comport_new,
         (t_method)comport_free, sizeof(t_comport),
-        0, A_DEFFLOAT, A_DEFFLOAT, 0);
+        0, A_GIMME, 0);
 
     class_addfloat(comport_class, (t_method)comport_float);
     class_addlist(comport_class, (t_method)comport_list);
