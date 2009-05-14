@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemlib written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2007 */
+iemlib written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 */
 
 #ifndef __IEMLIB_H__
 #define __IEMLIB_H__
@@ -98,5 +98,19 @@ union tabfudge_f
 #define IEM_DENORMAL(f) 0
 
 #endif
+
+/* on 64bit systems we cannot use garray_getfloatarray... */
+#if (defined __x86_64__)
+# define iemarray_t t_word
+# define iemarray_getarray garray_getfloatwords
+# define iemarray_getfloat(pointer, index) (pointer[index].w_float)
+# define iemarray_setfloat(pointer, index, fvalue) (pointer[index].w_float = fvalue)
+#else
+# define iemarray_t t_float
+# define iemarray_getarray garray_getfloatarray
+# define iemarray_getfloat(pointer, index) (pointer[index])
+# define iemarray_setfloat(pointer, index, fvalue) (pointer[index] = fvalue)
+#endif
+
 
 #endif

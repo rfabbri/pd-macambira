@@ -42,7 +42,6 @@ all: $(OBJ)
 	mv $(TARGET) ..
 
 $(OBJ) : %.o : %.c
-	touch $*.c
 	$(CC) -arch i386 -arch ppc $(CFLAGS) $(INCLUDE) -c -o $*.o $*.c
 
 
