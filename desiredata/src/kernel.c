@@ -7,13 +7,14 @@
 /* IOhannes :
  * changed the canvas_restore in "g_canvas.c", so that it might accept $args as well (like "pd $0_test")
  * so you can make multiple & distinguishable templates
- * 1511:forum::fï¿½r::umlï¿½ute:2001
+ * 1511:forum::für::umläute:2001
  * change marked with IOhannes
  */
 
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
 #include "m_simd.h"
+#include "config.h"
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
