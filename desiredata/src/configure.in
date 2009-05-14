@@ -21,6 +21,12 @@ AC_SUBST(STRIPFLAG)
 AC_SUBST(EXTERNTARGET)
 AC_SUBST(LIBSUFFIX)
 AC_SUBST(LDSOFLAGS)
+AC_SUBST(WATCHDOG)
+AC_SUBST(WLIB)
+AC_SUBST(EXE)
+AC_SUBST(WSTRIP)
+AC_SUBST(PDSEND)
+AC_SUBST(PDRECEIVE)
 
 AC_SUBST(WATCHDOG)
 AC_SUBST(WLIB)
@@ -79,7 +85,14 @@ if test `uname -s` = Linux; then
     CPPFLAGS="-DDL_OPEN -DPA_USE_OSS -DUNIX -DUNISTD"
     MORECFLAGS="-fno-strict-aliasing"
     STRIPFLAG=-s
+    STRIP="@#strip"
     LDSOFLAGS="-shared"
+    WATCHDOG=pd-watchdog
+    EXE=""
+    WLIB=""
+    WSTRIP=""
+    PDRECEIVE=pdreceive
+    PDSEND=pdsend
 fi
 
 if test `uname -s` = Darwin; then
@@ -105,26 +118,51 @@ if test `uname -s` = Darwin; then
 #	EXTERNTARGET=d_fat
 #	LDFLAGS=$LDFLAGS" -arch i386 -arch ppc"
 #    fi
+	WATCHDOG=pd-watchdog
+	EXE=""
+	WLIB=""
+	WSTRIP=""
+	PDRECEIVE=pdreceive
+	PDSEND=pdsend
 fi
 
 if test `uname -s | cut -f1 -d_` = CYGWIN; then
     LDFLAGS="-Wl,-export-dynamic "
-    EXT=pd_linux
+    EXT=dll
     LIBSUFFIX=.dll
     CPPFLAGS="-DDL_OPEN -DPA_USE_OSS -DUNIX -DUNISTD"
     MORECFLAGS="-fno-strict-aliasing"
     STRIPFLAG=-s
     LDSOFLAGS="-shared"
+	WLIB=""
+	EXE=.exe
+	WSTRIP=""
+	PDRECEIVE=pdreceive
+	PDSEND=pdsend
 fi
 
-if test `uname -s | cut -f1 -d_` = MINGW; then
-    LDFLAGS="-Wl,-export-dynamic "
+if test `uname -s | cut -f1 -d_` = MINGW32; then
+    LDFLAGS="-lm -lpthreadGC2 -lwsock32 -lwinmm -lole32 -L../src -lpd"
     EXT=dll
     LIBSUFFIX=.dll
-    CPPFLAGS=" -DMSW -DDL_OPEN   -DUNISTD"
-    MORECFLAGS="-fno-strict-aliasing"
+    CPPFLAGS="-DMSW \
+#	-DUSEAPI_MMIO \
+#	-DUSE_PORTAUDIO \
+    -DPD_INTERNAL -DPD "
+    MORECFLAGS="-mms-bitfields"
     STRIPFLAG=-s
     LDSOFLAGS="-shared"
+#	AUDIOSRC="s_audio_mmio.c"
+	MIDISRC="s_midi_mmio.c"
+
+	STRIP="strip --strip-unneeded -R .note -R .comment"
+	EXPORT="-Wl, --export-all-symbols -Wl, --out-implib=pd.a"
+	WLIB=$WLIB"$LDFLAGS $EXPORT; $STRIP libpd.dll"
+	PDRECEIVE="$LDFLAGS; $STRIP pdreceive.exe"
+	PDSEND="$LDFLAGS; $STRIP pdsend.exe"
+	EXE=.exe
+	WATCHDOG=pd.com
+	WSTRIP=$STRIP $DESTDIR$bindir/pd.exe
 fi
 
 if test `uname -m` = x86_64; then
