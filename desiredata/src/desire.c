@@ -6983,7 +6983,7 @@ extern "C" t_socketreceiver *netreceive_newest_receiver(t_text *x);
 void glob_initfromgui(void *dummy, t_symbol *s) {
     char buf[256], buf2[256];
     char cwd[666];
-    getcwd(cwd,665);
+    if (!getcwd(cwd,665)) strcpy(cwd,"actual_name_is_way_too_long.oops");
     sys_socketreceiver=netreceive_newest_receiver(sys_netreceive);
     sys_vgui("%s",lost_posts.str().data());
     /* load dynamic libraries specified with "-lib" args */
