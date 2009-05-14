@@ -1081,10 +1081,10 @@ static void *any_new(t_symbol *s,int argc, t_atom *argv) {
 
 static void any_anything(t_any *x, t_symbol *s, int argc, t_atom *argv) {
     t_atom *outv; int outc = x->alist->n+argc+1; ATOMS_ALLOCA(outv, outc);
-    if (argv[0].a_type == A_FLOAT && *s=="list" || *s=="float") {
+    if ((argv[0].a_type == A_FLOAT  && s==&s_list) || s==&s_float) {
       alist_list(x->alist, 0, argc, argv); outlet_anything(x->outlet, &s_list, argc, argv);return;
     }
-    if (argv[0].a_type == A_SYMBOL || *s!="list" || *s!="float") {
+    if ( argv[0].a_type == A_SYMBOL || s!=&s_list  || s!=&s_float) {
       alist_anything(x->alist, s, argc, argv); outlet_anything(x->outlet, s, argc, argv);
     }
 }
@@ -1700,7 +1700,7 @@ struct t_triggerout {
     int type;
     t_outlet *outlet;
 };
-typedef struct t_trigger : t_object {
+struct t_trigger : t_object {
     t_int n;
     t_triggerout *vec;
 };
@@ -1914,7 +1914,7 @@ struct t_vcommon : t_pd {
     int c_refcount;
     t_float f;
 };
-typedef struct t_value : t_object {
+struct t_value : t_object {
     t_symbol *sym;
     t_float *floatstar;
 };
