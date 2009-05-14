@@ -93,7 +93,7 @@ static void readdir_close(t_readdir *x)
 {
   if (!x->x_dir) return;
   if (0 != closedir(x->x_dir)) {
-    error("readdir: cannot close %s: %s", x->x_dirname->s_name, strerror(errno));
+    pd_error(x, "readdir: cannot close %s: %s", x->x_dirname->s_name, strerror(errno));
     return;
   }
   x->x_dir = NULL;
@@ -111,7 +111,7 @@ static void readdir_open(t_readdir *x, t_symbol *dirname)
 
   if (x->x_dir) readdir_close(x);
   if ( !(x->x_dir = opendir(dirname->s_name)) ) {
-    error("readdir: cannot open %s: %s", dirname->s_name, strerror(errno));
+    pd_error(x, "readdir: cannot open %s: %s", dirname->s_name, strerror(errno));
     return;
   }
   x->x_dirname = dirname;
@@ -127,7 +127,7 @@ static void readdir_next(t_readdir *x)
   if ( !x->x_dir || !(result = readdir(x->x_dir)) ) {
     if (errno == EBADF) {
       //-- real error
-      error("readdir: cannot read from %s: %s", x->x_dirname->s_name, strerror(errno));
+      pd_error(x, "readdir: cannot read from %s: %s", x->x_dirname->s_name, strerror(errno));
     }
     else {
       //-- end of directory
@@ -136,37 +136,44 @@ static void readdir_next(t_readdir *x)
     return;
   }
 
-  //-- get type
+#if HAVE_STRUCT_DIRENT_D_TYPE
+  //-- get type (if this OS supports it, e.g. if we're not on windoof)
   switch (result->d_type)
     {
-    case DT_REG:
-      sel = sp_file;
-      break;
+#if HAVE_DECL_DT_REG
+    case DT_REG: sel = sp_file; break;
+#endif
 
-    case DT_DIR:
-      sel = sp_dir;
-      break;
+#if HAVE_DECL_DT_DIR
+    case DT_DIR: sel = sp_dir; break;
+#endif
 
-    case DT_FIFO:
-      sel = sp_fifo;
-      break;
+#if HAVE_DECL_DT_FIFO
+    case DT_FIFO: sel = sp_fifo; break;
+#endif
 
-    case DT_SOCK:
-      sel = sp_sock;
-      break;
+#if HAVE_DECL_DT_SOCK
+    case DT_SOCK: sel = sp_sock; break;
+#endif
 
-    case DT_CHR:
-      sel = sp_chrdev;
-      break;
+#if HAVE_DECL_DT_CHR
+    case DT_CHR: sel = sp_chrdev; break;
+#endif
 
-    case DT_BLK:
-      sel = sp_blkdev;
-      break;
+#if HAVE_DECL_DT_BLK
+    case DT_BLK: sel = sp_blkdev; break;
+#endif
 
+#if HAVE_DECL_DT_UNKNOWN
+    case DT_UNKNOWN:
+#endif
     default:
       sel = sp_unknown;
       break;
     }
+#else  /* if !HAVE_STRUCT_DIRENT_D_TYPE */
+  sel = sp_unknown;
+#endif /* HAVE_STRUCT_DIRENT_D_TYPE */
 
   x->x_eatom.a_w.w_symbol = gensym(result->d_name);
   outlet_anything(x->x_ent_outlet, sel, 1, &x->x_eatom);
@@ -199,7 +206,7 @@ static void readdir_tell(t_readdir *x)
 static void readdir_seek(t_readdir *x, t_floatarg pos)
 {
   if (!x->x_dir) {
-    error("readdir: seek %f: no directory opened!", pos);
+    pd_error(x, "readdir: seek %g: no directory opened!", pos);
     return;
   }
   seekdir(x->x_dir, (off_t)pos);

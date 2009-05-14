@@ -4,7 +4,7 @@ AC_PREREQ(2.5)
 
 dnl Some handy macros
 define([THE_PACKAGE_NAME],    [readdir])
-define([THE_PACKAGE_VERSION], [0.02-2])
+define([THE_PACKAGE_VERSION], [0.03-0])
 define([THE_PACKAGE_AUTHOR],  [moocow@ling.uni-potsdam.de])
 
 AC_INIT(THE_PACKAGE_NAME, THE_PACKAGE_VERSION, THE_PACKAGE_AUTHOR)
@@ -49,6 +49,7 @@ AX_PD_EXTERNAL
 ## Local: headers
 
 dnl AC_HEADER_STDC
+dnl sys/stat.h
 AC_CHECK_HEADERS([dirent.h fcntl.h string.h errno.h],
 	[],
 	AC_MSG_WARN([-----------------------------------------------------------------])
@@ -58,6 +59,24 @@ AC_CHECK_HEADERS([dirent.h fcntl.h string.h errno.h],
 
 ## /local: headers
 ##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+## Local: structs
+
+##-- check for 'd_type' field in struct dirent
+AC_CHECK_MEMBERS([struct dirent.d_type],
+        [HAVE_STRUCT_DIRENT_D_TYPE=yes],[HAVE_STRUCT_DIRENT_D_TYPE=no],
+	[#include <dirent.h>])
+
+##-- check for dirent d_type decls
+AC_CHECK_DECLS([DT_REG,DT_DIR,DT_FIFO,DT_SOCK,DT_CHR,DT_BLK,DT_UNKNOWN],
+	[],[],
+	[#include <dirent.h>])
+
+
+## /local: structs
+##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 ##vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 ## Local: debug

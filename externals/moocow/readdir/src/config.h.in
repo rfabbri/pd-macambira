@@ -1,5 +1,33 @@
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to 1 if you have the declaration of `DT_BLK', and to 0 if you don't.
+   */
+#undef HAVE_DECL_DT_BLK
+
+/* Define to 1 if you have the declaration of `DT_CHR', and to 0 if you don't.
+   */
+#undef HAVE_DECL_DT_CHR
+
+/* Define to 1 if you have the declaration of `DT_DIR', and to 0 if you don't.
+   */
+#undef HAVE_DECL_DT_DIR
+
+/* Define to 1 if you have the declaration of `DT_FIFO', and to 0 if you
+   don't. */
+#undef HAVE_DECL_DT_FIFO
+
+/* Define to 1 if you have the declaration of `DT_REG', and to 0 if you don't.
+   */
+#undef HAVE_DECL_DT_REG
+
+/* Define to 1 if you have the declaration of `DT_SOCK', and to 0 if you
+   don't. */
+#undef HAVE_DECL_DT_SOCK
+
+/* Define to 1 if you have the declaration of `DT_UNKNOWN', and to 0 if you
+   don't. */
+#undef HAVE_DECL_DT_UNKNOWN
+
 /* Define to 1 if you have the <dirent.h> header file. */
 #undef HAVE_DIRENT_H
 
@@ -11,6 +39,9 @@
 
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
+
+/* Define to 1 if `d_type' is member of `struct dirent'. */
+#undef HAVE_STRUCT_DIRENT_D_TYPE
 
 /* Name of package */
 #undef PACKAGE
