@@ -1,5 +1,11 @@
 $Id: ChangeLog,v 1.1.4.11.2.44 2007/09/06 16:12:01 chunlee Exp $
 
+DesireData 2009.04... :
+ * fixed some win32 (mingw) bugs (thanks to Patrice Colet)
+ * modal dialogues now appear on top of current window, not always main window
+ * added -stdout
+ * fixed osx scrolling
+
 DesireData 2008.02.19 :
 
  * added more Bokmål (Norwegian) translations from Gisle Frøysland
