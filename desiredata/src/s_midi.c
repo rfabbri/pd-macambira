@@ -411,13 +411,13 @@ void sys_open_midi(int nmidiindev, int *midiindev, int nmidioutdev, int *midiout
     midi_oss_init();
 #endif
 #endif
-    if (enable)
+    if (enable) {
 #ifdef USEAPI_ALSA
-        if (sys_midiapi == API_ALSA)
-            sys_alsa_do_open_midi(nmidiindev, midiindev, nmidioutdev, midioutdev);
+        if (sys_midiapi == API_ALSA) sys_alsa_do_open_midi(nmidiindev, midiindev, nmidioutdev, midioutdev);
         else
 #endif /* ALSA */
             sys_do_open_midi(nmidiindev, midiindev, nmidioutdev, midioutdev);
+    }
     sys_save_midi_params(nmidiindev, midiindev, nmidioutdev, midioutdev);
     sys_vgui("set pd_whichmidiapi %d\n", sys_midiapi);
 }
