@@ -1213,7 +1213,7 @@ allows COM port numbers to be specified. */
 
     if(argc > 0 && argv->a_type == A_FLOAT)
         com_num = atom_getfloatarg(0,argc,argv);
-    if(argc > 1 && argv->a_type == A_FLOAT)
+    if(argc > 1)
         fbaud = atom_getfloatarg(1,argc,argv);
 
 /*	 Open the Comport for RD and WR and get a handle */
