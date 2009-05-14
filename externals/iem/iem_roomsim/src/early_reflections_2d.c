@@ -155,7 +155,7 @@ static void early_reflections_2d_doit(t_early_reflections_2d *x)
   t_float diff_x, diff_y;
   t_float sum_x, sum_y;
   t_float lx, wy;
-  t_float x0, y0;
+  t_float x0, y0_;
   t_float xp1, yp1;
   t_float xn1, yn1;
   t_float xp2, yp2;
@@ -182,7 +182,7 @@ static void early_reflections_2d_doit(t_early_reflections_2d *x)
     sum_y = x->x_src_y[i] + x->x_head_y;
     
     x0 = diff_x;
-    y0 = diff_y;
+    y0_ = diff_y;
     xp1 = lx - sum_x;
     yp1 = wy - sum_y;
     xn1 = -lx - sum_x;
@@ -192,14 +192,14 @@ static void early_reflections_2d_doit(t_early_reflections_2d *x)
     xn2 = -2.0f*lx + diff_x;
     yn2 = -2.0f*wy + diff_y;
     
-    rad[0] = early_reflections_2d_calc_radius(r_ambi, x0, y0);
-    rad[1] = early_reflections_2d_calc_radius(r_ambi, xp1, y0);
+    rad[0] = early_reflections_2d_calc_radius(r_ambi, x0, y0_);
+    rad[1] = early_reflections_2d_calc_radius(r_ambi, xp1, y0_);
     rad[2] = early_reflections_2d_calc_radius(r_ambi, x0, yp1);
-    rad[3] = early_reflections_2d_calc_radius(r_ambi, xn1, y0);
+    rad[3] = early_reflections_2d_calc_radius(r_ambi, xn1, y0_);
     rad[4] = early_reflections_2d_calc_radius(r_ambi, x0, yn1);
-    rad[5] = early_reflections_2d_calc_radius(r_ambi, xp2, y0);
+    rad[5] = early_reflections_2d_calc_radius(r_ambi, xp2, y0_);
     rad[6] = early_reflections_2d_calc_radius(r_ambi, x0, yp2);
-    rad[7] = early_reflections_2d_calc_radius(r_ambi, xn2, y0);
+    rad[7] = early_reflections_2d_calc_radius(r_ambi, xn2, y0_);
     rad[8] = early_reflections_2d_calc_radius(r_ambi, x0, yn2);
     rad[9] = early_reflections_2d_calc_radius(r_ambi, xp1, yp1);
     rad[10] = early_reflections_2d_calc_radius(r_ambi, xn1, yn1);
@@ -297,7 +297,7 @@ static void early_reflections_2d_doit(t_early_reflections_2d *x)
     */
     
     at = x->x_para_at+1;
-    SETFLOAT(at, early_reflections_2d_calc_azimuth(x_180_over_pi, x0, y0));
+    SETFLOAT(at, early_reflections_2d_calc_azimuth(x_180_over_pi, x0, y0_));
     
     outlet_anything(x->x_direct_out, x->x_s_index_phi, 2, x->x_para_at);
     
@@ -309,13 +309,13 @@ static void early_reflections_2d_doit(t_early_reflections_2d *x)
     +1x-1y, -1x+1y
     */
     
-    phi[0] = early_reflections_2d_calc_azimuth(x_180_over_pi, xp1, y0);
+    phi[0] = early_reflections_2d_calc_azimuth(x_180_over_pi, xp1, y0_);
     phi[1] = early_reflections_2d_calc_azimuth(x_180_over_pi, x0, yp1);
-    phi[2] = early_reflections_2d_calc_azimuth(x_180_over_pi, xn1, y0);
+    phi[2] = early_reflections_2d_calc_azimuth(x_180_over_pi, xn1, y0_);
     phi[3] = early_reflections_2d_calc_azimuth(x_180_over_pi, x0, yn1);
-    phi[4] = early_reflections_2d_calc_azimuth(x_180_over_pi, xp2, y0);
+    phi[4] = early_reflections_2d_calc_azimuth(x_180_over_pi, xp2, y0_);
     phi[5] = early_reflections_2d_calc_azimuth(x_180_over_pi, x0, yp2);
-    phi[6] = early_reflections_2d_calc_azimuth(x_180_over_pi, xn2, y0);
+    phi[6] = early_reflections_2d_calc_azimuth(x_180_over_pi, xn2, y0_);
     phi[7] = early_reflections_2d_calc_azimuth(x_180_over_pi, x0, yn2);
     phi[8] = early_reflections_2d_calc_azimuth(x_180_over_pi, xp1, yp1);
     phi[9] = early_reflections_2d_calc_azimuth(x_180_over_pi, xn1, yn1);

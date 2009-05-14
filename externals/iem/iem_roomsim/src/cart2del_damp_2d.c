@@ -106,7 +106,7 @@ static void cart2del_damp_2d_doit(t_cart2del_damp_2d *x)
   t_float diff_x, diff_y;
   t_float sum_x, sum_y;
   t_float lx, wy;
-  t_float x0, y0;
+  t_float x0, y0_;
   t_float xp1, yp1;
   t_float xn1, yn1;
   t_float xp2, yp2;
@@ -126,7 +126,7 @@ static void cart2del_damp_2d_doit(t_cart2del_damp_2d *x)
   sum_y = x->x_src_y + x->x_head_y;
   
   x0 = diff_x;
-  y0 = diff_y;
+  y0_ = diff_y;
   xp1 = lx - sum_x;
   yp1 = wy - sum_y;
   xn1 = -lx - sum_x;
@@ -136,14 +136,14 @@ static void cart2del_damp_2d_doit(t_cart2del_damp_2d *x)
   xn2 = -2.0f*lx + diff_x;
   yn2 = -2.0f*wy + diff_y;
   
-  rad[0] = cart2del_damp_2d_calc_radius(r_ambi, x0, y0);
-  rad[1] = cart2del_damp_2d_calc_radius(r_ambi, xp1, y0);
+  rad[0] = cart2del_damp_2d_calc_radius(r_ambi, x0, y0_);
+  rad[1] = cart2del_damp_2d_calc_radius(r_ambi, xp1, y0_);
   rad[2] = cart2del_damp_2d_calc_radius(r_ambi, x0, yp1);
-  rad[3] = cart2del_damp_2d_calc_radius(r_ambi, xn1, y0);
+  rad[3] = cart2del_damp_2d_calc_radius(r_ambi, xn1, y0_);
   rad[4] = cart2del_damp_2d_calc_radius(r_ambi, x0, yn1);
-  rad[5] = cart2del_damp_2d_calc_radius(r_ambi, xp2, y0);
+  rad[5] = cart2del_damp_2d_calc_radius(r_ambi, xp2, y0_);
   rad[6] = cart2del_damp_2d_calc_radius(r_ambi, x0, yp2);
-  rad[7] = cart2del_damp_2d_calc_radius(r_ambi, xn2, y0);
+  rad[7] = cart2del_damp_2d_calc_radius(r_ambi, xn2, y0_);
   rad[8] = cart2del_damp_2d_calc_radius(r_ambi, x0, yn2);
   rad[9] = cart2del_damp_2d_calc_radius(r_ambi, xp1, yp1);
   rad[10] = cart2del_damp_2d_calc_radius(r_ambi, xn1, yn1);
@@ -220,12 +220,12 @@ static void cart2del_damp_2d_doit(t_cart2del_damp_2d *x)
   SETSYMBOL(at, x->x_s_index_phi);
   
   SETFLOAT(at+1, 1.0f);
-  SETFLOAT(at+2, cart2del_damp_2d_calc_azimuth(x_180_over_pi, x0, y0));
+  SETFLOAT(at+2, cart2del_damp_2d_calc_azimuth(x_180_over_pi, x0, y0_));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_direct, 3, at);
   
   
   SETFLOAT(at+1, 1.0f);
-  SETFLOAT(at+2, cart2del_damp_2d_calc_azimuth(x_180_over_pi, xp1, y0));
+  SETFLOAT(at+2, cart2del_damp_2d_calc_azimuth(x_180_over_pi, xp1, y0_));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early1, 3, at);
   
   SETFLOAT(at+1, 2.0f);
@@ -233,7 +233,7 @@ static void cart2del_damp_2d_doit(t_cart2del_damp_2d *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early1, 3, at);
   
   SETFLOAT(at+1, 3.0f);
-  SETFLOAT(at+2, cart2del_damp_2d_calc_azimuth(x_180_over_pi, xn1, y0));
+  SETFLOAT(at+2, cart2del_damp_2d_calc_azimuth(x_180_over_pi, xn1, y0_));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early1, 3, at);
   
   SETFLOAT(at+1, 4.0f);
@@ -242,7 +242,7 @@ static void cart2del_damp_2d_doit(t_cart2del_damp_2d *x)
   
   
   SETFLOAT(at+1, 1.0f);
-  SETFLOAT(at+2, cart2del_damp_2d_calc_azimuth(x_180_over_pi, xp2, y0));
+  SETFLOAT(at+2, cart2del_damp_2d_calc_azimuth(x_180_over_pi, xp2, y0_));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 3, at);
   
   SETFLOAT(at+1, 2.0f);
@@ -250,7 +250,7 @@ static void cart2del_damp_2d_doit(t_cart2del_damp_2d *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 3, at);
   
   SETFLOAT(at+1, 3.0f);
-  SETFLOAT(at+2, cart2del_damp_2d_calc_azimuth(x_180_over_pi, xn2, y0));
+  SETFLOAT(at+2, cart2del_damp_2d_calc_azimuth(x_180_over_pi, xn2, y0_));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 3, at);
   
   SETFLOAT(at+1, 4.0f);

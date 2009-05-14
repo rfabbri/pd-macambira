@@ -244,7 +244,7 @@ static void early_reflections_3d_doit(t_early_reflections_3d *x)
   t_float diff_x, diff_y, diff_z;
   t_float sum_x, sum_y, sum_z;
   t_float lx, wy, hz;
-  t_float x0, y0, z0;
+  t_float x0, y0_, z0;
   t_float xp1, yp1, zp1;
   t_float xn1, yn1, zn1;
   t_float xp2, yp2, zp2;
@@ -281,7 +281,7 @@ static void early_reflections_3d_doit(t_early_reflections_3d *x)
     sum_z = x->x_src_z[i] + x->x_head_z - hz;
     
     x0 = diff_x;
-    y0 = diff_y;
+    y0_ = diff_y;
     z0 = diff_z;
     xp1 = lx - sum_x;
     yp1 = wy - sum_y;
@@ -296,30 +296,30 @@ static void early_reflections_3d_doit(t_early_reflections_3d *x)
     yn2 = -2.0f*wy + diff_y;
     zn2 = -2.0f*hz + diff_z;
     
-    rad[0] = early_reflections_3d_calc_radius(r_ambi, x0, y0, z0);
-    rad[1] = early_reflections_3d_calc_radius(r_ambi, xp1, y0, z0);
+    rad[0] = early_reflections_3d_calc_radius(r_ambi, x0, y0_, z0);
+    rad[1] = early_reflections_3d_calc_radius(r_ambi, xp1, y0_, z0);
     rad[2] = early_reflections_3d_calc_radius(r_ambi, x0, yp1, z0);
-    rad[3] = early_reflections_3d_calc_radius(r_ambi, x0, y0, zp1);
-    rad[4] = early_reflections_3d_calc_radius(r_ambi, xn1, y0, z0);
+    rad[3] = early_reflections_3d_calc_radius(r_ambi, x0, y0_, zp1);
+    rad[4] = early_reflections_3d_calc_radius(r_ambi, xn1, y0_, z0);
     rad[5] = early_reflections_3d_calc_radius(r_ambi, x0, yn1, z0);
-    rad[6] = early_reflections_3d_calc_radius(r_ambi, x0, y0, zn1);
-    rad[7] = early_reflections_3d_calc_radius(r_ambi, xp2, y0, z0);
+    rad[6] = early_reflections_3d_calc_radius(r_ambi, x0, y0_, zn1);
+    rad[7] = early_reflections_3d_calc_radius(r_ambi, xp2, y0_, z0);
     rad[8] = early_reflections_3d_calc_radius(r_ambi, x0, yp2, z0);
-    rad[9] = early_reflections_3d_calc_radius(r_ambi, x0, y0, zp2);
-    rad[10] = early_reflections_3d_calc_radius(r_ambi, xn2, y0, z0);
+    rad[9] = early_reflections_3d_calc_radius(r_ambi, x0, y0_, zp2);
+    rad[10] = early_reflections_3d_calc_radius(r_ambi, xn2, y0_, z0);
     rad[11] = early_reflections_3d_calc_radius(r_ambi, x0, yn2, z0);
-    rad[12] = early_reflections_3d_calc_radius(r_ambi, x0, y0, zn2);
+    rad[12] = early_reflections_3d_calc_radius(r_ambi, x0, y0_, zn2);
     rad[13] = early_reflections_3d_calc_radius(r_ambi, xp1, yp1, z0);
-    rad[14] = early_reflections_3d_calc_radius(r_ambi, xp1, y0, zp1);
+    rad[14] = early_reflections_3d_calc_radius(r_ambi, xp1, y0_, zp1);
     rad[15] = early_reflections_3d_calc_radius(r_ambi, x0, yp1, zp1);
     rad[16] = early_reflections_3d_calc_radius(r_ambi, xn1, yn1, z0);
-    rad[17] = early_reflections_3d_calc_radius(r_ambi, xn1, y0, zn1);
+    rad[17] = early_reflections_3d_calc_radius(r_ambi, xn1, y0_, zn1);
     rad[18] = early_reflections_3d_calc_radius(r_ambi, x0, yn1, zn1);
     rad[19] = early_reflections_3d_calc_radius(r_ambi, xp1, yn1, z0);
-    rad[20] = early_reflections_3d_calc_radius(r_ambi, xp1, y0, zn1);
+    rad[20] = early_reflections_3d_calc_radius(r_ambi, xp1, y0_, zn1);
     rad[21] = early_reflections_3d_calc_radius(r_ambi, x0, yp1, zn1);
     rad[22] = early_reflections_3d_calc_radius(r_ambi, xn1, yp1, z0);
-    rad[23] = early_reflections_3d_calc_radius(r_ambi, xn1, y0, zp1);
+    rad[23] = early_reflections_3d_calc_radius(r_ambi, xn1, y0_, zp1);
     rad[24] = early_reflections_3d_calc_radius(r_ambi, x0, yn1, zp1);
     
     /* delay-reihenfolge: 0 auslassen,
@@ -474,9 +474,9 @@ static void early_reflections_3d_doit(t_early_reflections_3d *x)
     */
     
     at = x->x_para_at+1;
-    SETFLOAT(at, early_reflections_3d_calc_elevation(x_180_over_pi, x0, y0, z0));
+    SETFLOAT(at, early_reflections_3d_calc_elevation(x_180_over_pi, x0, y0_, z0));
     at++;
-    SETFLOAT(at, early_reflections_3d_calc_azimuth(x_180_over_pi, x0, y0, z0));
+    SETFLOAT(at, early_reflections_3d_calc_azimuth(x_180_over_pi, x0, y0_, z0));
     
     outlet_anything(x->x_direct_out, x->x_s_index_delta_phi, 3, x->x_para_at);
     
@@ -490,52 +490,52 @@ static void early_reflections_3d_doit(t_early_reflections_3d *x)
     -1x+1y, -1x+1z, -1y+1z
     */
     
-    delta[0] = early_reflections_3d_calc_elevation(x_180_over_pi, xp1, y0, z0);
-    phi[0] = early_reflections_3d_calc_azimuth(x_180_over_pi, xp1, y0, z0);
+    delta[0] = early_reflections_3d_calc_elevation(x_180_over_pi, xp1, y0_, z0);
+    phi[0] = early_reflections_3d_calc_azimuth(x_180_over_pi, xp1, y0_, z0);
     delta[1] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, yp1, z0);
     phi[1] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, yp1, z0);
-    delta[2] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, y0, zp1);
-    phi[2] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, y0, zp1);
-    delta[3] = early_reflections_3d_calc_elevation(x_180_over_pi, xn1, y0, z0);
-    phi[3] = early_reflections_3d_calc_azimuth(x_180_over_pi, xn1, y0, z0);
+    delta[2] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, y0_, zp1);
+    phi[2] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, y0_, zp1);
+    delta[3] = early_reflections_3d_calc_elevation(x_180_over_pi, xn1, y0_, z0);
+    phi[3] = early_reflections_3d_calc_azimuth(x_180_over_pi, xn1, y0_, z0);
     delta[4] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, yn1, z0);
     phi[4] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, yn1, z0);
-    delta[5] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, y0, zn1);
-    phi[5] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, y0, zn1);
-    delta[6] = early_reflections_3d_calc_elevation(x_180_over_pi, xp2, y0, z0);
-    phi[6] = early_reflections_3d_calc_azimuth(x_180_over_pi, xp2, y0, z0);
+    delta[5] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, y0_, zn1);
+    phi[5] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, y0_, zn1);
+    delta[6] = early_reflections_3d_calc_elevation(x_180_over_pi, xp2, y0_, z0);
+    phi[6] = early_reflections_3d_calc_azimuth(x_180_over_pi, xp2, y0_, z0);
     delta[7] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, yp2, z0);
     phi[7] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, yp2, z0);
-    delta[8] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, y0, zp2);
-    phi[8] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, y0, zp2);
-    delta[9] = early_reflections_3d_calc_elevation(x_180_over_pi, xn2, y0, z0);
-    phi[9] = early_reflections_3d_calc_azimuth(x_180_over_pi, xn2, y0, z0);
+    delta[8] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, y0_, zp2);
+    phi[8] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, y0_, zp2);
+    delta[9] = early_reflections_3d_calc_elevation(x_180_over_pi, xn2, y0_, z0);
+    phi[9] = early_reflections_3d_calc_azimuth(x_180_over_pi, xn2, y0_, z0);
     delta[10] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, yn2, z0);
     phi[10] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, yn2, z0);
-    delta[11] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, y0, zn2);
-    phi[11] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, y0, zn2);
+    delta[11] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, y0_, zn2);
+    phi[11] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, y0_, zn2);
     delta[12] = early_reflections_3d_calc_elevation(x_180_over_pi, xp1, yp1, z0);
     phi[12] = early_reflections_3d_calc_azimuth(x_180_over_pi, xp1, yp1, z0);
-    delta[13] = early_reflections_3d_calc_elevation(x_180_over_pi, xp1, y0, zp1);
-    phi[13] = early_reflections_3d_calc_azimuth(x_180_over_pi, xp1, y0, zp1);
+    delta[13] = early_reflections_3d_calc_elevation(x_180_over_pi, xp1, y0_, zp1);
+    phi[13] = early_reflections_3d_calc_azimuth(x_180_over_pi, xp1, y0_, zp1);
     delta[14] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, yp1, zp1);
     phi[14] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, yp1, zp1);
     delta[15] = early_reflections_3d_calc_elevation(x_180_over_pi, xn1, yn1, z0);
     phi[15] = early_reflections_3d_calc_azimuth(x_180_over_pi, xn1, yn1, z0);
-    delta[16] = early_reflections_3d_calc_elevation(x_180_over_pi, xn1, y0, zn1);
-    phi[16] = early_reflections_3d_calc_azimuth(x_180_over_pi, xn1, y0, zn1);
+    delta[16] = early_reflections_3d_calc_elevation(x_180_over_pi, xn1, y0_, zn1);
+    phi[16] = early_reflections_3d_calc_azimuth(x_180_over_pi, xn1, y0_, zn1);
     delta[17] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, yn1, zn1);
     phi[17] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, yn1, zn1);
     delta[18] = early_reflections_3d_calc_elevation(x_180_over_pi, xp1, yn1, z0);
     phi[18] = early_reflections_3d_calc_azimuth(x_180_over_pi, xp1, yn1, z0);
-    delta[19] = early_reflections_3d_calc_elevation(x_180_over_pi, xp1, y0, zn1);
-    phi[19] = early_reflections_3d_calc_azimuth(x_180_over_pi, xp1, y0, zn1);
+    delta[19] = early_reflections_3d_calc_elevation(x_180_over_pi, xp1, y0_, zn1);
+    phi[19] = early_reflections_3d_calc_azimuth(x_180_over_pi, xp1, y0_, zn1);
     delta[20] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, yp1, zn1);
     phi[20] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, yp1, zn1);
     delta[21] = early_reflections_3d_calc_elevation(x_180_over_pi, xn1, yp1, z0);
     phi[21] = early_reflections_3d_calc_azimuth(x_180_over_pi, xn1, yp1, z0);
-    delta[22] = early_reflections_3d_calc_elevation(x_180_over_pi, xn1, y0, zp1);
-    phi[22] = early_reflections_3d_calc_azimuth(x_180_over_pi, xn1, y0, zp1);
+    delta[22] = early_reflections_3d_calc_elevation(x_180_over_pi, xn1, y0_, zp1);
+    phi[22] = early_reflections_3d_calc_azimuth(x_180_over_pi, xn1, y0_, zp1);
     delta[23] = early_reflections_3d_calc_elevation(x_180_over_pi, x0, yn1, zp1);
     phi[23] = early_reflections_3d_calc_azimuth(x_180_over_pi, x0, yn1, zp1);
     

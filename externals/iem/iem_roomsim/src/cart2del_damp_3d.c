@@ -160,7 +160,7 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   t_float diff_x, diff_y, diff_z;
   t_float sum_x, sum_y, sum_z;
   t_float lx, wy, hz;
-  t_float x0, y0, z0;
+  t_float x0, y0_, z0;
   t_float xp1, yp1, zp1;
   t_float xn1, yn1, zn1;
   t_float xp2, yp2, zp2;
@@ -183,7 +183,7 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   sum_z = x->x_src_z + x->x_head_z - hz;
   
   x0 = diff_x;
-  y0 = diff_y;
+  y0_ = diff_y;
   z0 = diff_z;
   xp1 = lx - sum_x;
   yp1 = wy - sum_y;
@@ -198,30 +198,30 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   yn2 = -2.0f*wy + diff_y;
   zn2 = -2.0f*hz + diff_z;
   
-  rad[0] = cart2del_damp_3d_calc_radius(r_ambi, x0, y0, z0);
-  rad[1] = cart2del_damp_3d_calc_radius(r_ambi, xp1, y0, z0);
+  rad[0] = cart2del_damp_3d_calc_radius(r_ambi, x0, y0_, z0);
+  rad[1] = cart2del_damp_3d_calc_radius(r_ambi, xp1, y0_, z0);
   rad[2] = cart2del_damp_3d_calc_radius(r_ambi, x0, yp1, z0);
-  rad[3] = cart2del_damp_3d_calc_radius(r_ambi, x0, y0, zp1);
-  rad[4] = cart2del_damp_3d_calc_radius(r_ambi, xn1, y0, z0);
+  rad[3] = cart2del_damp_3d_calc_radius(r_ambi, x0, y0_, zp1);
+  rad[4] = cart2del_damp_3d_calc_radius(r_ambi, xn1, y0_, z0);
   rad[5] = cart2del_damp_3d_calc_radius(r_ambi, x0, yn1, z0);
-  rad[6] = cart2del_damp_3d_calc_radius(r_ambi, x0, y0, zn1);
-  rad[7] = cart2del_damp_3d_calc_radius(r_ambi, xp2, y0, z0);
+  rad[6] = cart2del_damp_3d_calc_radius(r_ambi, x0, y0_, zn1);
+  rad[7] = cart2del_damp_3d_calc_radius(r_ambi, xp2, y0_, z0);
   rad[8] = cart2del_damp_3d_calc_radius(r_ambi, x0, yp2, z0);
-  rad[9] = cart2del_damp_3d_calc_radius(r_ambi, x0, y0, zp2);
-  rad[10] = cart2del_damp_3d_calc_radius(r_ambi, xn2, y0, z0);
+  rad[9] = cart2del_damp_3d_calc_radius(r_ambi, x0, y0_, zp2);
+  rad[10] = cart2del_damp_3d_calc_radius(r_ambi, xn2, y0_, z0);
   rad[11] = cart2del_damp_3d_calc_radius(r_ambi, x0, yn2, z0);
-  rad[12] = cart2del_damp_3d_calc_radius(r_ambi, x0, y0, zn2);
+  rad[12] = cart2del_damp_3d_calc_radius(r_ambi, x0, y0_, zn2);
   rad[13] = cart2del_damp_3d_calc_radius(r_ambi, xp1, yp1, z0);
-  rad[14] = cart2del_damp_3d_calc_radius(r_ambi, xp1, y0, zp1);
+  rad[14] = cart2del_damp_3d_calc_radius(r_ambi, xp1, y0_, zp1);
   rad[15] = cart2del_damp_3d_calc_radius(r_ambi, x0, yp1, zp1);
   rad[16] = cart2del_damp_3d_calc_radius(r_ambi, xn1, yn1, z0);
-  rad[17] = cart2del_damp_3d_calc_radius(r_ambi, xn1, y0, zn1);
+  rad[17] = cart2del_damp_3d_calc_radius(r_ambi, xn1, y0_, zn1);
   rad[18] = cart2del_damp_3d_calc_radius(r_ambi, x0, yn1, zn1);
   rad[19] = cart2del_damp_3d_calc_radius(r_ambi, xp1, yn1, z0);
-  rad[20] = cart2del_damp_3d_calc_radius(r_ambi, xp1, y0, zn1);
+  rad[20] = cart2del_damp_3d_calc_radius(r_ambi, xp1, y0_, zn1);
   rad[21] = cart2del_damp_3d_calc_radius(r_ambi, x0, yp1, zn1);
   rad[22] = cart2del_damp_3d_calc_radius(r_ambi, xn1, yp1, z0);
-  rad[23] = cart2del_damp_3d_calc_radius(r_ambi, xn1, y0, zp1);
+  rad[23] = cart2del_damp_3d_calc_radius(r_ambi, xn1, y0_, zp1);
   rad[24] = cart2del_damp_3d_calc_radius(r_ambi, x0, yn1, zp1);
   
   /* delay-reihenfolge: 0 auslassen,
@@ -325,14 +325,14 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   SETSYMBOL(at, x->x_s_index_theta_phi);
   
   SETFLOAT(at+1, 1.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, x0, y0, z0));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, x0, y0, z0));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, x0, y0_, z0));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, x0, y0_, z0));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_direct, 4, at);
   
   
   SETFLOAT(at+1, 1.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xp1, y0, z0));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xp1, y0, z0));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xp1, y0_, z0));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xp1, y0_, z0));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early1, 4, at);
   
   SETFLOAT(at+1, 2.0f);
@@ -341,13 +341,13 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early1, 4, at);
   
   SETFLOAT(at+1, 3.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, x0, y0, zp1));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, x0, y0, zp1));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, x0, y0_, zp1));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, x0, y0_, zp1));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early1, 4, at);
   
   SETFLOAT(at+1, 4.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xn1, y0, z0));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xn1, y0, z0));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xn1, y0_, z0));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xn1, y0_, z0));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early1, 4, at);
   
   SETFLOAT(at+1, 5.0f);
@@ -356,14 +356,14 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early1, 4, at);
   
   SETFLOAT(at+1, 6.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, x0, y0, zn1));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, x0, y0, zn1));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, x0, y0_, zn1));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, x0, y0_, zn1));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early1, 4, at);
   
   
   SETFLOAT(at+1, 1.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xp2, y0, z0));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xp2, y0, z0));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xp2, y0_, z0));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xp2, y0_, z0));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 2.0f);
@@ -372,13 +372,13 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 3.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, x0, y0, zp2));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, x0, y0, zp2));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, x0, y0_, zp2));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, x0, y0_, zp2));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 4.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xn2, y0, z0));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xn2, y0, z0));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xn2, y0_, z0));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xn2, y0_, z0));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 5.0f);
@@ -387,8 +387,8 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 6.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, x0, y0, zn2));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, x0, y0, zn2));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, x0, y0_, zn2));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, x0, y0_, zn2));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 7.0f);
@@ -397,8 +397,8 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 8.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xp1, y0, zp1));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xp1, y0, zp1));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xp1, y0_, zp1));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xp1, y0_, zp1));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 9.0f);
@@ -412,8 +412,8 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 11.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xn1, y0, zn1));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xn1, y0, zn1));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xn1, y0_, zn1));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xn1, y0_, zn1));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 12.0f);
@@ -427,8 +427,8 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 14.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xp1, y0, zn1));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xp1, y0, zn1));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xp1, y0_, zn1));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xp1, y0_, zn1));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 15.0f);
@@ -442,8 +442,8 @@ static void cart2del_damp_3d_doit(t_cart2del_damp_3d *x)
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 17.0f);
-  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xn1, y0, zp1));
-  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xn1, y0, zp1));
+  SETFLOAT(at+2, cart2del_damp_3d_calc_elevation(x_180_over_pi, xn1, y0_, zp1));
+  SETFLOAT(at+3, cart2del_damp_3d_calc_azimuth(x_180_over_pi, xn1, y0_, zp1));
   outlet_anything(x->x_obj.ob_outlet, x->x_s_early2, 4, at);
   
   SETFLOAT(at+1, 18.0f);
