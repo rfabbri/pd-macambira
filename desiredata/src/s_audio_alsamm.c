@@ -14,7 +14,7 @@
    (winfried)
 */
 #include <alsa/asoundlib.h>
-#include "m_pd.h"
+#include "desire.h"
 #include "s_stuff.h"
 #include <errno.h>
 #include <stdio.h>
@@ -132,6 +132,11 @@ static int alsamm_stop();
 snd_output_t* alsa_stdout;
 
 static void check_error(int err, const char *why) {if (err < 0) error("%s: %s", why, snd_strerror(err));}
+class AlsaError : Error {
+public:
+  int err;
+  AlsaError (int err) : err(err) {}};
+#define CHK(CODE) do {int err=CODE; if (err<0) {error("%s: %s", #CODE, snd_strerror(err)); throw AlsaError(err);}} while (0)
 
 int alsamm_open_audio(int rate) {
   int err;
@@ -180,36 +185,23 @@ int alsamm_open_audio(int rate) {
   for(i=0;i<alsa_noutdev;i++) {
         /*   post("open audio out %d, of %lx, %d",i,&alsa_device[i],
                    alsa_outdev[i].a_handle); */
-      err = set_hwparams(alsa_outdev[i].a_handle, hw_params, &(alsa_outdev[i].a_channels));
-      if (err<0) {check_error(err,"playback device hwparam_set error:"); continue;}
-      err = set_swparams(alsa_outdev[i].a_handle, sw_params,1);
-      if (err<0) {check_error(err,"playback device swparam_set error:"); continue;}
+    try {
+      CHK(set_hwparams(alsa_outdev[i].a_handle, hw_params, &(alsa_outdev[i].a_channels)));
+      CHK(set_swparams(alsa_outdev[i].a_handle, sw_params,1));
       alsamm_outchannels += alsa_outdev[i].a_channels;
       alsa_outdev[i].a_addr = (char **)malloc(sizeof(char *)*alsa_outdev[i].a_channels);
-      if(alsa_outdev[i].a_addr == NULL) {
-        check_error(errno,"playback device outaddr allocation error:");
-        continue;
-      }
+      if(!alsa_outdev[i].a_addr) {check_error(errno,"playback device outaddr allocation error:"); continue;}
       memset(alsa_outdev[i].a_addr, 0, sizeof(char*) * alsa_outdev[i].a_channels);
-      post("playback device with %d channels and buffer_time %d us opened",
-           alsa_outdev[i].a_channels, alsamm_buffertime);
+      post("playback device with %d channels and buffer_time %d us opened", alsa_outdev[i].a_channels, alsamm_buffertime);
+    } catch (AlsaError) {continue;}
   }
   for(i=0;i<alsa_nindev;i++) {
       if(sys_verbose) post("capture card %d:--------------------",i);
-      if((err = set_hwparams(alsa_indev[i].a_handle, hw_params, &(alsa_indev[i].a_channels))) < 0) {
-          check_error(err,"capture device hwparam_set error:");
-          continue;
-      }
+      CHK(set_hwparams(alsa_indev[i].a_handle, hw_params, &(alsa_indev[i].a_channels)));
       alsamm_inchannels += alsa_indev[i].a_channels;
-      if((err = set_swparams(alsa_indev[i].a_handle, sw_params,0)) < 0){
-        check_error(err,"capture device swparam_set error:");
-        continue;
-      }
+      CHK(set_swparams(alsa_indev[i].a_handle, sw_params,0));
       alsa_indev[i].a_addr = (char **)malloc(sizeof(char*)*alsa_indev[i].a_channels);
-      if(alsa_indev[i].a_addr == NULL){
-        check_error(errno,"capture device inaddr allocation error:");
-        continue;
-      }
+      if(!alsa_indev[i].a_addr) {check_error(errno,"capture device inaddr allocation error:"); continue;}
       memset(alsa_indev[i].a_addr, 0, sizeof(char*) * alsa_indev[i].a_channels);
       if(sys_verbose) post("capture device with %d channels and buffertime %d us opened", alsa_indev[i].a_channels,alsamm_buffertime);
   }
@@ -219,7 +211,7 @@ int alsamm_open_audio(int rate) {
       if ((err = snd_pcm_link(alsa_indev[i].a_handle, alsa_outdev[i].a_handle)) == 0) {
         alsa_indev[i].a_synced = alsa_outdev[i].a_synced = 1;
         if(sys_verbose) post("Linking in and outs of card %d",i);
-      } else check_error(err,"could not link in and outs");
+      } else error("could not link in and outs");
     }
   }
   /* some globals */
@@ -240,29 +232,22 @@ int alsamm_open_audio(int rate) {
 }
 
 void alsamm_close_audio() {
-  int i,err;
+  int i;
   if(debug&&sys_verbose) post("closing devices");
   alsamm_stop();
   for(i=0;i< alsa_noutdev;i++) {
     //if(debug&&sys_verbose) post("unlink audio out %d, of %lx",i,used_outdevice[i]);
     if(alsa_outdev[i].a_synced != 0){
-      if((err = snd_pcm_unlink(alsa_outdev[i].a_handle)) < 0) check_error(err, "snd_pcm_unlink (output)");
+      CHK(snd_pcm_unlink(alsa_outdev[i].a_handle));
       alsa_outdev[i].a_synced = 0;
      }
-    if((err = snd_pcm_close(alsa_outdev[i].a_handle)) <= 0) check_error(err, "snd_pcm_close (output)");
-    if(alsa_outdev[i].a_addr) {
-      free(alsa_outdev[i].a_addr);
-      alsa_outdev[i].a_addr = NULL;
-    }
+    CHK(snd_pcm_close(alsa_outdev[i].a_handle));
+    if(alsa_outdev[i].a_addr) {free(alsa_outdev[i].a_addr); alsa_outdev[i].a_addr=0;}
     alsa_outdev[i].a_channels = 0;
   }
   for(i=0;i< alsa_nindev;i++) {
-    err = snd_pcm_close(alsa_indev[i].a_handle);
-    if(sys_verbose) check_error(err, "snd_pcm_close (input)");
-    if(alsa_indev[i].a_addr){
-      free(alsa_indev[i].a_addr);
-      alsa_indev[i].a_addr = NULL;
-    }
+    CHK(snd_pcm_close(alsa_indev[i].a_handle));
+    if(alsa_indev[i].a_addr) {free(alsa_indev[i].a_addr); alsa_indev[i].a_addr=0;}
     alsa_indev[i].a_channels = 0;
   }
   alsa_nindev = alsa_noutdev = 0;
@@ -274,62 +259,32 @@ void alsamm_close_audio() {
 
 /* ------- PCM INITS --------------------------------- */
 static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs) {
+ try {
 #ifndef ALSAAPI9
   unsigned int rrate;
   int err, dir;
   /* choose all parameters */
-  err = snd_pcm_hw_params_any(handle, params);
-  if (err < 0) {
-    check_error(err,"Broken configuration: no configurations available");
-    return err;
-  }
+  CHK(snd_pcm_hw_params_any(handle, params));
   /* set the nointerleaved read/write format */
-  err = snd_pcm_hw_params_set_access(handle, params,
-                                     SND_PCM_ACCESS_MMAP_NONINTERLEAVED);
-  if (err >= 0) {
-    if(debug&&sys_verbose) post("Access type %s available","SND_PCM_ACCESS_MMAP_NONINTERLEAVED");
-  }
-  else{
-    check_error(err,"No Accesstype SND_PCM_ACCESS_MMAP_NONINTERLEAVED");
-    return err;
-  }
+  CHK(snd_pcm_hw_params_set_access(handle, params, SND_PCM_ACCESS_MMAP_NONINTERLEAVED));
   /* set the sample format */
-  err = snd_pcm_hw_params_set_format(handle, params, ALSAMM_FORMAT);
-  if (err < 0) {
-    check_error(err,"Sample format not available for playback");
-    return err;
-  }
+  CHK(snd_pcm_hw_params_set_format(handle, params, ALSAMM_FORMAT));
   if(debug&&sys_verbose) post("Setting format to %s",snd_pcm_format_name(ALSAMM_FORMAT));
   /* first check samplerate since channels numbers are samplerate dependend (double speed) */
   /* set the stream rate */
   rrate = alsamm_sr;
   if(debug&&sys_verbose) post("Samplerate request: %i Hz",rrate);
   dir=-1;
-  err = snd_pcm_hw_params_set_rate_near(handle, params, &rrate, &dir);
-  if (err < 0) {
-    check_error(err,"Rate not available");
-    return err;
-  }
+  CHK(snd_pcm_hw_params_set_rate_near(handle, params, &rrate, &dir));
   if (rrate != alsamm_sr) {
     post("Warning: rate %iHz doesn't match requested %iHz", rrate,alsamm_sr);
     alsamm_sr = rrate;
-  }
-  else
-    if(sys_verbose)
-      post("Samplerate is set to %iHz",alsamm_sr);
+  } else if (sys_verbose) post("Samplerate is set to %iHz",alsamm_sr);
   /* Info on channels */
   {
     int maxchs,minchs,channels = *chs;
-    if((err = snd_pcm_hw_params_get_channels_max(params,
-    	(unsigned int *)&maxchs)) < 0){
-      check_error(err,"Getting channels_max not available");
-      return err;
-    }
-    if((err = snd_pcm_hw_params_get_channels_min(params,
-    	(unsigned int *)&minchs)) < 0){
-      check_error(err,"Getting channels_min not available");
-      return err;
-    }
+    CHK(snd_pcm_hw_params_get_channels_max(params, (unsigned *)&maxchs));
+    CHK(snd_pcm_hw_params_get_channels_min(params, (unsigned *)&minchs));
     if(debug&&sys_verbose) post("Getting channels:min=%d, max= %d for request=%d",minchs,maxchs,channels);
     if(channels < 0)channels=maxchs;
     if(channels > maxchs)channels = maxchs;
@@ -339,11 +294,7 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
     if(debug&&sys_verbose) post("trying to use channels: %d",channels);
   }
   /* set the count of channels */
-  err = snd_pcm_hw_params_set_channels(handle, params, *chs);
-  if (err < 0) {
-    check_error(err,"Channels count not available");
-    return err;
-  }
+  CHK(snd_pcm_hw_params_set_channels(handle, params, *chs));
   /* testing for channels */
   if((err = snd_pcm_hw_params_get_channels(params,(unsigned int *)chs)) < 0)
     check_error(err,"Get channels not available");
@@ -352,153 +303,83 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
   if(alsamm_buffersize > 0) {
     if(debug&&sys_verbose) post("hw_params: ask for max buffersize of %d samples", (unsigned int) alsamm_buffersize);
     alsamm_buffer_size = alsamm_buffersize;
-    err = snd_pcm_hw_params_set_buffer_size_near(handle, params, (unsigned long *)&alsamm_buffer_size);
-    if (err < 0) {
-      check_error(err,"Unable to set max buffer size");
-      return err;
-    }
+    CHK(snd_pcm_hw_params_set_buffer_size_near(handle, params, (unsigned long *)&alsamm_buffer_size));
   }
   else {
     if(alsamm_buffertime <= 0) /* should never happen, but use 20ms */
       alsamm_buffertime = 20000;
     if(debug&&sys_verbose) post("hw_params: ask for max buffertime of %d ms", (unsigned int) (alsamm_buffertime*0.001) );
-    err = snd_pcm_hw_params_set_buffer_time_near(handle, params, &alsamm_buffertime, &dir);
-    if (err < 0) {
-      check_error(err,"Unable to set max buffer time");
-      return err;
-    }
+    CHK(snd_pcm_hw_params_set_buffer_time_near(handle, params, &alsamm_buffertime, &dir));
   }
-  err = snd_pcm_hw_params_get_buffer_time(params,
-    (unsigned int *)&alsamm_buffertime, &dir);
-  if (err < 0) {
-    check_error(err,"Unable to get buffer time");
-    return err;
-  }
+  CHK(snd_pcm_hw_params_get_buffer_time(params, (unsigned *)&alsamm_buffertime, &dir));
   if(debug&&sys_verbose) post("hw_params: got buffertime to %f ms", float(alsamm_buffertime*0.001));
-  err = snd_pcm_hw_params_get_buffer_size(params, (unsigned long *)&alsamm_buffer_size);
-  if (err < 0) {
-    check_error(err,"Unable to get buffer size");
-    return err;
-  }
+  CHK(snd_pcm_hw_params_get_buffer_size(params, (unsigned long *)&alsamm_buffer_size));
   if(debug&&sys_verbose) post("hw_params: got  buffersize to %d samples",(int) alsamm_buffer_size);
-  err = snd_pcm_hw_params_get_period_size(params, (unsigned long *)&alsamm_period_size, &dir);
-  if (err > 0) {
-    check_error(err,"Unable to get period size");
-    return err;
-  }
+  CHK(snd_pcm_hw_params_get_period_size(params, (unsigned long *)&alsamm_period_size, &dir));
   if(debug&&sys_verbose) post("Got period size of %d", (int) alsamm_period_size);
   {
     unsigned int pmin,pmax;
-    err = snd_pcm_hw_params_get_periods_min(params, &pmin, &dir);
-    if (err > 0) {
-      check_error(err,"Unable to get period size");
-      return err;
-    }
-    err = snd_pcm_hw_params_get_periods_min(params, &pmax, &dir);
-    if (err > 0) {
-      check_error(err,"Unable to get period size");
-      return err;
-    }
+    CHK(snd_pcm_hw_params_get_periods_min(params, &pmin, &dir));
+    CHK(snd_pcm_hw_params_get_periods_min(params, &pmax, &dir));
     /* use maximum of periods */
-    if( alsamm_periods <= 0)
-      alsamm_periods = pmax;
+    if( alsamm_periods <= 0) alsamm_periods = pmax;
     alsamm_periods = (alsamm_periods > pmax)?pmax:alsamm_periods;
     alsamm_periods = (alsamm_periods < pmin)?pmin:alsamm_periods;
-    err = snd_pcm_hw_params_set_periods(handle, params, alsamm_periods, dir);
-    if (err > 0) {
-      check_error(err,"Unable to set periods");
-      return err;
-    }
-    err = snd_pcm_hw_params_get_periods(params, &pmin, &dir);
-    if (err > 0) {
-      check_error(err,"Unable to get periods");
-      return err;
-    }
+    CHK(snd_pcm_hw_params_set_periods(handle, params, alsamm_periods, dir));
+    CHK(snd_pcm_hw_params_get_periods(params, &pmin, &dir));
     if(debug&&sys_verbose) post("Got periods of %d, where periodsmin=%d, periodsmax=%d",alsamm_periods,pmin,pmax);
   }
   /* write the parameters to device */
-  err = snd_pcm_hw_params(handle, params);
-  if (err < 0) {
-    check_error(err,"Unable to set hw params");
-    return err;
-  }
+  CHK(snd_pcm_hw_params(handle, params));
 #endif /* ALSAAPI9 */
   return 0;
+ } catch (AlsaError e) {return e.err;}
 }
 
 static int set_swparams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams, int playback) {
+ try {
 #ifndef ALSAAPI9
-  int err;
   snd_pcm_uframes_t ps,ops;
   snd_pcm_uframes_t bs,obs;
   /* get the current swparams */
-  err = snd_pcm_sw_params_current(handle, swparams);
-  if (err < 0) {
-    check_error(err,"Unable to determine current swparams for playback");
-    return err;
-  }
+  CHK(snd_pcm_sw_params_current(handle, swparams));
   /* AUTOSTART: start the transfer on each write/commit ??? */
   snd_pcm_sw_params_get_start_threshold(swparams, &obs);
-  err = snd_pcm_sw_params_set_start_threshold(handle, swparams, 0U);
-  if (err < 0) {
-    check_error(err,"Unable to set start threshold mode");
-    return err;
-  }
+  CHK(snd_pcm_sw_params_set_start_threshold(handle, swparams, 0U));
   snd_pcm_sw_params_get_start_threshold(swparams, &bs);
   if(debug&&sys_verbose) post("sw_params: got start_thresh_hold= %d (was %d)",(int) bs,(int)obs);
   /* AUTOSTOP:  never stop the machine */
   snd_pcm_sw_params_get_stop_threshold(swparams, &obs);
-  err = snd_pcm_sw_params_set_stop_threshold(handle, swparams, (snd_pcm_uframes_t)-1);
-  if (err < 0) {
-    check_error(err,"Unable to set stop threshold mode");
-    return err;
-  }
+  CHK(snd_pcm_sw_params_set_stop_threshold(handle, swparams, (snd_pcm_uframes_t)-1));
   snd_pcm_sw_params_get_stop_threshold(swparams, &bs);
   if(debug&&sys_verbose) post("sw_params: set stop_thresh_hold= %d (was %d)", (int) bs,(int)obs);
   /* AUTOSILENCE: silence if overrun.... */
   snd_pcm_sw_params_get_silence_threshold (swparams, &ops);
-  if ((err = snd_pcm_sw_params_set_silence_threshold (handle, swparams, alsamm_period_size)) < 0) {
-    check_error (err,"cannot set silence threshold for");
-    return -1;
-  }
+  CHK(snd_pcm_sw_params_set_silence_threshold (handle, swparams, alsamm_period_size));
   snd_pcm_sw_params_get_silence_threshold (swparams, &ps);
   if(debug&&sys_verbose) post("sw_params: set silence_threshold = %d (was %d)", (int) ps,(int)ops);
   snd_pcm_sw_params_get_silence_size (swparams, &ops);
-  if ((err = snd_pcm_sw_params_set_silence_size(handle, swparams, alsamm_period_size)) < 0) {
-    check_error (err,"cannot set silence size for");
-    return -1;
-  }
+  CHK(snd_pcm_sw_params_set_silence_size(handle, swparams, alsamm_period_size));
   snd_pcm_sw_params_get_silence_size (swparams, &ps);
   if(debug&&sys_verbose) post("sw_params: set silence_size = %d (was %d)", (int) ps,(int)ops);
   /* AVAIL: allow the transfer when at least period_size samples can be processed */
   snd_pcm_sw_params_get_avail_min(swparams, &ops);
-  err = snd_pcm_sw_params_set_avail_min(handle, swparams, sys_dacblocksize/2);
-  if (err < 0) {
-    check_error(err,"Unable to set avail min for");
-    return err;
-    }
+  CHK(snd_pcm_sw_params_set_avail_min(handle, swparams, sys_dacblocksize/2));
   snd_pcm_sw_params_get_avail_min(swparams, &ps);
   if(debug&&sys_verbose) post("sw_params: set avail_min= %d (was  %d)", (int) ps, (int) ops);
   /* ALIGN: align all transfers to 1 sample */
   snd_pcm_sw_params_get_xfer_align(swparams, &ops);
-  err = snd_pcm_sw_params_set_xfer_align(handle, swparams, 1);
-  if (err < 0) {
-    check_error(err,"Unable to set transfer align for playback");
-    return err;
-  }
+  CHK(snd_pcm_sw_params_set_xfer_align(handle, swparams, 1));
   snd_pcm_sw_params_get_xfer_align(swparams, &ps);
   if(debug&&sys_verbose) post("sw_params: set xfer_align = %d (was  %d)", (int) ps, (int) ops);
   /* write the parameters to the playback device */
-  err = snd_pcm_sw_params(handle, swparams);
-  if (err < 0) {
-    check_error(err,"Unable to set sw params");
-    return err;
-  }
+  CHK(snd_pcm_sw_params(handle, swparams));
   if(debug&&sys_verbose) post("set sw finished");
 #else
   post("alsa: need version 1.0 or above for mmap operation");
 #endif /* ALSAAPI9 */
   return 0;
+ } catch (AlsaError e) {return e.err;}
 }
 
 /* ALSA Transfer helps */
