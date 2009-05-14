@@ -71,7 +71,8 @@ static void tab_add_scalar_list(t_tab_add_scalar *x, t_symbol *s, int argc, t_at
   int beg_src1, beg_dst;
   int i, n;
   int ok_src1, ok_dst;
-  iemarray_t *vec_src1, *vec_dst, add;
+  iemarray_t *vec_src1, *vec_dst;
+  t_float add;
   
   if((argc >= 4) &&
     IS_A_FLOAT(argv,0) &&

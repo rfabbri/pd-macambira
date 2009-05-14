@@ -54,7 +54,7 @@ static void tab_mul_scalar_float(t_tab_mul_scalar *x, t_floatarg m)
       t_garray *a;
       
       for(i=0; i<n; i++)
-        vec_dst[i] = vec_src1[i]*m;
+        iemarray_setfloat(vec_dst, i, iemarray_getfloat(vec_src1, i)*m);
       outlet_bang(x->x_obj.ob_outlet);
       a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
       garray_redraw(a);
@@ -104,7 +104,7 @@ static void tab_mul_scalar_list(t_tab_mul_scalar *x, t_symbol *s, int argc, t_at
         t_garray *a;
         
         for(i=0; i<n; i++)
-          vec_dst[i] = vec_src1[i]*m;
+          iemarray_setfloat(vec_dst, i, iemarray_getfloat(vec_src1, i)*m);
         outlet_bang(x->x_obj.ob_outlet);
         a = (t_garray *)pd_findbyclass(x->x_sym_dst, garray_class);
         garray_redraw(a);

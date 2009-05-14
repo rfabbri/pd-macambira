@@ -64,7 +64,7 @@ static void tab_rifft_ifftsize(t_tab_rifft *x, t_floatarg f)
   if(i != x->x_fftsize)
   {
     x->x_sin_cos = (TAB_COMPLEX *)resizebytes(x->x_sin_cos, x->x_fftsize*sizeof(TAB_COMPLEX), i*sizeof(TAB_COMPLEX));
-    x->x_beg_mem_dst_im = (t_float *)resizebytes(x->x_beg_mem_dst_im, x->x_fftsize*sizeof(t_float), i*sizeof(t_float));
+    x->x_beg_mem_dst_im = (iemarray_t *)resizebytes(x->x_beg_mem_dst_im, x->x_fftsize*sizeof(iemarray_t), i*sizeof(iemarray_t));
     x->x_fftsize = i;
   }
   tab_rifft_init(x);
@@ -381,7 +381,7 @@ static void *tab_rifft_new(t_symbol *s, int argc, t_atom *argv)
   x->x_sym_src_im = src_im;
   x->x_sym_dst = dst;
   x->x_sin_cos = (TAB_COMPLEX *)getbytes(x->x_fftsize * sizeof(TAB_COMPLEX));
-  x->x_beg_mem_dst_im = (t_float *)getbytes(x->x_fftsize * sizeof(t_float));
+  x->x_beg_mem_dst_im = (iemarray_t *)getbytes(x->x_fftsize * sizeof(iemarray_t));
   tab_rifft_init(x);
   outlet_new(&x->x_obj, &s_bang);
   return(x);

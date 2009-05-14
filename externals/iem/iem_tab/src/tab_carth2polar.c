@@ -96,8 +96,6 @@ static void tab_carth2polar_bang(t_tab_carth2polar *x)
         im = iemarray_getfloat(vec_src_im, i);
         mag = sqrt(re*re + im*im);
         arg = atan2(im, re) * rcp_two_pi;
-        vec_dst_mag[i] = mag;
-        vec_dst_arg[i] = arg;
         iemarray_setfloat(vec_dst_mag, i, mag);
         iemarray_setfloat(vec_dst_arg, i, arg);
       }
