@@ -198,6 +198,19 @@ static int oss_setchannels(int fd, int wantchannels, char *devname) {
 #define O_AUDIOFLAG O_NDELAY
 /* what's the deal with (!O_NDELAY) ? does it make sense to you? */
 
+ssize_t read2(int fd, void *buf, size_t count) {
+    ssize_t r = read(fd,buf,count);
+    if (r<0) error("can't read: %s",strerror(errno));
+    if (r<(ssize_t)count) error("incomplete read");
+    return r;
+}
+ssize_t write2(int fd, const void *buf, size_t count) {
+    ssize_t r = write(fd,buf,count);
+    if (r<0) error("can't write: %s",strerror(errno));
+    if (r<(ssize_t)count) error("incomplete write");
+    return r;
+}
+
 int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
                    int noutdev, int *outdev, int nchout, int *chout, int rate, int bogus)
 { /* IOhannes */
@@ -317,7 +330,7 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
        will not block.  But I wonder why we only have to read from one of the devices and not all of them??? */
     if (linux_nindevs) {
         if (sys_verbose) post("OSS: issuing first ADC 'read'...");
-        read(linux_adcs[0].fd, buf, linux_adcs[0].bytespersamp * linux_adcs[0].nchannels * sys_dacblocksize);
+        read2(linux_adcs[0].fd, buf, linux_adcs[0].bytespersamp * linux_adcs[0].nchannels * sys_dacblocksize);
         if (sys_verbose) post("...done.");
     }
     /* now go and fill all the output buffers. */
@@ -325,7 +338,7 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
 	t_oss_dev &d = linux_dacs[i];
         memset(buf, 0, d.bytespersamp * d.nchannels * sys_dacblocksize);
         for (int j = 0; j < sys_advance_samples/sys_dacblocksize; j++)
-            write(d.fd, buf, d.bytespersamp * d.nchannels * sys_dacblocksize);
+            write2(d.fd, buf, d.bytespersamp * d.nchannels * sys_dacblocksize);
     }
     sys_setalarm(0);
     sys_inchannels = inchannels;
