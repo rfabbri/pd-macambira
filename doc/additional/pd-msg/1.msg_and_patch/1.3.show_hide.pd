@@ -1,4 +1,4 @@
-#N canvas 198 107 383 241 10;
+#N canvas 209 341 383 241 10;
 #N canvas 209 154 262 142 my-subpatch 0;
 #X text 37 40 This is the sub patch;
 #X restore 215 98 pd my-subpatch;

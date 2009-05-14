@@ -1,26 +1,26 @@
-Here some documentation about internal pd messages.
+Here is some documentation that covers internal pd messages.
 (pd-msg_05)
 
-1) Thoses msg are sent directly to pd (pd selector) or to a loaded patch (pd-patch.pd selector).
-  all thoses msg has to be finnished by a ";"
+1) Internal msgs are sent directly to pd (pd selector) or to a loaded patch (pd-patch.pd selector).
+  all these msgs have to end with a semicolon ";"
   you can test them using :
-    in the file menu : message
+    the pd menu under "File : Message..." or with the shortcut <ctrl-m>
     pdsend
     the tclsend2pd in the 4.msg_from_tcl folder.
 
-  Thoses message allows you (examples):
-    To control pd without the gui :
-      Take benefit of the no-gui option
-        open a patch via socket... (tcl, python, sh, c++,...)
-        modify or create new patch
-      Create patch that will create some other
-        Deals with massive polyphonie (100 osc~ or more...)
-        load patchs from an other
-        construct generative patch
-      Create new gui
-    etc...
+  These messages allow you to:
+    control pd without the gui :
+    make use of the no-gui option
+    open a patch via socket... (tcl, python, sh, c++,...)
+    modify or create a new patch
+    create a patch that will create some other patch
+    dynamically create objects to create polyphony (e.g., 100 osc~ or more...)
+    load patches from within another patch
+    construct generative patches
+    create a new gui
+    and much more...
 
-2) Here an list of those msg (* are documented somewhere in this doc):
+2) Here's a list of pd's internal msgs (* are documented somewhere in this doc):
 
   messages to pd:
         init  [gimme]
@@ -36,14 +36,14 @@ Here some documentation about internal pd messages.
         ping
 
  messages to canvas:
-    *    obj  [gimme]
-    *    msg  [gimme]
-    *    floatatom  [gimme]
-    *    symbolatom  [gimme]
-    *    text  [gimme]
-    *    graph  [gimme]
-    *    array
-    *    scalar  [gimme]
+    *   obj  [gimme]
+    *   msg  [gimme]
+    *   floatatom  [gimme]
+    *   symbolatom  [gimme]
+    *   text  [gimme]
+    *   graph  [gimme]
+    *   array
+    *   scalar  [gimme]
         bng  [gimme]
         toggle  [gimme]
         vslider  [gimme]
@@ -51,40 +51,40 @@ Here some documentation about internal pd messages.
         radio  [gimme]
         vumeter  [gimme]
         mycnv  [gimme]
-    *    connect  [float] [float] [float] [float]
-    *    restore  [gimme]
+    *   connect  [float] [float] [float] [float]
+    *   restore  [gimme]
         write  [symbol] [defsymbol]
         read  [symbol] [defsymbol]
         mergefile  [symbol] [defsymbol]
         sort
-    *    click  [float] [float] [float] [float]
-    *    mouseup  [float] [float] [float]
-    *    key  [gimme]
-    *    motion  [float] [float] [float]
-    *    print  [symbol]
-    *    menusave
-    *    menusaveas
-    *    menuclose  [deffloat]
-    *    saveto  [symbol] [symbol]
-    *    cut
-    *    copy
-    *    paste
-    *    duplicate
-    *    selectall
-    *    tidy
-    *    texteditor
-    *    editmode  [deffloat]
+    *   click  [float] [float] [float] [float]
+    *   mouseup  [float] [float] [float]
+    *   key  [gimme]
+    *   motion  [float] [float] [float]
+    *   print  [symbol]
+    *   menusave
+    *   menusaveas
+    *   menuclose  [deffloat]
+    *   saveto  [symbol] [symbol]
+    *   cut
+    *   copy
+    *   paste
+    *   duplicate
+    *   selectall
+    *   tidy
+    *   texteditor
+    *   editmode  [deffloat]
         protectmode  [deffloat]
-    *    print  [symbol]
-    *    pop  [deffloat]
-    *    loadbang
-    *    relocate  [symbol] [symbol]
-    *    menufont
-    *    font  [float] [float] [float]
-    *    find  [gimme]
-    *    findagain
-    *    findparent
-    *    vis  [float]
+    *   print  [symbol]
+    *   pop  [deffloat]
+    *   loadbang
+    *   relocate  [symbol] [symbol]
+    *   menufont
+    *   font  [float] [float] [float]
+    *   find  [gimme]
+    *   findagain
+    *   findparent
+    *   vis  [float]
         properties  [float] [float]
         help  [float] [float]
         arraydialog  [symbol] [float] [float] [float]
@@ -95,55 +95,55 @@ Here some documentation about internal pd messages.
 
 
 
-3) Here the map of the documentation :
+3) Here's an overview of the documentation :
   1.msg_and_patch
-    describe msg that can be sent to patch.
-    contains pd files
+    description of msgs that can be sent to patches.
+    (contains pd files)
 
   2.msg_and_pd
-    describe msg that can be sent to pd.
-    contains pd files  
+    description of msgs that can be sent to pd.
+    (contains pd files)  
 
   3.pdscript 
-    it's sh scrip using pdsend to create patch into pd.
-    pdscript has been done by Guenter Geiger
-    contains it's own readme + files.
+    an example sh scrip using pdsend to create a patch in pd.
+    pdscript was authored by Guenter Geiger
+    (contains it's own readme + files)
 
   4.msg_from_tcl/tk
-    decribe how to use tcl/tk to create, open patch, etc...
+    decription of how to use tcl/tk to create a patch, open a patch, etc...
   
   5.Examples
-    Contain an example of how a "obj x y myOsc~" message can be use
-    to deal with massive polyphonie
+    examples of how an "obj x y myOsc~" message can be used
+    to deal with "massive polyphony"
 
 4) Releases :
 
   release 0.5 : pd-msg_05.tar.gz
-    add some more msg.
+    added some more msg.
     Thanks to Krzysztof Czaja
-    all msg are listed for pd0.34
+    all msgs are listed for pd0.34
 
   release 0.4 : pd-msg_04.tar.gz
-    add many message :
+    added many messages :
       the events messages
       the menu messages
       the cut&paste msg, etc...
     complete the polyphonie example
   
   release 0.3 : pd-msg
-    Rearenge patch & examples in diferents directory.
+    Rearrange patch & examples in different directory.
     add polyphonie examples
     add tcl scripts...
 
   release 0.2 : self-generation
-    add messages to open and close patch.
+    added messages to open and close patch.
 
   release 0.1 : self-construction
     first release
 
 5) To do list :
 
-  some msg are not well explain or not explain at all.
+  some msgs are not well explained or not explained at all.
 
 6) Reference :
   Look @ the end of code of g_canvas.c in the source directory.

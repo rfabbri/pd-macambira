@@ -1,4 +1,4 @@
-#N canvas 22 196 222 608 10;
+#N canvas 394 36 222 544 10;
 #X text 17 121 GUI stuff;
 #X msg 17 145 menusave;
 #X msg 17 171 menusaveas;
@@ -17,9 +17,9 @@
 #X msg 17 327 find test;
 #X obj 17 496 s pd-2.menu.pd;
 #X text 98 196 Warnning !!!;
-#X text 15 14 Thoes msg will do exactly;
 #X text 17 33 what the corresponding;
-#X text 19 52 menu do.;
+#X text 15 14 These messages will do exactly;
+#X text 19 52 menu items do.;
 #X connect 1 0 16 0;
 #X connect 2 0 16 0;
 #X connect 3 0 16 0;

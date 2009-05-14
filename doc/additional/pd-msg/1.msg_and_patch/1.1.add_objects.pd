@@ -1,19 +1,8 @@
-#N canvas 67 167 711 648 10;
-#X text 42 13 To add an object into patch just send a message to the
-patch itself :;
+#N canvas 154 21 711 648 10;
 #X msg 42 49 msg 500 10 bang;
-#X text 42 98 The selector should be "msg" \, "floatatom" \, "obj"
-\, "text" \, "array" \, "symbolatom" \, "scalar" and "graph";
 #X text 224 53 <= Click here first;
-#X text 42 279 For connecting objects use the selector "connect". it
-take 4 arguments : the number of the first object \, the number of
-the outlet \, the number of the second object \, and the number of
-the inlet :;
 #X text 207 232 <= and here;
-#X text 236 204 <= Then click here (and have a look to the properties
-of the object created);
-#X text 193 348 <= click here <= and here;
-#X text 42 437 And now the end of this exemple :;
+#X text 42 456 And now the end of this exemple :;
 #X text 42 143 The next 2 numbers are X & Y position in the canvas.
 Then it's a symbol for the name of the obj \, the content of the msg
 \, etc... and some additionals parameters.;
@@ -32,28 +21,40 @@ Then it's a symbol for the name of the obj \, the content of the msg
 #X text 20 532 8;
 #X text 19 556 9;
 #X text 14 582 10;
+#X text 42 13 To add an object into a patch just send a message to
+the patch itself :;
+#X obj 42 74 s pd-1.1.add_objects.pd;
+#X obj 42 255 s pd-1.1.add_objects.pd;
+#X obj 43 399 s pd-1.1.add_objects.pd;
+#X obj 42 612 s pd-1.1.add_objects.pd;
+#X text 42 98 The selector should be "msg" \, "floatatom" \, "obj"
+\, "text" \, "array" \, "symbolatom" \, "scalar" or "graph";
+#X text 236 204 <= Then click here (and have a look at the properties
+of the object created);
+#X text 42 279 For connecting objects use the selector "connect". It
+takes 4 arguments : the number of the first object \, the number of
+the outlet \, the number of the second object \, and the number of
+the inlet :;
+#X text 193 375 <= and here;
+#X text 193 348 <= click here;
+#X msg 43 349 connect 35 0 37 0;
+#X msg 43 374 connect 36 0 37 1;
+#X msg 42 507 connect 37 0 38 0;
+#X msg 42 557 connect 38 0 39 0;
 #X text 276 530 !!! W A R N N I N G !!! It's very important to respect
-the order the objects are created. If you don't the "connect" selector
-won't work correctly. If you are not sure \, reload this patch and
-try again.;
-#X msg 43 349 connect 34 0 36 0;
-#X msg 43 374 connect 35 0 36 1;
-#X msg 42 507 connect 36 0 37 0;
-#X msg 42 557 connect 37 0 38 0;
-#X obj 42 74 s pd-1.add_objects.pd;
-#X obj 42 255 s pd-1.add_objects.pd;
-#X obj 43 399 s pd-1.add_objects.pd;
-#X obj 42 612 s pd-1.add_objects.pd;
-#X connect 1 0 30 0;
-#X connect 10 0 31 0;
-#X connect 11 0 31 0;
-#X connect 12 0 33 0;
-#X connect 13 0 33 0;
-#X connect 14 0 33 0;
-#X connect 26 0 32 0;
-#X connect 27 0 32 0;
-#X connect 27 0 32 0;
-#X connect 27 0 32 0;
-#X connect 27 0 32 0;
-#X connect 28 0 33 0;
-#X connect 29 0 33 0;
+the order in which objects are created. If you don't the "connect"
+selector won't work correctly. If you get stuck \, reload this patch
+and try again.;
+#X connect 0 0 21 0;
+#X connect 5 0 22 0;
+#X connect 6 0 22 0;
+#X connect 7 0 24 0;
+#X connect 8 0 24 0;
+#X connect 9 0 24 0;
+#X connect 30 0 23 0;
+#X connect 31 0 23 0;
+#X connect 31 0 23 0;
+#X connect 31 0 23 0;
+#X connect 31 0 23 0;
+#X connect 32 0 24 0;
+#X connect 33 0 24 0;

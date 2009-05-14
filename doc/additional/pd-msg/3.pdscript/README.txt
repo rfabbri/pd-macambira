@@ -1,4 +1,4 @@
-This is a short example how to "script" a Pd patch with pd commands.
+This is a short example that shows how to "script" a Pd patch with pd commands.
 You will need to have 'pdsend' installed, which is a command line 
 tool for sending messages to Pd.  There is one included in this
 directory which might work for you.
