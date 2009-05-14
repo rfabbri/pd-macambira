@@ -13,4 +13,4 @@ rsync -av --progress --whole-file --exclude='*inv\**' --cvs-exclude --timeout=60
 sleep 60
 
 REM now get the SVN changes, this might fail a lot, especially on '.svn/entries'
-rsync -av --progress --whole-file --exclude='*inv\**' --timeout=60 rsync://128.238.56.50/distros/pd-extended/ /home/pd/auto-build/pd-extended/
+rsync -av --progress --whole-file --delete-before --exclude='*inv\**' --timeout=60 rsync://128.238.56.50/distros/pd-extended/ /home/pd/auto-build/pd-extended/
