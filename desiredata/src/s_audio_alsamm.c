@@ -137,6 +137,7 @@ public:
   int err;
   AlsaError (int err) : err(err) {}};
 #define CHK(CODE) do {int err=CODE; if (err<0) {error("%s: %s", #CODE, snd_strerror(err)); throw AlsaError(err);}} while (0)
+#define  CH(CODE) do {int err=CODE; if (err<0) {error("%s: %s", #CODE, snd_strerror(err));                      }} while (0)
 
 int alsamm_open_audio(int rate) {
   int err;
@@ -159,13 +160,8 @@ int alsamm_open_audio(int rate) {
   alsamm_inchannels = 0;
   alsamm_outchannels = 0;
   /* opening alsa debug channel */
-  err = snd_output_stdio_attach(&alsa_stdout, stdout, 0);
-  if (err < 0) {
-    check_error(err,"attaching alsa debug Output to stdout failed");
-    /*    return; no so bad ... and never should happe */
-  }
-  /*
-     Weak failure prevention:
+  CH(snd_output_stdio_attach(&alsa_stdout, stdout, 0));
+  /* Weak failure prevention:
      first card found (out then in) is used as a reference for parameter,
      so this  set the globals and other cards hopefully dont change them
   */
@@ -190,7 +186,7 @@ int alsamm_open_audio(int rate) {
       CHK(set_swparams(alsa_outdev[i].a_handle, sw_params,1));
       alsamm_outchannels += alsa_outdev[i].a_channels;
       alsa_outdev[i].a_addr = (char **)malloc(sizeof(char *)*alsa_outdev[i].a_channels);
-      if(!alsa_outdev[i].a_addr) {check_error(errno,"playback device outaddr allocation error:"); continue;}
+      if(!alsa_outdev[i].a_addr) {error("playback device outaddr allocation error:"); continue;}
       memset(alsa_outdev[i].a_addr, 0, sizeof(char*) * alsa_outdev[i].a_channels);
       post("playback device with %d channels and buffer_time %d us opened", alsa_outdev[i].a_channels, alsamm_buffertime);
     } catch (AlsaError) {continue;}
@@ -201,7 +197,7 @@ int alsamm_open_audio(int rate) {
       alsamm_inchannels += alsa_indev[i].a_channels;
       CHK(set_swparams(alsa_indev[i].a_handle, sw_params,0));
       alsa_indev[i].a_addr = (char **)malloc(sizeof(char*)*alsa_indev[i].a_channels);
-      if(!alsa_indev[i].a_addr) {check_error(errno,"capture device inaddr allocation error:"); continue;}
+      if(!alsa_indev[i].a_addr) {error("capture device inaddr allocation error:"); continue;}
       memset(alsa_indev[i].a_addr, 0, sizeof(char*) * alsa_indev[i].a_channels);
       if(sys_verbose) post("capture device with %d channels and buffertime %d us opened", alsa_indev[i].a_channels,alsamm_buffertime);
   }
@@ -296,9 +292,8 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
   /* set the count of channels */
   CHK(snd_pcm_hw_params_set_channels(handle, params, *chs));
   /* testing for channels */
-  if((err = snd_pcm_hw_params_get_channels(params,(unsigned int *)chs)) < 0)
-    check_error(err,"Get channels not available");
-  else if(debug&&sys_verbose) post("When setting channels count and got %d",*chs);
+  CH(snd_pcm_hw_params_get_channels(params,(unsigned int *)chs));
+  if(debug&&sys_verbose) post("When setting channels count, got %d",*chs);
   /* if buffersize is set use this instead buffertime */
   if(alsamm_buffersize > 0) {
     if(debug&&sys_verbose) post("hw_params: ask for max buffersize of %d samples", (unsigned int) alsamm_buffersize);
@@ -393,19 +388,14 @@ static int set_swparams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams, int pl
 static int xrun_recovery(snd_pcm_t *handle, int err) {
   if (debug) alsamm_xruns++; /* count xruns */
   if (err == -EPIPE) {    /* under-run */
-    err = snd_pcm_prepare(handle);
-    if (err < 0) check_error(err,"Can't recovery from underrun, prepare failed.");
-    err = snd_pcm_start(handle);
-    if (err < 0) check_error(err,"Can't start when recover from underrun.");
+    CH(snd_pcm_prepare(handle));
+    CH(snd_pcm_start(handle));
     return 0;
   } else if (err == -ESTRPIPE) {
-    while ((err = snd_pcm_resume(handle)) == -EAGAIN)
-      sleep(1);       /* wait until the suspend flag is released */
+    while ((err = snd_pcm_resume(handle)) == -EAGAIN) sleep(1); /* wait until the suspend flag is released */
     if (err < 0) {
-      err = snd_pcm_prepare(handle);
-      if (err<0) check_error(err,"Can't recovery from suspend, prepare failed.");
-      err = snd_pcm_start(handle);
-      if (err<0) check_error(err,"Can't start when recover from underrun.");
+      CH(snd_pcm_prepare(handle));
+      CH(snd_pcm_start(handle));
     }
     return 0;
   }
@@ -577,8 +567,7 @@ int alsamm_send_dacs() {
   /* here we should check if in and out samples are here.
      but, the point is if out samples available also in sample should,
      so we dont make a precheck of insamples here and let outsample check be the
-     the first of the forst card.
-  */
+     the first of the first card. */
   /* OUTPUT Transfer */
   fpo = sys_soundout;
   for(devno = 0;devno < alsa_noutdev;devno++){
@@ -587,11 +576,8 @@ int alsamm_send_dacs() {
     int ochannels =dev->a_channels;
     /* how much samples available ??? */
     oavail = snd_pcm_avail_update(out);
-    /* only one reason i can think about,
-       the driver stopped and says broken pipe
-       so this should not happen if we have enough stopthreshhold
-       but if try to restart with next commit
-    */
+    /* only one reason i can think about, the driver stopped and says broken pipe
+       so this should not happen if we have enough stopthreshold but if try to restart with next commit */
     if (oavail < 0) {
       if (debug) broken_opipe++;
       err = xrun_recovery(out, -EPIPE);
@@ -653,9 +639,8 @@ int alsamm_send_dacs() {
         /* osc(buf, oframes, (dac_send%1000 < 500)?-100.0:-10.0,440,&(indexes[chn])); */
         for (i = 0, fp2 = fp1 + chn*sys_dacblocksize; i < oframes; i++,fp2++) {
             float s1 = *fp2 * F32MAX;
-            /* better but slower, better never clip ;-)
-               buf[i]= CLIP32(s1); */
-            buf[i]= ((int) s1 & 0xFFFFFF00);
+            /* better but slower, better never clip ;-) buf[i] = CLIP32(s1); */
+            buf[i] = (int) s1 & 0xFFFFFF00;
             *fp2 = 0.0;
         }
       }
@@ -703,9 +688,7 @@ int alsamm_send_dacs() {
       iavail=snd_pcm_avail_update(in);
     }
     /* only transfer full transfersize or nothing */
-    if(iavail < sys_dacblocksize){
-      return SENDDACS_NO;
-    }
+    if(iavail < sys_dacblocksize) return SENDDACS_NO;
     size = sys_dacblocksize;
     fp1 = fpi;
     ioffset = 0;
@@ -752,7 +735,7 @@ int alsamm_send_dacs() {
   if ((timenow = sys_getrealtime()) > (timelast + sleep_time)) {
       if(debug && dac_send < 10 && sys_verbose)
         post("slept %f > %f + %f (=%f)", timenow,timelast,sleep_time,(timelast + sleep_time));
-      return (SENDDACS_SLEPT);
+      return SENDDACS_SLEPT;
   }
   return SENDDACS_YES;
 }
