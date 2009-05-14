@@ -495,8 +495,8 @@ extern "C" void ugen_connect(t_dspcontext *dc, t_object *x1, int outno, t_object
     int sigoutno = obj_sigoutletindex(x1, outno);
     int siginno = obj_siginletindex(x2, inno);
     if (ugen_loud) post("%s -> %s: %d->%d", class_getname(x1->ob_pd), class_getname(x2->ob_pd), outno, inno);
-    for (u1 = dc->ugenlist; u1 && u1->obj != x1; u1 = u1->next);
-    for (u2 = dc->ugenlist; u2 && u2->obj != x2; u2 = u2->next);
+    for (u1 = dc->ugenlist; u1 && u1->obj != x1; u1 = u1->next) {}
+    for (u2 = dc->ugenlist; u2 && u2->obj != x2; u2 = u2->next) {}
     if (!u1 || !u2 || siginno < 0) {
         pd_error(u1->obj, "signal outlet connect to nonsignal inlet (ignored)");
         return;
@@ -532,17 +532,13 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u) {
     t_sigoutconnect *oc;
     t_class *klass = pd_class(u->obj);
     int i, n;
-    /* suppress creating new signals for the outputs of signal
-       inlets and subpatchs; except in the case we're an inlet and "blocking"
-       is set.  We don't yet know if a subcanvas will be "blocking" so there
-       we delay new signal creation, which will be handled by calling
-       signal_setborrowed in the ugen_done_graph routine below. */
-    int nonewsigs = klass==canvas_class || klass==vinlet_class && !dc->reblock;
-    /* when we encounter a subcanvas or a signal outlet, suppress freeing
-       the input signals as they may be "borrowed" for the super or sub
-       patch; same exception as above, but also if we're "switched" we
-       have to do a copy rather than a borrow.  */
-    int nofreesigs = klass==canvas_class || klass==voutlet_class && !(dc->reblock || dc->switched);
+    /* suppress creating new signals for the outputs of signal-inlets and subpatches, except in the case we're an inlet
+       and "blocking" is set.  We don't yet know if a subcanvas will be "blocking" so there we delay new signal creation,
+       which will be handled by calling signal_setborrowed in the ugen_done_graph routine below. When we encounter a
+       subcanvas or a signal outlet, suppress freeing the input signals as they may be "borrowed" for the parent or subpatch;
+       same exception as above, but also if we're "switched" we have to do a copy rather than a borrow. */
+    int nonewsigs  = klass==canvas_class || (klass==vinlet_class &&  ! dc->reblock                 );
+    int nofreesigs = klass==canvas_class || (klass==voutlet_class && !(dc->reblock || dc->switched));
     t_signal **insig, **outsig, **sig, *s1, *s2, *s3;
     t_ugenbox *u2;
     if (ugen_loud) post("doit %s %d %d", class_getname(klass), nofreesigs, nonewsigs);
