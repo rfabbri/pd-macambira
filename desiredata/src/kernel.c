@@ -2273,10 +2273,10 @@ int binbuf_match(t_binbuf *inbuf, t_binbuf *searchbuf) {
         for (size_t nmatched = 0; nmatched < searchbuf->n; nmatched++) {
             t_atom *a1 = &inbuf->v[indexin + nmatched], *a2 = &searchbuf->v[nmatched];
             if (a1->a_type != a2->a_type ||
-                a1->a_type == A_SYMBOL  && a1->a_symbol != a2->a_symbol ||
-                a1->a_type == A_FLOAT   && a1->a_float  != a2->a_float  ||
-                a1->a_type == A_DOLLAR  && a1->a_index  != a2->a_index  ||
-                a1->a_type == A_DOLLSYM && a1->a_symbol != a2->a_symbol) goto nomatch;
+                (a1->a_type == A_SYMBOL  && a1->a_symbol != a2->a_symbol) ||
+                (a1->a_type == A_FLOAT   && a1->a_float  != a2->a_float ) ||
+                (a1->a_type == A_DOLLAR  && a1->a_index  != a2->a_index ) ||
+                (a1->a_type == A_DOLLSYM && a1->a_symbol != a2->a_symbol)) goto nomatch;
         }
         return 1;
     nomatch: ;
