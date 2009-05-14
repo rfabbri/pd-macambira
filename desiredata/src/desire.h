@@ -360,4 +360,10 @@ EXTERN int pd_stackn;
 
 EXTERN int gstack_empty(); /* that's a completely different stack: see pd_pushsym,pd_popsym */
 
+class Error {};
+class VeryUnlikelyError : Error {};
+int throw_if_negative(int n) {if (n<0) throw VeryUnlikelyError(); else return n;}
+#define  asprintf(ARGS...) throw_if_negative( asprintf(ARGS))
+#define vasprintf(ARGS...) throw_if_negative(vasprintf(ARGS))
+
 #endif /* __DESIRE_H */
