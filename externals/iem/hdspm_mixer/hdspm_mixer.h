@@ -1,5 +1,6 @@
 /* Very simple Mixer for RME DSP-MADI and maybe other hammerfall dsp 
    (C) 2003 IEM, Winfried Ritsch  (ritsch at iem.at)
+   (c) 2008 iem, Thomas Musil (musil at iem.at) ... modified to a pd external
    Institute of Electronic Music and Acoustics
    GPL - see Licence.txt
 
@@ -11,6 +12,8 @@
 #define HDSPMM_VERSION "0.6"
 #define HDSPMM_MAX_CARDS 3
 #define HDSPMM_MAX_NAME_LEN 128
+
+#define IS_A_FLOAT(atom,index) ((atom+index)->a_type == A_FLOAT)
 
 
 /* Protos */
