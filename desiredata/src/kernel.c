@@ -35,6 +35,12 @@
 #define a_gpointer a_w.w_gpointer
 #define a_index    a_w.w_index
 
+class Error {};
+class VeryUnlikelyError : Error {};
+
+#define  asprintf(ARGS...) do {if ( asprintf(ARGS)<0) throw VeryUnlikelyError();} while(0)
+#define vasprintf(ARGS...) do {if (vasprintf(ARGS)<0) throw VeryUnlikelyError();} while(0)
+
 using namespace std;
 
 /* T.Grill - bit alignment for signal vectors (must be a multiple of 8!) */
@@ -2350,6 +2356,8 @@ void pd_init() {
 
 #ifndef HAVE_ASPRINTF
 #define HAVE_ASPRINTF
+#undef asprintf
+#undef vasprintf
 int asprintf(char **str, const char *fmt, ...) throw () {
         va_list ap;
         int ret;
