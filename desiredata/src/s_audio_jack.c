@@ -74,7 +74,7 @@ static int cb_process (jack_nframes_t nframes, void *arg) {
 		return 0;
 	}
 	int status = sys_timedlock(timeout);
-	if (status)
+	if (status) {
 		if (status == ETIMEDOUT) {
 			/* we're late ... lets hope that jack doesn't kick us out */
 			error("timeout %d", (timeout));
@@ -84,6 +84,7 @@ static int cb_process (jack_nframes_t nframes, void *arg) {
 			post("sys_timedlock returned %d", status);
 			return 0;
 		}
+	}
 	for (int i = 0; i != dspticks_per_jacktick; ++i) {
 		for (int j=0; j<sys_inchannels; j++) {
 			t_sample *in = (t_sample *)jack_port_get_buffer(input_port[j], nframes);
