@@ -68,10 +68,12 @@ AC_CHECK_MEMBERS([struct dirent.d_type],
         [HAVE_STRUCT_DIRENT_D_TYPE=yes],[HAVE_STRUCT_DIRENT_D_TYPE=no],
 	[#include <dirent.h>])
 
-##-- check for dirent d_type decls
-AC_CHECK_DECLS([DT_REG,DT_DIR,DT_FIFO,DT_SOCK,DT_CHR,DT_BLK,DT_UNKNOWN],
+if test "$HAVE_STRUCT_DIRENT_D_TYPE" = "yes"; then
+  ##-- check for dirent d_type decls
+  AC_CHECK_DECLS([DT_REG,DT_DIR,DT_FIFO,DT_SOCK,DT_CHR,DT_BLK,DT_UNKNOWN],
 	[],[],
 	[#include <dirent.h>])
+fi
 
 
 ## /local: structs

@@ -4078,8 +4078,9 @@ else
 fi
 
 
-##-- check for dirent d_type decls
-{ echo "$as_me:$LINENO: checking whether DT_REG is declared" >&5
+if test "$HAVE_STRUCT_DIRENT_D_TYPE" = "yes"; then
+  ##-- check for dirent d_type decls
+  { echo "$as_me:$LINENO: checking whether DT_REG is declared" >&5
 echo $ECHO_N "checking whether DT_REG is declared... $ECHO_C" >&6; }
 if test "${ac_cv_have_decl_DT_REG+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -4550,6 +4551,7 @@ _ACEOF
 fi
 
 
+fi
 
 
 ## /local: structs
