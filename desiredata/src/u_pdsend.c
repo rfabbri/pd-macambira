@@ -22,7 +22,7 @@ from its standard input to Pd via the netsend/netreceive ("FUDI") protocol. */
 #define SOCKET_ERROR -1
 #endif
 
-void sockerror(char *s);
+void sockerror(const char *s);
 void x_closesocket(int fd);
 #define BUFSIZE 4096
 
@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     int sockfd, portno, protocol;
     struct sockaddr_in server;
     struct hostent *hp;
-    char *hostname;
+    const char *hostname;
 #ifdef MSW
     short version = MAKEWORD(2, 0);
     WSADATA nobby;
@@ -93,7 +93,7 @@ usage:
     return 1;
 }
 
-void sockerror(char *s) {
+void sockerror(const char *s) {
 #ifdef MSW
     int err = WSAGetLastError();
     if (err == 10054) return;
