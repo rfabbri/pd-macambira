@@ -25,8 +25,6 @@ AC_SUBST(WATCHDOG)
 AC_SUBST(WLIB)
 AC_SUBST(EXE)
 AC_SUBST(WSTRIP)
-AC_SUBST(PDSEND)
-AC_SUBST(PDRECEIVE)
 AC_SUBST(STRIP)
 
 AC_CONFIG_HEADERS([config.h:config.h.in])
@@ -87,8 +85,6 @@ if test `uname -s` = Linux; then
     WATCHDOG=pd-watchdog
     EXE=""
     WSTRIP=""
-    PDRECEIVE=pdreceive
-    PDSEND=pdsend
 fi
 
 if test `uname -s` = Darwin; then
@@ -117,8 +113,6 @@ if test `uname -s` = Darwin; then
 	WATCHDOG=pd-watchdog
 	EXE=""
 	WSTRIP=""
-	PDRECEIVE=pdreceive
-	PDSEND=pdsend
 fi
 
 if test `uname -s | cut -f1 -d_` = CYGWIN; then
@@ -131,8 +125,6 @@ if test `uname -s | cut -f1 -d_` = CYGWIN; then
     LDSOFLAGS="-shared"
     EXE=.exe
     WSTRIP=""
-    PDRECEIVE=pdreceive
-    PDSEND=pdsend
 fi
 
 if test `uname -s | cut -f1 -d_` = MINGW32; then
@@ -150,8 +142,6 @@ if test `uname -s | cut -f1 -d_` = MINGW32; then
     STRIP="strip --strip-unneeded -R .note -R .comment"
     EXPORT="-Wl, --export-all-symbols -Wl, --out-implib=pd.a"
     WLIB=$WLIB"$LDFLAGS $EXPORT; $STRIP libpd.dll"
-    PDRECEIVE="$LDFLAGS; $STRIP pdreceive.exe"
-    PDSEND="$LDFLAGS; $STRIP pdsend.exe"
     EXE=.exe
     WATCHDOG=pd.com
     WSTRIP=$STRIP $DESTDIR$bindir/pd.exe

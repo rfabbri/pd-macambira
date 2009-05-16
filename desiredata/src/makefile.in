@@ -31,8 +31,6 @@ STRIP = @STRIP@
 WATCHDOG = @WATCHDOG@
 WLIB = @WLIB@
 EXE = @EXE@
-PDSEND = @PDSEND@
-PDRECEIVE = @PDRECEIVE@
 # variables to build on mingw <colet.patrice@free.fr>
 #-----------------------------------------------------------
 
@@ -59,8 +57,8 @@ $(SRC:.c=.o): %.o: %.c config.log
 $(SO): $(OBJ) config.log
 	$(CXX) $(LDSOFLAGS) $(LDFLAGS) $(DBG_CFLAGS) -I../src -o $(SO) $(OBJ) $(WLIB)
 
-pd: $(OBJ) config.log $(SO) main.c
-	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) $$PWD/$(SO) main.c -o pd
+pd$(EXE): $(OBJ) config.log $(SO) main.c
+	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) $$PWD/$(SO) main.c -o pd$(EXE)
 
 pd-watchdog: s_watchdog.c
 	$(CC) $(CFLAGS) $(STRIPFLAG) -o pd-watchdog s_watchdog.c
@@ -70,13 +68,15 @@ pd.com: main.o
 		$(LIBS) -L../src -lpd
 	strip --strip-unneeded -R .note -R .comment pd.com
 
-pdsend: u_pdsend.c
-	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdsend u_pdsend.c
-	$(STRIP) pdsend
+# i should sort out the LDFLAGS thing so that pd,pdsend,pdreceive don't get linked to all libs that libpd.so is linked to.
 
-pdreceive: u_pdreceive.c
-	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdreceive u_pdreceive.c
-	$(STRIP) pdreceive
+pdsend$(EXE): u_pdsend.c
+	$(CC) $(CFLAGS) $(STRIPFLAG) $(LDFLAGS) -o pdsend$(EXE) u_pdsend.c
+	$(STRIP) pdsend$(EXE)
+
+pdreceive$(EXE): u_pdreceive.c
+	$(CC) $(CFLAGS) $(STRIPFLAG) $(LDFLAGS) -o pdreceive$(EXE) u_pdreceive.c
+	$(STRIP) pdreceive$(EXE)
 
 externs::
 	cd ../extra; for ext in bonk~ choice expr~ fiddle~ loop~ lrshift~ pique sigmund~; do \
