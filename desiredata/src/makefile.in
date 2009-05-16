@@ -64,18 +64,17 @@ pd-watchdog: s_watchdog.c
 	$(CC) $(CFLAGS) $(STRIPFLAG) -o pd-watchdog s_watchdog.c
 
 pd.com: main.o
-	$(CC) $(LDFLAGS) $(DBG_CFLAGS) $(CFLAGS) -o pd.com main.o \
-		$(LIBS) -L../src -lpd
+	$(CC) $(LDFLAGS) $(DBG_CFLAGS) $(CFLAGS) -o pd.com main.o $(LIBS) -L../src -lpd
 	strip --strip-unneeded -R .note -R .comment pd.com
 
 # i should sort out the LDFLAGS thing so that pd,pdsend,pdreceive don't get linked to all libs that libpd.so is linked to.
 
-pdsend$(EXE): u_pdsend.c
-	$(CC) $(CFLAGS) $(STRIPFLAG) $(LDFLAGS) -o pdsend$(EXE) u_pdsend.c
+pdsend$(EXE): u_pdsend.c config.log
+	$(CXX) $(CFLAGS) $(STRIPFLAG) $(LDFLAGS) -o pdsend$(EXE) u_pdsend.c
 	$(STRIP) pdsend$(EXE)
 
-pdreceive$(EXE): u_pdreceive.c
-	$(CC) $(CFLAGS) $(STRIPFLAG) $(LDFLAGS) -o pdreceive$(EXE) u_pdreceive.c
+pdreceive$(EXE): u_pdreceive.c config.log
+	$(CXX) $(CFLAGS) $(STRIPFLAG) $(LDFLAGS) -o pdreceive$(EXE) u_pdreceive.c
 	$(STRIP) pdreceive$(EXE)
 
 externs::
