@@ -166,7 +166,7 @@ forgetit:
 typedef int (*t_loader)(t_canvas *canvas, char *classname);
 
 /* linked list of loaders */
-typedef struct t_loader_queue {
+struct t_loader_queue {
     t_loader loader;
     t_loader_queue *next;
 };
