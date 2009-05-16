@@ -26,8 +26,7 @@ void sockerror(char *s);
 void x_closesocket(int fd);
 #define BUFSIZE 4096
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     int sockfd, portno, protocol;
     struct sockaddr_in server;
     struct hostent *hp;
@@ -36,100 +35,76 @@ int main(int argc, char **argv)
     short version = MAKEWORD(2, 0);
     WSADATA nobby;
 #endif
-    if (argc < 2 || sscanf(argv[1], "%d", &portno) < 1 || portno <= 0)
-        goto usage;
-    if (argc >= 3)
-        hostname = argv[2];
-    else hostname = "127.0.0.1";
-    if (argc >= 4)
-    {
-        if (!strcmp(argv[3], "tcp"))
-            protocol = SOCK_STREAM;
-        else if (!strcmp(argv[3], "udp"))
-            protocol = SOCK_DGRAM;
+    if (argc<2 || sscanf(argv[1], "%d", &portno)<1 || portno<=0) goto usage;
+    if (argc>=3) hostname = argv[2]; else hostname = "127.0.0.1";
+    if (argc >= 4) {
+        if      (!strcmp(argv[3], "tcp")) protocol = SOCK_STREAM;
+        else if (!strcmp(argv[3], "udp")) protocol = SOCK_DGRAM;
         else goto usage;
-    }
-    else protocol = SOCK_STREAM;
+    } else protocol = SOCK_STREAM;
 #ifdef MSW
     if (WSAStartup(version, &nobby)) sockerror("WSAstartup");
 #endif
 
     sockfd = socket(AF_INET, protocol, 0);
-    if (sockfd < 0)
-    {
+    if (sockfd < 0) {
         sockerror("socket()");
-        exit(1);
+        return 1;
     }
-        /* connect socket using hostname provided in command line */
+    /* connect socket using hostname provided in command line */
     server.sin_family = AF_INET;
     hp = gethostbyname(hostname);
-    if (hp == 0)
-    {
+    if (hp == 0) {
         fprintf(stderr, "%s: unknown host\n", hostname);
         x_closesocket(sockfd);
-        exit(1);
+        return 1;
     }
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
 
     /* assign client port number */
     server.sin_port = htons((unsigned short)portno);
 
-    /* try to connect.  */
-    if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) < 0)
-    {
+    /* try to connect. */
+    if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) < 0) {
         sockerror("connect");
         x_closesocket(sockfd);
-        exit(1);
+        return 1;
     }
 
     /* now loop reading stdin and sending  it to socket */
-    while (1)
-    {
+    while (1) {
         char buf[BUFSIZE], *bp;
-	unsigned int  nsent, nsend;
-        if (!fgets(buf, BUFSIZE, stdin))
-            break;
+	unsigned int nsent, nsend;
+        if (!fgets(buf, BUFSIZE, stdin)) break;
         nsend = strlen(buf);
-        for (bp = buf, nsent = 0; nsent < nsend;)
-        {
+        for (bp = buf, nsent = 0; nsent < nsend;) {
             int res = send(sockfd, buf, nsend-nsent, 0);
-            if (res < 0)
-            {
-                sockerror("send");
-                goto done;
-            }
+            if (res<0) {sockerror("send"); goto done;}
             nsent += res;
             bp += res;
         }
     }
 done:
-    if (ferror(stdin))
-        perror("stdin");
-    exit (0);
+    if (ferror(stdin)) perror("stdin");
+    return 0;
 usage:
     fprintf(stderr, "usage: pdsend <portnumber> [host] [udp|tcp]\n");
     fprintf(stderr, "(default is localhost and tcp)\n");
-    exit(1);
+    return 1;
 }
 
-void sockerror(char *s)
-{
+void sockerror(char *s) {
 #ifdef MSW
     int err = WSAGetLastError();
     if (err == 10054) return;
-    else if (err == 10044)
-    {
-        fprintf(stderr,
-            "Warning: you might not have TCP/IP \"networking\" turned on\n");
-    }
+    else if (err == 10044) fprintf(stderr,"Warning: you might not have TCP/IP \"networking\" turned on\n");
 #else
     int err = errno;
 #endif
     fprintf(stderr, "%s: %s (%d)\n", s, strerror(err), err);
 }
 
-void x_closesocket(int fd)
-{
+void x_closesocket(int fd) {
 #ifdef MSW
     closesocket(fd);
 #else
