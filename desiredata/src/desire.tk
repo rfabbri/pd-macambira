@@ -1,5 +1,5 @@
 #!/usr/bin/env wish
-set cvsid {$Id: desire.tk,v 1.1.2.600.2.419 2007-10-27 00:22:27 matju Exp $}
+set cvsid {$Id$}
 #-----------------------------------------------------------------------------------#
 # 
 # DesireData
@@ -1970,6 +1970,7 @@ def Canvas bind {eventtype selector args} {
 	}
 }
 
+# apparently, this method is useless
 def Canvas osx_scroll {axis diff} {$self scroll $axis [expr -abs($diff)/$diff]}
 
 def Canvas new_binds {} {
