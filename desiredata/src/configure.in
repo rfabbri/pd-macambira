@@ -27,13 +27,7 @@ AC_SUBST(EXE)
 AC_SUBST(WSTRIP)
 AC_SUBST(PDSEND)
 AC_SUBST(PDRECEIVE)
-
-AC_SUBST(WATCHDOG)
-AC_SUBST(WLIB)
-AC_SUBST(WEXE)
-AC_SUBST(EXE)
-AC_SUBST(PDSEND)
-AC_SUBST(PDRECEIVE)
+AC_SUBST(STRIP)
 
 AC_CONFIG_HEADERS([config.h:config.h.in])
 
@@ -78,6 +72,9 @@ AC_CHECK_FUNCS(vasprintf)
 AUDIOSRC=""
 MIDISRC="s_midi_none.c"
 
+WLIB=""
+STRIP="meuhhhhh"
+
 if test `uname -s` = Linux; then
     LDFLAGS="-Wl,-export-dynamic "
     EXT=pd_linux
@@ -89,7 +86,6 @@ if test `uname -s` = Linux; then
     LDSOFLAGS="-shared"
     WATCHDOG=pd-watchdog
     EXE=""
-    WLIB=""
     WSTRIP=""
     PDRECEIVE=pdreceive
     PDSEND=pdsend
@@ -120,7 +116,6 @@ if test `uname -s` = Darwin; then
 #    fi
 	WATCHDOG=pd-watchdog
 	EXE=""
-	WLIB=""
 	WSTRIP=""
 	PDRECEIVE=pdreceive
 	PDSEND=pdsend
@@ -134,11 +129,10 @@ if test `uname -s | cut -f1 -d_` = CYGWIN; then
     MORECFLAGS="-fno-strict-aliasing"
     STRIPFLAG=-s
     LDSOFLAGS="-shared"
-	WLIB=""
-	EXE=.exe
-	WSTRIP=""
-	PDRECEIVE=pdreceive
-	PDSEND=pdsend
+    EXE=.exe
+    WSTRIP=""
+    PDRECEIVE=pdreceive
+    PDSEND=pdsend
 fi
 
 if test `uname -s | cut -f1 -d_` = MINGW32; then
@@ -146,23 +140,21 @@ if test `uname -s | cut -f1 -d_` = MINGW32; then
     EXT=dll
     LIBSUFFIX=.dll
     CPPFLAGS="-DMSW \
-#	-DUSEAPI_MMIO \
-#	-DUSE_PORTAUDIO \
     -DPD_INTERNAL -DPD "
     MORECFLAGS="-mms-bitfields"
     STRIPFLAG=-s
     LDSOFLAGS="-shared"
-#	AUDIOSRC="s_audio_mmio.c"
-	MIDISRC="s_midi_mmio.c"
+#   AUDIOSRC="s_audio_mmio.c"
+    MIDISRC="s_midi_mmio.c"
 
-	STRIP="strip --strip-unneeded -R .note -R .comment"
-	EXPORT="-Wl, --export-all-symbols -Wl, --out-implib=pd.a"
-	WLIB=$WLIB"$LDFLAGS $EXPORT; $STRIP libpd.dll"
-	PDRECEIVE="$LDFLAGS; $STRIP pdreceive.exe"
-	PDSEND="$LDFLAGS; $STRIP pdsend.exe"
-	EXE=.exe
-	WATCHDOG=pd.com
-	WSTRIP=$STRIP $DESTDIR$bindir/pd.exe
+    STRIP="strip --strip-unneeded -R .note -R .comment"
+    EXPORT="-Wl, --export-all-symbols -Wl, --out-implib=pd.a"
+    WLIB=$WLIB"$LDFLAGS $EXPORT; $STRIP libpd.dll"
+    PDRECEIVE="$LDFLAGS; $STRIP pdreceive.exe"
+    PDSEND="$LDFLAGS; $STRIP pdsend.exe"
+    EXE=.exe
+    WATCHDOG=pd.com
+    WSTRIP=$STRIP $DESTDIR$bindir/pd.exe
 fi
 
 if test `uname -m` = x86_64; then

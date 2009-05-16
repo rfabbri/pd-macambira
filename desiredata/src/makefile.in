@@ -25,11 +25,11 @@ CFLAGS = $(CPPFLAGS) @CFLAGS@ $(MORECFLAGS)
 CFLAGS += -Wall -Wextra -Wno-unused-parameter -I.
 CFLAGS += -DINSTALL_PREFIX=\"$(prefix)\"
 
+STRIP = @STRIP@
 
 # --------------------- win32 ---------------------------
 WATCHDOG = @WATCHDOG@
 WLIB = @WLIB@
-WEXE = @WEXE@ 
 EXE = @EXE@
 PDSEND = @PDSEND@
 PDRECEIVE = @PDRECEIVE@
@@ -68,19 +68,21 @@ pd-watchdog: s_watchdog.c
 pd.com: main.o
 	$(CC) $(LDFLAGS) $(DBG_CFLAGS) $(CFLAGS) -o pd.com main.o \
 		$(LIBS) -L../src -lpd
-		strip --strip-unneeded -R .note -R .comment pd.com
+	strip --strip-unneeded -R .note -R .comment pd.com
 
 pdsend: u_pdsend.c
-	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdsend u_pdsend.c $(PDSEND)
+	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdsend u_pdsend.c
+	$(STRIP) pdsend
 
 pdreceive: u_pdreceive.c
-	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdreceive u_pdreceive.c $(PDRECEIVE)
+	$(CC) $(CFLAGS) $(STRIPFLAG) -o pdreceive u_pdreceive.c
+	$(STRIP) pdreceive
 
 externs::
 	cd ../extra; for ext in bonk~ choice expr~ fiddle~ loop~ lrshift~ pique sigmund~; do \
 		cd $$ext; make @EXTERNTARGET@ || break; cd ..; done
 
-install::  all
+install:: all
 	install -d $(DESTDIR)$(bindir)
 	install -d $(DESTDIR)$(libpdbindir)
 	for file in defaults.ddrc pkgIndex.tcl poe.tcl bgerror.tcl; do \
