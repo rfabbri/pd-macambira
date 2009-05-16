@@ -1,5 +1,5 @@
 #!/usr/bin/env wish
-set cvsid {$Id$}
+set svnid {$Id$}
 #-----------------------------------------------------------------------------------#
 # 
 # DesireData
@@ -936,11 +936,13 @@ def Client init_controls {} {
     . configure -menu .mbar
     wm title . "DesireData"
     catch {wm iconphoto . icon_pd}
-    #regexp {\d\d\d\d/\d\d/\d\d} $::cvsid version
-    #regsub -all "/" $version "." version
-    set version "svn"
+    regexp {\d\d\d\d-\d\d-\d\d} $::svnid date
+    regsub -all "/" $date "." date
+    regexp {desire.tk (\d+)} $::svnid blah revision
+    set version "svn#$revision ($date)"
     set ::pd_version_client $version
-    post "DesireData client version $version with Tcl %s and Tk %s" $::tcl_patchLevel $::tk_patchLevel
+    post "DesireData client version $version"
+    post "Using Tcl %s and Tk %s" $::tcl_patchLevel $::tk_patchLevel
 }
 
 proc pdtk_pd_dsp {value} {
