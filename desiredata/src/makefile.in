@@ -65,13 +65,14 @@ pd.com: main.o
 	strip --strip-unneeded -R .note -R .comment pd.com
 
 # i should sort out the LDFLAGS thing so that pd,pdsend,pdreceive don't get linked to all libs that libpd.so is linked to.
+# note that MinGW really wants LDFLAGS at the end of the line, not the middle, according to patco.
 
 pdsend$(EXE): u_pdsend.c config.log
-	$(CXX) $(CFLAGS) $(STRIPFLAG) $(LDFLAGS) -o pdsend$(EXE) u_pdsend.c
+	$(CXX) $(CFLAGS) $(STRIPFLAG) -o pdsend$(EXE) u_pdsend.c $(LDFLAGS)
 	$(STRIP) pdsend$(EXE)
 
 pdreceive$(EXE): u_pdreceive.c config.log
-	$(CXX) $(CFLAGS) $(STRIPFLAG) $(LDFLAGS) -o pdreceive$(EXE) u_pdreceive.c
+	$(CXX) $(CFLAGS) $(STRIPFLAG) -o pdreceive$(EXE) u_pdreceive.c $(LDFLAGS)
 	$(STRIP) pdreceive$(EXE)
 
 externs::
