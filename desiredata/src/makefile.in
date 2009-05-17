@@ -35,8 +35,8 @@ EXE = @EXE@
 #-----------------------------------------------------------
 
 SRCXX = desire.c kernel.c builtins.c builtins_dsp.c s_path.c s_inter.c s_main.c \
-	m_sched.c s_loader.c d_soundfile.c d_ugen.c s_audio.c s_midi.c @AUDIOSRC@ @MIDISRC@
-SRC = m_fifo.c m_simd.c d_mayer_fft.c d_fftroutine.c
+	m_sched.c s_loader.c d_soundfile.c d_ugen.c s_audio.c s_midi.c \
+	m_fifo.c m_simd.c d_mayer_fft.c d_fftroutine.c @AUDIOSRC@ @MIDISRC@
 OBJ = $(SRCXX:.c=.o) $(SRC:.c=.o)
 SO = libpd$(LIBSUFFIX)
 
@@ -50,9 +50,6 @@ bin:: pd$(EXE) $(WATCHDOG) pdsend pdreceive
 
 $(SRCXX:.c=.o): %.o: %.c config.log
 	$(CXX) $(CFLAGS) -xc++ -c -o $*.o $*.c
-
-$(SRC:.c=.o): %.o: %.c config.log
-	$(CXX) $(CFLAGS) -Wno-parentheses -Wno-switch -c -o $*.o $*.c
 
 $(SO): $(OBJ) config.log
 	$(CXX) $(LDSOFLAGS) $(LDFLAGS) $(DBG_CFLAGS) -I../src -o $(SO) $(OBJ) $(WLIB)
