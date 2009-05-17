@@ -228,13 +228,13 @@ REAL c1,s1,s2,c2,s3,c3,s4,c4;
  for (k1=1,k2=0;k1<n;k1++)
     {
      REAL aa;
-     for (k=n>>1; (!((k2^=k)&k)); k>>=1);
+     for (k=n>>1; (!((k2^=k)&k)); k>>=1) {}
      if (k1>k2)
         {
              aa=fz[k1];fz[k1]=fz[k2];fz[k2]=aa;
         }
     }
- for ( k=0 ; (1<<k)<n ; k++ );
+ for ( k=0 ; (1<<k)<n ; k++ ) {}
  k  &= 1;
  if (k==0)
     {

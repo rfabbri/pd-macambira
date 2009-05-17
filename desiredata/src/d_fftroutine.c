@@ -308,7 +308,7 @@ void build_fft_network(FFT_NET *fft_net, int n, int window_type)
          /* network definition */
          fft_net->n   = n;
          fft_net->bps = bps = n/2;
-         for (i = 0, j = n; j > 1; j >>= 1, i++);
+         for (i = 0, j = n; j > 1; j >>= 1, i++) {}
          fft_net->stages = stages = i;
          fft_net->direction = FORWARD;
          fft_net->window_type = window_type;
