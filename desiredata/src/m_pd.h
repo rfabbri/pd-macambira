@@ -114,7 +114,7 @@ extern "C" {
 #pragma warning( disable : 4101 )  /* unused automatic variables */
 #endif /* _MSC_VER */
 
-    /* the external storage class is "extern" in GCC; in MS-C it's ugly. */
+/* the external storage class is "extern" on Linux and OSX; on Win32 it's ugly like this: */
 #if defined(MSW) && !defined (__GNUC__)
 #ifdef PD_INTERNAL
 #define EXTERN __declspec(dllexport) extern
@@ -602,7 +602,7 @@ EXTERN void class_setdrawcommand(t_class *c);
 EXTERN int class_isdrawcommand(t_class *c);
 EXTERN void class_domainsignalin(t_class *c, int onset);
 #define CLASS_MAINSIGNALIN(c, type, field) \
-    class_domainsignalin(c, (char *)(&((type *)0)->field) - (char *)0)
+    class_domainsignalin(c, (char *)(&((type *)0xdead0000)->field) - (char *)0xdead0000)
 
 /* in "class" observer: observable calls this to notify of a change */
 typedef void (*t_notice)(     t_gobj *x, t_gobj *origin, int argc, t_atom *argv);
