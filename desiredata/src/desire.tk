@@ -8304,7 +8304,10 @@ def ClientPrefsDialog get_val {} {
 			}
 			toggle { set look($class:$name) $@$name}
 			integer {set look($class:$name) $@$name}
-			choice|language {set look($class:$name) $@$name}
+			choice|language {
+			  if {$@$name == "autolanguage"} {set l auto} {set l $@$name}
+			  set look($class:$name) $l
+			}
 			#font {set look(View:font) $@str}
 		}
 	}
