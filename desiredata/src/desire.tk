@@ -749,13 +749,6 @@ for {set i 0} {$i < $argc} {incr i} {
 
 #set cmdline(server) \"$cmdline(server)\"
 set encoding ""
-set langoptions {
-	english francais deutsch catala espanol portugues italiano bokmal
-	euskara polski dansk chinese nihongo brasileiro turkce nederlands
-	russkij
-
-}
-#lappend langoptions {chinese}
 #lappend langoptions {esperanto}
 set langfile locale/[switch -regexp -- $language {
   ^(en|english|C)$    {list english}
@@ -8252,7 +8245,8 @@ section Client others
     toggle View tooltip
     toggle Wire wirearrow
     integer Client console
-    choice View language
+    language View language
+    language View language2
     integer Canvas pointer_sense
 }
 
@@ -8375,9 +8369,9 @@ def ClientPrefsDialog init {} {
 				set which_section .$subself.main.$subsection
 				set which_self $subself
 			}
-			choice {
-				set @$name $look(View:language)
-				$self add $which_section [list $name $type -choices $::langoptions]
+			language {
+				set @$name $look(View:$name)
+				$self add $which_section [list $name choice -choices $::langoptions]
 			}
 			color {
 				set str [string tolower $class$name]
