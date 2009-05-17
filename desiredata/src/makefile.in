@@ -61,7 +61,7 @@ pd$(EXE): $(OBJ) config.log $(SO) main.c
 	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) $$PWD/$(SO) main.c -o pd$(EXE)
 
 pd-watchdog: s_watchdog.c
-	$(CC) $(CFLAGS) $(STRIPFLAG) -o pd-watchdog s_watchdog.c
+	$(CXX) $(CFLAGS) $(STRIPFLAG) -o pd-watchdog s_watchdog.c
 
 pd.com: main.o
 	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) $(CFLAGS) -o pd.com main.o $(LIBS) -L../src -lpd
