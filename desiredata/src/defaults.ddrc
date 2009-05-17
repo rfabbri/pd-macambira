@@ -3,7 +3,9 @@ look {
     bgedit #ffffff
   }
   View {
-    language english
+    language auto
+    language2 francais
+    language_dual 0
   }
   Client {
     console 666
