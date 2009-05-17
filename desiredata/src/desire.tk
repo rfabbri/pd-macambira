@@ -750,35 +750,15 @@ for {set i 0} {$i < $argc} {incr i} {
 
 #set cmdline(server) \"$cmdline(server)\"
 set encoding ""
-#lappend langoptions {esperanto}
-set langfile locale/[switch -regexp -- $language {
-  ^(en|english|C)$    {list english}
-  ^(fr|francais)$     {list francais}
-  ^(de|deutsch)$      {list deutsch}
-  ^(ca|catala)$       {list catala}
-  ^(es|espanol)$      {list espanol}
-  ^(pt|portugues)$    {list portugues}
-  ^(it|italiano)$     {list italiano}
-  ^(nb|norsk|bokmal)$ {list bokmal}
-  ^(ch|chinese)$      {set encoding utf-8; list chinese}
-  ^(eu|euskara)$      {list euskara}
-  ^(eo|esperanto)$    {set encoding utf-8; list esperanto}
-  ^(pl|polski)$       {set encoding utf-8; list polski}
-  ^(dk|dansk)$        {list dansk}
-  ^(ja|japanese|nihongo)$ {list nihongo}
-  ^(br|brasiliano|brasileiro)$ {list brasileiro}
-  ^(tr|turkce)$       {set encoding utf-8; list turkce}
-  ^(nl|nederlands)$   {list nederlands}
-  ^(ru|russkij)$      {set encoding utf-8; list russkij}
-  default {error "huh??? unknown language (locale)"}
-}].tcl
-
+if {$language == "C"} {set language en}
 proc localedir {x} {file join [file dirname [file dirname $::argh0]] lib/pd/bin/$x}
+if {[regexp {desire\.tk$} $argh0]} {source locale/index.tcl} {source [localedir locale/index.tcl]}
+set langentry [figure_out_language $language]
+set encoding [lindex $langentry 0]
+set langfile locale/[lindex $langentry 1].tcl
 if {[regexp {desire\.tk$} $argh0]} {
-	source locale/index.tcl
 	if {$encoding != ""} {source -encoding $encoding $langfile} else {source $langfile}
 } else {
-	source [localedir locale/index.tcl]
 	if {$encoding != ""} {source -encoding $encoding [localedir $langfile]} else {source [localedir $langfile]}
 }
 
@@ -8300,7 +8280,7 @@ def ClientPrefsDialog get_val {} {
 	global ddrc_options look key accels
 	set check_key {}
 	foreach {type class name} $ddrc_options {
-		switch $type {
+		switch -regexp -- $type {
 			color {
 				set str [string tolower $class$name]
 				set look($class:$name) $@$str
@@ -8324,7 +8304,7 @@ def ClientPrefsDialog get_val {} {
 			}
 			toggle { set look($class:$name) $@$name}
 			integer {set look($class:$name) $@$name}
-			choice  {set look($class:$name) $@$name}
+			choice|language {set look($class:$name) $@$name}
 			#font {set look(View:font) $@str}
 		}
 	}
@@ -8372,7 +8352,8 @@ def ClientPrefsDialog init {} {
 			}
 			language {
 				set @$name $look(View:$name)
-				$self add $which_section [list $name choice -choices $::langoptions]
+				say autolanguage "[say auto] ([say [lindex [figure_out_language [guess_lang]] 1]])"
+				$self add $which_section [list $name choice -choices [concat autolanguage $::langoptions]]
 			}
 			color {
 				set str [string tolower $class$name]
