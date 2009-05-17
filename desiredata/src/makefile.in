@@ -52,7 +52,7 @@ $(SRCXX:.c=.o): %.o: %.c config.log
 	$(CXX) $(CFLAGS) -xc++ -c -o $*.o $*.c
 
 $(SRC:.c=.o): %.o: %.c config.log
-	$(CXX) $(CFLAGS) -Wno-parentheses -Wno-switch -Wstrict-prototypes -c -o $*.o $*.c
+	$(CXX) $(CFLAGS) -Wno-parentheses -Wno-switch -c -o $*.o $*.c
 
 $(SO): $(OBJ) config.log
 	$(CXX) $(LDSOFLAGS) $(LDFLAGS) $(DBG_CFLAGS) -I../src -o $(SO) $(OBJ) $(WLIB)
