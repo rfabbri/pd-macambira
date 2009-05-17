@@ -554,6 +554,7 @@ if {$tk} {
 
 
 	set main [string toupper [info script] 0 0]
+	set ::current_window .
 	bind $main    <FocusIn> {set ::current_window %W}
 	bind Toplevel <FocusIn> {set ::current_window %W}
 	proc tk_messageBox2 {args} {tk_messageBox -parent $::current_window {*}$args}
