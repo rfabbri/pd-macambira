@@ -41,7 +41,7 @@ proc figure_out_language {language} {
   ^(eo|esperanto)$    {list utf-8     esperanto}
   ^(pl|polski)$       {list utf-8     polski}
   ^(dk|dansk)$        {list iso8859-1 dansk}
-  ^(ja|nihongo)$      {list iso8859-1 nihongo}
+  ^(ja|nihongo)$      {list utf-8     nihongo}
   ^(br|brasileiro)$   {list iso8859-1 brasileiro}
   ^(tr|turkce)$       {list utf-8     turkce}
   ^(nl|nederlands)$   {list iso8859-1 nederlands}
