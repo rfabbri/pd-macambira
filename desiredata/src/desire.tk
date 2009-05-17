@@ -935,7 +935,7 @@ def Client init_controls {} {
     if {$::cmdline(console)} {set ::console [Console new .log]}
     . configure -menu .mbar
     wm title . "DesireData"
-    catch {wm iconphoto . icon_pd}
+    catch {wm iconphoto . icon_pd_32}
     regexp {\d\d\d\d-\d\d-\d\d} $::svnid date
     regsub -all "/" $date "." date
     regexp {desire.tk (\d+)} $::svnid blah revision
@@ -6686,12 +6686,13 @@ def Listener init {serf name command} {
 	set @command $command
 	set @expanded 0
 	set @serf $serf
+	set font $::look(View:font)
 	frame $serf
 	pack [frame  $serf.1]   -side left -fill y
 	pack [frame  $serf.1.1] -side bottom
 	pack [button $serf.1.1.expander -image icon_plus -command "$self toggle_expand"] -side left
-	pack [label  $serf.1.1.label -width 11 -text "$name: " -font {Courier 10}] -side left
-	pack [entry $serf.entry -width 40 -font $::look(View:font)] -side left -fill x -expand yes
+	pack [label  $serf.1.1.label -width 11 -font $font -text "$name: "] -side left
+	pack [entry $serf.entry -width 40 -font $font] -side left -fill x -expand yes
 	pack $serf -fill x -expand no
 	bind $serf.entry <Up>     "$self scroll_history +1"
 	bind $serf.entry <Down>   "$self scroll_history -1"
@@ -6793,7 +6794,7 @@ proc button_bar_add {x y} {
 
 if {$tk} {
 	set dir $cmdline(icons)
-	foreach icon {mode_edit mode_run pd}     {image create photo icon_$icon -file $dir/$icon.gif}
+	foreach icon {mode_edit mode_run pd_32}  {image create photo icon_$icon -file $dir/$icon.gif}
 	foreach b $butt {mset {icon name cmd} $b; image create photo icon_$icon -file $dir/$icon.gif}
 }
 
@@ -9009,6 +9010,13 @@ def Canvas graphviz_sort {} {
 			edge {break}
 		}
 	}
+}
+
+proc widget_tree {w {indent 0}} {
+  foreach element [winfo children $w] {
+    puts [format "%*s%s" [expr 2*$indent] "" $element]
+    widget_tree $element [expr 2+$indent]
+  }
 }
 
 
