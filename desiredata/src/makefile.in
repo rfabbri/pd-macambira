@@ -64,7 +64,7 @@ pd-watchdog: s_watchdog.c
 	$(CC) $(CFLAGS) $(STRIPFLAG) -o pd-watchdog s_watchdog.c
 
 pd.com: main.o
-	$(CC) $(LDFLAGS) $(DBG_CFLAGS) $(CFLAGS) -o pd.com main.o $(LIBS) -L../src -lpd
+	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) $(CFLAGS) -o pd.com main.o $(LIBS) -L../src -lpd
 	strip --strip-unneeded -R .note -R .comment pd.com
 
 # i should sort out the LDFLAGS thing so that pd,pdsend,pdreceive don't get linked to all libs that libpd.so is linked to.
