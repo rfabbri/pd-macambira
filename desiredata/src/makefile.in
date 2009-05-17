@@ -46,7 +46,7 @@ SO = libpd$(LIBSUFFIX)
 
 all:: bin externs
 
-bin:: pd$(EXE) $(WATCHDOG) pdsend pdreceive
+bin:: pd$(EXE) $(WATCHDOG) pdsend$(EXE) pdreceive$(EXE)
 
 $(SRCXX:.c=.o): %.o: %.c config.log
 	$(CXX) $(CFLAGS) -xc++ -c -o $*.o $*.c
@@ -57,8 +57,8 @@ $(SO): $(OBJ) config.log
 pd$(EXE): $(OBJ) config.log $(SO) main.c
 	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) $$PWD/$(SO) main.c -o pd$(EXE)
 
-pd-watchdog: s_watchdog.c
-	$(CXX) $(CFLAGS) $(STRIPFLAG) -o pd-watchdog s_watchdog.c
+pd-watchdog$(EXE): s_watchdog.c
+	$(CXX) $(CFLAGS) $(STRIPFLAG) -o pd-watchdog$(EXE) s_watchdog.c
 
 pd.com: main.o
 	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) $(CFLAGS) -o pd.com main.o $(LIBS) -L../src -lpd
@@ -85,7 +85,7 @@ install:: all
 		install $$file $(DESTDIR)$(libpdbindir)/$$file; done
 	install $(BINARYMODE) $(SO) $(DESTDIR)$(libdir)/$(SO)
 	test -w /etc/ld.so.cache && ldconfig || true
-	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) main.c -o $(DESTDIR)$(bindir)/pd $(WSTRIP)
+	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) main.c -o $(DESTDIR)$(bindir)/pd$(EXE) $(WSTRIP)
 	install -m755 desire.tk   $(DESTDIR)$(bindir)/desire.tk
 	install -m755 desire   $(DESTDIR)$(bindir)/desire
 	install -m755 pdsend$(EXE)      $(DESTDIR)$(bindir)/pdsend$(EXE)
@@ -131,7 +131,7 @@ makefile.deps: makefile
 uninstall::
 	rm -f -r $(DESTDIR)$(libpddir)
 	rm -f $(DESTDIR)$(libdir)/libpd*
-	cd $(DESTDIR)$(bindir);      rm pd pdsend pdreceive
+	cd $(DESTDIR)$(bindir);      rm pd$(EXE) pdsend$(EXE) pdreceive$(EXE)
 	cd $(DESTDIR)$(includedir);  rm m_pd.h desire.h
 	cd $(DESTDIR)$(mandir)/man1; rm pd.1.gz pdsend.1.gz pdreceive.1.gz
 
