@@ -46,7 +46,7 @@ SO = libpd$(LIBSUFFIX)
 
 all:: bin externs
 
-bin:: pd $(WATCHDOG) pdsend pdreceive
+bin:: pd$(EXE) $(WATCHDOG) pdsend pdreceive
 
 $(SRCXX:.c=.o): %.o: %.c config.log
 	$(CXX) $(CFLAGS) -xc++ -c -o $*.o $*.c
