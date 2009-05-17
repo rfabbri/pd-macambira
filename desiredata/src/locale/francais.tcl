@@ -362,9 +362,9 @@ say_namespace summary {
 
   say_category "SUBWINDOWS"
   say pd "Definie un subwindow"
-  say table "Tableau de nombres dans un subwindow"
-  say inlet "Ajouter une entrée à un pd"  ###LOL
-  say outlet "Ajouter une sortie à un pd" ###LOL
+  say table "Tableau de nombres dans une sous-fenêtre"
+  say inlet "Ajouter une entrée à une abstraction ou sous-patch"
+  say outlet "Ajouter une sortie à une abstraction ou sous-patch"
   say  inlet~  "[say inlet] (pour un signal)"
   say outlet~ "[say outlet] (pour un  signal)"
 
@@ -388,7 +388,7 @@ say_namespace summary {
   
   say_category "OBSOLETE"
   say scope~ "(utiliser tabwrite~)"
-  say namecanvas "Renomme un patch" ;# what was this anyway?
+  say namecanvas "Donne un symbole de réception au canevas contenant cet objet" ;# what was this anyway?
   say template "(utiliser struct)"
 }
 
@@ -492,7 +492,7 @@ say cancel "Annuler"
 say apply  "Appliquer"
 say ok     "OK"
 say popup_open "Ouvrir"
-say popup_insert "Insèrer"
+say popup_insert "Insérer"
 say popup_properties "Propriétés"
 say popup_clear_wires "Supprimer les cordons"
 say popup_auto_wire "Supprimer l'objet"
@@ -510,7 +510,7 @@ say add "Ajouter"
 say up "Vers le haut"
 say down "Vers le bas"
 say remove "Supprimer"
-say lib_add    "Ajouter le nom ajouté à la liste"
+say lib_add    "Ajouter le nom à la liste"
 say lib_up     "Inverser l'ordre avec la librairie précédente"
 say lib_down   "Inverser l'ordre avec la librairie suivante"
 say lib_remove "Supprimer la librairie selectionnée dans la liste"
@@ -518,7 +518,7 @@ say dir_add    "Ajouter un dossier avec la boite de dialogue"
 say dir_up     "Inverser l'ordre avec le dossier précédent"
 say dir_down   "Inverser l'ordre avec le dossier suivant"
 say dir_remove "Supprimer le dossier selectionné dans la liste"
-say client_class_tree "Client Class Tree"
+say client_class_tree "Arbre des classes du client"
 say clipboard_view "Vue du presse-papier"
 say command_history_view "Vue de l'historique de commandes"
 say event_history_view "Vue de l'historique d'événements"
@@ -537,3 +537,6 @@ say damn "Zut alors!"
 say console_clear "Effacer la console"
 say horizontal "Horizontal"
 say vertical "Vertical"
+say tcl_console "Client Tcl"
+say pd_console "Serveur Pd"
+say auto "Auto"
