@@ -39,7 +39,9 @@ objects use Posix-like threads.  */
 # define lseek lseek64
 #endif
 
+#if 0
 static bool debug=0;
+#endif
 
 #define EAT_ARG(ATYPE,VAR) if (argc<1 || argv->a_type != ATYPE) goto usage; else {VAR = *argv++; argc--;}
 
