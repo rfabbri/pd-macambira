@@ -1,7 +1,7 @@
 current:
 	echo make pd_linux, pd_nt, pd_irix, pd_darwin
 
-clean: ; rm -f *.pd_linux *.o
+clean: ; rm -f *.pd_linux *.dll *.pd_darwin *.o
 
 # ----------------------- NT -----------------------
 
@@ -60,11 +60,11 @@ DARWINCFLAGS = -DPD -DUNIX -DMACOSX -O2 \
     -Wall -W \
     -Wno-unused -Wno-parentheses -Wno-switch
 
-DARWININCLUDE =  -I../../src -Iinclude
+DARWININCLUDE =  -I../../../pd/src
 
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -o $*.o -c $*.c
-	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o
+	cc -bundle -undefined suppress -o $*.pd_darwin $*.o
 	rm -f $*.o ../$*.pd_darwin
 	ln -s $*/$*.pd_darwin ..
 
@@ -79,7 +79,7 @@ LINUXCFLAGS = -DPD -DUNIX -DHAVE_LRINT -DHAVE_LRINTF -O2 \
     -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
-LINUXINCLUDE =  -I../../src
+LINUXINCLUDE =  -I../../../pd/src
 
 .c.pd_linux:
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
