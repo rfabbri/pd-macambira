@@ -86,7 +86,7 @@ pd_linux: $(NAME).pd_linux $(NAMEB).pd_linux
 .SUFFIXES: .pd_linux
 
 LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes -Werror \
+    -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 LINUXINCLUDE =  -I../../src 
