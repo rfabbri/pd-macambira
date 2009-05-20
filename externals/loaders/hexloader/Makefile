@@ -15,7 +15,8 @@ PDLIBDIR=$(PDROOT)/bin
 EXTENSION=$(MAKECMDGOALS)
 
 
-DEFINES=-DPD -DMISSING_LOADER_T
+#DEFINES=-DPD -DMISSING_LOADER_T
+DEFINES=-DPD
 
 # if no filename-extension is supplied by the user
 # try to guess one, based on what "uname" tells us

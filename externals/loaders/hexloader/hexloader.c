@@ -20,6 +20,11 @@
 
 #if (PD_MINOR_VERSION >= 40)
 
+#if (PD_MINOR_VERSION < 42)
+// with 0.42 the loader_t made it into s_stuff.h
+# define MISSING_LOADER_T 1
+#endif
+
 #include "s_stuff.h"
 #include "g_canvas.h"
 #include <stdio.h>
