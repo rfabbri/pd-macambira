@@ -518,9 +518,6 @@ static filelist_t*hexloader_getalternatives(char*org) {
 }
 
 static int hexloader_doload(char*filename, char*setupfun) {
-#ifdef __WIN32__
-    HINSTANCE ntdll;
-#endif
     t_hexloader_setup makeout=0;
 
 #ifdef DL_OPEN
@@ -532,8 +529,8 @@ static int hexloader_doload(char*filename, char*setupfun) {
       return (0);
     }
     makeout = (t_hexloader_setup)dlsym(dlobj,  setupfun);
-#endif
-#ifdef __WIN32__
+#elif defined __WIN32__
+    HINSTANCE ntdll;
     sys_bashfilename(filename, filename);
     ntdll = LoadLibrary(filename);
     if (!ntdll)
@@ -704,7 +701,7 @@ static t_filepath*hexloader_trypatches(filelist_t*altnames0, char*classname) {
 /**
  * this is the actual loader:
  * we first try to load an external with alternative (hexified) names
- * if this fails, we fall back to load a patch with athese names
+ * if this fails, we fall back to load a patch with these names
  */
 static int hexloader_doloader(t_canvas *canvas, filelist_t*altnames0, char*classname)
 {
