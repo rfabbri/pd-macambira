@@ -56,17 +56,20 @@ pd_darwin: netreceive~.pd_darwin netsend~.pd_darwin
 
 .SUFFIXES: .pd_darwin
 
-DARWINCFLAGS = -DPD -DUNIX -DMACOSX -O2 \
-    -Wall -W \
-    -Wno-unused -Wno-parentheses -Wno-switch
+DARWINFATFLAGS = -arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk
+
+DARWINCFLAGS = -DPD -DUNIX -DMACOSX -DHAVE_LRINT -DHAVE_LRINTF -fast -fPIC \
+    -Wall -W -Wno-unused -Wstrict-prototypes \
+	$(DARWINFATFLAGS)
 
 DARWININCLUDE =  -I../../../pd/src
 
+DARWINLDFLAGS = -bundle -undefined dynamic_lookup $(DARWINFATFLAGS)
+
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -o $*.o -c $*.c
-	cc -bundle -undefined suppress -o $*.pd_darwin $*.o
-	rm -f $*.o ../$*.pd_darwin
-	ln -s $*/$*.pd_darwin ..
+	cc $(DARWINLDFLAGS) -o $*.pd_darwin $*.o
+	rm -f $*.o
 
 # ----------------------- LINUX i386 -----------------------
 
