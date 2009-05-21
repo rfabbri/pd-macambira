@@ -1,13 +1,70 @@
-#N canvas 0 0 521 599 10;
-#X msg 101 -138 open /dev/video0;
-#X obj 101 57 pdp_v4l2;
-#X msg 207 60 set;
-#X obj 101 99 pdp_opencv_bgsubstract;
-#X floatatom 273 102 5 0 0 0 - - -;
-#X obj 108 174 pdp_xv;
-#X text 317 103 threshold (default 13);
-#X connect 0 0 1 0;
-#X connect 1 0 3 0;
-#X connect 2 0 3 0;
-#X connect 3 0 5 0;
-#X connect 4 0 3 1;
+#N canvas 572 68 734 841 10;
+#X obj 41 -94 cnv 15 621 223 empty empty empty 20 12 0 14 -260097 -66577
+0;
+#X obj 91 63 pdp_1394L;
+#X msg 148 -37 open /dev/dv1394/0;
+#X obj 71 -62 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 73 -37 metro 40;
+#X msg 191 29 norm PAL;
+#X msg 161 -8 close;
+#X obj 281 -56 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 281 -29 metro 40;
+#X msg 371 -2 close;
+#X obj 301 69 pdp_v4l;
+#X msg 358 -34 open /dev/video0;
+#X obj 482 -54 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 482 -27 metro 40;
+#X msg 572 0 close;
+#X msg 559 -32 open /dev/video0;
+#X obj 502 71 pdp_v4l2;
+#X obj 43 142 cnv 15 621 73 empty empty empty 20 12 0 14 -260801 -66577
+0;
+#X obj 91 177 pdp_convert bitmap/rgb/*;
+#X text 255 171 COLORMODEL CONVERSION :: allways remember pdp_opencv
+only works in RGB colormodel;
+#X obj 44 230 cnv 15 621 113 empty empty empty 20 12 0 14 -258113 -66577
+0;
+#X msg 261 254 set;
+#X floatatom 261 292 5 0 0 0 - - -;
+#X obj 91 368 pdp_xv;
+#X obj 91 314 pdp_opencv_bgsubstract;
+#X text 71 -91 FIRST OF ALL SETUP YOUR CAMERA;
+#X text 44 -326 pdp_opencv_bgsubstract :: A simple background substract
+and binarization object.;
+#X text 43 -234 This object takes an image as a background reference
+and the compare each incomming frame with that. On the output you get
+a bw image \, black pixels are considered as background and white poixels
+as foreground.;
+#X text 43 -281 It is useful if you want to detect objects that are
+in front of an static background and you want to isolate the foreground
+siluete of the foreground objects.;
+#X text 43 -173 pdp_opencv_bgsubstract works comparing color values
+of each pixel \, so it can fail if the foreground object has the same
+color that the background \, and also if the light conditions or the
+shadows changes since you SET the background image.;
+#X text 304 253 SET THE BACKGROUNG REFERENCE;
+#X text 304 290 threshold (default 13) to use when comparing pixel
+colors;
+#X connect 1 0 18 0;
+#X connect 2 0 1 0;
+#X connect 3 0 4 0;
+#X connect 4 0 1 0;
+#X connect 5 0 1 0;
+#X connect 6 0 1 0;
+#X connect 7 0 8 0;
+#X connect 8 0 10 0;
+#X connect 9 0 10 0;
+#X connect 10 0 18 0;
+#X connect 11 0 10 0;
+#X connect 12 0 13 0;
+#X connect 13 0 16 0;
+#X connect 14 0 16 0;
+#X connect 15 0 16 0;
+#X connect 16 0 18 0;
+#X connect 18 0 24 0;
+#X connect 21 0 24 0;
+#X connect 22 0 24 1;
+#X connect 24 0 23 0;

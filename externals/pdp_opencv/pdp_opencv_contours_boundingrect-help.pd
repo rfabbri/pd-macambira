@@ -1,28 +1,128 @@
-#N canvas 0 25 1247 665 10;
-#X obj 133 49 pdp_v4l2;
-#X msg 201 14 open /dev/video0;
-#X obj 133 290 pdp_xv;
-#X floatatom 355 325 5 0 0 0 - - -;
-#X floatatom 390 325 5 0 0 0 - - -;
-#X floatatom 427 325 5 0 0 0 - - -;
-#X floatatom 461 325 5 0 0 0 - - -;
-#X obj 352 296 unpack 0 0 0 0 0;
-#X obj 352 245 route 0 1 2 3 4;
-#X floatatom 242 163 5 0 0 0 - - -;
-#X floatatom 352 180 5 0 0 0 - - -;
-#X obj 133 213 pdp_opencv_contours_boundingrect;
-#X text 284 159 min area in pixels (default 1);
-#X text 399 179 max area in pixels (default 76800);
-#X text 505 325 Xorigin Yorigin Width Height;
-#X text 412 263 For each contour detected;
-#X connect 0 0 11 0;
-#X connect 1 0 0 0;
-#X connect 7 0 3 0;
-#X connect 7 1 4 0;
-#X connect 7 2 5 0;
-#X connect 7 3 6 0;
-#X connect 8 0 7 0;
-#X connect 9 0 11 1;
-#X connect 10 0 11 2;
-#X connect 11 0 2 0;
-#X connect 11 1 8 0;
+#N canvas 363 68 1249 684 10;
+#X obj 41 -82 cnv 15 621 223 empty empty empty 20 12 0 14 -260097 -66577
+0;
+#X obj 91 75 pdp_1394L;
+#X msg 148 -25 open /dev/dv1394/0;
+#X obj 71 -50 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 73 -25 metro 40;
+#X msg 191 41 norm PAL;
+#X msg 161 4 close;
+#X obj 281 -44 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X obj 281 -17 metro 40;
+#X msg 371 10 close;
+#X obj 301 81 pdp_v4l;
+#X msg 358 -22 open /dev/video0;
+#X obj 482 -42 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 482 -15 metro 40;
+#X msg 563 4 close;
+#X msg 559 -20 open /dev/video0;
+#X obj 502 83 pdp_v4l2;
+#X obj 43 154 cnv 15 621 73 empty empty empty 20 12 0 14 -260801 -66577
+0;
+#X obj 91 189 pdp_convert bitmap/rgb/*;
+#X text 255 183 COLORMODEL CONVERSION :: allways remember pdp_opencv
+only works in RGB colormodel;
+#X obj 47 337 cnv 15 621 313 empty empty empty 20 12 0 14 -258113 -66577
+0;
+#X text 71 -79 FIRST OF ALL SETUP YOUR CAMERA;
+#X floatatom 185 509 5 0 0 0 - - -;
+#X floatatom 220 509 5 0 0 0 - - -;
+#X floatatom 257 509 5 0 0 0 - - -;
+#X floatatom 291 509 5 0 0 0 - - -;
+#X obj 185 482 unpack 0 0 0 0 0;
+#X obj 185 446 route 0 1 2 3 4;
+#X floatatom 312 345 5 0 0 0 - - -;
+#X floatatom 312 368 5 0 0 0 - - -;
+#X obj 91 387 pdp_opencv_contours_boundingrect;
+#X text 335 509 Xorigin Yorigin Width Height;
+#X floatatom 205 565 5 0 0 0 - - -;
+#X floatatom 240 565 5 0 0 0 - - -;
+#X floatatom 277 565 5 0 0 0 - - -;
+#X floatatom 311 565 5 0 0 0 - - -;
+#X obj 202 536 unpack 0 0 0 0 0;
+#X text 355 565 Xorigin Yorigin Width Height;
+#X obj 91 663 pdp_xv;
+#X obj 44 244 cnv 15 621 73 empty empty empty 20 12 0 14 -260801 -66577
+0;
+#X msg 242 270 set;
+#X floatatom 242 294 5 0 0 0 - - -;
+#X obj 91 294 pdp_opencv_bgsubstract;
+#X text 280 293 threshold (default 13) to use when comparing pixel
+colors;
+#X text 277 269 set the background reference;
+#X text 42 -273 It is useful as a motion tracker if you have well issolated
+silouets of the objects you want to track.;
+#X text 347 346 minimal area in pixels to be detected (default 1);
+#X text 346 370 maximal area in pixels to be detected (default 76800)
+;
+#X msg 568 59 format \$1;
+#X obj 569 37 hradio 15 1 0 4 empty empty empty 0 -8 0 10 -262144 -1
+-1 0;
+#X text 43 -307 pdp_opencv_contours_boundingrect :: Calculates up-right
+bounding rectangle of all contours of a binary image.;
+#X text 42 -234 This object considers a contour to be analyzed any
+group of white pixels in a black background \, for this reason you
+will find useful to use pdp_bgsubstract or pdp_threshold to obtain
+a correct input for pdp_opencv_contours_boundingrect.;
+#X text 43 -173 pdp_opencv_contours_boundingrect works detecting any
+white areas in the input image \, it's important to set max/min values
+of the areas you want to detect to filter non interesting noise or
+areas \, also sometimes you will need to use pdp_opencv_morphology
+to transform the contours of the shapes to be analyzed..;
+#X floatatom 278 409 5 0 0 0 - - -;
+#X text 317 410 Number of detected contours;
+#X floatatom 230 623 5 0 0 0 - - -;
+#X floatatom 265 623 5 0 0 0 - - -;
+#X floatatom 302 623 5 0 0 0 - - -;
+#X floatatom 336 623 5 0 0 0 - - -;
+#X obj 227 594 unpack 0 0 0 0 0;
+#X text 380 623 Xorigin Yorigin Width Height;
+#X text 288 451 For each contour detected;
+#X text 288 438 We have the contours sorted bottom to top and left
+to right;
+#X obj 103 465 print;
+#X connect 1 0 18 0;
+#X connect 2 0 1 0;
+#X connect 3 0 4 0;
+#X connect 4 0 1 0;
+#X connect 5 0 1 0;
+#X connect 6 0 1 0;
+#X connect 7 0 8 0;
+#X connect 8 0 10 0;
+#X connect 9 0 10 0;
+#X connect 10 0 18 0;
+#X connect 11 0 10 0;
+#X connect 12 0 13 0;
+#X connect 13 0 16 0;
+#X connect 14 0 16 0;
+#X connect 15 0 16 0;
+#X connect 16 0 18 0;
+#X connect 18 0 42 0;
+#X connect 26 0 22 0;
+#X connect 26 1 23 0;
+#X connect 26 2 24 0;
+#X connect 26 3 25 0;
+#X connect 27 0 26 0;
+#X connect 27 1 36 0;
+#X connect 27 2 59 0;
+#X connect 28 0 30 1;
+#X connect 29 0 30 2;
+#X connect 30 0 38 0;
+#X connect 30 1 27 0;
+#X connect 30 1 63 0;
+#X connect 36 0 32 0;
+#X connect 36 1 33 0;
+#X connect 36 2 34 0;
+#X connect 36 3 35 0;
+#X connect 40 0 42 0;
+#X connect 41 0 42 1;
+#X connect 42 0 30 0;
+#X connect 48 0 16 0;
+#X connect 49 0 48 0;
+#X connect 59 0 55 0;
+#X connect 59 1 56 0;
+#X connect 59 2 57 0;
+#X connect 59 3 58 0;
