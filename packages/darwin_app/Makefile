@@ -1,7 +1,7 @@
 current: darwin_app
 
 # turn on weak linking and dlopen support
-export MACOSX_DEPLOYMENT_TARGET = 10.3
+export MACOSX_DEPLOYMENT_TARGET = 10.4
 
 CWD := $(shell pwd)
 BUILD_BASE = $(CWD)/build
