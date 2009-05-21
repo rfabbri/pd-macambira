@@ -140,7 +140,7 @@ void  pdp_opencv_motempl_update_mhi( t_pdp_opencv_motempl *x, IplImage* img, Ipl
     cvCvtPlaneToPix( x->mask, 0, 0, 0, dst );
 
     // calculate motion gradient orientation and valid orientation mask
-    cvCalcMotionGradient( x->mhi, x->mask, x->orient, x->max_time_delta, x->min_time_delta, 3 ); 
+    cvCalcMotionGradient( x->mhi, x->mask, x->orient, x->max_time_delta, x->min_time_delta, x->x_mhi_duration ); 
     
     if( !x->storage )
         x->storage = cvCreateMemStorage(0);
@@ -294,7 +294,7 @@ static void pdp_opencv_motempl_min_time_delta(t_pdp_opencv_motempl *x, t_floatar
 
 static void pdp_opencv_motempl_frame_buffer_num(t_pdp_opencv_motempl *x, t_floatarg f)
 {
-	if (f>=1) x->frame_buffer_num = (int)f;
+	if (f>=3) x->frame_buffer_num = (int)f;
 	x->buf = NULL;
 }
 

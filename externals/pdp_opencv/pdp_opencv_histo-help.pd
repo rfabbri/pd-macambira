@@ -1,0 +1,24 @@
+#N canvas 0 6 1247 665 10;
+#X obj -72 -110 metro 40;
+#X obj -67 -131 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1
+0 1;
+#X obj -12 80 pdp_scale 320 240;
+#X obj -12 350 pdp_xv;
+#X msg 24 315 posdim 0 -23 320 240;
+#X obj 82 241 pdp_xv;
+#X obj 82 201 pdp_opencv_histo;
+#X msg 60 -98 open /dev/video0;
+#X obj -8 -63 pdp_v4l2;
+#X floatatom 189 238 5 0 0 0 - - -;
+#X obj 189 176 hradio 15 1 0 5 empty empty empty 0 -8 0 10 -262144
+-1 -1 0;
+#X connect 0 0 8 0;
+#X connect 1 0 0 0;
+#X connect 2 0 3 0;
+#X connect 2 0 6 0;
+#X connect 4 0 3 0;
+#X connect 6 0 5 0;
+#X connect 6 1 9 0;
+#X connect 7 0 8 0;
+#X connect 8 0 2 0;
+#X connect 10 0 6 1;

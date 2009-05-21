@@ -41,6 +41,7 @@ typedef struct pdp_opencv_contours_boundingrect_struct
 
     t_outlet *x_outlet0;
     t_outlet *x_dataout;
+    t_outlet *x_countout;
     int x_packet0;
     int x_packet1;
     int x_dropped;
@@ -138,9 +139,9 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     //cvZero( x->cnt_img );
     
 
+        int i = 0;                   // Indicator of cycles.
     for( ; contours != 0; contours = contours->h_next )
         {
-        int i = 0;                   // Indicator of cycles.
         int count = contours->total; // This is number point in contour
         CvRect rect;
 
@@ -158,6 +159,7 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     	    outlet_list( x->x_dataout, 0, 5, rlist );
 	    i++;
 	}
+    	    outlet_float( x->x_countout, i );
 	
         }
 
@@ -269,6 +271,7 @@ void *pdp_opencv_contours_boundingrect_new(t_floatarg f)
 
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
     x->x_dataout = outlet_new(&x->x_obj, &s_anything); 
+    x->x_countout = outlet_new(&x->x_obj, &s_float); 
 
     x->x_packet0 = -1;
     x->x_packet1 = -1;
