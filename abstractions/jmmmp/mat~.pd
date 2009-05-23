@@ -1,22 +1,22 @@
-#N canvas 441 135 457 490 10;
+#N canvas 441 135 457 504 10;
 #X obj 31 109 cnv 15 29 128 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 19 322 *~;
+#X obj 19 352 *~;
 #X obj 48 302 line~;
 #X msg 48 282 \$1 20;
 #X obj 48 67 inlet Lautstaerke;
 #X obj 19 47 inlet~ Signal;
-#X obj 19 402 outlet~;
+#X obj 19 432 outlet~;
 #X obj 48 262 dbtorms;
 #X obj 98 282 outlet;
 #X obj 48 113 vsl 10 119 0 127 0 0 empty empty empty 0 -8 0 8 -195568
--1 -1 9291 0;
+-1 -1 0 0;
 #X obj 50 138 cnv 1 6 2 empty empty empty 20 12 0 14 -262144 -262144
 0;
-#X obj 29 382 - 100;
+#X obj 29 412 - 100;
 #X obj 34 113 vsl 10 119 -100 12 0 0 empty empty empty 0 -8 0 8 -195568
--1 -262144 8848 0;
-#X obj 29 342 env~ 8820;
+-1 -262144 0 0;
+#X obj 29 372 env~ 8820;
 #X obj 39 87 inlet mute;
 #X obj 71 112 bang;
 #X obj 71 132 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
@@ -26,8 +26,6 @@
 #X obj 96 170 expr if ($f1 == 0 \, 22 \, 20);
 #X msg 96 190 color \$1;
 #X obj 101 112 init 1;
-#X text 12 427 (C) 2006 João Pais - jmmmpais@googlemail.com
-;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
 #X text 8 227 The names of its contributors may not be used to endorse
@@ -53,7 +51,7 @@ in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
 #X text 8 7 Copyright 2006 \, João Pais;
-#X restore 15 445 pd license;
+#X restore 15 475 pd license;
 #X text 11 8 [met~] - Level meter with amplitude control;
 #X text 280 45 Inlets;
 #X text 280 135 Outlets;
@@ -62,12 +60,16 @@ in the documentation and/or other materials provided with the distribution.
 #X text 280 175 - Signal level (0-1);
 #X text 280 105 - Level (0-127);
 #X text 280 85 - Mute / Unmute (bang);
-#X obj 29 362 dbtofad;
+#X obj 29 392 dbtofad;
 #X obj 36 143 cnv 1 6 2 empty empty empty 20 12 0 14 -262144 -262144
 0;
+#X obj 48 332 *~;
+#X text 12 457 (C) 2009 João Pais - jmmmpais@googlemail.com;
+#X obj 145 328 snaps~;
 #X connect 1 0 6 0;
 #X connect 1 0 13 0;
-#X connect 2 0 1 1;
+#X connect 2 0 33 0;
+#X connect 2 0 33 1;
 #X connect 3 0 2 0;
 #X connect 4 0 9 0;
 #X connect 5 0 1 0;
@@ -75,7 +77,7 @@ in the documentation and/or other materials provided with the distribution.
 #X connect 7 0 8 0;
 #X connect 9 0 17 0;
 #X connect 11 0 12 0;
-#X connect 13 0 32 0;
+#X connect 13 0 31 0;
 #X connect 14 0 15 0;
 #X connect 15 0 16 0;
 #X connect 16 0 18 0;
@@ -86,5 +88,6 @@ in the documentation and/or other materials provided with the distribution.
 #X connect 19 0 20 0;
 #X connect 20 0 12 0;
 #X connect 21 0 16 0;
-#X connect 32 0 11 0;
+#X connect 31 0 11 0;
+#X connect 33 0 1 1;
 #X coords 0 -1 1 1 31 130 1 30 108;
