@@ -1218,10 +1218,10 @@ scalars (g_scalar.c); their graphical behavior is defined accordingly. */
 
 t_class *array_class;
 
-static t_array *array_new(t_symbol *templatesym, t_gpointer *parent) {
+static t_array *array_new(t_symbol *tsym, t_gpointer *parent) {
     t_array *x = (t_array *)pd_new(array_class);
-    t_template *t = template_findbyname(templatesym);
-    x->templatesym = templatesym;
+    t_template *t = template_findbyname(tsym);
+    x->tsym = tsym;
     x->n = 1;
     x->elemsize = sizeof(t_word) * t->n;
     /* aligned allocation */
@@ -1234,7 +1234,7 @@ static t_array *array_new(t_symbol *templatesym, t_gpointer *parent) {
 }
 
 void array_resize(t_array *x, int n) {
-    t_template *t = template_findbyname(x->templatesym);
+    t_template *t = template_findbyname(x->tsym);
     if (n < 1) n = 1;
     int oldn = x->n;
     int elemsize = sizeof(t_word) * t->n;
@@ -1258,7 +1258,7 @@ static void array_resize_and_redraw(t_array *array, int n) {
 void word_free(t_word *wp, t_template *t);
 
 static void array_free(t_array *x) {
-    t_template *scalartemplate = template_findbyname(x->templatesym);
+    t_template *scalartemplate = template_findbyname(x->tsym);
     for (int i=0; i < x->n; i++) word_free((t_word *)(x->vec + x->elemsize*i), scalartemplate);
     freealignedbytes(x->vec, x->elemsize * x->n);
 }
@@ -1300,10 +1300,10 @@ arrays (the scalar will be of type "_float_array").  Currently this is
 always called by graph_array() below; but when we make a more general way
 to save and create arrays this might get called more directly. */
 
-static t_garray *graph_scalar(t_canvas *gl, t_symbol *s, t_symbol *templatesym, int saveit) {
-    if (!template_findbyname(templatesym)) return 0;
+static t_garray *graph_scalar(t_canvas *gl, t_symbol *s, t_symbol *tsym, int saveit) {
+    if (!template_findbyname(tsym)) return 0;
     t_garray *x = (t_garray *)pd_new(garray_class);
-    x->scalar = scalar_new(gl, templatesym);
+    x->scalar = scalar_new(gl, tsym);
     x->realname = s;
     x->realname = canvas_realizedollar(gl, s);
     pd_bind(x,x->realname);
@@ -1344,7 +1344,7 @@ static t_array *garray_getarray_floatonly(t_garray *x, int *yonsetp, int *elemsi
     t_array *a = garray_getarray(x);
     int yonset, type;
     t_symbol *arraytype;
-    t_template *t = template_findbyname(a->templatesym);
+    t_template *t = template_findbyname(a->tsym);
     if (!template_find_field(t,&s_y,&yonset,&type,&arraytype) || type != DT_FLOAT)
             return 0;
     *yonsetp = yonset;
@@ -1380,22 +1380,22 @@ by a more coherent (and general) invocation. */
 t_garray *graph_array(t_canvas *gl, t_symbol *s, t_symbol *templateargsym, t_floatarg fsize, t_floatarg fflags) {
     int n = (int)fsize, zonset, ztype, saveit;
     t_symbol *zarraytype;
-    t_symbol *templatesym = gensym("pd-_float_array");
+    t_symbol *tsym = gensym("pd-_float_array");
     int flags = (int)fflags;
     int filestyle = (flags & 6)>>1;
     int style = filestyle == 0 ? PLOTSTYLE_POLY : filestyle == 1 ? PLOTSTYLE_POINTS : filestyle;
     if (templateargsym != &s_float) {error("%s: only 'float' type understood", templateargsym->name); return 0;}
-    t_template *t = template_findbyname(templatesym);
-    TEMPLATE_CHECK(templatesym,0)
+    t_template *t = template_findbyname(tsym);
+    TEMPLATE_CHECK(tsym,0)
     if (!template_find_field(t, gensym("z"), &zonset, &ztype, &zarraytype)) {
-        error("template %s has no 'z' field", templatesym->name);
+        error("template %s has no 'z' field", tsym->name);
         return 0;
     }
-    if (ztype != DT_ARRAY) {error("template %s, 'z' field is not an array", templatesym->name); return 0;}
+    if (ztype != DT_ARRAY) {error("template %s, 'z' field is not an array", tsym->name); return 0;}
     t_template *ztemplate = template_findbyname(zarraytype);
     if (!ztemplate) {error("no template of type %s", zarraytype->name); return 0;}
     saveit = (flags & 1) != 0;
-    t_garray *x = graph_scalar(gl, s, templatesym, saveit);
+    t_garray *x = graph_scalar(gl, s, tsym, saveit);
     x->hidename = (flags>>3)&1;
     if (n <= 0) n = 100;
     array_resize(x->scalar->v[zonset].w_array, n);
@@ -1588,21 +1588,21 @@ static void array_motion(void *z, t_floatarg dx, t_floatarg dy) {
 int scalar_doclick(t_word *data, t_template *t, t_scalar *sc, t_array *ap, t_canvas *owner, float xloc, float yloc,
 int xpix, int ypix, int shift, int alt, int dbl, int doit);
 
-static int array_getfields(t_symbol *elemtemplatesym, t_canvas **elemtemplatecanvasp,
+static int array_getfields(t_symbol *elemtsym, t_canvas **elemtemplatecanvasp,
 t_template **elemtemplatep, int *elemsizep, t_slot *xslot, t_slot *yslot, t_slot *wslot,
 int *xonsetp, int *yonsetp, int *wonsetp);
 
 /* try clicking on an element of the array as a scalar (if clicking
    on the trace of the array failed) */
 static int array_doclick_element(t_array *array, t_canvas *canvas, t_scalar *sc, t_array *ap,
-t_symbol *elemtemplatesym, float linewidth, float xloc, float xinc, float yloc,
+t_symbol *elemtsym, float linewidth, float xloc, float xinc, float yloc,
 t_slot *xfield, t_slot *yfield, t_slot *wfield, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
     t_canvas *elemtemplatecanvas;
     t_template *elemtemplate;
     int elemsize, yonset, wonset, xonset, incr;
     //float xsum=0;
-    if (elemtemplatesym == &s_float) return 0;
-    if (array_getfields(elemtemplatesym, &elemtemplatecanvas,
+    if (elemtsym == &s_float) return 0;
+    if (array_getfields(elemtsym, &elemtemplatecanvas,
         &elemtemplate, &elemsize, xfield, yfield, wfield, &xonset, &yonset, &wonset))
                 return 0;
     /* if it has more than 2000 points, just check 300 of them. */
@@ -1629,12 +1629,12 @@ static float canvas_dpixtody(t_canvas*x,float dypix){return dypix*(canvas_pixels
 /* LATER move this and others back into plot parentwidget code, so
    they can be static (look in g_canvas.h for candidates). */
 int array_doclick(t_array *array, t_canvas *canvas, t_scalar *sc, t_array *ap,
-t_symbol *elemtemplatesym, float linewidth, float xloc, float xinc, float yloc, float scalarvis,
+t_symbol *elemtsym, float linewidth, float xloc, float xinc, float yloc, float scalarvis,
 t_slot *xfield, t_slot *yfield, t_slot *wfield, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
     t_canvas *elemtemplatecanvas;
     t_template *elemtemplate;
     int elemsize, yonset, wonset, xonset;
-    if (!array_getfields(elemtemplatesym, &elemtemplatecanvas, &elemtemplate, &elemsize,
+    if (!array_getfields(elemtsym, &elemtemplatecanvas, &elemtemplate, &elemsize,
 	xfield, yfield, wfield, &xonset, &yonset, &wonset)) {
         float best = 100;
         /* if it has more than 2000 points, just check 1000 of them. */
@@ -1651,7 +1651,7 @@ t_slot *xfield, t_slot *yfield, t_slot *wfield, int xpix, int ypix, int shift, i
                 dy = fabs(pypix-pwpix-ypix); if (dx+dy < best) best = dx+dy;
             }
         } if (best > 8) {
-            if (scalarvis != 0) return array_doclick_element(array, canvas, sc, ap, elemtemplatesym,
+            if (scalarvis != 0) return array_doclick_element(array, canvas, sc, ap, elemtsym,
 		linewidth, xloc, xinc, yloc, xfield, yfield, wfield, xpix, ypix, shift, alt, dbl, doit);
             return 0;
         }
@@ -1791,7 +1791,7 @@ static void garray_dofo(t_garray *x, int npoints, float dcval, int nsin, t_float
     TEMPLATE_FLOATY(array,)
     if (npoints == 0) npoints = 512;  /* dunno what a good default would be... */
     if (npoints != (1 << ilog2(npoints)))
-        post("%s: rounnding to %d points", array->templatesym->name, (npoints = (1<<ilog2(npoints))));
+        post("%s: rounnding to %d points", array->tsym->name, (npoints = (1<<ilog2(npoints))));
     garray_resize(x, npoints + 3);
     double phaseincr = 2. * 3.14159 / npoints;
     for (i=0, phase = -phaseincr; i < array->n; i++, phase += phaseincr) {
@@ -1935,7 +1935,7 @@ void garray_resize(t_garray *x, t_floatarg f) {
 
 static void garray_print(t_garray *x) {
     t_array *array = garray_getarray(x);
-    post("garray %s: template %s, length %d", x->realname->name, array->templatesym->name, array->n);
+    post("garray %s: template %s, length %d", x->realname->name, array->tsym->name, array->n);
 }
 
 static void g_array_setup() {
@@ -2311,10 +2311,10 @@ static void canvas_readerror(int natoms, t_atom *vec, int message, int nline, co
 
 /* fill in the contents of the scalar into the vector w. */
 static void canvas_readatoms(t_canvas *x, int natoms, t_atom *vec,
-int *p_nextmsg, t_symbol *templatesym, t_word *w, int argc, t_atom *argv) {
-    t_template *t = template_findbyname(templatesym);
+int *p_nextmsg, t_symbol *tsym, t_word *w, int argc, t_atom *argv) {
+    t_template *t = template_findbyname(tsym);
     if (!t) {
-        error("%s: no such template", templatesym->name);
+        error("%s: no such template", tsym->name);
         *p_nextmsg = natoms;
         return;
     }
@@ -2324,9 +2324,9 @@ int *p_nextmsg, t_symbol *templatesym, t_word *w, int argc, t_atom *argv) {
         if (t->vec[i].type == DT_ARRAY) {
             t_array *a = w[i].w_array;
             int elemsize = a->elemsize, nitems = 0;
-            t_symbol *arraytemplatesym = t->vec[i].arraytemplate;
-            t_template *arraytemplate = template_findbyname(arraytemplatesym);
-            if (!arraytemplate) error("%s: no such template", arraytemplatesym->name);
+            t_symbol *arraytsym = t->vec[i].arraytemplate;
+            t_template *arraytemplate = template_findbyname(arraytsym);
+            if (!arraytemplate) error("%s: no such template", arraytsym->name);
             else while (1) {
 		int message;
                 t_word *element;
@@ -2335,7 +2335,7 @@ int *p_nextmsg, t_symbol *templatesym, t_word *w, int argc, t_atom *argv) {
                 if (!nline) break;
                 array_resize(a, nitems + 1);
                 element = (t_word *)&a->vec[nitems*elemsize];
-                canvas_readatoms(x, natoms, vec, p_nextmsg, arraytemplatesym, element, nline, vec + message);
+                canvas_readatoms(x, natoms, vec, p_nextmsg, arraytsym, element, nline, vec + message);
                 nitems++;
             }
         } else if (t->vec[i].type == DT_CANVAS) {
@@ -2382,9 +2382,9 @@ static void canvas_readfrombinbuf(t_canvas *x, t_binbuf *b, const char *filename
     }
     /* read in templates and check for consistency */
     while (1) {
-        t_template *newtemplate, *existtemplate;
-        t_atom *templateargs = (t_atom *)getbytes(0);
-        int ntemplateargs = 0;
+        t_template *newt, *existt;
+        t_atom *targs = (t_atom *)getbytes(0);
+        int ntargs = 0;
         nline = canvas_scanbinbuf(natoms, vec, &message, &nextmsg);
         if (nline < 2) break;
         else if (nline > 2) canvas_readerror(natoms, vec, message, nline, "extra items ignored");
@@ -2393,30 +2393,27 @@ static void canvas_readfrombinbuf(t_canvas *x, t_binbuf *b, const char *filename
             canvas_readerror(natoms, vec, message, nline, "bad template header");
             continue;
         }
-        t_symbol *templatesym = canvas_makebindsym(vec[message + 1].a_symbol);
+        t_symbol *tsym = canvas_makebindsym(vec[message + 1].a_symbol);
         while (1) {
             nline = canvas_scanbinbuf(natoms, vec, &message, &nextmsg);
-            if (nline != 2 && nline != 3) break;
-            int newnargs = ntemplateargs + nline;
-            templateargs = (t_atom *)realloc(templateargs, sizeof(*templateargs) * newnargs);
-            templateargs[ntemplateargs] = vec[message];
-            templateargs[ntemplateargs + 1] = vec[message + 1];
-            if (nline == 3) templateargs[ntemplateargs + 2] = vec[message + 2];
-            ntemplateargs = newnargs;
+            if (nline!=2 && nline!=3) break;
+            int newnargs = ntargs + nline;
+            targs = (t_atom *)realloc(targs, sizeof(*targs) * newnargs);
+            targs[ntargs] = vec[message];
+            targs[ntargs+1] = vec[message+1];
+            if (nline==3) targs[ntargs+2] = vec[message+2];
+            ntargs = newnargs;
         }
-        newtemplate = template_new(templatesym, ntemplateargs, templateargs);
-        free(templateargs);
-        if (!(existtemplate = template_findbyname(templatesym))) {
-            error("%s: template not found in current patch", templatesym->name);
-            template_free(newtemplate);
+        newt = template_new(tsym, ntargs, targs);
+        free(targs);
+	existt = template_findbyname(tsym);
+        if (!existt) {error("%s: template not found in current patch", tsym->name); template_free(newt); return;}
+        if (!template_match(existt, newt)) {
+            error("%s: template doesn't match current one", tsym->name);
+            template_free(newt);
             return;
         }
-        if (!template_match(existtemplate, newtemplate)) {
-            error("%s: template doesn't match current one", templatesym->name);
-            template_free(newtemplate);
-            return;
-        }
-        template_free(newtemplate);
+        template_free(newt);
     }
     while (nextmsg < natoms) canvas_readscalar(x, natoms, vec, &nextmsg, selectem);
 }
@@ -2455,25 +2452,25 @@ void canvas_dataproperties(t_canvas *x, t_scalar *sc, t_binbuf *b) {
     canvas_readfrombinbuf(x, b, "properties dialog", 0);
 }
 
-static void canvas_doaddtemplate(t_symbol *templatesym, int *p_ntemplates, t_symbol ***p_templatevec) {
+static void canvas_doaddtemplate(t_symbol *tsym, int *p_ntemplates, t_symbol ***p_templatevec) {
     int n = *p_ntemplates;
     t_symbol **templatevec = *p_templatevec;
-    for (int i=0; i < n; i++) if (templatevec[i] == templatesym) return;
+    for (int i=0; i < n; i++) if (templatevec[i] == tsym) return;
     templatevec = (t_symbol **)realloc(templatevec, (n+1)*sizeof(*templatevec));
-    templatevec[n] = templatesym;
+    templatevec[n] = tsym;
     *p_templatevec = templatevec;
     *p_ntemplates = n+1;
 }
 
 static void canvas_writelist(t_gobj *y, t_binbuf *b);
 
-static void canvas_writescalar(t_symbol *templatesym, t_word *w, t_binbuf *b, int amarrayelement) {
-    t_template *t = template_findbyname(templatesym);
+static void canvas_writescalar(t_symbol *tsym, t_word *w, t_binbuf *b, int amarrayelement) {
+    t_template *t = template_findbyname(tsym);
     t_atom *a = (t_atom *)getbytes(0);
     int n = t->n, natom = 0;
     if (!amarrayelement) {
         t_atom templatename;
-        SETSYMBOL(&templatename, gensym(templatesym->name + 3));
+        SETSYMBOL(&templatename, gensym(tsym->name + 3));
         binbuf_add(b, 1, &templatename);
     }
     if (!t) bug("canvas_writescalar");
@@ -2497,9 +2494,9 @@ static void canvas_writescalar(t_symbol *templatesym, t_word *w, t_binbuf *b, in
         if (t->vec[i].type == DT_ARRAY) {
             t_array *a = w[i].w_array;
             int elemsize = a->elemsize, nitems = a->n;
-            t_symbol *arraytemplatesym = t->vec[i].arraytemplate;
+            t_symbol *arraytsym = t->vec[i].arraytemplate;
             for (int j = 0; j < nitems; j++)
-                canvas_writescalar(arraytemplatesym, (t_word *)&a->vec[elemsize*j], b, 1);
+                canvas_writescalar(arraytsym, (t_word *)&a->vec[elemsize*j], b, 1);
             binbuf_addsemi(b);
         } else if (t->vec[i].type == DT_CANVAS) {
             canvas_writelist(w->w_canvas->boxes->first(), b);
@@ -2517,19 +2514,19 @@ static void canvas_writelist(t_gobj *y, t_binbuf *b) {
 
 static void canvas_addtemplatesforlist(t_gobj *y, int *p_ntemplates, t_symbol ***p_templatevec);
 
-static void canvas_addtemplatesforscalar(t_symbol *templatesym, t_word *w, int *p_ntemplates, t_symbol ***p_templatevec) {
-    t_template *t = template_findbyname(templatesym);
-    canvas_doaddtemplate(templatesym, p_ntemplates, p_templatevec);
+static void canvas_addtemplatesforscalar(t_symbol *tsym, t_word *w, int *p_ntemplates, t_symbol ***p_templatevec) {
+    t_template *t = template_findbyname(tsym);
+    canvas_doaddtemplate(tsym, p_ntemplates, p_templatevec);
     if (!t) {bug("canvas_addtemplatesforscalar"); return;}
     t_dataslot *ds = t->vec;
     for (int i=t->n; i--; ds++, w++) {
         if (ds->type == DT_ARRAY) {
             t_array *a = w->w_array;
             int elemsize = a->elemsize, nitems = a->n;
-            t_symbol *arraytemplatesym = ds->arraytemplate;
-            canvas_doaddtemplate(arraytemplatesym, p_ntemplates, p_templatevec);
+            t_symbol *arraytsym = ds->arraytemplate;
+            canvas_doaddtemplate(arraytsym, p_ntemplates, p_templatevec);
             for (int j=0; j<nitems; j++)
-                canvas_addtemplatesforscalar(arraytemplatesym, (t_word *)&a->vec[elemsize*j], p_ntemplates, p_templatevec);
+                canvas_addtemplatesforscalar(arraytsym, (t_word *)&a->vec[elemsize*j], p_ntemplates, p_templatevec);
         } else if (ds->type == DT_CANVAS)
             canvas_addtemplatesforlist(w->w_canvas->boxes->first(), p_ntemplates, p_templatevec);
     }
@@ -3210,14 +3207,14 @@ static t_scalar *gpointer_getscalar(t_gpointer *gp) {
 /* make a new scalar and add to the canvas.  We create a "gp" here which will be used for array items to point back here.
    This gp doesn't do reference counting or "validation" updates though; the parent won't go away without the contained
    arrays going away too.  The "gp" is copied out by value in the word_init() routine so we can throw our copy away. */
-t_scalar *scalar_new(t_canvas *owner, t_symbol *templatesym) {
+t_scalar *scalar_new(t_canvas *owner, t_symbol *tsym) {
     t_gpointer gp;
     gpointer_init(&gp);
-    t_template *t = template_findbyname(templatesym);
-    TEMPLATE_CHECK(templatesym,0)
+    t_template *t = template_findbyname(tsym);
+    TEMPLATE_CHECK(tsym,0)
     t_scalar *x = (t_scalar *)getbytes(sizeof(t_scalar) + (t->n - 1) * sizeof(*x->v));
     x->_class = scalar_class;
-    x->t = templatesym;
+    x->t = tsym;
     gpointer_setcanvas(&gp, owner, x);
     word_init(x->v, t, &gp);
     return x;
@@ -3226,8 +3223,8 @@ t_scalar *scalar_new(t_canvas *owner, t_symbol *templatesym) {
 /* Pd method to create a new scalar, add it to a canvas, and initialize it from the message arguments. */
 int canvas_readscalar(t_canvas *x, int natoms, t_atom *vec, int *p_nextmsg, int selectit);
 static void canvas_scalar(t_canvas *canvas, t_symbol *classname, t_int argc, t_atom *argv) {
-    t_symbol *templatesym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
-    if (!template_findbyname(templatesym)) {error("%s: no such template", atom_getsymbolarg(0, argc, argv)->name); return;}
+    t_symbol *tsym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
+    if (!template_findbyname(tsym)) {error("%s: no such template", atom_getsymbolarg(0, argc, argv)->name); return;}
     int nextmsg;
     t_binbuf *b = binbuf_new();
     binbuf_restore(b, argc, argv);
@@ -3244,11 +3241,11 @@ static void scalar_getbasexy(t_scalar *x, float *basex, float *basey) {
 /*
 static void scalar_displace(t_gobj *z, t_canvas *canvas, int dx, int dy) {
     t_scalar *x = (t_scalar *)z;
-    t_symbol *templatesym = x->t;
-    t_template *t = template_findbyname(templatesym);
+    t_symbol *tsym = x->t;
+    t_template *t = template_findbyname(tsym);
     t_symbol *zz;
     int xonset, yonset, xtype, ytype, gotx, goty;
-    TEMPLATE_CHECK(templatesym,)
+    TEMPLATE_CHECK(tsym,)
     gotx = template_find_field(t,&s_x,&xonset,&xtype,&zz);
     if (gotx && (xtype != DT_FLOAT)) gotx = 0;
     goty = template_find_field(t,&s_y,&yonset,&ytype,&zz);
@@ -3308,7 +3305,7 @@ static int scalar_click(t_gobj *z, t_canvas *owner, int xpix, int ypix, int shif
     return scalar_doclick(x->v, t, x, 0, owner, 0, 0, xpix, ypix, shift, alt, dbl, doit);
 }
 
-void canvas_writescalar(t_symbol *templatesym, t_word *w, t_binbuf *b, int amarrayelement);
+void canvas_writescalar(t_symbol *tsym, t_word *w, t_binbuf *b, int amarrayelement);
 
 static void scalar_save(t_gobj *z, t_binbuf *b) {
     t_scalar *x = (t_scalar *)z;
@@ -3381,7 +3378,7 @@ static int dataslot_matches(t_dataslot *ds1, t_dataslot *ds2, int nametoo) {
 
 /* -- templates, the active ingredient in gtemplates defined below. ------- */
 
-static t_template *template_new(t_symbol *templatesym, int argc, t_atom *argv) {
+static t_template *template_new(t_symbol *tsym, int argc, t_atom *argv) {
     t_template *x = (t_template *)pd_new(template_class);
     x->n = 0;
     x->vec = (t_dataslot *)getbytes(0);
@@ -3410,8 +3407,8 @@ static t_template *template_new(t_symbol *templatesym, int argc, t_atom *argv) {
     bad:
         argc -= 2; argv += 2;
     }
-    x->sym = templatesym;
-    if (templatesym->name) pd_bind(x,x->sym);
+    x->sym = tsym;
+    if (tsym->name) pd_bind(x,x->sym);
     return x;
 }
 
@@ -3527,7 +3524,7 @@ static t_scalar *template_conformscalar(t_template *tfrom, t_template *tto, int 
 /* conform an array, recursively conforming sublists and arrays  */
 static void template_conformarray(t_template *tfrom, t_template *tto, int *conformaction, t_array *a) {
     t_template *scalartemplate = 0;
-    if (a->templatesym == tfrom->sym) {
+    if (a->tsym == tfrom->sym) {
         /* the array elements must all be conformed */
         int oldelemsize = sizeof(t_word) * tfrom->n;
 	int newelemsize = sizeof(t_word) *   tto->n;
@@ -3543,7 +3540,7 @@ static void template_conformarray(t_template *tfrom, t_template *tto, int *confo
         scalartemplate = tto;
         a->vec = newarray;
         free(oldarray);
-    } else scalartemplate = template_findbyname(a->templatesym);
+    } else scalartemplate = template_findbyname(a->tsym);
     /* convert all arrays and sublist fields in each element of the array */
     for (int i=0; i<a->n; i++) {
         t_word *wp = (t_word *)(a->vec + sizeof(t_word) * a->n * i);
@@ -3638,8 +3635,8 @@ static void template_notifyforscalar(t_template *t, t_canvas *owner, t_scalar *s
    in trouble.  LATER we'll figure out how to conform the new patch's objects
    to the pre-existing struct. */
 static void *template_usetemplate(void *dummy, t_symbol *s, int argc, t_atom *argv) {
-    t_symbol *templatesym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
-    t_template *x = (t_template *)pd_findbyclass(templatesym, template_class);
+    t_symbol *tsym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
+    t_template *x = (t_template *)pd_findbyclass(tsym, template_class);
     if (!argc) return 0;
     argc--; argv++;
     if (x) {
@@ -3647,16 +3644,16 @@ static void *template_usetemplate(void *dummy, t_symbol *s, int argc, t_atom *ar
         /* If the new template is the same as the old one, there's nothing to do.  */
         if (!template_match(x, y)) { /* Are there "struct" objects upholding this template? */
             if (x->list) {
-                error("%s: template mismatch", templatesym->name);
+                error("%s: template mismatch", tsym->name);
             } else {
                 template_conform(x, y);
                 pd_free(x);
-                t_template *y2 = template_new(templatesym, argc, argv);
+                t_template *y2 = template_new(tsym, argc, argv);
                 y2->list = 0;
             }
         }
         pd_free(y);
-    } else template_new(templatesym, argc, argv);
+    } else template_new(tsym, argc, argv);
     return 0;
 }
 
@@ -4118,13 +4115,13 @@ void plot_float(t_plot *x, t_floatarg f) {
 /* get everything we'll need from the owner template of the array being
    plotted. Not used for garrays, but see below */
 static int plot_readownertemplate(t_plot *x, t_word *data, t_template *ownertemplate,
-t_symbol **elemtemplatesymp, t_array **arrayp, float *linewidthp, float *xlocp, float *xincp, float *ylocp,
+t_symbol **elemtsymp, t_array **arrayp, float *linewidthp, float *xlocp, float *xincp, float *ylocp,
 float *stylep, float *visp, float *scalarvisp) {
     int arrayonset, type;
-    t_symbol *elemtemplatesym;
+    t_symbol *elemtsym;
     t_array *array;
     if (x->data.type != A_ARRAY || !x->data.var) {error("needs an array field"); return -1;}
-    if (!template_find_field(ownertemplate, x->data.varsym, &arrayonset, &type, &elemtemplatesym)) {
+    if (!template_find_field(ownertemplate, x->data.varsym, &arrayonset, &type, &elemtsym)) {
         error("%s: no such field", x->data.varsym->name);
         return -1;
     }
@@ -4137,14 +4134,14 @@ float *stylep, float *visp, float *scalarvisp) {
     *stylep = slot_getfloat(&x->style, ownertemplate, data, 1);
     *visp   = slot_getfloat(&x->vis,   ownertemplate, data, 1);
     *scalarvisp = slot_getfloat(&x->scalarvis, ownertemplate, data, 1);
-    *elemtemplatesymp = elemtemplatesym;
+    *elemtsymp = elemtsym;
     *arrayp = array;
     return 0;
 }
 
 /* get everything else you could possibly need about a plot,
    either for plot's own purposes or for plotting a "garray" */
-static int array_getfields(t_symbol *elemtemplatesym, t_canvas **elemtemplatecanvasp,
+static int array_getfields(t_symbol *elemtsym, t_canvas **elemtemplatecanvasp,
 t_template **elemtemplatep, int *elemsizep, t_slot *xslot, t_slot *yslot, t_slot *wslot,
 int *xonsetp, int *yonsetp, int *wonsetp) {
     int type;
@@ -4152,10 +4149,10 @@ int *xonsetp, int *yonsetp, int *wonsetp) {
     t_canvas *elemtemplatecanvas = 0;
     /* the "float" template is special in not having to have a canvas;
        template_findbyname is hardwired to return a predefined template. */
-    t_template *elemtemplate = template_findbyname(elemtemplatesym);
-    if (!elemtemplate) {error("%s: no such template", elemtemplatesym->name); return -1;}
-    if (!(elemtemplatesym==&s_float || (elemtemplatecanvas = template_findcanvas(elemtemplate)))) {
-        error("%s: no canvas for this template", elemtemplatesym->name);
+    t_template *elemtemplate = template_findbyname(elemtsym);
+    if (!elemtemplate) {error("%s: no such template", elemtsym->name); return -1;}
+    if (!(elemtsym==&s_float || (elemtemplatecanvas = template_findcanvas(elemtemplate)))) {
+        error("%s: no canvas for this template", elemtsym->name);
         return -1;
     }
     *elemtemplatecanvasp = elemtemplatecanvas;
@@ -4176,13 +4173,13 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
     int elemsize, yonset, wonset, xonset;
     t_canvas *elemtemplatecanvas;
     t_template *elemtemplate;
-    t_symbol *elemtemplatesym;
+    t_symbol *elemtsym;
     float linewidth, xloc, xinc, yloc, style, xsum, yval, vis, scalarvis;
     t_array *array;
-    if (plot_readownertemplate(x, data, t, &elemtemplatesym, &array, &linewidth, &xloc, &xinc, &yloc, &style, &vis, &scalarvis)) return;
+    if (plot_readownertemplate(x, data, t, &elemtsym, &array, &linewidth, &xloc, &xinc, &yloc, &style, &vis, &scalarvis)) return;
     t_slot *xslot = &x->xpoints, *yslot = &x->ypoints, *wslot = &x->wpoints;
     if (!vis) return;
-    if (array_getfields(elemtemplatesym, &elemtemplatecanvas, &elemtemplate, &elemsize,
+    if (array_getfields(elemtsym, &elemtemplatecanvas, &elemtemplate, &elemsize,
 	xslot, yslot, wslot, &xonset, &yonset, &wonset)) return;
     int nelem = array->n;
     char *elem = (char *)array->vec;
@@ -4321,13 +4318,13 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
 static int plot_click(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, t_scalar *sc,
 t_array *ap, float basex, float basey, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
     t_plot *x = (t_plot *)z;
-    t_symbol *elemtemplatesym;
+    t_symbol *elemtsym;
     float linewidth, xloc, xinc, yloc, style, vis, scalarvis;
     t_array *array;
-    if (plot_readownertemplate(x, data, t, &elemtemplatesym, &array, &linewidth, &xloc, &xinc,
+    if (plot_readownertemplate(x, data, t, &elemtsym, &array, &linewidth, &xloc, &xinc,
 	&yloc, &style, &vis, &scalarvis)) return 0;
     if (!vis) return 0;
-    return array_doclick(array, canvas, sc, ap, elemtemplatesym, linewidth, basex + xloc, xinc,
+    return array_doclick(array, canvas, sc, ap, elemtsym, linewidth, basex + xloc, xinc,
 	basey + yloc, scalarvis, &x->xpoints, &x->ypoints, &x->wpoints, xpix, ypix, shift, alt, dbl, doit);
 }
 
@@ -4511,8 +4508,8 @@ int gpointer_check(const t_gpointer *gp, int headok) {
 }
 
 /* get the template for the object pointer to.  Assumes we've already checked freshness.  Returns 0 if head of list. */
-static t_symbol *gpointer_gettemplatesym(const t_gpointer *gp) {
-    if (gp->o->_class == array_class) return gp->array->templatesym;
+static t_symbol *gpointer_gettsym(const t_gpointer *gp) {
+    if (gp->o->_class == array_class) return gp->array->tsym;
     t_scalar *sc = gp->scalar;
     return sc ? sc->t : 0;
 }
@@ -4622,9 +4619,9 @@ static void ptrobj_sendwindow(t_ptrobj *x, t_symbol *s, int argc, t_atom *argv) 
 static void ptrobj_bang(t_ptrobj *x) {
     t_typedout *to = x->typedout;
     if (!gpointer_check(&x->gp, 1)) {error("bang: empty pointer"); return;}
-    t_symbol *templatesym = gpointer_gettemplatesym(&x->gp);
+    t_symbol *tsym = gpointer_gettsym(&x->gp);
     for (int n=x->ntypedout; n--; to++)
-        if (to->type == templatesym) {outlet_pointer(to->outlet, &x->gp); return;}
+        if (to->type == tsym) {outlet_pointer(to->outlet, &x->gp); return;}
     outlet_pointer(x->otherout, &x->gp);
 }
 
@@ -4654,13 +4651,13 @@ struct t_getvariable {
     t_outlet *outlet;
 };
 struct t_get : t_object {
-    t_symbol *templatesym;
+    t_symbol *tsym;
     int nout;
     t_getvariable *variables;
 };
 static void *get_new(t_symbol *why, int argc, t_atom *argv) {
     t_get *x = (t_get *)pd_new(get_class);
-    x->templatesym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
+    x->tsym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
     if (argc) argc--, argv++;
     t_getvariable *sp = x->variables = (t_getvariable *)getbytes(argc * sizeof (*x->variables));
     x->nout = argc;
@@ -4676,9 +4673,9 @@ static void *get_new(t_symbol *why, int argc, t_atom *argv) {
 
 static void get_pointer(t_get *x, t_gpointer *gp) {
     int nitems = x->nout;
-    t_template *t = template_findbyname(x->templatesym);
+    t_template *t = template_findbyname(x->tsym);
     t_getvariable *vp;
-    TEMPLATE_CHECK(x->templatesym,)
+    TEMPLATE_CHECK(x->tsym,)
     if (!gpointer_check(gp, 0)) {error("stale or empty pointer"); return;}
     t_word *vec = gpointer_word(gp);
     vp = x->variables + nitems-1;
@@ -4706,7 +4703,7 @@ struct t_setvariable {
 
 struct t_set : t_object {
     t_gpointer gp;
-    t_symbol *templatesym;
+    t_symbol *tsym;
     int nin;
     int issymbol;
     t_setvariable *variables;
@@ -4720,7 +4717,7 @@ static void *set_new(t_symbol *why, int argc, t_atom *argv) {
         argv++;
     }
     else x->issymbol = 0;
-    x->templatesym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
+    x->tsym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
     if (argc) argc--, argv++;
     t_setvariable *sp = x->variables = (t_setvariable *)getbytes(argc * sizeof (*x->variables));
     x->nin = argc;
@@ -4742,12 +4739,12 @@ static void *set_new(t_symbol *why, int argc, t_atom *argv) {
 
 static void set_bang(t_set *x) {
     int nitems = x->nin;
-    t_template *t = template_findbyname(x->templatesym);
+    t_template *t = template_findbyname(x->tsym);
     t_gpointer *gp = &x->gp;
-    TEMPLATE_CHECK(x->templatesym,)
+    TEMPLATE_CHECK(x->tsym,)
     if (!gpointer_check(gp, 0)) {error("empty pointer"); return;}
-    if (gpointer_gettemplatesym(gp) != x->templatesym) {
-        error("%s: got wrong template (%s)",x->templatesym->name,gpointer_gettemplatesym(gp)->name);
+    if (gpointer_gettsym(gp) != x->tsym) {
+        error("%s: got wrong template (%s)",x->tsym->name,gpointer_gettsym(gp)->name);
         return;
     }
     if (!nitems) return;
@@ -4777,15 +4774,15 @@ static void set_free(t_set *x) {
 static t_class *elem_class;
 
 struct t_elem : t_object {
-    t_symbol *templatesym;
+    t_symbol *tsym;
     t_symbol *fieldsym;
     t_gpointer gp;
     t_gpointer gparent;
 };
 
-static void *elem_new(t_symbol *templatesym, t_symbol *fieldsym) {
+static void *elem_new(t_symbol *tsym, t_symbol *fieldsym) {
     t_elem *x = (t_elem *)pd_new(elem_class);
-    x->templatesym = canvas_makebindsym(templatesym);
+    x->tsym = canvas_makebindsym(tsym);
     x->fieldsym = fieldsym;
     gpointer_init(&x->gp);
     gpointer_init(&x->gparent);
@@ -4796,26 +4793,26 @@ static void *elem_new(t_symbol *templatesym, t_symbol *fieldsym) {
 
 static void elem_float(t_elem *x, t_float f) {
     int indx = (int)f, nitems, onset;
-    t_symbol *fieldsym = x->fieldsym, *elemtemplatesym;
-    t_template *t = template_findbyname(x->templatesym);
+    t_symbol *fieldsym = x->fieldsym, *elemtsym;
+    t_template *t = template_findbyname(x->tsym);
     t_template *elemtemplate;
     t_gpointer *gparent = &x->gparent;
     t_array *array;
     int elemsize, type;
     if (!gpointer_check(gparent, 0)) {error("empty pointer"); return;}
-    if (gpointer_gettemplatesym(gparent) != x->templatesym) {
-        error("%s: got wrong template (%s)", x->templatesym->name, gpointer_gettemplatesym(gparent)->name);
+    if (gpointer_gettsym(gparent) != x->tsym) {
+        error("%s: got wrong template (%s)", x->tsym->name, gpointer_gettsym(gparent)->name);
         return;
     }
     t_word *w = gpointer_word(gparent);
-    TEMPLATE_CHECK(x->templatesym,)
-    if (!template_find_field(t, fieldsym, &onset, &type, &elemtemplatesym)) {
+    TEMPLATE_CHECK(x->tsym,)
+    if (!template_find_field(t, fieldsym, &onset, &type, &elemtsym)) {
         error("couldn't find array field %s", fieldsym->name);
         return;
     }
     if (type != DT_ARRAY) {error("element: field %s not of type array", fieldsym->name); return;}
-    if (!(elemtemplate = template_findbyname(elemtemplatesym))) {
-        error("couldn't find field template %s", elemtemplatesym->name);
+    if (!(elemtemplate = template_findbyname(elemtsym))) {
+        error("couldn't find field template %s", elemtsym->name);
         return;
     }
     elemsize = elemtemplate->n * sizeof(t_word);
@@ -4837,13 +4834,13 @@ static void elem_free(t_elem *x, t_gpointer *gp) {
 static t_class *getsize_class;
 
 struct t_getsize : t_object {
-    t_symbol *templatesym;
+    t_symbol *tsym;
     t_symbol *fieldsym;
 };
 
-static void *getsize_new(t_symbol *templatesym, t_symbol *fieldsym) {
+static void *getsize_new(t_symbol *tsym, t_symbol *fieldsym) {
     t_getsize *x = (t_getsize *)pd_new(getsize_class);
-    x->templatesym = canvas_makebindsym(templatesym);
+    x->tsym = canvas_makebindsym(tsym);
     x->fieldsym = fieldsym;
     outlet_new(x,&s_float);
     return x;
@@ -4851,17 +4848,17 @@ static void *getsize_new(t_symbol *templatesym, t_symbol *fieldsym) {
 
 static void getsize_pointer(t_getsize *x, t_gpointer *gp) {
     int onset, type;
-    t_symbol *fieldsym = x->fieldsym, *elemtemplatesym;
-    t_template *t = template_findbyname(x->templatesym);
-    TEMPLATE_CHECK(x->templatesym,)
-    if (!template_find_field(t, fieldsym, &onset, &type, &elemtemplatesym)) {
+    t_symbol *fieldsym = x->fieldsym, *elemtsym;
+    t_template *t = template_findbyname(x->tsym);
+    TEMPLATE_CHECK(x->tsym,)
+    if (!template_find_field(t, fieldsym, &onset, &type, &elemtsym)) {
         error("couldn't find array field %s", fieldsym->name);
         return;
     }
     if (type != DT_ARRAY) {error("field %s not of type array", fieldsym->name); return;}
     if (!gpointer_check(gp, 0)) {error("stale or empty pointer"); return;}
-    if (gpointer_gettemplatesym(gp) != x->templatesym) {
-        error("%s: got wrong template (%s)", x->templatesym->name, gpointer_gettemplatesym(gp)->name);
+    if (gpointer_gettsym(gp) != x->tsym) {
+        error("%s: got wrong template (%s)", x->tsym->name, gpointer_gettsym(gp)->name);
         return;
     }
     t_word *w = gpointer_word(gp);
@@ -4874,14 +4871,14 @@ static void getsize_pointer(t_getsize *x, t_gpointer *gp) {
 static t_class *setsize_class;
 
 struct t_setsize : t_object {
-    t_symbol *templatesym;
+    t_symbol *tsym;
     t_symbol *fieldsym;
     t_gpointer gp;
 };
 
-static void *setsize_new(t_symbol *templatesym, t_symbol *fieldsym, t_floatarg newsize) {
+static void *setsize_new(t_symbol *tsym, t_symbol *fieldsym, t_floatarg newsize) {
     t_setsize *x = (t_setsize *)pd_new(setsize_class);
-    x->templatesym = canvas_makebindsym(templatesym);
+    x->tsym = canvas_makebindsym(tsym);
     x->fieldsym = fieldsym;
     gpointer_init(&x->gp);
     pointerinlet_new(x,&x->gp);
@@ -4890,25 +4887,25 @@ static void *setsize_new(t_symbol *templatesym, t_symbol *fieldsym, t_floatarg n
 
 static void setsize_float(t_setsize *x, t_float f) {
     int onset, type;
-    t_template *t = template_findbyname(x->templatesym);
+    t_template *t = template_findbyname(x->tsym);
     int newsize = (int)f;
     t_gpointer *gp = &x->gp;
     if (!gpointer_check(&x->gp, 0)) {error("empty pointer"); return;}
-    if (gpointer_gettemplatesym(&x->gp) != x->templatesym) {
-        error("%s: got wrong template (%s)", x->templatesym->name, gpointer_gettemplatesym(&x->gp)->name);
+    if (gpointer_gettsym(&x->gp) != x->tsym) {
+        error("%s: got wrong template (%s)", x->tsym->name, gpointer_gettsym(&x->gp)->name);
         return;
     }
     t_word *w = gpointer_word(gp);
-    TEMPLATE_CHECK(x->templatesym,)
-    t_symbol *elemtemplatesym;
-    if (!template_find_field(t, x->fieldsym, &onset, &type, &elemtemplatesym)) {
+    TEMPLATE_CHECK(x->tsym,)
+    t_symbol *elemtsym;
+    if (!template_find_field(t, x->fieldsym, &onset, &type, &elemtsym)) {
         error("couldn't find array field %s", x->fieldsym->name);
         return;
     }
     if (type != DT_ARRAY) {error("field %s not of type array", x->fieldsym->name); return;}
-    t_template *elemtemplate = template_findbyname(elemtemplatesym);
+    t_template *elemtemplate = template_findbyname(elemtsym);
     if (!elemtemplate) {
-        error("couldn't find field template %s", elemtemplatesym->name);
+        error("couldn't find field template %s", elemtsym->name);
         return;
     }
     int elemsize = elemtemplate->n * sizeof(t_word);
@@ -4947,14 +4944,14 @@ struct t_appendvariable {
 
 struct t_append : t_object {
     t_gpointer gp;
-    t_symbol *templatesym;
+    t_symbol *tsym;
     int nin;
     t_appendvariable *variables;
 };
 
 static void *append_new(t_symbol *why, int argc, t_atom *argv) {
     t_append *x = (t_append *)pd_new(append_class);
-    x->templatesym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
+    x->tsym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
     if (argc) argc--, argv++;
     x->variables = (t_appendvariable *)getbytes(argc * sizeof (*x->variables));
     x->nin = argc;
@@ -4974,16 +4971,16 @@ static void *append_new(t_symbol *why, int argc, t_atom *argv) {
 
 static void append_float(t_append *x, t_float f) {
     int nitems = x->nin;
-    t_template *t = template_findbyname(x->templatesym);
+    t_template *t = template_findbyname(x->tsym);
     t_gpointer *gp = &x->gp;
-    TEMPLATE_CHECK(x->templatesym,)
+    TEMPLATE_CHECK(x->tsym,)
     if (!gp->o) {error("no current pointer"); return;}
     if (gp->o->_class == array_class) {error("lists only, not arrays"); return;}
     t_canvas *canvas = gp->canvas;
     if (!nitems) return;
     x->variables[0].f = f;
-    t_scalar *sc = scalar_new(canvas,x->templatesym);
-    if (!sc) {error("%s: couldn't create scalar", x->templatesym->name); return;}
+    t_scalar *sc = scalar_new(canvas,x->tsym);
+    if (!sc) {error("%s: couldn't create scalar", x->tsym->name); return;}
     canvas->boxes->add(sc);
     gobj_changed(sc,0);
     gp->scalar = sc;
@@ -5004,14 +5001,14 @@ static void append_free(t_append *x) {
 static t_class *sublist_class;
 
 struct t_sublist : t_object {
-    t_symbol *templatesym;
+    t_symbol *tsym;
     t_symbol *fieldsym;
     t_gpointer gp;
 };
 
-static void *sublist_new(t_symbol *templatesym, t_symbol *fieldsym) {
+static void *sublist_new(t_symbol *tsym, t_symbol *fieldsym) {
     t_sublist *x = (t_sublist *)pd_new(sublist_class);
-    x->templatesym = canvas_makebindsym(templatesym);
+    x->tsym = canvas_makebindsym(tsym);
     x->fieldsym = fieldsym;
     gpointer_init(&x->gp);
     outlet_new(x,&s_pointer);
@@ -5020,9 +5017,9 @@ static void *sublist_new(t_symbol *templatesym, t_symbol *fieldsym) {
 
 static void sublist_pointer(t_sublist *x, t_gpointer *gp) {
     t_symbol *dummy;
-    t_template *t = template_findbyname(x->templatesym);
+    t_template *t = template_findbyname(x->tsym);
     int onset, type;
-    TEMPLATE_CHECK(x->templatesym,)
+    TEMPLATE_CHECK(x->tsym,)
     if (!gpointer_check(gp, 0)) {error("stale or empty pointer"); return;}
     if (!template_find_field(t, x->fieldsym, &onset, &type, &dummy)) {
         error("couldn't find field %s", x->fieldsym->name);

@@ -227,7 +227,10 @@ struct _array {
     int n;            /* number of elements */
     int elemsize;     /* size in bytes; LATER get this from template */
     char *vec;        /* array of elements */
-    t_symbol *templatesym;    /* template for elements */
+    union {
+      t_symbol *tsym;    /* template for elements */
+      t_symbol *templatesym; /* alias */
+    };
     t_gpointer gp;    /* pointer to scalar or array element we're in */
 };
 
