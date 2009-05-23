@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <sys/time.h>
 #include <sstream>
+#include <vector>
 #include <map>
 
 #ifdef MSW
@@ -80,7 +81,7 @@ t_class *boxes_class;
 struct t_boxes : t_gobj {
 	typedef  std::map<int,t_gobj *> M;
 	typedef std::pair<int,t_gobj *> KV;
-private:
+//private:
 	std::map<int,t_gobj *> map;
 public:
 	void invariant () {size();}
@@ -2029,32 +2030,21 @@ static float gobj_getxforsort(t_gobj *g) {
     return x1;
 }
 
-/*
-static t_gobj *canvas_dosort(t_canvas *x, t_gobj *g, int nitems) {
-    t_gobj *g2, *g3;
-    int n1 = nitems/2, n2 = nitems - n1, i;
-    if (nitems < 2) return g;
-    int i=n1-1;
-    for (g2 = g; i--; g2 = g2->next()) {}
-    g3 = g2->next();
-    g2->g_next = 0;
-    g = canvas_dosort(x, g, n1);
-    g3 = canvas_dosort(x, g3, n2);
-    return canvas_merge(x, g, g3);
+// three-way comparison (T is assumed Comparable)
+template <class T> static inline T cmp(T a, T b) {return a<b ? -1 : a>b;}
+
+int canvas_sort_compare(const void *a, const void *b) {
+    return cmp(gobj_getxforsort(*(t_gobj **)a),gobj_getxforsort(*(t_gobj **)b));
 }
 
 void canvas_sort(t_canvas *x) {
-    int nitems = 0, foo = 0;
-    float lastx = -1e37;
-    canvas_each(g,x) {
-        float x1 = gobj_getxforsort(g);
-        if (x1 < lastx) foo = 1;
-        lastx = x1;
-        nitems++;
-    }
-    if (foo) x->list = canvas_dosort(x, x->list, nitems);
+    std::vector<t_gobj *> v;
+    canvas_each(y,x) v.push_back(y);
+    qsort(v.data(),v.size(),sizeof(t_gobj *),canvas_sort_compare);
+    x->boxes->map.clear();
+    int i=0;
+    foreach(y,v) {(*y)->dix->index=i++; x->boxes->add(*y);}
 }
-*/
 
 static t_inlet *canvas_addinlet(t_canvas *x, t_pd *who, t_symbol *s, t_symbol* h) {
     t_inlet *ip = inlet_new(x,who,s,0); inlet_settip(ip,h);
@@ -6677,7 +6667,7 @@ static void g_canvas_setup() {
     class_addmethod2(c,graph_yticks,"yticks","fff");
     class_addmethod2(c,graph_ylabel,"ylabel","*");
     class_addmethod2(c,graph_array,"array","sfsF");
-    //class_addmethod2(c,canvas_sort,"sort","");
+    class_addmethod2(c,canvas_sort,"sort","");
 // dd-specific
     class_addmethod2(c,canvas_object_moveto,"object_moveto","sff");
     class_addmethod2(c,canvas_object_delete,"object_delete","s");
