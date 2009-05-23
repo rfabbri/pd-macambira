@@ -152,13 +152,10 @@ void sys_poll_midi() {
     }
 }
 #else
-/* this version uses the asynchronous "read()" ... */
 void sys_poll_midi() {
     int throttle = 100;
-    struct timeval timout;
-    int did = 1, maxfd = 0;
+    int did = 1;
     while (did) {
-        fd_set readset, writeset, exceptset;
         did = 0;
         if (throttle-- < 0) break;
         for (int i=0; i<oss_nmidiin; i++) {
