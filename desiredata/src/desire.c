@@ -59,6 +59,8 @@
 #define IS_A_FLOAT(atom,index)   ((atom+index)->a_type == A_FLOAT)
 #define IS_A_SYMBOL(atom,index)  ((atom+index)->a_type == A_SYMBOL)
 
+template <class T> T *realloc2(T *p, size_t n) {return (T *)realloc(p,n*sizeof(T));}
+
 int imin(int a, int b) {return a<b?a:b;}
 int imax(int a, int b) {return a>b?a:b;}
 t_symbol *s_empty, *s_pd, *s_Pd;
@@ -207,7 +209,7 @@ void appendix_free (t_gobj *master) {
 void gobj_subscribe(t_gobj *self, t_gobj *observer) {
 	t_appendix *d = self->dix;
 	for (size_t i=0; i<d->nobs; i++) if (d->obs[i]) return;
-	d->obs=(t_gobj **)realloc(d->obs,sizeof(t_gobj *)*(1+d->nobs));
+	d->obs=realloc2(d->obs,1+d->nobs);
 	d->obs[d->nobs++] = observer;
 	t_onsubscribe ons = self->_class->onsubscribe;
 	ons(self,observer);
@@ -1224,7 +1226,6 @@ static t_array *array_new(t_symbol *tsym, t_gpointer *parent) {
     x->tsym = tsym;
     x->n = 1;
     x->elemsize = sizeof(t_word) * t->n;
-    /* aligned allocation */
     x->vec = (char *)getalignedbytes(x->elemsize);
     /* note here we blithely copy a gpointer instead of "setting" a new one; this gpointer isn't accounted for
        and needn't be since we'll be deleted before the thing pointed to gets deleted anyway; see array_free. */
@@ -1249,11 +1250,7 @@ void array_resize(t_array *x, int n) {
     }
 }
 
-static void array_resize_and_redraw(t_array *array, int n) {
-/* what was that for??? */
-    array_resize(array,n);
-    gobj_changed(array,0);
-}
+static void array_resize_and_redraw(t_array *array, int n) {array_resize(array,n); gobj_changed(array,0);}
 
 void word_free(t_word *wp, t_template *t);
 
@@ -1360,23 +1357,17 @@ int garray_getname(t_garray *x, t_symbol **namep) {
 }
 
 
-/* if there is one garray in a graph, reset the graph's coordinates
-   to fit a new size and style for the garray */
+/* if there is one garray in a graph, reset the graph's coordinates to fit a new size and style for the garray */
 static void garray_fittograph(t_garray *x, int n, int style) {
     t_array *array = garray_getarray(x);
     t_canvas *gl = x->canvas;
-    if (gl->boxes->first() == x && !x->next()) {
-        vmess(gl,gensym("bounds"),"ffff",0.,gl->y1, double(style == PLOTSTYLE_POINTS || n == 1 ? n : n-1), gl->y2);
-                /* close any dialogs that might have the wrong info now... */
-    }
+    if (gl->boxes->first() == x && !x->next())
+        vmess(gl,gensym("bounds"),"ffff",0.,gl->y1, double(style==PLOTSTYLE_POINTS || n==1 ? n : n-1), gl->y2);
     array_resize_and_redraw(array, n);
 }
 
-/* handle "array" message to canvases; call graph_scalar above with
-an appropriate template; then set size and flags.  This is called
-from the menu and in the file format for patches.  LATER replace this
-by a more coherent (and general) invocation. */
-
+/* handle "array" message to canvases; call graph_scalar above with an appropriate template; then set size and flags.
+   This is called from the menu and in the file format for patches.  LATER replace this by a more coherent (and general) invocation. */
 t_garray *graph_array(t_canvas *gl, t_symbol *s, t_symbol *templateargsym, t_floatarg fsize, t_floatarg fflags) {
     int n = (int)fsize, zonset, ztype, saveit;
     t_symbol *zarraytype;
@@ -1452,8 +1443,7 @@ void garray_arraydialog(t_garray *x, t_symbol *name, t_floatarg fsize, t_floatar
         gobj_changed(x,0);
     }
     int size = max(1,int(fsize));
-    if (size != a->n) garray_resize(x, size);
-    else if (style != stylewas) garray_fittograph(x, size, style);
+    if (size != a->n) garray_resize(x, size); else if (style != stylewas) garray_fittograph(x, size, style);
     template_setfloat(scalartemplate, gensym("style"), x->scalar->v, (float)style, 0);
     garray_setsaveit(x, saveit!=0);
     garray_redraw(x);
@@ -1790,8 +1780,10 @@ static void garray_dofo(t_garray *x, int npoints, float dcval, int nsin, t_float
     t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     TEMPLATE_FLOATY(array,)
     if (npoints == 0) npoints = 512;  /* dunno what a good default would be... */
-    if (npoints != (1 << ilog2(npoints)))
-        post("%s: rounnding to %d points", array->tsym->name, (npoints = (1<<ilog2(npoints))));
+    if (npoints != (1<<ilog2(npoints))) {
+        npoints = 1<<ilog2(npoints);
+        post("%s: rounnding to %d points", array->tsym->name, npoints);
+    }
     garray_resize(x, npoints + 3);
     double phaseincr = 2. * 3.14159 / npoints;
     for (i=0, phase = -phaseincr; i < array->n; i++, phase += phaseincr) {
@@ -2113,7 +2105,7 @@ static void graph_yticks(t_canvas *x, t_floatarg point, t_floatarg inc, t_floata
 static void graph_xlabel(t_canvas *x, t_symbol *s, int argc, t_atom *argv) {
     if (argc < 1) {error("graph_xlabel: no y value given"); return;}
     x->xlabely = atom_getfloatarg(0,argc--,argv++);
-    x->xlabel = (t_symbol **)realloc(x->xlabel,argc*sizeof(void*));
+    x->xlabel = realloc2(x->xlabel,argc);
     x->nxlabels = argc;
     for (int i=0; i < argc; i++) x->xlabel[i] = atom_gensym(&argv[i]);
     gobj_changed(x,"xlabel");
@@ -2121,7 +2113,7 @@ static void graph_xlabel(t_canvas *x, t_symbol *s, int argc, t_atom *argv) {
 static void graph_ylabel(t_canvas *x, t_symbol *s, int argc, t_atom *argv) {
     if (argc < 1) {error("graph_ylabel: no x value given"); return;}
     x->ylabelx = atom_getfloatarg(0,argc--,argv++);
-    x->ylabel = (t_symbol **)realloc(x->ylabel,argc*sizeof(void*));
+    x->ylabel = realloc2(x->ylabel,argc);
     x->nylabels = argc;
     for (int i=0; i < argc; i++) x->ylabel[i] = atom_gensym(&argv[i]);
     gobj_changed(x,"ylabel");
@@ -2398,7 +2390,7 @@ static void canvas_readfrombinbuf(t_canvas *x, t_binbuf *b, const char *filename
             nline = canvas_scanbinbuf(natoms, vec, &message, &nextmsg);
             if (nline!=2 && nline!=3) break;
             int newnargs = ntargs + nline;
-            targs = (t_atom *)realloc(targs, sizeof(*targs) * newnargs);
+            targs = realloc2(targs,newnargs);
             targs[ntargs] = vec[message];
             targs[ntargs+1] = vec[message+1];
             if (nline==3) targs[ntargs+2] = vec[message+2];
@@ -2456,7 +2448,7 @@ static void canvas_doaddtemplate(t_symbol *tsym, int *p_ntemplates, t_symbol ***
     int n = *p_ntemplates;
     t_symbol **templatevec = *p_templatevec;
     for (int i=0; i < n; i++) if (templatevec[i] == tsym) return;
-    templatevec = (t_symbol **)realloc(templatevec, (n+1)*sizeof(*templatevec));
+    templatevec = realloc2(templatevec,n+1);
     templatevec[n] = tsym;
     *p_templatevec = templatevec;
     *p_ntemplates = n+1;
@@ -2478,7 +2470,7 @@ static void canvas_writescalar(t_symbol *tsym, t_word *w, t_binbuf *b, int amarr
     for (int i=0; i<n; i++) {
 	int ty = t->vec[i].type;
         if (ty==DT_FLOAT || ty==DT_SYMBOL) {
-            a = (t_atom *)realloc(a, (natom+1)*sizeof(*a));
+            a = realloc2(a,natom+1);
             if (t->vec[i].type == DT_FLOAT) SETFLOAT( a + natom, w[i].w_float);
             else                            SETSYMBOL(a + natom, w[i].w_symbol);
             natom++;
@@ -3326,7 +3318,7 @@ static void scalar_properties(t_gobj *z, t_canvas *owner) {
     b = canvas_writetobinbuf(owner, 0);
     binbuf_gettext(b, &buf, &bufsize);
     binbuf_free(b);
-    buf = (char *)realloc(buf, bufsize+1);
+    buf = realloc2(buf,bufsize+1);
     buf[bufsize] = 0;
     sprintf(buf2, "pdtk_data_dialog %%s {");
     sys_gui(buf);
@@ -3399,7 +3391,7 @@ static t_template *template_new(t_symbol *tsym, int argc, t_atom *argv) {
             argv++;
         } else {error("%s: no such type", newtypesym->name); goto bad;}
         newn = (oldn = x->n) + 1;
-        x->vec = (t_dataslot *)realloc(x->vec, newn*sizeof(*x->vec));
+        x->vec = realloc2(x->vec,newn);
         x->n = newn;
         x->vec[oldn].type = newtype;
         x->vec[oldn].name = newname;
@@ -7115,7 +7107,7 @@ static void dopost(const char *s) {
 void      post(const char *fmt, ...) {
     char *buf; va_list ap; va_start(ap, fmt);
     size_t n = vasprintf(&buf, fmt, ap); va_end(ap);
-    buf=(char*)realloc(buf,n+2); strcpy(buf+n,"\n");
+    buf=realloc2(buf,n+2); strcpy(buf+n,"\n");
     dopost(buf); free(buf);
 }
 void startpost(const char *fmt, ...) {
