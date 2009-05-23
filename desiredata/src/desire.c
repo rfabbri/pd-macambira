@@ -2029,30 +2029,6 @@ static float gobj_getxforsort(t_gobj *g) {
     return x1;
 }
 
-static t_gobj *canvas_merge(t_canvas *x, t_gobj *g1, t_gobj *g2) {
-/*
-    t_gobj *g = 0, *g9 = 0;
-    float f1 = g1 ? gobj_getxforsort(g1) : 0;
-    float f2 = g2 ? gobj_getxforsort(g2) : 0;
-    while (1) {
-	if (g1 && !(g2 && f1>f2)) {
-	        if (g9) {g9->g_next = g1; g9 = g1;} else g9 = g = g1;
-	        if ((g1 = g1->next())) f1 = gobj_getxforsort(g1);
-	        g9->g_next = 0;
-	        continue;
-	}
-	if (g1 || g2) {
-	        if (g9) {g9->g_next = g2; g9 = g2;} else g9 = g = g2;
-	        if ((g2 = g2->next())) f2 = gobj_getxforsort(g2);
-	        g9->g_next = 0;
-	        continue;
-	}
-        break;
-    }
-    return g;
-*/
-}
-
 /*
 static t_gobj *canvas_dosort(t_canvas *x, t_gobj *g, int nitems) {
     t_gobj *g2, *g3;
