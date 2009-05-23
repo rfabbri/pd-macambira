@@ -1625,13 +1625,14 @@ static void dac_dsp(t_dac *x, t_signal **sp) {
     for (i = x->n, ip = x->vec, sp2 = sp; i--; ip++, sp2++) {
         int ch = *ip - 1;
         if ((*sp2)->n != sys_dacblocksize) error("dac~: bad vector size");
-    	else if (ch >= 0 && ch < sys_get_outchannels())
+    	else if (ch >= 0 && ch < sys_get_outchannels()) {
 		if(SIMD_CHECK3(sys_dacblocksize,sys_soundout + sys_dacblocksize*ch, (*sp2)->v,sys_soundout + sys_dacblocksize*ch))
 		    dsp_add(plus_perf_simd, 4, sys_soundout + sys_dacblocksize*ch,
 			    (*sp2)->v, sys_soundout + sys_dacblocksize*ch, sys_dacblocksize);
 		else
 		    dsp_add(plus_perform, 4, sys_soundout + sys_dacblocksize*ch, (*sp2)->v, sys_soundout + sys_dacblocksize*ch,
 			sys_dacblocksize);
+	}
     }
 }
 static void dac_free(t_dac *x) {free(x->vec);}
