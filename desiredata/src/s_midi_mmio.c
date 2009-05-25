@@ -48,7 +48,7 @@ static void msw_midiouterror(char *s, int err) {
 }
 
 static HMIDIOUT hMidiOut[MAXMIDIOUTDEV];    /* output device */
-static int msw_nmidiout;                            /* number of devices */
+static int msw_nmidiout;                    /* number of devices */
 
 static void msw_open_midiout(int nmidiout, int *midioutvec) {
     UINT result, wRtn;
@@ -425,17 +425,12 @@ void sys_poll_midi() {
             int byte2 = (msw_nextevent.data >> 16) & 0xff;
             int portno = msw_nextevent.dwDevice;
             switch (msgtype) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 6:
+            case 0: case 1: case 2: case 3: case 6:
                 sys_midibytein(portno, commandbyte);
                 sys_midibytein(portno, byte1);
                 sys_midibytein(portno, byte2);
                 break; 
-            case 4:
-            case 5:
+            case 4: case 5:
                 sys_midibytein(portno, commandbyte);
                 sys_midibytein(portno, byte1);
                 break;
@@ -465,17 +460,16 @@ void sys_close_midi() {
 /* list the audio and MIDI device names */
 void sys_listmididevs() {
     UINT  wRtn, ndevices;
-    unsigned int i;
     /* for MIDI and audio in and out, get the number of devices. Then get the capabilities of each device and print its description. */
     ndevices = midiInGetNumDevs();
-    for (i = 0; i < ndevices; i++) {
+    for (unsigned i=0; i<ndevices; i++) {
         MIDIINCAPS micap;
         wRtn = midiInGetDevCaps(i, (LPMIDIINCAPS) &micap, sizeof(micap));
         if (wRtn) msw_midiinerror("midiInGetDevCaps: %s", wRtn);
         else error("MIDI input device #%d: %s", i+1, micap.szPname);
     }
     ndevices = midiOutGetNumDevs();
-    for (i = 0; i < ndevices; i++) {
+    for (unsigned i=0; i<devices; i++) {
         MIDIOUTCAPS mocap;
         wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap, sizeof(mocap));
         if (wRtn) msw_midiouterror("midiOutGetDevCaps: %s", wRtn);
@@ -488,14 +482,14 @@ void midi_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *noutdevs
     int i, nin = midiInGetNumDevs(), nout = midiOutGetNumDevs();
     UINT  wRtn;
     if (nin > maxndev) nin = maxndev;
-    for (i = 0; i < nin; i++) {
+    for (int i=0; i<nin; i++) {
         MIDIINCAPS micap;
         wRtn = midiInGetDevCaps(i, (LPMIDIINCAPS) &micap, sizeof(micap));
         strncpy(indevlist + i * devdescsize, (wRtn ? "???" : micap.szPname), devdescsize);
         indevlist[(i+1) * devdescsize - 1] = 0;
     }
     if (nout > maxndev) nout = maxndev;
-    for (i = 0; i < nout; i++) {
+    for (int i=0; i<nout; i++) {
         MIDIOUTCAPS mocap;
         wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap, sizeof(mocap));
         strncpy(outdevlist + i * devdescsize, (wRtn ? "???" : mocap.szPname), devdescsize);
