@@ -33,18 +33,18 @@ static int process (jack_nframes_t nframes, void *arg) {
 	jack_out_max = max(int(nframes),JACK_OUT_MAX);
 	if (jack_filled >= nframes) {
 		if (jack_filled != nframes) post("Partial read");
-		for (int j = 0; j < sys_outchannels;  j++) {
+		for (int j=0; j<sys_outchannels;  j++) {
 			float *out = (float *)jack_port_get_buffer(output_port[j], nframes);
 			memcpy(out, jack_outbuf + (j * BUF_JACK), sizeof(float)*nframes);
 		}
-		for (int j = 0; j < sys_inchannels; j++) {
+		for (int j=0; j<sys_inchannels; j++) {
 			float *in  = (float *)jack_port_get_buffer( input_port[j], nframes);
 			memcpy(jack_inbuf + (j * BUF_JACK), in,   sizeof(float)*nframes);
 		}
 		jack_filled -= nframes;
 	} else { /* PD could not keep up ! */
 		if (jack_started) jack_dio_error = 1;
-		for (int j = 0; j < outport_count;  j++) {
+		for (int j=0; j<outport_count;  j++) {
 			float *out = (float *)jack_port_get_buffer (output_port[j], nframes);
 			memset(out, 0, sizeof (float) * nframes);
 		}
@@ -108,7 +108,7 @@ static int jack_srate (jack_nframes_t srate, void *arg) {
     return 0;
 }
 
-void jack_close_audio(void);
+static void jack_close_audio(void);
 static int jack_ignore_graph_callback = 0;
 static t_int jack_shutdown_handler(t_int* none) {
 	error("jack kicked us out ... trying to reconnect");
@@ -150,7 +150,7 @@ static char** jack_get_clients() {
                it in spot 0 put it in spot 0 and move whatever was already in spot 0 to the end. */
             if (strcmp("alsa_pcm",tmp_client_name)==0 && num_clients>0) {
                 /* alsa_pcm goes in spot 0 */
-		char* tmp = jack_client_names[ num_clients ];
+		char* tmp = jack_client_names[num_clients];
 		jack_client_names[num_clients] = jack_client_names[0];
 		jack_client_names[0] = tmp;
 		strcpy(jack_client_names[0], tmp_client_name);
@@ -177,13 +177,13 @@ static int jack_connect_ports(char *client) {
 	const char **jack_ports = jack_get_ports(jack_client, regex_pattern, 0, JackPortIsOutput);
 	if (jack_ports)
 		for (int i=0;jack_ports[i] != 0 && i < sys_inchannels;i++)
-			if (jack_connect (jack_client, jack_ports[i], jack_port_name (input_port[i])))
+			if (jack_connect(jack_client, jack_ports[i], jack_port_name(input_port[i])))
 				error("cannot connect input ports %s -> %s", jack_ports[i],jack_port_name(input_port[i]));
 	free(jack_ports);
 	jack_ports = jack_get_ports(jack_client, regex_pattern, 0, JackPortIsInput);
 	if (jack_ports)
 		for (int i=0;jack_ports[i] != 0 && i < sys_outchannels;i++)
-			if (jack_connect (jack_client, jack_port_name (output_port[i]), jack_ports[i]))
+			if (jack_connect(jack_client, jack_port_name(output_port[i]), jack_ports[i]))
 				error("cannot connect output ports %s -> %s",jack_port_name(output_port[i]),jack_ports[i]);
 	free(jack_ports);
 	return 0;
@@ -256,11 +256,11 @@ int jack_open_audio_2(int inchans, int outchans, int rate, int scheduler) {
     int srate = jack_get_sample_rate (jack_client);
     sys_dacsr = srate;
     /* create the ports */
-    for (int j = 0; j < inchans; j++) {
+    for (int j=0; j<inchans; j++) {
 	sprintf(port_name, "input%d", j);
 	if (!input_port[j])  input_port[j]  = jack_port_register(jack_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
     }
-    for (int j = 0; j < outchans; j++) {
+    for (int j=0; j<outchans; j++) {
 	sprintf(port_name, "output%d", j);
 	if (!output_port[j]) output_port[j] = jack_port_register(jack_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
     }
@@ -278,7 +278,7 @@ int jack_open_audio_2(int inchans, int outchans, int rate, int scheduler) {
     return 0;
 }
 
-void jack_close_audio() {
+static void jack_close_audio() {
     if (!jack_client) return;
     jack_deactivate(jack_client);
     jack_started = 0;
