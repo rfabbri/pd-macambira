@@ -56,7 +56,7 @@
 #define DEVICENO 0
 #define NBUF 2
 #define COMPOSITEIN 1
-#define WANTED_BUFFERS 2
+#define MAX_BUFFERS 8
 #define MAX_INPUT   16
 #define MAX_NORM    16
 #define MAX_FORMAT  32
@@ -85,17 +85,19 @@ typedef struct pdp_v4l2_struct
   int x_ninputs;
   int x_nstandards;
   int x_nformats;
+  int x_nbbuffers;
+
   struct v4l2_capability x_vcap;
   struct v4l2_input x_inputs[MAX_INPUT];
   struct v4l2_standard x_standards[MAX_NORM];
   struct v4l2_fmtdesc x_formats[MAX_FORMAT];
   struct v4l2_streamparm x_streamparam;
   struct v4l2_queryctrl x_controls[MAX_CTRL*2];
-  struct v4l2_buffer x_v4l2_buf[WANTED_BUFFERS];
+  struct v4l2_buffer x_v4l2_buf[MAX_BUFFERS];
   struct v4l2_format x_v4l2_format;
   struct v4l2_requestbuffers x_reqbufs;
 
-  unsigned char *x_pdp_buf[WANTED_BUFFERS];
+  unsigned char *x_pdp_buf[MAX_BUFFERS];
  
   int x_tvfd;
   int x_frame;
@@ -141,7 +143,7 @@ static void pdp_v4l2_close(t_pdp_v4l2 *x)
     }
 
     if (x->x_initialized){
-        for( i=0; i<WANTED_BUFFERS; i++ )
+        for( i=0; i<x->x_nbbuffers; i++ )
         {
            munmap(x->x_pdp_buf[i], x->x_v4l2_buf[i].length);
         }
@@ -253,7 +255,7 @@ static void *pdp_v4l2_thread(void *voidx)
 {
     t_pdp_v4l2 *x = ((t_pdp_v4l2 *)voidx);
 
-    x->x_frame ^= 0x1;
+    x->x_frame = (x->x_frame+1)%x->x_nbbuffers;
     if ( -1 == pdp_v4l2_start_capturing( x ) )
     {
        post( "pdp_v4l2 : problem starting capture.. exiting " );
@@ -267,7 +269,7 @@ static void *pdp_v4l2_thread(void *voidx)
         pdp_v4l2_wait_frame(x);
 
         /* wait until previous capture is ready */
-        x->x_frame ^= 0x1;
+        x->x_frame = (x->x_frame+1)%x->x_nbbuffers;
         pdp_v4l2_capture_frame(x);
 
         /* setup pointers for main thread */
@@ -320,10 +322,10 @@ static int pdp_v4l2_set_format(t_pdp_v4l2 *x, t_int index)
 
 static int pdp_v4l2_init_mmap(t_pdp_v4l2 *x)
 {
-  unsigned int i;
+  int i;
 
     // get mmap numbers 
-    x->x_reqbufs.count  = WANTED_BUFFERS;
+    x->x_reqbufs.count  = MAX_BUFFERS;
     x->x_reqbufs.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     x->x_reqbufs.memory = V4L2_MEMORY_MMAP;
     if (-1 == ioctl(x->x_tvfd, VIDIOC_REQBUFS, &x->x_reqbufs, 0))
@@ -334,7 +336,15 @@ static int pdp_v4l2_init_mmap(t_pdp_v4l2 *x)
     post("pdp_v4l2: got %d buffers type %d memory %d", 
         x->x_reqbufs.count, x->x_reqbufs.type, x->x_reqbufs.memory );
 
-    for (i = 0; i < x->x_reqbufs.count; i++) 
+    if ( x->x_reqbufs.count > MAX_BUFFERS )
+    {
+        post( "pdp_v4l2 : this device requires more buffer space" ); 
+        return -1;
+    }
+
+    x->x_nbbuffers = x->x_reqbufs.count;
+
+    for (i = 0; i < x->x_nbbuffers; i++) 
     {
         x->x_v4l2_buf[i].index  = i;
         x->x_v4l2_buf[i].type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -355,7 +365,7 @@ static int pdp_v4l2_init_mmap(t_pdp_v4l2 *x)
     }
     post( "pdp_v4l2 : mapped %d buffers", x->x_reqbufs.count ); 
 
-    for (i = 0; i < WANTED_BUFFERS; i++) 
+    for (i = 0; i < x->x_nbbuffers; i++) 
     {
         x->x_v4l2_buf[i].type        = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         x->x_v4l2_buf[i].memory      = V4L2_MEMORY_MMAP;
