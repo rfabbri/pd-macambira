@@ -54,17 +54,10 @@
 #define CLIP32(x) (((x)>F32MAX)?F32MAX:((x) < -F32MAX)?-F32MAX:(x))
 
 #define ALSAMM_FORMAT SND_PCM_FORMAT_S32
-/*
-   maximum of 4 devices
-   you can mix rme9632,hdsp9632 (18 chans) rme9652,hdsp9652 (26 chans), dsp-madi (64 chans)
-   if synced
-*/
+/* maximum of 4 devices. you can mix rme9632,hdsp9632 (18 chans) rme9652,hdsp9652 (26 chans), dsp-madi (64 chans) if synced */
 
-/*
-   we need same samplerate, buffertime and so on for
-   each card soo we use global vars...
-   time is in us,   size in frames (i hope so ;-)
-*/
+/* we need same samplerate, buffertime and so on for each card soo we use global vars...
+   time is in us, size in frames (i hope so ;-) */
 static unsigned int alsamm_sr = 0;
 static unsigned int alsamm_buffertime = 0;
 static unsigned int alsamm_buffersize = 0;
@@ -178,9 +171,8 @@ int alsamm_open_audio(int rate) {
          sys_schedadvance,sys_advance_samples,alsamm_buffertime,
          sys_blocksize,alsamm_buffersize);
   alsamm_periods = 0; /* no one wants periods setting from command line ;-) */
-  for (i=0;i<alsa_noutdev;i++) {
-        /*   post("open audio out %d, of %lx, %d",i,&alsa_device[i],
-                   alsa_outdev[i].a_handle); */
+  for (int i=0; i<alsa_noutdev;i++) {
+    /* post("open audio out %d, of %lx, %d",i,&alsa_device[i], alsa_outdev[i].a_handle); */
     try {
       CHK(set_hwparams(alsa_outdev[i].a_handle, hw_params, &(alsa_outdev[i].a_channels)));
       CHK(set_swparams(alsa_outdev[i].a_handle, sw_params,1));
@@ -191,7 +183,7 @@ int alsamm_open_audio(int rate) {
       post("playback device with %d channels and buffer_time %d us opened", alsa_outdev[i].a_channels, alsamm_buffertime);
     } catch (AlsaError) {continue;}
   }
-  for (i=0;i<alsa_nindev;i++) {
+  for (int i=0; i<alsa_nindev; i++) {
       if(sys_verbose) post("capture card %d:--------------------",i);
       CHK(set_hwparams(alsa_indev[i].a_handle, hw_params, &(alsa_indev[i].a_channels)));
       alsamm_inchannels += alsa_indev[i].a_channels;
@@ -230,7 +222,7 @@ int alsamm_open_audio(int rate) {
 void alsamm_close_audio() {
   if(debug&&sys_verbose) post("closing devices");
   alsamm_stop();
-  for (int i=0;i< alsa_noutdev;i++) {
+  for (int i=0; i<alsa_noutdev; i++) {
     //if(debug&&sys_verbose) post("unlink audio out %d, of %lx",i,used_outdevice[i]);
     if(alsa_outdev[i].a_synced != 0) {
       CHK(snd_pcm_unlink(alsa_outdev[i].a_handle));
@@ -240,7 +232,7 @@ void alsamm_close_audio() {
     if(alsa_outdev[i].a_addr) {free(alsa_outdev[i].a_addr); alsa_outdev[i].a_addr=0;}
     alsa_outdev[i].a_channels = 0;
   }
-  for (int i=0;i< alsa_nindev;i++) {
+  for (int i=0; i<alsa_nindev; i++) {
     CHK(snd_pcm_close(alsa_indev[i].a_handle));
     if(alsa_indev[i].a_addr) {free(alsa_indev[i].a_addr); alsa_indev[i].a_addr=0;}
     alsa_indev[i].a_channels = 0;
@@ -257,7 +249,6 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
  try {
 #ifndef ALSAAPI9
   unsigned int rrate;
-  int dir;
   /* choose all parameters */
   CHK(snd_pcm_hw_params_any(handle, params));
   /* set the nointerleaved read/write format */
@@ -269,7 +260,7 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
   /* set the stream rate */
   rrate = alsamm_sr;
   if(debug&&sys_verbose) post("Samplerate request: %i Hz",rrate);
-  dir=-1;
+  int dir=-1;
   CHK(snd_pcm_hw_params_set_rate_near(handle, params, &rrate, &dir));
   if (rrate != alsamm_sr) {
     post("Warning: rate %iHz doesn't match requested %iHz", rrate,alsamm_sr);
@@ -281,9 +272,9 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
     CHK(snd_pcm_hw_params_get_channels_max(params, (unsigned *)&maxchs));
     CHK(snd_pcm_hw_params_get_channels_min(params, (unsigned *)&minchs));
     if(debug&&sys_verbose) post("Getting channels:min=%d, max= %d for request=%d",minchs,maxchs,channels);
-    if(channels < 0)channels=maxchs;
-    if(channels > maxchs)channels = maxchs;
-    if(channels < minchs)channels = minchs;
+    if(channels<0) channels=maxchs;
+    if(channels>maxchs) channels = maxchs;
+    if(channels<minchs) channels = minchs;
     if(channels != *chs) post("requested channels=%d but used=%d",*chs,channels);
     *chs = channels;
     if(debug&&sys_verbose) post("trying to use channels: %d",channels);
@@ -348,13 +339,13 @@ static int set_swparams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams, int pl
   snd_pcm_sw_params_get_stop_threshold(swparams, &bs);
   if(debug&&sys_verbose) post("sw_params: set stop_thresh_hold= %d (was %d)", (int) bs,(int)obs);
   /* AUTOSILENCE: silence if overrun.... */
-  snd_pcm_sw_params_get_silence_threshold (swparams, &ops);
-  CHK(snd_pcm_sw_params_set_silence_threshold (handle, swparams, alsamm_period_size));
-  snd_pcm_sw_params_get_silence_threshold (swparams, &ps);
+  snd_pcm_sw_params_get_silence_threshold(swparams, &ops);
+  CHK(snd_pcm_sw_params_set_silence_threshold(handle, swparams, alsamm_period_size));
+  snd_pcm_sw_params_get_silence_threshold(swparams, &ps);
   if(debug&&sys_verbose) post("sw_params: set silence_threshold = %d (was %d)", (int) ps,(int)ops);
-  snd_pcm_sw_params_get_silence_size (swparams, &ops);
+  snd_pcm_sw_params_get_silence_size(swparams, &ops);
   CHK(snd_pcm_sw_params_set_silence_size(handle, swparams, alsamm_period_size));
-  snd_pcm_sw_params_get_silence_size (swparams, &ps);
+  snd_pcm_sw_params_get_silence_size(swparams, &ps);
   if(debug&&sys_verbose) post("sw_params: set silence_size = %d (was %d)", (int) ps,(int)ops);
   /* AVAIL: allow the transfer when at least period_size samples can be processed */
   snd_pcm_sw_params_get_avail_min(swparams, &ops);
@@ -379,10 +370,7 @@ static int set_swparams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams, int pl
 /* ALSA Transfer helps */
 
 /* xrun_recovery is called if time to late or error
-  Note: use outhandle if synced i/o
-        the devices are linked so prepare
-        has only be called on out,
-        hopefully resume too...
+   Note: use outhandle if synced i/o; the devices are linked so prepare has only be called on out, hopefully resume too...
 */
 static int xrun_recovery(snd_pcm_t *handle, int err) {
   if (debug) alsamm_xruns++; /* count xruns */
@@ -405,12 +393,10 @@ static int xrun_recovery(snd_pcm_t *handle, int err) {
 static int alsamm_get_channels(snd_pcm_t *dev, snd_pcm_uframes_t *avail, snd_pcm_uframes_t *offset, int nchns, char **addr) {
   int err = 0;
   const snd_pcm_channel_area_t *mm_areas;
-  if (nchns > 0 && avail != NULL && offset != NULL) {
-    if ((err = snd_pcm_mmap_begin(dev, &mm_areas, offset, avail)) < 0) {
-      check_error(err,"setmems: begin_mmap failure ???");
-      return err;
-    }
-    for (int chn = 0; chn < nchns; chn++) {
+  if (nchns>0 && avail && offset) {
+    err = snd_pcm_mmap_begin(dev, &mm_areas, offset, avail);
+    if (err<0) {check_error(err,"setmems: begin_mmap failure ???"); return err;}
+    for (int chn=0; chn<nchns; chn++) {
       const snd_pcm_channel_area_t *a = &mm_areas[chn];
       addr[chn] = (char *) a->addr + ((a->first + a->step * *offset) / 8);
     }
@@ -421,16 +407,13 @@ static int alsamm_get_channels(snd_pcm_t *dev, snd_pcm_uframes_t *avail, snd_pcm
 
 static void alsamm_start() {
   int err = 0;
-  int chn;
   /* first prepare for in/out */
   for (int devno=0; devno<alsa_noutdev; devno++) {
     snd_pcm_uframes_t offset, avail;
     t_alsa_dev *dev = &alsa_outdev[devno];
     /* snd_pcm_prepare also in xrun, but cannot harm here */
-    if ((err = snd_pcm_prepare (dev->a_handle)) < 0) {
-      check_error(err,"outcard prepare error for playback");
-      return;
-    }
+    err = snd_pcm_prepare(dev->a_handle);
+    if (err<0) {check_error(err,"outcard prepare error for playback"); return;}
     offset = 0;
     avail = snd_pcm_avail_update(dev->a_handle);
     if (avail != (snd_pcm_uframes_t) alsamm_buffer_size) {
@@ -440,12 +423,9 @@ static void alsamm_start() {
     if(debug&&sys_verbose) post("start: set mems for avail=%d,offset=%d at buffersize=%d",avail,offset,alsamm_buffer_size);
     if(avail > 0) {
       int comitted = 0;
-      if ((err = alsamm_get_channels(dev->a_handle, &avail, &offset, dev->a_channels,dev->a_addr)) < 0) {
-        check_error(err,"setting initial out channelspointer failure ?");
-        continue;
-      }
-      for (chn = 0; chn < dev->a_channels; chn++)
-        memset(dev->a_addr[chn],0,avail*ALSAMM_SAMPLEWIDTH_32);
+      err = alsamm_get_channels(dev->a_handle, &avail, &offset, dev->a_channels,dev->a_addr);
+      if (err<0) {check_error(err,"setting initial out channelspointer failure ?"); continue;}
+      for (int chn=0; chn<dev->a_channels; chn++) memset(dev->a_addr[chn],0,avail*ALSAMM_SAMPLEWIDTH_32);
       comitted = snd_pcm_mmap_commit (dev->a_handle, offset, avail);
       avail = snd_pcm_avail_update(dev->a_handle);
       if(debug&&sys_verbose) post("start: now channels cleared, out with avail=%d, offset=%d,comitted=%d",avail,offset,comitted);
@@ -454,20 +434,16 @@ static void alsamm_start() {
     avail = snd_pcm_avail_update(dev->a_handle);
     if(debug&&sys_verbose) post("start: finish start, out with avail=%d, offset=%d",avail,offset);
     /* we have no autostart so anyway start*/
-    if ((err = snd_pcm_start (dev->a_handle)) < 0) {
-      check_error(err,"could not start playback");
-    }
+    err = snd_pcm_start (dev->a_handle);
+    if (err<0) check_error(err,"could not start playback");
   }
-  for (int devno = 0;devno < alsa_nindev;devno++) {
+  for (int devno=0; devno<alsa_nindev; devno++) {
     snd_pcm_uframes_t ioffset, iavail;
     t_alsa_dev *dev = &alsa_indev[devno];
-    /* if devices are synced then dont need to prepare
-       hopefully dma in aereas allready filled correct by the card */
-    if(dev->a_synced == 0) {
-      if ((err = snd_pcm_prepare (dev->a_handle)) < 0) {
-        check_error(err,"incard prepare error for capture");
-        /*      return err;*/
-      }
+    /* if devices are synced then don't need to prepare; hopefully dma in aereas allready filled correct by the card */
+    if (dev->a_synced == 0) {
+      err = snd_pcm_prepare (dev->a_handle);
+      if (err<0) {check_error(err,"incard prepare error for capture"); /* return err;*/}
     }
     ioffset = 0;
     iavail = snd_pcm_avail_update (dev->a_handle);
@@ -475,10 +451,8 @@ static void alsamm_start() {
     if (debug) post("start in: set in mems for avail=%d,offset=%d at buffersize=%d",iavail,ioffset,alsamm_buffer_size);
     if (iavail > (snd_pcm_uframes_t) 0) {
       if (debug) post("empty buffer not available at start, since avail %d != %d buffersize", iavail, alsamm_buffer_size);
-      if ((err = alsamm_get_channels(dev->a_handle, &iavail, &ioffset, dev->a_channels,dev->a_addr)) < 0) {
-        check_error(err,"getting in channelspointer failure ????");
-        continue;
-      }
+      err = alsamm_get_channels(dev->a_handle, &iavail, &ioffset, dev->a_channels,dev->a_addr);
+      if (err<0) {check_error(err,"getting in channelspointer failure ????"); continue;}
       snd_pcm_mmap_commit (dev->a_handle, ioffset, iavail);
       iavail = snd_pcm_avail_update (dev->a_handle);
       if (debug) post("start in now avail=%d",iavail);
@@ -487,22 +461,18 @@ static void alsamm_start() {
     /* if devices are synced then dont need to start */
     /* start with autostart , but anyway start */
     if(dev->a_synced == 0) {
-      if ((err = snd_pcm_start (dev->a_handle)) < 0) {
-        check_error(err,"could not start capture");
-        continue;
-      }
+      err = snd_pcm_start (dev->a_handle);
+      if (err<0) {check_error(err,"could not start capture"); continue;}
     }
   }
 }
 
 static void alsamm_stop() {
-  /* first stop in... */
   for (int devno=0; devno<alsa_nindev; devno++) {
     t_alsa_dev *dev = &alsa_indev[devno];
     if(sys_verbose) post("stop in device %d",devno);
     CH(snd_pcm_drop(dev->a_handle));
   }
-  /* then outs */
   for (int devno=0; devno<alsa_noutdev;devno++) {
     t_alsa_dev *dev = &alsa_outdev[devno];
     if(sys_verbose) post("stop out device %d",devno);
@@ -520,7 +490,7 @@ static void alsamm_stop() {
 
 Problems to solve:
 
-   a) Since in ALSA MMAP, the MMAP reagion can change (dont ask me why)
+   a) Since in ALSA MMAP, the MMAP reagion can change (don't ask me why)
    we have to do it each cycle or we say on RME HAMMERFALL/HDSP/DSPMADI
    it never changes to it once. so maybe we can do it once in open
 
@@ -544,10 +514,8 @@ int alsamm_send_dacs() {
   int outchannels = sys_outchannels;
   timelast = sys_getrealtime();
  if (debug) {
-  if(dac_send++ < 0)
-    post("dac send called in %d, out %d, xrun %d",inchannels,outchannels, alsamm_xruns);
-  if(alsamm_xruns && (alsamm_xruns % 1000) == 0)
-    post("1000 xruns accoured");
+  if(dac_send++ < 0) post("dac send called in %d, out %d, xrun %d",inchannels,outchannels, alsamm_xruns);
+  if(alsamm_xruns && (alsamm_xruns % 1000) == 0) post("1000 xruns accoured");
   if(dac_send < WATCH_PERIODS) {
     out_cm[dac_send] = -1;
     in_avail[dac_send] = out_avail[dac_send] = -1;
@@ -559,8 +527,7 @@ int alsamm_send_dacs() {
   if (!inchannels && !outchannels) return SENDDACS_NO;
   /* here we should check if in and out samples are here.
      but, the point is if out samples available also in sample should,
-     so we dont make a precheck of insamples here and let outsample check be the
-     the first of the first card. */
+     so we don't make a precheck of insamples here and let outsample check be the first of the first card. */
   /* OUTPUT Transfer */
   fpo = sys_soundout;
   for(devno = 0;devno < alsa_noutdev;devno++) {
@@ -574,10 +541,7 @@ int alsamm_send_dacs() {
     if (oavail < 0) {
       if (debug) broken_opipe++;
       err = xrun_recovery(out, -EPIPE);
-      if (err < 0) {
-        check_error(err,"otavail<0 recovery failed");
-        return SENDDACS_NO;
-      }
+      if (err < 0) {check_error(err,"otavail<0 recovery failed"); return SENDDACS_NO;}
       oavail = snd_pcm_avail_update(out);
     }
     /* check if we are late and have to (able to) catch up */
@@ -585,22 +549,14 @@ int alsamm_send_dacs() {
     state = snd_pcm_state(out);
     if (state == SND_PCM_STATE_XRUN) {
       err = xrun_recovery(out, -EPIPE);
-      if (err < 0) {
-        check_error(err,"DAC XRUN recovery failed");
-        return SENDDACS_NO;
-      }
+      if (err < 0) {check_error(err,"DAC XRUN recovery failed"); return SENDDACS_NO;}
       oavail = snd_pcm_avail_update(out);
     } else if (state == SND_PCM_STATE_SUSPENDED) {
       err = xrun_recovery(out, -ESTRPIPE);
-      if (err < 0) {
-        check_error(err,"DAC SUSPEND recovery failed");
-        return SENDDACS_NO;
-      }
+      if (err < 0) {check_error(err,"DAC SUSPEND recovery failed"); return SENDDACS_NO;}
       oavail = snd_pcm_avail_update(out);
     }
-    if(debug && dac_send < WATCH_PERIODS) {
-      out_avail[dac_send] = oavail;
-    }
+    if(debug && dac_send < WATCH_PERIODS) out_avail[dac_send] = oavail;
     /* we only transfer transfersize of bytes request,
        this should only happen on first card otherwise we got a problem :-(()*/
     if(oavail < sys_dacblocksize) return SENDDACS_NO;
@@ -612,7 +568,6 @@ int alsamm_send_dacs() {
        transfer (normally when buffersize is a multiple of transfersize
        this should never happen) */
     while (size > 0) {
-      int chn;
       snd_pcm_sframes_t oframes;
       oframes = size;
       err =  alsamm_get_channels(out, (unsigned long *)&oframes, (unsigned long *)&ooffset,ochannels,dev->a_addr);
@@ -620,14 +575,12 @@ int alsamm_send_dacs() {
         out_offset[dac_send] = ooffset;
         outaddr[dac_send] = (char *) dev->a_addr[0];
       }
-      if (err < 0) {
-        if ((err = xrun_recovery(out, err)) < 0) {
-          check_error(err,"MMAP begins avail error");
-          break; /* next card please */
-        }
+      if (err<0) {
+        err = xrun_recovery(out, err);
+        if (err<0) {check_error(err,"MMAP begins avail error"); break; /* next card please */}
       }
       /* transfer into memory */
-      for (chn = 0; chn < ochannels; chn++) {
+      for (int chn=0; chn<ochannels; chn++) {
         t_alsa_sample32 *buf = (t_alsa_sample32 *)dev->a_addr[chn];
         /* osc(buf, oframes, (dac_send%1000 < 500)?-100.0:-10.0,440,&(indexes[chn])); */
         for (i = 0, fp2 = fp1 + chn*sys_dacblocksize; i < oframes; i++,fp2++) {
@@ -667,17 +620,11 @@ int alsamm_send_dacs() {
     state = snd_pcm_state(in);
     if (state == SND_PCM_STATE_XRUN) {
       err = xrun_recovery(in, -EPIPE);
-      if (err < 0) {
-        check_error(err,"ADC XRUN recovery failed");
-        return SENDDACS_NO;
-      }
+      if (err<0) {check_error(err,"ADC XRUN recovery failed"); return SENDDACS_NO;}
       iavail=snd_pcm_avail_update(in);
     } else if (state == SND_PCM_STATE_SUSPENDED) {
       err = xrun_recovery(in, -ESTRPIPE);
-      if (err < 0) {
-        check_error(err,"ADC SUSPEND recovery failed");
-        return SENDDACS_NO;
-      }
+      if (err < 0) {check_error(err,"ADC SUSPEND recovery failed"); return SENDDACS_NO;}
       iavail=snd_pcm_avail_update(in);
     }
     /* only transfer full transfersize or nothing */
@@ -689,14 +636,11 @@ int alsamm_send_dacs() {
        transfer (normally when buffersize is a multiple of transfersize
        this should never happen) */
     while(size > 0) {
-      int chn;
       snd_pcm_sframes_t iframes = size;
-      err =  alsamm_get_channels(in, (unsigned long *)&iframes, (unsigned long *)&ioffset,ichannels,dev->a_addr);
-      if (err < 0) {
-        if ((err = xrun_recovery(in, err)) < 0) {
-          check_error(err,"MMAP begins avail error");
-          return SENDDACS_NO;
-        }
+      err = alsamm_get_channels(in, (unsigned long *)&iframes, (unsigned long *)&ioffset,ichannels,dev->a_addr);
+      if (err<0) {
+        err = xrun_recovery(in, err);
+        if (err<0) {check_error(err,"MMAP begins avail error"); return SENDDACS_NO;}
       }
       if(debug && dac_send < WATCH_PERIODS) {
         in_avail[dac_send] = iavail;
@@ -704,21 +648,18 @@ int alsamm_send_dacs() {
         inaddr[dac_send] = dev->a_addr[0];
       }
       /* transfer into memory */
-      for (chn = 0; chn < ichannels; chn++) {
+      for (int chn=0; chn<ichannels; chn++) {
         t_alsa_sample32 *buf = (t_alsa_sample32 *) dev->a_addr[chn];
         for (i = 0, fp2 = fp1 + chn*sys_dacblocksize; i < iframes; i++,fp2++) {
             /* mask the lowest bits, since subchannels info can make zero samples nonzero */
-            *fp2 = (float) ((t_alsa_sample32) (buf[i] & 0xFFFFFF00))
-              * (1.0 / (float) INT32_MAX);
+            *fp2 = (float) (t_alsa_sample32(buf[i] & 0xFFFFFF00)) * (1.0 / float(INT32_MAX));
         }
       }
       commitres = snd_pcm_mmap_commit(in, ioffset, iframes);
       if (commitres < 0 || commitres != iframes) {
         post("please never");
-        if ((err = xrun_recovery(in, commitres >= 0 ? -EPIPE : commitres)) < 0) {
-          check_error(err,"MMAP synced in commit error");
-          return SENDDACS_NO;
-        }
+        err = xrun_recovery(in, commitres >= 0 ? -EPIPE : commitres);
+        if (err<0) {check_error(err,"MMAP synced in commit error"); return SENDDACS_NO;}
       }
       fp1 += iframes;
       size -= iframes;
@@ -738,9 +679,7 @@ void alsamm_showstat(snd_pcm_t *handle) {
   int err;
   snd_pcm_status_t *status;
   snd_pcm_status_alloca(&status);
-  if ((err = snd_pcm_status(handle, status)) < 0) {
-    check_error(err, "Get Stream status error");
-    return;
-  }
+  err = snd_pcm_status(handle, status);
+  if (err<0) {check_error(err,"Get Stream status error"); return;}
   snd_pcm_status_dump(status, alsa_stdout);
 }
