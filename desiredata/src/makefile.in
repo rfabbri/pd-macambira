@@ -60,8 +60,8 @@ pd$(EXE): $(OBJ) config.log $(SO) main.c
 pd-watchdog$(EXE): s_watchdog.c
 	$(CXX) $(CFLAGS) $(STRIPFLAG) -o pd-watchdog$(EXE) s_watchdog.c
 
-pd.com: main.o
-	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) $(CFLAGS) -o pd.com main.o $(LIBS) -L../src -lpd
+pd.com: main.c
+	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) $(CFLAGS) -o pd.com main.c $(LIBS) -L../src -lpd
 	strip --strip-unneeded -R .note -R .comment pd.com
 
 # i should sort out the LDFLAGS thing so that pd,pdsend,pdreceive don't get linked to all libs that libpd.so is linked to.
