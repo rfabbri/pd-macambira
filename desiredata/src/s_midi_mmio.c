@@ -6,7 +6,7 @@
 #include "s_stuff.h"
 #include <stdio.h>
 #include <windows.h>
-#include <MMSYSTEM.H>
+#include <mmsystem.h>
 
 /* ------------- MIDI time stamping from audio clock ------------ */
 #ifdef MIDI_TIMESTAMP
@@ -41,7 +41,7 @@ static double msw_midigettimefor(LARGE_INTEGER timestamp) {
 #endif /* MIDI_TIMESTAMP */
 
 /* ------------------------- MIDI output -------------------------- */
-static void msw_midiouterror(char *s, int err) {
+static void msw_midiouterror(const char *s, int err) {
     char t[256];
     midiOutGetErrorText(err, t, 256);
     error(s,t);
@@ -83,7 +83,7 @@ static void msw_close_midiout() {
 
 #define INPUT_BUFFER_SIZE 1000     // size of input buffer in events
 
-static void msw_midiinerror(char *s, int err) {
+static void msw_midiinerror(const char *s, int err) {
     char t[256];
     midiInGetErrorText(err, t, 256);
     error(s,t);
@@ -479,7 +479,7 @@ void sys_listmididevs() {
 #endif
 
 void midi_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *noutdevs, int maxndev, int devdescsize) {
-    int i, nin = midiInGetNumDevs(), nout = midiOutGetNumDevs();
+    int nin = midiInGetNumDevs(), nout = midiOutGetNumDevs();
     UINT  wRtn;
     if (nin > maxndev) nin = maxndev;
     for (int i=0; i<nin; i++) {
