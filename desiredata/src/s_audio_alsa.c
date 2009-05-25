@@ -167,37 +167,34 @@ static int alsaio_setup(t_alsa_dev *dev, int out, int *channels, int *rate, int 
 }
 
 /* return 0 on success */
-int alsa_open_audio(
+static int alsa_open_audio(
 int  naudioindev, int * audioindev, int  nchindev, int * chindev,
 int naudiooutdev, int *audiooutdev, int nchoutdev, int *choutdev, int rate, int dummy) {
     int err, inchans = 0, outchans = 0;
     char devname[512];
     int frag_size = (sys_blocksize ? sys_blocksize : ALSA_DEFFRAGSIZE);
-    int nfrags, i, iodev, dev2;
+    int nfrags, i;
     nfrags = int(sys_schedadvance * (float)rate / (1e6 * frag_size));
     /* save our belief as to ALSA's buffer size for later */
     alsa_buf_samps = nfrags * frag_size;
     alsa_nindev = alsa_noutdev = 0;
     alsa_jittermax = ALSA_DEFJITTERMAX;
     if (sys_verbose) post("audio buffer set to %d", (int)(0.001 * sys_schedadvance));
-    for (iodev = 0; iodev < naudioindev; iodev++) {
+    for (int iodev=0; iodev<naudioindev; iodev++) {
         alsa_numbertoname(audioindev[iodev], devname, 512);
         err = snd_pcm_open(&alsa_indev[alsa_nindev].a_handle, devname, SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK);
         check_error(err, "snd_pcm_open (input)");
-        if (err < 0)
-            continue;
+        if (err<0) continue;
         alsa_indev[alsa_nindev].a_devno = audioindev[iodev];
         snd_pcm_nonblock(alsa_indev[alsa_nindev].a_handle, 1);
-        if (sys_verbose)
-            post("opened input device name %s", devname);
+        if (sys_verbose) post("opened input device name %s", devname);
         alsa_nindev++;
     }
-    for (iodev = 0; iodev < naudiooutdev; iodev++) {
+    for (int iodev=0; iodev<naudiooutdev; iodev++) {
         alsa_numbertoname(audiooutdev[iodev], devname, 512);
         err = snd_pcm_open(&alsa_outdev[alsa_noutdev].a_handle, devname, SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
         check_error(err, "snd_pcm_open (output)");
-        if (err < 0)
-            continue;
+        if (err<0) continue;
         alsa_outdev[alsa_noutdev].a_devno = audiooutdev[iodev];
         snd_pcm_nonblock(alsa_outdev[alsa_noutdev].a_handle, 1);
         alsa_noutdev++;
@@ -205,29 +202,28 @@ int naudiooutdev, int *audiooutdev, int nchoutdev, int *choutdev, int rate, int 
     if (!alsa_nindev && !alsa_noutdev) goto blewit;
     /* If all the open devices support mmap_noninterleaved, let's call Wini's code in s_audio_alsamm.c */
     alsa_usemmap = 1;
-    for (iodev = 0; iodev < alsa_nindev ; iodev++) if (!alsaio_canmmap(&alsa_indev [iodev])) alsa_usemmap = 0;
-    for (iodev = 0; iodev < alsa_noutdev; iodev++) if (!alsaio_canmmap(&alsa_outdev[iodev])) alsa_usemmap = 0;
+    for (int iodev=0; iodev<alsa_nindev ; iodev++) if (!alsaio_canmmap(&alsa_indev [iodev])) alsa_usemmap = 0;
+    for (int iodev=0; iodev<alsa_noutdev; iodev++) if (!alsaio_canmmap(&alsa_outdev[iodev])) alsa_usemmap = 0;
     if (alsa_usemmap) {
         post("using mmap audio interface");
         if (alsamm_open_audio(rate)) goto blewit; else return 0;
     }
-    for (iodev = 0; iodev < alsa_nindev; iodev++) {
+    for (int iodev=0; iodev<alsa_nindev; iodev++) {
         int channels = chindev[iodev];
         if (alsaio_setup(&alsa_indev[iodev], 0, &channels, &rate, nfrags, frag_size) < 0) goto blewit;
         inchans += channels;
     }
-    for (iodev = 0; iodev < alsa_noutdev; iodev++) {
+    for (int iodev=0; iodev<alsa_noutdev; iodev++) {
         int channels = choutdev[iodev];
         if (alsaio_setup(&alsa_outdev[iodev], 1, &channels, &rate, nfrags, frag_size) < 0) goto blewit;
         outchans += channels;
     }
-    if (!inchans && !outchans)
-        goto blewit;
-    for (iodev = 0; iodev < alsa_nindev ; iodev++) snd_pcm_prepare( alsa_indev[iodev].a_handle);
-    for (iodev = 0; iodev < alsa_noutdev; iodev++) snd_pcm_prepare(alsa_outdev[iodev].a_handle);
+    if (!inchans && !outchans) goto blewit;
+    for (int iodev=0; iodev<alsa_nindev ; iodev++) snd_pcm_prepare( alsa_indev[iodev].a_handle);
+    for (int iodev=0; iodev<alsa_noutdev; iodev++) snd_pcm_prepare(alsa_outdev[iodev].a_handle);
     /* if duplex we can link the channels so they start together */
-    for (iodev = 0; iodev < alsa_nindev; iodev++) {
-        for (dev2 = 0; dev2 < alsa_noutdev; dev2++) {
+    for (int iodev=0; iodev<alsa_nindev; iodev++) {
+        for (int dev2=0; dev2<alsa_noutdev; dev2++) {
             if (alsa_indev[iodev].a_devno == alsa_outdev[iodev].a_devno) {
                 snd_pcm_link(alsa_indev[iodev].a_handle,alsa_outdev[iodev].a_handle);
             }
@@ -243,11 +239,11 @@ int naudiooutdev, int *audiooutdev, int nchoutdev, int *choutdev, int rate, int 
     if (outchans) {
         i = (frag_size * nfrags)/sys_dacblocksize + 1;
         while (i--) {
-            for (iodev = 0; iodev < alsa_noutdev; iodev++)
+            for (int iodev=0; iodev<alsa_noutdev; iodev++)
                 snd_pcm_writei(alsa_outdev[iodev].a_handle, alsa_snd_buf, sys_dacblocksize);
         }
     } else if (inchans) {
-        for (iodev = 0; iodev < alsa_nindev; iodev++)
+        for (int iodev=0; iodev<alsa_nindev; iodev++)
             if ((err = snd_pcm_start(alsa_indev[iodev].a_handle)) < 0) check_error(err, "input start failed");
     }
     return 0;
@@ -258,12 +254,9 @@ blewit:
     return 1;
 }
 
-void alsa_close_audio() {
+static void alsa_close_audio() {
     int err;
-    if (alsa_usemmap) {
-        alsamm_close_audio();
-        return;
-    }
+    if (alsa_usemmap) {alsamm_close_audio(); return;}
     for (int iodev=0; iodev<alsa_nindev; iodev++) {
         err = snd_pcm_close(alsa_indev[iodev].a_handle);
         check_error(err, "snd_pcm_close (input)");
@@ -298,16 +291,17 @@ int alsa_send_dacs() {
     callno++;
 #endif
     alsa_checkiosync();     /* check I/O are in sync and data not late */
-    for (iodev = 0; iodev < alsa_nindev; iodev++) {
+    for (int iodev=0; iodev<alsa_nindev; iodev++) {
         snd_pcm_status(alsa_indev[iodev].a_handle, alsa_status);
         if (snd_pcm_status_get_avail(alsa_status) < transfersize) return SENDDACS_NO;
     }
-    for (iodev = 0; iodev < alsa_noutdev; iodev++) {
+    for (int iodev=0; iodev<alsa_noutdev; iodev++) {
         snd_pcm_status(alsa_outdev[iodev].a_handle, alsa_status);
         if (snd_pcm_status_get_avail(alsa_status) < transfersize) return SENDDACS_NO;
     }
     /* do output */
-    for (iodev = 0, fp1 = sys_soundout, ch = 0; iodev < alsa_noutdev; iodev++) {
+    fp1 = sys_soundout; ch = 0;
+    for (int iodev=0; iodev<alsa_noutdev; iodev++) {
         int thisdevchans = alsa_outdev[iodev].a_channels;
         int chans = (chansouttogo < thisdevchans ? chansouttogo : thisdevchans);
         chansouttogo -= chans;
@@ -340,10 +334,8 @@ int alsa_send_dacs() {
             sys_log_error(ERR_DACSLEPT);
             return SENDDACS_NO;
         }
-
         /* zero out the output buffer */
-        memset(sys_soundout, 0, sys_dacblocksize * sizeof(*sys_soundout) *
-               sys_outchannels);
+        memset(sys_soundout, 0, sys_dacblocksize * sizeof(*sys_soundout) * sys_outchannels);
         if (sys_getrealtime() - timenow > 0.002) {
     #ifdef DEBUG_ALSA_XFER
             post("output %d took %d msec", callno, int(1000 * (timenow - timelast)));
@@ -412,42 +404,13 @@ void alsa_printstate() {
 }
 
 
-void alsa_resync() {
-    int i, result, iodev = 0;
-    if (sys_audioapi != API_ALSA) {
-        error("restart-audio: implemented for ALSA only.");
-        return;
-    }
-    memset(alsa_snd_buf, 0, alsa_indev[iodev].a_sampwidth * sys_dacblocksize * sys_outchannels);
-    for (i = 0; i < 1000000; i++) {
-        result = snd_pcm_writei(alsa_outdev[iodev].a_handle, alsa_snd_buf, sys_dacblocksize);
-        if (result != (int)sys_dacblocksize) break;
-    }
-    post("%d written", i);
-}
-
 void alsa_putzeros(int iodev, int n) {
-    int result;
     memset(alsa_snd_buf, 0, alsa_outdev[iodev].a_sampwidth * sys_dacblocksize * alsa_outdev[iodev].a_channels);
-    for (int i=0; i<n; i++) {
-        result = snd_pcm_writei(alsa_outdev[iodev].a_handle, alsa_snd_buf, sys_dacblocksize);
-#if 0
-        if (result != sys_dacblocksize) post("result %d", result);
-#endif
-    }
-    /* post ("putzeros %d", n); */
+    for (int i=0; i<n; i++) snd_pcm_writei(alsa_outdev[iodev].a_handle, alsa_snd_buf, sys_dacblocksize);
 }
 
 void alsa_getzeros(int iodev, int n) {
-    int i, result;
-    for (i = 0; i < n; i++) {
-        result = snd_pcm_readi(alsa_indev[iodev].a_handle, alsa_snd_buf, sys_dacblocksize);
-#if 0
-        if (result != sys_dacblocksize)
-            post("result %d", result);
-#endif
-    }
-    /* post ("getzeros %d", n); */
+    for (int i=0; i<n; i++) snd_pcm_readi(alsa_indev[iodev].a_handle, alsa_snd_buf, sys_dacblocksize);
 }
 
 /* call this only if both input and output are open */
@@ -550,7 +513,7 @@ static void alsa_numbertoname(int devno, char *devname, int nchar) {
 
 /* For each hardware card found, we list two devices, the "hard" and
    "plug" one.  The card scan is derived from portaudio code. */
-void alsa_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *noutdevs, int *canmulti, int maxndev, int devdescsize) {
+static void alsa_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *noutdevs, int *canmulti, int maxndev, int devdescsize) {
     int ndev = 0, cardno = -1, i, j;
     *canmulti = 2;  /* supports multiple devices */
     while (!snd_card_next(&cardno) && cardno >= 0) {
