@@ -5,17 +5,15 @@
 /* modified 2/98 by Winfried Ritsch to deal with up to 4 synchronized
 "wave" devices, which is how ADAT boards appear to the WAVE API. */
 
-#include "m_pd.h"
+#include "desire.h"
 #include "s_stuff.h"
 #include <stdio.h>
 #include <windows.h>
-#include <MMSYSTEM.H>
+#include <mmsystem.h>
 
 /* ------------------------- audio -------------------------- */
 
-static void nt_close_midiin();
 static void nt_noresync();
-static void postflags();
 
 #define NAPORTS 16   /* wini hack for multiple ADDA devices  */
 #define CHANNELS_PER_DEVICE 2
@@ -29,9 +27,7 @@ int nt_realdacblksize;
 #define MAXBUFFER 100   /* number of buffers in use at maximum advance */
 #define DEFBUFFER 30    /* default is about 30x6 = 180 msec! */
 static int nt_naudiobuffer = DEFBUFFER;
-float sys_dacsr = DEFAULTSRATE;
 
-static int nt_whichapi = API_MMIO;
 static int nt_meters;        /* true if we're metering */
 static float nt_inmax;       /* max input amplitude */
 static float nt_outmax;      /* max output amplitude */
@@ -342,9 +338,6 @@ static void nt_resyncaudio() {
 #define LATE 0
 #define RESYNC 1
 #define NOTHING 2
-static int nt_errorcount;
-static int nt_resynccount;
-static double nt_nextreporttime = -1;
 
 void nt_logerror(int which) {
 #if 0
@@ -360,33 +353,20 @@ void nt_logerror(int which) {
 #endif
 }
 
-/* system buffer with t_sample types for one tick */
-t_sample *sys_soundout;
-t_sample *sys_soundin;
-float sys_dacsr;
-
 int mmio_send_dacs() {
-    HMMIO hmmio;
     UINT mmresult;
-    HANDLE hFormat;
-    int i, j;
-    short *sp1, *sp2;
-    float *fp1, *fp2;
-    int nextfill, doxfer = 0;
     if (!nt_nwavein && !nt_nwaveout) return 0;
     if (nt_meters) {
-        int i, n;
-        float maxsamp;
-        for (i = 0, n = 2 * nt_nwavein * sys_dacblocksize, maxsamp = nt_inmax; i < n; i++) {
+        float maxsamp = nt_inmax;
+        for (int i=0, n=2*nt_nwavein*sys_dacblocksize; i<n; i++) {
             float f = sys_soundin[i];
-            if (f > maxsamp) maxsamp = f;
-            else if (-f > maxsamp) maxsamp = -f;
+            if (f > maxsamp) maxsamp = f; else if (-f > maxsamp) maxsamp = -f;
         }
         nt_inmax = maxsamp;
-        for (i = 0, n = 2 * nt_nwaveout * sys_dacblocksize, maxsamp = nt_outmax; i < n; i++) {
+	maxsamp = nt_outmax;
+        for (int i=0, n=2*nt_nwaveout*sys_dacblocksize; i<n; i++) {
             float f = sys_soundout[i];
-            if (f > maxsamp) maxsamp = f;
-            else if (-f > maxsamp) maxsamp = -f;
+            if (f > maxsamp) maxsamp = f; else if (-f > maxsamp) maxsamp = -f;
         }
         nt_outmax = maxsamp;
     }
@@ -415,15 +395,17 @@ int mmio_send_dacs() {
         }
     }
     /* Convert audio output to fixed-point and put it in the output buffer. */
+    int i, j;
+    short *sp1, *sp2;
+    float *fp1, *fp2;
     fp1 = sys_soundout;
     for (int nda=0; nda<nt_nwaveout; nda++) {
         int phase = ntsnd_outphase[nda];
-        for (i=0, sp1=(short *)(ntsnd_outvec[nda][phase].lpData)+CHANNELS_PER_DEVICE*nt_fill; i<2; i++, fp1 += sys_dacblocksize, sp1++) {
-            for (j = 0, fp2 = fp1, sp2 = sp1; j < sys_dacblocksize; j++, fp2++, sp2 += CHANNELS_PER_DEVICE) {
-                int x1 = 32767.f * *fp2;
-                if (x1 > 32767) x1 = 32767;
-                else if (x1 < -32767) x1 = -32767;
-                *sp2 = x1;
+	sp1=(short *)(ntsnd_outvec[nda][phase].lpData)+CHANNELS_PER_DEVICE*nt_fill;
+        for (int i=0; i<2; i++, fp1 += sys_dacblocksize, sp1++) {
+	    fp2 = fp1; sp2 = sp1;
+            for (int j=0; j<sys_dacblocksize; j++, fp2++, sp2 += CHANNELS_PER_DEVICE) {
+                *sp2 = clip(int(*fp2*32767),-32768,32767);
             }
         }
     }
@@ -497,9 +479,9 @@ idle:
 
 /* ------------------- public routines -------------------------- */
 
-void mmio_open_audio(int naudioindev, int *audioindev,
-int nchindev, int *chindev, int naudiooutdev, int *audiooutdev,
-int nchoutdev, int *choutdev, int rate) /* IOhannes */ {
+int mmio_open_audio(
+   int naudioindev,  int *audioindev,  int nchindev,  int *chindev,
+  int naudiooutdev, int *audiooutdev, int nchoutdev, int *choutdev, int rate, int dummy) /* IOhannes */ {
     int nbuf;
     nt_realdacblksize = (sys_blocksize ? sys_blocksize : DEFREALDACBLKSIZE);
     nbuf = sys_advance_samples/nt_realdacblksize;
@@ -518,6 +500,7 @@ int nchoutdev, int *choutdev, int rate) /* IOhannes */ {
     nt_whichdac = (naudiooutdev < 1 ? (nt_nwaveout > 1 ? WAVE_MAPPER : -1) : audiooutdev[0]);
     if (naudiooutdev > 1 || naudioindev > 1) post("separate audio device choice not supported; using sequential devices.");
     mmio_do_open_audio();
+    return 0;
 }
 
 #if 0
