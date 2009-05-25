@@ -140,13 +140,12 @@ int alsamm_open_audio(int rate) {
   /* Be aware in ALSA periodsize can be in bytes, where buffersize is in frames,
      but sometimes buffersize is in bytes and periods in frames, crazy alsa...
      ...we use periodsize and buffersize in frames */
-  int i;
   snd_pcm_hw_params_alloca(&hw_params);
   snd_pcm_sw_params_alloca(&sw_params);
   /* see add_devname */
   /* first have a look which cards we can get and set up device infos for them */
   /* init some structures */
-  for(i=0;i < ALSA_MAXDEV;i++) {
+  for(int i=0; i<ALSA_MAXDEV;i++) {
     alsa_indev[i].a_synced=alsa_outdev[i].a_synced=0;
     alsa_indev[i].a_channels=alsa_outdev[i].a_channels=-1; /* query defaults */
   }
@@ -672,14 +671,4 @@ int alsamm_send_dacs() {
       return SENDDACS_SLEPT;
   }
   return SENDDACS_YES;
-}
-
-/* extra debug info */
-void alsamm_showstat(snd_pcm_t *handle) {
-  int err;
-  snd_pcm_status_t *status;
-  snd_pcm_status_alloca(&status);
-  err = snd_pcm_status(handle, status);
-  if (err<0) {check_error(err,"Get Stream status error"); return;}
-  snd_pcm_status_dump(status, alsa_stdout);
 }
