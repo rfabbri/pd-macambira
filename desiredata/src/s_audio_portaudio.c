@@ -127,21 +127,19 @@ int indeviceno, int outdeviceno, int schedmode) {
             const PaStreamInfo *streaminfo = Pa_GetStreamInfo(pa_stream);
             t_atom atoms[4];
             t_symbol *pd = gensym("pd");
-            t_symbol *selector1 = gensym("audiocurrentininfo");
-            t_symbol *selector2 = gensym("audiocurrentoutinfo");
             sys_schedadvance = int(1e-6 * streaminfo->outputLatency);
 
             SETFLOAT(atoms, (float)indeviceno);
             SETFLOAT(atoms+1, (float)inchans);
             SETFLOAT(atoms+2, (float)rate);
             SETFLOAT(atoms+3, (float)streaminfo->inputLatency * 1000.f);
-            typedmess(pd->s_thing, selector1, 4, atoms);
+            typedmess(pd->s_thing, gensym("audiocurrentininfo"), 4, atoms);
 
             SETFLOAT(atoms, (float)outdeviceno);
             SETFLOAT(atoms+1, (float)outchans);
             SETFLOAT(atoms+2, (float)rate);
             SETFLOAT(atoms+3, (float)streaminfo->outputLatency * 1000.f);
-            typedmess(pd->s_thing, selector2, 4, atoms);
+            typedmess(pd->s_thing, gensym("audiocurrentoutinfo"), 4, atoms);
         }
     } else err = 0;
 
@@ -200,7 +198,7 @@ PaStreamCallbackFlags statusFlags, void *userData) {
     return 0;
 }
 
-void pa_close_audio() {
+static void pa_close_audio() {
     if(sys_verbose) post("closing portaudio");
     if (pa_inchans || pa_outchans) {
         if (pa_stream) {
@@ -217,13 +215,13 @@ void pa_close_audio() {
 }
 
 /* for blocked IO */
-int pa_send_dacs() {
+static int pa_send_dacs() {
     /* we don't support blocking i/o */
     return SENDDACS_NO;
 }
 
 /* lifted from pa_devs.c in portaudio */
-void pa_listdevs() {
+static void pa_listdevs() {
     PaError err;
     pa_initialize();
     int numDevices = Pa_GetDeviceCount();
@@ -251,7 +249,7 @@ void pa_listdevs() {
 }
 
 /* scanning for devices */
-void pa_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *noutdevs, int *canmulti, int maxndev, int devdescsize) {
+static void pa_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *noutdevs, int *canmulti, int maxndev, int devdescsize) {
     int nin = 0, nout = 0, ndev;
     *canmulti = 1;  /* one dev each for input and output */
     pa_initialize();
