@@ -121,25 +121,17 @@ void sys_alsa_do_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midio
     return;
 }
 
-#define md_msglen(x) (((x)<0xC0)?2:((x)<0xE0)?1:((x)<0xF0)?2:\
-    ((x)==0xF2)?2:((x)<0xF4)?1:0)
-
 void sys_alsa_putmidimess(int portno, int a, int b, int c) {
     int channel = a&15;
     snd_seq_event_t ev;
     snd_seq_ev_clear(&ev);
     if (portno >= 0 && portno < alsa_nmidiout) {
-        if (a >= 224) { // pitchbend
-    	    snd_seq_ev_set_pitchbend(&ev,channel,CombineBytes(b,c));
-        } else if (a >= 208) { // touch
-	    snd_seq_ev_set_chanpress(&ev,channel,b);
-        } else if (a >= 192) { // program
-	    snd_seq_ev_set_pgmchange(&ev,channel,b);
-        } else if (a >= 176) { // controller
-    	    snd_seq_ev_set_controller(&ev,channel,b,c);
-        } else if (a >= 160) { // polytouch
-	    snd_seq_ev_set_keypress(&ev,channel,b,c);
-        } else if (a >= 144) { // note
+        if      (a >= 224) snd_seq_ev_set_pitchbend(&ev,channel,CombineBytes(b,c));
+        else if (a >= 208) snd_seq_ev_set_chanpress(&ev,channel,b); // touch
+        else if (a >= 192) snd_seq_ev_set_pgmchange(&ev,channel,b);
+        else if (a >= 176) snd_seq_ev_set_controller(&ev,channel,b,c);
+        else if (a >= 160) snd_seq_ev_set_keypress(&ev,channel,b,c);// polytouch
+        else if (a >= 144) { // note
             channel = a-144;
             if (c) snd_seq_ev_set_noteon(&ev,channel,b,c);
             else   snd_seq_ev_set_noteoff(&ev,channel,b,c);
