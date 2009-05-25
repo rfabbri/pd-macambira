@@ -1,4 +1,4 @@
-#N canvas 0 232 313 197 10;
+#N canvas 0 232 518 277 10;
 #X declare -path effect -path abs_light;
 #X obj 5 16 declare -path effect -path abs_light;
 #N canvas 0 25 1171 554 memoires_lumiere 0;
@@ -1129,3 +1129,7 @@ dmx interface;
 #X text 87 73 midi_channel of the midi2DMX interface;
 #X connect 13 0 12 0;
 #X restore 5 111 pd bcf2000 _________________________;
+#X text 9 153 This should be adapted depending on the DMX interface
+you are using \, and also depending to your need. You should always
+fork this project befor using ig \, since it will evole without any
+warning.;
