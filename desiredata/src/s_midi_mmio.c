@@ -2,7 +2,7 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-#include "m_pd.h"
+#include "desire.h"
 #include "s_stuff.h"
 #include <stdio.h>
 #include <windows.h>
@@ -56,10 +56,10 @@ static void msw_open_midiout(int nmidiout, int *midioutvec) {
     if (nmidiout > MAXMIDIOUTDEV) nmidiout = MAXMIDIOUTDEV;
     int dev = 0;
     for (int i=0; i<nmidiout; i++) {
-        MIDIOUTCAPS mocap;
+        MIDIOUTCAPS m;
         int devno =  midioutvec[i];
         result = midiOutOpen(&hMidiOut[dev], devno, 0, 0, CALLBACK_NULL);
-        wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap, sizeof(mocap));
+        wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &m, sizeof(m));
         if (result != MMSYSERR_NOERROR) {
             error("midiOutOpen: %s",midioutcaps.szPname);
             msw_midiouterror("midiOutOpen: %s", result);
@@ -459,41 +459,34 @@ void sys_close_midi() {
 #if 0
 /* list the audio and MIDI device names */
 void sys_listmididevs() {
-    UINT  wRtn, ndevices;
     /* for MIDI and audio in and out, get the number of devices. Then get the capabilities of each device and print its description. */
-    ndevices = midiInGetNumDevs();
+    UINT ndevices = midiInGetNumDevs();
     for (unsigned i=0; i<ndevices; i++) {
-        MIDIINCAPS micap;
-        wRtn = midiInGetDevCaps(i, (LPMIDIINCAPS) &micap, sizeof(micap));
+        MIDIINCAPS m;
+        UINT wRtn = midiInGetDevCaps(i, (LPMIDIINCAPS) &m, sizeof(m));
         if (wRtn) msw_midiinerror("midiInGetDevCaps: %s", wRtn);
-        else error("MIDI input device #%d: %s", i+1, micap.szPname);
+        else error("MIDI input device #%d: %s", i+1, m.szPname);
     }
     ndevices = midiOutGetNumDevs();
     for (unsigned i=0; i<devices; i++) {
-        MIDIOUTCAPS mocap;
-        wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap, sizeof(mocap));
+        MIDIOUTCAPS m;
+        UINT wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &m, sizeof(m));
         if (wRtn) msw_midiouterror("midiOutGetDevCaps: %s", wRtn);
-        else error("MIDI output device #%d: %s", i+1, mocap.szPname);
+        else error("MIDI output device #%d: %s", i+1, m.szPname);
     }
 }
 #endif
 
 void midi_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *noutdevs, int maxndev, int devdescsize) {
-    int nin = midiInGetNumDevs(), nout = midiOutGetNumDevs();
-    UINT  wRtn;
-    if (nin > maxndev) nin = maxndev;
+    int  nin = min(maxndev,int( midiInGetNumDevs()));
+    int nout = min(maxndev,int(midiOutGetNumDevs()));
     for (int i=0; i<nin; i++) {
-        MIDIINCAPS micap;
-        wRtn = midiInGetDevCaps(i, (LPMIDIINCAPS) &micap, sizeof(micap));
-        strncpy(indevlist + i * devdescsize, (wRtn ? "???" : micap.szPname), devdescsize);
-        indevlist[(i+1) * devdescsize - 1] = 0;
+        MIDIINCAPS m;  UINT wRtn =  midiInGetDevCaps(i, (LPMIDIINCAPS)  &m, sizeof(m));
+        strncpy(indevlist  + i*devdescsize, (wRtn ? "???" : m.szPname), devdescsize);  indevlist[(i+1)*devdescsize - 1] = 0;
     }
-    if (nout > maxndev) nout = maxndev;
     for (int i=0; i<nout; i++) {
-        MIDIOUTCAPS mocap;
-        wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap, sizeof(mocap));
-        strncpy(outdevlist + i * devdescsize, (wRtn ? "???" : mocap.szPname), devdescsize);
-        outdevlist[(i+1) * devdescsize - 1] = 0;
+        MIDIOUTCAPS m; UINT wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &m, sizeof(m));
+        strncpy(outdevlist + i*devdescsize, (wRtn ? "???" : m.szPname), devdescsize); outdevlist[(i+1)*devdescsize - 1] = 0;
     }
     *nindevs = nin;
     *noutdevs = nout;
