@@ -106,21 +106,17 @@ static int sys_do_load_lib(t_canvas *canvas, char *objectname) {
     char *filename=0, *dirbuf, *classname, *nameptr;
     t_xxx makeout = NULL;
     int fd;
-    if ((classname = strrchr(objectname, '/'))) classname++;
-    else classname = objectname;
-    if (sys_onloadlist(objectname)) {
-        post("%s: already loaded", objectname);
-        return 1;
-    }
+    if ((classname = strrchr(objectname, '/'))) classname++; else classname = objectname;
+    if (sys_onloadlist(objectname)) {post("%s: already loaded", objectname); return 1;}
     char *symname = make_setup_name(classname);
     /* try looking in the path for (objectname).(sys_dllextent) ... */
-    if ((fd = canvas_open2(canvas, objectname, sys_dllextent , &dirbuf, &nameptr, 1)) >= 0) goto gotone;
+    fd = canvas_open2(canvas, objectname, sys_dllextent , &dirbuf, &nameptr, 1); if (fd>=0) goto gotone;
     /* same, with the more generic sys_dllextent2 */
-    if ((fd = canvas_open2(canvas, objectname, sys_dllextent2, &dirbuf, &nameptr, 1)) >= 0) goto gotone;
+    fd = canvas_open2(canvas, objectname, sys_dllextent2, &dirbuf, &nameptr, 1); if (fd>=0) goto gotone;
     /* next try (objectname)/(classname).(sys_dllextent) ... */
     asprintf(&filename,"%s/%s",objectname,classname);
-    if ((fd = canvas_open2(canvas, filename, sys_dllextent , &dirbuf, &nameptr, 1)) >= 0) goto gotone;
-    if ((fd = canvas_open2(canvas, filename, sys_dllextent2, &dirbuf, &nameptr, 1)) >= 0) goto gotone;
+    fd = canvas_open2(canvas,   filename, sys_dllextent , &dirbuf, &nameptr, 1); if (fd>=0) goto gotone;
+    fd = canvas_open2(canvas,   filename, sys_dllextent2, &dirbuf, &nameptr, 1); if (fd>=0) goto gotone;
     return 0;
 gotone:
     close(fd);
@@ -132,25 +128,16 @@ gotone:
 //    filename = realloc(filename,);
 #ifdef DL_OPEN
     void *dlobj = dlopen(filename, RTLD_NOW | RTLD_GLOBAL);
-    if (!dlobj) {
-        post("%s: %s", filename, dlerror());
-        goto forgetit;
-    }
+    if (!dlobj) {post("%s: %s", filename, dlerror()); goto forgetit;}
     makeout = (t_xxx)dlsym(dlobj, symname);
 #endif
 #ifdef MSW
     sys_bashfilename(filename, filename);
     HINSTANCE ntdll = LoadLibrary(filename);
-    if (!ntdll) {
-        post("%s: couldn't load", filename);
-        goto forgetit;
-    }
+    if (!ntdll) {post("%s: couldn't load", filename); goto forgetit;}
     makeout = (t_xxx)GetProcAddress(ntdll,"ntdll");
 #endif
-    if (!makeout) {
-        post("%s: can't find symbol '%s' in library", filename, symname);
-        goto forgetit;
-    }
+    if (!makeout) {post("%s: can't find symbol '%s' in library", filename, symname); goto forgetit;}
     makeout();
     class_set_extern_dir(&s_);
     sys_putonloadlist(objectname);
