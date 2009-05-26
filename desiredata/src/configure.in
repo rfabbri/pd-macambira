@@ -73,7 +73,10 @@ MIDISRC="s_midi_none.c"
 WLIB=""
 STRIP="meuhhhhh"
 
-if test `uname -s` = Linux; then
+OS=$(uname -s)
+dnl OS=MINGW32
+
+if test $OS = Linux; then
     LDFLAGS="-Wl,-export-dynamic "
     EXT=pd_linux
     LIBSUFFIX=.so
@@ -87,7 +90,7 @@ if test `uname -s` = Linux; then
     WSTRIP=""
 fi
 
-if test `uname -s` = Darwin; then
+if test $OS = Darwin; then
     LDFLAGS=""
     EXT=pd_darwin
     LIBSUFFIX=.dylib
@@ -115,7 +118,7 @@ if test `uname -s` = Darwin; then
 	WSTRIP=""
 fi
 
-if test `uname -s | cut -f1 -d_` = CYGWIN; then
+if test $(echo $OS | cut -f1 -d_) = CYGWIN; then
     LDFLAGS="-Wl,-export-dynamic "
     EXT=dll
     LIBSUFFIX=.dll
@@ -127,8 +130,9 @@ if test `uname -s | cut -f1 -d_` = CYGWIN; then
     WSTRIP=""
 fi
 
-if test `uname -s | cut -f1 -d_` = MINGW32; then
+if test $(echo $OS | cut -f1 -d_) = MINGW32; then
     LDFLAGS="-lm -lpthreadGC2 -lwsock32 -lwinmm -lole32 -L../src -lpd"
+#    LDFLAGS="-lm /home/matju/pthreads-mingw/lib/libpthreadGC2.a -lwsock32 -lwinmm -lole32 -L../src -lpd"
     EXT=dll
     LIBSUFFIX=.dll
     CPPFLAGS="-DMSW \
@@ -136,11 +140,10 @@ if test `uname -s | cut -f1 -d_` = MINGW32; then
     MORECFLAGS="-mms-bitfields"
     STRIPFLAG=-s
     LDSOFLAGS="-shared"
-#   AUDIOSRC="s_audio_mmio.c"
+    AUDIOSRC="s_audio_mmio.c"
     MIDISRC="s_midi_mmio.c"
-
     STRIP="strip --strip-unneeded -R .note -R .comment"
-    EXPORT="-Wl, --export-all-symbols -Wl, --out-implib=pd.a"
+    EXPORT="-Wl,--export-all-symbols -Wl,--out-implib=pd.a"
     WLIB=$WLIB"$LDFLAGS $EXPORT; $STRIP libpd.dll"
     EXE=.exe
     WATCHDOG=pd.com
