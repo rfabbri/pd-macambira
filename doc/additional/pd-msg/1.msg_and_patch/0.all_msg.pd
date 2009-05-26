@@ -32,8 +32,8 @@
 #X obj 40 665 s pd-subpatch;
 #X obj 395 665 s pd-subpatch;
 #X msg 40 211 connect 0 0 1 0;
-#X msg 40 495 read textfile.txt;
-#X msg 40 517 write textfile.txt;
+#X msg 40 475 read textfile.txt;
+#X msg 40 497 write textfile.txt;
 #X msg 395 503 vis \$1;
 #X msg 443 618 vis 1 \, clear;
 #X obj 443 599 loadbang;
@@ -57,7 +57,7 @@
 #X obj 38 120 filledcurve 999 0 1 10 25 25 45 40 25 25 35 10 25;
 #X obj 20 12 struct ds float x float y symbol sym;
 #X obj 38 147 drawsymbol sym 55 25 0;
-#X restore 225 473 pd ds;
+#X restore 225 519 pd ds;
 #X msg 40 385 motion 200 200 0;
 #X msg 40 276 editmode 1;
 #X msg 40 341 key 1 8 0;
@@ -75,9 +75,21 @@
 #X text 471 423 ( 0 or 1 );
 #X text 14 2 Here is a list of all messages:;
 #X text 23 188 connections;
-#X text 22 453 creating/reading/writing data structures;
-#X msg 40 473 scalar ds 175 175 -hi_there!;
 #X text 78 581 make it visible again;
+#N canvas 523 391 152 85 ds2 0;
+#N canvas 50 470 557 157 template-toplevel 0;
+#X obj 21 94 plot bazoo 700 3 10 20 20;
+#X obj 21 68 drawpolygon q 4 0 0 20 z z -5 10 20;
+#X obj 21 30 struct template-toplevel float x float y float z float
+q array bazoo template-element;
+#X restore 11 11 pd template-toplevel;
+#N canvas 199 231 600 239 template-element 0;
+#X obj 58 83 drawpolygon 10 2 5 0 0 -5 -5 0 0 5 5 0;
+#X obj 59 48 struct template-element float x float y float w;
+#X restore 11 34 pd template-element;
+#X restore 225 475 pd ds2;
+#X msg 40 519 scalar ds 225 225 -hi_there!;
+#X text 22 453 reading/writing/creating data structures;
 #X connect 0 0 28 0;
 #X connect 3 0 29 0;
 #X connect 4 0 29 0;
@@ -123,4 +135,4 @@
 #X connect 55 0 28 0;
 #X connect 58 0 28 0;
 #X connect 62 0 28 0;
-#X connect 68 0 28 0;
+#X connect 69 0 28 0;
