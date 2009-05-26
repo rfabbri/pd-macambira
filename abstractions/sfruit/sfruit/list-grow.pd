@@ -1,20 +1,20 @@
-#N canvas 62 84 450 300 10;
+#N canvas 62 84 447 353 10;
 #X obj 80 40 inlet;
-#X obj 248 208 outlet;
+#X obj 248 258 outlet;
 #X obj 248 39 inlet;
 #X obj 248 114 list prepend;
-#X obj 248 177 spigot;
+#X obj 248 227 spigot;
 #X obj 80 77 route clear;
-#X msg 182 142 1;
-#X msg 143 142 0;
-#X obj 362 67 == 0;
+#X msg 194 152 1;
+#X msg 160 152 0;
+#X obj 392 127 == 0;
 #X obj 317 63 t a;
 #X obj 317 92 spigot 1;
-#X obj 286 39 t b;
-#X text 43 225 this is an attempt at avoiding unnecessary list copies
+#X obj 266 69 t b;
+#X text 43 285 this is an attempt at avoiding unnecessary list copies
 a la mathieu's fast list-drip (but i don't actually remember if that
 was the mechanism for speed : )) oh well \, hopefully it's fast;
-#X obj 143 118 t b b b b;
+#X obj 143 128 t b b b b;
 #X connect 0 0 5 0;
 #X connect 2 0 3 0;
 #X connect 3 0 4 0;
