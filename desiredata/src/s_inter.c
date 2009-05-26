@@ -683,6 +683,7 @@ static pthread_cond_t watchdog_cond = PTHREAD_COND_INITIALIZER;
 static void *watchdog_thread(void *);
 
 /* start a high priority watchdog thread */
+#ifndef MSW
 static int sys_start_watchdog_thread() {
 	pthread_attr_t w_attr;
 	main_pd_thread = pthread_self();
@@ -691,7 +692,7 @@ static int sys_start_watchdog_thread() {
 	int status = pthread_create(&watchdog_id, &w_attr, (void*(*)(void*)) watchdog_thread, NULL);
 	return status; /* what is this function supposed to return anyway? it tried returning void though declared as int */
 }
-
+#endif
 #ifdef MSW
 int gettimeofday (struct timeval *tv, void *tz);
 #endif
