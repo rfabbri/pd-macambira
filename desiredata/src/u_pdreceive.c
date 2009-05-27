@@ -45,10 +45,6 @@ static void dopoll();
 int main(int argc, char **argv) {
     int portno;
     struct sockaddr_in server;
-#ifdef MSW
-    short version = MAKEWORD(2, 0);
-    WSADATA nobby;
-#endif
     if (argc < 2 || sscanf(argv[1],"%d",&portno)<1 || portno<=0) goto usage;
     if (argc >= 3) {
         if      (!strcmp(argv[2],"tcp")) protocol = SOCK_STREAM;
@@ -56,6 +52,8 @@ int main(int argc, char **argv) {
         else goto usage;
     } else protocol = SOCK_STREAM;
 #ifdef MSW
+    short version = MAKEWORD(2, 0);
+    WSADATA nobby;
     if (WSAStartup(version, &nobby)) sockerror("WSAstartup");
 #endif
     sockfd = socket(AF_INET, protocol, 0);
@@ -66,28 +64,15 @@ int main(int argc, char **argv) {
     maxfd = sockfd + 1;
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-
 #ifdef IRIX
     /* this seems to work only in IRIX but is unnecessary in Linux.  Not sure what MSW needs in place of this. */
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, 0, 0) < 0) fprintf(stderr, "setsockopt failed\n");
 #endif
-
     /* assign client port number */
     server.sin_port = htons((unsigned short)portno);
-
     /* name the socket */
-    if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0) {
-        sockerror("bind");
-        x_closesocket(sockfd);
-        return 0;
-    }
-    if (protocol == SOCK_STREAM) {
-        if (listen(sockfd, 5) < 0) {
-            sockerror("listen");
-            x_closesocket(sockfd);
-            return 1;
-        }
-    }
+    if (bind(sockfd, (struct sockaddr *)&server, sizeof(server))<0) {sockerror("bind"); x_closesocket(sockfd); return 0;}
+    if (protocol == SOCK_STREAM) if (listen(sockfd, 5) < 0) {sockerror("listen"); x_closesocket(sockfd); return 1;}
     /* now loop forever selecting on sockets */
     while (1) dopoll();
 usage:
@@ -113,10 +98,7 @@ static void rmport(t_fdpoll *x) {
         if (fp == x) {
             x_closesocket(fp->fd);
             free(fp->inbuf);
-            while (i--) {
-                fp[0] = fp[1];
-                fp++;
-            }
+            for (;i--;fp++) fp[0] = fp[1];
             fdpoll = (t_fdpoll *)realloc(fdpoll, (nfdpoll-1)*sizeof(t_fdpoll));
             nfdpoll--;
             printf("number_connected %d;\n", nfdpoll);
@@ -143,10 +125,7 @@ static void udpread() {
 #ifdef MSW
         for (int j=0; j<ret; j++) putchar(buf[j]);
 #else
-        if (write(1, buf, ret) < ret) {
-            perror("write");
-            exit(1);
-        }
+        if (write(1, buf, ret) < ret) {perror("write"); exit(1);}
 #endif
     }
 }
@@ -200,14 +179,13 @@ static void tcpread(t_fdpoll *x) {
 }
 
 static void dopoll() {
-    t_fdpoll *fp;
     fd_set readset, writeset, exceptset;
     FD_ZERO(&writeset);
     FD_ZERO(&readset);
     FD_ZERO(&exceptset);
     FD_SET(sockfd, &readset);
     if (protocol == SOCK_STREAM) {
-        fp = fdpoll;
+        t_fdpoll *fp = fdpoll;
         for (int i=nfdpoll; i--; fp++) FD_SET(fp->fd, &readset);
     }
     if (select(maxfd+1, &readset, &writeset, &exceptset, 0) < 0) {perror("select"); exit(1);}
