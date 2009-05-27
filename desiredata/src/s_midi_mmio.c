@@ -462,17 +462,13 @@ void sys_listmididevs() {
     /* for MIDI and audio in and out, get the number of devices. Then get the capabilities of each device and print its description. */
     UINT ndevices = midiInGetNumDevs();
     for (unsigned i=0; i<ndevices; i++) {
-        MIDIINCAPS m;
-        UINT wRtn = midiInGetDevCaps(i, (LPMIDIINCAPS) &m, sizeof(m));
-        if (wRtn) msw_midiinerror("midiInGetDevCaps: %s", wRtn);
-        else error("MIDI input device #%d: %s", i+1, m.szPname);
+        MIDIINCAPS  m; UINT wRtn = midiInGetDevCaps( i, (LPMIDIINCAPS)  &m, sizeof(m));
+        if (wRtn) msw_midiinerror("midiInGetDevCaps: %s", wRtn); else error("MIDI input device #%d: %s", i+1, m.szPname);
     }
     ndevices = midiOutGetNumDevs();
     for (unsigned i=0; i<devices; i++) {
-        MIDIOUTCAPS m;
-        UINT wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &m, sizeof(m));
-        if (wRtn) msw_midiouterror("midiOutGetDevCaps: %s", wRtn);
-        else error("MIDI output device #%d: %s", i+1, m.szPname);
+        MIDIOUTCAPS m; UINT wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &m, sizeof(m));
+        if (wRtn) msw_midiouterror("midiOutGetDevCaps: %s", wRtn); else error("MIDI output device #%d: %s", i+1, m.szPname);
     }
 }
 #endif
@@ -482,12 +478,10 @@ void midi_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *noutdevs
     int nout = min(maxndev,int(midiOutGetNumDevs()));
     for (int i=0; i<nin; i++) {
         MIDIINCAPS m;  UINT wRtn =  midiInGetDevCaps(i, (LPMIDIINCAPS)  &m, sizeof(m));
-        strncpy(indevlist  + i*devdescsize, (wRtn ? "???" : m.szPname), devdescsize);  indevlist[(i+1)*devdescsize - 1] = 0;
-    }
+        strncpy(indevlist  + i*devdescsize, (wRtn ? "???" : m.szPname), devdescsize);  indevlist[(i+1)*devdescsize - 1] = 0;}
     for (int i=0; i<nout; i++) {
         MIDIOUTCAPS m; UINT wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &m, sizeof(m));
-        strncpy(outdevlist + i*devdescsize, (wRtn ? "???" : m.szPname), devdescsize); outdevlist[(i+1)*devdescsize - 1] = 0;
-    }
+        strncpy(outdevlist + i*devdescsize, (wRtn ? "???" : m.szPname), devdescsize); outdevlist[(i+1)*devdescsize - 1] = 0;}
     *nindevs = nin;
     *noutdevs = nout;
 }

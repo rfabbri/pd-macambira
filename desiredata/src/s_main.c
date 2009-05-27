@@ -615,8 +615,8 @@ static void sys_afterargparse() {
     if (sys_nchout>=0) {for (int i=0; i<nchoutdev; i++) audio_out.chdev[i] = sys_choutlist[i];}
     if (sys_nsoundin >=0) {audio_in.ndev  = sys_nsoundin; for (int i=0; i< audio_in.ndev; i++)  audio_in.dev[i] = sys_soundindevlist[i];}
     if (sys_nsoundout>=0) {audio_out.ndev = sys_nsoundout;for (int i=0; i<audio_out.ndev; i++) audio_out.dev[i] = sys_soundoutdevlist[i];}
-    if (sys_nmidiin >=0) {nmidiindev  = sys_nmidiin;  for (int i=0; i<  nmidiindev; i++)   midiindev[i] = sys_midiindevlist[i];}
-    if (sys_nmidiout>=0) {nmidioutdev = sys_nmidiout; for (int i=0; i< nmidioutdev; i++)  midioutdev[i] = sys_midioutdevlist[i];}
+    if (sys_nmidiin >=0)  {nmidiindev     = sys_nmidiin;  for (int i=0; i<    nmidiindev; i++)     midiindev[i] = sys_midiindevlist[i];}
+    if (sys_nmidiout>=0)  {nmidioutdev    = sys_nmidiout; for (int i=0; i<   nmidioutdev; i++)    midioutdev[i] = sys_midioutdevlist[i];}
     if (sys_main_advance) advance = sys_main_advance;
     if (sys_main_srate)      rate = sys_main_srate;
     if (sys_main_dacblocksize) dacblksize = sys_main_dacblocksize;
