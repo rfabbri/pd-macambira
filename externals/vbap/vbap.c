@@ -139,9 +139,9 @@ void vbap_ft4(t_vbap *x, double g) { x->x_gain = g; }
 
 /*--------------------------------------------------------------------------*/
 // create new instance of object... 
-#ifdef PD
 static void *vbap_new(t_float azi, t_float ele, t_float spread)
 {
+#ifdef PD
 	t_vbap *x = (t_vbap *)newobject(vbap_class);
 
 	floatinlet_new(&x->x_obj, &x->x_azi);
@@ -153,8 +153,6 @@ static void *vbap_new(t_float azi, t_float ele, t_float spread)
 	x->x_outlet2 = outlet_new(&x->x_obj, &s_float);
 	x->x_outlet3 = outlet_new(&x->x_obj, &s_float);
 #else /* Max */
-void *vbap_new(float azi,float ele)
-{
 	t_vbap *x = (t_vbap *)newobject(vbap_class);
 
 	floatin(x,4);	
@@ -172,11 +170,11 @@ void *vbap_new(float azi,float ele)
 	x->x_spread_base[0] = 0.0;
 	x->x_spread_base[1] = 1.0;
 	x->x_spread_base[2] = 0.0;
-	x->x_spread = spread;
 	x->x_lsset_available =0;
 
 	x->x_azi = azi;
 	x->x_ele = ele;
+	x->x_spread = spread;
 
 	return(x);					/* return a reference to the object instance */
 }
@@ -240,17 +238,22 @@ static void vbap(float g[3], long ls[3], t_vbap *x)
   long neg_g_am, best_neg_g_am;
   
   // transfering the azimuth angle to a decent value
-  while(x->x_azi > 180.0)
-  	x->x_azi -= 360.0;
-  while(x->x_azi < -179.0)
-  	x->x_azi += 360.0;
+  if(x->x_azi > 360.0 || x->x_azi < -360.0)
+    x->x_azi = fmod(x->x_azi, 360.0);
+  if(x->x_azi > 180.0)
+    x->x_azi -= 360.0;
+  if(x->x_azi < -179.0)
+    x->x_azi += 360.0;
+
   	
   // transferring the elevation to a decent value
   if(dim == 3){
-  	while(x->x_ele > 180.0)
-  		x->x_ele -= 360.0;
-  	while(x->x_ele < -179.0)
-  		x->x_ele += 360.0;
+    if(x->x_ele > 360.0 || x->x_ele < -360.0)
+      x->x_ele = fmod(x->x_ele, 360.0);
+    if(x->x_ele > 180.0)
+      x->x_ele -= 360.0;
+    if(x->x_ele < -179.0)
+  	  x->x_ele += 360.0;
   } else
   	x->x_ele = 0.0;
   
