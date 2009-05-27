@@ -796,6 +796,8 @@ set scale_amount 1.1
 
 class_new Console {View}
 
+def Console osx_scroll {axis diff} {$@c.1 yview scroll [expr -2-abs($diff)/$diff]}
+
 def Console init {c} {
 	set @c $c
 	frame $c
@@ -805,9 +807,7 @@ def Console init {c} {
 	pack $c.2 -side left -fill    y -expand no
 	pack $c -fill both -expand yes
 	$c.2 set 0.0 1.0
-	switch $::OS { osx {
-		bind $c.1 <MouseWheel> [list $c.1 yview scroll [expr {-2-abs(%D)/%D}] units]
-	}}
+	switch $::OS {osx {bind $c.1 <MouseWheel> [list $self osx_scroll %D]}}
 	set @lines 0
 }
 
@@ -1945,9 +1945,6 @@ def Canvas bind {eventtype selector args} {
 		bind $c $eventtype [concat [list $self $selector] $args]
 	}
 }
-
-# apparently, this method is useless
-def Canvas osx_scroll {axis diff} {$self scroll $axis [expr -abs($diff)/$diff]}
 
 def Canvas new_binds {} {
     # mouse buttons
