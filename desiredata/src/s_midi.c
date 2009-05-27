@@ -396,7 +396,6 @@ void sys_get_midi_params(int *pnmidiindev, int *pmidiindev, int *pnmidioutdev, i
     *pnmidiindev  = midi_nmidiindev;  for (int i=0; i<MAXMIDIINDEV;  i++) pmidiindev [i] = midi_midiindev[i];
     *pnmidioutdev = midi_nmidioutdev; for (int i=0; i<MAXMIDIOUTDEV; i++) pmidioutdev[i] = midi_midioutdev[i];
 }
-
 static void sys_save_midi_params(int nmidiindev, int *midiindev, int nmidioutdev, int *midioutdev) {
     midi_nmidiindev  = nmidiindev;  for (int i=0; i<MAXMIDIINDEV;  i++) midi_midiindev [i] = midiindev[i];
     midi_nmidioutdev = nmidioutdev; for (int i=0; i<MAXMIDIOUTDEV; i++) midi_midioutdev[i] = midioutdev[i];
@@ -483,49 +482,35 @@ void glob_midi_setapi(t_pd *dummy, t_floatarg f) {
 
 extern t_class *glob_pdobject;
 
-/* start an midi settings dialog window */
+/* start a midi settings dialog window */
 void glob_midi_properties(t_pd *dummy, t_floatarg flongform) {
     /* these are the devices you're using: */
     int nindev, midiindev[MAXMIDIINDEV];
     int noutdev, midioutdev[MAXMIDIOUTDEV];
-    char midiinstr[16*4+1],midioutstr[16*4+1],*strptr;
+    char midiinstr[16*4+1],midioutstr[16*4+1],*s;
     /* these are all the devices on your system: */
     char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
     int nindevs = 0, noutdevs = 0;
-    char  indevliststring[MAXNDEV*(DEVDESCSIZE+4)+80];
-    char outdevliststring[MAXNDEV*(DEVDESCSIZE+4)+80];
+    char  indevl[MAXNDEV*(DEVDESCSIZE+4)+80];
+    char outdevl[MAXNDEV*(DEVDESCSIZE+4)+80];
     midi_getdevs(indevlist, &nindevs, outdevlist, &noutdevs, MAXNDEV, DEVDESCSIZE);
-    strcpy(indevliststring, "{");
-    for (int i=0; i< nindevs; i++) sprintf( indevliststring+strlen( indevliststring), "\"%s\" ",  indevlist + i * DEVDESCSIZE);
-    strcat(indevliststring, "}");
-    strcpy(outdevliststring, "{");
-    for (int i=0; i<noutdevs; i++) sprintf(outdevliststring+strlen(outdevliststring), "\"%s\" ", outdevlist + i * DEVDESCSIZE);
-    strcat(outdevliststring, "}");
+    *indevl=0;  for (int i=0; i< nindevs; i++) sprintf( indevl+strlen( indevl), "\"%s\" ",  indevlist + i * DEVDESCSIZE);
+    *outdevl=0; for (int i=0; i<noutdevs; i++) sprintf(outdevl+strlen(outdevl), "\"%s\" ", outdevlist + i * DEVDESCSIZE);
     sys_get_midi_params(&nindev, midiindev, &noutdev, midioutdev);
     if (nindev > 1 || noutdev > 1) flongform = 1;
-    *(strptr = midiinstr) = 0;
-    for(int i=0; i<16; ++i) {
-        sprintf(strptr,"%3d ",nindev > i &&  midiindev[i]>= 0 ? midiindev[i] : -1);
-        strptr += strlen(strptr);
-    }
-    *(strptr = midioutstr) = 0;
-    for(int i=0; i<16; ++i) {
-        sprintf(strptr,"%3d ",noutdev > i &&  midioutdev[i]>= 0 ? midioutdev[i] : -1);
-        strptr += strlen(strptr);
-    }
-    sys_vgui("pdtk_midi_dialog %%s %s %s %s %s %d\n", indevliststring,midiinstr,outdevliststring,midioutstr,!!flongform);
+    s=midiinstr ; *s=0; for(int i=0; i<16; ++i) {sprintf(s,"%3d ", nindev>i && midiindev[i] >=0? midiindev[i]:-1); s+=strlen(s);}
+    s=midioutstr; *s=0; for(int i=0; i<16; ++i) {sprintf(s,"%3d ",noutdev>i && midioutdev[i]>=0?midioutdev[i]:-1); s+=strlen(s);}
+    sys_vgui("pdtk_midi_dialog %%s {%s} %s {%s} %s %d\n", indevl,midiinstr,outdevl,midioutstr,!!flongform);
 }
 
 /* new values from dialog window */
 void glob_midi_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv) {
-    int i, nindev, noutdev;
-    int newmidiindev[16], newmidioutdev[16];
-    int alsadevin, alsadevout;
+    int i, nindev, noutdev, newmidiindev[16], newmidioutdev[16], alsadevin, alsadevout;
     for (int i=0; i<16; i++) {
-        newmidiindev[i] = atom_getintarg(i, argc, argv);
+        newmidiindev[i]  = atom_getintarg(i   , argc, argv);
         newmidioutdev[i] = atom_getintarg(i+16, argc, argv);
     }
-    for (i=0, nindev=0;  i<16; i++) {if ( newmidiindev[i] >= 0)  { newmidiindev[nindev]  =  newmidiindev[i]; nindev++;}}
+    for (i=0, nindev=0;  i<16; i++) {if ( newmidiindev[i] >= 0) { newmidiindev[nindev]  =  newmidiindev[i]; nindev++;}}
     for (i=0, noutdev=0; i<16; i++) {if (newmidioutdev[i] >= 0) {newmidioutdev[noutdev] = newmidioutdev[i]; noutdev++;}}
     alsadevin = atom_getintarg(32, argc, argv);
     alsadevout = atom_getintarg(33, argc, argv);
@@ -542,15 +527,10 @@ void glob_midi_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv) {
 }
 
 /* tb { */
-
 void glob_midi_getindevs(t_pd *dummy, t_symbol *s, int ac, t_atom *av) {
-    /* these are all the devices on your system: */
     char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
-    int nindevs = 0, noutdevs = 0;
-    t_atom argv[MAXNDEV];
-    int f = ac ? (int)atom_getfloatarg(0,ac,av) : -1;
-    t_symbol *selector = gensym("midiindev");
-    t_symbol *pd = gensym("pd");
+    int nindevs = 0, noutdevs = 0; t_symbol *selector = gensym("midiindev"); t_symbol *pd = gensym("pd");
+    t_atom argv[MAXNDEV]; int f = ac ? (int)atom_getfloatarg(0,ac,av) : -1;
     midi_getdevs(indevlist, &nindevs, outdevlist, &noutdevs, MAXNDEV, DEVDESCSIZE);
     if (f<0) {
         for (int i=0; i<nindevs; i++) SETSYMBOL(argv+i, gensym(indevlist + i * DEVDESCSIZE));
@@ -560,17 +540,12 @@ void glob_midi_getindevs(t_pd *dummy, t_symbol *s, int ac, t_atom *av) {
         typedmess(pd->s_thing, selector, 1, argv);
     }
 }
-
 void glob_midi_getoutdevs(t_pd *dummy, t_symbol *s, int ac, t_atom *av) {
-    /* these are all the devices on your system: */
     char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
-    int nindevs = 0, noutdevs = 0;
-    t_atom argv[MAXNDEV];
-    int f = ac ? (int)atom_getfloatarg(0,ac,av) : -1;
-    t_symbol *selector = gensym("midioutdev");
-    t_symbol *pd = gensym("pd");
+    int nindevs = 0, noutdevs = 0; t_symbol *selector = gensym("midioutdev"); t_symbol *pd = gensym("pd");
+    t_atom argv[MAXNDEV]; int f = ac ? (int)atom_getfloatarg(0,ac,av) : -1;
     midi_getdevs(indevlist, &nindevs, outdevlist, &noutdevs, MAXNDEV, DEVDESCSIZE);
-    if (f < 0) {
+    if (f<0) {
         for (int i=0; i<noutdevs; i++) SETSYMBOL(argv+i, gensym(outdevlist + i*DEVDESCSIZE));
         typedmess(pd->s_thing, selector, noutdevs, argv);
     } else if (f < noutdevs) {
@@ -579,15 +554,10 @@ void glob_midi_getoutdevs(t_pd *dummy, t_symbol *s, int ac, t_atom *av) {
     }
 }
 
-void glob_midi_getcurrentindevs(t_pd *dummy) {
-    int nindev, midiindev[MAXMIDIINDEV], noutdev, midioutdev[MAXMIDIOUTDEV];
-    t_atom argv[MAXNDEV]; sys_get_midi_params(&nindev, midiindev, &noutdev, midioutdev);
-    for (int i=0; i<nindev; i++) SETFLOAT(argv+i, midiindev[i]);
-    typedmess(gensym("pd")->s_thing, gensym("midicurrentindev"), nindev, argv);
-}
-void glob_midi_getcurrentoutdevs(t_pd *dummy) {
-    int nindev, midiindev[MAXMIDIINDEV], noutdev, midioutdev[MAXMIDIOUTDEV];
-    t_atom argv[MAXNDEV]; sys_get_midi_params(&nindev, midiindev, &noutdev, midioutdev);
-    for (int i=0; i<noutdev; i++) SETFLOAT(argv+i, midioutdev[i]);
-    typedmess(gensym("pd")->s_thing, gensym("midicurrentoutdev"), noutdev, argv);
-}
+#define FOO(N,D,M) \
+    int nindev, midiindev[MAXMIDIINDEV], noutdev, midioutdev[MAXMIDIOUTDEV]; \
+    t_atom argv[MAXNDEV]; sys_get_midi_params(&nindev, midiindev, &noutdev, midioutdev); \
+    for (int i=0; i<N; i++) SETFLOAT(argv+i, D[i]); \
+    typedmess(gensym("pd")->s_thing, gensym(M),  nindev,  argv);
+void glob_midi_getcurrentindevs( t_pd *dummy) {FOO( nindev,midiindev ,"midicurrentindev" )}
+void glob_midi_getcurrentoutdevs(t_pd *dummy) {FOO(noutdev,midioutdev,"midicurrentoutdev")}
