@@ -369,4 +369,13 @@ inline static int throw_if_negative(int n) {if (n<0) throw VeryUnlikelyError(); 
 #define  asprintf(ARGS...) throw_if_negative( asprintf(ARGS))
 #define vasprintf(ARGS...) throw_if_negative(vasprintf(ARGS))
 
+#define PERFORM1ARGS(A,a)                                                                       A a = (A)w[1];
+#define PERFORM2ARGS(A,a,B,b)                         PERFORM1ARGS(A,a)                         B b = (B)w[2];
+#define PERFORM3ARGS(A,a,B,b,C,c)                     PERFORM2ARGS(A,a,B,b)                     C c = (C)w[3];
+#define PERFORM4ARGS(A,a,B,b,C,c,D,d)                 PERFORM3ARGS(A,a,B,b,C,c)                 D d = (D)w[4];
+#define PERFORM5ARGS(A,a,B,b,C,c,D,d,E,e)             PERFORM4ARGS(A,a,B,b,C,c,D,d)             E e = (E)w[5];
+#define PERFORM6ARGS(A,a,B,b,C,c,D,d,E,e,F,f)         PERFORM5ARGS(A,a,B,b,C,c,D,d,E,e)         F f = (F)w[6];
+#define PERFORM7ARGS(A,a,B,b,C,c,D,d,E,e,F,f,G,g)     PERFORM6ARGS(A,a,B,b,C,c,D,d,E,e,F,f)     G g = (G)w[7];
+#define PERFORM8ARGS(A,a,B,b,C,c,D,d,E,e,F,f,G,g,H,h) PERFORM7ARGS(A,a,B,b,C,c,D,d,E,e,F,f,G,g) H h = (H)w[8];
+
 #endif /* __DESIRE_H */
