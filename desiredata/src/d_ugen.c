@@ -26,17 +26,15 @@ t_sample *obj_findsignalscalar(t_object *x, int m);
 static int ugen_loud;
 static t_int *dsp_chain;
 static int dsp_chainsize;
-struct _vinlet;
-struct _voutlet;
+struct t_vinlet;
+struct t_voutlet;
 
-extern "C" {
-void vinlet_dspprolog( struct _vinlet *x,  t_signal **parentsigs, int myvecsize, int calcsize, int phase, int period, int frequency,
+void vinlet_dspprolog(t_vinlet *x,  t_signal **parentsigs, int myvecsize, int calcsize, int phase, int period, int frequency,
     int downsample, int upsample, int reblock, int switched);
-void voutlet_dspprolog(struct _voutlet *x, t_signal **parentsigs, int myvecsize, int calcsize, int phase, int period, int frequency,
+void voutlet_dspprolog(t_voutlet *x, t_signal **parentsigs, int myvecsize, int calcsize, int phase, int period, int frequency,
     int downsample, int upsample, int reblock, int switched);
-void voutlet_dspepilog(struct _voutlet *x, t_signal **parentsigs, int myvecsize, int calcsize, int phase, int period, int frequency,
+void voutlet_dspepilog(t_voutlet *x, t_signal **parentsigs, int myvecsize, int calcsize, int phase, int period, int frequency,
     int downsample, int upsample, int reblock, int switched);
-};
 
 /* zero out a vector */
 t_int *zero_perform(t_int *w) {
@@ -719,10 +717,10 @@ extern "C" void ugen_done_graph(t_dspcontext *dc) {
         t_signal **outsigs = dc->iosigs;
         if (outsigs) outsigs += dc->ninlets;
         if (pd_class(zz) == vinlet_class)
-            vinlet_dspprolog((struct _vinlet *)zz, dc->iosigs, vecsize, calcsize, dsp_phase, period, frequency,
+            vinlet_dspprolog((t_vinlet *)zz, dc->iosigs, vecsize, calcsize, dsp_phase, period, frequency,
                     downsample, upsample, reblock, switched);
         else if (pd_class(zz) == voutlet_class)
-            voutlet_dspprolog((struct _voutlet *)zz,  outsigs, vecsize, calcsize, dsp_phase, period, frequency,
+            voutlet_dspprolog((t_voutlet *)zz,  outsigs, vecsize, calcsize, dsp_phase, period, frequency,
                     downsample, upsample, reblock, switched);
     }
     int chainblockbegin = dsp_chainsize; /* DSP chain onset before block prolog code */
@@ -770,7 +768,7 @@ extern "C" void ugen_done_graph(t_dspcontext *dc) {
         if (pd_class(zz) == voutlet_class) {
             t_signal **iosigs = dc->iosigs;
             if (iosigs) iosigs += dc->ninlets;
-            voutlet_dspepilog((struct _voutlet *)zz, iosigs, vecsize, calcsize, dsp_phase, period, frequency,
+            voutlet_dspepilog((t_voutlet *)zz, iosigs, vecsize, calcsize, dsp_phase, period, frequency,
                     downsample, upsample, reblock, switched);
         }
     }
@@ -782,8 +780,7 @@ extern "C" void ugen_done_graph(t_dspcontext *dc) {
     }
     if (ugen_loud) {
         t_int *ip;
-        if (!dc->parentcontext)
-            for (i = dsp_chainsize, ip = dsp_chain; i--; ip++) post("chain %lx", *ip);
+        if (!dc->parentcontext) for (i=dsp_chainsize, ip=dsp_chain; i--; ip++) post("chain %lx", *ip);
         post("... ugen_done_graph done.");
     }
     /* now delete everything. */
@@ -802,8 +799,7 @@ extern "C" void ugen_done_graph(t_dspcontext *dc) {
         dc->ugenlist = u->next;
         free(u);
     }
-    if (ugen_currentcontext == dc) ugen_currentcontext = dc->parentcontext;
-    else bug("ugen_currentcontext");
+    if (ugen_currentcontext == dc) ugen_currentcontext = dc->parentcontext; else bug("ugen_currentcontext");
     free(dc);
 }
 
@@ -819,38 +815,25 @@ t_signal *ugen_getiosig(int index, int inout) {
 /* --------------------- up/down-sampling --------------------- */
 /* LATER: add some downsampling-filters for HOLD and LINEAR */
 
+/* up: upsampling factor */
+/* down: downsampling factor */
+/* parent: original vectorsize */
 t_int *downsampling_perform_0(t_int *w) {
-  t_float *in  = (t_float *)w[1]; /* original signal     */
-  t_float *out = (t_float *)w[2]; /* downsampled signal  */
-  int down     = int(w[3]);       /* downsampling factor */
-  int parent   = int(w[4]);       /* original vectorsize */
+  PERFORM4ARGS(t_float *,in, t_float *,out, int,down, int,parent);
   int n=parent/down;
-  while(n--) {
-    *out++=*in;
-    in+=down;
-  }
+  while(n--) {*out++=*in; in+=down;}
   return w+5;
 }
-
+/* the downsampled vector is exactly the first part of the parent vector; the rest of the parent is just skipped
+ * cool for FFT-data, where you only want to process the significant (1st) part of the vector */
 t_int *downsampling_perform_block(t_int *w) {
-  /* the downsampled vector is exactly the first part of the parent vector
-   * the rest of the parent is just skipped
-   * cool for FFT-data, where you only want to process the significant (1st) part of the vector
-   */
-  t_float *in  = (t_float *)w[1]; /* original signal     */
-  t_float *out = (t_float *)w[2]; /* downsampled signal  */
-  int down     = int(w[3]);       /* downsampling factor */
-  int parent   = int(w[4]);       /* original vectorsize */
+  PERFORM4ARGS(t_float *,in, t_float *,out, int,down, int,parent);
   int n=parent/down;
   while(n--) *out++=*in++;
   return w+5;
 }
-
 t_int *upsampling_perform_0(t_int *w) {
-  t_float *in  = (t_float *)w[1]; /* original signal     */
-  t_float *out = (t_float *)w[2]; /* upsampled signal    */
-  int up       = int(w[3]);       /* upsampling factor   */
-  int parent   = int(w[4]);       /* original vectorsize */
+  PERFORM4ARGS(t_float *,in, t_float *,out, int,up, int,parent);
   int n=parent*up;
   t_float *dummy = out;
   while(n--) *out++=0;
@@ -859,12 +842,8 @@ t_int *upsampling_perform_0(t_int *w) {
   while(n--) {*out=*in++; out+=up;}
   return w+5;
 }
-
 t_int *upsampling_perform_hold(t_int *w) {
-  t_float *in  = (t_float *)w[1]; /* original signal     */
-  t_float *out = (t_float *)w[2]; /* upsampled signal    */
-  int up       = int(w[3]);       /* upsampling factor   */
-  int parent   = int(w[4]);       /* original vectorsize */
+  PERFORM4ARGS(t_float *,in, t_float *,out, int,up, int,parent);
   int i=up;
   t_float *dum_out = out;
   t_float *dum_in  = in;
@@ -876,15 +855,9 @@ t_int *upsampling_perform_hold(t_int *w) {
   }
   return w+5;
 }
-
 t_int *upsampling_perform_linear(t_int *w) {
-  t_resample *x= (t_resample *)w[1];
-  t_float *in  = (t_float *)w[2]; /* original signal     */
-  t_float *out = (t_float *)w[3]; /* upsampled signal    */
-  const int up       = int(w[4]); /* upsampling factor   */
-  const int parent   = int(w[5]); /* original vectorsize */
-  const int length   = parent*up;
-  t_float *fp;
+  PERFORM5ARGS(t_resample *,x, t_float *,in, t_float *,out, int,up, int,parent);
+  const int length = parent*up;
   t_float a=*x->buffer, b=*in;
   const t_float up_inv = (t_float)1.0/up;
   t_float findex = 0.f;
@@ -893,7 +866,7 @@ t_int *upsampling_perform_linear(t_int *w) {
     t_float frac=findex-index;
     if(frac==0.)frac=1.;
     *out++ = frac * b + (1.-frac) * a;
-    fp=in+index;
+    t_float *fp=in+index;
     b=*fp;
     // do we still need the last sample of the previous pointer for interpolation ?
     a=(index)?*(fp-1):a;
@@ -901,15 +874,10 @@ t_int *upsampling_perform_linear(t_int *w) {
   *x->buffer = a;
   return w+6;
 }
-
+/* 1st part of the upsampled signal-vector will be the original one; 2nd part of the upsampled signal-vector is just 0
+ * cool for FFT-data, where you only want to process the significant (1st) part of the vector */
 t_int *upsampling_perform_block(t_int *w) {
-  /* 1st part of the upsampled signal-vector will be the original one
-   * 2nd part of the upsampled signal-vector is just 0
-   * cool for FFT-data, where you only want to process the significant (1st) part of the vector */
-  t_float *in  = (t_float *)w[1]; /* original signal     */
-  t_float *out = (t_float *)w[2]; /* upsampled signal    */
-  int up       = (int)w[3];       /* upsampling factor   */
-  int parent   = (int)w[4];       /* original vectorsize */
+  PERFORM4ARGS(t_float *,in, t_float *,out, int,up, int,parent);
   int i=parent;
   int n=parent*(up-1);
   while (i--) *out++=*in++;
@@ -960,20 +928,12 @@ void resample_dsp(t_resample *x, t_sample* in, int insize, t_sample* out, int ou
 }
 void resamplefrom_dsp(t_resample *x, t_sample *in, int insize, int outsize, int method) {
   if (insize==outsize) {           free(x->v); x->n = 0; x->v = in; return;}
-  if (x->n != outsize) {
-    free(x->v);
-    x->v = (t_float *)t_getbytes(outsize * sizeof(*x->v));
-    x->n = outsize;
-  }
+  if (x->n != outsize) {           free(x->v); x->v = (t_float *)t_getbytes(outsize * sizeof(*x->v)); x->n = outsize;}
   resample_dsp(x, in, insize, x->v, x->n, method);
 }
 void resampleto_dsp(t_resample *x, t_sample *out, int insize, int outsize, int method) {
   if (insize==outsize) {if (x->n) free(x->v); x->n = 0; x->v = out; return;}
-  if (x->n != insize) {
-    free(x->v);
-    x->v = (t_float *)t_getbytes(insize * sizeof(*x->v));
-    x->n = insize;
-  }
+  if (x->n != insize) {            free(x->v); x->v = (t_float *)t_getbytes(insize * sizeof(*x->v)); x->n = insize;}
   resample_dsp(x, x->v, x->n, out, outsize, method);
 }
 
