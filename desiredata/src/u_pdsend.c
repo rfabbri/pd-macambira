@@ -45,32 +45,15 @@ int main(int argc, char **argv) {
 #ifdef MSW
     if (WSAStartup(version, &nobby)) sockerror("WSAstartup");
 #endif
-
     sockfd = socket(AF_INET, protocol, 0);
-    if (sockfd < 0) {
-        sockerror("socket()");
-        return 1;
-    }
+    if (sockfd < 0) {sockerror("socket()"); return 1;}
     /* connect socket using hostname provided in command line */
     server.sin_family = AF_INET;
     hp = gethostbyname(hostname);
-    if (hp == 0) {
-        fprintf(stderr, "%s: unknown host\n", hostname);
-        x_closesocket(sockfd);
-        return 1;
-    }
+    if (!hp) {fprintf(stderr, "%s: unknown host\n", hostname); x_closesocket(sockfd); return 1;}
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
-
-    /* assign client port number */
     server.sin_port = htons((unsigned short)portno);
-
-    /* try to connect. */
-    if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) < 0) {
-        sockerror("connect");
-        x_closesocket(sockfd);
-        return 1;
-    }
-
+    if (connect(sockfd, (struct sockaddr *)&server, sizeof(server))<0) {sockerror("connect"); x_closesocket(sockfd); return 1;}
     /* now loop reading stdin and sending  it to socket */
     while (1) {
         char buf[BUFSIZE], *bp;
