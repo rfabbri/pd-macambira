@@ -160,11 +160,9 @@ void dsp_add_plus(t_sample *in1, t_sample *in2, t_sample *out, int n) {
 
 /* T.Grill - squaring: optimized * for equal input signals */
 t_int *sqr_perf8(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_float *,in, t_float *,out, int,n);
     for (; n; n -= 8, in += 8, out += 8) {
-    	float f0 = in[0], f1 = in[1], f2 = in[2], f3 = in[3];
+	float f0 = in[0], f1 = in[1], f2 = in[2], f3 = in[3];
     	float f4 = in[4], f5 = in[5], f6 = in[6], f7 = in[7];
     	out[0] = f0 * f0; out[1] = f1 * f1; out[2] = f2 * f2; out[3] = f3 * f3;
     	out[4] = f4 * f4; out[5] = f5 * f5; out[6] = f6 * f6; out[7] = f7 * f7;
@@ -175,23 +173,20 @@ t_int *sqr_perf8(t_int *w) {
 /* T.Grill - added optimization for equal input signals */
 static void times_dsp(t_times *x, t_signal **sp) {
     const int n = sp[0]->n;
-    if (n&7) dsp_add(times_perform, 4, sp[0]->v, sp[1]->v, sp[2]->v, n);
+    if (n&7)						dsp_add(times_perform,   4, sp[0]->v, sp[1]->v, sp[2]->v, n);
     else if(sp[0]->v == sp[1]->v) {
-	if(SIMD_CHECK2(n,sp[0]->v,sp[2]->v))
-	     dsp_add(sqr_perf_simd, 3, sp[0]->v, sp[2]->v, n);
-	else dsp_add(sqr_perf8, 3, sp[0]->v, sp[2]->v, n);
+	if(SIMD_CHECK2(n,sp[0]->v,sp[2]->v))		dsp_add(sqr_perf_simd,   3, sp[0]->v, sp[2]->v, n);
+	else						dsp_add(sqr_perf8,       3, sp[0]->v, sp[2]->v, n);
     } else {
-	if(SIMD_CHECK3(n,sp[0]->v,sp[1]->v,sp[2]->v))
-	     dsp_add(times_perf_simd, 4, sp[0]->v, sp[1]->v, sp[2]->v, n);
-	else dsp_add(times_perf8, 4, sp[0]->v, sp[1]->v, sp[2]->v, n);
+	if(SIMD_CHECK3(n,sp[0]->v,sp[1]->v,sp[2]->v))	dsp_add(times_perf_simd, 4, sp[0]->v, sp[1]->v, sp[2]->v, n);
+	else						dsp_add(times_perf8,     4, sp[0]->v, sp[1]->v, sp[2]->v, n);
     }
 }
 static void scalartimes_dsp(t_scalartimes *x, t_signal **sp) {
     const int n = sp[0]->n;
-    if (n&7) dsp_add(scalartimes_perform, 4, sp[0]->v, &x->b,sp[1]->v, n);
-    else if(SIMD_CHECK2(n,sp[0]->v,sp[1]->v))
-	 dsp_add(scalartimes_perf_simd, 4, sp[0]->v, &x->b, sp[1]->v, n);
-    else dsp_add(scalartimes_perf8, 4, sp[0]->v, &x->b, sp[1]->v, n);
+    if (n&7)					dsp_add(scalartimes_perform,   4, sp[0]->v, &x->b, sp[1]->v, n);
+    else if(SIMD_CHECK2(n,sp[0]->v,sp[1]->v))	dsp_add(scalartimes_perf_simd, 4, sp[0]->v, &x->b, sp[1]->v, n);
+    else					dsp_add(scalartimes_perf8,     4, sp[0]->v, &x->b, sp[1]->v, n);
 }
 
 PERFORM(plus ,a+b)    DSPDSP(plus)      DSPNEW(plus ,"+~")
@@ -208,8 +203,7 @@ PERFORM(eq  ,a==b)    DSPDSP2(eq)       DSPNEW(eq   ,"==~")
 PERFORM(ne  ,a!=b)    DSPDSP2(ne)       DSPNEW(ne   ,"!=~")
 
 t_int *over_perform(t_int *w) {
-    t_float *in1 = (t_float *)w[1], *in2 = (t_float *)w[2], *out = (t_float *)w[3];
-    int n = (int)w[4];
+    PERFORM4ARGS(t_float *,in1, t_float *,in2, t_float *,out, int,n);
     while (n--) {
         float g = *in2++;
         *out++ = (g ? *in1++ / g : 0);
@@ -217,10 +211,7 @@ t_int *over_perform(t_int *w) {
     return w+5;
 }
 t_int *over_perf8(t_int *w) {
-    t_float *in1 = (t_float *)w[1];
-    t_float *in2 = (t_float *)w[2];
-    t_float *out = (t_float *)w[3];
-    int n = (int)w[4];
+    PERFORM4ARGS(t_float *,in1, t_float *,in2, t_float *,out, int,n);
     for (; n; n -= 8, in1 += 8, in2 += 8, out += 8) {
         float f0 = in1[0], f1 = in1[1], f2 = in1[2], f3 = in1[3];
         float f4 = in1[4], f5 = in1[5], f6 = in1[6], f7 = in1[7];
@@ -239,23 +230,17 @@ t_int *over_perf8(t_int *w) {
 }
 /* T.Grill - added check for zero */
 t_int *scalarover_perform(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_float f = *(t_float *)w[2];
-    t_float *out = (t_float *)w[3];
-    int n = (int)w[4];
+    PERFORM4ARGS(t_float *,in, t_float,f, t_float *,out, int,n);
     if(f) f = 1./f;
     while (n--) *out++ = *in++ * f;
     return w+5;
 }
 t_int *scalarover_perf8(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_float g = *(t_float *)w[2];
-    t_float *out = (t_float *)w[3];
-    int n = (int)w[4];
-    if (g) g = 1.f / g;
+    PERFORM4ARGS(t_float *,in, t_float,f, t_float *,out, int,n);
+    if (f) f = 1.f / f;
     for (; n; n -= 8, in += 8, out += 8) {
-        out[0] = in[0] * g; out[1] = in[1] * g; out[2] = in[2] * g; out[3] = in[3] * g;
-        out[4] = in[4] * g; out[5] = in[5] * g; out[6] = in[6] * g; out[7] = in[7] * g;
+        out[0] = in[0]*f; out[1] = in[1]*f; out[2] = in[2]*f; out[3] = in[3]*f;
+        out[4] = in[4]*f; out[5] = in[5]*f; out[6] = in[6]*f; out[7] = in[7]*f;
     }
     return w+5;
 }
@@ -282,9 +267,8 @@ static void tabwrite_tilde_redraw(t_tabwrite_tilde *x) {
     else garray_redraw(a);
 }
 static t_int *tabwrite_tilde_perform(t_int *w) {
-    t_tabwrite_tilde *x = (t_tabwrite_tilde *)w[1];
-    t_float *in = (t_float *)w[2];
-    int n = (int)w[3], phase = x->phase, endphase = x->nsampsintab;
+    PERFORM3ARGS(t_tabwrite_tilde *,x, t_float *,in, int,n);
+    int phase = x->phase, endphase = x->nsampsintab;
     if (!x->vec) goto bad;
     if (endphase > phase) {
         int nxfer = endphase - phase;
@@ -302,9 +286,8 @@ bad:
     return w+4;
 }
 static t_int *tabwrite_tilde_perf_simd(t_int *w) {
-    t_tabwrite_tilde *x = (t_tabwrite_tilde *)w[1];
-    t_float *in = (t_float *)w[2];
-    int n = (int)w[3], phase = x->phase, endphase = x->nsampsintab;
+    PERFORM3ARGS(t_tabwrite_tilde *,x, t_float *,in, int,n);
+    int phase = x->phase, endphase = x->nsampsintab;
     if (!x->vec) goto bad;
     if (endphase > phase) {
         int nxfer = endphase - phase;
@@ -370,9 +353,9 @@ static void *tabplay_tilde_new(t_symbol *s) {
     return x;
 }
 static t_int *tabplay_tilde_perform(t_int *w) {
-    t_tabplay_tilde *x = (t_tabplay_tilde *)w[1];
-    t_float *out = (t_float *)w[2], *fp;
-    int n = (int)w[3], phase = x->phase, endphase = (x->nsampsintab < x->limit ? x->nsampsintab : x->limit), nxfer, n3;
+    PERFORM3ARGS(t_tabplay_tilde *,x, t_float *,out, int,n);
+    t_float *fp;
+    int phase = x->phase, endphase = (x->nsampsintab < x->limit ? x->nsampsintab : x->limit), nxfer, n3;
     if (!x->vec || phase >= endphase) {while (n--) *out++ = 0; goto bye;}
     nxfer = min(endphase-phase,n);
     fp = x->vec + phase;
@@ -384,7 +367,6 @@ static t_int *tabplay_tilde_perform(t_int *w) {
         x->phase = 0x7fffffff;
         while (n3--) *out++ = 0;
     } else x->phase = phase;
-    return w+4;
 bye:
     return w+4;
 }
@@ -431,10 +413,7 @@ static void *tabread_tilde_new(t_symbol *s) {
     return x;
 }
 static t_int *tabread_tilde_perform(t_int *w) {
-    t_tabread_tilde *x = (t_tabread_tilde *)w[1];
-    t_float *in = (t_float *)w[2];
-    t_float *out = (t_float *)w[3];
-    int n = (int)w[4];
+    PERFORM4ARGS(t_tabread_tilde *,x, t_float *,in, t_float *,out, int,n);
     float *buf = x->vec;
     int maxindex = x->npoints - 1;
     if (!buf) {while (n--) *out++ = 0; goto bad;}
@@ -479,10 +458,7 @@ static void *tabread4_tilde_new(t_symbol *s) {
     return x;
 }
 static t_int *tabread4_tilde_perform(t_int *w) {
-    t_tabread4_tilde *x = (t_tabread4_tilde *)w[1];
-    t_float *in = (t_float *)w[2];
-    t_float *out = (t_float *)w[3];
-    int n = (int)w[4];
+    PERFORM4ARGS(t_tabread4_tilde *,x, t_float *,in, t_float *,out, int,n);
     int maxindex;
     float *buf = x->vec, *fp;
     maxindex = x->npoints - 3;
@@ -576,10 +552,7 @@ static void *tabosc4_tilde_new(t_symbol *s) {
     return x;
 }
 static t_int *tabosc4_tilde_perform(t_int *w) {
-    t_tabosc4_tilde *x = (t_tabosc4_tilde *)w[1];
-    t_float *in = (t_float *)w[2];
-    t_float *out = (t_float *)w[3];
-    int n = (int)w[4];
+    PERFORM4ARGS(t_tabosc4_tilde *,x, t_float *,in, t_float *,out, int,n);
     union tabfudge tf;
     float fnpoints = x->fnpoints;
     int mask = (int)(fnpoints-1);
@@ -688,9 +661,7 @@ static void *tabsend_new(t_symbol *s) {
     return x;
 }
 static t_int *tabsend_perform(t_int *w) {
-    t_tabsend *x = (t_tabsend *)w[1];
-    t_float *in = (t_float *)w[2];
-    int n = w[3];
+    PERFORM3ARGS(t_tabsend *,x, t_float *,in, int,n);
     t_float *dest = x->vec;
     int i = x->graphcount;
     if (!x->vec) goto bad;
@@ -706,9 +677,7 @@ bad:
     return w+4;
 }
 static t_int *tabsend_perf_simd(t_int *w) {
-    t_tabsend *x = (t_tabsend *)w[1];
-    t_float *in = (t_float *)w[2];
-    int n = w[3];
+    PERFORM3ARGS(t_tabsend *,x, t_float *,in, int,n);
     t_float *dest = x->vec;
     int i = x->graphcount;
     if (!x->vec) goto bad;
@@ -758,9 +727,7 @@ struct t_tabreceive : t_object {
     t_symbol *arrayname;
 };
 static t_int *tabreceive_perform(t_int *w) {
-    t_tabreceive *x = (t_tabreceive *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = w[3];
+    PERFORM3ARGS(t_tabreceive *,x, t_float *,out, int,n);
     t_float *from = x->vec;
     if (from) {
         int vecsize = x->vecsize; while (vecsize--) *out++ = *from++;
@@ -769,17 +736,17 @@ static t_int *tabreceive_perform(t_int *w) {
     return w+4;
 }
 static t_int *tabreceive_perf8(t_int *w) {
-    t_tabreceive *x = (t_tabreceive *)w[1];
+    PERFORM3ARGS(t_tabreceive *,x, t_float *,out, int,n);
     t_float *from = x->vec;
-    if (from) copyvec_8((t_float *)w[2],from,w[3]);
-    else      zerovec_8((t_float *)w[2],     w[3]);
+    if (from) copyvec_8(out,from,n);
+    else      zerovec_8(out,     n);
     return w+4;
 }
 static t_int *tabreceive_perfsimd(t_int *w) {
-    t_tabreceive *x = (t_tabreceive *)w[1];
+    PERFORM3ARGS(t_tabreceive *,x, t_float *,out, int,n);
     t_float *from = x->vec;
-    if(from) copyvec_simd((t_float *)w[2],from,w[3]);
-    else     zerovec_simd((t_float *)w[2],     w[3]);
+    if(from) copyvec_simd(out,from,n);
+    else     zerovec_simd(out,     n);
     return w+4;
 }
 static void tabreceive_dsp(t_tabreceive *x, t_signal **sp) {
@@ -909,16 +876,13 @@ struct t_sig : t_object {
     float a;
 };
 t_int *sig_tilde_perform(t_int *w) {
-    t_float f = *(t_float *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3];
-    while (n--) *out++ = f;
+    PERFORM3ARGS(t_float *,f, t_float *,out, int,n);
+    t_float g=*f;
+    while (n--) *out++ = g;
     return w+4;
 }
 t_int *sig_tilde_perf8(t_int *w) {
-    t_float f = *(t_float *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_float,f, t_float *,out, int,n);
     for (; n; n -= 8, out += 8) {
         out[0] = f; out[1] = f;
         out[2] = f; out[3] = f;
@@ -928,11 +892,9 @@ t_int *sig_tilde_perf8(t_int *w) {
     return w+4;
 }
 void dsp_add_scalarcopy(t_sample *in, t_sample *out, int n) {
-    if (n&7)
-         dsp_add(sig_tilde_perform,    3, in, out, n);
-    else if(SIMD_CHECK1(n,out))
-	 dsp_add(sig_tilde_perf_simd, 3, in, out, n);
-    else dsp_add(sig_tilde_perf8,     3, in, out, n);
+    if (n&7)                    dsp_add(sig_tilde_perform,   3, in, out, n);
+    else if(SIMD_CHECK1(n,out)) dsp_add(sig_tilde_perf_simd, 3, in, out, n);
+    else                        dsp_add(sig_tilde_perf8,     3, in, out, n);
 }
 static void sig_tilde_float(t_sig *x, t_float f) {
     x->a = f;
@@ -971,9 +933,7 @@ struct t_line : t_object {
     float slopestep; /* tb: 4*x->inc */
 };
 static t_int *line_tilde_perform(t_int *w) {
-    t_line *x = (t_line *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_line *,x, t_float *,out, int,n);
     float f = x->value;
     if (PD_BIGORSMALL(f)) x->value = f = 0;
     if (x->retarget) {
@@ -1014,9 +974,7 @@ static void line_tilde_slope(t_float* out, t_int n, t_float* value, t_float* slo
 	}
 }
 static t_int *line_tilde_perf8(t_int *w) {
-    t_line *x = (t_line *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_line *,x, t_float *,out, int,n);
     float f = x->value;
     if (PD_BIGORSMALL(f)) x->value = f = 0;
     if (x->retarget) {
@@ -1041,9 +999,7 @@ static t_int *line_tilde_perf8(t_int *w) {
     return w+4;
 }
 static t_int *line_tilde_perfsimd(t_int *w) {
-    t_line *x = (t_line *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_line *,x, t_float *,out, int,n);
     float f = x->value;
     if (PD_BIGORSMALL(f)) x->value = f = 0;
     if (x->retarget) {
@@ -1083,11 +1039,9 @@ static void line_tilde_stop(t_line *x) {
     x->ticksleft = x->retarget = 0;
 }
 static void line_tilde_dsp(t_line *x, t_signal **sp) {
-    if(sp[0]->n&7)
-	 dsp_add(line_tilde_perform,  3, x, sp[0]->v, sp[0]->n);
-    else if (SIMD_CHECK1(sp[0]->n,sp[0]->v))
-	 dsp_add(line_tilde_perfsimd, 3, x, sp[0]->v, sp[0]->n);
-    else dsp_add(line_tilde_perf8,    3, x, sp[0]->v, sp[0]->n);
+    if(sp[0]->n&7)				dsp_add(line_tilde_perform,  3, x, sp[0]->v, sp[0]->n);
+    else if (SIMD_CHECK1(sp[0]->n,sp[0]->v))	dsp_add(line_tilde_perfsimd, 3, x, sp[0]->v, sp[0]->n);
+    else					dsp_add(line_tilde_perf8,    3, x, sp[0]->v, sp[0]->n);
     x->oneovern = 1./sp[0]->n;
     x->dspticktomsec = sp[0]->sr / (1000 * sp[0]->n);
 }
@@ -1133,15 +1087,13 @@ struct t_vline : t_object {
     t_vseg *list;
 };
 static t_int *vline_tilde_perform(t_int *w) {
-    t_vline *x = (t_vline *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3], i;
+    PERFORM3ARGS(t_vline *,x, t_float *,out, int,n);
     double f = x->value;
     double inc = x->inc;
     double msecpersamp = x->msecpersamp;
     double timenow = clock_gettimesince(x->referencetime) - n * msecpersamp;
     t_vseg *s = x->list;
-    for (i = 0; i < n; i++) {
+    for (int i=0; i<n; i++) {
         double timenext = timenow + msecpersamp;
     checknext:
         if (s) {
@@ -1274,8 +1226,7 @@ static void *snapshot_tilde_new() {
     return x;
 }
 static t_int *snapshot_tilde_perform(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_float *out = (t_float *)w[2];
+    PERFORM2ARGS(t_float *,in, t_float *,out);
     *out = *in;
     return w+3;
 }
@@ -1316,8 +1267,7 @@ static void *vsnapshot_tilde_new() {
     return x;
 }
 static t_int *vsnapshot_tilde_perform(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_vsnapshot *x = (t_vsnapshot *)w[2];
+    PERFORM2ARGS(t_float *,in, t_vsnapshot *,x);
     t_float *out = x->vec;
     int n = x->n, i;
     for (i = 0; i < n; i++) out[i] = in[i];
@@ -1398,9 +1348,7 @@ static void *env_tilde_new(t_floatarg fnpoints, t_floatarg fperiod) {
     return x;
 }
 static t_int *env_tilde_perform(t_int *w) {
-    t_sigenv *x = (t_sigenv *)w[1];
-    t_float *in = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_sigenv *,x, t_float *,in, int,n);
     float *sump = x->sumbuf;
     in += n;
     for (int count = x->phase; count < x->npoints; count += x->realperiod, sump++) {
@@ -1442,9 +1390,7 @@ static float env_tilde_accum_8(t_float* in, t_float* hp, t_int n) {
 	return ret;
 }
 static t_int *env_tilde_perf8(t_int *w) {
-    t_sigenv *x = (t_sigenv *)w[1];
-    t_float *in = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_sigenv *,x, t_float *,in, int,n);
     float *sump = x->sumbuf;
     in += n;
     for (int count = x->phase; count < x->npoints; count += x->realperiod, sump++) {
@@ -1455,8 +1401,7 @@ static t_int *env_tilde_perf8(t_int *w) {
     if (x->phase < 0) {
         x->result = x->sumbuf[0];
 	float *sump = x->sumbuf;
-        for (int count = x->realperiod; count < x->npoints; count += x->realperiod, sump++)
-                sump[0] = sump[1];
+        for (int count = x->realperiod; count < x->npoints; count += x->realperiod, sump++) sump[0] = sump[1];
         sump[0] = 0;
         x->phase = x->realperiod - n;
         clock_delay(x->clock, 0L);
@@ -1464,9 +1409,7 @@ static t_int *env_tilde_perf8(t_int *w) {
     return w+4;
 }
 static t_int *env_tilde_perf_simd(t_int *w) {
-    t_sigenv *x = (t_sigenv *)w[1];
-    t_float *in = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_sigenv *,x, t_float *,in, int,n);
     float *sump = x->sumbuf;
     in += n;
     for (int count = x->phase; count < x->npoints; count += x->realperiod, sump++) {
@@ -1553,9 +1496,7 @@ static void threshold_tilde_tick(t_threshold_tilde *x) {
   outlet_bang(x->out(x->state?0:1));
 }
 static t_int *threshold_tilde_perform(t_int *w) {
-    float *in1 = (float *)w[1];
-    t_threshold_tilde *x = (t_threshold_tilde *)w[2];
-    int n = (t_int)w[3];
+    PERFORM3ARGS(float *,in1, t_threshold_tilde *,x, int,n);
     if (x->deadwait > 0)
         x->deadwait -= x->msecpertick;
     else if (x->state) {
@@ -1665,16 +1606,12 @@ static void *adc_new(t_symbol *s, int argc, t_atom *argv) {
     return x;
 }
 t_int *copy_perform(t_int *w) {
-    t_float *in1 = (t_float *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_float *,in1, t_float *,out, int,n);
     while (n--) *out++ = *in1++;
     return w+4;
 }
 t_int *copy_perf8(t_int *w) {
-    t_float *in1 = (t_float *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_float *,in1, t_float *,out, int,n);
     for (; n; n -= 8, in1 += 8, out += 8) {
         out[0] = in1[0];
         out[1] = in1[1];
@@ -1688,11 +1625,9 @@ t_int *copy_perf8(t_int *w) {
     return w+4;
 }
 void dsp_add_copy(t_sample *in, t_sample *out, int n) {
-    if (n&7)
-         dsp_add(copy_perform,   3, in, out, n);
-    else if (SIMD_CHECK2(n,in,out))
-	 dsp_add(copy_perf_simd, 3, in, out, n);
-    else dsp_add(copy_perf8,     3, in, out, n);
+    if (n&7)				dsp_add(copy_perform,   3, in, out, n);
+    else if (SIMD_CHECK2(n,in,out))	dsp_add(copy_perf_simd, 3, in, out, n);
+    else				dsp_add(copy_perf8,     3, in, out, n);
 }
 static void adc_dsp(t_adc *x, t_signal **sp) {
     t_int i, *ip;
@@ -1765,9 +1700,7 @@ static void *sigdelwrite_new(t_symbol *s, t_floatarg msec) {
     return x;
 }
 static t_int *sigdelwrite_perform(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_delwritectl *c = (t_delwritectl *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_float *,in, t_delwritectl *,c, int,n);
     int phase = c->c_phase, nsamps = c->c_n;
     float *vp = c->c_vec, *bp = vp + phase, *ep = vp + (c->c_n + XTRASAMPS);
     phase += n;
@@ -1789,9 +1722,7 @@ static t_int *sigdelwrite_perform(t_int *w) {
     return w+4;
 }
 static t_int *sigdelwrite_perf8(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_delwritectl *c = (t_delwritectl *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_float *,in, t_delwritectl *,c, int,n);
     int phase = c->c_phase, nsamps = c->c_n;
     float *vp = c->c_vec, *bp = vp + phase, *ep = vp + (c->c_n + XTRASAMPS);
     phase += n;
@@ -1814,9 +1745,7 @@ static t_int *sigdelwrite_perf8(t_int *w) {
     return w+4;
 }
 static t_int *sigdelwrite_perfsimd(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_delwritectl *c = (t_delwritectl *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_float *,in, t_delwritectl *,c, int,n);
     int phase = c->c_phase, nsamps = c->c_n;
     float *vp = c->c_vec, *bp = vp + phase, *ep = vp + (c->c_n + XTRASAMPS);
     phase += n;
@@ -1839,11 +1768,9 @@ static t_int *sigdelwrite_perfsimd(t_int *w) {
     return w+4;
 }
 static void sigdelwrite_dsp(t_sigdelwrite *x, t_signal **sp) {
-	if (sp[0]->n & 7)
-		dsp_add(sigdelwrite_perform,  3, sp[0]->v, &x->cspace, sp[0]->n);
-	else if (SIMD_CHECK1(sp[0]->n, sp[0]->v))
-		dsp_add(sigdelwrite_perfsimd, 3, sp[0]->v, &x->cspace, sp[0]->n);
-	else	dsp_add(sigdelwrite_perf8,    3, sp[0]->v, &x->cspace, sp[0]->n);
+	if (sp[0]->n & 7)			  dsp_add(sigdelwrite_perform,  3, sp[0]->v, &x->cspace, sp[0]->n);
+	else if (SIMD_CHECK1(sp[0]->n, sp[0]->v)) dsp_add(sigdelwrite_perfsimd, 3, sp[0]->v, &x->cspace, sp[0]->n);
+	else					  dsp_add(sigdelwrite_perf8,    3, sp[0]->v, &x->cspace, sp[0]->n);
     x->sortno = ugen_getsortno();
     sigdelwrite_checkvecsize(x, sp[0]->n);
 }
@@ -1866,7 +1793,7 @@ struct t_sigdelread : t_object {
     t_float sr;       /* samples per msec */
     t_float n;        /* vector size */
     int zerodel;      /* 0 or vecsize depending on read/write order */
-	void (*copy_fp)(t_float*, const t_float*, int); /* tb: copy function */
+    void (*copy_fp)(t_float*, const t_float*, int); /* tb: copy function */
 };
 static void sigdelread_float(t_sigdelread *x, t_float f);
 static void *sigdelread_new(t_symbol *s, t_floatarg f) {
@@ -1892,10 +1819,8 @@ static void sigdelread_float(t_sigdelread *x, t_float f) {
     else x->copy_fp = copyvec_simd_unalignedsrc;
 }
 static t_int *sigdelread_perform(t_int *w) {
-    t_float *out = (t_float *)w[1];
-    t_delwritectl *c = (t_delwritectl *)w[2];
-    int delsamps = *(int *)w[3];
-    int n = (int)w[4];
+    PERFORM4ARGS(t_float *,out, t_delwritectl *,c, int *,delsampsp, int,n);
+    int delsamps = *delsampsp;
     int phase = c->c_phase - delsamps, nsamps = c->c_n;
     float *vp = c->c_vec, *bp, *ep = vp + (c->c_n + XTRASAMPS);
     if (phase < 0) phase += nsamps;
@@ -1907,10 +1832,8 @@ static t_int *sigdelread_perform(t_int *w) {
     return w+5;
 }
 static t_int *sigdelread_perf8(t_int *w) {
-    t_float *out = (t_float *)w[1];
-    t_delwritectl *c = (t_delwritectl *)w[2];
-    int delsamps = *(int *)w[3];
-    int n = (int)w[4];
+    PERFORM4ARGS(t_float *,out, t_delwritectl *,c, int *,delsampsp, int,n);
+    int delsamps = *delsampsp;
     int phase = c->c_phase - delsamps, nsamps = c->c_n;
     float *vp = c->c_vec, *bp, *ep = vp + (c->c_n + XTRASAMPS);
     if (phase < 0) phase += nsamps;
@@ -1924,26 +1847,18 @@ static t_int *sigdelread_perf8(t_int *w) {
     return w+5;
 }
 static t_int *sigdelread_perfsimd(t_int *w) {
-    t_float *out = (t_float *)w[1];
-    t_delwritectl *c = (t_delwritectl *)w[2];
-    int delsamps = *(int *)w[3];
-    int n = (int)w[4];
-    t_sigdelread *x = (t_sigdelread *)w[5];
+    PERFORM5ARGS(t_float *,out, t_delwritectl *,c, int *,delsampsp, int,n, t_sigdelread *,x);
+    int delsamps = *delsampsp;
     int phase = c->c_phase - delsamps, nsamps = c->c_n;
     float *vp = c->c_vec, *bp, *ep = vp + (c->c_n + XTRASAMPS);
     if (phase < 0) phase += nsamps;
     bp = vp + phase;
-	if (phase + n > nsamps)
-		while (n--) {
-			*out++ = *bp++;
-			if (bp == ep) bp -= nsamps;
-		}
-	else x->copy_fp(out, bp, n);
+    if (phase + n > nsamps) while (n--) {*out++ = *bp++; if (bp == ep) bp -= nsamps;}
+    else x->copy_fp(out, bp, n);
     return w+6;
 }
 static void sigdelread_dsp(t_sigdelread *x, t_signal **sp) {
-    t_sigdelwrite *delwriter =
-        (t_sigdelwrite *)pd_findbyclass(x->sym, sigdelwrite_class);
+    t_sigdelwrite *delwriter = (t_sigdelwrite *)pd_findbyclass(x->sym, sigdelwrite_class);
     x->sr = sp[0]->sr * 0.001;
     x->n = sp[0]->n;
     if (delwriter) {
@@ -1983,12 +1898,7 @@ static void *sigvd_new(t_symbol *s) {
     return x;
 }
 static t_int *sigvd_perform(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_float *out = (t_float *)w[2];
-    t_delwritectl *ctl = (t_delwritectl *)w[3];
-    t_sigvd *x = (t_sigvd *)w[4];
-    int n = (int)w[5];
-
+    PERFORM5ARGS(t_float *,in, t_float *,out, t_delwritectl *,ctl, t_sigvd *,x, int,n);
     int nsamps = ctl->c_n;
     float limit = nsamps - n - 1;
     float fn = n-1;
@@ -2065,9 +1975,7 @@ static void *sigrifft_new() {
     x->a = 0; return x;}
 
 static t_int *sigfft_swap(t_int *w) {
-    float *in1 = (t_float *)w[1];
-    float *in2 = (t_float *)w[2];
-    int n = w[3];
+    PERFORM3ARGS(float *,in1, float *,in2, int,n);
     for (;n--; in1++, in2++) {
         float f = *in1;
 	*in1 = *in2;
@@ -2101,9 +2009,7 @@ static void  sigfft_dsp(t_sigfft *x, t_signal **sp) {sigfft_dspx(x, sp, sigfft_p
 static void sigifft_dsp(t_sigfft *x, t_signal **sp) {sigfft_dspx(x, sp, sigifft_perform);}
 
 static t_int *sigrfft_flip(t_int *w) {
-    float *in = (t_float *)w[1];
-    float *out = (t_float *)w[2];
-    int n = w[3];
+    PERFORM3ARGS(float *,in, float *,out, int,n);
     while (n--) *(--out) = *in++;
     *(--out) = 0; /* to hell with it */
     return w+4;
@@ -2300,13 +2206,9 @@ static void *sigframp_new() {
     return x;
 }
 static t_int *sigframp_perform(t_int *w) {
-    float *inreal = (t_float *)w[1];
-    float *inimag = (t_float *)w[2];
-    float *outfreq = (t_float *)w[3];
-    float *outamp = (t_float *)w[4];
+    PERFORM5ARGS(float *,inreal, float *,inimag, float *,outfreq, float *,outamp, int,n);
     float lastreal = 0, currentreal = inreal[0], nextreal = inreal[1];
     float lastimag = 0, currentimag = inimag[0], nextimag = inimag[1];
-    int n = w[5];
     int m = n + 1;
     float fbin = 1, oneovern2 = 1.f/((float)n * (float)n);
     inreal += 2;
@@ -2378,10 +2280,7 @@ static void sighip_clear(t_sighip *x, t_floatarg q) {x->cspace.x = 0;}
 static void siglop_clear(t_siglop *x, t_floatarg q) {x->cspace.x = 0;}
 
 static t_int *sighip_perform(t_int *w) {
-    float *in = (float *)w[1];
-    float *out = (float *)w[2];
-    t_hipctl *c = (t_hipctl *)w[3];
-    int n = (t_int)w[4];
+    PERFORM4ARGS(float *,in, float *,out, t_hipctl *,c, int,n);
     float last = c->x;
     float coef = c->coef;
     if (coef < 1) {
@@ -2399,10 +2298,7 @@ static t_int *sighip_perform(t_int *w) {
     return w+5;
 }
 static t_int *siglop_perform(t_int *w) {
-    float *in = (float *)w[1];
-    float *out = (float *)w[2];
-    t_lopctl *c = (t_lopctl *)w[3];
-    int n = (t_int)w[4];
+    PERFORM4ARGS(float *,in, float *,out, t_lopctl *,c, int,n);
     float last = c->x;
     float coef = c->coef;
     float feedback = 1 - coef;
@@ -2411,12 +2307,10 @@ static t_int *siglop_perform(t_int *w) {
     c->x = last;
     return w+5;
 }
-static void sighip_dsp(t_sighip *x, t_signal **sp) {
-    x->sr = sp[0]->sr; sighip_ft1(x,  x->hz);
-    dsp_add(sighip_perform, 4, sp[0]->v, sp[1]->v, x->ctl, sp[0]->n);}
-static void siglop_dsp(t_siglop *x, t_signal **sp) {
-    x->sr = sp[0]->sr; siglop_ft1(x, x->hz);
-    dsp_add(siglop_perform, 4, sp[0]->v, sp[1]->v, x->ctl, sp[0]->n);}
+static void sighip_dsp(t_sighip *x, t_signal **sp) {x->sr = sp[0]->sr; sighip_ft1(x,x->hz);
+    dsp_add(sighip_perform,4,sp[0]->v,sp[1]->v,x->ctl,sp[0]->n);}
+static void siglop_dsp(t_siglop *x, t_signal **sp) {x->sr = sp[0]->sr; siglop_ft1(x,x->hz);
+    dsp_add(siglop_perform,4,sp[0]->v,sp[1]->v,x->ctl,sp[0]->n);}
 
 void sighip_setup() {
     sighip_class = class_new2("hip~",sighip_new,0,sizeof(t_sighip),0,"F");
@@ -2490,10 +2384,7 @@ static void sigbp_ft1(t_sigbp *x, t_floatarg f) {sigbp_docoef(x, f, x->q);}
 static void sigbp_ft2(t_sigbp *x, t_floatarg q) {sigbp_docoef(x, x->freq, q);}
 static void sigbp_clear(t_sigbp *x, t_floatarg q) {x->ctl->x1 = x->ctl->x2 = 0;}
 static t_int *sigbp_perform(t_int *w) {
-    float *in = (float *)w[1];
-    float *out = (float *)w[2];
-    t_bpctl *c = (t_bpctl *)w[3];
-    int n = (t_int)w[4];
+    PERFORM4ARGS(float *,in, float *,out, t_bpctl *,c, int,n);
     float last = c->x1;
     float prev = c->x2;
     float coef1 = c->coef1;
@@ -2553,10 +2444,7 @@ static void *sigbiquad_new(t_symbol *s, int argc, t_atom *argv) {
     return x;
 }
 static t_int *sigbiquad_perform(t_int *w) {
-    float *in = (float *)w[1];
-    float *out = (float *)w[2];
-    t_biquadctl *c = (t_biquadctl *)w[3];
-    int n = (t_int)w[4];
+    PERFORM4ARGS(float *,in, float *,out, t_biquadctl *,c, int,n);
     float last = c->x1;
     float prev = c->x2;
     float fb1 = c->fb1;
@@ -2578,10 +2466,8 @@ static t_int *sigbiquad_perform(t_int *w) {
 /* tb: some loop unrolling & do some relaxed denormal bashing */
 /* (denormal bashing = non-Pentium4 penalised for Pentium4's failings) */
 static t_int *sigbiquad_perf8(t_int *w) {
-    float *in = (float *)w[1];
-    float *out = (float *)w[2];
-    t_biquadctl *c = (t_biquadctl *)w[3];
-    int n = (t_int)w[4]>>3;
+    PERFORM4ARGS(float *,in, float *,out, t_biquadctl *,c, int,n);
+    n>>=3;
     float last = c->x1;
     float prev = c->x2;
     float fb1 = c->fb1;
@@ -2671,11 +2557,7 @@ static void *sigsamphold_new() {
     return x;
 }
 static t_int *sigsamphold_perform(t_int *w) {
-    float *in1 = (float *)w[1];
-    float *in2 = (float *)w[2];
-    float *out = (float *)w[3];
-    t_sigsamphold *x = (t_sigsamphold *)w[4];
-    int n = (t_int)w[5];
+    PERFORM5ARGS(float *,in1, float *,in2, float *,out, t_sigsamphold *,x, int,n);
     float lastin = x->lastin;
     float lastout = x->lastout;
     for (int i = 0; i < n; i++, *in1++) {
@@ -2723,8 +2605,8 @@ static void *sigrzrev_new(t_float f) {
     pd_float((t_pd *)inlet_new(x, x, &s_signal, &s_signal), f); outlet_new(x, &s_signal); x->last=0; return x;}
 
 static t_int *sigrpole_perform(t_int *w) {
-    float *in1 = (float *)w[1]; float *in2 = (float *)w[2]; float *out = (float *)w[3];
-    t_sigrpole *x = (t_sigrpole *)w[4]; int n = (t_int)w[5]; float last = x->last;
+    PERFORM5ARGS(float *,in1, float *,in2, float *,out, t_sigrpole *,x, t_int,n);
+    float last = x->last;
     for (int i=0; i<n; i++) {
         float next = *in1++, coef = *in2++;
         *out++ = last = coef*last + next;
@@ -2734,8 +2616,8 @@ static t_int *sigrpole_perform(t_int *w) {
     return w+6;
 }
 static t_int *sigrzero_perform(t_int *w) {
-    float *in1 = (float *)w[1]; float *in2 = (float *)w[2]; float *out = (float *)w[3];
-    t_sigrzero *x = (t_sigrzero *)w[4]; int n = (t_int)w[5]; float last = x->last;
+    PERFORM5ARGS(float *,in1, float *,in2, float *,out, t_sigrzero *,x, t_int,n);
+    float last = x->last;
     for (int i = 0; i < n; i++) {
         float next = *in1++, coef = *in2++;
         *out++ = next - coef*last;
@@ -2745,8 +2627,8 @@ static t_int *sigrzero_perform(t_int *w) {
     return w+6;
 }
 static t_int *sigrzrev_perform(t_int *w) {
-    float *in1 = (float *)w[1]; float *in2 = (float *)w[2]; float *out = (float *)w[3];
-    t_sigrzrev *x = (t_sigrzrev *)w[4]; int n = (t_int)w[5]; float last = x->last;
+    PERFORM5ARGS(float *,in1, float *,in2, float *,out, t_sigrzrev *,x, t_int,n);
+    float last = x->last;
     for (int i = 0; i < n; i++) {
         float next = *in1++, coef = *in2++;
         *out++ = last - coef*next;
@@ -2826,11 +2708,7 @@ static void *sigczrev_new(t_float re, t_float im) {
 }
 
 static t_int *sigcpole_perform(t_int *w) {
-    float *inre1 = (float *)w[1], *inim1 = (float *)w[2];
-    float *inre2 = (float *)w[3], *inim2 = (float *)w[4];
-    float *outre = (float *)w[5], *outim = (float *)w[6];
-    t_sigcpole *x = (t_sigcpole *)w[7];
-    int n = (t_int)w[8];
+    PERFORM8ARGS(float *,inre1, float *,inim1, float *,inre2, float *,inim2, float *,outre, float *,outim, t_sigcpole *,x, int,n);
     float lastre = x->lastre;
     float lastim = x->lastim;
     for (int i = 0; i < n; i++) {
@@ -2847,11 +2725,7 @@ static t_int *sigcpole_perform(t_int *w) {
     return w+9;
 }
 static t_int *sigczero_perform(t_int *w) {
-    float *inre1 = (float *)w[1], *inim1 = (float *)w[2];
-    float *inre2 = (float *)w[3], *inim2 = (float *)w[4];
-    float *outre = (float *)w[5], *outim = (float *)w[6];
-    t_sigczero *x = (t_sigczero *)w[7];
-    int n = (t_int)w[8];
+    PERFORM8ARGS(float *,inre1, float *,inim1, float *,inre2, float *,inim2, float *,outre, float *,outim, t_sigczero *,x, int,n);
     float lastre = x->lastre;
     float lastim = x->lastim;
     for (int i = 0; i < n; i++) {
@@ -2867,11 +2741,7 @@ static t_int *sigczero_perform(t_int *w) {
     return w+9;
 }
 static t_int *sigczrev_perform(t_int *w) {
-    float *inre1 = (float *)w[1], *inim1 = (float *)w[2];
-    float *inre2 = (float *)w[3], *inim2 = (float *)w[4];
-    float *outre = (float *)w[5], *outim = (float *)w[6];
-    t_sigczrev *x = (t_sigczrev *)w[7];
-    int n = (t_int)w[8];
+    PERFORM8ARGS(float *,inre1, float *,inim1, float *,inre2, float *,inim2, float *,outre, float *,outim, t_sigczrev *,x, int,n);
     float lastre = x->lastre;
     float lastim = x->lastim;
     for (int i = 0; i < n; i++) {
@@ -2889,11 +2759,11 @@ static t_int *sigczrev_perform(t_int *w) {
 }
 
 static void sigcpole_dsp(t_sigcpole *x, t_signal **sp) {
-    dsp_add(sigcpole_perform, 8, sp[0]->v, sp[1]->v, sp[2]->v, sp[3]->v, sp[4]->v, sp[5]->v, x, sp[0]->n);}
+    dsp_add(sigcpole_perform,8,sp[0]->v,sp[1]->v,sp[2]->v,sp[3]->v,sp[4]->v,sp[5]->v,x,sp[0]->n);}
 static void sigczero_dsp(t_sigczero *x, t_signal **sp) {
-    dsp_add(sigczero_perform, 8, sp[0]->v, sp[1]->v, sp[2]->v, sp[3]->v, sp[4]->v, sp[5]->v, x, sp[0]->n);}
+    dsp_add(sigczero_perform,8,sp[0]->v,sp[1]->v,sp[2]->v,sp[3]->v,sp[4]->v,sp[5]->v,x,sp[0]->n);}
 static void sigczrev_dsp(t_sigczrev *x, t_signal **sp) {
-    dsp_add(sigczrev_perform, 8, sp[0]->v, sp[1]->v, sp[2]->v, sp[3]->v, sp[4]->v, sp[5]->v, x, sp[0]->n);}
+    dsp_add(sigczrev_perform,8,sp[0]->v,sp[1]->v,sp[2]->v,sp[3]->v,sp[4]->v,sp[5]->v,x,sp[0]->n);}
 
 static void sigcpole_clear(t_sigcpole *x) {x->lastre = x->lastim = 0;}
 static void sigczero_clear(t_sigczero *x) {x->lastre = x->lastim = 0;}
@@ -2938,15 +2808,8 @@ static void *sigsend_new(t_symbol *s) {
     x->a = 0;
     return x;
 }
-static t_int *sigsend_perform(t_int *w) {
-    testcopyvec((t_float *)w[2],(t_float *)w[1],w[3]);
-    return w+4;
-}
-/* T.Grill - SIMD version */
-static t_int *sigsend_perfsimd(t_int *w) {
-    testcopyvec_simd((t_float *)w[2],(t_float *)w[1],w[3]);
-    return w+4;
-}
+static t_int *sigsend_perform(t_int *w)  {testcopyvec(     (t_float *)w[2],(t_float *)w[1],w[3]); return w+4;}
+static t_int *sigsend_perfsimd(t_int *w) {testcopyvec_simd((t_float *)w[2],(t_float *)w[1],w[3]); return w+4;} // T.Grill
 static void sigsend_dsp(t_sigsend *x, t_signal **sp) {
     const int n = x->n;
     if(n != sp[0]->n) {error("sigsend %s: unexpected vector size", x->sym->name); return;}
@@ -2981,9 +2844,7 @@ static void *sigreceive_new(t_symbol *s) {
     return x;
 }
 static t_int *sigreceive_perform(t_int *w) {
-    t_sigreceive *x = (t_sigreceive *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_sigreceive *,x, t_float *,out, int,n);
     t_float *in = x->wherefrom;
     if (in) {
         while (n--) *out++ = *in++;
@@ -2994,18 +2855,18 @@ static t_int *sigreceive_perform(t_int *w) {
 }
 /* tb: vectorized receive function */
 static t_int *sigreceive_perf8(t_int *w) {
-    t_sigreceive *x = (t_sigreceive *)w[1];
+    PERFORM3ARGS(t_sigreceive *,x, t_float *,out, int,n);
     t_float *in = x->wherefrom;
-    if (in) copyvec_8((t_float *)w[2],in,w[3]);
-    else    zerovec_8((t_float *)w[2],w[3]);
+    if (in) copyvec_8(out,in,n);
+    else    zerovec_8(out,   n);
     return w+4;
 }
 /* T.Grill - SIMD version */
 static t_int *sigreceive_perfsimd(t_int *w) {
-    t_sigreceive *x = (t_sigreceive *)w[1];
+    PERFORM3ARGS(t_sigreceive *,x, t_float *,out, int,n);
     t_float *in = x->wherefrom;
-    if(in) copyvec_simd((t_float *)w[2],in,w[3]);
-    else   zerovec_simd((t_float *)w[2],w[3]);
+    if(in) copyvec_simd(out,in,n);
+    else   zerovec_simd(out,   n);
     return w+4;
 }
 static void sigreceive_set(t_sigreceive *x, t_symbol *s) {
@@ -3028,10 +2889,9 @@ static void sigreceive_dsp(t_sigreceive *x, t_signal **sp) {
     if (sp[0]->n != n) {error("receive~ %s: vector size mismatch", x->sym->name); return;}
     sigreceive_set(x, x->sym);
     /* x->wherefrom is aligned because we aligned the sender memory buffer */
-    if(n&7) dsp_add(sigreceive_perform,  3, x, sp[0]->v, n);
-    else if(SIMD_CHECK1(n,sp[0]->v))
-	    dsp_add(sigreceive_perfsimd, 3, x, sp[0]->v, n);
-    else    dsp_add(sigreceive_perf8,    3, x, sp[0]->v, n);
+    if(n&7)				dsp_add(sigreceive_perform,  3, x, sp[0]->v, n);
+    else if(SIMD_CHECK1(n,sp[0]->v))    dsp_add(sigreceive_perfsimd, 3, x, sp[0]->v, n);
+    else				dsp_add(sigreceive_perf8,    3, x, sp[0]->v, n);
 }
 static void sigreceive_setup() {
     sigreceive_class = class_new2("receive~",sigreceive_new,0,sizeof(t_sigreceive),0,"S");
@@ -3059,31 +2919,30 @@ static void *sigcatch_new(t_symbol *s) {
     return x;
 }
 static t_int *sigcatch_perform(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_float *,in, t_float *,out, int,n);
     while (n--) *out++ = *in, *in++ = 0;
     return w+4;
 }
 /* tb: vectorized catch function */
 static t_int *sigcatch_perf8(t_int *w) {
-    copyvec_8((t_float *)w[2],(t_float *)w[1],w[3]);
-    zerovec_8((t_float *)w[1],w[3]);
+    PERFORM3ARGS(t_float *,in, t_float *,out, int,n);
+    copyvec_8(out,in,n);
+    zerovec_8(    in,n);
     return w+4;
 }
 /* T.Grill: SIMD catch function */
 static t_int *sigcatch_perfsimd(t_int *w) {
-    copyvec_simd((t_float *)w[2],(t_float *)w[1],w[3]);
-    zerovec_simd((t_float *)w[1],w[3]);
+    PERFORM3ARGS(t_float *,in, t_float *,out, int,n);
+    copyvec_simd(out,in,n);
+    zerovec_simd(    in,n);
     return w+4;
 }
 static void sigcatch_dsp(t_sigcatch *x, t_signal **sp) {
     const int n = sp[0]->n;
     if (x->n != n) {error("sigcatch %s: unexpected vector size", x->sym->name); return;}
-    if(n&7) dsp_add(sigcatch_perform, 3, x->vec, sp[0]->v, n);
-    else if(SIMD_CHECK2(n,x->vec,sp[0]->v))
-	 dsp_add(sigcatch_perfsimd,   3, x->vec, sp[0]->v, n);
-    else dsp_add(sigcatch_perf8,      3, x->vec, sp[0]->v, n);
+    if(n&7)					dsp_add(sigcatch_perform, 3, x->vec, sp[0]->v, n);
+    else if(SIMD_CHECK2(n,x->vec,sp[0]->v))	dsp_add(sigcatch_perfsimd,3, x->vec, sp[0]->v, n);
+    else					dsp_add(sigcatch_perf8,   3, x->vec, sp[0]->v, n);
 }
 static void sigcatch_free(t_sigcatch *x) {
     pd_unbind(x, x->sym);
@@ -3167,10 +3026,8 @@ static void *clip_new(t_floatarg lo, t_floatarg hi) {
 }
 /* T.Grill - changed function interface so that class pointer needn't be passed */
 t_int *clip_perform(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_float *out = (t_float *)w[2];
-    const t_float lo = *(t_float *)w[3],hi = *(t_float *)w[4];
-    int n = (int)w[5];
+    PERFORM5ARGS(t_float *,in, t_float *,out, t_float *,lop, t_float *,hip, int,n);
+    t_float lo=*lop, hi=*hip;
     while (n--) *out++ = clip(*in++,lo,hi);
     return w+6;
 }
@@ -3375,9 +3232,7 @@ struct t_print : t_object {
     int count;
 };
 static t_int *print_perform(t_int *w) {
-    t_print *x = (t_print *)w[1];
-    t_float *in = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_print *,x, t_float *,in, int,n);
     if (x->count) {
         post("%s:", x->sym->name);
         if (n == 1) post("%8g", in[0]);
@@ -3393,9 +3248,7 @@ static t_int *print_perform(t_int *w) {
     }
     return w+4;
 }
-static void print_dsp(t_print *x, t_signal **sp) {
-    dsp_add(print_perform, 3, x, sp[0]->v, sp[0]->n);
-}
+static void print_dsp(t_print *x, t_signal **sp) {dsp_add(print_perform, 3, x, sp[0]->v, sp[0]->n);}
 static void print_float(t_print *x, t_float f) {x->count = max(0,(int)f);}
 static void print_bang(t_print *x) {x->count = 1;}
 static void *print_new(t_symbol *s) {
@@ -3419,7 +3272,7 @@ struct t_bang : t_object {
     t_clock *clock;
 };
 static t_int *bang_tilde_perform(t_int *w) {
-    t_bang *x = (t_bang *)w[1];
+    PERFORM1ARGS(t_bang *,x);
     clock_delay(x->clock, 0);
     return w+2;
 }
@@ -3455,10 +3308,7 @@ static void *phasor_new(t_floatarg f) {
     return x;
 }
 static t_int *phasor_perform(t_int *w) {
-    t_phasor *x = (t_phasor *)w[1];
-    t_float *in = (t_float *)w[2];
-    t_float *out = (t_float *)w[3];
-    int n = (int)w[4];
+    PERFORM4ARGS(t_phasor *,x, t_float *,in, t_float *,out, int,n);
     double dphase = x->phase + UNITBIT32;
     union tabfudge tf;
     int normhipart;
@@ -3504,9 +3354,7 @@ static void *cos_new() {
     return x;
 }
 static t_int *cos_perform(t_int *w) {
-    t_float *in = (t_float *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_float *,in, t_float *,out, int,n);
     float *tab = cos_table, *addr, f1, f2, frac;
     double dphase;
     int normhipart;
@@ -3588,10 +3436,7 @@ static void *osc_new(t_floatarg f) {
     return x;
 }
 static t_int *osc_perform(t_int *w) {
-    t_osc *x = (t_osc *)w[1];
-    t_float *in = (t_float *)w[2];
-    t_float *out = (t_float *)w[3];
-    int n = (int)w[4];
+    PERFORM4ARGS(t_osc *,x, t_float *,in, t_float *,out, int,n);
     float *tab = cos_table, *addr, f1, f2, frac;
     double dphase = x->phase + UNITBIT32;
     int normhipart;
@@ -3684,12 +3529,7 @@ static void sigvcf_ft1(t_sigvcf *x, t_floatarg f) {
     x->ctl->q = (f > 0 ? f : 0.f);
 }
 static t_int *sigvcf_perform(t_int *w) {
-    float *in1 = (float *)w[1];
-    float *in2 = (float *)w[2];
-    float *out1 = (float *)w[3];
-    float *out2 = (float *)w[4];
-    t_vcfctl *c = (t_vcfctl *)w[5];
-    int n = (t_int)w[6];
+    PERFORM6ARGS(float *,in1, float *,in2, float *,out1, float *,out2, t_vcfctl *,c, int,n);
     float re = c->re, re2;
     float im = c->im;
     float q = c->q;
@@ -3756,9 +3596,7 @@ static void *noise_new() {
     return x;
 }
 static t_int *noise_perform(t_int *w) {
-    t_float *out = (t_float *)w[1];
-    int *vp = (int *)w[2];
-    int n = (int)w[3];
+    PERFORM3ARGS(t_float *,out, int *,vp, int,n);
     int val = *vp;
     while (n--) {
         *out++ = ((float)((val & 0x7fffffff) - 0x40000000)) * (float)(1.0 / 0x40000000);
@@ -3775,18 +3613,12 @@ static void noise_setup() {
     class_addmethod2(noise_class, noise_dsp, "dsp","");
 }
 void builtins_dsp_setup() {
-    plus_setup();
-    minus_setup();
-    times_setup();
-    over_setup();
-    max_setup();
-    min_setup();
-    lt_setup();
-    gt_setup();
-    le_setup();
-    ge_setup();
-    eq_setup();
-    ne_setup();
+    plus_setup();    minus_setup();
+    times_setup();   over_setup();
+    max_setup();     min_setup();
+    lt_setup();      gt_setup();
+    le_setup();      ge_setup();
+    eq_setup();      ne_setup();
     //abs_setup();
 
     tab_tilde_setup();
