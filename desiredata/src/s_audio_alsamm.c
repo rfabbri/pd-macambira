@@ -92,19 +92,18 @@ static int alsamm_inchannels = 0;
 static int alsamm_outchannels = 0;
 
 /* Defines */
- #define WATCH_PERIODS 90
- static int in_avail[WATCH_PERIODS];
- static int out_avail[WATCH_PERIODS];
- static int in_offset[WATCH_PERIODS];
- static int out_offset[WATCH_PERIODS];
- static int out_cm[WATCH_PERIODS];
- static char *outaddr[WATCH_PERIODS];
- static char *inaddr[WATCH_PERIODS];
- static int xruns_watch[WATCH_PERIODS];
- static int broken_opipe;
-
- static int dac_send = 0;
- static int alsamm_xruns = 0;
+#define WATCH_PERIODS 90
+static int in_avail[WATCH_PERIODS];
+static int out_avail[WATCH_PERIODS];
+static int in_offset[WATCH_PERIODS];
+static int out_offset[WATCH_PERIODS];
+static int out_cm[WATCH_PERIODS];
+static char *outaddr[WATCH_PERIODS];
+static char *inaddr[WATCH_PERIODS];
+static int xruns_watch[WATCH_PERIODS];
+static int broken_opipe;
+static int dac_send = 0;
+static int alsamm_xruns = 0;
 
 static void show_availist() {
   for(int i=1; i<WATCH_PERIODS; i++) {
@@ -503,8 +502,6 @@ int alsamm_send_dacs() {
   snd_pcm_sframes_t size;
   snd_pcm_sframes_t commitres;
   snd_pcm_state_t state;
-  snd_pcm_sframes_t ooffset, oavail;
-  snd_pcm_sframes_t ioffset, iavail;
   /* unused channels should be zeroed out on startup (open) and stay this */
   int inchannels = sys_inchannels;
   int outchannels = sys_outchannels;
@@ -526,15 +523,15 @@ int alsamm_send_dacs() {
      so we don't make a precheck of insamples here and let outsample check be the first of the first card. */
   /* OUTPUT Transfer */
   fpo = sys_soundout;
-  for(devno = 0;devno < alsao.ndev;devno++) {
+  for (int devno=0; devno<alsao.ndev; devno++) {
     t_alsa_dev *dev = &alsao.dev[devno];
     snd_pcm_t *out = dev->a_handle;
     int ochannels =dev->a_channels;
     /* how much samples available ??? */
-    oavail = snd_pcm_avail_update(out);
+    snd_pcm_sframes_t ooffset=0, oavail=snd_pcm_avail_update(out);
     /* only one reason i can think about, the driver stopped and says broken pipe
        so this should not happen if we have enough stopthreshold but if try to restart with next commit */
-    if (oavail < 0) {
+    if (oavail<0) {
       if (debug) broken_opipe++;
       err = xrun_recovery(out, -EPIPE);
       if (err < 0) {check_error(err,"otavail<0 recovery failed"); return SENDDACS_NO;}
@@ -544,33 +541,23 @@ int alsamm_send_dacs() {
     /* xruns will be ignored since you cant do anything since already happend */
     state = snd_pcm_state(out);
     if (state == SND_PCM_STATE_XRUN) {
-      err = xrun_recovery(out, -EPIPE);
-      if (err < 0) {check_error(err,"DAC XRUN recovery failed"); return SENDDACS_NO;}
+      err = xrun_recovery(out,    -EPIPE); if (err<0) {check_error(err,"DAC XRUN recovery failed"   ); return SENDDACS_NO;}
       oavail = snd_pcm_avail_update(out);
     } else if (state == SND_PCM_STATE_SUSPENDED) {
-      err = xrun_recovery(out, -ESTRPIPE);
-      if (err < 0) {check_error(err,"DAC SUSPEND recovery failed"); return SENDDACS_NO;}
+      err = xrun_recovery(out, -ESTRPIPE); if (err<0) {check_error(err,"DAC SUSPEND recovery failed"); return SENDDACS_NO;}
       oavail = snd_pcm_avail_update(out);
     }
     if(debug && dac_send < WATCH_PERIODS) out_avail[dac_send] = oavail;
-    /* we only transfer transfersize of bytes request,
-       this should only happen on first card otherwise we got a problem :-(()*/
+    /* we only transfer transfersize of bytes request, this should only happen on first card otherwise we got a problem */
     if(oavail < sys_dacblocksize) return SENDDACS_NO;
     /* transfer now */
-    size = sys_dacblocksize;
-    fp1 = fpo;
-    ooffset = 0;
-    /* since this can go over a buffer boundery we maybe need two steps to
-       transfer (normally when buffersize is a multiple of transfersize
-       this should never happen) */
-    while (size > 0) {
-      snd_pcm_sframes_t oframes;
-      oframes = size;
+    size = sys_dacblocksize; fp1 = fpo;
+    /* since this can go over a buffer boundery we maybe need two steps to transfer
+       (normally when buffersize is a multiple of transfersize this should never happen) */
+    while (size>0) {
+      snd_pcm_sframes_t oframes = size;
       err =  alsamm_get_channels(out, (unsigned long *)&oframes, (unsigned long *)&ooffset,ochannels,dev->a_addr);
-      if(debug && dac_send < WATCH_PERIODS) {
-        out_offset[dac_send] = ooffset;
-        outaddr[dac_send] = (char *) dev->a_addr[0];
-      }
+      if(debug && dac_send < WATCH_PERIODS) {out_offset[dac_send] = ooffset; outaddr[dac_send] = (char *) dev->a_addr[0];}
       if (err<0) {
         err = xrun_recovery(out, err);
         if (err<0) {check_error(err,"MMAP begins avail error"); break; /* next card please */}
@@ -580,18 +567,15 @@ int alsamm_send_dacs() {
         t_alsa_sample32 *buf = (t_alsa_sample32 *)dev->a_addr[chn];
         /* osc(buf, oframes, (dac_send%1000 < 500)?-100.0:-10.0,440,&(indexes[chn])); */
         for (i = 0, fp2 = fp1 + chn*sys_dacblocksize; i < oframes; i++,fp2++) {
-            float s1 = *fp2 * F32MAX;
             /* better but slower, better never clip ;-) buf[i] = CLIP32(s1); */
-            buf[i] = (int) s1 & 0xFFFFFF00;
+            buf[i] = int(*fp2 * F32MAX) & 0xFFFFFF00;
             *fp2 = 0.0;
         }
       }
       commitres = snd_pcm_mmap_commit(out, ooffset, oframes);
       if (commitres < 0 || commitres != oframes) {
-        if ((err = xrun_recovery(out, commitres >= 0 ? -EPIPE : commitres)) < 0) {
-          check_error(err,"MMAP commit error");
-          return SENDDACS_NO;
-        }
+        err = xrun_recovery(out, commitres >= 0 ? -EPIPE : commitres);
+        if (err<0) {check_error(err,"MMAP commit error"); return SENDDACS_NO;}
       }
       if(debug && dac_send < WATCH_PERIODS) out_cm[dac_send] = oframes;
       fp1 += oframes;
@@ -600,52 +584,44 @@ int alsamm_send_dacs() {
     fpo += ochannels*sys_dacblocksize;
   }/* for devno */
   fpi = sys_soundin; /* star first card first channel */
-  for(devno = 0;devno < alsai.ndev;devno++) {
+  for (devno=0; devno<alsai.ndev; devno++) {
     t_alsa_dev *dev = &alsai.dev[devno];
     snd_pcm_t *in = dev->a_handle;
     int ichannels = dev->a_channels;
-    iavail = snd_pcm_avail_update(in);
-    if (iavail < 0) {
+    snd_pcm_sframes_t ioffset=0, iavail=snd_pcm_avail_update(in);
+    if (iavail<0) {
       err = xrun_recovery(in, iavail);
-      if (err < 0) {check_error(err,"input avail update failed"); return SENDDACS_NO;}
+      if (err<0) {check_error(err,"input avail update failed"); return SENDDACS_NO;}
       iavail=snd_pcm_avail_update(in);
     }
     state = snd_pcm_state(in);
     if (state == SND_PCM_STATE_XRUN) {
-      err = xrun_recovery(in, -EPIPE);
-      if (err<0) {check_error(err,"ADC XRUN recovery failed"); return SENDDACS_NO;}
+      err = xrun_recovery(in,   -EPIPE); if (err<0) {check_error(err,"ADC XRUN recovery failed"   ); return SENDDACS_NO;}
       iavail=snd_pcm_avail_update(in);
     } else if (state == SND_PCM_STATE_SUSPENDED) {
-      err = xrun_recovery(in, -ESTRPIPE);
-      if (err < 0) {check_error(err,"ADC SUSPEND recovery failed"); return SENDDACS_NO;}
+      err = xrun_recovery(in,-ESTRPIPE); if (err<0) {check_error(err,"ADC SUSPEND recovery failed"); return SENDDACS_NO;}
       iavail=snd_pcm_avail_update(in);
     }
     /* only transfer full transfersize or nothing */
     if(iavail < sys_dacblocksize) return SENDDACS_NO;
     size = sys_dacblocksize;
     fp1 = fpi;
-    ioffset = 0;
-    /* since sysdata can go over a driver buffer boundery we maybe need two steps to
-       transfer (normally when buffersize is a multiple of transfersize
-       this should never happen) */
-    while(size > 0) {
+    /* since sysdata can go over a driver buffer boundery we maybe need two steps to transfer
+       (normally when buffersize is a multiple of transfersize this should never happen) */
+    while(size>0) {
       snd_pcm_sframes_t iframes = size;
       err = alsamm_get_channels(in, (unsigned long *)&iframes, (unsigned long *)&ioffset,ichannels,dev->a_addr);
       if (err<0) {
         err = xrun_recovery(in, err);
         if (err<0) {check_error(err,"MMAP begins avail error"); return SENDDACS_NO;}
       }
-      if(debug && dac_send < WATCH_PERIODS) {
-        in_avail[dac_send] = iavail;
-        in_offset[dac_send] = ioffset;
-        inaddr[dac_send] = dev->a_addr[0];
-      }
+      if(debug && dac_send < WATCH_PERIODS) {in_avail[dac_send] = iavail; in_offset[dac_send] = ioffset; inaddr[dac_send] = dev->a_addr[0];}
       /* transfer into memory */
       for (int chn=0; chn<ichannels; chn++) {
         t_alsa_sample32 *buf = (t_alsa_sample32 *) dev->a_addr[chn];
         for (i = 0, fp2 = fp1 + chn*sys_dacblocksize; i < iframes; i++,fp2++) {
             /* mask the lowest bits, since subchannels info can make zero samples nonzero */
-            *fp2 = (float) (t_alsa_sample32(buf[i] & 0xFFFFFF00)) * (1.0 / float(INT32_MAX));
+            *fp2 = float(t_alsa_sample32(buf[i]&0xFFFFFF00)) * (1.0/float(INT32_MAX));
         }
       }
       commitres = snd_pcm_mmap_commit(in, ioffset, iframes);
@@ -659,7 +635,8 @@ int alsamm_send_dacs() {
     }
     fpi += ichannels*sys_dacblocksize;
   } /* for out devno < alsamm_outcards */
-  if ((timenow = sys_getrealtime()) > (timelast + sleep_time)) {
+  timenow = sys_getrealtime();
+  if (timenow > timelast+sleep_time) {
       if(debug && dac_send < 10 && sys_verbose)
         post("slept %f > %f + %f (=%f)", timenow,timelast,sleep_time,(timelast + sleep_time));
       return SENDDACS_SLEPT;

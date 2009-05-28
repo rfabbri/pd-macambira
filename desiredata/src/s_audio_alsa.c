@@ -287,12 +287,12 @@ int alsa_send_dacs() {
     callno++;
 #endif
     alsa_checkiosync();     /* check I/O are in sync and data not late */
-    for (int iodev=0; iodev<alsai.ndev; iodev++) {
-        snd_pcm_status(alsai.dev[iodev].a_handle, alsa_status);
+    for (int i=0; i<alsai.ndev; i++) {
+        snd_pcm_status(alsai.dev[i].a_handle, alsa_status);
         if (snd_pcm_status_get_avail(alsa_status) < transfersize) return SENDDACS_NO;
     }
-    for (int iodev=0; iodev<alsao.ndev; iodev++) {
-        snd_pcm_status(alsao.dev[iodev].a_handle, alsa_status);
+    for (int i=0; i<alsao.ndev; i++) {
+        snd_pcm_status(alsao.dev[i].a_handle, alsa_status);
         if (snd_pcm_status_get_avail(alsa_status) < transfersize) return SENDDACS_NO;
     }
     /* do output */
@@ -419,11 +419,7 @@ static void alsa_checkiosync() {
     int result, giveup = 1000, alreadylogged = 0;
     snd_pcm_sframes_t minphase, maxphase, thisphase, outdelay;
     while (1) {
-        if (giveup-- <= 0) {
-            post("tried but couldn't sync A/D/A");
-            alsa_jittermax += 1;
-            return;
-        }
+        if (giveup-- <= 0) {post("tried but couldn't sync A/D/A"); alsa_jittermax += 1; return;}
         minphase = 0x7fffffff;
         maxphase = -0x7fffffff;
         for (int i=0; i<alsao.ndev; i++) {
