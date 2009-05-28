@@ -2459,7 +2459,7 @@ static void canvas_writelist(t_gobj *y, t_binbuf *b);
 static void canvas_writescalar(t_symbol *tsym, t_word *w, t_binbuf *b, int amarrayelement) {
     t_template *t = template_findbyname(tsym);
     t_atom *a = (t_atom *)getbytes(0);
-    int n = t->n, natom = 0;
+    int n = t->n;
     if (!amarrayelement) {
         t_atom templatename;
         SETSYMBOL(&templatename, gensym(tsym->name + 3));
@@ -2467,6 +2467,7 @@ static void canvas_writescalar(t_symbol *tsym, t_word *w, t_binbuf *b, int amarr
     }
     if (!t) bug("canvas_writescalar");
     /* write the atoms (floats and symbols) */
+    int natom = 0;
     for (int i=0; i<n; i++) {
 	int ty = t->vec[i].type;
         if (ty==DT_FLOAT || ty==DT_SYMBOL) {
@@ -2477,8 +2478,7 @@ static void canvas_writescalar(t_symbol *tsym, t_word *w, t_binbuf *b, int amarr
         }
     }
         /* array elements have to have at least something */
-    if (natom == 0 && amarrayelement)
-        SETSYMBOL(a + natom,  &s_bang), natom++;
+    if (natom == 0 && amarrayelement) {SETSYMBOL(a + natom,  &s_bang); natom++;}
     binbuf_add(b, natom, a);
     binbuf_addsemi(b);
     free(a);
@@ -2487,8 +2487,7 @@ static void canvas_writescalar(t_symbol *tsym, t_word *w, t_binbuf *b, int amarr
             t_array *a = w[i].w_array;
             int elemsize = a->elemsize, nitems = a->n;
             t_symbol *arraytsym = t->vec[i].arraytemplate;
-            for (int j = 0; j < nitems; j++)
-                canvas_writescalar(arraytsym, (t_word *)&a->vec[elemsize*j], b, 1);
+            for (int j = 0; j < nitems; j++) canvas_writescalar(arraytsym, (t_word *)&a->vec[elemsize*j], b, 1);
             binbuf_addsemi(b);
         } else if (t->vec[i].type == DT_CANVAS) {
             canvas_writelist(w->w_canvas->boxes->first(), b);
@@ -2733,7 +2732,7 @@ static void vinlet_bang(t_vinlet *x)                    {outlet_bang(x->outlet);
 static void vinlet_pointer(t_vinlet *x, t_gpointer *gp) {outlet_pointer(x->outlet, gp);}
 static void vinlet_float(t_vinlet *x, t_float f)        {outlet_float(x->outlet, f);}
 static void vinlet_symbol(t_vinlet *x, t_symbol *s)     {outlet_symbol(x->outlet, s);}
-static void vinlet_list(t_vinlet *x, t_symbol *s, int argc, t_atom *argv)     {outlet_list(x->outlet, s, argc, argv);}
+static void vinlet_list(    t_vinlet *x, t_symbol *s, int argc, t_atom *argv) {    outlet_list(x->outlet, s, argc, argv);}
 static void vinlet_anything(t_vinlet *x, t_symbol *s, int argc, t_atom *argv) {outlet_anything(x->outlet, s, argc, argv);}
 
 static void vinlet_free(t_vinlet *x) {
@@ -2750,21 +2749,16 @@ t_inlet *vinlet_getit(t_pd *x) {
 int vinlet_issignal(t_vinlet *x) {return x->buf!=0;}
 
 t_int *vinlet_perform(t_int *w) {
-    t_vinlet *x = (t_vinlet *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = int(w[3]);
+    PERFORM3ARGS(t_vinlet *,x, t_float *,out, int,n);
     t_float *in = x->read;
     while (n--) *out++ = *in++;
     if (in == x->endbuf) in = x->buf;
     x->read = in;
     return w+4;
 }
-
 /* tb: vectorized */
 t_int *vinlet_perf8(t_int *w) {
-    t_vinlet *x = (t_vinlet *)w[1];
-    t_float *out = (t_float *)w[2];
-    int n = int(w[3]);
+    PERFORM3ARGS(t_vinlet *,x, t_float *,out, int,n);
     t_float *in = x->read;
     for (; n; n -= 8, in += 8, out += 8) {
 	out[0] = in[0]; out[1] = in[1]; out[2] = in[2]; out[3] = in[3];
@@ -2774,17 +2768,15 @@ t_int *vinlet_perf8(t_int *w) {
     x->read = in;
     return w+4;
 }
-
 /* T.Grill: SIMD version */
 t_int *vinlet_perfsimd(t_int *w) {
-    t_vinlet *x = (t_vinlet *)(w[1]);
+    PERFORM3ARGS(t_vinlet *,x, t_float *,out, int,n);
     t_float *in = x->read;
-    copyvec_simd((t_float *)w[2],in,w[3]);
+    copyvec_simd(out,in,n);
     if (in == x->endbuf) in = x->buf;
     x->read = in;
     return w+4;
 }
-
 static void vinlet_dsp(t_vinlet *x, t_signal **sp) {
     if (!x->buf) return; /* no buffer means we're not a signal inlet */
     t_signal *outsig = sp[0];
@@ -2799,12 +2791,9 @@ static void vinlet_dsp(t_vinlet *x, t_signal **sp) {
         x->read = x->buf;
     }
 }
-
 /* prolog code: loads buffer from parent patch */
 t_int *vinlet_doprolog(t_int *w) {
-    t_vinlet *x = (t_vinlet *)w[1];
-    t_float *in = (t_float *)w[2];
-    int n = int(w[3]);
+    PERFORM3ARGS(t_vinlet *,x, t_float *,in, int,n);
     t_float *out = x->fill;
     if (out == x->endbuf) {
         t_float *f1 = x->buf, *f2 = x->buf + x->hop;
@@ -2820,7 +2809,7 @@ t_int *vinlet_doprolog(t_int *w) {
 extern "C" int inlet_getsignalindex(t_inlet *x);
 
 /* set up prolog DSP code  */
-extern "C" void vinlet_dspprolog(t_vinlet *x, t_signal **parentsigs, int myvecsize, int calcsize, int phase, int period,
+void vinlet_dspprolog(t_vinlet *x, t_signal **parentsigs, int myvecsize, int calcsize, int phase, int period,
 int frequency, int downsample, int upsample, int reblock, int switched) {
     t_signal *insig;
     x->updown.downsample = downsample;
@@ -2943,56 +2932,40 @@ static void *voutlet_new(t_symbol *s) {
     return x;
 }
 
-static void voutlet_bang(t_voutlet *x)
-{outlet_bang(x->parentoutlet);}
-static void voutlet_pointer(t_voutlet *x, t_gpointer *gp)
-{outlet_pointer(x->parentoutlet, gp);}
-static void voutlet_float(t_voutlet *x, t_float f)
-{outlet_float(x->parentoutlet, f);}
-static void voutlet_symbol(t_voutlet *x, t_symbol *s)
-{outlet_symbol(x->parentoutlet, s);}
-static void voutlet_list(t_voutlet *x, t_symbol *s, int argc, t_atom *argv)
-{outlet_list(x->parentoutlet, s, argc, argv);}
-static void voutlet_anything(t_voutlet *x, t_symbol *s, int argc, t_atom *argv)
-{outlet_anything(x->parentoutlet, s, argc, argv);}
+static void voutlet_bang(t_voutlet *x)                                              {outlet_bang(x->parentoutlet);}
+static void voutlet_pointer(t_voutlet *x, t_gpointer *gp)                        {outlet_pointer(x->parentoutlet, gp);}
+static void voutlet_float(t_voutlet *x, t_float f)                                 {outlet_float(x->parentoutlet, f);}
+static void voutlet_symbol(t_voutlet *x, t_symbol *s)                             {outlet_symbol(x->parentoutlet, s);}
+static void voutlet_list(    t_voutlet *x, t_symbol *s, int argc, t_atom *argv) {    outlet_list(x->parentoutlet, s, argc, argv);}
+static void voutlet_anything(t_voutlet *x, t_symbol *s, int argc, t_atom *argv) {outlet_anything(x->parentoutlet, s, argc, argv);}
 
-static void voutlet_free(t_voutlet *x) {
-    canvas_rmoutlet(x->canvas, x->parentoutlet);
-    resample_free(&x->updown);
-}
-
+static void voutlet_free(t_voutlet *x) {canvas_rmoutlet(x->canvas, x->parentoutlet); resample_free(&x->updown);}
 t_outlet *voutlet_getit(t_pd *x) {
     if (pd_class(x) != voutlet_class) bug("voutlet_getit");
     return ((t_voutlet *)x)->parentoutlet;
 }
 
-/* ------------------------- signal outlet -------------------------- */
-
 int voutlet_issignal(t_voutlet *x) {return x->buf!=0;}
 
 /* LATER optimize for non-overlapped case where the "+=" isn't needed */
 t_int *voutlet_perform(t_int *w) {
-    t_voutlet *x = (t_voutlet *)w[1];
-    t_float *in = (t_float *)w[2];
-    int n = int(w[3]);
+    PERFORM3ARGS(t_voutlet *,x, t_float *,in, int,n);
     t_float *out = x->write, *outwas = out, *end = x->endbuf;
     while (n--) {
         *out++ += *in++;
-    	if (out == end) out = x->buf;
+        if (out == end) out = x->buf;
     }
     outwas += x->hop;
     if (outwas >= end) outwas = x->buf;
     x->write = outwas;
     return w+4;
 }
-
 /* epilog code for blocking: write buffer to parent patch */
 static t_int *voutlet_doepilog(t_int *w) {
-    t_voutlet *x = (t_voutlet *)w[1];
-    t_float *out = (t_float *)w[2]; /* IOhannes */
+    PERFORM3ARGS(t_voutlet *,x, t_float *,out, int,n);
     t_float *in = x->empty;
     if (x->updown.downsample != x->updown.upsample)    out = x->updown.v; /* IOhannes */
-    for (int n = (int)(w[3]); n--; in++) *out++ = *in, *in = 0;
+    for (; n--; in++) *out++ = *in, *in = 0;
     if (in == x->endbuf) in = x->buf;
     x->empty = in;
     return w+4;
@@ -3000,10 +2973,10 @@ static t_int *voutlet_doepilog(t_int *w) {
 
 /* IOhannes { */
 static t_int *voutlet_doepilog_resampling(t_int *w) {
-    t_voutlet *x = (t_voutlet *)w[1];
+    PERFORM2ARGS(t_voutlet *,x, int,n);
     t_float *in  = x->empty;
     t_float *out = x->updown.v; /* IOhannes */
-    for (int n = (int)(w[2]); n--; in++) *out++ = *in, *in = 0;
+    for (; n--; in++) *out++ = *in, *in = 0;
     if (in == x->endbuf) in = x->buf;
     x->empty = in;
     return w+3;
@@ -3013,7 +2986,7 @@ extern "C" int outlet_getsignalindex(t_outlet *x);
 
 /* prolog for outlets -- store pointer to the outlet on the parent, which, if "reblock" is false, will want to refer
    back to whatever we see on our input during the "dsp" method called later.  */
-extern "C" void voutlet_dspprolog(t_voutlet *x, t_signal **parentsigs, int myvecsize, int calcsize, int phase, int period,
+void voutlet_dspprolog(t_voutlet *x, t_signal **parentsigs, int myvecsize, int calcsize, int phase, int period,
 int frequency, int downsample, int upsample, int reblock, int switched) {
     x->updown.downsample=downsample;  x->updown.upsample=upsample; /* IOhannes */
     x->justcopyout = (switched && !reblock);
@@ -3039,7 +3012,7 @@ static void voutlet_dsp(t_voutlet *x, t_signal **sp) {
 /* set up epilog DSP code.  If we're reblocking, this is the
    time to copy the samples out to the containing object's outlets.
    If we aren't reblocking, there's nothing to do here.  */
-extern "C" void voutlet_dspepilog(t_voutlet *x, t_signal **parentsigs,
+void voutlet_dspepilog(t_voutlet *x, t_signal **parentsigs,
 int myvecsize, int calcsize, int phase, int period, int frequency, int downsample, int upsample, int reblock, int switched) {
     if (!x->buf) return;  /* this shouldn't be necesssary... */
     x->updown.downsample=downsample;
