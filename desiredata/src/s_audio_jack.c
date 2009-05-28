@@ -51,8 +51,7 @@ static int process (jack_nframes_t nframes, void *arg) {
 		memset(jack_outbuf,0,sizeof(jack_outbuf));
 		jack_filled = 0;
 	}
-        /* tb: wait in the scheduler */
-        /* pthread_cond_broadcast(&jack_sem); */
+        /* tb: wait in the scheduler: pthread_cond_broadcast(&jack_sem); */
 	return 0;
 }
 
@@ -75,15 +74,8 @@ static int cb_process (jack_nframes_t nframes, void *arg) {
 	}
 	int status = sys_timedlock(timeout);
 	if (status) {
-		if (status == ETIMEDOUT) {
-			/* we're late ... lets hope that jack doesn't kick us out */
-			error("timeout %d", (timeout));
-			sys_log_error(ERR_SYSLOCK);
-			return 0;
-		} else {
-			post("sys_timedlock returned %d", status);
-			return 0;
-		}
+		if (status == ETIMEDOUT) {error("timeout %d", (timeout)); sys_log_error(ERR_SYSLOCK); return 0;}
+		else {post("sys_timedlock returned %d", status); return 0;}
 	}
 	for (int i = 0; i != dspticks_per_jacktick; ++i) {
 		for (int j=0; j<sys_inchannels; j++) {
@@ -92,7 +84,7 @@ static int cb_process (jack_nframes_t nframes, void *arg) {
 		}
 		sched_tick(sys_time + sys_time_per_dsp_tick);
 		for (int j=0; j<sys_outchannels;  j++) {
-			t_sample *out = (t_sample *)jack_port_get_buffer (output_port[j], nframes);
+			t_sample *out = (t_sample *)jack_port_get_buffer(output_port[j], nframes);
 			copyblock(out + i * sys_dacblocksize, sys_soundout + j * sys_dacblocksize, sys_dacblocksize);
 		}
 		if (sys_meters) sys_peakmeters();
@@ -113,11 +105,9 @@ static int jack_ignore_graph_callback = 0;
 static t_int jack_shutdown_handler(t_int* none) {
 	error("jack kicked us out ... trying to reconnect");
 	jack_ignore_graph_callback = 1;
-	/* clean up */
 	jack_close_audio();
 	/* try to reconnect to jack server */
 	jack_open_audio(sys_inchannels, sys_outchannels, int(sys_dacsr), jack_scheduler);
-	/* restore last connection state */
  	jack_restore_connection_state();
 	jack_ignore_graph_callback = 0;
 	return 0;
@@ -192,7 +182,7 @@ static int jack_connect_ports(char *client) {
 static void jack_error(const char *desc) {}
 
 int jack_open_audio_2(int inchans, int outchans, int rate, int scheduler);
-int jack_open_audio(int inchans, int outchans, int rate, int scheduler) {
+int jack_open_audio(  int inchans, int outchans, int rate, int scheduler) {
     jack_dio_error = 0;
     if (inchans==0 && outchans==0) return 0;
     int ret = jack_open_audio_2(inchans,outchans,rate,scheduler);
@@ -205,10 +195,7 @@ int jack_open_audio_2(int inchans, int outchans, int rate, int scheduler) {
     int new_jack = 0;
     if (outchans > NUM_JACK_PORTS) {post("%d output ports not supported, setting to %d",outchans, NUM_JACK_PORTS); outchans = NUM_JACK_PORTS;}
     if ( inchans > NUM_JACK_PORTS) {post( "%d input ports not supported, setting to %d", inchans, NUM_JACK_PORTS);  inchans = NUM_JACK_PORTS;}
-    if (jack_client && scheduler != sys_getscheduler()) {
-	jack_client_close(jack_client);
-	jack_client = 0;
-    }
+    if (jack_client && scheduler != sys_getscheduler()) {jack_client_close(jack_client); jack_client = 0;}
     sys_setscheduler(scheduler);
     jack_scheduler = scheduler;
     /* set block copy/zero functions */
@@ -245,10 +232,7 @@ int jack_open_audio_2(int inchans, int outchans, int rate, int scheduler) {
 	/* tell the JACK server to call `jack_shutdown()' if
 	   it ever shuts down, either entirely, or if it just decides to stop calling us. */
 	jack_on_shutdown (jack_client, jack_shutdown, 0);
-	for (int j=0;j<NUM_JACK_PORTS;j++) {
-		input_port[j]=0;
-		output_port[j]=0;
-	}
+	for (int j=0;j<NUM_JACK_PORTS;j++) {input_port[j]=0; output_port[j]=0;}
 	new_jack = 1;
     }
     /* display the current sample rate. once the client is activated
@@ -284,10 +268,7 @@ static void jack_close_audio() {
     jack_started = 0;
     jack_client_close(jack_client);
     jack_client = 0;
-    for (int i=0; i<NUM_JACK_PORTS; i++) {
-	input_port[i] = 0;
-	output_port[i] = 0;
-    }
+    for (int i=0; i<NUM_JACK_PORTS; i++) {input_port[i] = 0; output_port[i] = 0;}
 }
 
 int jack_send_dacs() {
@@ -295,24 +276,16 @@ int jack_send_dacs() {
 	int timeref = int(sys_getrealtime());
 	if (!jack_client) return SENDDACS_NO;
 	if (!sys_inchannels && !sys_outchannels) return SENDDACS_NO;
-	if (jack_dio_error) {
-		sys_log_error(ERR_RESYNC);
-		jack_dio_error = 0;
-	}
+	if (jack_dio_error) {sys_log_error(ERR_RESYNC); jack_dio_error = 0;}
 	if (jack_filled >= jack_out_max) return SENDDACS_NO;
-	/* 	tb: wait in the scheduler */
-/* 		pthread_cond_wait(&jack_sem,&jack_mutex); */
+	/* tb: wait in the scheduler: pthread_cond_wait(&jack_sem,&jack_mutex); */
 	jack_started = 1;
 	float *fp = sys_soundout;
-	for (int j=0; j<sys_outchannels; j++) {
+	for (int j=0; j<sys_outchannels; j++, fp += sys_dacblocksize)
 		memcpy(jack_outbuf + j*BUF_JACK + jack_filled, fp, sys_dacblocksize*sizeof(float));
-		fp += sys_dacblocksize;
-	}
 	fp = sys_soundin;
-	for (int j=0; j<sys_inchannels; j++) {
+	for (int j=0; j<sys_inchannels; j++, fp += sys_dacblocksize)
 		memcpy(fp, jack_inbuf + j*BUF_JACK + jack_filled,  sys_dacblocksize*sizeof(float));
-		fp += sys_dacblocksize;
-	}
 	int timenow = int(sys_getrealtime());
 	if (timenow-timeref > sys_sleepgrain*1e-6) rtnval = SENDDACS_SLEPT;
 	memset(sys_soundout,0,sys_dacblocksize*sizeof(float)*sys_outchannels);
@@ -324,8 +297,8 @@ void jack_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *noutdevs
     *canmulti = 0; /* supports multiple devices */
     int ndev = 1;
     for (int i=0; i<ndev; i++) {
-        sprintf( indevlist + i * devdescsize, "JACK");
-        sprintf(outdevlist + i * devdescsize, "JACK");
+        sprintf( indevlist + i*devdescsize, "JACK");
+        sprintf(outdevlist + i*devdescsize, "JACK");
     }
     *nindevs = *noutdevs = ndev;
 }
@@ -339,10 +312,8 @@ static const char **jack_out_connections[NUM_JACK_PORTS]; /* ports connected to 
 t_int jack_save_connection_state(t_int* dummy) {
 	if (jack_ignore_graph_callback) return 0;
 	for (int i=0; i<NUM_JACK_PORTS; i++) {
-		/* saving the inputs connections */
 		if ( jack_in_connections[i]) free( jack_in_connections[i]);
 		jack_in_connections[i] = i< sys_inchannels ? jack_port_get_all_connections(jack_client, input_port[i])  : 0;
-		/* saving the outputs connections */
 		if (jack_out_connections[i]) free(jack_out_connections[i]);
 		jack_out_connections[i]= i<sys_outchannels ? jack_port_get_all_connections(jack_client, output_port[i]) : 0;
 	}
@@ -359,7 +330,7 @@ static void jack_restore_connection_state() {
 				const char *port = jack_in_connections[i][j];
 				if (!port) break; /* we've connected all incoming ports */
 				int status = jack_connect(jack_client, port, jack_port_name(input_port[i]));
-				if (status) error("cannot connect input ports %s -> %s", port, jack_port_name (input_port[i]));
+				if (status) error("cannot connect input ports %s -> %s", port, jack_port_name(input_port[i]));
 			}
 		}
 		/* restoring the output connections */
