@@ -20,20 +20,20 @@ typedef int32_t t_alsa_sample32;
 #define INT32_MAX 0x7fffffff
 #endif
 
-typedef struct _alsa_dev
-{
+struct t_alsa_dev {
     snd_pcm_t *a_handle;
     int a_devno;
     int a_sampwidth;
     int a_channels;
     char **a_addr;
     int a_synced; 
-} t_alsa_dev;
+};
 
-extern t_alsa_dev alsa_indev[ALSA_MAXDEV];
-extern t_alsa_dev alsa_outdev[ALSA_MAXDEV];
-extern int alsa_nindev;
-extern int alsa_noutdev;
+struct t_alsa {
+    t_alsa_dev dev[ALSA_MAXDEV];
+    int ndev;
+};
+extern t_alsa alsai, alsao;
 
 int alsamm_open_audio(int rate);
 void alsamm_close_audio(void);

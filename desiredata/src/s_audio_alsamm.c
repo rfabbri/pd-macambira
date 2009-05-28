@@ -146,8 +146,8 @@ int alsamm_open_audio(int rate) {
   /* first have a look which cards we can get and set up device infos for them */
   /* init some structures */
   for(int i=0; i<ALSA_MAXDEV;i++) {
-    alsa_indev[i].a_synced=alsa_outdev[i].a_synced=0;
-    alsa_indev[i].a_channels=alsa_outdev[i].a_channels=-1; /* query defaults */
+    alsai.dev[i].a_synced=alsao.dev[i].a_synced=0;
+    alsai.dev[i].a_channels=alsao.dev[i].a_channels=-1; /* query defaults */
   }
   alsamm_inchannels = 0;
   alsamm_outchannels = 0;
@@ -167,36 +167,35 @@ int alsamm_open_audio(int rate) {
   if(sys_verbose)
     post("syschedadvance=%d us(%d Samples)so buffertime max should be this=%d"
          "or sys_blocksize=%d (samples) to use buffersize=%d",
-         sys_schedadvance,sys_advance_samples,alsamm_buffertime,
-         sys_blocksize,alsamm_buffersize);
+         sys_schedadvance,sys_advance_samples,alsamm_buffertime,sys_blocksize,alsamm_buffersize);
   alsamm_periods = 0; /* no one wants periods setting from command line ;-) */
-  for (int i=0; i<alsa_noutdev;i++) {
-    /* post("open audio out %d, of %lx, %d",i,&alsa_device[i], alsa_outdev[i].a_handle); */
+  for (int i=0; i<alsao.ndev;i++) {
+    /* post("open audio out %d, of %lx, %d",i,&alsa_device[i], alsao.dev[i].a_handle); */
     try {
-      CHK(set_hwparams(alsa_outdev[i].a_handle, hw_params, &(alsa_outdev[i].a_channels)));
-      CHK(set_swparams(alsa_outdev[i].a_handle, sw_params,1));
-      alsamm_outchannels += alsa_outdev[i].a_channels;
-      alsa_outdev[i].a_addr = (char **)malloc(sizeof(char *)*alsa_outdev[i].a_channels);
-      if(!alsa_outdev[i].a_addr) {error("playback device outaddr allocation error:"); continue;}
-      memset(alsa_outdev[i].a_addr, 0, sizeof(char*) * alsa_outdev[i].a_channels);
-      post("playback device with %d channels and buffer_time %d us opened", alsa_outdev[i].a_channels, alsamm_buffertime);
+      CHK(set_hwparams(alsao.dev[i].a_handle, hw_params, &(alsao.dev[i].a_channels)));
+      CHK(set_swparams(alsao.dev[i].a_handle, sw_params,1));
+      alsamm_outchannels += alsao.dev[i].a_channels;
+      alsao.dev[i].a_addr = (char **)malloc(sizeof(char *)*alsao.dev[i].a_channels);
+      if(!alsao.dev[i].a_addr) {error("playback device outaddr allocation error:"); continue;}
+      memset(alsao.dev[i].a_addr, 0, sizeof(char*) * alsao.dev[i].a_channels);
+      post("playback device with %d channels and buffer_time %d us opened", alsao.dev[i].a_channels, alsamm_buffertime);
     } catch (AlsaError) {continue;}
   }
-  for (int i=0; i<alsa_nindev; i++) {
+  for (int i=0; i<alsai.ndev; i++) {
       if(sys_verbose) post("capture card %d:--------------------",i);
-      CHK(set_hwparams(alsa_indev[i].a_handle, hw_params, &(alsa_indev[i].a_channels)));
-      alsamm_inchannels += alsa_indev[i].a_channels;
-      CHK(set_swparams(alsa_indev[i].a_handle, sw_params,0));
-      alsa_indev[i].a_addr = (char **)malloc(sizeof(char*)*alsa_indev[i].a_channels);
-      if(!alsa_indev[i].a_addr) {error("capture device inaddr allocation error:"); continue;}
-      memset(alsa_indev[i].a_addr, 0, sizeof(char*) * alsa_indev[i].a_channels);
-      if(sys_verbose) post("capture device with %d channels and buffertime %d us opened", alsa_indev[i].a_channels,alsamm_buffertime);
+      CHK(set_hwparams(alsai.dev[i].a_handle, hw_params, &(alsai.dev[i].a_channels)));
+      alsamm_inchannels += alsai.dev[i].a_channels;
+      CHK(set_swparams(alsai.dev[i].a_handle, sw_params,0));
+      alsai.dev[i].a_addr = (char **)malloc(sizeof(char*)*alsai.dev[i].a_channels);
+      if(!alsai.dev[i].a_addr) {error("capture device inaddr allocation error:"); continue;}
+      memset(alsai.dev[i].a_addr, 0, sizeof(char*) * alsai.dev[i].a_channels);
+      if(sys_verbose) post("capture device with %d channels and buffertime %d us opened", alsai.dev[i].a_channels,alsamm_buffertime);
   }
   /* check for linked handles of input for each output*/
-  for (int i=0; i<(alsa_noutdev < alsa_nindev ? alsa_noutdev:alsa_nindev); i++) {
-    if (alsa_outdev[i].a_devno == alsa_indev[i].a_devno) {
-      if ((err = snd_pcm_link(alsa_indev[i].a_handle, alsa_outdev[i].a_handle)) == 0) {
-        alsa_indev[i].a_synced = alsa_outdev[i].a_synced = 1;
+  for (int i=0; i<(alsao.ndev < alsai.ndev ? alsao.ndev:alsai.ndev); i++) {
+    if (alsao.dev[i].a_devno == alsai.dev[i].a_devno) {
+      if ((err = snd_pcm_link(alsai.dev[i].a_handle, alsao.dev[i].a_handle)) == 0) {
+        alsai.dev[i].a_synced = alsao.dev[i].a_synced = 1;
         if(sys_verbose) post("Linking in and outs of card %d",i);
       } else error("could not link in and outs");
     }
@@ -208,35 +207,35 @@ int alsamm_open_audio(int rate) {
   if(sys_verbose) post("open_audio: after dacsend=%d (xruns=%d)done",dac_send,alsamm_xruns);
   alsamm_xruns = dac_send = 0; /* reset debug */
   /* start alsa in open or better in send_dacs once ??? we will see */
-  for (int i=0;i<alsa_noutdev;i++) snd_pcm_dump(alsa_outdev[i].a_handle, alsa_stdout);
-  for (int i=0;i<alsa_nindev;i++)  snd_pcm_dump( alsa_indev[i].a_handle, alsa_stdout);
+  for (int i=0;i<alsao.ndev;i++) snd_pcm_dump(alsao.dev[i].a_handle, alsa_stdout);
+  for (int i=0;i<alsai.ndev;i++) snd_pcm_dump(alsai.dev[i].a_handle, alsa_stdout);
   fflush(stdout);
  }
   sys_setchsr(alsamm_inchannels,  alsamm_outchannels, alsamm_sr, sys_dacblocksize);
   alsamm_start();
-  /* report success  */
+  /* report success */
   return 0;
 }
 
 void alsamm_close_audio() {
   if(debug&&sys_verbose) post("closing devices");
   alsamm_stop();
-  for (int i=0; i<alsa_noutdev; i++) {
+  for (int i=0; i<alsao.ndev; i++) {
     //if(debug&&sys_verbose) post("unlink audio out %d, of %lx",i,used_outdevice[i]);
-    if(alsa_outdev[i].a_synced != 0) {
-      CHK(snd_pcm_unlink(alsa_outdev[i].a_handle));
-      alsa_outdev[i].a_synced = 0;
+    if(alsao.dev[i].a_synced) {
+      CHK(snd_pcm_unlink(alsao.dev[i].a_handle));
+      alsao.dev[i].a_synced = 0;
      }
-    CHK(snd_pcm_close(alsa_outdev[i].a_handle));
-    if(alsa_outdev[i].a_addr) {free(alsa_outdev[i].a_addr); alsa_outdev[i].a_addr=0;}
-    alsa_outdev[i].a_channels = 0;
+    CHK(snd_pcm_close(alsao.dev[i].a_handle));
+    if(alsao.dev[i].a_addr) {free(alsao.dev[i].a_addr); alsao.dev[i].a_addr=0;}
+    alsao.dev[i].a_channels = 0;
   }
-  for (int i=0; i<alsa_nindev; i++) {
-    CHK(snd_pcm_close(alsa_indev[i].a_handle));
-    if(alsa_indev[i].a_addr) {free(alsa_indev[i].a_addr); alsa_indev[i].a_addr=0;}
-    alsa_indev[i].a_channels = 0;
+  for (int i=0; i<alsai.ndev; i++) {
+    CHK(snd_pcm_close(alsai.dev[i].a_handle));
+    if(alsai.dev[i].a_addr) {free(alsai.dev[i].a_addr); alsai.dev[i].a_addr=0;}
+    alsai.dev[i].a_channels = 0;
   }
-  alsa_nindev = alsa_noutdev = 0;
+  alsai.ndev = alsao.ndev = 0;
  if(debug) {
   if(sys_verbose) post("close_audio: after dacsend=%d (xruns=%d)done",dac_send,alsamm_xruns);
    alsamm_xruns = dac_send = 0;
@@ -407,9 +406,9 @@ static int alsamm_get_channels(snd_pcm_t *dev, snd_pcm_uframes_t *avail, snd_pcm
 static void alsamm_start() {
   int err = 0;
   /* first prepare for in/out */
-  for (int devno=0; devno<alsa_noutdev; devno++) {
+  for (int devno=0; devno<alsao.ndev; devno++) {
     snd_pcm_uframes_t offset, avail;
-    t_alsa_dev *dev = &alsa_outdev[devno];
+    t_alsa_dev *dev = &alsao.dev[devno];
     /* snd_pcm_prepare also in xrun, but cannot harm here */
     err = snd_pcm_prepare(dev->a_handle);
     if (err<0) {check_error(err,"outcard prepare error for playback"); return;}
@@ -436,9 +435,9 @@ static void alsamm_start() {
     err = snd_pcm_start (dev->a_handle);
     if (err<0) check_error(err,"could not start playback");
   }
-  for (int devno=0; devno<alsa_nindev; devno++) {
+  for (int devno=0; devno<alsai.ndev; devno++) {
     snd_pcm_uframes_t ioffset, iavail;
-    t_alsa_dev *dev = &alsa_indev[devno];
+    t_alsa_dev *dev = &alsai.dev[devno];
     /* if devices are synced then don't need to prepare; hopefully dma in aereas allready filled correct by the card */
     if (dev->a_synced == 0) {
       err = snd_pcm_prepare (dev->a_handle);
@@ -467,14 +466,12 @@ static void alsamm_start() {
 }
 
 static void alsamm_stop() {
-  for (int devno=0; devno<alsa_nindev; devno++) {
-    t_alsa_dev *dev = &alsa_indev[devno];
-    if(sys_verbose) post("stop in device %d",devno);
+  for (int devno=0; devno<alsai.ndev; devno++) {
+    t_alsa_dev *dev = &alsai.dev[devno]; if(sys_verbose) post("stop in device %d",devno);
     CH(snd_pcm_drop(dev->a_handle));
   }
-  for (int devno=0; devno<alsa_noutdev;devno++) {
-    t_alsa_dev *dev = &alsa_outdev[devno];
-    if(sys_verbose) post("stop out device %d",devno);
+  for (int devno=0; devno<alsao.ndev;devno++) {
+    t_alsa_dev *dev = &alsao.dev[devno]; if(sys_verbose) post("stop out device %d",devno);
     CH(snd_pcm_drop(dev->a_handle));
   }
   if (debug) show_availist();
@@ -529,8 +526,8 @@ int alsamm_send_dacs() {
      so we don't make a precheck of insamples here and let outsample check be the first of the first card. */
   /* OUTPUT Transfer */
   fpo = sys_soundout;
-  for(devno = 0;devno < alsa_noutdev;devno++) {
-    t_alsa_dev *dev = &alsa_outdev[devno];
+  for(devno = 0;devno < alsao.ndev;devno++) {
+    t_alsa_dev *dev = &alsao.dev[devno];
     snd_pcm_t *out = dev->a_handle;
     int ochannels =dev->a_channels;
     /* how much samples available ??? */
@@ -603,17 +600,14 @@ int alsamm_send_dacs() {
     fpo += ochannels*sys_dacblocksize;
   }/* for devno */
   fpi = sys_soundin; /* star first card first channel */
-  for(devno = 0;devno < alsa_nindev;devno++) {
-    t_alsa_dev *dev = &alsa_indev[devno];
+  for(devno = 0;devno < alsai.ndev;devno++) {
+    t_alsa_dev *dev = &alsai.dev[devno];
     snd_pcm_t *in = dev->a_handle;
     int ichannels = dev->a_channels;
     iavail = snd_pcm_avail_update(in);
     if (iavail < 0) {
       err = xrun_recovery(in, iavail);
-      if (err < 0) {
-        check_error(err,"input avail update failed");
-        return SENDDACS_NO;
-      }
+      if (err < 0) {check_error(err,"input avail update failed"); return SENDDACS_NO;}
       iavail=snd_pcm_avail_update(in);
     }
     state = snd_pcm_state(in);
@@ -664,7 +658,7 @@ int alsamm_send_dacs() {
       size -= iframes;
     }
     fpi += ichannels*sys_dacblocksize;
-  } /* for out devno < alsamm_outcards*/
+  } /* for out devno < alsamm_outcards */
   if ((timenow = sys_getrealtime()) > (timelast + sleep_time)) {
       if(debug && dac_send < 10 && sys_verbose)
         post("slept %f > %f + %f (=%f)", timenow,timelast,sleep_time,(timelast + sleep_time));
