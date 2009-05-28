@@ -28,42 +28,29 @@ int nt_realdacblksize;
 #define DEFBUFFER 30    /* default is about 30x6 = 180 msec! */
 static int nt_naudiobuffer = DEFBUFFER;
 
-static int nt_meters;        /* true if we're metering */
-static float nt_inmax;       /* max input amplitude */
-static float nt_outmax;      /* max output amplitude */
-static int nt_nwavein, nt_nwaveout;     /* number of WAVE devices in and out */
+static int nt_meters;                 /* true if we're metering */
+static float nt_inmax,   nt_outmax;   /* max amplitude */
+static int   nt_nwavein, nt_nwaveout; /* number of WAVE devices */
 
 typedef struct _sbuf {
     HANDLE hData;
     HPSTR  lpData;      // pointer to waveform data memory
     HANDLE hWaveHdr;
-    WAVEHDR   *lpWaveHdr;   // pointer to header structure
+    WAVEHDR *lpWaveHdr;   // pointer to header structure
 } t_sbuf;
 
 t_sbuf ntsnd_outvec[NAPORTS][MAXBUFFER];    /* circular buffer array */
+t_sbuf ntsnd_invec [NAPORTS][MAXBUFFER];    /* circular buffer array */
 HWAVEOUT ntsnd_outdev[NAPORTS];             /* output device */
+HWAVEIN  ntsnd_indev [NAPORTS];             /* input device */
 static int ntsnd_outphase[NAPORTS];         /* index of next buffer to send */
+static int ntsnd_inphase [NAPORTS];         /* index of next buffer to read */
 
-t_sbuf ntsnd_invec[NAPORTS][MAXBUFFER];     /* circular buffer array */
-HWAVEIN ntsnd_indev[NAPORTS];               /* input device */
-static int ntsnd_inphase[NAPORTS];          /* index of next buffer to read */
-
-static void nt_waveinerror(const char *s, int err) {
-    char t[256];
-    waveInGetErrorText(err, t, 256);
-    error(s,t);
-}
-
-static void nt_waveouterror(const char *s, int err) {
-    char t[256];
-    waveOutGetErrorText(err, t, 256);
-    error(s,t);
-}
+static void nt_waveinerror( const char *s, int err) {char t[256];  waveInGetErrorText(err, t, 256); error(s,t);}
+static void nt_waveouterror(const char *s, int err) {char t[256]; waveOutGetErrorText(err, t, 256); error(s,t);}
 
 static void wave_prep(t_sbuf *bp, int setdone) {
     WAVEHDR *wh;
-    short *sp;
-    int i;
     /* Allocate and lock memory for the waveform data. The memory for waveform data must be globally allocated with
      * GMEM_MOVEABLE and GMEM_SHARE flags. */
     if (!(bp->hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_SHARE, (DWORD) (CHANNELS_PER_DEVICE * SAMPSIZE * nt_realdacblksize))))
@@ -75,14 +62,15 @@ static void wave_prep(t_sbuf *bp, int setdone) {
         printf("alloc 2 failed\n");
     if (!(wh = bp->lpWaveHdr = (WAVEHDR *) GlobalLock(bp->hWaveHdr)))
         printf("lock 2 failed\n");
-    for (i = CHANNELS_PER_DEVICE * nt_realdacblksize, sp = (short *)bp->lpData; i--; ) *sp++ = 0;
+    short *sp = (short *)bp->lpData;
+    for (int i=CHANNELS_PER_DEVICE*nt_realdacblksize; i--; ) *sp++ = 0;
     wh->lpData = bp->lpData;
-    wh->dwBufferLength = (CHANNELS_PER_DEVICE * SAMPSIZE * nt_realdacblksize);
+    wh->dwBufferLength = CHANNELS_PER_DEVICE * SAMPSIZE * nt_realdacblksize;
     wh->dwFlags = 0;
     wh->dwLoops = 0L;
     wh->lpNext = 0;
     wh->reserved = 0;
-        /* optionally (for writing) set DONE flag as if we had queued them */
+    /* optionally (for writing) set DONE flag as if we had queued them */
     if (setdone) wh->dwFlags = WHDR_DONE;
 }
 
@@ -90,9 +78,7 @@ static UINT nt_whichdac = WAVE_MAPPER, nt_whichadc = WAVE_MAPPER;
 
 int mmio_do_open_audio() {
     PCMWAVEFORMAT  form;
-    int i, j;
     UINT mmresult;
-    int nad, nda;
     static int naudioprepped = 0, nindevsprepped = 0, noutdevsprepped = 0;
     if (sys_verbose) post("%d devices in, %d devices out", nt_nwavein, nt_nwaveout);
     form.wf.wFormatTag = WAVE_FORMAT_PCM;
@@ -103,71 +89,62 @@ int mmio_do_open_audio() {
     form.wBitsPerSample = 8 * SAMPSIZE;
     if (nt_nwavein <= 1 && nt_nwaveout <= 1) nt_noresync();
     if (nindevsprepped < nt_nwavein) {
-        for (i = nindevsprepped; i < nt_nwavein; i++)
-            for (j = 0; j < naudioprepped; j++)
-                wave_prep(&ntsnd_invec[i][j], 0);
+        for (int i=nindevsprepped;  i<nt_nwavein;  i++) for (int j=0; j<naudioprepped; j++) wave_prep(&ntsnd_invec[i][j], 0);
         nindevsprepped = nt_nwavein;
     }
     if (noutdevsprepped < nt_nwaveout) {
-        for (i = noutdevsprepped; i < nt_nwaveout; i++)
-            for (j = 0; j < naudioprepped; j++)
-                wave_prep(&ntsnd_outvec[i][j], 1);
+        for (int i=noutdevsprepped; i<nt_nwaveout; i++) for (int j=0; j<naudioprepped; j++) wave_prep(&ntsnd_outvec[i][j], 1);
         noutdevsprepped = nt_nwaveout;
     }
     if (naudioprepped < nt_naudiobuffer) {
-        for (j = naudioprepped; j < nt_naudiobuffer; j++) {
-            for (i = 0; i < nt_nwavein;  i++) wave_prep(&ntsnd_invec [i][j], 0);
-            for (i = 0; i < nt_nwaveout; i++) wave_prep(&ntsnd_outvec[i][j], 1);
+        for (int j=naudioprepped; j<nt_naudiobuffer; j++) {
+            for (int i=0; i<nt_nwavein;  i++) wave_prep(&ntsnd_invec [i][j], 0);
+            for (int i=0; i<nt_nwaveout; i++) wave_prep(&ntsnd_outvec[i][j], 1);
         }
         naudioprepped = nt_naudiobuffer;
     }
-    for (nad=0; nad < nt_nwavein; nad++) {
+    for (int n=0; n<nt_nwavein; n++) {
         /* Open waveform device(s), sucessively numbered, for input */
-        mmresult = waveInOpen(&ntsnd_indev[nad], nt_whichadc+nad, (WAVEFORMATEX *)(&form), 0L, 0L, CALLBACK_NULL);
-        if (sys_verbose) printf("opened adc device %d with return %d\n", nt_whichadc+nad,mmresult);
+        mmresult = waveInOpen(&ntsnd_indev[n], nt_whichadc+n, (WAVEFORMATEX *)(&form), 0L, 0L, CALLBACK_NULL);
+        if (sys_verbose) printf("opened adc device %d with return %d\n", nt_whichadc+n,mmresult);
         if (mmresult != MMSYSERR_NOERROR) {
             nt_waveinerror("waveInOpen: %s", mmresult);
-            nt_nwavein = nad; /* nt_nwavein = 0 wini */
+            nt_nwavein = n; /* nt_nwavein = 0 wini */
         } else {
-            for (i = 0; i < nt_naudiobuffer; i++) {
-                mmresult = waveInPrepareHeader(ntsnd_indev[nad], ntsnd_invec[nad][i].lpWaveHdr, sizeof(WAVEHDR));
+            for (int i=0; i<nt_naudiobuffer; i++) {
+                mmresult = waveInPrepareHeader(ntsnd_indev[n], ntsnd_invec[n][i].lpWaveHdr, sizeof(WAVEHDR));
                 if (mmresult != MMSYSERR_NOERROR) nt_waveinerror("waveinprepareheader: %s", mmresult);
-                mmresult = waveInAddBuffer(    ntsnd_indev[nad], ntsnd_invec[nad][i].lpWaveHdr, sizeof(WAVEHDR));
+                mmresult = waveInAddBuffer(    ntsnd_indev[n], ntsnd_invec[n][i].lpWaveHdr, sizeof(WAVEHDR));
                 if (mmresult != MMSYSERR_NOERROR) nt_waveinerror("waveInAddBuffer: %s", mmresult);
             }
         }
     }
     /* quickly start them all together */
-    for (nad = 0; nad < nt_nwavein; nad++) waveInStart(ntsnd_indev[nad]);
-    for (nda = 0; nda < nt_nwaveout; nda++) {
+    for (int n=0; n<nt_nwavein; n++) waveInStart(ntsnd_indev[n]);
+    for (int n=0; n<nt_nwaveout; n++) {
         /* Open a waveform device for output in sucessiv device numbering*/
-        mmresult = waveOutOpen(&ntsnd_outdev[nda], nt_whichdac + nda, (WAVEFORMATEX *)(&form), 0L, 0L, CALLBACK_NULL);
-        if (sys_verbose) post("opened dac device %d, with return %d", nt_whichdac +nda, mmresult);
+        mmresult = waveOutOpen(&ntsnd_outdev[n], nt_whichdac + n, (WAVEFORMATEX *)(&form), 0L, 0L, CALLBACK_NULL);
+        if (sys_verbose) post("opened dac device %d, with return %d", nt_whichdac +n, mmresult);
         if (mmresult != MMSYSERR_NOERROR) {
-            post("Wave out open device %d + %d",nt_whichdac,nda);
+            post("Wave out open device %d + %d",nt_whichdac,n);
             nt_waveouterror("waveOutOpen device: %s",  mmresult);
-            nt_nwaveout = nda;
+            nt_nwaveout = n;
         }
     }
     return 0;
 }
 
-void mmio_close_audio() {
+static void mmio_close_audio() {
     int errcode;
-    int nda, nad;
     if (sys_verbose) post("closing audio...");
-    for (nda=0; nda < nt_nwaveout; nda++) /*if (nt_nwaveout) wini */ {
-       errcode = waveOutReset(ntsnd_outdev[nda]);
-       if (errcode != MMSYSERR_NOERROR) printf("error resetting output %d: %d", nda, errcode);
-       errcode = waveOutClose(ntsnd_outdev[nda]);
-       if (errcode != MMSYSERR_NOERROR) printf("error closing output %d: %d",nda , errcode);
+    for (int n=0; n<nt_nwaveout; n++) /*if (nt_nwaveout) wini */ {
+       errcode = waveOutReset(ntsnd_outdev[n]); if (errcode!=MMSYSERR_NOERROR) printf("error resetting output %d: %d",n,errcode);
+       errcode = waveOutClose(ntsnd_outdev[n]); if (errcode!=MMSYSERR_NOERROR) printf("error closing output %d: %d",  n,errcode);
     }
     nt_nwaveout = 0;
-    for(nad=0; nad < nt_nwavein;nad++) /* if (nt_nwavein) wini */ {
-        errcode = waveInReset(ntsnd_indev[nad]);
-        if (errcode != MMSYSERR_NOERROR) printf("error resetting input: %d", errcode);
-        errcode = waveInClose(ntsnd_indev[nad]);
-        if (errcode != MMSYSERR_NOERROR) printf("error closing input: %d", errcode);
+    for(int n=0; n<nt_nwavein;n++) /* if (nt_nwavein) wini */ {
+        errcode = waveInReset(ntsnd_indev[n]);  if (errcode!=MMSYSERR_NOERROR) printf("error resetting input: %d", errcode);
+        errcode = waveInClose(ntsnd_indev[n]);  if (errcode!=MMSYSERR_NOERROR) printf("error closing input: %d", errcode);
     }
     nt_nwavein = 0;
 }
@@ -186,26 +163,17 @@ static double nt_hibuftime;
 static double initsystime = -1;
 
 /* call this whenever we reset audio */
-static void nt_resetmidisync() {
-    initsystime = clock_getsystime();
-    nt_hibuftime = sys_getrealtime();
-}
+static void nt_resetmidisync() {initsystime = clock_getsystime(); nt_hibuftime = sys_getrealtime();}
 
 /* call this whenever we're idled waiting for audio to be ready.
    The routine maintains a high and low water point for the difference between real and DAC time. */
 
 static void nt_midisync() {
-    double jittersec, diff;
     if (initsystime == -1) nt_resetmidisync();
-    jittersec = (nt_dacjitterbufsallowed > nt_adcjitterbufsallowed ?
-        nt_dacjitterbufsallowed : nt_adcjitterbufsallowed)
-            * nt_realdacblksize / sys_getsr();
-    diff = sys_getrealtime() - 0.001 * clock_gettimesince(initsystime);
+    double jittersec = max(nt_dacjitterbufsallowed,nt_adcjitterbufsallowed) * nt_realdacblksize / sys_getsr();
+    double diff = sys_getrealtime() - 0.001 * clock_gettimesince(initsystime);
     if (diff > nt_hibuftime) nt_hibuftime = diff;
-    if (diff < nt_hibuftime - jittersec) {
-        post("jitter excess %d %f", dac, diff);
-        nt_resetmidisync();
-    }
+    if (diff < nt_hibuftime - jittersec) {post("jitter excess %d %f", dac, diff); nt_resetmidisync();}
 }
 
 static double nt_midigettimefor(LARGE_INTEGER timestamp) {
@@ -222,62 +190,49 @@ static int nt_fill = 0;
 
 #if 0 /* this is used for debugging */
 static void nt_printaudiostatus() {
-    int nad, nda;
-    for (nad = 0; nad < nt_nwavein; nad++) {
-        int phase = ntsnd_inphase[nad];
-        int phase2 = phase, phase3 = WRAPFWD(phase2), count, ntrans = 0;
+    for (int n=0; n<nt_nwavein; n++) {
+        int phase = ntsnd_inphase[n];
+        int phase2 = phase, phase3 = WRAPFWD(phase2), ntrans = 0;
         int firstphasedone = -1, firstphasebusy = -1;
-        for (count = 0; count < nt_naudiobuffer; count++) {
-            int donethis = (ntsnd_invec[nad][phase2].lpWaveHdr->dwFlags & WHDR_DONE);
-            int donenext = (ntsnd_invec[nad][phase3].lpWaveHdr->dwFlags & WHDR_DONE);
-            if (donethis && !donenext) {
-                if (firstphasebusy >= 0) goto multipleadc;
-                firstphasebusy = count;
-            }
-            if (!donethis && donenext) {
-                if (firstphasedone >= 0) goto multipleadc;
-                firstphasedone = count;
-            }
+        for (int count=0; count<nt_naudiobuffer; count++) {
+            int donethis = (ntsnd_invec[n][phase2].lpWaveHdr->dwFlags & WHDR_DONE);
+            int donenext = (ntsnd_invec[n][phase3].lpWaveHdr->dwFlags & WHDR_DONE);
+            if (donethis && !donenext) {if (firstphasebusy >= 0) goto multipleadc; else firstphasebusy = count;}
+            if (!donethis && donenext) {if (firstphasedone >= 0) goto multipleadc; else firstphasedone = count;}
             phase2 = phase3;
             phase3 = WRAPFWD(phase2 + 1);
         }
-        post("nad %d phase %d busy %d done %d", nad, phase, firstphasebusy, firstphasedone);
+        post("nad %d phase %d busy %d done %d", n, phase, firstphasebusy, firstphasedone);
         continue;
     multipleadc:
-        startpost("nad %d phase %d: oops:", nad, phase);
-        for (count = 0; count < nt_naudiobuffer; count++) {
+        startpost("nad %d phase %d: oops:", n, phase);
+        for (int count=0; count<nt_naudiobuffer; count++) {
             char buf[80];
-            sprintf(buf, " %d", (ntsnd_invec[nad][count].lpWaveHdr->dwFlags & WHDR_DONE));
+            sprintf(buf, " %d", (ntsnd_invec[n][count].lpWaveHdr->dwFlags & WHDR_DONE));
             poststring(buf);
         }
         endpost();
     }
-    for (nda = 0; nda < nt_nwaveout; nda++) {
-        int phase = ntsnd_outphase[nad];
-        int phase2 = phase, phase3 = WRAPFWD(phase2), count, ntrans = 0;
+    for (int n=0; n<nt_nwaveout; n++) {
+        int phase = ntsnd_outphase[n];
+        int phase2 = phase, phase3 = WRAPFWD(phase2), ntrans = 0;
         int firstphasedone = -1, firstphasebusy = -1;
         for (count = 0; count < nt_naudiobuffer; count++) {
-            int donethis = (ntsnd_outvec[nda][phase2].lpWaveHdr->dwFlags & WHDR_DONE);
-            int donenext = (ntsnd_outvec[nda][phase3].lpWaveHdr->dwFlags & WHDR_DONE);
-            if (donethis && !donenext) {
-                if (firstphasebusy >= 0) goto multipledac;
-                firstphasebusy = count;
-            }
-            if (!donethis && donenext) {
-                if (firstphasedone >= 0) goto multipledac;
-                firstphasedone = count;
-            }
+            int donethis = (ntsnd_outvec[n][phase2].lpWaveHdr->dwFlags & WHDR_DONE);
+            int donenext = (ntsnd_outvec[n][phase3].lpWaveHdr->dwFlags & WHDR_DONE);
+            if (donethis && !donenext) {if (firstphasebusy >= 0) goto multipledac; else firstphasebusy = count;}
+            if (!donethis && donenext) {if (firstphasedone >= 0) goto multipledac; else firstphasedone = count;}
             phase2 = phase3;
             phase3 = WRAPFWD(phase2 + 1);
         }
-        if (firstphasebusy < 0) post("nda %d phase %d all %d", nda, phase, (ntsnd_outvec[nad][0].lpWaveHdr->dwFlags & WHDR_DONE));
-        else post("nda %d phase %d busy %d done %d", nda, phase, firstphasebusy, firstphasedone);
+        if (firstphasebusy < 0) post("nda %d phase %d all %d", n, phase, (ntsnd_outvec[n][0].lpWaveHdr->dwFlags & WHDR_DONE));
+        else post("nda %d phase %d busy %d done %d", n, phase, firstphasebusy, firstphasedone);
         continue;
     multipledac:
-        startpost("nda %d phase %d: oops:", nda, phase);
+        startpost("nda %d phase %d: oops:", n, phase);
         for (count = 0; count < nt_naudiobuffer; count++) {
             char buf[80];
-            sprintf(buf, " %d", (ntsnd_outvec[nad][count].lpWaveHdr->dwFlags & WHDR_DONE));
+            sprintf(buf, " %d", (ntsnd_outvec[n][count].lpWaveHdr->dwFlags & WHDR_DONE));
             poststring(buf);
         }
         endpost();
@@ -285,50 +240,45 @@ static void nt_printaudiostatus() {
 }
 #endif /* 0 */
 
-/* this is a hack to avoid ever resyncing audio pointers in case for whatever
-reason the sync testing below gives false positives. */
+/* this is a hack to avoid ever resyncing audio pointers in case for whatever reason the sync testing below gives false positives. */
 
 static int nt_resync_cancelled;
-
-static void nt_noresync() {
-    nt_resync_cancelled = 1;
-}
+static void nt_noresync() {nt_resync_cancelled = 1;}
 
 static void nt_resyncaudio() {
     UINT mmresult;
-    int nad, nda, count;
     if (nt_resync_cancelled) return;
     /* for each open input device, eat all buffers which are marked ready. The next one will thus be "busy". */
     post("resyncing audio");
-    for (nad = 0; nad < nt_nwavein; nad++) {
-        int phase = ntsnd_inphase[nad];
-        for (count = 0; count < MAXRESYNC; count++) {
-            WAVEHDR *inwavehdr = ntsnd_invec[nad][phase].lpWaveHdr;
-            if (!(inwavehdr->dwFlags & WHDR_DONE)) break;
-            if (inwavehdr->dwFlags & WHDR_PREPARED) waveInUnprepareHeader(ntsnd_indev[nad], inwavehdr, sizeof(WAVEHDR));
-            inwavehdr->dwFlags = 0L;
-            waveInPrepareHeader(ntsnd_indev[nad], inwavehdr, sizeof(WAVEHDR));
-            mmresult = waveInAddBuffer(ntsnd_indev[nad], inwavehdr, sizeof(WAVEHDR));
+    for (int n=0; n<nt_nwavein; n++) {
+        int phase = ntsnd_inphase[n], count;
+        for (count=0; count<MAXRESYNC; count++) {
+            WAVEHDR *h = ntsnd_invec[n][phase].lpWaveHdr;
+            if (!(h->dwFlags & WHDR_DONE)) break;
+            if (h->dwFlags & WHDR_PREPARED) waveInUnprepareHeader(ntsnd_indev[n], h, sizeof(WAVEHDR));
+            h->dwFlags = 0L;
+            waveInPrepareHeader(ntsnd_indev[n], h, sizeof(WAVEHDR));
+            mmresult = waveInAddBuffer(ntsnd_indev[n], h, sizeof(WAVEHDR));
             if (mmresult != MMSYSERR_NOERROR) nt_waveinerror("waveInAddBuffer: %s", mmresult);
-            ntsnd_inphase[nad] = phase = WRAPFWD(phase + 1);
+            ntsnd_inphase[n] = phase = WRAPFWD(phase+1);
         }
-        if (count == MAXRESYNC) post("resync error 1");
+        if (count == MAXRESYNC) post("resync error at input");
     }
     /* Each output buffer which is "ready" is filled with zeros and queued. */
-    for (nda = 0; nda < nt_nwaveout; nda++) {
-        int phase = ntsnd_outphase[nda];
-        for (count = 0; count < MAXRESYNC; count++) {
-            WAVEHDR *outwavehdr = ntsnd_outvec[nda][phase].lpWaveHdr;
-            if (!(outwavehdr->dwFlags & WHDR_DONE)) break;
-            if (outwavehdr->dwFlags & WHDR_PREPARED) waveOutUnprepareHeader(ntsnd_outdev[nda], outwavehdr, sizeof(WAVEHDR));
-            outwavehdr->dwFlags = 0L;
-            memset((char *)(ntsnd_outvec[nda][phase].lpData), 0, (CHANNELS_PER_DEVICE * SAMPSIZE * nt_realdacblksize));
-            waveOutPrepareHeader(   ntsnd_outdev[nda], outwavehdr, sizeof(WAVEHDR));
-            mmresult = waveOutWrite(ntsnd_outdev[nda], outwavehdr, sizeof(WAVEHDR));
+    for (int n=0; n<nt_nwaveout; n++) {
+        int phase = ntsnd_outphase[n], count;
+        for (count=0; count<MAXRESYNC; count++) {
+            WAVEHDR *h = ntsnd_outvec[n][phase].lpWaveHdr;
+            if (!(h->dwFlags & WHDR_DONE)) break;
+            if (h->dwFlags & WHDR_PREPARED) waveOutUnprepareHeader(ntsnd_outdev[n], h, sizeof(WAVEHDR));
+            h->dwFlags = 0L;
+            memset((char *)(ntsnd_outvec[n][phase].lpData), 0, (CHANNELS_PER_DEVICE * SAMPSIZE * nt_realdacblksize));
+            waveOutPrepareHeader(   ntsnd_outdev[n], h, sizeof(WAVEHDR));
+            mmresult = waveOutWrite(ntsnd_outdev[n], h, sizeof(WAVEHDR));
             if (mmresult != MMSYSERR_NOERROR) nt_waveouterror("waveOutAddBuffer: %s", mmresult);
-            ntsnd_outphase[nda] = phase = WRAPFWD(phase + 1);
+            ntsnd_outphase[n] = phase = WRAPFWD(phase+1);
         }
-        if (count == MAXRESYNC) post("resync error 2");
+        if (count == MAXRESYNC) post("resync error at output");
     }
 #ifdef MIDI_TIMESTAMP
     nt_resetmidisync();
@@ -353,7 +303,7 @@ void nt_logerror(int which) {
 #endif
 }
 
-int mmio_send_dacs() {
+static int mmio_send_dacs() {
     UINT mmresult;
     if (!nt_nwavein && !nt_nwaveout) return 0;
     if (nt_meters) {
@@ -373,25 +323,21 @@ int mmio_send_dacs() {
     /* the "fill pointer" nt_fill controls where in the next I/O buffers we will write and/or read.  If it's zero, we
        first check whether the buffers are marked "done". */
     if (!nt_fill) {
-        for (int nad=0; nad<nt_nwavein; nad++) {
-            int phase = ntsnd_inphase[nad];
-            WAVEHDR *inwavehdr = ntsnd_invec[nad][phase].lpWaveHdr;
-            if (!(inwavehdr->dwFlags & WHDR_DONE)) goto idle;
+        for (int n=0; n<nt_nwavein; n++) {
+            int phase = ntsnd_inphase[n];  WAVEHDR *h = ntsnd_invec[n][phase].lpWaveHdr;
+            if (!(h->dwFlags & WHDR_DONE)) goto idle;
         }
-        for (int nda=0; nda<nt_nwaveout; nda++) {
-            int phase = ntsnd_outphase[nda];
-            WAVEHDR *outwavehdr = ntsnd_outvec[nda][phase].lpWaveHdr;
-            if (!(outwavehdr->dwFlags & WHDR_DONE)) goto idle;
+        for (int n=0; n<nt_nwaveout; n++) {
+            int phase = ntsnd_outphase[n]; WAVEHDR *h = ntsnd_outvec[n][phase].lpWaveHdr;
+            if (!(h->dwFlags & WHDR_DONE)) goto idle;
         }
-        for (int nad=0; nad<nt_nwavein; nad++) {
-            int phase = ntsnd_inphase[nad];
-            WAVEHDR *inwavehdr = ntsnd_invec[nad][phase].lpWaveHdr;
-            if (inwavehdr->dwFlags & WHDR_PREPARED) waveInUnprepareHeader(ntsnd_indev[nad], inwavehdr, sizeof(WAVEHDR));
+        for (int n=0; n<nt_nwavein; n++) {
+            int phase = ntsnd_inphase[n];  WAVEHDR *h = ntsnd_invec[n][phase].lpWaveHdr;
+            if (h->dwFlags & WHDR_PREPARED) waveInUnprepareHeader(ntsnd_indev[n], h, sizeof(WAVEHDR));
         }
-        for (int nda=0; nda<nt_nwaveout; nda++) {
-            int phase = ntsnd_outphase[nda];
-            WAVEHDR *outwavehdr = ntsnd_outvec[nda][phase].lpWaveHdr;
-            if (outwavehdr->dwFlags & WHDR_PREPARED) waveOutUnprepareHeader(ntsnd_outdev[nda], outwavehdr, sizeof(WAVEHDR));
+        for (int n=0; n<nt_nwaveout; n++) {
+            int phase = ntsnd_outphase[n]; WAVEHDR *h = ntsnd_outvec[n][phase].lpWaveHdr;
+            if (h->dwFlags & WHDR_PREPARED) waveOutUnprepareHeader(ntsnd_outdev[n], h, sizeof(WAVEHDR));
         }
     }
     /* Convert audio output to fixed-point and put it in the output buffer. */
@@ -399,9 +345,9 @@ int mmio_send_dacs() {
     short *sp1, *sp2;
     float *fp1, *fp2;
     fp1 = sys_soundout;
-    for (int nda=0; nda<nt_nwaveout; nda++) {
-        int phase = ntsnd_outphase[nda];
-	sp1=(short *)(ntsnd_outvec[nda][phase].lpData)+CHANNELS_PER_DEVICE*nt_fill;
+    for (int n=0; n<nt_nwaveout; n++) {
+        int phase = ntsnd_outphase[n];
+	sp1=(short *)(ntsnd_outvec[n][phase].lpData)+CHANNELS_PER_DEVICE*nt_fill;
         for (int i=0; i<2; i++, fp1 += sys_dacblocksize, sp1++) {
 	    fp2 = fp1; sp2 = sp1;
             for (int j=0; j<sys_dacblocksize; j++, fp2++, sp2 += CHANNELS_PER_DEVICE) {
@@ -412,45 +358,43 @@ int mmio_send_dacs() {
     memset(sys_soundout, 0, (sys_dacblocksize *sizeof(t_sample)*CHANNELS_PER_DEVICE)*nt_nwaveout);
     /* vice versa for the input buffer */
     fp1 = sys_soundin;
-    for (int nad=0; nad<nt_nwavein; nad++) {
-        int phase = ntsnd_inphase[nad];
-        for (i=0, sp1=(short *)(ntsnd_invec[nad][phase].lpData)+CHANNELS_PER_DEVICE*nt_fill; i < 2; i++, fp1 += sys_dacblocksize, sp1++) {
+    for (int n=0; n<nt_nwavein; n++) {
+        int phase = ntsnd_inphase[n];
+        for (i=0, sp1=(short *)(ntsnd_invec[n][phase].lpData)+CHANNELS_PER_DEVICE*nt_fill; i < 2; i++, fp1 += sys_dacblocksize, sp1++) {
             for (j = 0, fp2 = fp1, sp2 = sp1; j < sys_dacblocksize; j++, fp2++, sp2 += CHANNELS_PER_DEVICE) {
-                *fp2 = ((float)(1./32767.)) * (float)(*sp2);
+                *fp2 = float(1./32767.)*float(*sp2);
             }
         }
     }
-    nt_fill = nt_fill + sys_dacblocksize;
+    nt_fill += sys_dacblocksize;
     if (nt_fill == nt_realdacblksize) {
         nt_fill = 0;
-        for (int nad=0; nad<nt_nwavein; nad++) {
-            int phase = ntsnd_inphase[nad];
-            HWAVEIN device = ntsnd_indev[nad];
-            WAVEHDR *inwavehdr = ntsnd_invec[nad][phase].lpWaveHdr;
-            waveInPrepareHeader(device, inwavehdr, sizeof(WAVEHDR));
-            mmresult = waveInAddBuffer(device, inwavehdr, sizeof(WAVEHDR));
+        for (int n=0; n<nt_nwavein; n++) {
+            int phase = ntsnd_inphase[n];
+            HWAVEIN device = ntsnd_indev[n];
+            WAVEHDR *h = ntsnd_invec[n][phase].lpWaveHdr;
+            waveInPrepareHeader(device, h, sizeof(WAVEHDR));
+            mmresult = waveInAddBuffer(device, h, sizeof(WAVEHDR));
             if (mmresult != MMSYSERR_NOERROR) nt_waveinerror("waveInAddBuffer: %s", mmresult);
-            ntsnd_inphase[nad] = WRAPFWD(phase + 1);
+            ntsnd_inphase[n] = WRAPFWD(phase+1);
         }
-        for (int nda=0; nda<nt_nwaveout; nda++) {
-            int phase = ntsnd_outphase[nda];
-            HWAVEOUT device = ntsnd_outdev[nda];
-            WAVEHDR *outwavehdr = ntsnd_outvec[nda][phase].lpWaveHdr;
-            waveOutPrepareHeader(device, outwavehdr, sizeof(WAVEHDR));
-            mmresult = waveOutWrite(device, outwavehdr, sizeof(WAVEHDR));
+        for (int n=0; n<nt_nwaveout; n++) {
+            int phase = ntsnd_outphase[n];
+            HWAVEOUT device = ntsnd_outdev[n];
+            WAVEHDR *h = ntsnd_outvec[n][phase].lpWaveHdr;
+            waveOutPrepareHeader(device, h, sizeof(WAVEHDR));
+            mmresult = waveOutWrite(device, h, sizeof(WAVEHDR));
             if (mmresult != MMSYSERR_NOERROR) nt_waveouterror("waveOutWrite: %s", mmresult);
-            ntsnd_outphase[nda] = WRAPFWD(phase + 1);
+            ntsnd_outphase[n] = WRAPFWD(phase+1);
         }
         /* check for DAC underflow or ADC overflow. */
-        for (int nad=0; nad<nt_nwavein; nad++) {
-            int phase = WRAPBACK(ntsnd_inphase[nad] - 2);
-            WAVEHDR *inwavehdr = ntsnd_invec[nad][phase].lpWaveHdr;
-            if (inwavehdr->dwFlags & WHDR_DONE) goto late;
+        for (int n=0; n<nt_nwavein; n++) {
+            int phase = WRAPBACK(ntsnd_inphase[n]-2);  WAVEHDR *h = ntsnd_invec[n][phase].lpWaveHdr;
+            if (h->dwFlags & WHDR_DONE) goto late;
         }
-        for (int nda=0; nda<nt_nwaveout; nda++) {
-            int phase = WRAPBACK(ntsnd_outphase[nda] - 2);
-            WAVEHDR *outwavehdr = ntsnd_outvec[nda][phase].lpWaveHdr;
-            if (outwavehdr->dwFlags & WHDR_DONE) goto late;
+        for (int n=0; n<nt_nwaveout; n++) {
+            int phase = WRAPBACK(ntsnd_outphase[n]-2); WAVEHDR *h = ntsnd_outvec[n][phase].lpWaveHdr;
+            if (h->dwFlags & WHDR_DONE) goto late;
         }
     }
     return 1;
@@ -460,15 +404,15 @@ late:
     return 1;
 idle:
     /* If more than nt_adcjitterbufsallowed ADC buffers are ready on any input device, resynchronize */
-    for (int nad=0; nad<nt_nwavein; nad++) {
-        int phase = ntsnd_inphase[nad];
-        WAVEHDR *inwavehdr = ntsnd_invec[nad][WRAPFWD(phase + nt_adcjitterbufsallowed)].lpWaveHdr;
+    for (int n=0; n<nt_nwavein; n++) {
+        int phase = ntsnd_inphase[n];
+        WAVEHDR *inwavehdr = ntsnd_invec[n][WRAPFWD(phase + nt_adcjitterbufsallowed)].lpWaveHdr;
         if ( inwavehdr->dwFlags & WHDR_DONE) {nt_resyncaudio(); return 0;}
     }
     /* test dac sync the same way */
-    for (int nda=0; nda<nt_nwaveout; nda++) {
-        int phase = ntsnd_outphase[nda];
-        WAVEHDR *outwavehdr = ntsnd_outvec[nda][WRAPFWD(phase + nt_dacjitterbufsallowed)].lpWaveHdr;
+    for (int n=0; n<nt_nwaveout; n++) {
+        int phase = ntsnd_outphase[n];
+        WAVEHDR *outwavehdr = ntsnd_outvec[n][WRAPFWD(phase + nt_dacjitterbufsallowed)].lpWaveHdr;
         if (outwavehdr->dwFlags & WHDR_DONE) {nt_resyncaudio(); return 0;}
     }
 #ifdef MIDI_TIMESTAMP
@@ -479,26 +423,24 @@ idle:
 
 /* ------------------- public routines -------------------------- */
 
-int mmio_open_audio(
+static int mmio_open_audio(
    int naudioindev,  int *audioindev,  int nchindev,  int *chindev,
   int naudiooutdev, int *audiooutdev, int nchoutdev, int *choutdev, int rate, int dummy) /* IOhannes */ {
-    int nbuf;
     nt_realdacblksize = (sys_blocksize ? sys_blocksize : DEFREALDACBLKSIZE);
-    nbuf = sys_advance_samples/nt_realdacblksize;
+    int nbuf = sys_advance_samples/nt_realdacblksize;
     if (nbuf >= MAXBUFFER) {
-        post("pd: audio buffering maxed out to %d", (int)(MAXBUFFER * ((nt_realdacblksize * 1000.)/44100.)));
+        post("pd: audio buffering maxed out to %d", int(MAXBUFFER * ((nt_realdacblksize * 1000.)/44100.)));
         nbuf = MAXBUFFER;
-    }
-    else if (nbuf < 4) nbuf = 4;
+    } else if (nbuf < 4) nbuf = 4;
     post("%d audio buffers", nbuf);
     nt_naudiobuffer = nbuf;
-    if (nt_adcjitterbufsallowed > nbuf - 2) nt_adcjitterbufsallowed = nbuf - 2;
-    if (nt_dacjitterbufsallowed > nbuf - 2) nt_dacjitterbufsallowed = nbuf - 2;
+    if (nt_adcjitterbufsallowed > nbuf-2) nt_adcjitterbufsallowed = nbuf-2;
+    if (nt_dacjitterbufsallowed > nbuf-2) nt_dacjitterbufsallowed = nbuf-2;
     nt_nwavein = sys_inchannels / 2;
     nt_nwaveout = sys_outchannels / 2;
     nt_whichadc = (naudioindev  < 1 ? (nt_nwavein  > 1 ? WAVE_MAPPER : -1) : audioindev[0]);
     nt_whichdac = (naudiooutdev < 1 ? (nt_nwaveout > 1 ? WAVE_MAPPER : -1) : audiooutdev[0]);
-    if (naudiooutdev > 1 || naudioindev > 1) post("separate audio device choice not supported; using sequential devices.");
+    if (naudiooutdev>1 || naudioindev>1) post("separate audio device choice not supported; using sequential devices.");
     mmio_do_open_audio();
     return 0;
 }
@@ -506,43 +448,32 @@ int mmio_open_audio(
 #if 0
 /* list the audio and MIDI device names */
 void mmio_listdevs() {
-    UINT  wRtn, ndevices;
-    unsigned int i;
-    ndevices = waveInGetNumDevs();
-    for (i = 0; i < ndevices; i++) {
-        WAVEINCAPS wicap;
-        wRtn = waveInGetDevCaps(i, (LPWAVEINCAPS) &wicap, sizeof(wicap));
-        if (wRtn) nt_waveinerror("waveInGetDevCaps: %s", wRtn);
-        else post("audio input device #%d: %s", i+1, wicap.szPname);
+    UINT ndevices = waveInGetNumDevs();
+    for (unsigned i=0; i<ndevices; i++) {
+        WAVEINCAPS w; UINT wRtn = waveInGetDevCaps( i, (LPWAVEINCAPS) &w, sizeof(w));
+	if (wRtn) nt_waveinerror( "waveInGetDevCaps: %s",  wRtn); else post("audio input device #%d: %s", i+1, w.szPname);
     }
     ndevices = waveOutGetNumDevs();
-    for (i = 0; i < ndevices; i++) {
-        WAVEOUTCAPS wocap;
-        wRtn = waveOutGetDevCaps(i, (LPWAVEOUTCAPS) &wocap, sizeof(wocap));
-        if (wRtn) nt_waveouterror("waveOutGetDevCaps: %s", wRtn);
-        else post("audio output device #%d: %s", i+1, wocap.szPname);
+    for (unsigned i=0; i<ndevices; i++) {
+        WAVEOUTCAPS w; UINT wRtn = waveOutGetDevCaps(i, (LPWAVEOUTCAPS)&w, sizeof(w));
+	if (wRtn) nt_waveouterror("waveOutGetDevCaps: %s", wRtn); else post("audio output device #%d: %s", i+1, w.szPname);
     }
 }
 #endif
 
-void mmio_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *noutdevs, int *canmulti, int maxndev, int devdescsize) {
-    int  wRtn, ndev, i;
+static void mmio_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *noutdevs, int *canmulti, int maxndev, int devdescsize) {
     *canmulti = 2;  /* supports multiple devices */
-    ndev = waveInGetNumDevs();
-    if (ndev > maxndev) ndev = maxndev;
+    int ndev = min(maxndev,int(waveInGetNumDevs()));
     *nindevs = ndev;
-    for (i = 0; i < ndev; i++) {
-        WAVEINCAPS wicap;
-        wRtn = waveInGetDevCaps(i, (LPWAVEINCAPS) &wicap, sizeof(wicap));
-        sprintf(indevlist + i * devdescsize, (wRtn ? "???" : wicap.szPname));
+    for (int i=0; i<ndev; i++) {
+        WAVEINCAPS w;  int wRtn = waveInGetDevCaps(i, (LPWAVEINCAPS) &w, sizeof(w));
+        sprintf(indevlist  + i*devdescsize, wRtn?"???":w.szPname);
     }
-    ndev = waveOutGetNumDevs();
-    if (ndev > maxndev) ndev = maxndev;
+    ndev = min(maxndev,int(waveOutGetNumDevs()));
     *noutdevs = ndev;
-    for (i = 0; i < ndev; i++) {
-        WAVEOUTCAPS wocap;
-        wRtn = waveOutGetDevCaps(i, (LPWAVEOUTCAPS) &wocap, sizeof(wocap));
-        sprintf(outdevlist + i * devdescsize, (wRtn ? "???" : wocap.szPname));
+    for (int i=0; i<ndev; i++) {
+        WAVEOUTCAPS w; int wRtn = waveOutGetDevCaps(i,(LPWAVEOUTCAPS)&w, sizeof(w));
+        sprintf(outdevlist + i*devdescsize, wRtn?"???":w.szPname);
     }
 }
 
