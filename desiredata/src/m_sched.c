@@ -229,10 +229,11 @@ static int sched_lastinclip, sched_lastoutclip, sched_lastindb, sched_lastoutdb;
 
 static void sched_pollformeters () {
     int inclip, outclip, indb, outdb;
-    static int sched_nextmeterpolltime, sched_nextpingtime;
+    static int sched_nextmeterpolltime;
     /* if there's no GUI but we're running in "realtime", here is
        where we arrange to ping the watchdog every 2 seconds. */
 #ifdef __linux__
+    static int sched_nextpingtime;
     if (sys_hipriority && (sched_diddsp - sched_nextpingtime > 0)) {
         glob_watchdog(0);
         /* ping every 2 seconds */
