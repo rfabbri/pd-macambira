@@ -901,7 +901,7 @@ t_symbol *qualified_name(t_symbol *s) {
    find out how this is handled.  */
 t_class *class_new2(const char *ss, t_newmethod newmethod, t_method freemethod,
 size_t size, int flags, const char *sig) {
-    t_symbol *s = gensym(ss);
+    t_symbol *s = ss?gensym(ss):0;
     int typeflag = flags & CLASS_TYPEMASK;
     if (!typeflag) typeflag = CLASS_PATCHABLE;
 #ifdef QUALIFIED_NAME
@@ -941,10 +941,8 @@ size_t size, int flags, const char *sig) {
     c->externdir = class_extern_dir;
     c->savefn = (typeflag == CLASS_PATCHABLE ? text_save : class_nosavefn);
 #ifdef QUALIFIED_NAME
-    c->helpname = gensym(ss);
     // like a class_addcreator
-    if (pd_library_name && newmethod)
-      class_addmethod2(pd_objectmaker._class, (t_method)newmethod, ss, sig);
+    if (pd_library_name && newmethod) class_addmethod2(pd_objectmaker._class, (t_method)newmethod, ss, sig);
 #endif
     c->onsubscribe = gobj_onsubscribe;
     class_table->set(c->name, c);
@@ -1024,10 +1022,10 @@ phooey:
     *f=0; va_end(ap);
     
 t_class *class_new(t_symbol *s, t_newmethod newmethod, t_method freemethod, size_t size, int flags, t_atomtypearg arg1, ...) {
-    COMMON(0); return class_new2(s->name,newmethod,freemethod,size,flags,fmt);
+    COMMON(0); return class_new2(s?s->name:0,newmethod,freemethod,size,flags,fmt);
 }
 void class_addcreator(t_newmethod newmethod, t_symbol *s, t_atomtypearg arg1, ...) {
-    COMMON(); class_addcreator2(s->name,newmethod,fmt);
+    COMMON(); class_addcreator2(s?s->name:0,newmethod,fmt);
 }
 void class_addmethod(t_class *c, t_method fn, t_symbol *sel, t_atomtypearg arg1, ...) {
     COMMON(); class_addmethod2(c,fn,sel->name,fmt);
