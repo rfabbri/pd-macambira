@@ -433,10 +433,10 @@ struct _inlet : t_pd {
 static t_class *inlet_class, *pointerinlet_class, *floatinlet_class, *symbolinlet_class;
 
 #define ISINLET(pd) ( \
-    pd->_class == inlet_class || \
+    pd->_class ==        inlet_class || \
     pd->_class == pointerinlet_class || \
-    pd->_class == floatinlet_class || \
-    pd->_class == symbolinlet_class)
+    pd->_class ==   floatinlet_class || \
+    pd->_class ==  symbolinlet_class)
 
 /* --------------------- generic inlets ala max ------------------ */
 
@@ -479,50 +479,37 @@ const char *inlet_tip(t_inlet* i,int num) {
   return "?";
 }
 
-/* LATER figure out how to make these efficient: */
 static void inlet_bang(t_inlet *x) {
     if (x->symfrom == &s_bang) pd_vmess(x->dest, x->u.symto, "");
     else if (!x->symfrom) pd_bang(x->dest);
-    else inlet_wrong(x, &s_bang);
-}
+    else inlet_wrong(x, &s_bang);}
 static void inlet_pointer(t_inlet *x, t_gpointer *gp) {
     if (x->symfrom == &s_pointer) pd_vmess(x->dest, x->u.symto, "p", gp);
     else if (!x->symfrom) pd_pointer(x->dest, gp);
-    else inlet_wrong(x, &s_pointer);
-}
+    else inlet_wrong(x, &s_pointer);}
 static void inlet_float(t_inlet *x, t_float f) {
     if (x->symfrom == &s_float) pd_vmess(x->dest, x->u.symto, "f", (t_floatarg)f);
     else if (x->symfrom == &s_signal) x->u.floatsignalvalue = f;
     else if (!x->symfrom) pd_float(x->dest, f);
-    else inlet_wrong(x, &s_float);
-}
-
+    else inlet_wrong(x, &s_float);}
 static void inlet_symbol(t_inlet *x, t_symbol *s) {
     if (x->symfrom == &s_symbol) pd_vmess(x->dest, x->u.symto, "s", s);
     else if (!x->symfrom) pd_symbol(x->dest, s);
-    else inlet_wrong(x, &s_symbol);
-}
-
+    else inlet_wrong(x, &s_symbol);}
 static void inlet_list(t_inlet *x, t_symbol *s, int argc, t_atom *argv) {
     if (x->symfrom == &s_list || x->symfrom == &s_float || x->symfrom == &s_symbol || x->symfrom == &s_pointer)
             typedmess(x->dest, x->u.symto, argc, argv);
     else if (!x->symfrom) pd_list(x->dest, s, argc, argv);
-    else inlet_wrong(x, &s_list);
-}
-
+    else inlet_wrong(x, &s_list);}
 static void inlet_anything(t_inlet *x, t_symbol *s, int argc, t_atom *argv) {
     if (x->symfrom == s) typedmess(x->dest, x->u.symto, argc, argv);
     else if (!x->symfrom) typedmess(x->dest, s, argc, argv);
-    else inlet_wrong(x, s);
-}
+    else inlet_wrong(x, s);}
 
 void inlet_free(t_inlet *x) {
     t_object *y = x->owner;
     if (y->inlet == x) y->inlet = x->next;
-    else for (t_inlet *x2 = y->inlet; x2; x2 = x2->next) if (x2->next == x) {
-        x2->next = x->next;
-        break;
-    }
+    else for (t_inlet *x2 = y->inlet; x2; x2 = x2->next) if (x2->next == x) {x2->next = x->next; break;}
     pd_free(x);
 }
 
@@ -534,8 +521,8 @@ static void pointerinlet_pointer(t_inlet *x, t_gpointer *gp) {
     if (gp->o) gp->o->refcount++;
 }
 
-static void floatinlet_float(  t_inlet *x, t_float f)   { *(x->u.floatslot) = f; }
-static void symbolinlet_symbol(t_inlet *x, t_symbol *s) { *(x->u.symslot)   = s; }
+static void floatinlet_float(  t_inlet *x, t_float f)   {*x->u.floatslot = f;}
+static void symbolinlet_symbol(t_inlet *x, t_symbol *s) {*x->u.symslot   = s;}
 
 #define COMMON \
     x->owner = owner; \
@@ -544,18 +531,12 @@ static void symbolinlet_symbol(t_inlet *x, t_symbol *s) { *(x->u.symslot)   = s;
     object_append_inlet(owner,x); \
     return x;
 
-t_inlet *floatinlet_new(t_object *owner, t_float *fp) {
-    t_inlet *x = (t_inlet *)pd_new(floatinlet_class);
-    x->symfrom = &s_float; x->u.floatslot = fp; COMMON
-}
-t_inlet *symbolinlet_new(t_object *owner, t_symbol **sp) {
-    t_inlet *x = (t_inlet *)pd_new(symbolinlet_class);
-    x->symfrom = &s_symbol; x->u.symslot = sp; COMMON
-}
-t_inlet *pointerinlet_new(t_object *owner, t_gpointer *gp) {
-    t_inlet *x = (t_inlet *)pd_new(pointerinlet_class);
-    x->symfrom = &s_pointer; x->u.pointerslot = gp; COMMON
-}
+t_inlet *  floatinlet_new(t_object *owner, t_float *   fp) {t_inlet *x=(t_inlet *)pd_new(floatinlet_class);
+    x->symfrom=&s_float;   x->u.floatslot  =fp; COMMON}
+t_inlet * symbolinlet_new(t_object *owner, t_symbol ** sp) {t_inlet *x=(t_inlet *)pd_new(symbolinlet_class);
+    x->symfrom=&s_symbol;  x->u.symslot    =sp; COMMON}
+t_inlet *pointerinlet_new(t_object *owner, t_gpointer *gp) {t_inlet *x=(t_inlet *)pd_new(pointerinlet_class);
+    x->symfrom=&s_pointer; x->u.pointerslot=gp; COMMON}
 #undef COMMON
 
 /* ---------------------- routine to handle lists ---------------------- */
@@ -572,9 +553,9 @@ void obj_list(t_object *x, t_symbol *s, int argc, t_atom *argv) {
         else if (ap->a_type == A_FLOAT)     pd_float(ip,ap->a_float);
         else                               pd_symbol(ip,ap->a_symbol);
     }
-    if      (argv->a_type == A_POINTER) pd_pointer(x, argv->a_gpointer);
-    else if (argv->a_type == A_FLOAT)     pd_float(x, argv->a_float);
-    else                                 pd_symbol(x, argv->a_symbol);
+    if      (argv->a_type == A_POINTER)   pd_pointer(x,argv->a_gpointer);
+    else if (argv->a_type == A_FLOAT)       pd_float(x,argv->a_float);
+    else                                   pd_symbol(x,argv->a_symbol);
 }
 
 void obj_init () {
@@ -671,7 +652,7 @@ void outlet_free(t_outlet *x) {
     free(x);
 }
 
-#define each_inlet(i,obj)  for ( t_inlet *i=obj->inlet; i; i=i->next)
+#define each_inlet(i,obj)  for ( t_inlet *i=obj->inlet ; i; i=i->next)
 #define each_outlet(o,obj) for (t_outlet *o=obj->outlet; o; o=o->next)
 
 static t_pd *find_inlet(t_object *to, int inlet) {
@@ -773,11 +754,9 @@ t_object *pd_checkobject(t_pd *x) {
 }
 
 /* move an inlet or outlet to the head of the list. this code is not safe with the latest additions in t_outconnect ! */
-void obj_moveinletfirst( t_object *x,  t_inlet *i) {
-    if (x->inlet == i) return;
+void obj_moveinletfirst( t_object *x,  t_inlet *i) {if (x->inlet  == i) return;
     each_inlet( i2,x) if (i2->next == i) {i2->next = i->next; i->next = x-> inlet; x-> inlet = i; return;}}
-void obj_moveoutletfirst(t_object *x, t_outlet *o) {
-    if (x->outlet == o) return;
+void obj_moveoutletfirst(t_object *x, t_outlet *o) {if (x->outlet == o) return;
     each_outlet(o2,x) if (o2->next == o) {o2->next = o->next; o->next = x->outlet; x->outlet = o; return;}}
 
 /* routines for DSP sorting, which are used in d_ugen.c and g_canvas.c */
@@ -1039,34 +1018,21 @@ phooey:
     bug("class_addmethod: %s_%s: bad argument types", c->name->name, sel->name);
 }
 
-t_class *class_new(t_symbol *s, t_newmethod newmethod, t_method freemethod,
-size_t size, int flags, t_atomtypearg arg1, ...) {
-    char fmt[42],*f=fmt; va_list ap; va_start(ap,arg1); int t=arg1;
-    while(t) {
-	if (t>A_CANT) {error("class_new: ARRGH! t=%d",t); return 0;}
-	*f++ = " fsp;,FS$@*!"[t];
-	t=(t_atomtype)va_arg(ap,int);
-    }
-    *f=0; va_end(ap); return class_new2(s->name,newmethod,freemethod,size,flags,fmt);
+#define COMMON(R) \
+    char fmt[42],*f=fmt; va_list ap; va_start(ap,arg1); int t=arg1; \
+    while(t) {if (t>A_CANT) {error("%s: ARRGH! t=%d",__func__,t); return R;} *f++ = " fsp;,FS$@*!"[t]; t=(t_atomtype)va_arg(ap,int);} \
+    *f=0; va_end(ap);
+    
+t_class *class_new(t_symbol *s, t_newmethod newmethod, t_method freemethod, size_t size, int flags, t_atomtypearg arg1, ...) {
+    COMMON(0); return class_new2(s->name,newmethod,freemethod,size,flags,fmt);
 }
 void class_addcreator(t_newmethod newmethod, t_symbol *s, t_atomtypearg arg1, ...) {
-    char fmt[42],*f=fmt; va_list ap; va_start(ap,arg1); int t=arg1;
-    while(t) {
-	if (t>A_CANT) {error("class_addcreator: ARRGH! t=%d",t); return;}
-	*f++ = " fsp;,FS$@*!"[t];
-	t=(t_atomtype)va_arg(ap,int);
-    }
-    *f=0; va_end(ap); class_addcreator2(s->name,newmethod,fmt);
+    COMMON(); class_addcreator2(s->name,newmethod,fmt);
 }
 void class_addmethod(t_class *c, t_method fn, t_symbol *sel, t_atomtypearg arg1, ...) {
-    char fmt[42],*f=fmt; va_list ap; va_start(ap,arg1); int t=arg1;
-    while(t) {
-	if (t>A_CANT) {error("class_addmethod: ARRGH! t=%d",t); return;}
-	*f++ = " fsp;,FS$@*!"[t];
-	t=(t_atomtype)va_arg(ap,int);
-    }
-    *f=0; va_end(ap); class_addmethod2(c,fn,sel->name,fmt);
+    COMMON(); class_addmethod2(c,fn,sel->name,fmt);
 }
+#undef COMMON
 
 /* see also the "class_addfloat", etc.,  macros in m_pd.h */
 #undef class_addbang
@@ -1081,27 +1047,24 @@ void class_addsymbol(  t_class *c, t_method fn) {c-> symbolmethod =  (t_symbolme
 void class_addlist(    t_class *c, t_method fn) {c->   listmethod =    (t_listmethod)fn;}
 void class_addanything(t_class *c, t_method fn) {c->    anymethod =     (t_anymethod)fn;}
 
-char *class_getname(t_class *c)     {return c->name->name;}
-char *class_gethelpname(t_class *c) {return c->helpname->name;}
-void class_sethelpsymbol(t_class *c, t_symbol *s) {c->helpname = s;}
-void class_setdrawcommand(t_class *c) {c->drawcommand = 1;}
-int  class_isdrawcommand( t_class *c) {return c->drawcommand;}
-void class_setnotice(     t_class *c, t_notice      notice     ) {c->notice      = notice     ;}
-void class_setonsubscribe(t_class *c, t_onsubscribe onsubscribe) {c->onsubscribe = onsubscribe;}
+char *class_getname(       t_class *c)     {return c->name->name;}
+char *class_gethelpname(   t_class *c) {return c->helpname->name;}
+void  class_sethelpsymbol( t_class *c, t_symbol *s) {c->helpname = s;}
+void  class_setdrawcommand(t_class *c) {c->drawcommand = 1;}
+int   class_isdrawcommand( t_class *c) {return c->drawcommand;}
+void  class_setnotice(     t_class *c, t_notice      notice     ) {c->notice      = notice     ;}
+void  class_setonsubscribe(t_class *c, t_onsubscribe onsubscribe) {c->onsubscribe = onsubscribe;}
 
 static void pd_floatforsignal(t_pd *x, t_float f) {
     int offset = x->_class->floatsignalin;
-    if (offset > 0)
-        *(t_sample *)(((char *)x) + offset) = f;
-    else
-        error("%s: float unexpected for signal input", x->_class->name->name);
+    if (offset>0) *(t_sample *)((char *)x + offset) = f;
+    else error("%s: float unexpected for signal input", x->_class->name->name);
 }
 
 void class_domainsignalin(t_class *c, int onset) {
     if (onset <= 0) onset = -1;
     else {
-        if (c->floatmethod != pd_defaultfloat)
-            post("warning: %s: float method overwritten", c->name->name);
+        if (c->floatmethod != pd_defaultfloat) post("warning: %s: float method overwritten", c->name->name);
         c->floatmethod = (t_floatmethod)pd_floatforsignal;
     }
     c->floatsignalin = onset;
@@ -1110,10 +1073,7 @@ void class_domainsignalin(t_class *c, int onset) {
 void class_set_extern_dir(t_symbol *s) {class_extern_dir = s;}
 char *class_gethelpdir(t_class *c) {return c->externdir->name;}
 
-static void class_nosavefn(t_gobj *z, t_binbuf *b) {
-    bug("save function called but not defined");
-}
-
+static void class_nosavefn(t_gobj *z, t_binbuf *b) {bug("save function called but not defined");}
 void class_setsavefn(t_class *c, t_savefn f) {c->savefn = f;}
 t_savefn class_getsavefn(t_class *c) {return  c->savefn;}
 
@@ -1381,9 +1341,9 @@ void pd_vmess(t_pd *x, t_symbol *sel, const char *fmt, ...) {
             break;
         }
         switch(*fp++) {
-        case 'f': SETFLOAT(at,   va_arg(ap, double)); break;
-        case 's': SETSYMBOL(at,  va_arg(ap, t_symbol *)); break;
-        case 'i': SETFLOAT(at,   va_arg(ap, t_int)); break;
+        case 'f': SETFLOAT(at,   va_arg(ap,       double)); break;
+        case 's': SETSYMBOL(at,  va_arg(ap,   t_symbol *)); break;
+        case 'i': SETFLOAT(at,   va_arg(ap,        t_int)); break;
         case 'p': SETPOINTER(at, va_arg(ap, t_gpointer *)); break;
         default: goto done;
         }
@@ -1398,9 +1358,9 @@ done:
 void pd_forwardmess(t_pd *x, int argc, t_atom *argv) {
     if (argc) {
         t_atomtype t = argv->a_type;
-        if      (t == A_SYMBOL)   pd_typedmess(x, argv->a_symbol, argc-1, argv+1);
-        else if (t == A_POINTER) {if (argc==1) pd_pointer(x, argv->a_gpointer); else pd_list(x, &s_list, argc, argv);}
-	else if (t == A_FLOAT)   {if (argc==1) pd_float(  x, argv->a_float);    else pd_list(x, &s_list, argc, argv);}
+        if      (t==A_SYMBOL)   pd_typedmess(x, argv->a_symbol, argc-1, argv+1);
+        else if (t==A_POINTER) {if (argc==1) pd_pointer(x, argv->a_gpointer); else pd_list(x, &s_list, argc, argv);}
+	else if (t==A_FLOAT)   {if (argc==1) pd_float(  x, argv->a_float);    else pd_list(x, &s_list, argc, argv);}
         else bug("pd_forwardmess");
     }
 }
@@ -1408,16 +1368,13 @@ void pd_forwardmess(t_pd *x, int argc, t_atom *argv) {
 void nullfn () {}
 
 t_gotfn getfn(t_pd *x, t_symbol *s) {
-    t_class *c = x->_class;
-    t_methodentry *m = c->methods;
+    t_class *c = x->_class; t_methodentry *m = c->methods;
     for (int i=c->nmethod; i--; m++) if (m->me_name == s) return m->me_fun;
     error("%s: no method for message '%s'", c->name->name, s->name);
     return (t_gotfn)nullfn;
 }
-
 t_gotfn zgetfn(t_pd *x, t_symbol *s) {
-    t_class *c = x->_class;
-    t_methodentry *m = c->methods;
+    t_class *c = x->_class; t_methodentry *m = c->methods;
     for (int i=c->nmethod; i--; m++) if (m->me_name == s) return m->me_fun;
     return 0;
 }
@@ -1693,8 +1650,8 @@ void binbuf_addv(t_binbuf *x, const char *fmt, ...) {
             break;
         }
         switch(*fp++) {
-        case 'i': SETFLOAT(at, va_arg(ap, int)); break;
-        case 'f': SETFLOAT(at, va_arg(ap, double)); break;
+        case 'i': SETFLOAT( at, va_arg(ap, int)); break;
+        case 'f': SETFLOAT( at, va_arg(ap, double)); break;
         case 's': SETSYMBOL(at, va_arg(ap, t_symbol *)); break;
         case 't': SETSYMBOL(at, gensym(va_arg(ap, char *))); break;
         case ';': SETSEMI(at); break;
@@ -2016,17 +1973,14 @@ int binbuf_read(t_binbuf *b, const char *filename, const char *dirname, int flag
 
 /* read a binbuf from a file, via the search patch of a canvas */
 int binbuf_read_via_canvas(t_binbuf *b, const char *filename, t_canvas *canvas, int flags) {
-    char *buf, *bufptr;
-    int fd = canvas_open2(canvas, filename, "", &buf, &bufptr, 0);
+    char *buf, *bufptr; int fd = canvas_open2(canvas, filename, "", &buf, &bufptr, 0);
     if (fd<0) {error("%s: can't open", filename); return 1;}
     close(fd); free(buf);
     return !!binbuf_read(b, bufptr, buf, flags);
 }
-
 /* old version */
 int binbuf_read_via_path(t_binbuf *b, char const *filename, const char *dirname, int flags) {
-    char *buf, *bufptr;
-    int fd = open_via_path2(dirname, filename, "", &buf, &bufptr, 0);
+    char *buf, *bufptr; int fd = open_via_path2(dirname, filename, "", &buf, &bufptr, 0);
     if (fd<0) {error("%s: can't open", filename); return 1;}
     close(fd);
     bool r = binbuf_read(b, bufptr, buf, flags);
@@ -2122,10 +2076,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd) {
             }
             if (!strcmp(first, "#N")) {
                 if (!strcmp(second, "vpatcher")) {
-                    if (stackdepth >= MAXSTACK) {
-                        post("too many embedded patches");
-                        return newb;
-                    }
+                    if (stackdepth >= MAXSTACK) {post("too many embedded patches"); return newb;}
                     stack[stackdepth] = nobj;
                     stackdepth++;
                     nobj = 0;
