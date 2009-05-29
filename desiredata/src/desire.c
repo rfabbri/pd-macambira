@@ -2232,13 +2232,14 @@ static void graph_vis(t_gobj *gr, int vis) {
 }
 #endif
 
-static int text_xpix(t_text *x, t_canvas *canvas) {
+/* nonstatic (to fix a -lib load error) */
+extern "C" int text_xpix(t_text *x, t_canvas *canvas) {
     float width = canvas->x2-canvas->x1;
     if (canvas->havewindow || !canvas->gop) return x->x;
     if (canvas->goprect) return canvas->x+x->x-canvas->xmargin;
     return canvas_xtopixels(canvas, canvas->x1 + width * x->x / (canvas->screenx2-canvas->screenx1));
 }
-static int text_ypix(t_text *x, t_canvas *canvas) {
+extern "C" int text_ypix(t_text *x, t_canvas *canvas) {
     float height = canvas->y2-canvas->y1;
     if (canvas->havewindow || !canvas->gop) return x->y;
     if (canvas->goprect) return canvas->y+x->y-canvas->ymargin;
@@ -7199,10 +7200,23 @@ extern "C" {
   void gobj_vis () {BYE}
   void gfxstub_deleteforkey () {BYE}
   void gfxstub_new () {BYE}
-
+  void rtext_width () {BYE}
+  void rtext_height () {BYE}
+  void *rtext_new () {BYE return 0;}
+  void rtext_free () {BYE}
   void glist_delete(t_canvas *x, t_gobj *y) {canvas_delete(x,y);}
 
   //redundantwards-compatibility
   void canvas_setcurrent  (t_canvas *x) {pd_pushsym(x);}
   void canvas_unsetcurrent(t_canvas *x)  {pd_popsym(x);}
+  
+  //int sys_isreadablefile(const char *file) {}
+
+  /* test if path is absolute or relative, based on leading /, env vars, ~, etc */
+  int sys_isabsolutepath(const char *dir) {
+    return dir[0] == '/' || dir[0] == '~'
+#ifdef MSW
+        || dir[0] == '%' || (dir[1] == ':' && dir[2] == '/')
+#endif
+  ;}
 };
