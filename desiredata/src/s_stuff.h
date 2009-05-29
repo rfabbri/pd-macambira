@@ -296,24 +296,18 @@ EXTERN void sys_pollmidiqueue(void);
 EXTERN int sys_pollgui(void);
 EXTERN void sys_setchsr(int chin, int chout, int sr, int dacblocksize);
 
-EXTERN void inmidi_noteon(int portno, int channel, int pitch, int velo);
-EXTERN void inmidi_controlchange(int portno, int channel, int ctlnumber, int value);
-EXTERN void inmidi_programchange(int portno, int channel, int value);
-EXTERN void inmidi_pitchbend(int portno, int channel, int value);
-EXTERN void inmidi_aftertouch(int portno, int channel, int value);
-EXTERN void inmidi_polyaftertouch(int portno, int channel, int pitch, int value);
+EXTERN void inmidi_noteon(        int portno, int channel, int pitch,     int velo);
+EXTERN void inmidi_controlchange( int portno, int channel, int ctlnumber, int value);
+EXTERN void inmidi_programchange( int portno, int channel,                int value);
+EXTERN void inmidi_pitchbend(     int portno, int channel,                int value);
+EXTERN void inmidi_aftertouch(    int portno, int channel,                int value);
+EXTERN void inmidi_polyaftertouch(int portno, int channel, int pitch,     int value);
 /* } jsarlo */
 
 /* functions in x_midi.c */
-void inmidi_realtimein(int portno, int cmd);
-void inmidi_byte(int portno, int byte);
-void inmidi_sysex(int portno, int byte);
-void inmidi_noteon(int portno, int channel, int pitch, int velo);
-void inmidi_controlchange(int portno, int channel, int ctlnumber, int value);
-void inmidi_programchange(int portno, int channel, int value);
-void inmidi_pitchbend(int portno, int channel, int value);
-void inmidi_aftertouch(int portno, int channel, int value);
-void inmidi_polyaftertouch(int portno, int channel, int pitch, int value);
+void inmidi_realtimein(    int portno, int cmd);
+void inmidi_byte(          int portno, int byte);
+void inmidi_sysex(         int portno, int byte);
 
 #if defined(_LANGUAGE_C_PLUS_PLUS) || defined(__cplusplus)
 }
