@@ -22,7 +22,8 @@ LEGEND:
 
 ------------------8<--------cut-here--------8<------------------
 
-[ ] zexy doesn't load
+[s] gcov for server-side coverage test
+[c] find some way to have client-side coverage test
 [ ] right-click on an [s] or [r] would have an option "Find Matching Sends & Receives"
 [ ] do not install .svn folders
 [s] class_setreinit(t_pd *, t_symbol *s, int argc, t_atom *argv)
@@ -98,12 +99,11 @@ LEGEND:
 [ ] fix deleteing/closing Canvas
     [ ] server sends -> x806a3b8 delete twice
     [ ] fix deletion order
-[ ] graphical array rendering optimization
-[ ] fix double delete of [pd].
+[ ] graphical array rendering optimisation
+[ ] fix double delete of [pd]; this is because [pd] is both an object in a patch and a patch itself, and "subscribe" doesn't distinguish.
 [s] added "version 2" syntax parser (optional), which has nested lists,
     extended quoting, extended float syntax
     (some ex-symbols now parsed as floats: +1 +1.0 +1e8 0x10 and so on.)
-[ ] note that Marius Schebella is interested in benchmarks
 [ ] atomically with multiple level
 [ ] tidy_up/snap to grid
 [ ] cleaner parsing of [expr]... remove int type because it causes e.g. [expr 8.0 / 10.0] = 0 but [expr 8.0/10.0] = 0.8
@@ -161,10 +161,10 @@ LEGEND:
 [c] implement timeout in def Manager call
 [s] finish merging 0.40 (wasn't it finished?)
 [s] merge 0.41 (no?)
+[s] merge 0.42
 [s] proper symbol quoting
 [s] refcounted symbols
 [c] patching-in-tongues follow-up
-[c] def def
 [c] take care of needless "save changes?"
 [c] make List objects, to manage children, visible_children, wires, selection, selection_wires.
 [c] skip unneeded motion events inside client (do we need this?)
@@ -175,12 +175,12 @@ LEGEND:
 [b] fix the [key] and [keyup] and [mouse] (?) classes
 [s] fix all issues with backslashes and braces.
 [-] write an installer in Tcl/Tk.
-[s] canvas_object_insert()
 [c] simplify def Dialog add
 [c] devlist isn't supposed to be like a choice, rather like several choices.
 [c] implement def Canvas tidy
 [c] set tk::mac::useCGDrawing 1
 [s] differential upload
+[c] differential download (property dialogs autoapply)
 [c] differential redraw
 [b] improved dirty_lists including proper array support
 [b] bang counter (instead of sending every bang message to client)
@@ -545,3 +545,8 @@ mode) when you hit apple (or ctrl on win/lin?).
 
 marius.
 
+
+
+
+
+[ ] sync pd.gif with pd_32.gif
