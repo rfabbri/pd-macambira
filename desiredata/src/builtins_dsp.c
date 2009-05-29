@@ -116,13 +116,11 @@ static void scalar##NAME##_dsp(t_scalarminus *x, t_signal **sp) { \
 
 #define PERFORM(NAME,EXPR) \
 t_int *NAME##_perform(t_int *w) { \
-    t_float *in1 = (t_float *)w[1], *in2 = (t_float *)w[2], *out = (t_float *)w[3]; \
-    int n = (int)w[4]; \
+    PERFORM4ARGS(t_float *,in1, t_float *,in2, t_float *,out, int,n); \
     while (n--) {t_float a=*in1++, b=*in2++; *out++ = (EXPR);} \
     return w+5;} \
 t_int *NAME##_perf8(t_int *w) { \
-    t_float *in1 = (t_float *)w[1], *in2 = (t_float *)w[2], *out = (t_float *)w[3]; \
-    int n = (int)w[4]; \
+    PERFORM4ARGS(t_float *,in1, t_float *,in2, t_float *,out, int,n); \
     for (; n; n -= 8, in1 += 8, in2 += 8, out += 8) { \
         {t_float a=in1[0], b=in2[0]; out[0] = (EXPR);} \
         {t_float a=in1[1], b=in2[1]; out[1] = (EXPR);} \
@@ -134,13 +132,11 @@ t_int *NAME##_perf8(t_int *w) { \
         {t_float a=in1[7], b=in2[7]; out[7] = (EXPR);}} \
     return w+5;} \
 t_int *scalar##NAME##_perform(t_int *w) { \
-    t_float *in = (t_float *)w[1]; t_float b = *(t_float *)w[2]; t_float *out = (t_float *)w[3]; \
-    int n = (int)w[4]; \
+    PERFORM4ARGS(t_float *,in, t_float *,in2, t_float *,out, int,n); t_float b=*in2; \
     while (n--) {t_float a=*in++; *out++ = (EXPR);} \
     return w+5;} \
 t_int *scalar##NAME##_perf8(t_int *w) { \
-    t_float *in = (t_float *)w[1]; t_float b = *(t_float *)w[2]; t_float *out = (t_float *)w[3]; \
-    int n = (int)w[4]; \
+    PERFORM4ARGS(t_float *,in, t_float *,in2, t_float *,out, int,n); t_float b=*in2; \
     for (; n; n -= 8, in += 8, out += 8) { \
 	{t_float a=in[0]; out[0] = (EXPR);} \
 	{t_float a=in[1]; out[1] = (EXPR);} \
@@ -463,19 +459,6 @@ static t_int *tabread4_tilde_perform(t_int *w) {
     float *buf = x->vec, *fp;
     maxindex = x->npoints - 3;
     if (!buf) goto zero;
-#if 0       /* test for spam -- I'm not ready to deal with this */
-    for (i = 0,  xmax = 0, xmin = maxindex,  fp = in1; i < n; i++,  fp++) {
-        float f = *in1;
-        if (f < xmin) xmin = f;
-        else if (f > xmax) xmax = f;
-    }
-    if (xmax < xmin + x->c_maxextent) xmax = xmin + x->c_maxextent;
-    for (i = 0, splitlo = xmin+ x->c_maxextent, splithi = xmax - x->c_maxextent,
-        fp = in1; i < n; i++,  fp++) {
-        float f = *in1;
-        if (f > splitlo && f < splithi) goto zero;
-    }
-#endif
     for (int i=0; i<n; i++) {
         float findex = *in++;
         int index = (int)findex;
@@ -562,7 +545,6 @@ static t_int *tabosc4_tilde_perform(t_int *w) {
     if (!tab) {while (n--) *out++ = 0; return w+5;}
     tf.d = UNITBIT32;
     int normhipart = tf.i[HIOFFSET];
-#if 1
     while (n--) {
         tf.d = dphase;
         dphase += *in++ * conv;
@@ -576,7 +558,6 @@ static t_int *tabosc4_tilde_perform(t_int *w) {
         float cminusb = c-b;
         *out++ = b + frac * (cminusb - 0.1666667f * (1.-frac) * ((d - a - 3.0f * cminusb) * frac + (d + 2.0f*a - 3.0f*b)));
     }
-#endif
     tf.d = UNITBIT32 * fnpoints;
     normhipart = tf.i[HIOFFSET];
     tf.d = dphase + (UNITBIT32 * fnpoints - UNITBIT32);
@@ -1671,12 +1652,10 @@ static void sigdelwrite_checkvecsize(t_sigdelwrite *x, int vecsize) {
         x->vecsize = vecsize;
         x->rsortno = ugen_getsortno();
     }
-    /*  LATER this should really check sample rate and blocking, once that is
-        supported.  Probably we don't actually care about vecsize.
-        For now just suppress this check. */
+    /*  LATER this should really check sample rate and blocking, once that is supported.
+        Probably we don't actually care about vecsize. For now just suppress this check. */
 #if 0
-    else if (vecsize != x->vecsize)
-        error("delread/delwrite/vd vector size mismatch");
+    else if (vecsize != x->vecsize) error("delread/delwrite/vd vector size mismatch");
 #endif
 }
 static void *sigdelwrite_new(t_symbol *s, t_floatarg msec) {
@@ -3364,7 +3343,7 @@ static t_int *cos_perform(t_int *w) {
 
 #if 0 /* this is the readable version of the code. */
     while (n--) {
-        dphase = (double)(*in++ * (float)(COSTABSIZE)) + UNITBIT32;
+        dphase = double(*in++ * float(COSTABSIZE)) + UNITBIT32;
         tf.d = dphase;
         addr = tab + (tf.i[HIOFFSET] & (COSTABSIZE-1));
         tf.i[HIOFFSET] = normhipart;
@@ -3374,12 +3353,12 @@ static t_int *cos_perform(t_int *w) {
         *out++ = f1 + frac * (f2 - f1);
     }
 #else /* this is the same, unwrapped by hand. */
-    dphase = (double)(*in++ * (float)(COSTABSIZE)) + UNITBIT32;
+    dphase = double(*in++ * float(COSTABSIZE)) + UNITBIT32;
     tf.d = dphase;
     addr = tab + (tf.i[HIOFFSET] & (COSTABSIZE-1));
     tf.i[HIOFFSET] = normhipart;
     while (--n) {
-        dphase = (double)(*in++ * (float)(COSTABSIZE)) + UNITBIT32;
+        dphase = double(*in++ * float(COSTABSIZE)) + UNITBIT32;
         frac = tf.d - UNITBIT32;
         tf.d = dphase;
         f1 = addr[0];
@@ -3444,18 +3423,6 @@ static t_int *osc_perform(t_int *w) {
     float conv = x->conv;
     tf.d = UNITBIT32;
     normhipart = tf.i[HIOFFSET];
-#if 0
-    while (n--) {
-        tf.d = dphase;
-        dphase += *in++ * conv;
-        addr = tab + (tf.i[HIOFFSET] & (COSTABSIZE-1));
-        tf.i[HIOFFSET] = normhipart;
-        frac = tf.d - UNITBIT32;
-        f1 = addr[0];
-        f2 = addr[1];
-        *out++ = f1 + frac * (f2 - f1);
-    }
-#else
     tf.d = dphase;
     dphase += *in++ * conv;
     addr = tab + (tf.i[HIOFFSET] & (COSTABSIZE-1));
@@ -3468,13 +3435,12 @@ static t_int *osc_perform(t_int *w) {
         f2 = addr[1];
         addr = tab + (tf.i[HIOFFSET] & (COSTABSIZE-1));
         tf.i[HIOFFSET] = normhipart;
-            *out++ = f1 + frac * (f2 - f1);
+        *out++ = f1 + frac * (f2 - f1);
         frac = tf.d - UNITBIT32;
     }
     f1 = addr[0];
     f2 = addr[1];
     *out++ = f1 + frac * (f2 - f1);
-#endif
     tf.d = UNITBIT32 * COSTABSIZE;
     normhipart = tf.i[HIOFFSET];
     tf.d = dphase + (UNITBIT32 * COSTABSIZE - UNITBIT32);
@@ -3486,9 +3452,7 @@ static void osc_dsp(t_osc *x, t_signal **sp) {
     x->conv = COSTABSIZE/sp[0]->sr;
     dsp_add(osc_perform, 4, x, sp[0]->v, sp[1]->v, sp[0]->n);
 }
-static void osc_ft1(t_osc *x, t_float f) {
-    x->phase = COSTABSIZE * f;
-}
+static void osc_ft1(t_osc *x, t_float f) {x->phase = COSTABSIZE * f;}
 static void osc_setup() {
     osc_class = class_new2("osc~",osc_new,0,sizeof(t_osc),0,"F");
     CLASS_MAINSIGNALIN(osc_class, t_osc, a);
@@ -3557,13 +3521,12 @@ static t_int *sigvcf_perform(t_int *w) {
         addr = tab + tabindex;
         tf.i[HIOFFSET] = normhipart;
         frac = tf.d - UNITBIT32;
-        f1 = addr[0]; f2 = addr[1]; coefr = r * (f1 + frac * (f2 - f1));
-        addr = tab + ((tabindex - (COSTABSIZE/4)) & (COSTABSIZE-1));
+        f1 = addr[0]; f2 = addr[1]; coefr = r * (f1 + frac * (f2 - f1)); addr = tab + ((tabindex - (COSTABSIZE/4)) & (COSTABSIZE-1));
         f1 = addr[0]; f2 = addr[1]; coefi = r * (f1 + frac * (f2 - f1));
         f1 = *in1++;
         re2 = re;
         *out1++ = re = ampcorrect * oneminusr * f1 + coefr * re2 - coefi * im;
-        *out2++ = im = coefi * re2 + coefr * im;
+        *out2++ = im =                               coefi * re2 + coefr * im;
     }
     if (PD_BIGORSMALL(re)) re = 0;
     if (PD_BIGORSMALL(im)) im = 0;
