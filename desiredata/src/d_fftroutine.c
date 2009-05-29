@@ -280,7 +280,7 @@ void fft_clear(void)
              nextnet = thisnet->next;
              net_dealloc(thisnet);
              free((char *)thisnet);
-           } while (thisnet = nextnet);
+           } while ((thisnet = nextnet));
          }
 }
            
