@@ -387,7 +387,7 @@ void manager_call (void *foo) {
 			}
 		}
 	}
-	clock_delay(self->clock,50);
+	clock_delay(self->clock,25);
 }
 
 void manager_notice (t_gobj *self_, t_gobj *origin, int argc, t_atom *argv) {
@@ -1974,7 +1974,7 @@ void canvas_add_debug(t_canvas *x, t_gobj *y) {
 }
 
 void canvas_add(t_canvas *x, t_gobj *y, int index) {
-    post("canvas_add index=%d next_o_index=%d",index,x->next_o_index);
+    //post("canvas_add index=%d next_o_index=%d",index,x->next_o_index);
     gobj_setcanvas(y,x);
     if (index<0) y->dix->index = x->next_o_index++;
     else         y->dix->index = index;
