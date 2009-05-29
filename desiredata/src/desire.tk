@@ -7984,12 +7984,8 @@ def ServerPrefsDialogue read_one {type name contents i} {
 		files     {incr i; lappend @$name [lindex $contents $i]}
 		choice    {
 			if {$name == "audio_api_choice"} {
-				if {$@$name == ""} {
-				set @$name [lsearch $::pd_apilist2 [lindex $contents $i]]
-				}
-			} else {
-				set @$name [lindex $contents $i]
-			}
+				if {$@$name == ""} {set @$name [lsearch $::pd_apilist2 [lindex $contents $i]]}
+			} else {set @$name [lindex $contents $i]}
 		}
 		void      {        set @$name 1}
 		default   {incr i; set @$name [lindex $contents $i]}
@@ -8010,18 +8006,12 @@ def ServerPrefsDialogue read {} {
 	set i 0
 
 	# prevent Tk8.5 from showing grey checkmarks
-	foreach name {-nodac -noadc -32bit -nomidiin -nomidiout -verbose -noloadbang -listdev -realtime} {
-		set _($self:$name) 0
-	}
+	foreach name {-nodac -noadc -32bit -nomidiin -nomidiout -verbose -noloadbang -listdev -realtime} {set _($self:$name) 0}
 
 	while {$i < [llength $contents]} {
 		set op [lindex $contents $i]
 		if {[string length $op]==0} {break}
-		if {![info exists pdrc_options_h($op)]} {
-			post "unknown option: %s" $op
-			incr i
-			continue
-		}
+		if {![info exists pdrc_options_h($op)]} {post "unknown option: %s" $op; incr i; continue}
 		mset {type name} $pdrc_options_h($op)
 		set name [lindex [split $name "|"] 0]
 		set i [$self read_one $type $name $contents $i]
@@ -8040,13 +8030,9 @@ def ServerPrefsDialogue write {} {
 			#files    {foreach item $v {puts $fd "$name $item"}}
 			void      {if {$v != ""} {if {$v} {puts $fd $name}}}
 			choice    {
-				if {$name != "audio_api_choice"} {
-					set vv [lindex $names [expr 1+$v]]
-					if {$vv != "default"} {puts $fd $vv}
-				} else {
-					set vv [lindex $::pd_apilist2 $v]
-					if {$vv != "default"} {puts $fd $vv}
-				}
+				if {$name != "audio_api_choice"} {set vv [lindex $names [expr 1+$v]]} \
+				else                             {set vv [lindex $::pd_apilist2 $v] }
+				if {$vv != "default"} {puts $fd $vv}
 			}
 			devlist {}
 			default   {if {[string length $v]} {puts $fd "$name $v"}}
@@ -8080,7 +8066,7 @@ def ServerPrefsDialogue init_content {} {
 				$self add $f.main.$section [list $name choice -choices $ops]
 			}
 			devlist {$self add $f.main.$section [list $name devlist] }
-			spins {$self add $f.main.$section [list $name spins [lindex $names 1]] }
+			spins   {$self add $f.main.$section [list $name spins [lindex $names 1]] }
 			default {$self add $f.main.$section [list $name $type]}
 		}
 	}
@@ -8092,11 +8078,11 @@ def ServerPrefsDialogue update_content {} {
 }
 
 def ServerPrefsDialogue update_channels {} {
-	set indev_len [llength $@audioindev]
+	set  indev_len [llength $@audioindev]
 	set outdev_len [llength $@audiooutdev]
 	set i 0
-	foreach chan $@inchannels {
-		if {$i < $indev_len} {set s "readonly"} else {set s "disabled"}
+	foreach chan  $@inchannels {
+		if {$i <  $indev_len} {set s "readonly"} else {set s "disabled"}
 		.$self.1.main.1.-inchannels.$i configure -state $s
 		incr i
 	}
@@ -8299,7 +8285,7 @@ def ClientPrefsDialogue get_val {} {
 					set old_key $key($class:$item)
 					if {$key($class:$item) != $new_key} {
 						if {[dict exists $accels $old_key]} {
-							set cmd [dict get $accels $old_key]
+							set cmd    [dict get    $accels $old_key]
 							set accels [dict remove $accels $old_key]
 							dict set accels $new_key $cmd
 						}
@@ -8372,9 +8358,7 @@ def ClientPrefsDialogue init {} {
 				$self add $which_section [list $str $type]
 			}
 			key {
-				foreach item $name {
-					set @$item $key($class:$item)
-				}
+				foreach item $name {set @$item $key($class:$item)}
 				$self add $which_section [list $name $type]
 			}
 			toggle {
@@ -8565,8 +8549,7 @@ def ClipboardDialogue init {clipboard} {
 	super close
 	set @clipboard $clipboard
         wm title .$self "Clipboard"
-	pack [text .$self.text -yscrollcommand ".$self.scroll set" -width 72
-	     ] -side left -fill both -expand yes
+	pack [text .$self.text -yscrollcommand ".$self.scroll set" -width 72] -side left -fill both -expand yes
 	pack [scrollbar .$self.scroll -command ".$self.text yview"] -side right -fill y
 	$@clipboard subscribe $self
 	$self notice
@@ -8721,20 +8704,16 @@ def KeyboardDialogue pack_keys {keys name off} {
 				continue
 			}
 			set ::keyboard_row_of($key) $i
-			if {[info exists ::keyboard_width_of($key)]} {
-				set width $::keyboard_width_of($key)
-			} else {set width 3}
-			if {[info exists ::keyboard_text_of($key)]}  {
-				set text  $::keyboard_text_of($key)
-			} else  {set text $key}
+			if {[info exists ::keyboard_width_of($key)]} {set width $::keyboard_width_of($key)} else {set width 3}
+			if {[info exists ::keyboard_text_of($key)]}  {set text  $::keyboard_text_of($key) } else {set text $key}
 			if {[regexp {\((\w+)\)} $text foo bar]} {
 				set font [$self look font]
-				pack [label .$self.board.$name.$i.key$key -image icon_$bar -relief raise -border 4 -bg \
-					"#dddddd" -width [expr $width*[font measure $font 0]] \
-					-height [font metrics $font -linespace]] -side left
+				pack [label .$self.board.$name.$i.key$key -image icon_$bar -relief raise -border 4 \
+					-side left -bg "#dddddd" -width [expr $width*[font measure $font 0]] \
+					-height [font metrics $font -linespace]]
 			} else {
-				pack [label .$self.board.$name.$i.key$key -text " $text " -relief raise -border 4 \
-				  	-bg "#dddddd" -width $width -font [$self look font]] -side left
+				pack [label .$self.board.$name.$i.key$key -text " $text "  -relief raise -border 4 \
+					-side left -bg "#dddddd" -width $width -font [$self look font]]
 			}
 		}
 		pack .$self.board.$name.$i -fill x
@@ -8802,7 +8781,6 @@ def MessageBox deconstruct {} {concat [list #X msg        $@x1 $@y1] $@text}
 def FloatBox   deconstruct {} {concat [list #X floatatom  $@x1 $@y1] $@w $@min $@max $@pos $@lab $@snd $@rcv}
 def SymbolBox  deconstruct {} {concat [list #X symbolatom $@x1 $@y1] $@w $@min $@max $@pos $@lab $@snd $@rcv}
 def Comment    deconstruct {} {concat [list #X text       $@x1 $@y1] $@text}
-
 
 def Box deconstruct {} {
 	if {[array names ::fields -exact $@pdclass] == ""} {
