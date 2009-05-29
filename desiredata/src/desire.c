@@ -7200,6 +7200,8 @@ extern "C" {
   void gfxstub_deleteforkey () {BYE}
   void gfxstub_new () {BYE}
 
+  void glist_delete(t_canvas *x, t_gobj *y) {canvas_delete(x,y);}
+
   //redundantwards-compatibility
   void canvas_setcurrent  (t_canvas *x) {pd_pushsym(x);}
   void canvas_unsetcurrent(t_canvas *x)  {pd_popsym(x);}
