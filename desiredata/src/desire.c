@@ -25,6 +25,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #ifdef MSW
 #include <io.h>
@@ -43,8 +44,8 @@
 
 #define foreach(ITER,COLL) for(typeof(COLL.begin()) ITER = COLL.begin(); ITER != (COLL).end(); ITER++)
 
-#define boxes_each(CHILD,BOXES)   for(t_gobj *CHILD=(BOXES)->first(); CHILD; CHILD=CHILD->next())
-#define canvas_each(CHILD,CANVAS)   for(t_gobj *CHILD=(CANVAS)->boxes->first(); CHILD; CHILD=CHILD->next())
+#define boxes_each(CHILD,BOXES)    for(t_gobj *CHILD=        (BOXES)->first(); CHILD; CHILD=CHILD->next())
+#define canvas_each(CHILD,CANVAS)  for(t_gobj *CHILD=(CANVAS)->boxes->first(); CHILD; CHILD=CHILD->next())
 #define canvas_wires_each(WIRE,TRAV,CANVAS) \
 	for (t_outconnect *WIRE=(t_outconnect *)666; WIRE==(t_outconnect *)666; ) \
 		for (t_linetraverser TRAV(CANVAS); (WIRE=linetraverser_next(&TRAV)); )
@@ -55,7 +56,7 @@
 #define a_float  a_w.w_float
 #define a_symbol a_w.w_symbol
 
-#define CLAMP(_var,_min,_max) do { if (_var<_min) _var=_min; else if (_var>_max) _var=_max; } while(0)
+#define CLAMP(_var,_min,_max) do {if (_var<_min) _var=_min; else if (_var>_max) _var=_max;} while(0)
 #define IS_A_FLOAT(atom,index)   ((atom+index)->a_type == A_FLOAT)
 #define IS_A_SYMBOL(atom,index)  ((atom+index)->a_type == A_SYMBOL)
 
@@ -638,7 +639,8 @@ static void canvas_coords(t_canvas *x, t_symbol *s, int argc, t_atom *argv) {
     gobj_changed(x,0);
 }
 
-template <class T> void swap(T &a, T &b) {T c=a; a=b; b=c;}
+//template <class T> void swap(T &a, T &b) {T c=a; a=b; b=c;}
+#define swap std::swap
 
 #define CANVAS_DEFGRAPHWIDTH 200
 #define CANVAS_DEFGRAPHHEIGHT 140
@@ -930,22 +932,14 @@ extern "C" void ugen_add(t_dspcontext *dc, t_object *x);
 extern "C" void ugen_connect(t_dspcontext *dc, t_object *from, int outlet, t_object *to, int inlet);
 extern "C" void ugen_done_graph(t_dspcontext *dc);
 
-/* schedule one canvas for DSP.  This is called below for all "root"
-   canvases, but is also called from the "dsp" method for sub-
-   canvases, which are treated almost like any other tilde object.  */
+/* schedule one canvas for DSP.  This is called below for all "root" canvases,
+   but is also called from the "dsp" method for sub-canvases, which are treated almost like any other tilde object.  */
 static void canvas_dodsp(t_canvas *x, int toplevel, t_signal **sp) {
     t_object *ob;
     t_symbol *dspsym = gensym("dsp");
-    /* create a new "DSP graph" object to use in sorting this canvas.
-       If we aren't toplevel, there are already other dspcontexts around. */
     t_dspcontext *dc = ugen_start_graph(toplevel, sp, obj_nsiginlets(x), obj_nsigoutlets(x));
-    /* find all the "dsp" boxes and add them to the graph */
-    canvas_each(y,x) if ((ob = pd_checkobject(y)) && zgetfn(y,dspsym)) ugen_add(dc, ob);
-    /* ... and all dsp interconnections */
-    canvas_wires_each(oc,t,x)
-        if (obj_issignaloutlet(t.from, t.outlet))
-            ugen_connect(dc, t.from, t.outlet, t.to, t.inlet);
-    /* finally, sort them and add them to the DSP chain */
+    canvas_each(y,x) {ob = pd_checkobject(y); if (ob && zgetfn(y,dspsym)) ugen_add(dc, ob);}
+    canvas_wires_each(oc,t,x) if (obj_issignaloutlet(t.from, t.outlet)) ugen_connect(dc, t.from, t.outlet, t.to, t.inlet);
     ugen_done_graph(dc);
 }
 
@@ -2023,16 +2017,16 @@ static float gobj_getxforsort(t_gobj *g) {
 }
 
 // three-way comparison (T is assumed Comparable)
-template <class T> static inline T cmp(T a, T b) {return a<b ? -1 : a>b;}
+// template <class T> static inline T cmp(T a, T b) {return a<b ? -1 : a>b;}
 
-int canvas_sort_compare(const void *a, const void *b) {
-    return cmp(gobj_getxforsort(*(t_gobj **)a),gobj_getxforsort(*(t_gobj **)b));
+bool canvas_sort_lt(t_gobj * const &a, t_gobj * const &b) /* is a StrictWeakOrdering */ {
+    return gobj_getxforsort(a) < gobj_getxforsort(b);
 }
 
 void canvas_sort(t_canvas *x) {
     std::vector<t_gobj *> v;
     canvas_each(y,x) v.push_back(y);
-    qsort(v.data(),v.size(),sizeof(t_gobj *),canvas_sort_compare);
+    sort(v.begin(),v.end(),canvas_sort_lt);
     x->boxes->map.clear();
     int i=0;
     foreach(y,v) {(*y)->dix->index=i++; x->boxes->add(*y);}
