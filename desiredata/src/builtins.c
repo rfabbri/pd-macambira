@@ -1172,28 +1172,12 @@ static int mydiv(int a, int b) {
 }
 BINOP(binop_mydiv, (float)mydiv((int)a,(int)b))
 
+BINOP(binop_atan2, (a==0 && b==0 ? 0 : atan2f(a,b)));
+
 FUNC1(sin,sinf(a))
 FUNC1(cos,cosf(a))
 FUNC1(tan,tanf(a))
 FUNC1(atan,atanf(a))
-
-static t_class *atan2_class;
-struct t_atan2 : t_object {
-    float f;
-};
-static void *atan2_new() {
-    t_atan2 *x = (t_atan2 *)pd_new(atan2_class);
-    static int warned;
-    if (!warned) post("warning: atan2 inlets switched from Pd 0.37 to 0.38"), warned=1;
-    floatinlet_new(x, &x->f);
-    x->f = 0;
-    outlet_new(x, &s_float);
-    return x;
-}
-static void atan2_float(t_atan2 *x, t_float f) {
-    float r = (f == 0 && x->f == 0 ? 0 : atan2f(f, x->f));
-    outlet_float(x->outlet, r);
-}
 
 FUNC1(sqrt,sqrtf(a))
 FUNC1(log, a>0 ? logf(a) : -1000)
@@ -1251,6 +1235,7 @@ void arithmetic_setup() {
     BINOPDECL(binop_pc,"%")
     BINOPDECL(binop_mymod,"mod")
     BINOPDECL(binop_mydiv,"div")
+    BINOPDECL(binop_atan2,"atan2");
 
     s = gensym("math");
 
@@ -1263,7 +1248,6 @@ void arithmetic_setup() {
     FUNCDECL(cos,"cos");
     FUNCDECL(tan,"tan");
     FUNCDECL(atan,"atan");
-    FUNCDECL(atan2,"atan2"); /* actually a binop */
     FUNCDECL(sqrt,"sqrt");
     FUNCDECL(log,"log");
     FUNCDECL(exp,"exp");
