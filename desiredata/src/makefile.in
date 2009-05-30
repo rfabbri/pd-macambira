@@ -79,6 +79,9 @@ externs::
 	cd ../extra; for ext in bonk~ choice expr~ fiddle~ loop~ lrshift~ pique sigmund~; do \
 		cd $$ext; make @EXTERNTARGET@ || break; cd ..; done
 
+# note: will not install symlinks. you'd need another -o -type.
+FINDFLAGS = -name .svn -prune -o -type f
+
 install:: all
 	install -d $(DESTDIR)$(bindir)
 	install -d $(DESTDIR)$(libpdbindir)
@@ -86,16 +89,16 @@ install:: all
 		install $$file $(DESTDIR)$(libpdbindir)/$$file; done
 	install $(BINARYMODE) $(SO) $(DESTDIR)$(libdir)/$(SO)
 	test -w /etc/ld.so.cache && ldconfig || true
-	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) main.c -o $(DESTDIR)$(bindir)/pd$(EXE) $(WSTRIP)
+	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) main.c -lpd -o $(DESTDIR)$(bindir)/pd$(EXE) $(WSTRIP)
 	install -m755 desire.tk   $(DESTDIR)$(bindir)/desire.tk
 	install -m755 desire   $(DESTDIR)$(bindir)/desire
 	install -m755 pdsend$(EXE)      $(DESTDIR)$(bindir)/pdsend$(EXE)
 	install -m755 pdreceive$(EXE)   $(DESTDIR)$(bindir)/pdreceive$(EXE)
 	install -m755 $(WATCHDOG) $(DESTDIR)$(libpdbindir)/$(WATCHDOG)
-	find locale   -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(libpdbindir)/'{}' ';'
-	find icons    -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(libpddir)/'{}' ';'
-	find ../doc   -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(pddocdir)/'{}' ';'
-	find ../extra -name .svn -prune -o -type f -exec install -D -m644 '{}' $(DESTDIR)$(libpddir)/'{}' ';'
+	find locale   $(FINDFLAGS) -exec install -D -m644 '{}' $(DESTDIR)$(libpdbindir)/'{}' ';'
+	find icons    $(FINDFLAGS) -exec install -D -m644 '{}' $(DESTDIR)$(libpddir)/'{}'    ';'
+	find ../doc   $(FINDFLAGS) -exec install -D -m644 '{}' $(DESTDIR)$(pddocdir)/'{}'    ';'
+	find ../extra $(FINDFLAGS) -exec install -D -m644 '{}' $(DESTDIR)$(libpddir)/'{}'    ';'
 	install -d $(DESTDIR)$(includedir)
 	for file in m_pd.h desire.h; do install -m644 $$file $(DESTDIR)$(includedir)/$$file; done
 	install -d $(DESTDIR)$(mandir)/man1
