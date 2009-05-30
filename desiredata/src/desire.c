@@ -5925,7 +5925,7 @@ static void bng_savefn(t_bng *x, t_binbuf *b) {
 }
 
 static void bng_reload(t_bng *x, t_symbol *s, int argc, t_atom *argv) {
-    t_foo foo = { argc, argv, 0 };
+    t_foo foo = {argc,argv,0};
     binbuf_update(x,gensym("bng"),argc,argv);
     if (!bng_pickle(x,&foo)) return;
     SET(h,x->w);
@@ -5979,7 +5979,7 @@ static void toggle_savefn(t_toggle *x, t_binbuf *b) {
 }
 
 static void toggle_reload(t_toggle *x, t_symbol *s, int argc, t_atom *argv) {
-    t_foo foo = { argc, argv, 0 };
+    t_foo foo = {argc,argv,0};
     binbuf_update(x,gensym("tgl"),argc,argv);
     if (!toggle_pickle(x,&foo)) return;
     SET(h,x->w);
@@ -6088,7 +6088,7 @@ static void radio_savefn(t_radio *x, t_binbuf *b) {
 }
 
 static void radio_reload(t_radio *x, t_symbol *s, int argc, t_atom *argv) {
-    t_foo foo = { argc, argv, 0 };
+    t_foo foo = {argc,argv,0};
     binbuf_update(x,radio_flavor(x),argc,argv);
     if (!radio_pickle(x,&foo)) return;
     iemgui_constrain(x);
@@ -6188,7 +6188,7 @@ static void slider_savefn(t_slider *x, t_binbuf *b) {
 }
 
 static void slider_reload(t_slider *x, t_symbol *s, int argc, t_atom *argv) {
-    t_foo foo = { argc, argv, 0 };
+    t_foo foo = {argc,argv,0};
     binbuf_update(x,gensym((char *)(x->orient?"vsl":"hsl")),argc,argv);
     if (!slider_pickle(x,&foo)) return;
 //this is wrong because it should happen when loading a file but not when loading from properties:
@@ -6225,9 +6225,7 @@ static int nbx_check_minmax(t_nbx *x) {
 	if(min==0.0 && max==0.0) max = 1.0;
 	if(max>0.0 && min<=0.0) min = 0.01*max;
 	if(max<=0.0 && min>0.0) max = 0.01*min;
-    } else {
-	if(min>max) swap(min,max);
-    }
+    } else if (min>max) swap(min,max);
     SET(min,min);
     SET(max,max);
     CLAMP(x->val,x->min,x->max);
@@ -6239,59 +6237,49 @@ static void nbx_bang(t_nbx *x) {
     outlet_float(x->outlet, x->val);
     if(x->snd && x->snd->thing) pd_float(x->snd->thing, x->val);
 }
-
 static void nbx_set(t_nbx *x, t_floatarg f) {SET(val,f); nbx_clip(x);}
 static void nbx_float(t_nbx *x, t_floatarg f) {nbx_set(x, f); if(iemgui_forward(x)) nbx_bang(x);}
-
 static void nbx_log_height(t_nbx *x, t_floatarg lh) {
     SET(log_height,max(10,(int)lh));
     SET(k,x->is_log ? exp(log(x->max/x->min)/(double)(x->log_height)) : 1.0);
 }
-
 static void nbx_size(t_nbx *x, t_symbol *s, int ac, t_atom *av) {
     SET(w,max(1,(int)atom_getintarg(0, ac, av)));
     if(ac > 1) SET(h,max(8,(int)atom_getintarg(1, ac, av)));
 }
-
-static void nbx_range(t_nbx *x, t_float min, t_float max)
-{SET(min,min); SET(max,max); nbx_check_minmax(x);}
-
+static void nbx_range(t_nbx *x, t_float min, t_float max) {SET(min,min); SET(max,max); nbx_check_minmax(x);}
 static void nbx_lin(t_nbx *x) {SET(is_log,0);                     }
 static void nbx_log(t_nbx *x) {SET(is_log,1); nbx_check_minmax(x);}
 static void nbx_loadbang(t_nbx *x) {if(iemgui_loadbang(x)) nbx_bang(x);}
-
 static void nbx_list(t_nbx *x, t_symbol *s, int ac, t_atom *av) {
     if (!IS_A_FLOAT(av,0)) return;
     nbx_set(x, atom_getfloatarg(0, ac, av));
     nbx_bang(x);
 }
-
 static int nbx_pickle(t_nbx *x, t_foo *foo) {
     return pd_pickle(foo,"iiddbiaaaiiiicccd;i",
 	&x->w,&x->h,&x->min,&x->max,&x->is_log,&x->isa,&x->snd,&x->rcv,&x->lab,
 	&x->ldx,&x->ldy,&x->font_style,&x->fontsize,&x->bcol,&x->fcol,&x->lcol,&x->val,&x->log_height);
 }
-
 static void nbx_savefn(t_nbx *x, t_binbuf *b) {
     t_foo foo = {0,0,b};
     if (!b) return;
     pd_savehead(b,x,"nbx");
     nbx_pickle(x,&foo);
 }
-
 static void nbx_reload(t_nbx *x, t_symbol *s, int argc, t_atom *argv) {
-    t_foo foo = { argc, argv, 0 };
+    t_foo foo = {argc,argv,0};
     binbuf_update(x,gensym("nbx"),argc,argv);
     if (!nbx_pickle(x,&foo)) return;
     if (!x->isa&1) SET(val,0.0);
-    iemgui_constrain(x);
+    SET(fontsize,max(x->fontsize,4));
+    SET(h,iemgui_clip_size(x->h));
     SET(w,max(x->w,1));
     nbx_check_minmax(x);
     SET(w,max(x->w,1));
     if (x->rcv) pd_bind(x,x->rcv);
     gobj_changed(x,0);
 }
-
 static void *nbx_new(t_symbol *s, int argc, t_atom *argv) {
     t_nbx *x = (t_nbx *)iemgui_new(nbx_class);
     SET(log_height,256);
@@ -6368,7 +6356,7 @@ static void vu_savefn(t_vu *x, t_binbuf *b) {
 }
 
 static void vu_reload(t_vu *x, t_symbol *s, int argc, t_atom *argv) {
-    t_foo foo = { argc, argv, 0 };
+    t_foo foo = {argc,argv,0};
     binbuf_update(x,gensym("vu"),argc,argv);
     if (!vu_pickle(x,&foo)) return;
     iemgui_constrain(x);
@@ -6425,7 +6413,7 @@ static void cnv_savefn(t_cnv *x, t_binbuf *b) {
 }
 
 static void cnv_reload(t_cnv *x, t_symbol *s, int argc, t_atom *argv) {
-    t_foo foo = { argc, argv, 0 };
+    t_foo foo = {argc,argv,0};
     binbuf_update(x,gensym("cnv"),argc,argv);
     if (!cnv_pickle(x,&foo)) return;
     SET(w,max(x->w,1));
@@ -6935,41 +6923,41 @@ void glob_initfromgui(void *dummy, t_symbol *s) {
 */
 }
 
-void glob_meters(void *dummy, t_floatarg f);
-void glob_audiostatus(void *dummy);
-void glob_audio_properties(t_pd *dummy, t_floatarg flongform);
-void glob_audio_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv);
-void glob_audio_setapi(t_pd *dummy, t_floatarg f);
-void glob_midi_properties(t_pd *dummy, t_floatarg flongform);
-void glob_midi_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv);
-void glob_midi_setapi(t_pd *dummy, t_floatarg f);
-void glob_start_path_dialog(t_pd *dummy, t_floatarg flongform);
-void glob_path_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv);
-void glob_start_startup_dialog(t_pd *dummy, t_floatarg flongform);
-void glob_startup_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv);
-void glob_ping(t_pd *dummy);
+void glob_meters(void *, t_floatarg f);
+void glob_audiostatus(void *);
+void glob_audio_properties(t_pd *, t_floatarg flongform);
+void glob_audio_dialog(t_pd *, t_symbol *s, int argc, t_atom *argv);
+void glob_audio_setapi(t_pd *, t_floatarg f);
+void glob_midi_properties(t_pd *, t_floatarg flongform);
+void glob_midi_dialog(t_pd *, t_symbol *s, int argc, t_atom *argv);
+void glob_midi_setapi(t_pd *, t_floatarg f);
+void glob_start_path_dialog(t_pd *, t_floatarg flongform);
+void glob_path_dialog(t_pd *, t_symbol *s, int argc, t_atom *argv);
+void glob_start_startup_dialog(t_pd *, t_floatarg flongform);
+void glob_startup_dialog(t_pd *, t_symbol *s, int argc, t_atom *argv);
+void glob_ping(t_pd *);
 extern "C" {
-void glob_finderror(t_pd *dummy);
+void glob_finderror(t_pd *);
 };
 /* tb: message-based audio configuration { */
-void glob_audio_testaudiosetting(t_pd * dummy, t_symbol *s, int ac, t_atom *av);
-void glob_audio_getaudioindevices(t_pd * dummy, t_symbol *s, int ac, t_atom *av);
-void glob_audio_getaudiooutdevices(t_pd * dummy, t_symbol *s, int ac, t_atom *av);
-void glob_audio_getaudioininfo(t_pd * dummy, t_float f);
+void glob_audio_testaudiosetting(t_pd *, t_symbol *s, int ac, t_atom *av);
+void glob_audio_getaudioindevices(t_pd *, t_symbol *s, int ac, t_atom *av);
+void glob_audio_getaudiooutdevices(t_pd *, t_symbol *s, int ac, t_atom *av);
+void glob_audio_getaudioininfo(t_pd *, t_float f);
 void glob_audio_getaudiooutinfo(t_pd * dummy, t_float f);
-//void glob_audio_samplerate(t_pd * dummy, t_float f);
-//void glob_audio_delay(t_pd * dummy, t_float f);
-//void glob_audio_dacblocksize(t_pd * dummy, t_float f);
-//void glob_audio_scheduler(t_pd * dummy, t_float f);
-void glob_audio_device(t_pd * dummy, t_symbol *s, int argc, t_atom *argv);
-//void glob_audio_device_in(t_pd * dummy, t_symbol *s, int argc, t_atom *argv);
-//void glob_audio_device_out(t_pd * dummy, t_symbol *s, int argc, t_atom *argv);
+//void glob_audio_samplerate(t_pd *, t_float f);
+//void glob_audio_delay(t_pd *, t_float f);
+//void glob_audio_dacblocksize(t_pd *, t_float f);
+//void glob_audio_scheduler(t_pd *, t_float f);
+void glob_audio_device(t_pd *, t_symbol *s, int argc, t_atom *argv);
+//void glob_audio_device_in(t_pd *, t_symbol *s, int argc, t_atom *argv);
+//void glob_audio_device_out(t_pd *, t_symbol *s, int argc, t_atom *argv);
 void glob_audio_getcurrent_devices ();
-void glob_audio_asio_latencies(t_pd * dummy, t_float f);
-void glob_midi_getindevs( t_pd *dummy, t_symbol *s, int ac, t_atom *av);
-void glob_midi_getoutdevs(t_pd *dummy, t_symbol *s, int ac, t_atom *av);
-void glob_midi_getcurrentindevs(t_pd *dummy);
-void glob_midi_getcurrentoutdevs(t_pd *dummy);
+void glob_audio_asio_latencies(t_pd *, t_float f);
+void glob_midi_getindevs( t_pd *, t_symbol *s, int ac, t_atom *av);
+void glob_midi_getoutdevs(t_pd *, t_symbol *s, int ac, t_atom *av);
+void glob_midi_getcurrentindevs(t_pd *);
+void glob_midi_getcurrentoutdevs(t_pd *);
 /* tb } */
 
 static void glob_object_table() {
