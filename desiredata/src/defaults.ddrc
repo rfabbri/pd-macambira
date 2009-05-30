@@ -117,6 +117,7 @@ key {
     dropper Alt+y
     duplicate Ctrl+d
     editmodeswitch Ctrl+e
+    visual_diff Ctrl+E
     find Ctrl+f
     find_again Ctrl+g
     find_last_error {}
