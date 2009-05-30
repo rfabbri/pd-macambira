@@ -185,7 +185,6 @@ void sys_setvirtualalarm(void);
 #define API_MMIO 3
 #define API_PORTAUDIO 4
 #define API_JACK 5
-#define API_SGI 6
 #define API_ASIO 7
 
 #if defined(USEAPI_OSS)
