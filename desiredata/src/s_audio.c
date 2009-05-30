@@ -360,23 +360,24 @@ static void audio_getdevs(char *indevlist, int *nindevs, char *outdevlist, int *
     else {*nindevs = *noutdevs = 0;}
 }
 
-static void sys_listaudiodevs() {
+void sys_listdevs() {
+#ifdef USEAPI_JACK
+    if (sys_audioapi == API_JACK) return jack_listdevs();
+#endif
+#ifdef USEAPI_SGI
+    if (sys_audioapi == API_SGI)  return sgi_listaudiodevs();
+#endif
     char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
     int nindevs = 0, noutdevs = 0, canmulti = 0;
     audio_getdevs(indevlist, &nindevs, outdevlist, &noutdevs, &canmulti,  MAXNDEV, DEVDESCSIZE);
     /* To agree with command line flags, normally start at 1; but microsoft "MMIO" device list starts at 0 (the "mapper"). */
     /* (see also sys_mmio variable in s_main.c)  */
-    if (!nindevs) post("no audio input devices found");
-    else {
-        post("audio input devices:");
-        for (int i=0; i<nindevs;  i++) post("%d. %s", i + (sys_audioapi != API_MMIO),  indevlist + i * DEVDESCSIZE);
-    }
-    if (!noutdevs)  post("no audio output devices found");
-    else {
-        post("audio output devices:");
-        for (int i=0; i<noutdevs; i++) post("%d. %s", i + (sys_audioapi != API_MMIO), outdevlist + i * DEVDESCSIZE);
-    }
+    if (!nindevs)  post("no audio input devices found");  else post("audio input devices:");
+    for (int i=0; i<nindevs;  i++) post("%d. %s", i + (sys_audioapi != API_MMIO),  indevlist + i * DEVDESCSIZE);
+    if (!noutdevs) post("no audio output devices found"); else post("audio output devices:");
+    for (int i=0; i<noutdevs; i++) post("%d. %s", i + (sys_audioapi != API_MMIO), outdevlist + i * DEVDESCSIZE);
     post("API number %d", sys_audioapi);
+    sys_listmididevs();
 }
 
 /* start an audio settings dialog window */
@@ -415,7 +416,7 @@ void glob_audio_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv) {
         newoutchan[i] = INTARG(i+12);
     }
     for (int i=0; i<4; i++) {
-        if (newinchan[i]) {
+        if (newinchan[i] ) {
             newindev[ nindev]  = newindev[i];
             newinchan[nindev] = newinchan[i];
             nindev++;
@@ -432,22 +433,6 @@ void glob_audio_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv) {
     sys_open_audio(nindev,  newindev,  nindev,  newinchan,
                    noutdev, newoutdev, noutdev, newoutchan,
                    INTARG(16),INTARG(17),INTARG(18),INTARG(19), 1);
-}
-
-extern void sgi_listaudiodevs();
-void sys_listdevs() {
-    if (sys_audioapi == API_PORTAUDIO) sys_listaudiodevs(); else
-#ifdef USEAPI_JACK
-    if (sys_audioapi == API_JACK)      jack_listdevs();     else
-#endif
-    if (sys_audioapi == API_OSS)       sys_listaudiodevs(); else
-    if (sys_audioapi == API_ALSA)      sys_listaudiodevs(); else
-#ifdef USEAPI_SGI
-    if (sys_audioapi == API_SGI)       sgi_listaudiodevs(); else
-#endif
-    if (sys_audioapi == API_MMIO)      sys_listaudiodevs(); else
-    post("unknown API");
-    sys_listmididevs();
 }
 
 void sys_setblocksize(int n) {
