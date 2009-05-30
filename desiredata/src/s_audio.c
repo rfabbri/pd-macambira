@@ -105,9 +105,9 @@ static float (*peak_fp)(t_float*, t_int, t_float) = peakvec;
 
 static int audio_isopen() {return audio_state && ((audi.ndev > 0 && audi.chdev[0] > 0) || (audo.ndev > 0 && audo.chdev[0] > 0));}
 
-extern "C" void sys_get_audio_params(t_audiodevs *in, t_audiodevs *out, int *prate, int *pdacblocksize, int *padvance, int *pscheduler) {
-    in->ndev =audi.ndev;  for (int i=0; i<MAXAUDIOINDEV;  i++) {in ->dev[i] = audi.dev[i];  in->chdev[i]=audi.chdev[i];}
-    out->ndev=audo.ndev; for (int i=0; i<MAXAUDIOOUTDEV; i++) {out->dev[i] = audo.dev[i]; out->chdev[i]=audo.chdev[i];}
+extern "C" void sys_get_audio_params(t_audiodevs *ai, t_audiodevs *ao, int *prate, int *pdacblocksize, int *padvance, int *pscheduler) {
+    ai->ndev=audi.ndev; for (int i=0; i< MAXAUDIOINDEV; i++) {ai->dev[i] = audi.dev[i]; ai->chdev[i]=audi.chdev[i];}
+    ao->ndev=audo.ndev; for (int i=0; i<MAXAUDIOOUTDEV; i++) {ao->dev[i] = audo.dev[i]; ao->chdev[i]=audo.chdev[i];}
     *prate = audio_rate;
     *pdacblocksize = audio_dacblocksize;
     *padvance = audio_advance;
@@ -128,8 +128,8 @@ int rate, int dacblocksize, int advance, int scheduler) {
     audio_scheduler = scheduler;
 }
 
-extern "C" void sys_open_audio2(t_audiodevs *in, t_audiodevs *out, int rate, int dacblocksize, int advance, int scheduler) {
-    sys_open_audio(in->ndev,in->dev,in->ndev,in->chdev,out->ndev,out->dev,out->ndev,out->chdev,rate,dacblocksize,advance,scheduler,1);
+extern "C" void sys_open_audio2(t_audiodevs *ai, t_audiodevs *ao, int rate, int dacblocksize, int advance, int scheduler) {
+    sys_open_audio(ai->ndev,ai->dev,ai->ndev,ai->chdev,ao->ndev,ao->dev,ao->ndev,ao->chdev,rate,dacblocksize,advance,scheduler,1);
 }
 
 /* init routines for any API which needs to set stuff up before any other API gets used.  This is only true of OSS so far. */
@@ -311,11 +311,11 @@ void sys_close_audio() {
 
 /* open audio using whatever parameters were last used */
 void sys_reopen_audio() {
-    t_audiodevs in, out;
+    t_audiodevs ai,ao;
     int rate, dacblocksize, advance, scheduler;
     sys_close_audio();
-    sys_get_audio_params(&in,&out,&rate, &dacblocksize, &advance, &scheduler);
-    sys_open_audio2(&in,&out, rate, dacblocksize, advance, scheduler);
+    sys_get_audio_params(&ai,&ao,&rate,&dacblocksize,&advance,&scheduler);
+    sys_open_audio2(     &ai,&ao, rate, dacblocksize, advance, scheduler);
 }
 
 /* tb: default value of peak_fp {*/
@@ -383,23 +383,23 @@ void sys_listdevs() {
 /* start an audio settings dialog window */
 void glob_audio_properties(t_pd *dummy, t_floatarg flongform) {
     /* these are the devices you're using: */
-    t_audiodevs in,out;
+    t_audiodevs ai,ao;
     int rate, dacblocksize, advance, scheduler;
     /* these are all the devices on your system: */
-    char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
-    int nindevs = 0, noutdevs = 0, canmulti = 0;
-    audio_getdevs(indevlist, &nindevs, outdevlist, &noutdevs, &canmulti, MAXNDEV, DEVDESCSIZE);
-    ostringstream indevliststring;  for (int i=0; i<nindevs;  i++) indevliststring  << " {" <<  (indevlist + i*DEVDESCSIZE) << "}";
-    ostringstream outdevliststring; for (int i=0; i<noutdevs; i++) outdevliststring << " {" << (outdevlist + i*DEVDESCSIZE) << "}";
-    sys_get_audio_params(&in,&out,&rate,&dacblocksize,&advance,&scheduler);
-    if (in.ndev > 1 || out.ndev > 1) flongform = 1;
-    ostringstream indevs;   for (int i=0; i< in.ndev; i++) indevs   << " " <<   in.dev [i];
-    ostringstream outdevs;  for (int i=0; i<out.ndev; i++) outdevs  << " " <<   out.dev[i];
-    ostringstream inchans;  for (int i=0; i< in.ndev; i++) inchans  << " " <<  in.chdev[i];
-    ostringstream outchans; for (int i=0; i<out.ndev; i++) outchans << " " << out.chdev[i];
+    char idevlist[MAXNDEV*DEVDESCSIZE], odevlist[MAXNDEV*DEVDESCSIZE];
+    int nidev = 0, nodev = 0, canmulti = 0;
+    audio_getdevs(idevlist, &nidev, odevlist, &nodev, &canmulti, MAXNDEV, DEVDESCSIZE);
+    ostringstream idevliststring; for (int i=0; i<nidev; i++) idevliststring << " {" << (idevlist + i*DEVDESCSIZE) << "}";
+    ostringstream odevliststring; for (int i=0; i<nodev; i++) odevliststring << " {" << (odevlist + i*DEVDESCSIZE) << "}";
+    sys_get_audio_params(&ai,&ao,&rate,&dacblocksize,&advance,&scheduler);
+    if (ai.ndev > 1 || ao.ndev > 1) flongform = 1;
+    ostringstream idevs;  for (int i=0; i<ai.ndev; i++) idevs  << " " << ai.  dev[i];
+    ostringstream odevs;  for (int i=0; i<ao.ndev; i++) odevs  << " " << ao.  dev[i];
+    ostringstream ichans; for (int i=0; i<ai.ndev; i++) ichans << " " << ai.chdev[i];
+    ostringstream ochans; for (int i=0; i<ao.ndev; i++) ochans << " " << ao.chdev[i];
     sys_vgui("pdtk_audio_dialog {%s} {%s} {%s} {%s} {%s} {%s} %d %d %d %d %d\n",
-        indevliststring .str().data()+1,  indevs.str().data()+1,  inchans.str().data()+1,
-        outdevliststring.str().data()+1, outdevs.str().data()+1, outchans.str().data()+1,
+        idevliststring.str().data()+1, idevs.str().data()+1, ichans.str().data()+1,
+        odevliststring.str().data()+1, odevs.str().data()+1, ochans.str().data()+1,
         rate, dacblocksize, advance, canmulti, flongform!=0);
 }
 
@@ -407,32 +407,19 @@ void glob_audio_properties(t_pd *dummy, t_floatarg flongform) {
 
 /* new values from dialog window */
 void glob_audio_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv) {
-    int nindev=0, noutdev=0;
-    int newindev[4], newinchan[4], newoutdev[4], newoutchan[4];
+    int nidev=0, nodev=0;
+    t_audiodevs ai,ao;
     for (int i=0; i<4; i++) {
-        newindev[i]   = INTARG(i   );
-        newinchan[i]  = INTARG(i+4 );
-        newoutdev[i]  = INTARG(i+8 );
-        newoutchan[i] = INTARG(i+12);
+        ai.dev  [i] = INTARG(i   );
+        ai.chdev[i] = INTARG(i+4 );
+        ao.dev  [i] = INTARG(i+8 );
+        ao.chdev[i] = INTARG(i+12);
     }
-    for (int i=0; i<4; i++) {
-        if (newinchan[i] ) {
-            newindev[ nindev]  = newindev[i];
-            newinchan[nindev] = newinchan[i];
-            nindev++;
-        }
-    }
-    for (int i=0; i<4; i++) {
-        if (newoutchan[i]) {
-            newoutdev[ noutdev]  = newoutdev[i];
-            newoutchan[noutdev] = newoutchan[i];
-            noutdev++;
-        }
-    }
+    for (int i=0; i<4; i++) if (ai.chdev[i]) {ai.dev[nidev] = ai.dev[i]; ai.chdev[nidev] = ai.chdev[i]; nidev++;}
+    for (int i=0; i<4; i++) if (ao.chdev[i]) {ao.dev[nodev] = ao.dev[i]; ao.chdev[nodev] = ao.chdev[i]; nodev++;}
     sys_close_audio();
-    sys_open_audio(nindev,  newindev,  nindev,  newinchan,
-                   noutdev, newoutdev, noutdev, newoutchan,
-                   INTARG(16),INTARG(17),INTARG(18),INTARG(19), 1);
+    sys_open_audio(nidev, ai.dev, nidev, ai.chdev,
+                   nodev, ao.dev, nodev, ao.chdev, INTARG(16),INTARG(17),INTARG(18),INTARG(19), 1);
 }
 
 void sys_setblocksize(int n) {
