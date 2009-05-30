@@ -1803,9 +1803,8 @@ def Canvas init_window {} {
 	    toplevel $win -menu $win.m
     } else {
 	    if {[$self look menubar]} {toplevel $win -menu $win.m} else {toplevel $win -menu ""}
-
     }
-    catch {wm iconphoto $win icon_pd}
+    catch {wm iconphoto $win icon_pd_32}
     set @menubar $win.m
     $self init_menus
     # turn buttonbar on/off
