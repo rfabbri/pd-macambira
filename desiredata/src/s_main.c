@@ -78,7 +78,6 @@ int sys_midioutdevlist[MAXMIDIOUTDEV] = {1};
 static int sys_main_srate;
 static int sys_main_dacblocksize = DEFDACBLKSIZE;
 static int sys_main_advance;
-static int sys_listplease;
 
 /* jsarlo { */
 int sys_externalschedlib;
@@ -193,7 +192,6 @@ static const char *(usagemessage[]) = {
 "-nodac           -- suppress audio output",
 "-noadc           -- suppress audio input",
 "-noaudio         -- suppress audio input and output (-nosound is synonym)",
-"-listdev         -- list audio and MIDI devices",
 
 #define NOT_HERE "(support not compiled in)"
 
@@ -528,15 +526,8 @@ int sys_argparse(int argc, char **argv) {
 	}
         if (ARG("-stdout",1)) {sys_printtofh = stdout; NEXT(1);}
         if (ARG("-stderr",1)) {sys_printtofh = stderr; NEXT(1);}
-        if (ARG("-guicmd",2)) {
-		fprintf(stderr,"Warning: -guicmd ignored");
-		NEXT(2);
-	}
-        if (ARG("-send",2)) {
-            sys_messagelist = namelist_append(sys_messagelist, argv[1], 1);
-            NEXT(2);
-        }
-        if (ARG("-listdev",1)) {sys_listplease=1; NEXT(1);}
+        if (ARG("-guicmd",2)) {fprintf(stderr,"Warning: -guicmd ignored"); NEXT(2);}
+        if (ARG("-send",2)) {sys_messagelist = namelist_append(sys_messagelist,argv[1],1); NEXT(2);}
         /* jsarlo { */
         if (ARG("-schedlib",2)) {
             sys_externalschedlib = 1;
@@ -605,7 +596,6 @@ static void sys_afterargparse() {
     }
     for (int i=0; i<sys_nmidiin;  i++) sys_midiindevlist[i]--;
     for (int i=0; i<sys_nmidiout; i++) sys_midioutdevlist[i]--;
-    if (sys_listplease) sys_listdevs();
     /* get the current audio parameters.  These are set by the preferences mechanism (sys_loadpreferences()) or
        else are the default.  Overwrite them with any results of argument parsing, and store them again. */
     sys_get_audio_params(&audio_in, &audio_out, &rate, &dacblksize, &advance, &scheduler);
