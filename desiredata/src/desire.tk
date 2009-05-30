@@ -1323,12 +1323,12 @@ set item {
 		set fs [lindex [lindex $args $find] 1]
 		lset args $find 1 [format %.0f [expr {$fs*$zoom}]]
 	}
-	set find [lsearch $args "-fill"]
-	if {$find >= 0} {
-		incr find
-		set fill [lindex $args $find]
-		lset args $find [randomise_color $fill]
-	}
+	#set find [lsearch $args "-fill"]
+	#if {$find >= 0} {
+	#	incr find
+	#	set fill [lindex $args $find]
+	#	lset args $find [randomise_color $fill]
+	#}
 	set tags {}
 	foreach s $suffixes {lappend tags "$self$s"}
 	set ss [lindex $tags 0]
@@ -6128,7 +6128,6 @@ def NumBox init {mess} {
 	set @buf ""
 	set @text [clip 0 $@min $@max]
 }
-
 def NumBox calc {x y x1 y1} {
 	set span [expr $@max-$@min]
 	set l [expr $@is_log ? $@log_height : ($@max-$@min)]
@@ -6137,13 +6136,10 @@ def NumBox calc {x y x1 y1} {
 	set d [clip $d $@min $@max]
 	return $d
 }
-
-
 def NumBox reinit {mess} {
 	super $mess
 	set @text $@val
 }
-
 def NumBox draw {} {
 	super
 	mset {x1 y1} [$self xy]
@@ -6161,7 +6157,6 @@ def NumBox draw {} {
 	$self item BASE4  polygon $points2 -outline [$self look frame3] -fill $color4
 	$c raise ${self}BASE4
 }
-
 def NumBox ftoa {} {
 	set f $@text
 	set is_exp 0
@@ -6182,27 +6177,23 @@ def NumBox ftoa {} {
 	}
 	return $buf
 }
-
 def NumBox unfocus {} {set @buf ""; $self changed}
 
 class_new Radio {BlueBox}
-
 def Radio reinit {mess} {
 	super $mess
 	switch [lindex $mess 4] {
-		hradio {set @orient 0} hdl {set @orient 0}
-		vradio {set @orient 1} vdl {set @orient 1}
+		hradio  {set @orient 0} hdl {set @orient 0}
+		vradio  {set @orient 1} vdl {set @orient 1}
 		default {set @orient 0}
 	}
 }
-
 def Radio bbox {} {
 	mset {x1 y1} [$self xy]
 	set x2 [expr $x1+$@w*($@orient ?1:$@n)]
 	set y2 [expr $y1+$@w*($@orient ?$@n:1)]
 	list $x1 $y1 $x2 $y2
 }
-
 def Radio draw {} {
 	mset {x1 y1 x2 y2} [$self bbox]
 	super
@@ -6215,27 +6206,23 @@ def Radio draw {} {
 	}
 	$self set $@on
 }
-
 def Radio set {value} {
 	set c [$self get_canvas]
 	[$c widget] itemconfigure ${self}BUT       -fill #ffffff
 	[$c widget] itemconfigure ${self}BUT$value -fill #000000
 }
-
 def Radio click {x y f target} {
 	mset {x1 y1} [$self xy]
 	set i [expr {($@orient ?$y-$y1:$x-$x1)/$@w}]
 	netsend [list .$self fout $i]
 }
-
 def Radio key_incr {val1 val2} {
 	netsend [list .$self fout [expr $@on - $val2]]
 }
 
-class_new Slider {BlueBox}
-
 # in sliders, @value is the kind of value that goes thru inlets and outlets
 # whereas @val is always measured in "centipixels" (unzoomed).
+class_new Slider {BlueBox}
 def Slider reinit {mess} {
 	super $mess
 	set @knob_thick 4
@@ -6245,7 +6232,6 @@ def Slider reinit {mess} {
 	}
 	$self update_value
 }
-
 def Slider update_value {} {
 	set span [expr {$@max-$@min}]
 	set l [expr $@orient ?$@h:$@w]
@@ -6253,13 +6239,11 @@ def Slider update_value {} {
 	#set t [expr $@val * [$self slider_ratio] * 0.01]
 	#set @value [expr $@min*exp($t)]
 }
-
 def Slider init {mess} {
 	super $mess
 	set @oposition $@min
 	$self update_value
 }
-
 def Slider bbox {} {
 	mset {x1 y1} [$self xy]
 	if {!$@orient} {
@@ -6268,13 +6252,11 @@ def Slider bbox {} {
 		list $x1 [expr $y1-$@knob_thick] [expr $x1+$@w] [expr $y1+$@h]
 	}
 }
-
 #the value/centipixel ratio
 def Slider slider_ratio {} {
 	set diff [expr $@is_log ? log($@max/$@min) : ($@max-$@min)]
 	return [expr $diff / ($@orient ? ($@h-1) : ($@w-1))]
 }
-
 def Slider draw_knob {} {
 	mset {x1 y1 x2 y2} [$self bbox]
 	set l [expr $@orient ?$@h:$@w]
@@ -6293,7 +6275,6 @@ def Slider draw_knob {} {
 	}
 	$self item KNOB rectangle $coords -outline red -fill [darker $color]
 }
-
 def Slider draw {} {
 	mset {x1 y1 x2 y2} [$self bbox]
 	#if {$@orient} {set y1 [expr $y1-2]} {set x1 [expr $x1-2]}
@@ -6302,7 +6283,6 @@ def Slider draw {} {
 	$self draw_knob
 	$self update_value
 }
-
 # not used
 def Slider draw_notches {} {
 	if {$@orient} {
@@ -6319,7 +6299,6 @@ def Slider draw_notches {} {
 	# there were supposed to be 7 notches... i don't remember what happened here.
 	$@canvas item NOTCH $coords -dash [list 1 $eighth 1 $eighth] -width $thick -fill [darker [$self look bg]]
 }
-
 def Slider click {x y f target} {
 	set canvas [$self get_canvas]
 	mset {type id detail} [$canvas identify_target $x $y $f]
@@ -6335,14 +6314,12 @@ def Slider click {x y f target} {
 		netsend [list .$self float $@value]
 	} else {set @oposition $@value}
 }
-
 def Slider unclick {x y f target} {
 	### keep focus if only clicked. do we want that feature?
 	# if {[distance $@click_at [list $x $y]] == 0} {return}
 	set canvas [$self get_canvas]
 	$canvas focus= ""
 }
-
 def Slider motion {x y f target} {
 	set canvas [$self get_canvas]
 	set focused [$self == [$canvas focus]]
@@ -6354,23 +6331,19 @@ def Slider motion {x y f target} {
 	set out [clip $value $@min $@max]
 	netsend [list .$self float $out]
 }
-
 def Slider key_incr {val1 val2} {
 	set @value [expr $@value - $val2]
 	netsend [list .$self float $@value]
 }
-
 def Slider calc {x y x1 y1} {
 	set span [expr $@max-$@min]
 	set l [expr {$@orient ?$@h:$@w}]
 	set d [expr {($@orient ?$y1-$y:$x-$x1)*$span/($l+0.0)}]
 	return $d
 }
-
 def Slider unfocus {} {$self draw}
 
 class_new Labelled {}
-
 def Labelled draw {} {
 	global leet
 	super
@@ -6387,6 +6360,7 @@ def Labelled draw {} {
 	    }
 	$self item LABEL text [list $lx $ly] -text $text -anchor w -font $lfont -fill $lcolor
 }
+
 #-----------------------------------------------------------------------------------#
 class_new Bang {BlueBox}
 def Bang init {mess} {
@@ -6394,12 +6368,10 @@ def Bang init {mess} {
 	set @flash 0
 	set @count 0
 }
-
 def Bang bbox {} {
 	mset {x1 y1} [$self xy]
 	list $x1 $y1 [expr $x1+$@w] [expr $y1+$@w]
 }
-
 def Bang draw {} {
 	super
 	mset {x1 y1 x2 y2} [$self bbox]
@@ -6423,12 +6395,10 @@ def Bang bang {count} {set @count $count; set @flash 1}
 def Bang key_incr {val1 val2} {netsend [list .$self bang]}
 
 class_new Toggle {BlueBox}
-
 def Toggle bbox {} {
 	mset {x1 y1} [$self xy]
 	list $x1 $y1 [expr $x1+$@w] [expr $y1+$@w]
 }
-
 def Toggle draw {} {
 	super
 	mset {x1 y1 x2 y2} [$self bbox]
@@ -6445,7 +6415,6 @@ def Toggle draw {} {
 	$self item X1 line [list $x3 $y3 [expr $x4+1] [expr $y4+1]] -width $t -fill $fill
 	$self item X2 line [list $x3 $y4 [expr $x4+1] [expr $y3-1]] -width $t -fill $fill
 }
-
 def Toggle unclick {x y f target} {}
 def Toggle click {x y f target} {
 	if {!$@on} {set @on 1} {set @on 0}
@@ -6454,29 +6423,24 @@ def Toggle click {x y f target} {
 }
 
 class_new Vu {IEMGUI Box}
-
 set vu_col {
 	0 17 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16
 	15 15 15 15 15 15 15 15 15 15 14 14 13 13 13 13 13 13 13 13 13 13 13 19 19 19
 }
-
 def Vu init {mess} {
 	super $mess
 	set @value 0
 	set @peak 0
 }
-
 def Vu bbox {} {
 	mset {x1 y1} [$self xy]
 	list $x1 $y1 [expr $x1+$@w] [expr $y1+$@h]
 }
-
 def Vu led_size {} {
 	set n [expr $@h/40]
 	if {$n < 2} {set n 2}
 	return [expr $n-1]
 }
-
 def Vu draw {} {
 	global vu_col
 	mset {x1 y1 x2 y2} [$self bbox]
@@ -6512,10 +6476,8 @@ def Vu draw {} {
 	set y [expr $y1 + ($led_size+1)*(41-$@peak) - ($led_size+1)/2]
 	$self item PEAK rectangle [list $x1 $y $x2 [expr $y+$led_size]] -fill [parse_color $c] -width 0
 }
-
 def Vu rms=  {rms } {set @value $rms; $self changed rms}
 def Vu peak= {peak} {set @peak $peak; $self changed peak}
-
 def Vu set {i j} {
 	set @value $i
 	set @peak  $j
@@ -6530,20 +6492,17 @@ if {![catch {
 }
 
 class_new Cnv {Labelled IEMGUI Box}
-
 def Cnv draw {} {
 	mset {x1 y1} [$self xy]
 	$self item BASE rectangle [list $x1 $y1 [expr $x1+$@w] [expr $y1+$@h]] -fill [parse_color $@bcol]
 	super
 }
-
 def Cnv bbox {} {
 	mset {x1 y1} [$self xy]
 	return [list $x1 $y1 [expr $x1+$@w] [expr $y1+$@h]]
 }
 
 class_new Array {Box}
-
 def Array init {mess} {
 	super $mess
 	set @name [lindex $mess 2]
@@ -6551,18 +6510,15 @@ def Array init {mess} {
 	set @data {}
 	set @draw 0
 }
-
 def Array bbox {} {
 	return {0 0 1 1} ;# huh?
 }
-
 def Array draw_name {} {
 	mset {x_off y_off} [$@canvas xy]
 	$self item TEXT text [lmap + [list $x_off $y_off] 2] \
 		    -font [View_look $self font] -text $@name \
 		    -fill [View_look $self fg] -anchor nw
 }
-
 def Array draw {} {
 	$self draw_name
 	mset {x_off y_off} [$@canvas xy]
@@ -6614,7 +6570,6 @@ def Array draw {} {
 		#}
 	}
 }
-
 def Array click {x y f target} {
 	if {[winfo exists [$@canvas widget]]} {set canvas $@canvas} else {set canvas [$@canvas canvas]}
 	$canvas focus= $self
@@ -6662,7 +6617,6 @@ def Array array_set {data_list} {
 ############ evaluator
 
 class_new Listener {Thing}
-
 def Listener init {serf name command} {
 	set @history [History new 20]
 	set @command $command
@@ -6680,12 +6634,10 @@ def Listener init {serf name command} {
 	bind $serf.entry <Down>   "$self scroll_history -1"
 	bind $serf.entry <Return> "$self eval"
 }
-
 def Listener toggle_expand {} {
 	set @expanded [expr 1-$@expanded]
 	if {$@expanded} {$self expand} {$self unexpand}
 }
-
 def Listener expand {} {
 	set e $@serf.entry
 	set text [$e get]
@@ -6695,7 +6647,6 @@ def Listener expand {} {
 	$@serf.1.1.expander configure -image icon_minus
 	bind $e <Alt-Return> "$self eval"
 }
-
 def Listener unexpand {} {
 	set e $@serf.entry
 	set text [$e get 0.0 end]
@@ -6708,24 +6659,20 @@ def Listener unexpand {} {
 	bind $e <Down>   "$self down"
 	bind $e <Return> "$self eval"
 }
-
 def Listener replace {stuff} {
 	$@serf.entry delete 0 end
 	$@serf.entry insert 0 $stuff
 	$@serf.entry icursor end
 }
-
 def Listener scroll_history {incr} {
 	if {![$@history histi]} {$@history set_hist 0 [$self get_command]}
 	$self replace [$@history traverse $incr]
 	
 }
-
 def Listener append {v}  {
 	$@history prepend $v
 	lappend @hist $v; set @histi [llength $@hist]
 }
-
 def Listener get_command {} {
 	set e $@serf.entry
 	if {$@expanded} {
@@ -6735,7 +6682,6 @@ def Listener get_command {} {
 	}
 
 }
-
 def Listener eval {} {
 	set e $@serf.entry
 	$@history histi= 0
@@ -6769,19 +6715,13 @@ set butt {
 	{Array   array  {menuarray 0}}
 }
 
-proc button_bar_add {x y} {
-	global butt
-	lappend butt [list $x $y noload]
-}
-
+proc button_bar_add {x y} {lappend ::butt [list $x $y noload]}
 if {$tk} {
 	set dir $cmdline(icons)
 	foreach icon {mode_edit mode_run pd_32}  {image create photo icon_$icon -file $dir/$icon.gif}
 	foreach b $butt {mset {icon name cmd} $b; image create photo icon_$icon -file $dir/$icon.gif}
 }
-
 class_new ButtonBar {View}
-
 def ButtonBar init {canvas} {
 	set @canvas $canvas
 	set bb .$@canvas.bbar
@@ -6797,39 +6737,30 @@ def ButtonBar init {canvas} {
 	$bb.scale set [format %d%% [expr int(100*[$@canvas zoom])]]
 	$bb.name insert 0 $@canvas
 }
-
 def ButtonBar widget {} {return .$@canvas.bbar}
-
 proc obj_create {c flag} {}
 
 ############ crosshair
 
 class_new Crosshair {View}
-
 def Crosshair classtags {} {return {}}
-
 def Crosshair init {canvas} {
 	super
 	set @canvas $canvas
 	$self data= 0 0 {none}
 }
-
 def Crosshair data= {x y target} {
 	set @x $x
 	set @y $y
 	set @target $target
 }
-
 def Crosshair draw {} {
-	
 	mset {type id detail} $@target
 	set x $@x; set y $@y
-	
 	if {[$@canvas look hairsnap]} {
 		switch -regexp -- $type {^object|outlet|inlet$ {mset {x y x3 y3} [$id bbox]}}
 	}
 	mset {x1 y1 x2 y2} [$self display_area]
-
 	set h1 [list $x1 $y $x2 $y]
 	set v1 [list $x $y1 $x $y2]
 	$self item VHAIR1 line $v1 -fill [$@canvas look crosshair] -width 1 -dash {4 4 4 4}
@@ -6838,33 +6769,28 @@ def Crosshair draw {} {
 
 #def Crosshair erase {} {$self item_delete VHAIR1; $self item_delete HHAIR1}
 class_new Sense {View}
-
 def Sense init {canvas} {
 	super
 	set @canvas $canvas
 	$self data= 0 0 0 red
 }
-
 def Sense data= {x y range col} {
 	set @x $x
 	set @y $y
 	set @range $range
 	set @col $col
 }
-
 def Sense flash {x y sense col} {
 	$self data= $x $y $sense $col
 	$self draw
 	after 500 $self erase
 }
-
 def Sense draw {} {
 	set c [$@canvas widget]
 	set x1 [expr $@x-$@range]; set y1 [expr $@y-$@range]
 	set x2 [expr $@x+$@range]; set y2 [expr $@y+$@range]
 	$self item SENSE oval [list $x1 $y1 $x2 $y2] -fill $@col -outline yellow
 }
-
 def View display_area {} {
 	set c [$@canvas widget]; set z [$@canvas zoom]
 	set edge 10
@@ -6876,7 +6802,6 @@ def View display_area {} {
 }
 
 class_new Grid {View}
-
 def Grid init {canvas} {
 	super
 	set @canvas $canvas
@@ -6887,14 +6812,11 @@ def Grid init {canvas} {
 	set @col [$@canvas look grid]
 	set @gap 5
 }
-
 def Grid classtags {} {return {}}
-
 def Grid update {h w} {set @width $w; set @height $h}
 def Grid size= {size} {set @size $size}
 def Canvas snap_grid {} {return [$self look snap_grid]}
 def Canvas snap_grid= {val} {set ::look(Canvas:snap_grid) $val}
-
 def Canvas snap_objs2grid {} {
 	if {![$self editmode]} {return}
 	foreach obj [$@objects values] {
@@ -6905,7 +6827,6 @@ def Canvas snap_objs2grid {} {
 		$obj moveto $x $y
 	}
 }
-
 def Grid draw {} {
 	mset {x1 y1 x2 y2} [$self display_area]
 	set c [$@canvas widget]
@@ -6914,7 +6835,6 @@ def Grid draw {} {
 	$self draw_lines $y1 $y2 $x1 $x2 HL
 	if {$lowest != -1} {$c lower $self $lowest}
 }
-
 def Grid draw_lines {v1 v2 v3 v4 tag} {
 	set s $@size; set g $@gap
 	for {set i $v1} {$i < $v2} {incr i} {
@@ -6934,7 +6854,6 @@ def Canvas lowest_item {} {
 	set lowest [lindex [$c gettags [lindex $all 0]] 0]
 	return $lowest
 }
-
 #def Canvas grid_size {} {return [$self look grid_size]}
 def Canvas grid_size= {size} {
 	set ::look(Canvas:grid_size) $size
@@ -6943,7 +6862,6 @@ def Canvas grid_size= {size} {
 ############ tooltips (only those that are drawn as canvas items)
 
 class_new Tooltip {View}
-
 def Tooltip init {canvas pos curpos text type iserror} {
 	set @canvas $canvas
 	set @pos $pos
@@ -6952,11 +6870,9 @@ def Tooltip init {canvas pos curpos text type iserror} {
 	set @type $type
 	set @iserror $iserror
 }
-
 def Tooltip iserror {} {return $@iserror}
 def Tooltip curpos  {} {return $@curpos}
 def Tooltip text    {} {return $@text}
-
 def Tooltip draw {} {
 	set c [$@canvas widget]
 	if {$@iserror} {
@@ -6978,11 +6894,8 @@ def Tooltip draw {} {
 	$self item RECT polygon $coords -fill $bg -outline $fg
 	$c lower ${self}RECT ${self}TEXT
 }
-
 # $c delete tooltip_bg tooltip_fg
-
 set tooltip ""
-
 def Canvas show_tooltip {x y text type {iserror 0}} {
 	global tooltip
 	if {$tooltip ne "" && [$tooltip text] eq $text} {return}
@@ -6993,18 +6906,17 @@ def Canvas show_tooltip {x y text type {iserror 0}} {
 
 ############ class browser
 
-class_new ServerClassDict {Observable Thing}
-def ServerClassDict init {} {
-
-}
+# future use, maybe:
+#class_new ServerClassDict {Observable Thing}
+#def ServerClassDict init {} {}
 
 # Completion/Browser init can be cleaned up a bit more, do it later...
 class_new ClassBrowser {Dialogue}
 class_new Browser {ClassBrowser}
 def Browser init {name x y textbox} {super $name $x $y $textbox}
+
 class_new Completion {ClassBrowser}
 def Completion init {name x y textbox} {super $name $x $y $textbox}
-
 def Completion cancel {} {
 	bind $@textbox <Key>            "$@textself key_input %W %x %y %K %A 0"
 	bind $@textbox <Control-Return> "$@textself key_input %W %x %y 10 %A 0"
@@ -7014,7 +6926,6 @@ def Completion cancel {} {
 	$self delete
 }
 def ClassBrowser delete {} {set @exist 0; super}
-
 def ClassBrowser init {name x y textbox} {
 	set @name $name
 	set @width 0
@@ -7024,11 +6935,9 @@ def ClassBrowser init {name x y textbox} {
 	netsend [list pd update-path]
         netsend [list pd update-class-list $self list_callback]
 }
-
 def ClassBrowser fill_box {s} {
-	global class_list
 	$@listbox delete 0 end
-	foreach class [lsort $class_list] {
+	foreach class [lsort $::class_list] {
 		if {[string length $s]==0 || [string first $s $class]>=0} {
 			set t "\[$class\]"
 			if {[can_say $class]} {append t "  [say $class]"}
@@ -7041,7 +6950,7 @@ def ClassBrowser fill_box {s} {
 	if {![$@listbox size]} {$@listbox insert 0 $none; set @width [string length $none]}
 	$@listbox selection set 0 0
 }
- 
+
 def Completion fill_box {s} {
 	super $s
 	wm maxsize .$self [winfo reqwidth .$self.comp] [winfo reqheight .$self.comp]
@@ -7188,7 +7097,6 @@ def ClassBrowser complete {} {
 	set class [$self current_class]
 	$@textbox delete 1.0 1.end
 	$@textbox insert 1.0 $class
-
 	$obj unedit
 	destroy .$self
 }
@@ -7303,7 +7211,6 @@ proc change_entry {self val} {
 }
 
 class_new Dialogue {View}
-
 def Dialogue add_stuff {f name label} {
 	frame $f
 #	frame $f.label -width $@label_width -borderwidth 2
@@ -7313,7 +7220,6 @@ def Dialogue add_stuff {f name label} {
 	pack [label $f.label -text $label -width [expr $@label_width/7] -wraplength $@label_width -anchor e] -side left
 	balloon $f.label $name
 }
-
 def Dialogue add_side {f name label} {
 	$self add_stuff $f $name $label
 	frame $f.side -relief ridge -borderwidth 2
@@ -7326,7 +7232,6 @@ def Dialogue add_side {f name label} {
 	pack $f.side.bottom -side bottom
 	pack $f.side -side left
 }
-
 def Dialogue add_color {f name label} {
 	$self add_stuff $f $name $label
 	set v $@$name
@@ -7339,8 +7244,6 @@ def Dialogue add_color {f name label} {
 	bind $f.preset <Return> "$self color_popup $f $name 10"
 	pack $f.color $f.preset -side left
 }
-
-
 def Dialogue add_choice {f name label choices} {
 	$self add_stuff $f $name $label
 	menu $f.menu -tearoff 0
@@ -7358,7 +7261,6 @@ def Dialogue add_choice {f name label choices} {
 	pack $f.label $f.butt -side left
 	bind $f.butt <1> [list $self dropmenu_open $f $name]
 }
-
 def Dialogue add_key {f name label} {
 	set text ""
 	set n 0
@@ -7375,7 +7277,6 @@ def Dialogue add_key {f name label} {
 		pack $f.$item_lower -side left
 	}
 }
-
 def Dialogue add_folders {f name label} {
 	$self add_stuff $f $name $label
 	set v $_($self:$name) ;# bug in poetcl
@@ -7397,7 +7298,6 @@ def Dialogue add_folders {f name label} {
 	}
 	pack $f.b -side top
 }
-
 def Dialogue add_libraries {f name label} {
 	$self add_stuff $f $name $label
 	set v $_($self:$name) ;# bug in objtcl
@@ -7408,12 +7308,9 @@ def Dialogue add_libraries {f name label} {
 	foreach line $v {$f.a.list insert end $line}
 	# save the listbox path at @$name instead
 	set @$name $f.a.list
-	scrollbar $f.a.yscroll -command "$f.a.list yview"
-	scrollbar $f.a.xscroll -command "$f.a.list xview" -orient horizontal
-
-	pack $f.a.xscroll -side bottom -fill x
+	pack [scrollbar $f.a.yscroll -command "$f.a.list yview"] -side bottom -fill x
 	pack $f.a.list -side left -fill both -expand 1
-	pack $f.a.yscroll -side left -fill y
+	pack [scrollbar $f.a.xscroll -command "$f.a.list xview" -orient horizontal] -side left -fill y
 	pack $f.a -side left
 
 	frame $f.b       -borderwidth 0
@@ -7427,7 +7324,6 @@ def Dialogue add_libraries {f name label} {
 	}
 	pack $f.b -side top
 }
-
 def Dialogue dir_add {listbox} {
 	set dir [tk_chooseDirectory -initialdir ~ -title "Choose a folder" -parent .$self]
 	if {$dir == ""} {return}
@@ -7435,13 +7331,11 @@ def Dialogue dir_add {listbox} {
 	$listbox yview end
 	focus .$self
 }
-
 # doesn't work with toplevel widget
 proc upwidget {levels name} {
 	set l [split $name .]
 	return [join [lrange $l 0 end-$levels] .]
 }
-
 def Dialogue lib_add {f} {
 	set f [upwidget 2 $f]
 	set listbox $f.a.list
@@ -7452,14 +7346,12 @@ def Dialogue lib_add {f} {
 	$entry delete 0 end
 	focus $entry
 }
-
 def Dialogue listbox_remove {listbox} {
 	set sel [$listbox curselection]
 	if {$sel == ""} {return}
 	$listbox delete $sel
 	$listbox selection set $sel
 }
-
 def Dialogue listbox_swap {listbox dir} {
 	set sel [$listbox curselection]
 	if {$sel == ""} {return}
@@ -7471,7 +7363,6 @@ def Dialogue listbox_swap {listbox dir} {
 	$listbox selection set $sel
 	$listbox see $sel
 }
-
 def Dialogue add_devlist {f name label} {
 	$self add_stuff $f $name $label
 	menu $f.menu -tearoff 0
@@ -7488,33 +7379,28 @@ def Dialogue add_devlist {f name label} {
 	pack $f.label $f.butt -side left
 	bind $f.butt <1> [list $self dropmenu_open $f $name]
 }
-
 def Dialogue add_spins {f name label option} {
-	global _
 	$self add_stuff $f $name $label
 	set i 0
 	set trim_name [string trimleft $name "-"]
 	set n [llength $@$option]
 	foreach part $@$trim_name {
 		if {$i < $n} {set s "readonly"} else {set s "disabled"}
-		set v "_($self:$trim_name${i})"
+		set v "::_($self:$trim_name${i})"
 		spinbox $f.$i -width 2 -command "$self spinning %d $v" -state $s -textvariable $v
 		pack $f.$i -side left
 		balloon $f.$i "Device [expr $i+1]"
 		incr i
 	}
 }
-
 def Dialogue spinning {mode v} {
 	switch $mode {
 		up {incr $v; puts " incr $v"}
 		down {incr $v -1}
 	}
 }
-
 def Dialogue listbox_up   {listbox} {$self listbox_swap $listbox -1}
 def Dialogue listbox_down {listbox} {$self listbox_swap $listbox +1}
-
 def Dialogue add {w args} {
 	foreach row $args {
 		set name [lindex $row 0]
@@ -7585,7 +7471,6 @@ proc logvar {args} {
 }
 
 def Dialogue spinbox_update {mode} {puts " $mode"}
-
 def Dialogue add_font {f name label class} {
 	$self add_stuff $f $name $label
 	set v $@$name
@@ -7596,10 +7481,9 @@ def Dialogue add_font {f name label class} {
 	pack $f.font $f.preset -side left
 }
 
-class_new FontDialogue {Dialogue}
-
 def Canvas fd {} {FontDialogue new_as view_font [$self look font] "View"}
 
+class_new FontDialogue {Dialogue}
 def FontDialogue init {class orig} {
 	if {[winfo exists .$self]} {return}
 	super cancel ok
@@ -7660,7 +7544,6 @@ def FontDialogue init {class orig} {
 	focus $f.list.box
 	$self none_resizable
 }
-
 def FontDialogue font_update {f} {
 	global font
 	set lb $f.list.box
@@ -7671,7 +7554,6 @@ def FontDialogue font_update {f} {
 	# logvar @str
 	$f.preview.canvas itemconfigure ${self}TEXT -font $@str
 }
-
 def FontDialogue font_changesize {f mode} {
 	switch $mode {
 		up   {set @size [expr $@size+1]}
@@ -7681,18 +7563,15 @@ def FontDialogue font_changesize {f mode} {
 	$f.var.size.entry insert 0 $@size
 	$self font_update $f
 }
-
 def FontDialogue font_style {f bold} {
 	set @bold $bold
 	$self font_update $f
 }
-
 def FontDialogue font_update_size {f} {
 	set size [$f.var.size.entry get]
 	if [regexp {^[0-9]+$} $size] {set @size $size}
 	$self font_update $f
 }
-
 def FontDialogue apply {} {
 	set ::look($@class:font) $@str
 	$@orig configure -font [lreplace $@str 1 1 -10] -text $@str -width [string length $@str]
@@ -7762,7 +7641,6 @@ def Dialogue close  {} {$self delete}
 def Dialogue apply  {} {}
 def Dialogue delete {} {destroy .$self; super}
 def Dialogue erase {} {}; # so that it doesn't call View erase
-
 def Dialogue init {args} {
 	super
 	set f .$self
@@ -7785,28 +7663,23 @@ def Dialogue init {args} {
 	bind .$self         <Tab> "$self traversal %K %W forward"
 	bind .$self <Control-Tab> "$self traversal %K %W back"
 }
-
 def Dialogue none_resizable {} {wm resizable .$self 0 0}
-
 def Dialogue traversal {k w direction} {
 	switch $direction {
 		forward {focus [tk_focusNext $w]}
 		back    {focus [tk_focusPrev $w]}
 	}
 }
-
 def Dialogue dropmenu_open {frame} {
 	set x [winfo rootx $frame.butt]
 	set y [expr [winfo height $frame.butt] + [winfo rooty $frame.butt]]
 	tk_popup $frame.menu $x $y
 }
-
 def Dialogue dropmenu_set {frame var part val} {
 	#if {$say} {set text [say $part]} else {set text $part}
 	set @$var $val
 	$frame.butt configure -text [say $part]
 }
-
 def Dialogue color_popup_select {frame var color} {
 	set @$var $color
 	set col [format #%6.6x $color]
@@ -7815,7 +7688,6 @@ def Dialogue color_popup_select {frame var color} {
 	if {$self != "ddrc"} {$self do_auto_apply}
 	#$self do_auto_apply
 }
-
 def Dialogue color_popup {frame var i} {
 	set w $frame.color.popup
 	if [winfo exists $w] {destroy $w}
@@ -7828,7 +7700,6 @@ def Dialogue color_popup {frame var i} {
 	}
 	tk_popup $w [expr [winfo rootx $frame.color]] [expr [winfo rooty $frame.color]]
 }
-
 def Dialogue choose_col {frame var val} {
 	set c 0xFFFFFF
 	set color [tk_chooseColor -title $val -initialcolor $val]
@@ -7839,8 +7710,6 @@ def Dialogue choose_col {frame var val} {
 }
 
 class_new PagedDialogue {Dialogue}
-class_new Notebook    {Thing}
-
 def PagedDialogue init {args} {
 	eval [concat [list super] $args]
 	set @nb [Notebook new_as $self.1]
@@ -7848,6 +7717,8 @@ def PagedDialogue init {args} {
 	pack .$@nb -expand 1 -fill both
 	$self none_resizable
 }
+
+class_new Notebook    {Thing}
 def Notebook delete {} {super}
 def Notebook init {{width 590} {height 350}} {
 	set f .$self
@@ -7920,14 +7791,12 @@ proc pdtk_audio_dialog {indevlist indevs inchans outdevlist outdevs outchans sr 
 }
 
 class_new ServerPrefsDialogue {PagedDialogue}
-
 def ServerPrefsDialogue apply {} {
 	set audio_props [$self audio_properties=?]
 	#pd pd audio-dialog $audio_props
 	netsend [list "pd" "audio-dialog" $audio_props]
 	$self write
 }
-
 def ServerPrefsDialogue init_reverse_hash {} {
 	global pdrc_options pdrc_options_h pd_apilist2
 	foreach {type names} $pdrc_options {
@@ -7943,7 +7812,6 @@ def ServerPrefsDialogue init_reverse_hash {} {
 		}
 	}
 }
-
 def ServerPrefsDialogue audio_properties {indevlist indevs inchans outdevlist outdevs outchans sr dspblock advance multi} {
 	set @audioindev $indevlist
 	set @audiooutdev $outdevlist
@@ -7968,7 +7836,6 @@ def ServerPrefsDialogue audio_properties {indevlist indevs inchans outdevlist ou
 		$self update_content
 	}
 }
-
 def ServerPrefsDialogue audio_properties=? {} {
 	set indev0 [lsearch $@audioindev $@audioindev0]
 	set outdev0 [lsearch $@audiooutdev $@audiooutdev0]
@@ -7976,7 +7843,6 @@ def ServerPrefsDialogue audio_properties=? {} {
 		     $outdev0 0 0 0 $@outchannels0 $@outchannels1 $@outchannels2 $@outchannels3 \
 	             $@r $@blocksize $@audiobuf]
 }
-
 def ServerPrefsDialogue read_one {type name contents i} {
 	switch -- $type {
 		folders   {incr i; lappend @$name [lindex $contents $i]}
@@ -7993,7 +7859,6 @@ def ServerPrefsDialogue read_one {type name contents i} {
 	incr i
 	return $i
 }
-
 def ServerPrefsDialogue read {} {
 	global pdrc_options pdrc_options_h cmdline
 	set fd [open $cmdline(rcfilename) "RDONLY CREAT"]
@@ -8017,7 +7882,6 @@ def ServerPrefsDialogue read {} {
 		set i [$self read_one $type $name $contents $i]
 	}
 }
-
 def ServerPrefsDialogue write {} {
 	set fd [open $::cmdline(rcfilename) w]
 	#set fd stdout; puts "WOULD SAVE:"
@@ -8041,15 +7905,12 @@ def ServerPrefsDialogue write {} {
 	close $fd
 	#puts "THE END"
 }
-def ServerPrefsDialogue reset {} {
-}
-
+#def ServerPrefsDialogue reset {} {}
 def ServerPrefsDialogue init_content {} {
-	global pdrc_options
 	set f .$self.1
 	set section 0
 	set @label_width 200 ;# 24
-	foreach {type names} $pdrc_options {
+	foreach {type names} $::pdrc_options {
 		set name [lindex [split [lindex $names 0] "|"] 0]
 		switch $type { void { set type toggle }}
 		switch $type {
@@ -8072,11 +7933,7 @@ def ServerPrefsDialogue init_content {} {
 	}
 	$@nb page_select 1
 }
-
-def ServerPrefsDialogue update_content {} {
-	$self update_channels
-}
-
+def ServerPrefsDialogue update_content {} {$self update_channels}
 def ServerPrefsDialogue update_channels {} {
 	set  indev_len [llength $@audioindev]
 	set outdev_len [llength $@audiooutdev]
@@ -8093,7 +7950,6 @@ def ServerPrefsDialogue update_channels {} {
 		incr i
 	}
 }
-
 def ServerPrefsDialogue init {} {
 	netsend [list pd audio-properties]
 	$self init_reverse_hash
@@ -8101,7 +7957,6 @@ def ServerPrefsDialogue init {} {
 	super reset cancel apply ok
 	# pd pd  midi-properties
 }
-
 def ServerPrefsDialogue dropmenu_set {frame var part val} {
 	set trim_part [string trimleft $part "-"]
 	set trim_var [string trimleft $var "-"]
@@ -8228,7 +8083,6 @@ section Client others
 class_new ClientPrefsDialogue {PagedDialogue}
 def ClientPrefsDialogue apply {} {$self write; $self do_apply}
 def ClientPrefsDialogue read {} {read_ddrc}
-
 def ClientPrefsDialogue do_apply {} {
 	foreach canvas $::window_list {
 		if {[$canvas class] == "Canvas"} {
@@ -8241,7 +8095,6 @@ def ClientPrefsDialogue do_apply {} {
 		}
 	}
 }
-
 def ClientPrefsDialogue write {} {
 	global look key
 	$self get_val
@@ -8268,7 +8121,6 @@ def ClientPrefsDialogue write {} {
 	}
 	close $fd
 }
-
 #this retrieves the values set in the editor
 def ClientPrefsDialogue get_val {} {
 	global ddrc_options look key accels
@@ -8306,15 +8158,12 @@ def ClientPrefsDialogue get_val {} {
 		}
 	}
 }
-
 def ClientPrefsDialogue reset {} {
 	# this should reload defaults.ddrc ?
 }
-
 def ClientPrefsDialogue revert {} {
 	# this should reload currently used settings ?
 }
-
 def ClientPrefsDialogue init {} {
 	global ddrc_options look key
 	#do we need to read .ddrc each time the pref editor is opened?
@@ -8325,7 +8174,6 @@ def ClientPrefsDialogue init {} {
 	set section 0
 	set subsection 0
 	set @label_width 200 ;# 24
-
 	foreach {type class names} $ddrc_options {
 		set name [lindex [split $names |] 0]
 		switch $type { void { set type toggle }}
@@ -8383,13 +8231,11 @@ def ClientPrefsDialogue init {} {
 	}
 	$@nb page_select 1
 }
-
 def ClientPrefsDialogue dropmenu_set {frame var part val} {
 	set @$var $part
 	# set _($self:${var}2) [say $part]
 	$frame.butt configure -text [say $part]
 }
-
 def ClientPrefsDialogue dropmenu_open {f name} {
 	super $f
 }
@@ -8397,7 +8243,6 @@ def ClientPrefsDialogue dropmenu_open {f name} {
 ############ find dialog ###########
 
 class_new FindDialogue {Dialogue}
-
 def FindDialogue init {canvas} {
 	super cancel find
 	set @canvas $canvas
@@ -8406,7 +8251,6 @@ def FindDialogue init {canvas} {
 	$self add $f [list "string" "entry"]
 	focus .find.string.entry
 }
-
 def FindDialogue find {} {$self ok}
 def FindDialogue ok {} {
 	$@canvas find_string= $@string
@@ -8432,7 +8276,6 @@ def ClientClassTreeDialogue make_row {w tree} {
 		incr i
 	}
 }
-
 def ClientClassTreeDialogue init {} {
 	super close
 	pack [frame .$self.1   -width 600 -height 400] -fill y -expand y
@@ -8445,7 +8288,6 @@ def ClientClassTreeDialogue init {} {
 	$self make_row $w [Thing get_hierarchy]
 	after 100 "$self update_scrollbar"
 }
-
 def ClientClassTreeDialogue update_scrollbar {} {
 	set w .$self.1.1
 	set zy [winfo height $w]
@@ -8454,7 +8296,6 @@ def ClientClassTreeDialogue update_scrollbar {} {
 	set y2 [expr   0.0+$y1+$zy]
 	.$self.1.scroll set [expr $y1/$sy] [expr $y2/$sy]
 }
-
 def ClientClassTreeDialogue scroll {args} {
 	set w .$self.1.1
 	set zy [winfo height $w]
@@ -8472,7 +8313,6 @@ def ClientClassTreeDialogue scroll {args} {
 }
 
 class_new AboutDialogue {Dialogue}
-
 def AboutDialogue init {} {
 	super close
         wm title .$self "About DesireData"
@@ -8544,7 +8384,6 @@ def Class get_hierarchy {} {
 
 #----------------------------------------------------------------
 class_new ClipboardDialogue {Dialogue}
-
 def ClipboardDialogue init {clipboard} {
 	super close
 	set @clipboard $clipboard
@@ -8554,12 +8393,10 @@ def ClipboardDialogue init {clipboard} {
 	$@clipboard subscribe $self
 	$self notice
 }
-
 def ClipboardDialogue notice {args} {
 	.$self.text delete 0.0 end
 	.$self.text insert 0.0 [$@clipboard value]
 }
-
 def ClipboardDialogue delete {} {
 	$@clipboard unsubscribe $self
 	super
@@ -8567,7 +8404,6 @@ def ClipboardDialogue delete {} {
 
 #----------------------------------------------------------------
 class_new ListDialogue {Dialogue}
-
 def ListDialogue init {history title} {
 	super close
 	set @history $history
@@ -8579,23 +8415,19 @@ def ListDialogue init {history title} {
 	$@history subscribe $self
 	$self notice
 }
-
 def ListDialogue listbox {} {return .$self.1.list}
-
 def ListDialogue notice {args} {
 	set w [$self listbox]
 	$w delete 0 end
 	foreach e [$@history list] {$w insert end $e}
 	$w see end
 }
-
 def ListDialogue delete {} {
 	$@history unsubscribe $self
 	super
 }
 
 class_new EventHistoryDialogue {ListDialogue}
-
 def EventHistoryDialogue init {history} {
 	super $history [say event_history_view]
 	pack [checkbutton .$self.hide -text [say hide_key_release]] -fill x
@@ -8604,7 +8436,6 @@ def EventHistoryDialogue init {history} {
 
 #----------------------------------------------------------------
 #class_new Splash {Thing}
-
 #def Splash init {} {
 #	toplevel .$self
 #	frame .$self.f
