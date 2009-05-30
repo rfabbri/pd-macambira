@@ -31,7 +31,7 @@
 #include "cv.h"
 #endif
 
-
+#define MAX_COMPONENTS 10
 
 typedef struct pdp_opencv_floodfill_struct
 {
@@ -39,6 +39,8 @@ typedef struct pdp_opencv_floodfill_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
+    t_outlet *x_outlet1;
+    t_atom x_list[5];
     int x_packet0;
     int x_packet1;
     int x_dropped;
@@ -50,20 +52,22 @@ typedef struct pdp_opencv_floodfill_struct
 
     int x_infosok; 
 
-    int up_diff;
-    int lo_diff;
-    int ffill_case;
-    int connectivity;
-    int is_color;
-    int is_mask;
-    int new_mask_val;
+    int x_up;
+    int x_lo;
+    int x_connectivity;
+    int x_color;
 
-    // The output and temporary images
+    // tracked components
+    int x_xcomp[MAX_COMPONENTS];
+    int x_ycomp[MAX_COMPONENTS];
 
-    IplImage* color_img0;
-    IplImage* mask;
+    // fill color
+    int x_r[MAX_COMPONENTS];
+    int x_g[MAX_COMPONENTS];
+    int x_b[MAX_COMPONENTS];
+
+    // opencv data
     IplImage* color_img;
-    IplImage* gray_img0;
     IplImage* gray_img;
     
 } t_pdp_opencv_floodfill;
@@ -72,39 +76,31 @@ typedef struct pdp_opencv_floodfill_struct
 
 static void pdp_opencv_floodfill_process_rgb(t_pdp_opencv_floodfill *x)
 {
-    t_pdp     *header = pdp_packet_header(x->x_packet0);
-    short int *data   = (short int *)pdp_packet_data(x->x_packet0);
-    t_pdp     *newheader = pdp_packet_header(x->x_packet1);
-    short int *newdata = (short int *)pdp_packet_data(x->x_packet1); 
-    int i;
-      
+  t_pdp     *header = pdp_packet_header(x->x_packet0);
+  short int *data   = (short int *)pdp_packet_data(x->x_packet0);
+  t_pdp     *newheader = pdp_packet_header(x->x_packet1);
+  short int *newdata = (short int *)pdp_packet_data(x->x_packet1); 
+  int i;
+  CvConnectedComp comp;
+  int flags = x->x_connectivity + ( 255 << 8 ) + CV_FLOODFILL_FIXED_RANGE;
 
     if ((x->x_width != (t_int)header->info.image.width) || 
         (x->x_height != (t_int)header->info.image.height)) 
     {
 
-    	post("pdp_opencv_floodfill :: resizing plugins");
-	
-    	//cv_freeplugins(x);
-
-    	x->x_width = header->info.image.width;
-    	x->x_height = header->info.image.height;
-    	x->x_size = x->x_width*x->x_height;
+      post("pdp_opencv_floodfill :: resizing plugins");
+  
+      x->x_width = header->info.image.width;
+      x->x_height = header->info.image.height;
+      x->x_size = x->x_width*x->x_height;
     
-    	//Destroy cv_images
-    	cvReleaseImage( &x->color_img );
-    	cvReleaseImage( &x->color_img0 );
-    	cvReleaseImage( &x->mask );
-    	cvReleaseImage( &x->gray_img );
-    	cvReleaseImage( &x->gray_img0 );
-
+      //Destroy cv_images
+      cvReleaseImage( &x->color_img );
+      cvReleaseImage( &x->gray_img );
    
-	//Create cv_images 
-    	x->color_img0 = cvCreateImage( cvSize(x->x_width,x->x_height), 8, 3 );
-    	x->color_img = cvCreateImage( cvSize(x->x_width,x->x_height), 8, 3 );
-    	x->gray_img0 = cvCreateImage( cvSize(x->x_width, x->x_height), 8, 1 );
-    	x->gray_img = cvCreateImage( cvSize(x->x_width, x->x_height), 8, 1 );
-    	x->mask = cvCreateImage( cvSize(x->x_width + 2, x->x_height + 2), 8, 1 );
+      //Create cv_images 
+      x->color_img = cvCreateImage( cvSize(x->x_width,x->x_height), 8, 3 );
+      x->gray_img = cvCreateImage( cvSize(x->x_width, x->x_height), 8, 1 );
     }
     
     newheader->info.image.encoding = header->info.image.encoding;
@@ -112,87 +108,56 @@ static void pdp_opencv_floodfill_process_rgb(t_pdp_opencv_floodfill *x)
     newheader->info.image.height = x->x_height;
 
     memcpy( newdata, data, x->x_size*3 );
-    // FEM UNA COPIA DEL PACKET A x->grey->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( x->color_img->imageData, data, x->x_size*3 );
-
     
-    cvCvtColor(x->color_img, x->gray_img, CV_BGR2GRAY);
+    if ( !x->x_color )
+    {
+      cvCvtColor(x->color_img, x->gray_img, CV_BGR2GRAY);
+    }
 
+    // mark recognized components
+    for ( i=0; i<MAX_COMPONENTS; i++ )
+    {
+       if ( x->x_xcomp[i] != -1 )
+       {
+         if ( x->x_color )
+         {
+            CvPoint seed = cvPoint(x->x_xcomp[i],x->x_ycomp[i]);
+            CvScalar color = CV_RGB( x->x_r[i], x->x_g[i], x->x_b[i] );
+            cvFloodFill( x->color_img, seed, color, CV_RGB( x->x_lo, x->x_lo, x->x_lo ),
+                         CV_RGB( x->x_up, x->x_up, x->x_up ), &comp, flags, NULL );
+            SETFLOAT(&x->x_list[0], i);
+            SETFLOAT(&x->x_list[1], comp.rect.x);
+            SETFLOAT(&x->x_list[2], comp.rect.y);
+            SETFLOAT(&x->x_list[3], comp.rect.width);
+            SETFLOAT(&x->x_list[4], comp.rect.height);
+            outlet_list( x->x_outlet1, 0, 5, x->x_list );
+         }
+         else
+         {
+            CvPoint seed = cvPoint(x->x_xcomp[i],x->x_ycomp[i]);
+            CvScalar brightness = cvRealScalar((x->x_r[i]*2 + x->x_g[i]*7 + x->x_b[i] + 5)/10);
+            cvFloodFill( x->gray_img, seed, brightness, cvRealScalar(x->x_lo),
+                         cvRealScalar(x->x_up), &comp, flags, NULL );
+            SETFLOAT(&x->x_list[0], i);
+            SETFLOAT(&x->x_list[1], comp.rect.x);
+            SETFLOAT(&x->x_list[2], comp.rect.y);
+            SETFLOAT(&x->x_list[3], comp.rect.width);
+            SETFLOAT(&x->x_list[4], comp.rect.height);
+            outlet_list( x->x_outlet1, 0, 5, x->x_list );
+         }
+       }
+    }
 
-	int px = 0;       
-	int py = 0;       
-	int biggestNum=0,biggestLocX=0,biggestLocY=0;
-	int haveOne=0;
-	CvPixelPosition8u sil;
-	int stride = x->gray_img->widthStep;
-	unsigned char * pI = (unsigned char *)x->gray_img->imageData;
-	CV_INIT_PIXEL_POS(sil, pI, x->gray_img->widthStep, cvSize(x->gray_img->width, x->gray_img->height), 0, 0,IPL_ORIGIN_TL);
-	CvPoint xy;
-        CvPoint seed = cvPoint(px,py);
-        int lo = x->ffill_case == 0 ? 0 : x->lo_diff;
-        int up = x->ffill_case == 0 ? 0 : x->up_diff;
-        int flags = x->connectivity + (x->new_mask_val << 8) +
-                        (x->ffill_case == 1 ? CV_FLOODFILL_FIXED_RANGE : 0);
-        CvConnectedComp comp;
-	int min_area_size = 200;
-
-	for(py=0; py<x->gray_img->height; py++)
-	{
-		for(px=0; px<x->gray_img->width; px++)
-		{
- 			if(*(sil.currline + sil.x) != 0) // check if used yet
-			{
-				xy.x = px;
-				xy.y = py;
-				cvFloodFill ( x->gray_img, xy, cvRealScalar(100), cvRealScalar(lo), cvRealScalar(up), &comp, flags, NULL );	
-				// if size is too small remove that region
-				// Also, keep only the biggest region!!!	
-				if( ((int)(comp.area)<min_area_size) || ((int)(comp.area)<biggestNum) )
-				{
-					// remove it
-					//cvFloodFill ( x->gray_img, xy, cvRealScalar(0), cvRealScalar(lo), cvRealScalar(up), &comp, flags, NULL );
-				} else { // for keeping just the largest
-					// remove previous max
-					if(haveOne)
-					{
-						xy.x = biggestLocX;
-						xy.y = biggestLocY;
-						//cvFloodFill ( x->gray_img, xy, cvRealScalar(0), cvRealScalar(lo), cvRealScalar(up), &comp, flags, NULL );
-					} else haveOne=1;
-					biggestNum=(int)(comp.area);
-					biggestLocX=px;
-					biggestLocY=py;
-				}
-			}
-		CV_MOVE_RIGHT_WRAP(sil, 1);
-		}
-	CV_MOVE_DOWN(sil, 1);
-	}
-	if(haveOne)
-	{
-		xy.x = biggestLocX;
-		xy.y = biggestLocY;
-		//cvFloodFill ( x->gray_img, xy, cvRealScalar(255), cvRealScalar(lo), cvRealScalar(up), &comp, flags, NULL );
-	}
-            
-                
-
-		//CvScalar brightness = cvRealScalar(255);
-                //cvFloodFill( x->color_img, seed, CV_RGB(255,255,255), CV_RGB(lo,lo,lo),
-                //             CV_RGB(up,up,up), &comp, flags, NULL );
-
-    cvCvtColor(x->gray_img, x->color_img, CV_GRAY2BGR);
+    if ( !x->x_color )
+    {
+      cvCvtColor(x->gray_img, x->color_img, CV_GRAY2RGB);
+    }
 
     memcpy( newdata, x->color_img->imageData, x->x_size*3 );
-    //printf("%g pixels were repainted\n", comp.area );
     return;
 }
 
-
-static void pdp_opencv_floodfill_diff(t_pdp_opencv_floodfill *x, t_floatarg f)
-{
-	if ((f==1)||(f==3)||(f==5)||(f==7)) x->up_diff = (int)f;
-}
 
 static void pdp_opencv_floodfill_sendpacket(t_pdp_opencv_floodfill *x)
 {
@@ -206,34 +171,27 @@ static void pdp_opencv_floodfill_sendpacket(t_pdp_opencv_floodfill *x)
 
 static void pdp_opencv_floodfill_process(t_pdp_opencv_floodfill *x)
 {
-   int encoding;
-   t_pdp *header = 0;
-   char *parname;
-   unsigned pi;
-   int partype;
-   float pardefault;
-   t_atom plist[2];
-   t_atom tlist[2];
-   t_atom vlist[2];
+  int encoding;
+  t_pdp *header = 0;
 
-   /* check if image data packets are compatible */
-   if ( (header = pdp_packet_header(x->x_packet0))
-	&& (PDP_BITMAP == header->type)){
+  /* check if image data packets are compatible */
+  if ( (header = pdp_packet_header(x->x_packet0))
+  && (PDP_BITMAP == header->type)){
     
-	/* pdp_opencv_floodfill_process inputs and write into active inlet */
-	switch(pdp_packet_header(x->x_packet0)->info.image.encoding){
+  /* pdp_opencv_floodfill_process inputs and write into active inlet */
+  switch(pdp_packet_header(x->x_packet0)->info.image.encoding){
 
-	case PDP_BITMAP_RGB:
+   case PDP_BITMAP_RGB:
             x->x_packet1 = pdp_packet_clone_rw(x->x_packet0);
             pdp_queue_add(x, pdp_opencv_floodfill_process_rgb, pdp_opencv_floodfill_sendpacket, &x->x_queue_id);
-	    break;
+      break;
 
-	default:
-	    /* don't know the type, so dont pdp_opencv_floodfill_process */
-	    break;
-	    
-	}
-    }
+   default:
+      /* don't know the type, so dont pdp_opencv_floodfill_process */
+      break;
+      
+   }
+  }
 
 }
 
@@ -257,28 +215,137 @@ static void pdp_opencv_floodfill_free(t_pdp_opencv_floodfill *x)
 
     pdp_queue_finish(x->x_queue_id);
     pdp_packet_mark_unused(x->x_packet0);
-    //cv_freeplugins(x);
     
-    	//Destroy cv_images
-    	cvReleaseImage( &x->color_img );
-    	cvReleaseImage( &x->color_img0 );
-    	cvReleaseImage( &x->mask );
-    	cvReleaseImage( &x->gray_img );
-    	cvReleaseImage( &x->gray_img0 );
+    //Destroy cv_images
+    cvReleaseImage( &x->color_img );
+    cvReleaseImage( &x->gray_img );
+}
+
+static void pdp_opencv_floodfill_up_diff(t_pdp_opencv_floodfill *x, t_floatarg fupdiff )
+{
+    if ( ( (int)fupdiff >= 0 ) && ( (int)fupdiff <= 255 ) )
+    {
+       x->x_up = (int)fupdiff;
+    }
+}
+
+static void pdp_opencv_floodfill_lo_diff(t_pdp_opencv_floodfill *x, t_floatarg flodiff )
+{
+    if ( ( (int)flodiff >= 0 ) && ( (int)flodiff <= 255 ) )
+    {
+       x->x_lo = (int)flodiff;
+    }
+}
+
+static void pdp_opencv_floodfill_color(t_pdp_opencv_floodfill *x, t_floatarg fcolor )
+{
+    if ( ( (int)fcolor == 0 ) || ( (int)fcolor == 1 ) )
+    {
+       x->x_color = (int)fcolor;
+    }
+}
+
+static void pdp_opencv_floodfill_fillcolor(t_pdp_opencv_floodfill *x, t_floatarg findex, t_floatarg fr, t_floatarg fg, t_floatarg fb )
+{
+    if ( ( (int)findex <= 0 ) || ( (int)findex > MAX_COMPONENTS ) )
+    {
+       post( "pdp_opencv_floodfill : wrong color index : %d", (int)findex );
+       return;
+    }
+
+    if ( ( (int)fr >= 0 ) || ( (int)fr <= 255 ) )
+    {
+       x->x_r[(int)findex-1] = (int)fr;
+    }
+
+    if ( ( (int)fg >= 0 ) || ( (int)fg <= 255 ) )
+    {
+       x->x_g[(int)findex-1] = (int)fg;
+    }
+
+    if ( ( (int)fb >= 0 ) || ( (int)fb <= 255 ) )
+    {
+       x->x_b[(int)findex-1] = (int)fb;
+    }
+
+}
+
+static void pdp_opencv_floodfill_mark(t_pdp_opencv_floodfill *x, t_floatarg fperx, t_floatarg fpery )
+{
+  int i;
+  int inserted;
+    
+    if ( ( fperx < 0.0 ) || ( fperx > 1.0 ) || ( fpery < 0.0 ) || ( fpery > 1.0 ) )
+    {
+       return;
+    }
+
+    inserted = 0;
+    for ( i=0; i<MAX_COMPONENTS; i++)
+    {
+       if ( x->x_xcomp[i] == -1 )
+       {
+          x->x_xcomp[i] = (int)(fperx*x->x_width);
+          x->x_ycomp[i] = (int)(fpery*x->x_height);
+          post( "pdp_opencv_floodfill : inserted point (%d,%d)", x->x_xcomp[i], x->x_ycomp[i] );
+          inserted = 1;
+          break;
+       }
+    }
+    if ( !inserted )
+    {
+       post( "pdp_opencv_floodfill : max components reached" );
+    }
+}
+
+static void pdp_opencv_floodfill_delete(t_pdp_opencv_floodfill *x, t_floatarg findex )
+{
+  int i;
+    
+    if ( ( findex < 1.0 ) || ( findex > 10 ) )
+    {
+       return;
+    }
+
+    x->x_xcomp[(int)findex-1] = -1;
+    x->x_ycomp[(int)findex-1] = -1;
+}
+
+static void pdp_opencv_floodfill_connectivity(t_pdp_opencv_floodfill *x, t_floatarg fconnectivity )
+{
+  int i;
+    
+    if ( ( fconnectivity != 4.0 ) && ( fconnectivity != 8.0 ) )
+    {
+       return;
+    }
+
+    x->x_connectivity = (int)fconnectivity;
+}
+
+static void pdp_opencv_floodfill_clear(t_pdp_opencv_floodfill *x )
+{
+  int i;
+    
+    for ( i=0; i<MAX_COMPONENTS; i++)
+    {
+      x->x_xcomp[i] = -1;
+      x->x_ycomp[i] = -1;
+    }
 }
 
 t_class *pdp_opencv_floodfill_class;
 
-
 void *pdp_opencv_floodfill_new(t_floatarg f)
 {
-    int i;
+  int i;
 
     t_pdp_opencv_floodfill *x = (t_pdp_opencv_floodfill *)pd_new(pdp_opencv_floodfill_class);
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("lo_diff"));
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("up_diff"));
 
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
+    x->x_outlet1 = outlet_new(&x->x_obj, &s_anything); 
 
     x->x_packet0 = -1;
     x->x_packet1 = -1;
@@ -290,20 +357,22 @@ void *pdp_opencv_floodfill_new(t_floatarg f)
 
     x->x_infosok = 0;
 
-    x->ffill_case = 1;
-    x->lo_diff = 20; 
-    x->up_diff = 20;
-    x->connectivity = 4;
-    x->is_color = 1;
-    x->is_mask = 0;
-    x->new_mask_val = 255;
+    x->x_lo = 20; 
+    x->x_up = 20;
+    x->x_connectivity = 4;
+    x->x_color = 1;
 
-    x->color_img0 = cvCreateImage( cvSize(x->x_width,x->x_height), 8, 3 );
+    for ( i=0; i<MAX_COMPONENTS; i++)
+    {
+       x->x_xcomp[i] = -1;
+       x->x_ycomp[i] = -1;
+       x->x_r[i] = rand() & 255;
+       x->x_g[i] = rand() & 255;
+       x->x_b[i] = rand() & 255;
+    }
+
     x->color_img = cvCreateImage( cvSize(x->x_width,x->x_height), 8, 3 );
-    x->mask = cvCreateImage( cvSize(x->x_width + 2, x->x_height + 2), 8, 1 );
-    x->gray_img0 = cvCreateImage( cvSize(x->x_width, x->x_height), 8, 1 );
     x->gray_img = cvCreateImage( cvSize(x->x_width, x->x_height), 8, 1 );
-
 
     return (void *)x;
 }
@@ -318,13 +387,19 @@ extern "C"
 void pdp_opencv_floodfill_setup(void)
 {
 
-    post( "		pdp_opencv_floodfill");
+    post( "    pdp_opencv_floodfill");
     pdp_opencv_floodfill_class = class_new(gensym("pdp_opencv_floodfill"), (t_newmethod)pdp_opencv_floodfill_new,
-    	(t_method)pdp_opencv_floodfill_free, sizeof(t_pdp_opencv_floodfill), 0, A_DEFFLOAT, A_NULL);
+      (t_method)pdp_opencv_floodfill_free, sizeof(t_pdp_opencv_floodfill), 0, A_DEFFLOAT, A_NULL);
 
     class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
-    //class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_up_diff, gensym("up_diff"),  A_FLOAT, A_NULL );   
-    //class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_lo_diff, gensym("lo_diff"),  A_FLOAT, A_NULL );   
+    class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_color, gensym("color"),  A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_fillcolor, gensym("fillcolor"),  A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_mark, gensym("mark"),  A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_delete, gensym("delete"), A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_connectivity, gensym("connectivity"), A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_clear, gensym("clear"), A_NULL);
+    class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_up_diff, gensym("up_diff"),  A_FLOAT, A_NULL );   
+    class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_lo_diff, gensym("lo_diff"),  A_FLOAT, A_NULL );   
 
 }
 
