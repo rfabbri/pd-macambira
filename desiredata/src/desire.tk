@@ -143,8 +143,8 @@ proc luniq {a} {
 
 # one-dimensional intervals (left-closed, right-open); not much in use at the moment, not that they wouldn't deserve to!
 # (slightly buggy)
-proc inside      {x x0 x1} {return [expr $x>=$x0 && $x<$x1]}
-proc overlap {y0 y1 x0 x1} {return [expr [inside $y0 $x0 $x1] || [inside $y1 $x0 $x1]]}
+proc inside      {x x0 x1} {return [expr {$x>=$x0 && $x<$x1}]}
+proc overlap {y0 y1 x0 x1} {return [expr {[inside $y0 $x0 $x1] || [inside $y1 $x0 $x1]}]}
 
 proc distance {point1 point2} {
 	set off [l- $point1 $point2]
@@ -238,7 +238,7 @@ def Manager call {} {
 		} else {
 			puts "  tries to draw ZOMBIE $o"
 		}
-		if {$i == [expr [llength $@q] - 1]} {set @q {}}
+		if {$i == [expr {[llength $@q]-1}]} {set @q {}}
 	}
 	after 25 "$self call"
 }
@@ -384,8 +384,8 @@ def CommandHistory init {} {
 	set @redo_stack {}
 }
 
-def CommandHistory can_undo? {} {return [expr [llength @undo_stack] > 0]}
-def CommandHistory can_redo? {} {return [expr [llength @redo_stack] > 0]}
+def CommandHistory can_undo? {} {return [expr {[llength @undo_stack] > 0}]}
+def CommandHistory can_redo? {} {return [expr {[llength @redo_stack] > 0}]}
 def CommandHistory next_undo_name {} {return stuff}
 def CommandHistory next_redo_name {} {return stuff}
 def CommandHistory undo_stack {} {return $@undo_stack}
@@ -493,12 +493,12 @@ def History set_hist {idx stuff} {set @hist [lreplace $@hist $idx $idx $stuff]}
 
 def History prepend {stuff} {
 	set @hist [linsert $@hist 1 $stuff]
-	if {[llength $@hist] >= $@size} {set @hist [lrange $@hist 0 [expr $@size-1]]}
+	if {[llength $@hist] >= $@size} {set @hist [lrange $@hist 0 [expr {$@size-1}]]}
 }
 
 def History traverse {incr} {
-	set @histi [expr $@histi + $incr]
-	set mod [expr ([llength $@hist]<[expr $@size+1]) ?[llength $@hist]:[expr $@size+1]]
+	set @histi [expr {$@histi + $incr}]
+	set mod [min [llength $@hist] [expr {$@size+1}]]
 	if {$@histi >=$mod} {set @histi [expr $@histi%$mod]}
 	if {$@histi < 0} {set @histi [expr ($@histi+$mod)%$mod]}
 	return [lindex $@hist $@histi]
@@ -796,7 +796,7 @@ set scale_amount 1.1
 
 class_new Console {View}
 
-def Console osx_scroll {axis diff} {$@c.1 yview scroll [expr -2-abs($diff)/$diff]}
+def Console osx_scroll {axis diff} {$@c.1 yview scroll [expr {-2-abs($diff)/$diff}]}
 
 def Console init {c} {
 	set @c $c
@@ -817,10 +817,10 @@ def Console post_string {x} {
 	set oldpos [lindex [$@c.2 get] 1]
 	$@c.1 insert end $x
 	regsub -all "\n" $x "" y
-	set n [expr [string length $x]-[string length $y]]
+	set n [expr {[string length $x]-[string length $y]}]
 	incr @lines $n
 	set max $::cmdline(console)
-	if {$@lines >= $max} {$@c.1 delete 1.0 [expr $@lines - $max + 1].0; set @lines $max}
+	if {$@lines >= $max} {$@c.1 delete 1.0 [expr {$@lines-$max+1}].0; set @lines $max}
 	if {$oldpos > 0.9999} {$@c.1 see end}
 }
 
@@ -984,7 +984,7 @@ proc poll_gdb {} {
 		if {[regexp {^Program received signal (\w+), (.*)\.} $line bogus sig1 sig2]} {
 			set where ""
 			# can anyone figure out why a long backtrace won't be slurped in this case?
-			set timeout [expr [clock seconds]+2]
+			set timeout [expr {[clock seconds]+2}]
 			#fconfigure $gdb -blocking 1 -buffering none
 			while {![eof $gdb] && [clock seconds] < $timeout} {
 				set line [gets $gdb]
@@ -6355,11 +6355,11 @@ def Slider motion {x y f target} {
 	netsend [list .$self float $out]
 }
 def Slider key_incr {val1 val2} {
-	set @value [expr $@value - $val2]
+	set @value [expr {$@value-$val2}]
 	netsend [list .$self float $@value]
 }
 def Slider calc {x y x1 y1} {
-	set span [expr $@max-$@min]
+	set span [expr {$@max-$@min}]
 	set l [expr {$@orient ?$@h:$@w}]
 	set d [expr {($@orient ?$y1-$y:$x-$x1)*$span/($l+0.0)}]
 	return $d
@@ -8872,7 +8872,7 @@ def Canvas :-)2 {n meuh} {
   set x [expr int(1050*rand())]; set y [expr int(650*rand())]
   set x [expr int($n/36)*16]; set y [expr ($n%36)*18]
   puts ":-) $c"
-  netsend [list .$self obj $x $y $c] [list $self :-)2 [expr $n+1]]
+  netsend [list .$self obj $x $y $c] [list $self :-)2 [expr {$n+1}]]
   #if {$n>1500} {post "stopped at %d" $n}
 }
 
