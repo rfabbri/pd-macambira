@@ -1819,7 +1819,7 @@ def Canvas init_window {} {
     # turn statusbar on/off
     if {[$self look statusbar]} {pack [$@statusbar widget] -side bottom -fill x}
     set w [expr [lindex $@canvas_size 0]-4];# dd canvas is 4 pixel out with pd canvas? 
-    set h [expr [lindex $@canvas_size 1]-4]   
+    set h [expr [lindex $@canvas_size 1]-4]
     pack [canvas $c -width $w -height $h -background white] -side left -expand 1 -fill both
     set @yscroll $win.yscroll; set @xscroll $win.xscroll
     $self init_scrollbars
@@ -2818,6 +2818,7 @@ def ObjectBox draw_box {} {
 	super
 	set xya [$self bbox]
 	mset {x1 y1 x2 y2} $xya
+	# the 3d look could be done quicker using incr on x1 y1 x2 y2 like BlueBox does.
 	#set xyb [l+ [list $x2 $y1 $x1 $y1 $x1 $y2] [list -1 +1 +1 +1 +1 -1]]
 	#set xyc [l+ [list $x2 $y1 $x2 $y2 $x1 $y2] [list -1 +1 -1 -1 +1 -1]]
         if {[$self selected?]} {set fg [$self look selectframe]} {set fg [$self look frame3]}
@@ -2917,9 +2918,7 @@ def Canvas visibles {} {return $@visibles}
 
 def Canvas all_changed {} {
 	foreach x $@visibles {
-		if {[$x class] == "Canvas"} {
-			if {$@gop} {$x all_changed}
-		}
+		if {[$x class] == "Canvas"} {if {$@gop} {$x all_changed}}
 		$x changed
 	}
 }
@@ -3010,12 +3009,12 @@ def Canvas motion_update {} {
 	set @motion_after_id [after 50 "$self motion_update"]
 }
 
-def Canvas click_wrap {x y b f} {
+def Canvas   click_wrap {x y b f} {
 	set c [$self widget]
 	set x [expr [$c canvasx $x]/$@zoom]
 	set y [expr [$c canvasy $y]/$@zoom]
 	set f [expr 1<<($b+7)|$f]
-	$self click $x $y $f [$self identify_target $x $y $f]
+	$self click   $x $y $f [$self identify_target $x $y $f]
 }
 def Canvas unclick_wrap {x y b f} {
 	set c [$self widget]
@@ -3024,9 +3023,9 @@ def Canvas unclick_wrap {x y b f} {
 	set f [expr 1<<($b+7)|$f]
 	$self unclick $x $y $f [$self identify_target $x $y $f]
 }
-def Canvas key_wrap {x y key iso shift} {
+def Canvas   key_wrap {x y key iso shift} {
 	set c [$self widget]
-	$self key [expr [$c canvasx $x]/$@zoom] [expr [$c canvasy $y]/$@zoom] $key $iso $shift
+	$self key   [expr [$c canvasx $x]/$@zoom] [expr [$c canvasy $y]/$@zoom] $key $iso $shift
 }
 def Canvas keyup_wrap {x y key iso shift} {
 	set c [$self widget]
@@ -3287,12 +3286,12 @@ def Canvas target {x y f tag} {
 			set  ins [$id  ninlets]
 			if {$y>=$y2-6 && $outs} {
 				set val [expr int(($x-$x1)*$outs/($x2-$x1))]
-				if {$val == $outs} {set val [expr $val-1]}
+				if {$val==$outs} {incr val -1}
 				return [list "outlet" $id $val]
 			}
 			if {$y< $y1+2 &&  $ins} {
 				set val [expr int(($x-$x1)* $ins/($x2-$x1))]
-				if {$val == $ins} {set val [expr $val-1]}
+				if {$val== $ins} {incr val -1}
 				return [list  "inlet" $id $val]
 			}
 			return [list "object" $id]
@@ -3590,14 +3589,14 @@ def Runcommand init {serf name command} {
 	label $f.cmd_l -text Command: -font {helvetica -10} -pady 0
 	pack $f.cmd_l -side left
 	entry $f.entry -width 30 -relief flat -bg white -borderwidth 0 -highlightthickness 0
-	bind $f.entry <Escape> "$self unpack_prompt"
+	bind $f.entry <Escape>    "$self unpack_prompt"
 	bind $f.entry <Control-g> "$self unpack_prompt"
-	bind $f.entry <Return> "$self eval"
-	bind $f.entry <Up>     "$self scroll_history +1"
-	bind $f.entry <Down>   "$self scroll_history -1"
-	bind $f.entry <Control-p>     "$self scroll_history +1"
-	bind $f.entry <Control-n>     "$self scroll_history -1"
-	bind $f.entry <Tab>    "$self completion +"
+	bind $f.entry <Return>    "$self eval"
+	bind $f.entry <Up>        "$self scroll_history +1"
+	bind $f.entry <Down>      "$self scroll_history -1"
+	bind $f.entry <Control-p> "$self scroll_history +1"
+	bind $f.entry <Control-n> "$self scroll_history -1"
+	bind $f.entry <Tab>       "$self completion +"
 	switch $::tcl_platform(os) {
 		Linux   {bind $f.entry <ISO_Left_Tab> "$self completion -"}
 		default {bind $f.entry    <Shift-Tab> "$self completion -"}
@@ -3744,22 +3743,21 @@ def Canvas copy_times= {c} {set @copy_count $c}
 def Canvas copy_times {} {return $@copy_count}
 
 def Canvas copy {} {
-	global clipboard obj_index_sel
 	if {![$@objectsel size]} {return}
 	$clipboard value= ""
 	$self copy_times= 1
-	array unset obj_index_sel $self:*
+	array unset ::obj_index_sel $self:*
 	set j 0
 	foreach i [lsort -integer [$@objectsel keys]] {
 		set child [$@objectsel get $i]
-		#set obj_index_sel($self:$child) [$@objectsel search $child]
-		set obj_index_sel($self:$child) $j; incr j
-		$child deconstruct_to $clipboard
+		#set ::obj_index_sel($self:$child) [$@objectsel search $child]
+		set ::obj_index_sel($self:$child) $j; incr j
+		$child deconstruct_to $::clipboard
 	}
 	foreach wire [$@wiresel values] {
-		if {[array names obj_index_sel $self:[$wire from]] == ""} {continue}
-		if {[array names obj_index_sel $self:[$wire to  ]] == ""} {continue}
-		$wire deconstruct_to $clipboard $self
+		if {[array names ::obj_index_sel $self:[$wire from]] == ""} {continue}
+		if {[array names ::obj_index_sel $self:[$wire to  ]] == ""} {continue}
+		$wire deconstruct_to $::clipboard $self
 	}
 }
 
@@ -4104,17 +4102,17 @@ def Canvas subpatcherize {} {
 			}
 		}
 	}
-	# $broken stores totall number of broken connections, i= need [inlet] o = need [outlet]
+	# $broken stores total number of broken connections, i= need [inlet] o = need [outlet]
 	foreach c $broken {
 		mset {type f o t i dsp} $c
 		if {$type == "i"} {
-			lappend ins [list $t $i];lappend toins [list o $f $o $dsp]
+			lappend ins  [list $t $i]; lappend    toins [list o $f $o $dsp]
 		} else {
 			lappend outs [list $f $o]; lappend fromouts [list i $t $i $dsp]
 		}
 	}
 	# figures out the inlet/outlet positioning and num of in/outlet to create
-	set ins [$self subpatcherize_iopos $toins $ins]
+	set ins  [$self subpatcherize_iopos    $toins  $ins]
 	set outs [$self subpatcherize_iopos $fromouts $outs]
 	# iolist stores in/outlets to be conected inside the subpatch
 	foreach in   $ins {mset {idx p dsp}  $in; lappend iolist [list i [$self idx_map $idx] $p $dsp]}
@@ -4142,7 +4140,7 @@ def Canvas subpatcherize_rewire {wires inlist outlist bogus} {
 	foreach wire $wires {
 		mset {type f o t i dsp} $wire
 		if {$type == "i"} {
-			set idx [lsearch $inlist [list $t $i $dsp]]
+			set idx [lsearch  $inlist [list $t $i $dsp]]
 			$self connect [list $f $o [$@objects search $obj] $idx]
 		} else {
 			set idx [lsearch $outlist [list $f $o $dsp]]
@@ -4175,16 +4173,8 @@ def FutureWire init {canvas x y f target} {
 	set @canvas $canvas
 	mset {type from port} $target
 	switch $type {
-	    outlet {
-		set @from $from; set @outlet $port
-		set   @to ""   ; set @inlet ""
-		set port_name ${from}o${port}
-	    }
-	    inlet {
-		set @from ""   ; set @outlet ""
-		set   @to $from; set @inlet $port
-		set port_name ${from}i${port}
-	    }
+	    outlet {set @from $from; set @outlet $port; set   @to ""   ; set @inlet ""   ; set port_name ${from}o${port}}
+	    inlet  {set @from ""   ; set @outlet ""   ; set   @to $from; set @inlet $port; set port_name ${from}i${port}}
 	}
 	mset {x y} [lmap / [rect_centre [[$@canvas widget] bbox $port_name]] [$@canvas zoom]]
 	set @x1 $x
@@ -4303,10 +4293,7 @@ def Canvas click {x y f target} {
 		wire {$self click_on_wire $id $f $x $y}
 		nothing {
 			#$self deselect_all
-			if {[lindex $@iohilite 0] == -1} {
-				$self click_on_nothing $f $target $x $y
-				return
-			}
+			if {[lindex $@iohilite 0] == -1} {$self click_on_nothing $f $target $x $y; return}
 		}
 		label {$self click_on_object $id $f}
 		default {error "BORK: $type"}
@@ -4334,7 +4321,7 @@ def Canvas click_runmode {id x y f target} {
 			$id click $x $y $f $target
 		} else {
 			if {[$id subpatch]} {
-				if {![$id mapped]} {$id popup_open} else {if {![$id gop]} {raise .$id}}
+				if {![$id mapped]} {$id popup_open} elseif {![$id gop]} {raise .$id}
 			}
 		}
 	}
@@ -4854,7 +4841,7 @@ def Canvas return_key {x y key iso f} {
 		if {[$@objectsel size] == 1} {
 			mset {bx1 by1 bx2 by2} [[$self selection] bbox]
 			set x1 [expr ($bx1+$bx2)/2]; set y1 [expr ($by1+$by2)/2]
-			$self click_wrap $x1 $y1 1 $f
+			$self   click_wrap $x1 $y1 1 $f
 			$self unclick_wrap $x1 $y1 1 $f
 		}
 	} else {
@@ -5746,11 +5733,8 @@ def Display draw {} {
 		set w [min [max $w $tw] $@wrap]
 	}
 	set h [max $h 1]
-	$self item BASE rect [list $x $y [expr $x+$w+$xf+2] [expr $y+($@ys*$h)+$yf+1]] \
-	    -fill [$self look bg]
-
-	$self item TEXT text [l+ $@textoffset [$self xy]] -font $font -text $text \
-	    -fill [$self look fg] -anchor nw -width $@wrap
+	$self item BASE rect [list $x $y [expr $x+$w+$xf+2] [expr $y+($@ys*$h)+$yf+1]] -fill [$self look bg]
+	$self item TEXT text [l+ $@textoffset [$self xy]] -font $font -text $text -fill [$self look fg] -anchor nw -width $@wrap
 	$self draw_io
 }
 
@@ -5771,14 +5755,13 @@ def BlueBox draw_box {} {
 	super
 	set xya [$self bbox]
 	mset {x1 y1 x2 y2} $xya
-	set xyb [list [expr $x2-1] [expr $y1+1] [expr $x1+1] [expr $y1+1] [expr $x1+1] [expr $y2-1]]
-	set xyc [list [expr $x2-1] [expr $y1+1] [expr $x2-1] [expr $y2-1] [expr $x1+1] [expr $y2-1]]
 	set color [color_* [$self look bg] [parse_color $@bcol]]
 	if {[$self selected?]} {set frcol [$self look selectframe]} {set frcol [$self look frame3]}
 	$self item BASE  rectangle $xya -fill $color -outline $frcol
 	#below lines draws the 3d box edge
-	#$self item BASE2 line      $xyb -fill #ffffff
-	#$self item BASE3 line      $xyc -fill [darker $color]
+	#incr x1 +1; incr y1 +1; incr x2 -1; incr y2 -1
+	#$self item BASE2 line [list $x2 $y1 $x1 $y1 $x1 $y2] -fill #ffffff
+	#$self item BASE3 line [list $x2 $y1 $x2 $y2 $x1 $y2] -fill [darker $color]
 	$self draw_io
 }
 
