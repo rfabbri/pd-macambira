@@ -2287,6 +2287,7 @@ def Canvas init_menus {} {
     $self populate_menu file {new_file open_file {} send_message {} close save save_as print {} abort_server quit}
     $self populate_menu edit {undo redo {} cut copy paste duplicate select_all subpatcherize {} tidy_up {}}
     $self populate_menu find {find find_again find_last_error}
+    #!@#$ those shortcuts should be looked up in the key table!!!
     $m.view add checkbutton -label [say visual_diff] -selectcolor grey0 -command [list $self visual_diff] \
     	-accelerator [accel_munge "Ctrl+E"] -indicatoron 1
     $self populate_menu view {get_elapsed {} reload redraw}
@@ -6229,7 +6230,6 @@ def Radio key_incr {val1 val2} {
 class_new Slider {BlueBox}
 def Slider reinit {mess} {
 	super $mess
-	set @knob_thick 4
 	switch [lindex $mess 4] {
 		hsl {set @orient 0}
 		vsl {set @orient 1}
@@ -6251,9 +6251,9 @@ def Slider init {mess} {
 def Slider bbox {} {
 	mset {x1 y1} [$self xy]
 	if {!$@orient} {
-		list $x1 $y1 [expr $x1+$@w+$@knob_thick] [expr $y1+$@h]
+		list [expr {$x1-3}] $y1 [expr {$x1+$@w+2}] [expr {$y1+$@h}]
 	} else {
-		list $x1 [expr $y1-$@knob_thick] [expr $x1+$@w] [expr $y1+$@h]
+		list $x1 [expr {$y1-2}] [expr {$x1+$@w}] [expr {$y1+$@h+3}]
 	}
 }
 #the value/centipixel ratio
@@ -6262,20 +6262,19 @@ def Slider slider_ratio {} {
 	return [expr $diff / ($@orient ? ($@h-1) : ($@w-1))]
 }
 def Slider draw_knob {} {
-	mset {x1 y1 x2 y2} [$self bbox]
+	mset {x1 y1} [$self xy]
 	set l [expr $@orient ?$@h:$@w]
 	set span [expr {$@max-$@min}]
 	set color [$self look bg]
 	set scaled [expr {$@value*($l-1)/$span}]
-	set thick [expr $@knob_thick/2]
 	if {$@orient} {
-		set y1 [expr $y1+$@knob_thick]
+		set y1 [expr $y1+2]
 		set y [expr $y1+$@h-$scaled-2]
-		set coords [list [expr $x1+2] $y [expr $x1+$@w-2] [expr $y-2]]
+		set coords [list [expr {$x1+2}] [expr {$y-1}] [expr {$x1+$@w-2}] [expr {$y+1}]]
 	} else {
-		set x2 [expr $x1-$@knob_thick]
+		set x1 [expr $x1-1]
 		set x [expr $x1+$scaled]
-		set coords [list $x [expr $y1+$thick] [expr $x+2] [expr $y1+$@h-$thick]]
+		set coords [list $x [expr {$y1+2}] [expr {$x+2}] [expr {$y1+$@h-2}]]
 	}
 	$self item KNOB rectangle $coords -outline red -fill [darker $color]
 }
@@ -8750,12 +8749,13 @@ def Canvas visual_diff {} {
 }
 
 def Canvas blink_image {} {
+	set @blinky [after 300 [list $self blink_image]]
 	if {[llength [.$self.c gettags BLINKY]]} {
 		.$self.c delete BLINKY
 	} else {
-		.$self.c create image 0 0 -image image_$self -tag BLINKY -anchor nw
+		# there's something that causes the pd screenshot to be off by 1 pixel. i don't know what.
+		.$self.c create image 0 -1 -image image_$self -tag BLINKY -anchor nw
 	}
-	set @blinky [after 250 [list $self blink_image]]
 }
 
 #-----------------------------------------------------------------
