@@ -78,7 +78,7 @@ look {
     thick 1
     wirearrow 1
   }
-  KeyboardDialog {
+  KeyboardDialogue {
     font {Courier -10}
   }
   Console {
