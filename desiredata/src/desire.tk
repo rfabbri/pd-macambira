@@ -5641,7 +5641,7 @@ def MessageBox bang {flag} {
 # it was class_new AtomBox {View Box}, which is wrong because already Box<View
 # it shouldn't have mattered, but super doesn't support proper pruning yet
 #class_new AtomBox {Box}
-class_new AtomBox {TextBox}
+class_new AtomBox {Labelled TextBox}
 def AtomBox draw_box {} {
 	$self update_size
 	mset {x1 y1 x2 y2} [$self bbox]
@@ -6348,21 +6348,19 @@ def Slider unfocus {} {$self draw}
 
 class_new Labelled {}
 def Labelled draw {} {
-	global leet
 	super
-	mset {x1 y1} [$self xy]
-	set lx [expr $x1+$@ldx]
-	set ly [expr $y1+$@ldy]
-	set label $@lab; switch -- $label { empty { set label "" }}
+	mset {lx ly} [$self label_xy]
+	set label $@lab; switch -- $label {empty {set label ""}}
 	set lfont [list [lindex {courier helvetica times} $@fstyle] $@fs bold]
 	set lcolor [parse_color $@lcol]
-	if {$leet} {
+	if {$::leet} {
 		    set text [string map -nocase {a 4 e 3 t 7 s 5 i 1 o 0 g 9} $label]
 	    } else {
 		    set text $label
 	    }
 	$self item LABEL text [list $lx $ly] -text $text -anchor w -font $lfont -fill $lcolor
 }
+def Labelled label_xy {} {mset {x1 y1} [$self xy]; list [expr {$x1+$@ldx}] [expr {$y1+$@ldy}]}
 
 #-----------------------------------------------------------------------------------#
 class_new Bang {BlueBox}
@@ -6378,8 +6376,8 @@ def Bang bbox {} {
 def Bang draw {} {
 	super
 	mset {x1 y1 x2 y2} [$self bbox]
+	set rect [list [expr {$x1+1}] [expr {$y1+1}] [expr {$x2-1}] [expr {$y2-1}]]
 	if {$@flash} {
-		set rect [list [expr $x1+2] [expr $y1+2] [expr $x2-2] [expr $y2-2]]
 		#$self item BUT oval $rect -fill [color_* [$self look bg] [parse_color $@fcol]]
 		set fcol [color_* [$self look bg] [parse_color $@fcol]]
 		set bcol [color_* [$self look bg] [parse_color $@bcol]]
@@ -6388,7 +6386,6 @@ def Bang draw {} {
 		set @flash 0
 	} else {
 		set colour [parse_color $@bcol]
-		set rect [list [expr $x1+2] [expr $y1+2] [expr $x2-2] [expr $y2-2]]
 		$self item BUT oval $rect -fill [color_* [$self look bg] $colour] -outline [$self look frame3]
 	}
 }
@@ -6425,7 +6422,7 @@ def Toggle click {x y f target} {
 	$self changed
 }
 
-class_new Vu {IEMGUI Box}
+class_new Vu {Labelled IEMGUI Box}
 set vu_col {
 	0 17 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16
 	15 15 15 15 15 15 15 15 15 15 14 14 13 13 13 13 13 13 13 13 13 13 13 19 19 19
