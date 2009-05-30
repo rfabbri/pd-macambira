@@ -33,6 +33,7 @@ LEGEND:
 [s] get rid of stderr in server
 [ ] pd-extended's [tcl_version]
 [c] -path and -helppath listbox entries should be draggable (so that up/down buttons can be removed)
+[s] finish merging 0.40 (wasn't it finished?)
 [s] merge 0.41 (no?)
 [s] merge 0.42
 [s] refcounted symbols
@@ -40,6 +41,16 @@ LEGEND:
 [b] rewrite [image], [display], [knob], [grid], [popup], ...
 [s] merge martin peach's tcp externs into the core
 [ ] sync pd.gif with pd_32.gif
+[s] inheritance: [super] "instantiates" other abstraction with same $0; [self] allows sending messages to self; [declare super ...] makes the tree.
+[ ] cleaner parsing of [expr]... remove int type because it causes e.g. [expr 8.0 / 10.0] = 0 but [expr 8.0/10.0] = 0.8
+[ ] how does [declare -stdpath] work? this is a mystery. can't get it to work in pd 0.40.
+[ ] tidy_up/snap to grid
+[c] change the order of the fields in Properties if it makes things more logical than the order of fields of savefn
+[b] too much duplication of inlets vs outlets in source (where?)
+[b] [t a] could be a very small GUI object (called "null object")
+[b] all the [t] could be GUI objects
+[b] GUI objects for [inlet] and [outlet] and [pd] ([page])
+[-] make a dd-extended
 ------------------8<------------------------------------progress-bar----------------------------------------------8<------------------
 [ ] use pd_32.gif on _all_ windows.
 [ ] help files for: [parse], [unparse], etc.
@@ -57,16 +68,13 @@ LEGEND:
 [c] atomic undo
 [c] undo subpatch
 [c] numbox: is_log
-[c] change the order of the fields in Properties if it makes things more logical than the order of fields of savefn
 [c] [hradio] : chg -> is_log
 [c] [vu] props : scale should appear instead of is_log
 [s] update s_audio.c to support any number of devices (not just max 4)
 [c] new way to do View get_canvas
-[b] too much duplication of inlets vs outlets
 [c] def Menuable raise {} {wm withdraw $w; wm deiconify $w
 [s] what to do with post() in case of -listdev, etc.?
 [s] turn old [dropper] code into a feature of SymbolBox
-[s] inheritance: [super] "instantiates" other abstraction with same $0; [self] allows sending messages to self; [declare super ...] makes the tree.
 [b] pd-dev message to Ed Kelly, October 5.
 [b] GOP problems are back due to recent changes in canvas_map and canvas_vis.
     now that abstractions don't get loaded into the client anymore, GOP can't always be drawn anymore too.
@@ -99,9 +107,6 @@ LEGEND:
     extended quoting, extended float syntax
     (some ex-symbols now parsed as floats: +1 +1.0 +1e8 0x10 and so on.)
 [ ] atomically with multiple level
-[ ] tidy_up/snap to grid
-[ ] cleaner parsing of [expr]... remove int type because it causes e.g. [expr 8.0 / 10.0] = 0 but [expr 8.0/10.0] = 0.8
-[ ] how does [declare -stdpath] work? this is a mystery. can't get it to work in pd 0.40.
 
 [ ] PureUnity
     [ ] benchmark
@@ -132,7 +137,9 @@ LEGEND:
 [c] hide inlets/outlets of IEMGUI when they have receive-symbols/send-symbols
 [c] rightclick help doesn't work on [cnv]: tries to find help for "cnv.pd" ???
 [s] creating a graph causes crash.
-[b] fix NumBox's width and height (or remove those settings)
+[b] fix NumBox's height (box size follows font size) or just remove that setting
+[b] fix NumBox's width (missing some fudge)
+[b] fix NumBox's mem corruption while testing width on auto-apply
 
 Implement (or fix) Find:
     with ability to search across canvases:
@@ -147,10 +154,8 @@ Implement (or fix) Find:
     [ ] add units/pixel
 [c] array button doesn't work (menuarray)
 [c] implement timeout in def Manager call
-[s] finish merging 0.40 (wasn't it finished?)
 [s] proper symbol quoting
 [c] patching-in-tongues follow-up
-[c] take care of needless "save changes?"
 [c] make List objects, to manage children, visible_children, wires, selection, selection_wires.
 [c] skip unneeded motion events inside client (do we need this?)
 [b] rename pd to pd-server, desire.tk to pd-client, add new program "pd" which would launch both (will we really do this?)
@@ -258,7 +263,7 @@ Iohannes said about redirecting stdout/stderr:
     that could read like "int: set left operand; bang: do it"
 [c] custom buttonbars (including premade objects with args like a [t b f] and such)
     [c] with configurable hotkeys
-[b] colored wires
+[b] coloured wires
 [b] insert_object makes error with multiple selection.
 [c] popup_properties on multiple selection.
 [b] segmented patchcords:
@@ -267,30 +272,21 @@ Iohannes said about redirecting stdout/stderr:
     [c] a modifier key to delete a segment (actually the others should be that way too)
     [c] you should be able to right click on a regular wire, and press "segment" or do a hotkey with it
         and it automatically turns it into an straight-elbow multisegmented wire
-[b] [t a] could be a very small GUI object (called "null object")
-[b] all the [t] could be GUI objects
-[b] GUI objects for [inlet] and [outlet] and [pd] ([page])
-[-] make a dd-extended
-
 [s] symbol vs strings: Ruby is right: the Symbol vs String distinction is annoying and possibly obsolete.
     according to me, symbols exist mostly because LISP had them before they had strings, and because most
     Strings implementations aren't powerful enough to be as fast (or almost as fast) as Symbols.
     (well, for compatibility reasons, just like in Ruby, we can't remove symbol support completely, but
     at least we can reduce the difference between strings and symbols to a minimum.)
-
 [b] server-side IEMGUI could be turned into Tcl-based externs OR EVEN become abstractions.
     it's possible to make a DesireData GUI for any Pd class, including abstractions.
     to turn IEMGUI into an abstraction, what's missing is the savefn/saveargs/scanargs business.
-
 [s] I would like to know how much it is feasible to compress the t_atom
     structure so that even with 64-bit pointers the t_atom still stays 8 bytes
     instead of 16. I think it's possible, but not necessarily in a
     backwards-compatible way, and not necessarily in a portable way. also maybe it's not that useful.
-
 [c] splashscreen: we could make it different than other programs by inserting the splashscreen
     inside the main window or we could make it a separate window but no timer, just an [OK] button,
     so actually, this would be exactly the same as the "About" dialogue.
-
 [s] turn [makefilename] into something that doesn't suck. (alias it to [sprintf] or [format])
 
 [b] data inspector: when this tool is enabled, it prints on the console any data coming through whatever cable you
