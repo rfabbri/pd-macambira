@@ -1794,6 +1794,12 @@ def Canvas gop_rect {} {
 
 }
 
+rename toplevel toplevel_orig
+proc toplevel {name args} {
+    eval [concat [list toplevel_orig $name] $args]
+    catch {wm iconphoto $name icon_pd_32}
+}
+
 # should be called once and only from init
 def Canvas init_window {} {
     lappend ::window_list $self
@@ -1804,7 +1810,6 @@ def Canvas init_window {} {
     } else {
 	    if {[$self look menubar]} {toplevel $win -menu $win.m} else {toplevel $win -menu ""}
     }
-    catch {wm iconphoto $win icon_pd_32}
     set @menubar $win.m
     $self init_menus
     # turn buttonbar on/off
