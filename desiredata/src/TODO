@@ -51,8 +51,10 @@ LEGEND:
 [b] all the [t] could be GUI objects
 [b] GUI objects for [inlet] and [outlet] and [pd] ([page])
 [-] make a dd-extended
+[s] SymbolBox could support dnd
+[b] http://lists.puredata.info/pipermail/pd-dev/2007-10/009581.html
+[s] what to do with post() in case of -nogui ? (it fills an ever-expanding buffer, does it?)
 ------------------8<------------------------------------progress-bar----------------------------------------------8<------------------
-[ ] use pd_32.gif on _all_ windows.
 [ ] help files for: [parse], [unparse], etc.
 [s] recreate abstr instances after abstr save
 [s] [bng] messages get duplicated upon entering a subpatch???
@@ -73,9 +75,6 @@ LEGEND:
 [s] update s_audio.c to support any number of devices (not just max 4)
 [c] new way to do View get_canvas
 [c] def Menuable raise {} {wm withdraw $w; wm deiconify $w
-[s] what to do with post() in case of -listdev, etc.?
-[s] turn old [dropper] code into a feature of SymbolBox
-[b] pd-dev message to Ed Kelly, October 5.
 [b] GOP problems are back due to recent changes in canvas_map and canvas_vis.
     now that abstractions don't get loaded into the client anymore, GOP can't always be drawn anymore too.
      i mean, because the content of GOP is not uploaded to the client, so the client can't draw anything about it..
@@ -92,9 +91,6 @@ LEGEND:
 [s] serial got sent too early when creating [pd] with push & #N canvas (http://pastebin.ca/318318)
 [s] GOP problems are back due to recent changes in canvas_map and canvas_vis
 [s] prevent hidden subpatches/abstraction-instances from being loaded in the client all of the time.
-[s] server don't pick up changes via NumBox reload, ie the width:
-    <- .x8068058 reload 2 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 256;
-    -> change x8068058 x8067c50 {#X obj 335 166 nbx 8 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 256;}
 [b] fix gop
     [c] reimplement View get_canvas so that it does not rely on [focus]
     [s] gop contains can be drawn if not uploaded to client
@@ -131,15 +127,13 @@ LEGEND:
 [s] audio loopback pseudo-device (inside pd)
 [s] use vector doubling in binbuf_add,binbuf_addv...
 [c] opening an already-open subpatch should just raise that subpatch
-[c] bug: you can move parts of gop subpatches, from the parent patch!
-[c] pixel offsets are not correct in [hsl] [vsl]:
-    distinguish between $@w or $@h and actual size. there should be 4 extra pixels.
+[c] pixel offsets are not correct in [hsl] [vsl]: distinguish between $@w or $@h and actual size. there should be 4 extra pixels.
 [c] hide inlets/outlets of IEMGUI when they have receive-symbols/send-symbols
 [c] rightclick help doesn't work on [cnv]: tries to find help for "cnv.pd" ???
 [s] creating a graph causes crash.
 [b] fix NumBox's height (box size follows font size) or just remove that setting
 [b] fix NumBox's width (missing some fudge)
-[b] fix NumBox's mem corruption while testing width on auto-apply
+[b] fix std::map's apparent trouble getting exit() done properly
 
 Implement (or fix) Find:
     with ability to search across canvases:
@@ -255,8 +249,8 @@ Iohannes said about redirecting stdout/stderr:
 [c] patch window may open too big (all branches, osx)
 [b] properties on objectboxes (generic dialogues tapping into method signatures) (?)
     [s] hooks for outsourcing the preceding stuff to a plugin (eg: GridFlow, PyExt)
-[b] VT100 colours in console
 [b] [graph] is too slow (gui) for real big arrays
+[b] VT100 colours in console ?
 [b] freeform comments (no atom parsing)
 [b] preserve whitespace in textboxes?
 [b] inlet inspector to show what are the message types expected by an inlet
