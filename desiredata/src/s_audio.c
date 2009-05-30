@@ -91,8 +91,8 @@ int sys_schedadvance;   /* scheduler advance in microseconds */
 static int audio_state;
 
 /* last requested parameters */
-static t_audiodevs audio_in;
-static t_audiodevs audio_out;
+static t_audiodevs audi;
+static t_audiodevs audo;
 static int audio_rate;
 static int audio_dacblocksize;
 static int audio_advance;
@@ -103,16 +103,11 @@ extern int sys_callbackscheduler;
 float peakvec(t_float* vec, t_int n, t_float cur_max);
 static float (*peak_fp)(t_float*, t_int, t_float) = peakvec;
 
-static int audio_isopen() {
-    return audio_state && ((audio_in.ndev > 0 &&  audio_in.chdev[0] > 0)
-                       || (audio_out.ndev > 0 && audio_out.chdev[0] > 0));
-}
+static int audio_isopen() {return audio_state && ((audi.ndev > 0 && audi.chdev[0] > 0) || (audo.ndev > 0 && audo.chdev[0] > 0));}
 
 extern "C" void sys_get_audio_params(t_audiodevs *in, t_audiodevs *out, int *prate, int *pdacblocksize, int *padvance, int *pscheduler) {
-    in->ndev  = audio_in.ndev;
-    out->ndev = audio_out.ndev;
-    for (int i=0; i<MAXAUDIOINDEV; i++)  {in ->dev[i] = audio_in.dev[i];   in->chdev[i]  = audio_in.chdev[i];}
-    for (int i=0; i<MAXAUDIOOUTDEV; i++) {out->dev[i] = audio_out.dev[i]; out->chdev[i] = audio_out.chdev[i];}
+    in->ndev =audi.ndev;  for (int i=0; i<MAXAUDIOINDEV;  i++) {in ->dev[i] = audi.dev[i];  in->chdev[i]=audi.chdev[i];}
+    out->ndev=audo.ndev; for (int i=0; i<MAXAUDIOOUTDEV; i++) {out->dev[i] = audo.dev[i]; out->chdev[i]=audo.chdev[i];}
     *prate = audio_rate;
     *pdacblocksize = audio_dacblocksize;
     *padvance = audio_advance;
@@ -123,10 +118,10 @@ void sys_save_audio_params(
 int nindev,  int *indev,  int *chindev,
 int noutdev, int *outdev, int *choutdev,
 int rate, int dacblocksize, int advance, int scheduler) {
-    audio_in.ndev  = nindev;
-    audio_out.ndev = noutdev;
-    for (int i=0; i<MAXAUDIOINDEV;  i++) {audio_in.dev[i]  = indev[i];  audio_in.chdev[i]  = chindev[i];}
-    for (int i=0; i<MAXAUDIOOUTDEV; i++) {audio_out.dev[i] = outdev[i]; audio_out.chdev[i] = choutdev[i];}
+    audi.ndev  = nindev;
+    audo.ndev = noutdev;
+    for (int i=0; i<MAXAUDIOINDEV;  i++) {audi.dev[i]  = indev[i]; audi.chdev[i]  = chindev[i];}
+    for (int i=0; i<MAXAUDIOOUTDEV; i++) {audo.dev[i] = outdev[i]; audo.chdev[i] = choutdev[i];}
     audio_rate = rate;
     audio_dacblocksize = dacblocksize;
     audio_advance = advance;
@@ -134,8 +129,7 @@ int rate, int dacblocksize, int advance, int scheduler) {
 }
 
 extern "C" void sys_open_audio2(t_audiodevs *in, t_audiodevs *out, int rate, int dacblocksize, int advance, int scheduler) {
-	sys_open_audio(in->ndev,  in->dev,  in->ndev,  in->chdev,
-		      out->ndev, out->dev, out->ndev, out->chdev, rate, dacblocksize, advance, scheduler, 1);
+    sys_open_audio(in->ndev,in->dev,in->ndev,in->chdev,out->ndev,out->dev,out->ndev,out->chdev,rate,dacblocksize,advance,scheduler,1);
 }
 
 /* init routines for any API which needs to set stuff up before any other API gets used.  This is only true of OSS so far. */
@@ -408,31 +402,28 @@ void glob_audio_properties(t_pd *dummy, t_floatarg flongform) {
         rate, dacblocksize, advance, canmulti, flongform!=0);
 }
 
+#define INTARG(i) atom_getintarg(i,argc,argv)
+
 /* new values from dialog window */
 void glob_audio_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv) {
     int nindev=0, noutdev=0;
     int newindev[4], newinchan[4], newoutdev[4], newoutchan[4];
-    /* the new values the dialog came back with: */
-    int newrate         = atom_getintarg(16, argc, argv);
-    int newdacblocksize = atom_getintarg(17, argc, argv);
-    int newadvance      = atom_getintarg(18, argc, argv);
-    int newschedmode    = atom_getintarg(19, argc, argv);
     for (int i=0; i<4; i++) {
-        newindev[i]   = atom_getintarg(i,    argc, argv);
-        newinchan[i]  = atom_getintarg(i+4,  argc, argv);
-        newoutdev[i]  = atom_getintarg(i+8,  argc, argv);
-        newoutchan[i] = atom_getintarg(i+12, argc, argv);
+        newindev[i]   = INTARG(i   );
+        newinchan[i]  = INTARG(i+4 );
+        newoutdev[i]  = INTARG(i+8 );
+        newoutchan[i] = INTARG(i+12);
     }
     for (int i=0; i<4; i++) {
         if (newinchan[i]) {
-            newindev[nindev]  = newindev[i];
+            newindev[ nindev]  = newindev[i];
             newinchan[nindev] = newinchan[i];
             nindev++;
         }
     }
     for (int i=0; i<4; i++) {
         if (newoutchan[i]) {
-            newoutdev[noutdev]  = newoutdev[i];
+            newoutdev[ noutdev]  = newoutdev[i];
             newoutchan[noutdev] = newoutchan[i];
             noutdev++;
         }
@@ -440,7 +431,7 @@ void glob_audio_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv) {
     sys_close_audio();
     sys_open_audio(nindev,  newindev,  nindev,  newinchan,
                    noutdev, newoutdev, noutdev, newoutchan,
-                   newrate, newdacblocksize, newadvance, newschedmode, 1);
+                   INTARG(16),INTARG(17),INTARG(18),INTARG(19), 1);
 }
 
 extern void sgi_listaudiodevs();
@@ -477,9 +468,9 @@ void glob_audio_setapi(t_pd *dummy, t_floatarg f) {
             sys_close_audio();
             sys_audioapi = newapi;
 	    /* bash device params back to default */
-            audio_in.ndev = audio_out.ndev = 1;
-            audio_in.dev[0]   = audio_out.dev[0] = DEFAULTAUDIODEV;
-            audio_in.chdev[0] = audio_out.chdev[0] = SYS_DEFAULTCH;
+            audi.ndev     = audo.ndev     = 1;
+            audi.dev[0]   = audo.dev[0]   = DEFAULTAUDIODEV;
+            audi.chdev[0] = audo.chdev[0] = SYS_DEFAULTCH;
 	}
 	sched_set_using_dacs(0);
 /* 	glob_audio_properties(0, 0); */
@@ -488,11 +479,8 @@ void glob_audio_setapi(t_pd *dummy, t_floatarg f) {
 
 /* start or stop the audio hardware */
 void sys_set_audio_state(int onoff) {
-    if (onoff) {  /* start */
-        if (!audio_isopen()) sys_reopen_audio();
-    } else {
-        if (audio_isopen())  sys_close_audio();
-    }
+    if (onoff) {if (!audio_isopen()) sys_reopen_audio();}
+    else       {if ( audio_isopen())  sys_close_audio();}
     sched_set_using_dacs(onoff);
     sys_setscheduler(sys_getscheduler()); /* tb: reset scheduler */
     audio_state = onoff;
@@ -550,13 +538,12 @@ void glob_foo(void *dummy, t_symbol *s, int argc, t_atom *argv) {
 /* tb: message-based audio configuration
  * supported by vibrez.net { */
 void glob_audio_samplerate(t_pd * dummy, t_float f) {
-	t_audiodevs in, out;
+	t_audiodevs ai,ao;
 	int rate, dacblocksize, advance, scheduler;
 	if (f == sys_getsr()) return;
-	sys_get_audio_params(&in,&out,&rate, &dacblocksize, &advance, &scheduler);
+	sys_get_audio_params(&ai,&ao,&rate, &dacblocksize, &advance, &scheduler);
 	sys_close_audio();
-	sys_open_audio(in.ndev, in.dev, in.ndev, in.chdev, out.ndev, out.dev, out.ndev, out.chdev,
-		(int)f, dacblocksize, advance, scheduler, 1);
+	sys_open_audio2(&ai,&ao,(int)f, dacblocksize, advance, scheduler);
 }
 
 void glob_audio_api(t_pd *dummy, t_float f) {
@@ -566,79 +553,75 @@ void glob_audio_api(t_pd *dummy, t_float f) {
 }
 
 void glob_audio_delay(t_pd *dummy, t_float f) {
-	t_audiodevs in,out;
+	t_audiodevs ai,ao;
 	int rate, dacblocksize, advance, scheduler;
 	if ((int)f == audio_advance) return;
-	sys_get_audio_params(&in,&out, &rate, &dacblocksize, &advance, &scheduler);
+	sys_get_audio_params(&ai,&ao, &rate, &dacblocksize, &advance, &scheduler);
 	sys_close_audio();
-	sys_open_audio(in.ndev, in.dev, in.ndev, in.chdev, out.ndev, out.dev, out.ndev, out.chdev,
-		rate, dacblocksize, (int) f, scheduler, 1);
+	sys_open_audio(ai.ndev,ai.dev,ai.ndev,ai.chdev,ao.ndev,ao.dev,ao.ndev,ao.chdev,rate,dacblocksize,int(f),scheduler,1);
 }
 
 void glob_audio_dacblocksize(t_pd * dummy, t_float f) {
-	t_audiodevs in,out;
+	t_audiodevs ai,ao;
 	int rate, dacblocksize, advance, scheduler;
 	if ((int)f == audio_dacblocksize) return;
-	sys_get_audio_params(&in,&out, &rate, &dacblocksize, &advance, &scheduler);
+	sys_get_audio_params(&ai,&ao, &rate, &dacblocksize, &advance, &scheduler);
 	sys_close_audio();
-	sys_open_audio2(&in,&out, rate, (int)f, advance, scheduler);
+	sys_open_audio2(&ai,&ao, rate, (int)f, advance, scheduler);
 }
 
 void glob_audio_scheduler(t_pd * dummy, t_float f) {
-	t_audiodevs in,out;
+	t_audiodevs ai,ao;
 	int rate, dacblocksize, advance, scheduler;
 	if ((int)f == sys_callbackscheduler) return;
 	scheduler = f!=0;
-	sys_get_audio_params(&in,&out, &rate, &dacblocksize, &advance, &scheduler);
+	sys_get_audio_params(&ai,&ao, &rate, &dacblocksize, &advance, &scheduler);
 	sys_close_audio();
-	sys_open_audio2(&in,&out, rate, dacblocksize, advance, scheduler);
+	sys_open_audio2(&ai,&ao, rate, dacblocksize, advance, scheduler);
 	if (scheduler != sys_callbackscheduler) {
-		if (scheduler == 1) {
-			post("switched to callback-based scheduler");
-		} else {
-			post("switched to traditional scheduler");
-		}
+		if (scheduler == 1) post("switched to callback-based scheduler");
+		else                post("switched to traditional scheduler");
 	} else post("couldn't change scheduler");
 }
 
 void glob_audio_device(t_pd *dummy, t_symbol *s, int argc, t_atom *argv) {
-	t_audiodevs in,out;
+	t_audiodevs ai,ao;
 	int rate, dacblocksize, advance, scheduler;
-	sys_get_audio_params(&in,&out, &rate, &dacblocksize, &advance, &scheduler);
-	out.ndev = in.ndev = (int)atom_getfloatarg(0, argc, argv);
+	sys_get_audio_params(&ai,&ao, &rate, &dacblocksize, &advance, &scheduler);
+	ao.ndev = ai.ndev = (int)atom_getfloatarg(0, argc, argv);
 	for (int i=0; i<MAXAUDIOINDEV; i++) {
-		out.dev  [i] = in.dev  [i] = int(atom_getfloatarg(i*2+1, argc, argv));
-		out.chdev[i] = in.chdev[i] = int(atom_getfloatarg(i*2+2, argc, argv));
+		ao.dev  [i] = ai.dev  [i] = int(atom_getfloatarg(i*2+1, argc, argv));
+		ao.chdev[i] = ai.chdev[i] = int(atom_getfloatarg(i*2+2, argc, argv));
 	}
 	sys_close_audio();
-	sys_open_audio2(&in,&out, rate, dacblocksize, advance, scheduler);
+	sys_open_audio2(&ai,&ao, rate, dacblocksize, advance, scheduler);
 }
 
 void glob_audio_device_in(t_pd *dummy, t_symbol *s, int argc, t_atom *argv) {
-	t_audiodevs in,out;
+	t_audiodevs ai,ao;
 	int rate, dacblocksize, advance, scheduler;
-	sys_get_audio_params(&in,&out, &rate, &dacblocksize, &advance, &scheduler);
-	in.ndev = (int)atom_getfloatarg(0, argc, argv);
+	sys_get_audio_params(&ai,&ao, &rate, &dacblocksize, &advance, &scheduler);
+	ai.ndev = (int)atom_getfloatarg(0, argc, argv);
 	for (int i=0; i<MAXAUDIOINDEV; i=i+2) {
-		in.dev  [i] = atom_getintarg(i+1, argc, argv);
-		in.chdev[i] = atom_getintarg(i+2, argc, argv);
+		ai.dev  [i] = atom_getintarg(i+1, argc, argv);
+		ai.chdev[i] = atom_getintarg(i+2, argc, argv);
 	}
 	sys_close_audio();
-	sys_open_audio2(&in,&out,rate, dacblocksize, advance, scheduler);
+	sys_open_audio2(&ai,&ao,rate, dacblocksize, advance, scheduler);
 }
 
 void glob_audio_device_out(t_pd *dummy, t_symbol *s, int argc, t_atom *argv) {
-	t_audiodevs in,out;
+	t_audiodevs ai,ao;
 	int rate, dacblocksize, advance, scheduler;
-	sys_get_audio_params(&in,&out, &rate, &dacblocksize, &advance, &scheduler);
-	out.ndev = (int)atom_getfloatarg(0, argc, argv);
+	sys_get_audio_params(&ai,&ao, &rate, &dacblocksize, &advance, &scheduler);
+	ao.ndev = (int)atom_getfloatarg(0, argc, argv);
 	/* i+=2 ? isn't that a bug??? */
 	for (int i=0; i<MAXAUDIOOUTDEV; i+=2) {
-		out.dev  [i] = atom_getintarg(i+1, argc, argv);
-		out.chdev[i] = atom_getintarg(i+2, argc, argv);
+		ao.dev  [i] = atom_getintarg(i+1, argc, argv);
+		ao.chdev[i] = atom_getintarg(i+2, argc, argv);
 	}
 	sys_close_audio();
-	sys_open_audio2(&in,&out, rate, dacblocksize, advance, scheduler);
+	sys_open_audio2(&ai,&ao, rate, dacblocksize, advance, scheduler);
 }
 
 /* some general helper functions */
@@ -650,7 +633,7 @@ void sys_update_sleepgrain() {
 
 /* t_audiodevs are the ones you're using; char[] are all the devices available. */
 void glob_audio_getaudioindevices(t_pd * dummy, t_symbol *s, int ac, t_atom *av) {
-    t_audiodevs in,out;
+    t_audiodevs ai,ao;
     int rate, dacblocksize, advance, scheduler;
     int nindevs = 0, noutdevs = 0, canmulti = 0;
     t_atom argv[MAXNDEV];
@@ -659,7 +642,7 @@ void glob_audio_getaudioindevices(t_pd * dummy, t_symbol *s, int ac, t_atom *av)
     t_symbol *pd = gensym("pd");
     char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
     audio_getdevs(indevlist, &nindevs, outdevlist, &noutdevs, &canmulti, MAXNDEV, DEVDESCSIZE);
-    sys_get_audio_params(&in,&out, &rate, &dacblocksize, &advance, &scheduler);
+    sys_get_audio_params(&ai,&ao, &rate, &dacblocksize, &advance, &scheduler);
     if (f < 0) {
         for (int i=0; i<nindevs; i++) SETSTRING(argv+i,indevlist+i*DEVDESCSIZE);
         typedmess(pd->s_thing, selector, nindevs, argv);
@@ -669,7 +652,7 @@ void glob_audio_getaudioindevices(t_pd * dummy, t_symbol *s, int ac, t_atom *av)
     }
 }
 void glob_audio_getaudiooutdevices(t_pd * dummy, t_symbol *s, int ac, t_atom *av) {
-    t_audiodevs in,out;
+    t_audiodevs ai,ao;
     int rate, dacblocksize, advance, scheduler;
     int nindevs = 0, noutdevs = 0, canmulti = 0;
     t_atom argv[MAXNDEV];
@@ -678,7 +661,7 @@ void glob_audio_getaudiooutdevices(t_pd * dummy, t_symbol *s, int ac, t_atom *av
     t_symbol *pd = gensym("pd");
     char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
     audio_getdevs(indevlist, &nindevs, outdevlist, &noutdevs, &canmulti, MAXNDEV, DEVDESCSIZE);
-    sys_get_audio_params(&in,&out, &rate, &dacblocksize, &advance, &scheduler);
+    sys_get_audio_params(&ai,&ao, &rate, &dacblocksize, &advance, &scheduler);
     if (f < 0) {
         for (int i=0; i<noutdevs; i++) SETSYMBOL(argv+i, gensym(outdevlist+i*DEVDESCSIZE));
         typedmess(pd->s_thing, selector, noutdevs, argv);
