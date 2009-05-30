@@ -80,9 +80,9 @@ int sys_audioapi = API_DEFAULT;
 int sys_dacblocksize;
 int sys_schedblocksize;
 int sys_meters;          /* true if we're metering */
-static float sys_inmax;         /* max input amplitude */
-static float sys_outmax;        /* max output amplitude */
-int sys_schedadvance;   /* scheduler advance in microseconds */
+static float sys_inmax;  /* max input amplitude */
+static float sys_outmax; /* max output amplitude */
+int sys_schedadvance;    /* scheduler advance in microseconds */
 
 /* the "state" is normally one if we're open and zero otherwise; but if the state is one,
    we still haven't necessarily opened the audio hardware; see audio_isopen() below. */
@@ -104,8 +104,8 @@ static float (*peak_fp)(t_float*, t_int, t_float) = peakvec;
 static int audio_isopen() {return audio_state && ((audi.ndev > 0 && audi.chdev[0] > 0) || (audo.ndev > 0 && audo.chdev[0] > 0));}
 
 extern "C" void sys_get_audio_params(t_audiodevs *ai, t_audiodevs *ao, int *prate, int *pdacblocksize, int *padvance, int *pscheduler) {
-    ai->ndev=audi.ndev; for (int i=0; i< MAXAUDIOINDEV; i++) {ai->dev[i] = audi.dev[i]; ai->chdev[i]=audi.chdev[i];}
-    ao->ndev=audo.ndev; for (int i=0; i<MAXAUDIOOUTDEV; i++) {ao->dev[i] = audo.dev[i]; ao->chdev[i]=audo.chdev[i];}
+    ai->ndev=audi.ndev; for (int i=0; i< MAXAUDIOINDEV; i++) {ai->dev[i]=audi.dev[i]; ai->chdev[i]=audi.chdev[i];}
+    ao->ndev=audo.ndev; for (int i=0; i<MAXAUDIOOUTDEV; i++) {ao->dev[i]=audo.dev[i]; ao->chdev[i]=audo.chdev[i];}
     *prate = audio_rate;
     *pdacblocksize = audio_dacblocksize;
     *padvance = audio_advance;
@@ -113,12 +113,12 @@ extern "C" void sys_get_audio_params(t_audiodevs *ai, t_audiodevs *ao, int *prat
 }
 
 void sys_save_audio_params(
-int nindev,  int *indev,  int *chindev,
-int noutdev, int *outdev, int *choutdev, int rate, int dacblocksize, int advance, int scheduler) {
-    audi.ndev  = nindev;
-    audo.ndev = noutdev;
-    for (int i=0; i<MAXAUDIOINDEV;  i++) {audi.dev[i]  = indev[i]; audi.chdev[i]  = chindev[i];}
-    for (int i=0; i<MAXAUDIOOUTDEV; i++) {audo.dev[i] = outdev[i]; audo.chdev[i] = choutdev[i];}
+int nidev, int *idev, int *ichdev,
+int nodev, int *odev, int *ochdev, int rate, int dacblocksize, int advance, int scheduler) {
+    audi.ndev  = nidev;
+    audo.ndev = nodev;
+    for (int i=0; i<MAXAUDIOINDEV;  i++) {audi.dev[i]=idev[i]; audi.chdev[i]=ichdev[i];}
+    for (int i=0; i<MAXAUDIOOUTDEV; i++) {audo.dev[i]=odev[i]; audo.chdev[i]=ochdev[i];}
     audio_rate = rate;
     audio_dacblocksize = dacblocksize;
     audio_advance = advance;
@@ -164,7 +164,7 @@ void sys_setchsr(int chin, int chout, int sr, int dacblocksize) {
     sys_soundout = (t_float *)getalignedbytes(outbytes);
     memset(sys_soundout, 0, outbytes);
     /* tb: modification for simd-optimized peak finding */
-    if (SIMD_CHKCNT(sys_inchannels * sys_dacblocksize) &&
+    if (SIMD_CHKCNT(sys_inchannels  * sys_dacblocksize) &&
 	SIMD_CHKCNT(sys_outchannels * sys_dacblocksize))
 	 peak_fp = peakvec_simd;
     else peak_fp = peakvec;
@@ -177,11 +177,12 @@ void sys_setchsr(int chin, int chout, int sr, int dacblocksize) {
 /* open audio devices (after cleaning up the specified device and channel vectors).  The audio devices are "zero based"
    (i.e. "0" means the first one.)  We also save the cleaned-up device specification so that we
     can later re-open audio and/or show the settings on a dialog window. */
-void sys_open_audio(int nindev, int *indev, int nchindev, int *chindev, int noutdev, int *outdev, int nchoutdev,
-int *choutdev, int rate, int dacblocksize, int advance, int schedmode, int enable) {
+void sys_open_audio(
+  int nidev, int *idev, int nichdev, int *ichdev,
+  int nodev, int *odev, int nochdev, int *ochdev, int rate, int dacblocksize, int advance, int schedmode, int enable) {
     int defaultchannels = SYS_DEFAULTCH;
-    int realinchans[MAXAUDIOINDEV], realoutchans[MAXAUDIOOUTDEV];
-    char idevlist[MAXNDEV*DEVDESCSIZE], odevlist[MAXNDEV*DEVDESCSIZE];
+    int realich[MAXAUDIOINDEV];  char idevlist[MAXNDEV*DEVDESCSIZE];
+    int realoch[MAXAUDIOOUTDEV]; char odevlist[MAXNDEV*DEVDESCSIZE];
     int indevs = 0, outdevs = 0, canmulti = 0;
     audio_getdevs(idevlist, &indevs, odevlist, &outdevs, &canmulti, MAXNDEV, DEVDESCSIZE);
     if (sys_externalschedlib) return;
@@ -192,54 +193,30 @@ int *choutdev, int rate, int dacblocksize, int advance, int schedmode, int enabl
      audio_init();
      /* Since the channel vector might be longer than the audio device vector, or vice versa, we fill the shorter one
         in to match the longer one.  Also, if both are empty, we fill in one device (the default) and two channels. */
-    if (nindev == -1) { /* no input audio devices specified */
-        if (nchindev == -1) {
-            if (indevs >= 1) {
-                nchindev=1; chindev[0]=defaultchannels;
-                  nindev=1;   indev[0]=DEFAULTAUDIODEV;
-            } else nindev = nchindev = 0;
-        } else {
-            for (int i=0; i<MAXAUDIOINDEV; i++) indev[i] = i;
-            nindev = nchindev;
-        }
+    if (nidev == -1) { /* no input audio devices specified */
+        if (nichdev == -1) {
+            if (indevs >= 1) {nidev=nichdev=1; ichdev[0]=defaultchannels; idev[0]=DEFAULTAUDIODEV;} else nidev = nichdev=0;
+        } else for (int i=0; i<MAXAUDIOINDEV; i++) idev[i] = i;
     } else {
-        if (nchindev == -1) {
-            nchindev = nindev;
-            for (int i=0; i<nindev; i++) chindev[i] = defaultchannels;
-        } else if (nchindev > nindev) {
-            for (int i=nindev; i<nchindev; i++) if (i==0)   indev[i]=DEFAULTAUDIODEV; else   indev[i]=indev[i-1]+1;
-            nindev = nchindev;
-        } else if (nchindev < nindev) {
-            for (int i=nchindev; i<nindev; i++) if (i==0) chindev[i]=defaultchannels; else chindev[i]=chindev[i-1];
-            nindev = nchindev;
-        }
+        if (nichdev == -1) {nichdev = nidev; for (int i=0; i<nidev; i++) ichdev[i] = defaultchannels;
+        } else if (nichdev > nidev) {for (int i=nidev; i<nichdev; i++) if (i==0)   idev[i]=DEFAULTAUDIODEV; else   idev[i]=idev[i-1]+1;
+        } else if (nichdev < nidev) {for (int i=nichdev; i<nidev; i++) if (i==0) ichdev[i]=defaultchannels; else ichdev[i]=ichdev[i-1];}
     }
-    if (noutdev == -1) { /* not set */
-        if (nchoutdev == -1) {
-            if (outdevs >= 1) {
-                nchoutdev=1; choutdev[0]=defaultchannels;
-                  noutdev=1;   outdev[0]=DEFAULTAUDIODEV;
-            } else nchoutdev = noutdev = 0;
-        } else {
-            for (int i=0; i<MAXAUDIOOUTDEV; i++) outdev[i] = i;
-            noutdev = nchoutdev;
-        }
+    nidev = nichdev;
+    if (nodev == -1) { /* not set */
+        if (nochdev == -1) {
+            if (outdevs >= 1) {nodev=nochdev=1; ochdev[0]=defaultchannels; odev[0]=DEFAULTAUDIODEV;} else nodev = nochdev=0;
+        } else for (int i=0; i<MAXAUDIOOUTDEV; i++) odev[i] = i;
     } else {
-        if (nchoutdev == -1) {
-            nchoutdev = noutdev;
-            for (int i=0; i<noutdev; i++) choutdev[i] = defaultchannels;
-        } else if (nchoutdev > noutdev) {
-            for (int i=noutdev; i<nchoutdev; i++) if (i==0)   outdev[0]=DEFAULTAUDIODEV; else   outdev[i]=outdev[i-1]+1;
-            noutdev = nchoutdev;
-        } else if (nchoutdev < noutdev) {
-            for (int i=nchoutdev; i<noutdev; i++) if (i==0) choutdev[0]=defaultchannels; else choutdev[i]=choutdev[i-1];
-            noutdev = nchoutdev;
-        }
+        if (nochdev == -1) {nochdev = nodev; for (int i=0; i<nodev; i++) ochdev[i] = defaultchannels;
+        } else if (nochdev > nodev) {for (int i=nodev; i<nochdev; i++) if (i==0)   odev[0]=DEFAULTAUDIODEV; else   odev[i]=odev[i-1]+1;
+        } else if (nochdev < nodev) {for (int i=nochdev; i<nodev; i++) if (i==0) ochdev[0]=defaultchannels; else ochdev[i]=ochdev[i-1];}
     }
+    nodev = nochdev;
     /* count total number of input and output channels */
     int inchans=0, outchans=0;
-    for (int i=0;  i < nindev;  i++)  inchans += (realinchans[i]  = (chindev[i] > 0 ?  chindev[i] : 0));
-    for (int i=0; i < noutdev; i++) outchans += (realoutchans[i] = (choutdev[i] > 0 ? choutdev[i] : 0));
+    for (int i=0; i<nidev; i++)  inchans += (realich[i] = (ichdev[i] > 0 ? ichdev[i] : 0));
+    for (int i=0; i<nodev; i++) outchans += (realoch[i] = (ochdev[i] > 0 ? ochdev[i] : 0));
     /* if no input or output devices seem to have been specified, this really means just disable audio, which we now do. */
     if (!inchans && !outchans) enable = 0;
     sys_schedadvance = advance * 1000;
@@ -249,24 +226,21 @@ int *choutdev, int rate, int dacblocksize, int advance, int schedmode, int enabl
         /* for alsa, only one device is supported; it may be open for both input and output. */
 #ifdef USEAPI_PORTAUDIO
         if (sys_audioapi == API_PORTAUDIO)
-            pa_open_audio(inchans, outchans, rate, advance,
-		  (noutdev > 0 ? indev[0] : 0),
-		  (noutdev > 0 ? outdev[0] : 0), schedmode);
+            pa_open_audio(inchans, outchans, rate, advance, (nodev>0?idev[0]:0), (nodev>0?odev[0]:0), schedmode);
 	else
 #endif
 #ifdef USEAPI_JACK
         if (sys_audioapi == API_JACK)
-            jack_open_audio((nindev > 0 ? realinchans[0] : 0),
-                            (noutdev > 0 ? realoutchans[0] : 0), rate, schedmode);
+            jack_open_audio((nidev>0?realich[0]:0), (nodev>0?realoch[0]:0), rate, schedmode);
         else
 #endif
         if (sys_audioapi == API_OSS || sys_audioapi == API_ALSA || sys_audioapi == API_MMIO)
-            sys_audio()->open_audio(nindev, indev, nchindev, realinchans, noutdev, outdev, nchoutdev, realoutchans, rate, -42);
+            sys_audio()->open_audio(nidev, idev, nichdev, realich, nodev, odev, nochdev, realoch, rate, -42);
         else if (sys_audioapi == API_ASIO)
-	    sys_audio()->open_audio(nindev, indev, nchindev,     chindev, noutdev, outdev, nchoutdev,     choutdev, rate, schedmode);
+	    sys_audio()->open_audio(nidev, idev, nichdev,  ichdev, nodev, odev, nochdev,  ochdev, rate, schedmode);
 	else post("unknown audio API specified");
     }
-    sys_save_audio_params(nindev, indev, chindev, noutdev, outdev, choutdev, int(sys_dacsr), sys_dacblocksize, advance, schedmode);
+    sys_save_audio_params(nidev, idev, ichdev, nodev, odev, ochdev, int(sys_dacsr), sys_dacblocksize, advance, schedmode);
     if (sys_inchannels == 0 && sys_outchannels == 0) enable = 0;
     audio_state = enable;
     sys_vgui("set pd_whichapi %d\n", audio_isopen() ? sys_audioapi : 0);
@@ -305,7 +279,7 @@ void sys_reopen_audio() {
 float peakvec(t_float* vec, t_int n, t_float cur_max) {
 	for (int i=0; i<n; i++) {
 		float f = *vec++;
-		if (f > cur_max) cur_max = f;
+		if      (+f > cur_max) cur_max = +f;
 		else if (-f > cur_max) cur_max = -f;
 	}
 	return cur_max;
