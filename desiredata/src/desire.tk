@@ -2288,7 +2288,7 @@ def Canvas init_menus {} {
     $self populate_menu edit {undo redo {} cut copy paste duplicate select_all subpatcherize {} tidy_up {}}
     $self populate_menu find {find find_again find_last_error}
     $m.view add checkbutton -label [say visual_diff] -selectcolor grey0 -command [list $self visual_diff] \
-    	-accelerator [accel_munge "Ctrl+e"] -indicatoron 1
+    	-accelerator [accel_munge "Ctrl+E"] -indicatoron 1
     $self populate_menu view {get_elapsed {} reload redraw}
     $self populate_menu put {Object Message Number Symbol Comment {} bng tgl nbx vsl hsl vradio hradio vu cnv {} Graph Array}
     $self populate_menu window {{}}
@@ -8730,10 +8730,11 @@ def Canvas auto_test {} {
 #-----------------------------------------------------------------
 def Canvas visual_diff {} {
 	if {$@blinky != ""} {
+		.$self.c delete BLINKY
 		after cancel $@blinky
+		set @blinky ""
 		return
 	}
-	#regsub {\.pd} [$self name] {} filename
 	set filename [$self name]
 	set initialfile ""
         foreach suffix {gif jpg jpeg png} {
@@ -8754,7 +8755,7 @@ def Canvas blink_image {} {
 	} else {
 		.$self.c create image 0 0 -image image_$self -tag BLINKY -anchor nw
 	}
-	set @blinky [after 500 [list $self blink_image]]
+	set @blinky [after 250 [list $self blink_image]]
 }
 
 #-----------------------------------------------------------------
