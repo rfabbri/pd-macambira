@@ -34,8 +34,6 @@
 #include <ctype.h>
 #endif
 
-
-
 typedef struct pdp_opencv_motempl_struct
 {
     t_object x_obj;
@@ -53,7 +51,8 @@ typedef struct pdp_opencv_motempl_struct
     int x_size;
 
     int x_thresh;
-    int x_mhi_duration;
+    double x_mhi_duration;
+    int x_aperture;
 
     int x_infosok; 
 
@@ -74,6 +73,7 @@ typedef struct pdp_opencv_motempl_struct
     // various tracking parameters (in seconds)
     double max_time_delta;
     double min_time_delta;
+
     // number of cyclic frame buffer used for motion detection
     // (should, probably, depend on FPS)
     int frame_buffer_num; 
@@ -81,6 +81,8 @@ typedef struct pdp_opencv_motempl_struct
     int max_size;
     int min_size;
     
+    t_atom rlist[6];
+
 } t_pdp_opencv_motempl;
 
 void  pdp_opencv_motempl_update_mhi( t_pdp_opencv_motempl *x, IplImage* img, IplImage* dst, int diff_threshold )
@@ -140,7 +142,7 @@ void  pdp_opencv_motempl_update_mhi( t_pdp_opencv_motempl *x, IplImage* img, Ipl
     cvCvtPlaneToPix( x->mask, 0, 0, 0, dst );
 
     // calculate motion gradient orientation and valid orientation mask
-    cvCalcMotionGradient( x->mhi, x->mask, x->orient, x->max_time_delta, x->min_time_delta, x->x_mhi_duration ); 
+    cvCalcMotionGradient( x->mhi, x->mask, x->orient, x->max_time_delta, x->min_time_delta, x->x_aperture ); 
     
     if( !x->storage )
         x->storage = cvCreateMemStorage(0);
@@ -198,14 +200,13 @@ void  pdp_opencv_motempl_update_mhi( t_pdp_opencv_motempl *x, IplImage* img, Ipl
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
 
-    	 t_atom rlist[6];
-         SETFLOAT(&rlist[0], i);
-         SETFLOAT(&rlist[1], center.x);
-         SETFLOAT(&rlist[2], center.y);
-         SETFLOAT(&rlist[3], comp_rect.width);
-         SETFLOAT(&rlist[4], comp_rect.height);
-         SETFLOAT(&rlist[5], angle);
-    	 outlet_list( x->x_dataout, 0, 6, rlist );
+         SETFLOAT(&x->rlist[0], i);
+         SETFLOAT(&x->rlist[1], center.x);
+         SETFLOAT(&x->rlist[2], center.y);
+         SETFLOAT(&x->rlist[3], comp_rect.width);
+         SETFLOAT(&x->rlist[4], comp_rect.height);
+         SETFLOAT(&x->rlist[5], angle);
+       outlet_list( x->x_dataout, 0, 6, x->rlist );
     }
 }
 
@@ -225,23 +226,23 @@ static void pdp_opencv_motempl_process_rgb(t_pdp_opencv_motempl *x)
         (x->x_height != (t_int)header->info.image.height)) 
     {
 
-    	post("pdp_opencv_motempl :: resizing plugins");
-	
-    	//cv_freeplugins(x);
+      post("pdp_opencv_motempl :: resizing plugins");
+  
+      //cv_freeplugins(x);
 
-    	x->x_width = header->info.image.width;
-    	x->x_height = header->info.image.height;
-    	x->x_size = x->x_width*x->x_height;
+      x->x_width = header->info.image.width;
+      x->x_height = header->info.image.height;
+      x->x_size = x->x_width*x->x_height;
     
-    	//Destroy cv_images
-    	cvReleaseImage( &x->image );
-    	cvReleaseImage( &x->motion );
+      //Destroy cv_images
+      cvReleaseImage( &x->image );
+      cvReleaseImage( &x->motion );
    
-	//Create cv_images 
-    	x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
-    	x->motion = cvCreateImage( cvSize(x->image->width,x->image->height), 8, 3 );
-    	cvZero( x->motion );
-    	x->motion->origin = x->image->origin;
+      //create cv_images 
+      x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
+      x->motion = cvCreateImage( cvSize(x->image->width,x->image->height), 8, 3 );
+      cvZero( x->motion );
+      x->motion->origin = x->image->origin;
     }
     
     newheader->info.image.encoding = header->info.image.encoding;
@@ -250,52 +251,57 @@ static void pdp_opencv_motempl_process_rgb(t_pdp_opencv_motempl *x)
 
     memcpy( newdata, data, x->x_size*3 );
     
-    
-    // FEM UNA COPIA DEL PACKET A x->grey->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( x->image->imageData, data, x->x_size*3 );
         
     pdp_opencv_motempl_update_mhi( x, x->image, x->motion, x->x_thresh );
 
     memcpy( newdata, x->motion->imageData, x->x_size*3 );
 
- 
     return;
 }
 
 static void pdp_opencv_motempl_thresh(t_pdp_opencv_motempl *x, t_floatarg f)
 {
-	x->x_thresh = (int)f;
+  x->x_thresh = (int)f;
 }
 
 static void pdp_opencv_motempl_min_size(t_pdp_opencv_motempl *x, t_floatarg f)
 {
-	if (f>=0) x->min_size = (int)f;
+  if (f>=0) x->min_size = (int)f;
 }
 
 static void pdp_opencv_motempl_max_size(t_pdp_opencv_motempl *x, t_floatarg f)
 {
-	if (f>=0) x->max_size = (int)f;
+  if (f>=0) x->max_size = (int)f;
 }
 
 static void pdp_opencv_motempl_mhi_duration(t_pdp_opencv_motempl *x, t_floatarg f)
 {
-	if (f>=1) x->x_mhi_duration = (int)f;
+  if (f>0) x->x_mhi_duration = f;
+}
+
+static void pdp_opencv_motempl_aperture(t_pdp_opencv_motempl *x, t_floatarg f)
+{
+  if ( ( (int)f == 3.0 ) || ( (int)f == 5.0 ) || (  (int)f == 7.0 ) )
+  {
+    x->x_aperture = (int)f;
+  }
 }
 
 static void pdp_opencv_motempl_max_time_delta(t_pdp_opencv_motempl *x, t_floatarg f)
 {
-	if (f>0) x->max_time_delta = f;
+  if (f>0) x->max_time_delta = f;
 }
 
 static void pdp_opencv_motempl_min_time_delta(t_pdp_opencv_motempl *x, t_floatarg f)
 {
-	if (f>0) x->min_time_delta = f;
+  if (f>0) x->min_time_delta = f;
 }
 
 static void pdp_opencv_motempl_frame_buffer_num(t_pdp_opencv_motempl *x, t_floatarg f)
 {
-	if (f>=3) x->frame_buffer_num = (int)f;
-	x->buf = NULL;
+  if (f>=3) x->frame_buffer_num = (int)f;
+  x->buf = NULL;
 }
 
 static void pdp_opencv_motempl_sendpacket(t_pdp_opencv_motempl *x)
@@ -310,34 +316,27 @@ static void pdp_opencv_motempl_sendpacket(t_pdp_opencv_motempl *x)
 
 static void pdp_opencv_motempl_process(t_pdp_opencv_motempl *x)
 {
-   int encoding;
-   t_pdp *header = 0;
-   char *parname;
-   unsigned pi;
-   int partype;
-   float pardefault;
-   t_atom plist[2];
-   t_atom tlist[2];
-   t_atom vlist[2];
+ int encoding;
+ t_pdp *header = 0;
 
-   /* check if image data packets are compatible */
-   if ( (header = pdp_packet_header(x->x_packet0))
-	&& (PDP_BITMAP == header->type)){
+ /* check if image data packets are compatible */
+ if ( (header = pdp_packet_header(x->x_packet0))
+  && (PDP_BITMAP == header->type)){
     
-	/* pdp_opencv_motempl_process inputs and write into active inlet */
-	switch(pdp_packet_header(x->x_packet0)->info.image.encoding){
+  /* pdp_opencv_motempl_process inputs and write into active inlet */
+  switch(pdp_packet_header(x->x_packet0)->info.image.encoding){
 
-	case PDP_BITMAP_RGB:
+  case PDP_BITMAP_RGB:
             x->x_packet1 = pdp_packet_clone_rw(x->x_packet0);
             pdp_queue_add(x, pdp_opencv_motempl_process_rgb, pdp_opencv_motempl_sendpacket, &x->x_queue_id);
-	    break;
+      break;
 
-	default:
-	    /* don't know the type, so dont pdp_opencv_motempl_process */
-	    break;
-	    
-	}
-    }
+  default:
+      /* don't know the type, so dont pdp_opencv_motempl_process */
+      break;
+      
+  }
+ }
 
 }
 
@@ -361,15 +360,13 @@ static void pdp_opencv_motempl_free(t_pdp_opencv_motempl *x)
 
     pdp_queue_finish(x->x_queue_id);
     pdp_packet_mark_unused(x->x_packet0);
-    //cv_freeplugins(x);
     
-    	//Destroy cv_images
-    	cvReleaseImage( &x->image );
-    	cvReleaseImage( &x->motion );
+    //Destroy cv_images
+    cvReleaseImage( &x->image );
+    cvReleaseImage( &x->motion );
 }
 
 t_class *pdp_opencv_motempl_class;
-
 
 void *pdp_opencv_motempl_new(t_floatarg f)
 {
@@ -395,7 +392,8 @@ void *pdp_opencv_motempl_new(t_floatarg f)
 
     x->x_thresh = 30;
     x->x_mhi_duration = 1;
-	
+    x->x_aperture = 3;
+  
     x->last = 0;
     // various tracking parameters (in seconds)
     x->max_time_delta = 0.5;
@@ -414,7 +412,6 @@ void *pdp_opencv_motempl_new(t_floatarg f)
 
     x->storage = NULL; 
 
-
     return (void *)x;
 }
 
@@ -428,13 +425,14 @@ extern "C"
 void pdp_opencv_motempl_setup(void)
 {
 
-    post( "		pdp_opencv_motempl");
+    post( "    pdp_opencv_motempl");
     pdp_opencv_motempl_class = class_new(gensym("pdp_opencv_motempl"), (t_newmethod)pdp_opencv_motempl_new,
-    	(t_method)pdp_opencv_motempl_free, sizeof(t_pdp_opencv_motempl), 0, A_DEFFLOAT, A_NULL);
+      (t_method)pdp_opencv_motempl_free, sizeof(t_pdp_opencv_motempl), 0, A_DEFFLOAT, A_NULL);
 
     class_addmethod(pdp_opencv_motempl_class, (t_method)pdp_opencv_motempl_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_opencv_motempl_class, (t_method)pdp_opencv_motempl_thresh, gensym("threshold"),  A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_motempl_class, (t_method)pdp_opencv_motempl_mhi_duration, gensym("mhi_duration"),  A_FLOAT, A_NULL );   
+    class_addmethod(pdp_opencv_motempl_class, (t_method)pdp_opencv_motempl_aperture, gensym("aperture"),  A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_motempl_class, (t_method)pdp_opencv_motempl_max_time_delta, gensym("max_time_delta"),  A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_motempl_class, (t_method)pdp_opencv_motempl_min_time_delta, gensym("min_time_delta"),  A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_motempl_class, (t_method)pdp_opencv_motempl_frame_buffer_num, gensym("frame_buffer_num"),  A_FLOAT, A_NULL );   
