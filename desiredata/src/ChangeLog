@@ -5,7 +5,7 @@ DesireData 2009.06... :
  * modal dialogues now appear on top of current window, not always main window
  * added -stdout
  * fixed osx scrolling
-
+ * -listdev not supported anymore
 
 
 DesireData 2008.02.19 :

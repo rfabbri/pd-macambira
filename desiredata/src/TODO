@@ -12,9 +12,9 @@ LEGEND:
 [s] observable wires list
 [s] gop filter
 [s] triad (which triad???)
+[c] make List objects, to manage children, visible_children, wires, selection, selection_wires.
 
 --- those should be only things that will not be in milestones 1,2,3, until the progress bar.
-
 [ ] glerm says: backspace key problem in virtual keyboard
 [s] rewrite [any]
 [ ] right-click on an [s] or [r] would have an option "Find Matching Sends & Receives"
@@ -55,6 +55,9 @@ LEGEND:
 [b] http://lists.puredata.info/pipermail/pd-dev/2007-10/009581.html
 [s] what to do with post() in case of -nogui ? (it fills an ever-expanding buffer, does it?)
 ------------------8<------------------------------------progress-bar----------------------------------------------8<------------------
+[c] is pd_mess_split correct? e.g. does it handle \\; properly?
+[c] make [display] look distinctive (not confusable with ObjectBox)
+[c] correct the dozen problems you can see by using visual_diff on all_guis_and_gop.pd
 [ ] help files for: [parse], [unparse], etc.
 [s] recreate abstr instances after abstr save
 [s] [bng] messages get duplicated upon entering a subpatch???
@@ -122,10 +125,9 @@ LEGEND:
   ./externals/grill/dynext/src/main.cpp:952: mess1((t_pd *)canvas,const_cast<t_symbol *>(sym_dsp),NULL);
 
 [s] allow helpfiles to load without having to "make install".
-[s] switch iemguis to using only t_atoms
 [s] MIDI loopback pseudo-device (inside pd)
 [s] audio loopback pseudo-device (inside pd)
-[s] use vector doubling in binbuf_add,binbuf_addv...
+[s] use vector doubling in binbuf_add,binbuf_addv...?
 [c] opening an already-open subpatch should just raise that subpatch
 [c] pixel offsets are not correct in [hsl] [vsl]: distinguish between $@w or $@h and actual size. there should be 4 extra pixels.
 [c] hide inlets/outlets of IEMGUI when they have receive-symbols/send-symbols
@@ -150,7 +152,6 @@ Implement (or fix) Find:
 [c] implement timeout in def Manager call
 [s] proper symbol quoting
 [c] patching-in-tongues follow-up
-[c] make List objects, to manage children, visible_children, wires, selection, selection_wires.
 [c] skip unneeded motion events inside client (do we need this?)
 [b] rename pd to pd-server, desire.tk to pd-client, add new program "pd" which would launch both (will we really do this?)
 [b] #V test with bg color
@@ -158,7 +159,6 @@ Implement (or fix) Find:
 [c] iemprops: min,max labels broken
 [b] fix the [key] and [keyup] and [mouse] (?) classes
 [s] fix all issues with backslashes and braces.
-[c] devlist isn't supposed to be like a choice, rather like several choices.
 [c] implement def Canvas tidy
 [c] set tk::mac::useCGDrawing 1
 [s] differential upload
@@ -507,3 +507,17 @@ imply that clicking on messages or numbers has different behaviour (play
 mode) when you hit apple (or ctrl on win/lin?).
 
 marius.
+
+#--------#--------#--------#--------#--------#--------#--------#--------#--------
+http://autobuild.puredata.info/auto-build/2009-05-30/logs/2009-05-30_08.33.25_linux_ubuntu-intrepid-i386_pd-desiredata_run-automated-builder.txt
+s_audio_oss.o s_audio_alsa.o s_audio_alsamm.o s_midi_alsa.o s_audio_jack.o s_midi_oss.o
+
+http://autobuild.puredata.info/auto-build/2009-05-30/logs/2009-05-30_08.11.32_linux_ubuntu-hardy-i386_pd-desiredata_run-automated-builder.txt
+s_audio_oss.o s_audio_alsa.o s_audio_alsamm.o s_midi_alsa.o s_audio_jack.o s_midi_oss.o  
+
+http://autobuild.puredata.info/auto-build/2009-05-30/logs/2009-05-30_06.48.53_linux_debian-lenny-powerpc_pd-desiredata_run-automated-builder.txt
+s_audio_oss.o s_audio_alsa.o s_audio_alsamm.o s_midi_alsa.o s_audio_jack.o s_midi_oss.o  
+
+http://autobuild.puredata.info/auto-build/2009-05-30/logs/2009-05-30_06.48.53_linux_debian-lenny-powerpc_pd-desiredata_run-automated-builder.txt
+s_audio_oss.o s_audio_alsa.o s_audio_alsamm.o s_midi_alsa.o s_audio_jack.o s_midi_oss.o  
+
