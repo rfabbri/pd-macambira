@@ -112,7 +112,54 @@ typedef struct _tabosci_tilde
     t_float x_fa1, x_fa2, x_fb1, x_fb2, x_fb3; 
     t_float cutoff;
     t_int upsample;
+    t_float x_sr;
 } t_tabosci_tilde;
+
+void tabosci_tilde_cutoff(t_tabosci_tilde *x, t_float cut)
+{
+    x->cutoff = cut;
+
+    if (x->cutoff == 0)
+    {
+        x->x_fb1 = 1;
+        x->x_fb2 = 0;
+        x->x_fb3 = 0;
+        x->x_fa1 = 0;
+        x->x_fa2 = 0;
+
+        x->x_prev_in = 0;
+        x->x_last_in = 0;
+        x->x_prev_out = 0; // reset filter memory
+    }
+    else
+    {
+        // filter coef to cut all high freq.
+        t_float tmp1, tmp2;
+
+        tmp1 = sqrt(2)/2;
+        tmp1 = sinh(tmp1);
+
+        tmp2 = x->cutoff * 2 * 3.1415926 / (x->upsample * x->x_sr);
+	tmp2 = min(6.28,tmp2);
+
+        tmp1 *= sin(tmp2);
+        tmp2 = cos(tmp2);
+
+        x->x_fb1 = (1-tmp2 ) /2;
+        x->x_fb2 = (1-tmp2 );
+        x->x_fb3 = (1-tmp2 ) /2;
+        x->x_fa1 = -2 * tmp2;
+        x->x_fa2 = 1 - tmp1;
+	
+        tmp1 +=1;
+
+        x->x_fb1 /= tmp1;
+        x->x_fb2 /= tmp1;
+        x->x_fb3 /= tmp1;
+        x->x_fa1 /= tmp1;
+        x->x_fa2 /= tmp1;
+    }
+}
 
 static void *tabosci_tilde_new(t_symbol *s)
 {
@@ -125,15 +172,9 @@ static void *tabosci_tilde_new(t_symbol *s)
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("ft1"));
     x->x_f = 0;
     x->cutoff = 0;
-
-    x->x_fb1 = 1;
-    x->x_fb2 = 0;
-    x->x_fb3 = 0;
-    x->x_fa1 = 0;
-    x->x_fa2 = 0;
-
-    x->upsample = 4;
-
+    x->upsample = 1;
+    x->x_sr = 44100;
+    tabosci_tilde_cutoff(x,0); // comput filter coef
     return (x);
 }
 
@@ -158,7 +199,6 @@ static t_int *tabosci_tilde_perform(t_int *w)
     tf.tf_d = UNITBIT32;
     normhipart = tf.tf_i[HIOFFSET];
 
-#if 1
     while (n--)
     {
         t_sample frac,  a,  b,  c,  d, cminusb, temp, filter_out; 
@@ -196,7 +236,6 @@ static t_int *tabosci_tilde_perform(t_int *w)
         *out++ = x->x_last_out;
         *in++;
     }
-#endif
 
     tf.tf_d = UNITBIT32 * fnpoints;
     normhipart = tf.tf_i[HIOFFSET];
@@ -237,39 +276,11 @@ void tabosci_tilde_set(t_tabosci_tilde *x, t_symbol *s)
     }
 }
 
-void tabosci_tilde_cutoff(t_tabosci_tilde *x, t_float cut)
-{
-    x->cutoff = cut;
-
-// filter coef to cut all high freq.
-    t_float tmp1, tmp2;
-
-    tmp1 = sqrt(2)/2;
-    tmp1 = sinh(tmp1);
-
-    tmp2 = x->cutoff * 2 * 3.14159 / x->upsample ;
-
-    tmp1 *= sin(tmp2);
-    tmp2 = cos(tmp2);
-
-    x->x_fb1 = (1-tmp2 ) /2;
-    x->x_fb2 = (1-tmp2 );
-    x->x_fb3 = (1-tmp2 ) /2;
-    x->x_fa1 = -2 * tmp2;
-    x->x_fa2 = 1 - tmp1;
-	
-    tmp1 +=1;
-
-    x->x_fb1 /= tmp1;
-    x->x_fb2 /= tmp1;
-    x->x_fb3 /= tmp1;
-    x->x_fa1 /= tmp1;
-    x->x_fa2 /= tmp1;
-}
 
 void tabosci_tilde_upsample(t_tabosci_tilde *x, t_float up)
 {
     x->upsample = max(1,up);
+    tabosci_tilde_cutoff(x,x->cutoff);
 }
 
 static void tabosci_tilde_ft1(t_tabosci_tilde *x, t_float f)
@@ -279,9 +290,13 @@ static void tabosci_tilde_ft1(t_tabosci_tilde *x, t_float f)
 
 static void tabosci_tilde_dsp(t_tabosci_tilde *x, t_signal **sp)
 {
-    x->x_conv = 1. / sp[0]->s_sr;
+    if (x->x_sr != sp[0]->s_sr)
+    {
+        x->x_sr = sp[0]->s_sr;
+        tabosci_tilde_cutoff(x,x->cutoff);
+        x->x_conv = 1. / sp[0]->s_sr;
+    }
     tabosci_tilde_set(x, x->x_arrayname);
-
     dsp_add(tabosci_tilde_perform, 4, x, sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 
