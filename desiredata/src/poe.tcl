@@ -70,7 +70,6 @@ proc def {self selector argnames body} {
 	global _ __trace __args
 	if {![info exists _($self:_class)]} {error "unknown class '$self'"}
 	set name ${self}_$selector
-	#if {$name == "Canvas_motion_wrap"} {set body "puts \[time {$body}\]"}
 	set argnames [concat [list self] $argnames]
 	if {([info exists __trace($self:$selector)] || [info exists __trace(*:$selector)]
          ||  [info exists __trace($self:*)]         || [info exists __trace(*:*)])
