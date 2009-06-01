@@ -1,0 +1,18 @@
+#N canvas 695 59 307 351 12;
+#X floatatom 35 39 0 0 0 0 - - -;
+#X text 115 131 signal output (delayed signal);
+#X obj 35 67 sig~;
+#X text 84 64 signal input (delay time in ms);
+#X text 178 97 creation argument: name of delay line;
+#X obj 31 297 phasor~;
+#X msg 31 272 222;
+#X obj 31 248 loadbang;
+#X obj 34 159 oscillo~;
+#X obj 34 92 vdc~ test;
+#X obj 32 322 delwrite~ test 1000;
+#X connect 0 0 2 0;
+#X connect 2 0 9 0;
+#X connect 5 0 10 0;
+#X connect 6 0 5 0;
+#X connect 7 0 6 0;
+#X connect 9 0 8 0;
