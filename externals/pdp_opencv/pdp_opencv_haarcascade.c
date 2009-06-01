@@ -34,12 +34,7 @@
 #include "cv.h"
 #endif
 
-
-
-
-
 const char* default_cascade ="./haarcascade_frontalface_alt.xml";
-
 
 typedef struct pdp_opencv_haarcascade_struct
 {
@@ -49,6 +44,7 @@ typedef struct pdp_opencv_haarcascade_struct
     t_outlet *x_outlet0;
     t_outlet *x_outlet1;
     t_outlet *x_dataout;
+    t_atom rlist[4];
     int x_packet0;
     int x_packet1;
     int x_dropped;
@@ -68,6 +64,7 @@ typedef struct pdp_opencv_haarcascade_struct
     IplImage *frame, *img;
     CvMemStorage* storage;
     CvHaarClassifierCascade* cascade;
+    CvFont font;
     
 } t_pdp_opencv_haarcascade;
 
@@ -79,7 +76,7 @@ static void pdp_opencv_haarcascade_process_rgb(t_pdp_opencv_haarcascade *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1); 
-      
+    int i;
 
     if ((x->x_width != (t_int)header->info.image.width) || 
         (x->x_height != (t_int)header->info.image.height)) 
@@ -109,15 +106,12 @@ static void pdp_opencv_haarcascade_process_rgb(t_pdp_opencv_haarcascade *x)
 
     memcpy( newdata, data, x->x_size*3 );
     
-    //cv_processframe(x, x->x_plugin, newdata);
-    
-    // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( x->frame->imageData, data, x->x_size*3 );
     
-            if( x->frame->origin == IPL_ORIGIN_TL )
-                cvCopy( x->frame, x->img, 0 );
-            else
-                cvFlip( x->frame, x->img, 0 );
+    if( x->frame->origin == IPL_ORIGIN_TL )
+        cvCopy( x->frame, x->img, 0 );
+    else
+        cvFlip( x->frame, x->img, 0 );
             
     static CvScalar colors[] = 
     {
@@ -134,9 +128,7 @@ static void pdp_opencv_haarcascade_process_rgb(t_pdp_opencv_haarcascade *x)
     double scale = 1.3;
     IplImage* gray = cvCreateImage( cvSize(x->img->width,x->img->height), 8, 1 );
     IplImage* small_img = cvCreateImage( cvSize( cvRound (x->img->width/scale),
-                         cvRound (x->img->height/scale)),
-                     8, 1 );
-    int i;
+                         cvRound (x->img->height/scale)), 8, 1 );
 
     cvCvtColor( x->img, gray, CV_BGR2GRAY );
     cvResize( gray, small_img, CV_INTER_LINEAR );
@@ -150,7 +142,12 @@ static void pdp_opencv_haarcascade_process_rgb(t_pdp_opencv_haarcascade *x)
 				x->scale_factor, x->min_neighbors, x->mode, cvSize(x->min_size, x->min_size) );
         //t = (double)cvGetTickCount() - t;
         //printf( "detection time = %gms\n", t/((double)cvGetTickFrequency()*1000.) );
-    outlet_float(x->x_outlet1, (float)faces->total);
+
+        if ( faces && (faces->total > 0 ) )
+            outlet_float(x->x_outlet1, (float)faces->total);
+        else
+            outlet_float(x->x_outlet1, 0.0);
+
         for( i = 0; i < (faces ? faces->total : 0); i++ )
         {
             CvRect* r = (CvRect*)cvGetSeqElem( faces, i );
@@ -160,13 +157,15 @@ static void pdp_opencv_haarcascade_process_rgb(t_pdp_opencv_haarcascade *x)
             center.y = cvRound((r->y + r->height*0.5)*scale);
             radius = cvRound((r->width + r->height)*0.25*scale);
             cvCircle( x->img, center, radius, colors[i%8], 3, 8, 0 );
+            char tindex[4];
+            sprintf( tindex, "%d", i );
+            cvPutText( x->img, tindex, center, &x->font, CV_RGB(255,255,255));        
 
-    	    t_atom rlist[4];
-            SETFLOAT(&rlist[0], i);
-            SETFLOAT(&rlist[1], center.x);
-            SETFLOAT(&rlist[2], center.y);
-            SETFLOAT(&rlist[3], radius);
-    	    outlet_list( x->x_dataout, 0, 4, rlist );
+            SETFLOAT(&x->rlist[0], i);
+            SETFLOAT(&x->rlist[1], center.x);
+            SETFLOAT(&x->rlist[2], center.y);
+            SETFLOAT(&x->rlist[3], radius);
+    	    outlet_list( x->x_dataout, 0, 4, x->rlist );
         }
     }
 
@@ -175,15 +174,8 @@ static void pdp_opencv_haarcascade_process_rgb(t_pdp_opencv_haarcascade *x)
     cvClearMemStorage( x->storage );
 
     memcpy( newdata, x->img->imageData, x->x_size*3 );
-
-
  
     return;
-}
-
-static void pdp_opencv_haarcascade_param(t_pdp_opencv_haarcascade *x, t_floatarg f1, t_floatarg f2)
-{
-
 }
 
 static void pdp_opencv_haarcascade_scale_factor(t_pdp_opencv_haarcascade *x, t_floatarg f)
@@ -208,10 +200,10 @@ static void pdp_opencv_haarcascade_min_neighbors(t_pdp_opencv_haarcascade *x, t_
 
 static void pdp_opencv_haarcascade_load(t_pdp_opencv_haarcascade *x, t_symbol *filename)
 {
-    x->cascade = (CvHaarClassifierCascade*)cvLoad(  filename->s_name, 0, 0, 0 );
+    x->cascade = (CvHaarClassifierCascade*)cvLoad( filename->s_name, 0, 0, 0 );
     if( !x->cascade )
     {
-        post( "ERROR: Could not load classifier cascade from %s\n", filename->s_name );
+        post( "pdp_opencv_haarcascade: ERROR: Could not load classifier cascade from %s\n", filename->s_name );
     } else  post( "pdp_opencv_haarcascade: Loaded classifier cascade from %s\n", filename->s_name );
 }
 
@@ -313,18 +305,18 @@ void *pdp_opencv_haarcascade_new(t_floatarg f)
     x->mode = 0;
     x->min_size = 30;
 
-    
     x->cascade = (CvHaarClassifierCascade*)cvLoad( default_cascade, 0, 0, 0 );
     if( !x->cascade )
     {
-        post( "ERROR: Could not load default classifier cascade\n" );
+        post( "pdp_opencv_haarcascade : ERROR : Could not load default classifier cascade\n" );
     } else post( "pdp_opencv_haarcascade: Loaded default classifier cascade\n" );
     x->storage = cvCreateMemStorage(0);
 
-        x->frame = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
-    	x->img = cvCreateImage(cvSize(x->frame->width,x->frame->height), IPL_DEPTH_8U, 3);
+    x->frame = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
+    x->img = cvCreateImage(cvSize(x->frame->width,x->frame->height), IPL_DEPTH_8U, 3);
 
-
+    // initialize font
+    cvInitFont( &x->font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0, 1, 8 );
 
     return (void *)x;
 }
