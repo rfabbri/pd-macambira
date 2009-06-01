@@ -126,7 +126,7 @@ static t_int *tabosc4c_tilde_perform(t_int *w)
     int n = (int)(w[4]);
     int normhipart;
     union tabfudge tf;
-    double a3,a1,a2; // CH
+    double a3,a1,a2; // CH : for the interpolation
     t_float fnpoints = x->x_fnpoints;
     int mask = fnpoints - 1;
     t_float conv = fnpoints * x->x_conv;
@@ -139,7 +139,6 @@ static t_int *tabosc4c_tilde_perform(t_int *w)
     tf.tf_d = UNITBIT32;
     normhipart = tf.tf_i[HIOFFSET];
 
-#if 1
     while (n--)
     {
         t_sample frac,  a,  b,  c,  d, cminusb;
@@ -169,7 +168,7 @@ static t_int *tabosc4c_tilde_perform(t_int *w)
 
 	*out++ =  ((a3 * frac + a2) * frac + a1) * frac + b;
     }
-#endif
+
 
     tf.tf_d = UNITBIT32 * fnpoints;
     normhipart = tf.tf_i[HIOFFSET];

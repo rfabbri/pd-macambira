@@ -40,6 +40,9 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "m_pd.h"
 
+#define max(a,b) ( ((a) > (b)) ? (a) : (b) ) 
+#define min(a,b) ( ((a) < (b)) ? (a) : (b) )
+
 /******************** tabreadi~ ***********************/
 
 static t_class *tabreadi_tilde_class;
@@ -51,7 +54,58 @@ typedef struct _tabreadi_tilde
     t_word *x_vec;
     t_symbol *x_arrayname;
     t_float x_f;
+    t_sample x_prev_in, x_last_in, x_prev_out, x_last_out;
+    t_float x_fa1, x_fa2, x_fb1, x_fb2, x_fb3; 
+    t_float cutoff;
+    t_int upsample;
+    t_float x_sr;
 } t_tabreadi_tilde;
+
+void tabreadi_tilde_cutoff(t_tabreadi_tilde *x, t_float cut)
+{
+    x->cutoff = cut;
+
+    if (x->cutoff == 0)
+    {
+        x->x_fb1 = 1;
+        x->x_fb2 = 0;
+        x->x_fb3 = 0;
+        x->x_fa1 = 0;
+        x->x_fa2 = 0;
+
+        x->x_prev_in = 0;
+        x->x_last_in = 0;
+        x->x_prev_out = 0; // reset filter memory
+    }
+    else
+    {
+        // filter coef to cut all high freq.
+        t_float tmp1, tmp2;
+
+        tmp1 = sqrt(2)/2;
+        tmp1 = sinh(tmp1);
+
+        tmp2 = x->cutoff * 2 * 3.1415926 / (x->upsample * x->x_sr);
+	tmp2 = min(6.28,tmp2);
+
+        tmp1 *= sin(tmp2);
+        tmp2 = cos(tmp2);
+
+        x->x_fb1 = (1-tmp2 ) /2;
+        x->x_fb2 = (1-tmp2 );
+        x->x_fb3 = (1-tmp2 ) /2;
+        x->x_fa1 = -2 * tmp2;
+        x->x_fa2 = 1 - tmp1;
+	
+        tmp1 +=1;
+
+        x->x_fb1 /= tmp1;
+        x->x_fb2 /= tmp1;
+        x->x_fb3 /= tmp1;
+        x->x_fa1 /= tmp1;
+        x->x_fa2 /= tmp1;
+    }
+}
 
 static void *tabreadi_tilde_new(t_symbol *s)
 {
@@ -60,7 +114,10 @@ static void *tabreadi_tilde_new(t_symbol *s)
     x->x_vec = 0;
     outlet_new(&x->x_obj, gensym("signal"));
     x->x_f = 0;
-    return (x);
+    x->cutoff = 0;
+    x->upsample = 1;
+    x->x_sr = 44100;
+    tabreadi_tilde_cutoff(x,0); // comput filter coef   return (x);
 }
 
 static t_int *tabreadi_tilde_perform(t_int *w)
@@ -96,20 +153,22 @@ static t_int *tabreadi_tilde_perform(t_int *w)
 
     for (i = 0; i < n; i++)
     {
-        t_sample findex = *in++;
-        int index = findex;
-        t_sample frac,  a,  b,  c,  d, cminusb;
-        static int count;
-        if (index < 1)
-            index = 1, frac = 0;
-        else if (index > maxindex)
-            index = maxindex, frac = 1;
-        else frac = findex - index;
-        wp = buf + index;
-        a = wp[-1].w_float;
-        b = wp[0].w_float;
-        c = wp[1].w_float;
-        d = wp[2].w_float;
+    	    for (i=0;i<x->upsample;i++)
+    	    {	
+            t_sample findex = *in++; // ??? comment limiter ca pour faire un band limited????
+            int index = findex;
+            t_sample frac,  a,  b,  c,  d, cminusb;
+            static int count;
+            if (index < 1)
+                index = 1, frac = 0;
+            else if (index > maxindex)
+                index = maxindex, frac = 1;
+            else frac = findex - index;
+            wp = buf + index;
+            a = wp[-1].w_float;
+            b = wp[0].w_float;
+            c = wp[1].w_float;
+            d = wp[2].w_float;
         /* if (!i && !(count++ & 1023))
             post("fp = %lx,  shit = %lx,  b = %f",  fp, buf->b_shit,  b); */
 //        cminusb = c-b;
@@ -118,9 +177,14 @@ static t_int *tabreadi_tilde_perform(t_int *w)
 //                (d - a - 3.0f * cminusb) * frac + (d + 2.0f*a - 3.0f*b)
 // CH
 	// 4-point, 3rd-order Hermite (x-form)
-	a1 = 0.5f * (c - a);
-	a2 = a - 2.5 * b + 2.f * c - 0.5f * d;
-	a3 = 0.5f * (d - a) + 1.5f * (b - c);
+	    a1 = 0.5f * (c - a);
+	    a2 = a - 2.5 * b + 2.f * c - 0.5f * d;
+	    a3 = 0.5f * (d - a) + 1.5f * (b - c);
+
+
+// TODO
+
+        }
 
 	*out++ =  ((a3 * frac + a2) * frac + a1) * frac + b;     
     }
@@ -150,8 +214,22 @@ void tabreadi_tilde_set(t_tabreadi_tilde *x, t_symbol *s)
     else garray_usedindsp(a);
 }
 
+
+void tabreadi_tilde_upsample(t_tabreadi_tilde *x, t_float up)
+{
+    x->upsample = max(1,up);
+    tabreadi_tilde_cutoff(x,x->cutoff);
+}
+
+
 static void tabreadi_tilde_dsp(t_tabreadi_tilde *x, t_signal **sp)
 {
+   if (x->x_sr != sp[0]->s_sr)
+    {
+        x->x_sr = sp[0]->s_sr;
+        tabreadi_tilde_cutoff(x,x->cutoff);
+    }
+
     tabreadi_tilde_set(x, x->x_arrayname);
 
     dsp_add(tabreadi_tilde_perform, 4, x,
