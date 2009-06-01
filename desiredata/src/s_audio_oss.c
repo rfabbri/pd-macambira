@@ -88,11 +88,11 @@ void oss_init() {
 
 void oss_set32bit() {oss_32bit=1;}
 
-typedef struct _multidev {
+struct t_multidev {
      int fd;
      int channels;
      int format;
-} t_multidev;
+};
 
 int oss_reset(int fd) {
      int err = ioctl(fd,SNDCTL_DSP_RESET);
@@ -351,12 +351,12 @@ static void oss_calcspace() {
     audio_buf_info ainfo;
     for (int dev=0; dev<linux_noutdevs; dev++) {
         if (ioctl(linux_dacs[dev].fd, SOUND_PCM_GETOSPACE,&ainfo) < 0)
-           error("OSS: ioctl on output device %d failed",dev);
+           error("OSS: ioctl on output device %d failed (fd=%d)", dev, linux_dacs[dev].fd);
         linux_dacs[dev].space = ainfo.bytes;
     }
     for (int dev=0; dev<linux_nindevs; dev++) {
         if (ioctl(linux_adcs[dev].fd, SOUND_PCM_GETISPACE,&ainfo) < 0)
-            error("OSS: ioctl on input device %d, fd %d failed", dev, linux_adcs[dev].fd);
+            error("OSS: ioctl on input device %d failed (fd=%d)", dev, linux_adcs[dev].fd);
         linux_adcs[dev].space = ainfo.bytes;
     }
 }
