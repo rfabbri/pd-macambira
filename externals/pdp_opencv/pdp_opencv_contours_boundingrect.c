@@ -32,8 +32,6 @@
 #include "cv.h"
 #endif
 
-
-
 typedef struct pdp_opencv_contours_boundingrect_struct
 {
     t_object x_obj;
@@ -42,6 +40,7 @@ typedef struct pdp_opencv_contours_boundingrect_struct
     t_outlet *x_outlet0;
     t_outlet *x_dataout;
     t_outlet *x_countout;
+    t_atom    rlist[5];
     int x_packet0;
     int x_packet1;
     int x_dropped;
@@ -59,15 +58,12 @@ typedef struct pdp_opencv_contours_boundingrect_struct
     
 } t_pdp_opencv_contours_boundingrect;
 
-
-
 static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_boundingrect *x)
 {
     t_pdp     *header = pdp_packet_header(x->x_packet0);
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1); 
-      
 
     if ((x->x_width != (t_int)header->info.image.width) || 
         (x->x_height != (t_int)header->info.image.height)) 
@@ -120,7 +116,6 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     //ContourBoundingRect
     //
 
-    
     // TODO afegir parametres
     // Retrieval mode.
     // CV_RETR_TREE || CV_RETR_CCOMP || CV_RETR_LIST || CV_RETR_EXTERNAL
@@ -136,12 +131,11 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     //TODO afegir parametre
     //si volem veure la imatge original o un fons negre
     cvCopy(x->image, x->cnt_img, NULL);
-    //cvZero( x->cnt_img );
+    // cvZero( x->cnt_img );
     
-
-        int i = 0;                   // Indicator of cycles.
+    int i = 0;                   // Indicator of cycles.
     for( ; contours != 0; contours = contours->h_next )
-        {
+    {
         int count = contours->total; // This is number point in contour
         CvRect rect;
 
@@ -149,23 +143,21 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
 	if ( ( (rect.width*rect.height) > x->minarea ) && ( (rect.width*rect.height) < x->maxarea ) ) {
 	    cvRectangle( x->cnt_img, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
 
-    	    t_atom rlist[4];
-            SETFLOAT(&rlist[0], i);
-            SETFLOAT(&rlist[1], rect.x);
-            SETFLOAT(&rlist[2], rect.y);
-            SETFLOAT(&rlist[3], rect.width);
-            SETFLOAT(&rlist[4], rect.height);
+            SETFLOAT(&x->rlist[0], i);
+            SETFLOAT(&x->rlist[1], rect.x);
+            SETFLOAT(&x->rlist[2], rect.y);
+            SETFLOAT(&x->rlist[3], rect.width);
+            SETFLOAT(&x->rlist[4], rect.height);
 
-    	    outlet_list( x->x_dataout, 0, 5, rlist );
+    	    outlet_list( x->x_dataout, 0, 5, x->rlist );
 	    i++;
-	}
-    	    outlet_float( x->x_countout, i );
+      }
+      outlet_float( x->x_countout, i );
 	
-        }
+    }
 
     cvReleaseMemStorage( &stor02 );
 
-    //cvShowImage( "contours", x->cnt_img );
     memcpy( newdata, x->cnt_img->imageData, x->x_size*3 );
 
  
@@ -250,12 +242,11 @@ static void pdp_opencv_contours_boundingrect_free(t_pdp_opencv_contours_bounding
 
     pdp_queue_finish(x->x_queue_id);
     pdp_packet_mark_unused(x->x_packet0);
-    //cv_freeplugins(x);
     
-    	//Destroy cv_images
-	cvReleaseImage(&x->image);
-    	cvReleaseImage(&x->gray);
-    	cvReleaseImage(&x->cnt_img);
+    //Destroy cv_images
+    cvReleaseImage(&x->image);
+    cvReleaseImage(&x->gray);
+    cvReleaseImage(&x->cnt_img);
 }
 
 t_class *pdp_opencv_contours_boundingrect_class;
@@ -283,11 +274,8 @@ void *pdp_opencv_contours_boundingrect_new(t_floatarg f)
 
     x->x_infosok = 0;
 
-    x->minarea   = 1;
+    x->minarea   = 10*10;
     x->maxarea   = 320*240;
-    
-
-
 
     x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
     x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
