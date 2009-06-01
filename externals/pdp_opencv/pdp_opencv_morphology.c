@@ -31,8 +31,6 @@
 #include "cv.h"
 #endif
 
-
-
 typedef struct pdp_opencv_morphology_struct
 {
     t_object x_obj;
@@ -59,12 +57,8 @@ typedef struct pdp_opencv_morphology_struct
     IplImage* dst;
 
     IplConvKernel* element;
-
-
     
 } t_pdp_opencv_morphology;
-
-
 
 
 // callback function for open/close trackbar
@@ -84,7 +78,6 @@ void pdp_opencv_morphology_OpenClose(t_pdp_opencv_morphology *x, int pos)
         cvErode(x->dst,x->dst,x->element,1);
     }
     cvReleaseStructuringElement(&x->element);
-    //cvShowImage("Open/Close",dst);
 }   
 
 // callback function for erode/dilate trackbar
@@ -102,7 +95,6 @@ void pdp_opencv_morphology_ErodeDilate(t_pdp_opencv_morphology *x, int pos)
         cvDilate(x->src,x->dst,x->element,1);
     }
     cvReleaseStructuringElement(&x->element);
-    //cvShowImage("Erode/Dilate",dst);
 }   
 
 
@@ -146,12 +138,10 @@ static void pdp_opencv_morphology_process_rgb(t_pdp_opencv_morphology *x)
     // FEM UNA COPIA DEL PACKET A x->grey->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( x->src->imageData, data, x->x_size*3 );
        
-        if (x->mode==1) pdp_opencv_morphology_OpenClose(x,x->pos);
-        else pdp_opencv_morphology_ErodeDilate(x,x->pos);
-	 
+    if (x->mode==1) pdp_opencv_morphology_OpenClose(x,x->pos);
+    else pdp_opencv_morphology_ErodeDilate(x,x->pos);
 
     memcpy( newdata, x->dst->imageData, x->x_size*3 );
-
  
     return;
 }
@@ -178,7 +168,7 @@ static void pdp_opencv_morphology_mode(t_pdp_opencv_morphology *x, t_floatarg f)
 
 static void pdp_opencv_morphology_pos(t_pdp_opencv_morphology *x, t_floatarg f)
 {
-	x->pos = (int)f;
+    x->pos = (int)f;
 }
 
 static void pdp_opencv_morphology_sendpacket(t_pdp_opencv_morphology *x)
@@ -244,15 +234,13 @@ static void pdp_opencv_morphology_free(t_pdp_opencv_morphology *x)
 
     pdp_queue_finish(x->x_queue_id);
     pdp_packet_mark_unused(x->x_packet0);
-    //cv_freeplugins(x);
     
-    	//Destroy cv_images
-    	cvReleaseImage( &x->src );
-    	cvReleaseImage( &x->dst );
+    //Destroy cv_images
+    cvReleaseImage( &x->src );
+    cvReleaseImage( &x->dst );
 }
 
 t_class *pdp_opencv_morphology_class;
-
 
 void *pdp_opencv_morphology_new(t_floatarg f)
 {
@@ -278,11 +266,9 @@ void *pdp_opencv_morphology_new(t_floatarg f)
     x->mode = 0;
     
     x->element = 0;
-
     
     x->src = cvCreateImage( cvSize(x->x_width,x->x_height), 8, 3 );
     x->dst = cvCloneImage(x->src);
-
 
     return (void *)x;
 }

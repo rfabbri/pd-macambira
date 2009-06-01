@@ -31,8 +31,6 @@
 #include "cv.h"
 #endif
 
-
-
 typedef struct pdp_opencv_laplace_struct
 {
     t_object x_obj;
@@ -63,8 +61,6 @@ typedef struct pdp_opencv_laplace_struct
     
 } t_pdp_opencv_laplace;
 
-
-
 static void pdp_opencv_laplace_process_rgb(t_pdp_opencv_laplace *x)
 {
     t_pdp     *header = pdp_packet_header(x->x_packet0);
@@ -73,7 +69,6 @@ static void pdp_opencv_laplace_process_rgb(t_pdp_opencv_laplace *x)
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1); 
     int i;
       
-
     if ((x->x_width != (t_int)header->info.image.width) || 
         (x->x_height != (t_int)header->info.image.height)) 
     {
@@ -107,23 +102,19 @@ static void pdp_opencv_laplace_process_rgb(t_pdp_opencv_laplace *x)
 
     memcpy( newdata, data, x->x_size*3 );
     
-    
     // FEM UNA COPIA DEL PACKET A x->grey->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( x->frame->imageData, data, x->x_size*3 );
         
-	cvCvtPixToPlane( x->frame, x->planes[0], x->planes[1], x->planes[2], 0 );
-        for( i = 0; i < 3; i++ )
-        {
-            cvLaplace( x->planes[i], x->laplace, x->aperture_size );
-            cvConvertScaleAbs( x->laplace, x->planes[i], 1, 0 );
-        }
-        cvCvtPlaneToPix( x->planes[0], x->planes[1], x->planes[2], 0, x->colorlaplace );
-        x->colorlaplace->origin = x->frame->origin;
-
-        //cvShowImage("Laplacian", colorlaplace );
+    cvCvtPixToPlane( x->frame, x->planes[0], x->planes[1], x->planes[2], 0 );
+    for( i = 0; i < 3; i++ )
+    {
+      cvLaplace( x->planes[i], x->laplace, x->aperture_size );
+      cvConvertScaleAbs( x->laplace, x->planes[i], 1, 0 );
+    }
+    cvCvtPlaneToPix( x->planes[0], x->planes[1], x->planes[2], 0, x->colorlaplace );
+    x->colorlaplace->origin = x->frame->origin;
 
     memcpy( newdata, x->colorlaplace->imageData, x->x_size*3 );
-
  
     return;
 }
@@ -131,7 +122,7 @@ static void pdp_opencv_laplace_process_rgb(t_pdp_opencv_laplace *x)
 
 static void pdp_opencv_laplace_thresh(t_pdp_opencv_laplace *x, t_floatarg f)
 {
-	if ((f==1)||(f==3)||(f==5)||(f==7)) x->aperture_size = (int)f;
+    if ((f==1)||(f==3)||(f==5)||(f==7)) x->aperture_size = (int)f;
 }
 
 static void pdp_opencv_laplace_sendpacket(t_pdp_opencv_laplace *x)
@@ -148,13 +139,6 @@ static void pdp_opencv_laplace_process(t_pdp_opencv_laplace *x)
 {
    int encoding;
    t_pdp *header = 0;
-   char *parname;
-   unsigned pi;
-   int partype;
-   float pardefault;
-   t_atom plist[2];
-   t_atom tlist[2];
-   t_atom vlist[2];
 
    /* check if image data packets are compatible */
    if ( (header = pdp_packet_header(x->x_packet0))
@@ -197,14 +181,13 @@ static void pdp_opencv_laplace_free(t_pdp_opencv_laplace *x)
 
     pdp_queue_finish(x->x_queue_id);
     pdp_packet_mark_unused(x->x_packet0);
-    //cv_freeplugins(x);
     
-    	//Destroy cv_images
-    	for( i = 0; i < 3; i++ )
-    		cvReleaseImage( &x->planes[i] );
-    	cvReleaseImage( &x->frame );
-    	cvReleaseImage( &x->laplace );
-    	cvReleaseImage( &x->colorlaplace );
+    //Destroy cv_images
+    for( i = 0; i < 3; i++ )
+    	cvReleaseImage( &x->planes[i] );
+    cvReleaseImage( &x->frame );
+    cvReleaseImage( &x->laplace );
+    cvReleaseImage( &x->colorlaplace );
 }
 
 t_class *pdp_opencv_laplace_class;
@@ -230,7 +213,6 @@ void *pdp_opencv_laplace_new(t_floatarg f)
     x->x_infosok = 0;
 
     x->aperture_size = 3;
-
     
     for( i = 0; i < 3; i++ )
      x->planes[i] = cvCreateImage( cvSize(x->x_width, x->x_height), 8, 1 );

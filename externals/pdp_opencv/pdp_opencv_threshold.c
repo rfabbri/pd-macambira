@@ -64,7 +64,6 @@ static void pdp_opencv_threshold_process_rgb(t_pdp_opencv_threshold *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1); 
-      
 
     if ((x->x_width != (t_int)header->info.image.width) || 
         (x->x_height != (t_int)header->info.image.height)) 
@@ -72,8 +71,6 @@ static void pdp_opencv_threshold_process_rgb(t_pdp_opencv_threshold *x)
 
     	post("pdp_opencv_threshold :: resizing plugins");
 	
-    	//cv_freeplugins(x);
-
     	x->x_width = header->info.image.width;
     	x->x_height = header->info.image.height;
     	x->x_size = x->x_width*x->x_height;
@@ -86,11 +83,8 @@ static void pdp_opencv_threshold_process_rgb(t_pdp_opencv_threshold *x)
         x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
 
     	// Create the output images with new sizes
-
     	x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
     
-    	//load the plugins
-    	//cv_loadplugins(x, FF_PLUGIN_DIR);
     }
     
     newheader->info.image.encoding = header->info.image.encoding;
@@ -99,9 +93,6 @@ static void pdp_opencv_threshold_process_rgb(t_pdp_opencv_threshold *x)
 
     memcpy( newdata, data, x->x_size*3 );
     
-    //cv_processframe(x, x->x_plugin, newdata);
-    
-    // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( x->image->imageData, data, x->x_size*3 );
     
     // Convert to grayscale
@@ -127,31 +118,24 @@ static void pdp_opencv_threshold_process_rgb(t_pdp_opencv_threshold *x)
     }
   
     cvCvtColor(x->gray, x->image, CV_GRAY2BGR);
-    //cvShowImage(wndname, cedge);
     memcpy( newdata, x->image->imageData, x->x_size*3 );
-
  
     return;
 }
 
-static void pdp_opencv_threshold_param(t_pdp_opencv_threshold *x, t_floatarg f1, t_floatarg f2)
-{
-
-}
-
 static void pdp_opencv_threshold_thresh(t_pdp_opencv_threshold *x, t_floatarg f)
 {
-	x->threshold_value = (int)f;
+    x->threshold_value = (int)f;
 }
 
 static void pdp_opencv_threshold_max(t_pdp_opencv_threshold *x, t_floatarg f)
 {
-	x->max_value = (int)f;
+    x->max_value = (int)f;
 }
 
 static void pdp_opencv_threshold_mode(t_pdp_opencv_threshold *x, t_floatarg f)
 {
-	x->threshold_mode = (int)f;
+    x->threshold_mode = (int)f;
 }
 
 static void pdp_opencv_threshold_sendpacket(t_pdp_opencv_threshold *x)
@@ -219,13 +203,12 @@ static void pdp_opencv_threshold_free(t_pdp_opencv_threshold *x)
     pdp_packet_mark_unused(x->x_packet0);
     //cv_freeplugins(x);
     
-    	//Destroy cv_images
-	cvReleaseImage(&x->image);
-    	cvReleaseImage(&x->gray);
+    //Destroy cv_images
+    cvReleaseImage(&x->image);
+    cvReleaseImage(&x->gray);
 }
 
 t_class *pdp_opencv_threshold_class;
-
 
 void *pdp_opencv_threshold_new(t_floatarg f)
 {
@@ -247,16 +230,12 @@ void *pdp_opencv_threshold_new(t_floatarg f)
 
     x->x_infosok = 0;
 
-    x->threshold_value = 1;
+    x->threshold_value = 50;
     x->max_value = 255;
     x->threshold_mode  = 0;
-    
-
-
 
     x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
     x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
-    cvCvtColor(x->image, x->gray, CV_BGR2GRAY);
 
     return (void *)x;
 }

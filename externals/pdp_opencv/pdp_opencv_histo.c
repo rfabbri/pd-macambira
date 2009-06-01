@@ -53,6 +53,7 @@ typedef struct pdp_opencv_histo_struct
     int x_infosok; 
 
     int save_now;
+    int nbsaved;
     
     CvHistogram *hist;
     CvHistogram *saved_hist[MAX_HISTOGRAMS_TO_COMPARE];
@@ -151,56 +152,55 @@ static void pdp_opencv_histo_process_rgb(t_pdp_opencv_histo *x)
     cvCvtColor( x->src, x->hsv, CV_BGR2HSV );
     cvCvtPixToPlane( x->hsv, x->h_plane, x->s_plane, x->v_plane, 0 );
 	
-	// Build the histogram and compute its contents.
-	
-
-
-	if (x->save_now>=0) {
+    // Build the histogram and compute its contents.
+    if (x->save_now>=0) {
     		fprintf(stderr,"saving histogram %d\n",x->save_now);
     		cvCvtPixToPlane( x->hsv, x->h_saved_plane, x->s_saved_plane, x->v_saved_plane, 0 );
         	cvCalcHist( x->saved_planes, x->saved_hist[x->save_now], 0, 0 ); //Compute histogram
         	cvNormalizeHist( x->saved_hist[x->save_now], 1.0 );  //Normalize it 
+		x->nbsaved++;
 		x->save_now=-1;
-	} 
-        	cvCalcHist( x->planes, x->hist, 0, 0 ); //Compute histogram
-        	cvNormalizeHist( x->hist, 1.0 );  //Normalize it 
+     } 
+     cvCalcHist( x->planes, x->hist, 0, 0 ); //Compute histogram
+     cvNormalizeHist( x->hist, 1.0 );  //Normalize it 
 
-	double tato[MAX_HISTOGRAMS_TO_COMPARE];
-	int nearest = -1;
-	double max  =  0;
+     double tato[MAX_HISTOGRAMS_TO_COMPARE];
+     int nearest = -1;
+     double max  =  0;
 
-	int n;
-	for (n=0; n<MAX_HISTOGRAMS_TO_COMPARE; n++) {
+     int n;
+     for (n=0; n<MAX_HISTOGRAMS_TO_COMPARE; n++) {
 		tato[n] = cvCompareHist(x->hist, x->saved_hist[n], CV_COMP_INTERSECT);
 		if (tato[n]>max) {
 			max = tato[n];
 			nearest = n;
 		}
-	}
+     }
     	
-	outlet_float(x->x_outlet1, (float)nearest);
+    if ( x->nbsaved > 0 )
+       outlet_float(x->x_outlet1, (float)nearest);
+    else
+       outlet_float(x->x_outlet1, -1.0);
 
-	// Create an image to use to visualize our histogram.
+    // Create an image to use to visualize our histogram.
+    int scale = 10;
+    //IplImage* hist_img = cvCreateImage( 
+    //  cvSize(x->x_width,x->x_height),
+    //  8,
+    //  3
+    //);
+    //cvZero( hist_img );
+
+    // populate our visualization with little gray squares.
 	
-	int scale = 10;
-        //IplImage* hist_img = cvCreateImage( 
-        //  cvSize(x->x_width,x->x_height),
-        //  8,
-        //  3
-        //);
-        //cvZero( hist_img );
+    float max_value = 0;
+    cvGetMinMaxHistValue( x->hist, 0, &max_value, 0, 0 );
 
-	// populate our visualization with little gray squares.
-	
-	float max_value = 0;
-        cvGetMinMaxHistValue( x->hist, 0, &max_value, 0, 0 );
+    int h = 0;
+    int s = 0;
 
-	int h = 0;
-	int s = 0;
-
-
-        for( h = 0; h < h_bins; h++ ) {
-            for( s = 0; s < s_bins; s++ ) {
+    for( h = 0; h < h_bins; h++ ) {
+         for( s = 0; s < s_bins; s++ ) {
                  float bin_val = cvQueryHistValue_2D( x->hist, h, s );
                  int intensity = cvRound( bin_val * 255 / max_value );
                  cvRectangle(
@@ -209,7 +209,7 @@ static void pdp_opencv_histo_process_rgb(t_pdp_opencv_histo *x)
                    cvPoint( (h+1)*scale - 1, (s+1)*scale - 1),
 		   CV_RGB(intensity,intensity,intensity), CV_FILLED, 8 , 0 );
                }
-          }
+    }
 
     //memory copy again, now from x->cedge->imageData to the new data pdp packet
     //memcpy( newdata, hist_img, x->x_size*3 );
@@ -288,15 +288,15 @@ static void pdp_opencv_histo_free(t_pdp_opencv_histo *x)
     pdp_packet_mark_unused(x->x_packet0);
     //cv_freeplugins(x);
     
-    	//Destroy cv_images
-	cvReleaseImage(&x->src);
-    	cvReleaseImage(&x->hsv);
-    	cvReleaseImage(&x->h_plane);
-    	cvReleaseImage(&x->s_plane);
-    	cvReleaseImage(&x->v_plane);
-    	cvReleaseImage(&x->h_saved_plane);
-    	cvReleaseImage(&x->s_saved_plane);
-    	cvReleaseImage(&x->v_saved_plane);
+    //Destroy cv_images
+    cvReleaseImage(&x->src);
+    cvReleaseImage(&x->hsv);
+    cvReleaseImage(&x->h_plane);
+    cvReleaseImage(&x->s_plane);
+    cvReleaseImage(&x->v_plane);
+    cvReleaseImage(&x->h_saved_plane);
+    cvReleaseImage(&x->s_saved_plane);
+    cvReleaseImage(&x->v_saved_plane);
 }
 
 t_class *pdp_opencv_histo_class;
@@ -322,30 +322,28 @@ void *pdp_opencv_histo_new(t_floatarg f)
 
     x->x_infosok = 0;
     x->save_now = 0;
+    x->nbsaved = 0;
     
+    x->src = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
+    x->hsv = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3 );
 
-
-
-    	x->src = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
-	x->hsv = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3 );
-
-    	x->h_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
-    	x->s_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
-    	x->v_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
-	x->planes[0] = x->h_plane;
-	x->planes[1] = x->s_plane;
-        cvCvtPixToPlane( x->hsv, x->h_plane, x->s_plane, x->v_plane, 0 );
-    	x->h_saved_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
-    	x->s_saved_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
-    	x->v_saved_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
-	x->saved_planes[0] = x->h_saved_plane;
-	x->saved_planes[1] = x->s_saved_plane;
-        cvCvtPixToPlane( x->hsv, x->h_saved_plane, x->s_saved_plane, x->v_saved_plane, 0 );
+    x->h_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
+    x->s_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
+    x->v_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
+    x->planes[0] = x->h_plane;
+    x->planes[1] = x->s_plane;
+    cvCvtPixToPlane( x->hsv, x->h_plane, x->s_plane, x->v_plane, 0 );
+    x->h_saved_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
+    x->s_saved_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
+    x->v_saved_plane = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
+    x->saved_planes[0] = x->h_saved_plane;
+    x->saved_planes[1] = x->s_saved_plane;
+    cvCvtPixToPlane( x->hsv, x->h_saved_plane, x->s_saved_plane, x->v_saved_plane, 0 );
 
     cvCvtColor( x->src, x->hsv, CV_BGR2HSV );
 
-	int h_bins = (int)(x->x_width/10), s_bins = (int)(x->x_height/10);
-        {
+    int h_bins = (int)(x->x_width/10), s_bins = (int)(x->x_height/10);
+    {
           int    hist_size[]  = { h_bins, s_bins };
           float  h_ranges[]   = { 0, 180 };         // hue is [0,180]
           float  s_ranges[]   = { 0, 255 };
@@ -367,7 +365,7 @@ void *pdp_opencv_histo_new(t_floatarg f)
           	  1
           	);
 	  }
-        }
+    }
 
     return (void *)x;
 }
@@ -388,7 +386,6 @@ void pdp_opencv_histo_setup(void)
 
     class_addmethod(pdp_opencv_histo_class, (t_method)pdp_opencv_histo_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_opencv_histo_class, (t_method)pdp_opencv_histo_save, gensym("save"),  A_FLOAT, A_NULL );   
-
 
 }
 
