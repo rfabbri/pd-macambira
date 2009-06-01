@@ -206,7 +206,7 @@ void  pdp_opencv_motempl_update_mhi( t_pdp_opencv_motempl *x, IplImage* img, Ipl
          SETFLOAT(&x->rlist[3], comp_rect.width);
          SETFLOAT(&x->rlist[4], comp_rect.height);
          SETFLOAT(&x->rlist[5], angle);
-       outlet_list( x->x_dataout, 0, 6, x->rlist );
+         outlet_list( x->x_dataout, 0, 6, x->rlist );
     }
 }
 
