@@ -6683,7 +6683,7 @@ void glob_help(t_pd *bogus, t_symbol *s) {
 extern "C" void glob_update_class_list (t_pd *self, t_symbol *cb_recv, t_symbol *cb_sel) {
     t_symbol *k; t_class *v;
     sys_gui("global class_list; set class_list {");
-    hash_foreach(k,v,class_table) sys_vgui("%s ", ((t_symbol *)k)->name);
+    hash_foreach(k,v,class_table) if (k) sys_vgui("%s ", k->name);
     sys_gui("}\n");
     sys_vgui("%s %s\n",cb_recv->name, cb_sel->name);
 }
