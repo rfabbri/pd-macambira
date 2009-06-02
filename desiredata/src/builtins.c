@@ -325,10 +325,10 @@ static void netreceive_doit(t_netreceive *x, t_binbuf *b) {
                 goto nodice;
             }
             if (at[msg].a_type == A_FLOAT) {
-                if (emsg > msg + 1) outlet_list(x->msgout, 0, emsg-msg, at + msg);
+                if (emsg > msg + 1) x->msgout->send(emsg-msg, at + msg);
                 else x->msgout->send(at[msg].a_float);
             } else if (at[msg].a_type == A_SYMBOL)
-                outlet_anything(x->msgout, at[msg].a_symbol, emsg-msg-1, at + msg + 1);
+                x->msgout->send(at[msg].a_symbol,emsg-msg-1,at+msg+1);
         }
     nodice:
         msg = emsg + 1;
@@ -472,7 +472,7 @@ static void qlist_donext(t_qlist *x, int drop, int automatic) {
             if (automatic) {
                 clock_delay(x->clock, x->clockdelay = ap->a_float * x->tempo);
                 x->whenclockset = clock_getsystime();
-            } else outlet_list(x->outlet, 0, onset2-onset, ap);
+            } else x->outlet->send(onset2-onset,ap);
             return;
         }
         ap2 = ap + 1;
@@ -590,9 +590,8 @@ static void textfile_bang(t_textfile *x) {
     while (onset2 < argc && (ap2->a_type != A_SEMI && ap2->a_type != A_COMMA)) onset2++, ap2++;
     if (onset2 > onset) {
         x->onset = onset2;
-        if (ap->a_type == A_SYMBOL)
-            outlet_anything(x->outlet, ap->a_symbol, onset2-onset-1, ap+1);
-        else outlet_list(x->outlet, 0, onset2-onset, ap);
+        if (ap->a_type == A_SYMBOL) x->outlet->send(ap->a_symbol,onset2-onset-1,ap+1);
+        else                        x->outlet->send(             onset2-onset  ,ap  );
     } else {
         x->onset = 0x7fffffff;
         x->out(1)->send();
@@ -684,27 +683,27 @@ static void list_append_list(t_list_append *x, t_symbol *s, int argc, t_atom *ar
     t_atom *outv; int outc = x->alist->n + argc; ATOMS_ALLOCA(outv, outc);
     atoms_copy(argc, argv, outv);
     alist_toatoms(x->alist, outv+argc);
-    outlet_list(x->outlet, &s_list, outc, outv); ATOMS_FREEA(outv, outc);
+    x->outlet->send(outc,outv); ATOMS_FREEA(outv,outc);
 }
 static void list_append_anything(t_list_append *x, t_symbol *s, int argc, t_atom *argv) {
     t_atom *outv; int outc = x->alist->n+argc+1; ATOMS_ALLOCA(outv, outc);
     SETSYMBOL(outv, s);
     atoms_copy(argc, argv, outv + 1);
     alist_toatoms(x->alist, outv + 1 + argc);
-    outlet_list(x->outlet, &s_list, outc, outv); ATOMS_FREEA(outv, outc);
+    x->outlet->send(outc,outv); ATOMS_FREEA(outv,outc);
 }
 static void list_prepend_list(t_list_prepend *x, t_symbol *s, int argc, t_atom *argv) {
     t_atom *outv; int outc = x->alist->n + argc; ATOMS_ALLOCA(outv, outc);
     alist_toatoms(x->alist, outv);
     atoms_copy(argc, argv, outv + x->alist->n);
-    outlet_list(x->outlet, &s_list, outc, outv); ATOMS_FREEA(outv, outc);
+    x->outlet->send(outc,outv); ATOMS_FREEA(outv,outc);
 }
 static void list_prepend_anything(t_list_prepend *x, t_symbol *s, int argc, t_atom *argv) {
     t_atom *outv; int outc = x->alist->n+argc+1; ATOMS_ALLOCA(outv, outc);
     alist_toatoms(x->alist, outv);
     SETSYMBOL(outv + x->alist->n, s);
     atoms_copy(argc, argv, outv + x->alist->n + 1);
-    outlet_list(x->outlet, &s_list, outc, outv); ATOMS_FREEA(outv, outc);
+    x->outlet->send(outc,outv); ATOMS_FREEA(outv,outc);
 }
 static t_pd *list_split_new(t_floatarg f) {
     t_list_split *x = (t_list_split *)pd_new(list_split_class);
@@ -717,11 +716,11 @@ static t_pd *list_split_new(t_floatarg f) {
 }
 static void list_split_list(t_list_split *x, t_symbol *s, int argc, t_atom *argv) {
     int n = (int)x->f;
-    if (n < 0) n = 0;
+    if (n<0) n=0;
     if (argc >= n) {
-        outlet_list(x->out(1), &s_list, argc-n, argv+n);
-        outlet_list(x->out(0), &s_list, n, argv);
-    } else outlet_list(x->out(2), &s_list, argc, argv);
+        x->out(1)->send(argc-n,argv+n);
+        x->out(0)->send(n,argv);
+    } else x->out(2)->send(argc,argv);
 }
 static void list_split_anything(t_list_split *x, t_symbol *s, int argc, t_atom *argv) {
     t_atom *outv;
@@ -738,12 +737,10 @@ static t_pd *list_trim_new() {
     return x;
 }
 static void list_trim_list(t_list_trim *x, t_symbol *s, int argc, t_atom *argv) {
-    if (argc < 1 || argv[0].a_type != A_SYMBOL) outlet_list(x->outlet, &s_list, argc, argv);
-    else outlet_anything(x->outlet, argv[0].a_symbol, argc-1, argv+1);
+    if (argc < 1 || argv[0].a_type != A_SYMBOL) x->outlet->send(argc,argv);
+    else x->outlet->send(argv[0].a_symbol,argc-1,argv+1);
 }
-static void list_trim_anything(t_list_trim *x, t_symbol *s, int argc, t_atom *argv) {
-    outlet_anything(x->outlet, s, argc, argv);
-}
+static void list_trim_anything(t_list_trim *x, t_symbol *s, int argc, t_atom *argv) {x->outlet->send(s,argc,argv);}
 
 static t_pd *list_length_new() {
     t_list_length *x = (t_list_length *)pd_new(list_length_class);
@@ -1024,10 +1021,7 @@ static void *clipboard_new(t_symbol *s) {
 }
 
 static void clipboard_bang(t_clipboard *x) {sys_mgui(x->dix->canvas, "get_clipboard", "p", x);}
-
-static void clipboard_reply (t_clipboard *x, t_symbol *s, int argc, t_atom *argv) {
-  outlet_list(x->dump, &s_list, argc, argv);
-}
+static void clipboard_reply (t_clipboard *x, t_symbol *s, int argc, t_atom *argv) {x->dump->send(argc,argv);}
 
 static void clipboard_setup() {
     t_class *c = clipboard_class = class_new2("clipboard",clipboard_new,0,sizeof(t_clipboard),0,"S");
@@ -1082,10 +1076,10 @@ static void *any_new(t_symbol *s,int argc, t_atom *argv) {
 static void any_anything(t_any *x, t_symbol *s, int argc, t_atom *argv) {
     t_atom *outv; int outc = x->alist->n+argc+1; ATOMS_ALLOCA(outv, outc);
     if ((argv[0].a_type == A_FLOAT  && s==&s_list) || s==&s_float) {
-      alist_list(x->alist, 0, argc, argv); outlet_anything(x->outlet, &s_list, argc, argv);return;
+      alist_list(x->alist,0,argc,argv); x->outlet->send(argc,argv); return;
     }
     if ( argv[0].a_type == A_SYMBOL || s!=&s_list  || s!=&s_float) {
-      alist_anything(x->alist, s, argc, argv); outlet_anything(x->outlet, s, argc, argv);
+      alist_anything(x->alist,s,argc,argv); x->outlet->send(s,argc,argv);
     }
 }
 
@@ -1094,8 +1088,8 @@ static void any_bang(t_any *x) {
     ATOMS_ALLOCA(outv, outc);
     alist_toatoms(x->alist, outv);
     if (!binbuf_getnatom(x->alist)) {x->outlet->send();return;}
-    if (outv[0].a_type == A_FLOAT) {outlet_anything(x->outlet, &s_list, outc, outv);}
-    if (outv[0].a_type == A_SYMBOL) {outlet_anything(x->outlet, outv[0].a_symbol, outc-1, outv+1);}
+    if (outv[0].a_type == A_FLOAT) {x->outlet->send(outc,outv);}
+    if (outv[0].a_type == A_SYMBOL) {x->outlet->send(outv[0].a_symbol,outc-1,outv+1);}
     ATOMS_FREEA(outv, outc);
 }
 
@@ -1453,15 +1447,15 @@ static void route_anything(t_route *x, t_symbol *sel, int argc, t_atom *argv) {
     t_routeelement *e = x->vec;
     post("1: sel=%s",sel->name);
     for (int n = x->n; n--; e++) if (e->a.a_type == A_SYMBOL) if (e->a.a_symbol == sel) {
-        if (argc > 0 && argv[0].a_type == A_SYMBOL) outlet_anything(e->out, argv[0].a_symbol, argc-1, argv+1);
+        if (argc > 0 && argv[0].a_type == A_SYMBOL) e->out->send(argv[0].a_symbol,argc-1,argv+1);
         else { /* tb {: avoid 1 element lists */
-	    if (argc > 1) outlet_list(e->out, 0, argc, argv);
+	    if (argc > 1) e->out->send(argc,argv);
 	    else if (argc == 0) e->out->send();
 	    else e->out->send(&argv[0]);
 	} /* tb } */
         return;
     }
-    outlet_anything(x->rejectout, sel, argc, argv);
+    x->rejectout->send(sel,argc,argv);
 }
 
 #define route_eachr(E,L) for (t_routeelement *E = L->vec;E;E=0) for (int ROUTEN = x->n; ROUTEN--; E++)
@@ -1469,13 +1463,10 @@ static void route_list(t_route *x, t_symbol *sel, int argc, t_atom *argv) {
     if (argc && argv->a_type == A_FLOAT) {
         float f = atom_getfloat(argv);
         route_eachr(e,x) if (e->a.a_type == A_FLOAT && e->a.a_float == f) {
-            if (argc > 1 && argv[1].a_type == A_SYMBOL)
-                outlet_anything(e->out, argv[1].a_symbol, argc-2, argv+2);
+            if (argc > 1 && argv[1].a_type == A_SYMBOL) e->out->send(argv[1].a_symbol,argc-2,argv+2);
             else {
 		argc--; argv++;
-		if (argc > 1) outlet_list(e->out, 0, argc, argv);
-		else if (argc == 0) e->out->send();
-		else e->out->send(&argv[0]);
+		if (argc>1) e->out->send(argc,argv); else if (argc==0) e->out->send(); else e->out->send(&argv[0]);
 	    }
             return;
         } else if (e->a.a_type == A_SYMBOL && e->a.a_symbol == &s_float) {
@@ -1485,8 +1476,8 @@ static void route_list(t_route *x, t_symbol *sel, int argc, t_atom *argv) {
     } else { /* symbol arguments */
         if (argc > 1) { /* 2 or more args: treat as "list" */
 	    route_eachr(e,x) if (e->a.a_type == A_SYMBOL && e->a.a_symbol == &s_list) {
-                if (argv[0].a_type==A_SYMBOL) outlet_anything(e->out, argv[0].a_symbol, argc-1, argv+1);
-                else outlet_list(e->out, 0, argc, argv);
+                if (argv[0].a_type==A_SYMBOL) e->out->send(argv[0].a_symbol,argc-1,argv+1);
+                else e->out->send(argc,argv);
                 return;
             }
         } else if (argc==0)                  {route_eachr(e,x) {if (e->a.a_symbol==&s_bang   ) {e->out->send(        ); return;}}
@@ -1495,7 +1486,7 @@ static void route_list(t_route *x, t_symbol *sel, int argc, t_atom *argv) {
         } else if (argv[0].a_type==A_POINTER){route_eachr(e,x) {if (e->a.a_symbol==&s_pointer) {e->out->send(&argv[0]); return;}}
         }
     }
-    if (!argc) x->rejectout->send(); else outlet_list(x->rejectout, 0, argc, argv);
+    if (!argc) x->rejectout->send(); else x->rejectout->send(argc,argv);
 }
 
 static void route_free(t_route *x) {free(x->vec);}
@@ -1570,7 +1561,7 @@ static void pack_bang(t_pack *x) {
         x->outvec = 0;
     }
     memcpy(outvec, x->vec, size);
-    outlet_list(x->outlet, &s_list, x->n, outvec);
+    x->outlet->send(x->n,outvec);
     if (reentered) free(outvec); else x->outvec = outvec;
 }
 
@@ -2884,7 +2875,7 @@ void unpost_anything (t_unpost *x, t_symbol *s, int argc, t_atom *argv) {
     sys_printhook = unpost_printhook;
     current_unpost = new t_unpost_frame;
     current_unpost->self = x;
-    outlet_anything(x->o0,s,argc,argv);
+    x->o0->send(s,argc,argv);
     sys_printhook = backup1;
     current_unpost = backup2;
 }
@@ -2915,7 +2906,7 @@ void *parse_new (t_symbol *s) {
 void parse_symbol (t_unpost *x, t_symbol *s) {
     t_binbuf *b = binbuf_new();
     binbuf_text(b,s->name,s->n);
-    outlet_anything(x->outlet,&s_list,b->n,b->v);
+    x->outlet->send(&s_list,b->n,b->v);
     binbuf_free(b);
 }
 
@@ -2932,7 +2923,7 @@ void tracecall_anything (t_tracecall *x, t_symbol *dummy, int dum, t_atom *my) {
 	SETSYMBOL( &a[0],pd_stack[i].self->_class->name);
 	SETSYMBOL( &a[1],pd_stack[i].s);
 	//SETPOINTER(&a[2],pd_stack[i].self);
-	outlet_list(x->outlet,&s_list,2,a);
+	x->outlet->send(2,a);
     }
 }
 

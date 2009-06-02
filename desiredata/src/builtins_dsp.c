@@ -389,7 +389,7 @@ static void tabplay_tilde_list(t_tabplay_tilde *x, t_symbol *s, int argc, t_atom
     x->phase = start;
 }
 static void tabplay_tilde_stop(t_tabplay_tilde *x) {x->phase = 0x7fffffff;}
-static void tabplay_tilde_tick(t_tabplay_tilde *x) {outlet_bang(x->out(1));}
+static void tabplay_tilde_tick(t_tabplay_tilde *x) {x->out(1)->send();}
 static void tabplay_tilde_free(t_tabplay_tilde *x) {clock_free(x->clock);}
 
 /******************** tabread~ ***********************/
@@ -769,7 +769,7 @@ static void tabread_float(t_tabread *x, t_float f) {
     if (!a) {error("%s: no such array", x->arrayname->name); return;}
     if (!garray_getfloatarray(a, &npoints, &vec)) {error("%s: bad template for tabread", x->arrayname->name); return;}
     int n = clip(int(f),0,npoints-1);
-    outlet_float(x->outlet, (npoints ? vec[n] : 0));
+    x->outlet->send(npoints ? vec[n] : 0);
 }
 static void tabread_set(t_tabread *x, t_symbol *s) {
     x->arrayname = s;
@@ -797,15 +797,15 @@ static void tabread4_float(t_tabread4 *x, t_float f) {
     t_float *vec;
     if (!ar) {error("%s: no such array", x->arrayname->name); return;}
     if (!garray_getfloatarray(ar, &npoints, &vec)) {error("%s: bad template for tabread4", x->arrayname->name); return;}
-    if (npoints < 4)    {outlet_float(x->outlet, 0); return;}
-    if (f <= 1)         {outlet_float(x->outlet, vec[1]); return;}
-    if (f >= npoints-2) {outlet_float(x->outlet, vec[npoints-2]); return;}
+    if (npoints < 4)    {x->outlet->send(0.); return;}
+    if (f <= 1)         {x->outlet->send(vec[1]); return;}
+    if (f >= npoints-2) {x->outlet->send(vec[npoints-2]); return;}
     int n = min(int(f),npoints-3);
     float *fp = vec + n;
     float frac = f - n;
     float a=fp[-1], b=fp[0], c=fp[1], d=fp[2];
     float cminusb = c-b;
-    outlet_float(x->outlet, b + frac * (cminusb - 0.1666667f * (1.-frac) * ((d - a - 3.0f * cminusb) * frac + (d + 2.0f*a - 3.0f*b))));
+    x->outlet->send (b + frac * (cminusb - 0.1666667f * (1.-frac) * ((d - a - 3.0f * cminusb) * frac + (d + 2.0f*a - 3.0f*b))));
 }
 static void tabread4_set(t_tabread4 *x, t_symbol *s) {x->arrayname = s;}
 static void *tabread4_new(t_symbol *s) {
@@ -1214,12 +1214,8 @@ static t_int *snapshot_tilde_perform(t_int *w) {
 static void snapshot_tilde_dsp(t_snapshot *x, t_signal **sp) {
     dsp_add(snapshot_tilde_perform, 2, sp[0]->v + (sp[0]->n-1), &x->value);
 }
-static void snapshot_tilde_bang(t_snapshot *x) {
-    outlet_float(x->outlet, x->value);
-}
-static void snapshot_tilde_set(t_snapshot *x, t_floatarg f) {
-    x->value = f;
-}
+static void snapshot_tilde_bang(t_snapshot *x) {x->outlet->send(x->value);}
+static void snapshot_tilde_set(t_snapshot *x, t_floatarg f) {x->value = f;}
 static void snapshot_tilde_setup() {
     snapshot_tilde_class = class_new2("snapshot~",snapshot_tilde_new,0,sizeof(t_snapshot),0,"");
     CLASS_MAINSIGNALIN(snapshot_tilde_class, t_snapshot, a);
@@ -1273,7 +1269,7 @@ static void vsnapshot_tilde_bang(t_vsnapshot *x) {
         int indx = clip((int)(clock_gettimesince(x->time) * x->sampspermsec),0,x->n-1);
         val = x->vec[indx];
     } else val = 0;
-    outlet_float(x->outlet, val);
+    x->outlet->send(val);
 }
 static void vsnapshot_tilde_ff(t_vsnapshot *x) {
     if (x->vec) free(x->vec);
@@ -1418,9 +1414,7 @@ static void env_tilde_dsp(t_sigenv *x, t_signal **sp) {
     else dsp_add(env_tilde_perf8,     3, x, sp[0]->v, sp[0]->n);
     if (sp[0]->n > MAXVSTAKEN) bug("env_tilde_dsp");
 }
-static void env_tilde_tick(t_sigenv *x) {
-    outlet_float(x->outlet, powtodb(x->result));
-}
+static void env_tilde_tick(t_sigenv *x) {x->outlet->send(powtodb(x->result));}
 static void env_tilde_ff(t_sigenv *x) {
     clock_free(x->clock);
     freealignedbytes(x->buf, (x->npoints + MAXVSTAKEN) * sizeof(float));
@@ -1473,9 +1467,7 @@ static void threshold_tilde_ft1(t_threshold_tilde *x, t_floatarg f) {
     x->state = (f != 0);
     x->deadwait = 0;
 }
-static void threshold_tilde_tick(t_threshold_tilde *x) {
-  outlet_bang(x->out(x->state?0:1));
-}
+static void threshold_tilde_tick(t_threshold_tilde *x) {x->out(!x->state)->send();}
 static t_int *threshold_tilde_perform(t_int *w) {
     PERFORM3ARGS(float *,in1, t_threshold_tilde *,x, int,n);
     if (x->deadwait > 0)
@@ -3256,7 +3248,7 @@ static t_int *bang_tilde_perform(t_int *w) {
     return w+2;
 }
 static void bang_tilde_dsp(t_bang *x, t_signal **sp) {dsp_add(bang_tilde_perform, 1, x);}
-static void bang_tilde_tick(t_bang *x) {outlet_bang(x->outlet);}
+static void bang_tilde_tick(t_bang *x) {x->outlet->send();}
 static void bang_tilde_free(t_bang *x) {clock_free(x->clock);}
 static void *bang_tilde_new(t_symbol *s) {
     t_bang *x = (t_bang *)pd_new(bang_tilde_class);
