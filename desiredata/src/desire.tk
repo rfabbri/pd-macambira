@@ -6891,7 +6891,7 @@ def Tooltip draw {} {
 		o {set ny [expr {$y+24}]}
 		i {set ny [expr {$y-24}]}
 	}
-	$self item TEXT text [list [expr $x+12] $ny] -fill $fg -text $@text -anchor w
+	$self item TEXT text [list [expr $x+12] $ny] -fill $fg -text $@text -anchor sw -width 300
 	mset {x1 y1 x2 y2} [l+ [$c bbox ${self}TEXT] [list -4 -4 +4 +4]]
 	switch -- $@type {
 	  o {set coords [list $x1 $y1 [expr $x1+8] $y1 $x $y [expr $x1+16] $y1 $x2 $y1 $x2 $y2 $x1 $y2 $x1 $y1]}
