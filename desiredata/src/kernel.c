@@ -128,24 +128,10 @@ t_symbol *atom_gensym(t_atom *a) { /* this works better for graph labels */
     return gensym("???");
 }
 
-t_float atom_getfloatarg(int which, int argc, t_atom *argv) {
-    if (argc <= which) return 0;
-    argv += which;
-    return argv->a_type==A_FLOAT ? argv->a_float : 0;
-}
-
-t_int atom_getintarg(int which, int argc, t_atom *argv)
-{return (t_int)atom_getfloatarg(which, argc, argv);}
-
-t_symbol *atom_getsymbolarg(int which, int argc, t_atom *argv) {
-    if (argc <= which) return &s_;
-    argv += which;
-    return argv->a_type==A_SYMBOL ? argv->a_symbol : &s_;
-}
-
-const char *atom_getstringarg(int which, int argc, t_atom *argv) {
-    return atom_getsymbolarg(which,argc,argv)->name;
-}
+t_float     atom_getfloatarg( int which, int argc, t_atom *argv) {return argc<=which ? 0   : atom_getfloat( argv+which);}
+t_symbol *  atom_getsymbolarg(int which, int argc, t_atom *argv) {return argc<=which ? &s_ : atom_getsymbol(argv+which);}
+t_int       atom_getintarg(   int which, int argc, t_atom *argv) {return t_int(atom_getfloatarg(which,argc,argv));}
+const char *atom_getstringarg(int which, int argc, t_atom *argv) {return      atom_getsymbolarg(which,argc,argv)->name;}
 
 /* convert an atom into a string, in the reverse sense of binbuf_text (q.v.)
    special attention is paid to symbols containing the special characters
