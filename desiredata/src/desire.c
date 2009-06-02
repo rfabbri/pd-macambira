@@ -1610,8 +1610,7 @@ static float canvas_pixelstoy(t_canvas *x, float xpix);
 static float canvas_dpixtodx(t_canvas*x,float dxpix){return dxpix*(canvas_pixelstox(x,1)-canvas_pixelstox(x,0));}
 static float canvas_dpixtody(t_canvas*x,float dypix){return dypix*(canvas_pixelstoy(x,1)-canvas_pixelstoy(x,0));}
 
-/* LATER move this and others back into plot parentwidget code, so
-   they can be static (look in g_canvas.h for candidates). */
+/* LATER move this and others back into plot parentwidget code, so they can be static (look in g_canvas.h for candidates). */
 int array_doclick(t_array *array, t_canvas *canvas, t_scalar *sc, t_array *ap,
 t_symbol *elemtsym, float linewidth, float xloc, float xinc, float yloc, float scalarvis,
 t_slot *xfield, t_slot *yfield, t_slot *wfield, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
@@ -1715,10 +1714,10 @@ t_slot *xfield, t_slot *yfield, t_slot *wfield, int xpix, int ypix, int shift, i
 static void garray_save(t_gobj *z, t_binbuf *b) {
     t_garray *x = (t_garray *)z;
     t_array *array = garray_getarray(x);
-    t_template *scalartemplate;
     /* LATER "save" the scalar as such */
     if (x->scalar->t != gensym("pd-_float_array")) {error("can't save arrays of type %s yet", x->scalar->t->name); return;}
-    if (!(scalartemplate = template_findbyname(x->scalar->t))) {error("no template of type %s", x->scalar->t->name); return;}
+    t_template *scalartemplate = template_findbyname(x->scalar->t);
+    if (!scalartemplate) {error("no template of type %s", x->scalar->t->name); return;}
     int style = (int)template_getfloat(scalartemplate, gensym("style"), x->scalar->v, 0);
     int filestyle = (style == PLOTSTYLE_POINTS ? 1 : (style == PLOTSTYLE_POLY ? 0 : style));
     binbuf_addv(b, "ttsisi;","#X","array", x->realname, array->n, &s_float, x->saveit+2*filestyle+8*x->hidename);
@@ -1744,8 +1743,7 @@ char *garray_vec(t_garray *x)   {return (char *)garray_getarray(x)->vec;} /* get
 
 /* routine that checks if we're just an array of floats and if so returns the goods */
 int garray_getfloatarray(t_garray *x, int *size, t_float **vec) {
-    int yonset, elemsize;
-    t_array *a = garray_getarray_floatonly(x, &yonset, &elemsize);
+    int yonset, elemsize; t_array *a = garray_getarray_floatonly(x, &yonset, &elemsize);
     TEMPLATE_FLOATY(a,0)
     if (elemsize != sizeof(t_word)) {error("%s: has more than one field", x->realname); return 0;}
     *size = garray_npoints(x);
@@ -1760,8 +1758,7 @@ void garray_setsaveit(t_garray *x, int saveit) {
 }
 
 static void garray_const(t_garray *x, t_floatarg g) {
-    int yonset, elemsize;
-    t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
+    int yonset, elemsize; t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     TEMPLATE_FLOATY(array,)
     for (int i=0; i<array->n; i++) *((float *)(array->vec + elemsize*i) + yonset) = g;
     garray_redraw(x);
@@ -1769,9 +1766,7 @@ static void garray_const(t_garray *x, t_floatarg g) {
 
 /* sum of Fourier components; called from functions below */
 static void garray_dofo(t_garray *x, int npoints, float dcval, int nsin, t_float *vsin, int sineflag) {
-    double phase, fj;
-    int yonset, i, j, elemsize;
-    t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
+    int yonset, elemsize; t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     TEMPLATE_FLOATY(array,)
     if (npoints == 0) npoints = 512;  /* dunno what a good default would be... */
     if (npoints != (1<<ilog2(npoints))) {
@@ -1780,8 +1775,11 @@ static void garray_dofo(t_garray *x, int npoints, float dcval, int nsin, t_float
     }
     garray_resize(x, npoints + 3);
     double phaseincr = 2. * 3.14159 / npoints;
-    for (i=0, phase = -phaseincr; i < array->n; i++, phase += phaseincr) {
+    double phase = -phaseincr;
+    for (int i=0; i<array->n; i++, phase += phaseincr) {
+        double fj;
         double sum = dcval;
+	int j;
         if (sineflag) for (j=0, fj=phase; j<nsin; j++, fj+=phase) sum += vsin[j] * sin(fj);
         else          for (j=0, fj=    0; j<nsin; j++, fj+=phase) sum += vsin[j] * cos(fj);
         *((float *)(array->vec + elemsize*i) + yonset) = sum;
@@ -1808,9 +1806,8 @@ static void garray_cosinesum(t_garray *x, t_symbol *s, int argc, t_atom *argv) {
 }
 
 static void garray_normalize(t_garray *x, t_float f) {
+    int yonset, elemsize; t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     double maxv=0;
-    int yonset, elemsize;
-    t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     TEMPLATE_FLOATY(array,)
     if (f <= 0) f = 1;
     for (int i=0; i < array->n; i++) {
@@ -1827,21 +1824,17 @@ static void garray_normalize(t_garray *x, t_float f) {
 
 /* list: the first value is an index; subsequent values are put in the "y" slot of the array. */
 static void garray_list(t_garray *x, t_symbol *s, int argc, t_atom *argv) {
-    int yonset, elemsize;
-    t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
+    int yonset, elemsize; t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     TEMPLATE_FLOATY(array,)
     if (argc < 2) return;
-    else {
-        int firstindex = atom_getintarg(0,argc--,argv++);
-        if (firstindex < 0) { /* drop negative x values */
-            argc += firstindex;
-            argv -= firstindex;
-            firstindex = 0;
-        }
-        if (argc + firstindex > array->n) argc = array->n - firstindex;
-        for (int i=0; i < argc; i++)
-            *((float *)(array->vec + elemsize * (i + firstindex)) + yonset) = atom_getfloat(argv + i);
+    int firstindex = atom_getintarg(0,argc--,argv++);
+    if (firstindex < 0) { /* drop negative x values */
+        argc += firstindex;
+        argv -= firstindex;
+        firstindex = 0;
     }
+    if (argc + firstindex > array->n) argc = array->n - firstindex;
+    for (int i=0; i < argc; i++) *((float *)(array->vec + elemsize * (i + firstindex)) + yonset) = atom_getfloat(argv + i);
     garray_redraw(x);
 }
 
@@ -1863,10 +1856,9 @@ static void garray_rename(t_garray *x, t_symbol *s) {
 }
 
 static void garray_read(t_garray *x, t_symbol *filename) {
+    int yonset, elemsize; t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     FILE *fd;
     char *buf, *bufptr;
-    int yonset, elemsize;
-    t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     TEMPLATE_FLOATY(array,)
     int nelem = array->n;
     int filedesc = canvas_open2(canvas_getcanvas(x->canvas), filename->name, "", &buf, &bufptr, 0);
@@ -1886,8 +1878,7 @@ static void garray_read(t_garray *x, t_symbol *filename) {
 }
 
 static void garray_write(t_garray *x, t_symbol *filename) {
-    int yonset, elemsize;
-    t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
+    int yonset, elemsize; t_array *array = garray_getarray_floatonly(x, &yonset, &elemsize);
     TEMPLATE_FLOATY(array,)
     char *buf = canvas_makefilename(canvas_getcanvas(x->canvas),filename->name,0,0);
     sys_bashfilename(buf, buf);
@@ -3899,10 +3890,7 @@ static void *curve_new(t_symbol *classsym, t_int argc, t_atom *argv) {
 }
 
 static void curve_float(t_curve *x, t_floatarg f) {
-    if (x->vis.type != A_FLOAT || x->vis.var) {
-        error("global vis/invis for a template with variable visibility");
-        return;
-    }
+    if (x->vis.type != A_FLOAT || x->vis.var) {error("global vis/invis for a template with variable visibility"); return;}
     int viswas = x->vis.f!=0;
     if ((f!=0 && viswas) || (f==0 && !viswas)) return;
     canvas_redrawallfortemplatecanvas(x->canvas, 2);
@@ -4185,16 +4173,16 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
 	        /* found "w" field which controls linewidth.  The trace is a filled polygon with 2n points. */
                 //sys_vgui(".x%lx.c create polygon \\\n", (long)canvas_getcanvas(canvas));
 		xsum = xloc;
-                for (int i=0; i<nelem; i++) {
-                    float usexloc = xonset>=0 ? xloc+*(float *)(elem+elemsize*i+xonset) : (xsum+=xinc);
-                    float    yval = yonset>=0 ?      *(float *)(elem+elemsize*i+yonset) : 0;
-                    wval = *(float *)(elem+elemsize*i+wonset);
-                    float xpix = canvas_xtopixels(canvas, basex + slot_cvttocoord(xslot, usexloc));
-                    ixpix = (int)roundf(xpix);
-                    if (xonset >= 0 || ixpix != lastpixel) {
-                        sys_vgui("%d %f \\\n", ixpix, canvas_ytopixels(canvas,
-				basey + slot_cvttocoord(yslot,yval+yloc)
-				      - slot_cvttocoord(wslot,wval)));
+#define FOO float usexloc = xonset>=0 ? xloc+*(float *)(elem+elemsize*i+xonset) : xsum; \
+            float    yval = yonset>=0 ?      *(float *)(elem+elemsize*i+yonset) : 0; \
+            wval = *(float *)(elem+elemsize*i+wonset); \
+            float xpix = canvas_xtopixels(canvas, basex + slot_cvttocoord(xslot, usexloc)); \
+            ixpix = int(roundf(xpix)); \
+	    float w = slot_cvttocoord(wslot,wval);
+		for (int i=0; i<nelem; i++) {
+                    xsum+=xinc; FOO;
+                    if (xonset>=0 || ixpix!=lastpixel) {
+                        sys_vgui("%d %f \\\n", ixpix, canvas_ytopixels(canvas, basey + slot_cvttocoord(yslot,yval+yloc) - w));
                         ndrawn++;
                     }
                     lastpixel = ixpix;
@@ -4202,19 +4190,15 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
                 }
                 lastpixel = -1;
                 for (int i=nelem-1; i>=0; i--) {
-                    float usexloc = xonset>=0 ? xloc+*(float *)(elem+elemsize*i+xonset) : (xsum-=xinc);
-                    float    yval = yonset>=0 ?      *(float *)(elem+elemsize*i+yonset) : 0;
-                    wval = *(float *)((elem + elemsize*i) + wonset);
-                    float xpix = canvas_xtopixels(canvas, basex + slot_cvttocoord(xslot, usexloc));
-                    ixpix = (int)roundf(xpix);
-                    if (xonset >= 0 || ixpix != lastpixel) {
-                        sys_vgui("%d %f \\\n", ixpix, canvas_ytopixels(canvas,
-                        	basey + yloc + slot_cvttocoord(yslot, yval) + slot_cvttocoord(wslot, wval)));
+		    xsum-=xinc; FOO;
+                    if (xonset>=0 || ixpix!=lastpixel) {
+                        sys_vgui("%d %f \\\n", ixpix, canvas_ytopixels(canvas, basey + yloc + slot_cvttocoord(yslot,yval)+w));
                         ndrawn++;
                     }
                     lastpixel = ixpix;
                     if (ndrawn >= 1000) goto ouch;
                 }
+#undef FOO
                 /* TK will complain if there aren't at least 3 points. There should be at least two already. */
                 if (ndrawn < 4) {
 		    int y = int(slot_cvttocoord(yslot, yval));
@@ -4253,7 +4237,7 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
         }
 	/* We're done with the outline; now draw all the points. This code is inefficient since
 	   the template has to be searched for drawing instructions for every last point. */
-        if (scalarvis != 0) {
+        if (scalarvis) {
 	    int xsum = (int)xloc;
             for (int i=0; i<nelem; i++) {
                 //float usexloc = xonset>=0 ? basex + xloc + *(float *)(elem+elemsize*i+xonset) : basex+xsum;
@@ -4266,9 +4250,7 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
         }
     } else {
 	/* un-draw the individual points */
-	/* if (scalarvis != 0)
-            for (int i=0; i<nelem; i++)
-                canvas_each(y,elemtemplatecanvas)
+	/* if (scalarvis) for (int i=0; i<nelem; i++) canvas_each(y,elemtemplatecanvas)
                     pd_getparentwidget(y)->w_parentvisfn(y, canvas, (t_word *)(elem+elemsize*i), elemtemplate,0,0,0);*/
 	/* and then the trace */
         sys_vgui(".x%lx.c delete plot%lx\n", (long)canvas_getcanvas(canvas), (long)data);
@@ -4281,11 +4263,10 @@ t_array *ap, float basex, float basey, int xpix, int ypix, int shift, int alt, i
     t_symbol *elemtsym;
     float linewidth, xloc, xinc, yloc, style, vis, scalarvis;
     t_array *array;
-    if (plot_readownertemplate(x, data, t, &elemtsym, &array, &linewidth, &xloc, &xinc,
-	&yloc, &style, &vis, &scalarvis)) return 0;
+    if (plot_readownertemplate(x,data,t,&elemtsym,&array,&linewidth,&xloc,&xinc,&yloc,&style,&vis,&scalarvis)) return 0;
     if (!vis) return 0;
-    return array_doclick(array, canvas, sc, ap, elemtsym, linewidth, basex + xloc, xinc,
-	basey + yloc, scalarvis, &x->xpoints, &x->ypoints, &x->wpoints, xpix, ypix, shift, alt, dbl, doit);
+    return array_doclick(array,canvas,sc,ap,elemtsym,linewidth,basex+xloc,xinc,
+	basey+yloc,scalarvis,&x->xpoints,&x->ypoints,&x->wpoints,xpix,ypix,shift,alt,dbl,doit);
 }
 
 /* ---------------- drawnumber: draw a number (or symbol) ---------------- */
@@ -6682,7 +6663,7 @@ void glob_help(t_pd *bogus, t_symbol *s) {
 
 extern "C" void glob_update_class_list (t_pd *self, t_symbol *cb_recv, t_symbol *cb_sel) {
     t_symbol *k; t_class *v;
-    sys_gui("global class_list; set class_list {");
+    sys_gui("set ::class_list {");
     hash_foreach(k,v,class_table) if (k) sys_vgui("%s ", k->name);
     sys_gui("}\n");
     sys_vgui("%s %s\n",cb_recv->name, cb_sel->name);
