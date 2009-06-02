@@ -944,7 +944,7 @@ static t_int soundfiler_read_output(t_int * w) {
 	t_outlet* outlet = (t_outlet*) w[0];
 	float itemsread = (float) w[1];
 	if (debug) post("bang %p", outlet);
-	outlet_float (outlet, itemsread);
+	outlet->send(itemsread);
 	return 0;
 }
 
@@ -1029,7 +1029,7 @@ fail:
 static void soundfiler_t_write(t_soundfiler *x, t_symbol *s, int argc, t_atom *argv) {
     long bozo = soundfiler_t_dowrite(x, x->canvas, argc, argv);
     sys_lock();
-    outlet_float(x->outlet, (float)bozo);
+    x->outlet->send(float(bozo));
     sys_lock();
 }
 
@@ -1080,7 +1080,7 @@ static void soundfiler_t_resize(t_soundfiler *y, t_symbol *s, int argc, t_atom *
     freealignedbytes (vec, was * elemsize);
     mlockall(MCL_FUTURE);
     sys_lock();
-    outlet_float(y->outlet, (float)atom_getintarg(1,argc,argv));
+    y->outlet->send((float)atom_getintarg(1,argc,argv));
     sys_unlock();
     return;
 usage:
@@ -1132,7 +1132,7 @@ static void soundfiler_t_const(t_soundfiler *y, t_symbol *s, int argc, t_atom *a
     freealignedbytes (vec, size * elemsize);
     mlockall(MCL_FUTURE);
     sys_lock();
-    outlet_float(y->outlet, size);
+    y->outlet->send(size);
     sys_unlock();
     return;
  usage:
@@ -1272,8 +1272,8 @@ usage:
     post("flags: -skip <n> -nframes <n> -resize -maxsize <n> ...");
     post("-raw <headerbytes> <channels> <bytespersample> <endian (b, l, or n)>.");
 done:
-    if (fd >= 0) close (fd);
-    outlet_float(x->outlet, (float)itemsread);
+    if (fd >= 0) close(fd);
+    x->outlet->send(float(itemsread));
 }
 
 /* this is broken out from soundfiler_write below so garray_write can
@@ -1356,20 +1356,20 @@ fail:
 
 static void soundfiler_write(t_soundfiler *x, t_symbol *s, int argc, t_atom *argv) {
     long bozo = soundfiler_dowrite(x, x->canvas, argc, argv);
-    outlet_float(x->outlet, (float)bozo);
+    x->outlet->send(bozo);
 }
 
 static void soundfiler_setup() {
     t_class *c = soundfiler_class = class_new2("soundfiler", (t_newmethod)soundfiler_new, 0, sizeof(t_soundfiler), 0, "");
 #ifdef THREADED_SF
-    class_addmethod2(c, (t_method)soundfiler_t_read_addq, "read", "*");
-/*     class_addmethod2(c, (t_method)soundfiler_t_write_addq, "write", "*"); */
-    class_addmethod2(c, (t_method)soundfiler_t_resize_addq, "resize", "*");
-    class_addmethod2(c, (t_method)soundfiler_t_const_addq,  "const", "*");
+    class_addmethod2(c, soundfiler_t_read_addq, "read", "*");
+/*     class_addmethod2(c, soundfiler_t_write_addq, "write", "*"); */
+    class_addmethod2(c, soundfiler_t_resize_addq, "resize", "*");
+    class_addmethod2(c, soundfiler_t_const_addq,  "const", "*");
 #else
-    class_addmethod2(c, (t_method)soundfiler_read, "read", "*");
+    class_addmethod2(c, soundfiler_read, "read", "*");
 #endif /* THREADED_SF */
-    class_addmethod2(c, (t_method)soundfiler_write, "write", "*");
+    class_addmethod2(c, soundfiler_write, "write", "*");
 }
 
 /************************* readsf object ******************************/
@@ -1623,7 +1623,7 @@ static void *readsf_new(t_floatarg fnchannels, t_floatarg fbufsize) {
     return x;
 }
 
-static void readsf_tick(t_readsf *x) {outlet_bang(x->bangout);}
+static void readsf_tick(t_readsf *x) {x->bangout->send();}
 
 static t_int *readsf_perform(t_int *w) {
     t_readsf *x = (t_readsf *)(w[1]);
