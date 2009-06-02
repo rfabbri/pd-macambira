@@ -567,13 +567,6 @@ static int outlet_eventno;
 void outlet_setstacklim () {outlet_eventno++;}
 int sched_geteventno( void) {return outlet_eventno;}
 
-struct _outlet {
-    t_object *owner;
-    struct _outlet *next;
-    t_outconnect *connections;
-    t_symbol *sym;
-};
-
 t_inlet  *t_object:: in(int n) {t_inlet  *i= inlet; while(n--) i=i->next; return i;}
 t_outlet *t_object::out(int n) {t_outlet *o=outlet; while(n--) o=o->next; return o;}
 
@@ -611,17 +604,17 @@ t_outlet *outlet_new(t_object *owner, t_symbol *s) {
 }
 
 #define each_connect(oc,x) for (t_outconnect *oc = x->connections; oc; oc = oc->next)
-void outlet_bang(t_outlet *x)                                          {each_connect(oc,x) pd_bang(oc->oc_to);}
-void outlet_pointer(t_outlet *x, t_gpointer *gp) {t_gpointer gpointer = *gp; each_connect(oc,x) pd_pointer(oc->oc_to, &gpointer);}
-void outlet_float(t_outlet *x, t_float f)                              {each_connect(oc,x) pd_float(oc->oc_to, f);}
-void outlet_symbol(t_outlet *x, t_symbol *s)                           {each_connect(oc,x) pd_symbol(oc->oc_to, s);}
-void outlet_list(t_outlet *x, t_symbol *s, int argc, t_atom *argv)     {each_connect(oc,x) pd_list(  oc->oc_to,s,argc,argv);}
-void outlet_anything(t_outlet *x, t_symbol *s, int argc, t_atom *argv) {each_connect(oc,x) typedmess(oc->oc_to,s,argc,argv);}
+void outlet_bang(t_outlet *x)                                         {each_connect(oc,x) pd_bang(   oc->oc_to);}
+void outlet_pointer(t_outlet *x, t_gpointer *v) {t_gpointer gp = *v;   each_connect(oc,x) pd_pointer(oc->oc_to,&gp);}
+void outlet_float(t_outlet *x, t_float v)                             {each_connect(oc,x) pd_float(  oc->oc_to,v);}
+void outlet_symbol(t_outlet *x, t_symbol *v)                          {each_connect(oc,x) pd_symbol( oc->oc_to,v);}
+void outlet_list(t_outlet *x, t_symbol *s, int argc, t_atom *argv)    {each_connect(oc,x) pd_list(   oc->oc_to,s,argc,argv);}
+void outlet_anything(t_outlet *x, t_symbol *s, int argc, t_atom *argv){each_connect(oc,x) typedmess( oc->oc_to,s,argc,argv);}
 
 void outlet_atom(t_outlet *x, t_atom *a) {
-    if      (a->a_type == A_FLOAT  ) outlet_float(  x,a->a_float);
-    else if (a->a_type == A_SYMBOL ) outlet_symbol( x,a->a_symbol);
-    else if (a->a_type == A_POINTER) outlet_pointer(x,a->a_gpointer);
+    if      (a->a_type==A_FLOAT  ) x->send(a->a_float);
+    else if (a->a_type==A_SYMBOL ) x->send(a->a_symbol);
+    else if (a->a_type==A_POINTER) x->send(a->a_gpointer);
     else error("can't send atom whose type is %d",a->a_type);
 }
 
