@@ -1576,8 +1576,7 @@ static int array_getfields(t_symbol *elemtsym, t_canvas **elemtemplatecanvasp,
 t_template **elemtemplatep, int *elemsizep, t_slot *xslot, t_slot *yslot, t_slot *wslot,
 int *xonsetp, int *yonsetp, int *wonsetp);
 
-/* try clicking on an element of the array as a scalar (if clicking
-   on the trace of the array failed) */
+/* try clicking on an element of the array as a scalar (if clicking on the trace of the array failed) */
 static int array_doclick_element(t_array *array, t_canvas *canvas, t_scalar *sc, t_array *ap,
 t_symbol *elemtsym, float linewidth, float xloc, float xinc, float yloc,
 t_slot *xfield, t_slot *yfield, t_slot *wfield, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
@@ -1586,9 +1585,7 @@ t_slot *xfield, t_slot *yfield, t_slot *wfield, int xpix, int ypix, int shift, i
     int elemsize, yonset, wonset, xonset, incr;
     //float xsum=0;
     if (elemtsym == &s_float) return 0;
-    if (array_getfields(elemtsym, &elemtemplatecanvas,
-        &elemtemplate, &elemsize, xfield, yfield, wfield, &xonset, &yonset, &wonset))
-                return 0;
+    if (array_getfields(elemtsym,&elemtemplatecanvas,&elemtemplate,&elemsize,xfield,yfield,wfield,&xonset,&yonset,&wonset)) return 0;
     /* if it has more than 2000 points, just check 300 of them. */
     if (array->n < 2000) incr=1; else incr = array->n/300;
     for (int i=0; i < array->n; i += incr) {
@@ -3368,9 +3365,9 @@ int template_size(t_template *x) {return x->n * sizeof(t_word);}
 int template_find_field(t_template *x, t_symbol *name, int *p_onset, int *p_type, t_symbol **p_arraytype) {
     if (!x) {bug("template_find_field"); return 0;}
     for (int i = 0; i<x->n; i++) if (x->vec[i].name == name) {
-        *p_onset = i*sizeof(t_word);
-        *p_type      = x->vec[i].type;
-        *p_arraytype = x->vec[i].arraytemplate;
+        if (p_onset)     *p_onset     = i*sizeof(t_word);
+        if (p_type)      *p_type      = x->vec[i].type;
+        if (p_arraytype) *p_arraytype = x->vec[i].arraytemplate;
         return 1;
     }
     return 0;
@@ -4060,11 +4057,21 @@ void plot_float(t_plot *x, t_floatarg f) {
     canvas_redrawallfortemplatecanvas(x->canvas, 1);
 }
 
+struct t_pelote {
+  t_symbol *elemtsym;
+  t_array *array;
+  float linewidth;
+  float xloc;
+  float xinc;
+  float yloc;
+  float style;
+  float vis;
+  float scalarvis;
+};
+
 /* get everything we'll need from the owner template of the array being
    plotted. Not used for garrays, but see below */
-static int plot_readownertemplate(t_plot *x, t_word *data, t_template *ownertemplate,
-t_symbol **elemtsymp, t_array **arrayp, float *linewidthp, float *xlocp, float *xincp, float *ylocp,
-float *stylep, float *visp, float *scalarvisp) {
+static int plot_readownertemplate(t_plot *x, t_word *data, t_template *ownertemplate, t_pelote *out) {
     int arrayonset, type;
     t_symbol *elemtsym;
     t_array *array;
@@ -4075,15 +4082,17 @@ float *stylep, float *visp, float *scalarvisp) {
     }
     if (type != DT_ARRAY) {error("%s: not an array", x->data.varsym->name); return -1;}
     array = *(t_array **)(((char *)data) + arrayonset);
-    *linewidthp = slot_getfloat(&x->width, ownertemplate, data, 1);
-    *xlocp  = slot_getfloat(&x->xloc,  ownertemplate, data, 1);
-    *xincp  = slot_getfloat(&x->xinc,  ownertemplate, data, 1);
-    *ylocp  = slot_getfloat(&x->yloc,  ownertemplate, data, 1);
-    *stylep = slot_getfloat(&x->style, ownertemplate, data, 1);
-    *visp   = slot_getfloat(&x->vis,   ownertemplate, data, 1);
-    *scalarvisp = slot_getfloat(&x->scalarvis, ownertemplate, data, 1);
-    *elemtsymp = elemtsym;
-    *arrayp = array;
+#define SLUT(FIELD) slot_getfloat(&x->FIELD, ownertemplate, data, 1);
+    out->linewidth = SLUT(width);
+    out->xloc      = SLUT(xloc);
+    out->xinc      = SLUT(xinc);
+    out->yloc      = SLUT(yloc);
+    out->style     = SLUT(style);
+    out->vis       = SLUT(vis);
+    out->scalarvis = SLUT(scalarvis);
+#undef SLUT
+    out->elemtsym = elemtsym;
+    out->array = array;
     return 0;
 }
 
@@ -4121,40 +4130,38 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
     int elemsize, yonset, wonset, xonset;
     t_canvas *elemtemplatecanvas;
     t_template *elemtemplate;
-    t_symbol *elemtsym;
-    float linewidth, xloc, xinc, yloc, style, xsum, yval, vis, scalarvis;
-    t_array *array;
-    if (plot_readownertemplate(x, data, t, &elemtsym, &array, &linewidth, &xloc, &xinc, &yloc, &style, &vis, &scalarvis)) return;
+    float xsum, yval;
+    t_pelote p;
+    if (plot_readownertemplate(x,data,t,&p)) return;
     t_slot *xslot = &x->xpoints, *yslot = &x->ypoints, *wslot = &x->wpoints;
-    if (!vis) return;
-    if (array_getfields(elemtsym, &elemtemplatecanvas, &elemtemplate, &elemsize,
-	xslot, yslot, wslot, &xonset, &yonset, &wonset)) return;
-    int nelem = array->n;
-    char *elem = (char *)array->vec;
+    if (!p.vis) return;
+    if (array_getfields(p.elemtsym,&elemtemplatecanvas,&elemtemplate,&elemsize,xslot,yslot,wslot,&xonset,&yonset,&wonset)) return;
+    int nelem = p.array->n;
+    char *elem = (char *)p.array->vec;
     if (tovis) {
-        if (style == PLOTSTYLE_POINTS) {
+        if (p.style == PLOTSTYLE_POINTS) {
             float minyval = 1e20, maxyval = -1e20;
             int ndrawn = 0;
-	    xsum = basex + xloc;
+	    xsum = basex + p.xloc;
             for (int i=0; i<nelem; i++) {
                 float yval;
                 int ixpix, inextx;
                 if (xonset >= 0) {
-                    float usexloc = basex + xloc + *(float *)((elem + elemsize*i) + xonset);
+                    float usexloc = basex + p.xloc + *(float *)((elem + elemsize*i) + xonset);
                     ixpix  = canvas_xtopixels(canvas, slot_cvttocoord(xslot, usexloc));
                     inextx = ixpix + 2;
                 } else {
-                    ixpix  = canvas_xtopixels(canvas, slot_cvttocoord(xslot, xsum)); xsum += xinc;
+                    ixpix  = canvas_xtopixels(canvas, slot_cvttocoord(xslot, xsum)); xsum += p.xinc;
                     inextx = canvas_xtopixels(canvas, slot_cvttocoord(xslot, xsum));
                 }
-                yval = yonset>=0 ? yloc + *(float *)((elem + elemsize*i) + yonset) : 0;
+                yval = yonset>=0 ? p.yloc + *(float *)((elem + elemsize*i) + yonset) : 0;
                 if (yval > maxyval) maxyval = yval;
                 if (yval < minyval) minyval = yval;
                 if (i == nelem-1 || inextx != ixpix) {
                     sys_vgui(".x%lx.c create rectangle %d %d %d %d -fill black -width 0  -tags plot%lx\n",
                         (long)canvas_getcanvas(canvas), ixpix,
 			(int) canvas_ytopixels(canvas, basey + slot_cvttocoord(yslot, minyval)), inextx,
-			(int)(canvas_ytopixels(canvas, basey + slot_cvttocoord(yslot, maxyval))+linewidth),
+			(int)(canvas_ytopixels(canvas, basey + slot_cvttocoord(yslot, maxyval))+p.linewidth),
 			(long)data);
                     ndrawn++;
                     minyval = 1e20;
@@ -4172,57 +4179,49 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
             if (wonset >= 0) {
 	        /* found "w" field which controls linewidth.  The trace is a filled polygon with 2n points. */
                 //sys_vgui(".x%lx.c create polygon \\\n", (long)canvas_getcanvas(canvas));
-		xsum = xloc;
-#define FOO float usexloc = xonset>=0 ? xloc+*(float *)(elem+elemsize*i+xonset) : xsum; \
-            float    yval = yonset>=0 ?      *(float *)(elem+elemsize*i+yonset) : 0; \
+		xsum = p.xloc;
+#define FOO float usexloc = xonset>=0 ? p.xloc+*(float *)(elem+elemsize*i+xonset) : xsum; \
+            float    yval = yonset>=0 ?        *(float *)(elem+elemsize*i+yonset) : 0; \
             wval = *(float *)(elem+elemsize*i+wonset); \
             float xpix = canvas_xtopixels(canvas, basex + slot_cvttocoord(xslot, usexloc)); \
             ixpix = int(roundf(xpix)); \
 	    float w = slot_cvttocoord(wslot,wval);
 		for (int i=0; i<nelem; i++) {
-                    xsum+=xinc; FOO;
+                    xsum+=p.xinc; FOO;
                     if (xonset>=0 || ixpix!=lastpixel) {
-                        sys_vgui("%d %f \\\n", ixpix, canvas_ytopixels(canvas, basey + slot_cvttocoord(yslot,yval+yloc) - w));
-                        ndrawn++;
-                    }
-                    lastpixel = ixpix;
-                    if (ndrawn >= 1000) goto ouch;
-                }
+                        sys_vgui("%d %f \\\n", ixpix, canvas_ytopixels(canvas, basey + slot_cvttocoord(yslot,yval+p.yloc) - w));
+                        ndrawn++;}
+                    lastpixel = ixpix;}
                 lastpixel = -1;
                 for (int i=nelem-1; i>=0; i--) {
-		    xsum-=xinc; FOO;
+		    xsum-=p.xinc; FOO;
                     if (xonset>=0 || ixpix!=lastpixel) {
-                        sys_vgui("%d %f \\\n", ixpix, canvas_ytopixels(canvas, basey + yloc + slot_cvttocoord(yslot,yval)+w));
-                        ndrawn++;
-                    }
-                    lastpixel = ixpix;
-                    if (ndrawn >= 1000) goto ouch;
-                }
+                        sys_vgui("%d %f \\\n", ixpix, canvas_ytopixels(canvas, basey + p.yloc + slot_cvttocoord(yslot,yval)+w));
+                        ndrawn++;}
+                    lastpixel = ixpix;}
 #undef FOO
                 /* TK will complain if there aren't at least 3 points. There should be at least two already. */
                 if (ndrawn < 4) {
 		    int y = int(slot_cvttocoord(yslot, yval));
 		    int w = int(slot_cvttocoord(wslot, wval));
                     sys_vgui("%d %f %d %f\\\n",
-			ixpix + 10, canvas_ytopixels(canvas, basey + yloc + y + w),
-                        ixpix + 10, canvas_ytopixels(canvas, basey + yloc + y - w));
-                }
-            ouch:
-                sys_vgui(" -width 1 -fill %s -outline %s\\\n", outline, outline);
-                if (style == PLOTSTYLE_BEZ) sys_vgui("-smooth 1\\\n");
+			ixpix + 10, canvas_ytopixels(canvas, basey + p.yloc + y + w),
+                        ixpix + 10, canvas_ytopixels(canvas, basey + p.yloc + y - w));}
+                sys_vgui(" -width 1 -fill %s -outline %s", outline, outline);
+                if (p.style == PLOTSTYLE_BEZ) sys_vgui("-smooth 1");
                 sys_vgui("-tags plot%lx\n", (long)data);
-	    } else if (linewidth > 0) {
+	    } else if (p.linewidth>0) {
 		/* no "w" field.  If the linewidth is positive, draw a segmented line with the
 		   requested width; otherwise don't draw the trace at all. */
                 sys_vgui(".x%lx.c create line \\\n", (long)canvas_getcanvas(canvas));
-		xsum = xloc;
+		xsum = p.xloc;
                 for (int i=0; i<nelem; i++) {
-                    float usexloc = xonset>=0 ? xloc+*(float *)(elem+elemsize*i+xonset) : xsum; if (xonset>=0) xsum+=(int)xinc;
-                    float    yval = yonset>=0 ?      *(float *)(elem+elemsize*i+yonset) : 0;
+                    float usexloc = xonset>=0 ? p.xloc+*(float *)(elem+elemsize*i+xonset) : xsum; if (xonset>=0) xsum+=int(p.xinc);
+                    float    yval = yonset>=0 ?        *(float *)(elem+elemsize*i+yonset) : 0;
                     float xpix = canvas_xtopixels(canvas, basex + slot_cvttocoord(xslot, usexloc));
                     ixpix = (int)roundf(xpix);
                     if (xonset >= 0 || ixpix != lastpixel) {
-                        sys_vgui("%d %f \\\n", ixpix, canvas_ytopixels(canvas, basey + yloc + slot_cvttocoord(yslot, yval)));
+                        sys_vgui("%d %f \\\n", ixpix, canvas_ytopixels(canvas, basey + p.yloc + slot_cvttocoord(yslot, yval)));
                         ndrawn++;
                     }
                     lastpixel = ixpix;
@@ -4231,17 +4230,16 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
                 /* TK will complain if there aren't at least 2 points... */
                 if (ndrawn == 0) sys_vgui("0 0 0 0 \\\n");
                 else if (ndrawn == 1) sys_vgui("%d %f \\\n", ixpix + 10,
-                    canvas_ytopixels(canvas, basey + yloc + slot_cvttocoord(yslot, yval)));
-                sys_vgui("-width %f -fill %s -smooth %d -tags plot%lx",linewidth,outline,style==PLOTSTYLE_BEZ,(long)data);
+                    canvas_ytopixels(canvas, basey + p.yloc + slot_cvttocoord(yslot, yval)));
+                sys_vgui("-width %f -fill %s -smooth %d -tags plot%lx",p.linewidth,outline,p.style==PLOTSTYLE_BEZ,(long)data);
             }
         }
-	/* We're done with the outline; now draw all the points. This code is inefficient since
-	   the template has to be searched for drawing instructions for every last point. */
-        if (scalarvis) {
-	    int xsum = (int)xloc;
+	/* We're done with the outline; now draw all the points. */
+        if (p.scalarvis) {
+	    int xsum = int(p.xloc);
             for (int i=0; i<nelem; i++) {
                 //float usexloc = xonset>=0 ? basex + xloc + *(float *)(elem+elemsize*i+xonset) : basex+xsum;
-		if (xonset>=0) xsum+=int(xinc);
+		if (xonset>=0) xsum+=int(p.xinc);
                 yval = yonset>=0 ? *(float *)(elem+elemsize*i+yonset) : 0;
                 //float useyloc = basey + yloc + slot_cvttocoord(yslot, yval);
                 /*canvas_each(y,elemtemplatecanvas) pd_getparentwidget(y)->w_parentvisfn(y, canvas,
@@ -4257,13 +4255,15 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
     }
 }
 
+// could be merged with array_doclick
 static int plot_click(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, t_scalar *sc,
 t_array *ap, float basex, float basey, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
     t_plot *x = (t_plot *)z;
     t_symbol *elemtsym;
-    float linewidth, xloc, xinc, yloc, style, vis, scalarvis;
+    float linewidth, xloc, xinc, yloc, vis, scalarvis;
     t_array *array;
-    if (plot_readownertemplate(x,data,t,&elemtsym,&array,&linewidth,&xloc,&xinc,&yloc,&style,&vis,&scalarvis)) return 0;
+    t_pelote p;
+    if (plot_readownertemplate(x,data,t,&p)) return 0;
     if (!vis) return 0;
     return array_doclick(array,canvas,sc,ap,elemtsym,linewidth,basex+xloc,xinc,
 	basey+yloc,scalarvis,&x->xpoints,&x->ypoints,&x->wpoints,xpix,ypix,shift,alt,dbl,doit);
@@ -4561,8 +4561,7 @@ static void ptrobj_bang(t_ptrobj *x) {
     t_typedout *to = x->typedout;
     if (!gpointer_check(&x->gp, 1)) {error("bang: empty pointer"); return;}
     t_symbol *tsym = gpointer_gettsym(&x->gp);
-    for (int n=x->ntypedout; n--; to++)
-        if (to->type == tsym) {outlet_pointer(to->outlet, &x->gp); return;}
+    for (int n=x->ntypedout; n--; to++) if (to->type == tsym) {outlet_pointer(to->outlet, &x->gp); return;}
     outlet_pointer(x->otherout, &x->gp);
 }
 
@@ -4605,9 +4604,8 @@ static void *get_new(t_symbol *why, int argc, t_atom *argv) {
     for (int i=0; i < argc; i++, sp++) {
         sp->sym = atom_getsymbolarg(i, argc, argv);
         sp->outlet = outlet_new(x,0);
-        /* LATER connect with the template and set the outlet's type
-        correctly.  We can't yet guarantee that the template is there
-        before we hit this routine. */
+        /* LATER connect with the template and set the outlet's type correctly.
+	We can't yet guarantee that the template is there before we hit this routine. */
     }
     return x;
 }
@@ -4624,7 +4622,7 @@ static void get_pointer(t_get *x, t_gpointer *gp) {
         int onset, type;
         t_symbol *arraytype;
         if (template_find_field(t, vp->sym, &onset, &type, &arraytype)) {
-            if       (type == DT_FLOAT)  outlet_float(vp->outlet,   *(t_float *)(((char *)vec) + onset));
+            if      (type == DT_FLOAT ) outlet_float( vp->outlet,   *(t_float *)(((char *)vec) + onset));
             else if (type == DT_SYMBOL) outlet_symbol(vp->outlet, *(t_symbol **)(((char *)vec) + onset));
             else error("%s.%s is not a number or symbol", t->sym->name, vp->sym->name);
         } else error("%s.%s: no such field", t->sym->name, vp->sym->name);
