@@ -52,7 +52,7 @@ ifeq ($(OS_NAME),darwin)
   FAT_FLAGS = -arch ppc -arch ppc64 -arch i386
 # 10.5 Leopard
 #  FAT_FLAGS = -arch ppc -arch ppc7400 -arch ppc64 -arch i386 -arch x86_64
-  CFLAGS += -I/sw/include -I$(externals_src)/pdp/include -DMACOSX -DUNIX -Dunix
+  CFLAGS += -I/sw/include -I$(externals_src)/pdp/include -DMACOSX -DUNIX -Dunix -DDL_OPEN
   LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -undefined dynamic_lookup \
 		-L/sw/lib -weak_framework Carbon
   LIBS += -lc 
@@ -60,7 +60,7 @@ ifeq ($(OS_NAME),darwin)
   STRIP = strip -x
 endif
 ifeq ($(OS_NAME),linux)
-  CFLAGS += -I$(externals_src)/pdp/include -DUNIX -Dunix -fPIC
+  CFLAGS += -I$(externals_src)/pdp/include -DUNIX -Dunix -DDL_OPEN -fPIC
   LDFLAGS += -Wl,-export_dynamic  -shared
   LIBS += -lc
   DYLIB_LDFLAGS = $(LDFLAGS)
