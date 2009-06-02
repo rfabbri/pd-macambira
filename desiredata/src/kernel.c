@@ -1798,7 +1798,7 @@ t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew) {
         but does not happen when the A_DOLLSYM is the name of a subpatch */
     /* JMZ: this should mimick the original behaviour */
  	if(!tonew && !next && buf.str().size()==0) return 0;
-	buf2 << buf;
+	buf2 << buf.str();
 	str+=next;
 	substr=strchr(str, '$');
 	if(substr) {
