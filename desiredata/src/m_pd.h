@@ -520,12 +520,6 @@ EXTERN void gpointer_unset(t_gpointer *gp);
 EXTERN int gpointer_check(const t_gpointer *gp, int headok);
 
 /* ----------------- patchable "objects" -------------- */
-/* already defined
-EXTERN_STRUCT _inlet;
-#define t_inlet struct _inlet
-EXTERN_STRUCT _outlet;
-#define t_outlet struct _outlet
-*/
 EXTERN t_inlet *inlet_new(t_object *owner, t_pd *dest, t_symbol *s1, t_symbol *s2);
 EXTERN t_inlet *pointerinlet_new(t_object *owner, t_gpointer *gp);
 EXTERN t_inlet *floatinlet_new(t_object *owner, t_float *fp);
@@ -536,15 +530,35 @@ EXTERN void inlet_free(t_inlet *x);
 
 EXTERN t_outlet *outlet_new(t_object *owner, t_symbol *s);
 EXTERN void outlet_bang(    t_outlet *x);
-EXTERN void outlet_pointer( t_outlet *x, t_gpointer *gp);
 EXTERN void outlet_float(   t_outlet *x, t_float f);
 EXTERN void outlet_symbol(  t_outlet *x, t_symbol *s);
 EXTERN void outlet_string(  t_outlet *x, const char *s); /* makes a refcounted symbol (copying s) */
+EXTERN void outlet_pointer( t_outlet *x, t_gpointer *gp);
 EXTERN void outlet_atom(    t_outlet *x, t_atom *a);
-EXTERN void outlet_list(    t_outlet *x, t_symbol *s, int argc, t_atom *argv);
+EXTERN void outlet_list(    t_outlet *x, t_symbol *s, int argc, t_atom *argv); /* ignores s, uses &s_list instead */
 EXTERN void outlet_anything(t_outlet *x, t_symbol *s, int argc, t_atom *argv);
 EXTERN t_symbol *outlet_getsymbol(t_outlet *x);
 EXTERN void outlet_free(t_outlet *x);
+
+struct _outlet {
+#ifdef PD_PLUSPLUS_FACE
+    void send()              {outlet_bang(   this);}
+    void send(t_float     v) {outlet_float(  this,v);}
+    void send(t_symbol   *v) {outlet_symbol( this,v);}
+    void send(const char *v) {outlet_string( this,v);}
+    void send(t_gpointer *v) {outlet_pointer(this,v);}
+    void send(t_atom     *v) {outlet_atom(   this,v);}
+    void send(             int argc, t_atom *argv) {outlet_list(    this,0,argc,argv);}
+    void send(t_symbol *s, int argc, t_atom *argv) {outlet_anything(this,s,argc,argv);}
+  //private:
+#endif
+    t_object *owner;
+    struct _outlet *next;
+    t_outconnect *connections;
+    t_symbol *sym;
+};
+
+
 EXTERN t_object *pd_checkobject(t_pd *x);
 
 /* -------------------- canvases -------------- */
