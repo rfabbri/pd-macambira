@@ -76,7 +76,7 @@ static t_class *C##_class; \
 static void *C##_new() { \
     t_object *x = (t_object *)pd_new(C##_class); \
     outlet_new(x, &s_float); return x;} \
-static void C##_float(t_object *x, t_float a) {outlet_float(x->outlet, EXPR);}
+static void C##_float(t_object *x, t_float a) {x->outlet->send(EXPR);}
 #define FUNC1DECL(C,SYM) \
     C##_class = class_new2(SYM,C##_new,0,sizeof(t_object),0,""); \
     class_addfloat(C##_class, (t_method)C##_float); \
@@ -109,7 +109,7 @@ static void openpanel_bang(t_openpanel *x) {
 static void openpanel_symbol(t_openpanel *x, t_symbol *s) {
     sys_vgui("pdtk_openpanel {%s} {%s}\n", x->s->name, (s && s->name) ? s->name : "\"\"");
 }
-static void openpanel_callback(t_openpanel *x, t_symbol *s) {outlet_symbol(x->outlet, s);}
+static void openpanel_callback(t_openpanel *x, t_symbol *s) {x->outlet->send(s);}
 static void openpanel_path(t_openpanel *x, t_symbol *s) {x->path=s;}
 static void openpanel_free(t_openpanel *x) {pd_unbind(x, x->s);}
 static void openpanel_setup() {
@@ -140,7 +140,7 @@ static void savepanel_bang(t_savepanel *x) {
 static void savepanel_symbol(t_savepanel *x, t_symbol *s) {
     sys_vgui("pdtk_savepanel {%s} {%s}\n", x->s->name, (s && s->name) ? s->name : "\"\"");
 }
-static void savepanel_callback(t_savepanel *x, t_symbol *s) {outlet_symbol(x->outlet, s);}
+static void savepanel_callback(t_savepanel *x, t_symbol *s) {x->outlet->send(s);}
 static void savepanel_free(t_savepanel *x) {pd_unbind(x, x->s);}
 static void savepanel_setup() {
     t_class *c = savepanel_class = class_new2("savepanel",savepanel_new,savepanel_free,sizeof(t_savepanel),0,"S");
@@ -160,7 +160,7 @@ static void *key_new() {
     pd_bind(x, key_sym);
     return x;
 }
-static void key_float(t_key *x, t_floatarg f) {outlet_float(x->outlet, f);}
+static void key_float(t_key *x, t_floatarg f) {x->outlet->send(f);}
 
 struct t_keyup : t_object {};
 static void *keyup_new() {
@@ -169,7 +169,7 @@ static void *keyup_new() {
     pd_bind(x, keyup_sym);
     return x;
 }
-static void keyup_float(t_keyup *x, t_floatarg f) {outlet_float(x->outlet, f);}
+static void keyup_float(t_keyup *x, t_floatarg f) {x->outlet->send(f);}
 
 struct t_keyname : t_object {};
 static void *keyname_new() {
@@ -180,8 +180,8 @@ static void *keyname_new() {
     return x;
 }
 static void keyname_list(t_keyname *x, t_symbol *s, int ac, t_atom *av) {
-    outlet_symbol(x->out(1), atom_getsymbolarg(1, ac, av));
-    outlet_float( x->out(0), atom_getfloatarg( 0, ac, av));
+    x->out(1)->send(atom_getsymbolarg(1, ac, av));
+    x->out(0)->send(atom_getfloatarg( 0, ac, av));
 }
 static void key_free(    t_key *x)     {pd_unbind(x, key_sym);}
 static void keyup_free(  t_keyup *x)   {pd_unbind(x, keyup_sym);}
@@ -246,14 +246,14 @@ static void netsend_connect(t_netsend *x, t_symbol *hostname, t_floatarg fportno
         return;
     }
     x->fd = sockfd;
-    outlet_float(x->outlet, 1);
+    x->outlet->send(1.);
 }
 
 static void netsend_disconnect(t_netsend *x) {
     if (x->fd < 0) return;
     sys_closesocket(x->fd);
     x->fd = -1;
-    outlet_float(x->outlet, 0);
+    x->outlet->send(0.);
 }
 static void netsend_send(t_netsend *x, t_symbol *s, int argc, t_atom *argv) {
     if (x->fd < 0) {error("netsend: not connected"); return;}
@@ -311,7 +311,7 @@ struct t_netreceive : t_object {
     t_socketreceiver *sr;
 };
 static void netreceive_notify(t_netreceive *x) {
-    outlet_float(x->connectout, --x->nconnections);
+    x->connectout->send(--x->nconnections);
 }
 static void netreceive_doit(t_netreceive *x, t_binbuf *b) {
     int natom = binbuf_getnatom(b);
@@ -326,7 +326,7 @@ static void netreceive_doit(t_netreceive *x, t_binbuf *b) {
             }
             if (at[msg].a_type == A_FLOAT) {
                 if (emsg > msg + 1) outlet_list(x->msgout, 0, emsg-msg, at + msg);
-                else outlet_float(x->msgout, at[msg].a_float);
+                else x->msgout->send(at[msg].a_float);
             } else if (at[msg].a_type == A_SYMBOL)
                 outlet_anything(x->msgout, at[msg].a_symbol, emsg-msg-1, at + msg + 1);
         }
@@ -341,7 +341,7 @@ static void netreceive_connectpoll(t_netreceive *x) {
         t_socketreceiver *y = socketreceiver_new((t_pd *)x, fd,
             (t_socketnotifier)netreceive_notify, x->msgout?(t_socketreceivefn)netreceive_doit:0, 0);
         sys_addpollfn(fd, (t_fdpollfn)socketreceiver_read, y);
-        outlet_float(x->connectout, ++x->nconnections);
+        x->connectout->send(++x->nconnections);
 	y->next = x->sr;
 	x->sr = y;
     }
@@ -501,7 +501,7 @@ static void qlist_donext(t_qlist *x, int drop, int automatic) {
 
 end:
     x->onset = 0x7fffffff;
-    outlet_bang(x->out(1));
+    x->out(1)->send();
     x->whenclockset = 0;
 }
 static void qlist_next(t_qlist *x, t_floatarg drop) {qlist_donext(x, drop != 0, 0);}
@@ -595,7 +595,7 @@ static void textfile_bang(t_textfile *x) {
         else outlet_list(x->outlet, 0, onset2-onset, ap);
     } else {
         x->onset = 0x7fffffff;
-        outlet_bang(x->out(1));
+        x->out(1)->send();
     }
 }
 
@@ -750,8 +750,8 @@ static t_pd *list_length_new() {
     outlet_new(x, &s_float);
     return x;
 }
-static void list_length_list(    t_list_length *x, t_symbol *s, int argc, t_atom *argv) {outlet_float(x->outlet, (float)argc);}
-static void list_length_anything(t_list_length *x, t_symbol *s, int argc, t_atom *argv) {outlet_float(x->outlet, (float)argc+1);}
+static void list_length_list(    t_list_length *x, t_symbol *s, int argc, t_atom *argv) {x->outlet->send(float(argc));}
+static void list_length_anything(t_list_length *x, t_symbol *s, int argc, t_atom *argv) {x->outlet->send(float(argc+1));}
 
 static void *list_new(t_pd *dummy, t_symbol *s, int argc, t_atom *argv) {
     t_pd *newest = 0; /* hide global var */
@@ -811,7 +811,7 @@ static void random_bang(t_random *x) {
     x->state = randval = randval * 472940017 + 832416023;
     nval = (int)((double)range * (double)randval * (1./4294967296.));
     if (nval >= range) nval = (int)(range-1);
-    outlet_float(x->outlet, nval);
+    x->outlet->send(nval);
 }
 static void random_seed(t_random *x, float f, float glob) {x->state = (int)f;}
 static void random_setup() {
@@ -828,7 +828,7 @@ static void *loadbang_new() {
     return x;
 }
 static void loadbang_loadbang(t_loadbang *x) {
-    if (!sys_noloadbang) outlet_bang(x->outlet);
+    if (!sys_noloadbang) x->outlet->send();
 }
 static void loadbang_setup() {
     loadbang_class = class_new2("loadbang",loadbang_new,0,sizeof(t_loadbang),CLASS_NOINLET,"");
@@ -900,13 +900,13 @@ static void cputime_bang2(t_cputime *x) {
             ((kerneltime.QuadPart - x->kerneltime.QuadPart) +
                (usertime.QuadPart -   x->usertime.QuadPart)) : 0;
 #endif
-    outlet_float(x->outlet, elapsedcpu);
+    x->outlet->send(elapsedcpu);
 }
 
 static void realtime_bang(t_realtime *x) {x->setrealtime = sys_getrealtime();}
 static void    timer_bang(t_timer *x   ) {x->settime     = clock_getsystime();}
-static void realtime_bang2(t_realtime *x) {outlet_float(x->outlet, (sys_getrealtime() - x->setrealtime) * 1000.);}
-static void    timer_bang2(t_timer *x   ) {outlet_float(x->outlet, clock_gettimesince(x->settime));}
+static void realtime_bang2(t_realtime *x) {x->outlet->send((sys_getrealtime() - x->setrealtime) * 1000.);}
+static void    timer_bang2(t_timer *x   ) {x->outlet->send(clock_gettimesince(x->settime));}
 
 static void *cputime_new() {
     t_cputime *x = (t_cputime *)pd_new(cputime_class);
@@ -992,7 +992,7 @@ static void *macro_new(t_symbol *s) {
     return x;
 }
 
-static void macro_bang(t_macro *x) {outlet_bang(x->bangout);}
+static void macro_bang(t_macro *x) {x->bangout->send();}
 
 static void macro_send(t_macro *x, t_symbol *s, int argc, t_atom *argv) {
   std::ostringstream t;
@@ -1093,7 +1093,7 @@ static void any_bang(t_any *x) {
     t_atom *outv; int outc = x->alist->n;
     ATOMS_ALLOCA(outv, outc);
     alist_toatoms(x->alist, outv);
-    if (!binbuf_getnatom(x->alist)) {outlet_bang(x->outlet);return;}
+    if (!binbuf_getnatom(x->alist)) {x->outlet->send();return;}
     if (outv[0].a_type == A_FLOAT) {outlet_anything(x->outlet, &s_list, outc, outv);}
     if (outv[0].a_type == A_SYMBOL) {outlet_anything(x->outlet, outv[0].a_symbol, outc-1, outv+1);}
     ATOMS_FREEA(outv, outc);
@@ -1135,7 +1135,7 @@ static void *binop_new(t_class *floatclass, t_floatarg f) {
 #define BINOP(NAME,EXPR) \
 static t_class *NAME##_class; \
 static void *NAME##_new(t_floatarg f) {return binop_new(NAME##_class, f);} \
-static void NAME##_bang(t_binop *x) {float a=x->f1,b=x->f2; outlet_float(x->outlet,(EXPR));} \
+static void NAME##_bang(t_binop *x) {float a=x->f1,b=x->f2; x->outlet->send(EXPR);} \
 static void NAME##_float(t_binop *x, t_float f) {x->f1=f; NAME##_bang(x);}
 
 BINOP(binop_plus,a+b)
@@ -1197,8 +1197,8 @@ static void *clip_new(t_floatarg f2, t_floatarg f3) {
     outlet_new(x, &s_float);
     return x;
 }
-static void clip_bang( t_clip *x) {                      outlet_float(x->outlet, clip(x->f1,x->f2,x->f3));}
-static void clip_float(t_clip *x, t_float f) {x->f1 = f; outlet_float(x->outlet, clip(x->f1,x->f2,x->f3));}
+static void clip_bang( t_clip *x) {                      x->outlet->send(clip(x->f1,x->f2,x->f3));}
+static void clip_float(t_clip *x, t_float f) {x->f1 = f; x->outlet->send(clip(x->f1,x->f2,x->f3));}
 
 void arithmetic_setup() {
     t_symbol *s = gensym("operators");
@@ -1258,20 +1258,20 @@ void arithmetic_setup() {
     class_addbang(clip_class, clip_bang);
 }
 
-static t_class *pdint_class;    struct t_pdint    : t_object {t_float f;};
-static t_class *pdfloat_class;  struct t_pdfloat  : t_object {t_float f;};
-static t_class *pdsymbol_class; struct t_pdsymbol : t_object {t_symbol *s;};
+static t_class *pdint_class;    struct t_pdint    : t_object {t_float   v;};
+static t_class *pdfloat_class;  struct t_pdfloat  : t_object {t_float   v;};
+static t_class *pdsymbol_class; struct t_pdsymbol : t_object {t_symbol *v;};
 static t_class *bang_class;     struct t_bang     : t_object {};
 
-static void pdint_bang(t_pdint *x) {outlet_float(x->outlet, (t_float)(int)x->f);}
-static void pdint_float(t_pdint *x, t_float f) {x->f = f; pdint_bang(x);}
+static void pdint_bang(t_pdint *x) {x->outlet->send(t_float(int(x->v)));}
+static void pdint_float(t_pdint *x, t_float v) {x->v = v; pdint_bang(x);}
 
-static void pdfloat_bang(t_pdfloat *x) {outlet_float(x->outlet, x->f);}
-static void pdfloat_float(t_pdfloat *x, t_float f) {x->f=f; pdfloat_bang(x);}
+static void pdfloat_bang(t_pdfloat *x) {x->outlet->send(x->v);}
+static void pdfloat_float(t_pdfloat *x, t_float v) {x->v=v; pdfloat_bang(x);}
 
-static void pdsymbol_bang(t_pdsymbol *x) {outlet_symbol(x->outlet, x->s);}
-static void pdsymbol_symbol(  t_pdsymbol *x, t_symbol *s                    ) {x->s=s; pdsymbol_bang(x);}
-static void pdsymbol_anything(t_pdsymbol *x, t_symbol *s, int ac, t_atom *av) {x->s=s; pdsymbol_bang(x);}
+static void pdsymbol_bang(t_pdsymbol *x) {x->outlet->send(x->v);}
+static void pdsymbol_symbol(  t_pdsymbol *x, t_symbol *v                    ) {x->v=v; pdsymbol_bang(x);}
+static void pdsymbol_anything(t_pdsymbol *x, t_symbol *v, int ac, t_atom *av) {x->v=v; pdsymbol_bang(x);}
 
 /* For "list" message don't just output "list"; if empty, we want to bang the symbol and
    if it starts with a symbol, we output that. Otherwise it's not clear what we should do
@@ -1286,21 +1286,18 @@ static void pdsymbol_list(t_pdsymbol *x, t_symbol *s, int ac, t_atom *av) {
 }
 #endif
 
-static void *pdint_new(t_floatarg f) {
-    t_pdint *x = (t_pdint *)pd_new(pdint_class);
-    x->f = f; outlet_new(x, &s_float); floatinlet_new(x, &x->f);
+static void *pdint_new(t_floatarg v) {
+    t_pdint *x   = (t_pdint *)  pd_new(pdint_class  ); x->v=v; outlet_new(x,&s_float); floatinlet_new(x,&x->v);
     return x;
 }
-static void *pdfloat_new(t_pd *dummy, t_float f) {
-    t_pdfloat *x = (t_pdfloat *)pd_new(pdfloat_class);
-    x->f = f; outlet_new(x, &s_float); floatinlet_new(x, &x->f);
+static void *pdfloat_new(t_pd *dummy, t_float v) {
+    t_pdfloat *x = (t_pdfloat *)pd_new(pdfloat_class); x->v=v; outlet_new(x,&s_float); floatinlet_new(x,&x->v);
     pd_set_newest((t_pd *)x);
     return x;
 }
 static void *pdfloat_new2(t_floatarg f) {return pdfloat_new(0, f);}
-static void *pdsymbol_new(t_pd *dummy, t_symbol *s) {
-    t_pdsymbol *x = (t_pdsymbol *)pd_new(pdsymbol_class);
-    x->s = s; outlet_new(x, &s_symbol);symbolinlet_new(x, &x->s);
+static void *pdsymbol_new(t_pd *dummy, t_symbol *v) {
+    t_pdsymbol *x = (t_pdsymbol *)pd_new(pdsymbol_class); x->v=v; outlet_new(x, &s_symbol); symbolinlet_new(x, &x->v);
     pd_set_newest((t_pd *)x);
     return x;
 }
@@ -1311,7 +1308,7 @@ static void *bang_new(t_pd *dummy) {
     return x;
 }
 static void *bang_new2(t_bang f) {return bang_new(0);}
-static void bang_bang(t_bang *x) {outlet_bang(x->outlet);}
+static void bang_bang(t_bang *x) {x->outlet->send();}
 
 void misc_setup() {
     pdint_class = class_new2("int",pdint_new,0,sizeof(t_pdint),0,"F");
@@ -1347,12 +1344,12 @@ static void send_pointer( t_send *x, t_gpointer *gp) {                     if (x
 static void send_list(    t_send *x, t_symbol *s, int argc, t_atom *argv) {if (x->sym->thing)    pd_list(x->sym->thing,s,argc,argv);}
 static void send_anything(t_send *x, t_symbol *s, int argc, t_atom *argv) {if (x->sym->thing)  typedmess(x->sym->thing,s,argc,argv);}
 
-static void receive_bang(    t_receive *x) {                                         outlet_bang(x->outlet);}
-static void receive_float(   t_receive *x, t_float f) {                             outlet_float(x->outlet, f);}
-static void receive_symbol(  t_receive *x, t_symbol *s) {                          outlet_symbol(x->outlet, s);}
-static void receive_pointer( t_receive *x, t_gpointer *gp) {                      outlet_pointer(x->outlet, gp);}
-static void receive_list(    t_receive *x, t_symbol *s, int argc, t_atom *argv) {    outlet_list(x->outlet, s, argc, argv);}
-static void receive_anything(t_receive *x, t_symbol *s, int argc, t_atom *argv) {outlet_anything(x->outlet, s, argc, argv);}
+static void receive_bang(    t_receive *x) {                                     x->outlet->send();}
+static void receive_float(   t_receive *x, t_float v) {                          x->outlet->send(v);}
+static void receive_symbol(  t_receive *x, t_symbol *v) {                        x->outlet->send(v);}
+static void receive_pointer( t_receive *x, t_gpointer *v) {                      x->outlet->send(v);}
+static void receive_list(    t_receive *x, t_symbol *s, int argc, t_atom *argv) {x->outlet->send(argc,argv);}
+static void receive_anything(t_receive *x, t_symbol *s, int argc, t_atom *argv) {x->outlet->send(s,argc,argv);}
 static void *receive_new(t_symbol *s) {
     t_receive *x = (t_receive *)pd_new(receive_class);
     x->sym = s;
@@ -1403,12 +1400,12 @@ struct t_select : t_object {
 #define select_each(e,x) for (t_selectelement *e = x->vec;e;e=0) for (int nelement = x->nelement; nelement--; e++)
 
 static void select_float(t_select *x, t_float f) {
-    select_each(e,x) if (e->a.a_type==A_FLOAT  && e->a.a_float==f)  {outlet_bang(e->out); return;}
-    outlet_float(x->rejectout, f);
+    select_each(e,x) if (e->a.a_type==A_FLOAT  && e->a.a_float==f)  {e->out->send(); return;}
+    x->rejectout->send(f);
 }
 static void select_symbol(t_select *x, t_symbol *s) {
-    select_each(e,x) if (e->a.a_type==A_SYMBOL && e->a.a_symbol==s) {outlet_bang(e->out); return;}
-    outlet_symbol(x->rejectout, s);
+    select_each(e,x) if (e->a.a_type==A_SYMBOL && e->a.a_symbol==s) {e->out->send(); return;}
+    x->rejectout->send(s);
 }
 static void select_free(t_select *x) {free(x->vec);}
 static void *select_new(t_symbol *s, int argc, t_atom *argv) {
@@ -1459,8 +1456,8 @@ static void route_anything(t_route *x, t_symbol *sel, int argc, t_atom *argv) {
         if (argc > 0 && argv[0].a_type == A_SYMBOL) outlet_anything(e->out, argv[0].a_symbol, argc-1, argv+1);
         else { /* tb {: avoid 1 element lists */
 	    if (argc > 1) outlet_list(e->out, 0, argc, argv);
-	    else if (argc == 0) outlet_bang(e->out);
-	    else outlet_atom(e->out,&argv[0]);
+	    else if (argc == 0) e->out->send();
+	    else e->out->send(&argv[0]);
 	} /* tb } */
         return;
     }
@@ -1477,12 +1474,12 @@ static void route_list(t_route *x, t_symbol *sel, int argc, t_atom *argv) {
             else {
 		argc--; argv++;
 		if (argc > 1) outlet_list(e->out, 0, argc, argv);
-		else if (argc == 0) outlet_bang(e->out);
-		else outlet_atom(e->out,&argv[0]);
+		else if (argc == 0) e->out->send();
+		else e->out->send(&argv[0]);
 	    }
             return;
         } else if (e->a.a_type == A_SYMBOL && e->a.a_symbol == &s_float) {
-	    outlet_float(e->out, argv[0].a_float);
+	    e->out->send(argv[0].a_float);
 	    return;
         }
     } else { /* symbol arguments */
@@ -1492,13 +1489,13 @@ static void route_list(t_route *x, t_symbol *sel, int argc, t_atom *argv) {
                 else outlet_list(e->out, 0, argc, argv);
                 return;
             }
-        } else if (argc==0)                  {route_eachr(e,x) {if (e->a.a_symbol==&s_bang   ) {outlet_bang(e->out         ); return;}}
-        } else if (argv[0].a_type==A_FLOAT)  {route_eachr(e,x) {if (e->a.a_symbol==&s_float  ) {outlet_atom(e->out,&argv[0]); return;}}
-        } else if (argv[0].a_type==A_SYMBOL) {route_eachr(e,x) {if (e->a.a_symbol==&s_symbol ) {outlet_atom(e->out,&argv[0]); return;}}
-        } else if (argv[0].a_type==A_POINTER){route_eachr(e,x) {if (e->a.a_symbol==&s_pointer) {outlet_atom(e->out,&argv[0]); return;}}
+        } else if (argc==0)                  {route_eachr(e,x) {if (e->a.a_symbol==&s_bang   ) {e->out->send(        ); return;}}
+        } else if (argv[0].a_type==A_FLOAT)  {route_eachr(e,x) {if (e->a.a_symbol==&s_float  ) {e->out->send(&argv[0]); return;}}
+        } else if (argv[0].a_type==A_SYMBOL) {route_eachr(e,x) {if (e->a.a_symbol==&s_symbol ) {e->out->send(&argv[0]); return;}}
+        } else if (argv[0].a_type==A_POINTER){route_eachr(e,x) {if (e->a.a_symbol==&s_pointer) {e->out->send(&argv[0]); return;}}
         }
     }
-    if (!argc) outlet_bang(x->rejectout); else outlet_list(x->rejectout, 0, argc, argv);
+    if (!argc) x->rejectout->send(); else outlet_list(x->rejectout, 0, argc, argv);
 }
 
 static void route_free(t_route *x) {free(x->vec);}
@@ -1659,9 +1656,9 @@ static void *unpack_new(t_symbol *s, int argc, t_atom *argv) {
 }
 static void unpack_list(t_unpack *x, t_symbol *s, int argc, t_atom *argv) {
     if (argc > x->n) argc = x->n;
-    //for (int i=argc-1; i>=0; i--) outlet_atom(x->vec[i],&argv[i]);
+    //for (int i=argc-1; i>=0; i--) x->vec[i]->send(&argv[i]);
     for (int i=argc-1; i>=0; i--) {
-	if (x->vat[i]==A_ATOM || x->vat[i]==argv[i].a_type) outlet_atom(x->vec[i],&argv[i]);
+	if (x->vat[i]==A_ATOM || x->vat[i]==argv[i].a_type) x->vec[i]->send(&argv[i]);
 	else error("type mismatch");
     }
 }
@@ -1724,27 +1721,26 @@ static void *trigger_new(t_symbol *s, int argc, t_atom *argv) {
 static void trigger_list(t_trigger *x, t_symbol *s, int argc, t_atom *argv) {
     t_triggerout *u = x->vec+x->n;
     for (int i = x->n; u--, i--;) {
-        if      (u->type == 'f')   outlet_float(u->outlet, argc ? atom_getfloat(argv) : 0);
-        else if (u->type == 'b')    outlet_bang(u->outlet);
-        else if (u->type == 's')  outlet_symbol(u->outlet, argc ? atom_getsymbol(argv) : &s_symbol);
+        if      (u->type == 'f')  u->outlet->send(argc ? atom_getfloat(argv) : 0);
+        else if (u->type == 'b')  u->outlet->send();
+        else if (u->type == 's')  u->outlet->send(argc ? atom_getsymbol(argv) : &s_symbol);
         else if (u->type == 'p') {
-            if (!argc || argv->a_type != 'p') error("unpack: bad pointer");
-            else outlet_pointer(u->outlet, argv->a_pointer);
-        } else outlet_list(u->outlet, &s_list, argc, argv);
+            if (!argc || argv->a_type != 'p') error("unpack: bad pointer"); else u->outlet->send(argv->a_pointer);
+        } else u->outlet->send(argc,argv);
     }
 }
 static void trigger_anything(t_trigger *x, t_symbol *s, int argc, t_atom *argv) {
     t_triggerout *u = x->vec+x->n;
     for (int i = x->n; u--, i--;) {
-        if      (u->type == 'b') outlet_bang(u->outlet);
-        else if (u->type == 'a') outlet_anything(u->outlet, s, argc, argv);
+        if      (u->type == 'b') u->outlet->send();
+        else if (u->type == 'a') u->outlet->send(s,argc,argv);
         else error("trigger: can only convert 's' to 'b' or 'a'", s->name);
     }
 }
-static void trigger_bang(t_trigger *x) {trigger_list(x, 0, 0, 0);}
-static void trigger_pointer(t_trigger *x, t_gpointer *gp) {t_atom at; SETPOINTER(&at, gp); trigger_list(x, 0, 1, &at);}
-static void trigger_float(t_trigger *x, t_float f) {       t_atom at; SETFLOAT(&at, f);    trigger_list(x, 0, 1, &at);}
-static void trigger_symbol(t_trigger *x, t_symbol *s) {    t_atom at; SETSYMBOL(&at, s);   trigger_list(x, 0, 1, &at);}
+static void trigger_bang(t_trigger *x)                                                    {trigger_list(x,0,0,0  );}
+static void trigger_pointer(t_trigger *x, t_gpointer *gp) {t_atom at; SETPOINTER(&at, gp); trigger_list(x,0,1,&at);}
+static void trigger_float(t_trigger *x, t_float f) {       t_atom at; SETFLOAT(&at, f);    trigger_list(x,0,1,&at);}
+static void trigger_symbol(t_trigger *x, t_symbol *s) {    t_atom at; SETSYMBOL(&at, s);   trigger_list(x,0,1,&at);}
 static void trigger_free(t_trigger *x) {free(x->vec);}
 static void trigger_setup() {
     t_class *c = trigger_class = class_new2("trigger",trigger_new,trigger_free,sizeof(t_trigger),0,"*");
@@ -1766,12 +1762,12 @@ static void *spigot_new(t_floatarg f) {
     x->state = f;
     return x;
 }
-static void spigot_bang(    t_spigot *x) {                                     if (x->state) outlet_bang(x->outlet);}
-static void spigot_pointer( t_spigot *x, t_gpointer *gp) {                     if (x->state) outlet_pointer(x->outlet, gp);}
-static void spigot_float(   t_spigot *x, t_float f) {                          if (x->state) outlet_float(x->outlet, f);}
-static void spigot_symbol(  t_spigot *x, t_symbol *s) {                        if (x->state) outlet_symbol(x->outlet, s);}
-static void spigot_list(    t_spigot *x, t_symbol *s, int argc, t_atom *argv) {if (x->state) outlet_list(x->outlet, s, argc, argv);}
-static void spigot_anything(t_spigot *x, t_symbol *s, int argc, t_atom *argv) {if (x->state) outlet_anything(x->outlet, s, argc, argv);}
+static void spigot_bang(    t_spigot *x) {                                     if (x->state) x->outlet->send();}
+static void spigot_pointer( t_spigot *x, t_gpointer *v) {                      if (x->state) x->outlet->send(v);}
+static void spigot_float(   t_spigot *x, t_float v) {                          if (x->state) x->outlet->send(v);}
+static void spigot_symbol(  t_spigot *x, t_symbol *v) {                        if (x->state) x->outlet->send(v);}
+static void spigot_list(    t_spigot *x, t_symbol *s, int argc, t_atom *argv) {if (x->state) x->outlet->send(  argc,argv);}
+static void spigot_anything(t_spigot *x, t_symbol *s, int argc, t_atom *argv) {if (x->state) x->outlet->send(s,argc,argv);}
 static void spigot_setup() {
     t_class *c = spigot_class = class_new2("spigot",spigot_new,0,sizeof(t_spigot),0,"F");
     class_addbang(c, spigot_bang);
@@ -1792,7 +1788,7 @@ static void *moses_new(t_floatarg f) {
     x->y = f;
     return x;
 }
-static void moses_float(t_moses *x, t_float f) {outlet_float(x->out(f>=x->y), f);}
+static void moses_float(t_moses *x, t_float v) {x->out(v>=x->y)->send(v);}
 static void moses_setup() {
     moses_class = class_new2("moses",moses_new,0,sizeof(t_moses),0,"F");
     class_addfloat(moses_class, moses_float);
@@ -1809,8 +1805,8 @@ static void *until_new() {
     x->run = 0;
     return x;
 }
-static void until_bang(t_until *x) {            x->run=1; x->count=-1;     while (x->run && x->count) {x->count--; outlet_bang(x->outlet);}}
-static void until_float(t_until *x, t_float f) {x->run=1; x->count=(int)f; while (x->run && x->count) {x->count--; outlet_bang(x->outlet);}}
+static void until_bang(t_until *x) {            x->run=1; x->count=-1;     while (x->run && x->count) {x->count--; x->outlet->send();}}
+static void until_float(t_until *x, t_float f) {x->run=1; x->count=(int)f; while (x->run && x->count) {x->count--; x->outlet->send();}}
 static void until_bang2(t_until *x) {x->run = 0;}
 static void until_setup() {
     until_class = class_new2("until",until_new,0,sizeof(t_until),0,"");
@@ -1830,8 +1826,8 @@ static void *makefilename_new(t_symbol *s) {
 }
 
 /* doesn't do any typechecking or even counting the % signs properly */
-static void makefilename_float(t_makefilename *x, t_floatarg f) {outlet_symbol(x->outlet,symprintf(x->format->name,(int)f));}
-static void makefilename_symbol(t_makefilename *x, t_symbol *s) {outlet_symbol(x->outlet,symprintf(x->format->name,s->name));}
+static void makefilename_float(t_makefilename *x, t_floatarg f) {x->outlet->send(symprintf(x->format->name,(int)f));}
+static void makefilename_symbol(t_makefilename *x, t_symbol *s) {x->outlet->send(symprintf(x->format->name,s->name));}
 static void makefilename_set(t_makefilename *x, t_symbol *s) {x->format = s;}
 
 static void makefilename_setup() {
@@ -1856,8 +1852,8 @@ static void *swap_new(t_floatarg f) {
     return x;
 }
 static void swap_bang(t_swap *x) {
-    outlet_float(x->out(1), x->f1);
-    outlet_float(x->out(0), x->f2);
+    x->out(1)->send(x->f1);
+    x->out(0)->send(x->f2);
 }
 static void swap_float(t_swap *x, t_float f) {
     x->f1 = f;
@@ -1878,11 +1874,11 @@ static void *change_new(t_floatarg f) {
     outlet_new(x, &s_float);
     return x;
 }
-static void change_bang(t_change *x) {outlet_float(x->outlet, x->f);}
+static void change_bang(t_change *x) {x->outlet->send(x->f);}
 static void change_float(t_change *x, t_float f) {
     if (f != x->f) {
         x->f = f;
-        outlet_float(x->outlet, x->f);
+        x->outlet->send(x->f);
     }
 }
 static void change_set(t_change *x, t_float f) {x->f = f;}
@@ -1935,7 +1931,7 @@ static void *value_new(t_symbol *s) {
     outlet_new(x, &s_float);
     return x;
 }
-static void value_bang(t_value *x) {outlet_float(x->outlet, *x->floatstar);}
+static void value_bang(t_value *x) {x->outlet->send(*x->floatstar);}
 static void value_float(t_value *x, t_float f) {*x->floatstar = f;}
 static void value_ff(t_value *x) {value_release(x->sym);}
 static void value_setup() {
@@ -1963,8 +1959,8 @@ struct t_notein : t_object {t_float ch;};
 struct t_ctlin  : t_object {t_float ch; t_float ctlno;};
 
 static void midiin_list(t_midiin *x, t_symbol *s, int ac, t_atom *av) {
-    outlet_float(x->out(1), atom_getfloatarg(1, ac, av) + 1);
-    outlet_float(x->out(0), atom_getfloatarg(0, ac, av));
+    x->out(1)->send(atom_getfloatarg(1,ac,av) + 1);
+    x->out(0)->send(atom_getfloatarg(0,ac,av));
 }
 void inmidi_byte(int portno, int byte) {
     if ( midiin_sym->thing) {t_atom at[2]; SETFLOAT(at, byte); SETFLOAT(at+1, portno+1); pd_list( midiin_sym->thing, 0, 2, at);}
@@ -1977,9 +1973,9 @@ static void notein_list(t_notein *x, t_symbol *s, int argc, t_atom *argv) {
     float pitch   = atom_getfloatarg(0, argc, argv);
     float velo    = atom_getfloatarg(1, argc, argv);
     float channel = atom_getfloatarg(2, argc, argv);
-    if (x->ch) {if (channel != x->ch) return;} else outlet_float(x->out(2), channel);
-    outlet_float(x->out(1), velo);
-    outlet_float(x->out(0), pitch);
+    if (x->ch) {if (channel != x->ch) return;} else x->out(2)->send(channel);
+    x->out(1)->send(velo);
+    x->out(0)->send(pitch);
 }
 
 void inmidi_noteon(int portno, int channel, int pitch, int velo) {
@@ -2035,9 +2031,9 @@ static void ctlin_list(t_ctlin *x, t_symbol *s, int argc, t_atom *argv) {
     t_float channel   = atom_getfloatarg(2, argc, argv);
     if (x->ctlno >= 0 && x->ctlno != ctlnumber) return;
     if (x->ch > 0  && x->ch != channel) return;
-    if (x->ch == 0) outlet_float(x->out(2), channel);
-    if (x->ctlno < 0) outlet_float(x->out(1), ctlnumber);
-    outlet_float(x->out(0), value);
+    if (x->ch == 0)   x->out(2)->send(channel);
+    if (x->ctlno < 0) x->out(1)->send(ctlnumber);
+    x->out(0)->send(value);
 }
 
 static void  midiin_free(t_midiin *x) {pd_unbind(x,  midiin_sym);}
@@ -2066,20 +2062,17 @@ static void *midi2_new(t_class *cl, t_floatarg ch) {
 static void midi2_list(t_midi2 *x, t_symbol *s, int argc, t_atom *argv) {
     float value   = atom_getfloatarg(0, argc, argv);
     float channel = atom_getfloatarg(1, argc, argv);
-    if (x->ch) {if (channel != x->ch) return;} else outlet_float(x->out(1), channel);
-    outlet_float(x->out(0), value);
+    if (x->ch) {if (channel != x->ch) return;} else x->out(1)->send(channel);
+    x->out(0)->send(value);
 }
 static t_symbol *pgmin_sym, *bendin_sym, *touchin_sym;
 static t_class *pgmin_class, *bendin_class, *touchin_class;
 struct   t_pgmin : t_midi2 {};
 struct  t_bendin : t_midi2 {};
 struct t_touchin : t_midi2 {};
-static void *pgmin_new(t_floatarg f) {
-    t_pgmin *x   = (t_pgmin *)  midi2_new(pgmin_class  ,f); pd_bind(x,   pgmin_sym); return x;}
-static void *bendin_new(t_floatarg f) {
-    t_bendin *x  = (t_bendin *) midi2_new(bendin_class ,f); pd_bind(x,  bendin_sym); return x;}
-static void *touchin_new(t_floatarg f) {
-    t_touchin *x = (t_touchin *)midi2_new(touchin_class,f); pd_bind(x, touchin_sym); return x;}
+static void *pgmin_new(t_floatarg f) {  t_pgmin *x   = (t_pgmin *)  midi2_new(pgmin_class  ,f);pd_bind(x,  pgmin_sym);return x;}
+static void *bendin_new(t_floatarg f) { t_bendin *x  = (t_bendin *) midi2_new(bendin_class ,f);pd_bind(x, bendin_sym);return x;}
+static void *touchin_new(t_floatarg f) {t_touchin *x = (t_touchin *)midi2_new(touchin_class,f);pd_bind(x,touchin_sym);return x;}
 static void   pgmin_free(  t_pgmin *x) {pd_unbind(x,   pgmin_sym);}
 static void  bendin_free( t_bendin *x) {pd_unbind(x,  bendin_sym);}
 static void touchin_free(t_touchin *x) {pd_unbind(x, touchin_sym);}
@@ -2116,9 +2109,9 @@ static void *polytouchin_new(t_floatarg f) {
 }
 static void polytouchin_list(t_polytouchin *x, t_symbol *s, int argc, t_atom *argv) {
     t_float channel = atom_getfloatarg(2, argc, argv);
-    if (x->ch) {if (channel != x->ch) return;} else outlet_float(x->out(2), channel);
-    outlet_float(x->out(1), atom_getfloatarg(0, argc, argv)); /*pitch*/
-    outlet_float(x->out(0), atom_getfloatarg(1, argc, argv)); /*value*/
+    if (x->ch) {if (channel != x->ch) return;} else x->out(2)->send(channel);
+    x->out(1)->send(atom_getfloatarg(0, argc, argv)); /*pitch*/
+    x->out(0)->send(atom_getfloatarg(1, argc, argv)); /*value*/
 }
 static void polytouchin_free(t_polytouchin *x) {pd_unbind(x, polytouchin_sym);}
 static void polytouchin_setup() {
@@ -2150,8 +2143,8 @@ static void *midiclkin_new(t_floatarg f) {
     return x;
 }
 static void midiclkin_list(t_midiclkin *x, t_symbol *s, int argc, t_atom *argv) {
-    outlet_float(x->out(1), atom_getfloatarg(1, argc, argv)); /*count*/
-    outlet_float(x->out(0), atom_getfloatarg(0, argc, argv)); /*value*/
+    x->out(1)->send(atom_getfloatarg(1, argc, argv)); /*count*/
+    x->out(0)->send(atom_getfloatarg(0, argc, argv)); /*value*/
 }
 static void midiclkin_free(t_midiclkin *x) {pd_unbind(x, midiclkin_sym);}
 static void midiclkin_setup() {
@@ -2187,8 +2180,8 @@ static void *midirealtimein_new() {
     return x;
 }
 static void midirealtimein_list(t_midirealtimein *x, t_symbol *s, int argc, t_atom *argv) {
-    outlet_float(x->out(1), atom_getfloatarg(0, argc, argv)); /*portno*/
-    outlet_float(x->out(0), atom_getfloatarg(1, argc, argv)); /*byte*/
+    x->out(1)->send(atom_getfloatarg(0, argc, argv)); /*portno*/
+    x->out(0)->send(atom_getfloatarg(1, argc, argv)); /*byte*/
 }
 static void midirealtimein_free(t_midirealtimein *x) {pd_unbind(x, midirealtimein_sym);}
 static void midirealtimein_setup() {
@@ -2326,8 +2319,8 @@ static void *makenote_new(t_floatarg velo, t_floatarg dur) {
 static void makenote_tick(t_hang *hang) {
     t_makenote *x = hang->owner;
     t_hang *h2, *h3;
-    outlet_float(x->out(1), 0);
-    outlet_float(x->out(0), hang->pitch);
+    x->out(1)->send(0.);
+    x->out(0)->send(hang->pitch);
     if (x->hang == hang) x->hang = hang->next;
     else for (h2 = x->hang; (h3 = h2->next); h2 = h3) {
         if (h3 == hang) {
@@ -2340,8 +2333,8 @@ static void makenote_tick(t_hang *hang) {
 }
 static void makenote_float(t_makenote *x, t_float f) {
     if (!x->velo) return;
-    outlet_float(x->out(1), x->velo);
-    outlet_float(x->out(0), f);
+    x->out(1)->send(x->velo);
+    x->out(0)->send(f);
     t_hang *hang = (t_hang *)getbytes(sizeof *hang);
     hang->next = x->hang;
     x->hang = hang;
@@ -2353,8 +2346,8 @@ static void makenote_float(t_makenote *x, t_float f) {
 static void makenote_stop(t_makenote *x) {
     t_hang *hang;
     while ((hang = x->hang)) {
-        outlet_float(x->out(1), 0);
-        outlet_float(x->out(0), hang->pitch);
+        x->out(1)->send(0.);
+        x->out(0)->send(hang->pitch);
         x->hang = hang->next;
         clock_free(hang->clock);
         free(hang);
@@ -2388,8 +2381,8 @@ static void *stripnote_new() {
 }
 static void stripnote_float(t_stripnote *x, t_float f) {
     if (!x->velo) return;
-    outlet_float(x->out(1), x->velo);
-    outlet_float(x->out(0), f);
+    x->out(1)->send(x->velo);
+    x->out(0)->send(f);
 }
 static void stripnote_setup() {
     stripnote_class = class_new2("stripnote",stripnote_new,0,sizeof(t_stripnote),0,"");
@@ -2440,20 +2433,16 @@ static void poly_float(t_poly *x, t_float f) {
                     firstoff = v, serialoff = v->serial, offindex = i;
         }
         if (firstoff) {
-            outlet_float(x->out(2), x->vel);
-            outlet_float(x->out(1), firstoff->pitch = f);
-            outlet_float(x->out(0), offindex+1);
+            x->out(2)->send(x->vel);
+            x->out(1)->send(firstoff->pitch = f);
+            x->out(0)->send(offindex+1);
             firstoff->used = 1;
             firstoff->serial = x->serial++;
         }
         /* if none, steal one */
         else if (firston && x->steal) {
-            outlet_float(x->out(2), 0);
-            outlet_float(x->out(1), firston->pitch);
-            outlet_float(x->out(0), onindex+1);
-            outlet_float(x->out(2), x->vel);
-            outlet_float(x->out(1), firston->pitch = f);
-            outlet_float(x->out(0), onindex+1);
+            x->out(2)->send(0.);     x->out(1)->send(firston->pitch    ); x->out(0)->send(onindex+1);
+            x->out(2)->send(x->vel); x->out(1)->send(firston->pitch = f); x->out(0)->send(onindex+1);
             firston->serial = x->serial++;
         }
     } else {    /* note off. Turn off oldest match */
@@ -2463,18 +2452,18 @@ static void poly_float(t_poly *x, t_float f) {
         if (firston) {
             firston->used = 0;
             firston->serial = x->serial++;
-            outlet_float(x->out(2), 0);
-            outlet_float(x->out(1), firston->pitch);
-            outlet_float(x->out(0), onindex+1);
+            x->out(2)->send(0.);
+            x->out(1)->send(firston->pitch);
+            x->out(0)->send(onindex+1);
         }
     }
 }
 static void poly_stop(t_poly *x) {
     t_voice *v = x->vec;
     for (int i = 0; i < x->n; i++, v++) if (v->used) {
-        outlet_float(x->out(2), 0L);
-        outlet_float(x->out(1), v->pitch);
-        outlet_float(x->out(0), i+1);
+        x->out(2)->send(0.);
+        x->out(1)->send(v->pitch);
+        x->out(0)->send(i+1);
         v->used = 0;
         v->serial = x->serial++;
     }
@@ -2537,7 +2526,7 @@ static void bag_float(t_bag *x, t_float f) {
 static void bag_flush(t_bag *x) {
     t_bagelem *bagelem;
     while ((bagelem = x->first)) {
-        outlet_float(x->outlet, bagelem->value);
+        x->outlet->send(bagelem->value);
         x->first = bagelem->next;
         free(bagelem);
     }
@@ -2603,7 +2592,7 @@ static void delay_bang(t_delay *x) {clock_delay(x->clock, x->deltime);}
 static void delay_stop(t_delay *x) {clock_unset(x->clock);}
 static void delay_ft1(t_delay *x, t_floatarg g) {x->deltime = max(0.f,g);}
 static void delay_float(t_delay *x, t_float f) {delay_ft1(x, f); delay_bang(x);}
-static void delay_tick(t_delay *x) {outlet_bang(x->outlet);}
+static void delay_tick(t_delay *x) {x->outlet->send();}
 static void delay_free(t_delay *x) {clock_free(x->clock);}
 static void *delay_new(t_floatarg f) {
     t_delay *x = (t_delay *)pd_new(delay_class);
@@ -2630,7 +2619,7 @@ struct t_metro : t_object {
 };
 static void metro_tick(t_metro *x) {
     x->hit = 0;
-    outlet_bang(x->outlet);
+    x->outlet->send();
     if (!x->hit) clock_delay(x->clock, x->deltime);
 }
 static void metro_float(t_metro *x, t_float f) {
@@ -2674,9 +2663,9 @@ static void line_tick(t_line *x) {
     double timenow = clock_getsystime();
     double msectogo = - clock_gettimesince(x->targettime);
     if (msectogo < 1E-9) {
-        outlet_float(x->outlet, x->targetval);
+        x->outlet->send(x->targetval);
     } else {
-        outlet_float(x->outlet, x->setval + x->oneovertimediff * (timenow-x->prevtime) * (x->targetval-x->setval));
+        x->outlet->send(x->setval + x->oneovertimediff * (timenow-x->prevtime) * (x->targetval-x->setval));
         clock_delay(x->clock, (x->grain > msectogo ? msectogo : x->grain));
     }
 }
@@ -2695,7 +2684,7 @@ static void line_float(t_line *x, t_float f) {
     } else {
         clock_unset(x->clock);
         x->targetval = x->setval = f;
-        outlet_float(x->outlet, f);
+        x->outlet->send(f);
     }
     x->gotinlet = 0;
 }
@@ -2810,9 +2799,9 @@ static void hang_tick(t_hang2 *h) {
     t_word *w = h->vec + x->n-1;
     for (int i = x->n; i--; p--, w--) {
         switch (p->a_type) {
-        case A_FLOAT:  outlet_float(  x->out(i), w->w_float   ); break;
-        case A_SYMBOL: outlet_symbol( x->out(i), w->w_symbol  ); break;
-        case A_POINTER:outlet_pointer(x->out(i), w->w_gpointer); break;
+        case A_FLOAT:  x->out(i)->send(w->w_float   ); break;
+        case A_SYMBOL: x->out(i)->send(w->w_symbol  ); break;
+        case A_POINTER:x->out(i)->send(w->w_gpointer); break;
         default:{}
         }
     }
@@ -2879,7 +2868,7 @@ void unpost_printhook (const char *s) {
     for (;;) {
         p = strchr(d,'\n');
         if (!p) break;
-        outlet_symbol(current_unpost->self->o1,gensym2(d,p-d));
+        current_unpost->self->o1->send(gensym2(d,p-d));
 	d=p+1;
     }
     if (d!=dd) {
@@ -2913,7 +2902,7 @@ void unparse_list (t_unparse *x, t_symbol *s, int argc, t_atom *argv) {
 	o << ' ';
 	atom_ostream(argv+i,o);
     }
-    outlet_symbol(x->outlet,gensym(o.str().data()+1));
+    x->outlet->send(gensym(o.str().data()+1));
 }
 
 struct t_parse : t_object {};
