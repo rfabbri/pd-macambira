@@ -2711,12 +2711,12 @@ static void *vinlet_new(t_symbol *s) {
     return x;
 }
 
-static void vinlet_bang(t_vinlet *x)                    {outlet_bang(x->outlet);}
-static void vinlet_pointer(t_vinlet *x, t_gpointer *gp) {outlet_pointer(x->outlet, gp);}
-static void vinlet_float(t_vinlet *x, t_float f)        {outlet_float(x->outlet, f);}
-static void vinlet_symbol(t_vinlet *x, t_symbol *s)     {outlet_symbol(x->outlet, s);}
-static void vinlet_list(    t_vinlet *x, t_symbol *s, int argc, t_atom *argv) {    outlet_list(x->outlet, s, argc, argv);}
-static void vinlet_anything(t_vinlet *x, t_symbol *s, int argc, t_atom *argv) {outlet_anything(x->outlet, s, argc, argv);}
+static void vinlet_bang(t_vinlet *x)                   {x->outlet->send();}
+static void vinlet_pointer(t_vinlet *x, t_gpointer *v) {x->outlet->send(v);}
+static void vinlet_float(t_vinlet *x, t_float v)       {x->outlet->send(v);}
+static void vinlet_symbol(t_vinlet *x, t_symbol *v)    {x->outlet->send(v);}
+static void vinlet_list(    t_vinlet *x, t_symbol *s, int argc, t_atom *argv) {x->outlet->send(  argc,argv);}
+static void vinlet_anything(t_vinlet *x, t_symbol *s, int argc, t_atom *argv) {x->outlet->send(s,argc,argv);}
 
 static void vinlet_free(t_vinlet *x) {
     canvas_rminlet(x->canvas, x->inlet);
@@ -2915,12 +2915,12 @@ static void *voutlet_new(t_symbol *s) {
     return x;
 }
 
-static void voutlet_bang(t_voutlet *x)                                              {outlet_bang(x->parentoutlet);}
-static void voutlet_pointer(t_voutlet *x, t_gpointer *gp)                        {outlet_pointer(x->parentoutlet, gp);}
-static void voutlet_float(t_voutlet *x, t_float f)                                 {outlet_float(x->parentoutlet, f);}
-static void voutlet_symbol(t_voutlet *x, t_symbol *s)                             {outlet_symbol(x->parentoutlet, s);}
-static void voutlet_list(    t_voutlet *x, t_symbol *s, int argc, t_atom *argv) {    outlet_list(x->parentoutlet, s, argc, argv);}
-static void voutlet_anything(t_voutlet *x, t_symbol *s, int argc, t_atom *argv) {outlet_anything(x->parentoutlet, s, argc, argv);}
+static void voutlet_bang(    t_voutlet *x)                                      {x->parentoutlet->send( );}
+static void voutlet_pointer( t_voutlet *x, t_gpointer *v)                       {x->parentoutlet->send(v);}
+static void voutlet_float(   t_voutlet *x, t_float v)                           {x->parentoutlet->send(v);}
+static void voutlet_symbol(  t_voutlet *x, t_symbol *v)                         {x->parentoutlet->send(v);}
+static void voutlet_list(    t_voutlet *x, t_symbol *s, int argc, t_atom *argv) {x->parentoutlet->send(  argc,argv);}
+static void voutlet_anything(t_voutlet *x, t_symbol *s, int argc, t_atom *argv) {x->parentoutlet->send(s,argc,argv);}
 
 static void voutlet_free(t_voutlet *x) {canvas_rmoutlet(x->canvas, x->parentoutlet); resample_free(&x->updown);}
 t_outlet *voutlet_getit(t_pd *x) {
@@ -3560,9 +3560,7 @@ t_canvas *template_findcanvas(t_template *t) {
     /* return ((t_canvas *)pd_findbyclass(t->sym, canvas_class)); */
 }
 
-void template_notify(t_template *t, t_symbol *s, int argc, t_atom *argv) {
-    if (t->list) outlet_anything(t->list->outlet, s, argc, argv);
-}
+void template_notify(t_template *t, t_symbol *s, int argc, t_atom *argv) {if (t->list) t->list->outlet->send(s,argc,argv);}
 
 /* bash the first of (argv) with a pointer to a scalar, and send on
    to template as a notification message */
@@ -4540,11 +4538,11 @@ static void ptrobj_vnext(t_ptrobj *x, float f) {
         t_scalar *sc = (t_scalar *)gobj;
         gp->scalar = sc;
         for (int n = x->ntypedout; n--; to++)
-            if (to->type == sc->t) {outlet_pointer(to->outlet, &x->gp); return;}
-        outlet_pointer(x->otherout, &x->gp);
+            if (to->type == sc->t) {to->outlet->send(&x->gp); return;}
+        x->otherout->send(&x->gp);
     } else {
         gpointer_unset(gp);
-        outlet_bang(x->bangout);
+        x->bangout->send();
     }
 }
 
@@ -4561,8 +4559,8 @@ static void ptrobj_bang(t_ptrobj *x) {
     t_typedout *to = x->typedout;
     if (!gpointer_check(&x->gp, 1)) {error("bang: empty pointer"); return;}
     t_symbol *tsym = gpointer_gettsym(&x->gp);
-    for (int n=x->ntypedout; n--; to++) if (to->type == tsym) {outlet_pointer(to->outlet, &x->gp); return;}
-    outlet_pointer(x->otherout, &x->gp);
+    for (int n=x->ntypedout; n--; to++) if (to->type == tsym) {to->outlet->send(&x->gp); return;}
+    x->otherout->send(&x->gp);
 }
 
 static void ptrobj_pointer(t_ptrobj *x, t_gpointer *gp) {
@@ -4622,8 +4620,8 @@ static void get_pointer(t_get *x, t_gpointer *gp) {
         int onset, type;
         t_symbol *arraytype;
         if (template_find_field(t, vp->sym, &onset, &type, &arraytype)) {
-            if      (type == DT_FLOAT ) outlet_float( vp->outlet,   *(t_float *)(((char *)vec) + onset));
-            else if (type == DT_SYMBOL) outlet_symbol(vp->outlet, *(t_symbol **)(((char *)vec) + onset));
+            if      (type == DT_FLOAT ) vp->outlet->send(  *(t_float *)(((char *)vec) + onset));
+            else if (type == DT_SYMBOL) vp->outlet->send(*(t_symbol **)(((char *)vec) + onset));
             else error("%s.%s is not a number or symbol", t->sym->name, vp->sym->name);
         } else error("%s.%s: no such field", t->sym->name, vp->sym->name);
     }
@@ -4760,7 +4758,7 @@ static void elem_float(t_elem *x, t_float f) {
     if (indx < 0) indx = 0;
     if (indx >= nitems) indx = nitems-1;
     gpointer_setarray(&x->gp, array, (t_word *)&array->vec[indx*elemsize]);
-    outlet_pointer(x->outlet, &x->gp);
+    x->outlet->send(&x->gp);
 }
 
 static void elem_free(t_elem *x, t_gpointer *gp) {
@@ -4802,7 +4800,7 @@ static void getsize_pointer(t_getsize *x, t_gpointer *gp) {
     }
     t_word *w = gpointer_word(gp);
     t_array *array = *(t_array **)(((char *)w) + onset);
-    outlet_float(x->outlet, (float)(array->n));
+    x->outlet->send(float(array->n));
 }
 
 /* ---------------------- setsize ----------------------------- */
@@ -4927,7 +4925,7 @@ static void append_float(t_append *x, t_float f) {
     t_appendvariable *vp=x->variables;
     for (int i=0; i<nitems; i++,vp++) template_setfloat(t, vp->sym, vec, vp->f, 1);
     scalar_redraw(sc, canvas);
-    outlet_pointer(x->outlet, gp);
+    x->outlet->send(gp);
 }
 
 static void append_free(t_append *x) {
@@ -4967,7 +4965,7 @@ static void sublist_pointer(t_sublist *x, t_gpointer *gp) {
     if (type != DT_CANVAS) {error("field %s not of type list", x->fieldsym->name); return;}
     t_word *w = gpointer_word(gp);
     gpointer_setcanvas(&x->gp, *(t_canvas **)(((char *)w) + onset), 0);
-    outlet_pointer(x->outlet, &x->gp);
+    x->outlet->send(&x->gp);
 }
 
 static void sublist_free(t_sublist *x, t_gpointer *gp) {gpointer_unset(&x->gp);}
@@ -5149,26 +5147,19 @@ struct t_message : t_text {
     t_canvas *canvas;
 };
 
-static void mresp_bang(t_mresp *x)                {outlet_bang(x->outlet);}
-static void mresp_float(t_mresp *x, t_float f)    {outlet_float(x->outlet, f);}
-static void mresp_symbol(t_mresp *x, t_symbol *s) {outlet_symbol(x->outlet, s);}
-static void mresp_list(t_mresp *x, t_symbol *s, int argc, t_atom *argv)
-	{outlet_list(x->outlet, s, argc, argv);}
-static void mresp_anything(t_mresp *x, t_symbol *s, int argc, t_atom *argv)
-	{outlet_anything(x->outlet, s, argc, argv);}
+/* where is mresp_pointer ? */
+static void mresp_bang(t_mresp *x)                 {x->outlet->send();}
+static void mresp_float(  t_mresp *x, t_float   v) {x->outlet->send(v);}
+static void mresp_symbol( t_mresp *x, t_symbol *v) {x->outlet->send(v);}
+static void mresp_list(t_mresp *x, t_symbol *s, int argc, t_atom *argv)     {x->outlet->send(  argc,argv);}
+static void mresp_anything(t_mresp *x, t_symbol *s, int argc, t_atom *argv) {x->outlet->send(s,argc,argv);}
 
-static void message_bang(t_message *x)
-{binbuf_eval(x->binbuf,&x->mresp, 0, 0);}
-static void message_float(t_message *x, t_float f)
-{t_atom at; SETFLOAT(&at, f);  binbuf_eval(x->binbuf, &x->mresp, 1, &at);}
-static void message_symbol(t_message *x, t_symbol *s)
-{t_atom at; SETSYMBOL(&at, s); binbuf_eval(x->binbuf, &x->mresp, 1, &at);}
-static void message_list(t_message *x, t_symbol *s, int argc, t_atom *argv)
-{binbuf_eval(x->binbuf, &x->mresp, argc, argv);}
-static void message_add2(t_message *x, t_symbol *s, int argc, t_atom *argv)
-{binbuf_add(x->binbuf, argc, argv); gobj_changed(x,"binbuf");}
-static void message_set(t_message *x, t_symbol *s, int argc, t_atom *argv)
-{binbuf_clear(x->binbuf); message_add2(x,s,argc,argv);}
+static void message_bang(t_message *x)                {                              binbuf_eval(x->binbuf,&x->mresp,0,0);}
+static void message_float(t_message *x, t_float f)    {t_atom at; SETFLOAT(&at, f);  binbuf_eval(x->binbuf,&x->mresp,1,&at);}
+static void message_symbol(t_message *x, t_symbol *s) {t_atom at; SETSYMBOL(&at, s); binbuf_eval(x->binbuf,&x->mresp,1,&at);}
+static void message_list(t_message *x, t_symbol *s, int argc, t_atom *argv){binbuf_eval(x->binbuf, &x->mresp, argc, argv);}
+static void message_add2(t_message *x, t_symbol *s, int argc, t_atom *argv){binbuf_add(x->binbuf, argc, argv); gobj_changed(x,"binbuf");}
+static void message_set(t_message *x, t_symbol *s, int argc, t_atom *argv) {binbuf_clear(x->binbuf); message_add2(x,s,argc,argv);}
 static void message_add(t_message *x, t_symbol *s, int argc, t_atom *argv)
 {binbuf_add(x->binbuf, argc, argv); binbuf_addsemi(x->binbuf);        gobj_changed(x,"binbuf");}
 static void message_addcomma(t_message *x)
@@ -5251,10 +5242,10 @@ static void gatom_bang(t_gatom *x) {
     t_symbol *s = x->expanded_to;
     t_outlet *o = x->outlet;
     if (x->atom.a_type == A_FLOAT) {
-    	if (o) outlet_float(o, x->atom.a_float);
+    	if (o) o->send(x->atom.a_float);
 	if (*s->name && s->thing) {if (x->snd == x->rcv) goto err; pd_float(s->thing, x->atom.a_float);}
     } else if (x->atom.a_type == A_SYMBOL) {
-    	if (o) outlet_symbol(o, x->atom.a_symbol);
+    	if (o) o->send(x->atom.a_symbol);
 	if (*s->name && s->thing) {if (x->snd == x->rcv) goto err; pd_symbol(s->thing, x->atom.a_symbol);}
     }
     return;
@@ -5850,13 +5841,13 @@ static void bng_set(t_bng *x) {
 }
 
 static void bng_bout2(t_bng *x) {
-    outlet_bang(x->outlet);
+    x->outlet->send();
     if(x->snd && x->snd->thing) pd_bang(x->snd->thing);
 }
 
 static void bng_bang(t_bng *x) {
     bng_set(x);
-    outlet_bang(x->outlet);
+    x->outlet->send();
     if(x->snd && x->snd->thing && iemgui_forward(x)) pd_bang(x->snd->thing);
 }
 static void bng_bang2   (t_bng *x) {                       {bng_set(x); bng_bout2(x);}}
@@ -5911,7 +5902,7 @@ static void iemgui_free(t_iemgui *x) {
 static t_class *toggle_class;
 
 static void toggle_action(t_toggle *x) {
-    outlet_float(x->outlet, x->on);
+    x->outlet->send(x->on);
     if(x->snd && x->snd->thing) pd_float(x->snd->thing, x->on);
 }
 
@@ -5970,12 +5961,12 @@ static void radio_set(t_radio *x, t_floatarg f) {
 static void radio_send2(t_radio *x, float a, float b) {
 	SETFLOAT(x->at,a);
 	SETFLOAT(x->at+1,b);
-	outlet_list(x->outlet, &s_list, 2, x->at);
+	x->outlet->send(2,x->at);
 	if(x->snd && x->snd->thing) pd_list(x->snd->thing, &s_list, 2, x->at);
 }
 
 static void radio_send(t_radio *x, float a) {
-    	outlet_float(x->outlet,a);
+    	x->outlet->send(a);
 	if(x->snd && x->snd->thing) pd_float(x->snd->thing,a);
 }
 
@@ -6110,7 +6101,7 @@ static void slider_bang(t_slider *x) {
     double t = (double)x->val * slider_ratio(x) * 0.01;
     double out = x->is_log ? x->min*exp(t) : x->min+t;
     if (fabs(out) < 1.0e-10) out = 0.0;
-    outlet_float(x->outlet, out);
+    x->outlet->send(out);
     if(x->snd && x->snd->thing) pd_float(x->snd->thing, out);
 }
 
@@ -6193,7 +6184,7 @@ static int nbx_check_minmax(t_nbx *x) {
 }
 
 static void nbx_bang(t_nbx *x) {
-    outlet_float(x->outlet, x->val);
+    x->outlet->send(x->val);
     if(x->snd && x->snd->thing) pd_float(x->snd->thing, x->val);
 }
 static void nbx_set(t_nbx *x, t_floatarg f) {SET(val,f); nbx_clip(x);}
@@ -6293,15 +6284,15 @@ static int vuify(t_vu *x, float v) {
 static float vu_round(float v) {return 0.01*(int)(100.0*v+0.5);}
 
 static void vu_float0(t_vu *x, t_floatarg v) {
-	SET(rms, vuify(x,v)); SET(fr,vu_round(v)); outlet_float(x->out(0), x->fr);
+	SET(rms, vuify(x,v)); SET(fr,vu_round(v)); x->out(0)->send(x->fr);
 	sys_mgui(x,"rms=","i",x->rms);}
 static void vu_float1(t_vu *x, t_floatarg v) {
-	SET(peak,vuify(x,v)); SET(fp,vu_round(v)); outlet_float(x->out(1),x->fp);
+	SET(peak,vuify(x,v)); SET(fp,vu_round(v)); x->out(1)->send(x->fp);
 	sys_mgui(x,"peak=","i",x->peak);}
 
 static void vu_bang(t_vu *x) {
-    outlet_float(x->out(1), x->fp);
-    outlet_float(x->out(0),  x->fr);
+    x->out(1)->send(x->fp);
+    x->out(0)->send(x->fr);
 }
 
 static int vu_pickle(t_vu *x, t_foo *foo) {
