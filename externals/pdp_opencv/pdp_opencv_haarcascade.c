@@ -34,6 +34,8 @@
 #include "cv.h"
 #endif
 
+#define MAX_MARKERS 50
+
 const char* default_cascade ="./haarcascade_frontalface_alt.xml";
 
 typedef struct pdp_opencv_haarcascade_struct
@@ -45,6 +47,11 @@ typedef struct pdp_opencv_haarcascade_struct
     t_outlet *x_outlet1;
     t_outlet *x_dataout;
     t_atom rlist[4];
+    int x_xmark[MAX_MARKERS];
+    int x_ymark[MAX_MARKERS];
+    int x_found[MAX_MARKERS];
+    int x_ftolerance;
+
     int x_packet0;
     int x_packet1;
     int x_dropped;
@@ -68,7 +75,30 @@ typedef struct pdp_opencv_haarcascade_struct
     
 } t_pdp_opencv_haarcascade;
 
+static int pdp_opencv_haarcascade_mark(t_pdp_opencv_haarcascade *x, t_floatarg fx, t_floatarg fy )
+{
+  int i;
+  
+    if ( ( fx < 0.0 ) || ( fx > x->x_width ) || ( fy < 0 ) || ( fy > x->x_height ) )
+    {
+       return -1;
+    }
 
+    for ( i=0; i<MAX_MARKERS; i++)
+    {
+       if ( x->x_xmark[i] == -1 )
+       {
+          x->x_xmark[i] = (int)fx;
+          x->x_ymark[i] = (int)fy;
+          x->x_found[i] = x->x_ftolerance;
+          post( "pdp_opencv_haarcascade : inserted point %d (%d,%d)", i, x->x_xmark[i], x->x_ymark[i] );
+          return i;
+       }
+    }
+
+    post( "pdp_opencv_haarcascade : max markers reached" );
+    return -1;
+}
 
 static void pdp_opencv_haarcascade_process_rgb(t_pdp_opencv_haarcascade *x)
 {
@@ -76,7 +106,7 @@ static void pdp_opencv_haarcascade_process_rgb(t_pdp_opencv_haarcascade *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1); 
-    int i;
+    int i, im;
 
     if ((x->x_width != (t_int)header->info.image.width) || 
         (x->x_height != (t_int)header->info.image.height)) 
@@ -148,24 +178,66 @@ static void pdp_opencv_haarcascade_process_rgb(t_pdp_opencv_haarcascade *x)
         else
             outlet_float(x->x_outlet1, 0.0);
 
+        for ( im=0; im<MAX_MARKERS; im++ )
+        {
+           if ( x->x_xmark[im] != -1.0 )
+           {
+             x->x_found[im]--;
+           }
+        }
+
         for( i = 0; i < (faces ? faces->total : 0); i++ )
         {
+          int oi, found;
+
             CvRect* r = (CvRect*)cvGetSeqElem( faces, i );
             CvPoint center;
             int radius;
             center.x = cvRound((r->x + r->width*0.5)*scale);
             center.y = cvRound((r->y + r->height*0.5)*scale);
             radius = cvRound((r->width + r->height)*0.25*scale);
-            cvCircle( x->img, center, radius, colors[i%8], 3, 8, 0 );
+
+            found = 0;
+            oi = -1;
+            for ( im=0; im<MAX_MARKERS; im++ )
+            {
+              // check if the object is already known
+              if ( sqrt( pow(center.x - x->x_xmark[im], 2 ) + pow(center.y - x->x_ymark[im], 2 ) ) <= radius )
+              {
+                 oi=im;
+                 found=1;
+                 x->x_found[im] = x->x_ftolerance;
+                 x->x_xmark[im] = center.x;
+                 x->x_ymark[im] = center.y;
+                 break;
+              }
+            }
+            // new object detected
+            if ( !found )
+            {
+               oi = pdp_opencv_haarcascade_mark(x, center.x, center.y );
+            }
             char tindex[4];
-            sprintf( tindex, "%d", i );
+            sprintf( tindex, "%d", oi );
+            cvCircle( x->img, center, radius, colors[oi%8], 3, 8, 0 );
             cvPutText( x->img, tindex, center, &x->font, CV_RGB(255,255,255));        
 
-            SETFLOAT(&x->rlist[0], i);
+            SETFLOAT(&x->rlist[0], oi);
             SETFLOAT(&x->rlist[1], center.x);
             SETFLOAT(&x->rlist[2], center.y);
             SETFLOAT(&x->rlist[3], radius);
     	    outlet_list( x->x_dataout, 0, 4, x->rlist );
+        }
+        // delete lost objects
+        for ( im=0; im<MAX_MARKERS; im++ )
+        {
+           if ( x->x_found[im] < 0 )
+           {
+             x->x_xmark[im] = -1.0;
+             x->x_ymark[im] = -1,0;
+             x->x_found[im] = x->x_ftolerance;
+             post( "deleted point %d", im );
+           }
         }
     }
 
@@ -198,6 +270,36 @@ static void pdp_opencv_haarcascade_min_neighbors(t_pdp_opencv_haarcascade *x, t_
 	if (f>=1) x->min_neighbors = (int)f;
 }
 
+static void pdp_opencv_haarcascade_ftolerance(t_pdp_opencv_haarcascade *x, t_floatarg f)
+{
+	if (f>=1) x->x_ftolerance = (int)f;
+}
+
+static void pdp_opencv_haarcascade_delete(t_pdp_opencv_haarcascade *x, t_floatarg findex )
+{
+  int i;
+
+    if ( ( findex < 1.0 ) || ( findex > 10 ) )
+    {
+       return;
+    }
+
+    x->x_xmark[(int)findex-1] = -1;
+    x->x_ymark[(int)findex-1] = -1;
+}
+
+static void pdp_opencv_haarcascade_clear(t_pdp_opencv_haarcascade *x )
+{
+  int i;
+
+    for ( i=0; i<MAX_MARKERS; i++)
+    {
+      x->x_xmark[i] = -1;
+      x->x_ymark[i] = -1;
+      x->x_found[i] = x->x_ftolerance;
+    }
+}
+
 static void pdp_opencv_haarcascade_load(t_pdp_opencv_haarcascade *x, t_symbol *filename)
 {
     x->cascade = (CvHaarClassifierCascade*)cvLoad( filename->s_name, 0, 0, 0 );
@@ -221,13 +323,6 @@ static void pdp_opencv_haarcascade_process(t_pdp_opencv_haarcascade *x)
 {
    int encoding;
    t_pdp *header = 0;
-   char *parname;
-   unsigned pi;
-   int partype;
-   float pardefault;
-   t_atom plist[2];
-   t_atom tlist[2];
-   t_atom vlist[2];
 
    /* check if image data packets are compatible */
    if ( (header = pdp_packet_header(x->x_packet0))
@@ -282,7 +377,7 @@ t_class *pdp_opencv_haarcascade_class;
 
 void *pdp_opencv_haarcascade_new(t_floatarg f)
 {
-    int i;
+  int i;
 
     t_pdp_opencv_haarcascade *x = (t_pdp_opencv_haarcascade *)pd_new(pdp_opencv_haarcascade_class);
 
@@ -304,6 +399,13 @@ void *pdp_opencv_haarcascade_new(t_floatarg f)
     x->min_neighbors = 2;
     x->mode = 0;
     x->min_size = 30;
+    x->x_ftolerance = 5;
+
+    for ( i=0; i<MAX_MARKERS; i++ )
+    {
+      x->x_xmark[i] = -1;
+      x->x_ymark[i] = -1;
+    }
 
     x->cascade = (CvHaarClassifierCascade*)cvLoad( default_cascade, 0, 0, 0 );
     if( !x->cascade )
@@ -341,8 +443,8 @@ void pdp_opencv_haarcascade_setup(void)
     class_addmethod(pdp_opencv_haarcascade_class, (t_method)pdp_opencv_haarcascade_min_neighbors, gensym("min_neighbors"),  A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_haarcascade_class, (t_method)pdp_opencv_haarcascade_mode, gensym("mode"),  A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_haarcascade_class, (t_method)pdp_opencv_haarcascade_min_size, gensym("min_size"),  A_FLOAT, A_NULL );   
-
-
+    class_addmethod(pdp_opencv_haarcascade_class, (t_method)pdp_opencv_haarcascade_ftolerance, gensym("ftolerance"), A_FLOAT, A_NULL );
+    class_addmethod(pdp_opencv_haarcascade_class, (t_method)pdp_opencv_haarcascade_clear, gensym("clear"), A_NULL );
 }
 
 #ifdef __cplusplus

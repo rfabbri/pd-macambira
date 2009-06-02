@@ -1,4 +1,4 @@
-#N canvas 25 49 1247 801 10;
+#N canvas 30 49 1247 801 10;
 #X obj -158 12 cnv 15 621 250 empty empty empty 20 12 0 14 -260097
 -66577 0;
 #X obj 82 52 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
@@ -29,59 +29,68 @@
 #X obj -14 108 loadbang;
 #X text -85 41 playing a video file;
 #X text 112 50 Camera input;
-#X obj -156 266 cnv 15 621 300 empty empty empty 20 12 0 14 -258113
+#X obj -158 272 cnv 15 621 350 empty empty empty 20 12 0 14 -258113
 -66577 0;
-#X obj -129 591 pdp_xv;
-#X floatatom 25 511 5 0 0 0 - - -;
-#X floatatom 74 512 5 0 0 0 - - -;
-#X floatatom 121 510 5 0 0 0 - - -;
-#X obj 21 465 route 0 1 2 3 4;
-#X obj -129 418 pdp_opencv_haarcascade;
-#X text 123 469 For each object detected;
-#X obj 24 489 unpack 0 0 0;
-#X floatatom 174 512 5 0 0 0 - - -;
-#X floatatom 213 512 5 0 0 0 - - -;
-#X floatatom 251 513 5 0 0 0 - - -;
-#X obj 172 491 unpack 0 0 0;
+#X obj -130 661 pdp_xv;
+#X floatatom 25 583 5 0 0 0 - - -;
+#X floatatom 74 584 5 0 0 0 - - -;
+#X floatatom 121 582 5 0 0 0 - - -;
+#X obj 21 537 route 0 1 2 3 4;
+#X obj -129 490 pdp_opencv_haarcascade;
+#X text 123 541 For each object detected;
+#X obj 24 561 unpack 0 0 0;
+#X floatatom 174 584 5 0 0 0 - - -;
+#X floatatom 213 584 5 0 0 0 - - -;
+#X floatatom 251 585 5 0 0 0 - - -;
+#X obj 172 563 unpack 0 0 0;
 #X text -158 -62 pdp_opencv_haarscasccade : object recognition based
 on Haar's algorithm ( decision tree algorithm );
 #X text -159 -37 used for face detection by default;
-#X floatatom -56 443 5 0 0 0 - - -;
-#X text -17 443 number of objects detected;
-#X msg 6 282 load \$1;
-#X obj 70 282 openpanel;
-#X obj 138 281 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#X floatatom -56 515 5 0 0 0 - - -;
+#X text -17 515 number of objects detected;
+#X msg -27 309 load \$1;
+#X obj 37 309 openpanel;
+#X obj 105 308 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X text -162 -25 ( load haarscascase_frontalface_alt.xml );
-#X text 161 292 ( default haarscascase_frontalface_alt.xml );
-#X text 470 288 don't forget this step;
-#X text 471 274 <-- WARNING : if you don't see any object detected
+#X text 128 319 ( default haarscascase_frontalface_alt.xml );
+#X text 471 294 don't forget this step;
+#X text 472 280 <-- WARNING : if you don't see any object detected
 ;
-#X text 163 280 load an haar's decision tree;
-#X msg 25 311 mode \$1;
-#X obj 83 311 hradio 15 1 0 2 empty empty empty 0 -8 0 10 -262144 -1
+#X text 130 307 load an haar's decision tree;
+#X msg -8 338 mode \$1;
+#X obj 50 338 hradio 15 1 0 2 empty empty empty 0 -8 0 10 -262144 -1
 -1 0;
-#X msg 34 338 min_size \$1;
-#X floatatom 114 340 5 0 0 0 - - -;
-#X floatatom 317 512 5 0 0 0 - - -;
-#X floatatom 356 512 5 0 0 0 - - -;
-#X floatatom 394 513 5 0 0 0 - - -;
-#X obj 315 491 unpack 0 0 0;
-#X text 124 311 mode 0 or 1 ( default 0 );
-#X text 154 338 minimum size of object ( default 30 );
-#X floatatom 152 363 5 0 0 0 - - -;
-#X text 190 362 minimum neighbours of object ( default 2 );
-#X msg 46 362 min_neighbors \$1;
-#X floatatom 160 389 5 0 0 0 - - -;
-#X text 198 388 scale used for recognition ( default 1.1 );
-#X text 315 527 Xcenter Ycenter Radius;
-#X text 171 527 Xcenter Ycenter Radius;
-#X text 25 527 Xcenter Ycenter Radius;
-#X msg 54 388 scale_factor \$1;
+#X msg 1 365 min_size \$1;
+#X floatatom 81 367 5 0 0 0 - - -;
+#X floatatom 317 584 5 0 0 0 - - -;
+#X floatatom 356 584 5 0 0 0 - - -;
+#X floatatom 394 585 5 0 0 0 - - -;
+#X obj 315 563 unpack 0 0 0;
+#X text 91 338 mode 0 or 1 ( default 0 );
+#X text 121 365 minimum size of object ( default 30 );
+#X floatatom 119 390 5 0 0 0 - - -;
+#X text 157 389 minimum neighbours of object ( default 2 );
+#X msg 13 389 min_neighbors \$1;
+#X floatatom 127 416 5 0 0 0 - - -;
+#X text 165 415 scale used for recognition ( default 1.1 );
+#X text 315 599 Xcenter Ycenter Radius;
+#X text 171 599 Xcenter Ycenter Radius;
+#X text 25 599 Xcenter Ycenter Radius;
+#X msg 21 415 scale_factor \$1;
 #X obj -68 228 hsl 128 15 0 500 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
 #X text -158 -9 Written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
 );
+#X obj -129 687 route press;
+#X msg -79 661 cursor 1;
+#X msg 40 439 ftolerance \$1;
+#X floatatom 130 440 5 0 0 0 - - -;
+#X msg -58 209 162;
+#X msg 45 463 clear;
+#X text 90 464 clear history;
+#X text 171 447 temporarily ( default 5 );
+#X text 171 435 number of frames where an object can disappear;
 #X connect 1 0 2 0;
 #X connect 2 0 4 0;
 #X connect 3 0 4 0;
@@ -105,10 +114,12 @@ on Haar's algorithm ( decision tree algorithm );
 #X connect 21 0 20 0;
 #X connect 22 0 21 0;
 #X connect 22 0 15 0;
+#X connect 26 0 71 0;
 #X connect 30 0 33 0;
 #X connect 30 1 37 0;
 #X connect 30 2 57 0;
 #X connect 31 0 26 0;
+#X connect 31 0 72 0;
 #X connect 31 1 40 0;
 #X connect 31 2 30 0;
 #X connect 33 0 27 0;
@@ -132,3 +143,8 @@ on Haar's algorithm ( decision tree algorithm );
 #X connect 63 0 68 0;
 #X connect 68 0 31 0;
 #X connect 69 0 13 1;
+#X connect 72 0 26 0;
+#X connect 73 0 31 0;
+#X connect 74 0 73 0;
+#X connect 75 0 69 0;
+#X connect 76 0 31 0;
