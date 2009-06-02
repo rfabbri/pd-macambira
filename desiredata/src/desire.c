@@ -5252,26 +5252,18 @@ static void gatom_bang(t_gatom *x) {
     t_outlet *o = x->outlet;
     if (x->atom.a_type == A_FLOAT) {
     	if (o) outlet_float(o, x->atom.a_float);
-	if (*s->name && s->thing) {
-	    if (x->snd == x->rcv) goto err;
-	    pd_float(s->thing, x->atom.a_float);
-    	}
+	if (*s->name && s->thing) {if (x->snd == x->rcv) goto err; pd_float(s->thing, x->atom.a_float);}
     } else if (x->atom.a_type == A_SYMBOL) {
     	if (o) outlet_symbol(o, x->atom.a_symbol);
-	if (*s->name && s->thing) {
-	    if (x->snd == x->rcv) goto err;
-	    pd_symbol(s->thing, x->atom.a_symbol);
-    	}
+	if (*s->name && s->thing) {if (x->snd == x->rcv) goto err; pd_symbol(s->thing, x->atom.a_symbol);}
     }
     return;
 err:
     error("%s: atom with same send/receive name (infinite loop)", x->snd->name);
 }
 
-static void gatom_float(t_gatom *x, t_float f)
-{t_atom at; SETFLOAT(&at, f); gatom_set(x, 0, 1, &at); gatom_bang(x);}
-static void gatom_symbol(t_gatom *x, t_symbol *s)
-{t_atom at; SETSYMBOL(&at, s); gatom_set(x, 0, 1, &at); gatom_bang(x);}
+static void gatom_float(t_gatom *x, t_float f)    {t_atom at; SETFLOAT( &at, f); gatom_set(x, 0, 1, &at); gatom_bang(x);}
+static void gatom_symbol(t_gatom *x, t_symbol *s) {t_atom at; SETSYMBOL(&at, s); gatom_set(x, 0, 1, &at); gatom_bang(x);}
 
 static void gatom_reload(t_gatom *x, t_symbol *sel, int argc, t_atom *argv) {
     int width; t_float wherelabel;
@@ -5342,18 +5334,13 @@ extern "C" void text_save(t_gobj *z, t_binbuf *b) {
     	binbuf_addv(b, "ttii","#X","text", (t_int)x->x, (t_int)x->y);
         binbuf_addbinbuf(b, x->binbuf);
     } else {
-    	if (zgetfn(x,gensym("saveto")) &&
-	 !(x->_class==canvas_class && (canvas_isabstraction(c) || canvas_istable(c)))) {
+    	if (zgetfn(x,gensym("saveto")) && !(x->_class==canvas_class && (canvas_isabstraction(c) || canvas_istable(c)))) {
     	    mess1(x,gensym("saveto"),b);
     	    binbuf_addv(b,"ttii","#X","restore", (t_int)x->x, (t_int)x->y);
     	} else {
     	    binbuf_addv(b,"ttii","#X","obj",     (t_int)x->x, (t_int)x->y);
         }
-	if (x->binbuf) {
-	        binbuf_addbinbuf(b, x->binbuf);
-	} else {
-		/*bug("binbuf missing at #X restore !!!");*/
-	}
+	if (x->binbuf) binbuf_addbinbuf(b, x->binbuf); /*else bug("binbuf missing at #X restore !!!");*/
     }
     binbuf_addv(b, ";");
 }
@@ -5440,15 +5427,11 @@ static void canvas_object_delete(t_canvas *x, t_symbol *name) {
 
 static void canvas_object_get_tips(t_canvas *x, t_symbol *name) {
 	t_text *o = symbol2opointer(name); if (!o) return;
-	char foo[666];
-	if (o->_class->firstin) strcpy(foo,o->_class->firsttip->name); else strcpy(foo,"");
+	std::ostringstream foo;
+	if (o->_class->firstin) foo << o->_class->firsttip->name;
 	int n = obj_ninlets(x);
-	//char *foop = foo;
-	for (int i=!!o->_class->firstin; i<n; i++) {
-		strcat(foo," ");
-		strcat(foo,inlet_tip(o->inlet,i));
-	}
-	sys_mgui(o,"tips=","S",foo);
+	for (int i=!!o->_class->firstin; i<n; i++) foo << " " << inlet_tip(o->inlet,i);
+	sys_mgui(o,"tips=","S",foo.str().data());
 }
 
 extern "C" void open_via_helppath(const char *name, const char *dir);
@@ -5521,12 +5504,9 @@ static void g_text_setup() {
 }
 
 static int iemgui_color_hex[]= {
-	0xfcfcfc, 0xa0a0a0, 0x404040, 0xfce0e0, 0xfce0c0,
-	0xfcfcc8, 0xd8fcd8, 0xd8fcfc, 0xdce4fc, 0xf8d8fc,
-	0xe0e0e0, 0x7c7c7c, 0x202020, 0xfc2828, 0xfcac44,
-	0xe8e828, 0x14e814, 0x28f4f4, 0x3c50fc, 0xf430f0,
-	0xbcbcbc, 0x606060, 0x000000, 0x8c0808, 0x583000,
-	0x782814, 0x285014, 0x004450, 0x001488, 0x580050
+	0xfcfcfc, 0xa0a0a0, 0x404040, 0xfce0e0, 0xfce0c0, 0xfcfcc8, 0xd8fcd8, 0xd8fcfc, 0xdce4fc, 0xf8d8fc,
+	0xe0e0e0, 0x7c7c7c, 0x202020, 0xfc2828, 0xfcac44, 0xe8e828, 0x14e814, 0x28f4f4, 0x3c50fc, 0xf430f0,
+	0xbcbcbc, 0x606060, 0x000000, 0x8c0808, 0x583000, 0x782814, 0x285014, 0x004450, 0x001488, 0x580050
 };
 
 static int iemgui_clip_size(int size) {return max(8,size);}
