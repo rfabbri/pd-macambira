@@ -339,9 +339,11 @@ void glob_watchdog(t_pd *dummy);
 
 #ifdef __cplusplus
 #include<iostream>
+// should I remove min,max now? g++ complains about conflict between min and std::min...
+// they have the same def. btw i don't know how to refer to my own.
 template <class T> static T min(T a, T b) {return a<b?a:b;}
 template <class T> static T max(T a, T b) {return a>b?a:b;}
-template <class T> T clip(T a, T b, T c) {return min(max(a,b),c);}
+template <class T> T clip(T a, T b, T c) {return std::min(std::max(a,b),c);}
 void  oprintf(std::ostream &buf, const char *s, ...);
 void voprintf(std::ostream &buf, const char *s, va_list args);
 EXTERN std::ostringstream lost_posts;
