@@ -17,13 +17,8 @@ int main(int argc, char **argv) {
     while (1) {
         struct timeval timout;
         fd_set readset;
-        if (happy) {
-            timout.tv_sec = 5;
-            timout.tv_usec = 0;
-        } else {
-            timout.tv_sec = 2;
-            timout.tv_usec = 0;
-        }
+        if (happy) {timout.tv_sec = 5; timout.tv_usec = 0;}
+	else       {timout.tv_sec = 2; timout.tv_usec = 0;}
         FD_ZERO(&readset);
         FD_SET(0, &readset);
         select(1, &readset, 0, 0, &timout);
