@@ -74,6 +74,7 @@ for distrodir in ${HOME}/auto-build/*; do
 		 run_build_script $distro IGNORE_CHROOT_USE_SYSTEM
 		 for chrootdir in /var/chroot/*; do 
 			 chroot=$(echo $chrootdir | sed 's|.*/\(.*\)|\1|')
+			 HOSTNAME=`cat /etc/hostname`
 			 run_build_script $distro $chroot
 		 done
 	 fi
