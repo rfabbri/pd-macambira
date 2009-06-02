@@ -510,19 +510,19 @@ static void pointerinlet_pointer(t_inlet *x, t_gpointer *gp) {
 static void floatinlet_float(  t_inlet *x, t_float f)   {*x->u.floatslot = f;}
 static void symbolinlet_symbol(t_inlet *x, t_symbol *s) {*x->u.symslot   = s;}
 
-#define COMMON \
+#define COMMON(qlass,sym,slot) \
+    t_inlet *x=(t_inlet *)pd_new(qlass); \
+    x->symfrom=&sym; \
+    x->u.slot = p; \
     x->owner = owner; \
     x->dest = 0; \
     x->next = 0; \
     object_append_inlet(owner,x); \
     return x;
 
-t_inlet *  floatinlet_new(t_object *owner, t_float *   fp) {t_inlet *x=(t_inlet *)pd_new(floatinlet_class);
-    x->symfrom=&s_float;   x->u.floatslot  =fp; COMMON}
-t_inlet * symbolinlet_new(t_object *owner, t_symbol ** sp) {t_inlet *x=(t_inlet *)pd_new(symbolinlet_class);
-    x->symfrom=&s_symbol;  x->u.symslot    =sp; COMMON}
-t_inlet *pointerinlet_new(t_object *owner, t_gpointer *gp) {t_inlet *x=(t_inlet *)pd_new(pointerinlet_class);
-    x->symfrom=&s_pointer; x->u.pointerslot=gp; COMMON}
+t_inlet *  floatinlet_new(t_object *owner, t_float *   p) {COMMON(  floatinlet_class,s_float  ,floatslot  )}
+t_inlet * symbolinlet_new(t_object *owner, t_symbol ** p) {COMMON( symbolinlet_class,s_symbol ,symslot    )}
+t_inlet *pointerinlet_new(t_object *owner, t_gpointer *p) {COMMON(pointerinlet_class,s_pointer,pointerslot)}
 #undef COMMON
 
 /* ---------------------- routine to handle lists ---------------------- */
