@@ -951,7 +951,7 @@ static void samplerate_tilde_bang(t_samplerate *x) {
         t_block *b = (t_block *)canvas_getblock(block_class, &canvas);
         if (b) srate *= float(b->upsample) / float(b->downsample);
     }
-    outlet_float(x->ob_outlet, srate);
+    x->ob_outlet->send(srate);
 }
 static void *samplerate_tilde_new(t_symbol *s) {
     t_samplerate *x = (t_samplerate *)pd_new(samplerate_tilde_class);
