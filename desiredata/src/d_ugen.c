@@ -303,7 +303,7 @@ extern "C" void signal_makereusable(t_signal *sig) {
     for (t_signal *s5 = signal_freeborrowed;   s5; s5 = s5->nextfree) {if (s5 == sig) {bug("signal_free 3"); return;}}
     for (t_signal *s5 = signal_freelist[logn]; s5; s5 = s5->nextfree) {if (s5 == sig) {bug("signal_free 4"); return;}}
 #endif
-    if (ugen_loud) post("free %lx: %d", sig, sig->isborrowed);
+    if (ugen_loud) post("free %lx: %d", long(sig), sig->isborrowed);
     if (sig->isborrowed) {
         /* if the signal is borrowed, decrement the borrowed-from signal's reference count, possibly marking it reusable too */
         t_signal *s2 = sig->borrowedfrom;
@@ -357,7 +357,7 @@ t_signal *signal_new(int n, float sr) {
     ret->sr = sr;
     ret->refcount = 0;
     ret->borrowedfrom = 0;
-    if (ugen_loud) post("new %lx: %d", ret, ret->isborrowed);
+    if (ugen_loud) post("new %lx: %d", long(ret), ret->isborrowed);
     return ret;
 }
 
@@ -586,10 +586,10 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u) {
         if (!(*sig)->refcount) signal_makereusable(*sig);
     }
     if (ugen_loud) {
-        if      (u->nin+u->nout==0) post("put %s %d",           class_getname(u->obj->ob_pd), ugen_index(dc,u));
-        else if (u->nin+u->nout==1) post("put %s %d (%lx)",     class_getname(u->obj->ob_pd), ugen_index(dc,u),sig[0]);
-        else if (u->nin+u->nout==2) post("put %s %d (%lx %lx)", class_getname(u->obj->ob_pd), ugen_index(dc,u),sig[0],sig[1]);
-        else                post("put %s %d (%lx %lx %lx ...)", class_getname(u->obj->ob_pd), ugen_index(dc,u),sig[0],sig[1],sig[2]);
+        if      (u->nin+u->nout==0) post("put %s %d",          class_getname(u->obj->ob_pd),ugen_index(dc,u));
+        else if (u->nin+u->nout==1) post("put %s %d (%lx)",    class_getname(u->obj->ob_pd),ugen_index(dc,u),long(sig[0]));
+        else if (u->nin+u->nout==2) post("put %s %d (%lx %lx)",class_getname(u->obj->ob_pd),ugen_index(dc,u),long(sig[0]),long(sig[1]));
+        else   post("put %s %d (%lx %lx %lx ...)",class_getname(u->obj->ob_pd),ugen_index(dc,u),long(sig[0]),long(sig[1]),long(sig[2]));
     }
     /* pass it on and trip anyone whose last inlet was filled */
     for (uout = u->out, i = u->nout; i--; uout++) {
@@ -703,7 +703,7 @@ extern "C" void ugen_done_graph(t_dspcontext *dc) {
             if ((*sigp)->isborrowed && !(*sigp)->borrowedfrom) {
                 signal_setborrowed(*sigp, signal_new(parent_vecsize, parent_srate));
                 (*sigp)->refcount++;
-                if (ugen_loud) post("set %lx->%lx", *sigp, (*sigp)->borrowedfrom);
+                if (ugen_loud) post("set %lx->%lx", long(*sigp), long((*sigp)->borrowedfrom));
             }
         }
     }
@@ -754,7 +754,7 @@ extern "C" void ugen_done_graph(t_dspcontext *dc) {
                 signal_setborrowed(*sigp, s3);
                 (*sigp)->refcount++;
                 dsp_add_zero(s3->v, s3->n);
-                if (ugen_loud) post("oops, belatedly set %lx->%lx", *sigp, (*sigp)->borrowedfrom);
+                if (ugen_loud) post("oops, belatedly set %lx->%lx", long(*sigp), long((*sigp)->borrowedfrom));
             }
         }
         break;   /* don't need to keep looking. */

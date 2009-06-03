@@ -518,7 +518,7 @@ static void soundfile_finishwrite(void *obj, char *filename, int fd,
 int filetype, long nframes, long itemswritten, int bytesperframe, int swap) {
     if (itemswritten < nframes) {
         if (nframes < 0x7fffffff)
-            error("soundfiler_write: %d out of %d bytes written", itemswritten, nframes);
+            error("soundfiler_write: %ld out of %ld bytes written", itemswritten, nframes);
         /* try to fix size fields in header */
         if (filetype == FORMAT_WAVE) {
             long datasize = itemswritten * bytesperframe, v;
@@ -1224,10 +1224,7 @@ static void soundfiler_read(t_soundfiler *x, t_symbol *s, int argc, t_atom *argv
         if (poswas < 0 || eofis < 0) {error("lseek failed"); goto done;}
         lseek(fd, poswas, SEEK_SET);
         framesinfile = (eofis - poswas) / (p.nchannels * p.bytespersample);
-        if (framesinfile > maxsize) {
-            error("soundfiler_read: truncated to %d elements", maxsize);
-            framesinfile = maxsize;
-        }
+        if (framesinfile > maxsize) {error("soundfiler_read: truncated to %ld elements", maxsize); framesinfile = maxsize;}
         framesinfile = min(framesinfile, p.bytelimit / (p.nchannels * p.bytespersample));
         finalsize = framesinfile;
         for (int i=0; i<argc; i++) {
