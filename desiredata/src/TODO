@@ -55,10 +55,12 @@ LEGEND:
 [b] http://lists.puredata.info/pipermail/pd-dev/2007-10/009581.html
 [s] what to do with post() in case of -nogui ? (it fills an ever-expanding buffer, does it?)
 ------------------8<------------------------------------progress-bar----------------------------------------------8<------------------
+[c] clicking on an object does not do Open.
+[ ] <Return> in Completion shouldn't finish the object.
 [c] is pd_mess_split correct? e.g. does it handle \\; properly?
 [c] make [display] look distinctive (not confusable with ObjectBox)
 [c] correct the dozen problems you can see by using visual_diff on all_guis_and_gop.pd
-[ ] help files for: [parse], [unparse], etc.
+[ ] help files for: [parse], [unparse], [clipboard], [display], etc.
 [s] recreate abstr instances after abstr save
 [s] [bng] messages get duplicated upon entering a subpatch???
 [s] counter-test.pd shows [nbx] jamming the update queue if too many updates at once...?
@@ -274,9 +276,8 @@ Iohannes said about redirecting stdout/stderr:
 [b] server-side IEMGUI could be turned into Tcl-based externs OR EVEN become abstractions.
     it's possible to make a DesireData GUI for any Pd class, including abstractions.
     to turn IEMGUI into an abstraction, what's missing is the savefn/saveargs/scanargs business.
-[s] I would like to know how much it is feasible to compress the t_atom
-    structure so that even with 64-bit pointers the t_atom still stays 8 bytes
-    instead of 16. I think it's possible, but not necessarily in a
+[s] I would like to know how much it is feasible to compress the t_atom structure so that even with 64-bit pointers the t_atom
+    still stays 8 bytes instead of 16. I think it's possible, but not necessarily in a
     backwards-compatible way, and not necessarily in a portable way. also maybe it's not that useful.
 [c] splashscreen: we could make it different than other programs by inserting the splashscreen
     inside the main window or we could make it a separate window but no timer, just an [OK] button,
@@ -439,39 +440,26 @@ here's my current Pd GUI wishlist, things that could streamline my work
 flow, things that don't seem logical to me...etc:
 
 I wish:
-[ ] going in and out of edit mode was reflected by the cursor turning into 
-a hand or arrow immediately, not requiring the user to move it first, 
-who, if newbie, can get confused if he/she hasn't moved the mouse.
-(this is the case on some versions I use in class, specifically 
-pd-extended OSX I think)
-[ ] shift-click-and-drag on a number box would also work after you already 
-clicked. Another idea: ctrl-click-drag to increment in steps of 10 or 100.
-[ ] home, end, shift+left/right, ctrl+left/right, ctrl+shift+left/right 
-would work within object boxes just like in a text editor.
-[ ] click+drag a single object or messagebox wouldn't automatically 
-activate text entry mode but the object itself stays the selection, so 
-that you can move it again or use arrow keys for repositioning without 
-having to deselect+reselect first.
-[ ] for a multiple connections facility, to connect all outlets of object a 
-to all inlets of object b, and variations on that. (I think max has had 
-this for a while, and maybe desiredata ?).
+[ ] going in and out of edit mode was reflected by the cursor turning into a hand or arrow immediately,
+    not requiring the user to move it first, who, if newbie, can get confused if he/she hasn't moved the mouse.
+    (this is the case on some versions I use in class, specifically pd-extended OSX I think)
+[ ] shift-click-and-drag on a number box would also work after you already clicked.
+    Another idea: ctrl-click-drag to increment in steps of 10 or 100.
+[ ] home, end, shift+left/right, ctrl+left/right, ctrl+shift+left/right would work within object boxes just like in a text editor.
+[ ] click+drag a single object or messagebox wouldn't automatically activate text entry mode but the object itself stays the selection,
+    so that you can move it again or use arrow keys for repositioning without having to deselect+reselect first.
+[ ] for a multiple connections facility, to connect all outlets of object a to all inlets of object b, and variations on that.
+    (I think max has had this for a while, and maybe desiredata ?).
 [ ] 'subpatcherize'
-[ ] that when deleting all text in a comment and clicking outside it, the 
-comment would be deleted, so that if you save the patch, close it, and 
-reopen it, there doesn't appear the word 'comment' everywhere you left a 
-'blank' comment this way. Alternatively it could become 'comment' upon 
-finalizing an empty comment, so that you can still see, select and 
-delete it.
-[ ] the file browser (openpanel/savepanel) would support keystrokes to 
-navigate: alt+up one dir up, tab to toggle focus between text entry and 
-graphical area (where folders and files are displayed)...etc
-[ ] opening the filebrowser wouldn't cause the Pd main window to pop in 
-front of all the patcher windows after it is closed.
-[ ] one object could be finalized by clicking the outlet of another object, 
-so that you can immediately connect it. The extra click outside the 
-object to finalize it first is unnecessary. When I click the outlet of 
-another object, it is obvious that I am done typing the name of the 
-current one.
+[ ] that when deleting all text in a comment and clicking outside it, the comment would be deleted, so that if you save the patch,
+    close it, and reopen it, there doesn't appear the word 'comment' everywhere you left a 'blank' comment this way. Alternatively
+    it could become 'comment' upon finalizing an empty comment, so that you can still see, select and delete it.
+[ ] the file browser (openpanel/savepanel) would support keystrokes to navigate: alt+up one dir up, tab to toggle focus between text
+    entry and graphical area (where folders and files are displayed)...etc
+[ ] opening the filebrowser wouldn't cause the Pd main window to pop in front of all the patcher windows after it is closed.
+[ ] one object could be finalized by clicking the outlet of another object, so that you can immediately connect it. The extra click
+    outside the object to finalize it first is unnecessary. When I click the outlet of another object, it is obvious that I am done
+    typing the name of the current one.
 
 #--------#--------#--------#--------#--------#--------#--------#--------#--------
 marius schebella 2008 Feb 17

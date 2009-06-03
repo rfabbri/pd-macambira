@@ -5296,7 +5296,9 @@ MIDISRC="s_midi_none.c"
 WLIB=""
 STRIP="meuhhhhh"
 
-OS=$(uname -s)
+if test "$OS" = ""; then
+  OS=$(uname -s)
+fi
 
 if test $OS = Linux; then
     LDFLAGS="-Wl,-export-dynamic "
@@ -5353,8 +5355,8 @@ if test $(echo $OS | cut -f1 -d_) = CYGWIN; then
 fi
 
 if test $(echo $OS | cut -f1 -d_) = MINGW32; then
-    LDFLAGS="-lm -lpthreadGC2 -lwsock32 -lwinmm -lole32 -L../src -lpd"
-#    LDFLAGS="-lm /home/matju/pthreads-mingw/lib/libpthreadGC2.a -lwsock32 -lwinmm -lole32 -L../src -lpd"
+#    LDFLAGS="-lm -lpthreadGC2 -lwsock32 -lwinmm -lole32 -L../src -lpd"
+    LDFLAGS="-lm /home/matju/pthreads-mingw/lib/libpthreadGC2.a -lwsock32 -lwinmm -lole32 -L../src -lpd"
     EXT=dll
     LIBSUFFIX=.dll
     CPPFLAGS="-DMSW \
