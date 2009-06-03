@@ -7307,7 +7307,7 @@ def Dialogue add_folders {f name label} {
 }
 def Dialogue add_libraries {f name label} {
 	$self add_stuff $f $name $label
-	set v $_($self:$name) ;# bug in objtcl
+	set v $_($self:$name) ;# bug in poetcl. is it still there?
 	frame $f.a
 	listbox $f.a.list -width 32 -height 16 -yscrollcommand "$f.a.yscroll set" \
 	    -activestyle none -xscrollcommand "$f.a.xscroll set"
@@ -7315,9 +7315,9 @@ def Dialogue add_libraries {f name label} {
 	foreach line $v {$f.a.list insert end $line}
 	# save the listbox path at @$name instead
 	set @$name $f.a.list
-	pack [scrollbar $f.a.yscroll -command "$f.a.list yview"] -side bottom -fill x
-	pack $f.a.list -side left -fill both -expand 1
-	pack [scrollbar $f.a.xscroll -command "$f.a.list xview" -orient horizontal] -side left -fill y
+	pack [scrollbar $f.a.yscroll -command "$f.a.list yview"] -side right -fill y
+	pack $f.a.list -side top -fill both -expand 1
+	pack [scrollbar $f.a.xscroll -command "$f.a.list xview" -orient horizontal] -side bottom -fill x
 	pack $f.a -side left
 
 	frame $f.b       -borderwidth 0
@@ -7327,7 +7327,7 @@ def Dialogue add_libraries {f name label} {
 
 	foreach {cmd lab} {lib_add add listbox_remove remove listbox_up up listbox_down down} {
 		pack [button $f.b.$cmd -command "$self $cmd $f.a.list" -text [say $lab] -width 6] -side top
-		balloon $f.b.$cmd [say dir_$lab]
+		#balloon $f.b.$cmd [say dir_$lab]
 	}
 	pack $f.b -side top
 }
@@ -7719,39 +7719,10 @@ def Dialogue choose_col {frame var val} {
 class_new PagedDialogue {Dialogue}
 def PagedDialogue init {args} {
 	eval [concat [list super] $args]
-	set @nb [Notebook new_as $self.1]
+	set @nb [ttk::notebook .$self.1]
 	set @nbs $@nb
-	pack .$@nb -expand 1 -fill both
+	pack $@nb -expand 1 -fill both
 	$self none_resizable
-}
-
-class_new Notebook    {Thing}
-def Notebook delete {} {super}
-def Notebook init {{width 590} {height 350}} {
-	set f .$self
-	frame $f
-	pack [frame $f.bar] -fill x
-	pack [frame $f.main -borderwidth 1 -relief raised -width $width -height $height] -fill both -expand yes
-}
-
-def Notebook page_select {i} {
-	set f .$self
-	catch {
-		$f.bar.$@section configure -relief raised
-		place forget $f.main.$@section
-		pack $f.bar.$@section -pady {4 4}
-	}
-	set @section $i
-	place $f.main.$@section -x 0 -y 0 ;# -width [winfo width $f.main] -height [winfo height $f.main]
-	$f.bar.$@section configure -relief sunken
-	pack $f.bar.$@section -pady {8 0}
-}
-
-def Notebook add_section {section text} {
-	set f .$self
-	frame $f.main.$section
-	pack [button $f.bar.$section -text $text -command [list $self page_select $section]] -side left -pady {4 4}
-	bind $f.bar.$section <Return> "$self page_select $section"
 }
 
 # numbers in section are for the % of space taken by labels
@@ -7837,7 +7808,7 @@ def ServerPrefsDialogue audio_properties {indevlist indevs inchans outdevlist ou
 	mset [list @inchannels0  @inchannels1  @inchannels2  @inchannels3]  $@inchannels
 	mset [list @outchannels0 @outchannels1 @outchannels2 @outchannels3] $@outchannels
 	set @audio_api_choice2 [say [lindex $::pd_apilist2 $@audio_api_choice]]
-	if {![winfo exists .$self.1.main.1]} {
+	if {![winfo exists .$self.1.1]} {
 		$self init_content
 	} else {
 		$self update_content
@@ -7923,7 +7894,8 @@ def ServerPrefsDialogue init_content {} {
 		switch $type {
 			section {
 				set @label_width [expr 6*[lindex $names 1]] ;# % of 600 px
-				$@nb add_section [incr section] [say $name]
+				frame .$self.1.[incr section]
+				$@nb add .$self.1.$section -text [say $name]
 			}
 			choice  {
 				if {$name == "audio_api_choice"} {
@@ -7931,14 +7903,13 @@ def ServerPrefsDialogue init_content {} {
 				} else {
 					set ops [lrange $names 1 end]
 				}
-				$self add $f.main.$section [list $name choice -choices $ops]
+				$self add $f.$section [list $name choice -choices $ops]
 			}
-			devlist {$self add $f.main.$section [list $name devlist] }
-			spins   {$self add $f.main.$section [list $name spins [lindex $names 1]] }
-			default {$self add $f.main.$section [list $name $type]}
+			devlist {$self add $f.$section [list $name devlist] }
+			spins   {$self add $f.$section [list $name spins [lindex $names 1]] }
+			default {$self add $f.$section [list $name $type]}
 		}
 	}
-	$@nb page_select 1
 }
 def ServerPrefsDialogue update_content {} {$self update_channels}
 def ServerPrefsDialogue update_channels {} {
@@ -7946,14 +7917,14 @@ def ServerPrefsDialogue update_channels {} {
 	set outdev_len [llength $@audiooutdev]
 	set i 0
 	foreach chan  $@inchannels {
-		if {$i <  $indev_len} {set s "readonly"} else {set s "disabled"}
-		.$self.1.main.1.-inchannels.$i configure -state $s
+		if {$i< $indev_len} {set s "readonly"} else {set s "disabled"}
+		.$self.1.1.-inchannels.$i configure -state $s
 		incr i
 	}
 	set i 0
 	foreach chan $@outchannels {
-		if {$i < $outdev_len} {set s "readonly"} else {set s "disabled"}
-		.$self.1.main.1.-outchannels.$i configure -state $s
+		if {$i<$outdev_len} {set s "readonly"} else {set s "disabled"}
+		.$self.1.1.-outchannels.$i configure -state $s
 		incr i
 	}
 }
@@ -8172,34 +8143,31 @@ def ClientPrefsDialogue revert {} {
 	# this should reload currently used settings ?
 }
 def ClientPrefsDialogue init {} {
-	global ddrc_options look key
-	#do we need to read .ddrc each time the pref editor is opened?
-	#$self read
+	global look key
 	super cancel apply ok
 	#super cancel reset revert apply ok
 	set f .$self.1
 	set section 0
 	set subsection 0
 	set @label_width 200 ;# 24
-	foreach {type class names} $ddrc_options {
+	foreach {type class names} $::ddrc_options {
 		set name [lindex [split $names |] 0]
 		switch $type { void { set type toggle }}
 		switch $type {
 			section {
 				$@nb add_section [incr section] [say $name]
-				set which_section $f.main.$section
+				set which_section $f.$section
 				set which_self $self
 				set subsection 0
 			}
 			subsection {
-				set subself $self.1.main.$section.subsections
+				set subself $self.1.$section.subsections
 				if {!$subsection} {
 					lappend @nbs [Notebook new_as $subself 590 300]
 					pack .$subself
 				}
 				$subself add_section [incr subsection] [say $name]
-				$subself page_select 1
-				set which_section .$subself.main.$subsection
+				set which_section .$subself.$subsection
 				set which_self $subself
 			}
 			language {
@@ -8236,7 +8204,6 @@ def ClientPrefsDialogue init {} {
 			}
 		}
 	}
-	$@nb page_select 1
 }
 def ClientPrefsDialogue dropmenu_set {frame var part val} {
 	set @$var $part
