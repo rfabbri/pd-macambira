@@ -9,7 +9,7 @@
 */
 
 
-#include "m_pd.h"
+#include "desire.h"
 #include <stdio.h>
 #ifdef UNISTD
 #include <unistd.h>
