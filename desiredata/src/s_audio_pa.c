@@ -3,8 +3,7 @@
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
 /* this file calls Ross Bencina's and Phil Burk's Portaudio package.  It's
-   the main way in for Mac OS and, with Michael Casey's help, also into
-   ASIO in Windows. */
+   the main way in for Mac OS and, with Michael Casey's help, also into ASIO in Windows. */
 
 /* tb: requires portaudio >= V19 */
 
@@ -48,6 +47,8 @@ static PaStreamCallback *pa_callback = NULL;
 int process (const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo,
 PaStreamCallbackFlags statusFlags, void *userData);
 
+/*int  naudioindev, int * audioindev, int  nchindev, int * chindev,
+int naudiooutdev, int *audiooutdev, int nchoutdev, int *choutdev, int rate, int dummy*/
 int pa_open_audio(int inchans, int outchans, int rate, int advance, int indeviceno, int outdeviceno, int schedmode) {
     PaError err;
     int j, devno, pa_indev = -1, pa_outdev = -1;
@@ -165,14 +166,14 @@ const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, voi
 	sys_log_error(ERR_SYSLOCK);
 	return 0;
     }
-    for (j = 0; j < sys_inchannels; j++) {
+    for (int j=0; j<sys_inchannels; j++) {
 	t_sample * in = ((t_sample**)input)[j];
-	copyvec(sys_soundin + j * sys_dacblocksize,in,sys_dacblocksize);
+	copyvec(    sys_soundin  + j * sys_dacblocksize,in,sys_dacblocksize);
     }
     sched_tick(sys_time + sys_time_per_dsp_tick);
-    for (j = 0; j < sys_outchannels;  j++) {
-	t_sample * out = ((t_sample**)output)[j];
-	copyvec(out,sys_soundout + j * sys_dacblocksize,sys_dacblocksize);
+    for (int j=0; j<sys_outchannels;  j++) {
+	t_sample *out = ((t_sample**)output)[j];
+	copyvec(out,sys_soundout + j * sys_dacblocksize,   sys_dacblocksize);
     }
     /* update peak meters */
     if (sys_meters) sys_peakmeters();

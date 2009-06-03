@@ -8,7 +8,6 @@
 
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
-#include "s_stuff.h"
 #include "m_simd.h"
 #include <stdio.h>
 #ifdef UNISTD
