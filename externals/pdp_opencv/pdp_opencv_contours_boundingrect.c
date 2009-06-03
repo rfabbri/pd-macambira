@@ -32,6 +32,8 @@
 #include "cv.h"
 #endif
 
+#define MAX_MARKERS 100
+
 typedef struct pdp_opencv_contours_boundingrect_struct
 {
     t_object x_obj;
@@ -45,6 +47,11 @@ typedef struct pdp_opencv_contours_boundingrect_struct
     int x_packet1;
     int x_dropped;
     int x_queue_id;
+    int x_xmark[MAX_MARKERS];
+    int x_ymark[MAX_MARKERS];
+    int x_found[MAX_MARKERS];
+    int x_ftolerance;
+    int x_mmove;
 
     int x_width;
     int x_height;
@@ -55,8 +62,33 @@ typedef struct pdp_opencv_contours_boundingrect_struct
     int minarea;
     int maxarea;
     IplImage *image, *gray, *cnt_img;
+    CvFont font;
     
 } t_pdp_opencv_contours_boundingrect;
+
+static int pdp_opencv_contours_boundingrect_mark(t_pdp_opencv_contours_boundingrect *x, t_floatarg fx, t_floatarg fy )
+{
+  int i;
+
+    if ( ( fx < 0.0 ) || ( fx > x->x_width ) || ( fy < 0 ) || ( fy > x->x_height ) )
+    {
+       return -1;
+    }
+
+    for ( i=0; i<MAX_MARKERS; i++)
+    {
+       if ( x->x_xmark[i] == -1 )
+       {
+          x->x_xmark[i] = (int)fx;
+          x->x_ymark[i] = (int)fy;
+          x->x_found[i] = x->x_ftolerance;
+          return i;
+       }
+    }
+
+    post( "pdp_opencv_contours_boundingrect : max markers reached" );
+    return -1;
+}
 
 static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_boundingrect *x)
 {
@@ -64,6 +96,9 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1); 
+    char tindex[4];
+    int i = 0;                   // Indicator of cycles.
+    int im = 0;                  // Indicator of markers.
 
     if ((x->x_width != (t_int)header->info.image.width) || 
         (x->x_height != (t_int)header->info.image.height)) 
@@ -94,8 +129,6 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     newheader->info.image.width = x->x_width;
     newheader->info.image.height = x->x_height;
 
-    memcpy( newdata, data, x->x_size*3 );
-    
     // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( x->image->imageData, data, x->x_size*3 );
     
@@ -133,15 +166,47 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     cvCopy(x->image, x->cnt_img, NULL);
     // cvZero( x->cnt_img );
     
-    int i = 0;                   // Indicator of cycles.
+    for ( im=0; im<MAX_MARKERS; im++ )
+    {
+      if ( x->x_xmark[im] != -1.0 )
+      {
+        x->x_found[im]--;
+      }
+    }
+
     for( ; contours != 0; contours = contours->h_next )
     {
         int count = contours->total; // This is number point in contour
         CvRect rect;
+        int oi, found;
 
 	rect = cvContourBoundingRect( contours, 1);
 	if ( ( (rect.width*rect.height) > x->minarea ) && ( (rect.width*rect.height) < x->maxarea ) ) {
+
+            found = 0;
+            oi = -1;
+            for ( im=0; im<MAX_MARKERS; im++ )
+            {
+              // check if the object is already known
+              if ( ( abs( rect.x - x->x_xmark[im] ) < x->x_mmove ) && ( abs( rect.y - x->x_ymark[im] ) < x->x_mmove ) )
+              {
+                 oi=im;
+                 found=1;
+                 x->x_found[im] = x->x_ftolerance;
+                 x->x_xmark[im] = rect.x;
+                 x->x_ymark[im] = rect.y;
+                 break;
+              }
+            }
+            // new object detected
+            if ( !found )
+            {
+               oi = pdp_opencv_contours_boundingrect_mark(x, rect.x, rect.y );
+            }
+
 	    cvRectangle( x->cnt_img, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
+            sprintf( tindex, "%d", i );
+            cvPutText( x->cnt_img, tindex, cvPoint(rect.x,rect.y), &x->font, CV_RGB(255,255,255));
 
             SETFLOAT(&x->rlist[0], i);
             SETFLOAT(&x->rlist[1], rect.x);
@@ -151,15 +216,25 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
 
     	    outlet_list( x->x_dataout, 0, 5, x->rlist );
 	    i++;
-      }
-      outlet_float( x->x_countout, i );
-	
+        }
+    }
+    outlet_float( x->x_countout, i );
+
+    // delete lost objects
+    for ( im=0; im<MAX_MARKERS; im++ )
+    {
+       if ( x->x_found[im] < 0 )
+       {
+         x->x_xmark[im] = -1.0;
+         x->x_ymark[im] = -1,0;
+         x->x_found[im] = x->x_ftolerance;
+         post( "deleted point %d", im );
+       }
     }
 
     cvReleaseMemStorage( &stor02 );
 
     memcpy( newdata, x->cnt_img->imageData, x->x_size*3 );
-
  
     return;
 }
@@ -178,6 +253,42 @@ static void pdp_opencv_contours_boundingrect_maxarea(t_pdp_opencv_contours_bound
 {
 	x->maxarea = (int)f;
 }
+
+static void pdp_opencv_contours_boundingrect_ftolerance(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
+{
+        if ((int)f>=1) x->x_ftolerance = (int)f;
+}
+
+static void pdp_opencv_contours_boundingrect_mmove(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
+{
+        if ((int)f>=1) x->x_mmove = (int)f;
+}
+
+static void pdp_opencv_contours_boundingrect_delete(t_pdp_opencv_contours_boundingrect *x, t_floatarg findex )
+{
+  int i;
+
+    if ( ( findex < 1.0 ) || ( findex > 10 ) )
+    {
+       return;
+    }
+
+    x->x_xmark[(int)findex-1] = -1;
+    x->x_ymark[(int)findex-1] = -1;
+}
+
+static void pdp_opencv_contours_boundingrect_clear(t_pdp_opencv_contours_boundingrect *x )
+{
+  int i;
+
+    for ( i=0; i<MAX_MARKERS; i++)
+    {
+      x->x_xmark[i] = -1;
+      x->x_ymark[i] = -1;
+      x->x_found[i] = x->x_ftolerance;
+    }
+}
+
 
 static void pdp_opencv_contours_boundingrect_sendpacket(t_pdp_opencv_contours_boundingrect *x)
 {
@@ -277,9 +388,15 @@ void *pdp_opencv_contours_boundingrect_new(t_floatarg f)
     x->minarea   = 10*10;
     x->maxarea   = 320*240;
 
+    x->x_ftolerance  = 5;
+    x->x_mmove   = 5;
+
     x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
     x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
     x->cnt_img = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 3);
+
+    // initialize font
+    cvInitFont( &x->font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0, 1, 8 );
 
     //contours = 0;
     return (void *)x;
@@ -302,7 +419,9 @@ void pdp_opencv_contours_boundingrect_setup(void)
     class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_minarea, gensym("minarea"),  A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_maxarea, gensym("maxarea"),  A_FLOAT, A_NULL );   
-
+    class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_ftolerance, gensym("ftolerance"), A_FLOAT, A_NULL );
+    class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_mmove, gensym("maxmove"), A_FLOAT, A_NULL );
+    class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_clear, gensym("clear"), A_NULL );
 
 }
 
