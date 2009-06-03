@@ -3,7 +3,6 @@
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
 #include "m_pd.h"
-#include "s_stuff.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

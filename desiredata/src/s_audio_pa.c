@@ -8,7 +8,6 @@
 /* tb: requires portaudio >= V19 */
 
 #include "m_pd.h"
-#include "s_stuff.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

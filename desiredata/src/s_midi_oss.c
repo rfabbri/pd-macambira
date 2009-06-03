@@ -15,7 +15,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include "desire.h"
-#include "s_stuff.h"
 
 static int oss_nmidiin;  static int oss_midiinfd [MAXMIDIINDEV];
 static int oss_nmidiout; static int oss_midioutfd[MAXMIDIOUTDEV];
@@ -119,10 +118,10 @@ void sys_poll_midi() {
         for (int i=0; i<oss_nmidiin; i++) {
             char c;
             int ret = read(oss_midiinfd[i], &c, 1);
-            if (ret < 0) {
+            if (ret<0) {
                 if (errno != EAGAIN) perror("MIDI");
             } else if (ret != 0) {
-                sys_midibytein(i, (c & 0xff));
+                sys_midibytein(i, c&0xff);
                 did = 1;
             }
         }
@@ -146,9 +145,9 @@ void midi_oss_init() {
         int fd;
         char namebuf[80];
         oss_nmidiindevs = i;
-        if (i == 0)                       {fd = open("/dev/midi", O_RDONLY | O_NDELAY); if (fd>=0) {close(fd); continue;}}
-        sprintf(namebuf, "/dev/midi%2.2d", i); fd = open(namebuf, O_RDONLY | O_NDELAY); if (fd>=0) {close(fd); continue;}
-        sprintf(namebuf, "/dev/midi%d", i);    fd = open(namebuf, O_RDONLY | O_NDELAY); if (fd>=0) {close(fd); continue;}
+        if (i == 0)                       {fd = open("/dev/midi", O_RDONLY|O_NDELAY); if (fd>=0) {close(fd); continue;}}
+        sprintf(namebuf, "/dev/midi%2.2d", i); fd = open(namebuf, O_RDONLY|O_NDELAY); if (fd>=0) {close(fd); continue;}
+        sprintf(namebuf, "/dev/midi%d", i);    fd = open(namebuf, O_RDONLY|O_NDELAY); if (fd>=0) {close(fd); continue;}
         break;
     }
     for (int i=0; i<NSEARCH; i++) {
