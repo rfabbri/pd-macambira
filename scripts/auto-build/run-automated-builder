@@ -39,12 +39,18 @@ run_build_script ()
 
 	 BUILDSCRIPT="${HOME}/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh"
          ## LATER: make the uploaded ${LOGFILE} (name) be consistent with the uploaded package-file (name)
-	 LOGFILE="${HOME}/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${SCRIPT}.txt"
+	 LOGFILE="${HOME}/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}.txt"
 	 touch "${LOGFILE}" 
 
 	 if [ -d /var/chroot/$chroot ]; then
+		 echo "----------------------------------------" >> "$LOGFILE" 2>&1
+		 echo "Building in dchroot $chroot" >> "$LOGFILE" 2>&1
+		 echo "----------------------------------------" >> "$LOGFILE" 2>&1
 		 dchroot -c $chroot -d "$BUILDSCRIPT" >> "$LOGFILE" 2>&1
 	 else
+		 echo "----------------------------------------" >> "$LOGFILE" 2>&1
+		 echo "Building on native system" >> "$LOGFILE" 2>&1
+		 echo "----------------------------------------" >> "$LOGFILE" 2>&1
 		 sh "$BUILDSCRIPT" >> "$LOGFILE" 2>&1
 	 fi
 	 
@@ -75,7 +81,7 @@ for distrodir in ${HOME}/auto-build/*; do
 		 if [ -e /var/chroot ]; then
 			 for chrootdir in /var/chroot/*; do 
 				 chroot=$(echo $chrootdir | sed 's|.*/\(.*\)|\1|')
-				 HOSTNAME=`cat /etc/hostname`
+				 HOSTNAME=`cat /var/chroot/$chroot/etc/hostname`
 				 run_build_script $distro $chroot
 			 done
 		 fi
