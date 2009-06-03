@@ -19,6 +19,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 #include <fcntl.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -1081,10 +1083,9 @@ static int hash(const char *s, size_t n) {
     return hash2;
 }
 
-/* tb: made dogensym() threadsafe
- * supported by vibrez.net */
+/* tb: made dogensym() threadsafe */
+static t_symbol *symhash[HASHSIZE];
 t_symbol *dogensym(const char *s, size_t n, t_symbol *oldsym) {
-    static t_symbol *symhash[HASHSIZE];
 #ifdef THREADSAFE_GENSYM
     static pthread_mutex_t hash_lock = PTHREAD_MUTEX_INITIALIZER;
 #endif
@@ -1144,6 +1145,20 @@ extern "C" t_symbol *symprintf(const char *s, ...) {
     t_symbol *r = gensym(buf);
     free(buf);
     return r;
+}
+
+bool symbol_lt (t_symbol *a, t_symbol *b) {return strcmp(a->name,b->name)<0;}
+
+void glob_symbol_table (t_pd *, float onlybound) {
+    std::vector<t_symbol *> all;
+    for (size_t i=0; i<int(sizeof(symhash)/sizeof(*symhash)); i++) for (t_symbol *s=symhash[i]; s; s=s->next) all.push_back(s);
+    sort(all.begin(),all.end(),symbol_lt);
+    for (size_t i=0; i<all.size(); i++) {
+        int j=0;
+	if (all[i]->thing) j++;
+	//if (all[i]->thing->_class==bindlist_class) j++;
+        if (j>0 || !onlybound) printf("  %0*lx: %s (%d)\n",2*sizeof(void*),long(all[i]),all[i]->name,j);
+    }
 }
 
 static int tryingalready;
@@ -1723,7 +1738,7 @@ void binbuf_print(t_binbuf *x) {
     for (size_t i=0; i < x->n; i++) {
         if (newline) {
             if (startedpost) endpost();
-            startpost("");
+            startpost("%s",""); /* dummy string to fool __attribute__ */
             startedpost = 1;
         }
         postatom(1, x->v + i);
@@ -1825,8 +1840,8 @@ void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv) {
             while (ac && (at->a_type == A_SEMI || at->a_type == A_COMMA)) {ac--; at++;}
             if (!ac) break;
             if (at->a_type == A_DOLLAR) {
-                if (at->a_index <= 0 || at->a_index > argc)  {error("$%d: not enough arguments supplied", at->a_index); goto cleanup;}
-                else if (argv[at->a_index-1].a_type != A_SYMBOL) {error("$%d: symbol needed as receiver", at->a_index); goto cleanup;}
+                if (at->a_index<=0 || at->a_index>argc)    {error("$%ld: not enough arguments supplied",long(at->a_index)); goto cleanup;}
+                else if (argv[at->a_index-1].a_type!=A_SYMBOL) {error("$%ld: symbol needed as receiver",long(at->a_index)); goto cleanup;}
                 else s = argv[at->a_index-1].a_symbol;
             } else if (at->a_type == A_DOLLSYM) {
                 s = binbuf_realizedollsym(at->a_symbol, argc, argv, 0);
@@ -1870,7 +1885,7 @@ void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv) {
                 else if (at->a_index == 0) SETFLOAT(msp, canvas_getdollarzero());
                 else {
                     SETFLOAT(msp, 0);
-                    if (target != &pd_objectmaker) error("$%d: argument number out of range", at->a_index);
+                    if (target != &pd_objectmaker) error("$%ld: argument number out of range",long(at->a_index));
                 }
                 break;
             case A_DOLLSYM: {

@@ -6927,7 +6927,7 @@ static void glob_object_table() {
 		long(object_table->size()-inlets-lists-zombies),long(inlets),long(lists),long(zombies));
 }
 
-void glob_symbol_table ();
+void glob_symbol_table (t_pd *, float onlybound);
 
 extern t_class *glob_pdobject;
 extern "C" void glob_init () {
@@ -6981,7 +6981,7 @@ extern "C" void glob_init () {
     class_addmethod2(c,glob_update_path,       "update-path", "");
     class_addmethod2(c,glob_help,              "help", "s");
     class_addmethod2(c,glob_object_table,"object_table","");
-    class_addmethod2(c,glob_symbol_table,"symbol_table","");
+    class_addmethod2(c,glob_symbol_table,"symbol_table","F");
     class_addanything(c, max_default);
     pd_bind((t_pd *)&glob_pdobject, gensym("pd"));
 }
