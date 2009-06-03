@@ -7161,3 +7161,6 @@ extern "C" {
 #endif
   ;}
 };
+
+t_gobj *canvas_first (t_canvas *self) {return self->boxes->first();}
+t_gobj *gobj_next (t_gobj *self) {return self->next();}
