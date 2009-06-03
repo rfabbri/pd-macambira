@@ -10,6 +10,7 @@
 #include <alsa/asoundlib.h>
 
 #include "desire.h"
+using namespace desire;
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>

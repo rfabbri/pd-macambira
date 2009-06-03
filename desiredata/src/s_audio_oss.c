@@ -8,6 +8,7 @@
 
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
+using namespace desire;
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>

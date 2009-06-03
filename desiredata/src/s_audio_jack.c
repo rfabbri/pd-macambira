@@ -3,6 +3,7 @@
 #include <string.h>
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
+using namespace desire;
 #include "m_simd.h"
 #include <jack/jack.h>
 #include <regex.h>
