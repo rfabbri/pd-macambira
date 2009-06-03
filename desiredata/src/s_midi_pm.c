@@ -10,7 +10,6 @@
 
 
 #include "m_pd.h"
-#include "s_stuff.h"
 #include <stdio.h>
 #ifdef UNISTD
 #include <unistd.h>

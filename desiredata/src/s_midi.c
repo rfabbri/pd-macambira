@@ -6,7 +6,6 @@
 
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
-#include "s_stuff.h"
 #ifdef UNISTD
 #include <unistd.h>
 #include <sys/time.h>
