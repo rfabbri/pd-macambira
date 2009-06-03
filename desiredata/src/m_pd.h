@@ -92,6 +92,7 @@ public:
 extern "C" {
 #endif
 
+#define DESIRE 1
 #define PD_MAJOR_VERSION 1
 #define PD_MINOR_VERSION 0
 #define PD_DEVEL_VERSION 0
@@ -577,6 +578,10 @@ EXTERN t_symbol *canvas_getdir(t_glist *x);
 EXTERN void canvas_dataproperties(t_glist *x, t_scalar *sc, t_binbuf *b);
 EXTERN int canvas_open( t_canvas *x, const char *name, const char *ext, char * dirresult, char **nameresult, unsigned int size, int bin);
 EXTERN int canvas_open2(t_canvas *x, const char *name, const char *ext, char **dirresult, char **nameresult,                    int bin);
+
+// new abstracted calls
+EXTERN t_gobj *canvas_first(t_canvas *x);
+EXTERN t_gobj *gobj_next(t_gobj *x);
 
 /* -------------------- classes -------------- */
 

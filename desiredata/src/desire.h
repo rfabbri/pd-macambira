@@ -38,7 +38,7 @@
 */
 
 #ifndef DESIRE
-#define DESIRE
+#define DESIRE 1
 #endif
 #ifndef __DESIRE_H
 #define __DESIRE_H
