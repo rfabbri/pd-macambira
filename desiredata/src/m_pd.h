@@ -146,7 +146,6 @@ typedef struct _class t_class;
 typedef struct _outlet t_outlet;
 typedef struct _inlet t_inlet;
 typedef struct _clock t_clock;
-typedef struct _gpointer t_gpointer;
 typedef struct _glist t_glist, t_canvas;
 typedef struct _symbol t_symbol;
 typedef struct _atom t_atom;
