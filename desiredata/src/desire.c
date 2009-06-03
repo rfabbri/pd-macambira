@@ -1306,11 +1306,8 @@ static t_garray *graph_scalar(t_canvas *gl, t_symbol *s, t_symbol *tsym, int sav
     return x;
 }
 
-#define TEMPLATE_CHECK(tsym,ret) if (!t) {\
-	error("couldn't find template %s", tsym->name); return ret;}
-
-#define TEMPLATE_FLOATY(a,ret) if (!a) {\
-        error("%s: needs floating-point 'y' field", x->realname); return ret;}
+#define TEMPLATE_CHECK(tsym,ret) if (!t) {error("couldn't find template %s", tsym->name); return ret;}
+#define TEMPLATE_FLOATY(a,ret) if (!a) {error("%s: needs floating-point 'y' field", x->realname->name); return ret;}
 
     /* get a garray's "array" structure. */
 t_array *garray_getarray(t_garray *x) {
@@ -1742,7 +1739,7 @@ char *garray_vec(t_garray *x)   {return (char *)garray_getarray(x)->vec;} /* get
 int garray_getfloatarray(t_garray *x, int *size, t_float **vec) {
     int yonset, elemsize; t_array *a = garray_getarray_floatonly(x, &yonset, &elemsize);
     TEMPLATE_FLOATY(a,0)
-    if (elemsize != sizeof(t_word)) {error("%s: has more than one field", x->realname); return 0;}
+    if (elemsize != sizeof(t_word)) {error("%s: has more than one field", x->realname->name); return 0;}
     *size = garray_npoints(x);
     *vec =  (float *)garray_vec(x);
     return 1;
@@ -2278,21 +2275,16 @@ static int canvas_scanbinbuf(int natoms, t_atom *vec, int *p_indexout, int *p_ne
 }
 static int canvas_readscalar(t_canvas *x, int natoms, t_atom *vec, int *p_nextmsg, int selectit);
 static void canvas_readerror(int natoms, t_atom *vec, int message, int nline, const char *s) {
-    error(s);
+    error("%s",s);
     startpost("line was:");
     postatom(nline, vec + message);
     endpost();
 }
 
 /* fill in the contents of the scalar into the vector w. */
-static void canvas_readatoms(t_canvas *x, int natoms, t_atom *vec,
-int *p_nextmsg, t_symbol *tsym, t_word *w, int argc, t_atom *argv) {
+static void canvas_readatoms(t_canvas *x, int natoms, t_atom *vec, int *p_nextmsg, t_symbol *tsym, t_word *w, int argc, t_atom *argv) {
     t_template *t = template_findbyname(tsym);
-    if (!t) {
-        error("%s: no such template", tsym->name);
-        *p_nextmsg = natoms;
-        return;
-    }
+    if (!t) {error("%s: no such template", tsym->name); *p_nextmsg = natoms; return;}
     word_restore(w, t, argc, argv);
     int n = t->n;
     for (int i=0; i<n; i++) {
@@ -5376,7 +5368,7 @@ static void text_setto(t_text *x, t_canvas *canvas, char *buf, int bufsize) {
 	    canvas_delete(canvas,x);
 	    canvas_objtext(canvas,xwas,ywas,b,backupi);
 	    t_pd *backup = newest;
-	    post("backupi=%d newest->index=%d",backupi,((t_object *)newest)->dix->index);
+	    post("backupi=%d newest->index=%ld",backupi,((t_object *)newest)->dix->index);
 	    if (newest && pd_class(newest) == canvas_class) canvas_loadbang((t_canvas *)newest);
 	    canvas_paste_wires(canvas_getcanvas(canvas), buf);
 	    newest = backup;
@@ -5391,7 +5383,7 @@ t_object *symbol2opointer(t_symbol *s) {
 		error("%s target is zombie? object_table says '%ld'",s->name,object_table->get(o));
 		return 0;
 	}
-	if (!o->_class->patchable) {error("%s target not a patchable object"); return 0;}
+	if (!o->_class->patchable) {error("%s target not a patchable object",s->name); return 0;}
 	return o;
 }
 
@@ -6932,8 +6924,10 @@ static void glob_object_table() {
 		} else post("  %p %ld (%dobs) %s",k,(long)v,nobs,x->_class->name->name);
 	}
 	post("} (%ld non-omitted objects, plus %ld [inlet], plus %ld [__list], plus %ld zombies)",
-		object_table->size()-inlets-lists-zombies,inlets,lists,zombies);
+		long(object_table->size()-inlets-lists-zombies),long(inlets),long(lists),long(zombies));
 }
+
+void glob_symbol_table ();
 
 extern t_class *glob_pdobject;
 extern "C" void glob_init () {
@@ -6987,6 +6981,7 @@ extern "C" void glob_init () {
     class_addmethod2(c,glob_update_path,       "update-path", "");
     class_addmethod2(c,glob_help,              "help", "s");
     class_addmethod2(c,glob_object_table,"object_table","");
+    class_addmethod2(c,glob_symbol_table,"symbol_table","");
     class_addanything(c, max_default);
     pd_bind((t_pd *)&glob_pdobject, gensym("pd"));
 }
@@ -7047,7 +7042,7 @@ void verror(const char *fmt, va_list ap) {
     //post("at stack level %ld\n",pd_stackn);
     error_object = pd_stackn>=0 ? pd_stack[pd_stackn-1].self : 0;
 }
-void error(               const char *fmt, ...) {va_list ap; va_start(ap,fmt); verror(fmt,ap); va_end(ap);}
+void    error(            const char *fmt, ...) {va_list ap; va_start(ap,fmt); verror(fmt,ap); va_end(ap);}
 void pd_error(void *moot, const char *fmt, ...) {va_list ap; va_start(ap,fmt); verror(fmt,ap); va_end(ap);}
 
 void verbose(int level, const char *fmt, ...) {
@@ -7066,7 +7061,7 @@ void verbose(int level, const char *fmt, ...) {
 
 extern "C" void glob_finderror(t_pd *dummy) {
     if (!error_object) {post("no findable error yet."); return;}
-    post("last trackable error was for object x%lx: %s", error_object, error_string);
+    post("last trackable error was for object x%lx: %s",long(error_object),error_string);
     sys_mgui(error_object,"show_error","S",error_string);
     canvas_finderror(error_object);
 }
