@@ -5,7 +5,6 @@
 /* Zmölnig added advanced multidevice-support (2001) */
 
 #include "desire.h"
-#include "s_stuff.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <limits.h>

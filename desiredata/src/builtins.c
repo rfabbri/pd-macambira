@@ -6,7 +6,6 @@
 
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
-#include "s_stuff.h"
 #include <stdlib.h>
 #include <stdarg.h>
 #include <math.h>
@@ -1342,7 +1341,7 @@ static void receive_bang(    t_receive *x) {                                    
 static void receive_float(   t_receive *x, t_float v) {                          x->outlet->send(v);}
 static void receive_symbol(  t_receive *x, t_symbol *v) {                        x->outlet->send(v);}
 static void receive_pointer( t_receive *x, t_gpointer *v) {                      x->outlet->send(v);}
-static void receive_list(    t_receive *x, t_symbol *s, int argc, t_atom *argv) {x->outlet->send(argc,argv);}
+static void receive_list(    t_receive *x, t_symbol *s, int argc, t_atom *argv) {x->outlet->send(  argc,argv);}
 static void receive_anything(t_receive *x, t_symbol *s, int argc, t_atom *argv) {x->outlet->send(s,argc,argv);}
 static void *receive_new(t_symbol *s) {
     t_receive *x = (t_receive *)pd_new(receive_class);
@@ -1725,7 +1724,7 @@ static void trigger_anything(t_trigger *x, t_symbol *s, int argc, t_atom *argv) 
     for (int i = x->n; u--, i--;) {
         if      (u->type == 'b') u->outlet->send();
         else if (u->type == 'a') u->outlet->send(s,argc,argv);
-        else error("trigger: can only convert 's' to 'b' or 'a'", s->name);
+        else error("trigger: can only convert 's' to 'b' or 'a'; got %s", s->name);
     }
 }
 static void trigger_bang(t_trigger *x)                                                    {trigger_list(x,0,0,0  );}

@@ -15,7 +15,6 @@ to reset the value.
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
 #include "m_simd.h"
-#include "s_stuff.h"
 #include <math.h>
 #include <stdio.h>
 #include <string.h>

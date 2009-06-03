@@ -12,7 +12,6 @@
 #define PD_PLUSPLUS_FACE
 #include "m_pd.h"
 #include "desire.h"
-#include "s_stuff.h"
 #include <ctype.h>
 #include <math.h>
 #include <stdarg.h>
@@ -515,7 +514,7 @@ char *canvas_makefilename(t_canvas *x, char *file, char *result, int resultsize)
 }
 
 static void canvas_rename(t_canvas *x, t_symbol *s, t_symbol *dir) {
-    t_symbol *bs = canvas_makebindsym(x->name);
+    t_symbol *bs = canvas_makebindsym(s);
     if (x->name!=s_Pd) pd_unbind(x, bs);
     SET(name,s);
     if (x->name!=s_Pd)   pd_bind(x, bs);
@@ -781,12 +780,32 @@ extern "C" void canvas_popabstraction(t_canvas *x) {
 
 void canvas_objfor(t_canvas *gl, t_text *x, int argc, t_atom *argv);
 
+const char *atomtype_name(t_atomtype i) {
+#define T(TYPE) case TYPE: return #TYPE;
+  switch (i) {
+    T(A_NULL)
+    T(A_FLOAT) T(A_SYMBOL) T(A_POINTER)
+    T(A_SEMI) T(A_COMMA)
+    T(A_DEFFLOAT) T(A_DEFSYM)
+    T(A_DOLLAR) T(A_DOLLSYM)
+    T(A_GIMME)
+    T(A_CANT)
+/* regular pd stops here, before #12 */
+    T(A_ATOM)
+    T(A_LIST)
+    T(A_GRID)
+    T(A_GRIDOUT)
+    default: return "A_UNKNOWN";
+  }
+}
+
 void canvas_restore(t_canvas *x, t_symbol *s, int argc, t_atom *argv) {
     if (argc > 3) {
         t_atom *ap=argv+3;
         if (ap->a_type == A_SYMBOL) {
             t_canvasenvironment *e = canvas_getenv(canvas_getcurrent());
-            canvas_rename(x, binbuf_realizedollsym(ap->a_symbol, e->argc, e->argv, 1), 0);
+	    for (int i=0; i<e->argc; i++) post("restore: arg %d has type %s",i,atomtype_name(e->argv[i].a_type));
+            canvas_rename(x, binbuf_realizedollsym(ap->a_symbol,e->argc,e->argv,1), 0);
         }
     }
     canvas_pop(x,0); /* 0 means "don't touch" here. */
