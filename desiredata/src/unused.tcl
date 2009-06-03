@@ -1,3 +1,29 @@
+if {$tk} {
+	set main [Client new]
+	set window_list [list $main]
+} else {
+	set cmdline(console) 0
+	#foreach dir $auto_path {
+	#	set file $dir/libtclreadline[info sharedlibextension]
+	#	puts "trying $file"
+	#	if {![catch {load $file}]} {puts "found tclreadline !"}
+	#}
+	package require tclreadline
+	proc ::tclreadline::prompt1 {} {return "desire> "}
+	::tclreadline::Loop
+	#while {1} {
+	#	#set line [::tclreadline::readline read]
+	#	puts -nonewline "desire> "
+	#	flush stdout
+	#	set line [gets stdin]
+	#	if {[catch {puts [eval $line]}]} {
+	#		puts "error: $::errorInfo"
+	#	}
+	#}
+	#vwait foo
+}
+
+
 #lappend ::auto_path /usr/local/lib/graphviz
 catch {package require Tcldot}
 def Canvas graphviz_sort {} {
@@ -50,4 +76,3 @@ def Canvas graphviz_sort {} {
 		}
 	}
 }
-
