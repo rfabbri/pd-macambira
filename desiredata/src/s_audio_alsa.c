@@ -393,13 +393,13 @@ void alsa_printstate() {
     }
     if (sys_inchannels) {
         result = snd_pcm_delay(alsai.dev[i].a_handle, &indelay);
-        if (result<0) error("snd_pcm_delay 1 failed"); else post( "in delay %d",  indelay);
+        if (result<0) error("snd_pcm_delay 1 failed"); else post( "in delay %d", int( indelay));
     }
     if (sys_outchannels) {
         result = snd_pcm_delay(alsao.dev[i].a_handle, &outdelay);
-        if (result<0) error("snd_pcm_delay 2 failed"); else post("out delay %d", outdelay);
+        if (result<0) error("snd_pcm_delay 2 failed"); else post("out delay %d", int(outdelay));
     }
-    post("sum %d (%d mod 64)", indelay + outdelay, (indelay+outdelay)%64);
+    post("sum %ld (%ld mod 64)", indelay + outdelay, (indelay+outdelay)%64);
     post("buf samples %d", alsa_buf_samps);
 }
 

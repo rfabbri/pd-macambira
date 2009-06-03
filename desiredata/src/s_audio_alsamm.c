@@ -416,7 +416,7 @@ static void alsamm_start() {
       check_error(avail,"full buffer not available at start");
     }
     /* cleaning out mmap buffer before start */
-    if(debug&&sys_verbose) post("start: set mems for avail=%d,offset=%d at buffersize=%d",avail,offset,alsamm_buffer_size);
+    if(debug&&sys_verbose) post("start: set mems for avail=%ld,offset=%ld at buffersize=%ld",avail,offset,alsamm_buffer_size);
     if(avail > 0) {
       int comitted = 0;
       err = alsamm_get_channels(dev->a_handle, &avail, &offset, dev->a_channels,dev->a_addr);
@@ -424,11 +424,11 @@ static void alsamm_start() {
       for (int chn=0; chn<dev->a_channels; chn++) memset(dev->a_addr[chn],0,avail*ALSAMM_SAMPLEWIDTH_32);
       comitted = snd_pcm_mmap_commit (dev->a_handle, offset, avail);
       avail = snd_pcm_avail_update(dev->a_handle);
-      if(debug&&sys_verbose) post("start: now channels cleared, out with avail=%d, offset=%d,comitted=%d",avail,offset,comitted);
+      if(debug&&sys_verbose) post("start: now channels cleared, out with avail=%ld, offset=%ld,comitted=%d",avail,offset,comitted);
     }
     /* now start, should be autostarted */
     avail = snd_pcm_avail_update(dev->a_handle);
-    if(debug&&sys_verbose) post("start: finish start, out with avail=%d, offset=%d",avail,offset);
+    if(debug&&sys_verbose) post("start: finish start, out with avail=%ld, offset=%ld",avail,offset);
     /* we have no autostart so anyway start*/
     err = snd_pcm_start (dev->a_handle);
     if (err<0) check_error(err,"could not start playback");
@@ -444,16 +444,16 @@ static void alsamm_start() {
     ioffset = 0;
     iavail = snd_pcm_avail_update (dev->a_handle);
     /* cleaning out mmap buffer before start */
-    if (debug) post("start in: set in mems for avail=%d,offset=%d at buffersize=%d",iavail,ioffset,alsamm_buffer_size);
+    if (debug) post("start in: set in mems for avail=%ld,offset=%ld at buffersize=%ld",iavail,ioffset,alsamm_buffer_size);
     if (iavail > (snd_pcm_uframes_t) 0) {
-      if (debug) post("empty buffer not available at start, since avail %d != %d buffersize", iavail, alsamm_buffer_size);
+      if (debug) post("empty buffer not available at start, since avail %ld != %ld buffersize",iavail,alsamm_buffer_size);
       err = alsamm_get_channels(dev->a_handle, &iavail, &ioffset, dev->a_channels,dev->a_addr);
       if (err<0) {check_error(err,"getting in channelspointer failure ????"); continue;}
       snd_pcm_mmap_commit (dev->a_handle, ioffset, iavail);
       iavail = snd_pcm_avail_update (dev->a_handle);
-      if (debug) post("start in now avail=%d",iavail);
+      if (debug) post("start in now avail=%ld",iavail);
     }
-    if (debug) post("start: init inchannels with avail=%d, offset=%d",iavail,ioffset);
+    if (debug) post("start: init inchannels with avail=%ld, offset=%ld",iavail,ioffset);
     /* if devices are synced then dont need to start */
     /* start with autostart , but anyway start */
     if(dev->a_synced == 0) {
