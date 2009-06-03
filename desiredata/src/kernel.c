@@ -13,6 +13,7 @@
 
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
+using namespace desire;
 #include "m_simd.h"
 #include "config.h"
 #include <stdlib.h>
@@ -1585,6 +1586,7 @@ void pd_eval_text(const char *t, size_t size) {
 	binbuf_free(x);
 }
 
+namespace desire {
 void voprintf(ostream &buf, const char *s, va_list args) {
     char *b;
     vasprintf(&b,s,args);
@@ -1597,6 +1599,7 @@ void oprintf(ostream &buf, const char *s, ...) {
     voprintf(buf,s,args);
     va_end(args);
 }
+};//end namespace desire
 
 /* convert a binbuf to text; no null termination. */
 void binbuf_gettext(t_binbuf *x, char **bufp, int *lengthp) {

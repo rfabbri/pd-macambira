@@ -10,8 +10,8 @@
 */
 
 #define PD_PLUSPLUS_FACE
-#include "m_pd.h"
 #include "desire.h"
+using namespace desire;
 #include <ctype.h>
 #include <math.h>
 #include <stdarg.h>
@@ -1335,14 +1335,11 @@ t_array *garray_getarray(t_garray *x) {
     t_scalar *sc = x->scalar;
     t_template *t = template_findbyname(sc->t);
     TEMPLATE_CHECK(sc->t,0)
-    if (!template_find_field(t, gensym("z"), &zonset, &ztype, &zarraytype)) {
+    if (!template_find_field(t,gensym("z"),&zonset,&ztype,&zarraytype)) {
         error("template %s has no 'z' field", sc->t->name);
         return 0;
     }
-    if (ztype != DT_ARRAY) {
-        error("template %s, 'z' field is not an array", sc->t->name);
-        return 0;
-    }
+    if (ztype != DT_ARRAY) {error("template %s, 'z' field is not an array", sc->t->name); return 0;}
     return sc->v[zonset].w_array;
 }
 
@@ -1352,8 +1349,7 @@ static t_array *garray_getarray_floatonly(t_garray *x, int *yonsetp, int *elemsi
     int yonset, type;
     t_symbol *arraytype;
     t_template *t = template_findbyname(a->tsym);
-    if (!template_find_field(t,&s_y,&yonset,&type,&arraytype) || type != DT_FLOAT)
-            return 0;
+    if (!template_find_field(t,&s_y,&yonset,&type,&arraytype) || type != DT_FLOAT) return 0;
     *yonsetp = yonset;
     *elemsizep = a->elemsize;
     return a;
@@ -1365,7 +1361,6 @@ int garray_getname(t_garray *x, t_symbol **namep) {
     *namep = x->realname;
     return x->hidename;
 }
-
 
 /* if there is one garray in a graph, reset the graph's coordinates to fit a new size and style for the garray */
 static void garray_fittograph(t_garray *x, int n, int style) {

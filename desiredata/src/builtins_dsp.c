@@ -14,6 +14,7 @@ to reset the value.
 
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
+using namespace desire;
 #include "m_simd.h"
 #include <math.h>
 #include <stdio.h>

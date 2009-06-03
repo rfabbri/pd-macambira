@@ -9,6 +9,7 @@ that didn't really belong anywhere. */
 
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
+using namespace desire;
 #include "pthread.h"
 #include <sstream>
 #ifdef UNISTD

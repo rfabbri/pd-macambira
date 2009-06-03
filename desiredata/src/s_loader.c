@@ -19,6 +19,7 @@
 #include <string.h>
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
+using namespace desire;
 #include <stdio.h>
 #include <sstream>
 using namespace std;

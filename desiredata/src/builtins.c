@@ -6,6 +6,7 @@
 
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
+using namespace desire;
 #include <stdlib.h>
 #include <stdarg.h>
 #include <math.h>
