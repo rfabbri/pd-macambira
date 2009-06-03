@@ -10,7 +10,7 @@
 
 /* tb: requires portaudio >= V19 */
 
-#include "m_pd.h"
+#include "desire.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -239,9 +239,9 @@ static void pa_listdevs() {
         post("%d outputs ", pdi->maxOutputChannels);
         if (i == Pa_GetDefaultInputDevice())  post(" (Default Input)");
         if (i == Pa_GetDefaultOutputDevice()) post(" (Default Output)");
-        post("");
+        post("%s","");
     }
-    post("");
+    post("%s","");
     return;
  error:
     error("Error #%d occurred while using the portaudio stream: %s\n", err, Pa_GetErrorText(err));
