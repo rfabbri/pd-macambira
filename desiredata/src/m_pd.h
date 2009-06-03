@@ -145,7 +145,10 @@ typedef struct _class t_class;
 typedef struct _outlet t_outlet;
 typedef struct _inlet t_inlet;
 typedef struct _clock t_clock;
+typedef struct _gpointer t_gpointer;
 typedef struct _glist t_glist, t_canvas;
+typedef struct _symbol t_symbol;
+typedef struct _atom t_atom;
 
 #ifdef PD_PLUSPLUS_FACE
 struct t_pd {
@@ -155,7 +158,7 @@ struct t_pd {
 typedef t_class *t_pd;      /* pure datum: nothing but a class pointer */
 #endif
 
-typedef struct _symbol {
+struct _symbol {
     char *name;           /* the const string that represents this symbol */
     t_pd *thing;          /* pointer to the target of a receive-symbol or to the bindlist of several targets */
     struct _symbol *next; /* brochette of all symbols (only for permanent symbols) */
@@ -165,7 +168,7 @@ typedef struct _symbol {
     bool operator == (const char *s) const {return strcmp(this->name,s)==0;}
     bool operator != (const char *s) const {return strcmp(this->name,s);}
 #endif
-} t_symbol;
+};
 #define s_name  name
 #define s_thing thing
 #define s_next  next
@@ -250,7 +253,7 @@ typedef enum {
 
 #define A_DEFSYMBOL A_DEFSYM    /* better name for this */
 
-typedef struct _atom {
+struct _atom {
     t_atomtype a_type;
     union word a_w;
 #ifdef __cplusplus
@@ -259,7 +262,7 @@ typedef struct _atom {
     //bool operator == (_atom &o) {return a_type==o.a_type && a_w.w_index==o.a_w.w_index;}
     //bool operator != (_atom &o) {return a_type!=o.a_type || a_w.w_index!=o.a_w.w_index;}
 #endif
-} t_atom;
+};
 
 struct t_arglist {long c; t_atom v[0];};
 
@@ -522,10 +525,10 @@ EXTERN int gpointer_check(const t_gpointer *gp, int headok);
 /* ----------------- patchable "objects" -------------- */
 EXTERN t_inlet *inlet_new(t_object *owner, t_pd *dest, t_symbol *s1, t_symbol *s2);
 EXTERN t_inlet *pointerinlet_new(t_object *owner, t_gpointer *gp);
-EXTERN t_inlet *floatinlet_new(t_object *owner, t_float *fp);
-EXTERN t_inlet *symbolinlet_new(t_object *owner, t_symbol **sp);
-EXTERN t_inlet *stringinlet_new(t_object *owner, t_symbol **sp); /* for future use */
-EXTERN t_inlet *signalinlet_new(t_object *owner, t_float f);
+EXTERN t_inlet *floatinlet_new(  t_object *owner, t_float *fp);
+EXTERN t_inlet *symbolinlet_new( t_object *owner, t_symbol **sp);
+EXTERN t_inlet *stringinlet_new( t_object *owner, t_symbol **sp); /* for future use */
+EXTERN t_inlet *signalinlet_new( t_object *owner, t_float f);
 EXTERN void inlet_free(t_inlet *x);
 
 EXTERN t_outlet *outlet_new(t_object *owner, t_symbol *s);
@@ -653,17 +656,17 @@ typedef int (*t_loader)(t_canvas *canvas, char *classname);
 EXTERN void sys_register_loader(t_loader loader);
 
 /* ------------   printing --------------------------------- */
-EXTERN void post(const char *fmt, ...);
-EXTERN void startpost(const char *fmt, ...);
+EXTERN void post(const char *fmt, ...) __attribute__((format(printf,1,2)));
+EXTERN void startpost(const char *fmt, ...) __attribute__((format(printf,1,2)));
 EXTERN void poststring(const char *s);
 EXTERN void postfloat(float f);
 EXTERN void postatom(int argc, t_atom *argv);
 EXTERN void endpost(void);
-EXTERN void error(const char *fmt, ...);
+EXTERN void error(const char *fmt, ...) __attribute__((format(printf,1,2)));
 EXTERN void verror(const char *fmt, va_list args);
-EXTERN void verbose(int level, const char *fmt, ...);
-EXTERN void bug(const char *fmt, ...);
-EXTERN void pd_error(void *object, const char *fmt, ...) /*__attribute__ ((deprecated))*/;
+EXTERN void verbose(int level, const char *fmt, ...) __attribute__((format(printf,2,3)));
+EXTERN void bug(const char *fmt, ...) __attribute__((format(printf,1,2)));
+EXTERN void pd_error(void *object, const char *fmt, ...) __attribute__((format(printf,2,3))) /*__attribute__ ((deprecated))*/;
 EXTERN void sys_logerror(const char *object, const char *s);
 EXTERN void sys_unixerror(const char *object);
 EXTERN void sys_ouch(void);
