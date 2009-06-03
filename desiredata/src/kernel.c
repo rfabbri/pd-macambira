@@ -1150,15 +1150,18 @@ extern "C" t_symbol *symprintf(const char *s, ...) {
 bool symbol_lt (t_symbol *a, t_symbol *b) {return strcmp(a->name,b->name)<0;}
 
 void glob_symbol_table (t_pd *, float onlybound) {
+    post("symbol_table = {");
     std::vector<t_symbol *> all;
     for (size_t i=0; i<int(sizeof(symhash)/sizeof(*symhash)); i++) for (t_symbol *s=symhash[i]; s; s=s->next) all.push_back(s);
     sort(all.begin(),all.end(),symbol_lt);
     for (size_t i=0; i<all.size(); i++) {
         int j=0;
-	if (all[i]->thing) j++;
-	//if (all[i]->thing->_class==bindlist_class) j++;
-        if (j>0 || !onlybound) printf("  %0*lx: %s (%d)\n",2*sizeof(void*),long(all[i]),all[i]->name,j);
+	if (all[i]->thing) {
+	  if (all[i]->thing->_class==bindlist_class) j=2; else j=1;
+	}
+        if (j>0 || !onlybound) post("  %0*lx: %s (%d)",2*sizeof(void*),long(all[i]),all[i]->name,j);
     }
+    post("}");
 }
 
 static int tryingalready;
