@@ -1,6 +1,6 @@
 /* This is for compiling pd without any midi support. by matju, 2006.11.21 */
 
-#include "m_pd.h"
+#include "desire.h"
 
 void sys_do_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec) {}
 void sys_close_midi(void) {}

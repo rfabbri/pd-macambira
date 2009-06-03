@@ -7,7 +7,7 @@
 
 /* tb: requires portaudio >= V19 */
 
-#include "m_pd.h"
+#include "desire.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
