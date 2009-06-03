@@ -8684,10 +8684,10 @@ class_new OopsDialogue {Dialogue}
 
 def OopsDialogue init {sig1 sig2 where} {
 	super damn
-	wm title .$self "Oops..."
+	wm title .$self [say oops]
 	pack [label .$self.head -text $sig2 -font {Helvetica -14 bold}] -side top
-	pack [label .$self.note -text "This program has performed a silly operation and has been shut down."] -side top
-	pack [text .$self.text -yscrollcommand ".$self.scroll set" -width 80 -height 15] -side left -fill both -expand 1
+	pack [label .$self.note -text [say oops_text]] -side top
+	pack [text .$self.text -yscrollcommand ".$self.scroll set" -width 108 -height 15] -side left -fill both -expand 1
 	pack [scrollbar .$self.scroll -command ".$self.text yview"] -side right -fill y
 	.$self.text insert 0.0 $where
 }

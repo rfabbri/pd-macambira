@@ -554,7 +554,10 @@ say keyboarddialogfont "police du clavier virtuel"
 say keyboard_view "Clavier virtuel"
 say log_height "Log Height" ;#TODO
 say visual_diff "Visual diff" ;#TODO
-
-#....
-
 say auto "Auto"
+
+# 2009:
+
+say oops "Oupse..."
+say oops_text "Ce programme a effectué une opération niaiseuse et a été zigouillé."
+
