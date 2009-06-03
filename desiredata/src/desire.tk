@@ -1036,6 +1036,7 @@ after 0 {
 	    set gdb [open "| gdb --quiet 2&>1" w+]
 	    fconfigure $gdb -blocking 0 -buffering none
 	    puts $gdb "file \"$cmdline(server)\"" ;# bad quoting, sorry
+	    puts $gdb "set width 242"
 	    puts $gdb "run -guiport $server_port"
 	    puts $gdb "where"
 	    puts $gdb "quit"
@@ -8686,7 +8687,7 @@ def OopsDialogue init {sig1 sig2 where} {
 	wm title .$self "Oops..."
 	pack [label .$self.head -text $sig2 -font {Helvetica -14 bold}] -side top
 	pack [label .$self.note -text "This program has performed a silly operation and has been shut down."] -side top
-	pack [text .$self.text -yscrollcommand ".$self.scroll set" -width 72 -height 15] -side left -fill both -expand 1
+	pack [text .$self.text -yscrollcommand ".$self.scroll set" -width 80 -height 15] -side left -fill both -expand 1
 	pack [scrollbar .$self.scroll -command ".$self.text yview"] -side right -fill y
 	.$self.text insert 0.0 $where
 }
