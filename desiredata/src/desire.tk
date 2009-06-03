@@ -8155,18 +8155,15 @@ def ClientPrefsDialogue init {} {
 		switch $type { void { set type toggle }}
 		switch $type {
 			section {
-				$@nb add_section [incr section] [say $name]
+				incr section
+				$@nb add [ttk::notebook $@nb.$section] -text [say $name]
 				set which_section $f.$section
 				set which_self $self
 				set subsection 0
 			}
 			subsection {
-				set subself $self.1.$section.subsections
-				if {!$subsection} {
-					lappend @nbs [Notebook new_as $subself 590 300]
-					pack .$subself
-				}
-				$subself add_section [incr subsection] [say $name]
+				set subself $self.1.$section
+				.$subself add [frame .$subself.[incr subsection]] -text [say $name]
 				set which_section .$subself.$subsection
 				set which_self $subself
 			}
