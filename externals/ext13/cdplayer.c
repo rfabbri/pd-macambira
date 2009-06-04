@@ -1,4 +1,4 @@
-#ifdef LINUX
+#ifdef __gnu_linux__
 
 #include "ext13.h"
 #include "m_pd.h"

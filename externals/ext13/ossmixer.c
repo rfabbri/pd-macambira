@@ -1,5 +1,5 @@
 
-#ifdef LINUX
+#ifdef __gnu_linux__
 
 #include "ext13.h"
 #include "m_pd.h"
@@ -34,7 +34,7 @@ typedef struct _ossmixer
 
 static void *ossmixer_new(t_floatarg f)
 {
-    char* devicename;
+    char devicename[FILENAME_MAX];
     int fd = -1;
     t_ossmixer *x = (t_ossmixer *)pd_new(ossmixer_class);
     outlet_new(&x->x_obj, &s_bang);

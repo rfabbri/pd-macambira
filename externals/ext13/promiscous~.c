@@ -1,4 +1,4 @@
-#ifdef LINUX
+#ifdef __gnu_linux__
 // find a replacement for <linux/if_packet.h>
 // then this will work on other UNIXes
 
