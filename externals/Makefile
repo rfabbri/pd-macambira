@@ -61,7 +61,7 @@ ifeq ($(OS_NAME),darwin)
 endif
 ifeq ($(OS_NAME),linux)
   CFLAGS += -I$(externals_src)/pdp/include -DUNIX -Dunix -DDL_OPEN -fPIC
-  LDFLAGS += -Wl,-export_dynamic  -shared
+  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
   LIBS += -lc
   DYLIB_LDFLAGS = $(LDFLAGS)
   STRIP = strip --strip-unneeded -R .note -R .comment
