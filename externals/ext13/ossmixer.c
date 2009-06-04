@@ -40,15 +40,15 @@ static void *ossmixer_new(t_floatarg f)
     outlet_new(&x->x_obj, &s_bang);
     x->x_out1 = outlet_new(&x->x_obj, &s_symbol);
     sprintf(devicename,"/dev/mixer%d",(int)f);
-    x->device = gensym(devicename);
-/*    x->device = gensym ("/dev/mixer");*/
+//    x->device = gensym(devicename);
+    x->device = gensym ("/dev/mixer");
     fd = open(x->device->s_name, O_WRONLY);
     if (fd < 0){
        post ("ossmixer: could not open %s",x->device->s_name);
        x->device = gensym("/dev/mixer");
        close (fd);
     }else{
-       post ("ossmixer: device set to %s",devicename);
+       post ("ossmixer: device set to %s",x->device->s_name);
     }
     close(fd);
     return (x);
@@ -56,7 +56,7 @@ static void *ossmixer_new(t_floatarg f)
 
 static void ossmixer_set_device(t_ossmixer *x, t_floatarg f)
 {
-   char* devicename;
+   char devicename[FILENAME_MAX];
    int fd = -1;
    sprintf(devicename,"/dev/mixer%d",(int)f);
    x->device = gensym(devicename);
