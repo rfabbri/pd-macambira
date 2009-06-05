@@ -1746,10 +1746,6 @@ motex: $(MOTEX_OBJECTS:.c=.$(EXTENSION))
 
 motex_install: motex
 	install -d $(objectsdir)/$(MOTEX_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MOTEX_NAME) \
-		--author "Iain Mott <iain.mott@bigpond.com>" \
-		--license "GNU GPL" \
-		--version "1.1.3-cvs"
 	install -p $(MOTEX_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MOTEX_NAME)
 	install -p $(externals_src)/motex/noisegate~.pd $(objectsdir)/$(MOTEX_NAME)
 	install -d $(helpdir)/$(MOTEX_NAME)
