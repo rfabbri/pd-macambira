@@ -8,7 +8,7 @@ LIBRARY_NAME = $(shell basename $(PWD))
 
 CFLAGS = -DPD -I../../pd/src -Wall -W -g
 LDFLAGS =  
-LIBS = -lm
+LIBS = 
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
@@ -67,3 +67,6 @@ clean:
 dist:
 	cd .. && tar cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
 
+
+etags:
+	etags *.[ch] ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h

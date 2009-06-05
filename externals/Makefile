@@ -705,12 +705,9 @@ ext13_test:
 
 ext13_install: ext13
 	install -d $(objectsdir)/$(EXT13_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(EXT13_NAME) \
-		--author "d13@klingt.org" \
-		--version "0.17"
 	install -p $(EXT13_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(EXT13_NAME)
 	install -d $(helpdir)/$(EXT13_NAME)
-	install -p $(wildcard $(externals_src)/ext13/doc/*.pd) \
+	install -p $(wildcard $(externals_src)/ext13/*.pd) \
 		$(helpdir)/$(EXT13_NAME)
 #	install -d $(manualsdir)/$(EXT13_NAME)
 	install -d $(readmesdir)
