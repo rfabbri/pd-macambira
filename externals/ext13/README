@@ -8,23 +8,16 @@ there`s no warranty for anything.
 --------compile------------
 ext13 is developed and tested in linux.
 if you need it for another platform, you have to do the work to port it
-to compile it do  
-./configure
-or ./configure --prefix=/usr/lib (or similar) for a path other than /usr/local
+to compile it to get a seperate file for each object (.pd_linux):
+
+make clean
 make
 
 
-to get a seperate externalfile (.pd_linux) for every external, or
+make dist
 
-./configure
-make clean
-make ext13
-to get a single library for all externals.
-
-make install 
-will put the externals in /path/to/pd/externs/
-and the helpfiles in /path/to/pd/doc/5.manual/
-
+will make a tarball of a libdir which can be dropped into place anywhere in
+Pd's path.
 
 don`t forget to put the files in your pd-path or do a 
 -lib /path/to/ext13
