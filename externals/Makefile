@@ -75,7 +75,7 @@ ifeq ($(OS_NAME),windows)
 #	-D'MAP_PRIVATE=2' \
 #	-D'O_NDELAY=O_NONBLOCK'
   CFLAGS += -mms-bitfields -DMSW -DNT $(WINDOWS_HACKS)
-  LDFLAGS += -shared
+  LDFLAGS += -s -shared
 # all of these included libs are part of libc in UNIX platforms.  All except
 # libregex are in DLLs, so they get stripped from the external's .dll binary
   LIBS += -L$(pd_src)/bin  -L$(pd_src)/obj  -lpd \
@@ -1740,27 +1740,14 @@ moonlib_clean:
 
 #------------------------------------------------------------------------------#
 # MOTEX
-MOTEX_NAME=motex
-MOTEX_OBJECTS := $(wildcard $(externals_src)/motex/*.c)
-motex: $(MOTEX_OBJECTS:.c=.$(EXTENSION))
+motex:
+	make -C $(externals_src)/motex
 
-motex_install: motex
-	install -d $(objectsdir)/$(MOTEX_NAME)
-	install -p $(MOTEX_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MOTEX_NAME)
-	install -p $(externals_src)/motex/noisegate~.pd $(objectsdir)/$(MOTEX_NAME)
-	install -d $(helpdir)/$(MOTEX_NAME)
-	install -p $(wildcard $(externals_src)/motex/*-help.pd) \
-		$(helpdir)/$(MOTEX_NAME)
-#	install -d $(manualsdir)/$(MOTEX_NAME)
-	install -d $(readmesdir)
-	install -p $(externals_src)/motex/README \
-		$(readmesdir)/$(MOTEX_NAME).txt
+motex_install:
+	make -C $(externals_src)/motex objectsdir="$(objectsdir)" install
 
 motex_clean:
-	-rm -f -- $(externals_src)/motex/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/motex/*.o
-	-rm -f -- $(externals_src)/motex/*.bak
-	-rm -f -- $(externals_src)/motex/*.*~
+	make -C $(externals_src)/motex clean
 
 
 

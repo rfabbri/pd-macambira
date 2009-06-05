@@ -4,7 +4,7 @@
 
 SOURCES = getenv.c ln~.c pansig~.c pan~.c pol2rec~.c polygate~.c rec2pol~.c shuffle.c system.c
 
-LIBRARY_NAME = $(shell basename $(PWD))
+LIBRARY_NAME := $(shell basename `pwd`)
 
 pd_src = ../../pd
 objectsdir = $(pd_src)/extra
@@ -49,6 +49,7 @@ endif
 CFLAGS += $(OPT_CFLAGS)
 
 
+.PHONY = install libdir_install single_install install-doc install-exec clean dist etags
 
 all: $(SOURCES:.c=.$(EXTENSION))
 
@@ -68,17 +69,18 @@ $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
 	$(STRIP) $(LIBRARY_NAME).$(EXTENSION)
 	rm -f -- $*.o
 
+
 install: libdir_install
 
 # The meta and help files are explicitly installed to make sure they are
 # actually there.  Those files are not optional, then need to be there.
-libdir_install: install-doc install-exec
+libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-exec
 	install -d $(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(LIBRARY_NAME)-meta.pd $(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(SOURCES:.c=.$(EXTENSION)) $(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
-single_install: install-doc install-exec
+single_install: $(LIBRARY_NAME) install-doc install-exec
 	install -d $(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(LIBRARY_NAME).$(EXTENSION) $(objectsdir)/$(LIBRARY_NAME)
 
