@@ -1,7 +1,10 @@
-
-LIBRARY_NAME = $(shell basename $(PWD))
+# to use this Makefile for your project, you should only need to add your
+# source files to the SOURCES variable.  For objects that only build on
+# certain platforms, add those to the SOURCES line for the right platforms.
 
 SOURCES = catch13~.c ext13.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mandelbrot.c messages.c openpatch.c ossmixer.c piperead~.c pipewrite~.c receive13~.c receive13.c scramble~.c send13~.c send13.c sfread.c sfwrite13~.c streamin13~.c streamout13~.c strippath.c throw13~.c wavinfo.c 
+
+LIBRARY_NAME = $(shell basename $(PWD))
 
 CFLAGS = -DPD -I../../pd/src -Wall -W -g
 LDFLAGS =  
@@ -33,19 +36,10 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   EXTENSION = dll
   OS = windows
   OPT_CFLAGS = -03 -funroll-loops -fomit-frame-pointer
-  WINDOWS_HACKS = -D'O_NONBLOCK=1' -D'srand48(n)=srand((n))' \
-    -D'drand48()=((double)rand()/RAND_MAX)' -D'bzero(p,n)=memset(p,0,n)'
-# These don't seem to be needed:
-#	-D'PROT_READ=1' \
-#	-D'MAP_PRIVATE=2' \
-#	-D'O_NDELAY=O_NONBLOCK'
-  CFLAGS += -mms-bitfields -DMSW -DNT $(WINDOWS_HACKS)
+  WINDOWS_HACKS = -D'O_NONBLOCK=1'
+  CFLAGS += -mms-bitfields $(WINDOWS_HACKS)
   LDFLAGS += -shared
-# all of these included libs are part of libc in UNIX platforms.  All except
-# libregex are in DLLs, so they get stripped from the external's .dll binary
-  LIBS += -L$(pd_src)/bin  -L$(pd_src)/obj  -lpd \
-    -lwsock32 -lpthreadGC2 -lkernel32 -luser32 -lgdi32 -lregex
-  DYLIB_LDFLAGS = -shared
+  LIBS += -L$(pd_src)/bin -L$(pd_src)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
   STRIP = strip --strip-unneeded -R .note -R .comment
 endif
 
