@@ -2,7 +2,7 @@
 # source files to the SOURCES variable.  For objects that only build on
 # certain platforms, add those to the SOURCES line for the right platforms.
 
-SOURCES = catch13~.c ext13.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mandelbrot.c messages.c openpatch.c ossmixer.c piperead~.c pipewrite~.c receive13~.c receive13.c scramble~.c send13~.c send13.c sfread.c sfwrite13~.c streamin13~.c streamout13~.c strippath.c throw13~.c wavinfo.c 
+SOURCES = catch13~.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mandelbrot.c messages.c openpatch.c ossmixer.c piperead~.c pipewrite~.c receive13~.c receive13.c scramble~.c send13~.c send13.c sfread.c sfwrite13~.c streamin13~.c streamout13~.c strippath.c throw13~.c wavinfo.c 
 
 LIBRARY_NAME = $(shell basename $(PWD))
 
@@ -50,6 +50,12 @@ CFLAGS += $(OPT_CFLAGS)
 
 
 all: $(SOURCES:.c=.$(EXTENSION))
+
+$(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
+	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(LIBS)
+	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
+	$(STRIP) $(LIBRARY_NAME).$(EXTENSION)
+	rm -f -- $*.o
 
 %.o: %.c
 	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
