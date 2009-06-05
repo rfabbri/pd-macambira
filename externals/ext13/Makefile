@@ -17,16 +17,12 @@ ifeq ($(UNAME),Darwin)
   SOURCES += 
   EXTENSION = pd_darwin
   OS = macosx
-  CFLAGS += -fPIC
   OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
-  LDFLAGS += -bundle -undefined dynamic_lookup
+  FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
+  CFLAGS += -fPIC $(FAT_FLAGS)
+  LDFLAGS += -bundle -undefined dynamic_lookup $(FAT_FLAGS)
   LIBS += -lc 
   STRIP = strip -x
-  ifeq ($(shell uname -m),i386)
-    OPT_CFLAGS += -march=pentium-m
-  else
-    OPT_CFLAGS += -march=7400
-  endif
  endif
 ifeq ($(UNAME),Linux)
   SOURCES += cdplayer.c ossmixer.c promiscous~.c
