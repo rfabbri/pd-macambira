@@ -55,6 +55,7 @@ all:
 install: 
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) install
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) doc_format
+	find $(DESTDIR) -name \*.pd -print0 | xargs -0 chmod a-x
 	@echo " "
 	@echo "linux_make install succeeded!"
 
@@ -64,9 +65,9 @@ install:
 #
 #==============================================================================#
 
-package: $(PACKAGE_TYPE)
-
 PACKAGE_NAME = Pd-$(PD_VERSION)
+
+package: $(PACKAGE_TYPE)
 
 
 tarbz2: installer_makefile installer_readme
