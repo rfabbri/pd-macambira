@@ -6,7 +6,9 @@ SOURCES = catch13~.c ext13.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mande
 
 LIBRARY_NAME = $(shell basename $(PWD))
 
-CFLAGS = -DPD -I../../pd/src -Wall -W -g
+pd_src = ../../pd
+
+CFLAGS = -DPD -I$(pd_src)/src -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
@@ -20,6 +22,11 @@ ifeq ($(UNAME),Darwin)
   LDFLAGS += -bundle -undefined dynamic_lookup
   LIBS += -lc 
   STRIP = strip -x
+  ifeq ($(shell uname -m),i386)
+    OPT_CFLAGS += -march=pentium-m
+  else
+    OPT_CFLAGS += -march=7400
+  endif
  endif
 ifeq ($(UNAME),Linux)
   SOURCES += cdplayer.c ossmixer.c promiscous~.c
@@ -35,10 +42,9 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   SOURCES += 
   EXTENSION = dll
   OS = windows
-  OPT_CFLAGS = -03 -funroll-loops -fomit-frame-pointer
-  WINDOWS_HACKS = -D'O_NONBLOCK=1'
-  CFLAGS += -mms-bitfields $(WINDOWS_HACKS)
-  LDFLAGS += -shared
+  OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -march=i686 -mtune=pentium4
+  CFLAGS += -mms-bitfields
+  LDFLAGS += -s -shared
   LIBS += -L$(pd_src)/bin -L$(pd_src)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
   STRIP = strip --strip-unneeded -R .note -R .comment
 endif
