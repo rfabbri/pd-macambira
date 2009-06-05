@@ -67,7 +67,7 @@ clean:
 
 
 dist:
-	cd .. && tar cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
+	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
 
 
 etags:
