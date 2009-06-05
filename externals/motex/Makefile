@@ -1,0 +1,80 @@
+# to use this Makefile for your project, you should only need to add your
+# source files to the SOURCES variable.  For objects that only build on
+# certain platforms, add those to the SOURCES line for the right platforms.
+
+SOURCES = getenv.c ln~.c pansig~.c pan~.c pol2rec~.c polygate~.c rec2pol~.c shuffle.c system.c
+
+LIBRARY_NAME = $(shell basename $(PWD))
+
+pd_src = ../../pd
+
+CFLAGS = -DPD -I$(pd_src)/src -Wall -W -g
+LDFLAGS =  
+LIBS = 
+
+UNAME := $(shell uname -s)
+ifeq ($(UNAME),Darwin)
+  SOURCES += 
+  EXTENSION = pd_darwin
+  OS = macosx
+  OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
+  FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
+  CFLAGS += -fPIC $(FAT_FLAGS)
+  LDFLAGS += -bundle -undefined dynamic_lookup $(FAT_FLAGS)
+  LIBS += -lc 
+  STRIP = strip -x
+ endif
+ifeq ($(UNAME),Linux)
+  SOURCES += 
+  EXTENSION = pd_linux
+  OS = linux
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += -fPIC
+  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+endif
+ifeq (MINGW,$(findstring MINGW,$(UNAME)))
+  SOURCES += 
+  EXTENSION = dll
+  OS = windows
+  OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -march=i686 -mtune=pentium4
+  CFLAGS += -mms-bitfields
+  LDFLAGS += -s -shared
+  LIBS += -L$(pd_src)/bin -L$(pd_src)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
+  STRIP = strip --strip-unneeded -R .note -R .comment
+endif
+
+CFLAGS += $(OPT_CFLAGS)
+
+
+
+all: $(SOURCES:.c=.$(EXTENSION))
+
+%.o: %.c
+	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+
+%.$(EXTENSION): %.o
+	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS)
+	chmod a-x "$*.$(EXTENSION)"
+	$(STRIP) $*.$(EXTENSION)
+	rm -f -- $*.o
+
+$(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
+	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(LIBS)
+	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
+	$(STRIP) $(LIBRARY_NAME).$(EXTENSION)
+	rm -f -- $*.o
+
+
+clean:
+	-rm -f -- $(SOURCES:.c=.o)
+	-rm -f -- $(SOURCES:.c=.$(EXTENSION))
+
+
+dist:
+	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
+
+
+etags:
+	etags *.[ch] ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
