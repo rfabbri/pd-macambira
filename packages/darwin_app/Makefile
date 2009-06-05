@@ -210,7 +210,9 @@ dmg: pdp_help_hack
 # To enable the local image icon
 	/Developer/Tools/SetFile -a C /Volumes/$(VOLUME_NAME)/.VolumeIcon.icns \
 		/Volumes/$(VOLUME_NAME)
-	chmod -R a-w "/Volumes/$(VOLUME_NAME)/$(PD_APP_NAME).app/Contents/Resources/doc"
+	$(MAKE) -C $(packages_src) \
+		DESTDIR="/Volumes/$(VOLUME_NAME)/$(PD_APP_NAME).app/Contents/Resources" doc_format
+	chmod -R a-w "/Volumes/$(VOLUME_NAME)/$(PD_APP_NAME).app/Contents/Resources"
 	hdiutil detach `mount | grep $(VOLUME_NAME) | cut -d ' ' -f 1`
 	hdiutil convert -format UDZO -o "$(PACKAGE_NAME).dmg" build.dmg
 	rm -f build.dmg

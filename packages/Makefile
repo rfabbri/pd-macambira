@@ -224,10 +224,11 @@ $(gem_src)/src/Gem.pd_darwin:
 	cd $(gem_src)/src && aclocal
 	cd $(gem_src)/src && autoconf
 	cd $(gem_src)/src && ./configure \
-		--without-x --without-ImageMagick \
+		--without-x --without-ImageMagick --without-v4l \
 		--without-tiff --without-jpeg --without-mpeg --without-mpeg3 \
 		--without-ieee1394 --without-aviplay --without-avifile --without-ffmpeg \
 		--with-ftgl-includes=/sw/include --with-ftgl-libs=/sw/lib \
+		--with-artoolkit-includes=/sw/include --with-artoolkit-libs=/sw/lib \
 		--with-pd=$(pd_src)
 	$(MAKE) -C $(gem_src)/src
 
@@ -439,25 +440,12 @@ endif
 
 
 #----------------------------------------------------------------------------
-# DOC_FORMAT
+# clean up the documentation before packaging
 doc_format:
 # clean out cruft files
 	-find $(DESTDIR) -name .DS_Store -delete
 	-find $(DESTDIR) -name '*.*.bak' -delete
-# run script to move help-*.pd files to *-help.pd according to the standard
-	cd $(helpdir) && \
-		$(scripts_src)/convert-help-to-standard.sh
-
-
-
-#----------------------------------------------------------------------------
-# STRIP_HACK
-# not all of the build systems are stripping the externals, so strip them here.
-# Gem, xsample, and some other things don't like to be stripped
-strip_hack:
-	$(STRIP) $(objectsdir)/*/*.$(EXTENSION)
-	$(STRIP) $(objectsdir)/[A-FH-Za-wyz]*.$(EXTENSION)
-
+	-find $(DESTDIR) -name .svn -print0 | xargs -0 rm -rf
 
 
 #==============================================================================#
