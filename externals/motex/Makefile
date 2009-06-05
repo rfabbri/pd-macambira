@@ -7,6 +7,7 @@ SOURCES = getenv.c ln~.c pansig~.c pan~.c pol2rec~.c polygate~.c rec2pol~.c shuf
 LIBRARY_NAME = $(shell basename $(PWD))
 
 pd_src = ../../pd
+objectsdir = $(pd_src)/extra
 
 CFLAGS = -DPD -I$(pd_src)/src -Wall -W -g
 LDFLAGS =  
@@ -60,16 +61,43 @@ all: $(SOURCES:.c=.$(EXTENSION))
 	$(STRIP) $*.$(EXTENSION)
 	rm -f -- $*.o
 
+# this links everything into a single binary file
 $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
 	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(LIBS)
 	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
 	$(STRIP) $(LIBRARY_NAME).$(EXTENSION)
 	rm -f -- $*.o
 
+install: libdir_install
+
+# The meta and help files are explicitly installed to make sure they are
+# actually there.  Those files are not optional, then need to be there.
+libdir_install: install-doc install-exec
+	install -d $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(LIBRARY_NAME)-meta.pd $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(SOURCES:.c=.$(EXTENSION)) $(objectsdir)/$(LIBRARY_NAME)
+
+# install library linked as single binary
+single_install: install-doc install-exec
+	install -d $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(LIBRARY_NAME).$(EXTENSION) $(objectsdir)/$(LIBRARY_NAME)
+
+install-doc:
+	install -d $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(SOURCES:.c=-help.pd) $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(wildcard *.pd) $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p README $(objectsdir)/$(LIBRARY_NAME)/README.txt
+	install -m644 -p LICENCE $(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
+
+install-exec:
+	install -d $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(wildcard *.pd) $(objectsdir)/$(LIBRARY_NAME)
+
 
 clean:
 	-rm -f -- $(SOURCES:.c=.o)
 	-rm -f -- $(SOURCES:.c=.$(EXTENSION))
+	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
 
 
 dist:
