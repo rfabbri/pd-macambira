@@ -107,7 +107,7 @@ static int streamin13_listen(t_streamin13 *x,int portno)
         server.sin_family = AF_INET;
         server.sin_addr.s_addr = INADDR_ANY;
 
-    #if defined(UNIX) || defined(unix)
+    #if defined(__linux__) || defined(__APPLE__)
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
         post("setsockopt failed\n");
     #endif

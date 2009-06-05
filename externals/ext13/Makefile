@@ -15,7 +15,7 @@ ifeq ($(UNAME),Darwin)
   SOURCES += 
   EXTENSION = pd_darwin
   OS = macosx
-  CFLAGS += -DUNIX -fPIC
+  CFLAGS += -fPIC
   OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
   LDFLAGS += -bundle -undefined dynamic_lookup
   LIBS += -lc 
@@ -26,7 +26,7 @@ ifeq ($(UNAME),Linux)
   EXTENSION = pd_linux
   OS = linux
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-  CFLAGS += -DUNIX -fPIC
+  CFLAGS += -fPIC
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
   LIBS += -lc
   STRIP = strip --strip-unneeded -R .note -R .comment
