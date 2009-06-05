@@ -22,26 +22,18 @@ WISH_NAME := $(shell ( test -d $(WISH_SOURCE)/Wish.app && echo Wish) \
 WISH = "$(WISH_SOURCE)/$(WISH_NAME).app"
 WISH_CONTENTS = "$(WISH)/Contents"
 
-# which CPU to compile for
-TARGET_PLATFORM := $(shell uname -p)
-
 # CPU-specific gleaned from:
 # http://developer.apple.com/releasenotes/DeveloperTools/RN-GCC4/
 # http://hpc.sourceforge.net/
-# 10.3 uses gcc 3.3, and 10.3 only runs on PowerPC
-GCC_VERSION := $(shell gcc -dumpversion)
-ifeq ($(GCC_VERSION),3.3)
-OPT_CFLAGS += -O3 -funroll-loops -fomit-frame-pointer -march=powerpc -mtune=G3
-else
-# auto-vectorization in GCC 4.x for CPUs with SIMD
-OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 \
-	-fast -fPIC -mcpu=7450 -mtune=7450
-endif
 
-# Mac/Intels only run 10.4, so always gcc 4.x
+OPT_CFLAGS = -fast -fPIC -ftree-vectorize -ftree-vectorizer-verbose=2
+
+# which CPU to compile for
+TARGET_PLATFORM := $(shell uname -p)
 ifeq ($(TARGET_PLATFORM),i386)
-OPT_CFLAGS = -fast -fPIC -march=pentium4 -msse2 -mfpmath=sse \
-	-ftree-vectorize -ftree-vectorizer-verbose=2
+  OPT_CFLAGS += -march=pentium4 -msse3 -mfpmath=sse
+else
+  OPT_CFLAGS += -mcpu=7400 -mtune=7400
 endif
 
 OPT_FLAGS += -DDEBUG_SOUNDFILE
