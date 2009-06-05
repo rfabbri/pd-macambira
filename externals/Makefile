@@ -690,35 +690,14 @@ ekext_clean:
 
 #------------------------------------------------------------------------------#
 # EXT13
-EXT13_NAME=ext13
-# openpatch and sfread.c doesn't compile, so exclude them
-EXT13_FILES = catch13~.c kalashnikov.c ossmixer.c receive13~.c sfwrite13~.c \
-wavinfo.c cdplayer.c mandelbrot.c piperead~.c scramble~.c streamin13~.c \
-mandelbrot~.c pipewrite~.c send13.c streamout13~.c filesize.c messages.c \
-promiscous~.c send13~.c strippath.c ftos.c receive13.c throw13~.c
-EXT13_OBJECTS = $(patsubst %,$(externals_src)/ext13/%,$(EXT13_FILES))
-ext13: $(EXT13_OBJECTS:.c=.$(EXTENSION))
+ext13:
+	make -C $(externals_src)/ext13
 
-ext13_test:
-	@echo "objects: $(EXT13_OBJECTS)"
-
-
-ext13_install: ext13
-	install -d $(objectsdir)/$(EXT13_NAME)
-	install -p $(EXT13_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(EXT13_NAME)
-	install -d $(helpdir)/$(EXT13_NAME)
-	install -p $(wildcard $(externals_src)/ext13/*.pd) \
-		$(helpdir)/$(EXT13_NAME)
-#	install -d $(manualsdir)/$(EXT13_NAME)
-	install -d $(readmesdir)
-	install -p $(externals_src)/ext13/README \
-		$(readmesdir)/$(EXT13_NAME).txt
+ext13_install:
+	make -C $(externals_src)/ext13 objectsdir="$(objectsdir)" install
 
 ext13_clean:
-	-rm -f -- $(externals_src)/ext13/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/ext13/*.o
-	-rm -f -- $(externals_src)/ext13/*.bak
-	-rm -f -- $(externals_src)/ext13/*.*~
+	make -C $(externals_src)/ext13 clean
 
 
 

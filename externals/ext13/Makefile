@@ -4,9 +4,10 @@
 
 SOURCES = catch13~.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mandelbrot.c messages.c openpatch.c piperead~.c pipewrite~.c receive13~.c receive13.c scramble~.c send13~.c send13.c sfwrite13~.c streamin13~.c streamout13~.c strippath.c throw13~.c wavinfo.c 
 
-LIBRARY_NAME = $(shell basename $(PWD))
+LIBRARY_NAME := $(shell basename `pwd`)
 
 pd_src = ../../pd
+objectsdir = $(pd_src)/extra
 
 CFLAGS = -DPD -I$(pd_src)/src -Wall -W -g
 LDFLAGS =  
@@ -49,6 +50,7 @@ endif
 CFLAGS += $(OPT_CFLAGS)
 
 
+.PHONY = install libdir_install single_install install-doc install-exec clean dist etags
 
 all: $(SOURCES:.c=.$(EXTENSION))
 
@@ -61,6 +63,7 @@ all: $(SOURCES:.c=.$(EXTENSION))
 	$(STRIP) $*.$(EXTENSION)
 	rm -f -- $*.o
 
+# this links everything into a single binary file
 $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
 	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(LIBS)
 	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
@@ -68,9 +71,37 @@ $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
 	rm -f -- $*.o
 
 
+install: libdir_install
+
+# The meta and help files are explicitly installed to make sure they are
+# actually there.  Those files are not optional, then need to be there.
+libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-exec
+	install -d $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(LIBRARY_NAME)-meta.pd $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(SOURCES:.c=.$(EXTENSION)) $(objectsdir)/$(LIBRARY_NAME)
+
+# install library linked as single binary
+single_install: $(LIBRARY_NAME) install-doc install-exec
+	install -d $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(LIBRARY_NAME).$(EXTENSION) $(objectsdir)/$(LIBRARY_NAME)
+
+install-doc:
+	install -d $(objectsdir)/$(LIBRARY_NAME)
+#	install -m644 -p $(SOURCES:.c=-help.pd) $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(wildcard *.pd) $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p README $(objectsdir)/$(LIBRARY_NAME)/README.txt
+	install -m644 -p VERSION $(objectsdir)/$(LIBRARY_NAME)/VERSION
+	install -m644 -p CHANGES $(objectsdir)/$(LIBRARY_NAME)/CHANGES.txt
+
+install-exec:
+	install -d $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(wildcard *.pd) $(objectsdir)/$(LIBRARY_NAME)
+
+
 clean:
 	-rm -f -- $(SOURCES:.c=.o)
 	-rm -f -- $(SOURCES:.c=.$(EXTENSION))
+	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
 
 
 dist:
