@@ -364,3 +364,26 @@ Source: build\msvcr71.dll; DestDir: {sys}; Flags: restartreplace uninsneverunins
 ;Source: build\portaudio\*.*; DestDir: {app}\portaudio; Flags: ignoreversion recursesubdirs
 ;Source: build\src\*.*; DestDir: {app}\src; Flags: ignoreversion recursesubdirs
 ;Source: build\tcl\*.*; DestDir: {app}\tcl; Flags: ignoreversion recursesubdirs
+
+[Code]
+function NextButtonClick(CurPageID: Integer): Boolean;
+var
+  ResultCode: Integer;
+begin
+  case CurPageID of
+    wpReady:
+      begin
+		if(FileExists(ExpandConstant('{app}\unins000.exe')) AND FileExists(ExpandConstant('{app}\bin\pd.exe'))) then begin
+			if MsgBox('Found a previous Version of Pure Data at ' + ExpandConstant('{app} ') + #13#13 'Do you want to uninstall it first? (recommended)', mbConfirmation, MB_YESNO) = idYes then begin
+			if not Exec(ExpandConstant('{app}\unins000.exe'), '', '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then
+            MsgBox('NextButtonClick:' #13#13 'The uninstall file could not be executed. ' + SysErrorMessage(ResultCode) + '.', mbError, MB_OK);
+			end;
+		end;
+        BringToFrontAndRestore();
+        MsgBox('NextButtonClick:' #13#13 'The normal installation will now start.', mbInformation, MB_OK);
+      end;
+  end;
+
+  Result := True;
+end;
+
