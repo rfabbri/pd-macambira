@@ -553,7 +553,7 @@ if {$tk} {
 	}
 
 
-	set main [string toupper [info script] 0 0]
+	set main [. cget -class]
 	set ::current_window .
 	bind $main    <FocusIn> {set ::current_window %W}
 	bind Toplevel <FocusIn> {set ::current_window %W}
@@ -8202,14 +8202,8 @@ def ClientPrefsDialogue init {} {
 		}
 	}
 }
-def ClientPrefsDialogue dropmenu_set {frame var part val} {
-	set @$var $part
-	# set _($self:${var}2) [say $part]
-	$frame.butt configure -text [say $part]
-}
-def ClientPrefsDialogue dropmenu_open {f name} {
-	super $f
-}
+def ClientPrefsDialogue dropmenu_set {frame var part val} {set @$var $part; $frame.butt configure -text [say $part]}
+def ClientPrefsDialogue dropmenu_open {f name} {super $f}
 
 ############ find dialog ###########
 
