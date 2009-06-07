@@ -6647,9 +6647,9 @@ t_pd *pd_new3(const char *s) {
 extern "C" void boxes_init() {
     t_class *c;
     c =      boxes_class = class_new2("__boxes"     ,0/*boxes_new*/     ,     boxes_free,sizeof(t_boxes),CLASS_GOBJ,"");
-    class_setnotice(c,boxes_notice);
+    class_setnotice(c,t_notice(boxes_notice));
     c = gop_filtre_class = class_new2("__gop_filtre",0/*gop_filtre_new*/,gop_filtre_free,sizeof(t_boxes),CLASS_GOBJ,"");
-    class_setnotice(c,gop_filtre_notice);
+    class_setnotice(c,t_notice(gop_filtre_notice));
 }
 
 static void desire_setup() {
