@@ -16,7 +16,7 @@
 #X msg 103 233 vis 0;
 #X obj 33 252 outlet;
 #X obj 344 40 loadbang;
-#X obj 344 87 s2l-explode;
+#X obj 344 87 symbol-explode;
 #X obj 344 113 list split 30;
 #X obj 344 223 list-l2s;
 #X obj 381 144 list-l2s;

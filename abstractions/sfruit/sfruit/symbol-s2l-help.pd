@@ -1,6 +1,6 @@
 #N canvas 854 366 442 210 10;
-#X obj 44 81 s2l-explode;
-#X text 2 6 [s2l-explode] splits a symbol into individual characters
+#X obj 44 81 symbol-explode;
+#X text 2 6 [symbol-explode] splits a symbol into individual characters
 ;
 #X msg 44 52 Supercalifragilisticexpialidocious;
 #X obj 44 107 prepent set;

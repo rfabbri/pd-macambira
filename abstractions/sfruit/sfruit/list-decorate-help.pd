@@ -2,7 +2,7 @@
 
 
 
-#X obj 58 181 list-proc-insert;
+#X obj 58 181 list-decorate;
 #X msg 58 96 a b c d e f g;
 #X obj 182 181 list-len;
 #X obj 104 130 hradio 15 1 0 8 empty empty POS_(zero-based) 0 -6 0
@@ -17,7 +17,7 @@
 #X text 235 122 POS defaults to 0 \, meaning it will prepend the result
 to the original list.;
 #N canvas 0 22 322 281 how_to_append 0;
-#X obj 58 181 list-proc-insert;
+#X obj 58 181 list-decorate;
 #X msg 58 66 a b c d e f g;
 #X obj 58 97 t a a;
 #X obj 58 216 print NEW_LIST2;
@@ -36,7 +36,7 @@ to the original list.;
 #X connect 6 0 5 1;
 #X connect 7 0 5 0;
 #X restore 310 185 pd how_to_append;
-#X text 7 6 list-proc-insert: call user-defined process on incoming
+#X text 7 6 list-decorate: call user-defined process on incoming
 list and insert result into original list at position POS.;
 #X obj 416 30 import-disabled list-abs;
 #X connect 0 0 5 0;

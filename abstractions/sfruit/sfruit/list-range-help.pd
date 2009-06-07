@@ -37,6 +37,35 @@ is less than n2 \, or interval -1 if n2 is less than n1;
 #X msg 496 353;
 #X msg 346 388;
 #X msg 206 428;
+#N canvas 823 429 453 357 getting_the_full_range 0;
+#X obj 169 155 t a a;
+#X obj 169 121 inlet;
+#X obj 196 189 <;
+#X obj 196 214 expr ($f1 * 2) - 1;
+#X obj 169 269 list-add;
+#X msg 196 244 0 \$1;
+#X obj 169 314 outlet;
+#X msg 213 122 5 10;
+#X msg 250 122 10 -7;
+#X text 51 12 You may find it annoying that list-range stops just short
+of the destination - I'm copying Python's implementation and trusting
+they've got a good reason for that (maybe I even know it but I haven't
+had my coffee). In any case \, here's a little patch to "fix" that
+annoyance if it hits you (place it just before [list-range]).;
+#X obj 242 294 prepent set;
+#X msg 242 316;
+#X connect 0 0 4 0;
+#X connect 0 1 2 0;
+#X connect 1 0 0 0;
+#X connect 2 0 3 0;
+#X connect 3 0 5 0;
+#X connect 4 0 6 0;
+#X connect 4 0 10 0;
+#X connect 5 0 4 1;
+#X connect 7 0 0 0;
+#X connect 8 0 0 0;
+#X connect 10 0 11 0;
+#X restore 471 23 pd getting_the_full_range;
 #X connect 0 0 27 0;
 #X connect 1 0 22 0;
 #X connect 5 0 31 0;

@@ -2,7 +2,7 @@
 
 #X obj 95 480 * 4;
 #X obj 95 503 outlet;
-#X obj 27 81 s2l-explode;
+#X obj 27 81 symbol-explode;
 #X obj 27 19 inlet;
 #X obj 163 172 list-splat -1;
 #X obj 27 107 list-split-at /;

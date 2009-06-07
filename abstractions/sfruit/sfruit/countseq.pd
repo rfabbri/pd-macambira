@@ -26,7 +26,7 @@
 #X obj 307 288 outlet;
 #X obj 84 249 outlet;
 #X obj 307 252 list-map;
-#X obj 384 233 s2l-explode;
+#X obj 384 233 symbol-explode;
 #X obj 384 253 list split 1;
 #X obj 418 274 list-l2s;
 #X obj 418 295 atoi;
