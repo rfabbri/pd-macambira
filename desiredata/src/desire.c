@@ -772,7 +772,6 @@ static void canvas_pop(t_canvas *x, t_floatarg fvis) {
     pd_popsym(x); canvas_resortinlets(x); canvas_resortoutlets(x);
     if (fvis) canvas_vis(x, 1);
 }
-/* called by m_class.c */
 extern "C" void canvas_popabstraction(t_canvas *x) {
     pd_set_newest(x);
     pd_popsym(x); canvas_resortinlets(x); canvas_resortoutlets(x);
@@ -4171,7 +4170,6 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
                     minyval = 1e20;
                     maxyval = -1e20;
                 }
-                if (ndrawn > 2000 || ixpix >= 3000) break;
             }
         } else {
             char outline[20];
@@ -4229,7 +4227,6 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
                         ndrawn++;
                     }
                     lastpixel = ixpix;
-                    if (ndrawn >= 1000) break;
                 }
                 /* TK will complain if there aren't at least 2 points... */
                 if (ndrawn == 0) sys_vgui("0 0 0 0 \\\n");
@@ -4263,14 +4260,11 @@ static void plot_vis(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, f
 static int plot_click(t_gobj *z, t_canvas *canvas, t_word *data, t_template *t, t_scalar *sc,
 t_array *ap, float basex, float basey, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
     t_plot *x = (t_plot *)z;
-    t_symbol *elemtsym;
-    float linewidth, xloc, xinc, yloc, vis, scalarvis;
-    t_array *array;
     t_pelote p;
     if (plot_readownertemplate(x,data,t,&p)) return 0;
-    if (!vis) return 0;
-    return array_doclick(array,canvas,sc,ap,elemtsym,linewidth,basex+xloc,xinc,
-	basey+yloc,scalarvis,&x->xpoints,&x->ypoints,&x->wpoints,xpix,ypix,shift,alt,dbl,doit);
+    if (!p.vis) return 0;
+    return array_doclick(p.array,canvas,sc,ap,p.elemtsym,p.linewidth,basex+p.xloc,p.xinc,
+	basey+p.yloc,p.scalarvis,&x->xpoints,&x->ypoints,&x->wpoints,xpix,ypix,shift,alt,dbl,doit);
 }
 
 /* ---------------- drawnumber: draw a number (or symbol) ---------------- */
@@ -4372,11 +4366,8 @@ static void drawnumber_motion(void *z, t_floatarg dx, t_floatarg dy) {
 static void drawnumber_key(void *z, t_floatarg fkey) {
     //t_drawnumber *x = (t_drawnumber *)z;
     int key = (int)fkey;
-    if (!gpointer_check(&dn.gpointer, 0)) {
-        post("drawnumber_motion: scalar disappeared");
-        return;
-    }
-    if (key == 0) return;
+    if (!gpointer_check(&dn.gpointer, 0)) {post("drawnumber_motion: scalar disappeared"); return;}
+    if (!key) return;
     if (dn.symbol) {
         /* key entry for a symbol field... has to be rewritten in Tcl similarly to TextBox for edition of [drawsymbol] */
         // template_getsymbol(dn.t, f->varsym, dn.wp, 1)->name;
@@ -6381,7 +6372,6 @@ static void cnv_reload(t_cnv *x, t_symbol *s, int argc, t_atom *argv) {
     if (x->rcv) pd_bind(x,x->rcv);
     gobj_changed(x,0);
 }
-#undef FOO
 
 static void *cnv_new(t_symbol *s, int argc, t_atom *argv) {
     t_cnv *x = (t_cnv *) iemgui_new(cnv_class);
@@ -6411,15 +6401,10 @@ void canvas_onsubscribe(t_gobj *x, t_gobj *observer) {
 
 /* [declare] and canvas_open come from 0.40 */
 /* ------------------------------- declare ------------------------ */
-
-/* put "declare" objects in a patch to tell it about the environment in
-which objects should be created in this canvas.  This includes directories to
-search ("-path", "-stdpath") and object libraries to load
-("-lib" and "-stdlib").  These must be set before the patch containing
-the "declare" object is filled in with its contents; so when the patch is
-saved,  we throw early messages to the canvas to set the environment
-before any objects are created in it. */
-
+/* put "declare" objects in a patch to tell it about the environment in which objects should be created in this canvas.
+   This includes directories to  search ("-path", "-stdpath") and object libraries to load ("-lib" and "-stdlib").
+   These must be set before the patch containing the "declare" object is filled in with its contents; so when the patch is
+   saved,  we throw early messages to the canvas to set the environment before any objects are created in it. */
 struct t_declare : t_object {
     int useme;
 };
@@ -6662,9 +6647,9 @@ t_pd *pd_new3(const char *s) {
 extern "C" void boxes_init() {
     t_class *c;
     c =      boxes_class = class_new2("__boxes"     ,0/*boxes_new*/     ,     boxes_free,sizeof(t_boxes),CLASS_GOBJ,"");
-    class_setnotice(c,t_notice(boxes_notice));
+    class_setnotice(c,boxes_notice);
     c = gop_filtre_class = class_new2("__gop_filtre",0/*gop_filtre_new*/,gop_filtre_free,sizeof(t_boxes),CLASS_GOBJ,"");
-    class_setnotice(c,t_notice(gop_filtre_notice));
+    class_setnotice(c,gop_filtre_notice);
 }
 
 static void desire_setup() {
