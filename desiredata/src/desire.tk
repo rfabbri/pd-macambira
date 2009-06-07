@@ -6501,7 +6501,7 @@ if {![catch {
 class_new Cnv {Labelled IEMGUI Box}
 def Cnv draw {} {
 	mset {x1 y1} [$self xy]
-	$self item BASE rectangle [list $x1 $y1 [expr $x1+$@w] [expr $y1+$@h]] -fill [parse_color $@bcol]
+	$self item BASE rectangle [list $x1 $y1 [expr {$x1+$@w+1}] [expr {$y1+$@h+1}]] -fill [parse_color $@bcol] -width 0
 	super
 }
 def Cnv bbox {} {
