@@ -1,4 +1,4 @@
-#N canvas 164 131 1249 684 10;
+#N canvas 1 49 1424 780 10;
 #X obj 41 -82 cnv 15 621 223 empty empty empty 20 12 0 14 -260097 -66577
 0;
 #X obj 91 75 pdp_1394L;
@@ -14,7 +14,7 @@
 #X msg 371 10 close;
 #X obj 301 81 pdp_v4l;
 #X msg 358 -22 open /dev/video0;
-#X obj 482 -42 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 482 -42 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X obj 482 -15 metro 40;
 #X msg 563 4 close;
@@ -25,34 +25,31 @@
 #X obj 91 189 pdp_convert bitmap/rgb/*;
 #X text 255 183 COLORMODEL CONVERSION :: allways remember pdp_opencv
 only works in RGB colormodel;
-#X obj 48 328 cnv 15 621 313 empty empty empty 20 12 0 14 -258113 -66577
+#X obj 44 328 cnv 15 621 360 empty empty empty 20 12 0 14 -258113 -66577
 0;
 #X text 71 -79 FIRST OF ALL SETUP YOUR CAMERA;
-#X floatatom 185 509 5 0 0 0 - - -;
-#X floatatom 220 509 5 0 0 0 - - -;
-#X floatatom 257 509 5 0 0 0 - - -;
-#X floatatom 291 509 5 0 0 0 - - -;
-#X obj 185 482 unpack 0 0 0 0 0;
-#X obj 185 461 route 0 1 2 3 4;
-#X floatatom 211 385 5 0 0 0 - - -;
-#X floatatom 283 398 5 0 0 0 - - -;
-#X obj 93 413 pdp_opencv_contours_boundingrect;
-#X text 335 509 Xorigin Yorigin Width Height;
-#X floatatom 205 565 5 0 0 0 - - -;
-#X floatatom 240 565 5 0 0 0 - - -;
-#X floatatom 277 565 5 0 0 0 - - -;
-#X floatatom 311 565 5 0 0 0 - - -;
-#X obj 202 536 unpack 0 0 0 0 0;
-#X text 355 565 Xorigin Yorigin Width Height;
-#X obj 91 663 pdp_xv;
+#X floatatom 184 556 5 0 0 0 - - -;
+#X floatatom 219 556 5 0 0 0 - - -;
+#X floatatom 256 556 5 0 0 0 - - -;
+#X floatatom 290 556 5 0 0 0 - - -;
+#X obj 184 529 unpack 0 0 0 0 0;
+#X obj 184 508 route 0 1 2 3 4;
+#X floatatom 210 432 5 0 0 0 - - -;
+#X floatatom 282 445 5 0 0 0 - - -;
+#X obj 92 460 pdp_opencv_contours_boundingrect;
+#X text 334 556 Xorigin Yorigin Width Height;
+#X floatatom 204 612 5 0 0 0 - - -;
+#X floatatom 239 612 5 0 0 0 - - -;
+#X floatatom 276 612 5 0 0 0 - - -;
+#X floatatom 310 612 5 0 0 0 - - -;
+#X obj 201 583 unpack 0 0 0 0 0;
+#X text 354 612 Xorigin Yorigin Width Height;
+#X obj 91 703 pdp_xv;
 #X obj 44 244 cnv 15 621 73 empty empty empty 20 12 0 14 -260801 -66577
 0;
-#X msg 242 270 set;
 #X floatatom 242 294 5 0 0 0 - - -;
-#X obj 91 294 pdp_opencv_bgsubstract;
 #X text 280 293 threshold (default 13) to use when comparing pixel
 colors;
-#X text 277 269 set the background reference;
 #X msg 568 59 format \$1;
 #X obj 569 37 hradio 15 1 0 4 empty empty empty 0 -8 0 10 -262144 -1
 -1 0;
@@ -67,31 +64,38 @@ white areas in the input image \, it's important to set max/min values
 of the areas you want to detect to filter non interesting noise or
 areas \, also sometimes you will need to use pdp_opencv_morphology
 to transform the contours of the shapes to be analyzed..;
-#X floatatom 280 435 5 0 0 0 - - -;
-#X text 319 436 Number of detected contours;
-#X floatatom 230 623 5 0 0 0 - - -;
-#X floatatom 265 623 5 0 0 0 - - -;
-#X floatatom 302 623 5 0 0 0 - - -;
-#X floatatom 336 623 5 0 0 0 - - -;
-#X obj 227 594 unpack 0 0 0 0 0;
-#X text 380 623 Xorigin Yorigin Width Height;
-#X text 288 466 For each contour detected;
-#X text 288 453 We have the contours sorted bottom to top and left
+#X floatatom 279 482 5 0 0 0 - - -;
+#X text 318 483 Number of detected contours;
+#X floatatom 229 670 5 0 0 0 - - -;
+#X floatatom 264 670 5 0 0 0 - - -;
+#X floatatom 301 670 5 0 0 0 - - -;
+#X floatatom 335 670 5 0 0 0 - - -;
+#X obj 226 641 unpack 0 0 0 0 0;
+#X text 379 670 Xorigin Yorigin Width Height;
+#X text 287 513 For each contour detected;
+#X text 287 500 We have the contours sorted bottom to top and left
 to right;
 #X text 42 -273 It is useful as a motion tracker if you have well isolated
 silouets of the objects you want to track.;
-#X text 249 383 minimal area in pixels to be detected (default 10x10)
+#X text 248 430 minimal area in pixels to be detected (default 10x10)
 ;
-#X text 320 399 maximal area in pixels to be detected (default 320x240)
+#X text 319 446 maximal area in pixels to be detected (default 320x240)
 ;
 #X msg 138 335 mode \$1;
 #X obj 199 336 hradio 15 1 0 4 empty empty empty 0 -8 0 10 -262144
 -1 -1 0;
 #X text 268 337 retrieval mode ( see cvFindContours );
-#X obj 242 364 hradio 15 1 0 5 empty empty empty 0 -8 0 10 -262144
+#X obj 234 361 hradio 15 1 0 5 empty empty empty 0 -8 0 10 -262144
 -1 -1 0;
-#X text 318 364 retrieval method ( see cvFindContours );
-#X msg 175 363 method \$1;
+#X text 316 361 retrieval method ( see cvFindContours );
+#X msg 167 360 method \$1;
+#X obj 92 294 pdp_opencv_threshold;
+#X msg 190 383 maxmove \$1;
+#X floatatom 264 384 5 0 0 0 - - -;
+#X floatatom 288 408 5 0 0 0 - - -;
+#X msg 200 405 ftolerance \$1;
+#X text 307 383 maximum move of a countour ( default 10 );
+#X text 324 406 frame tolerance for identification ( default 5 );
 #X connect 1 0 18 0;
 #X connect 2 0 1 0;
 #X connect 3 0 4 0;
@@ -108,33 +112,36 @@ silouets of the objects you want to track.;
 #X connect 14 0 16 0;
 #X connect 15 0 16 0;
 #X connect 16 0 18 0;
-#X connect 18 0 42 0;
+#X connect 18 0 66 0;
 #X connect 26 0 22 0;
 #X connect 26 1 23 0;
 #X connect 26 2 24 0;
 #X connect 26 3 25 0;
 #X connect 27 0 26 0;
 #X connect 27 1 36 0;
-#X connect 27 2 56 0;
+#X connect 27 2 53 0;
 #X connect 28 0 30 1;
 #X connect 29 0 30 2;
 #X connect 30 0 38 0;
 #X connect 30 1 27 0;
-#X connect 30 2 50 0;
+#X connect 30 2 47 0;
 #X connect 36 0 32 0;
 #X connect 36 1 33 0;
 #X connect 36 2 34 0;
 #X connect 36 3 35 0;
-#X connect 40 0 42 0;
-#X connect 41 0 42 1;
-#X connect 42 0 30 0;
-#X connect 45 0 16 0;
-#X connect 46 0 45 0;
-#X connect 56 0 52 0;
-#X connect 56 1 53 0;
-#X connect 56 2 54 0;
-#X connect 56 3 55 0;
-#X connect 63 0 30 0;
-#X connect 64 0 63 0;
-#X connect 66 0 68 0;
-#X connect 68 0 30 0;
+#X connect 40 0 66 2;
+#X connect 42 0 16 0;
+#X connect 43 0 42 0;
+#X connect 53 0 49 0;
+#X connect 53 1 50 0;
+#X connect 53 2 51 0;
+#X connect 53 3 52 0;
+#X connect 60 0 30 0;
+#X connect 61 0 60 0;
+#X connect 63 0 65 0;
+#X connect 65 0 30 0;
+#X connect 66 0 30 0;
+#X connect 67 0 30 0;
+#X connect 68 0 67 0;
+#X connect 69 0 70 0;
+#X connect 70 0 30 0;

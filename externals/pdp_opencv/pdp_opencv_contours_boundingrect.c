@@ -209,10 +209,10 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
             }
 
 	    cvRectangle( x->cnt_img, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
-            sprintf( tindex, "%d", i );
+            sprintf( tindex, "%d", oi );
             cvPutText( x->cnt_img, tindex, cvPoint(rect.x,rect.y), &x->font, CV_RGB(255,255,255));
 
-            SETFLOAT(&x->rlist[0], i);
+            SETFLOAT(&x->rlist[0], oi);
             SETFLOAT(&x->rlist[1], rect.x);
             SETFLOAT(&x->rlist[2], rect.y);
             SETFLOAT(&x->rlist[3], rect.width);
@@ -450,7 +450,7 @@ void *pdp_opencv_contours_boundingrect_new(t_floatarg f)
     x->maxarea   = 320*240;
 
     x->x_ftolerance  = 5;
-    x->x_mmove   = 5;
+    x->x_mmove   = 10;
     x->x_cmode   = CV_RETR_TREE;
     x->x_cmethod = CV_CHAIN_APPROX_SIMPLE;
 
