@@ -53,6 +53,11 @@ typedef struct pdp_opencv_contours_boundingrect_struct
     int x_ftolerance;
     int x_mmove;
 
+    // contours retrieval mode
+    int x_cmode;
+    // contours retrieval method
+    int x_cmethod;
+
     int x_width;
     int x_height;
     int x_size;
@@ -86,7 +91,7 @@ static int pdp_opencv_contours_boundingrect_mark(t_pdp_opencv_contours_boundingr
        }
     }
 
-    post( "pdp_opencv_contours_boundingrect : max markers reached" );
+    // post( "pdp_opencv_contours_boundingrect : max markers reached" );
     return -1;
 }
 
@@ -129,7 +134,6 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     newheader->info.image.width = x->x_width;
     newheader->info.image.height = x->x_height;
 
-    // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( x->image->imageData, data, x->x_size*3 );
     
     // Convert to grayscale
@@ -149,12 +153,12 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     //ContourBoundingRect
     //
 
-    // TODO afegir parametres
     // Retrieval mode.
-    // CV_RETR_TREE || CV_RETR_CCOMP || CV_RETR_LIST || CV_RETR_EXTERNAL
+    // CV_RETR_EXTERNAL || CV_RETR_LIST || CV_RETR_CCOMP || CV_RETR_TREE
     // Approximation method.
-    // CV_CHAIN_APPROX_SIMPLE || CV_CHAIN_CODE || CV_CHAIN_APPROX_NONE || CV_CHAIN_APPROX_TC89_L1 || CV_CHAIN_APPROX_TC89_KCOS || CV_LINK_RUNS
-    cvFindContours( x->gray, stor02, &contours, sizeof(CvContour), CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
+    // CV_CHAIN_CODE || CV_CHAIN_APPROX_NONE || CV_CHAIN_APPROX_SIMPLE || CV_CHAIN_APPROX_TC89_L1 || CV_CHAIN_APPROX_TC89_KCOS || CV_LINK_RUNS
+    cvFindContours( x->gray, stor02, &contours, sizeof(CvContour), x->x_cmode, x->x_cmethod, cvPoint(0,0) );
+
     // TODO afegir parametres
     // aqui es fa una aproximacio del contorn per a que sigui mes polinomic i no tingui tants punts
     // els ultims dos parametres han de ser variables
@@ -228,7 +232,6 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
          x->x_xmark[im] = -1.0;
          x->x_ymark[im] = -1,0;
          x->x_found[im] = x->x_ftolerance;
-         post( "deleted point %d", im );
        }
     }
 
@@ -237,11 +240,6 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     memcpy( newdata, x->cnt_img->imageData, x->x_size*3 );
  
     return;
-}
-
-static void pdp_opencv_contours_boundingrect_param(t_pdp_opencv_contours_boundingrect *x, t_floatarg f1, t_floatarg f2)
-{
-
 }
 
 static void pdp_opencv_contours_boundingrect_minarea(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
@@ -262,6 +260,69 @@ static void pdp_opencv_contours_boundingrect_ftolerance(t_pdp_opencv_contours_bo
 static void pdp_opencv_contours_boundingrect_mmove(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
 {
         if ((int)f>=1) x->x_mmove = (int)f;
+}
+
+static void pdp_opencv_contours_boundingrect_cmode(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
+{
+    // CV_RETR_EXTERNAL || CV_RETR_LIST || CV_RETR_CCOMP || CV_RETR_TREE
+    int mode = (int)f;
+
+    if ( mode == CV_RETR_EXTERNAL )
+    {
+       x->x_cmode = CV_RETR_EXTERNAL;
+       post( "pdp_opencv_contours_boundingrect : mode set to CV_RETR_EXTERNAL" );
+    }
+    if ( mode == CV_RETR_LIST )
+    {
+       x->x_cmode = CV_RETR_LIST;
+       post( "pdp_opencv_contours_boundingrect : mode set to CV_RETR_LIST" );
+    }
+    if ( mode == CV_RETR_CCOMP )
+    {
+       x->x_cmode = CV_RETR_CCOMP;
+       post( "pdp_opencv_contours_boundingrect : mode set to CV_RETR_CCOMP" );
+    }
+    if ( mode == CV_RETR_TREE )
+    {
+       x->x_cmode = CV_RETR_TREE;
+       post( "pdp_opencv_contours_boundingrect : mode set to CV_RETR_TREE" );
+    }
+}
+
+static void pdp_opencv_contours_boundingrect_cmethod(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
+{
+  int method = (int)f;
+
+    // CV_CHAIN_CODE || CV_CHAIN_APPROX_NONE || CV_CHAIN_APPROX_SIMPLE || CV_CHAIN_APPROX_TC89_L1 || CV_CHAIN_APPROX_TC89_KCOS || CV_LINK_RUNS
+    if ( method == CV_CHAIN_CODE )
+    {
+       post( "pdp_opencv_contours_boundingrect : not supported method : CV_CHAIN_CODE" );
+    }
+    if ( method == CV_CHAIN_APPROX_NONE )
+    {
+       x->x_cmethod = CV_CHAIN_APPROX_NONE;
+       post( "pdp_opencv_contours_boundingrect : method set to CV_CHAIN_APPROX_NONE" );
+    }
+    if ( method == CV_CHAIN_APPROX_SIMPLE )
+    {
+       x->x_cmethod = CV_CHAIN_APPROX_SIMPLE;
+       post( "pdp_opencv_contours_boundingrect : method set to CV_CHAIN_APPROX_SIMPLE" );
+    }
+    if ( method == CV_CHAIN_APPROX_TC89_L1 )
+    {
+       x->x_cmethod = CV_CHAIN_APPROX_TC89_L1;
+       post( "pdp_opencv_contours_boundingrect : method set to CV_CHAIN_APPROX_TC89_L1" );
+    }
+    if ( method == CV_CHAIN_APPROX_TC89_KCOS )
+    {
+       x->x_cmethod = CV_CHAIN_APPROX_TC89_KCOS;
+       post( "pdp_opencv_contours_boundingrect : method set to CV_CHAIN_APPROX_TC89_KCOS" );
+    }
+    if ( ( method == CV_LINK_RUNS ) && ( x->x_cmode == CV_RETR_LIST ) )
+    {
+       x->x_cmethod = CV_LINK_RUNS;
+       post( "pdp_opencv_contours_boundingrect : method set to CV_LINK_RUNS" );
+    }
 }
 
 static void pdp_opencv_contours_boundingrect_delete(t_pdp_opencv_contours_boundingrect *x, t_floatarg findex )
@@ -390,6 +451,8 @@ void *pdp_opencv_contours_boundingrect_new(t_floatarg f)
 
     x->x_ftolerance  = 5;
     x->x_mmove   = 5;
+    x->x_cmode   = CV_RETR_TREE;
+    x->x_cmethod = CV_CHAIN_APPROX_SIMPLE;
 
     x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
     x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
@@ -422,6 +485,8 @@ void pdp_opencv_contours_boundingrect_setup(void)
     class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_ftolerance, gensym("ftolerance"), A_FLOAT, A_NULL );
     class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_mmove, gensym("maxmove"), A_FLOAT, A_NULL );
     class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_clear, gensym("clear"), A_NULL );
+    class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_cmode, gensym("mode"), A_FLOAT, A_NULL );
+    class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_cmethod, gensym("method"), A_FLOAT, A_NULL );
 
 }
 
