@@ -1,8 +1,9 @@
 Source: pd-extended
-Version: 0.40.3extended-1
+Version: 0.42.5~cvs1-1
 Section: sound
 Priority: optional
 Maintainer: Hans-Christoph Steiner <hans@at.or.at>
+Homepage: http://puredata.info
 Package: pd-extended
 Architecture: i386
 Depends: xterm | x-terminal-emulator, ttf-bitstream-vera, x-ttcidfont-conf, tcllib, 

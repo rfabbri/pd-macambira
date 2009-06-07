@@ -81,16 +81,22 @@ tarbz2: installer_makefile installer_readme
 deb: DEB_BUILD_ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 deb: DEB_PD_VERSION := $(shell echo $(PD_VERSION) | sed 's|\(.*\)-extended-\(.*\)|\1~cvs\2-1|')
 deb: $(bindir)
-# GNOME menu support
+# free desktop menu, mime, and icon support
 	install -d $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
 	install -p -m0644 $(packages_src)/linux_make/pd.png \
 		$(DESTDIR)/usr/share/icons/hicolor/128x128/apps/
 	install -d $(DESTDIR)/usr/share/icons/hicolor/48x48/apps
 	install -p -m0644 $(packages_src)/linux_make/pd-48x48.png \
 		$(DESTDIR)/usr/share/icons/hicolor/48x48/apps/pd.png
+	install -d $(DESTDIR)/usr/share/icons/hicolor/128x128/mimetypes
+	install -p -m0644 $(packages_src)/linux_make/text-x-puredata.png \
+		$(DESTDIR)/usr/share/icons/hicolor/128x128/mimetypes
 	install -d $(DESTDIR)/usr/share/applications/ 
-	install -p $(packages_src)/linux_make/pd-extended.desktop \
+	install -p -m0644 $(packages_src)/linux_make/pd-extended.desktop \
 		$(DESTDIR)/usr/share/applications/
+	install -d $(DESTDIR)/usr/share/mime/packages/
+	install -p -m0644 $(packages_src)/linux_make/pd-extended.xml \
+		$(DESTDIR)/usr/share/mime/packages/
 # files for /etc
 	install -d $(DESTDIR)/etc/bash_completion.d/
 	install -p $(scripts_src)/bash_completion/pd $(DESTDIR)/etc/bash_completion.d
@@ -114,9 +120,11 @@ deb: $(bindir)
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
+	cp $(packages_src)/linux_make/debian/pd-extended.postrm $(DESTDIR)/DEBIAN
+	cp $(packages_src)/linux_make/debian/pd-extended.postinst $(DESTDIR)/DEBIAN
 # set build architecture and version for the package
-	sed -i 's|^Version:.*|Version: $(DEB_PD_VERSION)|' \
-		$(DESTDIR)/DEBIAN/control
+#	sed -i 's|^Version:.*|Version: $(DEB_PD_VERSION)|' \
+#		$(DESTDIR)/DEBIAN/control
 	sed -i 's|^Architecture:.*|Architecture: $(DEB_BUILD_ARCH)|' \
 		$(DESTDIR)/DEBIAN/control
 # add auto-generated dependencies
