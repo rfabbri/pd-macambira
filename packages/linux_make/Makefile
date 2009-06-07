@@ -123,8 +123,8 @@ deb: $(bindir)
 	cp $(packages_src)/linux_make/debian/pd-extended.postrm $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/pd-extended.postinst $(DESTDIR)/DEBIAN
 # set build architecture and version for the package
-#	sed -i 's|^Version:.*|Version: $(DEB_PD_VERSION)|' \
-#		$(DESTDIR)/DEBIAN/control
+	sed -i 's|^Version:.*|Version: $(DEB_PD_VERSION)|' \
+		$(DESTDIR)/DEBIAN/control
 	sed -i 's|^Architecture:.*|Architecture: $(DEB_BUILD_ARCH)|' \
 		$(DESTDIR)/DEBIAN/control
 # add auto-generated dependencies
