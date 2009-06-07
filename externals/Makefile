@@ -43,7 +43,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 # this variable is to support old "win" directories, rather than "windows"
 BUILDSRC_OS_NAME = $(OS_NAME)
 
-CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS) -I$(gem_src)/src
+CFLAGS = -DPD -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS) -I$(gem_src)/src
 LDFLAGS =  
 LIBS = -lm
 
@@ -89,7 +89,7 @@ CXXFLAGS = $(CFLAGS)
 ### C++ files
 %.$(EXTENSION): %.cpp
 %.$(EXTENSION): %.cc
-	$(CXX) $(CXXFLAGS) -o "$*.o" -c "$<"
+	$(CXX) $(OPT_CFLAGS) $(CXXFLAGS) -o "$*.o" -c "$<"
 	$(CXX) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o" $(LIBS)
 	chmod a-x "$*.$(EXTENSION)"
 #	$(STRIP) $*.$(EXTENSION)
@@ -97,12 +97,12 @@ CXXFLAGS = $(CFLAGS)
 
 %.o: %.cpp
 %.o: %.cc
-	$(CXX) $(CXXFLAGS) -o "$*.o" -c "$<"
+	$(CXX) $(OPT_CFLAGS) $(CXXFLAGS) -o "$*.o" -c "$<"
 
 
 ### C files
 %.o: %.c
-	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+	$(CC) $(OPT_CFLAGS) $(CFLAGS) -o "$*.o" -c "$*.c"
 
 %.$(EXTENSION): %.o
 	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) \
@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tkwidgets tof toxy unauthorized vbap windowing zexy
+LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -271,7 +271,7 @@ AKA.WIIREMOTE_SRC := $(wildcard $(externals_src)/io/aka.wiiremote/*.c)
 
 AKA.WIIREMOTE_OBJECTS := $(AKA.WIIREMOTE_SRC:.c=.o)
 $(AKA.WIIREMOTE_OBJECTS) : %.o : %.c
-	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+	$(CC) $(OPT_CFLAGS) $(CFLAGS) -o "$*.o" -c "$*.c"
 
 $(externals_src)/io/aka.wiiremote/akawiiremote.$(EXTENSION): $(AKA.WIIREMOTE_OBJECTS) 
 	$(CC) $(LDFLAGS) -o $(externals_src)/io/aka.wiiremote/akawiiremote.$(EXTENSION) \
@@ -319,6 +319,8 @@ apple_install: apple
 	install -d $(helpdir)/$(APPLE_NAME)
 	install -p $(externals_src)/apple/*-help.pd \
 		$(helpdir)/$(APPLE_NAME)
+	install -p $(externals_src)/apple/*-help.pd \
+		$(objectsdir)/$(APPLE_NAME)
 #	install -d $(manualsdir)/$(APPLE_NAME)
 #	install -p $(externals_src)/apple/manual.txt \
 #		$(manualsdir)/$(APPLE_NAME)
@@ -408,8 +410,12 @@ boids_clean:
 #------------------------------------------------------------------------------#
 # BSAYLOR
 BSAYLOR_NAME=bsaylor
-BSAYLOR_OBJECTS := $(wildcard $(externals_src)/bsaylor/*~.c)
-bsaylor: $(BSAYLOR_OBJECTS:.c=.$(EXTENSION))
+BSAYLOR_SRC := $(wildcard $(externals_src)/bsaylor/*~.c)
+BSAYLOR_OBJECTS := $(BSAYLOR_SRC:.c=.o)
+$(BSAYLOR_OBJECTS) : %.o : %.c
+	$(CC) $(CFLAGS) -O2 -funroll-loops -fomit-frame-pointer -o "$*.o" -c "$*.c"
+
+bsaylor: $(BSAYLOR_OBJECTS:.o=.$(EXTENSION))
 
 bsaylor_install: bsaylor
 	install -d $(objectsdir)/$(BSAYLOR_NAME)
@@ -418,10 +424,12 @@ bsaylor_install: bsaylor
 		--description "signal objects" \
 		--license "GNU GPL 2" \
 		--version ""
-	install -p $(BSAYLOR_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(BSAYLOR_NAME)
+	install -p $(BSAYLOR_SRC:.c=.$(EXTENSION)) $(objectsdir)/$(BSAYLOR_NAME)
 	install -d $(helpdir)/$(BSAYLOR_NAME)
 	install -p $(externals_src)/bsaylor/help/*.pd \
 		$(helpdir)/$(BSAYLOR_NAME)
+	install -p $(externals_src)/bsaylor/help/*.pd \
+		$(objectsdir)/$(BSAYLOR_NAME)
 	install -p $(externals_src)/bsaylor/*.wav $(helpdir)/$(BSAYLOR_NAME)
 #	install -d $(manualsdir)/$(BSAYLOR_NAME)
 	install -d $(readmesdir)
@@ -495,6 +503,7 @@ creb_install: creb
 		$(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) 		$(objectsdir)/$(CREB_NAME)
 	install -d $(helpdir)/$(CREB_NAME)
 	install -p $(externals_src)/creb/doc/*.* $(helpdir)/$(CREB_NAME)
+	install -p $(externals_src)/creb/doc/*.* $(objectsdir)/$(CREB_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/creb/doc/reference.txt \
 		$(readmesdir)/$(CREB_NAME).txt
@@ -527,6 +536,8 @@ cxc_install: cxc
 	install -d $(helpdir)/$(CXC_NAME)
 	install -p $(wildcard $(externals_src)/cxc/reference/*.pd) \
 		$(helpdir)/$(CXC_NAME)
+	install -p $(wildcard $(externals_src)/cxc/reference/*.pd) \
+		$(objectsdir)/$(CXC_NAME)
 #	install -d $(manualsdir)/$(CXC_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/cxc/README \
@@ -545,7 +556,8 @@ CYCLONE_NAME=cyclone
 # cyclone is compiled straight into $(OUT_DIR)
 CYCLONE_OUT_DIR=$(objectsdir)/$(CYCLONE_NAME)
 cyclone: $(bindir)
-	$(MAKE) -C $(externals_src)/miXed/cyclone
+	$(MAKE) OPT_CFLAGS="-O2 -funroll-loops -fomit-frame-pointer" \
+		-C $(externals_src)/miXed/cyclone
 
 cyclone_install: cyclone
 	install -d $(objectsdir)/$(CYCLONE_NAME)
@@ -567,6 +579,8 @@ cyclone_install: cyclone
 	install -d $(helpdir)/$(CYCLONE_NAME)
 	install -p $(externals_src)/miXed/doc/help/cyclone/*.* \
 		$(helpdir)/$(CYCLONE_NAME)
+	install -p $(externals_src)/miXed/doc/help/cyclone/*.* \
+		$(objectsdir)/$(CYCLONE_NAME)
 #	install -d $(manualsdir)/$(CYCLONE_NAME)
 	install -d $(examplesdir)/$(CYCLONE_NAME)
 	install -p $(externals_src)/miXed/test/cyclone/*.* \
@@ -670,6 +684,8 @@ ekext_install: ekext
 	install -d $(helpdir)/$(EKEXT_NAME)
 	install -p $(externals_src)/ekext/*/*help*.pd \
 		$(helpdir)/$(EKEXT_NAME)
+	install -p $(externals_src)/ekext/*/*help*.pd \
+		$(objectsdir)/$(EKEXT_NAME)
 #	install -d $(manualsdir)/$(EKEXT_NAME)
 #	install -p $(externals_src)/ekext/manual.txt \
 #		$(manualsdir)/$(EKEXT_NAME)
@@ -793,6 +809,8 @@ flib_install: flib
 	install -d $(helpdir)/$(FLIB_NAME)
 	install -p $(externals_src)/postlude/flib/doc/*.pd \
 		$(helpdir)/$(FLIB_NAME)
+	install -p $(externals_src)/postlude/flib/doc/*.pd \
+		$(objectsdir)/$(FLIB_NAME)
 #	install -d $(manualsdir)/$(FLIB_NAME)
 #	install -p $(externals_src)/postlude/flib/manual.txt \
 #		$(manualsdir)/$(FLIB_NAME)
@@ -942,6 +960,8 @@ ggee_install: ggee
 	install -d $(helpdir)/$(GGEE_NAME)
 	install -p $(externals_src)/ggee/*/*-help.pd \
 		$(externals_src)/ggee/*/*.gif $(helpdir)/$(GGEE_NAME)
+	install -p $(externals_src)/ggee/*/*-help.pd \
+		$(externals_src)/ggee/*/*.gif $(objectsdir)/$(GGEE_NAME)
 #	install -d $(manualsdir)/$(GGEE_NAME)
 #	install -p $(externals_src)/ggee/manual.txt \
 #		$(manualsdir)/$(GGEE_NAME)
@@ -1021,6 +1041,10 @@ hcs_install: hcs
 		$(helpdir)/$(HCS_NAME)
 	install -p $(externals_src)/hcs/*.gif \
 		$(helpdir)/$(HCS_NAME)
+	install -p $(externals_src)/hcs/*-help.pd \
+		$(objectsdir)/$(HCS_NAME)
+	install -p $(externals_src)/hcs/*.gif \
+		$(objectsdir)/$(HCS_NAME)
 #	install -d $(manualsdir)/$(HCS_NAME)
 #	install -p $(externals_src)/hcs/README* $(externals_src)/hcs/TODO \
 #		$(manualsdir)/$(HCS_NAME)
@@ -1043,18 +1067,18 @@ hcs_clean:
 # HID
 HID_NAME = hid
 ifeq ($(OS_NAME),windows)
-  HID_CFLAGS = $(CFLAGS) 
+  HID_CFLAGS = $(OPT_CFLAGS) $(CFLAGS) 
   HID_LIBS = $(LIBS) -lhid -lsetupapi
 else
   ifeq ($(OS_NAME),darwin)
     FRAMEWORKS = Carbon IOKit ForceFeedback
-    HID_CFLAGS = $(CFLAGS) -I$(externals_src)/hcs/hid/HID\ Utilities\ Source
+    HID_CFLAGS = $(OPT_CFLAGS) $(CFLAGS) -I$(externals_src)/hcs/hid/HID\ Utilities\ Source
     HID_UTILITIES_SOURCE = $(externals_src)/hcs/hid/HID\ Utilities\ Source
     HID_LIBS = $(LIBS) -L$(HID_UTILITIES_SOURCE)/build \
 		-L$(HID_UTILITIES_SOURCE)/build/Default \
       -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
   else
-    HID_CFLAGS = $(CFLAGS) 
+    HID_CFLAGS = $(OPT_CFLAGS) $(CFLAGS) 
     HID_LIBS = $(LIBS)
   endif
 endif
@@ -1093,6 +1117,7 @@ hid_install: hid
 	install -p $(externals_src)/hcs/hid/*.pd $(objectsdir)/$(HID_NAME)
 	install -d $(helpdir)/$(HID_NAME)
 	install -p $(externals_src)/hcs/hid/doc/*.pd       $(helpdir)/$(HID_NAME)
+	install -p $(externals_src)/hcs/hid/doc/*.pd       $(objectsdir)/$(HID_NAME)
 	install -p $(externals_src)/hcs/hid/examples/*.pd $(helpdir)/$(HID_NAME)
 	install -d $(examplesdir)/$(HID_NAME)
 	install -p $(externals_src)/hcs/hid/examples/*.pd  $(examplesdir)/$(HID_NAME)
@@ -1236,6 +1261,8 @@ iem_ambi_install: iem_ambi
 	install -d $(helpdir)/$(IEM_AMBI_NAME)
 	install -p $(externals_src)/iem/iem_ambi/*.pd \
 		$(helpdir)/$(IEM_AMBI_NAME)
+	install -p $(externals_src)/iem/iem_ambi/*.pd \
+		$(objectsdir)/$(IEM_AMBI_NAME)
 #	install -d $(manualsdir)/$(IEM_AMBI_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_ambi/READ_ME.txt \
@@ -1270,6 +1297,8 @@ iem_bin_ambi_install: iem_bin_ambi
 	install -d $(helpdir)/$(IEM_BIN_AMBI_NAME)
 	install -p $(externals_src)/iem/iem_bin_ambi/*.pd \
 		$(helpdir)/$(IEM_BIN_AMBI_NAME)
+	install -p $(externals_src)/iem/iem_bin_ambi/*.pd \
+		$(objectsdir)/$(IEM_BIN_AMBI_NAME)
 #	install -d $(manualsdir)/$(IEM_BIN_AMBI_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_bin_ambi/READ_ME.txt \
@@ -1319,6 +1348,8 @@ iem16_install: iem16
 	install -d $(helpdir)/$(IEM16_NAME)
 	install -p $(externals_src)/iem16/help/*.pd \
 		$(helpdir)/$(IEM16_NAME)
+	install -p $(externals_src)/iem16/help/*.pd \
+		$(objectsdir)/$(IEM16_NAME)
 
 iem16_clean:
 	-$(MAKE) -C $(IEM16_DIR) clean
@@ -1338,18 +1369,24 @@ iem16_clean:
 # IEMLIB
 IEMLIB_NAME=iemlib
 # omit the lib files and iem_mp3 (for patent reasons :( )
-IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/iemlib1/src/*[^1].c) $(wildcard $(externals_src)/iemlib/iemlib2/src/*[^2].c)  $(wildcard $(externals_src)/iemlib/iem_t3_lib/src/t3_*.c)  $(wildcard $(externals_src)/iemlib/alias/*.c)
-iemlib: $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
+IEMLIB_SRC := $(wildcard $(externals_src)/iemlib/iemlib1/src/*[^1].c) $(wildcard $(externals_src)/iemlib/iemlib2/src/*[^2].c)  $(wildcard $(externals_src)/iemlib/iem_t3_lib/src/t3_*.c)  $(wildcard $(externals_src)/iemlib/alias/*.c)
+
+IEMLIB_OBJECTS := $(IEMLIB_SRC:.c=.o)
+$(IEMLIB_OBJECTS) : %.o : %.c
+	$(CC) $(CFLAGS) -O2 -funroll-loops -fomit-frame-pointer -o "$*.o" -c "$*.c"
+
+iemlib: $(IEMLIB_SRC:.c=.$(EXTENSION))
 
 iemlib_install: iemlib
 	install -d $(objectsdir)/$(IEMLIB_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMLIB_NAME) \
 		--description "a collection of objects written at IEM/KUG" \
 		--license "GNU GPL"
-	install -p $(IEMLIB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEMLIB_NAME)
+	install -p $(IEMLIB_SRC:.c=.$(EXTENSION)) $(objectsdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/iemabs/*.pd $(objectsdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/alias/*.pd $(objectsdir)/$(IEMLIB_NAME)
 	install -d $(helpdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/*/*-help.pd $(objectsdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/*/*-help.pd $(helpdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/*/*.mp3 $(helpdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/*/*.wav $(helpdir)/$(IEMLIB_NAME)
@@ -1396,7 +1433,7 @@ $(IEMMATRIX_OBJ:.o=.$(EXTENSION)) : %.$(EXTENSION) : $(IEMMATRIX_OBJ) $(IEMMATRI
 	#rm -f -- "$*.o"
 
 $(IEMMATRIX_OBJ) $(IEMMATRIX_SHARED:.c=.o) : %.o : %.c
-	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c" -I$(IEMMATRIX_ROOT)/src
+	$(CC) $(OPT_CFLAGS) $(CFLAGS) -o "$*.o" -c "$*.c" -I$(IEMMATRIX_ROOT)/src
 
 iemmatrix_install: iemmatrix
 	install -d $(objectsdir)/$(IEMMATRIX_NAME)
@@ -1413,6 +1450,8 @@ iemmatrix_install: iemmatrix
 		$(helpdir)/$(IEMMATRIX_NAME)
 	install -p $(externals_src)/iem/iemmatrix/abs/*-help.pd \
 		$(helpdir)/$(IEMMATRIX_NAME)
+	install -p $(externals_src)/iem/iemmatrix/abs/*-help.pd \
+		$(objectsdir)/$(IEMMATRIX_NAME)
 	install -d $(manualsdir)/$(IEMMATRIX_NAME)
 	install -p $(externals_src)/iem/iemmatrix/*.txt \
 		$(manualsdir)/$(IEMMATRIX_NAME)
@@ -1445,6 +1484,8 @@ iem_matrix_install: iem_matrix
 	install -d $(helpdir)/$(IEM_MATRIX_NAME)
 	install -p $(externals_src)/iem/iem_matrix/*.pd \
 		$(helpdir)/$(IEM_MATRIX_NAME)
+	install -p $(externals_src)/iem/iem_matrix/*.pd \
+		$(objectsdir)/$(IEM_MATRIX_NAME)
 
 iem_matrix_clean:
 	-rm -f -- $(IEM_MATRIX_OBJ:.o=.$(EXTENSION))
@@ -1471,6 +1512,8 @@ jasch_lib_install: jasch_lib
 	install -d $(helpdir)/$(JASCH_LIB_NAME)
 	install -p $(externals_src)/jasch_lib/*/*-help.pd \
 		$(helpdir)/$(JASCH_LIB_NAME)
+	install -p $(externals_src)/jasch_lib/*/*-help.pd \
+		$(objectsdir)/$(JASCH_LIB_NAME)
 #	install -d $(manualsdir)/$(JASCH_LIB_NAME)
 #	install -p $(externals_src)/jasch_lib/manual.txt \
 #		$(manualsdir)/$(JASCH_LIB_NAME)
@@ -1556,6 +1599,8 @@ markex_install: markex
 	install -d $(helpdir)/$(MARKEX_NAME)
 	install -p $(wildcard $(externals_src)/markex/*.pd) \
 		$(helpdir)/$(MARKEX_NAME)
+	install -p $(wildcard $(externals_src)/markex/*.pd) \
+		$(objectsdir)/$(MARKEX_NAME)
 #	install -d $(manualsdir)/$(MARKEX_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/markex/README \
@@ -1584,6 +1629,8 @@ maxlib_install: maxlib
 	install -d $(helpdir)/$(MAXLIB_NAME)
 	install -p $(wildcard $(externals_src)/maxlib/help/*.pd) \
 		$(helpdir)/$(MAXLIB_NAME)
+	install -p $(wildcard $(externals_src)/maxlib/help/*.pd) \
+		$(objectsdir)/$(MAXLIB_NAME)
 #	install -d $(manualsdir)/$(MAXLIB_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/maxlib/README \
@@ -1614,6 +1661,8 @@ mjlib_install: mjlib
 	install -d $(helpdir)/$(MJLIB_NAME)
 	install -p $(wildcard $(externals_src)/mjlib/doc/*.pd) \
 		$(helpdir)/$(MJLIB_NAME)
+	install -p $(wildcard $(externals_src)/mjlib/doc/*.pd) \
+		$(objectsdir)/$(MJLIB_NAME)
 #	install -d $(manualsdir)/$(MJLIB_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/mjlib/readme.txt \
@@ -1661,6 +1710,8 @@ moocow_install:
 	  || echo 'moocow_install: WARNING: no library patches to install!'
 	install -d $(helpdir)/$(MOOCOW_NAME)
 	install -p $(MOOCOW_BUILD)/doc/5.reference/*.pd \
+		$(objectsdir)/$(MOOCOW_NAME) \
+	install -p $(MOOCOW_BUILD)/doc/5.reference/*.pd \
 		$(helpdir)/$(MOOCOW_NAME) \
 	  || echo 'moocow_install: WARNING: no help patches to install!'
 #	install -d $(manualsdir)/$(MOOCOW_NAME)
@@ -1695,6 +1746,7 @@ moonlib_install: moonlib
 		--version "0.2"
 	install -p $(MOONLIB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MOONLIB_NAME)
 	install -d $(helpdir)/$(MOONLIB_NAME)
+	install -p $(externals_src)/moonlib/help/*.pd $(objectsdir)/$(MOONLIB_NAME)
 	install -p $(externals_src)/moonlib/help/*.pd $(helpdir)/$(MOONLIB_NAME)
 	install -p $(externals_src)/moonlib/help/*.gif $(helpdir)/$(MOONLIB_NAME)
 	install -d $(helpdir)/$(MOONLIB_NAME)/d
@@ -1748,6 +1800,8 @@ mrpeach_install: mrpeach
 	install -d $(helpdir)/$(MRPEACH_NAME)
 	install -p $(externals_src)/mrpeach/*/*-help.pd \
 		$(helpdir)/$(MRPEACH_NAME)
+	install -p $(externals_src)/mrpeach/*/*-help.pd \
+		$(objectsdir)/$(MRPEACH_NAME)
 #	install -d $(manualsdir)/$(MRPEACH_NAME)
 #	install -p $(externals_src)/mrpeach/manual.txt \
 #		$(manualsdir)/$(MRPEACH_NAME)
@@ -1975,6 +2029,8 @@ pdogg_install: pdogg
 	install -d $(helpdir)/$(PDOGG_NAME)
 	install -p $(externals_src)/pdogg/*/*.pd \
 		$(helpdir)/$(PDOGG_NAME)
+	install -p $(externals_src)/pdogg/*/*.pd \
+		$(objectsdir)/$(PDOGG_NAME)
 #	install -d $(manualsdir)/$(PDOGG_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/pdogg/readme \
@@ -2239,11 +2295,15 @@ postlude_clean:
 #------------------------------------------------------------------------------#
 # SIGPACK
 SIGPACK_NAME=sigpack
-SIGPACK_OBJECTS := $(wildcard $(externals_src)/sigpack/source/*~.c)
+SIGPACK_SRC := $(wildcard $(externals_src)/sigpack/source/*~.c)
 SIGPACK_VERSION := $(shell grep "define VERSION" \
 	$(externals_src)/sigpack/source/sIgpAck.c | cut -d '"' -f 2)
 
-sigpack: $(SIGPACK_OBJECTS:.c=.$(EXTENSION))
+SIGPACK_OBJECTS := $(SIGPACK_SRC:.c=.o)
+$(SIGPACK_OBJECTS) : %.o : %.c
+	$(CC) $(CFLAGS) -O2 -funroll-loops -fomit-frame-pointer -o "$*.o" -c "$*.c"
+
+sigpack: $(SIGPACK_SRC:.c=.$(EXTENSION))
 
 sigpack_install: sigpack
 	install -d $(objectsdir)/$(SIGPACK_NAME)
@@ -2251,10 +2311,12 @@ sigpack_install: sigpack
 		--author "weiss@weiss-archiv.de" \
 		--license "GNU GPL 2" \
 		--version "$(SIGPACK_VERSION)"
-	install -p $(SIGPACK_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(SIGPACK_NAME)
+	install -p $(SIGPACK_SRC:.c=.$(EXTENSION)) $(objectsdir)/$(SIGPACK_NAME)
 	install -d $(helpdir)/$(SIGPACK_NAME)
 	install -p $(externals_src)/sigpack/help/*.pd \
 		$(helpdir)/$(SIGPACK_NAME)
+	install -p $(externals_src)/sigpack/help/*.pd \
+		$(objectsdir)/$(SIGPACK_NAME)
 #	install -d $(manualsdir)/$(SIGPACK_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/sigpack/readme.txt \
@@ -2318,6 +2380,8 @@ smlib_install: smlib
 	install -d $(helpdir)/$(SMLIB_NAME)
 	install -p $(wildcard $(externals_src)/smlib/help/*.pd )\
 		$(helpdir)/$(SMLIB_NAME)
+	install -p $(wildcard $(externals_src)/smlib/help/*.pd )\
+		$(objectsdir)/$(SMLIB_NAME)
 #	install -d $(manualsdir)/$(SMLIB_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/smlib/readme.txt $(readmesdir)/$(SMLIB_NAME).txt
@@ -2415,6 +2479,8 @@ tof_install: tof
 	install -d $(helpdir)/$(TOF_NAME)
 	install -p $(externals_src)/tof/help/*.pd \
 		$(helpdir)/$(TOF_NAME)
+	install -p $(externals_src)/tof/help/*.pd \
+		$(objectsdir)/$(TOF_NAME)
 #	install -d $(manualsdir)/$(TOF_NAME)
 #	install -p $(externals_src)/tof/manual.txt \
 #		$(manualsdir)/$(TOF_NAME)
@@ -2504,6 +2570,8 @@ unauthorized_install: unauthorized
 	install -d $(helpdir)/$(UNAUTHORIZED_NAME)
 	install -p $(externals_src)/unauthorized/*/*.pd \
 		$(helpdir)/$(UNAUTHORIZED_NAME)
+	install -p $(externals_src)/unauthorized/*/*.pd \
+		$(objectsdir)/$(UNAUTHORIZED_NAME)
 	install -p $(externals_src)/unauthorized/*/*.pls \
 		$(helpdir)/$(UNAUTHORIZED_NAME)
 	install -d $(helpdir)/$(UNAUTHORIZED_NAME)/blm
@@ -2576,6 +2644,7 @@ vbap_install: vbap
 		 $(objectsdir)/$(VBAP_NAME)
 	install -d $(helpdir)/$(VBAP_NAME)
 	install -p $(externals_src)/vbap/*-help.pd $(helpdir)/$(VBAP_NAME)
+	install -p $(externals_src)/vbap/*-help.pd $(objectsdir)/$(VBAP_NAME)
 #	install -d $(manualsdir)/$(VBAP_NAME)
 #	install -p $(externals_src)/vbap/manual.txt \
 #		$(manualsdir)/$(VBAP_NAME)
@@ -2613,6 +2682,8 @@ windowing_install: windowing
 	install -d $(helpdir)/$(WINDOWING_NAME)
 	install -p $(externals_src)/windowing/*-help.pd \
 		$(helpdir)/$(WINDOWING_NAME)
+	install -p $(externals_src)/windowing/*-help.pd \
+		$(objectsdir)/$(WINDOWING_NAME)
 #	install -d $(manualsdir)/$(WINDOWING_NAME)
 #	install -p $(externals_src)/windowing/manual.txt \
 #		$(manualsdir)/$(WINDOWING_NAME)
@@ -2760,6 +2831,8 @@ pdcontainer_install: pdcontainer
 	install -d $(helpdir)/$(PDCONTAINER_NAME)
 	install -p $(externals_src)/grh/PDContainer/help/*.pd \
 		$(helpdir)/$(PDCONTAINER_NAME)
+	install -p $(externals_src)/grh/PDContainer/help/*.pd \
+		$(objectsdir)/$(PDCONTAINER_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/grh/PDContainer/readme.txt \
 		$(readmesdir)/$(PDCONTAINER_NAME).txt
@@ -2806,6 +2879,8 @@ adaptive_install: adaptive
 	install -d $(helpdir)/$(ADAPTIVE_NAME)
 	install -p $(externals_src)/grh/adaptive/doc/*.pd \
 		$(helpdir)/$(ADAPTIVE_NAME)
+	install -p $(externals_src)/grh/adaptive/doc/*.pd \
+		$(objectsdir)/$(ADAPTIVE_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/grh/adaptive/readme \
 		$(readmesdir)/$(ADAPTIVE_NAME).txt
@@ -2840,6 +2915,8 @@ iem_adaptfilt_install: iem_adaptfilt
 	install -d $(helpdir)/$(IEMADAPT_NAME)
 	install -p $(externals_src)/iem/iem_adaptfilt/help/*.pd \
 		$(helpdir)/$(IEMADAPT_NAME)
+	install -p $(externals_src)/iem/iem_adaptfilt/help/*.pd \
+		$(objectsdir)/$(IEMADAPT_NAME)
 	install -d $(manualsdir)/$(IEMADAPT_NAME)
 	install -p $(externals_src)/iem/iem_adaptfilt/doc/adapt_filt_lib.pdf \
 		$(manualsdir)/$(IEMADAPT_NAME)
@@ -2870,6 +2947,8 @@ iem_delay_install: iem_delay
 	install -d $(helpdir)/$(IEMDELAY_NAME)
 	install -p $(externals_src)/iem/iem_delay/*.pd \
 		$(helpdir)/$(IEMDELAY_NAME)
+	install -p $(externals_src)/iem/iem_delay/*.pd \
+		$(objectsdir)/$(IEMDELAY_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_delay/READ_ME.txt \
 		$(readmesdir)/$(IEMDELAY_NAME).txt
@@ -2900,6 +2979,8 @@ iem_roomsim_install: iem_roomsim
 	install -d $(helpdir)/$(IEMROOM_NAME)
 	install -p $(externals_src)/iem/iem_roomsim/*.pd \
 		$(helpdir)/$(IEMROOM_NAME)
+	install -p $(externals_src)/iem/iem_roomsim/*.pd \
+		$(objectsdir)/$(IEMROOM_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_roomsim/READ_ME.txt \
 		$(readmesdir)/$(IEMROOM_NAME).txt
@@ -2930,6 +3011,8 @@ iem_spec2_install: iem_spec2
 	install -d $(helpdir)/$(IEMSPEC2_NAME)
 	install -p $(externals_src)/iem/iem_spec2/*.pd \
 		$(helpdir)/$(IEMSPEC2_NAME)
+	install -p $(externals_src)/iem/iem_spec2/*.pd \
+		$(objectsdir)/$(IEMSPEC2_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_spec2/READ_ME.txt \
 		$(readmesdir)/$(IEMSPEC2_NAME).txt
@@ -2973,6 +3056,8 @@ iem_tab_install: iem_tab
 	install -d $(helpdir)/$(IEMTAB_NAME)
 	install -p $(externals_src)/iem/iem_tab/*.pd \
 		$(helpdir)/$(IEMTAB_NAME)
+	install -p $(externals_src)/iem/iem_tab/*.pd \
+		$(objectsdir)/$(IEMTAB_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_tab/READ_ME.txt \
 		$(readmesdir)/$(IEMTAB_NAME).txt
@@ -3083,6 +3168,8 @@ iemgui_install: iemgui
 	install -d $(helpdir)/$(IEMGUI_NAME)
 	install -p $(externals_src)/iem/iemgui/*.pd \
 		$(helpdir)/$(IEMGUI_NAME)
+	install -p $(externals_src)/iem/iemgui/*.pd \
+		$(objectsdir)/$(IEMGUI_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iemgui/READ_ME.txt \
 		$(readmesdir)/$(IEMGUI_NAME).txt
