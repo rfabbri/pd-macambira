@@ -142,24 +142,13 @@ else
   endif
 endif
 
-
-all: pre_all_$(OS_NAME) $(LIB_TARGETS)
-	@echo " "
-	@echo "Compiled external for $(OS_NAME) aka $(UNAME)"
-
-# these targets are for platform-specific needs that run before objects:
-pre_all_darwin:
-
-pre_all_linux:
-
-pre_all_windows:
-
-pre_all_unknown:
-# this target is for "everything else"
-
-
 #------------------------------------------------------------------------------#
-# INSTALL
+
+all: $(LIB_TARGETS)
+	@echo " "
+	@echo "Compiled externals for $(OS_NAME) aka $(UNAME)"
+
+
 install: $(examplesdir) $(helpdir) $(manualsdir) $(objectsdir) $(readmesdir) \
 all $(patsubst %, %_install,$(LIB_TARGETS))
 	@echo " "
@@ -302,40 +291,14 @@ aka.wiiremote_clean:
 
 #------------------------------------------------------------------------------#
 # APPLE
-APPLE_NAME=apple
-APPLE_OBJECTS := $(wildcard $(externals_src)/apple/*.c)
-apple: $(APPLE_OBJECTS:.c=.$(EXTENSION))
+apple:
+	make -C $(externals_src)/apple
 
-apple_install: apple
-	install -d $(objectsdir)/$(APPLE_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(APPLE_NAME) \
-		--author "Hans-Christoph Steiner" \
-		--description "support for Apple-specific functions" \
-		--license "GPLv2 or later"
-	install -p $(APPLE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(APPLE_NAME)
-	install -p $(shell ls -1 $(externals_src)/apple/*.pd | \
-		grep -v '-help.pd' | sed 's|\(.*\)|"\1"|g') \
-		 $(objectsdir)/$(APPLE_NAME)
-	install -d $(helpdir)/$(APPLE_NAME)
-	install -p $(externals_src)/apple/*-help.pd \
-		$(helpdir)/$(APPLE_NAME)
-	install -p $(externals_src)/apple/*-help.pd \
-		$(objectsdir)/$(APPLE_NAME)
-#	install -d $(manualsdir)/$(APPLE_NAME)
-#	install -p $(externals_src)/apple/manual.txt \
-#		$(manualsdir)/$(APPLE_NAME)
-#	install -d $(readmesdir)
-#	install -p $(externals_src)/apple/README \
-#		$(readmesdir)/$(APPLE_NAME).txt
-#	install -d $(examplesdir)/$(APPLE_NAME)
-#	install -p $(externals_src)/apple/examples/*.pd \
-#		$(examplesdir)/$(APPLE_NAME)
+apple_install:
+	make -C $(externals_src)/apple objectsdir="$(objectsdir)" install
 
 apple_clean:
-	-rm -f -- $(APPLE_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(APPLE_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/apple/*.bak
-	-rm -f -- $(externals_src)/apple/*.*~
+	make -C $(externals_src)/apple clean
 
 
 #------------------------------------------------------------------------------#
