@@ -719,7 +719,7 @@ for "project" beaming (pdsvn-dir);
 #X obj 28 122 t a b a;
 #X obj 78 122 s \$0process;
 #X obj 505 43 r \$0process;
-#X obj 505 73 symbol-explode;
+#X obj 505 73 symbol-s2l;
 #X obj 584 116 list length;
 #X obj 203 77 s \$0listStatusReset;
 #X obj 112 145 r \$0listStatusReset;

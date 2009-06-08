@@ -16,7 +16,7 @@
 #X text 225 261 letter width;
 #X obj 189 261 * 4.5;
 #X obj 189 184 list2symbol;
-#X obj 189 211 symbol-explode;
+#X obj 189 211 symbol-s2l;
 #X obj 329 170 import-disabled zexy;
 #X connect 0 0 1 0;
 #X connect 3 0 0 0;

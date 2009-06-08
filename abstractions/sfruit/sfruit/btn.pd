@@ -7,7 +7,7 @@
 -66577 0;
 #X text -118 -45 subtract difference add half to text xoffset;
 #X text -117 -67 div result + 2 \, then add 1 extra radio;
-#X obj -61 38 symbol-explode;
+#X obj -61 38 symbol-s2l;
 #X msg -61 -2 boobies;
 #X obj -61 17 t a a;
 #X obj 65 17 s \$0canvas;
