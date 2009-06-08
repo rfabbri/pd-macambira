@@ -204,19 +204,14 @@ GEM_NAME = Gem
 $(gem_src)/src/configure: 
 	cd $(gem_src)/src && ./autogen.sh
 
-# each platform currently needs a custom ./configure, so this is commented out
-# until the ./configure defaults work on all three platforms
-#$(gem_src)/src/Make.config: $(gem_src)/src/Make.config.in
-#	cd $(gem_src)/src && ./configure	--with-pd=$(pd_src)
-
-$(gem_src)/src/Gem.dll:
+$(gem_src)/src/Gem.dll: $(gem_src)/src/configure
 
 $(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
 	cd $(gem_src)/src && ./configure \
 		--without-ffmpeg --with-pd=$(pd_src) --disable-NV
 	$(MAKE) -C $(gem_src)/src
 
-$(gem_src)/src/Gem.pd_darwin:
+$(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
 	cd $(gem_src)/src && ./configure \
 		--without-x --without-ImageMagick --without-v4l \
 		--without-tiff --without-jpeg --without-mpeg --without-mpeg3 \
