@@ -1397,9 +1397,7 @@ int class_getfieldindex(t_class *x, const char *s) {
 	return -1;
 }
 
-/* O(n) asymptotic time :-} */
 /* only looks for already loaded classes though. */
-
 t_class *class_find (t_symbol *s) {return (t_class *)class_table->get(s);}
 
 void glob_update_class_info (t_pd *bogus, t_symbol *s, t_symbol *cb_recv, t_symbol *cb_sel) {
