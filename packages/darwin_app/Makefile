@@ -27,13 +27,14 @@ WISH_CONTENTS = "$(WISH)/Contents"
 # http://hpc.sourceforge.net/
 
 OPT_CFLAGS = -fast -fPIC -ftree-vectorize -ftree-vectorizer-verbose=2
+FAT_FLAGS = -mmacosx-version-min=10.4
 
 # which CPU to compile for
 TARGET_PLATFORM := $(shell uname -p)
 ifeq ($(TARGET_PLATFORM),i386)
   OPT_CFLAGS += -march=pentium4 -msse3 -mfpmath=sse
 else
-  OPT_CFLAGS += -mcpu=7400 -mtune=7400
+  OPT_CFLAGS += -mcpu=7450 -mtune=7450
 endif
 
 OPT_FLAGS += -DDEBUG_SOUNDFILE
@@ -45,6 +46,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				prefix=$(prefix) \
 				DESTDIR=$(DESTDIR) \
 				OPT_CFLAGS="$(OPT_CFLAGS)" \
+				FAT_FLAGS="$(FAT_FLAGS)" \
 				UNAME=$(UNAME)
 
 all:
