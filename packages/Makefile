@@ -213,6 +213,7 @@ $(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
 
 $(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
 	cd $(gem_src)/src && ./configure \
+		PKG_FTGL_CFLAGS=-I/sw/include/freetype2 \
 		--without-x --without-ImageMagick --without-v4l \
 		--without-tiff --without-jpeg --without-mpeg --without-mpeg3 \
 		--without-ieee1394 --without-aviplay --without-avifile --without-ffmpeg \
