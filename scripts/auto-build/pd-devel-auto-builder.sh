@@ -56,6 +56,7 @@ cd "${auto_build_root_dir}/packages/$BUILD_DIR"
 make -C "${auto_build_root_dir}/packages" set_version PD-EXTENDED_VERSION_PREFIX=devel
 make test_locations
 mount
+print_ip_address
 make package_clean
 make install PD-EXTENDED_VERSION_PREFIX=devel
 make package PD-EXTENDED_VERSION_PREFIX=devel
