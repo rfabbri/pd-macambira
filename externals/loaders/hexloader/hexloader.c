@@ -1,4 +1,6 @@
-/* Copyright (c) 2007 IOhannes m zmölnig @ IEM
+/*
+ * hexloader
+ * Copyright (c) 2007-2009 IOhannes m zmölnig @ IEM
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," that comes with Pd.  
  */
@@ -545,6 +547,8 @@ static int hexloader_doload(char*filename, char*setupfun) {
       return (0);
     }
     makeout = (t_hexloader_setup)GetProcAddress(ntdll, setupfun);  
+#else
+    error("alas! somebody (you?) has compiled [hexloader] without support for loading externals...how should i load?");
 #endif
 
     if (!makeout)
