@@ -2440,8 +2440,8 @@ def Macro add {mess} {
 	if {[regexp {^Shift_} $k]} {return}
 	if {$event == "KeyRelease"} {return}
 	if {$event == "ButtonRelease"} {lappend @list [lreplace $mess 0 0 "Motion"]}
-	if {$event == "KeyPress"} {lappend @list [lreplace $mess 0 0 "Motion"]}
-	if {$event == "ButtonPress"} {lappend @list [lreplace $mess 0 0 "Motion"]}
+	if {$event == "KeyPress"     } {lappend @list [lreplace $mess 0 0 "Motion"]}
+	if {$event == "ButtonPress"  } {lappend @list [lreplace $mess 0 0 "Motion"]}
 	lappend @list $mess
 }
 
@@ -6199,8 +6199,8 @@ def Radio reinit {mess} {
 }
 def Radio bbox {} {
 	mset {x1 y1} [$self xy]
-	set x2 [expr $x1+$@w*($@orient ?1:$@n)]
-	set y2 [expr $y1+$@w*($@orient ?$@n:1)]
+	set x2 [expr {$x1+$@w*($@orient ?1:$@n)}]
+	set y2 [expr {$y1+$@w*($@orient ?$@n:1)}]
 	list $x1 $y1 $x2 $y2
 }
 def Radio draw {} {
@@ -6208,21 +6208,25 @@ def Radio draw {} {
 	super
 	$self item_delete BUT ;# would be cool if this didn't delete stuff that we're about to redraw.
 	for {set i 0} {$i<$@n} {incr i} {
-		$self item [list BUT$i BUT] rectangle \
-		    [list [expr $x1+3] [expr $y1+3] [expr $x1+$@w-3] [expr $y1+$@w-3]] \
-		    -fill #ffffff -outline #000000
-		if {$@orient} {set y1 [expr $y1+$@w]} {set x1 [expr $x1+$@w]}
+		#set coords [list [expr {$x1+3}] [expr {$y1+3}] [expr {$x1+$@w-3}] [expr {$y1+$@w-3}]]
+		set coords [list $x1 $y1 [expr {$x1+$@w}] [expr {$y1+$@w}]]
+		$self item [list BUT$i BUT] rectangle $coords -fill #ffffff -outline #000000
+		if {$@orient} {set y1 [expr {$y1+$@w}]} {set x1 [expr {$x1+$@w}]}
 	}
 	$self set $@on
 }
 def Radio set {value} {
 	set c [$self get_canvas]
-	[$c widget] itemconfigure ${self}BUT       -fill #ffffff
-	[$c widget] itemconfigure ${self}BUT$value -fill #000000
+	mset {x1 y1} [$self xy]
+	set value [expr round($value)]
+	if {$@orient} {set y1 [expr $y1+$@w*$value]} {set x1 [expr $x1+$@w*$value]}
+	set coords [list [expr {$x1+3}] [expr {$y1+3}] [expr {$x1+$@w-3}] [expr {$y1+$@w-3}]]
+	puts "coords=$coords"
+	$self item [list CHECK BUT] rectangle $coords -fill #000000
 }
 def Radio click {x y f target} {
 	mset {x1 y1} [$self xy]
-	set i [expr {($@orient ?$y-$y1:$x-$x1)/$@w}]
+	set i [expr {int($@orient ?$y-$y1-2:$x-$x1-2)/$@w}]
 	netsend [list .$self fout $i]
 }
 def Radio key_incr {val1 val2} {
