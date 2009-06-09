@@ -29,6 +29,7 @@ objects use Posix-like threads.  */
 
 #define PD_PLUSPLUS_FACE
 #include "desire.h"
+using namespace desire;
 #define a_symbol a_w.w_symbol
 #define a_float a_w.w_float
 
