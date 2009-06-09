@@ -57,8 +57,8 @@ void iemmatrix_sources_setup(void)
 	iemtx_mean_setup(); /* mtx_mean.c */
 	iemtx_min2_setup(); /* mtx_min2.c */
 	iemtx_minmax_setup(); /* mtx_minmax.c */
-	iemtx_mul_setup(); /* mtx_mul.c */
 	iemtx_mul__setup(); /* mtx_mul~.c */
+	iemtx_mul_setup(); /* mtx_mul.c */
 	iemtx_neq_setup(); /* mtx_neq.c */
 	iemtx_not_setup(); /* mtx_not.c */
 	iemtx_ones_setup(); /* mtx_ones.c */
@@ -69,6 +69,7 @@ void iemmatrix_sources_setup(void)
 	iemtx_powtodb_setup(); /* mtx_powtodb.c */
 	iemtx_print_setup(); /* mtx_print.c */
 	iemtx_prod_setup(); /* mtx_prod.c */
+	iemtx_qr_setup(); /* mtx_qr.c */
 	iemtx_rand_setup(); /* mtx_rand.c */
 	iemtx_repmat_setup(); /* mtx_repmat.c */
 	iemtx_resize_setup(); /* mtx_resize.c */
