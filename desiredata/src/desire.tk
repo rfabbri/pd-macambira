@@ -2370,23 +2370,23 @@ def Canvas gop_target {id} {
 }
 
 #-----------------------------------------------------------------------------------#
-class_new Macro_Rect {View}
+class_new MacroRect {View}
 
-def Macro_Rect init {} {super; $self data= 0 0 0 0 blue}
+def MacroRect init {} {super; $self data= 0 0 0 0 blue}
 
-def Macro_Rect data= {x1 y1 x2 y2 col} {
+def MacroRect data= {x1 y1 x2 y2 col} {
 	set @x1 $x1; set @y1 $y1
 	set @x2 $x2; set @y2 $y2
 	set @col $col
 }
 
-def Macro_Rect flash {x1 y1 x2 y2 col} {
+def MacroRect flash {x1 y1 x2 y2 col} {
 	$self data= $x1 $y1 $x2 $y2 $col
 	$self draw
 	after 500 $self erase
 }
 
-def Macro_Rect draw {} {
+def MacroRect draw {} {
 	set @canvas [string range [focus] 1 [string first . [focus] 1]-1]
 	$self item MACRO rect [list $@x1 $@y1 $@x2 $@y2] -outline $@col
 }
@@ -2401,7 +2401,7 @@ def Macro init {} {
 	set @delay 200
 	set @offset_x 0
 	set @offset_y 0
-	set @rect [Macro_Rect new]
+	set @rect [MacroRect new]
 }
 def Macro state= {val} {
 	set @state $val
