@@ -24,7 +24,7 @@ LINUXINCLUDE =  -I$(LINUXINCLUDEPATH) -I../../vstserver/include
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -I/site/include/wine -c $(NAME).c -I../include -DPLUGIN_TILDE_USE_VST -DPLUGIN_DEBUG -DPLUGIN_TILDE_VERBOSE
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -I/site/include/wine  -c plugin~_vst.c -I../include -DPLUGIN_TILDE_USE_VST -DPLUGIN_DEBUG -DPLUGIN_TILDE_VERBOSE 
 
-	ld -export_dynamic k_vst~.o plugin~_vst.o -shared -o $(NAME).pd_linux -lc -lm -L/usr/local/lib -L../../vstserver -lvst
+	ld --export-dynamic k_vst~.o plugin~_vst.o -shared -o $(NAME).pd_linux -lc -lm -L/usr/local/lib -L../../vstserver -lvst
 	strip --strip-unneeded $*.pd_linux
 	rm -f $*.o ../$*.pd_linux
 	ln -s k_vst~/$*.pd_linux ..

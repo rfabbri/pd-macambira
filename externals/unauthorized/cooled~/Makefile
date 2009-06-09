@@ -69,7 +69,7 @@ LINUXINCLUDE =  -I../../src
 .c.pd_linux:
 	./tk2c.bash < $*.tk > $*.tk2c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lpthread -lc -lm
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o -lpthread -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	rm -f $*.o ../$*.pd_linux
 	ln -s $*/$*.pd_linux ..

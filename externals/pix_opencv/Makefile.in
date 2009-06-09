@@ -16,7 +16,7 @@ all: pix_preview.pd_linux
 
 pix_preview.pd_linux: pix_preview.o 
 	rm -f pix_preview.pd_linux
-	gcc -export_dynamic -shared -o pix_preview.pd_linux pix_preview.o $(LIBS)
+	gcc -Wl,--export-dynamic -shared -o pix_preview.pd_linux pix_preview.o $(LIBS)
 
 clean:
 	rm -f *.o

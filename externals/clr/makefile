@@ -25,4 +25,4 @@ MONOLIB = -L$(MONOPATH)/lib -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -licon
 
 .cpp.dll:
 	g++ $(CFLAGS) $(PDINC) $(MONOINC) -o $*.o -c $*.cpp
-	g++ -export_dynamic -shared -mno-cygwin $(PDLIB) -o $*.dll $*.o $(MONOLIB) -lm
+	g++ --export-dynamic -shared -mno-cygwin $(PDLIB) -o $*.dll $*.o $(MONOLIB) -lm

@@ -72,7 +72,7 @@ LINUXOBJ = clone_connective.o clone_signal.o
 	cc -O2 -Wall -DPD -fPIC $(LINUXCFLAGS) $(LINUXINCLUDE) -c clone_connective.c
 	cc -O2 -Wall -DPD -fPIC $(LINUXCFLAGS) $(LINUXINCLUDE) -c clone_signal.c
 	cc -O2 -Wall -DPD -fPIC $(LINUXCFLAGS) $(LINUXINCLUDE) -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o $(LINUXOBJ) -lc
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o $(LINUXOBJ) -lc
 	strip --strip-unneeded $*.pd_linux 
 
 # ----------------------------------------------------------

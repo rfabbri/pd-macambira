@@ -27,7 +27,7 @@ LINUXINCLUDE =  -I/usr/include -I./include
 
 .c.pd_linux:
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/$(NAME).c
-	ld -export_dynamic  -shared -o $(NAME).pd_linux $(NAME).o -lc 
+	ld --export-dynamic  -shared -o $(NAME).pd_linux $(NAME).o -lc 
 	strip --strip-unneeded $(NAME).pd_linux
 	rm -f *.o
 

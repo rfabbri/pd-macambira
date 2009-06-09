@@ -13,7 +13,7 @@ LD = ld
 STRIP = strip --strip-unneeded
 
 AFLAGS = 
-LFLAGS = -export_dynamic  -shared
+LFLAGS = --export-dynamic  -shared
 WFLAGS =
 
 MAKEDEP_FLAGS = -MM

@@ -49,14 +49,14 @@ $(OTARGETS): %.o_linux : %.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o_linux -c $*.c
 
 $(TARGETS): %.pd_linux : %.o_linux
-	$(LD) -export_dynamic  -shared -o $*.pd_linux $*.o_linux -lc -lm
+	$(LD) --export-dynamic  -shared -o $*.pd_linux $*.o_linux -lc -lm
 	strip --strip-unneeded $*.pd_linux
 
 pd_linux: $(TARGETS)
 
 MarkEx.pd_linux: $(OTARGETS)
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o MarkEx.o_linux -c MarkEx.c
-	$(LD) -export_dynamic  -shared -o MarkEx.pd_linux *.o_linux -lc -lm
+	$(LD) --export-dynamic  -shared -o MarkEx.pd_linux *.o_linux -lc -lm
 	strip --strip-unneeded MarkEx.pd_linux
 
 # ----------------------- CLEAN -----------------------

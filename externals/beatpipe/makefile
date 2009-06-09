@@ -7,7 +7,7 @@ LINUXINCLUDE =  -I/usr/local/include
 
 beatpipe: beatpipe.c
 	gcc $(CFLAGS) $(LINUXCFLAGS) $(LINUXINCLUDE) -o beatpipe.o -c beatpipe.c
-	ld -export_dynamic  -shared -o beatpipe.pd_linux beatpipe.o -lc -lm
+	ld --export-dynamic  -shared -o beatpipe.pd_linux beatpipe.o -lc -lm
 	strip --strip-unneeded beatpipe.pd_linux
 	rm beatpipe.o
 

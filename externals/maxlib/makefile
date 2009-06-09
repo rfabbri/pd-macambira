@@ -383,7 +383,7 @@ LINUXEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/weibull.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/wrap.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o $(LINUXEXTERNALS) -lc
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o $(LINUXEXTERNALS) -lc
 	strip --strip-unneeded $*.pd_linux
 
 # ----------------------------------------------------------

@@ -92,7 +92,7 @@ LINUXINCLUDE =  -I../../src -I.
 
 .c.pd_linux:
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm -L/usr/local/lib -lmp3lame
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o -lc -lm -L/usr/local/lib -lmp3lame
 	strip --strip-unneeded $*.pd_linux
 	rm -f $*.o ../$*.pd_linux
 	ln -s $*/$*.pd_linux ..

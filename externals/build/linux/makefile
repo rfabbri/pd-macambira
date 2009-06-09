@@ -53,7 +53,7 @@ INCLUDES = -I. -I.. -I../../../pd/src -I../include
 
 %.pd_linux: ../src/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o "$*.o" -c "../src/$*.c"
-	gcc -Wl,-export_dynamic  -shared -o "$*.pd_linux" "$*.o" -lc -lm \
+	gcc -Wl,--export-dynamic  -shared -o "$*.pd_linux" "$*.o" -lc -lm \
 		`test -f $*.libs && cat $*.libs` \
 		`test -f ../src/$*.libs && cat ../src/$*.libs`
 	chmod a-x "$*.pd_linux"

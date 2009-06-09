@@ -70,7 +70,7 @@ LINUXINCLUDE =  -I../../src -I../../src/pdinclude
 
 .c.pd_linux:
 	$(CC) -O2 -Wall -DPD -fPIC $(NS_INCLUDE) -c $*.c 
-	$(LD) -export_dynamic  -shared -o $*.pd_linux $*.o -lc 
+	$(LD) --export-dynamic  -shared -o $*.pd_linux $*.o -lc 
 	rm -f $*.o ../$*.pd_linux 
 	#cp $*.pd_linux ../../xjimmies/.
 

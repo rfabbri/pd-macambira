@@ -8,7 +8,7 @@ ifeq ($(UNAME),Linux)
   OS_NAME = linux
   EXTENSION = pd_linux
   CFLAGS += -DUNIX -Dunix -fPIC
-  LDFLAGS += -Wl,-export_dynamic  -shared
+  LDFLAGS += -Wl,--export-dynamic  -shared
 endif
 ifeq ($(UNAME),Darwin)
   OS_NAME = darwin

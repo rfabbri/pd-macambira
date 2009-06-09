@@ -29,7 +29,7 @@ LINUXINCLUDE = -I /usr/local/include
 
 .c.pd_linux:
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	ld -lsdif -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm 
+	ld -lsdif --export-dynamic  -shared -o $*.pd_linux $*.o -lc -lm 
 	strip --strip-unneeded $*.pd_linux
 	rm $*.o
 

@@ -71,7 +71,7 @@ LINUXINCLUDE =  -I../../src
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o lpc.o -c lpc.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o tables.o -c tables.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux *.o -lc -lm
+	ld --export-dynamic  -shared -o $*.pd_linux *.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	rm -f $*.o ../$*.pd_linux
 	ln -s $*/$*.pd_linux ..

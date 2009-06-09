@@ -5,7 +5,7 @@ CC = gcc
 CXX = c++
 LD = ld
 AFLAGS = 
-LFLAGS = -export_dynamic  -shared
+LFLAGS = --export-dynamic  -shared
 WFLAGS =
 IFLAGS = -I./include -I../src
 INSTALL_PREFIX=/usr/local
@@ -27,7 +27,7 @@ all: $(TARGETS)
 
 mjLib: $(TARGETS)
 	cc -c $(CFLAGS) -DPD mjLib.c
-	$(LD) -export_dynamic  -shared -o mjLib.pd_linux *.o $(LIBS)
+	$(LD) --export-dynamic  -shared -o mjLib.pd_linux *.o $(LIBS)
 	strip --strip-unneeded mjLib.pd_linux
 
 clean::

@@ -71,7 +71,7 @@ LINUXINCLUDEPATH=../../src
 LINUXINCLUDE =  -I$(LINUXINCLUDEPATH)
 
 $(NAME).pd_linux: $(NAME).o
-	ld -export_dynamic  -shared -o $(NAME).pd_linux k_guile.o -lc -lm -lguile
+	ld --export-dynamic  -shared -o $(NAME).pd_linux k_guile.o -lc -lm -lguile
 	strip --strip-unneeded $*.pd_linux
 	rm -f $*.o ../$*.pd_linux
 	ln -s $(DIR)/$*.pd_linux ..

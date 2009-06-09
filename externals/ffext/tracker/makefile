@@ -32,7 +32,7 @@ LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
    -Wall -W -Wno-shadow -Wstrict-prototypes \
    -Wno-unused -Wno-parentheses -Wno-switch
 LINUXINCLUDE = -I/usr/include -I$(PDPATH)/src
-LINUXLDFLAGS = -export_dynamic  -shared
+LINUXLDFLAGS = --export-dynamic  -shared
 
 .c.pd_linux:
 	$(CC) $(LINUXCFLAGS) $(CFLAGS) $(LINUXINCLUDE) -fPIC -o $*.o -c $*.c

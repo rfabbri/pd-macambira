@@ -70,7 +70,7 @@ LSTRIP = strip --strip-unneeded -R .note -R .comment
 
 .c.pd_linux:
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	cc -Wl,-export_dynamic --shared -o $*.pd_linux $*.o -lm
+	cc -Wl,--export-dynamic --shared -o $*.pd_linux $*.o -lm
 	$(LSTRIP) $*.pd_linux
 	rm -f $*.o
 

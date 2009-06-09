@@ -74,7 +74,7 @@ LSTRIP = strip --strip-unneeded -R .note -R .comment
 .c.pd_linux:
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o sndfiler.o -c sndfiler.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o file_input.o -c file_input.c
-	cc -Wl,-export_dynamic --shared -o $*.pd_linux $(OBJ) -lm -lsndfile -lvorbisfile
+	cc -Wl,--export-dynamic --shared -o $*.pd_linux $(OBJ) -lm -lsndfile -lvorbisfile
 #	$(LSTRIP) $*.pd_linux
 	rm -f $*.o
 

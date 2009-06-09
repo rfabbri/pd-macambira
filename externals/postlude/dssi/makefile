@@ -30,7 +30,7 @@ LINUXINCLUDE =  -I/usr/include -I./include
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/jsearch.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/jload.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/dssi~.c
-	gcc -export_dynamic  -shared -o $(NAME).pd_linux dssi~.o jload.o jsearch.o -lc -lm -llo
+	gcc --export-dynamic  -shared -o $(NAME).pd_linux dssi~.o jload.o jsearch.o -lc -lm -llo
 #	strip --strip-unneeded $(NAME).pd_linux
 	cp $(NAME).pd_linux ~/pd-externals/
 	rm -f *.o

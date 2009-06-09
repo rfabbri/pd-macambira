@@ -72,7 +72,7 @@ LINUXINCLUDE =  -I/usr/lib/pd/include/
 
 .c.pd_linux:
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -g -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	rm $*.o
 	cp $*.pd_linux ../.

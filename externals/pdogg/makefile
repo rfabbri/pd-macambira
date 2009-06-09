@@ -85,7 +85,7 @@ LINUXEXTERNALS = oggamp~.o oggcast~.o oggread~.o oggwrite~.o
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c oggread~/oggread~.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c oggwrite~/oggwrite~.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o $(LINUXEXTERNALS) -lc \
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o $(LINUXEXTERNALS) -lc \
            -lm -L/usr/local/lib -lvorbisfile -lvorbisenc -lvorbis -logg
 	strip --strip-unneeded $*.pd_linux
 

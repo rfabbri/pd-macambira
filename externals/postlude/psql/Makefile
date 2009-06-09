@@ -28,7 +28,7 @@ LINUXCFLAGS =  -g -DPD -O0 -fPIC -funroll-loops -fomit-frame-pointer \
 
 .c.pd_linux:
 	$(CC) $(LINUXCFLAGS) $(INCLUDE) -o $*.o -c $*.c 
-	$(CC) -export_dynamic  -shared -o $*.pd_linux $*.o $(LDFLAGS) 
+	$(CC) --export-dynamic  -shared -o $*.pd_linux $*.o $(LDFLAGS) 
 	strip --strip-unneeded $*.pd_linux
 	rm $*.o 
 

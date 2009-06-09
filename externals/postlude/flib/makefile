@@ -149,7 +149,7 @@ LINUXINCLUDE =  -I/usr/include
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/hca~.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/cc~.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c $*.c
-	ld -export_dynamic  -shared -o $(NAME).pd_linux $(NAME).o $(LINUXOBJECTS) -lc -lm
+	ld --export-dynamic  -shared -o $(NAME).pd_linux $(NAME).o $(LINUXOBJECTS) -lc -lm
 	strip --strip-unneeded $(NAME).pd_linux
 
 # ----------------------- IRIX 5.x -----------------------

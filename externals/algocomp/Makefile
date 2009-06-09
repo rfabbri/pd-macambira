@@ -33,7 +33,7 @@ LINUXINCLUDE =  -I../../src
 
 .c.pd_linux:
 	cc -O2 -Wall -DPD -fPIC $(LINUXCFLAGS) $(LINUXINCLUDE) -c $*.c 
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc 
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o -lc 
 	strip --strip-unneeded $*.pd_linux 
 
 install_linux:
@@ -72,7 +72,7 @@ install_nt:
 
 pd_xp:
 	gcc -O2 -Wall -DPD -L$(LIBPATH) -c $(NAME).c 
-	ld -export_dynamic -shared -o $(NAME).dll -lc 
+	ld --export-dynamic -shared -o $(NAME).dll -lc 
 
 
 install_xp:

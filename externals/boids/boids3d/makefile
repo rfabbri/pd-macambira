@@ -68,7 +68,7 @@ LINUXINCLUDE =  -I../../src
 
 .c.pd_linux:
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	rm -f $*.o
 

@@ -86,7 +86,7 @@ strange1.o tent.o three_d.o threeply.o tinkerbell.o unity.o lotka_volterra.o
 
 .c.pd_linux:
 	cc -O2 -Wall -DPD -fPIC $(LINUXCFLAGS) $(LINUXINCLUDE) -c *.c 
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o $(LINUXEXTERNALS) -lc 
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o $(LINUXEXTERNALS) -lc 
 	strip --strip-unneeded $*.pd_linux 
 
 # ----------------------------------------------------------

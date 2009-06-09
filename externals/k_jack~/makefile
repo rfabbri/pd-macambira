@@ -71,7 +71,7 @@ LINUXINCLUDE =  -I$(PDSRCDIR)
 
 .c.pd_linux:
 	gcc $(LINUXCFLAGS) $(LINUXINCLUDE) -g -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm -ljack
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o -lc -lm -ljack
 	strip --strip-unneeded $*.pd_linux
 	rm -f $*.o ../$*.pd_linux
 	ln -s $*/$*.pd_linux ..

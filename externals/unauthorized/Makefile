@@ -49,7 +49,7 @@ MINGW_LDFLAGS = -shared -L../../pd/bin -LC:/msys/1.0/lib \
 
 #.c.dll: CURRENT_DIR = `echo $* | cut -d '/' -f 1`
 #	$(CC) $(MINGW_CFLAGS) $(MINGW_INCLUDE) -o $*.o -c $*.c
-#	ld -export_dynamic  -shared -o $*.dll $*.o -lc -lm $(MINGW_LFLAGS)
+#	ld --export-dynamic  -shared -o $*.dll $*.o -lc -lm $(MINGW_LFLAGS)
 #	strip --strip-unneeded $*.dll
 #	dllwrap --target=i386-mingw32 -mno-cygwin --output-lib=lib$*.a \
 #				--dllname=$*.dll --driver-name=gcc $*.o $(MINGW_LFLAGS)
@@ -127,7 +127,7 @@ LINUXINCLUDE =  -I../../src -I../../pd/src
 
 .c.pd_linux:
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	-rm $*.o
 

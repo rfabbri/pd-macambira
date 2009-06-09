@@ -78,7 +78,7 @@ else
 LINUXCFLAGS += -O2
 endif
 
-LINUXLDFLAGS =  -export_dynamic -shared  -lc -lm
+LINUXLDFLAGS =  --export-dynamic -shared  -lc -lm
 LINUXLIBS = -lcurl
 
 LINUXINCLUDE =  -I$(PDSRCDIR)
@@ -159,7 +159,7 @@ MINGWCFLAGS = $(DEFINES) -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch -mms-bitfields
 
-MINGWLDFLAGS =  -export_dynamic -shared -lm -lkernel32 -lcoldname -lcrtdll -lpd -L$(PDLIBDIR)
+MINGWLDFLAGS =  --export-dynamic -shared -lm -lkernel32 -lcoldname -lcrtdll -lpd -L$(PDLIBDIR)
 
 MINGWINCLUDE =  -I$(PDSRCDIR)
 

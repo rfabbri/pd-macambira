@@ -65,7 +65,7 @@ DEFS = -DPD
 #CFLAGS = -O2 -g -Wall $(LINCLUDE) $(UCFLAGS) $(AFLAGS)
 CFLAGS = $(OPTIMIZE_FLAGS) -fomit-frame-pointer -fPIC -Wall $(LINCLUDE) $(UCFLAGS) $(AFLAGS) $(DEFS)
 
-LDFLAGS = -Wl,-export_dynamic -shared
+LDFLAGS = -Wl,--export-dynamic -shared
 LIBS = -lc -lm
 
 # here come the targets

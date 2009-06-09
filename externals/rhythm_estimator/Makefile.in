@@ -97,7 +97,7 @@ pdincludedir = $(pddir)/src
 INCLUDES = -I$(top_srcdir) -I$(pdincludedir)
 CFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer     -Wall -W -Wshadow -Wstrict-prototypes -Werror     -Wno-unused -Wno-parentheses -Wno-switch
 
-LDFLAGS = -export_dynamic -shared
+LDFLAGS = --export-dynamic -shared
 
 pdinstall_DATA =  	AUTHORS 	COPYING 	NEWS 	README 	TODO 	bang-eater.pd 	cama99.ps 	click1.wav 	click2.wav 	drumboy~.pd 	drunk-metro.pd 	ping~.pd 	rhythm_estimator.pd 	rhythm_estimator_example.pd 	rhythm_estimator_example2.pd
 

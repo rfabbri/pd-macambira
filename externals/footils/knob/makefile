@@ -79,7 +79,7 @@ LINUXINCLUDE =  -I../../src -I$(PD_DIR)/src
 
 .c.pd_linux:
 	cc -O2 -Wall -DPD -fPIC $(LINUXINCLUDE) -c $*.c 
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc 
+	ld --export-dynamic  -shared -o $*.pd_linux $*.o -lc 
 	strip $*.pd_linux 
 
 # ----------------------------------------------------------

@@ -46,7 +46,7 @@ INCLUDES = -I$(top_srcdir) -I$(pdincludedir)
 CFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch
-LDFLAGS = -export_dynamic -shared
+LDFLAGS = --export-dynamic -shared
 
 ## Install the documentation.
 

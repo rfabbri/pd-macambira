@@ -28,7 +28,7 @@ LINUXLINKS = -lX11 -lXtst -lgtk -lgdk -lgmodule -lglib -ldl -lXi -lXext -lX11 -l
 .c.pd_linux:
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c \
     `xmms-config --cflags`
-	ld -export_dynamic -shared -o $*.pd_linux $*.o -lpcre -lc -lm\
+	ld --export-dynamic -shared -o $*.pd_linux $*.o -lpcre -lc -lm\
     -L/usr/lib -L/usr/X11R6/lib $(LINUXLINKS)
 	strip --strip-unneeded $*.pd_linux
 	rm $*.o

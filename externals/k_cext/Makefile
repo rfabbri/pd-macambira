@@ -67,7 +67,7 @@ LINUXINCLUDE =  -I$(LINUXINCLUDEPATH)
 .c.pd_linux:
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -DINCLUDEPATH=\""`pwd`"\" -DLINUXINCLUDE=\""$(LINUXINCLUDEPATH)"\" -o k_cext.o -c k_cext.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -DINCLUDEPATH=\""`pwd`"\" -DLINUXINCLUDE=\""$(LINUXINCLUDEPATH)"\" -o k_cext_unix.o -c k_cext_unix.c
-	ld -export_dynamic  -shared -o k_cext.pd_linux k_cext.o k_cext_unix.o -lc -lm
+	ld --export-dynamic  -shared -o k_cext.pd_linux k_cext.o k_cext_unix.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	rm -f $*.o ../$*.pd_linux
 	ln -s $(DIR)/$*.pd_linux ..
