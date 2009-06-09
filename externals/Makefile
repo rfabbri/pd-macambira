@@ -135,10 +135,10 @@ ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid pdp pidip gem2pdp iem16 apple pdp_opengl
+    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl apple
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip gem2pdp hdspm_mixer iem16 postlude tclpd pdvjtools sixaxis pdp_opengl
+    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl pdvjtools postlude tclpd sixaxis
   endif
 endif
 
