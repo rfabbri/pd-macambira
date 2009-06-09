@@ -107,15 +107,15 @@ scripts_src = $(cvs_root_dir)/scripts
 # destinations
 bindir = $(DESTDIR)$(prefix)/bin
 includedir = $(DESTDIR)$(prefix)/include
-libdir = $(DESTDIR)$(prefix)/lib
+libdir = $(prefix)/lib
 mandir = $(DESTDIR)$(prefix)/man
 
 ifeq ($(OS_NAME),darwin)
-  libpddir = $(DESTDIR)$(prefix)
+  libpddir = $(prefix)
   libpdbindir = $(bindir)
   else
     ifeq ($(OS_NAME),windows)
-      libpddir = $(DESTDIR)$(prefix)
+      libpddir = $(prefix)
       libpdbindir = $(bindir)
     else
       libpddir = $(libdir)/pd
@@ -123,8 +123,8 @@ ifeq ($(OS_NAME),darwin)
     endif
 endif
 
-objectsdir = $(libpddir)/extra
-pddocdir = $(libpddir)/doc
+objectsdir = $(DESTDIR)$(libpddir)/extra
+pddocdir = $(DESTDIR)$(libpddir)/doc
 examplesdir = $(pddocdir)/examples
 helpdir = $(pddocdir)/5.reference
 manualsdir = $(pddocdir)/manuals
