@@ -69,7 +69,6 @@ static void *newMTXSh (t_symbol *s, int argc, t_atom *argv)
   x->ws = 0; 
   x->l=0;
   nmax=(int) atom_getfloat(argv);
-  post("mtx_spherical_harmonics order %d",nmax);
   if (nmax<0)
      nmax=0;
   x->nmax=nmax;
