@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <mmsystem.h>
+using namespace desire;
 
 /* ------------------------- audio -------------------------- */
 
