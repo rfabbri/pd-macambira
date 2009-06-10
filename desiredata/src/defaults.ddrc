@@ -47,9 +47,6 @@ look {
   SelRect {
     rect #ff12ff
   }
-  Slider {
-    bg #ccebff
-  }
   TextBox {
     bgedit {#ffffff}
     fg {#000000}
