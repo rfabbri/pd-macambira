@@ -5301,7 +5301,7 @@ if test "$OS" = ""; then
 fi
 
 if test $OS = Linux; then
-    LDFLAGS="-Wl,-export-dynamic "
+    LDFLAGS="-Wl,--export-dynamic "
     EXT=pd_linux
     LIBSUFFIX=.so
     CPPFLAGS="-DDL_OPEN -DPA_USE_OSS -DUNIX -DUNISTD"
@@ -5343,7 +5343,7 @@ if test $OS = Darwin; then
 fi
 
 if test $(echo $OS | cut -f1 -d_) = CYGWIN; then
-    LDFLAGS="-Wl,-export-dynamic "
+    LDFLAGS="-Wl,--export-dynamic "
     EXT=dll
     LIBSUFFIX=.dll
     CPPFLAGS="-DDL_OPEN -DPA_USE_OSS -DUNIX -DUNISTD"
@@ -5355,8 +5355,8 @@ if test $(echo $OS | cut -f1 -d_) = CYGWIN; then
 fi
 
 if test $(echo $OS | cut -f1 -d_) = MINGW32; then
-#    LDFLAGS="-lm -lpthreadGC2 -lwsock32 -lwinmm -lole32 -L../src -lpd"
-    LDFLAGS="-lm /home/matju/pthreads-mingw/lib/libpthreadGC2.a -lwsock32 -lwinmm -lole32 -L../src -lpd"
+    LDFLAGS="-lm -lpthreadGC2 -lwsock32 -lwinmm -lole32 -L../src -lpd"
+#    LDFLAGS="-lm /home/matju/pthreads-mingw/lib/libpthreadGC2.a -lwsock32 -lwinmm -lole32 -L../src -lpd"
     EXT=dll
     LIBSUFFIX=.dll
     CPPFLAGS="-DMSW \

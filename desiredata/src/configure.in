@@ -73,11 +73,12 @@ MIDISRC="s_midi_none.c"
 WLIB=""
 STRIP="meuhhhhh"
 
-OS=$(uname -s)
-dnl OS=MINGW32
+if test "$OS" = ""; then
+  OS=$(uname -s)
+fi
 
 if test $OS = Linux; then
-    LDFLAGS="-Wl,-export-dynamic "
+    LDFLAGS="-Wl,--export-dynamic "
     EXT=pd_linux
     LIBSUFFIX=.so
     CPPFLAGS="-DDL_OPEN -DPA_USE_OSS -DUNIX -DUNISTD"
@@ -119,7 +120,7 @@ if test $OS = Darwin; then
 fi
 
 if test $(echo $OS | cut -f1 -d_) = CYGWIN; then
-    LDFLAGS="-Wl,-export-dynamic "
+    LDFLAGS="-Wl,--export-dynamic "
     EXT=dll
     LIBSUFFIX=.dll
     CPPFLAGS="-DDL_OPEN -DPA_USE_OSS -DUNIX -DUNISTD"
