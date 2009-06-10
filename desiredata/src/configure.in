@@ -73,11 +73,11 @@ MIDISRC="s_midi_none.c"
 WLIB=""
 STRIP="meuhhhhh"
 
-if test "$OS" = ""; then
-  OS=$(uname -s)
+if test "$USE_OS" = ""; then
+  USE_OS=$(uname -s)
 fi
 
-if test $OS = Linux; then
+if test $USE_OS = Linux; then
     LDFLAGS="-Wl,--export-dynamic "
     EXT=pd_linux
     LIBSUFFIX=.so
@@ -91,7 +91,7 @@ if test $OS = Linux; then
     WSTRIP=""
 fi
 
-if test $OS = Darwin; then
+if test $USE_OS = Darwin; then
     LDFLAGS=""
     EXT=pd_darwin
     LIBSUFFIX=.dylib
@@ -119,7 +119,7 @@ if test $OS = Darwin; then
 	WSTRIP=""
 fi
 
-if test $(echo $OS | cut -f1 -d_) = CYGWIN; then
+if test $(echo $USE_OS | cut -f1 -d_) = CYGWIN; then
     LDFLAGS="-Wl,--export-dynamic "
     EXT=dll
     LIBSUFFIX=.dll
@@ -131,7 +131,7 @@ if test $(echo $OS | cut -f1 -d_) = CYGWIN; then
     WSTRIP=""
 fi
 
-if test $(echo $OS | cut -f1 -d_) = MINGW32; then
+if test $(echo $USE_OS | cut -f1 -d_) = MINGW32; then
     LDFLAGS="-lm -lpthreadGC2 -lwsock32 -lwinmm -lole32 -L../src -lpd"
 #    LDFLAGS="-lm /home/matju/pthreads-mingw/lib/libpthreadGC2.a -lwsock32 -lwinmm -lole32 -L../src -lpd"
     EXT=dll
