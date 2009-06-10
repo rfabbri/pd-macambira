@@ -22,6 +22,7 @@ LOG
 #include "cv.h"
 #endif
 
+#define MAX_MARKERS 50
 
 const char* cascade_name ="./haarcascade_frontalface_alt.xml";
 
@@ -68,6 +69,9 @@ class GEM_EXTERN pix_opencv_haarcascade : public GemPixObj
     	void	    	modeMess(float mode);
     	void	    	minSizeMess(float min_size);
 	void 		loadCascadeMess(t_symbol *filename);
+    	void	    	fToleranceMess(float ftolerance);
+	void 		clearMess(void);
+        int             mark(float fx, float fy );
     	// The parameters for cvHaarDetectObjects function
 	float 		scale_factor;
 	int 		min_neighbors;
@@ -76,6 +80,12 @@ class GEM_EXTERN pix_opencv_haarcascade : public GemPixObj
 	// to detect changes in the image size
 	int 		comp_xsize;
 	int		comp_ysize;
+        t_atom          rlist[4];
+        // marked objects history
+        int x_xmark[MAX_MARKERS];
+        int x_ymark[MAX_MARKERS];
+        int x_found[MAX_MARKERS];
+        int x_ftolerance;
 
     private:
     
@@ -86,12 +96,16 @@ class GEM_EXTERN pix_opencv_haarcascade : public GemPixObj
     	static void	modeMessCallback(void *data, float mode);
     	static void	minSizeMessCallback(void *data, float min_size);
     	static void 	loadCascadeMessCallback(void *data, t_symbol* filename);
+    	static void	fToleranceMessCallback(void *data, float ftolerance);
+    	static void	clearMessCallback(void *data);
 
 	CvHaarClassifierCascade* cascade;
+        CvFont font;
 	/////////
 	// IplImage needed
     	IplImage 	*rgba, *frame, *grey;
 	
+	t_outlet 	*m_numout;
 	t_outlet 	*m_dataout;
 };
 

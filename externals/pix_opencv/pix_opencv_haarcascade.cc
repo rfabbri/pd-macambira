@@ -16,6 +16,8 @@
 /////////////////////////////////////////////////////////
 
 #include "pix_opencv_haarcascade.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 CPPEXTERN_NEW(pix_opencv_haarcascade)
 
@@ -29,6 +31,9 @@ CPPEXTERN_NEW(pix_opencv_haarcascade)
 /////////////////////////////////////////////////////////
 pix_opencv_haarcascade :: pix_opencv_haarcascade()
 { 
+ int i;
+
+  m_numout = outlet_new(this->x_obj, 0);
   m_dataout = outlet_new(this->x_obj, 0);
 
   scale_factor = 1.1;
@@ -41,13 +46,23 @@ pix_opencv_haarcascade :: pix_opencv_haarcascade()
   rgba = NULL;
   grey = NULL;
   frame = NULL;
+  x_ftolerance = 5;
 
-    cascade = (CvHaarClassifierCascade*)cvLoad( cascade_name, 0, 0, 0 );
-    if( !cascade )
-    {
-        post( "ERROR: Could not load classifier cascade\n" );
-    }
-    else    post( "Loaded classifier cascade from %s", cascade_name );
+  for ( i=0; i<MAX_MARKERS; i++ )
+  {
+    x_xmark[i] = -1;
+    x_ymark[i] = -1;
+  }
+
+  // initialize font
+  cvInitFont( &font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0, 1, 8 );
+
+  cascade = (CvHaarClassifierCascade*)cvLoad( cascade_name, 0, 0, 0 );
+  if( !cascade )
+  {
+      post( "ERROR: Could not load classifier cascade\n" );
+  }
+  else    post( "Loaded classifier cascade from %s", cascade_name );
 
 }
 
@@ -69,7 +84,7 @@ pix_opencv_haarcascade :: ~pix_opencv_haarcascade()
 /////////////////////////////////////////////////////////
 void pix_opencv_haarcascade :: processRGBAImage(imageStruct &image)
 {
-    double scale = 1;
+  double scale = 1;
 
   if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!rgba)) {
 
@@ -102,40 +117,89 @@ void pix_opencv_haarcascade :: processRGBAImage(imageStruct &image)
         {{255,0,255}}
     };
 
-    int i;
+    int i, im;
 
     if( cascade )
     {
         CvSeq* faces = cvHaarDetectObjects( rgba, cascade, storage,
                                             scale_factor, min_neighbors, mode, cvSize(min_size, min_size) );
+
+        if ( faces && (faces->total > 0 ) )
+            outlet_float(this->m_numout, (float)faces->total);
+        else
+            outlet_float(this->m_numout, 0.0);
+
+        for ( im=0; im<MAX_MARKERS; im++ )
+        {
+           if ( this->x_xmark[im] != -1.0 )
+           {
+             this->x_found[im]--;
+           }
+        }
+
         for( i = 0; i < (faces ? faces->total : 0); i++ )
         {
+          int oi, found;
+         
             CvRect* r = (CvRect*)cvGetSeqElem( faces, i );
             CvPoint center;
             int radius;
             center.x = cvRound((r->x + r->width*0.5)*scale);
             center.y = cvRound((r->y + r->height*0.5)*scale);
             radius = cvRound((r->width + r->height)*0.25*scale);
-            cvCircle( rgba, center, radius, colors[i%8], 3, 8, 0 );
 
-    	    t_atom rlist[4];
-            SETFLOAT(&rlist[0], i);
-            SETFLOAT(&rlist[1], center.x);
-            SETFLOAT(&rlist[2], center.y);
-            SETFLOAT(&rlist[3], radius);
-    	    outlet_list( m_dataout, 0, 4, rlist );
+            found = 0;
+            oi = -1;
+            for ( im=0; im<MAX_MARKERS; im++ )
+            {
+              // check if the object is already known
+              if ( sqrt( pow(center.x - this->x_xmark[im], 2 ) + pow(center.y - this->x_ymark[im], 2 ) ) <= radius )
+              {
+                 oi=im;
+                 found=1;
+                 this->x_found[im] = this->x_ftolerance;
+                 this->x_xmark[im] = center.x;
+                 this->x_ymark[im] = center.y;
+                 break;
+              }
+            }
+            // new object detected
+            if ( !found )
+            {
+               oi = this->mark(center.x, center.y );
+            }
+
+            char tindex[4];
+            sprintf( tindex, "%d", oi );
+            cvCircle( rgba, center, radius, colors[oi%8], 3, 8, 0 );
+            cvPutText( rgba, tindex, center, &this->font, CV_RGB(255,255,255));
+
+            SETFLOAT(&this->rlist[0], oi);
+            SETFLOAT(&this->rlist[1], center.x);
+            SETFLOAT(&this->rlist[2], center.y);
+            SETFLOAT(&this->rlist[3], radius);
+    	    outlet_list( m_dataout, 0, 4, this->rlist );
         }
+        // delete lost objects
+        for ( im=0; im<MAX_MARKERS; im++ )
+        {
+           if ( this->x_found[im] < 0 )
+           {
+             this->x_xmark[im] = -1.0;
+             this->x_ymark[im] = -1,0;
+             this->x_found[im] = this->x_ftolerance;
+           }
+        }
+
     }
 
-    
     cvReleaseMemStorage( &storage );
-    //cvShowImage(wndname, cedge);
     memcpy( image.data, rgba->imageData, image.xsize*image.ysize*4 );
 }
 
 void pix_opencv_haarcascade :: processRGBImage(imageStruct &image)
 {
-    double scale = 1;
+  double scale = 1;
 
   if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!frame)) {
 
@@ -168,34 +232,82 @@ void pix_opencv_haarcascade :: processRGBImage(imageStruct &image)
         {{255,0,255}}
     };
 
-    int i;
+    int i, im;
 
     if( cascade )
     {
         CvSeq* faces = cvHaarDetectObjects( frame, cascade, storage,
                                             1.1, 2, 0, cvSize(30, 30) );
+
+        if ( faces && (faces->total > 0 ) )
+            outlet_float(this->m_numout, (float)faces->total);
+        else
+            outlet_float(this->m_numout, 0.0);
+
+        for ( im=0; im<MAX_MARKERS; im++ )
+        {
+           if ( this->x_xmark[im] != -1.0 )
+           {
+             this->x_found[im]--;
+           }
+        }
+
         for( i = 0; i < (faces ? faces->total : 0); i++ )
         {
+          int oi, found;
+         
             CvRect* r = (CvRect*)cvGetSeqElem( faces, i );
             CvPoint center;
             int radius;
             center.x = cvRound((r->x + r->width*0.5)*scale);
             center.y = cvRound((r->y + r->height*0.5)*scale);
             radius = cvRound((r->width + r->height)*0.25*scale);
-            cvCircle( frame, center, radius, colors[i%8], 3, 8, 0 );
 
-    	    t_atom rlist[4];
-            SETFLOAT(&rlist[0], i);
-            SETFLOAT(&rlist[1], center.x);
-            SETFLOAT(&rlist[2], center.y);
-            SETFLOAT(&rlist[3], radius);
-    	    outlet_list( m_dataout, 0, 4, rlist );
+            found = 0;
+            oi = -1;
+            for ( im=0; im<MAX_MARKERS; im++ )
+            {
+              // check if the object is already known
+              if ( sqrt( pow(center.x - this->x_xmark[im], 2 ) + pow(center.y - this->x_ymark[im], 2 ) ) <= radius )
+              {
+                 oi=im;
+                 found=1;
+                 this->x_found[im] = this->x_ftolerance;
+                 this->x_xmark[im] = center.x;
+                 this->x_ymark[im] = center.y;
+                 break;
+              }
+            }
+            // new object detected
+            if ( !found )
+            {
+               oi = this->mark(center.x, center.y );
+            }
+
+            char tindex[4];
+            sprintf( tindex, "%d", oi );
+            cvCircle( frame, center, radius, colors[oi%8], 3, 8, 0 );
+            cvPutText( frame, tindex, center, &this->font, CV_RGB(255,255,255));
+
+            SETFLOAT(&this->rlist[0], oi);
+            SETFLOAT(&this->rlist[1], center.x);
+            SETFLOAT(&this->rlist[2], center.y);
+            SETFLOAT(&this->rlist[3], radius);
+    	    outlet_list( m_dataout, 0, 4, this->rlist );
+        }
+        // delete lost objects
+        for ( im=0; im<MAX_MARKERS; im++ )
+        {
+           if ( this->x_found[im] < 0 )
+           {
+             this->x_xmark[im] = -1.0;
+             this->x_ymark[im] = -1,0;
+             this->x_found[im] = this->x_ftolerance;
+           }
         }
     }
-
     
     cvReleaseMemStorage( &storage );
-    //cvShowImage(wndname, cedge);
     memcpy( image.data, frame->imageData, image.xsize*image.ysize*3 );
 }
 
@@ -306,6 +418,31 @@ void pix_opencv_haarcascade :: minSizeMess (float min_size)
 }
 
 /////////////////////////////////////////////////////////
+// fToleranceMess
+//
+/////////////////////////////////////////////////////////
+void pix_opencv_haarcascade :: fToleranceMess (float ftolerance)
+{
+  this->x_ftolerance = (int)ftolerance;
+}
+
+/////////////////////////////////////////////////////////
+// clearMess
+//
+/////////////////////////////////////////////////////////
+void pix_opencv_haarcascade :: clearMess (void)
+{
+  int i;
+
+    for ( i=0; i<MAX_MARKERS; i++)
+    {
+      this->x_xmark[i] = -1;
+      this->x_ymark[i] = -1;
+      this->x_found[i] = this->x_ftolerance;
+    }
+}
+
+/////////////////////////////////////////////////////////
 // static member function
 //
 /////////////////////////////////////////////////////////
@@ -321,6 +458,10 @@ void pix_opencv_haarcascade :: obj_setupCallback(t_class *classPtr)
   		  gensym("min_size"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_haarcascade::loadCascadeMessCallback,
   		  gensym("load"), A_SYMBOL, A_NULL);
+  class_addmethod(classPtr, (t_method)&pix_opencv_haarcascade::fToleranceMessCallback,
+  		  gensym("ftolerance"), A_FLOAT, A_NULL);
+  class_addmethod(classPtr, (t_method)&pix_opencv_haarcascade::clearMessCallback,
+  		  gensym("clear"), A_NULL);
 }
 void pix_opencv_haarcascade :: scaleFactorMessCallback(void *data, t_floatarg scale_factor)
 {
@@ -338,6 +479,14 @@ void pix_opencv_haarcascade :: minSizeMessCallback(void *data, t_floatarg min_si
 {
   if (min_size>1) GetMyClass(data)->minSizeMess((float)min_size);
 }
+void pix_opencv_haarcascade :: fToleranceMessCallback(void *data, t_floatarg ftolerance)
+{
+  if (ftolerance>1) GetMyClass(data)->fToleranceMess((float)ftolerance);
+}
+void pix_opencv_haarcascade :: clearMessCallback(void *data)
+{
+  GetMyClass(data)->clearMess();
+}
 void pix_opencv_haarcascade :: loadCascadeMessCallback(void *data, t_symbol* filename)
 {
 	    GetMyClass(data)->loadCascadeMess(filename);
@@ -350,4 +499,27 @@ void pix_opencv_haarcascade :: loadCascadeMess(t_symbol *filename)
         post( "ERROR: Could not load classifier cascade" );
     }
     else    post( "Loaded classifier cascade from %s", filename->s_name );
+}
+int pix_opencv_haarcascade :: mark(float fx, float fy )
+{
+  int i;
+
+    if ( ( fx < 0.0 ) || ( fx > this->rgba->width ) || ( fy < 0 ) || ( fy > this->rgba->height ) )
+    {
+       return -1;
+    }
+
+    for ( i=0; i<MAX_MARKERS; i++)
+    {
+       if ( this->x_xmark[i] == -1 )
+       {
+          this->x_xmark[i] = (int)fx;
+          this->x_ymark[i] = (int)fy;
+          this->x_found[i] = this->x_ftolerance;
+          return i;
+       }
+    }
+
+    post( "pix_opencv_haarcascade : max markers reached" );
+    return -1;
 }

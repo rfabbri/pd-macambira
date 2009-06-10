@@ -1,7 +1,7 @@
-#N canvas 512 26 691 638 10;
+#N canvas 197 73 1091 744 10;
 #X obj 266 -83 gemhead;
-#X obj 316 556 pix_texture;
-#X obj 316 584 square 2;
+#X obj 87 544 pix_texture;
+#X obj 87 577 square 2;
 #X obj 9 -74 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 0 22 454 304 gemwin 0;
@@ -33,10 +33,10 @@
 #X restore 14 -30 pd gemwin;
 #X msg 14 -54 destroy;
 #X text 10 -74 Create window and render;
-#X obj 143 248 pix_texture;
-#X obj 143 276 square 2;
-#X obj 266 167 translateXYZ -2 0 0;
-#X obj 314 254 cnv 15 175 200 empty empty empty 20 12 0 14 -24198 -66577
+#X obj -86 241 pix_texture;
+#X obj -86 269 square 2;
+#X obj 37 160 translateXYZ -2 0 0;
+#X obj 85 247 cnv 15 650 250 empty empty empty 20 12 0 14 -24198 -66577
 0;
 #X obj 278 -56 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -47,50 +47,65 @@
 #X msg 278 -7 open \$1;
 #X obj 266 102 pix_film;
 #X msg 284 36 auto \$1;
-#X obj 284 18 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+#X obj 284 18 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #X msg 295 60 colorspace Grey;
-#X obj 316 228 translateXYZ 4 0 0;
-#X floatatom 464 520 5 0 0 0 - - -;
-#X floatatom 499 520 5 0 0 0 - - -;
-#X floatatom 536 520 5 0 0 0 - - -;
-#X floatatom 493 569 5 0 0 0 - - -;
-#X floatatom 528 569 5 0 0 0 - - -;
-#X floatatom 565 569 5 0 0 0 - - -;
-#X floatatom 537 625 5 0 0 0 - - -;
-#X floatatom 572 625 5 0 0 0 - - -;
-#X obj 316 409 pix_opencv_haarcascade;
-#X obj 319 193 separator;
-#X obj 403 258 openpanel;
-#X obj 461 440 route 0 1 2 3 4;
-#X text 521 458 For each face detected;
-#X text 589 523 Xcenter Ycenter Radius;
-#X text 612 570 Xcenter Ycenter Radius;
-#X obj 461 491 unpack 0 0 0;
-#X obj 490 540 unpack 0 0 0;
-#X obj 534 596 unpack 0 0 0;
-#X floatatom 612 625 5 0 0 0 - - -;
-#X text 654 625 Xcenter Ycenter Radius;
-#X msg 343 259 load \$1;
-#X text 493 260 Load a trained cascade classifier from XML file;
-#X obj 473 258 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#X obj 87 221 translateXYZ 4 0 0;
+#X floatatom 264 583 5 0 0 0 - - -;
+#X floatatom 299 583 5 0 0 0 - - -;
+#X floatatom 336 583 5 0 0 0 - - -;
+#X floatatom 407 583 5 0 0 0 - - -;
+#X floatatom 442 583 5 0 0 0 - - -;
+#X floatatom 479 583 5 0 0 0 - - -;
+#X floatatom 545 585 5 0 0 0 - - -;
+#X floatatom 580 585 5 0 0 0 - - -;
+#X obj 88 472 pix_opencv_haarcascade;
+#X obj 90 186 separator;
+#X obj 174 251 openpanel;
+#X obj 251 529 route 0 1 2 3 4;
+#X text 251 601 Xcenter Ycenter Radius;
+#X text 396 600 Xcenter Ycenter Radius;
+#X obj 261 554 unpack 0 0 0;
+#X obj 404 554 unpack 0 0 0;
+#X obj 542 556 unpack 0 0 0;
+#X floatatom 620 584 5 0 0 0 - - -;
+#X text 539 601 Xcenter Ycenter Radius;
+#X msg 114 252 load \$1;
+#X text 264 253 Load a trained cascade classifier from XML file;
+#X obj 244 251 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
-#X floatatom 481 315 5 0 0 0 - - -;
-#X floatatom 453 380 5 0 0 0 - - -;
-#X msg 360 344 mode \$1;
-#X obj 421 344 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X floatatom 281 348 5 0 0 0 - - -;
+#X floatatom 235 319 5 0 0 0 - - -;
+#X msg 134 285 mode \$1;
+#X obj 195 285 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X msg 362 379 min_size \$1;
-#X msg 358 312 min_neighbors \$1;
-#X text 520 314 Minimum number (minus 1) of neighbor rectangles that
+#X msg 144 318 min_size \$1;
+#X msg 158 345 min_neighbors \$1;
+#X text 319 337 Minimum number (minus 1) of neighbor rectangles that
 makes up an object (default 2);
-#X text 493 380 Minimum window size (default 30);
-#X msg 357 285 scale_factor \$1;
-#X floatatom 475 285 5 0 0 0 - - -;
-#X text 519 284 The factor by which the search window is scaled between
+#X msg 187 378 scale_factor \$1;
+#X floatatom 305 378 5 0 0 0 - - -;
+#X text 349 377 The factor by which the search window is scaled between
 the subsequent scans (default 1.1);
-#X text 446 346 Mode of operation. Currently the only flag that may
-be specified is CV_HAAR_DO_CANNY_PRUNING;
+#X text 351 529 For each object detected;
+#X floatatom 158 503 5 0 0 0 - - -;
+#X text 197 503 number of objects detected;
+#X text 399 -22 used for face detection by default;
+#X text 396 -10 ( load haarscascase_frontalface_alt.xml );
+#X text 401 -47 pix_opencv_haarscasccade : object recognition based
+on Haar's algorithm ( decision tree algorithm );
+#X text 400 6 Written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
+);
+#X text 399 18 and Yves Degoyon ( ydegoyon@gmail.com );
+#X text 276 320 Minimum size of object (default 30);
+#X msg 215 407 ftolerance \$1;
+#X floatatom 305 408 5 0 0 0 - - -;
+#X msg 220 431 clear;
+#X text 346 415 temporarily ( default 5 );
+#X text 346 403 number of frames where an object can disappear;
+#X text 265 432 clear markers history;
+#X text 217 282 Mode of operation. Currently the only flag that may
+be specified is CV_HAAR_DO_CANNY_PRUNING ( 0 );
 #X connect 0 0 16 0;
 #X connect 1 0 2 0;
 #X connect 4 0 5 0;
@@ -110,28 +125,32 @@ be specified is CV_HAAR_DO_CANNY_PRUNING;
 #X connect 19 0 16 0;
 #X connect 20 0 29 0;
 #X connect 29 0 1 0;
-#X connect 29 1 32 0;
+#X connect 29 1 54 0;
+#X connect 29 2 32 0;
 #X connect 30 0 20 0;
-#X connect 31 0 41 0;
-#X connect 32 0 36 0;
-#X connect 32 1 37 0;
-#X connect 32 2 38 0;
-#X connect 36 0 21 0;
-#X connect 36 1 22 0;
-#X connect 36 2 23 0;
-#X connect 37 0 24 0;
-#X connect 37 1 25 0;
-#X connect 37 2 26 0;
-#X connect 38 0 27 0;
-#X connect 38 1 28 0;
-#X connect 38 2 39 0;
-#X connect 41 0 29 0;
-#X connect 43 0 31 0;
-#X connect 44 0 49 0;
-#X connect 45 0 48 0;
-#X connect 46 0 29 0;
-#X connect 47 0 46 0;
+#X connect 31 0 40 0;
+#X connect 32 0 35 0;
+#X connect 32 1 36 0;
+#X connect 32 2 37 0;
+#X connect 35 0 21 0;
+#X connect 35 1 22 0;
+#X connect 35 2 23 0;
+#X connect 36 0 24 0;
+#X connect 36 1 25 0;
+#X connect 36 2 26 0;
+#X connect 37 0 27 0;
+#X connect 37 1 28 0;
+#X connect 37 2 38 0;
+#X connect 40 0 29 0;
+#X connect 42 0 31 0;
+#X connect 43 0 48 0;
+#X connect 44 0 47 0;
+#X connect 45 0 29 0;
+#X connect 46 0 45 0;
+#X connect 47 0 29 0;
 #X connect 48 0 29 0;
-#X connect 49 0 29 0;
-#X connect 52 0 29 0;
-#X connect 53 0 52 0;
+#X connect 50 0 29 0;
+#X connect 51 0 50 0;
+#X connect 62 0 29 0;
+#X connect 63 0 62 0;
+#X connect 64 0 29 0;
