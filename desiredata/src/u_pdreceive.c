@@ -42,7 +42,7 @@ static void x_closesocket(int fd);
 static void dopoll();
 #define BUFSIZE 4096
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv) {{ // open extra scope because of goto and decls
     int portno;
     struct sockaddr_in server;
     if (argc < 2 || sscanf(argv[1],"%d",&portno)<1 || portno<=0) goto usage;
@@ -75,6 +75,7 @@ int main(int argc, char **argv) {
     if (protocol == SOCK_STREAM) if (listen(sockfd, 5) < 0) {sockerror("listen"); x_closesocket(sockfd); return 1;}
     /* now loop forever selecting on sockets */
     while (1) dopoll();
+  } // close extra scope so that we can goto.
 usage:
     fprintf(stderr, "usage: pdreceive <portnumber> [udp|tcp]\n");
     fprintf(stderr, "(default is tcp)\n");
