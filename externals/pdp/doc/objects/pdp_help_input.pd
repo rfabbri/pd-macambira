@@ -49,7 +49,7 @@ object.;
 #X text 239 566 for noise input;
 #X text 293 137 disconnect for noise input;
 #X obj 492 255 ggee/getdir;
-#X msg 492 288 open \$1/../media/midr-mjpeg.mov;
+#X msg 492 288 open \$1/../../media/midr-mjpeg.mov;
 #X obj 492 515 pdp_qt;
 #X connect 0 0 4 0;
 #X connect 2 0 30 0;
