@@ -166,7 +166,9 @@ typedef struct
 static int OSC_strlen(char *s);
 static int OSC_padString(char *dest, char *str);
 static int OSC_padStringWithAnExtraStupidComma(char *dest, char *str);
-static int OSC_WritePadding(char *dest, int i);
+static int OSC_WriteStringPadding(char *dest, int i);
+static int OSC_WriteBlobPadding(char *dest, int i);
+
 static int CheckTypeTag(OSCbuf *buf, char expectedType);
 
 /* Initialize the given OSCbuf.  The user of this module must pass in the
@@ -425,14 +427,14 @@ static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
 #endif
             if ((c = typeStr[m+1]) == 0) break;
             if (!(c == 'T' || c == 'F' || c == 'N' || c == 'I'))
-                ++nTagsWithData; /* these tags have data */
-/*OSC-blob
+			{
+                ++nTagsWithData; /* anything other than these tags have at least one data byte */
+/*
+	OSC-blob
     An int32 size count, followed by that many 8-bit bytes of arbitrary binary data, 
 	followed by 0-3 additional zero bytes to make the total number of bits a multiple of 32.
-*/			if (c == 'b')
-			{
-				++nTagsWithData ; /* at least one byte of data, */
-				blobCount++; /* but probably more, so set a flag */
+*/
+				if (c == 'b') blobCount++; /* b probably has more than one byte, so set a flag */
 			}
 		}
         if (((blobCount == 0)&&(nTagsWithData != nArgs)) || ((blobCount != 0)&&(nTagsWithData > nArgs)))
@@ -1267,7 +1269,7 @@ static int OSC_writeBlobArg(OSCbuf *buf, typedArg *arg, size_t nArgs)
 #endif
 		buf->bufptr[i] = b;
 	}
-	i = OSC_WritePadding(buf->bufptr, i);
+	i = OSC_WriteBlobPadding(buf->bufptr, i);
 	buf->bufptr += i;
 	buf->gettingFirstUntypedArg = 0;
     return 0;
@@ -1340,7 +1342,7 @@ static int OSC_padString(char *dest, char *str)
 
     for (i = 0; str[i] != '\0'; i++) dest[i] = str[i];
 
-    return OSC_WritePadding(dest, i);
+    return OSC_WriteStringPadding(dest, i);
 }
 
 static int OSC_padStringWithAnExtraStupidComma(char *dest, char *str)
@@ -1350,16 +1352,24 @@ static int OSC_padStringWithAnExtraStupidComma(char *dest, char *str)
     dest[0] = ',';
     for (i = 0; str[i] != '\0'; i++) dest[i+1] = str[i];
 
-    return OSC_WritePadding(dest, i+1);
+    return OSC_WriteStringPadding(dest, i+1);
 }
 
-static int OSC_WritePadding(char *dest, int i)
-{
+static int OSC_WriteStringPadding(char *dest, int i)
+{ 
+	/* pad with at least one zero to fit 4-byte */
     dest[i] = '\0';
     i++;
 
     for (; (i % STRING_ALIGN_PAD) != 0; i++) dest[i] = '\0';
 
+    return i;
+}
+
+static int OSC_WriteBlobPadding(char *dest, int i)
+{
+	/* pad if necessary to fit 4-byte */
+    for (; (i % STRING_ALIGN_PAD) != 0; i++) dest[i] = '\0';
     return i;
 }
 
