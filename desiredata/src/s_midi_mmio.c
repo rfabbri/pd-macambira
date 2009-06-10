@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <mmsystem.h>
+using namespace desire;
 
 /* ------------- MIDI time stamping from audio clock ------------ */
 #ifdef MIDI_TIMESTAMP
