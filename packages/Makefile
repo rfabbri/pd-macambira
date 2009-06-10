@@ -363,7 +363,7 @@ ifeq ($(OS_NAME),linux)
 	echo "<dt>Only for the current user account</dt>" >> $(README_FILE)
 	echo "<dd>~/pd-externals/</dd>" >> $(README_FILE)
 	echo "<dt>For all user accounts on the computer</dt>" >> $(README_FILE)
-	echo "<dd>/usr/share/pd-externals</dd>" >> $(README_FILE)
+	echo "<dd>/usr/local/lib/pd-externals</dd>" >> $(README_FILE)
 endif
 ifeq ($(OS_NAME),windows)
 	echo "<dt>Only for the current user account</dt>" >> $(README_FILE)
