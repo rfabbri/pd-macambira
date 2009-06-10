@@ -132,12 +132,11 @@ if test $(echo $USE_OS | cut -f1 -d_) = CYGWIN; then
 fi
 
 if test $(echo $USE_OS | cut -f1 -d_) = MINGW32; then
-    LDFLAGS="-lm -lpthreadGC2 -lwsock32 -lwinmm -lole32 -L../src -lpd"
-#    LDFLAGS="-lm /home/matju/pthreads-mingw/lib/libpthreadGC2.a -lwsock32 -lwinmm -lole32 -L../src -lpd"
+    LDFLAGS="-lm -lpthreadGC2 -lwsock32 -lwinmm -lole32"
+#    LDFLAGS="-lm /home/matju/pthreads-mingw/lib/libpthreadGC2.a -lwsock32 -lwinmm -lole32"
     EXT=dll
     LIBSUFFIX=.dll
-    CPPFLAGS="-DMSW \
-    -DPD_INTERNAL -DPD "
+    CPPFLAGS="-DMSW -DPD_INTERNAL -DPD "
     MORECFLAGS="-mms-bitfields"
     STRIPFLAG=-s
     LDSOFLAGS="-shared"
