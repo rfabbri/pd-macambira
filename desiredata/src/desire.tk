@@ -227,12 +227,10 @@ def Manager init {} {
 }
 
 def Manager call {} {
-	global poolset
 	#if {[llength $@q]} {post "client queue %d" [llength $@q]}
-
 	for {set i 0} {$i < [llength $@q]} {incr i} {
 		set o [lindex $@q $i]
-		unset poolset($o)
+		unset ::poolset($o)
 		if {[info exists _($o:_class)]} {
 			if {[catch {$o draw_maybe}]} {puts [error_dump]}
 		} else {
@@ -240,16 +238,15 @@ def Manager call {} {
 		}
 		if {$i == [expr {[llength $@q]-1}]} {set @q {}}
 	}
-	after 25 "$self call"
+	after 25 [list $self call]
 }
 
 def Manager notice {origin args} {
-	global poolset
-	if {[info exists poolset($origin)]} {
+	if {[info exists ::poolset($origin)]} {
 		# post %s "def Manager notice: double dirty"
 		# nothing for now
 	} {
-		set poolset($origin) {-1}
+		set ::poolset($origin) {-1}
 		lappend @q $origin
 	}
 	#post "Manager notice: queue length is now %d" [llength $@q]
@@ -5752,11 +5749,13 @@ def IEMGUI text {} {
 class_new BlueBox {Labelled IEMGUI Box}
 #class_new BlueBox {Box Labelled}
 
+def BlueBox fg {} {color_* [$self look bg] [parse_color $@fcol]}
+def BlueBox bg {} {color_* [$self look bg] [parse_color $@bcol]}
 def BlueBox draw_box {} {
 	super
 	set xya [$self bbox]
 	mset {x1 y1 x2 y2} $xya
-	set color [color_* [$self look bg] [parse_color $@bcol]]
+	set color [$self bg]
 	if {[$self selected?]} {set frcol [$self look selectframe]} {set frcol [$self look frame3]}
 	$self item BASE  rectangle $xya -fill $color -outline $frcol
 	#below lines draws the 3d box edge
@@ -6210,7 +6209,7 @@ def Radio draw {} {
 	for {set i 0} {$i<$@n} {incr i} {
 		#set coords [list [expr {$x1+3}] [expr {$y1+3}] [expr {$x1+$@w-3}] [expr {$y1+$@w-3}]]
 		set coords [list $x1 $y1 [expr {$x1+$@w}] [expr {$y1+$@w}]]
-		$self item [list BUT$i BUT] rectangle $coords -fill #ffffff -outline #000000
+		$self item [list BUT$i BUT] rectangle $coords -fill [$self bg] -outline [$self fg]
 		if {$@orient} {set y1 [expr {$y1+$@w}]} {set x1 [expr {$x1+$@w}]}
 	}
 	$self set $@on
@@ -6220,18 +6219,16 @@ def Radio set {value} {
 	mset {x1 y1} [$self xy]
 	set value [expr round($value)]
 	if {$@orient} {set y1 [expr $y1+$@w*$value]} {set x1 [expr $x1+$@w*$value]}
-	set coords [list [expr {$x1+3}] [expr {$y1+3}] [expr {$x1+$@w-3}] [expr {$y1+$@w-3}]]
+	set coords [list [expr {$x1+3}] [expr {$y1+3}] [expr {$x1+$@w-2}] [expr {$y1+$@w-2}]]
 	puts "coords=$coords"
-	$self item [list CHECK BUT] rectangle $coords -fill #000000
+	$self item [list CHECK BUT] rectangle $coords -fill [$self fg] -width 0
 }
 def Radio click {x y f target} {
 	mset {x1 y1} [$self xy]
 	set i [expr {int($@orient ?$y-$y1-2:$x-$x1-2)/$@w}]
 	netsend [list .$self fout $i]
 }
-def Radio key_incr {val1 val2} {
-	netsend [list .$self fout [expr $@on - $val2]]
-}
+def Radio key_incr {val1 val2} {netsend [list .$self fout [expr {$@on-$val2}]]}
 
 # in sliders, @value is the kind of value that goes thru inlets and outlets
 # whereas @val is always measured in "centipixels" (unzoomed).
@@ -6273,7 +6270,6 @@ def Slider draw_knob {} {
 	mset {x1 y1} [$self xy]
 	set l [expr $@orient ?$@h:$@w]
 	set span [expr {$@max-$@min}]
-	set color [$self look bg]
 	set scaled [expr {$@value*($l-1)/$span}]
 	if {$@orient} {
 		set y1 [expr $y1+2]
@@ -6284,7 +6280,7 @@ def Slider draw_knob {} {
 		set x [expr $x1+$scaled]
 		set coords [list $x [expr {$y1+2}] [expr {$x+2}] [expr {$y1+$@h-2}]]
 	}
-	$self item KNOB rectangle $coords -outline red -fill [darker $color]
+	$self item KNOB rectangle $coords -outline red -fill [darker [$self look bg]]
 }
 def Slider draw {} {
 	mset {x1 y1 x2 y2} [$self bbox]
@@ -6390,8 +6386,8 @@ def Bang draw {} {
 	set rect [list [expr {$x1+1}] [expr {$y1+1}] [expr {$x2-1}] [expr {$y2-1}]]
 	if {$@flash} {
 		#$self item BUT oval $rect -fill [color_* [$self look bg] [parse_color $@fcol]]
-		set fcol [color_* [$self look bg] [parse_color $@fcol]]
-		set bcol [color_* [$self look bg] [parse_color $@bcol]]
+		set fcol []
+		set bcol []
 		$self item BUT oval $rect -fill $fcol
 		after 100 [list $self item BUT oval $rect -fill $bcol]
 		set @flash 0
@@ -8209,7 +8205,7 @@ def ClientPrefsDialogue init {} {
 def ClientPrefsDialogue dropmenu_set {frame var part val} {set @$var $part; $frame.butt configure -text [say $part]}
 def ClientPrefsDialogue dropmenu_open {f name} {super $f}
 
-############ find dialog ###########
+############ find dialogue ###########
 
 class_new FindDialogue {Dialogue}
 def FindDialogue init {canvas} {
