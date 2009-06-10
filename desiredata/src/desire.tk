@@ -7643,7 +7643,7 @@ proc balloon:show {w arg} {
 }
 
 def Dialogue ok     {} {$self apply; $self cancel}
-def Dialogue cancel {} {if {[info exists @nbs]} {foreach x $@nbs {$x delete}}; after 1 [list $self delete]}
+def Dialogue cancel {} {$self delete}
 def Dialogue close  {} {$self delete}
 def Dialogue apply  {} {}
 def Dialogue delete {} {destroy .$self; super}
