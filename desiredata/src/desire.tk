@@ -5356,12 +5356,6 @@ def Wire popup_insert {} {
 #-----------------------------------------------------------------------------------#
 ############ colouring
 
-proc color_* {c1 c2} {
-	scan $c1 #%02x%02x%02x r g b
-	scan $c2 #%02x%02x%02x R G B
-	return [format #%02x%02x%02x [expr ($r*$R)>>8] [expr ($g*$G)>>8] [expr ($b*$B)>>8]]
-}
-
 # equivalent to color* #c0c0c0 $c
 proc darker {c} {
 	scan $c #%02x%02x%02x r g b
@@ -5749,13 +5743,11 @@ def IEMGUI text {} {
 class_new BlueBox {Labelled IEMGUI Box}
 #class_new BlueBox {Box Labelled}
 
-def BlueBox fg {} {color_* [$self look bg] [parse_color $@fcol]}
-def BlueBox bg {} {color_* [$self look bg] [parse_color $@bcol]}
 def BlueBox draw_box {} {
 	super
 	set xya [$self bbox]
 	mset {x1 y1 x2 y2} $xya
-	set color [$self bg]
+	set color [parse_color $@bcol]
 	if {[$self selected?]} {set frcol [$self look selectframe]} {set frcol [$self look frame3]}
 	$self item BASE  rectangle $xya -fill $color -outline $frcol
 	#below lines draws the 3d box edge
@@ -6209,7 +6201,7 @@ def Radio draw {} {
 	for {set i 0} {$i<$@n} {incr i} {
 		#set coords [list [expr {$x1+3}] [expr {$y1+3}] [expr {$x1+$@w-3}] [expr {$y1+$@w-3}]]
 		set coords [list $x1 $y1 [expr {$x1+$@w}] [expr {$y1+$@w}]]
-		$self item [list BUT$i BUT] rectangle $coords -fill [$self bg] -outline [$self fg]
+		$self item [list BUT$i BUT] rectangle $coords -fill [parse_color $@bcol] -outline [parse_color $@fcol]
 		if {$@orient} {set y1 [expr {$y1+$@w}]} {set x1 [expr {$x1+$@w}]}
 	}
 	$self set $@on
@@ -6221,7 +6213,7 @@ def Radio set {value} {
 	if {$@orient} {set y1 [expr $y1+$@w*$value]} {set x1 [expr $x1+$@w*$value]}
 	set coords [list [expr {$x1+3}] [expr {$y1+3}] [expr {$x1+$@w-2}] [expr {$y1+$@w-2}]]
 	puts "coords=$coords"
-	$self item [list CHECK BUT] rectangle $coords -fill [$self fg] -width 0
+	$self item [list CHECK BUT] rectangle $coords -fill [parse_color $@fcol] -width 0
 }
 def Radio click {x y f target} {
 	mset {x1 y1} [$self xy]
@@ -6385,7 +6377,7 @@ def Bang draw {} {
 	mset {x1 y1 x2 y2} [$self bbox]
 	set rect [list [expr {$x1+1}] [expr {$y1+1}] [expr {$x2-1}] [expr {$y2-1}]]
 	if {$@flash} {
-		#$self item BUT oval $rect -fill [color_* [$self look bg] [parse_color $@fcol]]
+		#$self item BUT oval $rect -fill [parse_color $@fcol]
 		set fcol []
 		set bcol []
 		$self item BUT oval $rect -fill $fcol
@@ -6393,7 +6385,7 @@ def Bang draw {} {
 		set @flash 0
 	} else {
 		set colour [parse_color $@bcol]
-		$self item BUT oval $rect -fill [color_* [$self look bg] $colour] -outline [$self look frame3]
+		$self item BUT oval $rect -fill $colour -outline [$self look frame3]
 	}
 }
 def Bang unclick {x y f target} {}
@@ -6411,13 +6403,13 @@ def Toggle draw {} {
 	mset {x1 y1 x2 y2} [$self bbox]
 	set colour [parse_color $@bcol]
 	set t [expr {int(($@w+29)/30)}]
-	set fill [color_* [$self look bg] $colour]
+	set fill $colour
 	set x3 [expr {$x1+$t+2}]; set y3 [expr {$y1+$t+2}]
 	set x4 [expr {$x2-$t-2}]; set y4 [expr {$y2-$t-2}]
 	if {$@on} {
 		set fill [parse_color $@fcol]
 	} {
-		set fill [color_* [$self look bg] [parse_color $@bcol]]
+		set fill [parse_color $@bcol]
 	}
 	$self item X1 line [list $x3 $y3 [expr {$x4+1}] [expr {$y4+1}]] -width $t -fill $fill
 	$self item X2 line [list $x3 $y4 [expr {$x4+1}] [expr {$y3-1}]] -width $t -fill $fill
@@ -6457,7 +6449,7 @@ def Vu draw {} {
 	set led_size [$self led_size]
 	set x3 [expr $x1+$@w/4]
 	set x4 [expr $x2-$@w/4]
-	$self item BASE rectangle [list $x1 $y1 $x2 $y2] -width 0 -fill [color_* [$self look bg] $colour]
+	$self item BASE rectangle [list $x1 $y1 $x2 $y2] -width 0 -fill $colour
 	for {set i 1} {$i<=40} {incr i} {
 		set y [expr $y1 + ($led_size+1)*(41-$i) - ($led_size+1)/2]
 		$self item RMS${i} rectangle [list $x3 $y $x4 [expr $y+$led_size]] \
@@ -6478,7 +6470,7 @@ def Vu draw {} {
 		incr i
 	}
 	set y [expr $y1 + ($led_size+1)*(41-$@value) - ($led_size+1)/2]
-	$self item MASK rectangle [list $x3 $y1 $x4 $y] -width 0 -fill [color_* [$self look bg] $colour]
+	$self item MASK rectangle [list $x3 $y1 $x4 $y] -width 0 -fill $colour
 	set c [lindex $vu_col [expr int($@peak)]]
 	set y [expr $y1 + ($led_size+1)*(41-$@peak) - ($led_size+1)/2]
 	$self item PEAK rectangle [list $x1 $y $x2 [expr $y+$led_size]] -fill [parse_color $c] -width 0
@@ -7632,9 +7624,7 @@ proc balloon:show {w arg} {
 	catch {destroy $top}
 	toplevel $top -bd 1 -bg black
 	wm overrideredirect $top 1
-	if {$::tcl_platform(platform) == "macintosh"} {
-		unsupported1 style $top floating sideTitlebar
-	}
+	if {$::tcl_platform(platform) == "macintosh"} {unsupported1 style $top floating sideTitlebar}
 	pack [message $top.txt -aspect 10000 -bg lightyellow -font fixed -text $arg]
 	set wmx [expr [winfo rootx $w]+[winfo width $w]]
 	set wmy       [winfo rooty $w]
