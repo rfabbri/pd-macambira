@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <alsa/asoundlib.h>
 #include "desire.h"
+using namespace desire;
 
 #define MAX_EVENT_SIZE 256
 
