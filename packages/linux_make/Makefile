@@ -71,7 +71,7 @@ package: $(PACKAGE_TYPE)
 
 
 tarbz2: installer_makefile installer_readme
-	install -p $(packages_src)/linux_make/default.pdsettings $(libpddir)
+	install -p $(packages_src)/linux_make/default.pdsettings $(DESTDIR)$(libpddir)
 	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
 	cd $(DESTDIR) && \
 		tar cjf $(PACKAGE_NAME).tar.bz2  $(PACKAGE_NAME)
