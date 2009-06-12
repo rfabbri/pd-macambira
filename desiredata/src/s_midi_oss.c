@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include "desire.h"
+using namespace desire;
 
 static int oss_nmidiin;  static int oss_midiinfd [MAXMIDIINDEV];
 static int oss_nmidiout; static int oss_midioutfd[MAXMIDIOUTDEV];
