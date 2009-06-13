@@ -784,9 +784,6 @@ set look(Box:extrapix) [switch $::OS {
 #set look(View:frame2) #668888
 #set look(View:frame3) #000000
 
-#!@#$ this is supposed to be BlueBox!
-#set look(Slider:bg) #ccebff
-
 set zoom(canned) [list 25 33 50 75 100 125 150 200 250 300 400]
 set scale_amount 1.1
 ################## set up main window #########################
@@ -905,10 +902,11 @@ def Client init_controls {} {
     . configure -menu .mbar
     wm title . "DesireData"
     catch {wm iconphoto . icon_pd_32}
-    regexp {\d\d\d\d-\d\d-\d\d} $::svnid date
-    regsub -all "/" $date "." date
-    regexp {desire.tk (\d+)} $::svnid blah revision
-    set version "svn#$revision ($date)"
+    if {[regexp {\d\d\d\d-\d\d-\d\d} $::svnid date]} {
+      regsub -all "/" $date "." date
+      regexp {desire.tk (\d+)} $::svnid blah revision
+      set version "svn#$revision ($date)"
+    } {set version "(unknown svn version)"}
     set ::pd_version_client $version
     post "DesireData client version $version"
     post "Using Tcl %s and Tk %s" $::tcl_patchLevel $::tk_patchLevel
@@ -4863,9 +4861,7 @@ def Canvas arrow_key {val1 val2} {
 			set o [$@selection values]
 			if {[[$o class] <= IEMGUI] || [[$o class] == FloatBox]} {$o key_incr $val1 $val2}
 		}
-	} else {
-		$self selection_move $val1 $val2
-	}
+	} else {$self selection_move $val1 $val2}
 }
 
 def Canvas clear_selection {} {
