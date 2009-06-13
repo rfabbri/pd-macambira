@@ -206,8 +206,8 @@ test_locations:
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
 	@echo --------------------------------------------------
-	@echo "PACKAGE_DEPENDS 	$(PACKAGE_DEPENDS)"
-	@echo --------------------------------------------------
+#	@echo "PACKAGE_DEPENDS 	$(PACKAGE_DEPENDS)"
+#	@echo --------------------------------------------------
 	autoconf --version
 	@echo --------------------------------------------------
 	make --version
