@@ -108,7 +108,7 @@ deb: $(bindir)
 	install -d $(DESTDIR)/etc/pd-extended
 	ln -s $(prefix)/lib/pd/default.pdsettings \
 		$(DESTDIR)/etc/pd-extended/default.pdsettings
-	install -p $(packages_src)/linux_make/default.pdsettings $(libpddir)
+	install -p $(packages_src)/linux_make/default.pdsettings $(DESTDIR)$(libpddir)
 # globla folder for user installed files
 	install -d -m0777 $(DESTDIR)/usr/share/pd
 # emacs mode for .pd files
