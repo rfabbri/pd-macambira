@@ -81,29 +81,29 @@ lib_install:
 	install -p $(bin_src)/lua51.dll  $(dlldir)
 	install -p $(bin_src)/pthreadGC2.dll  $(dlldir)
 # these stay with pd.exe
-	install -p $(bin_src)/tcl84.dll  $(bindir)
-	install -p $(bin_src)/tclpip84.dll  $(bindir)
-	install -p $(bin_src)/tk84.dll  $(bindir)
+	install -p $(bin_src)/tcl85.dll  $(bindir)
+	install -p $(bin_src)/tclpip85.dll  $(bindir)
+	install -p $(bin_src)/tk85.dll  $(bindir)
 # if these are there, install them
 	-install -p $(system32)/msvcp71.dll $(dlldir)
 	-install -p $(system32)/msvcr71.dll $(dlldir)
 	-install -p $(system32)/pthreadVC.dll $(dlldir)
 # these go into the Pd package's lib dir
-	install -d $(libdir)/tcl8.4
-	cp -r /usr/local/lib/tcl8.4/* $(libdir)/tcl8.4
-	install -d $(libdir)/tk8.4
-	cp -r /usr/local/lib/tk8.4/* $(libdir)/tk8.4
+	install -d $(DESTDIR)$(libdir)/tcl8.5
+	cp -r /usr/local/lib/tcl8.5/* $(DESTDIR)$(libdir)/tcl8.5
+	install -d $(DESTDIR)$(libdir)/tk8.5
+	cp -r /usr/local/lib/tk8.5/* $(DESTDIR)$(libdir)/tk8.5
 
 
 exe_install:
 	install -d $(bindir)
-	install -p $(bin_src)/wish84.exe  $(bindir)
-	install -p $(bin_src)/tclsh84.exe  $(bindir)
+	install -p $(bin_src)/wish85.exe  $(bindir)
+	install -p $(bin_src)/tclsh85.exe  $(bindir)
 
 
 # on Windows, the pddp tcl files need to be in pd/lib aka $(libdir)
 pddplink_hack:
-	install -d $(libdir)/pddp
+	install -d $(DESTDIR)$(libdir)/pddp
 	install -p $(externals_src)/miXed/bin/pddp/*.tcl $(libdir)/pddp
 
 
