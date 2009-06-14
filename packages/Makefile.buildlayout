@@ -107,9 +107,9 @@ scripts_src = $(cvs_root_dir)/scripts
 # destinations
 bindir = $(DESTDIR)$(prefix)/bin
 includedir = $(DESTDIR)$(prefix)/include
-libdir = $(prefix)/lib
 mandir = $(DESTDIR)$(prefix)/man
 
+libdir = $(prefix)/lib
 ifeq ($(OS_NAME),darwin)
   libpddir = $(prefix)
   libpdbindir = $(bindir)
