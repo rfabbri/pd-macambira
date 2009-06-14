@@ -626,7 +626,7 @@ EXTERN void class_domainsignalin(t_class *c, int onset);
     class_domainsignalin(c, (char *)(&((type *)0xdead0000)->field) - (char *)0xdead0000)
 
 /* in "class" observer: observable calls this to notify of a change */
-typedef void (*t_notice)(     t_gobj *x, t_gobj *origin, int argc, t_atom *argv);
+typedef void (*t_notice)(t_gobj *x, t_gobj *origin, int argc, t_atom *argv);
 EXTERN void class_setnotice(t_class *c, t_notice notice);
 
 /* in "class" observable: observable sends initial data to observer */
@@ -643,13 +643,13 @@ EXTERN void class_setsavefn(t_class *c, t_savefn f);
 EXTERN t_savefn class_getsavefn(t_class *c);
 
 #ifndef PD_CLASS_DEF
-#define class_addbang(x, y)     class_addbang(    (x), (t_method)(y))
-#define class_addpointer(x, y)  class_addpointer( (x), (t_method)(y))
-#define class_addfloat(x, y)    class_doaddfloat( (x), (t_method)(y))
-#define class_addsymbol(x, y)   class_addsymbol(  (x), (t_method)(y))
-#define class_addstring(x, y)   class_addstring(  (x), (t_method)(y)) /* for future use */
-#define class_addlist(x, y)     class_addlist(    (x), (t_method)(y))
-#define class_addanything(x, y) class_addanything((x), (t_method)(y))
+#define class_addbang(    x,y) class_addbang(    (x),(t_method)(y))
+#define class_addpointer( x,y) class_addpointer( (x),(t_method)(y))
+#define class_addfloat(   x,y) class_doaddfloat( (x),(t_method)(y))
+#define class_addsymbol(  x,y) class_addsymbol(  (x),(t_method)(y))
+#define class_addstring(  x,y) class_addstring(  (x),(t_method)(y)) /* for future use */
+#define class_addlist(    x,y) class_addlist(    (x),(t_method)(y))
+#define class_addanything(x,y) class_addanything((x),(t_method)(y))
 #endif
 
 EXTERN void class_settip(t_class *x,t_symbol* s);
