@@ -104,7 +104,7 @@ exe_install:
 # on Windows, the pddp tcl files need to be in pd/lib aka $(libdir)
 pddplink_hack:
 	install -d $(DESTDIR)$(libdir)/pddp
-	install -p $(externals_src)/miXed/bin/pddp/*.tcl $(libdir)/pddp
+	install -p $(externals_src)/miXed/bin/pddp/*.tcl $(DESTDIR)$(libdir)/pddp
 
 
 # here are some hacks to assemble a package from binaries
