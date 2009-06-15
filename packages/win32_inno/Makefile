@@ -3,6 +3,7 @@
 #
 all: install
 
+export CC = gcc
 CWD := $(shell pwd)
 
 DESTDIR = $(CWD)/build
