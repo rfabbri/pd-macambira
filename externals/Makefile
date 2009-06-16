@@ -519,7 +519,7 @@ CYCLONE_NAME=cyclone
 # cyclone is compiled straight into $(OUT_DIR)
 CYCLONE_OUT_DIR=$(objectsdir)/$(CYCLONE_NAME)
 cyclone: $(bindir)
-	$(MAKE) OPT_CFLAGS="-O2 -funroll-loops -fomit-frame-pointer" \
+	$(MAKE) OPT_CFLAGS="-O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing -fPIC" \
 		-C $(externals_src)/miXed/cyclone
 
 cyclone_install: cyclone
