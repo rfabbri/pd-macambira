@@ -152,3 +152,9 @@ write text ... http://www.hci.iastate.edu/575x/doku.php?id=code_samples:adding_t
 simple edge ... http://www.hci.iastate.edu/575x/doku.php?id=code_samples:edge_detection
 
 http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html#SECTION00053000000000000000
+
+############################# sevy ++
+adaptive threshold
+hough lines
+hough circles
+arguments in pdp_histo

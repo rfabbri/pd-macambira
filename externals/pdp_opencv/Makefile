@@ -37,7 +37,7 @@ endif
 
 .SUFFIXES = $(EXTENSION)
 
-SOURCES = pdp_opencv_threshold.c pdp_opencv_edge.c pdp_opencv_distrans.c pdp_opencv_laplace.c pdp_opencv_motempl.c pdp_opencv_morphology.c pdp_opencv_haarcascade.c pdp_opencv_contours_convexity.c pdp_opencv_contours_boundingrect.c pdp_opencv_bgsubstract.c pdp_opencv_lk.c pdp_opencv_floodfill.c pdp_opencv_histo.c
+SOURCES = pdp_opencv_threshold.c pdp_opencv_edge.c pdp_opencv_distrans.c pdp_opencv_laplace.c pdp_opencv_motempl.c pdp_opencv_morphology.c pdp_opencv_haarcascade.c pdp_opencv_contours_convexity.c pdp_opencv_contours_boundingrect.c pdp_opencv_bgsubstract.c pdp_opencv_lk.c pdp_opencv_floodfill.c pdp_opencv_histo.c pdp_opencv_dft.c
 
 all: $(SOURCES:.c=.$(EXTENSION))
 
