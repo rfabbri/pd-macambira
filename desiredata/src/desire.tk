@@ -7674,9 +7674,8 @@ def Dialogue color_popup {frame var i} {
 	    pack [frame $w.$i -bd 0 -bg "#000000"]
 	    for {set j 0} {$j<10} {incr j} {
 		set c [lindex $::preset_colors [expr {$i*10+$j}]]
-		pack [button $w.$i.$j -image icon_empty -width 24 -height 24 \
-		    -background "#$c" -highlightbackground "#$c" -activebackground "#$c" \
-		    -command [list $self color_popup_select $frame $var [expr 0x$c]] -padx 0 -pady 0] -side left
+		pack [frame $w.$i.$j -width 24 -height 24 -background "#$c" -relief raised] -side left
+		bind $w.$i.$j <ButtonRelease> [list $self color_popup_select $frame $var [expr 0x$c]]
 	    }
 	}
 }
