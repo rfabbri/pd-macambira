@@ -1,5 +1,5 @@
 /* 
- Evaluates all circular harmonics 
+ Evaluates all fully normalized circular harmonics 
  at the angles phi up to the order nmax. 
  using the recurrence for the Chebyshev
  polynomials of the first and second kind
@@ -42,6 +42,8 @@ void chebyshev12(double *phi, Cheby12WorkSpace *wc) {
    const int incr=2*wc->nmax+1;
    double *cosphi;
    double *sinphi;
+   const double oneoversqrt2pi=1.0/sqrt(2.0*M_PI);
+   const double oneoversqrtpi=1.0/sqrt(M_PI);
    // memory allocation
    if ((wc!=0)&&(phi!=0)) {
       if ((cosphi=(double*)calloc(wc->l,sizeof(double)))==0) {
@@ -56,9 +58,9 @@ void chebyshev12(double *phi, Cheby12WorkSpace *wc) {
          cosphi[l]=cos(phi[l]);
          sinphi[l]=sin(phi[l]);
          // initial value T_0=1
-         wc->t[l0]=1;
-         wc->t[l0+1]=cosphi[l];
-         wc->t[l0-1]=sinphi[l];
+         wc->t[l0]=oneoversqrt2pi;
+         wc->t[l0+1]=cosphi[l]*oneoversqrtpi;
+         wc->t[l0-1]=sinphi[l]*oneoversqrtpi;
       }
       // recurrence for n>1
       for (n=2; n<=wc->nmax; n++) {

@@ -43,7 +43,7 @@ static void sharmonics_initlegendrenormlzd(SHWorkSpace *ws) {
    }
 }
 
-// multiplying Chebyshev sin/cos to the preliminary result
+// multiplying normalized Chebyshev sin/cos to the preliminary result
 // Y_n^m(phi,theta) = Y_n^m(theta) * T_m(phi)
 // ny0 and nt0 denote where the position (n,m)=(n,0) or m=0 is in the arrays
 // ly0 and lt0 denote the starting position for one vertex in the arrays

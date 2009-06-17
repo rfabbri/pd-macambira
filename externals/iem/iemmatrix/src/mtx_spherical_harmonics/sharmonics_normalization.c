@@ -27,8 +27,14 @@ SHNorml *sharmonics_normalization_new (const size_t nmax) {
          wn=0;
       }
       else {
+	 /*
+         deprecated:
          // computing N_n^m for m=0, wrongly normalized
          wn->n[0]=sqrt(1/(2*M_PI));
+	 */
+
+         // computing N_n^m for m=0,
+         wn->n[0]=oneoversqrt2;
          for (n=1,n0=1; n<=nmax; n++) {
             wn->n[n0]=wn->n[0] * sqrt(2*n+1);
             n0+=n+1;
@@ -40,11 +46,14 @@ SHNorml *sharmonics_normalization_new (const size_t nmax) {
             }
             n0+=n+1;
          }
+	 /*
+	 deprecated:
          // correcting normalization of N_n^0
          for (n=0,n0=0; n<=nmax; n++) {
             wn->n[n0]*=oneoversqrt2;
             n0+=n+1;
          }
+	 */
       }
    }
    return wn;
