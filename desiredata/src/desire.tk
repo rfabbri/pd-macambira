@@ -556,14 +556,10 @@ if {$tk} {
 	bind Toplevel <FocusIn> {set ::current_window %W}
 	proc tk_messageBox2 {args} {tk_messageBox -parent $::current_window {*}$args}
 
-	# it's unfortunate but we seem to have to turn off global bindings
-	# for Text objects to get control-s and control-t to do what we want for
-	# "text" dialogs below. Also we have to get rid of tab's changing the focus.
+	# Also we have to get rid of tab's changing the focus.
 	bind all <Key-Tab> ""
 	#bind all <Key-Shift-Tab> ""
 	bind all <<PrevWindow>> ""
-	bind Text <Control-t> {}
-	bind Text <Control-s> {}
 	set mods {{} 0 Shift- 1 Control- 4 Shift-Control- 5 Alt- 8 Shift-Alt- 9 Control-Alt- 12 Shift-Control-Alt- 13}
 	foreach type {KeyPress KeyRelease} {
 	    foreach {subtype mod} $mods {
@@ -582,7 +578,7 @@ proc modekey {k mode} {
   if {$mode&1} {append s Shift-}
   if {$mode&4} {append s Control-}
   if {$mode&8} {append s Alt-}
-	if {[regexp {[0-9]} $k]} {set k Key-$k}
+  if {[regexp {[0-9]} $k]} {set k Key-$k}
   return $s$k
 }
 
@@ -591,10 +587,9 @@ proc modeclick {k mode event} {
   if {$mode&1} {append s Shift-}
   if {$mode&4} {append s Control-}
   if {$mode&8} {append s Alt-}
-	if {[regexp {[0-9]} $k]} {set k $event-$k}
+  if {[regexp {[0-9]} $k]} {set k $event-$k}
   return $s$k
 }
-
 
 # there are two palettes of 30 colours used in Pd
 # when placed in a 3*10 grid, the difference is that
@@ -604,12 +599,6 @@ set preset_colors {
 	fcfcfc e0e0e0 bcbcbc fce0e0 fce0c0 fcfcc8 d8fcd8 d8fcfc dce4fc f8d8fc
 	a0a0a0 7c7c7c 606060 fc2828 fcac44 e8e828 14e814 28f4f4 3c50fc f430f0
 	404040 202020 000000 8c0808 583000 782814 285014 004450 001488 580050
-}
-
-set preset_colors2 {
-	fcfcfc a0a0a0 404040 fce0e0 fce0c0 fcfcc8 d8fcd8 d8fcfc dce4fc f8d8fc
-	e0e0e0 7c7c7c 202020 fc2828 fcac44 e8e828 14e814 28f4f4 3c50fc f430f0
-	bcbcbc 606060 000000 8c0808 583000 782814 285014 004450 001488 580050
 }
 
 switch $::OS {
@@ -5385,10 +5374,7 @@ proc parse_color {c} {
 		set g [expr round((($c>> 6)&63)*255/63)]
 		set b [expr round((($c>> 0)&63)*255/63)]
 		return [format #%02x%02x%02x $r $g $b]
-	} {
-		global preset_colors2
-		return #[lindex $preset_colors2 $c]
-	}
+	} {return #[lindex $::preset_colours2 $c]}
 }
 
 proc unparse_color {c} {
@@ -5768,7 +5754,7 @@ def PropertiesDialogue init {of} {
 	bind $f <KeyPress>        [list $self do_auto_apply]
 	bind $f <ButtonRelease>   [list $self do_auto_apply]
 	set @auto_apply 0
-	$self none_resizable
+	$self non_resizable
 }
 
 def PropertiesDialogue do_auto_apply {} {
@@ -7233,7 +7219,7 @@ def Dialogue add_color {f name label} {
 	set text_color [complement $v]
 	button $f.color -text $v -font {Courier 10} -width 10 -pady 2 -fg $text_color \
 	    -command [list $self choose_col $f $name $v] -relief sunken -background $v \
-	    -highlightbackground "#ffffff" -activebackground [darker $v]
+	    -highlightbackground [brighter $v] -activebackground [darker $v]
 	button $f.preset -text [say "preset"] -pady 2 -font {Helvetica 8} \
 	    -command [list $self color_popup $f $name 10]
 	bind $f.preset <Return> "$self color_popup $f $name 10"
@@ -7308,10 +7294,9 @@ def Dialogue add_libraries {f name label} {
 	pack [scrollbar $f.a.xscroll -command "$f.a.list xview" -orient horizontal] -side bottom -fill x
 	pack $f.a -side left
 
-	frame $f.b       -borderwidth 0
-	entry $f.b.entry -width 15 -borderwidth 5 -relief ridge
-	bind  $f.b.entry <Return> "$self lib_add $f.a.list"
-	pack  $f.b.entry -side top
+	frame $f.b -borderwidth 0
+	pack [entry $f.b.entry -width 15 -borderwidth 5 -relief ridge] -side top
+	bind $f.b.entry <Return> "$self lib_add $f.a.list"
 
 	foreach {cmd lab} {lib_add add listbox_remove remove listbox_up up listbox_down down} {
 		pack [button $f.b.$cmd -command "$self $cmd $f.a.list" -text [say $lab] -width 6] -side top
@@ -7492,23 +7477,25 @@ def FontDialogue init {class orig} {
 	set @bold   [expr [lsearch $font bold  ]>=0]
 	set @italic [expr [lsearch $font italic]>=0]
 	set @str $font
-	logvar @family @size @bold @italic
 	pack [label $f.label -text [say font_family] -anchor w] -side top -fill x
+
 	frame $f.list -bd 2
-	
-	pack [listbox $f.list.box -relief sunken -yscrollcommand "$f.list.scroll set"] -side left
+	pack [listbox $f.list.box -relief sunken -yscrollcommand "$f.list.scroll set" -width 30] -side left -expand yes -fill both
 	pack [scrollbar $f.list.scroll -relief sunken -command "$f.list.box yview" -takefocus 0] -side right -fill y
 	bind $f.list.box <<ListboxSelect>> "$self font_update $f"
 	foreach name [lsort [font families]] {$f.list.box insert end $name}
-
 	set fontlist [$f.list.box get 0 end]
-	set find [lsearch $fontlist $@family]
-	if {$find < 0} {set find 0}
+	set find [max 0 [lsearch $fontlist $@family]]
 	$f.list.box selection set $find $find
 	$f.list.box activate $find
 	$f.list.box see $find
 	bind $f.list.box <ButtonRelease-1> "$self font_update $f"
 	bind $f.list.box <ButtonPress-1> "focus $f.list.box"
+	pack $f.list -side left -expand yes -fill both
+
+	#pack [ttk::separator $f.sep -orient vertical] -side left -fill y
+	#pack [ttk::sizegrip $f.sep] -side left -fill y
+	#ttk::panedwindow
 
 	frame $f.var
 	frame $f.var.size
@@ -7530,14 +7517,13 @@ def FontDialogue init {class orig} {
 
 	frame $f.preview
 	pack [label  $f.preview.label -text [say font_preview]] -side left
-	pack [canvas $f.preview.canvas -width 250 -height 50 -relief sunken -borderwidth 1]  -side left -fill x
+	pack [canvas $f.preview.canvas -width 250 -height 50 -relief sunken -borderwidth 1] -side left -fill x
 	$f.preview.canvas create text 4 4 -tags ${self}TEXT -anchor nw -text [say font_preview_2] -font $font
 
-	pack $f.list  -side left
 	pack $f.var -side top -fill x
 	pack $f.preview -side top -pady 10
 	focus $f.list.box
-	$self none_resizable
+	#$self non_resizable
 }
 def FontDialogue font_update {f} {
 	global font
@@ -7656,7 +7642,7 @@ def Dialogue init {args} {
 	bind .$self         <Tab> "$self traversal %K %W forward"
 	bind .$self <Control-Tab> "$self traversal %K %W back"
 }
-def Dialogue none_resizable {} {wm resizable .$self 0 0}
+def Dialogue non_resizable {} {wm resizable .$self 0 0}
 def Dialogue traversal {k w direction} {
 	switch $direction {
 		forward {focus [tk_focusNext $w]}
@@ -7685,13 +7671,12 @@ def Dialogue color_popup {frame var i} {
 	set w $frame.color.popup
 	if [winfo exists $w] {destroy $w}
 	menu $w -tearoff false
-	global preset_colors
-	for {set i 0} {$i<[llength $preset_colors]} {incr i} {
-		set c [lindex $preset_colors $i]
+	for {set i 0} {$i<[llength $::preset_colors]} {incr i} {
+		set c [lindex $::preset_colors $i]
 		$w add command -label "     " -background "#$c" -activebackground "#$c" \
 		    -command [list $self color_popup_select $frame $var [expr 0x$c]]
 	}
-	tk_popup $w [expr [winfo rootx $frame.color]] [expr [winfo rooty $frame.color]]
+	tk_popup $w [expr [winfo rootx $frame.preset]] [expr [winfo rooty $frame.preset]]
 }
 def Dialogue choose_col {frame var val} {
 	set c 0xFFFFFF
@@ -7708,7 +7693,7 @@ def PagedDialogue init {args} {
 	set @nb [ttk::notebook .$self.1]
 	set @nbs $@nb
 	pack $@nb -expand 1 -fill both
-	$self none_resizable
+	$self non_resizable
 }
 
 # numbers in section are for the % of space taken by labels
