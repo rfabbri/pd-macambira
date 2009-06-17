@@ -5751,8 +5751,8 @@ def PropertiesDialogue init {of} {
 	frame $f.buttonsep2 -height 2 -borderwidth 1 -relief sunken
 	pack $f.auto_apply $f.buttonsep2 -side bottom -fill x
 	bind $f <KeyPress-Return> "break";#so that Return don't call do_auto_apply after Dialogue ok
-	bind $f <KeyPress>        [list $self do_auto_apply]
-	bind $f <ButtonRelease>   [list $self do_auto_apply]
+	#bind $f <KeyPress>        [list $self do_auto_apply] ;# too wide: may cause Ok/Cancel to spit errors
+	#bind $f <ButtonRelease>   [list $self do_auto_apply] ;# too wide: may cause Ok/Cancel to spit errors
 	$self non_resizable
 }
 class_new IEMPropertiesDialogue {PropertiesDialogue}
