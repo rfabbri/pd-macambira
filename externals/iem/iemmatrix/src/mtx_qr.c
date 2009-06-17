@@ -115,8 +115,6 @@ static void mTXQrMatrix (MTXQr *x, t_symbol *s,
     post("mtx_qr: invalid dimensions");
   else if (in_size<size) 
     post("mtx_qr: sparse matrix not yet supported: use \"mtx_check\"");
-  else if (rows<columns)
-     post("mtx_qr: gsl_linalg_SVD_decomp does not support M<N");
   else {
      x->rows=rows;
      x->columns=columns;
