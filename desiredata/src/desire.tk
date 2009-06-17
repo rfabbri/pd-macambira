@@ -5753,14 +5753,8 @@ def PropertiesDialogue init {of} {
 	bind $f <KeyPress-Return> "break";#so that Return don't call do_auto_apply after Dialogue ok
 	bind $f <KeyPress>        [list $self do_auto_apply]
 	bind $f <ButtonRelease>   [list $self do_auto_apply]
-	set @auto_apply 0
 	$self non_resizable
 }
-
-def PropertiesDialogue do_auto_apply {} {
-	if {$@auto_apply} {$self apply}
-}
-
 class_new IEMPropertiesDialogue {PropertiesDialogue}
 
 def IEMGUI properties_apply {list {orient -1}} {
@@ -7218,8 +7212,7 @@ def Dialogue add_color {f name label} {
 	set v $@$name
 	set text_color [complement $v]
 	button $f.color -text $v -font {Courier 10} -width 10 -pady 2 -fg $text_color \
-	    -command [list $self choose_col $f $name $v] -relief sunken -background $v \
-	    -highlightbackground [brighter $v] -activebackground [darker $v]
+	    -command [list $self choose_col $f $name $v] -relief sunken -background $v -highlightbackground $v -activebackground $v
 	button $f.preset -text [say "preset"] -pady 2 -font {Helvetica 8} \
 	    -command [list $self color_popup $f $name 10]
 	bind $f.preset <Return> "$self color_popup $f $name 10"
@@ -7641,7 +7634,9 @@ def Dialogue init {args} {
 	wm protocol $f WM_DELETE_WINDOW "$self cancel"
 	bind .$self         <Tab> "$self traversal %K %W forward"
 	bind .$self <Control-Tab> "$self traversal %K %W back"
+	set @auto_apply 0
 }
+def Dialogue do_auto_apply {} {if {$@auto_apply} {$self apply}}
 def Dialogue non_resizable {} {wm resizable .$self 0 0}
 def Dialogue traversal {k w direction} {
 	switch $direction {
@@ -7662,21 +7657,28 @@ def Dialogue dropmenu_set {frame var part val} {
 def Dialogue color_popup_select {frame var color} {
 	set @$var $color
 	set col [format #%6.6x $color]
-	if {$self == "ddrc"} {set @$var $col}
-	$frame.color configure -background $col -foreground [complement $col] -text $col
-	if {$self != "ddrc"} {$self do_auto_apply}
-	#$self do_auto_apply
+	if {$self == "ddrc"} {set @$var $col} ;#!@#$ fishy
+	$frame.color configure -background $col -activebackground $col -highlightbackground $col \
+	  -foreground [complement $col] -text $col
+	destroy $frame.color.popup
+	$self do_auto_apply
 }
 def Dialogue color_popup {frame var i} {
 	set w $frame.color.popup
 	if [winfo exists $w] {destroy $w}
-	menu $w -tearoff false
-	for {set i 0} {$i<[llength $::preset_colors]} {incr i} {
-		set c [lindex $::preset_colors $i]
-		$w add command -label "     " -background "#$c" -activebackground "#$c" \
-		    -command [list $self color_popup_select $frame $var [expr 0x$c]]
+	#menu $w -tearoff false
+	toplevel $w -bg "#000000"
+	wm overrideredirect $w 1
+	wm geometry $w +[expr [winfo rootx $frame.preset]]+[expr {[winfo rooty $frame.preset]+[winfo height $frame.preset]}]
+	for {set i 0} {$i<3} {incr i} {
+	    pack [frame $w.$i -bd 0 -bg "#000000"]
+	    for {set j 0} {$j<10} {incr j} {
+		set c [lindex $::preset_colors [expr {$i*10+$j}]]
+		pack [button $w.$i.$j -image icon_empty -width 24 -height 24 \
+		    -background "#$c" -highlightbackground "#$c" -activebackground "#$c" \
+		    -command [list $self color_popup_select $frame $var [expr 0x$c]] -padx 0 -pady 0] -side left
+	    }
 	}
-	tk_popup $w [expr [winfo rootx $frame.preset]] [expr [winfo rooty $frame.preset]]
 }
 def Dialogue choose_col {frame var val} {
 	set c 0xFFFFFF
