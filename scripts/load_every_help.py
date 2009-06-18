@@ -39,12 +39,18 @@ def make_netreceive_patch(filename):
 
 def send_to_socket(message):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('localhost', PORT))
-    s.send(message)
-    s.close()
+    s.settimeout(5)
+    try:
+        s.connect(('localhost', PORT))
+        s.send(message)
+        s.close()
+    except socket.timeout:
+        print "socket timed out while sending"
 
 def send_to_pd(message):
+    print 'Sending to pd: ' + message
     send_to_socket('; pd ' + message + ';\n')
+    print 'finished sending'
 
 def open_patch(filename):
     dir, file = os.path.split(filename)
@@ -69,14 +75,15 @@ def quit_pd(process):
     send_to_pd('quit')
     time.sleep(1)
     try:
+        print 'Trying to kill pd'
         os.kill(process.pid, signal.SIGTERM)
     except OSError:
-        pass
+        print 'OSError on SIGTERM'
     time.sleep(1)
     try:
         os.kill(process.pid, signal.SIGKILL)
     except OSError:
-        pass
+        print "OSError on SIGKILL"
 
 
 #---------- list of lines to ignore ----------#
@@ -127,15 +134,16 @@ for root, dirs, files in os.walk(docdir):
     for name in files:
         m = re.search(".*\.pd$", name)
         if m:
-            print 'checking ' + name
+            print 'checking ' + root + '/' + name
             patchoutput = []
             patch = os.path.join(root, m.string)
             p = launch_pd()
             try:
                 open_patch(patch)
-                time.sleep(1)
+                time.sleep(5)
                 close_patch(patch)
                 quit_pd(p)
+                print 'Finished ' + root + '/' + name + '\n\n'
             except socket.error:
                 patchoutput.append('socket.error')                 
             while True:
