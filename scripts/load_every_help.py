@@ -149,7 +149,7 @@ for root, dirs, files in os.walk(docdir):
             while True:
                 line = p.stdout.readline()
                 m = re.search('EOF on socket', line)
-                if not m:
+                if not m and line:
                     patchoutput.append(line) 
                 else:
                     break
