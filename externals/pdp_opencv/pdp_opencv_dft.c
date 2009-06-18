@@ -40,6 +40,7 @@ typedef struct pdp_opencv_dft_struct
     t_outlet *x_outlet1;
     int x_packet0;
     int x_packet1;
+    int x_packet2;
     int x_dropped;
     int x_queue_id;
 
@@ -119,6 +120,7 @@ void pdp_opencv_dft_shift_dft(CvArr * src_arr, CvArr * dst_arr )
         cvCopy(q2, q4, 0);
         cvCopy(tmp, q2, 0);
     }
+    cvReleaseMat( &tmp );
 }
 
 static void pdp_opencv_dft_process_rgb(t_pdp_opencv_dft *x)
@@ -127,6 +129,8 @@ static void pdp_opencv_dft_process_rgb(t_pdp_opencv_dft *x)
   short int *data   = (short int *)pdp_packet_data(x->x_packet0);
   t_pdp     *newheader = pdp_packet_header(x->x_packet1);;
   short int *newdata = (short int *)pdp_packet_data(x->x_packet1);; 
+  t_pdp     *phaseheader = pdp_packet_header(x->x_packet2);;
+  short int *phasedata = (short int *)pdp_packet_data(x->x_packet2);; 
   CvMat tmp;
   double m,M;
   int px,py;
@@ -196,6 +200,16 @@ static void pdp_opencv_dft_process_rgb(t_pdp_opencv_dft *x)
       // Split Fourier in real and imaginary parts
       cvSplit( x->dft_A, x->image_re, x->image_im, 0, 0 );
   
+      // calculate phase
+      for( py=0; py<x->image_re->height; py++ ) {
+         double* ptrr = (double*) ( x->image_re->imageData + py * x->image_re->widthStep);
+         double* ptri = (double*) ( x->image_im->imageData + py * x->image_im->widthStep);
+         float* ptrp = (float*) ( x->image_pout->imageData + py * x->image_pout->widthStep);
+         for( px=0; px<x->image_re->width; px++ ) {
+           (*(ptrp+px)) = cvFastArctan( (float)*(ptri+px), (float)*(ptrr+px) );
+         }
+      }
+
       // Compute the magnitude of the spectrum Mag = sqrt(Re^2 + Im^2)
       cvPow( x->image_re, x->image_re, 2.0);
       cvPow( x->image_im, x->image_im, 2.0);
@@ -228,6 +242,8 @@ static void pdp_opencv_dft_process_rgb(t_pdp_opencv_dft *x)
 
     cvCvtColor(x->image_mout, x->image, CV_GRAY2RGB);
     memcpy( newdata, x->image->imageData, x->x_size*3 );
+    cvCvtColor(x->image_pout, x->image, CV_GRAY2RGB);
+    memcpy( phasedata, x->image->imageData, x->x_size*3 );
 
     return;
 }
@@ -240,6 +256,12 @@ static void pdp_opencv_dft_sendpacket(t_pdp_opencv_dft *x)
 
     /* unregister and propagate if valid dest packet */
     pdp_packet_pass_if_valid(x->x_outlet0, &x->x_packet1);
+
+    /* unregister and propagate if valid dest packet */
+    pdp_packet_pass_if_valid(x->x_outlet1, &x->x_packet2);
+
+    pdp_packet_mark_unused(x->x_packet1);
+    pdp_packet_mark_unused(x->x_packet2);
 }
 
 static void pdp_opencv_dft_process(t_pdp_opencv_dft *x)
@@ -256,6 +278,7 @@ static void pdp_opencv_dft_process(t_pdp_opencv_dft *x)
 
 	case PDP_BITMAP_RGB:
             x->x_packet1 = pdp_packet_clone_rw(x->x_packet0);
+            x->x_packet2 = pdp_packet_clone_rw(x->x_packet0);
             pdp_queue_add(x, pdp_opencv_dft_process_rgb, pdp_opencv_dft_sendpacket, &x->x_queue_id);
 	    break;
 
@@ -321,6 +344,7 @@ void *pdp_opencv_dft_new(t_floatarg f)
 
     x->x_packet0 = -1;
     x->x_packet1 = -1;
+    x->x_packet2 = -1;
     x->x_queue_id = -1;
 
     x->x_width  = 320;
