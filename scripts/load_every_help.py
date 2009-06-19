@@ -127,23 +127,21 @@ def remove_ignorelines(list):
 make_netreceive_patch(netreceive_patch)
 
 logoutput = []
-docdir = pdrootdir + '/doc'
+docdir = os.path.join(pdrootdir, 'doc')
 for root, dirs, files in os.walk(docdir):
-    #dirs.remove('.svn')
-#    print "root: " + root
     for name in files:
         m = re.search(".*\.pd$", name)
         if m:
-            print 'checking ' + root + '/' + name
             patchoutput = []
             patch = os.path.join(root, m.string)
+            print 'checking ' + patch
             p = launch_pd()
             try:
                 open_patch(patch)
                 time.sleep(5)
                 close_patch(patch)
                 quit_pd(p)
-                print 'Finished ' + root + '/' + name + '\n\n'
+                print 'Finished ' + patch + '\n\n'
             except socket.error:
                 patchoutput.append('socket.error')                 
             while True:
@@ -155,9 +153,9 @@ for root, dirs, files in os.walk(docdir):
                     break
             patchoutput = remove_ignorelines(patchoutput)
             if len(patchoutput) > 0:
-#                print 'found log messages: ' + name
+#                print 'found log messages: ' + patch
                 logoutput.append('\n\n__________________________________________________\n')
-                logoutput.append('loading: ' + name + '\n')
+                logoutput.append('loading: ' + patch + '\n')
 #                logoutput.append('--------------------------------------------------\n')
                 logoutput += patchoutput
 #                for line in patchoutput:
