@@ -10,7 +10,10 @@ library = os.getcwd().split('/')[-1]
 print "current library: " + library + "\n"
 
 for root, dirs, files in os.walk('.'):
-    dirs.remove('.svn')
+    try:
+        dirs.remove('.svn')
+    except:
+        pass
 #    print "root: " + root
     for name in files:
         m = re.search(".*-help\.pd$", name)
