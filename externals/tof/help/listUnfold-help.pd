@@ -1,0 +1,20 @@
+#N canvas 154 102 524 446 10;
+#X obj 196 327 listUnfold;
+#X obj 165 388 print value;
+#X obj 277 385 print index;
+#X msg 199 277 anything works too;
+#X msg 154 208 5 3 2 8 4;
+#X msg 185 237 symbol test;
+#X obj 62 22 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
+0;
+#X text 67 77 author: mrtoftrash@gmail.com;
+#X text 67 88 version: 2009-06-07 (initial release);
+#X text 67 66 tags: list flow tof;
+#X text 68 22 description: output the individual elements of a list
+one after the other while simultaneously doing so with their indices.
+;
+#X connect 0 0 1 0;
+#X connect 0 1 2 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 0 0;

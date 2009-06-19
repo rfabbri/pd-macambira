@@ -1,0 +1,47 @@
+#N canvas 305 118 476 537 10;
+#X obj 66 482 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj -11 19 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
+0;
+#X text -6 75 author: mrtoftrash@gmail.com;
+#X text -6 96 version: 2009-04-14 (initial release);
+#X text -7 60 tags: initialization;
+#X text -6 18 description: outputs an inital argument. Outputs a default
+one if no initial argument is set. Can also check that an argument
+is of a particular type.;
+#X obj 13 187 argument 1;
+#X text 5 247 If a second argument is set \, its value will be used
+as the default value. The default value is used only if there is no
+parent argument OR if the type of the parent argument does not match
+the type of the default one.;
+#X obj 4 322 argument 1 32;
+#X obj 12 167 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 4 298 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 4 349 print;
+#X obj 13 208 print;
+#X text 6 135 The first argument selects the nth parent argument to
+output.;
+#X text 92 321 <-Will output 32 because there are no parent arguments.
+;
+#X text 87 183 <-Should output the first parent argument. But in this
+case \, the parent (the containing patch) has no arguments and this
+example will not output anything.;
+#X text 137 428 -- Example --;
+#X text 5 449 Inside the following abstraction \, three [argument]
+objects are linked to arguments 1 \, 2 and 3;
+#X obj 158 347 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 158 369 argument;
+#X obj 158 395 print;
+#X text 218 370 <-Outputs the \$0 as symbol;
+#X text 172 506 <- open it;
+#X obj 66 506 argument-abs a b;
+#X connect 0 0 23 0;
+#X connect 6 0 12 0;
+#X connect 8 0 11 0;
+#X connect 9 0 6 0;
+#X connect 10 0 8 0;
+#X connect 18 0 19 0;
+#X connect 19 0 20 0;
