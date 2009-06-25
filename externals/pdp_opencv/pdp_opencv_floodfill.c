@@ -126,12 +126,6 @@ static void pdp_opencv_floodfill_process_rgb(t_pdp_opencv_floodfill *x)
             CvScalar color = CV_RGB( x->x_r[i], x->x_g[i], x->x_b[i] );
             cvFloodFill( x->color_img, seed, color, CV_RGB( x->x_lo, x->x_lo, x->x_lo ),
                          CV_RGB( x->x_up, x->x_up, x->x_up ), &comp, flags, NULL );
-            SETFLOAT(&x->x_list[0], i);
-            SETFLOAT(&x->x_list[1], comp.rect.x);
-            SETFLOAT(&x->x_list[2], comp.rect.y);
-            SETFLOAT(&x->x_list[3], comp.rect.width);
-            SETFLOAT(&x->x_list[4], comp.rect.height);
-            outlet_list( x->x_outlet1, 0, 5, x->x_list );
          }
          else
          {
@@ -139,13 +133,17 @@ static void pdp_opencv_floodfill_process_rgb(t_pdp_opencv_floodfill *x)
             CvScalar brightness = cvRealScalar((x->x_r[i]*2 + x->x_g[i]*7 + x->x_b[i] + 5)/10);
             cvFloodFill( x->gray_img, seed, brightness, cvRealScalar(x->x_lo),
                          cvRealScalar(x->x_up), &comp, flags, NULL );
-            SETFLOAT(&x->x_list[0], i);
-            SETFLOAT(&x->x_list[1], comp.rect.x);
-            SETFLOAT(&x->x_list[2], comp.rect.y);
-            SETFLOAT(&x->x_list[3], comp.rect.width);
-            SETFLOAT(&x->x_list[4], comp.rect.height);
-            outlet_list( x->x_outlet1, 0, 5, x->x_list );
          }
+         SETFLOAT(&x->x_list[0], i);
+         SETFLOAT(&x->x_list[1], comp.rect.x);
+         SETFLOAT(&x->x_list[2], comp.rect.y);
+         SETFLOAT(&x->x_list[3], comp.rect.width);
+         SETFLOAT(&x->x_list[4], comp.rect.height);
+         outlet_list( x->x_outlet1, 0, 5, x->x_list );
+
+         // follow the blob
+         x->x_xcomp[i] = comp.rect.x + ( comp.rect.width / 2 );
+         x->x_ycomp[i] = comp.rect.y + ( comp.rect.height / 2 );
        }
     }
 
