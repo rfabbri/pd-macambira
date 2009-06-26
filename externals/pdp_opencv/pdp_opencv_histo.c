@@ -158,41 +158,31 @@ static void pdp_opencv_histo_process_rgb(t_pdp_opencv_histo *x)
     		cvCvtPixToPlane( x->hsv, x->h_saved_plane, x->s_saved_plane, x->v_saved_plane, 0 );
         	cvCalcHist( x->saved_planes, x->saved_hist[x->save_now], 0, 0 ); //Compute histogram
         	cvNormalizeHist( x->saved_hist[x->save_now], 1.0 );  //Normalize it 
-		x->nbsaved++;
 		x->save_now=-1;
-     } 
-     cvCalcHist( x->planes, x->hist, 0, 0 ); //Compute histogram
-     cvNormalizeHist( x->hist, 1.0 );  //Normalize it 
+		x->nbsaved++;
+    } 
+    cvCalcHist( x->planes, x->hist, 0, 0 ); //Compute histogram
+    cvNormalizeHist( x->hist, 1.0 );  //Normalize it 
 
-     double tato[MAX_HISTOGRAMS_TO_COMPARE];
-     int nearest = -1;
-     double max  =  0;
+    double tato[MAX_HISTOGRAMS_TO_COMPARE];
+    int nearest = -1;
+    double max  =  0;
 
-     int n;
-     for (n=0; n<MAX_HISTOGRAMS_TO_COMPARE; n++) {
-		tato[n] = cvCompareHist(x->hist, x->saved_hist[n], CV_COMP_INTERSECT);
-		if (tato[n]>max) {
-			max = tato[n];
-			nearest = n;
-		}
-     }
+    int n;
+    if ( x->nbsaved > 0 ) 
+    for (n=0; n<MAX_HISTOGRAMS_TO_COMPARE; n++) {
+	tato[n] = cvCompareHist(x->hist, x->saved_hist[n], CV_COMP_INTERSECT);
+	if (tato[n]>max) {
+		max = tato[n];
+		nearest = n;
+	}
+    }
     	
-    if ( x->nbsaved > 0 )
-       outlet_float(x->x_outlet1, (float)nearest);
-    else
-       outlet_float(x->x_outlet1, -1.0);
+    outlet_float(x->x_outlet1, (float)nearest);
 
     // Create an image to use to visualize our histogram.
     int scale = 10;
-    //IplImage* hist_img = cvCreateImage( 
-    //  cvSize(x->x_width,x->x_height),
-    //  8,
-    //  3
-    //);
-    //cvZero( hist_img );
-
     // populate our visualization with little gray squares.
-	
     float max_value = 0;
     cvGetMinMaxHistValue( x->hist, 0, &max_value, 0, 0 );
 
@@ -200,19 +190,17 @@ static void pdp_opencv_histo_process_rgb(t_pdp_opencv_histo *x)
     int s = 0;
 
     for( h = 0; h < h_bins; h++ ) {
-         for( s = 0; s < s_bins; s++ ) {
-                 float bin_val = cvQueryHistValue_2D( x->hist, h, s );
-                 int intensity = cvRound( bin_val * 255 / max_value );
-                 cvRectangle(
-                   x->src,
-                   cvPoint( h*scale, s*scale ),
-                   cvPoint( (h+1)*scale - 1, (s+1)*scale - 1),
-		   CV_RGB(intensity,intensity,intensity), CV_FILLED, 8 , 0 );
-               }
+       for( s = 0; s < s_bins; s++ ) {
+          float bin_val = cvQueryHistValue_2D( x->hist, h, s );
+          int intensity = cvRound( bin_val * 255 / max_value );
+          cvRectangle(
+                x->src,
+                cvPoint( h*scale, s*scale ),
+                cvPoint( (h+1)*scale - 1, (s+1)*scale - 1),
+                CV_RGB(intensity,intensity,intensity), CV_FILLED, 8 , 0 );
+        }
     }
 
-    //memory copy again, now from x->cedge->imageData to the new data pdp packet
-    //memcpy( newdata, hist_img, x->x_size*3 );
     memcpy( newdata, x->src->imageData, x->x_size*3 );
 
     return;
@@ -220,7 +208,7 @@ static void pdp_opencv_histo_process_rgb(t_pdp_opencv_histo *x)
 
 static void pdp_opencv_histo_save(t_pdp_opencv_histo *x, t_floatarg f)
 {
-	if (((int)f>=0)&&((int)f<MAX_HISTOGRAMS_TO_COMPARE)) x->save_now = (int)f;
+    if (((int)f>=0)&&((int)f<MAX_HISTOGRAMS_TO_COMPARE)) x->save_now = (int)f;
 }
 
 static void pdp_opencv_histo_sendpacket(t_pdp_opencv_histo *x)
@@ -286,7 +274,6 @@ static void pdp_opencv_histo_free(t_pdp_opencv_histo *x)
 
     pdp_queue_finish(x->x_queue_id);
     pdp_packet_mark_unused(x->x_packet0);
-    //cv_freeplugins(x);
     
     //Destroy cv_images
     cvReleaseImage(&x->src);
@@ -323,7 +310,7 @@ void *pdp_opencv_histo_new(t_floatarg f)
     x->x_infosok = 0;
     x->save_now = 0;
     x->nbsaved = 0;
-    
+
     x->src = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
     x->hsv = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3 );
 
@@ -386,6 +373,7 @@ void pdp_opencv_histo_setup(void)
 
     class_addmethod(pdp_opencv_histo_class, (t_method)pdp_opencv_histo_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_opencv_histo_class, (t_method)pdp_opencv_histo_save, gensym("save"),  A_FLOAT, A_NULL );   
+
 
 }
 
