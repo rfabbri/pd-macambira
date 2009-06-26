@@ -128,17 +128,17 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vbap windowing zexy
+LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl apple iemxmlrpc
+    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl apple
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl pdvjtools postlude tclpd sixaxis iemxmlrpc
+    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl pdvjtools postlude tclpd sixaxis
   endif
 endif
 
