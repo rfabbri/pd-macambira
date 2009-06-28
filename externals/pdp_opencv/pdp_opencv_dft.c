@@ -120,7 +120,9 @@ void pdp_opencv_dft_shift_dft(CvArr * src_arr, CvArr * dst_arr )
         cvCopy(q2, q4, 0);
         cvCopy(tmp, q2, 0);
     }
-    cvReleaseMat( &tmp );
+    if(src_arr==dst_arr){
+        cvReleaseMat( &tmp );
+    }
 }
 
 static void pdp_opencv_dft_process_rgb(t_pdp_opencv_dft *x)
@@ -146,15 +148,15 @@ static void pdp_opencv_dft_process_rgb(t_pdp_opencv_dft *x)
     
     	//Destroy cv_images
     	cvReleaseImage( &x->image );
-    	cvReleaseImage( &x->gray );
+    	//cvReleaseImage( &x->gray );
     	cvReleaseImage( &x->input_re );
     	cvReleaseImage( &x->input_im );
     	cvReleaseImage( &x->input_co );
     	cvReleaseMat( &x->dft_A );
-    	cvReleaseImage( &x->image_re );
-    	cvReleaseImage( &x->image_im );
-    	cvReleaseImage( &x->image_mout );
-    	cvReleaseImage( &x->image_pout );
+    	//cvReleaseImage( &x->image_re );
+    	//cvReleaseImage( &x->image_im );
+    	//cvReleaseImage( &x->image_mout );
+    	//cvReleaseImage( &x->image_pout );
     
     	x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
     	x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
@@ -314,20 +316,21 @@ static void pdp_opencv_dft_free(t_pdp_opencv_dft *x)
 {
   int i;
 
-    pdp_queue_finish(x->x_queue_id);
-    pdp_packet_mark_unused(x->x_packet0);
-    
     //destroy cv structures
     cvReleaseImage( &x->image );
-    cvReleaseImage( &x->gray );
+    //cvReleaseImage( &x->gray );
     cvReleaseImage( &x->input_re );
     cvReleaseImage( &x->input_im );
     cvReleaseImage( &x->input_co );
     cvReleaseMat( &x->dft_A );
-    cvReleaseImage( &x->image_re );
-    cvReleaseImage( &x->image_im );
-    cvReleaseImage( &x->image_mout );
-    cvReleaseImage( &x->image_pout );
+    //cvReleaseImage( &x->image_re );
+    //cvReleaseImage( &x->image_im );
+    //cvReleaseImage( &x->image_mout );
+    //cvReleaseImage( &x->image_pout );
+
+    pdp_queue_finish(x->x_queue_id);
+    pdp_packet_mark_unused(x->x_packet0);
+    
 }
 
 t_class *pdp_opencv_dft_class;
@@ -352,7 +355,7 @@ void *pdp_opencv_dft_new(t_floatarg f)
     x->x_size   = x->x_width * x->x_height;
 
     x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
-    x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
+    x->gray = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 1);
     x->input_re = cvCreateImage( cvGetSize(x->image), IPL_DEPTH_64F, 1);
     x->input_im = cvCreateImage( cvGetSize(x->image), IPL_DEPTH_64F, 1);
     x->input_co = cvCreateImage( cvGetSize(x->image), IPL_DEPTH_64F, 2);
