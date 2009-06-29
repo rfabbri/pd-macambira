@@ -1,5 +1,5 @@
-PD_DIR = ../../pd
-GEM_DIR = ../../Gem
+PD_DIR = ../pd
+GEM_DIR = ../gem
 
 GEM_OPENCV_VERSION = 0.1
 
@@ -14,7 +14,7 @@ CPPFLAGS  = -fPIC -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
  INCLUDES += `pkg-config --cflags opencv`
- LDFLAGS =  -Wl,--export-dynamic -shared
+ LDFLAGS =  -export_dynamic -shared
  LIBS = `pkg-config --libs opencv`
  EXTENSION = pd_linux
 endif
@@ -36,7 +36,7 @@ endif
 
 .SUFFIXES = $(EXTENSION)
 
-SOURCES = pix_opencv_edge.cc pix_opencv_laplace.cc pix_opencv_morphology.cc pix_opencv_distrans.cc pix_opencv_motempl.cc pix_opencv_haarcascade.cc pix_opencv_contours_boundingrect.cc pix_opencv_bgsubstract.cc pix_opencv_contours_convexity.cc
+SOURCES = pix_opencv_edge.cc pix_opencv_laplace.cc pix_opencv_morphology.cc pix_opencv_distrans.cc pix_opencv_motempl.cc pix_opencv_haarcascade.cc pix_opencv_contours_boundingrect.cc pix_opencv_bgsubstract.cc pix_opencv_contours_convexity.cc pix_opencv_dft.cc
 
 all: $(SOURCES:.cc=.$(EXTENSION))
 
