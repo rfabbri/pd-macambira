@@ -4,7 +4,7 @@ current: all
 
 INCLUDE = -I. -I/usr/local/src/pd/src
 
-LDFLAGS = -export-dynamic -shared
+LDFLAGS = --export-dynamic -shared
 LIB = -ldl -lm -lpthread
 
 #select either the DBG and OPT compiler flags below:
