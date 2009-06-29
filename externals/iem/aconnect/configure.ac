@@ -117,7 +117,7 @@ dnl  OK, checks for machines are here now
 dnl
 if test `uname -s` = Linux; 
 then
-  LFLAGS="-export_dynamic  -shared"
+  LFLAGS="--export_dynamic  -shared"
   CFLAGS="-fPIC $CFLAGS"
   EXT=pd_linux	
 fi
