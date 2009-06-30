@@ -58,6 +58,7 @@ list-shellsort -  Sort a list of floats into ascending order using a Shell sort
 list-sieve -  Look up occurence of incoming floats in a list
 list-sort -  Sort an incoming list of values 
 list-splat -  like [list split] which also accepts negative split locations
+list-stddev - calculate the standard deviation of a float
 list-sub -  Substract two lists element by element
 list-swap -  swap two elements of a list at given indices.
 list-tabdump - dump a [table] into a list
