@@ -22,6 +22,8 @@ LOG
 #include "cv.h"
 #endif
 
+#define MAX_MARKERS 100
+
 /*-----------------------------------------------------------------
 -------------------------------------------------------------------
 CLASS
@@ -62,24 +64,48 @@ class GEM_EXTERN pix_opencv_contours_boundingrect : public GemPixObj
     	// Set the new edge threshold
     	void	    	floatMinAreaMess(float minarea);
     	void	    	floatMaxAreaMess(float maxarea);
+    	void	    	floatFToleranceMess(float maxarea);
+    	void	    	floatMMoveMess(float maxarea);
+    	void	    	floatCModeMess(float maxarea);
+    	void	    	floatCMethodMess(float maxarea);
+    	void	    	floatClearMess(void);
+        int             mark(float fx, float fy );
+    	void	    	deleteMark(float findex);
     	// The new minimal/maximal area 
 	int 		minarea;
 	int 		maxarea;
 	// to detect changes in the image size
 	int 		comp_xsize;
 	int		comp_ysize;
+        int             x_xmark[MAX_MARKERS];
+        int             x_ymark[MAX_MARKERS];
+        int             x_found[MAX_MARKERS];
+        int             x_ftolerance;
+        int             x_mmove;
+
+        // contours retrieval mode
+        int             x_cmode;
+        // contours retrieval method
+        int             x_cmethod;
 
     private:
     
 	t_outlet 	*m_dataout;
+	t_outlet 	*m_countout;
     	//////////
     	// Static member functions
     	static void 	floatMinAreaMessCallback(void *data, t_floatarg minarea);
     	static void 	floatMaxAreaMessCallback(void *data, t_floatarg maxarea);
+    	static void 	floatFToleranceMessCallback(void *data, t_floatarg ftolerance);
+    	static void 	floatMMoveMessCallback(void *data, t_floatarg mmove);
+    	static void 	floatCModeMessCallback(void *data, t_floatarg cmode);
+    	static void 	floatCMethodMessCallback(void *data, t_floatarg cmethod);
+    	static void 	floatClearMessCallback(void *data);
 
 	/////////
 	// IplImage needed
     	IplImage 	*rgb, *orig, *cnt_img, *gray;
+        CvFont font;
 	
 };
 

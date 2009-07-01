@@ -1,5 +1,5 @@
-#N canvas 510 70 691 547 10;
-#X obj 286 -33 gemhead;
+#N canvas 515 94 691 547 10;
+#X obj 618 -33 gemhead;
 #X obj 364 374 pix_texture;
 #X obj 364 402 square 2;
 #X obj 20 159 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
@@ -61,6 +61,19 @@
 #X msg 472 288 set;
 #X text 508 288 set the background;
 #X text 572 320 threshold (default 13);
+#X text 26 -2 This object takes an image as a background reference
+and the compare each incomming frame with that. On the output you get
+a bw image \, black pixels are considered as background and white poixels
+as foreground.;
+#X text 27 -94 pix_opencv_bgsubstract :: A simple background substract
+and binarization object.;
+#X text 26 -49 It is useful if you want to detect objects that are
+in front of an static background and you want to isolate the foreground
+silhouete of the foreground objects.;
+#X text 26 59 pix_opencv_bgsubstract works comparing color values of
+each pixel \, so it can fail if the foreground object has the same
+color that the background \, and also if the light conditions or the
+shadows changes since you SET the background image.;
 #X connect 0 0 21 0;
 #X connect 1 0 2 0;
 #X connect 4 0 5 0;
