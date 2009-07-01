@@ -329,7 +329,7 @@ static void pdp_opencv_contours_boundingrect_delete(t_pdp_opencv_contours_boundi
 {
   int i;
 
-    if ( ( findex < 1.0 ) || ( findex > 10 ) )
+    if ( ( findex < 1.0 ) || ( findex > MAX_MARKERS ) )
     {
        return;
     }
