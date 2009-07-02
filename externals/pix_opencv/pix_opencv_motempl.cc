@@ -36,21 +36,21 @@ pix_opencv_motempl :: pix_opencv_motempl()
   inlet_new(this->x_obj, &this->x_obj->ob_pd, gensym("float"), gensym("max_size"));
   m_dataout = outlet_new(this->x_obj, 0);
 
-  mhi_duration = 1;
+  mhi_duration = 1.0;
   diff_threshold = 30;
   last = 0;
   comp_xsize  = 0;
   comp_ysize  = 0;
 
-    // various tracking parameters (in seconds)
-    max_time_delta = 0.5;
-    min_time_delta = 0.05;
-    // number of cyclic frame buffer used for motion detection
-    // (should, probably, depend on FPS)
-    frame_buffer_num = 4;
+  // various tracking parameters (in seconds)
+  max_time_delta = 0.5;
+  min_time_delta = 0.05;
+  // number of cyclic frame buffer used for motion detection
+  // (should, probably, depend on FPS)
+  frame_buffer_num = 4;
 
-    min_size=50;
-    max_size=500; 
+  min_size=50;
+  max_size=500; 
 
   img = NULL;
   motion = NULL;
@@ -169,7 +169,7 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
     cvCvtPlaneToPix( mask, 0, 0, 0, motion );
 
     // calculate motion gradient orientation and valid orientation mask
-    cvCalcMotionGradient( mhi, mask, orient, max_time_delta, min_time_delta, 3 );
+    cvCalcMotionGradient( mhi, mask, orient, max_time_delta, min_time_delta, aperture );
     
     if( !storage )
         storage = cvCreateMemStorage(0);
@@ -324,7 +324,7 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
     cvCvtPlaneToPix( mask, 0, 0, 0, motion );
 
     // calculate motion gradient orientation and valid orientation mask
-    cvCalcMotionGradient( mhi, mask, orient, max_time_delta, min_time_delta, 3 );
+    cvCalcMotionGradient( mhi, mask, orient, max_time_delta, min_time_delta, aperture );
     
     if( !storage )
         storage = cvCreateMemStorage(0);
@@ -482,7 +482,7 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
     cvCvtPlaneToPix( mask, 0, 0, 0, motion );
 
     // calculate motion gradient orientation and valid orientation mask
-    cvCalcMotionGradient( mhi, mask, orient, max_time_delta, min_time_delta, 3 );
+    cvCalcMotionGradient( mhi, mask, orient, max_time_delta, min_time_delta, aperture );
     
     if( !storage )
         storage = cvCreateMemStorage(0);
@@ -571,6 +571,7 @@ void pix_opencv_motempl :: obj_setupCallback(t_class *classPtr)
   class_addmethod(classPtr, (t_method)&pix_opencv_motempl::frame_buffer_numMessCallback, gensym("frame_buffer_num"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_motempl::min_sizeMessCallback, gensym("min_size"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_motempl::max_sizeMessCallback, gensym("max_size"), A_FLOAT, A_NULL);
+  class_addmethod(classPtr, (t_method)&pix_opencv_motempl::apertureMessCallback, gensym("aperture"), A_FLOAT, A_NULL);
 }
 void pix_opencv_motempl :: thresholdMessCallback(void *data, t_floatarg pos)
 {
@@ -600,13 +601,24 @@ void pix_opencv_motempl :: frame_buffer_numMessCallback(void *data, t_floatarg f
 {
   GetMyClass(data)->floatframe_buffer_num((float)frame_buffer_num);
 }
+void pix_opencv_motempl :: apertureMessCallback(void *data, t_floatarg aperture)
+{
+  GetMyClass(data)->apertureMess((float)aperture);
+}
 void pix_opencv_motempl :: floatThreshMess(float thresh)
 {
   if (thresh>=0) diff_threshold = (int)thresh;
 }
 void pix_opencv_motempl :: floatMhiDuration(float duration)
 {
-  if (duration>=1) mhi_duration = (int)duration;
+  if ( duration < 1.0 ) mhi_duration = duration;
+}
+void pix_opencv_motempl :: apertureMess(float aperture)
+{
+  if ( ( aperture == 3.0 ) || ( aperture == 5.0 ) || ( aperture == 7.0 ) )
+  {
+    aperture = (int)aperture;
+  }
 }
 void pix_opencv_motempl :: floatmax_size(float max_size)
 {

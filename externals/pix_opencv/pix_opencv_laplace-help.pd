@@ -1,4 +1,4 @@
-#N canvas 456 80 691 547 10;
+#N canvas 338 215 691 547 10;
 #X obj 286 -33 gemhead;
 #X obj 364 374 pix_texture;
 #X obj 364 402 square 2;
@@ -33,14 +33,11 @@
 #X restore 25 203 pd gemwin;
 #X msg 25 179 destroy;
 #X text 21 159 Create window and render;
-#X text 64 81 greys out all pixels (but pixel-values are still in RGBA)
-;
 #X obj 200 368 pix_texture;
 #X obj 200 396 square 2;
 #X obj 266 167 translateXYZ -2 0 0;
 #X obj 367 224 separator;
-#X floatatom 493 296 5 0 0 0 - - -;
-#X obj 499 -71 cnv 15 155 250 empty empty empty 20 12 0 14 -24198 -66577
+#X obj 337 281 cnv 15 200 70 empty empty empty 20 12 0 14 -24198 -66577
 0;
 #X obj 511 -66 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -59,29 +56,41 @@
 ;
 #X msg 528 50 colorspace Grey;
 #X obj 364 259 translateXYZ 4 0 0;
-#X obj 364 297 pix_opencv_laplace;
-#X connect 0 0 23 0;
+#X obj 364 323 pix_opencv_laplace;
+#X msg 409 298 1;
+#X msg 443 298 3;
+#X msg 476 298 5;
+#X msg 508 298 7;
+#X text 371 280 aperture size ( default 3 );
+#X text 26 56 Written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
+);
+#X text 26 45 used as an edge detector;
+#X text 25 32 pix_opencv_laplace : laplace filter;
+#X connect 0 0 21 0;
 #X connect 1 0 2 0;
 #X connect 4 0 5 0;
 #X connect 5 0 4 0;
-#X connect 8 0 9 0;
-#X connect 10 0 8 0;
-#X connect 10 0 11 0;
-#X connect 11 0 27 0;
-#X connect 12 0 28 1;
-#X connect 14 0 21 0;
-#X connect 15 0 16 0;
-#X connect 15 1 17 0;
-#X connect 15 2 18 0;
+#X connect 7 0 8 0;
+#X connect 9 0 7 0;
+#X connect 9 0 10 0;
+#X connect 10 0 25 0;
+#X connect 12 0 19 0;
+#X connect 13 0 14 0;
+#X connect 13 1 15 0;
+#X connect 13 2 16 0;
+#X connect 17 0 18 0;
+#X connect 18 0 21 1;
 #X connect 19 0 20 0;
-#X connect 20 0 23 1;
-#X connect 21 0 22 0;
-#X connect 22 0 23 0;
-#X connect 23 0 10 0;
-#X connect 23 1 15 0;
-#X connect 23 2 19 0;
-#X connect 24 0 23 0;
-#X connect 25 0 24 0;
-#X connect 26 0 23 0;
-#X connect 27 0 28 0;
-#X connect 28 0 1 0;
+#X connect 20 0 21 0;
+#X connect 21 0 9 0;
+#X connect 21 1 13 0;
+#X connect 21 2 17 0;
+#X connect 22 0 21 0;
+#X connect 23 0 22 0;
+#X connect 24 0 21 0;
+#X connect 25 0 26 0;
+#X connect 26 0 1 0;
+#X connect 27 0 26 1;
+#X connect 28 0 26 1;
+#X connect 29 0 26 1;
+#X connect 30 0 26 1;
