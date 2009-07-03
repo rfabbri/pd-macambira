@@ -54,8 +54,6 @@ typedef struct pdp_opencv_lk_struct
   int x_height;
   int x_size;
 
-  int x_infosok; 
-
   int win_size;
   double quality;
   int min_distance;
@@ -93,8 +91,6 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
 
       post("pdp_opencv_lk :: resizing plugins");
   
-      //cv_freeplugins(x);
-
       x->x_width = header->info.image.width;
       x->x_height = header->info.image.height;
       x->x_size = x->x_width*x->x_height;
@@ -299,7 +295,7 @@ static void pdp_opencv_lk_delete(t_pdp_opencv_lk *x, t_floatarg findex )
 {
   int i;
 
-    if ( ( findex < 1.0 ) || ( findex > 10 ) )
+    if ( ( findex < 1.0 ) || ( findex > MAX_MARKERS ) )
     {
        return;
     }
@@ -413,11 +409,8 @@ void *pdp_opencv_lk_new(t_floatarg f)
   x->x_height = 240;
   x->x_size   = x->x_width * x->x_height;
 
-  x->x_infosok = 0;
   x->win_size = 10;
  
-  IplImage *image = 0, *grey = 0, *prev_grey = 0, *pyramid = 0, *prev_pyramid = 0, *swap_temp;
-
   x->points [0] = 0;
   x->points [1] = 0;
   x->status = 0;
