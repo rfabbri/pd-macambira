@@ -1,5 +1,5 @@
-#N canvas 15 49 833 785 10;
-#X text -14 -95 written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
+#N canvas 20 49 833 785 10;
+#X text -15 -97 written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
 ) and Yves Degoyon ( ydegoyon@gmail.com );
 #X obj -17 -55 cnv 15 621 250 empty empty empty 20 12 0 14 -260097
 -66577 0;
@@ -9,7 +9,7 @@
 #X msg 313 39 close;
 #X obj 243 110 pdp_v4l;
 #X msg 300 7 open /dev/video0;
-#X obj 412 -20 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 412 -20 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 412 7 metro 40;
 #X msg 493 26 close;
@@ -26,15 +26,13 @@
 #X msg 13 24 open \$1;
 #X msg 13 -29 bang;
 #X msg 47 123 loop \$1;
-#X obj 127 123 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 127 123 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X obj 127 41 loadbang;
 #X text 56 -26 playing a video file;
 #X text 253 -17 Camera input;
 #X obj 73 161 hsl 128 15 0 500 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
-#X text -14 -120 pdp_opencv_lk : contour point detection using pyramid
-segmentation;
 #X obj -15 203 cnv 15 621 400 empty empty empty 20 12 0 14 -258113
 -66577 0;
 #X obj 38 628 pdp_xv;
@@ -82,22 +80,24 @@ segmentation;
 #X text 167 630 <-- mark the points you want to track in the video
 window;
 #X text 312 510 position of each marked point;
+#X text -14 -110 pdp_opencv_lk : contour most significant points detection
+;
 #X connect 2 0 3 0;
 #X connect 3 0 5 0;
 #X connect 4 0 5 0;
-#X connect 5 0 31 0;
-#X connect 5 0 44 0;
+#X connect 5 0 30 0;
+#X connect 5 0 43 0;
 #X connect 6 0 5 0;
 #X connect 7 0 8 0;
 #X connect 8 0 11 0;
 #X connect 9 0 11 0;
 #X connect 10 0 11 0;
-#X connect 11 0 31 0;
-#X connect 11 0 44 0;
+#X connect 11 0 30 0;
+#X connect 11 0 43 0;
 #X connect 12 0 11 0;
 #X connect 13 0 12 0;
-#X connect 14 0 31 0;
-#X connect 14 0 44 0;
+#X connect 14 0 30 0;
+#X connect 14 0 43 0;
 #X connect 15 0 14 0;
 #X connect 16 0 15 0;
 #X connect 17 0 15 0;
@@ -109,34 +109,34 @@ window;
 #X connect 23 0 22 0;
 #X connect 23 0 16 0;
 #X connect 26 0 14 1;
-#X connect 29 0 49 0;
-#X connect 30 0 31 1;
-#X connect 31 0 29 0;
-#X connect 31 0 48 0;
-#X connect 31 1 67 0;
-#X connect 33 0 34 0;
-#X connect 34 0 31 0;
-#X connect 36 0 31 0;
-#X connect 37 0 36 0;
-#X connect 38 0 39 0;
-#X connect 39 0 31 0;
-#X connect 41 0 31 0;
-#X connect 44 0 43 0;
-#X connect 45 0 47 0;
-#X connect 45 0 46 0;
-#X connect 45 0 68 0;
-#X connect 46 0 41 0;
-#X connect 47 0 37 0;
-#X connect 48 0 29 0;
-#X connect 49 0 50 0;
-#X connect 50 0 31 0;
-#X connect 51 0 31 0;
-#X connect 53 0 31 0;
-#X connect 55 0 31 0;
-#X connect 57 0 55 0;
-#X connect 59 0 45 0;
-#X connect 60 0 59 0;
-#X connect 62 0 63 0;
-#X connect 62 1 64 0;
-#X connect 67 0 62 0;
-#X connect 68 0 44 1;
+#X connect 28 0 48 0;
+#X connect 29 0 30 1;
+#X connect 30 0 28 0;
+#X connect 30 0 47 0;
+#X connect 30 1 66 0;
+#X connect 32 0 33 0;
+#X connect 33 0 30 0;
+#X connect 35 0 30 0;
+#X connect 36 0 35 0;
+#X connect 37 0 38 0;
+#X connect 38 0 30 0;
+#X connect 40 0 30 0;
+#X connect 43 0 42 0;
+#X connect 44 0 46 0;
+#X connect 44 0 45 0;
+#X connect 44 0 67 0;
+#X connect 45 0 40 0;
+#X connect 46 0 36 0;
+#X connect 47 0 28 0;
+#X connect 48 0 49 0;
+#X connect 49 0 30 0;
+#X connect 50 0 30 0;
+#X connect 52 0 30 0;
+#X connect 54 0 30 0;
+#X connect 56 0 54 0;
+#X connect 58 0 44 0;
+#X connect 59 0 58 0;
+#X connect 61 0 62 0;
+#X connect 61 1 63 0;
+#X connect 66 0 61 0;
+#X connect 67 0 43 1;
