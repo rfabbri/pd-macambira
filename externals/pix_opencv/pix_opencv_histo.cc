@@ -38,6 +38,8 @@ pix_opencv_histo :: pix_opencv_histo()
   inlet_new(this->x_obj, &this->x_obj->ob_pd, gensym("float"), gensym("save"));
   m_dataout = outlet_new(this->x_obj, &s_anything);
 
+  save_now = 0;
+
   rgba = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 4);
   rgb = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 3);
   grey = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 1);
@@ -48,7 +50,6 @@ pix_opencv_histo :: pix_opencv_histo()
   v_plane = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 1);
   planes[0] = h_plane;
   planes[1] = s_plane;
-  cvCvtPixToPlane( hsv, h_plane, s_plane, v_plane, 0 );
   h_saved_plane = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 1);
   s_saved_plane = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 1);
   v_saved_plane = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 1);
@@ -113,6 +114,8 @@ void pix_opencv_histo :: processRGBAImage(imageStruct &image)
 
     this->comp_xsize=image.xsize;
     this->comp_ysize=image.ysize;
+
+    post( "pix_opencv_histo : reallocating buffers" );
 
     //Destroy cv_images to clean memory
     cvReleaseImage(&rgba);
