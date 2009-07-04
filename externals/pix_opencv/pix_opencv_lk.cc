@@ -33,8 +33,8 @@ pix_opencv_lk :: pix_opencv_lk()
 { 
   int i;
 
-  comp_xsize=0;
-  comp_ysize=0;
+  comp_xsize=320;
+  comp_ysize=240;
 
   inlet_new(this->x_obj, &this->x_obj->ob_pd, gensym("float"), gensym("winsize"));
 
