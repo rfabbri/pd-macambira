@@ -2,7 +2,8 @@ current: all
 
 .SUFFIXES: .pd_linux
 
-INCLUDE = -I. -I/usr/local/src/pd/src
+PDSOURCE?=/usr/local/src/pd/src
+INCLUDE = -I. -I$(PDSOURCE)
 
 LDFLAGS = --export-dynamic -shared
 LIB = -ldl -lm -lpthread
