@@ -22,7 +22,7 @@ LINUXINCLUDE =  -I$(PD_SRC) -I/usr/include/
 .cc.pd_linux:
 	g++  $(FFMPEG_HEADERS) -I$(PD_SRC) -fPIC -c -O -o videogrid.o videogrid.cc
 # 	./tk2c.bash < $*.tk > $*.tk2c
-	g++ $(FFMPEG_HEADERS) -Wl,--export-dynamic  -shared -o videogrid.pd_linux videogrid.o -lavformat -lavcodec -lavutil -libswscale -lquicktime
+	g++ $(FFMPEG_HEADERS) -Wl,--export-dynamic  -shared -o videogrid.pd_linux videogrid.o -lavformat -lavcodec -lavutil -lswscale -lquicktime
 	rm -f $*.o 
 
 # ----------------------------------------------------------
