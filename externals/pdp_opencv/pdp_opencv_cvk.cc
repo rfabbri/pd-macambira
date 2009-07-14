@@ -147,7 +147,7 @@ static void pdp_opencv_cvk_process_rgb(t_pdp_opencv_cvk *x)
        }
        outlet_float(x->x_outlet1, x->x_dist->data.fl[0]);
 
-       // cvReleaseImage( &img32 );
+       cvReleaseImage( &img32 );
        x->x_classify = 0;
     }
 
@@ -222,6 +222,8 @@ static void pdp_opencv_cvk_free(t_pdp_opencv_cvk *x)
     // destroy cv_images
     cvReleaseImage( &x->rgb );
     cvReleaseImage( &x->grey );
+    cvReleaseMat( &x->trainData );
+    cvReleaseMat( &x->trainClasses );
 
 }
 
@@ -414,6 +416,7 @@ void pdp_opencv_cvk_load(t_pdp_opencv_cvk *x)
      // convert data matrix sizexsize to vecor
      row1 = cvReshape( &data, &row_header, 0, 1 );
      cvCopy(row1, &row, NULL);
+     cvReleaseImage( &img );
   }
 
   // create the classifier
@@ -434,6 +437,26 @@ static void pdp_opencv_cvk_classify(t_pdp_opencv_cvk *x)
        return;
     }
     x->x_classify=1;
+}
+
+static void pdp_opencv_cvk_pload(t_pdp_opencv_cvk *x, t_symbol *path, t_floatarg nsamples )
+{
+   if ( (int) nsamples <= 0 )
+   {
+      post( "pdp_opencv_cvk : wrong number of samples : %d", nsamples );
+      return;
+   }
+   else
+   {
+      x->x_nsamples = (int)nsamples;
+      x->x_rsamples = 0;
+      cvReleaseMat( &x->trainData );
+      cvReleaseMat( &x->trainClasses );
+      x->trainData = NULL;
+      x->trainClasses = NULL;
+   }
+   strcpy( x->x_filepath, path->s_name );
+   pdp_opencv_cvk_load(x);
 }
 
 void *pdp_opencv_cvk_new(t_symbol *s, int argc, t_atom *argv )
@@ -524,6 +547,7 @@ void pdp_opencv_cvk_setup(void)
 
     class_addmethod(pdp_opencv_cvk_class, (t_method)pdp_opencv_cvk_input_0, gensym("pdp"), A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_opencv_cvk_class, (t_method)pdp_opencv_cvk_classify, gensym("bang"), A_NULL);
+    class_addmethod(pdp_opencv_cvk_class, (t_method)pdp_opencv_cvk_pload, gensym("load"), A_SYMBOL, A_DEFFLOAT, A_NULL);
 
 }
 
