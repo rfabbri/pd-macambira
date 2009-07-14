@@ -8,7 +8,7 @@
 #X obj -155 14 pdp_v4l;
 #X msg -137 -55 open /dev/video0;
 #X obj -30 -111 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1
-0 1;
+1 1;
 #X obj -30 -84 metro 40;
 #X msg 34 -65 close;
 #X msg 30 -89 open /dev/video0;
@@ -135,6 +135,7 @@
 1;
 #X text 106 230 <-- also outputs phase diagram;
 #X text 110 240 ( necessary for reverse dft );
+#X obj 151 401 * 0.9;
 #X connect 1 0 2 0;
 #X connect 2 0 4 0;
 #X connect 3 0 4 0;
@@ -188,6 +189,7 @@
 #X connect 61 0 65 0;
 #X connect 62 0 66 1;
 #X connect 63 0 66 0;
+#X connect 64 0 90 0;
 #X connect 65 0 60 0;
 #X connect 66 0 57 0;
 #X connect 66 0 58 0;
@@ -197,3 +199,4 @@
 #X connect 84 0 48 0;
 #X connect 85 1 86 0;
 #X connect 87 0 85 1;
+#X connect 90 0 83 1;

@@ -38,10 +38,6 @@
 #include "highgui.h"
 #include "ml.h"
 
-#define MAX_MARKERS 10
-
-const int MAX_COUNT = 500;
-
 typedef struct pdp_opencv_cvk_struct
 {
   t_object x_obj;
@@ -525,7 +521,7 @@ void *pdp_opencv_cvk_new(t_symbol *s, int argc, t_atom *argv )
   x->trainData = NULL;
   x->trainClasses = NULL;
 
-  error( "pdp_opencv_cvk : loading %d samples from : %s", x->x_nsamples, x->x_filepath );
+  post( "pdp_opencv_cvk : loading %d samples from : %s", x->x_nsamples, x->x_filepath );
   pdp_opencv_cvk_load( x );
 
   return (void *)x;
