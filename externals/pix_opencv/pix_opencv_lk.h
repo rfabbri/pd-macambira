@@ -13,8 +13,8 @@ LOG
 
 -----------------------------------------------------------------*/
 
-#ifndef INCLUDE_PIX_OPENCV_DISTRANS_H_
-#define INCLUDE_PIX_OPENCV_DISTRANS_H_
+#ifndef INCLUDE_PIX_OPENCV_LK_H_
+#define INCLUDE_PIX_OPENCV_LK_H_
 
 #include "Base/GemPixObj.h"
 
