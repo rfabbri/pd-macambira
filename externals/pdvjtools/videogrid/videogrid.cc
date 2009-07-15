@@ -665,44 +665,28 @@ extern "C"
         maxim = x->x_num_fil * x->x_num_col;
         path  ig_path = PATH_TEMPORAL;
         /* si hi ha tants nodes a la cua com el maxim */
-        /* if((numNodes(&x->x_cua)) >=  maxim){ */
+        if((numNodes(&x->x_cua)) >=  maxim){
             /* desencua */
-        /*    int extret;
-            extret = desencuar(&x->x_cua); */
+            int extret;
+            extret = desencuar(&x->x_cua);
             /* obtenir la posició en la cua del nou node */
-        /*    if(x->x_ultima_img == maxim - 1) {
+            if(x->x_ultima_img == maxim - 1) {
                 pos = 0;
             }else{
                 pos = x->x_ultima_img + 1;
             }
             sys_vgui(".x%x.c delete %xS%d\n", glist_getcanvas(x->x_glist), x, x->x_ultima_img);
-        }*/
+        }
 
         /* FFMPEG o Quicktime per les conversions */
         int fferror=0;
-        /* int nN = x->x_ultima_img; */
- 	int nN;
+        int nN = x->x_ultima_img;
         if (format_adequat_v(entrada, x->x_format_list) == 0) {
             /* ara no entra: format_adequat_v = 0 sempre */
             /* convertir_img(entrada,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN); */
             fferror = 0;
 
         } else {
-            /* si hi ha tants nodes a la cua com el maxim */
-            if((numNodes(&x->x_cua)) >=  maxim){
-            	/* desencua */
-	        int extret;
-            	extret = desencuar(&x->x_cua);
-            	/* obtenir la posició en la cua del nou node */
-            	if(x->x_ultima_img == maxim - 1) {
-               	    pos = 0;
-            	}else{
-                    pos = x->x_ultima_img + 1;
-            	}
-            	sys_vgui(".x%x.c delete %xS%d\n", glist_getcanvas(x->x_glist), x, x->x_ultima_img);
-            }
-            /* FFMPEG o Quicktime per les conversions */
-            nN = x->x_ultima_img;
             fferror=convertir_img_ff(entrada,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN);
         }
         /* post ("%d",fferror); */
