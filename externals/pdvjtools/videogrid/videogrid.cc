@@ -1,4 +1,3 @@
-
 extern "C"
 {
     /*
@@ -681,16 +680,14 @@ extern "C"
         /* FFMPEG o Quicktime per les conversions */
         int fferror=0;
         int nN = x->x_ultima_img;
-	/*
         if (format_adequat_v(entrada, x->x_format_list) == 0) {
-          
-            // convertir_img(entrada,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN);
-            fferror = -1;
+            /* ara no entra: format_adequat_v = 0 sempre */
+            /* convertir_img(entrada,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN); */
+            fferror = 0;
 
         } else {
-	*/
-        fferror=convertir_img_ff(entrada,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN);
-        /* } */
+            fferror=convertir_img_ff(entrada,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN);
+        }
         /* post ("%d",fferror); */
         if (fferror>=0) {
             /* encua el nou node */
@@ -769,6 +766,7 @@ extern "C"
                     strcat(ig_path,".");
                     strcat(ig_path,FORMAT_MINIATURA);
                     /* post("reestablint la imatge %s", actual->pathFitxer); */
+                    // videogrid_afegir_imatge(x,actual->pathFitxer);
                     convertir_img_ff(actual->pathFitxer,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN);
                     sys_vgui("image create photo img%x%d -file %s\n",x,nN,ig_path);
                     sys_vgui(".x%x.c create image %d %d -image img%x%d -tags %xS%d\n",
@@ -1214,9 +1212,7 @@ extern "C"
             post("Videogrid: Problem opening file %s.\n",e);
         }
         else {
-	    if (format_adequat_v(e, x->x_format_list) != 0) {
-		videogrid_afegir_imatge(x,e);
-	    }
+            videogrid_afegir_imatge(x,e);
         }
     }
 
@@ -1257,15 +1253,13 @@ extern "C"
                                 strcpy(pathActual,x->x_dir_actual);
                                 strcat(pathActual,"/");
                                 strcat(pathActual,nomImatge);
-				if (format_adequat_v(pathActual, x->x_format_list) != 0) {
-					pthread_mutex_lock(&x->x_lock);
-					videogrid_afegir_imatge(x, pathActual);
-					pthread_mutex_unlock(&x->x_lock);
-					/* incrementa en 1 per indicar el nombre de nodes encuats per aquest directori */
-					numEncuats++;					
-				}
-				/* es desa la posició en el directori de l'últim node encuat */
-				x->x_dir_pos = numPosDir;
+                    pthread_mutex_lock(&x->x_lock);
+                                videogrid_afegir_imatge(x, pathActual);
+                    pthread_mutex_unlock(&x->x_lock);
+                                /* incrementa en 1 per indicar el nombre de nodes encuats per aquest directori */
+                                numEncuats++;
+                                /* es desa la posició en el directori de l'últim node encuat */
+                                x->x_dir_pos = numPosDir;
                             }
                         }
                     }
@@ -1286,15 +1280,13 @@ extern "C"
                             strcpy(pathActual,x->x_dir_actual);
                             strcat(pathActual,"/");
                             strcat(pathActual,nomImatge);
-			    if (format_adequat_v(pathActual, x->x_format_list) != 0) {
-				pthread_mutex_lock(&x->x_lock);
-				videogrid_afegir_imatge(x, pathActual);
-				pthread_mutex_unlock(&x->x_lock);
-				/* incrementa en 1 per indicar el nombre de nodes encuats per aquest directori */
-				numEncuats++;				
-			    }
-			    /* es desa la posició en el directori de l'últim node encuat */
-			    x->x_dir_pos = numPosDir;
+                pthread_mutex_lock(&x->x_lock);
+                            videogrid_afegir_imatge(x, pathActual);
+                pthread_mutex_unlock(&x->x_lock);
+                            /* incrementa en 1 per indicar el nombre de nodes encuats per aquest directori */
+                            numEncuats++;
+                            /* es desa la posició en el directori de l'últim node encuat */
+                            x->x_dir_pos = numPosDir;
                         }
                     }
                 }
@@ -1809,3 +1801,4 @@ extern "C"
         class_setpropertiesfn(videogrid_class, videogrid_properties);
     }
 }
+
