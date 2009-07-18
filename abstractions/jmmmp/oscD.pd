@@ -4,15 +4,13 @@
 #X obj 98 121 outlet;
 #X obj 88 101 dumpOSC \$1;
 #X obj 28 131 nbx 3 13 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
-10 -233017 -1 -1 0 256;
+10 -233017 -1 -1 670 256;
 #X obj 12 171 mod 1000;
 #X obj 66 131 tgl 13 0 empty empty empty 0 -6 0 8 -233017 -1 -1 0 1
 ;
 #X obj 88 151 spigot;
-#X obj 88 171 print oscD;
 #X obj 12 151 f+ 1;
-#X text 12 251 (C) 2006 João Pais - jmmmpais@googlemail.com
-;
+#X text 12 251 (C) 2006 João Pais - jmmmpais@googlemail.com;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
 #X text 8 227 The names of its contributors may not be used to endorse
@@ -51,14 +49,15 @@ in the documentation and/or other materials provided with the distribution.
 #X obj 66 61 loadbang;
 #X obj 66 81 \$2;
 #X text 196 80 - Printing on / off;
-#X connect 0 0 8 0;
+#X obj 88 171 print oscD \$1;
+#X connect 0 0 7 0;
 #X connect 2 0 1 0;
 #X connect 2 0 0 0;
 #X connect 2 0 6 0;
 #X connect 4 0 3 0;
 #X connect 5 0 6 1;
-#X connect 6 0 7 0;
-#X connect 8 0 4 0;
-#X connect 20 0 21 0;
-#X connect 21 0 5 0;
+#X connect 6 0 22 0;
+#X connect 7 0 4 0;
+#X connect 19 0 20 0;
+#X connect 20 0 5 0;
 #X coords 0 -1 1 1 72 30 1 10 116;

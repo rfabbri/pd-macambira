@@ -56,18 +56,17 @@
 #X restore 104 194 pd inside;
 #X msg 162 174 reset;
 #X obj 104 154 metro 1000;
-#X obj 10 100 cnv 15 62 20 empty \$0clock 0:03 5 11 0 14 -99865 -233017
+#X obj 10 100 cnv 15 62 20 empty \$0clock 1:35 5 11 0 14 -99865 -233017
 0;
-#X msg 162 214 label \$1;
-#X obj 162 234 s \$0clock;
+#X msg 202 214 label \$1;
+#X obj 202 234 s \$0clock;
 #X obj 138 80 route float;
-#X obj 73 100 tgl 10 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
+#X obj 73 100 tgl 10 0 empty empty empty 0 -6 0 8 -195568 -1 -1 1 1
 ;
 #X obj 73 110 bng 10 250 50 0 empty empty empty 0 -6 0 8 -195568 -1
 -1;
 #X msg 73 80 set \$1;
-#X text 12 267 (C) 2006 João Pais - jmmmpais@googlemail.com
-;
+#X text 12 267 (C) 2006 João Pais - jmmmpais@googlemail.com;
 #X obj 73 124 t b 0 b;
 #X text 12 4 [clock] - Chronometer with display in seconds;
 #N canvas 0 0 426 446 license 0;
@@ -99,16 +98,19 @@ in the documentation and/or other materials provided with the distribution.
 #X text 270 50 Inlets;
 #X text 270 70 - On / Off;
 #X text 270 120 Outlets;
-#X text 270 190 - On / Off;
-#X text 270 210 - Reset;
-#X text 270 170 GUI;
+#X text 270 210 - On / Off;
+#X text 270 230 - Reset;
+#X text 270 190 GUI;
 #X text 270 90 - Set / Reset;
 #X text 270 140 - Second count (Float);
+#X obj 155 234 outlet;
+#X text 270 160 - GUI output;
 #X connect 0 0 9 0;
 #X connect 1 0 5 0;
 #X connect 1 0 12 0;
 #X connect 3 0 2 0;
 #X connect 3 1 7 0;
+#X connect 3 1 25 0;
 #X connect 4 0 3 2;
 #X connect 5 0 3 0;
 #X connect 7 0 8 0;

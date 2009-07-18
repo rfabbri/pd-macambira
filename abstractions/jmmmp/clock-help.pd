@@ -10,9 +10,9 @@
 #X text 260 50 Inlets;
 #X text 260 70 - On / Off;
 #X text 260 120 Outlets;
-#X text 260 190 - On / Off;
-#X text 260 210 - Reset;
-#X text 260 170 GUI;
+#X text 260 210 - On / Off;
+#X text 260 230 - Reset;
+#X text 260 190 GUI;
 #X text 260 90 - Set / Reset;
 #X text 117 99 Set + Reset;
 #X obj 26 139 clock;
@@ -22,6 +22,7 @@
 #X text 64 169 Seconds;
 #X text 260 140 - Second count (Float);
 #X text 12 247 Related objects: [stoppuhr] [uhr];
+#X text 260 159 - GUI output;
 #X connect 1 0 15 0;
 #X connect 2 0 15 1;
 #X connect 3 0 15 1;
