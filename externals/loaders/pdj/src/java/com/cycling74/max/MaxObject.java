@@ -863,7 +863,7 @@ public class MaxObject {
                 } catch (NoSuchMethodException e) {
                     try {
                         Constructor c = clz.getConstructor(argType);
-                        obj = (MaxObject) c.newInstance(new Object[0]);
+                        obj = (MaxObject) c.newInstance((Object[]) new Object[0]);
                     } catch ( Exception e1 ) {
                         popPdjPointer();
                         throw e1;

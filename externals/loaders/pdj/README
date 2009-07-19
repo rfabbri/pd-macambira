@@ -2,7 +2,7 @@
 pdj - java plugin interface to pure-data
 ###########################################################################
 
-RELEASE 0.8.4 / March 2008
+RELEASE 0.8.5 / May 2008
 
 PDJ enables you to write java code to interact with pure-data objects. The
 API is totally based on Cycling74 Max/MSP 'mxj' object implementation. This 
@@ -27,7 +27,7 @@ IMPLEMENTED:
 
 LIMITATION:
 
-	* Signal inlets cannot be hot inlets for receiving atom message.
+	* Signal inlets cannot be hot inlets for receiving atom messages.
 	  This means that if you create a signal inlet and send an atom
 	  to this inlet, pdj won't be able to process it; float or symbol.
 	  This looks like a work as designed in pd.
@@ -40,14 +40,14 @@ WORKAROUNDS:
 	* on some machines, the System.out redirection can crash PD. If
 	  it is the case, you can disable it in the pdj.properties file;
 	  check the property: pdj.redirect-pdio.
-	* You must use pdj pd scheduler if you need to use AWT with OS X. 
+	* you must use pdj pd scheduler if you need to use AWT with OS X. 
 	  See below.
 
 REQUIEREMENTS:
 	
-	* pure-data 0.41.x
+	* pure-data 0.40.x powerpc/intel/ub
 	* java JDK version 1.4.x or better; use 1.5 if you can !
-	* works on linux, windows and OS X (10.3.9)
+	* works on linux, windows and OS X (10.3 or better)
 	
 REQUIEREMENTS FOR BUILDING:
 
@@ -66,6 +66,7 @@ INSTALLATION:
 	  the same directory
 	* double check dist/pdj.properties to be sure that the JAVA 
 	  environment parameters are right
+	* Use the corresponding build for MacOS 10.3 or 10.4 and greater
 
 USAGE:
 
@@ -75,8 +76,10 @@ USAGE:
 
 USING AWT WITH OS X:
 
+	=== THIS ONLY WORKS ON pd 41.x ===
+
 	Unlike Linux or Windows, you cannot just simply fire-up a AWT form on OS X. 
-	This is because the event GUI mecanism has these limitation :
+	This is because the event GUI mechanism has these limitation :
  	
 	--> A CFRunLoopRun must be park in the main thread before the main loop is 
 	    started
@@ -93,11 +96,14 @@ USING AWT WITH OS X:
 	a miller's 41.2 pd version.
 
 	Once the patch is applied and compiled, you must configure your pure-data 
-	environement to add the option : -schedlib [fullpath of the pdj external 
+	environment to add the option : -schedlib [fullpath of the pdj external 
 	without the extension]. Use the menu Pd -> Preference -> Startup to do this.
 	Don't forget to click on [Save All Settings].
 
-	Be carfull when you configure this switch since it can crash PD on startup. 
+	Rename the file pdj.pd_darwin to pdj.d_fat since pure-data only search for
+	.d_fat extensions.
+
+	Be careful when you configure this switch since it can crash PD on startup. 
 	If you do have the problem; you will have to delete all pd-preferences by 
 	deleting file: ~/Library/Preferences/org.puredata.pd.plist
 	
@@ -105,6 +111,15 @@ USING AWT WITH OS X:
 		'pdj: using pdj scheduler for Java AWT'
 
 CHANGELOG:
+
+	--- VERSION 0.8.5 ---
+	* added com.cycling74.net package
+	* support for the pd-extended auto-build, slowly pdj will be part of pd-extended
+	* can now be build with mingw on windows
+	* FIXED: sending un-initialized array crash pure-data
+	* FIXED: MaxObject reflection with java 1.5 caused an RMI/IIOP error
+	* FIXED: Callback reflection with java 1.5 caused IllegalArgumentException
+	* FIXED: OS X 10.3 support
 
 	--- VERSION 0.8.4 ---
 	* amd64 for Linux (thanks to Sergio Torres-Perez)

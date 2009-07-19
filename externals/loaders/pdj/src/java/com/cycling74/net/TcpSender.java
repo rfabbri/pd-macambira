@@ -1,20 +1,21 @@
 package com.cycling74.net;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxRuntimeException;
 
-/** 
- * This portion of code is scheduled for pdj-0.8.5
- * IT IS NOT FUNCTIONAL
+/**
+ * Class wrapper to send atoms via TCP/IP. The host on the other side
+ * must use TcpReceive to read the sended atoms. 
+ * 
+ * This class is a work in progress and have been lightly tested.
  */
 public class TcpSender {
-	DatagramSocket sender;
-	DatagramPacket packet;
+    InetAddress inetAddress;
 	String address = null;
 	int port = -1;
 	
@@ -22,58 +23,47 @@ public class TcpSender {
 	}
 	
 	public TcpSender(String address, int port) {
-		this.address= address;
+	    setAddress(address);
 		this.port = port;
 	}
 	
 	public void send(Atom args[]) {
-		if ( sender == null )
-			initsocket();
-		
-		byte buff[] = Atom.toOneString(args).getBytes();
-		packet.setData(buff, 0, buff.length);
-		try {
-			sender.send(packet);
-		} catch (IOException e) {
-			throw new MaxRuntimeException(e);
-		}
+		send(Atom.toOneString(args));
 	}
 	
 	public void send(int i) {
-		if ( sender == null )
-			initsocket();
-		
-		byte buff[] = Integer.toString(i).getBytes();
-		packet.setData(buff, 0, buff.length);
-		try {
-			sender.send(packet);
-		} catch (IOException e) {
-			throw new MaxRuntimeException(e);
-		}
+		send(Integer.toString(i));
 	}
 	
 	public void send(float f) {
-		if ( sender == null ) 
-			initsocket();
-		
-		byte buff[] = Float.toString(f).getBytes();
-		packet.setData(buff, 0, buff.length);
-		try {
-			sender.send(packet);
-		} catch (IOException e) {
-			throw new MaxRuntimeException(e);
-		}
+		send(Float.toString(f));
 	}
 
+	public void send(String msg) {
+       if ( address == null )
+            throw new MaxRuntimeException("TcpSender has no active hosts");
+        if ( port == -1 )
+            throw new MaxRuntimeException("TcpSender has no active port");
+	        
+	    try {
+	        Socket sender = new Socket(inetAddress, port);
+	        sender.getOutputStream().write(msg.getBytes());
+	        sender.close();
+	    } catch (IOException e) {
+            throw new MaxRuntimeException(e);
+	    }
+	}
+	
 	public String getAddress() {
 		return address;
 	}
 	
 	public void setAddress(String address) {
-		if ( sender != null ) { 
-			sender = null;
-			sender.close();
-		}
+	    try {
+            inetAddress = InetAddress.getByName(address);
+        } catch (UnknownHostException e) {
+            throw new MaxRuntimeException(e);
+        }
 		this.address = address;
 	}
 	
@@ -82,22 +72,6 @@ public class TcpSender {
 	}
 	
 	public void setPort(int port) {
-		if ( sender != null ) {
-			sender = null;
-			sender.close();
-		}
 		this.port = port;
-	}
-	
-	private synchronized void initsocket() {
-		if ( sender != null )
-			return;
-		try {
-			sender = new DatagramSocket();
-			sender.connect(new InetSocketAddress(address, port));
-			packet = new DatagramPacket(new byte[0], 0);
-		} catch (Exception e) {
-			throw new MaxRuntimeException(e);
-		}
 	}
 }

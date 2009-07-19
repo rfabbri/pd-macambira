@@ -6,12 +6,12 @@ package com.cycling74.msp;
  */
 public interface MSPPerformable {
     /**
-     * @see MSPPerformer.dspsetup(MSPSignal in[], MSPSignal out[])
+     * Interface for MSPPerformer.dspsetup(MSPSignal in[], MSPSignal out[])
      */
     public void dspsetup(MSPSignal in[], MSPSignal out[]);
     
     /**
-     * @see MSPPerformer.perform(MSPSignal in[], MSPSignal out[]);
+     * Interface for MSPPerformer.perform(MSPSignal in[], MSPSignal out[]);
      */
     public void perform(MSPSignal in[], MSPSignal out[]);
 }

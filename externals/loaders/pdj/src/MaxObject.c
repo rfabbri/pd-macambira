@@ -25,6 +25,11 @@ JNIEXPORT jlong JNICALL Java_com_cycling74_max_MaxObject_newInlet
   		inlet_new(&pdj->x_obj, &pdj->x_obj.ob_pd, &s_signal, 0);	
   		return 0;
   	}
+
+  	if ( inlet_proxy == 0 ) { 
+        	bug("the inlet_proxy IS NOT initialized. danke!");
+       		return 0;
+    	}
   	
   	proxy = (t_inlet_proxy *) pd_new(inlet_proxy);
   	proxy->idx = pdj->nb_inlet++;
@@ -77,7 +82,9 @@ JNIEXPORT void JNICALL Java_com_cycling74_max_MaxObject_doOutletAnything
   	t_atom args[MAX_ATOMS_STACK];
   	int argc;
 
-  	jatoms2atoms(env, value, &argc, args);
+  	if ( jatoms2atoms(env, value, &argc, args) != 0 )
+		return;
+
   	if ( str == NULL ) {
   		if ( args[0].a_type == A_FLOAT ) {
   			outlet_anything(x, &s_list, argc, args);

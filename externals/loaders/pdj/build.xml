@@ -31,6 +31,33 @@
 		<taskdef resource="cpptasks.tasks" classpath="lib/ant/cpptasks.jar"/>
 		<typedef resource="cpptasks.types" classpath="lib/ant/cpptasks.jar"/>
 		<available classname="junit.framework.Test" property="isJunitFound"/>
+		
+		<!-- this is to set a special condition if you are using gcc (mingw) on win32
+      -->
+      
+		<condition property="win32.gcc">
+	      <and>
+	          <equals arg1="${compiler}" arg2="gcc"/>
+	          <equals arg1="${isWin32}" arg2="true"/>
+	      </and>
+		</condition>
+		
+		<condition property="win32.msvc">
+	      <and>
+	          <equals arg1="${compiler}" arg2="msvc"/>
+	          <equals arg1="${isWin32}" arg2="true"/>
+	      </and>
+		</condition>
+		
+		<!-- if the OS X bundle is d_fat, then pdj must be build with the -arch option
+		     This property does only apply on OS X.
+		  -->
+		<condition property="isFatBin">
+		    <or>
+    		    <contains string="${os.version}" substring="10.4"/>
+    		    <contains string="${os.version}" substring="10.5"/>
+    		</or>
+		</condition>
 	</target>
 	
 	<target name="cl-java" depends="-init">
@@ -49,6 +76,10 @@
 		<uptodate property="javah.up2date" srcfile="${pdj.jar}" targetfile="${javah.file}"/>
 	</target>
 	
+	<target name="initlib-win32" if="win32.gcc">
+		<copy file="${pd.home}/obj/pd.a" tofile="${work.dir}/libpd.a"/>
+	</target>
+	
 	<target name="javah" depends="cl-java" unless="javah.up2date">
 		<javah class="${native.classes}" classpath="${pdj.jar}" outputFile="${javah.file}" force="true"/>
 	</target>
@@ -61,7 +92,11 @@
 		<move file="${dist.dir}/libpdj.${pdj.archBuild}.bundle" tofile="${pdj.outfile}"/>
 	</target>
 	
-	<target name="cl" depends="javah">
+	<target name="-windows-rename" if="win32.gcc">
+	  <move file="${dist.dir}/libpdj.so" tofile="${dist.dir}/pdj.dll"/>
+	</target>
+	
+	<target name="cl" depends="javah, initlib-win32">
 		<cc debug="true" objdir="${work.dir}" outtype="${linker.type}" 
 			outfile="${pdj.outfile}" name="${compiler}">
 			
@@ -76,15 +111,17 @@
 			<defineset define="PROFILER"/>
 			<defineset define="PD"/>
 			<defineset define="NT" if="isWin32"/>
+			<defineset define="WIN32GCC" if="win32.gcc"/>
 			<compilerarg value="-Wall" if="isLinux"/>
 		
 			<compilerarg value="-fno-common" if="isOSX"/>
 			<compilerarg value="-fPIC" if="isOSX"/>
-			<compilerarg value="-arch" if="isOSX"/>
-			<compilerarg value="i386" if="isOSX"/>
-			<compilerarg value="-arch" if="isOSX"/>
-			<compilerarg value="ppc" if="isOSX"/>
-			
+			<compilerarg value="-arch" if="isFatBin"/>
+			<compilerarg value="i386" if="isFatBin"/>
+			<compilerarg value="-arch" if="isFatBin"/>
+			<compilerarg value="ppc" if="isFatBin"/>
+			<compilerarg value="-isysroot" if="isFatBin"/>
+			<compilerarg value="/Developer/SDKs/MacOSX10.4u.sdk" if="isFatBin"/>
 			<!-- includes files -->
 			<includepath location="${jdk.include}"/>
 			<includepath location="${jdk.include}/linux" if="isLinux"/>
@@ -93,19 +130,20 @@
 			<includepath location="${work.dir}"/>
 			
 			<!-- linker specific -->
-			<libset dir="${pd.home}/bin" libs="pd" if="isWin32"/>
+			<libset dir="${pd.home}/bin" libs="pd" if="win32.msvc"/>
+			<libset dir="${work.dir}" libs="pd" if="win32.gcc"/>
 			<libset libs="Advapi32" if="isWin32"/>
-			<linkerarg value="/export:pdj_setup" if="isWin32"/>
-			
+			<linkerarg value="/export:pdj_setup" if="win32.msvc"/>
+
 			<linkerarg value="-export-dynamic" if="isLinux"/>
 			<linkerarg value="-Xlinker" if="isLinux"/>
 			
 			<!-- OS X :-\ -->
 			<linker name="gcc" if="isOSX"/>
-			<linkerarg value="-arch" if="isOSX"/>
-			<linkerarg value="i386" if="isOSX"/>
-			<linkerarg value="-arch" if="isOSX"/>
-			<linkerarg value="ppc" if="isOSX"/>
+			<linkerarg value="-arch" if="isFatBin"/>
+			<linkerarg value="i386" if="isFatBin"/>
+			<linkerarg value="-arch" if="isFatBin"/>
+			<linkerarg value="ppc" if="isFatBin"/>
 			<linkerarg value="-framework" if="isOSX"/>
 			<linkerarg value="JavaVM" if="isOSX"/>
 			<linkerarg value="-framework" if="isOSX"/>
@@ -117,10 +155,13 @@
 			<linkerarg value="suppress" if="isOSX"/>
 			<linkerarg value="-lm" if="isOSX"/>
 			<linkerarg value="-bundle" if="isOSX"/>
+			<linkerarg value="-isysroot" if="isFatBin"/>
+			<linkerarg value="/Developer/SDKs/MacOSX10.4u.sdk" if="isFatBin"/>
 		</cc>
 		
 		<antcall target="-linux-rename"/>
 		<antcall target="-osx-rename"/>
+		<antcall target="-windows-rename"/>
 	</target>
 	
 	<target name="package" depends="cl">
@@ -135,6 +176,80 @@
 			<fileset dir="${classes.dir}" includes="*.class"/>
 		</copy>
 	</target>
+	
+	<target name="dist" depends="clean">
+		<tar destfile="../pdj-${pdj.version}.tar.gz" compression="gzip">
+			<tarfileset dir="." prefix="pdj-${pdj.version}"/>
+		</tar>
+	</target>
+	
+	<target name="javadoc" depends="cl-java">
+		<mkdir dir="${javadoc.dir}"/>
+		<javadoc source="src" destdir="${javadoc.dir}" windowtitle="pdj-MXJ API">
+			<fileset dir="src/java">
+				<include name="com/cycling74/max/*.java"/>
+				<include name="com/cycling74/msp/*.java"/>
+				<include name="com/cycling74/net/*.java"/>
+				<exclude name="*.java"/>
+				<exclude name="**/test/**"/>
+				<exclude name="**/*Test.java"/>
+			</fileset>
+			<link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
+			<doctitle><![CDATA[<h1>The MXJ Java API for pure-data</h1>
+		    <p>This API is based on MXJ for Max/MSP.</p>]]></doctitle>
+			<bottom><![CDATA[This API is based on mxj for <a  
+		    	href="http://www.cycling74.com/products/maxmsp.html">
+		    	Max/MSP</a> by Cycling74. Please see original MXJ
+			    implementation.]]></bottom>
+		</javadoc>
+	</target>
+	
+	<target name="dist-www" depends="javadoc">
+		<tar destfile="../pdj-web.tar.gz" compression="gzip">
+			<tarfileset dir="www">
+				<exclude name=".*"/>
+			</tarfileset>
+		</tar>
+	</target>
+
+	<target name="dist-win32" depends="package,javadoc">
+		<zip destfile="${dist.dir}/pdj-${pdj.version}-win32.zip">
+			<zipfileset dir="www/api" includes="**" prefix="javadoc"/>
+			<fileset dir="${dist.dir}">
+				<include name="docs/*.pdf"/>
+				<include name="classes/**"/>
+				<include name="*.jar"/>
+				<include name="*.pd"/>
+				<include name="*.properties"/>
+				<include name="*.dll"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="README"/>
+				<include name="LICENSE"/>
+			</fileset>
+		</zip>
+	</target>
+	
+	<target name="dist-osx" depends="package,javadoc">
+		<tar destfile="../pdj-${pdj.version}-osx.tar.gz" compression="gzip">
+			<tarfileset dir="www/api" includes="**" prefix="pdj/javadoc"/>
+			<tarfileset dir="${dist.dir}" prefix="pdj">
+				<include name="docs/*.pdf"/>
+				<include name="classes/**"/>
+				<include name="*.jar"/>
+				<include name="*.pd"/>
+				<include name="*.properties"/>
+				<include name="*.${pdj.archBuild}"/>
+				<include name="pdj.d_fat" if="isFatBin"/>
+			</tarfileset>
+			<tarfileset dir="." prefix="pdj">
+				<include name="README"/>
+				<include name="LICENSE"/>
+			</tarfileset>
+		</tar>
+	</target>
+	
+	<!-- test targets -->
 	
 	<target name="test" depends="package">
 		<exec dir="${dist.dir}" executable="${pd.home}/bin/pd">
@@ -168,73 +283,4 @@
 		</exec>
 	</target>
 	
-	<target name="dist" depends="clean">
-		<tar destfile="../pdj-${pdj.version}.tar.gz" compression="gzip">
-			<tarfileset dir="." prefix="pdj-${pdj.version}"/>
-		</tar>
-	</target>
-	
-	<target name="javadoc" depends="cl-java">
-		<mkdir dir="${javadoc.dir}"/>
-		<javadoc source="src" destdir="${javadoc.dir}" windowtitle="pdj-MXJ API">
-			<fileset dir="src/java">
-				<include name="com/cycling74/max/*.java"/>
-				<include name="com/cycling74/msp/*.java"/>
-				<!-- <include name="com/cycling74/net/*.java"/> -->
-				<exclude name="*.java"/>
-				<exclude name="**/test/**"/>
-				<exclude name="**/*Test.java"/>
-			</fileset>
-			<link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
-			<doctitle><![CDATA[<h1>The MXJ Java API for pure-data</h1>
-		    <p>This API is based on MXJ for Max/MSP.</p>]]></doctitle>
-			<bottom><![CDATA[This API is based on mxj for <a  
-		    	href="http://www.cycling74.com/products/maxmsp.html">
-		    	Max/MSP</a> by Cycling74. Please see original MXJ
-			    implementation.]]></bottom>
-		</javadoc>
-	</target>
-	
-	<target name="dist-www" depends="javadoc">
-		<tar destfile="../pdj-web.tar.gz" compression="gzip">
-			<tarfileset dir="www">
-				<exclude name=".*"/>
-			</tarfileset>
-		</tar>
-	</target>
-
-	<target name="dist-win32" depends="package,javadoc">
-		<zip destfile="${dist.dir}/pdj-${pdj.version}-win32.zip">
-			<zipfileset dir="www/api" includes="**" prefix="javadoc"/>
-			<fileset dir="${dist.dir}">
-				<include name="classes/**"/>
-				<include name="*.jar"/>
-				<include name="*.pd"/>
-				<include name="*.properties"/>
-				<include name="*.dll"/>
-			</fileset>
-			<fileset dir=".">
-				<include name="README"/>
-				<include name="LICENSE"/>
-			</fileset>
-		</zip>
-	</target>
-	
-	<target name="dist-osx" depends="package,javadoc">
-		<zip destfile="../pdj-${pdj.version}-osx.zip">
-			<zipfileset dir="www/api" includes="**" prefix="javadoc"/>
-			<fileset dir="${dist.dir}">
-				<include name="docs/**"/>
-				<include name="classes/**"/>
-				<include name="*.jar"/>
-				<include name="*.pd"/>
-				<include name="*.properties"/>
-				<include name="*.${pdj.archBuild}"/>
-			</fileset>
-			<fileset dir=".">
-				<include name="README"/>
-				<include name="LICENSE"/>
-			</fileset>
-		</zip>
-	</target>
 </project>

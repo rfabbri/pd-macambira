@@ -35,6 +35,12 @@
 	#define JPOINTER_CAST (unsigned int)
 #endif
 
+#ifdef WIN32GCC
+  #define DLLEXPORT __declspec(dllexport)
+#else 
+  #define DLLEXPORT
+#endif
+
 // the JVM takes 50M; I don't care taking 4K...
 #define BUFFER_SIZE 4096
 

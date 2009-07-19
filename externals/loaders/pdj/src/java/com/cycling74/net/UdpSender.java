@@ -8,9 +8,11 @@ import java.net.InetAddress;
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxRuntimeException;
 
-/** 
- * This portion of code is scheduled for pdj-0.8.5
- * IT IS NOT FUNCTIONAL
+/**
+ * Class wrapper to send atoms via UDP/IP. The host on the other side
+ * must use UdpReceive to read the sended atoms. 
+ * 
+ * This class is a work in progress and have been lightly tested.
  */
 public class UdpSender {
     InetAddress inetAddress;
@@ -23,6 +25,11 @@ public class UdpSender {
 	public UdpSender() {
 	}
 	
+	/**
+	 * Create a UpdSender.
+	 * @param address the hostname/ip address of the host to reach
+	 * @param port the UDP port to use
+	 */
 	public UdpSender(String address, int port) {
 		this.address = address;
 		this.port = port;
@@ -41,22 +48,45 @@ public class UdpSender {
 		send(Float.toString(f).getBytes());
 	}
 
+	public void send(String msg, Atom args[]) {
+        send((msg + " " + Atom.toOneString(args)).getBytes());
+	}
+	
+	/**
+	 * Returns the hostname/ip address to reach.
+	 * @return hostname/ip address to reach
+	 */
 	public String getAddress() {
 		return address;
 	}
 	
+	/**
+	 * Sets hostname/ip address to reach.
+	 * @param address hostname/ip address to reach
+	 */
+	
 	public void setAddress(String address) {
 		this.address = address;
-		initsocket();
+		if ( port != -1 )
+		    initsocket();
 	}
 	
+	/**
+	 * Returns the UDP port to use.
+	 * @return the UDP port to use
+	 */
 	public int getPort() {
 		return port;
 	}
 	
+    /**
+     * Sets the UDP port to use.
+     * @param port the UDP port to use
+     */
 	public void setPort(int port) {
 		this.port = port;
-		initsocket();
+		if ( address != null )
+		    initsocket();
 	}
 	
 	synchronized void initsocket() {
@@ -71,14 +101,13 @@ public class UdpSender {
 
 	void send(byte buff[]) {
 	    if ( sender == null )
-	        throw new MaxRuntimeException("UdpSender is not initialized");
-
+	        throw new MaxRuntimeException("UdpSender: UPD port or address is missing");
+	    
 	    try {
 	        DatagramPacket packet = new DatagramPacket(buff, buff.length, inetAddress, port);
 	        sender.send(packet);
 	    } catch (IOException e) {
 	        throw new MaxRuntimeException(e);
 	    }
-
 	}
 }

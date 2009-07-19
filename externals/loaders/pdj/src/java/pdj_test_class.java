@@ -51,6 +51,11 @@ public class pdj_test_class extends MaxObject implements Executable {
 
 	protected void inlet(float f) {
 		post("le float " + f + "inlet " + getInlet());
+		
+		Atom args[] = new Atom[2];
+		args[0] = Atom.newAtom(1);
+		
+		outlet(0, args);
 	}
 
 	void wer(Atom[] atom) {

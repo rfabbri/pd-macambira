@@ -13,7 +13,7 @@
  * === USING AWT WITH OS X
  *
  * Unlike Linux or Windows, you cannot just simply fire-up a AWT form on OS X. This is 
- * because the event GUI mecanism has these limitation :
+ * because the event GUI mechanism has these limitation :
  * 
  * --> A CFRunLoopRun must be park in the main thread.
  * --> Java must be run in a secondary thread.
@@ -27,12 +27,12 @@
  * src/pd_patch/osx_extsched_fix.patch. This patch has been made on a miller's 41.2
  * pd version.
  *
- * Once the patch is applied and compiled, you must configure your pure-data environement
+ * Once the patch is applied and compiled, you must configure your pure-data environment
  * to add the option : -schedlib [fullpath of the pdj external without the extension]. Use
  * the menu Pd -> Preference -> Startup to do this. Don't forget to click on [Save All
  * Settings].
  * 
- * Be carfull when you configure this switch since it can crash PD on startup. If you do
+ * Be careful when you configure this switch since it can crash PD on startup. If you do
  * have the problem; you will have to delete all pd-preference by deleting file:
  * ~/Library/Preferences/org.puredata.pd.plist
  * 
@@ -41,18 +41,33 @@
  */
 
 int rc_pd = 0xFF;
-CFRunLoopRef cfrunloop;
 
 
-/* setting the environment varible APP_NAME_<pid> to the applications name */
+/* setting the environment variable APP_NAME_<pid> to the applications name */
 /* sets it for the application menu */
-void setAppName(const char * name) {
+static void setAppName(const char * name) {
     char a[32];
     pid_t id = getpid();
     sprintf(a,"APP_NAME_%ld",(long)id);
     setenv(a, name, 1);
 }
 
+static void *getProcAddress(const char *name) {
+    NSSymbol symbol;
+    char *symbolName;
+    
+    // Prepend a '_' for the Unix C symbol mangling convention
+    symbolName = malloc (strlen (name) + 2);
+    strcpy(symbolName + 1, name);
+    symbolName[0] = '_';
+    symbol = NULL;
+    
+    if (NSIsSymbolNameDefined(symbolName))
+        symbol = NSLookupAndBindSymbol(symbolName);
+    free (symbolName);
+    
+    return symbol ? NSAddressOfSymbol(symbol) : NULL;
+}
 
 /** 
  * The main pd thread, will become a secondary thread to AWT.
@@ -66,12 +81,22 @@ void *pdj_pdloop(void *notused) {
 
     // we create the JVM now
     init_jvm();
+    pdj_setup();
 
     /* open audio and MIDI */
     sys_reopen_midi();
     sys_reopen_audio();
 
-    rc_pd = m_mainloop();
+    // m_mainloop is only in 41.x, we will try to be gentle if we do not
+    // find the function m_mainloop
+    int (*mainloop)() = getProcAddress("m_mainloop");
+
+    if ( mainloop == NULL ) {
+        fprintf(stderr, "unable to find m_mainloop function in current pure-data\n");
+        exit(-1);    
+    }
+
+    rc_pd = mainloop();
     
     exit(rc_pd);
 }
@@ -158,10 +183,12 @@ int getuglylibpath(char *path) {
             imagename = (char *) _dyld_get_image_name(i);
     }
 
-	if ( imagename != NULL ) {		
+	if ( imagename != NULL ) {
+	    // remove the pdj.d_fat/pdj.pd_darwin text
         strncpy(path, imagename, MAXPDSTRING);
-	    // remove the pdj.pd_fat text
-        path[strlen(imagename) - 10] = 0;
+        int i = strlen(imagename)-1;
+        for(; i != 0 && path[i] != '/'; i--);
+    	path[i] = 0;
         return 0;
 	} 
 	

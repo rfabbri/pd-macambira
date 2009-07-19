@@ -44,6 +44,13 @@ int jatoms2atoms(JNIEnv *env, jobjectArray jatoms, int *nb_atoms, t_atom *atoms)
 	
 	for(i=0;i<*nb_atoms;i++) {
 		obj = (*env)->GetObjectArrayElement(env, jatoms, i);
+		if ( obj == NULL ) {
+			jclass exception = (*env)->FindClass(env, "java/lang/NullPointerException");
+			ASSERT(exception);
+			(*env)->ThrowNew(env, exception, NULL);
+			(*env)->DeleteLocalRef(env, exception);
+			return 1;
+		}
 		rc |= jatom2atom(env, obj, atoms+i);
 	}
 	

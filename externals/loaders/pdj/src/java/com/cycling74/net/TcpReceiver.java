@@ -1,33 +1,54 @@
 package com.cycling74.net;
 
-import java.lang.reflect.Method;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 import com.cycling74.max.Atom;
+import com.cycling74.max.Callback;
 import com.cycling74.max.MaxRuntimeException;
 import com.cycling74.max.MaxSystem;
 
-/** 
- * This portion of code is scheduled for pdj-0.8.5
- * IT IS NOT FUNCTIONAL
+/**
+ * Class wrapper to receive atoms via TCP/IP using the class
+ * TcpSender.
+ *
+ * This class is a work in progress and have been lightly tested.
  */
 public class TcpReceiver implements Runnable {
-	DatagramSocket receiver;
-	DatagramPacket packet;
-	
-	Method callback = null;
-	Object instance;
+    ServerSocket receiver;
+    
+	Callback callback = null;
 	
 	String debugString = null;
-	int port;
+	int port = -1;
 	boolean runnable = true;
+	
+	public TcpReceiver() {
+	    
+	}
+
+    public TcpReceiver(int port) {
+        this.port = port;
+    }
+
+    public TcpReceiver(int port, Object caller, String method) {
+        this.port = port;
+        this.callback = new Callback(caller, method, new Object[] { new Atom[0] });
+    }
+
 	
 	public void close() {
 		if ( receiver == null ) 
 			return;
 		runnable = false;
-		receiver.close();		
+		try {
+            receiver.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }		
 	}
 	
 	public int getPort() {
@@ -35,9 +56,17 @@ public class TcpReceiver implements Runnable {
 	}
 	
 	public void setActive(boolean active) {
-		if ( active == false ) {
-			runnable = true;
-			new Thread(this).start();
+	    if ( port == -1 )
+            throw new MaxRuntimeException("No TCP port specified");
+	    
+		if ( active == true ) {
+			try {
+                receiver = new ServerSocket(port);
+            } catch (IOException e) {
+                throw new MaxRuntimeException(e);
+            }
+            runnable = true;
+			new Thread(this, "TcpSender[" + port + "]").start();
 		} else {
 			close();
 		}
@@ -46,8 +75,7 @@ public class TcpReceiver implements Runnable {
 	
 	public void setCallback(Object caller, String methodName) {
 		try {
-			callback = caller.getClass().getDeclaredMethod(methodName, new Class[] { Atom.class });
-			instance = caller;
+		    this.callback = new Callback(caller, methodName, new Object[] { new Atom[0] });
 		} catch (Exception e) {
 			throw new MaxRuntimeException(e);
 		}
@@ -62,22 +90,29 @@ public class TcpReceiver implements Runnable {
 		this.debugString = debugString;
 	}
 	
+	private void parseMessage(BufferedReader reader) throws IOException {
+	    while(runnable) { 
+	        String msg = reader.readLine();
+            if ( debugString != null )
+                MaxSystem.post(debugString + " " + msg);
+        
+            if ( callback != null ) {
+                callback.setArgs(Atom.parse(msg));
+                try {  
+                    callback.execute();
+                } catch( Exception e ) {
+                    e.printStackTrace();
+                }
+            }
+	    }
+	}
+	
 	public void run() {
-		DatagramPacket packet = new DatagramPacket(new byte[4096], 4096);
-		Object callerArgs[] = new Object[1];
-		
 		try {
 			while(runnable) {
-					receiver.receive(packet);
-					String msg = new String(packet.getData(), 0, packet.getLength());
-					if ( debugString != null )
-						MaxSystem.post(debugString + " " + msg);
-					callerArgs[0] = Atom.parse(msg);
-					try {
-						callback.invoke(instance, callerArgs);
-					} catch( Exception e ) {
-						e.printStackTrace();
-					}
+	            Socket socket = receiver.accept();
+	            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+	            parseMessage(reader);
 			}
 		} catch (Exception e) {
 			if ( runnable != false) {

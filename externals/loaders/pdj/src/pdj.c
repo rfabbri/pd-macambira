@@ -362,7 +362,7 @@ static void pdj_loadbang(t_pdj *pdj) {
 }
 
 
-void pdj_setup(void) {
+DLLEXPORT void pdj_setup(void) {
 	char stack_pos;
 	
     pdj_class = class_new(gensym("pdj"), 

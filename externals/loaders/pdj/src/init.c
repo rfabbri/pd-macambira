@@ -2,10 +2,12 @@
  * initialization
  */
  
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "pdj.h"
+#include "native_classes.h"
 
 #define MAX_PROPERTIES 40
 char *properties[MAX_PROPERTIES+1][2];
@@ -209,8 +211,134 @@ static int initIDCaching(JNIEnv *env) {
 
 
 static int linkClasses(JNIEnv *env) {
+	// link native method to java classes 
+	JNINativeMethod link;
+	jclass maxsystem = (*env)->FindClass(env, "com/cycling74/max/MaxSystem");
+	jclass mspbuffer = (*env)->FindClass(env, "com/cycling74/msp/MSPBuffer");
 	jclass pdjSystem = (*env)->FindClass(env, "com/e1/pdj/PDJSystem");
 	jmethodID id;
+
+	link.name = "newInlet";
+	link.signature = "(I)J";
+	link.fnPtr = Java_com_cycling74_max_MaxObject_newInlet;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxObject, &link, 1);
+
+	link.name = "newOutlet";
+	link.signature = "(I)J";
+	link.fnPtr = Java_com_cycling74_max_MaxObject_newOutlet;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxObject, &link, 1);
+	
+	link.name = "doOutletBang";
+	link.signature = "(J)V";
+	link.fnPtr = Java_com_cycling74_max_MaxObject_doOutletBang;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxObject, &link, 1);
+	
+	link.name = "doOutletFloat";
+	link.signature = "(JF)V";
+	link.fnPtr = Java_com_cycling74_max_MaxObject_doOutletFloat;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxObject, &link, 1);
+	
+	link.name = "doOutletSymbol";
+	link.signature = "(JLjava/lang/String;)V";
+	link.fnPtr = Java_com_cycling74_max_MaxObject_doOutletSymbol;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxObject, &link, 1);
+	
+	link.name = "doOutletAnything";
+	link.signature = "(JLjava/lang/String;[Lcom/cycling74/max/Atom;)V";
+	link.fnPtr = Java_com_cycling74_max_MaxObject_doOutletAnything;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxObject, &link, 1);
+	
+	link.name = "getPatchPath";
+	link.signature = "()Ljava/lang/String;";
+	link.fnPtr = Java_com_cycling74_max_MaxObject_getPatchPath;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxObject, &link, 1);
+	
+	link.name = "pushPdjPointer";
+	link.signature = "(J)V";
+	link.fnPtr = Java_com_cycling74_max_MaxObject_pushPdjPointer;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxObject, &link, 1);
+	
+	link.name = "popPdjPointer";
+	link.signature = "()J";
+	link.fnPtr = Java_com_cycling74_max_MaxObject_popPdjPointer;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxObject, &link, 1);
+	
+	link.name = "getTime";
+	link.signature = "()D";
+	link.fnPtr = Java_com_cycling74_max_MaxClock_getTime;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxClock, &link, 1);
+
+	link.name = "delay";
+	link.signature = "(D)V";
+	link.fnPtr = Java_com_cycling74_max_MaxClock_delay;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxClock, &link, 1);
+
+	link.name = "release";
+	link.signature = "()V";
+	link.fnPtr = Java_com_cycling74_max_MaxClock_release;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxClock, &link, 1);
+
+	link.name = "unset";
+	link.signature = "()V";
+	link.fnPtr = Java_com_cycling74_max_MaxClock_unset;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxClock, &link, 1);
+
+	link.name = "create_clock";
+	link.signature = "()V";
+	link.fnPtr = Java_com_cycling74_max_MaxClock_create_1clock;
+    (*env)->RegisterNatives(env, pdjCaching.cls_MaxClock, &link, 1);
+	
+
+	link.name = "post";
+	link.signature = "(Ljava/lang/String;)V";
+	link.fnPtr = Java_com_cycling74_max_MaxSystem_post;
+    (*env)->RegisterNatives(env, maxsystem, &link, 1);
+
+	link.name = "error";
+	link.signature = "(Ljava/lang/String;)V";
+	link.fnPtr = Java_com_cycling74_max_MaxSystem_error;
+    (*env)->RegisterNatives(env, maxsystem, &link, 1);
+
+	link.name = "ouch";
+	link.signature = "(Ljava/lang/String;)V";
+	link.fnPtr = Java_com_cycling74_max_MaxSystem_ouch;
+    (*env)->RegisterNatives(env, maxsystem, &link, 1);
+
+	link.name = "sendMessageToBoundObject";
+	link.signature = "(Ljava/lang/String;Ljava/lang/String;[Lcom/cycling74/max/Atom;)Z";
+	link.fnPtr = Java_com_cycling74_max_MaxSystem_sendMessageToBoundObject;
+    (*env)->RegisterNatives(env, maxsystem, &link, 1);
+
+	link.name = "locateFile";
+	link.signature = "(Ljava/lang/String;)Ljava/lang/String;";
+	link.fnPtr = Java_com_cycling74_max_MaxSystem_locateFile;
+    (*env)->RegisterNatives(env, maxsystem, &link, 1);
+
+	link.name = "locateFile";
+	link.signature = "(Ljava/lang/String;)Ljava/lang/String;";
+	link.fnPtr = Java_com_cycling74_max_MaxSystem_locateFile;
+    (*env)->RegisterNatives(env, maxsystem, &link, 1);
+
+	link.name = "setSize";
+	link.signature = "(Ljava/lang/String;IJ)V";
+	link.fnPtr = Java_com_cycling74_msp_MSPBuffer_setSize;
+    (*env)->RegisterNatives(env, mspbuffer, &link, 1);
+
+	link.name = "getSize";
+	link.signature = "(Ljava/lang/String;)J";
+	link.fnPtr = Java_com_cycling74_msp_MSPBuffer_getSize;
+    (*env)->RegisterNatives(env, mspbuffer, &link, 1);
+
+	link.name = "getArray";
+	link.signature = "(Ljava/lang/String;JJ)[F";
+	link.fnPtr = Java_com_cycling74_msp_MSPBuffer_getArray;
+    (*env)->RegisterNatives(env, mspbuffer, &link, 1);
+
+	link.name = "setArray";
+	link.signature = "(Ljava/lang/String;J[F)V";
+	link.fnPtr = Java_com_cycling74_msp_MSPBuffer_setArray;
+    (*env)->RegisterNatives(env, mspbuffer, &link, 1);
+	
 	if ( pdjSystem == NULL ) {
 		SHOWEXC;
 		return 1;

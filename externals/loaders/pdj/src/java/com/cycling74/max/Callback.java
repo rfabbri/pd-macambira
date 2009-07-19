@@ -130,6 +130,7 @@ public class Callback implements Executable {
 		try {
 			method.invoke(obj, args);
 		} catch (IllegalArgumentException e) {
+		    e.printStackTrace();
 			MaxSystem.error("pdj: IllegalArgumentException:" + e);
 		} catch (IllegalAccessException e) {
 			MaxSystem.error("pdj: IllegalAccessException:" + e);
@@ -144,7 +145,7 @@ public class Callback implements Executable {
 	 * @return the array of arguments
 	 */
 	public Object[] getArgs() {
-		return args;
+		return (Object[]) args[0];
 	}
 	
 	/**
@@ -176,7 +177,7 @@ public class Callback implements Executable {
 	 * @param i int value
 	 */
 	public void setArgs(int i) {
-		args = new Object[] { new Integer(i) };
+		setSubArgs(new Object[] { new Integer(i) });
 	}
 
 	/**
@@ -184,7 +185,7 @@ public class Callback implements Executable {
 	 * @param f float argument
 	 */
 	public void setArgs(float f) {
-		args = new Object[] { new Float(f) };
+	    setSubArgs(new Object[] { new Float(f) });
 	}
 	
 	/**
@@ -192,7 +193,7 @@ public class Callback implements Executable {
 	 * @param value int value
 	 */
 	public void setArgs(String value) {
-		args = new Object[] { value };
+		setSubArgs(new Object[] { value });
 	}
 	
 	/**
@@ -200,7 +201,7 @@ public class Callback implements Executable {
 	 * @param flag boolean value
 	 */
 	public void setArgs(boolean flag) {
-		args = new Object[] { flag ? Boolean.TRUE : Boolean.FALSE };
+		setSubArgs(new Object[] { flag ? Boolean.TRUE : Boolean.FALSE });
 	}
 	
 	/**
@@ -208,6 +209,15 @@ public class Callback implements Executable {
 	 * @param args the array object to pass to the method
 	 */
 	public void setArgs(Object args[]) {
-		this.args = (Object[]) args.clone();
+		setSubArgs((Object[]) args.clone());
+	}
+	
+	/**
+	 * Fix for <1.5 method.invoke.
+	 * @param args
+	 */
+	private void setSubArgs(Object args[]) {
+	    this.args = new Object[1];
+	    this.args[0] = args;
 	}
 }

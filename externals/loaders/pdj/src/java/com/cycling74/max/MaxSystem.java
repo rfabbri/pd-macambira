@@ -146,8 +146,8 @@ public class MaxSystem {
 		int ret[] = new int[3];
 		
 		ret[0] = 0;
-		ret[1] = 99;
-		ret[2] = 0;
+		ret[1] = 8;
+		ret[2] = 5;
 		
 		return ret;
 	}
@@ -171,7 +171,7 @@ public class MaxSystem {
 	}
 	
 	// constants
-	public static String MXJ_VERSION = "pdj 0.8.4";
+	public static String MXJ_VERSION = "pdj 0.8.5";
 	
 	public static final int PATH_STYLE_COLON		= 2;
 	public static final int PATH_STYLE_MAX			= 0;

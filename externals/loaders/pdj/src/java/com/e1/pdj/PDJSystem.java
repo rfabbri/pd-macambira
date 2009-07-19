@@ -2,12 +2,10 @@ package com.e1.pdj;
 
 import com.cycling74.max.MaxSystem;
 
-import java.awt.Component;
-import java.awt.Frame;
 import java.awt.Toolkit;
 import java.io.*;
-
 import java.awt.GraphicsEnvironment;
+
 /**
  * Startup class for pdj.
  */
@@ -24,7 +22,7 @@ public class PDJSystem {
 	public static void _init_system() {
 		if ( loaded == 1 )
 			return;
-		linknative();
+		javainit();
 		initIO();
 	}
 
@@ -42,49 +40,29 @@ public class PDJSystem {
 		GenericCompiler.rtJar = systemCpJar + ps + "jre" + ps + "lib" + ps + "rt.jar" + File.pathSeparator;
 	}
 
-	/**
-	  * Link the Java native classes
-	  */
-	static void linknative() {
-		String pdjHome = System.getProperty("pdj.home");
 
+	static void javainit() {
 		// this is a hack to be sure that statics of MaxSystem are loaded
 		// before everything
 		Class cls = MaxSystem.class;
 		
 		String osname = System.getProperty("os.name");
-
-		if ( osname.indexOf("Linux") != -1 ) {
-			// maps PD object as a JVM native library
-			Runtime.getRuntime().load(pdjHome + "/pdj.pd_linux");
-			loaded = 1;
-			resolvRtJar();
-			return;
-		}
-
-		if ( osname.indexOf("Windows") != -1 ) {
-			// maps PD object as a JVM native library
-			Runtime.getRuntime().load(pdjHome + "/pdj.dll");
-			loaded = 1;
-			resolvRtJar();
-			return;
-		}
-
 		if ( osname.indexOf("OS X") != -1 ) {
-			// maps PD object as a JVM native library
-			Runtime.getRuntime().load(pdjHome + "/pdj.d_fat");
-			loaded = 1;
-
-            if ( System.getenv("PDJ_USE_AWT") != null ) {
-			    GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-			    Toolkit.getDefaultToolkit();
-            }
-			GenericCompiler.rtJar = "/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar:";
-
-			return;
-		}
-
-		System.err.println("pdj: operating system type not found, the native link has not been made");
+		    try {
+		        if (System.getenv("PDJ_USE_AWT") != null) {
+		            GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+		            Toolkit.getDefaultToolkit();
+		        }
+		    } catch (Error e) {
+		        // on java 1.4, this will throw an error, we simply ignore AWT with 1.4
+		    }
+            GenericCompiler.rtJar = "/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar:";
+            loaded = 1;
+            return;
+        }
+		
+		loaded = 1;
+		resolvRtJar();
 	}
 
 	static boolean redirectIO() {
