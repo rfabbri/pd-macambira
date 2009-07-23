@@ -233,10 +233,9 @@ static void binfile_bang(t_binfile *x)
     if (x->x_rd_offset < x->x_length)
     {
         c = x->x_buf[x->x_rd_offset++];
-        if (x->x_rd_offset == x->x_length) outlet_bang(x->x_bang_outlet);
         outlet_float(x->x_bin_outlet, (float)c);
     }
-    else outlet_bang(x->x_bin_outlet);
+    else outlet_bang(x->x_bang_outlet);
 }
 
 /* The arguments of the ``list''-method
