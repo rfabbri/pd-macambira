@@ -114,6 +114,9 @@ clean:
 	-rm -f -- $(SOURCES:.c=.$(EXTENSION))
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
 
+distclean: clean
+	-rm -f -- ../$(LIBRARY_NAME)-$(OS)-$(shell uname -m).tar.bz2
+	-rm -f -- ../$(LIBRARY_NAME)-$(OS).tar.bz2
 
 dist: dist_$(OS)
 
