@@ -18,7 +18,9 @@ SOURCES_Windows =
 #
 #------------------------------------------------------------------------------#
 
-pd_src = ../../pd
+prefix = ../..
+libdir = $(prefix)/lib
+pd_src = $(libdir)/pd
 objectsdir = $(pd_src)/extra
 
 CFLAGS = -DPD -I$(pd_src)/src -Wall -W -g
@@ -85,28 +87,28 @@ install: libdir_install
 # The meta and help files are explicitly installed to make sure they are
 # actually there.  Those files are not optional, then need to be there.
 libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-exec
-	install -d $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(LIBRARY_NAME)-meta.pd $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(SOURCES:.c=.$(EXTENSION)) $(objectsdir)/$(LIBRARY_NAME)
-	$(STRIP) $(addprefix $(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION)))
+	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(LIBRARY_NAME)-meta.pd $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION)))
 
 # install library linked as single binary
 single_install: $(LIBRARY_NAME) install-doc install-exec
-	install -d $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(LIBRARY_NAME).$(EXTENSION) $(objectsdir)/$(LIBRARY_NAME)
-	$(STRIP) $(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
+	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(STRIP) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
 
 install-doc:
-	install -d $(objectsdir)/$(LIBRARY_NAME)
-#	install -m644 -p $(SOURCES:.c=-help.pd) $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(wildcard *.pd) $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p README $(objectsdir)/$(LIBRARY_NAME)/README.txt
-	install -m644 -p VERSION $(objectsdir)/$(LIBRARY_NAME)/VERSION
-	install -m644 -p CHANGES $(objectsdir)/$(LIBRARY_NAME)/CHANGES.txt
+	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+#	install -m644 -p $(SOURCES:.c=-help.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p README $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
+	install -m644 -p VERSION $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/VERSION.txt
+	install -m644 -p CHANGES $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/CHANGES.txt
 
 install-exec:
 	install -d $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(wildcard *.pd) $(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 
 clean:
@@ -118,7 +120,7 @@ distclean: clean
 	-rm -f -- ../$(LIBRARY_NAME)-$(OS)-$(shell uname -m).tar.bz2
 	-rm -f -- ../$(LIBRARY_NAME)-$(OS).tar.bz2
 
-dist: dist_$(OS)
+dist: all dist_$(OS)
 
 dist_linux:
 	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS)-$(shell uname -m).tar.bz2 $(LIBRARY_NAME)
@@ -134,7 +136,7 @@ etags:
 	etags *.[ch] ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
 showpaths:
-	echo "pd_src: $(pd_src)"
-	echo "objectsdir: $(objectsdir)"
-	echo "LIBRARY_NAME: $(LIBRARY_NAME)"
-	echo "SOURCES: $(SOURCES)"
+	@echo "pd_src: $(pd_src)"
+	@echo "objectsdir: $(objectsdir)"
+	@echo "LIBRARY_NAME: $(LIBRARY_NAME)"
+	@echo "SOURCES: $(SOURCES)"
