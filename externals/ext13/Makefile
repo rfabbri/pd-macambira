@@ -1,10 +1,22 @@
-# to use this Makefile for your project, you should only need to add your
-# source files to the SOURCES variable.  For objects that only build on
-# certain platforms, add those to the SOURCES line for the right platforms.
+# To use this Makefile for your project, first put the name of your library in
+# LIBRARY_NAME variable. The folder for your project should have the same name
+# as your library.
+LIBRARY_NAME = ext13
 
+# Next, add your source files to the SOURCES variable.
 SOURCES = catch13~.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mandelbrot.c messages.c openpatch.c piperead~.c pipewrite~.c receive13~.c receive13.c scramble~.c send13~.c send13.c sfwrite13~.c streamin13~.c streamout13~.c strippath.c throw13~.c wavinfo.c 
 
-LIBRARY_NAME := $(shell basename `pwd`)
+# For objects that only build on certain platforms, add those to the SOURCES
+# line for the right platforms.
+SOURCES_Darwin = 
+SOURCES_Linux = cdplayer.c ossmixer.c promiscous~.c
+SOURCES_Windows = 
+
+#------------------------------------------------------------------------------#
+#
+# you shouldn't need to edit anything below here, if we did it right :)
+#
+#------------------------------------------------------------------------------#
 
 pd_src = ../../pd
 objectsdir = $(pd_src)/extra
@@ -15,7 +27,7 @@ LIBS =
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
-  SOURCES += 
+  SOURCES += $(SOURCES_Darwin)
   EXTENSION = pd_darwin
   OS = macosx
   OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
@@ -26,7 +38,7 @@ ifeq ($(UNAME),Darwin)
   STRIP = strip -x
  endif
 ifeq ($(UNAME),Linux)
-  SOURCES += cdplayer.c ossmixer.c promiscous~.c
+  SOURCES += $(SOURCES_Linux)
   EXTENSION = pd_linux
   OS = linux
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
@@ -36,7 +48,7 @@ ifeq ($(UNAME),Linux)
   STRIP = strip --strip-unneeded -R .note -R .comment
 endif
 ifeq (MINGW,$(findstring MINGW,$(UNAME)))
-  SOURCES += 
+  SOURCES += $(SOURCES_Windows)
   EXTENSION = dll
   OS = windows
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -march=i686 -mtune=pentium4
@@ -60,15 +72,12 @@ all: $(SOURCES:.c=.$(EXTENSION))
 %.$(EXTENSION): %.o
 	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS)
 	chmod a-x "$*.$(EXTENSION)"
-	$(STRIP) $*.$(EXTENSION)
 	rm -f -- $*.o
 
 # this links everything into a single binary file
 $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
 	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(LIBS)
 	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
-	$(STRIP) $(LIBRARY_NAME).$(EXTENSION)
-	rm -f -- $*.o
 
 
 install: libdir_install
@@ -79,11 +88,13 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-exec
 	install -d $(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(LIBRARY_NAME)-meta.pd $(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(SOURCES:.c=.$(EXTENSION)) $(objectsdir)/$(LIBRARY_NAME)
+	$(STRIP) $(addprefix $(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION)))
 
 # install library linked as single binary
 single_install: $(LIBRARY_NAME) install-doc install-exec
 	install -d $(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(LIBRARY_NAME).$(EXTENSION) $(objectsdir)/$(LIBRARY_NAME)
+	$(STRIP) $(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
 
 install-doc:
 	install -d $(objectsdir)/$(LIBRARY_NAME)
@@ -104,9 +115,23 @@ clean:
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
 
 
-dist:
+dist: dist_$(OS)
+
+dist_linux:
+	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS)-$(shell uname -m).tar.bz2 $(LIBRARY_NAME)
+
+dist_macosx:
+	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
+
+dist_windows:
 	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
 
 
 etags:
 	etags *.[ch] ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
+
+showpaths:
+	echo "pd_src: $(pd_src)"
+	echo "objectsdir: $(objectsdir)"
+	echo "LIBRARY_NAME: $(LIBRARY_NAME)"
+	echo "SOURCES: $(SOURCES)"
