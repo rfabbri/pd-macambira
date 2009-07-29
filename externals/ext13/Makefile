@@ -18,9 +18,9 @@ SOURCES_Windows =
 #
 #------------------------------------------------------------------------------#
 
-prefix = ../..
-libdir = $(prefix)/lib
-pd_src = $(libdir)/pd
+# where the pd source is
+pd_src = ../../pd
+# where to install the library
 objectsdir = $(pd_src)/extra
 
 CFLAGS = -DPD -I$(pd_src)/src -Wall -W -g
