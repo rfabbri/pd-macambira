@@ -6,7 +6,7 @@ Maintainer: Hans-Christoph Steiner <hans@at.or.at>
 Homepage: http://puredata.info
 Package: pd-extended
 Architecture: i386
-Depends: xterm | x-terminal-emulator, ttf-bitstream-vera, x-ttcidfont-conf, tcllib, 
+Depends: xterm | x-terminal-emulator, ttf-bitstream-vera, x-ttcidfont-conf, tcllib
 Replaces: puredata, pd-externals, gem, pd-pdp, pd-zexy
 Conflicts: pd, pd-externals, gem, pd-pdp, pd-zexy
 Provides: pd
