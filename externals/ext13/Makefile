@@ -18,12 +18,12 @@ SOURCES_Windows =
 #
 #------------------------------------------------------------------------------#
 
-# where the pd source is
-pd_src = ../../pd
+# where Pd lives
+PD_PATH = ../../pd
 # where to install the library
-objectsdir = $(pd_src)/extra
+objectsdir = $(PD_PATH)/extra
 
-CFLAGS = -DPD -I$(pd_src)/src -Wall -W -g
+CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
@@ -57,7 +57,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   WINDOWS_HACKS = -D'O_NONBLOCK=1'
   CFLAGS += -mms-bitfields $(WINDOWS_HACKS)
   LDFLAGS += -s -shared -Wl,--enable-auto-import
-  LIBS += -L$(pd_src)/bin -L$(pd_src)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
+  LIBS += -L$(PD_PATH)/bin -L$(PD_PATH)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
   STRIP = strip --strip-unneeded -R .note -R .comment
 endif
 
@@ -136,7 +136,7 @@ etags:
 	etags *.[ch] ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
 showpaths:
-	@echo "pd_src: $(pd_src)"
+	@echo "PD_PATH: $(PD_PATH)"
 	@echo "objectsdir: $(objectsdir)"
 	@echo "LIBRARY_NAME: $(LIBRARY_NAME)"
 	@echo "SOURCES: $(SOURCES)"
