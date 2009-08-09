@@ -33,7 +33,7 @@ using namespace desire;
 #define a_symbol a_w.w_symbol
 #define a_float a_w.w_float
 
-#define MAXSFCHANS 64
+#define MAXSFCHANS 256
 
 #ifdef _LARGEFILE64_SOURCE
 # define open open64
