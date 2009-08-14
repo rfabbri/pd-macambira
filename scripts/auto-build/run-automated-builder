@@ -24,7 +24,7 @@ SCRIPT=$(echo $0| sed 's|.*/\(.*\)|\1|g')
 mailbody_on_failure () {
  ## this is a somewhat simplistic expression to detect error-lines
  echo "last 20 errors ----------------------------------------"
- cat ${LOGFILE} | grep -i "error: " | tail -20
+ cat ${LOGFILE} | grep -i -e "error: " -e "cannot find" | tail -20
  echo "last 5 lines ----------------------------------------"
  tail -5 ${LOGFILE}
  echo ""
