@@ -5,7 +5,7 @@ Download the package here : [[http://hangar.org/wikis/lab/pd/pdp_opencv-0.1a.tar
 
 ===== GNU/Linux ===== 
 
-(actually only tested in GNU/Linux Ubuntu Gutsy)
+(actually only tested in GNU/Linux Ubuntu)
 
 unpack it :: 
 
@@ -40,11 +40,27 @@ and copy the .pd_linux to your externals folder ::
 
 (This is only for pix_opencv Actually there is no MACOSX makefile for pdp_opencv.)
 
-Just overwrite the Makefile with this one : [[http://hangar.org/wikis/lab/pd/opencv/Makefile.darwin|Makefile.darwin]]
+first install openCV MacOS framework 
+   download openCV private framework from http://www.ient.rwth-aachen.de/cms/software/opencv/
+   copy the provided OpenCV.framework folder in your /System/Library/Frameworks/ directory ::
+	cp -Rf /Volumes/OpenCV\ Private\ Framework/OpenCV.framework /System/Library/Frameworks/
+ 
+cd into the library folder ::
 
-then follow the same steps of the GNU/Linux Install (but with pd_darwin instead of pd_linux)
+  cd pix_opencv
 
+edit the Makefile to fit your system and sources folders: 
 
+for pix_opencv edit the Makefile and change the values for PD_DIR and GEM_DIR variables
+
+then, compile it ::
+
+  make clean
+  make
+
+and copy the .pd_darwin to your externals folder ::
+
+  cp *.pd_darwin /Applications/Pd-0.40.3-extended-20080315.app/Contents/Resources/extra/Gem/ for exemple
 
 
 ===== MAC OSX (powerPC) =====
