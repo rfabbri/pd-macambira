@@ -1,5 +1,5 @@
-PD_DIR = ../pd
-GEM_DIR = ../gem
+PD_DIR = ../../pd
+GEM_DIR = ../../Gem
 
 GEM_OPENCV_VERSION = 0.1
 
@@ -19,10 +19,9 @@ ifeq ($(UNAME),Linux)
  EXTENSION = pd_linux
 endif
 ifeq ($(UNAME),Darwin)
- OPENCV_DIR = opencv-1.0.0
- INCLUDES += -I$(OPENCV_DIR)/cv/include -I$(OPENCV_DIR)/cxcore/include
+ INCLUDES += -I/System/Library/Frameworks/OpenCV.framework/Headers/
  LDFLAGS =  -bundle -undefined dynamic_lookup
- LIBS =  -lm $(OPENCV_DIR)/build/cv/src/.libs/lib_cv.a
+ LIBS =  -lm -framework OpenCV
  EXTENSION = pd_darwin
 endif
 ifeq (MINGW,$(findstring MINGW,$(UNAME)))
