@@ -15,15 +15,15 @@
 //
 /////////////////////////////////////////////////////////
 
-#include "pix_opencv_cvk.h"
+#include "pix_opencv_knear.h"
 
 #include <stdio.h>
 
-CPPEXTERN_NEW_WITH_TWO_ARGS(pix_opencv_cvk, t_symbol *, A_DEFSYM, t_floatarg, A_DEFFLOAT )
+CPPEXTERN_NEW_WITH_TWO_ARGS(pix_opencv_knear, t_symbol *, A_DEFSYM, t_floatarg, A_DEFFLOAT )
 
 /////////////////////////////////////////////////////////
 //
-// pix_opencv_cvk
+// pix_opencv_knear
 //
 /////////////////////////////////////////////////////////
 
@@ -35,7 +35,7 @@ CPPEXTERN_NEW_WITH_TWO_ARGS(pix_opencv_cvk, t_symbol *, A_DEFSYM, t_floatarg, A_
 /////////////////////////////////////////////////////////
 
 
-void pix_opencv_cvk :: findX(IplImage* imgSrc,int* min, int* max)
+void pix_opencv_knear :: findX(IplImage* imgSrc,int* min, int* max)
 {
   int i;
   int minFound=0;
@@ -62,7 +62,7 @@ void pix_opencv_cvk :: findX(IplImage* imgSrc,int* min, int* max)
   }
 }
 
-void pix_opencv_cvk :: findY(IplImage* imgSrc,int* min, int* max)
+void pix_opencv_knear :: findY(IplImage* imgSrc,int* min, int* max)
 {
   int i;
   int minFound=0;
@@ -95,7 +95,7 @@ void pix_opencv_cvk :: findY(IplImage* imgSrc,int* min, int* max)
 //
 /////////////////////////////////////////////////////////
 
-CvRect pix_opencv_cvk :: findBB(IplImage* imgSrc)
+CvRect pix_opencv_knear :: findBB(IplImage* imgSrc)
 {
   CvRect aux;
   int xmin, xmax, ymin, ymax;
@@ -109,7 +109,7 @@ CvRect pix_opencv_cvk :: findBB(IplImage* imgSrc)
   return aux;
 }
 
-IplImage pix_opencv_cvk :: preprocessing(IplImage* imgSrc,int new_width, int new_height)
+IplImage pix_opencv_knear :: preprocessing(IplImage* imgSrc,int new_width, int new_height)
 {
   IplImage* result;
   IplImage* scaledResult;
@@ -151,7 +151,7 @@ IplImage pix_opencv_cvk :: preprocessing(IplImage* imgSrc,int new_width, int new
 
 }
 
-void pix_opencv_cvk :: load_patterns(void)
+void pix_opencv_knear :: load_patterns(void)
 {
   IplImage* src_image;
   IplImage prs_image;
@@ -170,30 +170,30 @@ void pix_opencv_cvk :: load_patterns(void)
      src_image = cvLoadImage(file,0);
      if(!src_image)
      {
-       post("pix_opencv_cvk : error: couldn't load image %s\n", file);
+       post("pix_opencv_knear : error: couldn't load image %s\n", file);
        continue;
      }
      if ( ( this->x_pwidth == -1 ) || ( this->x_pheight == -1 ) )
      {
         this->x_pwidth = src_image->width;
         this->x_pheight = src_image->height;
-        // post( "pix_opencv_cvk : loaded : %s (%dx%d)", file, src_image->width, src_image->height);
+        // post( "pix_opencv_knear : loaded : %s (%dx%d)", file, src_image->width, src_image->height);
         this->x_rsamples++;
      }
      else if ( ( src_image->width != this->x_pwidth ) || ( src_image->height != this->x_pheight ) )
      {
-        post( "pix_opencv_cvk : error : %s (%dx%d) : wrong size ( should be %dx%d )", file, src_image->width, src_image->height, this->x_pwidth, this->x_pheight);
+        post( "pix_opencv_knear : error : %s (%dx%d) : wrong size ( should be %dx%d )", file, src_image->width, src_image->height, this->x_pwidth, this->x_pheight);
         continue;
      }
      else
      {
-        // post( "pix_opencv_cvk : loaded : %s (%dx%d)", file, src_image->width, src_image->height);
+        // post( "pix_opencv_knear : loaded : %s (%dx%d)", file, src_image->width, src_image->height);
         this->x_rsamples++;
      }
 
      // process file
      prs_image = this->preprocessing(src_image, this->x_pwidth, this->x_pheight);
-     // post( "pix_opencv_cvk : preprocessed : %s (%dx%d)", file, this->x_pwidth, this->x_pheight);
+     // post( "pix_opencv_knear : preprocessed : %s (%dx%d)", file, this->x_pwidth, this->x_pheight);
 
      if ( ( this->trainData == NULL ) || ( this->trainClasses == NULL ))
      {
@@ -220,7 +220,7 @@ void pix_opencv_cvk :: load_patterns(void)
   }
 
   // create the classifier
-  post( "pix_opencv_cvk : loaded : %d samples from %s", this->x_rsamples, this->x_filepath);
+  post( "pix_opencv_knear : loaded : %d samples from %s", this->x_rsamples, this->x_filepath);
   if ( this->x_rsamples == this->x_nsamples )
   {
     this->knn=new CvKNearest( this->trainData, this->trainClasses, 0, false, this->x_nsamples );
@@ -234,7 +234,7 @@ void pix_opencv_cvk :: load_patterns(void)
 // Constructor
 //
 /////////////////////////////////////////////////////////
-pix_opencv_cvk :: pix_opencv_cvk(t_symbol *path, t_floatarg nsamples)
+pix_opencv_knear :: pix_opencv_knear(t_symbol *path, t_floatarg nsamples)
 { 
   m_dataout = outlet_new(this->x_obj, &s_anything);
 
@@ -264,7 +264,7 @@ pix_opencv_cvk :: pix_opencv_cvk(t_symbol *path, t_floatarg nsamples)
 // Destructor
 //
 /////////////////////////////////////////////////////////
-pix_opencv_cvk :: ~pix_opencv_cvk()
+pix_opencv_knear :: ~pix_opencv_knear()
 {
     // destroy cv structures
     cvReleaseImage( &rgba );
@@ -279,7 +279,7 @@ pix_opencv_cvk :: ~pix_opencv_cvk()
 // processImage
 //
 /////////////////////////////////////////////////////////
-void pix_opencv_cvk :: processRGBAImage(imageStruct &image)
+void pix_opencv_knear :: processRGBAImage(imageStruct &image)
 {
  int i;
 
@@ -310,7 +310,7 @@ void pix_opencv_cvk :: processRGBAImage(imageStruct &image)
      float result;
      CvMat row_header, *row1, odata;
 
-       // post( "pix_opencv_cvk : size : (%dx%d)", this->x_pwidth, this->x_pheight);
+       // post( "pix_opencv_knear : size : (%dx%d)", this->x_pwidth, this->x_pheight);
 
        // process file
        prs_image = this->preprocessing(this->grey, this->x_pwidth, this->x_pheight);
@@ -324,7 +324,7 @@ void pix_opencv_cvk :: processRGBAImage(imageStruct &image)
        result=this->knn->find_nearest(row1,this->x_nsamples,0,0,this->x_nearest,this->x_dist);
        for ( i=0; i<this->x_nsamples; i++ )
        {
-         // post( "pix_opencv_cvk : distance : %f", this->x_dist->data.fl[i] );
+         // post( "pix_opencv_knear : distance : %f", this->x_dist->data.fl[i] );
        }
        outlet_float(this->m_dataout, this->x_dist->data.fl[0]);
 
@@ -335,7 +335,7 @@ void pix_opencv_cvk :: processRGBAImage(imageStruct &image)
   memcpy( image.data, rgba->imageData, image.xsize*image.ysize*4 );
 }
 
-void pix_opencv_cvk :: processRGBImage(imageStruct &image)
+void pix_opencv_knear :: processRGBImage(imageStruct &image)
 {
  int i;
 
@@ -366,7 +366,7 @@ void pix_opencv_cvk :: processRGBImage(imageStruct &image)
      float result;
      CvMat row_header, *row1, odata;
 
-       // post( "pix_opencv_cvk : size : (%dx%d)", this->x_pwidth, this->x_pheight);
+       // post( "pix_opencv_knear : size : (%dx%d)", this->x_pwidth, this->x_pheight);
 
        // process file
        prs_image = this->preprocessing(this->grey, this->x_pwidth, this->x_pheight);
@@ -380,7 +380,7 @@ void pix_opencv_cvk :: processRGBImage(imageStruct &image)
        result=this->knn->find_nearest(row1,this->x_nsamples,0,0,this->x_nearest,this->x_dist);
        for ( i=0; i<this->x_nsamples; i++ )
        {
-         // post( "pix_opencv_cvk : distance : %f", this->x_dist->data.fl[i] );
+         // post( "pix_opencv_knear : distance : %f", this->x_dist->data.fl[i] );
        }
        outlet_float(this->m_dataout, this->x_dist->data.fl[0]);
 
@@ -391,11 +391,11 @@ void pix_opencv_cvk :: processRGBImage(imageStruct &image)
   memcpy( image.data, rgb->imageData, image.xsize*image.ysize*3 );
 }
 
-void pix_opencv_cvk :: processYUVImage(imageStruct &image)
+void pix_opencv_knear :: processYUVImage(imageStruct &image)
 {
 }
     	
-void pix_opencv_cvk :: processGrayImage(imageStruct &image)
+void pix_opencv_knear :: processGrayImage(imageStruct &image)
 { 
  int i;
 
@@ -425,7 +425,7 @@ void pix_opencv_cvk :: processGrayImage(imageStruct &image)
      float result;
      CvMat row_header, *row1, odata;
 
-       // post( "pix_opencv_cvk : size : (%dx%d)", this->x_pwidth, this->x_pheight);
+       // post( "pix_opencv_knear : size : (%dx%d)", this->x_pwidth, this->x_pheight);
 
        // process file
        prs_image = this->preprocessing(this->grey, this->x_pwidth, this->x_pheight);
@@ -439,7 +439,7 @@ void pix_opencv_cvk :: processGrayImage(imageStruct &image)
        result=this->knn->find_nearest(row1,this->x_nsamples,0,0,this->x_nearest,this->x_dist);
        for ( i=0; i<this->x_nsamples; i++ )
        {
-         // post( "pix_opencv_cvk : distance : %f", this->x_dist->data.fl[i] );
+         // post( "pix_opencv_knear : distance : %f", this->x_dist->data.fl[i] );
        }
        outlet_float(this->m_dataout, this->x_dist->data.fl[0]);
 
@@ -454,29 +454,29 @@ void pix_opencv_cvk :: processGrayImage(imageStruct &image)
 // static member function
 //
 /////////////////////////////////////////////////////////
-void pix_opencv_cvk :: obj_setupCallback(t_class *classPtr)
+void pix_opencv_knear :: obj_setupCallback(t_class *classPtr)
 {
-  class_addmethod(classPtr, (t_method)&pix_opencv_cvk::bangMessCallback,
+  class_addmethod(classPtr, (t_method)&pix_opencv_knear::bangMessCallback,
   		  gensym("bang"), A_NULL);
-  class_addmethod(classPtr, (t_method)&pix_opencv_cvk::loadMessCallback,
+  class_addmethod(classPtr, (t_method)&pix_opencv_knear::loadMessCallback,
 		  gensym("load"), A_SYMBOL, A_DEFFLOAT, A_NULL);
 }
 
-void pix_opencv_cvk :: bangMessCallback(void *data)
+void pix_opencv_knear :: bangMessCallback(void *data)
 {
    if ( GetMyClass(data)->trainData == NULL )
   {
-     ::post( "pix_opencv_cvk : no patterns loaded : cannot process" );
+     ::post( "pix_opencv_knear : no patterns loaded : cannot process" );
      return;
   }
   GetMyClass(data)->x_classify=1;
 }
 
-void pix_opencv_cvk :: loadMessCallback(void *data, t_symbol *path, t_floatarg nsamples)
+void pix_opencv_knear :: loadMessCallback(void *data, t_symbol *path, t_floatarg nsamples)
 {
    if ( (int) nsamples <= 0 )
    {
-      ::post( "pix_opencv_cvk : wrong number of samples : %d", nsamples );
+      ::post( "pix_opencv_knear : wrong number of samples : %d", nsamples );
       return;
    }
    else

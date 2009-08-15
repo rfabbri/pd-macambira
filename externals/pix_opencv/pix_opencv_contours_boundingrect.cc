@@ -44,7 +44,7 @@ pix_opencv_contours_boundingrect :: pix_opencv_contours_boundingrect()
   rgb = NULL;
   x_ftolerance  = 5;
   x_mmove   = 10;
-  x_cmode   = CV_RETR_TREE;
+  x_cmode   = CV_RETR_LIST;
   x_cmethod = CV_CHAIN_APPROX_SIMPLE;
 
   // initialize font

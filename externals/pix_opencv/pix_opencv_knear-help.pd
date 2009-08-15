@@ -45,7 +45,7 @@
 #X text 9 -71 by damiles : http://blog.damiles.com/?p=93;
 #X text 9 -58 adapted to PD by Yves Degoyon ( ydegoyon@gmail.com )
 ;
-#X text 9 -93 pix_opencv_cvk : OCR-like pattern recognition;
+#X text 9 -93 pix_opencv_knear : OCR-like pattern recognition;
 #X msg 532 250 bang;
 #X text 628 251 Compare the incoming frame to the patterns;
 #X text 667 281 Load a new set of patterns from a directory;
@@ -56,7 +56,7 @@
 ;
 #X obj 384 72 pix_image;
 #X msg 560 310 load /usr/local/pd/pdp_opencv/doc/plus 50;
-#X obj 365 335 pix_opencv_cvk /usr/local/pd/pdp_opencv/doc/plus 50
+#X obj 365 335 pix_opencv_knear /usr/local/pd/pdp_opencv/doc/plus 50
 ;
 #X obj 592 380 print distance;
 #X obj 572 251 loadbang;

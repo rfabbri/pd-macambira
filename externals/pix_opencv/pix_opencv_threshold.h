@@ -13,24 +13,21 @@ LOG
 
 -----------------------------------------------------------------*/
 
-#ifndef INCLUDE_PIX_OPENCV_CVK_H_
-#define INCLUDE_PIX_OPENCV_CVK_H_
+#ifndef INCLUDE_PIX_OPENCV_EDGE_H_
+#define INCLUDE_PIX_OPENCV_EDGE_H_
 
 #include "Base/GemPixObj.h"
 
 #ifndef _EiC
 #include "cv.h"
-#include "highgui.h"
-#include "ml.h"
 #endif
 
 /*-----------------------------------------------------------------
 -------------------------------------------------------------------
 CLASS
+    pix_opencv_threshold
     
-   pix_opencv_cvk : OCR like pattern recognition
-   based on basic OCR with Open CV tutorial
-   by damiles : http://blog.damiles.com/?p=93    
+    Change pix to greyscale
 
 KEYWORDS
     pix
@@ -38,21 +35,21 @@ KEYWORDS
 DESCRIPTION
    
 -----------------------------------------------------------------*/
-class GEM_EXTERN pix_opencv_cvk : public GemPixObj
+class GEM_EXTERN pix_opencv_threshold : public GemPixObj
 {
-    CPPEXTERN_HEADER(pix_opencv_cvk, GemPixObj)
+    CPPEXTERN_HEADER(pix_opencv_threshold, GemPixObj)
 
     public:
 
 	    //////////
 	    // Constructor
-    	pix_opencv_cvk(t_symbol *path, t_floatarg nsamples);
+    	pix_opencv_threshold();
     	
     protected:
     	
     	//////////
     	// Destructor
-    	virtual ~pix_opencv_cvk();
+    	virtual ~pix_opencv_threshold();
 
     	//////////
     	// Do the processing
@@ -61,43 +58,33 @@ class GEM_EXTERN pix_opencv_cvk : public GemPixObj
 	virtual void 	processYUVImage(imageStruct &image);
     	virtual void 	processGrayImage(imageStruct &image); 
     	
-        void findX(IplImage* imgSrc,int* min, int* max);
-        void findY(IplImage* imgSrc,int* min, int* max);
-        CvRect findBB(IplImage* imgSrc);
-        IplImage preprocessing(IplImage* imgSrc,int new_width, int new_height);
-        void load_patterns(void);
+	//////////
+    	// Set the new edge threshold
+    	void	    	floatMaxMess(float maxvalue);
+    	void	    	floatThreshMess(float edge_thresh);
+    	void	    	floatModeMess(float mode);
+
+    	// The new edge threshold
+	int 		threshold_value;
+    	int 		max_value;
+    	int 		threshold_mode;
 
 	// to detect changes in the image size
 	int 		comp_xsize;
 	int		comp_ysize;
-    
+	float		edge_thresh;
 
     private:
     
     	//////////
     	// Static member functions
-    	static void 	bangMessCallback(void *data);
-    	static void 	loadMessCallback(void *data, t_symbol *path, t_floatarg nsamples);
+    	static void 	floatMaxMessCallback(void *data, t_floatarg maxvalue);
+    	static void 	floatThreshMessCallback(void *data, t_floatarg thresh_value);
+    	static void 	floatModeMessCallback(void *data, t_floatarg thresh_mode_value);
 
-        // internal data
-        t_outlet        *m_dataout;
-        int             x_classify;
-
-         // open cv classifier data
-        char            *x_filepath;
-        int             x_nsamples;
-        int             x_rsamples;
-        CvMat           *trainData;
-        CvMat           *trainClasses;
-        CvMat           *x_nearest;
-        CvMat           *x_dist;
-        int             x_pwidth;
-        int             x_pheight;
-        CvKNearest      *knn;
-
-	// The output and temporary images
-    	IplImage 	*rgba, *rgb, *grey;
-	
+	/////////
+	// IplImage needed
+    	IplImage 	*orig, *rgb, *gray;
 };
 
 #endif	// for header file
