@@ -36,7 +36,7 @@ and copy the .pd_linux to your externals folder ::
 
 
 
-===== MAC OSX (macintel) =====
+===== MAC OSX (intel and powerPC) =====
 
 (This is only for pix_opencv Actually there is no MACOSX makefile for pdp_opencv.)
 
@@ -61,61 +61,4 @@ then, compile it ::
 and copy the .pd_darwin to your externals folder ::
 
   cp *.pd_darwin /Applications/Pd-0.40.3-extended-20080315.app/Contents/Resources/extra/Gem/ for exemple
-
-
-===== MAC OSX (powerPC) =====
-
-• Download this three libraries with Fink : libjpeg + libpng3 + libtiff
-
-• In Terminal :
-cvs -d:pserver:anonymous@opencvlibrary.cvs.sourceforge.net:/cvsroot/opencvlibrary login
----->  then hit 'enter' on your keyboard
-cvs -z3 -d:pserver:anonymous@opencvlibrary.cvs.sourceforge.net:/cvsroot/opencvlibrary co
--P opencv
-----> download opencv sources
-
-• with a text editor, open the file : cvcap_qt.cpp
-look for '__BEGIN__' and change it by '__BEGIN__{'
-look for '__END__' and change it by '}__END__'
----->  save
-
-• In Terminal
----->  go to your opencv folder you just download and create a new folder 'build' :
-cd blabla/opencv
-mkdir build
-cd build
-../configure CPPFLAGS="-I/sw/include" LDFLAGS="-L/sw/lib"
-make
-sudo make install
----->   enter your password
-
-• With you browser go to :
-http://hangar.org/wikis/lab/doku.php?id=start:puredata_opencv
----->   download pix_opencv-0.1a.tar.gz and decompress all :
-http://hangar.org/wikis/lab/pd/pix_opencv-0.1a.tar.gz
----->   download PD-extended sources and decompress all :
-http://downloads.sourceforge.net/pure-data/Pd-0.39.3-extended.tar.bz2
----->   download the makefile for macosx :
-http://hangar.org/wikis/lab/pd/opencv/Makefile.darwin
-
-• In the Finder :
----->   change 'Makefile.darwin' by 'Makefile' and then overwrite the 'Makefile' in
-'pix_opencv' folder you just download
-
-• With a text editor :
----->   open this new 'Makefile' and change :
-PD_DIR = /*/Pd-0.39.3-extended/pd (enter the path of the 'pd' folder in
-'Pd-0.39.3-extended' folder you just download from sourceforge)
-GEM_DIR = /*/Pd-0.39.3-extended/Gem  (enter the path of the 'Gem' folder in
-'Pd-0.39.3-extended' folder you just download from sourceforge)
----->   save
-
-• In Terminal :
----->   go to the folder 'pix_opencv' with 'cd '
-export MACOSX_DEPLOYMENT_TARGET=10.4
-make clean
-make
-
-• Then copy the '.pd_darwin' create in the 'pix_opencv' folder in your
-'/Applications/Pd-0.40.3-extended-20080315.app/Contents/Resources/extra/Gem/' for exemple
 
