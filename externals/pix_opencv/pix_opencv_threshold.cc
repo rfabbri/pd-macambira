@@ -46,10 +46,10 @@ pix_opencv_threshold :: pix_opencv_threshold()
 /////////////////////////////////////////////////////////
 pix_opencv_threshold :: ~pix_opencv_threshold()
 { 
-    	//Destroy cv_images to clean memory
-	cvReleaseImage(&orig);
-    	cvReleaseImage(&gray);
-    	cvReleaseImage(&rgb);
+   //Destroy cv_images to clean memory
+   cvReleaseImage(&orig);
+   cvReleaseImage(&gray);
+   cvReleaseImage(&rgb);
 }
 
 /////////////////////////////////////////////////////////
@@ -214,11 +214,11 @@ void pix_opencv_threshold :: processGrayImage(imageStruct &image)
 /////////////////////////////////////////////////////////
 void pix_opencv_threshold :: floatMaxMess (float maxvalue)
 {
-  if ( (int)maxvalue>0 ) this->max_value = (int)maxvalue;
+  if ( (int)maxvalue>0 ) this->max_value = maxvalue;
 }
 void pix_opencv_threshold :: floatThreshMess (float edge_thresh)
 {
-  this->edge_thresh = (int)edge_thresh;
+  this->threshold_value = edge_thresh;
 }
 void pix_opencv_threshold :: floatModeMess (float mode)
 {

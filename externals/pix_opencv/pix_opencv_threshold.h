@@ -65,14 +65,13 @@ class GEM_EXTERN pix_opencv_threshold : public GemPixObj
     	void	    	floatModeMess(float mode);
 
     	// The new edge threshold
-	int 		threshold_value;
-    	int 		max_value;
+	float 		threshold_value;
+    	float       	max_value;
     	int 		threshold_mode;
 
 	// to detect changes in the image size
 	int 		comp_xsize;
 	int		comp_ysize;
-	float		edge_thresh;
 
     private:
     

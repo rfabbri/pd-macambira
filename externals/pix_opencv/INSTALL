@@ -60,5 +60,5 @@ then, compile it ::
 
 and copy the .pd_darwin to your externals folder ::
 
-  cp *.pd_darwin /Applications/Pd-0.40.3-extended-20080315.app/Contents/Resources/extra/Gem/ for exemple
+  cp *.pd_darwin /Applications/Pd-0.40.3-extended-20080315.app/Contents/Resources/extra/Gem/ for example
 

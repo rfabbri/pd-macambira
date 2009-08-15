@@ -1,5 +1,5 @@
-PD_DIR = ../../pd
-GEM_DIR = ../../Gem
+PD_DIR = ../pd
+GEM_DIR = ../gem
 
 GEM_OPENCV_VERSION = 0.1
 
