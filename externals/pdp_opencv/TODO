@@ -155,6 +155,8 @@ http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html#SECT
 
 ############################# sevy ++
 adaptive threshold
-hough lines
-hough circles
-arguments in pdp_histo
+hough lines/circles
+SIFT ( remarkable points )
+SURF ( remarkable points )
+camshift ( very greedy )
+stereo calibration ( need two cams and a chessboard )

@@ -62,7 +62,9 @@ typedef struct pdp_opencv_contours_boundingrect_struct
     int x_height;
     int x_size;
 
-    int x_infosok; 
+    int x_nightmode;  // don't show the original image
+    int x_draw;       // draw contours boundaries rectangles
+    int x_show;       // show the real contour
 
     int minarea;
     int maxarea;
@@ -168,7 +170,10 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     //TODO afegir parametre
     //si volem veure la imatge original o un fons negre
     cvCopy(x->image, x->cnt_img, NULL);
-    // cvZero( x->cnt_img );
+    if ( x->x_nightmode )
+    {
+       cvZero( x->cnt_img );
+    }
     
     for ( im=0; im<MAX_MARKERS; im++ )
     {
@@ -208,9 +213,17 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
                oi = pdp_opencv_contours_boundingrect_mark(x, rect.x, rect.y );
             }
 
-	    cvRectangle( x->cnt_img, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
-            sprintf( tindex, "%d", oi );
-            cvPutText( x->cnt_img, tindex, cvPoint(rect.x,rect.y), &x->font, CV_RGB(255,255,255));
+            if ( x->x_draw )
+            {
+	      cvRectangle( x->cnt_img, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
+              sprintf( tindex, "%d", oi );
+              cvPutText( x->cnt_img, tindex, cvPoint(rect.x,rect.y), &x->font, CV_RGB(255,255,255));
+            }
+
+            if ( x->x_show )
+            {
+	      cvDrawContours( x->cnt_img, contours, CV_RGB(255,255,255), CV_RGB(255,255,255), 0, 1, 8, cvPoint(0,0) );
+            }
 
             SETFLOAT(&x->rlist[0], oi);
             SETFLOAT(&x->rlist[1], rect.x);
@@ -244,17 +257,32 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
 
 static void pdp_opencv_contours_boundingrect_minarea(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
 {
-	x->minarea = (int)f;
+    x->minarea = (int)f;
 }
 
 static void pdp_opencv_contours_boundingrect_maxarea(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
 {
-	x->maxarea = (int)f;
+    x->maxarea = (int)f;
 }
 
 static void pdp_opencv_contours_boundingrect_ftolerance(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
 {
-        if ((int)f>=1) x->x_ftolerance = (int)f;
+    if ((int)f>=1) x->x_ftolerance = (int)f;
+}
+
+static void pdp_opencv_contours_boundingrect_nightmode(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
+{
+    if  ( ((int)f==1) || ((int)f==0) ) x->x_nightmode = (int)f;
+}
+
+static void pdp_opencv_contours_boundingrect_draw(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
+{
+    if  ( ((int)f==1) || ((int)f==0) ) x->x_draw = (int)f;
+}
+
+static void pdp_opencv_contours_boundingrect_show(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
+{
+    if  ( ((int)f==1) || ((int)f==0) ) x->x_show = (int)f;
 }
 
 static void pdp_opencv_contours_boundingrect_mmove(t_pdp_opencv_contours_boundingrect *x, t_floatarg f)
@@ -444,15 +472,17 @@ void *pdp_opencv_contours_boundingrect_new(t_floatarg f)
     x->x_height = 240;
     x->x_size   = x->x_width * x->x_height;
 
-    x->x_infosok = 0;
-
     x->minarea   = 10*10;
     x->maxarea   = 320*240;
 
     x->x_ftolerance  = 5;
     x->x_mmove   = 10;
-    x->x_cmode   = CV_RETR_TREE;
+    x->x_cmode   = CV_RETR_LIST;
     x->x_cmethod = CV_CHAIN_APPROX_SIMPLE;
+
+    x->x_nightmode = 0;
+    x->x_draw = 1;
+    x->x_show = 0;
 
     x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
     x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
@@ -487,6 +517,9 @@ void pdp_opencv_contours_boundingrect_setup(void)
     class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_clear, gensym("clear"), A_NULL );
     class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_cmode, gensym("mode"), A_FLOAT, A_NULL );
     class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_cmethod, gensym("method"), A_FLOAT, A_NULL );
+    class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_nightmode, gensym("nightmode"), A_FLOAT, A_NULL );
+    class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_draw, gensym("draw"), A_FLOAT, A_NULL );
+    class_addmethod(pdp_opencv_contours_boundingrect_class, (t_method)pdp_opencv_contours_boundingrect_show, gensym("show"), A_FLOAT, A_NULL );
 
 }
 

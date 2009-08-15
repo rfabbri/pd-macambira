@@ -41,6 +41,10 @@ void pdp_opencv_floodfill_setup(void);
 void pdp_opencv_contours_convexity_setup(void);
 void pdp_opencv_contours_boundingrect_setup(void);
 void pdp_opencv_lk_setup(void);
+void pdp_opencv_dft_setup(void);
+void pdp_opencv_cvk_setup(void);
+void pdp_opencv_hu_moments_setup(void);
+void pdp_opencv_hu_compare_setup(void);
 
 
 /* library setup routine */
@@ -69,7 +73,10 @@ void pdp_opencv_setup(void){
     pdp_opencv_contours_convexity_setup();
     pdp_opencv_contours_boundingrect_setup();
     pdp_opencv_lk_setup();
-
+    pdp_opencv_dft_setup();
+    pdp_opencv_cvk_setup();
+    pdp_opencv_hu_moments_setup();
+    pdp_opencv_hu_compare_setup();
 
     pdp_opencv_initialized++;
 

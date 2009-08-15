@@ -1,5 +1,5 @@
-#N canvas 20 49 833 785 10;
-#X text -15 -97 written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
+#N canvas 350 49 833 785 10;
+#X text -16 -86 written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
 ) and Yves Degoyon ( ydegoyon@gmail.com );
 #X obj -17 -55 cnv 15 621 250 empty empty empty 20 12 0 14 -260097
 -66577 0;
@@ -9,7 +9,7 @@
 #X msg 313 39 close;
 #X obj 243 110 pdp_v4l;
 #X msg 300 7 open /dev/video0;
-#X obj 412 -20 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 412 -20 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X obj 412 7 metro 40;
 #X msg 493 26 close;
@@ -35,69 +35,79 @@
 -1 -1 0 1;
 #X obj -15 203 cnv 15 621 400 empty empty empty 20 12 0 14 -258113
 -66577 0;
-#X obj 38 628 pdp_xv;
-#X floatatom 159 315 5 0 0 0 - - -;
-#X obj 38 458 pdp_opencv_lk;
-#X text 194 314 window size;
-#X obj 214 293 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 15 621 pdp_xv;
+#X floatatom 108 313 5 0 0 0 - - -;
+#X obj 14 497 pdp_opencv_lk;
+#X text 143 312 window size;
+#X obj 185 292 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
-#X msg 129 291 nightmode \$1;
-#X text 233 294 set nightmode;
-#X msg 124 265 quality \$1;
-#X floatatom 199 266 5 0 0 0 - - -;
-#X floatatom 207 241 5 0 0 0 - - -;
-#X msg 110 240 mindistance \$1;
-#X text 248 239 set distance ( default 10 );
-#X msg 103 212 init;
-#X text 172 212 init point detections;
+#X msg 100 290 nightmode \$1;
+#X text 204 293 set nightmode;
+#X msg 95 264 quality \$1;
+#X floatatom 170 265 5 0 0 0 - - -;
+#X floatatom 178 240 5 0 0 0 - - -;
+#X msg 81 239 mindistance \$1;
+#X text 219 238 set distance ( default 10 );
+#X msg 74 211 init;
 #X obj 414 169 pdp_xv;
 #X obj 314 169 pdp_opencv_edge;
-#X floatatom 292 266 5 0 0 0 - - -;
-#X obj 140 212 t b;
-#X obj 237 264 / 1000;
-#X msg 89 628 cursor 1;
-#X obj 38 654 route press;
-#X msg 160 341 mark \$1 \$2;
-#X msg 171 367 delete \$1;
-#X text 242 367 delete a marker;
-#X msg 182 393 clear;
-#X text 230 394 delete all markers;
-#X msg 189 420 maxmove \$1;
-#X text 303 420 max movement of a marker ( default 5 pisels );
-#X floatatom 265 422 5 0 0 0 - - -;
-#X text 424 265 set quality ( default 100 );
-#X msg 332 264 100;
-#X obj 365 264 loadbang;
-#X text 239 342 mark %x %y : mark a point to track ( max points : 10
+#X floatatom 263 265 5 0 0 0 - - -;
+#X obj 111 211 t b;
+#X obj 208 263 / 1000;
+#X msg 66 621 cursor 1;
+#X obj 15 647 route press;
+#X msg 109 339 mark \$1 \$2;
+#X msg 116 366 delete \$1;
+#X text 307 366 delete a marker;
+#X msg 116 391 clear;
+#X text 164 392 delete all markers;
+#X msg 115 414 maxmove \$1;
+#X text 229 414 max movement of a marker ( default 5 pisels );
+#X floatatom 191 416 5 0 0 0 - - -;
+#X text 395 264 set quality ( default 100 );
+#X msg 303 263 100;
+#X obj 336 263 loadbang;
+#X text 188 340 mark %x %y : mark a point to track ( max points : 10
 );
-#X obj 141 535 unpack f f;
-#X floatatom 142 560 5 0 0 0 - - -;
-#X floatatom 200 561 5 0 0 0 - - -;
-#X text 143 576 X;
-#X text 198 577 Y;
-#X obj 140 509 route 1 2 3 4 5 6 7 8 9 10;
+#X obj 112 546 unpack f f;
+#X floatatom 113 571 5 0 0 0 - - -;
+#X floatatom 171 572 5 0 0 0 - - -;
+#X text 114 587 X;
+#X text 169 588 Y;
+#X obj 112 525 route 1 2 3 4 5 6 7 8 9 10;
 #X obj 285 169 / 2;
-#X text 167 630 <-- mark the points you want to track in the video
+#X text 144 623 <-- mark the points you want to track in the video
 window;
-#X text 312 510 position of each marked point;
-#X text -14 -110 pdp_opencv_lk : contour most significant points detection
+#X text 280 527 position of each marked point;
+#X text 197 442 make a delaunay with all points;
+#X msg 116 440 delaunay on;
+#X msg 118 461 delaunay off;
+#X text 228 472 make a delaunay with point 1 and a tolerance of 50
+( all points which color is in that range will be included in the delaunay)
 ;
+#X obj 181 366 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
+-1 -1 0;
+#X msg 124 484 pdelaunay 1 50;
+#X text -14 -111 pdp_opencv_lk : Lukas-Kanade corner points tracking
+;
+#X text -14 -99 Corner points detection based on Shi and Tomasi;
+#X text 142 211 init corner points detections;
 #X connect 2 0 3 0;
 #X connect 3 0 5 0;
 #X connect 4 0 5 0;
 #X connect 5 0 30 0;
-#X connect 5 0 43 0;
+#X connect 5 0 42 0;
 #X connect 6 0 5 0;
 #X connect 7 0 8 0;
 #X connect 8 0 11 0;
 #X connect 9 0 11 0;
 #X connect 10 0 11 0;
 #X connect 11 0 30 0;
-#X connect 11 0 43 0;
+#X connect 11 0 42 0;
 #X connect 12 0 11 0;
 #X connect 13 0 12 0;
 #X connect 14 0 30 0;
-#X connect 14 0 43 0;
+#X connect 14 0 42 0;
 #X connect 15 0 14 0;
 #X connect 16 0 15 0;
 #X connect 17 0 15 0;
@@ -109,11 +119,11 @@ window;
 #X connect 23 0 22 0;
 #X connect 23 0 16 0;
 #X connect 26 0 14 1;
-#X connect 28 0 48 0;
+#X connect 28 0 47 0;
 #X connect 29 0 30 1;
 #X connect 30 0 28 0;
-#X connect 30 0 47 0;
-#X connect 30 1 66 0;
+#X connect 30 0 46 0;
+#X connect 30 1 65 0;
 #X connect 32 0 33 0;
 #X connect 33 0 30 0;
 #X connect 35 0 30 0;
@@ -121,22 +131,26 @@ window;
 #X connect 37 0 38 0;
 #X connect 38 0 30 0;
 #X connect 40 0 30 0;
-#X connect 43 0 42 0;
-#X connect 44 0 46 0;
-#X connect 44 0 45 0;
-#X connect 44 0 67 0;
-#X connect 45 0 40 0;
-#X connect 46 0 36 0;
-#X connect 47 0 28 0;
-#X connect 48 0 49 0;
+#X connect 42 0 41 0;
+#X connect 43 0 45 0;
+#X connect 43 0 44 0;
+#X connect 43 0 66 0;
+#X connect 44 0 40 0;
+#X connect 45 0 36 0;
+#X connect 46 0 28 0;
+#X connect 47 0 48 0;
+#X connect 48 0 30 0;
 #X connect 49 0 30 0;
-#X connect 50 0 30 0;
-#X connect 52 0 30 0;
-#X connect 54 0 30 0;
-#X connect 56 0 54 0;
-#X connect 58 0 44 0;
-#X connect 59 0 58 0;
-#X connect 61 0 62 0;
-#X connect 61 1 63 0;
-#X connect 66 0 61 0;
-#X connect 67 0 43 1;
+#X connect 51 0 30 0;
+#X connect 53 0 30 0;
+#X connect 55 0 53 0;
+#X connect 57 0 43 0;
+#X connect 58 0 57 0;
+#X connect 60 0 61 0;
+#X connect 60 1 62 0;
+#X connect 65 0 60 0;
+#X connect 66 0 42 1;
+#X connect 70 0 30 0;
+#X connect 71 0 30 0;
+#X connect 73 0 49 0;
+#X connect 74 0 30 0;

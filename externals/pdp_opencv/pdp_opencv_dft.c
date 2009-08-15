@@ -129,10 +129,10 @@ static void pdp_opencv_dft_process_rgb(t_pdp_opencv_dft *x)
 {
   t_pdp     *header = pdp_packet_header(x->x_packet0);
   short int *data   = (short int *)pdp_packet_data(x->x_packet0);
-  t_pdp     *newheader = pdp_packet_header(x->x_packet1);;
-  short int *newdata = (short int *)pdp_packet_data(x->x_packet1);; 
-  t_pdp     *phaseheader = pdp_packet_header(x->x_packet2);;
-  short int *phasedata = (short int *)pdp_packet_data(x->x_packet2);; 
+  t_pdp     *newheader = pdp_packet_header(x->x_packet1);
+  short int *newdata = (short int *)pdp_packet_data(x->x_packet1);
+  t_pdp     *phaseheader = pdp_packet_header(x->x_packet2);
+  short int *phasedata = (short int *)pdp_packet_data(x->x_packet2);
   CvMat tmp;
   double m,M;
   int px,py;

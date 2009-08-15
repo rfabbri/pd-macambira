@@ -133,8 +133,6 @@ static void pdp_opencv_distrans_process_rgb(t_pdp_opencv_distrans *x)
 
     memcpy( newdata, data, x->x_size*3 );
     
-    
-    // FEM UNA COPIA DEL PACKET A x->grey->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( x->image->imageData, data, x->x_size*3 );
     cvCvtColor(x->image, x->gray, CV_BGR2GRAY);
     
@@ -181,10 +179,7 @@ static void pdp_opencv_distrans_process_rgb(t_pdp_opencv_distrans *x)
         }
     }
     
-    //cvShowImage( wndname, dist8u );
-
     memcpy( newdata, x->dist8u->imageData, x->x_size*3 );
-
  
     return;
 }
