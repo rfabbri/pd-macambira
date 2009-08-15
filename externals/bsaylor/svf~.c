@@ -18,7 +18,7 @@
 #define F_R 3
 
 // Denormalise floats, only actually needed for PIII and very recent PowerPC
-#define FLUSH_TO_ZERO(fv) (((*(unsigned int*)&(fv))&0x7f800000)==0)?0.0f:(fv)
+//#define FLUSH_TO_ZERO(fv) (((*(unsigned int*)&(fv))&0x7f800000)==0)?0.0f:(fv)
 
 /* pd's samplerate */
 float fs;
@@ -56,8 +56,8 @@ static inline float run_svf(t_svf *sv, float in) {
         in = sv->qnrm * in ;
         for (i=0; i < F_R; i++) {
                 // only needed for pentium chips
-                in  = FLUSH_TO_ZERO(in);
-                sv->l = FLUSH_TO_ZERO(sv->l);
+	  in  = ((int)in & 0x7f800000)==0?0.0f:in;
+                sv->l = ((int)sv->l & 0x7f800000)==0?0.0f:sv->l;
                 // very slight waveshape for extra stability
                 sv->b = sv->b - sv->b * sv->b * sv->b * 0.001f;
 
