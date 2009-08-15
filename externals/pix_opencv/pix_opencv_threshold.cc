@@ -37,6 +37,7 @@ pix_opencv_threshold :: pix_opencv_threshold()
   comp_xsize  = 0;
   comp_ysize  = 0;
   orig = NULL;
+  rgb = NULL;
   gray = NULL;
 }
 
@@ -66,14 +67,16 @@ void pix_opencv_threshold :: processRGBAImage(imageStruct &image)
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-	cvReleaseImage(&orig);
-    	cvReleaseImage(&gray);
-    	cvReleaseImage(&rgb);
+        if ( orig )
+        {
+	  cvReleaseImage(&orig);
+    	  cvReleaseImage(&gray);
+    	  cvReleaseImage(&rgb);
+        }
 
 	//create the orig image with new size
         orig = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 4);
-
-    	// Create the output images with new sizes
+        rgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
     	gray = cvCreateImage(cvSize(orig->width,orig->height), IPL_DEPTH_8U, 1);
     }
     // Here we make a copy of the pixel data from image to orig->imageData
@@ -119,14 +122,16 @@ void pix_opencv_threshold :: processRGBImage(imageStruct &image)
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-	cvReleaseImage(&orig);
-    	cvReleaseImage(&gray);
-    	cvReleaseImage(&rgb);
+        if ( rgb )
+        {
+	  cvReleaseImage(&orig);
+    	  cvReleaseImage(&gray);
+    	  cvReleaseImage(&rgb);
+        }
 
 	//create the orig image with new size
+        orig = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 4);
         rgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
-
-    	// Create the output images with new sizes
     	gray = cvCreateImage(cvSize(rgb->width,rgb->height), IPL_DEPTH_8U, 1);
     
     }
@@ -174,11 +179,15 @@ void pix_opencv_threshold :: processGrayImage(imageStruct &image)
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-	cvReleaseImage(&orig);
-    	cvReleaseImage(&gray);
-    	cvReleaseImage(&rgb);
+        if ( rgb )
+        {
+	  cvReleaseImage(&orig);
+    	  cvReleaseImage(&gray);
+    	  cvReleaseImage(&rgb);
+        }
 
 	//create the orig image with new size
+        orig = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 4);
         rgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
     	gray = cvCreateImage(cvSize(rgb->width,rgb->height), IPL_DEPTH_8U, 1);
     
