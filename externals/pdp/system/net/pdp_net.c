@@ -564,7 +564,7 @@ void pdp_udp_sender_sleepperiod(t_pdp_udp_sender *x, unsigned int sleepperiod)
 void pdp_udp_sender_udp_packet_size(t_pdp_udp_sender *x, unsigned int udp_packet_size)
 {
     int i = (int)udp_packet_size - sizeof(t_pdp_udp_header);
-    if (i < 1024) i = 1024;
+    // if (i < 1024) i = 1024;
     if (i > PDP_UDP_BUFSIZE) i = PDP_UDP_BUFSIZE;
     x->x_udp_payload_size = i;
 }

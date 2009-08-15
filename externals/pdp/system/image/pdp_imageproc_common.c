@@ -41,7 +41,9 @@
 
 u32 pdp_imageproc_legalwidth(int i)
 {
-    if (i>1024) return 1024;
+    // sevy : we don't see no need for that limitation
+    // has been tested on linux with 1280x1024 without problems
+    // if (i>1024) return 1024;
     if (i>0) return  ((((i-1)>>3)+1)<<3);
     return 8;
     
@@ -49,13 +51,13 @@ u32 pdp_imageproc_legalwidth(int i)
 
 u32 pdp_imageproc_legalheight(int i)
 {
-    if (i>1024) return 1024;
+    // if (i>1024) return 1024;
     if (i>0) return  ((((i-1)>>3)+1)<<3);
     return 8;
 }
 u32 pdp_imageproc_legalwidth_round_down(int i)
 {
-    if (i>1024) return 1024;
+    // if (i>1024) return 1024;
     if (i>8) return  ((i>>3)<<3);
     return 8;
     
@@ -63,7 +65,7 @@ u32 pdp_imageproc_legalwidth_round_down(int i)
 
 u32 pdp_imageproc_legalheight_round_down(int i)
 {
-    if (i>1024) return 1024;
+    // if (i>1024) return 1024;
     if (i>8) return  ((i>>3)<<3);
     return 8;
 }
