@@ -62,9 +62,6 @@ typedef struct pdp_opencv_lk_struct
   int x_threshold;
   int x_xmark[MAX_MARKERS];
   int x_ymark[MAX_MARKERS];
-  uchar x_bmark[MAX_MARKERS];
-  uchar x_gmark[MAX_MARKERS];
-  uchar x_rmark[MAX_MARKERS];
   int x_found[MAX_MARKERS];
 
   // The output and temporary images
@@ -179,17 +176,6 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
     }
     else if( x->count > 0 )
     {
-        // update point markers colors
-        for ( im=0; im<MAX_MARKERS; im++ )
-        {
-          if ( x->x_xmark[im] != -1 )
-          {
-             x->x_rmark[im] = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_ymark[im]))[x->x_xmark[im]*3];
-             x->x_gmark[im] = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_ymark[im]))[x->x_xmark[im]*3+1];
-             x->x_bmark[im] = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_ymark[im]))[x->x_xmark[im]*3+2];
-          }
-        }
-
         cvCalcOpticalFlowPyrLK( x->prev_grey, x->grey, x->prev_pyramid, x->pyramid,
               x->points[0], x->points[1], x->count, cvSize(x->win_size,x->win_size), 3, x->status, 0,
               cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03), x->flags );
@@ -221,14 +207,14 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
             // only add points included in (color-threshold)<p<(color+treshold)
             if ( ( x->x_delaunay > 0 ) && ( x->x_xmark[x->x_delaunay-1] != -1 ) ) 
             {
-               int px = cvPointFrom32f(x->points[1][i]).x-1;
-               int py = cvPointFrom32f(x->points[1][i]).y-1;
+               int px = cvPointFrom32f(x->points[1][i]).x;
+               int py = cvPointFrom32f(x->points[1][i]).y;
                int ppx, ppy;
 
                // eight connected pixels 
-               for ( ppx=px; ppx<=px+2; ppx++ )
+               for ( ppx=px-1; ppx<=px+1; ppx++ )
                { 
-                 for ( ppy=py; ppy<=py+2; ppy++ )
+                 for ( ppy=py-1; ppy<=py+1; ppy++ )
                  { 
                    if ( ( ppx < 0 ) || ( ppx >= x->x_width ) ) continue;
                    if ( ( ppy < 0 ) || ( ppy >= x->x_height ) ) continue;
@@ -237,9 +223,13 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
                    uchar green = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*ppx))[ppy*3+1];
                    uchar blue = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*ppx))[ppy*3+2];
 
-                   int diff = abs(red-x->x_rmark[x->x_delaunay-1]) + abs(green-x->x_gmark[x->x_delaunay-1]) + abs(blue-x->x_bmark[x->x_delaunay-1]);
+                   uchar pred = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_xmark[x->x_delaunay-1]))[x->x_ymark[x->x_delaunay-1]*3];
+                   uchar pgreen = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_xmark[x->x_delaunay-1]))[x->x_ymark[x->x_delaunay-1]*3+1];
+                   uchar pblue = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_xmark[x->x_delaunay-1]))[x->x_ymark[x->x_delaunay-1]*3+2];
 
-                   post( "pdp_opencv_lk : point (%d,%d,%d) : diff : %d", blue, green, red, diff );
+                   int diff = abs(red-pred) + abs(green-pgreen) + abs(blue-pblue);
+
+                   // post( "pdp_opencv_lk : point (%d,%d,%d) : diff : %d", blue, green, red, diff );
 
                    if ( diff < x->x_threshold )
                    {
@@ -447,7 +437,6 @@ static void pdp_opencv_lk_mark(t_pdp_opencv_lk *x, t_floatarg fperx, t_floatarg 
        {
           x->x_xmark[i] = px;
           x->x_ymark[i] = py;
-          // post( "pdp_opencv_lk : inserted point %d : (%d,%d,%d)", i, x->x_rmark[i], x->x_gmark[i], x->x_bmark[i] );
           inserted = 1;
           break;
        }
