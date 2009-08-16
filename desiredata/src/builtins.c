@@ -2854,7 +2854,7 @@ extern t_printhook sys_printhook;
 void unpost_printhook (const char *s) {
     std::ostringstream &b = current_unpost->buf;
     b << s;
-    char *p;
+    const char *p;
     const char *d=b.str().data(),*dd=d;
     for (;;) {
         p = strchr(d,'\n');

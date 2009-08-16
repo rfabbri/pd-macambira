@@ -1381,7 +1381,7 @@ void class_settip(t_class *x,t_symbol* s) {x->firsttip = s;}
 void class_setfieldnames(t_class *x, const char *s) {
     char foo[64];
     while (*s) {
-	char *t = strchr(s,' ');
+	const char *t = strchr(s,' ');
 	int i = t-s;
 	if (!t) return;
 	memcpy(foo,s,i);
