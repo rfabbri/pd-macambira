@@ -439,7 +439,7 @@ array as the array to be edited by clicking on:;
 #X msg 286 272 symbol array2;
 #X text 15 71 2 - Bang "Calculate";
 #X text 16 378 - ascending line;
-#N canvas 232 298 502 309 panning-curves 0;
+#N canvas 232 298 502 383 panning-curves 0;
 #X obj 380 12 switch~ 0;
 #X text 17 138 - simple (triangular);
 #X text 12 19 Panning curves;
@@ -457,7 +457,12 @@ final value is as close as possible.;
 #X text 11 40 These curves are for the left side. To get the right
 side value \, just read the table at the mirror point: [arraysize]-[index]-1.
 ;
-#X text 17 268 Formulas taken from Csound Ezine/Jamie Bullock.;
+#X text 17 328 Formulas taken from Csound Ezine/Jamie Bullock \, Georg
+Holzmann.;
+#X obj 149 265 expr~ (cos($v1)-sin($v1))*(sqrt(2)/2);
+#X obj 149 245 expr~ ($v1*3.14159/2)-3.14159/4;
+#X text 16 245 - tangent law;
+#X connect 14 0 13 0;
 #X restore 23 478 pd panning-curves;
 #N canvas 148 141 450 259 trigonometry/windowing 0;
 #X text 17 48 - sine wave;
@@ -711,7 +716,7 @@ array as the array to be edited by clicking on:;
 10 -228856 -1 -1;
 #X text 32 576 Draw a wave shape through break points;
 #X text 32 619 Define a wave shape through its function;
-#X obj 12 549 cnv 15 90 20 empty empty Other.tools 5 11 0 12 -191407
+#X obj 12 549 cnv 15 100 20 empty empty Ploting.tools 5 11 0 12 -191407
 -33289 0;
 #X text 94 685 (where everything works);
 #X text 12 474 You can copy the commands and paste them in your patch:
