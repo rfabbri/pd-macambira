@@ -44,6 +44,7 @@
 #define __DESIRE_H
 
 #include "m_pd.h"
+#include <stdio.h>
 
 #if defined(_LANGUAGE_C_PLUS_PLUS) || defined(__cplusplus)
 extern "C" {
