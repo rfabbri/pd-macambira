@@ -28,12 +28,6 @@ package require Tcl 8.5
 package require Tk 8.5
 package require Tktable 2.9
 
-if {1 || ![info exists pd] && [info exists netsend]} {
-    set ::sendgui "netsend"
-} else {
-    set ::sendgui "pd"
-}
-
 namespace eval pd::composer {
     variable debug
     variable w
@@ -59,6 +53,14 @@ namespace eval pd::composer {
         if {$debug} {puts stderr "composer-TCL: $args"}
     }
 
+    proc sendGui {what} {
+        debugPrint "sendGui $what"
+        catch {netsend $what}
+        lappend what \;\n
+        catch {pdsend $what}
+        catch {pd {*}$what}
+    }
+
     proc createPattern {id name len} {
         debugPrint [info level 0]
         variable length
@@ -72,7 +74,7 @@ namespace eval pd::composer {
             return -code error "Length must be positive integer"
         }
 
-        $::sendgui [concat $id EDIT addpattern $name $len \;]
+        sendGui [concat $id EDIT addpattern $name $len]
         #lappend patterns($id) $name
         #dict set length($id) $name $len
         #$w($id).f.p configure -values $patterns($id)
@@ -83,7 +85,7 @@ namespace eval pd::composer {
         variable length;
         variable patterns;
 
-        $::sendgui [concat $id EDIT removepattern $name \;]
+        sendGui [concat $id EDIT removepattern $name]
 
         #set oldidx [lsearch -exact $patterns($id) $name]
         #set length($id) [dict remove $length($id) $name]
@@ -99,7 +101,7 @@ namespace eval pd::composer {
         #upvar 0 $::datavar($w)_$src SRC
         #upvar 0 $::datavar($w)_$dst DST
 
-        $::sendgui [concat $id EDIT copypattern $src $dst \;]
+        sendGui [concat $id EDIT copypattern $src $dst]
 
         #createPattern $w $dst [dict get $length($id) $src]
         #array set DST [array get SRC]
@@ -117,7 +119,7 @@ namespace eval pd::composer {
             return -code error "Length must pe positive integer"
         }
 
-        $::sendgui [concat $id EDIT resizepattern $name $len \;]
+        sendGui [concat $id EDIT resizepattern $name $len]
 
         #dict set length($id) $name $len
         #if {$name == $currentpattern($id)} {
@@ -142,7 +144,7 @@ namespace eval pd::composer {
             return -code error "No such pattern: '$name'"
         }
 
-        $::sendgui [concat $id EDIT renamepattern $name $newName \;]
+        sendGui [concat $id EDIT renamepattern $name $newName]
 
         #lset patterns($id) $idx $newName
         #array set DST [array get SRC]
@@ -166,7 +168,7 @@ namespace eval pd::composer {
 
     proc displayPattern {id name} {
         debugPrint "request-pattern-length"
-        $::sendgui [concat $id EDIT getpatternlength $name \;]
+        sendGui [concat $id EDIT getpatternlength $name]
     }
 
     proc displayPattern_async {id name} {
@@ -212,7 +214,7 @@ namespace eval pd::composer {
     }
 
     proc rowTag {id r} {
-        debugPrint [info level 0]
+        #debugPrint [info level 0]
         if {$r % $::div1 == 0} {return "alt0"}
         if {$r % $::div2 == 0} {return "alt1"}
     }
@@ -228,7 +230,7 @@ namespace eval pd::composer {
     proc edit {id r c bwrite value} {
         # NOT USED
         #if {$bwrite} {
-        #    $::sendgui [concat $id EDIT setcell $currentpattern($id) $r $c $value \;]
+        #    sendGui [concat $id EDIT setcell $currentpattern($id) $r $c $value]
         #} else {
         #}
     }
@@ -284,7 +286,7 @@ namespace eval pd::composer {
         #$w($id).f.p configure -values $patterns($id)
 
         debugPrint "request-patterns"
-        $::sendgui [concat $id EDIT getpatterns \;]
+        sendGui [concat $id EDIT getpatterns]
 
         debugPrint "bindevent"
         bind $w($id).f.p <<ComboboxSelected>> "[namespace current]::displayCurrentPattern $id"
@@ -337,7 +339,7 @@ namespace eval pd::composer {
 
         debugPrint "wm"
         wm minsize $w($id) 300 150
-        wm protocol $w($id) WM_DELETE_WINDOW "$::sendgui $id EDIT editor-close \\;"
+        wm protocol $w($id) WM_DELETE_WINDOW "[namespace current]::sendGui {$id EDIT editor-close}"
 
         debugPrint "menu"
         menu $w($id).m -tearoff 0
@@ -392,7 +394,7 @@ namespace eval pd::composer {
         debugPrint [info level 0]
         variable currentpattern
 
-        $::sendgui [concat $id EDIT setcell $currentpattern($id) $row $col $newVal \;]
+        sendGui [concat $id EDIT setcell $currentpattern($id) $row $col $newVal]
 
         return 1
     }
@@ -529,6 +531,11 @@ namespace eval pd::composer {
         destroy $w($id)
     }
 
+    proc setCellValueUI {id pat r c v} {
+        upvar 0 [getDataVar $id $pat] data
+        set data($r,$c) [string map {empty {}} $v]
+    }
+
     proc dispatch {id args} {
         debugPrint [info level 0]
         variable w
@@ -554,7 +561,7 @@ namespace eval pd::composer {
                 if {![dict exists $length($id) $pat_name] || [dict get $length($id) $pat_name] != $pat_length} {
                     dict set length($id) $pat_name $pat_length
                     for {set i 0} {$i < $pat_length} {incr i} {
-                        $::sendgui [concat $id EDIT getrow $pat_name $i \;]
+                        sendGui [concat $id EDIT getrow $pat_name $i]
                     }
                 }
                 displayPattern_async $id $pat_name
@@ -568,12 +575,9 @@ namespace eval pd::composer {
                 }
                 set row [lrange $args 3 end]
                 debugPrint "got row: '$pat_name' ($row_num) {$row}"
-                debugPrint "dataVar = [getDataVar $id $pat_name]"
-                upvar 0 [getDataVar $id $pat_name] data
-                set data($row_num,-1) [expr {1+$row_num}]
+                setCellValueUI $id $pat_name $row_num -1 [expr {1+$row_num}]
                 for {set i 0} {$i < [llength $row]} {incr i} {
-                    debugPrint "set data($row_num,$i) [lindex $row $i]"
-                    set data($row_num,$i) [lindex $row $i]
+                    setCellValueUI $id $pat_name $row_num $i [lindex $row $i]
                 }
                 if {$row_num + 1 == [dict get $length($id) $pat_name]} {
                     #refreshGrid $id
@@ -591,8 +595,7 @@ namespace eval pd::composer {
                 set cell [lindex $args 4]
                 debugPrint "got cell: '$pat_name' ($row_num,$col_num) {$cell}"
                 debugPrint "dataVar = [getDataVar $id $pat_name]"
-                upvar 0 [getDataVar $id $pat_name] data
-                set data($row_num,$col_num) $cell
+                setCellValueUI $id $pat_name $row_num $col_num $cell
             }
         }
     }

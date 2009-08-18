@@ -56,6 +56,7 @@
 #define SONG_SELECTOR "#SONG"
 
 extern t_symbol s_list;
+extern t_symbol s_empty;
 
 struct _track;
 struct _pattern;

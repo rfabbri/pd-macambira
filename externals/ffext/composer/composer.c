@@ -35,10 +35,10 @@
 ArrayListDeclare(songs, t_song*, int);
 
 t_symbol s_list = {"list", 0, 0};
+t_symbol s_empty = {"empty", 0, 0};
 
 void composer_setup(void) {
     debugprint("loading composer library for pd");
-/* #include "window.tk2c" */
     sys_vgui("source {window.tk}\n");
     song_proxy_setup();
     track_proxy_setup();

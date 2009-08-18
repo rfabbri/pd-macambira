@@ -156,6 +156,7 @@ static void track_proxy_save(t_gobj* z, t_binbuf* b) {
                 switch(pat->x_rows[j][k].a_type) {
                 case A_FLOAT: binbuf_addv(b, "i", pat->x_rows[j][k].a_w.w_float); break;
                 case A_SYMBOL: binbuf_addv(b, "s", pat->x_rows[j][k].a_w.w_symbol); break;
+                case A_NULL: binbuf_addv(b, "s", gensym("empty")); break;
                 default: binbuf_addv(b, "s", gensym("?")); break;
                 }
             }
@@ -297,9 +298,6 @@ static void track_proxy_editcmd(t_track_proxy* x, t_symbol* s_, int argc, t_atom
     } else if(s == gensym("addpattern")) {
         p = track_proxy_addpattern(x, s1, f2);
         if(p) {
-            debugprint("BAMBOLOOOOOO");
-            //for(i = 0; i < p->x_rows_count; i++)
-            //    track_proxy_sendgui(x, gensym("row"), x->x_track->x_ncolumns + 2, track_proxy_getrow_with_header(x, p->x_name, i));
             track_proxy_sendgui_pattern_names(x);
         }
     } else if(s == gensym("removepattern")) {
@@ -320,8 +318,6 @@ static void track_proxy_editcmd(t_track_proxy* x, t_symbol* s_, int argc, t_atom
     } else if(s == gensym("copypattern")) {
         p = track_proxy_copypattern(x, s1, s2);
         if(p) {
-            //for(i = 0; i < p->x_rows_count; i++)
-            //    track_proxy_sendgui(x, gensym("row"), x->x_track->x_ncolumns + 2, track_proxy_getrow_with_header(x, p->x_name, i));
             track_proxy_sendgui_pattern_names(x);
         }
     } else {
@@ -354,9 +350,11 @@ static void track_proxy_sendgui(t_track_proxy* x, t_symbol* s, int argc, t_atom*
         }
     }
     if(strlen(buf) >= bufsz) {
+        debugprint("track: sendgui: message too long");
         bug("track: sendgui: message too long");
         return;
     }
+    debugprint("pd::composer::dispatch %s %s", x->rcv->s_name, buf);
     sys_vgui("pd::composer::dispatch %s %s\n", x->rcv->s_name, buf);
 }
 
