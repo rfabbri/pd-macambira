@@ -50,6 +50,10 @@ typedef struct pdp_shape_struct
     int x_cursX;
     int x_cursY;
     
+    float x_meanX;
+    float x_meanY;
+    int x_nbpts;
+    
     int x_colorY; // YUV components of selected color
     int x_colorU;
     int x_colorV;
@@ -324,6 +328,9 @@ static void pdp_shape_do_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
        *(pbbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
           (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
      }
+     x->x_meanX = ( x->x_nbpts*x->x_meanX + nX )/(x->x_nbpts+1);
+     x->x_meanY = ( x->x_nbpts*x->x_meanY + nY )/(x->x_nbpts+1);
+     x->x_nbpts++;
   }
 
   nX = (int) X+1; 
@@ -470,8 +477,23 @@ static void pdp_shape_process_yv12(t_pdp_shape *x)
       memset( x->x_bbdata, 0x0, (x->x_vsize+(x->x_vsize>>1))<<1 );
     }
 
+    x->x_nbpts = 0;
+    x->x_meanX = 0;
+    x->x_meanY = 0;
     if ( x->x_cursX != -1 ) pdp_shape_frame_detect( x, x->x_cursX, x->x_cursY );
+    // post( "pdp_shape : mean : %f,%f : nbpoints : %d", x->x_meanX, x->x_meanY, x->x_nbpts );
   
+    if ( x->x_nbpts > 0 )
+    {
+      if ( ( x->x_meanX >= 0 ) && ( x->x_meanX < x->x_vwidth )
+        && ( x->x_meanY >= 0 ) && ( x->x_meanY < x->x_vheight ) 
+        && pdp_shape_check_point(x, x->x_meanX, x->x_meanY) )
+      {
+        x->x_cursX = (int)x->x_meanX;
+        x->x_cursY = (int)x->x_meanY;
+      }
+    }
+
     // paint cursor in red for debug purpose
     if ( ( x->x_cursX != -1 ) && ( x->x_shape ) )
     {
@@ -605,7 +627,6 @@ void pdp_shape_setup(void)
 //    post( pdp_shape_version );
     pdp_shape_class = class_new(gensym("pdp_shape"), (t_newmethod)pdp_shape_new,
     	(t_method)pdp_shape_free, sizeof(t_pdp_shape), 0, A_NULL);
-
 
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_pick, gensym("pick"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
