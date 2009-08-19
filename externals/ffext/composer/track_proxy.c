@@ -28,6 +28,11 @@
 
 t_class* track_proxy_class;
 
+static t_atom response_pattern_length[2];
+static t_atom response_cell[4];
+static t_atom* response_row; // TODO: memory leaks check
+static size_t response_row_sz;
+
 void track_proxy_setup(void) {
     debugprint("registering 'track' class...");
     ArrayListInit(songs, t_song*, 10);
@@ -106,13 +111,17 @@ static void track_proxy_free(t_track_proxy* x) {
     pd_unbind(&x->x_obj.ob_pd, x->rcv);
 }
 
-static void track_proxy_sendgui_pattern_names(t_track_proxy* x) {
-    debugprint("track_proxy_sendgui_pattern_names(" PTR ")", x);
+static t_atom* track_proxy_get_pattern_names(t_track_proxy* x) {
     t_int n = track_get_pattern_count(x->x_track);
-    t_atom* a = (t_atom*)getbytes(sizeof(t_atom)*n);
-    track_get_pattern_names(x->x_track, a);
-    track_proxy_sendgui(x, gensym("patterns"), n, a);
-    freebytes(a, sizeof(t_atom)*n);
+    if(response_row) {
+        freebytes(response_row, response_row_sz);
+        response_row = NULL;
+        response_row_sz = 0;
+    }
+    response_row_sz = sizeof(t_atom) * n;
+    response_row = (t_atom*)getbytes(response_row_sz);
+    track_get_pattern_names(x->x_track, response_row);
+    return response_row;
 }
 
 static void track_proxy_reload(t_track_proxy* x) {
@@ -143,30 +152,7 @@ static void track_proxy_save(t_gobj* z, t_binbuf* b) {
         (t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
         gensym("track"), t->x_song->x_name, t->x_name, t->x_ncolumns);
 
-    // data format:
-    // TRACK_SELECTOR DATA <song_name> <track_name> <npatterns> [<pat_name> <pat rows> RxC_atoms]*n
-
-    binbuf_addv(b, "ssssi", gensym(TRACK_SELECTOR), gensym("DATA"),
-            t->x_song->x_name, t->x_name, t->x_patterns_count);
-
-    int i,j,k;
-    for(i = 0; i < t->x_patterns_count; i++) {
-        t_pattern* pat = t->x_patterns[i];
-        binbuf_addv(b, "si", pat->x_name, pat->x_rows_count);
-        for(j = 0; j < pat->x_rows_count; j++) {
-            for(k = 0; k < t->x_ncolumns; k++) {
-                switch(pat->x_rows[j][k].a_type) {
-                case A_FLOAT: binbuf_addv(b, "f", pat->x_rows[j][k].a_w.w_float); break;
-                case A_SYMBOL: binbuf_addv(b, "s", pat->x_rows[j][k].a_w.w_symbol); break;
-                case A_NULL: binbuf_addv(b, "s", gensym("empty")); break;
-                default: binbuf_addv(b, "s", gensym("unknown")); break;
-                }
-            }
-            //binbuf_add(b, t->x_ncolumns, &pat->x_rows[j]);
-        }
-    }
-
-    binbuf_addv(b, ";");
+    track_binbuf_save(t, gensym(TRACK_SELECTOR), b);
 }
 
 static void track_proxy_sendrow(t_track_proxy* x, t_pattern* pat, t_int row) {
@@ -177,7 +163,7 @@ static void track_proxy_sendrow(t_track_proxy* x, t_pattern* pat, t_int row) {
 }
 
 static void track_proxy_anything(t_track_proxy* x, t_symbol* s, int argc, t_atom* argv) {
-    debugprint("track_proxy_anything(" PTR ", %s, %d, " PTR ")", s, s->s_name, argc, argv);
+    debugprint("track_proxy_anything(" PTR ", %s, %d, " PTR ")", x, s->s_name, argc, argv);
 
     if(s == gensym("DATA")) {
         track_proxy_loaddata(x, s, argc, argv);
@@ -192,90 +178,18 @@ static void track_proxy_anything(t_track_proxy* x, t_symbol* s, int argc, t_atom
 }
 
 static void track_proxy_loaddata(t_track_proxy* x, t_symbol* s, int argc, t_atom* argv) {
-    int i,base;
-    base = 0;
-
-    if(argc < (base+2) || argv[base].a_type != A_SYMBOL || argv[base+1].a_type != A_SYMBOL) {
-        error("track: data format error 1");
-        return;
-    }
-    t_symbol* song_name = argv[base+0].a_w.w_symbol;
-    t_symbol* track_name = argv[base+1].a_w.w_symbol;
-    base += 2;
-
-    if(x->x_track->x_song->x_name != song_name) {
-        debugprint("WARNING: discarding data from another song: %s", song_name->s_name);
-        return;
-    }
-
-    if(x->x_track->x_name != track_name) {
-        debugprint("WARNING: discarding data from another track: %s", track_name->s_name);
-        return;
-    }
-
-    if(argc < (base+1) || argv[base].a_type != A_FLOAT) {
-        error("track: data format error 2");
-        return;
-    }
-    t_int npatterns = (t_int)argv[base].a_w.w_float;
-    base += 1;
-
-    debugprint("track: %s-%s: %d patterns to read", song_name->s_name, track_name->s_name, npatterns);
-
-    t_symbol* patname;
-    t_int patrows;
-    t_pattern* pat;
-
-    debugprint("track_proxy_loaddata(" PTR ", %s, %d, " PTR ")", x, s->s_name, argc, argv);
-    for(i = 0; i < npatterns; i++) {
-        debugprint("reading pattern %d...", i);
-        if(argc < (base + 2)) {
-            error("track: data format error 3 (i=%d)", i);
-            return;
-        }
-        if(argv[base+0].a_type != A_SYMBOL || argv[base+1].a_type != A_FLOAT) {
-            error("track: data format error 4 (i=%d)", i);
-            return;
-        }
-        patname = argv[base+0].a_w.w_symbol;
-        patrows = (t_int)argv[base+1].a_w.w_float;
-        debugprint("pattern %d: %s-%s-%s, length=%d, RxC=%d", i,
-                song_name->s_name, track_name->s_name, patname->s_name,
-                patrows, patrows * x->x_track->x_ncolumns);
-        base += 2;
-        if(argc >= (base + patrows * x->x_track->x_ncolumns) && patrows > 0) {
-            pat = pattern_new(x->x_track, patname, patrows);
-            debugprint("created new pattern " PTR " ('%s', %d rows) for track " PTR, pat, patname->s_name, patrows, x->x_track);
-            int j,h,k;
-            for(h = 0, j = base; j < (base + patrows * x->x_track->x_ncolumns); j += x->x_track->x_ncolumns, h++) {
-                debugprint("  working on row %d", h);
-                for(k = 0; k < x->x_track->x_ncolumns; k++) {
-                    pattern_setcell(pat, h, k, &argv[j+k]);
-                }
-            }
-            base += patrows * x->x_track->x_ncolumns;
-        } else {
-            error("track: data format error 8 (i=%d)", i);
-            return;
-        }
-    }
+    track_loaddata(x->x_track, argc, argv);
 }
 
 static t_atom* track_proxy_getpatternlength(t_track_proxy* x, t_symbol* pat_name) {
-    /*if(argc < 1 || argv[0].a_type != A_SYMBOL) {
-        error("track: getpatternlength: usage: getpatternlength <pattern_name>");
-        return NULL;
-    }
-    t_symbol* pat_name = argv[0].a_w.w_symbol;*/
     ArrayListGetByName(x->x_track->x_patterns, pat_name, t_pattern*, pat);
     if(!pat) {
         error("track: getpatternlength: no such pattern: '%s'", pat_name->s_name);
         return NULL;
     }
-    t_atom* pl = (t_atom*)getbytes(sizeof(t_atom) * 2);
-    SETSYMBOL(&pl[0], pat->x_name);
-    SETFLOAT(&pl[1], pat->x_rows_count);
-    return pl;
+    SETSYMBOL(&response_pattern_length[0], pat->x_name);
+    SETFLOAT(&response_pattern_length[1], pat->x_rows_count);
+    return &response_pattern_length[0];
 }
 
 static void track_proxy_editcmd(t_track_proxy* x, t_symbol* s_, int argc, t_atom* argv_) {
@@ -306,11 +220,13 @@ static void track_proxy_editcmd(t_track_proxy* x, t_symbol* s_, int argc, t_atom
     } else if(s == gensym("editor-close")) {
         track_proxy_properties_close((t_gobj*) x, NULL);
     } else if(s == gensym("getpatterns")) {
-        track_proxy_sendgui_pattern_names(x);
+        t_atom* rsp = track_proxy_get_pattern_names(x);
+        track_proxy_sendgui(x, gensym("patterns"), response_row_sz, rsp);
     } else if(s == gensym("getpatternlength")) {
         track_proxy_sendgui(x, gensym("patternlength"), 2, track_proxy_getpatternlength(x, s1));
     } else if(s == gensym("getrow")) {
-        track_proxy_sendgui(x, gensym("row"), x->x_track->x_ncolumns + 2, track_proxy_getrow_with_header(x, s1, f2));
+        t_atom* rsp = track_proxy_getrow_with_header(x, s1, f2);
+        track_proxy_sendgui(x, gensym("row"), response_row_sz, rsp);
     } else if(s == gensym("setrow")) {
         track_proxy_setrow(x, s, argc, argv);
     } else if(s == gensym("getcell")) {
@@ -320,12 +236,14 @@ static void track_proxy_editcmd(t_track_proxy* x, t_symbol* s_, int argc, t_atom
     } else if(s == gensym("addpattern")) {
         p = track_proxy_addpattern(x, s1, f2);
         if(p) {
-            track_proxy_sendgui_pattern_names(x);
+            t_atom* rsp = track_proxy_get_pattern_names(x);
+            track_proxy_sendgui(x, gensym("patterns"), response_row_sz, rsp);
         }
     } else if(s == gensym("removepattern")) {
         j = track_proxy_removepattern(x, s1);
         if(j) {
-            track_proxy_sendgui_pattern_names(x);
+            t_atom* rsp = track_proxy_get_pattern_names(x);
+            track_proxy_sendgui(x, gensym("patterns"), response_row_sz, rsp);
         }
     } else if(s == gensym("resizepattern")) {
         p = track_proxy_resizepattern(x, s1, f2);
@@ -335,12 +253,14 @@ static void track_proxy_editcmd(t_track_proxy* x, t_symbol* s_, int argc, t_atom
     } else if(s == gensym("renamepattern")) {
         p = track_proxy_renamepattern(x, s1, s2);
         if(p) {
-            track_proxy_sendgui_pattern_names(x);
+            t_atom* rsp = track_proxy_get_pattern_names(x);
+            track_proxy_sendgui(x, gensym("patterns"), response_row_sz, rsp);
         }
     } else if(s == gensym("copypattern")) {
         p = track_proxy_copypattern(x, s1, s2);
         if(p) {
-            track_proxy_sendgui_pattern_names(x);
+            t_atom* rsp = track_proxy_get_pattern_names(x);
+            track_proxy_sendgui(x, gensym("patterns"), response_row_sz, rsp);
         }
     } else {
         error("track: editcmd: unknown command: %s", s->s_name);
@@ -348,34 +268,9 @@ static void track_proxy_editcmd(t_track_proxy* x, t_symbol* s_, int argc, t_atom
 }
 
 static void track_proxy_sendgui(t_track_proxy* x, t_symbol* s, int argc, t_atom* argv) {
-    static const unsigned int tmpsz = 80;
     static const unsigned int bufsz = 8*MAXPDSTRING;
-    char* tmp;
     char buf[bufsz];
-    int i,j;
-    buf[0] = '\0';
-    strncat(buf, s->s_name, bufsz);
-    strncat(buf, " ", bufsz);
-    for(i = 0; i < argc; i++) {
-        if(i > 0) strncat(buf, " ", bufsz);
-        if(argv[i].a_type == A_FLOAT) {
-            tmp = (char*)getbytes(tmpsz*sizeof(char));
-            if(argv[i].a_w.w_float == (t_float)(t_int)argv[i].a_w.w_float)
-                sprintf(tmp, "%ld", (t_int)argv[i].a_w.w_float);
-            else
-                sprintf(tmp, "%f", argv[i].a_w.w_float);
-            strncat(buf, tmp, bufsz);
-        } else if(argv[i].a_type == A_SYMBOL) {
-            strncat(buf, argv[i].a_w.w_symbol->s_name, bufsz);
-        } else {
-            strncat(buf, "null", bufsz);
-        }
-    }
-    if(strlen(buf) >= bufsz) {
-        debugprint("track: sendgui: message too long");
-        bug("track: sendgui: message too long");
-        return;
-    }
+    list_snconvf(buf, bufsz, s, argc, argv);
     debugprint("pd::composer::dispatch %s %s", x->rcv->s_name, buf);
     sys_vgui("pd::composer::dispatch %s %s\n", x->rcv->s_name, buf);
 }
@@ -425,16 +320,23 @@ static t_atom* track_proxy_getrow(t_track_proxy* x, t_symbol* pat_name, t_floata
 }
 
 static t_atom* track_proxy_getrow_with_header(t_track_proxy* x, t_symbol* pat_name, t_floatarg rownum) {
+    if(response_row) {
+        freebytes(response_row, response_row_sz);
+        response_row = NULL;
+        response_row_sz = 0;
+    }
+
     t_atom* row = track_proxy_getrow(x, pat_name, rownum);
     if(!row) {
         error("track: getrow: nu such patern: '%s'", pat_name->s_name);
         return NULL;
     }
-    t_atom* row_with_hdr = (t_atom*)getbytes(sizeof(t_atom) * (x->x_track->x_ncolumns + 2));
-    SETSYMBOL(&row_with_hdr[0], pat_name);
-    SETFLOAT(&row_with_hdr[1], rownum);
-    memcpy(&row_with_hdr[2], row, sizeof(t_atom) * x->x_track->x_ncolumns);
-    return row_with_hdr;
+    response_row_sz = sizeof(t_atom) * (x->x_track->x_ncolumns + 2);
+    t_atom* response_row = (t_atom*)getbytes(response_row_sz);
+    SETSYMBOL(&response_row[0], pat_name);
+    SETFLOAT(&response_row[1], rownum);
+    memcpy(&response_row[2], row, sizeof(t_atom) * x->x_track->x_ncolumns);
+    return &response_row[0];
 }
 
 static void track_proxy_getrow_o(t_track_proxy* x, t_symbol* pat_name, t_floatarg rownum) {
@@ -475,12 +377,11 @@ static t_atom* track_proxy_getcell_with_header(t_track_proxy* x, t_symbol* pat_n
         error("track: getcell: nu such patern: '%s'", pat_name->s_name);
         return NULL;
     }
-    t_atom* row_with_hdr = (t_atom*)getbytes(sizeof(t_atom) * 4);
-    SETSYMBOL(&row_with_hdr[0], pat_name);
-    SETFLOAT(&row_with_hdr[1], rownum);
-    SETFLOAT(&row_with_hdr[2], colnum);
-    memcpy(&row_with_hdr[3], cell, sizeof(t_atom));
-    return row_with_hdr;
+    SETSYMBOL(&response_cell[0], pat_name);
+    SETFLOAT(&response_cell[1], rownum);
+    SETFLOAT(&response_cell[2], colnum);
+    memcpy(&response_cell[3], cell, sizeof(t_atom));
+    return &response_cell[0];
 }
 
 static void track_proxy_getcell_o(t_track_proxy* x, t_symbol* pat_name, t_floatarg rownum, t_floatarg colnum) {

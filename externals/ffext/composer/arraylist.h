@@ -3,7 +3,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL */
 /* WARRANTIES, see the file, "LICENSE.txt," in this distribution.           */
 /*                                                                          */
-/* composer: a music composition framework for pure-data                    */
+/* arraylist.h: macro library for dynamic arrays                            */
 /*                                                                          */
 /* This program is free software; you can redistribute it and/or            */
 /* modify it under the terms of the GNU General Public License              */
@@ -21,7 +21,6 @@
 /* along with this program; if not, write to the Free Software Foundation,  */
 /* Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.          */
 /*                                                                          */
-/* Based on PureData by Miller Puckette and others.                         */
 /* ------------------------------------------------------------------------ */
 
 #include "common.h"
@@ -41,7 +40,8 @@
 
 #define ArrayListInit(arrName, type, initSize) \
     arrName ## _maxsize = initSize; \
-    arrName = (type*)getbytes(sizeof(type) * (initSize)); \
+    if(initSize > 0) arrName = (type*)getbytes(sizeof(type) * (initSize)); \
+    else arrName = NULL; \
     arrName ## _count = 0
 
 #define ArrayListAdd(arrName, type, objToAdd) \

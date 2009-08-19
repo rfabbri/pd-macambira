@@ -28,20 +28,33 @@
 
 static t_song* song_new(t_symbol* song_name) {
     ArrayListGetByName(songs, song_name, t_song*, obj);
-    debugprint("song_new - object lookup {{%s}} => " PTR, song_name->s_name, obj);
+    debugprint("song_new - object lookup %s => " PTR, song_name->s_name, obj);
     if(obj) return obj;
 
     t_song* x = (t_song*)getbytes(sizeof(t_song));
     x->x_name = song_name;
-    ArrayListInit(x->x_tracks, struct _track*, 16); 
+    ArrayListInit(x->x_tracks, struct _track*, 16);
+    // mastertrack is named like the song
+    x->x_mastertrack = mastertrack_new(x, x->x_name, 0);
 
     debugprint("created a song object (" PTR "), "
-        "creation args: {{%s}}",
+        "creation args: %s",
         x, x->x_name->s_name);
 
     ArrayListAdd(songs, t_song*, x);
     debugprint("registered song object to global song collection");
     return x;
+}
+
+static void song_mastertrack_fix_cols(t_song* x) {
+    debugprint("song_mastertrack_fix_cols(" PTR "), new track count: %d", x, x->x_tracks_count);
+    debugprint("song='%s' mastertrack=" PTR, x->x_name->s_name, x->x_mastertrack);
+    debugprint("we have %d patterns, sir", x->x_mastertrack->x_patterns_count);
+    int j;
+    for(j = 0; j < x->x_mastertrack->x_patterns_count; j++) {
+        if(j > 0) post("WARNING: mastertrack with more than one pattern!");
+        pattern_resize_cols(x->x_mastertrack->x_patterns[j], x->x_tracks_count);
+    }
 }
 
 static void song_free(t_song* x) {

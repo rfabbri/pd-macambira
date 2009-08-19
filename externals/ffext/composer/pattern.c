@@ -28,7 +28,7 @@
 
 static t_pattern* pattern_new(t_track* track, t_symbol* name, t_int rows) {
     ArrayListGetByName(track->x_patterns, name, t_pattern*, obj);
-    debugprint("pattern_new - object lookup {{%s}} => " PTR, name->s_name, obj);
+    debugprint("pattern_new - object lookup %s => " PTR, name->s_name, obj);
     if(obj) return obj;
 
     t_pattern* x = (t_pattern*)getbytes(sizeof(t_pattern));
@@ -84,6 +84,20 @@ static void pattern_resize(t_pattern *x, t_int newsize) {
     while(x->x_rows_count > newsize)
         ArrayListRemoveByIndex(x->x_rows, x->x_rows_count - 1);
     debugprint("final size: %d", x->x_rows_count);
+}
+
+/* WARNING: do not call this for track with more than 1 pattern!
+ *          Works only for the mastertrack (song_proxy)
+ */
+static void pattern_resize_cols(t_pattern* x, t_int newcols) {
+    int j;
+    for(j = 0; j < x->x_rows_count; j++) {
+        if(&x->x_rows[j])
+            x->x_rows[j] = (t_atom*)resizebytes(x->x_rows[j], x->x_track->x_ncolumns, newcols);
+        else
+            x->x_rows[j] = (t_atom*)getbytes(sizeof(t_atom) * newcols);
+    }
+    x->x_track->x_ncolumns = newcols;
 }
 
 static void pattern_new_empty_row(t_pattern* x) {
