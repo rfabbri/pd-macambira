@@ -90,7 +90,7 @@ static void pattern_new_empty_row(t_pattern* x) {
     t_atom* rowdata = (t_atom*)getbytes(sizeof(t_atom) * x->x_track->x_ncolumns);
     int j;
     for(j = 0; j < x->x_track->x_ncolumns; j++)
-        SETSYMBOL(&(rowdata[j]), &s_empty);
+        SETSYMBOL(&(rowdata[j]), gensym("empty"));
     ArrayListAdd(x->x_rows, t_atom*, rowdata);
 }
 

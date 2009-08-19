@@ -46,6 +46,7 @@ namespace eval pd::composer {
     array set patterns {}
 
     variable quirks_fix_int_floats 0
+    variable symbolmap {empty {}}
     # set to 1 until startup, for getting soon a pattern list
     # affects the behavior of dispatcher::patterns branch
     variable startup
@@ -372,6 +373,11 @@ namespace eval pd::composer {
     proc validateCommand {id row col curVal newVal} {
         debugPrint [info level 0]
         variable currentpattern
+        variable symbolmap
+
+        debugPrint "BEFORE: newVal = '$newVal'"
+        set newVal [dict get [dict merge [list $newVal $newVal] [lreverse $symbolmap]] $newVal]
+        debugPrint "AFTER: newVal = '$newVal'"
 
         sendGui [concat $id EDIT setcell $currentpattern($id) $row $col $newVal]
 
@@ -510,7 +516,8 @@ namespace eval pd::composer {
 
     proc setCellValueUI {id pat r c v} {
         upvar 0 [getDataVar $id $pat] data
-        set data($r,$c) [string map {empty {}} $v]
+        variable symbolmap
+        set data($r,$c) [dict get [dict merge [list $v $v] $symbolmap] $v]
     }
 
     proc dispatch {id args} {

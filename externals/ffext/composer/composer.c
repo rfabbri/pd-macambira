@@ -34,9 +34,6 @@
 
 ArrayListDeclare(songs, t_song*, int);
 
-t_symbol s_list = {"list", 0, 0};
-t_symbol s_empty = {"empty", 0, 0};
-
 void composer_setup(void) {
     debugprint("loading composer library for pd");
     sys_vgui("source {window.tk}\n");
