@@ -1,0 +1,4 @@
+TODO:
+ - optimize performance of symbol->index lookups, especially for patterns
+ - check for memory leaks
+ - compress in-patch data
