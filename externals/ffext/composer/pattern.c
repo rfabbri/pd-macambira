@@ -38,9 +38,9 @@ static t_pattern* pattern_new(t_track* track, t_symbol* name, t_int rows) {
 
     int i;
     for(i = 0; i < rows; i++) {
-        debugprint("x->x_rows[%d] = " PTR, i, x->x_rows[i]);
+        //debugprint("x->x_rows[%d] = " PTR, i, x->x_rows[i]);
         pattern_new_empty_row(x);
-        debugprint("x->x_rows[%d] <- " PTR, i, x->x_rows[i]);
+        //debugprint("x->x_rows[%d] <- " PTR, i, x->x_rows[i]);
     }
 
     debugprint("created new pattern " PTR " with %d rows (x_rows = " PTR ")", x, x->x_rows_count, x->x_rows);
@@ -116,16 +116,16 @@ static t_atom* pattern_getcell(t_pattern* x, t_int row, t_int col) {
 static void pattern_setrow(t_pattern* x, t_int row, t_atom* rowdata) {
     debugprint("pattern_setrow(" PTR ", %d, " PTR ")", x, row, rowdata);
     row = WRAP(row, x->x_rows_count);
-    debugprint("x->x_rows[%d] = " PTR, row, x->x_rows[row]);
+    //debugprint("x->x_rows[%d] = " PTR, row, x->x_rows[row]);
     t_atom *myrowdata = x->x_rows[row];
     memcpy(myrowdata, rowdata, sizeof(t_atom) * x->x_track->x_ncolumns);
-    debugprint("x->x_rows[%d] <- " PTR, row, x->x_rows[row]);
+    //debugprint("x->x_rows[%d] <- " PTR, row, x->x_rows[row]);
 }
 
 static void pattern_setcell(t_pattern* x, t_int row, t_int col, t_atom* a) {
     row = WRAP(row, x->x_rows_count);
     col = WRAP(col, x->x_track->x_ncolumns);
-    debugprint("about to write an atom (size=%d) at address " PTR, sizeof(t_atom), &(x->x_rows[row][col]));
+    //debugprint("about to write an atom (size=%d) at address " PTR, sizeof(t_atom), &(x->x_rows[row][col]));
     memcpy(&(x->x_rows[row][col]), a, sizeof(t_atom));
 }
 

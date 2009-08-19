@@ -82,7 +82,8 @@ static t_track_proxy* track_proxy_new(t_symbol* song_name, t_symbol* track_name,
     sprintf(rcv_buf, "track_proxy-%s-%s", x->x_track->x_song->x_name->s_name, x->x_track->x_name->s_name);
     x->rcv = gensym(rcv_buf);
     pd_bind(&x->x_obj.ob_pd, x->rcv);
-    debugprint("created an instance of t_track_proxy " PTR ", to_track = " PTR, x, x->x_track);
+    debugprint("created an instance of t_track_proxy " PTR ", to_track=" PTR ", n=%s",
+            x, x->x_track, x->x_track->x_name->s_name);
 
     track_proxy_properties_close((t_gobj*) x, NULL);
 
@@ -97,7 +98,7 @@ static void track_proxy_free(t_track_proxy* x) {
     track_proxy_properties_close((t_gobj*) x, NULL);
 
     pd_unbind(&x->x_obj.ob_pd, gensym(TRACK_SELECTOR));
-    /* LATER find a way to get #TRACK unbound earlier (at end of load?) */
+    /* LATER find a way to get TRACK_SELECTOR unbound earlier (at end of load?) */
     t_pd* x2;
     while (x2 = pd_findbyclass(gensym(TRACK_SELECTOR), track_proxy_class))
         pd_unbind(x2, gensym(TRACK_SELECTOR));
@@ -143,9 +144,10 @@ static void track_proxy_save(t_gobj* z, t_binbuf* b) {
         gensym("track"), t->x_song->x_name, t->x_name, t->x_ncolumns);
 
     // data format:
-    // #TRACK DATA <npatterns> [<pat_name> <pat rows> RxC_atoms]*n
+    // TRACK_SELECTOR DATA <song_name> <track_name> <npatterns> [<pat_name> <pat rows> RxC_atoms]*n
 
-    binbuf_addv(b, "ssi", gensym(TRACK_SELECTOR), gensym("DATA"), t->x_patterns_count);
+    binbuf_addv(b, "ssssi", gensym(TRACK_SELECTOR), gensym("DATA"),
+            t->x_song->x_name, t->x_name, t->x_patterns_count);
 
     int i,j,k;
     for(i = 0; i < t->x_patterns_count; i++) {
@@ -193,14 +195,32 @@ static void track_proxy_loaddata(t_track_proxy* x, t_symbol* s, int argc, t_atom
     int i,base;
     base = 0;
 
+    if(argc < (base+2) || argv[base].a_type != A_SYMBOL || argv[base+1].a_type != A_SYMBOL) {
+        error("track: data format error 1");
+        return;
+    }
+    t_symbol* song_name = argv[base+0].a_w.w_symbol;
+    t_symbol* track_name = argv[base+1].a_w.w_symbol;
+    base += 2;
+
+    if(x->x_track->x_song->x_name != song_name) {
+        debugprint("WARNING: discarding data from another song: %s", song_name->s_name);
+        return;
+    }
+
+    if(x->x_track->x_name != track_name) {
+        debugprint("WARNING: discarding data from another track: %s", track_name->s_name);
+        return;
+    }
+
     if(argc < (base+1) || argv[base].a_type != A_FLOAT) {
         error("track: data format error 2");
         return;
     }
-
     t_int npatterns = (t_int)argv[base].a_w.w_float;
-    debugprint("track: %d patterns to read", npatterns);
     base += 1;
+
+    debugprint("track: %s-%s: %d patterns to read", song_name->s_name, track_name->s_name, npatterns);
 
     t_symbol* patname;
     t_int patrows;
@@ -219,8 +239,9 @@ static void track_proxy_loaddata(t_track_proxy* x, t_symbol* s, int argc, t_atom
         }
         patname = argv[base+0].a_w.w_symbol;
         patrows = (t_int)argv[base+1].a_w.w_float;
-        debugprint("pattern %d: name='%s', length=%d, RxC=%d", i, patname->s_name, patrows,
-                patrows * x->x_track->x_ncolumns);
+        debugprint("pattern %d: %s-%s-%s, length=%d, RxC=%d", i,
+                song_name->s_name, track_name->s_name, patname->s_name,
+                patrows, patrows * x->x_track->x_ncolumns);
         base += 2;
         if(argc >= (base + patrows * x->x_track->x_ncolumns) && patrows > 0) {
             pat = pattern_new(x->x_track, patname, patrows);

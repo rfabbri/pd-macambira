@@ -538,7 +538,7 @@ namespace eval pd::composer {
                 set pat_name [lindex $args 1]
                 set pat_length [lindex $args 2]
                 debugPrint "got patternlength: '$pat_name' (len=$pat_length)"
-                if {![dict exists $length($id) $pat_name] || [dict get $length($id) $pat_name] != $pat_length} {
+                if {![dict exists $length($id) $pat_name] || [dict get $length($id) $pat_name] != $pat_length || $showpattern($id)} {
                     dict set length($id) $pat_name $pat_length
                     for {set i 0} {$i < $pat_length} {incr i} {
                         sendGui [concat $id EDIT getrow $pat_name $i]
