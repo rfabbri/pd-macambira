@@ -154,12 +154,13 @@ static void track_proxy_save(t_gobj* z, t_binbuf* b) {
         for(j = 0; j < pat->x_rows_count; j++) {
             for(k = 0; k < t->x_ncolumns; k++) {
                 switch(pat->x_rows[j][k].a_type) {
-                case A_FLOAT: binbuf_addv(b, "i", pat->x_rows[j][k].a_w.w_float); break;
+                case A_FLOAT: binbuf_addv(b, "f", pat->x_rows[j][k].a_w.w_float); break;
                 case A_SYMBOL: binbuf_addv(b, "s", pat->x_rows[j][k].a_w.w_symbol); break;
                 case A_NULL: binbuf_addv(b, "s", gensym("empty")); break;
-                default: binbuf_addv(b, "s", gensym("?")); break;
+                default: binbuf_addv(b, "s", gensym("unknown")); break;
                 }
             }
+            //binbuf_add(b, t->x_ncolumns, &pat->x_rows[j]);
         }
     }
 

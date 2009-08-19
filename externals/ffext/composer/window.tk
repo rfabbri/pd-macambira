@@ -46,6 +46,12 @@ namespace eval pd::composer {
     array set patterns {}
 
     variable quirks_fix_int_floats 0
+    # set to 1 until startup, for getting soon a pattern list
+    # affects the behavior of dispatcher::patterns branch
+    variable startup
+    array set startup {}
+    variable showpattern
+    array set showpattern {}
 
     proc debugPrint {args} {
         variable debug
@@ -75,9 +81,6 @@ namespace eval pd::composer {
         }
 
         sendGui [concat $id EDIT addpattern $name $len]
-        #lappend patterns($id) $name
-        #dict set length($id) $name $len
-        #$w($id).f.p configure -values $patterns($id)
     }
 
     proc removePattern {id name} {
@@ -86,25 +89,13 @@ namespace eval pd::composer {
         variable patterns;
 
         sendGui [concat $id EDIT removepattern $name]
-
-        #set oldidx [lsearch -exact $patterns($id) $name]
-        #set length($id) [dict remove $length($id) $name]
-        #set patterns($id) [lsearch -all -inline -not -exact $patterns($id) $name]
-        #while {$oldidx >= [llength $patterns($id)]} {incr oldidx -1}
-        #if {$oldidx < 0} {set oldidx 0}
-        #displayPattern $id [lindex $patterns($id) $oldidx]
     }
 
     proc copyPattern {id src dst} {
         debugPrint [info level 0]
         variable length;
-        #upvar 0 $::datavar($w)_$src SRC
-        #upvar 0 $::datavar($w)_$dst DST
 
         sendGui [concat $id EDIT copypattern $src $dst]
-
-        #createPattern $w $dst [dict get $length($id) $src]
-        #array set DST [array get SRC]
     }
 
     proc resizePattern {id name newSize} {
@@ -120,20 +111,12 @@ namespace eval pd::composer {
         }
 
         sendGui [concat $id EDIT resizepattern $name $len]
-
-        #dict set length($id) $name $len
-        #if {$name == $currentpattern($id)} {
-            # refresh stuff
-        #    displayPattern $id $name
-        #}
     }
 
     proc renamePattern {id name newName} {
         debugPrint [info level 0]
         variable length;
         variable patterns;
-        #upvar 0 $::datavar($w)_$name SRC
-        #upvar 0 $::datavar($w)_$newName DST
 
         if {$name == $newName} return
         if {$newName in $patterns($id)} {
@@ -145,15 +128,6 @@ namespace eval pd::composer {
         }
 
         sendGui [concat $id EDIT renamepattern $name $newName]
-
-        #lset patterns($id) $idx $newName
-        #array set DST [array get SRC]
-        #array unset SRC
-
-        #dict set length($id) $newName [dict get $length($id) $name]
-        #set length($id) [dict remove $length($id) $name]
-
-        #displayPattern $id $newName
     }
 
     proc generateNewPatternName {id} {
@@ -168,7 +142,21 @@ namespace eval pd::composer {
 
     proc displayPattern {id name} {
         debugPrint "request-pattern-length"
+        variable showpattern
+        set showpattern($id) 1
         sendGui [concat $id EDIT getpatternlength $name]
+    }
+
+    proc updateTitle {id} {
+        variable w
+        variable songname
+        variable trackname
+        variable currentpattern
+        set t "Song: $songname($id)  Track: $trackname($id)"
+        if {$currentpattern($id) != {}} {
+            append t " Pattern: $currentpattern($id)"
+        }
+        wm title $w($id) $t
     }
 
     proc displayPattern_async {id name} {
@@ -182,27 +170,21 @@ namespace eval pd::composer {
         variable trackname
         variable [getDataVar $id]
 
-        wm title $w($id) "Song: $songname($id)  Track: $trackname($id)"
-        debugPrint "checkExit"
-        if {$name == {}} {return}
-        if {$name ni $patterns($id)} {
-            debugPrint "Pattern '$name' does not exist"
-            return -code error "Pattern '$name' does not exist"
+        set currentpattern($id) $name
+        updateTitle $id
+       
+        if {$currentpattern($id) == {}} {
+            grid forget $w($id).t
+            return
         }
-        debugPrint "s1"
+
         set rows [dict get $length($id) $name]
         set cols $columns($id)
         debugPrint "resizing tktable widget to ${rows}x${cols}"
         grid $w($id).t -row 10 -column 0 -sticky news
         $w($id).t configure -state normal -variable [getDataVar $id] -rows $rows -cols [expr {1+$cols}]
-        debugPrint "s2"
         $w($id).f.p configure -values $patterns($id)
-        debugPrint "s3"
         $w($id).f.p current [lsearch -exact $patterns($id) $name]
-        debugPrint "setCurPattern"
-        set currentpattern($id) $name
-        debugPrint "setTitle"
-        wm title $w($id) "Song: $songname($id)  Track: $trackname($id)  Pattern: $name"
     }
 
     proc displayCurrentPattern {id} {
@@ -214,7 +196,6 @@ namespace eval pd::composer {
     }
 
     proc rowTag {id r} {
-        #debugPrint [info level 0]
         if {$r % $::div1 == 0} {return "alt0"}
         if {$r % $::div2 == 0} {return "alt1"}
     }
@@ -252,6 +233,8 @@ namespace eval pd::composer {
         variable songname
         variable trackname
         variable patterns
+        variable startup
+        variable showpattern
         variable [getDataVar $id]
 
         catch {destroy $w($id)}
@@ -282,16 +265,10 @@ namespace eval pd::composer {
         debugPrint "step2"
         $w($id).f.p state readonly
 
-        # movet to async counterpart
-        #$w($id).f.p configure -values $patterns($id)
-
-        debugPrint "request-patterns"
-        sendGui [concat $id EDIT getpatterns]
-
         debugPrint "bindevent"
         bind $w($id).f.p <<ComboboxSelected>> "[namespace current]::displayCurrentPattern $id"
         debugPrint "table"
-        #grid [
+
         table $w($id).t -state disabled \
             -insertofftime 0 \
             -bordercursor sb_h_double_arrow \
@@ -310,10 +287,7 @@ namespace eval pd::composer {
             -variable [getDataVar $id] -exportselection 1 \
             -xscrollcommand "$w($id).hscroll set" \
             -yscrollcommand "$w($id).vscroll set" \
-            -rowtagcommand "[namespace current]::rowTag $id" \
-
-        #] -row 10 -column 0 -sticky news
-
+            -rowtagcommand "[namespace current]::rowTag $id"
         #grid $w($id).t -row 10 -column 0 -sticky news
 
         debugPrint "scrollbars"
@@ -363,6 +337,11 @@ namespace eval pd::composer {
         debugPrint "more-bind-events"
         bind $w($id).t <ButtonPress-3> "$w($id).t activate @%x,%y; tk_popup $w($id).m %X %Y"
         bind $w($id).t <Control-t> "switchColumnType $id"
+
+        set startup($id) 1
+        set showpattern($id) 0
+        debugPrint "request-patterns"
+        sendGui [concat $id EDIT getpatterns]
 
         return $w($id)
     }
@@ -470,7 +449,6 @@ namespace eval pd::composer {
         dict set options vlength [dict get $length($id) $currentpattern($id)]
         dict set options action_ok {
             %ns::copyPattern %id %old_name [%w.ename get]
-            %ns::displayPattern %id [%w.ename get]
             destroy %w
         }
         patternPropertiesDialog_common $id $options
@@ -495,7 +473,6 @@ namespace eval pd::composer {
             %ns::createPattern %id [%w.ename get] [%w.elength get]
             destroy %w
         }
-        #   %ns::displayPattern %id [%w.ename get]
         dict set options vname [generateNewPatternName $id]
         dict set options vlength 16
         patternPropertiesDialog_common $id $options
@@ -542,16 +519,19 @@ namespace eval pd::composer {
         variable patterns
         variable length
         variable currentpattern
+        variable startup
+        variable showpattern
         variable quirks_fix_int_floats
         switch -exact [lindex $args 0] {
             patterns {
                 set patterns($id) [lrange $args 1 end]
                 debugPrint "tk::patterns <- $patterns($id)"
                 $w($id).f.p configure -values $patterns($id)
-                if {0 && [llength $patterns($id)] > 0 && $currentpattern($id) == {}} {
-                    set firstpat [lindex $patterns($id) 0]
-                    debugPrint "showing pattern '$firstpat'"
-                    displayPattern $id $firstpat
+                if {$startup($id)} {
+                    set startup($id) 0
+                    if {[llength $patterns($id)] > 0} {
+                        displayPattern $id [lindex $patterns($id) 0]
+                    }
                 }
             }
             patternlength {
@@ -564,7 +544,6 @@ namespace eval pd::composer {
                         sendGui [concat $id EDIT getrow $pat_name $i]
                     }
                 }
-                displayPattern_async $id $pat_name
             }
             row {
                 set pat_name [lindex $args 1]
@@ -580,7 +559,10 @@ namespace eval pd::composer {
                     setCellValueUI $id $pat_name $row_num $i [lindex $row $i]
                 }
                 if {$row_num + 1 == [dict get $length($id) $pat_name]} {
-                    #refreshGrid $id
+                    if {$showpattern($id)} {
+                        set showpattern($id) 0
+                        displayPattern_async $id $pat_name
+                    }
                 }
             }
             cell {
