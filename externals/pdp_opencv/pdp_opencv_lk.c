@@ -32,8 +32,7 @@
 #include "cv.h"
 #endif
 
-#define MAX_MARKERS 10
-
+#define MAX_MARKERS 500
 const int MAX_COUNT = 500;
 
 typedef struct pdp_opencv_lk_struct
@@ -58,6 +57,8 @@ typedef struct pdp_opencv_lk_struct
   double quality;
   int min_distance;
   int x_maxmove;
+  int x_ftolerance;
+  int x_markall;
   int x_delaunay;
   int x_threshold;
   int x_xmark[MAX_MARKERS];
@@ -84,6 +85,8 @@ typedef struct pdp_opencv_lk_struct
     
 } t_pdp_opencv_lk;
 
+static void pdp_opencv_lk_clear(t_pdp_opencv_lk *x);
+
 static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
 {
     t_pdp     *header = pdp_packet_header(x->x_packet0);
@@ -91,6 +94,7 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1); 
     int i,j,k,im;
+    int marked;
 
     if ((x->x_width != (t_int)header->info.image.width) || 
         (x->x_height != (t_int)header->info.image.height) || (!x->image)) 
@@ -138,7 +142,7 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
         
     for ( im=0; im<MAX_MARKERS; im++ )
     {
-        x->x_found[im] = 0;
+        x->x_found[im]--;
     }
 
     if ( x->x_delaunay >= 0 )
@@ -242,9 +246,10 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
 
             cvCircle( x->image, cvPointFrom32f(x->points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
 
+            marked=0;
             for ( im=0; im<MAX_MARKERS; im++ )
             {
-              // first marking
+              // search for this point
               if ( x->x_xmark[im] != -1.0 )
               {
                if ( ( abs( x->points[1][i].x - x->x_xmark[im] ) <= x->x_maxmove ) && ( abs( x->points[1][i].y - x->x_ymark[im] ) <= x->x_maxmove ) )
@@ -254,7 +259,8 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
                   cvPutText( x->image, tindex, cvPointFrom32f(x->points[1][i]), &x->font, CV_RGB(255,255,255));
                   x->x_xmark[im]=x->points[1][i].x;
                   x->x_ymark[im]=x->points[1][i].y;
-                  x->x_found[im]=1;
+                  x->x_found[im]++;
+                  marked=1;
                   SETFLOAT(&x->x_list[0], im+1);
                   SETFLOAT(&x->x_list[1], x->x_xmark[im]);
                   SETFLOAT(&x->x_list[2], x->x_ymark[im]);
@@ -263,6 +269,19 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
               }
             }
 
+            if ( x->x_markall && !marked )
+            {
+              for ( im=0; im<MAX_MARKERS; im++)
+              {
+                if ( x->x_xmark[im] == -1 )
+                {
+                  x->x_xmark[im]=x->points[1][i].x;
+                  x->x_ymark[im]=x->points[1][i].y;
+                  x->x_found[im]=x->x_ftolerance;
+                  break;
+                }
+              }
+            }
         }
         x->count = k;
     }
@@ -343,6 +362,7 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
     {
         if ( (x->x_xmark[im] != -1.0 ) && !x->x_found[im] )
         {
+           // lost the point
            x->x_xmark[im]=-1.0;
            x->x_ymark[im]=-1.0;
            SETFLOAT(&x->x_list[0], im+1);
@@ -395,6 +415,11 @@ static void pdp_opencv_lk_maxmove(t_pdp_opencv_lk *x, t_floatarg f)
   if (f>=3.0) x->x_maxmove = (int)f;
 }
 
+static void pdp_opencv_lk_ftolerance(t_pdp_opencv_lk *x, t_floatarg f)
+{
+  if (f>0.0) x->x_ftolerance = (int)f;
+}
+
 static void pdp_opencv_lk_delaunay(t_pdp_opencv_lk *x, t_symbol *s)
 {
   if (s == gensym("on")) 
@@ -417,34 +442,68 @@ static void pdp_opencv_lk_init(t_pdp_opencv_lk *x)
   x->need_to_init = 1;
 }
 
-static void pdp_opencv_lk_mark(t_pdp_opencv_lk *x, t_floatarg fperx, t_floatarg fpery )
+static void pdp_opencv_lk_mark(t_pdp_opencv_lk *x, t_symbol *s, int argc, t_atom *argv)
 {
   int i;
   int inserted;
   int px,py;
-   
-    if ( ( fperx < 0.0 ) || ( fperx > 1.0 ) || ( fpery < 0.0 ) || ( fpery > 1.0 ) )
-    {
-       return;
-    }
 
-    px = (int)(fperx*x->x_width);
-    py = (int)(fpery*x->x_height);
-    inserted = 0;
-    for ( i=0; i<MAX_MARKERS; i++)
+    if ( argc == 1 ) // mark all
     {
-       if ( x->x_xmark[i] == -1 )
-       {
-          x->x_xmark[i] = px;
-          x->x_ymark[i] = py;
-          inserted = 1;
-          break;
-       }
+      if ( argv[0].a_type != A_SYMBOL )
+      {
+        error( "pdp_opencv_lk : wrong argument (should be 'all')" );
+        return;
+      }
+      if ( !strcmp( argv[0].a_w.w_symbol->s_name, "all" ) )
+      {
+        x->x_markall = 1;
+        return;
+      }
+      if ( !strcmp( argv[0].a_w.w_symbol->s_name, "none" ) )
+      {
+        x->x_markall = 0;
+        pdp_opencv_lk_clear(x);
+        return;
+      }
     }
-    if ( !inserted )
+    else
     {
-       post( "pdp_opencv_lk : max markers reached" );
-    }
+      if ( ( argv[0].a_type != A_FLOAT ) || ( argv[1].a_type != A_FLOAT ) )
+      {
+        error( "pdp_opencv_lk : wrong argument (should be mark px py)" );
+        return;
+      }
+      else
+      {
+        float fperx = argv[0].a_w.w_float;
+        float fpery = argv[1].a_w.w_float;
+  
+        if ( ( fperx < 0.0 ) || ( fperx > 1.0 ) || ( fpery < 0.0 ) || ( fpery > 1.0 ) )
+        {
+           return;
+        }
+
+        px = (int)(fperx*x->x_width);
+        py = (int)(fpery*x->x_height);
+        inserted = 0;
+        for ( i=0; i<MAX_MARKERS; i++)
+        {
+           if ( x->x_xmark[i] == -1 )
+           {
+              x->x_xmark[i] = px;
+              x->x_ymark[i] = py;
+              x->x_found[i] = x->x_ftolerance;
+              inserted = 1;
+              break;
+           }
+        }
+        if ( !inserted )
+        {
+           post( "pdp_opencv_lk : max markers reached" );
+        }
+      }
+   }
 }
 
 static void pdp_opencv_lk_delete(t_pdp_opencv_lk *x, t_floatarg findex )
@@ -579,9 +638,11 @@ void *pdp_opencv_lk_new(t_floatarg f)
   x->quality = 0.1;
   x->min_distance = 10;
   x->x_maxmove = 8;
+  x->x_ftolerance = 8;
   x->x_delaunay = -1;
   x->x_threshold = -1;
 
+  x->x_markall = 0;
   for ( i=0; i<MAX_MARKERS; i++ )
   {
      x->x_xmark[i] = -1;
@@ -623,11 +684,12 @@ void pdp_opencv_lk_setup(void)
     class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_nightmode, gensym("nightmode"), A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_quality, gensym("quality"), A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_init, gensym("init"), A_NULL );   
-    class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_mark, gensym("mark"), A_FLOAT, A_FLOAT, A_NULL );   
+    class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_mark, gensym("mark"), A_GIMME, A_NULL );   
     class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_delete, gensym("delete"), A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_clear, gensym("clear"), A_NULL );   
     class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_mindistance, gensym("mindistance"),  A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_maxmove, gensym("maxmove"),  A_FLOAT, A_NULL );   
+    class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_ftolerance, gensym("ftolerance"),  A_FLOAT, A_NULL );   
     class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_delaunay, gensym("delaunay"),  A_SYMBOL, A_NULL );   
     class_addmethod(pdp_opencv_lk_class, (t_method)pdp_opencv_lk_pdelaunay, gensym("pdelaunay"),  A_FLOAT, A_FLOAT, A_NULL );   
 
