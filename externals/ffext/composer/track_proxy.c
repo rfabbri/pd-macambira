@@ -94,7 +94,8 @@ static t_track_proxy* track_proxy_new(t_symbol* song_name, t_symbol* track_name,
 
     pd_bind(&x->x_obj.ob_pd, gensym(TRACK_SELECTOR));
 
-    sys_vgui("pd::composer::init %s %s %s %d %d\n", x->rcv->s_name, x->x_track->x_song->x_name->s_name, x->x_track->x_name->s_name, x->x_track->x_ncolumns, DEBUG_BOOL);
+    debugprint("pd::composer::init %s %s %s %d %s %d\n", x->rcv->s_name, x->x_track->x_song->x_name->s_name, x->x_track->x_name->s_name, x->x_track->x_ncolumns, "NULL", DEBUG_BOOL);
+    sys_vgui("pd::composer::init %s %s %s %d %s %d\n", x->rcv->s_name, x->x_track->x_song->x_name->s_name, x->x_track->x_name->s_name, x->x_track->x_ncolumns, "NULL", DEBUG_BOOL);
 
     return x;
 }
@@ -112,14 +113,13 @@ static void track_proxy_free(t_track_proxy* x) {
 }
 
 static t_atom* track_proxy_get_pattern_names(t_track_proxy* x) {
-    t_int n = track_get_pattern_count(x->x_track);
     if(response_row) {
-        freebytes(response_row, response_row_sz);
+        freebytes(response_row, response_row_sz * sizeof(t_atom));
         response_row = NULL;
         response_row_sz = 0;
     }
-    response_row_sz = sizeof(t_atom) * n;
-    response_row = (t_atom*)getbytes(response_row_sz);
+    response_row_sz = track_get_pattern_count(x->x_track);
+    response_row = (t_atom*)getbytes(sizeof(t_atom) * response_row_sz);
     track_get_pattern_names(x->x_track, response_row);
     return response_row;
 }
@@ -262,6 +262,8 @@ static void track_proxy_editcmd(t_track_proxy* x, t_symbol* s_, int argc, t_atom
             t_atom* rsp = track_proxy_get_pattern_names(x);
             track_proxy_sendgui(x, gensym("patterns"), response_row_sz, rsp);
         }
+    } else if(s == gensym("gettracks")) {
+        // dummy STFU
     } else {
         error("track: editcmd: unknown command: %s", s->s_name);
     }
@@ -321,18 +323,18 @@ static t_atom* track_proxy_getrow(t_track_proxy* x, t_symbol* pat_name, t_floata
 
 static t_atom* track_proxy_getrow_with_header(t_track_proxy* x, t_symbol* pat_name, t_floatarg rownum) {
     if(response_row) {
-        freebytes(response_row, response_row_sz);
+        freebytes(response_row, response_row_sz * sizeof(t_atom));
         response_row = NULL;
         response_row_sz = 0;
     }
 
     t_atom* row = track_proxy_getrow(x, pat_name, rownum);
     if(!row) {
-        error("track: getrow: nu such patern: '%s'", pat_name->s_name);
+        error("track: getrow: no such pattern: '%s'", pat_name->s_name);
         return NULL;
     }
-    response_row_sz = sizeof(t_atom) * (x->x_track->x_ncolumns + 2);
-    t_atom* response_row = (t_atom*)getbytes(response_row_sz);
+    response_row_sz = x->x_track->x_ncolumns + 2;
+    t_atom* response_row = (t_atom*)getbytes(response_row_sz * sizeof(t_atom));
     SETSYMBOL(&response_row[0], pat_name);
     SETFLOAT(&response_row[1], rownum);
     memcpy(&response_row[2], row, sizeof(t_atom) * x->x_track->x_ncolumns);
@@ -374,7 +376,7 @@ static t_atom* track_proxy_getcell(t_track_proxy* x, t_symbol* pat_name, t_float
 static t_atom* track_proxy_getcell_with_header(t_track_proxy* x, t_symbol* pat_name, t_floatarg rownum, t_floatarg colnum) {
     t_atom* cell = track_proxy_getcell(x, pat_name, rownum, colnum);
     if(!cell) {
-        error("track: getcell: nu such patern: '%s'", pat_name->s_name);
+        error("track: getcell: no such pattern: '%s'", pat_name->s_name);
         return NULL;
     }
     SETSYMBOL(&response_cell[0], pat_name);

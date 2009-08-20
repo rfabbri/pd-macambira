@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include "arraylist.h"
 
-#define PTR "0x%x"
+#define PTR "0x%lx"
 #ifdef DEBUG
 #define debugprint(args...)  post( args )
 #define DEBUG_BOOL 1
@@ -105,8 +105,11 @@ typedef struct _pattern
 static t_song* song_new(t_symbol* song_name);
 static void song_mastertrack_fix_cols(t_song* x);
 static void song_free(t_song* x);
+static void song_internal_resize_cols(t_song* x, t_int sz);
 static t_song* song_get(t_symbol* song_name);
 static int song_exists(t_symbol* song_name);
+static void song_loaddata(t_song* x, int argc, t_atom* argv);
+static void song_binbuf_save(t_song* t, t_symbol* selector, t_binbuf* b);
 
 static t_track* track_new(t_symbol* song_name, t_symbol* track_name, t_int columns);
 static t_track* mastertrack_new(t_song* song, t_symbol* track_name, t_int columns);
@@ -114,7 +117,8 @@ static t_track* song_create_track(t_song* x, t_symbol* track_name, t_int columns
 static void track_free(t_track* x);
 static t_track* track_get(t_symbol* song_name, t_symbol* track_name);
 static int track_exists(t_symbol* song_name, t_symbol* track_name);
-static void track_binbuf_save(t_track* x);
+static void track_binbuf_save(t_track* x, t_symbol* selector, t_binbuf* b);
+
 
 static t_pattern* pattern_new(t_track* track, t_symbol* name, t_int rows);
 static t_pattern* pattern_clone(t_pattern* src, t_symbol* newname);
@@ -122,6 +126,7 @@ static void pattern_free(t_pattern* x);
 static void pattern_rename(t_pattern* x, t_symbol* newname);
 static void pattern_resize(t_pattern *x, t_int newsize);
 static void pattern_resize_cols(t_pattern* x, t_int newcols);
+static void pattern_init_cell(t_atom* a);
 static void pattern_new_empty_row(t_pattern* x);
 static t_atom* pattern_getrow(t_pattern* x, t_int row);
 static t_atom* pattern_clone_row(t_pattern* x, t_atom* row);
@@ -134,6 +139,7 @@ static int pattern_exists(t_symbol* song_name, t_symbol* track_name, t_symbol* p
 void song_proxy_setup(void);
 static t_song_proxy* song_proxy_new(t_symbol* song_name);
 static void song_proxy_free(t_song_proxy* x);
+static t_atom* song_proxy_get_pattern_names(t_song_proxy* x);
 static void song_proxy_float(t_song_proxy* x, t_floatarg f);
 static void song_proxy_properties(t_gobj* z, t_glist* owner);
 static void song_proxy_properties_close(t_gobj* z, t_glist* owner);
@@ -143,6 +149,7 @@ static void song_proxy_gettracks_o(t_song_proxy* x);
 static t_int song_proxy_gettracks_count(t_song_proxy* x);
 static void song_proxy_gettracks_count_o(t_song_proxy* x);
 static void song_proxy_anything(t_song_proxy* x, t_symbol* s, int argc, t_atom* argv);
+static void song_proxy_loadsonginfo(t_song_proxy* x, t_symbol* s, int argc, t_atom* argv);
 static void song_proxy_loaddata(t_song_proxy* x, t_symbol* s, int argc, t_atom* argv);
 static t_atom* song_proxy_getpatternlength(t_song_proxy* x, t_symbol* pat_name);
 static void song_proxy_editcmd(t_song_proxy* x, t_symbol* s_, int argc, t_atom* argv_);
@@ -156,7 +163,6 @@ static t_atom* song_proxy_getcell(t_song_proxy* x, t_symbol* pat_name, t_floatar
 static t_atom* song_proxy_getcell_with_header(t_song_proxy* x, t_symbol* pat_name, t_floatarg rownum, t_floatarg colnum);
 static void song_proxy_getcell_o(t_song_proxy* x, t_symbol* pat_name, t_floatarg rownum, t_floatarg colnum);
 static t_pattern* song_proxy_resizepattern(t_song_proxy* x, t_symbol* name, t_floatarg rows);
-static t_atom* song_proxy_get_track_names(t_song_proxy* x);
 
 void track_proxy_setup(void);
 static t_track_proxy* track_proxy_new(t_symbol* song_name, t_symbol* track_name, t_floatarg cols);

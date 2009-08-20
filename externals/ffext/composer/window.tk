@@ -44,6 +44,8 @@ namespace eval pd::composer {
     array set columns {}
     variable patterns
     array set patterns {}
+    variable tracks
+    array set tracks {}
 
     variable quirks_fix_int_floats 0
     variable symbolmap {empty {}}
@@ -153,9 +155,14 @@ namespace eval pd::composer {
         variable songname
         variable trackname
         variable currentpattern
-        set t "Song: $songname($id)  Track: $trackname($id)"
-        if {$currentpattern($id) != {}} {
-            append t " Pattern: $currentpattern($id)"
+        set t "Song: $songname($id)"
+        if {$currentpattern($id) == "Arrangement"} {
+            append t "  Arrangement"
+        } else {
+            append t "  Track: $trackname($id)"
+            if {$currentpattern($id) != {}} {
+                append t "  Pattern: $currentpattern($id)"
+            }
         }
         wm title $w($id) $t
     }
@@ -181,8 +188,8 @@ namespace eval pd::composer {
 
         set rows [dict get $length($id) $name]
         set cols $columns($id)
-        debugPrint "resizing tktable widget to ${rows}x${cols}"
         grid $w($id).t -row 10 -column 0 -sticky news
+        debugPrint "resizing tktable widget to ${rows}x${cols}"
         $w($id).t configure -state normal -variable [getDataVar $id] -rows $rows -cols [expr {1+$cols}]
         $w($id).f.p configure -values $patterns($id)
         $w($id).f.p current [lsearch -exact $patterns($id) $name]
@@ -343,6 +350,7 @@ namespace eval pd::composer {
         set showpattern($id) 0
         debugPrint "request-patterns"
         sendGui [concat $id EDIT getpatterns]
+        sendGui [concat $id EDIT gettracks]
 
         return $w($id)
     }
@@ -485,7 +493,7 @@ namespace eval pd::composer {
     }
 
     #entrypoint
-    proc init {id song_name track_name cols debug_flag} {
+    proc init {id song_name track_name cols set_current_pattern debug_flag} {
         debugPrint [info level 0]
         variable debug
         set debug [expr {$debug_flag != 0}]
@@ -498,7 +506,11 @@ namespace eval pd::composer {
         set w($id) .w_${song_name}_${track_name}
         set songname($id) $song_name
         set trackname($id) $track_name
-        set currentpattern($id) {}
+        if {$set_current_pattern == {NULL}} {
+            set currentpattern($id) {}
+        } else {
+            set currentpattern($id) $set_current_pattern
+        }
         set length($id) {}
         set columns($id) $cols
     }
@@ -528,11 +540,13 @@ namespace eval pd::composer {
         variable currentpattern
         variable startup
         variable showpattern
+        variable columns
         variable quirks_fix_int_floats
         switch -exact [lindex $args 0] {
             patterns {
+                # for track mode
                 set patterns($id) [lrange $args 1 end]
-                debugPrint "tk::patterns <- $patterns($id)"
+                debugPrint "patterns <- $patterns($id)"
                 $w($id).f.p configure -values $patterns($id)
                 if {$startup($id)} {
                     set startup($id) 0
@@ -540,6 +554,15 @@ namespace eval pd::composer {
                         displayPattern $id [lindex $patterns($id) 0]
                     }
                 }
+            }
+            tracks {
+                # for song mode
+                set tracks($id) [lrange $args 1 end]
+                debugPrint "tracks <- $tracks($id)"
+                set cols [llength $tracks($id)]
+                #debugPrint "resizing tktable widget to ${cols} cols"
+                #$w($id).t configure -state normal -cols $cols 
+                set columns($id) $cols
             }
             patternlength {
                 set pat_name [lindex $args 1]

@@ -90,21 +90,31 @@ static void pattern_resize(t_pattern *x, t_int newsize) {
  *          Works only for the mastertrack (song_proxy)
  */
 static void pattern_resize_cols(t_pattern* x, t_int newcols) {
-    int j;
+    int i,j;
     for(j = 0; j < x->x_rows_count; j++) {
         if(&x->x_rows[j])
             x->x_rows[j] = (t_atom*)resizebytes(x->x_rows[j], x->x_track->x_ncolumns, newcols);
         else
             x->x_rows[j] = (t_atom*)getbytes(sizeof(t_atom) * newcols);
     }
+    if(newcols > x->x_track->x_ncolumns) {
+        for(j = 0; j < x->x_rows_count; j++) {
+            for(i = x->x_track->x_ncolumns; i < newcols; i++)
+                pattern_init_cell(&x->x_rows[j][i]);
+        }
+    }
     x->x_track->x_ncolumns = newcols;
+}
+
+static void pattern_init_cell(t_atom* a) {
+    SETSYMBOL(a, gensym("empty"));
 }
 
 static void pattern_new_empty_row(t_pattern* x) {
     t_atom* rowdata = (t_atom*)getbytes(sizeof(t_atom) * x->x_track->x_ncolumns);
     int j;
     for(j = 0; j < x->x_track->x_ncolumns; j++)
-        SETSYMBOL(&(rowdata[j]), gensym("empty"));
+        pattern_init_cell(&rowdata[j]);
     ArrayListAdd(x->x_rows, t_atom*, rowdata);
 }
 

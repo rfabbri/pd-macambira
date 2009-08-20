@@ -98,6 +98,7 @@ static int track_exists(t_symbol* song_name, t_symbol* track_name) {
 }
 
 static void track_loaddata(t_track* x, int argc, t_atom* argv) {
+    debugprint("track_loaddata(" PTR ", %d, " PTR ")", x, argc, argv);
     int i,base;
     base = 0;
 
@@ -125,6 +126,8 @@ static void track_loaddata(t_track* x, int argc, t_atom* argv) {
         return;
     }
 
+    debugprint("track_loaddata: song='%s', track='%s'", song_name->s_name, track_name->s_name);
+
     if(argc < (base+1) || argv[base].a_type != A_FLOAT) {
         error("track: data format error 2");
         return;
@@ -132,7 +135,7 @@ static void track_loaddata(t_track* x, int argc, t_atom* argv) {
     t_int npatterns = (t_int)argv[base].a_w.w_float;
     base += 1;
 
-    debugprint("track: %s-%s: %d patterns to read", song_name->s_name, track_name->s_name, npatterns);
+    debugprint("track_loaddata: %d patterns to read", npatterns);
 
     t_symbol* patname;
     t_int patrows;
@@ -173,7 +176,7 @@ static void track_loaddata(t_track* x, int argc, t_atom* argv) {
     }
 }
 
-static void track_binbuf_save(t_track* x, t_symbol* selector, t_binbuf* b) {
+static void track_binbuf_save(t_track* t, t_symbol* selector, t_binbuf* b) {
     // data format:
     // SELECTOR DATA <song_name> <track_name> <npatterns> [<pat_name> <pat rows> RxC_atoms]*n
 

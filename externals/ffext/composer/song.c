@@ -50,11 +50,11 @@ static void song_mastertrack_fix_cols(t_song* x) {
     debugprint("song_mastertrack_fix_cols(" PTR "), new track count: %d", x, x->x_tracks_count);
     debugprint("song='%s' mastertrack=" PTR, x->x_name->s_name, x->x_mastertrack);
     debugprint("we have %d patterns, sir", x->x_mastertrack->x_patterns_count);
-    int j;
-    for(j = 0; j < x->x_mastertrack->x_patterns_count; j++) {
-        if(j > 0) post("WARNING: mastertrack with more than one pattern!");
-        pattern_resize_cols(x->x_mastertrack->x_patterns[j], x->x_tracks_count);
+    if(x->x_mastertrack->x_patterns_count < x->x_mastertrack->x_ncolumns) {
+        debugprint("song_mastertrack_fix_cols: still loading (apparently?), skipping.");
+        return;
     }
+    song_internal_resize_cols(x, x->x_tracks_count);
 }
 
 static void song_free(t_song* x) {
@@ -64,6 +64,14 @@ static void song_free(t_song* x) {
     ArrayListRemove(songs, x);
 }
 
+static void song_internal_resize_cols(t_song* x, t_int sz) {
+    int j;
+    for(j = 0; j < x->x_mastertrack->x_patterns_count; j++) {
+        if(j > 0) post("WARNING: mastertrack with more than one pattern!");
+        pattern_resize_cols(x->x_mastertrack->x_patterns[j], sz);
+    }
+}
+
 static t_song* song_get(t_symbol* song_name) {
     ArrayListGetByName(songs, song_name, t_song*, result);
     return result;
@@ -71,4 +79,26 @@ static t_song* song_get(t_symbol* song_name) {
 
 static int song_exists(t_symbol* song_name) {
     return song_get(song_name) != 0L;
+}
+
+static void song_loaddata(t_song* x, int argc, t_atom* argv) {
+    if(argc < 2) {
+        error("song_loaddata: format error 1");
+        return;
+    }
+    if(argv[0].a_type != A_SYMBOL || argv[1].a_type != A_FLOAT) {
+        error("song_loaddata: format error 2");
+    }
+    t_symbol* name = argv[0].a_w.w_symbol;
+    t_int ntracks = (t_int)argv[1].a_w.w_float;
+    debugprint("song_loaddata: song='%s', tracks=%d", name->s_name, ntracks);
+    song_internal_resize_cols(x, ntracks);
+}
+
+static void song_binbuf_save(t_song* t, t_symbol* selector, t_binbuf* b) {
+    // data format:
+    // SELECTOR DATA <song_name> <ntracks>
+
+    binbuf_addv(b, "sssi", selector, gensym("SONGINFO"), t->x_name, t->x_tracks_count);
+    binbuf_addv(b, ";");
 }

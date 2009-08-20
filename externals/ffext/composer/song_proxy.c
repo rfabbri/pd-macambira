@@ -45,6 +45,21 @@ void song_proxy_setup(void) {
         0
     );
     class_addfloat(song_proxy_class, song_proxy_float);
+    class_addanything(song_proxy_class, song_proxy_anything);
+    class_addmethod(song_proxy_class, (t_method)song_proxy_properties, \
+            gensym("editor-open"), 0);
+    class_addmethod(song_proxy_class, (t_method)song_proxy_properties_close, \
+            gensym("editor-close"), 0);
+    class_addmethod(song_proxy_class, (t_method)song_proxy_setrow, \
+            gensym("setrow"), A_GIMME, 0);
+    class_addmethod(song_proxy_class, (t_method)song_proxy_getrow_o, \
+            gensym("getrow"), A_SYMBOL, A_FLOAT, 0);
+    class_addmethod(song_proxy_class, (t_method)song_proxy_setcell, \
+            gensym("setcell"), A_GIMME, 0);
+    class_addmethod(song_proxy_class, (t_method)song_proxy_getcell_o, \
+            gensym("getcell"), A_SYMBOL, A_FLOAT, A_FLOAT, 0);
+    class_addmethod(song_proxy_class, (t_method)song_proxy_resizepattern, \
+            gensym("resizepattern"), A_SYMBOL, A_FLOAT, 0);
 #if PD_MINOR_VERSION >= 37
     class_setpropertiesfn(song_proxy_class, song_proxy_properties);
     class_setsavefn(song_proxy_class, song_proxy_save);
@@ -58,18 +73,19 @@ static t_song_proxy* song_proxy_new(t_symbol* song_name) {
     x->x_song = song_new(song_name);
     x->b_editor_open = 0;
     char rcv_buf[80];
-    sprintf(rcv_buf, "track_proxy-%s-%s", x->x_song->x_name->s_name, x->x_song->x_mastertrack->x_name->s_name);
+    sprintf(rcv_buf, "song_proxy-%s", x->x_song->x_name->s_name);
     x->rcv = gensym(rcv_buf);
     pd_bind(&x->x_obj.ob_pd, x->rcv);
 
     debugprint("created an instance of t_song_proxy: " PTR, x);
-    return x;
 
     song_proxy_properties_close((t_gobj*) x, NULL);
 
     pd_bind(&x->x_obj.ob_pd, gensym(SONG_SELECTOR));
+    pd_bind(&x->x_obj.ob_pd, gensym(TRACK_SELECTOR));
 
-    sys_vgui("pd::composer::init %s %s %s %d %d\n", x->rcv->s_name, x->x_song->x_name->s_name, x->x_song->x_mastertrack->x_name->s_name, x->x_song->x_mastertrack->x_ncolumns, DEBUG_BOOL);
+    debugprint("pd::composer::init %s %s %s %d %s %d\n", x->rcv->s_name, x->x_song->x_name->s_name, x->x_song->x_mastertrack->x_name->s_name, x->x_song->x_mastertrack->x_ncolumns, "Arrangement", DEBUG_BOOL);
+    sys_vgui("pd::composer::init %s %s %s %d %s %d\n", x->rcv->s_name, x->x_song->x_name->s_name, x->x_song->x_mastertrack->x_name->s_name, x->x_song->x_mastertrack->x_ncolumns, "Arrangement", DEBUG_BOOL);
 
     return x;
 }
@@ -78,12 +94,27 @@ static void song_proxy_free(t_song_proxy* x) {
     song_proxy_properties_close((t_gobj*) x, NULL);
 
     pd_unbind(&x->x_obj.ob_pd, gensym(SONG_SELECTOR));
+    pd_unbind(&x->x_obj.ob_pd, gensym(TRACK_SELECTOR));
+
     /* LATER find a way to get SONG_SELECTOR unbound earlier (at end of load?) */
+    /* Was this code needed? for what?
     t_pd* x2;
     while (x2 = pd_findbyclass(gensym(SONG_SELECTOR), song_proxy_class))
-        pd_unbind(x2, gensym(SONG_SELECTOR));
+        pd_unbind(x2, gensym(SONG_SELECTOR));*/
 
     pd_unbind(&x->x_obj.ob_pd, x->rcv);
+}
+
+static t_atom* song_proxy_get_pattern_names(t_song_proxy* x) {
+    if(response_row) {
+        freebytes(response_row, response_row_sz * sizeof(t_atom));
+        response_row = NULL;
+        response_row_sz = 0;
+    }
+    response_row_sz = track_get_pattern_count(x->x_song->x_mastertrack);
+    response_row = (t_atom*)getbytes(sizeof(t_atom) * response_row_sz);
+    track_get_pattern_names(x->x_song->x_mastertrack, response_row);
+    return response_row;
 }
 
 static void song_proxy_float(t_song_proxy* x, t_floatarg f) {
@@ -106,24 +137,27 @@ static void song_proxy_properties_close(t_gobj* z, t_glist* owner) {
 }
 
 static void song_proxy_save(t_gobj* z, t_binbuf* b) {
-    t_track_proxy* x = (t_track_proxy*)z;
-    t_track* t = x->x_track;
+    t_song_proxy* x = (t_song_proxy*)z;
+    t_song* s = x->x_song;
+    t_track* t = s->x_mastertrack;
 
-    binbuf_addv(b, "ssiisssi;", gensym("#X"), gensym("obj"),
+    binbuf_addv(b, "ssiiss;", gensym("#X"), gensym("obj"),
         (t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
-        gensym("track"), t->x_song->x_name, t->x_name, t->x_ncolumns);
+        gensym("song"), s->x_name);
+
+    song_binbuf_save(s, gensym(SONG_SELECTOR), b);
 
     track_binbuf_save(t, gensym(TRACK_SELECTOR), b);
 }
 
 static t_atom* song_proxy_gettracks(t_song_proxy* x) {
     if(response_row) {
-        freebytes(response_row, response_row_sz);
+        freebytes(response_row, response_row_sz * sizeof(t_atom));
         response_row = NULL;
         response_row_sz = 0;
     }
-    response_row_sz = sizeof(t_atom) * x->x_song->x_tracks_count;
-    response_row = (t_atom*)getbytes(response_row_sz);
+    response_row_sz = x->x_song->x_tracks_count;
+    response_row = (t_atom*)getbytes(response_row_sz * sizeof(t_atom));
     int i;
     for(i = 0; i < x->x_song->x_tracks_count; i++) {
         SETSYMBOL(&response_row[i], x->x_song->x_tracks[i]->x_name);
@@ -154,10 +188,17 @@ static void song_proxy_anything(t_song_proxy* x, t_symbol* s, int argc, t_atom* 
     } else if(s == gensym("EDIT")) {
         song_proxy_editcmd(x, s, argc, argv);
         return;
+    } else if(s == gensym("SONGINFO")) {
+        song_proxy_loadsonginfo(x, s, argc, argv);
+        return;
     } else {
         error("unrecognized command for anything method: %s ", s->s_name);
         return;
     }
+}
+
+static void song_proxy_loadsonginfo(t_song_proxy* x, t_symbol* s, int argc, t_atom* argv) {
+    song_loaddata(x->x_song, argc, argv);
 }
 
 static void song_proxy_loaddata(t_song_proxy* x, t_symbol* s, int argc, t_atom* argv) {
@@ -202,8 +243,11 @@ static void song_proxy_editcmd(t_song_proxy* x, t_symbol* s_, int argc, t_atom* 
         song_proxy_properties((t_gobj*) x, NULL);
     } else if(s == gensym("editor-close")) {
         song_proxy_properties_close((t_gobj*) x, NULL);
+    } else if(s == gensym("getpatterns")) {
+        t_atom* rsp = song_proxy_get_pattern_names(x);
+        song_proxy_sendgui(x, gensym("patterns"), response_row_sz, rsp);
     } else if(s == gensym("gettracks")) {
-        t_atom* rsp = song_proxy_get_track_names(x);
+        t_atom* rsp = song_proxy_gettracks(x);
         song_proxy_sendgui(x, gensym("tracks"), response_row_sz, rsp);
     } else if(s == gensym("gettrackscount")) {
         t_atom a;
@@ -270,21 +314,29 @@ static t_atom* song_proxy_getrow(t_song_proxy* x, t_symbol* pat_name, t_floatarg
 
 static t_atom* song_proxy_getrow_with_header(t_song_proxy* x, t_symbol* pat_name, t_floatarg rownum) {
     if(response_row) {
-        freebytes(response_row, response_row_sz);
+        freebytes(response_row, response_row_sz * sizeof(t_atom));
         response_row = NULL;
         response_row_sz = 0;
     }
 
     t_atom* row = song_proxy_getrow(x, pat_name, rownum);
     if(!row) {
-        error("song: getrow: nu such patern: '%s'", pat_name->s_name);
+        error("song: getrow: no such pattern: '%s'", pat_name->s_name);
         return NULL;
     }
-    response_row_sz = sizeof(t_atom) * (x->x_song->x_mastertrack->x_ncolumns + 2);
-    t_atom* response_row = (t_atom*)getbytes(response_row_sz);
+    fprintf(stderr, "GOT A ROW " PTR ", 2 + %d (=? %d) columns, last a_type = %d\n", (long unsigned int)row, (int)x->x_song->x_mastertrack->x_ncolumns, (int)x->x_song->x_tracks_count, 0);
+    response_row_sz = x->x_song->x_mastertrack->x_ncolumns + 2;
+    t_atom* response_row = (t_atom*)getbytes(response_row_sz * sizeof(t_atom));
     SETSYMBOL(&response_row[0], pat_name);
     SETFLOAT(&response_row[1], rownum);
     memcpy(&response_row[2], row, sizeof(t_atom) * x->x_song->x_mastertrack->x_ncolumns);
+    if(response_row[2].a_type == A_SYMBOL)
+        fprintf(stderr, "VALUE[2] = %s\n", response_row[2].a_w.w_symbol->s_name);
+    else if(response_row[2].a_type == A_FLOAT)
+        fprintf(stderr, "VALUE[2] = %f\n", response_row[2].a_w.w_float);
+    else
+        fprintf(stderr, "VALUE[2] = ? (type = %d)\n", response_row[2].a_type);
+
     return &response_row[0];
 }
 
@@ -323,7 +375,7 @@ static t_atom* song_proxy_getcell(t_song_proxy* x, t_symbol* pat_name, t_floatar
 static t_atom* song_proxy_getcell_with_header(t_song_proxy* x, t_symbol* pat_name, t_floatarg rownum, t_floatarg colnum) {
     t_atom* cell = song_proxy_getcell(x, pat_name, rownum, colnum);
     if(!cell) {
-        error("song: getcell: nu such patern: '%s'", pat_name->s_name);
+        error("song: getcell: no such pattern: '%s'", pat_name->s_name);
         return NULL;
     }
     SETSYMBOL(&response_cell[0], pat_name);
@@ -347,19 +399,4 @@ static t_pattern* song_proxy_resizepattern(t_song_proxy* x, t_symbol* name, t_fl
     }
     pattern_resize(pat, (t_int)rows);
     return pat;
-}
-
-static t_atom* song_proxy_get_track_names(t_song_proxy* x) {
-    if(response_row) {
-        freebytes(response_row, response_row_sz);
-        response_row = NULL;
-        response_row_sz = 0;
-    }
-    response_row_sz = sizeof(t_atom) * x->x_song->x_tracks_count;
-    response_row = (t_atom*)getbytes(response_row_sz);
-    int i;
-    for(i = 0; i < x->x_song->x_tracks_count; i++) {
-        SETSYMBOL(&response_row[i], x->x_song->x_tracks[i]->x_name);
-    }
-    return &response_row[0];
 }
