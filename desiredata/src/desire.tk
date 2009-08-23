@@ -3446,12 +3446,11 @@ def FindModel search_recursive {} {
 			$self result= [lindex $@results 0]
 			set @results [lreplace $@results 0 0]
 			incr @last_canvas
-			return
 		} else {
 			incr @last_canvas
 			$self search_recursive
-			return
 		}
+		return
 	}
 	set old_canvases $@next_canvases
 	set @next_canvases {}
@@ -7748,17 +7747,14 @@ def ServerPrefsDialogue apply {} {
 	$self write
 }
 def ServerPrefsDialogue init_reverse_hash {} {
-	global pdrc_options pdrc_options_h pd_apilist2
-	foreach {type names} $pdrc_options {
+	foreach {type names} $::pdrc_options {
 		set name [lindex $names 0]
 		if {[info exists @$name]} {
 			if {$name != "audio_api_choice"} {set @$name ""}
-		} else {
-			set @$name ""
-		}
-		foreach alias $names {set pdrc_options_h($alias) [list $type $name]}
+		} else {set @$name ""}
+		foreach alias $names {set ::pdrc_options_h($alias) [list $type $name]}
 		if {$name == "audio_api_choice"} {
-			foreach alias [lrange $pd_apilist2 1 end] {set pdrc_options_h($alias) [list $type $name]}
+			foreach alias [lrange $::pd_apilist2 1 end] {set ::pdrc_options_h($alias) [list $type $name]}
 		}
 	}
 }
@@ -7780,11 +7776,7 @@ def ServerPrefsDialogue audio_properties {indevlist indevs inchans outdevlist ou
 	mset [list @inchannels0  @inchannels1  @inchannels2  @inchannels3]  $@inchannels
 	mset [list @outchannels0 @outchannels1 @outchannels2 @outchannels3] $@outchannels
 	set @audio_api_choice2 [say [lindex $::pd_apilist2 $@audio_api_choice]]
-	if {![winfo exists .$self.1.1]} {
-		$self init_content
-	} else {
-		$self update_content
-	}
+	if {![winfo exists .$self.1.1]} {$self   init_content} else {$self update_content}
 }
 def ServerPrefsDialogue audio_properties=? {} {
 	set indev0 [lsearch $@audioindev $@audioindev0]
