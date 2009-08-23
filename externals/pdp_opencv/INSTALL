@@ -2,9 +2,20 @@ GNU/Linux
 
 (actually only tested in GNU/Linux Ubuntu Gutsy)
 
-unpack it ::
+first install opencv development packages,
+on ubuntu :
 
-cd into the library folder ::
+apt-get install libcv-dev
+apt-get install libcvaux-dev
+apt-get install libhighgui-dev
+
+
+then get the _SOURCES_ of the pd you are using
+and of the GEM or PDP that you are loading
+( it might not work if the version 
+is different )
+
+then compile the externals :
 
 cd pix_opencv
 
@@ -12,7 +23,7 @@ or
 
 cd pdp_opencv
 
-edit the Makefile to fit your system and sources folders:
+edit the Makefile to fit your pd and GEM/PDP sources paths :
 
 for pix_opencv edit the Makefile and change the values for PD_DIR and GEM_DIR variables
 
@@ -26,26 +37,5 @@ make
 and copy the .pd_linux to your externals folder ::
 
 cp *.pd_linux /usr/local/lib/pd/extra/
-
-MAC OSX (macintel)
-
-(This is only for pix_opencv Actually still there isn’t a MACOSX makefile for pdp_opencv.)
-
-cd pix_opencv
-
-Overwrite the Makefile with this one : Makefile.darwin
-
-edit the Makefile and change the values for PD_DIR and GEM_DIR variables
-and edit this lines : OPENCV_CFLAGS and OPENCV_LIBS
-Put something like that -I/opt/local/var/macports/software/opencv/1.0.0_0/opt/local/include/opencv/ and -L/opt/local/var/macports/software/opencv/1.0.0_0/opt/local/lib/ -lcxcore -lcv -lhighgui -lcvaux -lml 
-
-then, compile it ::
-
-make clean
-make
-
-and copy the .pd_darwin to your externals folder ::
-
-cp *.pd_darwin /Applications/Pd-0.40.3-extended-20080315.app/Contents/Resources/extra/
 
 
