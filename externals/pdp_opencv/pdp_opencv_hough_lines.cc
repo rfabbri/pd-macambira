@@ -42,7 +42,7 @@ typedef struct pdp_opencv_hough_lines_struct
 
   t_outlet *x_outlet0;
   t_outlet *x_outlet1;
-  t_atom x_list[3];
+  t_atom x_list[5];
 
   int x_packet0;
   int x_packet1;
@@ -139,9 +139,15 @@ static void pdp_opencv_hough_lines_process_rgb(t_pdp_opencv_hough_lines *x)
             pt2.x = cvRound(x0 - 1000*(-b));
             pt2.y = cvRound(y0 - 1000*(a));
             cvLine( x->image, pt1, pt2, CV_RGB(255,0,0), 3, 8 );
-            sprintf( tindex, "%d", i );
+            SETFLOAT(&x->x_list[0], i);
+            SETFLOAT(&x->x_list[1], pt1.x);
+            SETFLOAT(&x->x_list[2], pt1.y);
+            SETFLOAT(&x->x_list[3], pt2.x);
+            SETFLOAT(&x->x_list[4], pt2.y);
+            outlet_list( x->x_outlet1, 0, 5, x->x_list );
             pt1.x = (pt1.x+pt2.x)/2;
             pt1.y = (pt1.y+pt2.y)/2;
+            sprintf( tindex, "%d", i );
             cvPutText( x->image, tindex, pt1, &x->font, CV_RGB(255,255,255));
           }
         }
@@ -160,9 +166,15 @@ static void pdp_opencv_hough_lines_process_rgb(t_pdp_opencv_hough_lines *x)
             CvPoint* line = (CvPoint*)cvGetSeqElem(x->x_lines,i);
             char tindex[10];
             cvLine( x->image, line[0], line[1], CV_RGB(255,0,0), 3, 8 );
-            sprintf( tindex, "%d", i );
+            SETFLOAT(&x->x_list[0], i);
+            SETFLOAT(&x->x_list[1], line[0].x);
+            SETFLOAT(&x->x_list[2], line[0].y);
+            SETFLOAT(&x->x_list[3], line[1].x);
+            SETFLOAT(&x->x_list[4], line[1].y);
+            outlet_list( x->x_outlet1, 0, 5, x->x_list );
             line[0].x = (line[0].x+line[1].x)/2;
             line[0].y = (line[0].y+line[1].y)/2;
+            sprintf( tindex, "%d", i );
             cvPutText( x->image, tindex, line[0], &x->font, CV_RGB(255,255,255));
           }
         }
@@ -190,9 +202,15 @@ static void pdp_opencv_hough_lines_process_rgb(t_pdp_opencv_hough_lines *x)
             pt2.x = cvRound(x0 - 1000*(-b));
             pt2.y = cvRound(y0 - 1000*(a));
             cvLine( x->image, pt1, pt2, CV_RGB(255,0,0), 3, 8 );
-            sprintf( tindex, "%d", i );
+            SETFLOAT(&x->x_list[0], i);
+            SETFLOAT(&x->x_list[1], pt1.x);
+            SETFLOAT(&x->x_list[2], pt1.y);
+            SETFLOAT(&x->x_list[3], pt2.x);
+            SETFLOAT(&x->x_list[4], pt2.y);
+            outlet_list( x->x_outlet1, 0, 5, x->x_list );
             pt1.x = (pt1.x+pt2.x)/2;
             pt1.y = (pt1.y+pt2.y)/2;
+            sprintf( tindex, "%d", i );
             cvPutText( x->image, tindex, pt1, &x->font, CV_RGB(255,255,255));
           }
         }
@@ -345,8 +363,8 @@ void *pdp_opencv_hough_lines_new(t_floatarg f)
   x->x_height = 240;
   x->x_size   = x->x_width * x->x_height;
 
-  x->x_mode = CV_HOUGH_STANDARD;
-  x->x_threshold = 200;
+  x->x_mode = CV_HOUGH_PROBABILISTIC;
+  x->x_threshold = 50;
   x->x_maxlines = 10;
   x->x_minlength = 30.0;
   x->x_gap = 10.0;
