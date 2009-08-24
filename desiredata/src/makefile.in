@@ -88,8 +88,7 @@ install:: all
 	for file in defaults.ddrc pkgIndex.tcl poe.tcl bgerror.tcl; do \
 		install $$file $(DESTDIR)$(libpdbindir)/$$file; done
 	install $(BINARYMODE) $(SO) $(DESTDIR)$(libdir)/$(SO)
-	test -w /etc/ld.so.cache && ldconfig || true
-	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) main.c -lpd -o $(DESTDIR)$(bindir)/pd$(EXE) $(WSTRIP)
+	$(CXX) $(LDFLAGS) $(DBG_CFLAGS) main.c -L $(DESTDIR)$(libdir) -lpd -o $(DESTDIR)$(bindir)/pd$(EXE) $(WSTRIP)
 	install -m755 desire.tk   $(DESTDIR)$(bindir)/desire.tk
 	install -m755 desire   $(DESTDIR)$(bindir)/desire
 	install -m755 pdsend$(EXE)      $(DESTDIR)$(bindir)/pdsend$(EXE)
