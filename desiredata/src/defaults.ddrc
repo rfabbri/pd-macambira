@@ -118,7 +118,6 @@ key {
     find Ctrl+f
     find_again Ctrl+g
     find_last_error {}
-    font_bomb Ctrl+F
     incr_scale Ctrl+PLUS
     incr_zoom Ctrl+equal
     key_nav_down Ctrl+down
@@ -177,7 +176,6 @@ key {
     find Ctrl+f
     find_again Ctrl+g
     find_last_error {}
-    font_bomb {}
     latency_meter {}
     load_meter {}
     midi_settings {}
