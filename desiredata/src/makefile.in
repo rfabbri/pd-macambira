@@ -11,6 +11,9 @@ bindir = @bindir@
 includedir = @includedir@
 libdir = @libdir@
 mandir = @mandir@
+datarootdir = @datarootdir@
+datadir = @datadir@
+
 # varibles to match packages/Makefile.buildlayout so that they can be easily
 # overridden when building Pd-extended builds. <hans@at.or.at>
 libpddir = $(libdir)/pd
