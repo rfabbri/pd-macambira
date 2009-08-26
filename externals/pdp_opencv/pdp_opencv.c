@@ -42,9 +42,19 @@ void pdp_opencv_contours_convexity_setup(void);
 void pdp_opencv_contours_boundingrect_setup(void);
 void pdp_opencv_lk_setup(void);
 void pdp_opencv_dft_setup(void);
-void pdp_opencv_cvk_setup(void);
+void pdp_opencv_knear_setup(void);
 void pdp_opencv_hu_moments_setup(void);
 void pdp_opencv_hu_compare_setup(void);
+void pdp_opencv_pgh_compare_setup(void);
+void pdp_opencv_bgstats_setup(void);
+void pdp_opencv_surf_setup(void);
+void pdp_opencv_lk_setup(void);
+void pdp_opencv_athreshold_setup(void);
+void pdp_opencv_channels_setup(void);
+void pdp_opencv_hough_lines_setup(void);
+void pdp_opencv_hough_circles_setup(void);
+void pdp_opencv_camshift_setup(void);
+
 
 
 /* library setup routine */
@@ -74,9 +84,18 @@ void pdp_opencv_setup(void){
     pdp_opencv_contours_boundingrect_setup();
     pdp_opencv_lk_setup();
     pdp_opencv_dft_setup();
-    pdp_opencv_cvk_setup();
+    pdp_opencv_knear_setup();
     pdp_opencv_hu_moments_setup();
     pdp_opencv_hu_compare_setup();
+    pdp_opencv_pgh_compare_setup();
+    pdp_opencv_bgstats_setup();
+    pdp_opencv_surf_setup();
+    pdp_opencv_lk_setup();
+    pdp_opencv_athreshold_setup();
+    pdp_opencv_channels_setup();
+    pdp_opencv_hough_lines_setup();
+    pdp_opencv_hough_circles_setup();
+    pdp_opencv_camshift_setup();
 
     pdp_opencv_initialized++;
 
