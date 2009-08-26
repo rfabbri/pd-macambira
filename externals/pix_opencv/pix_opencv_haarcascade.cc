@@ -313,6 +313,7 @@ void pix_opencv_haarcascade :: processRGBImage(imageStruct &image)
 
 void pix_opencv_haarcascade :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_haarcascade : yuv format not supported" );
 }
     	
 void pix_opencv_haarcascade :: processGrayImage(imageStruct &image)

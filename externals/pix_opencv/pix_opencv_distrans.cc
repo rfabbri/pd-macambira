@@ -292,6 +292,7 @@ void pix_opencv_distrans :: processRGBImage(imageStruct &image)
 
 void pix_opencv_distrans :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_distrans : yuv format not supported" );
 }
     	
 void pix_opencv_distrans :: processGrayImage(imageStruct &image)

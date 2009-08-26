@@ -192,6 +192,7 @@ void pix_opencv_morphology :: processRGBImage(imageStruct &image)
 
 void pix_opencv_morphology :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_morphology : yuv format not supported" );
 }
     	
 void pix_opencv_morphology :: processGrayImage(imageStruct &image)

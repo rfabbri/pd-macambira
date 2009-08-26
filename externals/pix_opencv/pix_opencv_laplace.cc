@@ -164,6 +164,7 @@ void pix_opencv_laplace :: processRGBImage(imageStruct &image)
 
 void pix_opencv_laplace :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_laplace : yuv format not supported" );
 }
     	
 void pix_opencv_laplace :: processGrayImage(imageStruct &image)

@@ -172,6 +172,7 @@ void pix_opencv_bgsubstract :: processRGBImage(imageStruct &image)
 
 void pix_opencv_bgsubstract :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_bgsubstract : yuv format not supported" );
 }
     	
 void pix_opencv_bgsubstract :: processGrayImage(imageStruct &image)

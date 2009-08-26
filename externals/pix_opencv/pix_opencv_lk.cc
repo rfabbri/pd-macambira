@@ -361,6 +361,7 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
 
 void pix_opencv_lk :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_lk : yuv format not supported" );
 }
     	
 void pix_opencv_lk :: processGrayImage(imageStruct &image)

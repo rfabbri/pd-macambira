@@ -167,6 +167,7 @@ void pix_opencv_threshold :: processRGBImage(imageStruct &image)
 
 void pix_opencv_threshold :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_threshold : yuv format not supported" );
 }
     	
 void pix_opencv_threshold :: processGrayImage(imageStruct &image)

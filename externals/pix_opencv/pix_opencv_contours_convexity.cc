@@ -453,6 +453,7 @@ void pix_opencv_contours_convexity :: processRGBImage(imageStruct &image)
 
 void pix_opencv_contours_convexity :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_contours_convexity : yuv format not supported" );
 }
     	
 void pix_opencv_contours_convexity :: processGrayImage(imageStruct &image)

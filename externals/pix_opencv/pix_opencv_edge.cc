@@ -159,6 +159,7 @@ void pix_opencv_edge :: processRGBImage(imageStruct &image)
 
 void pix_opencv_edge :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_edge : yuv format not supported" );
 }
     	
 void pix_opencv_edge :: processGrayImage(imageStruct &image)

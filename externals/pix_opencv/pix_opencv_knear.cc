@@ -393,6 +393,7 @@ void pix_opencv_knear :: processRGBImage(imageStruct &image)
 
 void pix_opencv_knear :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_knear : yuv format not supported" );
 }
     	
 void pix_opencv_knear :: processGrayImage(imageStruct &image)

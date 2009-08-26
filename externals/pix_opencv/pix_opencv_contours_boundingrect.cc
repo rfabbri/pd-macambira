@@ -325,6 +325,7 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
 
 void pix_opencv_contours_boundingrect :: processYUVImage(imageStruct &image)
 {
+   post( "pix_opencv_contours_boundingrect : yuv format not supported" );
 }
     	
 void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)

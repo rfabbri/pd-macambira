@@ -362,6 +362,7 @@ void pix_opencv_histo :: processRGBImage(imageStruct &image)
 
 void pix_opencv_histo :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_histo : yuv format not supported" );
 }
     	
 void pix_opencv_histo :: processGrayImage(imageStruct &image)

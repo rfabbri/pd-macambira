@@ -398,6 +398,7 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
 
 void pix_opencv_motempl :: processYUVImage(imageStruct &image)
 {
+  post( "pix_opencv_motempl : yuv format not supported" );
 }
     	
 void pix_opencv_motempl :: processGrayImage(imageStruct &image)
