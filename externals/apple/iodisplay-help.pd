@@ -1,10 +1,8 @@
 #N canvas 392 89 560 598 10;
-#X obj 4 547 cnv 15 550 20 empty \$0-pddp.cnv.footer empty 20 12 0
-14 -228856 -66577 0;
 #X obj 4 -17 cnv 15 550 40 empty \$0-pddp.cnv.header iodisplay 3 12
-0 18 -204280 -1 0;
+0 18 -241536 -1 0;
 #X obj 3 179 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 15 12 0 13
--228856 -1 0;
+-245500 -191407 0;
 #N canvas 779 22 494 344 META 0;
 #X text 12 25 KEYWORDS control number float store;
 #X text 12 45 LICENSE GPL;
@@ -18,35 +16,15 @@
 #X text 12 185 RELEASE_VERSION 0.40-test05;
 #X restore 504 549 pd META;
 #X obj 3 271 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlet 15 12 0
-13 -228856 -1 0;
+13 -245500 -191407 0;
 #X obj 3 321 cnv 3 550 3 empty \$0-pddp.cnv.argument argument 15 12
-0 13 -228856 -1 0;
+0 13 -245500 -191407 0;
 #X obj 3 371 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 15
-12 0 13 -228856 -1 0;
+12 0 13 -245500 -191407 0;
 #X obj 72 245 cnv 17 3 20 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
 -162280 0;
 #X obj 72 199 cnv 17 3 40 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
-#N canvas 309 454 609 478 guts 0;
-#X obj 117 95 textfile;
-#X msg 116 24 symbol template-HCS.pd;
-#X msg 116 54 read \$1 \, rewind \, bang;
-#X obj 117 141 trigger bang anything;
-#X obj 58 117 bang;
-#X obj 240 162 route #X;
-#X obj 240 183 route text;
-#X obj 240 250 route DESCRIPTION;
-#X obj 239 276 print;
-#X obj 140 277 print TEXT;
-#X connect 0 0 3 0;
-#X connect 1 0 2 0;
-#X connect 2 0 0 0;
-#X connect 3 0 4 0;
-#X connect 3 1 5 0;
-#X connect 4 0 0 0;
-#X connect 5 0 6 0;
-#X connect 7 0 8 0;
-#X restore 453 549 pd guts;
 #X obj 412 6 pddp/pddplink http://wiki.puredata.info/en/apple/keyboard_light
 -text pdpedia: keyboard_light;
 #X obj 104 390 pddp/pddplink http://www.osxbook.com/book/bonus/chapter10/light/
@@ -60,14 +38,14 @@ Apple;
 #X floatatom 116 82 5 0 0 0 - - -;
 #X obj 81 140 pddp/print;
 #X obj 81 107 iodisplay brightness;
-#X text 102 339 SYMBOL - name of the IODisplay parameter to control
+#X text 102 339 symbol - name of the IODisplay parameter to control
 ;
-#X text 103 289 FLOAT - value of the current IODisplay parameter;
-#X text 102 245 SYMBOL - name of the IODisplay parameter to control
+#X text 103 289 float - value of the current IODisplay parameter;
+#X text 102 245 symbol - name of the IODisplay parameter to control
 ;
-#X text 102 198 BANG - output the current IODisplay parameter level
+#X text 102 198 bang - output the current IODisplay parameter level
 ;
-#X text 102 218 FLOAT - set the current IODisplay parameter level;
+#X text 102 218 float - set the current IODisplay parameter level;
 #X obj 103 411 pddp/pddplink http://darcs.brianweb.net/vendor/powerpc-apple-darwin/include/IOKit/graphics/IOGraphicsTypes.h
 -text IOKit/graphics/IOGraphicsTypes.h;
 #X text 14 430 Possible IODisplay parameters:;
@@ -88,17 +66,17 @@ Apple;
 #X text 384 527 defaults;
 #X msg 291 33 bang;
 #X obj 306 59 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 2800 1;
+-1 -1 0 1;
 #X floatatom 319 83 5 0 0 0 - - -;
 #X obj 291 140 pddp/print;
 #X msg 366 83 symbol brightness;
 #X obj 291 107 iodisplay;
-#X connect 14 0 18 0;
-#X connect 15 0 16 0;
-#X connect 15 0 18 0;
-#X connect 18 0 17 0;
-#X connect 41 0 46 0;
-#X connect 42 0 43 0;
-#X connect 42 0 46 0;
-#X connect 45 0 46 1;
-#X connect 46 0 44 0;
+#X connect 12 0 16 0;
+#X connect 13 0 14 0;
+#X connect 13 0 16 0;
+#X connect 16 0 15 0;
+#X connect 39 0 44 0;
+#X connect 40 0 41 0;
+#X connect 40 0 44 0;
+#X connect 43 0 44 1;
+#X connect 44 0 42 0;
