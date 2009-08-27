@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vbap windowing zexy
+LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1325,6 +1325,37 @@ iem16_clean:
 	-rm -f -- $(IEM16_DIR)/*.o
 	-rm -f -- $(IEM16_DIR)/*.bak
 	-rm -f -- $(IEM16_DIR)/*.*~
+
+#------------------------------------------------------------------------------#
+# IEMGUTS
+IEMGUTS_NAME=iemguts
+IEMGUTS_OBJECTS := $(wildcard $(externals_src)/iem/iemguts/src/*.c)
+iemguts: $(IEMGUTS_OBJECTS:.c=.$(EXTENSION))
+
+
+iemguts_install: iemguts
+	install -d $(DESTDIR)$(objectsdir)/$(IEMGUTS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMGUTS_NAME) \
+		--author "IOhannes m zmoelnig" \
+		--description "IEMguts is a collection of objects that deal with the infrastructure to build better abstractions" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(IEMGUTS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMGUTS_NAME)
+	install -d $(DESTDIR)$(helpdir)/$(IEMGUTS_NAME)
+	install -p $(externals_src)/iem/iemguts/help/*.pd \
+		$(DESTDIR)$(helpdir)/$(IEMGUTS_NAME)
+	install -d $(DESTDIR)$(readmesdir)
+	install -p $(externals_src)/iem/iemguts/README.txt \
+		$(DESTDIR)$(readmesdir)/$(IEMGUTS_NAME).txt
+	install -d $(DESTDIR)$(examplesdir)/$(IEMGUTS_NAME)
+	install -p $(externals_src)/iem/iemguts/examples/*.pd \
+		$(DESTDIR)$(examplesdir)/$(IEMGUTS_NAME)
+
+iemguts_clean:
+	-rm -f -- $(IEMGUTS_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(IEMGUTS_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/iem/iemguts/*.bak
+	-rm -f -- $(externals_src)/iem/iemguts/*.*~
 
 
 
