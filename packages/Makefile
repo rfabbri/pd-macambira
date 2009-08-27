@@ -225,28 +225,28 @@ $(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
 gem: $(gem_src)/src/Gem.$(EXTENSION)
 
 gem_install: gem $(helpdir)
-	install -d $(helpdir)/$(GEM_NAME)
-	install -p $(gem_src)/help/*.* $(helpdir)/$(GEM_NAME)
-	install -p $(gem_src)/abstractions/*-help.pd $(helpdir)/$(GEM_NAME)
-	install -d $(objectsdir)/$(GEM_NAME)
+	install -d $(DESTDIR)$(helpdir)/$(GEM_NAME)
+	install -p $(gem_src)/help/*.* $(DESTDIR)$(helpdir)/$(GEM_NAME)
+	install -p $(gem_src)/abstractions/*-help.pd $(DESTDIR)$(helpdir)/$(GEM_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)
 ifneq ($(OS_NAME),windows)
-	install -p $(gem_src)/src/Gem.$(EXTENSION)   $(objectsdir)/$(GEM_NAME)/
+	install -p $(gem_src)/src/Gem.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 endif
 # kludge to get helpfiles working since the HELPSYMBOL stuff changed
-	install -p $(gem_src)/help/*.*   $(objectsdir)/$(GEM_NAME)/
+	install -p $(gem_src)/help/*.*  $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 	install -p $(shell ls -1 $(gem_src)/abstractions/*.* | \
-		grep -v '\-help.pd')  $(objectsdir)/$(GEM_NAME)
-	install -d $(manualsdir)/$(GEM_NAME)
-	install -p $(gem_src)/doc/*.* $(manualsdir)/$(GEM_NAME)
-	install -d $(manualsdir)/$(GEM_NAME)/manual
+		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(GEM_NAME)
+	install -d $(DESTDIR)$(manualsdir)/$(GEM_NAME)
+	install -p $(gem_src)/doc/*.* $(DESTDIR)$(manualsdir)/$(GEM_NAME)
+	install -d $(DESTDIR)$(manualsdir)/$(GEM_NAME)/manual
 # in Gem 0.92, $(gem_src)/manual moved to $(gem_src)/doc/manual
 	(test -d $(gem_src)/manual && \
-		install -p $(gem_src)/manual/*.* $(manualsdir)/$(GEM_NAME)/manual) || \
-		install -p $(gem_src)/doc/manual/*.* $(manualsdir)/$(GEM_NAME)/manual
+		install -p $(gem_src)/manual/*.* $(DESTDIR)$(manualsdir)/$(GEM_NAME)/manual) || \
+		install -p $(gem_src)/doc/manual/*.* $(DESTDIR)$(manualsdir)/$(GEM_NAME)/manual
 	for dir in $(shell ls -1 $(gem_src)/examples | grep -v CVS); do \
 		echo "installing $$dir"; \
-		install -d $(examplesdir)/$(GEM_NAME)/$$dir ; \
-		install -p $(gem_src)/examples/$$dir/*.* $(examplesdir)/$(GEM_NAME)/$$dir ;\
+		install -d $(DESTDIR)$(examplesdir)/$(GEM_NAME)/$$dir ; \
+		install -p $(gem_src)/examples/$$dir/*.* $(DESTDIR)$(examplesdir)/$(GEM_NAME)/$$dir ;\
 	done
 
 
@@ -254,12 +254,12 @@ endif
 # noncvs_install
 # this is for including pre-compiled binaries in a build
 noncvs_install:
-	-install -p $(packages_src)/noncvs/$(OS_NAME)/bin/*.* $(bindir)
-	-install -p $(packages_src)/noncvs/$(OS_NAME)/doc/5.reference/*.* $(helpdir)
-	-install -p $(packages_src)/noncvs/$(OS_NAME)/extra/*.* $(objectsdir)
+	-install -p $(packages_src)/noncvs/$(OS_NAME)/bin/*.* $(DESTDIR)$(bindir)
+	-install -p $(packages_src)/noncvs/$(OS_NAME)/doc/5.reference/*.* $(DESTDIR)$(helpdir)
+	-install -p $(packages_src)/noncvs/$(OS_NAME)/extra/*.* $(DESTDIR)$(objectsdir)
 ifeq ($(OS_NAME),windows)
 	-install -p $(packages_src)/noncvs/windows/extra/Gem/*.* \
-		$(objectsdir)/$(GEM_NAME)/
+		$(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 endif
 	-test -d $(packages_src)/noncvs/$(OS_NAME)/gripd && \
 		install -d $(DESTDIR)$(prefix)/gripd
@@ -272,8 +272,8 @@ endif
 PD_NAME=Pd
 pd_install: pd
 	$(MAKE) -C $(pd_src)/src $(DEST_PATHS) $(PD_BUILD_FLAGS) install
-	install -d $(manualsdir)/$(PD_NAME)
-	install -p $(pd_src)/src/notes.txt $(manualsdir)/$(PD_NAME)
+	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
+	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
 
 #==============================================================================#
 #
@@ -281,10 +281,10 @@ pd_install: pd
 #
 #==============================================================================#
 
-LICENSE_FILE = $(manualsdir)/$(PD_NAME)/License.html
+LICENSE_FILE = $(DESTDIR)$(manualsdir)/$(PD_NAME)/License.html
 license_install:
   # generate HTML version of License
-	install -d $(manualsdir)/$(PD_NAME)
+	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
 	-rm $(LICENSE_FILE)
 	touch $(LICENSE_FILE)
 	echo "<html><body>" >> "$(LICENSE_FILE)"
@@ -294,13 +294,13 @@ license_install:
 	cat "$(packages_src)/gpl-3.0.txt" | sed -e 's/^$$/\<P\>/g' >> "$(LICENSE_FILE)"
 	echo "</font></body></html>" >> $(LICENSE_FILE)
 # Pd's license file
-	install -p "$(pd_src)/LICENSE.txt" "$(manualsdir)/$(PD_NAME)/Pd-LICENSE.txt"
+	install -p "$(pd_src)/LICENSE.txt" "$(DESTDIR)$(manualsdir)/$(PD_NAME)/Pd-LICENSE.txt"
 
 
 
-WELCOME_FILE = $(manualsdir)/$(PD_NAME)/Welcome.html
+WELCOME_FILE = $(DESTDIR)$(manualsdir)/$(PD_NAME)/Welcome.html
 welcome_install:
-	install -d $(manualsdir)/$(PD_NAME)
+	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
 	-rm $(WELCOME_FILE)
 	touch $(WELCOME_FILE)
 	echo "<html><head>" >> $(WELCOME_FILE)
@@ -317,9 +317,9 @@ welcome_install:
 
 
 
-README_FILE = $(manualsdir)/$(PD_NAME)/ReadMe.html
+README_FILE = $(DESTDIR)$(manualsdir)/$(PD_NAME)/ReadMe.html
 readme_install: 
-	install -d $(manualsdir)/$(PD_NAME)
+	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
 	echo $(CYCLONE_RELEASE)
 	-rm $(README_FILE)
 	touch $(README_FILE)

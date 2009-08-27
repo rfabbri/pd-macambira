@@ -105,9 +105,9 @@ scripts_src = $(cvs_root_dir)/scripts
 
 
 # destinations
-bindir = $(DESTDIR)$(prefix)/bin
-includedir = $(DESTDIR)$(prefix)/include
-mandir = $(DESTDIR)$(prefix)/man
+bindir = $(prefix)/bin
+includedir = $(prefix)/include
+mandir = $(prefix)/man
 
 libdir = $(prefix)/lib
 ifeq ($(OS_NAME),darwin)
@@ -123,8 +123,8 @@ ifeq ($(OS_NAME),darwin)
     endif
 endif
 
-objectsdir = $(DESTDIR)$(libpddir)/extra
-pddocdir = $(DESTDIR)$(libpddir)/doc
+objectsdir = $(libpddir)/extra
+pddocdir = $(libpddir)/doc
 examplesdir = $(pddocdir)/examples
 helpdir = $(pddocdir)/5.reference
 manualsdir = $(pddocdir)/manuals
@@ -142,28 +142,28 @@ $(DESTDIR):
 	install -d $(DESTDIR)
 
 $(bindir): $(DESTDIR)
-	install -d $(bindir)
+	install -d $(DESTDIR)$(bindir)
 
 $(examplesdir): $(DESTDIR)
-	install -d $(examplesdir)
+	install -d $(DESTDIR)$(examplesdir)
 
 $(includedir): $(DESTDIR)
-	install -d $(includedir)
+	install -d $(DESTDIR)$(includedir)
 
 $(pddocdir): $(DESTDIR)
-	install -d $(pddocdir)
+	install -d $(DESTDIR)$(pddocdir)
 
 $(helpdir): $(DESTDIR)
-	install -d $(helpdir)
+	install -d $(DESTDIR)$(helpdir)
 
 $(manualsdir): $(DESTDIR)
-	install -d $(manualsdir)
+	install -d $(DESTDIR)$(manualsdir)
 
 $(objectsdir): $(DESTDIR)
-	install -d $(objectsdir)
+	install -d $(DESTDIR)$(objectsdir)
 
 $(readmesdir): $(manualsdir)
-	install -d $(readmesdir)
+	install -d $(DESTDIR)$(readmesdir)
 
 installdirs: $(DESTDIR) $(bindir) $(examplesdir) $(pddocdir) $(includedir) $(helpdir) $(manualsdir) $(objectsdir) $(readmesdir)
 
@@ -203,48 +203,48 @@ PACKAGE_NAME = Pd-$(PD_VERSION)
 #==============================================================================#
 
 applications_clean:
-	-rm -f -- $(examplesdir)/*/*/*/*/*.*
-	-rm -f -- $(examplesdir)/*/*/*/*.*
-	-rm -f -- $(examplesdir)/*/*/*.*
-	-rm -f -- $(examplesdir)/*/*.*
-	-rmdir $(examplesdir)/*/*/*/*
-	-rmdir $(examplesdir)/*/*/*
-	-rmdir $(examplesdir)/*/*
-	-rmdir $(examplesdir)/*
-	-rmdir $(examplesdir)
+	-rm -f -- $(DESTDIR)$(examplesdir)/*/*/*/*/*.*
+	-rm -f -- $(DESTDIR)$(examplesdir)/*/*/*/*.*
+	-rm -f -- $(DESTDIR)$(examplesdir)/*/*/*.*
+	-rm -f -- $(DESTDIR)$(examplesdir)/*/*.*
+	-rmdir $(DESTDIR)$(examplesdir)/*/*/*/*
+	-rmdir $(DESTDIR)$(examplesdir)/*/*/*
+	-rmdir $(DESTDIR)$(examplesdir)/*/*
+	-rmdir $(DESTDIR)$(examplesdir)/*
+	-rmdir $(DESTDIR)$(examplesdir)
 
 
 help_clean:
-	-rm -f -- $(helpdir)/*/*/*.*
-	-rm -f -- $(helpdir)/*/*.*
-	-rm -f -- $(helpdir)/*.*
-	-rmdir $(helpdir)/*/*
-	-rmdir $(helpdir)/*
-	-rmdir $(helpdir)
+	-rm -f -- $(DESTDIR)$(helpdir)/*/*/*.*
+	-rm -f -- $(DESTDIR)$(helpdir)/*/*.*
+	-rm -f -- $(DESTDIR)$(helpdir)/*.*
+	-rmdir $(DESTDIR)$(helpdir)/*/*
+	-rmdir $(DESTDIR)$(helpdir)/*
+	-rmdir $(DESTDIR)$(helpdir)
 
 
 manuals_clean:
-	-rm -f -- $(manualsdir)/*/*/*.*
-	-rm -f -- $(manualsdir)/*/*.*
-	-rmdir $(manualsdir)/*/*
-	-rmdir $(manualsdir)/*
-	-rmdir $(manualsdir)
+	-rm -f -- $(DESTDIR)$(manualsdir)/*/*/*.*
+	-rm -f -- $(DESTDIR)$(manualsdir)/*/*.*
+	-rmdir $(DESTDIR)$(manualsdir)/*/*
+	-rmdir $(DESTDIR)$(manualsdir)/*
+	-rmdir $(DESTDIR)$(manualsdir)
 
 
 objects_clean:
-	-rm $(objectsdir)/*/*/*.pd
-	-rm $(objectsdir)/*/*.pd
-	-rm $(objectsdir)/*.pd
-	-rm $(objectsdir)/*/*/*.$(EXTENSION)
-	-rm $(objectsdir)/*/*.$(EXTENSION)
-	-rm $(objectsdir)/*.$(EXTENSION)
-	-rmdir $(objectsdir)/*/*
-	-rmdir $(objectsdir)/*
-	-rmdir $(objectsdir)
+	-rm $(DESTDIR)$(objectsdir)/*/*/*.pd
+	-rm $(DESTDIR)$(objectsdir)/*/*.pd
+	-rm $(DESTDIR)$(objectsdir)/*.pd
+	-rm $(DESTDIR)$(objectsdir)/*/*/*.$(EXTENSION)
+	-rm $(DESTDIR)$(objectsdir)/*/*.$(EXTENSION)
+	-rm $(DESTDIR)$(objectsdir)/*.$(EXTENSION)
+	-rmdir $(DESTDIR)$(objectsdir)/*/*
+	-rmdir $(DESTDIR)$(objectsdir)/*
+	-rmdir $(DESTDIR)$(objectsdir)
 
 
 install_clean: applications_clean help_clean manuals_clean objects_clean
-	-rmdir $(pddocdir)
+	-rmdir $(DESTDIR)$(pddocdir)
 	-rmdir $(DESTDIR)$(prefix)
 	-rmdir $(DESTDIR)
 	@echo " "
