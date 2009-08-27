@@ -19,11 +19,9 @@ ifeq ($(UNAME),Linux)
  EXTENSION = pd_linux
 endif
 ifeq ($(UNAME),Darwin)
- export MACOSX_DEPLOYMENT_TARGET = 10.3
- OPENCV_DIR = /Users/pd/opencv-1.0.0
- INCLUDES += -I$(OPENCV_DIR)/cv/include -I$(OPENCV_DIR)/cxcore/include -I$(OPENCV_DIR)/cvaux/include -I/sw/include
+ INCLUDES += -I/System/Library/Frameworks/OpenCV.framework/Headers/
  LDFLAGS =  -bundle -undefined dynamic_lookup
- LIBS =  -lm $(OPENCV_DIR)/build/cv/src/.libs/lib_cv.a -L/sw/lib
+ LIBS =  -lm -framework OpenCV
  EXTENSION = pd_darwin
 endif
 ifeq (MINGW,$(findstring MINGW,$(UNAME)))
