@@ -1335,7 +1335,7 @@ iemguts: $(IEMGUTS_OBJECTS:.c=.$(EXTENSION))
 
 iemguts_install: iemguts
 	install -d $(DESTDIR)$(objectsdir)/$(IEMGUTS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMGUTS_NAME) \
+	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(IEMGUTS_NAME) \
 		--author "IOhannes m zmoelnig" \
 		--description "IEMguts is a collection of objects that deal with the infrastructure to build better abstractions" \
 		--license "GNU GPL" \
