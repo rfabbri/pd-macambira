@@ -16,8 +16,7 @@
 #X text 236 125 - state;
 #X text 236 155 Key control;
 #X text 236 175 - Esc on / off;
-#X text 12 251 (C) 2006 João Pais - jmmmpais@googlemail.com
-;
+#X text 12 251 (C) 2006 João Pais - jmmmpais@googlemail.com;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
 #X text 8 227 The names of its contributors may not be used to endorse
@@ -44,16 +43,16 @@ in the documentation and/or other materials provided with the distribution.
 #X text 8 27 jmmmpais@googlemail.com;
 #X text 8 7 Copyright 2006 \, João Pais;
 #X restore 15 269 pd license;
-#X obj 73 102 cnv 13 37 13 empty \$0-label empty 4 8 0 12 -195568 -1
-0;
+#X obj 73 102 cnv 13 37 13 empty \$0-label 0 4 8 0 12 -195568 -1 0
+;
 #X obj 18 222 s \$0-label;
 #X msg 18 202 label \$1;
 #X obj 18 182 makesymbol;
 #X connect 0 0 2 0;
 #X connect 1 0 5 0;
-#X connect 1 0 21 0;
 #X connect 2 0 3 0;
 #X connect 2 1 1 0;
+#X connect 2 1 21 0;
 #X connect 3 0 1 1;
 #X connect 3 0 6 0;
 #X connect 4 0 7 0;
