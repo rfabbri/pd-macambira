@@ -133,10 +133,12 @@ int tcl_to_pd(Tcl_Obj *input, t_atom *output) {
 
 int pd_to_tcl(t_atom *input, Tcl_Obj **output) {
   Tcl_Obj* tcl_t_atom[2];
-  /*post("pd_to_tcl got an atom of type %d (%s)",
+#ifdef DEBUG
+  post("pd_to_tcl: atom type = %d (%s)",
     input->a_type, input->a_type == A_FLOAT ? "A_FLOAT" :
     input->a_type == A_SYMBOL ? "A_SYMBOL" :
-    input->a_type == A_POINTER ? "A_POINTER" : "?");*/
+    input->a_type == A_POINTER ? "A_POINTER" : "?");
+#endif
   switch (input->a_type) {
     case A_FLOAT: {
       tcl_t_atom[0] = Tcl_NewStringObj("float", -1);
@@ -159,7 +161,11 @@ int pd_to_tcl(t_atom *input, Tcl_Obj **output) {
       break;
     }
   }
+#ifdef DEBUG
+  post("pd_to_tcl: atom value = \"%s\"", Tcl_GetStringFromObj(tcl_t_atom[1], 0));
+#endif
   *output = Tcl_NewListObj(2, &tcl_t_atom[0]);
+  Tcl_IncrRefCount(*output);
   return TCL_OK;
 }
 

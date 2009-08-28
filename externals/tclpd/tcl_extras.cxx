@@ -17,21 +17,22 @@ static void *tclpd_init (t_symbol *classsym, int ac, t_atom *at) {
   t_tcl *self = (t_tcl *)pd_new(qlass);
   char s[32];
   sprintf(s,"pd%06lx",cereal++);
-  self->self = Tcl_NewStringObj(s,strlen(s));
-  object_table[string(s)] = (t_pd*)self;
+  self->self = Tcl_NewStringObj(s, -1);
   Tcl_IncrRefCount(self->self);
+  object_table[string(s)] = (t_pd*)self;
   Tcl_Obj *av[ac+2];
-  av[0] = Tcl_NewStringObj(name,strlen(name));
+  av[0] = Tcl_NewStringObj(name, -1);
+  Tcl_IncrRefCount(av[0]);
   av[1] = self->self;
   for(int i=0; i<ac; i++) {
     if(pd_to_tcl(&at[i], &av[2+i]) == TCL_ERROR) {
-      post("tcl error: %s\n", Tcl_GetString(Tcl_GetObjResult(tcl_for_pd)));
+      post("tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
       pd_free((t_pd *)self);
       return 0;
     }
   }
   if (Tcl_EvalObjv(tcl_for_pd,ac+2,av,0) != TCL_OK) {
-    post("tcl error: %s\n", Tcl_GetString(Tcl_GetObjResult(tcl_for_pd)));
+    post("tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
     pd_free((t_pd *)self);
     return 0;
   }
@@ -59,14 +60,17 @@ static void tclpd_anything (t_tcl *self, t_symbol *s, int ac, t_atom *at) {
   av[1] = Tcl_NewIntObj(0); // TODO: 0 -> outlet_number
   Tcl_AppendToObj(av[1],"_",1);
   Tcl_AppendToObj(av[1],s->s_name,strlen(s->s_name)); // selector
+  Tcl_IncrRefCount(av[1]);
   for(int i=0; i<ac; i++) {
     if(pd_to_tcl(&at[i], &av[2+i]) == TCL_ERROR) {
-      post("tcl error: %s\n", Tcl_GetString(Tcl_GetObjResult(tcl_for_pd)));
+      post("tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
       return;
     }
   }
-  if (Tcl_EvalObjv(tcl_for_pd,ac+2,av,0) != TCL_OK)
-    post("tcl error: %s\n", Tcl_GetString(Tcl_GetObjResult(tcl_for_pd)));
+  int result = Tcl_EvalObjv(tcl_for_pd,ac+2,av,0);
+  Tcl_DecrRefCount(av[1]);
+  if (result != TCL_OK)
+    post("tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
 }
 
 static void tclpd_free (t_tcl *self) {
