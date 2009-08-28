@@ -1,8 +1,12 @@
 #!/usr/bin/make
 
+DEBUG=1
 TCL_VERSION := $(shell echo 'puts $$tcl_version' | tclsh)
 INCLUDES =  -I../../pd/src -I/usr/include -I/usr/include/tcl$(TCL_VERSION)
 CFLAGS += $(INCLUDES) -xc++ -funroll-loops -fno-operator-names -fno-omit-frame-pointer -falign-functions=16 -O2 -Wall -fPIC
+ifeq ($(DEBUG),1)
+	CFLAGS += -O0 -g -ggdb -DDEBUG
+endif
 LDSOFLAGS += -lm -ltcl$(TCL_VERSION)
 CXX = g++
 OS = linux
