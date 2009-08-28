@@ -5,9 +5,12 @@ package provide pdlib 0.1
 
 package require Tcl 8.5
 
-set verbose 0
+set verbose 1
 
 namespace eval ::pd {
+    proc error_msg {m} {
+        return "pdlib: [uplevel {lindex [info level 0] 0}]: error: $m"
+    }
 
     proc add_inlet {self sel} {
         if $::verbose {post [info level 0]}
@@ -24,8 +27,7 @@ namespace eval ::pd {
                 lappend _($self:x_inlet) [symbolinlet_new [tclpd_get_object $self] $ptr]
             }
             default {
-                post "inlet creation error: unsupported selector: $sel"
-                return {}
+                return -code error [error_msg "unsupported selector: $sel"]
             }
         }
         return [lindex $_($self:x_inlet) end]
@@ -36,7 +38,7 @@ namespace eval ::pd {
         if {$n <= 0} {return {}}
         if {![info exists _($self:p_inlet)] ||
             $n >= [llength $_($self:p_inlet)]} {
-            return -code error "pdlib: error: no such inlet: $n"
+            return -code error [error_msg "no such inlet: $n"]
         }
         variable _
         return [[lindex $_($self:p_inlet) [expr $n-1]] value]
@@ -59,8 +61,7 @@ namespace eval ::pd {
                     [outlet_new [tclpd_get_object $self] [gensym "list"]]
             }
             default {
-                return -code error \
-                "pdlib: outlet creation error: unsupported selector: $sel"
+                return -code error [error_msg "unsupported selector: $sel"]
             }
         }
         return [lindex $_($self:x_outlet) end]
@@ -93,7 +94,7 @@ namespace eval ::pd {
                 outlet_bang $outlet
             }
             default {
-                return -code error "pdlib: outlet: unknown selector: $sel"
+                return -code error [error_msg "unknown selector: $sel"]
             }
         }
     }
@@ -122,11 +123,14 @@ namespace eval ::pd {
     }
 
     proc class {classname def} {
+        if $::verbose {post [lrange [info level 0] 0 end-1]}
         variable class_db
         array set class_db {}
         set class_db($classname:d_inlet) {}
         set class_db($classname:d_outlet) {}
         set def2 [regsub -all -line {#.*$} $def {}]
+        set patchable_flag 1
+        set noinlet_flag 0
         foreach {id arg} $def2 {
             switch -- $id {
                 inlet {
@@ -135,28 +139,42 @@ namespace eval ::pd {
                 outlet {
                     lappend class_db($classname:d_outlet) $arg
                 }
+                patchable {
+                    if {$arg != 0 && $arg != 1} {
+                        return -code error [error_msg "patchable must be 0/1"]
+                    }
+                    set patchable_flag $arg
+                }
+                noinlet {
+                    if {$arg != 0 && $arg != 1} {
+                        return -code error [error_msg "noinlet must be 0/1"]
+                    }
+                    set noinlet_flag $arg
+                }
                 default {
-                    proc ::${classname}_${id} {self args} \
-                        "global _; [expand_macros $arg]"
+                    proc ::${classname}_${id} {self args} [concat "global _;" [regsub -all @(\\\$?\[\\w\\?\]+) $arg _(\$self:\\1)]]
                 }
             }
         }
 
         proc ::$classname {self args} "
+            if \$::verbose {::pd::post \[info level 0\]}
             ::pd::create_iolets $classname \$self
             ::pd::call_classmethod $classname \$self constructor {*}\$args
             proc ::\$self {selector args} \"
+             if \\\$::verbose {::pd::post \\\[info level 0\\\]}
              ::pd::call_classmethod $classname \$self \\\$selector {*}\\\$args
             \"
             return \$self
         "
 
-        tclpd_class_new $classname 3
-    }
+        # TODO: c->c_gobj = (typeflag >= CLASS_GOBJ)
+        set flag [expr {
+            8 * ($noinlet_flag != 0) +
+            3 * ($patchable_flag != 0)
+        }]
 
-    proc expand_macros {body} {
-        # from poe.tcl by Mathieu Bouchard
-        return [regsub -all @(\\\$?\[\\w\\?\]+) $body _(\$self:\\1)]
+        tclpd_class_new $classname $flag
     }
 
     proc post {args} {
