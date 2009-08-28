@@ -19,7 +19,7 @@ extern "C" int tclpd_do_load_lib(t_canvas *canvas, char *objectname)
     if ((fd = canvas_open(canvas, objectname, ".tcl",
         dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
             goto gotone;
-        /* next try (objectname)/(classname).(sys_dllextent) ... */
+        /* next try (objectname)/(classname).(tcl) ... */
     strncpy(filename, objectname, MAXPDSTRING);
     filename[MAXPDSTRING-2] = 0;
     strcat(filename, "/");
@@ -28,7 +28,6 @@ extern "C" int tclpd_do_load_lib(t_canvas *canvas, char *objectname)
     if ((fd = canvas_open(canvas, filename, ".tcl",
         dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
             goto gotone;
-    //post("Tcl_loader: tried and failed");
     return (0);
 gotone:
     close(fd);
