@@ -12,6 +12,7 @@ namespace eval ::pd {
         return "pdlib: [uplevel {lindex [info level 0] 0}]: error: $m"
     }
 
+    # create additional inlets with this
     proc add_inlet {self sel} {
         if $::verbose {post [info level 0]}
         variable _
@@ -19,20 +20,36 @@ namespace eval ::pd {
             float {
                 set ptr [new_t_float]
                 lappend _($self:p_inlet) $ptr
-                lappend _($self:x_inlet) [floatinlet_new [tclpd_get_object $self] $ptr]
+                lappend _($self:t_inlet) "float"
+                #lappend _($self:x_inlet) [floatinlet_new [tclpd_get_object $self] $ptr]
             }
             symbol {
                 set ptr [new_t_symbol]
                 lappend _($self:p_inlet) $ptr
-                lappend _($self:x_inlet) [symbolinlet_new [tclpd_get_object $self] $ptr]
+                lappend _($self:t_inlet) "symbol"
+                #lappend _($self:x_inlet) [symbolinlet_new [tclpd_get_object $self] $ptr]
+            }
+            list {
+                set ptr [new_t_alist]
+                alist_init $ptr
+                alist_list $ptr 0 3 {some test args}
+                lappend _($self:p_inlet) $ptr
+                lappend _($self:t_inlet) "list"
+            }
+            DISABLED__pointer {
+            ## need to think more about this
+            #    set ptr [new_t_pointer]
+            #    lappend _($self:p_inlet) $ptr
+            ##    lappend _($self:x_inlet) [pointerinlet_new [tclpd_get_object $self] $ptr]
             }
             default {
                 return -code error [error_msg "unsupported selector: $sel"]
             }
         }
-        return [lindex $_($self:x_inlet) end]
+        #return [lindex $_($self:x_inlet) end]
     }
 
+    # get the value of a given inlet (inlets numbered starting from 1)
     proc inlet {self n} {
         if {$::verbose} {post [info level 0]}
         if {$n <= 0} {return {}}
@@ -41,9 +58,15 @@ namespace eval ::pd {
             return -code error [error_msg "no such inlet: $n"]
         }
         variable _
-        return [[lindex $_($self:p_inlet) [expr $n-1]] value]
+        set p_inlet [lindex $_($self:p_inlet) [expr $n-1]]
+        if {$_($self:t_inlet) == {list}} {
+            return [$p_inlet value]
+        } else {
+            return [$p_inlet value]
+        }
     }
 
+    # used in object constructor for adding inlets
     proc add_outlet {self sel} {
         if $::verbose {post [info level 0]}
         variable _
@@ -67,6 +90,7 @@ namespace eval ::pd {
         return [lindex $_($self:x_outlet) end]
     }
 
+    # used inside class for outputting some value
     proc outlet {self n sel args} {
         if $::verbose {post [info level 0]}
         variable _
@@ -99,12 +123,14 @@ namespace eval ::pd {
         }
     }
 
+    # used in object constructor to create inlets (internal method)
     proc create_iolets {cn self} {
         if $::verbose {post [info level 0]}
         variable class_db
         variable _
         set _($self:p_inlet) {}
-        set _($self:x_inlet) {}
+        #set _($self:x_inlet) {}
+        set _($self:t_inlet) {}
         set _($self:x_outlet) {}
         for {set i 0} {$i < [llength $class_db($cn:d_inlet)]} {incr i} {
             add_inlet $self [lindex $class_db($cn:d_inlet) $i]
@@ -114,6 +140,7 @@ namespace eval ::pd {
         }
     }
 
+    # add a class method (that is: a proc named <class>_<sel>)
     proc call_classmethod {classname self sel args} {
         if $::verbose {post [info level 0]}
         set m "${classname}_${sel}"
@@ -122,12 +149,14 @@ namespace eval ::pd {
         }
     }
 
+    # this handles the pd::class definition
     proc class {classname def} {
         if $::verbose {post [lrange [info level 0] 0 end-1]}
         variable class_db
         array set class_db {}
         set class_db($classname:d_inlet) {}
         set class_db($classname:d_outlet) {}
+        # strip comments:
         set def2 [regsub -all -line {#.*$} $def {}]
         set patchable_flag 1
         set noinlet_flag 0
@@ -157,10 +186,12 @@ namespace eval ::pd {
             }
         }
 
+        # class level dispatcher (sort of class constructor)
         proc ::$classname {self args} "
             if \$::verbose {::pd::post \[info level 0\]}
             ::pd::create_iolets $classname \$self
             ::pd::call_classmethod $classname \$self constructor {*}\$args
+            # object dispatcher
             proc ::\$self {selector args} \"
              if \\\$::verbose {::pd::post \\\[info level 0\\\]}
              ::pd::call_classmethod $classname \$self \\\$selector {*}\\\$args
@@ -174,9 +205,11 @@ namespace eval ::pd {
             3 * ($patchable_flag != 0)
         }]
 
+        # this wraps the call to class_new()
         tclpd_class_new $classname $flag
     }
 
+    # wrapper to post() withouth vargs
     proc post {args} {
         poststring2 [concat {*}$args]
     }
