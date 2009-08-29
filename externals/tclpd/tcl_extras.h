@@ -42,6 +42,7 @@ t_class* tclpd_class_new(char *name, int flags);
 t_tcl* tclpd_new(t_symbol *classsym, int ac, t_atom *at);
 void tclpd_free (t_tcl *self);
 void tclpd_anything(t_tcl *self, t_symbol *s, int ac, t_atom *at);
+void tclpd_add_proxyinlet(t_object* o, t_proxyinlet* i);
 t_pd* tclpd_get_instance(const char* objectSequentialId);
 t_object* tclpd_get_object(const char* objectSequentialId);
 t_pd* tclpd_get_object_pd(const char* objectSequentialId);

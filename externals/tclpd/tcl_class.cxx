@@ -79,6 +79,10 @@ void tclpd_anything(t_tcl *self, t_symbol *s, int ac, t_atom *at) {
 
 /* Tcl glue: */
 
+void tclpd_add_proxyinlet(t_object* o, t_proxyinlet* i) {
+    inlet_new(o, &i->pd, 0, 0);
+}
+
 t_pd* tclpd_get_instance(const char* objectSequentialId) {
     return object_table[objectSequentialId];
 }

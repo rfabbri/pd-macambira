@@ -17,7 +17,8 @@ pd::class list_change {
     0_list {
         if {$args != $@curlist} {
             set @curlist $args
-            0_bang
+            pd::outlet $self 0 list $@curlist
+            #0_bang
         }
     }
 

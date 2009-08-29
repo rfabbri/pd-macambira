@@ -33,7 +33,11 @@ namespace eval ::pd {
                 set ptr [new_t_proxyinlet]
                 proxyinlet_init $ptr
                 #proxyinlet_list $ptr [gensym list] 2 {{symbol foo} {symbol bar}}
-                inlet_new [tclpd_get_object $self] [$ptr cget -pd] 0 {}
+                #puts "(t_proxyinlet) $ptr cget -pd = "
+                #puts "                               [$ptr cget -pd]"
+                #inlet_new [tclpd_get_object $self] [$ptr cget -pd] 0 {}
+                # I HATE SWIG
+                tclpd_add_proxyinlet [tclpd_get_object $self] $ptr
                 lappend _($self:p_inlet) $ptr
                 lappend _($self:t_inlet) "list"
             }
