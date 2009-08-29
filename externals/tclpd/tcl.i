@@ -60,8 +60,12 @@
 
 %typemap(in) t_atom * {
     t_atom *a = (t_atom*)getbytes(sizeof(t_atom));
-    if(tcl_to_pd($input, a) == TCL_ERROR)
+    if(tcl_to_pd($input, a) == TCL_ERROR) {
+#ifdef DEBUG
+        post("Tcl SWIG: typemap(in) error");
+#endif
         return TCL_ERROR;
+    }
     $1 = a;
 }
 
@@ -71,8 +75,12 @@
 
 %typemap(out) t_atom* {
     Tcl_Obj* res_obj;
-    if(pd_to_tcl($1, &res_obj) == TCL_ERROR)
+    if(pd_to_tcl($1, &res_obj) == TCL_ERROR) {
+#ifdef DEBUG
+        post("Tcl SWIG: typemap(out) error");
+#endif
         return TCL_ERROR;
+    }
     Tcl_SetObjResult(tcl_for_pd, res_obj);
 }
 

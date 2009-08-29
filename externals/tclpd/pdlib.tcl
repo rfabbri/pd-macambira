@@ -30,9 +30,10 @@ namespace eval ::pd {
                 #lappend _($self:x_inlet) [symbolinlet_new [tclpd_get_object $self] $ptr]
             }
             list {
-                set ptr [new_t_alist]
-                alist_init $ptr
-                alist_list $ptr 0 3 {some test args}
+                set ptr [new_t_proxyinlet]
+                proxyinlet_init $ptr
+                #proxyinlet_list $ptr [gensym list] 2 {{symbol foo} {symbol bar}}
+                inlet_new [tclpd_get_object $self] [$ptr cget -pd] 0 {}
                 lappend _($self:p_inlet) $ptr
                 lappend _($self:t_inlet) "list"
             }
@@ -60,7 +61,7 @@ namespace eval ::pd {
         variable _
         set p_inlet [lindex $_($self:p_inlet) [expr $n-1]]
         if {$_($self:t_inlet) == {list}} {
-            return [$p_inlet value]
+            return [$p_inlet argv]
         } else {
             return [$p_inlet value]
         }

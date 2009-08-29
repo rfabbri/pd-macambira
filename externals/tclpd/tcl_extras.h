@@ -11,6 +11,20 @@ typedef struct _t_tcl {
     Tcl_Obj *self;
 } t_tcl;
 
+typedef struct _t_proxyinlet {
+    t_pd pd;
+    int argc;
+    t_atom* argv;
+} t_proxyinlet;
+
+/* tcl_proxyinlet.cxx */
+void proxyinlet_init(t_proxyinlet* x);
+void proxyinlet_clear(t_proxyinlet* x);
+void proxyinlet_list(t_proxyinlet* x, t_symbol* s, int argc, t_atom* argv);
+void proxyinlet_anything(t_proxyinlet* x, t_symbol* s, int argc, t_atom* argv);
+void proxyinlet_clone(t_proxyinlet* x, t_proxyinlet* y);
+void proxyinlet_setup(void);
+
 /* tcl_wrap.cxx */
 extern "C" int Tclpd_SafeInit(Tcl_Interp *interp);
 
@@ -21,6 +35,7 @@ int          tcl_to_pd            (Tcl_Obj* input, t_atom* output);
 /* tcl_setup.cxx */
 extern Tcl_Interp *tcl_for_pd;
 extern "C" void tclpd_setup(void);
+void tclpd_interp_error(int result);
 
 /* tcl_class.cxx */
 t_class* tclpd_class_new(char *name, int flags);

@@ -37,7 +37,7 @@ clean::
 
 .SUFFIXES: .cxx .o
 
-SRCS = tcl_wrap.cxx tcl_typemap.cxx tcl_class.cxx tcl_setup.cxx tcl_loader.cxx
+SRCS = tcl_wrap.cxx tcl_typemap.cxx tcl_class.cxx tcl_proxyinlet.cxx tcl_setup.cxx tcl_loader.cxx
 OBJS = ${SRCS:.cxx=.o}
 
 tcl_wrap.cxx:: tcl.i tcl_extras.h Makefile
@@ -46,5 +46,10 @@ tcl_wrap.cxx:: tcl.i tcl_extras.h Makefile
 .cxx.o:: tcl_extras.h Makefile
 	$(CXX) $(CFLAGS) $(INCLUDES) -xc++ -c $<
 
-$(LIBNAME)$(PDSUF):: tcl_extras.h Makefile $(OBJS)
+$(LIBNAME)$(PDSUF):: tcl_extras.h Makefile $(OBJS) pdlib_tcl_syntax
 	$(LDSHARED) $(CFLAGS) -o $(LIBNAME)$(PDSUF) $(OBJS) $(LDSOFLAGS)
+
+pdlib_tcl_syntax: pdlib.tcl
+	@echo -n "checking pdlib.tcl for syntax..."
+	@tclsh pdlib.tcl >/dev/null 2>&1
+	@echo " OK"

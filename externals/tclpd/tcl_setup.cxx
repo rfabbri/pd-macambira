@@ -15,6 +15,8 @@ void tclpd_setup(void) {
 
     post("Tcl loader v0.1.1 - 08.2009");
 
+    proxyinlet_setup();
+
     tcl_for_pd = Tcl_CreateInterp();
     Tcl_Init(tcl_for_pd);
     Tclpd_SafeInit(tcl_for_pd);
@@ -50,4 +52,19 @@ void tclpd_setup(void) {
     delete[] dirname;
 
     sys_register_loader(tclpd_do_load_lib);
+}
+
+void tclpd_interp_error(int result) {
+    post("Tcl error: %s", Tcl_GetStringResult(tcl_for_pd));
+    post("  (see stderr for details)");
+
+    fprintf(stderr, "------------------- Tcl error: -------------------\n");
+    Tcl_Obj* dict = Tcl_GetReturnOptions(tcl_for_pd, result);
+    Tcl_Obj* errorInfo = NULL;
+    Tcl_Obj* errorInfoK = Tcl_NewStringObj("-errorinfo", -1);
+    Tcl_IncrRefCount(errorInfoK);
+    Tcl_DictObjGet(tcl_for_pd, dict, errorInfoK, &errorInfo);
+    Tcl_DecrRefCount(errorInfoK);
+    fprintf(stderr, "%s\n", Tcl_GetStringFromObj(errorInfo, 0));
+    fprintf(stderr, "--------------------------------------------------\n");
 }

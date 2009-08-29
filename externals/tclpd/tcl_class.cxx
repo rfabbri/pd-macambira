@@ -33,20 +33,22 @@ t_tcl* tclpd_new(t_symbol *classsym, int ac, t_atom *at) {
     av[1] = self->self;
     for(int i=0; i<ac; i++) {
         if(pd_to_tcl(&at[i], &av[2+i]) == TCL_ERROR) {
-            post("tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
+            //post("tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
+            tclpd_interp_error(TCL_ERROR);
             pd_free((t_pd *)self);
             return 0;
         }
     }
-    if (Tcl_EvalObjv(tcl_for_pd,ac+2,av,0) != TCL_OK) {
-        post("tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
+    if(Tcl_EvalObjv(tcl_for_pd,ac+2,av,0) != TCL_OK) {
+        //post("tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
+        tclpd_interp_error(TCL_ERROR);
         pd_free((t_pd *)self);
         return 0;
     }
     return self;
 }
 
-void tclpd_free (t_tcl *self) {
+void tclpd_free(t_tcl *self) {
 #ifdef DEBUG
     post("tclpd_free called");
 #endif
@@ -62,14 +64,17 @@ void tclpd_anything(t_tcl *self, t_symbol *s, int ac, t_atom *at) {
     Tcl_IncrRefCount(av[1]);
     for(int i=0; i<ac; i++) {
         if(pd_to_tcl(&at[i], &av[2+i]) == TCL_ERROR) {
-            post("Tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
+            //post("Tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
+            tclpd_interp_error(TCL_ERROR);
             return;
         }
     }
     int result = Tcl_EvalObjv(tcl_for_pd,ac+2,av,0);
     Tcl_DecrRefCount(av[1]);
-    if (result != TCL_OK)
-        post("Tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
+    if (result != TCL_OK) {
+        //post("Tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
+        tclpd_interp_error(TCL_ERROR);
+    }
 }
 
 /* Tcl glue: */
