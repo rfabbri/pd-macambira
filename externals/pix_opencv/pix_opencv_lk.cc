@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////
+
 //
 // GEM - Graphics Environment for Multimedia
 //
@@ -52,6 +52,10 @@ pix_opencv_lk :: pix_opencv_lk()
   quality = 0.1;
   min_distance = 10;
   maxmove = 8;
+  markall = 0;
+  ftolerance = 5;
+  delaunay = -1;
+  threshold = -1;
 
   for ( i=0; i<MAX_MARKERS; i++ )
   {
@@ -97,6 +101,7 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
 {
   int i, k;
   int im;
+  int marked;
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) 
   {
@@ -124,7 +129,23 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
 
   for ( im=0; im<MAX_MARKERS; im++ )
   {
-       x_found[im] = 0;
+       x_found[im]--;
+  }
+
+  if ( delaunay >= 0 )
+  {
+    // init data structures for the delaunay
+    x_fullrect.x = -comp_xsize/2;
+    x_fullrect.y = -comp_ysize/2;
+    x_fullrect.width = 2*comp_xsize;
+    x_fullrect.height = 2*comp_ysize;
+
+    x_storage = cvCreateMemStorage(0);
+    x_subdiv = cvCreateSubdiv2D( CV_SEQ_KIND_SUBDIV2D, sizeof(*x_subdiv),
+                               sizeof(CvSubdiv2DPoint),
+                               sizeof(CvQuadEdge2D),
+                               x_storage );
+     cvInitSubdivDelaunay2D( x_subdiv, x_fullrect );
   }
 
   if( need_to_init )
@@ -168,8 +189,50 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
           continue;
 
          points[1][k++] = points[1][i];
+         if ( delaunay == 0 ) // add all the points
+         {
+            cvSubdivDelaunay2DInsert( x_subdiv, points[1][i] );
+            cvCalcSubdivVoronoi2D( x_subdiv );
+         }
+         // only add points included in (color-threshold)<p<(color+treshold)
+         if ( ( delaunay > 0 ) && ( x_xmark[delaunay-1] != -1 ) )
+         {
+            int px = cvPointFrom32f(points[1][i]).x;
+            int py = cvPointFrom32f(points[1][i]).y;
+            int ppx, ppy;
+
+            // eight connected pixels
+            for ( ppx=px-1; ppx<=px+1; ppx++ )
+            {
+              for ( ppy=py-1; ppy<=py+1; ppy++ )
+              {
+                if ( ( ppx < 0 ) || ( ppx >= comp_xsize ) ) continue;
+                if ( ( ppy < 0 ) || ( ppy >= comp_ysize ) ) continue;
+
+                uchar red = ((uchar*)(rgba->imageData + rgba->widthStep*ppx))[ppy*4];
+                uchar green = ((uchar*)(rgba->imageData + rgba->widthStep*ppx))[ppy*4+1];
+                uchar blue = ((uchar*)(rgba->imageData + rgba->widthStep*ppx))[ppy*4+2];
+
+                uchar pred = ((uchar*)(rgba->imageData + rgba->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*4];
+                uchar pgreen = ((uchar*)(rgba->imageData + rgba->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*4+1];
+                uchar pblue = ((uchar*)(rgba->imageData + rgba->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*4+2];
+
+                int diff = abs(red-pred) + abs(green-pgreen) + abs(blue-pblue);
+
+                // post( "pix_opencv_lk : point (%d,%d,%d) : diff : %d", blue, green, red, diff );
+
+                if ( diff < threshold )
+                {
+                   cvSubdivDelaunay2DInsert( x_subdiv, points[1][i] );
+                   cvCalcSubdivVoronoi2D( x_subdiv );
+                }
+              }
+            }
+         }
+
          cvCircle( rgba, cvPointFrom32f(points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
 
+         marked=0;
          for ( im=0; im<MAX_MARKERS; im++ )
          {
            // first marking
@@ -182,11 +245,26 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
                cvPutText( rgba, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
                x_xmark[im]=points[1][i].x;
                x_ymark[im]=points[1][i].y;
-               x_found[im]=1;
+               x_found[im]=ftolerance;
+               marked=1;
                SETFLOAT(&x_list[0], im+1);
                SETFLOAT(&x_list[1], x_xmark[im]);
                SETFLOAT(&x_list[2], x_ymark[im]);
                outlet_list( m_dataout, 0, 3, x_list );
+             }
+           }
+         }
+
+         if ( markall && !marked )
+         {
+           for ( im=0; im<MAX_MARKERS; im++)
+           {
+             if ( x_xmark[im] == -1 )
+             {
+               x_xmark[im]=points[1][i].x;
+               x_ymark[im]=points[1][i].y;
+               x_found[im]=ftolerance;
+               break;
              }
            }
          }
@@ -218,6 +296,49 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
         add_remove_pt = 0;
   }
 
+  // draw the delaunay
+  if ( delaunay >= 0 )
+  {
+     CvSeqReader  reader;
+     int i, total = x_subdiv->edges->total;
+     int elem_size = x_subdiv->edges->elem_size;
+
+     cvStartReadSeq( (CvSeq*)(x_subdiv->edges), &reader, 0 );
+
+     for( i = 0; i < total; i++ )
+     {
+       CvQuadEdge2D* edge = (CvQuadEdge2D*)(reader.ptr);
+       CvSubdiv2DPoint* org_pt;
+       CvSubdiv2DPoint* dst_pt;
+       CvPoint2D32f org;
+       CvPoint2D32f dst;
+       CvPoint iorg, idst;
+
+         if( CV_IS_SET_ELEM( edge ))
+         {
+           org_pt = cvSubdiv2DEdgeOrg((CvSubdiv2DEdge)edge);
+           dst_pt = cvSubdiv2DEdgeDst((CvSubdiv2DEdge)edge);
+
+           if( org_pt && dst_pt )
+           {
+               org = org_pt->pt;
+               dst = dst_pt->pt;
+
+               iorg = cvPoint( cvRound( org.x ), cvRound( org.y ));
+               idst = cvPoint( cvRound( dst.x ), cvRound( dst.y ));
+
+               if ( ( org.x > 0 ) && ( org.x < comp_xsize ) &&
+                    ( dst.x > 0 ) && ( dst.x < comp_xsize ) &&
+                    ( org.y > 0 ) && ( org.y < comp_ysize ) &&
+                    ( dst.y > 0 ) && ( dst.y < comp_ysize ) )
+               cvLine( rgba, iorg, idst, CV_RGB(255,0,0), 1, CV_AA, 0 );
+           }
+         }
+
+         CV_NEXT_SEQ_ELEM( elem_size, reader );
+     }
+  }
+
   CV_SWAP( prev_grey, grey, swap_temp );
   CV_SWAP( prev_pyramid, pyramid, swap_temp );
   CV_SWAP( points[0], points[1], swap_points );
@@ -230,6 +351,7 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
 { 
   int i, k;
   int im;
+  int marked;
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) 
   {
@@ -257,7 +379,23 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
 
   for ( im=0; im<MAX_MARKERS; im++ )
   {
-       x_found[im] = 0;
+       x_found[im]--;
+  }
+
+  if ( delaunay >= 0 )
+  {
+    // init data structures for the delaunay
+    x_fullrect.x = -comp_xsize/2;
+    x_fullrect.y = -comp_ysize/2;
+    x_fullrect.width = 2*comp_xsize;
+    x_fullrect.height = 2*comp_ysize;
+
+    x_storage = cvCreateMemStorage(0);
+    x_subdiv = cvCreateSubdiv2D( CV_SEQ_KIND_SUBDIV2D, sizeof(*x_subdiv),
+                               sizeof(CvSubdiv2DPoint),
+                               sizeof(CvQuadEdge2D),
+                               x_storage );
+     cvInitSubdivDelaunay2D( x_subdiv, x_fullrect );
   }
 
   if( need_to_init )
@@ -301,8 +439,50 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
           continue;
 
          points[1][k++] = points[1][i];
+         if ( delaunay == 0 ) // add all the points
+         {
+            cvSubdivDelaunay2DInsert( x_subdiv, points[1][i] );
+            cvCalcSubdivVoronoi2D( x_subdiv );
+         }
+         // only add points included in (color-threshold)<p<(color+treshold)
+         if ( ( delaunay > 0 ) && ( x_xmark[delaunay-1] != -1 ) )
+         {
+            int px = cvPointFrom32f(points[1][i]).x;
+            int py = cvPointFrom32f(points[1][i]).y;
+            int ppx, ppy;
+
+            // eight connected pixels
+            for ( ppx=px-1; ppx<=px+1; ppx++ )
+            {
+              for ( ppy=py-1; ppy<=py+1; ppy++ )
+              {
+                if ( ( ppx < 0 ) || ( ppx >= comp_xsize ) ) continue;
+                if ( ( ppy < 0 ) || ( ppy >= comp_ysize ) ) continue;
+
+                uchar red = ((uchar*)(rgb->imageData + rgb->widthStep*ppx))[ppy*3];
+                uchar green = ((uchar*)(rgb->imageData + rgb->widthStep*ppx))[ppy*3+1];
+                uchar blue = ((uchar*)(rgb->imageData + rgb->widthStep*ppx))[ppy*3+2];
+
+                uchar pred = ((uchar*)(rgb->imageData + rgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3];
+                uchar pgreen = ((uchar*)(rgb->imageData + rgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3+1];
+                uchar pblue = ((uchar*)(rgb->imageData + rgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3+2];
+
+                int diff = abs(red-pred) + abs(green-pgreen) + abs(blue-pblue);
+
+                // post( "pix_opencv_lk : point (%d,%d,%d) : diff : %d", blue, green, red, diff );
+
+                if ( diff < threshold )
+                {
+                   cvSubdivDelaunay2DInsert( x_subdiv, points[1][i] );
+                   cvCalcSubdivVoronoi2D( x_subdiv );
+                }
+              }
+            }
+         }
+
          cvCircle( rgb, cvPointFrom32f(points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
 
+         marked=0;
          for ( im=0; im<MAX_MARKERS; im++ )
          {
            // first marking
@@ -315,11 +495,26 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
                cvPutText( rgb, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
                x_xmark[im]=points[1][i].x;
                x_ymark[im]=points[1][i].y;
-               x_found[im]=1;
+               x_found[im]=ftolerance;
+               marked=1;
                SETFLOAT(&x_list[0], im+1);
                SETFLOAT(&x_list[1], x_xmark[im]);
                SETFLOAT(&x_list[2], x_ymark[im]);
                outlet_list( m_dataout, 0, 3, x_list );
+             }
+           }
+         }
+
+         if ( markall && !marked )
+         {
+           for ( im=0; im<MAX_MARKERS; im++)
+           {
+             if ( x_xmark[im] == -1 )
+             {
+               x_xmark[im]=points[1][i].x;
+               x_ymark[im]=points[1][i].y;
+               x_found[im]=ftolerance;
+               break;
              }
            }
          }
@@ -351,6 +546,49 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
         add_remove_pt = 0;
   }
 
+  // draw the delaunay
+  if ( delaunay >= 0 )
+  {
+     CvSeqReader  reader;
+     int i, total = x_subdiv->edges->total;
+     int elem_size = x_subdiv->edges->elem_size;
+
+     cvStartReadSeq( (CvSeq*)(x_subdiv->edges), &reader, 0 );
+
+     for( i = 0; i < total; i++ )
+     {
+       CvQuadEdge2D* edge = (CvQuadEdge2D*)(reader.ptr);
+       CvSubdiv2DPoint* org_pt;
+       CvSubdiv2DPoint* dst_pt;
+       CvPoint2D32f org;
+       CvPoint2D32f dst;
+       CvPoint iorg, idst;
+
+         if( CV_IS_SET_ELEM( edge ))
+         {
+           org_pt = cvSubdiv2DEdgeOrg((CvSubdiv2DEdge)edge);
+           dst_pt = cvSubdiv2DEdgeDst((CvSubdiv2DEdge)edge);
+
+           if( org_pt && dst_pt )
+           {
+               org = org_pt->pt;
+               dst = dst_pt->pt;
+
+               iorg = cvPoint( cvRound( org.x ), cvRound( org.y ));
+               idst = cvPoint( cvRound( dst.x ), cvRound( dst.y ));
+
+               if ( ( org.x > 0 ) && ( org.x < comp_xsize ) &&
+                    ( dst.x > 0 ) && ( dst.x < comp_xsize ) &&
+                    ( org.y > 0 ) && ( org.y < comp_ysize ) &&
+                    ( dst.y > 0 ) && ( dst.y < comp_ysize ) )
+               cvLine( rgb, iorg, idst, CV_RGB(255,0,0), 1, CV_AA, 0 );
+           }
+         }
+
+         CV_NEXT_SEQ_ELEM( elem_size, reader );
+     }
+  }
+
   CV_SWAP( prev_grey, grey, swap_temp );
   CV_SWAP( prev_pyramid, pyramid, swap_temp );
   CV_SWAP( points[0], points[1], swap_points );
@@ -368,6 +606,7 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
 { 
   int i, k;
   int im;
+  int marked;
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) 
   {
@@ -394,7 +633,23 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
 
   for ( im=0; im<MAX_MARKERS; im++ )
   {
-       x_found[im] = 0;
+       x_found[im]--;
+  }
+
+  if ( delaunay >= 0 )
+  {
+    // init data structures for the delaunay
+    x_fullrect.x = -comp_xsize/2;
+    x_fullrect.y = -comp_ysize/2;
+    x_fullrect.width = 2*comp_xsize;
+    x_fullrect.height = 2*comp_ysize;
+
+    x_storage = cvCreateMemStorage(0);
+    x_subdiv = cvCreateSubdiv2D( CV_SEQ_KIND_SUBDIV2D, sizeof(*x_subdiv),
+                               sizeof(CvSubdiv2DPoint),
+                               sizeof(CvQuadEdge2D),
+                               x_storage );
+     cvInitSubdivDelaunay2D( x_subdiv, x_fullrect );
   }
 
   if( need_to_init )
@@ -438,8 +693,45 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
           continue;
 
          points[1][k++] = points[1][i];
+         if ( delaunay == 0 ) // add all the points
+         {
+            cvSubdivDelaunay2DInsert( x_subdiv, points[1][i] );
+            cvCalcSubdivVoronoi2D( x_subdiv );
+         }
+         // only add points included in (color-threshold)<p<(color+treshold)
+         if ( ( delaunay > 0 ) && ( x_xmark[delaunay-1] != -1 ) )
+         {
+            int px = cvPointFrom32f(points[1][i]).x;
+            int py = cvPointFrom32f(points[1][i]).y;
+            int ppx, ppy;
+
+            // eight connected pixels
+            for ( ppx=px-1; ppx<=px+1; ppx++ )
+            {
+              for ( ppy=py-1; ppy<=py+1; ppy++ )
+              {
+                if ( ( ppx < 0 ) || ( ppx >= comp_xsize ) ) continue;
+                if ( ( ppy < 0 ) || ( ppy >= comp_ysize ) ) continue;
+
+                uchar lum = ((uchar*)(grey->imageData + grey->widthStep*ppx))[ppy];
+                uchar plum = ((uchar*)(grey->imageData + grey->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]];
+
+                int diff = abs(plum-lum);
+
+                // post( "pix_opencv_lk : point (%d,%d,%d) : diff : %d", blue, green, red, diff );
+
+                if ( diff < threshold )
+                {
+                   cvSubdivDelaunay2DInsert( x_subdiv, points[1][i] );
+                   cvCalcSubdivVoronoi2D( x_subdiv );
+                }
+              }
+            }
+         }
+
          cvCircle( grey, cvPointFrom32f(points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
 
+         marked=0;
          for ( im=0; im<MAX_MARKERS; im++ )
          {
            // first marking
@@ -452,11 +744,26 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
                cvPutText( grey, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
                x_xmark[im]=points[1][i].x;
                x_ymark[im]=points[1][i].y;
-               x_found[im]=1;
+               x_found[im]=ftolerance;
+               marked=1;
                SETFLOAT(&x_list[0], im+1);
                SETFLOAT(&x_list[1], x_xmark[im]);
                SETFLOAT(&x_list[2], x_ymark[im]);
                outlet_list( m_dataout, 0, 3, x_list );
+             }
+           }
+         }
+
+         if ( markall && !marked )
+         {
+           for ( im=0; im<MAX_MARKERS; im++)
+           {
+             if ( x_xmark[im] == -1 )
+             {
+               x_xmark[im]=points[1][i].x;
+               x_ymark[im]=points[1][i].y;
+               x_found[im]=ftolerance;
+               break;
              }
            }
          }
@@ -488,6 +795,49 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
         add_remove_pt = 0;
   }
 
+  // draw the delaunay
+  if ( delaunay >= 0 )
+  {
+     CvSeqReader  reader;
+     int i, total = x_subdiv->edges->total;
+     int elem_size = x_subdiv->edges->elem_size;
+
+     cvStartReadSeq( (CvSeq*)(x_subdiv->edges), &reader, 0 );
+
+     for( i = 0; i < total; i++ )
+     {
+       CvQuadEdge2D* edge = (CvQuadEdge2D*)(reader.ptr);
+       CvSubdiv2DPoint* org_pt;
+       CvSubdiv2DPoint* dst_pt;
+       CvPoint2D32f org;
+       CvPoint2D32f dst;
+       CvPoint iorg, idst;
+
+         if( CV_IS_SET_ELEM( edge ))
+         {
+           org_pt = cvSubdiv2DEdgeOrg((CvSubdiv2DEdge)edge);
+           dst_pt = cvSubdiv2DEdgeDst((CvSubdiv2DEdge)edge);
+
+           if( org_pt && dst_pt )
+           {
+               org = org_pt->pt;
+               dst = dst_pt->pt;
+
+               iorg = cvPoint( cvRound( org.x ), cvRound( org.y ));
+               idst = cvPoint( cvRound( dst.x ), cvRound( dst.y ));
+
+               if ( ( org.x > 0 ) && ( org.x < comp_xsize ) &&
+                    ( dst.x > 0 ) && ( dst.x < comp_xsize ) &&
+                    ( org.y > 0 ) && ( org.y < comp_ysize ) &&
+                    ( dst.y > 0 ) && ( dst.y < comp_ysize ) )
+               cvLine( grey, iorg, idst, CV_RGB(255,0,0), 1, CV_AA, 0 );
+           }
+         }
+
+         CV_NEXT_SEQ_ELEM( elem_size, reader );
+     }
+  }
+
   CV_SWAP( prev_grey, grey, swap_temp );
   CV_SWAP( prev_pyramid, pyramid, swap_temp );
   CV_SWAP( points[0], points[1], swap_points );
@@ -512,7 +862,7 @@ void pix_opencv_lk :: obj_setupCallback(t_class *classPtr)
   class_addmethod(classPtr, (t_method)&pix_opencv_lk::initMessCallback,
 		  gensym("init"), A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_lk::markMessCallback,
-		  gensym("mark"), A_FLOAT, A_FLOAT, A_NULL);
+		  gensym("mark"), A_GIMME, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_lk::deleteMessCallback,
 		  gensym("delete"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_lk::clearMessCallback,
@@ -521,6 +871,12 @@ void pix_opencv_lk :: obj_setupCallback(t_class *classPtr)
 		  gensym("mindistance"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_lk::maxMoveMessCallback,
 		  gensym("maxmove"), A_FLOAT, A_NULL);
+  class_addmethod(classPtr, (t_method)&pix_opencv_lk::ftoleranceMessCallback,
+		  gensym("ftolerance"), A_FLOAT, A_NULL);
+  class_addmethod(classPtr, (t_method)&pix_opencv_lk::delaunayMessCallback,
+		  gensym("delaunay"), A_SYMBOL, A_NULL);
+  class_addmethod(classPtr, (t_method)&pix_opencv_lk::pdelaunayMessCallback,
+		  gensym("pdelaunay"), A_FLOAT, A_FLOAT, A_NULL);
 }
 
 void  pix_opencv_lk :: winSizeMessCallback(void *data, t_floatarg winsize)
@@ -543,9 +899,9 @@ void  pix_opencv_lk :: initMessCallback(void *data)
     GetMyClass(data)->initMess();
 }
 
-void  pix_opencv_lk :: markMessCallback(void *data, t_floatarg mx, t_floatarg my)
+void  pix_opencv_lk :: markMessCallback(void *data, t_symbol *s, int argc, t_atom *argv)
 {
-    GetMyClass(data)->markMess((float)mx, (float)my);
+    GetMyClass(data)->markMess(argc, argv);
 }
 
 void  pix_opencv_lk :: deleteMessCallback(void *data, t_floatarg index)
@@ -568,6 +924,21 @@ void  pix_opencv_lk :: maxMoveMessCallback(void *data, t_floatarg maxmove)
     GetMyClass(data)->maxMoveMess((float)maxmove);
 }
 
+void  pix_opencv_lk :: ftoleranceMessCallback(void *data, t_floatarg ftolerance)
+{
+    GetMyClass(data)->ftoleranceMess((float)ftolerance);
+}
+
+void  pix_opencv_lk :: delaunayMessCallback(void *data, t_symbol *s)
+{
+    GetMyClass(data)->delaunayMess(s);
+}
+
+void  pix_opencv_lk :: pdelaunayMessCallback(void *data, t_floatarg fpoint, t_floatarg fthreshold)
+{
+    GetMyClass(data)->pdelaunayMess(fpoint, fthreshold);
+}
+
 void  pix_opencv_lk :: winSizeMess(float winsize)
 {
     if (winsize>1.0) win_size = (int)winsize;
@@ -588,32 +959,68 @@ void  pix_opencv_lk :: initMess(void)
     need_to_init = 1;
 }
 
-void  pix_opencv_lk :: markMess(float mx, float my)
+void  pix_opencv_lk :: markMess(int argc, t_atom *argv)
 {
   int i;
   int inserted;
 
-    if ( ( mx < 0.0 ) || ( mx >= comp_xsize ) || ( my < 0.0 ) || ( my >= comp_ysize ) )
+    if ( argc == 1 ) // mark all or none
     {
-       return;
+      if ( argv[0].a_type != A_SYMBOL )
+      {
+        error( "pix_opencv_lk : wrong argument (should be 'all')" );
+        return;
+      }
+      if ( !strcmp( argv[0].a_w.w_symbol->s_name, "all" ) )
+      {
+        markall = 1;
+        return;
+      }
+      if ( !strcmp( argv[0].a_w.w_symbol->s_name, "none" ) )
+      {
+        markall = 0;
+        clearMess();
+        return;
+      }
     }
+    else
+    {
+      if ( ( argv[0].a_type != A_FLOAT ) || ( argv[1].a_type != A_FLOAT ) )
+      {
+        error( "pix_opencv_lk : wrong argument (should be mark px py)" );
+        return;
+      }
+      else
+      {
+        float fperx = argv[0].a_w.w_float;
+        float fpery = argv[1].a_w.w_float;
+        int px, py;
 
-    inserted = 0;
-    for ( i=0; i<MAX_MARKERS; i++)
-    {
-       if ( x_xmark[i] == -1 )
-       {
-          x_xmark[i] = (int)(mx);
-          x_ymark[i] = (int)(my);
-          post( "pix_opencv_lk : inserted point (%d,%d)", x_xmark[i], x_ymark[i] );
-          inserted = 1;
-          break;
-       }
-    }
-    if ( !inserted )
-    {
-       post( "pix_opencv_lk : max markers reached" );
-    }
+        if ( ( fperx < 0.0 ) || ( fperx > 1.0 ) || ( fpery < 0.0 ) || ( fpery > 1.0 ) )
+        {
+           return;
+        }
+
+        px = (int)(fperx*comp_xsize);
+        py = (int)(fpery*comp_ysize);
+        inserted = 0;
+        for ( i=0; i<MAX_MARKERS; i++)
+        {
+           if ( x_xmark[i] == -1 )
+           {
+              x_xmark[i] = px;
+              x_ymark[i] = py;
+              x_found[i] = ftolerance;
+              inserted = 1;
+              break;
+           }
+        }
+        if ( !inserted )
+        {
+           post( "pix_opencv_lk : max markers reached" );
+        }
+      }
+   }
 }
 
 void  pix_opencv_lk :: deleteMess(float index)
@@ -651,5 +1058,27 @@ void  pix_opencv_lk :: maxMoveMess(float maxmove)
 {
   // has to be more than the size of a point
   if (maxmove>=3.0) maxmove = (int)maxmove;
+}
+
+void  pix_opencv_lk :: ftoleranceMess(float ftolerance)
+{
+  if (ftolerance>=0.0) ftolerance = (int)ftolerance;
+}
+
+void  pix_opencv_lk :: delaunayMess(t_symbol *s)
+{
+  if (s == gensym("on"))
+     delaunay = 0;
+  if (s == gensym("off"))
+     delaunay = -1;
+}
+
+void  pix_opencv_lk :: pdelaunayMess(t_floatarg point, t_floatarg threshold)
+{
+  if (((int)point>0) && ((int)point<MAX_MARKERS))
+  {
+     delaunay = (int)point;
+     threshold = (int)threshold;
+  }
 }
 

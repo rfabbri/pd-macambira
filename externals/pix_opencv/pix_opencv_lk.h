@@ -65,11 +65,14 @@ class GEM_EXTERN pix_opencv_lk : public GemPixObj
         void  nightModeMess(float nightmode);
         void  qualityMess(float quality);
         void  initMess(void);
-        void  markMess(float mx, float my);
+        void  markMess(int, t_atom*);
         void  deleteMess(float index);
         void  clearMess(void);
         void  minDistanceMess(float mindistance);
         void  maxMoveMess(float maxmove);
+        void  ftoleranceMess(float ftolerance);
+        void  delaunayMess(t_symbol *s);
+        void  pdelaunayMess(t_floatarg fpoint, t_floatarg fthreshold);
 
         int comp_xsize;
         int comp_ysize;
@@ -81,6 +84,10 @@ class GEM_EXTERN pix_opencv_lk : public GemPixObj
         int min_distance;
         int night_mode;
         int maxmove;
+        int markall;
+        int ftolerance;
+        int delaunay;
+        int threshold;
 
     private:
     
@@ -90,11 +97,14 @@ class GEM_EXTERN pix_opencv_lk : public GemPixObj
         static void  nightModeMessCallback(void *data, t_floatarg nightmode);
         static void  qualityMessCallback(void *data, t_floatarg quality);
         static void  initMessCallback(void *data);
-        static void  markMessCallback(void *data, t_floatarg mx, t_floatarg my);
+        static void  markMessCallback(void *data, t_symbol* name, int argc, t_atom* argv);
         static void  deleteMessCallback(void *data, t_floatarg index);
         static void  clearMessCallback(void *data);
         static void  minDistanceMessCallback(void *data, t_floatarg mindistance);
         static void  maxMoveMessCallback(void *data, t_floatarg maxmove);
+        static void  ftoleranceMessCallback(void *data, t_floatarg ftolerance);
+        static void  delaunayMessCallback(void *data, t_symbol *s);
+        static void  pdelaunayMessCallback(void *data, t_floatarg fpoint, t_floatarg fthreshold);
 
 	// Internal Open CV data
         IplImage *rgba, *rgb, *grey, *prev_grey, *pyramid, *prev_pyramid, *swap_temp;
@@ -110,6 +120,10 @@ class GEM_EXTERN pix_opencv_lk : public GemPixObj
         CvPoint pt;
         CvFont font;
 
+        // structures needed for the delaunay
+        CvRect x_fullrect;
+        CvMemStorage* x_storage;
+        CvSubdiv2D* x_subdiv;
 	
 };
 
