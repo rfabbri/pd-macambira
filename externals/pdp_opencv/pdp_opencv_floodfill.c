@@ -387,7 +387,7 @@ void pdp_opencv_floodfill_setup(void)
 
     class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_color, gensym("color"),  A_DEFFLOAT, A_NULL);
-    class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_fillcolor, gensym("fillcolor"),  A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_fillcolor, gensym("fillcolor"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_mark, gensym("mark"),  A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_delete, gensym("delete"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_opencv_floodfill_class, (t_method)pdp_opencv_floodfill_connectivity, gensym("connectivity"), A_DEFFLOAT, A_NULL);
