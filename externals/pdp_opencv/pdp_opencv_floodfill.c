@@ -140,10 +140,6 @@ static void pdp_opencv_floodfill_process_rgb(t_pdp_opencv_floodfill *x)
          SETFLOAT(&x->x_list[3], comp.rect.width);
          SETFLOAT(&x->x_list[4], comp.rect.height);
          outlet_list( x->x_outlet1, 0, 5, x->x_list );
-
-         // follow the blob
-         x->x_xcomp[i] = comp.rect.x + ( comp.rect.width / 2 );
-         x->x_ycomp[i] = comp.rect.y + ( comp.rect.height / 2 );
        }
     }
 
@@ -285,7 +281,7 @@ static void pdp_opencv_floodfill_mark(t_pdp_opencv_floodfill *x, t_floatarg fper
        {
           x->x_xcomp[i] = (int)(fperx*x->x_width);
           x->x_ycomp[i] = (int)(fpery*x->x_height);
-          post( "pdp_opencv_floodfill : inserted point (%d,%d)", x->x_xcomp[i], x->x_ycomp[i] );
+          // post( "pdp_opencv_floodfill : inserted point (%d,%d)", x->x_xcomp[i], x->x_ycomp[i] );
           inserted = 1;
           break;
        }
