@@ -1,4 +1,4 @@
-#N canvas 355 42 757 669 10;
+#N canvas 674 88 757 669 10;
 #X obj -147 -72 cnv 15 621 250 empty empty empty 20 12 0 14 -260097
 -66577 0;
 #X obj 93 -32 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
@@ -7,7 +7,7 @@
 #X msg 183 22 close;
 #X obj 113 93 pdp_v4l;
 #X msg 170 -10 open /dev/video0;
-#X obj 294 -30 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 294 -30 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 294 -3 metro 40;
 #X msg 375 16 close;
@@ -49,21 +49,21 @@ occur again;
 #X obj -66 300 pdp_opencv_hist_compare;
 #X obj 69 319 unpack f f f f f;
 #X obj 391 97 hradio 15 1 0 4 empty empty empty 0 -8 0 10 -262144 -1
--1 1;
+-1 0;
 #X msg 390 119 input \$1;
-#X text 161 343 matchiing measure with stored histograms;
 #X text 162 354 nearest to 1 is the winner;
 #X text 37 421 closest histogram (winner);
 #X obj 69 347 vsl 15 37 0 1 0 0 empty empty empty 0 -9 0 10 -262144
--1 -1 2840 1;
+-1 -1 0 1;
 #X obj 92 347 vsl 15 37 0 1 0 0 empty empty empty 0 -9 0 10 -262144
--1 -1 1917 1;
+-1 -1 0 1;
 #X obj 115 347 vsl 15 37 0 1 0 0 empty empty empty 0 -9 0 10 -262144
--1 -1 2486 1;
+-1 -1 0 1;
 #X obj 138 347 vsl 15 37 0 1 0 0 empty empty empty 0 -9 0 10 -262144
 -1 -1 0 1;
 #X text -148 -150 pdp_opencv_hist_compare : rapid patern recognition
 using HS histograms;
+#X text 161 343 matching measure with stored histograms;
 #X connect 1 0 2 0;
 #X connect 2 0 4 0;
 #X connect 3 0 4 0;
@@ -94,9 +94,9 @@ using HS histograms;
 #X connect 37 0 31 0;
 #X connect 37 1 32 0;
 #X connect 37 2 38 0;
-#X connect 38 0 44 0;
-#X connect 38 1 45 0;
-#X connect 38 2 46 0;
-#X connect 38 3 47 0;
+#X connect 38 0 43 0;
+#X connect 38 1 44 0;
+#X connect 38 2 45 0;
+#X connect 38 3 46 0;
 #X connect 39 0 40 0;
 #X connect 40 0 10 0;
