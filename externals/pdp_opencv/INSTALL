@@ -10,7 +10,7 @@ apt-get install libcvaux-dev
 apt-get install libhighgui-dev
 
 then get the _SOURCES_ of the pd you are using
-and of the GEM or PDP that you are loading
+and of the PDP that you are loading
 ( it might not work if the version 
 is different )
 

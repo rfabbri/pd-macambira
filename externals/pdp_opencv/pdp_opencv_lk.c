@@ -259,7 +259,7 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
                   cvPutText( x->image, tindex, cvPointFrom32f(x->points[1][i]), &x->font, CV_RGB(255,255,255));
                   x->x_xmark[im]=x->points[1][i].x;
                   x->x_ymark[im]=x->points[1][i].y;
-                  x->x_found[im]++;
+                  x->x_found[im]=x->x_ftolerance;
                   marked=1;
                   SETFLOAT(&x->x_list[0], im+1);
                   SETFLOAT(&x->x_list[1], x->x_xmark[im]);
