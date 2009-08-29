@@ -27,7 +27,7 @@ LOG
 /*-----------------------------------------------------------------
 -------------------------------------------------------------------
 CLASS
-    pix_opencv_histo
+    pix_opencv_hist_compare
     
     Histogram reognition object using Open CV
 
@@ -38,21 +38,21 @@ DESCRIPTION
    
 -----------------------------------------------------------------*/
 
-class GEM_EXTERN pix_opencv_histo : public GemPixObj
+class GEM_EXTERN pix_opencv_hist_compare : public GemPixObj
 {
-    CPPEXTERN_HEADER(pix_opencv_histo, GemPixObj)
+    CPPEXTERN_HEADER(pix_opencv_hist_compare, GemPixObj)
 
     public:
 
 	//////////
 	// Constructor
-    	pix_opencv_histo();
+    	pix_opencv_hist_compare();
     	
     protected:
     	
     	//////////
     	// Destructor
-    	virtual ~pix_opencv_histo();
+    	virtual ~pix_opencv_hist_compare();
 
     	//////////
     	// Do the processing
@@ -67,6 +67,7 @@ class GEM_EXTERN pix_opencv_histo : public GemPixObj
         int comp_ysize;
 
         t_outlet *m_dataout;
+        t_outlet *m_measureout;
 
     private:
     

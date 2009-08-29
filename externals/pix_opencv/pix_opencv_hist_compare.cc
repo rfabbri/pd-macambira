@@ -15,20 +15,20 @@
 //
 /////////////////////////////////////////////////////////
 
-#include "pix_opencv_histo.h"
+#include "pix_opencv_hist_compare.h"
 
-CPPEXTERN_NEW(pix_opencv_histo)
+CPPEXTERN_NEW(pix_opencv_hist_compare)
 
 /////////////////////////////////////////////////////////
 //
-// pix_opencv_histo
+// pix_opencv_hist_compare
 //
 /////////////////////////////////////////////////////////
 // Constructor
 //
 /////////////////////////////////////////////////////////
 
-pix_opencv_histo :: pix_opencv_histo()
+pix_opencv_hist_compare :: pix_opencv_hist_compare()
 { 
   int i;
 
@@ -37,6 +37,7 @@ pix_opencv_histo :: pix_opencv_histo()
 
   inlet_new(this->x_obj, &this->x_obj->ob_pd, gensym("float"), gensym("save"));
   m_dataout = outlet_new(this->x_obj, &s_anything);
+  m_measureout = outlet_new(this->x_obj, &s_anything);
 
   save_now = 0;
 
@@ -86,7 +87,7 @@ pix_opencv_histo :: pix_opencv_histo()
 // Destructor
 //
 /////////////////////////////////////////////////////////
-pix_opencv_histo :: ~pix_opencv_histo()
+pix_opencv_hist_compare :: ~pix_opencv_hist_compare()
 {
     //Destroy cv_images to clean memory
     cvReleaseImage(&rgba);
@@ -105,7 +106,7 @@ pix_opencv_histo :: ~pix_opencv_histo()
 // processImage
 //
 /////////////////////////////////////////////////////////
-void pix_opencv_histo :: processRGBAImage(imageStruct &image)
+void pix_opencv_hist_compare :: processRGBAImage(imageStruct &image)
 {
   int i;
   int h_bins = (int)(comp_xsize/10), s_bins = (int)(comp_ysize/10);
@@ -115,7 +116,7 @@ void pix_opencv_histo :: processRGBAImage(imageStruct &image)
     this->comp_xsize=image.xsize;
     this->comp_ysize=image.ysize;
 
-    post( "pix_opencv_histo : reallocating buffers" );
+    post( "pix_opencv_hist_compare : reallocating buffers" );
 
     //Destroy cv_images to clean memory
     cvReleaseImage(&rgba);
@@ -194,6 +195,7 @@ void pix_opencv_histo :: processRGBAImage(imageStruct &image)
   cvNormalizeHist( hist, 1.0 );  //Normalize it
 
   double tato[MAX_HISTOGRAMS_TO_COMPARE];
+  t_atom datalist[MAX_HISTOGRAMS_TO_COMPARE];
   int nearest = -1;
   double max  =  0;
 
@@ -201,13 +203,18 @@ void pix_opencv_histo :: processRGBAImage(imageStruct &image)
   if ( nbsaved > 0 )
     for (n=0; n<MAX_HISTOGRAMS_TO_COMPARE; n++) {
         tato[n] = cvCompareHist(hist, saved_hist[n], CV_COMP_INTERSECT);
+        SETFLOAT(&datalist[n], tato[n]);
         if (tato[n]>max) {
                 max = tato[n];
                 nearest = n;
     }
   }
 
-  outlet_float(m_dataout, (float)nearest);
+  if ( nbsaved > 0 ) {
+       outlet_float(m_dataout, (float)nearest);
+       outlet_list( m_measureout, 0, MAX_HISTOGRAMS_TO_COMPARE , datalist );
+  } else
+       outlet_float(m_dataout, -1.0);
 
   // Create an image to use to visualize our histogram.
   int scale = 10;
@@ -234,7 +241,7 @@ void pix_opencv_histo :: processRGBAImage(imageStruct &image)
 
 }
 
-void pix_opencv_histo :: processRGBImage(imageStruct &image)
+void pix_opencv_hist_compare :: processRGBImage(imageStruct &image)
 {
   int i;
   int h_bins = (int)(comp_xsize/10), s_bins = (int)(comp_ysize/10);
@@ -320,6 +327,7 @@ void pix_opencv_histo :: processRGBImage(imageStruct &image)
    cvNormalizeHist( hist, 1.0 );  //Normalize it
 
    double tato[MAX_HISTOGRAMS_TO_COMPARE];
+   t_atom datalist[MAX_HISTOGRAMS_TO_COMPARE];
    int nearest = -1;
    double max  =  0;
 
@@ -327,13 +335,18 @@ void pix_opencv_histo :: processRGBImage(imageStruct &image)
    if ( nbsaved > 0 )
       for (n=0; n<MAX_HISTOGRAMS_TO_COMPARE; n++) {
         tato[n] = cvCompareHist(hist, saved_hist[n], CV_COMP_INTERSECT);
+        SETFLOAT(&datalist[n], tato[n]);
         if (tato[n]>max) {
                 max = tato[n];
                 nearest = n;
       }
    }
 
-   outlet_float(m_dataout, (float)nearest);
+  if ( nbsaved > 0 ) {
+       outlet_float(m_dataout, (float)nearest);
+       outlet_list( m_measureout, 0, MAX_HISTOGRAMS_TO_COMPARE , datalist );
+  } else
+       outlet_float(m_dataout, -1.0);
 
    // Create an image to use to visualize our histogram.
    int scale = 10;
@@ -360,12 +373,12 @@ void pix_opencv_histo :: processRGBImage(imageStruct &image)
 
 }
 
-void pix_opencv_histo :: processYUVImage(imageStruct &image)
+void pix_opencv_hist_compare :: processYUVImage(imageStruct &image)
 {
-  post( "pix_opencv_histo : yuv format not supported" );
+  post( "pix_opencv_hist_compare : yuv format not supported" );
 }
     	
-void pix_opencv_histo :: processGrayImage(imageStruct &image)
+void pix_opencv_hist_compare :: processGrayImage(imageStruct &image)
 { 
   int i;
   int h_bins = (int)(comp_xsize/10), s_bins = (int)(comp_ysize/10);
@@ -447,37 +460,43 @@ void pix_opencv_histo :: processGrayImage(imageStruct &image)
        cvNormalizeHist( saved_hist[save_now], 1.0 );  //Normalize it
        save_now=-1;
        nbsaved++;
-    }
-    cvCalcHist( planes, hist, 0, 0 ); //Compute histogram
-    cvNormalizeHist( hist, 1.0 );  //Normalize it
+   }
+   cvCalcHist( planes, hist, 0, 0 ); //Compute histogram
+   cvNormalizeHist( hist, 1.0 );  //Normalize it
 
-    double tato[MAX_HISTOGRAMS_TO_COMPARE];
-    int nearest = -1;
-    double max  =  0;
+   double tato[MAX_HISTOGRAMS_TO_COMPARE];
+   t_atom datalist[MAX_HISTOGRAMS_TO_COMPARE];
+   int nearest = -1;
+   double max  =  0;
 
-    int n;
-    if ( nbsaved > 0 )
+   int n;
+   if ( nbsaved > 0 )
       for (n=0; n<MAX_HISTOGRAMS_TO_COMPARE; n++) {
         tato[n] = cvCompareHist(hist, saved_hist[n], CV_COMP_INTERSECT);
+        SETFLOAT(&datalist[n], tato[n]);
         if (tato[n]>max) {
                 max = tato[n];
                 nearest = n;
       }
-    }
+   }
 
-    outlet_float(m_dataout, (float)nearest);
+   if ( nbsaved > 0 ) {
+      outlet_float(m_dataout, (float)nearest);
+      outlet_list( m_measureout, 0, MAX_HISTOGRAMS_TO_COMPARE , datalist );
+   } else
+      outlet_float(m_dataout, -1.0);
 
-    // Create an image to use to visualize our histogram.
-    int scale = 10;
-    // populate our visualization with little gray squares.
-    float max_value = 0;
-    cvGetMinMaxHistValue( hist, 0, &max_value, 0, 0 );
+   // Create an image to use to visualize our histogram.
+   int scale = 10;
+   // populate our visualization with little gray squares.
+   float max_value = 0;
+   cvGetMinMaxHistValue( hist, 0, &max_value, 0, 0 );
 
-    int h = 0;
-    int s = 0;
+   int h = 0;
+   int s = 0;
 
-    for( h = 0; h < h_bins; h++ ) {
-       for( s = 0; s < s_bins; s++ ) {
+   for( h = 0; h < h_bins; h++ ) {
+      for( s = 0; s < s_bins; s++ ) {
           float bin_val = cvQueryHistValue_2D( hist, h, s );
           int intensity = cvRound( bin_val * 255 / max_value );
           cvRectangle(
@@ -486,9 +505,9 @@ void pix_opencv_histo :: processGrayImage(imageStruct &image)
                 cvPoint( (h+1)*scale - 1, (s+1)*scale - 1),
                 CV_RGB(intensity,intensity,intensity), CV_FILLED, 8 , 0 );
         }
-    }
+   }
 
-    memcpy( image.data, grey->imageData, image.xsize*image.ysize );
+   memcpy( image.data, grey->imageData, image.xsize*image.ysize );
 
 }
 
@@ -497,18 +516,18 @@ void pix_opencv_histo :: processGrayImage(imageStruct &image)
 //
 /////////////////////////////////////////////////////////
 
-void pix_opencv_histo :: obj_setupCallback(t_class *classPtr)
+void pix_opencv_hist_compare :: obj_setupCallback(t_class *classPtr)
 {
-  class_addmethod(classPtr, (t_method)&pix_opencv_histo::saveMessCallback,
+  class_addmethod(classPtr, (t_method)&pix_opencv_hist_compare::saveMessCallback,
                   gensym("save"), A_FLOAT, A_NULL);
 }
 
-void pix_opencv_histo :: saveMess(float index)
+void pix_opencv_hist_compare :: saveMess(float index)
 {
     if (((int)index>=0)&&((int)index<MAX_HISTOGRAMS_TO_COMPARE)) save_now = (int)index;
 }
 
-void pix_opencv_histo :: saveMessCallback(void *data, t_floatarg index)
+void pix_opencv_hist_compare :: saveMessCallback(void *data, t_floatarg index)
 {
   GetMyClass(data)->saveMess(index);
 }

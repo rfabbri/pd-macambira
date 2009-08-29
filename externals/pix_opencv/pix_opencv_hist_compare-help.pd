@@ -1,7 +1,7 @@
-#N canvas 36 143 1154 642 10;
+#N canvas 41 167 1154 642 10;
 #X obj 396 -37 gemhead;
-#X obj 364 372 pix_texture;
-#X obj 364 400 square 2;
+#X obj 364 478 pix_texture;
+#X obj 364 506 square 2;
 #X obj 9 -28 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 0 22 454 304 gemwin 0;
@@ -33,11 +33,11 @@
 #X restore 14 16 pd gemwin;
 #X msg 14 -8 destroy;
 #X text 15 -26 Create window and render;
-#X obj 200 368 pix_texture;
-#X obj 200 396 square 2;
+#X obj 216 478 pix_texture;
+#X obj 216 506 square 2;
 #X obj 367 159 translateXYZ -2 0 0;
 #X obj 367 224 separator;
-#X obj 350 285 cnv 15 500 80 empty empty empty 20 12 0 14 -24198 -66577
+#X obj 350 285 cnv 15 500 180 empty empty empty 20 12 0 14 -24198 -66577
 0;
 #X obj 511 -66 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -57,19 +57,30 @@
 #X obj 364 259 translateXYZ 4 0 0;
 #X obj 580 26 loadbang;
 #X msg 528 50 colorspace RGBA;
-#X floatatom 456 349 5 0 0 0 - - -;
 #X obj 439 290 hradio 15 1 0 5 empty empty empty 0 -8 0 10 -262144
 -1 -1 0;
 #X text 522 289 save an histogram at position nth ( 0 <= n <= 80 )
 ;
-#X text 496 350 closest histogram;
-#X obj 364 315 pix_opencv_histo;
 #X text 5 -87 record histograms of specific situations;
 #X text 7 -75 the object will recognize the situations if they occur
 again;
 #X text 7 -61 Written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
 );
-#X text 6 -100 pix_opencv_histo : image recognition using histograms
+#X floatatom 443 421 5 0 0 0 - - -;
+#X obj 505 346 unpack f f f f f;
+#X text 598 381 nearest to 1 is the winner;
+#X text 479 422 closest histogram (winner);
+#X obj 505 374 vsl 15 37 0 1 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 0 1;
+#X obj 528 374 vsl 15 37 0 1 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 0 1;
+#X obj 551 374 vsl 15 37 0 1 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 0 1;
+#X obj 574 374 vsl 15 37 0 1 0 0 empty empty empty 0 -9 0 10 -262144
+-1 -1 0 1;
+#X text 597 370 matching measure with stored histograms;
+#X obj 364 315 pix_opencv_hist_compare;
+#X text 7 -100 pix_opencv_hist_compare : image recognition using histograms
 ;
 #X connect 0 0 21 0;
 #X connect 1 0 2 0;
@@ -92,9 +103,14 @@ again;
 #X connect 21 2 17 0;
 #X connect 22 0 21 0;
 #X connect 23 0 22 0;
-#X connect 24 0 31 0;
+#X connect 24 0 41 0;
 #X connect 25 0 26 0;
 #X connect 26 0 21 0;
-#X connect 28 0 31 1;
-#X connect 31 0 1 0;
-#X connect 31 1 27 0;
+#X connect 27 0 41 1;
+#X connect 33 0 36 0;
+#X connect 33 1 37 0;
+#X connect 33 2 38 0;
+#X connect 33 3 39 0;
+#X connect 41 0 1 0;
+#X connect 41 1 32 0;
+#X connect 41 2 33 0;
