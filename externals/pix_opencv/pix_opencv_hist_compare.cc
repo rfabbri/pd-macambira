@@ -194,14 +194,14 @@ void pix_opencv_hist_compare :: processRGBAImage(imageStruct &image)
   cvCalcHist( planes, hist, 0, 0 ); //Compute histogram
   cvNormalizeHist( hist, 1.0 );  //Normalize it
 
-  double tato[MAX_HISTOGRAMS_TO_COMPARE];
-  t_atom datalist[MAX_HISTOGRAMS_TO_COMPARE];
+  double tato[nbsaved];
+  t_atom datalist[nbsaved];
   int nearest = -1;
   double max  =  0;
 
   int n;
   if ( nbsaved > 0 )
-    for (n=0; n<MAX_HISTOGRAMS_TO_COMPARE; n++) {
+    for (n=0; n<nbsaved; n++) {
         tato[n] = cvCompareHist(hist, saved_hist[n], CV_COMP_INTERSECT);
         SETFLOAT(&datalist[n], tato[n]);
         if (tato[n]>max) {
@@ -212,7 +212,7 @@ void pix_opencv_hist_compare :: processRGBAImage(imageStruct &image)
 
   if ( nbsaved > 0 ) {
        outlet_float(m_dataout, (float)nearest);
-       outlet_list( m_measureout, 0, MAX_HISTOGRAMS_TO_COMPARE , datalist );
+       outlet_list( m_measureout, 0, nbsaved , datalist );
   } else
        outlet_float(m_dataout, -1.0);
 
@@ -326,14 +326,14 @@ void pix_opencv_hist_compare :: processRGBImage(imageStruct &image)
    cvCalcHist( planes, hist, 0, 0 ); //Compute histogram
    cvNormalizeHist( hist, 1.0 );  //Normalize it
 
-   double tato[MAX_HISTOGRAMS_TO_COMPARE];
-   t_atom datalist[MAX_HISTOGRAMS_TO_COMPARE];
+   double tato[nbsaved];
+   t_atom datalist[nbsaved];
    int nearest = -1;
    double max  =  0;
 
    int n;
    if ( nbsaved > 0 )
-      for (n=0; n<MAX_HISTOGRAMS_TO_COMPARE; n++) {
+      for (n=0; n<nbsaved; n++) {
         tato[n] = cvCompareHist(hist, saved_hist[n], CV_COMP_INTERSECT);
         SETFLOAT(&datalist[n], tato[n]);
         if (tato[n]>max) {
@@ -344,7 +344,7 @@ void pix_opencv_hist_compare :: processRGBImage(imageStruct &image)
 
   if ( nbsaved > 0 ) {
        outlet_float(m_dataout, (float)nearest);
-       outlet_list( m_measureout, 0, MAX_HISTOGRAMS_TO_COMPARE , datalist );
+       outlet_list( m_measureout, 0, nbsaved , datalist );
   } else
        outlet_float(m_dataout, -1.0);
 
@@ -464,14 +464,14 @@ void pix_opencv_hist_compare :: processGrayImage(imageStruct &image)
    cvCalcHist( planes, hist, 0, 0 ); //Compute histogram
    cvNormalizeHist( hist, 1.0 );  //Normalize it
 
-   double tato[MAX_HISTOGRAMS_TO_COMPARE];
-   t_atom datalist[MAX_HISTOGRAMS_TO_COMPARE];
+   double tato[nbsaved];
+   t_atom datalist[nbsaved];
    int nearest = -1;
    double max  =  0;
 
    int n;
    if ( nbsaved > 0 )
-      for (n=0; n<MAX_HISTOGRAMS_TO_COMPARE; n++) {
+      for (n=0; n<nbsaved; n++) {
         tato[n] = cvCompareHist(hist, saved_hist[n], CV_COMP_INTERSECT);
         SETFLOAT(&datalist[n], tato[n]);
         if (tato[n]>max) {
@@ -482,7 +482,7 @@ void pix_opencv_hist_compare :: processGrayImage(imageStruct &image)
 
    if ( nbsaved > 0 ) {
       outlet_float(m_dataout, (float)nearest);
-      outlet_list( m_measureout, 0, MAX_HISTOGRAMS_TO_COMPARE , datalist );
+      outlet_list( m_measureout, 0, nbsaved , datalist );
    } else
       outlet_float(m_dataout, -1.0);
 

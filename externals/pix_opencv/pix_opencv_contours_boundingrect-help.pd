@@ -1,18 +1,15 @@
-#N canvas 68 50 1040 775 10;
+#N canvas 73 50 1040 775 10;
 #X obj 441 -19 gemhead;
-#X obj 365 456 pix_texture;
-#X obj 365 484 square 2;
-#X obj 21 444 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
+#X obj 364 510 pix_texture;
+#X obj 364 538 square 2;
+#X obj 25 436 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 5 49 454 304 gemwin 0;
-#X obj 132 136 gemwin;
 #X obj 67 89 outlet;
 #X obj 67 10 inlet;
 #X obj 67 41 route create;
 #X msg 67 70 set destroy;
 #X msg 182 68 set create;
-#X msg 132 112 create \, 1;
-#X msg 238 112 destroy;
 #N canvas 92 178 247 179 Gem.init 0;
 #X obj 118 46 loadbang;
 #X msg 118 81 reset;
@@ -20,24 +17,31 @@
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X restore 289 80 pd Gem.init;
+#X obj 161 230 gemwin;
+#X msg 160 177 create \, 1;
+#X msg 236 178 destroy;
+#X msg 282 150 frame 15;
+#X obj 163 140 t b b b;
+#X connect 1 0 2 0;
 #X connect 2 0 3 0;
-#X connect 3 0 4 0;
-#X connect 3 0 6 0;
-#X connect 3 1 5 0;
-#X connect 3 1 7 0;
-#X connect 4 0 1 0;
-#X connect 5 0 1 0;
-#X connect 6 0 0 0;
-#X connect 7 0 0 0;
-#X connect 8 0 0 0;
-#X restore 26 488 pd gemwin;
-#X msg 26 464 destroy;
-#X text 22 444 Create window and render;
+#X connect 2 0 10 0;
+#X connect 2 1 4 0;
+#X connect 2 1 8 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 7 0 6 0;
+#X connect 8 0 6 0;
+#X connect 9 0 6 0;
+#X connect 10 0 7 0;
+#X connect 10 2 9 0;
+#X restore 30 480 pd gemwin;
+#X msg 30 456 destroy;
+#X text 26 436 Create window and render;
 #X obj 200 368 pix_texture;
 #X obj 200 396 square 2;
 #X obj 266 167 translateXYZ -2 0 0;
 #X obj 281 199 separator;
-#X obj 344 254 cnv 15 550 180 empty empty empty 20 12 0 14 -24198 -66577
+#X obj 344 246 cnv 15 550 250 empty empty empty 20 12 0 14 -24198 -66577
 0;
 #X obj 511 -66 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -55,24 +59,24 @@
 #X obj 479 5 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #X obj 281 227 translateXYZ 4 0 0;
-#X floatatom 482 374 5 0 0 0 - - -;
-#X obj 365 406 pix_opencv_contours_boundingrect;
+#X floatatom 481 432 5 0 0 0 - - -;
+#X obj 364 464 pix_opencv_contours_boundingrect;
 #X obj 378 110 pix_invert;
 #X obj 319 135 pix_threshold;
 #X floatatom 322 103 5 0 0 0 - - -;
 #X msg 289 101 0.33;
 #X obj 234 101 loadbang;
-#X text 517 370 min area in pixels (default 1);
-#X floatatom 568 388 5 0 0 0 - - -;
-#X text 606 387 max area in pixels (default 76800);
-#X floatatom 498 542 5 0 0 0 - - -;
-#X floatatom 533 542 5 0 0 0 - - -;
-#X floatatom 570 542 5 0 0 0 - - -;
-#X floatatom 604 542 5 0 0 0 - - -;
-#X obj 495 513 unpack 0 0 0 0 0;
-#X obj 495 462 route 0 1 2 3 4;
-#X text 648 542 Xorigin Yorigin Width Height;
-#X text 555 480 For each contour detected;
+#X text 516 428 min area in pixels (default 1);
+#X floatatom 567 446 5 0 0 0 - - -;
+#X text 605 445 max area in pixels (default 76800);
+#X floatatom 497 596 5 0 0 0 - - -;
+#X floatatom 532 596 5 0 0 0 - - -;
+#X floatatom 569 596 5 0 0 0 - - -;
+#X floatatom 603 596 5 0 0 0 - - -;
+#X obj 494 567 unpack 0 0 0 0 0;
+#X obj 494 516 route 0 1 2 3 4;
+#X text 647 596 Xorigin Yorigin Width Height;
+#X text 554 534 For each contour detected;
 #X text 655 -107 It is useful as a motion tracker if you have well
 isolated silouets of the objects you want to track.;
 #X msg 385 260 mode \$1;
@@ -100,13 +104,24 @@ white areas in the input image \, it's important to set max/min values
 of the areas you want to detect to filter non interesting noise or
 areas \, also sometimes you will need to use pix_opencv_morphology
 to transform the contours of the shapes to be analyzed..;
-#X msg 490 350 clear;
-#X floatatom 598 445 5 0 0 0 - - -;
-#X text 636 446 number of contours;
+#X floatatom 597 499 5 0 0 0 - - -;
+#X text 635 500 number of contours;
 #X msg 531 87 colorspace RGBA;
 #X msg 521 66 colorspace RGB;
 #X msg 513 46 colorspace Gray;
 #X obj 562 21 loadbang;
+#X msg 462 355 nightmode \$1;
+#X obj 552 356 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 541 377 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 554 399 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 481 376 draw \$1;
+#X text 568 375 draw bounding rectangle ( default : on );
+#X msg 496 397 show \$1;
+#X text 581 396 draw the detected contours ( default : off );
+#X text 575 356 hide original image ( default : off );
 #X connect 0 0 21 0;
 #X connect 1 0 2 0;
 #X connect 4 0 5 0;
@@ -132,7 +147,7 @@ to transform the contours of the shapes to be analyzed..;
 #X connect 25 0 26 1;
 #X connect 26 0 1 0;
 #X connect 26 1 40 0;
-#X connect 26 2 60 0;
+#X connect 26 2 59 0;
 #X connect 27 0 28 0;
 #X connect 28 0 9 0;
 #X connect 29 0 28 1;
@@ -152,8 +167,13 @@ to transform the contours of the shapes to be analyzed..;
 #X connect 51 0 50 0;
 #X connect 52 0 53 0;
 #X connect 53 0 26 0;
-#X connect 59 0 26 0;
+#X connect 61 0 21 0;
 #X connect 62 0 21 0;
 #X connect 63 0 21 0;
-#X connect 64 0 21 0;
-#X connect 65 0 62 0;
+#X connect 64 0 61 0;
+#X connect 65 0 26 0;
+#X connect 66 0 65 0;
+#X connect 67 0 69 0;
+#X connect 68 0 71 0;
+#X connect 69 0 26 0;
+#X connect 71 0 26 0;

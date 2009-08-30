@@ -44,6 +44,9 @@ pix_opencv_contours_boundingrect :: pix_opencv_contours_boundingrect()
   rgb = NULL;
   x_ftolerance  = 5;
   x_mmove   = 10;
+  x_nightmode   = 0;
+  x_show   = 0;
+  x_draw   = 1;
   x_cmode   = CV_RETR_LIST;
   x_cmethod = CV_CHAIN_APPROX_SIMPLE;
 
@@ -131,6 +134,10 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
     
     // Convert to grayscale
     cvCvtColor(orig, gray, CV_RGBA2GRAY);
+    if ( x_nightmode )
+    {
+       cvZero( orig );
+    }
 
     CvSeq* contours;
     CvMemStorage* stor02;
@@ -178,9 +185,17 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
                oi = this->mark(rect.x, rect.y );
             }
 
-	    cvRectangle( orig, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
-            sprintf( tindex, "%d", oi );
-            cvPutText( orig, tindex, cvPoint(rect.x,rect.y), &font, CV_RGB(255,255,255));
+            if ( x_draw )
+            {
+	      cvRectangle( orig, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
+              sprintf( tindex, "%d", oi );
+              cvPutText( orig, tindex, cvPoint(rect.x,rect.y), &font, CV_RGB(255,255,255));
+            }
+
+            if ( x_show )
+            {
+              cvDrawContours( orig, contours, CV_RGB(255,255,255), CV_RGB(255,255,255), 0, 1, 8, cvPoint(0,0) );
+            }
 
     	    t_atom rlist[4];
             SETFLOAT(&rlist[0], oi);
@@ -242,6 +257,10 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
     
     // Convert to grayscale
     cvCvtColor(rgb, gray, CV_RGB2GRAY);
+    if ( x_nightmode )
+    {
+       cvZero( rgb );
+    }
   
     CvSeq* contours;
     CvMemStorage* stor02;
@@ -289,9 +308,17 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
                oi = this->mark(rect.x, rect.y );
             }
 
-	    cvRectangle( rgb, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
-            sprintf( tindex, "%d", oi );
-            cvPutText( rgb, tindex, cvPoint(rect.x,rect.y), &font, CV_RGB(255,255,255));
+            if ( x_draw )
+            {
+	      cvRectangle( rgb, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
+              sprintf( tindex, "%d", oi );
+              cvPutText( rgb, tindex, cvPoint(rect.x,rect.y), &font, CV_RGB(255,255,255));
+            }
+
+            if ( x_show )
+            {
+              cvDrawContours( rgb, contours, CV_RGB(255,255,255), CV_RGB(255,255,255), 0, 1, 8, cvPoint(0,0) );
+            }
 
     	    t_atom rlist[4];
             SETFLOAT(&rlist[0], oi);
@@ -359,6 +386,10 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
     // http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html 
     memcpy( gray->imageData, image.data, image.xsize*image.ysize );
     memcpy( cnt_img->imageData, image.data, image.xsize*image.ysize );
+    if ( x_nightmode )
+    {
+       cvZero( cnt_img );
+    }
 
     CvSeq* contours;
     CvMemStorage* stor02;
@@ -406,9 +437,17 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
                oi = this->mark(rect.x, rect.y );
             }
 
-	    cvRectangle( cnt_img, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), cvScalarAll(255), 2, 8 , 0 );
-            sprintf( tindex, "%d", oi );
-            cvPutText( cnt_img, tindex, cvPoint(rect.x,rect.y), &font, cvScalarAll(255));
+            if ( x_draw )
+            {
+	      cvRectangle( cnt_img, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), cvScalarAll(255), 2, 8 , 0 );
+              sprintf( tindex, "%d", oi );
+              cvPutText( cnt_img, tindex, cvPoint(rect.x,rect.y), &font, cvScalarAll(255));
+            }
+
+            if ( x_show )
+            {
+              cvDrawContours( cnt_img, contours, CV_RGB(255,255,255), CV_RGB(255,255,255), 0, 1, 8, cvPoint(0,0) );
+            }
 
     	    t_atom rlist[4];
             SETFLOAT(&rlist[0], oi);
@@ -555,6 +594,21 @@ void pix_opencv_contours_boundingrect :: floatClearMess (void)
     }
 }
 
+void pix_opencv_contours_boundingrect :: floatNightmodeMess (float nightmode)
+{
+  if ( ((int)nightmode==1) || ((int)nightmode==0) ) x_nightmode = (int)nightmode;
+}
+
+void pix_opencv_contours_boundingrect :: floatShowMess (float show)
+{
+  if ( ((int)show==1) || ((int)show==0) ) x_show = (int)show;
+}
+
+void pix_opencv_contours_boundingrect :: floatDrawMess (float draw)
+{
+  if ( ((int)draw==1) || ((int)draw==0) ) x_draw = (int)draw;
+}
+
 /////////////////////////////////////////////////////////
 // static member function
 //
@@ -574,7 +628,13 @@ void pix_opencv_contours_boundingrect :: obj_setupCallback(t_class *classPtr)
   class_addmethod(classPtr, (t_method)&pix_opencv_contours_boundingrect::floatCMethodMessCallback,
   		  gensym("cmethod"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_contours_boundingrect::floatClearMessCallback,
-  		  gensym("clear"), A_FLOAT, A_NULL);
+  		  gensym("clear"), A_NULL);
+  class_addmethod(classPtr, (t_method)&pix_opencv_contours_boundingrect::floatNightmodeMessCallback,
+  		  gensym("nightmode"), A_FLOAT, A_NULL);
+  class_addmethod(classPtr, (t_method)&pix_opencv_contours_boundingrect::floatShowMessCallback,
+  		  gensym("show"), A_FLOAT, A_NULL);
+  class_addmethod(classPtr, (t_method)&pix_opencv_contours_boundingrect::floatDrawMessCallback,
+  		  gensym("draw"), A_FLOAT, A_NULL);
 }
 
 void pix_opencv_contours_boundingrect :: floatMaxAreaMessCallback(void *data, t_floatarg maxarea)
@@ -610,4 +670,19 @@ void pix_opencv_contours_boundingrect :: floatCMethodMessCallback(void *data, t_
 void pix_opencv_contours_boundingrect :: floatClearMessCallback(void *data)
 {
   GetMyClass(data)->floatClearMess();
+}
+
+void pix_opencv_contours_boundingrect :: floatNightmodeMessCallback(void *data, t_floatarg nightmode)
+{
+  GetMyClass(data)->floatNightmodeMess(nightmode);
+}
+
+void pix_opencv_contours_boundingrect :: floatShowMessCallback(void *data, t_floatarg show)
+{
+  GetMyClass(data)->floatShowMess(show);
+}
+
+void pix_opencv_contours_boundingrect :: floatDrawMessCallback(void *data, t_floatarg draw)
+{
+  GetMyClass(data)->floatDrawMess(draw);
 }

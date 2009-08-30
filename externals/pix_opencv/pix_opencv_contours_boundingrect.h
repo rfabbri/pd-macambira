@@ -69,6 +69,9 @@ class GEM_EXTERN pix_opencv_contours_boundingrect : public GemPixObj
     	void	    	floatCModeMess(float maxarea);
     	void	    	floatCMethodMess(float maxarea);
     	void	    	floatClearMess(void);
+    	void	    	floatNightmodeMess(float nightmode);
+    	void	    	floatShowMess(float show);
+    	void	    	floatDrawMess(float draw);
         int             mark(float fx, float fy );
     	void	    	deleteMark(float findex);
     	// The new minimal/maximal area 
@@ -82,6 +85,9 @@ class GEM_EXTERN pix_opencv_contours_boundingrect : public GemPixObj
         int             x_found[MAX_MARKERS];
         int             x_ftolerance;
         int             x_mmove;
+        int             x_nightmode;
+        int             x_draw;
+        int             x_show;
 
         // contours retrieval mode
         int             x_cmode;
@@ -101,6 +107,9 @@ class GEM_EXTERN pix_opencv_contours_boundingrect : public GemPixObj
     	static void 	floatCModeMessCallback(void *data, t_floatarg cmode);
     	static void 	floatCMethodMessCallback(void *data, t_floatarg cmethod);
     	static void 	floatClearMessCallback(void *data);
+    	static void 	floatNightmodeMessCallback(void *data, t_floatarg nightmode);
+    	static void 	floatShowMessCallback(void *data, t_floatarg show);
+    	static void 	floatDrawMessCallback(void *data, t_floatarg draw);
 
 	/////////
 	// IplImage needed

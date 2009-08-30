@@ -37,6 +37,7 @@ pix_opencv_motempl :: pix_opencv_motempl()
   m_dataout = outlet_new(this->x_obj, 0);
 
   mhi_duration = 1.0;
+  aperture = 3;
   diff_threshold = 30;
   last = 0;
   comp_xsize  = 0;

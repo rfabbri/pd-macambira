@@ -5,14 +5,11 @@
 #X obj 36 256 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 0 22 454 304 gemwin 0;
-#X obj 132 136 gemwin;
 #X obj 67 89 outlet;
 #X obj 67 10 inlet;
 #X obj 67 41 route create;
 #X msg 67 70 set destroy;
 #X msg 182 68 set create;
-#X msg 132 112 create \, 1;
-#X msg 238 112 destroy;
 #N canvas 87 154 247 179 Gem.init 0;
 #X obj 118 46 loadbang;
 #X msg 118 81 reset;
@@ -20,16 +17,23 @@
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X restore 289 80 pd Gem.init;
+#X obj 171 266 gemwin;
+#X msg 164 226 create \, 1;
+#X msg 252 229 destroy;
+#X msg 292 186 frame 15;
+#X obj 173 176 t b b b;
+#X connect 1 0 2 0;
 #X connect 2 0 3 0;
-#X connect 3 0 4 0;
-#X connect 3 0 6 0;
-#X connect 3 1 5 0;
-#X connect 3 1 7 0;
-#X connect 4 0 1 0;
-#X connect 5 0 1 0;
-#X connect 6 0 0 0;
-#X connect 7 0 0 0;
-#X connect 8 0 0 0;
+#X connect 2 0 10 0;
+#X connect 2 1 4 0;
+#X connect 2 1 8 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 7 0 6 0;
+#X connect 8 0 6 0;
+#X connect 9 0 6 0;
+#X connect 10 0 7 0;
+#X connect 10 2 9 0;
 #X restore 43 300 pd gemwin;
 #X msg 43 276 destroy;
 #X text 39 256 Create window and render;
@@ -69,7 +73,7 @@
 #X text 524 291 switch open/close and erode/dilate modes;
 #X text 528 375 number of iterations -10/+10 (be carefull);
 #X obj 361 405 pix_opencv_morphology;
-#X text 467 493 written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
+#X text 468 494 written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
 );
 #X text 468 455 pdp_opencv_morphology : morphology filter ( erosion
 / dilatation );
