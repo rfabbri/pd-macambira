@@ -22,7 +22,7 @@ LOG
 #include "cv.h"
 #endif
 
-#define MAX_MARKERS 10
+#define MAX_MARKERS 500
 const int MAX_COUNT = 500;
 
 /*-----------------------------------------------------------------

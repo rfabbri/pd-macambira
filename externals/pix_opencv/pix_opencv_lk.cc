@@ -109,6 +109,13 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
     this->comp_xsize=image.xsize;
     this->comp_ysize=image.ysize;
 
+    cvReleaseImage( &rgba );
+    cvReleaseImage( &rgb );
+    cvReleaseImage( &grey );
+    cvReleaseImage( &prev_grey );
+    cvReleaseImage( &pyramid );
+    cvReleaseImage( &prev_pyramid );
+
     rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
     rgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
     grey = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
@@ -238,13 +245,14 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
            // first marking
            if ( x_xmark[im] != -1.0 )
            {
-             if ( ( abs( points[1][i].x - x_xmark[im] ) <= maxmove ) && ( abs( points[1][i].y - x_ymark[im] ) <= maxmove ) )
+             // post( "pix_opencv_lk : compare (%f,%f) to (%d,%d)", points[1][i].x, points[1][i].y, x_xmark[im], x_ymark[im] );
+             if ( ( abs( (int)points[1][i].x - x_xmark[im] ) <= maxmove ) && ( abs( (int)points[1][i].y - x_ymark[im] ) <= maxmove ) )
              {
                char tindex[4];
                sprintf( tindex, "%d", im+1 );
                cvPutText( rgba, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
-               x_xmark[im]=points[1][i].x;
-               x_ymark[im]=points[1][i].y;
+               x_xmark[im]=(int)points[1][i].x;
+               x_ymark[im]=(int)points[1][i].y;
                x_found[im]=ftolerance;
                marked=1;
                SETFLOAT(&x_list[0], im+1);
@@ -358,6 +366,13 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
 
     this->comp_xsize=image.xsize;
     this->comp_ysize=image.ysize;
+
+    cvReleaseImage( &rgba );
+    cvReleaseImage( &rgb );
+    cvReleaseImage( &grey );
+    cvReleaseImage( &prev_grey );
+    cvReleaseImage( &pyramid );
+    cvReleaseImage( &prev_pyramid );
 
     rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
     rgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
@@ -613,6 +628,13 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
 
     this->comp_xsize=image.xsize;
     this->comp_ysize=image.ysize;
+
+    cvReleaseImage( &rgba );
+    cvReleaseImage( &rgb );
+    cvReleaseImage( &grey );
+    cvReleaseImage( &prev_grey );
+    cvReleaseImage( &pyramid );
+    cvReleaseImage( &prev_pyramid );
 
     rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
     rgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
@@ -992,17 +1014,17 @@ void  pix_opencv_lk :: markMess(int argc, t_atom *argv)
       }
       else
       {
-        float fperx = argv[0].a_w.w_float;
-        float fpery = argv[1].a_w.w_float;
+        float fpx = argv[0].a_w.w_float;
+        float fpy = argv[1].a_w.w_float;
         int px, py;
 
-        if ( ( fperx < 0.0 ) || ( fperx > 1.0 ) || ( fpery < 0.0 ) || ( fpery > 1.0 ) )
+        if ( ( fpx < 0.0 ) || ( fpx > comp_xsize ) || ( fpy < 0.0 ) || ( fpy > comp_ysize ) )
         {
            return;
         }
 
-        px = (int)(fperx*comp_xsize);
-        py = (int)(fpery*comp_ysize);
+        px = (int)fpx;
+        py = comp_ysize-(int)fpy;
         inserted = 0;
         for ( i=0; i<MAX_MARKERS; i++)
         {
@@ -1012,6 +1034,7 @@ void  pix_opencv_lk :: markMess(int argc, t_atom *argv)
               x_ymark[i] = py;
               x_found[i] = ftolerance;
               inserted = 1;
+              // post( "pix_opencv_lk : inserted point (%d,%d)", px, py );
               break;
            }
         }

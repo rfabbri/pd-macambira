@@ -90,17 +90,18 @@ void pix_opencv_floodfill :: processRGBAImage(imageStruct &image)
     this->comp_xsize=image.xsize;
     this->comp_ysize=image.ysize;
 
+    cvReleaseImage( &rgba );
+    cvReleaseImage( &rgb );
+    cvReleaseImage( &grey );
+
     rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
     rgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
     grey = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
   }
 
   memcpy( rgba->imageData, image.data, image.xsize*image.ysize*4 );
-
-  if ( !x_color )
-  {
-    cvCvtColor(rgba, grey, CV_BGRA2GRAY);
-  }
+  cvCvtColor(rgba, grey, CV_BGRA2GRAY);
+  cvCvtColor(rgba, rgb, CV_BGRA2BGR);
 
   // mark recognized components
   for ( i=0; i<MAX_COMPONENTS; i++ )
@@ -111,7 +112,7 @@ void pix_opencv_floodfill :: processRGBAImage(imageStruct &image)
        {
           CvPoint seed = cvPoint(x_xcomp[i],x_ycomp[i]);
           CvScalar color = CV_RGB( x_r[i], x_g[i], x_b[i] );
-          cvFloodFill( rgba, seed, color, CV_RGB( x_lo, x_lo, x_lo ),
+          cvFloodFill( rgb, seed, color, CV_RGB( x_lo, x_lo, x_lo ),
                        CV_RGB( x_up, x_up, x_up ), &comp, flags, NULL );
        }
        else
@@ -134,6 +135,10 @@ void pix_opencv_floodfill :: processRGBAImage(imageStruct &image)
   {
     cvCvtColor(grey, rgba, CV_GRAY2BGRA);
   }
+  else
+  {
+    cvCvtColor(rgb, rgba, CV_BGR2BGRA);
+  }
 
   memcpy( image.data, rgba->imageData, image.xsize*image.ysize*4 );
 }
@@ -151,6 +156,10 @@ void pix_opencv_floodfill :: processRGBImage(imageStruct &image)
 
     this->comp_xsize=image.xsize;
     this->comp_ysize=image.ysize;
+
+    cvReleaseImage( &rgba );
+    cvReleaseImage( &rgb );
+    cvReleaseImage( &grey );
 
     rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
     rgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
@@ -218,6 +227,10 @@ void pix_opencv_floodfill :: processGrayImage(imageStruct &image)
 
     this->comp_xsize=image.xsize;
     this->comp_ysize=image.ysize;
+
+    cvReleaseImage( &rgba );
+    cvReleaseImage( &rgb );
+    cvReleaseImage( &grey );
 
     rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
     rgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
@@ -287,9 +300,9 @@ void  pix_opencv_floodfill :: connectivityMessCallback(void *data, t_floatarg co
     GetMyClass(data)->connectivityMess(connectivity);
 }
 
-void  pix_opencv_floodfill :: markMessCallback(void *data, t_floatarg perx, t_floatarg pery)
+void  pix_opencv_floodfill :: markMessCallback(void *data, t_floatarg px, t_floatarg py)
 {
-    GetMyClass(data)->markMess(perx, pery);
+    GetMyClass(data)->markMess(px, py);
 }
 
 void  pix_opencv_floodfill :: deleteMessCallback(void *data, t_floatarg index)
@@ -354,19 +367,19 @@ void  pix_opencv_floodfill :: connectivityMess(float connectivity)
     x_connectivity = (int)connectivity;
 }
 
-void  pix_opencv_floodfill :: markMess(float fperx, float fpery)
+void  pix_opencv_floodfill :: markMess(float fpx, float fpy)
 {
   int i;
   int inserted;
   int px, py;
 
-    if ( ( fperx < 0.0 ) || ( fperx > 1.0 ) || ( fpery < 0.0 ) || ( fpery > 1.0 ) )
+    if ( ( fpx < 0.0 ) || ( fpx > comp_xsize ) || ( fpy < 0.0 ) || ( fpy > comp_ysize ) )
     {
       return;
     }
 
-    px = (int)(fperx*comp_xsize);
-    py = (int)(fpery*comp_ysize);
+    px = (int)fpx;
+    py = comp_ysize-(int)fpy;
     inserted = 0;
     for ( i=0; i<MAX_COMPONENTS; i++)
     {
@@ -374,6 +387,7 @@ void  pix_opencv_floodfill :: markMess(float fperx, float fpery)
        {
          x_xcomp[i] = px;
          x_ycomp[i] = py;
+         // post( "pix_opencv_floodfill : inserted point (%d,%d)", px, py );
          inserted = 1;
          break;
        }
