@@ -79,16 +79,21 @@ void tclpd_anything(t_tcl *self, t_symbol *s, int ac, t_atom *at) {
 
 /* Tcl glue: */
 
-void tclpd_add_proxyinlet(t_object* o, t_proxyinlet* i) {
-    inlet_new(o, &i->pd, 0, 0);
+t_proxyinlet* tclpd_add_proxyinlet(t_tcl* x, t_symbol* s) {
+    t_proxyinlet* proxy = (t_proxyinlet*)pd_new(proxyinlet_class);
+    proxyinlet_init(proxy);
+    proxy->target = x;
+    proxy->sel = s;
+    inlet_new(&x->o, &proxy->obj.ob_pd, 0, 0);
+    return proxy;
 }
 
-t_pd* tclpd_get_instance(const char* objectSequentialId) {
-    return object_table[objectSequentialId];
+t_tcl* tclpd_get_instance(const char* objectSequentialId) {
+    return (t_tcl*)object_table[objectSequentialId];
 }
 
 t_object* tclpd_get_object(const char* objectSequentialId) {
-    t_tcl* x = (t_tcl*)tclpd_get_instance(objectSequentialId);
+    t_tcl* x = tclpd_get_instance(objectSequentialId);
     return &x->o;
 }
 

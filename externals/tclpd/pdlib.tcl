@@ -30,14 +30,8 @@ namespace eval ::pd {
                 #lappend _($self:x_inlet) [symbolinlet_new [tclpd_get_object $self] $ptr]
             }
             list {
-                set ptr [new_t_proxyinlet]
-                proxyinlet_init $ptr
-                #proxyinlet_list $ptr [gensym list] 2 {{symbol foo} {symbol bar}}
-                #puts "(t_proxyinlet) $ptr cget -pd = "
-                #puts "                               [$ptr cget -pd]"
-                #inlet_new [tclpd_get_object $self] [$ptr cget -pd] 0 {}
-                # I HATE SWIG
-                tclpd_add_proxyinlet [tclpd_get_object $self] $ptr
+                # none selector means cold inlet
+                set ptr [tclpd_add_proxyinlet [tclpd_get_instance $self] [gensym none]]
                 lappend _($self:p_inlet) $ptr
                 lappend _($self:t_inlet) "list"
             }
@@ -54,18 +48,19 @@ namespace eval ::pd {
         #return [lindex $_($self:x_inlet) end]
     }
 
-    # get the value of a given inlet (inlets numbered starting from 1)
+    # get the value of a given inlet
     proc inlet {self n} {
         if {$::verbose} {post [info level 0]}
         if {$n <= 0} {return {}}
+        variable _
+        if {$::verbose} {post "llength of _(self:p_inlet) is [llength $_($self:p_inlet)]"}
         if {![info exists _($self:p_inlet)] ||
-            $n >= [llength $_($self:p_inlet)]} {
+            $n > [llength $_($self:p_inlet)]} {
             return -code error [error_msg "no such inlet: $n"]
         }
-        variable _
         set p_inlet [lindex $_($self:p_inlet) [expr $n-1]]
         if {$_($self:t_inlet) == {list}} {
-            return [$p_inlet argv]
+            return [proxyinlet_get_atoms $p_inlet]
         } else {
             return [$p_inlet value]
         }
@@ -167,10 +162,10 @@ namespace eval ::pd {
         set noinlet_flag 0
         foreach {id arg} $def2 {
             switch -- $id {
-                inlet {
+                NOinlet {
                     lappend class_db($classname:d_inlet) $arg
                 }
-                outlet {
+                NOoutlet {
                     lappend class_db($classname:d_outlet) $arg
                 }
                 patchable {
