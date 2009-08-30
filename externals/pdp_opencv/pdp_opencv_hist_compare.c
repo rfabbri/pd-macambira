@@ -165,14 +165,14 @@ static void pdp_opencv_hist_compare_process_rgb(t_pdp_opencv_hist_compare *x)
      cvCalcHist( x->planes, x->hist, 0, 0 ); //Compute histogram
      cvNormalizeHist( x->hist, 1.0 );  //Normalize it 
 
-     double tato[MAX_HISTOGRAMS_TO_COMPARE];
-     t_atom datalist[MAX_HISTOGRAMS_TO_COMPARE];
+     double tato[x->nbsaved];
+     t_atom datalist[x->nbsaved];
      int nearest = -1;
      double max  =  0;
 
      int n;
      if ( x->nbsaved > 0 )
-       for (n=0; n<MAX_HISTOGRAMS_TO_COMPARE; n++) {
+       for (n=0; n<x->nbsaved; n++) {
 		tato[n] = cvCompareHist(x->hist, x->saved_hist[n], CV_COMP_INTERSECT);
 		SETFLOAT(&datalist[n], tato[n]);
 		if (tato[n]>max) {
@@ -183,7 +183,7 @@ static void pdp_opencv_hist_compare_process_rgb(t_pdp_opencv_hist_compare *x)
     	
     if ( x->nbsaved > 0 ) {
        outlet_float(x->x_outlet1, (float)nearest);
-       outlet_list( x->x_dataout, 0, MAX_HISTOGRAMS_TO_COMPARE, datalist );
+       outlet_list( x->x_dataout, 0, x->nbsaved, datalist );
     } else
        outlet_float(x->x_outlet1, -1.0);
     	    
