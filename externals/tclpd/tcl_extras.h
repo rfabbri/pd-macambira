@@ -9,11 +9,13 @@
 typedef struct _t_tcl {
     t_object o;
     Tcl_Obj* self;
+    int ninlets;
 } t_tcl;
 
 typedef struct _t_proxyinlet {
     t_object obj;
     t_tcl* target;
+    int ninlet;
     t_symbol* sel;
     int argc;
     t_atom* argv;
@@ -23,7 +25,6 @@ typedef struct _t_proxyinlet {
 extern t_class* proxyinlet_class;
 void proxyinlet_init(t_proxyinlet* x);
 void proxyinlet_clear(t_proxyinlet* x);
-void proxyinlet_list(t_proxyinlet* x, t_symbol* s, int argc, t_atom* argv);
 void proxyinlet_anything(t_proxyinlet* x, t_symbol* s, int argc, t_atom* argv);
 void proxyinlet_trigger(t_proxyinlet* x);
 t_atom* proxyinlet_get_atoms(t_proxyinlet* x);
@@ -47,7 +48,8 @@ t_class* tclpd_class_new(char* name, int flags);
 t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at);
 void tclpd_free (t_tcl* self);
 void tclpd_anything(t_tcl* self, t_symbol* s, int ac, t_atom* at);
-t_proxyinlet* tclpd_add_proxyinlet(t_tcl* x, t_symbol* s);
+void tclpd_inlet_anything(t_tcl *self, int inlet, t_symbol *s, int ac, t_atom *at);
+t_proxyinlet* tclpd_add_proxyinlet(t_tcl* x);
 t_tcl* tclpd_get_instance(const char* objectSequentialId);
 t_object* tclpd_get_object(const char* objectSequentialId);
 t_pd* tclpd_get_object_pd(const char* objectSequentialId);

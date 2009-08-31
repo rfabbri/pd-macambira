@@ -13,21 +13,19 @@ pd::class list_change {
     }
 
     0_list {
-        puts stderr "**** called [info level 0]"
-        puts stderr ">> inlet 0 is [pd::inlet $self 0]"
-        puts stderr ">> inlet 1 is [pd::inlet $self 1]"
-        #if {$args != $@curlist} {
-        #    set @curlist $args
-        #    pd::outlet $self 0 list $@curlist
-            #0_bang
-        #}
+        # HOT inlet
+        if {$args != $@curlist} {
+            set @curlist $args
+            pd::outlet $self 0 list $@curlist
+        }
     }
 
     0_bang {
-        puts stderr "**** called [info level 0]"
-        puts stderr ">> inlet 0 is [pd::inlet $self 0]"
-        puts stderr ">> inlet 1 is [pd::inlet $self 1]"
-        #pd::outlet $self 0 list $@curlist
+        pd::outlet $self 0 list $@curlist
     }
 
+    1_list {
+        # COLD inlet
+        set @curlist $args
+    }
 }

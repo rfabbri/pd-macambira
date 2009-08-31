@@ -22,6 +22,7 @@ t_tcl* tclpd_new(t_symbol *classsym, int ac, t_atom *at) {
     const char* name = classsym->s_name;
     t_class* qlass = class_table[string(name)];
     t_tcl* self = (t_tcl*)pd_new(qlass);
+    self->ninlets = 1 /* qlass->c_firstin ??? */;
     char s[32];
     sprintf(s, "pd%06lx", objectSequentialId++);
     self->self = Tcl_NewStringObj(s, -1);
@@ -55,16 +56,19 @@ void tclpd_free(t_tcl *self) {
 }
 
 void tclpd_anything(t_tcl *self, t_symbol *s, int ac, t_atom *at) {
+    tclpd_inlet_anything(self, 0, s, ac, at);
+}
+
+void tclpd_inlet_anything(t_tcl *self, int inlet, t_symbol *s, int ac, t_atom *at) {
 /* proxy method */
     Tcl_Obj *av[ac+2];
     av[0] = self->self;
-    av[1] = Tcl_NewIntObj(0); // TODO: 0 -> outlet_number
+    av[1] = Tcl_NewIntObj(inlet);
     Tcl_AppendToObj(av[1],"_",1);
     Tcl_AppendToObj(av[1],s->s_name,strlen(s->s_name)); // selector
     Tcl_IncrRefCount(av[1]);
     for(int i=0; i<ac; i++) {
         if(pd_to_tcl(&at[i], &av[2+i]) == TCL_ERROR) {
-            //post("Tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
             tclpd_interp_error(TCL_ERROR);
             return;
         }
@@ -72,18 +76,17 @@ void tclpd_anything(t_tcl *self, t_symbol *s, int ac, t_atom *at) {
     int result = Tcl_EvalObjv(tcl_for_pd,ac+2,av,0);
     Tcl_DecrRefCount(av[1]);
     if (result != TCL_OK) {
-        //post("Tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
         tclpd_interp_error(TCL_ERROR);
     }
 }
 
 /* Tcl glue: */
 
-t_proxyinlet* tclpd_add_proxyinlet(t_tcl* x, t_symbol* s) {
+t_proxyinlet* tclpd_add_proxyinlet(t_tcl* x) {
     t_proxyinlet* proxy = (t_proxyinlet*)pd_new(proxyinlet_class);
     proxyinlet_init(proxy);
     proxy->target = x;
-    proxy->sel = s;
+    proxy->ninlet = x->ninlets++;
     inlet_new(&x->o, &proxy->obj.ob_pd, 0, 0);
     return proxy;
 }

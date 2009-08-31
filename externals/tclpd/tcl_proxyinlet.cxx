@@ -16,21 +16,24 @@ void proxyinlet_clear(t_proxyinlet* x) {
     }
 }
 
+#define PROXYINLET_SEL_TO_LIST 0 // 0 or 1
+
 void proxyinlet_anything(t_proxyinlet* x, t_symbol* s, int argc, t_atom* argv) {
     proxyinlet_clear(x);
 
-    if(!(x->argv = (t_atom*)getbytes((argc+1) * sizeof(*x->argv)))) {
+    if(!(x->argv = (t_atom*)getbytes((argc+PROXYINLET_SEL_TO_LIST) * sizeof(*x->argv)))) {
         x->argc = 0;
         error("proxyinlet: getbytes: out of memory");
         return;
     }
 
-    x->argc = argc + 1;
-    SETSYMBOL(&x->argv[0], s);
+    x->argc = argc + PROXYINLET_SEL_TO_LIST;
+    if(PROXYINLET_SEL_TO_LIST == 1) SETSYMBOL(&x->argv[0], s);
+    else x->sel = s;
 
     int i;
     for(i = 0; i < argc; i++) {
-        x->argv[i+1] = argv[i];
+        x->argv[i+PROXYINLET_SEL_TO_LIST] = argv[i];
     }
 
     proxyinlet_trigger(x);
@@ -38,7 +41,7 @@ void proxyinlet_anything(t_proxyinlet* x, t_symbol* s, int argc, t_atom* argv) {
 
 void proxyinlet_trigger(t_proxyinlet* x) {
     if(x->target != NULL && x->sel != gensym("none")) {
-        tclpd_anything(x->target, x->sel, x->argc, x->argv);
+        tclpd_inlet_anything(x->target, x->ninlet, x->sel, x->argc, x->argv);
     }
 }
 

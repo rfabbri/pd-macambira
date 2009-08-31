@@ -1,93 +1,32 @@
 # TCL objectized library for PD api
-# by Federico Ferri <mescalinum@gmail.com> - 2007
+# by Federico Ferri <mescalinum@gmail.com> - (C) 2007-2009
 
 package provide pdlib 0.1
 
 package require Tcl 8.5
 
-set verbose 1
+set verbose 0
 
 namespace eval ::pd {
     proc error_msg {m} {
         return "pdlib: [uplevel {lindex [info level 0] 0}]: error: $m"
     }
 
-    # create additional inlets with this
     proc add_inlet {self sel} {
         if $::verbose {post [info level 0]}
         variable _
-        switch -- $sel {
-            float {
-                set ptr [new_t_float]
-                lappend _($self:p_inlet) $ptr
-                lappend _($self:t_inlet) "float"
-                #lappend _($self:x_inlet) [floatinlet_new [tclpd_get_object $self] $ptr]
-            }
-            symbol {
-                set ptr [new_t_symbol]
-                lappend _($self:p_inlet) $ptr
-                lappend _($self:t_inlet) "symbol"
-                #lappend _($self:x_inlet) [symbolinlet_new [tclpd_get_object $self] $ptr]
-            }
-            list {
-                # none selector means cold inlet
-                set ptr [tclpd_add_proxyinlet [tclpd_get_instance $self] [gensym none]]
-                lappend _($self:p_inlet) $ptr
-                lappend _($self:t_inlet) "list"
-            }
-            DISABLED__pointer {
-            ## need to think more about this
-            #    set ptr [new_t_pointer]
-            #    lappend _($self:p_inlet) $ptr
-            ##    lappend _($self:x_inlet) [pointerinlet_new [tclpd_get_object $self] $ptr]
-            }
-            default {
-                return -code error [error_msg "unsupported selector: $sel"]
-            }
-        }
-        #return [lindex $_($self:x_inlet) end]
+        tclpd_add_proxyinlet [tclpd_get_instance $self]
     }
 
-    # get the value of a given inlet
-    proc inlet {self n} {
-        if {$::verbose} {post [info level 0]}
-        if {$n <= 0} {return {}}
-        variable _
-        if {$::verbose} {post "llength of _(self:p_inlet) is [llength $_($self:p_inlet)]"}
-        if {![info exists _($self:p_inlet)] ||
-            $n > [llength $_($self:p_inlet)]} {
-            return -code error [error_msg "no such inlet: $n"]
-        }
-        set p_inlet [lindex $_($self:p_inlet) [expr $n-1]]
-        if {$_($self:t_inlet) == {list}} {
-            return [proxyinlet_get_atoms $p_inlet]
-        } else {
-            return [$p_inlet value]
-        }
-    }
-
-    # used in object constructor for adding inlets
     proc add_outlet {self sel} {
         if $::verbose {post [info level 0]}
-        variable _
-        switch -- $sel {
-            float {
-                lappend _($self:x_outlet) \
-                    [outlet_new [tclpd_get_object $self] [gensym "float"]]
-            }
-            symbol {
-                lappend _($self:x_outlet) \
-                    [outlet_new [tclpd_get_object $self] [gensym "symbol"]]
-            }
-            list {
-                lappend _($self:x_outlet) \
-                    [outlet_new [tclpd_get_object $self] [gensym "list"]]
-            }
-            default {
+        if {[lsearch -exact {bang float list symbol} $sel] == -1} {
                 return -code error [error_msg "unsupported selector: $sel"]
-            }
         }
-        return [lindex $_($self:x_outlet) end]
+        variable _
+        set o [outlet_new [tclpd_get_object $self] [gensym $sel]]
+        lappend _($self:x_outlet) $o
+        return $o
     }
 
     # used inside class for outputting some value
@@ -123,23 +62,6 @@ namespace eval ::pd {
         }
     }
 
-    # used in object constructor to create inlets (internal method)
-    proc create_iolets {cn self} {
-        if $::verbose {post [info level 0]}
-        variable class_db
-        variable _
-        set _($self:p_inlet) {}
-        #set _($self:x_inlet) {}
-        set _($self:t_inlet) {}
-        set _($self:x_outlet) {}
-        for {set i 0} {$i < [llength $class_db($cn:d_inlet)]} {incr i} {
-            add_inlet $self [lindex $class_db($cn:d_inlet) $i]
-        }
-        for {set i 0} {$i < [llength $class_db($cn:d_outlet)]} {incr i} {
-            add_outlet $self [lindex $class_db($cn:d_outlet) $i]
-        }
-    }
-
     # add a class method (that is: a proc named <class>_<sel>)
     proc call_classmethod {classname self sel args} {
         if $::verbose {post [info level 0]}
@@ -162,12 +84,6 @@ namespace eval ::pd {
         set noinlet_flag 0
         foreach {id arg} $def2 {
             switch -- $id {
-                NOinlet {
-                    lappend class_db($classname:d_inlet) $arg
-                }
-                NOoutlet {
-                    lappend class_db($classname:d_outlet) $arg
-                }
                 patchable {
                     if {$arg != 0 && $arg != 1} {
                         return -code error [error_msg "patchable must be 0/1"]
@@ -189,7 +105,6 @@ namespace eval ::pd {
         # class level dispatcher (sort of class constructor)
         proc ::$classname {self args} "
             if \$::verbose {::pd::post \[info level 0\]}
-            ::pd::create_iolets $classname \$self
             ::pd::call_classmethod $classname \$self constructor {*}\$args
             # object dispatcher
             proc ::\$self {selector args} \"

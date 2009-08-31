@@ -53,6 +53,8 @@
     /* extern "C" { void tcl_setup() {tclpd_setup(void);} } */
 %}
 
+/* this does the trick of solving
+ TypeError in method 'outlet_list', argument 4 of type 't_atom *' */
 %name(outlet_list) EXTERN void outlet_list(t_outlet *x, t_symbol *s, int argc, t_atom_array *argv);
 
 %pointer_class(t_float, t_float)
