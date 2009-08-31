@@ -129,38 +129,31 @@ namespace eval ::pd {
         poststring2 [concat {*}$args]
     }
 
-    proc assert= {a b} {
-        if {$a != $b} {
-            post "ASSERTION FAILED: \"$a\" == \"$b\""
-            return 0
-        }
-        return 1
-    }
-
     proc args {} {
         return [uplevel 1 "llength \$args"]
     }
 
-    proc arg_float {n} {
+    proc arg {n {assertion any}} {
         set v [uplevel 1 "lindex \$args $n"]
+        set i 0
         foreach {selector value} $v {break}
-        assert= $selector "float"
-        return $value
+        if {$assertion == {int}} {
+            set assertion {float}
+            set i 1
+        }
+        if {$assertion != {any}} {
+            if {$selector != $assertion} {
+                return -code error "arg #$n is $selector, must be $assertion"
+            }
+        }
+        if {$assertion == {float} && $i && $value != int($value)} {
+            return -code error "arg #$n is float, must be int"
+        }
+        if {$assertion == {float} && $i} {
+            return [expr {int($value)}]
+        } else {
+            return $value
+        }
     }
-
-    proc arg_int {n} {
-        set v [uplevel 1 "lindex \$args $n"]
-        foreach {selector value} $v {break}
-        assert= $selector "float"
-        return [expr {int($value)}]
-    }
-
-    proc arg_symbol {n} {
-        set v [uplevel 1 "lindex \$args $n"]
-        foreach {selector value} $v {break}
-        assert= $selector "symbol"
-        return $value
-    }
-
 }
 

@@ -1,7 +1,6 @@
 source pdlib.tcl
 
 pd::class list_change {
-
     constructor {
         # add second inlet (first created by default)
         pd::add_inlet $self list
