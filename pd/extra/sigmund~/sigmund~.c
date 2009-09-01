@@ -26,13 +26,13 @@ for example, defines this in the file d_fft_mayer.c or d_fft_fftsg.c. */
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef NT
+#ifdef _WIN32
 #include <malloc.h>
 #else
 #include <alloca.h>
 #endif
 #include <stdlib.h>
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
@@ -1395,7 +1395,7 @@ void sigmund_tilde_setup(void)
         gensym("print"), 0);
     class_addmethod(sigmund_class, (t_method)sigmund_printnext,
         gensym("printnext"), A_FLOAT, 0);
-    post("sigmund~ version 0.06");
+    post("sigmund~ version 0.07");
 }
 
 #endif /* PD */
@@ -1429,6 +1429,10 @@ static t_int *sigmund_perform(t_int *w)
     int n = (int)(w[3]), j;
     int infill = x->x_infill;
     float *fp = x->x_inbuf2 + infill;
+
+    if (x->x_obj.z_disabled) /* return if in muted MSP subpatch -Rd */
+        return (w+4);
+
     if (infill < 0 || infill >= x->x_npts)
         infill = 0;
         /* for some reason this sometimes happens: */
@@ -1642,7 +1646,7 @@ int main()
     class_register(CLASS_BOX, c);
     sigmund_class = c;
     
-    post("sigmund~ v0.06");
+    post("sigmund~ version 0.07");
     return (0);
 }
 
