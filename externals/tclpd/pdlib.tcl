@@ -63,12 +63,17 @@ namespace eval ::pd {
     }
 
     # add a class method (that is: a proc named <class>_<sel>)
-    proc call_classmethod {classname self sel args} {
+    proc call_classmethod {classname self inlet sel args} {
         if $::verbose {post [info level 0]}
-        set m "${classname}_${sel}"
-        if {[llength [info commands "::$m"]] > 0} {
-            return [$m $self {*}$args]
+        set m_sel "::${classname}_${inlet}_${sel}"
+        if {[llength [info commands $m_sel]] > 0} {
+            return [$m_sel $self {*}$args]
         }
+        set m_any "::${classname}_${inlet}_anything"
+        if {[llength [info commands $m_any]] > 0} {
+            return [$m_any $self $sel {*}$args]
+        }
+        post "class $classname: inlet $inlet: no such selector: $sel"
     }
 
     # this handles the pd::class definition
@@ -105,11 +110,11 @@ namespace eval ::pd {
         # class level dispatcher (sort of class constructor)
         proc ::$classname {self args} "
             if \$::verbose {::pd::post \[info level 0\]}
-            ::pd::call_classmethod $classname \$self constructor {*}\$args
+            ::pd::call_classmethod $classname \$self 0 constructor {*}\$args
             # object dispatcher
-            proc ::\$self {selector args} \"
+            proc ::\$self {inlet selector args} \"
              if \\\$::verbose {::pd::post \\\[info level 0\\\]}
-             ::pd::call_classmethod $classname \$self \\\$selector {*}\\\$args
+             ::pd::call_classmethod $classname \$self \\\$inlet \\\$selector {*}\\\$args
             \"
             return \$self
         "

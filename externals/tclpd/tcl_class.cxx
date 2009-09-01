@@ -37,7 +37,7 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     t_tcl* self = (t_tcl*)pd_new(qlass);
     self->ninlets = 1 /* qlass->c_firstin ??? */;
     char s[32];
-    sprintf(s, "pd%06lx", objectSequentialId++);
+    sprintf(s, "tclpd:%s:x%x", name, objectSequentialId++);
     self->self = Tcl_NewStringObj(s, -1);
     Tcl_IncrRefCount(self->self);
     object_table[string(s)] = (t_pd*)self;
@@ -47,46 +47,44 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     av[1] = self->self;
     for(int i=0; i<ac; i++) {
         if(pd_to_tcl(&at[i], &av[2+i]) == TCL_ERROR) {
-            //post("tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
             tclpd_interp_error(TCL_ERROR);
-            pd_free((t_pd *)self);
+            pd_free((t_pd*)self);
             return 0;
         }
     }
-    if(Tcl_EvalObjv(tcl_for_pd,ac+2,av,0) != TCL_OK) {
-        //post("tcl error: %s\n", Tcl_GetStringResult(tcl_for_pd));
+    if(Tcl_EvalObjv(tcl_for_pd, ac+2, av, 0) != TCL_OK) {
         tclpd_interp_error(TCL_ERROR);
-        pd_free((t_pd *)self);
+        pd_free((t_pd*)self);
         return 0;
     }
     return self;
 }
 
-void tclpd_free(t_tcl *self) {
+void tclpd_free(t_tcl* self) {
 #ifdef DEBUG
     post("tclpd_free called");
 #endif
 }
 
-void tclpd_anything(t_tcl *self, t_symbol *s, int ac, t_atom *at) {
+void tclpd_anything(t_tcl* self, t_symbol* s, int ac, t_atom* at) {
     tclpd_inlet_anything(self, 0, s, ac, at);
 }
 
-void tclpd_inlet_anything(t_tcl *self, int inlet, t_symbol *s, int ac, t_atom *at) {
+void tclpd_inlet_anything(t_tcl* self, int inlet, t_symbol* s, int ac, t_atom* at) {
 /* proxy method */
-    Tcl_Obj *av[ac+2];
+    Tcl_Obj* av[ac+3];
     av[0] = self->self;
     av[1] = Tcl_NewIntObj(inlet);
-    Tcl_AppendToObj(av[1],"_",1);
-    Tcl_AppendToObj(av[1],s->s_name,strlen(s->s_name)); // selector
     Tcl_IncrRefCount(av[1]);
+    av[2] = Tcl_NewStringObj(s->s_name, -1);
+    Tcl_IncrRefCount(av[2]);
     for(int i=0; i<ac; i++) {
-        if(pd_to_tcl(&at[i], &av[2+i]) == TCL_ERROR) {
+        if(pd_to_tcl(&at[i], &av[3+i]) == TCL_ERROR) {
             tclpd_interp_error(TCL_ERROR);
             return;
         }
     }
-    int result = Tcl_EvalObjv(tcl_for_pd,ac+2,av,0);
+    int result = Tcl_EvalObjv(tcl_for_pd, ac+3, av, 0);
     Tcl_DecrRefCount(av[1]);
     if (result != TCL_OK) {
         tclpd_interp_error(TCL_ERROR);

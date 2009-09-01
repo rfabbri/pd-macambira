@@ -1,4 +1,8 @@
 #include "m_pd.h"
+#include "m_imp.h"
+#include "g_canvas.h"
+#include "s_stuff.h"
+
 #include <tcl.h>
 
 /* PATH_MAX is not defined in limits.h on some platforms */
@@ -67,7 +71,7 @@ int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shif
 extern "C" int tclpd_do_load_lib(t_canvas* canvas, char* objectname);
 /* pd loader private stuff: */
 typedef int (*loader_t)(t_canvas *canvas, char* classname);
-extern "C" void sys_register_loader(loader_t loader);
+//extern "C" void sys_register_loader(loader_t loader);
 extern "C" int sys_onloadlist(char* classname);
 extern "C" void sys_putonloadlist(char* classname);
 extern "C" void class_set_extern_dir(t_symbol* s);
