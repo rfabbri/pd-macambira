@@ -45,6 +45,7 @@ void tclpd_interp_error(int result);
 
 /* tcl_class.cxx */
 t_class* tclpd_class_new(char* name, int flags);
+t_class* tclpd_guiclass_new(const char* name, int flags);
 t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at);
 void tclpd_free (t_tcl* self);
 void tclpd_anything(t_tcl* self, t_symbol* s, int ac, t_atom* at);
@@ -54,6 +55,13 @@ t_tcl* tclpd_get_instance(const char* objectSequentialId);
 t_object* tclpd_get_object(const char* objectSequentialId);
 t_pd* tclpd_get_object_pd(const char* objectSequentialId);
 void poststring2(const char* s);
+void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* xp2, int* yp2);
+void tclpd_guiclass_displace(t_gobj* z, t_glist* glist, int dx, int dy);
+void tclpd_guiclass_select(t_gobj* z, t_glist* glist, int selected);
+void tclpd_guiclass_activate(t_gobj* z, t_glist* glist, int state);
+void tclpd_guiclass_delete(t_gobj* z, t_glist* glist);
+void tclpd_guiclass_vis(t_gobj* z, t_glist* glist, int vis);
+int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shift, int alt, int dbl, int doit);
 
 /* tcl_loader.cxx */
 extern "C" int tclpd_do_load_lib(t_canvas* canvas, char* objectname);

@@ -10,15 +10,28 @@ map<string,t_class*> class_table;
 map<string,t_pd*> object_table;
 
 /* set up the class that handles loading of tcl classes */
-t_class* tclpd_class_new(char *name, int flags) {
-    t_class *c = class_new(gensym(name), (t_newmethod)tclpd_new,
+t_class* tclpd_class_new(const char* name, int flags) {
+    t_class* c = class_new(gensym(name), (t_newmethod)tclpd_new,
         (t_method)tclpd_free, sizeof(t_tcl), flags, A_GIMME, A_NULL);
     class_table[string(name)] = c;
     class_addanything(c, tclpd_anything);
     return c;
 }
 
-t_tcl* tclpd_new(t_symbol *classsym, int ac, t_atom *at) {
+t_class* tclpd_guiclass_new(const char* name, int flags) {
+    t_class* c = tclpd_class_new(name, flags);
+    t_widgetbehavior* wb = (t_widgetbehavior*)getbytes(sizeof(t_widgetbehavior));
+    wb->w_getrectfn = tclpd_guiclass_getrect;
+    wb->w_displacefn = tclpd_guiclass_displace;
+    wb->w_selectfn = tclpd_guiclass_select;
+    wb->w_activatefn = NULL;
+    wb->w_deletefn = tclpd_guiclass_delete;
+    wb->w_visfn = tclpd_guiclass_vis;
+    wb->w_clickfn = tclpd_guiclass_click;
+    class_setwidget(c, wb);
+}
+
+t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     const char* name = classsym->s_name;
     t_class* qlass = class_table[string(name)];
     t_tcl* self = (t_tcl*)pd_new(qlass);
@@ -107,4 +120,25 @@ t_pd* tclpd_get_object_pd(const char* objectSequentialId) {
 
 void poststring2 (const char *s) {
     post("%s", s);
+}
+
+void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* xp2, int* yp2) {
+}
+
+void tclpd_guiclass_displace(t_gobj* z, t_glist* glist, int dx, int dy) {
+}
+
+void tclpd_guiclass_select(t_gobj* z, t_glist* glist, int selected) {
+}
+
+void tclpd_guiclass_activate(t_gobj* z, t_glist* glist, int state) {
+}
+
+void tclpd_guiclass_delete(t_gobj* z, t_glist* glist) {
+}
+
+void tclpd_guiclass_vis(t_gobj* z, t_glist* glist, int vis) {
+}
+
+int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
 }
