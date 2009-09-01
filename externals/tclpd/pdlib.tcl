@@ -110,7 +110,7 @@ namespace eval ::pd {
         # class level dispatcher (sort of class constructor)
         proc ::$classname {self args} "
             if \$::verbose {::pd::post \[info level 0\]}
-            ::pd::call_classmethod $classname \$self 0 constructor {*}\$args
+            ::${classname}_constructor \$self {*}\$args
             # object dispatcher
             proc ::\$self {inlet selector args} \"
              if \\\$::verbose {::pd::post \\\[info level 0\\\]}

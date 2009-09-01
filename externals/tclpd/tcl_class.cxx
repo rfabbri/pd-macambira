@@ -5,7 +5,7 @@
 
 using namespace std;
 
-static long objectSequentialId = 0;
+static unsigned long objectSequentialId = 0;
 map<string,t_class*> class_table;
 map<string,t_pd*> object_table;
 
@@ -29,6 +29,7 @@ t_class* tclpd_guiclass_new(const char* name, int flags) {
     wb->w_visfn = tclpd_guiclass_vis;
     wb->w_clickfn = tclpd_guiclass_click;
     class_setwidget(c, wb);
+    return c;
 }
 
 t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
@@ -37,7 +38,7 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     t_tcl* self = (t_tcl*)pd_new(qlass);
     self->ninlets = 1 /* qlass->c_firstin ??? */;
     char s[32];
-    sprintf(s, "tclpd:%s:x%x", name, objectSequentialId++);
+    sprintf(s, "tclpd:%s:x%lx", name, objectSequentialId++);
     self->self = Tcl_NewStringObj(s, -1);
     Tcl_IncrRefCount(self->self);
     object_table[string(s)] = (t_pd*)self;
@@ -139,4 +140,5 @@ void tclpd_guiclass_vis(t_gobj* z, t_glist* glist, int vis) {
 }
 
 int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
+    return 0;
 }

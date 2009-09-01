@@ -1,7 +1,7 @@
 #include "m_pd.h"
-#include "m_imp.h"
+//#include "m_imp.h"
 #include "g_canvas.h"
-#include "s_stuff.h"
+//#include "s_stuff.h"
 
 #include <tcl.h>
 
@@ -48,7 +48,7 @@ extern "C" void tclpd_setup(void);
 void tclpd_interp_error(int result);
 
 /* tcl_class.cxx */
-t_class* tclpd_class_new(char* name, int flags);
+t_class* tclpd_class_new(const char* name, int flags);
 t_class* tclpd_guiclass_new(const char* name, int flags);
 t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at);
 void tclpd_free (t_tcl* self);
@@ -71,7 +71,7 @@ int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shif
 extern "C" int tclpd_do_load_lib(t_canvas* canvas, char* objectname);
 /* pd loader private stuff: */
 typedef int (*loader_t)(t_canvas *canvas, char* classname);
-//extern "C" void sys_register_loader(loader_t loader);
+extern "C" void sys_register_loader(loader_t loader);
 extern "C" int sys_onloadlist(char* classname);
 extern "C" void sys_putonloadlist(char* classname);
 extern "C" void class_set_extern_dir(t_symbol* s);
