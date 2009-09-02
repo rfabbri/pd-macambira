@@ -1,7 +1,7 @@
 #include "tcl_extras.h"
 
 void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* xp2, int* yp2) {
-    Tcl_Obj* av[5], *o, *theList;
+    Tcl_Obj* av[5], *o, *theList = NULL;
     int tmp[4], i, length;
     t_tcl* x = (t_tcl*)z;
     av[0] = x->self;
@@ -19,6 +19,7 @@ void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* 
         goto error;
     }
     theList = Tcl_GetObjResult(tcl_for_pd);
+    Tcl_IncrRefCount(theList);
     length = 0;
     //result = Tcl_ListObjGetElements(tcl_for_pd, theList, @, @);
     result = Tcl_ListObjLength(tcl_for_pd, theList, &length);
@@ -47,6 +48,7 @@ void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* 
     goto cleanup;
 error:
 cleanup:
+    if(theList) Tcl_DecrRefCount(theList);
     Tcl_DecrRefCount(av[1]);
     Tcl_DecrRefCount(av[2]);
     Tcl_DecrRefCount(av[3]);
@@ -54,7 +56,7 @@ cleanup:
 }
 
 void tclpd_guiclass_displace(t_gobj* z, t_glist* glist, int dx, int dy) {
-    Tcl_Obj* av[5], *theList, *o;
+    Tcl_Obj* av[5], *theList = NULL, *o;
     int length, i, tmp[2];
     t_tcl* x = (t_tcl*)z;
     av[0] = x->self;
@@ -72,6 +74,7 @@ void tclpd_guiclass_displace(t_gobj* z, t_glist* glist, int dx, int dy) {
         goto error;
     }
     theList = Tcl_GetObjResult(tcl_for_pd);
+    Tcl_IncrRefCount(theList);
     length = 0;
     //result = Tcl_ListObjGetElements(tcl_for_pd, theList, @, @);
     result = Tcl_ListObjLength(tcl_for_pd, theList, &length);
@@ -102,6 +105,7 @@ void tclpd_guiclass_displace(t_gobj* z, t_glist* glist, int dx, int dy) {
     goto cleanup;
 error:
 cleanup:
+    if(theList) Tcl_DecrRefCount(theList);
     Tcl_DecrRefCount(av[1]);
     Tcl_DecrRefCount(av[2]);
     Tcl_DecrRefCount(av[3]);
@@ -168,7 +172,7 @@ void tclpd_guiclass_vis(t_gobj* z, t_glist* glist, int vis) {
     av[2] = Tcl_NewStringObj("vis", -1);
     Tcl_IncrRefCount(av[2]);
     char buf[32];
-    snprintf(buf, 32, ".x%x.c", glist_getcanvas(glist));
+    snprintf(buf, 32, ".x%lx.c", glist_getcanvas(glist));
     av[3] = Tcl_NewStringObj(buf, -1);
     Tcl_IncrRefCount(av[3]);
     av[4] = Tcl_NewIntObj(text_xpix(&x->o, glist));
@@ -220,7 +224,9 @@ int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shif
         goto error;
     }
     o = Tcl_GetObjResult(tcl_for_pd);
+    Tcl_IncrRefCount(o);
     result = Tcl_GetIntFromObj(tcl_for_pd, o, &i);
+    Tcl_DecrRefCount(o);
     if(result != TCL_OK) {
         tclpd_interp_error(result);
         goto error;
