@@ -13,8 +13,12 @@ map<string,t_pd*> object_table;
 t_class* tclpd_class_new(const char* name, int flags) {
     t_class* c = class_new(gensym(name), (t_newmethod)tclpd_new,
         (t_method)tclpd_free, sizeof(t_tcl), flags, A_GIMME, A_NULL);
+
     class_table[string(name)] = c;
     class_addanything(c, tclpd_anything);
+
+    class_setsavefn(c, tclpd_save);
+
     return c;
 }
 
@@ -123,4 +127,51 @@ void poststring2 (const char *s) {
 }
 
 void tclpd_save(t_gobj* z, t_binbuf* b) {
+    Tcl_Obj* av[3], *res;
+    t_tcl* x = (t_tcl*)z;
+    av[0] = x->self;
+    av[1] = Tcl_NewStringObj("object", -1);
+    Tcl_IncrRefCount(av[1]);
+    av[2] = Tcl_NewStringObj("save", -1);
+    Tcl_IncrRefCount(av[2]);
+    int result = Tcl_EvalObjv(tcl_for_pd, 3, av, 0);
+    if(result == TCL_OK) {
+        res = Tcl_GetObjResult(tcl_for_pd);
+        Tcl_IncrRefCount(res);
+        int objc;
+        Tcl_Obj** objv;
+        result = Tcl_ListObjGetElements(tcl_for_pd, res, &objc, &objv);
+        if(result == TCL_OK) {
+            if(objc == 0 && objv == NULL) {
+                // call default savefn
+                text_save(z, b);
+            } else {
+                // do custom savefn
+                int i;
+                double tmp;
+                for(i = 0; i < objc; i++) {
+                    result = Tcl_GetDoubleFromObj(tcl_for_pd, objv[i], &tmp);
+                    if(result == TCL_OK) {
+                        binbuf_addv(b, "f", (t_float)tmp);
+                    } else {
+                        char* tmps = Tcl_GetStringFromObj(objv[i], NULL);
+                        if(!strcmp(tmps, ";")) {
+                            binbuf_addv(b, ";");
+                        } else {
+                            binbuf_addv(b, "s", gensym(tmps));
+                        }
+                    }
+                }
+            }
+        } else {
+            pd_error(x, "Tcl: object save: failed");
+            tclpd_interp_error(result);
+        }
+        Tcl_DecrRefCount(res);
+    } else {
+        pd_error(x, "Tcl: object save: failed");
+        tclpd_interp_error(result);
+    }
+    Tcl_DecrRefCount(av[1]);
+    Tcl_DecrRefCount(av[2]);
 }

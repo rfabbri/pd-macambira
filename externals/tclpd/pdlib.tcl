@@ -77,11 +77,12 @@ namespace eval ::pd {
     }
 
     proc read_class_definition {classname def} {
-        # strip comments:
-        set def2 [regsub -all -line {#.*$} $def {}]
         set patchable_flag 1
         set noinlet_flag 0
-        foreach {id arg} $def2 {
+
+        proc ::${classname}_object_save {self args} {return ""}
+
+        foreach {id arg} $def {
             switch -- $id {
                 patchable {
                     if {$arg != 0 && $arg != 1} {
