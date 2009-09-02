@@ -37,7 +37,7 @@ clean::
 
 .SUFFIXES: .cxx .o
 
-SRCS = tcl_wrap.cxx tcl_typemap.cxx tcl_class.cxx tcl_proxyinlet.cxx tcl_setup.cxx tcl_loader.cxx
+SRCS = tcl_wrap.cxx tcl_typemap.cxx tcl_class.cxx tcl_widgetbehavior.cxx tcl_proxyinlet.cxx tcl_setup.cxx tcl_loader.cxx
 OBJS = ${SRCS:.cxx=.o}
 
 tcl_wrap.cxx:: tcl.i tcl_extras.h Makefile
