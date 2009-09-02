@@ -76,13 +76,7 @@ namespace eval ::pd {
         post "Tcl class $classname: inlet $inlet: no such method: $sel"
     }
 
-    # this handles the pd::class definition
-    proc class {classname def} {
-        if $::verbose {post [lrange [info level 0] 0 end-1]}
-        variable class_db
-        array set class_db {}
-        set class_db($classname:d_inlet) {}
-        set class_db($classname:d_outlet) {}
+    proc read_class_definition {classname def} {
         # strip comments:
         set def2 [regsub -all -line {#.*$} $def {}]
         set patchable_flag 1
@@ -125,8 +119,26 @@ namespace eval ::pd {
             3 * ($patchable_flag != 0)
         }]
 
+        return $flag
+    }
+
+    # this handles the pd::class definition
+    proc class {classname def} {
+        if $::verbose {post [lrange [info level 0] 0 end-1]}
+
+        set flag [read_class_definition $classname $def]
+
         # this wraps the call to class_new()
         tclpd_class_new $classname $flag
+    }
+
+    proc guiclass {classname def} {
+        if $::verbose {post [lrange [info level 0] 0 end-1]}
+
+        set flag [read_class_definition $classname $def]
+
+        # this wraps the call to class_new()
+        tclpd_guiclass_new $classname $flag
     }
 
     # wrapper to post() withouth vargs
@@ -159,6 +171,23 @@ namespace eval ::pd {
         } else {
             return $value
         }
+    }
+
+    # mechanism for uploading procs to gui interp, without the hassle of escaping [encoder]
+    proc guiproc {name argz body} {
+        # upload the decoder
+        sys_gui "proc guiproc {name argz body} {set map {}; for {set i 0} {\$i < 256} {incr i} {lappend map %\[format %02x \$i\] \[format %c \$i\]}; foreach x {name argz body} {set \$x \[string map \$map \[set \$x\]\]}; uplevel \[list proc \$name \$argz \$body\]}\n"
+        # build the mapping
+        set map {}
+        for {set i 0} {$i < 256} {incr i} {
+            set chr [format %c $i]
+            set hex [format %02x $i]
+            if {[regexp {[^A-Za-z0-9]} $chr]} {lappend map $chr %$hex}
+        }
+        # encode data
+        foreach x {name argz body} {set $x [string map $map [set $x]]}
+        # upload proc
+        sys_gui "guiproc $name $argz $body\n"
     }
 }
 
