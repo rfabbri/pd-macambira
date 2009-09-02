@@ -22,8 +22,11 @@ endif
 LIBNAME = tcl
 TCL_VERSION := $(shell echo 'puts $$tcl_version' | tclsh)
 INCLUDES =  -I../../pd/src -I/usr/include -I/usr/include/tcl$(TCL_VERSION)
-CFLAGS += -funroll-loops -fno-operator-names -fno-omit-frame-pointer -falign-functions=16 -O2 -Wall -fPIC
+CFLAGS += -funroll-loops -fno-operator-names -fno-omit-frame-pointer -falign-functions=16 -Wall -fPIC
 CFLAGS += -DPDSUF=\"$(PDSUF)\"
+ifeq ($(DEBUG),0)
+	CFLAGS += -O2
+endif
 LDSOFLAGS += -lm -ltcl$(TCL_VERSION)
 LDSHARED = $(CXX) $(PDBUNDLEFLAGS)
 
