@@ -1,4 +1,5 @@
 #include "tcl_extras.h"
+#include <string.h>
 
 void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* xp2, int* yp2) {
     Tcl_Obj* av[5], *o, *theList = NULL;
@@ -198,7 +199,7 @@ cleanup:
 }
 
 int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
-    Tcl_Obj* av[9], *o;
+    Tcl_Obj* av[9], *o = NULL;
     int i = 0;
     t_tcl* x = (t_tcl*)z;
     av[0] = x->self;
@@ -218,22 +219,26 @@ int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shif
     Tcl_IncrRefCount(av[7]);
     av[8] = Tcl_NewIntObj(doit);
     Tcl_IncrRefCount(av[8]);
+    fprintf(stderr, "C: puttan madonna");
     int result = Tcl_EvalObjv(tcl_for_pd, 9, av, 0);
+    fprintf(stderr, "C: cristo pinocchio");
     if(result != TCL_OK) {
         tclpd_interp_error(result);
         goto error;
     }
     o = Tcl_GetObjResult(tcl_for_pd);
     Tcl_IncrRefCount(o);
-    result = Tcl_GetIntFromObj(tcl_for_pd, o, &i);
-    Tcl_DecrRefCount(o);
-    if(result != TCL_OK) {
-        tclpd_interp_error(result);
-        goto error;
+    if(strlen(Tcl_GetStringFromObj(o, NULL)) > 0) {
+        result = Tcl_GetIntFromObj(tcl_for_pd, o, &i);
+        if(result != TCL_OK) {
+            tclpd_interp_error(result);
+            goto error;
+        }
     }
     goto cleanup;
 error:
 cleanup:
+    if(o) Tcl_DecrRefCount(o);
     Tcl_DecrRefCount(av[1]);
     Tcl_DecrRefCount(av[2]);
     Tcl_DecrRefCount(av[3]);
