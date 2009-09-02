@@ -10,6 +10,8 @@
 #define PATH_MAX 4096
 #endif
 
+#define TCLPD_VERSION "0.2"
+
 typedef struct _t_tcl {
     t_object o;
     Tcl_Obj* self;

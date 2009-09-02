@@ -13,7 +13,7 @@ void tclpd_setup(void) {
         return;
     }
 
-    post("Tcl loader v0.1.1 - 08.2009");
+    post("Tcl loader v" TCLPD_VERSION);
 
     proxyinlet_setup();
 
