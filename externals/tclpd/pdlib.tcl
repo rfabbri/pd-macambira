@@ -62,7 +62,7 @@ namespace eval ::pd {
         }
     }
 
-    # add a class method (that is: a proc named <class>_<sel>)
+    # used internally (from dispatcher) to call a class method
     proc call_classmethod {classname self inlet sel args} {
         if $::verbose {post [info level 0]}
         set m_sel "::${classname}_${inlet}_${sel}"
@@ -71,9 +71,9 @@ namespace eval ::pd {
         }
         set m_any "::${classname}_${inlet}_anything"
         if {[llength [info commands $m_any]] > 0} {
-            return [$m_any $self $sel {*}$args]
+            return [$m_any $self [list symbol $sel] {*}$args]
         }
-        post "class $classname: inlet $inlet: no such selector: $sel"
+        post "Tcl class $classname: inlet $inlet: no such method: $sel"
     }
 
     # this handles the pd::class definition
