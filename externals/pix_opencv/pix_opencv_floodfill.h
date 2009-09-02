@@ -2,7 +2,7 @@
 LOG
     GEM - Graphics Environment for Multimedia
 
-    Change pix to greyscale
+    Color blob tracker
 
     Copyright (c) 1997-1999 Mark Danks. mark@danks.org
     Copyright (c) Günther Geiger. geiger@epy.co.at
@@ -13,8 +13,8 @@ LOG
 
 -----------------------------------------------------------------*/
 
-#ifndef INCLUDE_PIX_OPENCV_LK_H_
-#define INCLUDE_PIX_OPENCV_LK_H_
+#ifndef INCLUDE_PIX_OPENCV_FLOODFILL_H_
+#define INCLUDE_PIX_OPENCV_FLOODFILL_H_
 
 #include "Base/GemPixObj.h"
 
@@ -29,7 +29,7 @@ LOG
 CLASS
     pix_opencv_floodfill
     
-    Color blobs tracker
+    Color blob tracker
 
 KEYWORDS
     pix

@@ -2,7 +2,7 @@
 LOG
     GEM - Graphics Environment for Multimedia
 
-    Change pix to greyscale
+    Distrans algorithm
 
     Copyright (c) 1997-1999 Mark Danks. mark@danks.org
     Copyright (c) Günther Geiger. geiger@epy.co.at
@@ -27,7 +27,7 @@ LOG
 CLASS
     pix_opencv_distrans
     
-    Change pix to greyscale
+    Distrans algorithm
 
 KEYWORDS
     pix

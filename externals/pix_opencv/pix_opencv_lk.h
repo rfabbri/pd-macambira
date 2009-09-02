@@ -2,7 +2,7 @@
 LOG
     GEM - Graphics Environment for Multimedia
 
-    Change pix to greyscale
+    LK point detection and tracking
 
     Copyright (c) 1997-1999 Mark Danks. mark@danks.org
     Copyright (c) Günther Geiger. geiger@epy.co.at
@@ -30,7 +30,7 @@ const int MAX_COUNT = 500;
 CLASS
     pix_opencv_lk
     
-    Change pix to greyscale
+    LK point detection and tracking
 
 KEYWORDS
     pix

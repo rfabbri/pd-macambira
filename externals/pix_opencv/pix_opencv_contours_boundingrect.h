@@ -2,7 +2,7 @@
 LOG
     GEM - Graphics Environment for Multimedia
 
-    Change pix to greyscale
+    Contours Bounding Rectangle detection
 
     Copyright (c) 1997-1999 Mark Danks. mark@danks.org
     Copyright (c) Günther Geiger. geiger@epy.co.at
@@ -29,7 +29,7 @@ LOG
 CLASS
     pix_opencv_contours_boundingrect
     
-    Change pix to greyscale
+    Contours Bounding Rectangle detection
 
 KEYWORDS
     pix

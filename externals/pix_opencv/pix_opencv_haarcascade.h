@@ -2,7 +2,7 @@
 LOG
     GEM - Graphics Environment for Multimedia
 
-    Change pix to greyscale
+    Trained classifier using Haar's cascade
 
     Copyright (c) 1997-1999 Mark Danks. mark@danks.org
     Copyright (c) Günther Geiger. geiger@epy.co.at
@@ -13,8 +13,8 @@ LOG
 
 -----------------------------------------------------------------*/
 
-#ifndef INCLUDE_PIX_OPENCV_FACEDETECT_H_
-#define INCLUDE_PIX_OPENCV_FACEDETECT_H_
+#ifndef INCLUDE_PIX_OPENCV_HAARSCASCADE_H_
+#define INCLUDE_PIX_OPENCV_HAARSCASCADE_H_
 
 #include "Base/GemPixObj.h"
 
@@ -31,7 +31,7 @@ const char* cascade_name ="./haarcascade_frontalface_alt.xml";
 CLASS
     pix_opencv_haarcascade
     
-    Change pix to greyscale
+    Trained classifier using Haar's cascade
 
 KEYWORDS
     pix

@@ -2,7 +2,7 @@
 LOG
     GEM - Graphics Environment for Multimedia
 
-    Change pix to greyscale
+    Adaptive threshold object
 
     Copyright (c) 1997-1999 Mark Danks. mark@danks.org
     Copyright (c) Günther Geiger. geiger@epy.co.at
@@ -13,8 +13,8 @@ LOG
 
 -----------------------------------------------------------------*/
 
-#ifndef INCLUDE_PIX_OPENCV_EDGE_H_
-#define INCLUDE_PIX_OPENCV_EDGE_H_
+#ifndef INCLUDE_PIX_OPENCV_ATHRESHOLD_H_
+#define INCLUDE_PIX_OPENCV_ATHRESHOLD_H_
 
 #include "Base/GemPixObj.h"
 
@@ -27,7 +27,7 @@ LOG
 CLASS
     pix_opencv_athreshold
     
-    Adapative threshold object
+    Adaptive threshold object
 
 KEYWORDS
     pix

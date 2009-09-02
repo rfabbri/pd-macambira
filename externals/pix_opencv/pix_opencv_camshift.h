@@ -13,8 +13,8 @@ LOG
 
 -----------------------------------------------------------------*/
 
-#ifndef INCLUDE_PIX_OPENCV_LK_H_
-#define INCLUDE_PIX_OPENCV_LK_H_
+#ifndef INCLUDE_PIX_OPENCV_CAMSHIFT_H_
+#define INCLUDE_PIX_OPENCV_CAMSHIFT_H_
 
 #include "Base/GemPixObj.h"
 
@@ -30,7 +30,7 @@ const int MAX_COUNT = 500;
 CLASS
     pix_opencv_camshift
     
-    Change pix to greyscale
+    Continously adaptive mean-shift tracker
 
 KEYWORDS
     pix

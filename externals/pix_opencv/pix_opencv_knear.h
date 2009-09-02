@@ -2,7 +2,7 @@
 LOG
     GEM - Graphics Environment for Multimedia
 
-    Change pix to greyscale
+    Simple distance classifier
 
     Copyright (c) 1997-1999 Mark Danks. mark@danks.org
     Copyright (c) Günther Geiger. geiger@epy.co.at
@@ -13,8 +13,8 @@ LOG
 
 -----------------------------------------------------------------*/
 
-#ifndef INCLUDE_PIX_OPENCV_CVK_H_
-#define INCLUDE_PIX_OPENCV_CVK_H_
+#ifndef INCLUDE_PIX_OPENCV_KNEAR_H_
+#define INCLUDE_PIX_OPENCV_KNEAR_H_
 
 #include "Base/GemPixObj.h"
 

@@ -2,7 +2,7 @@
 LOG
     GEM - Graphics Environment for Multimedia
 
-    Change pix to greyscale
+    Motion detection based on motion history
 
     Copyright (c) 1997-1999 Mark Danks. mark@danks.org
     Copyright (c) Günther Geiger. geiger@epy.co.at
@@ -32,7 +32,7 @@ LOG
 CLASS
     pix_opencv_motempl
     
-    Change pix to greyscale
+    Motion detection based on motion history
 
 KEYWORDS
     pix
