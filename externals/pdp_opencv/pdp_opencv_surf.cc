@@ -617,7 +617,6 @@ void *pdp_opencv_surf_new(t_floatarg f)
   int i;
 
   t_pdp_opencv_surf *x = (t_pdp_opencv_surf *)pd_new(pdp_opencv_surf_class);
-  inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("win_size"));
 
   x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
   x->x_outlet1 = outlet_new(&x->x_obj, &s_anything);
