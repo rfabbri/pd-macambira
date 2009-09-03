@@ -174,6 +174,14 @@ namespace eval ::pd {
         }
     }
 
+    proc default_arg {n assertion defval} {
+        if {$n < [uplevel "pd::args"]} {
+            return [uplevel "pd::arg $n $assertion"]
+        } else {
+            return $defval
+        }
+    }
+
     # mechanism for uploading procs to gui interp, without the hassle of escaping [encoder]
     proc guiproc {name argz body} {
         # upload the decoder
