@@ -202,21 +202,22 @@ void pix_opencv_hough_circles :: processGrayImage(imageStruct &image)
 
   memcpy( gray->imageData, image.data, image.xsize*image.ysize );
 
-  if( night_mode )
-      cvZero( gray );
-
   x_storage = cvCreateMemStorage(0);
 
   cvSmooth( gray, gray, CV_GAUSSIAN, 9, 9 );
   CvSeq* circles = cvHoughCircles( gray, x_storage, CV_HOUGH_GRADIENT, x_resolution, x_mindist, x_threshold, x_threshold2 );
+
+  if( night_mode )
+      cvZero( gray );
+
   ucircles = (circles->total>x_maxcircles)?x_maxcircles:circles->total;
   for( i = 0; i < ucircles; i++ )
   {
     float* p = (float*)cvGetSeqElem( circles, i );
     char tindex[10];
 
-       cvCircle( gray, cvPoint(cvRound(p[0]),cvRound(p[1])), 3, CV_RGB(0,255,0), -1, 8, 0 );
-       cvCircle( gray, cvPoint(cvRound(p[0]),cvRound(p[1])), cvRound(p[2]), CV_RGB(255,0,0), 3, 8, 0 );
+       cvCircle( gray, cvPoint(cvRound(p[0]),cvRound(p[1])), 3, CV_RGB(255,255,255), -1, 8, 0 );
+       cvCircle( gray, cvPoint(cvRound(p[0]),cvRound(p[1])), cvRound(p[2]), CV_RGB(255,255,255), 3, 8, 0 );
        SETFLOAT(&x_list[0], i);
        SETFLOAT(&x_list[1], cvRound(p[0]));
        SETFLOAT(&x_list[2], cvRound(p[1]));
