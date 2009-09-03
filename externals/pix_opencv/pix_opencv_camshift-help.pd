@@ -17,7 +17,7 @@
 #X msg 62 93 reset;
 #X obj 49 135 outlet;
 #X msg 107 89 dimen 320 240;
-#X msg 202 89 frame 15;
+#X msg 202 89 frame 5;
 #X obj 107 51 t b b b;
 #X connect 0 0 5 0;
 #X connect 1 0 2 0;

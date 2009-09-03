@@ -20,7 +20,7 @@
 #X obj 161 230 gemwin;
 #X msg 160 177 create \, 1;
 #X msg 236 178 destroy;
-#X msg 282 150 frame 15;
+#X msg 282 150 frame 5;
 #X obj 163 140 t b b b;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;

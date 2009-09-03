@@ -20,7 +20,7 @@
 #X obj 160 260 gemwin;
 #X msg 159 207 create \, 1;
 #X msg 235 208 destroy;
-#X msg 281 180 frame 15;
+#X msg 281 180 frame 5;
 #X obj 162 170 t b b b;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;
@@ -51,7 +51,7 @@
 #X floatatom 613 151 5 0 0 3 height - -;
 #X obj 568 109 bng 15 250 50 0 empty empty end_reached 20 7 0 10 -262144
 -1 -1;
-#X floatatom 550 74 5 0 10000 1 frame# - -;
+#X floatatom 561 89 5 0 10000 1 frame# - -;
 #X obj 511 -37 openpanel;
 #X msg 511 -17 open \$1;
 #X obj 499 92 pix_film;
@@ -74,8 +74,10 @@
 ;
 #X text 592 306 frame so it is just processed when it receives a bang
 ;
-#X obj 580 26 loadbang;
-#X msg 528 50 colorspace RGBA;
+#X msg 579 28 colorspace RGBA;
+#X obj 602 1 loadbang;
+#X msg 685 28 colorspace RGB;
+#X msg 784 29 colorspace Grey;
 #X connect 0 0 21 0;
 #X connect 1 0 2 0;
 #X connect 4 0 5 0;
@@ -103,5 +105,7 @@
 #X connect 30 0 32 0;
 #X connect 31 0 30 0;
 #X connect 32 0 25 0;
-#X connect 36 0 37 0;
-#X connect 37 0 21 0;
+#X connect 36 0 21 0;
+#X connect 37 0 36 0;
+#X connect 38 0 21 0;
+#X connect 39 0 21 0;
