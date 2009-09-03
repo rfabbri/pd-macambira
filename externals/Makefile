@@ -138,7 +138,7 @@ else
     LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl apple
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl pdvjtools postlude tclpd sixaxis
+    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl pdvjtools postlude sixaxis
   endif
 endif
 
