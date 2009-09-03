@@ -8,13 +8,13 @@ pd::guiproc bitmap_draw_new {self c x y sz w h data} {
                 [expr {0+$x+$j*$sz}] [expr {0+$y+$i*$sz}] \
                 [expr {1+$x+($j+1)*$sz}] [expr {1+$y+($i+1)*$sz}] \
                 -outline black -fill [lindex {white black} [lindex $data $z]] \
-                -tags [list $c cell_${j}_${i}_$c]
+                -tags [list $self cell_${j}_${i}_$self]
             incr z
         }
     }
     set x2 [expr {$x+$w*$sz+1}]
     set y2 [expr {$y+$h*$sz+1}]
-    $c create rectangle $x $y $x2 $y2 -outline black -tags [list $c border$c]
+    $c create rectangle $x $y $x2 $y2 -outline black -tags [list $self border$self]
 }
 
 pd::guiclass bitmap {
@@ -60,14 +60,14 @@ pd::guiclass bitmap {
         if {$dx != 0 || $dy != 0} {
             incr @x $dx
             incr @y $dy
-            sys_gui [list $@c move $@c $dx $dy]\n
+            sys_gui [list $@c move $self $dx $dy]\n
         }
         return [list $@x $@y]
     }
 
     widgetbehavior_select {
         set sel [lindex $args 0]
-        sys_gui [list $@c itemconfigure $@c -outline [lindex {black blue} $sel]]\n
+        sys_gui [list $@c itemconfigure $self -outline [lindex {black blue} $sel]]\n
     }
 
     widgetbehavior_activate {
@@ -81,7 +81,7 @@ pd::guiclass bitmap {
         if {$vis} {
             sys_gui [list bitmap_draw_new $self $@c $@x $@y $@sz $@w $@h $@data ]\n
         } else {
-            sys_gui [list $@c delete $@c]\n
+            sys_gui [list $@c delete $self]\n
         }
     }
 
@@ -101,7 +101,7 @@ pd::guiclass bitmap {
             puts stderr "RELX=$xpix RELY=$ypix IDX=$idx"
             set d [expr {[lindex $@data $idx]==0}]
             lset @data $idx $d
-            sys_gui [list $@c itemconfigure cell_${j}_${i}_$@c -fill [lindex {white black} $d]]\n
+            sys_gui [list $@c itemconfigure cell_${j}_${i}_$self -fill [lindex {white black} $d]]\n
         }
     }
 }
