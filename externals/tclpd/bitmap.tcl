@@ -22,6 +22,7 @@ pd::guiclass bitmap {
         pd::add_outlet $self float
 
         set @sz [pd::default_arg 0 int 15]
+        if {$@sz < 4} {set @sz 4}
         set @w [pd::default_arg 1 int 8]
         set @h [pd::default_arg 2 int 8]
 
@@ -41,6 +42,55 @@ pd::guiclass bitmap {
             lappend r [list float [lindex $@data $i]]
         }
         pd::outlet $self 0 list $r
+    }
+
+    0_getcol {
+        set r [list]
+        set n [pd::arg 0 int]
+        for {set i [expr {$n}]} {$i < [expr {$@w*$@h}]} {incr i $@w} {
+            lappend r [list float [lindex $@data $i]]
+        }
+        pd::outlet $self 0 list $r
+    }
+
+    0_getcell {
+        set r [pd::arg 0 int]
+        set c [pd::arg 1 int]
+        pd::outlet $self 0 float [lindex $@data [expr {$r*$@w+$c}]]
+    }
+
+    0_setrow {
+        set row [pd::arg 0 int]
+        set z 1
+        set col 0
+        for {set i [expr {$row*$@w}]} {$i < [expr {($row+1)*$@w}]} {incr i} {
+            set d [expr {0!=[pd::arg $z int]}]
+            lset @data $i $d
+            sys_gui [list $@c itemconfigure cell_${col}_${row}_$self -fill [lindex {white black} $d]]\n
+            incr z
+            incr col
+        }
+    }
+
+    0_setcol {
+        set col [pd::arg 0 int]
+        set z 1
+        set row 0
+        for {set i [expr {$col}]} {$i < [expr {$@w*$@h}]} {incr i $@w} {
+            set d [expr {0!=[pd::arg $z int]}]
+            lset @data $i $d
+            sys_gui [list $@c itemconfigure cell_${col}_${row}_$self -fill [lindex {white black} $d]]\n
+            incr z
+            incr row
+        }
+    }
+
+    0_setcell {
+        set r [pd::arg 0 int]
+        set c [pd::arg 1 int]
+        set d [expr {0!=[pd::arg 2 int]}]
+        lset @data [expr {$r*$@w+$c}] $d
+        sys_gui [list $@c itemconfigure cell_${r}_${c}_$self -fill [lindex {white black} $d]]\n
     }
 
     object_save {

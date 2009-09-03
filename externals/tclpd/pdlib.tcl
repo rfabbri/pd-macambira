@@ -152,8 +152,16 @@ namespace eval ::pd {
     }
 
     proc arg {n {assertion any}} {
-        set v [uplevel 1 "lindex \$args $n"]
+        upvar 1 args up_args
+        set up_args_len [llength $up_args]
+        if {$n < 0 || $n >= $up_args_len} {
+            return -code error "fatal: argument $n out of range"
+        }
+        set v [lindex $up_args $n]
         set i 0
+        if {[llength $v] != 2} {
+            return -code error "fatal: malformed atom: $v (full args: $up_args)"
+        }
         foreach {selector value} $v {break}
         if {$assertion == {int}} {
             set assertion {float}
