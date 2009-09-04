@@ -129,10 +129,11 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
   }
 
   memcpy( rgba->imageData, image.data, image.xsize*image.ysize*4 );
+  cvCvtColor(rgba, rgb, CV_BGRA2RGB);
   cvCvtColor(rgba, grey, CV_BGRA2GRAY);
 
   if( night_mode )
-      cvZero( rgba );
+      cvZero( rgb );
 
   for ( im=0; im<MAX_MARKERS; im++ )
   {
@@ -237,7 +238,7 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
             }
          }
 
-         cvCircle( rgba, cvPointFrom32f(points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
+         cvCircle( rgb, cvPointFrom32f(points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
 
          marked=0;
          for ( im=0; im<MAX_MARKERS; im++ )
@@ -250,7 +251,7 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
              {
                char tindex[4];
                sprintf( tindex, "%d", im+1 );
-               cvPutText( rgba, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
+               cvPutText( rgb, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
                x_xmark[im]=(int)points[1][i].x;
                x_ymark[im]=(int)points[1][i].y;
                x_found[im]=ftolerance;
@@ -339,7 +340,7 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
                     ( dst.x > 0 ) && ( dst.x < comp_xsize ) &&
                     ( org.y > 0 ) && ( org.y < comp_ysize ) &&
                     ( dst.y > 0 ) && ( dst.y < comp_ysize ) )
-               cvLine( rgba, iorg, idst, CV_RGB(255,0,0), 1, CV_AA, 0 );
+               cvLine( rgb, iorg, idst, CV_RGB(255,0,0), 1, CV_AA, 0 );
            }
          }
 
@@ -352,6 +353,7 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
   CV_SWAP( points[0], points[1], swap_points );
   need_to_init = 0;
 
+  cvCvtColor(rgb, rgba, CV_BGR2BGRA);
   memcpy( image.data, rgba->imageData, image.xsize*image.ysize*4 );
 }
 
