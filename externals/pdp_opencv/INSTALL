@@ -1,3 +1,11 @@
+
+Download the package here : [[http://hangar.org/wikis/lab/pd/pdp_opencv-0.2.tar.gz|pdp_opencv-0.2.tar.gz]]
+
+or get the latest version through svn :
+
+svn co https://pure-data.svn.sourceforge.net/svnroot/pure-data pure-data
+cd pure-data/trunk/externals/pdp_opencv
+
 ===== GNU/Linux =====
 
 (actually only tested in GNU/Linux Ubuntu Gutsy)
