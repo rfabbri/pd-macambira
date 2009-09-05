@@ -1,6 +1,6 @@
 #N canvas 248 90 1192 685 10;
 #X obj 396 -37 gemhead;
-#X obj 218 457 pix_texture;
+#X obj 212 457 pix_texture;
 #X obj 28 132 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 189 149 454 304 gemwin 0;
@@ -17,19 +17,16 @@
 #X msg 62 93 reset;
 #X obj 49 135 outlet;
 #X msg 107 89 dimen 320 240;
-#X msg 202 89 frame 5;
 #X obj 107 51 t b b b;
-#X connect 0 0 5 0;
+#X connect 0 0 4 0;
 #X connect 1 0 2 0;
 #X connect 3 0 2 0;
-#X connect 4 0 2 0;
-#X connect 5 0 3 0;
-#X connect 5 1 4 0;
-#X connect 5 2 1 0;
+#X connect 4 0 3 0;
+#X connect 4 2 1 0;
 #X restore 289 80 pd Gem.init;
 #X obj 128 109 t b b b;
 #X msg 156 138 dimen 320 240;
-#X msg 251 138 frame 15;
+#X msg 250 137 frame 5;
 #X connect 2 0 3 0;
 #X connect 3 0 4 0;
 #X connect 3 0 9 0;
@@ -45,7 +42,7 @@
 #X connect 10 0 0 0;
 #X connect 11 0 0 0;
 #X restore 35 178 pd gemwin;
-#X msg 35 157 create;
+#X msg 35 157 destroy;
 #X text 36 136 Create window and render;
 #X obj 340 180 cnv 15 600 450 empty empty empty 20 12 0 14 -24198 -66577
 0;
@@ -62,7 +59,7 @@
 #X msg 511 -17 open \$1;
 #X obj 499 92 pix_film;
 #X msg 517 26 auto \$1;
-#X obj 517 8 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 517 8 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #X floatatom 488 520 5 0 0 0 - - -;
 #X text 523 519 window size;
@@ -117,7 +114,6 @@
 #X text 651 466 make a delaunay with point 1 and a tolerance of 50
 ( all points which color is in that range will be included in the delaunay)
 ;
-#X msg 552 478 pdelaunay 1 50;
 #X msg 533 409 ftolerance \$1;
 #X floatatom 625 409 5 0 0 0 - - -;
 #X text 665 409 frame tolerance for point identification ( default
@@ -131,14 +127,15 @@
 -1 -1 0;
 #X floatatom 969 251 5 0 0 0 - - -;
 #X floatatom 1022 254 5 0 0 0 - - -;
-#X obj 208 534 rectangle 4 3;
+#X obj 212 518 rectangle 4 3;
 #X obj 212 489 pix_resize 320 240;
 #X obj 588 13 loadbang;
 #X msg 588 38 colorspace RGBA;
 #X msg 692 38 colorspace RGB;
 #X msg 651 12 colorspace Grey;
+#X msg 550 475 pdelaunay 1 500;
 #X connect 0 0 16 0;
-#X connect 1 0 79 0;
+#X connect 1 0 78 0;
 #X connect 3 0 4 0;
 #X connect 4 0 3 0;
 #X connect 7 0 14 0;
@@ -180,9 +177,9 @@
 #X connect 52 1 53 1;
 #X connect 52 2 58 0;
 #X connect 53 0 56 1;
-#X connect 53 0 77 0;
+#X connect 53 0 76 0;
 #X connect 54 0 56 0;
-#X connect 54 0 76 0;
+#X connect 54 0 75 0;
 #X connect 55 0 54 0;
 #X connect 55 1 53 0;
 #X connect 56 0 33 0;
@@ -193,11 +190,11 @@
 #X connect 65 0 51 0;
 #X connect 66 0 51 0;
 #X connect 68 0 51 0;
-#X connect 69 0 51 0;
-#X connect 70 0 69 0;
-#X connect 75 0 34 0;
-#X connect 79 0 78 0;
-#X connect 80 0 81 0;
+#X connect 69 0 68 0;
+#X connect 74 0 34 0;
+#X connect 78 0 77 0;
+#X connect 79 0 80 0;
+#X connect 80 0 16 0;
 #X connect 81 0 16 0;
 #X connect 82 0 16 0;
-#X connect 83 0 16 0;
+#X connect 83 0 51 0;

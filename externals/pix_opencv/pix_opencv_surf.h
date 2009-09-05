@@ -69,7 +69,7 @@ class GEM_EXTERN pix_opencv_surf : public GemPixObj
         void  maxMoveMess(float maxmove);
         void  ftoleranceMess(float ftolerance);
         void  delaunayMess(t_symbol *s);
-        void  pdelaunayMess(t_floatarg fpoint, t_floatarg fthreshold);
+        void  pdelaunayMess(float fpoint, float fthreshold);
 
         int comp_xsize;
         int comp_ysize;

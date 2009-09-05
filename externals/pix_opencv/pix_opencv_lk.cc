@@ -67,9 +67,11 @@ pix_opencv_lk :: pix_opencv_lk()
   cvInitFont( &font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0, 1, 8 );
 
   rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
+  orgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
   rgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
-  grey = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
-  prev_grey = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+  gray = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+  ogray = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+  prev_gray = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
   pyramid = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
   prev_pyramid = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
   points[0] = (CvPoint2D32f*)cvAlloc(MAX_COUNT*sizeof(points[0][0]));
@@ -86,9 +88,11 @@ pix_opencv_lk :: ~pix_opencv_lk()
 {
   // Destroy cv_images
   cvReleaseImage( &rgba );
+  cvReleaseImage( &orgb );
   cvReleaseImage( &rgb );
-  cvReleaseImage( &grey );
-  cvReleaseImage( &prev_grey );
+  cvReleaseImage( &gray );
+  cvReleaseImage( &ogray );
+  cvReleaseImage( &prev_gray );
   cvReleaseImage( &pyramid );
   cvReleaseImage( &prev_pyramid );
 }
@@ -110,16 +114,20 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
     this->comp_ysize=image.ysize;
 
     cvReleaseImage( &rgba );
+    cvReleaseImage( &orgb );
     cvReleaseImage( &rgb );
-    cvReleaseImage( &grey );
-    cvReleaseImage( &prev_grey );
+    cvReleaseImage( &gray );
+    cvReleaseImage( &ogray );
+    cvReleaseImage( &prev_gray );
     cvReleaseImage( &pyramid );
     cvReleaseImage( &prev_pyramid );
 
     rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
+    orgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
     rgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
-    grey = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
-    prev_grey = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+    gray = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+    ogray = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+    prev_gray = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
     pyramid = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
     prev_pyramid = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
     points[0] = (CvPoint2D32f*)cvAlloc(MAX_COUNT*sizeof(points[0][0]));
@@ -130,7 +138,8 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
 
   memcpy( rgba->imageData, image.data, image.xsize*image.ysize*4 );
   cvCvtColor(rgba, rgb, CV_BGRA2RGB);
-  cvCvtColor(rgba, grey, CV_BGRA2GRAY);
+  cvCvtColor(rgba, orgb, CV_BGRA2RGB);
+  cvCvtColor(rgba, gray, CV_BGRA2GRAY);
 
   if( night_mode )
       cvZero( rgb );
@@ -159,13 +168,13 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
   if( need_to_init )
   {
      /* automatic initialization */
-     IplImage* eig = cvCreateImage( cvSize(grey->width,grey->height), 32, 1 );
-     IplImage* temp = cvCreateImage( cvSize(grey->width,grey->height), 32, 1 );
+     IplImage* eig = cvCreateImage( cvSize(gray->width,gray->height), 32, 1 );
+     IplImage* temp = cvCreateImage( cvSize(gray->width,gray->height), 32, 1 );
 
      count = MAX_COUNT;
-     cvGoodFeaturesToTrack( grey, eig, temp, points[1], &count,
+     cvGoodFeaturesToTrack( gray, eig, temp, points[1], &count,
                                quality, min_distance, 0, 3, 0, 0.04 );
-     cvFindCornerSubPix( grey, points[1], count,
+     cvFindCornerSubPix( gray, points[1], count,
           cvSize(win_size,win_size), cvSize(-1,-1),
           cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
      cvReleaseImage( &eig );
@@ -175,7 +184,7 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
   }
   else if( count > 0 )
   {
-     cvCalcOpticalFlowPyrLK( prev_grey, grey, prev_pyramid, pyramid,
+     cvCalcOpticalFlowPyrLK( prev_gray, gray, prev_pyramid, pyramid,
               points[0], points[1], count, cvSize(win_size,win_size), 3, status, 0,
               cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03), flags );
      flags |= CV_LKFLOW_PYR_A_READY;
@@ -217,17 +226,17 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
                 if ( ( ppx < 0 ) || ( ppx >= comp_xsize ) ) continue;
                 if ( ( ppy < 0 ) || ( ppy >= comp_ysize ) ) continue;
 
-                uchar red = ((uchar*)(rgba->imageData + rgba->widthStep*ppx))[ppy*4];
-                uchar green = ((uchar*)(rgba->imageData + rgba->widthStep*ppx))[ppy*4+1];
-                uchar blue = ((uchar*)(rgba->imageData + rgba->widthStep*ppx))[ppy*4+2];
+                uchar red = ((uchar*)(orgb->imageData + orgb->widthStep*ppx))[ppy*3];
+                uchar green = ((uchar*)(orgb->imageData + orgb->widthStep*ppx))[ppy*3+1];
+                uchar blue = ((uchar*)(orgb->imageData + orgb->widthStep*ppx))[ppy*3+2];
 
-                uchar pred = ((uchar*)(rgba->imageData + rgba->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*4];
-                uchar pgreen = ((uchar*)(rgba->imageData + rgba->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*4+1];
-                uchar pblue = ((uchar*)(rgba->imageData + rgba->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*4+2];
+                uchar pred = ((uchar*)(orgb->imageData + orgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3];
+                uchar pgreen = ((uchar*)(orgb->imageData + orgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3+1];
+                uchar pblue = ((uchar*)(orgb->imageData + orgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3+2];
 
                 int diff = abs(red-pred) + abs(green-pgreen) + abs(blue-pblue);
 
-                // post( "pix_opencv_lk : point (%d,%d,%d) : diff : %d", blue, green, red, diff );
+                // post( "pix_opencv_lk : point (%d,%d,%d) : diff : %d threshold : %d", blue, green, red, diff, threshold );
 
                 if ( diff < threshold )
                 {
@@ -299,7 +308,7 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
   if( add_remove_pt && count < MAX_COUNT )
   {
         points[1][count++] = cvPointTo32f(pt);
-        cvFindCornerSubPix( grey, points[1] + count - 1, 1,
+        cvFindCornerSubPix( gray, points[1] + count - 1, 1,
            cvSize(win_size,win_size), cvSize(-1,-1),
            cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
         add_remove_pt = 0;
@@ -348,7 +357,7 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
      }
   }
 
-  CV_SWAP( prev_grey, grey, swap_temp );
+  CV_SWAP( prev_gray, gray, swap_temp );
   CV_SWAP( prev_pyramid, pyramid, swap_temp );
   CV_SWAP( points[0], points[1], swap_points );
   need_to_init = 0;
@@ -370,16 +379,20 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
     this->comp_ysize=image.ysize;
 
     cvReleaseImage( &rgba );
+    cvReleaseImage( &orgb );
     cvReleaseImage( &rgb );
-    cvReleaseImage( &grey );
-    cvReleaseImage( &prev_grey );
+    cvReleaseImage( &gray );
+    cvReleaseImage( &ogray );
+    cvReleaseImage( &prev_gray );
     cvReleaseImage( &pyramid );
     cvReleaseImage( &prev_pyramid );
 
     rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
+    orgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
     rgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
-    grey = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
-    prev_grey = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+    gray = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+    ogray = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+    prev_gray = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
     pyramid = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
     prev_pyramid = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
     points[0] = (CvPoint2D32f*)cvAlloc(MAX_COUNT*sizeof(points[0][0]));
@@ -389,7 +402,8 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
   }
 
   memcpy( rgb->imageData, image.data, image.xsize*image.ysize*3 );
-  cvCvtColor(rgb, grey, CV_BGRA2GRAY);
+  memcpy( orgb->imageData, image.data, image.xsize*image.ysize*3 );
+  cvCvtColor(rgb, gray, CV_BGRA2GRAY);
 
   if( night_mode )
       cvZero( rgb );
@@ -418,13 +432,13 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
   if( need_to_init )
   {
      /* automatic initialization */
-     IplImage* eig = cvCreateImage( cvSize(grey->width,grey->height), 32, 1 );
-     IplImage* temp = cvCreateImage( cvSize(grey->width,grey->height), 32, 1 );
+     IplImage* eig = cvCreateImage( cvSize(gray->width,gray->height), 32, 1 );
+     IplImage* temp = cvCreateImage( cvSize(gray->width,gray->height), 32, 1 );
 
      count = MAX_COUNT;
-     cvGoodFeaturesToTrack( grey, eig, temp, points[1], &count,
+     cvGoodFeaturesToTrack( gray, eig, temp, points[1], &count,
                                quality, min_distance, 0, 3, 0, 0.04 );
-     cvFindCornerSubPix( grey, points[1], count,
+     cvFindCornerSubPix( gray, points[1], count,
           cvSize(win_size,win_size), cvSize(-1,-1),
           cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
      cvReleaseImage( &eig );
@@ -434,7 +448,7 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
   }
   else if( count > 0 )
   {
-     cvCalcOpticalFlowPyrLK( prev_grey, grey, prev_pyramid, pyramid,
+     cvCalcOpticalFlowPyrLK( prev_gray, gray, prev_pyramid, pyramid,
               points[0], points[1], count, cvSize(win_size,win_size), 3, status, 0,
               cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03), flags );
      flags |= CV_LKFLOW_PYR_A_READY;
@@ -476,13 +490,13 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
                 if ( ( ppx < 0 ) || ( ppx >= comp_xsize ) ) continue;
                 if ( ( ppy < 0 ) || ( ppy >= comp_ysize ) ) continue;
 
-                uchar red = ((uchar*)(rgb->imageData + rgb->widthStep*ppx))[ppy*3];
-                uchar green = ((uchar*)(rgb->imageData + rgb->widthStep*ppx))[ppy*3+1];
-                uchar blue = ((uchar*)(rgb->imageData + rgb->widthStep*ppx))[ppy*3+2];
+                uchar red = ((uchar*)(orgb->imageData + orgb->widthStep*ppx))[ppy*3];
+                uchar green = ((uchar*)(orgb->imageData + orgb->widthStep*ppx))[ppy*3+1];
+                uchar blue = ((uchar*)(orgb->imageData + orgb->widthStep*ppx))[ppy*3+2];
 
-                uchar pred = ((uchar*)(rgb->imageData + rgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3];
-                uchar pgreen = ((uchar*)(rgb->imageData + rgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3+1];
-                uchar pblue = ((uchar*)(rgb->imageData + rgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3+2];
+                uchar pred = ((uchar*)(orgb->imageData + orgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3];
+                uchar pgreen = ((uchar*)(orgb->imageData + orgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3+1];
+                uchar pblue = ((uchar*)(orgb->imageData + orgb->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]*3+2];
 
                 int diff = abs(red-pred) + abs(green-pgreen) + abs(blue-pblue);
 
@@ -557,7 +571,7 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
   if( add_remove_pt && count < MAX_COUNT )
   {
         points[1][count++] = cvPointTo32f(pt);
-        cvFindCornerSubPix( grey, points[1] + count - 1, 1,
+        cvFindCornerSubPix( gray, points[1] + count - 1, 1,
            cvSize(win_size,win_size), cvSize(-1,-1),
            cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
         add_remove_pt = 0;
@@ -606,7 +620,7 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
      }
   }
 
-  CV_SWAP( prev_grey, grey, swap_temp );
+  CV_SWAP( prev_gray, gray, swap_temp );
   CV_SWAP( prev_pyramid, pyramid, swap_temp );
   CV_SWAP( points[0], points[1], swap_points );
   need_to_init = 0;
@@ -632,16 +646,19 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
     this->comp_ysize=image.ysize;
 
     cvReleaseImage( &rgba );
+    cvReleaseImage( &orgb );
     cvReleaseImage( &rgb );
-    cvReleaseImage( &grey );
-    cvReleaseImage( &prev_grey );
+    cvReleaseImage( &ogray );
+    cvReleaseImage( &gray );
+    cvReleaseImage( &prev_gray );
     cvReleaseImage( &pyramid );
     cvReleaseImage( &prev_pyramid );
 
     rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
+    orgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
     rgb = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 3 );
-    grey = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
-    prev_grey = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+    gray = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+    prev_gray = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
     pyramid = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
     prev_pyramid = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
     points[0] = (CvPoint2D32f*)cvAlloc(MAX_COUNT*sizeof(points[0][0]));
@@ -650,10 +667,11 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
 
   }
 
-  memcpy( grey->imageData, image.data, image.xsize*image.ysize );
+  memcpy( gray->imageData, image.data, image.xsize*image.ysize );
+  memcpy( ogray->imageData, image.data, image.xsize*image.ysize );
 
   if( night_mode )
-      cvZero( grey );
+      cvZero( gray );
 
   for ( im=0; im<MAX_MARKERS; im++ )
   {
@@ -679,13 +697,13 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
   if( need_to_init )
   {
      /* automatic initialization */
-     IplImage* eig = cvCreateImage( cvSize(grey->width,grey->height), 32, 1 );
-     IplImage* temp = cvCreateImage( cvSize(grey->width,grey->height), 32, 1 );
+     IplImage* eig = cvCreateImage( cvSize(gray->width,gray->height), 32, 1 );
+     IplImage* temp = cvCreateImage( cvSize(gray->width,gray->height), 32, 1 );
 
      count = MAX_COUNT;
-     cvGoodFeaturesToTrack( grey, eig, temp, points[1], &count,
+     cvGoodFeaturesToTrack( gray, eig, temp, points[1], &count,
                                quality, min_distance, 0, 3, 0, 0.04 );
-     cvFindCornerSubPix( grey, points[1], count,
+     cvFindCornerSubPix( gray, points[1], count,
           cvSize(win_size,win_size), cvSize(-1,-1),
           cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
      cvReleaseImage( &eig );
@@ -695,7 +713,7 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
   }
   else if( count > 0 )
   {
-     cvCalcOpticalFlowPyrLK( prev_grey, grey, prev_pyramid, pyramid,
+     cvCalcOpticalFlowPyrLK( prev_gray, gray, prev_pyramid, pyramid,
               points[0], points[1], count, cvSize(win_size,win_size), 3, status, 0,
               cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03), flags );
      flags |= CV_LKFLOW_PYR_A_READY;
@@ -737,8 +755,8 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
                 if ( ( ppx < 0 ) || ( ppx >= comp_xsize ) ) continue;
                 if ( ( ppy < 0 ) || ( ppy >= comp_ysize ) ) continue;
 
-                uchar lum = ((uchar*)(grey->imageData + grey->widthStep*ppx))[ppy];
-                uchar plum = ((uchar*)(grey->imageData + grey->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]];
+                uchar lum = ((uchar*)(ogray->imageData + ogray->widthStep*ppx))[ppy];
+                uchar plum = ((uchar*)(ogray->imageData + ogray->widthStep*x_xmark[delaunay-1]))[x_ymark[delaunay-1]];
 
                 int diff = abs(plum-lum);
 
@@ -753,7 +771,7 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
             }
          }
 
-         cvCircle( grey, cvPointFrom32f(points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
+         cvCircle( gray, cvPointFrom32f(points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
 
          marked=0;
          for ( im=0; im<MAX_MARKERS; im++ )
@@ -765,7 +783,7 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
              {
                char tindex[4];
                sprintf( tindex, "%d", im+1 );
-               cvPutText( grey, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
+               cvPutText( gray, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
                x_xmark[im]=points[1][i].x;
                x_ymark[im]=points[1][i].y;
                x_found[im]=ftolerance;
@@ -813,7 +831,7 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
   if( add_remove_pt && count < MAX_COUNT )
   {
         points[1][count++] = cvPointTo32f(pt);
-        cvFindCornerSubPix( grey, points[1] + count - 1, 1,
+        cvFindCornerSubPix( gray, points[1] + count - 1, 1,
            cvSize(win_size,win_size), cvSize(-1,-1),
            cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
         add_remove_pt = 0;
@@ -854,7 +872,7 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
                     ( dst.x > 0 ) && ( dst.x < comp_xsize ) &&
                     ( org.y > 0 ) && ( org.y < comp_ysize ) &&
                     ( dst.y > 0 ) && ( dst.y < comp_ysize ) )
-               cvLine( grey, iorg, idst, CV_RGB(255,0,0), 1, CV_AA, 0 );
+               cvLine( gray, iorg, idst, CV_RGB(255,0,0), 1, CV_AA, 0 );
            }
          }
 
@@ -862,12 +880,12 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
      }
   }
 
-  CV_SWAP( prev_grey, grey, swap_temp );
+  CV_SWAP( prev_gray, gray, swap_temp );
   CV_SWAP( prev_pyramid, pyramid, swap_temp );
   CV_SWAP( points[0], points[1], swap_points );
   need_to_init = 0;
 
-  memcpy( image.data, grey->imageData, image.xsize*image.ysize );
+  memcpy( image.data, gray->imageData, image.xsize*image.ysize );
 }
 
 /////////////////////////////////////////////////////////
@@ -960,22 +978,22 @@ void  pix_opencv_lk :: delaunayMessCallback(void *data, t_symbol *s)
 
 void  pix_opencv_lk :: pdelaunayMessCallback(void *data, t_floatarg fpoint, t_floatarg fthreshold)
 {
-    GetMyClass(data)->pdelaunayMess(fpoint, fthreshold);
+    GetMyClass(data)->pdelaunayMess((float)fpoint, (float)fthreshold);
 }
 
-void  pix_opencv_lk :: winSizeMess(float winsize)
+void  pix_opencv_lk :: winSizeMess(float fwinsize)
 {
-    if (winsize>1.0) win_size = (int)winsize;
+    if (fwinsize>1.0) win_size = (int)fwinsize;
 }
 
-void  pix_opencv_lk :: nightModeMess(float nightmode)
+void  pix_opencv_lk :: nightModeMess(float fnightmode)
 {
-    if ((nightmode==0.0)||(nightmode==1.0)) night_mode = (int)nightmode;
+    if ((fnightmode==0.0)||(fnightmode==1.0)) night_mode = (int)fnightmode;
 }
 
-void  pix_opencv_lk :: qualityMess(float quality)
+void  pix_opencv_lk :: qualityMess(float fquality)
 {
-    if (quality>0.0) quality = quality;
+    if (fquality>0.0) quality = fquality;
 }
 
 void  pix_opencv_lk :: initMess(void)
@@ -1074,15 +1092,15 @@ void  pix_opencv_lk :: clearMess(void)
 
 }
 
-void  pix_opencv_lk :: minDistanceMess(float mindistance)
+void  pix_opencv_lk :: minDistanceMess(float fmindistance)
 {
-    if (mindistance>1.0) min_distance = (int)mindistance;
+    if (fmindistance>1.0) min_distance = (int)fmindistance;
 }
 
-void  pix_opencv_lk :: maxMoveMess(float maxmove)
+void  pix_opencv_lk :: maxMoveMess(float fmaxmove)
 {
   // has to be more than the size of a point
-  if (maxmove>=3.0) maxmove = (int)maxmove;
+  if (fmaxmove>=3.0) maxmove = (int)fmaxmove;
 }
 
 void  pix_opencv_lk :: ftoleranceMess(float ftolerance)
@@ -1098,12 +1116,13 @@ void  pix_opencv_lk :: delaunayMess(t_symbol *s)
      delaunay = -1;
 }
 
-void  pix_opencv_lk :: pdelaunayMess(t_floatarg point, t_floatarg threshold)
+void  pix_opencv_lk :: pdelaunayMess(float fpoint, float fthreshold)
 {
-  if (((int)point>0) && ((int)point<MAX_MARKERS))
+  if (((int)fpoint>0) && ((int)fpoint<MAX_MARKERS))
   {
-     delaunay = (int)point;
-     threshold = (int)threshold;
+     delaunay = (int)fpoint;
+     threshold = (int)fthreshold;
+     // post( "pix_opencv_lk : setting threshold to : %d", threshold );
   }
 }
 

@@ -871,7 +871,7 @@ void  pix_opencv_surf :: delaunayMessCallback(void *data, t_symbol *s)
 
 void  pix_opencv_surf :: pdelaunayMessCallback(void *data, t_floatarg fpoint, t_floatarg fthreshold)
 {
-    GetMyClass(data)->pdelaunayMess(fpoint, fthreshold);
+    GetMyClass(data)->pdelaunayMess((float)fpoint, (float)fthreshold);
 }
 
 void  pix_opencv_surf :: nightModeMess(float nightmode)
@@ -994,12 +994,13 @@ void  pix_opencv_surf :: delaunayMess(t_symbol *s)
      x_delaunay = -1;
 }
 
-void  pix_opencv_surf :: pdelaunayMess(t_floatarg point, t_floatarg threshold)
+void  pix_opencv_surf :: pdelaunayMess(float point, float threshold)
 {
   if (((int)point>0) && ((int)point<MAX_MARKERS))
   {
      x_delaunay = (int)point;
      x_threshold = (int)threshold;
+     // post( "pix_opencv_surf : setting threshold to : %d", x_threshold );
   }
 }
 

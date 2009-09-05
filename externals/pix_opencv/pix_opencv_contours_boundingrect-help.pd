@@ -20,7 +20,7 @@
 #X obj 161 230 gemwin;
 #X msg 160 177 create \, 1;
 #X msg 236 178 destroy;
-#X msg 282 150 frame 5;
+#X msg 294 178 frame 5;
 #X obj 163 140 t b b b;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;
@@ -38,7 +38,7 @@
 #X msg 30 456 destroy;
 #X text 26 436 Create window and render;
 #X obj 200 368 pix_texture;
-#X obj 200 396 square 2;
+#X obj 198 397 square 2;
 #X obj 266 167 translateXYZ -2 0 0;
 #X obj 281 199 separator;
 #X obj 344 246 cnv 15 550 250 empty empty empty 20 12 0 14 -24198 -66577

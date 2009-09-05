@@ -72,7 +72,7 @@ class GEM_EXTERN pix_opencv_lk : public GemPixObj
         void  maxMoveMess(float maxmove);
         void  ftoleranceMess(float ftolerance);
         void  delaunayMess(t_symbol *s);
-        void  pdelaunayMess(t_floatarg fpoint, t_floatarg fthreshold);
+        void  pdelaunayMess(float fpoint, float fthreshold);
 
         int comp_xsize;
         int comp_ysize;
@@ -107,7 +107,7 @@ class GEM_EXTERN pix_opencv_lk : public GemPixObj
         static void  pdelaunayMessCallback(void *data, t_floatarg fpoint, t_floatarg fthreshold);
 
 	// Internal Open CV data
-        IplImage *rgba, *rgb, *grey, *prev_grey, *pyramid, *prev_pyramid, *swap_temp;
+        IplImage *rgba, *rgb, *orgb, *gray, *ogray, *prev_gray, *pyramid, *prev_pyramid, *swap_temp;
         int x_xmark[MAX_MARKERS];
         int x_ymark[MAX_MARKERS];
         int x_found[MAX_MARKERS];

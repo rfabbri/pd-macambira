@@ -14,25 +14,22 @@
 #X msg 62 93 reset;
 #X obj 49 135 outlet;
 #X msg 107 89 dimen 320 240;
-#X msg 202 89 frame 5;
 #X obj 107 51 t b b b;
-#X connect 0 0 5 0;
+#X connect 0 0 4 0;
 #X connect 1 0 2 0;
 #X connect 3 0 2 0;
-#X connect 4 0 2 0;
-#X connect 5 0 3 0;
-#X connect 5 1 4 0;
-#X connect 5 2 1 0;
+#X connect 4 0 3 0;
+#X connect 4 2 1 0;
 #X restore 268 69 pd Gem.init;
 #X obj 162 241 gemwin;
 #X msg 161 188 create \, 1;
 #X msg 237 189 destroy;
 #X msg 188 161 dimen 320 240;
-#X msg 283 161 frame 15;
 #X obj 164 126 t b b b;
+#X msg 279 161 frame 5;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;
-#X connect 2 0 11 0;
+#X connect 2 0 10 0;
 #X connect 2 1 4 0;
 #X connect 2 1 8 0;
 #X connect 3 0 0 0;
@@ -40,13 +37,13 @@
 #X connect 7 0 6 0;
 #X connect 8 0 6 0;
 #X connect 9 0 6 0;
-#X connect 10 0 6 0;
-#X connect 11 0 7 0;
-#X connect 11 1 9 0;
-#X connect 11 2 10 0;
+#X connect 10 0 7 0;
+#X connect 10 1 9 0;
+#X connect 10 2 11 0;
+#X connect 11 0 6 0;
 #X restore 35 178 pd gemwin;
 #X msg 36 156 destroy;
-#X text 36 136 Create window and render;
+#X text 36 135 Create window and render;
 #X obj 340 181 cnv 15 600 350 empty empty empty 20 12 0 14 -24198 -66577
 0;
 #X obj 511 -66 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -72,11 +69,11 @@
 #X obj 868 50 route 1;
 #X msg 889 75 bang;
 #X obj 367 424 pix_opencv_floodfill;
-#X text -38 44 used in tracking algorithms as an object selector;
-#X text -38 71 and Yves Degoyon ( ydegoyon@gmail.com );
-#X text -39 21 pdp_opencv_floodfill : mark image components with a
-specific color;
-#X text -38 57 Written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
+#X text 56 60 used in tracking algorithms as an object selector;
+#X text 56 87 and Yves Degoyon ( ydegoyon@gmail.com );
+#X text 55 37 pdp_opencv_floodfill : mark image components with a specific
+color;
+#X text 56 73 Written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
 );
 #X floatatom 458 376 5 0 0 0 - - -;
 #X floatatom 466 397 5 0 0 0 - - -;
