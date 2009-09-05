@@ -1,7 +1,12 @@
 
 
 
-Download the package here : [[http://hangar.org/wikis/lab/pd/pdp_opencv-0.1a.tar.gz|pdp_opencv-0.1a.tar.gz]] [[http://hangar.org/wikis/lab/pd/pix_opencv-0.1a.tar.gz|pix_opencv-0.1a.tar.gz]]
+Download the package here : [[http://hangar.org/wikis/lab/pd/pix_opencv-0.2.tar.gz|pix_opencv-0.2.tar.gz]]
+
+or get the latest version through svn :
+
+svn co https://pure-data.svn.sourceforge.net/svnroot/pure-data pure-data
+cd pure-data/trunk/externals/pix_opencv
 
 ===== GNU/Linux ===== 
 
