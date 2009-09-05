@@ -154,6 +154,10 @@ simple edge ... http://www.hci.iastate.edu/575x/doku.php?id=code_samples:edge_de
 http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html#SECTION00053000000000000000
 
 ############################# sevy ++
+<<<<<<< .mine
+one day : stereo calibration ( need two cams and a chessboard )
+=======
 hough lines/circles
 camshift ( very greedy )
 one day : stereo calibration ( need two cams and a chessboard )
+>>>>>>> .r12151
