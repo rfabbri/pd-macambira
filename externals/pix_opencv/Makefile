@@ -24,14 +24,6 @@ ifeq ($(UNAME),Darwin)
  LIBS =  -lm -framework OpenCV
  EXTENSION = pd_darwin
 endif
-ifeq (MINGW,$(findstring MINGW,$(UNAME)))
- OPENCV_DIR = opencv-1.0.0
- INCLUDES += -I$(OPENCV_DIR)/cv/include -I$(OPENCV_DIR)/cxcore/include
- CPPFLAGS += -mms-bitfields -DMSW -DNT $(WINDOWS_HACKS)
- LDFLAGS += -shared
- LIBS = -L$(pd_src)/bin -L$(pd_src)/obj -lpd -lkernel32 -luser32 -lgdi32 \
-	-lm $(OPENCV_DIR)/build/cv/src/.libs/lib_cv.a
-endif
 
 .SUFFIXES = $(EXTENSION)
 
