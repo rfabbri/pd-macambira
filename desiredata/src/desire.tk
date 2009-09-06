@@ -739,6 +739,7 @@ set encoding ""
 if {$language == "C"} {set language en}
 proc localedir {x} {file join [file dirname [file dirname $::argh0]] lib/pd/bin/$x}
 if {[regexp {desire\.tk$} $argh0]} {source locale/index.tcl} {source [localedir locale/index.tcl]}
+puts "locale/index.tcl vs [localedir locale/index.tcl]"
 set langentry [figure_out_language $language]
 set encoding [lindex $langentry 0]
 set langfile locale/[lindex $langentry 1].tcl
@@ -897,7 +898,8 @@ def Client init_controls {} {
       set version "svn#$revision ($date)"
     } {set version "(unknown svn version)"}
     set ::pd_version_client $version
-    post "DesireData client version $version"
+    post "DesireData client version %s" $version
+    post "Running from %s" [info script]
     post "Using Tcl %s and Tk %s" $::tcl_patchLevel $::tk_patchLevel
 }
 
@@ -1123,7 +1125,7 @@ def Client open_file_really {filename} {
     set ::pd_opendir $folder
     set basename [string range $filename [expr $i+1] end]
     if {[string last .pd $filename] >= 0} {
-	    netsend [list pd open [enquote $basename] [enquote $folder]]
+	    netsend [list pd open $basename $folder]
     }
 }
 
