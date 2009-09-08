@@ -52,7 +52,7 @@ typedef struct pdp_opencv_bgstats_struct
 
     int x_erode; 
     float x_minarea; 
-    float x_delta; 
+    float x_alpha; 
     int x_frames; 
 
     IplImage *foreground, *incoming;
@@ -112,13 +112,13 @@ static void pdp_opencv_bgstats_process_rgb(t_pdp_opencv_bgstats *x)
     x->x_modelparams.N1cc = CV_BGFG_FGD_N1CC;
     x->x_modelparams.N2cc = CV_BGFG_FGD_N2CC;
     x->x_modelparams.is_obj_without_holes = 1;
-    x->x_modelparams.alpha1 = CV_BGFG_FGD_ALPHA_1;
     x->x_modelparams.alpha2 = CV_BGFG_FGD_ALPHA_2;
     x->x_modelparams.alpha3 = CV_BGFG_FGD_ALPHA_3;
     x->x_modelparams.T = CV_BGFG_FGD_T;
     x->x_modelparams.perform_morphing = x->x_erode;
     x->x_modelparams.minArea = x->x_minarea;
-    x->x_modelparams.delta = x->x_delta;
+    x->x_modelparams.delta = CV_BGFG_FGD_DELTA;
+    x->x_modelparams.alpha1 = x->x_alpha;
     x->x_model = cvCreateFGDStatModel( x->incoming, &x->x_modelparams );
   }
   else if ( x->x_frames == 5 )
@@ -164,12 +164,12 @@ static void pdp_opencv_bgstats_erode(t_pdp_opencv_bgstats *x, t_floatarg f)
     }
 }
 
-static void pdp_opencv_bgstats_delta(t_pdp_opencv_bgstats *x, t_floatarg f)
+static void pdp_opencv_bgstats_alpha(t_pdp_opencv_bgstats *x, t_floatarg f)
 {
     if ( ( f>0.0 ) && ( x->x_model != NULL ) )     
     {
-       x->x_delta = f;
-       x->x_modelparams.delta = f;
+       x->x_alpha = f;
+       x->x_modelparams.alpha1 = f;
        cvReleaseBGStatModel( &x->x_model );
        x->x_model = cvCreateFGDStatModel( x->incoming, &x->x_modelparams );
     }
@@ -281,7 +281,7 @@ void *pdp_opencv_bgstats_new(t_floatarg f)
 
     x->x_erode = 2;
     x->x_minarea = 10*10;
-    x->x_delta = 0.1; // 0.1 seconds
+    x->x_alpha = 0.1;
     x->x_frames = 0;
 
     x->foreground = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
@@ -309,7 +309,7 @@ void pdp_opencv_bgstats_setup(void)
     class_addmethod(pdp_opencv_bgstats_class, (t_method)pdp_opencv_bgstats_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_opencv_bgstats_class, (t_method)pdp_opencv_bgstats_minarea, gensym("minarea"),  A_DEFFLOAT, A_NULL );   
     class_addmethod(pdp_opencv_bgstats_class, (t_method)pdp_opencv_bgstats_erode, gensym("erode"),  A_DEFFLOAT, A_NULL );   
-    class_addmethod(pdp_opencv_bgstats_class, (t_method)pdp_opencv_bgstats_delta, gensym("delta"),  A_DEFFLOAT, A_NULL );   
+    class_addmethod(pdp_opencv_bgstats_class, (t_method)pdp_opencv_bgstats_alpha, gensym("alpha"),  A_DEFFLOAT, A_NULL );   
     class_addmethod(pdp_opencv_bgstats_class, (t_method)pdp_opencv_bgstats_reset, gensym("reset"), A_NULL );   
 
 }
