@@ -34,7 +34,7 @@ pix_opencv_bgstats :: pix_opencv_bgstats()
 
   x_erode = 2;
   x_minarea = 10*10;
-  x_delta = 0.1; // 0.1 seconds
+  x_alpha = 0.1; // 0.1 seconds
   x_frames = 0;
 
   foreground = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 3);
@@ -104,13 +104,13 @@ void pix_opencv_bgstats :: processRGBAImage(imageStruct &image)
       x_modelparams.N1cc = CV_BGFG_FGD_N1CC;
       x_modelparams.N2cc = CV_BGFG_FGD_N2CC;
       x_modelparams.is_obj_without_holes = 1;
-      x_modelparams.alpha1 = CV_BGFG_FGD_ALPHA_1;
       x_modelparams.alpha2 = CV_BGFG_FGD_ALPHA_2;
       x_modelparams.alpha3 = CV_BGFG_FGD_ALPHA_3;
       x_modelparams.T = CV_BGFG_FGD_T;
       x_modelparams.perform_morphing = x_erode;
       x_modelparams.minArea = x_minarea;
-      x_modelparams.delta = x_delta;
+      x_modelparams.alpha1 = x_alpha;
+      x_modelparams.delta = CV_BGFG_FGD_DELTA;
       x_model = cvCreateFGDStatModel( incoming, &x_modelparams );
     }
     else if ( x_frames == 5 )
@@ -169,13 +169,13 @@ void pix_opencv_bgstats :: processRGBImage(imageStruct &image)
       x_modelparams.N1cc = CV_BGFG_FGD_N1CC;
       x_modelparams.N2cc = CV_BGFG_FGD_N2CC;
       x_modelparams.is_obj_without_holes = 1;
-      x_modelparams.alpha1 = CV_BGFG_FGD_ALPHA_1;
       x_modelparams.alpha2 = CV_BGFG_FGD_ALPHA_2;
       x_modelparams.alpha3 = CV_BGFG_FGD_ALPHA_3;
       x_modelparams.T = CV_BGFG_FGD_T;
       x_modelparams.perform_morphing = x_erode;
       x_modelparams.minArea = x_minarea;
-      x_modelparams.delta = x_delta;
+      x_modelparams.alpha1 = x_alpha;
+      x_modelparams.delta = CV_BGFG_FGD_DELTA;
       x_model = cvCreateFGDStatModel( incoming, &x_modelparams );
     }
     else if ( x_frames == 5 )
@@ -232,12 +232,12 @@ void pix_opencv_bgstats :: floatErodeMess(float erode)
   }
 }
 
-void pix_opencv_bgstats :: floatDeltaMess(float delta)
+void pix_opencv_bgstats :: floatAlphaMess(float alpha)
 {
-   if ( ( delta>0.0 ) && ( x_model != NULL ) )
+   if ( ( alpha>0.0 ) && ( x_model != NULL ) )
    {
-       x_delta = delta;
-       x_modelparams.delta = delta;
+       x_alpha = alpha;
+       x_modelparams.alpha1 = alpha;
        cvReleaseBGStatModel( &x_model );
        x_model = cvCreateFGDStatModel( incoming, &x_modelparams );
    }
@@ -262,8 +262,8 @@ void pix_opencv_bgstats :: obj_setupCallback(t_class *classPtr)
   		  gensym("minarea"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_bgstats::floatErodeMessCallback,
   		  gensym("erode"), A_FLOAT, A_NULL);
-  class_addmethod(classPtr, (t_method)&pix_opencv_bgstats::floatDeltaMessCallback,
-  		  gensym("delta"), A_FLOAT, A_NULL);
+  class_addmethod(classPtr, (t_method)&pix_opencv_bgstats::floatAlphaMessCallback,
+  		  gensym("alpha"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_bgstats::resetMessCallback,
   		  gensym("reset"), A_NULL);
 
@@ -279,9 +279,9 @@ void pix_opencv_bgstats :: floatErodeMessCallback(void *data, t_floatarg erode)
   GetMyClass(data)->floatErodeMess((float)erode);
 }
 
-void pix_opencv_bgstats :: floatDeltaMessCallback(void *data, t_floatarg delta)
+void pix_opencv_bgstats :: floatAlphaMessCallback(void *data, t_floatarg alpha)
 {
-  GetMyClass(data)->floatDeltaMess((float)delta);
+  GetMyClass(data)->floatAlphaMess((float)alpha);
 }
 
 void pix_opencv_bgstats :: resetMessCallback(void *data)

@@ -63,13 +63,13 @@ class GEM_EXTERN pix_opencv_bgstats : public GemPixObj
     	// Set the new edge threshold
     	void	    	floatMinAreaMess(float minarea);
     	void	    	floatErodeMess(float erode);
-    	void	    	floatDeltaMess(float delta);
+    	void	    	floatAlphaMess(float alpha);
     	void	    	resetMess(void);
 
     	// The new threshold
         int             x_erode;
         float           x_minarea;
-        float           x_delta;
+        float           x_alpha;
         int             x_frames;
 
 	// to detect changes in the image size
@@ -82,7 +82,7 @@ class GEM_EXTERN pix_opencv_bgstats : public GemPixObj
     	// Static member functions
     	static void    	floatMinAreaMessCallback(void *data, float minarea);
     	static void    	floatErodeMessCallback(void *data, float erode);
-    	static void    	floatDeltaMessCallback(void *data, float delta);
+    	static void    	floatAlphaMessCallback(void *data, float alpha);
     	static void    	resetMessCallback(void *data);
 
 	/////////
