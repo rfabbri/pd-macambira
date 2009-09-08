@@ -116,9 +116,9 @@ static void pdp_opencv_channels_process_rgb(t_pdp_opencv_channels *x)
         
     cvSplit( x->image, x->bimage, x->gimage, x->rimage, NULL );
     cvZero( x->zimage );
-    cvMerge( x->rimage, x->zimage, x->zimage, NULL, x->frimage );
+    cvMerge( x->zimage, x->zimage, x->rimage, NULL, x->frimage );
     cvMerge( x->zimage, x->gimage, x->zimage, NULL, x->fgimage);
-    cvMerge( x->zimage, x->zimage, x->bimage, NULL, x->fbimage );
+    cvMerge( x->bimage, x->zimage, x->zimage, NULL, x->fbimage );
 
     memcpy( rdata, x->frimage->imageData, x->x_size*3 );
     memcpy( gdata, x->fgimage->imageData, x->x_size*3 );
