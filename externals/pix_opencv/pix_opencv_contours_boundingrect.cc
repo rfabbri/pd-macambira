@@ -622,11 +622,11 @@ void pix_opencv_contours_boundingrect :: obj_setupCallback(t_class *classPtr)
   class_addmethod(classPtr, (t_method)&pix_opencv_contours_boundingrect::floatFToleranceMessCallback,
   		  gensym("ftolerance"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_contours_boundingrect::floatMMoveMessCallback,
-  		  gensym("mmove"), A_FLOAT, A_NULL);
+  		  gensym("maxmove"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_contours_boundingrect::floatCModeMessCallback,
-  		  gensym("cmode"), A_FLOAT, A_NULL);
+  		  gensym("mode"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_contours_boundingrect::floatCMethodMessCallback,
-  		  gensym("cmethod"), A_FLOAT, A_NULL);
+  		  gensym("method"), A_FLOAT, A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_contours_boundingrect::floatClearMessCallback,
   		  gensym("clear"), A_NULL);
   class_addmethod(classPtr, (t_method)&pix_opencv_contours_boundingrect::floatNightmodeMessCallback,

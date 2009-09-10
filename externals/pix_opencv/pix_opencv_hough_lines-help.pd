@@ -1,4 +1,4 @@
-#N canvas 0 0 1043 756 10;
+#N canvas 320 49 1043 756 10;
 #X obj 396 -37 gemhead;
 #X obj 370 595 pix_texture;
 #X obj 372 616 square 2;
@@ -87,7 +87,6 @@
 #X floatatom 545 396 5 0 0 0 - - -;
 #X floatatom 567 428 5 0 0 0 - - -;
 #X msg 444 394 aresolution \$1;
-#X msg 462 426 dresolutyion \$1;
 #X text 611 424 distance resolution ( default 1 \, for mode CV_HOUGH_MULTI_SCALE
 );
 #X text 583 393 angle resolution ( default 1 \, for mode CV_HOUGH_MULTI_SCALE
@@ -112,6 +111,7 @@
 #X text 68 59 written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
 ) and Yves Degoyon ( ydegoyon@gmail.com );
 #X text 67 44 pix_opencv_hough_lines : Hough lines algorithm;
+#X msg 462 426 dresolution \$1;
 #X connect 0 0 21 0;
 #X connect 1 0 2 0;
 #X connect 4 0 5 0;
@@ -139,7 +139,7 @@
 #X connect 27 0 21 0;
 #X connect 28 0 21 0;
 #X connect 29 0 1 0;
-#X connect 29 1 59 0;
+#X connect 29 1 58 0;
 #X connect 30 0 31 0;
 #X connect 31 0 29 0;
 #X connect 33 0 39 0;
@@ -151,13 +151,13 @@
 #X connect 42 0 43 0;
 #X connect 43 0 29 0;
 #X connect 46 0 48 0;
-#X connect 47 0 49 0;
+#X connect 47 0 69 0;
 #X connect 48 0 29 0;
-#X connect 49 0 29 0;
-#X connect 52 0 29 0;
-#X connect 53 0 52 0;
-#X connect 59 0 61 0;
-#X connect 61 0 57 0;
-#X connect 61 1 58 0;
-#X connect 61 2 64 0;
-#X connect 61 3 65 0;
+#X connect 51 0 29 0;
+#X connect 52 0 51 0;
+#X connect 58 0 60 0;
+#X connect 60 0 56 0;
+#X connect 60 1 57 0;
+#X connect 60 2 63 0;
+#X connect 60 3 64 0;
+#X connect 69 0 29 0;
