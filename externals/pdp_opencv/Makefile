@@ -5,11 +5,10 @@ GEM_OPENCV_VERSION = 0.1
 
 # build flags
 
-INCLUDES =  -I$(PD_DIR)/src -I.  -I$(PDP_DIR)/include -I$(PD_DIR)/src
+INCLUDES = -I$(PD_DIR)/src -I.  -I$(PDP_DIR)/include -I$(PD_DIR)/src
 CPPFLAGS  = -fPIC -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
     -Wall -W -Wno-unused -Wno-parentheses -Wno-switch \
     -DGEM_OPENCV_VERSION=\"$(GEM_OPENCV_VERSION)\" -g
-
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
@@ -37,7 +36,7 @@ all: $(SOURCES:.c=.$(EXTENSION)) $(SOURCES:.cc=.$(EXTENSION))
 .cc.o:
 	g++ $(CPPFLAGS) $(INCLUDES) -o $*.o -c $*.cc
 
-c.o:
+.c.o:
 	gcc $(CPPFLAGS) $(INCLUDES) -o $*.o -c $*.c
 
 install:
