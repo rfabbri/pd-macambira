@@ -121,6 +121,9 @@ class GEM_EXTERN pix_opencv_motempl : public GemPixObj
    IplImage *segmask; // motion segmentation map
    CvMemStorage* storage; // temporary storage
    t_outlet 	*m_dataout;
+   CvFont font;
+   t_atom rlist[6];
+
 };
 
 #endif	// for header file

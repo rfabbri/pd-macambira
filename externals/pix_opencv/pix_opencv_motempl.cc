@@ -40,8 +40,8 @@ pix_opencv_motempl :: pix_opencv_motempl()
   aperture = 3;
   diff_threshold = 30;
   last = 0;
-  comp_xsize  = 0;
-  comp_ysize  = 0;
+  comp_xsize  = 320;
+  comp_ysize  = 240;
 
   // various tracking parameters (in seconds)
   max_time_delta = 0.5;
@@ -64,6 +64,15 @@ pix_opencv_motempl :: pix_opencv_motempl()
   storage = NULL; 
   
   mask_size = CV_DIST_MASK_PRECISE;
+
+  cvInitFont( &font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0, 1, 8 );
+
+  img = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 3);
+  motion = cvCreateImage( cvSize(comp_xsize,comp_ysize), 8, 3 );
+  cvZero( motion );
+  motion->origin = img->origin;
+  rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
+  alpha = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
 
 }
 
@@ -97,7 +106,7 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
  CvPoint center;
  double magnitude;          
  CvScalar color;
- t_atom rlist[6];
+ char tindex[10];
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) {
 
@@ -228,7 +237,9 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
         cvLine( motion, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
-        SETFLOAT(&rlist[0], j++);
+        sprintf( tindex, "%d", ++j );
+        cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
+        SETFLOAT(&rlist[0], j);
         SETFLOAT(&rlist[1], center.x);
         SETFLOAT(&rlist[2], center.y);
         SETFLOAT(&rlist[3], comp_rect.width);
@@ -258,7 +269,7 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
  CvPoint center;
  double magnitude;          
  CvScalar color;
- t_atom rlist[6];
+ char tindex[10];
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) {
 
@@ -383,7 +394,9 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
         cvLine( motion, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
-        SETFLOAT(&rlist[0], j++);
+        sprintf( tindex, "%d", ++j );
+        cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
+        SETFLOAT(&rlist[0], j);
         SETFLOAT(&rlist[1], center.x);
         SETFLOAT(&rlist[2], center.y);
         SETFLOAT(&rlist[3], comp_rect.width);
@@ -415,7 +428,7 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
  CvPoint center;
  double magnitude;          
  CvScalar color;
- t_atom rlist[6];
+ char tindex[10];
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) {
 
@@ -543,7 +556,9 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
         cvLine( motion, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
-        SETFLOAT(&rlist[0], j++);
+        sprintf( tindex, "%d", ++j );
+        cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
+        SETFLOAT(&rlist[0], j);
         SETFLOAT(&rlist[1], center.x);
         SETFLOAT(&rlist[2], center.y);
         SETFLOAT(&rlist[3], comp_rect.width);
