@@ -89,7 +89,7 @@ void  pdp_opencv_motempl_update_mhi( t_pdp_opencv_motempl *x, IplImage* img, Ipl
 {
     double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
     CvSize size = cvSize(img->width,img->height); // get current frame size
-    int i, idx1 = x->last, idx2;
+    int i, j, idx1 = x->last, idx2;
     IplImage* silh;
     CvSeq* seq;
     CvRect comp_rect;
@@ -155,6 +155,7 @@ void  pdp_opencv_motempl_update_mhi( t_pdp_opencv_motempl *x, IplImage* img, Ipl
 
     // iterate through the motion components,
     // One more iteration (i == -1) corresponds to the whole image (global motion)
+    j=0;
     for( i = -1; i < seq->total; i++ ) {
 
         if( i < 0 ) { // case of the whole image
@@ -200,7 +201,7 @@ void  pdp_opencv_motempl_update_mhi( t_pdp_opencv_motempl *x, IplImage* img, Ipl
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
 
-         SETFLOAT(&x->rlist[0], i);
+         SETFLOAT(&x->rlist[0], j++);
          SETFLOAT(&x->rlist[1], center.x);
          SETFLOAT(&x->rlist[2], center.y);
          SETFLOAT(&x->rlist[3], comp_rect.width);
