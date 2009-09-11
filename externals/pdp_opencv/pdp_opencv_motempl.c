@@ -66,6 +66,7 @@ typedef struct pdp_opencv_motempl_struct
     IplImage *mask; // valid orientation mask
     IplImage *segmask; // motion segmentation map
     CvMemStorage* storage; // temporary storage
+    CvFont font;
     
     IplImage* image;
     IplImage* motion;
@@ -87,17 +88,18 @@ typedef struct pdp_opencv_motempl_struct
 
 void  pdp_opencv_motempl_update_mhi( t_pdp_opencv_motempl *x, IplImage* img, IplImage* dst, int diff_threshold )
 {
-    double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
-    CvSize size = cvSize(img->width,img->height); // get current frame size
-    int i, j, idx1 = x->last, idx2;
-    IplImage* silh;
-    CvSeq* seq;
-    CvRect comp_rect;
-    double count;
-    double angle;
-    CvPoint center;
-    double magnitude;          
-    CvScalar color;
+  double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
+  CvSize size = cvSize(img->width,img->height); // get current frame size
+  int i, j, idx1 = x->last, idx2;
+  IplImage* silh;
+  CvSeq* seq;
+  CvRect comp_rect;
+  double count;
+  double angle;
+  CvPoint center;
+  double magnitude;          
+  CvScalar color;
+  char tindex[10];
 
     // allocate images at the beginning or
     // reallocate them if the frame size is changed
@@ -200,19 +202,17 @@ void  pdp_opencv_motempl_update_mhi( t_pdp_opencv_motempl *x, IplImage* img, Ipl
         cvLine( dst, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
-
-         SETFLOAT(&x->rlist[0], j++);
-         SETFLOAT(&x->rlist[1], center.x);
-         SETFLOAT(&x->rlist[2], center.y);
-         SETFLOAT(&x->rlist[3], comp_rect.width);
-         SETFLOAT(&x->rlist[4], comp_rect.height);
-         SETFLOAT(&x->rlist[5], angle);
-       outlet_list( x->x_dataout, 0, 6, x->rlist );
+        sprintf( tindex, "%d", ++j );
+        cvPutText( dst, tindex, center, &x->font, CV_RGB(255,255,255));
+        SETFLOAT(&x->rlist[0], j);
+        SETFLOAT(&x->rlist[1], center.x);
+        SETFLOAT(&x->rlist[2], center.y);
+        SETFLOAT(&x->rlist[3], comp_rect.width);
+        SETFLOAT(&x->rlist[4], comp_rect.height);
+        SETFLOAT(&x->rlist[5], angle);
+        outlet_list( x->x_dataout, 0, 6, x->rlist );
     }
 }
-
-
-
 
 static void pdp_opencv_motempl_process_rgb(t_pdp_opencv_motempl *x)
 {
@@ -283,7 +283,7 @@ static void pdp_opencv_motempl_mhi_duration(t_pdp_opencv_motempl *x, t_floatarg 
 
 static void pdp_opencv_motempl_aperture(t_pdp_opencv_motempl *x, t_floatarg f)
 {
-  if ( ( (int)f == 3.0 ) || ( (int)f == 5.0 ) || (  (int)f == 7.0 ) )
+  if ( ( (int)f == 1.0 ) || ( (int)f == 3.0 ) || ( (int)f == 5.0 ) || (  (int)f == 7.0 ) )
   {
     x->x_aperture = (int)f;
   }
@@ -412,6 +412,9 @@ void *pdp_opencv_motempl_new(t_floatarg f)
     x->motion->origin = x->image->origin;
 
     x->storage = NULL; 
+
+    // initialize font
+    cvInitFont( &x->font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0, 1, 8 );
 
     return (void *)x;
 }
