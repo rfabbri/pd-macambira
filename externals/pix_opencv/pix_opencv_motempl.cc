@@ -86,6 +86,18 @@ pix_opencv_motempl :: ~pix_opencv_motempl()
 /////////////////////////////////////////////////////////
 void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
 {
+ double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
+ CvSize size = cvSize(img->width,img->height); // get current frame size
+ int i, j, idx1 = last, idx2;
+ IplImage* silh;
+ CvSeq* seq;
+ CvRect comp_rect;
+ double count;
+ double angle;
+ CvPoint center;
+ double magnitude;          
+ CvScalar color;
+ t_atom rlist[6];
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) {
 
@@ -114,18 +126,6 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
     int from_to[] = { 0, 0, 1, 1, 2, 2, 3, 3 };
     //cvSet( rgba, cvScalar(1,2,3,4) );
     cvMixChannels( (const CvArr**)in, 1, out, 2, from_to, 4 );
-
-    double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
-    CvSize size = cvSize(img->width,img->height); // get current frame size
-    int i, idx1 = last, idx2;
-    IplImage* silh;
-    CvSeq* seq;
-    CvRect comp_rect;
-    double count;
-    double angle;
-    CvPoint center;
-    double magnitude;          
-    CvScalar color;
 
     // allocate images at the beginning or
     // reallocate them if the frame size is changed
@@ -183,6 +183,7 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
 
     // iterate through the motion components,
     // One more iteration (i == -1) corresponds to the whole image (global motion)
+    j=0;
     for( i = -1; i < seq->total; i++ ) {
 
         if( i < 0 ) { // case of the whole image
@@ -227,15 +228,13 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
         cvLine( motion, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
-    //aqui treurem la info dels blobs en questio ... 
-    	 t_atom rlist[6];
-         SETFLOAT(&rlist[0], i);
-         SETFLOAT(&rlist[1], center.x);
-         SETFLOAT(&rlist[2], center.y);
-         SETFLOAT(&rlist[3], comp_rect.width);
-         SETFLOAT(&rlist[4], comp_rect.height);
-         SETFLOAT(&rlist[5], angle);
-    	 outlet_list( m_dataout, 0, 6, rlist );
+        SETFLOAT(&rlist[0], j++);
+        SETFLOAT(&rlist[1], center.x);
+        SETFLOAT(&rlist[2], center.y);
+        SETFLOAT(&rlist[3], comp_rect.width);
+        SETFLOAT(&rlist[4], comp_rect.height);
+        SETFLOAT(&rlist[5], angle);
+    	outlet_list( m_dataout, 0, 6, rlist );
     }
 
 
@@ -248,6 +247,19 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
 
 void pix_opencv_motempl :: processRGBImage(imageStruct &image)
 {
+ double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
+ CvSize size = cvSize(img->width,img->height); // get current frame size
+ int i, j, idx1 = last, idx2;
+ IplImage* silh;
+ CvSeq* seq;
+ CvRect comp_rect;
+ double count;
+ double angle;
+ CvPoint center;
+ double magnitude;          
+ CvScalar color;
+ t_atom rlist[6];
+
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) {
 
 	this->comp_xsize = image.xsize;
@@ -270,18 +282,6 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
     // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( img->imageData, image.data, image.xsize*image.ysize*3 );
     
-    double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
-    CvSize size = cvSize(img->width,img->height); // get current frame size
-    int i, idx1 = last, idx2;
-    IplImage* silh;
-    CvSeq* seq;
-    CvRect comp_rect;
-    double count;
-    double angle;
-    CvPoint center;
-    double magnitude;          
-    CvScalar color;
-
     // allocate images at the beginning or
     // reallocate them if the frame size is changed
     if( (!mhi) || (mhi->width != size.width) || (mhi->height != size.height)  || (!buf)) {
@@ -338,6 +338,7 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
 
     // iterate through the motion components,
     // One more iteration (i == -1) corresponds to the whole image (global motion)
+    j=0;
     for( i = -1; i < seq->total; i++ ) {
 
         if( i < 0 ) { // case of the whole image
@@ -382,14 +383,13 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
         cvLine( motion, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
-    	 t_atom rlist[6];
-         SETFLOAT(&rlist[0], i);
-         SETFLOAT(&rlist[1], center.x);
-         SETFLOAT(&rlist[2], center.y);
-         SETFLOAT(&rlist[3], comp_rect.width);
-         SETFLOAT(&rlist[4], comp_rect.height);
-         SETFLOAT(&rlist[5], angle);
-    	 outlet_list( m_dataout, 0, 6, rlist );
+        SETFLOAT(&rlist[0], j++);
+        SETFLOAT(&rlist[1], center.x);
+        SETFLOAT(&rlist[2], center.y);
+        SETFLOAT(&rlist[3], comp_rect.width);
+        SETFLOAT(&rlist[4], comp_rect.height);
+        SETFLOAT(&rlist[5], angle);
+    	outlet_list( m_dataout, 0, 6, rlist );
     }
 
 
@@ -404,6 +404,19 @@ void pix_opencv_motempl :: processYUVImage(imageStruct &image)
     	
 void pix_opencv_motempl :: processGrayImage(imageStruct &image)
 { 
+ double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
+ CvSize size = cvSize(img->width,img->height); // get current frame size
+ int i, j, idx1 = last, idx2;
+ IplImage* silh;
+ CvSeq* seq;
+ CvRect comp_rect;
+ double count;
+ double angle;
+ CvPoint center;
+ double magnitude;          
+ CvScalar color;
+ t_atom rlist[6];
+
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) {
 
 	this->comp_xsize = image.xsize;
@@ -429,18 +442,6 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
     // Convert to RGB
     cvCvtColor( alpha, img, CV_GRAY2RGB);
     
-    double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
-    CvSize size = cvSize(img->width,img->height); // get current frame size
-    int i, idx1 = last, idx2;
-    IplImage* silh;
-    CvSeq* seq;
-    CvRect comp_rect;
-    double count;
-    double angle;
-    CvPoint center;
-    double magnitude;          
-    CvScalar color;
-
     // allocate images at the beginning or
     // reallocate them if the frame size is changed
     if( (!mhi) || (mhi->width != size.width) || (mhi->height != size.height) || (!buf)) {
@@ -497,6 +498,7 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
 
     // iterate through the motion components,
     // One more iteration (i == -1) corresponds to the whole image (global motion)
+    j=0;
     for( i = -1; i < seq->total; i++ ) {
 
         if( i < 0 ) { // case of the whole image
@@ -541,14 +543,13 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
         cvLine( motion, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
-    	 t_atom rlist[6];
-         SETFLOAT(&rlist[0], i);
-         SETFLOAT(&rlist[1], center.x);
-         SETFLOAT(&rlist[2], center.y);
-         SETFLOAT(&rlist[3], comp_rect.width);
-         SETFLOAT(&rlist[4], comp_rect.height);
-         SETFLOAT(&rlist[5], angle);
-    	 outlet_list( m_dataout, 0, 6, rlist );
+        SETFLOAT(&rlist[0], j++);
+        SETFLOAT(&rlist[1], center.x);
+        SETFLOAT(&rlist[2], center.y);
+        SETFLOAT(&rlist[3], comp_rect.width);
+        SETFLOAT(&rlist[4], comp_rect.height);
+        SETFLOAT(&rlist[5], angle);
+    	outlet_list( m_dataout, 0, 6, rlist );
     }
 
 
