@@ -10,7 +10,7 @@
 #define PATH_MAX 4096
 #endif
 
-#define TCLPD_VERSION "0.2"
+#define TCLPD_VERSION "0.2.1"
 
 #define InitArray(name, size, value) for(int zz=0; zz<(size); zz++) name[zz]=value
 
