@@ -49,7 +49,7 @@ tcl_wrap.cxx:: tcl.i tcl_extras.h Makefile
 .cxx.o:: tcl_extras.h Makefile
 	$(CXX) $(CFLAGS) $(INCLUDES) -xc++ -c $<
 
-$(LIBNAME)$(PDSUF):: tcl_extras.h Makefile $(OBJS) pdlib_tcl_syntax
+$(LIBNAME)$(PDSUF):: tcl_extras.h Makefile $(OBJS)
 	$(LDSHARED) $(CFLAGS) -o $(LIBNAME)$(PDSUF) $(OBJS) $(LDSOFLAGS)
 
 pdlib_tcl_syntax: pdlib.tcl
