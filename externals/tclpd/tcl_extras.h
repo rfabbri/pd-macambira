@@ -12,6 +12,8 @@
 
 #define TCLPD_VERSION "0.2"
 
+#define InitArray(name, size, value) for(int zz=0; zz<(size); zz++) name[zz]=value
+
 typedef struct _t_tcl {
     t_object o;
     Tcl_Obj* self;

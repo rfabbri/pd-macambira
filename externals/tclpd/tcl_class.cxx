@@ -37,35 +37,56 @@ t_class* tclpd_guiclass_new(const char* name, int flags) {
 }
 
 t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
+    // lookup in class table
     const char* name = classsym->s_name;
     t_class* qlass = class_table[string(name)];
+
     t_tcl* self = (t_tcl*)pd_new(qlass);
     self->ninlets = 1 /* qlass->c_firstin ??? */;
+
     char s[64];
     snprintf(s, 64, "tclpd:%s:x%lx", name, objectSequentialId++);
     self->self = Tcl_NewStringObj(s, -1);
     Tcl_IncrRefCount(self->self);
+
+    // store in object table (for later lookup)
     object_table[string(s)] = (t_pd*)self;
-    Tcl_Obj *av[ac+2];
+
+    // build constructor command
+    Tcl_Obj *av[ac+2]; InitArray(av, ac+2, NULL);
     av[0] = Tcl_NewStringObj(name, -1);
     Tcl_IncrRefCount(av[0]);
     av[1] = self->self;
+    Tcl_IncrRefCount(av[1]);
     for(int i=0; i<ac; i++) {
         if(pd_to_tcl(&at[i], &av[2+i]) == TCL_ERROR) {
-            tclpd_interp_error(TCL_ERROR);
-            pd_free((t_pd*)self);
-            return 0;
+#ifdef DEBUG
+            post("pd_to_tcl: tclpd_new: failed during conversion. check memory leaks!");
+#endif
+            goto error;
         }
     }
     if(Tcl_EvalObjv(tcl_for_pd, ac+2, av, 0) != TCL_OK) {
-        tclpd_interp_error(TCL_ERROR);
-        pd_free((t_pd*)self);
-        return 0;
+        goto error;
     }
+
+    for(int i = 0; i < (ac+2); i++)
+        Tcl_DecrRefCount(av[i]);
+
     return self;
+
+error:
+    tclpd_interp_error(TCL_ERROR);
+    for(int i = 0; i < (ac+2); i++) {
+        if(!av[i]) break;
+        Tcl_DecrRefCount(av[i]);
+    }
+    pd_free((t_pd*)self);
+    return 0;
 }
 
 void tclpd_free(t_tcl* self) {
+    Tcl_DecrRefCount(self->self);
 #ifdef DEBUG
     post("tclpd_free called");
 #endif
@@ -76,25 +97,42 @@ void tclpd_anything(t_tcl* self, t_symbol* s, int ac, t_atom* at) {
 }
 
 void tclpd_inlet_anything(t_tcl* self, int inlet, t_symbol* s, int ac, t_atom* at) {
-/* proxy method */
-    Tcl_Obj* av[ac+3];
+    // proxy method - format: <self> <inlet#> <selector> ...
+    Tcl_Obj* av[ac+3]; InitArray(av, ac+3, NULL);
+    int result;
+
     av[0] = self->self;
+    Tcl_IncrRefCount(av[0]);
     av[1] = Tcl_NewIntObj(inlet);
     Tcl_IncrRefCount(av[1]);
     av[2] = Tcl_NewStringObj(s->s_name, -1);
     Tcl_IncrRefCount(av[2]);
     for(int i=0; i<ac; i++) {
         if(pd_to_tcl(&at[i], &av[3+i]) == TCL_ERROR) {
-            tclpd_interp_error(TCL_ERROR);
-            return;
+#ifdef DEBUG
+            post("pd_to_tcl: tclpd_inlet_anything: failed during conversion. check memory leaks!");
+#endif
+            goto error;
         }
     }
-    int result = Tcl_EvalObjv(tcl_for_pd, ac+3, av, 0);
-    Tcl_DecrRefCount(av[1]);
-    Tcl_DecrRefCount(av[2]);
+    result = Tcl_EvalObjv(tcl_for_pd, ac+3, av, 0);
     if(result != TCL_OK) {
-        tclpd_interp_error(TCL_ERROR);
+        goto error;
     }
+
+    for(int i=0; i < (ac+3); i++)
+        Tcl_DecrRefCount(av[i]);
+
+    // OK
+    return;
+
+error:
+    tclpd_interp_error(TCL_ERROR);
+    for(int i=0; i < (ac+3); i++) {
+        if(!av[i]) break;
+        Tcl_DecrRefCount(av[i]);
+    }
+    return;
 }
 
 /* Tcl glue: */
@@ -127,9 +165,13 @@ void poststring2 (const char *s) {
 }
 
 void tclpd_save(t_gobj* z, t_binbuf* b) {
-    Tcl_Obj* av[3], *res;
+    Tcl_Obj* av[3]; InitArray(av, 3, NULL);
+    Tcl_Obj* res;
+
     t_tcl* x = (t_tcl*)z;
+
     av[0] = x->self;
+    Tcl_IncrRefCount(av[0]);
     av[1] = Tcl_NewStringObj("object", -1);
     Tcl_IncrRefCount(av[1]);
     av[2] = Tcl_NewStringObj("save", -1);
@@ -172,6 +214,7 @@ void tclpd_save(t_gobj* z, t_binbuf* b) {
         pd_error(x, "Tcl: object save: failed");
         tclpd_interp_error(result);
     }
+    Tcl_DecrRefCount(av[0]);
     Tcl_DecrRefCount(av[1]);
     Tcl_DecrRefCount(av[2]);
 }
