@@ -59,6 +59,10 @@ void tclpd_interp_error(int result) {
     post("  (see stderr for details)");
 
     fprintf(stderr, "------------------- Tcl error: -------------------\n");
+
+    // Tcl_GetReturnOptions and Tcl_DictObjGet only available in Tcl >= 8.5
+
+#if ((TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || (TCL_MAJOR_VERSION > 8))
     Tcl_Obj* dict = Tcl_GetReturnOptions(tcl_for_pd, result);
     Tcl_Obj* errorInfo = NULL;
     Tcl_Obj* errorInfoK = Tcl_NewStringObj("-errorinfo", -1);
@@ -66,5 +70,9 @@ void tclpd_interp_error(int result) {
     Tcl_DictObjGet(tcl_for_pd, dict, errorInfoK, &errorInfo);
     Tcl_DecrRefCount(errorInfoK);
     fprintf(stderr, "%s\n", Tcl_GetStringFromObj(errorInfo, 0));
+#else
+    fprintf(stderr, "Backtrace not available in Tcl < 8.5. Please upgrade Tcl.\n");
+#endif
+
     fprintf(stderr, "--------------------------------------------------\n");
 }
