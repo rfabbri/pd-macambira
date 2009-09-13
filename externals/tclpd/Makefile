@@ -1,6 +1,6 @@
 #!/usr/bin/make
 
-DEBUG=0
+DEBUG?=0
 OS = linux
 
 ifeq ($(DEBUG),1)
