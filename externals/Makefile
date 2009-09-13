@@ -86,9 +86,6 @@ endif
 
 CXXFLAGS = $(CFLAGS)
 
-TCL_RUNTIME_VERSION=$(shell echo 'puts $$tcl_version' | tclsh)
-TCL_HEADERS_VERSION=$(shell sed -n 's|^#define TCL_VERSION.*"\([0-9]\.[0-9][0-9]*\)".*|\1|p' /usr/include/tcl.h)
-
 ### C++ files
 %.$(EXTENSION): %.cpp
 %.$(EXTENSION): %.cc
@@ -142,10 +139,6 @@ else
   else
     # GNU/Linux, BSD, IRIX, etc.
     LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl pdvjtools postlude sixaxis
-	# externals that depend on Tcl 8.5 or greater
-    ifeq ($(TCL_HEADERS_VERSION),8.5)
-	  LIB_TARGETS += tclpd
-    endif
   endif
 endif
 
