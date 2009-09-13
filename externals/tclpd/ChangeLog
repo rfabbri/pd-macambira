@@ -1,0 +1,11 @@
+Version 0.2.1:
+	- Added support for properties function.
+
+Version 0.2:
+	- Added support for GUI externals (widgetbehavior).
+	- Added support for save function.
+	- Fixed memory leaks.
+
+Version 0.1.1:
+	- Basic support for atom conversion, pd classes, methods.
+	- Fixed issues with tcl obj reference counter (segfaults).
