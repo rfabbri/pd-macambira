@@ -65,6 +65,7 @@ t_pd* tclpd_get_object_pd(const char* objectSequentialId);
 void poststring2(const char* s);
 extern "C" void text_save(t_gobj *z, t_binbuf *b);
 void tclpd_save(t_gobj* z, t_binbuf* b);
+void tclpd_properties(t_gobj* z, t_glist* owner);
 
 /* tcl_widgetbehavior.cxx */
 void tclpd_guiclass_getrect(t_gobj* z, t_glist* owner, int* xp1, int* yp1, int* xp2, int* yp2);

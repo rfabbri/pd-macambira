@@ -17,8 +17,37 @@ t_class* tclpd_class_new(const char* name, int flags) {
     class_table[string(name)] = c;
     class_addanything(c, tclpd_anything);
 
+    // always set save function. it will call the default if
+    // none exists in tcl space.
     class_setsavefn(c, tclpd_save);
 
+    // check if properties function exists in tcl space.
+    char buf[80];
+    int res_i;
+    snprintf(buf, 80, "llength [info procs ::%s_object_properties]", name);
+    if(Tcl_Eval(tcl_for_pd, buf) == TCL_OK) {
+        Tcl_Obj* res = Tcl_GetObjResult(tcl_for_pd);
+        if(Tcl_GetIntFromObj(tcl_for_pd, res, &res_i) == TCL_OK) {
+            if(res_i) {
+                class_setpropertiesfn(c, tclpd_properties);
+            }
+#ifdef DEBUG
+            else {
+                post("tclpd_class_new: propertiesfn does not exist", buf);
+            }
+#endif
+        }
+#ifdef DEBUG
+        else {
+            post("tclpd_class_new: Tcl_GetIntFromObj returned an error");
+        }
+#endif
+    }
+#ifdef DEBUG
+    else {
+        post("tclpd_class_new: [info procs] returned an error");
+    }
+#endif
     return c;
 }
 
@@ -212,6 +241,29 @@ void tclpd_save(t_gobj* z, t_binbuf* b) {
         Tcl_DecrRefCount(res);
     } else {
         pd_error(x, "Tcl: object save: failed");
+        tclpd_interp_error(result);
+    }
+    Tcl_DecrRefCount(av[0]);
+    Tcl_DecrRefCount(av[1]);
+    Tcl_DecrRefCount(av[2]);
+}
+
+void tclpd_properties(t_gobj* z, t_glist* owner) {
+    Tcl_Obj* av[3]; InitArray(av, 3, NULL);
+    Tcl_Obj* res;
+
+    t_tcl* x = (t_tcl*)z;
+
+    av[0] = x->self;
+    Tcl_IncrRefCount(av[0]);
+    av[1] = Tcl_NewStringObj("object", -1);
+    Tcl_IncrRefCount(av[1]);
+    av[2] = Tcl_NewStringObj("properties", -1);
+    Tcl_IncrRefCount(av[2]);
+    int result = Tcl_EvalObjv(tcl_for_pd, 3, av, 0);
+    if(result != TCL_OK) {
+        //res = Tcl_GetObjResult(tcl_for_pd);
+        pd_error(x, "Tcl: object properties: failed");
         tclpd_interp_error(result);
     }
     Tcl_DecrRefCount(av[0]);
