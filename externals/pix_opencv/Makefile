@@ -1,7 +1,7 @@
-PD_DIR = ../../pd
-GEM_DIR = ../gem
+PD_DIR = /usr/local/pd
+GEM_DIR = /usr/local/pd/gem
 
-GEM_OPENCV_VERSION = 0.1
+GEM_OPENCV_VERSION = 0.2
 
 # build flags
 
@@ -27,9 +27,10 @@ endif
 
 .SUFFIXES = $(EXTENSION)
 
-SOURCES = pix_opencv_edge.cc pix_opencv_laplace.cc pix_opencv_morphology.cc pix_opencv_distrans.cc pix_opencv_motempl.cc pix_opencv_haarcascade.cc pix_opencv_contours_boundingrect.cc pix_opencv_bgsubstract.cc pix_opencv_contours_convexity.cc pix_opencv_dft.cc pix_opencv_lk.cc pix_opencv_hist_compare.cc pix_opencv_knear.cc pix_opencv_threshold.cc pix_opencv_floodfill.cc pix_opencv_athreshold.cc pix_opencv_bgstats.cc pix_opencv_camshift.cc pix_opencv_hu_compare.cc pix_opencv_pgh_compare.cc pix_opencv_hough_circles.cc pix_opencv_hough_lines.cc pix_opencv_surf.cc pix_opencv_hu_moments.cc
+SOURCES = pix_opencv_edge.cc pix_opencv_laplace.cc pix_opencv_morphology.cc pix_opencv_distrans.cc pix_opencv_motempl.cc pix_opencv_haarcascade.cc pix_opencv_contours_boundingrect.cc pix_opencv_bgsubstract.cc pix_opencv_contours_convexity.cc pix_opencv_dft.cc pix_opencv_lk.cc pix_opencv_hist_compare.cc pix_opencv_knear.cc pix_opencv_threshold.cc pix_opencv_floodfill.cc pix_opencv_athreshold.cc pix_opencv_bgstats.cc pix_opencv_camshift.cc pix_opencv_hu_compare.cc pix_opencv_pgh_compare.cc pix_opencv_hough_circles.cc pix_opencv_hough_lines.cc pix_opencv_hu_moments.cc
+SOURCES_OPT = pix_opencv_surf.cc
 
-all: $(SOURCES:.cc=.$(EXTENSION))
+all: $(SOURCES:.cc=.$(EXTENSION)) $(SOURCES_OPT:.cc=.$(EXTENSION))
 
 %.$(EXTENSION): %.o
 	gcc $(LDFLAGS) -o $*.$(EXTENSION) $*.o $(LIBS)
