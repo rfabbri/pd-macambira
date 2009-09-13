@@ -16,7 +16,9 @@
 
 typedef struct _t_tcl {
     t_object o;
+    t_glist* x_glist;
     Tcl_Obj* self;
+    Tcl_Obj* classname;
     int ninlets;
 } t_tcl;
 
@@ -60,8 +62,11 @@ void tclpd_anything(t_tcl* self, t_symbol* s, int ac, t_atom* at);
 void tclpd_inlet_anything(t_tcl *self, int inlet, t_symbol *s, int ac, t_atom *at);
 t_proxyinlet* tclpd_add_proxyinlet(t_tcl* x);
 t_tcl* tclpd_get_instance(const char* objectSequentialId);
+t_pd* tclpd_get_instance_pd(const char* objectSequentialId);
 t_object* tclpd_get_object(const char* objectSequentialId);
 t_pd* tclpd_get_object_pd(const char* objectSequentialId);
+t_glist* tclpd_get_glist(const char* objectSequentialId);
+t_symbol* null_symbol();
 void poststring2(const char* s);
 extern "C" void text_save(t_gobj *z, t_binbuf *b);
 void tclpd_save(t_gobj* z, t_binbuf* b);

@@ -18,13 +18,17 @@ namespace eval ::pd {
         tclpd_add_proxyinlet [tclpd_get_instance $self]
     }
 
-    proc add_outlet {self sel} {
+    proc add_outlet {self {sel {}}} {
         if $::verbose {post [info level 0]}
-        if {[lsearch -exact {bang float list symbol} $sel] == -1} {
-                return -code error [error_msg "unsupported selector: $sel"]
-        }
         variable _
-        set o [outlet_new [tclpd_get_object $self] [gensym $sel]]
+        if {$sel == {}} {
+            set o [outlet_new [tclpd_get_object $self] [null_symbol]]
+        } else {
+            if {[lsearch -exact {bang float list symbol} $sel] == -1} {
+                return -code error [error_msg "unsupported selector: $sel"]
+            }
+            set o [outlet_new [tclpd_get_object $self] [gensym $sel]]
+        }
         lappend _($self:x_outlet) $o
         return $o
     }
@@ -57,7 +61,14 @@ namespace eval ::pd {
                 outlet_bang $outlet
             }
             default {
-                return -code error [error_msg "unknown selector: $sel"]
+                set v [lindex $args 0]
+                set sz [llength $v]
+                set aa [new_atom_array $sz]
+                for {set i 0} {$i < $sz} {incr i} {
+                    set_atom_array $aa $i [lindex $v $i]
+                }
+                outlet_anything $outlet [gensym $sel] $sz $aa
+                delete_atom_array $aa $sz
             }
         }
     }

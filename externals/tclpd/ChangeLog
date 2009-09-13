@@ -1,5 +1,7 @@
 Version 0.2.1:
 	- Added support for properties function.
+	- Added support for pd_bind/unbind.
+	- Added destructor call in pd_free.
 
 Version 0.2:
 	- Added support for GUI externals (widgetbehavior).

@@ -38,9 +38,26 @@
 %ignore post;
 %ignore class_new;
 
+/* functions that we can't auto-wrap, because <insert reason here> */
+%ignore glist_new;
+%ignore canvas_zapallfortemplate;
+%ignore canvas_fattenforscalars;
+%ignore canvas_visforscalars;
+%ignore canvas_clicksub;
+%ignore text_xcoord;
+%ignore text_ycoord;
+%ignore canvas_getglistonsuper;
+%ignore canvas_getfont;
+%ignore canvas_setusedastemplate;
+%ignore canvas_vistext;
+%ignore rtext_remove;
+%ignore canvas_recurapply;
+%ignore gobj_properties;
+
 /* end of ignore-list */
 
 %include "m_pd.h"
+%include "g_canvas.h"
 %include "tcl_extras.h"
 
 %{
@@ -54,8 +71,9 @@
 %}
 
 /* this does the trick of solving
- TypeError in method 'outlet_list', argument 4 of type 't_atom *' */
+ TypeError in method 'xyz', argument 4 of type 't_atom *' */
 %name(outlet_list) EXTERN void outlet_list(t_outlet *x, t_symbol *s, int argc, t_atom_array *argv);
+%name(outlet_anything) EXTERN void outlet_anything(t_outlet *x, t_symbol *s, int argc, t_atom_array *argv);
 
 %pointer_class(t_float, t_float)
 %pointer_class(t_symbol, t_symbol)

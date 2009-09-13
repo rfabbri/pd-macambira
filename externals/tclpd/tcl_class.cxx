@@ -70,22 +70,27 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     const char* name = classsym->s_name;
     t_class* qlass = class_table[string(name)];
 
-    t_tcl* self = (t_tcl*)pd_new(qlass);
-    self->ninlets = 1 /* qlass->c_firstin ??? */;
+    t_tcl* x = (t_tcl*)pd_new(qlass);
+    x->ninlets = 1 /* qlass->c_firstin ??? */;
+
+    x->classname = Tcl_NewStringObj(name, -1);
+    Tcl_IncrRefCount(x->classname);
 
     char s[64];
     snprintf(s, 64, "tclpd:%s:x%lx", name, objectSequentialId++);
-    self->self = Tcl_NewStringObj(s, -1);
-    Tcl_IncrRefCount(self->self);
+    x->self = Tcl_NewStringObj(s, -1);
+    Tcl_IncrRefCount(x->self);
+
+    x->x_glist = (t_glist*)canvas_getcurrent();
 
     // store in object table (for later lookup)
-    object_table[string(s)] = (t_pd*)self;
+    object_table[string(s)] = (t_pd*)x;
 
     // build constructor command
     Tcl_Obj *av[ac+2]; InitArray(av, ac+2, NULL);
-    av[0] = Tcl_NewStringObj(name, -1);
+    av[0] = x->classname;
     Tcl_IncrRefCount(av[0]);
-    av[1] = self->self;
+    av[1] = x->self;
     Tcl_IncrRefCount(av[1]);
     for(int i=0; i<ac; i++) {
         if(pd_to_tcl(&at[i], &av[2+i]) == TCL_ERROR) {
@@ -95,6 +100,7 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
             goto error;
         }
     }
+    // call constructor
     if(Tcl_EvalObjv(tcl_for_pd, ac+2, av, 0) != TCL_OK) {
         goto error;
     }
@@ -102,7 +108,7 @@ t_tcl* tclpd_new(t_symbol* classsym, int ac, t_atom* at) {
     for(int i = 0; i < (ac+2); i++)
         Tcl_DecrRefCount(av[i]);
 
-    return self;
+    return x;
 
 error:
     tclpd_interp_error(TCL_ERROR);
@@ -110,27 +116,45 @@ error:
         if(!av[i]) break;
         Tcl_DecrRefCount(av[i]);
     }
-    pd_free((t_pd*)self);
+    pd_free((t_pd*)x);
     return 0;
 }
 
-void tclpd_free(t_tcl* self) {
-    Tcl_DecrRefCount(self->self);
+void tclpd_free(t_tcl* x) {
+    // build destructor command
+    Tcl_Obj *sym = Tcl_NewStringObj(Tcl_GetStringFromObj(x->classname, NULL), -1);
+    Tcl_AppendToObj(sym, "_destructor", -1);
+    Tcl_Obj *av[2]; InitArray(av, 2, NULL);
+    av[0] = sym;
+    Tcl_IncrRefCount(av[0]);
+    av[1] = x->self;
+    Tcl_IncrRefCount(av[1]);
+    // call destructor
+    if(Tcl_EvalObjv(tcl_for_pd, 2, av, 0) != TCL_OK) {
+#ifdef DEBUG
+        post("tclpd_free: failed");
+#endif
+    }
+    Tcl_DecrRefCount(av[0]);
+    Tcl_DecrRefCount(av[1]);
+
+    Tcl_DecrRefCount(x->self);
+    Tcl_DecrRefCount(x->classname);
 #ifdef DEBUG
     post("tclpd_free called");
 #endif
 }
 
-void tclpd_anything(t_tcl* self, t_symbol* s, int ac, t_atom* at) {
-    tclpd_inlet_anything(self, 0, s, ac, at);
+void tclpd_anything(t_tcl* x, t_symbol* s, int ac, t_atom* at) {
+    tclpd_inlet_anything(x, 0, s, ac, at);
 }
 
-void tclpd_inlet_anything(t_tcl* self, int inlet, t_symbol* s, int ac, t_atom* at) {
+void tclpd_inlet_anything(t_tcl* x, int inlet, t_symbol* s, int ac, t_atom* at) {
     // proxy method - format: <self> <inlet#> <selector> ...
     Tcl_Obj* av[ac+3]; InitArray(av, ac+3, NULL);
     int result;
 
-    av[0] = self->self;
+    av[0] = x->self;
     Tcl_IncrRefCount(av[0]);
     av[1] = Tcl_NewIntObj(inlet);
     Tcl_IncrRefCount(av[1]);
@@ -179,6 +203,10 @@ t_tcl* tclpd_get_instance(const char* objectSequentialId) {
     return (t_tcl*)object_table[objectSequentialId];
 }
 
+t_pd* tclpd_get_instance_pd(const char* objectSequentialId) {
+    return (t_pd*)object_table[objectSequentialId];
+}
+
 t_object* tclpd_get_object(const char* objectSequentialId) {
     t_tcl* x = tclpd_get_instance(objectSequentialId);
     return &x->o;
@@ -187,6 +215,15 @@ t_object* tclpd_get_object(const char* objectSequentialId) {
 t_pd* tclpd_get_object_pd(const char* objectSequentialId) {
     t_object* o = tclpd_get_object(objectSequentialId);
     return &o->ob_pd;
+}
+
+t_glist* tclpd_get_glist(const char* objectSequentialId) {
+    t_tcl* x = tclpd_get_instance(objectSequentialId);
+    return x->x_glist;
+}
+
+t_symbol* null_symbol() {
+    return (t_symbol*)0;
 }
 
 void poststring2 (const char *s) {

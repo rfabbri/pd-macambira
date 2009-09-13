@@ -1,5 +1,4 @@
 TODO-list for tclpd (most important things first)
 =================================================
-- add support for send/receive symbols (pd_bind?)
-- add support for properties function
 - add (or check) GOP
+- signal externals? (really?)
