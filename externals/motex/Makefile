@@ -104,7 +104,7 @@ install-doc:
 	install -m644 -p LICENCE $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
 
 install-exec:
-	install -d $(objectsdir)/$(LIBRARY_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 

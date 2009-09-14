@@ -107,7 +107,7 @@ install-doc:
 	install -m644 -p CHANGES $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/CHANGES.txt
 
 install-exec:
-	install -d $(objectsdir)/$(LIBRARY_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 
