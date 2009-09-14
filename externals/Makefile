@@ -673,7 +673,7 @@ ext13:
 	make -C $(externals_src)/ext13
 
 ext13_install:
-	make -C $(externals_src)/ext13 objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/ext13 DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 ext13_clean:
 	make -C $(externals_src)/ext13 clean
@@ -1769,7 +1769,7 @@ motex:
 	make -C $(externals_src)/motex
 
 motex_install:
-	make -C $(externals_src)/motex objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/motex DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 motex_clean:
 	make -C $(externals_src)/motex clean
