@@ -47,10 +47,8 @@ gotone:
     strncat(filename, nameptr, MAXPDSTRING-strlen(filename));
     filename[MAXPDSTRING-1] = 0;
 
-    // load tcl:
-    char b[MAXPDSTRING+10];
-    snprintf(&b[0], MAXPDSTRING+10, "source %s", filename);
-    int result = Tcl_Eval(tcl_for_pd, b);
+    // load tcl external:
+    int result = Tcl_EvalFile(tcl_for_pd, filename);
     if(result == TCL_OK) {
         post("Tcl loader: loaded %s", filename);
     } else {
