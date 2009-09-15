@@ -95,7 +95,7 @@ AC_CANONICAL_HOST
 case "$host" in
  	*-linux*)
 		  EXTENSION=pd_linux
-		  LDFLAGS="$LDFLAGS -export_dynamic -shared"
+		  LDFLAGS="$LDFLAGS -Wl,--export-dynamic -shared"
 		  ;;
  	*-mingw*)
 		  CFLAGS="$CFLAGS -mms-bitfields"
