@@ -115,8 +115,8 @@ deb: $(bindir)
 	install -d $(DESTDIR)/usr/share/emacs/site-lisp/
 	install -p $(scripts_src)/pd-mode.el $(DESTDIR)/usr/share/emacs/site-lisp/
 # Pd-related scripts
-	install -p $(scripts_src)/pd-diff $(bindir)
-	install -p $(scripts_src)/config-switcher.sh $(bindir)
+	install -p $(scripts_src)/pd-diff $(DESTDIR)$(bindir)
+	install -p $(scripts_src)/config-switcher.sh $(DESTDIR)$(bindir)
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
