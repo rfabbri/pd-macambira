@@ -1,6 +1,39 @@
 #include "tcl_extras.h"
 #include <string.h>
 
+void tclpd_guiclass_motion(t_tcl* x, t_floatarg dx, t_floatarg dy) {
+    Tcl_Obj* av[5]; InitArray(av, 5, NULL);
+    int tmp[4], i, length;
+    av[0] = x->self;
+    Tcl_IncrRefCount(av[0]);
+    av[1] = Tcl_NewStringObj("widgetbehavior", -1);
+    Tcl_IncrRefCount(av[1]);
+    av[2] = Tcl_NewStringObj("motion", -1);
+    Tcl_IncrRefCount(av[2]);
+    av[3] = Tcl_NewDoubleObj(dx);
+    Tcl_IncrRefCount(av[3]);
+    av[4] = Tcl_NewDoubleObj(dy);
+    Tcl_IncrRefCount(av[4]);
+    int result = Tcl_EvalObjv(tcl_for_pd, 5, av, 0);
+    if(result != TCL_OK) {
+        tclpd_interp_error(result);
+        goto error;
+    }
+    goto cleanup;
+error:
+cleanup:
+    Tcl_DecrRefCount(av[0]);
+    Tcl_DecrRefCount(av[1]);
+    Tcl_DecrRefCount(av[2]);
+    Tcl_DecrRefCount(av[3]);
+    Tcl_DecrRefCount(av[4]);
+}
+
+void tclpd_guiclass_grab(t_tcl* x, t_glist* glist, int xpix, int ypix) {
+    glist_grab(glist, &x->o.te_g, (t_glistmotionfn)tclpd_guiclass_motion, 0, \
+        (t_floatarg)xpix, (t_floatarg)ypix);
+}
+
 int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shift, int alt, int dbl, int doit) {
     Tcl_Obj* av[9]; InitArray(av, 9, NULL);
     Tcl_Obj* o = NULL;
@@ -52,6 +85,8 @@ cleanup:
     Tcl_DecrRefCount(av[6]);
     Tcl_DecrRefCount(av[7]);
     Tcl_DecrRefCount(av[8]);
+
+    // return value (BOOL) means 'object wants to be clicked' (g_editor.c:1270)
     return i;
 }
 

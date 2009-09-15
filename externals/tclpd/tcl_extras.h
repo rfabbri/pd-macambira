@@ -80,6 +80,8 @@ void tclpd_guiclass_activate(t_gobj* z, t_glist* glist, int state);
 void tclpd_guiclass_delete(t_gobj* z, t_glist* glist);
 void tclpd_guiclass_vis(t_gobj* z, t_glist* glist, int vis);
 int tclpd_guiclass_click(t_gobj* z, t_glist* glist, int xpix, int ypix, int shift, int alt, int dbl, int doit);
+void tclpd_guiclass_motion(t_tcl* x, t_floatarg dx, t_floatarg dy);
+void tclpd_guiclass_grab(t_tcl* x, t_glist* glist, int xpix, int ypix);
 
 /* tcl_loader.cxx */
 extern "C" int tclpd_do_load_lib(t_canvas* canvas, char* objectname);
