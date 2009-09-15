@@ -2,21 +2,28 @@ source pdlib.tcl
 
 set ::script_path [file dirname [info script]]
 
-pd::guiproc bitmap_draw_new {self c x y sz w h data} {
+pd::guiproc bitmap_draw_new {self c x y config data} {
+    set w [dict get $config -uwidth]
+    set h [dict get $config -uheight]
+    set sz [dict get $config -cellsize]
+    set fgcolor [dict get $config -fgcolor]
+    set bgcolor [dict get $config -bgcolor]
+    set colors [list $bgcolor $fgcolor]
     set z 0
     for {set i 0} {$i < $h} {incr i} {
         for {set j 0} {$j < $w} {incr j} {
             $c create rectangle \
                 [expr {0+$x+$j*$sz}] [expr {0+$y+$i*$sz}] \
                 [expr {1+$x+($j+1)*$sz}] [expr {1+$y+($i+1)*$sz}] \
-                -outline black -fill [lindex {white black} [lindex $data $z]] \
+                -outline $fgcolor -fill [lindex $colors [lindex $data $z]] \
                 -tags [list $self cell_${j}_${i}_$self]
             incr z
         }
     }
     set x2 [expr {$x+$w*$sz+1}]
     set y2 [expr {$y+$h*$sz+1}]
-    $c create rectangle $x $y $x2 $y2 -outline black -tags [list $self border$self]
+    $c create rectangle $x $y $x2 $y2 \
+        -outline $fgcolor -tags [list $self border$self]
 }
 
 pd::guiclass bitmap {
@@ -28,8 +35,8 @@ pd::guiclass bitmap {
 
         # set defaults:
         set @config [list]
-        lappend @config -width 8
-        lappend @config -height 8
+        lappend @config -uwidth 8
+        lappend @config -uheight 8
         lappend @config -cellsize 16
         lappend @config -label ""
         lappend @config -labelpos "top"
@@ -44,11 +51,25 @@ pd::guiclass bitmap {
             0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
             0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
         }
+        # expanded ($n) send/recv symbols:
+        set @send {}
+        set @recv {}
 
         ::$self 0 config {*}$args
 
         set @rcvLoadData {#bitmap}
         pd_bind [tclpd_get_instance_pd $self] [gensym $@rcvLoadData]
+    }
+
+    destructor {
+        set pdself [tclpd_get_instance_pd $self]
+        if {$@rcvLoadData != {}} {
+            #should not happen!
+            pd_unbind $pdself [gensym $@rcvLoadData]
+        }
+        if {[dict get $@config -receivesymbol] != {}} {
+            pd_unbind $pdself $@recv
+        }
     }
 
     0_config {
@@ -65,17 +86,17 @@ pd::guiclass bitmap {
                 }
                 incr i
                 set v [lindex $optlist $i]
-                if {[lsearch -exact {-width -height -cellsize} $k] != -1} {
+                if {[lsearch -exact {-uwidth -uheight -cellsize} $k] != -1} {
                     set v [expr {int($v)}]
                 }
                 dict set newconf $k $v
                 incr i
             }
-            if {[dict get $@config -width] != [dict get $newconf -width] ||
-                [dict get $@config -height] != [dict get $newconf -height]} {
+            if {[dict get $@config -uwidth] != [dict get $newconf -uwidth] ||
+                [dict get $@config -uheight] != [dict get $newconf -uheight]} {
                 $self 0 resize {*}[pd::add_selectors [list \
-                    [dict get $newconf -width] \
-                    [dict get $newconf -height] \
+                    [dict get $newconf -uwidth] \
+                    [dict get $newconf -uheight] \
                     ]]
             }
             set ui 0
@@ -89,14 +110,32 @@ pd::guiclass bitmap {
                     }
                 }
             }
+            foreach opt {sendsymbol receivesymbol} {
+                set old [dict get $@config -$opt]
+                if {[dict exists $newconf -$opt]} {
+                    set new [dict get $newconf -$opt]
+                    if {$old != $new} {
+                        if {$opt == "receivesymbol"} {
+                            set selfpd [tclpd_get_instance_pd $self]
+                            if {$old != {}} {
+                                pd_unbind $selfpd $@recv
+                            }
+                            if {$new != {}} {
+                                set @recv [canvas_realizedollar \
+                                    [tclpd_get_glist $self] [gensym $new]]
+                                pd_bind $selfpd $@recv
+                            } else {
+                                set @recv {}
+                            }
+                        }
+                        dict set @config -$opt $new
+                    }
+                }
+            }
             if {$ui && [info exists @c]} {
                 sys_gui [list $@c delete $self]\n
                 sys_gui [list bitmap_draw_new $self \
-                    $@c $@x $@y \
-                    [dict get $@config -cellsize] \
-                    [dict get $@config -width] \
-                    [dict get $@config -height] \
-                    $@data]\n
+                    $@c $@x $@y $@config $@data]\n
             }
         }
     }
@@ -104,27 +143,27 @@ pd::guiclass bitmap {
     0_resize {
         set w [pd::arg 0 int]
         set h [pd::arg 1 int]
-        set oldw [dict get $@config -width]
-        set oldh [dict get $@config -height]
+        set oldw [dict get $@config -uwidth]
+        set oldh [dict get $@config -uheight]
         set newd {}
         for {set y 0} {$y < $h} {incr y} {
             for {set x 0} {$x < $w} {incr x} {
                 if {$x < $oldw && $y < $oldh} {
-                    lappend newd [lindex $d [expr {$y*$oldw+$x}]]
+                    lappend newd [lindex $@data [expr {$y*$oldw+$x}]]
                 } else {
                     lappend newd 0
                 }
             }
         }
-        dict set @config -width $w
-        dict set @config -height $h
+        dict set @config -uwidth $w
+        dict set @config -uheight $h
         set @data $newd
     }
 
     0_getrow {
         set r [list]
         set n [pd::arg 0 int]
-        set w [dict get $@config -width]
+        set w [dict get $@config -uwidth]
         for {set i [expr {$n*$w}]} {$i < [expr {($n+1)*$w}]} {incr i} {
             lappend r [list float [lindex $@data $i]]
         }
@@ -134,8 +173,8 @@ pd::guiclass bitmap {
     0_getcol {
         set r [list]
         set n [pd::arg 0 int]
-        set w [dict get $@config -width]
-        set h [dict get $@config -height]
+        set w [dict get $@config -uwidth]
+        set h [dict get $@config -uheight]
         for {set i [expr {$n}]} {$i < [expr {$w*$h}]} {incr i $w} {
             lappend r [list float [lindex $@data $i]]
         }
@@ -145,7 +184,7 @@ pd::guiclass bitmap {
     0_getcell {
         set r [pd::arg 0 int]
         set c [pd::arg 1 int]
-        set w [dict get $@config -width]
+        set w [dict get $@config -uwidth]
         pd::outlet $self 0 float [lindex $@data [expr {$r*$w+$c}]]
     }
 
@@ -153,12 +192,15 @@ pd::guiclass bitmap {
         set row [pd::arg 0 int]
         set z 1
         set col 0
-        set w [dict get $@config -width]
+        set w [dict get $@config -uwidth]
+        set fgcolor [dict get $@config -fgcolor]
+        set bgcolor [dict get $@config -bgcolor]
+        set colors [list $bgcolor $fgcolor]
         for {set idx [expr {$row*$w}]} {$idx < [expr {($row+1)*$w}]} {incr idx} {
             set d [expr {0!=[pd::arg $z int]}]
             lset @data $idx $d
             sys_gui [list $@c itemconfigure cell_${col}_${row}_$self \
-                -fill [lindex {white black} $d]]\n
+                -fill [lindex $colors $d]]\n
             incr z
             incr col
         }
@@ -168,13 +210,16 @@ pd::guiclass bitmap {
         set col [pd::arg 0 int]
         set z 1
         set row 0
-        set w [dict get $@config -width]
-        set h [dict get $@config -height]
+        set w [dict get $@config -uwidth]
+        set h [dict get $@config -uheight]
+        set fgcolor [dict get $@config -fgcolor]
+        set bgcolor [dict get $@config -bgcolor]
+        set colors [list $bgcolor $fgcolor]
         for {set idx [expr {$col}]} {$idx < [expr {$w*$h}]} {incr idx $w} {
             set d [expr {0!=[pd::arg $z int]}]
             lset @data $idx $d
             sys_gui [list $@c itemconfigure cell_${col}_${row}_$self \
-                -fill [lindex {white black} $d]]\n
+                -fill [lindex $colors $d]]\n
             incr z
             incr row
         }
@@ -184,18 +229,21 @@ pd::guiclass bitmap {
         set r [pd::arg 0 int]
         set c [pd::arg 1 int]
         set d [expr {0!=[pd::arg 2 int]}]
-        set w [dict get $@config -width]
+        set w [dict get $@config -uwidth]
+        set fgcolor [dict get $@config -fgcolor]
+        set bgcolor [dict get $@config -bgcolor]
+        set colors [list $bgcolor $fgcolor]
         set idx [expr {$r*$w+$c}]
         lset @data $idx $d
         sys_gui [list $@c itemconfigure cell_${r}_${c}_$self \
-            -fill [lindex {white black} $d]]\n
+            -fill [lindex $colors $d]]\n
     }
 
     0_setdata {
         set d [pd::strip_selectors $args]
         set l [llength $d]
-        set w [dict get $@config -width]
-        set h [dict get $@config -height]
+        set w [dict get $@config -uwidth]
+        set h [dict get $@config -uheight]
         if {$l != $w*$h} {
             return -code error "bad data size"
         }
@@ -213,14 +261,17 @@ pd::guiclass bitmap {
     }
 
     object_properties {
-        sys_gui [list propertieswindow .prop:$self \
-            $@config {Bitmap properties}]\n
+        set title "\[bitmap\] properties"
+        set x_xobj_obpd [tclpd_get_object_pd $self]
+        set x [tclpd_get_instance $self]
+        set buf [list propertieswindow %s $@config $title]\n
+        gfxstub_new $x_xobj_obpd $x $buf
     }
 
     widgetbehavior_getrect {
         lassign $args x1 y1
-        set w [dict get $@config -width]
-        set h [dict get $@config -height]
+        set w [dict get $@config -uwidth]
+        set h [dict get $@config -uheight]
         set sz [dict get $@config -cellsize]
         set x2 [expr {1+$x1+$w*$sz}]
         set y2 [expr {1+$y1+$h*$sz}]
@@ -240,8 +291,12 @@ pd::guiclass bitmap {
 
     widgetbehavior_select {
         set sel [lindex $args 0]
+        set fgcolor [dict get $@config -fgcolor]
+        set bgcolor [dict get $@config -bgcolor]
+        set selcolor "blue"
+        set colors [list $selcolor $fgcolor]
         sys_gui [list $@c itemconfigure $self \
-            -outline [lindex {black blue} $sel]]\n
+            -outline [lindex $colors $sel]]\n
     }
 
     widgetbehavior_activate {
@@ -252,21 +307,23 @@ pd::guiclass bitmap {
         set @x [lindex $args 1]
         set @y [lindex $args 2]
         set vis [lindex $args 3]
-        set w [dict get $@config -width]
-        set h [dict get $@config -height]
+        set w [dict get $@config -uwidth]
+        set h [dict get $@config -uheight]
         set sz [dict get $@config -cellsize]
         if {$vis} {
-            sys_gui [list bitmap_draw_new $self \
-                $@c $@x $@y $sz $w $h $@data ]\n
+            sys_gui [list bitmap_draw_new $self $@c $@x $@y $@config $@data]\n
         } else {
             sys_gui [list $@c delete $self]\n
         }
     }
 
     widgetbehavior_click {
-        set w [dict get $@config -width]
-        set h [dict get $@config -height]
+        set w [dict get $@config -uwidth]
+        set h [dict get $@config -uheight]
         set sz [dict get $@config -cellsize]
+        set fgcolor [dict get $@config -fgcolor]
+        set bgcolor [dict get $@config -bgcolor]
+        set colors [list $bgcolor $fgcolor]
         set xpix [expr {[lindex $args 0]-$@x-1}]
         set ypix [expr {[lindex $args 1]-$@y-1}]
         if {$xpix < 0 || $xpix >= $w*$sz} {return}
@@ -282,7 +339,7 @@ pd::guiclass bitmap {
             set d [expr {[lindex $@data $idx]==0}]
             lset @data $idx $d
             sys_gui [list $@c itemconfigure cell_${j}_${i}_$self \
-                -fill [lindex {white black} $d]]\n
+                -fill [lindex $colors $d]]\n
         }
     }
 }
