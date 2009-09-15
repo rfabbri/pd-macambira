@@ -14,26 +14,6 @@
 %ignore c_extern;
 %ignore c_addmess;
 
-/* functions that are only in Miller's pd, not in devel_0_39/DesireData */
-%ignore sys_idlehook;
-
-/* functions that are not supported by DesireData */
-%ignore class_getpropertiesfn;
-%ignore class_setpropertiesfn;
-%ignore class_getwidget;
-%ignore class_setwidget;
-%ignore sys_fontwidth;
-%ignore sys_fontheight;
-%ignore sys_queuegui;
-%ignore sys_unqueuegui;
-%ignore sys_pretendguibytes;
-%ignore class_setparentwidget;
-%ignore pd_getparentwidget;
-%ignore getzbytes;
-%ignore gfxstub_new;
-%ignore gfxstub_deleteforkey;
-%ignore glist_grab;
-
 /* functions that we can't auto-wrap, because they have varargs */
 %ignore post;
 %ignore class_new;
