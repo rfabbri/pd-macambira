@@ -116,12 +116,13 @@ namespace eval ::pd {
         # class level dispatcher (sort of class constructor)
         proc ::$classname {self args} "
             if \$::verbose {::pd::post \[info level 0\]}
-            ::${classname}_constructor \$self {*}\$args
-            # object dispatcher
+            # define object dispatcher:
             proc ::\$self {inlet selector args} \"
              if \\\$::verbose {::pd::post \\\[info level 0\\\]}
              ::pd::call_classmethod $classname \$self \\\$inlet \\\$selector {*}\\\$args
             \"
+            # call constructor:
+            ::${classname}_constructor \$self {*}\$args
             return \$self
         "
 
@@ -199,6 +200,41 @@ namespace eval ::pd {
         } else {
             return $defval
         }
+    }
+
+    proc strip_selectors {pdlist} {
+        set r {}
+        foreach atom $pdlist {
+            if {[llength $atom] != 2} {
+                return -code error "Malformed pd list!"
+            }
+            lappend r [lindex $atom 1]
+        }
+        return $r
+    }
+
+    proc add_selectors {tcllist} {
+        set r {}
+        foreach i $tcllist {
+            lappend r [list [lindex {float symbol} [catch {expr $i}]] $i]
+        }
+        return $r
+    }
+
+    proc strip_empty {tcllist} {
+        set r {}
+        foreach i $tcllist {
+            if {$i == "empty"} {lappend r {}} {lappend r $i}
+        }
+        return $r
+    }
+
+    proc add_empty {tcllist} {
+        set r {}
+        foreach i $tcllist {
+            if {$i == {}} {lappend r "empty"} {lappend r $i}
+        }
+        return $r
     }
 
     # mechanism for uploading procs to gui interp, without the hassle of escaping [encoder]
