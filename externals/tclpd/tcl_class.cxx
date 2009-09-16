@@ -16,7 +16,8 @@ t_class* tclpd_class_new(const char* name, int flags) {
 
     class_table[string(name)] = c;
     class_addanything(c, tclpd_anything);
-
+    class_addmethod(c, (t_method)tclpd_loadbang, gensym("loadbang"), A_NULL);
+    
     // always set save function. it will call the default if
     // none exists in tcl space.
     class_setsavefn(c, tclpd_save);
@@ -186,6 +187,10 @@ error:
         Tcl_DecrRefCount(av[i]);
     }
     return;
+}
+
+void tclpd_loadbang(t_tcl* x) {
+    tclpd_inlet_anything(x, 0, gensym("loadbang"), 0, NULL);
 }
 
 /* Tcl glue: */
