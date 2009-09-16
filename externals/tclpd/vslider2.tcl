@@ -1,3 +1,5 @@
+package require Tclpd 0.2.1
+
 source pdlib.tcl
 
 set ::script_path [file dirname [info script]]

@@ -39,6 +39,7 @@ void tclpd_setup(void) {
 
     Tcl_SetVar(tcl_for_pd, "DIR", dirresult, 0);
     Tcl_Eval(tcl_for_pd, "set auto_path [linsert $auto_path $DIR]");
+    Tcl_Eval(tcl_for_pd, "package provide Tclpd " TCLPD_VERSION);
 
     if(Tcl_Eval(tcl_for_pd, "source $DIR/tcl.tcl") == TCL_OK) {
         post("Tcl loader: loaded %s/tcl.tcl", dirresult);
