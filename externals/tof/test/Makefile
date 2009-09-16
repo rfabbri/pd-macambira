@@ -14,7 +14,7 @@ clean:
 
 .SUFFIXES: .pd_linux
 
-PDPATH = /home/tom/src/pure-data/pd
+PDPATH = ../../../pd
 
 TOFPATH = ../src
 
