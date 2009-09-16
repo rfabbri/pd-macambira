@@ -1,0 +1,103 @@
+#N canvas 1027 43 1018 689 10;
+#X obj 42 514 dac~;
+#X obj 47 192 nbx 5 14 -1e+37 1e+37 0 0 /wow/OSC1/freq /wow/OSC1/freq_
+/wow/OSC1/freq 0 -8 0 10 -262144 -1 -1 320 256;
+#X obj 161 190 hsl 128 15 0 1 0 0 /wow/OSC1/amp /wow/OSC1/amp_ /wow/OSC1/amp
+-2 -8 0 10 -262144 -1 -1 0 1;
+#X obj 49 231 nbx 5 14 -1e+37 1e+37 0 0 /wow/OSC2/freq /wow/OSC2/freq_
+/wow/OSC2/freq 0 -8 0 10 -262144 -1 -1 400 256;
+#X obj 163 229 hsl 128 15 0 1 0 0 /wow/OSC2/amp /wow/OSC2/amp_ /wow/OSC2/amp
+-2 -8 0 10 -262144 -1 -1 0 1;
+#X obj 387 215 print PARAM;
+#X floatatom 52 304 5 0 0 0 - - -;
+#X msg 52 334 /OSC1/freq \$1;
+#X obj 387 187 spigot;
+#X obj -23 22 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
+0;
+#X text -18 74 author: mrtoftrash@gmail.com;
+#X text -19 95 version: 2009-04-14 (initial release);
+#X obj 480 172 tgl 15 0 empty empty listen 17 7 0 10 -262144 -1 -1
+0 1;
+#X text -18 21 description: param is a state saving and message routing
+system.;
+#X obj 387 160 receive PARAM;
+#X text 544 140 -- listening stream --;
+#X text 586 266 -- saving and loading --;
+#X text 11 248 Open the properties dialog of the above gui objects
+to examine how they are linked to the abstraction below.;
+#X floatatom 73 453 5 0 0 0 - - -;
+#X obj 52 475 *~ 0;
+#X obj 73 401 loadbang;
+#N canvas 0 0 450 300 more_about_hierachy 0;
+#X restore 607 532 pd more_about_hierachy;
+#X obj 49 158 hsl 128 15 0 1 0 0 /masterVolume /masterVolume_ /masterVolume
+-2 -8 0 10 -262144 -1 -1 1270 1;
+#X text 605 488 -- the /ID keyword --;
+#X text 107 124 -- example --;
+#X text 468 202 You can "listen" to the param "stream" by receiving
+PARAM messages. Enable(click) the "listen" toggle then change the value
+of some the example's sliders or number boxes to print out this stream.
+;
+#X text 531 461 -- implementing params in your own abstractions --
+;
+#X text 606 508 -- default values --;
+#X text 528 433 DOCUMENTATION TODO:;
+#X obj 685 598 paramDump;
+#X obj 685 571 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 685 626 print;
+#X text 121 553 -- linking with OSC and MIDI --;
+#X text -19 53 tags: state routing gui;
+#X msg 771 560 values /wow;
+#X msg 772 584 values /;
+#X msg 802 509 values *;
+#X msg 586 595 ------;
+#X msg 797 617 guis *;
+#X msg 801 643 guis /;
+#X obj 492 528 paramGui;
+#X floatatom 180 404 5 0 0 0 - - -;
+#X obj 581 61 ./examples/param-generator /id me;
+#X obj 492 497 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 73 430 param /masterVolume 0 /gui slider 0 1;
+#X msg 520 495 /wow;
+#X msg 615 643 guis /wow;
+#X obj 422 366 print yeah;
+#X msg 170 327 save;
+#X msg 621 25 save;
+#X msg 810 79 save;
+#X obj 742 116 paramRoute;
+#X obj 52 365 examples/param-synth /id wow /OSC1/freq 320;
+#X obj 399 339 param /t_test 0 /gui tgl;
+#X obj 32 587 OSCToParam 7493;
+#X text 134 583 OSCToParam can send all icomming OSC message to matching
+parameters. For example \, the OSC message '/masterVolume 0.56' on
+port 7493 will be forwarded to the parameter '/masterVolume' that will
+then take the value '0.56'.;
+#X connect 6 0 7 0;
+#X connect 7 0 52 0;
+#X connect 8 0 5 0;
+#X connect 12 0 8 1;
+#X connect 14 0 8 0;
+#X connect 18 0 19 1;
+#X connect 19 0 0 0;
+#X connect 19 0 0 1;
+#X connect 20 0 44 0;
+#X connect 29 0 31 0;
+#X connect 30 0 29 0;
+#X connect 34 0 29 0;
+#X connect 35 0 29 0;
+#X connect 36 0 29 0;
+#X connect 37 0 31 0;
+#X connect 38 0 29 0;
+#X connect 39 0 29 0;
+#X connect 41 0 44 0;
+#X connect 43 0 40 0;
+#X connect 44 0 18 0;
+#X connect 45 0 40 0;
+#X connect 46 0 29 0;
+#X connect 48 0 52 0;
+#X connect 49 0 42 0;
+#X connect 50 0 51 0;
+#X connect 52 0 19 0;
+#X connect 53 0 47 0;

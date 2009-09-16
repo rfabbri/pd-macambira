@@ -1,0 +1,4 @@
+#N canvas 452 316 450 300 10;
+#X obj 88 46 oscx/dumpOSC \$1;
+#X obj 89 149 maxlib/remote;
+#X connect 0 0 1 0;
