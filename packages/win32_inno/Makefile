@@ -66,40 +66,46 @@ prebuilt_install: pddplink_hack
 
 bin_src = /usr/local/bin
 system32 = /c/WINDOWS/system32
-# ultimately, the DLLs should be installed in %SystemRoot%\system32 by InnoSetup
-dlldir =  $(DESTDIR)$(prefix)/
-#dlldir = $(bindir)
 lib_install:
-# these get installed into %SystemRoot%\system32 by the installer
-	install -d $(dlldir)
-	install -p $(bin_src)/libfftw3-3.dll  $(dlldir)
-	install -p $(bin_src)/libfftw3f-3.dll  $(dlldir)
-	install -p $(bin_src)/libogg-0.dll  $(dlldir)
-	install -p $(bin_src)/libsndfile-1.dll  $(dlldir)
-	install -p $(bin_src)/libvorbis-0.dll  $(dlldir)
-	install -p $(bin_src)/libvorbisenc-2.dll  $(dlldir)
-	install -p $(bin_src)/libvorbisfile-3.dll  $(dlldir)
-	install -p $(bin_src)/lua51.dll  $(dlldir)
-	install -p $(bin_src)/pthreadGC2.dll  $(dlldir)
+# ultimately, the DLLs should be installed in %SystemRoot%\system32 by
+# InnoSetup since they are 'officially' named and versioned DLLs, and can be
+# shared between apps
+	install -d $(DESTDIR)$(prefix)/
+	install -p $(bin_src)/libfftw3-3.dll  $(DESTDIR)$(prefix)/
+	install -p $(bin_src)/libfftw3f-3.dll  $(DESTDIR)$(prefix)/
+	install -p $(bin_src)/libogg-0.dll  $(DESTDIR)$(prefix)/
+	install -p $(bin_src)/libsndfile-1.dll  $(DESTDIR)$(prefix)/
+	install -p $(bin_src)/libvorbis-0.dll  $(DESTDIR)$(prefix)/
+	install -p $(bin_src)/libvorbisenc-2.dll  $(DESTDIR)$(prefix)/
+	install -p $(bin_src)/libvorbisfile-3.dll  $(DESTDIR)$(prefix)/
+	install -p $(bin_src)/lua51.dll          $(DESTDIR)$(prefix)/
+	install -p $(bin_src)/pthreadGC2.dll     $(DESTDIR)$(prefix)/
 # these stay with pd.exe
-	install -p $(bin_src)/tcl85.dll  $(bindir)
-	install -p $(bin_src)/tclpip85.dll  $(bindir)
-	install -p $(bin_src)/tk85.dll  $(bindir)
-# if these are there, install them
-	-install -p $(system32)/msvcp71.dll $(dlldir)
-	-install -p $(system32)/msvcr71.dll $(dlldir)
-	-install -p $(system32)/pthreadVC.dll $(dlldir)
+	install -d $(DESTDIR)$(bindir)
+	install -p $(bin_src)/tcl85.dll     $(DESTDIR)$(bindir)
+	install -p $(bin_src)/tclpip85.dll  $(DESTDIR)$(bindir)
+	install -p $(bin_src)/tk85.dll      $(DESTDIR)$(bindir)
+# if these are installed, include them in the build root
+	-install -p $(system32)/msvcp71.dll   $(DESTDIR)$(bindir)
+	-install -p $(system32)/msvcr71.dll   $(DESTDIR)$(bindir)
+	-install -p $(system32)/pthreadVC.dll $(DESTDIR)$(bindir)
 # these go into the Pd package's lib dir
+	install -d $(DESTDIR)$(libdir)/tcl8
+	cp -rp /usr/local/lib/tcl8/* $(DESTDIR)$(libdir)/tcl8
 	install -d $(DESTDIR)$(libdir)/tcl8.5
-	cp -r /usr/local/lib/tcl8.5/* $(DESTDIR)$(libdir)/tcl8.5
+	cp -rp /usr/local/lib/tcl8.5/* $(DESTDIR)$(libdir)/tcl8.5
 	install -d $(DESTDIR)$(libdir)/tk8.5
-	cp -r /usr/local/lib/tk8.5/* $(DESTDIR)$(libdir)/tk8.5
+	cp -rp /usr/local/lib/tk8.5/* $(DESTDIR)$(libdir)/tk8.5
+	install -d $(DESTDIR)$(libdir)/dde1.3
+	cp -rp /usr/local/lib/dde1.3/* $(DESTDIR)$(libdir)/dde1.3
+	install -d $(DESTDIR)$(libdir)/reg1.2
+	cp -rp /usr/local/lib/reg1.2/* $(DESTDIR)$(libdir)/reg1.2
 
 
 exe_install:
-	install -d $(bindir)
-	install -p $(bin_src)/wish85.exe  $(bindir)
-	install -p $(bin_src)/tclsh85.exe  $(bindir)
+	install -d $(DESTDIR)$(bindir)
+	install -p $(bin_src)/wish85.exe  $(DESTDIR)$(bindir)
+	install -p $(bin_src)/tclsh85.exe  $(DESTDIR)$(bindir)
 
 
 # on Windows, the pddp tcl files need to be in pd/lib aka $(libdir)
