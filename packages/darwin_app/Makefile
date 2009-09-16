@@ -136,8 +136,8 @@ spotlight_importer_install:
 
 # tigital's Gem window focus black magic
 rez_install:
-	install -pv "$(CWD)/mac.r" "$(bindir)"
-	cd $(bindir) && /Developer/Tools/Rez -t APPL mac.r -o pd
+	install -pv "$(CWD)/mac.r" "$(DESTDIR)$(bindir)"
+	cd "$(DESTDIR)$(bindir)" && /Developer/Tools/Rez -t APPL mac.r -o pd
 
 
 # switch Linux-only pdp_v4l to Mac-only pdp_ieee1394
