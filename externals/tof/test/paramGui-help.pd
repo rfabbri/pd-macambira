@@ -1,0 +1,35 @@
+#N canvas 228 199 663 465 10;
+#X obj 34 424 paramGui;
+#X obj -13 32 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
+0;
+#X text -8 84 author: mrtoftrash@gmail.com;
+#X text -9 105 version: 2009-04-14 (initial release);
+#X text -8 31 description: builds interfaces out of pd guis for params.
+;
+#X text -9 63 tags: param gui;
+#X obj 34 338 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 52 221 param /pGUIexample 0 /gui nbx;
+#X floatatom 52 242 5 0 0 0 - - -;
+#X text -10 152 gui flag: when creating a param object \, you can append
+a gui flag (/gui) that will indicate the type of pd object that will
+be created and linked to that param. For example \, the following will
+create a number box:;
+#X text 388 215 Current /gui options:;
+#X text 390 238 /gui nbx;
+#X text 390 253 /gui bng;
+#X text 391 288 /gui hsl (min) (max);
+#X text 391 270 /gui tgl;
+#X text 389 305 /gui symbolatom;
+#X msg 65 357 /;
+#X text 55 337 Bang: build guis for all params that have a gui flag.
+;
+#X text 93 357 /: builds guis for all params that have a gui flag and
+that are at the root level.;
+#X msg 91 390 /id;
+#X text 125 390 /(id): builds guis for all params that have a gui flag
+and that are inside the abstraction with this id.;
+#X connect 6 0 0 0;
+#X connect 7 0 8 0;
+#X connect 16 0 0 0;
+#X connect 19 0 0 0;

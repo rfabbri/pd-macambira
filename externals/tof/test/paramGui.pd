@@ -1,5 +1,5 @@
-#N canvas 1027 19 997 713 10;
-#N canvas 417 395 450 315 \$0target 1;
+#N canvas 1027 0 997 713 10;
+#N canvas 417 395 450 315 \$0target 0;
 #X text 0 0 Please Copy and Paste;
 #X obj 0 20 hsl 100 15 0 1 0 0 /me/amp /me/amp_ /me/amp 105 7 0 10
 -262144 -1 -1 0 1;
