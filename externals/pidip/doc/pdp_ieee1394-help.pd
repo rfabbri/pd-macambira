@@ -50,7 +50,7 @@ capture object for linux;
 #X text 708 174 setting video standard;
 #X msg 638 197 norm SECAM;
 #X msg 639 221 norm NTSC;
-#X obj 535 303 pdp_xv;
+#X obj 535 303 pdp_glx;
 #X connect 0 0 26 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;

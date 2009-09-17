@@ -25,6 +25,7 @@
 #include "yuv.h"
 #include <math.h>
 #include <stdio.h>
+#include "g_canvas.h"
 
 static char   *pdp_binary_version = "pdp_binary: a image binarizer version 0.1 written by Yves Degoyon (ydegoyon@free.fr)";
 
@@ -43,6 +44,9 @@ typedef struct pdp_binary_struct
     int x_colorY; // YUV components of binary mask
     int x_colorU;
     int x_colorV;
+    int x_colorR; // RGB components of binary mask
+    int x_colorG;
+    int x_colorB;
     int x_cursX; // X position of the cursor
     int x_cursY; // Y position of the cursor
     int x_tolerance; // tolerance 
@@ -53,7 +57,25 @@ typedef struct pdp_binary_struct
     t_outlet *x_U;  // output U component of selected color
     t_outlet *x_V;  // output V component of selected color
 
+    t_canvas *x_canvas;
+
 } t_pdp_binary;
+
+static void pdp_binary_draw_color(t_pdp_binary *x)
+{
+ int width, height;
+ char color[32];
+
+    sprintf( color, "#%.2X%.2X%.2X", x->x_colorR, x->x_colorG, x->x_colorB );
+    width = rtext_width( glist_findrtext( (t_glist*)x->x_canvas, (t_text *)x ) );
+    height = rtext_height( glist_findrtext( (t_glist*)x->x_canvas, (t_text *)x ) );
+    sys_vgui(".x%x.c delete rectangle %xCOLOR\n", x->x_canvas, x );
+    sys_vgui(".x%x.c create rectangle %d %d %d %d -fill %s -tags %xCOLOR\n",
+             x->x_canvas, x->x_obj.te_xpix+width+5, x->x_obj.te_ypix,
+             x->x_obj.te_xpix+width+height+5,
+             x->x_obj.te_ypix+height, color, x );
+}
+
 
 static void pdp_binary_setcur(t_pdp_binary *x,  t_floatarg fpx, t_floatarg fpy  )
 {
@@ -66,28 +88,40 @@ static void pdp_binary_setcur(t_pdp_binary *x,  t_floatarg fpx, t_floatarg fpy  
 
 static void pdp_binary_y(t_pdp_binary *x, t_floatarg fy )
 {
-   if ( fy <= 255. )
+   if ( fy <= 255. && fy >= 0. )
    {
       x->x_colorY = (int)fy;
       outlet_float( x->x_Y, x->x_colorY );
+      x->x_colorR = yuv_YUVtoR( x->x_colorY, x->x_colorU, x->x_colorV );
+      x->x_colorG = yuv_YUVtoG( x->x_colorY, x->x_colorU, x->x_colorV );
+      x->x_colorB = yuv_YUVtoB( x->x_colorY, x->x_colorU, x->x_colorV );
+      if (glist_isvisible(x->x_canvas)) pdp_binary_draw_color( x );
    }
 }
 
 static void pdp_binary_u(t_pdp_binary *x, t_floatarg fu )
 {
-   if ( fu <= 255. )
+   if ( fu <= 255. && fu >= 0. )
    {
       x->x_colorU = (int)fu;
       outlet_float( x->x_U, x->x_colorU );
+      x->x_colorR = yuv_YUVtoR( x->x_colorY, x->x_colorU, x->x_colorV );
+      x->x_colorG = yuv_YUVtoG( x->x_colorY, x->x_colorU, x->x_colorV );
+      x->x_colorB = yuv_YUVtoB( x->x_colorY, x->x_colorU, x->x_colorV );
+      if (glist_isvisible(x->x_canvas)) pdp_binary_draw_color( x );
    }
 }
 
 static void pdp_binary_v(t_pdp_binary *x, t_floatarg fv )
 {
-   if ( fv < 255 )
+   if ( fv < 255 && fv >= 0. )
    {
       x->x_colorV = (int)fv;
       outlet_float( x->x_V, x->x_colorV );
+      x->x_colorR = yuv_YUVtoR( x->x_colorY, x->x_colorU, x->x_colorV );
+      x->x_colorG = yuv_YUVtoG( x->x_colorY, x->x_colorU, x->x_colorV );
+      x->x_colorB = yuv_YUVtoB( x->x_colorY, x->x_colorU, x->x_colorV );
+      if (glist_isvisible(x->x_canvas)) pdp_binary_draw_color( x );
    }
 }
 
@@ -130,6 +164,10 @@ static void pdp_binary_pick(t_pdp_binary *x)
       outlet_float( x->x_Y, x->x_colorY );
       outlet_float( x->x_V, x->x_colorV );
       outlet_float( x->x_U, x->x_colorU );
+      x->x_colorR = yuv_YUVtoR( x->x_colorY, x->x_colorU, x->x_colorV );
+      x->x_colorG = yuv_YUVtoG( x->x_colorY, x->x_colorU, x->x_colorV );
+      x->x_colorB = yuv_YUVtoB( x->x_colorY, x->x_colorU, x->x_colorV );
+      if (glist_isvisible(x->x_canvas)) pdp_binary_draw_color( x );
    }
 }
 
@@ -171,15 +209,19 @@ static void pdp_binary_process_yv12(t_pdp_binary *x)
         x->x_vsize = x->x_vwidth*x->x_vheight;
         pdp_binary_allocate( x ); 
         post( "pdp_binary : reallocated buffers" );
+        outlet_float( x->x_Y, x->x_colorY );
+        outlet_float( x->x_V, x->x_colorV );
+        outlet_float( x->x_U, x->x_colorU );
     }
 
     memcpy(x->x_frame, data, (x->x_vsize + (x->x_vsize>>1))<<1 );
-
-    // post( "pdp_binary : newheader:%x", newheader );
+    memset(newdata, 0x0, (x->x_vsize + (x->x_vsize>>1))<<1 );
 
     newheader->info.image.encoding = header->info.image.encoding;
     newheader->info.image.width = x->x_vwidth;
     newheader->info.image.height = x->x_vheight;
+
+    // post( "pdp_binary : y=%d, u=%d, v=%d", x->x_colorY, x->x_colorU, x->x_colorV );
 
     // binarize
     pfY = data;
@@ -192,8 +234,6 @@ static void pdp_binary_process_yv12(t_pdp_binary *x)
          y = (*pfY)>>7;
          v = ((*pfV)>>8)+128;
          u = ((*pfU)>>8)+128;
-
-         // post( "pdp_binary : y=%d, u=%d, v=%d", y, u, v );
 
          diff = 0;
          if ( x->x_colorY >= 0 )
@@ -213,10 +253,6 @@ static void pdp_binary_process_yv12(t_pdp_binary *x)
          {
             *(newdata+(py*x->x_vwidth+px)) = 0xff<<7;
          }
-         else
-         {
-            *(newdata+(py*x->x_vwidth+px)) = 0;
-         }
             
          pfY++;
          if ( (px%2==0) && (py%2==0) )
@@ -225,8 +261,6 @@ static void pdp_binary_process_yv12(t_pdp_binary *x)
          }
        }
     }
-
-    memset( newdata+x->x_vsize, 0x0, (x->x_vsize>>1)<<1 );
 
     return;
 }
@@ -319,6 +353,10 @@ void *pdp_binary_new(void)
     x->x_colorU = -1;
     x->x_colorV = -1;
 
+    x->x_colorR = yuv_YUVtoR( x->x_colorY, x->x_colorU, x->x_colorV );
+    x->x_colorG = yuv_YUVtoG( x->x_colorY, x->x_colorU, x->x_colorV );
+    x->x_colorB = yuv_YUVtoB( x->x_colorY, x->x_colorU, x->x_colorV );
+
     x->x_packet0 = -1;
     x->x_packet1 = -1;
 
@@ -330,6 +368,8 @@ void *pdp_binary_new(void)
     x->x_vheight = -1;
     x->x_vsize = -1;
     x->x_frame = NULL;
+
+    x->x_canvas = canvas_getcurrent();
 
     return (void *)x;
 }
@@ -356,7 +396,6 @@ void pdp_binary_setup(void)
     class_addmethod(pdp_binary_class, (t_method)pdp_binary_pick, gensym("pick"),  A_NULL);
     class_addmethod(pdp_binary_class, (t_method)pdp_binary_tolerance, gensym("tolerance"), A_FLOAT, A_NULL);
     class_addmethod(pdp_binary_class, (t_method)pdp_binary_setcur, gensym("setcur"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
-
 }
 
 #ifdef __cplusplus

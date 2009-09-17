@@ -282,9 +282,9 @@ static void pdp_cmap_pick(t_pdp_cmap *x)
       x->x_colorG = yuv_YUVtoG( y, u, v );
       x->x_colorB = yuv_YUVtoB( y, u, v );
       if (glist_isvisible(x->x_canvas)) pdp_cmap_draw_color( x, x->x_colorR, x->x_colorG, x->x_colorB );
-      x->x_colors[x->x_current].y = 255;
-      x->x_colors[x->x_current].u = 255;
-      x->x_colors[x->x_current].v = 255;
+      x->x_colors[x->x_current].y = rand() & 255;
+      x->x_colors[x->x_current].u = rand() & 255;
+      x->x_colors[x->x_current].v = rand() & 255;
       x->x_colors[x->x_current].on = 1;
    }
 }
@@ -362,8 +362,8 @@ static void pdp_cmap_process_yv12(t_pdp_cmap *x)
               {
                  // change color not luminosity
                  // *pfY = x->x_colors[ci].y;
-                 *pfV = x->x_colors[ci].v;
-                 *pfU = x->x_colors[ci].u;
+                 *pfV = ( x->x_colors[ci].v - 128 )<<8;
+                 *pfU = ( x->x_colors[ci].u - 128 )<<8;
               } 
   
               pfY++;poY++;
@@ -533,7 +533,6 @@ void pdp_cmap_setup(void)
     class_addmethod(pdp_cmap_class, (t_method)pdp_cmap_delete, gensym("delete"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_cmap_class, (t_method)pdp_cmap_resize, gensym("resize"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_cmap_class, (t_method)pdp_cmap_setcur, gensym("setcur"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
-
 }
 
 #ifdef __cplusplus

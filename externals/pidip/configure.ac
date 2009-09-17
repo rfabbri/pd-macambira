@@ -4,7 +4,7 @@ AC_INIT
 AC_CANONICAL_HOST
 AC_CONFIG_HEADER(include/pidip_config.h)
 
-PDP_PIDIP_VERSION="0.12.23"
+PDP_PIDIP_VERSION="0.12.24"
 PD_DIR=/usr/local/pd
 PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg

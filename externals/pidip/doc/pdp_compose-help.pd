@@ -1,4 +1,4 @@
-#N canvas 221 9 712 664 10;
+#N canvas 226 49 712 664 10;
 #X obj 105 562 pdp_glx;
 #X obj 100 167 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
@@ -23,7 +23,7 @@
 #X floatatom 299 360 5 0 0 0 - - -;
 #X text 336 338 X coordinate of cursor ( pick );
 #X text 347 359 Y coordinate of cursor ( pick );
-#X msg 14 443 pick;
+#X msg 34 489 pick;
 #X text 11 422 Pick up the color;
 #X floatatom 309 380 5 0 0 0 - - -;
 #X text 356 380 Tolerance ( default = 50 );
@@ -79,9 +79,11 @@ source;
 #X text 441 409 Use luminosity;
 #X text 424 435 Show the cursor;
 #X msg 155 561 cursor \$1;
-#X obj 233 562 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 233 562 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
 1;
 #X obj 16 517 route press;
+#X obj 33 464 del 100;
+#X msg 33 442 bang;
 #X connect 0 0 69 0;
 #X connect 1 0 8 0;
 #X connect 2 0 9 0;
@@ -132,7 +134,9 @@ source;
 #X connect 61 0 62 0;
 #X connect 62 0 53 0;
 #X connect 63 0 53 0;
-#X connect 63 0 21 0;
+#X connect 63 0 71 0;
 #X connect 67 0 0 0;
 #X connect 68 0 67 0;
 #X connect 69 0 63 0;
+#X connect 70 0 21 0;
+#X connect 71 0 70 0;

@@ -1,4 +1,4 @@
-#N canvas 137 28 781 666 10;
+#N canvas 137 84 781 666 10;
 #X obj 32 596 pdp_glx;
 #X obj 268 64 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
@@ -9,9 +9,9 @@
 #X obj 369 20 openpanel;
 #X obj 354 3 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
-#X floatatom 316 99 5 0 0;
+#X floatatom 330 152 5 0 0 0 - - -;
 #X msg 225 65 stop;
-#X obj 323 68 hsl 300 15 0 1000 0 0 empty empty empty -2 -6 0 8 -262144
+#X obj 337 121 hsl 300 15 0 1000 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
 #X obj 257 135 metro 70;
 #X obj 252 167 pdp_yqt;
@@ -21,14 +21,14 @@
 -1;
 #X msg 37 199 stop;
 #X msg 122 230 open /dev/video;
-#X floatatom 253 369 5 0 0;
-#X floatatom 262 390 5 0 0;
-#X floatatom 270 414 5 0 0;
-#X floatatom 228 321 5 0 0;
+#X floatatom 253 369 5 0 0 0 - - -;
+#X floatatom 262 390 5 0 0 0 - - -;
+#X floatatom 270 414 5 0 0 0 - - -;
+#X floatatom 228 321 5 0 0 0 - - -;
 #X text 346 633 written by Yves Degoyon ( ydegoyon@free.fr );
-#X floatatom 237 345 5 0 0;
-#X msg 93 382 pick;
-#X floatatom 282 438 5 0 0;
+#X floatatom 237 345 5 0 0 0 - - -;
+#X msg 108 473 pick;
+#X floatatom 282 438 5 0 0 0 - - -;
 #X msg 293 466 luminosity \$1;
 #X obj 394 468 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
@@ -54,12 +54,12 @@
 #X msg 318 538 delete \$1;
 #X text 440 540 Delete a mapping;
 #X msg 341 565 resize 20;
-#X floatatom 393 540 5 0 0;
+#X floatatom 393 540 5 0 0 0 - - -;
 #X obj 669 329 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 669 381 pdp_control;
 #X msg 669 354 thread \$1;
-#X floatatom 669 442 5 0 0;
+#X floatatom 669 442 5 0 0 0 - - -;
 #X obj 669 413 route pdp_drop;
 #X msg 82 596 cursor \$1;
 #X obj 157 597 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
@@ -68,15 +68,18 @@
 #X text 425 566 Resize the color table;
 #X text 371 514 Clear the color table;
 #X text 1 422 Set the cursor;
-#X msg 105 422 setcur \$1 \$2;
-#X connect 0 0 59 0;
+#X msg 94 387 setcur \$1 \$2;
+#X obj 33 627 route press drag release;
+#X msg 107 419 bang;
+#X obj 107 446 del 100;
+#X connect 0 0 60 0;
 #X connect 1 0 10 0;
 #X connect 2 0 11 0;
 #X connect 3 0 2 0;
 #X connect 4 0 11 0;
 #X connect 5 0 4 0;
 #X connect 6 0 5 0;
-#X connect 7 0 10 1;
+#X connect 7 0 11 1;
 #X connect 8 0 10 0;
 #X connect 9 0 7 0;
 #X connect 10 0 11 0;
@@ -110,4 +113,7 @@
 #X connect 53 0 0 0;
 #X connect 54 0 53 0;
 #X connect 59 0 31 0;
-#X connect 59 0 23 0;
+#X connect 59 0 61 0;
+#X connect 60 0 59 0;
+#X connect 61 0 62 0;
+#X connect 62 0 23 0;

@@ -1,3 +1,7 @@
+0.12.24 ( codename Baltanik )
+   fixed color selection bugs and help patches 
+   in pdp_binary, pdp_ctrack, pdp_cmap, pdp_shape, pdp_compose
+
 0.12.23 ( codename My Mum's Cam )
   added pdp_v4l2 : video 4 linux 2 object
     code template from pdp_v4l and xawtv ( v4l2 driver ),
