@@ -1,27 +1,82 @@
-#N canvas 73 50 1040 775 10;
-#X obj 441 -19 gemhead;
-#X obj 364 510 pix_texture;
-#X obj 364 538 square 2;
-#X obj 25 436 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
+#N canvas 625 108 1040 775 10;
+#X obj 580 466 cnv 15 550 250 empty empty empty 20 12 0 14 -24198 -66577
 0;
-#N canvas 5 49 454 304 gemwin 0;
+#X floatatom 717 652 5 0 0 0 - - -;
+#X obj 600 684 pix_opencv_contours_boundingrect;
+#X text 752 648 min area in pixels (default 1);
+#X floatatom 803 666 5 0 0 0 - - -;
+#X text 841 665 max area in pixels (default 76800);
+#X floatatom 733 816 5 0 0 0 - - -;
+#X floatatom 768 816 5 0 0 0 - - -;
+#X floatatom 805 816 5 0 0 0 - - -;
+#X floatatom 839 816 5 0 0 0 - - -;
+#X obj 730 787 unpack 0 0 0 0 0;
+#X obj 730 736 route 0 1 2 3 4;
+#X text 790 754 For each contour detected;
+#X text 29 172 It is useful as a motion tracker if you have well isolated
+silouets of the objects you want to track.;
+#X msg 621 480 mode \$1;
+#X obj 682 481 hradio 15 1 0 4 empty empty empty 0 -8 0 10 -262144
+-1 -1 0;
+#X text 751 482 retrieval mode ( see cvFindContours );
+#X obj 717 506 hradio 15 1 0 5 empty empty empty 0 -8 0 10 -262144
+-1 -1 0;
+#X text 799 506 retrieval method ( see cvFindContours );
+#X msg 650 505 method \$1;
+#X msg 673 528 maxmove \$1;
+#X floatatom 747 529 5 0 0 0 - - -;
+#X floatatom 771 553 5 0 0 0 - - -;
+#X msg 683 550 ftolerance \$1;
+#X text 790 528 maximum move of a countour ( default 10 );
+#X text 807 551 frame tolerance for identification ( default 5 );
+#X text 30 138 pix_opencv_contours_boundingrect :: Calculates up-right
+bounding rectangle of all contours of a binary image.;
+#X text 29 211 This object considers a contour to be analyzed any group
+of white pixels in a black background \, for this reason you will find
+useful to use pdp_bgsubstract or pdp_threshold to obtain a correct
+input for pix_opencv_contours_boundingrect.;
+#X text 29 265 pix_opencv_contours_boundingrect works detecting any
+white areas in the input image \, it's important to set max/min values
+of the areas you want to detect to filter non interesting noise or
+areas \, also sometimes you will need to use pix_opencv_morphology
+to transform the contours of the shapes to be analyzed..;
+#X floatatom 833 719 5 0 0 0 - - -;
+#X text 871 720 number of contours;
+#X msg 698 575 nightmode \$1;
+#X obj 788 576 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 777 597 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 790 619 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 717 596 draw \$1;
+#X text 804 595 draw bounding rectangle ( default : on );
+#X msg 732 617 show \$1;
+#X text 817 616 draw the detected contours ( default : off );
+#X text 811 576 hide original image ( default : off );
+#X obj 715 44 gemhead;
+#X obj 596 842 pix_texture;
+#X obj 596 861 square 2;
+#X obj 33 40 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
+0;
+#N canvas 0 22 454 304 gemwin 0;
 #X obj 67 89 outlet;
 #X obj 67 10 inlet;
-#X obj 67 41 route create;
+#X obj 65 41 route create;
 #X msg 67 70 set destroy;
 #X msg 182 68 set create;
-#N canvas 92 178 247 179 Gem.init 0;
+#N canvas 87 154 247 179 Gem.init 0;
 #X obj 118 46 loadbang;
 #X msg 118 81 reset;
 #X obj 118 113 outlet;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X restore 289 80 pd Gem.init;
-#X obj 161 230 gemwin;
-#X msg 160 177 create \, 1;
-#X msg 236 178 destroy;
-#X msg 294 178 frame 5;
-#X obj 163 140 t b b b;
+#X obj 162 241 gemwin;
+#X msg 161 188 create \, 1;
+#X msg 237 189 destroy;
+#X msg 283 161 frame 5;
+#X obj 164 126 t b b b;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;
 #X connect 2 0 10 0;
@@ -34,146 +89,139 @@
 #X connect 9 0 6 0;
 #X connect 10 0 7 0;
 #X connect 10 2 9 0;
-#X restore 30 480 pd gemwin;
-#X msg 30 456 destroy;
-#X text 26 436 Create window and render;
-#X obj 200 368 pix_texture;
-#X obj 198 397 square 2;
-#X obj 266 167 translateXYZ -2 0 0;
-#X obj 281 199 separator;
-#X obj 344 246 cnv 15 550 250 empty empty empty 20 12 0 14 -24198 -66577
-0;
-#X obj 511 -66 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X restore 43 84 pd gemwin;
+#X msg 43 66 create;
+#X obj 444 838 pix_texture;
+#X obj 444 866 square 2;
+#X obj 596 371 separator;
+#X obj 727 71 bng 25 250 50 0 load empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 527 164 unpack 0 0 0;
-#X floatatom 517 187 5 0 0 3 length - -;
-#X floatatom 566 187 5 0 0 3 width - -;
-#X floatatom 616 187 5 0 0 3 height - -;
-#X obj 571 145 bng 15 250 50 0 empty empty end_reached 20 7 0 10 -262144
+#X obj 784 246 bng 15 250 50 0 empty empty end_reached 20 7 0 10 -262144
 -1 -1;
-#X floatatom 553 110 5 0 10000 1 frame# - -;
-#X obj 511 -37 openpanel;
-#X msg 511 -17 open \$1;
-#X obj 502 128 pix_film;
-#X msg 479 23 auto \$1;
-#X obj 479 5 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
-;
-#X obj 281 227 translateXYZ 4 0 0;
-#X floatatom 481 432 5 0 0 0 - - -;
-#X obj 364 464 pix_opencv_contours_boundingrect;
-#X obj 378 110 pix_invert;
-#X obj 319 135 pix_threshold;
-#X floatatom 322 103 5 0 0 0 - - -;
-#X msg 289 101 0.33;
-#X obj 234 101 loadbang;
-#X text 516 428 min area in pixels (default 1);
-#X floatatom 567 446 5 0 0 0 - - -;
-#X text 605 445 max area in pixels (default 76800);
-#X floatatom 497 596 5 0 0 0 - - -;
-#X floatatom 532 596 5 0 0 0 - - -;
-#X floatatom 569 596 5 0 0 0 - - -;
-#X floatatom 603 596 5 0 0 0 - - -;
-#X obj 494 567 unpack 0 0 0 0 0;
-#X obj 494 516 route 0 1 2 3 4;
-#X text 647 596 Xorigin Yorigin Width Height;
-#X text 554 534 For each contour detected;
-#X text 655 -107 It is useful as a motion tracker if you have well
-isolated silouets of the objects you want to track.;
-#X msg 385 260 mode \$1;
-#X obj 446 261 hradio 15 1 0 4 empty empty empty 0 -8 0 10 -262144
--1 -1 0;
-#X text 515 262 retrieval mode ( see cvFindContours );
-#X obj 481 286 hradio 15 1 0 5 empty empty empty 0 -8 0 10 -262144
--1 -1 0;
-#X text 563 286 retrieval method ( see cvFindContours );
-#X msg 414 285 method \$1;
-#X msg 437 308 maxmove \$1;
-#X floatatom 511 309 5 0 0 0 - - -;
-#X floatatom 535 333 5 0 0 0 - - -;
-#X msg 447 330 ftolerance \$1;
-#X text 554 308 maximum move of a countour ( default 10 );
-#X text 571 331 frame tolerance for identification ( default 5 );
-#X text 656 -141 pix_opencv_contours_boundingrect :: Calculates up-right
-bounding rectangle of all contours of a binary image.;
-#X text 655 -68 This object considers a contour to be analyzed any
-group of white pixels in a black background \, for this reason you
-will find useful to use pdp_bgsubstract or pdp_threshold to obtain
-a correct input for pix_opencv_contours_boundingrect.;
-#X text 655 -14 pix_opencv_contours_boundingrect works detecting any
-white areas in the input image \, it's important to set max/min values
-of the areas you want to detect to filter non interesting noise or
-areas \, also sometimes you will need to use pix_opencv_morphology
-to transform the contours of the shapes to be analyzed..;
-#X floatatom 597 499 5 0 0 0 - - -;
-#X text 635 500 number of contours;
-#X msg 531 87 colorspace RGBA;
-#X msg 521 66 colorspace RGB;
-#X msg 513 46 colorspace Gray;
-#X obj 562 21 loadbang;
-#X msg 462 355 nightmode \$1;
-#X obj 552 356 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X floatatom 766 211 5 0 10000 1 frame# - -;
+#X obj 727 100 openpanel;
+#X msg 727 120 open \$1;
+#X obj 715 229 pix_film;
+#X msg 733 163 auto \$1;
+#X obj 733 145 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X obj 541 377 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X text 41 46 Create window and render;
+#X msg 828 146 colorspace RGBA;
+#X msg 933 146 colorspace RGB;
+#X msg 1037 146 colorspace Grey;
+#X obj 828 118 loadbang;
+#X obj 595 342 pix_separator;
+#X obj 444 374 separator;
+#X obj 444 345 pix_separator;
+#X obj 444 409 translateXYZ -2 0 0;
+#X obj 596 406 translateXYZ 2 0 0;
+#N canvas 0 0 450 300 vswitch 0;
+#X obj 144 263 outlet;
+#X obj 36 26 inlet;
+#X obj 260 29 inlet;
+#X obj 36 133 spigot;
+#X obj 260 141 spigot;
+#X obj 119 64 loadbang;
+#X msg 83 93 0;
+#X msg 113 93 1;
+#X msg 296 104 0;
+#X msg 326 104 1;
+#X obj 399 34 inlet;
+#X obj 399 67 select 0;
+#X connect 1 0 3 0;
+#X connect 2 0 4 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 7 0;
+#X connect 5 0 8 0;
+#X connect 6 0 3 1;
+#X connect 7 0 3 1;
+#X connect 8 0 4 1;
+#X connect 9 0 4 1;
+#X connect 10 0 11 0;
+#X connect 11 0 7 0;
+#X connect 11 0 8 0;
+#X connect 11 1 9 0;
+#X connect 11 1 6 0;
+#X restore 537 299 pd vswitch;
+#X obj 605 299 tgl 15 0 empty load empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 554 399 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
-1;
-#X msg 481 376 draw \$1;
-#X text 568 375 draw bounding rectangle ( default : on );
-#X msg 496 397 show \$1;
-#X text 581 396 draw the detected contours ( default : off );
-#X text 575 356 hide original image ( default : off );
-#X connect 0 0 21 0;
-#X connect 1 0 2 0;
-#X connect 4 0 5 0;
-#X connect 5 0 4 0;
-#X connect 7 0 8 0;
-#X connect 9 0 7 0;
-#X connect 9 0 10 0;
-#X connect 10 0 24 0;
-#X connect 12 0 19 0;
-#X connect 13 0 14 0;
-#X connect 13 1 15 0;
-#X connect 13 2 16 0;
-#X connect 17 0 18 0;
-#X connect 18 0 21 1;
-#X connect 19 0 20 0;
-#X connect 20 0 21 0;
-#X connect 21 0 27 0;
-#X connect 21 1 13 0;
-#X connect 21 2 17 0;
-#X connect 22 0 21 0;
-#X connect 23 0 22 0;
-#X connect 24 0 26 0;
-#X connect 25 0 26 1;
-#X connect 26 0 1 0;
-#X connect 26 1 40 0;
-#X connect 26 2 59 0;
-#X connect 27 0 28 0;
-#X connect 28 0 9 0;
-#X connect 29 0 28 1;
-#X connect 30 0 29 0;
-#X connect 31 0 30 0;
-#X connect 33 0 26 2;
-#X connect 39 0 35 0;
-#X connect 39 1 36 0;
-#X connect 39 2 37 0;
-#X connect 39 3 38 0;
-#X connect 40 0 39 0;
-#X connect 44 0 26 0;
+#X obj 478 227 pix_video;
+#X obj 478 39 gemhead;
+#X msg 517 152 device 0;
+#X msg 526 183 driver 1;
+#X msg 503 98 dialog;
+#X msg 508 128 device /dev/dv1394-0;
+#X floatatom 746 894 5 0 0 0 - - -;
+#X floatatom 781 894 5 0 0 0 - - -;
+#X floatatom 818 894 5 0 0 0 - - -;
+#X floatatom 852 894 5 0 0 0 - - -;
+#X obj 743 865 unpack 0 0 0 0 0;
+#X text 883 816 ( First contour ) Xorigin Yorigin Width Height;
+#X text 895 892 ( Second contour ) Xorigin Yorigin Width Height;
+#X obj 596 439 pix_opencv_bgsubstract;
+#X connect 1 0 2 1;
+#X connect 2 0 41 0;
+#X connect 2 1 11 0;
+#X connect 2 2 29 0;
+#X connect 4 0 2 2;
+#X connect 10 0 6 0;
+#X connect 10 1 7 0;
+#X connect 10 2 8 0;
+#X connect 10 3 9 0;
+#X connect 11 0 10 0;
+#X connect 11 1 79 0;
+#X connect 14 0 2 0;
+#X connect 15 0 14 0;
+#X connect 17 0 19 0;
+#X connect 19 0 2 0;
+#X connect 20 0 2 0;
+#X connect 21 0 20 0;
+#X connect 22 0 23 0;
+#X connect 23 0 2 0;
+#X connect 31 0 2 0;
+#X connect 32 0 31 0;
+#X connect 33 0 35 0;
+#X connect 34 0 37 0;
+#X connect 35 0 2 0;
+#X connect 37 0 2 0;
+#X connect 40 0 54 0;
+#X connect 41 0 42 0;
+#X connect 44 0 45 0;
 #X connect 45 0 44 0;
-#X connect 47 0 49 0;
-#X connect 49 0 26 0;
-#X connect 50 0 26 0;
-#X connect 51 0 50 0;
+#X connect 46 0 47 0;
+#X connect 48 0 66 0;
+#X connect 49 0 52 0;
+#X connect 50 0 51 0;
+#X connect 51 0 54 1;
 #X connect 52 0 53 0;
-#X connect 53 0 26 0;
-#X connect 61 0 21 0;
-#X connect 62 0 21 0;
-#X connect 63 0 21 0;
-#X connect 64 0 61 0;
-#X connect 65 0 26 0;
-#X connect 66 0 65 0;
-#X connect 67 0 69 0;
-#X connect 68 0 71 0;
-#X connect 69 0 26 0;
-#X connect 71 0 26 0;
+#X connect 53 0 54 0;
+#X connect 54 0 67 1;
+#X connect 54 2 50 0;
+#X connect 55 0 54 0;
+#X connect 56 0 55 0;
+#X connect 58 0 54 0;
+#X connect 58 0 69 0;
+#X connect 59 0 54 0;
+#X connect 60 0 54 0;
+#X connect 61 0 58 0;
+#X connect 61 0 56 0;
+#X connect 62 0 48 0;
+#X connect 63 0 65 0;
+#X connect 64 0 63 0;
+#X connect 65 0 46 0;
+#X connect 66 0 82 0;
+#X connect 67 0 62 0;
+#X connect 67 0 64 0;
+#X connect 68 0 67 2;
+#X connect 69 0 67 0;
+#X connect 70 0 69 0;
+#X connect 71 0 69 0;
+#X connect 72 0 69 0;
+#X connect 73 0 69 0;
+#X connect 74 0 69 0;
+#X connect 79 0 75 0;
+#X connect 79 1 76 0;
+#X connect 79 2 77 0;
+#X connect 79 3 78 0;
+#X connect 82 0 2 0;
