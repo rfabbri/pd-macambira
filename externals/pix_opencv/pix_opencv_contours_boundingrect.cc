@@ -105,6 +105,7 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
   unsigned char *pixels = image.data;
   char tindex[4];
   int im = 0;                  // Indicator of markers.
+  t_atom rlist[5];
 
   if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!orig)) {
 
@@ -197,7 +198,6 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
               cvDrawContours( orig, contours, CV_RGB(255,255,255), CV_RGB(255,255,255), 0, 1, 8, cvPoint(0,0) );
             }
 
-    	    t_atom rlist[4];
             SETFLOAT(&rlist[0], oi);
             SETFLOAT(&rlist[1], rect.x);
             SETFLOAT(&rlist[2], rect.y);
@@ -219,6 +219,12 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
          x_xmark[im] = -1.0;
          x_ymark[im] = -1,0;
          x_found[im] = x_ftolerance;
+         SETFLOAT(&rlist[0], im);
+         SETFLOAT(&rlist[1], -1.0);
+         SETFLOAT(&rlist[2], -1.0);
+         SETFLOAT(&rlist[3], 0.0);
+         SETFLOAT(&rlist[4], 0.0);
+    	 outlet_list( m_dataout, 0, 5, rlist );
        }
     }
 
@@ -232,6 +238,7 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
 {
   unsigned char *pixels = image.data;
   char tindex[4];
+  t_atom rlist[5];
   int im = 0;                  // Indicator of markers.
 
   if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!rgb)) {
@@ -320,7 +327,6 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
               cvDrawContours( rgb, contours, CV_RGB(255,255,255), CV_RGB(255,255,255), 0, 1, 8, cvPoint(0,0) );
             }
 
-    	    t_atom rlist[4];
             SETFLOAT(&rlist[0], oi);
             SETFLOAT(&rlist[1], rect.x);
             SETFLOAT(&rlist[2], rect.y);
@@ -342,6 +348,12 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
          x_xmark[im] = -1.0;
          x_ymark[im] = -1,0;
          x_found[im] = x_ftolerance;
+         SETFLOAT(&rlist[0], im);
+         SETFLOAT(&rlist[1], -1.0);
+         SETFLOAT(&rlist[2], -1.0);
+         SETFLOAT(&rlist[3], 0.0);
+         SETFLOAT(&rlist[4], 0.0);
+    	 outlet_list( m_dataout, 0, 5, rlist );
        }
     }
 
@@ -358,6 +370,7 @@ void pix_opencv_contours_boundingrect :: processYUVImage(imageStruct &image)
 void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
 { 
   char tindex[4];
+  t_atom rlist[5];
   int im = 0;                  // Indicator of markers.
 
   if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!orig)) {
@@ -449,7 +462,6 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
               cvDrawContours( cnt_img, contours, CV_RGB(255,255,255), CV_RGB(255,255,255), 0, 1, 8, cvPoint(0,0) );
             }
 
-    	    t_atom rlist[4];
             SETFLOAT(&rlist[0], oi);
             SETFLOAT(&rlist[1], rect.x);
             SETFLOAT(&rlist[2], rect.y);
@@ -471,6 +483,12 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
          x_xmark[im] = -1.0;
          x_ymark[im] = -1,0;
          x_found[im] = x_ftolerance;
+         SETFLOAT(&rlist[0], im);
+         SETFLOAT(&rlist[1], -1.0);
+         SETFLOAT(&rlist[2], -1.0);
+         SETFLOAT(&rlist[3], 0.0);
+         SETFLOAT(&rlist[4], 0.0);
+    	 outlet_list( m_dataout, 0, 5, rlist );
        }
     }
 
