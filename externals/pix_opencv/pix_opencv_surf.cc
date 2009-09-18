@@ -927,7 +927,7 @@ void  pix_opencv_surf :: markMess(int argc, t_atom *argv)
         }
 
         px = (int)fpx;
-        py = comp_ysize-(int)fpy;
+        py = (int)fpy;
         inserted = 0;
         for ( i=0; i<MAX_MARKERS; i++)
         {
