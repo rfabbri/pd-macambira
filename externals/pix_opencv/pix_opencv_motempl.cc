@@ -96,7 +96,7 @@ pix_opencv_motempl :: ~pix_opencv_motempl()
 void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
 {
  double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
- CvSize size = cvSize(img->width,img->height); // get current frame size
+ CvSize size = cvSize(image.xsize,image.ysize); // get current frame size
  int i, j, idx1 = last, idx2;
  IplImage* silh;
  CvSeq* seq;
@@ -145,14 +145,14 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
         }
         
         for( i = 0; i < frame_buffer_num; i++ ) {
-            //cvReleaseImage( &(buf[i]) );
+            // TODO if ( buf[i] != NULL ) cvReleaseImage( &buf[i] );
             buf[i] = cvCreateImage( size, IPL_DEPTH_8U, 1 );
             cvZero( buf[i] );
         }
-        cvReleaseImage( &mhi );
-        cvReleaseImage( &orient );
-        cvReleaseImage( &segmask );
-        cvReleaseImage( &mask );
+        if ( mhi != NULL ) cvReleaseImage( &mhi );
+        if ( orient != NULL ) cvReleaseImage( &orient );
+        if ( segmask != NULL ) cvReleaseImage( &segmask );
+        if ( mask != NULL ) cvReleaseImage( &mask );
         
         mhi = cvCreateImage( size, IPL_DEPTH_32F, 1 );
         cvZero( mhi ); // clear MHI at the beginning
@@ -259,7 +259,7 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
 void pix_opencv_motempl :: processRGBImage(imageStruct &image)
 {
  double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
- CvSize size = cvSize(img->width,img->height); // get current frame size
+ CvSize size = cvSize(image.xsize,image.ysize); // get current frame size
  int i, j, idx1 = last, idx2;
  IplImage* silh;
  CvSeq* seq;
@@ -302,14 +302,14 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
         }
         
         for( i = 0; i < frame_buffer_num; i++ ) {
-            //cvReleaseImage( &(buf[i]) );
+            // TODO if ( buf[i] != NULL ) cvReleaseImage( &(buf[i]) );
             buf[i] = cvCreateImage( size, IPL_DEPTH_8U, 1 );
             cvZero( buf[i] );
         }
-        cvReleaseImage( &mhi );
-        cvReleaseImage( &orient );
-        cvReleaseImage( &segmask );
-        cvReleaseImage( &mask );
+        if ( mhi != NULL ) cvReleaseImage( &mhi );
+        if ( orient != NULL ) cvReleaseImage( &orient );
+        if ( segmask != NULL ) cvReleaseImage( &segmask );
+        if ( mask != NULL ) cvReleaseImage( &mask );
         
         mhi = cvCreateImage( size, IPL_DEPTH_32F, 1 );
         cvZero( mhi ); // clear MHI at the beginning
@@ -418,7 +418,7 @@ void pix_opencv_motempl :: processYUVImage(imageStruct &image)
 void pix_opencv_motempl :: processGrayImage(imageStruct &image)
 { 
  double timestamp = (double)clock()/CLOCKS_PER_SEC; // get current time in seconds
- CvSize size = cvSize(img->width,img->height); // get current frame size
+ CvSize size = cvSize(image.xsize,image.ysize); // get current frame size
  int i, j, idx1 = last, idx2;
  IplImage* silh;
  CvSeq* seq;
@@ -464,14 +464,14 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
         }
         
         for( i = 0; i < frame_buffer_num; i++ ) {
-            //cvReleaseImage( &(buf[i]) );
+            // TODO cvReleaseImage( &(buf[i]) );
             buf[i] = cvCreateImage( size, IPL_DEPTH_8U, 1 );
             cvZero( buf[i] );
         }
-        cvReleaseImage( &mhi );
-        cvReleaseImage( &orient );
-        cvReleaseImage( &segmask );
-        cvReleaseImage( &mask );
+        if ( mhi != NULL ) cvReleaseImage( &mhi );
+        if ( orient != NULL ) cvReleaseImage( &orient );
+        if ( segmask != NULL ) cvReleaseImage( &segmask );
+        if ( mask != NULL ) cvReleaseImage( &mask );
         
         mhi = cvCreateImage( size, IPL_DEPTH_32F, 1 );
         cvZero( mhi ); // clear MHI at the beginning
