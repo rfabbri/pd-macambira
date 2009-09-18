@@ -245,6 +245,12 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
          x->x_xmark[im] = -1.0;
          x->x_ymark[im] = -1,0;
          x->x_found[im] = x->x_ftolerance;
+         SETFLOAT(&x->rlist[0], im);
+         SETFLOAT(&x->rlist[1], -1.0);
+         SETFLOAT(&x->rlist[2], -1.0);
+         SETFLOAT(&x->rlist[3], 0.0);
+         SETFLOAT(&x->rlist[4], 0.0);
+    	 outlet_list( x->x_dataout, 0, 5, x->rlist );
        }
     }
 

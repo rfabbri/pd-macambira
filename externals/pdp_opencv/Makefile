@@ -1,5 +1,5 @@
-PD_DIR = /usr/local/pd
-PDP_DIR = /usr/local/pd/pdp
+PD_DIR = /usr/src/pd-svn/trunk/pd
+PDP_DIR = /usr/src/pd-svn/trunk/externals/pdp
 
 GEM_OPENCV_VERSION = 0.2
 
@@ -27,7 +27,7 @@ endif
 .SUFFIXES = $(EXTENSION)
 
 SOURCES = pdp_opencv_threshold.c pdp_opencv_edge.c pdp_opencv_distrans.c pdp_opencv_laplace.c pdp_opencv_motempl.c pdp_opencv_morphology.c pdp_opencv_haarcascade.c pdp_opencv_contours_convexity.c pdp_opencv_contours_boundingrect.c pdp_opencv_bgsubstract.c pdp_opencv_lk.c pdp_opencv_floodfill.c pdp_opencv_hist_compare.c pdp_opencv_dft.c pdp_opencv_knear.cc pdp_opencv_hu_moments.c pdp_opencv_hu_compare.cc pdp_opencv_pgh_compare.cc pdp_opencv_bgstats.cc pdp_opencv_athreshold.c pdp_opencv_hough_lines.cc pdp_opencv_channels.cc pdp_opencv_hough_circles.cc pdp_opencv_camshift.cc pdp_opencv_colorfilt.c
-SOURCES_OPT = pdp_opencv_surf.cc
+SOURCES_OPT = 
 
 all: $(SOURCES:.c=.$(EXTENSION)) $(SOURCES:.cc=.$(EXTENSION)) $(SOURCES_OPT:.c=.$(EXTENSION)) $(SOURCES_OPT:.cc=.$(EXTENSION))
 
