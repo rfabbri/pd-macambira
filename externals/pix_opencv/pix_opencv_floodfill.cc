@@ -379,7 +379,8 @@ void  pix_opencv_floodfill :: markMess(float fpx, float fpy)
     }
 
     px = (int)fpx;
-    py = comp_ysize-(int)fpy;
+    //py = comp_ysize-(int)fpy;
+    py = (int)fpy;
     inserted = 0;
     for ( i=0; i<MAX_COMPONENTS; i++)
     {

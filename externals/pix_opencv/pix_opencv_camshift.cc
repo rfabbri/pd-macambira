@@ -422,7 +422,7 @@ void  pix_opencv_camshift :: trackMess(float px, float py)
 
     if ( ( px<0.0 ) || ( px>comp_xsize ) || ( py<0.0 ) || ( py>comp_ysize ) ) return;
 
-    py = comp_ysize - py;
+    //py = comp_ysize - py;
     origin = cvPoint((int)px,(int)py);
     rx = ( (int)px-(x_rwidth/2) < 0 )? 0:(int)px-(x_rwidth/2);
     ry = ( (int)py-(x_rheight/2) < 0 )? 0:(int)py-(x_rheight/2);
