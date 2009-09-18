@@ -22,7 +22,6 @@
 
 #include "tof.h"
 #include "param.h"
-#include <stdio.h>
 
 
 
@@ -34,11 +33,13 @@ typedef struct _paramDump
   t_object                    x_obj;
   t_outlet*			          outlet;
   t_symbol*						s_set;
+  t_symbol*					root;
 } t_paramDump;
 
 // Dump out the values of a specific id
 //static void paramDump_values(t_paramDump *x, t_symbol* s, int a_ac, t_atom* a_av) {
 
+/*
 static void paramDump_values(t_paramDump *x, t_symbol* s) {
 	
 	//if ( s == &s_list && a_ac > 0 && IS_A_SYMBOL(a_av,0)  ) s = atom_getsymbol(a_av);
@@ -50,7 +51,7 @@ static void paramDump_values(t_paramDump *x, t_symbol* s) {
 		
 		struct param* pp = get_param_list();
 		while (pp) {
-			if (pp->id && (all || pp->id == s) ) {
+			if (pp->root == x->root && (all || pp->id == s) ) {
 				param_output_prepend(pp,x->outlet,pp->path);
 				
 			}
@@ -59,14 +60,16 @@ static void paramDump_values(t_paramDump *x, t_symbol* s) {
 	//}
 }
 
+*/
+
 static void paramDump_guis(t_paramDump *x, t_symbol* s) {
 	
-	char* star = "*";
-	int all = !(strcmp(s->s_name, star));
+	//char* star = "*";
+	//int all = !(strcmp(s->s_name, star));
 		
-		struct param* pp = get_param_list();
+		struct param* pp = get_param_list(x->root);
 		while (pp) {
-			if (pp->ac_g && (all || pp->id == s) ) {
+			if (pp->ac_g ) {
 				
 				outlet_anything(x->outlet,pp->path,pp->ac_g,pp->av_g);
 				
@@ -75,6 +78,7 @@ static void paramDump_guis(t_paramDump *x, t_symbol* s) {
 		}
 }
 
+/*
 static void paramDump_update_guis(t_paramDump *x, t_symbol* s) {
 	
 	char* star = "*";
@@ -82,9 +86,9 @@ static void paramDump_update_guis(t_paramDump *x, t_symbol* s) {
 		
 		struct param* pp = get_param_list();
 		while (pp) {
-			if (pp->ac_g && (all || pp->id == s) ) {
+			if (pp->ac_g && pp->root == x->root && (all || pp->id == s) ) {
 				
-				param_send_prepend(pp, pp->path_g ,x->s_set );
+				param_send_prepend(pp, pp->path_ ,x->s_set );
 			    //if ( pp->path_g->s_thing) 
 				//	pd_typedmess(pp->path_g->s_thing, pp->selector,pp->ac, pp->av);
 			       
@@ -94,16 +98,21 @@ static void paramDump_update_guis(t_paramDump *x, t_symbol* s) {
 		pp = pp->next;
 		}
 }
-
+*/
 
 
 // Dump out everything (OR THE ID'S OR JUST THE NAMES?)
 static void paramDump_bang(t_paramDump *x) {
 	
 	
-	struct param* pp = get_param_list();
+	struct param* pp = get_param_list(x->root);
+	if (pp == NULL) {
+		post("No params found");
+	} else {
+		post("Found params");
+	}
 	while (pp) {
-		//if (pp->id) {
+		//if (pp->root == x->root) {
 			param_output_prepend(pp,x->outlet,pp->path);
 			
 		//}
@@ -125,6 +134,9 @@ static void paramDump_free(t_paramDump *x)
 static void *paramDump_new(t_symbol *s, int ac, t_atom *av) {
   t_paramDump *x = (t_paramDump *)pd_new(paramDump_class);
   
+  x->root = tof_get_dollarzero(tof_get_root_canvas(tof_get_canvas()));
+  
+  
     x->s_set = gensym("set");
 	
     x->outlet = outlet_new(&x->x_obj, &s_list);
@@ -139,9 +151,9 @@ void paramDump_setup(void) {
 
  class_addbang(paramDump_class, paramDump_bang);
  
- class_addmethod(paramDump_class, (t_method) paramDump_values, gensym("values"), A_DEFSYMBOL,0);
+ //class_addmethod(paramDump_class, (t_method) paramDump_values, gensym("values"), A_DEFSYMBOL,0);
  
  class_addmethod(paramDump_class, (t_method) paramDump_guis, gensym("guis"), A_DEFSYMBOL,0);
- class_addmethod(paramDump_class, (t_method) paramDump_update_guis, gensym("update"), A_DEFSYMBOL,0);
+ //class_addmethod(paramDump_class, (t_method) paramDump_update_guis, gensym("update"), A_DEFSYMBOL,0);
 
 }

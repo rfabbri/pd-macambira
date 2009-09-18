@@ -1,95 +1,91 @@
-#N canvas 1027 0 997 713 10;
-#N canvas 417 395 450 315 \$0target 0;
-#X text 0 0 Please Copy and Paste;
-#X obj 0 20 hsl 100 15 0 1 0 0 /me/amp /me/amp_ /me/amp 105 7 0 10
--262144 -1 -1 0 1;
-#X obj 0 40 nbx 5 14 -1e+37 1e+37 0 0 /me/freq /me/freq_ /me/freq 57
-7 0 10 -262144 -1 -1 0 256;
-#X obj 0 60 hsl 100 15 0 1 0 0 /masterVolume /masterVolume_ /masterVolume
-105 7 0 10 -262144 -1 -1 0 1;
-#X obj 0 80 hsl 100 15 0 1 0 0 /wow/OSC1/amp /wow/OSC1/amp_ /wow/OSC1/amp
-105 7 0 10 -262144 -1 -1 0 1;
-#X obj 0 100 nbx 5 14 -1e+37 1e+37 0 0 /wow/OSC1/freq /wow/OSC1/freq_
-/wow/OSC1/freq 57 7 0 10 -262144 -1 -1 0 256;
-#X obj 0 120 hsl 100 15 0 1 0 0 /wow/OSC2/amp /wow/OSC2/amp_ /wow/OSC2/amp
-105 7 0 10 -262144 -1 -1 0 1;
-#X obj 0 140 nbx 5 14 -1e+37 1e+37 0 0 /wow/OSC2/freq /wow/OSC2/freq_
-/wow/OSC2/freq 57 7 0 10 -262144 -1 -1 0 256;
-#X symbolatom 0 160 17 0 0 1 /s /s_ /s;
+#N canvas 1027 0 997 703 10;
+#N canvas 425 135 450 315 \$0target 0;
 #X restore 77 109 pd \$0target;
 #X obj 260 140 list split 1;
 #X obj 101 566 s pd-\$0target;
-#X obj 362 333 list prepend;
+#X obj 273 341 list prepend;
 #X obj 386 399 list trim;
 #X obj 423 199 value \$0y;
-#X obj 228 226 value \$0y;
-#X obj 178 213 t a b;
-#X obj 178 275 list prepend;
-#X obj 272 256 t f f;
-#X msg -37 460 obj 0 \$1 bng 15 250 50 0 \$2 \$2_ \$2 17 7 0 10 -262144
--1 -1;
-#X obj 574 200 s pd-\$0target;
-#X msg 132 483 obj 0 \$1 nbx 5 14 -1e+37 1e+37 0 0 \$2 \$2_ \$2 57
-7 0 10 -262144 -1 -1 0 256;
+#X obj -156 281 value \$0y;
+#X obj -112 311 t f f;
+#X obj 497 164 s pd-\$0target;
 #X obj 266 106 paramDump;
 #X obj 323 -167 inlet path;
 #X obj 316 -119 route bang;
 #X obj 375 -93 symbol;
 #X obj 299 -27 t b a b b;
 #X msg 110 182 vis 1;
-#X obj 322 230 + 20;
-#X msg 419 159 20;
-#X msg 578 158 clear \, text 0 0 Please Copy and Paste;
-#X msg 600 228 clear;
-#X msg 289 515 obj 0 \$1 hsl 100 15 \$3 \$4 0 0 \$2 \$2_ \$2 105 7
-0 10 -262144 -1 -1 0 1;
-#X obj 451 313 list split 1;
+#X obj -62 285 + 20;
+#X obj 434 277 list split 1;
 #X obj 394 374 list;
-#X msg 753 490 text 0 \$1 Unknown gui type for \$2;
-#X msg 523 448 symbolatom 0 \$1 17 0 0 1 \$2 \$2_ \$2;
+#X msg 729 492 text 0 \$1 Unknown gui type for \$2;
 #X obj 294 -79 symbol *;
-#X msg 272 57 guis \$1 \, update \$1;
 #X obj 384 423 route bng nbx slider symbolatom tgl;
-#X msg 528 476 obj 0 \$1 tgl 15 0 \$2 \$2_ \$2 17 7 0 10 -262144 -1
+#X obj 469 389 print;
+#X msg 272 57 guis \$1;
+#X obj 0 302 zexy/makesymbol %s%s%s;
+#X msg 0 278 list $ 0 \$1;
+#X msg 89 279 list $ 0 \$1_;
+#X obj 54 344 zexy/makesymbol %s%s%s;
+#X obj -2 210 t b a a a;
+#X obj -5 386 pack f s s s;
+#X msg -37 460 obj 0 \$1 bng 15 250 50 0 \$2 \$3 \$4 17 7 0 10 -262144
+-1 -1;
+#X msg 132 483 obj 0 \$1 nbx 5 14 -1e+37 1e+37 0 0 \$2 \$3 \$4 57 7
+0 10 -262144 -1 -1 0 256;
+#X msg 289 515 obj 0 \$1 hsl 100 15 \$5 \$6 0 0 \$2 \$3 \$4 105 7 0
+10 -262144 -1 -1 0 1;
+#X msg 528 476 obj 0 \$1 tgl 15 0 \$2 \$3 \$4 17 7 0 10 -262144 -1
 -1 0 1;
-#X connect 1 0 7 0;
-#X connect 1 1 24 0;
-#X connect 3 0 25 0;
-#X connect 4 0 30 0;
-#X connect 6 0 9 0;
-#X connect 7 0 8 0;
-#X connect 7 1 6 0;
-#X connect 8 0 3 0;
-#X connect 9 0 8 1;
-#X connect 9 1 19 0;
-#X connect 10 0 2 0;
-#X connect 12 0 2 0;
-#X connect 13 0 1 0;
-#X connect 14 0 15 0;
-#X connect 15 0 28 0;
-#X connect 15 1 16 0;
-#X connect 16 0 17 0;
-#X connect 17 0 18 0;
-#X connect 17 1 29 0;
-#X connect 17 2 20 0;
-#X connect 17 3 21 0;
+#X msg 521 448 symbolatom 0 \$1 17 0 0 1 \$4 \$3 \$2;
+#X msg 496 89 clear \, text 0 0 YOU MUST COPY AND PASTE THE FOLLOWING
+INTERFACES INSIDE THE ROOT PATCH OR INSIDE A SUBPATCH OF THE ROOT PATCH
+OR THEY WILL NOT WORK!;
+#X msg 419 159 50;
+#X connect 1 0 27 0;
+#X connect 1 1 16 0;
+#X connect 3 0 17 0;
+#X connect 4 0 21 0;
+#X connect 4 0 20 0;
+#X connect 6 0 7 0;
+#X connect 7 0 28 0;
+#X connect 7 1 15 0;
+#X connect 9 0 1 0;
+#X connect 10 0 11 0;
+#X connect 11 0 19 0;
+#X connect 11 1 12 0;
+#X connect 12 0 13 0;
+#X connect 13 0 14 0;
+#X connect 13 1 22 0;
+#X connect 13 2 35 0;
+#X connect 13 3 34 0;
+#X connect 14 0 2 0;
+#X connect 15 0 6 0;
+#X connect 16 0 3 1;
+#X connect 16 1 17 1;
+#X connect 17 0 4 0;
 #X connect 18 0 2 0;
-#X connect 19 0 6 0;
-#X connect 20 0 5 0;
-#X connect 21 0 11 0;
-#X connect 22 0 11 0;
-#X connect 23 0 2 0;
-#X connect 24 0 3 1;
-#X connect 24 1 25 1;
-#X connect 25 0 4 0;
-#X connect 26 0 2 0;
-#X connect 27 0 2 0;
-#X connect 28 0 17 0;
-#X connect 29 0 13 0;
-#X connect 30 0 10 0;
-#X connect 30 1 12 0;
-#X connect 30 2 23 0;
-#X connect 30 3 27 0;
-#X connect 30 4 31 0;
-#X connect 30 5 26 0;
+#X connect 19 0 13 0;
+#X connect 20 0 29 0;
+#X connect 20 1 30 0;
+#X connect 20 2 31 0;
+#X connect 20 3 33 0;
+#X connect 20 4 32 0;
+#X connect 20 5 18 0;
+#X connect 22 0 9 0;
+#X connect 23 0 28 1;
+#X connect 24 0 23 0;
+#X connect 25 0 26 0;
+#X connect 26 0 28 2;
+#X connect 27 0 6 0;
+#X connect 27 1 24 0;
+#X connect 27 2 25 0;
+#X connect 27 3 28 3;
+#X connect 28 0 3 0;
+#X connect 29 0 2 0;
+#X connect 30 0 2 0;
 #X connect 31 0 2 0;
+#X connect 32 0 2 0;
+#X connect 33 0 2 0;
+#X connect 34 0 8 0;
+#X connect 35 0 5 0;

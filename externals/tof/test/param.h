@@ -1,37 +1,40 @@
-
+#define PARAMDEBUG
 #include <stdio.h>
 
+char param_buf_temp_a[MAXPDSTRING];
+char param_buf_temp_b[MAXPDSTRING];
+char* separator = "/";
+
+
 struct param {
-   t_symbol* 	selector; //Type of data stored
-   int 			ac; //Number of values stored
-   int			 alloc; //Memory allocated
-   t_atom* 		av; //Values stored
-   t_symbol* 	path; //Path(name) of the param
-   t_symbol*    path_g;
-   //t_symbol* 	basepath;
-   struct param* next; //Next param
-   struct param* previous; //Previous param
-   int 			users; //Number of param objects using this param
-   t_symbol* 	id; //An id set only if it is saveable
-   int 			ac_g;
-   t_atom*		av_g;
+   
+   t_symbol*		root;
+   t_symbol* 		path; //Path(name) of the param
+   t_symbol*    	send;
+   t_symbol*		receive; 
+   t_symbol* 		selector; //Type of data stored
+   int			 	alloc; //Memory allocated
+   int 				ac; //Number of values stored
+   t_atom* 			av; //Values stored
+   struct param* 	next; //Next param
+   struct param* 	previous; //Previous param
+   int 				users; //Number of param objects using this param
+   t_symbol* 		id; //The base id
+   int 				ac_g; //Gui argument count
+   t_atom*			av_g; //Gui argument values
 };
 
+struct paramroot {
+	t_symbol*			root;
+	struct param* 		params; //param list
+	struct paramroot* 	next; //Next paramroot
+    struct paramroot* 	previous; //Previous paramroot
+};
 
-struct param* paramlist;
+struct paramroot* paramroots;
 
+//struct param* paramlist;
 
-typedef struct param_build_info {
-	int ac;
-	t_atom* 	av;
-	t_symbol* 	path;
-	t_symbol* 	id;
-	t_symbol*	path_g;
-	int 		ac_g;
-    t_atom*		av_g;
-	t_symbol* 	basepath;
-	t_symbol* 	basename;
-}t_param_build_info;
 
 static void set_param_anything( struct param* p, t_symbol* s, int ac, t_atom *av) {
 	
@@ -56,132 +59,6 @@ static void set_param( struct param* p, int ac, t_atom *av) {
 	tof_set_selector(&s,&ac, &av );
 	set_param_anything(p,s,ac,av);
 }
-
-
-
-
-
-
-static struct param* get_param_list(void) {
-	
-	if (paramlist == NULL) {
-		//post("No params found");
-		return NULL;
-	 }
-	
-    return paramlist;
-	
-}
-
-static void print_all_params(void) {
-	
-	struct param* p = paramlist;
-	post("--paramlist--");
-		while(p) {
-			if ( p->path) post("Path: %s",p->path->s_name);
-			if (p->id) post("Id: %s",p->id->s_name);
-			p = p->next;
-	}
-	
-}
-
-
-//static struct param* register_param( t_symbol* path, int ac, t_atom* av, t_symbol* id
-static struct param* register_param( t_param_build_info* build) {
-	
-	//post("registering %s", path->s_name);
-	t_symbol* path = build->path;
-	t_symbol* path_g = build->path_g;
-	int ac = build->ac;
-	t_atom* av = build->av;
-	t_symbol* id = build->id;
-	int ac_g = build->ac_g;
-	t_atom* av_g = build->av_g;
-	
-	
-	//if ( path) post("path:%s",path->s_name);
-	//if ( id) post("id:%s",id->s_name);
-	
-        struct param* last = paramlist;
-		// Search for param with same path
-		while( last ) {
-			if ( last->path == path) {
-				//post("Found param with same name");
-				last->users = last->users + 1;
-				return last;
-			}
-			if ( last->next == NULL ) break;
-			last = last->next; 
-		}
-		
-		// Create and add param to the end
-		struct param* p = getbytes(sizeof(*p));
-		p->alloc = 0;
-		p->path = path;
-		p->path_g = path_g;
-		p->next = NULL;
-		p->users = 1;
-		p->id = id;
-		set_param( p, ac, av);
-		p->ac_g = ac_g;
-		p->av_g = getbytes(ac_g*sizeof(*(p->av_g)));
-		tof_copy_atoms(av_g,p->av_g,ac_g);
-		if (last) {
-			//post("Appending param");
-			p->previous = last;
-			last->next = p;
-		} else {
-			//post("Creating first param");
-			p->previous = NULL;
-			paramlist = p;
-		}
-		
-		
-		//print_all_params();
-		
-	return p;
-	
-}
-
-static void unregister_param( struct param* p) {
-	
-	//post("unregistering %s", p->path->s_name);
-	
-	if ( paramlist) {
-
-		p->users = p->users - 1;
-		if ( p->users == 0 ) {
-			// Remove param
-			//post("Removing last param of this name");
-			if (p->previous) {
-				p->previous->next = p->next;
-				if (p->next) p->next->previous = p->previous;
-				/*
-				if (p->next == NULL) {
-					p->previous->next = NULL;
-				} else {
-					p->previous->next = p->next;
-				}
-				*/
-			} else {
-				paramlist = p->next;
-				if ( p->next != NULL) p->next->previous = NULL;
-			}
-			freebytes(p->av, p->alloc * sizeof *(p->av) );
-			freebytes(p->av_g, p->ac_g * sizeof *(p->av_g) );
-			freebytes(p, sizeof *p);
-		}
-		
-	} else {
-		post("Euh... no params found!");
-	}
-	
-	//print_all_params();
-	
-}
-
-////////////////////
-
 
 
 static void param_find_value(t_symbol *name, int ac, t_atom *av, int *ac_r,t_atom** av_r) {
@@ -209,13 +86,339 @@ static void param_find_value(t_symbol *name, int ac, t_atom *av, int *ac_r,t_ato
 	if ( j > 0) {
 		*ac_r = j;
 		*av_r = av+i;
-		//x->x_param = register_param( x->x_path , j, av+i,saveable);
 	} else {
 		*ac_r = 0;
 	}
  }
 
 
+/*
+static void print_all_params(void) {
+	
+	struct param* p = paramlist;
+	post("--paramlist--");
+		while(p) {
+			if ( p->path) post("Path: %s",p->path->s_name);
+			if (p->id) post("Id: %s",p->id->s_name);
+			p = p->next;
+	}
+	
+}
+*/
+
+
+static struct paramroot* param_get_root(t_symbol* root) {
+	
+	if (paramroots == NULL) {
+		#ifdef PARAMDEBUG
+		post("Could not get...not even one root created");
+		#endif
+		return NULL;
+	 }
+	
+	
+	// Pointer to the start of paramroots
+	struct paramroot* branch = paramroots;
+		
+		while( branch ) {
+			if ( branch->root == root) {
+				#ifdef PARAMDEBUG
+				  post("Found root:%s",root->s_name);
+				#endif
+				
+				return branch;
+			}
+			branch = branch->next; 
+		}
+	#ifdef PARAMDEBUG
+		post("Could not find root");
+	#endif
+	return branch;
+	
+}
+
+
+static struct paramroot* param_root_attach(t_symbol* root){
+		
+		// Pointer to the start of paramroots
+		struct paramroot* branch = paramroots;
+		
+		while( branch ) {
+			if ( branch->root == root) {
+				#ifdef PARAMDEBUG
+				  post("Found root:%s",root->s_name);
+				#endif
+				
+				return branch;
+			}
+			if ( branch->next == NULL ) break;
+			branch = branch->next; 
+		}
+		
+		// we did not find a paramroot linked to this root canvas
+		// so we create it
+		#ifdef PARAMDEBUG
+			 post("Creating root:%s",root->s_name);
+		#endif
+		
+		// Create and add paramroot to the end
+		struct paramroot* newbranch = getbytes(sizeof(*newbranch));
+		newbranch->root = root;
+		newbranch->next = NULL;
+		newbranch->params = NULL;
+		
+		if (branch) {
+			#ifdef PARAMDEBUG
+			  post("Appending it to previous roots");
+			#endif
+			newbranch->previous = branch;
+			branch->next = newbranch;
+		} else {
+			#ifdef PARAMDEBUG
+				post("Creating first root");
+			#endif
+			newbranch->previous = NULL;
+			paramroots = newbranch;
+		}
+		
+		
+		return newbranch;
+	
+}
+
+
+
+static struct param* get_param_list(t_symbol* root) {
+	
+	
+	struct paramroot* branch = param_get_root(root);
+	if (branch) {
+		
+	#ifdef PARAMDEBUG
+		post("Getting params from %s",branch->root->s_name);
+		if (!branch->params) post("Root contains no params");
+	#endif
+		return branch->params;
+	} 
+	
+	return NULL;
+    
+	
+}
+
+static t_symbol* param_get_name ( int ac, t_atom* av  ) {
+	
+	if (ac  && IS_A_SYMBOL(av, 0)) {
+		char *firstChar =  (atom_getsymbol(av))->s_name;
+		if (*firstChar == *separator) {
+			return atom_getsymbol(av);
+		 }
+	} 
+	post("param requires a name that starts with a \"/\"");
+	return NULL;
+}
+
+// Name can be NULL
+
+static t_symbol* param_get_path( t_canvas* i_canvas,  t_symbol* name) {
+	
+	char* sbuf_name = param_buf_temp_a;
+	char* sbuf_temp = param_buf_temp_b;
+	sbuf_name[0] = '\0';
+	sbuf_temp[0] = '\0';
+	//char* separator = "/";
+	
+	
+	t_symbol* id_s = gensym("/id"); // symbol that points to "/id" symbol
+	   
+    // arguments of the current canvas being analyzed
+    int i_ac;
+    t_atom * i_av;
+	
+	// temp pointer to the current id being added to the path
+	t_symbol* id_temp;
+	
+	/* FIND ID AND BASEPATH  */
+   while( i_canvas->gl_owner) {
+	   // Ignore all supatches
+	   if ( tof_canvas_is_not_subpatch(i_canvas) ) {
+		tof_get_canvas_arguments(i_canvas,&i_ac, &i_av);
+		id_temp=tof_get_canvas_name(i_canvas);
+		//id_temp= canvas_realizedollar(i_canvas, gensym("$0"));
+		int start = 0;
+		int count = 0;
+		//found_id_flag = 0;
+		
+		while( tof_get_tagged_argument(*separator,i_ac,i_av,&start,&count) ) {
+			
+			if ( IS_A_SYMBOL(i_av,start)
+			   && (id_s == (i_av+start)->a_w.w_symbol) 
+			   && (count > 1) ) {  
+	           	id_temp = atom_getsymbol(i_av+start+1);
+	           	//id_canvas = i_canvas;
+				//found_id_flag = 1;
+	           	break;
+			}
+			start= start + count;
+		}	        
+        // if ever an /id is missing, this param is not saveable
+        //if (found_id_flag == 0)  saveable = 0;
+        
+	   // Prepend newly found ID
+		   strcpy(sbuf_temp,sbuf_name);
+		   strcpy(sbuf_name, separator);
+		   strcat(sbuf_name, id_temp->s_name);
+		   strcat(sbuf_name,sbuf_temp);  
+		}
+        i_canvas = i_canvas->gl_owner;
+    } 
+  //strcat(sbuf_name,separator);
+  if ( name != NULL) {
+	  strcat(sbuf_name,name->s_name);
+  } else {
+	  strcat(sbuf_name, separator);
+  }
+  
+  return gensym(sbuf_name);
+	
+}
+
+
+
+// root, path, ac, av, ac_g, av_g
+// From there, deduct id, path_, etc...
+
+//static struct param* register_param( t_canvas* canvas, int o_ac, t_atom* o_av) {
+
+static struct param* param_register(t_symbol* root, t_symbol* path, int ac, t_atom* av,int ac_g, t_atom* av_g) {
+	
+			
+     //char *separator = "/";
+		
+		
+		
+		/* GET POINTER TO PARAMLIST FOR THAT ROOT  */
+		struct paramroot* branch = param_root_attach(root);
+        struct param* last = branch->params;
+		
+		// Search for param with same path
+		while( last ) {
+			if ( last->path == path) {
+				#ifdef PARAMDEBUG
+				  post("Found param with same name");
+				#endif
+				last->users = last->users + 1;
+				return last;
+			}
+			if ( last->next == NULL ) break;
+			last = last->next; 
+		}
+		
+		// Create and add param to the end
+		
+		
+		
+		
+		struct param* p = getbytes(sizeof(*p));
+		p->root = root;
+		p->alloc = 0;
+		p->path = path;
+		
+		// Create receive and send symbols: $0/path
+		strcpy(param_buf_temp_a,p->root->s_name);  
+		//strcat(param_buf_temp_a,separator);
+		strcat(param_buf_temp_a,p->path->s_name);
+		p->receive = gensym(param_buf_temp_a);
+		strcat(param_buf_temp_a,"_");  
+		p->send = gensym(param_buf_temp_a);
+		
+		p->next = NULL;
+		p->users = 1;
+		//p->id = id;
+		set_param( p, ac, av);
+		p->ac_g = ac_g;
+		p->av_g = getbytes(ac_g*sizeof(*(p->av_g)));
+		tof_copy_atoms(av_g,p->av_g,ac_g);
+		if (last) {
+			#ifdef PARAMDEBUG
+			  post("Appending param");
+			#endif
+			p->previous = last;
+			last->next = p;
+		} else {
+			#ifdef PARAMDEBUG
+				post("Creating first param");
+			#endif
+			p->previous = NULL;
+			branch->params = p;
+		}
+		
+		
+		return p;
+   
+}
+
+static void param_unregister(struct param* p) {
+	
+	//post("unregistering %s", p->path->s_name);
+	struct paramroot* branch = param_get_root(p->root);
+	struct param* paramlist = branch->params;
+	
+	if ( paramlist) {
+
+		p->users = p->users - 1;
+		if ( p->users == 0 ) {
+			// Remove param
+			//post("Removing last param of this name");
+			if (p->previous) {
+				p->previous->next = p->next;
+				if (p->next) p->next->previous = p->previous;
+				/*
+				if (p->next == NULL) {
+					p->previous->next = NULL;
+				} else {
+					p->previous->next = p->next;
+				}
+				*/
+			} else {
+				paramlist = p->next;
+				if ( p->next != NULL) p->next->previous = NULL;
+			}
+			freebytes(p->av, p->alloc * sizeof *(p->av) );
+			freebytes(p->av_g, p->ac_g * sizeof *(p->av_g) );
+			freebytes(p, sizeof *p);
+		}
+		
+		// Update the params for that root
+		if (paramlist == NULL) {
+			if (branch->previous) {
+				branch->previous->next = branch->next;
+					if (branch->next) branch->next->previous = branch->previous;
+			} else {
+				paramroots = branch->next;
+				if ( branch->next != NULL) branch->next->previous = NULL;
+			}
+			#ifdef PARAMDEBUG
+			  post("Removing root:%s",branch->root->s_name);
+			#endif
+			freebytes(branch, sizeof *branch);
+		} else {
+			branch->params = paramlist;
+		}
+		
+	} else {
+		post("Euh... no params found!");
+	}
+	
+	
+}
+
+
+
+
+
+
+/*
 static void get_param_build_info(t_canvas* canvas, int o_ac, t_atom* o_av, struct param_build_info* pbi, int flag) {
 	
 	 pbi->path = NULL;
@@ -254,10 +457,6 @@ static void get_param_build_info(t_canvas* canvas, int o_ac, t_atom* o_av, struc
    
    t_symbol* id_s = NULL;
    
-   // A HACK to find out if we are in a subpatch or an abstraction 
-   // A subpatch always has the same $0 as it's parent
-   //t_symbol* p_id_s = canvas_realizedollar(i_canvas, gensym("$0"));
-  //t_symbol* p_id_s = gensym("");
    
    while( i_canvas->gl_owner) {
 	   // Ignore all supatches
@@ -265,8 +464,6 @@ static void get_param_build_info(t_canvas* canvas, int o_ac, t_atom* o_av, struc
 		tof_get_canvas_arguments(i_canvas,&i_ac, &i_av);
 		id_s= canvas_realizedollar(i_canvas, gensym("$0"));
 	
-		//if (id_s != p_id_s) {
-		//	p_id_s = id_s;
 		
 		int start = 0;
 		int count = 0;
@@ -290,16 +487,12 @@ static void get_param_build_info(t_canvas* canvas, int o_ac, t_atom* o_av, struc
         if (found_id_flag == 0)  saveable = 0;
         
 		
-		//if (id_s != p_id_s) {
 	   // Prepend newly found ID
 		   strcpy(sbuf_temp,sbuf_name);
 		   strcpy(sbuf_name, "/");
 		   strcat(sbuf_name, id_s->s_name);
 		   strcat(sbuf_name,sbuf_temp);  
-        //}
-	     //  p_id_s = id_s;
-		   
-     //} 
+        
 		}
         i_canvas = i_canvas->gl_owner;
     } 
@@ -392,7 +585,7 @@ static void get_param_build_info(t_canvas* canvas, int o_ac, t_atom* o_av, struc
 	
 }
 }
-
+*/
 
 static void param_send_prepend(struct param *p, t_symbol* s,t_symbol* prepend) {
 	
@@ -449,8 +642,9 @@ static void param_output_prepend(struct param* p, t_outlet* outlet, t_symbol* s)
 }
 
 
-
-static int param_write(t_canvas* canvas, t_symbol* filename, t_symbol* id) {
+// Write will only save the params that share the same root
+static int param_write(t_canvas* canvas, t_symbol* filename) {
+	
 	
 	int w_error;
 	
@@ -458,9 +652,9 @@ static int param_write(t_canvas* canvas, t_symbol* filename, t_symbol* id) {
 		
 	t_binbuf *bbuf = binbuf_new();
 	
-	struct param *p = get_param_list();
+	struct param *p = get_param_list(tof_get_dollarzero(canvas));
 	while(p) {
-	    if ( p->id && ( id == NULL || p->id == id) && (p->selector != &s_bang)) {
+	    if ((p->selector != &s_bang)) {
 			int ac = p->ac + 2;
 			t_atom *av = getbytes(ac*sizeof(*av));	
 			tof_copy_atoms(p->av,av+2,p->ac);
@@ -486,7 +680,7 @@ static int param_write(t_canvas* canvas, t_symbol* filename, t_symbol* id) {
 	binbuf_free(bbuf);
 	
 	return w_error;
-
+    
 }
 
 
@@ -502,7 +696,7 @@ static int param_read(t_canvas* canvas, t_symbol* filename)
     r_error= (binbuf_read_via_canvas(bbuf, filename->s_name, canvas, 0));
             //pd_error(x, "%s: read failed", filename->s_name);
 			
-  
+    t_symbol* root = tof_get_dollarzero(canvas);
 	
 	int bb_ac = binbuf_getnatom(bbuf);
 	int ac = 0;
@@ -512,7 +706,13 @@ static int param_read(t_canvas* canvas, t_symbol* filename)
 	  while (bb_ac--) {
 		if (bb_av->a_type == A_SEMI) {
 			if ( IS_A_SYMBOL(av,0) && ac > 1) {
-			   t_symbol* s = atom_getsymbol(av);
+				t_symbol* path = atom_getsymbol(av);
+				strcpy(param_buf_temp_a,root->s_name);
+				strcat(param_buf_temp_a,path->s_name);
+			   t_symbol* s = gensym(param_buf_temp_a);
+			   #ifdef PARAMDEBUG
+				post("Restoring:%s",s->s_name);
+			   #endif
 			   if ( s->s_thing) pd_forwardmess(s->s_thing, ac-1, av+1);
 				  
 			   

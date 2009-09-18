@@ -32,14 +32,14 @@ static t_symbol* paramFile_makefilename(t_symbol* basename, t_float f) {
 	if ( f > 127) f = 127;
 	
 	int i = (int) f;
-	int length = strlen(basename->s_name)+6;
+	int length = strlen(basename->s_name)+10;
 	char* buf = getbytes( length * sizeof (*buf));	
-	sprintf(buf,"%s%03d.p",basename->s_name,i);
+	sprintf(buf,"%s%03d.param",basename->s_name,i);
 	//strcpy(buf,basename->s_name);
 	//strcat(buf,".param");
 	t_symbol* filename = gensym(buf);
 	freebytes(buf, length * sizeof (*buf));
-	post("File name:%s",filename->s_name);
+	//post("File name:%s",filename->s_name);
 	return filename;
 }
 
@@ -48,7 +48,8 @@ static void paramFile_write(t_paramFile *x, t_float f) {
 	
 	
 	t_symbol* filename = paramFile_makefilename(x->basename,f);
-	if ( param_write(x->canvas,filename,NULL) ) pd_error("%s: write failed", filename->s_name);
+	post("Writing to:%s",filename->s_name);
+	if ( param_write(x->canvas,filename) ) pd_error(x,"%s: write failed", filename->s_name);
 
 }
 
@@ -57,7 +58,7 @@ static void paramFile_read(t_paramFile *x, t_float f) {
 	
 	
 	t_symbol* filename = paramFile_makefilename(x->basename,f);
-	
+	post("Reading from:%s",filename->s_name);
 	if (param_read(x->canvas, filename)) pd_error(x, "%s: read failed", filename->s_name);
 
 	

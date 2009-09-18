@@ -31,17 +31,17 @@ static t_class *paramRoute_class;
 typedef struct _paramRoute
 {
   t_object                    x_obj;
-  t_symbol                    *basepath;
+  t_symbol                    *path;
   t_outlet					  *x_outlet;
   t_symbol 					*s_save;
   t_symbol 					*s_load;
   t_symbol*					s_empty;
   t_canvas*					canvas;
-  t_symbol*					id;
+  t_symbol*					root;
  
 } t_paramRoute;
 
-
+/*
 static t_symbol* paramRoute_makefilename( t_symbol *basename, t_float n) {
 	
 	
@@ -75,7 +75,7 @@ static t_symbol* paramRoute_makefilename( t_symbol *basename, t_float n) {
 	post("File name:%s",filename->s_name);
 	return filename;
 }
-
+*/
 static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av) { 
   
   //I DEACTIVATED THE SAVE & LOAD FEATURES UNTIL I BETTER DEFINE PARAMROUTE'S STATE SAVING
@@ -104,18 +104,21 @@ static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av
   } else { // Try to send
 	  
 	  if (ac) {
-		int sendBufLength = strlen(x->basepath->s_name) + strlen(s->s_name) + 1;
-		char *sendBuf = (char*)getbytes((sendBufLength)*sizeof(char));
+		//int sendBufLength = strlen(x->path->s_name) + strlen(s->s_name) + 1;
+		//char *sendBuf = (char*)getbytes((sendBufLength)*sizeof(char));
 	   
-		strcpy(sendBuf, x->basepath->s_name);
-		strcat(sendBuf, s->s_name);
-		t_symbol* target = gensym(sendBuf);
-		freebytes(sendBuf, (sendBufLength)*sizeof(char));
-		
+	    strcpy(param_buf_temp_a, x->root->s_name);
+		strcpy(param_buf_temp_b, x->path->s_name);
+		strcat(param_buf_temp_b, s->s_name);
+		t_symbol* path = gensym(param_buf_temp_b);
+		strcat(param_buf_temp_a, param_buf_temp_b);
+		t_symbol* target = gensym(param_buf_temp_a);
+		//freebytes(sendBuf, (sendBufLength)*sizeof(char));
+		//post("target:%s",target->s_name);
 		if (target->s_thing) {
-			if (target->s_thing) pd_forwardmess(target->s_thing, ac, av);
+			pd_forwardmess(target->s_thing, ac, av);
 		   } else {
-			 outlet_anything(x->x_outlet,s,ac,av);
+			 outlet_anything(x->x_outlet,path,ac,av);
 		   }
 		
 	  }
@@ -138,12 +141,6 @@ static void *paramRoute_new(t_symbol *s, int ac, t_atom *av) {
 	 x->s_load = gensym("load");
      x->s_empty = gensym("");
 
-    // String variables
-	char *separator = "/";
-	char sbuf_name[MAXPDSTRING];
-	char sbuf_temp[MAXPDSTRING];
-	sbuf_name[0] = '\0';
-	sbuf_temp[0] = '\0';
 	
 	// GET THE CURRENT CANVAS
     t_canvas *canvas=tof_get_canvas();
@@ -151,14 +148,10 @@ static void *paramRoute_new(t_symbol *s, int ac, t_atom *av) {
    // Get the root  canvas
    x->canvas = tof_get_root_canvas(canvas);
    
-   struct param_build_info build_info;
-   get_param_build_info(canvas,ac,av,&build_info,0);
-	
-	//param_get_id_stuff(canvas,sbuf_name, sbuf_temp, &(x->x_saveable));
-    x->id = build_info.id;
-  	x->basepath = build_info.basepath;
-   //if (x->basepath)  post("PARAMROUTE BASEPATH: %s",x->basepath->s_name);
-   //if (x->id)  post("PARAMROUTE ID: %s",x->id->s_name);
+   x->root = tof_get_dollarzero(x->canvas);
+   
+   x->path = param_get_path(canvas,NULL);
+   
     // INLETS AND OUTLETS
     x->x_outlet = outlet_new(&x->x_obj, &s_list);
   return (x);

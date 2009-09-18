@@ -1,11 +1,11 @@
-#N canvas 1027 43 1018 689 10;
+#N canvas 1024 0 1018 716 10;
 #X obj 42 514 dac~;
 #X obj 47 192 nbx 5 14 -1e+37 1e+37 0 0 /wow/OSC1/freq /wow/OSC1/freq_
-/wow/OSC1/freq 0 -8 0 10 -262144 -1 -1 320 256;
+/wow/OSC1/freq 0 -8 0 10 -262144 -1 -1 0 256;
 #X obj 161 190 hsl 128 15 0 1 0 0 /wow/OSC1/amp /wow/OSC1/amp_ /wow/OSC1/amp
 -2 -8 0 10 -262144 -1 -1 0 1;
 #X obj 49 231 nbx 5 14 -1e+37 1e+37 0 0 /wow/OSC2/freq /wow/OSC2/freq_
-/wow/OSC2/freq 0 -8 0 10 -262144 -1 -1 400 256;
+/wow/OSC2/freq 0 -8 0 10 -262144 -1 -1 0 256;
 #X obj 163 229 hsl 128 15 0 1 0 0 /wow/OSC2/amp /wow/OSC2/amp_ /wow/OSC2/amp
 -2 -8 0 10 -262144 -1 -1 0 1;
 #X obj 387 215 print PARAM;
@@ -31,7 +31,7 @@ to examine how they are linked to the abstraction below.;
 #N canvas 0 0 450 300 more_about_hierachy 0;
 #X restore 607 532 pd more_about_hierachy;
 #X obj 49 158 hsl 128 15 0 1 0 0 /masterVolume /masterVolume_ /masterVolume
--2 -8 0 10 -262144 -1 -1 1270 1;
+-2 -8 0 10 -262144 -1 -1 0 1;
 #X text 605 488 -- the /ID keyword --;
 #X text 107 124 -- example --;
 #X text 468 202 You can "listen" to the param "stream" by receiving
@@ -62,20 +62,24 @@ of some the example's sliders or number boxes to print out this stream.
 #X obj 73 430 param /masterVolume 0 /gui slider 0 1;
 #X msg 520 495 /wow;
 #X msg 615 643 guis /wow;
-#X obj 422 366 print yeah;
-#X msg 170 327 save;
 #X msg 621 25 save;
 #X msg 810 79 save;
 #X obj 742 116 paramRoute;
-#X obj 52 365 examples/param-synth /id wow /OSC1/freq 320;
-#X obj 399 339 param /t_test 0 /gui tgl;
 #X obj 32 587 OSCToParam 7493;
 #X text 134 583 OSCToParam can send all icomming OSC message to matching
 parameters. For example \, the OSC message '/masterVolume 0.56' on
 port 7493 will be forwarded to the parameter '/masterVolume' that will
 then take the value '0.56'.;
+#X obj 422 366 print yeah;
+#X obj 399 339 param /t_test 0 /gui tgl;
+#X obj 676 343 paramFile;
+#X obj 678 296 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 613 564 guis;
+#X obj 51 366 examples/param-synth /id tom /OSC1/freq 320;
+#X obj 440 117 ./examples/boubou;
 #X connect 6 0 7 0;
-#X connect 7 0 52 0;
+#X connect 7 0 57 0;
 #X connect 8 0 5 0;
 #X connect 12 0 8 1;
 #X connect 14 0 8 0;
@@ -96,8 +100,9 @@ then take the value '0.56'.;
 #X connect 44 0 18 0;
 #X connect 45 0 40 0;
 #X connect 46 0 29 0;
-#X connect 48 0 52 0;
-#X connect 49 0 42 0;
-#X connect 50 0 51 0;
-#X connect 52 0 19 0;
-#X connect 53 0 47 0;
+#X connect 47 0 42 0;
+#X connect 48 0 49 0;
+#X connect 53 0 52 0;
+#X connect 55 0 54 0;
+#X connect 56 0 29 0;
+#X connect 57 0 19 0;

@@ -21,6 +21,7 @@
 
 
 
+
 #include "tof.h"
 #include "param.h"
 
@@ -36,9 +37,9 @@ typedef struct _param
   t_object                    x_obj;
   struct _param_inlet2       *x_param_inlet2;
   
-  t_symbol 					*x_path;
+  //t_symbol 					*x_path;
   t_symbol	                 *s_PARAM;
-  t_symbol                   *x_update_gui;
+  //t_symbol                   *x_update_gui;
   t_symbol                   *s_set;
   struct param				  *x_param;
 } t_param;
@@ -49,65 +50,26 @@ typedef struct _param_inlet2
   t_param  *p_owner;
 } t_param_inlet2;
 
-/*
-static void output_param(t_param *x) {
-	if (x->x_param) {
-		if((x->x_param->selector == &s_bang) ) {
-			outlet_bang(x->x_obj.ob_outlet);
-		} else {
-			outlet_anything(x->x_obj.ob_outlet, x->x_param->selector, x->x_param->ac, x->x_param->av);
-		}
-	}	
-}
-*/
-/*
-static void send_param(t_param *x, t_symbol* s,t_symbol* prepend ) {
-	if (x->x_param) {
-	   if((x->x_param->selector == &s_bang)) {
-			 if (s->s_thing) 
-			     pd_bang(s->s_thing);
-	  } else {
-		if (s->s_thing) {
-			if ( x->x_param->selector == &s_list || x->x_param->selector == &s_float || x->x_param->selector == &s_symbol ) {
-				typedmess(s->s_thing, prepend, x->x_param->ac, x->x_param->av);
-			} else {
-			int ac = x->x_param->ac + 1;
-			t_atom *av = getbytes(ac*sizeof(*av));	
-			tof_copy_atoms(x->x_param->av,av+1,x->x_param->ac);
-			SETSYMBOL(av, x->x_param->selector);
-			typedmess(s->s_thing, prepend, ac, av);
-			freebytes(av, ac*sizeof(*av));
-		}
-		}
-	  }
-	}
-	
-}
-*/
 
 static void param_bang(t_param *x)
 {
-	param_output(x->x_param,x->x_obj.ob_outlet);
+	if ( x->x_param) {
+		param_output(x->x_param,x->x_obj.ob_outlet);
 	
-	param_send_prepend(x->x_param, x->s_PARAM ,x->x_path );
-    if(x->x_param->selector != &s_bang ) param_send_prepend(x->x_param, x->x_update_gui ,x->s_set );
- 
+		//param_send_prepend(x->x_param, x->s_PARAM ,x->x_param->path );
+		//if(x->x_param->selector != &s_bang ) param_send_prepend(x->x_param, x->x_param->send ,x->s_set );
+   }
 }
 
 static void param_anything(t_param *x, t_symbol *s, int ac, t_atom *av)
 {
  
+  post("RECEIVING SOMETHING");
+ 
   if ( x->x_param) set_param_anything(x->x_param,s,ac,av);
   
   param_bang(x);
-  
-  /*
-  param_output(x->x_param,x->x_obj.ob_outlet);
- 
-  param_send_prepend(x->x_param, x->s_PARAM ,x->x_path );
-  if(x->x_param->selector != &s_bang ) param_send_prepend(x->x_param, x->x_update_gui ,x->s_set );
-  */
-  
+    
 }
 
 
@@ -127,11 +89,11 @@ static void param_free(t_param *x)
 {
 	
 	if(x->x_param_inlet2) pd_free((t_pd *)x->x_param_inlet2);
-	
-	
-	if (x->x_param) unregister_param(x->x_param);
-	
-	if ( x->x_path) pd_unbind(&x->x_obj.ob_pd, x->x_path);
+
+	if (x->x_param) {
+		pd_unbind(&x->x_obj.ob_pd, x->x_param->receive);
+		param_unregister(x->x_param);
+	}
     
 }
 
@@ -149,30 +111,76 @@ static void *param_new(t_symbol *s, int ac, t_atom *av)
   x->x_param_inlet2 = p;
   p->p_owner = x;
   
+  // GET THE CURRENT CANVAS
+  t_canvas* canvas=tof_get_canvas();
+  
+  // GET THE NAME
+  t_symbol* name = param_get_name(ac,av);
+  
+  if (name) {
+	  
+	  t_symbol* path = param_get_path(canvas,name);
+	  t_symbol* root = tof_get_dollarzero(tof_get_root_canvas(canvas));
+	  
+	  
+	  // FIND PARAM VALUE
+	  // A. In canvas' arguments
+	  // B. In object's arguments
+	  // C. Defaults to a bang
+	  
+	   int ac_p = 0;
+		t_atom* av_p = NULL;
+	  
+			  
+	   // A. In canvas' arguments
+		int ac_c = 0;
+		t_atom* av_c = NULL;
+		
+		t_canvas * before = tof_get_canvas_before_root(canvas);
+		tof_get_canvas_arguments(before,&ac_c , &av_c);
+		param_find_value(name, ac_c, av_c,&ac_p,&av_p);
+	  
+		// B. I object's arguments
+	  if ( ac_p == 0  && ac > 1) {
+		int start = 1;
+		int count = 0;
+		tof_get_tagged_argument('/',ac,av,&start,&count);
+		if (count > 0) {
+			ac_p = count;
+			av_p = av + start;
+		}
+	  }
+		  
+	  
+	  
+	  
+	  //FIND THE GUI TAGS
+	  int ac_g = 0;
+	  t_atom* av_g = NULL;
+	 // There could be a problem if the the name is also /gui
+	 param_find_value(gensym("/gui"), ac, av,&ac_g,&av_g);
+	  
+	  x->x_param = param_register(root,path,ac_p,av_p,ac_g,av_g);
+	  
+	  #ifdef PARAMDEBUG
+			post("receive:%s",x->x_param->receive->s_name);
+			post("send:%s",x->x_param->send->s_name);
+	  #endif
+	  
+	  // BIND RECEIVER
+  	  pd_bind(&x->x_obj.ob_pd, x->x_param->receive );
+      // CREATE INLETS AND OUTLETS
+      inlet_new((t_object *)x, (t_pd *)p, 0, 0);
+      outlet_new(&x->x_obj, &s_list);
+	  
+	  
+  } else {
+	  
+	   pd_error(x,"Could not create param. See possible errors above.");
+  }
+  
+  
 
-   x->x_param = NULL;
-
-
-	// GET THE CURRENT CANVAS
-	t_canvas *canvas=tof_get_canvas();
-   
-   struct param_build_info build_info;
-   get_param_build_info(canvas,ac,av,&build_info,1);
-	
- 
-  if ( build_info.path  ) {
-	x->x_path = build_info.path;
-	x->x_update_gui = build_info.path_g;
-	// BIND RECEIVER
-  	pd_bind(&x->x_obj.ob_pd, build_info.path );
-	// REGISTER PARAM
-	x->x_param = register_param(&build_info);
-    // CREATE INLETS AND OUTLETS
-    inlet_new((t_object *)x, (t_pd *)p, 0, 0);
-    outlet_new(&x->x_obj, &s_list);
-   } else {
-	   pd_error(x,"[param] requires a name(first argument) that starts with a /");
-   }
   
   
   

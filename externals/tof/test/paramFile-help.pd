@@ -1,59 +1,30 @@
-#N canvas 1138 171 606 437 10;
-#X msg 245 346 save;
-#X msg 284 347 load;
-#X text 244 327 no presets:;
-#X obj 440 328 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
+#N canvas 1024 0 1018 716 10;
+#X obj 265 196 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
 -1 -1 0;
-#X obj 499 354 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
+#X obj 316 247 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
 -1 -1 0;
-#X msg 440 348 save \$1;
-#X msg 499 375 load \$1;
-#X text 435 310 with presets:;
 #X obj 11 36 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
 #X text 16 92 author: mrtoftrash@gmail.com;
 #X text 16 113 version: 2009-04-14 (initial release);
-#X text 16 37 description: paramFile is an abstraction than can save
-and restore params.;
-#X obj 245 383 paramFile fileName;
-#X obj 440 399 paramFile fileName;
-#X text 14 155 argument 1: the file name's prefix. A ".param" is always
-appended to the file name stored on the computer. In preset mode \,
-the preset number is also include in the stored file name.;
-#X text 16 71 tags: state file;
-#X obj 391 225 param /test bob;
-#X obj 55 261 paramFile;
-#X obj 55 231 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#X obj 30 252 paramFile;
+#X obj 30 171 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 222 222 param /music 43;
-#X obj 342 255 param /mtime is 1506;
-#X obj 54 297 print FILE;
-#X floatatom 230 253 5 0 0 0 - - -;
-#X floatatom 155 229 5 0 0 0 - - -;
-#X obj 335 281 print mtime;
-#X obj 105 231 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X msg 146 289 3;
-#X msg 490 259 yuyt;
-#X msg 120 333 2;
-#X msg 448 283 tom;
-#X msg 195 280 2;
-#X msg 203 314 3;
-#X connect 0 0 12 0;
-#X connect 1 0 12 0;
-#X connect 3 0 5 0;
-#X connect 4 0 6 0;
-#X connect 5 0 13 0;
-#X connect 6 0 13 0;
-#X connect 17 0 21 0;
-#X connect 18 0 17 0;
-#X connect 19 0 22 0;
-#X connect 20 0 24 0;
-#X connect 23 0 19 0;
-#X connect 25 0 17 1;
-#X connect 26 0 17 0;
-#X connect 27 0 20 0;
-#X connect 28 0 17 0;
-#X connect 29 0 20 0;
-#X connect 30 0 17 1;
-#X connect 31 0 17 1;
+#X obj 81 211 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 16 37 description: paramFile is an abstraction than saves and
+restores params in individual files on the hard disk.;
+#X text 16 71 tags: state file param;
+#X text 52 169 Save preset "000";
+#X text 108 207 Load preset "000";
+#X obj 265 295 paramFile;
+#X floatatom 265 220 5 0 0 0 - - -;
+#X floatatom 316 269 5 0 0 0 - - -;
+#X text 305 218 Save preset N;
+#X text 354 268 Load preset N;
+#X connect 0 0 13 0;
+#X connect 1 0 14 0;
+#X connect 6 0 5 0;
+#X connect 7 0 5 1;
+#X connect 13 0 12 0;
+#X connect 14 0 12 1;
