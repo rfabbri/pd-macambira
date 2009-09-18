@@ -27,10 +27,16 @@ static void tof_copy_atoms(t_atom *src, t_atom *dst, int n)
     *dst++ = *src++;
 }
 
+
+
+
 static t_symbol* tof_get_dollar(t_canvas* canvas, t_symbol* dollar) {
 	return canvas_realizedollar(canvas, dollar);
 }
 
+static t_symbol* tof_get_dollarzero(t_canvas* canvas) {
+	return canvas_realizedollar(canvas, gensym("$0"));
+}
 
 
 static int tof_path_is_absolute(char *dir, int length)
@@ -125,10 +131,19 @@ static int tof_anything_to_string( t_symbol* s, int ac, t_atom* av,char* buffer 
 
 }
 
+// returns the last canvas before the root canvas
+static t_canvas* tof_get_canvas_before_root(t_canvas* canvas) 
+{
+    // Find the proper parent canvas
+    while ( canvas->gl_owner && canvas->gl_owner->gl_owner) {
+        canvas = canvas->gl_owner;
+    }
+    return canvas;
+}
 
 static t_canvas* tof_get_root_canvas(t_canvas* canvas) 
 {
-    // Find the proper parent canvas
+    // Find the root canvas
     while ( canvas->gl_owner) {
        
         canvas = canvas->gl_owner;
