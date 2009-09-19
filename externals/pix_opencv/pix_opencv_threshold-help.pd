@@ -1,4 +1,4 @@
-#N canvas 577 161 1077 791 10;
+#N canvas 343 49 1077 791 10;
 #X obj 174 365 cnv 15 600 180 empty empty empty 20 12 0 14 -4034 -66577
 0;
 #X floatatom 300 424 5 0 0 0 - - -;
@@ -68,7 +68,7 @@
 #X msg 322 0 open \$1;
 #X obj 310 109 pix_film;
 #X msg 328 43 auto \$1;
-#X obj 328 25 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 328 25 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #X text -282 -36 Create window and render;
 #X msg 423 26 colorspace RGBA;

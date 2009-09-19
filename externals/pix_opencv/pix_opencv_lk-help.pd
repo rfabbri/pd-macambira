@@ -1,4 +1,4 @@
-#N canvas 378 68 1192 685 10;
+#N canvas 228 92 1192 685 10;
 #X obj 140 -12 cnv 15 600 450 empty empty empty 20 12 0 14 -24198 -66577
 0;
 #X floatatom 288 328 5 0 0 0 - - -;
@@ -58,7 +58,7 @@
 #X floatatom 425 217 5 0 0 0 - - -;
 #X text 465 217 frame tolerance for point identification ( default
 : 5 );
-#X text -230 -324 written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
+#X text -232 -324 written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
 ) and Yves Degoyon ( ydegoyon@gmail.com );
 #X text -231 -336 Corner points detection based on Shi and Tomasi;
 #X text -231 -348 pix_opencv_lk : Lukas-Kanade corner points tracking
@@ -68,22 +68,22 @@
 #X floatatom 769 59 5 0 0 0 - - -;
 #X floatatom 822 62 5 0 0 0 - - -;
 #X msg 350 283 pdelaunay 1 500;
-#X obj 357 -411 gemhead;
-#X obj 369 -384 bng 25 250 50 0 load empty empty 0 -6 0 8 -262144 -1
+#X obj 341 -335 gemhead;
+#X obj 353 -308 bng 25 250 50 0 load empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 426 -209 bng 15 250 50 0 empty empty end_reached 20 7 0 10 -262144
+#X obj 410 -133 bng 15 250 50 0 empty empty end_reached 20 7 0 10 -262144
 -1 -1;
-#X floatatom 408 -244 5 0 10000 1 frame# - -;
-#X obj 369 -355 openpanel;
-#X msg 369 -335 open \$1;
-#X obj 357 -226 pix_film;
-#X msg 375 -292 auto \$1;
-#X obj 375 -310 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X floatatom 392 -168 5 0 10000 1 frame# - -;
+#X obj 353 -279 openpanel;
+#X msg 353 -259 open \$1;
+#X obj 341 -150 pix_film;
+#X msg 359 -216 auto \$1;
+#X obj 359 -234 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
 1;
-#X msg 470 -309 colorspace RGBA;
-#X msg 575 -309 colorspace RGB;
-#X msg 679 -309 colorspace Grey;
-#X obj 470 -337 loadbang;
+#X msg 454 -233 colorspace RGBA;
+#X msg 559 -233 colorspace RGB;
+#X msg 663 -233 colorspace Grey;
+#X obj 454 -261 loadbang;
 #N canvas 0 0 450 300 vswitch 0;
 #X obj 144 263 outlet;
 #X obj 36 26 inlet;
@@ -112,15 +112,15 @@
 #X connect 11 0 8 0;
 #X connect 11 1 9 0;
 #X connect 11 1 6 0;
-#X restore 175 -152 pd vswitch;
-#X obj 247 -156 tgl 15 0 empty load empty 17 7 0 10 -262144 -1 -1 0
+#X restore 178 -115 pd vswitch;
+#X obj 250 -119 tgl 15 0 empty load empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 120 -228 pix_video;
-#X obj 120 -416 gemhead;
-#X msg 159 -303 device 0;
-#X msg 168 -272 driver 1;
-#X msg 145 -357 dialog;
-#X msg 150 -327 device /dev/dv1394-0;
+#X obj 161 -166 pix_video;
+#X obj 163 -320 gemhead;
+#X msg 200 -241 device 0;
+#X msg 209 -210 driver 1;
+#X msg 186 -295 dialog;
+#X msg 191 -265 device /dev/dv1394-0;
 #X obj 178 469 pix_texture;
 #X obj -231 -425 cnv 15 220 70 empty empty empty 20 12 0 14 -195568
 -66577 0;

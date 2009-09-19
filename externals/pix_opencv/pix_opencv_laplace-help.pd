@@ -1,4 +1,4 @@
-#N canvas 430 219 670 547 10;
+#N canvas 184 49 872 790 10;
 #X obj 347 393 cnv 15 200 70 empty empty empty 20 12 0 14 -24198 -66577
 0;
 #X obj 374 435 pix_opencv_laplace;
@@ -7,11 +7,11 @@
 #X msg 486 410 5;
 #X msg 518 410 7;
 #X text 381 392 aperture size ( default 3 );
-#X text -94 80 Written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
+#X text 517 343 Written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
 );
-#X text -94 69 used as an edge detector;
-#X text -95 56 pix_opencv_laplace : laplace filter;
-#X obj -96 -31 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
+#X text 517 332 used as an edge detector;
+#X text 516 319 pix_opencv_laplace : laplace filter;
+#X obj 515 232 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 0 22 454 304 gemwin 0;
 #X obj 67 89 outlet;
@@ -43,9 +43,9 @@
 #X connect 9 0 6 0;
 #X connect 10 0 7 0;
 #X connect 10 2 9 0;
-#X restore -91 13 pd gemwin;
-#X msg -91 -8 create;
-#X text -90 -26 Create window and render;
+#X restore 520 276 pd gemwin;
+#X msg 520 255 create;
+#X text 521 237 Create window and render;
 #X obj 493 -11 gemhead;
 #X obj 374 316 separator;
 #X obj 505 16 bng 25 250 50 0 load empty empty 0 -6 0 8 -262144 -1
@@ -57,7 +57,7 @@
 #X msg 505 65 open \$1;
 #X obj 493 174 pix_film;
 #X msg 511 108 auto \$1;
-#X obj 511 90 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 511 90 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #X msg 606 91 colorspace RGBA;
 #X msg 711 91 colorspace RGB;
