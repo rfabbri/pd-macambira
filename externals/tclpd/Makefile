@@ -1,33 +1,36 @@
 #!/usr/bin/make
 
 DEBUG?=0
-OS = linux
+OS := $(shell uname -s)
+TCL_VERSION := $(shell echo 'puts $$tcl_version' | tclsh)
 
 ifeq ($(DEBUG),1)
 	CFLAGS += -O0 -g -ggdb -DDEBUG
 endif
-ifeq ($(OS),darwin)
+ifeq ($(OS),Linux)
+  PDSUF = .pd_linux
+  PDBUNDLEFLAGS = -shared -rdynamic
+  LDSOFLAGS = -lm -ltcl$(TCL_VERSION)
+endif
+ifeq ($(OS),Darwin)
   PDSUF = .pd_darwin
+  INCLUDES = -I/Library/Frameworks/Tcl.framework/Headers
   PDBUNDLEFLAGS = -bundle -flat_namespace -undefined dynamic_lookup
-else
-  ifeq ($(OS),nt)
-    PDSUF = .dll
-    PDBUNDLEFLAGS = -shared
-  else
-    PDSUF = .pd_linux
-    PDBUNDLEFLAGS = -shared -rdynamic
-  endif
+  LDSOFLAGS = -lm -framework Tcl
+endif
+ifeq (MINGW,$(findstring MINGW,$(UNAME)))
+  PDSUF = .dll
+  PDBUNDLEFLAGS = -shared
+  LDSOFLAGS = -lm -ltcl$(TCL_VERSION)
 endif
 
 LIBNAME = tcl
-TCL_VERSION := $(shell echo 'puts $$tcl_version' | tclsh)
 INCLUDES =  -I../../pd/src -I/usr/include -I/usr/include/tcl$(TCL_VERSION)
 CFLAGS += -funroll-loops -fno-operator-names -fno-omit-frame-pointer -falign-functions=16 -Wall -fPIC
 CFLAGS += -DPDSUF=\"$(PDSUF)\"
 ifeq ($(DEBUG),0)
 	CFLAGS += -O2
 endif
-LDSOFLAGS += -lm -ltcl$(TCL_VERSION)
 LDSHARED = $(CXX) $(PDBUNDLEFLAGS)
 
 all:: $(LIBNAME)$(PDSUF)
