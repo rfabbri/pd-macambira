@@ -415,7 +415,7 @@ proc propertiespanel_apply {w} {
         lappend newconf $key $v
     }
     set newconf [string map {$ \\$} $newconf]
-    pd [concat $::id($w) config {*}$newconf \;]
+    pd [linsert $newconf 0 $::id($w) config]\;
 }
 
 proc propertiespanel_close {w} {
