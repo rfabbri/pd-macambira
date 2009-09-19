@@ -52,6 +52,7 @@ typedef struct pdp_opencv_contours_convexhull_struct
     int x_cmode;
     // contours retrieval method
     int x_cmethod;
+    int x_accuracy;
 
     int x_width;
     int x_height;
@@ -128,7 +129,7 @@ static void pdp_opencv_contours_convexhull_process_rgb(t_pdp_opencv_contours_con
     // CV_CHAIN_CODE || CV_CHAIN_APPROX_NONE || CV_CHAIN_APPROX_SIMPLE || CV_CHAIN_APPROX_TC89_L1 || CV_CHAIN_APPROX_TC89_KCOS || CV_LINK_RUNS
 
     cvFindContours( x->gray, stor02, &contours, sizeof(CvContour), x->x_cmode, x->x_cmethod, cvPoint(0,0) );
-    if (contours) contours = cvApproxPoly( contours, sizeof(CvContour), stor02, CV_POLY_APPROX_DP, 3, 1 );
+    if (contours) contours = cvApproxPoly( contours, sizeof(CvContour), stor02, CV_POLY_APPROX_DP, x->x_accuracy, 1 );
 
     cvCopy(x->image, x->cnt_img, NULL);
     if ( x->x_nightmode )
@@ -180,13 +181,13 @@ static void pdp_opencv_contours_convexhull_process_rgb(t_pdp_opencv_contours_con
         // Draw convex hull for current contour.
         for(i=0; i<hullsize-1; i++)
         {
-            cvLine(x->cnt_img, PointArray[hull[i]], PointArray[hull[i+1]],CV_RGB(0,0,255),1, CV_AA, 0 );
+            cvLine(x->cnt_img, PointArray[hull[i]], PointArray[hull[i+1]],CV_RGB(0,0,255),3, CV_AA, 0 );
             SETFLOAT(&rlist[j], PointArray[hull[i]].x);
             SETFLOAT(&rlist[j+1], PointArray[hull[i]].y);
             j = j + 2;
         }
 
-        cvLine(x->cnt_img, PointArray[hull[hullsize-1]], PointArray[hull[0]],CV_RGB(0,0,255),1, CV_AA, 0 );
+        cvLine(x->cnt_img, PointArray[hull[hullsize-1]], PointArray[hull[0]],CV_RGB(0,0,255),3, CV_AA, 0 );
         SETFLOAT(&rlist[j], PointArray[hull[i]].x);
         SETFLOAT(&rlist[j+1], PointArray[hull[i]].y);
         outlet_list( x->x_dataout, 0, hullsize*2, rlist );
@@ -208,6 +209,11 @@ static void pdp_opencv_contours_convexhull_process_rgb(t_pdp_opencv_contours_con
 static void pdp_opencv_contours_convexhull_nightmode(t_pdp_opencv_contours_convexhull *x, t_floatarg f)
 {
     if  ( ((int)f==1) || ((int)f==0) ) x->x_nightmode = (int)f;
+}
+
+static void pdp_opencv_contours_convexhull_accuracy(t_pdp_opencv_contours_convexhull *x, t_floatarg f)
+{
+    if  ((int)f>=0) x->x_accuracy = (int)f;
 }
 
 static void pdp_opencv_contours_convexhull_cmode(t_pdp_opencv_contours_convexhull *x, t_floatarg f)
@@ -368,6 +374,7 @@ void *pdp_opencv_contours_convexhull_new(t_floatarg f)
     x->x_cmethod = CV_CHAIN_APPROX_SIMPLE;
 
     x->x_nightmode = 0;
+    x->x_accuracy = 3;
 
     x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
     x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
@@ -391,10 +398,11 @@ void pdp_opencv_contours_convexhull_setup(void)
     pdp_opencv_contours_convexhull_class = class_new(gensym("pdp_opencv_contours_convexhull"), (t_newmethod)pdp_opencv_contours_convexhull_new,
     	(t_method)pdp_opencv_contours_convexhull_free, sizeof(t_pdp_opencv_contours_convexhull), 0, A_DEFFLOAT, A_NULL);
 
-    class_addmethod(pdp_opencv_contours_convexhull_class, (t_method)pdp_opencv_contours_convexhull_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_opencv_contours_convexhull_class, (t_method)pdp_opencv_contours_convexhull_input_0, gensym("pdp"), A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_opencv_contours_convexhull_class, (t_method)pdp_opencv_contours_convexhull_cmode, gensym("mode"), A_FLOAT, A_NULL );
     class_addmethod(pdp_opencv_contours_convexhull_class, (t_method)pdp_opencv_contours_convexhull_cmethod, gensym("method"), A_FLOAT, A_NULL );
     class_addmethod(pdp_opencv_contours_convexhull_class, (t_method)pdp_opencv_contours_convexhull_nightmode, gensym("nightmode"), A_FLOAT, A_NULL );
+    class_addmethod(pdp_opencv_contours_convexhull_class, (t_method)pdp_opencv_contours_convexhull_accuracy, gensym("accuracy"), A_FLOAT, A_NULL );
 
 }
 
