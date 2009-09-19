@@ -144,11 +144,13 @@ pd::guiclass slider2 {
         dict set @state _min [expr {$a>$b?$b:$a}]
         dict set @state _max [expr {$a>$b?$a:$b}]
         dict set @state _rev [expr {$a>$b}]
-        # recompute pix2units conversion
-        switch [dict get $@config -orient] {
+        set orient [dict get $@config -orient]
+        switch $orient {
             horizontal {set dim [dict get $@config -width];  set mul  1}
             vertical   {set dim [dict get $@config -height]; set mul -1}
+            default {return -code error "invalid value '$orient' for -orient"}
         }
+        # recompute pix2units conversion
         set @pix2units [expr {(2.0 * [dict get $@state _rev] - 1.0) *
             ( [dict get $@state _max] - [dict get $@state _min] ) *
             $mul / ( $dim - [dict get $@config -headsz])}]
@@ -158,6 +160,10 @@ pd::guiclass slider2 {
             sys_gui [list slider2_draw_new $self $@c $@x $@y $@config $@state]\n
         } elseif {$upd && [info exists @c]} {
             sys_gui [list slider2_update $self $@c $@x $@y $@config $@state]\n
+        }
+        if {[dict exists $newconf -width] || [dict exists $newconf -height]} {
+            canvas_fixlinesfor \
+                [tclpd_get_glist $self] [tclpd_get_instance_text $self]
         }
     }
     
@@ -192,8 +198,9 @@ pd::guiclass slider2 {
     }
 
     object_properties {
+        set c [string map {$ \\$} $@config]
         gfxstub_new [tclpd_get_object_pd $self] [tclpd_get_instance $self] \
-            [list propertieswindow %s $@config "\[slider2\] properties"]\n
+            [list propertieswindow %s $c "\[slider2\] properties"]\n
     }
 
     widgetbehavior_getrect {
