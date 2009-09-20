@@ -76,23 +76,23 @@ install: libdir_install
 # The meta and help files are explicitly installed to make sure they are
 # actually there.  Those files are not optional, then need to be there.
 libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-exec
-	install -d $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(LIBRARY_NAME)-meta.pd $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(SOURCES:.c=.$(EXTENSION)) $(objectsdir)/$(LIBRARY_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(LIBRARY_NAME)-meta.pd $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
 single_install: $(LIBRARY_NAME) install-doc install-exec
-	install -d $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(LIBRARY_NAME).$(EXTENSION) $(objectsdir)/$(LIBRARY_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 install-doc:
-	install -d $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(SOURCES:.c=-help.pd) $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(wildcard *.pd) $(objectsdir)/$(LIBRARY_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(SOURCES:.c=-help.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 install-exec:
-	install -d $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(wildcard *.pd) $(objectsdir)/$(LIBRARY_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 
 clean:
