@@ -142,18 +142,18 @@ rez_install:
 
 # switch Linux-only pdp_v4l to Mac-only pdp_ieee1394
 pdp_help_hack:
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(helpdir)/pdp*-help.pd
-	rm -f --  $(helpdir)/pdp*-help.pd.bak
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(helpdir)/pdp/*.pd
-	rm -f --  $(helpdir)/pdp/*.pd.bak
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(helpdir)/pidip/*.pd
-	rm -f --  $(helpdir)/pidip/*.pd.bak
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(examplesdir)/pdp/*.pd
-	rm -f --  $(examplesdir)/pdp/*.pd.bak
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(examplesdir)/pidip/*.pd
-	rm -f --  $(examplesdir)/pidip/*.pd.bak
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(examplesdir)/3dp/*.pd
-	rm -f --  $(examplesdir)/3dp/*.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(helpdir)/pdp*-help.pd
+	rm -f --  $(DESTDIR)$(helpdir)/pdp*-help.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(helpdir)/pdp/*.pd
+	rm -f --  $(DESTDIR)$(helpdir)/pdp/*.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(helpdir)/pidip/*.pd
+	rm -f --  $(DESTDIR)$(helpdir)/pidip/*.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(examplesdir)/pdp/*.pd
+	rm -f --  $(DESTDIR)$(examplesdir)/pdp/*.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(examplesdir)/pidip/*.pd
+	rm -f --  $(DESTDIR)$(examplesdir)/pidip/*.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(examplesdir)/3dp/*.pd
+	rm -f --  $(DESTDIR)$(examplesdir)/3dp/*.pd.bak
 
 darwin_app_embed_libs:
 # embed libquicktime plugins
@@ -197,7 +197,7 @@ dmg: pdp_help_hack
 # detach one with the same name first
 	-hdiutil detach "/Volumes/$(VOLUME_NAME)"
 	hdiutil attach build.dmg
-	install -p $(manualsdir)/Pd/ReadMe.html "/Volumes/$(VOLUME_NAME)"
+	install -p $(DESTDIR)$(manualsdir)/Pd/ReadMe.html "/Volumes/$(VOLUME_NAME)"
 # add link to /Applications for easy install
 	ln -s /Applications /Volumes/$(VOLUME_NAME)/Applications
 # Install to .background for easier manual DS_Store makeing 
