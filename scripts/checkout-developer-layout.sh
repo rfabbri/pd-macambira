@@ -40,7 +40,7 @@ cd pure-data
 
 for section in Gem videoIO; do
          echo "checking out Gem::${section}"
-         svn checkout SVNOPTIONS ${PDAUTH} ${GEMURL}/${section} ${section}
+         svn checkout $SVNOPTIONS ${PDAUTH} ${GEMURL}/${section} ${section}
 done
 
 
