@@ -43,7 +43,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   WINDOWS_HACKS = -D'O_NONBLOCK=1'
   CFLAGS += -mms-bitfields $(WINDOWS_HACKS)
   LDFLAGS += -s -shared -Wl,--enable-auto-import
-  LIBS += -L$(pd_src)/bin -L$(pd_src)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
+  LIBS += -L$(PD_PATH)/src -L$(pd_src)/bin -L$(pd_src)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
   STRIP = strip --strip-unneeded -R .note -R .comment
 endif
 
