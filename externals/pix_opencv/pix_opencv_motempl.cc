@@ -237,15 +237,30 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
         cvLine( motion, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
-        sprintf( tindex, "%d", ++j );
-        cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
-        SETFLOAT(&rlist[0], j);
-        SETFLOAT(&rlist[1], center.x);
-        SETFLOAT(&rlist[2], center.y);
-        SETFLOAT(&rlist[3], comp_rect.width);
-        SETFLOAT(&rlist[4], comp_rect.height);
-        SETFLOAT(&rlist[5], angle);
-    	outlet_list( m_dataout, 0, 6, rlist );
+        if( i < 0 )  // case of the whole image
+        {
+          sprintf( tindex, "%d", i );
+          cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
+          SETFLOAT(&rlist[0], i);
+          SETFLOAT(&rlist[1], center.x);
+          SETFLOAT(&rlist[2], center.y);
+          SETFLOAT(&rlist[3], comp_rect.width);
+          SETFLOAT(&rlist[4], comp_rect.height);
+          SETFLOAT(&rlist[5], angle);
+          outlet_list( m_dataout, 0, 6, rlist );
+        }
+        else
+        {
+          sprintf( tindex, "%d", ++j );
+          cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
+          SETFLOAT(&rlist[0], j);
+          SETFLOAT(&rlist[1], center.x);
+          SETFLOAT(&rlist[2], center.y);
+          SETFLOAT(&rlist[3], comp_rect.width);
+          SETFLOAT(&rlist[4], comp_rect.height);
+          SETFLOAT(&rlist[5], angle);
+          outlet_list( m_dataout, 0, 6, rlist );
+        }
     }
 
 
@@ -394,15 +409,30 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
         cvLine( motion, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
-        sprintf( tindex, "%d", ++j );
-        cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
-        SETFLOAT(&rlist[0], j);
-        SETFLOAT(&rlist[1], center.x);
-        SETFLOAT(&rlist[2], center.y);
-        SETFLOAT(&rlist[3], comp_rect.width);
-        SETFLOAT(&rlist[4], comp_rect.height);
-        SETFLOAT(&rlist[5], angle);
-    	outlet_list( m_dataout, 0, 6, rlist );
+        if( i < 0 )  // case of the whole image
+        {
+          sprintf( tindex, "%d", i );
+          cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
+          SETFLOAT(&rlist[0], i);
+          SETFLOAT(&rlist[1], center.x);
+          SETFLOAT(&rlist[2], center.y);
+          SETFLOAT(&rlist[3], comp_rect.width);
+          SETFLOAT(&rlist[4], comp_rect.height);
+          SETFLOAT(&rlist[5], angle);
+          outlet_list( m_dataout, 0, 6, rlist );
+        }
+        else
+        {
+          sprintf( tindex, "%d", ++j );
+          cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
+          SETFLOAT(&rlist[0], j);
+          SETFLOAT(&rlist[1], center.x);
+          SETFLOAT(&rlist[2], center.y);
+          SETFLOAT(&rlist[3], comp_rect.width);
+          SETFLOAT(&rlist[4], comp_rect.height);
+          SETFLOAT(&rlist[5], angle);
+          outlet_list( m_dataout, 0, 6, rlist );
+        }
     }
 
 
@@ -556,15 +586,30 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
         cvLine( motion, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
-        sprintf( tindex, "%d", ++j );
-        cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
-        SETFLOAT(&rlist[0], j);
-        SETFLOAT(&rlist[1], center.x);
-        SETFLOAT(&rlist[2], center.y);
-        SETFLOAT(&rlist[3], comp_rect.width);
-        SETFLOAT(&rlist[4], comp_rect.height);
-        SETFLOAT(&rlist[5], angle);
-    	outlet_list( m_dataout, 0, 6, rlist );
+        if( i < 0 )  // case of the whole image
+        {
+          sprintf( tindex, "%d", i );
+          cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
+          SETFLOAT(&rlist[0], i);
+          SETFLOAT(&rlist[1], center.x);
+          SETFLOAT(&rlist[2], center.y);
+          SETFLOAT(&rlist[3], comp_rect.width);
+          SETFLOAT(&rlist[4], comp_rect.height);
+          SETFLOAT(&rlist[5], angle);
+          outlet_list( m_dataout, 0, 6, rlist );
+        }
+        else
+        {
+          sprintf( tindex, "%d", ++j );
+          cvPutText( motion, tindex, center, &font, CV_RGB(255,255,255));
+          SETFLOAT(&rlist[0], j);
+          SETFLOAT(&rlist[1], center.x);
+          SETFLOAT(&rlist[2], center.y);
+          SETFLOAT(&rlist[3], comp_rect.width);
+          SETFLOAT(&rlist[4], comp_rect.height);
+          SETFLOAT(&rlist[5], angle);
+    	  outlet_list( m_dataout, 0, 6, rlist );
+        }
     }
 
 
