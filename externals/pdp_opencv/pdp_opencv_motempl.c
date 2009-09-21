@@ -202,15 +202,30 @@ void  pdp_opencv_motempl_update_mhi( t_pdp_opencv_motempl *x, IplImage* img, Ipl
         cvLine( dst, center, cvPoint( cvRound( center.x + magnitude*cos(angle*CV_PI/180)),
                 cvRound( center.y - magnitude*sin(angle*CV_PI/180))), color, 3, CV_AA, 0 );
 
-        sprintf( tindex, "%d", ++j );
-        cvPutText( dst, tindex, center, &x->font, CV_RGB(255,255,255));
-        SETFLOAT(&x->rlist[0], j);
-        SETFLOAT(&x->rlist[1], center.x);
-        SETFLOAT(&x->rlist[2], center.y);
-        SETFLOAT(&x->rlist[3], comp_rect.width);
-        SETFLOAT(&x->rlist[4], comp_rect.height);
-        SETFLOAT(&x->rlist[5], angle);
-        outlet_list( x->x_dataout, 0, 6, x->rlist );
+        if ( i<0 )
+        {
+          sprintf( tindex, "%d", i );
+          cvPutText( dst, tindex, center, &x->font, CV_RGB(255,255,255));
+          SETFLOAT(&x->rlist[0], i);
+          SETFLOAT(&x->rlist[1], center.x);
+          SETFLOAT(&x->rlist[2], center.y);
+          SETFLOAT(&x->rlist[3], comp_rect.width);
+          SETFLOAT(&x->rlist[4], comp_rect.height);
+          SETFLOAT(&x->rlist[5], angle);
+          outlet_list( x->x_dataout, 0, 6, x->rlist );
+        }
+        else
+        {
+          sprintf( tindex, "%d", ++j );
+          cvPutText( dst, tindex, center, &x->font, CV_RGB(255,255,255));
+          SETFLOAT(&x->rlist[0], j);
+          SETFLOAT(&x->rlist[1], center.x);
+          SETFLOAT(&x->rlist[2], center.y);
+          SETFLOAT(&x->rlist[3], comp_rect.width);
+          SETFLOAT(&x->rlist[4], comp_rect.height);
+          SETFLOAT(&x->rlist[5], angle);
+          outlet_list( x->x_dataout, 0, 6, x->rlist );
+        }
     }
 }
 
