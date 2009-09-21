@@ -125,13 +125,21 @@ PD_BUILD_FLAGS =
 HAVE_AUTOGEN_SH := $(wildcard $(pd_src)/autogen.sh)
 # test for the new build system
 ifeq (autogen.sh, $(findstring autogen.sh,$(HAVE_AUTOGEN_SH)))
+#----------------------------------------------------------------------------#
 # new autotools build system
 pd:
 	cd $(pd_src) \
 		&& ./autogen.sh \
 		&& ./configure $(PD_CONFIGURE_FLAGS) \
 		&& make $(DEST_PATHS) $(PD_BUILD_FLAGS)
+
+PD_NAME=Pd
+pd_install: pd
+	$(MAKE) -C $(pd_src) $(DEST_PATHS) $(PD_BUILD_FLAGS) install
+	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
+	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
 else
+#----------------------------------------------------------------------------#
 # old build system
 PD_AUTOCONF = autoconf
 $(pd_src)/src/configure: $(pd_src)/src/configure.in
@@ -149,6 +157,12 @@ pd: $(pd_src)/src/configure
 	-cd $(pd_src)/src && ./configure $(PD_CONFIGURE_FLAGS) && \
 		make OPT_CFLAGS="" depend  && \
 		make $(DEST_PATHS) $(PD_BUILD_FLAGS)
+
+PD_NAME=Pd
+pd_install: pd
+	$(MAKE) -C $(pd_src)/src $(DEST_PATHS) $(PD_BUILD_FLAGS) install
+	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
+	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
 
 endif
 
@@ -266,14 +280,6 @@ endif
 	-install -p $(packages_src)/noncvs/$(OS_NAME)/gripd/*.* \
 		$(DESTDIR)$(prefix)/gripd
 
-
-#------------------------------------------------------------------------------
-# pd_install
-PD_NAME=Pd
-pd_install: pd
-	$(MAKE) -C $(pd_src)/src $(DEST_PATHS) $(PD_BUILD_FLAGS) install
-	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
-	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
 
 #==============================================================================#
 #
