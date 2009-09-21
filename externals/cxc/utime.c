@@ -4,7 +4,7 @@
  */
 
 #include <m_pd.h>
-#ifdef NT
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <sys/time.h>
@@ -29,7 +29,7 @@ static void *utime_new(t_symbol *s, int argc, t_atom *argv) {
   return (x);
 }
 
-#ifndef NT
+#ifndef _WIN32
 static void utime_bang(t_utime *x)
 {
   struct timeval myutime;

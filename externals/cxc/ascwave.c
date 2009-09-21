@@ -3,6 +3,9 @@
 #include "m_pd.h"
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN32
+#include <malloc.h>
+#endif
 
 #ifndef RAND_MAX
 #define	RAND_MAX	21
@@ -60,15 +63,10 @@ void ascwave_ft1(t_ascwave *x, t_floatarg g)
   int lchr = x->x_chr;
   int schr = 32;
   int i = 0;
-#ifndef NT
-  char xip[sz+1];
-  char xap[sz+1];
-#else
   char* xip;
   char* xap;
   xip = (char*)malloc((sz+1)*sizeof(char));
   xap = (char*)malloc((sz+1)*sizeof(char));
-#endif
 
   for (i = 0;i <= sz; ++i) {
     if (i == sz-1) {
@@ -101,10 +99,8 @@ void ascwave_ft1(t_ascwave *x, t_floatarg g)
     outlet_symbol(x->t_ob.ob_outlet, gensym(xip));
   x->x_jodel = g;
 
-#ifdef NT
   free(xip);
   free(xap);
-#endif
 }
 
 static void ascwave_width(t_ascwave *x, t_floatarg g)
