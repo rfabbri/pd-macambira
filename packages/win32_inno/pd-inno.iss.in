@@ -332,6 +332,8 @@ Source: C:\WINDOWS\Fonts\VeraMoIt.ttf; DestDir: {fonts}; Flags: onlyifdoesntexis
 Source: C:\WINDOWS\Fonts\VeraIt.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Sans Oblique
 Source: C:\WINDOWS\Fonts\VeraSe.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Serif
 Source: C:\WINDOWS\Fonts\VeraSeBd.ttf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Bitstream Vera Serif Bold
+; Inconsolata font
+Source: C:\WINDOWS\Fonts\Inconsolata.otf; DestDir: {fonts}; Flags: onlyifdoesntexist uninsneveruninstall; FontInstall: Inconsolata
 ;
 ;
 ;-----------------------------------------------------------------------------
