@@ -106,11 +106,13 @@ static void paramDump_bang(t_paramDump *x) {
 	
 	
 	struct param* pp = get_param_list(x->root);
+	#ifdef PARAMDEBUG
 	if (pp == NULL) {
 		post("No params found");
 	} else {
 		post("Found params");
 	}
+	#endif
 	while (pp) {
 		//if (pp->root == x->root) {
 			param_output_prepend(pp,x->outlet,pp->path);

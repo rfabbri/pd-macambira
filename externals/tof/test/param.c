@@ -56,16 +56,16 @@ static void param_bang(t_param *x)
 	if ( x->x_param) {
 		param_output(x->x_param,x->x_obj.ob_outlet);
 	
-		//param_send_prepend(x->x_param, x->s_PARAM ,x->x_param->path );
-		//if(x->x_param->selector != &s_bang ) param_send_prepend(x->x_param, x->x_param->send ,x->s_set );
+		//if (PARAMECHO) param_send_prepend(x->x_param, x->s_PARAM ,x->x_param->path );
+		if(x->x_param->selector != &s_bang ) param_send_prepend(x->x_param, x->x_param->send ,x->s_set );
    }
 }
 
 static void param_anything(t_param *x, t_symbol *s, int ac, t_atom *av)
 {
- 
+ #ifdef PARAMDEBUG
   post("RECEIVING SOMETHING");
- 
+ #endif
   if ( x->x_param) set_param_anything(x->x_param,s,ac,av);
   
   param_bang(x);
@@ -138,17 +138,18 @@ static void *param_new(t_symbol *s, int ac, t_atom *av)
 		
 		t_canvas * before = tof_get_canvas_before_root(canvas);
 		tof_get_canvas_arguments(before,&ac_c , &av_c);
-		param_find_value(name, ac_c, av_c,&ac_p,&av_p);
+		tof_find_tagged_argument('/',name, ac_c, av_c,&ac_p,&av_p);
 	  
 		// B. I object's arguments
 	  if ( ac_p == 0  && ac > 1) {
-		int start = 1;
-		int count = 0;
-		tof_get_tagged_argument('/',ac,av,&start,&count);
-		if (count > 0) {
-			ac_p = count;
-			av_p = av + start;
-		}
+		int ac_a = 0;
+		t_atom* av_a = NULL;
+		tof_find_tagged_argument('/',name, ac, av,&ac_p,&av_p);
+		//tof_get_tagged_argument('/',ac,av,&start,&count);
+		//if (count > 1) {
+		//	ac_p = ac_a;
+		//	av_p = av_a + 1;
+		//}
 	  }
 		  
 	  
@@ -158,7 +159,7 @@ static void *param_new(t_symbol *s, int ac, t_atom *av)
 	  int ac_g = 0;
 	  t_atom* av_g = NULL;
 	 // There could be a problem if the the name is also /gui
-	 param_find_value(gensym("/gui"), ac, av,&ac_g,&av_g);
+	 tof_find_tagged_argument('/',gensym("/gui"), ac, av,&ac_g,&av_g);
 	  
 	  x->x_param = param_register(root,path,ac_p,av_p,ac_g,av_g);
 	  

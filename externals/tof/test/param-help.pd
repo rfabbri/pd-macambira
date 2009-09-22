@@ -1,108 +1,89 @@
-#N canvas 1024 0 1018 716 10;
-#X obj 42 514 dac~;
-#X obj 47 192 nbx 5 14 -1e+37 1e+37 0 0 /wow/OSC1/freq /wow/OSC1/freq_
-/wow/OSC1/freq 0 -8 0 10 -262144 -1 -1 0 256;
-#X obj 161 190 hsl 128 15 0 1 0 0 /wow/OSC1/amp /wow/OSC1/amp_ /wow/OSC1/amp
--2 -8 0 10 -262144 -1 -1 0 1;
-#X obj 49 231 nbx 5 14 -1e+37 1e+37 0 0 /wow/OSC2/freq /wow/OSC2/freq_
-/wow/OSC2/freq 0 -8 0 10 -262144 -1 -1 0 256;
-#X obj 163 229 hsl 128 15 0 1 0 0 /wow/OSC2/amp /wow/OSC2/amp_ /wow/OSC2/amp
--2 -8 0 10 -262144 -1 -1 0 1;
-#X obj 387 215 print PARAM;
-#X floatatom 52 304 5 0 0 0 - - -;
-#X msg 52 334 /OSC1/freq \$1;
-#X obj 387 187 spigot;
-#X obj -23 22 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
+#N canvas 1024 0 1018 688 10;
+#X floatatom 477 321 5 0 0 0 - - -;
+#X obj -23 2 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
-#X text -18 74 author: mrtoftrash@gmail.com;
-#X text -19 95 version: 2009-04-14 (initial release);
-#X obj 480 172 tgl 15 0 empty empty listen 17 7 0 10 -262144 -1 -1
-0 1;
-#X text -18 21 description: param is a state saving and message routing
+#X text -18 54 author: mrtoftrash@gmail.com;
+#X text -18 1 description: param is a state saving and message routing
 system.;
-#X obj 387 160 receive PARAM;
-#X text 544 140 -- listening stream --;
-#X text 586 266 -- saving and loading --;
-#X text 11 248 Open the properties dialog of the above gui objects
-to examine how they are linked to the abstraction below.;
-#X floatatom 73 453 5 0 0 0 - - -;
-#X obj 52 475 *~ 0;
-#X obj 73 401 loadbang;
-#N canvas 0 0 450 300 more_about_hierachy 0;
-#X restore 607 532 pd more_about_hierachy;
-#X obj 49 158 hsl 128 15 0 1 0 0 /masterVolume /masterVolume_ /masterVolume
--2 -8 0 10 -262144 -1 -1 0 1;
-#X text 605 488 -- the /ID keyword --;
-#X text 107 124 -- example --;
-#X text 468 202 You can "listen" to the param "stream" by receiving
-PARAM messages. Enable(click) the "listen" toggle then change the value
-of some the example's sliders or number boxes to print out this stream.
+#X text -19 75 version: 2009-09-19 (localized release);
+#X text -19 33 tags: state routing param;
+#X obj 33 546 paramFile;
+#X obj 555 541 paramDump;
+#X obj 557 620 paramGui;
+#X obj 32 592 paramRoute;
+#X text 3 389 /id keyword:;
+#X obj 14 127 param /my_name my_value;
+#X text 169 122 argument 1: param name (must start with a slash);
+#X text 169 139 argument 2...: param value (can be a list);
+#X obj 525 126 param /number 30 /gui nbx;
+#X text 578 181 nbx: creates a numberbox;
+#X text 577 200 slider min max: creates a slider with the indicated
+minimum and maximum;
+#X text 577 229 bng: creates a bang;
+#X text 577 247 tgl: creates a toggle;
+#X text 579 265 symbolatom: creates a symbol box;
+#X text 68 355 (\$0)/abstraction's name/.../param's name;
+#X text 5 210 If the param object is created directly in the root patch
+(as the my_name example above) \, its path is as follows:;
+#X text 7 172 A param object creates a storage area for anything. This
+data can be accessed through a unique symbolic path.;
+#X text 60 245 (\$0)/param's name;
+#X text 7 279 If the param is inside an abstraction (or inside an abstraction
+contained inside another abstraction an so forth) \, the path starts
+at the root and follows every child patch (abstraction) until it reaches
+the param object \, at which point the param's name is appended:;
+#X text 623 617 Build a PD gui for all params that have values for
+the "/gui" keyword.;
+#X text 100 590 Sends values to params using a relative path.;
+#X text 624 538 Dumps all params children of the root patch.;
+#X obj 34 620 OSCToParam;
+#X text 107 620 Routes OSC messages to matching params;
+#X text 515 166 /gui options:;
+#X text 526 81 When you create a param \, you can optinally use the
+"/gui" keyword to flag the param with gui options.;
+#X text 40 414 If an abstraction's arguments contains the "/id" keyword
+\, the symbol following the "/id" keyword \, instead of the abstraction's
+name \, will be used to build the path. See an example to the right.
 ;
-#X text 531 461 -- implementing params in your own abstractions --
+#X text 99 541 Saves and restores all params chilren of the root patch
+to/from a file with optionnal presets.;
+#X obj 557 599 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 33 519 bng 15 250 50 0 empty empty save 17 7 0 10 -262144 -1
+-1;
+#X obj 99 518 bng 15 250 50 0 empty empty load 17 7 0 10 -262144 -1
+-1;
+#X floatatom 525 146 5 0 0 0 - - -;
+#X obj 555 519 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 555 569 print DUMP;
+#X text 268 490 --------------------- SEE ALSO -----------------------
 ;
-#X text 606 508 -- default values --;
-#X text 528 433 DOCUMENTATION TODO:;
-#X obj 685 598 paramDump;
-#X obj 685 571 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X obj 685 626 print;
-#X text 121 553 -- linking with OSC and MIDI --;
-#X text -19 53 tags: state routing gui;
-#X msg 771 560 values /wow;
-#X msg 772 584 values /;
-#X msg 802 509 values *;
-#X msg 586 595 ------;
-#X msg 797 617 guis *;
-#X msg 801 643 guis /;
-#X obj 492 528 paramGui;
-#X floatatom 180 404 5 0 0 0 - - -;
-#X obj 581 61 ./examples/param-generator /id me;
-#X obj 492 497 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X obj 73 430 param /masterVolume 0 /gui slider 0 1;
-#X msg 520 495 /wow;
-#X msg 615 643 guis /wow;
-#X msg 621 25 save;
-#X msg 810 79 save;
-#X obj 742 116 paramRoute;
-#X obj 32 587 OSCToParam 7493;
-#X text 134 583 OSCToParam can send all icomming OSC message to matching
-parameters. For example \, the OSC message '/masterVolume 0.56' on
-port 7493 will be forwarded to the parameter '/masterVolume' that will
-then take the value '0.56'.;
-#X obj 422 366 print yeah;
-#X obj 399 339 param /t_test 0 /gui tgl;
-#X obj 676 343 paramFile;
-#X obj 678 296 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X msg 613 564 guis;
-#X obj 51 366 examples/param-synth /id tom /OSC1/freq 320;
-#X obj 440 117 ./examples/boubou;
-#X connect 6 0 7 0;
-#X connect 7 0 57 0;
-#X connect 8 0 5 0;
-#X connect 12 0 8 1;
-#X connect 14 0 8 0;
-#X connect 18 0 19 1;
-#X connect 19 0 0 0;
-#X connect 19 0 0 1;
-#X connect 20 0 44 0;
-#X connect 29 0 31 0;
-#X connect 30 0 29 0;
-#X connect 34 0 29 0;
-#X connect 35 0 29 0;
-#X connect 36 0 29 0;
-#X connect 37 0 31 0;
-#X connect 38 0 29 0;
-#X connect 39 0 29 0;
-#X connect 41 0 44 0;
-#X connect 43 0 40 0;
-#X connect 44 0 18 0;
-#X connect 45 0 40 0;
-#X connect 46 0 29 0;
-#X connect 47 0 42 0;
+#X obj 477 414 param-abs /id FM_MOD;
+#X obj 472 448 dac~;
+#X obj 690 364 hsl 100 15 0 1 0 0 \$0/FM_MOD/volume \$0/FM_MOD/volume_
+/FM_MOD/volume 105 7 0 10 -262144 -1 -1 624 1;
+#X obj 690 384 hsl 100 15 200 2000 0 0 \$0/FM_MOD/carrier \$0/FM_MOD/carrier_
+/FM_MOD/carrier 105 7 0 10 -262144 -1 -1 400 1;
+#X obj 688 423 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/index
+\$0/FM_MOD/modulation/index_ /FM_MOD/modulation/index 57 7 0 10 -262144
+-1 -1 16 256;
+#X obj 688 404 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/freq
+\$0/FM_MOD/modulation/freq_ /FM_MOD/modulation/freq 57 7 0 10 -262144
+-1 -1 66 256;
+#X msg 477 343 modulation/index \$1;
+#X obj 517 367 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 800 1;
+#X msg 514 389 volume \$1;
+#X connect 0 0 47 0;
+#X connect 7 0 39 0;
+#X connect 14 0 37 0;
+#X connect 34 0 8 0;
+#X connect 35 0 6 0;
+#X connect 36 0 6 1;
+#X connect 38 0 7 0;
+#X connect 41 0 42 0;
+#X connect 41 0 42 1;
+#X connect 47 0 41 0;
 #X connect 48 0 49 0;
-#X connect 53 0 52 0;
-#X connect 55 0 54 0;
-#X connect 56 0 29 0;
-#X connect 57 0 19 0;
+#X connect 49 0 41 0;

@@ -1,0 +1,24 @@
+#N canvas 1228 134 711 410 10;
+#X text 84 2 This abstraction is an example for the param external.
+;
+#X obj 175 232 *~;
+#X floatatom 175 147 0 0 0 0 - - -;
+#X floatatom 237 200 0 0 0 0 - - -;
+#X text 64 127 frequency;
+#X text 63 114 modulation;
+#X text 278 216 index;
+#X text 280 197 modulation;
+#X obj 175 172 osc~;
+#X obj 163 341 outlet~;
+#X obj 237 172 param /index 20 /gui nbx;
+#X obj 174 122 param /freq 3 /gui nbx;
+#X obj 172 99 loadbang;
+#X obj 238 148 loadbang;
+#X connect 1 0 9 0;
+#X connect 2 0 8 0;
+#X connect 3 0 1 1;
+#X connect 8 0 1 0;
+#X connect 10 0 3 0;
+#X connect 11 0 2 0;
+#X connect 12 0 11 0;
+#X connect 13 0 10 0;

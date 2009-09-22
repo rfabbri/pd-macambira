@@ -1,9 +1,11 @@
-#define PARAMDEBUG
+//#define PARAMDEBUG
 #include <stdio.h>
 
 char param_buf_temp_a[MAXPDSTRING];
 char param_buf_temp_b[MAXPDSTRING];
 char* separator = "/";
+
+//char PARAMECHO = 0;
 
 
 struct param {
@@ -38,7 +40,7 @@ struct paramroot* paramroots;
 
 static void set_param_anything( struct param* p, t_symbol* s, int ac, t_atom *av) {
 	
-	if ( s == &s_bang ) {
+	if ( s == &s_bang || ac == 0 ) {
 		p->ac = 0;
 		p->selector = s;
 	} else {
@@ -61,35 +63,7 @@ static void set_param( struct param* p, int ac, t_atom *av) {
 }
 
 
-static void param_find_value(t_symbol *name, int ac, t_atom *av, int *ac_r,t_atom** av_r) {
-	
-	int i;
-	int j = 0;
-	for (i=0;i<ac;i++) {
-		//if ( IS_A_SYMBOL(av,i)) post("analyzing %s",atom_getsymbol(av+i)->s_name);
-		if ( IS_A_SYMBOL(av,i) && name == atom_getsymbol(av+i) && (i+1)<ac ) {
-			//post("matches");
-			i=i+1;
-			for (j=i;j<ac;j++) {
-				if (  IS_A_SYMBOL(av,j) && (atom_getsymbol(av+j))->s_name[0] == '/' ) {
-					//j = j-1;
-					break;
-				}
-			}
-			break;
-		}
-	}
-	j = j-i;
-	//post("i:%d j:%d",i,j);
-	
-	
-	if ( j > 0) {
-		*ac_r = j;
-		*av_r = av+i;
-	} else {
-		*ac_r = 0;
-	}
- }
+
 
 
 /*
@@ -245,21 +219,21 @@ static t_symbol* param_get_path( t_canvas* i_canvas,  t_symbol* name) {
 		tof_get_canvas_arguments(i_canvas,&i_ac, &i_av);
 		id_temp=tof_get_canvas_name(i_canvas);
 		//id_temp= canvas_realizedollar(i_canvas, gensym("$0"));
-		int start = 0;
-		int count = 0;
+		int ac_a = 0;
+		t_atom* av_a = NULL;
+		int iter = 0;
 		//found_id_flag = 0;
 		
-		while( tof_get_tagged_argument(*separator,i_ac,i_av,&start,&count) ) {
+		while( tof_next_tagged_argument(*separator,i_ac,i_av,&ac_a,&av_a,&iter) ) {
 			
-			if ( IS_A_SYMBOL(i_av,start)
-			   && (id_s == (i_av+start)->a_w.w_symbol) 
-			   && (count > 1) ) {  
-	           	id_temp = atom_getsymbol(i_av+start+1);
+			if ( IS_A_SYMBOL(av_a,0)
+			   && (id_s == av_a->a_w.w_symbol) 
+			   && (ac_a > 1) ) {  
+	           	id_temp = atom_getsymbol(av_a+1);
 	           	//id_canvas = i_canvas;
 				//found_id_flag = 1;
 	           	break;
 			}
-			start= start + count;
 		}	        
         // if ever an /id is missing, this param is not saveable
         //if (found_id_flag == 0)  saveable = 0;
@@ -614,9 +588,8 @@ static void param_output(struct param *p, t_outlet* outlet) {
 	// SHOULD I COPY THIS DATA BEFORE SENDING IT OUT?
 	// OR IS THE NORM TO ONLY COPY ON INPUT?
 	if (p) {
-		if((p->selector == &s_bang) ) {
-			outlet_bang(outlet);
-		} else {
+		if(!(p->selector == &s_bang) ) {
+			
 			outlet_anything(outlet, p->selector, p->ac, p->av);
 		}
 	}	
@@ -637,6 +610,8 @@ static void param_output_prepend(struct param* p, t_outlet* outlet, t_symbol* s)
 			SETSYMBOL(av, p->selector);
 			outlet_anything(outlet,s,ac,av);
 			freebytes(av, ac*sizeof(t_atom));
+	} else if (p->selector == &s_bang) {
+		outlet_anything(outlet,s,0,NULL);
 	}
 	
 }
@@ -713,9 +688,31 @@ static int param_read(t_canvas* canvas, t_symbol* filename)
 			   #ifdef PARAMDEBUG
 				post("Restoring:%s",s->s_name);
 			   #endif
-			   if ( s->s_thing) pd_forwardmess(s->s_thing, ac-1, av+1);
-				  
 			   
+			   // STUPID SYMBOL WITH SPACES MANAGEMENT
+			   if ( s->s_thing && ac > 3 && IS_A_SYMBOL(av,1) &&  atom_getsymbol(av+1) == &s_symbol) {
+				   // This whole block is simply to convert symbols saved with spaces to complete symbols
+				   
+				   t_binbuf *bbuf_stupid = binbuf_new();
+				   binbuf_add(bbuf_stupid, ac-2, av+2);
+				   
+				   char *char_buf;
+				   int char_length;
+				   binbuf_gettext(bbuf_stupid, &char_buf, &char_length);
+				   char_buf = resizebytes(char_buf, char_length, char_length+1);
+				   char_buf[char_length] = 0;
+				   t_symbol* stupid_symbol = gensym(char_buf);
+				   //post("STUPID: %s",stupid_symbol->s_name);
+				   freebytes(char_buf, char_length+1);
+				   binbuf_free(bbuf_stupid);
+				   t_atom* stupid_atom = getbytes(sizeof(*stupid_atom));
+				   SETSYMBOL(stupid_atom, stupid_symbol);
+				   pd_typedmess(s->s_thing, &s_symbol, 1, stupid_atom);
+				   freebytes(stupid_atom, sizeof(*stupid_atom));
+				   
+			   } else {
+					if ( s->s_thing) pd_forwardmess(s->s_thing, ac-1, av+1);
+				}
 		    }
 		  
 		  ac = 0;
