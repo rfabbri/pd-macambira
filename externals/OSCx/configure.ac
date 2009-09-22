@@ -112,7 +112,7 @@ else
 					 LDFLAGS="-shared"
 					 INCLUDES="$INCLUDES -I../../../pd/src"
 					 pd_suffix=dll
-					 LIBS="-L../../../pd/bin -L../../../pd/obj -lpd -lm -lwsock32"
+					 LIBS="-L../../../pd/src -L../../../pd/bin -L../../../pd/obj -lpd -lm -lwsock32"
 					 ;;
         *-*-darwin*)
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
