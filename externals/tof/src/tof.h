@@ -172,10 +172,14 @@ static void tof_set_selector(t_symbol** selector_sym_p,int* ac_p, t_atom** av_p 
 		}
 }
 
+/*
 static int tof_get_tagged_argument(char tag, int ac, t_atom *av, int *start, int *count) {
 	int i;
 	
-    if ( ac == 0 || *start >= ac) return 0;
+    if ( ac == 0 || *start >= ac) {
+		*count = 0;
+		return 0;
+	}
 
     for ( i= *start + 1; i < ac; i++ ) {
         if ( (av+i)->a_type == A_SYMBOL 
@@ -185,6 +189,57 @@ static int tof_get_tagged_argument(char tag, int ac, t_atom *av, int *start, int
 
      return (i-*start);     
 }
+*/
 
+// Returned value permits a while operation on the function
+static int tof_next_tagged_argument(char tag, int ac, t_atom *av, int* ac_a, t_atom ** av_a, int* iter) {
+	int i;
+	
+    if ( ac == 0 || *iter >= ac) {
+		*ac_a = 0;
+		*av_a = NULL;
+		return 0;
+	}
 
+    for ( i= *iter + 1; i < ac; i++ ) {
+        if ( (av+i)->a_type == A_SYMBOL 
+          && (atom_getsymbol(av+i))->s_name[0] == tag) break;
+     }
+	 *ac_a = i - *iter;
+	 *av_a = av + *iter;
+	 *iter = i;
+     
+     return (*ac_a);     
+}
+
+static void tof_find_tagged_argument(char tag,t_symbol *name, int ac, t_atom *av, int *ac_r,t_atom** av_r) {
+	
+	int i;
+	int j = 0;
+	for (i=0;i<ac;i++) {
+		//if ( IS_A_SYMBOL(av,i)) post("analyzing %s",atom_getsymbol(av+i)->s_name);
+		if ( IS_A_SYMBOL(av,i) && name == atom_getsymbol(av+i) && (i+1)<ac ) {
+			//post("matches");
+			i=i+1;
+			for (j=i;j<ac;j++) {
+				if (  IS_A_SYMBOL(av,j) && (atom_getsymbol(av+j))->s_name[0] == tag ) {
+					//j = j-1;
+					break;
+				}
+			}
+			break;
+		}
+	}
+	j = j-i;
+	//post("i:%d j:%d",i,j);
+	
+	
+	if ( j > 0) {
+		*ac_r = j;
+		*av_r = av+i;
+	} else {
+		*ac_r = 0;
+		*av_r = NULL;
+	}
+ }
 
