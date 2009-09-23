@@ -107,7 +107,7 @@ static void pattern_resize_cols(t_pattern* x, t_int newcols) {
 }
 
 static void pattern_init_cell(t_atom* a) {
-    SETSYMBOL(a, gensym("empty"));
+    if(a) SETSYMBOL(a, gensym("empty"));
 }
 
 static void pattern_new_empty_row(t_pattern* x) {
