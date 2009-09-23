@@ -7,6 +7,9 @@
 #X text -3 -54 description: forwards all incomming OSC messages to
 matching params.;
 #X obj -3 82 OSCToParam 3475;
-#X text 97 71 All OSC messages received on port 3475 will be forwarded
-to matching params.;
 #X text -3 -20 tags: routing param OSC;
+#X text 97 71 All OSC messages received on port 3475 will be forwarded
+to matching children params.;
+#X text 46 124 See the param object's help for more information on
+params:;
+#X obj 139 153 param /a_param;
