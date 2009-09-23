@@ -2467,23 +2467,14 @@ tof_install: tof
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(TOF_NAME) \
 		--author "Thomas Ouellet Fredericks" \
 		--description "Various utilities" \
-		--license "http://www.kopimi.se/kopimi/" \
-		--version "1"
+		--license "Whatever Hans wants" \
+		--version "2009-09-22"
 	install -p $(TOF_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(TOF_NAME)
 	install -d $(DESTDIR)$(helpdir)/$(TOF_NAME)
 	install -p $(externals_src)/tof/help/*.pd \
 		$(DESTDIR)$(helpdir)/$(TOF_NAME)
 	install -p $(externals_src)/tof/help/*.pd \
 		$(DESTDIR)$(objectsdir)/$(TOF_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(TOF_NAME)
-#	install -p $(externals_src)/tof/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(TOF_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/tof/README \
-		$(DESTDIR)$(readmesdir)/$(TOF_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(TOF_NAME)
-#	install -p $(externals_src)/tof/examples/*.pd \
-		$(DESTDIR)$(examplesdir)/$(TOF_NAME)
 
 tof_clean:
 	-rm -f -- $(TOF_OBJECTS:.c=.$(EXTENSION))
