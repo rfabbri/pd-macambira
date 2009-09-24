@@ -15,7 +15,7 @@ GEM2PDP_TARBALL = $(GEM2PDP_DISTRO).tar.gz
 INCLUDES = @INCLUDES@ -I$(PD_DIR)/src -I. -I$(PDP_DIR)/include  -I$(GEM_DIR)/src 
 CFLAGS = -fPIC -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
     -Wall -W -Wno-unused -Wno-parentheses -Wno-switch \
-    -DGEM2PDP_VERSION=\"$(GEM2PDP_VERSION)\" -g  -DHAVE_BASE_GEMCONFIG_H_ @CFLAGS@
+    -DGEM2PDP_VERSION=\"$(GEM2PDP_VERSION)\" -g  @CFLAGS@
 PDP_PIDIP_CFLAGS  = -O
 
 export MACOSX_DEPLOYMENT_TARGET = 10.3
