@@ -55,11 +55,7 @@ pix_opencv_colorfilt :: pix_opencv_colorfilt()
 
   rgba = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 4);
   rgb = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 3);
-#ifdef DARWIN
   brgb = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 4);
-#else
-  brgb = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 3);
-#endif
 }
 
 /////////////////////////////////////////////////////////
@@ -115,11 +111,7 @@ void pix_opencv_colorfilt :: processRGBAImage(imageStruct &image)
 	//create the orig image with new size
         rgba = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 4);
         rgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
-#ifdef DARWIN
     	brgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 4);
-#else
-    	brgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
-#endif
     }
     memcpy( rgba->imageData, image.data, image.xsize*image.ysize*4 );
     cvCopy(rgba, brgb);
@@ -178,11 +170,7 @@ void pix_opencv_colorfilt :: processRGBImage(imageStruct &image)
 	//create the orig image with new size
         rgba = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 4);
         rgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
-#ifdef DARWIN
     	brgb = cvCreateImage(cvSize(rgb->width,rgb->height), IPL_DEPTH_8U, 4);
-#else
-    	brgb = cvCreateImage(cvSize(rgb->width,rgb->height), IPL_DEPTH_8U, 3);
-#endif
     
     }
     memcpy( rgb->imageData, image.data, image.xsize*image.ysize*3 );
@@ -255,9 +243,9 @@ void pix_opencv_colorfilt :: pickMess (float xcur, float ycur)
       x_colorB = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+3];
 #else
       ycur = brgb->height - ycur;
-      x_colorR = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*3];
-      x_colorG = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*3+1];
-      x_colorB = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*3+2];
+      x_colorR = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4];
+      x_colorG = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+1];
+      x_colorB = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+2];
 #endif
       outlet_float( x_R, x_colorR );
       outlet_float( x_G, x_colorG );
