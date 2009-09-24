@@ -55,7 +55,11 @@ pix_opencv_colorfilt :: pix_opencv_colorfilt()
 
   rgba = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 4);
   rgb = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 3);
+#ifdef DARWIN
+  brgb = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 4);
+#else
   brgb = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 3);
+#endif
 }
 
 /////////////////////////////////////////////////////////
@@ -111,27 +115,39 @@ void pix_opencv_colorfilt :: processRGBAImage(imageStruct &image)
 	//create the orig image with new size
         rgba = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 4);
         rgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
+#ifdef DARWIN
+    	brgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 4);
+#else
     	brgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
+#endif
     }
     memcpy( rgba->imageData, image.data, image.xsize*image.ysize*4 );
-    cvCvtColor(rgba, brgb, CV_BGRA2BGR);
+    cvCopy(rgba, brgb);
 
     for( py=0; py<rgba->height; py++ ) {
       for( px=0; px<rgba->width; px++ ) {
-        b = ((uchar*)(rgba->imageData + rgba->widthStep*(int)py))[(int)px*4];
+#ifdef DARWIN
+        g = ((uchar*)(rgba->imageData + rgba->widthStep*(int)py))[(int)px*4];
+        r = ((uchar*)(rgba->imageData + rgba->widthStep*(int)py))[(int)px*4+1];
+        b = ((uchar*)(rgba->imageData + rgba->widthStep*(int)py))[(int)px*4+3];
+#else 
+        r = ((uchar*)(rgba->imageData + rgba->widthStep*(int)py))[(int)px*4];
         g = ((uchar*)(rgba->imageData + rgba->widthStep*(int)py))[(int)px*4+1];
-        r = ((uchar*)(rgba->imageData + rgba->widthStep*(int)py))[(int)px*4+2];
+        b = ((uchar*)(rgba->imageData + rgba->widthStep*(int)py))[(int)px*4+2];
+#endif
 
         diff = 0;
         diff = abs(r-x_colorR );
         diff += abs(g-x_colorG );
         diff += abs(b-x_colorB );
+        diff = diff/3;
 
         if ( diff > x_tolerance )
         {
            (rgba->imageData + rgba->widthStep*(int)py)[(int)px*4] = 0x0;
            (rgba->imageData + rgba->widthStep*(int)py)[(int)px*4+1] = 0x0;
            (rgba->imageData + rgba->widthStep*(int)py)[(int)px*4+2] = 0x0;
+           (rgba->imageData + rgba->widthStep*(int)py)[(int)px*4+3] = 0x0;
         }
       }
     }
@@ -162,7 +178,11 @@ void pix_opencv_colorfilt :: processRGBImage(imageStruct &image)
 	//create the orig image with new size
         rgba = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 4);
         rgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
+#ifdef DARWIN
+    	brgb = cvCreateImage(cvSize(rgb->width,rgb->height), IPL_DEPTH_8U, 4);
+#else
     	brgb = cvCreateImage(cvSize(rgb->width,rgb->height), IPL_DEPTH_8U, 3);
+#endif
     
     }
     memcpy( rgb->imageData, image.data, image.xsize*image.ysize*3 );
@@ -229,10 +249,16 @@ void pix_opencv_colorfilt :: pickMess (float xcur, float ycur)
    if ( ( xcur >= 0. ) && ( xcur <= comp_xsize )
         && ( ycur > 0. ) && ( ycur < comp_ysize ) )
    {
-      x_colorB = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*3];
+#ifdef DARWIN
+      x_colorR = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+1];
+      x_colorG = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+2];
+      x_colorB = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+3];
+#else
+      ycur = brgb->height - ycur;
+      x_colorR = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*3];
       x_colorG = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*3+1];
-      x_colorR = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*3+2];
-
+      x_colorB = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*3+2];
+#endif
       outlet_float( x_R, x_colorR );
       outlet_float( x_G, x_colorG );
       outlet_float( x_B, x_colorB );

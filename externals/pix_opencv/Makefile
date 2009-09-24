@@ -13,12 +13,14 @@ CPPFLAGS  = -fPIC -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
+ CPPFLAGS += -DLINUX
  INCLUDES += `pkg-config --cflags opencv`
  LDFLAGS =  -export_dynamic -shared
  LIBS = `pkg-config --libs opencv`
  EXTENSION = pd_linux
 endif
 ifeq ($(UNAME),Darwin)
+ CPPFLAGS += -DDARWIN
  INCLUDES += -I/System/Library/Frameworks/OpenCV.framework/Headers/
  LDFLAGS =  -bundle -undefined dynamic_lookup
  LIBS =  -lm -framework OpenCV
