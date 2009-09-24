@@ -2473,8 +2473,9 @@ tof_install: tof
 	install -d $(DESTDIR)$(helpdir)/$(TOF_NAME)
 	install -p $(externals_src)/tof/help/*.pd \
 		$(DESTDIR)$(helpdir)/$(TOF_NAME)
-	install -p $(externals_src)/tof/help/*.pd \
+	install -p $(externals_src)/tof/abs/*.pd \
 		$(DESTDIR)$(objectsdir)/$(TOF_NAME)
+	#install -p $(externals_src)/tof/help/*.pd $(DESTDIR)$(objectsdir)/$(TOF_NAME)
 
 tof_clean:
 	-rm -f -- $(TOF_OBJECTS:.c=.$(EXTENSION))
