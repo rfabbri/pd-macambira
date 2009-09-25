@@ -2,6 +2,7 @@
 #include "Song.hpp"
 #include "Track.hpp"
 #include "Pattern.hpp"
+#include "Editor.hpp"
 
 #include <iostream>
 
@@ -27,6 +28,8 @@ void track_proxy_setup(void)
         CLASS_DEFAULT,
         A_SYMBOL, A_SYMBOL, A_NULL
     );
+    class_addmethod(track_proxy_class, (t_method)track_proxy_editor, \
+            gensym("editor"), A_FLOAT, A_NULL);
     class_addmethod(track_proxy_class, (t_method)track_proxy_getpatterns, \
             gensym("getpatterns"), A_NULL);
     class_addmethod(track_proxy_class, (t_method)track_proxy_getpatternsize, \
@@ -46,13 +49,13 @@ void track_proxy_setup(void)
     /* class_addmethod(track_proxy_class, (t_method)track_proxy_data, \
             gensym("data"), A_GIMME, A_NULL);*/
 #if PD_MINOR_VERSION >= 37
-    //class_setpropertiesfn(track_proxy_class, track_proxy_properties);
+    class_setpropertiesfn(track_proxy_class, track_proxy_properties);
     class_setsavefn(track_proxy_class, track_proxy_save);
 #endif
     class_sethelpsymbol(track_proxy_class, gensym("track.pd"));
 }
 
-static t_track_proxy *track_proxy_new(t_symbol *song_name, t_symbol *track_name)
+t_track_proxy *track_proxy_new(t_symbol *song_name, t_symbol *track_name)
 {
     t_track_proxy *x = (t_track_proxy*)pd_new(track_proxy_class);
     x->outlet = outlet_new(&x->x_obj, &s_list);
@@ -73,10 +76,12 @@ static t_track_proxy *track_proxy_new(t_symbol *song_name, t_symbol *track_name)
     // bind to TRACK_SELECTOR for loading in-patch data
     pd_bind(&x->x_obj.ob_pd, gensym(TRACK_SELECTOR));
 
+    Editor::init(x);
+
     return x;
 }
 
-static void track_proxy_free(t_track_proxy *x)
+void track_proxy_free(t_track_proxy *x)
 {
     pd_unbind(&x->x_obj.ob_pd, gensym(TRACK_SELECTOR));
     /* LATER find a way to get TRACK_SELECTOR unbound earlier (at end of load?) */
@@ -87,7 +92,7 @@ static void track_proxy_free(t_track_proxy *x)
     pd_unbind(&x->x_obj.ob_pd, x->editor_recv);
 }
 
-static void track_proxy_save(t_gobj *z, t_binbuf *b)
+void track_proxy_save(t_gobj *z, t_binbuf *b)
 {
     t_track_proxy *x = (t_track_proxy*)z;
     Track *t = x->track;
@@ -131,7 +136,14 @@ static void track_proxy_save(t_gobj *z, t_binbuf *b)
     binbuf_addv(b, "sss;", gensym(TRACK_SELECTOR), gensym("data"), gensym("end"));
 }
 
-static void track_proxy_send_result(t_track_proxy *x, int outlet, int editor)
+void track_proxy_properties(t_gobj *z, t_glist *owner)
+{
+    t_track_proxy *x = (t_track_proxy *) z;
+    if(!x->editor_open) Editor::openWindow(x);
+    else Editor::closeWindow(x);
+}
+
+void track_proxy_send_result(t_track_proxy *x, int outlet, int editor)
 {
     if(result_argc <= 0) return;
     if(outlet)
@@ -143,7 +155,22 @@ static void track_proxy_send_result(t_track_proxy *x, int outlet, int editor)
     }
 }
 
-static int track_proxy_getpatterns(t_track_proxy *x)
+int track_proxy_editor(t_track_proxy *x, t_floatarg arg)
+{
+    t_int a = (t_int) arg;
+    if(a < 0)
+    {
+        if(!x->editor_open) Editor::openWindow(x);
+        else Editor::closeWindow(x);
+    }
+    else
+    {
+        if(a > 0) Editor::openWindow(x);
+        else Editor::closeWindow(x);
+    }
+}
+
+int track_proxy_getpatterns(t_track_proxy *x)
 {
     SETSYMBOL(&result_argv[0], gensym("patternnames"));
     result_argc = 1;
@@ -166,7 +193,7 @@ static int track_proxy_getpatterns(t_track_proxy *x)
     return 0;
 }
 
-static int track_proxy_getpatternsize(t_track_proxy *x, t_floatarg pat)
+int track_proxy_getpatternsize(t_track_proxy *x, t_floatarg pat)
 {
     t_int p = (t_int) pat;
     Pattern *pattern = x->track->getPattern(p);
@@ -183,7 +210,7 @@ static int track_proxy_getpatternsize(t_track_proxy *x, t_floatarg pat)
     return 0;
 }
 
-static int track_proxy_setrow(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv)
+int track_proxy_setrow(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv)
 {
     if(argc < 2 || !IS_A_FLOAT(argv,0) || !IS_A_FLOAT(argv,1))
     {
@@ -211,7 +238,7 @@ static int track_proxy_setrow(t_track_proxy *x, t_symbol *sel, int argc, t_atom 
     return 0;
 }
 
-static int track_proxy_getrow(t_track_proxy *x, t_floatarg pat, t_floatarg rownum)
+int track_proxy_getrow(t_track_proxy *x, t_floatarg pat, t_floatarg rownum)
 {
     t_int p = (t_int) pat;
     t_int r = (t_int) rownum;
@@ -238,7 +265,7 @@ static int track_proxy_getrow(t_track_proxy *x, t_floatarg pat, t_floatarg rownu
     return 0;
 }
 
-static int track_proxy_addpattern(t_track_proxy *x, t_symbol *name, t_floatarg rows, t_floatarg cols)
+int track_proxy_addpattern(t_track_proxy *x, t_symbol *name, t_floatarg rows, t_floatarg cols)
 {
     t_int r = (t_int) rows;
     t_int c = (t_int) cols;
@@ -246,7 +273,7 @@ static int track_proxy_addpattern(t_track_proxy *x, t_symbol *name, t_floatarg r
     return 0;
 }
 
-static int track_proxy_removepattern(t_track_proxy *x, t_floatarg pat)
+int track_proxy_removepattern(t_track_proxy *x, t_floatarg pat)
 {
     t_int p = (t_int) pat;
     Pattern *pattern = x->track->getPattern(p);
@@ -259,7 +286,7 @@ static int track_proxy_removepattern(t_track_proxy *x, t_floatarg pat)
     return -9;
 }
 
-static int track_proxy_resizepattern(t_track_proxy *x, t_floatarg pat, t_floatarg rows, t_floatarg cols)
+int track_proxy_resizepattern(t_track_proxy *x, t_floatarg pat, t_floatarg rows, t_floatarg cols)
 {
     t_int p = (t_int) pat;
     t_int r = (t_int) rows;
@@ -274,7 +301,7 @@ static int track_proxy_resizepattern(t_track_proxy *x, t_floatarg pat, t_floatar
     return 0;
 }
 
-static int track_proxy_copypattern(t_track_proxy *x, t_symbol *src, t_symbol *dst)
+int track_proxy_copypattern(t_track_proxy *x, t_symbol *src, t_symbol *dst)
 {
     pd_error(x, "copypattern: not implemented yet");
     return -9;

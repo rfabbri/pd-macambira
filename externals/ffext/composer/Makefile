@@ -28,7 +28,7 @@ endif
 
 LIBNAME = composer
 INCLUDES =  -I../../pd/src -I/usr/include #-I/usr/include/tcl$(TCL_VERSION)
-CFLAGS += -funroll-loops -fno-operator-names -fno-omit-frame-pointer -falign-functions=16 -Wall -fPIC
+CFLAGS += -funroll-loops -fno-operator-names -fno-omit-frame-pointer -falign-functions=16 -Wno-deprecated -fPIC
 CFLAGS += -DPDSUF=\"$(PDSUF)\"
 LDSHARED = $(CXX) $(PDBUNDLEFLAGS)
 
@@ -38,17 +38,23 @@ all: $(LIBNAME)$(PDSUF)
 		'[size: '`ls -gGh $(LIBNAME)$(PDSUF) | cut -d " " -f 3`']'
 
 clean::
-	rm -f $(LIBNAME)$(PDSUF) *.o *~
+	rm -f $(LIBNAME)$(PDSUF) editor_tk.cpp *.o *~
 
 .SUFFIXES: .cpp .o
 
-SRCS = Song.cpp Pattern.cpp Track.cpp PdClasses.cpp
+SRCS = Song.cpp Pattern.cpp Track.cpp Editor.o PdClasses.cpp
 OBJS = ${SRCS:.cpp=.o}
+
+editor_tk.cpp: editor.tk
+	( echo 'static const char* editor_tk[] = {'; \
+	sed -e 's/\(["\\]\)/\\\1/g' -e 's/^/"/' -e 's/$$/",/' \
+	editor.tk; echo '"" };' ) > editor_tk.cpp
 
 Song.o: Song.cpp Song.hpp
 Pattern.o: Pattern.cpp Pattern.hpp
 Track.o: Track.cpp Track.hpp
-PdClass.o: PdClasses.cpp PdClasses.h
+Editor.o: Editor.cpp Editor.hpp editor_tk.cpp
+PdClass.o: PdClasses.cpp PdClasses.hpp
 
 .cpp.o: Makefile
 	$(CXX) $(CFLAGS) $(INCLUDES) -xc++ -c $<
