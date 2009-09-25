@@ -1,4 +1,4 @@
-#N canvas 1 49 1424 780 10;
+#N canvas 1049 0 999 694 10;
 #X obj 41 -81 cnv 15 621 300 empty empty empty 20 12 0 14 -260097 -66577
 0;
 #X obj 301 -30 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
@@ -7,9 +7,9 @@
 #X msg 382 16 close;
 #X msg 378 -8 open /dev/video0;
 #X obj 321 95 pdp_v4l2;
-#X obj 44 328 cnv 15 621 200 empty empty empty 20 12 0 14 -258113 -66577
+#X obj 46 322 cnv 15 621 250 empty empty empty 20 12 0 14 -258113 -66577
 0;
-#X obj 95 538 pdp_xv;
+#X obj 93 604 pdp_xv;
 #X obj 44 244 cnv 15 621 73 empty empty empty 20 12 0 14 -260801 -66577
 0;
 #X floatatom 243 280 5 0 0 0 - - -;
@@ -19,7 +19,7 @@ colors;
 #X obj 387 50 hradio 15 1 0 4 empty empty empty 0 -8 0 10 -262144 -1
 -1 0;
 #X obj 93 280 pdp_opencv_threshold;
-#X text 50 -112 Written by Yves Degoyon ( ydegoyon@gmail.com );
+#X text 52 -114 Written by Yves Degoyon ( ydegoyon@gmail.com );
 #X obj 93 157 pdp_qt;
 #X msg 125 64 bang;
 #X msg 166 64 stop;
@@ -34,7 +34,7 @@ colors;
 #X text 161 -19 ( try estrella.mov );
 #X obj 319 253 loadbang;
 #X msg 280 253 160;
-#X floatatom 219 482 30 0 0 0 - - -;
+#X floatatom 182 521 30 0 0 0 - - -;
 #X text 62 -63 INPUT : movie or camera;
 #X obj 684 -82 cnv 15 621 300 empty empty empty 20 12 0 14 -260097
 -66577 0;
@@ -60,17 +60,17 @@ colors;
 #X msg 893 251 160;
 #X floatatom 185 94 5 0 0 0 - - -;
 #X obj 93 440 pdp_opencv_hu_compare;
-#X text 224 465 distance;
+#X text 187 504 distance;
 #X obj 236 361 hradio 15 1 0 3 empty empty empty 0 -8 0 10 -262144
 -1 -1 0;
 #X text 287 355 method used for comparison : one of : CV_CONTOURS_MATCH_I1
 \, CV_CONTOURS_MATCH_I2 or CV_CONTOURS_MATCH_I3;
 #X text 228 445 calculating their hu moments ( CvMatchShape );
 #X obj 112 189 s frame;
-#X floatatom 218 595 10 0 0 0 - - -;
-#X floatatom 276 573 5 0 0 0 - - -;
-#X text 312 573 frame;
-#X obj 254 549 r frame;
+#X floatatom 687 554 10 0 0 0 - - -;
+#X floatatom 745 532 5 0 0 0 - - -;
+#X text 781 532 frame;
+#X obj 723 508 r frame;
 #N canvas 5 441 449 300 cmin 0;
 #X obj 70 144 route 1;
 #X msg 122 144 bang;
@@ -224,15 +224,15 @@ colors;
 #X connect 11 0 10 1;
 #X connect 12 0 11 0;
 #X connect 13 0 11 0;
-#X restore 218 571 pd cmin;
-#X text 284 596 min;
+#X restore 687 530 pd cmin;
+#X text 753 555 min;
 #X obj 125 92 metro 100;
-#X msg 310 550 bang;
-#X obj 314 595 s iframe;
+#X msg 779 509 bang;
+#X obj 783 554 s iframe;
 #X obj 174 156 r iframe;
 #X obj 144 157 - 1;
 #X msg 52 119 bang;
-#X obj 153 471 pdp_xv;
+#X obj 111 502 pdp_xv;
 #X obj 208 360 + 1;
 #X obj 705 65 pdp_noise;
 #X obj 282 297 s tresh;
@@ -242,12 +242,12 @@ colors;
 #X floatatom 198 334 5 0 0 0 - - -;
 #X text 239 334 minimum size of selected contours ( default : 10x10
 );
-#X obj 435 500 route 1;
-#X obj 487 500 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#X obj 398 539 route 1;
+#X obj 450 539 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X msg 174 382 clear;
 #X text 282 382 recalculates the pattern contour;
-#X obj 396 501 < 0.1;
+#X obj 359 540 < 0.1;
 #X obj 805 21 s reset;
 #X obj 796 -4 t b s;
 #X obj 223 383 r reset;
@@ -260,10 +260,21 @@ hu moments using CvMatchShape.;
 #X text 337 403 criteria value under which the contour is recongnized
 ;
 #X text 335 414 ( adjust to your situation : default : 0.1 );
-#X obj 496 480 hsl 128 15 0 0.2 0 0 cdist empty empty -2 -8 0 10 -262144
+#X obj 459 519 hsl 128 15 0 0.2 0 0 cdist empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
-#X text 409 463 criteria value;
-#X floatatom 414 482 10 0 0 0 - - -;
+#X text 477 536 criteria value;
+#X floatatom 377 521 10 0 0 0 - - -;
+#X obj 236 466 unpack f f f f f;
+#X text 350 466 position of detected contours;
+#X floatatom 259 488 5 0 0 0 - - -;
+#X floatatom 297 489 5 0 0 0 - - -;
+#X floatatom 337 488 5 0 0 0 - - -;
+#X floatatom 380 489 5 0 0 0 - - -;
+#X text 266 501 X;
+#X text 305 500 Y;
+#X text 337 500 width;
+#X text 378 501 height;
+#X text 705 489 minimum distance;
 #X connect 1 0 2 0;
 #X connect 2 0 5 0;
 #X connect 3 0 5 0;
@@ -306,6 +317,7 @@ hu moments using CvMatchShape.;
 #X connect 49 0 7 0;
 #X connect 49 1 67 0;
 #X connect 49 2 28 0;
+#X connect 49 3 93 0;
 #X connect 51 0 68 0;
 #X connect 56 0 63 0;
 #X connect 58 0 59 1;
@@ -332,3 +344,7 @@ hu moments using CvMatchShape.;
 #X connect 87 0 86 0;
 #X connect 90 0 80 1;
 #X connect 90 0 92 0;
+#X connect 93 1 95 0;
+#X connect 93 2 96 0;
+#X connect 93 3 97 0;
+#X connect 93 4 98 0;

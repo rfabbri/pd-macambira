@@ -40,6 +40,7 @@ typedef struct pdp_opencv_pgh_compare_struct
     t_outlet *x_outlet0;
     t_outlet *x_patternout;
     t_outlet *x_dataout;
+    t_outlet *x_posout;
 
     int x_packet0;
     int x_packet1;
@@ -53,6 +54,7 @@ typedef struct pdp_opencv_pgh_compare_struct
 
     int x_minsize;
     float x_cdistance;
+    t_atom    rlist[5];
 
     IplImage *image, *gray;
     IplImage *imager, *grayr;
@@ -115,6 +117,7 @@ static void pdp_opencv_pgh_compare_process_rgb(t_pdp_opencv_pgh_compare *x)
 
     cvFindContours( x->gray, mstorage, &contourl, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
 
+    i=0;
     if ( contourl && x->x_bcontourr )
     {
       contourlp=contourl;
@@ -138,6 +141,12 @@ static void pdp_opencv_pgh_compare_process_rgb(t_pdp_opencv_pgh_compare *x)
            {
              cvRectangle( x->gray, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,255,255), 2, 8 , 0 );
              cvDrawContours( x->gray, contourlp, CV_RGB(255,255,255), CV_RGB(255,255,255), 0, 1, 8, cvPoint(0,0) );
+             SETFLOAT(&x->rlist[0], i++);
+             SETFLOAT(&x->rlist[1], rect.x);
+             SETFLOAT(&x->rlist[2], rect.y);
+             SETFLOAT(&x->rlist[3], rect.width);
+             SETFLOAT(&x->rlist[4], rect.height);
+             outlet_list( x->x_posout, 0, 5, x->rlist );
            }
            else
            {
@@ -310,6 +319,7 @@ void *pdp_opencv_pgh_compare_new(t_floatarg f)
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
     x->x_patternout = outlet_new(&x->x_obj, &s_anything); 
     x->x_dataout = outlet_new(&x->x_obj, &s_anything); 
+    x->x_posout = outlet_new(&x->x_obj, &s_anything); 
 
     x->x_packet0 = -1;
     x->x_packet1 = -1;
