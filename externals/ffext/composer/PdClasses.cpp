@@ -4,6 +4,9 @@
 #include "Pattern.hpp"
 #include "Editor.hpp"
 
+#include "callwrappers_pd.cpp"
+#include "callwrappers_ed.cpp"
+
 #include <iostream>
 
 using std::cout;
@@ -30,22 +33,7 @@ void track_proxy_setup(void)
     );
     class_addmethod(track_proxy_class, (t_method)track_proxy_editor, \
             gensym("editor"), A_FLOAT, A_NULL);
-    class_addmethod(track_proxy_class, (t_method)track_proxy_getpatterns, \
-            gensym("getpatterns"), A_NULL);
-    class_addmethod(track_proxy_class, (t_method)track_proxy_getpatternsize, \
-            gensym("getpatternsize"), A_FLOAT, A_NULL);
-    class_addmethod(track_proxy_class, (t_method)track_proxy_setrow, \
-            gensym("setrow"), A_GIMME, A_NULL);
-    class_addmethod(track_proxy_class, (t_method)track_proxy_getrow, \
-            gensym("getrow"), A_FLOAT, A_FLOAT, A_NULL);
-    class_addmethod(track_proxy_class, (t_method)track_proxy_addpattern, \
-            gensym("addpattern"), A_SYMBOL, A_FLOAT, A_FLOAT, A_NULL);
-    class_addmethod(track_proxy_class, (t_method)track_proxy_removepattern, \
-            gensym("removepattern"), A_FLOAT, A_NULL);
-    class_addmethod(track_proxy_class, (t_method)track_proxy_resizepattern, \
-            gensym("resizepattern"), A_FLOAT, A_FLOAT, A_FLOAT, A_NULL);
-    class_addmethod(track_proxy_class, (t_method)track_proxy_copypattern, \
-            gensym("copypattern"), A_SYMBOL, A_SYMBOL, A_NULL);
+#include "classsetup.cpp" 
     /* class_addmethod(track_proxy_class, (t_method)track_proxy_data, \
             gensym("data"), A_GIMME, A_NULL);*/
 #if PD_MINOR_VERSION >= 37

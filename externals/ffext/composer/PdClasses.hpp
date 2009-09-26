@@ -28,6 +28,8 @@ void track_proxy_save(t_gobj *z, t_binbuf *b);
 void track_proxy_properties(t_gobj *z, t_glist *owner);
 void track_proxy_send_result(t_track_proxy *x, int outlet, int editor);
 int track_proxy_editor(t_track_proxy *x, t_floatarg arg);
+
+/*#begin methods*/
 int track_proxy_getpatterns(t_track_proxy *x);
 int track_proxy_getpatternsize(t_track_proxy *x, t_floatarg pat);
 int track_proxy_setrow(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv);
@@ -36,6 +38,10 @@ int track_proxy_addpattern(t_track_proxy *x, t_symbol *name, t_floatarg rows, t_
 int track_proxy_removepattern(t_track_proxy *x, t_floatarg pat);
 int track_proxy_resizepattern(t_track_proxy *x, t_floatarg pat, t_floatarg rows, t_floatarg cols);
 int track_proxy_copypattern(t_track_proxy *x, t_symbol *src, t_symbol *dst);
+/*#end methods*/
+
+#include "methods_pd.hpp"
+#include "methods_ed.hpp"
 
 extern "C" void composer_setup(void);
 

@@ -38,23 +38,20 @@ all: $(LIBNAME)$(PDSUF)
 		'[size: '`ls -gGh $(LIBNAME)$(PDSUF) | cut -d " " -f 3`']'
 
 clean::
-	rm -f $(LIBNAME)$(PDSUF) editor_tk.cpp *.o *~
+	rm -f $(LIBNAME)$(PDSUF)
+	rm -f *.o *~
+	rm -f editor_tk.cpp methods_pd.hpp methods_ed.hpp classsetup.cpp callwrappers_pd.cpp callwrappers_ed.cpp
 
 .SUFFIXES: .cpp .o
 
 SRCS = Song.cpp Pattern.cpp Track.cpp Editor.o PdClasses.cpp
 OBJS = ${SRCS:.cpp=.o}
 
-editor_tk.cpp: editor.tk
-	( echo 'static const char* editor_tk[] = {'; \
-	sed -e 's/\(["\\]\)/\\\1/g' -e 's/^/"/' -e 's/$$/",/' \
-	editor.tk; echo '"" };' ) > editor_tk.cpp
-
 Song.o: Song.cpp Song.hpp
 Pattern.o: Pattern.cpp Pattern.hpp
 Track.o: Track.cpp Track.hpp
 Editor.o: Editor.cpp Editor.hpp editor_tk.cpp
-PdClass.o: PdClasses.cpp PdClasses.hpp
+PdClasses.o: PdClasses.cpp PdClasses.hpp methods_pd.hpp methods_ed.hpp classsetup.cpp callwrappers_pd.cpp callwrappers_ed.cpp
 
 .cpp.o: Makefile
 	$(CXX) $(CFLAGS) $(INCLUDES) -xc++ -c $<
@@ -62,3 +59,82 @@ PdClass.o: PdClasses.cpp PdClasses.hpp
 $(LIBNAME)$(PDSUF): Makefile $(OBJS)
 	$(LDSHARED) $(LDSOFLAGS) $(CFLAGS) -xnone $(OBJS) -o $(LIBNAME)$(PDSUF)
 
+editor_tk.cpp: editor.tk
+	( echo 'static const char* editor_tk[] = {'; sed -e 's/\(["\\]\)/\\\1/g' -e 's/^/"/' -e 's/$$/",/' editor.tk; echo '"" };' ) > editor_tk.cpp
+
+methods.hpp: PdClasses.hpp
+	awk ' \
+		/^\/\*#end methods\*\/$$/{M=0} \
+		{if(M==1) print $$0} \
+		/^\/\*#begin methods\*\/$$/{M=1}' \
+		PdClasses.hpp \
+	| sed \
+		-e 's/\> *\(\**\) *\w\+\(,\|)\)/\1\2/g' \
+		-e 's/(/( /' -e 's/)/ )/' \
+	| awk '{ \
+		for(x=1; x<NF; x++) { \
+			if(x<=2||x==NF) \
+				printf($$x" "); \
+			else \
+				printf($$x" arg"(x-3)", "); \
+		} \
+		printf("\n"); \
+		}' \
+	| sed \
+		-e 's/,\( arg[0-9]\+\)/\1/g' \
+		-e 's/, $$/);/' \
+		-e 's/( /(/' \
+	> methods.hpp
+
+methods_pd.hpp: methods.hpp
+	sed -e 's/\<track_proxy_\w\+\>/\0P/' methods.hpp > methods_pd.hpp
+
+methods_ed.hpp: methods.hpp
+	sed -e 's/\<track_proxy_\w\+\>/\0E/' methods.hpp > methods_ed.hpp
+
+classsetup.cpp: methods.hpp
+	sed \
+		-e 's/\<track_proxy_\(\w\+\)\>/\0 \1/' \
+		-e 's/);$$/, /' \
+		-e 's/(t_track_proxy\* arg0,\?//' \
+		-e 's/ arg[0-9]\+, / /g' \
+		-e 's/\<t_symbol\* int t_atom\>\*/A_GIMME, /g' \
+		-e 's/\<t_symbol\>\*/A_SYMBOL, /g' \
+		-e 's/\<t_floatarg\>/A_FLOAT, /g' \
+		methods.hpp \
+	| awk '{ \
+		printf("class_addmethod(track_proxy_class, (t_method)%sP, gensym(\"%s\"), ", $$2, $$3); \
+		for(i=4; i<=NF; i++) printf("%s ", $$i); \
+		printf("A_NULL);\n"); \
+		\
+		printf("class_addmethod(track_proxy_class, (t_method)%sE, gensym(\"%sE\"), ", $$2, $$3); \
+		for(i=4; i<=NF; i++) printf("%s ", $$i); \
+		printf("A_NULL);\n"); \
+	}' \
+	> classsetup.cpp
+
+callwrappers_pd.cpp: methods.hpp
+	sed \
+		-e 's/;$$//' \
+		-e 's/^\(.*\)\(\<track_proxy_\w\+\>\)\((.*)\)$$/\1\2P\3 {\n    \2\3;\/\/real call\n    track_proxy_send_result(arg0, 1, 0);\n}/' \
+		methods.hpp \
+	| sed \
+		-e '/\/\/real call/s/(t_track_proxy\* arg0/(arg0/' \
+		-e '/\/\/real call/s/\(arg[0-9]\+, \)[A-Za-z_*]\+ \(arg[0-9]\+\)/\1\2/g' \
+		-e '/\/\/real call/s/\(arg[0-9]\+, \)[A-Za-z_*]\+ \(arg[0-9]\+\)/\1\2/g' \
+		-e '/\/\/real call/s/\(arg[0-9]\+, \)[A-Za-z_*]\+ \(arg[0-9]\+\)/\1\2/g' \
+		-e '/\/\/real call/s/\(arg[0-9]\+, \)[A-Za-z_*]\+ \(arg[0-9]\+\)/\1\2/g' \
+	> callwrappers_pd.cpp
+
+callwrappers_ed.cpp: methods.hpp
+	sed \
+		-e 's/;$$//' \
+		-e 's/^\(.*\)\(\<track_proxy_\w\+\>\)\((.*)\)$$/\1\2E\3 {\n    \2\3;\/\/real call\n    track_proxy_send_result(arg0, 0, 1);\n}/' \
+		methods.hpp \
+	| sed \
+		-e '/\/\/real call/s/(t_track_proxy\* arg0/(arg0/' \
+		-e '/\/\/real call/s/\(arg[0-9]\+, \)[A-Za-z_*]\+ \(arg[0-9]\+\)/\1\2/g' \
+		-e '/\/\/real call/s/\(arg[0-9]\+, \)[A-Za-z_*]\+ \(arg[0-9]\+\)/\1\2/g' \
+		-e '/\/\/real call/s/\(arg[0-9]\+, \)[A-Za-z_*]\+ \(arg[0-9]\+\)/\1\2/g' \
+		-e '/\/\/real call/s/\(arg[0-9]\+, \)[A-Za-z_*]\+ \(arg[0-9]\+\)/\1\2/g' \
+	> callwrappers_ed.cpp
