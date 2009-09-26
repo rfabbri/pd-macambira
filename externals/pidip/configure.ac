@@ -11,11 +11,13 @@ FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
 MPEG4IP_SOURCE_DIR=/SOURCES/mpeg4ip
 PDP_STREAMING_OBJECTS=
 PDP_CAPTURE_OBJECT=
+PDP_DC1394_OBJECT
 IMLIB_LIBS=
 IMLIB_CFLAGS=
 MAGIC_LIBS=
 MAGIC_CFLAGS=
 THEORA_LIBS=
+DC1394_LIBS=
 enable_ffmpeg=no
 enable_mpeg4ip=no
 enable_lcapture=no
@@ -130,6 +132,11 @@ AC_CHECK_LIB(Magick, XWindowByProperty,
               echo "Image Magick not found : not building pdp_capture", 
               -I/usr/X11R6/include -L/usr/X11R6/lib )
 
+AC_CHECK_LIB(dc1394, dc1394_camera_enumerate, 
+              [ PDP_DC1394_OBJECT="pdp_dc1394.o"
+              DC1394_LIBS="-ldc1394 -lraw1394"],
+              echo "dc1394 not found : not building pdp_dc1394", )
+
 AC_CHECK_LIB(bz2, BZ2_bzBuffToBuffCompress, , AC_MSG_ERROR(streaming requires bz2 library!!))
 AC_CHECK_LIB(z, deflate, , AC_MSG_ERROR(streaming requires compress library!!))
 AC_CHECK_LIB(dl, dlopen, , AC_MSG_ERROR(streaming requires dynamic loader library!!))
@@ -139,6 +146,7 @@ AC_CHECK_LIB(vorbis, vorbis_analysis_init, , AC_MSG_ERROR(streaming requires vor
 AC_CHECK_LIB(vorbisenc, vorbis_encode_setup_init, , AC_MSG_ERROR(streaming requires vorbis encoder library!!), -lm)
 AC_CHECK_LIB(theora, theora_encode_init, , AC_MSG_ERROR(theora library needed! sorry...), -lm)
 AC_CHECK_LIB(quicktime, lqt_decode_video, , AC_MSG_ERROR(libquicktime not found) )
+AC_CHECK_LIB(dc1394, dc1394_camera_enumerate, , AC_MSG_ERROR(dc1394 not found) )
 
 qt_minor_version="`lqt-config --version | cut -f3 -d'.'`"
 qt_major_version="`lqt-config --version | cut -f1 -d'.'`"
@@ -286,8 +294,10 @@ AC_SUBST(PDP_PIDIP_VERSION)
 AC_SUBST(IMLIB_LIBS)
 AC_SUBST(IMLIB_CFLAGS)
 AC_SUBST(THEORA_LIBS)
+AC_SUBST(DC1394_LIBS)
 AC_SUBST(PDP_STREAMING_OBJECTS)
 AC_SUBST(PDP_CAPTURE_OBJECT)
+AC_SUBST(PDP_DC1394_OBJECT)
 AC_SUBST(PDP_PIDIP_LIBS)
 AC_SUBST(PDP_PIDIP_INCLUDES)
 

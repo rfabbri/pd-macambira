@@ -6,6 +6,7 @@ PDP_PIDIP_LIBS = @PDP_PIDIP_LIBS@
 IMLIB_CFLAGS = @IMLIB_CFLAGS@
 IMLIB_LIBS = @IMLIB_LIBS@
 THEORA_LIBS = @THEORA_LIBS@
+DC1394_LIBS = @DC1394_LIBS@
 PDP_PIDIP_INCLUDES =  @PDP_PIDIP_INCLUDES@
 PDP_PIDIP_VERSION = @PDP_PIDIP_VERSION@
 MPEG4IP_CFLAGS = @MPEG4IP_CFLAGS@
@@ -40,12 +41,12 @@ pdp_pidip_all:
 
 pidip.pd_darwin: pdp_pidip_all
 	rm -f pidip.pd_darwin
-	g++ -bundle -undefined dynamic_lookup -headerpad_max_install_names -o pidip.pd_darwin modules/*.o system/*.o -L/sw/lib $(THEORA_LIBS) $(PDP_PIDIP_LIBS) $(IMLIB_LIBS)
+	g++ -bundle -undefined dynamic_lookup -headerpad_max_install_names -o pidip.pd_darwin modules/*.o system/*.o -L/sw/lib $(THEORA_LIBS) $(DC1394_LIBS) $(PDP_PIDIP_LIBS) $(IMLIB_LIBS)
 	strip -x pidip.pd_darwin
 
 pidip.pd_linux: pdp_pidip_all
-	rm -f pidip.pd_linux
-	g++ -Wl,--export-dynamic -shared -o pidip.pd_linux modules/*.o system/*.o $(THEORA_LIBS) $(PDP_PIDIP_LIBS) $(IMLIB_LIBS)
+	rm -f pidip.pd_linu
+	g++ -export_dynamic -shared -o pidip.pd_linux modules/*.o system/*.o $(THEORA_LIBS) $(PDP_PIDIP_LIBS) $(IMLIB_LIBS) $(DC1394_LIBS)
 	strip --strip-unneeded pidip.pd_linux
 
 clean:
