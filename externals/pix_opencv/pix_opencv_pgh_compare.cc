@@ -30,6 +30,7 @@ CPPEXTERN_NEW_WITH_GIMME(pix_opencv_pgh_compare)
 pix_opencv_pgh_compare :: pix_opencv_pgh_compare(int argc, t_atom*argv)
 { 
     m_dataout = outlet_new(this->x_obj, &s_anything);
+    m_posout = outlet_new(this->x_obj, &s_anything);
 
     comp_xsize=320;
     comp_ysize=240;
@@ -139,6 +140,7 @@ void pix_opencv_pgh_compare :: processRGBA_RGBA(imageStruct &left, imageStruct &
 
   cvFindContours( gray, mstorage, &contourl, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
 
+  i=0;
   if ( contourl && x_bcontourr )
   {
     contourlp=contourl;
@@ -162,6 +164,12 @@ void pix_opencv_pgh_compare :: processRGBA_RGBA(imageStruct &left, imageStruct &
          {
            cvRectangle( gray, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,255,255), 2, 8 , 0 );
            cvDrawContours( gray, contourlp, CV_RGB(255,255,255), CV_RGB(255,255,255), 0, 1, 8, cvPoint(0,0) );
+           SETFLOAT(&rlist[0], i++);
+           SETFLOAT(&rlist[1], rect.x);
+           SETFLOAT(&rlist[2], rect.y);
+           SETFLOAT(&rlist[3], rect.width);
+           SETFLOAT(&rlist[4], rect.height);
+           outlet_list( m_posout, 0, 5, rlist );
          }
          else
          {

@@ -63,6 +63,7 @@ class GEM_EXTERN pix_opencv_pgh_compare : public GemPixDualObj
         int comp_ysize;
 
         t_outlet *m_dataout;
+        t_outlet *m_posout;
 
         int x_minsize;
         float x_cdistance;
@@ -80,6 +81,8 @@ class GEM_EXTERN pix_opencv_pgh_compare : public GemPixDualObj
 
         CvMemStorage *x_storage;
         CvSeq        *x_bcontourr;
+
+        t_atom       rlist[5];
 
 };
 

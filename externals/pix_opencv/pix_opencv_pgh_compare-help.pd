@@ -1,4 +1,4 @@
-#N canvas 266 176 1154 642 10;
+#N canvas 266 183 1154 642 10;
 #X obj 897 4 gemhead;
 #X obj 372 500 pix_texture;
 #X obj 372 528 square 2;
@@ -57,7 +57,7 @@
 -1 -1;
 #X obj 783 437 hsl 128 15 0 0.2 0 0 cdist empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
-#X text 696 420 criteria value;
+#X text 805 455 criteria value;
 #X floatatom 701 439 10 0 0 0 - - -;
 #X msg 478 319 criteria \$1;
 #X obj 562 320 r cdist;
@@ -96,7 +96,7 @@
 #X obj 831 34 pix_resize 320 240;
 #X obj 831 181 translateXYZ 4 0 0;
 #X obj 374 177 pix_resize 320 240;
-#X obj 374 395 pix_opencv_pgh_compare;
+#X obj 374 356 pix_opencv_pgh_compare;
 #X text 17 -80 pix_opencv_pgh_compare :: compare contours calculating
 their PGH histograms.;
 #X text 17 -53 Written by Yves Degoyon ( ydegoyon@gmail.com ) using
@@ -144,6 +144,16 @@ example code from OpenCV book;
 #X msg 420 56 driver 1;
 #X msg 397 -29 dialog;
 #X msg 402 1 device /dev/dv1394-0;
+#X obj 544 379 unpack f f f f f;
+#X text 658 379 position of detected contours;
+#X floatatom 567 401 5 0 0 0 - - -;
+#X floatatom 605 402 5 0 0 0 - - -;
+#X floatatom 645 401 5 0 0 0 - - -;
+#X floatatom 688 402 5 0 0 0 - - -;
+#X text 574 414 X;
+#X text 613 413 Y;
+#X text 645 413 width;
+#X text 686 414 height;
 #X connect 0 0 38 0;
 #X connect 1 0 2 0;
 #X connect 4 0 5 0;
@@ -191,6 +201,7 @@ example code from OpenCV book;
 #X connect 57 0 52 0;
 #X connect 58 0 1 0;
 #X connect 58 1 16 0;
+#X connect 58 2 75 0;
 #X connect 61 0 18 0;
 #X connect 63 0 64 0;
 #X connect 64 0 13 0;
@@ -207,3 +218,7 @@ example code from OpenCV book;
 #X connect 72 0 69 0;
 #X connect 73 0 69 0;
 #X connect 74 0 69 0;
+#X connect 75 1 77 0;
+#X connect 75 2 78 0;
+#X connect 75 3 79 0;
+#X connect 75 4 80 0;

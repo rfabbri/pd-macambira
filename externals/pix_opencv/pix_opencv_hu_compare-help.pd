@@ -1,7 +1,7 @@
-#N canvas 266 86 1154 642 10;
+#N canvas 266 66 1154 759 10;
 #X obj 937 -7 gemhead;
-#X obj 372 500 pix_texture;
-#X obj 372 528 square 2;
+#X obj 375 543 pix_texture;
+#X obj 374 566 square 2;
 #X obj 9 -28 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 0 22 454 304 gemwin 0;
@@ -37,7 +37,7 @@
 #X restore 14 16 pd gemwin;
 #X msg 14 -5 create;
 #X text 15 -23 Create window and render;
-#X obj 363 232 cnv 15 700 250 empty empty empty 20 12 0 14 -24198 -66577
+#X obj 353 225 cnv 15 700 300 empty empty empty 20 12 0 14 -24198 -66577
 0;
 #X obj 619 -90 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -51,16 +51,16 @@
 #X obj 625 -16 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 373 395 pix_opencv_hu_compare;
-#X floatatom 506 439 30 0 0 0 - - -;
-#X text 511 422 distance;
-#X obj 722 457 route 1;
-#X obj 774 457 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#X floatatom 491 481 30 0 0 0 - - -;
+#X text 496 464 distance;
+#X obj 707 499 route 1;
+#X obj 759 499 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
-#X obj 683 458 < 0.1;
-#X obj 783 437 hsl 128 15 0 0.2 0 0 cdist empty empty -2 -8 0 10 -262144
+#X obj 668 500 < 0.1;
+#X obj 768 479 hsl 128 15 0 0.2 0 0 cdist empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
-#X text 696 420 criteria value;
-#X floatatom 701 439 10 0 0 0 - - -;
+#X text 788 499 criteria value;
+#X floatatom 686 481 10 0 0 0 - - -;
 #X text 528 376 calculating their hu moments ( CvMatchShape );
 #X text 527 364 compares the contours to the pattern reference contour
 ;
@@ -154,6 +154,16 @@ colors;
 #X msg 422 16 driver 1;
 #X msg 399 -69 dialog;
 #X msg 404 -39 device /dev/dv1394-0;
+#X obj 547 415 unpack f f f f f;
+#X text 661 415 position of detected contours;
+#X floatatom 570 437 5 0 0 0 - - -;
+#X floatatom 608 438 5 0 0 0 - - -;
+#X floatatom 648 437 5 0 0 0 - - -;
+#X floatatom 691 438 5 0 0 0 - - -;
+#X text 577 450 X;
+#X text 616 449 Y;
+#X text 648 449 width;
+#X text 689 450 height;
 #X connect 0 0 49 0;
 #X connect 1 0 2 0;
 #X connect 4 0 5 0;
@@ -169,6 +179,7 @@ colors;
 #X connect 15 0 14 0;
 #X connect 16 0 1 0;
 #X connect 16 1 17 0;
+#X connect 16 2 82 0;
 #X connect 17 0 21 0;
 #X connect 19 0 20 0;
 #X connect 21 0 19 0;
@@ -219,3 +230,7 @@ colors;
 #X connect 79 0 76 0;
 #X connect 80 0 76 0;
 #X connect 81 0 76 0;
+#X connect 82 1 84 0;
+#X connect 82 2 85 0;
+#X connect 82 3 86 0;
+#X connect 82 4 87 0;
