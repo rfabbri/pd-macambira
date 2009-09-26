@@ -1,17 +1,17 @@
 #N canvas 63 47 629 668 10;
-#X obj 60 46 nbx 3 14 0 127 0 1 \$0.cc.s \$0.cc.r CC 42 8 0 11 -194624
+#X obj 60 46 nbx 3 14 0 127 0 1 \$0-cc-s \$0-cc.r CC 42 8 0 11 -194624
 -1 -1 1 256;
-#X obj 63 64 bng 13 250 50 0 \$0.learn-on \$0.nullR empty 0 -6 0 8
+#X obj 63 64 bng 13 250 50 0 \$0-learn-on \$0-nullR empty 0 -6 0 8
 -259541 -1 -1;
-#X obj 330 178 r \$0.cc.v;
-#X obj 81 67 bng 8 250 50 0 empty \$0.lite1 empty 0 -6 0 8 -1 -262085
+#X obj 330 178 r \$0-cc-v;
+#X obj 81 67 bng 8 250 50 0 empty \$0-lite1 empty 0 -6 0 8 -1 -262085
 -1;
-#X obj 92 67 bng 8 250 50 0 empty \$0.lite2 empty 0 -6 0 8 -1 -262085
+#X obj 92 67 bng 8 250 50 0 empty \$0-lite2 empty 0 -6 0 8 -1 -262085
 -1;
-#X obj 103 67 bng 8 250 50 0 empty \$0.lite3 empty 0 -6 0 8 -1 -262085
+#X obj 103 67 bng 8 250 50 0 empty \$0-lite3 empty 0 -6 0 8 -1 -262085
 -1;
 #X obj 268 49 ctlin;
-#X obj 60 81 nbx 2 14 1 64 0 0 \$0.device-number.s \$0.device-number.r
+#X obj 60 81 nbx 2 14 1 64 0 0 \$0-device-number-s \$0-device-number.r
 Dev 32 8 0 11 -110565 -1 -1 1 256;
 #X obj 268 267 spigot;
 #X obj 268 181 / 127;
@@ -19,13 +19,13 @@ Dev 32 8 0 11 -110565 -1 -1 1 256;
 #X obj 349 566 list append;
 #X obj 333 611 s;
 #X msg 294 322 set \$1;
-#X obj 268 397 s \$0.data;
-#X obj 210 467 r \$0.data;
-#X obj 333 431 r \$0.data;
+#X obj 268 397 s \$0-data;
+#X obj 210 467 r \$0-data;
+#X obj 333 431 r \$0-data;
 #X obj 32 231 loadbang;
 #X msg 32 253 1;
 #X obj 391 544 t b f;
-#X obj 391 522 r \$0.channel;
+#X obj 391 522 r \$0-channel;
 #X obj 349 500 list append \$2;
 #X obj 10 570 r \$1/getControls;
 #X obj 10 620 s \$1/controlsList;
@@ -37,7 +37,7 @@ Dev 32 8 0 11 -110565 -1 -1 1 256;
 #X obj 349 478 list append \$1;
 #X text 208 594 Omni;
 #X obj 10 492 r \$1/setChannel;
-#X obj 10 517 s \$0.channel;
+#X obj 10 517 s \$0-channel;
 #X obj 51 31 cnv 12 75 12 empty empty \$2 2 7 0 11 -83692 -262144 0
 ;
 #X obj 315 98 t a;
@@ -55,20 +55,20 @@ Dev 32 8 0 11 -110565 -1 -1 1 256;
 #X restore 26 198 pd sssad;
 #N canvas 0 22 458 308 midi-learn 0;
 #X obj 217 143 inlet;
-#X obj 162 38 r \$0.learn-on;
+#X obj 162 38 r \$0-learn-on;
 #X obj 217 177 spigot;
 #X obj 74 188 metro 250;
 #X obj 29 126 t b b;
-#X obj 217 199 s \$0.cc.r;
+#X obj 217 199 s \$0-cc.r;
 #X obj 162 75 pipe 1000;
 #X msg 255 74 1;
 #X msg 274 118 0;
 #X msg 74 150 0;
 #X msg 106 150 1;
 #X obj 58 251 sel 0 1 2;
-#X obj 58 281 s \$0.lite1;
-#X obj 138 281 s \$0.lite2;
-#X obj 218 281 s \$0.lite3;
+#X obj 58 281 s \$0-lite1;
+#X obj 138 281 s \$0-lite2;
+#X obj 218 281 s \$0-lite3;
 #X msg 29 189 0;
 #X obj 58 221 f;
 #X obj 85 221 + 1;
@@ -102,10 +102,10 @@ Dev 32 8 0 11 -110565 -1 -1 1 256;
 #X obj 55 241 outlet;
 #X obj 55 137 div 16;
 #X obj 55 197 ==;
-#X obj 71 175 r \$0.device-number;
+#X obj 71 175 r \$0-device-number;
 #X obj 82 88 mod 16;
 #X obj 55 67 t f f;
-#X obj 82 108 s \$0.channel;
+#X obj 82 108 s \$0-channel;
 #X obj 55 156 + 1;
 #X connect 0 0 6 0;
 #X connect 2 0 8 0;
@@ -118,7 +118,7 @@ Dev 32 8 0 11 -110565 -1 -1 1 256;
 #X restore 348 156 pd parse-channel;
 #N canvas 115 84 464 470 midi-sensory 1;
 #X obj 73 159 spigot;
-#X obj 73 100 r \$0.data;
+#X obj 73 100 r \$0-data;
 #X obj 106 134 r MMMAP_SENSING?;
 #X obj 219 61 keycommand ¬ MMMAP_SENSING? 1;
 #X obj 219 86 keycommand Escape MMMAP_SENSING? 0;
@@ -126,14 +126,14 @@ Dev 32 8 0 11 -110565 -1 -1 1 256;
 #X obj 73 181 t b b;
 #X msg 110 181 0;
 #X obj 139 181 s MMMAP_SENSING?;
-#X obj 73 231 s \$1.sensed;
+#X obj 73 231 s \$1-sensed;
 #X obj 77 288 r MMMAP_SENSING?;
 #X obj 137 422 s \$1\$2/GUIR;
 #X msg 137 398 color \$1 -1 -1;
-#X obj 198 288 r \$1\$2.assigning?;
+#X obj 198 288 r \$1\$2-assigning?;
 #X obj 334 315 sel 0 1;
 #X msg 334 340 0;
-#X obj 334 268 r \$1\$2.connections;
+#X obj 334 268 r \$1\$2-connections;
 #X obj 197 308 sel 1;
 #X obj 334 291 f;
 #X msg 197 331 19;
@@ -171,8 +171,8 @@ Dev 32 8 0 11 -110565 -1 -1 1 256;
 #X connect 25 0 12 0;
 #X restore 485 392 pd midi-sensory;
 #X text 195 15 [cc-learner /unit /control];
-#X obj 32 329 s \$0.device-number.all;
-#X obj 32 279 s \$0.device-number.all;
+#X obj 32 329 s \$0-device-number.all;
+#X obj 32 279 s \$0-device-number.all;
 #X obj 268 203 min 1;
 #X obj 315 250 &&;
 #X obj 268 133 midi.random-smooth;
