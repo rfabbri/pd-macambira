@@ -1,9 +1,7 @@
 
 
 
-Download the package here : [[http://hangar.org/wikis/lab/pd/pix_opencv-0.2.tar.gz|pix_opencv-0.2.tar.gz]]
-
-or get the latest version through svn :
+get the source version through svn :
 
 svn co https://pure-data.svn.sourceforge.net/svnroot/pure-data pure-data
 cd pure-data/trunk/externals/pix_opencv
@@ -24,26 +22,30 @@ and of the GEM that you are loading
 ( it might not work if the version
 is different )
 
-cd into the package folder ::
+cd into the package folder :
 
   cd pix_opencv
 
-edit the Makefile to fit your system and sources folders: 
+configure the package with the appropriate command for your system :
 
-edit the Makefile and change the values for PD_DIR and GEM_DIR variables
+  ./configure --with-pd=<path to pd _sources_> --with-gem=<path to gem _sources_>
 
-then, compile it ::
+for example :
 
-  make clean
-  make
+./configure --with-pd=/usr/local/pd --with-gem=/usr/local/pd/gem
+
+then, compile it :
+
+make clean
+make
 
 and copy the .pd_linux to your externals folder ::
 
-  cp *.pd_linux /usr/local/lib/pd/extra/
-
+cp *.pd_linux /usr/local/lib/pd/extra/
 
 
 ===== MAC OSX (intel and powerPC) =====
+
 
 first install openCV MacOS framework 
    download openCV private framework from http://www.ient.rwth-aachen.de/cms/software/opencv/
@@ -59,9 +61,13 @@ cd into the package folder ::
 
   cd pix_opencv
 
-edit the Makefile to fit your system and sources folders: 
+configure the package with the appropriate command for your system :
 
-edit the Makefile and change the values for PD_DIR and GEM_DIR variables
+  ./configure --with-pd=<path to pd _sources_> --with-gem=<path to gem _sources_>
+
+for example :
+
+./configure --with-pd=/usr/local/pd --with-gem=/usr/local/pd/gem
 
 then, compile it ::
 
