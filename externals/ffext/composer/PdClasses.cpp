@@ -334,6 +334,12 @@ int track_proxy_addpattern(t_track_proxy *x, t_symbol *name, t_floatarg rows, t_
     result_argc = 0;
     t_int r = (t_int) rows;
     t_int c = (t_int) cols;
+    Pattern *pattern = x->track->getPattern(name->s_name);
+    if(pattern)
+    {
+        pd_error(x, "addpattern: pattern already exist: %s", name->s_name);
+        return -3;
+    }
     x->track->addPattern(r, c, string(name->s_name));
     return 0;
 }
@@ -347,8 +353,8 @@ int track_proxy_removepattern(t_track_proxy *x, t_symbol *pat)
         pd_error(x, "removepattern: no such pattern: %s", pat->s_name);
         return -2;
     }
-    pd_error(x, "removepattern: not implemented yet");
-    return -9;
+    x->track->removePattern(pat->s_name);
+    return 0;
 }
 
 int track_proxy_resizepattern(t_track_proxy *x, t_symbol *pat, t_floatarg rows, t_floatarg cols)
@@ -362,6 +368,11 @@ int track_proxy_resizepattern(t_track_proxy *x, t_symbol *pat, t_floatarg rows, 
         pd_error(x, "resizepattern: no such pattern: %s", pat->s_name);
         return -2;
     }
+    if(rows < 1 || cols < 1)
+    {
+        pd_error(x, "resizepattern: rows and columns must be positive");
+        return -6;
+    }
     pattern->resize(r, c);
     return 0;
 }
@@ -372,8 +383,14 @@ int track_proxy_renamepattern(t_track_proxy *x, t_symbol *oldName, t_symbol *new
     Pattern *pattern = x->track->getPattern(oldName->s_name);
     if(!pattern)
     {
-        pd_error(x, "resizepattern: no such pattern: %s", oldName->s_name);
+        pd_error(x, "renamepattern: no such pattern: %s", oldName->s_name);
         return -2;
+    }
+    pattern = x->track->getPattern(newName->s_name);
+    if(pattern)
+    {
+        pd_error(x, "renamepattern: destination pattern already exist: %s", newName->s_name);
+        return -3;
     }
     x->track->renamePattern(oldName->s_name, newName->s_name);
     return 0;
@@ -382,8 +399,20 @@ int track_proxy_renamepattern(t_track_proxy *x, t_symbol *oldName, t_symbol *new
 int track_proxy_copypattern(t_track_proxy *x, t_symbol *src, t_symbol *dst)
 {
     result_argc = 0;
-    pd_error(x, "copypattern: not implemented yet");
-    return -9;
+    Pattern *pattern = x->track->getPattern(src->s_name);
+    if(!pattern)
+    {
+        pd_error(x, "copypattern: no such pattern: %s", src->s_name);
+        return -2;
+    }
+    pattern = x->track->getPattern(dst->s_name);
+    if(pattern)
+    {
+        pd_error(x, "copypattern: destination pattern already exist: %s", dst->s_name);
+        return -3;
+    }
+    x->track->copyPattern(src->s_name, dst->s_name);
+    return 0;
 }
 
 void composer_setup()

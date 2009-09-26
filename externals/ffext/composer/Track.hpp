@@ -27,6 +27,8 @@ public:
 	void addPattern(int rows, int cols, string name);
     Pattern *getPattern(const string &p);
     void renamePattern(const string &oldName, const string &newName);
+    void copyPattern(const string &src, const string &dst);
+    void removePattern(const string &p);
 	inline unsigned int getPatternCount() {return patterns.size();}
     inline map<string,Pattern *>::iterator patternsBegin() {return patterns.begin();}
     inline map<string,Pattern *>::iterator patternsEnd() {return patterns.end();}

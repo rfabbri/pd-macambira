@@ -53,7 +53,23 @@ void Track::renamePattern(const string &oldName, const string &newName)
 {
     Pattern *pattern = getPattern(oldName);
     if(!pattern) return;
-    pattern->setName(newName);
     patterns[newName] = patterns[oldName];
+    patterns[newName]->setName(newName);
     patterns.erase(oldName);
 }
+
+void Track::copyPattern(const string &src, const string &dst)
+{
+    Pattern *pattern = getPattern(src);
+    if(!pattern) return;
+    patterns[dst] = new Pattern(*patterns[src]);
+    patterns[dst]->setName(dst);
+}
+
+void Track::removePattern(const string &p)
+{
+    Pattern *pattern = getPattern(p);
+    if(!pattern) return;
+    patterns.erase(p);
+}
+
