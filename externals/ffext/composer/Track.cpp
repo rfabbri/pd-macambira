@@ -27,10 +27,14 @@ void Track::print()
 {
 	cerr << "---- Track: " << name << " ----" << endl;
 
-	for(unsigned int i = 0; i < patterns.size(); i++)
+	/*for(unsigned int i = 0; i < patterns.size(); i++)
 	{
 		cerr << "  Pattern[" << patterns[i]->getName() << "]: " << patterns[i]->getName() << endl;
-	}
+	}*/
+    for(map<string,Pattern *>::iterator i = patterns.begin(); i != patterns.end(); i++)
+    {
+		cerr << "  Pattern[" << i->first << "]: " << i->second->getName() << endl;
+    }
 
 	cerr << "---- End track (" << name << ") ----" << endl;
 }
@@ -38,10 +42,22 @@ void Track::print()
 void Track::addPattern(int rows, int cols, string name)
 {
     Pattern *pattern = new Pattern(rows, cols, name);
-	patterns.push_back(pattern);
+	//patterns.push_back(pattern);
+    patterns[name] = pattern;
 }
 
-Pattern *Track::getPattern(int n)
+/*Pattern *Track::getPattern(int n)
 {
-	return patterns[n];
+    if(n < 0 || n >= patterns.size())
+        return 0;
+    else
+        return patterns[n];
+}*/
+
+Pattern *Track::getPattern(const string &p)
+{
+    if(patterns.find(p) != patterns.end())
+        return patterns[p];
+    else
+        return 0;
 }

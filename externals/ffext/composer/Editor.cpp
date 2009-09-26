@@ -58,7 +58,29 @@ void Editor::init(t_track_proxy *x)
         x->track->getName().c_str(),
         16,
         "NULL",
-        1);
+#ifdef DEBUG
+        1
+#else
+        0
+#endif
+    );
+}
+
+void Editor::dispatch(t_track_proxy *x, int argc, t_atom* argv)
+{
+    string s = "";
+    for(int i = 0; i < argc; i++)
+    {
+        s += " {";
+        char buf[MAXPDSTRING];
+        atom_string(&argv[i], buf, MAXPDSTRING);
+        s += buf;
+        s += "}";
+    }
+    sys_vgui("pd::composer::dispatch %s%s\n",
+        x->editor_recv->s_name,
+        s.c_str()
+        );
 }
 
 void Editor::openWindow(t_track_proxy *x)

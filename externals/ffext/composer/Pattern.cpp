@@ -6,6 +6,8 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+#define WRAP(v,w) (((v)<0)?(((w)-1)-((-(v)-1)%(w))):((v)%(w)))
+
 Pattern::Pattern(int numRows, int numCols, string patternName)
 : name(patternName)
 {
@@ -72,10 +74,14 @@ void Pattern::resize(int numRows, int numCols)
 
 void Pattern::setCell(int row, int col, Cell cell)
 {
+    row = WRAP(row, rows.size());
+    col = WRAP(col, columns);
 	rows[row][col] = cell;
 }
 
 Cell Pattern::getCell(int row, int col)
 {
+    row = WRAP(row, rows.size());
+    col = WRAP(col, columns);
 	return rows[row][col];
 }

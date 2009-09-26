@@ -14,6 +14,7 @@ using std::cerr;
 using std::endl;
 
 #define IS_A_FLOAT(atom,index) ((atom+index)->a_type == A_FLOAT)
+#define IS_A_SYMBOL(atom,index) ((atom+index)->a_type == A_SYMBOL)
 
 t_atom result_argv[MAX_RESULT_SIZE];
 int result_argc;
@@ -31,11 +32,9 @@ void track_proxy_setup(void)
         CLASS_DEFAULT,
         A_SYMBOL, A_SYMBOL, A_NULL
     );
-    class_addmethod(track_proxy_class, (t_method)track_proxy_editor, \
-            gensym("editor"), A_FLOAT, A_NULL);
 #include "classsetup.cpp" 
-    /* class_addmethod(track_proxy_class, (t_method)track_proxy_data, \
-            gensym("data"), A_GIMME, A_NULL);*/
+    class_addmethod(track_proxy_class, (t_method)track_proxy_data, \
+            gensym("data"), A_GIMME, A_NULL);
 #if PD_MINOR_VERSION >= 37
     class_setpropertiesfn(track_proxy_class, track_proxy_properties);
     class_setsavefn(track_proxy_class, track_proxy_save);
@@ -73,9 +72,9 @@ void track_proxy_free(t_track_proxy *x)
 {
     pd_unbind(&x->x_obj.ob_pd, gensym(TRACK_SELECTOR));
     /* LATER find a way to get TRACK_SELECTOR unbound earlier (at end of load?) */
-    t_pd* x2;
+    /*t_pd* x2;
     while((x2 = pd_findbyclass(gensym(TRACK_SELECTOR), track_proxy_class)))
-        pd_unbind(x2, gensym(TRACK_SELECTOR));
+        pd_unbind(x2, gensym(TRACK_SELECTOR));*/
 
     pd_unbind(&x->x_obj.ob_pd, x->editor_recv);
 }
@@ -91,13 +90,13 @@ void track_proxy_save(t_gobj *z, t_binbuf *b)
         gensym("track"), gensym(s->getName().c_str()),
 	gensym(t->getName().c_str()));
 
-    for(unsigned int p = 0; p < t->getPatternCount(); p++)
+    for(map<string,Pattern *>::iterator i = t->patternsBegin(); i != t->patternsEnd(); i++)
     {
+        Pattern *pattern = i->second;
         binbuf_addv(b, "ss", gensym(TRACK_SELECTOR), gensym("data"));
-        Pattern *pattern = t->getPattern(p);
         t_int r = pattern->getRows();
         t_int c = pattern->getColumns();
-        binbuf_addv(b, "siii", gensym(pattern->getName().c_str()), p, r, c);
+        binbuf_addv(b, "sii", gensym(pattern->getName().c_str()), r, c);
         t_atom tmp;
         for(unsigned int j = 0; j < r; j++)
         {
@@ -124,6 +123,45 @@ void track_proxy_save(t_gobj *z, t_binbuf *b)
     binbuf_addv(b, "sss;", gensym(TRACK_SELECTOR), gensym("data"), gensym("end"));
 }
 
+void track_proxy_data(t_track_proxy *x, t_symbol *s, int argc, t_atom *argv)
+{
+    if(argc == 1 && IS_A_SYMBOL(argv,0) && argv[0].a_w.w_symbol == gensym("end"))
+    {
+        pd_unbind(&x->x_obj.ob_pd, gensym(TRACK_SELECTOR));
+        return;
+    }
+    if(argc < 3 || !IS_A_SYMBOL(argv,0) || !IS_A_FLOAT(argv,1) || !IS_A_FLOAT(argv,2))
+    {
+        pd_error(x, "unrecognized format for in-patch data");
+        return;
+    }
+    t_symbol *pat = argv[0].a_w.w_symbol;
+    t_int rows = (t_int) argv[1].a_w.w_float;
+    t_int cols = (t_int) argv[2].a_w.w_float;
+    if(argc != (3 + rows * cols))
+    {
+        pd_error(x, "unrecognized format for in-patch data (malformed data?)");
+        return;
+    }
+    Track *t = x->track;
+    t->addPattern(rows, cols, pat->s_name);
+    Pattern *p = t->getPattern(pat->s_name);
+    if(!p)
+    {
+        pd_error(x, "fatal error: cannot create patern");
+        return;
+    }
+    int a = 3;
+    for(int r = 0; r < rows; r++)
+    {
+        for(int c = 0; c < cols; c++)
+        {
+            p->setCell(r, c, argv[a]);
+            a++;
+        }
+    }
+}
+
 void track_proxy_properties(t_gobj *z, t_glist *owner)
 {
     t_track_proxy *x = (t_track_proxy *) z;
@@ -140,6 +178,7 @@ void track_proxy_send_result(t_track_proxy *x, int outlet, int editor)
     }
     if(editor)
     {
+        Editor::dispatch(x, result_argc, &result_argv[0]);
     }
 }
 
@@ -156,42 +195,38 @@ int track_proxy_editor(t_track_proxy *x, t_floatarg arg)
         if(a > 0) Editor::openWindow(x);
         else Editor::closeWindow(x);
     }
+    result_argc = 0;
 }
 
 int track_proxy_getpatterns(t_track_proxy *x)
 {
     SETSYMBOL(&result_argv[0], gensym("patternnames"));
     result_argc = 1;
-    for(unsigned int i = 0; i < x->track->getPatternCount(); i++)
+    Track *t = x->track;
+    for(map<string,Pattern *>::iterator i = t->patternsBegin(); i != t->patternsEnd(); i++)
     {
-	if(result_argc >= MAX_RESULT_SIZE)
+        if(result_argc >= MAX_RESULT_SIZE)
         {
-	    pd_error(x, "getpatternnames: result too long");
-	    return -2;
-	}
-	Pattern *pattern = x->track->getPattern(i);
-        if(!pattern)
-        {
-            pd_error(x, "getpatternnames: no such pattern: %d", i);
-            return -1;
+            pd_error(x, "getpatternnames: result too long");
+            return -2;
         }
-	SETSYMBOL(&result_argv[result_argc], gensym(pattern->getName().c_str()));
+        Pattern *pattern = i->second;
+        SETSYMBOL(&result_argv[result_argc], gensym(pattern->getName().c_str()));
         result_argc++;
     }
     return 0;
 }
 
-int track_proxy_getpatternsize(t_track_proxy *x, t_floatarg pat)
+int track_proxy_getpatternsize(t_track_proxy *x, t_symbol *pat)
 {
-    t_int p = (t_int) pat;
-    Pattern *pattern = x->track->getPattern(p);
+    Pattern *pattern = x->track->getPattern(pat->s_name);
     if(!pattern)
     {
-        pd_error(x, "getpatternsize: no such pattern: %d", p);
+        pd_error(x, "getpatternsize: no such pattern: %s", pat->s_name);
         return -1;
     }
     SETSYMBOL(&result_argv[0], gensym("patternsize"));
-    SETFLOAT(&result_argv[1], (t_float) p);
+    SETSYMBOL(&result_argv[1], pat);
     SETFLOAT(&result_argv[2], pattern->getRows());
     SETFLOAT(&result_argv[3], pattern->getColumns());
     result_argc = 4;
@@ -200,17 +235,18 @@ int track_proxy_getpatternsize(t_track_proxy *x, t_floatarg pat)
 
 int track_proxy_setrow(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv)
 {
-    if(argc < 2 || !IS_A_FLOAT(argv,0) || !IS_A_FLOAT(argv,1))
+    result_argc = 0;
+    if(argc < 2 || !IS_A_SYMBOL(argv,0) || !IS_A_FLOAT(argv,1))
     {
-        pd_error(x, "setrow: usage: setrow <pattern#> <row#> <atom0> <atom1> ...");
+        pd_error(x, "setrow: usage: setrow <pattern> <row#> <atom0> <atom1> ...");
         return -1;
     }
-    t_int p = (t_int) argv[0].a_w.w_float;
+    t_symbol *pat = argv[0].a_w.w_symbol;
+    Pattern *pattern = x->track->getPattern(pat->s_name);
     t_int r = (t_int) argv[1].a_w.w_float;
-    Pattern *pattern = x->track->getPattern(p);
     if(!pattern)
     {
-        pd_error(x, "setrow: no such pattern: %d", p);
+        pd_error(x, "setrow: no such pattern: %s", pat->s_name);
         return -2;
     }
     if((argc - 2) != pattern->getColumns())
@@ -222,67 +258,107 @@ int track_proxy_setrow(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv)
     {
         pattern->setCell(r, i - 2, argv[i]);
     }
-    result_argc = 0;
     return 0;
 }
 
-int track_proxy_getrow(t_track_proxy *x, t_floatarg pat, t_floatarg rownum)
+int track_proxy_getrow(t_track_proxy *x, t_symbol *pat, t_floatarg rownum)
 {
-    t_int p = (t_int) pat;
     t_int r = (t_int) rownum;
-    Pattern *pattern = x->track->getPattern(p);
+    Pattern *pattern = x->track->getPattern(pat->s_name);
     if(!pattern)
     {
-        pd_error(x, "getrow: no such pattern: %d", p);
+        pd_error(x, "getrow: no such pattern: %s", pat->s_name);
         return -2;
     }
     SETSYMBOL(&result_argv[0], gensym("patternrow"));
-    SETFLOAT(&result_argv[1], (t_float) p);
+    SETSYMBOL(&result_argv[1], pat);
     SETFLOAT(&result_argv[2], (t_float) r);
     result_argc = 3;
     for(unsigned int i = 0; i < pattern->getColumns(); i++)
     {
-	if(result_argc >= MAX_RESULT_SIZE)
+        if(result_argc >= MAX_RESULT_SIZE)
         {
-	    pd_error(x, "getrow: result too long");
-	    return -2;
-	}
+            pd_error(x, "getrow: result too long");
+            return -2;
+        }
         result_argv[result_argc] = pattern->getCell(r, i);
         result_argc++;
     }
     return 0;
 }
 
+int track_proxy_setcell(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv)
+{
+    result_argc = 0;
+    if(argc != 4 || !IS_A_SYMBOL(argv,0) || !IS_A_FLOAT(argv,1) || !IS_A_FLOAT(argv,2))
+    {
+        pd_error(x, "setrow: usage: setcell <pattern> <row#> <col#> <atom>");
+        return -1;
+    }
+    t_symbol *pat = argv[0].a_w.w_symbol;
+    Pattern *pattern = x->track->getPattern(pat->s_name);
+    t_int r = (t_int) argv[1].a_w.w_float;
+    t_int c = (t_int) argv[2].a_w.w_float;
+    if(!pattern)
+    {
+        pd_error(x, "setcell: no such pattern: %s", pat->s_name);
+        return -2;
+    }
+    pattern->setCell(r, c, argv[3]);
+    return 0;
+}
+
+int track_proxy_getcell(t_track_proxy *x, t_symbol *pat, t_floatarg rownum, t_floatarg colnum)
+{
+    t_int r = (t_int) rownum;
+    t_int c = (t_int) colnum;
+    Pattern *pattern = x->track->getPattern(pat->s_name);
+    if(!pattern)
+    {
+        pd_error(x, "getcell: no such pattern: %s", pat->s_name);
+        return -2;
+    }
+    SETSYMBOL(&result_argv[0], gensym("patterncell"));
+    SETSYMBOL(&result_argv[1], pat);
+    SETFLOAT(&result_argv[2], (t_float) r);
+    SETFLOAT(&result_argv[3], (t_float) c);
+    result_argv[4] = pattern->getCell(r, c);
+    result_argc = 5;
+    return 0;
+}
+
+
 int track_proxy_addpattern(t_track_proxy *x, t_symbol *name, t_floatarg rows, t_floatarg cols)
 {
+    result_argc = 0;
     t_int r = (t_int) rows;
     t_int c = (t_int) cols;
     x->track->addPattern(r, c, string(name->s_name));
     return 0;
 }
 
-int track_proxy_removepattern(t_track_proxy *x, t_floatarg pat)
+int track_proxy_removepattern(t_track_proxy *x, t_symbol *pat)
 {
-    t_int p = (t_int) pat;
-    Pattern *pattern = x->track->getPattern(p);
+    result_argc = 0;
+    Pattern *pattern = x->track->getPattern(pat->s_name);
     if(!pattern)
     {
-        pd_error(x, "removepattern: no such pattern: %d", p);
+        pd_error(x, "removepattern: no such pattern: %s", pat->s_name);
         return -2;
     }
     pd_error(x, "removepattern: not implemented yet");
     return -9;
 }
 
-int track_proxy_resizepattern(t_track_proxy *x, t_floatarg pat, t_floatarg rows, t_floatarg cols)
+int track_proxy_resizepattern(t_track_proxy *x, t_symbol *pat, t_floatarg rows, t_floatarg cols)
 {
-    t_int p = (t_int) pat;
+    result_argc = 0;
     t_int r = (t_int) rows;
     t_int c = (t_int) cols;
-    Pattern *pattern = x->track->getPattern(p);
+    Pattern *pattern = x->track->getPattern(pat->s_name);
     if(!pattern)
     {
-        pd_error(x, "resizepattern: no such pattern: %d", p);
+        pd_error(x, "resizepattern: no such pattern: %s", pat->s_name);
         return -2;
     }
     pattern->resize(r, c);
@@ -291,6 +367,7 @@ int track_proxy_resizepattern(t_track_proxy *x, t_floatarg pat, t_floatarg rows,
 
 int track_proxy_copypattern(t_track_proxy *x, t_symbol *src, t_symbol *dst)
 {
+    result_argc = 0;
     pd_error(x, "copypattern: not implemented yet");
     return -9;
 }

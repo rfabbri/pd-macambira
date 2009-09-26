@@ -38,8 +38,8 @@ namespace eval pd::composer {
     array set trackname {}
     variable currentpattern
     array set currentpattern {}
-    variable length
-    array set length {}
+    variable size
+    array set size {}
     variable columns
     array set columns {}
     variable patterns
@@ -70,55 +70,54 @@ namespace eval pd::composer {
         catch {pd {*}$what}
     }
 
-    proc createPattern {id name len} {
+    proc editCommand {method args} {
+        linsert $args 0 [uplevel {set id}] ${method}E
+    }
+
+    proc createPattern {id name rows cols} {
         debugPrint [info level 0]
-        variable length
         variable patterns
 
         if {$name in $patterns($id)} {
             return -code error "Pattern '$name' already exists"
         }
-        set len [expr {int($len)}]
-        if {$len <= 0} {
-            return -code error "Length must be positive integer"
+        set rows [expr {int($rows)}]
+        set cols [expr {int($cols)}]
+        if {$rows <= 0 || $cols <= 0} {
+            return -code error "Pattern dimensions must pe positive integer"
         }
 
-        sendGui [concat $id EDIT addpattern $name $len]
+        sendGui [editCommand addpattern $name $rows $cols]
     }
 
     proc removePattern {id name} {
         debugPrint [info level 0]
-        variable length;
-        variable patterns;
-
-        sendGui [concat $id EDIT removepattern $name]
+        sendGui [editCommand removepattern $name]
     }
 
     proc copyPattern {id src dst} {
         debugPrint [info level 0]
-        variable length;
-
-        sendGui [concat $id EDIT copypattern $src $dst]
+        sendGui [editCommand copypattern $src $dst]
     }
 
-    proc resizePattern {id name newSize} {
+    proc resizePattern {id name rows cols} {
         debugPrint [info level 0]
         variable currentpattern;
-        variable length;
+        variable size;
 
-        if {$newSize == [dict get $length($id) $name]} return
+        if {[list $rows $cols] == [dict get $size($id) $name]} return
 
-        set len [expr {int($newSize)}]
-        if {$len <= 0} {
-            return -code error "Length must pe positive integer"
+        set rows [expr {int($rows)}]
+        set cols [expr {int($cols)}]
+        if {$rows <= 0 || $cols <= 0} {
+            return -code error "Pattern dimensions must pe positive integer"
         }
 
-        sendGui [concat $id EDIT resizepattern $name $len]
+        sendGui [editCommand resizepattern $name $rows $cols]
     }
 
     proc renamePattern {id name newName} {
         debugPrint [info level 0]
-        variable length;
         variable patterns;
 
         if {$name == $newName} return
@@ -130,7 +129,7 @@ namespace eval pd::composer {
             return -code error "No such pattern: '$name'"
         }
 
-        sendGui [concat $id EDIT renamepattern $name $newName]
+        sendGui [editCommand renamepattern $name $newName]
     }
 
     proc generateNewPatternName {id} {
@@ -144,10 +143,10 @@ namespace eval pd::composer {
     }
 
     proc displayPattern {id name} {
-        debugPrint "request-pattern-length"
+        debugPrint "request-pattern-size"
         variable showpattern
         set showpattern($id) 1
-        sendGui [concat $id EDIT getpatternlength $name]
+        sendGui [editCommand getpatternsize $name]
     }
 
     proc updateTitle {id} {
@@ -171,7 +170,7 @@ namespace eval pd::composer {
         debugPrint [info level 0]
         variable currentpattern
         variable patterns
-        variable length
+        variable size
         variable columns
         variable w
         variable songname
@@ -186,8 +185,8 @@ namespace eval pd::composer {
             return
         }
 
-        set rows [dict get $length($id) $name]
-        set cols $columns($id)
+        #set cols $columns($id)
+        lassign [dict get $size($id) $name] rows cols
         grid $w($id).t -row 10 -column 0 -sticky news
         debugPrint "resizing tktable widget to ${rows}x${cols}"
         $w($id).t configure -state normal -variable [getDataVar $id] -rows $rows -cols [expr {1+$cols}]
@@ -219,7 +218,7 @@ namespace eval pd::composer {
     proc edit {id r c bwrite value} {
         # NOT USED
         #if {$bwrite} {
-        #    sendGui [concat $id EDIT setcell $currentpattern($id) $r $c $value]
+        #    sendGui [editCommand setcell $currentpattern($id) $r $c $value]
         #} else {
         #}
     }
@@ -321,7 +320,7 @@ namespace eval pd::composer {
 
         debugPrint "wm"
         wm minsize $w($id) 300 150
-        wm protocol $w($id) WM_DELETE_WINDOW "[namespace current]::sendGui {$id EDIT editor-close}"
+        wm protocol $w($id) WM_DELETE_WINDOW [list [namespace current]::sendGui [editCommand editor 0]]
 
         debugPrint "menu"
         menu $w($id).m -tearoff 0
@@ -349,8 +348,8 @@ namespace eval pd::composer {
         set startup($id) 1
         set showpattern($id) 0
         debugPrint "request-patterns"
-        sendGui [concat $id EDIT getpatterns]
-        sendGui [concat $id EDIT gettracks]
+        sendGui [editCommand getpatterns]
+        #sendGui [editCommand gettracks]
 
         return $w($id)
     }
@@ -387,7 +386,7 @@ namespace eval pd::composer {
         set newVal [dict get [dict merge [list $newVal $newVal] [lreverse $symbolmap]] $newVal]
         debugPrint "AFTER: newVal = '$newVal'"
 
-        sendGui [concat $id EDIT setcell $currentpattern($id) $row $col $newVal]
+        sendGui [editCommand setcell $currentpattern($id) $row $col $newVal]
 
         return 1
     }
@@ -397,15 +396,17 @@ namespace eval pd::composer {
         variable currentpattern
         variable w
         set bname 1
-        set blength 1
+        set brows 1
+        set bcols 0
         set old_name {}
         catch {set old_name $currentpattern($id)}
         set vname {}
-        set vlength {}
+        set vrows {}
+        set vcols {}
         set action_cancel {destroy %w}
         set action_ok $action_cancel
 
-        set opts {vname vlength bname blength action_ok action_cancel}
+        set opts {vname vrows vcols bname brows bcols action_ok action_cancel}
         foreach opt $opts {
             catch {set $opt [dict get $options $opt]}
         }
@@ -424,43 +425,52 @@ namespace eval pd::composer {
         }
 
         grid [ttk::label $w_.lname -text "Name: "] -row 0 -column 0
-        grid [ttk::label $w_.llength -text "Rows: "] -row 1 -column 0
+        grid [ttk::label $w_.lrows -text "Rows: "] -row 1 -column 0
+        grid [ttk::label $w_.lcols -text "Cols: "] -row 2 -column 0
         grid [ttk::entry $w_.ename] -row 0 -column 1
-        grid [ttk::entry $w_.elength] -row 1 -column 1
-        grid [ttk::frame $w_.b] -row 2 -columnspan 2
+        grid [ttk::entry $w_.erows] -row 1 -column 1
+        grid [ttk::entry $w_.ecols] -row 2 -column 1
+        grid [ttk::frame $w_.b] -row 999 -columnspan 2
         grid [ttk::button $w_.b.ok -text Ok -command $action_ok] -row 0 -column 0 -in $w_.b
         grid [ttk::button $w_.b.cancel -text Cancel -command $action_cancel] -row 0 -column 1 -in $w_.b
 
         $w_.ename insert 0 $vname
-        $w_.elength insert 0 $vlength
+        $w_.erows insert 0 $vrows
+        $w_.ecols insert 0 $vcols
 
         if {!$bname} {$w_.ename configure -state disabled}
-        if {!$blength} {$w_.elength configure -state disabled}
+        if {!$brows} {$w_.erows configure -state disabled}
+        if {!$bcols} {$w_.ecols configure -state disabled}
     }
 
     proc patternPropertiesDialog {id {options {}}} {
         debugPrint [info level 0]
         variable currentpattern;
-        variable length;
+        variable size;
 
         dict set options action_ok {
-            %ns::resizePattern %id %old_name [%w.elength get]
+            %ns::resizePattern %id %old_name [%w.erows get] [%w.ecols get]
             %ns::renamePattern %id %old_name [%w.ename get]
             destroy %w
         }
         dict set options vname $currentpattern($id)
-        dict set options vlength [dict get $length($id) $currentpattern($id)]
+        lassign [dict get $size($id) $currentpattern($id)] pat_rows pat_cols
+        dict set options vrows $pat_rows
+        dict set options vcols $pat_cols
         patternPropertiesDialog_common $id $options
     }
 
     proc copyPatternDialog {id {options {}}} {
         debugPrint [info level 0]
         variable w;
-        variable length;
+        variable size;
 
-        dict set options blength 0
+        dict set options brows 0
+        dict set options bcols 0
         dict set options vname [generateNewPatternName $id]
-        dict set options vlength [dict get $length($id) $currentpattern($id)]
+        lassign [dict get $size($id) $currentpattern($id)] pat_rows pat_cols
+        dict set options vrows $pat_rows
+        dict set options vcols $pat_rows
         dict set options action_ok {
             %ns::copyPattern %id %old_name [%w.ename get]
             destroy %w
@@ -484,11 +494,12 @@ namespace eval pd::composer {
     proc newPatternDialog {id {options {}}} {
         debugPrint [info level 0]
         dict set options action_ok {
-            %ns::createPattern %id [%w.ename get] [%w.elength get]
+            %ns::createPattern %id [%w.ename get] [%w.erows get] [%w.ecols get]
             destroy %w
         }
         dict set options vname [generateNewPatternName $id]
-        dict set options vlength 16
+        dict set options vrows 16
+        dict set options vcols 8
         patternPropertiesDialog_common $id $options
     }
 
@@ -500,7 +511,7 @@ namespace eval pd::composer {
         variable w
         variable songname
         variable trackname
-        variable length
+        variable size
         variable currentpattern
         variable columns
         set w($id) .w_${song_name}_${track_name}
@@ -511,7 +522,7 @@ namespace eval pd::composer {
         } else {
             set currentpattern($id) $set_current_pattern
         }
-        set length($id) {}
+        set size($id) {}
         set columns($id) $cols
     }
 
@@ -536,14 +547,14 @@ namespace eval pd::composer {
         debugPrint [info level 0]
         variable w
         variable patterns
-        variable length
+        variable size
         variable currentpattern
         variable startup
         variable showpattern
         variable columns
         variable quirks_fix_int_floats
         switch -exact [lindex $args 0] {
-            patterns {
+            patternnames {
                 # for track mode
                 set patterns($id) [lrange $args 1 end]
                 debugPrint "patterns <- $patterns($id)"
@@ -564,18 +575,20 @@ namespace eval pd::composer {
                 #$w($id).t configure -state normal -cols $cols 
                 set columns($id) $cols
             }
-            patternlength {
+            patternsize {
                 set pat_name [lindex $args 1]
-                set pat_length [lindex $args 2]
-                debugPrint "got patternlength: '$pat_name' (len=$pat_length)"
-                if {![dict exists $length($id) $pat_name] || [dict get $length($id) $pat_name] != $pat_length || $showpattern($id)} {
-                    dict set length($id) $pat_name $pat_length
-                    for {set i 0} {$i < $pat_length} {incr i} {
-                        sendGui [concat $id EDIT getrow $pat_name $i]
+                set pat_rows [lindex $args 2]
+                set pat_cols [lindex $args 3]
+                set new_size [list $pat_rows $pat_cols]
+                debugPrint "got patternsize: '$pat_name' (size = $pat_rows x $pat_cols)"
+                if {![dict exists $size($id) $pat_name] || [dict get $size($id) $pat_name] != $new_size || $showpattern($id)} {
+                    dict set size($id) $pat_name $new_size
+                    for {set i 0} {$i < $pat_rows} {incr i} {
+                        sendGui [editCommand getrow $pat_name $i]
                     }
                 }
             }
-            row {
+            patternrow {
                 set pat_name [lindex $args 1]
                 if {$quirks_fix_int_floats} {
                     set row_num [expr {int([lindex $args 2])}]
@@ -588,14 +601,15 @@ namespace eval pd::composer {
                 for {set i 0} {$i < [llength $row]} {incr i} {
                     setCellValueUI $id $pat_name $row_num $i [lindex $row $i]
                 }
-                if {$row_num + 1 == [dict get $length($id) $pat_name]} {
+                lassign [dict get $size($id) $pat_name] pat_rows pat_cols
+                if {$row_num + 1 == $pat_rows} {
                     if {$showpattern($id)} {
                         set showpattern($id) 0
                         displayPattern_async $id $pat_name
                     }
                 }
             }
-            cell {
+            patterncell {
                 set pat_name [lindex $args 1]
                 if {$quirks_fix_int_floats} {
                     set row_num [expr {int([lindex $args 2])}]
