@@ -9,12 +9,11 @@
 
 #include <iostream>
 
+#include "Common.hpp"
+
 using std::cout;
 using std::cerr;
 using std::endl;
-
-#define IS_A_FLOAT(atom,index) ((atom+index)->a_type == A_FLOAT)
-#define IS_A_SYMBOL(atom,index) ((atom+index)->a_type == A_SYMBOL)
 
 t_atom result_argv[MAX_RESULT_SIZE];
 int result_argc;
@@ -196,6 +195,7 @@ int track_proxy_editor(t_track_proxy *x, t_floatarg arg)
         else Editor::closeWindow(x);
     }
     result_argc = 0;
+    return 0;
 }
 
 int track_proxy_getpatterns(t_track_proxy *x)
@@ -249,14 +249,15 @@ int track_proxy_setrow(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv)
         pd_error(x, "setrow: no such pattern: %s", pat->s_name);
         return -2;
     }
-    if((argc - 2) != pattern->getColumns())
+    unsigned int argc2 = argc - 2;
+    if(argc2 != pattern->getColumns())
     {
         pd_error(x, "setrow: input error: must provide exactly %d elements for a row", pattern->getColumns());
         return -3;
     }
-    for(unsigned int i = 2; i < argc; i++)
+    for(unsigned int i = 0; i < argc2; i++)
     {
-        pattern->setCell(r, i - 2, argv[i]);
+        pattern->setCell(r, i, argv[i + 2]);
     }
     return 0;
 }
@@ -362,6 +363,19 @@ int track_proxy_resizepattern(t_track_proxy *x, t_symbol *pat, t_floatarg rows, 
         return -2;
     }
     pattern->resize(r, c);
+    return 0;
+}
+
+int track_proxy_renamepattern(t_track_proxy *x, t_symbol *oldName, t_symbol *newName)
+{
+    result_argc = 0;
+    Pattern *pattern = x->track->getPattern(oldName->s_name);
+    if(!pattern)
+    {
+        pd_error(x, "resizepattern: no such pattern: %s", oldName->s_name);
+        return -2;
+    }
+    x->track->renamePattern(oldName->s_name, newName->s_name);
     return 0;
 }
 

@@ -26,6 +26,7 @@ public:
 	void setCell(int row, int col, Cell cell);
 	Cell getCell(int row, int col);
 	inline const string &getName() {return name;}
+    inline void setName(const string &newName) {name = newName;}
 	inline unsigned int getRows() {return rows.size();}
 	inline unsigned int getColumns() {return columns;}
 };

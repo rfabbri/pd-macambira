@@ -40,6 +40,7 @@ int track_proxy_getcell(t_track_proxy *x, t_symbol *pat, t_floatarg rownum, t_fl
 int track_proxy_addpattern(t_track_proxy *x, t_symbol *name, t_floatarg rows, t_floatarg cols);
 int track_proxy_removepattern(t_track_proxy *x, t_symbol *pat);
 int track_proxy_resizepattern(t_track_proxy *x, t_symbol *pat, t_floatarg rows, t_floatarg cols);
+int track_proxy_renamepattern(t_track_proxy *x, t_symbol *oldName, t_symbol *newName);
 int track_proxy_copypattern(t_track_proxy *x, t_symbol *src, t_symbol *dst);
 /*#end methods*/
 

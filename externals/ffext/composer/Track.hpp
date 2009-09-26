@@ -3,12 +3,10 @@
 
 #include <map>
 #include <string>
-//#include <vector>
 
 #include <m_pd.h>
 
 using std::string;
-//using std::vector;
 using std::map;
 
 class Song;
@@ -20,7 +18,6 @@ public:
 	static Track *byName(string songName, string trackName);
 private:
 	string name;
-	//vector<Pattern *> patterns;
     map<string,Pattern *> patterns;
 	Song *song;
 protected:
@@ -28,8 +25,8 @@ protected:
 public:
 	void print();
 	void addPattern(int rows, int cols, string name);
-	//Pattern *getPattern(int n);
     Pattern *getPattern(const string &p);
+    void renamePattern(const string &oldName, const string &newName);
 	inline unsigned int getPatternCount() {return patterns.size();}
     inline map<string,Pattern *>::iterator patternsBegin() {return patterns.begin();}
     inline map<string,Pattern *>::iterator patternsEnd() {return patterns.end();}

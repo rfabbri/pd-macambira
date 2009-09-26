@@ -7,8 +7,10 @@
 
 #include <m_pd.h>
 
+#include "Common.hpp"
+
 #include "editor_tk.cpp"
-static const int editor_tk_len = sizeof(editor_tk) / sizeof(editor_tk[0]);
+static const unsigned int editor_tk_len = sizeof(editor_tk) / sizeof(editor_tk[0]);
 
 using std::cerr;
 using std::endl;
@@ -34,11 +36,11 @@ void Editor::uploadCode()
 {
     sys_gui("proc Xeval {c {d {}}} {switch $c {begin {set ::Xeval_map {}; for {set i 0} {$i < 256} {incr i} {lappend ::Xeval_map \%[format \%02x $i] [format \%c $i]}; set ::Xeval_data {}} data {append ::Xeval_data [string map $::Xeval_map $d]\\n} end {uplevel #0 $::Xeval_data; unset ::Xeval_map; unset ::Xeval_data}}}\n"); 
     sys_gui("Xeval begin\n");
-    for(int i = 0; i < editor_tk_len; i++)
+    for(unsigned int i = 0; i < editor_tk_len; i++)
     {
         string s = "Xeval data {";
         string l = editor_tk[i];
-        for(int j = 0; j < l.length(); j++)
+        for(unsigned int j = 0; j < l.length(); j++)
         {
             if(isalnum(l[j])) s.append(1, l[j]);
             else s += string(urlencode(l[j]));
@@ -52,11 +54,10 @@ void Editor::uploadCode()
 void Editor::init(t_track_proxy *x)
 {
     uploadCode();
-    sys_vgui("pd::composer::init %s %s %s %d %s %d\n",
+    sys_vgui("pd::composer::init %s %s %s %s %d\n",
         x->editor_recv->s_name,
         x->track->getSong()->getName().c_str(),
         x->track->getName().c_str(),
-        16,
         "NULL",
 #ifdef DEBUG
         1

@@ -27,10 +27,6 @@ void Track::print()
 {
 	cerr << "---- Track: " << name << " ----" << endl;
 
-	/*for(unsigned int i = 0; i < patterns.size(); i++)
-	{
-		cerr << "  Pattern[" << patterns[i]->getName() << "]: " << patterns[i]->getName() << endl;
-	}*/
     for(map<string,Pattern *>::iterator i = patterns.begin(); i != patterns.end(); i++)
     {
 		cerr << "  Pattern[" << i->first << "]: " << i->second->getName() << endl;
@@ -42,17 +38,8 @@ void Track::print()
 void Track::addPattern(int rows, int cols, string name)
 {
     Pattern *pattern = new Pattern(rows, cols, name);
-	//patterns.push_back(pattern);
     patterns[name] = pattern;
 }
-
-/*Pattern *Track::getPattern(int n)
-{
-    if(n < 0 || n >= patterns.size())
-        return 0;
-    else
-        return patterns[n];
-}*/
 
 Pattern *Track::getPattern(const string &p)
 {
@@ -60,4 +47,13 @@ Pattern *Track::getPattern(const string &p)
         return patterns[p];
     else
         return 0;
+}
+
+void Track::renamePattern(const string &oldName, const string &newName)
+{
+    Pattern *pattern = getPattern(oldName);
+    if(!pattern) return;
+    pattern->setName(newName);
+    patterns[newName] = patterns[oldName];
+    patterns.erase(oldName);
 }

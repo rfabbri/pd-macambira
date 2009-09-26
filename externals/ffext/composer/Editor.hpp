@@ -1,3 +1,6 @@
+#ifndef COMPOSER_EDITOR_H_INCLUDED
+#define COMPOSER_EDITOR_H_INCLUDED
+
 #include "PdClasses.hpp"
 #include <m_pd.h>
 
@@ -10,3 +13,5 @@ public:
     static void openWindow(t_track_proxy *x);
     static void closeWindow(t_track_proxy *x);
 };
+
+#endif // COMPOSER_EDITOR_H_INCLUDED

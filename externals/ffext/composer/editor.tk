@@ -40,8 +40,6 @@ namespace eval pd::composer {
     array set currentpattern {}
     variable size
     array set size {}
-    variable columns
-    array set columns {}
     variable patterns
     array set patterns {}
     variable tracks
@@ -88,16 +86,19 @@ namespace eval pd::composer {
         }
 
         sendGui [editCommand addpattern $name $rows $cols]
+        sendGui [editCommand getpatterns]
     }
 
     proc removePattern {id name} {
         debugPrint [info level 0]
         sendGui [editCommand removepattern $name]
+        sendGui [editCommand getpatterns]
     }
 
     proc copyPattern {id src dst} {
         debugPrint [info level 0]
         sendGui [editCommand copypattern $src $dst]
+        sendGui [editCommand getpatterns]
     }
 
     proc resizePattern {id name rows cols} {
@@ -105,7 +106,9 @@ namespace eval pd::composer {
         variable currentpattern;
         variable size;
 
-        if {[list $rows $cols] == [dict get $size($id) $name]} return
+        if {[dict exists $size($id) $name]} {
+            if {[list $rows $cols] == [dict get $size($id) $name]} return
+        }
 
         set rows [expr {int($rows)}]
         set cols [expr {int($cols)}]
@@ -114,10 +117,14 @@ namespace eval pd::composer {
         }
 
         sendGui [editCommand resizepattern $name $rows $cols]
+        if {$currentpattern($id) == $name} {
+            displayPattern $id $name
+        }
     }
 
     proc renamePattern {id name newName} {
         debugPrint [info level 0]
+        variable currentpattern;
         variable patterns;
 
         if {$name == $newName} return
@@ -130,6 +137,10 @@ namespace eval pd::composer {
         }
 
         sendGui [editCommand renamepattern $name $newName]
+        if {$currentpattern($id) == $name} {
+            set currentpattern($id) $newName
+        }
+        sendGui [editCommand getpatterns]
     }
 
     proc generateNewPatternName {id} {
@@ -171,7 +182,6 @@ namespace eval pd::composer {
         variable currentpattern
         variable patterns
         variable size
-        variable columns
         variable w
         variable songname
         variable trackname
@@ -185,7 +195,6 @@ namespace eval pd::composer {
             return
         }
 
-        #set cols $columns($id)
         lassign [dict get $size($id) $name] rows cols
         grid $w($id).t -row 10 -column 0 -sticky news
         debugPrint "resizing tktable widget to ${rows}x${cols}"
@@ -397,7 +406,7 @@ namespace eval pd::composer {
         variable w
         set bname 1
         set brows 1
-        set bcols 0
+        set bcols 1
         set old_name {}
         catch {set old_name $currentpattern($id)}
         set vname {}
@@ -449,8 +458,8 @@ namespace eval pd::composer {
         variable size;
 
         dict set options action_ok {
-            %ns::resizePattern %id %old_name [%w.erows get] [%w.ecols get]
             %ns::renamePattern %id %old_name [%w.ename get]
+            %ns::resizePattern %id [%w.ename get] [%w.erows get] [%w.ecols get]
             destroy %w
         }
         dict set options vname $currentpattern($id)
@@ -464,7 +473,7 @@ namespace eval pd::composer {
         debugPrint [info level 0]
         variable w;
         variable size;
-
+        variable currentpattern;
         dict set options brows 0
         dict set options bcols 0
         dict set options vname [generateNewPatternName $id]
@@ -480,13 +489,14 @@ namespace eval pd::composer {
 
     proc removePatternConfirm {id} {
         debugPrint [info level 0]
+        variable w;
         variable currentpattern;
         if {[tk_messageBox \
             -type yesno -default no \
             -title "Question" \
             -icon question -message "Do you confirm pattern delete?" \
             -detail "The operation cannot be undone" \
-            -parent $w] == {yes}} {
+            -parent $w($id)] == {yes}} {
             removePattern $id $currentpattern($id)
         }
     }
@@ -504,7 +514,7 @@ namespace eval pd::composer {
     }
 
     #entrypoint
-    proc init {id song_name track_name cols set_current_pattern debug_flag} {
+    proc init {id song_name track_name set_current_pattern debug_flag} {
         debugPrint [info level 0]
         variable debug
         set debug [expr {$debug_flag != 0}]
@@ -513,7 +523,6 @@ namespace eval pd::composer {
         variable trackname
         variable size
         variable currentpattern
-        variable columns
         set w($id) .w_${song_name}_${track_name}
         set songname($id) $song_name
         set trackname($id) $track_name
@@ -523,7 +532,6 @@ namespace eval pd::composer {
             set currentpattern($id) $set_current_pattern
         }
         set size($id) {}
-        set columns($id) $cols
     }
 
     proc openWindow {id} {
@@ -551,7 +559,6 @@ namespace eval pd::composer {
         variable currentpattern
         variable startup
         variable showpattern
-        variable columns
         variable quirks_fix_int_floats
         switch -exact [lindex $args 0] {
             patternnames {
@@ -565,15 +572,6 @@ namespace eval pd::composer {
                         displayPattern $id [lindex $patterns($id) 0]
                     }
                 }
-            }
-            tracks {
-                # for song mode
-                set tracks($id) [lrange $args 1 end]
-                debugPrint "tracks <- $tracks($id)"
-                set cols [llength $tracks($id)]
-                #debugPrint "resizing tktable widget to ${cols} cols"
-                #$w($id).t configure -state normal -cols $cols 
-                set columns($id) $cols
             }
             patternsize {
                 set pat_name [lindex $args 1]

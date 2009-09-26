@@ -2,11 +2,11 @@
 
 #include <iostream>
 
+#include "Common.hpp"
+
 using std::cout;
 using std::cerr;
 using std::endl;
-
-#define WRAP(v,w) (((v)<0)?(((w)-1)-((-(v)-1)%(w))):((v)%(w)))
 
 Pattern::Pattern(int numRows, int numCols, string patternName)
 : name(patternName)
