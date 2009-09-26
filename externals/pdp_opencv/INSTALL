@@ -24,20 +24,24 @@ is different )
 
 then compile the externals :
 
-cd pdp_opencv
+  cd pdp_opencv
 
-edit the Makefile to fit your pd and PDP sources paths :
+configure the package with the appropriate command for your system :
 
-edit the Makefile and change the values for PD_DIR and PDP_DIR variables
+  ./configure --with-pd=<path to pd _sources_> --with-pdp=<path to pdp _sources_>
 
-then, compile it ::
+for example :
 
-make clean
-make
+  ./configure --with-pd=/usr/local/pd --with-pdp=/usr/local/pd/pdp
 
-and copy the .pd_linux to your externals folder ::
+then, compile it :
 
-cp *.pd_linux /usr/local/lib/pd/extra/
+  make clean
+  make
+
+and copy the .pd_linux to your externals folder :
+
+  cp *.pd_linux /usr/local/lib/pd/extra/
 
 ===== MAC OSX (intel and powerPC) =====
 
@@ -46,13 +50,22 @@ first install openCV MacOS framework
    copy the provided OpenCV.framework folder in your /System/Library/Frameworks/ directory ::
         cp -Rf /Volumes/OpenCV\ Private\ Framework/OpenCV.framework /System/Library/Frameworks/
 
+then get the _SOURCES_ of the pd you are using
+and of the PDP that you are loading
+( it might not work if the version 
+is different )
+
 cd into the library folder ::
 
   cd pdp_opencv
 
-edit the Makefile to fit your system and sources folders:
+configure the package with the appropriate command for your system :
 
-edit the Makefile and change the values for PD_DIR and PDP_DIR variables
+  ./configure --with-pd=<path to pd _sources_> --with-pdp=<path to pdp _sources_>
+
+for example :
+
+  ./configure --with-pd=/usr/local/pd --with-pdp=/usr/local/pd/pdp
 
 then, compile it ::
 
