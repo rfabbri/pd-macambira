@@ -134,6 +134,7 @@ AC_CHECK_LIB(Magick, XWindowByProperty,
 
 AC_CHECK_LIB(dc1394, dc1394_camera_enumerate, 
               [ PDP_DC1394_OBJECT="pdp_dc1394.o"
+              AC_DEFINE(HAVE_DC1394, 1, dc1394 cameras interface)
               DC1394_LIBS="-ldc1394 -lraw1394"],
               echo "dc1394 not found : not building pdp_dc1394", )
 

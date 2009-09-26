@@ -15,3 +15,6 @@
 
 /* Define to 1 if you have libdv for firewire camera */
 #undef HAVE_LIBDV
+
+/* Define to 1 if you have libdc1394 for dc camera */
+#undef HAVE_DC1394

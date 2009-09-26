@@ -80,7 +80,11 @@ extern "C"
     void pdp_fdiff_setup(void);
     void pdp_hue_setup(void);
     void pdp_dot_setup(void);
+
+#ifdef HAVE_DC1394
     void pdp_dc1394_setup(void);
+#endif
+
 
 #ifdef HAVE_V4L2
     void pdp_v4l2_setup(void);
@@ -184,7 +188,10 @@ void pidip_setup(void){
     pdp_fdiff_setup();
     pdp_hue_setup();
     pdp_dot_setup();
+
+#ifdef HAVE_DC1394
     pdp_dc1394_setup();
+#endif
 
 #ifdef HAVE_V4L2
     pdp_v4l2_setup();
