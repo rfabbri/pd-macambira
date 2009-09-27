@@ -147,7 +147,6 @@ AC_CHECK_LIB(vorbis, vorbis_analysis_init, , AC_MSG_ERROR(streaming requires vor
 AC_CHECK_LIB(vorbisenc, vorbis_encode_setup_init, , AC_MSG_ERROR(streaming requires vorbis encoder library!!), -lm)
 AC_CHECK_LIB(theora, theora_encode_init, , AC_MSG_ERROR(theora library needed! sorry...), -lm)
 AC_CHECK_LIB(quicktime, lqt_decode_video, , AC_MSG_ERROR(libquicktime not found) )
-AC_CHECK_LIB(dc1394, dc1394_camera_enumerate, , AC_MSG_ERROR(dc1394 not found) )
 
 qt_minor_version="`lqt-config --version | cut -f3 -d'.'`"
 qt_major_version="`lqt-config --version | cut -f1 -d'.'`"
