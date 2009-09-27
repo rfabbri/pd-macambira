@@ -33,7 +33,7 @@ LIBRARY_NAME=${ac_unique_file%.*}
 CONFIGUREFLAGS=$(echo ${ac_configure_args} | sed "s/'//g")
 
 AC_ARG_WITH(extension, [  --with-extension=<ext>  enforce a certain extension for the dynamic library (e.g. dll)])
-AC_ARG_WITH(pdpath,    [  --with-pd=</path/to/pd> where to look for pd-headers and and -libs])
+AC_ARG_WITH(pd,    [  --with-pd=</path/to/pd> where to look for pd-headers and and -libs])
 
 AC_ARG_ENABLE(PIC,     [  --disable-PIC           disable compilation with PIC-flag])
 if test "x" = "x${enable_PIC}" ; then
