@@ -248,7 +248,6 @@ int track_proxy_meta(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv)
                 value = x->track->getMeta(key->s_name);
             else
                 value = arg;
-            cerr << "meta.track.get << '" << value << "'" << endl;
             SETSYMBOL(&result_argv[0], gensym("meta"));
             SETSYMBOL(&result_argv[1], target);
             SETSYMBOL(&result_argv[2], key);

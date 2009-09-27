@@ -671,12 +671,13 @@ namespace eval pd::composer {
                         switch -exact [lindex $args 2] {
                             colw {
                                 set a [lrange $args 3 end]
-                                puts stderr "meta.track.colw a='$a'"
+                                debugPrint "got meta: track: colw: '$a'"
                                 if {$a == {none}} return
                                 $w($id).t width {*}$a
                             }
                             div {
                                 lassign [lrange $args 3 end] ::div1($id) ::div2($id)
+                                debugPrint "got meta: track: div: '$::div1($id) $::div2($id)'"
                             }
                         }
                     }
