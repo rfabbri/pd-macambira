@@ -212,8 +212,8 @@ namespace eval pd::composer {
     }
 
     proc rowTag {id r} {
-        if {$r % $::div1 == 0} {return "alt0"}
-        if {$r % $::div2 == 0} {return "alt1"}
+        if {$r % $::div1($id) == 0} {return "alt0"}
+        if {$r % $::div2($id) == 0} {return "alt1"}
     }
 
     proc refreshGrid {id} {
@@ -257,7 +257,7 @@ namespace eval pd::composer {
         return $n
     }
 
-    proc checkColumnSizes {id} {
+    proc columnSizeChanged {id} {
         variable w
         variable columnsizes
         set newsz {}
@@ -267,6 +267,13 @@ namespace eval pd::composer {
             set columnsizes($id) $newsz
             sendGui [editCommand meta track set colw {*}$newsz]
         }
+    }
+
+    proc divChanged {id} {
+        refreshGrid $id
+        sendGui [editCommand meta track set div \
+            [expr {int($::div1($id))}] \
+            [expr {int($::div2($id))}]]
     }
 
     proc createMainWindow {id} {
@@ -292,25 +299,29 @@ namespace eval pd::composer {
         grid [ttk::label $w($id).f.l -text "Pattern: "] \
             -row 0 -column 0 -in $w($id).f
         debugPrint "combobox patterns"
-        grid [ttk::combobox $w($id).f.p -textvariable "[namespace current]::currentpattern($id)"] \
+        grid [ttk::combobox $w($id).f.p \
+            -textvariable "[namespace current]::currentpattern($id)"] \
             -row 0 -column 1 -in $w($id).f
         debugPrint "divs"
         grid [ttk::label $w($id).f.ld1 -text "Div1: "] \
             -row 0 -column 2 -in $w($id).f
-        grid [spinbox $w($id).f.d1 -command "[namespace current]::refreshGrid $id" -from 8 -to 64 \
-            -increment 1 -format %3.0f -width 3 -textvar ::div1] \
+        grid [spinbox $w($id).f.d1 -command "[namespace current]::divChanged $id" \
+            -from 8 -to 64 \
+            -increment 1 -format %3.0f -width 3 -textvar ::div1($id)] \
             -row 0 -column 3 -in $w($id).f
         grid [ttk::label $w($id).f.ld2 -text "Div2: "] \
             -row 0 -column 4 -in $w($id).f
-        grid [spinbox $w($id).f.d2 -command "[namespace current]::refreshGrid $id" -from 2 -to 64 \
-            -increment 1 -format %3.0f -width 3 -textvar ::div2] \
+        grid [spinbox $w($id).f.d2 -command "[namespace current]::divChanged $id" \
+            -from 2 -to 64 \
+            -increment 1 -format %3.0f -width 3 -textvar ::div2($id)] \
             -row 0 -column 5 -in $w($id).f
 
         debugPrint "step2"
         $w($id).f.p state readonly
 
         debugPrint "bindevent"
-        bind $w($id).f.p <<ComboboxSelected>> "[namespace current]::displayCurrentPattern $id"
+        bind $w($id).f.p <<ComboboxSelected>> \
+            "[namespace current]::displayCurrentPattern $id"
         debugPrint "table"
 
         table $w($id).t -state disabled \
@@ -338,7 +349,7 @@ namespace eval pd::composer {
         if {![llength [info procs ::tk::table::ChangeWidth_]]} {
             rename ::tk::table::ChangeWidth ::tk::table::ChangeWidth_
             proc ::tk::table::ChangeWidth {w i a} "
-                ::pd::composer::checkColumnSizes $id
+                ::pd::composer::columnSizeChanged $id
                 uplevel ::tk::table::ChangeWidth_ \$w \$i \$a
                 "
         }
@@ -392,7 +403,7 @@ namespace eval pd::composer {
         debugPrint "more-bind-events"
         bind $w($id).t <ButtonPress-3> "$w($id).t activate @%x,%y; tk_popup $w($id).m %X %Y"
         bind $w($id).t <Control-t> "switchColumnType $id"
-        bind $w($id).t <ButtonRelease-1> "[namespace current]::checkColumnSizes $id"
+        bind $w($id).t <ButtonRelease-1> "[namespace current]::columnSizeChanged $id"
 
         set startup($id) 1
         set showpattern($id) 0
@@ -615,6 +626,8 @@ namespace eval pd::composer {
                     }
                     # ...and column width
                     sendGui [editCommand meta track get colw none]
+                    # ...and div1/div2 settings
+                    sendGui [editCommand meta track get div 8 4]
                 }
             }
             patternrow {
@@ -661,6 +674,9 @@ namespace eval pd::composer {
                                 puts stderr "meta.track.colw a='$a'"
                                 if {$a == {none}} return
                                 $w($id).t width {*}$a
+                            }
+                            div {
+                                lassign [lrange $args 3 end] ::div1($id) ::div2($id)
                             }
                         }
                     }
