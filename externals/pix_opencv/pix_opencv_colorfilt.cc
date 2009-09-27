@@ -242,7 +242,7 @@ void pix_opencv_colorfilt :: pickMess (float xcur, float ycur)
       x_colorG = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+2];
       x_colorB = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+3];
 #else
-      ycur = brgb->height - ycur;
+      //ycur = brgb->height - ycur;
       x_colorR = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4];
       x_colorG = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+1];
       x_colorB = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+2];
