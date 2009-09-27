@@ -224,12 +224,23 @@ namespace eval pd::composer {
         $w($id).t configure -padx [$w($id).t cget -padx]
     }
 
-    proc edit {id r c bwrite value} {
-        # NOT USED
-        #if {$bwrite} {
-        #    sendGui [editCommand setcell $currentpattern($id) $r $c $value]
-        #} else {
-        #}
+    proc dw {id n k op} {
+        if {$op != {write}} {return}
+        if {$n != [getDataVar $id]} {return}
+        if {$k == {active}} {return}
+        if {$k == {#TEST KEY#}} {return}
+        variable currentpattern
+        variable symbolmap
+
+        lassign [split $k ,] row col
+        upvar [getDataVar $id] data
+        set newVal $data($k)
+
+        debugPrint "BEFORE: newVal = '$newVal'"
+        set newVal [dict get [dict merge [list $newVal $newVal] [lreverse $symbolmap]] $newVal]
+        debugPrint "AFTER: newVal = '$newVal'"
+
+        sendGui [editCommand setcell $currentpattern($id) $row $col $newVal]
     }
 
     proc getDataVar {id {P {}}} {
@@ -238,7 +249,11 @@ namespace eval pd::composer {
         variable trackname
         if {$P == ""} {set P $currentpattern($id)}
         set n "[namespace current]::data_$songname($id)_$trackname($id)_$P"
-        if {![info exists $n]} {array set $n {}}
+        if {![info exists $n]} {
+            array set $n {}
+            trace add variable $n write [list [namespace current]::dw $id]
+            # TODO: when to remove the above variable trace?
+        }
         return $n
     }
 
@@ -293,14 +308,15 @@ namespace eval pd::composer {
             -browsecmd "[namespace current]::activeCellChanges $id %r %c" \
             -cols 0 -rows 0 \
             -cache 0 \
-            -usecommand 0 -command "[namespace current]::edit $id %r %c %i %s" \
             -colstretchmode none -rowstretchmode none \
             -flashmode 1 -flashtime 2 -autoclear 1 \
             -justify left -multiline 0 -resizeborders col \
             -selectmode extended -selecttype cell \
-            -titlecols 1 -titlerows 0 -validate 1 \
-            -validatecommand "[namespace current]::validateCommand $id %r %c %s %S" \
-            -variable [getDataVar $id] -exportselection 1 \
+            -titlecols 1 -titlerows 0 \
+            -validate 0 \
+            -variable [getDataVar $id] \
+            -sparsearray 0 \
+            -exportselection 1 \
             -xscrollcommand "$w($id).hscroll set" \
             -yscrollcommand "$w($id).vscroll set" \
             -rowtagcommand "[namespace current]::rowTag $id"
@@ -384,20 +400,6 @@ namespace eval pd::composer {
         debugPrint [info level 0]
         variable w
         if {$col < 0} {$w($id).t activate $row,[incr col]}
-    }
-
-    proc validateCommand {id row col curVal newVal} {
-        debugPrint [info level 0]
-        variable currentpattern
-        variable symbolmap
-
-        debugPrint "BEFORE: newVal = '$newVal'"
-        set newVal [dict get [dict merge [list $newVal $newVal] [lreverse $symbolmap]] $newVal]
-        debugPrint "AFTER: newVal = '$newVal'"
-
-        sendGui [editCommand setcell $currentpattern($id) $row $col $newVal]
-
-        return 1
     }
 
     proc patternPropertiesDialog_common {id options} {
@@ -537,6 +539,7 @@ namespace eval pd::composer {
     proc openWindow {id} {
         debugPrint [info level 0]
         createMainWindow $id
+        updateTitle $id
     }
 
     proc closeWindow {id} {
