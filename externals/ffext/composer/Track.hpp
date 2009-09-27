@@ -1,6 +1,8 @@
 #ifndef COMPOSER_TRACK_H_INCLUDED
 #define COMPOSER_TRACK_H_INCLUDED
 
+#include "HasMeta.hpp"
+
 #include <map>
 #include <string>
 
@@ -12,7 +14,7 @@ using std::map;
 class Song;
 class Pattern;
 
-class Track
+class Track : public HasMeta
 {
 public:
 	static Track *byName(string songName, string trackName);
@@ -30,10 +32,12 @@ public:
     void copyPattern(const string &src, const string &dst);
     void removePattern(const string &p);
 	inline unsigned int getPatternCount() {return patterns.size();}
-    inline map<string,Pattern *>::iterator patternsBegin() {return patterns.begin();}
-    inline map<string,Pattern *>::iterator patternsEnd() {return patterns.end();}
 	inline Song *getSong() {return song;}
 	inline const string &getName() {return name;}
+
+    typedef map<string,Pattern *>::const_iterator pattern_iterator;
+    inline pattern_iterator pattern_begin() const {return patterns.begin();}
+    inline pattern_iterator pattern_end() const {return patterns.end();}
 };
 
 #endif // COMPOSER_TRACK_H_INCLUDED

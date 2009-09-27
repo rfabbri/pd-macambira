@@ -89,7 +89,8 @@ void track_proxy_save(t_gobj *z, t_binbuf *b)
         gensym("track"), gensym(s->getName().c_str()),
 	gensym(t->getName().c_str()));
 
-    for(map<string,Pattern *>::iterator i = t->patternsBegin(); i != t->patternsEnd(); i++)
+    // save paterns
+    for(Track::pattern_iterator i = t->pattern_begin(); i != t->pattern_end(); i++)
     {
         Pattern *pattern = i->second;
         binbuf_addv(b, "ss", gensym(TRACK_SELECTOR), gensym("data"));
@@ -117,6 +118,14 @@ void track_proxy_save(t_gobj *z, t_binbuf *b)
             }
         }
         binbuf_addv(b, ";");
+    }
+
+    // save metadata
+    for(Track::meta_iterator i = t->meta_begin(); i != t->meta_end(); i++)
+    {
+        binbuf_addv(b, "ssssss;", gensym(TRACK_SELECTOR),
+                gensym("meta"), gensym("track"), gensym("set"),
+                gensym(i->first.c_str()), gensym(i->second.c_str()));
     }
 
     binbuf_addv(b, "sss;", gensym(TRACK_SELECTOR), gensym("data"), gensym("end"));
@@ -181,21 +190,119 @@ void track_proxy_send_result(t_track_proxy *x, int outlet, int editor)
     }
 }
 
-int track_proxy_editor(t_track_proxy *x, t_floatarg arg)
+int track_proxy_meta(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv)
 {
-    t_int a = (t_int) arg;
-    if(a < 0)
+    result_argc = 0;
+    t_symbol *action = 0, *target = 0, *key = 0;
+    int w = -1;
+
+    if(argc < 3 || !IS_A_SYMBOL(argv,0) || !IS_A_SYMBOL(argv,1) || !IS_A_SYMBOL(argv,2))
+    {
+        pd_error(x, "meta: bad arguments");
+        goto usage;
+    }
+    target = argv[0].a_w.w_symbol;
+    action = argv[1].a_w.w_symbol;
+    key = argv[2].a_w.w_symbol;
+
+    if(action == gensym("get")) w = 0;
+    if(action == gensym("set")) w = 1;
+    if(w < 0) goto badargs;
+
+    if(target == gensym("song"))
+    {
+        pd_error(x, "meta: %s target not implemented yet", target->s_name);
+        return -1;
+    }
+    else if(target == gensym("track"))
+    {
+        string arg = "";
+        string atomStr = "";
+        for(int i = 3; i < argc; i++)
+        {
+            if(arg.length()) arg += " ";
+            char buf[MAXPDSTRING];
+            atom_string(&argv[i], buf, MAXPDSTRING);
+            atomStr = buf;
+            if(atomStr.find(" ", 0) != string::npos)
+                arg += "{" + atomStr + "}";
+            else
+                arg += atomStr;
+        }
+
+        if(w)
+        {
+            if(argc < 4) goto badargs;
+            x->track->setMeta(key->s_name, arg);
+        }
+        else
+        {
+            if(argc < 3) goto badargs;
+            string value = "";
+            if(argc == 3 && !x->track->hasMeta(key->s_name))
+            {
+                pd_error(x, "meta: key '%s' does not exist into %s", key->s_name, target->s_name);
+                return -5;
+            }
+            if(x->track->hasMeta(key->s_name))
+                value = x->track->getMeta(key->s_name);
+            else
+                value = arg;
+            cerr << "meta.track.get << '" << value << "'" << endl;
+            SETSYMBOL(&result_argv[0], gensym("meta"));
+            SETSYMBOL(&result_argv[1], target);
+            SETSYMBOL(&result_argv[2], key);
+            SETSYMBOL(&result_argv[3], gensym(value.c_str()));
+            result_argc = 4;
+        }
+        return 0;
+    }
+
+badargs:
+    pd_error(x, "meta: bad arguments");
+usage:
+    post("usage: meta song|track set <key> <value>");
+    post("       meta song|track get <key>");
+    return 1;
+}
+
+int track_proxy_editor(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv)
+{
+    result_argc = 0;
+    t_symbol *arg1 = 0, *arg2 = 0, *arg3 = 0;
+    if(argc < 1 || !IS_A_SYMBOL(argv,0))
+    {
+        pd_error(x, "editor: missing subcommand");
+        goto usage;
+    }
+
+    arg1 = argv[0].a_w.w_symbol;
+    if(arg1 == gensym("show"))
+    {
+        Editor::openWindow(x);
+    }
+    else if(arg1 == gensym("hide"))
+    {
+        Editor::closeWindow(x);
+    }
+    else if(arg1 == gensym("toggle"))
     {
         if(!x->editor_open) Editor::openWindow(x);
         else Editor::closeWindow(x);
     }
     else
     {
-        if(a > 0) Editor::openWindow(x);
-        else Editor::closeWindow(x);
+        pd_error(x, "editor: unknown subcommand: %s", arg1->s_name);
+        goto usage;
     }
-    result_argc = 0;
     return 0;
+
+usage:
+    post("track: editor: available subcommands:");
+    post("    editor show");
+    post("    editor hide");
+    post("    editor toggle");
+    return 1;
 }
 
 int track_proxy_getpatterns(t_track_proxy *x)
@@ -203,7 +310,7 @@ int track_proxy_getpatterns(t_track_proxy *x)
     SETSYMBOL(&result_argv[0], gensym("patternnames"));
     result_argc = 1;
     Track *t = x->track;
-    for(map<string,Pattern *>::iterator i = t->patternsBegin(); i != t->patternsEnd(); i++)
+    for(Track::pattern_iterator i = t->pattern_begin(); i != t->pattern_end(); i++)
     {
         if(result_argc >= MAX_RESULT_SIZE)
         {

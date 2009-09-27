@@ -1,6 +1,8 @@
 #ifndef COMPOSER_SONG_H_INCLUDED
 #define COMPOSER_SONG_H_INCLUDED
 
+#include "HasMeta.hpp"
+
 #include <map>
 #include <string>
 
@@ -11,7 +13,7 @@
 using std::map;
 using std::string;
 
-class Song
+class Song : public HasMeta
 {
 private:
 	static map<string,Song *> byname;

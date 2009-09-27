@@ -30,7 +30,8 @@ void track_proxy_properties(t_gobj *z, t_glist *owner);
 void track_proxy_send_result(t_track_proxy *x, int outlet, int editor);
 
 /*#begin methods*/
-int track_proxy_editor(t_track_proxy *x, t_floatarg arg);
+int track_proxy_meta(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv);
+int track_proxy_editor(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv);
 int track_proxy_getpatterns(t_track_proxy *x);
 int track_proxy_getpatternsize(t_track_proxy *x, t_symbol *pat);
 int track_proxy_setrow(t_track_proxy *x, t_symbol *sel, int argc, t_atom *argv);
