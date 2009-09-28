@@ -1,0 +1,4 @@
+version 0.2-rc4 ( codename BALTANIK )
+
+* contours detection objects ( hu_compare and pgh_compare )
+now give the posititon of matching contours.
