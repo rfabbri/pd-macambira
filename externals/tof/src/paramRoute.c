@@ -41,41 +41,7 @@ typedef struct _paramRoute
  
 } t_paramRoute;
 
-/*
-static t_symbol* paramRoute_makefilename( t_symbol *basename, t_float n) {
-	
-	
-	
-	int d = (int) n;
-	int length = strlen(basename->s_name);
-	char* buf = getbytes( (length + 6) * sizeof (*buf));	
-	char* number =  getbytes( 6 * sizeof (*number));
-		
-	int i;
-	int j = 0;
-	for ( i=0; i< length; i++ ) {
-		if ( (basename->s_name)[i] != '/' ) {
-				buf[j] = (basename->s_name)[i];
-				j++;
-			}
-    }
-	buf[j] = '\0';
-		
-	if ( strlen(buf) == 0 ) {
-		sprintf(number,"p%03d",d);
-	} else {
-		sprintf(number,".p%03d",d);
-	}
-	
-	strcat(buf,number);
-	t_symbol* filename = gensym(buf);
-	freebytes(number, 6 * sizeof (*number));
-	freebytes(buf, (length + 6) * sizeof (*buf));
-	
-	post("File name:%s",filename->s_name);
-	return filename;
-}
-*/
+
 static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av) { 
   
   //I DEACTIVATED THE SAVE & LOAD FEATURES UNTIL I BETTER DEFINE PARAMROUTE'S STATE SAVING
@@ -106,10 +72,11 @@ static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av
 	  if (ac) {
 		//int sendBufLength = strlen(x->path->s_name) + strlen(s->s_name) + 1;
 		//char *sendBuf = (char*)getbytes((sendBufLength)*sizeof(char));
-	   
+	   if ( s->s_name[0] == '/' && strlen(s->s_name) > 1) {
 	    strcpy(param_buf_temp_a, x->root->s_name);
 		strcpy(param_buf_temp_b, x->path->s_name);
-		strcat(param_buf_temp_b, s->s_name);
+		
+		strcat(param_buf_temp_b, s->s_name + 1);
 		t_symbol* path = gensym(param_buf_temp_b);
 		strcat(param_buf_temp_a, param_buf_temp_b);
 		t_symbol* target = gensym(param_buf_temp_a);
@@ -120,7 +87,9 @@ static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av
 		   } else {
 			 outlet_anything(x->x_outlet,path,ac,av);
 		   }
-		
+		} else {
+			pd_error(x,"Target name must start with a \"/\"");
+		}
 	  }
 	
 	  }

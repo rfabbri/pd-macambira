@@ -199,10 +199,7 @@ static void *param_new(t_symbol *s, int ac, t_atom *av)
 	   pd_error(x,"Could not create param. See possible errors above.");
   }
   
-  
 
-  
-  
   
   return (x);
 }
