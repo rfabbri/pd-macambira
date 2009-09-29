@@ -25,8 +25,7 @@
 #include "tof.h"
 #include "param.h"
 
-
-
+extern int sys_noloadbang;
 
 static t_class *param_class;
 static t_class *param_inlet2_class;
@@ -42,6 +41,7 @@ typedef struct _param
   //t_symbol                   *x_update_gui;
   t_symbol                   *s_set;
   struct param				  *x_param;
+  int 						  noloadbang;
 } t_param;
 
 typedef struct _param_inlet2
@@ -49,6 +49,9 @@ typedef struct _param_inlet2
   t_object        x_obj;
   t_param  *p_owner;
 } t_param_inlet2;
+
+
+
 
 
 static void param_bang(t_param *x)
@@ -59,6 +62,12 @@ static void param_bang(t_param *x)
 		//if (PARAMECHO) param_send_prepend(x->x_param, x->s_PARAM ,x->x_param->path );
 		if(x->x_param->selector != &s_bang ) param_send_prepend(x->x_param, x->x_param->send ,x->s_set );
    }
+}
+
+static void param_loadbang(t_param *x)
+{
+    if (!sys_noloadbang && !x->noloadbang)
+        param_bang(x);
 }
 
 static void param_anything(t_param *x, t_symbol *s, int ac, t_atom *av)
@@ -152,14 +161,24 @@ static void *param_new(t_symbol *s, int ac, t_atom *av)
 		//}
 	  }
 		  
+		  
+      // FIND THE NO LOADBANG TAG: /nlb
+	  int i;
+	  x->noloadbang = 0;
+	 
+	  for ( i =0; i < ac; i++) {
+		  if ( IS_A_SYMBOL(av,i) && (strcmp("/nlb",atom_getsymbol(av+i)->s_name) == 0)) {
+			  x->noloadbang = 1;
+			  break;
+		  }
+	  }
 	  
 	  
-	  
-	  //FIND THE GUI TAGS
+	  //FIND THE GUI OPTIONS: /g
 	  int ac_g = 0;
 	  t_atom* av_g = NULL;
-	 // There could be a problem if the the name is also /gui
-	 tof_find_tagged_argument('/',gensym("/gui"), ac, av,&ac_g,&av_g);
+	 // There could be a problem if the the name is also /g
+	 tof_find_tagged_argument('/',gensym("/g"), ac, av,&ac_g,&av_g);
 	  
 	  x->x_param = param_register(root,path,ac_p,av_p,ac_g,av_g);
 	  
@@ -197,6 +216,8 @@ void param_setup(void)
 
   class_addanything(param_class, param_anything);
   class_addbang(param_class, param_bang);
+  
+  class_addmethod(param_class, (t_method)param_loadbang, gensym("loadbang"), 0);
   
   param_inlet2_class = class_new(gensym("_param_inlet2"),
     0, 0, sizeof(t_param_inlet2), CLASS_PD | CLASS_NOINLET, 0);
