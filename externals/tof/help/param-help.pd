@@ -1,4 +1,4 @@
-#N canvas 1024 0 1018 688 10;
+#N canvas 6 80 1018 688 10;
 #X floatatom 477 321 5 0 0 0 - - -;
 #X obj -23 2 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
@@ -7,21 +7,15 @@
 system.;
 #X text -19 75 version: 2009-09-19 (localized release);
 #X text -19 33 tags: state routing param;
-#X obj 33 546 paramFile;
-#X obj 555 541 paramDump;
-#X obj 557 620 paramGui;
-#X obj 32 592 paramRoute;
 #X text 3 389 /id keyword:;
-#X obj 14 127 param /my_name my_value;
-#X text 169 122 argument 1: param name (must start with a slash);
-#X text 169 139 argument 2...: param value (can be a list);
-#X obj 525 126 param /number 30 /gui nbx;
-#X text 578 181 nbx: creates a numberbox;
-#X text 577 200 slider min max: creates a slider with the indicated
+#X text 179 122 argument 1: param name (must start with a slash);
+#X text 179 139 argument 2...: param value (can be a list);
+#X text 585 115 nbx: creates a numberbox;
+#X text 584 134 slider min max: creates a slider with the indicated
 minimum and maximum;
-#X text 577 229 bng: creates a bang;
-#X text 577 247 tgl: creates a toggle;
-#X text 579 265 symbolatom: creates a symbol box;
+#X text 584 163 bng: creates a bang;
+#X text 584 181 tgl: creates a toggle;
+#X text 586 199 symbolatom: creates a symbol box;
 #X text 68 355 (\$0)/abstraction's name/.../param's name;
 #X text 5 210 If the param object is created directly in the root patch
 (as the my_name example above) \, its path is as follows:;
@@ -32,11 +26,7 @@ data can be accessed through a unique symbolic path.;
 contained inside another abstraction an so forth) \, the path starts
 at the root and follows every child patch (abstraction) until it reaches
 the param object \, at which point the param's name is appended:;
-#X text 100 590 Sends values to params using a relative path.;
-#X obj 34 620 OSCToParam;
-#X text 515 166 /gui options:;
-#X text 526 81 When you create a param \, you can optinally use the
-"/gui" keyword to flag the param with gui options.;
+#X text 128 592 Sends values to params using a relative path.;
 #X text 40 414 If an abstraction's arguments contains the "/id" keyword
 \, the symbol following the "/id" keyword \, instead of the abstraction's
 name \, will be used to build the path. See an example to the right.
@@ -47,7 +37,7 @@ name \, will be used to build the path. See an example to the right.
 -1;
 #X obj 99 518 bng 15 250 50 0 empty empty load 17 7 0 10 -262144 -1
 -1;
-#X floatatom 525 146 5 0 0 0 - - -;
+#X floatatom 529 84 5 0 0 0 - - -;
 #X obj 555 519 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X obj 555 569 print DUMP;
@@ -55,35 +45,55 @@ name \, will be used to build the path. See an example to the right.
 ;
 #X obj 472 448 dac~;
 #X obj 690 364 hsl 100 15 0 1 0 0 \$0/FM_MOD/volume \$0/FM_MOD/volume_
-/FM_MOD/volume 105 7 0 10 -262144 -1 -1 0 1;
+/FM_MOD/volume 105 7 0 10 -262144 -1 -1 4131 1;
 #X obj 690 384 hsl 100 15 200 2000 0 0 \$0/FM_MOD/carrier \$0/FM_MOD/carrier_
-/FM_MOD/carrier 105 7 0 10 -262144 -1 -1 3300 1;
+/FM_MOD/carrier 105 7 0 10 -262144 -1 -1 2200 1;
 #X obj 688 423 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/index
 \$0/FM_MOD/modulation/index_ /FM_MOD/modulation/index 57 7 0 10 -262144
--1 -1 20 256;
+-1 -1 85 256;
 #X obj 688 404 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/freq
 \$0/FM_MOD/modulation/freq_ /FM_MOD/modulation/freq 57 7 0 10 -262144
 -1 -1 3 256;
-#X msg 477 343 modulation/index \$1;
 #X obj 517 367 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 0 1;
-#X msg 514 389 volume \$1;
-#X obj 477 414 param-abs /id FM_MOD;
-#X text 624 538 Outputs all children params of the root patch.;
-#X text 99 541 Saves and restores all chilren params of the root patch
+-1 -1 5300 1;
+#X text 650 542 Outputs all children params of the root patch.;
+#X text 121 539 Saves and restores all chilren params of the root patch
 to/from a file with optionnal presets.;
-#X text 623 617 Build a PD gui for all children params that have values
+#X text 636 617 Build a PD gui for all children params that have values
 for the "/gui" keyword.;
-#X text 107 620 Routes OSC messages to matching children params;
-#X connect 0 0 42 0;
-#X connect 7 0 35 0;
-#X connect 14 0 33 0;
-#X connect 30 0 8 0;
-#X connect 31 0 6 0;
-#X connect 32 0 6 1;
-#X connect 34 0 7 0;
-#X connect 42 0 45 0;
-#X connect 43 0 44 0;
-#X connect 44 0 45 0;
-#X connect 45 0 37 0;
-#X connect 45 0 37 1;
+#X text 124 617 Routes OSC messages to matching children params;
+#X obj 529 58 tof/param /number 30 /g nbx;
+#X obj 33 546 tof/paramFile;
+#X obj 32 592 tof/paramRoute;
+#X obj 30 619 tof/OSCToParam;
+#X obj 555 541 tof/paramDump;
+#X obj 557 620 tof/paramGui;
+#X obj -10 149 print loadbang;
+#X obj -10 125 tof/param /my_name my_value;
+#X text 526 100 /g options:;
+#X text 529 13 When you create a param \, you can optinally use the
+"/g" keyword to flag the param with gui options.;
+#X text 484 1 /g keyword:;
+#X text 500 224 /nlb keyword:;
+#X obj 477 414 param-abs /id FM_MOD /carrier 600;
+#X floatatom 644 312 5 0 0 0 - - -;
+#X obj 644 289 tof/param /test 50 /nlb;
+#X text 531 246 A param automatically ouputs its value when it is created.
+You can disable this behavior with the "/nlb" (no loadbang) keyword.
+;
+#X msg 477 343 modulation/index \$1;
+#X msg 514 389 volume \$1;
+#X connect 0 0 54 0;
+#X connect 21 0 43 0;
+#X connect 22 0 39 0;
+#X connect 23 0 39 1;
+#X connect 25 0 42 0;
+#X connect 33 0 55 0;
+#X connect 38 0 24 0;
+#X connect 42 0 26 0;
+#X connect 45 0 44 0;
+#X connect 50 0 28 0;
+#X connect 50 0 28 1;
+#X connect 52 0 51 0;
+#X connect 54 0 50 0;
+#X connect 55 0 50 0;
