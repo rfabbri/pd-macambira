@@ -21,6 +21,8 @@
 
 #include "tof.h"
 
+extern int sys_noloadbang;
+
 t_class *argument_class;
 
 typedef struct argument
@@ -46,6 +48,13 @@ static void argument_bang(t_argument *x)
 
 }
 
+
+
+static void argument_loadbang(t_argument *x)
+{
+    if (!sys_noloadbang)
+        argument_bang(x);
+}
 
 static void argument_free(t_argument *x) {
 	
@@ -114,6 +123,9 @@ void argument_setup(void)
     (t_newmethod)argument_new, (t_method)argument_free,
         sizeof(t_argument), CLASS_DEFAULT, A_GIMME,0);
     class_addbang(argument_class, argument_bang);
+   
+   
+   class_addmethod(argument_class, (t_method)argument_loadbang, gensym("loadbang"), 0);
    
 }
 
