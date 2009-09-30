@@ -36,7 +36,7 @@ MOOCOW_BUILD_VERSION ?=2009-04-27.002
 #	CFLAGS="$(shell echo $(CFLAGS))" ##-- works
 CONFIGURE_ARGS=\
 	CFLAGS="$(CFLAGS) -I/sw/include" \
-	LDFLAGS="$(LDFLAGS) -L$(pd_src)/bin -L$(pd_src)/obj -L/sw/lib" \
+	LDFLAGS="$(LDFLAGS) -L$(pd_src)/src -L$(pd_src)/bin -L$(pd_src)/obj -L/sw/lib" \
 	--with-pd-include="$(pd_src)/src" \
 	--with-pd-dir="$(MOOCOW_BUILD)" \
 	--disable-dependency-tracking
