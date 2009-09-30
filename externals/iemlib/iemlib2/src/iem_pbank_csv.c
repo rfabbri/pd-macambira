@@ -431,7 +431,8 @@ static void iem_pbank_csv_read(t_iem_pbank_csv *x, t_symbol *filename, t_symbol 
     fseek(fh,0,SEEK_SET);
     txbuf1 = (char *)getbytes(2 * txalloc * sizeof(char));
     txbuf2 = (char *)getbytes(2 * txalloc * sizeof(char));
-    fread(txbuf1, sizeof(char), txalloc, fh);
+    if(fread(txbuf1, sizeof(char), txalloc, fh) < sizeof(char)*txalloc)
+	post("pbank.csv:435: warning read error (not specified)");
     fclose(fh);
     
       // windows return
