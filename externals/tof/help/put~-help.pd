@@ -1,0 +1,48 @@
+#N canvas 206 49 525 620 10;
+#X obj -1 29 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
+0;
+#X text 4 77 author: mrtoftrash@gmail.com;
+#X text 4 29 description: many to many nonlocal signal connections.
+;
+#X text 3 55 tags: flow~;
+#X text 4 98 version: 2009-09-30 (initial release);
+#X obj 36 250 tof/put~ A;
+#X obj 302 252 tof/put~ B;
+#X obj 35 195 osc~ 800;
+#X obj 301 215 noise~;
+#X obj 35 222 *~ 0.5;
+#X obj 145 253 tof/put~ A;
+#X obj 144 225 *~ 0.5;
+#X obj 144 198 osc~ 600;
+#X obj 60 466 dac~;
+#X obj 67 373 tof/get~;
+#X msg 67 320 set A;
+#X msg 140 323 set B;
+#X msg 375 214 set A;
+#X msg 397 242 set B;
+#X obj 68 422 *~ 0.1;
+#X obj 138 389 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 800 1;
+#X msg 215 335 set C;
+#X text 40 497 All put~ objects copy their input to a local buffer
+which all receive~ objects of the same name read from. They may be
+in different windows or even different patches. Any number of get~
+objects may be associated with any number of put~ objects . Because
+of the buffer \, the signal is delayed by one block.;
+#X text 23 142 Argument: the name.;
+#X text 23 160 put~ takes "set" messages to switch between get~ objects.
+;
+#X connect 7 0 9 0;
+#X connect 8 0 6 0;
+#X connect 9 0 5 0;
+#X connect 11 0 10 0;
+#X connect 12 0 11 0;
+#X connect 14 0 19 0;
+#X connect 15 0 14 0;
+#X connect 16 0 14 0;
+#X connect 17 0 6 0;
+#X connect 18 0 6 0;
+#X connect 19 0 13 0;
+#X connect 19 0 13 1;
+#X connect 20 0 19 1;
+#X connect 21 0 14 0;
