@@ -69,7 +69,11 @@ static t_symbol *iem_image_calc_size(t_iem_image *x)
     }
     else
     {
-      fread(buf, 22, sizeof(unsigned char), fh);
+      if(fread(buf, 22, sizeof(unsigned char), fh) < 22){
+	post("iem_image-ERROR: can not read header in %s ", namebuf);
+        x->x_gifsym = (t_symbol *)0;
+        return((t_symbol *)0);
+        };
       fclose(fh);
       c = (char *)buf;
       if((c[0] != 'G')||(c[1] != 'I')||(c[2] != 'F'))
