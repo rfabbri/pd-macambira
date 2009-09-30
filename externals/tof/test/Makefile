@@ -31,3 +31,4 @@ LINUXINCLUDE =  -I$(PDPATH)/src
 	ld --export-dynamic  -shared -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	rm $*.o
+	mv $*.pd_linux ~/pd-externals/tof

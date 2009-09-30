@@ -1,87 +1,34 @@
-
 static t_class *pak_class;
 static t_class *pak_inlet_class;
-struct _param_inlet2;
-
-#define PAK_MAX_INLETS 100
 
 typedef struct _pak
 {
-  t_object                     x_obj;
-  struct _pak_inlet		       inlets[PAK_MAX_INLETS];
-  int 						   number;
+    t_object 			x_obj;
+    t_int 				x_n;              // number of args
+    t_atom 				*x_vec;          // input values
+    t_int 				x_nptr;           // number of pointers
+    t_gpointer 			*x_gpointer; // the pointers
+    t_atom 				*x_outvec;       // space for output values
+	int					count;
+	struct _pak_inlet  **proxy;
+	t_inlet 			**in;
 } t_pak;
+
+
 
 typedef struct _pak_inlet
 {
-  t_object        x_obj;
-  t_pak  *p_owner;
+  t_pd  		p_pd;
+  t_pack    	*master;
+  int 			id;
+  t_symbol*		type;
 } t_pak_inlet;
 
 
-
-
-
-// CONSTRUCTOR
-static void *param_new(t_symbol *s, int ac, t_atom *av)
+static void *pak_new(t_symbol *s, int argc, t_atom *argv)
 {
-  t_param *x = (t_param *)pd_new(param_class);
-  t_param_inlet2 *p = (t_param_inlet2 *)pd_new(param_inlet2_class);
-   
-  // Stuff
-  x->s_set = gensym("set");
-  x->s_PARAM = gensym("PARAM");
-  
-  // Set up second inlet proxy
-  x->x_param_inlet2 = p;
-  p->p_owner = x;
-  
- 
-
-  
-  return (x);
-}
-
-
-void pak_setup(void)
-{
-  pak_class = class_new(gensym("pak"),
-    (t_newmethod)pak_new, (t_method)pak_free,
-    sizeof(t_param), 0, A_GIMME, 0);
-
-
-  //class_addanything(param_class, param_anything);
-  //class_addbang(param_class, param_bang);
-  
-  //class_addmethod(param_class, (t_method)param_loadbang, gensym("loadbang"), 0);
-  
-  pak_inlet_class = class_new(gensym("_pak_inlet"),
-    0, 0, sizeof(t_pak_inlet), CLASS_PD | CLASS_NOINLET, 0);
-	
-  //class_addanything(pak_inlet_class, pak_inlet_anything);
-  
-}
-
-
-///////////////// PACK ///////////////
-
-/*
-static t_class *pack_class;
-
-typedef struct _pack
-{
-    t_object x_obj;
-    t_int x_n;              // number of args
-    t_atom *x_vec;          // input values
-    t_int x_nptr;           // number of pointers
-    t_gpointer *x_gpointer; // the pointers
-    t_atom *x_outvec;       // space for output values
-} t_pack;
-
-static void *pack_new(t_symbol *s, int argc, t_atom *argv)
-{
-    t_pack *x = (t_pack *)pd_new(pack_class);
-    t_atom defarg[2], *ap, *vec, *vp;
+    t_pak *x = (t_pak *)pd_new(pak_class);
+    t_atom defarg[2], *vap, *vec, *vp;
     t_gpointer *gp;
     int nptr = 0;
     int i;
@@ -104,12 +51,40 @@ static void *pack_new(t_symbol *s, int argc, t_atom *argv)
     gp = x->x_gpointer = (t_gpointer *)t_getbytes(nptr * sizeof (*gp));
     x->x_nptr = nptr;
 
+
+    // Create inlet proxys
+	x->count = argc - 1;
+	if (x->count < 0) x->count = 0;
+	x->in = (t_inlet **)getbytes(x->count * sizeof(t_inlet *));
+	x->proxy = (t_pak_inlet**)getbytes(x->count * sizeof(t_pak_inlet*));
+    //
+
+    /*
+	 
+	for (n = 0; n < x->count; n++) {
+		x->proxy[n]=(t_pak_inlet*)pd_new(pak_inlet_class);
+		x->proxy[n]->master = x;
+		x->proxy[n]->id=n;
+		x->in[n] = inlet_new ((t_object*)x, (t_pd*)x->proxy[n], 0,0);
+	}
+	 
+	 */
+
+    int n;
     for (i = 0, vp = x->x_vec, ap = argv; i < argc; i++, ap++, vp++)
     {
+	  n = i-1;	
         if (ap->a_type == A_FLOAT)
         {
             *vp = *ap;
-            if (i) floatinlet_new(&x->x_obj, &vp->a_w.w_float);
+            if (i) {
+				//floatinlet_new(&x->x_obj, &vp->a_w.w_float);
+			x->proxy[n]=(t_pak_inlet*)pd_new(pak_inlet_class);
+			x->proxy[n]->master = x;
+			x->proxy[n]->id=n;
+			x->proxy[n]->typr = &s_float;
+			x->in[n] = inlet_new ((t_object*)x, (t_pd*)x->proxy[n], 0,0);
+			}
         }
         else if (ap->a_type == A_SYMBOL)
         {
@@ -129,18 +104,25 @@ static void *pack_new(t_symbol *s, int argc, t_atom *argv)
             }
             else
             {
-                if (c != 'f') pd_error(x, "pack: %s: bad type",
+                if (c != 'f') pd_error(x, "pak: %s: bad type",
                     ap->a_w.w_symbol->s_name);
                 SETFLOAT(vp, 0);
                 if (i) floatinlet_new(&x->x_obj, &vp->a_w.w_float);
             }
         }
     }
+	
+	
+	 
+	
+	 
+	 
+	 
     outlet_new(&x->x_obj, &s_list);
     return (x);
 }
 
-static void pack_bang(t_pack *x)
+static void pak_bang(t_pak *x)
 {
     int i, reentered = 0, size = x->x_n * sizeof (t_atom);
     t_gpointer *gp;
@@ -148,7 +130,7 @@ static void pack_bang(t_pack *x)
     for (i = x->x_nptr, gp = x->x_gpointer; i--; gp++)
         if (!gpointer_check(gp, 1))
     {
-        pd_error(x, "pack: stale pointer");
+        pd_error(x, "pak: stale pointer");
         return;
     }
         // reentrancy protection.  The first time through use the pre-allocated
@@ -157,7 +139,7 @@ static void pack_bang(t_pack *x)
     {
             // LATER figure out how to deal with reentrancy and pointers... 
         if (x->x_nptr)
-            post("pack_bang: warning: reentry with pointers unprotected");
+            post("pak_bang: warning: reentry with pointers unprotected");
         outvec = t_getbytes(size);
         reentered = 1;
     }
@@ -173,44 +155,44 @@ static void pack_bang(t_pack *x)
     else x->x_outvec = outvec;
 }
 
-static void pack_pointer(t_pack *x, t_gpointer *gp)
+static void pak_pointer(t_pak *x, t_gpointer *gp)
 {
     if (x->x_vec->a_type == A_POINTER)
     {
         gpointer_unset(x->x_gpointer);
         *x->x_gpointer = *gp;
         if (gp->gp_stub) gp->gp_stub->gs_refcount++;
-        pack_bang(x);
+        pak_bang(x);
     }
-    else pd_error(x, "pack_pointer: wrong type");
+    else pd_error(x, "pak_pointer: wrong type");
 }
 
-static void pack_float(t_pack *x, t_float f)
+static void pak_float(t_pak *x, t_float f)
 {
     if (x->x_vec->a_type == A_FLOAT)
     {
         x->x_vec->a_w.w_float = f;
-        pack_bang(x);
+        pak_bang(x);
     }
-    else pd_error(x, "pack_float: wrong type");
+    else pd_error(x, "pak_float: wrong type");
 }
 
-static void pack_symbol(t_pack *x, t_symbol *s)
+static void pak_symbol(t_pak *x, t_symbol *s)
 {
     if (x->x_vec->a_type == A_SYMBOL)
     {
         x->x_vec->a_w.w_symbol = s;
-        pack_bang(x);
+        pak_bang(x);
     }
-    else pd_error(x, "pack_symbol: wrong type");
+    else pd_error(x, "pak_symbol: wrong type");
 }
 
-static void pack_list(t_pack *x, t_symbol *s, int ac, t_atom *av)
+static void pak_list(t_pak *x, t_symbol *s, int ac, t_atom *av)
 {
     obj_list(&x->x_obj, 0, ac, av);
 }
 
-static void pack_anything(t_pack *x, t_symbol *s, int ac, t_atom *av)
+static void pak_anything(t_pak *x, t_symbol *s, int ac, t_atom *av)
 {
     t_atom *av2 = (t_atom *)getbytes((ac + 1) * sizeof(t_atom));
     int i;
@@ -221,7 +203,16 @@ static void pack_anything(t_pack *x, t_symbol *s, int ac, t_atom *av)
     freebytes(av2, (ac + 1) * sizeof(t_atom));
 }
 
-static void pack_free(t_pack *x)
+
+static void pak_inlet(t_pak  *y, t_symbol *s, int argc, t_atom *argv)
+{
+  t_mux*x=y->p_master;
+  if(y->id==x->i_selected)
+    outlet_anything(x->x_obj.ob_outlet, s, argc, argv);
+}
+
+
+static void pak_free(t_pak *x)
 {
     t_gpointer *gp;
     int i;
@@ -230,20 +221,51 @@ static void pack_free(t_pack *x)
     freebytes(x->x_vec, x->x_n * sizeof(*x->x_vec));
     freebytes(x->x_outvec, x->x_n * sizeof(*x->x_outvec));
     freebytes(x->x_gpointer, x->x_nptr * sizeof(*x->x_gpointer));
+	
+	// Free proxys
+	const int count = x->count;
+
+	  if(x->in && x->proxy){
+		int n=0;
+		for(n=0; n<count; n++){
+		  if(x->in[n]){
+			inlet_free(x->in[n]);
+		  }
+		  x->in[n]=0;
+		  if(x->proxy[n]){
+			t_pak_inlet *y=x->proxy[n];
+			y->master=0;
+			y->id=0;
+			pd_free(&y->p_pd);        
+		  }
+		  x->proxy[n]=0;      
+		}
+		freebytes(x->in, x->count * sizeof(t_inlet *));
+		freebytes(x->proxy, x->count * sizeof(t_pak_inlet*));
+	  }
+	
+	
 }
 
-static void pack_setup(void)
+static void pak_setup(void)
 {
-    pack_class = class_new(gensym("pack"), (t_newmethod)pack_new,
-        (t_method)pack_free, sizeof(t_pack), 0, A_GIMME, 0);
-    class_addbang(pack_class, pack_bang);
-    class_addpointer(pack_class, pack_pointer);
-    class_addfloat(pack_class, pack_float);
-    class_addsymbol(pack_class, pack_symbol);
-    class_addlist(pack_class, pack_list);
-    class_addanything(pack_class, pack_anything);
+    pak_class = class_new(gensym("pak"), (t_newmethod)pak_new,
+        (t_method)pak_free, sizeof(t_pak), 0, A_GIMME, 0);
+    class_addbang(pak_class, pak_bang);
+    class_addpointer(pak_class, pak_pointer);
+    class_addfloat(pak_class, pak_float);
+    class_addsymbol(pak_class, pak_symbol);
+    class_addlist(pak_class, pak_list);
+    class_addanything(pak_class, pak_anything);
+	
+	// Setup proxies
+	
+	pak_inlet_class = class_new(0, 0, 0, sizeof(t_pak_inlet),CLASS_PD | CLASS_NOINLET, 0);
+	class_addanything(pak_inlet_class, pak_inlet);
+	
 }
-*/
+
+
 
 //////////////// MULTIPLEX //////////////
 
