@@ -693,8 +693,11 @@ void pix_opencv_motempl :: floatmin_size(float min_size)
 }
 void pix_opencv_motempl :: floatframe_buffer_num(float frame_buffer_num)
 {
-  if (frame_buffer_num>=1) this->frame_buffer_num = (int)frame_buffer_num;
-  this->buf = NULL;
+  if (frame_buffer_num>=3) 
+  {
+    this->frame_buffer_num = (int)frame_buffer_num;
+    this->buf = NULL;
+  }
 }
 void pix_opencv_motempl :: floatmax_time_delta(float max_time_delta)
 {
