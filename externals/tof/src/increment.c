@@ -119,6 +119,9 @@ void *increment_new(t_symbol *s, int argc, t_atom *argv)
 
   floatinlet_new(&x->x_obj, &x->inc);
   
+  inlet_new(&x->x_obj, &x->x_obj.ob_pd,
+        gensym("bang"), gensym("reset"));
+  
 
   x->outlet1 = outlet_new(&x->x_obj, &s_float);
   //x->outlet2 = outlet_new(&x->x_obj, &s_float);
