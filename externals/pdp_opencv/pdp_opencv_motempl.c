@@ -316,8 +316,11 @@ static void pdp_opencv_motempl_min_time_delta(t_pdp_opencv_motempl *x, t_floatar
 
 static void pdp_opencv_motempl_frame_buffer_num(t_pdp_opencv_motempl *x, t_floatarg f)
 {
-  if (f>=3) x->frame_buffer_num = (int)f;
-  x->buf = NULL;
+  if (f>=3) 
+  {
+    x->frame_buffer_num = (int)f;
+    x->buf = NULL;
+  }
 }
 
 static void pdp_opencv_motempl_sendpacket(t_pdp_opencv_motempl *x)
