@@ -1,5 +1,4 @@
 NAME=wiimote
-SYM=wiimote
 
 # If you want to use a customized Pd, then define a $PD_PATH variable.
 # Otherwise, the Pd must be installed on the system
@@ -25,8 +24,8 @@ PD_DOC_PATH := /usr/local/lib/pd/doc
 endif
 
 
-LIBS = $(LIBCWIID_PATH)/libcwiid.a -lbluetooth -lpthread
-#LIBS = -lcwiid -lbluetooth -lpthread
+#LIBS = $(LIBCWIID_PATH)/libcwiid.a -lbluetooth -lpthread
+LIBS = -lcwiid -lbluetooth -lpthread
 
 current: pd_linux
 

@@ -479,8 +479,12 @@ void cwiid_doConnect(t_wiimote *x, t_symbol *addr, t_symbol *dongaddr)
 	} 	
 	// connect:
 	
-
+#if 0
+#warning florian, you cannot just change the cwiid_open() function
   x->wiimote = cwiid_open(&bdaddr, dong_bdaddr_ptr, CWIID_FLAG_MESG_IFC);
+#else
+  x->wiimote = cwiid_open(&bdaddr, CWIID_FLAG_MESG_IFC);
+#endif
 
   if(NULL==x->wiimote) {
 		post("wiimote error: unable to connect");
