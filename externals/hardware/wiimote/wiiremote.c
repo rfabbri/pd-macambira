@@ -284,7 +284,7 @@ static void wiiremote_cwiid_classic(t_wiiremote *x, struct cwiid_classic_mesg *m
 {
 	t_atom ap[3];
 
-	t_float scale = 1.f / ((uint16_t)0xFFFF);
+	//	t_float scale = 1.f / ((uint16_t)0xFFFF);
 
 	SETSYMBOL(ap+0, gensym("left_stick"));
 	SETFLOAT (ap+1, mesg->l_stick[CWIID_X]);
@@ -363,7 +363,6 @@ static void wiiremote_cwiid_motionplus(t_wiiremote *x, struct cwiid_motionplus_m
 
 
 static void wiiremote_cwiid_message(t_wiiremote *x, union cwiid_mesg mesg) {
-	unsigned char buf[7];
 	switch (mesg.type) {
 	case CWIID_MESG_STATUS:
 		wiiremote_cwiid_battery(x, mesg.status_mesg.battery);
@@ -419,6 +418,7 @@ static void wiiremote_cwiid_message(t_wiiremote *x, union cwiid_mesg mesg) {
 #endif
 #ifdef CWIID_RPT_CLASSIC
 	case CWIID_MESG_CLASSIC:
+		wiiremote_cwiid_classic(x, &mesg.classic_mesg);
 		// todo
 		break;
 #endif
@@ -589,8 +589,6 @@ static void wiiremote_setLED(t_wiiremote *x, t_floatarg f)
 
 static void wiiremote_doConnect(t_wiiremote *x, t_symbol *addr, t_symbol *dongaddr)
 {
-	unsigned char buf[7];
-	int i;
 	bdaddr_t bdaddr;
 	unsigned int flags =  CWIID_FLAG_MESG_IFC;
 
@@ -633,7 +631,7 @@ static void wiiremote_doConnect(t_wiiremote *x, t_symbol *addr, t_symbol *dongad
 
   if(!addWiiremoteObject(x, cwiid_get_id(x->wiiremote))) {
     cwiid_close(x->wiiremote);
-    x->wiiremote==NULL;
+    x->wiiremote=NULL;
     return;
   }
 
@@ -703,9 +701,8 @@ static void wiiremote_doDisconnect(t_wiiremote *x)
 // ==============================================================
 // ==============================================================
 
-static void *wiiremote_new(t_symbol* s, int argc, t_atom *argv)
+static void *wiiremote_new(t_symbol*s, int argc, t_atom *argv)
 {
-	bdaddr_t bdaddr; // wiiremote bdaddr
 	t_wiiremote *x = (t_wiiremote *)pd_new(wiiremote_class);
 	
 	// create outlets:
@@ -719,7 +716,7 @@ static void *wiiremote_new(t_symbol* s, int argc, t_atom *argv)
 		
 	if (argc==2)
 	{
-		post("conecting to provided address...");
+		post("[%s] connecting to provided address...", s->s_name);
 		if (argv->a_type == A_SYMBOL)
 		{
 			wiiremote_doConnect(x, NULL, atom_getsymbol(argv));
@@ -739,25 +736,29 @@ static void wiiremote_free(t_wiiremote* x)
 
 void wiiremote_setup(void)
 {
-	int i;
-	
 	wiiremote_class = class_new(gensym("wiiremote"), (t_newmethod)wiiremote_new, (t_method)wiiremote_free, sizeof(t_wiiremote), CLASS_DEFAULT, A_GIMME, 0);
+
 	class_addmethod(wiiremote_class, (t_method) wiiremote_debug, gensym("debug"), 0);
-	class_addmethod(wiiremote_class, (t_method) wiiremote_doConnect, gensym("connect"), A_SYMBOL, A_SYMBOL, 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_status, gensym("status"), 0);
+
+
+	/* connection settings */
+	class_addmethod(wiiremote_class, (t_method) wiiremote_doConnect, gensym("connect"), A_DEFSYMBOL, A_DEFSYMBOL, 0);
 	class_addmethod(wiiremote_class, (t_method) wiiremote_doDisconnect, gensym("disconnect"), 0);
 	class_addmethod(wiiremote_class, (t_method) wiiremote_discover, gensym("discover"), 0);
 
 
-	class_addmethod(wiiremote_class, (t_method) wiiremote_status, gensym("status"), 0);
-
+	/* query data */
 	class_addmethod(wiiremote_class, (t_method) wiiremote_setReportMode, gensym("setReportMode"), A_DEFFLOAT, 0);
 	class_addmethod(wiiremote_class, (t_method) wiiremote_reportAcceleration, gensym("reportAcceleration"), A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_reportIR, gensym("reportIR"), A_DEFFLOAT, 0);
+
 	class_addmethod(wiiremote_class, (t_method) wiiremote_reportNunchuk, gensym("reportNunchuck"), A_DEFFLOAT, 0);
 	class_addmethod(wiiremote_class, (t_method) wiiremote_reportNunchuk, gensym("reportNunchuk"), A_DEFFLOAT, 0);
 	class_addmethod(wiiremote_class, (t_method) wiiremote_reportMotionplus, gensym("reportMotionplus"), A_DEFFLOAT, 0);
-	class_addmethod(wiiremote_class, (t_method) wiiremote_reportIR, gensym("reportIR"), A_DEFFLOAT, 0);
 
 
+	/* set things on the wiimote */
 	class_addmethod(wiiremote_class, (t_method) wiiremote_setRumble, gensym("setRumble"), A_DEFFLOAT, 0);
 	class_addmethod(wiiremote_class, (t_method) wiiremote_setLED, gensym("setLED"), A_DEFFLOAT, 0);
 }
