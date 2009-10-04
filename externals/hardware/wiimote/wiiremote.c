@@ -57,8 +57,8 @@ typedef struct _wiiremote
 
 	int reportMode;
 
-	struct acc acc_zero, acc_one; // acceleration
-	struct acc nc_acc_zero, nc_acc_one; // nunchuck acceleration
+	struct acc_cal acc_cal; /* calibration for built-in accelerometer */
+	struct acc_cal nc_acc_cal;  /* calibration for nunchuk accelerometer */
 
 	// outlets:
 	t_outlet *outlet_data;	
@@ -161,13 +161,30 @@ static void wiiremote_debug(t_wiiremote *x)
   post("IR: %s", (x->reportMode & CWIID_RPT_IR)?"ON":"OFF");
   post("extensions: %s",  (x->reportMode & CWIID_RPT_EXT)?"ON":"OFF");
 	post("");
-	post("Accelerometer calibration: zero=(%d,%d,%d) one=(%d,%d,%d)",x->acc_zero.x,x->acc_zero.y,x->acc_zero.z,x->acc_one.x,x->acc_one.y,x->acc_one.z);
-	post("Nunchuck calibration:      zero=(%d,%d,%d) one=(%d,%d,%d)",x->nc_acc_zero.x,x->nc_acc_zero.y,x->nc_acc_zero.z,x->nc_acc_one.x,x->nc_acc_one.y,x->nc_acc_one.z);
+	post("Accelerometer calibration: zero=(%d,%d,%d) one=(%d,%d,%d)",				 
+			 x->acc_cal.zero[CWIID_X], x->acc_cal.zero[CWIID_Y], x->acc_cal.zero[CWIID_Z],
+			 x->acc_cal.one [CWIID_X], x->acc_cal.one [CWIID_Y], x->acc_cal.one [CWIID_Z]);
+	post("Nunchuk calibration:      zero=(%d,%d,%d) one=(%d,%d,%d)",
+			 x->nc_acc_cal.zero[CWIID_X], x->nc_acc_cal.zero[CWIID_Y], x->nc_acc_cal.zero[CWIID_Z],
+			 x->nc_acc_cal.one [CWIID_X], x->nc_acc_cal.one [CWIID_Y], x->nc_acc_cal.one [CWIID_Z]);
+			 
 	
 
 }
 
 // ==============================================================
+
+static void wiiremote_cwiid_battery(t_wiiremote *x, int battery)
+{
+	t_atom ap[1];
+	t_float bat=(1.f*battery) / CWIID_BATTERY_MAX;
+
+	SETFLOAT(ap+0, bat);
+
+	verbose(1, "Battery: %d%%", (int) (100*bat));
+
+	outlet_anything(x->outlet_data, gensym("battery"), 1, ap);
+}
 
 // Button handler:
 static void wiiremote_cwiid_btn(t_wiiremote *x, struct cwiid_btn_mesg *mesg)
@@ -184,9 +201,9 @@ static void wiiremote_cwiid_acc(t_wiiremote *x, struct cwiid_acc_mesg *mesg)
 	double a_x, a_y, a_z;
 	t_atom ap[3];
 		
-	a_x = ((double)mesg->acc[CWIID_X] - x->acc_zero.x) / (x->acc_one.x - x->acc_zero.x);
-	a_y = ((double)mesg->acc[CWIID_Y] - x->acc_zero.y) / (x->acc_one.y - x->acc_zero.y);
-	a_z = ((double)mesg->acc[CWIID_Z] - x->acc_zero.z) / (x->acc_one.z - x->acc_zero.z);
+	a_x = ((double)mesg->acc[CWIID_X] - x->acc_cal.zero[CWIID_X]) / (x->acc_cal.one[CWIID_X] - x->acc_cal.zero[CWIID_X]);
+	a_y = ((double)mesg->acc[CWIID_Y] - x->acc_cal.zero[CWIID_Y]) / (x->acc_cal.one[CWIID_Y] - x->acc_cal.zero[CWIID_Y]);
+	a_z = ((double)mesg->acc[CWIID_Z] - x->acc_cal.zero[CWIID_Z]) / (x->acc_cal.one[CWIID_Z] - x->acc_cal.zero[CWIID_Z]);
 		
 	/*
 		double a, roll, pitch;
@@ -227,9 +244,9 @@ static void wiiremote_cwiid_nunchuk(t_wiiremote *x, struct cwiid_nunchuk_mesg *m
 	t_atom ap[4];
 	double a_x, a_y, a_z;
 
-	a_x = ((double)mesg->acc[CWIID_X] - x->nc_acc_zero.x) / (x->nc_acc_one.x - x->nc_acc_zero.x);
-	a_y = ((double)mesg->acc[CWIID_Y] - x->nc_acc_zero.y) / (x->nc_acc_one.y - x->nc_acc_zero.y);
-	a_z = ((double)mesg->acc[CWIID_Z] - x->nc_acc_zero.z) / (x->nc_acc_one.z - x->nc_acc_zero.z);
+	a_x = ((double)mesg->acc[CWIID_X] - x->nc_acc_cal.zero[CWIID_X]) / (x->nc_acc_cal.one[CWIID_X] - x->nc_acc_cal.zero[CWIID_X]);
+	a_y = ((double)mesg->acc[CWIID_Y] - x->nc_acc_cal.zero[CWIID_Y]) / (x->nc_acc_cal.one[CWIID_Y] - x->nc_acc_cal.zero[CWIID_Y]);
+	a_z = ((double)mesg->acc[CWIID_Z] - x->nc_acc_cal.zero[CWIID_Z]) / (x->nc_acc_cal.one[CWIID_Z] - x->nc_acc_cal.zero[CWIID_Z]);
 
 	/*
 	double a, roll, pitch;
@@ -242,34 +259,183 @@ static void wiiremote_cwiid_nunchuk(t_wiiremote *x, struct cwiid_nunchuk_mesg *m
 	
 	if (mesg->buttons & CWIID_NUNCHUK_BTN_C) {}
 	if (mesg->buttons & CWIID_NUNCHUK_BTN_Z) {}
-	/* nunchuck button */
+	/* nunchuk button */
 	SETSYMBOL(ap+0, gensym("button"));
 	SETFLOAT (ap+1, (t_float)mesg->buttons);
-	outlet_anything(x->outlet_data, gensym("nunchuck"), 2, ap);
+	outlet_anything(x->outlet_data, gensym("nunchuk"), 2, ap);
 	
 
-	/* nunchuck button */
+	/* nunchuk button */
 	SETSYMBOL(ap+0, gensym("acceleration"));
 	SETFLOAT (ap+1, a_x);
 	SETFLOAT (ap+2, a_y);
 	SETFLOAT (ap+3, a_z);
-	outlet_anything(x->outlet_data, gensym("nunchuck"), 4, ap);
+	outlet_anything(x->outlet_data, gensym("nunchuk"), 4, ap);
 	
-	/* nunchuck button */
+	/* nunchuk button */
 	SETSYMBOL(ap+0, gensym("stick"));
 	SETFLOAT (ap+1, mesg->stick[CWIID_X]);
 	SETFLOAT (ap+2, mesg->stick[CWIID_Y]);
-	outlet_anything(x->outlet_data, gensym("nunchuck"), 3, ap);
+	outlet_anything(x->outlet_data, gensym("nunchuk"), 3, ap);
 }
 
+#ifdef CWIID_RPT_CLASSIC
+static void wiiremote_cwiid_classic(t_wiiremote *x, struct cwiid_classic_mesg *mesg)
+{
+	t_atom ap[3];
+
+	t_float scale = 1.f / ((uint16_t)0xFFFF);
+
+	SETSYMBOL(ap+0, gensym("left_stick"));
+	SETFLOAT (ap+1, mesg->l_stick[CWIID_X]);
+	SETFLOAT (ap+2, mesg->l_stick[CWIID_Y]);
+	outlet_anything(x->outlet_data, gensym("classic"), 3, ap);
+
+	SETSYMBOL(ap+0, gensym("right_stick"));
+	SETFLOAT (ap+1, mesg->r_stick[CWIID_X]);
+	SETFLOAT (ap+2, mesg->r_stick[CWIID_Y]);
+	outlet_anything(x->outlet_data, gensym("classic"), 3, ap);
+
+
+	SETSYMBOL(ap+0, gensym("left"));
+	SETFLOAT (ap+1, mesg->l);
+	outlet_anything(x->outlet_data, gensym("classic"), 2, ap);
+
+	SETSYMBOL(ap+0, gensym("right"));
+	SETFLOAT (ap+1, mesg->r);
+	outlet_anything(x->outlet_data, gensym("classic"), 2, ap);
+
+
+	SETSYMBOL(ap+0, gensym("button"));
+	SETFLOAT(ap+1, (mesg->buttons & 0xFF00)>>8);
+	SETFLOAT(ap+2, mesg->buttons & 0x00FF);
+
+	outlet_anything(x->outlet_data, gensym("classic"), 3, ap);
+
+
+}
+#endif
+
+#ifdef CWIID_RPT_BALANCE
+#warning Balance ignores calibration data
+static void wiiremote_cwiid_balance_output(t_wiiremote *x, t_symbol*s, uint16_t value[3], t_float scale)
+{
+	t_atom ap[4];
+	t_float a = scale*value[CWIID_X];
+	t_float b = scale*value[CWIID_Y];
+	t_float c = scale*value[CWIID_Z];
+
+	SETSYMBOL(ap+0, s);
+	SETFLOAT (ap+1, a);
+	SETFLOAT (ap+2, b);
+	SETFLOAT (ap+3, c);
+	outlet_anything(x->outlet_data, gensym("balance"), 4, ap);
+}
+
+static void wiiremote_cwiid_balance(t_wiiremote *x, struct cwiid_balance_mesg *mesg)
+{
+	t_float scale = 1.f / ((uint16_t)0xFFFF);
+	wiiremote_cwiid_balance_output(x, gensym("right_top"), &mesg->right_top, scale);
+	wiiremote_cwiid_balance_output(x, gensym("right_bottom"), &mesg->right_bottom, scale);
+	wiiremote_cwiid_balance_output(x, gensym("left_top"), &mesg->left_top, scale);
+	wiiremote_cwiid_balance_output(x, gensym("left_bottom"), &mesg->left_bottom, scale);
+}
+#endif
+
+#ifdef CWIID_RPT_MOTIONPLUS
 static void wiiremote_cwiid_motionplus(t_wiiremote *x, struct cwiid_motionplus_mesg *mesg)
 {
 	t_atom ap[3];
-	SETFLOAT(ap+0, mesg->angle_rate[CWIID_PHI]);
-	SETFLOAT(ap+1, mesg->angle_rate[CWIID_THETA]);
-	SETFLOAT(ap+2, mesg->angle_rate[CWIID_PSI]);
+	t_float scale = 1.f / ((uint16_t)0xFFFF);
+
+	t_float phi  = scale*mesg->angle_rate[CWIID_PHI];
+	t_float theta= scale*mesg->angle_rate[CWIID_THETA];
+	t_float psi  = scale*mesg->angle_rate[CWIID_PSI];
+
+	SETFLOAT(ap+0, phi);
+	SETFLOAT(ap+1, theta);
+	SETFLOAT(ap+2, psi);
 
 	outlet_anything(x->outlet_data, gensym("motionplus"), 3, ap);
+}
+#endif
+
+
+
+static void wiiremote_cwiid_message(t_wiiremote *x, union cwiid_mesg mesg) {
+	unsigned char buf[7];
+	switch (mesg.type) {
+	case CWIID_MESG_STATUS:
+		wiiremote_cwiid_battery(x, mesg.status_mesg.battery);
+		switch (mesg.status_mesg.ext_type) {
+		case CWIID_EXT_NONE:
+			post("No extension attached");
+			break;
+		case CWIID_EXT_NUNCHUK:
+			post("Nunchuk extension attached");
+			if(cwiid_get_acc_cal(x->wiiremote, CWIID_EXT_NUNCHUK, &x->nc_acc_cal)) {
+				post("Unable to retrieve nunchuk calibration");
+			} else {
+				post("Retrieved nunchuk calibration: zero=(%02d,%02d,%02d) one=(%02d,%02d,%02d)",
+						 x->nc_acc_cal.zero[CWIID_X],
+						 x->nc_acc_cal.zero[CWIID_Y],
+						 x->nc_acc_cal.zero[CWIID_Z],
+						 x->nc_acc_cal.one [CWIID_X],
+						 x->nc_acc_cal.one [CWIID_Y],
+						 x->nc_acc_cal.one [CWIID_Z]);
+			}
+			break;
+		case CWIID_EXT_CLASSIC:
+			post("Classic controller attached. There is no support for this yet.");
+			break;
+		case CWIID_EXT_BALANCE:
+			post("Balance controller attached. There is no support for this yet.");
+			break;
+		case CWIID_EXT_MOTIONPLUS:
+			post("MotionPlus controller attached.");
+			/* no calibration needed for MotionPlus */
+			break;
+		case CWIID_EXT_UNKNOWN:
+			post("Unknown extension attached");
+			break;
+		default:
+			post("ext mesg %d unknown", mesg.status_mesg.ext_type);
+			break;
+		}
+		break;
+	case CWIID_MESG_BTN:
+		wiiremote_cwiid_btn(x, &mesg.btn_mesg);
+		break;
+	case CWIID_MESG_ACC:
+		wiiremote_cwiid_acc(x, &mesg.acc_mesg);
+		break;
+	case CWIID_MESG_IR:
+		wiiremote_cwiid_ir(x, &mesg.ir_mesg);
+		break;
+#ifdef CWIID_RPT_NUNCHUK
+	case CWIID_MESG_NUNCHUK:
+		wiiremote_cwiid_nunchuk(x, &mesg.nunchuk_mesg);
+		break;
+#endif
+#ifdef CWIID_RPT_CLASSIC
+	case CWIID_MESG_CLASSIC:
+		// todo
+		break;
+#endif
+#ifdef CWIID_RPT_MOTIONPLUS
+	case CWIID_MESG_MOTIONPLUS:
+		wiiremote_cwiid_motionplus(x, &mesg.motionplus_mesg);
+		break;
+#endif
+#ifdef CWIID_RPT_BALANCE
+	case CWIID_MESG_BALANCE:
+		wiiremote_cwiid_balance(x, &mesg.balance_mesg);
+		break;
+#endif
+	default:
+		post("mesg %d unknown", (mesg.type));
+		break;
+	}
 }
 
 
@@ -279,7 +445,7 @@ static void wiiremote_cwiid_motionplus(t_wiiremote *x, struct cwiid_motionplus_m
 
 // Unfortunately, the mesg struct passed as an argument to the
 // callback does not have a pointer to the wiiremote instance, and it
-// is thus impossible to know which wiiremote has invoked the callback.
+// is thus impossible to know which wiiremote-object has invoked the callback.
 // For this case we provide a hard-coded set of wrapper callbacks to
 // indicate which Pd wiiremote instance to control.
 
@@ -290,7 +456,6 @@ static void wiiremote_cwiid_motionplus(t_wiiremote *x, struct cwiid_motionplus_m
 static void cwiid_callback(cwiid_wiimote_t *wiiremote, int mesg_count,
                     union cwiid_mesg mesg_array[], struct timespec *timestamp)
 {
-	unsigned char buf[7];
 	int i;
   t_wiiremote *x=NULL;
 
@@ -304,76 +469,23 @@ static void cwiid_callback(cwiid_wiimote_t *wiiremote, int mesg_count,
     return;
 	}
 			
-  for (i=0; i < mesg_count; i++)
-		{	
-			switch (mesg_array[i].type) {
-      case CWIID_MESG_STATUS:
-        post("Battery: %d%", (int) (100.0 * mesg_array[i].status_mesg.battery / CWIID_BATTERY_MAX));
-        switch (mesg_array[i].status_mesg.ext_type) {
-        case CWIID_EXT_NONE:
-          post("No extension attached");
-          break;
-        case CWIID_EXT_NUNCHUK:
-          post("Nunchuck extension attached");
-						
-          if (cwiid_read(x->wiiremote, CWIID_RW_REG | CWIID_RW_DECODE, 0xA40020, 								7, buf)) {
-            post("Unable to retrieve Nunchuk calibration");
-          }
-          else {
-            x->nc_acc_zero.x = buf[0];
-            x->nc_acc_zero.y = buf[1];
-            x->nc_acc_zero.z = buf[2];
-            x->nc_acc_one.x  = buf[4];
-            x->nc_acc_one.y  = buf[5];
-            x->nc_acc_one.z  = buf[6];
-          }	
-          break;
-        case CWIID_EXT_CLASSIC:
-          post("Classic controller attached. There is no support for this yet.");
-          break;
-        case CWIID_EXT_UNKNOWN:
-          post("Unknown extension attached");
-          break;
-				default:
-					post("ext mesg %d unknown", (mesg_array[i].type));
-					break;
-        }
-        break;
-      case CWIID_MESG_BTN:
-        wiiremote_cwiid_btn(x, &mesg_array[i].btn_mesg);
-        break;
-      case CWIID_MESG_ACC:
-        wiiremote_cwiid_acc(x, &mesg_array[i].acc_mesg);
-        break;
-      case CWIID_MESG_IR:
-        wiiremote_cwiid_ir(x, &mesg_array[i].ir_mesg);
-        break;
-      case CWIID_MESG_NUNCHUK:
-        wiiremote_cwiid_nunchuk(x, &mesg_array[i].nunchuk_mesg);
-        break;
-#ifdef CWIID_FLAG_CLASSIC
-      case CWIID_MESG_CLASSIC:
-        // todo
-        break;
-#endif
-#ifdef CWIID_FLAG_MOTIONPLUS
-      case CWIID_MESG_MOTIONPLUS:
-        wiiremote_cwiid_motionplus(x, &mesg_array[i].motionplus_mesg);
-        break;
-#endif
-#ifdef CWIID_MESG_BALANCE
-      case CWIID_MESG_BALANCE:
-        wiiremote_cwiid_balance(x, &mesg_array[i].balance_mesg);
-        break;
-#endif
-      default:
-				post("mesg %d unknown", (mesg_array[i].type));
-        break;
-      }
-    }
+  for (i=0; i < mesg_count; i++) {
+		wiiremote_cwiid_message(x, mesg_array[i]);
+	}
 }
 
 // ==============================================================
+
+static void wiiremote_status(t_wiiremote *x)
+{
+	if(x->connected) {
+		if (cwiid_request_status(x->wiiremote)) {
+			pd_error(x, "error requesting status message");
+		}
+	}
+
+}
+
 
 static void wiiremote_resetReportMode(t_wiiremote *x)
 {
@@ -417,10 +529,32 @@ static void wiiremote_reportIR(t_wiiremote *x, t_floatarg f)
 	wiiremote_report(x, CWIID_RPT_IR, f);
 }
 
-static void wiiremote_reportNunchuck(t_wiiremote *x, t_floatarg f)
+static void wiiremote_reportNunchuk(t_wiiremote *x, t_floatarg f)
 {
 	wiiremote_report(x, CWIID_RPT_EXT, f);
 }
+
+static void wiiremote_reportMotionplus(t_wiiremote *x, t_floatarg f)
+{
+#ifdef CWIID_RPT_MOTIONPLUS
+	int flag=f;
+	if (x->connected)	{
+		verbose(1, "changing motionplus report mode for Wii%02d to %d", x->wiiremoteID, flag);
+		int err=0;
+		if(flag) {
+			err=cwiid_enable(x->wiiremote, CWIID_FLAG_MOTIONPLUS);
+		} else {
+			err=cwiid_disable(x->wiiremote, CWIID_FLAG_MOTIONPLUS);
+		}
+		if(err) {
+			pd_error(x, "turning %s motionplus returned %d", (flag?"on":"off"), err);
+		} else {
+			wiiremote_report(x, CWIID_RPT_MOTIONPLUS, f);
+		}
+	}
+#endif
+}
+
 static void wiiremote_setRumble(t_wiiremote *x, t_floatarg f)
 {
 	if (x->connected)
@@ -484,10 +618,6 @@ static void wiiremote_doConnect(t_wiiremote *x, t_symbol *addr, t_symbol *dongad
 	} 	
 	// connect:
 
-#ifdef  CWIID_FLAG_MOTIONPLUS
-	flags |=  CWIID_FLAG_MOTIONPLUS;
-#endif
-	
 
 #if 0
   x->wiiremote = cwiid_open(&bdaddr, dong_bdaddr_ptr, flags);
@@ -510,16 +640,17 @@ static void wiiremote_doConnect(t_wiiremote *x, t_symbol *addr, t_symbol *dongad
   x->wiiremoteID= cwiid_get_id(x->wiiremote);
   
   post("wiiremote %i is successfully connected", x->wiiremoteID);
-  if (cwiid_read(x->wiiremote, CWIID_RW_EEPROM, 0x16, 7, buf)) {
+
+	if(cwiid_get_acc_cal(x->wiiremote, CWIID_EXT_NONE, &x->acc_cal)) {
     post("Unable to retrieve accelerometer calibration");
   } else {
-    x->acc_zero.x = buf[0];
-    x->acc_zero.y = buf[1];
-    x->acc_zero.z = buf[2];
-    x->acc_one.x  = buf[4];
-    x->acc_one.y  = buf[5];
-    x->acc_one.z  = buf[6];
-    //post("Retrieved wiiremote calibration: zero=(%.1f,%.1f,%.1f) one=(%.1f,%.1f,%.1f)",buf[0],buf[2],buf[3],buf[4],buf[5],buf[6]);
+    post("Retrieved wiiremote calibration: zero=(%02d,%02d,%02d) one=(%02d,%02d,%02d)",
+				 x->acc_cal.zero[CWIID_X],
+				 x->acc_cal.zero[CWIID_Y],
+				 x->acc_cal.zero[CWIID_Z],
+				 x->acc_cal.one [CWIID_X],
+				 x->acc_cal.one [CWIID_Y],
+				 x->acc_cal.one [CWIID_Z]);
   }
 
   x->connected = 1;
@@ -615,10 +746,18 @@ void wiiremote_setup(void)
 	class_addmethod(wiiremote_class, (t_method) wiiremote_doConnect, gensym("connect"), A_SYMBOL, A_SYMBOL, 0);
 	class_addmethod(wiiremote_class, (t_method) wiiremote_doDisconnect, gensym("disconnect"), 0);
 	class_addmethod(wiiremote_class, (t_method) wiiremote_discover, gensym("discover"), 0);
+
+
+	class_addmethod(wiiremote_class, (t_method) wiiremote_status, gensym("status"), 0);
+
 	class_addmethod(wiiremote_class, (t_method) wiiremote_setReportMode, gensym("setReportMode"), A_DEFFLOAT, 0);
 	class_addmethod(wiiremote_class, (t_method) wiiremote_reportAcceleration, gensym("reportAcceleration"), A_DEFFLOAT, 0);
-	class_addmethod(wiiremote_class, (t_method) wiiremote_reportNunchuck, gensym("reportNunchuck"), A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_reportNunchuk, gensym("reportNunchuck"), A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_reportNunchuk, gensym("reportNunchuk"), A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_reportMotionplus, gensym("reportMotionplus"), A_DEFFLOAT, 0);
 	class_addmethod(wiiremote_class, (t_method) wiiremote_reportIR, gensym("reportIR"), A_DEFFLOAT, 0);
+
+
 	class_addmethod(wiiremote_class, (t_method) wiiremote_setRumble, gensym("setRumble"), A_DEFFLOAT, 0);
 	class_addmethod(wiiremote_class, (t_method) wiiremote_setLED, gensym("setLED"), A_DEFFLOAT, 0);
 }
