@@ -684,8 +684,7 @@ static void wiimote_doConnect(t_wiimote *x, t_symbol *addr, t_symbol *dongaddr)
 	if (NULL==addr || addr==gensym("")) {
 		post("Searching automatically...");		
 		bdaddr = *BDADDR_ANY;
-	}
-	else {
+	}	else {
 		str2ba(addr->s_name, &bdaddr);
 		post("Connecting to given address...");
 		post("Press buttons 1 and 2 simultaneously.");
@@ -695,8 +694,7 @@ static void wiimote_doConnect(t_wiimote *x, t_symbol *addr, t_symbol *dongaddr)
 	if (NULL==dongaddr || dongaddr==gensym("")) {
 		post("Binding automatically...");		
 		dong_bdaddr_ptr = NULL;		
-	}
-	else {
+	}	else {
 		str2ba(dongaddr->s_name, &dong_bdaddr);
 	} 	
 	// connect:
@@ -757,7 +755,7 @@ static void wiimote_discover(t_wiimote *x)
 {
 	post("Put the wiimote into discover mode by pressing buttons 1 and 2 simultaneously.");
 		
-	wiimote_doConnect(x, NULL, gensym("NULL"));
+	wiimote_doConnect(x, NULL, NULL);
 	if (!(x->connected))
 	{
 		post("Error: could not find any wiimotes. Please ensure that bluetooth is enabled, and that the 		'hcitool scan' command lists your Nintendo device.");
