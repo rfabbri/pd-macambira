@@ -37,12 +37,6 @@
 
 #define PI	3.14159265358979323
 
-struct acc {
-	unsigned char x;
-	unsigned char y;
-	unsigned char z;
-};
-
 // class and struct declarations for wiimote pd external:
 static t_class *wiimote_class;
 typedef struct _wiimote
@@ -54,7 +48,6 @@ typedef struct _wiimote
 	t_float connected;
 	int wiimoteID;
 
-
 	int reportMode;
 
 	struct acc_cal acc_cal; /* calibration for built-in accelerometer */
@@ -63,14 +56,14 @@ typedef struct _wiimote
 
 	// outlets:
 	t_outlet *outlet_data;	
+
+  struct timespec*basetime;
+  double baselogicaltime;
 } t_wiimote;
 
+static t_clock*g_clock=NULL;
 
-// For now, we make one global t_wiimote pointer that we can refer to
-// in the cwiid_callback. This means we can support maximum of ONE
-// wiimote. ARGH. We'll have to figure out how to have access to the
-// pd object from the callback (without modifying the CWiid code):
-#define MAX_WIIMOTES 14
+
 
 typedef struct _wiimoteList {
   t_wiimote*x;
@@ -151,6 +144,69 @@ static void removeWiimoteObject(const t_wiimote*x) {
 }
 
 
+/* time handling */
+
+
+static void print_timestamp(struct timespec*timestamp, struct timespec*reference) {
+	double t0=timestamp->tv_sec*1000. + (timestamp->tv_nsec) / 1000000.;
+	double t1=0;
+	double t=0;
+	if(reference) {
+		t1=reference->tv_sec*1000. + (reference->tv_nsec) / 1000000.;
+	}
+
+	t=t0-t1;
+
+	post("timestamp: %f", (t));
+}
+
+static void wiimote_setbasetime(t_wiimote*x) {
+  if(NULL==x->basetime) {
+    x->basetime=(struct timespec*)getbytes(sizeof(struct timespec));
+  }
+
+  if (clock_gettime(CLOCK_REALTIME, x->basetime)) {
+    // oops
+    freebytes(x->basetime, sizeof(struct timespec));
+    x->basetime=NULL;
+  }
+
+  x->baselogicaltime=clock_getlogicaltime();
+}
+
+static double wiimote_timestamp2logicaltime(t_wiimote*x, struct timespec*timestamp) {
+  if(x->basetime) {
+    double delay= /* how long (in ms) after we connected to the wiimote this timestamp appeared */
+      (timestamp->tv_sec - x->basetime->tv_sec) * 1000. +
+      (timestamp->tv_nsec - x->basetime->tv_nsec) / 1000000.;
+
+    if(delay<0)
+      return 0.;
+
+    return x->baselogicaltime + delay;
+  }
+
+  return 0.; /* immediately */
+}
+
+
+typedef struct _wiimoteMsgList {
+  union cwiid_mesg mesg;
+  double timestamp;
+  t_wiimote*x;
+  struct _wiimoteMsgList*next; 
+} t_wiimoteMsgList;
+
+t_wiimoteMsgList*g_wiimoteMsgList=NULL;
+
+static void addWiimsg(union cwiid_mesg mesg, double timestamp)
+{
+
+}
+	
+
+
+
 
 // ==============================================================
 static void wiimote_debug(t_wiimote *x)
@@ -181,8 +237,6 @@ static void wiimote_cwiid_battery(t_wiimote *x, int battery)
 	t_float bat=(1.f*battery) / CWIID_BATTERY_MAX;
 
 	SETFLOAT(ap+0, bat);
-
-	verbose(1, "Battery: %d%%", (int) (100*bat));
 
 	outlet_anything(x->outlet_data, gensym("battery"), 1, ap);
 }
@@ -397,7 +451,7 @@ static void wiimote_cwiid_message(t_wiimote *x, union cwiid_mesg mesg) {
 		wiimote_cwiid_battery(x, mesg.status_mesg.battery);
 		switch (mesg.status_mesg.ext_type) {
 		case CWIID_EXT_NONE:
-			post("No extension attached");
+			verbose(1, "No extension attached");
 			break;
 		case CWIID_EXT_NUNCHUK:
 #ifdef CWIID_RPT_NUNCHCUK
@@ -417,7 +471,7 @@ static void wiimote_cwiid_message(t_wiimote *x, union cwiid_mesg mesg) {
 #endif
 #ifdef CWIID_RPT_CLASSIC
 		case CWIID_EXT_CLASSIC:
-			post("Classic controller attached. There is no support for this yet.");
+			post("Classic controller attached. There is no real support for this yet.");
 			break;
 #endif
 #ifdef CWIID_RPT_BALANCE
@@ -478,18 +532,73 @@ static void wiimote_cwiid_message(t_wiimote *x, union cwiid_mesg mesg) {
 }
 
 
-static void print_timestamp(struct timespec*timestamp, struct timespec*reference) {
-	double t0=timestamp->tv_sec*1000. + (timestamp->tv_nsec) / 1000000.;
-	double t1=0;
-	double t=0;
-	if(reference) {
-		t1=reference->tv_sec*1000. + (reference->tv_nsec) / 1000000.;
-	}
+static void wiimote_dequeue(void*nada)
+{
+  /* get all the messages from the queue that are scheduled until now */
+  t_wiimoteMsgList*wl=g_wiimoteMsgList;
+  t_wiimoteMsgList*next=NULL;
+  double now=clock_getlogicaltime();
+  double nexttime=0.;
 
-	t=t0-t1;
 
-	post("timestamp: %f", (t));
+  if(NULL==wl) {
+    /* no messages to dequeue; this should never happen */
+  }
+  while(wl) {
+    if(now<wl->timestamp) {
+      /* no more messages to do for now, aborting */
+      break;
+    }
+    next=wl->next;
+    wiimote_cwiid_message(wl->x, wl->mesg);
+    wl->x=NULL;
+    wl->timestamp=0.;
+    wl->next=NULL;
+    freebytes(wl, sizeof(t_wiimoteMsgList));
+    wl=next;
+  }
 
+  /* reschedule clock */
+  if(wl) {
+    clock_delay(g_clock, wl->timestamp - now);
+  }
+}
+
+
+static void wiimote_queue(t_wiimote*x, union cwiid_mesg mesg, double timestamp)
+{ 
+  /* add mesg to the queue with a Pd timestamp */
+  t_wiimoteMsgList*wl=g_wiimoteMsgList;
+  t_wiimoteMsgList*lastentry=NULL;
+
+    /* insert the current message into the list */
+  t_wiimoteMsgList*newentry=(t_wiimoteMsgList*)getbytes(sizeof(t_wiimoteMsgList));
+  newentry->next=NULL;
+  newentry->x=x;
+  newentry->mesg=mesg;
+  newentry->timestamp=timestamp;
+
+  if(NULL!=wl) {
+    while(wl->next) {
+      if(wl->timestamp>timestamp){
+        break;
+      }
+      lastentry=wl;
+      wl=wl->next;
+    }
+  }
+
+  if(lastentry) {
+    newentry->next=lastentry->next;
+    lastentry->next=newentry;
+  } else {
+    // at the beginning
+    newentry->next=g_wiimoteMsgList;
+    g_wiimoteMsgList=newentry;
+  }
+
+  /* reset the clock */
+  clock_delay(g_clock, 0);
 }
 
 
@@ -503,22 +612,13 @@ static void print_timestamp(struct timespec*timestamp, struct timespec*reference
 // For this case we provide a hard-coded set of wrapper callbacks to
 // indicate which Pd wiimote instance to control.
 
-// So far I have only checked with one wiimote
-
-/*void cwiid_callback(cwiid_wiimote_t *wiimt, int mesg_count, union cwiid_mesg *mesg[], struct timespec *timestamp)
-*/
 static void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
                     union cwiid_mesg mesg_array[], struct timespec *timestamp)
 {
 	int i;
   t_wiimote *x=NULL;
+  double pd_timestamp=0;
 
-	static struct timespec*ts=NULL;
-	if(NULL==ts) {
-		ts=(struct timespec*)getbytes(sizeof(struct timespec));
-		ts->tv_sec  =timestamp->tv_sec;
-		ts->tv_nsec =timestamp->tv_nsec;
-	}
 
   if(g_wiimoteList==NULL||wiimote==NULL) {
     post("no wii's known");
@@ -530,7 +630,8 @@ static void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
     return;
 	}
 
-  //print_timestamp(timestamp, ts);
+  pd_timestamp=wiimote_timestamp2logicaltime(x, timestamp);
+
   for (i=0; i < mesg_count; i++) {
 		wiimote_cwiid_message(x, mesg_array[i]);
 	}
@@ -743,6 +844,8 @@ static void wiimote_doConnect(t_wiimote *x, t_symbol *addr, t_symbol *dongaddr)
   if (cwiid_set_mesg_callback(x->wiimote, &cwiid_callback)) {
     pd_error(x, "Unable to set message callback");
   }
+
+  wiimote_setbasetime(x);
 }
 
 // The following function attempts to discover a wiimote. It requires
@@ -787,21 +890,21 @@ static void wiimote_doDisconnect(t_wiimote *x)
 static void *wiimote_new(t_symbol*s, int argc, t_atom *argv)
 {
 	t_wiimote *x = (t_wiimote *)pd_new(wiimote_class);
-	
+
 	// create outlets:
 	x->outlet_data = outlet_new(&x->x_obj, NULL);
 
 	// initialize toggles:
 	x->connected = 0;
 	x->wiimoteID = -1;
+
+  x->basetime=NULL;
+  x->baselogicaltime=0.;
 	
-		// connect if user provided an address as an argument:
-		
-	if (argc==2)
-	{
+  // connect if user provided an address as an argument:
+  if (argc==2) {
 		post("[%s] connecting to provided address...", s->s_name);
-		if (argv->a_type == A_SYMBOL)
-		{
+		if (argv->a_type == A_SYMBOL)	{
 			wiimote_doConnect(x, NULL, atom_getsymbol(argv));
 		} else {
 			error("[wiimote] expects either no argument, or a bluetooth address as an argument. eg, 00:19:1D:70:CE:72");
@@ -815,10 +918,18 @@ static void *wiimote_new(t_symbol*s, int argc, t_atom *argv)
 static void wiimote_free(t_wiimote* x)
 {
 	wiimote_doDisconnect(x);
+  /* cleanup the queue */
+
+  /* free the clock */
+  if(x->basetime) {
+    freebytes(x->basetime, sizeof(struct timespec));
+  }
 }
 
 void wiimote_setup(void)
 {
+  g_clock = clock_new(NULL, (t_method)wiimote_dequeue);
+
 	wiimote_class = class_new(gensym("wiimote"), (t_newmethod)wiimote_new, (t_method)wiimote_free, sizeof(t_wiimote), CLASS_DEFAULT, A_GIMME, 0);
 
 	class_addmethod(wiimote_class, (t_method) wiimote_debug, gensym("debug"), 0);
