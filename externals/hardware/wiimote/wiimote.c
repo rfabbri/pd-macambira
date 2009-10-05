@@ -1,5 +1,5 @@
 // ===================================================================
-// Wiimote external for Puredata
+// Wiiremote external for Puredata
 // Written by Mike Wozniewki (Feb 2007), www.mikewoz.com
 //
 // Requires the CWiid library (version 0.6.00) by L. Donnie Smith
@@ -22,7 +22,7 @@
 
 //  ChangeLog:
 //  2008-04-14 Florian Krebs 
-//  * adapt wiimote external for the actual version of cwiid (0.6.00)
+//  * adapt wiiremote external for the actual version of cwiid (0.6.00)
 //  2009-09-14 IOhannes m zmölnig
 //    * made it compile without private cwiid-headers
 
@@ -43,80 +43,61 @@ struct acc {
 	unsigned char z;
 };
 
-/* Wiimote Callback */
-cwiid_mesg_callback_t cwiid_callback;
-
-// class and struct declarations for wiimote pd external:
-static t_class *cwiid_class;
-typedef struct _wiimote
+// class and struct declarations for wiiremote pd external:
+static t_class *wiiremote_class;
+typedef struct _wiiremote
 {
 	t_object x_obj; // standard pd object (must be first in struct)
 	
-	cwiid_wiimote_t *wiimote; // individual wiimote handle per pd object, represented in libcwiid
+	cwiid_wiimote_t *wiiremote; // individual wiiremote handle per pd object, represented in libcwiid
 
 	t_float connected;
-	int wiimoteID;
-	
-	t_float toggle_acc, toggle_ir, toggle_nc;
+	int wiiremoteID;
 
-	struct acc acc_zero, acc_one; // acceleration
-	struct acc nc_acc_zero, nc_acc_one; // nunchuck acceleration
 
-	// We store atom list for each data type so we don't waste time
-	// allocating memory at every callback:
-	t_atom btn_atoms[2];
-	t_atom acc_atoms[3];
-	t_atom ir_atoms[4];
-	t_atom nc_btn_atoms[2];
-	t_atom nc_acc_atoms[3];
-	t_atom nc_stick_atoms[2];
-	
+	int reportMode;
+
+	struct acc_cal acc_cal; /* calibration for built-in accelerometer */
+	struct acc_cal nc_acc_cal;  /* calibration for nunchuk accelerometer */
+
 	// outlets:
-	t_outlet *outlet_btn;
-	t_outlet *outlet_acc;
-	t_outlet *outlet_ir;
-	t_outlet *outlet_nc_btn;
-	t_outlet *outlet_nc_acc;
-	t_outlet *outlet_nc_stick;
-	
-} t_wiimote;
+	t_outlet *outlet_data;	
+} t_wiiremote;
 
 
-
-
-// For now, we make one global t_wiimote pointer that we can refer to
+// For now, we make one global t_wiiremote pointer that we can refer to
 // in the cwiid_callback. This means we can support maximum of ONE
-// wiimote. ARGH. We'll have to figure out how to have access to the
+// wiiremote. ARGH. We'll have to figure out how to have access to the
 // pd object from the callback (without modifying the CWiid code):
-#define MAX_WIIMOTES 14
+#define MAX_WIIREMOTES 14
 
-typedef struct _wiimoteList {
-  t_wiimote*x;
+typedef struct _wiiremoteList {
+  t_wiiremote*x;
   int id;
-  struct _wiimoteList*next;
-} t_wiimoteList;
+  struct _wiiremoteList*next;
+} t_wiiremoteList;
 
-t_wiimoteList*g_wiimoteList=NULL;
+t_wiiremoteList*g_wiiremoteList=NULL;
 
-int addWiimoteObject(t_wiimote*x, int id) {
-  t_wiimoteList*wl=g_wiimoteList;
-  t_wiimoteList*newentry=NULL;
+static int addWiiremoteObject(t_wiiremote*x, int id) {
+  t_wiiremoteList*wl=g_wiiremoteList;
+  t_wiiremoteList*newentry=NULL;
   if(NULL!=wl) {
     while(wl->next) {
       
       if(wl->x == x) {
-        pd_error(x, "[wiimote]: already bound to Wii%02d", wl->id);
+        pd_error(x, "[wiiremote]: already bound to Wii%02d", wl->id);
         return 0;
       }
       if(wl->id == id) {
-        pd_error(x, "[wiimote]: another object is already bound to Wii%02d", wl->id);
+        pd_error(x, "[wiiremote]: another object is already bound to Wii%02d", wl->id);
         return 0;
       }
       wl=wl->next;
     }
   }
 
-  newentry=(t_wiimoteList*)getbytes(sizeof(t_wiimoteList));
+  newentry=(t_wiiremoteList*)getbytes(sizeof(t_wiiremoteList));
   newentry->next=NULL;
   newentry->x=x;
   newentry->id=id;
@@ -124,13 +105,13 @@ int addWiimoteObject(t_wiimote*x, int id) {
   if(wl)
     wl->next=newentry;
   else 
-    g_wiimoteList=newentry;
+    g_wiiremoteList=newentry;
 
   return 1;
 }
 
-t_wiimote*getWiimoteObject(const int id) {
-  t_wiimoteList*wl=g_wiimoteList;
+static t_wiiremote*getWiiremoteObject(const int id) {
+  t_wiiremoteList*wl=g_wiiremoteList;
   if(NULL==wl)
     return NULL;
 
@@ -143,9 +124,9 @@ t_wiimote*getWiimoteObject(const int id) {
   return NULL;
 }
 
-void removeWiimoteObject(const t_wiimote*x) {
-  t_wiimoteList*wl=g_wiimoteList;
-  t_wiimoteList*last=NULL;
+static void removeWiiremoteObject(const t_wiiremote*x) {
+  t_wiiremoteList*wl=g_wiiremoteList;
+  t_wiiremoteList*last=NULL;
   if(NULL==wl)
     return;
 
@@ -154,12 +135,12 @@ void removeWiimoteObject(const t_wiimote*x) {
       if(last) {
         last->next=wl->next;
       } else {
-        g_wiimoteList=wl->next;
+        g_wiiremoteList=wl->next;
       }
       wl->x=NULL;
       wl->id=0;
       wl->next=NULL;
-      freebytes(wl, sizeof(t_wiimoteList));
+      freebytes(wl, sizeof(t_wiiremoteList));
 
       return;
     }
@@ -171,102 +152,101 @@ void removeWiimoteObject(const t_wiimote*x) {
 
 
 // ==============================================================
-void cwiid_debug(t_wiimote *x)
+static void wiiremote_debug(t_wiiremote *x)
 {
 	post("\n======================");
-	if (x->connected) post("Wiimote (id: %d) is connected.", x->wiimoteID);
-	else post("Wiimote (id: %d) is NOT connected.", x->wiimoteID);
-  post("acceleration: %s", (x->toggle_acc)?"ON":"OFF");
-  post("IR: %s", (x->toggle_ir)?"ON":"OFF");
-  post("nunchuck: %s", (x->toggle_nc)?"ON":"OFF");
+	if (x->connected) post("Wiiremote (id: %d) is connected.", x->wiiremoteID);
+	else post("Wiiremote (id: %d) is NOT connected.", x->wiiremoteID);
+  post("acceleration: %s", (x->reportMode & CWIID_RPT_ACC)?"ON":"OFF");
+  post("IR: %s", (x->reportMode & CWIID_RPT_IR)?"ON":"OFF");
+  post("extensions: %s",  (x->reportMode & CWIID_RPT_EXT)?"ON":"OFF");
 	post("");
-	post("Accelerometer calibration: zero=(%d,%d,%d) one=(%d,%d,%d)",x->acc_zero.x,x->acc_zero.y,x->acc_zero.z,x->acc_one.x,x->acc_one.y,x->acc_one.z);
-	post("Nunchuck calibration:      zero=(%d,%d,%d) one=(%d,%d,%d)",x->nc_acc_zero.x,x->nc_acc_zero.y,x->nc_acc_zero.z,x->nc_acc_one.x,x->nc_acc_one.y,x->nc_acc_one.z);
+	post("Accelerometer calibration: zero=(%d,%d,%d) one=(%d,%d,%d)",				 
+			 x->acc_cal.zero[CWIID_X], x->acc_cal.zero[CWIID_Y], x->acc_cal.zero[CWIID_Z],
+			 x->acc_cal.one [CWIID_X], x->acc_cal.one [CWIID_Y], x->acc_cal.one [CWIID_Z]);
+	post("Nunchuk calibration:      zero=(%d,%d,%d) one=(%d,%d,%d)",
+			 x->nc_acc_cal.zero[CWIID_X], x->nc_acc_cal.zero[CWIID_Y], x->nc_acc_cal.zero[CWIID_Z],
+			 x->nc_acc_cal.one [CWIID_X], x->nc_acc_cal.one [CWIID_Y], x->nc_acc_cal.one [CWIID_Z]);
+			 
 	
 
 }
 
 // ==============================================================
 
-// Button handler:
-void cwiid_btn(t_wiimote *x, struct cwiid_btn_mesg *mesg)
+static void wiiremote_cwiid_battery(t_wiiremote *x, int battery)
 {
-	SETFLOAT(x->btn_atoms+0, (mesg->buttons & 0xFF00)>>8);
-	SETFLOAT(x->btn_atoms+1, mesg->buttons & 0x00FF);
-	outlet_anything(x->outlet_btn, &s_list, 2, x->btn_atoms);
-/*
-	if (mesg->buttons & CWIID_BTN_UP) {}
-	if (mesg->buttons & CWIID_BTN_DOWN) {}
-	if (mesg->buttons & CWIID_BTN_LEFT) {}
-	if (mesg->buttons & CWIID_BTN_RIGHT) {}
-	if (mesg->buttons & CWIID_BTN_A) {}
-	if (mesg->buttons & CWIID_BTN_B) {}
-	if (mesg->buttons & CWIID_BTN_MINUS) {}
-	if (mesg->buttons & CWIID_BTN_PLUS) {}
-	if (mesg->buttons & CWIID_BTN_HOME) {}
-	if (mesg->buttons & CWIID_BTN_1) {}
-	if (mesg->buttons & CWIID_BTN_2) {}
-*/
-	
+	t_atom ap[1];
+	t_float bat=(1.f*battery) / CWIID_BATTERY_MAX;
+
+	SETFLOAT(ap+0, bat);
+
+	verbose(1, "Battery: %d%%", (int) (100*bat));
+
+	outlet_anything(x->outlet_data, gensym("battery"), 1, ap);
+}
+
+// Button handler:
+static void wiiremote_cwiid_btn(t_wiiremote *x, struct cwiid_btn_mesg *mesg)
+{
+	t_atom ap[2];
+	SETFLOAT(ap+0, (mesg->buttons & 0xFF00)>>8);
+	SETFLOAT(ap+1, mesg->buttons & 0x00FF);
+	outlet_anything(x->outlet_data, gensym("button"), 2, ap);
 }
 
 
-void cwiid_acc(t_wiimote *x, struct cwiid_acc_mesg *mesg)
+static void wiiremote_cwiid_acc(t_wiiremote *x, struct cwiid_acc_mesg *mesg)
 {
-	if (x->toggle_acc)
-	{
-		double a_x, a_y, a_z;
+	double a_x, a_y, a_z;
+	t_atom ap[3];
 		
-		a_x = ((double)mesg->acc[CWIID_X] - x->acc_zero.x) / (x->acc_one.x - x->acc_zero.x);
-		a_y = ((double)mesg->acc[CWIID_Y] - x->acc_zero.y) / (x->acc_one.y - x->acc_zero.y);
-		a_z = ((double)mesg->acc[CWIID_Z] - x->acc_zero.z) / (x->acc_one.z - x->acc_zero.z);
+	a_x = ((double)mesg->acc[CWIID_X] - x->acc_cal.zero[CWIID_X]) / (x->acc_cal.one[CWIID_X] - x->acc_cal.zero[CWIID_X]);
+	a_y = ((double)mesg->acc[CWIID_Y] - x->acc_cal.zero[CWIID_Y]) / (x->acc_cal.one[CWIID_Y] - x->acc_cal.zero[CWIID_Y]);
+	a_z = ((double)mesg->acc[CWIID_Z] - x->acc_cal.zero[CWIID_Z]) / (x->acc_cal.one[CWIID_Z] - x->acc_cal.zero[CWIID_Z]);
 		
-		/*
+	/*
 		double a, roll, pitch;
 		a = sqrt(pow(a_x,2)+pow(a_y,2)+pow(a_z,2));
 		roll = atan(a_x/a_z);
 		if (a_z <= 0.0) roll += PI * ((a_x > 0.0) ? 1 : -1);
 		roll *= -1;
 		pitch = atan(a_y/a_z*cos(roll));
-		*/
+	*/
+
 		
-		SETFLOAT(x->acc_atoms+0, a_x);
-		SETFLOAT(x->acc_atoms+1, a_y);
-		SETFLOAT(x->acc_atoms+2, a_z);
-		outlet_anything(x->outlet_acc, &s_list, 3, x->acc_atoms);
-	}
+	SETFLOAT(ap+0, a_x);
+	SETFLOAT(ap+1, a_y);
+	SETFLOAT(ap+2, a_z);
+	outlet_anything(x->outlet_data, gensym("acceleration"), 3, ap);
 	
 }
 
-void cwiid_ir(t_wiimote *x, struct cwiid_ir_mesg *mesg)
+static void wiiremote_cwiid_ir(t_wiiremote *x, struct cwiid_ir_mesg *mesg)
 {
 	unsigned int i;
 
-	if (x->toggle_ir)
-	{
-		//post("IR (valid,x,y,size) #%d: %d %d %d %d", i, data->ir_data.ir_src[i].valid, data->ir_data.ir_src[i].x, data->ir_data.ir_src[i].y, data->ir_data.ir_src[i].size);
-		for (i=0; i<CWIID_IR_SRC_COUNT; i++)
-		{		
-			if (mesg->src[i].valid)
-			{
-				SETFLOAT(x->ir_atoms+0, i);
-				SETFLOAT(x->ir_atoms+1, mesg->src[i].pos[CWIID_X]);
-				SETFLOAT(x->ir_atoms+2, mesg->src[i].pos[CWIID_Y]);
-				SETFLOAT(x->ir_atoms+3, mesg->src[i].size);
-				outlet_anything(x->outlet_ir, &s_list, 4, x->ir_atoms);
-			}
+	//post("IR (valid,x,y,size) #%d: %d %d %d %d", i, data->ir_data.ir_src[i].valid, data->ir_data.ir_src[i].x, data->ir_data.ir_src[i].y, data->ir_data.ir_src[i].size);
+	for (i=0; i<CWIID_IR_SRC_COUNT; i++){		
+		if (mesg->src[i].valid) {
+			t_atom ap[4];
+			SETFLOAT(ap+0, i);
+			SETFLOAT(ap+1, mesg->src[i].pos[CWIID_X]);
+			SETFLOAT(ap+2, mesg->src[i].pos[CWIID_Y]);
+			SETFLOAT(ap+3, mesg->src[i].size);
+			outlet_anything(x->outlet_data, gensym("ir"), 4, ap);
 		}
 	}
 }
 
-
-void cwiid_nunchuk(t_wiimote *x, struct cwiid_nunchuk_mesg *mesg)
+static void wiiremote_cwiid_nunchuk(t_wiiremote *x, struct cwiid_nunchuk_mesg *mesg)
 {
+	t_atom ap[4];
 	double a_x, a_y, a_z;
 
-	a_x = ((double)mesg->acc[CWIID_X] - x->nc_acc_zero.x) / (x->nc_acc_one.x - x->nc_acc_zero.x);
-	a_y = ((double)mesg->acc[CWIID_Y] - x->nc_acc_zero.y) / (x->nc_acc_one.y - x->nc_acc_zero.y);
-	a_z = ((double)mesg->acc[CWIID_Z] - x->nc_acc_zero.z) / (x->nc_acc_one.z - x->nc_acc_zero.z);
+	a_x = ((double)mesg->acc[CWIID_X] - x->nc_acc_cal.zero[CWIID_X]) / (x->nc_acc_cal.one[CWIID_X] - x->nc_acc_cal.zero[CWIID_X]);
+	a_y = ((double)mesg->acc[CWIID_Y] - x->nc_acc_cal.zero[CWIID_Y]) / (x->nc_acc_cal.one[CWIID_Y] - x->nc_acc_cal.zero[CWIID_Y]);
+	a_z = ((double)mesg->acc[CWIID_Z] - x->nc_acc_cal.zero[CWIID_Z]) / (x->nc_acc_cal.one[CWIID_Z] - x->nc_acc_cal.zero[CWIID_Z]);
 
 	/*
 	double a, roll, pitch;
@@ -279,153 +259,350 @@ void cwiid_nunchuk(t_wiimote *x, struct cwiid_nunchuk_mesg *mesg)
 	
 	if (mesg->buttons & CWIID_NUNCHUK_BTN_C) {}
 	if (mesg->buttons & CWIID_NUNCHUK_BTN_Z) {}
-	outlet_float(x->outlet_nc_btn, mesg->buttons);
+	/* nunchuk button */
+	SETSYMBOL(ap+0, gensym("button"));
+	SETFLOAT (ap+1, (t_float)mesg->buttons);
+	outlet_anything(x->outlet_data, gensym("nunchuk"), 2, ap);
 	
-	SETFLOAT(x->nc_acc_atoms+0, a_x);
-	SETFLOAT(x->nc_acc_atoms+1, a_y);
-	SETFLOAT(x->nc_acc_atoms+2, a_z);
-	outlet_anything(x->outlet_nc_acc, &s_list, 3, x->nc_acc_atoms);
+
+	/* nunchuk button */
+	SETSYMBOL(ap+0, gensym("acceleration"));
+	SETFLOAT (ap+1, a_x);
+	SETFLOAT (ap+2, a_y);
+	SETFLOAT (ap+3, a_z);
+	outlet_anything(x->outlet_data, gensym("nunchuk"), 4, ap);
 	
-	SETFLOAT(x->nc_stick_atoms+0, mesg->stick[CWIID_X]);
-	SETFLOAT(x->nc_stick_atoms+1, mesg->stick[CWIID_Y]);
-	outlet_anything(x->outlet_nc_stick, &s_list, 2, x->nc_stick_atoms);
-	
+	/* nunchuk button */
+	SETSYMBOL(ap+0, gensym("stick"));
+	SETFLOAT (ap+1, mesg->stick[CWIID_X]);
+	SETFLOAT (ap+2, mesg->stick[CWIID_Y]);
+	outlet_anything(x->outlet_data, gensym("nunchuk"), 3, ap);
 }
 
+#ifdef CWIID_RPT_CLASSIC
+static void wiiremote_cwiid_classic(t_wiiremote *x, struct cwiid_classic_mesg *mesg)
+{
+	t_atom ap[3];
+
+	//	t_float scale = 1.f / ((uint16_t)0xFFFF);
+
+	SETSYMBOL(ap+0, gensym("left_stick"));
+	SETFLOAT (ap+1, mesg->l_stick[CWIID_X]);
+	SETFLOAT (ap+2, mesg->l_stick[CWIID_Y]);
+	outlet_anything(x->outlet_data, gensym("classic"), 3, ap);
+
+	SETSYMBOL(ap+0, gensym("right_stick"));
+	SETFLOAT (ap+1, mesg->r_stick[CWIID_X]);
+	SETFLOAT (ap+2, mesg->r_stick[CWIID_Y]);
+	outlet_anything(x->outlet_data, gensym("classic"), 3, ap);
+
+
+	SETSYMBOL(ap+0, gensym("left"));
+	SETFLOAT (ap+1, mesg->l);
+	outlet_anything(x->outlet_data, gensym("classic"), 2, ap);
+
+	SETSYMBOL(ap+0, gensym("right"));
+	SETFLOAT (ap+1, mesg->r);
+	outlet_anything(x->outlet_data, gensym("classic"), 2, ap);
+
+
+	SETSYMBOL(ap+0, gensym("button"));
+	SETFLOAT(ap+1, (mesg->buttons & 0xFF00)>>8);
+	SETFLOAT(ap+2, mesg->buttons & 0x00FF);
+
+	outlet_anything(x->outlet_data, gensym("classic"), 3, ap);
+
+
+}
+#endif
+
+#ifdef CWIID_RPT_BALANCE
+#warning Balance ignores calibration data
+static void wiiremote_cwiid_balance_output(t_wiiremote *x, t_symbol*s, uint16_t value[3], t_float scale)
+{
+	t_atom ap[4];
+	t_float a = scale*value[CWIID_X];
+	t_float b = scale*value[CWIID_Y];
+	t_float c = scale*value[CWIID_Z];
+
+	SETSYMBOL(ap+0, s);
+	SETFLOAT (ap+1, a);
+	SETFLOAT (ap+2, b);
+	SETFLOAT (ap+3, c);
+	outlet_anything(x->outlet_data, gensym("balance"), 4, ap);
+}
+
+static void wiiremote_cwiid_balance(t_wiiremote *x, struct cwiid_balance_mesg *mesg)
+{
+	t_float scale = 1.f / ((uint16_t)0xFFFF);
+	wiiremote_cwiid_balance_output(x, gensym("right_top"), &mesg->right_top, scale);
+	wiiremote_cwiid_balance_output(x, gensym("right_bottom"), &mesg->right_bottom, scale);
+	wiiremote_cwiid_balance_output(x, gensym("left_top"), &mesg->left_top, scale);
+	wiiremote_cwiid_balance_output(x, gensym("left_bottom"), &mesg->left_bottom, scale);
+}
+#endif
+
+#ifdef CWIID_RPT_MOTIONPLUS
+static void wiiremote_cwiid_motionplus(t_wiiremote *x, struct cwiid_motionplus_mesg *mesg)
+{
+	t_atom ap[4];
+	t_float scale = 1.f;// / ((uint16_t)0xFFFF);
+
+	t_float phi  = scale*mesg->angle_rate[CWIID_PHI];
+	t_float theta= scale*mesg->angle_rate[CWIID_THETA];
+	t_float psi  = scale*mesg->angle_rate[CWIID_PSI];
+
+	t_float phi_speed   = 1.;
+	t_float theta_speed = 1.;
+	t_float psi_speed   = 1.;
+
+
+	SETSYMBOL(ap+0, gensym("low_speed"));
+#ifdef HAVE_CWIID_MOTIONPLUS_LOWSPEED
+	phi_speed  = mesg->low_speed[CWIID_PHI];
+	theta_speed= mesg->low_speed[CWIID_THETA];
+	psi_speed  = mesg->low_speed[CWIID_PSI];
+#endif
+	SETFLOAT (ap+1, phi_speed);
+	SETFLOAT (ap+2, theta_speed);
+	SETFLOAT (ap+3, psi_speed);
+	outlet_anything(x->outlet_data, gensym("motionplus"), 4, ap);
+
+
+	SETSYMBOL(ap+0, gensym("angle_rate"));
+	SETFLOAT (ap+1, phi);
+	SETFLOAT (ap+2, theta);
+	SETFLOAT (ap+3, psi);
+	outlet_anything(x->outlet_data, gensym("motionplus"), 4, ap);
+}
+#endif
+
+
+
+static void wiiremote_cwiid_message(t_wiiremote *x, union cwiid_mesg mesg) {
+	switch (mesg.type) {
+	case CWIID_MESG_STATUS:
+		wiiremote_cwiid_battery(x, mesg.status_mesg.battery);
+		switch (mesg.status_mesg.ext_type) {
+		case CWIID_EXT_NONE:
+			post("No extension attached");
+			break;
+		case CWIID_EXT_NUNCHUK:
+			post("Nunchuk extension attached");
+			if(cwiid_get_acc_cal(x->wiiremote, CWIID_EXT_NUNCHUK, &x->nc_acc_cal)) {
+				post("Unable to retrieve nunchuk calibration");
+			} else {
+				post("Retrieved nunchuk calibration: zero=(%02d,%02d,%02d) one=(%02d,%02d,%02d)",
+						 x->nc_acc_cal.zero[CWIID_X],
+						 x->nc_acc_cal.zero[CWIID_Y],
+						 x->nc_acc_cal.zero[CWIID_Z],
+						 x->nc_acc_cal.one [CWIID_X],
+						 x->nc_acc_cal.one [CWIID_Y],
+						 x->nc_acc_cal.one [CWIID_Z]);
+			}
+			break;
+		case CWIID_EXT_CLASSIC:
+			post("Classic controller attached. There is no support for this yet.");
+			break;
+		case CWIID_EXT_BALANCE:
+			post("Balance controller attached. There is no support for this yet.");
+			break;
+		case CWIID_EXT_MOTIONPLUS:
+			post("MotionPlus controller attached.");
+			/* no calibration needed for MotionPlus */
+			break;
+		case CWIID_EXT_UNKNOWN:
+			post("Unknown extension attached");
+			break;
+		default:
+			post("ext mesg %d unknown", mesg.status_mesg.ext_type);
+			break;
+		}
+		break;
+	case CWIID_MESG_BTN:
+		wiiremote_cwiid_btn(x, &mesg.btn_mesg);
+		break;
+	case CWIID_MESG_ACC:
+		wiiremote_cwiid_acc(x, &mesg.acc_mesg);
+		break;
+	case CWIID_MESG_IR:
+		wiiremote_cwiid_ir(x, &mesg.ir_mesg);
+		break;
+#ifdef CWIID_RPT_NUNCHUK
+	case CWIID_MESG_NUNCHUK:
+		wiiremote_cwiid_nunchuk(x, &mesg.nunchuk_mesg);
+		break;
+#endif
+#ifdef CWIID_RPT_CLASSIC
+	case CWIID_MESG_CLASSIC:
+		wiiremote_cwiid_classic(x, &mesg.classic_mesg);
+		// todo
+		break;
+#endif
+#ifdef CWIID_RPT_MOTIONPLUS
+	case CWIID_MESG_MOTIONPLUS:
+		wiiremote_cwiid_motionplus(x, &mesg.motionplus_mesg);
+		break;
+#endif
+#ifdef CWIID_RPT_BALANCE
+	case CWIID_MESG_BALANCE:
+		wiiremote_cwiid_balance(x, &mesg.balance_mesg);
+		break;
+#endif
+	default:
+		post("mesg %d unknown", (mesg.type));
+		break;
+	}
+}
+
+
+static void print_timestamp(struct timespec*timestamp, struct timespec*reference) {
+	double t0=timestamp->tv_sec*1000. + (timestamp->tv_nsec) / 1000000.;
+	double t1=0;
+	double t=0;
+	if(reference) {
+		t1=reference->tv_sec*1000. + (reference->tv_nsec) / 1000000.;
+	}
+
+	t=t0-t1;
+
+	post("timestamp: %f", (t));
+
+}
+
+
 // The CWiid library invokes a callback function whenever events are
-// generated by the wiimote. This function is specified when connecting
-// to the wiimote (in the cwiid_open function).
+// generated by the wiiremote. This function is specified when connecting
+// to the wiiremote (in the cwiid_open function).
 
 // Unfortunately, the mesg struct passed as an argument to the
-// callback does not have a pointer to the wiimote instance, and it
-// is thus impossible to know which wiimote has invoked the callback.
+// callback does not have a pointer to the wiiremote instance, and it
+// is thus impossible to know which wiiremote-object has invoked the callback.
 // For this case we provide a hard-coded set of wrapper callbacks to
-// indicate which Pd wiimote instance to control.
+// indicate which Pd wiiremote instance to control.
 
-// So far I have only checked with one wiimote
+// So far I have only checked with one wiiremote
 
-/*void cwiid_callback(cwiid_wiimote_t *wiimt, int mesg_count, union cwiid_mesg *mesg[], struct timespec *timestamp)
+/*void cwiid_callback(cwiid_wiiremote_t *wiimt, int mesg_count, union cwiid_mesg *mesg[], struct timespec *timestamp)
 */
-void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
+static void cwiid_callback(cwiid_wiimote_t *wiiremote, int mesg_count,
                     union cwiid_mesg mesg_array[], struct timespec *timestamp)
 {
-	unsigned char buf[7];
 	int i;
-  t_wiimote *x=NULL;
+  t_wiiremote *x=NULL;
 
-  if(g_wiimoteList==NULL||wiimote==NULL) {
+	static struct timespec*ts=NULL;
+	if(NULL==ts) {
+		ts=(struct timespec*)getbytes(sizeof(struct timespec));
+		ts->tv_sec  =timestamp->tv_sec;
+		ts->tv_nsec =timestamp->tv_nsec;
+	}
+
+  if(g_wiiremoteList==NULL||wiiremote==NULL) {
     post("no wii's known");
     return;
   }
-  x=getWiimoteObject(cwiid_get_id(wiimote));
+  x=getWiiremoteObject(cwiid_get_id(wiiremote));
   if(NULL==x) {
-		post("no wiimote loaded: %d%",cwiid_get_id(wiimote));
+		post("no wiiremote loaded: %d%",cwiid_get_id(wiiremote));
     return;
 	}
-			
-  for (i=0; i < mesg_count; i++)
-		{	
-			switch (mesg_array[i].type) {
-      case CWIID_MESG_STATUS:
-        post("Battery: %d%", (int) (100.0 * mesg_array[i].status_mesg.battery / CWIID_BATTERY_MAX));
-        switch (mesg_array[i].status_mesg.ext_type) {
-        case CWIID_EXT_NONE:
-          post("No nunchuck attached");
-          break;
-        case CWIID_EXT_NUNCHUK:
-          post("Nunchuck extension attached");
-						
-          if (cwiid_read(x->wiimote, CWIID_RW_REG | CWIID_RW_DECODE, 0xA40020, 								7, buf)) {
-            post("Unable to retrieve Nunchuk calibration");
-          }
-          else {
-            x->nc_acc_zero.x = buf[0];
-            x->nc_acc_zero.y = buf[1];
-            x->nc_acc_zero.z = buf[2];
-            x->nc_acc_one.x  = buf[4];
-            x->nc_acc_one.y  = buf[5];
-            x->nc_acc_one.z  = buf[6];
-          }	
-          break;
-        case CWIID_EXT_CLASSIC:
-          post("Classic controller attached. There is no support for this yet.");
-          break;
-        case CWIID_EXT_UNKNOWN:
-          post("Unknown extension attached");
-          break;
-        }
-        break;
-      case CWIID_MESG_BTN:
-        cwiid_btn(x, &mesg_array[i].btn_mesg);
-        break;
-      case CWIID_MESG_ACC:
-        cwiid_acc(x, &mesg_array[i].acc_mesg);
-        break;
-      case CWIID_MESG_IR:
-        cwiid_ir(x, &mesg_array[i].ir_mesg);
-        break;
-      case CWIID_MESG_NUNCHUK:
-        cwiid_nunchuk(x, &mesg_array[i].nunchuk_mesg);
-        break;
-      case CWIID_MESG_CLASSIC:
-        // todo
-        break;
-      default:
-        break;
-      }
-    }
+
+  //print_timestamp(timestamp, ts);
+  for (i=0; i < mesg_count; i++) {
+		wiiremote_cwiid_message(x, mesg_array[i]);
+	}
 }
 
 // ==============================================================
 
-
-
-void cwiid_setReportMode(t_wiimote *x, t_floatarg r)
+static void wiiremote_status(t_wiiremote *x)
 {
-	unsigned char rpt_mode;
-
-	if (r >= 0) rpt_mode = (unsigned char) r;
-	else {
-		rpt_mode = CWIID_RPT_STATUS | CWIID_RPT_BTN;
-		if (x->toggle_ir) rpt_mode |= CWIID_RPT_IR;
-		if (x->toggle_acc) rpt_mode |= CWIID_RPT_ACC;
-		if (x->toggle_nc) rpt_mode |= CWIID_RPT_EXT;
-	}
-	if (x->connected)
-	{
-    verbose(1, "changing report mode for Wii%02d to %d", x->wiimoteID, rpt_mode);
-		if (cwiid_command(x->wiimote, CWIID_CMD_RPT_MODE, rpt_mode)) {
-			post("wiimote error: problem setting report mode.");
+	if(x->connected) {
+		if (cwiid_request_status(x->wiiremote)) {
+			pd_error(x, "error requesting status message");
 		}
 	}
 }
 
-void cwiid_reportAcceleration(t_wiimote *x, t_floatarg f)
-{
-	x->toggle_acc = f;
-	cwiid_setReportMode(x, -1);
-}
 
-void cwiid_reportIR(t_wiimote *x, t_floatarg f)
+static void wiiremote_resetReportMode(t_wiiremote *x)
 {
-	x->toggle_ir = f;
-	cwiid_setReportMode(x, -1);
-}
-
-void cwiid_reportNunchuck(t_wiimote *x, t_floatarg f)
-{
-	x->toggle_nc = f;
-	cwiid_setReportMode(x, -1);
-}
-void cwiid_setRumble(t_wiimote *x, t_floatarg f)
-{
-	if (x->connected)
-	{
-		if (cwiid_command(x->wiimote, CWIID_CMD_RUMBLE, f)) post("wiiremote error: problem setting rumble.");
+	if (x->connected)	{
+		verbose(1, "changing report mode for Wii%02d to %d", x->wiiremoteID, x->reportMode);
+		if (cwiid_command(x->wiiremote, CWIID_CMD_RPT_MODE, x->reportMode)) {
+			post("wiiremote error: problem setting report mode.");
+		}
 	}
 }
 
-void cwiid_setLED(t_wiimote *x, t_floatarg f)
+
+static void wiiremote_setReportMode(t_wiiremote *x, t_floatarg r)
+{
+	if (r >= 0) {
+		x->reportMode = (int) r;
+		wiiremote_resetReportMode(x);
+	}	else {
+		return;
+	}
+}
+
+
+static void wiiremote_report(t_wiiremote*x, int flag, int onoff)
+{
+	if(onoff) {
+		x->reportMode |= flag;
+	} else {
+		x->reportMode &= ~flag;
+	}
+	wiiremote_resetReportMode(x);
+}
+
+static void wiiremote_reportAcceleration(t_wiiremote *x, t_floatarg f)
+{
+	wiiremote_report(x, CWIID_RPT_ACC, f);
+}
+
+static void wiiremote_reportIR(t_wiiremote *x, t_floatarg f)
+{
+	wiiremote_report(x, CWIID_RPT_IR, f);
+}
+
+static void wiiremote_reportNunchuk(t_wiiremote *x, t_floatarg f)
+{
+	wiiremote_report(x, CWIID_RPT_EXT, f);
+}
+
+static void wiiremote_reportMotionplus(t_wiiremote *x, t_floatarg f)
+{
+#ifdef CWIID_RPT_MOTIONPLUS
+	int flag=f;
+	if (x->connected)	{
+		verbose(1, "changing motionplus report mode for Wii%02d to %d", x->wiiremoteID, flag);
+		int err=0;
+		if(flag) {
+			err=cwiid_enable(x->wiiremote, CWIID_FLAG_MOTIONPLUS);
+		} else {
+			err=cwiid_disable(x->wiiremote, CWIID_FLAG_MOTIONPLUS);
+		}
+		if(err) {
+			pd_error(x, "turning %s motionplus returned %d", (flag?"on":"off"), err);
+		} else {
+			wiiremote_report(x, CWIID_RPT_MOTIONPLUS, f);
+		}
+	}
+#endif
+}
+
+static void wiiremote_setRumble(t_wiiremote *x, t_floatarg f)
+{
+	if (x->connected)
+	{
+		if (cwiid_command(x->wiiremote, CWIID_CMD_RUMBLE, f)) post("wiiremote error: problem setting rumble.");
+	}
+}
+
+static void wiiremote_setLED(t_wiiremote *x, t_floatarg f)
 {
 	// some possible values:
 	// CWIID_LED0_ON		0x01
@@ -434,7 +611,7 @@ void cwiid_setLED(t_wiimote *x, t_floatarg f)
 	// CWIID_LED3_ON		0x08
 	if (x->connected)
 	{
-		if (cwiid_command(x->wiimote, CWIID_CMD_LED, f)) post("wiiremote error: problem setting LED.");
+		if (cwiid_command(x->wiiremote, CWIID_CMD_LED, f)) post("wiiremote error: problem setting LED.");
 	}
 }
 
@@ -443,17 +620,16 @@ void cwiid_setLED(t_wiimote *x, t_floatarg f)
 // ==============================================================
 
 
-// The following function attempts to connect to a wiimote at a
+// The following function attempts to connect to a wiiremote at a
 // specific address, provided as an argument. eg, 00:19:1D:70:CE:72
 // This address can be discovered by running the following command
 // in a console:
 //   hcitool scan | grep Nintendo
 
-void cwiid_doConnect(t_wiimote *x, t_symbol *addr, t_symbol *dongaddr)
+static void wiiremote_doConnect(t_wiiremote *x, t_symbol *addr, t_symbol *dongaddr)
 {
-	unsigned char buf[7];
-	int i;
 	bdaddr_t bdaddr;
+	unsigned int flags =  CWIID_FLAG_MESG_IFC;
 
 	bdaddr_t  dong_bdaddr;
 	bdaddr_t* dong_bdaddr_ptr=&dong_bdaddr;
@@ -478,76 +654,81 @@ void cwiid_doConnect(t_wiimote *x, t_symbol *addr, t_symbol *dongaddr)
 		str2ba(dongaddr->s_name, &dong_bdaddr);
 	} 	
 	// connect:
-	
+
+
 #if 0
-#warning florian, you cannot just change the cwiid_open() function
-  x->wiimote = cwiid_open(&bdaddr, dong_bdaddr_ptr, CWIID_FLAG_MESG_IFC);
+  x->wiiremote = cwiid_open(&bdaddr, dong_bdaddr_ptr, flags);
 #else
-  x->wiimote = cwiid_open(&bdaddr, CWIID_FLAG_MESG_IFC);
+#warning multi-dongle support...
+  x->wiiremote = cwiid_open(&bdaddr, flags);
 #endif
 
-  if(NULL==x->wiimote) {
-		post("wiimote error: unable to connect");
+  if(NULL==x->wiiremote) {
+		post("wiiremote error: unable to connect");
     return;
   }
 
-  if(!addWiimoteObject(x, cwiid_get_id(x->wiimote))) {
-    cwiid_close(x->wiimote);
-    x->wiimote==NULL;
+  if(!addWiiremoteObject(x, cwiid_get_id(x->wiiremote))) {
+    cwiid_close(x->wiiremote);
+    x->wiiremote=NULL;
     return;
   }
 
-  x->wiimoteID= cwiid_get_id(x->wiimote);
+  x->wiiremoteID= cwiid_get_id(x->wiiremote);
   
-  post("wiimote %i is successfully connected", x->wiimoteID);
-  if (cwiid_read(x->wiimote, CWIID_RW_EEPROM, 0x16, 7, buf)) {
+  post("wiiremote %i is successfully connected", x->wiiremoteID);
+
+	if(cwiid_get_acc_cal(x->wiiremote, CWIID_EXT_NONE, &x->acc_cal)) {
     post("Unable to retrieve accelerometer calibration");
   } else {
-    x->acc_zero.x = buf[0];
-    x->acc_zero.y = buf[1];
-    x->acc_zero.z = buf[2];
-    x->acc_one.x  = buf[4];
-    x->acc_one.y  = buf[5];
-    x->acc_one.z  = buf[6];
-    //post("Retrieved wiimote calibration: zero=(%.1f,%.1f,%.1f) one=(%.1f,%.1f,%.1f)",buf[0],buf[2],buf[3],buf[4],buf[5],buf[6]);
+    post("Retrieved wiiremote calibration: zero=(%02d,%02d,%02d) one=(%02d,%02d,%02d)",
+				 x->acc_cal.zero[CWIID_X],
+				 x->acc_cal.zero[CWIID_Y],
+				 x->acc_cal.zero[CWIID_Z],
+				 x->acc_cal.one [CWIID_X],
+				 x->acc_cal.one [CWIID_Y],
+				 x->acc_cal.one [CWIID_Z]);
   }
 
   x->connected = 1;
-  cwiid_setReportMode(x,-1);
 
-  if (cwiid_set_mesg_callback(x->wiimote, &cwiid_callback)) {
+	x->reportMode |= CWIID_RPT_STATUS;
+	x->reportMode |= CWIID_RPT_BTN;
+  wiiremote_resetReportMode(x);
+
+  if (cwiid_set_mesg_callback(x->wiiremote, &cwiid_callback)) {
     pd_error(x, "Unable to set message callback");
   }
 }
 
-// The following function attempts to discover a wiimote. It requires
-// that the user puts the wiimote into 'discoverable' mode before being
+// The following function attempts to discover a wiiremote. It requires
+// that the user puts the wiiremote into 'discoverable' mode before being
 // called. This is done by pressing the red button under the battery
 // cover, or by pressing buttons 1 and 2 simultaneously.
 // TODO: Without pressing the buttons, I get a segmentation error. So far, I don't know why.
 
-void cwiid_discover(t_wiimote *x)
+static void wiiremote_discover(t_wiiremote *x)
 {
-	post("Put the wiimote into discover mode by pressing buttons 1 and 2 simultaneously.");
+	post("Put the wiiremote into discover mode by pressing buttons 1 and 2 simultaneously.");
 		
-	cwiid_doConnect(x, NULL, gensym("NULL"));
+	wiiremote_doConnect(x, NULL, gensym("NULL"));
 	if (!(x->connected))
 	{
-		post("Error: could not find any wiimotes. Please ensure that bluetooth is enabled, and that the 		'hcitool scan' command lists your Nintendo device.");
+		post("Error: could not find any wiiremotes. Please ensure that bluetooth is enabled, and that the 		'hcitool scan' command lists your Nintendo device.");
 	}
 }
 
-void cwiid_doDisconnect(t_wiimote *x)
+static void wiiremote_doDisconnect(t_wiiremote *x)
 {
 		
 	if (x->connected)
 	{
-		if (cwiid_close(x->wiimote)) {
-			post("wiimote error: problems when disconnecting.");
+		if (cwiid_close(x->wiiremote)) {
+			post("wiiremote error: problems when disconnecting.");
 		} 
 		else {
 			post("disconnect successfull, resetting values");
-            removeWiimoteObject(x);
+            removeWiiremoteObject(x);
 			x->connected = 0;
 		}
 	}
@@ -559,70 +740,66 @@ void cwiid_doDisconnect(t_wiimote *x)
 // ==============================================================
 // ==============================================================
 
-static void *cwiid_new(t_symbol* s, int argc, t_atom *argv)
+static void *wiiremote_new(t_symbol*s, int argc, t_atom *argv)
 {
-	bdaddr_t bdaddr; // wiimote bdaddr
-	t_wiimote *x = (t_wiimote *)pd_new(cwiid_class);
+	t_wiiremote *x = (t_wiiremote *)pd_new(wiiremote_class);
 	
 	// create outlets:
-	x->outlet_btn = outlet_new(&x->x_obj, &s_list);
-	x->outlet_acc = outlet_new(&x->x_obj, &s_list);
-	x->outlet_ir = outlet_new(&x->x_obj, &s_list);
-	x->outlet_nc_btn = outlet_new(&x->x_obj, &s_float);
-	x->outlet_nc_acc = outlet_new(&x->x_obj, &s_list);
-	x->outlet_nc_stick = outlet_new(&x->x_obj, &s_list);
+	x->outlet_data = outlet_new(&x->x_obj, NULL);
 
 	// initialize toggles:
-	x->toggle_acc = 0;
-	x->toggle_ir = 0;
-	x->toggle_nc = 0;
-
 	x->connected = 0;
-	x->wiimoteID = -1;
+	x->wiiremoteID = -1;
 	
 		// connect if user provided an address as an argument:
 		
 	if (argc==2)
 	{
-		post("conecting to provided address...");
+		post("[%s] connecting to provided address...", s->s_name);
 		if (argv->a_type == A_SYMBOL)
 		{
-			cwiid_doConnect(x, NULL, atom_getsymbol(argv));
+			wiiremote_doConnect(x, NULL, atom_getsymbol(argv));
 		} else {
-			error("[wiimote] expects either no argument, or a bluetooth address as an argument. eg, 00:19:1D:70:CE:72");
+			error("[wiiremote] expects either no argument, or a bluetooth address as an argument. eg, 00:19:1D:70:CE:72");
 			return NULL;
 		}
 	}
-	
-	
-
-	
-	
-
 	return (x);
 }
 
 
-static void cwiid_free(t_wiimote* x)
+static void wiiremote_free(t_wiiremote* x)
 {
-	cwiid_doDisconnect(x);
+	wiiremote_doDisconnect(x);
 }
 
-void wiimote_setup(void)
+void wiiremote_setup(void)
 {
-	int i;
-	
-	cwiid_class = class_new(gensym("wiimote"), (t_newmethod)cwiid_new, (t_method)cwiid_free, sizeof(t_wiimote), CLASS_DEFAULT, A_GIMME, 0);
-	class_addmethod(cwiid_class, (t_method) cwiid_debug, gensym("debug"), 0);
-	class_addmethod(cwiid_class, (t_method) cwiid_doConnect, gensym("connect"), A_SYMBOL, A_SYMBOL, 0);
-	class_addmethod(cwiid_class, (t_method) cwiid_doDisconnect, gensym("disconnect"), 0);
-	class_addmethod(cwiid_class, (t_method) cwiid_discover, gensym("discover"), 0);
-	class_addmethod(cwiid_class, (t_method) cwiid_setReportMode, gensym("setReportMode"), A_DEFFLOAT, 0);
-	class_addmethod(cwiid_class, (t_method) cwiid_reportAcceleration, gensym("reportAcceleration"), A_DEFFLOAT, 0);
-	class_addmethod(cwiid_class, (t_method) cwiid_reportNunchuck, gensym("reportNunchuck"), A_DEFFLOAT, 0);
-	class_addmethod(cwiid_class, (t_method) cwiid_reportIR, gensym("reportIR"), A_DEFFLOAT, 0);
-	class_addmethod(cwiid_class, (t_method) cwiid_setRumble, gensym("setRumble"), A_DEFFLOAT, 0);
-	class_addmethod(cwiid_class, (t_method) cwiid_setLED, gensym("setLED"), A_DEFFLOAT, 0);
+	wiiremote_class = class_new(gensym("wiiremote"), (t_newmethod)wiiremote_new, (t_method)wiiremote_free, sizeof(t_wiiremote), CLASS_DEFAULT, A_GIMME, 0);
+
+	class_addmethod(wiiremote_class, (t_method) wiiremote_debug, gensym("debug"), 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_status, gensym("status"), 0);
+
+
+	/* connection settings */
+	class_addmethod(wiiremote_class, (t_method) wiiremote_doConnect, gensym("connect"), A_DEFSYMBOL, A_DEFSYMBOL, 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_doDisconnect, gensym("disconnect"), 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_discover, gensym("discover"), 0);
+
+
+	/* query data */
+	class_addmethod(wiiremote_class, (t_method) wiiremote_setReportMode, gensym("setReportMode"), A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_reportAcceleration, gensym("reportAcceleration"), A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_reportIR, gensym("reportIR"), A_DEFFLOAT, 0);
+
+	class_addmethod(wiiremote_class, (t_method) wiiremote_reportNunchuk, gensym("reportNunchuck"), A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_reportNunchuk, gensym("reportNunchuk"), A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_reportMotionplus, gensym("reportMotionplus"), A_DEFFLOAT, 0);
+
+
+	/* set things on the wiimote */
+	class_addmethod(wiiremote_class, (t_method) wiiremote_setRumble, gensym("setRumble"), A_DEFFLOAT, 0);
+	class_addmethod(wiiremote_class, (t_method) wiiremote_setLED, gensym("setLED"), A_DEFFLOAT, 0);
 }
 
 
