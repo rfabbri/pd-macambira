@@ -157,7 +157,7 @@ static void print_timestamp(struct timespec*timestamp, struct timespec*reference
 
 	t=t0-t1;
 
-	post("timestamp: %f", (t));
+	post("timestamp: %f = %f-%f", (t), t0, t1);
 }
 
 static void wiimote_setbasetime(t_wiimote*x) {
@@ -175,23 +175,34 @@ static void wiimote_setbasetime(t_wiimote*x) {
 }
 
 static double wiimote_timestamp2logicaltime(t_wiimote*x, struct timespec*timestamp) {
-  if(x->basetime) {
-    double delay= /* how long (in ms) after we connected to the wiimote this timestamp appeared */
-      (timestamp->tv_sec - x->basetime->tv_sec) * 1000. +
-      (timestamp->tv_nsec - x->basetime->tv_nsec) / 1000000.;
+  double pddelay=clock_gettimesince(x->baselogicaltime); /* how long in logical time since we have connected to the wii */
+  double realdelay=0.;  /* how long (in ms) after we connected to the wiimote this timestamp appeared */
+  double delay=0.;
+  if(NULL==timestamp || NULL==x->basetime)
+    return 0.; /* immediately */
 
-    if(delay<0)
-      return 0.;
+  realdelay=
+    (timestamp->tv_sec - x->basetime->tv_sec) * 1000. +
+    (timestamp->tv_nsec - x->basetime->tv_nsec) / 1000000.;
 
-    return x->baselogicaltime + delay;
+  delay=realdelay-pddelay;
+
+#if 0
+  print_timestamp(timestamp, x->basetime);
+  post("logical time: %f = %f - %f", clock_gettimesince(x->baselogicaltime), now, x->baselogicaltime); 
+#endif
+  //post("diff = %f = %f - %f", realdelay-pddelay, realdelay, pddelay);
+
+  if(delay<0) {
+    return 0.;
   }
 
-  return 0.; /* immediately */
+  return realdelay;
 }
 
 
 typedef struct _wiimoteMsgList {
-  union cwiid_mesg mesg;
+  union cwiid_mesg*mesg;
   double timestamp;
   t_wiimote*x;
   struct _wiimoteMsgList*next; 
@@ -445,11 +456,11 @@ static void wiimote_cwiid_motionplus(t_wiimote *x, struct cwiid_motionplus_mesg 
 
 
 
-static void wiimote_cwiid_message(t_wiimote *x, union cwiid_mesg mesg) {
-	switch (mesg.type) {
+static void wiimote_cwiid_message(t_wiimote *x, union cwiid_mesg*mesg) {
+	switch (mesg->type) {
 	case CWIID_MESG_STATUS:
-		wiimote_cwiid_battery(x, mesg.status_mesg.battery);
-		switch (mesg.status_mesg.ext_type) {
+		wiimote_cwiid_battery(x, mesg->status_mesg.battery);
+		switch (mesg->status_mesg.ext_type) {
 		case CWIID_EXT_NONE:
 			verbose(1, "No extension attached");
 			break;
@@ -491,42 +502,42 @@ static void wiimote_cwiid_message(t_wiimote *x, union cwiid_mesg mesg) {
 			post("Unknown extension attached");
 			break;
 		default:
-			post("ext mesg %d unknown", mesg.status_mesg.ext_type);
+			post("ext mesg %d unknown", mesg->status_mesg.ext_type);
 			break;
 		}
 		break;
 	case CWIID_MESG_BTN:
-		wiimote_cwiid_btn(x, &mesg.btn_mesg);
+		wiimote_cwiid_btn(x, &mesg->btn_mesg);
 		break;
 	case CWIID_MESG_ACC:
-		wiimote_cwiid_acc(x, &mesg.acc_mesg);
+		wiimote_cwiid_acc(x, &mesg->acc_mesg);
 		break;
 	case CWIID_MESG_IR:
-		wiimote_cwiid_ir(x, &mesg.ir_mesg);
+		wiimote_cwiid_ir(x, &mesg->ir_mesg);
 		break;
 #ifdef CWIID_RPT_NUNCHUK
 	case CWIID_MESG_NUNCHUK:
-		wiimote_cwiid_nunchuk(x, &mesg.nunchuk_mesg);
+		wiimote_cwiid_nunchuk(x, &mesg->nunchuk_mesg);
 		break;
 #endif
 #ifdef CWIID_RPT_CLASSIC
 	case CWIID_MESG_CLASSIC:
-		wiimote_cwiid_classic(x, &mesg.classic_mesg);
+		wiimote_cwiid_classic(x, &mesg->classic_mesg);
 		// todo
 		break;
 #endif
 #ifdef CWIID_RPT_MOTIONPLUS
 	case CWIID_MESG_MOTIONPLUS:
-		wiimote_cwiid_motionplus(x, &mesg.motionplus_mesg);
+		wiimote_cwiid_motionplus(x, &mesg->motionplus_mesg);
 		break;
 #endif
 #ifdef CWIID_RPT_BALANCE
 	case CWIID_MESG_BALANCE:
-		wiimote_cwiid_balance(x, &mesg.balance_mesg);
+		wiimote_cwiid_balance(x, &mesg->balance_mesg);
 		break;
 #endif
 	default:
-		post("mesg %d unknown", (mesg.type));
+		post("mesg %d unknown", (mesg->type));
 		break;
 	}
 }
@@ -537,15 +548,18 @@ static void wiimote_dequeue(void*nada)
   /* get all the messages from the queue that are scheduled until now */
   t_wiimoteMsgList*wl=g_wiimoteMsgList;
   t_wiimoteMsgList*next=NULL;
-  double now=clock_getlogicaltime();
+  double now=0;
   double nexttime=0.;
+
+  //  post("dequeuing messages until %f", now);
 
 
   if(NULL==wl) {
     /* no messages to dequeue; this should never happen */
   }
   while(wl) {
-    if(now<wl->timestamp) {
+    now=clock_gettimesince(wl->x->baselogicaltime);
+    if(now+1.<wl->timestamp) {
       /* no more messages to do for now, aborting */
       break;
     }
@@ -553,19 +567,25 @@ static void wiimote_dequeue(void*nada)
     wiimote_cwiid_message(wl->x, wl->mesg);
     wl->x=NULL;
     wl->timestamp=0.;
+    freebytes(wl->mesg, sizeof( union cwiid_mesg));
+    wl->mesg=NULL;
     wl->next=NULL;
     freebytes(wl, sizeof(t_wiimoteMsgList));
     wl=next;
   }
 
+  g_wiimoteMsgList=wl;
+
   /* reschedule clock */
   if(wl) {
-    clock_delay(g_clock, wl->timestamp - now);
+    double delay=wl->timestamp - now;
+    if(delay<1.)delay=1.;
+    clock_delay(g_clock, delay);
   }
 }
 
 
-static void wiimote_queue(t_wiimote*x, union cwiid_mesg mesg, double timestamp)
+static void wiimote_queue(t_wiimote*x, union cwiid_mesg*mesg, double timestamp)
 { 
   /* add mesg to the queue with a Pd timestamp */
   t_wiimoteMsgList*wl=g_wiimoteMsgList;
@@ -575,7 +595,10 @@ static void wiimote_queue(t_wiimote*x, union cwiid_mesg mesg, double timestamp)
   t_wiimoteMsgList*newentry=(t_wiimoteMsgList*)getbytes(sizeof(t_wiimoteMsgList));
   newentry->next=NULL;
   newentry->x=x;
-  newentry->mesg=mesg;
+  newentry->mesg=(union cwiid_mesg*)getbytes(sizeof( union cwiid_mesg));
+  memcpy(newentry->mesg, mesg, (sizeof( union cwiid_mesg)));
+  //  post("queueing %x message %x (was %x) at %f", newentry, newentry->mesg, mesg, timestamp);
+
   newentry->timestamp=timestamp;
 
   if(NULL!=wl) {
@@ -619,6 +642,8 @@ static void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
   t_wiimote *x=NULL;
   double pd_timestamp=0;
 
+  //  print_timestamp(timestamp, NULL);
+
 
   if(g_wiimoteList==NULL||wiimote==NULL) {
     post("no wii's known");
@@ -633,7 +658,11 @@ static void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
   pd_timestamp=wiimote_timestamp2logicaltime(x, timestamp);
 
   for (i=0; i < mesg_count; i++) {
-		wiimote_cwiid_message(x, mesg_array[i]);
+#if 0
+    wiimote_queue(x, mesg_array+i, pd_timestamp);
+#else
+    wiimote_cwiid_message(x, mesg_array+i);
+#endif
 	}
 }
 
@@ -695,6 +724,18 @@ static void wiimote_report(t_wiimote*x, t_symbol*s, int onoff)
     pd_error(x, "unknown report mode '%s'", s->s_name);
   }
 
+  if(CWIID_RPT_MOTIONPLUS==flag) {
+		int err=0;
+		if(onoff) {
+			err=cwiid_enable(x->wiimote, CWIID_FLAG_MOTIONPLUS);
+		} else {
+			err=cwiid_disable(x->wiimote, CWIID_FLAG_MOTIONPLUS);
+		}
+		if(err) {
+			pd_error(x, "turning %s motionplus returned %d", (flag?"on":"off"), err);
+		}
+  }
+
   if(flag!=-1) {
     if(onoff) {
       x->reportMode |= flag;
@@ -722,23 +763,7 @@ static void wiimote_reportNunchuk(t_wiimote *x, t_floatarg f)
 
 static void wiimote_reportMotionplus(t_wiimote *x, t_floatarg f)
 {
-#ifdef CWIID_RPT_MOTIONPLUS
-	int flag=f;
-	if (x->connected)	{
-		verbose(1, "changing motionplus report mode for Wii%02d to %d", x->wiimoteID, flag);
-		int err=0;
-		if(flag) {
-			err=cwiid_enable(x->wiimote, CWIID_FLAG_MOTIONPLUS);
-		} else {
-			err=cwiid_disable(x->wiimote, CWIID_FLAG_MOTIONPLUS);
-		}
-		if(err) {
-			pd_error(x, "turning %s motionplus returned %d", (flag?"on":"off"), err);
-		} else {
-			wiimote_report(x, gensym("motionplus"), f);
-		}
-	}
-#endif
+	wiimote_report(x, gensym("motionplus"), f);
 }
 
 static void wiimote_setRumble(t_wiimote *x, t_floatarg f)
