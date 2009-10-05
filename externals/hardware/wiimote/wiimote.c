@@ -616,7 +616,7 @@ static void wiimote_reportIR(t_wiimote *x, t_floatarg f)
 
 static void wiimote_reportNunchuk(t_wiimote *x, t_floatarg f)
 {
-	wiimote_report(x, gensym("nunchuck"), f);
+	wiimote_report(x, gensym("nunchuk"), f);
 }
 
 static void wiimote_reportMotionplus(t_wiimote *x, t_floatarg f)
