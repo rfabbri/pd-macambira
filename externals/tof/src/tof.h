@@ -243,3 +243,51 @@ static void tof_find_tagged_argument(char tag,t_symbol *name, int ac, t_atom *av
 	}
  }
 
+
+
+static void tof_outlet_anything_prepend(t_outlet* outlet, t_symbol* s, int argc, t_atom* argv, t_symbol* pp) {
+	
+	if (s == &s_list || s == &s_float  || s == &s_symbol) {
+			outlet_anything(outlet,pp,argc,argv);
+	} else if (s != &s_bang) {
+			int ac = argc + 1;
+			t_atom *av = (t_atom *)getbytes(ac*sizeof(t_atom));	
+			tof_copy_atoms(argv,av+1,argc);
+			SETSYMBOL(av, s);
+			outlet_anything(outlet,pp,ac,av);
+			freebytes(av, ac*sizeof(t_atom));
+	} else {
+		outlet_bang(outlet);
+	}
+}
+	
+	
+static void tof_send_anything_prepend(t_symbol* target,t_symbol* s, int ac, t_atom* av,t_symbol* prepend) {
+
+	if (target->s_thing) {
+		if ( s == &s_list || s == &s_float || s == &s_symbol ) {
+			typedmess(target->s_thing, prepend, ac, av);
+		} else {
+			int new_ac = ac + 1;
+			t_atom *new_av = getbytes(new_ac*sizeof(*new_av));	
+			tof_copy_atoms(av,new_av+1,ac);
+			SETSYMBOL(new_av, s);
+			typedmess(target->s_thing, prepend, new_ac, new_av);
+			freebytes(new_av, new_ac*sizeof(*new_av));
+		}
+	}
+	
+}
+
+
+static t_symbol* tof_remove_extension(t_symbol* s) {
+	t_symbol* newsymbol;
+	int length = strlen(s->s_name) + 1;
+	char* newstring = getbytes(length * sizeof(*newstring));
+	strcpy(newstring,s->s_name);
+	char* last = strrchr( newstring, '.');
+	*last = '\0';
+	newsymbol = gensym(newstring);
+	freebytes(newstring,length * sizeof(*newstring));
+	return newsymbol;
+}

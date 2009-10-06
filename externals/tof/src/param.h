@@ -3,7 +3,7 @@
 
 char param_buf_temp_a[MAXPDSTRING];
 char param_buf_temp_b[MAXPDSTRING];
-char* separator = "/";
+char* param_separator = "/";
 
 //char PARAMECHO = 0;
 
@@ -21,7 +21,7 @@ struct param {
    struct param* 	next; //Next param
    struct param* 	previous; //Previous param
    int 				users; //Number of param objects using this param
-   t_symbol* 		id; //The base id
+   //t_symbol* 		id; //The base id
    int 				ac_g; //Gui argument count
    t_atom*			av_g; //Gui argument values
 };
@@ -61,24 +61,6 @@ static void set_param( struct param* p, int ac, t_atom *av) {
 	tof_set_selector(&s,&ac, &av );
 	set_param_anything(p,s,ac,av);
 }
-
-
-
-
-
-/*
-static void print_all_params(void) {
-	
-	struct param* p = paramlist;
-	post("--paramlist--");
-		while(p) {
-			if ( p->path) post("Path: %s",p->path->s_name);
-			if (p->id) post("Id: %s",p->id->s_name);
-			p = p->next;
-	}
-	
-}
-*/
 
 
 static struct paramroot* param_get_root(t_symbol* root) {
@@ -177,14 +159,14 @@ static struct param* get_param_list(t_symbol* root) {
 	
 	return NULL;
     
-	
 }
+
 
 static t_symbol* param_get_name ( int ac, t_atom* av  ) {
 	
 	if (ac  && IS_A_SYMBOL(av, 0)) {
 		char *firstChar =  (atom_getsymbol(av))->s_name;
-		if (*firstChar == *separator) {
+		if (*firstChar == *param_separator) {
 			return atom_getsymbol(av);
 		 }
 	} 
@@ -192,7 +174,6 @@ static t_symbol* param_get_name ( int ac, t_atom* av  ) {
 	return NULL;
 }
 
-// Name can be NULL
 
 static t_symbol* param_get_path( t_canvas* i_canvas,  t_symbol* name) {
 	
@@ -224,7 +205,7 @@ static t_symbol* param_get_path( t_canvas* i_canvas,  t_symbol* name) {
 		int iter = 0;
 		//found_id_flag = 0;
 		
-		while( tof_next_tagged_argument(*separator,i_ac,i_av,&ac_a,&av_a,&iter) ) {
+		while( tof_next_tagged_argument(*param_separator,i_ac,i_av,&ac_a,&av_a,&iter) ) {
 			
 			if ( IS_A_SYMBOL(av_a,0)
 			   && (id_s == av_a->a_w.w_symbol) 
@@ -240,7 +221,7 @@ static t_symbol* param_get_path( t_canvas* i_canvas,  t_symbol* name) {
         
 	   // Prepend newly found ID
 		   strcpy(sbuf_temp,sbuf_name);
-		   strcpy(sbuf_name, separator);
+		   strcpy(sbuf_name, param_separator);
 		   strcat(sbuf_name, id_temp->s_name);
 		   strcat(sbuf_name,sbuf_temp);  
 		}
@@ -250,7 +231,7 @@ static t_symbol* param_get_path( t_canvas* i_canvas,  t_symbol* name) {
   if ( name != NULL) {
 	  strcat(sbuf_name,name->s_name);
   } else {
-	  strcat(sbuf_name, separator);
+	  strcat(sbuf_name, param_separator);
   }
   
   return gensym(sbuf_name);
@@ -389,177 +370,6 @@ static void param_unregister(struct param* p) {
 
 
 
-
-
-
-/*
-static void get_param_build_info(t_canvas* canvas, int o_ac, t_atom* o_av, struct param_build_info* pbi, int flag) {
-	
-	 pbi->path = NULL;
-	 pbi->path_g = NULL;
-	 pbi->av = NULL;
-	 int saveable = 1;
-	 pbi->ac = 0;
-	 pbi->id = NULL;
-	 pbi->ac_g = 0;
-	 pbi->av_g = NULL;
-	 pbi->basepath = NULL;
-	 pbi->basename = NULL;
-	 
-	 int ac;
-	 t_atom* av;
-	 tof_get_canvas_arguments(canvas,&ac, &av);
-	
-	char *separator = "/";
-	char sbuf_name[MAXPDSTRING];
-	char sbuf_temp[MAXPDSTRING];
-	sbuf_name[0] = '\0';
-	sbuf_temp[0] = '\0';
-	
-   t_symbol* id = gensym("/id");
-   t_canvas* id_canvas = canvas;
-   t_canvas* i_canvas = canvas;
-   
-   int i;
-   
-   int i_ac;
-   t_atom * i_av;
-   
-   // A simple flag to indicate if an ID was found
-   int found_id_flag;
-   
-   
-   t_symbol* id_s = NULL;
-   
-   
-   while( i_canvas->gl_owner) {
-	   // Ignore all supatches
-	   if ( tof_canvas_is_not_subpatch(i_canvas) ) {
-		tof_get_canvas_arguments(i_canvas,&i_ac, &i_av);
-		id_s= canvas_realizedollar(i_canvas, gensym("$0"));
-	
-		
-		int start = 0;
-		int count = 0;
-		found_id_flag = 0;
-		
-		while( tof_get_tagged_argument('/',i_ac,i_av,&start,&count) ) {
-			
-			if ( IS_A_SYMBOL(i_av,start)
-			   && (id == (i_av+start)->a_w.w_symbol) 
-			   && (count > 1) ) {  
-	           	id_s = atom_getsymbol(i_av+start+1);
-	           	id_canvas = i_canvas;
-				found_id_flag = 1;
-	           	break;
-			}
-			start= start + count;
-		}
-		        
-				
-        // if ever an /id is missing, this param is not saveable
-        if (found_id_flag == 0)  saveable = 0;
-        
-		
-	   // Prepend newly found ID
-		   strcpy(sbuf_temp,sbuf_name);
-		   strcpy(sbuf_name, "/");
-		   strcat(sbuf_name, id_s->s_name);
-		   strcat(sbuf_name,sbuf_temp);  
-        
-		}
-        i_canvas = i_canvas->gl_owner;
-    } 
-    
-	if ( saveable ) {
-		
-		if ( id_s) {
-			
-			int id_buf_length = strlen(id_s->s_name)+2;
-			char * id_buf = getbytes(id_buf_length * sizeof (*id_buf));
-			strcpy(id_buf, "/");
-			strcat(id_buf,id_s->s_name);
-			pbi->id = gensym(id_buf);
-			freebytes(id_buf,id_buf_length * sizeof (*id_buf));
-		} else {
-			pbi->id = gensym("/");
-		}
-		
-	}
-	
-	pbi->basepath = gensym(sbuf_name);
-	
-	if (flag) {
-		
-			// FIND NAME
-		  t_symbol* midpath = NULL;
-		  //t_symbol* basename = NULL;
-		  
-		  if (o_ac  && IS_A_SYMBOL(o_av, 0)) {
-			char *firstChar =  (atom_getsymbol(o_av))->s_name;
-			if (*firstChar == (char)'/') {
-				 strcat(sbuf_name, atom_getsymbol(o_av)->s_name);
-				  pbi->path = gensym(sbuf_name);
-				  strcat(sbuf_temp, atom_getsymbol(o_av)->s_name);
-				  midpath = gensym(sbuf_temp);
-				  strcat(sbuf_name, "_");
-				  pbi->path_g = gensym(sbuf_name);
-				  pbi->basename = atom_getsymbol(o_av);
-			 }
-		  } 
-		  
-		  // if ( x->x_param )
-		  
-		  
-		  if ( pbi->path) {
-		  
-		  
-		  // FIND VALUE
-		  // A. Find in SUB canvas arguments
-		  // B. In canvas' arguments
-		  // C. In object's arguments
-		  // D. Defaults to a bang
-		  
-		  int p_ac =0;
-		  t_atom* p_av;
-		  
-		  
-		   // A. If name, try to find value in ID canvas' arguments
-		  if ( midpath) {
-			// GET ID CANVAS ARGUMENTS (may be the same as the local canvas)
-			//int i_ac;
-			//t_atom * i_av;
-			tof_get_canvas_arguments(id_canvas,&i_ac , &i_av);
-			param_find_value(midpath, i_ac, i_av,&(pbi->ac),&(pbi->av));
-		  } 
-		  
-		  // B. If basename, try to find value in LOCAL canvas' arguments
-		  if ( pbi->basename && pbi->ac == 0 ) {
-		
-			param_find_value(pbi->basename, ac, av,&(pbi->ac),&(pbi->av));
-		  } 
-		  
-		  
-			// C. If no value found in canvas' arguments, check the object's arguments
-		  if ( pbi->ac == 0  && o_ac > 1) {
-			int start = 1;
-			int count = 0;
-			tof_get_tagged_argument('/',o_ac,o_av,&start,&count);
-			if (count > 0) {
-				pbi->ac = count;
-				pbi->av = o_av + start;
-			}
-		  }
-		 
-		 //FIND THE GUI TAGS
-		 param_find_value(gensym("/gui"), o_ac, o_av,&(pbi->ac_g),&(pbi->av_g));
-		 //post("GUI COUNT:%d",pbi->ac_g);
-		  
-	}	
-	
-}
-}
-*/
 
 static void param_send_prepend(struct param *p, t_symbol* s,t_symbol* prepend) {
 	
@@ -723,7 +533,6 @@ static int param_read(t_canvas* canvas, t_symbol* filename)
 		}
 		bb_av++;
 	  }
-	
 	
 	binbuf_free(bbuf);
 	
