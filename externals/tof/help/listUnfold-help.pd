@@ -1,20 +1,40 @@
-#N canvas 154 102 524 446 10;
-#X obj 196 327 listUnfold;
-#X obj 165 388 print value;
-#X obj 277 385 print index;
-#X msg 199 277 anything works too;
-#X msg 154 208 5 3 2 8 4;
-#X msg 185 237 symbol test;
-#X obj 62 22 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
+#N canvas 82 115 833 496 10;
+#X msg 103 285 anything works too;
+#X msg 91 258 symbol test;
+#X obj 62 27 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
 #X text 67 77 author: mrtoftrash@gmail.com;
-#X text 67 88 version: 2009-06-07 (initial release);
-#X text 67 66 tags: list flow tof;
-#X text 68 22 description: output the individual elements of a list
-one after the other while simultaneously doing so with their indices.
+#X obj 100 362 tof/listUnfold;
+#X obj 464 358 tof/listUnfold wait;
+#X obj 493 309 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 67 66 tags: lists;
+#X obj 100 388 print ATOM;
+#X obj 181 389 print INDEX;
+#X obj 464 384 print ATOM;
+#X obj 575 381 print INDEX;
+#X msg 60 229 list a b c d e f g;
+#X msg 464 282 list m n o p q r s t u v;
+#X text 468 263 step 1: add list;
+#X text 513 307 step 2: bang to output each element;
+#X obj 122 313 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 147 312 bang to interrupt output;
+#X text 67 145 listUnfold has two modes:;
+#X text 68 27 description: output the individual elements of a list
+and their indices \, either immediately or on bangs.;
+#X text 67 88 version: 2009-10-06 (added the second mode);
+#X text 56 199 default mode: output everything once it is received.
 ;
-#X connect 0 0 1 0;
-#X connect 0 1 2 0;
-#X connect 3 0 0 0;
-#X connect 4 0 0 0;
-#X connect 5 0 0 0;
+#X text 428 196 "wait" or "manually" mode: output one element for every
+bang .;
+#X connect 0 0 4 0;
+#X connect 1 0 4 0;
+#X connect 4 0 8 0;
+#X connect 4 1 9 0;
+#X connect 5 0 10 0;
+#X connect 5 1 11 0;
+#X connect 6 0 5 0;
+#X connect 12 0 4 0;
+#X connect 13 0 5 0;
+#X connect 16 0 4 0;

@@ -1,7 +1,9 @@
+default: 
+
 PARAM: param paramDump paramRoute paramFile
 
 current:
-	echo make pd_linux
+	echo make class
 
 clean: 
 	rm -f *.pd_linux *.o
