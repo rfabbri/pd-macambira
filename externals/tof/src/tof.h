@@ -39,21 +39,6 @@ static t_symbol* tof_get_dollarzero(t_canvas* canvas) {
 }
 
 
-static int tof_path_is_absolute(char *dir, int length)
-{
-    if ((length && dir[0] == '/') || (dir[0] == '~')
-#ifdef MSW
-        || dir[0] == '%' || (length > 2 && (dir[1] == ':' && dir[2] == '/'))
-#endif
-        )
-    {
-        return 1;
-    } else {
-        return 0;            
-    }
-}
-
-
 static int tof_canvas_is_not_subpatch(t_canvas* canvas) {
 	
 	return canvas_isabstraction(canvas);
@@ -281,13 +266,15 @@ static void tof_send_anything_prepend(t_symbol* target,t_symbol* s, int ac, t_at
 
 
 static t_symbol* tof_remove_extension(t_symbol* s) {
-	t_symbol* newsymbol;
+	t_symbol* newsymbol = s;
 	int length = strlen(s->s_name) + 1;
 	char* newstring = getbytes(length * sizeof(*newstring));
 	strcpy(newstring,s->s_name);
 	char* last = strrchr( newstring, '.');
-	*last = '\0';
-	newsymbol = gensym(newstring);
+	if (last != NULL) {
+		*last = '\0';
+		newsymbol = gensym(newstring);
+	}
 	freebytes(newstring,length * sizeof(*newstring));
 	return newsymbol;
 }

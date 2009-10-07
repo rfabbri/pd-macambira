@@ -17,6 +17,22 @@ typedef struct _path {
 } t_path;
 
 
+
+static int path_is_absolute(char *dir, int length)
+{
+    if ((length && dir[0] == '/') || (dir[0] == '~')
+#ifdef MSW
+        || dir[0] == '%' || (length > 2 && (dir[1] == ':' && dir[2] == '/'))
+#endif
+        )
+    {
+        return 1;
+    } else {
+        return 0;            
+    }
+}
+
+
 // Code from http://www.codeguru.com/cpp/misc/misc/fileanddirectorynaming/article.php/c263#more
 static void getRelativeFilename(char* relativeFilename, char *currentDirectory, char *absoluteFilename)
 {
@@ -82,11 +98,14 @@ static void getRelativeFilename(char* relativeFilename, char *currentDirectory, 
 			i++;
 			if(currentDirectory[i] != '\0')
 			{
+				
 				levels++;
 			}
 		}
 	}
-
+	
+    
+    
 	// move the absolute filename marker back to the start of the directory name
 	// that it has stopped in.
 	while(afMarker > 0 && absoluteFilename[afMarker-1] != SLASH)
@@ -134,7 +153,7 @@ static void path_anything(t_path *x, t_symbol *s, int ac, t_atom* av) {
 		
 		// Is this a relative path?
 		// Checks for a starting / or a : as second character
-		if ( tof_path_is_absolute(tof_buf_temp_a,length  )) {
+		if ( path_is_absolute(tof_buf_temp_a,length  )) {
 			getRelativeFilename(tof_buf_temp_b,x->dir->s_name,tof_buf_temp_a);
 			result = gensym(tof_buf_temp_b);
 		} else {
@@ -146,12 +165,25 @@ static void path_anything(t_path *x, t_symbol *s, int ac, t_atom* av) {
 		// TRANFORM RELATIVE PATHS TO ABSOLUTE PATHS
 		
 		// Is this a relative path?
-		if ( tof_path_is_absolute(tof_buf_temp_a,length)  ) {
+		if ( path_is_absolute(tof_buf_temp_a,length)  ) {
 			result = gensym(tof_buf_temp_a);
 		} else {
+			// remove extra ../
 			strcpy(tof_buf_temp_b,x->dir->s_name);
-			strcat(tof_buf_temp_b,tof_buf_temp_a);
-			result = gensym(tof_buf_temp_b);
+			char* dir = tof_buf_temp_b;
+			char* p;
+			int l = strlen(dir);
+			if (dir[l-1] = '/') dir[l-1] = '\0';
+			char* file = tof_buf_temp_a;
+			while( strncmp(file,"../",3) == 0 ) {
+				file = file + 3;
+				p = strrchr(dir,'/');
+				if (p) *p = '\0';
+			}
+			
+			strcat(dir,"/");
+			strcat(dir,file);
+			result = gensym(dir);
 		}
 	}	
 
@@ -211,7 +243,8 @@ void *path_new(t_symbol *s, int argc, t_atom *argv)
 	  
 	}
 	strcpy(tof_buf_temp_a,x->dir->s_name);
-	strcat(tof_buf_temp_a,"/");
+	
+	//strcat(tof_buf_temp_a,"/");
 	x->dir = gensym(tof_buf_temp_a);
 	
   /*

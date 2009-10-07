@@ -92,7 +92,7 @@ static void paramCustom_save(t_paramCustom *x, t_binbuf* bb) {
 	
 	x->bb = bb;
 	// TRIGGER OUTPUT
-	outlet_bang(x->outlet2);
+	outlet_bang(x->outlet);
 	x->bb = NULL;
 	
 	} else {
@@ -122,7 +122,7 @@ static void paramClass_GUI(t_paramClass *x, int* ac, t_atom** av) {
 
 static void paramCustom_receive_anything(t_paramCustom_receive *r, t_symbol *s, int ac, t_atom *av){
 	
-	outlet_anything(r->owner->outlet,s,ac,av);
+	outlet_anything(r->owner->outlet2,s,ac,av);
 	
 	
 }
