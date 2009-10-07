@@ -12,38 +12,162 @@ struct _paramFile_inlet2;
 
 typedef struct _paramFile
 {
-  t_object                    x_obj;
-  //t_outlet					  *outlet;
-  t_canvas			          *canvas;
-  t_symbol 					*basename;
-  struct _paramFile_inlet2	  *inlet2;
+  t_object                    	x_obj;
+  t_canvas			          	*canvas;
+  t_symbol*						basename;
+  t_symbol*						root;
+  struct _paramFile_inlet2	   *inlet2;
+  int 							working;
 } t_paramFile;
+
 
 typedef struct _paramFile_inlet2 {
 	t_object                    x_obj;
 	t_paramFile					*x;
 } t_paramFile_inlet2;
 
-
-
-static t_symbol* paramFile_makefilename(t_symbol* basename, t_float f) {
+static t_symbol* paramFile_makefilename(t_paramFile* x, t_float f) {
 	
 	if (f < 0) f = 0;
 	if ( f > 127) f = 127;
 	
 	int i = (int) f;
-	int length = strlen(basename->s_name)+11;
+	int length = strlen(x->basename->s_name)+11;
 	char* buf = getbytes( length * sizeof (*buf));	
-	sprintf(buf,"%s-%03d.param",basename->s_name,i);
-	//strcpy(buf,basename->s_name);
-	//strcat(buf,".param");
+	sprintf(buf,"%s-%03d.param",x->basename->s_name,i);
 	t_symbol* filename = gensym(buf);
 	freebytes(buf, length * sizeof (*buf));
-	//post("File name:%s",filename->s_name);
 	return filename;
 }
 
 
+
+static void paramFile_write(t_paramFile* x, int f) {
+	
+	if ( x->working ) {
+		pd_error(x,"paramFile can only save or load to one file at a time");
+		return;
+	}
+	x->working = 1;
+	
+	t_symbol* filename = paramFile_makefilename(x,f);
+	post("Writing: %s",filename->s_name);
+	
+	int w_error;
+			
+	t_binbuf *bbuf = binbuf_new();
+	
+	t_param *p = get_param_list(x->root);
+	
+	while(p) {
+		
+		if ( p->save ) p->save(p->x,bbuf);
+		
+		p = p->next;
+	}
+	
+	
+    char buf[MAXPDSTRING];
+    canvas_makefilename(x->canvas, filename->s_name,buf, MAXPDSTRING);
+		
+	
+    w_error = (binbuf_write(bbuf, buf, "", 0));
+ 
+			
+	binbuf_free(bbuf);
+	
+	if (w_error) pd_error(x,"%s: write failed", filename->s_name);
+    
+	
+	x->working = 0;
+}
+
+static void paramFile_read(t_paramFile* x, int f)
+{
+	
+	if ( x->working ) {
+		pd_error(x,"paramFile can only save or load to one file at a time");
+		return;
+	}
+	x->working = 1;
+	
+	t_symbol* filename = paramFile_makefilename(x,f);
+	post("Reading: %s",filename->s_name);
+	
+	int r_error;
+	
+	//t_symbol* filename = param_makefilename(basename, n);
+	
+	t_binbuf *bbuf = binbuf_new();
+	
+    r_error= (binbuf_read_via_canvas(bbuf, filename->s_name, x->canvas, 0));
+            //pd_error(x, "%s: read failed", filename->s_name);
+			
+    t_symbol* root = x->root;
+	
+	int bb_ac = binbuf_getnatom(bbuf);
+	int ac = 0;
+    t_atom *bb_av = binbuf_getvec(bbuf);
+    t_atom *av = bb_av;
+	
+	  while (bb_ac--) {
+		if (bb_av->a_type == A_SEMI) {
+			if ( IS_A_SYMBOL(av,0) && ac > 1) {
+				t_symbol* path = atom_getsymbol(av);
+				strcpy(param_buf_temp_a,root->s_name);
+				strcat(param_buf_temp_a,path->s_name);
+			   t_symbol* s = gensym(param_buf_temp_a);
+			   #ifdef PARAMDEBUG
+				post("Restoring:%s",s->s_name);
+			   #endif
+			   
+			   // STUPID SYMBOL WITH SPACES MANAGEMENT
+			   if ( s->s_thing && ac > 3 && IS_A_SYMBOL(av,1) &&  atom_getsymbol(av+1) == &s_symbol) {
+				   // This whole block is simply to convert symbols saved with spaces to complete symbols
+				   
+				   t_binbuf *bbuf_stupid = binbuf_new();
+				   binbuf_add(bbuf_stupid, ac-2, av+2);
+				   
+				   char *char_buf;
+				   int char_length;
+				   binbuf_gettext(bbuf_stupid, &char_buf, &char_length);
+				   char_buf = resizebytes(char_buf, char_length, char_length+1);
+				   char_buf[char_length] = 0;
+				   t_symbol* stupid_symbol = gensym(char_buf);
+				   //post("STUPID: %s",stupid_symbol->s_name);
+				   freebytes(char_buf, char_length+1);
+				   binbuf_free(bbuf_stupid);
+				   t_atom* stupid_atom = getbytes(sizeof(*stupid_atom));
+				   SETSYMBOL(stupid_atom, stupid_symbol);
+				   pd_typedmess(s->s_thing, &s_symbol, 1, stupid_atom);
+				   freebytes(stupid_atom, sizeof(*stupid_atom));
+				   
+			   } else {
+					if ( s->s_thing) pd_forwardmess(s->s_thing, ac-1, av+1);
+				}
+		    }
+		  
+		  ac = 0;
+		  av = bb_av + 1;
+		} else {
+		  
+		  ac = ac + 1;
+		}
+		bb_av++;
+	  }
+	
+	binbuf_free(bbuf);
+	
+	if ( r_error) pd_error(x, "%s: read failed", filename->s_name);
+	
+	x->working = 0;
+}
+
+
+
+
+
+/*
 static void paramFile_write(t_paramFile *x, t_float f) {
 	
 	
@@ -52,18 +176,18 @@ static void paramFile_write(t_paramFile *x, t_float f) {
 	if ( param_write(x->canvas,filename) ) pd_error(x,"%s: write failed", filename->s_name);
 
 }
-
-
+*/
+/*
 static void paramFile_read(t_paramFile *x, t_float f) {
 	
 	
-	t_symbol* filename = paramFile_makefilename(x->basename,f);
+	t_symbol* filename = paramFile_makefilename(x,f);
 	post("Reading: %s",filename->s_name);
 	if (param_read(x->canvas, filename)) pd_error(x, "%s: read failed", filename->s_name);
 
 	
 }
-
+*/
 
 
 static void paramFile_bang(t_paramFile *x) {
@@ -77,6 +201,7 @@ static void paramFile_float(t_paramFile *x, t_float f) {
 	paramFile_write(x,f);
 		
 }
+
 
 static void paramFile_inlet2_bang(t_paramFile_inlet2 *inlet2) {
 	
@@ -95,7 +220,7 @@ static void paramFile_free(t_paramFile *x)
 	
 	if(x->inlet2) pd_free((t_pd *)x->inlet2);
 	
-    
+ 
 }
 
 
@@ -111,17 +236,11 @@ static void* paramFile_new(t_symbol *s, int ac, t_atom *av) {
   t_symbol* canvasname = tof_get_canvas_name(x->canvas);
   
   // remove the .pd (actually removes everything after the .)
-  int length = strlen(canvasname->s_name) + 1;
-  char* buf = getbytes( (length ) * sizeof (*buf));	
-  strcpy(buf,canvasname->s_name);
-  char* lastperiod = strrchr(buf,'.');
-  if ( lastperiod != NULL ) {
-	  *lastperiod = '\0';
-	  x->basename = gensym(buf);
-  } else {
-	x->basename = canvasname;
-  }
-  freebytes(buf, (length ) * sizeof (*buf));
+  x->basename = tof_remove_extension(canvasname);
+  
+  x->working = 0;
+  
+  x->root = tof_get_dollarzero(x->canvas);
   
    //x->outlet = outlet_new(&x->x_obj, &s_list);
    

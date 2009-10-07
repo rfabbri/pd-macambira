@@ -76,7 +76,7 @@ static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av
 	    strcpy(param_buf_temp_a, x->root->s_name);
 		strcpy(param_buf_temp_b, x->path->s_name);
 		
-		strcat(param_buf_temp_b, s->s_name + 1);
+		strcat(param_buf_temp_b, s->s_name);
 		t_symbol* path = gensym(param_buf_temp_b);
 		strcat(param_buf_temp_a, param_buf_temp_b);
 		t_symbol* target = gensym(param_buf_temp_a);

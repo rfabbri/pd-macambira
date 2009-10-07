@@ -1,6 +1,6 @@
 default: 
 
-PARAM: param paramDump paramRoute paramFile
+PARAM: param paramDump paramRoute paramFile paramId paramCustom
 
 current:
 	echo make class
