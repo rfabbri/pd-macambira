@@ -49,6 +49,16 @@ ifeq ($(UNAME),Linux)
   LIBS += -lc
   STRIP = strip --strip-unneeded -R .note -R .comment
 endif
+ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
+  SOURCES += 
+  EXTENSION = dll
+  OS = cygwin
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += 
+  LDFLAGS += -Wl,--export-dynamic -shared -L$(PD_PATH)/src
+  LIBS += -lc -lpd
+  STRIP = strip --strip-unneeded -R .note -R .comment
+endif
 ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   SOURCES += $(SOURCES_Windows)
   EXTENSION = dll
