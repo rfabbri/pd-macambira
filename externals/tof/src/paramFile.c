@@ -27,30 +27,39 @@ typedef struct _paramFile_inlet2 {
 } t_paramFile_inlet2;
 
 static t_symbol* paramFile_makefilename(t_paramFile* x, t_float f) {
-	
-	if (f < 0) f = 0;
-	if ( f > 127) f = 127;
+	t_symbol* filename;
 	
 	int i = (int) f;
-	int length = strlen(x->basename->s_name)+11;
-	char* buf = getbytes( length * sizeof (*buf));	
-	sprintf(buf,"%s-%03d.param",x->basename->s_name,i);
-	t_symbol* filename = gensym(buf);
-	freebytes(buf, length * sizeof (*buf));
+	
+	if (i<0) {
+		int length = strlen(x->basename->s_name)+7;
+		char* buf = getbytes( length * sizeof (*buf));	
+		sprintf(buf,"%s.param",x->basename->s_name);
+		filename = gensym(buf);
+		freebytes(buf, length * sizeof (*buf));
+	} else {
+		int length = strlen(x->basename->s_name)+11;
+		char* buf = getbytes( length * sizeof (*buf));	
+		sprintf(buf,"%s-%03d.param",x->basename->s_name,i);
+		filename = gensym(buf);
+		freebytes(buf, length * sizeof (*buf));
+	}
 	return filename;
 }
 
-
-
-static void paramFile_write(t_paramFile* x, int f) {
+static void paramFile_do_save(t_paramFile* x, t_float f) {
+	
+	
 	
 	if ( x->working ) {
 		pd_error(x,"paramFile can only save or load to one file at a time");
 		return;
 	}
+	t_symbol* filename = paramFile_makefilename(x,f);
+	
 	x->working = 1;
 	
-	t_symbol* filename = paramFile_makefilename(x,f);
+	
 	post("Writing: %s",filename->s_name);
 	
 	int w_error;
@@ -77,15 +86,18 @@ static void paramFile_write(t_paramFile* x, int f) {
 	binbuf_free(bbuf);
 	
 	if (w_error) pd_error(x,"%s: write failed", filename->s_name);
-    
 	
 	x->working = 0;
+	
 }
 
-static void paramFile_read(t_paramFile* x, int f)
-{
+
+
+
+
+static void paramFile_do_load(t_paramFile* x, t_float f) {
 	
-	if ( x->working ) {
+		if ( x->working ) {
 		pd_error(x,"paramFile can only save or load to one file at a time");
 		return;
 	}
@@ -161,57 +173,45 @@ static void paramFile_read(t_paramFile* x, int f)
 	if ( r_error) pd_error(x, "%s: read failed", filename->s_name);
 	
 	x->working = 0;
-}
-
-
-
-
-
-/*
-static void paramFile_write(t_paramFile *x, t_float f) {
-	
-	
-	t_symbol* filename = paramFile_makefilename(x->basename,f);
-	post("Writing: %s",filename->s_name);
-	if ( param_write(x->canvas,filename) ) pd_error(x,"%s: write failed", filename->s_name);
-
-}
-*/
-/*
-static void paramFile_read(t_paramFile *x, t_float f) {
-	
-	
-	t_symbol* filename = paramFile_makefilename(x,f);
-	post("Reading: %s",filename->s_name);
-	if (param_read(x->canvas, filename)) pd_error(x, "%s: read failed", filename->s_name);
-
 	
 }
-*/
+
+
+
 
 
 static void paramFile_bang(t_paramFile *x) {
 	
-	paramFile_write(x,0);	
+	paramFile_do_save(x,-1);	
 }
 
 
 static void paramFile_float(t_paramFile *x, t_float f) {
 	
-	paramFile_write(x,f);
+	if (f < 0 || f > 999 ) {
+		pd_error(x,"paramFile preset number must be between 0 and 999");
+		return;
+	}
+	
+	paramFile_do_save(x,f);
 		
 }
 
 
 static void paramFile_inlet2_bang(t_paramFile_inlet2 *inlet2) {
 	
-	paramFile_read(inlet2->x,0);
+	paramFile_do_load(inlet2->x,-1);
 	
 }
 
 static void paramFile_inlet2_float(t_paramFile_inlet2 *inlet2,t_float f) {
 	
-	paramFile_read(inlet2->x,f);
+	if (f < 0 || f > 999 ) {
+		pd_error(inlet2->x,"paramFile preset number must be between 0 and 999");
+		return;
+	}
+	
+	paramFile_do_load(inlet2->x,f);
 	
 }
 
@@ -265,8 +265,8 @@ void paramFile_setup(void) {
  class_addbang(paramFile_inlet2_class, paramFile_inlet2_bang);
  class_addfloat(paramFile_inlet2_class, paramFile_inlet2_float);
  
- class_addmethod(paramFile_class, (t_method) paramFile_read, gensym("load"), A_DEFFLOAT,0);
- class_addmethod(paramFile_class, (t_method) paramFile_write, gensym("save"), A_DEFFLOAT,0);
+ //class_addmethod(paramFile_class, (t_method) paramFile_load, gensym("load"), A_DEFFLOAT,0);
+ //class_addmethod(paramFile_class, (t_method) paramFile_float, gensym("save"), A_DEFFLOAT,0);
  
 }
 
