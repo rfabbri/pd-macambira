@@ -197,22 +197,42 @@ static int tof_next_tagged_argument(char tag, int ac, t_atom *av, int* ac_a, t_a
      return (*ac_a);     
 }
 
-static void tof_find_tagged_argument(char tag,t_symbol *name, int ac, t_atom *av, int *ac_r,t_atom** av_r) {
+
+
+static int tof_find_tag(char tag, t_symbol* name, int ac, t_atom* av) {
+	int i;
+	for (i=0; i<ac;i++) {
+		if ( IS_A_SYMBOL(av,i) && name == atom_getsymbol(av+i) ) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+
+
+
+// Returns 1 if the tag was found
+// Fills the given int* and t_atom** with the arguments of the tag
+static int tof_find_tagged_argument(char tag,t_symbol *name, int ac, t_atom *av, int *ac_r,t_atom** av_r) {
 	
 	int i;
+	int match = 0;
 	int j = 0;
 	for (i=0;i<ac;i++) {
-		//if ( IS_A_SYMBOL(av,i)) post("analyzing %s",atom_getsymbol(av+i)->s_name);
-		if ( IS_A_SYMBOL(av,i) && name == atom_getsymbol(av+i) && (i+1)<ac ) {
-			//post("matches");
-			i=i+1;
-			for (j=i;j<ac;j++) {
-				if (  IS_A_SYMBOL(av,j) && (atom_getsymbol(av+j))->s_name[0] == tag ) {
-					//j = j-1;
-					break;
+		if ( IS_A_SYMBOL(av,i) && name == atom_getsymbol(av+i) ) {
+			// FOUND MATCH
+			match = 1;
+			if ( (i+1)<ac ) { // IS THERE SPACE FOR AT LEAST ONE ARGUMENT?
+				i=i+1;
+				for (j=i;j<ac;j++) { //FIND ITS END
+					if (  IS_A_SYMBOL(av,j) && (atom_getsymbol(av+j))->s_name[0] == tag ) {
+						//j = j-1;
+						break;
+					}
 				}
+				break;
 			}
-			break;
 		}
 	}
 	j = j-i;
@@ -226,6 +246,9 @@ static void tof_find_tagged_argument(char tag,t_symbol *name, int ac, t_atom *av
 		*ac_r = 0;
 		*av_r = NULL;
 	}
+	
+	return match;
+	
  }
 
 

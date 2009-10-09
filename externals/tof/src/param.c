@@ -44,6 +44,7 @@ typedef struct _paramClass {
   t_symbol*						receive;
   t_symbol*						send;
   t_symbol*						set_s;
+  int							nowaitforbang;
 } t_paramClass;
 
 typedef struct _paramClass_inlet2
@@ -87,7 +88,7 @@ static void paramClass_anything(t_paramClass *x, t_symbol *s, int ac, t_atom *av
 		tof_copy_atoms(av, x->av, ac);
    }
   
-  paramClass_bang(x);
+  if (x->nowaitforbang) paramClass_bang(x);
     
 }
 
@@ -165,11 +166,40 @@ static void* paramClass_new(t_symbol *s, int ac, t_atom *av)
 	t_symbol* path = param_get_path(canvas,name);
 	t_symbol* root = tof_get_dollarzero(tof_get_root_canvas(canvas));
 	  
-	x->param = param_register(x,root,path,\
-	(t_paramGetMethod) paramClass_get,\
-	(t_paramSaveMethod) paramClass_save,\
-	(t_paramGUIMethod) paramClass_GUI);
 	  
+	 //FIND THE GUI OPTIONS: /g
+	 int ac_temp = 0;
+	 t_atom* av_temp = NULL;
+	 
+	 tof_find_tagged_argument('/',gensym("/g"), ac-1, av+1,&ac_temp,&av_temp);
+	 x->gac = ac_temp;
+	 x->gav = getbytes(x->gac * sizeof(*(x->gav)));
+	 tof_copy_atoms(av_temp,x->gav,x->gac);	  
+	  
+	  // FIND THE NO LOADBANG TAG: /nlb
+	x->noloadbang = tof_find_tag('/',gensym("/nlb"), ac-1, av+1);
+	  //post("nlb: %i",x->noloadbang);
+	  
+	    // FIND THE NO SAVE TAG: /ns
+	int nosave = tof_find_tag('/',gensym("/ns"), ac-1, av+1);
+	  //post("ns: %i",nosave);
+	  
+	  // FIND THE WAIT FOR BANG TAG: /wfb
+	  x->nowaitforbang = !(tof_find_tag('/',gensym("/wfb"), ac-1, av+1));
+	  
+	  
+	  // REGISTER PARAM
+	 t_paramSaveMethod paramSaveMethod = NULL;
+	 t_paramGUIMethod paramGUIMethod = NULL;
+	 
+	if ( x->gac > 0 ) paramGUIMethod = (t_paramGUIMethod) paramClass_GUI;
+	if ( nosave = 0 ) paramSaveMethod = (t_paramSaveMethod) paramClass_save;
+		
+	x->param = param_register(x,root,path, \
+	(t_paramGetMethod) paramClass_get, \
+	paramSaveMethod, \
+	paramGUIMethod);
+  
 	if (!x->param) return NULL;
 	 
 	// FIND PARAM VALUE
@@ -203,27 +233,11 @@ static void* paramClass_new(t_symbol *s, int ac, t_atom *av)
 		  
 	 
 		  
-	// FIND THE NO LOADBANG TAG: /nlb
-	int i;
-	x->noloadbang = 0;
-
-	for ( i =0; i < ac; i++) {
-	  if ( IS_A_SYMBOL(av,i) && (strcmp("/nlb",atom_getsymbol(av+i)->s_name) == 0)) {
-		  x->noloadbang = 1;
-		  break;
-	  }
-	}
+	
 
 	
 	  
-	 //FIND THE GUI OPTIONS: /g
-	 int ac_g = 0;
-	 t_atom* av_g = NULL;
-	 // There could be a problem if the the name is also /g
-	 tof_find_tagged_argument('/',gensym("/g"), ac, av,&ac_g,&av_g);
-	 x->gac = ac_g;
-	 x->gav = getbytes(x->gac * sizeof(*(x->gav)));
-	 tof_copy_atoms(av_g,x->gav,x->gac);	  
+	 
 	  
 	
 	  
