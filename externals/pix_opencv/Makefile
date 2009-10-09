@@ -36,8 +36,8 @@ ifeq ($(UNAME),Darwin)
   OS = macosx
   OPT_CFLAGS = -fast
   FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
-  CFLAGS += -fPIC -F.
-  LDFLAGS += -bundle -undefined dynamic_lookup -F.
+  CFLAGS += -fPIC -isysroot /Developer/SDKs/MacOSX10.4u.sdk
+  LDFLAGS += -bundle -undefined dynamic_lookup -isysroot /Developer/SDKs/MacOSX10.4u.sdk
   LIBS += -lc -framework OpenCV
   STRIP = strip -x
  endif
@@ -112,26 +112,32 @@ clean:
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
 
 distclean: clean
-	-rm -f -- ../$(LIBRARY_NAME)-$(OS)-$(shell uname -m).tar.bz2
-	-rm -f -- ../$(LIBRARY_NAME)-$(OS).tar.bz2
+	-rm -f -- ../$(LIBRARY_NAME)-$(LIBRARY_VERSION)-$(OS)-$(shell uname -m).tar.bz2
+	-rm -f -- ../$(LIBRARY_NAME)-$(LIBRARY_VERSION)-$(OS).tar.bz2
 
 dist: all dist_$(OS)
 
 dist_linux:
-	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS)-$(shell uname -m).tar.bz2 $(LIBRARY_NAME)
+	cd .. && tar --exclude=.svn -cjpf \
+		$(LIBRARY_NAME)-$(LIBRARY_VERSION)-$(OS)-$(shell uname -m).tar.bz2 \
+		$(LIBRARY_NAME)
 
 dist_macosx:
-	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
+	cd .. && tar --exclude=.svn -cjpf \
+		$(LIBRARY_NAME)-$(LIBRARY_VERSION)-$(OS)-$(shell uname -m).tar.bz2 \
+		$(LIBRARY_NAME)
 
 dist_windows:
-	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
-
+	cd .. && tar --exclude=.svn -cjpf \
+		$(LIBRARY_NAME)-$(LIBRARY_VERSION)-$(OS).tar.bz2 \
+		$(LIBRARY_NAME)
 
 etags:
 	etags *.[ch] ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
 showpaths:
 	@echo "PD_PATH: $(PD_PATH)"
+	@echo "GEM_PATH: $(GEM_PATH)"
 	@echo "objectsdir: $(objectsdir)"
 	@echo "LIBRARY_NAME: $(LIBRARY_NAME)"
 	@echo "SOURCES: $(SOURCES)"
