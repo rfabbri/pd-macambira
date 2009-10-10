@@ -16,13 +16,13 @@ LOG
 #ifndef INCLUDE_PIX_OPENCV_COLORFILT_H_
 #define INCLUDE_PIX_OPENCV_COLORFILT_H_
 
-#include "Base/GemPixObj.h"
-
 #include <stdio.h>
 
 #ifndef _EiC
 #include "cv.h"
 #endif
+
+#include "Base/GemPixObj.h"
 
 /*-----------------------------------------------------------------
 -------------------------------------------------------------------

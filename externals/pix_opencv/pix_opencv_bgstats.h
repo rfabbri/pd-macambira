@@ -16,12 +16,12 @@ LOG
 #ifndef INCLUDE_PIX_OPENCV_BGSTATS_H
 #define INCLUDE_PIX_OPENCV_BGSTATS_H
 
-#include "Base/GemPixObj.h"
-
 #ifndef _EiC
 #include "cv.h"
 #include "cvaux.h"
 #endif
+
+#include "Base/GemPixObj.h"
 
 /*-----------------------------------------------------------------
 -------------------------------------------------------------------

@@ -16,11 +16,11 @@ LOG
 #ifndef INCLUDE_PIX_OPENCV_CAMSHIFT_H_
 #define INCLUDE_PIX_OPENCV_CAMSHIFT_H_
 
-#include "Base/GemPixObj.h"
-
 #ifndef _EiC
 #include "cv.h"
 #endif
+
+#include "Base/GemPixObj.h"
 
 #define MAX_MARKERS 500
 const int MAX_COUNT = 500;

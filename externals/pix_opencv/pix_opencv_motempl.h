@@ -16,8 +16,6 @@ LOG
 #ifndef INCLUDE_PIX_OPENCV_MOTEMPL_H_
 #define INCLUDE_PIX_OPENCV_MOTEMPL_H_
 
-#include "Base/GemPixObj.h"
-
 #ifndef _EiC
 #include "cv.h"
 #include <time.h>
@@ -25,6 +23,8 @@ LOG
 #include <ctype.h>
 #endif
 #include <stdio.h>
+
+#include "Base/GemPixObj.h"
 
 
 /*-----------------------------------------------------------------

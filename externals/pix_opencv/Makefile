@@ -1,4 +1,4 @@
-PD_DIR = /Software/pd-svn/trunk/pd
+PD_DIR = /usr/local/pd
 GEM_DIR = /usr/local/pd/gem
 
 GEM_OPENCV_VERSION = 0.2
@@ -21,7 +21,7 @@ ifeq ($(UNAME),Linux)
 endif
 ifeq ($(UNAME),Darwin)
  CPPFLAGS += -DDARWIN
- INCLUDES += -I/System/Library/Frameworks/OpenCV.framework/Headers/
+ INCLUDES += -I/Library/Frameworks/OpenCV.framework/Headers/
  LDFLAGS =  -bundle -undefined dynamic_lookup
  LIBS =  -lm -framework OpenCV
  EXTENSION = pd_darwin

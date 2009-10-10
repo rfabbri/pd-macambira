@@ -16,11 +16,11 @@ LOG
 #ifndef INCLUDE_PIX_OPENCV_HU_COMPARE_H_
 #define INCLUDE_PIX_OPENCV_HU_COMPARE_H_
 
-#include "Base/GemPixDualObj.h"
-
 #ifndef _EiC
 #include "cv.h"
 #endif
+
+#include "Base/GemPixDualObj.h"
 
 /*-----------------------------------------------------------------
 CLASS

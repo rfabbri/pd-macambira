@@ -16,11 +16,11 @@ LOG
 #ifndef INCLUDE_PIX_OPENCV_FLOODFILL_H_
 #define INCLUDE_PIX_OPENCV_FLOODFILL_H_
 
-#include "Base/GemPixObj.h"
-
 #ifndef _EiC
 #include "cv.h"
 #endif
+
+#include "Base/GemPixObj.h"
 
 #define MAX_COMPONENTS 10
 

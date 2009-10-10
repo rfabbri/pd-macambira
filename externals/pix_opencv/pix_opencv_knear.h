@@ -16,13 +16,13 @@ LOG
 #ifndef INCLUDE_PIX_OPENCV_KNEAR_H_
 #define INCLUDE_PIX_OPENCV_KNEAR_H_
 
-#include "Base/GemPixObj.h"
-
 #ifndef _EiC
 #include "cv.h"
 #include "highgui.h"
 #include "ml.h"
 #endif
+
+#include "Base/GemPixObj.h"
 
 /*-----------------------------------------------------------------
 -------------------------------------------------------------------
