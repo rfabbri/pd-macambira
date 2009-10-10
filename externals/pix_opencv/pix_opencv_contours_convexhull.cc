@@ -182,7 +182,7 @@ void pix_opencv_contours_convexhull :: processRGBAImage(imageStruct &image)
         // Draw convex hull for current contour.        
         for(i=0; i<hullsize-1; i++)
         {
-#ifdef __APPLE__
+#ifdef DARWIN
             cvLine(rgb, PointArray[hull[i]], 
                             PointArray[hull[i+1]],CV_RGB(0,255,0),1, CV_AA, 0 );
 #else
@@ -193,7 +193,7 @@ void pix_opencv_contours_convexhull :: processRGBAImage(imageStruct &image)
             SETFLOAT(&rlist[j+1], PointArray[hull[i]].y);
 	    j = j + 2;
         }
-#ifdef __APPLE__
+#ifdef DARWIN
         cvLine(rgb, PointArray[hull[hullsize-1]],
                              PointArray[hull[0]],CV_RGB(0,255,0),1, CV_AA, 0 );
 #else

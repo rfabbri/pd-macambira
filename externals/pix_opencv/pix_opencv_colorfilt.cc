@@ -118,7 +118,7 @@ void pix_opencv_colorfilt :: processRGBAImage(imageStruct &image)
 
     for( py=0; py<rgba->height; py++ ) {
       for( px=0; px<rgba->width; px++ ) {
-#ifdef __APPLE__
+#ifdef DARWIN
         g = ((uchar*)(rgba->imageData + rgba->widthStep*(int)py))[(int)px*4];
         r = ((uchar*)(rgba->imageData + rgba->widthStep*(int)py))[(int)px*4+1];
         b = ((uchar*)(rgba->imageData + rgba->widthStep*(int)py))[(int)px*4+3];
@@ -237,7 +237,7 @@ void pix_opencv_colorfilt :: pickMess (float xcur, float ycur)
    if ( ( xcur >= 0. ) && ( xcur <= comp_xsize )
         && ( ycur > 0. ) && ( ycur < comp_ysize ) )
    {
-#ifdef __APPLE__
+#ifdef DARWIN
       x_colorR = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+1];
       x_colorG = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+2];
       x_colorB = ((uchar*)(brgb->imageData + brgb->widthStep*(int)ycur))[(int)xcur*4+3];

@@ -19,12 +19,7 @@ LOG
 #include "Base/GemPixDualObj.h"
 
 #ifndef _EiC
-#ifdef __APPLE__
-#include <OpenCV/OpenCV.h>
-#include <OpenCV/cvcompat.h>
-#else
 #include "cv.h"
-#endif
 #endif
 
 /*-----------------------------------------------------------------

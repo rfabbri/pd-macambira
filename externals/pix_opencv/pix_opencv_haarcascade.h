@@ -19,11 +19,7 @@ LOG
 #include "Base/GemPixObj.h"
 
 #ifndef _EiC
-#ifdef __APPLE__
-#include <OpenCV/OpenCV.h>
-#else
 #include "cv.h"
-#endif
 #endif
 
 #define MAX_MARKERS 50
