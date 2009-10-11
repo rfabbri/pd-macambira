@@ -44,9 +44,7 @@ void sphBessel (double x, double *y, int n) { //TODO: small values!
       y[0] = (x<EPS)?1.0:sin(x)/x;
    if (n>=1) 
       y[1] = -cos(x)/x + y[0]/x;
-   post("before %f %f %f",y[0],y[1],y[2]);
    radialRecurrence (x,y,n);
-   post("after %f %f %f",y[0],y[1],y[2]);
 }
 
 void sphNeumann (double x, double *y, int n) {

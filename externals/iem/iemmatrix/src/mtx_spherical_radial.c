@@ -83,18 +83,14 @@ static void *newMTXSph (t_symbol *s, int argc, t_atom *argv)
   fsym=atom_getsymbol(argv);
   if (fsym->s_name!=0)
      whichfunction=fsym->s_name[0];
-  post("%s",fsym->s_name);
   switch (whichfunction) {
      default:
      case 'j':
-        post("j");
         x->list_h_re_out = outlet_new (&x->x_obj, gensym("matrix"));
 	break;
      case 'h':
-        post("h");
         x->list_h_re_out = outlet_new (&x->x_obj, gensym("matrix"));
      case 'y':
-        post("h or y");
         x->list_h_im_out = outlet_new (&x->x_obj, gensym("matrix"));
   }
   nmax=(int) atom_getfloat(argv+1);
