@@ -84,6 +84,7 @@ void iemtx_slice_setup(void); /* mtx_slice.c */
 void iemtx_sndfileread_setup(void); /* mtx_sndfileread.c */
 void iemtx_sort_setup(void); /* mtx_sort.c */
 void iemtx_spherical_harmonics_setup(void); /* mtx_spherical_harmonics.c */
+void iemtx_spherical_radial_setup(void); /* mtx_spherical_radial.c */
 void iemtx_sub_setup(void); /* mtx_sub.c */
 void iemtx_sum_setup(void); /* mtx_sum.c */
 void iemtx_svd_setup(void); /* mtx_svd.c */

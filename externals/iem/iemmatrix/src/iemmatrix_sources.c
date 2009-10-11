@@ -86,6 +86,7 @@ void iemmatrix_sources_setup(void)
 	iemtx_sndfileread_setup(); /* mtx_sndfileread.c */
 	iemtx_sort_setup(); /* mtx_sort.c */
 	iemtx_spherical_harmonics_setup(); /* mtx_spherical_harmonics.c */
+	iemtx_spherical_radial_setup(); /* mtx_spherical_radial.c */
 	iemtx_sub_setup(); /* mtx_sub.c */
 	iemtx_sum_setup(); /* mtx_sum.c */
 	iemtx_svd_setup(); /* mtx_svd.c */
