@@ -18,7 +18,7 @@ ifeq ($(UNAME),Linux)
  EXTENSION = pd_linux
 endif
 ifeq ($(UNAME),Darwin)
- INCLUDES += -I/System/Library/Frameworks/OpenCV.framework/Headers/
+ INCLUDES += -I/Library/Frameworks/OpenCV.framework/Headers/
  LDFLAGS =  -bundle -undefined dynamic_lookup
  LIBS =  -lm -framework OpenCV
  EXTENSION = pd_darwin

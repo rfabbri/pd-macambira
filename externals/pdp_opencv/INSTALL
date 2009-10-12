@@ -47,8 +47,8 @@ and copy the .pd_linux to your externals folder :
 
 first install openCV MacOS framework
    download openCV private framework from http://www.ient.rwth-aachen.de/cms/software/opencv/
-   copy the provided OpenCV.framework folder in your /System/Library/Frameworks/ directory ::
-        cp -Rf /Volumes/OpenCV\ Private\ Framework/OpenCV.framework /System/Library/Frameworks/
+   copy the provided OpenCV.framework folder in your /Library/Frameworks/ directory ::
+        cp -Rf /Volumes/OpenCV\ Private\ Framework/OpenCV.framework /Library/Frameworks/
 
 then get the _SOURCES_ of the pd you are using
 and of the PDP that you are loading
