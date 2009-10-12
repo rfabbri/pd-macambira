@@ -15,6 +15,7 @@ typedef struct _paramCustom {
   t_binbuf*						bb;
   t_symbol*						receive;
   struct _paramCustom_receive*  r;
+  int 							nopresets;
 } t_paramCustom;
 
 typedef struct _paramCustom_receive
@@ -85,7 +86,11 @@ static void paramClass_get(t_paramClass *x, t_symbol** s, int* ac, t_atom** av) 
 */
 
 // SPECIAL PARAM SAVE FUNCTION
-static void paramCustom_save(t_paramCustom *x, t_binbuf* bb) {
+static void paramCustom_save(t_paramCustom *x, t_binbuf* bb, int f) {
+	
+	// f = -1 for the main save file
+	// f => 0 if it is a preset
+	if ( f >= 0 && x->nopresets) return;
 	
 	
 	if ( !x->bb ) {
@@ -98,27 +103,10 @@ static void paramCustom_save(t_paramCustom *x, t_binbuf* bb) {
 	} else {
 		pd_error(x,"paramCustom is already saving");
 	}
-	/*
-	if ((x->selector != &s_bang)) {
-		int ac = x->ac + 2;
-		t_atom *av = getbytes(ac*sizeof(*av));	
-		tof_copy_atoms(x->av,av+2,x->ac);
-		SETSYMBOL(av, x->param->path);
-		SETSYMBOL(av+1, x->selector);
-		binbuf_add(bb, ac, av);
-		binbuf_addsemi(bb);
-		freebytes(av, ac*sizeof(*av));
-	}
-	*/
+	
 }
 
-// SPECIAL PARAM GUI FUNCTION
-/*
-static void paramClass_GUI(t_paramClass *x, int* ac, t_atom** av) {
-	*ac = x->gac;
-	*av = x->gav;
-}
-*/
+
 
 static void paramCustom_receive_anything(t_paramCustom_receive *r, t_symbol *s, int ac, t_atom *av){
 	
@@ -145,6 +133,11 @@ static void* paramCustom_new(t_symbol *s, int ac, t_atom *av)
 	  
 	t_symbol* path = param_get_path(canvas,name);
 	t_symbol* root = tof_get_dollarzero(tof_get_root_canvas(canvas));
+	  
+	  // FIND THE NO PRESET TAG: /nps
+	 x->nopresets = tof_find_tag('/',gensym("/nps"), ac-1, av+1);
+	  
+	  
 	  
 	x->param = param_register(x,root,path,\
 	NULL,\

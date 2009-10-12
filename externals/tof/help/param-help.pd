@@ -29,7 +29,7 @@ the param object \, at which point the param's name is appended:;
 name \, will be used to build the path. See an example to the right.
 ;
 #X floatatom 556 110 5 0 0 0 - - -;
-#X text 53 585 --------------------- SEE ALSO -----------------------
+#X text 53 475 --------------------- SEE ALSO -----------------------
 ;
 #X obj 496 359 dac~;
 #X obj 717 280 hsl 100 15 0 1 0 0 \$0/FM_MOD/volume \$0/FM_MOD/volume_
@@ -45,20 +45,20 @@ name \, will be used to build the path. See an example to the right.
 #X obj 544 283 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
 #X obj 556 84 tof/param /number 30 /g nbx;
-#X obj 22 613 tof/paramFile;
-#X obj 118 613 tof/paramRoute;
-#X obj 217 613 tof/OSCToParam;
-#X obj 322 613 tof/paramDump;
-#X obj 25 637 tof/paramGui;
+#X obj 22 503 tof/paramFile;
+#X obj 118 503 tof/paramRoute;
+#X obj 217 503 tof/OSCToParam;
+#X obj 322 503 tof/paramDump;
+#X obj 25 527 tof/paramGui;
 #X obj -10 149 print loadbang;
 #X obj -10 125 tof/param /my_name my_value;
 #X text 553 126 /g options:;
 #X text 556 44 When you create a param \, you can optinally use the
 "/g" keyword to flag the param with gui options.;
 #X obj 504 330 param-abs /id FM_MOD /carrier 600;
-#X floatatom 613 531 5 0 0 0 - - -;
-#X obj 613 508 tof/param /test 50 /nlb;
-#X text 500 465 A param automatically ouputs its value when it is created.
+#X floatatom 613 481 5 0 0 0 - - -;
+#X obj 613 458 tof/param /test 50 /nlb;
+#X text 500 415 A param automatically ouputs its value when it is created.
 You can disable this behavior with the "/nlb" (no loadbang) keyword.
 ;
 #X msg 504 259 /modulation/index \$1;
@@ -66,21 +66,25 @@ You can disable this behavior with the "/nlb" (no loadbang) keyword.
 #X text 179 139 argument 2...: param value (can be anything;
 #X text 3 389 Abstraction /id:;
 #X text 498 27 /g keyword: GUI options;
-#X text 466 393 /ns keyword: No save;
-#X text 469 443 /nlb keyword: No loadbang;
-#X text 497 415 This param will never be saved.;
+#X text 4 577 /ns keyword: No save;
+#X text 469 393 /nlb keyword: No loadbang;
+#X text 35 598 This param will never be saved.;
 #X text 179 155 argument ...: special keywords;
-#X text 544 8 ----------------- SPECIAL KEYWORDS -------------------
+#X text 475 507 /wfb keyword: Wait for bang;
+#X text 507 529 This param will only output its contents on a bang.
 ;
-#X text 475 557 /wfb keyword: Wait for bang;
-#X text 507 579 This param will only output its contents on a bang.
-;
-#X obj 614 393 tof/param /nope 50 /ns;
-#X obj 500 629 tof/param /waiting 50 /wfb;
+#X obj 152 576 tof/param /nope 50 /ns;
+#X obj 500 579 tof/param /waiting 50 /wfb;
+#X floatatom 500 552 5 0 0 0 - - -;
 #X floatatom 500 602 5 0 0 0 - - -;
-#X floatatom 500 652 5 0 0 0 - - -;
-#X obj 544 605 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#X obj 544 555 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
+#X text 544 8 -------------- SPECIAL KEYWORDS (continued) --------------
+;
+#X text 71 553 -------------- SPECIAL KEYWORDS --------------;
+#X text 4 630 /nps keyword: No preset save;
+#X text 35 652 This param will never be saved in a preset file.;
+#X obj 203 630 tof/param /noPresets 67 /nps;
 #X connect 0 0 40 0;
 #X connect 25 0 41 0;
 #X connect 26 0 18 0;
@@ -90,6 +94,6 @@ You can disable this behavior with the "/nlb" (no loadbang) keyword.
 #X connect 38 0 37 0;
 #X connect 40 0 36 0;
 #X connect 41 0 36 0;
-#X connect 53 0 55 0;
-#X connect 54 0 53 0;
-#X connect 56 0 53 0;
+#X connect 52 0 54 0;
+#X connect 53 0 52 0;
+#X connect 55 0 52 0;

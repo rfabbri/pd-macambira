@@ -70,7 +70,7 @@ static void paramFile_do_save(t_paramFile* x, t_float f) {
 	
 	while(p) {
 		
-		if ( p->save ) p->save(p->x,bbuf);
+		if ( p->save ) p->save(p->x,bbuf,f);
 		
 		p = p->next;
 	}

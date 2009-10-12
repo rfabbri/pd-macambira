@@ -45,6 +45,7 @@ typedef struct _paramClass {
   t_symbol*						send;
   t_symbol*						set_s;
   int							nowaitforbang;
+  int							nopresets;
 } t_paramClass;
 
 typedef struct _paramClass_inlet2
@@ -127,7 +128,15 @@ static void paramClass_get(t_paramClass *x, t_symbol** s, int* ac, t_atom** av) 
 }
 
 // SPECIAL PARAM SAVE FUNCTION
-static void paramClass_save(t_paramClass *x, t_binbuf* bb) {
+static void paramClass_save(t_paramClass *x, t_binbuf* bb,int f) {
+	
+	//post("save:%i",f);
+	
+	
+	// f = -1 for the main save file
+	// f => 0 if it is a preset
+	if ( f >= 0 && x->nopresets) return;
+	
 	//Put my data in binbuf
 	if ((x->selector != &s_bang)) {
 		int ac = x->ac + 2;
@@ -180,20 +189,27 @@ static void* paramClass_new(t_symbol *s, int ac, t_atom *av)
 	x->noloadbang = tof_find_tag('/',gensym("/nlb"), ac-1, av+1);
 	  //post("nlb: %i",x->noloadbang);
 	  
+	  
+	  
+	  // FIND THE WAIT FOR BANG TAG: /wfb
+	  x->nowaitforbang = !(tof_find_tag('/',gensym("/wfb"), ac-1, av+1));
 	    // FIND THE NO SAVE TAG: /ns
 	int nosave = tof_find_tag('/',gensym("/ns"), ac-1, av+1);
 	  //post("ns: %i",nosave);
 	  
-	  // FIND THE WAIT FOR BANG TAG: /wfb
-	  x->nowaitforbang = !(tof_find_tag('/',gensym("/wfb"), ac-1, av+1));
+	   // FIND THE NO PRESET TAG: /nps
+	  x->nopresets = tof_find_tag('/',gensym("/nps"), ac-1, av+1);
 	  
 	  
 	  // REGISTER PARAM
 	 t_paramSaveMethod paramSaveMethod = NULL;
 	 t_paramGUIMethod paramGUIMethod = NULL;
 	 
+	 
+	 //post("no save:%i",nosave);
+	 
 	if ( x->gac > 0 ) paramGUIMethod = (t_paramGUIMethod) paramClass_GUI;
-	if ( nosave = 0 ) paramSaveMethod = (t_paramSaveMethod) paramClass_save;
+	if ( nosave == 0 ) paramSaveMethod = (t_paramSaveMethod) paramClass_save;
 		
 	x->param = param_register(x,root,path, \
 	(t_paramGetMethod) paramClass_get, \

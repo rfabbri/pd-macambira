@@ -1,7 +1,7 @@
 //#define PARAMDEBUG
 
 typedef void (*t_paramGetMethod)(void*,t_symbol**,int*,t_atom**);
-typedef void (*t_paramSaveMethod)(void*,t_binbuf*);
+typedef void (*t_paramSaveMethod)(void*,t_binbuf*,int);
 typedef void (*t_paramGUIMethod)(void*,int*,t_atom**);
 
 char param_buf_temp_a[MAXPDSTRING];
