@@ -26,8 +26,6 @@
 #include <stdio.h>
 #include "g_canvas.h"
 
-static char   *pdp_opencv_colorfilt_version = "pdp_opencv_colorfilt: a color filter";
-
 typedef struct pdp_opencv_colorfilt_struct
 {
     t_object x_obj;
@@ -63,8 +61,8 @@ static void pdp_opencv_colorfilt_draw_color(t_pdp_opencv_colorfilt *x)
     sprintf( color, "#%.2X%.2X%.2X", x->x_colorR, x->x_colorG, x->x_colorB );
     width = rtext_width( glist_findrtext( (t_glist*)x->x_canvas, (t_text *)x ) );
     height = rtext_height( glist_findrtext( (t_glist*)x->x_canvas, (t_text *)x ) );
-    sys_vgui(".x%x.c delete rectangle %xCOLOR\n", x->x_canvas, x );
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -fill %s -tags %xCOLOR\n",
+    sys_vgui((char*)".x%x.c delete rectangle %xCOLOR\n", x->x_canvas, x );
+    sys_vgui((char*)".x%x.c create rectangle %d %d %d %d -fill %s -tags %xCOLOR\n",
              x->x_canvas, x->x_obj.te_xpix+width+5, x->x_obj.te_ypix,
              x->x_obj.te_xpix+width+height+5,
              x->x_obj.te_ypix+height, color, x );
@@ -230,7 +228,7 @@ static void pdp_opencv_colorfilt_process(t_pdp_opencv_colorfilt *x)
 
 	case PDP_BITMAP_RGB:
             x->x_packet1 = pdp_packet_clone_rw(x->x_packet0);
-            pdp_queue_add(x, pdp_opencv_colorfilt_process_rgb, pdp_opencv_colorfilt_sendpacket, &x->x_queue_id);
+            pdp_queue_add(x, (void*)pdp_opencv_colorfilt_process_rgb, (void*)pdp_opencv_colorfilt_sendpacket, &x->x_queue_id);
 	    break;
 
 	default:
@@ -248,7 +246,7 @@ static void pdp_opencv_colorfilt_input_0(t_pdp_opencv_colorfilt *x, t_symbol *s,
 
     if (s== gensym("register_rw"))
     {
-       x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packet0, (int)f, pdp_gensym("bitmap/rgb/*") );
+       x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packet0, (int)f, pdp_gensym((char*)"bitmap/rgb/*") );
     }
 
     if ((s == gensym("process")) && (-1 != x->x_packet0) && (!x->x_dropped))
@@ -313,7 +311,6 @@ extern "C"
 
 void pdp_opencv_colorfilt_setup(void)
 {
-    // post( pdp_opencv_colorfilt_version );
     pdp_opencv_colorfilt_class = class_new(gensym("pdp_opencv_colorfilt"), (t_newmethod)pdp_opencv_colorfilt_new,
     	(t_method)pdp_opencv_colorfilt_free, sizeof(t_pdp_opencv_colorfilt), 0, A_NULL);
 

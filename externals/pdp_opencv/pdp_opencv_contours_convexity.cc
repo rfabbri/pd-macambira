@@ -179,10 +179,10 @@ static void pdp_opencv_contours_convexity_process_rgb(t_pdp_opencv_contours_conv
         
     //fprintf(stderr,"malloc\n");
         // Alloc memory for contour point set.    
-        PointArray = malloc( count*sizeof(CvPoint) );
+        PointArray = (CvPoint*)malloc( count*sizeof(CvPoint) );
                 
         // Alloc memory for indices of convex hull vertices.
-        hull = malloc(sizeof(int)*count);
+        hull = (int*)malloc(sizeof(int)*count);
         
         // Get contour point set.
     //fprintf(stderr,"cvCvtSeqToArray\n");
@@ -227,7 +227,7 @@ static void pdp_opencv_contours_convexity_process_rgb(t_pdp_opencv_contours_conv
              
             // Alloc memory for defect set.   
     //fprintf(stderr,"malloc\n");
-            defectArray = malloc(sizeof(CvConvexityDefect)*nomdef);
+            defectArray = (CvConvexityDefect*)malloc(sizeof(CvConvexityDefect)*nomdef);
             
             // Get defect set.
     //fprintf(stderr,"cvCvtSeqToArray\n");
@@ -345,7 +345,7 @@ static void pdp_opencv_contours_convexity_process(t_pdp_opencv_contours_convexit
 
 	case PDP_BITMAP_RGB:
             x->x_packet1 = pdp_packet_clone_rw(x->x_packet0);
-            pdp_queue_add(x, pdp_opencv_contours_convexity_process_rgb, pdp_opencv_contours_convexity_sendpacket, &x->x_queue_id);
+            pdp_queue_add(x, (void*)pdp_opencv_contours_convexity_process_rgb, (void*)pdp_opencv_contours_convexity_sendpacket, &x->x_queue_id);
 	    break;
 
 	default:
@@ -362,7 +362,7 @@ static void pdp_opencv_contours_convexity_input_0(t_pdp_opencv_contours_convexit
     /* if this is a register_ro message or register_rw message, register with packet factory */
 
     if (s == gensym("register_rw")) 
-       x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packet0, (int)f, pdp_gensym("bitmap/rgb/*") );
+       x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packet0, (int)f, pdp_gensym((char*)"bitmap/rgb/*") );
 
     if ((s == gensym("process")) && (-1 != x->x_packet0) && (!x->x_dropped))
     {

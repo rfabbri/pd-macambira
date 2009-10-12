@@ -190,7 +190,7 @@ static void pdp_opencv_bgsubstract_process(t_pdp_opencv_bgsubstract *x)
 
 	case PDP_BITMAP_RGB:
             x->x_packet1 = pdp_packet_clone_rw(x->x_packet0);
-            pdp_queue_add(x, pdp_opencv_bgsubstract_process_rgb, pdp_opencv_bgsubstract_sendpacket, &x->x_queue_id);
+            pdp_queue_add(x, (void*)pdp_opencv_bgsubstract_process_rgb, (void*)pdp_opencv_bgsubstract_sendpacket, &x->x_queue_id);
 	    break;
 
 	default:
@@ -207,7 +207,7 @@ static void pdp_opencv_bgsubstract_input_0(t_pdp_opencv_bgsubstract *x, t_symbol
     /* if this is a register_ro message or register_rw message, register with packet factory */
 
     if (s == gensym("register_rw")) 
-       x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packet0, (int)f, pdp_gensym("bitmap/rgb/*") );
+       x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packet0, (int)f, pdp_gensym((char*)"bitmap/rgb/*") );
 
     if ((s == gensym("process")) && (-1 != x->x_packet0) && (!x->x_dropped))
     {

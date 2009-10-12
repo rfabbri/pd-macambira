@@ -24,6 +24,7 @@
 #include <dirent.h>
 #include <limits.h>
 #include <dlfcn.h>
+#include <math.h>
 
 #include "pdp.h"
 
@@ -31,14 +32,16 @@
 #include "cv.h"
 #endif
 
+#define MAX_MARKERS 100
 
-
-typedef struct pdp_opencv_threshold_struct
+typedef struct pdp_opencv_hu_moments_struct
 {
     t_object x_obj;
     t_float x_f;
 
     t_outlet *x_outlet0;
+    t_outlet *x_dataout;
+    t_atom    rlist[7];
     int x_packet0;
     int x_packet1;
     int x_dropped;
@@ -48,29 +51,30 @@ typedef struct pdp_opencv_threshold_struct
     int x_height;
     int x_size;
 
-    int x_infosok; 
+    int x_binary;
 
-    int threshold_value;
-    int max_value;
-    int threshold_mode;
     IplImage *image, *gray;
+    CvMoments x_moments;
+    CvHuMoments x_humoments;
 
-    
-} t_pdp_opencv_threshold;
+} t_pdp_opencv_hu_moments;
 
-static void pdp_opencv_threshold_process_rgb(t_pdp_opencv_threshold *x)
+static void pdp_opencv_hu_moments_process_rgb(t_pdp_opencv_hu_moments *x)
 {
     t_pdp     *header = pdp_packet_header(x->x_packet0);
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1); 
+    char tindex[4];
+    int i = 0;                   // Indicator of cycles.
+    int im = 0;                  // Indicator of markers.
 
     if ((x->x_width != (t_int)header->info.image.width) || 
         (x->x_height != (t_int)header->info.image.height)) 
     {
 
-    	post("pdp_opencv_threshold :: resizing plugins");
-	
+    	post("pdp_opencv_hu_moments :: resizing");
+
     	x->x_width = header->info.image.width;
     	x->x_height = header->info.image.height;
     	x->x_size = x->x_width*x->x_height;
@@ -81,8 +85,6 @@ static void pdp_opencv_threshold_process_rgb(t_pdp_opencv_threshold *x)
     
 	//create the orig image with new size
         x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
-
-    	// Create the output images with new sizes
     	x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
     
     }
@@ -91,54 +93,30 @@ static void pdp_opencv_threshold_process_rgb(t_pdp_opencv_threshold *x)
     newheader->info.image.width = x->x_width;
     newheader->info.image.height = x->x_height;
 
-    memcpy( newdata, data, x->x_size*3 );
-    
     memcpy( x->image->imageData, data, x->x_size*3 );
     
     // Convert to grayscale
     cvCvtColor(x->image, x->gray, CV_BGR2GRAY);
-  
-    // Applies fixed-level thresholding to single-channel array.
-    switch(x->threshold_mode) {
-    	case 0:
-	   cvThreshold(x->gray, x->gray, (float)x->threshold_value, (float)x->max_value, CV_THRESH_BINARY);
-	   break;
-    	case 1:
-	   cvThreshold(x->gray, x->gray, (float)x->threshold_value, (float)x->max_value, CV_THRESH_BINARY_INV);
-	   break;
-    	case 2:
-	   cvThreshold(x->gray, x->gray, (float)x->threshold_value, (float)x->max_value, CV_THRESH_TRUNC);
-	   break;
-    	case 3:
-	   cvThreshold(x->gray, x->gray, (float)x->threshold_value, (float)x->max_value, CV_THRESH_TOZERO);
-	   break;
-    	case 4:
-	   cvThreshold(x->gray, x->gray, (float)x->threshold_value, (float)x->max_value, CV_THRESH_TOZERO_INV);
-	   break;
-    }
-  
-    cvCvtColor(x->gray, x->image, CV_GRAY2BGR);
+
+    cvMoments( x->gray, &x->x_moments, x->x_binary );
+    cvGetHuMoments( &x->x_moments, &x->x_humoments );
+
+    SETFLOAT(&x->rlist[0], x->x_humoments.hu1);
+    SETFLOAT(&x->rlist[1], x->x_humoments.hu2);
+    SETFLOAT(&x->rlist[2], x->x_humoments.hu3);
+    SETFLOAT(&x->rlist[3], x->x_humoments.hu4);
+    SETFLOAT(&x->rlist[4], x->x_humoments.hu5);
+    SETFLOAT(&x->rlist[5], x->x_humoments.hu6);
+    SETFLOAT(&x->rlist[6], x->x_humoments.hu7);
+
+    outlet_list( x->x_dataout, 0, 7, x->rlist );
+
     memcpy( newdata, x->image->imageData, x->x_size*3 );
  
     return;
 }
 
-static void pdp_opencv_threshold_thresh(t_pdp_opencv_threshold *x, t_floatarg f)
-{
-    x->threshold_value = (int)f;
-}
-
-static void pdp_opencv_threshold_max(t_pdp_opencv_threshold *x, t_floatarg f)
-{
-    x->max_value = (int)f;
-}
-
-static void pdp_opencv_threshold_mode(t_pdp_opencv_threshold *x, t_floatarg f)
-{
-    x->threshold_mode = (int)f;
-}
-
-static void pdp_opencv_threshold_sendpacket(t_pdp_opencv_threshold *x)
+static void pdp_opencv_hu_moments_sendpacket(t_pdp_opencv_hu_moments *x)
 {
     /* release the packet */
     pdp_packet_mark_unused(x->x_packet0);
@@ -148,7 +126,7 @@ static void pdp_opencv_threshold_sendpacket(t_pdp_opencv_threshold *x)
     pdp_packet_pass_if_valid(x->x_outlet0, &x->x_packet1);
 }
 
-static void pdp_opencv_threshold_process(t_pdp_opencv_threshold *x)
+static void pdp_opencv_hu_moments_process(t_pdp_opencv_hu_moments *x)
 {
    int encoding;
    t_pdp *header = 0;
@@ -164,16 +142,16 @@ static void pdp_opencv_threshold_process(t_pdp_opencv_threshold *x)
    if ( (header = pdp_packet_header(x->x_packet0))
 	&& (PDP_BITMAP == header->type)){
     
-	/* pdp_opencv_threshold_process inputs and write into active inlet */
+	/* pdp_opencv_hu_moments_process inputs and write into active inlet */
 	switch(pdp_packet_header(x->x_packet0)->info.image.encoding){
 
 	case PDP_BITMAP_RGB:
             x->x_packet1 = pdp_packet_clone_rw(x->x_packet0);
-            pdp_queue_add(x, pdp_opencv_threshold_process_rgb, pdp_opencv_threshold_sendpacket, &x->x_queue_id);
+            pdp_queue_add(x, (void*)pdp_opencv_hu_moments_process_rgb, (void*)pdp_opencv_hu_moments_sendpacket, &x->x_queue_id);
 	    break;
 
 	default:
-	    /* don't know the type, so dont pdp_opencv_threshold_process */
+	    /* don't know the type, so dont pdp_opencv_hu_moments_process */
 	    break;
 	    
 	}
@@ -181,44 +159,43 @@ static void pdp_opencv_threshold_process(t_pdp_opencv_threshold *x)
 
 }
 
-static void pdp_opencv_threshold_input_0(t_pdp_opencv_threshold *x, t_symbol *s, t_floatarg f)
+static void pdp_opencv_hu_moments_input_0(t_pdp_opencv_hu_moments *x, t_symbol *s, t_floatarg f)
 {
     /* if this is a register_ro message or register_rw message, register with packet factory */
 
     if (s == gensym("register_rw")) 
-       x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packet0, (int)f, pdp_gensym("bitmap/rgb/*") );
+       x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packet0, (int)f, pdp_gensym((char*)"bitmap/rgb/*") );
 
     if ((s == gensym("process")) && (-1 != x->x_packet0) && (!x->x_dropped))
     {
         /* add the process method and callback to the process queue */
-        pdp_opencv_threshold_process(x);
+        pdp_opencv_hu_moments_process(x);
     }
 }
 
-static void pdp_opencv_threshold_free(t_pdp_opencv_threshold *x)
+static void pdp_opencv_hu_moments_free(t_pdp_opencv_hu_moments *x)
 {
   int i;
 
     pdp_queue_finish(x->x_queue_id);
     pdp_packet_mark_unused(x->x_packet0);
-    //cv_freeplugins(x);
     
     //Destroy cv_images
     cvReleaseImage(&x->image);
     cvReleaseImage(&x->gray);
 }
 
-t_class *pdp_opencv_threshold_class;
+t_class *pdp_opencv_hu_moments_class;
 
-void *pdp_opencv_threshold_new(t_floatarg f)
+
+void *pdp_opencv_hu_moments_new(t_floatarg f)
 {
     int i;
 
-    t_pdp_opencv_threshold *x = (t_pdp_opencv_threshold *)pd_new(pdp_opencv_threshold_class);
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("max_value"));
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("threshold_value"));
+    t_pdp_opencv_hu_moments *x = (t_pdp_opencv_hu_moments *)pd_new(pdp_opencv_hu_moments_class);
 
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
+    x->x_dataout = outlet_new(&x->x_obj, &s_anything); 
 
     x->x_packet0 = -1;
     x->x_packet1 = -1;
@@ -228,18 +205,19 @@ void *pdp_opencv_threshold_new(t_floatarg f)
     x->x_height = 240;
     x->x_size   = x->x_width * x->x_height;
 
-    x->x_infosok = 0;
-
-    x->threshold_value = 50;
-    x->max_value = 255;
-    x->threshold_mode  = 0;
+    x->x_binary = 0;
 
     x->image = cvCreateImage(cvSize(x->x_width,x->x_height), IPL_DEPTH_8U, 3);
     x->gray = cvCreateImage(cvSize(x->image->width,x->image->height), IPL_DEPTH_8U, 1);
 
+    //contours = 0;
     return (void *)x;
 }
 
+static void pdp_opencv_hu_moments_binary(t_pdp_opencv_hu_moments *x, t_floatarg f)
+{
+    if ( ((int)f==1) || ((int)f==0) ) x->x_binary = (int)f;
+}
 
 #ifdef __cplusplus
 extern "C"
@@ -247,18 +225,15 @@ extern "C"
 #endif
 
 
-void pdp_opencv_threshold_setup(void)
+void pdp_opencv_hu_moments_setup(void)
 {
 
-    post( "		pdp_opencv_threshold");
-    pdp_opencv_threshold_class = class_new(gensym("pdp_opencv_threshold"), (t_newmethod)pdp_opencv_threshold_new,
-    	(t_method)pdp_opencv_threshold_free, sizeof(t_pdp_opencv_threshold), 0, A_DEFFLOAT, A_NULL);
+    post( "		pdp_opencv_hu_moments");
+    pdp_opencv_hu_moments_class = class_new(gensym("pdp_opencv_hu_moments"), (t_newmethod)pdp_opencv_hu_moments_new,
+    	(t_method)pdp_opencv_hu_moments_free, sizeof(t_pdp_opencv_hu_moments), 0, A_DEFFLOAT, A_NULL);
 
-    class_addmethod(pdp_opencv_threshold_class, (t_method)pdp_opencv_threshold_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
-    class_addmethod(pdp_opencv_threshold_class, (t_method)pdp_opencv_threshold_max, gensym("max_value"),  A_FLOAT, A_NULL );   
-    class_addmethod(pdp_opencv_threshold_class, (t_method)pdp_opencv_threshold_thresh, gensym("threshold_value"),  A_FLOAT, A_NULL );   
-    class_addmethod(pdp_opencv_threshold_class, (t_method)pdp_opencv_threshold_mode, gensym("mode"),  A_FLOAT, A_NULL );   
-
+    class_addmethod(pdp_opencv_hu_moments_class, (t_method)pdp_opencv_hu_moments_input_0, gensym("pdp"), A_SYMBOL, A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_opencv_hu_moments_class, (t_method)pdp_opencv_hu_moments_binary, gensym("binary"), A_DEFFLOAT, A_NULL);
 
 }
 
