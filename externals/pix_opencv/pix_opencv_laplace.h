@@ -17,7 +17,11 @@ LOG
 #define INCLUDE_PIX_OPENCV_LAPLACE_H_
 
 #ifndef _EiC
+#ifdef __APPLE__
+#include <OpenCV/OpenCV.h>
+#else
 #include "cv.h"
+#endif
 #endif
 
 #include "Base/GemPixObj.h"
