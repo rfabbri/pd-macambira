@@ -1,13 +1,13 @@
 Index: s_audio_jack.c
 ===================================================================
---- s_audio_jack.c	(Revision 9698)
+--- s_audio_jack.c	(Revision 12292)
 +++ s_audio_jack.c	(Arbeitskopie)
 @@ -13,7 +13,7 @@
  
  
  #define MAX_CLIENTS 100
 -#define NUM_JACK_PORTS 32
-+#define NUM_JACK_PORTS 1024
++#define NUM_JACK_PORTS 100
  #define BUF_JACK 4096
  static jack_nframes_t jack_out_max;
  #define JACK_OUT_MAX  64
@@ -23,15 +23,30 @@ Index: s_audio_jack.c
  }
  
  static int jack_xrun(void* arg) {
-@@ -228,6 +229,7 @@
+@@ -214,7 +215,7 @@
+ }
+ 
+ 
+-void pd_jack_error_callback(const char *desc) {
++static void pd_jack_error_callback(const char *desc) {
+   return;
+ }
+ 
+@@ -228,7 +229,13 @@
          int client_iterator = 0;
          int new_jack = 0;
          int srate;
 +        jack_status_t status;
  
++        if(NULL==jack_client_new) {
++          fprintf(stderr,"JACK framework not available\n");
++          return 1;
++        }
++
          jack_dio_error = 0;
          
-@@ -243,13 +245,28 @@
+         if ((inchans == 0) && (outchans == 0)) return 0;
+@@ -243,13 +250,28 @@
                  inchans = NUM_JACK_PORTS;
          }
  
@@ -63,7 +78,7 @@ Index: s_audio_jack.c
            
            if (!jack_client) { // jack spits out enough messages already, do not warn
              sys_inchannels = sys_outchannels = 0;
-@@ -305,11 +322,21 @@
+@@ -305,11 +327,21 @@
          for (j = 0; j < inchans; j++) {
                  sprintf(port_name, "input%d", j);
                  if (!input_port[j]) input_port[j] = jack_port_register (jack_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
