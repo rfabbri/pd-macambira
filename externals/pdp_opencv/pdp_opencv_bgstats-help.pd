@@ -1,4 +1,4 @@
-#N canvas 446 49 734 841 10;
+#N canvas 451 49 734 841 10;
 #X obj 39 -180 cnv 15 621 223 empty empty empty 20 12 0 14 -260097
 -66577 0;
 #X msg 146 -123 open /dev/dv1394/0;
@@ -24,8 +24,7 @@
 #X obj 89 -23 pdp_ieee1394;
 #X text 45 -326 pdp_opencv_bgstats : background and foreground extraction
 using a statitical method.;
-#X text 45 -210 Comments and support @ ydegoyon.gmail.com;
-#X text 69 -177 Caemra input;
+#X text 69 -177 Camera input;
 #X obj 89 196 pdp_opencv_bgstats;
 #X obj 229 74 / 100;
 #X floatatom 270 76 5 0 0 0 - - -;
@@ -52,6 +51,7 @@ background.;
 #X text 46 -259 This object does noise filtering using erosion and
 dilation steps ( erode paramater ). It also eliminates from the foreground
 object that are less than a minumum size ( minarea parameter ).;
+#X text 45 -210 comments to ydegoyon@gmail.com;
 #X connect 1 0 17 0;
 #X connect 2 0 3 0;
 #X connect 3 0 17 0;
@@ -60,21 +60,21 @@ object that are less than a minumum size ( minarea parameter ).;
 #X connect 6 0 7 0;
 #X connect 7 0 9 0;
 #X connect 8 0 9 0;
-#X connect 9 0 21 0;
+#X connect 9 0 20 0;
 #X connect 10 0 9 0;
 #X connect 11 0 12 0;
 #X connect 12 0 14 0;
 #X connect 13 0 14 0;
-#X connect 14 0 21 0;
-#X connect 17 0 21 0;
-#X connect 21 0 16 0;
-#X connect 21 1 38 0;
-#X connect 22 0 35 0;
-#X connect 23 0 22 0;
-#X connect 23 0 22 1;
-#X connect 24 0 25 0;
-#X connect 25 0 21 0;
-#X connect 26 0 27 0;
-#X connect 27 0 21 0;
-#X connect 29 0 21 0;
-#X connect 35 0 21 0;
+#X connect 14 0 20 0;
+#X connect 17 0 20 0;
+#X connect 20 0 16 0;
+#X connect 20 1 37 0;
+#X connect 21 0 34 0;
+#X connect 22 0 21 0;
+#X connect 22 0 21 1;
+#X connect 23 0 24 0;
+#X connect 24 0 20 0;
+#X connect 25 0 26 0;
+#X connect 26 0 20 0;
+#X connect 28 0 20 0;
+#X connect 34 0 20 0;

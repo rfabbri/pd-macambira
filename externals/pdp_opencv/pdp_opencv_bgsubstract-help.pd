@@ -48,6 +48,7 @@ shadows changes since you SET the background image.;
 #X text 304 290 threshold (default 13) to use when comparing pixel
 colors;
 #X obj 91 63 pdp_ieee1394;
+#X text 42 -120 comments to lluigomez@hangar.org;
 #X connect 1 0 31 0;
 #X connect 2 0 3 0;
 #X connect 3 0 31 0;

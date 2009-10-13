@@ -1,4 +1,4 @@
-#N canvas 6 49 714 937 10;
+#N canvas 11 49 714 937 10;
 #X obj -514 173 cnv 15 621 223 empty empty empty 20 12 0 14 -260097
 -66577 0;
 #X msg -407 230 open /dev/dv1394/0;
@@ -7,7 +7,7 @@
 #X obj -482 230 metro 40;
 #X msg -364 296 norm PAL;
 #X msg -394 259 close;
-#X obj -274 211 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1
+#X obj -273 210 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1
 0 1;
 #X obj -274 238 metro 40;
 #X msg -184 265 close;
@@ -95,6 +95,7 @@ bigest white area in the input image \, sometimes you will need to
 use pdp_opencv_morphology to transform the contours of the shape to
 be analyzed..;
 #X obj -464 330 pdp_ieee1394;
+#X text -515 152 comments to lluisgomez@hangar.org;
 #X connect 1 0 78 0;
 #X connect 2 0 3 0;
 #X connect 3 0 78 0;

@@ -1,79 +1,106 @@
-#N canvas 503 49 833 785 10;
-#X obj -17 -55 cnv 15 621 250 empty empty empty 20 12 0 14 -260097
--66577 0;
-#X obj 223 -15 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#N canvas 587 49 833 785 10;
+#X obj -11 57 cnv 15 621 250 empty empty empty 20 12 0 14 -260097 -66577
+0;
+#X obj 229 97 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 223 12 metro 40;
-#X msg 313 39 close;
-#X obj 243 110 pdp_v4l;
-#X msg 300 7 open /dev/video0;
-#X obj 412 -20 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 229 124 metro 40;
+#X msg 310 146 close;
+#X obj 249 222 pdp_v4l;
+#X msg 306 119 open /dev/video0;
+#X obj 423 95 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 412 7 metro 40;
-#X msg 493 26 close;
-#X msg 489 2 open /dev/video0;
-#X obj 433 106 pdp_v4l2;
-#X msg 498 81 format \$1;
-#X obj 499 59 hradio 15 1 0 4 empty empty empty 0 -8 0 10 -262144 -1
--1 0;
-#X obj 13 160 pdp_qt;
-#X obj 46 96 metro 40;
-#X msg 46 68 bang;
-#X msg 87 68 stop;
-#X obj 13 -1 openpanel;
-#X msg 13 24 open \$1;
-#X msg 13 -29 bang;
-#X msg 47 123 loop \$1;
-#X obj 127 123 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 423 122 metro 40;
+#X msg 500 145 close;
+#X msg 493 121 open /dev/video0;
+#X obj 423 223 pdp_v4l2;
+#X msg 501 192 format \$1;
+#X obj 502 170 hradio 15 1 0 4 empty empty empty 0 -8 0 10 -262144
+-1 -1 0;
+#X obj 19 272 pdp_qt;
+#X obj 52 208 metro 40;
+#X msg 52 180 bang;
+#X msg 93 180 stop;
+#X obj 19 111 openpanel;
+#X msg 19 136 open \$1;
+#X msg 19 83 bang;
+#X msg 53 235 loop \$1;
+#X obj 133 235 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
-#X obj 127 41 loadbang;
-#X text 56 -26 playing a video file;
-#X text 253 -17 Camera input;
-#X obj 73 161 hsl 128 15 0 500 0 0 empty empty empty -2 -8 0 10 -262144
+#X obj 133 153 loadbang;
+#X text 62 86 playing a video file;
+#X text 259 95 Camera input;
+#X obj 79 273 hsl 128 15 0 500 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
-#X obj -15 203 cnv 15 621 250 empty empty empty 20 12 0 14 -258113
+#X obj -10 311 cnv 15 621 400 empty empty empty 20 12 0 14 -258113
 -66577 0;
-#X obj 9 468 pdp_xv;
-#X obj 158 368 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 17 718 pdp_xv;
+#X obj 177 510 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X msg 73 366 nightmode \$1;
-#X text 177 369 set nightmode;
-#X floatatom 163 223 5 0 0 0 - - -;
-#X text -14 -77 pdp_opencv_bm : Block Matching optical flow algorithm.
+#X msg 92 508 nightmode \$1;
+#X floatatom 150 379 5 0 0 0 - - -;
+#X msg 40 378 blocksize \$1 \$1;
+#X floatatom 162 402 5 0 0 0 - - -;
+#X floatatom 176 428 5 0 0 0 - - -;
+#X obj 16 566 pdp_opencv_bm;
+#X msg 52 401 shiftsize \$1 \$1;
+#X msg 66 427 maxrange \$1 \$1;
+#X floatatom 166 455 5 0 0 0 - - -;
+#X msg 79 453 threshold \$1;
+#X obj 201 541 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 101 540 useprevious \$1;
+#X text -11 -51 pdp_opencv_bm : Block Matching optical flow algorithm.
 ;
-#X msg 53 222 blocksize \$1 \$1;
-#X floatatom 172 250 5 0 0 0 - - -;
-#X floatatom 179 279 5 0 0 0 - - -;
-#X obj 9 422 pdp_opencv_bm;
-#X msg 62 249 shiftsize \$1 \$1;
-#X text 204 223 set blocksize (width height) ( default 10x10 );
-#X text 212 249 set shiftsize (width height) ( default 10x10 );
-#X msg 69 278 maxrange \$1 \$1;
-#X text 220 279 set maxrange (width height) ( default 5x5 );
-#X floatatom 162 318 5 0 0 0 - - -;
-#X msg 75 316 threshold \$1;
-#X text 204 315 threhold value for the detection of movement ( default
+#X text 191 379 set blocksize (width height) ( default 20x20 );
+#X text 202 401 set shiftsize (width height) ( default 20x20 );
+#X text 216 428 set maxrange (width height) ( default 20x10 );
+#X text -10 0 with a great help from Mateu Batle & Alberto de Rodrigo
+from the iBit foundation.;
+#X floatatom 66 663 5 0 0 0 - - -;
+#X obj 120 603 unpack f f;
+#X floatatom 206 603 5 0 0 0 - - -;
+#X floatatom 208 623 5 0 0 0 - - -;
+#X text 248 602 largest amplitude of movement;
+#X text 223 539 use previous results ( default : 0 \, surprising results
+when on );
+#X msg 82 482 minblocks \$1;
+#X floatatom 169 483 5 0 0 0 - - -;
+#X text 196 511 set nightmode;
+#X text -11 -36 the main purpose of this object is to calculate the
+average direction and the intensity of the movement in a video stream.
+;
+#X text 213 477 minimum nuber of blocks to detect the movement;
+#X msg 32 156 bang;
+#X text 108 684 marked with a white arrow on the stream;
+#X obj 21 350 pdp_scale 320 240;
+#X text 137 345 this object can work on small frames unless you have
+a very powerful machine;
+#X msg 435 150 bang;
+#X text 108 660 average angle of the blocks movement;
+#X text 248 623 angle of the block with the maximum movement;
+#X text 246 635 ( in degrees [-180 \, 180]);
+#X text 107 672 ( in degrees [-180 \, 180]);
+#X text 208 452 threshold value for the detection of movement ( default
 10 );
-#X obj 296 385 pdp_background;
-#X obj 293 358 metro 40;
-#X obj 292 337 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X msg 99 -157;
-#X msg 321 334 stop;
-#X obj 281 413 pdp_convert image/YCrCb/*;
+#X obj 20 320 pdp_rotate;
+#X floatatom 89 322 5 0 0 0 - - -;
+#X text 127 314 you can rotate the object to check that the main direction
+of movement is detected;
+#X text 210 490 ( default 10 );
+#X text -10 24 comments to ydegoyon@gmail.com;
 #X connect 1 0 2 0;
 #X connect 2 0 4 0;
 #X connect 3 0 4 0;
-#X connect 4 0 36 0;
+#X connect 4 0 59 0;
 #X connect 5 0 4 0;
 #X connect 6 0 7 0;
 #X connect 7 0 10 0;
 #X connect 8 0 10 0;
 #X connect 9 0 10 0;
-#X connect 10 0 36 0;
+#X connect 10 0 59 0;
 #X connect 11 0 10 0;
 #X connect 12 0 11 0;
-#X connect 13 0 36 0;
+#X connect 13 0 67 0;
 #X connect 14 0 13 0;
 #X connect 15 0 14 0;
 #X connect 16 0 14 0;
@@ -86,18 +113,26 @@
 #X connect 22 0 15 0;
 #X connect 25 0 13 1;
 #X connect 28 0 29 0;
-#X connect 29 0 36 0;
-#X connect 31 0 33 0;
+#X connect 29 0 34 0;
+#X connect 30 0 31 0;
+#X connect 31 0 34 0;
+#X connect 32 0 35 0;
 #X connect 33 0 36 0;
-#X connect 34 0 37 0;
-#X connect 35 0 40 0;
-#X connect 36 0 27 0;
-#X connect 37 0 36 0;
-#X connect 40 0 36 0;
-#X connect 42 0 43 0;
-#X connect 43 0 36 0;
-#X connect 45 0 50 0;
-#X connect 46 0 45 0;
-#X connect 47 0 46 0;
-#X connect 49 0 46 0;
-#X connect 50 0 36 0;
+#X connect 34 0 27 0;
+#X connect 34 1 46 0;
+#X connect 34 2 47 0;
+#X connect 35 0 34 0;
+#X connect 36 0 34 0;
+#X connect 37 0 38 0;
+#X connect 38 0 34 0;
+#X connect 39 0 40 0;
+#X connect 40 0 34 0;
+#X connect 47 0 48 0;
+#X connect 47 1 49 0;
+#X connect 52 0 34 0;
+#X connect 53 0 52 0;
+#X connect 57 0 13 0;
+#X connect 59 0 34 0;
+#X connect 61 0 10 0;
+#X connect 67 0 59 0;
+#X connect 68 0 67 1;

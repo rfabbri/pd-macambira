@@ -11,7 +11,7 @@ movement history;
 #X msg 341 157 close;
 #X obj 271 228 pdp_v4l;
 #X msg 328 125 open /dev/video0;
-#X obj 440 98 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 440 98 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X obj 440 125 metro 40;
 #X msg 521 144 close;

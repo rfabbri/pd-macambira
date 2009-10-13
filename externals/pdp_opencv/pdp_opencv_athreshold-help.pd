@@ -1,4 +1,4 @@
-#N canvas 20 96 1039 729 10;
+#N canvas 25 96 1039 729 10;
 #X obj 11 -57 cnv 15 750 250 empty empty empty 20 12 0 14 -260097 -66577
 0;
 #X obj 251 -17 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
@@ -42,7 +42,6 @@
 #X msg 263 300 1;
 #X text 249 321 thresholding mode ( default 0 );
 #X text 14 -120 pdp_opencv_threshold : adaptive thresholding;
-#X text 13 -74 written by Yves Degoyon ( ydegoyon@gmail.com );
 #X text 13 -109 use the average of pixels in the block of pixels to
 filter only the pixels above or below that threshold \, depending on
 the mode BINARY or BINARY:INVERTED;
@@ -61,20 +60,21 @@ the mode BINARY or BINARY:INVERTED;
 #X floatatom 236 367 5 0 0 0 - - -;
 #X text 276 365 value to correct the theshold;
 #X obj 70 191 pdp_xv;
+#X text 13 -74 comments to ydegoyon@gmail.com;
 #X connect 1 0 2 0;
 #X connect 2 0 4 0;
 #X connect 3 0 4 0;
-#X connect 4 0 38 0;
+#X connect 4 0 37 0;
 #X connect 5 0 4 0;
 #X connect 6 0 7 0;
 #X connect 7 0 10 0;
 #X connect 8 0 10 0;
 #X connect 9 0 10 0;
-#X connect 10 0 38 0;
+#X connect 10 0 37 0;
 #X connect 11 0 10 0;
 #X connect 12 0 11 0;
-#X connect 13 0 38 0;
-#X connect 13 0 52 0;
+#X connect 13 0 37 0;
+#X connect 13 0 51 0;
 #X connect 14 0 13 0;
 #X connect 15 0 14 0;
 #X connect 16 0 14 0;
@@ -86,14 +86,14 @@ the mode BINARY or BINARY:INVERTED;
 #X connect 22 0 21 0;
 #X connect 22 0 15 0;
 #X connect 25 0 13 1;
-#X connect 28 0 38 2;
-#X connect 29 0 38 0;
-#X connect 30 0 38 1;
+#X connect 28 0 37 2;
+#X connect 29 0 37 0;
+#X connect 30 0 37 1;
 #X connect 32 0 29 0;
 #X connect 33 0 29 0;
-#X connect 38 0 27 0;
-#X connect 43 0 45 0;
-#X connect 44 0 45 0;
-#X connect 45 0 38 0;
-#X connect 49 0 38 0;
-#X connect 50 0 49 0;
+#X connect 37 0 27 0;
+#X connect 42 0 44 0;
+#X connect 43 0 44 0;
+#X connect 44 0 37 0;
+#X connect 48 0 37 0;
+#X connect 49 0 48 0;

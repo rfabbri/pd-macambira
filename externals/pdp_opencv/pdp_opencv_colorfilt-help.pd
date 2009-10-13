@@ -1,7 +1,7 @@
-#N canvas 367 49 810 785 10;
+#N canvas 372 49 810 785 10;
 #X obj -15 -31 cnv 15 621 250 empty empty empty 20 12 0 14 -260097
 -66577 0;
-#X obj 223 -15 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 223 -14 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 223 12 metro 40;
 #X msg 313 39 close;
@@ -30,15 +30,13 @@
 #X text 58 -2 playing a video file;
 #X text 253 -17 Camera input;
 #X obj 75 185 hsl 128 15 0 2000 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 12700 1;
+-1 -1 0 1;
 #X obj -15 222 cnv 15 621 350 empty empty empty 20 12 0 14 -258113
 -66577 0;
 #X text -13 -98 can be useful to isolate and track colors;
 #X obj 10 583 pdp_xv;
 #X obj 8 492 pdp_opencv_colorfilt;
 #X obj 244 161 pdp_xv;
-#X text -14 -111 pdp_opencv_colrfilt : RGB color filter;
-#X text -16 -63 written by Yves Degoyon ( ydegoyon@gmail.com );
 #X text -14 -87 it's very similar to pdp_binary for PiDiP but works
 in RGB colorspace;
 #X obj 110 384 pdp_colorgrid pdp_colorgrid1 256 0 256 50 0 50 0 1 1
@@ -63,12 +61,14 @@ in RGB colorspace;
 #X msg 290 160 cursor 1;
 #X floatatom 166 293 5 0 0 0 - - -;
 #X text 215 290 color tolerance ( default : 50 );
+#X text -14 -111 pdp_opencv_colorfilt : RGB color filter;
+#X text -14 -62 comments to ydegoyon@gmail.com.;
 #X connect 1 0 2 0;
 #X connect 2 0 4 0;
 #X connect 3 0 4 0;
 #X connect 4 0 29 0;
 #X connect 4 0 30 0;
-#X connect 4 0 52 0;
+#X connect 4 0 50 0;
 #X connect 5 0 4 0;
 #X connect 6 0 7 0;
 #X connect 7 0 10 0;
@@ -76,11 +76,11 @@ in RGB colorspace;
 #X connect 9 0 10 0;
 #X connect 10 0 29 0;
 #X connect 10 0 30 0;
-#X connect 10 0 52 0;
+#X connect 10 0 50 0;
 #X connect 11 0 10 0;
 #X connect 12 0 11 0;
 #X connect 13 0 30 0;
-#X connect 13 0 52 0;
+#X connect 13 0 50 0;
 #X connect 13 0 29 0;
 #X connect 14 0 13 0;
 #X connect 15 0 14 0;
@@ -94,18 +94,18 @@ in RGB colorspace;
 #X connect 22 0 15 0;
 #X connect 25 0 13 1;
 #X connect 29 0 28 0;
-#X connect 29 1 41 0;
-#X connect 29 2 42 0;
-#X connect 29 3 43 0;
-#X connect 30 0 51 0;
-#X connect 34 0 35 0;
-#X connect 34 1 36 0;
-#X connect 34 2 37 0;
-#X connect 35 0 29 1;
-#X connect 36 0 29 2;
-#X connect 37 0 29 3;
-#X connect 39 0 29 0;
-#X connect 50 0 29 0;
-#X connect 51 0 39 0;
-#X connect 52 0 30 0;
-#X connect 53 0 50 0;
+#X connect 29 1 39 0;
+#X connect 29 2 40 0;
+#X connect 29 3 41 0;
+#X connect 30 0 49 0;
+#X connect 32 0 33 0;
+#X connect 32 1 34 0;
+#X connect 32 2 35 0;
+#X connect 33 0 29 1;
+#X connect 34 0 29 2;
+#X connect 35 0 29 3;
+#X connect 37 0 29 0;
+#X connect 48 0 29 0;
+#X connect 49 0 37 0;
+#X connect 50 0 30 0;
+#X connect 51 0 48 0;
