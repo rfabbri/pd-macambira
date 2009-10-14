@@ -173,7 +173,7 @@ static void path_anything(t_path *x, t_symbol *s, int ac, t_atom* av) {
 			char* dir = tof_buf_temp_b;
 			char* p;
 			int l = strlen(dir);
-			if (dir[l-1] = '/') dir[l-1] = '\0';
+			if (dir[l-1] == '/') dir[l-1] = '\0';
 			char* file = tof_buf_temp_a;
 			while( strncmp(file,"../",3) == 0 ) {
 				file = file + 3;
