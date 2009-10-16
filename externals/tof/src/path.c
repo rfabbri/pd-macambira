@@ -140,11 +140,11 @@ static void path_bang(t_path *x)
 	 
 }
 
-static void path_anything(t_path *x, t_symbol *s, int ac, t_atom* av) {
+static void path_symbol(t_path *x, t_symbol *s) {
 	
 	
-	
-	int length = tof_anything_to_string(s,ac,av,tof_buf_temp_a);
+	strcpy(tof_buf_temp_a,s->s_name);
+	int length = strlen(tof_buf_temp_a);
 	t_symbol* result;
 	
 	if ( x->mode == x->s_relative ) {
@@ -190,22 +190,6 @@ static void path_anything(t_path *x, t_symbol *s, int ac, t_atom* av) {
 	outlet_symbol(x->outlet1, result);
 }
 
-
-
-
-/*
-void path_list(t_path *x,t_symbol *s, int argc, t_atom *argv)
-{
-  
- 
-  if ( argc >= 2) {
-	x->value =  atom_getfloat(argv);
-	x->inc =  atom_getfloat(argv+1);
-  } 
-  
-  
-}
-*/
 
 
 
@@ -269,7 +253,7 @@ void path_setup(void) {
         A_GIMME, 0);
 
   class_addbang(path_class, path_bang);
-  class_addanything(path_class,path_anything);
+  class_addsymbol(path_class,path_symbol);
   
   //class_addmethod(path_class, 
    //     (t_method)path_append, gensym("append"),
