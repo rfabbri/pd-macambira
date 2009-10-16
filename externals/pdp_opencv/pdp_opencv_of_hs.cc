@@ -16,6 +16,8 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
+ *   Horn and Schunck optical flow algorithm
+ *
  */
 
 #include <stdio.h>
@@ -33,7 +35,7 @@
 #include "cv.h"
 #endif
 
-typedef struct pdp_opencv_of_bm_struct
+typedef struct pdp_opencv_of_hs_struct
 {
   t_object x_obj;
   t_float x_f;
@@ -55,7 +57,8 @@ typedef struct pdp_opencv_of_bm_struct
   // OpenCv structures
   IplImage *image, *grey, *prev_grey, *swap_temp;
   IplImage *x_velx, *x_vely;
-  CvSize x_blocksize, x_shiftsize, x_maxrange, x_velsize;
+  CvSize   x_velsize;
+  double x_lambda;
 
   int x_nightmode;
   int x_threshold;
@@ -63,9 +66,9 @@ typedef struct pdp_opencv_of_bm_struct
   int x_minblocks;
   CvFont font;
 
-} t_pdp_opencv_of_bm;
+} t_pdp_opencv_of_hs;
 
-static void pdp_opencv_of_bm_process_rgb(t_pdp_opencv_of_bm *x)
+static void pdp_opencv_of_hs_process_rgb(t_pdp_opencv_of_hs *x)
 {
   t_pdp     *header = pdp_packet_header(x->x_packet0);
   short int *data   = (short int *)pdp_packet_data(x->x_packet0);
@@ -85,14 +88,14 @@ static void pdp_opencv_of_bm_process_rgb(t_pdp_opencv_of_bm *x)
         (x->x_height != (t_int)header->info.image.height) || (!x->image)) 
     {
 
-      post("pdp_opencv_of_bm :: resizing plugins");
+      post("pdp_opencv_of_hs :: resizing plugins");
   
       x->x_width = header->info.image.width;
       x->x_height = header->info.image.height;
       x->x_size = x->x_width*x->x_height;
 
-      x->x_velsize.width = (x->x_width-x->x_blocksize.width)/x->x_shiftsize.width; 
-      x->x_velsize.height = (x->x_height-x->x_blocksize.height)/x->x_shiftsize.height; 
+      x->x_velsize.width = x->x_width;
+      x->x_velsize.height = x->x_height;
     
       //Destroy cv_images
       cvReleaseImage( &x->image );
@@ -123,19 +126,19 @@ static void pdp_opencv_of_bm_process_rgb(t_pdp_opencv_of_bm *x)
     if( x->x_nightmode )
         cvZero( x->image );
         
-    cvCalcOpticalFlowBM( x->prev_grey, x->grey, 
-                         x->x_blocksize, x->x_shiftsize,
-                         x->x_maxrange, x->x_useprevious,
-                         x->x_velx, x->x_vely  );
+    cvCalcOpticalFlowHS( x->prev_grey, x->grey, 
+                         x->x_useprevious, x->x_velx, x->x_vely,
+                         x->x_lambda, 
+                         cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03) );
 
     nbblocks = 0;
     for( py=0; py<x->x_velsize.height; py++ ) 
     {
       for( px=0; px<x->x_velsize.width; px++ )
       {
-        // post( "pdp_opencv_of_bm : (%d,%d) values (%f,%f)", px, py, velxf, velyf );
-        orig.x = (px*x->x_width)/x->x_velsize.width;
-        orig.y = (py*x->x_height)/x->x_velsize.height;
+        // post( "pdp_opencv_of_hs : (%d,%d) values (%f,%f)", px, py, velxf, velyf );
+        orig.x = px;
+        orig.y = py;
         dest.x = (int)(orig.x + cvGet2D(x->x_velx, py, px).val[0]);
         dest.y = (int)(orig.y + cvGet2D(x->x_vely, py, px).val[0]);
         angle = -atan2( (double) cvGet2D(x->x_vely, py, px).val[0], (double) cvGet2D(x->x_velx, py, px).val[0] );
@@ -146,14 +149,14 @@ static void pdp_opencv_of_bm_process_rgb(t_pdp_opencv_of_bm *x)
         */
         if (hypotenuse >= x->x_threshold)
         {
-          cvLine( x->image, orig, dest, CV_RGB(0,255,0), (int)hypotenuse/10, CV_AA, 0 );
+          cvLine( x->image, orig, dest, CV_RGB(0,255,0), 1, CV_AA, 0 );
 
-          orig.x = (int) (dest.x - (x->x_shiftsize.width/4) * cos(angle + M_PI / 4));
-          orig.y = (int) (dest.y + (x->x_shiftsize.height/4) * sin(angle + M_PI / 4));
-          cvLine( x->image, orig, dest, CV_RGB(0,0,255), (int)hypotenuse/10, CV_AA, 0 );
-          orig.x = (int) (dest.x - (x->x_shiftsize.width/4) * cos(angle - M_PI / 4));
-          orig.y = (int) (dest.y + (x->x_shiftsize.height/4) * sin(angle - M_PI / 4));
-          cvLine( x->image, orig, dest, CV_RGB(0,0,255), (int)hypotenuse/10, CV_AA, 0 );
+          orig.x = (int) (dest.x - (6) * cos(angle + M_PI / 4));
+          orig.y = (int) (dest.y + (6) * sin(angle + M_PI / 4));
+          cvLine( x->image, orig, dest, CV_RGB(0,0,255), 1, CV_AA, 0 );
+          orig.x = (int) (dest.x - (6) * cos(angle - M_PI / 4));
+          orig.y = (int) (dest.y + (6) * sin(angle - M_PI / 4));
+          cvLine( x->image, orig, dest, CV_RGB(0,0,255), 1, CV_AA, 0 );
           meanx = (meanx*nbblocks+cvGet2D(x->x_velx, py, px).val[0])/(nbblocks+1);
           meany = (meanx*nbblocks+cvGet2D(x->x_vely, py, px).val[0])/(nbblocks+1);
           if ( hypotenuse > maxamp )
@@ -161,7 +164,7 @@ static void pdp_opencv_of_bm_process_rgb(t_pdp_opencv_of_bm *x)
              maxamp = hypotenuse;
              maxangle = angle;
           } 
-          // post( "pdp_opencv_of_bm : block %d : amp : %f : angle : %f", nbblocks, hypotenuse, (angle*180)/M_PI );
+          // post( "pdp_opencv_of_hs : block %d : amp : %f : angle : %f", nbblocks, hypotenuse, (angle*180)/M_PI );
           nbblocks++;
         } 
 
@@ -169,7 +172,7 @@ static void pdp_opencv_of_bm_process_rgb(t_pdp_opencv_of_bm *x)
     }
 
     meanangle=-atan2( meany, meanx ); 
-    // post( "pdp_opencv_of_bm : meanangle : %f", (meanangle*180)/M_PI );
+    // post( "pdp_opencv_of_hs : meanangle : %f", (meanangle*180)/M_PI );
 
     if ( nbblocks >= x->x_minblocks )
     {
@@ -178,11 +181,11 @@ static void pdp_opencv_of_bm_process_rgb(t_pdp_opencv_of_bm *x)
       dest.x = (int) (orig.x+((x->x_width>x->x_height)?x->x_height/2:x->x_width/2)*cos(meanangle));
       dest.y = (int) (orig.y-((x->x_width>x->x_height)?x->x_height/2:x->x_width/2)*sin(meanangle));
       cvLine( x->image, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
-      orig.x = (int) (dest.x - (x->x_shiftsize.width/2) * cos(meanangle + M_PI / 4));
-      orig.y = (int) (dest.y + (x->x_shiftsize.height/2) * sin(meanangle + M_PI / 4));
+      orig.x = (int) (dest.x - (6) * cos(meanangle + M_PI / 4));
+      orig.y = (int) (dest.y + (6) * sin(meanangle + M_PI / 4));
       cvLine( x->image, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
-      orig.x = (int) (dest.x - (x->x_shiftsize.width/2) * cos(meanangle - M_PI / 4));
-      orig.y = (int) (dest.y + (x->x_shiftsize.height/2) * sin(meanangle - M_PI / 4));
+      orig.x = (int) (dest.x - (6) * cos(meanangle - M_PI / 4));
+      orig.y = (int) (dest.y + (6) * sin(meanangle - M_PI / 4));
       cvLine( x->image, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
 
       // outputs the average angle of movement
@@ -203,60 +206,32 @@ static void pdp_opencv_of_bm_process_rgb(t_pdp_opencv_of_bm *x)
     return;
 }
 
-static void pdp_opencv_of_bm_nightmode(t_pdp_opencv_of_bm *x, t_floatarg f)
+static void pdp_opencv_of_hs_nightmode(t_pdp_opencv_of_hs *x, t_floatarg f)
 {
   if ((f==0.0)||(f==1.0)) x->x_nightmode = (int)f;
 }
 
-static void pdp_opencv_of_bm_useprevious(t_pdp_opencv_of_bm *x, t_floatarg f)
+static void pdp_opencv_of_hs_useprevious(t_pdp_opencv_of_hs *x, t_floatarg f)
 {
   if ((f==0.0)||(f==1.0)) x->x_useprevious = (int)f;
 }
 
-static void pdp_opencv_of_bm_minblocks(t_pdp_opencv_of_bm *x, t_floatarg f)
+static void pdp_opencv_of_hs_minblocks(t_pdp_opencv_of_hs *x, t_floatarg f)
 {
   if (f>=1.0) x->x_minblocks = (int)f;
 }
 
-static void pdp_opencv_of_bm_threshold(t_pdp_opencv_of_bm *x, t_floatarg f)
+static void pdp_opencv_of_hs_threshold(t_pdp_opencv_of_hs *x, t_floatarg f)
 {
   if (f>=0.0) x->x_threshold = (int)f;
 }
 
-static void pdp_opencv_of_bm_blocksize(t_pdp_opencv_of_bm *x, t_floatarg fwidth, t_floatarg fheight )
+static void pdp_opencv_of_hs_lambda(t_pdp_opencv_of_hs *x, t_floatarg flambda )
 {
-  if (fwidth>=5.0) x->x_blocksize.width = (int)fwidth;
-  if (fheight>=5.0) x->x_blocksize.height = (int)fheight;
-
-  x->x_velsize.width = (x->x_width-x->x_blocksize.width)/x->x_shiftsize.width; 
-  x->x_velsize.height = (x->x_height-x->x_blocksize.height)/x->x_shiftsize.height; 
-  cvReleaseImage( &x->x_velx );
-  cvReleaseImage( &x->x_vely );
-  x->x_velx = cvCreateImage( x->x_velsize, IPL_DEPTH_32F, 1 );
-  x->x_vely = cvCreateImage( x->x_velsize, IPL_DEPTH_32F, 1 );
-    
+  if (flambda>0.0) x->x_lambda = (double)flambda;
 }
 
-static void pdp_opencv_of_bm_shiftsize(t_pdp_opencv_of_bm *x, t_floatarg fwidth, t_floatarg fheight )
-{
-  if (fwidth>=5.0) x->x_shiftsize.width = (int)fwidth;
-  if (fheight>=5.0) x->x_shiftsize.height = (int)fheight;
-
-  x->x_velsize.width = (x->x_width-x->x_blocksize.width)/x->x_shiftsize.width; 
-  x->x_velsize.height = (x->x_height-x->x_blocksize.height)/x->x_shiftsize.height; 
-  cvReleaseImage( &x->x_velx );
-  cvReleaseImage( &x->x_vely );
-  x->x_velx = cvCreateImage( x->x_velsize, IPL_DEPTH_32F, 1 );
-  x->x_vely = cvCreateImage( x->x_velsize, IPL_DEPTH_32F, 1 );
-}
-
-static void pdp_opencv_of_bm_maxrange(t_pdp_opencv_of_bm *x, t_floatarg fwidth, t_floatarg fheight )
-{
-  if (fwidth>=1.0) x->x_maxrange.width = (int)fwidth;
-  if (fheight>=1.0) x->x_maxrange.height = (int)fheight;
-}
-
-static void pdp_opencv_of_bm_sendpacket(t_pdp_opencv_of_bm *x)
+static void pdp_opencv_of_hs_sendpacket(t_pdp_opencv_of_hs *x)
 {
   /* release the packet */
   pdp_packet_mark_unused(x->x_packet0);
@@ -266,7 +241,7 @@ static void pdp_opencv_of_bm_sendpacket(t_pdp_opencv_of_bm *x)
   pdp_packet_pass_if_valid(x->x_outlet0, &x->x_packet1);
 }
 
-static void pdp_opencv_of_bm_process(t_pdp_opencv_of_bm *x)
+static void pdp_opencv_of_hs_process(t_pdp_opencv_of_hs *x)
 {
    int encoding;
    t_pdp *header = 0;
@@ -275,16 +250,16 @@ static void pdp_opencv_of_bm_process(t_pdp_opencv_of_bm *x)
    if ( (header = pdp_packet_header(x->x_packet0))
      && (PDP_BITMAP == header->type)){
     
-     /* pdp_opencv_of_bm_process inputs and write into active inlet */
+     /* pdp_opencv_of_hs_process inputs and write into active inlet */
      switch(pdp_packet_header(x->x_packet0)->info.image.encoding){
 
      case PDP_BITMAP_RGB:
             x->x_packet1 = pdp_packet_clone_rw(x->x_packet0);
-            pdp_queue_add(x, (void*)pdp_opencv_of_bm_process_rgb, (void*)pdp_opencv_of_bm_sendpacket, &x->x_queue_id);
+            pdp_queue_add(x, (void*)pdp_opencv_of_hs_process_rgb, (void*)pdp_opencv_of_hs_sendpacket, &x->x_queue_id);
       break;
 
      default:
-      /* don't know the type, so dont pdp_opencv_of_bm_process */
+      /* don't know the type, so dont pdp_opencv_of_hs_process */
       break;
       
      }
@@ -292,7 +267,7 @@ static void pdp_opencv_of_bm_process(t_pdp_opencv_of_bm *x)
 
 }
 
-static void pdp_opencv_of_bm_input_0(t_pdp_opencv_of_bm *x, t_symbol *s, t_floatarg f)
+static void pdp_opencv_of_hs_input_0(t_pdp_opencv_of_hs *x, t_symbol *s, t_floatarg f)
 {
     /* if this is a register_ro message or register_rw message, register with packet factory */
 
@@ -302,11 +277,11 @@ static void pdp_opencv_of_bm_input_0(t_pdp_opencv_of_bm *x, t_symbol *s, t_float
     if ((s == gensym("process")) && (-1 != x->x_packet0) && (!x->x_dropped))
     {
         /* add the process method and callback to the process queue */
-        pdp_opencv_of_bm_process(x);
+        pdp_opencv_of_hs_process(x);
     }
 }
 
-static void pdp_opencv_of_bm_free(t_pdp_opencv_of_bm *x)
+static void pdp_opencv_of_hs_free(t_pdp_opencv_of_hs *x)
 {
   int i;
 
@@ -322,13 +297,13 @@ static void pdp_opencv_of_bm_free(t_pdp_opencv_of_bm *x)
     cvReleaseImage( &x->x_vely );
 }
 
-t_class *pdp_opencv_of_bm_class;
+t_class *pdp_opencv_of_hs_class;
 
-void *pdp_opencv_of_bm_new(t_floatarg f)
+void *pdp_opencv_of_hs_new(t_floatarg f)
 {
   int i;
 
-  t_pdp_opencv_of_bm *x = (t_pdp_opencv_of_bm *)pd_new(pdp_opencv_of_bm_class);
+  t_pdp_opencv_of_hs *x = (t_pdp_opencv_of_hs *)pd_new(pdp_opencv_of_hs_class);
 
   x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
   x->x_outlet1 = outlet_new(&x->x_obj, &s_anything);
@@ -343,17 +318,12 @@ void *pdp_opencv_of_bm_new(t_floatarg f)
   x->x_size   = x->x_width * x->x_height;
 
   x->x_nightmode=0;
-  x->x_threshold=10;
-  x->x_blocksize.width = 20;
-  x->x_blocksize.height = 20;
-  x->x_shiftsize.width = 20;
-  x->x_shiftsize.height = 20;
-  x->x_maxrange.width = 10;
-  x->x_maxrange.height = 10;
+  x->x_threshold=100;
+  x->x_lambda = 1.0;
   x->x_useprevious = 0;
   x->x_minblocks = 10;
-  x->x_velsize.width = (x->x_width-x->x_blocksize.width)/x->x_shiftsize.width; 
-  x->x_velsize.height = (x->x_height-x->x_blocksize.height)/x->x_shiftsize.height; 
+  x->x_velsize.width = x->x_width; 
+  x->x_velsize.height = x->x_height; 
 
   // initialize font
   cvInitFont( &x->font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0, 1, 8 );
@@ -375,21 +345,19 @@ extern "C"
 #endif
 
 
-void pdp_opencv_of_bm_setup(void)
+void pdp_opencv_of_hs_setup(void)
 {
 
-    post( "    pdp_opencv_of_bm");
-    pdp_opencv_of_bm_class = class_new(gensym("pdp_opencv_of_bm"), (t_newmethod)pdp_opencv_of_bm_new,
-      (t_method)pdp_opencv_of_bm_free, sizeof(t_pdp_opencv_of_bm), 0, A_DEFFLOAT, A_NULL);
+    post( "    pdp_opencv_of_hs");
+    pdp_opencv_of_hs_class = class_new(gensym("pdp_opencv_of_hs"), (t_newmethod)pdp_opencv_of_hs_new,
+      (t_method)pdp_opencv_of_hs_free, sizeof(t_pdp_opencv_of_hs), 0, A_DEFFLOAT, A_NULL);
 
-    class_addmethod(pdp_opencv_of_bm_class, (t_method)pdp_opencv_of_bm_input_0, gensym("pdp"), A_SYMBOL, A_DEFFLOAT, A_NULL);
-    class_addmethod(pdp_opencv_of_bm_class, (t_method)pdp_opencv_of_bm_nightmode, gensym("nightmode"), A_FLOAT, A_NULL );   
-    class_addmethod(pdp_opencv_of_bm_class, (t_method)pdp_opencv_of_bm_threshold, gensym("threshold"), A_FLOAT, A_NULL );   
-    class_addmethod(pdp_opencv_of_bm_class, (t_method)pdp_opencv_of_bm_blocksize, gensym("blocksize"), A_FLOAT, A_FLOAT, A_NULL );   
-    class_addmethod(pdp_opencv_of_bm_class, (t_method)pdp_opencv_of_bm_shiftsize, gensym("shiftsize"), A_FLOAT, A_FLOAT, A_NULL );   
-    class_addmethod(pdp_opencv_of_bm_class, (t_method)pdp_opencv_of_bm_maxrange, gensym("maxrange"), A_FLOAT, A_FLOAT, A_NULL );   
-    class_addmethod(pdp_opencv_of_bm_class, (t_method)pdp_opencv_of_bm_useprevious, gensym("useprevious"), A_FLOAT, A_NULL );   
-    class_addmethod(pdp_opencv_of_bm_class, (t_method)pdp_opencv_of_bm_minblocks, gensym("minblocks"), A_FLOAT, A_NULL );   
+    class_addmethod(pdp_opencv_of_hs_class, (t_method)pdp_opencv_of_hs_input_0, gensym("pdp"), A_SYMBOL, A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_opencv_of_hs_class, (t_method)pdp_opencv_of_hs_nightmode, gensym("nightmode"), A_FLOAT, A_NULL );   
+    class_addmethod(pdp_opencv_of_hs_class, (t_method)pdp_opencv_of_hs_threshold, gensym("threshold"), A_FLOAT, A_NULL );   
+    class_addmethod(pdp_opencv_of_hs_class, (t_method)pdp_opencv_of_hs_useprevious, gensym("useprevious"), A_FLOAT, A_NULL );   
+    class_addmethod(pdp_opencv_of_hs_class, (t_method)pdp_opencv_of_hs_lambda, gensym("lambda"), A_FLOAT, A_NULL );   
+    class_addmethod(pdp_opencv_of_hs_class, (t_method)pdp_opencv_of_hs_minblocks, gensym("minblocks"), A_FLOAT, A_NULL );   
 
 }
 
