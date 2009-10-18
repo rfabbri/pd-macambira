@@ -1,4 +1,0 @@
-#N canvas 630 126 450 300 10;
-#X obj 17 37 gf.error-2-test;
-#X msg 17 18 bang;
-#X connect 1 0 0 0;
