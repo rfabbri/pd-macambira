@@ -37,11 +37,11 @@ void tclpd_setup(void) {
         post("Tcl loader: %s was not found via the -path!", "tcl" PDSUF);
     }
 
-    Tcl_SetVar(tcl_for_pd, "DIR", dirresult, 0);
-    Tcl_Eval(tcl_for_pd, "set auto_path [linsert $auto_path $DIR]");
+    Tcl_SetVar(tcl_for_pd, "TCLPD_DIR", dirresult, 0);
+    Tcl_Eval(tcl_for_pd, "set ::auto_path [linsert $::auto_path $TCLPD_DIR]");
     Tcl_Eval(tcl_for_pd, "package provide Tclpd " TCLPD_VERSION);
 
-    if(Tcl_Eval(tcl_for_pd, "source $DIR/tcl.tcl") == TCL_OK) {
+    if(Tcl_Eval(tcl_for_pd, "source $TCLPD_DIR/tcl.tcl") == TCL_OK) {
         post("Tcl loader: loaded %s/tcl.tcl", dirresult);
     }
 
