@@ -1,4 +1,5 @@
-source pdlib.tcl
+package require Tclpd 0.2.1
+package require TclpdLib 0.17
 
 # dynroute: dynamically route messages based on first element
 # non-matching arguments are sent to last inlet

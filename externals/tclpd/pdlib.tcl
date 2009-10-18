@@ -1,7 +1,7 @@
 # TCL objectized library for PD api
 # by Federico Ferri <mescalinum@gmail.com> - (C) 2007-2009
 
-package provide pdlib 0.1
+package provide TclpdLib 0.17
 
 package require Tcl 8.5
 
