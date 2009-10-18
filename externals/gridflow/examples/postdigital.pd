@@ -1,0 +1,67 @@
+#N canvas 681 68 541 475 10;
+#X obj 23 2 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1;
+#X obj 65 89 #camera;
+#X obj 40 149 t a a a;
+#X obj 9 188 t a a;
+#X msg 39 207 close;
+#X msg 27 253 open /tmp/foo.mov \, bang \, cast uint8 \, close;
+#X obj 40 1 metro 100;
+#X obj 151 194 f;
+#X obj 111 194 bang;
+#X obj 65 109 #convolve (3 3 # 1 2 1 2 4 2);
+#X obj 65 128 # >> 4;
+#X obj 40 168 #finished;
+#X obj 41 230 #out;
+#X obj 27 272 #in;
+#X obj 29 302 # -;
+#X obj 30 414 #clip;
+#X obj 30 452 #out window;
+#X obj 14 38 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 34 63 #in babbage.jpg;
+#X msg 116 219 open quicktime /tmp/foo.mov \, codec jpeg \, parameter
+jpeg_quality \$1;
+#X obj 40 20 shunt;
+#X obj 79 21 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+;
+#X obj 30 355 # +;
+#X obj 30 336 # << 3;
+#X obj 176 194 nbx 3 14 0 100 0 0 empty empty empty 0 -8 0 10 -241291
+-1 -1 75 256;
+#X msg 176 175 75;
+#X obj 176 156 loadbang;
+#X text 64 301 compute difference between original image and jpeg decoding
+;
+#X text 80 336 boost the residue;
+#X text 64 355 add boosted residue to the original image;
+#X connect 0 0 6 0;
+#X connect 1 0 9 0;
+#X connect 2 0 11 0;
+#X connect 2 1 12 0;
+#X connect 2 2 8 0;
+#X connect 2 2 14 1;
+#X connect 2 2 22 1;
+#X connect 3 0 5 0;
+#X connect 3 1 4 0;
+#X connect 4 0 12 0;
+#X connect 5 0 13 0;
+#X connect 6 0 20 0;
+#X connect 7 0 19 0;
+#X connect 8 0 7 0;
+#X connect 9 0 10 0;
+#X connect 10 0 2 0;
+#X connect 11 0 3 0;
+#X connect 13 0 14 0;
+#X connect 14 0 23 0;
+#X connect 15 0 16 0;
+#X connect 17 0 18 0;
+#X connect 18 0 2 0;
+#X connect 19 0 12 0;
+#X connect 20 0 18 0;
+#X connect 20 1 1 0;
+#X connect 21 0 20 1;
+#X connect 22 0 15 0;
+#X connect 23 0 22 0;
+#X connect 24 0 7 1;
+#X connect 25 0 24 0;
+#X connect 26 0 25 0;

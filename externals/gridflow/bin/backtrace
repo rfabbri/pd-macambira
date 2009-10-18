@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+if ARGV.length != 1
+  puts "usage: core.rb <corefile>"
+  exit 1
+end
+qfile=ARGV[0].gsub /'/, "\\\\'"
+x=`gdb --batch -c '#{qfile}'`.split"\n"
+m=/`([^']+)/.match x[0]
+f=File.open("/tmp/backtrace_#{$$}.gdb","w")
+f.puts"bt"
+f.puts"quit"
+f.close
+cmd="gdb #{m[1]} #{qfile} --command=/tmp/backtrace_#{$$}.gdb"
+x=`#{cmd}`.split("\n")
+i=nil
+x.each_with_index {|line,i| break if /^#0/ =~ line }
+x[0..i]=[]
+puts x

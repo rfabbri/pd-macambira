@@ -1,0 +1,86 @@
+#N canvas 160 16 884 589 10;
+#X obj 5 6 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 5 550 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 6 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 4 232 cnv 15 430 145 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 25 271 pddp_open pure-data-1;
+#X obj 25 294 pddp_open pure-data-2;
+#X obj 25 317 pddp_open pure-data-3;
+#X obj 25 340 pddp_open pure-data-4;
+#X text 200 271 Pure-Data Introduction;
+#X text 200 294 GUI Objects for Interaction;
+#X text 200 317 Creating your first patch;
+#X text 200 340 Control: metro \, random & counter;
+#X obj 444 233 cnv 15 430 145 empty empty empty 20 12 0 14 -179884
+-66577 0;
+#X obj 5 391 cnv 15 430 145 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 25 416 pddp_open pure-data-5;
+#X obj 25 439 pddp_open pure-data-6;
+#X text 200 439 The powerful message object;
+#X obj 25 462 pddp_open pure-data-7;
+#X text 200 462 More about lists;
+#X text 200 485 Nesting collections of objects;
+#X text 200 416 Connectionless communications;
+#X obj 25 485 pddp_open pure-data-8;
+#X text 200 509 Using GUI's in abstractions;
+#X obj 25 509 pddp_open pure-data-9;
+#X obj 445 391 cnv 15 430 145 empty empty empty 20 12 0 14 -179884
+-66577 0;
+#X obj 468 271 pddp_open GridFlow-1;
+#X obj 468 294 pddp_open GridFlow-2;
+#X obj 468 317 pddp_open GridFlow-3;
+#X obj 468 340 pddp_open GridFlow-4;
+#X text 642 319 Introduction to video;
+#X obj 446 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 645 477 Interfacing with sensors;
+#X obj 467 426 pddp_open GridFlow-6;
+#X obj 467 452 pddp_open GridFlow-7;
+#X text 451 236 2 Introduction to GridFlow;
+#X obj 448 236 cnv 15 15 15 empty empty empty 20 12 0 14 -262144 -66577
+0;
+#X text 451 236 2 Introduction to GridFlow;
+#X obj 8 395 cnv 15 15 15 empty empty empty 20 12 0 14 -262144 -66577
+0;
+#X obj 449 395 cnv 15 15 15 empty empty empty 20 12 0 14 -262144 -66577
+0;
+#X obj 7 235 cnv 15 15 15 empty empty empty 20 12 0 14 -262144 -66577
+0;
+#X text 452 395 4 Intermediate GridFlow;
+#X text 10 235 1 Introduction to Pure-Data;
+#X text 11 395 3 Intermediate Pure-Data;
+#X text 582 563 Stephanie Brodeur and Darsha Hewitt 2006;
+#X text 451 46 What is GridFlow?;
+#X text 500 550 What is GridFlow? and GridFlow tutorials developed
+by;
+#X text 453 84 GridFlow is a plug-in for PureData that introduces the
+grid (#) data type into the PD environment. GridFlow allows you to
+work with live video \, still images and video files in a real-time
+environment.;
+#X text 11 46 What is PureData (aka PD)?;
+#X text 14 85 PureData is an open-source patching environment for multi-media
+(audio+image). PureData is a programming language where you create
+relationships by connecting visual boxes (rather than typing complex
+commands).;
+#X text 454 144 This section deals with the particular objects related
+to GridFlow. GridFlow uses the usual PD "control" objects \, as well
+as a set of GridFlow specific objects.;
+#X text 15 141 A basic understanding of PureData is useful when using
+GridFlow. If you are new to the PureData programming environment it
+is recommended that you follow the Introduction to PureData before
+you move onto the GridFlow tutorials.;
+#X text 10 13 Welcome to PureData;
+#X text 13 551 What is PureData? and PureData tutorials copyright Ben
+Bogart 2005 \; (See COPYING.TXT for details);
+#X text 642 340 Introduction to live video;
+#X text 641 273 Introduction to grids;
+#X text 639 296 Introduction to images;
+#X text 653 480;
+#X obj 467 477 pddp_open GridFlow-8;
+#X text 646 451 Motion detection;
+#X text 646 426 Advanced video effects;

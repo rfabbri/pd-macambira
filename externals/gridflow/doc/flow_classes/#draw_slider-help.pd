@@ -1,0 +1,53 @@
+#N canvas 516 122 624 690 10;
+#X obj 108 87 metro 100;
+#X obj 108 55 tgl 15 0 empty empty empty 17 7 0 10 -24198 -1 -1 1 1
+;
+#X obj 108 262 #out window;
+#X obj 3 1 cnv 15 620 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 402 2 GridFlow 0.9.0;
+#X obj 2 300 cnv 15 620 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 3 326 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 3 382 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 64 349 Grid values are clipped to the high and low values stored
+in the object;
+#X text 2 409 INTEGER;
+#X text 5 328 Inlet 0;
+#X text 5 384 Inlet 1;
+#X text 204 302 Inlets (3);
+#X obj 3 439 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 6 441 Inlet 2;
+#X text 3 469 INTEGER;
+#X obj 1 497 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 203 499 Outlets (1);
+#X obj 2 520 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 4 522 Outlet 0;
+#X text 3 350 GRID;
+#X text 4 543 GRID;
+#X text 63 543 Outputs the modified grid;
+#X text 69 408 An integer can be used to vary the minimum value of
+the range.;
+#X text 67 466 An integer can be used to vary the maximum value of
+the range.;
+#X obj 108 116 #in scissors.jpg;
+#X obj 298 149 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -241291
+-1 -1 12700 1;
+#X text 6 25 Draws a vu metre-like rectangle on an image.;
+#X text 438 148 <-- value to be displayed;
+#X msg 206 195 255 200 150;
+#X text 289 195 <-- colour;
+#X obj 3 0 #draw_vumetre;
+#X obj 108 224 #draw_slider put (0 255 0) (255 0 255) (40 40 80 200)
+0 127;
+#X connect 0 0 25 0;
+#X connect 1 0 0 0;
+#X connect 25 0 32 0;
+#X connect 26 0 32 2;
+#X connect 29 0 32 1;
+#X connect 32 0 2 0;

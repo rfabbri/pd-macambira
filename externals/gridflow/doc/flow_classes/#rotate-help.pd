@@ -1,0 +1,64 @@
+#N canvas 350 51 503 521 10;
+#X obj 181 122 cnv 15 51 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 1 345 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 168 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 191 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 215 347 Outlets (1);
+#X obj 1 426 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 210 425 Arguments (1);
+#X obj 0 263 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 366 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 398 1 GridFlow 0.8.4;
+#X text 2 192 Inlet 0;
+#X text 1 264 Inlet 1;
+#X text 221 169 Inlets (2);
+#X text 2 367 Outlet 0;
+#X obj 1 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 10 1 #rotate;
+#X text 393 1 GridFlow 0.8.4;
+#X obj 180 121 #rotate;
+#X text 11 454 INT;
+#X text 8 218 GRID;
+#X text 11 290 INT;
+#X text 4 26 The [#rotate] performs rotations on indexmaps and polygons
+and such objects.;
+#X obj 163 83 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 80 98 #in;
+#X obj 227 99 hsl 40 15 0 35999 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 2800 1;
+#X text 11 390 GRID;
+#X text 60 455 [#rotate] accepts an integer number (0 to 35999) as
+a creation argument which initializes the first angle of rotation.
+;
+#X obj 80 121 #remap_image;
+#X obj 80 142 #out window \, title #rotate;
+#X obj 9 57 tgl 15 0 empty empty empty 0 -6 0 8 -233017 -1 -1 1 1;
+#X obj 9 76 metro 100;
+#X text 65 392 Outputs the result of the rotation and needs to be sent
+to a [#remap_image] to be visualized.;
+#X text 57 217 The Grid passed in inlet 0 will be the grid on which
+the rotation will be performed.;
+#X text 57 289 An integer from 0 to 35999 (36000 is the same as 0)
+passed in inlet 1 will determine the angle of rotation for the object
+to be rotated.;
+#X floatatom 243 123 7 0 0 0 - - -;
+#X msg 80 57 open b001.jpg;
+#X connect 17 0 27 1;
+#X connect 22 0 23 0;
+#X connect 23 0 27 0;
+#X connect 24 0 17 1;
+#X connect 24 0 34 0;
+#X connect 27 0 28 0;
+#X connect 27 1 17 0;
+#X connect 29 0 30 0;
+#X connect 30 0 23 0;
+#X connect 35 0 23 0;

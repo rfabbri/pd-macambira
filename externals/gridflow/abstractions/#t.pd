@@ -1,0 +1,16 @@
+#N canvas 454 233 450 176 10;
+#X obj 26 29 inlet;
+#X obj 26 116 outlet;
+#X obj 72 116 outlet;
+#X obj 26 48 t a a;
+#X obj 26 67 #finished;
+#X obj 26 86 #store;
+#X text 120 22 This is for when [t a a] is not sufficient;
+#X text 121 36 Because GF doesn't fully follow ordering of;
+#X text 121 49 messages.;
+#X connect 0 0 3 0;
+#X connect 3 0 4 0;
+#X connect 3 1 5 1;
+#X connect 3 1 2 0;
+#X connect 4 0 5 0;
+#X connect 5 0 1 0;

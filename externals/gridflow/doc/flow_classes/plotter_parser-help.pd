@@ -1,0 +1,96 @@
+#N canvas 565 248 655 441 10;
+#X obj 215 131 plotter_parser;
+#X obj 215 33 until;
+#X obj 215 16 bng 15 250 50 0 empty empty empty 17 7 0 10 -24198 -1
+-1;
+#X obj 148 16 tgl 15 0 empty empty empty 17 7 0 10 -24198 -1 -1 0 1
+;
+#X msg 222 57 rewind;
+#X obj 317 129 print bogus;
+#X obj 215 245 loadbang;
+#X obj 226 174 print command;
+#X obj 147 215 #store;
+#X obj 229 203 loadbang;
+#X obj 226 155 spigot;
+#X obj 272 156 tgl 15 0 empty empty empty 17 7 0 10 -241291 -1 -1 0
+1;
+#X obj 33 300 fps;
+#X obj 306 18 bng 15 250 50 0 empty empty empty 17 7 0 10 -258699 -1
+-1;
+#X obj 148 33 metro 1;
+#X obj 215 79 #in grid plotter_parser_old.pd.hpgl \, headerless \,
+type b;
+#X obj 346 272 #pack;
+#X obj 376 256 nbx 5 14 -1e+37 1e+37 0 1 empty empty empty 0 -8 0 10
+-241291 -1 -1 0 256;
+#X obj 346 240 nbx 5 14 -1e+37 1e+37 0 1 empty empty empty 0 -8 0 10
+-241291 -1 -1 -1000 256;
+#X obj 346 323 #pack;
+#X obj 376 307 nbx 5 14 -1e+37 1e+37 0 1 empty empty empty 0 -8 0 10
+-241291 -1 -1 10333 256;
+#X obj 346 291 nbx 5 14 -1e+37 1e+37 0 1 empty empty empty 0 -8 0 10
+-241291 -1 -1 7000 256;
+#X obj 148 52 t b b;
+#X obj 124 252 gf.oneshot;
+#X obj 147 196 t b b;
+#X obj 33 319 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-225271 -1 -1 7.67569 256;
+#X obj 33 252 gf.oneshot;
+#X obj 51 119 bng 15 250 50 0 empty empty empty 17 7 0 10 -24198 -1
+-1;
+#X obj 51 136 t b b;
+#X obj 143 285 #draw_hpgl;
+#X obj 33 281 #out window;
+#X obj 145 136 f;
+#X obj 170 136 + 1;
+#X obj 145 155 sel;
+#X msg 229 222 600 800 3 b #;
+#X msg 215 264 3 b # 255 255 255;
+#X obj 170 155 % 8;
+#X connect 0 0 10 0;
+#X connect 0 0 29 2;
+#X connect 0 1 5 0;
+#X connect 1 0 15 0;
+#X connect 2 0 1 0;
+#X connect 3 0 14 0;
+#X connect 4 0 15 0;
+#X connect 6 0 35 0;
+#X connect 8 0 23 0;
+#X connect 8 0 26 0;
+#X connect 9 0 34 0;
+#X connect 10 0 7 0;
+#X connect 11 0 10 1;
+#X connect 12 0 25 0;
+#X connect 13 0 4 0;
+#X connect 13 0 34 0;
+#X connect 14 0 22 0;
+#X connect 15 0 0 0;
+#X connect 15 1 1 1;
+#X connect 15 1 3 0;
+#X connect 15 1 27 0;
+#X connect 16 0 29 3;
+#X connect 17 0 16 1;
+#X connect 18 0 16 0;
+#X connect 19 0 29 4;
+#X connect 20 0 19 1;
+#X connect 21 0 19 0;
+#X connect 22 0 15 0;
+#X connect 22 1 15 0;
+#X connect 23 0 29 0;
+#X connect 24 0 8 0;
+#X connect 24 1 23 1;
+#X connect 24 1 31 0;
+#X connect 26 0 30 0;
+#X connect 27 0 28 0;
+#X connect 28 0 8 0;
+#X connect 28 1 26 1;
+#X connect 29 0 8 1;
+#X connect 29 1 24 0;
+#X connect 30 0 12 0;
+#X connect 31 0 32 0;
+#X connect 31 0 33 0;
+#X connect 32 0 36 0;
+#X connect 33 0 27 0;
+#X connect 34 0 8 1;
+#X connect 35 0 29 1;
+#X connect 36 0 31 1;

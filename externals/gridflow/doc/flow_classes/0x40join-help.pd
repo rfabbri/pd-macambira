@@ -1,0 +1,44 @@
+#N canvas 677 232 659 362 10;
+#X obj 18 32 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 211 30 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 18 161 @join 2;
+#X text 16 8 @join;
+#X text 204 238 the left grid and right grid must have the same number
+of elements in all dimensions except the one specified \, which will
+be the sum of the two corresponding;
+#X text 563 10 gridflow;
+#X text 17 306 see also:;
+#X msg 41 73 open r001.jpg;
+#X msg 234 69 open b001.jpg;
+#X obj 18 53 fork;
+#X obj 211 48 fork;
+#X text 244 29 1 <--;
+#X text 45 31 2 <--;
+#X obj 18 242 #clip;
+#X obj 86 310 #fold +;
+#X obj 142 310 #scan +;
+#X obj 18 269 #out window;
+#X obj 18 96 #in;
+#X obj 237 96 #rgb_to_greyscale;
+#X obj 211 96 #in;
+#X obj 18 188 #perspective 128;
+#X text 205 170 creation argument is the index of the dimension by
+which the join will occur. for n-dimensional grids \, the dimensions
+are numbered from 0 to n-1. in addition \, negative numbers from -n
+to -1 may be used \, to which n will be added.;
+#X connect 0 0 9 0;
+#X connect 1 0 10 0;
+#X connect 2 0 20 0;
+#X connect 7 0 17 0;
+#X connect 8 0 19 0;
+#X connect 9 0 17 0;
+#X connect 9 1 7 0;
+#X connect 10 0 19 0;
+#X connect 10 1 8 0;
+#X connect 13 0 16 0;
+#X connect 17 0 2 0;
+#X connect 18 0 2 1;
+#X connect 19 0 18 0;
+#X connect 20 0 13 0;

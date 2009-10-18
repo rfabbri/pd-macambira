@@ -1,0 +1,9 @@
+#N canvas 383 288 441 244 10;
+#X obj 50 120 renamefile;
+#X msg 50 76 list current_name new_name;
+#X obj 128 206 ls;
+#X text 42 208 also see :;
+#X text 313 21 GridFlow 0.8.0;
+#X text 45 157 * The path should correspond to the location of the
+file from where pd is started;
+#X connect 1 0 0 0;

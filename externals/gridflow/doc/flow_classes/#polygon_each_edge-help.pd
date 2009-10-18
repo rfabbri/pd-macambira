@@ -1,0 +1,12 @@
+#N canvas 502 236 450 158 10;
+#X text 220 35 very small square;
+#X text 174 68 enumerate edges;
+#X obj 41 109 #print;
+#X text 52 88 each edge is a vertex pair;
+#X text 221 22 example polygon:;
+#X obj 60 40 # +;
+#X msg 44 10 4 2 # 0 0 1 1 1 1 1 0;
+#X obj 41 66 #polygon_each_edge;
+#X connect 5 0 7 0;
+#X connect 6 0 5 0;
+#X connect 7 0 2 0;

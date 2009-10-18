@@ -1,0 +1,65 @@
+Grid Literals
+	In every grid-accepting inlet, a list may be sent instead; if 
+	it consists only of integers, it will be converted to a 
+	one-dimensional grid. Else it may contain a single "#" sign and 
+	integers on both sides of it, where the ones to the left of it are 
+	fed as arguments to an imaginary [#redim] object and the one to the 
+	right of it are fed through that [#redim]. 
+ 	In every grid-accepting inlet, an integer or float may also be sent; 
+	it will be converted to a zero-dimensional grid (a scalar). 
+
+Grid Protocol
+	a grid has an associated number type that defines what are the possible values for its elements 
+	(and how much space it takes). the default is int32. 
+	a single-dimensional grid of 3 elements (a triplet) is called dim(3). a 
+	three-dimensional grid of 240 rows of 320 columns of triplets is called 
+	dim(240,320,3). 
+ 	There is a sequence in which elements of a Grid are stored and 
+	transmitted.  Dimension 0 is called "first" and dimension N-1 is 
+	called "last". They are called so because if you select a 
+	position in the first dimension of a grid, the selected part is of the same 
+	shape minus the first dimension; so in dim(240,320,3) if you select 
+	row 51 (or whichever valid row number), you get a dim(320,3). if you select 
+	a subpart two more times you get to a single number. 
+ 	At each such level, elements are sent/stored in their numeric order, 
+	and are numbered using natural numbers starting at 0. This ordering usually 
+	does not matter, but sometimes it does. Most notably, [#import], [#export] and [#redim] care about it. 
+	On the other hand, order of dimensions usually does matter; this is 
+	what distinguishes rows from columns and channels, for example. 
+	Most objects care about the distinction. 
+	A grid with only 1 element in a given dimension is different from one 
+	lacking that dimension; it won't have the same meaning. You can use this 
+	property to your advantage sometimes. 
+	Zero-dimensional grids exist. They are called dim(). They can only contain 
+	a single number. 
+Picture Protocol
+  This section is useful if you want to know what a picture is in terms of a grid.
+  A picture is a three-dimensional Grid: 0:rows 1:columns 2:channels
+
+Channels for the RGB color model are:  0:red 1:green 2:blue
+ 	Because Grids are made of 32-bit integers, a three-channel picture uses 
+	96 bpp (bits per pixel), and have to be downscaled to 24 bpp (or 16 bpp) 
+	for display. That huge amount of slack is there because when you create 
+	your own effects you often have intermediate results that need to be of 
+	higher precision than a normal picture. Especially, results of multiplications 
+	are big and should not overflow before you divide them back to normal; 
+	and similarly, you can have negative values all over, as long as you take 
+	care of them before they get to the display.
+ 	In the final conversion, high bits are just ignored. This means: black is 
+	0, maximum is 255, and values wrap like with % 256. If you want to 
+	clip them, you may use [# max 0] and [# min 255] objects.
+
+The following are called VecOps because each operation happens between more than just two numbers.
+A first kind of VecOp are those that arise when a pair of numbers (A0,A1) is considered as a single number A0+A1*sqrt(-1).
+If you need complex numbers but don't know yet how they work, learn them using a math tutorial and then those VecOps will begin to seem familiar.
+All the complex number operators are only for floats.
+TODO: fill the last two columns of this table.
+
+Synchronisation
+
+In GridFlow you cannot send two grids in different inlets at the 
+same time. You have to use [#finished] together with (possibly) [fork] and [#store], 
+which can be cumbersome. If you don't do this, the result is undefined 
+behaviour (or crash!).
+There are two exceptions: [#store] and # allow right-inlet grids to be buffered if an operation is occuring on left inlet. This 
+should make many programs simpler.

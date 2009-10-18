@@ -1,0 +1,28 @@
+#N canvas 301 131 637 303 10;
+#X obj 21 159 @complex_sq;
+#X text 96 15 this object computes the square of complex numbers. if
+seeing imaginary as Y and real as X \, then this operation squares
+the distance of a point from origin and doubles the angle between it
+and the +X half-axis clockwise. :);
+#X floatatom 21 108 5 0 0 0 - - -;
+#X floatatom 21 238 5 0 0 0 - - -;
+#X floatatom 64 108 5 0 0 0 - - -;
+#X floatatom 58 238 5 0 0 0 - - -;
+#X text 572 13 gridflow;
+#X text 21 275 see also:;
+#X obj 21 128 #pack;
+#X text 138 88 However \, this (old) object is backwards from the rest
+of GridFlow because it puts Imaginary before Real. [#fft] puts the
+Real part first.;
+#X text 14 14 @complex_sq;
+#X obj 114 235 #print;
+#X obj 21 209 #unpack;
+#X obj 94 279 # +;
+#X obj 127 279 # abs-;
+#X connect 0 0 11 0;
+#X connect 0 0 12 0;
+#X connect 2 0 8 0;
+#X connect 4 0 8 1;
+#X connect 8 0 0 0;
+#X connect 12 0 3 0;
+#X connect 12 1 5 0;

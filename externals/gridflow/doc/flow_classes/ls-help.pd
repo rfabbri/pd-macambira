@@ -1,0 +1,21 @@
+#N canvas 293 272 624 295 10;
+#X text 259 22 GridFlow 0.8.0;
+#X text 30 266 see also:;
+#X obj 106 267 renamefile;
+#X obj 189 267 unix_time;
+#X obj 67 130 ls;
+#X obj 67 48 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 25 186 listlength;
+#X floatatom 25 220 5 0 0 0 - - -;
+#X obj 107 187 display;
+#X obj 265 267 exec;
+#X msg 67 81 symbol /home;
+#X text 157 118 Similar to the Unix command 'ls'. Returns the filenames
+in a directory. May be used with [listlength] to determine the number
+of files in a directory.;
+#X connect 4 0 6 0;
+#X connect 4 0 8 0;
+#X connect 5 0 10 0;
+#X connect 6 0 7 0;
+#X connect 10 0 4 0;

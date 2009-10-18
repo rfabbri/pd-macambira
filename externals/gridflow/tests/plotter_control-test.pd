@@ -1,0 +1,51 @@
+#N canvas 598 366 622 323 10;
+#X obj 34 101 plotter_control;
+#X obj 122 120 t a;
+#X msg 469 54 42 \, 100 \, -30;
+#X text 439 167 52 50 49 48 48 45 51 48;
+#X obj 34 120 list prepend;
+#X obj 12 12 loadbang;
+#X msg 12 31 bang;
+#X obj 469 73 ascii;
+#X obj 440 148 display;
+#X obj 499 128 list prepend;
+#X obj 439 35 t b b;
+#X obj 439 18 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 439 128 seq_fold;
+#X obj 483 235 #to_symbol;
+#X obj 483 254 #import;
+#X obj 484 274 display;
+#X msg 483 216 65 13 10 66;
+#X msg 34 69 PU \, pd \, pa 200 300 \, SP 3 \, ip 1 2 3 \, other foo
+50 70 \, print hello world \, print_from_ascii 29 29 13 10;
+#X obj 12 158 expect 80 85 59 10 80 68 59 10 80 65 50 48 48 44 51 48
+48 59 10 83 80 51 59 10 73 80 49 44 50 44 51 59 10 70 79 79 53 48 44
+55 48 59 10 76 66 104 101 108 108 111 32 119 111 114 108 100 3 59 10
+76 66 29 29 13 10 3 59 10;
+#X obj 12 50 t b a b;
+#X obj 12 139 list;
+#X obj 13 217 display;
+#X connect 0 0 4 0;
+#X connect 1 0 4 1;
+#X connect 2 0 7 0;
+#X connect 4 0 1 0;
+#X connect 4 0 20 1;
+#X connect 5 0 6 0;
+#X connect 6 0 19 0;
+#X connect 7 0 12 1;
+#X connect 9 0 12 3;
+#X connect 10 1 2 0;
+#X connect 11 0 10 0;
+#X connect 12 0 8 0;
+#X connect 12 1 9 0;
+#X connect 12 2 9 1;
+#X connect 13 0 14 0;
+#X connect 14 0 15 0;
+#X connect 16 0 13 0;
+#X connect 17 0 0 0;
+#X connect 18 0 21 0;
+#X connect 19 0 20 0;
+#X connect 19 1 17 0;
+#X connect 19 2 4 1;
+#X connect 20 0 18 0;

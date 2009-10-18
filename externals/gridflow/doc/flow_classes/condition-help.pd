@@ -1,0 +1,16 @@
+#N canvas 78 0 388 273 10;
+#X obj 33 112 condition 0 0 60 90;
+#X floatatom 33 77 5 0 0 0 - - -;
+#X floatatom 161 77 5 0 0 0 - - -;
+#X obj 33 148 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 161 148 bng 15 250 50 0 empty empty empty 0 -6 0 8 -258699 -1
+-1;
+#X text 31 16 accepts (X0 \, Y0) (X1 \, Y1);
+#X text 30 194 returns a bang only when the condition changes;
+#X text 30 236 use with;
+#X obj 99 237 #motion_detection;
+#X connect 0 0 3 0;
+#X connect 0 1 4 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 1;

@@ -1,0 +1,28 @@
+#N canvas 0 0 613 300 10;
+#X obj 152 20 args hello (world a 42) *;
+#X obj 322 39 print args;
+#X obj 152 3 bng 15 250 50 0 empty empty empty 17 7 0 10 -24198 -1
+-1;
+#X obj 18 35 inlet;
+#X obj 18 233 outlet;
+#X obj 18 54 t a;
+#X obj 18 155 route temperature pression etc;
+#X obj 266 85 display;
+#X obj 209 105 display;
+#X text 270 69 rest of arguments (*);
+#X text 17 174 do whatever you want with those args;
+#X obj 223 230 t a;
+#X text 230 211 anything else coming from first inlet or named args
+;
+#X obj 153 125 display;
+#X text 157 106 hello;
+#X text 213 86 world;
+#X connect 0 0 13 0;
+#X connect 0 1 8 0;
+#X connect 0 2 7 0;
+#X connect 0 3 5 0;
+#X connect 0 3 1 0;
+#X connect 2 0 0 0;
+#X connect 3 0 5 0;
+#X connect 5 0 6 0;
+#X connect 6 3 11 0;

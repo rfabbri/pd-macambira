@@ -1,0 +1,6 @@
+#N canvas 209 229 409 113 10;
+#X obj 22 26 inlet rgb;
+#X obj 22 64 outlet rgba;
+#X obj 22 45 #inner (3 4 # 1 0 0 0 0 1 0 0 0 0 1 0);
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;

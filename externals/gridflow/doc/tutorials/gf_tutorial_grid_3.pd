@@ -1,0 +1,30 @@
+#N canvas 106 132 652 402 10;
+#X obj 7 11 cnv 15 640 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 10 11 1.2 How to create a grid.;
+#X obj 7 11 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 11 11 1.3 Creating a grid using the [# + 0] object.;
+#X obj 7 -29 cnv 15 640 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 12 -22 1 Introduction to Grids;
+#X obj 279 117 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 216 255 <-- the display object outputs results.;
+#X text 217 116 <-- step 1: click on either message box to view the
+numbers from the list in a grid.;
+#X text 9 36 The [# + 0] object works like [#import] but allows you
+to put your grid parameters and values into one message box instead
+of having to insert them into the object box.;
+#X obj 5 337 cnv 15 640 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X msg 16 113 3 3 # 6 1 3 6 3 324 6 3 4;
+#X msg 37 159 3 3 # 1 0 0 0;
+#X obj 17 254 display;
+#X obj 16 204 cnv 15 37 15 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 16 203 # + 0;
+#X text 14 345 GridFlow 0.8.4;
+#X connect 11 0 15 0;
+#X connect 12 0 15 0;
+#X connect 15 0 13 0;

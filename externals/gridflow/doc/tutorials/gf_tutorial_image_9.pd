@@ -1,0 +1,65 @@
+#N canvas 157 13 867 556 10;
+#X obj -14 522 cnv 15 862 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj -14 34 cnv 15 865 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -14 -1 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text -9 5 2 Introduction to Images;
+#X text -9 33 2.6 [#convolve];
+#X obj 147 258 #store;
+#X obj 147 362 # / 9;
+#X msg 297 372 3 3 # 1 1 1 1 1 1 1 1 1;
+#X obj -5 353 #out window;
+#X obj -5 160 #in;
+#X obj 147 177 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj -5 119 loadbang;
+#X obj 147 206 metro 33.3667;
+#X obj -5 218 t a;
+#X obj 147 335 #convolve \, seed 4;
+#X obj 297 339 loadbang;
+#X obj 297 445 display;
+#X obj 147 411 #clip;
+#X obj 529 390 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 228 141 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 229 175 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 164 140 <-- step #1 : load image;
+#X text 166 175 <-- step #3 : start metro;
+#X obj 297 316 cnv 15 110 15 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X text 331 316 Blurs;
+#X text 562 389 apply effect by selecting a message box;
+#X text 202 253 <-- The [#store] object stores the last grid that [#convolve]
+was applied to. Everytime time the metro bangs \, [#convolve] is applied
+to the grid retained in this object \, therefore applying effect on
+top of effect.;
+#X text 465 390 <-- step #2 :;
+#X text -8 529 GridFlow 0.9.0;
+#X text -18 502 ((Source convolve.pd : Copyright Mathieu Bouchard 2002)
+;
+#X msg 296 415 3 3 # 4 0 -1 3 1 0 0 0 4;
+#X text -9 55 [#convolve] allows you to apply preset effects such as
+blur \, edge sharpen and emboss onto a grid. In this example you can
+create two different kinds of "blurs" on an image.;
+#X msg -5 140 load working.jpg;
+#X obj 147 387 # abs-;
+#X connect 5 0 14 0;
+#X connect 6 0 33 0;
+#X connect 7 0 14 1;
+#X connect 9 0 13 0;
+#X connect 10 0 12 0;
+#X connect 11 0 32 0;
+#X connect 12 0 5 0;
+#X connect 13 0 5 1;
+#X connect 13 0 8 0;
+#X connect 14 0 6 0;
+#X connect 15 0 7 0;
+#X connect 17 0 13 0;
+#X connect 30 0 14 1;
+#X connect 30 0 16 0;
+#X connect 32 0 9 0;
+#X connect 33 0 17 0;

@@ -1,0 +1,28 @@
+#N canvas 297 445 656 323 10;
+#X text 208 121 opacity channel file;
+#X text 51 95 foreground file;
+#X text 438 96 background file;
+#X text 579 14 gridflow;
+#X text 206 209 a picture that has an opacity level will be used as
+foreground vs a picture that has no opacity channel. the output is
+a picture that has no opacity channel;
+#X msg 234 69 load b001.jpg;
+#X obj 211 96 #in;
+#X obj 237 96 #rgb_to_greyscale;
+#X obj 406 96 #in;
+#X msg 429 71 load g001.jpg;
+#X msg 41 71 load r001.jpg;
+#X obj 18 96 #in;
+#X obj 18 208 #layer;
+#X obj 18 161 @join -1;
+#X obj 18 269 #out window;
+#X text 14 5 #layer;
+#X connect 5 0 6 0;
+#X connect 6 0 7 0;
+#X connect 7 0 13 1;
+#X connect 8 0 12 1;
+#X connect 9 0 8 0;
+#X connect 10 0 11 0;
+#X connect 11 0 13 0;
+#X connect 12 0 14 0;
+#X connect 13 0 12 0;

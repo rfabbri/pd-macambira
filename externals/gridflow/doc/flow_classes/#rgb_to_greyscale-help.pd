@@ -1,0 +1,40 @@
+#N canvas 113 134 502 431 10;
+#X obj 1 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 299 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 210 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 1 233 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 215 301 Outlets (1);
+#X obj 1 320 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 398 1 GridFlow 0.8.4;
+#X text 2 234 Inlet 0;
+#X text 2 321 Outlet 0;
+#X obj 166 183 #out window;
+#X obj 166 112 #in;
+#X obj 14 0 #rgb_to_greyscale;
+#X obj 166 137 cnv 15 121 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 166 137 #rgb_to_greyscale;
+#X obj 174 91 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X msg 166 68 open working.jpg;
+#X obj 166 160 #greyscale_to_rgb;
+#X text 221 211 Inlets (1);
+#X text 7 259 GRID;
+#X text 8 346 GRID;
+#X text 87 260 A color grid at the left inlet is accepted.;
+#X text 15 27 Creates a greyscale image from a color image.;
+#X obj 2 391 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 196 392 Arguments (none);
+#X text 84 349 A grid equivalent to the original one is output in greyscale.
+;
+#X connect 10 0 13 0;
+#X connect 13 0 16 0;
+#X connect 14 0 10 0;
+#X connect 15 0 10 0;
+#X connect 16 0 9 0;

@@ -1,0 +1,42 @@
+#N canvas 544 108 502 472 10;
+#X obj 1 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 0 352 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 0 247 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 0 270 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 214 354 Outlets (1);
+#X obj 0 450 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 0 373 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 1 271 Inlet 0;
+#X text 1 374 Outlet 0;
+#X text 214 247 Inlets (1);
+#X obj 15 160 cnv 15 52 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X text 5 298 GRID;
+#X obj 14 91 #import ( 2 2 2 );
+#X obj 50 115 display;
+#X msg 14 64 1 2 3 4 5 6 7 8;
+#X text 209 449 Arguments (0);
+#X obj 161 217 display;
+#X text 59 298 Accepts a grid that will be transformed into a list.
+;
+#X text 3 401 LIST;
+#X text 57 401 The grid is transformed into a single message containing
+a sequence of integers.;
+#X text 12 27 Produces a list from grid data. Useful for the integration
+into the rest of PureData.;
+#X text 130 63 <-- create the grid here;
+#X obj 2 0 #to_list;
+#X text 397 1 GridFlow 0.9.0;
+#X obj 14 161 #to_list;
+#X obj 14 216 print converted_grid;
+#X connect 12 0 13 0;
+#X connect 12 0 24 0;
+#X connect 14 0 12 0;
+#X connect 24 0 16 0;
+#X connect 24 0 25 0;

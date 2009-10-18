@@ -1,0 +1,66 @@
+#!/usr/bin/tclsh
+
+set argh0 [file normalize [file join [pwd] $argv0]]
+source [file dirname $argh0]/pd-tools.tcl
+
+set toplefts {}
+
+# for the recursion to work properly, restore should be checked before #N, and the check
+# for #N shouldn't do "continue", as well as other tricky index stuff.
+proc find_top_left {lines i} {
+  global filename toplefts
+  set toplefts_i [llength $toplefts]
+  lappend toplefts [list patate poil] ;# temporary dummy value so that subpatches are represented in the correct order
+  set j $i
+  set xmin +9999; set ymin +9999
+  set xmax -9999; set ymax -9999
+  while {$i < [llength $lines]} {
+    set list [split [lindex $lines $i] " "]
+    if {[string compare [lindex $list 1] "connect"]==0} {incr i; continue}
+    if {[string compare [lindex $list 1] "restore"]==0} {break}
+    if {[string compare [lindex $list 0] "#N"]==0} {set i [find_top_left $lines [expr $i+1]]}
+    set x [lindex $list 2]; if {$xmin > $x} {set xmin $x}; if {$xmax < $x} {set xmax $x}
+    set y [lindex $list 3]; if {$ymin > $y} {set ymin $y}; if {$ymax < $y} {set ymax $y}
+    incr i
+  }
+  puts [format "filename=%-32s patch at lines %4d thru %4d has xmin=%d ymin=%d xmax=%d ymax=%d" $filename $j $i $xmin $ymin $xmax $ymax]
+  lset toplefts $toplefts_i [list $xmin $ymin]
+  return $i
+}
+
+# somewhat copy-pasted from the above, sorry.
+proc move_objects {lines i} {
+  global toplefts fout
+  set xymin [lindex $toplefts 0]
+  set xmin [lindex $xymin 0]; if {$xmin > 0} {set xmin 0}
+  set ymin [lindex $xymin 1]; if {$ymin > 0} {set ymin 0}
+  set toplefts [lrange $toplefts 1 end]
+  while {$i < [llength $lines]} {
+    set list [split [lindex $lines $i] " "]
+    if {[string compare [lindex $list 1] "connect"]==0} {puts $fout [pd_pickle $list]; incr i; continue}
+    if {[string compare [lindex $list 1] "restore"]==0} {break}
+    if {[string compare [lindex $list 0] "#N"]==0} {
+      puts $fout [pd_pickle $list]
+      set i [move_objects $lines [expr $i+1]]
+      set list [split [lindex $lines $i] " "]
+    }
+    set x [expr [lindex $list 2]-$xmin]
+    set y [expr [lindex $list 3]-$ymin]
+    set list [lreplace $list 2 3 $x $y]
+    puts $fout [pd_pickle $list]
+    incr i
+  }
+  return $i
+}
+
+foreach filename $argv {
+  set lines [pd_read_file $filename]
+  find_top_left $lines 1
+  #continue
+  set fout [open $filename.new w]
+  puts $fout [pd_pickle [lindex $lines 0]]
+  move_objects $lines 1
+  close $fout
+  exec mv $filename $filename.old
+  exec mv $filename.new $filename
+}

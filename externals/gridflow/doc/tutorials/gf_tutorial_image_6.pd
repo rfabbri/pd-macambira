@@ -1,0 +1,66 @@
+#N canvas 130 10 767 676 10;
+#X obj 7 -69 cnv 15 760 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 2 425 cnv 15 760 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 4 -220 cnv 15 760 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 18 -215 2 Introduction to Images;
+#X obj 5 -183 cnv 15 760 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 12 -155 When an image is represented as a grid every pixel
+value will vary between 0 and 255 Colour wrapping occurs when the result
+of an operation on the pixel value is higher than 255 Values above
+255 are counted from 0 For example: if a pixel has a red value of 240
+and 20 is added to it \, you get 5 instead of displaying 260 (240 +
+20 - 255 = 5).;
+#X text 17 -184 2.4 Colour Wrapping;
+#X text 15 -69 2.4 [#clip];
+#X text 11 -44 The [#clip] object is used with numops in order to set
+a lower and upper range to pixel values. This allows you to avoid over
+saturating the colours of your grid.;
+#X obj 163 83 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 19 254 cnv 15 38 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 53 161 hsl 128 15 0 255 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 0 1;
+#X obj 20 56 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1;
+#X obj 50 353 #clip;
+#X obj 20 78 metro 33.3;
+#X obj 75 185 #color;
+#X obj 20 385 #out window;
+#X obj 20 314 shunt;
+#X obj 50 288 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj 3 107 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1 -1
+;
+#X text 296 211 channel at a time;
+#X text 268 196 <-- use colour specific sliders to add values to one
+;
+#X obj 147 288 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 179 288 click here to redirect the flow of data using the [shunt]
+object and see the effect of [#clip];
+#X text 100 83 <-- step #1 : start the metro;
+#X text 199 160 <-- use slider to add values to all channels at once
+;
+#X text 9 432 GridFlow 0.8.4;
+#X obj 20 136 #store;
+#X obj 66 136 #in sewing.jpg;
+#X obj 20 254 # + 0;
+#X obj 66 117 loadbang;
+#X text 84 288 <-- step #2 :;
+#X connect 11 0 29 1;
+#X connect 12 0 14 0;
+#X connect 13 0 16 0;
+#X connect 14 0 27 0;
+#X connect 15 0 29 1;
+#X connect 17 0 16 0;
+#X connect 17 1 13 0;
+#X connect 18 0 17 1;
+#X connect 19 0 27 0;
+#X connect 27 0 29 0;
+#X connect 28 0 27 1;
+#X connect 29 0 17 0;
+#X connect 30 0 28 0;

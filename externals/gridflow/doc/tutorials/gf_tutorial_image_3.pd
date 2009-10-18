@@ -1,0 +1,84 @@
+#N canvas 0 87 993 482 10;
+#X obj 6 38 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 6 3 cnv 15 1000 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 5 149 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 530 134 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 484 163 #in;
+#X obj 484 191 cnv 15 42 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X text 8 180 In this section we will introduce some very basic functions
+of the numeric operator \, one of the most common methods used for
+image transformation.;
+#X text 7 69 GridFlow performs high level grid processing \; in other
+words its main function is the manipulation of images and video. There
+are several ways to modify images in GridFlow \, some are very basic
+while others are more advanced.;
+#X text 9 234 Numeric Operators (numop): transform grids by applying
+a mathematical operation to each pixel value.;
+#X obj 6 455 cnv 15 1000 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 18 37 2.3 Image Manipulation;
+#X text 17 148 Image Manipulation Using Numeric Operators;
+#X text 8 277 To transform a grid the numop must first be given an
+argument. That argument will be applied to every pixel in the grid.
+The following three examples show some ways to give the numop an argument.
+;
+#X obj 460 38 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 465 62 Altering a grid by placing an argument directly into
+the numop object.;
+#X obj 560 343 cnv 15 42 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 561 382 display;
+#X msg 483 278 1 2 3 4 5 6 7 8 9;
+#X obj 483 307 #import (3 3);
+#X obj 484 382 display;
+#X obj 10 38 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 22 37 2.3 Image Manipulation;
+#X obj 10 38 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 22 37 2.3 Image Manipulation;
+#X obj 672 103 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 11 352 cnv 15 20 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 422 361 --->;
+#X text 608 103 <-- step #1 : click here to load the image;
+#X obj 672 133 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 624 189 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 608 133 <-- step #2 : click here to view the image;
+#X text 658 201 the value (42);
+#X text 560 188 <-- step #3 : try altering the argument by changing
+;
+#X obj 691 276 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 691 342 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 627 276 <-- step #1 : click here to load the grid;
+#X text 20 8 2 Introduction to Images;
+#X text 472 37 2.3 Patch Example 1;
+#X text 9 352 Tip: To understand how pixels are affected by the numop
+test out this numeric grid patch. Each grid value that is output is
+multiplied by 42;
+#X obj 484 220 #out window;
+#X obj 484 191 # * 42;
+#X text 727 360 by changing the value (42);
+#X text 628 342 <-- step #2 : try altering the argument;
+#X obj 560 343 # * 42;
+#X text 14 463 GridFlow 0.8.4;
+#X msg 484 106 open working.jpg;
+#X connect 3 0 4 0;
+#X connect 4 0 40 0;
+#X connect 17 0 18 0;
+#X connect 18 0 19 0;
+#X connect 18 0 43 0;
+#X connect 40 0 39 0;
+#X connect 43 0 16 0;
+#X connect 45 0 4 0;

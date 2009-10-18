@@ -1,0 +1,85 @@
+#N canvas 109 540 736 659 10;
+#X obj 268 124 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 278 148 cnv 15 450 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 641 cnv 15 720 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 7 5 cnv 15 720 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 268 43 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 271 43 Arguments:;
+#X obj 268 267 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 271 267 Outlets:;
+#X obj 8 43 cnv 15 250 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 11 43 Usage:;
+#X obj 8 63 cnv 15 250 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 100 cnv 15 250 200 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 271 124 Inlets: (Read left to right \, inlet "0" being the
+leftmost);
+#X obj 80 71 #pack;
+#X text 11 5 SUMMARY:;
+#X text 76 5 Creates a one dimentional grid (Dim(N) vector) from individual
+integers.;
+#X obj 30 222 #color;
+#X floatatom 30 114 5 0 0 0 - - -;
+#X floatatom 52 142 5 0 0 0 - - -;
+#X floatatom 74 170 5 0 0 0 - - -;
+#X obj 30 196 #pack 3;
+#X text 283 63 One - [integer] defines the number of inlets and the
+amount of grid dimensions.;
+#X text 289 175 Integer - accepts multiple integers as defined by the
+argument and creates a vector.;
+#X text 283 287 One - outputs values from each individual inlet.;
+#X obj 270 483 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 281 503 cnv 15 450 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 7 335 cnv 15 720 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 268 373 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 271 373 Arguments:;
+#X obj 268 595 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 271 595 Outlets:;
+#X obj 8 373 cnv 15 250 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 11 373 Usage:;
+#X obj 8 393 cnv 15 250 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 430 cnv 15 250 200 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 273 482 Inlets: (Read left to right \, inlet "0" being the
+leftmost);
+#X text 11 335 SUMMARY:;
+#X obj 79 400 #unpack;
+#X obj 30 518 #unpack 3;
+#X obj 30 451 #color;
+#X floatatom 30 601 5 0 0 0 - - -;
+#X floatatom 59 574 5 0 0 0 - - -;
+#X floatatom 88 549 5 0 0 0 - - -;
+#X text 283 393 One - [integer] defines the number of outlets and the
+amount of grid dimensions.;
+#X text 281 148 All:;
+#X text 283 503 All:;
+#X text 284 529 Grid - receives grids and outputs integers.;
+#X text 289 218 Grid - receives grids and outputs integers.;
+#X text 77 335 Outputs individual integers corresponding to the vector
+dimensions (number of elements in a grid).;
+#X text 284 615 All - outputs the vector dimensions as individual integers.
+;
+#X text 17 648 GridFlow 0.8.0;
+#X connect 17 0 20 0;
+#X connect 18 0 20 1;
+#X connect 19 0 20 2;
+#X connect 20 0 16 0;
+#X connect 38 0 40 0;
+#X connect 38 1 41 0;
+#X connect 38 2 42 0;
+#X connect 39 0 38 0;

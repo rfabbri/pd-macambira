@@ -1,0 +1,30 @@
+#N canvas 414 111 504 403 10;
+#X obj 0 0 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 0 339 cnv 15 500 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 0 241 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 0 264 cnv 15 60 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 5 265 Inlet_0;
+#X obj 0 370 cnv 15 500 18 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 202 243 Inlets (1);
+#X text 16 312 GRID;
+#X text 17 287 LIST;
+#X text 15 300 INTEGER;
+#X text 394 1 GridFlow 0.8.5;
+#X text 88 278 GUI object equivalent to [print] and [#print]. method
+(any) () Displays the received message in the box \, resizing the box
+so that the message fits exactly.;
+#X obj 90 185 display;
+#X text 5 0 [display];
+#X text 202 340 Outlets (0);
+#X text 204 369 Arguments (0);
+#X msg 319 61 0 1 2 3 5 8 13;
+#X floatatom 319 89 5 0 0 0 - - -;
+#X obj 89 58 #color;
+#X connect 16 0 12 0;
+#X connect 17 0 12 0;
+#X connect 18 0 12 0;
