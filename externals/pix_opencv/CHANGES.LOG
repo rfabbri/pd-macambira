@@ -1,3 +1,10 @@
+version 0.2-rc5 ( codename THANKSIBIT )
+
+* added optical flow objects :
+Block Matching : pix_opencv_of_bm
+Horn and Schunck : pix_opencv_of_hs
+Lucas/Kanade : pix_opencv_of_lk
+
 version 0.2-rc4 ( codename BALTANIK )
 
 * fixed colorspace problems for mac ppc
