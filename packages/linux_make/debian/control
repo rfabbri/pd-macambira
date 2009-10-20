@@ -8,7 +8,7 @@ Package: pd-extended
 Architecture: i386
 Depends: xterm | x-terminal-emulator, ttf-bitstream-vera, x-ttcidfont-conf, tcllib
 Replaces: puredata, pd-externals, gem, pd-pdp, pd-zexy
-Conflicts: pd, pd-externals, gem, pd-pdp, pd-zexy
+Conflicts: puredata, pd-externals, gem, pd-pdp, pd-zexy
 Provides: pd
 Recommends: xdg-utils
 Description: Pure Data with patches and a large collection of externals
