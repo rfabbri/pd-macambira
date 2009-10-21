@@ -36,7 +36,7 @@ typedef struct _paramDump
 
 } t_paramDump;
 
-
+/*
 static void paramDump_updateguis(t_paramDump *x, t_symbol* s) {
 	
 	t_param* p = get_param_list(x->root);
@@ -62,7 +62,7 @@ static void paramDump_updateguis(t_paramDump *x, t_symbol* s) {
 	}
 		
 }
-
+*/
 static void paramDump_guis(t_paramDump *x, t_symbol* s) {
 	
 	t_param* p = get_param_list(x->root);
@@ -185,7 +185,7 @@ void paramDump_setup(void) {
  //class_addmethod(paramDump_class, (t_method) paramDump_values, gensym("values"), A_DEFSYMBOL,0);
  
  class_addmethod(paramDump_class, (t_method) paramDump_guis, gensym("guis"), A_DEFSYMBOL,0);
- class_addmethod(paramDump_class, (t_method) paramDump_updateguis, gensym("updateguis"), A_DEFSYMBOL,0);
+ //class_addmethod(paramDump_class, (t_method) paramDump_updateguis, gensym("updateguis"), A_DEFSYMBOL,0);
 
  
  //class_addmethod(paramDump_class, (t_method) paramDump_update_guis, gensym("update"), A_DEFSYMBOL,0);
