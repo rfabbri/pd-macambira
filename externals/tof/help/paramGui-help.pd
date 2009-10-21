@@ -1,30 +1,42 @@
-#N canvas 198 148 663 465 10;
-#X obj 10 241 paramGui;
-#X obj -13 32 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
+#N canvas 1067 99 864 482 10;
+#X obj 4 19 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
-#X text -8 84 author: mrtoftrash@gmail.com;
-#X text -8 31 description: builds interfaces out of pd guis for params.
+#X text 9 71 author: mrtoftrash@gmail.com;
+#X text 8 50 tags: param gui;
+#X text 114 356 --------------------- SEE ALSO -----------------------
 ;
-#X text -9 63 tags: param gui;
-#X obj 10 206 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
--1;
-#X text 406 216 /gui options:;
-#X text 31 205 Bang: build guis for all params that have /gui options.
+#X text 88 377 See the help for the param external to expand your mind:
 ;
-#X text 97 369 --------------------- SEE ALSO -----------------------
-;
-#X text 71 390 See the help for the param external to expand your mind:
-;
-#X obj 69 412 param /numerical 100 /gui nbx;
-#X text 108 277 -- SUPER IMPORTANT --;
-#X text 415 238 nbx: creates a numberbox;
-#X text 414 257 slider min max: creates a slider with the indicated
+#X text 125 264 -- SUPER IMPORTANT --;
+#X text 432 225 nbx: creates a numberbox;
+#X text 431 244 slider min max: creates a slider with the indicated
 minimum and maximum;
-#X text 414 286 bng: creates a bang;
-#X text 414 304 tgl: creates a toggle;
-#X text 416 322 symbolatom: creates a symbol box;
-#X obj 278 411 param /slip 100 /gui slider 0 127;
-#X text 14 293 You have to copy the created guis into your root patch
+#X text 431 273 bng: creates a bang;
+#X text 431 291 tgl: creates a toggle;
+#X text 433 309 symbolatom: creates a symbol box;
+#X text 31 280 You have to copy the created guis into your root patch
 (or a subpatch of it) for them to work with their target params!;
-#X text -9 105 version: 2009-09-19 (localized version);
-#X connect 5 0 0 0;
+#X text 8 92 version: 2009-09-19 (localized version);
+#X obj 86 399 tof/param /numerical 100 /gui nbx;
+#X obj 315 398 tof/param /slip 100 /gui slider 0 127;
+#X text 423 203 /g options:;
+#X obj 555 127 tof/paramId;
+#X obj 555 157 print;
+#X obj 555 100 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 647 48 ./param-abs /id bob;
+#X text 9 18 description: builds pd guis for params.;
+#X obj 682 139 tof/paramDump;
+#X obj 687 105 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 687 171 print;
+#X msg 729 106 guis;
+#X msg 748 171 ----;
+#X obj 610 370 tof/param /maude 3 /g bob;
+#X obj 608 409 tof/param /tom yo /g sym;
+#X connect 16 0 17 0;
+#X connect 18 0 16 0;
+#X connect 21 0 23 0;
+#X connect 22 0 21 0;
+#X connect 24 0 21 0;
+#X connect 25 0 23 0;

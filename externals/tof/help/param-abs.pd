@@ -1,4 +1,4 @@
-#N canvas 6 0 1018 692 10;
+#N canvas 6 0 1018 686 10;
 #X obj 225 477 outlet~;
 #X obj 55 21 inlet;
 #X text 179 26 This abstraction is an example for the param external.
@@ -18,6 +18,8 @@
 #X obj 317 349 tof/param /volume 0 /g slider 0 1;
 #X obj 223 202 tof/param /carrier 800 /g slider 200 2000;
 #X obj 55 66 tof/paramRoute;
+#X obj 660 195 iemguts/propertybang;
+#X obj 660 223 tof/paramGui;
 #X connect 1 0 17 0;
 #X connect 3 0 4 0;
 #X connect 4 0 7 0;
@@ -31,3 +33,4 @@
 #X connect 15 0 12 0;
 #X connect 16 0 3 0;
 #X connect 17 0 8 0;
+#X connect 18 0 19 0;

@@ -138,10 +138,11 @@ static void* paramCustom_new(t_symbol *s, int ac, t_atom *av)
 	 x->nopresets = tof_find_tag('/',gensym("/nps"), ac-1, av+1);
 	  
 	  
-	  
+
 	x->param = param_register(x,root,path,\
 	NULL,\
 	(t_paramSaveMethod) paramCustom_save,\
+	NULL,\
 	NULL);
 	  
 	if (!x->param) return NULL;

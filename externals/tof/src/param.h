@@ -1,8 +1,11 @@
+#include "tof.h"
+
 //#define PARAMDEBUG
 
 typedef void (*t_paramGetMethod)(void*,t_symbol**,int*,t_atom**);
 typedef void (*t_paramSaveMethod)(void*,t_binbuf*,int);
-typedef void (*t_paramGUIMethod)(void*,int*,t_atom**);
+typedef void (*t_paramGUIMethod)(void*,int*,t_atom**,t_symbol**,t_symbol**);
+typedef void (*t_paramGUIUpdateMethod)(void*);
 
 char param_buf_temp_a[MAXPDSTRING];
 char param_buf_temp_b[MAXPDSTRING];
@@ -21,6 +24,7 @@ typedef struct _param {
    t_paramGetMethod		get; //Function to get current value
    t_paramSaveMethod	save; //Function to save
    t_paramGUIMethod		GUI;
+   t_paramGUIUpdateMethod GUIUpdate;
    //t_symbol*			send;
    //t_symbol*			receive;
 } t_param;
@@ -140,10 +144,11 @@ static t_symbol* param_get_name ( int ac, t_atom* av  ) {
 		char* name =  atom_getsymbol(av)->s_name;
 		if (*name == *param_separator ) {
 			int length = strlen(name);
-			if (name[length-1] != '_') return atom_getsymbol(av);
+			if (name[length-1] != '_' || name[length-1] != '/') return atom_getsymbol(av);
 		 }
 	} 
-	post("param names must start with a \"/\" and can not end with a \"_\"!");
+	post("param names must start with a \"/\" and can not end with \
+    either a \"_\" or a \"/\"!");
 	return NULL;
 }
 
@@ -205,9 +210,14 @@ static t_symbol* param_get_path( t_canvas* i_canvas,  t_symbol* name) {
 		}
         i_canvas = i_canvas->gl_owner;
     } 
-  //strcat(sbuf_name,separator);
+  
+  // If no name, the path will always end with a /
+  
   if ( name != NULL) {
 	  strcat(sbuf_name,name->s_name);
+  } else {
+      //if (strlen(sbuf_name)==0) 
+      strcat(sbuf_name,param_separator); 
   }
   
   return gensym(sbuf_name);
@@ -222,7 +232,8 @@ static t_symbol* param_get_path( t_canvas* i_canvas,  t_symbol* name) {
 //static struct param* register_param( t_canvas* canvas, int o_ac, t_atom* o_av) {
 
 static t_param* param_register(void* x,t_symbol* root, t_symbol* path,\
- t_paramGetMethod get, t_paramSaveMethod save, t_paramGUIMethod GUI) {
+ t_paramGetMethod get, t_paramSaveMethod save, t_paramGUIMethod GUI, \
+ t_paramGUIUpdateMethod GUIUpdate) {
 	
 			
      //char *separator = "/";
@@ -263,6 +274,7 @@ static t_param* param_register(void* x,t_symbol* root, t_symbol* path,\
 		p->get = get;
 		p->save = save;
 		p->GUI = GUI;
+		p->GUIUpdate = GUIUpdate;
 		//p->id = id;
 		//set_param( p, ac, av);
 		//p->ac_g = ac_g;

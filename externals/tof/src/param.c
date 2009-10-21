@@ -20,7 +20,6 @@
  */
 
 
-#include "tof.h"
 #include "param.h"
 
 extern int sys_noloadbang;
@@ -151,11 +150,18 @@ static void paramClass_save(t_paramClass *x, t_binbuf* bb,int f) {
 }
 
 // SPECIAL PARAM GUI FUNCTION
-static void paramClass_GUI(t_paramClass *x, int* ac, t_atom** av) {
+static void paramClass_GUI(t_paramClass *x, int* ac, t_atom** av, t_symbol** send,t_symbol** receive) {
 	*ac = x->gac;
 	*av = x->gav;
+    *send = x->receive;
+    *receive = x->send;
 }
 
+
+// SPECIAL PARAM GUI FUNCTION
+static void paramClass_GUIUpdate(t_paramClass *x) {
+	if(x->selector != &s_bang ) tof_send_anything_prepend(x->send,x->selector,x->ac,x->av,x->set_s );
+}
 
 
 // CONSTRUCTOR
@@ -214,7 +220,8 @@ static void* paramClass_new(t_symbol *s, int ac, t_atom *av)
 	x->param = param_register(x,root,path, \
 	(t_paramGetMethod) paramClass_get, \
 	paramSaveMethod, \
-	paramGUIMethod);
+	paramGUIMethod,\
+	(t_paramGUIUpdateMethod)paramClass_GUIUpdate);
   
 	if (!x->param) return NULL;
 	 
@@ -247,15 +254,7 @@ static void* paramClass_new(t_symbol *s, int ac, t_atom *av)
 	//}
 	}
 		  
-	 
-		  
-	
 
-	
-	  
-	 
-	  
-	
 	  
 	  int l = strlen(path->s_name) + strlen(root->s_name) + 2;
 	  char* receiver = getbytes( l * sizeof(*receiver));

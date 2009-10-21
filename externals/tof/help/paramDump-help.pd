@@ -1,6 +1,5 @@
-#N canvas 238 80 610 462 10;
-#X obj 38 195 paramDump;
-#X obj 38 228 print;
+#N canvas 1257 140 623 501 10;
+#X obj 38 259 print;
 #X obj 38 129 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj 21 12 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
@@ -9,17 +8,25 @@
 #X text 26 89 version: 2009-09-19 (localized version);
 #X text 26 13 description: outputs all the children params of the root
 patch.;
-#X obj 205 227 param-abs /id FM_MOD;
-#X text 69 273 --------------------- SEE ALSO -----------------------
+#X obj 149 266 param-abs /id FM_MOD;
+#X text 69 304 --------------------- SEE ALSO -----------------------
 ;
-#X text 43 294 See the help for the param external to expand your mind:
+#X text 43 325 See the help for the param external to expand your mind:
 ;
-#X obj 148 320 param /another a_value;
+#X obj 148 351 param /another a_value;
 #X msg 82 161 guis;
 #X text 61 130 A bang will output all the params and their values.
 ;
-#X text 119 158 Guis will output all the optional /gui values.;
 #X text 26 47 tags: state param;
-#X connect 0 0 1 0;
-#X connect 2 0 0 0;
-#X connect 11 0 0 0;
+#X msg 117 204 symbol /FM_MOD;
+#X text 213 202 A symbol will dump only the params that start with
+that path.;
+#X obj 38 226 tof/paramDump;
+#X obj 303 265 param-abs /id SECOND;
+#X msg 124 179 guis /SECOND;
+#X text 119 158 Guis will output all the optional /g values.;
+#X connect 1 0 15 0;
+#X connect 10 0 15 0;
+#X connect 13 0 15 0;
+#X connect 15 0 0 0;
+#X connect 17 0 15 0;

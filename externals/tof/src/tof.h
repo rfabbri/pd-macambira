@@ -8,7 +8,7 @@
 
 #define IS_A_SYMBOL(atom,index) ((atom+index)->a_type == A_SYMBOL)
 #define IS_A_FLOAT(atom,index) ((atom+index)->a_type == A_FLOAT)
-#endif
+
 
 
 char tof_buf_temp_a[MAXPDSTRING];
@@ -270,16 +270,16 @@ static void tof_outlet_anything_prepend(t_outlet* outlet, t_symbol* s, int argc,
 }
 	
 	
-static void tof_send_anything_prepend(t_symbol* target,t_symbol* s, int ac, t_atom* av,t_symbol* prepend) {
+static void tof_send_anything_prepend(t_symbol* target,t_symbol* selector, int ac, t_atom* av,t_symbol* prepend) {
 
 	if (target->s_thing) {
-		if ( s == &s_list || s == &s_float || s == &s_symbol ) {
+		if ( selector == &s_list || selector == &s_float || selector == &s_symbol ) {
 			typedmess(target->s_thing, prepend, ac, av);
 		} else {
 			int new_ac = ac + 1;
 			t_atom *new_av = getbytes(new_ac*sizeof(*new_av));	
 			tof_copy_atoms(av,new_av+1,ac);
-			SETSYMBOL(new_av, s);
+			SETSYMBOL(new_av, selector);
 			typedmess(target->s_thing, prepend, new_ac, new_av);
 			freebytes(new_av, new_ac*sizeof(*new_av));
 		}
@@ -301,3 +301,4 @@ static t_symbol* tof_remove_extension(t_symbol* s) {
 	freebytes(newstring,length * sizeof(*newstring));
 	return newsymbol;
 }
+#endif
