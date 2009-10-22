@@ -1,47 +1,50 @@
-#N canvas 305 118 476 537 10;
-#X obj 66 482 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#N canvas 1064 8 505 644 10;
+#X obj 82 587 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj -11 19 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
-#X text -6 75 author: mrtoftrash@gmail.com;
-#X text -6 96 version: 2009-04-14 (initial release);
-#X text -7 60 tags: initialization;
-#X text -6 18 description: outputs an inital argument. Outputs a default
-one if no initial argument is set. Can also check that an argument
-is of a particular type.;
-#X obj 13 187 argument 1;
-#X text 5 247 If a second argument is set \, its value will be used
-as the default value. The default value is used only if there is no
-parent argument OR if the type of the parent argument does not match
-the type of the default one.;
-#X obj 4 322 argument 1 32;
-#X obj 12 167 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#X text -3 68 author: mrtoftrash@gmail.com;
+#X text -5 89 version: 2009-04-14 (initial release);
+#X text -4 47 tags: initialization;
+#X obj 8 257 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 4 298 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#X obj 5 346 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 4 349 print;
-#X obj 13 208 print;
-#X text 6 135 The first argument selects the nth parent argument to
-output.;
-#X text 92 321 <-Will output 32 because there are no parent arguments.
+#X obj 5 397 print;
+#X obj 8 305 print;
+#X obj 8 429 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 8 477 print;
+#X text 204 608 <- open it;
+#X obj 8 280 tof/argument 1;
+#X obj 5 370 tof/argument 1 32;
+#X obj 8 451 tof/argument;
+#X obj 82 611 ./argument-abs a b;
+#X text 106 127 [argument n default];
+#X text -4 17 description: Outputs the patch's creation arguments individually.
 ;
-#X text 87 183 <-Should output the first parent argument. But in this
-case \, the parent (the containing patch) has no arguments and this
-example will not output anything.;
-#X text 137 428 -- Example --;
-#X text 5 449 Inside the following abstraction \, three [argument]
-objects are linked to arguments 1 \, 2 and 3;
-#X obj 158 347 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X obj 158 369 argument;
-#X obj 158 395 print;
-#X text 218 370 <-Outputs the \$0 as symbol;
-#X text 172 506 <- open it;
-#X obj 66 506 argument-abs a b;
-#X connect 0 0 23 0;
-#X connect 6 0 12 0;
-#X connect 8 0 11 0;
-#X connect 9 0 6 0;
-#X connect 10 0 8 0;
-#X connect 18 0 19 0;
-#X connect 19 0 20 0;
+#X text 6 154 [argument] outputs the n-th creation argument.;
+#X text 9 174 If the n-th creation argument is not defined \, [argument]
+can optionally output a default one.;
+#X text 102 273 This help patch is a file and therefore has no creation
+arguments. The [argument] to the left has no default value \, so nothing
+will be outputed.;
+#X text 100 449 With no arguments \, [argument] outputs the patch's
+\$0 as symbol.;
+#X text 13 533 Inside the following abstraction \, three [argument]
+objects output the creation arguments. Look inside for an explenation
+of the printed output.;
+#X text 103 586 <- bang to print;
+#X text 120 363 As stated before \, this help patch is a file and has
+no creation arguments. But the [argument] to the left has a default
+value and will output it.;
+#X text 7 209 Also \, if the n-th creation argument is not of the same
+type as the default value \, the default value will be outputed instead.
+;
+#X connect 0 0 15 0;
+#X connect 5 0 12 0;
+#X connect 6 0 13 0;
+#X connect 9 0 14 0;
+#X connect 12 0 8 0;
+#X connect 13 0 7 0;
+#X connect 14 0 10 0;

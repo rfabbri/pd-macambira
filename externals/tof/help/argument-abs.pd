@@ -1,29 +1,27 @@
-#N canvas 336 203 614 414 10;
+#N canvas 336 203 651 389 10;
 #X obj 158 36 inlet;
 #X obj 158 92 t b b b;
 #X text 220 105 first;
 #X text 159 192 second;
 #X text 73 282 third;
-#X obj 11 303 argument 3 500;
-#X obj 210 130 argument 1;
-#X text 279 131 <-Outputs the first parent argument "symbol a";
+#X text 305 127 <-Outputs the first parent argument "symbol a";
 #X obj 158 67 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 134 213 argument 2 100;
-#X text 231 208 <-Outputs "100" because the types of the second argument
+#X text 256 207 <-Outputs "100" because the types of the second argument
 ("symbol b") and the default argument ("float 100") do not match.;
-#X text 200 29 Please note that the current parent arguments are: a
-b;
-#X text 101 305 <- Outputs "500" because there is not third parent
+#X text 130 300 <- Outputs "500" because there is not third parent
 argument;
 #X obj 210 166 print arg1;
 #X obj 129 258 print arg2;
 #X obj 11 342 print arg3;
-#X connect 0 0 8 0;
-#X connect 1 0 5 0;
-#X connect 1 1 9 0;
-#X connect 1 2 6 0;
-#X connect 5 0 15 0;
-#X connect 6 0 13 0;
-#X connect 8 0 1 0;
-#X connect 9 0 14 0;
+#X obj 210 130 tof/argument 1;
+#X obj 134 213 tof/argument 2 100;
+#X obj 11 303 tof/argument 3 500;
+#X connect 0 0 6 0;
+#X connect 1 0 14 0;
+#X connect 1 1 13 0;
+#X connect 1 2 12 0;
+#X connect 6 0 1 0;
+#X connect 12 0 9 0;
+#X connect 13 0 10 0;
+#X connect 14 0 11 0;

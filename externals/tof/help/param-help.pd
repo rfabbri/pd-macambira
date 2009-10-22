@@ -1,99 +1,111 @@
-#N canvas 1024 24 1018 688 10;
-#X floatatom 504 237 5 0 0 0 - - -;
+#N canvas 1086 33 780 563 10;
 #X obj -23 2 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
 #X text -18 54 author: mrtoftrash@gmail.com;
-#X text -18 1 description: param is a state saving and message routing
-system.;
 #X text -19 75 version: 2009-09-19 (localized release);
-#X text -19 33 tags: state routing param;
-#X text 179 122 argument 1: param name (must start with a slash);
-#X text 612 141 nbx: creates a numberbox;
-#X text 611 160 slider min max: creates a slider with the indicated
-minimum and maximum;
-#X text 611 189 bng: creates a bang;
-#X text 611 207 tgl: creates a toggle;
-#X text 613 225 symbolatom: creates a symbol box;
-#X text 68 355 (\$0)/abstraction's name/.../param's name;
-#X text 5 210 If the param object is created directly in the root patch
-(as the my_name example above) \, its path is as follows:;
-#X text 7 172 A param object creates a storage area for anything. This
-data can be accessed through a unique symbolic path.;
-#X text 60 245 (\$0)/param's name;
-#X text 7 279 If the param is inside an abstraction (or inside an abstraction
-contained inside another abstraction an so forth) \, the path starts
-at the root and follows every child patch (abstraction) until it reaches
-the param object \, at which point the param's name is appended:;
-#X text 40 414 If an abstraction's arguments contains the "/id" keyword
+#N canvas 237 177 542 366 all 0;
+#X text 210 53 argument 1: param name (must start with a slash);
+#X obj 21 56 tof/param /my_name my_value;
+#X text 210 70 argument 2...: param value (can be anything;
+#X text 210 86 argument ...: special keywords;
+#X text 85 303 (\$0)/abstraction's name/.../param's name;
+#X text 22 158 If the param object is created directly in the root
+patch (as the my_name example above) \, its path is as follows:;
+#X text 24 120 A param object creates a storage area for anything.
+This data can be accessed through a unique symbolic path.;
+#X text 77 193 (\$0)/param's name;
+#X text 24 227 If the param is inside an abstraction (or inside an
+abstraction contained inside another abstraction an so forth) \, the
+path starts at the root and follows every child patch (abstraction)
+until it reaches the param object \, at which point the param's name
+is appended:;
+#X restore -16 164 pd all about [param /name];
+#N canvas 0 0 525 231 all 0;
+#X text 63 67 If an abstraction's arguments contains the "/id" keyword
 \, the symbol following the "/id" keyword \, instead of the abstraction's
 name \, will be used to build the path. See an example to the right.
 ;
-#X floatatom 556 110 5 0 0 0 - - -;
-#X text 53 475 --------------------- SEE ALSO -----------------------
-;
-#X obj 496 359 dac~;
-#X obj 717 280 hsl 100 15 0 1 0 0 \$0/FM_MOD/volume \$0/FM_MOD/volume_
-/FM_MOD/volume 105 7 0 10 -262144 -1 -1 0 1;
-#X obj 717 300 hsl 100 15 200 2000 0 0 \$0/FM_MOD/carrier \$0/FM_MOD/carrier_
-/FM_MOD/carrier 105 7 0 10 -262144 -1 -1 2200 1;
-#X obj 715 339 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/index
-\$0/FM_MOD/modulation/index_ /FM_MOD/modulation/index 57 7 0 10 -262144
--1 -1 20 256;
-#X obj 715 320 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/freq
-\$0/FM_MOD/modulation/freq_ /FM_MOD/modulation/freq 57 7 0 10 -262144
--1 -1 3 256;
-#X obj 544 283 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 0 1;
-#X obj 556 84 tof/param /number 30 /g nbx;
-#X obj 22 503 tof/paramFile;
-#X obj 118 503 tof/paramRoute;
-#X obj 217 503 tof/OSCToParam;
-#X obj 322 503 tof/paramDump;
-#X obj 25 527 tof/paramGui;
-#X obj -10 149 print loadbang;
-#X obj -10 125 tof/param /my_name my_value;
-#X text 553 126 /g options:;
-#X text 556 44 When you create a param \, you can optinally use the
+#X text 26 42 Abstraction /id:;
+#X restore -14 326 pd all about /id;
+#N canvas 0 0 450 300 all 0;
+#X restore -16 187 pd all about [param custom /name];
+#N canvas 0 0 975 555 all 0;
+#X text 565 152 nbx: creates a numberbox;
+#X text 564 171 slider min max: creates a slider with the indicated
+minimum and maximum;
+#X text 564 200 bng: creates a bang;
+#X text 564 218 tgl: creates a toggle;
+#X text 566 236 symbolatom: creates a symbol box;
+#X floatatom 509 121 5 0 0 0 - - -;
+#X obj 509 95 tof/param /number 30 /g nbx;
+#X text 506 137 /g options:;
+#X text 509 55 When you create a param \, you can optinally use the
 "/g" keyword to flag the param with gui options.;
-#X obj 504 330 param-abs /id FM_MOD /carrier 600;
-#X floatatom 613 481 5 0 0 0 - - -;
-#X obj 613 458 tof/param /test 50 /nlb;
-#X text 500 415 A param automatically ouputs its value when it is created.
+#X floatatom 162 129 5 0 0 0 - - -;
+#X obj 162 106 tof/param /test 50 /nlb;
+#X text 49 63 A param automatically ouputs its value when it is created.
 You can disable this behavior with the "/nlb" (no loadbang) keyword.
 ;
-#X msg 504 259 /modulation/index \$1;
-#X msg 541 305 /volume \$1;
-#X text 179 139 argument 2...: param value (can be anything;
-#X text 3 389 Abstraction /id:;
-#X text 498 27 /g keyword: GUI options;
-#X text 4 577 /ns keyword: No save;
-#X text 469 393 /nlb keyword: No loadbang;
-#X text 35 598 This param will never be saved.;
-#X text 179 155 argument ...: special keywords;
-#X text 475 507 /wfb keyword: Wait for bang;
-#X text 507 529 This param will only output its contents on a bang.
+#X text 451 38 /g keyword: GUI options;
+#X text 18 41 /nlb keyword: No loadbang;
+#X text 24 155 /wfb keyword: Wait for bang;
+#X text 56 177 This param will only output its contents on a bang.
 ;
-#X obj 152 576 tof/param /nope 50 /ns;
-#X obj 500 579 tof/param /waiting 50 /wfb;
-#X floatatom 500 552 5 0 0 0 - - -;
-#X floatatom 500 602 5 0 0 0 - - -;
-#X obj 544 555 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X text 544 8 -------------- SPECIAL KEYWORDS (continued) --------------
+#X obj 49 227 tof/param /waiting 50 /wfb;
+#X floatatom 49 200 5 0 0 0 - - -;
+#X floatatom 49 250 5 0 0 0 - - -;
+#X obj 93 203 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 36 296 /ns keyword: No save;
+#X text 67 317 This param will never be saved.;
+#X obj 177 298 tof/param /nope 50 /ns;
+#X text 249 449 /nps keyword: No preset save;
+#X text 280 471 This param will never be saved in a preset file.;
+#X obj 448 449 tof/param /noPresets 67 /nps;
+#X text 284 411 Special keywords for [param /name] and [param custom]
 ;
-#X text 71 553 -------------- SPECIAL KEYWORDS --------------;
-#X text 4 630 /nps keyword: No preset save;
-#X text 35 652 This param will never be saved in a preset file.;
-#X obj 203 630 tof/param /noPresets 67 /nps;
-#X connect 0 0 40 0;
-#X connect 25 0 41 0;
-#X connect 26 0 18 0;
-#X connect 33 0 32 0;
-#X connect 36 0 20 0;
-#X connect 36 0 20 1;
-#X connect 38 0 37 0;
-#X connect 40 0 36 0;
-#X connect 41 0 36 0;
-#X connect 52 0 54 0;
-#X connect 53 0 52 0;
-#X connect 55 0 52 0;
+#X text 350 5 Special keywords for [param /name];
+#X connect 6 0 5 0;
+#X connect 10 0 9 0;
+#X connect 16 0 18 0;
+#X connect 17 0 16 0;
+#X connect 19 0 16 0;
+#X restore 150 164 pd all about keywords;
+#X text -18 1 description: [param] is a state saving and message routing
+system.;
+#X text -19 33 tags: state routing;
+#N canvas 0 0 450 300 all 0;
+#X restore -16 258 pd all about [param file];
+#N canvas 0 0 450 300 all 0;
+#X restore -16 280 pd all about [param route];
+#N canvas 0 0 450 300 all 0;
+#X restore -15 302 pd all about [param gui];
+#N canvas 0 0 450 300 all 0;
+#X restore -16 235 pd all about [param dump];
+#N canvas 0 0 450 300 all 0;
+#X restore -16 210 pd all about [param id];
+#X text -17 106 [param] is to state saving what [list] is to lists
+:);
+#X floatatom 98 383 5 0 0 0 - - -;
+#X obj 90 505 dac~;
+#X obj 341 417 hsl 100 15 0 1 0 0 \$0/FM_MOD/volume \$0/FM_MOD/volume_
+/FM_MOD/volume 105 7 0 10 -262144 -1 -1 0 1;
+#X obj 341 437 hsl 100 15 200 2000 0 0 \$0/FM_MOD/carrier \$0/FM_MOD/carrier_
+/FM_MOD/carrier 105 7 0 10 -262144 -1 -1 2200 1;
+#X obj 339 476 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/index
+\$0/FM_MOD/modulation/index_ /FM_MOD/modulation/index 57 7 0 10 -262144
+-1 -1 20 256;
+#X obj 339 457 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/freq
+\$0/FM_MOD/modulation/freq_ /FM_MOD/modulation/freq 57 7 0 10 -262144
+-1 -1 3 256;
+#X obj 138 429 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X msg 98 405 /modulation/index \$1;
+#X msg 135 451 /volume \$1;
+#X obj 98 476 ./param-abs /id FM_MOD /carrier 600;
+#X connect 15 0 22 0;
+#X connect 21 0 23 0;
+#X connect 22 0 24 0;
+#X connect 23 0 24 0;
+#X connect 24 0 16 0;
+#X connect 24 0 16 1;
