@@ -68,7 +68,9 @@ static void get_tilde_free( t_get_tilde *x) {
 void *get_tilde_new(t_symbol* s)
 {
   t_get_tilde *x = (t_get_tilde *)pd_new(get_tilde_class);
-
+  
+count = count + 1;
+post("c:%i",count);
   
  if (gensym("") != s ) x->pg = putget_register(s,0);
  

@@ -68,8 +68,9 @@ static void *put_tilde_new(t_symbol* s)
   t_put_tilde *x = (t_put_tilde *)pd_new(put_tilde_class);
 
   if (gensym("") != s ) x->pg = putget_register(s,1);
-
-
+ 
+ count = count + 1;
+post("c:%i",count);
   return (void *)x;
 }
 

@@ -22,10 +22,13 @@ struct putget {
     struct putget* 	previous; 
 	t_clock*		clock;
 	int 			armed;
+    
 };
 
 
 struct putget* PUTGETS;
+
+int count = 42;
 
 // This should be triggered by the clock
 static void putget_swap(struct putget* pg) {

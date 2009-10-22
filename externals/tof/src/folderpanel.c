@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "m_pd.h"
-#include "g_canvas.h"
+//#include "g_canvas.h"
 
 // tk_chooseDirectory
 /*
