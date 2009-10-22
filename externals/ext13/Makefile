@@ -29,16 +29,34 @@ LIBS =
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
-  SOURCES += $(SOURCES_Darwin)
-  EXTENSION = pd_darwin
-  OS = macosx
-  OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
-  FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
-  CFLAGS += -fPIC $(FAT_FLAGS)
-  LDFLAGS += -bundle -undefined dynamic_lookup $(FAT_FLAGS)
-  LIBS += -lc 
-  STRIP = strip -x
- endif
+  CPU := $(shell uname -p)
+  ifeq ($(CPU),arm) # iPhone/iPod Touch
+    SOURCES += $(SOURCES_Darwin)
+    EXTENSION = pd_darwin
+    OS = iphoneos
+    IPHONE_BASE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin
+    CC=$(IPHONE_BASE)/gcc
+    CPP=$(IPHONE_BASE)/cpp
+    CXX=$(IPHONE_BASE)/g++
+    ISYSROOT = -isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.0.sdk
+    IPHONE_CFLAGS = -miphoneos-version-min=3.0 $(ISYSROOT) -arch armv6
+    OPT_CFLAGS = -fast -funroll-loops -fomit-frame-pointer
+	CFLAGS := $(IPHONE_CFLAGS) $(OPT_CFLAGS) $(CFLAGS)
+    LDFLAGS += -arch armv6 -bundle -undefined dynamic_lookup $(ISYSROOT)
+    LIBS += -lc 
+    STRIP = strip -x
+  else # Mac OS X
+    SOURCES += $(SOURCES_Darwin)
+    EXTENSION = pd_darwin
+    OS = macosx
+    OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
+    FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
+    CFLAGS += -fPIC $(FAT_FLAGS)
+    LDFLAGS += -bundle -undefined dynamic_lookup $(FAT_FLAGS)
+    LIBS += -lc 
+    STRIP = strip -x
+  endif
+endif
 ifeq ($(UNAME),Linux)
   SOURCES += $(SOURCES_Linux)
   EXTENSION = pd_linux
@@ -150,3 +168,5 @@ showpaths:
 	@echo "objectsdir: $(objectsdir)"
 	@echo "LIBRARY_NAME: $(LIBRARY_NAME)"
 	@echo "SOURCES: $(SOURCES)"
+	@echo "UNAME: $(UNAME)"
+	@echo "CPU: $(CPU)"
