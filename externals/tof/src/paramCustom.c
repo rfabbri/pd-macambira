@@ -139,10 +139,8 @@ static void* paramCustom_new(t_symbol *s, int ac, t_atom *av)
 	  
 	  
 
-	x->param = param_register(x,root,path,\
-	NULL,\
-	(t_paramSaveMethod) paramCustom_save,\
-	NULL);
+	x->param = param_register(x,root,path, NULL,\
+	(t_paramSaveMethod) paramCustom_save,NULL);
 	  
 	if (!x->param) return NULL;
 	 

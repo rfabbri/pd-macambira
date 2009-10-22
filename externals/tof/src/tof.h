@@ -38,16 +38,17 @@ static t_symbol* tof_get_dollarzero(t_canvas* canvas) {
 	return canvas_realizedollar(canvas, gensym("$0"));
 }
 
-
+//canvas_isabstraction(t_canvas *x)
 static int tof_canvas_is_not_subpatch(t_canvas* canvas) {
 	
-	return canvas_isabstraction(canvas);
+	 return (canvas->gl_env != 0);
 }
 
 
 static t_canvas* tof_get_canvas(void) 
 {
-    return glist_getcanvas((t_glist *)canvas_getcurrent());
+    return canvas_getcurrent();
+    //return glist_getcanvas((t_glist *)canvas_getcurrent());
 }
 
 
@@ -137,9 +138,10 @@ static t_canvas* tof_get_root_canvas(t_canvas* canvas)
 }
 
 static void tof_get_canvas_arguments(t_canvas *canvas, int *ac_p, t_atom **av_p) {
-	canvas_setcurrent(canvas);
+    pd_pushsym(&canvas->gl_pd); //canvas_setcurrent(canvas);
     canvas_getargs(ac_p , av_p);
-	canvas_unsetcurrent(canvas);
+    pd_popsym(&canvas->gl_pd); //canvas_unsetcurrent(canvas);
+	
 }
 
 

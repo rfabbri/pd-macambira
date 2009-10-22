@@ -1,42 +1,39 @@
-#N canvas 1067 99 864 482 10;
+#N canvas 1067 99 946 482 10;
 #X obj 4 19 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
 #X text 9 71 author: mrtoftrash@gmail.com;
 #X text 8 50 tags: param gui;
-#X text 114 356 --------------------- SEE ALSO -----------------------
+#X text 57 374 --------------------- SEE ALSO -----------------------
 ;
-#X text 88 377 See the help for the param external to expand your mind:
+#X text 31 395 See the help for the param external to expand your mind:
 ;
-#X text 125 264 -- SUPER IMPORTANT --;
-#X text 432 225 nbx: creates a numberbox;
-#X text 431 244 slider min max: creates a slider with the indicated
+#X text 547 225 nbx: creates a numberbox;
+#X text 546 244 slider min max: creates a slider with the indicated
 minimum and maximum;
-#X text 431 273 bng: creates a bang;
-#X text 431 291 tgl: creates a toggle;
-#X text 433 309 symbolatom: creates a symbol box;
-#X text 31 280 You have to copy the created guis into your root patch
-(or a subpatch of it) for them to work with their target params!;
+#X text 546 273 bng: creates a bang;
+#X text 546 291 tgl: creates a toggle;
+#X text 548 309 symbolatom: creates a symbol box;
 #X text 8 92 version: 2009-09-19 (localized version);
-#X obj 86 399 tof/param /numerical 100 /gui nbx;
-#X obj 315 398 tof/param /slip 100 /gui slider 0 127;
-#X text 423 203 /g options:;
-#X obj 555 127 tof/paramId;
-#X obj 555 157 print;
-#X obj 555 100 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X obj 647 48 ./param-abs /id bob;
+#X obj 29 417 tof/param /numerical 100 /gui nbx;
+#X obj 258 416 tof/param /slip 100 /gui slider 0 127;
+#X obj 477 120 ./param-abs /id bob;
 #X text 9 18 description: builds pd guis for params.;
-#X obj 682 139 tof/paramDump;
-#X obj 687 105 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X obj 687 171 print;
-#X msg 729 106 guis;
-#X msg 748 171 ----;
-#X obj 610 370 tof/param /maude 3 /g bob;
-#X obj 608 409 tof/param /tom yo /g sym;
-#X connect 16 0 17 0;
-#X connect 18 0 16 0;
-#X connect 21 0 23 0;
-#X connect 22 0 21 0;
-#X connect 24 0 21 0;
-#X connect 25 0 23 0;
+#X obj 652 368 tof/param /maude 3 /g bob;
+#X obj 650 407 tof/param /tom yo /g sym;
+#X obj 21 219 tof/paramGui;
+#X obj 21 130 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 538 203 /g options for params:;
+#X text 599 119 <-click properties here;
+#X obj 90 182 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 42 127 This inlet creates the guis once. All further bangs
+only display the gui window.;
+#X text 112 178 This inlet creates and displays the window everytime
+it is bang. It is always up to date \, but a bit slower.;
+#X msg 506 74 /carrier \$1;
+#X floatatom 512 46 5 0 0 0 - - -;
+#X connect 18 0 17 0;
+#X connect 21 0 17 1;
+#X connect 24 0 13 0;
+#X connect 25 0 24 0;
