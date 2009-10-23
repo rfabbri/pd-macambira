@@ -182,7 +182,7 @@ static void* paramCustom_new(t_symbol *s, int ac, t_atom *av)
 
 void paramCustom_setup(void)
 {
-  paramCustom_class = class_new(gensym("paramCustom"),
+  paramCustom_class = class_new(gensym("param custom"),
     (t_newmethod)paramCustom_new, (t_method)paramCustom_free,
     sizeof(t_paramCustom), 0, A_GIMME, 0);
 
@@ -196,5 +196,7 @@ void paramCustom_setup(void)
     0, 0, sizeof(t_paramCustom_receive), CLASS_PD | CLASS_NOINLET, 0);
 	
   class_addanything(paramCustom_receive_class, paramCustom_receive_anything);
+  
+  class_sethelpsymbol(paramCustom_class,gensym("param"));
   
 }

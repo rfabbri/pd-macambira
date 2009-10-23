@@ -62,7 +62,8 @@ static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av
 			 outlet_anything(x->x_outlet,path,ac,av);
 		   }
 		} else {
-			pd_error(x,"Target name must start with a \"/\"");
+            outlet_anything(x->x_outlet,path,ac,av);
+			//pd_error(x,"Target name must start with a \"/\"");
 		}
 	  }
 	
@@ -101,10 +102,12 @@ static void *paramRoute_new(t_symbol *s, int ac, t_atom *av) {
 }
 
 void paramRoute_setup(void) {
-  paramRoute_class = class_new(gensym("paramRoute"),
+  paramRoute_class = class_new(gensym("param route"),
     (t_newmethod)paramRoute_new, (t_method)paramRoute_free,
     sizeof(t_paramRoute), 0, A_GIMME, 0);
 
  class_addanything(paramRoute_class, paramRoute_anything);
+ 
+ class_sethelpsymbol(paramRoute_class, gensym("param"));
  
 }

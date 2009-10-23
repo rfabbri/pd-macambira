@@ -246,7 +246,7 @@ static void* paramFile_new(t_symbol *s, int ac, t_atom *av) {
 
 
 void paramFile_setup(void) {
-  paramFile_class = class_new(gensym("paramFile"),
+  paramFile_class = class_new(gensym("param file"),
     (t_newmethod)paramFile_new, (t_method)paramFile_free,
     sizeof(t_paramFile), 0, A_GIMME, 0);
   
@@ -258,6 +258,8 @@ void paramFile_setup(void) {
  
  class_addbang(paramFile_inlet2_class, paramFile_inlet2_bang);
  class_addfloat(paramFile_inlet2_class, paramFile_inlet2_float);
+ 
+ class_sethelpsymbol(paramFile_class,gensym("param"));
  
  //class_addmethod(paramFile_class, (t_method) paramFile_load, gensym("load"), A_DEFFLOAT,0);
  //class_addmethod(paramFile_class, (t_method) paramFile_float, gensym("save"), A_DEFFLOAT,0);

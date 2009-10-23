@@ -238,6 +238,16 @@ static void paramGui_free(t_paramGui *x)
 	x->childcanvas = NULL;
 }
 
+/*
+static void paramGui_properties(t_gobj*z, t_glist*owner) {
+  t_iemguts_objlist*objs=objectsInCanvas((t_pd*)z);
+   while(objs) {
+    t_propertybang*x=(t_propertybang*)objs->obj;
+    propertybang_bang(x);
+    objs=objs->next;
+  } 
+}
+*/
 
 static void *paramGui_new(t_symbol *s, int ac, t_atom *av) {
   t_paramGui *x = (t_paramGui *)pd_new(paramGui_class);
@@ -289,16 +299,7 @@ static void *paramGui_new(t_symbol *s, int ac, t_atom *av) {
   
     // From this point on, we are hoping the "pd" object has been created
     x->childcanvas = (t_canvas*) pd_newest();
-    /*
-    // Change saved name to match pd's canvas naming scheme
-    int pdcanvasname_len = strlen(x->fullpath->s_name ) + 4;
-    char* pdcanvasname = getbytes(pdcanvasname_len * sizeof(*pdcanvasname));
-    strcpy(pdcanvasname,"pd-");
-    strcat(pdcanvasname,x->fullpath->s_name);
-	x->canvasname = gensym(pdcanvasname);
-    freebytes(pdcanvasname,pdcanvasname_len * sizeof(*pdcanvasname));
-	*/
-	
+   
 	
     // Hide the window (stupid way of doing this)
     if (x->childcanvas) {
@@ -306,18 +307,21 @@ static void *paramGui_new(t_symbol *s, int ac, t_atom *av) {
 		pd_typedmess((t_pd*)x->childcanvas,gensym("vis"),1,&a);
     }
 	
-	
-   //x->outlet = outlet_new(&x->x_obj, &s_list);
-   
    
    inlet_new(&x->x_obj, &x->x_obj.ob_pd,gensym("bang"), gensym("reset"));
+
+  
+
+  // SET THE PROPERTIES FUNCTION
+  //t_class *class = ((t_gobj*)currentcanvas)->g_pd;
+  //class_setpropertiesfn(class, propertybang_properties);
 
     
   return (x);
 }
 
 void paramGui_setup(void) {
-  paramGui_class = class_new(gensym("paramGui"),
+  paramGui_class = class_new(gensym("param gui"),
     (t_newmethod)paramGui_new, (t_method)paramGui_free,
     sizeof(t_paramGui), 0, A_GIMME, 0);
 
@@ -326,6 +330,8 @@ void paramGui_setup(void) {
 
  class_addmethod(paramGui_class, (t_method) paramGui_reset, gensym("reset"), 0);
  
+ 
+ class_sethelpsymbol(paramGui_class,gensym("param"));
  //class_addmethod(paramGui_class, (t_method) paramGui_guis, gensym("guis"), A_DEFSYMBOL,0);
  //class_addmethod(paramGui_class, (t_method) paramGui_updateguis, gensym("updateguis"), A_DEFSYMBOL,0);
 

@@ -151,7 +151,7 @@ static void *paramDump_new(t_symbol *s, int ac, t_atom *av) {
 }
 
 void paramDump_setup(void) {
-  paramDump_class = class_new(gensym("paramDump"),
+  paramDump_class = class_new(gensym("param dump"),
     (t_newmethod)paramDump_new, (t_method)paramDump_free,
     sizeof(t_paramDump), 0, A_GIMME, 0);
 
@@ -163,7 +163,7 @@ void paramDump_setup(void) {
  class_addmethod(paramDump_class, (t_method) paramDump_guis, gensym("guis"), A_DEFSYMBOL,0);
  //class_addmethod(paramDump_class, (t_method) paramDump_updateguis, gensym("updateguis"), A_DEFSYMBOL,0);
 
- 
+ class_sethelpsymbol(paramDump_class,gensym("param"));
  //class_addmethod(paramDump_class, (t_method) paramDump_update_guis, gensym("update"), A_DEFSYMBOL,0);
 
 }

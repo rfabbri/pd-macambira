@@ -300,6 +300,9 @@ static void* paramClass_new(t_symbol *s, int ac, t_atom *av)
       inlet_new((t_object *)x, (t_pd *)p, 0, 0);
       x->outlet = outlet_new(&x->x_obj, &s_list);
   
+  
+  
+  
   return (x);
 }
 
@@ -352,24 +355,6 @@ static void* param_new(t_symbol *s, int argc, t_atom *argv) {
 
 void param_setup(void)
 {
-    
-    /*
-    alist_setup();
-    list_append_setup();
-    list_prepend_setup();
-    list_split_setup();
-    list_trim_setup();
-    list_length_setup();
-    class_addcreator((t_newmethod)list_new, &s_list, A_GIMME, 0);
-    */
-    
-    /*
-    
-    
-    
-    */
-    /////////////
-  
   
   // SETUP THE PARAM CLASS
   param_class = class_new(gensym("param /"),
@@ -387,6 +372,7 @@ void param_setup(void)
 	
   class_addanything(param_inlet2_class, paramClass_inlet2_anything);
   
+   class_sethelpsymbol(param_class,gensym("param"));
   
   // SETUP OTHER CLASSES
    paramCustom_setup();
@@ -401,4 +387,6 @@ void param_setup(void)
   
    class_addcreator((t_newmethod)param_new, gensym("param"), A_GIMME, 0);
    class_addcreator((t_newmethod)param_new, gensym("tof/param"), A_GIMME, 0);
+   
+  
 }

@@ -47,7 +47,9 @@ static int tof_canvas_is_not_subpatch(t_canvas* canvas) {
 
 static t_canvas* tof_get_canvas(void) 
 {
-    return canvas_getcurrent();
+    t_glist *glist=(t_glist *)canvas_getcurrent();
+    
+    return (t_canvas*)glist_getcanvas(glist);
     //return glist_getcanvas((t_glist *)canvas_getcurrent());
 }
 

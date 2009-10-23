@@ -43,10 +43,12 @@ static void *paramId_new(t_symbol *s, int ac, t_atom *av) {
 }
 
 void paramId_setup(void) {
-  paramId_class = class_new(gensym("paramId"),
+  paramId_class = class_new(gensym("param id"),
     (t_newmethod)paramId_new, (t_method)paramId_free,
     sizeof(t_paramId), 0, A_GIMME, 0);
 
  class_addbang(paramId_class, paramId_bang);
+ 
+ class_sethelpsymbol(paramId_class, gensym("param"));
  
 }
