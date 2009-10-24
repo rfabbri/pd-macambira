@@ -50,8 +50,6 @@ pdpedia: apple/smc;
 #X text 102 241 keys - output all available keys in the right outlet
 ;
 #X text 16 34 get data:;
-#X msg 216 70 FNum;
-#X msg 279 73 F2Ac;
 #X connect 5 0 9 0;
 #X connect 9 0 13 0;
 #X connect 9 0 15 0;
@@ -60,5 +58,3 @@ pdpedia: apple/smc;
 #X connect 17 0 9 0;
 #X connect 18 0 9 0;
 #X connect 21 0 9 0;
-#X connect 28 0 9 0;
-#X connect 29 0 9 0;

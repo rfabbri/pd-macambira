@@ -318,7 +318,7 @@ static void smc_symbol(t_smc* x, t_symbol* key)
                 UInt32 i;
                 t_atom output_list[val.dataSize];
                 for (i = 0; i < val.dataSize; i++)
-                    SETFLOAT(&output_atom + i, (unsigned char) val.bytes[i]);
+                    SETFLOAT(output_list + i, (unsigned char) val.bytes[i]);
                 outlet_anything(x->data_outlet, gensym(val.key), 
                                 val.dataSize, output_list);
             }
