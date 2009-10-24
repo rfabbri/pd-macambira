@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <IOKit/IOKitLib.h> 
 
 #include "m_pd.h"
@@ -50,6 +51,7 @@ typedef struct _smc {
     t_outlet*           status_outlet;
 } t_smc;
 
+/* TODO make this in the t_smc struct */
 static io_connect_t conn;
 
 
@@ -101,6 +103,18 @@ float _strtof(char *str, int size, int e)
 /*------------------------------------------------------------------------------
  * SUPPORT FUNCTIONS
  */
+
+/* this function expects two 5 byte arrays of chars, 4 chars and a null. if
+ * the string is shorter than 4 chars, then pad it with spaces */
+void padkeycpy(char* dst, char* src)
+{
+    int i;
+    dst = "    ";
+    strncpy(dst, src, 4);
+    for(i = 0; i < 4; i++) 
+        if( ! isprint(src[i])) dst[i] = ' ';
+    dst[4] = '\0';
+}
 
 kern_return_t SMCOpen(void)
 {
@@ -232,58 +246,6 @@ UInt32 SMCReadIndexCount(void)
     return _strtoul(val.bytes, val.dataSize, 10);
 }
 
-double SMCGetTemperature(char *key)
-{
-    SMCVal_t val;
-    kern_return_t result;
-
-    result = SMCReadKey(key, &val);
-    if (result == kIOReturnSuccess) {
-        // read succeeded - check returned value
-        if (val.dataSize > 0) {
-            if (strcmp(val.dataType, DATATYPE_SP78) == 0) {
-                // convert fp78 value to temperature
-                int intValue = (val.bytes[0] * 256 + val.bytes[1]) >> 2;
-                return intValue / 64.0;
-            }
-        }
-    }
-    // read failed
-    return 0.0;
-}
-
-kern_return_t SMCSetFanRpm(char *key, int rpm)
-{
-    SMCVal_t val;
-    
-    strcpy(val.key, key);
-    val.bytes[0] = (rpm << 2) / 256;
-    val.bytes[1] = (rpm << 2) % 256;
-    val.dataSize = 2;
-    return SMCWriteKey(val);
-}
-
-int SMCGetFanRpm(char *key)
-{
-    SMCVal_t val;
-    kern_return_t result;
-
-    result = SMCReadKey(key, &val);
-    if (result == kIOReturnSuccess) {
-        // read succeeded - check returned value
-        if (val.dataSize > 0) {
-            if (strcmp(val.dataType, DATATYPE_FPE2) == 0) {
-                // convert FPE2 value to int value
-                return (int)_strtof(val.bytes, val.dataSize, 2);
-            }
-        }
-    }
-    // read failed
-    return -1;
-}
-
-
-
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
  */
@@ -298,11 +260,9 @@ static void smc_symbol(t_smc* x, t_symbol* key)
     SMCOpen();
     result = SMCReadKey(key->s_name, &val);
     if (result == kIOReturnSuccess) {
-        // read succeeded - check returned value
         x->key = key;
         if (val.dataSize > 0) {
             if (strcmp(val.dataType, DATATYPE_SP78) == 0) {
-                // convert sp78 value to temperature
                 int intValue = (val.bytes[0] * 256 + val.bytes[1]) >> 2;
                 SETFLOAT(&output_atom, intValue / 64.0);
                 outlet_anything(x->data_outlet, key, 1, &output_atom);
@@ -382,7 +342,36 @@ static void smc_anything(t_smc* x, t_symbol *s, int argc, t_atom *argv)
         x->key = s;
         if(x->key != &s_) smc_bang(x);
     } else if(argc == 1) {
-            atom_getfloatarg(0, argc, argv);
+        /* if there is one symbol and one float, then look up the proper data
+         * type then convert the float to the proper sequence of bytes */
+        SMCVal_t val;
+        char value = (char) atom_getfloatarg(0, argc, argv);
+        
+        x->key = s;
+        padkeycpy(val.key, x->key->s_name);
+        val.bytes[0] = (value << 2) / 256;
+        val.bytes[1] = (value << 2) % 256;
+        val.dataSize = 2;
+        SMCOpen();
+        SMCWriteKey(val);
+        SMCClose();
+        smc_symbol(x, x->key);
+    } else {
+        /* if there is a symbol and a list of bytes, then send that list of
+         * bytes directly to the key given by the symbol */
+        int i;
+        SMCVal_t val;
+        x->key = s;
+        padkeycpy(val.key, x->key->s_name);
+        for(i = 0; i < argc && i < 32; i++) {
+            val.bytes[i] = (char) atom_getfloatarg(i, argc, argv);
+            post(" byte %d: %i", i, val.bytes[i]);
+        }
+        val.dataSize = argc;
+        SMCOpen();
+        SMCWriteKey(val);
+        SMCClose();
+        smc_symbol(x, x->key);
     }
 }
 
