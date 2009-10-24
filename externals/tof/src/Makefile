@@ -1,6 +1,5 @@
-default: 
+default: argument crossfade~ iterate param breakpoints~ folderpanel listUnfold path breakpoints getdollarzero onlyone phasorshot~ common~ increment openHelp streamMinMax
 
-PARAM: param paramDump paramRoute paramFile paramCustom paramId paramGui
 
 current:
 	echo make class
