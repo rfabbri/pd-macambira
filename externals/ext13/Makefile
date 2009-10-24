@@ -102,7 +102,6 @@ all: $(SOURCES:.c=.$(EXTENSION))
 %.$(EXTENSION): %.o
 	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS)
 	chmod a-x "$*.$(EXTENSION)"
-	rm -f -- $*.o
 
 # this links everything into a single binary file
 $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
