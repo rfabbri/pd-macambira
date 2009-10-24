@@ -35,8 +35,8 @@
 #include "m_pd.h"
 #include "smc.h"
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
