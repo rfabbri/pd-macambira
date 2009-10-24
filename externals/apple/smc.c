@@ -288,7 +288,6 @@ int SMCGetFanRpm(char *key)
  * IMPLEMENTATION                    
  */
 
-
 static void smc_symbol(t_smc* x, t_symbol* key)
 {
 	DEBUG(post("smc_symbol"););
@@ -306,26 +305,25 @@ static void smc_symbol(t_smc* x, t_symbol* key)
                 // convert sp78 value to temperature
                 int intValue = (val.bytes[0] * 256 + val.bytes[1]) >> 2;
                 SETFLOAT(&output_atom, intValue / 64.0);
+                outlet_anything(x->data_outlet, key, 1, &output_atom);
+            } else if ((strcmp(val.dataType, DATATYPE_UINT8) == 0) ||
+                       (strcmp(val.dataType, DATATYPE_UINT16) == 0) ||
+                       (strcmp(val.dataType, DATATYPE_UINT32) == 0)) {
+                SETFLOAT(&output_atom, _strtoul(val.bytes, val.dataSize, 10));
+                outlet_anything(x->data_outlet, gensym(val.key), 1, &output_atom);
+            } else if (strcmp(val.dataType, DATATYPE_FPE2) == 0) {
+                SETFLOAT(&output_atom, _strtof(val.bytes, val.dataSize, 2));
+                outlet_anything(x->data_outlet, gensym(val.key), 1, &output_atom);
+            } else {
+                UInt32 i;
+                t_atom output_list[val.dataSize];
+                for (i = 0; i < val.dataSize; i++)
+                    SETFLOAT(&output_atom + i, (unsigned char) val.bytes[i]);
+                outlet_anything(x->data_outlet, gensym(val.key), 
+                                val.dataSize, output_list);
             }
-            outlet_anything(x->data_outlet, key, 1, &output_atom);
         }
-/*
-        if ((strcmp(val.dataType, DATATYPE_UINT8) == 0) ||
-            (strcmp(val.dataType, DATATYPE_UINT16) == 0) ||
-            (strcmp(val.dataType, DATATYPE_UINT32) == 0)) {
-            SETFLOAT(&output_atom, _strtoul(val.bytes, val.dataSize, 10));
-            outlet_anything(x->status_outlet, gensym("sensor"), 1, &output_atom);
-        } else if (strcmp(val.dataType, DATATYPE_FPE2) == 0) {
-            SETFLOAT(&output_atom, _strtof(val.bytes, val.dataSize, 2));
-            outlet_anything(x->status_outlet, gensym("sensor"), 1, &output_atom);
-        } else {
-            t_atom output_list[val.dataSize];
-            for (i = 0; i < val.dataSize; i++)
-                SETFLOAT(&output_atom + i, (unsigned char) val.bytes[i]);
-            outlet_anything(x->status_outlet, gensym("sensor"), 
-                            val.dataSize, &output_list);
-        }
-*/
+        
     }
     SMCClose();
 }
@@ -377,13 +375,24 @@ static void smc_info(t_smc* x)
     smc_keys(x);
 }
 
-static void *smc_new(void) 
+static void smc_anything(t_smc* x, t_symbol *s, int argc, t_atom *argv)
+{
+	DEBUG(post("smc_anything %d", argc););
+    if(argc == 0) {
+        x->key = s;
+        if(x->key != &s_) smc_bang(x);
+    } else if(argc == 1) {
+            atom_getfloatarg(0, argc, argv);
+    }
+}
+
+static void *smc_new(t_symbol* s) 
 {
 	DEBUG(post("smc_new"););
 	t_smc *x = (t_smc *)pd_new(smc_class);
 
-    x->key = &s_;
-    x->data_outlet = outlet_new(&x->x_obj, &s_list);
+    x->key = s;
+    x->data_outlet = outlet_new(&x->x_obj, &s_anything);
 	x->status_outlet = outlet_new(&x->x_obj, &s_anything);
 
 	return (x);
@@ -392,14 +401,16 @@ static void *smc_new(void)
 void smc_setup(void) 
 {
 	smc_class = class_new(gensym("smc"), 
-                                           (t_newmethod)smc_new,
-                                           NULL,
-                                           sizeof(t_smc), 
-                                           CLASS_DEFAULT, 
-                                           0);
+                          (t_newmethod)smc_new,
+                          NULL,
+                          sizeof(t_smc), 
+                          CLASS_DEFAULT,
+                          A_DEFSYMBOL,
+                          0);
 	/* add inlet datatype methods */
 	class_addbang(smc_class,(t_method) smc_bang);
 	class_addsymbol(smc_class,(t_method) smc_symbol);
 	class_addmethod(smc_class,(t_method) smc_info, gensym("info"), 0);
 	class_addmethod(smc_class,(t_method) smc_keys, gensym("keys"), 0);
+	class_addanything(smc_class,(t_method) smc_anything);
 }
