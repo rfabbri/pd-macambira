@@ -8,7 +8,7 @@ SOURCES =
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
-SOURCES_Darwin = ambient_light_sensor.c iodisplay.c keyboard_light.c sudden_motion_sensor.c
+SOURCES_Darwin = ambient_light_sensor.c iodisplay.c keyboard_light.c sudden_motion_sensor.c smc.c
 SOURCES_Linux = 
 SOURCES_Windows = 
 

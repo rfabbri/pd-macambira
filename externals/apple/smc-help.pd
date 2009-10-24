@@ -1,0 +1,59 @@
+#N canvas 139 41 559 441 10;
+#X obj 4 398 cnv 15 550 20 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -228856 -66577 0;
+#X obj 4 -17 cnv 15 550 40 empty \$0-pddp.cnv.header smc 3 12 0 18
+-204280 -1 0;
+#X obj 3 189 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlet 15 12 0 13
+-228856 -1 0;
+#N canvas 779 22 494 344 META 0;
+#X text 12 25 KEYWORDS control number float store;
+#X text 12 45 LICENSE GPL;
+#X text 12 65 TEMPLATE template-help.pd v0.1;
+#X text 12 85 PLATFORM windows macosx gnulinux;
+#X text 12 105 DATATYPE float list;
+#X text 12 5 GENRE storage;
+#X text 12 125 LIBRARY internal;
+#X text 12 145 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 165 RELEASE_DATE 2007-08-24;
+#X text 12 185 RELEASE_VERSION 0.40-test05;
+#X restore 504 400 pd META;
+#X obj 3 258 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 15 12 0
+13 -228856 -1 0;
+#X obj 3 338 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 15
+12 0 13 -228856 -1 0;
+#X text 102 208 BANG - output current screen brightness;
+#X msg 146 48 bang;
+#X text 183 46 output sensor values;
+#X text 102 227 "info" - outputs info about the sensor on the right
+outlet;
+#X obj 72 305 cnv 17 3 20 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
+-162280 0;
+#X obj 72 279 cnv 17 3 20 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+-162280 0;
+#X text 103 276 LIST - a list with the values of the left and right
+sensors;
+#X text 103 306 selector series with info about the sensor;
+#X obj 489 -14 apple/smc;
+#X obj 146 111 apple/smc;
+#X obj 197 134 pddp/print;
+#X obj 439 4 pddp/pddplink http://wiki.puredata.info/en/apple/smc -text
+pdpedia: apple/smc;
+#X text 15 6 description: interface to Apple System Management Controller
+;
+#X obj 69 163 pddp/print;
+#X obj 105 360 pddp/pddplink http://en.wikipedia.org/wiki/System_Management_Controller
+;
+#X obj 143 142 print;
+#X msg 158 70 keys;
+#X text 196 71 output a list of all available keys in the right outlet
+;
+#X msg 53 64 symbol TC0D;
+#X msg 167 90 info;
+#X text 203 89 output all status info;
+#X connect 7 0 15 0;
+#X connect 15 0 19 0;
+#X connect 15 0 21 0;
+#X connect 15 1 16 0;
+#X connect 22 0 15 0;
+#X connect 24 0 15 0;
+#X connect 25 0 15 0;
