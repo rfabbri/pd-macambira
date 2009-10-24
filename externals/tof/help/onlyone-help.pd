@@ -1,0 +1,66 @@
+#N canvas 1079 120 620 485 10;
+#X obj 63 213 loadbang;
+#X msg 123 213 set a;
+#X msg 165 214 set b;
+#X msg 208 215 set;
+#X obj 280 215 loadbang;
+#X msg 340 215 set a;
+#X msg 383 217 set b;
+#X msg 425 217 set;
+#X msg 297 306 1;
+#X msg 370 303 0;
+#X msg 66 299 1;
+#X msg 139 296 0;
+#X obj 67 274 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 138 271 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 296 280 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 367 278 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 62 244 tof/onlyone a;
+#X obj 294 251 tof/onlyone b;
+#X obj 39 33 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
+0;
+#X text 44 84 author: mrtoftrash@gmail.com;
+#X text 44 64 tags: initialization control;
+#X text 44 105 version: 2009-10-24;
+#X text 44 33 description: makes sure it is the first or only [onlyone]
+to use that name.;
+#X text 77 399 Outlet 1: bangs if it is the first or only one to use
+that name.;
+#X text 79 431 Outlet 2: bangs if it not the the first and not the
+only one to use that name.;
+#X text 62 139 Try to "set" the name of each [onlyone] to the same
+name and than to different names.;
+#X obj 82 358 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 81 329 metro 500;
+#X obj 330 340 metro 500;
+#X obj 336 368 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 65 171 If both [onlyone] have the same name \, only one metro
+will be active.;
+#X connect 0 0 16 0;
+#X connect 1 0 16 0;
+#X connect 2 0 16 0;
+#X connect 3 0 16 0;
+#X connect 4 0 17 0;
+#X connect 5 0 17 0;
+#X connect 6 0 17 0;
+#X connect 7 0 17 0;
+#X connect 8 0 28 0;
+#X connect 9 0 28 0;
+#X connect 10 0 27 0;
+#X connect 11 0 27 0;
+#X connect 12 0 10 0;
+#X connect 13 0 11 0;
+#X connect 14 0 8 0;
+#X connect 15 0 9 0;
+#X connect 16 0 12 0;
+#X connect 16 1 13 0;
+#X connect 17 0 14 0;
+#X connect 17 1 15 0;
+#X connect 27 0 26 0;
+#X connect 28 0 29 0;

@@ -308,28 +308,17 @@ static void param_unregister(t_param* p) {
 	
 	if ( paramlist) {
 
-		//p->users = p->users - 1;
-		//if ( p->users == 0 ) {
-			// Remove param
-			//post("Removing last param of this name");
+		
 			if (p->previous) {
 				p->previous->next = p->next;
 				if (p->next) p->next->previous = p->previous;
-				/*
-				if (p->next == NULL) {
-					p->previous->next = NULL;
-				} else {
-					p->previous->next = p->next;
-				}
-				*/
+				
 			} else {
 				paramlist = p->next;
 				if ( p->next != NULL) p->next->previous = NULL;
 			}
-			//freebytes(p->av, p->alloc * sizeof *(p->av) );
-			//freebytes(p->av_g, p->ac_g * sizeof *(p->av_g) );
+			
 			freebytes(p, sizeof *p);
-		//}
 		
 		// Update the params for that root
 		if (paramlist == NULL) {
