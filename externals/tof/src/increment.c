@@ -1,6 +1,8 @@
 #include "m_pd.h"
 
 static t_class *increment_class;
+static t_class *increment_inlet2_class;
+struct _increment_inlet2;
 
 typedef struct _increment {
   t_object  x_obj;
@@ -8,9 +10,16 @@ typedef struct _increment {
   t_float value;
   t_float inc;
   t_outlet* outlet1;
-  t_float start;
+  //t_float start;
+  struct _increment_inlet2*	  inlet2;
   //t_outlet* outlet2;
 } t_increment;
+
+typedef struct _increment_inlet2 {
+	t_object                    x_obj;
+	t_increment					*x;
+} t_increment_inlet2;
+
 
 
 static void increment_bang(t_increment *x)
@@ -22,9 +31,7 @@ static void increment_bang(t_increment *x)
 		x->value = x->value + x->inc;
 	}
 	 outlet_float(x->outlet1,x->value);
-	
-	 
-  
+
 }
 /*
 static void increment_float(t_increment *x, t_float f)
@@ -34,40 +41,45 @@ static void increment_float(t_increment *x, t_float f)
 }
 */
 
-static void increment_step(t_increment *x, t_float f)
+static void increment_float(t_increment *x, t_float f)
 {
   x->inc = f;
+  increment_bang(x);
 
 }
 
-static void increment_reset(t_increment *x)
+static void increment_inlet2_bang(t_increment_inlet2 *x)
+{
+	
+
+  
+  x->x->value = 0;
+  x->x->reset = 1;
+  
+ 
+}
+
+
+static void increment_set(t_increment *x, t_float f)
+{
+  x->value = f;
+  x->reset = 1;
+  
+}
+
+static void increment_inlet2_float(t_increment_inlet2 *x, t_float f)
 {
 	
 	//post("before");
  // post("start:%d",(int)x->start);
  // post("value:%d",(int)x->value);
   
-  x->value = x->start;
-  x->reset = 1;
+  increment_set(x->x, f);
   
  // post("after");
   //post("start:%d",(int)x->start);
   //post("value:%d",(int)x->value);
 }
-
-static void increment_set(t_increment *x, t_float f)
-{
-	
-  
- 
-  x->value = f;
-  x->start = f;
-  x->reset = 1;
-  
-  
-  
-}
-
 
 
 
@@ -109,19 +121,25 @@ void *increment_new(t_symbol *s, int argc, t_atom *argv)
 	x->inc = 1;
   }
   
-  x->start = x->value;
+  //x->start = x->value;
   
   //post("start:%d",(int)x->start);
   //post("value:%d",(int)x->value);
   
-   inlet_new(&x->x_obj, &x->x_obj.ob_pd,
-        gensym("float"), gensym("set"));
+   //inlet_new(&x->x_obj, &x->x_obj.ob_pd,
+       // gensym("float"), gensym("set"));
 
-  floatinlet_new(&x->x_obj, &x->inc);
+  //floatinlet_new(&x->x_obj, &x->inc);
   
-  inlet_new(&x->x_obj, &x->x_obj.ob_pd,
-        gensym("bang"), gensym("reset"));
+  //inlet_new(&x->x_obj, &x->x_obj.ob_pd,
+   //     gensym("bang"), gensym("reset"));
+   
+  t_increment_inlet2 *inlet2 = (t_increment_inlet2 *)pd_new(increment_inlet2_class);
   
+  inlet2->x = x;
+  x->inlet2 = inlet2;
+   
+  inlet_new((t_object *)x, (t_pd *)inlet2, 0, 0);
 
   x->outlet1 = outlet_new(&x->x_obj, &s_float);
   //x->outlet2 = outlet_new(&x->x_obj, &s_float);
@@ -138,17 +156,26 @@ void increment_setup(void) {
         A_GIMME, 0);
 
   class_addbang  (increment_class, increment_bang);
-  //class_addfloat (increment_class, increment_float);
+  class_addfloat (increment_class, increment_float);
   class_addmethod(increment_class, 
         (t_method)increment_set, gensym("set"),
         A_DEFFLOAT, 0);
+        
+increment_inlet2_class = class_new(gensym("increment_inlet2"),
+    0, 0, sizeof(t_increment_inlet2), CLASS_PD | CLASS_NOINLET, 0);
+ 
+ class_addbang(increment_inlet2_class, increment_inlet2_bang);
+ class_addfloat(increment_inlet2_class, increment_inlet2_float);
+        
+        
+        /*
 	class_addmethod(increment_class, 
         (t_method)increment_step, gensym("step"),
         A_DEFFLOAT, 0);
 	class_addmethod(increment_class,
 		(t_method)increment_reset, gensym("reset"),
 		0);
-
+   */
   //class_addlist (increment_class, increment_list);
   
 }
