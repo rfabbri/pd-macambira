@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch memento-p sfruit pd-wavelet 
+LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento mtl nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch memento-p sfruit pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -333,27 +333,22 @@ pddp_install:
 #	install -d $(DESTDIR)$(examplesdir)/$(PDDP_NAME)
 
 #-------------------------------------------------------------------------------
-# pdmtl
-PDMTL_NAME = pdmtl
-pdmtl_install:
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PDMTL_NAME) \
-		--author "Thomas Fredericks, Alexandre Quessy and 11h11" \
-		--license "GNU GPL" \
-		--description "Pure Data Montreal Abstractions"
-	install -d $(DESTDIR)$(objectsdir)/$(PDMTL_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/$(PDMTL_NAME)/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(PDMTL_NAME)
-	install -d $(DESTDIR)$(objectsdir)/$(PDMTL_NAME)/include
-	install -p $(abstractions_src)/$(PDMTL_NAME)/include/*.pd  \
-		$(DESTDIR)$(objectsdir)/$(PDMTL_NAME)/include
-	install -p $(abstractions_src)/$(PDMTL_NAME)/include/*.py  \
-		$(DESTDIR)$(objectsdir)/$(PDMTL_NAME)/include
-	install -p $(abstractions_src)/$(PDMTL_NAME)/include/*.keys  \
-		$(DESTDIR)$(objectsdir)/$(PDMTL_NAME)/include
-	install -d $(DESTDIR)$(helpdir)/$(PDMTL_NAME)
-	install -p $(abstractions_src)/$(PDMTL_NAME)/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(PDMTL_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(PDMTL_NAME)/medias
+# mtl
+MTL_NAME = mtl
+mtl_install:
+	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(MTL_NAME) \
+		--author "Thomas O Fredericks and 11h11" \
+		--license "If you use and die, it's not our fault" \
+		--description "(Pure Data) Montreal Abstractions"
+	install -d $(DESTDIR)$(objectsdir)/$(MTL_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/$(MTL_NAME)/*.pd | \
+		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(MTL_NAME)
+	install -d $(DESTDIR)$(helpdir)/$(MTL_NAME)
+	install -p $(abstractions_src)/$(MTL_NAME)/*-help.pd \
+		$(DESTDIR)$(helpdir)/$(MTL_NAME)
+	install -d $(DESTDIR)$(helpdir)/$(MTL_NAME)/examples
+    	install -p $(abstractions_src)/$(MTL_NAME)/examples/*.pd \
+		$(DESTDIR)$(helpdir)/$(MTL_NAME)/examples
 
 #-------------------------------------------------------------------------------
 # pdsvn
