@@ -336,19 +336,28 @@ pddp_install:
 # mtl
 MTL_NAME = mtl
 mtl_install:
+	install -d $(DESTDIR)$(objectsdir)/$(MTL_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(MTL_NAME) \
 		--author "Thomas O Fredericks and 11h11" \
 		--license "If you use and die, it's not our fault" \
 		--description "(Pure Data) Montreal Abstractions"
-	install -d $(DESTDIR)$(objectsdir)/$(MTL_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/$(MTL_NAME)/*.pd | \
 		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(MTL_NAME)
 	install -d $(DESTDIR)$(helpdir)/$(MTL_NAME)
 	install -p $(abstractions_src)/$(MTL_NAME)/*-help.pd \
 		$(DESTDIR)$(helpdir)/$(MTL_NAME)
+	install -p $(abstractions_src)/$(MTL_NAME)/browser.pd \
+		$(DESTDIR)$(helpdir)/$(MTL_NAME)
+	install -p $(abstractions_src)/$(MTL_NAME)/1-13LP.pd \
+		$(DESTDIR)$(helpdir)/$(MTL_NAME)
+	install -p $(abstractions_src)/$(MTL_NAME)/*.txt \
+		$(DESTDIR)$(objectsdir)/$(MTL_NAME)		
+	install -p $(abstractions_src)/$(MTL_NAME)/*.txt \
+		$(DESTDIR)$(helpdir)/$(MTL_NAME)	
 	install -d $(DESTDIR)$(helpdir)/$(MTL_NAME)/examples
-    	install -p $(abstractions_src)/$(MTL_NAME)/examples/*.pd \
+	install -p $(abstractions_src)/$(MTL_NAME)/examples/*.pd \
 		$(DESTDIR)$(helpdir)/$(MTL_NAME)/examples
+
 
 #-------------------------------------------------------------------------------
 # pdsvn
