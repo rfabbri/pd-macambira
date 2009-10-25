@@ -8,7 +8,7 @@ SOURCES =
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
-SOURCES_Darwin = ambient_light_sensor.c iodisplay.c keyboard_light.c sudden_motion_sensor.c smc.c
+SOURCES_Darwin = ambient_light_sensor.c iodisplay.c keyboard_light.c sudden_motion_sensor.c smc.c multitouch.c
 SOURCES_Linux = 
 SOURCES_Windows = 
 
@@ -51,9 +51,9 @@ ifeq ($(UNAME),Darwin)
     SOURCES += $(SOURCES_Darwin)
     EXTENSION = pd_darwin
     OS = macosx
-    OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
+    OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=3 -fast
     FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
-    CFLAGS += -fPIC $(FAT_FLAGS)
+    CFLAGS += -fPIC -std=c99 $(FAT_FLAGS)
     LDFLAGS += -bundle -undefined dynamic_lookup $(FAT_FLAGS)
     LIBS += -lc 
     STRIP = strip -x
@@ -96,6 +96,13 @@ CFLAGS += $(OPT_CFLAGS)
 .PHONY = install install install-doc install-exec clean dist distclean etags
 
 all: $(SOURCES:.c=.$(EXTENSION))
+
+multitouch.$(EXTENSION): multitouch.c
+	$(CC) $(CFLAGS) -o multitouch.o -c multitouch.c
+	$(CC) $(LDFLAGS) -F/System/Library/PrivateFrameworks \
+		-o multitouch.$(EXTENSION) multitouch.o $(LIBS) -framework MultitouchSupport
+	chmod a-x multitouch.$(EXTENSION)
+	rm -f -- multitouch.o
 
 %.$(EXTENSION): %.c
 	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
