@@ -1,6 +1,4 @@
-#N canvas 369 151 562 479 10;
-#X obj 4 428 cnv 15 550 20 empty \$0-pddp.cnv.footer empty 20 12 0
-14 -228856 -66577 0;
+#N canvas 180 29 562 479 10;
 #X obj 4 -17 cnv 15 550 40 empty \$0-pddp.cnv.header brightness 3 12
 0 18 -241536 -1 0;
 #X obj 3 189 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 15 12 0 13
@@ -23,27 +21,7 @@
 0 13 -245500 -191407 0;
 #X obj 3 368 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 15
 12 0 13 -245500 -191407 0;
-#N canvas 309 454 609 478 guts 0;
-#X obj 117 95 textfile;
-#X msg 116 24 symbol template-HCS.pd;
-#X msg 116 54 read \$1 \, rewind \, bang;
-#X obj 117 141 trigger bang anything;
-#X obj 58 117 bang;
-#X obj 240 162 route #X;
-#X obj 240 183 route text;
-#X obj 240 250 route DESCRIPTION;
-#X obj 239 276 print;
-#X obj 140 277 print TEXT;
-#X connect 0 0 3 0;
-#X connect 1 0 2 0;
-#X connect 2 0 0 0;
-#X connect 3 0 4 0;
-#X connect 3 1 5 0;
-#X connect 4 0 0 0;
-#X connect 5 0 6 0;
-#X connect 7 0 8 0;
-#X restore 453 430 pd guts;
-#X obj 412 6 pddp/pddplink http://wiki.puredata.info/en/apple/brightness
+#X obj 432 6 pddp/pddplink http://wiki.puredata.info/en/apple/brightness
 -text pdpedia: brightness;
 #X obj 104 394 pddp/pddplink http://www.osxbook.com/book/bonus/chapter10/light/
 ;
@@ -54,7 +32,7 @@
 #X floatatom 229 97 5 0 0 0 - - -;
 #X text 15 6 description: query and control screen brightness on Apples
 ;
-#X obj 426 -14 apple/brightness;
+#X obj 446 -14 apple/brightness;
 #X text 102 326 Accepts one float argument to set the screen brightness
 (between 0 and 1);
 #X text 103 276 float - current screen brightness (between 0 and 1)
@@ -63,7 +41,7 @@
 #X text 102 228 float - set the screen brightness (between 0 and 1)
 ;
 #X obj 197 122 apple/brightness;
-#X connect 10 0 20 0;
-#X connect 12 0 13 0;
-#X connect 12 0 20 0;
-#X connect 20 0 11 0;
+#X connect 8 0 18 0;
+#X connect 10 0 11 0;
+#X connect 10 0 18 0;
+#X connect 18 0 9 0;
