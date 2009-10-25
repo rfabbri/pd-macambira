@@ -11,8 +11,8 @@
 
 
 
-char tof_buf_temp_a[MAXPDSTRING];
-char tof_buf_temp_b[MAXPDSTRING];
+static char tof_buf_temp_a[MAXPDSTRING];
+static char tof_buf_temp_b[MAXPDSTRING];
 
 
 /* 
@@ -203,7 +203,7 @@ static int tof_next_tagged_argument(char tag, int ac, t_atom *av, int* ac_a, t_a
 
 
 
-static int tof_find_tag(char tag, t_symbol* name, int ac, t_atom* av) {
+static int tof_find_symbol(t_symbol* name, int ac, t_atom* av) {
 	int i;
 	for (i=0; i<ac;i++) {
 		if ( IS_A_SYMBOL(av,i) && name == atom_getsymbol(av+i) ) {

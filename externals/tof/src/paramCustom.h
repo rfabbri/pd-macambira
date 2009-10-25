@@ -132,7 +132,7 @@ static void* paramCustom_new(t_symbol *s, int ac, t_atom *av)
 	t_symbol* root = tof_get_dollarzero(tof_get_root_canvas(canvas));
 	  
 	  // FIND THE NO PRESET TAG: /nps
-	 x->nopresets = tof_find_tag('/',gensym("/nps"), ac-1, av+1);
+	 x->nopresets = tof_find_symbol(gensym("/nps"), ac-1, av+1);
 	  
 	  
 

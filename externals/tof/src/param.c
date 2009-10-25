@@ -197,19 +197,19 @@ static void* paramClass_new(t_symbol *s, int ac, t_atom *av)
 	 tof_copy_atoms(av_temp,x->gav,x->gac);	  
 	  
 	  // FIND THE NO LOADBANG TAG: /nlb
-	x->noloadbang = tof_find_tag('/',gensym("/nlb"), ac-1, av+1);
+	x->noloadbang = tof_find_symbol(gensym("/nlb"), ac-1, av+1);
 	  //post("nlb: %i",x->noloadbang);
 	  
 	  
 	  
 	  // FIND THE WAIT FOR BANG TAG: /wfb
-	  x->nowaitforbang = !(tof_find_tag('/',gensym("/wfb"), ac-1, av+1));
+	  x->nowaitforbang = !(tof_find_symbol(gensym("/wfb"), ac-1, av+1));
 	    // FIND THE NO SAVE TAG: /ns
-	int nosave = tof_find_tag('/',gensym("/ns"), ac-1, av+1);
+	int nosave = tof_find_symbol(gensym("/ns"), ac-1, av+1);
 	  //post("ns: %i",nosave);
 	  
 	   // FIND THE NO PRESET TAG: /nps
-	  x->nopresets = tof_find_tag('/',gensym("/nps"), ac-1, av+1);
+	  x->nopresets = tof_find_symbol(gensym("/nps"), ac-1, av+1);
 	  
 	  
 	  // REGISTER PARAM
