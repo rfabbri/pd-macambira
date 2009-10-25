@@ -27,9 +27,9 @@
 
 #include <mach/mach.h> 
 #include <IOKit/IOKitLib.h> 
+#include <CoreFoundation/CoreFoundation.h> 
 #include <math.h>
 #include <unistd.h>
-#include <CoreFoundation/CoreFoundation.h> 
 #include "MultitouchSupport.h"
 #include <m_pd.h>
 
@@ -109,6 +109,7 @@ static void multitouch_float(t_multitouch* x, t_float f)
         /* if I am the last instance, clean up the callback stuff */
 		if (polling == 0) {
 			MTDeviceStop(dev);
+		  	MTUnregisterContactFrameCallback(dev, callback);
 			MTDeviceRelease(dev);
 			dev = NULL;
 		}
