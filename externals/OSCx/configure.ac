@@ -79,20 +79,20 @@ else
         case $host in 
         *86*-linux*)
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O2 -fPIC"
-					 LDFLAGS="-Wl,-export_dynamic -shared"
+					 LDFLAGS="-Wl,--export-dynamic -shared"
 					 dnl we could test for bad glibc here, but don't
 					 pd_suffix=pd_linux
 					 LIBS="-lc -lm"
 					 ;;
         powerpc-*-linux*)
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1"
-					 LDFLAGS="-Wl,-export_dynamic -shared"
+					 LDFLAGS="-Wl,--export-dynamic -shared"
 					 pd_suffix=pd_linux
 					 LIBS="-lc -lm"
 					 ;;
         *-*-linux*)
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1"
-					 LDFLAGS="-Wl,-export_dynamic -shared"
+					 LDFLAGS="-Wl,--export-dynamic -shared"
 					 INCLUDES="$INCLUDES"
 					 pd_suffix=pd_linux
 					 LIBS="-L../../../pd/bin -lpd -lc -lm"
@@ -102,7 +102,7 @@ else
 			       ;;
         *-*-cygwin*)
                 CFLAGS="$CFLAGS -mno-cygwin -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
-					 LDFLAGS="-Wl,-export_dynamic -shared"
+					 LDFLAGS="-Wl,--export-dynamic -shared"
 					 INCLUDES="$INCLUDES -I../../../pd/src"
 					 pd_suffix=dll
 					 LIBS="-lc -lm"
@@ -123,7 +123,7 @@ else
         *)
 					 dnl assume unix
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1"
-					 LDFLAGS="-Wl,-export_dynamic -shared"
+					 LDFLAGS="-Wl,--export-dynamic -shared"
 					 pd_suffix=pd_linux
 					 LIBS="-lc -lm"
 					 ;;
