@@ -2,6 +2,9 @@
 #include "tof.h"
 #define SLASH '/'
 
+static char path_buf_a[MAXPDSTRING];
+static char path_buf_b[MAXPDSTRING];
+
 static t_class *path_class;
 
 typedef struct _path {
@@ -143,8 +146,8 @@ static void path_bang(t_path *x)
 static void path_symbol(t_path *x, t_symbol *s) {
 	
 	
-	strcpy(tof_buf_temp_a,s->s_name);
-	int length = strlen(tof_buf_temp_a);
+	strcpy(path_buf_a,s->s_name);
+	int length = strlen(path_buf_a);
 	t_symbol* result;
 	
 	if ( x->mode == x->s_relative ) {
@@ -153,11 +156,11 @@ static void path_symbol(t_path *x, t_symbol *s) {
 		
 		// Is this a relative path?
 		// Checks for a starting / or a : as second character
-		if ( path_is_absolute(tof_buf_temp_a,length  )) {
-			getRelativeFilename(tof_buf_temp_b,x->dir->s_name,tof_buf_temp_a);
-			result = gensym(tof_buf_temp_b);
+		if ( path_is_absolute(path_buf_a,length  )) {
+			getRelativeFilename(path_buf_b,x->dir->s_name,path_buf_a);
+			result = gensym(path_buf_b);
 		} else {
-			result = gensym(tof_buf_temp_a);
+			result = gensym(path_buf_a);
 		}
 		
 	} else {
@@ -165,16 +168,16 @@ static void path_symbol(t_path *x, t_symbol *s) {
 		// TRANFORM RELATIVE PATHS TO ABSOLUTE PATHS
 		
 		// Is this a relative path?
-		if ( path_is_absolute(tof_buf_temp_a,length)  ) {
-			result = gensym(tof_buf_temp_a);
+		if ( path_is_absolute(path_buf_a,length)  ) {
+			result = gensym(path_buf_a);
 		} else {
 			// remove extra ../
-			strcpy(tof_buf_temp_b,x->dir->s_name);
-			char* dir = tof_buf_temp_b;
+			strcpy(path_buf_b,x->dir->s_name);
+			char* dir = path_buf_b;
 			char* p;
 			int l = strlen(dir);
 			if (dir[l-1] == '/') dir[l-1] = '\0';
-			char* file = tof_buf_temp_a;
+			char* file = path_buf_a;
 			while( strncmp(file,"../",3) == 0 ) {
 				file = file + 3;
 				p = strrchr(dir,'/');
@@ -226,10 +229,10 @@ void *path_new(t_symbol *s, int argc, t_atom *argv)
 	  x->dir = tof_get_dir(tof_get_root_canvas(tof_get_canvas()));
 	  
 	}
-	strcpy(tof_buf_temp_a,x->dir->s_name);
+	strcpy(path_buf_a,x->dir->s_name);
 	
-	//strcat(tof_buf_temp_a,"/");
-	x->dir = gensym(tof_buf_temp_a);
+	//strcat(path_buf_a,"/");
+	x->dir = gensym(path_buf_a);
 	
   /*
    inlet_new(&x->x_obj, &x->x_obj.ob_pd,

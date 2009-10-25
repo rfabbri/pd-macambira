@@ -11,8 +11,8 @@
 
 
 
-static char tof_buf_temp_a[MAXPDSTRING];
-static char tof_buf_temp_b[MAXPDSTRING];
+//static char tof_buf_temp_a[MAXPDSTRING];
+//static char tof_buf_temp_b[MAXPDSTRING];
 
 
 /* 
