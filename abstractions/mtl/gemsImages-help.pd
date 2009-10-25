@@ -1,0 +1,29 @@
+#N canvas 656 22 540 465 10;
+#X obj 21 179 gemhead;
+#X obj 27 38 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+;
+#X obj 161 188 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 103 147 5 0 0 0 - - -;
+#X text 109 22 Description: Multiple images handler. The images do
+not need to be the same dimension.;
+#X obj 27 61 mtl/gemsWin /dimen 640 480;
+#X obj 22 210 mtl/gemsImages;
+#X obj 25 329 mtl/gemsFit window;
+#X obj 25 373 rectangle 1;
+#X text 138 144 Select a previously loaded image;
+#X text 186 184 Open a panel to select an image;
+#X obj 198 232 openpanel;
+#X obj 200 210 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 200 253 Add an image;
+#X obj 25 284 pix_texture;
+#X connect 0 0 6 0;
+#X connect 1 0 5 0;
+#X connect 2 0 6 1;
+#X connect 3 0 6 1;
+#X connect 6 0 14 0;
+#X connect 7 0 8 0;
+#X connect 11 0 6 1;
+#X connect 12 0 11 0;
+#X connect 14 0 7 0;

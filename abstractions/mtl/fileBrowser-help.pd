@@ -1,0 +1,39 @@
+#N canvas 1145 13 741 557 10;
+#X obj 255 113 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X symbolatom 53 479 80 0 0 0 - - -;
+#X obj 53 503 print;
+#X text 75 24 Description: Nice file browser.;
+#X text 262 205 <- Drag the slider to display all the contents of a
+folder.;
+#X text 271 177 - Files are white \, folders are grey!;
+#X floatatom 58 112 5 0 0 0 - - -;
+#X text 45 91 You can select files by index.;
+#X floatatom 392 273 5 0 0 1 size - -;
+#X obj 316 323 pack 0 10;
+#X obj 392 293 t b a;
+#X floatatom 313 276 5 0 2 1 font - -;
+#X msg 316 346 text.font \$1 \$2;
+#X msg 318 379 select.colorRGB 125 125 125;
+#X text 505 381 Change the select color;
+#X msg 318 405 select.colorRGB 0 125 125;
+#X msg 204 111 clear;
+#X text 287 109 <- click the bang (or click on the grey bar) to select
+the folder to be browsed.;
+#X text 300 237 You can use any of gBrowser's right inlet options.
+See gBrowser's help for more information.;
+#X obj 53 160 mtl/fileBrowser;
+#X text 75 38 tags: ui file;
+#X connect 0 0 19 0;
+#X connect 1 0 2 0;
+#X connect 6 0 19 0;
+#X connect 8 0 10 0;
+#X connect 9 0 12 0;
+#X connect 10 0 9 0;
+#X connect 10 1 9 1;
+#X connect 11 0 9 0;
+#X connect 12 0 19 1;
+#X connect 13 0 19 1;
+#X connect 15 0 19 1;
+#X connect 16 0 19 0;
+#X connect 19 0 1 0;

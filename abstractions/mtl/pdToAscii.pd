@@ -1,0 +1,8 @@
+#N canvas 989 362 450 300 10;
+#X obj 111 39 inlet;
+#X obj 110 237 outlet;
+#X obj 111 82 list trim;
+#X obj 110 122 moocow/any2bytes 0 -1;
+#X connect 0 0 2 0;
+#X connect 2 0 3 0;
+#X connect 3 0 1 0;

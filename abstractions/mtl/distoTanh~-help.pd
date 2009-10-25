@@ -1,0 +1,19 @@
+#N canvas 509 200 434 220 10;
+#X obj -35 88 *~ 0.5;
+#X obj 46 88 *~ 0.5;
+#X text -38 9 Description: A distortion using expr~ tanh;
+#X obj -36 155 mtl/out~;
+#X obj -36 64 osc~ 110;
+#X obj 47 63 osc~ 110;
+#X text -37 27 tags: fx~;
+#X obj 149 94 hsl 100 15 0 1 0 0 \$0/tanh/wet \$0/tanh/wet_ /tanh/wet
+105 7 0 8 -262144 -1 -1 0 1;
+#X obj 149 114 hsl 100 15 1 100 0 0 \$0/tanh/amount \$0/tanh/amount_
+/tanh/amount 105 7 0 8 -262144 -1 -1 0 1;
+#X obj -35 113 mtl/distoTanh~ /id tanh;
+#X connect 0 0 9 0;
+#X connect 1 0 9 1;
+#X connect 4 0 0 0;
+#X connect 5 0 1 0;
+#X connect 9 0 3 0;
+#X connect 9 1 3 1;

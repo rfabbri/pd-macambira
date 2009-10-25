@@ -1,0 +1,10 @@
+#N canvas 1140 143 838 392 10;
+#X text 13 46 tags: mix~;
+#X obj 69 114 mtl/in~;
+#X text 13 15 Description: Controls the input volume and displays a
+stereo VU.;
+#X obj 70 189 mtl/out~;
+#X text 245 122 The square next to the volume slider glows green when
+DSP is ON and input is detected.;
+#X connect 1 0 3 0;
+#X connect 1 1 3 1;

@@ -1,0 +1,52 @@
+#N canvas 494 278 763 356 10;
+#X obj 405 5 cnv 15 320 90 empty empty empty 20 12 0 14 -261682 -66577
+0;
+#X text 408 29 le 16 septembre 2009;
+#X text 407 64 Copyright © 2009 par Mathieu Bouchard;
+#X text 408 52 Fabriqué à Villeray \, avec amour;
+#X text 408 17 Tel que presenté au club PureData de Montréal;
+#X text 408 6 Patch de distorsion nonmonotone qui suit l'enveloppe
+;
+#X text 407 79 Publié sous licence Standard Improved BSD;
+#X obj 243 186 cyclone/Scope~ 130 130 256 3 128 -1 1 0 0 0 0 102 255
+51 135 135 135 0;
+#X obj 16 186 cyclone/Scope~ 130 130 256 3 128 -1 1 0 0 0 0 102 255
+51 135 135 135 0;
+#X obj 31 121 mtl/out~;
+#X text 26 -2 Description: distortion nonmonotone;
+#X text 28 14 tags: fx~;
+#X obj 31 71 *~ 0.5;
+#X obj 136 72 *~ 0.5;
+#X obj 32 47 osc~ 110;
+#X obj 136 47 osc~ 110;
+#X obj 407 108 hsl 100 15 0 1 0 0 \$0/matju/wet \$0/matju/wet_ /matju/wet
+105 7 0 8 -262144 -1 -1 0 1;
+#X obj 407 128 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/freq1 \$0/matju/freq1_
+/matju/freq1 48 7 0 8 -262144 -1 -1 0 256;
+#X obj 407 148 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/amp1 \$0/matju/amp1_
+/matju/amp1 48 7 0 8 -262144 -1 -1 0 256;
+#X obj 407 168 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/base1 \$0/matju/base1_
+/matju/base1 48 7 0 8 -262144 -1 -1 0 256;
+#X obj 407 188 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/freq2 \$0/matju/freq2_
+/matju/freq2 48 7 0 8 -262144 -1 -1 0 256;
+#X obj 407 208 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/amp2 \$0/matju/amp2_
+/matju/amp2 48 7 0 8 -262144 -1 -1 0 256;
+#X obj 407 228 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/base2 \$0/matju/base2_
+/matju/base2 48 7 0 8 -262144 -1 -1 0 256;
+#X obj 407 248 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/freqfeed \$0/matju/freqfeed_
+/matju/freqfeed 48 7 0 8 -262144 -1 -1 0 256;
+#X obj 407 268 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/ampfeed \$0/matju/ampfeed_
+/matju/ampfeed 48 7 0 8 -262144 -1 -1 0 256;
+#X obj 407 288 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/basefeed \$0/matju/basefeed_
+/matju/basefeed 48 7 0 8 -262144 -1 -1 0 256;
+#X obj 407 308 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/feedback \$0/matju/feedback_
+/matju/feedback 48 7 0 8 -262144 -1 -1 0 256;
+#X obj 31 96 mtl/distoNonmonotone~ /id matju;
+#X connect 12 0 8 0;
+#X connect 12 0 27 0;
+#X connect 13 0 27 1;
+#X connect 14 0 12 0;
+#X connect 15 0 13 0;
+#X connect 27 0 9 0;
+#X connect 27 1 7 0;
+#X connect 27 1 9 1;

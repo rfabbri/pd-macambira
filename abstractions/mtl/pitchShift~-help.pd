@@ -1,0 +1,29 @@
+#N canvas 417 57 407 261 10;
+#X obj 9 157 mtl/out~;
+#X text 5 15 tags: fx~;
+#X obj 205 133 nbx 5 14 -1e+37 1e+37 0 0 \$0/pishi/transpose \$0/pishi/transpose_
+/pishi/transpose 48 7 0 8 -262144 -1 -1 25 256;
+#X obj 205 88 tgl 15 0 \$0/pishi/switch \$0/pishi/switch_ /pishi/switch
+17 7 0 8 -262144 -1 -1 0 1;
+#X obj 8 61 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#N canvas 367 242 582 409 loop_sample 0;
+#X obj 47 313 outlet~;
+#X obj 43 9 inlet;
+#X obj 193 319 outlet~;
+#X msg 47 163 panel;
+#X obj 47 200 mtl/player~ 1;
+#X connect 1 0 3 0;
+#X connect 3 0 4 0;
+#X connect 4 0 0 0;
+#X connect 4 0 2 0;
+#X restore 8 97 pd loop_sample;
+#X obj 205 109 tgl 15 0 \$0/pishi/method \$0/pishi/method_ /pishi/method
+17 7 0 8 -262144 -1 -1 1 1;
+#X obj 8 129 mtl/pitchShift~ /id pishi;
+#X text 5 -2 Description: pitchshifter with 2 methods.;
+#X connect 4 0 5 0;
+#X connect 5 0 7 0;
+#X connect 5 1 7 1;
+#X connect 7 0 0 0;
+#X connect 7 1 0 1;

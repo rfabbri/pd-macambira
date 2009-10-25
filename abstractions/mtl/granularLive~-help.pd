@@ -1,0 +1,62 @@
+#N canvas 368 121 560 246 10;
+#X text 17 11 Description: Live granular;
+#X text 18 27 Author: Unknown;
+#X obj 20 123 mtl/granularLive~ /id granule;
+#X obj 21 159 mtl/out~;
+#X text 18 43 tags: fx~;
+#X obj 20 71 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+;
+#N canvas 5 185 450 300 generate~ 0;
+#X obj 32 213 osc~ 200;
+#X obj 32 89 metro 400;
+#X obj 32 175 mtof;
+#X obj 104 195 mtof;
+#X obj 32 132 + 20;
+#X obj 32 111 random 70;
+#X floatatom 83 69 5 0 0 0 - - -;
+#X obj 32 261 outlet~;
+#X obj 103 261 outlet~;
+#X obj 30 14 inlet;
+#X obj 104 175 mtl/closestNote 0 2 4 7 9;
+#X obj 104 234 *~;
+#X obj 31 234 *~;
+#X obj 104 214 osc~ 100;
+#X obj 32 155 mtl/closestNote 0 2 4 7 9;
+#X connect 0 0 12 0;
+#X connect 1 0 5 0;
+#X connect 2 0 0 0;
+#X connect 3 0 13 0;
+#X connect 4 0 10 0;
+#X connect 4 0 14 0;
+#X connect 5 0 4 0;
+#X connect 6 0 1 1;
+#X connect 9 0 1 0;
+#X connect 9 0 11 1;
+#X connect 9 0 12 1;
+#X connect 10 0 3 0;
+#X connect 11 0 8 0;
+#X connect 12 0 7 0;
+#X connect 13 0 11 0;
+#X connect 14 0 2 0;
+#X restore 20 96 pd generate~;
+#X obj 220 64 hsl 100 15 0 1 0 0 \$0/granule/wet \$0/granule/wet_ /granule/wet
+105 7 0 8 -262144 -1 -1 4400 1;
+#X obj 220 84 hsl 100 15 0 1 0 0 \$0/granule/feedbackleft \$0/granule/feedbackleft_
+/granule/feedbackleft 105 7 0 8 -262144 -1 -1 4300 1;
+#X obj 220 104 hsl 100 15 0 1 0 0 \$0/granule/feedbackright \$0/granule/feedbackright_
+/granule/feedbackright 105 7 0 8 -262144 -1 -1 3600 1;
+#X obj 220 124 nbx 5 14 -1e+37 1e+37 0 0 \$0/granule/transpositionleft
+\$0/granule/transpositionleft_ /granule/transpositionleft 48 7 0 8
+-262144 -1 -1 12 256;
+#X obj 220 144 nbx 5 14 -1e+37 1e+37 0 0 \$0/granule/transpositionright
+\$0/granule/transpositionright_ /granule/transpositionright 48 7 0
+8 -262144 -1 -1 24 256;
+#X obj 220 164 nbx 5 14 -1e+37 1e+37 0 0 \$0/granule/windowleft \$0/granule/windowleft_
+/granule/windowleft 48 7 0 8 -262144 -1 -1 100 256;
+#X obj 220 184 nbx 5 14 -1e+37 1e+37 0 0 \$0/granule/windowright \$0/granule/windowright_
+/granule/windowright 48 7 0 8 -262144 -1 -1 100 256;
+#X connect 2 0 3 0;
+#X connect 2 1 3 1;
+#X connect 5 0 6 0;
+#X connect 6 0 2 0;
+#X connect 6 1 2 1;

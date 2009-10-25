@@ -1,0 +1,29 @@
+#N canvas 526 221 452 396 10;
+#X obj 45 102 *~ 0.5;
+#X obj 126 101 *~ 0.5;
+#X text 14 29 Author: netpd;
+#X text 15 12 Description: a lofi distortion with frequency control
+;
+#X obj 44 167 mtl/out~;
+#X text 15 45 tags: fx~;
+#X obj 22 223 cyclone/Scope~ 130 130 256 3 128 -1 1 0 0 0 0 102 255
+51 135 135 135 0;
+#X obj 213 223 cyclone/Scope~ 130 130 256 3 128 -1 1 0 0 0 0 102 255
+51 135 135 135 0;
+#X obj 234 95 hsl 100 15 0 1 0 0 \$0/lofi/wet \$0/lofi/wet_ /lofi/wet
+105 7 0 8 -262144 -1 -1 0 1;
+#X obj 234 115 hsl 100 15 0 1 0 0 \$0/lofi/freq \$0/lofi/freq_ /lofi/freq
+105 7 0 8 -262144 -1 -1 4950 1;
+#X obj 234 135 hsl 100 15 0 1 0 0 \$0/lofi/bits \$0/lofi/bits_ /lofi/bits
+105 7 0 8 -262144 -1 -1 3960 1;
+#X obj 46 78 osc~ 110;
+#X obj 126 77 osc~ 110;
+#X obj 44 134 mtl/distoLofi~ /id lofi;
+#X connect 0 0 6 0;
+#X connect 0 0 13 0;
+#X connect 1 0 13 1;
+#X connect 11 0 0 0;
+#X connect 12 0 1 0;
+#X connect 13 0 4 0;
+#X connect 13 1 4 1;
+#X connect 13 1 7 0;

@@ -1,0 +1,27 @@
+#N canvas 243 150 569 441 10;
+#X text 26 48 tags: conversion;
+#X msg 54 90 A B C;
+#X obj 54 212 print;
+#X msg 97 114 list A B C;
+#X obj 54 185 mtl/pdToAscii;
+#X msg 123 147 567;
+#X text 99 89 Spaces in lists are converted (ASCII code 32);
+#X obj 57 314 list append 13;
+#X text 152 307 By using list append \, you can append special ASCII
+characters like the carriage return (ASCII code 13) in this case.;
+#X msg 57 247 78;
+#X msg 115 254 test;
+#X obj 57 344 print;
+#X text 27 17 Description: Converts Pd messages to a list of ASCII
+bytes.;
+#X msg 110 232 hello world;
+#X obj 57 286 mtl/pdToAscii;
+#X connect 1 0 4 0;
+#X connect 3 0 4 0;
+#X connect 4 0 2 0;
+#X connect 5 0 4 0;
+#X connect 7 0 11 0;
+#X connect 9 0 14 0;
+#X connect 10 0 14 0;
+#X connect 13 0 14 0;
+#X connect 14 0 7 0;
