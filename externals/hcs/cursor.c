@@ -59,6 +59,15 @@ static void create_proc_test(void)
     sys_gui("}\n");
 }
 
+/* in Pd 0.43, the internal proc changed from 'pd' to 'pdsend' */
+static void create_legacy_pd (void)
+{
+    post("creating legacy 'pdsend' using legacy 'pd' proc");
+    sys_gui("if {[info commands pdsend] ne {pdsend}} {\n");
+    sys_gui("  proc pdsend {message} {pd $message}\n");
+    sys_gui("}\n");
+}
+
 /* idea from #tcl for a Tcl unbind */
 static void create_unbind (void)
 {
@@ -80,7 +89,6 @@ static void create_button_proc(void)
 {
     sys_gui ("if { ! [::hcs_cursor_class::proc_test button]} {");
     sys_gui ("  proc ::hcs_cursor_class::button {button state} {\n");
-    sys_gui ("    puts stderr \"button $button $state\"\n");
     sys_vgui("    pd [concat %s button $button $state \\;]\n",
              cursor_receive_symbol->s_name);
     sys_gui ("  }\n");
@@ -91,7 +99,6 @@ static void create_mousewheel_proc(void)
 {
     sys_gui ("if { ! [::hcs_cursor_class::proc_test mousewheel]} {");
     sys_gui ("  proc ::hcs_cursor_class::mousewheel {delta} {\n");
-    sys_gui ("    puts stderr \"mousewheel $delta\"\n");
     sys_vgui("    pd [concat %s mousewheel $delta \\;]\n",
              cursor_receive_symbol->s_name);
     sys_gui ("  }\n");
@@ -146,7 +153,6 @@ static void cursor_float(t_cursor *x, t_float f)
             x->am_polling = 0;
             cursor_instances_polling--;
             /* if no more objects are listening, stop sending the events */
-            post("cursor_instances_polling-- %d", cursor_instances_polling);
             if (cursor_instances_polling == 0) {
                 sys_gui("set ::hcs_cursor_class::continue_pollmotion 0 \n");
                 sys_gui("::hcs_cursor_class::unbind all <ButtonPress> {::hcs_cursor_class::button %b 1}\n");
@@ -161,7 +167,6 @@ static void cursor_float(t_cursor *x, t_float f)
             pd_bind(&x->x_obj.ob_pd, cursor_receive_symbol);
             cursor_instances_polling++;
             /* if this is the first instance to start, set up Tcl binding and polling */
-            post("cursor_instances_polling++ %d", cursor_instances_polling);
             if (cursor_instances_polling == 1) {
                 sys_gui("set ::hcs_cursor_class::continue_pollmotion 1 \n");
                 sys_gui("::hcs_cursor_class::pollmotion \n");
@@ -205,6 +210,7 @@ static void cursor_mousewheel_callback(t_cursor *x, t_float f)
 static void cursor_free(t_cursor *x)
 {
     cursor_float(x, 0);
+    pd_unbind(&x->x_obj.ob_pd, x->receive_symbol);
 }
 
 static void *cursor_new(void)
@@ -267,6 +273,9 @@ void cursor_setup(void)
 
     create_namespace();
     create_proc_test();
+/* TODO figure this out once 0.43 is released */
+/*    if(PD_MAJOR_VERSION == 0 && PD_MINOR_VERSION < 43)
+        create_legacy_pd();*/
     create_unbind();
     create_motion_proc();
     create_pollmotion_proc();
