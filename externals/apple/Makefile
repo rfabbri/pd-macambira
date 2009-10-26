@@ -9,6 +9,7 @@ SOURCES =
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
 SOURCES_Darwin = ambient_light_sensor.c iodisplay.c keyboard_light.c sudden_motion_sensor.c smc.c multitouch.c
+SOURCES_iphoneos = multitouch.c
 SOURCES_Linux = 
 SOURCES_Windows = 
 
@@ -33,7 +34,7 @@ ifeq ($(UNAME),Darwin)
   ifeq ($(CPU),arm) # iPhone/iPod Touch
 # install Headers first:
 # http://iphonesdkdev.blogspot.com/2008/08/how-to-copy-sdk-headers-to-iphone-and.html
-    SOURCES += $(SOURCES_Darwin)
+    SOURCES += $(SOURCES_iphoneos)
     EXTENSION = pd_darwin
     OS = iphoneos
     IPHONE_BASE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin

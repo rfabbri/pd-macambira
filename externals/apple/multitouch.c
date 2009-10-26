@@ -33,8 +33,8 @@
 #include "MultitouchSupport.h"
 #include <m_pd.h>
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -51,7 +51,7 @@ typedef struct _multitouch {
 static MTDeviceRef dev;      /* reference to the trackpad */
 static int fingerc;  /* current count of Fingers */
 static Finger fingerv[32];  /* current list of Fingers */
-static int polling = 0; /* set when one instance is polling so others don't */
+static int multitouch_instances = 0; /* set when one instance is polling so others don't */
 
 /*------------------------------------------------------------------------------
  * CALLBACK TO GET DATA
@@ -92,42 +92,38 @@ static void multitouch_output(t_multitouch* x)
     }
 }
 
-
-static void multitouch_float(t_multitouch* x, t_float f)
+static void multitouch_info(t_multitouch* x)
 {
-	DEBUG(post("multitouch_float"););
-	if (f > 0) {
-        polling++;
-        /* if I am the first instance to poll, then set the callback up */
-		if (polling == 1) {
-			dev = MTDeviceCreateDefault();
-		  	MTRegisterContactFrameCallback(dev, callback);
-		  	MTDeviceStart(dev, 0);
-		}
-	} else {
-        polling--;
-        /* if I am the last instance, clean up the callback stuff */
-		if (polling == 0) {
-			MTDeviceStop(dev);
-		  	MTUnregisterContactFrameCallback(dev, callback);
-			MTDeviceRelease(dev);
-			dev = NULL;
-		}
-	}
+    t_atom output_atom;
+    SETFLOAT(&output_atom, fingerc);
+    outlet_anything(x->status_outlet, gensym("fingers"), 1, &output_atom);
 }
-
 
 static void multitouch_free(t_multitouch* x)
 {
 	DEBUG(post("multitouch_free"););
-    /* make sure callback is released before deleting the object */
-	multitouch_float(x, 0);
+    multitouch_instances--;
+    /* if I am the last instance, clean up the callback stuff */
+    if (multitouch_instances == 0) {
+        MTDeviceStop(dev);
+        MTUnregisterContactFrameCallback(dev, callback);
+        MTDeviceRelease(dev);
+        dev = NULL;
+    }
 }
 
 static void *multitouch_new(void) 
 {
 	DEBUG(post("multitouch_new"););
 	t_multitouch *x = (t_multitouch *)pd_new(multitouch_class);
+
+    multitouch_instances++;
+    /* if I am the first instance to poll, then set the callback up */
+    if (multitouch_instances == 1) {
+        dev = MTDeviceCreateDefault();
+        MTRegisterContactFrameCallback(dev, callback);
+        MTDeviceStart(dev, 0);
+    }
 
     x->data_outlet = outlet_new(&x->x_obj, &s_list);
 	x->status_outlet = outlet_new(&x->x_obj, &s_anything);
@@ -145,5 +141,5 @@ void multitouch_setup(void)
                                         0);
 	/* add inlet datatype methods */
 	class_addbang(multitouch_class,(t_method) multitouch_output);
-	class_addfloat(multitouch_class,(t_method) multitouch_float);
+	class_addmethod(multitouch_class,(t_method) multitouch_info, gensym("info"), 0);
 }
