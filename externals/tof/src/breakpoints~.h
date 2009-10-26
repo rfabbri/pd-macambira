@@ -48,6 +48,8 @@ typedef struct _breakpoints
 
       t_float x_f;    	/* place to hold inlet's value if it's set by message */
 
+      int state;
+
 
      t_outlet* out2;
      t_outlet* out3;
@@ -57,8 +59,8 @@ typedef struct _breakpoints
 
 
 t_widgetbehavior breakpoints_widgetbehavior;
-void breakpoints_drawme(t_breakpoints *x, t_glist *glist, int firsttime);
-int breakpoints_set_values(t_breakpoints * x);
-void breakpoints_resize(t_breakpoints* x,int ns);
+static void breakpoints_drawme(t_breakpoints *x, t_glist *glist, int firsttime);
+static int breakpoints_set_values(t_breakpoints * x);
+static void breakpoints_resize(t_breakpoints* x,int ns);
 
 #endif

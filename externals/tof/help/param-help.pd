@@ -1,9 +1,31 @@
-#N canvas 1086 33 780 563 10;
+#N canvas 139 45 722 412 10;
 #X obj -23 2 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
 #X text -18 54 author: mrtoftrash@gmail.com;
 #X text -19 75 version: 2009-09-19 (localized release);
-#N canvas 237 177 542 366 all 0;
+#X text -18 1 description: [param] is a state saving and message routing
+system.;
+#X text -19 33 tags: state routing;
+#X text -17 106 [param] is to state saving what [list] is to lists
+:);
+#X floatatom 144 229 5 0 0 0 - - -;
+#X obj 136 351 dac~;
+#X obj 387 263 hsl 100 15 0 1 0 0 \$0/FM_MOD/volume \$0/FM_MOD/volume_
+/FM_MOD/volume 105 7 0 10 -262144 -1 -1 0 1;
+#X obj 387 283 hsl 100 15 200 2000 0 0 \$0/FM_MOD/carrier \$0/FM_MOD/carrier_
+/FM_MOD/carrier 105 7 0 10 -262144 -1 -1 2200 1;
+#X obj 385 322 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/index
+\$0/FM_MOD/modulation/index_ /FM_MOD/modulation/index 57 7 0 10 -262144
+-1 -1 20 256;
+#X obj 385 303 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/freq
+\$0/FM_MOD/modulation/freq_ /FM_MOD/modulation/freq 57 7 0 10 -262144
+-1 -1 3 256;
+#X obj 184 275 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X msg 144 251 /modulation/index \$1;
+#X msg 181 297 /volume \$1;
+#X obj 144 322 ./param-abs /id FM_MOD /carrier 600;
+#N canvas 237 177 542 366 [param 0;
 #X text 210 53 argument 1: param name (must start with a slash);
 #X obj 21 56 tof/param /my_name my_value;
 #X text 210 70 argument 2...: param value (can be anything;
@@ -19,17 +41,8 @@ abstraction contained inside another abstraction an so forth) \, the
 path starts at the root and follows every child patch (abstraction)
 until it reaches the param object \, at which point the param's name
 is appended:;
-#X restore -16 164 pd all about [param /name];
-#N canvas 0 0 525 231 all 0;
-#X text 63 67 If an abstraction's arguments contains the "/id" keyword
-\, the symbol following the "/id" keyword \, instead of the abstraction's
-name \, will be used to build the path. See an example to the right.
-;
-#X text 26 42 Abstraction /id:;
-#X restore -14 326 pd all about /id;
-#N canvas 0 0 450 300 all 0;
-#X restore -16 187 pd all about [param custom /name];
-#N canvas 0 0 975 555 all 0;
+#X restore -16 164 pd [param /name];
+#N canvas 0 0 975 555 keywords 0;
 #X text 565 152 nbx: creates a numberbox;
 #X text 564 171 slider min max: creates a slider with the indicated
 minimum and maximum;
@@ -70,42 +83,117 @@ You can disable this behavior with the "/nlb" (no loadbang) keyword.
 #X connect 16 0 18 0;
 #X connect 17 0 16 0;
 #X connect 19 0 16 0;
-#X restore 150 164 pd all about keywords;
-#X text -18 1 description: [param] is a state saving and message routing
-system.;
-#X text -19 33 tags: state routing;
-#N canvas 0 0 450 300 all 0;
-#X restore -16 258 pd all about [param file];
-#N canvas 0 0 450 300 all 0;
-#X restore -16 280 pd all about [param route];
-#N canvas 0 0 450 300 all 0;
-#X restore -15 302 pd all about [param gui];
-#N canvas 0 0 450 300 all 0;
-#X restore -16 235 pd all about [param dump];
-#N canvas 0 0 450 300 all 0;
-#X restore -16 210 pd all about [param id];
-#X text -17 106 [param] is to state saving what [list] is to lists
-:);
-#X floatatom 98 383 5 0 0 0 - - -;
-#X obj 90 505 dac~;
-#X obj 341 417 hsl 100 15 0 1 0 0 \$0/FM_MOD/volume \$0/FM_MOD/volume_
-/FM_MOD/volume 105 7 0 10 -262144 -1 -1 0 1;
-#X obj 341 437 hsl 100 15 200 2000 0 0 \$0/FM_MOD/carrier \$0/FM_MOD/carrier_
-/FM_MOD/carrier 105 7 0 10 -262144 -1 -1 2200 1;
-#X obj 339 476 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/index
-\$0/FM_MOD/modulation/index_ /FM_MOD/modulation/index 57 7 0 10 -262144
--1 -1 20 256;
-#X obj 339 457 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/freq
-\$0/FM_MOD/modulation/freq_ /FM_MOD/modulation/freq 57 7 0 10 -262144
--1 -1 3 256;
-#X obj 138 429 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 0 1;
-#X msg 98 405 /modulation/index \$1;
-#X msg 135 451 /volume \$1;
-#X obj 98 476 ./param-abs /id FM_MOD /carrier 600;
-#X connect 15 0 22 0;
-#X connect 21 0 23 0;
-#X connect 22 0 24 0;
-#X connect 23 0 24 0;
-#X connect 24 0 16 0;
-#X connect 24 0 16 1;
+#X restore 150 164 pd keywords;
+#N canvas 0 0 450 300 [param 0;
+#X text 26 80 outlet 1: bang when a param save is called;
+#X text 29 106 outlet 2: the data to be restored (loaded from the save
+file);
+#X obj 46 228 param custom /cname;
+#X text 30 60 inlet 1: data to be saved (can be multiple messages)
+;
+#X text 31 18 description: allows to save and restore any type of data
+in a state.;
+#X obj 157 252 print custom_restored;
+#X msg 46 196 this will be saved;
+#X msg 205 197 this will also be saved;
+#X obj 106 156 t b b;
+#X connect 2 0 8 0;
+#X connect 2 1 5 0;
+#X connect 6 0 2 0;
+#X connect 7 0 2 0;
+#X connect 8 0 6 0;
+#X connect 8 1 7 0;
+#X restore -16 187 pd [param custom /name];
+#N canvas 43 205 542 321 [param 0;
+#X obj 48 278 print;
+#X obj 49 98 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X msg 92 170 guis;
+#X text 72 99 A bang will output all the params and their values.;
+#X msg 73 129 symbol /FM_MOD;
+#X text 169 127 A symbol will dump only the params that start with
+that path.;
+#X text 129 167 Guis will output all the optional /g values.;
+#X obj 49 244 tof/param dump;
+#X text 35 23 description: dumps the values or the gui options of params
+;
+#X msg 134 188 guis /FM_MOD;
+#X text 41 6 [param dump];
+#X connect 1 0 7 0;
+#X connect 2 0 7 0;
+#X connect 4 0 7 0;
+#X connect 7 0 0 0;
+#X connect 9 0 7 0;
+#X restore -16 235 pd [param dump];
+#N canvas 0 0 637 377 [param 0;
+#X obj 336 180 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
+-1 -1 0;
+#X obj 392 230 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
+-1 -1 0;
+#X obj 37 185 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 94 225 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X floatatom 336 204 5 0 0 0 - - -;
+#X floatatom 392 252 5 0 0 0 - - -;
+#X text 376 202 Save preset N;
+#X text 430 251 Restore preset N;
+#X text 26 46 description: saves and restores params in individual
+files on the hard disk.;
+#X text 27 27 [param file];
+#X obj 37 266 param file;
+#X obj 336 279 param file;
+#X text 30 110 Data is saved/restored in the same folder as the root
+patch.;
+#X text 116 223 Restore main save file;
+#X text 59 182 Save main save file;
+#X connect 0 0 4 0;
+#X connect 1 0 5 0;
+#X connect 2 0 10 0;
+#X connect 3 0 10 1;
+#X connect 4 0 11 0;
+#X connect 5 0 11 1;
+#X restore -16 257 pd [param file];
+#N canvas 461 363 450 300 [param 0;
+#X text 26 47 description: routes param messages.;
+#X text 26 20 [param route];
+#X text 28 92 [param route] routes messages to params. It relativitize
+target names.;
+#X restore -16 280 pd [param route];
+#N canvas 0 0 517 280 [param 0;
+#X text 19 28 description: builds pd guis for params.;
+#X obj 21 68 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 90 120 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 42 65 This inlet creates the guis once. All further bangs only
+display the gui window.;
+#X obj 21 157 tof/param gui;
+#X text 112 117 This inlet creates and displays the window everytime
+it is banged. The content is always up to date \, but a bit slower.
+;
+#X connect 1 0 4 0;
+#X connect 2 0 4 1;
+#X restore -15 302 pd [param gui];
+#N canvas 0 0 525 231 /id 0;
+#X text 26 42 Abstraction /id:;
+#X text 63 67 If an abstraction's arguments contains the "/id" keyword
+\, the symbol following the "/id" keyword \, instead of the abstraction's
+name \, will be used to build the path.;
+#X restore -16 323 pd /id;
+#N canvas 0 0 450 300 [param 0;
+#X text 38 36 [param path];
+#X text 37 57 description: outputs the current param path.;
+#X obj 42 105 param path;
+#X obj 46 83 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 43 130 print;
+#X connect 2 0 4 0;
+#X connect 3 0 2 0;
+#X restore -16 210 pd [param path];
+#X connect 6 0 13 0;
+#X connect 12 0 14 0;
+#X connect 13 0 15 0;
+#X connect 14 0 15 0;
+#X connect 15 0 7 0;
+#X connect 15 0 7 1;

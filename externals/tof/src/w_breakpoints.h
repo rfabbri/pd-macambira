@@ -295,7 +295,7 @@ int i;
 
 
 
-void breakpoints_drawme(t_breakpoints *x, t_glist *glist, int firsttime)
+static void breakpoints_drawme(t_breakpoints *x, t_glist *glist, int firsttime)
 {
 
      if (firsttime) breakpoints_create(x,glist);
@@ -307,7 +307,7 @@ void breakpoints_drawme(t_breakpoints *x, t_glist *glist, int firsttime)
 
 
 
-void breakpoints_erase(t_breakpoints* x,t_glist* glist)
+static void breakpoints_erase(t_breakpoints* x,t_glist* glist)
 {
      //int n;
      sys_vgui(".x%x.c delete %xS\n",
@@ -438,7 +438,7 @@ static void breakpoints_followpointer(t_breakpoints* x,t_glist* glist)
 }
 
 
-void breakpoints_motion(t_breakpoints *x, t_floatarg dx, t_floatarg dy)
+static void breakpoints_motion(t_breakpoints *x, t_floatarg dx, t_floatarg dy)
 {
 	if (x->w.shift) {
 	  x->w.pointerx+=dx/1000.f;
@@ -459,7 +459,7 @@ void breakpoints_motion(t_breakpoints *x, t_floatarg dx, t_floatarg dy)
      breakpoints_update(x,x->w.glist);
 }
 
-void breakpoints_key(t_breakpoints *x, t_floatarg f)
+static void breakpoints_key(t_breakpoints *x, t_floatarg f)
 {
      if (f == 8.0 && x->w.grabbed < x->last_state &&  x->w.grabbed > 0) {
 	  int i;

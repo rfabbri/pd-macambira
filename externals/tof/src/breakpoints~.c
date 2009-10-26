@@ -38,7 +38,7 @@ char dumpy[2000];
    cause the problem. for the moment we prevent from reallocating
    by setting the STATES variable to 100 */
 
-void breakpoints_resize(t_breakpoints* x,int ns)
+static void breakpoints_resize(t_breakpoints* x,int ns)
 {
      if (ns > x->args) {
 	  int newargs = ns*sizeof(t_float); 
@@ -59,39 +59,40 @@ static t_int *breakpointssig_perform(t_int *w)
 {
 	
 	t_breakpoints *x = (t_breakpoints *)(w[1]);
-    t_float *in = (t_float *)(w[2]);
-    t_float *out = (t_float *)(w[3]);
+    t_sample *in = (t_float *)(w[2]);
+    t_sample *out = (t_float *)(w[3]);
     int n = (int)(w[4]);
     
-    int state; 
-    float f;
-    float val;
+    //int state = x->state; 
+    t_sample f;
+    t_sample val;
     
-    while (n--)
-    {
-    	
-    	 // STUFF
-    state = 0;
-    f = *(in++);
+     if (x->state > x->last_state) x->state = x->last_state;
+    while (n--) {
+		f = *in;
+		 
+		
+   
      
-     while (x->duration[state] < f && state <  x->last_state) state++;
-
-     if (state == 0 || f >= x->duration[x->last_state]) {
-          val = x->finalvalues[state];
-          
-	  } else {
-       val = x->finalvalues[state-1] + (f - x->duration[state-1]) *
-		  (x->finalvalues[state] - x->finalvalues[state-1]) / 
-		  (x->duration[state] - x->duration[state-1]);
-         
-     
-     
- }
-     // STUFF END
-    	
-    	
-	*out++ = val;
+		while ( (x->state > 0) && (f < x->duration[x->state-1]) ) x->state--;
+		while ( (x->state <  x->last_state) && (x->duration[x->state] < f) ) x->state++;
+		// Interpolate
+		 if (x->state == 0 || f >= x->duration[x->last_state]) {
+			  val = x->finalvalues[x->state];
+		  } else {
+			  val = x->finalvalues[x->state-1] + 
+			  (f - x->duration[x->state-1])*
+			  (x->finalvalues[x->state] - x->finalvalues[x->state-1])/ 
+			  (x->duration[x->state] - x->duration[x->state-1]);
+		  }
+		  
+		// Output
+		*out= val;
+		out++;
+		in++;
+		//*out++=x->state;
     }
+    //x->state = state;
     return (w+5);
 }
 
@@ -105,7 +106,7 @@ static void breakpointssig_dsp(t_breakpoints *x, t_signal **sp)
     dsp_add(breakpointssig_perform, 4, x,sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 
-void breakpoints_totaldur(t_breakpoints* x,t_float dur)
+static void breakpoints_totaldur(t_breakpoints* x,t_float dur)
 {
      int i;
      float f = dur/x->duration[x->last_state];
@@ -143,7 +144,7 @@ static void breakpoints_dump(t_breakpoints* e)
      /////////////////////////////////////////////////////
 }
 
-void breakpoints_init(t_breakpoints *x,int argc,t_atom* argv)
+static void breakpoints_init(t_breakpoints *x,int argc,t_atom* argv)
 {
      t_float* dur;
      t_float* val;
@@ -211,7 +212,7 @@ void breakpoints_init(t_breakpoints *x,int argc,t_atom* argv)
 
 
 
-void breakpoints_list(t_breakpoints *x,t_symbol* s, int argc,t_atom* argv)
+static void breakpoints_list(t_breakpoints *x,t_symbol* s, int argc,t_atom* argv)
 {
      breakpoints_init(x,argc,argv);
      if (glist_isvisible(x->w.glist)) {
@@ -219,7 +220,7 @@ void breakpoints_list(t_breakpoints *x,t_symbol* s, int argc,t_atom* argv)
      }
 }
 
-void breakpoints_setresize(t_breakpoints *x, t_floatarg f)
+static void breakpoints_setresize(t_breakpoints *x, t_floatarg f)
 {
      x->resizeable = f;
 }
@@ -227,7 +228,7 @@ void breakpoints_setresize(t_breakpoints *x, t_floatarg f)
 
 
 
-
+/*
 void breakpoints_float(t_breakpoints *x, t_floatarg f)
 {
      int state = 0;
@@ -253,59 +254,6 @@ void breakpoints_float(t_breakpoints *x, t_floatarg f)
      outlet_float(x->x_obj.ob_outlet,val);
      if (x->s_sym != &s_) pd_float(x->s_sym->s_thing, val);
 }
-
-
-
-
-
-
-/*
-
-void breakpoints_release(t_breakpoints* x) {
-     t_atom a[2];
-     float del = x->duration[x->x_state] - x->duration[x->x_state-1];
-     if (x->x_state <= x->sustain_state) {
-	x->x_state = x->sustain_state+1; // skip sustain state
-     	clock_delay(x->x_clock,del);
-        SETFLOAT(a,x->finalvalues[x->x_state]*(x->max-x->min));
-        SETFLOAT(a+1,del);
-        OUT_LIST(x,2,a);
-     }
-}
-
-static void breakpoints_sustain(t_breakpoints *x, t_floatarg f)
-{
-     if (f > 0 && f < x->last_state) 
-        x->sustain_state = f;
-     else
-		 pd_error(x,"sustain value not betweem 0 and %f, ignoring message", x->last_state);
-}
-
-*/
-
-/*
-static void breakpoints_tick(t_breakpoints* x)
-{
-     t_atom a[2];
-     x->x_state++;
-     if (x->x_state <= x->last_state && x->x_state != x->sustain_state) {
-	  float del = x->duration[x->x_state] - x->duration[x->x_state-1];
-	  clock_delay(x->x_clock,del);
-	  SETFLOAT(a,x->finalvalues[x->x_state]*(x->max-x->min));
-	  SETFLOAT(a+1,del);
-	  OUT_LIST(x,2,a);
-     }
-//     else
-//	  clock_unset(x->x_clock);
-}
-
-*/
-
-/*
-static void breakpoints_freeze(t_breakpoints* x, t_floatarg f)
-{
-     x->x_freeze = f;
-}
 */
 
 static void bindsym(t_pd* x,t_symbol* o,t_symbol* s)
@@ -316,15 +264,12 @@ static void bindsym(t_pd* x,t_symbol* o,t_symbol* s)
 }
 
 
-
-
-
-
-
-
 static void *breakpoints_new(t_symbol *s,int argc,t_atom* argv)
 {
      t_breakpoints *x = (t_breakpoints *)pd_new(breakpoints_class);
+     
+     
+     x->state = 0;
      
      x->borderwidth = 2;
      
@@ -409,11 +354,11 @@ static void *breakpoints_new(t_symbol *s,int argc,t_atom* argv)
 
 
 
-void breakpoints_motion(t_breakpoints *x, t_floatarg dx, t_floatarg dy);
-void breakpoints_click(t_breakpoints *x,
+static void breakpoints_motion(t_breakpoints *x, t_floatarg dx, t_floatarg dy);
+static void breakpoints_click(t_breakpoints *x,
     t_floatarg xpos, t_floatarg ypos, t_floatarg shift, t_floatarg ctrl,
     t_floatarg alt);
-void breakpoints_key(t_breakpoints *x, t_floatarg f);
+static void breakpoints_key(t_breakpoints *x, t_floatarg f);
 
 t_widgetbehavior breakpoints_widgetbehavior;
 

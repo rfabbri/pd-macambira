@@ -1,54 +1,90 @@
-#N canvas 10 20 849 503 10;
-#X floatatom 23 59 5 0 0 0 - - -;
-#X obj 18 447 dac~;
-#X obj 223 359 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#N canvas 0 25 996 667 10;
+#X floatatom 119 332 5 0 0 0 - - -;
+#X obj 39 642 dac~;
+#X obj 245 549 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
-#X obj 440 208 cnv 15 15 15 empty empty empty 20 12 0 14 -258113 -66577
-0;
-#X text 456 206 Creation arguments;
-#X text 435 226 width height duration receive_symbol dump_symbol change_symbol
-;
-#X msg 575 330 dump;
-#X obj 629 379 r \$0d;
-#X obj 575 352 s \$0r;
-#X text 572 305 The beakpoints can now be controlld remotely:;
-#X text 439 270 The following breakpoints was created with this line:
-breakpoints~ 100 50 3000 \$0r \$0d \$0c;
-#X obj 629 403 print dump;
-#X obj 446 325 breakpoints~ 100 50 3000 \$0r \$0d \$0c;
-#X obj 26 204 breakpoints~;
-#X obj 627 331 r \$0c;
-#X obj 627 352 print change;
-#X obj 129 54 loadbang;
-#X text 131 97 You can set the point data by sending a list with the
-following format: initialValue delay1 value1 delay2 value2 ...;
-#X msg 129 78 0 50 1 50 -1 50 0;
-#X obj 24 126 *~ 150;
-#X obj 25 404 *~ 0.1;
-#X obj 61 381 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 0 1;
-#X text 28 7 Description: A signal~ graphical breakpoint envelope generator
-(based on envgen by ggee).;
-#X obj 23 101 phasor~ 200;
-#X msg 132 146 duration 150;
-#X text 220 146 set the total duration in milliseconds;
-#X msg 137 171 dump;
-#X text 177 170 Dump the current point data out the second outlet;
-#X text 220 374 Bangs when gui is changed;
-#X obj 123 356 print DUMP;
-#X connect 0 0 23 0;
-#X connect 6 0 8 0;
-#X connect 7 0 11 0;
-#X connect 13 0 20 0;
-#X connect 13 1 29 0;
-#X connect 13 2 2 0;
-#X connect 14 0 15 0;
-#X connect 16 0 18 0;
-#X connect 18 0 13 0;
-#X connect 19 0 13 0;
-#X connect 20 0 1 0;
-#X connect 20 0 1 1;
-#X connect 21 0 20 1;
-#X connect 23 0 19 0;
-#X connect 24 0 13 0;
-#X connect 26 0 13 0;
+#X obj 145 548 print DUMP;
+#X obj 48 396 tof/breakpoints~;
+#X text 618 155 The following breakpoints was created with this line:
+[breakpoints~ 100 50 3000 \$0r \$0d \$0c];
+#X text 28 -13 Description: A graphical signal~ breakpoint envelope
+generator (based on envgen by ggee).;
+#X obj 47 591 tabread4~ \$0table;
+#X obj 46 566 *~ 0;
+#N canvas 331 260 450 300 load_soundfile 0;
+#X obj 65 34 inlet;
+#X obj 66 68 openpanel;
+#X msg 66 136 read -resize \$1 \$2table;
+#X obj 66 172 soundfiler;
+#X obj 66 203 outlet;
+#X obj 66 99 pack s \$0;
+#X connect 0 0 1 0;
+#X connect 1 0 5 0;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X connect 5 0 2 0;
+#X restore 30 52 pd load_soundfile;
+#X obj 30 29 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 163 591 table \$0table;
+#X obj 30 74 s \$0samples;
+#X obj 67 544 r \$0samples;
+#X msg 100 308 dump;
+#X msg 60 205 1 1 0;
+#X text 799 362 -- Outlets --;
+#X text 637 415 Outlet 2: The point data when dumped.;
+#X text 636 437 Outlet 3: Bangs when the contents was modified with
+the mouse.;
+#X text 635 392 Outlet 1 signal: The value at that index;
+#X text 35 111 Inlet 1 list: sets the point data (value0 delay1 value1
+delay2 value2 etc...);
+#X text 142 94 -- Inlets --;
+#X obj 47 614 *~ 0.5;
+#X text 156 330 Inlet 1 signal: output the interpolated value at that
+index.;
+#X text 138 298 Inlet 1 dump: dump the current point data out the second
+outlet.;
+#X text 86 180 Play forward;
+#X text 104 201 Play backward;
+#X text 161 237 Play back and forth;
+#X text 257 419 Select a point with the mouse and press the backspace
+key to delete it.;
+#X text 258 400 Click and drag to change points;
+#X text 625 49 Argument 1: display width;
+#X text 625 63 Argument 2: display height;
+#X text 624 77 Argument 3: receive name;
+#X text 624 92 Argument 4: send name;
+#X text 624 106 Argument 5: dump receive name;
+#X text 624 121 Argument 6: contents change by mouse receive name;
+#X text 764 18 -- Arguments --;
+#X obj 624 205 tof/breakpoints~ 100 50 3000 \$0r \$0d \$0c;
+#X text 767 280 -- See also --;
+#X text 632 306 [tof/breakpoints];
+#X obj 119 357 phasor~ 0.5;
+#X text 52 29 Load a short sound loop and turn dsp on;
+#X obj 46 157 loadbang;
+#X msg 46 183 0 1 1;
+#X msg 72 236 0 0.5 1 0.5 0;
+#X msg 84 259 0 0.5 0.5 0 0 0.5 0.5;
+#X text 226 259 Mix things up;
+#X msg 96 282 0 0.25 0.25 0 1 0.25 0.75 0 0.5 0.25 0.75 0 0.25 0.25
+0.5;
+#X connect 0 0 40 0;
+#X connect 4 0 8 0;
+#X connect 4 1 3 0;
+#X connect 4 2 2 0;
+#X connect 7 0 22 0;
+#X connect 8 0 7 0;
+#X connect 9 0 12 0;
+#X connect 10 0 9 0;
+#X connect 13 0 8 1;
+#X connect 14 0 4 0;
+#X connect 15 0 4 0;
+#X connect 22 0 1 0;
+#X connect 22 0 1 1;
+#X connect 40 0 4 0;
+#X connect 42 0 43 0;
+#X connect 43 0 4 0;
+#X connect 44 0 4 0;
+#X connect 45 0 4 0;
+#X connect 47 0 4 0;

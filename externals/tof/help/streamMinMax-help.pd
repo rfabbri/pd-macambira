@@ -1,5 +1,4 @@
 #N canvas 425 210 412 446 10;
-#X obj 118 267 streamMinMax;
 #X floatatom 82 146 5 0 0 0 - - -;
 #X obj 199 195 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
@@ -14,15 +13,16 @@
 a stream of numbers.;
 #X text 7 -10 tags: stream;
 #X text 7 12 version: 2009-05-07 (initial release);
-#X obj 9 95 streamMinMax 45 100;
 #X text 210 145 set minimum and maximum;
 #X text 4 74 Argument 2: maximum value at start (defaults to none)
 ;
 #X text 4 59 Argument 1: minimum value at start (defaults to none)
 ;
 #X msg 168 144 43 90;
-#X connect 0 0 3 0;
-#X connect 0 1 4 0;
-#X connect 1 0 0 0;
-#X connect 2 0 0 0;
-#X connect 16 0 0 0;
+#X obj 9 95 tof/streamMinMax 45 100;
+#X obj 118 267 tof/streamMinMax;
+#X connect 0 0 16 0;
+#X connect 1 0 16 0;
+#X connect 14 0 16 0;
+#X connect 16 0 2 0;
+#X connect 16 1 3 0;

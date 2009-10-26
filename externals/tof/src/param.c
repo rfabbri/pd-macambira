@@ -23,7 +23,7 @@
 #include "paramCustom.h"
 #include "paramDump.h"
 #include "paramFile.h"
-#include "paramId.h"
+#include "paramPath.h"
 #include "paramRoute.h"
 #include "paramGui.h"
 
@@ -326,8 +326,8 @@ static void* param_new(t_symbol *s, int argc, t_atom *argv) {
             x = paramDump_new(s, argc-1, argv+1);
          else if (s2 == gensym("file"))
             x = paramFile_new(s, argc-1, argv+1);
-         else if (s2 == gensym("id"))
-            x = paramId_new(s, argc-1, argv+1);
+         else if (s2 == gensym("id") || s2 == gensym("path"))
+            x = paramPath_new(s, argc-1, argv+1);
          else if (s2 == gensym("route"))
             x = paramRoute_new(s, argc-1, argv+1);
         else if (s2 == gensym("gui"))
@@ -336,7 +336,7 @@ static void* param_new(t_symbol *s, int argc, t_atom *argv) {
             x = paramClass_new(s, argc, argv);
     }
     if ( x == NULL) {
-        post("Param is missing a symbolic argument. Possible values: custom, dump, file, id, route, gui or a /name.");
+        post("Param is missing a symbolic argument. Possible values: custom, dump, file, path, route, gui or a /name.");
         //post(" custom");
     //dump file id route gui or a /\"name\"
     //post("- dump");
@@ -378,7 +378,7 @@ void param_setup(void)
    paramCustom_setup();
    paramDump_setup();
    paramFile_setup();
-   paramId_setup();
+   paramPath_setup();
    paramRoute_setup();
    paramGui_setup();
   
