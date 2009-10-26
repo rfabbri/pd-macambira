@@ -12,32 +12,47 @@ typedef struct _paramRoute
   t_symbol*					    s_empty;
   t_canvas*					    canvas;
   t_symbol*					    root;
- 
+  t_symbol*						previousSymbol;
+  t_symbol*						target;
 } t_paramRoute;
 
 
 static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av) { 
   
+					t_param* p = get_param_list(x->root);
     
- // t_symbol* path;
-  t_symbol* target;
-  
  
 	  if (ac) {
-			   if ( s->s_name[0] == '/' && strlen(s->s_name) > 1) {
-                    strcpy(param_buf_temp_a, x->root->s_name);
-                    strcpy(param_buf_temp_b, x->path->s_name);
-
-                    strcat(param_buf_temp_b, s->s_name+1);
-                    //path = gensym(param_buf_temp_b);
-                    strcat(param_buf_temp_a, param_buf_temp_b);
-                    target = gensym(param_buf_temp_a);
-
-                    if (target->s_thing) {
-                        pd_forwardmess(target->s_thing, ac, av);
-                    } else {
-                        outlet_anything(x->x_outlet,s,ac,av);
-                    }
+			   if ( p != NULL && s->s_name[0] == '/' && strlen(s->s_name) > 1) {
+				   
+				   
+				   
+				  
+					   if (x->previousSymbol != s) {
+						   param_buf_temp_a[0] = '\0';
+						   #ifdef LOCAL
+							strcpy(param_buf_temp_a, x->root->s_name);
+							strcat(param_buf_temp_a, x->path->s_name);
+							strcat(param_buf_temp_b, s->s_name+1);
+							//strcat(param_buf_temp_a, param_buf_temp_b);
+							x->target = gensym(param_buf_temp_a);
+						   #else
+							strcpy(param_buf_temp_a, x->path->s_name);
+							strcat(param_buf_temp_a, s->s_name+1);
+							x->target = gensym(param_buf_temp_a);
+						   #endif
+						   x->previousSymbol = s;
+						} 
+						
+						while (p && p->path != x->target) p=p->next;
+						
+						if (p) {
+							pd_forwardmess(p->x, ac, av);
+						} else {
+							outlet_anything(x->x_outlet,s,ac,av);
+						}
+					
+                    
                 } else {
                     outlet_anything(x->x_outlet,s,ac,av);
                 }
@@ -59,6 +74,8 @@ static void *paramRoute_new(t_symbol *s, int ac, t_atom *av) {
 	 x->s_load = gensym("load");
      x->s_empty = gensym("");
 
+     x->target = NULL;
+	x->previousSymbol = NULL;
 	
 	// GET THE CURRENT CANVAS
     t_canvas *canvas=tof_get_canvas();

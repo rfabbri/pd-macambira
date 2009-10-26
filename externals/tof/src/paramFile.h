@@ -100,56 +100,69 @@ static void paramFile_do_load(t_paramFile* x, t_float f) {
 	t_symbol* filename = paramFile_makefilename(x,f);
 	post("Reading: %s",filename->s_name);
 	
+	
+	
+	t_symbol* root = x->root;
+	
+	t_param* pp = get_param_list(root);
+	t_param* p;
+	
+	if (pp) {
 	int r_error;
-	
-	//t_symbol* filename = param_makefilename(basename, n);
-	
 	t_binbuf *bbuf = binbuf_new();
 	
     r_error= (binbuf_read_via_canvas(bbuf, filename->s_name, x->canvas, 0));
-            //pd_error(x, "%s: read failed", filename->s_name);
-			
-    t_symbol* root = x->root;
-	
+           
 	int bb_ac = binbuf_getnatom(bbuf);
 	int ac = 0;
     t_atom *bb_av = binbuf_getvec(bbuf);
     t_atom *av = bb_av;
+	t_symbol* s;
+	
 	
 	  while (bb_ac--) {
 		if (bb_av->a_type == A_SEMI) {
 			if ( IS_A_SYMBOL(av,0) && ac > 1) {
+				/*
+				#ifdef LOCAL
 				t_symbol* path = atom_getsymbol(av);
 				strcpy(param_buf_temp_a,root->s_name);
 				strcat(param_buf_temp_a,path->s_name);
-			   t_symbol* s = gensym(param_buf_temp_a);
-			   #ifdef PARAMDEBUG
-				post("Restoring:%s",s->s_name);
-			   #endif
+				t_symbol* s = gensym(param_buf_temp_a);
+				#else
+				t_symbol* s = atom_getsymbol(av);
+				#endif
+			   */
+			   s = atom_getsymbol(av);
+			   p = pp;
+			   while(p && p->path != s) p=p->next;
 			   
-			   // STUPID SYMBOL WITH SPACES MANAGEMENT
-			   if ( s->s_thing && ac > 3 && IS_A_SYMBOL(av,1) &&  atom_getsymbol(av+1) == &s_symbol) {
-				   // This whole block is simply to convert symbols saved with spaces to complete symbols
-				   
-				   t_binbuf *bbuf_stupid = binbuf_new();
-				   binbuf_add(bbuf_stupid, ac-2, av+2);
-				   
-				   char *char_buf;
-				   int char_length;
-				   binbuf_gettext(bbuf_stupid, &char_buf, &char_length);
-				   char_buf = resizebytes(char_buf, char_length, char_length+1);
-				   char_buf[char_length] = 0;
-				   t_symbol* stupid_symbol = gensym(char_buf);
-				   //post("STUPID: %s",stupid_symbol->s_name);
-				   freebytes(char_buf, char_length+1);
-				   binbuf_free(bbuf_stupid);
-				   t_atom* stupid_atom = getbytes(sizeof(*stupid_atom));
-				   SETSYMBOL(stupid_atom, stupid_symbol);
-				   pd_typedmess(s->s_thing, &s_symbol, 1, stupid_atom);
-				   freebytes(stupid_atom, sizeof(*stupid_atom));
-				   
-			   } else {
-					if ( s->s_thing) pd_forwardmess(s->s_thing, ac-1, av+1);
+			  
+			   if (p) {
+				   if ( ac > 3 && IS_A_SYMBOL(av,1) &&  atom_getsymbol(av+1) == &s_symbol) {
+					   // STUPID MANAGEMENT OF SYMBOLS WITH SPACES 
+					   // This whole block is simply to convert symbols saved with spaces to complete symbols
+					   
+					   t_binbuf *bbuf_stupid = binbuf_new();
+					   binbuf_add(bbuf_stupid, ac-2, av+2);
+					   
+					   char *char_buf;
+					   int char_length;
+					   binbuf_gettext(bbuf_stupid, &char_buf, &char_length);
+					   char_buf = resizebytes(char_buf, char_length, char_length+1);
+					   char_buf[char_length] = 0;
+					   t_symbol* stupid_symbol = gensym(char_buf);
+					   //post("STUPID: %s",stupid_symbol->s_name);
+					   freebytes(char_buf, char_length+1);
+					   binbuf_free(bbuf_stupid);
+					   t_atom* stupid_atom = getbytes(sizeof(*stupid_atom));
+					   SETSYMBOL(stupid_atom, stupid_symbol);
+					   pd_typedmess(p->x, &s_symbol, 1, stupid_atom);
+					   freebytes(stupid_atom, sizeof(*stupid_atom));
+					   
+				   } else {
+					pd_forwardmess(p->x, ac-1, av+1);
+					}
 				}
 		    }
 		  
@@ -165,6 +178,9 @@ static void paramFile_do_load(t_paramFile* x, t_float f) {
 	binbuf_free(bbuf);
 	
 	if ( r_error) pd_error(x, "%s: read failed", filename->s_name);
+	}
+	
+	
 	
 	x->working = 0;
 	

@@ -1,4 +1,4 @@
-#N canvas 139 45 722 412 10;
+#N canvas 98 175 722 412 10;
 #X obj -23 2 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
 #X text -18 54 author: mrtoftrash@gmail.com;
@@ -10,37 +10,24 @@ system.;
 :);
 #X floatatom 144 229 5 0 0 0 - - -;
 #X obj 136 351 dac~;
-#X obj 387 263 hsl 100 15 0 1 0 0 \$0/FM_MOD/volume \$0/FM_MOD/volume_
-/FM_MOD/volume 105 7 0 10 -262144 -1 -1 0 1;
-#X obj 387 283 hsl 100 15 200 2000 0 0 \$0/FM_MOD/carrier \$0/FM_MOD/carrier_
-/FM_MOD/carrier 105 7 0 10 -262144 -1 -1 2200 1;
-#X obj 385 322 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/index
-\$0/FM_MOD/modulation/index_ /FM_MOD/modulation/index 57 7 0 10 -262144
--1 -1 20 256;
-#X obj 385 303 nbx 5 14 -1e+37 1e+37 0 0 \$0/FM_MOD/modulation/freq
-\$0/FM_MOD/modulation/freq_ /FM_MOD/modulation/freq 57 7 0 10 -262144
--1 -1 3 256;
 #X obj 184 275 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 0 1;
+-1 -1 9400 1;
 #X msg 144 251 /modulation/index \$1;
 #X msg 181 297 /volume \$1;
-#X obj 144 322 ./param-abs /id FM_MOD /carrier 600;
 #N canvas 237 177 542 366 [param 0;
 #X text 210 53 argument 1: param name (must start with a slash);
 #X obj 21 56 tof/param /my_name my_value;
 #X text 210 70 argument 2...: param value (can be anything;
 #X text 210 86 argument ...: special keywords;
-#X text 85 303 (\$0)/abstraction's name/.../param's name;
-#X text 22 158 If the param object is created directly in the root
-patch (as the my_name example above) \, its path is as follows:;
 #X text 24 120 A param object creates a storage area for anything.
 This data can be accessed through a unique symbolic path.;
-#X text 77 193 (\$0)/param's name;
 #X text 24 227 If the param is inside an abstraction (or inside an
 abstraction contained inside another abstraction an so forth) \, the
 path starts at the root and follows every child patch (abstraction)
 until it reaches the param object \, at which point the param's name
 is appended:;
+#X text 85 303 /abstraction's name/.../param's name;
+#X text 147 171 /my_name;
 #X restore -16 164 pd [param /name];
 #N canvas 0 0 975 555 keywords 0;
 #X text 565 152 nbx: creates a numberbox;
@@ -125,7 +112,7 @@ that path.;
 #X connect 7 0 0 0;
 #X connect 9 0 7 0;
 #X restore -16 235 pd [param dump];
-#N canvas 0 0 637 377 [param 0;
+#N canvas 288 382 637 377 [param 0;
 #X obj 336 180 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
 -1 -1 0;
 #X obj 392 230 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
@@ -191,9 +178,20 @@ name \, will be used to build the path.;
 #X connect 2 0 4 0;
 #X connect 3 0 2 0;
 #X restore -16 210 pd [param path];
-#X connect 6 0 13 0;
-#X connect 12 0 14 0;
-#X connect 13 0 15 0;
-#X connect 14 0 15 0;
-#X connect 15 0 7 0;
-#X connect 15 0 7 1;
+#X obj 144 322 ./param-abs /id FM_MOD /carrier 600;
+#X obj 404 243 cnv 15 200 20 empty empty /FM_MOD/ 2 12 0 8 -258401
+-262144 0;
+#X obj 404 266 nbx 5 14 -1e+37 1e+37 0 0 /FM_MOD/modulation/freq /FM_MOD/modulation/freq_
+modulation/freq 50 8 0 8 -262144 -1 -1 0 256;
+#X obj 404 284 nbx 5 14 -1e+37 1e+37 0 0 /FM_MOD/modulation/index /FM_MOD/modulation/index_
+modulation/index 50 8 0 8 -262144 -1 -1 0 256;
+#X obj 404 302 hsl 100 15 0 1 0 0 /FM_MOD/volume /FM_MOD/volume_ volume
+105 7 0 8 -262144 -1 -1 7328 1;
+#X obj 404 320 hsl 100 15 200 2000 0 0 /FM_MOD/carrier /FM_MOD/carrier_
+carrier 105 7 0 8 -262144 -1 -1 6200 1;
+#X connect 6 0 9 0;
+#X connect 8 0 10 0;
+#X connect 9 0 20 0;
+#X connect 10 0 20 0;
+#X connect 20 0 7 0;
+#X connect 20 0 7 1;

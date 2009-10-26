@@ -19,6 +19,9 @@
  *      MA 02110-1301, USA.
  */
 
+//#define PARAMDEBUG
+//#define LOCAL
+
 #include "param.h"
 #include "paramCustom.h"
 #include "paramDump.h"
@@ -262,7 +265,10 @@ static void* paramClass_new(t_symbol *s, int ac, t_atom *av)
 	  
 	  int l = strlen(path->s_name) + strlen(root->s_name) + 2;
 	  char* receiver = getbytes( l * sizeof(*receiver));
+	  receiver[0]='\0';
+	  #ifdef LOCAL
 	  strcat(receiver,root->s_name);
+	  #endif
 	  strcat(receiver,path->s_name);
 	  x->receive = gensym(receiver);
 	  strcat(receiver,"_");
@@ -310,17 +316,18 @@ static void* param_new(t_symbol *s, int argc, t_atom *argv) {
     
     //post("RUNNING COMMON NEW");
     
-    t_pd* x;
+    t_pd* x = NULL;
     
     if ( !argc || argv[0].a_type == A_FLOAT ) {
         x = NULL;
     } else {
     
-    t_symbol *s2 = argv[0].a_w.w_symbol;
+		t_symbol *s2 = argv[0].a_w.w_symbol;
     
-    //post("Loading: %s",s2->s_name);
-    
-        if (s2 == gensym("custom"))
+		//post("Loading: %s",s2->s_name);
+        if ( s2->s_name[0] == '/' )
+			x = paramClass_new(s, argc, argv);
+        else if (s2 == gensym("custom"))
             x = paramCustom_new(s, argc-1, argv+1);
         else if (s2 == gensym("dump"))
             x = paramDump_new(s, argc-1, argv+1);
@@ -333,11 +340,11 @@ static void* param_new(t_symbol *s, int argc, t_atom *argv) {
         else if (s2 == gensym("gui"))
             x = paramGui_new(s, argc-1, argv+1);
         else 
-            x = paramClass_new(s, argc, argv);
+			post("Param is missing an argument. Possible values: custom, dump, file, path, route, gui or a /name.");
     }
+    /*
     if ( x == NULL) {
-        post("Param is missing a symbolic argument. Possible values: custom, dump, file, path, route, gui or a /name.");
-        //post(" custom");
+                //post(" custom");
     //dump file id route gui or a /\"name\"
     //post("- dump");
     //post("- file");
@@ -346,7 +353,7 @@ static void* param_new(t_symbol *s, int argc, t_atom *argv) {
     //post("- gui");
     //post("- or a /name.");
     }
-    
+    */
     return (x);
     
 }

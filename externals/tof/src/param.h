@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-//#define PARAMDEBUG
+
 
 typedef void (*t_paramGetMethod)(void*,t_symbol**,int*,t_atom**);
 typedef void (*t_paramSaveMethod)(void*,t_binbuf*,int);

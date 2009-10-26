@@ -31,6 +31,7 @@ typedef struct _paramGui
   t_symbol*                 s_symbolatom;
   t_symbol*                 s_sym;
   t_symbol*                 s_text;
+   t_symbol*                 s_cnv;
   
   //t_symbol*					target;
   //t_class*					empty_s;
@@ -49,9 +50,32 @@ static void paramGui_bang(t_paramGui *x) {
             // Clear the canvas
             pd_typedmess((t_pd*)x->childcanvas,x->s_clear,0,NULL);
             
+            
+            
             int pos_x = 0;
             int pos_y = 0;
             t_atom atoms[22]; // This should be the maximum number of atoms
+            
+            // PINK HEADER
+            SETSYMBOL(&atoms[0],x->s_obj);
+			SETFLOAT(&atoms[1],pos_x);
+			SETFLOAT(&atoms[2],pos_y);
+			SETSYMBOL(&atoms[3],x->s_cnv);
+			SETFLOAT(&atoms[4],15);
+			SETFLOAT(&atoms[5],200);
+			SETFLOAT(&atoms[6],20);
+			SETSYMBOL(&atoms[7],x->s_empty);
+			SETSYMBOL(&atoms[8],x->s_empty);
+			SETSYMBOL(&atoms[9],x->path);
+			SETFLOAT(&atoms[10],2);
+			SETFLOAT(&atoms[11],12);
+			SETFLOAT(&atoms[12],0);
+			SETFLOAT(&atoms[13],8);
+			SETFLOAT(&atoms[14],-258401);
+			SETFLOAT(&atoms[15],-262144);
+			SETFLOAT(&atoms[16],0);
+			pd_forwardmess((t_pd*)x->childcanvas, 17, atoms);
+            pos_y = pos_y + 23;
             
             t_param* p = get_param_list(x->root);
             int ac;
@@ -70,6 +94,8 @@ static void paramGui_bang(t_paramGui *x) {
             int ac_got = 0;
             t_atom* av_got;
             t_symbol* s_got;
+             
+             
              
             while (p) {
                 gui_built = 1;
@@ -102,6 +128,9 @@ static void paramGui_bang(t_paramGui *x) {
 							} else {
 								shortpath = gensym(p->path->s_name + x->path_l);
 							}
+							
+							
+							
 							
                            type = atom_getsymbol(av);
                            if ( type == x->s_nbx ) {
@@ -302,6 +331,7 @@ static void *paramGui_new(t_symbol *s, int ac, t_atom *av) {
   x->s_symbolatom = gensym("symbolatom");
   x->s_sym = gensym("sym");
   x->s_text = gensym("text");
+  x->s_cnv = gensym("cnv");
   
   
   

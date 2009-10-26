@@ -10,7 +10,7 @@ typedef struct _paramCustom {
   t_outlet*						outlet;
   t_outlet*						outlet2;
   t_binbuf*						bb;
-  t_symbol*						receive;
+  //t_symbol*						receive;
   struct _paramCustom_receive*  r;
   int 							nopresets;
 } t_paramCustom;
@@ -66,7 +66,7 @@ static void paramCustom_anything(t_paramCustom *x, t_symbol *selector, int argc,
 static void paramCustom_free(t_paramCustom *x)
 {
 	
-	if (x->receive)  pd_unbind(&x->r->x_obj.ob_pd, x->receive);
+	//if (x->receive)  pd_unbind(&x->r->x_obj.ob_pd, x->receive);
 
 	if (x->param) param_unregister(x->param);
 	
@@ -83,8 +83,9 @@ static void paramClass_get(t_paramClass *x, t_symbol** s, int* ac, t_atom** av) 
 */
 
 // SPECIAL PARAM SAVE FUNCTION
-static void paramCustom_save(t_paramCustom *x, t_binbuf* bb, int f) {
+static void paramCustom_save(t_paramCustom_receive *r, t_binbuf* bb, int f) {
 	
+	t_paramCustom* x = r->owner;
 	// f = -1 for the main save file
 	// f => 0 if it is a preset
 	if ( f >= 0 && x->nopresets) return;
@@ -134,9 +135,15 @@ static void* paramCustom_new(t_symbol *s, int ac, t_atom *av)
 	  // FIND THE NO PRESET TAG: /nps
 	 x->nopresets = tof_find_symbol(gensym("/nps"), ac-1, av+1);
 	  
+	   // Set up param proxy
+		t_paramCustom_receive *r = (t_paramCustom_receive *)pd_new(paramCustom_receive_class);
+		x->r = r;
+		r->owner = x;
 	  
+		// BIND RECEIVER
+		//pd_bind(&r->x_obj.ob_pd, x->receive );
 
-	x->param = param_register(x,root,path, NULL,\
+	x->param = param_register(r,root,path, NULL,\
 	(t_paramSaveMethod) paramCustom_save,NULL);
 	  
 	if (!x->param) return NULL;
@@ -147,9 +154,8 @@ static void* paramCustom_new(t_symbol *s, int ac, t_atom *av)
 	  char* receiver = getbytes( l * sizeof(*receiver));
 	  strcat(receiver,root->s_name);
 	  strcat(receiver,path->s_name);
-	  x->receive = gensym(receiver);
-	  //strcat(receiver,"_");
-	 // x->send = gensym(receiver);
+	  //x->receive = gensym(receiver);
+
 	  freebytes(receiver,  l * sizeof(*receiver));
 	  
 	  #ifdef PARAMDEBUG
@@ -161,13 +167,7 @@ static void* paramCustom_new(t_symbol *s, int ac, t_atom *av)
 	  x->bb = NULL;
 	  
 	  
-	   // Set up receive proxy
-		t_paramCustom_receive *r = (t_paramCustom_receive *)pd_new(paramCustom_receive_class);
-		x->r = r;
-		r->owner = x;
 	  
-		// BIND RECEIVER
-		pd_bind(&r->x_obj.ob_pd, x->receive );
 	  
 	  
 
