@@ -19,8 +19,15 @@
  *      MA 02110-1301, USA.
  */
 
+// Post a lot of debug messages
 //#define PARAMDEBUG
+
+// Adds the root's $0 to the start of the paths
 //#define LOCAL
+
+// Uses the symbol's s_thing to target the proper param
+// This is faster but can potentially target two params
+#define USEBINDINGS
 
 #include "param.h"
 #include "paramCustom.h"

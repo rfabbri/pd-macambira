@@ -10,7 +10,9 @@ typedef struct _paramCustom {
   t_outlet*						outlet;
   t_outlet*						outlet2;
   t_binbuf*						bb;
-  //t_symbol*						receive;
+  #ifdef USEBINDINGS
+  t_symbol*						receive;
+  #endif
   struct _paramCustom_receive*  r;
   int 							nopresets;
 } t_paramCustom;
@@ -23,22 +25,6 @@ typedef struct _paramCustom_receive
 
 
 
-static void paramCustom_bang(t_paramCustom *x)
-{
-	/*
-	outlet_anything(x->outlet, x->selector, x->ac, x->av);
-	
-	if(x->selector != &s_bang ) tof_send_anything_prepend(x->send,x->selector,x->ac,x->av,x->set_s );
-   */
-}
-/*
-
-static void paramClass_loadbang(t_paramClass *x)
-{
-    if (!sys_noloadbang && !x->noloadbang)
-        paramClass_bang(x);
-}
-*/
 
 static void paramCustom_anything(t_paramCustom *x, t_symbol *selector, int argc, t_atom *argv)
 {
@@ -65,9 +51,10 @@ static void paramCustom_anything(t_paramCustom *x, t_symbol *selector, int argc,
 
 static void paramCustom_free(t_paramCustom *x)
 {
+	#ifdef USEBINDINGS
+	if (x->receive)  pd_unbind(&x->r->x_obj.ob_pd, x->receive);
+	#endif
 	
-	//if (x->receive)  pd_unbind(&x->r->x_obj.ob_pd, x->receive);
-
 	if (x->param) param_unregister(x->param);
 	
     
@@ -140,23 +127,31 @@ static void* paramCustom_new(t_symbol *s, int ac, t_atom *av)
 		x->r = r;
 		r->owner = x;
 	  
-		// BIND RECEIVER
-		//pd_bind(&r->x_obj.ob_pd, x->receive );
 
 	x->param = param_register(r,root,path, NULL,\
 	(t_paramSaveMethod) paramCustom_save,NULL);
 	  
 	if (!x->param) return NULL;
 	 
-		
 	  
-	  int l = strlen(path->s_name) + strlen(root->s_name) + 2;
-	  char* receiver = getbytes( l * sizeof(*receiver));
-	  strcat(receiver,root->s_name);
-	  strcat(receiver,path->s_name);
-	  //x->receive = gensym(receiver);
-
-	  freebytes(receiver,  l * sizeof(*receiver));
+	  #ifdef USEBINDINGS
+		
+		#ifdef LOCAL
+		   int l = strlen(path->s_name) + strlen(root->s_name) + 2;
+		   char* receiver = getbytes( l * sizeof(*receiver));
+		   receiver[0] = '\0';
+		   strcat(receiver,root->s_name);
+		   strcat(receiver,path->s_name);
+		   x->receive = gensym(receiver);
+		   freebytes(receiver,  l * sizeof(*receiver));
+		#else
+			x->receive = path;
+		#endif
+		
+		pd_bind(&r->x_obj.ob_pd, x->receive );
+      #endif
+      
+	 
 	  
 	  #ifdef PARAMDEBUG
 			post("receive:%s",x->receive->s_name);
@@ -188,7 +183,7 @@ void paramCustom_setup(void)
 
 
   class_addanything(paramCustom_class, paramCustom_anything);
-  class_addbang(paramCustom_class, paramCustom_bang);
+  //class_addbang(paramCustom_class, paramCustom_bang);
   
   //class_addmethod(param_class, (t_method)paramClass_loadbang, gensym("loadbang"), 0);
   

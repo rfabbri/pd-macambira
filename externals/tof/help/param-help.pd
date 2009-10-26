@@ -11,7 +11,7 @@ system.;
 #X floatatom 144 229 5 0 0 0 - - -;
 #X obj 136 351 dac~;
 #X obj 184 275 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 9400 1;
+-1 -1 0 1;
 #X msg 144 251 /modulation/index \$1;
 #X msg 181 297 /volume \$1;
 #N canvas 237 177 542 366 [param 0;
@@ -182,16 +182,21 @@ name \, will be used to build the path.;
 #X obj 404 243 cnv 15 200 20 empty empty /FM_MOD/ 2 12 0 8 -258401
 -262144 0;
 #X obj 404 266 nbx 5 14 -1e+37 1e+37 0 0 /FM_MOD/modulation/freq /FM_MOD/modulation/freq_
-modulation/freq 50 8 0 8 -262144 -1 -1 0 256;
+modulation/freq 50 8 0 8 -262144 -1 -1 29 256;
 #X obj 404 284 nbx 5 14 -1e+37 1e+37 0 0 /FM_MOD/modulation/index /FM_MOD/modulation/index_
-modulation/index 50 8 0 8 -262144 -1 -1 0 256;
+modulation/index 50 8 0 8 -262144 -1 -1 20 256;
 #X obj 404 302 hsl 100 15 0 1 0 0 /FM_MOD/volume /FM_MOD/volume_ volume
-105 7 0 8 -262144 -1 -1 7328 1;
+105 7 0 8 -262144 -1 -1 0 1;
 #X obj 404 320 hsl 100 15 200 2000 0 0 /FM_MOD/carrier /FM_MOD/carrier_
-carrier 105 7 0 8 -262144 -1 -1 6200 1;
+carrier 105 7 0 8 -262144 -1 -1 2200 1;
+#X obj 441 129 tof/param route;
+#X msg 440 91 /FM_MOD/modulation/freq \$1;
+#X floatatom 444 44 5 0 0 0 - - -;
 #X connect 6 0 9 0;
 #X connect 8 0 10 0;
 #X connect 9 0 20 0;
 #X connect 10 0 20 0;
 #X connect 20 0 7 0;
 #X connect 20 0 7 1;
+#X connect 27 0 26 0;
+#X connect 28 0 27 0;

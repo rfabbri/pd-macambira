@@ -103,11 +103,12 @@ static void paramFile_do_load(t_paramFile* x, t_float f) {
 	
 	
 	t_symbol* root = x->root;
-	
+	#ifndef USEBINDINGS
 	t_param* pp = get_param_list(root);
 	t_param* p;
 	
 	if (pp) {
+	#endif
 	int r_error;
 	t_binbuf *bbuf = binbuf_new();
 	
@@ -123,22 +124,28 @@ static void paramFile_do_load(t_paramFile* x, t_float f) {
 	  while (bb_ac--) {
 		if (bb_av->a_type == A_SEMI) {
 			if ( IS_A_SYMBOL(av,0) && ac > 1) {
-				/*
-				#ifdef LOCAL
-				t_symbol* path = atom_getsymbol(av);
-				strcpy(param_buf_temp_a,root->s_name);
-				strcat(param_buf_temp_a,path->s_name);
-				t_symbol* s = gensym(param_buf_temp_a);
+				#ifdef USEBINDINGS
+					#ifdef LOCAL
+					t_symbol* path = atom_getsymbol(av);
+					strcpy(param_buf_temp_a,root->s_name);
+					strcat(param_buf_temp_a,path->s_name);
+					s = gensym(param_buf_temp_a);
+					#else
+					s = atom_getsymbol(av);
+					#endif
 				#else
-				t_symbol* s = atom_getsymbol(av);
-				#endif
-			   */
-			   s = atom_getsymbol(av);
-			   p = pp;
-			   while(p && p->path != s) p=p->next;
-			   
+					 s = atom_getsymbol(av);
+					p = pp;
+					while(p && p->path != s) p=p->next;
+			    #endif
 			  
-			   if (p) {
+			   
+			  #ifdef USEBINDINGS
+				if (s->s_thing) {
+				   #else
+				   if (p) {
+				#endif
+				   
 				   if ( ac > 3 && IS_A_SYMBOL(av,1) &&  atom_getsymbol(av+1) == &s_symbol) {
 					   // STUPID MANAGEMENT OF SYMBOLS WITH SPACES 
 					   // This whole block is simply to convert symbols saved with spaces to complete symbols
@@ -157,11 +164,21 @@ static void paramFile_do_load(t_paramFile* x, t_float f) {
 					   binbuf_free(bbuf_stupid);
 					   t_atom* stupid_atom = getbytes(sizeof(*stupid_atom));
 					   SETSYMBOL(stupid_atom, stupid_symbol);
-					   pd_typedmess(p->x, &s_symbol, 1, stupid_atom);
+					   
+					   #ifdef USEBINDINGS
+							pd_typedmess(s->s_thing, &s_symbol, 1, stupid_atom);
+						#else
+							pd_typedmess(p->x, &s_symbol, 1, stupid_atom);
+						#endif
 					   freebytes(stupid_atom, sizeof(*stupid_atom));
 					   
 				   } else {
-					pd_forwardmess(p->x, ac-1, av+1);
+					   #ifdef USEBINDINGS
+							pd_forwardmess(s->s_thing, ac-1, av+1);
+						#else
+							pd_forwardmess(p->x, ac-1, av+1);
+						#endif
+					
 					}
 				}
 		    }
@@ -178,8 +195,9 @@ static void paramFile_do_load(t_paramFile* x, t_float f) {
 	binbuf_free(bbuf);
 	
 	if ( r_error) pd_error(x, "%s: read failed", filename->s_name);
+	#ifndef USEBINDINGS
 	}
-	
+	#endif
 	
 	
 	x->working = 0;

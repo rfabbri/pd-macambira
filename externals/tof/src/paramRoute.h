@@ -18,16 +18,15 @@ typedef struct _paramRoute
 
 
 static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av) { 
-  
+					
+					#ifndef USEBINDINGS
 					t_param* p = get_param_list(x->root);
-    
+					#endif
  
 	  if (ac) {
-			   if ( p != NULL && s->s_name[0] == '/' && strlen(s->s_name) > 1) {
-				   
-				   
-				   
-				  
+		  
+			   if ( s->s_name[0] == '/' && strlen(s->s_name) > 1) {
+
 					   if (x->previousSymbol != s) {
 						   param_buf_temp_a[0] = '\0';
 						   #ifdef LOCAL
@@ -43,15 +42,19 @@ static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av
 						   #endif
 						   x->previousSymbol = s;
 						} 
-						
+						#ifdef USEBINDINGS
+						if (x->target->s_thing) {
+							pd_forwardmess(x->target->s_thing, ac, av);
+						#else
 						while (p && p->path != x->target) p=p->next;
 						
 						if (p) {
 							pd_forwardmess(p->x, ac, av);
+						#endif
 						} else {
 							outlet_anything(x->x_outlet,s,ac,av);
 						}
-					
+					   
                     
                 } else {
                     outlet_anything(x->x_outlet,s,ac,av);
