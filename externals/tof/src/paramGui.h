@@ -31,8 +31,10 @@ typedef struct _paramGui
   t_symbol*                 s_symbolatom;
   t_symbol*                 s_sym;
   t_symbol*                 s_text;
-   t_symbol*                 s_cnv;
+  t_symbol*                 s_cnv;
   
+  t_symbol*					receive;
+  int						waiting;
   //t_symbol*					target;
   //t_class*					empty_s;
   //t_symbol*					root;
@@ -40,20 +42,14 @@ typedef struct _paramGui
 } t_paramGui;
 
 
-
-// Dump out
-static void paramGui_bang(t_paramGui *x) {
-    
-    if (x->childcanvas) {
-        
-        if (x->build) {
-            // Clear the canvas
+static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
+	
+			// Clear the canvas
             pd_typedmess((t_pd*)x->childcanvas,x->s_clear,0,NULL);
-            
-            
             
             int pos_x = 0;
             int pos_y = 0;
+            
             t_atom atoms[22]; // This should be the maximum number of atoms
             
             // PINK HEADER
@@ -269,18 +265,59 @@ static void paramGui_bang(t_paramGui *x) {
                 p = p->next;
                
             }
-        }
         
-        x->build = 0;
+			// Try to resize the canvas
+			 x->childcanvas->gl_screenx1 = x_position;
+			 x->childcanvas->gl_screeny1 = y_position;
+			 x->childcanvas->gl_screenx2 = pos_x + 300 + x->childcanvas->gl_screenx1;
+			 x->childcanvas->gl_screeny2 = pos_y + 30 + x->childcanvas->gl_screeny1;
+			 post("size: %i %i %i %i",x->childcanvas->gl_screenx1,x->childcanvas->gl_screeny1,\
+			 x->childcanvas->gl_screenx2,x->childcanvas->gl_screeny2);
+			 
+			 
+			 // Change the build flag
+			x->build = 0;
+			
+			// Show canvas
+			t_atom a;
+			SETFLOAT(&a,1);
+			pd_typedmess((t_pd*)x->childcanvas,x->s_vis,1,&a);
+	
+}
+
+
+static void paramGui_motion_callback(t_paramGui *x, t_float x_position, t_float y_position)
+{
+	if ( x->waiting ) {
+		x->waiting = 0;
+		paramGui_buildCanvas(x,(int) x_position,(int) y_position );
+	}
+}
+
+
+static void paramGui_bang(t_paramGui *x) {
+    
+    if (x->childcanvas && !x->waiting) {
         
-        // Show canvas
-        t_atom a;
-        SETFLOAT(&a,1);
-        pd_typedmess((t_pd*)x->childcanvas,x->s_vis,1,&a);
+        if (x->build) {
+            
+            // query for the mouse pointers position 
+            // one it is received, build the canvas 
+            x->waiting = 1;
+			sys_vgui("pd [concat %s motion [winfo pointerxy .] \\;]\n",x->receive->s_name);
+        } else {
+        
+			
+			
+			// Show canvas
+			t_atom a;
+			SETFLOAT(&a,1);
+			pd_typedmess((t_pd*)x->childcanvas,x->s_vis,1,&a);
+		}
         
     }  else {
         
-       pd_error(x,"No canvas to write to!");
+       pd_error(x,"No canvas to write to or mouse position not received!");
        
    }
 }
@@ -298,6 +335,10 @@ static void paramGui_free(t_paramGui *x)
 		pd_free((t_pd *)x->childcanvas);
 	}
 	x->childcanvas = NULL;
+	
+	if (x->receive) {
+		pd_unbind(&x->x_obj.ob_pd,x->receive);
+	}
 }
 
 /*
@@ -333,7 +374,12 @@ static void *paramGui_new(t_symbol *s, int ac, t_atom *av) {
   x->s_text = gensym("text");
   x->s_cnv = gensym("cnv");
   
+  char buf[MAXPDSTRING];
+  sprintf(buf, "#%lx", (t_int)x);
+  x->receive = gensym(buf);
+  pd_bind(&x->x_obj.ob_pd, x->receive );
   
+  x->waiting = 0;
   
   t_canvas* currentcanvas = tof_get_canvas();
   
@@ -383,6 +429,23 @@ static void *paramGui_new(t_symbol *s, int ac, t_atom *av) {
   return (x);
 }
 
+/*
+static void create_motion_proc(void)
+{
+    //sys_gui("if { ![::tof_param_class::proc_test motion]} {\n");
+    sys_gui ("  proc ::tof_param_class::motion {x y} {\n");
+    //sys_gui ("    if { $x != $::hcs_cursor_class::last_x \\\n");
+    //sys_gui ("      || $y != $::hcs_cursor_class::last_y} {\n");
+    sys_vgui("        pd [concat %s motion $x $y \\;]\n",
+             cursor_receive_symbol->s_name);
+    //sys_gui ("        set ::hcs_cursor_class::last_x $x\n");
+    //sys_gui ("        set ::hcs_cursor_class::last_y $y\n");
+    sys_gui ("    }\n");
+    //sys_gui ("  }\n");
+    //sys_gui ("}\n");
+}
+*/
+
 void paramGui_setup(void) {
   paramGui_class = class_new(gensym("param gui"),
     (t_newmethod)paramGui_new, (t_method)paramGui_free,
@@ -390,10 +453,16 @@ void paramGui_setup(void) {
 
  class_addbang(paramGui_class, paramGui_bang);
  //class_addsymbol(paramGui_class, paramGui_symbol);
-
+ 
+ // The mouse position callback
+ class_addmethod(paramGui_class, (t_method)paramGui_motion_callback,\
+                     gensym("motion"), A_DEFFLOAT, A_DEFFLOAT, 0);
+ 
  class_addmethod(paramGui_class, (t_method) paramGui_reset, gensym("reset"), 0);
  
  
  class_sethelpsymbol(paramGui_class,gensym("param"));
+ 
+  //create_motion_proc();
  
 }
