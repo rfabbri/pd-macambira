@@ -14,6 +14,9 @@
 #X obj 238 148 loadbang;
 #X obj 174 122 tof/param /freq 3 /g nbx;
 #X obj 237 172 tof/param /index 20 /g nbx;
+#X obj 477 36 inlet;
+#X obj 478 71 tof/param path;
+#X obj 480 98 print path;
 #X connect 1 0 9 0;
 #X connect 2 0 8 0;
 #X connect 3 0 1 1;
@@ -22,3 +25,5 @@
 #X connect 11 0 13 0;
 #X connect 12 0 2 0;
 #X connect 13 0 3 0;
+#X connect 14 0 15 0;
+#X connect 15 0 16 0;

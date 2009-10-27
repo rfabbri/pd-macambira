@@ -14,11 +14,10 @@
 #X obj 422 303 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X obj 422 351 print;
-#X text 618 482 <- open it;
+#X text 618 484 <- open it;
 #X obj 422 154 tof/argument 1;
 #X obj 419 244 tof/argument 1 32;
 #X obj 422 325 tof/argument;
-#X obj 496 485 ./argument-abs a b;
 #X text 5 176 [argument n default];
 #X text -4 17 description: Outputs the patch's creation arguments individually.
 ;
@@ -47,7 +46,8 @@ type as the default value \, the default value will be outputed instead.
 #X text -4 46 tags: initialization patch;
 #X text 1 126 see also:;
 #X obj 73 129 tof/arguments;
-#X connect 0 0 14 0;
+#X obj 496 485 ./test-argument a b;
+#X connect 0 0 29 0;
 #X connect 4 0 11 0;
 #X connect 5 0 12 0;
 #X connect 8 0 13 0;
