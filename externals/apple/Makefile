@@ -123,9 +123,7 @@ install-doc:
 	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 #	install -m644 -p $(SOURCES:.c=-help.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p README $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
-	install -m644 -p VERSION $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/VERSION.txt
-	install -m644 -p CHANGES $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/CHANGES.txt
+	install -m644 -p COPYING $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/COPYING.txt
 
 install-exec:
 	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
