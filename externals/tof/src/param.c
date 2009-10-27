@@ -19,17 +19,37 @@
  *      MA 02110-1301, USA.
  */
 
-// Post a lot of debug messages
+// Post a lot of debug messages.
 //#define PARAMDEBUG
 
-// Adds the root's $0 to the start of the paths
+// Adds the root's $0 to the start of the paths.
 //#define LOCAL
 
 // Uses the symbol's s_thing to target the proper param
-// This is faster but can potentially target two params
+// Instead of searching through paramroots for a match.
+// This is faster but can potentially target two params.
 #define USEBINDINGS
 
 #include "param.h"
+
+// Global symbols
+static t_symbol* s_vis;
+static t_symbol* s_empty;
+static t_symbol* s_clear;
+static t_symbol* s_set;
+static t_symbol* s_obj;
+static t_symbol* s_nbx;
+static t_symbol* s_bng;
+static t_symbol* s_slider;
+static t_symbol* s_hsl;
+static t_symbol* s_knob;
+static t_symbol* s_tgl;
+static t_symbol* s_symbolatom;
+static t_symbol* s_sym;
+static t_symbol* s_text;
+static t_symbol* s_cnv;
+
+
 #include "paramCustom.h"
 #include "paramDump.h"
 #include "paramFile.h"
@@ -37,6 +57,7 @@
 #include "paramRoute.h"
 #include "paramGui.h"
 
+// For loadbang
 extern int sys_noloadbang;
 
 static t_class *param_class;
@@ -349,18 +370,7 @@ static void* param_new(t_symbol *s, int argc, t_atom *argv) {
         else 
 			post("Param is missing an argument. Possible values: custom, dump, file, path, route, gui or a /name.");
     }
-    /*
-    if ( x == NULL) {
-                //post(" custom");
-    //dump file id route gui or a /\"name\"
-    //post("- dump");
-    //post("- file");
-    //post("- id");
-    //post("- route");
-    //post("- gui");
-    //post("- or a /name.");
-    }
-    */
+    
     return (x);
     
 }
@@ -401,6 +411,25 @@ void param_setup(void)
   
    class_addcreator((t_newmethod)param_new, gensym("param"), A_GIMME, 0);
    class_addcreator((t_newmethod)param_new, gensym("tof/param"), A_GIMME, 0);
+   
+   // GENERATE THE SYMBOLS
+   
+   s_vis = gensym("vis");
+  s_empty = gensym("empty");
+  s_clear = gensym("clear");
+  s_set = gensym("set");
+  s_obj = gensym("obj");
+  s_nbx = gensym("nbx");
+  s_bng = gensym("bng");
+  s_slider = gensym("slider");
+  s_hsl=gensym("hsl");
+  s_knob = gensym("knob");
+  s_tgl = gensym("tgl");
+  s_symbolatom = gensym("symbolatom");
+  s_sym = gensym("sym");
+  s_text = gensym("text");
+  s_cnv = gensym("cnv");
+   
    
   
 }

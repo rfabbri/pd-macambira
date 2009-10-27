@@ -1,4 +1,4 @@
-#N canvas 53 62 922 529 10;
+#N canvas 59 319 922 529 10;
 #X obj 496 461 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X obj -11 19 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
@@ -19,7 +19,7 @@
 #X obj 419 244 tof/argument 1 32;
 #X obj 422 325 tof/argument;
 #X obj 496 485 ./argument-abs a b;
-#X text 9 132 [argument n default];
+#X text 5 176 [argument n default];
 #X text -4 17 description: Outputs the patch's creation arguments individually.
 ;
 #X text 516 147 This help patch is a file and therefore has no creation
@@ -34,17 +34,19 @@ of the printed output.;
 #X text 534 237 As stated before \, this help patch is a file and has
 no creation arguments. But the [argument] to the left has a default
 value and will output it.;
-#X text 10 155 argument 1: patch's creation argument to output.;
-#X text 9 172 argument 2: default value to output if the patch's creation
+#X text 6 199 argument 1: patch's creation argument to output.;
+#X text 5 216 argument 2: default value to output if the patch's creation
 argument is not set or if the wrong type.;
-#X text 8 209 inlet 1 bang: outputs the n-th patch creation argument
+#X text 4 253 inlet 1 bang: outputs the n-th patch creation argument
 or the default value if there is no n-th creation argument.;
-#X text 9 245 outlet 1 anything: outputs the n-th patch creation argument
+#X text 5 289 outlet 1 anything: outputs the n-th patch creation argument
 or the default value if there is no n-th creation argument.;
-#X text 5 287 If the patch's n-th creation argument is not of the same
+#X text 1 331 If the patch's n-th creation argument is not of the same
 type as the default value \, the default value will be outputed instead.
 ;
 #X text -4 46 tags: initialization patch;
+#X text 1 126 see also:;
+#X obj 73 129 tof/arguments;
 #X connect 0 0 14 0;
 #X connect 4 0 11 0;
 #X connect 5 0 12 0;

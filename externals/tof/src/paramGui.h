@@ -16,22 +16,7 @@ typedef struct _paramGui
   t_symbol*                 path;
   int                       path_l;
   int                       build;
-  t_symbol*                 s_vis;
-  t_symbol*					s_empty;
-  t_symbol*                 s_clear;
-  t_symbol*                 s_set;
-  t_symbol*                 root;
-  t_symbol*                 s_obj;
-  t_symbol*                 s_nbx;
-  t_symbol*                 s_bng;
-  t_symbol*                 s_slider;
-  t_symbol*                 s_hsl;
-  t_symbol*                 s_knob;
-  t_symbol*                 s_tgl;
-  t_symbol*                 s_symbolatom;
-  t_symbol*                 s_sym;
-  t_symbol*                 s_text;
-  t_symbol*                 s_cnv;
+  t_symbol*					root;
   
   t_symbol*					receive;
   int						waiting;
@@ -45,7 +30,7 @@ typedef struct _paramGui
 static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
 	
 			// Clear the canvas
-            pd_typedmess((t_pd*)x->childcanvas,x->s_clear,0,NULL);
+            pd_typedmess((t_pd*)x->childcanvas,s_clear,0,NULL);
             
             int pos_x = 0;
             int pos_y = 0;
@@ -53,15 +38,15 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
             t_atom atoms[22]; // This should be the maximum number of atoms
             
             // PINK HEADER
-            SETSYMBOL(&atoms[0],x->s_obj);
+            SETSYMBOL(&atoms[0],s_obj);
 			SETFLOAT(&atoms[1],pos_x);
 			SETFLOAT(&atoms[2],pos_y);
-			SETSYMBOL(&atoms[3],x->s_cnv);
+			SETSYMBOL(&atoms[3],s_cnv);
 			SETFLOAT(&atoms[4],15);
 			SETFLOAT(&atoms[5],200);
 			SETFLOAT(&atoms[6],20);
-			SETSYMBOL(&atoms[7],x->s_empty);
-			SETSYMBOL(&atoms[8],x->s_empty);
+			SETSYMBOL(&atoms[7],s_empty);
+			SETSYMBOL(&atoms[8],s_empty);
 			SETSYMBOL(&atoms[9],x->path);
 			SETFLOAT(&atoms[10],2);
 			SETFLOAT(&atoms[11],12);
@@ -73,7 +58,7 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
 			pd_forwardmess((t_pd*)x->childcanvas, 17, atoms);
             pos_y = pos_y + 23;
             
-            t_param* p = get_param_list(x->root);
+            
             int ac;
             t_atom* av;
             t_symbol* type;
@@ -91,14 +76,16 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
             t_atom* av_got;
             t_symbol* s_got;
              
+            
+             t_param* p = get_param_list(x->root);
              
-             
-            while (p) {
+             while (p) {
+			
                 gui_built = 1;
                     if (p->GUI && (strncmp(p->path->s_name,x->path->s_name,x->path_l)==0)) {
                         p->GUI(p->x,&ac,&av,&send,&receive);
-                        if ( send == NULL ) send = x->s_empty;
-                        if ( receive == NULL ) receive = x->s_empty;
+                        if ( send == NULL ) send = s_empty;
+                        if ( receive == NULL ) receive = s_empty;
                         
                         /* 
                         // This code alows the positioning of the guis, but creates
@@ -129,11 +116,11 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
 							
 							
                            type = atom_getsymbol(av);
-                           if ( type == x->s_nbx ) {
-                                SETSYMBOL(&atoms[0],x->s_obj);
+                           if ( type == s_nbx ) {
+                                SETSYMBOL(&atoms[0],s_obj);
                                 SETFLOAT(&atoms[1],pos_x);
                                 SETFLOAT(&atoms[2],pos_y);
-                                SETSYMBOL(&atoms[3],x->s_nbx);
+                                SETSYMBOL(&atoms[3],s_nbx);
                                 SETFLOAT(&atoms[4],5);
                                 SETFLOAT(&atoms[5],14);
                                 SETFLOAT(&atoms[6],-1.0e+37);
@@ -155,11 +142,11 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
                                 pd_forwardmess((t_pd*)x->childcanvas, 22, atoms);
                                 pos_y = pos_y + GUI_Y_STEP;
                                 
-                            } else if (type == x->s_bng) {
-                                SETSYMBOL(&atoms[0],x->s_obj);
+                            } else if (type == s_bng) {
+                                SETSYMBOL(&atoms[0],s_obj);
                                 SETFLOAT(&atoms[1],pos_x);
                                 SETFLOAT(&atoms[2],pos_y);
-                                SETSYMBOL(&atoms[3],x->s_bng);
+                                SETSYMBOL(&atoms[3],s_bng);
                                 SETFLOAT(&atoms[4],15);
                                 SETFLOAT(&atoms[5],250);
                                 SETFLOAT(&atoms[6],50);
@@ -176,11 +163,11 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
                                 SETFLOAT(&atoms[17],-1);
                                 pd_forwardmess((t_pd*)x->childcanvas, 18, atoms);
                                 pos_y = pos_y + GUI_Y_STEP;
-                            } else if ( (type == x->s_slider) || (type == x->s_knob) || (type == x->s_hsl) ) {
-                                SETSYMBOL(&atoms[0],x->s_obj);
+                            } else if ( (type == s_slider) || (type == s_knob) || (type == s_hsl) ) {
+                                SETSYMBOL(&atoms[0],s_obj);
                                 SETFLOAT(&atoms[1],pos_x);
                                 SETFLOAT(&atoms[2],pos_y);
-                                SETSYMBOL(&atoms[3],x->s_hsl);
+                                SETSYMBOL(&atoms[3],s_hsl);
                                 SETFLOAT(&atoms[4],100);
                                 SETFLOAT(&atoms[5],15);
                                 if (ac > 1 && IS_A_FLOAT(av,1) ) {
@@ -210,11 +197,11 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
                                 pd_forwardmess((t_pd*)x->childcanvas, 22, atoms);
                                 pos_y = pos_y + GUI_Y_STEP;
                                 
-                            } else if (type == x->s_tgl) {
-                                SETSYMBOL(&atoms[0],x->s_obj);
+                            } else if (type == s_tgl) {
+                                SETSYMBOL(&atoms[0],s_obj);
                                 SETFLOAT(&atoms[1],pos_x);
                                 SETFLOAT(&atoms[2],pos_y);
-                                SETSYMBOL(&atoms[3],x->s_tgl);
+                                SETSYMBOL(&atoms[3],s_tgl);
                                 SETFLOAT(&atoms[4],15);
                                 SETFLOAT(&atoms[5],0);
                                 SETSYMBOL(&atoms[6],send);
@@ -233,8 +220,8 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
                                 pos_y = pos_y + GUI_Y_STEP;
                                 
                                 
-                            } else if ( type == x->s_symbolatom || type == x->s_sym) {
-                                SETSYMBOL(&atoms[0],x->s_symbolatom);
+                            } else if ( type == s_symbolatom || type == s_sym) {
+                                SETSYMBOL(&atoms[0],s_symbolatom);
                                 SETFLOAT(&atoms[1],pos_x);
                                 SETFLOAT(&atoms[2],pos_y);
                                 SETFLOAT(&atoms[3],17);
@@ -247,7 +234,7 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
                                 pd_forwardmess((t_pd*)x->childcanvas, 10,atoms);
                                 pos_y = pos_y + GUI_Y_STEP;
                             } else {
-                                SETSYMBOL(&atoms[0],x->s_text);
+                                SETSYMBOL(&atoms[0],s_text);
                                 SETFLOAT(&atoms[1],pos_x);
                                 SETFLOAT(&atoms[2],pos_y);
                                 SETSYMBOL(&atoms[3],shortpath);
@@ -256,16 +243,16 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
                                 gui_built = 0;
                             }
                             
-                            if ((gui_built) && (receive != x->s_empty) && (p->get)) {
+                            if ((gui_built) && (receive != s_empty) && (p->get)) {
                                 p->get(p->x,&s_got,&ac_got,&av_got);
-                                tof_send_anything_prepend(receive,s_got,ac_got,av_got,x->s_set);
+                                tof_send_anything_prepend(receive,s_got,ac_got,av_got,s_set);
                             }
                         }
                     }
                 p = p->next;
-               
+            
             }
-        
+			
 			// Try to resize the canvas
 			 x->childcanvas->gl_screenx1 = x_position;
 			 x->childcanvas->gl_screeny1 = y_position;
@@ -281,7 +268,7 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
 			// Show canvas
 			t_atom a;
 			SETFLOAT(&a,1);
-			pd_typedmess((t_pd*)x->childcanvas,x->s_vis,1,&a);
+			pd_typedmess((t_pd*)x->childcanvas,s_vis,1,&a);
 	
 }
 
@@ -312,7 +299,7 @@ static void paramGui_bang(t_paramGui *x) {
 			// Show canvas
 			t_atom a;
 			SETFLOAT(&a,1);
-			pd_typedmess((t_pd*)x->childcanvas,x->s_vis,1,&a);
+			pd_typedmess((t_pd*)x->childcanvas,s_vis,1,&a);
 		}
         
     }  else {
@@ -358,24 +345,10 @@ static void *paramGui_new(t_symbol *s, int ac, t_atom *av) {
   
   x->build = 1;
   
-  x->s_vis = gensym("vis");
-  x->s_empty = gensym("empty");
-  x->s_clear = gensym("clear");
-  x->s_set = gensym("set");
-  x->s_obj = gensym("obj");
-  x->s_nbx = gensym("nbx");
-  x->s_bng = gensym("bng");
-  x->s_slider = gensym("slider");
-  x->s_hsl=gensym("hsl");
-  x->s_knob = gensym("knob");
-  x->s_tgl = gensym("tgl");
-  x->s_symbolatom = gensym("symbolatom");
-  x->s_sym = gensym("sym");
-  x->s_text = gensym("text");
-  x->s_cnv = gensym("cnv");
+  
   
   char buf[MAXPDSTRING];
-  sprintf(buf, "#%lx", (t_int)x);
+  sprintf(buf, "#%lx", (long)x);
   x->receive = gensym(buf);
   pd_bind(&x->x_obj.ob_pd, x->receive );
   
