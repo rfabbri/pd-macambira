@@ -1,4 +1,4 @@
-#N canvas 294 281 682 266 10;
+#N canvas 296 345 682 266 10;
 #X text 333 81 feedback 0-127;
 #X text 334 97 frequency 0-127;
 #X text 334 110 q 0-127;
@@ -119,11 +119,13 @@
 #X obj 71 105 outlet~;
 #X obj 21 63 tof/crossfade~ 2;
 #X obj 499 -8 inlet params;
-#X obj 499 14 tof/paramRoute;
 #X obj 499 38 print PARAM_NOTFOUND;
 #X obj 159 -6 tof/param /wet 0 /g slider 0 1;
 #X obj 159 37 line~;
 #X msg 159 16 \$1 5;
+#X obj 499 14 tof/param route;
+#X obj 492 69 iemguts/propertybang;
+#X obj 493 98 tof/param gui;
 #X connect 10 0 15 2;
 #X connect 10 1 15 3;
 #X connect 11 0 10 0;
@@ -132,8 +134,9 @@
 #X connect 12 0 15 1;
 #X connect 15 0 13 0;
 #X connect 15 1 14 0;
-#X connect 16 0 17 0;
-#X connect 17 0 18 0;
-#X connect 19 0 21 0;
-#X connect 20 0 15 4;
-#X connect 21 0 20 0;
+#X connect 16 0 21 0;
+#X connect 18 0 20 0;
+#X connect 19 0 15 4;
+#X connect 20 0 19 0;
+#X connect 21 0 17 0;
+#X connect 22 0 23 0;

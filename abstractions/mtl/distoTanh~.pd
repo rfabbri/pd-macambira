@@ -1,4 +1,4 @@
-#N canvas 105 155 539 284 10;
+#N canvas 12 372 539 284 10;
 #X obj 33 21 inlet~;
 #X obj 31 231 outlet~;
 #X obj 82 209 outlet~;
@@ -26,6 +26,8 @@
 #X msg 235 220 \$1 5;
 #X obj 235 244 line~;
 #X obj 393 103 tof/param route;
+#X obj 364 203 iemguts/propertybang;
+#X obj 365 232 tof/param gui;
 #X connect 0 0 4 0;
 #X connect 0 0 8 0;
 #X connect 3 0 4 1;
@@ -40,3 +42,4 @@
 #X connect 10 0 11 0;
 #X connect 11 0 8 4;
 #X connect 12 0 7 0;
+#X connect 13 0 14 0;

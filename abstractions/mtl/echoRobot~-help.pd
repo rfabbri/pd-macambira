@@ -1,7 +1,7 @@
-#N canvas 618 57 435 205 10;
+#N canvas 123 346 514 204 10;
 #X obj 16 133 mtl/out~;
 #X text 15 24 tags: fx~;
-#X obj 15 56 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1 1
+#X obj 15 56 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
 ;
 #N canvas 5 185 450 300 generate~ 0;
 #X obj 32 213 osc~ 200;
@@ -36,14 +36,21 @@
 #X connect 13 0 11 0;
 #X connect 14 0 2 0;
 #X restore 15 81 pd generate~;
-#X obj 210 86 hsl 100 15 0 1 0 0 \$0/echorobot/wet \$0/echorobot/wet_
-/echorobot/wet 105 7 0 8 -262144 -1 -1 0 1;
-#X obj 210 106 hsl 100 15 1 100 0 0 \$0/echorobot/amount \$0/echorobot/amount_
-/echorobot/amount 105 7 0 8 -262144 -1 -1 1900 1;
 #X text 14 8 Description: Basic echo.;
 #X obj 16 106 mtl/echoRobot~ /id echorobot;
+#X obj 221 16 cnv 15 200 40 empty empty empty 20 12 0 14 -232576 -66577
+0;
+#X text 281 17 PARAM ENABLED;
+#X obj 254 35 mtl/param-enabled-help;
+#X text 195 104 <-Click on the propeties menu to display params;
+#X obj 220 133 cnv 15 200 20 empty empty /echorobot/ 2 12 0 8 -258401
+-262144 0;
+#X obj 220 156 hsl 100 15 0 1 0 0 /echorobot/wet /echorobot/wet_ wet
+105 7 0 8 -262144 -1 -1 0 1;
+#X obj 220 174 hsl 100 15 1 100 0 0 /echorobot/amount /echorobot/amount_
+amount 105 7 0 8 -262144 -1 -1 0 1;
 #X connect 2 0 3 0;
-#X connect 3 0 7 0;
-#X connect 3 1 7 1;
-#X connect 7 0 0 0;
-#X connect 7 1 0 1;
+#X connect 3 0 5 0;
+#X connect 3 1 5 1;
+#X connect 5 0 0 0;
+#X connect 5 1 0 1;

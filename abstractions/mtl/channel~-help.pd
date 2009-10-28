@@ -1,29 +1,36 @@
-#N canvas 1063 163 829 470 10;
-#X text 35 22 Description: Controls the panning and volume of a stereo
+#N canvas 426 307 716 270 10;
+#X text 13 15 Description: Controls the panning and volume of a stereo
 signal.;
-#X obj 41 88 adc~;
-#X text 38 54 tags: mix~;
-#X obj 39 122 mtl/channel~ /id chan0;
-#X obj 221 261 mtl/aux~ 0;
-#X obj 221 303 mtl/vu~;
-#X obj 380 302 mtl/vu~;
-#X obj 380 260 mtl/aux~ 1;
-#X obj 42 227 mtl/main~;
-#X obj 42 271 mtl/out~;
-#X obj 277 91 hsl 100 15 -20 20 0 0 \$0/chan0/hi \$0/chan0/hi_ /chan0/hi
-105 7 0 10 -262144 -1 -1 8900 1;
-#X obj 277 111 hsl 100 15 -20 20 0 0 \$0/chan0/mid \$0/chan0/mid_ /chan0/mid
-105 7 0 10 -262144 -1 -1 7900 1;
-#X obj 277 131 hsl 100 15 -20 20 0 0 \$0/chan0/low \$0/chan0/low_ /chan0/low
-105 7 0 10 -262144 -1 -1 9900 1;
-#X obj 277 151 hsl 100 15 -1 1 0 0 \$0/chan0/pan \$0/chan0/pan_ /chan0/pan
-105 7 0 10 -262144 -1 -1 0 1;
-#X obj 277 171 hradio 15 1 0 7 \$0/chan0/num \$0/chan0/num_ /chan0/num
-107 7 0 10 -262144 -1 -1 0;
-#X obj 277 191 hsl 100 15 0 1 0 0 \$0/chan0/aux \$0/chan0/aux_ /chan0/aux
-105 7 0 10 -262144 -1 -1 0 1;
-#X obj 277 211 hsl 100 15 0 1 0 0 \$0/chan0/main \$0/chan0/main_ /chan0/main
-105 7 0 10 -262144 -1 -1 0 1;
+#X obj 13 92 adc~;
+#X text 16 47 tags: mix~;
+#X obj 12 126 mtl/channel~ /id chan0;
+#X obj 172 160 mtl/aux~ 0;
+#X obj 172 202 mtl/vu~;
+#X obj 311 202 mtl/vu~;
+#X obj 311 160 mtl/aux~ 1;
+#X obj 12 158 mtl/main~;
+#X obj 12 202 mtl/out~;
+#X obj 483 21 cnv 15 200 40 empty empty empty 20 12 0 14 -232576 -66577
+0;
+#X text 543 22 PARAM ENABLED;
+#X obj 516 40 mtl/param-enabled-help;
+#X text 152 125 <-Click on the propeties menu to display params;
+#X obj 484 71 cnv 15 200 20 empty empty /chan0/ 2 12 0 8 -258401 -262144
+0;
+#X obj 484 94 hsl 100 15 -20 20 0 0 /chan0/hi /chan0/hi_ hi 105 7 0
+8 -262144 -1 -1 4950 1;
+#X obj 484 112 hsl 100 15 -20 20 0 0 /chan0/mid /chan0/mid_ mid 105
+7 0 8 -262144 -1 -1 4950 1;
+#X obj 484 130 hsl 100 15 -20 20 0 0 /chan0/low /chan0/low_ low 105
+7 0 8 -262144 -1 -1 4950 1;
+#X obj 484 148 hsl 100 15 -1 1 0 0 /chan0/pan /chan0/pan_ pan 105 7
+0 8 -262144 -1 -1 4950 1;
+#X obj 484 166 hsl 100 15 0 1 0 0 /chan0/aux /chan0/aux_ aux 105 7
+0 8 -262144 -1 -1 0 1;
+#X obj 484 184 hsl 100 15 0 1 0 0 /chan0/main /chan0/main_ main 105
+7 0 8 -262144 -1 -1 0 1;
+#X obj 484 202 nbx 5 14 -1e+37 1e+37 0 0 /chan0/auxn /chan0/auxn_ auxn
+50 8 0 8 -262144 -1 -1 0 256;
 #X connect 1 0 3 0;
 #X connect 1 1 3 1;
 #X connect 4 0 5 0;

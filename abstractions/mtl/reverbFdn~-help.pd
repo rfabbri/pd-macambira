@@ -1,8 +1,8 @@
-#N canvas 699 384 606 282 10;
+#N canvas 700 416 606 282 10;
 #X obj -2 0 cnv 15 600 30 empty empty fx.reverb.fdn~ 2 12 1 14 -233017
 -66577 0;
-#X text 426 42 Author: Miller Puckette;
-#X text 426 58 Version: 2008-03-05;
+#X text 440 32 Author: Miller Puckette;
+#X text 440 48 Version: 2008-03-05;
 #X obj 183 203 dac~ 3 4;
 #X text 179 217 outlets 3 and 4 can be used to feed rear channels in
 a multichannel setup (they don't require addition computation power).
@@ -46,14 +46,20 @@ a multichannel setup (they don't require addition computation power).
 #X connect 13 0 11 0;
 #X connect 14 0 2 0;
 #X restore 15 118 pd generate~;
-#X obj 188 91 hsl 100 15 0 1 0 0 \$0/fdn/wet \$0/fdn/wet_ /fdn/wet
+#X obj 161 81 cnv 15 200 40 empty empty empty 20 12 0 14 -232576 -66577
+0;
+#X text 221 82 PARAM ENABLED;
+#X obj 194 100 mtl/param-enabled-help;
+#X obj 374 81 cnv 15 200 20 empty empty /fdn/ 2 12 0 8 -258401 -262144
+0;
+#X obj 374 104 hsl 100 15 0 1 0 0 /fdn/wet /fdn/wet_ wet 105 7 0 8
+-262144 -1 -1 0 1;
+#X obj 374 122 hsl 100 15 0 100 0 0 /fdn/damp /fdn/damp_ damp 105 7
+0 8 -262144 -1 -1 0 1;
+#X obj 374 140 hsl 100 15 0 100 0 0 /fdn/liveness /fdn/liveness_ liveness
 105 7 0 8 -262144 -1 -1 0 1;
-#X obj 188 111 hsl 100 15 0 100 0 0 \$0/fdn/damp \$0/fdn/damp_ /fdn/damp
-105 7 0 8 -262144 -1 -1 7920 1;
-#X obj 188 131 hsl 100 15 0 100 0 0 \$0/fdn/liveness \$0/fdn/liveness_
-/fdn/liveness 105 7 0 8 -262144 -1 -1 8910 1;
-#X obj 188 151 hsl 100 15 0 127 0 0 \$0/fdn/crossover \$0/fdn/crossover_
-/fdn/crossover 105 7 0 8 -262144 -1 -1 6236 1;
+#X obj 374 158 hsl 100 15 0 127 0 0 /fdn/crossover /fdn/crossover_
+crossover 105 7 0 8 -262144 -1 -1 0 1;
 #X connect 6 0 7 0;
 #X connect 6 1 7 1;
 #X connect 6 2 3 0;

@@ -1,4 +1,4 @@
-#N canvas 643 527 448 238 10;
+#N canvas 768 235 459 322 10;
 #X text 16 39 From www.netpd.org;
 #X text 15 8 Description: rcomp is a basic downward compressor. its
 control chain is processed in audio rate.;
@@ -7,18 +7,6 @@ control chain is processed in audio rate.;
 #X obj 18 95 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
 ;
 #X text 16 60 tags: mix~;
-#X obj 189 137 hsl 100 15 1 10 0 0 \$0/compress~/ratio \$0/compress~/ratio_
-/compress~/ratio 105 7 0 8 -262144 -1 -1 0 1;
-#X obj 189 157 hsl 100 15 -60 0 0 0 \$0/compress~/threshold \$0/compress~/threshold_
-/compress~/threshold 105 7 0 8 -262144 -1 -1 9900 1;
-#X obj 189 177 hsl 100 15 1 300 0 0 \$0/compress~/attack \$0/compress~/attack_
-/compress~/attack 105 7 0 8 -262144 -1 -1 298 1;
-#X obj 189 197 hsl 100 15 5 3000 0 0 \$0/compress~/release \$0/compress~/release_
-/compress~/release 105 7 0 8 -262144 -1 -1 512 1;
-#X obj 186 97 tgl 15 0 \$0/compress~/switch \$0/compress~/switch_ /compress~/switch
-17 7 0 8 -262144 -1 -1 0 1;
-#X obj 189 117 hsl 100 15 -20 30 0 0 \$0/compress~/gain \$0/compress~/gain_
-/compress~/gain 105 7 0 8 -262144 -1 -1 3960 1;
 #N canvas 5 185 450 300 generate~ 0;
 #X obj 32 213 osc~ 200;
 #X obj 32 89 metro 400;
@@ -52,8 +40,27 @@ control chain is processed in audio rate.;
 #X connect 13 0 11 0;
 #X connect 14 0 2 0;
 #X restore 18 120 pd generate~;
+#X obj 222 170 cnv 15 200 20 empty empty /compress~/ 2 12 0 8 -258401
+-262144 0;
+#X obj 225 233 hsl 100 15 1 10 0 0 /compress~/ratio /compress~/ratio_
+ratio 105 7 0 8 -262144 -1 -1 0 1;
+#X obj 225 251 hsl 100 15 -60 0 0 0 /compress~/threshold /compress~/threshold_
+threshold 105 7 0 8 -262144 -1 -1 0 1;
+#X obj 225 269 hsl 100 15 1 300 0 0 /compress~/attack /compress~/attack_
+attack 105 7 0 8 -262144 -1 -1 0 1;
+#X obj 225 287 hsl 100 15 5 3000 0 0 /compress~/release /compress~/release_
+release 105 7 0 8 -262144 -1 -1 0 1;
+#X obj 222 195 tgl 15 0 /compress~/switch /compress~/switch_ switch
+17 7 0 8 -262144 -166441 -1 0 1;
+#X obj 225 215 hsl 100 15 -20 30 0 0 /compress~/gain /compress~/gain_
+gain 105 7 0 8 -262144 -1 -1 0 1;
+#X obj 219 80 cnv 15 200 40 empty empty empty 20 12 0 14 -232576 -66577
+0;
+#X text 279 81 PARAM ENABLED;
+#X obj 252 99 mtl/param-enabled-help;
+#X text 113 139 <-Click on the propeties menu to display params;
 #X connect 2 0 3 0;
 #X connect 2 1 3 1;
-#X connect 4 0 12 0;
-#X connect 12 0 2 0;
-#X connect 12 1 2 1;
+#X connect 4 0 6 0;
+#X connect 6 0 2 0;
+#X connect 6 1 2 1;

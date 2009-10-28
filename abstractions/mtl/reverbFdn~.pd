@@ -1,4 +1,4 @@
-#N canvas 221 111 705 576 10;
+#N canvas 222 143 705 576 10;
 #N canvas 549 339 890 407 processing 0;
 #X obj 420 84 inlet;
 #X obj 420 190 pack 0 50;
@@ -418,6 +418,8 @@
 #X obj 242 -21 tof/param /liveness 90 /g slider 0 100;
 #X obj 245 10 tof/param /crossover 80 /g slider 0 127;
 #X obj 573 25 tof/param route;
+#X obj 548 152 iemguts/propertybang;
+#X obj 549 181 tof/param gui;
 #X connect 0 0 14 2;
 #X connect 0 1 14 3;
 #X connect 0 2 5 0;
@@ -436,3 +438,4 @@
 #X connect 16 0 0 2;
 #X connect 17 0 0 3;
 #X connect 18 0 10 0;
+#X connect 19 0 20 0;

@@ -228,6 +228,8 @@
 #X obj 400 -2 tof/param /windowleft 15000 /g nbx;
 #X obj 429 58 tof/param /windowright 15000 /g nbx;
 #X obj 536 260 tof/param route;
+#X obj 334 328 iemguts/propertybang;
+#X obj 331 354 tof/param gui;
 #X connect 0 0 10 2;
 #X connect 1 0 10 0;
 #X connect 1 0 0 0;
@@ -247,3 +249,4 @@
 #X connect 16 0 0 1;
 #X connect 17 0 11 1;
 #X connect 18 0 6 0;
+#X connect 19 0 20 0;

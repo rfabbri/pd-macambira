@@ -1,4 +1,4 @@
-#N canvas 0 0 773 540 10;
+#N canvas 90 70 773 540 10;
 #X obj 52 509 outlet;
 #X text 166 155 That means that the abstraction can start playing on
 each beat (every 24 steps).;

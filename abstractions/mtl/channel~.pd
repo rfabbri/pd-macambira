@@ -1,4 +1,4 @@
-#N canvas 1079 16 948 682 10;
+#N canvas 362 183 948 682 10;
 #X obj 240 66 inlet~;
 #X obj 424 66 inlet~;
 #X obj 598 288 min 0;
@@ -31,25 +31,15 @@
 #X obj 313 405 tof/param /aux 0 /g slider 0 1;
 #X obj 254 489 tof/param /main 0 /g slider 0 1;
 #X obj 699 337 tof/param /auxn 0 /g nbx;
-#X obj 12 181 hsl 64 13 0 127 0 0 empty empty hi 10 7 0 9 -262144 -1
--1 0 1;
-#X obj 12 196 hsl 64 13 0 127 0 0 empty empty mid 10 7 0 9 -262144
--1 -1 0 1;
-#X obj 12 211 hsl 64 13 0 127 0 0 empty empty low 10 7 0 9 -262144
--1 -1 0 1;
-#X obj 89 181 hsl 69 15 0 127 0 0 empty empty pan 10 7 0 9 -262144
--1 -1 0 1;
-#X obj 117 199 hsl 40 13 0 127 0 0 empty empty aux 10 7 0 9 -262144
--1 -1 0 1;
-#X obj 86 198 nbx 2 14 -1e+37 1e+37 0 0 empty empty empty 30 7 0 9
--262144 -1 -1 0 256;
-#X obj 89 215 hsl 69 15 0 127 0 0 empty empty main 10 7 0 9 -262144
--1 -1 0 1;
-#X obj 15 258 cnv 15 100 16 empty \$0c synth 5 7 0 9 -1 -262144 0;
 #X obj 723 547 tof/common~;
 #X obj 476 624 tof/common~ MTLMAINR;
 #X obj 200 611 tof/common~ MTLMAINL;
 #X obj 93 560 tof/common~;
+#X obj 31 126 iemguts/propertybang;
+#X obj 32 155 tof/param gui;
+#X obj 830 76 inlet params;
+#X obj 830 122 print PARAM_NOTFOUND;
+#X obj 830 98 tof/param route;
 #X connect 0 0 23 0;
 #X connect 1 0 24 0;
 #X connect 2 0 9 0;
@@ -65,18 +55,18 @@
 #X connect 11 0 10 0;
 #X connect 12 0 19 1;
 #X connect 12 0 18 1;
-#X connect 13 0 43 0;
-#X connect 14 0 43 0;
-#X connect 15 0 42 0;
+#X connect 13 0 35 0;
+#X connect 14 0 35 0;
+#X connect 15 0 34 0;
 #X connect 16 0 18 0;
 #X connect 16 0 14 1;
 #X connect 17 0 16 0;
-#X connect 18 0 40 0;
-#X connect 19 0 41 0;
+#X connect 18 0 32 0;
+#X connect 19 0 33 0;
 #X connect 20 0 15 1;
 #X connect 20 0 19 0;
 #X connect 21 0 20 0;
-#X connect 22 0 40 0;
+#X connect 22 0 32 0;
 #X connect 23 0 4 0;
 #X connect 24 0 12 0;
 #X connect 25 0 23 5;
@@ -91,4 +81,7 @@
 #X connect 30 0 21 0;
 #X connect 31 0 22 0;
 #X connect 31 0 13 0;
+#X connect 36 0 37 0;
+#X connect 38 0 40 0;
+#X connect 40 0 39 0;
 #X coords 0 0 1 1 160 74 0;

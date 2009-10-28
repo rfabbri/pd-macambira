@@ -1,22 +1,29 @@
-#N canvas 610 186 462 238 10;
+#N canvas 311 214 546 294 10;
 #X obj -25 118 *~ 0.5;
 #X obj 71 117 *~ 0.5;
 #X obj -25 177 mtl/out~;
 #X text -29 46 tags: fx~;
 #X obj -25 94 osc~ 110;
 #X obj 71 93 osc~ 110;
-#X obj 193 106 hsl 100 15 0 1 0 0 \$0/distoSign/wet \$0/distoSign/wet_
-/distoSign/wet 105 7 0 8 -262144 -1 -1 0 1;
-#X obj 193 126 hsl 100 15 0 1 0 0 \$0/distoSign/positive \$0/distoSign/positive_
-/distoSign/positive 105 7 0 8 -262144 -1 -1 0 1;
-#X obj 193 146 hsl 100 15 0 1 0 0 \$0/distoSign/negative \$0/distoSign/negative_
-/distoSign/negative 105 7 0 8 -262144 -1 -1 0 1;
 #X text -29 12 Description: A simple distortion. Positive and negative
 distortion can be set independently.;
 #X obj -26 146 mtl/distoSign~ /id distoSign;
-#X connect 0 0 10 0;
-#X connect 1 0 10 1;
+#X text 153 145 <-Click on the propeties menu to display params;
+#X obj 270 40 cnv 15 200 40 empty empty empty 20 12 0 14 -232576 -66577
+0;
+#X text 330 41 PARAM ENABLED;
+#X obj 303 59 mtl/param-enabled-help;
+#X obj 272 174 cnv 15 200 20 empty empty /distoSign/ 2 12 0 8 -258401
+-262144 0;
+#X obj 272 197 hsl 100 15 0 1 0 0 /distoSign/wet /distoSign/wet_ wet
+105 7 0 8 -262144 -1 -1 0 1;
+#X obj 272 215 hsl 100 15 0 1 0 0 /distoSign/positive /distoSign/positive_
+positive 105 7 0 8 -262144 -1 -1 0 1;
+#X obj 272 233 hsl 100 15 0 1 0 0 /distoSign/negative /distoSign/negative_
+negative 105 7 0 8 -262144 -1 -1 0 1;
+#X connect 0 0 7 0;
+#X connect 1 0 7 1;
 #X connect 4 0 0 0;
 #X connect 5 0 1 0;
-#X connect 10 0 2 0;
-#X connect 10 1 2 1;
+#X connect 7 0 2 0;
+#X connect 7 1 2 1;

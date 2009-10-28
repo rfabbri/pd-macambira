@@ -127,6 +127,8 @@
 #X msg 218 283 \$1 5;
 #X obj 218 307 line~;
 #X obj 477 105 tof/param route;
+#X obj 473 228 iemguts/propertybang;
+#X obj 474 257 tof/param gui;
 #X connect 2 0 4 0;
 #X connect 2 0 10 0;
 #X connect 3 0 10 3;
@@ -144,3 +146,4 @@
 #X connect 13 0 14 0;
 #X connect 14 0 10 4;
 #X connect 15 0 9 0;
+#X connect 16 0 17 0;

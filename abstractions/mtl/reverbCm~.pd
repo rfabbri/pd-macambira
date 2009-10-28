@@ -1,4 +1,4 @@
-#N canvas 605 82 811 495 10;
+#N canvas 606 114 811 495 10;
 #N canvas 2 89 731 555 cmreverb 0;
 #X obj 25 22 inlet~;
 #X obj 85 22 inlet~;
@@ -99,6 +99,8 @@
 #X obj 278 111 tof/param /delay 0 /g slider 0 1;
 #X obj 169 64 tof/param /feedback 0 /g slider 0 1;
 #X obj 593 237 tof/param route;
+#X obj 588 339 iemguts/propertybang;
+#X obj 589 368 tof/param gui;
 #X connect 0 0 10 2;
 #X connect 0 1 10 3;
 #X connect 1 0 10 0;
@@ -116,3 +118,4 @@
 #X connect 14 0 6 0;
 #X connect 15 0 5 0;
 #X connect 16 0 9 0;
+#X connect 17 0 18 0;

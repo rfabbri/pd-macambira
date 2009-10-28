@@ -1,37 +1,37 @@
-#N canvas 184 399 401 173 10;
-#X obj 137 17 vsl 15 115 0 175 0 0 \$0_slider_s0 \$0_slider_r0 empty
-0 -8 0 8 -1 -228856 -228856 11400 0;
-#X obj -45 45 hradio 15 1 0 12 \$0_hr_2_s0 \$0_hr_2_r0 behavior 2 8
-1 9 -1 -1 -262140 0;
-#X obj -45 60 hradio 15 1 0 12 \$0_hr_3_s0 \$0_hr_3_r0 control~ 2 8
-1 9 -1 -1 -262140 0;
-#X obj -45 75 hradio 15 1 0 12 \$0_hr_4_s0 \$0_hr_4_r0 conversion 2
+#N canvas 710 179 403 172 10;
+#X obj 185 17 vsl 15 115 0 175 0 0 \$0_slider_s0 \$0_slider_r0 empty
+0 -8 0 8 -1 -228856 -228856 7800 0;
+#X obj 3 45 hradio 15 1 0 12 \$0_hr_2_s0 \$0_hr_2_r0 fx~ 2 8 1 9 -1
+-1 -258401 0;
+#X obj 3 60 hradio 15 1 0 12 \$0_hr_3_s0 \$0_hr_3_r0 gems 2 8 1 9 -1
+-1 -262140 0;
+#X obj 3 75 hradio 15 1 0 12 \$0_hr_4_s0 \$0_hr_4_r0 info 2 8 1 9 -1
+-1 -262140 0;
+#X obj 3 90 hradio 15 1 0 12 \$0_hr_5_s0 \$0_hr_5_r0 info~ 2 8 1 9
+-1 -1 -262140 0;
+#X obj 3 105 hradio 15 1 0 12 \$0_hr_6_s0 \$0_hr_6_r0 initialization
+2 8 1 9 -1 -1 -262140 0;
+#X obj 3 120 hradio 15 1 0 12 \$0_hr_7_s0 \$0_hr_7_r0 instrument~ 2
 8 1 9 -1 -1 -262140 0;
-#X obj -45 90 hradio 15 1 0 12 \$0_hr_5_s0 \$0_hr_5_r0 counter 2 8
-1 9 -1 -1 -262140 0;
-#X obj -45 105 hradio 15 1 0 12 \$0_hr_6_s0 \$0_hr_6_r0 data 2 8 1
-9 -1 -1 -262140 0;
-#X obj -45 120 hradio 15 1 0 12 \$0_hr_7_s0 \$0_hr_7_r0 examples 2
-8 1 9 -1 -1 -262140 0;
-#X obj 336 17 vsl 15 115 0 175 0 0 \$0_slider_s \$0_slider_r empty
+#X obj 384 17 vsl 15 115 0 175 0 0 \$0_slider_s \$0_slider_r empty
 0 -8 0 8 -1 -228856 -1 11400 0;
-#X obj 154 15 hradio 15 1 0 12 \$0_hr_0_s \$0_hr_0_r empty 2 8 1 9
--1 -1 -262140 0;
-#X obj 154 30 hradio 15 1 0 12 \$0_hr_1_s \$0_hr_1_r empty 2 8 1 9
--1 -1 -262140 0;
-#X obj 154 45 hradio 15 1 0 12 \$0_hr_2_s \$0_hr_2_r empty 2 8 1 9
--1 -1 -262140 0;
-#X obj 154 60 hradio 15 1 0 12 \$0_hr_3_s \$0_hr_3_r empty 2 8 1 9
--1 -1 -262140 0;
-#X obj 154 75 hradio 15 1 0 12 \$0_hr_4_s \$0_hr_4_r empty 2 8 1 9
--1 -1 -262140 0;
-#X obj 154 90 hradio 15 1 0 12 \$0_hr_5_s \$0_hr_5_r empty 2 8 1 9
--1 -1 -262140 0;
-#X obj 154 105 hradio 15 1 0 12 \$0_hr_6_s \$0_hr_6_r empty 2 8 1 9
--1 -1 -262140 0;
-#X obj 154 120 hradio 15 1 0 12 \$0_hr_7_s \$0_hr_7_r empty 2 8 1 9
--1 -1 -262140 0;
-#N canvas 1058 43 723 396 ./browser 0;
+#X obj 202 15 hradio 15 1 0 12 \$0_hr_0_s \$0_hr_0_r mtl/delayPhasor~
+2 8 1 9 -1 -1 -258401 4;
+#X obj 202 30 hradio 15 1 0 12 \$0_hr_1_s \$0_hr_1_r cyclone/delay~
+2 8 1 9 -1 -1 -262140 0;
+#X obj 202 45 hradio 15 1 0 12 \$0_hr_2_s \$0_hr_2_r mtl/distoAp~ 2
+8 1 9 -1 -1 -262140 0;
+#X obj 202 60 hradio 15 1 0 12 \$0_hr_3_s \$0_hr_3_r mtl/distoCrusher~
+2 8 1 9 -1 -1 -262140 0;
+#X obj 202 75 hradio 15 1 0 12 \$0_hr_4_s \$0_hr_4_r mtl/distoFuzz~
+2 8 1 9 -1 -1 -262140 0;
+#X obj 202 90 hradio 15 1 0 12 \$0_hr_5_s \$0_hr_5_r mtl/distoLofi~
+2 8 1 9 -1 -1 -262140 0;
+#X obj 202 105 hradio 15 1 0 12 \$0_hr_6_s \$0_hr_6_r mtl/distoNonmonotone~
+2 8 1 9 -1 -1 -262140 0;
+#X obj 202 120 hradio 15 1 0 12 \$0_hr_7_s \$0_hr_7_r mtl/distoSign~
+2 8 1 9 -1 -1 -262140 0;
+#N canvas 301 43 723 396 ./browser 0;
 #N canvas 1069 45 887 645 coll 0;
 #X obj 23 -42 inlet;
 #X obj 247 -40 inlet;
@@ -363,16 +363,11 @@
 #X obj 169 543 zexy/demultiplex 0 1;
 #X obj 96 207 t b a b;
 #X obj 473 542 t b a;
-#X obj 884 154 hcs/folder_list;
-#X obj 884 124 tof/path current absolute;
-#X msg 884 95 symbol examples/*;
-#X obj 884 190 hcs/split_path;
-#X obj 959 235 list prepend examples;
 #X obj 381 -2 t b b f b b;
 #X obj 502 49 sel 1 0;
 #X msg 618 120 read core.txt cr \, flush;
 #X connect 0 0 22 0;
-#X connect 1 0 34 0;
+#X connect 1 0 29 0;
 #X connect 2 0 22 0;
 #X connect 3 0 8 0;
 #X connect 3 1 5 0;
@@ -394,7 +389,7 @@
 #X connect 18 0 17 0;
 #X connect 18 1 19 1;
 #X connect 19 0 7 0;
-#X connect 20 0 34 0;
+#X connect 20 0 29 0;
 #X connect 21 0 22 0;
 #X connect 22 0 25 0;
 #X connect 22 1 25 1;
@@ -407,19 +402,13 @@
 #X connect 27 2 4 0;
 #X connect 28 0 6 0;
 #X connect 28 1 24 0;
-#X connect 29 0 32 0;
-#X connect 30 0 29 0;
-#X connect 31 0 30 0;
-#X connect 32 1 33 0;
-#X connect 33 0 7 0;
-#X connect 34 0 3 0;
-#X connect 34 1 21 0;
-#X connect 34 2 35 0;
-#X connect 34 3 31 0;
-#X connect 34 4 0 0;
-#X connect 35 0 16 0;
-#X connect 35 1 36 0;
-#X connect 36 0 14 0;
+#X connect 29 0 3 0;
+#X connect 29 1 21 0;
+#X connect 29 2 30 0;
+#X connect 29 4 0 0;
+#X connect 30 0 16 0;
+#X connect 30 1 31 0;
+#X connect 31 0 14 0;
 #X restore 321 63 pd readTags;
 #N canvas 178 252 827 449 coll 0;
 #X obj 23 -42 inlet;
@@ -647,6 +636,8 @@
 #X obj 411 -9 t b f b b;
 #X obj 258 137 s \$0_slider_r;
 #X obj 435 97 t b b b;
+#X obj 369 -61 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
 #X connect 1 0 0 0;
 #X connect 1 1 0 1;
 #X connect 2 0 0 0;
@@ -679,16 +670,19 @@
 #X connect 25 0 8 0;
 #X connect 25 1 5 0;
 #X connect 25 2 13 0;
-#X restore 229 -9 pd ./browser;
-#X obj -45 15 hradio 15 1 0 12 \$0_hr_0_s0 \$0_hr_0_r0 2d 2 8 1 9 -1
+#X connect 26 0 22 0;
+#X restore 277 -9 pd ./browser;
+#X obj 3 15 hradio 15 1 0 12 \$0_hr_0_s0 \$0_hr_0_r0 file 2 8 1 9 -1
 -1 -262140 0;
-#X obj -45 31 hradio 15 1 0 12 \$0_hr_1_s0 \$0_hr_1_r0 3d 2 8 1 9 -1
--1 -262140 0;
-#X obj -45 -9 cnv 15 198 22 empty empty TAG 1 12 1 12 -16645 -228856
+#X obj 3 31 hradio 15 1 0 12 \$0_hr_1_s0 \$0_hr_1_r0 file~ 2 8 1 9
+-1 -1 -262140 0;
+#X obj 3 -9 cnv 15 198 22 empty empty TAG 1 12 1 12 -16645 -228856
 0;
-#X obj 154 -9 cnv 15 197 22 empty empty CLASS/ABSTRACTION 0 12 1 12
+#X obj 202 -9 cnv 15 197 22 empty empty CLASS/ABSTRACTION 0 12 1 12
 -16645 -228856 0;
-#X obj -45 137 cnv 15 396 20 empty empty empty 20 12 0 14 -16645 -258401
+#X obj 3 137 cnv 15 396 20 empty empty empty 20 12 0 14 -16645 -258401
 0;
-#X obj -41 141 tgl 11 0 \$0love \$0lover with:love 17 6 0 8 -162280
--262144 -258401 1 1;
+#X obj 7 141 tgl 11 0 \$0love \$0lover with:love 17 6 0 8 -162280 -262144
+-258401 1 1;
+#X obj 146 141 cnv 15 100 10 empty empty http://wiki.dataflow.ws/PdMtlAbstractions
+0 6 0 8 -16645 -99865 0;

@@ -9,4 +9,4 @@ rm love.txt
 mv amourette.txt love.txt
 
 echo "Making copy of browser.pd"
-cp browser.pd 1-13LP.pd
+cp browser.pd 1.mtlBrowser.pd

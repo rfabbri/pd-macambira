@@ -1,4 +1,4 @@
-#N canvas 344 463 628 279 10;
+#N canvas 345 495 628 279 10;
 #N canvas 457 452 466 316 robotfeedback 0;
 #X obj 260 117 *~ 0.9;
 #X obj 33 118 *~ 0.9;
@@ -38,6 +38,8 @@
 #X msg 263 208 \$1 5;
 #X obj 147 29 tof/param /amount 20 /g slider 1 100;
 #X obj 484 33 tof/param route;
+#X obj 481 87 iemguts/propertybang;
+#X obj 482 116 tof/param gui;
 #X connect 0 0 5 2;
 #X connect 0 1 5 3;
 #X connect 1 0 0 0;
@@ -52,3 +54,4 @@
 #X connect 10 0 9 0;
 #X connect 11 0 0 2;
 #X connect 12 0 7 0;
+#X connect 13 0 14 0;

@@ -122,13 +122,21 @@ send routing
 sigpack/vowel~ fx~
 smlib/threshold routing
 tof/argument initialization patch
+tof/breakpoints~ ui control~
+tof/breakpoints ui timing
+tof/common~ mix~
 tof/crossfade~ mix~
 tof/folderpanel file
 tof/getdollarzero patch
 tof/increment counter
 tof/iterate routing
 tof/listUnfold lists
+tof/onlyone initialization symbols
+tof/openHelp tools patch
+tof/param state routing
 tof/path patch file
+tof/phasorshot~ control~
+tof/streamMinMax math
 unauthorized/grid ui
 unauthorized/wahwah~ fx~
 writesf~ file~ record~

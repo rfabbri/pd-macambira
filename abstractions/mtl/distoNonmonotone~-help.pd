@@ -1,52 +1,61 @@
-#N canvas 494 278 763 356 10;
-#X obj 405 5 cnv 15 320 90 empty empty empty 20 12 0 14 -261682 -66577
+#N canvas 63 491 905 408 10;
+#X obj 564 12 cnv 15 320 90 empty empty empty 20 12 0 14 -261682 -66577
 0;
-#X text 408 29 le 16 septembre 2009;
-#X text 407 64 Copyright © 2009 par Mathieu Bouchard;
-#X text 408 52 Fabriqué à Villeray \, avec amour;
-#X text 408 17 Tel que presenté au club PureData de Montréal;
-#X text 408 6 Patch de distorsion nonmonotone qui suit l'enveloppe
+#X text 567 36 le 16 septembre 2009;
+#X text 566 71 Copyright © 2009 par Mathieu Bouchard;
+#X text 567 59 Fabriqué à Villeray \, avec amour;
+#X text 567 24 Tel que presenté au club PureData de Montréal;
+#X text 567 13 Patch de distorsion nonmonotone qui suit l'enveloppe
 ;
-#X text 407 79 Publié sous licence Standard Improved BSD;
-#X obj 243 186 cyclone/Scope~ 130 130 256 3 128 -1 1 0 0 0 0 102 255
-51 135 135 135 0;
-#X obj 16 186 cyclone/Scope~ 130 130 256 3 128 -1 1 0 0 0 0 102 255
-51 135 135 135 0;
+#X text 566 86 Publié sous licence Standard Improved BSD;
 #X obj 31 121 mtl/out~;
 #X text 26 -2 Description: distortion nonmonotone;
 #X text 28 14 tags: fx~;
-#X obj 31 71 *~ 0.5;
-#X obj 136 72 *~ 0.5;
-#X obj 32 47 osc~ 110;
-#X obj 136 47 osc~ 110;
-#X obj 407 108 hsl 100 15 0 1 0 0 \$0/matju/wet \$0/matju/wet_ /matju/wet
-105 7 0 8 -262144 -1 -1 0 1;
-#X obj 407 128 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/freq1 \$0/matju/freq1_
-/matju/freq1 48 7 0 8 -262144 -1 -1 0 256;
-#X obj 407 148 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/amp1 \$0/matju/amp1_
-/matju/amp1 48 7 0 8 -262144 -1 -1 0 256;
-#X obj 407 168 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/base1 \$0/matju/base1_
-/matju/base1 48 7 0 8 -262144 -1 -1 0 256;
-#X obj 407 188 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/freq2 \$0/matju/freq2_
-/matju/freq2 48 7 0 8 -262144 -1 -1 0 256;
-#X obj 407 208 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/amp2 \$0/matju/amp2_
-/matju/amp2 48 7 0 8 -262144 -1 -1 0 256;
-#X obj 407 228 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/base2 \$0/matju/base2_
-/matju/base2 48 7 0 8 -262144 -1 -1 0 256;
-#X obj 407 248 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/freqfeed \$0/matju/freqfeed_
-/matju/freqfeed 48 7 0 8 -262144 -1 -1 0 256;
-#X obj 407 268 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/ampfeed \$0/matju/ampfeed_
-/matju/ampfeed 48 7 0 8 -262144 -1 -1 0 256;
-#X obj 407 288 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/basefeed \$0/matju/basefeed_
-/matju/basefeed 48 7 0 8 -262144 -1 -1 0 256;
-#X obj 407 308 nbx 5 14 -1e+37 1e+37 0 0 \$0/matju/feedback \$0/matju/feedback_
-/matju/feedback 48 7 0 8 -262144 -1 -1 0 256;
+#X obj 321 13 cnv 15 200 40 empty empty empty 20 12 0 14 -232576 -66577
+0;
+#X text 381 14 PARAM ENABLED;
+#X obj 354 32 mtl/param-enabled-help;
+#X text 232 95 <-Click on the propeties menu to display params;
 #X obj 31 96 mtl/distoNonmonotone~ /id matju;
-#X connect 12 0 8 0;
-#X connect 12 0 27 0;
-#X connect 13 0 27 1;
-#X connect 14 0 12 0;
-#X connect 15 0 13 0;
-#X connect 27 0 9 0;
-#X connect 27 1 7 0;
-#X connect 27 1 9 1;
+#X obj 331 139 cnv 15 200 20 empty empty /matju/ 2 12 0 8 -258401 -262144
+0;
+#X obj 331 162 nbx 5 14 -1e+37 1e+37 0 0 /matju/freq1 /matju/freq1_
+freq1 50 8 0 8 -262144 -1 -1 5 256;
+#X obj 331 180 nbx 5 14 -1e+37 1e+37 0 0 /matju/amp1 /matju/amp1_ amp1
+50 8 0 8 -262144 -1 -1 10 256;
+#X obj 331 198 nbx 5 14 -1e+37 1e+37 0 0 /matju/base1 /matju/base1_
+base1 50 8 0 8 -262144 -1 -1 10 256;
+#X obj 331 216 nbx 5 14 -1e+37 1e+37 0 0 /matju/freq2 /matju/freq2_
+freq2 50 8 0 8 -262144 -1 -1 4 256;
+#X obj 331 234 nbx 5 14 -1e+37 1e+37 0 0 /matju/amp2 /matju/amp2_ amp2
+50 8 0 8 -262144 -1 -1 13 256;
+#X obj 331 252 nbx 5 14 -1e+37 1e+37 0 0 /matju/base2 /matju/base2_
+base2 50 8 0 8 -262144 -1 -1 14 256;
+#X obj 331 270 nbx 5 14 -1e+37 1e+37 0 0 /matju/freqfeed /matju/freqfeed_
+freqfeed 50 8 0 8 -262144 -1 -1 9 256;
+#X obj 331 288 nbx 5 14 -1e+37 1e+37 0 0 /matju/ampfeed /matju/ampfeed_
+ampfeed 50 8 0 8 -262144 -1 -1 5 256;
+#X obj 331 306 nbx 5 14 -1e+37 1e+37 0 0 /matju/basefeed /matju/basefeed_
+basefeed 50 8 0 8 -262144 -1 -1 13 256;
+#X obj 331 324 hsl 100 15 0 1 0 0 /matju/feedback /matju/feedback_
+feedback 105 7 0 8 -262144 -1 -1 5600 1;
+#X obj 331 342 hsl 100 15 0 1 0 0 /matju/wet /matju/wet_ wet 105 7
+0 8 -262144 -1 -1 3100 1;
+#X obj 32 30 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#N canvas 367 242 582 409 loop_sample 0;
+#X obj 47 313 outlet~;
+#X obj 43 9 inlet;
+#X obj 193 319 outlet~;
+#X msg 47 163 panel;
+#X obj 47 200 mtl/player~ 1;
+#X connect 1 0 3 0;
+#X connect 3 0 4 0;
+#X connect 4 0 0 0;
+#X connect 4 0 2 0;
+#X restore 32 66 pd loop_sample;
+#X connect 14 0 7 0;
+#X connect 14 1 7 1;
+#X connect 27 0 28 0;
+#X connect 28 0 14 0;
+#X connect 28 1 14 1;

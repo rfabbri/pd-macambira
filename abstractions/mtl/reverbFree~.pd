@@ -1,4 +1,4 @@
-#N canvas 166 155 1016 505 10;
+#N canvas 167 187 1016 505 10;
 #X obj 42 454 outlet~ left;
 #X obj 134 454 outlet~ right;
 #X obj 44 71 inlet~ left;
@@ -55,6 +55,8 @@
 #X obj 360 177 tof/param /freeze 0 /g tgl;
 #X obj 360 137 tof/param /damping 0.4 /g slider 0 2;
 #X obj 741 152 tof/param route;
+#X obj 742 233 iemguts/propertybang;
+#X obj 743 262 tof/param gui;
 #X connect 2 0 4 0;
 #X connect 2 0 5 0;
 #X connect 3 0 4 1;
@@ -72,3 +74,4 @@
 #X connect 13 0 4 5;
 #X connect 14 0 4 3;
 #X connect 15 0 7 0;
+#X connect 16 0 17 0;
