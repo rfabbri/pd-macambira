@@ -116,14 +116,14 @@ static void *arguments_new(t_symbol *selector, int argc, t_atom* argv) {
 	  t_symbol* s = atom_getsymbol(argv);
 	  if ( s == gensym("comma") || s == x->s_comma ) {
 		  x->mode = COMMA;
-		  post("COMMA");
+		 // post("COMMA");
 	  } else {
 		  x->mode = TOKEN;
 		  x->token = s->s_name[0];
-		  post("TOKEN: %c",x->token);
+		  //post("TOKEN: %c",x->token);
 	  }
   } else {
-	   post("ALL");
+	   //post("ALL");
 	  x->mode = ALL;
   }
   

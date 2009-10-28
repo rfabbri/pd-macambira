@@ -1,5 +1,4 @@
-default: argument crossfade~ iterate param breakpoints~ folderpanel listUnfold path breakpoints getdollarzero onlyone phasorshot~ common~ increment openHelp streamMinMax
-
+default: argument getdollarzero breakpoints~ phasorshot~ streamMinMax iterate param crossfade~ path onlyone openHelp folderpanel common~ increment listUnfold arguments breakpoints
 
 current:
 	echo make class
