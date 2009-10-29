@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch memento-p sfruit pd-wavelet 
+LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento mtl nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch memento-p sfruit pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -348,7 +348,7 @@ mtl_install:
 		$(DESTDIR)$(helpdir)/$(MTL_NAME)
 	install -p $(abstractions_src)/$(MTL_NAME)/browser.pd \
 		$(DESTDIR)$(helpdir)/$(MTL_NAME)
-	install -p $(abstractions_src)/$(MTL_NAME)/1-13LP.pd \
+	install -p $(abstractions_src)/$(MTL_NAME)/1.mtlBrowser.pd  \
 		$(DESTDIR)$(helpdir)/$(MTL_NAME)
 	install -p $(abstractions_src)/$(MTL_NAME)/*.txt \
 		$(DESTDIR)$(objectsdir)/$(MTL_NAME)		
