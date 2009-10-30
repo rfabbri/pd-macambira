@@ -138,7 +138,7 @@ else
     LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl apple
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl pdvjtools postlude sixaxis
+    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl postlude sixaxis
   endif
 endif
 
@@ -2129,44 +2129,14 @@ pdp_opengl_clean:
 
 #------------------------------------------------------------------------------#
 # PDVJTOOLS
-PDVJTOOLS_NAME=pdvjtools
-PDVJTOOLS_OBJECTS := $(wildcard $(externals_src)/pdvjtools/*/*.c)
-# exclude videogrid for now since it doesn't build with ffmpeg from Debian/stable
-PDVJTOOLS_CPP_OBJECTS := $(wildcard $(externals_src)/pdvjtools/[^v]*/*.cc)
-pdvjtools: $(externals_src)/pdp/Makefile.config $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION)) \
-$(PDVJTOOLS_CPP_OBJECTS:.cc=.$(EXTENSION))
+pdvjtools:
+	make -C $(externals_src)/pdvjtools
 
-pdvjtools_install: pdvjtools
-	install -d $(DESTDIR)$(objectsdir)/$(PDVJTOOLS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PDVJTOOLS_NAME) \
-		--author "" \
-		--description "Pure Data Video Junk"
-	install -p $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(PDVJTOOLS_NAME)
-	install -p $(PDVJTOOLS_CPP_OBJECTS:.cc=.$(EXTENSION)) \
-		$(DESTDIR)$(objectsdir)/$(PDVJTOOLS_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(PDVJTOOLS_NAME)
-	install -p $(externals_src)/pdvjtools/*/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(PDVJTOOLS_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(PDVJTOOLS_NAME)
-	install -p $(externals_src)/pdvjtools/pdp_freeframe/INSTALL \
-		$(DESTDIR)$(manualsdir)/$(PDVJTOOLS_NAME)/pdp_freeframe_INSTALL
-	install -p $(externals_src)/pdvjtools/pdp_frei0r/INSTALL \
-		$(DESTDIR)$(manualsdir)/$(PDVJTOOLS_NAME)/pdp_frei0r_INSTALL
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/pdvjtools/README \
-#		$(DESTDIR)$(readmesdir)/$(PDVJTOOLS_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(PDVJTOOLS_NAME)
-#	install -p $(externals_src)/pdvjtools/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(PDVJTOOLS_NAME)
+pdvjtools_install:
+	make -C $(externals_src)/pdvjtools DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 pdvjtools_clean:
-	-rm -f -- $(PDVJTOOLS_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(PDVJTOOLS_CPP_OBJECTS:.cc=.$(EXTENSION))
-	-rm -f -- $(PDVJTOOLS_OBJECTS:.c=.o)
-	-rm -f -- $(PDVJTOOLS_CPP_OBJECTS:.cc=.o)
-	-rm -f -- $(externals_src)/pdvjtools/*.bak
-	-rm -f -- $(externals_src)/pdvjtools/*.*~
-
+	make -C $(externals_src)/pdvjtools clean
 
 
 #------------------------------------------------------------------------------#
