@@ -46,9 +46,13 @@ typedef unsigned int       u32;
 typedef unsigned long long u64;
 
 
-#ifndef __cplusplus
+#ifndef bool
 typedef int bool;
+#endif
+#ifndef true
 #define true 1;
+#endif
+#ifndef false
 #define false 0;
 #endif
 
