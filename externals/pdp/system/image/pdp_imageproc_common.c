@@ -72,7 +72,7 @@ u32 pdp_imageproc_legalheight_round_down(int i)
 
 
 /* check if two packets are allocated and of the same type */
-bool pdp_packet_compat(int packet0, int packet1)
+int pdp_packet_compat(int packet0, int packet1)
 {
 
     t_pdp *header0 = pdp_packet_header(packet0);
