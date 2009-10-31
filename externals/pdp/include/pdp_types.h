@@ -24,6 +24,9 @@
 #ifndef PDP_TYPES_H
 #define PDP_TYPES_H
 
+/* C99 standard header for bool, true, and false */
+#include <stdbool.h>
+
 /* check
    http://www.unix.org/whitepapers/64bit.html 
    on unix (LP64) int = 32bit
@@ -44,18 +47,6 @@ typedef unsigned char      u8;
 typedef unsigned short     u16;
 typedef unsigned int       u32;
 typedef unsigned long long u64;
-
-
-#ifndef bool
-typedef int bool;
-#endif
-#ifndef true
-#define true 1;
-#endif
-#ifndef false
-#define false 0;
-#endif
-
 
 typedef struct _pdp t_pdp;
 typedef void (*t_pdp_packet_method1)(t_pdp *);              /* dst */
