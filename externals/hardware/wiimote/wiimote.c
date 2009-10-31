@@ -660,7 +660,9 @@ static void wiimote_queue(t_wiimote*x, union cwiid_mesg*mesg, double timestamp)
   }
 
   /* reset the clock */
+  sys_lock();
   clock_delay(g_clock, 0);
+  sys_unlock();
 }
 #else
 static void wiimote_dequeue(void*nada)
@@ -734,7 +736,6 @@ static void cwiid_error_callback(cwiid_wiimote_t *wiimote, const char*err, va_li
       pd_error(x, "wiimote: unknown error");
     }
   }
-
 }
 
 // The CWiid library invokes a callback function whenever events are
