@@ -56,7 +56,7 @@ extern "C"
 
 
 /* check if valid texture packet. all other methods assume packet is valid */
-bool pdp_packet_texture_isvalid(int packet);
+int pdp_packet_texture_isvalid(int packet);
 
 /* returns a pointer to the packet subheader whem the packet contains a texture */
 /* try not to use the header directly, use clone and copy methods instead */
