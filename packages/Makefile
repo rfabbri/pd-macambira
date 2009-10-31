@@ -127,7 +127,7 @@ HAVE_AUTOGEN_SH := $(wildcard $(pd_src)/autogen.sh)
 ifeq (autogen.sh, $(findstring autogen.sh,$(HAVE_AUTOGEN_SH)))
 #----------------------------------------------------------------------------#
 # new autotools build system
-pd:
+pd: set_version
 	cd $(pd_src) \
 		&& ./autogen.sh \
 		&& ./configure $(PD_CONFIGURE_FLAGS) \
