@@ -69,8 +69,8 @@ extern "C"
 
 
 /* validate and compat check */
-bool pdp_packet_image_isvalid(int packet);
-bool pdp_packet_image_compat(int packet0, int packet1);
+int pdp_packet_image_isvalid(int packet);
+int pdp_packet_image_compat(int packet0, int packet1);
 
 /* short cuts to create specific packets */
 int pdp_packet_new_image(u32 encoding, u32 width, u32 height);

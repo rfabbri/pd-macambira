@@ -87,7 +87,7 @@ t_pdp_symbol *pdp_packet_bitmap_get_description(int packet);
 /* get subheader */
 t_bitmap *pdp_packet_bitmap_info(int packet);
 
-bool pdp_packet_bitmap_isvalid(int packet);
+int pdp_packet_bitmap_isvalid(int packet);
 
 #ifdef __cplusplus
 }
