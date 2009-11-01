@@ -1,8 +1,8 @@
-#N canvas 1117 77 629 562 10;
+#N canvas 806 101 629 562 10;
 #X msg 225 224 6 1 0 0 1 0 0 1;
 #X floatatom 37 158 5 0 0 0 - - -;
 #X obj 36 88 loadbang;
-#X msg 37 448 0 0 0 0 0 1 0 0;
+#X msg 37 448 0 0 0 0 0 0 0 0;
 #N canvas 1281 181 761 308 randomize 0;
 #X obj 136 23 inlet;
 #X obj 136 253 outlet;
@@ -42,7 +42,6 @@
 #X connect 13 0 5 8;
 #X connect 14 0 4 0;
 #X restore 268 157 pd randomize;
-#X obj 37 203 ./seq8x8;
 #X obj 37 423 cyclone/prepend set;
 #X obj 268 114 loadbang;
 #X obj 268 137 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
@@ -191,16 +190,17 @@
 #X obj 36 110 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X obj 36 132 mtl/clkSlave 2 8;
-#X connect 0 0 5 1;
-#X connect 1 0 5 0;
-#X connect 2 0 16 0;
-#X connect 4 0 5 1;
-#X connect 5 0 6 0;
-#X connect 5 0 13 0;
-#X connect 6 0 3 0;
-#X connect 7 0 8 0;
-#X connect 8 0 4 0;
-#X connect 13 0 12 0;
-#X connect 13 1 12 1;
-#X connect 16 0 17 0;
-#X connect 17 0 1 0;
+#X obj 37 203 mtl/seq8x8;
+#X connect 0 0 17 1;
+#X connect 1 0 17 0;
+#X connect 2 0 15 0;
+#X connect 4 0 17 1;
+#X connect 5 0 3 0;
+#X connect 6 0 7 0;
+#X connect 7 0 4 0;
+#X connect 12 0 11 0;
+#X connect 12 1 11 1;
+#X connect 15 0 16 0;
+#X connect 16 0 1 0;
+#X connect 17 0 5 0;
+#X connect 17 0 12 0;

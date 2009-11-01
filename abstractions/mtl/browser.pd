@@ -1,36 +1,36 @@
-#N canvas 711 211 403 172 10;
+#N canvas 716 235 403 172 10;
 #X obj 185 17 vsl 15 115 0 175 0 0 \$0_slider_s0 \$0_slider_r0 empty
-0 -8 0 8 -1 -228856 -228856 11400 0;
-#X obj 3 45 hradio 15 1 0 12 \$0_hr_2_s0 \$0_hr_2_r0 ambisonic 2 8
-1 9 -1 -1 -258401 2;
-#X obj 3 60 hradio 15 1 0 12 \$0_hr_3_s0 \$0_hr_3_r0 behavior 2 8 1
-9 -1 -1 -262140 0;
-#X obj 3 75 hradio 15 1 0 12 \$0_hr_4_s0 \$0_hr_4_r0 control~ 2 8 1
-9 -1 -1 -262140 0;
-#X obj 3 90 hradio 15 1 0 12 \$0_hr_5_s0 \$0_hr_5_r0 conversion 2 8
-1 9 -1 -1 -262140 0;
-#X obj 3 105 hradio 15 1 0 12 \$0_hr_6_s0 \$0_hr_6_r0 counter 2 8 1
-9 -1 -1 -262140 0;
-#X obj 3 120 hradio 15 1 0 12 \$0_hr_7_s0 \$0_hr_7_r0 data 2 8 1 9
+0 -8 0 8 -1 -228856 -228856 0 0;
+#X obj 3 45 hradio 15 1 0 12 \$0_hr_2_s0 \$0_hr_2_r0 symbols 2 8 1
+9 -1 -1 -262140 1;
+#X obj 3 60 hradio 15 1 0 12 \$0_hr_3_s0 \$0_hr_3_r0 synthesize~ 2
+8 1 9 -1 -1 -262140 0;
+#X obj 3 75 hradio 15 1 0 12 \$0_hr_4_s0 \$0_hr_4_r0 tables 2 8 1 9
+-1 -1 -262140 1;
+#X obj 3 90 hradio 15 1 0 12 \$0_hr_5_s0 \$0_hr_5_r0 timing 2 8 1 9
 -1 -1 -262140 0;
+#X obj 3 105 hradio 15 1 0 12 \$0_hr_6_s0 \$0_hr_6_r0 tools 2 8 1 9
+-1 -1 -262140 0;
+#X obj 3 120 hradio 15 1 0 12 \$0_hr_7_s0 \$0_hr_7_r0 ui 2 8 1 9 -1
+-1 -258401 0;
 #X obj 384 17 vsl 15 115 0 175 0 0 \$0_slider_s \$0_slider_r empty
-0 -8 0 8 -1 -228856 -1 4200 0;
-#X obj 202 15 hradio 15 1 0 12 \$0_hr_0_s \$0_hr_0_r mtl/ambiSend7~
-2 8 1 9 -1 -1 -262140 0;
-#X obj 202 30 hradio 15 1 0 12 \$0_hr_1_s \$0_hr_1_r mtl/ambiSfRead4~
-2 8 1 9 -1 -1 -262140 0;
-#X obj 202 45 hradio 15 1 0 12 \$0_hr_2_s \$0_hr_2_r mtl/ambiSfRead7~
-2 8 1 9 -1 -1 -262140 0;
-#X obj 202 60 hradio 15 1 0 12 \$0_hr_3_s \$0_hr_3_r mtl/ambiSfWrite4~
-2 8 1 9 -1 -1 -262140 0;
-#X obj 202 75 hradio 15 1 0 12 \$0_hr_4_s \$0_hr_4_r mtl/ambiSfWrite7~
-2 8 1 9 -1 -1 -262140 5;
-#X obj 202 90 hradio 15 1 0 12 \$0_hr_5_s \$0_hr_5_r mtl/ambiTable4
+0 -8 0 8 -1 -228856 -1 11400 0;
+#X obj 202 15 hradio 15 1 0 12 \$0_hr_0_s \$0_hr_0_r mtl/buttonColor
+2 8 1 9 -1 -1 -258401 3;
+#X obj 202 30 hradio 15 1 0 12 \$0_hr_1_s \$0_hr_1_r mtl/colorGrid
 2 8 1 9 -1 -1 -262140 4;
-#X obj 202 105 hradio 15 1 0 12 \$0_hr_6_s \$0_hr_6_r mtl/ambiTablePlay3~
+#X obj 202 45 hradio 15 1 0 12 \$0_hr_2_s \$0_hr_2_r mtl/doubleClick
 2 8 1 9 -1 -1 -262140 0;
-#X obj 202 120 hradio 15 1 0 12 \$0_hr_7_s \$0_hr_7_r mtl/ambiTableRead3~
-2 8 1 9 -1 -1 -262140 5;
+#X obj 202 60 hradio 15 1 0 12 \$0_hr_3_s \$0_hr_3_r mtl/fileBrowser
+2 8 1 9 -1 -1 -262140 2;
+#X obj 202 75 hradio 15 1 0 12 \$0_hr_4_s \$0_hr_4_r mtl/gBrowser 2
+8 1 9 -1 -1 -262140 2;
+#X obj 202 90 hradio 15 1 0 12 \$0_hr_5_s \$0_hr_5_r mtl/hsv 2 8 1
+9 -1 -1 -262140 4;
+#X obj 202 105 hradio 15 1 0 12 \$0_hr_6_s \$0_hr_6_r mtl/keyNameLearn
+2 8 1 9 -1 -1 -262140 3;
+#X obj 202 120 hradio 15 1 0 12 \$0_hr_7_s \$0_hr_7_r mtl/keyR 2 8
+1 9 -1 -1 -262140 2;
 #N canvas 301 43 723 396 ./browser 0;
 #N canvas 1069 45 887 645 coll 0;
 #X obj 23 -42 inlet;
@@ -672,10 +672,10 @@
 #X connect 25 2 13 0;
 #X connect 26 0 22 0;
 #X restore 277 -9 pd ./browser;
-#X obj 3 15 hradio 15 1 0 12 \$0_hr_0_s0 \$0_hr_0_r0 2d 2 8 1 9 -1
--1 -262140 0;
-#X obj 3 31 hradio 15 1 0 12 \$0_hr_1_s0 \$0_hr_1_r0 3d 2 8 1 9 -1
--1 -262140 0;
+#X obj 3 15 hradio 15 1 0 12 \$0_hr_0_s0 \$0_hr_0_r0 routing 2 8 1
+9 -1 -1 -262140 0;
+#X obj 3 31 hradio 15 1 0 12 \$0_hr_1_s0 \$0_hr_1_r0 sequencing 2 8
+1 9 -1 -1 -262140 0;
 #X obj 3 -9 cnv 15 198 22 empty empty TAG 1 12 1 12 -16645 -228856
 0;
 #X obj 202 -9 cnv 15 197 22 empty empty CLASS/ABSTRACTION 0 12 1 12
@@ -683,6 +683,6 @@
 #X obj 3 137 cnv 15 396 20 empty empty empty 20 12 0 14 -16645 -258401
 0;
 #X obj 7 141 tgl 11 0 \$0love \$0lover with:love 17 6 0 8 -162280 -262144
--258401 1 1;
+-258401 0 1;
 #X obj 146 141 cnv 15 100 10 empty empty http://wiki.dataflow.ws/PdMtlAbstractions
 0 6 0 8 -16645 -99865 0;

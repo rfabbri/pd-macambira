@@ -1,4 +1,4 @@
-#N canvas 1182 26 790 663 10;
+#N canvas 645 50 790 663 10;
 #N canvas 1191 53 886 636 guts 0;
 #X obj 371 459 snapshot~;
 #X obj 474 466 snapshot~;
@@ -167,7 +167,7 @@
 0;
 #X obj 102 142 cnv 1 1 7 empty \$0right empty 20 12 0 14 -24198 -262144
 0;
-#X obj 106 116 hsl 100 15 0 90 0 0 empty empty vol 104 8 0 9 -228856
+#X obj 106 116 hsl 100 15 0 100 0 0 empty empty vol 104 8 0 9 -228856
 -1 -1 0 1;
 #X obj 99 51 iemlib/init 0;
 #X obj 25 563 outlet~;

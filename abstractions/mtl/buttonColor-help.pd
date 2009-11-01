@@ -1,15 +1,13 @@
-#N canvas 78 109 637 527 10;
+#N canvas 83 133 570 447 10;
 #X obj 46 156 hradio 15 1 0 3 \$0bs \$0br button 3 7 0 9 -1 -1 -261684
 0;
 #X obj 47 59 hradio 15 1 0 3 \$0rs \$0rr empty 3 7 0 10 -1 -13184 -1
 0;
 #X text 39 -21 description: colorize a custom button on presses.;
-#X floatatom 143 183 5 0 0 0 - - -;
-#X floatatom 145 129 5 0 0 0 - - -;
-#X obj 150 56 buttonColor \$0rs \$0rr -1 -800000 -1 -1.67117e+07 -1
--1 250;
-#X floatatom 148 36 5 0 0 0 - - -;
-#X floatatom 150 79 5 0 0 0 - - -;
+#X floatatom 144 183 5 0 0 0 - - -;
+#X floatatom 144 133 5 0 0 0 - - -;
+#X floatatom 150 35 5 0 0 0 - - -;
+#X floatatom 150 93 5 0 0 0 - - -;
 #X text 52 228 Argument 1: GUI element's send symbol;
 #X text 52 244 Argument 2: GUI element's receive symbol;
 #X text 52 260 Argument 3: color of background when unpressed;
@@ -21,10 +19,12 @@
 #X text 52 356 Argument 9: release time;
 #X text 186 107 For the color coding conversion \, see:;
 #X obj 422 110 mtl/rgbToNum;
-#X obj 144 158 buttonColor \$0bs \$0br -1 -1 -1.677e+07 -1 -1 -1 250
-;
 #X text 44 -1 tags: ui;
-#X connect 4 0 19 0;
-#X connect 5 0 7 0;
-#X connect 6 0 5 0;
-#X connect 19 0 3 0;
+#X obj 150 56 mtl/buttonColor \$0rs \$0rr -1 -800000 -1 -1.67117e+07
+-1 -1 250;
+#X obj 144 158 mtl/buttonColor \$0bs \$0br -1 -1 -1.677e+07 -1 -1 -1
+250;
+#X connect 4 0 20 0;
+#X connect 5 0 19 0;
+#X connect 19 0 6 0;
+#X connect 20 0 3 0;

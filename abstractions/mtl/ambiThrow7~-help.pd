@@ -1,7 +1,5 @@
-#N canvas 443 185 343 176 10;
-#X text 31 44 See;
-#X obj 60 45 throw~;
-#X text 30 2 Description: Throws 7 signals.;
-#X text 33 17 tags: ambisonic;
-#X obj 73 101 mtl/ambiThrow7~ bar;
-#X obj 75 129 mtl/ambiCatch7~ bar;
+#N canvas 448 209 334 154 10;
+#X text 29 6 Description: Throws 7 signals.;
+#X text 29 21 tags: ambisonic;
+#X obj 36 64 mtl/ambiThrow7~ bar;
+#X obj 38 92 mtl/ambiCatch7~ bar;

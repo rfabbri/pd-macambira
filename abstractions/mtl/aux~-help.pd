@@ -1,4 +1,4 @@
-#N canvas 195 112 814 528 10;
+#N canvas 200 136 814 528 10;
 #X text 67 26 Description: Receives an aux stereo signal routed by
 mtl/channel~;
 #X text 223 160 Argument: the aux number.;

@@ -1,4 +1,4 @@
-#N canvas 441 378 422 237 10;
+#N canvas 446 402 422 237 10;
 #X floatatom 160 103 5 0 0 0 - - -;
 #X obj 198 102 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
@@ -9,9 +9,9 @@
 #X text 277 58 Version: 2007-12-09;
 #X text 29 20 Description: Converts radians into degrees.;
 #X obj 198 126 hcs/pi;
-#X obj 160 153 radianToDegree;
 #X text 27 58 tags: conversion;
-#X connect 0 0 8 0;
+#X obj 160 153 mtl/radianToDegree;
+#X connect 0 0 9 0;
 #X connect 1 0 7 0;
-#X connect 7 0 8 0;
-#X connect 8 0 2 0;
+#X connect 7 0 9 0;
+#X connect 9 0 2 0;
