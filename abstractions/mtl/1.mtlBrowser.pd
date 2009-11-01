@@ -1,36 +1,36 @@
-#N canvas 710 179 403 172 10;
+#N canvas 711 211 403 172 10;
 #X obj 185 17 vsl 15 115 0 175 0 0 \$0_slider_s0 \$0_slider_r0 empty
-0 -8 0 8 -1 -228856 -228856 7800 0;
-#X obj 3 45 hradio 15 1 0 12 \$0_hr_2_s0 \$0_hr_2_r0 fx~ 2 8 1 9 -1
--1 -258401 0;
-#X obj 3 60 hradio 15 1 0 12 \$0_hr_3_s0 \$0_hr_3_r0 gems 2 8 1 9 -1
--1 -262140 0;
-#X obj 3 75 hradio 15 1 0 12 \$0_hr_4_s0 \$0_hr_4_r0 info 2 8 1 9 -1
--1 -262140 0;
-#X obj 3 90 hradio 15 1 0 12 \$0_hr_5_s0 \$0_hr_5_r0 info~ 2 8 1 9
+0 -8 0 8 -1 -228856 -228856 11400 0;
+#X obj 3 45 hradio 15 1 0 12 \$0_hr_2_s0 \$0_hr_2_r0 ambisonic 2 8
+1 9 -1 -1 -258401 2;
+#X obj 3 60 hradio 15 1 0 12 \$0_hr_3_s0 \$0_hr_3_r0 behavior 2 8 1
+9 -1 -1 -262140 0;
+#X obj 3 75 hradio 15 1 0 12 \$0_hr_4_s0 \$0_hr_4_r0 control~ 2 8 1
+9 -1 -1 -262140 0;
+#X obj 3 90 hradio 15 1 0 12 \$0_hr_5_s0 \$0_hr_5_r0 conversion 2 8
+1 9 -1 -1 -262140 0;
+#X obj 3 105 hradio 15 1 0 12 \$0_hr_6_s0 \$0_hr_6_r0 counter 2 8 1
+9 -1 -1 -262140 0;
+#X obj 3 120 hradio 15 1 0 12 \$0_hr_7_s0 \$0_hr_7_r0 data 2 8 1 9
 -1 -1 -262140 0;
-#X obj 3 105 hradio 15 1 0 12 \$0_hr_6_s0 \$0_hr_6_r0 initialization
-2 8 1 9 -1 -1 -262140 0;
-#X obj 3 120 hradio 15 1 0 12 \$0_hr_7_s0 \$0_hr_7_r0 instrument~ 2
-8 1 9 -1 -1 -262140 0;
 #X obj 384 17 vsl 15 115 0 175 0 0 \$0_slider_s \$0_slider_r empty
-0 -8 0 8 -1 -228856 -1 11400 0;
-#X obj 202 15 hradio 15 1 0 12 \$0_hr_0_s \$0_hr_0_r mtl/delayPhasor~
-2 8 1 9 -1 -1 -258401 4;
-#X obj 202 30 hradio 15 1 0 12 \$0_hr_1_s \$0_hr_1_r cyclone/delay~
+0 -8 0 8 -1 -228856 -1 4200 0;
+#X obj 202 15 hradio 15 1 0 12 \$0_hr_0_s \$0_hr_0_r mtl/ambiSend7~
 2 8 1 9 -1 -1 -262140 0;
-#X obj 202 45 hradio 15 1 0 12 \$0_hr_2_s \$0_hr_2_r mtl/distoAp~ 2
-8 1 9 -1 -1 -262140 0;
-#X obj 202 60 hradio 15 1 0 12 \$0_hr_3_s \$0_hr_3_r mtl/distoCrusher~
+#X obj 202 30 hradio 15 1 0 12 \$0_hr_1_s \$0_hr_1_r mtl/ambiSfRead4~
 2 8 1 9 -1 -1 -262140 0;
-#X obj 202 75 hradio 15 1 0 12 \$0_hr_4_s \$0_hr_4_r mtl/distoFuzz~
+#X obj 202 45 hradio 15 1 0 12 \$0_hr_2_s \$0_hr_2_r mtl/ambiSfRead7~
 2 8 1 9 -1 -1 -262140 0;
-#X obj 202 90 hradio 15 1 0 12 \$0_hr_5_s \$0_hr_5_r mtl/distoLofi~
+#X obj 202 60 hradio 15 1 0 12 \$0_hr_3_s \$0_hr_3_r mtl/ambiSfWrite4~
 2 8 1 9 -1 -1 -262140 0;
-#X obj 202 105 hradio 15 1 0 12 \$0_hr_6_s \$0_hr_6_r mtl/distoNonmonotone~
+#X obj 202 75 hradio 15 1 0 12 \$0_hr_4_s \$0_hr_4_r mtl/ambiSfWrite7~
+2 8 1 9 -1 -1 -262140 5;
+#X obj 202 90 hradio 15 1 0 12 \$0_hr_5_s \$0_hr_5_r mtl/ambiTable4
+2 8 1 9 -1 -1 -262140 4;
+#X obj 202 105 hradio 15 1 0 12 \$0_hr_6_s \$0_hr_6_r mtl/ambiTablePlay3~
 2 8 1 9 -1 -1 -262140 0;
-#X obj 202 120 hradio 15 1 0 12 \$0_hr_7_s \$0_hr_7_r mtl/distoSign~
-2 8 1 9 -1 -1 -262140 0;
+#X obj 202 120 hradio 15 1 0 12 \$0_hr_7_s \$0_hr_7_r mtl/ambiTableRead3~
+2 8 1 9 -1 -1 -262140 5;
 #N canvas 301 43 723 396 ./browser 0;
 #N canvas 1069 45 887 645 coll 0;
 #X obj 23 -42 inlet;
@@ -672,10 +672,10 @@
 #X connect 25 2 13 0;
 #X connect 26 0 22 0;
 #X restore 277 -9 pd ./browser;
-#X obj 3 15 hradio 15 1 0 12 \$0_hr_0_s0 \$0_hr_0_r0 file 2 8 1 9 -1
+#X obj 3 15 hradio 15 1 0 12 \$0_hr_0_s0 \$0_hr_0_r0 2d 2 8 1 9 -1
 -1 -262140 0;
-#X obj 3 31 hradio 15 1 0 12 \$0_hr_1_s0 \$0_hr_1_r0 file~ 2 8 1 9
--1 -1 -262140 0;
+#X obj 3 31 hradio 15 1 0 12 \$0_hr_1_s0 \$0_hr_1_r0 3d 2 8 1 9 -1
+-1 -262140 0;
 #X obj 3 -9 cnv 15 198 22 empty empty TAG 1 12 1 12 -16645 -228856
 0;
 #X obj 202 -9 cnv 15 197 22 empty empty CLASS/ABSTRACTION 0 12 1 12

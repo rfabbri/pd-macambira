@@ -18,11 +18,14 @@
 #X text 56 61 tags: timing;
 #X obj 60 273 mtl/clkSlave;
 #X obj 474 68 mtl/clkMaster 120;
-#X text 148 166 Open(click) to read about quantization:;
-#X obj 152 187 mtl/clk-quantization-help;
+#X text 148 143 Open(click) to read about quantization:;
+#X obj 151 165 mtl/clk-quantization-help;
 #X text 214 221 steps per event (minimum of 1 \, maximum of 24 \, defaults
 to 4);
 #X floatatom 474 92 7 0 0 1 step - -;
+#X obj 574 96 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X msg 150 190 quantization \$1;
 #X connect 1 0 12 0;
 #X connect 2 0 12 0;
 #X connect 8 0 12 1;
@@ -33,4 +36,6 @@ to 4);
 #X connect 12 3 6 0;
 #X connect 12 4 7 0;
 #X connect 13 0 17 0;
-#X connect 15 0 12 0;
+#X connect 13 2 18 0;
+#X connect 15 0 19 0;
+#X connect 19 0 12 0;

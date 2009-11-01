@@ -20,39 +20,43 @@
 #X obj 331 139 cnv 15 200 20 empty empty /matju/ 2 12 0 8 -258401 -262144
 0;
 #X obj 331 162 nbx 5 14 -1e+37 1e+37 0 0 /matju/freq1 /matju/freq1_
-freq1 50 8 0 8 -262144 -1 -1 5 256;
+freq1 50 8 0 8 -262144 -1 -1 0 256;
 #X obj 331 180 nbx 5 14 -1e+37 1e+37 0 0 /matju/amp1 /matju/amp1_ amp1
-50 8 0 8 -262144 -1 -1 10 256;
+50 8 0 8 -262144 -1 -1 0 256;
 #X obj 331 198 nbx 5 14 -1e+37 1e+37 0 0 /matju/base1 /matju/base1_
-base1 50 8 0 8 -262144 -1 -1 10 256;
+base1 50 8 0 8 -262144 -1 -1 0 256;
 #X obj 331 216 nbx 5 14 -1e+37 1e+37 0 0 /matju/freq2 /matju/freq2_
-freq2 50 8 0 8 -262144 -1 -1 4 256;
+freq2 50 8 0 8 -262144 -1 -1 0 256;
 #X obj 331 234 nbx 5 14 -1e+37 1e+37 0 0 /matju/amp2 /matju/amp2_ amp2
-50 8 0 8 -262144 -1 -1 13 256;
+50 8 0 8 -262144 -1 -1 0 256;
 #X obj 331 252 nbx 5 14 -1e+37 1e+37 0 0 /matju/base2 /matju/base2_
-base2 50 8 0 8 -262144 -1 -1 14 256;
+base2 50 8 0 8 -262144 -1 -1 0 256;
 #X obj 331 270 nbx 5 14 -1e+37 1e+37 0 0 /matju/freqfeed /matju/freqfeed_
-freqfeed 50 8 0 8 -262144 -1 -1 9 256;
+freqfeed 50 8 0 8 -262144 -1 -1 0 256;
 #X obj 331 288 nbx 5 14 -1e+37 1e+37 0 0 /matju/ampfeed /matju/ampfeed_
-ampfeed 50 8 0 8 -262144 -1 -1 5 256;
+ampfeed 50 8 0 8 -262144 -1 -1 0 256;
 #X obj 331 306 nbx 5 14 -1e+37 1e+37 0 0 /matju/basefeed /matju/basefeed_
-basefeed 50 8 0 8 -262144 -1 -1 13 256;
+basefeed 50 8 0 8 -262144 -1 -1 0 256;
 #X obj 331 324 hsl 100 15 0 1 0 0 /matju/feedback /matju/feedback_
-feedback 105 7 0 8 -262144 -1 -1 5600 1;
+feedback 105 7 0 8 -262144 -1 -1 0 1;
 #X obj 331 342 hsl 100 15 0 1 0 0 /matju/wet /matju/wet_ wet 105 7
-0 8 -262144 -1 -1 3100 1;
+0 8 -262144 -1 -1 0 1;
 #X obj 32 30 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #N canvas 367 242 582 409 loop_sample 0;
 #X obj 47 313 outlet~;
 #X obj 43 9 inlet;
 #X obj 193 319 outlet~;
-#X msg 47 163 panel;
 #X obj 47 200 mtl/player~ 1;
-#X connect 1 0 3 0;
-#X connect 3 0 4 0;
-#X connect 4 0 0 0;
-#X connect 4 0 2 0;
+#X obj 56 104 openpanel;
+#X obj 56 70 b;
+#X msg 59 143 open \$1 \, bang;
+#X connect 1 0 5 0;
+#X connect 3 0 0 0;
+#X connect 3 0 2 0;
+#X connect 4 0 6 0;
+#X connect 5 0 4 0;
+#X connect 6 0 3 0;
 #X restore 32 66 pd loop_sample;
 #X connect 14 0 7 0;
 #X connect 14 1 7 1;

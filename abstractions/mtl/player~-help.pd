@@ -1,6 +1,6 @@
-#N canvas 570 214 919 638 10;
-#X floatatom 237 475 10 0 0 1 samples - -;
-#X obj 261 436 bng 15 250 50 0 empty empty stopped 0 -6 0 10 -262144
+#N canvas 37 26 972 651 10;
+#X floatatom 237 525 10 0 0 1 samples - -;
+#X obj 261 486 bng 15 250 50 0 empty empty stopped 0 -6 0 10 -262144
 -1 -1;
 #X msg 48 33 1;
 #X msg 92 73 2;
@@ -11,44 +11,51 @@
 #X text 77 29 Play at speed 1;
 #X text 102 48 Stop;
 #X text 120 74 Play at speed 2;
-#X text 207 526 Progress;
-#X text 590 158 Load a sound file;
+#X text 207 536 Progress;
+#X text 739 159 Load a sound file;
 #X msg 192 263 set table;
 #X msg 136 140 1 0.5;
 #X text 206 167 Play at speed 1 from 3/4 of the table;
 #X text 179 134 Play at speed 1 from halfway;
 #X msg 159 169 1 0.75;
-#X obj 571 183 openpanel;
-#X obj 571 158 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#X obj 720 184 openpanel;
+#X obj 720 159 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
-#X obj 18 538 mtl/out~;
-#X msg 570 343 set \$1 \, bang;
+#X obj 18 548 mtl/out~;
+#X msg 719 344 set \$1 \, bang;
 #X text 13 -23 tags: tables play~;
-#X obj 193 348 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 193 398 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 199 545 mtl/nbx~;
-#X text 212 344 Loop (stops looping when the end is reached);
-#X text 652 345 Sets the table and play it.;
+#X obj 199 555 mtl/nbx~;
+#X text 212 394 Loop (stops looping when the end is reached);
+#X text 801 346 Sets the table and play it.;
 #X text 259 259 You can change the table with a set message;
 #X msg 103 96 -0.5;
 #X text 137 95 Play backwards at speed 0.5;
 #X msg 172 201 -1 0.5;
 #X text 219 202 Play backwards from 1/2 of the table;
-#X obj 118 397 mtl/player~ 1;
-#X msg 200 292 panel;
+#X obj 118 447 mtl/player~ 1;
 #X text 132 118 ------------ offset ------------;
 #X text 26 -5 ------------ playback ------------;
 #X text 190 240 ------------ table/file management ------------;
 #X text 13 -38 Description: Plays tables and soundfiles.;
-#X obj 569 106 table \$0table;
-#X obj 571 209 list append \$0table;
-#X obj 570 263 soundfiler;
-#X msg 570 235 read -resize \$1 \$2;
-#X obj 570 291 b;
-#X obj 570 315 symbol \$0table;
-#X text 242 383 Arguments (in any order): The name of the an external
+#X obj 716 131 table \$0table;
+#X obj 720 210 list append \$0table;
+#X obj 719 264 soundfiler;
+#X msg 719 236 read -resize \$1 \$2;
+#X obj 719 292 b;
+#X obj 719 316 symbol \$0table;
+#X text 242 433 Arguments (in any order): The name of the an external
 table and the loop flag.;
-#X text 244 292 You can load a sound file in the internal table;
+#X text 260 346 You can load a sound file in the internal table;
+#X text 720 105 External table example;
+#X msg 200 287 set table 1000 44100;
+#X text 329 287 Set the table \, the length to be played and its samplerate
+;
+#X msg 207 347 open \$1;
+#X obj 209 326 openpanel;
+#X obj 210 308 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
 #X connect 2 0 31 0;
 #X connect 3 0 31 0;
 #X connect 4 0 31 0;
@@ -56,7 +63,7 @@ table and the loop flag.;
 #X connect 12 0 31 0;
 #X connect 13 0 31 0;
 #X connect 16 0 31 0;
-#X connect 17 0 38 0;
+#X connect 17 0 37 0;
 #X connect 18 0 17 0;
 #X connect 20 0 31 0;
 #X connect 22 0 31 1;
@@ -67,9 +74,12 @@ table and the loop flag.;
 #X connect 31 1 23 0;
 #X connect 31 2 0 0;
 #X connect 31 3 1 0;
-#X connect 32 0 31 0;
+#X connect 37 0 39 0;
 #X connect 38 0 40 0;
-#X connect 39 0 41 0;
-#X connect 40 0 39 0;
-#X connect 41 0 42 0;
-#X connect 42 0 20 0;
+#X connect 39 0 38 0;
+#X connect 40 0 41 0;
+#X connect 41 0 20 0;
+#X connect 45 0 31 0;
+#X connect 47 0 31 0;
+#X connect 48 0 47 0;
+#X connect 49 0 48 0;

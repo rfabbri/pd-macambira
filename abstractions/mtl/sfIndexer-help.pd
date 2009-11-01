@@ -1,21 +1,20 @@
-#N canvas 250 98 775 629 10;
-#X obj 14 134 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#N canvas 171 36 775 629 10;
+#X obj 14 116 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X text 12 12 description: Loads and stores soundfiles.;
 #X msg 14 503 set \$1 \, bang;
 #X obj 13 563 mtl/out~;
-#X msg 63 285 0;
-#X msg 96 285 1;
-#X msg 130 286 2;
-#X obj 61 253 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
--1;
-#X text 84 252 bang: outputs the last loaded soundfile;
-#X text 166 282 float: outputs the previously loaded soundfile at that
+#X msg 113 285 0;
+#X msg 146 285 1;
+#X msg 180 286 2;
+#X obj 111 253 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 134 254 bang: outputs the last loaded soundfile;
+#X text 216 282 float: outputs the previously loaded soundfile at that
 index;
 #X obj 90 401 cyclone/prepend set;
 #X obj 29 452 cyclone/prepend set;
 #X obj 203 326 cyclone/prepend set;
-#X text 214 398 Outlet 2: samplerate length channels;
 #X text 326 327 Outlet 3: index soundfile;
 #X text 152 448 Outlet 1: tables (one table per channel);
 #X text 13 28 tags: tables file~;
@@ -24,12 +23,11 @@ index;
 #X obj 603 120 bng 15 250 50 0 empty empty load 17 7 0 10 -262144 -1
 -1;
 #X obj 14 326 mtl/sfIndexer /id sfi-help;
-#X obj 14 156 openpanel;
-#X msg 14 181 add \$1;
-#X obj 41 209 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#X obj 14 138 openpanel;
+#X msg 14 163 add \$1;
+#X obj 38 191 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 41 228 openpanel;
-#X text 62 177 "add" soundfile: adds the indicated soundfile;
+#X obj 38 210 openpanel;
 #X text 12 82 sfIndexer will never reload the same soundfile twice.
 It will point to the previously filled tables instead.;
 #X text 13 48 sfIndexer can store and refer to an unlimited number
@@ -41,29 +39,38 @@ of loaded soundfiles.;
 #X obj 513 66 mtl/param-enabled-help;
 #X text 415 31 The list of loaded soundfiles can be saved and restored
 through the param system.;
-#X msg 90 420;
-#X msg 29 472;
-#X msg 203 346;
+#X msg 90 420 261415 44100 2;
+#X msg 29 472 /sfi-help//0/0 /sfi-help//0/1;
+#X msg 203 346 0 /home/tom/audio/1550-12_VEXST_Amen_breaks_fixed/24936_VEXST_Jungle_Break.wav
+;
 #X obj 528 144 tof/param file;
-#X text 67 205 "symbol": add the soundfile and output its data.;
-#X connect 0 0 20 0;
-#X connect 2 0 27 0;
-#X connect 4 0 19 0;
-#X connect 5 0 19 0;
-#X connect 6 0 19 0;
-#X connect 7 0 19 0;
-#X connect 10 0 32 0;
-#X connect 11 0 33 0;
-#X connect 12 0 34 0;
-#X connect 17 0 35 0;
-#X connect 18 0 35 1;
-#X connect 19 0 2 0;
-#X connect 19 0 11 0;
-#X connect 19 1 10 0;
-#X connect 19 2 12 0;
-#X connect 20 0 21 0;
-#X connect 21 0 19 0;
-#X connect 22 0 23 0;
-#X connect 23 0 19 0;
-#X connect 27 0 3 0;
-#X connect 27 0 3 1;
+#X text 64 187 "symbol": add the soundfile and output its data.;
+#X msg 114 225 panel;
+#X text 214 398 Outlet 2: length samplerate channels;
+#X text 62 159 "add" soundfile: adds the indicated soundfile without
+outputing its data.;
+#X text 155 221 Open internal openpanel.;
+#X msg 104 507 1;
+#X connect 0 0 19 0;
+#X connect 2 0 25 0;
+#X connect 4 0 18 0;
+#X connect 5 0 18 0;
+#X connect 6 0 18 0;
+#X connect 7 0 18 0;
+#X connect 10 0 30 0;
+#X connect 11 0 31 0;
+#X connect 12 0 32 0;
+#X connect 16 0 33 0;
+#X connect 17 0 33 1;
+#X connect 18 0 2 0;
+#X connect 18 0 11 0;
+#X connect 18 1 10 0;
+#X connect 18 2 12 0;
+#X connect 19 0 20 0;
+#X connect 20 0 18 0;
+#X connect 21 0 22 0;
+#X connect 22 0 18 0;
+#X connect 25 0 3 0;
+#X connect 25 0 3 1;
+#X connect 35 0 18 0;
+#X connect 39 0 25 1;

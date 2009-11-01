@@ -73,7 +73,6 @@ iemlib/init initialization
 iemlib/modulo_counter counter
 iemlib/mp3play~ play~
 iemlib/soundfile_info file~ info~
-iemlib/unsig~ info~ conversion
 line~ control~
 list-abs/list-abs lists
 list-abs/list-accum lists
@@ -122,6 +121,7 @@ send routing
 sigpack/vowel~ fx~
 smlib/threshold routing
 tof/argument initialization patch
+tof/arguments initialization patch
 tof/breakpoints~ ui control~
 tof/breakpoints ui timing
 tof/common~ mix~
@@ -129,7 +129,7 @@ tof/crossfade~ mix~
 tof/folderpanel file
 tof/getdollarzero patch
 tof/increment counter
-tof/iterate routing
+tof/iterate looping
 tof/listUnfold lists
 tof/onlyone initialization symbols
 tof/openHelp tools patch
@@ -147,10 +147,17 @@ zexy/msgfile file data
 zexy/packel lists
 zexy/prime math
 zexy/relay routing
-zexy/repeat routing
+zexy/repeat looping
 zexy/sort lists
 zexy/sum lists
 zexy/symbol2list conversion symbols lists
 zexy/tabdump tables
 zexy/tabset tables
 zexy/uniqsym symbols
+cyclone/capture~ info~ data
+cyclone/Snapshot~ info~ conversion
+cyclone/pong~ control~
+cyclone/mtr sequencing
+until looping
+qlist sequencing
+cyclone/trapezoid~ control~

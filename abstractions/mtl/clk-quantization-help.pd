@@ -1,5 +1,4 @@
-#N canvas 90 70 773 540 10;
-#X obj 52 509 outlet;
+#N canvas 90 70 701 554 10;
 #X text 166 155 That means that the abstraction can start playing on
 each beat (every 24 steps).;
 #X text 237 234 If you set seq.timing.slave's events/beat to 4 \, the
@@ -20,14 +19,17 @@ event (does not restart the pattern).;
 ;
 #X text 44 47 There are four methods of synchronizing a clkSlave to
 its clkMaster:;
-#X msg 50 113 quantization beat;
-#X msg 107 207 quantization event;
-#X msg 146 311 quantization loop;
-#X msg 150 403 quantization match;
-#X msg 165 464 quantization none;
 #X text 284 379 -- default --;
-#X connect 10 0 0 0;
-#X connect 11 0 0 0;
-#X connect 12 0 0 0;
-#X connect 13 0 0 0;
-#X connect 14 0 0 0;
+#X msg 165 464 none;
+#X msg 150 403 match;
+#X msg 146 311 loop;
+#X msg 107 207 event;
+#X msg 50 113 beat;
+#X obj 51 498 symbol;
+#X obj 51 523 outlet;
+#X connect 10 0 15 0;
+#X connect 11 0 15 0;
+#X connect 12 0 15 0;
+#X connect 13 0 15 0;
+#X connect 14 0 15 0;
+#X connect 15 0 16 0;
