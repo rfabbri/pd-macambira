@@ -1,4 +1,4 @@
-#N canvas 1105 122 866 496 10;
+#N canvas 569 146 866 496 10;
 #X obj 69 99 bng 15 250 50 0 empty empty empty 0 -6 0 10 -262144 -1
 -1;
 #X msg 161 257 pattern \$1;
@@ -20,7 +20,6 @@ of patterns of any length.;
 #X obj 407 119 cnv 15 400 80 empty empty empty 20 12 0 14 -232576 -66577
 0;
 #X text 569 121 PARAM ENABLED;
-#X obj 545 178 mtl/param-enabled-help;
 #X obj 406 16 cnv 15 320 20 empty empty empty 20 12 0 14 -261682 -66577
 0;
 #X text 413 143 All patterns can be saved and restored through the
@@ -40,20 +39,21 @@ param state saving system.;
 #X obj 69 351 mtl/tracker4 /id tr4;
 #X text 329 309 Print debuging messages.;
 #X msg 103 198 quantization \$1;
-#X connect 0 0 28 0;
-#X connect 1 0 28 0;
+#X obj 480 178 ../doc/5.reference/tof/param-help;
+#X connect 0 0 27 0;
+#X connect 1 0 27 0;
 #X connect 2 0 1 0;
 #X connect 3 0 9 0;
-#X connect 4 0 28 0;
-#X connect 5 0 28 0;
+#X connect 4 0 27 0;
+#X connect 5 0 27 0;
 #X connect 9 2 6 0;
-#X connect 11 0 25 0;
-#X connect 12 0 25 1;
-#X connect 18 0 30 0;
+#X connect 11 0 24 0;
+#X connect 12 0 24 1;
+#X connect 17 0 29 0;
+#X connect 25 0 26 0;
 #X connect 26 0 27 0;
-#X connect 27 0 28 0;
-#X connect 28 0 23 0;
-#X connect 28 1 24 0;
-#X connect 28 2 21 0;
-#X connect 28 3 22 0;
-#X connect 30 0 28 0;
+#X connect 27 0 22 0;
+#X connect 27 1 23 0;
+#X connect 27 2 20 0;
+#X connect 27 3 21 0;
+#X connect 29 0 27 0;

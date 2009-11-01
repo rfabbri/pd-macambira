@@ -110,6 +110,7 @@ mtl/eq~ mix~
 mtl/every sequencing
 mtl/fibonacci math
 mtl/fileBrowser ui file
+mtl/filterPeakSig~ fx~
 mtl/fit musical
 mtl/form musical behavior
 mtl/fpsToMs conversion

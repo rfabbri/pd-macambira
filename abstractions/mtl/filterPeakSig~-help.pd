@@ -1,4 +1,4 @@
-#N canvas 554 220 617 442 10;
+#N canvas 559 244 617 442 10;
 #X text 423 2 Version: 2007-09-15;
 #X text 423 17 Author: Roman Haefeli;
 #X text 26 3 Description: Peakfilter with signal frequency and Q control
@@ -55,14 +55,15 @@ nice sounds;
 #X obj 350 274 hsl 100 15 0 1 0 0 /fps/wet /fps/wet_ wet 105 7 0 8
 -262144 -1 -1 0 1;
 #X obj 350 292 hsl 100 15 1 1000 0 0 /fps/frequency /fps/frequency_
-frequency 105 7 0 8 -262144 -1 -1 0 1;
+frequency 105 7 0 8 -262144 -1 -1 10 1;
 #X obj 350 310 hsl 100 15 0 100 0 0 /fps/q /fps/q_ q 105 7 0 8 -262144
 -1 -1 0 1;
 #X text 201 207 <-Click on the propeties menu to display params;
 #X obj 349 161 cnv 15 200 40 empty empty empty 20 12 0 14 -232576 -66577
 0;
 #X text 409 162 PARAM ENABLED;
-#X obj 382 180 mtl/param-enabled-help;
+#X text 24 18 tags: fx~;
+#X obj 348 184 ../doc/5.reference/tof/param-help;
 #X connect 7 0 8 0;
 #X connect 8 0 14 0;
 #X connect 8 1 10 0;

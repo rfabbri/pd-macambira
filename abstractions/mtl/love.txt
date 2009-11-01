@@ -10,6 +10,7 @@ cyclone/active patch
 cyclone/Append lists symbols routing
 cyclone/Borax midi
 cyclone/Bucket lists routing
+cyclone/capture~ info~ data
 cyclone/capture info data
 cyclone/Clip lists
 cyclone/coll data file
@@ -25,19 +26,23 @@ cyclone/midiformat midi
 cyclone/midiparse midi
 cyclone/mousefilter ui
 cyclone/MouseState ui
+cyclone/mtr sequencing
 cyclone/onebang initialization routing
 cyclone/overdrive~ fx~
+cyclone/pong~ control~
 cyclone/prepend lists symbols routing
 cyclone/prob behavior
 cyclone/record~ file~ record~
 cyclone/Scope~ info~
 cyclone/seq midi
+cyclone/Snapshot~ info~ conversion
 cyclone/sprintf symbols
 cyclone/substitute symbols
 cyclone/sustain midi
 cyclone/thresh lists
 cyclone/TogEdge routing
 cyclone/tosymbol symbols conversion
+cyclone/trapezoid~ control~
 cyclone/urn random
 cyclone/zl lists
 ekext/cup counter
@@ -116,6 +121,7 @@ netsend network
 pdogg/oggread~ file~ play~
 pdogg/oggwrite~ file~ record~
 pdvjtools/colorgrid ui
+qlist sequencing
 receive routing
 send routing
 sigpack/vowel~ fx~
@@ -139,6 +145,7 @@ tof/phasorshot~ control~
 tof/streamMinMax math
 unauthorized/grid ui
 unauthorized/wahwah~ fx~
+until looping
 writesf~ file~ record~
 zexy/list2symbol conversion symbols lists
 zexy/makesymbol symbols
@@ -154,10 +161,3 @@ zexy/symbol2list conversion symbols lists
 zexy/tabdump tables
 zexy/tabset tables
 zexy/uniqsym symbols
-cyclone/capture~ info~ data
-cyclone/Snapshot~ info~ conversion
-cyclone/pong~ control~
-cyclone/mtr sequencing
-until looping
-qlist sequencing
-cyclone/trapezoid~ control~

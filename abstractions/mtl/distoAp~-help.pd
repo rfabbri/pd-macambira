@@ -1,4 +1,4 @@
-#N canvas 326 235 597 403 10;
+#N canvas 331 259 597 403 10;
 #X text 10 50 See: http://www.acoustics.hut.fi/~jpekonen/Papers/dafx08/
 ;
 #X text 11 5 Description: "Coefficient Modulated Allpass Filter as
@@ -14,18 +14,17 @@ Distortion Effect" as in the DAFx 2008 paper by Jussi Pekonen;
 #X obj 16 187 mtl/distoAp~ /id disAp;
 #X obj 24 323 tof/param route;
 #X text 166 185 <-Click on the propeties menu to display params;
-#X obj 289 98 cnv 15 200 40 empty empty empty 20 12 0 14 -232576 -66577
+#X obj 338 111 cnv 15 200 40 empty empty empty 20 12 0 14 -232576 -66577
 0;
-#X text 349 99 PARAM ENABLED;
-#X obj 322 117 mtl/param-enabled-help;
+#X text 398 112 PARAM ENABLED;
 #X obj 343 268 cnv 15 200 20 empty empty /disAp/ 2 12 0 8 -258401 -262144
 0;
 #X obj 343 291 hsl 100 15 0 127 0 0 /disAp/lop /disAp/lop_ lop 105
-7 0 8 -262144 -1 -1 1800 1;
+7 0 8 -262144 -1 -1 0 1;
 #X obj 343 309 hsl 100 15 0 500 0 0 /disAp/drive /disAp/drive_ drive
-105 7 0 8 -262144 -1 -1 4600 1;
+105 7 0 8 -262144 -1 -1 0 1;
 #X obj 343 327 hsl 100 15 0 1 0 0 /disAp/wet /disAp/wet_ wet 105 7
-0 8 -262144 -1 -1 1900 1;
+0 8 -262144 -1 -1 0 1;
 #X obj 19 117 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #N canvas 124 168 582 409 loop_sample 0;
@@ -43,12 +42,13 @@ Distortion Effect" as in the DAFx 2008 paper by Jussi Pekonen;
 #X connect 6 0 0 0;
 #X connect 6 0 2 0;
 #X restore 19 153 pd loop_sample;
+#X obj 337 135 ../doc/5.reference/tof/param-help;
 #X connect 6 0 11 0;
 #X connect 7 0 10 2;
 #X connect 8 0 7 0;
 #X connect 9 0 11 0;
 #X connect 10 0 2 0;
 #X connect 10 1 2 1;
-#X connect 20 0 21 0;
-#X connect 21 0 10 0;
-#X connect 21 1 10 1;
+#X connect 19 0 20 0;
+#X connect 20 0 10 0;
+#X connect 20 1 10 1;

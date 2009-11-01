@@ -1,4 +1,4 @@
-#N canvas 365 245 587 391 10;
+#N canvas 370 269 587 391 10;
 #X obj 45 102 *~ 0.5;
 #X obj 126 101 *~ 0.5;
 #X text 14 29 Author: netpd;
@@ -17,15 +17,15 @@
 #X obj 354 10 cnv 15 200 40 empty empty empty 20 12 0 14 -232576 -66577
 0;
 #X text 414 11 PARAM ENABLED;
-#X obj 387 29 mtl/param-enabled-help;
 #X obj 355 56 cnv 15 200 20 empty empty /lofi/ 2 12 0 8 -258401 -262144
 0;
 #X obj 355 79 hsl 100 15 0 1 0 0 /lofi/wet /lofi/wet_ wet 105 7 0 8
 -262144 -1 -1 0 1;
 #X obj 355 97 hsl 100 15 0 1 0 0 /lofi/freq /lofi/freq_ freq 105 7
-0 8 -262144 -1 -1 0 1;
+0 8 -262144 -1 -1 4950 1;
 #X obj 355 115 hsl 100 15 0 1 0 0 /lofi/bits /lofi/bits_ bits 105 7
-0 8 -262144 -1 -1 0 1;
+0 8 -262144 -1 -1 3960 1;
+#X obj 353 33 ../doc/5.reference/tof/param-help;
 #X connect 0 0 6 0;
 #X connect 0 0 10 0;
 #X connect 1 0 10 1;

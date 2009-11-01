@@ -1,4 +1,4 @@
-#N canvas 303 331 476 249 10;
+#N canvas 308 355 476 249 10;
 #X obj 9 157 mtl/out~;
 #X text 5 15 tags: fx~;
 #X obj 8 61 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
@@ -31,8 +31,8 @@ transpose 50 8 0 8 -262144 -1 -1 0 256;
 #X obj 189 75 cnv 15 200 40 empty empty empty 20 12 0 14 -232576 -66577
 0;
 #X text 249 76 PARAM ENABLED;
-#X obj 222 94 mtl/param-enabled-help;
 #X text 170 129 <-Click on the propeties menu to display params;
+#X obj 188 98 ../doc/5.reference/tof/param-help;
 #X connect 2 0 3 0;
 #X connect 3 0 4 0;
 #X connect 3 1 4 1;

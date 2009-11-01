@@ -1,4 +1,4 @@
-#N canvas 171 36 775 629 10;
+#N canvas 176 60 768 629 10;
 #X obj 14 116 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X text 12 12 description: Loads and stores soundfiles.;
@@ -36,7 +36,6 @@ of loaded soundfiles.;
 #X obj 409 7 cnv 15 350 80 empty empty empty 20 12 0 14 -232576 -66577
 0;
 #X text 545 9 PARAM ENABLED;
-#X obj 513 66 mtl/param-enabled-help;
 #X text 415 31 The list of loaded soundfiles can be saved and restored
 through the param system.;
 #X msg 90 420 261415 44100 2;
@@ -51,17 +50,18 @@ through the param system.;
 outputing its data.;
 #X text 155 221 Open internal openpanel.;
 #X msg 104 507 1;
+#X obj 480 65 ../doc/5.reference/tof/param-help;
 #X connect 0 0 19 0;
 #X connect 2 0 25 0;
 #X connect 4 0 18 0;
 #X connect 5 0 18 0;
 #X connect 6 0 18 0;
 #X connect 7 0 18 0;
-#X connect 10 0 30 0;
-#X connect 11 0 31 0;
-#X connect 12 0 32 0;
-#X connect 16 0 33 0;
-#X connect 17 0 33 1;
+#X connect 10 0 29 0;
+#X connect 11 0 30 0;
+#X connect 12 0 31 0;
+#X connect 16 0 32 0;
+#X connect 17 0 32 1;
 #X connect 18 0 2 0;
 #X connect 18 0 11 0;
 #X connect 18 1 10 0;
@@ -72,5 +72,5 @@ outputing its data.;
 #X connect 22 0 18 0;
 #X connect 25 0 3 0;
 #X connect 25 0 3 1;
-#X connect 35 0 18 0;
-#X connect 39 0 25 1;
+#X connect 34 0 18 0;
+#X connect 38 0 25 1;
