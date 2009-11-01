@@ -153,7 +153,7 @@ $(pd_src)/src/configure: $(pd_src)/src/configure.in
 #	cd $(pd_src)/src/ && ./configure $(PD_CONFIGURE_FLAGS)
 
 # this line has the "-" to support the current makefile.mingw hack
-pd: $(pd_src)/src/configure
+pd: $(pd_src)/src/configure set_version
 	-cd $(pd_src)/src && ./configure $(PD_CONFIGURE_FLAGS) && \
 		make OPT_CFLAGS="" depend  && \
 		make $(DEST_PATHS) $(PD_BUILD_FLAGS)
