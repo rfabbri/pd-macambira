@@ -488,6 +488,12 @@ static void wiimote_cwiid_error(t_wiimote *x, struct cwiid_error_mesg *mesg) {
 }
 
 static void wiimote_cwiid_message(t_wiimote *x, union cwiid_mesg*mesg) {
+  if(NULL==x){
+    return;
+  }
+  if(NULL==mesg) {
+    return;
+  }
    switch (mesg->type) {
    case CWIID_MESG_STATUS:
       wiimote_cwiid_battery(x, mesg->status_mesg.battery);
@@ -660,14 +666,12 @@ static void wiimote_queue(t_wiimote*x, union cwiid_mesg*mesg, double timestamp)
   }
 
   /* reset the clock */
-  sys_lock();
   clock_delay(g_clock, 0);
-  sys_unlock();
 }
 #else
 static void wiimote_dequeue(void*nada)
 {
-  /* get all the messages from the queue that are scheduled until now */
+  /* flush all the messages from the queue */
   t_wiimoteMsgList*wl=g_wiimoteMsgList;
   t_wiimoteMsgList*next=NULL;
 
@@ -770,6 +774,7 @@ static void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 
   pd_timestamp=wiimote_timestamp2logicaltime(x, timestamp);
 
+  sys_lock();
   for (i=0; i < mesg_count; i++) {
 #if 1
     wiimote_queue(x, mesg_array+i, pd_timestamp);
@@ -777,6 +782,7 @@ static void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
     wiimote_cwiid_message(x, mesg_array+i);
 #endif
    }
+  sys_unlock();
 }
 
 // ==============================================================
