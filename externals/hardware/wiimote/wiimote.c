@@ -104,7 +104,6 @@ static int addWiimoteObject(t_wiimote*x, int id) {
 
   return 1;
 }
-
 static t_wiimote*getWiimoteObject(const int id) {
   t_wiimoteList*wl=g_wiimoteList;
   if(NULL==wl)
@@ -964,6 +963,7 @@ static void wiimote_doConnect(t_wiimote *x, t_symbol *addr, t_symbol *dongaddr)
 
   if(NULL==x->wiimote) {
     pd_error(x, "wiimote: unable to connect");
+    wiimote_out_status(x, x->connected);
     return;
   }
 
