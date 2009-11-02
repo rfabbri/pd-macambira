@@ -283,7 +283,7 @@ static void bindsym(t_pd* x,t_symbol* o,t_symbol* s)
 static void *breakpoints_new(t_symbol *s,int argc,t_atom* argv)
 {
 	
-	post("BITHCE");
+	
 	
      t_breakpoints *x = (t_breakpoints *)pd_new(breakpoints_class);
      
