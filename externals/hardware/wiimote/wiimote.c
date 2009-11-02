@@ -788,11 +788,12 @@ static void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 
 static void wiimote_status(t_wiimote *x)
 {
-   if(x->connected) {
-      if (cwiid_request_status(x->wiimote)) {
-         pd_error(x, "error requesting status message");
-      }
-   }
+  if(x->connected) {
+    if (cwiid_request_status(x->wiimote)) {
+      pd_error(x, "error requesting status message");
+    }
+  }
+  wiimote_out_status(x, x->connected);
 }
 
 
