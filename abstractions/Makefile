@@ -353,10 +353,10 @@ mtl_install:
 	install -p $(abstractions_src)/$(MTL_NAME)/*.txt \
 		$(DESTDIR)$(objectsdir)/$(MTL_NAME)		
 	install -p $(abstractions_src)/$(MTL_NAME)/*.txt \
-		$(DESTDIR)$(helpdir)/$(MTL_NAME)	
-	install -d $(DESTDIR)$(helpdir)/$(MTL_NAME)/examples
+		$(DESTDIR)$(helpdir)/$(MTL_NAME)
+	install -d $(DESTDIR)$(examplesdir)/$(MTL_NAME)
 	install -p $(abstractions_src)/$(MTL_NAME)/examples/*.pd \
-		$(DESTDIR)$(helpdir)/$(MTL_NAME)/examples
+		$(DESTDIR)$(examplesdir)/$(MTL_NAME)
 
 
 #-------------------------------------------------------------------------------
