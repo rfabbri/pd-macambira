@@ -38,6 +38,7 @@ for pd_darwin in `find $PD_APP_CONTENTS -name '*.pd_darwin'`; do
 	fi
 done
 
+# check for .so plugins used by libquicktime and others
 for so in $PD_APP_LIB/*/*.so; do
 	LIBS=`otool -L $so | sed -n 's|.*/sw/lib/\(.*\.dylib\).*|\1|p'`
 	if [ "x$LIBS" != "x" ]; then
@@ -57,6 +58,27 @@ for so in $PD_APP_LIB/*/*.so; do
 	fi
 done
 
+for dylib in $PD_APP_LIB/*.dylib; do
+	LIBS=`otool -L $dylib | sed -n 's|.*/sw/lib/\(.*\.dylib\).*|\1|p'`
+	if [ "x$LIBS" != "x" ]; then
+		echo "`echo $dylib | sed 's|.*/\(.*\.dylib\)|\1|'` is using:"
+		for lib in $LIBS; do
+			echo -e "\t$lib"
+			new_lib=`echo $lib | sed 's|.*/\(.*\.dylib\)|\1|'`
+			if [ -e  $PD_APP_LIB/$new_lib ]; then
+				echo "$PD_APP_LIB/$new_lib already exists, skipping copy."
+			else
+				install -vp /sw/lib/$lib $PD_APP_LIB
+			fi
+			# @executable_path starts from Contents/Resources/bin/pd
+			install_name_tool -id @executable_path/../../$LIB_DIR/$new_lib $PD_APP_LIB/$new_lib
+			install_name_tool -change /sw/lib/$lib @executable_path/../../$LIB_DIR/$new_lib $dylib
+		done
+		echo " "
+	fi
+done
+
+# run it one more time to catch dylibs that depend on dylibs
 for dylib in $PD_APP_LIB/*.dylib; do
 	LIBS=`otool -L $dylib | sed -n 's|.*/sw/lib/\(.*\.dylib\).*|\1|p'`
 	if [ "x$LIBS" != "x" ]; then
