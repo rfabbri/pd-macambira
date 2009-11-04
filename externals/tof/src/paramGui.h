@@ -258,8 +258,7 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
 			 x->childcanvas->gl_screeny1 = y_position;
 			 x->childcanvas->gl_screenx2 = pos_x + 300 + x->childcanvas->gl_screenx1;
 			 x->childcanvas->gl_screeny2 = pos_y + 30 + x->childcanvas->gl_screeny1;
-			 //post("size: %i %i %i %i",x->childcanvas->gl_screenx1,x->childcanvas->gl_screeny1,\
-			 x->childcanvas->gl_screenx2,x->childcanvas->gl_screeny2);
+			 
 			 
 			 
 			 // Change the build flag
