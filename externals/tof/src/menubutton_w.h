@@ -10,6 +10,9 @@ static int menubutton_w_is_visible(t_menubutton* x) {
 }
 
 
+
+
+
 static void menubutton_w_disable(t_menubutton*x, t_float f){
  
   int i = (int)f;
@@ -151,7 +154,8 @@ static void menubutton_w_create_widget(t_menubutton *x)
       sys_vgui("destroy .x%x.c.s%x\n",x->x_glist,x);
       
       // Create menubutton and menu 
-      sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -justify left -relief flat -anchor w -indicatoron 0 -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -relief solid -tearoff 0 \n",
+      
+      sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -justify left -relief flat -anchor e -indicatoron 0 -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -relief solid -tearoff 0 \n",
 		x,x->x_glist,x,x,temp_name->s_name,x,x);
 		
        menubutton_w_apply_colors(x);
@@ -172,13 +176,13 @@ static void menubutton_w_draw_contour(t_menubutton *x, t_glist *glist, int draw)
 	 int onset = text_xpix(&x->x_obj, glist);
 	 if (draw==CREATE) {
     sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xR -outline \"%s\" \n",
-	     glist,
+	     glist_getcanvas(glist),
 	     onset, text_ypix(&x->x_obj, glist) ,
 	     onset + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height,
-	     x,x->co_color->s_name); //"green"
+	     x,x->co_color->s_name); 
   } else if (draw==UPDATE) {
     sys_vgui(".x%x.c coords %xR %d %d %d %d\n",
-	     glist, x, 
+	     glist_getcanvas(glist), x, 
 	     onset, text_ypix(&x->x_obj, glist) ,
 	     onset + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height );
   } else {
@@ -187,6 +191,12 @@ static void menubutton_w_draw_contour(t_menubutton *x, t_glist *glist, int draw)
 	
 }
 
+static void  menubutton_w_resize(t_menubutton* x) {
+	
+	sys_vgui(".x%x.c itemconfigure %xS -width %i -height %i \n", x->x_glist, x,x->x_width-1,x->x_height-1);
+	menubutton_w_draw_contour(x,x->x_glist,UPDATE);
+	canvas_fixlinesfor(x->x_glist,(t_text*) x);
+}
 
 static void menubutton_w_drawme(t_menubutton *x, t_glist *glist, int draw)
 {

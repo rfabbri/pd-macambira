@@ -158,6 +158,23 @@ static void menubutton_clear(t_menubutton* x) {
 	}
 }
 
+static void menubutton_size(t_menubutton* x,t_symbol *s, int argc, t_atom *argv) {
+	
+	if (argc>2) argc =2;
+	switch (argc) {
+		case 2: if ( (argv+1)->a_type == A_FLOAT) x->x_height = atom_getfloat(argv+1);
+		case 1: if ( argv->a_type == A_FLOAT) x->x_width = atom_getfloat(argv);
+		break;
+	}
+	
+	if ( x->x_width < 10) x->x_width = 10;
+	if ( x->x_height < 10) x->x_height = 10;
+	
+	if ( menubutton_w_is_visible(x) ) {
+		menubutton_w_resize(x);
+	}
+}
+
 
 
 static void menubutton_add(t_menubutton* x, t_symbol *s, int argc, t_atom *argv) {
@@ -403,6 +420,9 @@ static void *menubutton_new(t_symbol *s, int argc, t_atom *argv)
    DEBUG(post("send: %s receive: %s",x->send->s_name,x->receive->s_name);)
    
    
+   if ( x->x_width < 10) x->x_width = 10;
+   if ( x->x_height < 10) x->x_height = 10;
+   
    // Bind receiver
    if ( x->receive != x->s_empty ) pd_bind(&x->x_obj.ob_pd, x->receive);
 
@@ -455,7 +475,8 @@ void menubutton_setup(void) {
 	class_addmethod(menubutton_class, (t_method)menubutton_colors,
 								  gensym("colors"),A_GIMME,0);
 								 
-
+    class_addmethod(menubutton_class, (t_method)menubutton_size,
+								  gensym("size"),A_GIMME,0);
 
         class_addmethod(menubutton_class, (t_method)menubutton_set,
                                     gensym("set"),A_GIMME,0);
