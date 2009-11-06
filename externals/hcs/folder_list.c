@@ -61,9 +61,13 @@ typedef struct _folder_list {
 static void normalize_path(t_folder_list* x, char *normalized, const char *original)
 {
     t_symbol *cwd = canvas_getdir(x->x_canvas);
-    if(sys_isabsolutepath(original)) return;
+    if(sys_isabsolutepath(original)) {
+        strncpy(normalized, original, FILENAME_MAX);
+        return;
+    }
     strncpy(normalized, cwd->s_name, FILENAME_MAX);
-    if(normalized[(strlen(normalized)-1)] != '/') strncat(normalized, "/", 1);
+    if(normalized[(strlen(normalized)-1)] != '/') 
+        strncat(normalized, "/", 1);
     if(original[0] == '.') {
         if(original[1] == '/') {
             strncat(normalized, original + 2, 
@@ -75,7 +79,8 @@ static void normalize_path(t_folder_list* x, char *normalized, const char *origi
     } else if(original[0] != '/') {
         strncat(normalized, original, 
                 FILENAME_MAX - strlen(normalized));
-    }
+    } else 
+        strncpy(normalized, original, FILENAME_MAX);
 }
 
 static void folder_list_output(t_folder_list* x)
