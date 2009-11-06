@@ -1,0 +1,131 @@
+,-o----o----o----o-.
+|  GridFlow 0.9.6  |
+`-o--------------o-'
+  |
+.-o--------------------------------------------------------------
+| Hardware and Software you Probably Need
+
+Computer/Processor: GridFlow is mainly made on PC. This includes AMD K6/K7/K8 (Athlon/Opteron/etc), Intel P2/P3/P4 and other Pentiums, Intel CoreDuo, etc.; the absolute minimum is 386. However, it has also been built recently for Macintosh PowerPC (G3/G4/G5) recently.
+
+Operating System: GridFlow is mainly made on Ubuntu. We have also used Debian, SuSE, Mandrake, OSX. Microsoft Windows is not supported, but if you do want to try to add support for that, try CygWin and/or MinGW.
+
+Required Software:
+	Ruby 1.8 or 1.9
+	PureData 0.40 or later, or DesireData
+	GNU C++ Compiler (g++) version 3.x or 4.x
+	GNU Make
+	SVN
+	Developer CD (XCODE) (if using OSX)
+	FINK (if using OSX)
+
+Multimedia Components (optional):
+	libSDL (Simple Directmedia Layer)
+	libjpeg
+	libpng
+	libmpeg3 (.mpg reader, HeroineWarrior's)
+	libquicktime (.mov reader/writer, Burkhard Plaum's or HeroineWarrior's) 
+	libmpeg (.mpg reader, Greg Ward's, old)
+	Apple QuickTime (.mov reader/writer and camera interface)
+	Ascii Art Library (aalib)
+	PCI video digitizer card  (and Video4linux 1 driver)
+	USB camera (and Video4linux 1 driver)
+	FFTW3
+	OpenCV
+	NetPBM
+	OpenGL
+	Apple X11 (for 10.3: http://www.apple.com/support/downloads/x11formacosx.html
+		   for 10.4: http://www.apple.com/support/downloads/x11update2006113.html )
+
+.-o--------------------------------------------------------------
+| Downloading from SVN
+
+The SVN has the absolute latest version of GridFlow, but it's not guaranteed to be working, whereas 
+the actual releases are more tested.
+However you may have various reasons to use the SVN edition, so here's how:
+Make sure you have the svn program installed.
+
+cd pd/extra
+svn checkout http://gridflow.ca/svn/trunk
+mv trunk gridflow
+And the subsequent times, you only do this:
+cd pd/extra/gridflow
+svn update
+
+.-o--------------------------------------------------------------
+| Installation instructions (incl. compilation)
+	 Install Ruby.
+	Download GridFlow from the website and uncompress it, or get it from the SVN server.
+	Run ./configure from the gridflow directory. Make sure it detects all the components
+	you want to use with GridFlow. In MacOS you would normally use FINK to install those extra components: ruby libjpeg libjpeg-shlibs libpng-shlibs libpng3 libpng3-shlibs libmpeg libmpeg-shlibs 
+
+	In Debian (lenny) or Ubuntu (8.04), do
+		apt-get install libjpeg62-dev libpng12-dev libmpeg3-dev libquicktime-dev fftw3-dev \
+				libaa1-dev libsdl1.2-dev libnetpbm10-dev libx11-dev libxt-dev g++ \
+				ruby nasm libglib1.2-dev
+
+	At least with Ubuntu you can add those, but haven't tried with Debian yet:
+		apt-get install libcv-dev libdc1394-13-dev
+
+
+	Note: you may have to set CPLUS_INCLUDE_PATH and C_INCLUDE_PATH
+to indicate where to find *.h files, and you 
+may have to set both LIBRARY_PATH and LD_LIBRARY_PATH to indicate where to find 
+*.so or *.a or *.dylib or *.bundle or *.dll or *.lib files.
+	Note: you can do ./configure --help to get a list of supported 
+options. You can use them to ignore the presence of troublesome libraries 
+and select debugging level. With --use-compiler you should use a version of g++, not 
+directly a version of gcc, else you get undefined symbol problems. Some versions of gcc/g++ 
+are troublesome.
+	Run make to produce the executables gridflow.so and gridflow.pd_linux or similar 
+	Loading GridFlow:
+		PureData : With a text editor, modify or create ~/.pdrc and write -lib gridflow.  
+		DesireData : In "Server Preferences", add gridflow to the list of libraries. 
+Note that on MacOS the dot-files are invisible in the Finder but you do cd ~/Desktop; ln -s ../.pdrc "PureData Configuration" to make an alias on the Desktop. 
+Note also that on Windows the dot-files are even more trouble.
+
+.-o--------------------------------------------------------------
+| Other Tips
+
+	you just did a SVN update and now the program does not compile, or 
+crashes, or changes didn't go through. 
+		When some kinds of changes have happened, you may have to rerun the configure 
+	program before redoing make. If you had previously reconfigured with specific options, 
+	don't forget to use them again in this case.
+		Maybe matju forgot to upload part of an important change. Tell him. 
+	PureData Crashing: 
+		run start Pd from within the debugger using gdb $(which pd) then run then cause the crash.
+		In GDB, after a crash, you can use the where to find out what Pd was doing at the moment 
+			of the crash. If instead Pd is frozen, you can force it to crash using Ctrl+C in the terminal.
+		To quit GDB use the quit command.
+
+.-o--------------------------------------------------------------
+| Directory layout
+
+  ./abstractions ..... Pd object classes written in Pd
+  ./src ............. object classes written in C++
+  ./bin .............. programs startable as applications
+  ./bundled .......... files from other packages, bundled here for convenience
+  ./examples ......... more complex Pd programs showing off more practical uses.
+  ./doc .............. complete documentation in HTML, with XML source
+  ./doc/flow_classes . help files (.pd)
+  ./doc/tutorials .... tutorials
+  ./examples ......... more complex Pd programs showing off more practical uses.
+                       (this will replace ./pd_examples in the future).
+  ./images ........... sample images used by ./examples, ./doc
+  ./tests ............ will contain Pd programs that test GridFlow itself.
+                       (see also: the PureUnity project)
+
+.-o--------------------------------------------------------------
+| License Info
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  This program is free software; you can redistribute it and/or
+  Modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation; either version 2
+  of the License, or (at your option) any later version.
+
+  See file COPYING for further informations on licensing terms.

@@ -1,0 +1,71 @@
+#N canvas 648 0 632 642 10;
+#X obj 0 0 doc_h;
+#X obj 27 52 fps;
+#X obj 3 94 doc_c 1;
+#X obj 14 124 doc_cc 0;
+#X obj 97 124 doc_m c0 symbol;
+#X obj 3 178 doc_i 1;
+#X obj 14 208 doc_ii 0;
+#X obj 97 208 doc_m i0 bang;
+#X obj 97 291 doc_m i0 detailed;
+#X obj 97 335 doc_m i0 mode;
+#X obj 97 467 doc_m i0 period;
+#X obj 3 521 doc_o 1;
+#X obj 14 551 doc_oo 0;
+#X obj 97 551 doc_m o0 float;
+#X obj 97 573 doc_m o0 list;
+#X text 232 423 "logical" uses [timer];
+#X text 232 445 "process" uses [cputime];
+#X text 232 401 "cpu" uses [tsctime];
+#X text 232 335 "real" uses [realtime];
+#X text 232 357 "user" uses [usertime];
+#X text 232 379 "system" uses [systemtime];
+#X obj 3 666 doc_also;
+#X obj 103 666 realtime;
+#X obj 163 666 usertime;
+#X obj 223 666 systemtime;
+#X obj 295 666 tsctime;
+#X obj 349 666 timer;
+#X obj 391 666 cputime;
+#X text 232 208 Times at which bangs are received are stored until
+a large enough sample of those is accumulated. Large enough is defined
+to be whenever the timespan exceeds one second. Then a report is made
+through the outlet.;
+#X text 232 489 exceptionally \, anything else gets ignored.;
+#X text 232 551 (terse) this is the messages-per-second rating.;
+#X text 232 573 (detailed) this is: messages-per-second \, followed
+by five values of milliseconds-per-message: minimum \, median \, maximum
+\, average \, standard deviation.;
+#X text 232 621 (the average happens to be simply 1000 divided by the
+messages-per-second \, but it is convenient to have it anyway);
+#X obj 0 686 doc_f;
+#X obj 97 489 doc_m i0 <any>;
+#X text 232 146 "detailed": see outlet 0 list;
+#X text 232 124 "terse": see outlet 0 float;
+#X text 232 313 1: same as arg 0 detailed;
+#X text 232 291 0: same as arg 0 terse;
+#X text 232 467 minimum time between updates;
+#X text 185 52 measures frames per second... or bangs per second in
+general;
+#X connect 4 1 36 0;
+#X connect 4 1 35 0;
+#X connect 7 1 28 0;
+#X connect 8 1 37 0;
+#X connect 8 1 38 0;
+#X connect 9 1 18 0;
+#X connect 9 1 19 0;
+#X connect 9 1 20 0;
+#X connect 9 1 17 0;
+#X connect 9 1 15 0;
+#X connect 9 1 16 0;
+#X connect 10 1 39 0;
+#X connect 13 1 30 0;
+#X connect 14 1 32 0;
+#X connect 14 1 31 0;
+#X connect 21 1 22 0;
+#X connect 21 1 23 0;
+#X connect 21 1 24 0;
+#X connect 21 1 25 0;
+#X connect 21 1 26 0;
+#X connect 21 1 27 0;
+#X connect 34 1 29 0;

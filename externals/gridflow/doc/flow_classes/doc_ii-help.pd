@@ -1,0 +1,15 @@
+#N canvas 335 118 632 260 10;
+#X obj 0 0 doc_h;
+#X obj 3 91 doc_c;
+#X obj 3 131 doc_i;
+#X obj 3 171 doc_o;
+#X obj 0 231 doc_f;
+#X text 132 41 auto-positioning documentation subheader for a specific
+inlet.;
+#X text 103 211 doc_i;
+#X text 145 211 doc_cc;
+#X text 193 211 doc_oo;
+#X obj 3 211 doc_also;
+#X connect 9 1 6 0;
+#X connect 9 1 7 0;
+#X connect 9 1 8 0;

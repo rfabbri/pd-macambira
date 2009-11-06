@@ -1,0 +1,18 @@
+#N canvas 674 0 632 267 10;
+#X obj 0 0 doc_h;
+#X obj 3 70 doc_i 1;
+#X obj 14 100 doc_ii 0;
+#X obj 97 100 doc_m i0 grid;
+#X text 232 100 1-channel is taken as Y 8 (greyscale);
+#X text 232 122 2-channel is taken as YA 8:8 (greyscale and transparency)
+;
+#X text 232 144 3-channel is taken as RGB 8:8:8;
+#X text 232 166 4-channel is taken as RGBA 8:8:8 (colour with transparency)
+;
+#X obj 3 30 doc_c;
+#X obj 3 198 doc_o;
+#X obj 0 238 doc_f;
+#X connect 3 1 4 0;
+#X connect 3 1 5 0;
+#X connect 3 1 6 0;
+#X connect 3 1 7 0;

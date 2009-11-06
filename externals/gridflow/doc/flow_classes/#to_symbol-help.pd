@@ -1,0 +1,52 @@
+#N canvas 648 0 632 642 10;
+#X obj 11 498 cnv 15 63 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 176 469 display;
+#X obj 174 557 display;
+#X symbolatom 353 559 12 0 0 0 - - -;
+#X msg 11 409 72 101 108 108 111 32 87 111 114 108 100 33;
+#X obj 11 428 #import (3 2 2);
+#X text 324 409 <-- create the grid here;
+#X obj 11 498 #to_symbol;
+#X obj 11 557 print converted_grid;
+#X obj 0 0 doc_h;
+#X obj 3 691 doc_o 1;
+#X obj 3 629 doc_i 1;
+#X obj 3 589 doc_c 0;
+#X text 11 102 note that a zero value will cause pd to truncate the
+symbol there. thus a symbol may have less bytes than the grid it was
+made from.;
+#X text 10 147 remember that a byte is not necessarily a codepoint
+\, a codepoint is not necessarily a character \, and all characters
+don't always have the same width. these distinctions don't matter for
+all encodings.;
+#X text 11 32 Produces a symbol from grid data in its input. The values
+are expected to be valid in the character encoding that you are using
+\, but no check will be performed for that \, and additionally \, no
+check will be made that the generated symbol only contains characters
+that can be put in a symbol.;
+#X obj 14 659 doc_ii 0;
+#X obj 14 721 doc_oo 0;
+#X obj 97 659 doc_m i0 grid;
+#X obj 97 721 doc_m o0 symbol;
+#X obj 0 753 doc_f;
+#X text 232 659 will be transformed into a symbol.;
+#X text 232 721 symbol made of grid elements as bytes.;
+#X text 12 211 in the future \, this might work at the level of codepoints
+instead. thus with today's default UTF-8 (compact unicode) encoding
+\, &eacute \; has to be written as 195 169 \, you would be able to
+write it as just 233 (as with iso-latin-1) and it would get converted
+to 195 169 automatically. however there is still another form of this
+character that is made as two codepoints \, 101 (e) and the "dead acute"
+character \, separately \, on systems that support it.;
+#X text 14 342 at this point \, though \, most branches of pd still
+can't handle utf-8 properly \, so there isn't much of a hurry in adding
+utf-8 support to [#to_symbol]...;
+#X connect 4 0 5 0;
+#X connect 5 0 1 0;
+#X connect 5 0 7 0;
+#X connect 7 0 2 0;
+#X connect 7 0 3 0;
+#X connect 7 0 8 0;
+#X connect 18 1 21 0;
+#X connect 19 1 22 0;

@@ -1,0 +1,49 @@
+#N canvas 675 0 632 550 10;
+#X text 153 55 transforms a dim[a... \, b] grid into a dim[a... \,
+b-1] grid. there is a projection plane perpendicular to the last axis
+and whose position is given by the creation argument. each vector's
+length is adjusted so that it lies onto that plane. then the last dimension
+of each vector is dropped;
+#X obj 30 127 #pack 3;
+#X floatatom 75 82 5 0 0 0 - - -;
+#X obj 77 100 max 1;
+#X floatatom 12 95 5 0 0 0 - - -;
+#X floatatom 52 57 5 0 0 0 - - -;
+#X obj 30 190 #print;
+#X obj 79 182 #print;
+#X obj 79 163 #perspective;
+#X obj 103 501 #redim;
+#X obj 151 501 #ravel;
+#X obj 0 0 doc_h;
+#X obj 3 501 doc_also;
+#X obj 3 217 doc_c 1;
+#X obj 3 279 doc_i 1;
+#X obj 3 441 doc_o 1;
+#X obj 14 471 doc_oo 0;
+#X obj 14 309 doc_ii 0;
+#X obj 14 247 doc_cc 0;
+#X obj 97 309 doc_m i0 grid;
+#X obj 97 471 doc_m o0 grid;
+#X text 232 309 transforms a Dim[A... \, B] grid into a Dim[A... \,
+B-1] grid. There is a projection plane perpendicular to the last axis
+and whose position is given by the "depth" parameter. Each vector's
+length is adjusted so that it lies onto that plane. Then the last dimension
+of each vector is dropped.;
+#X text 232 383 useful for converting from 3-D geometry to 2-D geometry.
+Also useful for converting homogeneous 3-D into regular 3-D \, as homogeneous
+3-D is really just regular 4-D...(!);
+#X obj 97 247 doc_m c0 float;
+#X text 232 247 depth;
+#X obj 0 521 doc_f;
+#X connect 1 0 6 0;
+#X connect 1 0 8 0;
+#X connect 2 0 3 0;
+#X connect 3 0 1 2;
+#X connect 4 0 1 0;
+#X connect 5 0 1 1;
+#X connect 8 0 7 0;
+#X connect 12 1 9 0;
+#X connect 12 1 10 0;
+#X connect 19 1 21 0;
+#X connect 19 1 22 0;
+#X connect 23 1 24 0;

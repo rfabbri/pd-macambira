@@ -1,0 +1,16 @@
+#N canvas 83 326 450 195 10;
+#X obj 24 35 inlet A;
+#X obj 89 102 inlet B;
+#X obj 24 136 outlet A;
+#X obj 84 136 outlet B;
+#X obj 24 102 #store;
+#X obj 24 54 t a a;
+#X obj 24 73 #finished;
+#X obj 72 54 args (my_grid a 0);
+#X connect 0 0 5 0;
+#X connect 1 0 4 1;
+#X connect 4 0 2 0;
+#X connect 5 0 6 0;
+#X connect 5 1 3 0;
+#X connect 6 0 4 0;
+#X connect 7 0 4 1;

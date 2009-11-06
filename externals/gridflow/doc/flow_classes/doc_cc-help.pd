@@ -1,0 +1,15 @@
+#N canvas 335 118 632 242 10;
+#X obj 0 0 doc_h;
+#X obj 3 73 doc_c;
+#X obj 3 113 doc_i;
+#X obj 3 153 doc_o;
+#X obj 0 213 doc_f;
+#X text 144 35 auto-positioning documentation subheader for a specific
+creation argument.;
+#X obj 3 193 doc_also;
+#X text 103 193 [doc_c];
+#X text 157 193 [doc_ii];
+#X text 217 193 [doc_oo];
+#X connect 6 1 7 0;
+#X connect 6 1 8 0;
+#X connect 6 1 9 0;

@@ -1,0 +1,24 @@
+#N canvas 674 0 632 415 10;
+#X obj 90 185 display;
+#X msg 319 61 0 1 2 3 5 8 13;
+#X floatatom 319 89 5 0 0 0 - - -;
+#X obj 89 58 #color;
+#X obj 0 0 doc_h;
+#X obj 3 211 doc_c 0;
+#X obj 3 251 doc_i 1;
+#X obj 3 326 doc_o 0;
+#X obj 14 281 doc_ii 0;
+#X obj 3 366 doc_also;
+#X obj 103 366 print;
+#X obj 145 366 #print;
+#X obj 0 386 doc_f;
+#X obj 97 281 doc_m i0 <any>;
+#X text 294 142 GUI object equivalent to [print] and [#print].;
+#X text 232 281 Displays the received message in the box \, resizing
+the box so that the message fits exactly.;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 9 1 10 0;
+#X connect 9 1 11 0;
+#X connect 13 1 15 0;

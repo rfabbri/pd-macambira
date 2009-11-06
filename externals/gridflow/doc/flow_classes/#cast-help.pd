@@ -1,0 +1,67 @@
+#N canvas 646 0 632 564 10;
+#X obj 14 219 #print;
+#X obj 14 199 #cast float64;
+#X obj 269 218 #print;
+#X obj 126 218 #print;
+#X obj 269 198 #cast uint8;
+#X obj 126 198 #cast int32;
+#X floatatom 14 181 5 0 0 0 - - -;
+#X msg 126 177 9.8764 9 -32 0.3;
+#X obj 269 158 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 306 79 nbx 8 14 -1e+37 1e+37 0 1 empty empty empty 0 -6 0 10
+-262144 -1 -1 2.1416 256;
+#X obj 356 96 nbx 8 14 -1e+37 1e+37 0 1 empty empty empty 0 -6 0 10
+-262144 -1 -1 45 256;
+#X obj 269 177 #store;
+#X obj 306 133 #pack 3 float32;
+#X obj 14 161 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 126 157 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X text 12 26 Changes an entity of one data type into another. Returns
+a grid of the same dimensions containing all the same values after
+type conversion. While casting to a smaller type \, overflowing values
+will be truncated.;
+#X obj 406 113 nbx 8 14 -1e+37 1e+37 0 1 empty empty empty 0 -6 0 10
+-262144 -1 -1 45 256;
+#X text 232 358 Any grid;
+#X obj 14 420 doc_oo 0;
+#X obj 14 358 doc_ii 0;
+#X obj 14 283 doc_cc 0;
+#X text 232 420 Produces a grid of the same dimensions containing all
+the same values after type conversion.;
+#X text 232 455 conversion from float truncates fractional part (rounds
+towards zero);
+#X text 232 490 conversion to an int type may wrap (same as some #
+& or some # %);
+#X text 232 283 Number types are: uint8 \, int16 \, int32 \, int64
+\, float32 \, float64. see doc/numtype.pd for more info.;
+#X obj 306 154 #redim (2 2);
+#X obj 0 0 doc_h;
+#X obj 0 535 doc_f;
+#X obj 3 253 doc_c 1;
+#X obj 3 328 doc_i 1;
+#X obj 3 390 doc_o 1;
+#X obj 97 283 doc_m c0 symbol/numbertype;
+#X obj 97 358 doc_m i0 grid;
+#X obj 97 420 doc_m o0 grid;
+#X connect 1 0 0 0;
+#X connect 4 0 2 0;
+#X connect 5 0 3 0;
+#X connect 6 0 1 0;
+#X connect 7 0 5 0;
+#X connect 8 0 11 0;
+#X connect 9 0 12 0;
+#X connect 10 0 12 1;
+#X connect 11 0 4 0;
+#X connect 12 0 25 0;
+#X connect 13 0 6 0;
+#X connect 14 0 7 0;
+#X connect 16 0 12 2;
+#X connect 25 0 11 1;
+#X connect 31 1 24 0;
+#X connect 32 1 17 0;
+#X connect 33 1 21 0;
+#X connect 33 1 22 0;
+#X connect 33 1 23 0;

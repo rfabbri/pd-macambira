@@ -1,0 +1,56 @@
+#N canvas 0 0 1024 768 10;
+#X obj 0 0 cnv 15 1024 30 empty empty empty 20 12 0 14 20 -66577 0;
+#X text 10 0 op names;
+#X text 192 0 range;
+#X text 384 0 precision;
+#X text 608 0 description;
+#X obj 0 32 cnv 15 1024 62 empty empty empty 20 12 0 14 -249792 -66577 0;
+#X msg 10 32 op b  u8   uint8;
+#X text 192 32 0 to 255;
+#X text 384 32 1;
+#X text 608 32 
+	unsigned 8-bit integer. this is the usual size of numbers taken from files and cameras \,  and
+	written to files and to windows. (however #in converts to int32 unless otherwise specified.);
+#X obj 0 96 cnv 15 1024 62 empty empty empty 20 12 0 14 -233280 -66577 0;
+#X msg 10 96 op s i16   int16;
+#X text 192 96 -32768 to 32767;
+#X text 384 96 1;
+#X obj 0 160 cnv 15 1024 62 empty empty empty 20 12 0 14 -249792 -66577 0;
+#X msg 10 160 op i i32   int32;
+#X text 192 160 -(1<<31) to (1<<31)-1;
+#X text 384 160 1;
+#X text 608 160 
+	signed 32-bit integer. this is used by default throughout GridFlow.
+;
+#X obj 0 224 cnv 15 1024 62 empty empty empty 20 12 0 14 -233280 -66577 0;
+#X msg 10 224 op l i64   int64;
+#X text 192 224 -(1<<63) to (1<<63)-1;
+#X text 384 224 1;
+#X obj 0 288 cnv 15 1024 62 empty empty empty 20 12 0 14 -249792 -66577 0;
+#X msg 10 288 op f f32 float32;
+#X text 192 288 -(1<<128) to (1<<128);
+#X text 384 288 23 bits or 0.000012%;
+#X obj 0 352 cnv 15 1024 62 empty empty empty 20 12 0 14 -233280 -66577 0;
+#X msg 10 352 op d f64 float64;
+#X text 192 352 -(1<<2048) to (1<<2048);
+#X text 384 352 52 bits or 0.000000000000022%;
+#X obj 191 0 cnv 0 0 416 empty empty empty -1 12 0 14 0 -66577 0;
+#X obj 383 0 cnv 0 0 416 empty empty empty -1 12 0 14 0 -66577 0;
+#X obj 607 0 cnv 0 0 416 empty empty empty -1 12 0 14 0 -66577 0;
+#X text 10 416 High-performance computation requires precise and quite peculiar
+	definitions of numbers and their representation.;
+#X text 10 476 Inside most programs \,  numbers are written down as strings of 
+	bits. A bit is either zero or one. Just like the decimal system 
+	uses units \,  tens \,  hundreds \,  the binary system uses units \,  twos \,  
+	fours \,  eights \,  sixteens \,  and so on \,  doubling every time.;
+#X text 10 536 One notation \,  called integer allows for only integer values to be 
+	written (no fractions). when it is unsigned \,  no negative values may 
+	be written. when it is signed \,  one bit indicates whether the number 
+	is positive or negative. Integer storage is usually fixed-size \,  so you have 
+	bounds on the size of numbers \,  and if a result is too big it "wraps around" \,  truncating the biggest 
+	bits.;
+#X text 10 596 Another notation \,  called floating point (or float) stores numbers using 
+	a fixed number of significant digits \,  and a scale factor that allows for huge numbers 
+	and tiny fractions at once. Note that 1/3 has periodic digits \,  but even 0.1 has periodic digits \,  
+	in binary coding \;  so expect some slight roundings \;  the precision offered should be 
+	sufficient for most purposes. Make sure the errors of rounding don't accumulate \,  though.;

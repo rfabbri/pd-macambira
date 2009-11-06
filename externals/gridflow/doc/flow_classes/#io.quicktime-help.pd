@@ -1,0 +1,69 @@
+#N canvas 668 0 632 642 10;
+#X obj 0 0 doc_h;
+#X obj 3 218 doc_i 1;
+#X obj 14 248 doc_ii 0;
+#X text 190 43 Support for .mov files. This format supports frame-seek
+and frame-tell. Uses the HW-QuickTime library aka QuickTime4Linux (libquicktime.so).
+There is also a variant on the same library and that project is just
+called LibQuickTime. Some versions of those libraries may include support
+for different codecs \, and some also may support entirely different
+wrapper formats such as AVI. On Macintosh \, Apple QuickTime is used
+instead \, but several of the following messages may not be available.
+;
+#X obj 97 248 doc_m i0 codec;
+#X text 232 248 Allowed values are at least: raw \, jpeg \, png \,
+mjpa \, yuv2 \, yuv4. Some other values may allowed \, depending on
+the version of the library and which codec plugins are installed. Must
+be set before the first frame is written. only applies to [#out]. Choosing
+a codec is important because codecs influence greatly the speed of
+encoding \, the speed of decoding \, the size of the written file \,
+and its fidelity to the original content. Note that there exist other
+Apple-QuickTime codecs that are not supported by HW-QuickTime.;
+#X obj 97 584 doc_m i0 parameter;
+#X text 232 584 \$1=symbol \$2=int;
+#X text 232 606 Sets special codec-specific settings. For example:
+"parameter jpeg_quality 75";
+#X obj 97 479 doc_m i0 framerate;
+#X text 232 479 \$1=int;
+#X text 232 501 Sets the framerate of the file. This is not used by
+GridFlow when reading a file \, but other programs usually care.;
+#X obj 97 387 doc_m i0 colorspace;
+#X text 232 387 Allowed values are rgb \, rgba \, bgr \, bgra \, yuv
+\, yuva. Normally you don't need this.;
+#X obj 97 641 doc_m i0 size;
+#X text 232 641 \$1=height \$2=width;
+#X obj 3 721 doc_o 1;
+#X obj 3 901 doc_also;
+#X text 232 663 Forces a window size when writing. Usually this has
+to be used _after_ setting the framerate and codec and _before_ setting
+the codec-parameters. (Strange. Sorry.);
+#X text 232 422 \$1=height \$2=width;
+#X text 232 444 forces a window size when reading. this is a workaround
+for a problem in HW-QuickTime.;
+#X obj 3 178 doc_c;
+#X obj 0 921 doc_f;
+#X obj 97 422 doc_m i0 force_size;
+#X obj 97 549 doc_m i0 get;
+#X text 232 549 output various properties of the video that is open
+(#in) (see outlet 0);
+#X obj 14 751 doc_oo 0;
+#X obj 103 901 #io.mpeg;
+#X obj 97 751 doc_m o0 grid;
+#X obj 97 771 doc_m o0 codec symbol;
+#X obj 97 791 doc_m o0 depth float;
+#X obj 97 811 doc_m o0 framerate float;
+#X obj 97 831 doc_m o0 frames float;
+#X obj 97 851 doc_m o0 height float;
+#X obj 97 871 doc_m o0 width float;
+#X connect 4 1 5 0;
+#X connect 6 1 7 0;
+#X connect 6 1 8 0;
+#X connect 9 1 10 0;
+#X connect 9 1 11 0;
+#X connect 12 1 13 0;
+#X connect 14 1 15 0;
+#X connect 14 1 18 0;
+#X connect 17 1 27 0;
+#X connect 23 1 19 0;
+#X connect 23 1 20 0;
+#X connect 24 1 25 0;

@@ -1,0 +1,28 @@
+#N canvas 628 15 632 522 10;
+#X obj 0 0 doc_h;
+#X obj 0 493 doc_f;
+#X obj 58 239 #polygon_area;
+#X obj 59 259 display;
+#X msg 58 96 4 2 # 10 10 10 310 230 310 230 10;
+#X text 93 116 220 x 300 rectangle;
+#X obj 79 146 display;
+#X text 11 36 Find area of a polygon in square pixels.;
+#X obj 3 309 doc_c 0;
+#X obj 3 349 doc_i 1;
+#X obj 3 418 doc_o 1;
+#X obj 58 77 loadbang;
+#X obj 14 379 doc_ii 0;
+#X obj 97 379 doc_m i0 grid;
+#X text 232 379 Vertices of the polygon.;
+#X obj 14 448 doc_oo 0;
+#X obj 97 448 doc_m o0 grid;
+#X text 232 448 Grid of only one element representing the area of the
+polygon received from inlet 0;
+#X obj 58 115 # +;
+#X connect 2 0 3 0;
+#X connect 4 0 18 0;
+#X connect 11 0 4 0;
+#X connect 13 1 14 0;
+#X connect 16 1 17 0;
+#X connect 18 0 2 0;
+#X connect 18 0 6 0;

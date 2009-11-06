@@ -1,0 +1,7 @@
+#N canvas 335 118 632 227 10;
+#X obj 0 0 doc_h;
+#X obj 0 198 doc_f;
+#X obj 3 78 doc_c 0;
+#X obj 3 118 doc_i 0;
+#X obj 3 158 doc_o 0;
+#X text 173 46 an auto-positioning documentation footer.;

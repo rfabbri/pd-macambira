@@ -1,0 +1,111 @@
+#N canvas 602 0 632 642 10;
+#X floatatom 132 89 5 0 0 0 - - -;
+#X floatatom 177 89 5 0 0 0 - - -;
+#X floatatom 20 160 5 0 0 0 - - -;
+#X floatatom 132 200 5 0 0 0 - - -;
+#X text 115 201 R:;
+#X floatatom 193 200 5 0 0 0 - - -;
+#X floatatom 253 200 5 0 0 0 - - -;
+#X text 176 201 G:;
+#X text 237 201 B:;
+#X floatatom 73 161 5 0 0 0 - - -;
+#X text 1 161 X:;
+#X text 58 162 Y:;
+#X obj 132 107 #pack;
+#X obj 296 134 #in;
+#X msg 296 115 load r001.jpg;
+#X obj 20 131 #unpack;
+#X obj 132 175 #unpack 3;
+#X obj 134 150 #store;
+#X text 129 54 this example allows you to select a single pixel from
+the loaded picture and view its rgb value.;
+#X text 8 24 The [#store] stores exactly one grid \, using the right
+inlet. You fetch it back \, or selected subparts using the left inlet.
+;
+#X obj 296 181 display;
+#X obj 86 94 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 296 161 display;
+#X obj 296 96 loadbang;
+#X obj 3 341 doc_i 2;
+#X obj 0 0 doc_h;
+#X obj 3 279 doc_c 1;
+#X obj 14 371 doc_ii 0;
+#X obj 14 571 doc_ii 1;
+#X obj 3 882 doc_o 1;
+#X obj 14 912 doc_oo 0;
+#X obj 14 309 doc_cc 0;
+#X obj 97 309 doc_m c0 grid;
+#X obj 97 406 doc_m i0 grid;
+#X obj 97 371 doc_m i0 bang;
+#X text 232 371 A bang at the left inlet will cause [#store] to send
+its value to the outlet.;
+#X obj 97 571 doc_m i1 grid;
+#X text 232 571 when in reassign mode \, this is same as arg 0;
+#X text 232 593 when it put_at mode \, it basically keeps the previous
+arg 0 or reassignment \, but replaces a selected part inside of it.
+;
+#X obj 97 824 doc_m i1 reassign;
+#X obj 97 663 doc_m i1 put_at;
+#X obj 97 912 doc_m o0 grid;
+#X text 232 406 in this grid \, the last dimension refers to subparts
+of the stored grid. sending a Dim(200 \, 200 \, 2) on a [#store] that
+holds a Dim(240 \, 320 \, 3) will cause the [#store] to handle the
+incoming grid as a Dim(200 \, 200) of Dim(2)'s \, where each Dim(2)
+represents a position in a Dim(240 \, 320) of Dim(3)'s. therefore the
+resulting grid will be a Dim(200 \, 200) of Dim(3) which is a Dim(200
+\, 200 \, 3). in practice this example would be used for generating
+a 200*200 RGB picture from a 200*200 XY map and a 240*320 RGB picture.
+this object can be logically used in the same way for many purposes
+including color palettes \, tables of probabilities \, tables of statistics
+\, whole animations \, etc.;
+#X text 232 824 makes it so that sending a grid to inlet 1 detaches
+the old buffer from [#store] and attaches a new one instead. This is
+the default.;
+#X text 232 663 makes it so that sending a grid to inlet 1 writes into
+the existing buffer of [#store].;
+#X text 232 698 example: suppose you have [#store 10 240 320 3]. then
+"put_at 3" will allow to write a Dim[240 \, 320 \, 3] grid in indices
+(3 \, y \, x \, c) where y \, x \, c are indices of the incoming grid.
+in other words \, if that's a buffer of 10 RGB frames \, you'd be replacing
+frame #3. Furthermore \, it also allows you to write a Dim[n \, 240
+\, 320 \, 3] grid at (3+f \, y \, x \, c) where f \, y \, x \, c are
+indices of the incoming grid \, replacing frame #3 \, #4 \, ... up
+to #3+n-1. Here n is at most 7 because the last frame in the buffer
+is #9.;
+#X text 194 227 that way of working extends to other kinds of data
+you'd put in Grids \, in any numbers of dimensions. because \, as usual
+\, [#store] wouldn't know the difference.;
+#X text 232 912 grids as stored \, as indexed \, or as assembled from
+multiple indexings.;
+#X obj 0 957 doc_f;
+#X text 232 309 initial value to be stored;
+#X obj 97 628 doc_m i1 op;
+#X text 232 628 recombination operator used by put_at \, just like
+arg 0 of [#draw_image];
+#X connect 0 0 12 0;
+#X connect 1 0 12 1;
+#X connect 12 0 15 0;
+#X connect 12 0 17 0;
+#X connect 12 0 22 0;
+#X connect 13 0 17 1;
+#X connect 14 0 13 0;
+#X connect 15 0 2 0;
+#X connect 15 1 9 0;
+#X connect 16 0 3 0;
+#X connect 16 1 5 0;
+#X connect 16 2 6 0;
+#X connect 17 0 16 0;
+#X connect 17 0 20 0;
+#X connect 21 0 17 0;
+#X connect 23 0 14 0;
+#X connect 32 1 49 0;
+#X connect 33 1 42 0;
+#X connect 34 1 35 0;
+#X connect 36 1 37 0;
+#X connect 36 1 38 0;
+#X connect 39 1 43 0;
+#X connect 40 1 44 0;
+#X connect 40 1 45 0;
+#X connect 41 1 47 0;
+#X connect 50 1 51 0;

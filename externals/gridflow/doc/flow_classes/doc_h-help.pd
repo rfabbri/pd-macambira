@@ -1,0 +1,13 @@
+#N canvas 409 226 632 269 10;
+#X obj 0 0 doc_h;
+#X obj 0 240 doc_f;
+#X text 126 40 an auto-positioning documentation header;
+#X obj 3 160 doc_i 0;
+#X obj 3 200 doc_o 0;
+#X obj 3 72 doc_c 1;
+#X obj 14 102 doc_cc 0;
+#X obj 97 102 doc_m c0 symbol;
+#X text 232 102 namespace prefix (can't be figured out automatically
+for now). must include trailing slash. hopefully this is a temporary
+measure.;
+#X connect 7 1 8 0;

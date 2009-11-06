@@ -1,0 +1,19 @@
+#N canvas 635 118 632 307 10;
+#X obj 0 0 doc_h;
+#X obj 31 51 foreach;
+#X obj 3 96 doc_c 0;
+#X obj 3 136 doc_i 1;
+#X obj 14 166 doc_ii 0;
+#X obj 97 166 doc_m i0 list;
+#X obj 3 198 doc_o 1;
+#X obj 14 228 doc_oo 0;
+#X text 232 166 Outputs N messages \, one per list element \, in order.
+;
+#X obj 0 278 doc_f;
+#X obj 97 228 doc_m o0 <atom>;
+#X obj 3 258 doc_also;
+#X obj 103 258 drip 0;
+#X text 183 49 split a message into separate atoms and output them
+all.;
+#X connect 5 1 8 0;
+#X connect 11 1 12 0;

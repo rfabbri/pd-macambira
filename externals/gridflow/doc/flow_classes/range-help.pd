@@ -1,0 +1,28 @@
+#N canvas 680 0 632 393 10;
+#X obj 0 0 doc_h;
+#X obj 3 99 doc_c 0..;
+#X obj 3 304 doc_o 1..;
+#X obj 14 169 doc_ii 0;
+#X text 232 169 a value to be sent to one of the outlets. The first
+outlet is for values smaller than the first argument \; else the second
+outlet is for values smaller than the second argument \; and so on
+\; and the last outlet is for values greater or equal to the last argument.
+;
+#X obj 14 334 doc_oo any;
+#X obj 97 334 doc_m oany float;
+#X obj 97 169 doc_m i0 float;
+#X obj 3 139 doc_i 1..;
+#X obj 14 169 doc_ii other;
+#X obj 97 270 doc_m iother float;
+#X text 232 270 sets the corresponding separator in the separator list.
+;
+#X obj 0 364 doc_f;
+#X obj 256 53 moses 1;
+#X obj 164 53 range 1 2 3;
+#X text 241 52 =;
+#X obj 306 53 moses 2;
+#X obj 356 53 moses 3;
+#X connect 7 1 4 0;
+#X connect 10 1 11 0;
+#X connect 13 1 16 0;
+#X connect 16 1 17 0;

@@ -1,0 +1,20 @@
+#N canvas 692 0 632 364 10;
+#X obj 0 0 doc_h;
+#X obj 65 74 #hueshift;
+#X obj 3 105 doc_c 0..1;
+#X obj 3 165 doc_i 2;
+#X obj 3 275 doc_o 1;
+#X obj 14 195 doc_ii 0;
+#X obj 14 243 doc_ii 1;
+#X obj 14 135 doc_cc 0;
+#X obj 14 305 doc_oo 0;
+#X obj 97 135 doc_m c0 float;
+#X obj 97 195 doc_m i0 grid;
+#X obj 97 243 doc_m i1 float;
+#X text 232 243 same as arg 0;
+#X obj 97 305 doc_m o0 grid;
+#X text 232 195 RGB picture that gets hueshifted by a rotation in the
+colorwheel by the specified angle \; it gets sent to outlet 0;
+#X obj 0 335 doc_f;
+#X connect 10 1 14 0;
+#X connect 11 1 12 0;

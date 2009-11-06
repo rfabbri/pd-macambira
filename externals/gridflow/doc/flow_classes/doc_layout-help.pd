@@ -1,0 +1,46 @@
+#N canvas 335 118 632 473 10;
+#X obj 0 0 doc_h;
+#X obj 0 444 doc_f;
+#X obj 3 91 doc_c 4;
+#X obj 14 121 doc_cc 0;
+#X obj 14 156 doc_cc 1;
+#X obj 14 178 doc_cc 2;
+#X obj 14 200 doc_cc 3;
+#X obj 97 200 doc_m c3 symbol;
+#X text 232 200 parent;
+#X text 232 178 height;
+#X text 232 156 width;
+#X text 232 121 relative id \, such as c0/hello \, to which the parent's
+\$0 will be automatically prefixed (with an extra slash);
+#X obj 3 232 doc_i 2;
+#X obj 3 360 doc_o 2;
+#X obj 14 390 doc_oo 0;
+#X obj 14 412 doc_oo 1;
+#X obj 97 390 doc_m o0 <none>;
+#X text 232 412 current (x y) position of the object;
+#X obj 97 412 doc_m o1 list;
+#X obj 97 328 doc_m i1 list;
+#X text 232 328 new (x y) position after processing the output of outlet
+1;
+#X obj 97 284 doc_m i0 name;
+#X obj 97 306 doc_m i0 parent;
+#X obj 97 262 doc_m i0 height;
+#X text 232 262 same as arg 2;
+#X text 232 284 same as arg 0;
+#X text 232 306 same as arg 3;
+#X obj 14 262 doc_ii 0;
+#X obj 14 328 doc_ii 1;
+#X obj 97 156 doc_m c1 float;
+#X obj 97 178 doc_m c2 float;
+#X obj 97 121 doc_m c0 symbol;
+#X text 109 49 used by all [doc_...] abstractions for their own positioning
+;
+#X connect 7 1 8 0;
+#X connect 18 1 17 0;
+#X connect 19 1 20 0;
+#X connect 21 1 25 0;
+#X connect 22 1 26 0;
+#X connect 23 1 24 0;
+#X connect 29 1 10 0;
+#X connect 30 1 9 0;
+#X connect 31 1 11 0;

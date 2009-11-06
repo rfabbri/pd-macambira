@@ -1,0 +1,26 @@
+#N canvas 0 0 632 350 10;
+#X obj 3 117 doc_c 0;
+#X obj 3 157 doc_i 1;
+#X obj 3 217 doc_o 1;
+#X obj 14 247 doc_oo 0;
+#X obj 14 187 doc_ii 0;
+#X text 138 34 gives a symbol representing the numeric type of the
+grid received.;
+#X obj 97 247 doc_m o0 symbol;
+#X obj 97 187 doc_m i0 grid;
+#X obj 3 301 doc_also;
+#X obj 103 301 #dim;
+#X obj 139 301 #finished;
+#X obj 0 0 doc_h;
+#X obj 0 321 doc_f;
+#X obj 17 65 #type;
+#X symbolatom 17 84 10 0 0 0 - - -;
+#X msg 27 38 3 3 f # 10.4;
+#X text 232 247 numbertype in long form.;
+#X text 232 269 one of: uint8 int16 int32 int64 float32 float64;
+#X connect 6 1 16 0;
+#X connect 6 1 17 0;
+#X connect 8 1 9 0;
+#X connect 8 1 10 0;
+#X connect 13 0 14 0;
+#X connect 15 0 13 0;

@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+f = File.read("../compose-8859-1.pdd").split(/\s*;\s*/)
+g = File.open("Makefile","w")
+g.puts "default:: all"
+g.puts ""
+list = []
+
+[94,96,126,168,176,180,184].each {|a|
+  g.puts "#{a}u.hpgl: #{a}.hpgl Makefile"
+  dy = (if a==184 then 0 else 100 end)
+  g.puts "\t../../bin/hpgl_move 0 #{dy} < #{a}.hpgl > #{a}u.hpgl"
+  list << "#{a}u.hpgl"
+}
+
+f.each {|char|
+  a,b,c = char.split(/\s+/).map {|x| Integer x }
+  [0,32].each {|o|
+    d = c.to_s + (if o==0 and c>47 then "u" else "" end)
+    g.puts "#{a+o}.hpgl: #{b+o}.hpgl #{d}.hpgl Makefile"
+    g.puts "\tcat #{b+o}.hpgl #{d}.hpgl > #{a+o}.hpgl"
+    g.puts ""
+    list << "#{a+o}.hpgl"
+  }
+}
+
+g.puts "all:: "+list.join(" ")
+g.puts ""
+g.puts "clean::"
+g.puts "\trm "+list.join(" ")

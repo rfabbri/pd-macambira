@@ -1,0 +1,73 @@
+#N canvas 197 100 899 548 10;
+#X obj 8 6 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 448 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 8 497 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 668 499 Copyright Ben Bogart 2005 \; (See COPYING.TXT for details)
+;
+#N canvas 0 22 470 320 META 0;
+#X text 12 5 CATEGORY: tutorial;
+#X text 12 15 KEYWORDS: GUI slider toggle number message introduction
+;
+#X restore 16 503 pd META;
+#X text 12 20 DESCRIPTION: Message \, slider \, toggle \, bang and
+number;
+#X msg 93 145 hello world;
+#X obj 93 168 print;
+#X text 181 146 <- Click on this message;
+#X text 18 74 Messages control the behavior of objects and it is the
+objects that change what a patch does. The first object we're going
+to learn is "print". All "print" does is print out the messages you
+send it to the terminal:;
+#X text 19 197 TIP: If you forget what an object does you can always
+double-click (on a mac) or right-click (on a PC) and then choose "help".
+;
+#X text 19 250 In this tutorial we will use two different types of
+objects: "objects" (of which "print" is an example) and GUI objects
+\, (of which "message" is an example). GUI objects allow you to interact
+with your patch \, control PD and change parameters of objects. We
+are going to learn four types of GUI objects (but there are many more):
+Slider \, Toggle \, Bang \, and Number.;
+#X obj 76 355 hsl 300 30 0 127 0 0 empty empty This_is_a_HSlider_(Horizontal)
+10 15 1 10 -262144 -1 -1 0 1;
+#X obj 73 393 print;
+#X text 21 421 This "hslider" is connected to the print object. This
+way we can see what messages the "hslider" sends. Try clicking and
+dragging in the Slider. You can change the scale (and other properties)
+of some GUI Objects by double-clicking (mac) or right-clicking (pc)
+and choosing "properties".;
+#X text 13 46 The "message" and "hslider" GUI Objects:;
+#X text 453 46 "toggle" \, "bang" \, "number";
+#X obj 519 176 tgl 30 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 629 176 bng 30 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 629 210 print Bang;
+#X obj 519 210 print Toggle;
+#X obj 739 210 print Number;
+#X floatatom 739 192 5 0 0 0 - - -;
+#X text 466 76 "slider" \, "toggle" and "number" all send messages
+made up of floats (numbers). "bang" is a special case and it only sends
+the message "bang". Below we're using an argument to the print object
+that tags each message sent to the terminal. This way when we have
+multiple "print" objects in one patch we can differenciate thier output.
+;
+#X text 465 268 "toggle" sends the message "1" or "0" \, "bang" always
+sends "bang" and if you click and drag on the "number" you can see
+it acts a lot like a Slider. With "number" you can also click once
+\, and then type a number to send.;
+#X text 467 335 TIP: You can send floating point numbers by holding
+down the SHIFT key as you click and drag on the "number".;
+#X text 467 375 There are other types of GUI objects not covered here.
+See the guis-about.pd PDDP patch:;
+#X text 12 8 2 PD Introduction - Some Useful GUI Objects in Pure-Data
+;
+#X connect 7 0 8 0;
+#X connect 13 0 14 0;
+#X connect 18 0 21 0;
+#X connect 19 0 20 0;
+#X connect 23 0 22 0;

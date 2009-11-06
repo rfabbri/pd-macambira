@@ -1,0 +1,150 @@
+#N canvas 648 0 632 642 10;
+#X obj 0 0 doc_h;
+#X obj 3 517 doc_c 0..;
+#X msg 40 554 open x11;
+#X msg 40 574 open x11 here;
+#X msg 40 614 open x11 local 0;
+#X text 178 555 synonym of "open x11 here".;
+#X text 181 574 connects to the default X11 server \, according to
+your environment variable "DISPLAY".;
+#X text 182 614 connects to a display server on this machine.;
+#X msg 39 645 open x11 remote foo.org 0;
+#X text 201 644 connects to a remote X11 display server using TCP.
+Port number will be 6000 plus the display number \, because of the
+X11 standard.;
+#X text 141 38 supports 15 \, 16 \, 24 \, 32-bit truecolor displays
+;
+#X text 141 57 now also support 8-bit indexed displays \, using a private
+colormap configured as 3:3:2 RGB. When using 8-bit you can specify
+the "use_stripes" option to use a completely different color scheme
+involving R \, G \, B diagonal stripes \, a kind of 6:6:6 RGB spread
+over three pixels.;
+#X text 141 129 If you are using Windows or MacOS 10: you will have
+to install a X11 server. This will emulate Unix display on your OS.
+(note: Unix systems also need a X11 server \, but it's built-in and
+handles the video driver directly). In the case of MacOS 10 and QNX
+that both use non-X11 display technology on top of a basically Unix
+OS \, the OS comes with a X11 server \, but it may be on a "bundled
+software" CD.;
+#X msg 37 700 open x11 display foo.org:0;
+#X obj 3 736 doc_i 1;
+#X obj 14 766 doc_ii 0;
+#X obj 97 788 doc_m i0 grid;
+#X text 232 788 with [#out] \, displays a frame;
+#X obj 97 766 doc_m i0 bang;
+#X text 232 766 with [#in] \, captures a frame;
+#X obj 97 852 doc_m i0 out_size;
+#X text 232 852 \$1=height \$2=width. changes the window's size \,
+just like sending a grid dim(height \, width \, 3) would. this affects
+the size of screen captures too.;
+#X obj 97 920 doc_m i0 setcursor;
+#X text 232 920 \$1=cursor_id. \$1=cursor_id. Selects one of the 64
+predefined cursors of X11. (Note that if your cursor table has them
+numbered from 0 to 126 using only even numbers \, then those cursor
+numbers are all doubled compared to the ones GridFlow uses.);
+#X obj 97 810 doc_m i0 hidecursor;
+#X text 232 810 This makes the cursor invisible.;
+#X obj 3 1903 doc_also;
+#X obj 103 1903 #io.quartz;
+#X obj 175 1903 #io.sdl;
+#X text 141 227 Destroying the object (or sending "close") should close
+the window.;
+#X obj 35 65 #out x11;
+#X text 140 259 because of the design of Xlib \, or if any of the connections
+involved crashes \, then the whole program has to be terminated. (don't
+you love xlib). Something similar happens if you close any of the windows
+yourself \, but IIRC this could be fixed.;
+#X text 140 330 only one window may be used per x11 connection (to
+simplify matters \; this doesn't reduce flexibility).;
+#X text 140 375 there is an additional argument that may be added to
+every "open" message \; if you don't put it \, a new toplevel window
+is created. if you put "root" then the screen's wallpaper will be used
+instead (it may fail to work with some popular window managers). You
+can also put a window number \, e.g. 0x28003ff \, you may connect to
+an existing window \; you can find out the number of a window by using
+a tool like xwininfo \, part of X11 standard tools.;
+#X obj 3 1084 doc_o 1;
+#X obj 14 1114 doc_oo 0;
+#X obj 97 1114 doc_m o0 grid;
+#X text 232 1114 grid(rows columns rgb);
+#X text 232 1136 resizes the window to the size of the grid \; encodes
+that grid in the display's pixel format \; also displays it if autodraw
+&gt \; 0 the values must be in range 0-255 \, or else they will be
+"wrapped".;
+#X obj 97 1415 doc_m o0 position;
+#X text 232 1415 \$1=y \$2=x \$3=buttons;
+#X text 232 1437 This is emitted every time the cursor moves inside
+the window connected to this format handler. This is also emitted when
+the cursor is dragging from inside to outside the window. This is also
+emitted when a mouse button is pressed.;
+#X text 232 1511 The y and x coordinates are relative to the upper
+right corner of the window. Specific button states may be extracted
+from the button value by applying [>> buttonnumber] and then checking
+whether the result is odd.;
+#X text 232 1572 0: Shift;
+#X text 232 1594 1: Caps Lock;
+#X text 232 1616 2: Control;
+#X text 232 1638 3: Alternate;
+#X text 232 1660 4: NumLock;
+#X text 232 1682 5: (unknown);
+#X text 232 1704 6: Meta or Window Key;
+#X text 232 1726 7: Scroll Lock;
+#X text 232 1748 8: Left Mouse Button;
+#X text 232 1770 9: Middle Mouse Button or Mouse Wheel Click;
+#X text 232 1792 10: Right Mouse Button;
+#X text 232 1814 11: Wheel Up;
+#X text 232 1836 12: Wheel Down;
+#X text 232 1858 NOTE: This message form may become longer in the future
+\, but the already defined parts will stay the same.;
+#X obj 97 1210 doc_m o0 keypress;
+#X obj 97 1345 doc_m o0 keyrelease;
+#X text 232 1210 \$1=y \$2=x \$3=buttons \$4=keyname;
+#X text 232 1345 \$1=y \$2=x \$3=buttons \$4=keyname;
+#X text 232 1232 Similar to position above \, but this is emitted when
+a keyboard key is pressed while this format handler's window is active.
+Keynames follow the X11 standard \, similarly to PureData's [keyname]
+object. The only exception is that keynames that are digits get prefixed
+by a capital D so that they don't get mistaken for actual numbers.
+NOTE: This message form may become longer in the future \, but the
+already defined parts will stay the same.;
+#X text 232 1367 Same as keypress but when a key gets released instead.
+NOTE: This message form may become longer in the future \, but the
+already defined parts will stay the same.;
+#X obj 0 1923 doc_f;
+#X obj 97 832 doc_m i0 move;
+#X obj 97 994 doc_m i0 shared_memory;
+#X obj 97 1054 doc_m i0 xvideo;
+#X obj 97 1014 doc_m i0 title;
+#X obj 97 1034 doc_m i0 warp;
+#X obj 97 900 doc_m i0 set_geometry;
+#X text 208 701 other syntax for 'remote'.;
+#X connect 16 1 17 0;
+#X connect 18 1 19 0;
+#X connect 20 1 21 0;
+#X connect 22 1 23 0;
+#X connect 24 1 25 0;
+#X connect 26 1 27 0;
+#X connect 26 1 28 0;
+#X connect 36 1 37 0;
+#X connect 36 1 38 0;
+#X connect 39 1 40 0;
+#X connect 39 1 41 0;
+#X connect 39 1 42 0;
+#X connect 39 1 43 0;
+#X connect 39 1 44 0;
+#X connect 39 1 45 0;
+#X connect 39 1 46 0;
+#X connect 39 1 47 0;
+#X connect 39 1 48 0;
+#X connect 39 1 49 0;
+#X connect 39 1 50 0;
+#X connect 39 1 51 0;
+#X connect 39 1 52 0;
+#X connect 39 1 53 0;
+#X connect 39 1 54 0;
+#X connect 39 1 55 0;
+#X connect 39 1 56 0;
+#X connect 57 1 59 0;
+#X connect 57 1 61 0;
+#X connect 58 1 60 0;
+#X connect 58 1 62 0;

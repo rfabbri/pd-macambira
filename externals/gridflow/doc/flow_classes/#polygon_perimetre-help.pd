@@ -1,0 +1,23 @@
+#N canvas 335 118 632 342 10;
+#X obj 0 0 doc_h;
+#X obj 0 313 doc_f;
+#X obj 47 64 #polygon_perimetre;
+#X obj 3 129 doc_c 0;
+#X obj 3 169 doc_i 1;
+#X obj 3 231 doc_o 1;
+#X obj 14 261 doc_oo 0;
+#X obj 14 199 doc_ii 0;
+#X obj 97 261 doc_m o0 grid;
+#X obj 97 199 doc_m i0 grid;
+#X text 232 261 perimetre as grid[];
+#X text 232 199 polygon as grid[N \, 2] or any cyclic path as grid[N
+\, M];
+#X text 187 44 finds the perimetre of a sequence of points in which
+the last point is assumed to connect back to the first point. this
+not need be an actual polygon (because points don't need to be coplanar
+for this calculation to work).;
+#X obj 3 293 doc_also;
+#X obj 103 293 #polygon_area;
+#X connect 8 1 10 0;
+#X connect 9 1 11 0;
+#X connect 13 1 14 0;

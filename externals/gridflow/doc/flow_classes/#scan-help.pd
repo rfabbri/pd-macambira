@@ -1,0 +1,48 @@
+#N canvas 664 0 632 547 10;
+#X floatatom 17 76 5 0 0 0 - - -;
+#X floatatom 62 76 5 0 0 0 - - -;
+#X floatatom 109 76 5 0 0 0 - - -;
+#X floatatom 17 245 5 0 0 0 - - -;
+#X floatatom 56 245 5 0 0 0 - - -;
+#X floatatom 96 245 5 0 0 0 - - -;
+#X obj 17 116 #pack 3;
+#X obj 17 147 #scan +;
+#X obj 17 206 #unpack 3;
+#X obj 103 498 #fold +;
+#X obj 0 0 doc_h;
+#X obj 3 498 doc_also;
+#X obj 3 274 doc_c 1;
+#X obj 3 336 doc_i 1;
+#X obj 3 438 doc_o 1;
+#X obj 14 468 doc_oo 0;
+#X obj 14 304 doc_cc 0;
+#X text 69 35 computes subtotals and stuff;
+#X text 165 74 replaces every Dim(last) subgrid by all the results
+of cascading the operator on that subgrid \, producing a Dim(dims \,
+last) grid.;
+#X text 165 127 For example \, with base value 0 and operation + on
+grid "2 3 5 7" will compute 0+2=2 \, 2+3=5 \, 5+5=10 \, 10+7=17 \,
+and give the subtotals "2 5 10 17".;
+#X obj 14 366 doc_ii 0;
+#X obj 97 366 doc_m i0 grid;
+#X obj 97 386 doc_m i0 op;
+#X obj 97 408 doc_m i0 seed;
+#X text 165 191 [#scan +] computes subtotals \; this can be used \,
+for example \, to convert a regular probability distribution into a
+cumulative one. (or in general \, discrete integration);
+#X obj 0 518 doc_f;
+#X obj 97 468 doc_m o0 grid;
+#X obj 97 304 doc_m c0 symbol;
+#X text 232 304 numop;
+#X text 232 386 same as arg 0;
+#X connect 0 0 6 0;
+#X connect 1 0 6 1;
+#X connect 2 0 6 2;
+#X connect 6 0 7 0;
+#X connect 7 0 8 0;
+#X connect 8 0 3 0;
+#X connect 8 1 4 0;
+#X connect 8 2 5 0;
+#X connect 11 1 9 0;
+#X connect 22 1 29 0;
+#X connect 27 1 28 0;

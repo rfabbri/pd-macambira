@@ -1,0 +1,33 @@
+#N canvas 463 105 632 422 10;
+#X obj 0 0 doc_h;
+#X obj 3 187 doc_c;
+#X obj 0 393 doc_f;
+#X obj 3 373 doc_also;
+#X obj 103 373 cputime;
+#X obj 157 373 systemtime;
+#X text 186 108 What [usertime] and [systemtime] tell you together
+should add up to the amount that [cputime] tells you.;
+#X obj 3 311 doc_o 1;
+#X obj 3 227 doc_i 2;
+#X obj 14 257 doc_ii 0;
+#X obj 14 279 doc_ii 1;
+#X obj 14 341 doc_oo 0;
+#X obj 97 257 doc_m i0 bang;
+#X obj 97 279 doc_m i1 bang;
+#X obj 97 341 doc_m o0 float;
+#X text 232 257 reset timer;
+#X text 232 279 trigger output;
+#X text 232 341 value in milliseconds;
+#X text 188 38 While [cputime] gives you the total time spent in the
+pd process \, therefore excluding any time spent running any other
+programmes \, time spent running pd.tk \, and time spent doing nothing
+at all \, [systemtime] also excludes whatever is NOT run in the kernel.
+;
+#X text 188 142 In C language \, this is the "stime" feature of the
+times() command.;
+#X obj 61 66 systemtime;
+#X connect 3 1 4 0;
+#X connect 3 1 5 0;
+#X connect 12 1 15 0;
+#X connect 13 1 16 0;
+#X connect 14 1 17 0;

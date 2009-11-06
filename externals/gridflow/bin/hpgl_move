@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+# Copyright (c) 2009 by Mathieu Bouchard
+
+x = Float ARGV[0]
+y = Float ARGV[1]
+
+puts STDIN.read.split(/\s*;\s*/).map {|m|
+  h = m.slice!(0,2)
+  d = m.split(",")
+  case h
+  when "PA","PD","PU"
+    (0...d.length).each {|i|
+      off = if i%2==0 then x else y end
+      v = Float(d[i])+off
+      d[i] = if v==v.to_i then v.to_i else v.to_f end
+    }
+  end
+  h+d.join(",")
+}.join(";")

@@ -1,0 +1,78 @@
+#N canvas 335 0 632 700 10;
+#X obj 0 0 doc_h;
+#X obj 0 1031 doc_f;
+#X obj 3 347 doc_c 2;
+#X obj 3 911 doc_i 0;
+#X obj 3 951 doc_o 2;
+#X obj 14 981 doc_oo 0;
+#X obj 14 1001 doc_oo 1;
+#X obj 14 377 doc_cc 0;
+#X obj 14 425 doc_cc 1;
+#X obj 97 377 doc_m c0 symbol;
+#X obj 97 425 doc_m c1 symbol;
+#X text 232 377 code for associating to a specific [doc_c] \, [doc_i]
+or [doc_o]. for example \, to associate with [doc_c 3] \, the code
+is c3;
+#X text 232 425 in the case of [doc_i] or [doc_o] \, this is either
+a selector or a meta-selector.;
+#X text 232 556 the sorting order of [doc_m] elements in a given subsection
+is alphabetical except for those five at the beginning: bang \, float
+\, grid \, symbol \, pointer \, list. and this one at the very end:
+<any>.;
+#X text 232 617 a list of meta-selectors:;
+#X text 232 639 <any>: represents the anything-method;
+#X text 232 661 <none>: is for writing anything of interest (?) about
+nothing at all. when present \, this is usually the only entry in the
+given subsection \, and it usually just says that the inlet or outlet
+is meant to be useless. typically \, no messages are accepted in the
+inlet \, or else \, all messages are accepted without doing anything
+with them \, or in the case of outlet \, nothing ever comes out of
+it.;
+#X text 232 796 <evil>: is like <none> \, except that the outlet that
+bears it will do weird things to the object it gets connected to. things
+that are very different from sending mere messages.;
+#X text 232 866 <hpgl>: this stands for a pd message version of the
+HPGL protocol.;
+#X text 232 460 in the case of [doc_c] \, we're just faking that this
+is a selector \, but you better only use atom types here: float \,
+grid \, symbol \, pointer \, <atom>.;
+#X text 232 844 <atom>: this stands for float \, grid \, symbol \,
+or pointer.;
+#X obj 97 981 doc_m o0 <none>;
+#X obj 97 1001 doc_m o1 <evil>;
+#X text 232 761 <gone>: is like none \, except the inlet or outlet
+is completely missing.;
+#X text 190 37 style guide for comments:;
+#X text 190 59 do not say "accepts a grid that will do blah blah" \,
+because all methods are accepting messages anyway. but do not say "a
+grid that will do blah blah" \, because "grid" is already specified
+by the [doc_m]. in some sentence structures it will be clearer to say
+"the grid" in some places rather than not.;
+#X text 232 508 a meta-selector is a name written within <> marks.
+those represent special things that aren't really selectors \, as well
+as sets of several selectors (or of many of them).;
+#X text 190 142 say "image that will do blah blah" if an image is expected
+\, but note that not so many objects really require images as inputs.
+;
+#X text 192 186 there is also a difference between hard limitations
+\, and expected interpretations. for example \, if we say "an rgb image"
+and mean it and are right about it \, then only 3-dimensional grids
+will be accepted \, and only those with 3 elements in the last dimension
+will be accepted \, but it is up to us to think of that last dimension
+to represent rgb \, it is up to us to think that this last dimension
+is channels \, and that the other dimensions are rows and columns.
+however \, to ease the reading \, thinks like "(rows columns 3)" and
+"rgb image" will be said even though much of GridFlow itself doesn't
+care about it.;
+#X connect 9 1 11 0;
+#X connect 10 1 12 0;
+#X connect 10 1 26 0;
+#X connect 10 1 13 0;
+#X connect 10 1 14 0;
+#X connect 10 1 15 0;
+#X connect 10 1 16 0;
+#X connect 10 1 17 0;
+#X connect 10 1 18 0;
+#X connect 10 1 19 0;
+#X connect 10 1 20 0;
+#X connect 10 1 23 0;

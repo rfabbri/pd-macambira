@@ -1,0 +1,26 @@
+#N canvas 692 0 632 404 10;
+#X obj 171 66 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 171 135 #out window \, title checkers;
+#X obj 171 112 #checkers;
+#X text 232 330 Results in a checkered pattern of 50% / 75% greys in
+8 X 8 squares.;
+#X text 11 29 Displays a grid with a pattern of checkered squares.
+;
+#X obj 14 330 doc_oo 0;
+#X obj 14 256 doc_ii 0;
+#X obj 171 88 #for (0 0) (128 128) (1 1);
+#X text 232 256 typically the output of [#for (0 0) (height width)
+(1 1)];
+#X obj 0 0 doc_h;
+#X obj 0 375 doc_f;
+#X obj 3 186 doc_c 0;
+#X obj 3 226 doc_i 1;
+#X obj 3 300 doc_o 1;
+#X obj 97 256 doc_m i0 grid;
+#X obj 97 330 doc_m o0 grid;
+#X connect 0 0 7 0;
+#X connect 2 0 1 0;
+#X connect 7 0 2 0;
+#X connect 14 1 8 0;
+#X connect 15 1 3 0;

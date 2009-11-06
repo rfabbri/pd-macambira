@@ -1,0 +1,18 @@
+#N canvas 383 90 632 297 10;
+#X obj 0 0 doc_h;
+#X obj 0 268 doc_f;
+#X obj 3 84 doc_c 0;
+#X obj 3 124 doc_i 0;
+#X text 173 46 an auto-positioning documentation footer.;
+#X obj 3 164 doc_o 2;
+#X obj 14 194 doc_oo 0;
+#X obj 14 216 doc_oo 1;
+#X obj 97 194 doc_m o0 <none>;
+#X obj 97 216 doc_m o1 <evil>;
+#X text 232 194 this outlet is unused;
+#X text 232 216 this outlet is reserved for evil purposes;
+#X obj 3 248 doc_also;
+#X text 103 248 [doc_f];
+#X connect 8 1 10 0;
+#X connect 9 1 11 0;
+#X connect 12 1 13 0;

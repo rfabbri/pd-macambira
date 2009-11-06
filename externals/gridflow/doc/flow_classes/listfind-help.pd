@@ -1,0 +1,32 @@
+#N canvas 527 144 632 394 10;
+#X obj 0 0 doc_h;
+#X obj 0 365 doc_f;
+#X obj 44 66 listfind 2 3 5 7 11 13;
+#X floatatom 44 48 5 0 0 0 - - -;
+#X floatatom 44 85 5 0 0 0 - - -;
+#X text 214 54 find the position of an element (float or symbol) in
+a list \, or -1 if it is not found. in case of duplicate elements \,
+it only tells the position of the first occurrence.;
+#X obj 3 113 doc_c any;
+#X obj 14 143 doc_cc any;
+#X obj 97 143 doc_m cany <any>;
+#X obj 3 173 doc_i 1;
+#X obj 14 203 doc_ii 0;
+#X obj 97 203 doc_m i0 float;
+#X obj 97 238 doc_m i0 symbol;
+#X text 232 238 look for a symbol.;
+#X text 232 203 look for a float. this has the same gotchas as using
+[==] and [sel] \, about the precision of numbers.;
+#X obj 3 270 doc_o 1;
+#X obj 14 300 doc_oo 0;
+#X obj 97 300 doc_m o0 float int;
+#X text 232 300 nonnegative list index of first occurrence \, or -1
+if not found.;
+#X obj 3 345 doc_also;
+#X obj 103 345 listread;
+#X connect 2 0 4 0;
+#X connect 3 0 2 0;
+#X connect 11 1 14 0;
+#X connect 12 1 13 0;
+#X connect 17 1 18 0;
+#X connect 19 1 20 0;

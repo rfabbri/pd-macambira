@@ -1,0 +1,23 @@
+#N canvas 610 97 632 367 10;
+#X obj 92 137 #out window;
+#X obj 92 117 #hello;
+#X obj 92 77 loadbang;
+#X obj 0 0 doc_h;
+#X obj 3 170 doc_c;
+#X obj 0 334 doc_f;
+#X obj 3 210 doc_i 1;
+#X obj 14 240 doc_ii 0;
+#X obj 97 240 doc_m i0 list;
+#X text 232 240 Size of the grid.;
+#X obj 3 272 doc_o 1;
+#X obj 14 302 doc_oo 0;
+#X obj 97 302 doc_m o0 grid;
+#X text 9 35 Generates a television test pattern of 7 colour bars à
+la SMPTE.;
+#X text 232 302 Returns a grid representing the 7 colour bars.;
+#X msg 92 97 200 200;
+#X connect 1 0 0 0;
+#X connect 2 0 15 0;
+#X connect 8 1 9 0;
+#X connect 12 1 14 0;
+#X connect 15 0 1 0;

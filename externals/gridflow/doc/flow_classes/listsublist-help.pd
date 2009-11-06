@@ -1,0 +1,60 @@
+#N canvas 628 22 632 580 10;
+#X obj 103 531 listappend;
+#X obj 175 531 listelement;
+#X obj 253 531 listfind;
+#X obj 313 531 listflatten;
+#X obj 391 531 listprepend;
+#X obj 469 531 listreverse;
+#X msg 173 112 1 3 hello 8 13;
+#X msg 182 136 1 12 a b c d e f g h i j k l;
+#X obj 174 211 display;
+#X text 232 486 Outputs the sublist as specified by the inlets or the
+arguments.;
+#X text 9 33 The [listsublist] outputs consecutive elements of the
+list \, as selected by index (inlet 1 or arg 1) and length (inlet 2
+or arg 2). A negative index will start from the end of the list (like
+-1 means last element in the list).;
+#X floatatom 224 158 5 0 0 0 - - -;
+#X obj 0 0 doc_h;
+#X obj 3 350 doc_i 3;
+#X obj 3 456 doc_o 1;
+#X obj 3 253 doc_c 0..2;
+#X obj 3 531 doc_also;
+#X obj 14 380 doc_ii 0;
+#X obj 14 402 doc_ii 1;
+#X obj 14 424 doc_ii 2;
+#X obj 14 283 doc_cc 0;
+#X obj 14 305 doc_cc 1;
+#X obj 14 486 doc_oo 0;
+#X obj 547 531 listsublist;
+#X floatatom 267 158 5 0 0 0 - - -;
+#X obj 173 182 listsublist 2 3;
+#X text 232 283 The index in the list to start the sublist at.;
+#X text 232 305 The number of items wanted from the list starting at
+the index specified.;
+#X text 232 402 Index (See Argument 0);
+#X text 232 424 Number of items (See Argument 1);
+#X obj 97 283 doc_m c0 float/int;
+#X obj 97 305 doc_m c1 float/int;
+#X obj 97 380 doc_m i0 list;
+#X obj 97 402 doc_m i1 float int;
+#X obj 97 424 doc_m i2 float int;
+#X obj 97 486 doc_m o0 list;
+#X obj 0 551 doc_f;
+#X connect 6 0 25 0;
+#X connect 7 0 25 0;
+#X connect 11 0 25 1;
+#X connect 16 1 0 0;
+#X connect 16 1 1 0;
+#X connect 16 1 2 0;
+#X connect 16 1 3 0;
+#X connect 16 1 4 0;
+#X connect 16 1 5 0;
+#X connect 16 1 23 0;
+#X connect 24 0 25 2;
+#X connect 25 0 8 0;
+#X connect 30 1 26 0;
+#X connect 31 1 27 0;
+#X connect 33 1 28 0;
+#X connect 34 1 29 0;
+#X connect 35 1 9 0;

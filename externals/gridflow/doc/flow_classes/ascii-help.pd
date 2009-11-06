@@ -1,0 +1,25 @@
+#N canvas 442 305 632 357 10;
+#X obj 39 73 ascii;
+#X floatatom 39 41 5 0 0 0 - - -;
+#X obj 39 92 print;
+#X text 135 74 write integer as decimal in ascii codes;
+#X text 232 195 number to be converted into ascii codes;
+#X obj 0 0 doc_h;
+#X obj 3 227 doc_o 1;
+#X obj 3 165 doc_i 1;
+#X obj 14 195 doc_ii 0;
+#X obj 14 257 doc_oo 0;
+#X obj 3 125 doc_c 0;
+#X obj 97 195 doc_m i0 float int;
+#X obj 97 257 doc_m o0 float;
+#X obj 0 328 doc_f;
+#X msg 86 40 1e+06;
+#X text 232 257 a sequence of floats corresponding to the ascii codes
+of the input integer as written in decimal. the sign is written in
+the case of negative values. exponential notation is used for large
+numbers.;
+#X connect 0 0 2 0;
+#X connect 1 0 0 0;
+#X connect 11 1 4 0;
+#X connect 12 1 15 0;
+#X connect 14 0 0 0;

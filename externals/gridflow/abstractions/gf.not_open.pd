@@ -1,0 +1,10 @@
+#N canvas 0 0 450 300 10;
+#X obj 16 16 inlet;
+#X obj 16 35 t b b;
+#X obj 16 73 outlet;
+#X obj 55 35 gf.error not open;
+#X msg 16 54 not_open;
+#X connect 0 0 1 0;
+#X connect 1 0 4 0;
+#X connect 1 1 3 0;
+#X connect 4 0 2 0;

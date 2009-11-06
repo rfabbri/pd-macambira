@@ -1,0 +1,29 @@
+#N canvas 669 0 632 376 10;
+#X obj 43 44 #centroid;
+#X obj 14 163 doc_ii 0;
+#X obj 14 251 doc_oo 0;
+#X obj 14 273 doc_oo 1;
+#X obj 14 295 doc_oo 2;
+#X text 232 163 will compute the centroid of the given grid \, which
+is a weighted average \, namely \, the average position weighted by
+the pixel values.;
+#X text 138 41 obsolete. please use [#moment] instead.;
+#X obj 3 327 doc_also;
+#X obj 103 327 #moment;
+#X text 232 251 (y x);
+#X text 232 273 y;
+#X text 232 295 x;
+#X obj 0 0 doc_h;
+#X obj 0 347 doc_f;
+#X obj 3 93 doc_c;
+#X obj 3 133 doc_i 1;
+#X obj 3 221 doc_o 3;
+#X obj 97 163 doc_m i0;
+#X obj 97 251 doc_m o0 grid;
+#X obj 97 295 doc_m o2 float;
+#X obj 97 273 doc_m o1 float;
+#X connect 7 1 8 0;
+#X connect 17 1 5 0;
+#X connect 18 1 9 0;
+#X connect 19 1 11 0;
+#X connect 20 1 10 0;

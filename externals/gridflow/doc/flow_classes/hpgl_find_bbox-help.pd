@@ -1,0 +1,21 @@
+#N canvas 335 118 632 322 10;
+#X obj 0 293 doc_f;
+#X obj 0 0 doc_h;
+#X obj 94 48 hpgl_find_bbox;
+#X obj 3 81 doc_c 0;
+#X obj 3 121 doc_i 2;
+#X obj 3 231 doc_o 1;
+#X obj 14 151 doc_ii 0;
+#X obj 14 173 doc_ii 1;
+#X obj 14 261 doc_oo 0;
+#X obj 97 151 doc_m i0 <hpgl>;
+#X obj 97 173 doc_m i1 bang;
+#X obj 97 261 doc_m o0 grid;
+#X text 232 261 (2 2)-grid representing bounding box.;
+#X text 232 151 HPGL stream to find the bounding box of.;
+#X text 232 173 outputs the bounding box of all coordinates used so
+far in PA \, PD \, PU commands. if no such coordinates have been used
+so far \, it will output funny nonsense values instead.;
+#X connect 9 1 13 0;
+#X connect 10 1 14 0;
+#X connect 11 1 12 0;

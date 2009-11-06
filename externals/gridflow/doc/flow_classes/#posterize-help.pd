@@ -1,0 +1,63 @@
+#N canvas 674 0 632 625 10;
+#X obj 178 114 bng 15 250 50 0 empty empty empty 0 -6 0 8 -4034 -1
+-1;
+#X text 274 230 2 - 255;
+#X msg 217 157 open bluemarble.jpg;
+#X obj 197 179 #in;
+#X obj 178 203 #store;
+#X obj 178 251 #posterize;
+#X obj 103 570 #convolve;
+#X obj 169 570 #contrast;
+#X obj 235 570 #solarize;
+#X obj 301 570 #layer;
+#X obj 0 0 doc_h;
+#X obj 3 570 doc_also;
+#X obj 3 424 doc_i 2;
+#X obj 3 508 doc_o 1;
+#X obj 14 538 doc_oo 0;
+#X obj 14 454 doc_ii 0;
+#X obj 14 476 doc_ii 1;
+#X text 10 35 Reduces the number of possible intensities in an image:
+it rounds the color values. The effect is mostly apparent with a low
+number of levels.;
+#X obj 202 271 #out window \, title original;
+#X obj 178 291 #out window \, title modified;
+#X obj 178 136 t b b b;
+#X floatatom 235 230 5 0 0 0 - - -;
+#X msg 235 210 2;
+#X obj 235 190 loadbang;
+#X obj 97 454 doc_m i0 grid;
+#X obj 97 476 doc_m i1 float int;
+#X obj 97 538 doc_m o0 grid;
+#X text 232 538 posterised image;
+#X obj 3 323 doc_c 1;
+#X obj 14 353 doc_cc 0;
+#X obj 97 353 doc_m c0 float/int;
+#X text 11 75 example: simulate the 216-color "web" palette using 6
+levels. simulate a 15-bit display using 32 levels .;
+#X text 232 353 Number of possible levels per channel. The levels are
+equally spaced \, with the lowest at 0 and the highest at 255 the minimum
+number of levels is 2 and the default value is also 2;
+#X obj 0 590 doc_f;
+#X text 232 454 original image;
+#X text 232 476 same as arg 0;
+#X connect 0 0 20 0;
+#X connect 2 0 3 0;
+#X connect 3 0 4 1;
+#X connect 4 0 5 0;
+#X connect 4 0 18 0;
+#X connect 5 0 19 0;
+#X connect 11 1 6 0;
+#X connect 11 1 7 0;
+#X connect 11 1 8 0;
+#X connect 11 1 9 0;
+#X connect 20 0 4 0;
+#X connect 20 1 3 0;
+#X connect 20 2 2 0;
+#X connect 21 0 5 1;
+#X connect 22 0 21 0;
+#X connect 23 0 22 0;
+#X connect 24 1 34 0;
+#X connect 25 1 35 0;
+#X connect 26 1 27 0;
+#X connect 30 1 32 0;

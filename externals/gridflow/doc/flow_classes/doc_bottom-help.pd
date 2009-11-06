@@ -1,0 +1,27 @@
+#N canvas 335 118 632 372 10;
+#X obj 0 0 doc_h;
+#X obj 0 343 doc_f;
+#X obj 114 54 doc_bottom;
+#X obj 3 162 doc_i 2;
+#X obj 3 281 doc_o 1;
+#X obj 14 311 doc_oo 0;
+#X obj 14 192 doc_ii 0;
+#X obj 14 236 doc_ii 1;
+#X obj 97 311 doc_m o0 float;
+#X text 232 311 y position;
+#X obj 97 236 doc_m i1 symbol;
+#X obj 97 192 doc_m i0 float;
+#X obj 97 214 doc_m i0 before;
+#X text 232 192 y position;
+#X obj 3 100 doc_c 1;
+#X obj 14 130 doc_cc 0;
+#X obj 97 130 doc_m c0 float;
+#X text 232 130 0 or 1 whether to use the "before" directive.;
+#X text 232 214 used for sorting by name (id);
+#X text 232 236 node whose direct children should be queried (specified
+without the \$0);
+#X connect 8 1 9 0;
+#X connect 10 1 19 0;
+#X connect 11 1 13 0;
+#X connect 12 1 18 0;
+#X connect 16 1 17 0;

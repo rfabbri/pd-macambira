@@ -1,0 +1,96 @@
+#N canvas 188 22 632 673 10;
+#X floatatom 7 380 5 0 0 0 - - -;
+#X floatatom 71 348 5 0 0 0 - - -;
+#X floatatom 136 323 5 0 0 0 - - -;
+#X obj 7 34 tgl 15 0 empty empty empty 17 7 0 10 -24198 -1 -1 0 1;
+#X text 215 206 * my system resets the owner of the printer port to
+'root.lp' so I need to issue as root 'chown myuser.lp';
+#X text 215 50 * you will need : a paper clip (or a 'high tech' solid
+core 22-18 awg wire) an led a button;
+#X text 215 176 * consult http://en.wikipedia.org/wiki/Parallel_Port
+for the pinouts + more;
+#X text 215 255 7 6 5 4 3 2 1 0 bit number;
+#X text 215 269 9 8 7 6 5 4 3 2 pin number;
+#X text 215 237 layout of bit to pin numbers;
+#X text 18 32 <-- This will send a 0 or a 1 to the first pin;
+#X text 14 243 Will accept values from 0-255;
+#X obj 7 132 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 0 1
+;
+#X obj 26 132 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 0 1
+;
+#X obj 45 132 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 0 1
+;
+#X obj 64 132 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 0 1
+;
+#X obj 83 132 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 0 1
+;
+#X obj 102 132 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 0
+1;
+#X obj 121 132 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 0
+1;
+#X obj 140 132 tgl 15 0 empty empty empty 0 -6 0 8 -260818 -1 -1 0
+1;
+#X obj 7 229 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-241291 -1 -1 0 256;
+#X obj 7 191 #fold +;
+#X obj 7 210 #to_float;
+#X obj 7 172 # << (0 1 2 3 4 5 6 7);
+#X obj 7 153 #pack 8 \, \, \, \, \, \, \, \, \, \, \, \, \, \, \, \,
+;
+#X text 19 274 takes the port as argument;
+#X text 44 -1 The cheapest digital i/o interface;
+#X obj 7 293 parallel_port /dev/lp0;
+#X obj 7 63 metro 1;
+#X text 215 286 Flags : PERRORP (active low) \, PSELECD (active high)
+\, POUTPA (active high) \, PACK (active low) \, PBUSY (active high)
+;
+#X obj 0 0 doc_h;
+#X text 215 80 1: break the paper clip in two and connect pin 11 (Busy)
+to pin 24 (GND) and pin 12 (Paper-Out) to 25 (GND). Those pins are
+normally 1 and grounding them opens the port for messages.;
+#X text 215 138 2: connect the led between pins 2 (Data0) and 23 (GND)
+;
+#X text 215 156 3: connect a button between pin 10 and 22 (GND);
+#X obj 3 416 doc_c 1;
+#X obj 3 478 doc_i 1;
+#X obj 14 508 doc_ii 0;
+#X obj 14 446 doc_cc 0;
+#X obj 0 644 doc_f;
+#X text 177 322 parallel port flags;
+#X text 110 348 status (pin 10);
+#X text 51 379 reserved for future use;
+#X obj 3 540 doc_o 3;
+#X obj 14 570 doc_oo 0;
+#X obj 14 590 doc_oo 1;
+#X obj 14 612 doc_oo 2;
+#X obj 97 612 doc_m o2 float;
+#X obj 97 590 doc_m o1 float;
+#X obj 97 570 doc_m o0 <none>;
+#X obj 97 508 doc_m i0 float;
+#X obj 97 446 doc_m c0 symbol;
+#X text 232 446 device name (Linux parallel port interface);
+#X text 232 508 bytes to send;
+#X text 232 590 status;
+#X text 232 612 flags;
+#X connect 3 0 28 0;
+#X connect 12 0 24 0;
+#X connect 13 0 24 1;
+#X connect 14 0 24 2;
+#X connect 15 0 24 3;
+#X connect 16 0 24 4;
+#X connect 17 0 24 5;
+#X connect 18 0 24 6;
+#X connect 19 0 24 7;
+#X connect 20 0 27 0;
+#X connect 21 0 22 0;
+#X connect 22 0 20 0;
+#X connect 23 0 21 0;
+#X connect 24 0 23 0;
+#X connect 27 0 0 0;
+#X connect 27 1 1 0;
+#X connect 27 2 2 0;
+#X connect 28 0 12 0;
+#X connect 46 1 54 0;
+#X connect 47 1 53 0;
+#X connect 49 1 52 0;
+#X connect 50 1 51 0;

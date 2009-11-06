@@ -1,0 +1,52 @@
+#N canvas 648 0 632 537 10;
+#X obj 21 109 @complex_sq;
+#X text 176 59 this object computes the square of complex numbers.
+if seeing imaginary as Y and real as X \, then this operation squares
+the distance of a point from origin and doubles the angle between it
+and the +X half-axis clockwise. :);
+#X floatatom 21 58 5 0 0 0 - - -;
+#X floatatom 21 188 5 0 0 0 - - -;
+#X floatatom 64 58 5 0 0 0 - - -;
+#X floatatom 58 188 5 0 0 0 - - -;
+#X obj 21 78 #pack;
+#X obj 114 185 #print;
+#X obj 21 159 #unpack;
+#X obj 103 488 # +;
+#X obj 133 488 # abs-;
+#X obj 3 488 doc_also;
+#X obj 181 488 # C.sq-;
+#X obj 3 324 doc_c 0;
+#X obj 3 364 doc_i 1;
+#X obj 3 426 doc_o 1;
+#X obj 0 0 doc_h;
+#X obj 14 456 doc_oo 0;
+#X obj 14 394 doc_ii 0;
+#X obj 97 394 doc_m i0 grid;
+#X obj 97 456 doc_m o0 grid;
+#X text 232 394 grid of size (... \, 2);
+#X text 232 456 grid of same size;
+#X obj 0 508 doc_f;
+#X text 178 128 However \, this (old) object is backwards from the
+rest of GridFlow because it puts Imaginary before Real. [#fft] puts
+the Real part first. Open this abstraction to discover the new way
+to square a complex number. (The extra multiplication is the net result
+of swapping components before and after the squaring);
+#X text 178 212 used on an indexmap (#remap_image) \, this makes each
+thing appear twice \, each appearance spanning half of the original
+angle. straight lines become hyperbolic \, etc.;
+#X text 179 259 In the original version of GridFlow (aka Video4jmax
+0.2) \, the first example patch was feedback_fractal \, which used
+this operation with a [#remap_image] \, though it was expressed in
+much different terms back then.;
+#X connect 0 0 7 0;
+#X connect 0 0 8 0;
+#X connect 2 0 6 0;
+#X connect 4 0 6 1;
+#X connect 6 0 0 0;
+#X connect 8 0 3 0;
+#X connect 8 1 5 0;
+#X connect 11 1 9 1;
+#X connect 11 1 10 0;
+#X connect 11 1 12 0;
+#X connect 19 1 21 0;
+#X connect 20 1 22 0;

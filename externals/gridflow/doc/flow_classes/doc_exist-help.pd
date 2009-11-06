@@ -1,0 +1,26 @@
+#N canvas 215 276 632 354 10;
+#X obj 0 0 doc_h;
+#X obj 0 325 doc_f;
+#X obj 116 44 doc_exist;
+#X obj 3 82 doc_c 1;
+#X obj 3 157 doc_i 2;
+#X obj 3 241 doc_o 1;
+#X obj 14 271 doc_oo 0;
+#X obj 14 187 doc_ii 0;
+#X obj 14 209 doc_ii 1;
+#X obj 14 112 doc_cc 0;
+#X obj 97 112 doc_m c0 symbol;
+#X text 232 112 relative name of object to be checked for. the \$0
+of the parent will be automatically added (with a slash).;
+#X obj 97 187 doc_m i0 bang;
+#X obj 97 209 doc_m i1 symbol;
+#X text 232 209 same as arg 0;
+#X obj 97 271 doc_m o0 float;
+#X text 232 187 perform a check and output the result;
+#X text 232 271 0: not found;
+#X text 232 293 1: found;
+#X connect 10 1 11 0;
+#X connect 12 1 16 0;
+#X connect 13 1 14 0;
+#X connect 15 1 17 0;
+#X connect 15 1 18 0;

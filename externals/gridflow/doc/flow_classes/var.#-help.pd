@@ -1,0 +1,21 @@
+#N canvas 335 118 632 407 10;
+#X obj 0 0 doc_h;
+#X obj 0 378 doc_f;
+#X obj 125 58 var.#;
+#X text 189 44 somewhat like [#store] but designed to be most especially
+to grids what [f] is to floats and [symbol] is to symbols.;
+#X obj 3 218 doc_i 2;
+#X obj 3 318 doc_o 1;
+#X text 191 85 it was named that way because if you alias [f] to [var.f]
+\, and [s] to [var.s] \, then [var.\$1] will instantiate an object
+of that class-family. (this is related to the PureUnity project);
+#X obj 14 348 doc_oo 0;
+#X obj 14 288 doc_ii 1;
+#X obj 97 348 doc_m o0 grid;
+#X obj 97 288 doc_m i1 grid;
+#X obj 97 268 doc_m i0 grid;
+#X obj 97 248 doc_m i0 bang;
+#X obj 14 248 doc_ii 0;
+#X obj 14 188 doc_cc 0;
+#X obj 3 158 doc_c 0..1;
+#X obj 97 188 doc_m c0 grid;

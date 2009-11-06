@@ -1,0 +1,77 @@
+#N canvas 676 0 632 642 10;
+#X obj 0 0 doc_h;
+#X obj 26 50 #in videodev;
+#X obj 3 99 doc_c ...;
+#X obj 3 160 doc_i 1;
+#X obj 3 898 doc_o 1;
+#X obj 3 995 doc_also;
+#X obj 103 995 #io:quicktimecamera;
+#X msg 28 129 open videodev /dev/video0;
+#X obj 14 190 doc_ii 0;
+#X obj 97 210 doc_m i0 brightness;
+#X obj 97 539 doc_m i0 hue;
+#X obj 97 338 doc_m i0 colour;
+#X obj 97 378 doc_m i0 contrast;
+#X obj 97 868 doc_m i0 whiteness;
+#X obj 97 418 doc_m i0 get;
+#X obj 97 519 doc_m i0 help;
+#X obj 97 230 doc_m i0 channel;
+#X obj 97 768 doc_m i0 tuner;
+#X obj 97 579 doc_m i0 norm;
+#X obj 97 398 doc_m i0 frequency;
+#X obj 97 619 doc_m i0 transfer symbol;
+#X text 232 619 "read";
+#X text 232 663 "mmap": \$1=nframes (default:2);
+#X text 232 685 This is the normal (and fast) way of transferring pictures
+from the camera.;
+#X text 232 641 Some cameras/drivers only support this instead of mmap.
+;
+#X obj 97 828 doc_m i0 white_red;
+#X obj 97 788 doc_m i0 white_blue;
+#X obj 97 848 doc_m i0 white_speed;
+#X obj 97 808 doc_m i0 white_delay;
+#X obj 97 190 doc_m i0 auto_gain;
+#X obj 97 559 doc_m i0 noise_reduction;
+#X obj 97 358 doc_m i0 compression;
+#X obj 97 250 doc_m i0 colorspace;
+#X text 232 250 "y":;
+#X text 232 272 "yuv":;
+#X text 232 294 "rgb":;
+#X text 232 316 "magic":;
+#X obj 97 599 doc_m i0 size;
+#X text 188 764 \$1=y \$2=x;
+#X text 232 453 "min": minimum values for "size";
+#X text 232 475 "max": maximum values for "size";
+#X text 232 497 default: gets all attributes.;
+#X text 232 418 gets a specific attribute. a message is sent through
+right outlet.;
+#X text 232 720 In case of mmap \, the extra numeric argument sets
+the queue length in number of frames \, so you can select an appropriate
+tradeoff between efficiency and latency.;
+#X obj 0 1015 doc_f;
+#X obj 229 995 #io.dc1394;
+#X obj 14 928 doc_oo 0;
+#X obj 97 928 doc_m o0 grid;
+#X obj 97 950 doc_m o0 <any>;
+#X text 232 928 image coming out;
+#X text 232 950 most any inlet 0 message is also an outlet 0 message
+whose output can be triggered using 'get'.;
+#X text 130 51 get images from a V4L1 camera interface.;
+#X text 130 66 this is for Linux only.;
+#X connect 5 1 6 0;
+#X connect 5 1 45 0;
+#X connect 14 1 42 0;
+#X connect 14 1 39 0;
+#X connect 14 1 40 0;
+#X connect 14 1 41 0;
+#X connect 20 1 21 0;
+#X connect 20 1 24 0;
+#X connect 20 1 22 0;
+#X connect 20 1 23 0;
+#X connect 20 1 43 0;
+#X connect 32 1 33 0;
+#X connect 32 1 34 0;
+#X connect 32 1 35 0;
+#X connect 32 1 36 0;
+#X connect 47 1 49 0;
+#X connect 48 1 50 0;

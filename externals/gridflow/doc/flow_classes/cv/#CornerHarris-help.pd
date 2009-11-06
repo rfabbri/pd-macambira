@@ -1,0 +1,14 @@
+#N canvas 599 185 568 336 10;
+#X obj 0 0 doc_h cv/;
+#X obj 0 307 doc_f;
+#X obj 73 53 cv/#CornerHarris;
+#X obj 3 87 doc_c 0;
+#X obj 3 127 doc_i 1;
+#X obj 14 157 doc_ii 0;
+#X obj 3 247 doc_o 1;
+#X obj 14 277 doc_oo 0;
+#X obj 97 277 doc_m o0 grid;
+#X obj 97 157 doc_m i0 grid;
+#X obj 97 197 doc_m i0 block_size;
+#X obj 97 177 doc_m i0 aperture_size;
+#X obj 97 217 doc_m i0 k;

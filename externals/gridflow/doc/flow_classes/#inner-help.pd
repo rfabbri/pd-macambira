@@ -1,0 +1,56 @@
+#N canvas 666 0 632 642 10;
+#X obj 0 0 doc_h;
+#X obj 3 158 doc_c 1;
+#X obj 3 218 doc_i 2;
+#X obj 3 560 doc_o 1;
+#X obj 14 188 doc_cc 0;
+#X obj 14 248 doc_ii 0;
+#X obj 14 528 doc_ii 1;
+#X obj 14 590 doc_oo 0;
+#X text 232 248 Splits the Dim(anyA... \, lastA) left-hand grid into
+Dim(anyA...) pieces of Dim(lastA) size.;
+#X text 232 283 Splits the Dim(firstB \, anyB...) right-hand grid into
+Dim(anyB...) pieces of Dim(firstB) size.;
+#X text 232 318 On every piece pair \, does [#] using the specified
+op_para operation \, followed by a [#fold] using the specified op_fold
+operator and base value.;
+#X text 232 366 creates a Dim(anyA... \, anyB...) grid by assembling
+all the results together.;
+#X text 232 401 (note: lastA must be equal to firstB.);
+#X text 232 528 same as arg 0;
+#X text 232 471 the operation that combines the values from the two
+grids together. this defaults to "*" (as in the matrix product);
+#X text 232 423 the operation that combines the result of the "op"
+operations together. this defaults to "+" (as in the matrix product)
+;
+#X text 232 506 the base value for the fold;
+#X obj 0 640 doc_f;
+#X obj 97 248 doc_m i0 grid;
+#X obj 97 188 doc_m c0 grid;
+#X obj 97 471 doc_m i0 op;
+#X obj 97 506 doc_m i0 seed;
+#X obj 97 528 doc_m i1 grid;
+#X obj 97 590 doc_m o0 grid;
+#X obj 97 423 doc_m i0 fold;
+#X obj 3 620 doc_also;
+#X obj 103 620 #outer *;
+#X obj 163 620 #fold +;
+#X obj 62 89 #inner;
+#X text 160 48 think of this one as a special combination of [#outer]
+\, [#] and [#fold]. this is one of the most complex operations. It
+is very useful for performing linear transforms like rotations \, scalings
+\, shearings \, and some kinds of color remappings. A linear transform
+is done by something called matrix multiplication \, which happens
+to be [#inner]. [#inner] also does dot product and other funny operations.
+;
+#X connect 18 1 8 0;
+#X connect 18 1 9 0;
+#X connect 18 1 10 0;
+#X connect 18 1 11 0;
+#X connect 18 1 12 0;
+#X connect 20 1 14 0;
+#X connect 21 1 16 0;
+#X connect 22 1 13 0;
+#X connect 24 1 15 0;
+#X connect 25 1 26 0;
+#X connect 25 1 27 0;

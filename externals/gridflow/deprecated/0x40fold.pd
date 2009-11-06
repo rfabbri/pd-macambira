@@ -1,0 +1,15 @@
+#N canvas 404 162 450 184 10;
+#X obj 14 15 inlet;
+#X obj 193 23 inlet;
+#X obj 14 129 outlet;
+#X obj 124 22 args op seed;
+#X msg 121 63 op \$1;
+#X msg 154 63 seed \$1;
+#X obj 14 110 #fold +;
+#X connect 0 0 6 0;
+#X connect 1 0 5 0;
+#X connect 3 0 4 0;
+#X connect 3 1 5 0;
+#X connect 4 0 6 0;
+#X connect 5 0 6 0;
+#X connect 6 0 2 0;

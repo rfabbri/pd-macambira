@@ -1,0 +1,40 @@
+#N canvas 623 251 632 454 10;
+#X obj 0 0 doc_h;
+#X obj 0 425 doc_f;
+#X floatatom 44 48 5 0 0 0 - - -;
+#X floatatom 44 85 5 0 0 0 - - -;
+#X obj 3 143 doc_c any;
+#X obj 14 173 doc_cc any;
+#X obj 97 173 doc_m cany <any>;
+#X obj 3 203 doc_i 1;
+#X obj 14 233 doc_ii 0;
+#X obj 97 233 doc_m i0 float;
+#X obj 3 330 doc_o 1;
+#X obj 14 360 doc_oo 0;
+#X obj 97 360 doc_m o0 float int;
+#X text 232 360 nonnegative list index of first occurrence \, or -1
+if not found.;
+#X obj 3 405 doc_also;
+#X obj 103 405 listread;
+#X obj 44 66 listread 2 3 5 7 11 13;
+#X text 188 41 like [tabread] \, this outputs an element when given
+an index \, but unlike [tabread] \, this uses a list instead of an
+array.;
+#X obj 44 103 listfind 2 3 5 7 11 13;
+#X floatatom 44 122 5 0 0 0 - - -;
+#X text 188 88 a [listfind] with the same content cancels the effect
+of a [listread] when the input of [listread] is nonnegative and is
+smaller than the list's length.;
+#X text 232 233 lookup an element. if the index is nonnegative \, then
+it must be less than the list length \, else no output will be produced.
+if the index is negative \, then it must be greater than or equal to
+minus the list length \, and this counts from the end of the list:
+-1 will output the last element \, -2 will output the next to last
+\, etc.;
+#X connect 2 0 16 0;
+#X connect 3 0 18 0;
+#X connect 9 1 21 0;
+#X connect 12 1 13 0;
+#X connect 14 1 15 0;
+#X connect 16 0 3 0;
+#X connect 18 0 19 0;

@@ -1,0 +1,65 @@
+#N canvas 523 65 902 461 10;
+#X obj 4 323 cnv 15 900 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 5 -67 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 5 -106 cnv 15 900 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 5 -106 cnv 15 780 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 12 -99 2 Introduction to Images;
+#X obj 450 -67 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 453 -67 1.2 How to create a grid.;
+#X obj 450 -67 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 112 167 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 621 48 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 621 100 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 557 99 <-- step #2 : click here to update the image;
+#X text 556 47 <-- step #1 : click here to load the image;
+#X text 8 169 step 3: Add a;
+#X text 7 136 step 2: Create [#in] object;
+#X text 8 202 step 4: Create a [#out window];
+#X text 6 98 step 1:;
+#X obj 450 264 cnv 15 25 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 449 264 Tip:;
+#X text 485 263 Remember \, as with the rest of PD \, you can obtain
+information regarding specific objects by right-clicking on it. Try
+this for [#in].;
+#X text 6 250 GridFlow accepts several image formats including .jpg
+\, .png \, .tiff.;
+#X text 449 213 The [#out window] object must be deleted in order to
+close the display window the image is in.;
+#X text 8 -46 The following steps outline the items that you need to
+open a grid. Whether it be an image or a video you want to open theses
+four steps are necessary.;
+#X text 8 2 In order for GridFlow to recognize your media files by
+file name you have to put them in the "images" folder (located within
+the GridFlow directory). Another way to locate an image is to specify
+the path to where it is saved on your hard drive in the message box.
+;
+#X text 452 -46 To view the image you must initialize the patch. Click
+on the message box \, and then on the bang (this must be done in the
+run mode). The image will appear in a display window \, off to the
+side of the patch. Sometimes the display window opens behind the patch
+\, try moving the patch if the display seems to be missing.;
+#X text 459 -66 2.1 Patch Example;
+#X text 8 -68 2.1 Opening an Image;
+#X obj 450 140 cnv 15 22 15 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 450 180 #out window;
+#X msg 450 48 open b001.jpg;
+#X obj 534 99 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 450 139 #in;
+#X text 62 113 extension you want to open;
+#X text 63 99 Create message box [open< with the file name and;
+#X text 11 329 GridFlow 0.9.0;
+#X connect 29 0 31 0;
+#X connect 30 0 31 0;
+#X connect 31 0 28 0;

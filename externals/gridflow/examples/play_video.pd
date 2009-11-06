@@ -1,0 +1,44 @@
+#N canvas 1036 382 502 475 10;
+#X obj 29 221 #in;
+#X obj 29 -37 tgl 15 0 empty empty empty 17 7 0 10 -24198 -1 -1 0 1
+;
+#X obj 30 323 display;
+#X obj -17 -85 cnv 15 500 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj -16 356 cnv 15 500 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text -7 363 GridFlow 0.8.0;
+#X text -6 -83 play_video.pd;
+#X obj 29 -6 metro 33.333;
+#X obj 29 270 #out window \, title video;
+#X obj 29 296 fps;
+#X text -7 363 GridFlow 0.9.0;
+#X text 58 -38 <-- 2 start the metro;
+#X floatatom 69 167 5 0 0 0 - - -;
+#X msg 94 195 42;
+#X text 129 195 <-- select the frame number;
+#X text 116 84 libraries. Photo jpeg compression gives slightly;
+#X text 118 98 better results than mjpega. Rendering is cpu;
+#X text 117 112 intensive so if operations on the images is;
+#X text 117 70 Supported codecs will depend on your installed;
+#X text 114 166 <-- scrub the video (stop the metro first);
+#X text 117 138 such as 320 x 240;
+#X text 118 125 needed \, then start with a lower resolution;
+#X text 174 29 <-- 1 open a file \, make sure the correct;
+#X text 173 43 path is entered in pd's 'Path' preferences.;
+#X floatatom 53 246 5 0 0 0 - - -;
+#X obj 99 245 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 123 244 <-- outputs a bang when finished;
+#X text 139 -82 see also [#in]'s help file;
+#X msg 46 30 open violoncelle.mov;
+#X connect 0 0 8 0;
+#X connect 0 1 24 0;
+#X connect 0 1 25 0;
+#X connect 1 0 7 0;
+#X connect 7 0 0 0;
+#X connect 8 0 9 0;
+#X connect 9 0 2 0;
+#X connect 12 0 0 0;
+#X connect 13 0 0 0;
+#X connect 28 0 0 0;

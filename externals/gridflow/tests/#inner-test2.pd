@@ -1,0 +1,11 @@
+#N canvas 672 46 450 300 10;
+#X obj 51 121 #inner;
+#X obj 76 92 #transpose;
+#X obj 51 92 #t;
+#X obj 51 140 #print;
+#X msg 51 32 9 456 # 1 2 3 4 5;
+#X connect 0 0 3 0;
+#X connect 1 0 0 1;
+#X connect 2 0 0 0;
+#X connect 2 1 1 0;
+#X connect 4 0 2 0;

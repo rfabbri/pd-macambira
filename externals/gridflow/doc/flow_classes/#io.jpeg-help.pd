@@ -1,0 +1,16 @@
+#N canvas 666 0 632 245 10;
+#X obj 0 0 doc_h;
+#X obj 3 70 doc_i 1;
+#X obj 3 30 doc_c;
+#X obj 3 176 doc_o;
+#X obj 0 216 doc_f;
+#X obj 14 100 doc_ii 0;
+#X obj 97 100 doc_m i0 bang;
+#X obj 97 122 doc_m i0 grid;
+#X obj 97 144 doc_m i0 quality;
+#X text 232 100 read image (when in [#in]);
+#X text 232 122 write image (when in [#out]);
+#X text 232 144 quality percentage (when in [#out]);
+#X connect 6 1 9 0;
+#X connect 7 1 10 0;
+#X connect 8 1 11 0;

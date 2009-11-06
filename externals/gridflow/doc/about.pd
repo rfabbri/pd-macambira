@@ -1,0 +1,31 @@
+#N canvas 0 0 627 494 10;
+#X obj 0 453 doc_f;
+#N canvas 0 0 743 313 (subpatch) 0;
+#X obj 3 3 cnv 15 608 18 empty \$0-rect empty 2 9 1 13 -1 -262144 0
+;
+#X obj 511 3 cnv 15 100 18 empty \$0-rect2 GridFlow 1.0 2 9 1 12
+-1 -262144 0;
+#X coords 0 -1 1 1 614 24 1 0 0;
+#X restore 0 9 pd;
+#X text 96 280 Development of GridFlow 0.3.0 - 0.5.0 was made possible
+in part by a grant from the HRDC (DRHC) to Artengine.;
+#X text 96 311 Development of... much of GridFlow 0.8.x and 0.9.0 was
+made possible in part by a grant from the CSHRC.;
+#X text 96 371 Development of GridFlow 0.9.0 was made possible in part
+by Alexandre Castonguay's cooking.;
+#X text 96 260 GridFlow is sponsored by Artengine.;
+#X text 96 73 C++ Programming : Mathieu Bouchard;
+#X text 96 100 Pd Programming (abstractions) : Mathieu Bouchard;
+#X text 96 160 Pd Help Files (former ones) and Tutorials : Darsha Hewitt
+\, Stephanie Brodeur \, Alexandre Castonguay;
+#X text 96 130 Pd Help Files (current ones) : Mathieu Bouchard \, Patrick
+Boivin;
+#X text 19 47 Credits;
+#X text 16 231 Sponsors;
+#X text 96 195 OSX porting : Mathieu Bouchard \, James Tittle \, Adam
+Lindsay \, Patrick Boivin \, and others.;
+#X text 96 341 Development of [#from_pix] and [#to_pix] was sponsored
+by Videographe PARC;
+#X text 96 400 Development of GridFlow 0.9.3 and later has used Videographe
+as a meeting place. Since 0.9.6 \, the room is called Departement de
+Diagrammologie Algorithmique.;

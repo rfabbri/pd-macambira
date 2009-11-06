@@ -1,0 +1,81 @@
+$Id: README 2501 2006-07-24 16:25:29Z matju $
+
+Here's the file to list the authors of the pictures
+
+b001.jpg, r001.jpg:
+  Eyewire Catalogue, 1999 or before. It should be checked
+  whether there still exists a copyright on this, because
+  the original provider has disappeared (bankruptcy??)
+  several years ago.
+
+babbage.jpg :
+ (check provenance)
+Charles Babbage (1791-1871) is widely regarded as the first computer pioneer and 
+the great ancestral figure in the history of computing. Babbage excelled in a variety of 
+scientific and philosophical subjects though his present-day reputation rests largely 
+on the invention and design of his vast mechanical calculating engines. His 
+Analytical Engine conceived in 1834 is one of the startling intellectual feats of the 
+nineteenth century. The design of this machine possesses all the essential logical 
+features of the modern general purpose computer.
+from -> http://www.sciencemuseum.org.uk/on-line/babbage/index.asp
+
+etch_a_sketch.jpg :
+  by Stephanie Brodeur and Darsha Hewitt, 2006
+
+g001.jpg:
+  by Alexandre Castonguay, 1999 (?).
+
+bluemarble.jpg:
+  NASA (?)
+
+lada.jpg:
+  hungarian newspaper ad.
+
+lena.jpg:
+  Lena Sjööblom Soderberg, centerfold of Playboy 1972.11.
+  Researchers in infographics have extensively used that
+  picture without necessarily asking for copyright, and
+  apparently Playboy doesn't mind.
+
+lite_brite_code.jpg :
+  by Stephanie Brodeur and Darsha Hewitt, 2006
+
+lite_brite_1.jpg :
+  by Stephanie Brodeur and Darsha Hewitt, 2006
+
+litmus.jpg :
+  by Alexandre Castonguay, 2006.
+
+lucida-typewriter-12.grid.gz:
+  a grid(256,13,7) containing the Lucida Typewriter 12
+  medium font.
+
+opensource.png:
+  modification of a World War Two poster. Both authors
+  (original's and spoof's) are unknown to me. Should check.
+
+rose.jpg:
+  unknown origin.
+
+ruby0216.jpg:
+  photo from a conference about the Ruby programming language,
+  held somewhere in Japan in 2003 or so. (?)
+
+scissors.jpg, sewing.jpg, working.jpg :
+  original source (?) 
+  by Stephanie Brodeur and Darsha Hewitt, 2006
+
+teapot.png:
+  Researchers in infographics have also extensively used
+  that picture (actually the wireframe model). This is
+  (afaik) the original model, produced in the 1970's (?)
+  by one such researcher, and then was rendered in the
+  1990's using the Povray raytracer, and then bundled as
+  teapot.ppm in Tcl/Tk, and finally in 2001 I grabbed
+  that picture 
+
+test.mpeg:
+  unknown origin. Too small to be copyrightable.
+
+tux.tga.gz:
+  unknown origin.

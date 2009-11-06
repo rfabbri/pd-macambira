@@ -1,0 +1,10 @@
+#N canvas 454 262 632 251 10;
+#X obj 0 0 doc_h;
+#X obj 0 222 doc_f;
+#X obj 3 80 doc_c 1;
+#X obj 3 142 doc_i 0;
+#X obj 3 182 doc_o 0;
+#X obj 14 110 doc_cc 0;
+#X obj 97 110 doc_m c0 float;
+#X text 232 110 number of inlets in the class being documented;
+#X connect 6 1 7 0;

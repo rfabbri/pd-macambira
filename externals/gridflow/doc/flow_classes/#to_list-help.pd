@@ -1,0 +1,31 @@
+#N canvas 544 108 632 450 10;
+#X obj 15 164 cnv 15 52 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 50 115 display;
+#X msg 14 64 1 2 3 4 5 6 7 8;
+#X obj 161 217 display;
+#X text 12 27 Produces a list from grid data. Useful for the integration
+into the rest of PureData.;
+#X text 130 63 <-- create the grid here;
+#X obj 14 165 #to_list;
+#X obj 14 216 print converted_grid;
+#X obj 14 91 #import (2 2 2);
+#X obj 0 0 doc_h;
+#X obj 3 346 doc_o 1;
+#X obj 3 284 doc_i 1;
+#X obj 3 244 doc_c 0;
+#X text 232 376 The grid is transformed into a single message containing
+a sequence of floats.;
+#X obj 14 314 doc_ii 0;
+#X obj 14 376 doc_oo 0;
+#X obj 97 314 doc_m i0 grid;
+#X obj 97 376 doc_m o0 list;
+#X obj 0 421 doc_f;
+#X text 232 314 will be transformed into a list.;
+#X connect 2 0 8 0;
+#X connect 6 0 3 0;
+#X connect 6 0 7 0;
+#X connect 8 0 1 0;
+#X connect 8 0 6 0;
+#X connect 16 1 19 0;
+#X connect 17 1 13 0;

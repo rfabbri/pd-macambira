@@ -1,0 +1,22 @@
+#N canvas 338 225 632 377 10;
+#X obj 51 139 #print;
+#X obj 51 83 # +;
+#X obj 51 102 #polygon_each_edge;
+#X obj 0 0 doc_h;
+#X obj 3 170 doc_c;
+#X obj 3 210 doc_i 1;
+#X obj 3 273 doc_o 1;
+#X obj 14 303 doc_oo 0;
+#X obj 14 240 doc_ii 0;
+#X obj 0 348 doc_f;
+#X msg 51 48 4 2 # 0 0 0 20 20 20 20 0;
+#X obj 97 240 doc_m i0 grid;
+#X obj 97 303 doc_m o0 grid;
+#X text 232 240 Vertices of the polygon;
+#X text 232 303 Returns a grid contaning a vertex pair for each edge
+of the polygon.;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
+#X connect 10 0 1 0;
+#X connect 11 1 13 0;
+#X connect 12 1 14 0;

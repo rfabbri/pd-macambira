@@ -1,0 +1,11 @@
+#N canvas 565 290 632 249 10;
+#X obj 0 0 doc_h;
+#X obj 0 220 doc_f;
+#X text 173 43 an auto-positioning documentation header;
+#X obj 3 78 doc_c 1;
+#X obj 3 140 doc_i 0;
+#X obj 14 108 doc_cc 0;
+#X obj 3 180 doc_o 0;
+#X obj 97 108 doc_m c0 float;
+#X text 232 108 number of outlets in the class being documented;
+#X connect 7 1 8 0;

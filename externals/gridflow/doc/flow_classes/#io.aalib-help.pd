@@ -1,0 +1,45 @@
+#N canvas 684 0 632 568 10;
+#X obj 0 0 doc_h;
+#X obj 3 67 doc_c;
+#X msg 48 109 open aalib X11;
+#X text 161 105 Normally "X11" with uppercase X \; else consult the
+AALib manual.;
+#X text 161 141 you can pass "commandline options" of AALib here \,
+after "X11" or whichever other thing you chose instead of "X11".;
+#X obj 3 179 doc_i 1;
+#X obj 3 477 doc_o 1;
+#X obj 14 209 doc_ii 0;
+#X obj 14 507 doc_oo 0;
+#X obj 97 507 doc_m o0 grid;
+#X obj 97 209 doc_m i0 grid;
+#X text 232 209 grid(rows columns 1): converts a greyscale image to
+an ascii image and possibly displays it. note that the image is typically
+downscaled by a factor of 2 by aalib itself.;
+#X text 232 257 grid(rows columns 2): the inverse of "dump". Both together
+in a loop allow to post-process aalib's buffer before displaying. Goes
+well with "draw" \, "autodraw". the first channel is for the ascii
+codes and the second channel is for the attributes (colour \, blink).
+;
+#X obj 97 432 doc_m i0 print;
+#X text 232 432 \$1=y \$2=x \$3=attr \$4=text where text is a symbol
+and the rest are ints.;
+#X obj 97 331 doc_m i0 autodraw;
+#X text 232 331 "autodraw 1" does a "draw" after each incoming grid.
+;
+#X text 232 353 "autodraw 0" does not.;
+#X obj 97 375 doc_m i0 draw;
+#X text 232 375 eventually you need to use this if you use "autodraw
+0".;
+#X obj 97 397 doc_m i0 dump;
+#X text 232 397 produces a Dim[y \, x \, 2] grid whose two channels
+are ascii character codes and character attributes.;
+#X obj 0 539 doc_f;
+#X text 232 507 result of 'dump';
+#X connect 9 1 23 0;
+#X connect 10 1 11 0;
+#X connect 10 1 12 0;
+#X connect 13 1 14 0;
+#X connect 15 1 16 0;
+#X connect 15 1 17 0;
+#X connect 18 1 19 0;
+#X connect 20 1 21 0;

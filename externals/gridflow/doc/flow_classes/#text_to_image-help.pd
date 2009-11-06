@@ -1,0 +1,24 @@
+#N canvas 685 0 632 345 10;
+#X obj 0 0 doc_h;
+#X obj 33 40 #text_to_image;
+#X obj 3 71 doc_c 0;
+#X obj 3 111 doc_i 3;
+#X obj 3 256 doc_o 1;
+#X obj 14 141 doc_ii 0;
+#X obj 14 176 doc_ii 1;
+#X obj 14 211 doc_ii 2;
+#X obj 97 141 doc_m i0 bang;
+#X text 232 141 transforming the data into an image suitable for #draw_image.
+;
+#X obj 14 286 doc_oo 0;
+#X obj 97 286 doc_m o0 grid;
+#X obj 97 211 doc_m i2 grid;
+#X obj 97 176 doc_m i1 grid;
+#X text 232 176 2 by 3 matrix representing the colours to use (e.g.
+(2 3 # 0 170 0 255 255 0) means yellow on green);
+#X obj 0 316 doc_f;
+#X text 232 211 font grid \, for example \, from [#in grid lucida-typewriter-12.grid]
+;
+#X connect 8 1 9 0;
+#X connect 12 1 16 0;
+#X connect 13 1 14 0;

@@ -1,0 +1,29 @@
+#N canvas 678 0 632 446 10;
+#X obj 15 188 cnv 15 55 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 39 135 display;
+#X msg 15 73 1 2 3 4 5 6 7 8;
+#X text 138 73 <-- create the grid here;
+#X obj 15 188 #to_float;
+#X text 12 27 Produces sequences of floats from grid data. Useful for
+the integration into the rest of PureData.;
+#X obj 15 216 print converted_grid;
+#X obj 15 100 #import (2 2 2);
+#X obj 0 0 doc_h;
+#X obj 3 280 doc_i 1;
+#X obj 3 240 doc_c;
+#X obj 14 372 doc_oo 0;
+#X obj 14 310 doc_ii 0;
+#X obj 3 342 doc_o 1;
+#X obj 97 310 doc_m i0 grid;
+#X obj 97 372 doc_m o0 float;
+#X obj 0 417 doc_f;
+#X text 232 310 content to be finely chopped;
+#X text 232 372 a sequence of floats that the incoming grid is transformed
+into. they are output in normal grid order.;
+#X connect 2 0 7 0;
+#X connect 4 0 6 0;
+#X connect 7 0 1 0;
+#X connect 7 0 4 0;
+#X connect 14 1 17 0;
+#X connect 15 1 18 0;

@@ -1,0 +1,55 @@
+#N canvas 651 0 632 598 10;
+#X obj 25 293 #in;
+#X obj 25 342 #out window;
+#X text 232 537 Outputs the modified data as a grid.;
+#X text 12 27 This object is useful for color correction. for each
+pixel it takes it apart \, looks up each part separately in the colormap
+and constructs a new pixel from that.;
+#X obj 213 235 #for 0 256 1;
+#X obj 213 305 #outer gamma;
+#X msg 25 267 load bluemarble.jpg;
+#X obj 25 248 t b b;
+#X obj 289 261 #color 0 1024 1;
+#X msg 354 209 1024 512 256;
+#X obj 354 190 loadbang;
+#X obj 25 323 #apply_colormap_channelwise;
+#X obj 25 219 metro 100;
+#X obj 25 202 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X text 357 244 vary this:;
+#X obj 0 0 doc_h;
+#X obj 3 383 doc_c 0;
+#X obj 3 423 doc_i 2;
+#X obj 3 507 doc_o 1;
+#X obj 14 453 doc_ii 0;
+#X obj 14 475 doc_ii 1;
+#X obj 14 537 doc_oo 0;
+#X obj 97 453 doc_m i0 grid;
+#X text 12 70 currently works only with 3 channels at a time!;
+#X text 15 89 it also works on non-images \, for example on colormaps
+themselves \, but the last dimension must be channels \, and there
+must be three channels.;
+#X text 14 136 Note: if you just need to apply a palette on an indexed-color
+picture or greyscale picture \, you don't need this. Just use #store
+instead.;
+#X obj 0 569 doc_f;
+#X text 232 453 grid that will be modified by the colormap;
+#X text 232 475 Colormap (aka palette) is a grid[intensity \, channels]
+;
+#X obj 97 475 doc_m i1 grid;
+#X obj 97 537 doc_m o0 grid;
+#X connect 0 0 11 0;
+#X connect 4 0 5 0;
+#X connect 5 0 11 1;
+#X connect 6 0 0 0;
+#X connect 7 0 6 0;
+#X connect 7 1 4 0;
+#X connect 8 0 5 1;
+#X connect 9 0 8 0;
+#X connect 10 0 9 0;
+#X connect 11 0 1 0;
+#X connect 12 0 7 0;
+#X connect 13 0 12 0;
+#X connect 22 1 27 0;
+#X connect 29 1 28 0;
+#X connect 30 1 2 0;

@@ -1,0 +1,53 @@
+#N canvas 690 0 632 578 10;
+#X text 19 26 Transforms a grid by displacing pixels.;
+#X obj 27 154 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 46 179 #in;
+#X floatatom 156 201 5 0 0 0 - - -;
+#X obj 140 229 # +;
+#X msg 61 153 open sewing.jpg;
+#X text 201 199 <-- Modify value to see transformation.;
+#X text 178 152 <-- open image;
+#X obj 46 261 #out window \, title remapped;
+#X obj 46 97 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1;
+#X obj 46 120 metro 33.3667;
+#X text 19 45 If you chain indexmap (coordinate) transformations from
+outlet 1 to inlet 1 \, then sending an image in inlet 0 will emit its
+deformation out of outlet 0;
+#X obj 46 229 #remap_image;
+#X text 187 229 <-- change the numop to change the transformation;
+#X obj 103 529 #rotate;
+#X obj 0 0 doc_h;
+#X obj 3 295 doc_c 0;
+#X obj 3 335 doc_i 2;
+#X obj 3 529 doc_also;
+#X obj 3 432 doc_o 2;
+#X obj 14 365 doc_ii 0;
+#X obj 14 387 doc_ii 1;
+#X obj 14 462 doc_oo 0;
+#X obj 14 497 doc_oo 1;
+#X obj 97 365 doc_m i0 grid;
+#X text 232 365 grid to be remapped;
+#X obj 97 497 doc_m o1 grid;
+#X text 232 497 indexmap of dummy coordinates \, to be deformed;
+#X obj 97 387 doc_m i1 grid;
+#X text 232 387 modified version of what came out of outlet 1 \, which
+will determine the remapping;
+#X obj 97 462 doc_m o0 grid;
+#X text 232 462 the grid from inlet 0 after being remapped using the
+grid from inlet 1;
+#X obj 0 549 doc_f;
+#X connect 1 0 2 0;
+#X connect 2 0 12 0;
+#X connect 3 0 4 1;
+#X connect 4 0 12 1;
+#X connect 5 0 2 0;
+#X connect 9 0 10 0;
+#X connect 10 0 2 0;
+#X connect 12 0 8 0;
+#X connect 12 1 4 0;
+#X connect 18 1 14 0;
+#X connect 24 1 25 0;
+#X connect 26 1 27 0;
+#X connect 28 1 29 0;
+#X connect 30 1 31 0;

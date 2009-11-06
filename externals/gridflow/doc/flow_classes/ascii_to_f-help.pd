@@ -1,0 +1,31 @@
+#N canvas 335 118 632 388 10;
+#X obj 0 0 doc_h;
+#X obj 0 359 doc_f;
+#X obj 31 75 ascii_to_f;
+#X text 200 74 parser for floats written in ascii as sequences of floats
+;
+#X obj 3 134 doc_c 0;
+#X obj 3 174 doc_i 1;
+#X obj 3 236 doc_o 2;
+#X obj 14 266 doc_oo 0;
+#X obj 14 327 doc_oo 1;
+#X obj 14 204 doc_ii 0;
+#X obj 97 204 doc_m i0;
+#X obj 97 327 doc_m o1 float;
+#X obj 97 266 doc_m o0 float;
+#X text 232 327 integer coming from inlet 0 but unrecognised;
+#X text 232 204 ascii bytes (integer);
+#X floatatom 31 100 8 0 0 0 - - -;
+#X obj 90 100 display;
+#X msg 30 50 51 \, 46 \, 49 \, 52 \, 49 \, 53 \, 57 \, 51 \, 0;
+#X text 232 266 float value successfully parsed. note that this is
+output only when an unrecognised character is received \, because otherwise
+\, it can't be known for sure that the number is finished.;
+#X text 201 93 recognises plus \, minus \, period \, but no exponents
+\, infinities nor NaN.;
+#X connect 2 0 15 0;
+#X connect 2 1 16 0;
+#X connect 10 1 14 0;
+#X connect 11 1 13 0;
+#X connect 12 1 18 0;
+#X connect 17 0 2 0;

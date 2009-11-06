@@ -1,0 +1,15 @@
+#N canvas 546 210 632 258 10;
+#X obj 0 0 doc_h;
+#X obj 0 229 doc_f;
+#X text 103 209 doc_ii;
+#X text 151 209 doc_cc;
+#X text 199 209 doc_o;
+#X obj 3 89 doc_c 1;
+#X obj 3 129 doc_i 0;
+#X obj 3 169 doc_o 0;
+#X text 129 45 auto-positioning documentation subheader for a specific
+outlet.;
+#X obj 3 209 doc_also;
+#X connect 9 1 2 0;
+#X connect 9 1 3 0;
+#X connect 9 1 4 0;

@@ -1,0 +1,85 @@
+#N canvas 566 0 632 642 10;
+#X obj 255 129 #outer + (0 9000);
+#X text 333 91 make regular triangle;
+#X obj 255 227 #rotate;
+#X obj 209 53 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 308 227 * 100;
+#X floatatom 308 211 5 0 0 0 - - -;
+#X obj 268 72 t b b;
+#X obj 255 246 #polygon_comparator;
+#X obj 209 72 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 255 186 #t;
+#X obj 228 53 metro 1000;
+#X text 30 254 BUG: first try doesn't work;
+#X text 67 265 please bang twice;
+#X msg 381 149 4 2 # 1 1 1 -1 -1 -1 -1 1;
+#X obj 391 195 display;
+#X obj 255 110 # * 12000;
+#X obj 255 91 #for 0 3 1;
+#X obj 381 169 # * (100 100);
+#X obj 255 167 # + (0 0);
+#X obj 255 148 # cos* (100 100);
+#X obj 215 278 #fold min;
+#X obj 295 278 #fold max;
+#X obj 215 297 #to_float;
+#X obj 295 297 #to_float;
+#X obj 381 129 loadbang;
+#X obj 215 316 nbx 8 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 9
+-262144 -1 -1 0 256;
+#X obj 295 316 nbx 8 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 9
+-262144 -1 -1 0 256;
+#X text 232 453 or method "precision" for setting the size of the output
+grid.;
+#X text 232 510 in which the peak represents the amount of similarity
+between the two polygons \, and the position of the peak represents
+the optimal rotation for maximum overlapping of the polygons. The rotation
+origin is assumed to be the centroid (#moment 1);
+#X text 24 239 NOTE: requires [#fft];
+#X text 33 150 translations \, e.g. [# +];
+#X text 33 168 rotations \, e.g. [#rotate];
+#X obj 0 0 doc_h;
+#X obj 3 361 doc_c;
+#X obj 3 401 doc_i 2;
+#X obj 3 594 doc_o 1;
+#X text 232 488 a 2-D polygon as N by 2 grid;
+#X text 232 431 a 2-D polygon as N by 2 grid;
+#X obj 14 431 doc_ii 0;
+#X obj 14 488 doc_ii 1;
+#X obj 14 624 doc_oo 0;
+#X obj 0 654 doc_f;
+#X obj 97 431 doc_m i0 grid;
+#X obj 97 488 doc_m i1;
+#X text 8 114 Comparisons are meant to be invariant;
+#X text 8 126 to the following transformations:;
+#X text 33 186 scalar scalings \, e.g. [# *] with;
+#X text 33 198 only one value.;
+#X obj 97 624 doc_m o0 grid;
+#X connect 0 0 19 0;
+#X connect 2 0 7 0;
+#X connect 3 0 10 0;
+#X connect 4 0 2 1;
+#X connect 5 0 4 0;
+#X connect 6 1 16 0;
+#X connect 7 0 20 0;
+#X connect 7 0 21 0;
+#X connect 8 0 6 0;
+#X connect 9 0 2 0;
+#X connect 10 0 6 0;
+#X connect 13 0 17 0;
+#X connect 15 0 0 0;
+#X connect 16 0 15 0;
+#X connect 17 0 14 0;
+#X connect 17 0 7 1;
+#X connect 18 0 9 0;
+#X connect 19 0 18 0;
+#X connect 20 0 22 0;
+#X connect 21 0 23 0;
+#X connect 22 0 25 0;
+#X connect 23 0 26 0;
+#X connect 24 0 13 0;
+#X connect 42 1 37 0;
+#X connect 42 1 27 0;
+#X connect 43 1 36 0;
+#X connect 43 1 28 0;
