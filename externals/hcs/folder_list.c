@@ -28,17 +28,15 @@
 #ifdef _WIN32
 #define _WIN32_WINNT 0x0400
 #include <windows.h>
-#include <stdio.h>
 #else
 #include <stdlib.h>
 #include <glob.h>
 #endif
 
+#include <stdio.h>
 #include <string.h>
 
 static char *version = "$Revision: 1.12 $";
-
-t_int folder_list_instance_count;
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
@@ -50,33 +48,55 @@ static t_class *folder_list_class;
 
 typedef struct _folder_list {
 	t_object            x_obj;
-	t_symbol            *x_pattern;
+	t_symbol*           x_pattern;
+    t_canvas*           x_canvas;    
 } t_folder_list;
 
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
  */
 
-// TODO: regexp ~ to USERPROFILE for Windows
 // TODO: make FindFirstFile display when its just a dir
+
+static void normalize_path(t_folder_list* x, char *normalized, const char *original)
+{
+    t_symbol *cwd = canvas_getdir(x->x_canvas);
+    if(sys_isabsolutepath(original)) return;
+    strncpy(normalized, cwd->s_name, FILENAME_MAX);
+    if(normalized[(strlen(normalized)-1)] != '/') strncat(normalized, "/", 1);
+    if(original[0] == '.') {
+        if(original[1] == '/') {
+            strncat(normalized, original + 2, 
+                    FILENAME_MAX - strlen(normalized));
+        } else if(original[1] == '.' && original[2] == '/') {
+            strncat(normalized, original, 
+                    FILENAME_MAX - strlen(normalized));
+        }
+    } else if(original[0] != '/') {
+        strncat(normalized, original, 
+                FILENAME_MAX - strlen(normalized));
+    }
+}
 
 static void folder_list_output(t_folder_list* x)
 {
 	DEBUG(post("folder_list_output"););
+    char normalized_path[FILENAME_MAX] = "";
 
+    normalize_path(x, normalized_path, x->x_pattern->s_name);
 #ifdef _WIN32
 	WIN32_FIND_DATA findData;
 	HANDLE hFind;
 	DWORD errorNumber;
 	LPVOID lpErrorMessage;
-	char fullPathNameBuffer[MAX_PATH] = "";
-	char unbashBuffer[MAX_PATH] = "";
-	char outputBuffer[MAX_PATH] = "";
+	char fullPathNameBuffer[FILENAME_MAX] = "";
+	char unbashBuffer[FILENAME_MAX] = "";
+	char outputBuffer[FILENAME_MAX] = "";
 	char *pathBuffer;
 
 // arg, looks perfect, but only in Windows Vista
-//	GetFinalPathNameByHandle(hFind,fullPathNameBuffer,MAX_PATH,FILE_NAME_NORMALIZED);
-    GetFullPathName(x->x_pattern->s_name, MAX_PATH, fullPathNameBuffer, NULL);
+//	GetFinalPathNameByHandle(hFind,fullPathNameBuffer,FILENAME_MAX,FILE_NAME_NORMALIZED);
+    GetFullPathName(normalized_path, FILENAME_MAX, fullPathNameBuffer, NULL);
 	sys_unbashfilename(fullPathNameBuffer,unbashBuffer);
 	
 	hFind = FindFirstFile(x->x_pattern->s_name, &findData);
@@ -105,14 +125,14 @@ static void folder_list_output(t_folder_list* x)
     char* unbashBuffer_position = strrchr(unbashBuffer, '/');
     if(unbashBuffer_position)
     {
-        pathBuffer = getbytes(MAX_PATH+1);
+        pathBuffer = getbytes(FILENAME_MAX+1);
         strncpy(pathBuffer, unbashBuffer, unbashBuffer_position - unbashBuffer);
     }
 	do {
         // skip "." and ".."
         if( strcmp(findData.cFileName, ".") && strcmp(findData.cFileName, "..") ) 
 		{
-            strncpy(outputBuffer, pathBuffer, MAX_PATH);
+            strncpy(outputBuffer, pathBuffer, FILENAME_MAX);
 			strcat(outputBuffer,"/");
 			strcat(outputBuffer,findData.cFileName);
 			outlet_symbol( x->x_obj.ob_outlet, gensym(outputBuffer) );
@@ -123,20 +143,20 @@ static void folder_list_output(t_folder_list* x)
 	unsigned int i;
 	glob_t glob_buffer;
 	
-	DEBUG(post("globbing %s",x->x_pattern->s_name););
-	switch( glob( x->x_pattern->s_name, GLOB_TILDE, NULL, &glob_buffer ) )
+	DEBUG(post("globbing %s",normalized_path););
+	switch( glob( normalized_path, GLOB_TILDE, NULL, &glob_buffer ) )
 	{
     case GLOB_NOSPACE: 
-        pd_error(x,"[folder_list] out of memory for \"%s\"",x->x_pattern->s_name); 
+        pd_error(x,"[folder_list] out of memory for \"%s\"",normalized_path); 
         break;
 # ifdef GLOB_ABORTED
     case GLOB_ABORTED: 
-        pd_error(x,"[folder_list] aborted \"%s\"",x->x_pattern->s_name); 
+        pd_error(x,"[folder_list] aborted \"%s\"",normalized_path); 
         break;
 # endif
 # ifdef GLOB_NOMATCH
     case GLOB_NOMATCH: 
-        pd_error(x,"[folder_list] nothing found for \"%s\"",x->x_pattern->s_name); 
+        pd_error(x,"[folder_list] nothing found for \"%s\"",normalized_path); 
         break;
 # endif
 	}
@@ -152,19 +172,19 @@ static void folder_list_set(t_folder_list* x, t_symbol *s)
 	DEBUG(post("folder_list_set"););
 #ifdef _WIN32
     char *patternBuffer;
-    char envVarBuffer[MAX_PATH];
+    char envVarBuffer[FILENAME_MAX];
     if( (s->s_name[0] == '~') && (s->s_name[1] == '/'))
     {
-        patternBuffer = getbytes(MAX_PATH);
+        patternBuffer = getbytes(FILENAME_MAX);
         strcpy(patternBuffer,"%USERPROFILE%");
-        strncat(patternBuffer, s->s_name + 1, MAX_PATH - 1);
+        strncat(patternBuffer, s->s_name + 1, FILENAME_MAX - 1);
         post("set: %s", patternBuffer);
     }
     else
     {
         patternBuffer = s->s_name;
     }
-	ExpandEnvironmentStrings(patternBuffer, envVarBuffer, MAX_PATH - 2);
+	ExpandEnvironmentStrings(patternBuffer, envVarBuffer, FILENAME_MAX - 2);
 	x->x_pattern = gensym(envVarBuffer);
 #else  // UNIX
     // TODO translate env vars to a full path
@@ -188,14 +208,7 @@ static void *folder_list_new(t_symbol *s)
 	t_symbol *currentdir;
 	char buffer[MAXPDSTRING];
 
-	if(!folder_list_instance_count) 
-	{
-		post("[folder_list] %s",version);  
-		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
-		post("\tcompiled on "__DATE__" at "__TIME__ " ");
-	}
-	folder_list_instance_count++;
-
+    x->x_canvas =  canvas_getcurrent();
 
     symbolinlet_new(&x->x_obj, &x->x_pattern);
 	outlet_new(&x->x_obj, &s_symbol);
