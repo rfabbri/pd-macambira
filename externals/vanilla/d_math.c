@@ -2,11 +2,9 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-/*  mathematical functions and other transfer functions, including tilde
-    versions of stuff from x_acoustics.c.
-*/
+/*  sqrt-related functions from pd-vanilla's d_math.c */
 
-#include "d_math.h"
+#include "e_sqrt.h"
 
     /* these are used in externs like "bonk" */
 

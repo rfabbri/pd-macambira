@@ -2,7 +2,9 @@
 - figure out how Pd-extended is going to load this stuff in order to maintain
   maximum capatibility
 
-- replace pd-extended's d_math.c with this d_math.c
+- replace pd-extended's x_gui.c with this e_gfxstub.c
+
+- replace pd-extended's d_math.c with this e_sqrt.c
 
 - move this d_math.h to pd-extended's pd/src
 

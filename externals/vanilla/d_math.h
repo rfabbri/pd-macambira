@@ -2,7 +2,7 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-/* these are things used in a number of objectclasses from d_math.c */
+/* these are things used in a number of objectclasses from e_sqrt.c */
 
 #include "m_pd.h"
 
