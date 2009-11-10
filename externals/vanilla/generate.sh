@@ -23,3 +23,5 @@ done
 rm lib_d_fftroutine.c lib_d_fft_mayer.c lib_d_resample.c
 rm lib_d_fft_fftw.c lib_d_fft_fftsg.c lib_d_fftsg_h.c
 
+# these files have been split out into separate files per object
+rm lib_x_interface.c
