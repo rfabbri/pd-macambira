@@ -4,7 +4,7 @@
 LIBRARY_NAME = vanilla
 
 # Next, add your source files to the SOURCES variable.
-SOURCES = abs~.c bng.c clip~.c cnv.c dbtopow~.c dbtorms~.c exp~.c ftom~.c hradio.c hsl.c list.c log~.c mtof~.c nbx.c powtodb~.c pow~.c print.c qlist.c rmstodb~.c rsqrt~.c sqrt~.c textfile.c tgl.c vradio.c vslider.c vu.c wrap~.c
+SOURCES = abs~.c bng.c clip~.c cnv.c dbtopow~.c dbtorms~.c exp~.c ftom~.c hradio.c hsl.c key.c keyname.c keyup.c list.c log~.c mtof~.c nbx.c openpanel.c powtodb~.c pow~.c print.c qlist.c rmstodb~.c rsqrt~.c savepanel.c sqrt~.c textfile.c tgl.c vradio.c vslider.c vu.c wrap~.c
 
 
 # For objects that only build on certain platforms, add those to the SOURCES
@@ -132,6 +132,8 @@ install-doc:
 	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p README $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
 	install -m644 -p VERSION $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/VERSION.txt
+	install -m644 -p TODO $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/TODO.txt
+	install -m644 -p LICENSE $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
 
 install-exec:
 	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
