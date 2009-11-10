@@ -1,0 +1,4 @@
+#N canvas 230 230 450 300 10;
+#X text 44 73 LICENSE SIBSD;
+#X text 44 39 DESCRIPTION pd internals broken out into a standalone
+library;
