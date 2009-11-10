@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vbap windowing zexy
+LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -407,43 +407,6 @@ bsaylor_clean:
 	-rm -f -- $(externals_src)/bsaylor/*.o
 	-rm -f -- $(externals_src)/bsaylor/*.bak
 	-rm -f -- $(externals_src)/bsaylor/*.*~
-
-
-
-#------------------------------------------------------------------------------#
-# CORELIBS
-CORELIBS_NAME=corelibs
-CORELIBS_OBJECTS := $(wildcard $(externals_src)/corelibs/*.c)
-corelibs: $(CORELIBS_OBJECTS:.c=.$(EXTENSION))
-
-corelibs_install: corelibs
-	install -d $(DESTDIR)$(objectsdir)/$(CORELIBS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(CORELIBS_NAME) \
-		--author "Miller Puckette and others" \
-		--description "core libraries stripped out of Pd" \
-		--license "BSD" \
-		--version ""
-	install -p $(CORELIBS_OBJECTS:.c=.$(EXTENSION)) \
-		$(DESTDIR)$(objectsdir)/$(CORELIBS_NAME)
-#	install -d $(DESTDIR)$(helpdir)/$(CORELIBS_NAME)
-#	install -p $(externals_src)/corelibs/help/*.pd \
-#		$(DESTDIR)$(helpdir)/$(CORELIBS_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(CORELIBS_NAME)
-#	install -p $(externals_src)/corelibs/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(CORELIBS_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/corelibs/README \
-		$(DESTDIR)$(readmesdir)/$(CORELIBS_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(CORELIBS_NAME)
-#	install -p $(externals_src)/corelibs/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(CORELIBS_NAME)
-
-corelibs_clean:
-	-rm -f -- $(CORELIBS_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(CORELIBS_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/corelibs/*.bak
-	-rm -f -- $(externals_src)/corelibs/*.*~
-
 
 
 #------------------------------------------------------------------------------#
@@ -2615,6 +2578,16 @@ vbap_clean:
 	-rm -f -- $(externals_src)/vbap/*.*~
 
 
+#------------------------------------------------------------------------------#
+# VANILLA
+vanilla:
+	make -C $(externals_src)/vanilla
+
+vanilla_install:
+	make -C $(externals_src)/vanilla DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+vanilla_clean:
+	make -C $(externals_src)/vanilla clean
 
 
 #------------------------------------------------------------------------------#
