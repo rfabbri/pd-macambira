@@ -1,0 +1,10 @@
+#N canvas 10 10 287 206 10;
+#N canvas 340 183 420 300 META 0;
+#X text 10 10 META this is a prototype of a libdir meta file;
+#X text 10 50 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 10 100 LICENSE GNU GPL;
+#X text 10 30 NAME puremapping;
+#X text 10 120 VERSION 1.01;
+#X text 10 70 DESCRIPTION same as the mapping lib \, but using only
+pd vanilla;
+#X restore 10 10 pd META;
