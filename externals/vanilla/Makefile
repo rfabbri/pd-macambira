@@ -4,7 +4,7 @@
 LIBRARY_NAME = vanilla
 
 # Next, add your source files to the SOURCES variable.
-SOURCES = abs~.c bng.c cnv.c exp~.c hradio.c hsl.c log~.c nbx.c pow~.c print.c tgl.c vradio.c vslider.c vu.c
+SOURCES = abs~.c bng.c clip~.c cnv.c dbtopow~.c dbtorms~.c exp~.c ftom~.c hradio.c hsl.c log~.c mtof~.c nbx.c powtodb~.c pow~.c print.c rmstodb~.c rsqrt~.c sqrt~.c tgl.c vradio.c vslider.c vu.c wrap~.c
 
 
 # For objects that only build on certain platforms, add those to the SOURCES
@@ -50,7 +50,7 @@ ifeq ($(UNAME),Darwin)
     SOURCES += $(SOURCES_Darwin)
     EXTENSION = pd_darwin
     OS = macosx
-    OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
+    OPT_CFLAGS = -fast
     FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
     CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include
     LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
