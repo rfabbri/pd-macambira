@@ -14,11 +14,11 @@ This stuff is currently here as a proof of concept for turning Pd core into a
 micro-language.  If you want to start modifying these, then we should discuss
 how these should be maintained along with Miller's changes.
 
-test version
-------------
+DO NOT CHANGE THIS CODE!
+------------------------
 
-Once 0.40.x is done, then I plan on making the full test of this concept in
-the branch-v0-40-x-extended, splitting out each class into its own file in
-"extra", and compiling each as its own lib.
-
-<hans@at.or.at>
+This is not a place to fix bugs or add improvements.  This library is an exact
+mirror of the code in Pd-vanilla, warts and all.  The aim is 100%
+compatibility in a libdir form.  This way we can have libdirs for each version
+number, and then choose to use old versions of this library for compatibilty
+(i.e. vanilla-0.42.5, vanilla-0.41.4, vanilla-0.40.3).
