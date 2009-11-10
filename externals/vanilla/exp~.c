@@ -36,7 +36,7 @@ static void exp_tilde_dsp(t_exp_tilde *x, t_signal **sp)
         sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 
-static void exp_tilde_setup(void)
+void exp_tilde_setup(void)
 {
     exp_tilde_class = class_new(gensym("exp~"), (t_newmethod)exp_tilde_new, 0,
         sizeof(t_exp_tilde), 0, 0);

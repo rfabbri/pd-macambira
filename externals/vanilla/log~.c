@@ -47,7 +47,7 @@ static void log_tilde_dsp(t_log_tilde *x, t_signal **sp)
         sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[0]->s_n);
 }
 
-static void log_tilde_setup(void)
+void log_tilde_setup(void)
 {
     log_tilde_class = class_new(gensym("log~"), (t_newmethod)log_tilde_new, 0,
         sizeof(t_log_tilde), 0, A_DEFFLOAT, 0);

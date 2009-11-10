@@ -48,7 +48,7 @@ static void clip_dsp(t_clip *x, t_signal **sp)
     dsp_add(clip_perform, 4, x, sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 
-static void clip_tilde_setup(void)
+void clip_tilde_setup(void)
 {
     clip_class = class_new(gensym("clip~"), (t_newmethod)clip_new, 0,
         sizeof(t_clip), 0, A_DEFFLOAT, A_DEFFLOAT, 0);

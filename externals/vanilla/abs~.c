@@ -39,7 +39,7 @@ static void abs_tilde_dsp(t_abs_tilde *x, t_signal **sp)
         sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 
-static void abs_tilde_setup(void)
+void abs_tilde_setup(void)
 {
     abs_tilde_class = class_new(gensym("abs~"), (t_newmethod)abs_tilde_new, 0,
         sizeof(t_abs_tilde), 0, 0);

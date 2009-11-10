@@ -46,7 +46,7 @@ static void pow_tilde_dsp(t_pow_tilde *x, t_signal **sp)
         sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[0]->s_n);
 }
 
-static void pow_tilde_setup(void)
+void pow_tilde_setup(void)
 {
     pow_tilde_class = class_new(gensym("pow~"), (t_newmethod)pow_tilde_new, 0,
         sizeof(t_pow_tilde), 0, A_DEFFLOAT, 0);
