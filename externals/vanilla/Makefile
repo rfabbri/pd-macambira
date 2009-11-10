@@ -4,7 +4,7 @@
 LIBRARY_NAME = vanilla
 
 # Next, add your source files to the SOURCES variable.
-SOURCES = abs~.c bng.c clip~.c cnv.c dbtopow~.c dbtorms~.c exp~.c ftom~.c hradio.c hsl.c log~.c mtof~.c nbx.c powtodb~.c pow~.c print.c qlist.c rmstodb~.c rsqrt~.c sqrt~.c textfile.c tgl.c vradio.c vslider.c vu.c wrap~.c
+SOURCES = abs~.c bng.c clip~.c cnv.c dbtopow~.c dbtorms~.c exp~.c ftom~.c hradio.c hsl.c list.c log~.c mtof~.c nbx.c powtodb~.c pow~.c print.c qlist.c rmstodb~.c rsqrt~.c sqrt~.c textfile.c tgl.c vradio.c vslider.c vu.c wrap~.c
 
 
 # For objects that only build on certain platforms, add those to the SOURCES
