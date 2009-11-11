@@ -1,6 +1,4 @@
-#N canvas 10 10 287 206 10;
-#N canvas 340 183 458 294 META 0;
-#X text 10 10 META this is a prototype of a libdir meta file;
+#N canvas 10 10 506 253 10;
 #X text 10 168 LICENSE GNU GPL;
 #X text 10 50 AUTHOR Cyrille Henry;
 #X text 10 30 NAME lightboard;
@@ -11,4 +9,3 @@ controlling DMX systems. Unlike a hardware lighting console \, this
 system offers an open API allowing a full control over the lighting
 within Pure Data in order to connect light with other media. This also
 allows to have complex light movements and behaviours.;
-#X restore 10 10 pd META;
