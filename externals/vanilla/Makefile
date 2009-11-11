@@ -133,7 +133,7 @@ install-doc:
 	install -m644 -p README $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
 	install -m644 -p VERSION $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/VERSION.txt
 	install -m644 -p TODO $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/TODO.txt
-	install -m644 -p LICENSE $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
+	install -m644 -p LICENSE.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
 
 install-exec:
 	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
