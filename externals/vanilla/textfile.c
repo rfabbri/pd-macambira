@@ -28,6 +28,14 @@ typedef struct _qlist
 static t_class *textfile_class;
 typedef t_qlist t_textfile;
 
+static void qlist_rewind(t_qlist *x)
+{
+    x->x_onset = 0;
+    if (x->x_clock) clock_unset(x->x_clock);
+    x->x_whenclockset = 0;
+    x->x_reentered = 1;
+}
+
 static void qlist_add(t_qlist *x, t_symbol *s, int ac, t_atom *av)
 {
     t_atom a;
