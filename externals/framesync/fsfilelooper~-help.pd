@@ -1,13 +1,17 @@
-#N canvas 287 450 578 286 10;
-#X text 15 109 frame counter;
-#X text 173 92 start;
-#X text 174 104 frame;
-#X text 258 104 frame;
-#X text 258 94 end;
-#X text 69 143 audio out;
-#X text 114 187 argument: filename startframe# endframe#;
-#X text 45 20 loops a sound file between a startframe and endframe
+#N canvas 293 407 578 286 10;
+#X text 30 109 loops a sound file between a startframe and endframe
 ;
-#X text 220 142 phasor (0-1) for position between startframe and endframe
+#X obj 198 22 frameclock 100;
+#X text 173 142 start;
+#X text 174 154 frame;
+#X text 258 154 frame;
+#X text 258 144 end;
+#X text 69 193 audio out;
+#X text 114 237 argument: filename startframe# endframe#;
+#X obj 88 220 dac~;
+#X text 91 152 filename;
+#X obj 96 171 fsfilelooper~ ../../sound/voice.wav 20 45;
+#X text 220 192 line (0-1) for position between startframe and endframe
 ;
-#X obj 96 121 fsfilelooper~ filename.wav 0 10;
+#X connect 10 0 8 0;
+#X connect 10 0 8 1;
