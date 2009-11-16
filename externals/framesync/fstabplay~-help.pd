@@ -9,7 +9,7 @@ numbers.;
 #X text 146 227 name;
 #X text 201 217 start;
 #X text 134 311 arguments: arrayname startframe#;
-#X obj 115 112 fsclock 1000;
+#X obj 115 112 frameclock 1000;
 #X text 35 232 frame clock;
 #X obj 115 243 fstabplay~ \$0-array;
 #X connect 8 0 10 0;

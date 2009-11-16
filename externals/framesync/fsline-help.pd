@@ -3,7 +3,7 @@
 #X floatatom 80 212 9 0 0 0 - - -;
 #X obj 83 239 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 12700 1;
-#X obj 83 68 fsclock 100;
+#X obj 83 68 frameclock 100;
 #X floatatom 230 212 9 0 0 0 - - -;
 #X obj 233 239 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 12700 1;
