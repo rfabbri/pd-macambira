@@ -1,0 +1,13 @@
+#N canvas 134 291 450 300 10;
+#X text 38 24 Set the global Frames-Per-Second (FPS) for the global
+clock when using the 'framesync' library. You should only use this
+object once in a project. [frameclock] uses this object to set the
+FPS \, so if you are using [frameclock] \, don't use [fps] also.;
+#X msg 135 206 bang;
+#X floatatom 135 254 5 0 0 0 - - -;
+#X obj 135 230 fps;
+#X obj 135 128 fps 24;
+#X text 39 157 You can use it with no argument to get the current FPS
+(careful not to set the FPS more than once!):;
+#X connect 1 0 3 0;
+#X connect 3 0 2 0;
