@@ -1,15 +1,35 @@
-#N canvas 313 376 504 442 10;
-#X text 201 227 frame;
-#X text 212 265 bang when done;
-#X text 91 265 audio out;
-#X text 45 20 Plays a sound file til it ends \, synced up to the frame
+#N canvas 389 188 606 403 10;
+#X text 212 227 frame;
+#X text 241 263 bang when done;
+#X text 71 265 audio out;
+#X text 25 20 Plays a sound file til it ends \, synced up to the frame
 clock. Should stay in sync when randomly accessing different frame
 numbers.;
-#X text 146 216 array;
-#X text 146 227 name;
-#X text 201 217 start;
-#X text 134 311 arguments: arrayname startframe#;
-#X obj 115 112 frameclock 1000;
-#X text 35 232 frame clock;
-#X obj 115 243 fstabplay~ \$0-array;
-#X connect 8 0 10 0;
+#X text 96 216 array;
+#X text 96 227 name;
+#X text 211 216 start;
+#X text 177 308 arguments: arrayname startframe#;
+#X obj 377 279 soundfiler;
+#X obj 377 232 symbol \$0-array;
+#N canvas 0 22 450 300 (subpatch) 0;
+#X array \$0-array 62079 float 2;
+#X coords 0 1 62079 -1 200 140 1;
+#X restore 376 50 graph;
+#X msg 377 210 bang;
+#X msg 377 254 read ../../sound/voice.wav \$1;
+#X obj 95 112 frameclock 400;
+#X obj 76 322 output~;
+#X obj 95 243 fstabplay~ \$0-array 40;
+#X obj 224 264 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 108 82 78;
+#X msg 77 82 55;
+#X text 134 80 <-- try jumping to a frame;
+#X connect 9 0 12 0;
+#X connect 11 0 9 0;
+#X connect 12 0 8 0;
+#X connect 15 0 14 0;
+#X connect 15 0 14 1;
+#X connect 15 1 16 0;
+#X connect 17 0 13 0;
+#X connect 18 0 13 0;
