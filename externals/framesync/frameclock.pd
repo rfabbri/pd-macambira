@@ -8,7 +8,7 @@
 -4160 -258113;
 #X obj 327 434 outlet;
 #X obj 190 147 nbx 5 35 -1 1e+37 0 0 \$0-numbox \$0-numbox-receive
-empty 0 -8 0 16 -233017 -33289 -33289 100 256;
+empty 0 -8 0 16 -233017 -33289 -33289 67 256;
 #X obj 363 1 inlet;
 #N canvas 524 22 450 300 color 0;
 #X obj 161 16 inlet;
@@ -32,8 +32,8 @@ empty 0 -8 0 16 -233017 -33289 -33289 100 256;
 #X obj 433 19 loadbang;
 #X obj 433 39 trigger bang bang;
 #X obj 155 217 metro;
-#X obj 123 139 hsl 154 8 0 100 0 0 \$0-hsl \$0-hsl-receive empty -2
--8 0 10 -262130 -1 -1 15300 1;
+#X obj 123 139 hsl 154 8 0 400 0 0 \$0-hsl \$0-hsl-receive empty -2
+-8 0 10 -262130 -1 -1 2600 1;
 #X msg 371 88 range 0 \$1;
 #X obj 435 337 bang;
 #X msg 490 20 bang;
@@ -50,6 +50,8 @@ empty 0 -8 0 16 -233017 -33289 -33289 100 256;
 #X obj 28 198 send framesync/reset;
 #X obj 571 24 framesync/fps \$2;
 #X obj 555 64 framesync/fps_ms;
+#X obj 24 14 inlet;
+#X text 65 13 TODO make first inlet set frame position;
 #X connect 0 0 14 0;
 #X connect 1 1 10 0;
 #X connect 2 0 1 0;

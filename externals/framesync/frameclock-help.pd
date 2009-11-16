@@ -1,16 +1,19 @@
-#N canvas 496 163 487 404 10;
-#X floatatom 52 241 5 0 0 0 - - -;
+#N canvas 249 258 487 404 10;
+#X floatatom 52 321 5 0 0 0 - - -;
 #X text 51 22 a GUI to generate and control the frame clock \, with
 a default frames-per-second (FPS) of 30 frames/second.;
-#X floatatom 248 239 5 0 0 0 - - -;
+#X floatatom 248 319 5 0 0 0 - - -;
 #X text 49 72 the first argument/inlet sets the total number of frames
 ;
 #X text 49 92 the second argument/inlet sets the frames-per-second
 (FPS);
-#X text 54 306 you can set the current frame by dragging the yellow
+#X text 54 346 you can set the current frame by dragging the yellow
 bar or by clicking in the frame number box \, typing in a number \,
 and hitting enter;
-#X obj 53 169 fsclock 200;
-#X obj 249 167 fsclock 200 24;
-#X connect 6 0 0 0;
-#X connect 7 0 2 0;
+#X obj 249 247 frameclock 200 24;
+#X obj 154 142 frameclock 400;
+#X text 318 134 <-- set total frames;
+#X text 17 135 set current frame -->;
+#X obj 53 249 frameclock 200 29.97;
+#X connect 6 0 2 0;
+#X connect 10 0 0 0;
