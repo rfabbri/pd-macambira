@@ -1,4 +1,4 @@
-#N canvas 293 407 582 328 10;
+#N canvas 463 304 574 472 10;
 #X text 30 7 loops a sound file between a startframe and endframe;
 #X text 138 179 start;
 #X text 139 191 frame;
@@ -6,13 +6,33 @@
 #X text 223 181 end;
 #X text 34 230 audio out;
 #X text 56 189 filename;
-#X text 185 229 line (0-1) for position between startframe and endframe
-;
-#X obj 214 42 frameclock 400;
-#X obj 61 208 fsfilelooper~ ../../sound/voice.wav 50 200;
-#X obj 53 257 output~;
+#X obj 177 49 frameclock 400;
+#X obj 61 407 output~;
 #X text 318 206 args: filename startframe# endframe#;
 #X text 33 138 This will loop the voice.wav sound file starting at
 frame 50 and ending at frame 200:;
-#X connect 9 0 10 0;
-#X connect 9 0 10 1;
+#X obj 313 281 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 12700 1;
+#X floatatom 310 300 5 0 0 0 - - -;
+#X obj 61 208 fsfilelooper~ ../../sound/voice.wav 50 200;
+#X obj 310 260 line;
+#X text 204 227 right outlet outputs a message to send to a line which
+will generate a line with 0 at the start and 1 at the end;
+#X obj 139 382 *~;
+#X obj 154 362 line~;
+#X obj 139 306 osc~ 333;
+#X msg 231 333 0;
+#X obj 139 327 *~ 0.3;
+#X obj 231 312 select 1;
+#X connect 11 0 12 0;
+#X connect 13 0 8 0;
+#X connect 13 1 14 0;
+#X connect 13 1 17 0;
+#X connect 14 0 11 0;
+#X connect 14 0 21 0;
+#X connect 16 0 8 1;
+#X connect 17 0 16 1;
+#X connect 18 0 20 0;
+#X connect 19 0 17 0;
+#X connect 20 0 16 0;
+#X connect 21 0 19 0;
