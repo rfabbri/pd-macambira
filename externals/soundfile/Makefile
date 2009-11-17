@@ -4,7 +4,7 @@
 LIBRARY_NAME = soundfile
 
 # Next, add your source files to the SOURCES variable.
-SOURCES = sfsamples.c
+SOURCES = sfsamples.c sfduration.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
@@ -25,7 +25,7 @@ objectsdir = $(PD_PATH)/extra
 
 CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
 LDFLAGS =  
-LIBS = 
+LIBS = -lgavl -lgmerlin_avdec
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)

@@ -1,0 +1,6 @@
+#N canvas 198 412 450 300 10;
+#X floatatom 111 182 8 0 0 1 ms - -;
+#X msg 111 112 symbol ../../sound/voice.wav;
+#X obj 111 157 sfduration;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
