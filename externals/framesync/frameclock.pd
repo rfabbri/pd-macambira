@@ -52,28 +52,6 @@ empty 0 -8 0 16 -233017 -33289 -33289 0 256;
 #X obj 555 64 framesync/fps_ms;
 #X obj 24 14 inlet;
 #X text 65 13 set frame position;
-#N canvas 0 22 450 300 delay 0;
-#X obj 48 11 inlet;
-#X obj 48 265 outlet;
-#X obj 48 229 float;
-#X obj 48 143 framesync/fps_ms;
-#X obj 48 165 * 2;
-#X obj 48 186 delay;
-#X text 78 42 in the tabplay~-based objects \, the re-triggering is
-based on a delay that resets if it doesn't receive the next frame on
-time. So to jump to a frame \, stop the clock \, wait a bit \, then
-hard set \, and restart;
-#X obj 48 102 trigger bang float bang;
-#X obj 183 264 outlet;
-#X connect 0 0 7 0;
-#X connect 2 0 1 0;
-#X connect 3 0 4 0;
-#X connect 4 0 5 0;
-#X connect 5 0 2 0;
-#X connect 7 0 3 0;
-#X connect 7 1 2 1;
-#X connect 7 2 8 0;
-#X restore 28 49 pd delay set;
 #X connect 0 0 14 0;
 #X connect 1 1 10 0;
 #X connect 2 0 1 0;
@@ -107,7 +85,5 @@ hard set \, and restart;
 #X connect 25 0 21 0;
 #X connect 28 0 15 0;
 #X connect 31 0 14 1;
-#X connect 32 0 34 0;
-#X connect 34 0 15 0;
-#X connect 34 1 29 0;
+#X connect 32 0 15 0;
 #X coords 0 -1 1 1 159 62 1 120 120;

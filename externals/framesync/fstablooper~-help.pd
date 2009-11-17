@@ -1,4 +1,4 @@
-#N canvas 636 436 594 533 10;
+#N canvas 593 415 594 533 10;
 #X text 30 7 loops a sound file between a startframe and endframe;
 #X text 133 227 start;
 #X text 134 239 frame;
@@ -34,8 +34,9 @@ will generate a line with 0 at the start and 1 at the end;
 #X msg 90 42 33;
 #X msg 123 42 53;
 #X msg 402 142 read ../../sound/voice.wav \$1;
-#X msg 152 40 111;
-#X obj 62 256 fstablooper~ \$0-array 0 126;
+#X msg 152 42 111;
+#X obj 62 256 fstablooper~ \$0-array 20 126;
+#X text 180 41 <-- try jumping to a frame;
 #X connect 10 0 28 0;
 #X connect 12 0 10 0;
 #X connect 13 0 10 0;
