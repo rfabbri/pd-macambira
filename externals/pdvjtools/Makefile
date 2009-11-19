@@ -10,7 +10,7 @@ CXXSOURCES = pix_preview/pix_preview.cc videogrid/videogrid.cc
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
 CSOURCES_Darwin =
-CXXSOURCES_Darwin = videogrid/videogrid.cc
+CXXSOURCES_Darwin =
 
 CSOURCES_Linux = 
 CXXSOURCES_Linux = 
@@ -59,7 +59,7 @@ ifeq ($(UNAME),Darwin)
     EXTENSION = pd_darwin
     OS = macosx
     OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
-    FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
+    FAT_FLAGS = -arch ppc -arch i386 -arch x86_64 -mmacosx-version-min=10.4
     CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include
     LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
     LIBS += -lc 
@@ -125,8 +125,8 @@ install: all install-doc install-exec
 	install -m644 -p $(LIBRARY_NAME)-meta.pd $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(CSOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(CXXSOURCES:.cc=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	#$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(CSOURCES:.c=.$(EXTENSION)))
-	#$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(CXXSOURCES:.cc=.$(EXTENSION)))
+	$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(CSOURCES:.c=.$(EXTENSION)))
+	$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(CXXSOURCES:.cc=.$(EXTENSION)))
 
 install-doc:
 	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
