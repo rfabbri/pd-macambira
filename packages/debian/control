@@ -2,12 +2,12 @@ Source: puredata
 Section: sound
 Priority: optional
 Maintainer: Guenter Geiger (Debian/GNU) <geiger@debian.org>
-Build-Depends: tcl8.4-dev, tk8.4-dev, libasound2-dev, debhelper, libjack-dev
-Standards-Version: 3.6.0
+Build-Depends: cdbs, tcl8.4-dev, tk8.4-dev, libasound2-dev  [!hurd-i386 !kfreebsd-amd64 !kfreebsd-i386], debhelper, libjack0.100.0-dev | libjack-dev
+Standards-Version: 3.7.2
 
 Package: puredata
 Architecture: any
-Depends: xterm | x-terminal-emulator, ${shlibs:Depends}
+Depends: ${shlibs:Depends}
 Replaces: pd-externals, pd
 Provides: pd
 Conflicts: pd

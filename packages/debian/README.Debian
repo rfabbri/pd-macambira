@@ -11,7 +11,7 @@ There are different methods to solve this problem.
 
 1) starting pd with certain flags:
 
- -frags <n>
+ -audiobuf <n>
 
  sets the number of fragments used in the OSS driver, and additionally
  triggers the "good old and stable" device interface.
@@ -22,11 +22,6 @@ There are different methods to solve this problem.
 
 
 2) Using ALSA with OSS emulation
-
-3) Try to install the OSS/Free version instead of OSS commercial.
-
-
-
 
 
 Configuration

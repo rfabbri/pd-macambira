@@ -1,5 +1,3 @@
 usr/bin
-usr/sbin
 usr/include
-usr/share/man/man1
-usr/share/doc/pd/html
+usr/share/doc/puredata

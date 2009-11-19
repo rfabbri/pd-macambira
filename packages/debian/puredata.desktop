@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=PureData
+GenericName=
+Comment=
+Icon=puredata.xpm
+Exec=/usr/bin/pd
+Terminal=false
+Categories=AudioVideo;Audio;

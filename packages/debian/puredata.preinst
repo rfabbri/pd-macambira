@@ -1,0 +1,10 @@
+#! /bin/sh
+
+#DEBHELPER#
+
+if [ -d /usr/lib/pd/doc/1.manual ]
+then
+   rm -r /usr/lib/pd/doc/1.manual
+fi
+
+

@@ -1,2 +1,4 @@
-?package(puredata):needs=x11 section="Apps/Sound"\
-  title="PureData" command="x-terminal-emulator -e /usr/bin/pd"
+?package(puredata):needs="x11" section="Applications/Sound"\
+  title="PureData" \
+  command="/usr/bin/pd" \
+  icon="/usr/share/pixmaps/puredata.xpm"

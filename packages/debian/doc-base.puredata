@@ -6,6 +6,6 @@ Abstract: This manual describes the usage of PD.
 Section: Apps/Sound
 
 Format: HTML
-Index: /usr/share/doc/pd/html/index.htm
-Files: /usr/share/doc/pd/html/*.htm
+Index: /usr/share/doc/puredata/1.manual/index.htm
+Files: /usr/share/doc/puredata/1.manual/*.htm
 
