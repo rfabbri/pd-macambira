@@ -5,14 +5,14 @@ LIBRARY_NAME = pdvjtools
 
 # exclude videogrid for now since it doesn't build with ffmpeg from Debian/stable
 CSOURCES = colorgrid/colorgrid.c pdp_freeframe/pdp_freeframe.c pdp_frei0r/pdp_frei0r.c
-CXXSOURCES = pix_preview/pix_preview.cc
+CXXSOURCES = pix_preview/pix_preview.cc videogrid/videogrid.cc
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
 CSOURCES_Darwin =
 CXXSOURCES_Darwin = videogrid/videogrid.cc
 
-CSOURCES_Linux = pdp_1394L/pdp_1394L.c
+CSOURCES_Linux = 
 CXXSOURCES_Linux = 
 
 CSOURCES_Windows = 
@@ -29,9 +29,10 @@ PD_PATH = ../../pd
 # where to install the library
 objectsdir = $(PD_PATH)/extra
 
-CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g -I../pdp/include -I../../Gem/src
+CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g -I../pdp/include -I../../Gem/src -I/usr/include/ffmpeg
+
 LDFLAGS = 
-LIBS = 
+LIBS = -lavcodec -lavformat -lavutil -lswscale -lquicktime -lstdc++ 
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
@@ -107,14 +108,14 @@ CFLAGS += $(OPT_CFLAGS)
 
 all: $(CSOURCES:.c=.$(EXTENSION)) $(CXXSOURCES:.cc=.$(EXTENSION))
 
-%.o: %.c
+%.$(EXTENSION): %.c
 	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
-
-%.o: %.cc
-	$(CXX) $(CFLAGS) -o "$*.o" -c "$*.cc"
-
-%.$(EXTENSION): %.o
 	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS)
+	chmod a-x "$*.$(EXTENSION)"
+
+%.$(EXTENSION): %.cc
+	$(CXX) $(CFLAGS) -o "$*.o" -c "$*.cc"
+	$(CXX) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS)
 	chmod a-x "$*.$(EXTENSION)"
 
 # The meta and help files are explicitly installed to make sure they are
@@ -124,8 +125,8 @@ install: all install-doc install-exec
 	install -m644 -p $(LIBRARY_NAME)-meta.pd $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(CSOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(CXXSOURCES:.cc=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(CSOURCES:.c=.$(EXTENSION)))
-	$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(CXXSOURCES:.cc=.$(EXTENSION)))
+	#$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(CSOURCES:.c=.$(EXTENSION)))
+	#$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(CXXSOURCES:.cc=.$(EXTENSION)))
 
 install-doc:
 	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
