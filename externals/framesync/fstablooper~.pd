@@ -23,7 +23,7 @@
 #X obj 224 46 trigger bang bang bang bang bang;
 #X msg 285 26 bang;
 #X obj 208 481 bang;
-#X obj 252 238 framesync/fps_ms;
+#X obj 252 238 fps_ms;
 #X obj 237 317 samplerate~;
 #X obj 237 359 *;
 #X obj 252 338 / 1000;

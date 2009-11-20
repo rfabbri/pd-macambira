@@ -49,7 +49,7 @@ empty 0 -8 0 16 -233017 -33289 -33289 0 256;
 #X msg 150 97 set 0;
 #X obj 28 198 send framesync/reset;
 #X obj 571 24 framesync/fps \$2;
-#X obj 555 64 framesync/fps_ms;
+#X obj 555 64 fps_ms;
 #X obj 24 14 inlet;
 #X text 65 13 set frame position;
 #X connect 0 0 14 0;

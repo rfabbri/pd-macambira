@@ -12,7 +12,7 @@
 #X obj 158 251 int;
 #X obj 158 271 + 1;
 #X obj 158 299 +;
-#X obj 245 175 framesync/fps_ms;
+#X obj 245 175 fps_ms;
 #X obj 22 88 receive framesync/frameclock;
 #X text 19 71 current frame #;
 #X text 342 3 array to play;

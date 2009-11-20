@@ -12,7 +12,7 @@
 #X obj 40 96 purepd/symbol_argument \$1;
 #X obj 155 65 trigger bang bang bang;
 #X obj 40 176 table \$0-sample;
-#X obj 146 197 framesync/fstablooper~ \$0-sample;
+#X obj 146 197 fstablooper~ \$0-sample;
 #N canvas 206 494 450 300 load 0;
 #X obj 22 113 pack symbol symbol;
 #X obj 22 136 zexy/makesymbol %s/%s;
@@ -44,7 +44,7 @@
 #X text 143 18 start frame;
 #X text 294 14 end frame;
 #X obj 126 269 outlet;
-#X obj 141 140 framesync/fps_ms;
+#X obj 141 140 fps_ms;
 #X obj 126 106 -;
 #X obj 89 79 float;
 #X obj 126 160 *;
