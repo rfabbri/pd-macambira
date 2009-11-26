@@ -8,7 +8,7 @@ SOURCES =
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
-SOURCES_Darwin = ambient_light_sensor.c iodisplay.c keyboard_light.c sudden_motion_sensor.c smc.c multitouch.c
+SOURCES_Darwin = ambient_light_sensor.c iodisplay.c keyboard_light.c sudden_motion_sensor.c smc.c
 SOURCES_iphoneos = multitouch.c
 SOURCES_Linux = 
 SOURCES_Windows = 
@@ -50,6 +50,9 @@ ifeq ($(UNAME),Darwin)
     STRIP = strip -x
   else # Mac OS X
     SOURCES += $(SOURCES_Darwin)
+    ifneq ($(findstring 8.11.1, $(shell uname -r)), 8.11.1)
+      SOURCES += $(SOURCES_iphoneos)
+    endif
     EXTENSION = pd_darwin
     OS = macosx
     OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=3 -fast
