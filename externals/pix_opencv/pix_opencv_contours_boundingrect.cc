@@ -156,6 +156,7 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
     }
 
     int i = 0;                   // Indicator of cycles.
+    int ic = 0;                  // Indicator of contours.
     for( ; contours != 0; contours = contours->h_next )
     {
         int count = contours->total; // This is number point in contour
@@ -206,10 +207,10 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
 
     	    outlet_list( m_dataout, 0, 5, rlist );
 	    i++;
+	    ic++;
 	}
-        outlet_float( m_countout, i );
-	
     }
+    outlet_float( m_countout, ic );
 
     // delete lost objects
     for ( im=0; im<MAX_MARKERS; im++ )
@@ -285,6 +286,7 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
     }
 
     int i = 0;                   // Indicator of cycles.
+    int ic = 0;                  // Indicator of contours.
     for( ; contours != 0; contours = contours->h_next )
     {
         int count = contours->total; // This is number point in contour
@@ -335,10 +337,10 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
 
     	    outlet_list( m_dataout, 0, 5, rlist );
 	    i++;
+	    ic++;
 	}
-        outlet_float( m_countout, i );
-	
     }
+    outlet_float( m_countout, ic );
 
     // delete lost objects
     for ( im=0; im<MAX_MARKERS; im++ )
@@ -420,6 +422,7 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
     }
 
     int i = 0;                   // Indicator of cycles.
+    int ic = 0;                  // Indicator of contours.
     for( ; contours != 0; contours = contours->h_next )
     {
         int count = contours->total; // This is number point in contour
@@ -470,10 +473,10 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
 
     	    outlet_list( m_dataout, 0, 5, rlist );
 	    i++;
+	    ic++;
 	}
-        outlet_float( m_countout, i );
-	
     }
+    outlet_float( m_countout, i );
 
     // delete lost objects
     for ( im=0; im<MAX_MARKERS; im++ )

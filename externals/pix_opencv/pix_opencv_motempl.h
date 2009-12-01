@@ -17,14 +17,10 @@ LOG
 #define INCLUDE_PIX_OPENCV_MOTEMPL_H_
 
 #ifndef _EiC
-#ifdef __APPLE__
-#include <OpenCV/OpenCV.h>
-#else
 #include "cv.h"
 #include <time.h>
 #include <math.h>
 #include <ctype.h>
-#endif
 #endif
 #include <stdio.h>
 

@@ -17,12 +17,8 @@ LOG
 #define INCLUDE_PIX_OPENCV_BGSTATS_H
 
 #ifndef _EiC
-#ifdef __APPLE__
-#include <OpenCV/OpenCV.h>
-#else
 #include "cv.h"
 #include "cvaux.h"
-#endif
 #endif
 
 #include "Base/GemPixObj.h"
