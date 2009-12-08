@@ -1,4 +1,4 @@
-#N canvas 430 89 1009 673 10;
+#N canvas 426 113 1009 673 10;
 #X obj 329 386 tabread \$0keys;
 #X obj 325 445 pack;
 #X obj 324 466 route 0;
@@ -284,7 +284,7 @@
 #X obj 329 78 tgl 12 0 \$0s72 \$0r72mk empty 20 8 0 8 -262144 -1 -1
 0 127;
 #X obj 339 57 tgl 12 0 \$0s73 \$0r73mk empty 20 8 0 8 -262144 -1 -1
-0 1;
+0 127;
 #X obj 352 78 tgl 12 0 \$0s74 \$0r74mk empty 20 8 0 8 -262144 -1 -1
 0 127;
 #X obj 365 57 tgl 12 0 \$0s75 \$0r75mk empty 20 8 0 8 -262144 -1 -1
@@ -327,6 +327,7 @@
 #X obj 465 74 loadbang;
 #X obj 418 102 f \$1;
 #X msg 918 199 30;
+#X obj 416 14 inlet;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 2 1 8 0;
@@ -370,4 +371,5 @@
 #X connect 98 0 99 0;
 #X connect 99 0 78 0;
 #X connect 100 0 93 0;
+#X connect 101 0 78 0;
 #X coords 0 -1 1 1 394 100 1 0 0;

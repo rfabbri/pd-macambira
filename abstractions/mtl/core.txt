@@ -70,8 +70,8 @@ mtl/chordGuess midi
 mtl/chronometer timing
 mtl/clap808~ synthesize~
 mtl/clap~ synthesize~
-mtl/clkMaster timing
-mtl/clkSlave timing
+mtl/clkMaster timing sequencing
+mtl/clkSlave timing sequencing
 mtl/clkUDPIn timing network
 mtl/clkUDPOut timing network
 mtl/clocker timing

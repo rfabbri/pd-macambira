@@ -1,38 +1,38 @@
-#N canvas 716 235 403 172 10;
-#X obj 185 17 vsl 15 115 0 175 0 0 \$0_slider_s0 \$0_slider_r0 empty
-0 -8 0 8 -1 -228856 -228856 0 0;
-#X obj 3 45 hradio 15 1 0 12 \$0_hr_2_s0 \$0_hr_2_r0 symbols 2 8 1
-9 -1 -1 -262140 1;
-#X obj 3 60 hradio 15 1 0 12 \$0_hr_3_s0 \$0_hr_3_r0 synthesize~ 2
-8 1 9 -1 -1 -262140 0;
-#X obj 3 75 hradio 15 1 0 12 \$0_hr_4_s0 \$0_hr_4_r0 tables 2 8 1 9
--1 -1 -262140 1;
-#X obj 3 90 hradio 15 1 0 12 \$0_hr_5_s0 \$0_hr_5_r0 timing 2 8 1 9
+#N canvas 181 379 403 172 10;
+#X obj 185 19 vsl 15 115 0 175 0 0 \$0_slider_s0 \$0_slider_r0 empty
+0 -8 0 8 -1 -228856 -228856 11400 0;
+#X obj 3 47 hradio 15 1 0 12 \$0_hr_2_s0 \$0_hr_2_r0 ambisonic 2 8
+1 9 -1 -1 -262140 0;
+#X obj 3 62 hradio 15 1 0 12 \$0_hr_3_s0 \$0_hr_3_r0 behavior 2 8 1
+9 -1 -1 -262140 0;
+#X obj 3 77 hradio 15 1 0 12 \$0_hr_4_s0 \$0_hr_4_r0 control~ 2 8 1
+9 -1 -1 -262140 0;
+#X obj 3 92 hradio 15 1 0 12 \$0_hr_5_s0 \$0_hr_5_r0 conversion 2 8
+1 9 -1 -1 -262140 0;
+#X obj 3 107 hradio 15 1 0 12 \$0_hr_6_s0 \$0_hr_6_r0 counter 2 8 1
+9 -1 -1 -262140 0;
+#X obj 3 122 hradio 15 1 0 12 \$0_hr_7_s0 \$0_hr_7_r0 data 2 8 1 9
 -1 -1 -262140 0;
-#X obj 3 105 hradio 15 1 0 12 \$0_hr_6_s0 \$0_hr_6_r0 tools 2 8 1 9
--1 -1 -262140 0;
-#X obj 3 120 hradio 15 1 0 12 \$0_hr_7_s0 \$0_hr_7_r0 ui 2 8 1 9 -1
--1 -258401 0;
-#X obj 384 17 vsl 15 115 0 175 0 0 \$0_slider_s \$0_slider_r empty
+#X obj 384 19 vsl 15 115 0 175 0 0 \$0_slider_s \$0_slider_r empty
 0 -8 0 8 -1 -228856 -1 11400 0;
-#X obj 202 15 hradio 15 1 0 12 \$0_hr_0_s \$0_hr_0_r mtl/buttonColor
-2 8 1 9 -1 -1 -258401 3;
-#X obj 202 30 hradio 15 1 0 12 \$0_hr_1_s \$0_hr_1_r mtl/colorGrid
-2 8 1 9 -1 -1 -262140 4;
-#X obj 202 45 hradio 15 1 0 12 \$0_hr_2_s \$0_hr_2_r mtl/doubleClick
-2 8 1 9 -1 -1 -262140 0;
-#X obj 202 60 hradio 15 1 0 12 \$0_hr_3_s \$0_hr_3_r mtl/fileBrowser
-2 8 1 9 -1 -1 -262140 2;
-#X obj 202 75 hradio 15 1 0 12 \$0_hr_4_s \$0_hr_4_r mtl/gBrowser 2
-8 1 9 -1 -1 -262140 2;
-#X obj 202 90 hradio 15 1 0 12 \$0_hr_5_s \$0_hr_5_r mtl/hsv 2 8 1
-9 -1 -1 -262140 4;
-#X obj 202 105 hradio 15 1 0 12 \$0_hr_6_s \$0_hr_6_r mtl/keyNameLearn
-2 8 1 9 -1 -1 -262140 3;
-#X obj 202 120 hradio 15 1 0 12 \$0_hr_7_s \$0_hr_7_r mtl/keyR 2 8
-1 9 -1 -1 -262140 2;
-#N canvas 301 43 723 396 ./browser 0;
-#N canvas 1069 45 887 645 coll 0;
+#X obj 202 17 hradio 15 1 0 12 \$0_hr_0_s \$0_hr_0_r empty 2 8 1 9
+-1 -1 -262140 0;
+#X obj 202 32 hradio 15 1 0 12 \$0_hr_1_s \$0_hr_1_r empty 2 8 1 9
+-1 -1 -262140 0;
+#X obj 202 47 hradio 15 1 0 12 \$0_hr_2_s \$0_hr_2_r empty 2 8 1 9
+-1 -1 -262140 0;
+#X obj 202 62 hradio 15 1 0 12 \$0_hr_3_s \$0_hr_3_r empty 2 8 1 9
+-1 -1 -262140 0;
+#X obj 202 77 hradio 15 1 0 12 \$0_hr_4_s \$0_hr_4_r empty 2 8 1 9
+-1 -1 -262140 0;
+#X obj 202 92 hradio 15 1 0 12 \$0_hr_5_s \$0_hr_5_r empty 2 8 1 9
+-1 -1 -262140 0;
+#X obj 202 107 hradio 15 1 0 12 \$0_hr_6_s \$0_hr_6_r empty 2 8 1 9
+-1 -1 -262140 0;
+#X obj 202 122 hradio 15 1 0 12 \$0_hr_7_s \$0_hr_7_r empty 2 8 1 9
+-1 -1 -262140 0;
+#N canvas 1194 46 877 452 ./browser 0;
+#N canvas 1251 263 887 645 coll 0;
 #X obj 23 -42 inlet;
 #X obj 247 -40 inlet;
 #X obj 141 321 zexy/demultiplex 0 1;
@@ -623,7 +623,7 @@
 #X msg 459 43 175;
 #X obj 461 65 s \$0_slider_r;
 #X obj 405 182 s \$0_slider_r0;
-#X obj 587 293 outlet;
+#X obj 524 293 outlet;
 #X obj 490 31 s \$0reset;
 #X text 186 53 TAGS->;
 #X text 160 265 ABSTRACTIONS->;
@@ -638,6 +638,38 @@
 #X obj 435 97 t b b b;
 #X obj 369 -61 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
+#N canvas 101 228 450 300 \$0info 0;
+#X obj 69 14 cnv 13 300 13 empty empty http://wiki.dataflow.ws/PdMtlAbstractions
+0 7 0 8 -16645 -262144 0;
+#X restore 583 183 pd \$0info;
+#X obj 590 93 r \$0info;
+#X obj 590 151 s pd-\$0info;
+#X msg 595 123 vis 1;
+#N canvas 0 0 864 561 font 0;
+#X msg 73 349 \; \$2_hr_\$1_r0 label_font \$3 \$4;
+#X obj 82 38 r \$0font;
+#X obj 86 254 tof/iterate;
+#X msg 92 223 8;
+#X obj 74 290 pack f \$0 1 f;
+#X obj 87 116 + 9;
+#X msg 286 350 \; \$2_hr_\$1_r label_font \$3 \$4;
+#X obj 298 67 loadbang;
+#X msg 294 99 9;
+#X obj 96 166 t b f f;
+#X msg 177 184 set \$1;
+#X connect 1 0 5 0;
+#X connect 2 0 4 0;
+#X connect 3 0 2 0;
+#X connect 4 0 0 0;
+#X connect 4 0 6 0;
+#X connect 5 0 9 0;
+#X connect 7 0 8 0;
+#X connect 8 0 9 0;
+#X connect 9 0 3 0;
+#X connect 9 1 4 3;
+#X connect 9 2 10 0;
+#X connect 10 0 8 0;
+#X restore 700 226 pd font;
 #X connect 1 0 0 0;
 #X connect 1 1 0 1;
 #X connect 2 0 0 0;
@@ -671,18 +703,22 @@
 #X connect 25 1 5 0;
 #X connect 25 2 13 0;
 #X connect 26 0 22 0;
-#X restore 277 -9 pd ./browser;
-#X obj 3 15 hradio 15 1 0 12 \$0_hr_0_s0 \$0_hr_0_r0 routing 2 8 1
-9 -1 -1 -262140 0;
-#X obj 3 31 hradio 15 1 0 12 \$0_hr_1_s0 \$0_hr_1_r0 sequencing 2 8
-1 9 -1 -1 -262140 0;
-#X obj 3 -9 cnv 15 198 22 empty empty TAG 1 12 1 12 -16645 -228856
+#X connect 28 0 30 0;
+#X connect 30 0 29 0;
+#X restore 277 -7 pd ./browser;
+#X obj 3 17 hradio 15 1 0 12 \$0_hr_0_s0 \$0_hr_0_r0 2d 2 8 1 9 -1
+-1 -262140 0;
+#X obj 3 33 hradio 15 1 0 12 \$0_hr_1_s0 \$0_hr_1_r0 3d 2 8 1 9 -1
+-1 -262140 0;
+#X obj 3 -7 cnv 15 198 22 empty empty TAG 1 12 1 12 -16645 -228856
 0;
-#X obj 202 -9 cnv 15 197 22 empty empty CLASS/ABSTRACTION 0 12 1 12
+#X obj 202 -7 cnv 15 197 22 empty empty CLASS/ABSTRACTION 0 12 1 12
 -16645 -228856 0;
-#X obj 3 137 cnv 15 396 20 empty empty empty 20 12 0 14 -16645 -258401
+#X obj 3 139 cnv 15 396 20 empty empty empty 18 12 0 14 -16645 -258401
 0;
-#X obj 7 141 tgl 11 0 \$0love \$0lover with:love 17 6 0 8 -162280 -262144
--258401 0 1;
-#X obj 146 141 cnv 15 100 10 empty empty http://wiki.dataflow.ws/PdMtlAbstractions
-0 6 0 8 -16645 -99865 0;
+#X obj 6 144 tgl 9 0 \$0love \$0lover with:love 11 4 0 8 -162280 -262144
+-258401 1 1;
+#X obj 183 143 cnv 10 10 10 empty empty http://puredata.info/Members/mtl/
+0 6 0 7 -16645 -99865 0;
+#X obj 80 144 hradio 8 1 0 4 \$0font \$0 font 34 4 0 8 -162280 -262144
+-258401 0;

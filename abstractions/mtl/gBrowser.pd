@@ -1,4 +1,4 @@
-#N canvas 1032 0 1001 666 10;
+#N canvas 408 25 1001 666 10;
 #X obj 829 775 t f f;
 #X obj 267 5 inlet;
 #X obj 128 1066 outlet;
@@ -321,6 +321,8 @@
 #X obj 450 761 cyclone/speedlim 100;
 #X obj 1062 918 tof/iterate;
 #X obj 44 37 route bang float;
+#X obj 498 1000 outlet;
+#X obj 459 980 moses 0;
 #X connect 0 0 51 0;
 #X connect 1 0 57 0;
 #X connect 3 1 0 0;
@@ -390,6 +392,7 @@
 #X connect 65 0 107 0;
 #X connect 66 0 71 0;
 #X connect 68 0 42 0;
+#X connect 68 0 109 0;
 #X connect 69 0 46 0;
 #X connect 70 0 68 0;
 #X connect 70 1 24 0;
@@ -435,4 +438,5 @@
 #X connect 105 0 58 0;
 #X connect 106 0 5 0;
 #X connect 107 1 87 0;
+#X connect 109 1 108 0;
 #X coords 0 0 1 1 198 138 0;

@@ -1,39 +1,45 @@
-#N canvas 1145 13 741 557 10;
-#X obj 255 113 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 513 25 652 507 10;
+#X obj 11 60 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X symbolatom 53 479 80 0 0 0 - - -;
-#X obj 53 503 print;
-#X text 75 24 Description: Nice file browser.;
-#X text 262 205 <- Drag the slider to display all the contents of a
+#X symbolatom 11 451 80 0 0 0 - - -;
+#X obj 11 475 print;
+#X text 9 10 Description: Nice file browser.;
+#X text 223 202 <- Drag the slider to display all the contents of a
 folder.;
-#X text 271 177 - Files are white \, folders are grey!;
-#X floatatom 58 112 5 0 0 0 - - -;
-#X text 45 91 You can select files by index.;
-#X floatatom 392 273 5 0 0 1 size - -;
-#X obj 316 323 pack 0 10;
-#X obj 392 293 t b a;
-#X floatatom 313 276 5 0 2 1 font - -;
-#X msg 316 346 text.font \$1 \$2;
-#X msg 318 379 select.colorRGB 125 125 125;
-#X text 505 381 Change the select color;
-#X msg 318 405 select.colorRGB 0 125 125;
-#X msg 204 111 clear;
-#X text 287 109 <- click the bang (or click on the grey bar) to select
+#X floatatom 55 116 5 0 0 0 - - -;
+#X text 92 115 You can select files by index.;
+#X floatatom 339 288 5 0 0 1 size - -;
+#X obj 274 335 pack 0 10;
+#X obj 339 308 t b a;
+#X floatatom 274 288 5 0 2 1 font - -;
+#X msg 274 358 text.font \$1 \$2;
+#X msg 275 382 select.colorRGB 125 125 125;
+#X text 453 382 Change the select color;
+#X msg 276 407 select.colorRGB 0 125 125;
+#X msg 96 139 clear;
+#X text 32 56 <- click the bang (or click on the grey bar) to select
 the folder to be browsed.;
-#X text 300 237 You can use any of gBrowser's right inlet options.
+#X text 271 253 You can use any of gBrowser's right inlet options.
 See gBrowser's help for more information.;
-#X obj 53 160 mtl/fileBrowser;
-#X text 75 38 tags: ui file;
-#X connect 0 0 19 0;
+#X text 9 24 tags: ui file;
+#X obj 202 146 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 225 146 slider up + refresh the current folder;
+#X text 19 329 Files are white \, folders are grey!;
+#X obj 11 172 mtl/fileBrowser;
+#X msg 34 87 symbol /usr/lib/pd/doc;
+#X connect 0 0 22 0;
 #X connect 1 0 2 0;
-#X connect 6 0 19 0;
-#X connect 8 0 10 0;
-#X connect 9 0 12 0;
-#X connect 10 0 9 0;
-#X connect 10 1 9 1;
-#X connect 11 0 9 0;
-#X connect 12 0 19 1;
-#X connect 13 0 19 1;
-#X connect 15 0 19 1;
-#X connect 16 0 19 0;
-#X connect 19 0 1 0;
+#X connect 5 0 22 0;
+#X connect 7 0 9 0;
+#X connect 8 0 11 0;
+#X connect 9 0 8 0;
+#X connect 9 1 8 1;
+#X connect 10 0 8 0;
+#X connect 11 0 22 1;
+#X connect 12 0 22 1;
+#X connect 14 0 22 1;
+#X connect 15 0 22 0;
+#X connect 19 0 22 1;
+#X connect 22 0 1 0;
+#X connect 23 0 22 0;
