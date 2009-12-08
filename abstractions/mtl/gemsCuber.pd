@@ -1,6 +1,6 @@
 #N canvas 12 32 1022 686 10;
 #X obj 49 154 separator;
-#X obj 53 276 separator;
+#X obj 45 256 separator;
 #X obj 403 664 outlet;
 #X obj 406 128 f;
 #X obj 403 29 inlet;
@@ -10,7 +10,7 @@
 #X obj 551 16 inlet;
 #X text 557 1 num Y;
 #X obj 49 128 repeat 1;
-#X obj 53 250 repeat 1;
+#X obj 45 230 repeat 1;
 #X obj 144 17 inlet;
 #X obj 188 568 expr (1/$f2)*($f1*2+1)-1;
 #X obj 465 484 /;
@@ -31,7 +31,7 @@
 #X obj 66 409 t a b;
 #X obj 60 358 repeat 1;
 #X obj 51 179 t a b b;
-#X obj 55 300 t a b b;
+#X obj 47 280 t a b b;
 #X obj 721 31 inlet;
 #X text 722 8 num z;
 #X obj 721 129 f;
@@ -46,7 +46,7 @@
 #X obj 578 94 tof/argument 2 1;
 #X obj 750 111 tof/argument 3 1;
 #X obj 120 209 tof/increment;
-#X obj 106 324 tof/increment;
+#X obj 132 321 tof/increment;
 #X obj 113 433 tof/increment;
 #X obj 559 653 outlet;
 #X obj 651 656 outlet;
@@ -96,8 +96,10 @@
 #X connect 29 1 48 0;
 #X connect 30 0 28 0;
 #X connect 31 0 11 0;
+#X connect 31 1 47 1;
 #X connect 31 2 46 0;
 #X connect 32 0 30 0;
+#X connect 32 1 48 1;
 #X connect 32 2 47 0;
 #X connect 33 0 35 0;
 #X connect 35 0 36 0;
