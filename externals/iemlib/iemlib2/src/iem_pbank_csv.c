@@ -20,21 +20,26 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2009 
 1. symbol is a filename,
 2. symbol is a 2 character descriptor
 
-  1.char: 'b'...for blank as ITEM_SEPARATOR (" ")
-  1.char: 's'...for semicolon as ITEM_SEPARATOR (";")
-  1.char: 't'...for tabulator as ITEM_SEPARATOR ("	" = 0x09)
-  
-    2.char: 'b'...for blank,return as END_OF_LINE (" \n")
-    2.char: 's'...for semicolon,return as END_OF_LINE (";\n")
-    2.char: 't'...for tabulator,return as END_OF_LINE ("     \n")
-    2.char: 'r'...for return-only as END_OF_LINE ("\n")
-          
-        change: recall + offset + number
+1.char: 'b'...for blank as ITEM_SEPARATOR (" ")
+1.char: 's'...for semicolon as ITEM_SEPARATOR (";")
+1.char: 't'...for tabulator as ITEM_SEPARATOR ("	" = 0x09)
+
+2.char: 'b'...for blank,return as END_OF_LINE (" \n")
+2.char: 's'...for semicolon,return as END_OF_LINE (";\n")
+2.char: 't'...for tabulator,return as END_OF_LINE ("     \n")
+2.char: 'r'...for return-only as END_OF_LINE ("\n")
+
+change: recall + offset + number
 */
+
+#define IEMLIB2_DEBUG 0
 
 #define IEM_PBANK_ITEM_SEPARATOR 0
 #define IEM_PBANK_END_OF_LINE 1
 #define IEM_PBANK_FORMAT_SIZE 2
+#define IEM_PBANK_UNIFIED_RET 0x01
+#define IEM_PBANK_UNIFIED_SEP 0x02
+#define IEM_PBANK_UNIFIED_EOL 0x03
 
 static t_class *iem_pbank_csv_class;
 
@@ -71,10 +76,10 @@ static void iem_pbank_csv_write(t_iem_pbank_csv *x, t_symbol *filename, t_symbol
     strcpy(completefilename, filename->s_name);
   }
   else if(((filename->s_name[0] >= 'A')&&(filename->s_name[0] <= 'Z')||
-    (filename->s_name[0] >= 'a')&&(filename->s_name[0] <= 'z'))&&
-    (filename->s_name[1] == ':')&&(filename->s_name[2] == '/'))// windows, backslash becomes slash in pd
+           (filename->s_name[0] >= 'a')&&(filename->s_name[0] <= 'z'))&&
+          (filename->s_name[1] == ':')&&(filename->s_name[2] == '/'))// windows, backslash becomes slash in pd
   {
-    strcpy(completefilename, filename->s_name);
+            strcpy(completefilename, filename->s_name);
   }
   else
   {
@@ -172,8 +177,8 @@ static void iem_pbank_csv_write(t_iem_pbank_csv *x, t_symbol *filename, t_symbol
   }
 }
 
-int iem_pbank_csv_text2atom(char *text, int text_size, t_atom **at_beg,
-                            int *nalloc, char sep, char eol)
+static int iem_pbank_csv_text2atom(char *text, int text_size, t_atom **at_beg,
+                                   int *nalloc, char sep, char eol)
 {
   char buf[MAXPDSTRING+1], *bufp, *ebuf = buf+MAXPDSTRING;
   const char *textp = text, *etext = text + text_size;
@@ -213,9 +218,9 @@ int iem_pbank_csv_text2atom(char *text, int text_size, t_atom **at_beg,
         if (flst >= 0)
         {
           int digit = (c >= '0' && c <= '9'),
-            dot = (c == '.'), minus = (c == '-'),
-            plusminus = (minus || (c == '+')),
-            expon = (c == 'e' || c == 'E');
+          dot = (c == '.'), minus = (c == '-'),
+          plusminus = (minus || (c == '+')),
+          expon = (c == 'e' || c == 'E');
           if (flst == 0)  /* beginning */
           {
             if (minus) flst = 1;
@@ -270,7 +275,7 @@ int iem_pbank_csv_text2atom(char *text, int text_size, t_atom **at_beg,
         if (!slash) bufp++;
       }
       while (textp != etext && bufp != ebuf && *textp != ' ' &&
-        (slash || (*textp != sep && *textp != eol)));
+             (slash || (*textp != sep && *textp != eol)));
       *bufp = 0;
       
       if(*buf == '$' && buf[1] >= '0' && buf[1] <= '9' && !firstslash)
@@ -281,7 +286,7 @@ int iem_pbank_csv_text2atom(char *text, int text_size, t_atom **at_beg,
             SETDOLLSYM(ap, gensym(buf+1));
             goto iem_pbank_csv_didit;
           }
-          SETDOLLAR(ap, atoi(buf+1));
+            SETDOLLAR(ap, atoi(buf+1));
 iem_pbank_csv_didit: ;
       }
       else
@@ -303,7 +308,7 @@ iem_pbank_csv_didit: ;
     if(natom == *nalloc)
     {
       *at_beg = t_resizebytes(*at_beg, *nalloc * sizeof(t_atom),
-        *nalloc * (2*sizeof(t_atom)));
+                              *nalloc * (2*sizeof(t_atom)));
       *nalloc = *nalloc * 2;
       ap = *at_beg + natom;
     }
@@ -313,329 +318,463 @@ iem_pbank_csv_didit: ;
   return(natom);
 }
 
-/*static char myq(t_atom *a, int off)
+static void iem_pbank_csv_debug(char *buf, int n)
 {
-char c='0';
-
-  if(IS_A_SEMI(a,off))
-  c = 's';
-  else if(IS_A_COMMA(a,off))
-  c = 'c';
-  else if(IS_A_FLOAT(a,off))
-    c = 'f';
-    else if(IS_A_SYMBOL(a,off))
-    c = 'y';
-    return(c);
-} */
+  while(n >= 16)
+  {
+    post("%x %x %x %x | %x %x %x %x | %x %x %x %x | %x %x %x %x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], buf[12], buf[13], buf[14], buf[15]);
+    n -= 16;
+    buf += 16;
+  }
+  switch(n)
+  {
+  case 15:
+    post("%x %x %x %x | %x %x %x %x | %x %x %x %x | %x %x %x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], buf[12], buf[13], buf[14]);
+    break;
+  case 14:
+    post("%x %x %x %x | %x %x %x %x | %x %x %x %x | %x %x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], buf[12], buf[13]);
+    break;
+  case 13:
+    post("%x %x %x %x | %x %x %x %x | %x %x %x %x | %x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], buf[12]);
+    break;
+  case 12:
+    post("%x %x %x %x | %x %x %x %x | %x %x %x %x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], buf[8], buf[9], buf[10], buf[11]);
+    break;
+  case 11:
+    post("%x %x %x %x | %x %x %x %x | %x %x %x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], buf[8], buf[9], buf[10]);
+    break;
+  case 10:
+    post("%x %x %x %x | %x %x %x %x | %x %x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], buf[8], buf[9]);
+    break;
+  case 9:
+    post("%x %x %x %x | %x %x %x %x | %x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], buf[8]);
+    break;
+  case 8:
+    post("%x %x %x %x | %x %x %x %x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
+    break;
+  case 7:
+    post("%x %x %x %x | %x %x %x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6]);
+    break;
+  case 6:
+    post("%x %x %x %x | %x %x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
+    break;
+  case 5:
+    post("%x %x %x %x | %x", buf[0], buf[1], buf[2], buf[3], buf[4]);
+    break;
+  case 4:
+    post("%x %x %x %x", buf[0], buf[1], buf[2], buf[3]);
+    break;
+  case 3:
+    post("%x %x %x", buf[0], buf[1], buf[2]);
+    break;
+  case 2:
+    post("%x %x", buf[0], buf[1]);
+    break;
+  case 1:
+    post("%x", buf[0]);
+    break;
+   }
+}
 
 static void iem_pbank_csv_read(t_iem_pbank_csv *x, t_symbol *filename, t_symbol *format)
 {
-  char completefilename[400], eol[8], sep, mode[4], *txbuf1, *txbuf2, *txvec_src, *txvec_src2, *txvec_dst;
+  char completefilename[400], eol, sep, mode[4], *txbuf1, *txbuf2, *txvec_src, *txvec_dst;
   int size, p, l, i, j, nrl=x->x_nr_line, nrp=x->x_nr_para, atlen=0;
-  int txlen, txalloc, txalloc1, hat_alloc, max, eol_offset, eol_length;
+  int txlen, txalloc, hat_alloc, max, eol_length;
   FILE *fh;
   t_atom *ap, *hap, *at;
-  char formattext[100];
+  char formattext[100], str_format[8];
   
   strcpy(mode, "br"); // blank-separator, return-eol
-  sep = ' ';
-  sprintf(eol, ";\n");
-  eol_offset = 1;
-  eol_length = strlen(eol+eol_offset);
+  sep = ' '; // default SEP = space
+  eol = ';'; // default any char
+  eol_length = 1; // default: EOL = return only
   
   if(filename->s_name[0] == '/')/*make complete path + filename*/
-  {
-    strcpy(completefilename, filename->s_name);
-  }
-  else if(((filename->s_name[0] >= 'A')&&(filename->s_name[0] <= 'Z')||
-    (filename->s_name[0] >= 'a')&&(filename->s_name[0] <= 'z'))&&
-    (filename->s_name[1] == ':')&&(filename->s_name[2] == '/'))
-  {
-    strcpy(completefilename, filename->s_name);
-  }
-  else
-  {
-    strcpy(completefilename, canvas_getdir(x->x_canvas)->s_name);
-    strcat(completefilename, "/");
-    strcat(completefilename, filename->s_name);
-  }
-  
-  fh = fopen(completefilename,"rb");
-  if(!fh)
-  {
-    post("iem_pbank_csv_read: cannot open %s !!\n", completefilename);
-  }
-  else
-  {
-    if(strlen(format->s_name) >= IEM_PBANK_FORMAT_SIZE)
-    {
-      for(p=0; p<IEM_PBANK_FORMAT_SIZE; p++)
-      {
-        if((format->s_name[p] >= 'A')&&(format->s_name[p] <= 'Z'))
-          format->s_name[p] += 'a' - 'A';
-      }
-      if((format->s_name[IEM_PBANK_ITEM_SEPARATOR] == 'b')
-         ||(format->s_name[IEM_PBANK_ITEM_SEPARATOR] == 's')
-         ||(format->s_name[IEM_PBANK_ITEM_SEPARATOR] == 't'))
-        mode[IEM_PBANK_ITEM_SEPARATOR] = format->s_name[IEM_PBANK_ITEM_SEPARATOR];
-      
-      if((format->s_name[IEM_PBANK_END_OF_LINE] == 'b')
-         ||(format->s_name[IEM_PBANK_END_OF_LINE] == 's')
-         ||(format->s_name[IEM_PBANK_END_OF_LINE] == 't')
-         ||(format->s_name[IEM_PBANK_END_OF_LINE] == 'r'))
-        mode[IEM_PBANK_END_OF_LINE] = format->s_name[IEM_PBANK_END_OF_LINE];
-    }
-    else
-      post("iem_pbank_csv_read: use default format %s !!\n", mode);
-    if(mode[IEM_PBANK_ITEM_SEPARATOR] == 'b')
-    {
-      sep = ' ';
-      strcpy(formattext, "item-separator = BLANK; ");
-    }
-    else if(mode[IEM_PBANK_ITEM_SEPARATOR] == 's')
-    {
-      sep = ';';
-      strcpy(formattext, "item-separator = SEMICOLON; ");
-    }
-    else if(mode[IEM_PBANK_ITEM_SEPARATOR] == 't')
-    {
-      sep = 0x09;
-      strcpy(formattext, "item-separator = TABULATOR; ");
-    }
-    
-    eol_offset = 0;
-    if(mode[IEM_PBANK_END_OF_LINE] == 'b')
-    {
-      eol[0] = ' ';
-      strcat(formattext, "end_of_line_terminator = BLANK-RETURN.");
-    }
-    else if(mode[IEM_PBANK_END_OF_LINE] == 's')
-    {
-      eol[0] = ';';
-      strcat(formattext, "end_of_line_terminator = SEMICOLON-RETURN.");
-    }
-    else if(mode[IEM_PBANK_END_OF_LINE] == 't')
-    {
-      eol[0] = 0x09;
-      strcat(formattext, "end_of_line_terminator = TABULATOR-RETURN.");
-    }
-    else if(mode[IEM_PBANK_END_OF_LINE] == 'r')
-    {
-      eol_offset = 1;
-      strcat(formattext, "end_of_line_terminator = RETURN.");
-    }
-    eol_length = strlen(eol+eol_offset);
-    
-    fseek(fh, 0, SEEK_END);
-    txalloc = ftell(fh);
-    fseek(fh,0,SEEK_SET);
-    txbuf1 = (char *)getbytes(2 * txalloc * sizeof(char));
-    txbuf2 = (char *)getbytes(2 * txalloc * sizeof(char));
-    if(fread(txbuf1, sizeof(char), txalloc, fh) < sizeof(char)*txalloc)
-	post("pbank.csv:435: warning read error (not specified)");
-    fclose(fh);
-    
-      // windows return
-    txvec_src = txbuf1;
-    txvec_src2 = txbuf1 + 1;
-    txalloc1 = txalloc - 1;
-    for(l=0; l<txalloc1; l++)
-    {
-      if((*txvec_src == 0x0d) && (*txvec_src2 == 0x0a)) // windows return
-      {
-        txvec_src = 0x00;// replace windows return by 0x00 + 0x0a, 0x00 will be droped in next for++loop
-      }
-      txvec_src++;
-      txvec_src2++;
-    }
-    
-      // replace and drop
-    txvec_src = txbuf1;
-    txvec_dst = txbuf2;
-    p = 0;
-    for(l=0; l<txalloc; l++)
-    {
-      if(*txvec_src == 0x0d)// replace '0x0d' by '0x0a'
-      {
-        txvec_src++;
-        *txvec_dst++ = 0x0a;
-        p++;
-      }
-      else if(*txvec_src == sep)// replace 'sep' by ';'
-      {
-        txvec_src++;
-        *txvec_dst++ = ';';
-        p++;
-      }
-      else if(*txvec_src == ',')// replace ',' by '.'
-      {
-        txvec_src++;
-        *txvec_dst++ = '.';
-        p++;
-      }
-      else if((*txvec_src >= ' ') && (*txvec_src <= '~'))
-      {
-        *txvec_dst++ = *txvec_src++;// copy the same char
-        p++;
-      }
-      else
-        txvec_src++;// drop anything else
-    }
-    txlen = p;
-    
-      
-    txvec_src = txbuf2;
-    txvec_dst = txbuf1;
-    p = 0;
-    for(l=0; l<txlen; l++)
-    {
-      if(!strncmp(txvec_src, eol+eol_offset, eol_length)) /* replace eol by 0x0a */
-      {
-        txvec_src += eol_length;
-        l += eol_length - 1;
-        *txvec_dst++ = 0x0a;
-        p++;
-      }
-      else
-      {
-        *txvec_dst++ = *txvec_src++;// copy the same char
-        p++;
-      }
-    }
-    txlen = p;
-    
-    txvec_src = txbuf1;
-    txvec_dst = txbuf2;
-    p = 0;
-    for(l=0; l<txlen; l++)
-    {
-      if((*txvec_src == ';')&&(txvec_src[1] == ';')) /* fill between 2 sep a zero */
-      {
-        *txvec_dst++ = *txvec_src++;
-        *txvec_dst++ = '0';
-        p += 2;
-      }
-      else if((*txvec_src == ';')&&(txvec_src[1] == 0x0a)) /* fill between sep and eol a zero */
-      {
-        *txvec_dst++ = *txvec_src++;
-        *txvec_dst++ = '0';
-        p += 2;
-      }
-      else if((*txvec_src == 0x0a)&&(txvec_src[1] == ';')) /* fill between eol and sep a zero */
-      {
-        *txvec_dst++ = *txvec_src++;
-        *txvec_dst++ = '0';
-        p += 2;
-      }
-      else                /* copy the same char */
-      {
-        *txvec_dst++ = *txvec_src++;
-        p++;
-      }
-    }
-    txlen = p;
-    
-    /*     strncpy(txbuf2, txbuf1, txlen);
-    txbuf2[txlen] = 0;
-    post("\n\n%s\n\n", txbuf2);   */
-    
-    hat_alloc = 200;
-    hap = t_getbytes(hat_alloc * sizeof(t_atom));
-    
-    atlen = iem_pbank_csv_text2atom(txbuf1, txlen, &hap, &hat_alloc, ';', 0x0a);
-    
-    /*   ap = hap;
-    i = atlen;
-    while(i >= 20)
-    {
-    post("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",myq(ap,0),myq(ap,1),myq(ap,2),myq(ap,3),myq(ap,4),myq(ap,5),myq(ap,6),myq(ap,7),myq(ap,8),myq(ap,9),myq(ap,10),myq(ap,11),myq(ap,12),myq(ap,13),myq(ap,14),myq(ap,15),myq(ap,16),myq(ap,17),myq(ap,18),myq(ap,19));
-    ap += 20;
-    i -= 20;
-  } */
-    
-    at = x->x_atbegmem;
-    for(l=0; l<nrl; l++)/*reset all*/
-    {
-      for(p=0; p<nrp; p++)
-      {
-        SETFLOAT(at, 0.0f);
-        at++;
-      }
-    }
-    
-    at = x->x_atbegmem;
-    ap = hap;
-    nrp++;
-    i = 0; /* atom-counter */
-    j = 0;
-    for(l=0; l<nrl; l++)/* nrl line times */
-    {
-      for(p=1; p<=nrp;)
-      {
-        if((p == nrp) && !(IS_A_SEMI(ap,0)))
-        {
-          /*post("too long");*/
-          while(!(IS_A_SEMI(ap,0)))
-          {
-            ap++;
-            atlen--;
-            /*post("ignore");*/
-            j++;
-            if(atlen <= 0)
-            {
-              goto iem_pbank_csv_end;
-            }
-          }
-        }
-        else
-        {
-          if(IS_A_FLOAT(ap,0))
-          {
-            SETFLOAT(at, ap->a_w.w_float);
-            /*post("float");*/
-            p++;
-            i++;
-            at++;
-          }
-          else if(IS_A_SYMBOL(ap,0))
-          {
-            SETSYMBOL(at, ap->a_w.w_symbol);
-            /*post("sym");*/
-            p++;
-            i++;
-            at++;
-          }
-          else if(IS_A_SEMI(ap,0))
-          {
-            /*post("semi");*/
-            for(; p<nrp;)
-            {
-              SETFLOAT(at,0.0);
-              /*post("zero");*/
-              p++;
-              i++;
-              at++;
-            }
-            p=nrp + 1;
-          }
-          ap++;
-          atlen--;
-          j++;
-        }
-        if(atlen <= 0)
-        {
-          goto iem_pbank_csv_end;
-        }
-      }
-    }
-    
+     {
+       strcpy(completefilename, filename->s_name);
+     }
+     else if(((filename->s_name[0] >= 'A')&&(filename->s_name[0] <= 'Z')||
+              (filename->s_name[0] >= 'a')&&(filename->s_name[0] <= 'z'))&&
+             (filename->s_name[1] == ':')&&(filename->s_name[2] == '/'))
+     {
+       strcpy(completefilename, filename->s_name);
+     }
+     else
+     {
+       strcpy(completefilename, canvas_getdir(x->x_canvas)->s_name);
+       strcat(completefilename, "/");
+       strcat(completefilename, filename->s_name);
+     }
+     
+     fh = fopen(completefilename,"rb");
+     if(!fh)
+     {
+       post("iem_pbank_csv_read: cannot open %s !!\n", completefilename);
+     }
+     else
+     {
+       if(strlen(format->s_name) >= IEM_PBANK_FORMAT_SIZE)
+       {
+         strncpy(str_format, format->s_name, IEM_PBANK_FORMAT_SIZE);
+         str_format[IEM_PBANK_FORMAT_SIZE] = 0;
+         for(p=0; p<IEM_PBANK_FORMAT_SIZE; p++)
+         {
+           if((str_format[p] >= 'A')&&(str_format[p] <= 'Z'))
+             str_format[p] += 'a' - 'A';
+         }
+         if((str_format[IEM_PBANK_ITEM_SEPARATOR] == 'b')
+            ||(str_format[IEM_PBANK_ITEM_SEPARATOR] == 's')
+            ||(str_format[IEM_PBANK_ITEM_SEPARATOR] == 't'))
+           mode[IEM_PBANK_ITEM_SEPARATOR] = str_format[IEM_PBANK_ITEM_SEPARATOR];
+         
+         if((str_format[IEM_PBANK_END_OF_LINE] == 'b')
+            ||(str_format[IEM_PBANK_END_OF_LINE] == 's')
+            ||(str_format[IEM_PBANK_END_OF_LINE] == 't')
+            ||(str_format[IEM_PBANK_END_OF_LINE] == 'r'))
+           mode[IEM_PBANK_END_OF_LINE] = str_format[IEM_PBANK_END_OF_LINE];
+       }
+       else
+         post("iem_pbank_csv_read: use default format %s !!\n", mode);
+       if(mode[IEM_PBANK_ITEM_SEPARATOR] == 'b')
+       {
+         sep = ' ';
+         strcpy(formattext, "item-separator = BLANK; ");
+       }
+       else if(mode[IEM_PBANK_ITEM_SEPARATOR] == 's')
+       {
+         sep = ';';
+         strcpy(formattext, "item-separator = SEMICOLON; ");
+       }
+       else if(mode[IEM_PBANK_ITEM_SEPARATOR] == 't')
+       {
+         sep = 0x09;
+         strcpy(formattext, "item-separator = TABULATOR; ");
+       }
+       
+       eol_length = 2; // if EOL are 2 char
+       if(mode[IEM_PBANK_END_OF_LINE] == 'b')
+       {
+         eol = ' ';
+         strcat(formattext, "end_of_line_terminator = BLANK-RETURN.");
+       }
+       else if(mode[IEM_PBANK_END_OF_LINE] == 's')
+       {
+         eol = ';';
+         strcat(formattext, "end_of_line_terminator = SEMICOLON-RETURN.");
+       }
+       else if(mode[IEM_PBANK_END_OF_LINE] == 't')
+       {
+         eol = 0x09;
+         strcat(formattext, "end_of_line_terminator = TABULATOR-RETURN.");
+       }
+       else if(mode[IEM_PBANK_END_OF_LINE] == 'r')
+       {
+         eol_length = 1; // if EOL is only 1 char = return oly
+         strcat(formattext, "end_of_line_terminator = RETURN.");
+       }
+       
+       fseek(fh, 0, SEEK_END);
+       txalloc = ftell(fh);
+       fseek(fh,0,SEEK_SET);
+       txbuf1 = (char *)getbytes((2 * txalloc + 256) * sizeof(char));
+       txbuf2 = (char *)getbytes((2 * txalloc + 256) * sizeof(char));
+       if(fread(txbuf1, sizeof(char), txalloc, fh) < sizeof(char)*txalloc)
+         post("pbank.csv:435: warning read error (not specified)");
+       fclose(fh);
+       
+	// 1.)  allow only readable ASCII (0x09, 0x0a, 0x0d, 0x20...0x7e = 
+  //      = TAB, LF, CR, ' ' ... '~' = 
+  //      = Tabulator, LineFeed, CarridgeReturn, Space ... Tilde), else drop
+       txvec_src = txbuf1;
+       txvec_dst = txbuf2;
+       txlen = txalloc;
+       p = 0;
+       
+       for(l=0; l<txlen; l++)
+       {
+         if(((*txvec_src >= ' ') && (*txvec_src <= '~')) || (*txvec_src == 0x09) || (*txvec_src == 0x0a) || (*txvec_src == 0x0d))
+         {
+           *txvec_dst++ = *txvec_src++;  // copy the same char
+           p++;
+         }
+         else
+           txvec_src++;// drop anything else
+       }
+       txlen = p; // dst is 2
+       
+  // 2.) unify windows return
+       txvec_src = txbuf2;
+       txvec_dst = txbuf1;
+       p = 0;
+       
+       txlen--;  // because we seek 2 char
+       for(l=0; l<txlen; l++)
+       {
+         if((txvec_src[0] == 0x0d)&&(txvec_src[1] == 0x0a))  // windows return
+         {
+           *txvec_dst++ = IEM_PBANK_UNIFIED_RET;
+           txvec_src += 2;
+           l++;
+           p++;
+         }
+         else
+         {
+           if(l == (txlen-1))
+           {
+             *txvec_dst++ = *txvec_src++;
+             p++;
+           }
+           *txvec_dst++ = *txvec_src++;
+           p++;
+         }
+       }
+       txlen = p; // dst is 1
+       
+  // 3.) unify any other return
+       txvec_src = txbuf1;
+       txvec_dst = txbuf2;
+       
+       p = 0;
+       for(l=0; l<txlen; l++)
+       {
+         if((*txvec_src == 0x0d) || (*txvec_src == 0x0a))  //  return
+           *txvec_dst++ = IEM_PBANK_UNIFIED_RET;
+         else
+           *txvec_dst++ = *txvec_src;
+         txvec_src++;
+         p++;
+       }
+       txlen = p; // dst is 2
+       
+  // 4.) unify separator
+       txvec_src = txbuf2;
+       txvec_dst = txbuf1;
+       
+       p = 0;
+       for(l=0; l<txlen; l++)
+       {
+         if(*txvec_src == sep)  // replace 'sep' by IEM_PBANK_UNIFIED_SEP
+           *txvec_dst++ = IEM_PBANK_UNIFIED_SEP;
+         else
+           *txvec_dst++ = *txvec_src;
+         txvec_src++;
+         p++;
+       }
+       txlen = p; // dst is 1
+       
+  // 5.) unify EndOfLine
+       txvec_src = txbuf1;
+       txvec_dst = txbuf2;
+       
+       p = 0;
+       if(eol_length == 2) // EndOfLine are 2 char
+       {
+         txlen--;  // because we seek 2 char
+         for(l=0; l<txlen; l++)
+         {
+           if((txvec_src[0] == eol)&&(txvec_src[1] == IEM_PBANK_UNIFIED_RET))
+           {
+             *txvec_dst++ = IEM_PBANK_UNIFIED_EOL;
+             txvec_src += 2;
+             l++;
+             p++;
+           }
+           else
+           {
+             if(l == (txlen-1))
+             {
+               *txvec_dst++ = *txvec_src++;
+               p++;
+             }
+             *txvec_dst++ = *txvec_src++;
+             p++;
+           }
+         }
+       }
+       else // EndOfLine is only 1 char
+       {
+         for(l=0; l<txlen; l++)
+         {
+           if(*txvec_src == IEM_PBANK_UNIFIED_RET)
+             *txvec_dst++ = IEM_PBANK_UNIFIED_EOL;
+           else
+             *txvec_dst++ = *txvec_src;
+           txvec_src++;
+           p++;
+         }
+       }
+       txlen = p; // dst is 2
+       
+  // 6.) now correct the decimal comma to point (sometimes it happens with MS Excel)
+       txvec_src = txbuf2;
+       txvec_dst = txbuf1;
+       
+       p = 0;
+       for(l=0; l<txlen; l++)
+       {
+         if(*txvec_src == ',')  // replace ',' by '.'
+           *txvec_dst++ = '.';
+         else
+           *txvec_dst++ = *txvec_src;
+         txvec_src++;
+         p++;
+       }
+       txlen = p; // dst is 1
+       
+       
+       
+       
+    // 7.) fill between 2 separators a zero
+    // 7.) fill between separator and eol a zero
+    // 7.) fill between eol and separator a zero
+       txvec_src = txbuf1;
+       txvec_dst = txbuf2;
+       
+       p = 0;
+       txlen--;
+       i = 0;
+       for(l=0; l<txlen; )
+       {
+         if((txvec_src[0] == IEM_PBANK_UNIFIED_SEP)&&(txvec_src[1] == IEM_PBANK_UNIFIED_SEP))  // fill between 2 sep a zero
+         {
+           txvec_dst[0] = IEM_PBANK_UNIFIED_SEP;
+           txvec_dst[1] = '0';
+           txvec_dst[2] = IEM_PBANK_UNIFIED_SEP;
+           p += 2;
+           i = 1;
+           txvec_dst += 2;
+           l++;
+           txvec_src++;
+         }
+         else if((txvec_src[0] == IEM_PBANK_UNIFIED_SEP)&&(txvec_src[1] == IEM_PBANK_UNIFIED_EOL))  // fill between sep and eol a zero
+         {
+           txvec_dst[0] = IEM_PBANK_UNIFIED_SEP;
+           txvec_dst[1] = '0';
+           txvec_dst[2] = IEM_PBANK_UNIFIED_EOL;
+           p += 2;
+           i = 1;
+           txvec_dst += 2;
+           l++;
+           txvec_src++;
+         }
+         else if((txvec_src[0] == IEM_PBANK_UNIFIED_EOL)&&(txvec_src[1] == IEM_PBANK_UNIFIED_SEP))  // fill between sep and eol a zero
+         {
+           txvec_dst[0] = IEM_PBANK_UNIFIED_EOL;
+           txvec_dst[1] = '0';
+           txvec_dst[2] = IEM_PBANK_UNIFIED_SEP;
+           p += 2;
+           i = 1;
+           txvec_dst += 2;
+           l++;
+           txvec_src++;
+         }
+         else // copy the same char
+         {
+           if(l == (txlen-1))
+           {
+             *txvec_dst++ = *txvec_src++;
+             p++;
+             l++;
+           }
+           *txvec_dst++ = *txvec_src++;
+           p++;
+           l++;
+         }
+       }
+       if(i)
+         p++;
+       txlen = p; // dst is 2
+       
+       txvec_src = txbuf2;
+       
+       
+       hat_alloc = 200;
+       hap = t_getbytes(hat_alloc * sizeof(t_atom));
+       
+       atlen = iem_pbank_csv_text2atom(txbuf2, txlen, &hap, &hat_alloc, IEM_PBANK_UNIFIED_SEP, IEM_PBANK_UNIFIED_EOL);
+       
+       at = x->x_atbegmem;
+       for(l=0; l<nrl; l++)  /*reset all*/
+       {
+         for(p=0; p<nrp; p++)
+         {
+           SETFLOAT(at, 0.0f);
+           at++;
+         }
+       }
+       
+       at = x->x_atbegmem;
+       ap = hap;
+       nrp++;
+       i = 0; /* atom-counter */
+       j = 0;
+       for(l=0; l<nrl; l++)/* nrl line times */
+       {
+         for(p=1; p<=nrp;)
+         {
+           if((p == nrp) && !(IS_A_SEMI(ap,0)))
+           {
+             /*post("too long");*/
+             while(!(IS_A_SEMI(ap,0)))
+             {
+               ap++;
+               atlen--;
+               /*post("ignore");*/
+               j++;
+               if(atlen <= 0)
+               {
+                 goto iem_pbank_csv_end;
+               }
+             }
+           }
+           else
+           {
+             if(IS_A_FLOAT(ap,0))
+             {
+               SETFLOAT(at, ap->a_w.w_float);
+               /*post("float");*/
+               p++;
+               i++;
+               at++;
+             }
+             else if(IS_A_SYMBOL(ap,0))
+             {
+               SETSYMBOL(at, ap->a_w.w_symbol);
+               /*post("sym");*/
+               p++;
+               i++;
+               at++;
+             }
+             else if(IS_A_SEMI(ap,0))
+             {
+               /*post("semi");*/
+               for(; p<nrp;)
+               {
+                 SETFLOAT(at,0.0);
+                 /*post("zero");*/
+                 p++;
+                 i++;
+                 at++;
+               }
+               p=nrp + 1;
+             }
+             ap++;
+             atlen--;
+             j++;
+           }
+           if(atlen <= 0)
+           {
+             goto iem_pbank_csv_end;
+           }
+         }
+       }
+       
 iem_pbank_csv_end:
-    
-    
-    freebytes(hap, hat_alloc * sizeof(t_atom));
-    freebytes(txbuf1, 2 * txalloc * sizeof(char));
-    freebytes(txbuf2, 2 * txalloc * sizeof(char));
-    post("iem_pbank_csv: read %d parameters x %d lines from file:\n%s\nwith following format:\n%s\n", nrp-1, nrl, completefilename, formattext);
+       freebytes(hap, hat_alloc * sizeof(t_atom));
+       freebytes(txbuf1, (2 * txalloc + 256) * sizeof(char));
+       freebytes(txbuf2, (2 * txalloc + 256) * sizeof(char));
+       post("iem_pbank_csv: read %d parameters x %d lines from file:\n%s\nwith following format:\n%s\n", nrp-1, nrl, completefilename, formattext);
   }
 }
 
@@ -795,7 +934,7 @@ static void *iem_pbank_csv_new(t_symbol *s, int ac, t_atom *av)
 void iem_pbank_csv_setup(void )
 {
   iem_pbank_csv_class = class_new(gensym("iem_pbank_csv"), (t_newmethod)iem_pbank_csv_new,
-    (t_method)iem_pbank_csv_free, sizeof(t_iem_pbank_csv), 0, A_GIMME, 0);
+                                  (t_method)iem_pbank_csv_free, sizeof(t_iem_pbank_csv), 0, A_GIMME, 0);
   class_addmethod(iem_pbank_csv_class, (t_method)iem_pbank_csv_recall, gensym("recall"), A_GIMME, 0);
   class_addmethod(iem_pbank_csv_class, (t_method)iem_pbank_csv_store, gensym("store"), A_GIMME, 0);
   class_addmethod(iem_pbank_csv_class, (t_method)iem_pbank_csv_read, gensym("read"), A_SYMBOL, A_DEFSYM, 0);

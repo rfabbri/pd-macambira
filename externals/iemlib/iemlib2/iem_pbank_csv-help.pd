@@ -1,4 +1,4 @@
-#N canvas 308 80 1091 633 10;
+#N canvas 308 80 1095 637 10;
 #X obj 184 46 pp 0;
 #X floatatom 184 23 5 0 0 0 - - -;
 #X floatatom 224 31 5 0 0 0 - - -;
@@ -26,13 +26,13 @@
 #X text 696 220 the 2nd symbol of read- or write-message;
 #X text 696 251 1st char is the kind of separator:;
 #X text 712 262 b .. blank or space;
-#X text 711 271 s .. semicolon;
-#X text 711 281 t .. tabulator;
+#X text 711 272 s .. semicolon;
+#X text 711 282 t .. tabulator;
 #X text 429 339 0 <= n < number of lines;
 #X text 251 119 prepend column-number of parameter;
 #X text 691 309 2nd char is the kind of end_of_line:;
 #X text 706 320 b .. blank or space + return;
-#X text 705 349 r .. return only;
+#X text 705 350 r .. return only;
 #X text 8 2 iem_pbank_csv;
 #X text 109 2 parameter-bank with csv-syntax;
 #X obj 39 282 pp 0;
@@ -97,8 +97,8 @@
 #X text 157 513 iem.at;
 #X text 119 535 Graz \, Austria;
 #X obj 493 138 loadbang;
-#X text 705 329 s .. semicolon + return;
-#X text 705 339 t .. tabulator + return;
+#X text 705 330 s .. semicolon + return;
+#X text 705 340 t .. tabulator + return;
 #X text 699 231 should have 2 characters:;
 #X text 71 502 (c) Thomas Musil 2000 - 2009;
 #X obj 148 106 t b f;
@@ -108,6 +108,15 @@
 #X msg 593 137 read \$1 br;
 #X msg 682 137 write \$1 br;
 #X text 676 167 br .. blank as separator \, return as end of line;
+#N canvas 0 22 450 300 CHANGE 0;
+#X text 35 25 there are 2 small changes:;
+#X text 35 47 comma ' \, ' is no more allowed to separate items;
+#X text 35 57 comma-return is no more allowed to represent EndOfLine
+;
+#X text 34 87 every comma ' \, ' will be replaced by period '.' because
+sometimes it happens \, that MS Excel stores files with a comma as
+the decimal separator.;
+#X restore 680 23 pd CHANGE;
 #X connect 0 0 64 0;
 #X connect 1 0 0 0;
 #X connect 2 0 6 0;
