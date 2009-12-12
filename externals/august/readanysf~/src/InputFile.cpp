@@ -1,5 +1,6 @@
 #include "InputFile.h"
 #include <iostream.h>
+#include <string.h>
 
 InputFile::InputFile () {
   fd = 0;
