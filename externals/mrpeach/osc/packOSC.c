@@ -286,10 +286,10 @@ static void *packOSC_new(void)
     x->x_buflength = SC_BUFFER_SIZE;
     x->x_bufferForOSCbuf = (char *)getbytes(sizeof(char)*x->x_buflength);
     if(x->x_bufferForOSCbuf == NULL)
-        error("packOSC: unable to allocate %lu bytes for x_bufferForOSCbuf", sizeof(char)*x->x_buflength);
+        error("packOSC: unable to allocate %lu bytes for x_bufferForOSCbuf", (long)(sizeof(char)*x->x_buflength));
     x->x_bufferForOSClist = (t_atom *)getbytes(sizeof(t_atom)*x->x_buflength);
     if(x->x_bufferForOSClist == NULL)
-        error("packOSC: unable to allocate %lu bytes for x_bufferForOSClist", sizeof(t_atom)*x->x_buflength);
+        error("packOSC: unable to allocate %lu bytes for x_bufferForOSClist", (long)(sizeof(t_atom)*x->x_buflength));
     if (x->x_oscbuf != NULL)
         OSC_initBuffer(x->x_oscbuf, x->x_buflength, x->x_bufferForOSCbuf);
     x->x_listout = outlet_new(&x->x_obj, &s_list);
@@ -358,10 +358,10 @@ static void packOSC_setbufsize(t_packOSC *x, t_floatarg f)
     x->x_buflength = (long)f;
     x->x_bufferForOSCbuf = (char *)getbytes(sizeof(char)*x->x_buflength);
     if(x->x_bufferForOSCbuf == NULL)
-        error("packOSC unable to allocate %lu bytes for x_bufferForOSCbuf", sizeof(char)*x->x_buflength);
+        error("packOSC unable to allocate %lu bytes for x_bufferForOSCbuf", (long)(sizeof(char)*x->x_buflength));
     x->x_bufferForOSClist = (t_atom *)getbytes(sizeof(t_atom)*x->x_buflength);
     if(x->x_bufferForOSClist == NULL)
-        error("packOSC unable to allocate %lu bytes for x_bufferForOSClist", sizeof(t_atom)*x->x_buflength);
+        error("packOSC unable to allocate %lu bytes for x_bufferForOSClist", (long)(sizeof(t_atom)*x->x_buflength));
     OSC_initBuffer(x->x_oscbuf, x->x_buflength, x->x_bufferForOSCbuf);
     post("packOSC: bufsize is now %d",x->x_buflength);
 }
@@ -387,7 +387,7 @@ static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
 
     if (args == NULL)
     {
-        error("packOSC: unable to allocate %lu bytes for args", argsSize);
+        error("packOSC: unable to allocate %lu bytes for args", (long)argsSize);
         return;
     }
     messageName[0] = '\0'; /* empty */
@@ -411,7 +411,7 @@ static void packOSC_sendtyped(t_packOSC *x, t_symbol *s, int argc, t_atom *argv)
         typeStr = (char*)getzbytes(typeStrTotalSize);
         if (typeStr == NULL)
         {
-            error("packOSC: unable to allocate %lu bytes for typeStr", nTypeTags);
+            error("packOSC: unable to allocate %u bytes for typeStr", nTypeTags);
             return;
         }
         typeStr[0] = ',';
