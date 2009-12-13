@@ -166,7 +166,7 @@ static void *routeOSC_new(t_symbol *s, int argc, t_atom *argv)
 
     if (argc > MAX_NUM)
     {
-        error("* routeOSC: too many arguments: %ld (max %ld)", argc, MAX_NUM);
+        error("* routeOSC: too many arguments: %d (max %d)", argc, MAX_NUM);
         return 0;
     }
     x->x_num = 0;
