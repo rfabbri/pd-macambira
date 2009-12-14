@@ -1,0 +1,44 @@
+# Edit these two variables to suit your system.
+# You need both gavl and gmerlin_avdec libs to compile
+#
+GAVLPATH=/sw/include
+PDPATH=/Applications/Pd-extended.app/Contents/Resources/include/
+
+##############################################
+LBITS := $(shell getconf LONG_BIT)
+ifeq ($(LBITS),64)
+   # do 64 bit stuff here, like set some CFLAGS
+CFLAGS =  -fPIC -I./  -I$(GAVLPATH) -I$(GAVLPATH)/gavl -I$(GAVLPATH)/gmerlin -I$(PDPATH) -Wall
+else
+   # do 32 bit stuff here
+CFLAGS =  -I./  -I$(GAVLPATH)  -I$(GAVLPATH)/gavl -I$(GAVLPATH)/gmerlin -I$(PDPATH) -Wall
+endif
+
+# 10.4 Tiger
+  FAT_FLAGS = -arch ppc -arch ppc64 -arch i386
+# 10.5 Leopard
+#  FAT_FLAGS = -arch ppc -arch ppc7400 -arch ppc64 -arch i386 -arch x86_64
+CFLAGS += -I/sw/include -I$(externals_src)/pdp/include -DMACOSX -DUNIX -Dunix
+LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -undefined dynamic_lookup \
+		-L/sw/lib -weak_framework Carbon -lc -L/sw/lib -lgavl -lgmerlin_avdec  
+DYLIB_LDFLAGS = -dynamiclib -undefined dynamic_lookup -read_only_relocs warning -L/sw/lib  -lgavl -lgmerlin_avdec
+STRIP = strip -x
+
+
+all:  pd_darwin
+
+pd_darwin: readanysf~.cpp Readsf.cpp Readsf.h  objs/FifoAudioFrames.o objs/Readsf.o FifoAudioFrames.h FifoAudioFrames.cpp
+	g++  $(DYLIB_LDFLAGS) -o  readanysf~.pd_darwin  $(CFLAGS)  \
+	readanysf~.cpp \
+	objs/FifoAudioFrames.o \
+	objs/Readsf.o 
+	$(STRIP) readanysf~.pd_darwin
+
+objs/Readsf.o: Readsf.cpp Readsf.h FifoAudioFrames.h 
+	g++  -c -o objs/Readsf.o Readsf.cpp $(CFLAGS)
+
+objs/FifoAudioFrames.o: FifoAudioFrames.cpp FifoAudioFrames.h 
+	g++  -c -o objs/FifoAudioFrames.o FifoAudioFrames.cpp $(CFLAGS)
+
+clean:
+	rm objs/*.o readanysf~.pd_linux
