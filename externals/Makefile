@@ -908,6 +908,7 @@ ggee_clean:
 # HARDWARE
 HARDWARE_NAME=hardware
 # memPIO has some special deps, so don't include it yet.
+# uDMX requires libusb, so don't include it yet... 
 # multio.c requires libusb, so don't include it yet...  <hans@at.or.at>
 #HARDWARE_OBJECTS := $(wildcard $(externals_src)/hardware/*/*.cpp) \
 #$(wildcard $(externals_src)/hardware/*/*.c)
@@ -924,6 +925,8 @@ hardware_install: hardware
 #		$(DESTDIR)$(objectsdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/lanbox/lanbox.pd \
 		$(DESTDIR)$(objectsdir)/$(HARDWARE_NAME)
+	install -p $(externals_src)/hardware/DMXUSBPro/DMXUSBPro.pd \
+		$(DESTDIR)$(objectsdir)/$(HARDWARE_NAME)	
 	install -d $(DESTDIR)$(helpdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/*/*-help.pd \
 		$(DESTDIR)$(helpdir)/$(HARDWARE_NAME)

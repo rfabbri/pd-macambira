@@ -28,18 +28,24 @@ typedef struct _listUnfold {
 
 void listUnfold_bang(t_listUnfold *x)
 {
+	
+	
   //x->i_count = x->i_down;
   if ( x->mode == 0) {
 	x->iterating = 0;
   } else {
+	  int i;
+	  
 	 if ( x->iterating < x->ac ) {
-		 outlet_float(x->outlet2,x->iterating);
-		if ( IS_A_FLOAT(x->av,x->iterating) ) {
-			outlet_float(x->outlet1,atom_getfloat(x->av + x->iterating));
+		 i = x->iterating;
+		 x->iterating++;
+		 outlet_float(x->outlet2,i);
+		if ( IS_A_FLOAT(x->av,i) ) {
+			outlet_float(x->outlet1,atom_getfloat(x->av + i));
 		} else {
-			outlet_symbol(x->outlet1,atom_getsymbol(x->av + x->iterating));
+			outlet_symbol(x->outlet1,atom_getsymbol(x->av + i));
 		}
-		x->iterating++;
+		
 	 }
   } 
   
