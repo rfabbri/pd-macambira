@@ -36,6 +36,20 @@ static void menubutton_w_additem(t_menubutton* x, t_symbol *label, int i) {
 
 }
 
+//-anchor %s 
+
+static void menubutton_w_set_align(t_menubutton* x) {
+	
+	if ( x->halign == -1 ) {
+		sys_vgui(".x%x.c.s%x configure -anchor w\n", x->x_glist, x);
+	} else if ( x->halign == 0 ) {
+		sys_vgui(".x%x.c.s%x configure -anchor center\n", x->x_glist, x);
+	} else {
+		sys_vgui(".x%x.c.s%x configure -anchor e\n", x->x_glist, x);
+	}
+	
+}
+
 static void menubutton_w_apply_colors(t_menubutton* x) {
 	
 	sys_vgui(".x%x.c.s%x configure -background \"%s\" -foreground \"%s\" -activeforeground \"%s\" -activebackground \"%s\"\n", 
@@ -104,19 +118,33 @@ static void menubutton_w_draw_inlets(t_menubutton *x, t_glist *glist, int draw, 
 static void menubutton_w_draw_handle(t_menubutton *x, t_glist *glist, int draw) {
 
   DEBUG(post("draw_handle start: %i",draw);)
-  int onset = text_xpix(&x->x_obj, glist) + (x->x_width) ;
-
+  //int onset = text_xpix(&x->x_obj, glist) + (x->x_width) ;
+  int onset = text_xpix(&x->x_obj, glist) ;
+  
   if (draw==CREATE) {
+	  sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xhandle -outline blue -fill blue\n",
+	     glist_getcanvas(glist),
+	     onset, text_ypix(&x->x_obj, glist) ,
+	     onset + (x->x_width) , text_ypix(&x->x_obj, glist) + x->x_height ,
+	     x);
+	  /*
     sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xhandle -outline blue -fill blue\n",
 	     glist_getcanvas(glist),
 	     onset, text_ypix(&x->x_obj, glist) ,
 	     onset + HANDLEWIDTH, text_ypix(&x->x_obj, glist) + x->x_height ,
 	     x);
+	     */
   } else if (draw==UPDATE) {
+	  sys_vgui(".x%x.c coords %xhandle %d %d %d %d\n",
+	     glist_getcanvas(glist), x, 
+	     onset, text_ypix(&x->x_obj, glist) ,
+	     onset + (x->x_width) , text_ypix(&x->x_obj, glist) + x->x_height );
+	  /*
     sys_vgui(".x%x.c coords %xhandle %d %d %d %d\n",
 	     glist_getcanvas(glist), x, 
 	     onset, text_ypix(&x->x_obj, glist) ,
 	     onset + HANDLEWIDTH, text_ypix(&x->x_obj, glist) + x->x_height );
+	     */
   } else {
 	  sys_vgui(".x%x.c delete  %xhandle\n",glist_getcanvas(glist),x,0);
   }
@@ -155,10 +183,18 @@ static void menubutton_w_create_widget(t_menubutton *x)
       
       // Create menubutton and menu 
       
-      sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -justify left -relief flat -anchor e -indicatoron 0 -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -relief solid -tearoff 0 \n",
+      sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -justify left -relief flat -indicatoron 0 -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -relief solid -tearoff 0 \n",
 		x,x->x_glist,x,x,temp_name->s_name,x,x);
 		
+		menubutton_w_set_align(x);
+		
        menubutton_w_apply_colors(x);
+       
+       // Add a binding 
+       //post("Trying to bind");
+       //sys_vgui("bind Menubutton <ButtonPress-1> {} \n", x);
+       //sys_vgui("bind $%xw <ButtonPress-1> { } \n", x);
+       
       for(i=0 ; i<x->x_num_options ; i++)
         {
 			// Add menu itmes
@@ -265,7 +301,8 @@ static void menubutton_w_getrect(t_gobj *z, t_glist *owner,
     height = s->x_height;
     *xp1 = text_xpix(&s->x_obj, owner) ;
     *yp1 = text_ypix(&s->x_obj, owner) ;
-    *xp2 = text_xpix(&s->x_obj, owner) + width + HANDLEWIDTH ;
+    //*xp2 = text_xpix(&s->x_obj, owner) + width + HANDLEWIDTH ;
+    *xp2 = text_xpix(&s->x_obj, owner) + width ;
     *yp2 = text_ypix(&s->x_obj, owner) + height ;
   
    // DEBUG(post("getrect end");)
@@ -292,6 +329,7 @@ static void menubutton_w_select(t_gobj *z, t_glist *glist, int state)
 {
      DEBUG(post("select start");)
 
+
      t_menubutton *x = (t_menubutton *)z;
      if(x->initialized){
 		 /*
@@ -301,12 +339,14 @@ static void menubutton_w_select(t_gobj *z, t_glist *glist, int state)
        if (state) {
 		    menubutton_w_draw_handle(x,glist,CREATE);
 		    menubutton_w_draw_inlets(x, glist, CREATE, 1,1);
-		    menubutton_w_disable(x,1);
+		    //menubutton_w_disable(x,1);
+		    menubutton_w_drawme(x, glist, DESTROY);
        }
        else {
-		   menubutton_w_disable(x,0);
+		   //menubutton_w_disable(x,0);
 		 menubutton_w_draw_handle(x,glist,DESTROY);
          menubutton_w_draw_inlets(x,glist,DESTROY,1,1);
+         menubutton_w_drawme(x, glist, CREATE);
          
        }
      }

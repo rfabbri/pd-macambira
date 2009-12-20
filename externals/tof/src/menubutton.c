@@ -35,7 +35,7 @@
 #define IOWIDTH 4
 #endif
 
-
+static t_symbol* COMMA;
 
 
 typedef struct _menubutton
@@ -58,6 +58,7 @@ typedef struct _menubutton
      t_symbol* hi_color;
      t_symbol* co_color;
      int saveitems;
+     int halign;
      
      t_symbol* send;
      t_symbol* receive;
@@ -128,19 +129,22 @@ static void menubutton_save(t_gobj *z, t_binbuf *b)
     
 	DEBUG(post("send: %s receive: %s",send->s_name,receive->s_name);)
 	
-    binbuf_addv(b, "ssiisiississss", gensym("#X"), gensym("obj"),
+    binbuf_addv(b, "ssiisiississssi", gensym("#X"), gensym("obj"),
                 x->x_obj.te_xpix, x->x_obj.te_ypix ,  
                 atom_getsymbol(creation),
                 x->x_width, x->x_height, send,receive,x->saveitems,
-                x->bg_color, x->fg_color,x->hi_color,x->co_color);
+                x->bg_color, x->fg_color,x->hi_color,x->co_color,x->halign);
                 
 	// Loop for menu items
 	int i;
 	if ( x->saveitems) {
+		//binbuf_addv(b, "s", gensym(","));
 		for(i=0 ; i<x->x_num_options ; i++)
 		{
+			binbuf_addv(b, "s", gensym(","));
 			DEBUG(post("saving option: %s",x->x_options[i]->s_name);)
 			binbuf_addv(b, "s", x->x_options[i]);
+			
 		}
 	}	
     binbuf_addv(b, ";");
@@ -354,6 +358,19 @@ static void menubutton_saveitems( t_menubutton* x, t_float f) {
 	x->saveitems = (f != 0);
 }
 
+static void menubutton_align( t_menubutton* x, t_float f) {
+	if ( f > 0 ) {
+		x->halign = 1;
+	} else if ( f == 0) {
+		x->halign = 0;
+	} else {
+		x->halign = -1;
+	}
+	if(menubutton_w_is_visible(x)) {
+		//sys_vgui(".x%x.c.s%x configure -background \"%s\" -foreground \"%s\"\n", x->x_glist, x, x->bg_color->s_name,x->fg_color->s_name);
+	    menubutton_w_set_align(x);
+	}
+}
 
 static void *menubutton_new(t_symbol *s, int argc, t_atom *argv)
 {
@@ -383,6 +400,7 @@ static void *menubutton_new(t_symbol *s, int argc, t_atom *argv)
     x->hi_color = gensym("grey95");
     x->co_color = gensym("black");
     x->saveitems = 0;
+    x->halign = -1;
     
     x->s_empty = gensym("empty");
     x->s_ = gensym("");
@@ -396,10 +414,33 @@ static void *menubutton_new(t_symbol *s, int argc, t_atom *argv)
 
     x->x_disabled=0;
     
-    int conf_argc = argc;
-    if (conf_argc > 9) conf_argc = 9;
+    
+    int conf_argc;
+    t_atom* item_argv;
+    int item_argc;
+    
+    // loop through arguments and search for a comma
+    for ( conf_argc = 0; conf_argc < argc; conf_argc++) {
+		if ((argv+conf_argc)->a_type == A_SYMBOL && atom_getsymbol(argv+conf_argc) == COMMA) {
+			break;
+		}
+	}
+	
+	
+	
+	DEBUG(post("conf_argc: %i", conf_argc);)
+	item_argc = argc - (conf_argc + 1); // The +1 is to skip the comma
+	if (item_argc < 0) item_argc = 0;
+	item_argv = argv + conf_argc + 1; // Point to the start of the items
+	DEBUG(post("item_argc: %i", item_argc);)
+	
+    
+    // The maximum number of configuration arguments is 10
+    if (conf_argc > 10) conf_argc = 10;
+    
     switch(conf_argc){ 
-    case 9: if ((argv+8)->a_type==A_SYMBOL) x->co_color = atom_getsymbol(argv+8);
+	case 10: if ((argv+9)->a_type == A_FLOAT) x->halign = atom_getfloat(argv+9);	
+    case 9: if ((argv+8)->a_type == A_SYMBOL) x->co_color = atom_getsymbol(argv+8);
     case 8: if ((argv+7)->a_type==A_SYMBOL) x->hi_color = atom_getsymbol(argv+7);
     case 7: if ((argv+6)->a_type==A_SYMBOL) x->fg_color = atom_getsymbol(argv+6);
     case 6: if ((argv+5)->a_type==A_SYMBOL) x->bg_color = atom_getsymbol(argv+5);
@@ -439,7 +480,49 @@ static void *menubutton_new(t_symbol *s, int argc, t_atom *argv)
     outlet_new(&x->x_obj, &s_symbol);
 
 
-   if (argc > 9) menubutton_add(x,&s_list,argc-9,argv+9);
+
+    // PARSE ITEMS ALONG COMMAS
+    
+   unsigned int buffer_size = 0;
+   char buffer[MAXPDSTRING];
+   buffer[0] = '\0';
+   char* bp = buffer;
+   t_atom tempatom; 
+   int word_length;
+   	  
+	i = 0;
+	while (item_argc && i <= item_argc) {
+	   if (((item_argv+i)->a_type == A_SYMBOL && atom_getsymbol(item_argv+i) == COMMA)|| i == item_argc ) {
+			
+			if ( buffer_size ) {
+				SETSYMBOL(&tempatom,gensym(buffer));
+				menubutton_add(x,&s_list,1,&tempatom);
+				DEBUG(post("buffer: %s",buffer);)
+			}
+			buffer_size = 0;
+			bp = buffer; 
+			buffer[0] = '\0';
+			
+		} else {
+			if ( buffer_size > 0) {
+			  // Add a space separator
+			  *bp = ' ';
+			  bp++;
+			  *bp = '\0';
+			  buffer_size++;
+			}
+			atom_string(item_argv+i, bp , MAXPDSTRING-buffer_size);
+			word_length = strlen(bp);
+			DEBUG(post("word_length: %i",word_length);)
+			DEBUG(post("bp: %s",bp);)
+			bp = bp + word_length;
+			buffer_size = buffer_size + word_length;
+			}
+	   i++;
+	}
+		
+	//menubutton_add(x,&s_list,item_argc,item_argv);
+	
 
 
 DEBUG(post("menubutton new end");)
@@ -450,6 +533,9 @@ DEBUG(post("menubutton new end");)
 void menubutton_setup(void) {
 
     DEBUG(post("setup start");)
+
+    COMMA = gensym(",");
+
 
       menubutton_class = class_new(gensym("menubutton"), (t_newmethod)menubutton_new, (t_method)menubutton_free,
 				sizeof(t_menubutton),0,A_GIMME,0);
@@ -480,6 +566,10 @@ void menubutton_setup(void) {
 
         class_addmethod(menubutton_class, (t_method)menubutton_set,
                                     gensym("set"),A_GIMME,0);
+                                    
+class_addmethod(menubutton_class, (t_method)menubutton_align,
+                                    gensym("align"),A_FLOAT,0);
+
 
 	class_addsymbol(menubutton_class, (t_method)menubutton_symbol);
 
@@ -492,7 +582,7 @@ void menubutton_setup(void) {
     class_setsavefn(menubutton_class,&menubutton_save);
 
 
-	post("menubutton v0.01 tof, based on popup by Ben Bogart and button by ggee");
+	post("menubutton v0.12 tof, based on popup by Ben Bogart and button by ggee");
 }
 
 
