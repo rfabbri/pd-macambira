@@ -1,29 +1,66 @@
-#N canvas 1164 0 617 484 10;
-#X obj 210 274 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#N canvas 120 25 756 631 10;
+#X obj 221 187 key;
+#X msg 126 222 clear;
+#X obj 221 213 sel 65;
+#X text 267 213 <- Shift+A will open the menu;
+#X msg 47 63 add a bb ccc dddd eeeee;
+#X obj 45 498 print;
+#X msg 230 320 2;
+#X msg 261 321 3;
+#X text 201 62 add items;
+#X obj 265 417 r \$0pmenu;
+#X obj 332 422 bng 15 250 50 0 \$0pmenu empty empty 17 7 0 10 -262144
 -1 -1;
-#X obj 228 213 key;
-#X msg 158 188 clear;
-#X obj 228 239 sel 65;
-#X text 252 275 <- Shift+A will open the menu;
-#X text 225 5 <- Select a folder here;
-#X msg 61 151 add a bb ccc dddd eeeee;
-#X obj 61 431 print;
-#X obj 252 80 tof/folderpanel;
-#X text 324 311 bg fg hi;
-#X msg 204 325 2;
-#X msg 366 334 colors green;
-#X msg 246 321 3;
-#X msg 158 225 add a;
-#X obj 61 392 tof/pmenu black white red;
-#X text 201 414 Outlets: symbol index dump;
-#X obj 376 192 soundfiler;
-#X connect 0 0 14 0;
-#X connect 1 0 3 0;
+#X text 353 420 <- you can pop the menu from any gui by sending a bang
+to \$0pemenu;
+#X msg 291 320 -1;
+#X msg 224 287 colors green purple grey;
+#X obj 45 459 tof/pmenu 1 1 black white red;
+#X text 298 536 3: background color (#000000 html or tk colors);
+#X text 296 551 4: foreground color (#000000 hmtl or tk colors);
+#X text 298 566 5: highlight color (#000000 html or tk colors);
+#X text 222 257 values can be tk colors(red \, blue \, etc) or html
+colors (#ffffff);
+#X text 221 241 colors: background foreground highlight;
+#X text 297 507 2: focus the item that was last selected when the menu
+pops. On (1) by default.;
+#X text 296 476 1: display the indicator (the little bullet next to
+item that was last selected). On (1) by default.;
+#X obj 38 18 cnv 15 400 30 empty empty empty 20 12 0 14 -261234 -66577
+0;
+#X text 40 31 tags: ui;
+#X text 38 18 description: pops a menu;
+#X obj 300 458 cnv 15 400 15 empty empty empty 20 12 0 14 -257985 -66577
+0;
+#X text 303 456 Creation arguments:;
+#X msg 87 153 add \$1;
+#X obj 87 130 cyclone/tosymbol;
+#X msg 87 107 with spaces;
+#X text 84 87 Adding items with spaces;
+#X obj 113 180 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 132 176 Pop the menu;
+#X text 249 179 You can assign any key to pop the menu (Shift+A) in
+this case.;
+#X text 322 319 Select and output a menu item by index;
+#X msg 276 349 set a;
+#X msg 290 371 symbol a;
+#X text 346 370 Select an item by name and output it;
+#X text 320 349 Select an item by name without outputing it;
+#X text 85 501 Output: index name;
+#X connect 0 0 2 0;
+#X connect 1 0 14 0;
 #X connect 2 0 14 0;
-#X connect 3 0 0 0;
+#X connect 4 0 14 0;
 #X connect 6 0 14 0;
-#X connect 10 0 14 0;
-#X connect 11 0 14 0;
+#X connect 7 0 14 0;
+#X connect 9 0 14 0;
 #X connect 12 0 14 0;
 #X connect 13 0 14 0;
-#X connect 14 0 7 0;
+#X connect 14 0 5 0;
+#X connect 27 0 14 0;
+#X connect 28 0 27 0;
+#X connect 29 0 28 0;
+#X connect 31 0 14 0;
+#X connect 35 0 14 0;
+#X connect 36 0 14 0;

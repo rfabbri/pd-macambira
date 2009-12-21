@@ -30,45 +30,29 @@
 
 
 
+
+
 typedef struct _pmenu
 {
      t_object x_obj;
 
      t_glist * x_glist;
-     //t_outlet* out2;
-     //int x_rect_width;
-     //int x_rect_height;
+
      t_symbol*  callback;
 	
-     //int x_height;
-     //int x_width;
-	 
      int current_selection;
      int x_num_options;	 
      t_symbol* bg_color;
      t_symbol* fg_color;
      t_symbol* hi_color;
      t_symbol* co_color;
-     //int saveitems;
-     
-     //t_symbol* send;
-     //t_symbol* receive;
-     
-     //int send_set;
-     //int receive_set;
-     
-     //t_symbol* s_empty;
-     //t_symbol* s_;
-     //t_symbol* x_name;
-	
+    
      t_symbol** x_options;
      int        x_maxoptions;
-     //int 		visible;
-     
-     //t_symbol** current_options;
-
-     //int created; //1 when menu is created
-     //int x_disabled; /* when disabled, graphical chosing is prohibited */
+   
+      int indicator;
+      int focusing;
+   
 } t_pmenu;
 
 #include "pmenu_w.h"
@@ -77,7 +61,6 @@ static void pmenu_output(t_pmenu* x)
 {
   
   
-  pmenu_w_activate(x);
   
   t_atom atoms[2];
   SETFLOAT(atoms,x->current_selection);
@@ -240,9 +223,12 @@ static int pmenu_set_float(t_pmenu* x, t_floatarg item) {
 	if( (i < x->x_num_options) && (i >= 0)) {
 		x->current_selection = i;
 		//if(pmenu_w_is_visible(x)) pmenu_w_text(x,x->x_options[x->current_selection]);
+		pmenu_w_activate(x);
          return 1;
 	} else {
-         return 0;
+		x->current_selection = -1;
+		pmenu_w_activate(x);
+        return 0;
    }
 	
 }
@@ -255,7 +241,8 @@ static void pmenu_float(t_pmenu* x, t_floatarg item)
 	if ( pmenu_set_float(x,item) ) {
 		pmenu_output(x);
 	} else {
-		pd_error(x,"pmenu: expecting value between 0 and %i",x->x_num_options);
+		
+		//pd_error(x,"pmenu: expecting value between 0 and %i",x->x_num_options);
 	}
 
 	DEBUG(post("iselect end");)
@@ -271,9 +258,12 @@ static int pmenu_set_symbol(t_pmenu* x, t_symbol *s) {
 	  if(x->x_options[i]->s_name == s->s_name) {
 		    x->current_selection = i;
 			//if(pmenu_w_is_visible(x)) pmenu_w_text(x,s);
+            pmenu_w_activate(x);
 	        return 1;
        }
 	}
+	x->current_selection = -1;
+	pmenu_w_activate(x);
 	return 0;
 }
 
@@ -359,51 +349,33 @@ static void *pmenu_new(t_symbol *s, int argc, t_atom *argv)
     int i;
 	char buf[256];
 
-     //x->x_glist = NULL;
-    //x->visible = 0;
-    //x->created = 0;
-    
-    //x->x_glist = (t_glist*)NULL;
 
-    //x->x_height = 25;
     x->current_selection = -1;
 
     x->x_maxoptions=10;
     x->x_options=(t_symbol**)getbytes(sizeof(t_symbol*)*x->x_maxoptions);
-    //x->current_options=(t_symbol**)getbytes(sizeof(t_symbol*)*x->x_maxoptions);
+ 
     x->x_num_options = 0 ;
-     //x->x_options[0] = gensym("");
-     
-    //x->x_width = 124;
-    //x->x_height = 25;
+  
+    x->indicator = 1;
+    x->focusing = 1;
+  
     
     // These should match the default colors in pmenu_colors
     x->bg_color = gensym("grey90");
     x->fg_color = gensym("black");
     x->hi_color = gensym("grey95");
     x->co_color = gensym("black");
-    //x->saveitems = 0;
-    
-    //x->s_empty = gensym("empty");
-    //x->s_ = gensym("");
-    
-    //x->send = x->s_empty;
-    //x->receive = x->s_empty;
-    //x->send_set =0;
-    //x->receive_set =0;
-    
-   
-
-    //x->x_disabled=0;
-    
-    
+      
 	
-    if (argc > 4) argc = 4;
+    if (argc > 6) argc = 6;
     switch(argc){ 
-    case 4: if ((argv+3)->a_type==A_SYMBOL) x->hi_color = atom_getsymbol(argv+3);	
-	case 3: if ((argv+2)->a_type==A_SYMBOL) x->hi_color = atom_getsymbol(argv+2);	
-	case 2: if ((argv+1)->a_type==A_SYMBOL) x->fg_color = atom_getsymbol(argv+1);	
-	case 1: if ((argv)->a_type==A_SYMBOL) x->bg_color = atom_getsymbol(argv);
+    case 6: if ((argv+5)->a_type==A_SYMBOL) x->co_color = atom_getsymbol(argv+5);	
+	case 5: if ((argv+4)->a_type==A_SYMBOL) x->hi_color = atom_getsymbol(argv+4);	
+	case 4: if ((argv+3)->a_type==A_SYMBOL) x->fg_color = atom_getsymbol(argv+3);	
+	case 3: if ((argv+2)->a_type==A_SYMBOL) x->bg_color = atom_getsymbol(argv+2);
+	case 2: if ((argv+1)->a_type==A_FLOAT) x->focusing = atom_getfloat(argv+1);
+	case 1: if ((argv)->a_type==A_FLOAT) x->indicator = atom_getfloat(argv);
       break;
     }
 
@@ -420,7 +392,7 @@ static void *pmenu_new(t_symbol *s, int argc, t_atom *argv)
    
    pmenu_w_menu(x,CREATE);
    pmenu_w_apply_colors(x);
-   if (argc > 5) pmenu_add(x,&s_list,argc-5,argv+5);
+   //if (argc > 5) pmenu_add(x,&s_list,argc-5,argv+5);
 
 
 DEBUG(post("pmenu new end");)
@@ -439,16 +411,7 @@ void pmenu_setup(void) {
 				
 	class_addmethod(pmenu_class, (t_method)pmenu_callback,
 								  gensym("callback"),A_DEFFLOAT,0);
-	/*							  
-	class_addmethod(pmenu_class, (t_method)pmenu_send,
-								  gensym("send"),A_DEFSYMBOL,0);
-								  
-	class_addmethod(pmenu_class, (t_method)pmenu_receive,
-								  gensym("receive"),A_DEFSYMBOL,0);
-								  
-	class_addmethod(pmenu_class, (t_method)pmenu_saveitems,
-								  gensym("saveitems"),A_FLOAT,0);
-		*/		  
+	
 	class_addmethod(pmenu_class, (t_method)pmenu_add,
 								  gensym("add"), A_GIMME,0);
 	
@@ -457,11 +420,7 @@ void pmenu_setup(void) {
 						  
 	class_addmethod(pmenu_class, (t_method)pmenu_colors,
 								  gensym("colors"),A_GIMME,0);
-		/*								 
-    class_addmethod(pmenu_class, (t_method)pmenu_size,
-								  gensym("size"),A_GIMME,0);
-    */
-    
+	
         class_addmethod(pmenu_class, (t_method)pmenu_set,
                                     gensym("set"),A_GIMME,0);
 	
@@ -471,12 +430,7 @@ void pmenu_setup(void) {
 
 
 
-    //class_setwidget(pmenu_class,&pmenu_widgetbehavior);
-
-    //class_setsavefn(pmenu_class,&pmenu_save);
-
-
-	post("pmenu v0.01 by tof");
+	post("pmenu v0.02 by tof");
 }
 
 

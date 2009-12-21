@@ -26,7 +26,7 @@ by default.;
 #X obj 243 564 unpack f s;
 #X msg 189 327 set b;
 #X msg 189 351 set 2;
-#X text 124 193 values can be tk colors(red \, blue \, etc) or html
+#X text 126 196 values can be tk colors(red \, blue \, etc) or html
 colors (#ffffff);
 #X msg 184 275 colors default;
 #X text 125 180 colors: background foreground highlight contour;
@@ -57,7 +57,6 @@ be disabled allowing you to drag it.;
 #X text 541 448 10: horizontal alignement;
 #X text 537 463 \, : anything after a comma will be parsed as the menu
 items. Each menu item must be separated by a comma.;
-#X text 234 324 Select an item by value without outputing it;
 #X text 229 348 Select an item by index without outputing it;
 #X text 242 380 align right;
 #X text 245 398 align center;
@@ -68,15 +67,15 @@ items. Each menu item must be separated by a comma.;
 #X text 30 8 description: a button with a popup menu;
 #X text 31 21 tags: ui;
 #X msg 183 464 with spaces;
-#X text 105 572 output: index value;
 #X text 180 444 Adding items with spaces;
-#X text 339 445;
 #X obj 540 541 cnv 15 400 30 empty empty empty 20 12 0 14 -232576 -66577
 0;
 #X text 544 519 The [menubutton] at left was created with the following:
 ;
 #X text 546 539 [tof/menubutton 132 22 \$0s \$0r 1 green red orange
 purple 0 \, a \, b \, c \, d \, e \, f \, with spaces];
+#X text 105 572 output: index name;
+#X text 235 325 Select an item by name without outputing it;
 #X connect 0 0 16 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
@@ -101,4 +100,4 @@ purple 0 \, a \, b \, c \, d \, e \, f \, with spaces];
 #X connect 35 0 0 0;
 #X connect 41 0 0 0;
 #X connect 42 0 41 0;
-#X connect 58 0 42 0;
+#X connect 57 0 42 0;
