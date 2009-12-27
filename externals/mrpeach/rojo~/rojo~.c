@@ -23,6 +23,7 @@
  */
 
 #include "m_pd.h"
+#include <math.h>
 
 void *rojo_class;
 
