@@ -14,6 +14,7 @@
 #include <netdb.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <stdlib.h>
 #define SOCKET_ERROR -1
 #endif
 

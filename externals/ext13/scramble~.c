@@ -2,6 +2,7 @@
 #include "ext13.h"
 #include <sys/types.h>
 #include <string.h>
+#include <math.h>
 #ifndef _WIN32
 #include <netinet/in.h>
 #include <netdb.h>

@@ -5,6 +5,7 @@
 /* these are things used in a number of objectclasses from e_sqrt.c */
 
 #include "m_pd.h"
+#include <math.h>
 
 #define LOGTEN 2.302585092994
 #define DUMTAB1SIZE 256

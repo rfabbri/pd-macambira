@@ -1,11 +1,12 @@
-#ifdef NT
+#ifdef _WIN32
 #include "stdafx.h"
 #include <io.h>
-#include<stdio.h>
 #endif
 #include "m_pd.h"
 #include <stdlib.h>
 #include<time.h>
+#include <string.h>
+#include <stdio.h>
 #include "n2m.h"
 
 char* notes_up[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};

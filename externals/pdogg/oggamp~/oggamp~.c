@@ -42,7 +42,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
-#ifdef WIN32
+#include <stdlib.h>
+#ifdef _WIN32
 #include <io.h>	/* for 'write' in pute-function only */
 #include <winsock.h>
 #include <winbase.h>
