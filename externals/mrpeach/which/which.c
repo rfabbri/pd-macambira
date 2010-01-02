@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> /* for strncpy strncat */
-#ifdef MSW
+#ifdef _WIN32
 #include <io.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -52,7 +52,7 @@ static char sys_dllextent[] = ".d_fat", sys_dllextent2[] = ".pd_darwin";
 static char sys_dllextent[] = ".d_ppc", sys_dllextent2[] = ".pd_darwin";
 #endif
 #endif
-#ifdef MSW
+#ifdef _WIN32
 static char sys_dllextent[] = ".m_i386", sys_dllextent2[] = ".dll";
 #endif
 
