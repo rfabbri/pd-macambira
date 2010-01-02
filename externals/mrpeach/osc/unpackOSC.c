@@ -627,7 +627,7 @@ static t_float unpackOSC_DeltaTime(OSCTimeTag tt)
     {
         OSCTimeTag ttnow;
         double  ttusec, nowusec, delta;
-#ifdef MSW
+#ifdef _WIN32
         struct _timeb tb;
 
         _ftime(&tb); /* find now */
@@ -646,7 +646,7 @@ static t_float unpackOSC_DeltaTime(OSCTimeTag tt)
         /* find usec in tt */
         ttusec = tt.seconds*onemillion + ONE_MILLION_OVER_TWO_TO_THE_32*tt.fraction;
         nowusec = ttnow.seconds*onemillion + tv.tv_usec;
-#endif /* ifdef MSW */
+#endif /* ifdef _WIN32 */
         /* subtract now from tt to get delta time */
         /* if (ttusec < nowusec) return 0.0; */
         /*negative delays are all right */
