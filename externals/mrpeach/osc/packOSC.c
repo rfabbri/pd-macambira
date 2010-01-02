@@ -38,7 +38,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef MSW
+#ifdef _WIN32
 #include <winsock2.h>
 #include <sys/timeb.h>
 #else
@@ -1232,7 +1232,7 @@ static int OSC_writeFloatArg(OSCbuf *buf, float arg)
 static int OSC_writeIntArg(OSCbuf *buf, int4byte arg)
 {
     if(OSC_CheckOverflow(buf, 4))return 1;
-	if (CheckTypeTag(buf, 'i')) return 9;
+    if (CheckTypeTag(buf, 'i')) return 9;
 
     *((int4byte *) buf->bufptr) = htonl(arg);
     buf->bufptr += 4;
@@ -1243,35 +1243,35 @@ static int OSC_writeIntArg(OSCbuf *buf, int4byte arg)
 
 static int OSC_writeBlobArg(OSCbuf *buf, typedArg *arg, size_t nArgs)
 {
-	size_t	i;
-	unsigned char b;
+    size_t	i;
+    unsigned char b;
 
 /* pack all the args as single bytes following a 4-byte length */
-	if(OSC_CheckOverflow(buf, nArgs+4))return 1;
-	if (CheckTypeTag(buf, 'b')) return 9;
+    if(OSC_CheckOverflow(buf, nArgs+4))return 1;
+    if (CheckTypeTag(buf, 'b')) return 9;
 
     *((int4byte *) buf->bufptr) = htonl(nArgs);
 #ifdef DEBUG
-	post ("OSC_writeBlobArg length : %lu", nArgs);
+    post ("OSC_writeBlobArg length : %lu", nArgs);
 #endif
-	buf->bufptr += 4;
+    buf->bufptr += 4;
 
-	for (i = 0; i < nArgs; i++)
-	{
-		if (arg[i].type != BLOB_osc)
-		{
-			error("packOSC: blob element %i not blob type", i);
-			return 9;
-		}
-		b = (unsigned char)((arg[i].datum.i)&0x0FF);/* force int to 8-bit byte */
+    for (i = 0; i < nArgs; i++)
+    {
+        if (arg[i].type != BLOB_osc)
+        {
+            error("packOSC: blob element %i not blob type", i);
+            return 9;
+        }
+        b = (unsigned char)((arg[i].datum.i)&0x0FF);/* force int to 8-bit byte */
 #ifdef DEBUG
-		post ("OSC_writeBlobArg : %d, %d", arg[i].datum.i, b);
+        post ("OSC_writeBlobArg : %d, %d", arg[i].datum.i, b);
 #endif
-		buf->bufptr[i] = b;
-	}
-	i = OSC_WriteBlobPadding(buf->bufptr, i);
-	buf->bufptr += i;
-	buf->gettingFirstUntypedArg = 0;
+        buf->bufptr[i] = b;
+    }
+    i = OSC_WriteBlobPadding(buf->bufptr, i);
+    buf->bufptr += i;
+    buf->gettingFirstUntypedArg = 0;
     return 0;
 }
 
@@ -1407,7 +1407,7 @@ static OSCTimeTag OSCTT_CurrentTimePlusOffset(uint4 offset)
     OSCTimeTag tt;
     static unsigned int onemillion = 1000000;
     static unsigned int onethousand = 1000;
-#ifdef MSW
+#ifdef _WIN32
     struct _timeb tb;
 
     _ftime(&tb);
