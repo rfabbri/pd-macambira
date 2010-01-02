@@ -21,14 +21,14 @@
 #define int32 long  /* a data type that has 32 bits */
 #endif /* IRIX */
 
-#ifdef MSW
+#ifdef _WIN32
 /* little-endian; most significant byte is at highest address */
 #define HIOFFSET 1
 #define LOWOFFSET 0
 #define int32 long
 #include <float.h> /* for _finite */
 #define finite _finite
-#endif
+#endif // _WIN32
 
 #if defined(__FreeBSD__) || defined(__APPLE__)
 #include <machine/endian.h>
