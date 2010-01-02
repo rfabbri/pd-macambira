@@ -100,9 +100,6 @@ typedef struct _routeOSC
 
 /* prototypes  */
 
-#ifdef MSW
-__declspec(dllexport)
-#endif
 void routeOSC_setup(void);
 static int MyPatternMatch (const char *pattern, const char *test);
 static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
@@ -139,9 +136,6 @@ static void routeOSC_free(t_routeOSC *x)
 
 /* initialization routine */
 // setup
-#ifdef MSW
-__declspec(dllexport)
-#endif
 void routeOSC_setup(void)
 {
     routeOSC_class = class_new(gensym("routeOSC"), (t_newmethod)routeOSC_new,
