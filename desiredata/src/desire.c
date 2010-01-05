@@ -1273,16 +1273,11 @@ static void array_free(t_array *x) {
 }
 
 /* --------------------- graphical arrays (garrays) ------------------- */
-
 t_class *garray_class;
-
 static t_pd *garray_arraytemplatecanvas;
-
-/* create invisible, built-in canvases to determine the templates for floats
-and float-arrays. */
-
 void pd_eval_text2(const char *s) {pd_eval_text(s,strlen(s));}
 
+/* create invisible, built-in canvases to determine the templates for floats and float-arrays. */
 extern "C" void garray_init () {
     hack = 0; /* invisible canvases must be, uh, invisible */
     if (garray_arraytemplatecanvas) return;
@@ -1304,11 +1299,9 @@ extern "C" void garray_init () {
     hack = 1; /* enable canvas visibility for upcoming canvases */
 }
 
-/* create a new scalar attached to a symbol.  Used to make floating-point
-arrays (the scalar will be of type "_float_array").  Currently this is
-always called by graph_array() below; but when we make a more general way
-to save and create arrays this might get called more directly. */
-
+/* create a new scalar attached to a symbol.  Used to make floating-point arrays (the scalar will be of type "_float_array").
+   Currently this is always called by graph_array() below;
+   but when we make a more general way to save and create arrays this might get called more directly. */
 static t_garray *graph_scalar(t_canvas *gl, t_symbol *s, t_symbol *tsym, int saveit) {
     if (!template_findbyname(tsym)) return 0;
     t_garray *x = (t_garray *)pd_new(garray_class);
@@ -1327,7 +1320,7 @@ static t_garray *graph_scalar(t_canvas *gl, t_symbol *s, t_symbol *tsym, int sav
 #define TEMPLATE_CHECK(tsym,ret) if (!t) {error("couldn't find template %s", tsym->name); return ret;}
 #define TEMPLATE_FLOATY(a,ret) if (!a) {error("%s: needs floating-point 'y' field", x->realname->name); return ret;}
 
-    /* get a garray's "array" structure. */
+/* get a garray's "array" structure. */
 t_array *garray_getarray(t_garray *x) {
     int zonset, ztype;
     t_symbol *zarraytype;
@@ -1342,7 +1335,7 @@ t_array *garray_getarray(t_garray *x) {
     return sc->v[zonset].w_array;
 }
 
-    /* get the "array" structure and furthermore check it's float */
+/* get the "array" structure and furthermore check it's float */
 static t_array *garray_getarray_floatonly(t_garray *x, int *yonsetp, int *elemsizep) {
     t_array *a = garray_getarray(x);
     int yonset, type;
@@ -1382,10 +1375,7 @@ t_garray *graph_array(t_canvas *gl, t_symbol *s, t_symbol *templateargsym, t_flo
     if (templateargsym != &s_float) {error("%s: only 'float' type understood", templateargsym->name); return 0;}
     t_template *t = template_findbyname(tsym);
     TEMPLATE_CHECK(tsym,0)
-    if (!template_find_field(t, gensym("z"), &zonset, &ztype, &zarraytype)) {
-        error("template %s has no 'z' field", tsym->name);
-        return 0;
-    }
+    if (!template_find_field(t,gensym("z"),&zonset,&ztype,&zarraytype)) {error("template %s has no 'z' field", tsym->name); return 0;}
     if (ztype != DT_ARRAY) {error("template %s, 'z' field is not an array", tsym->name); return 0;}
     t_template *ztemplate = template_findbyname(zarraytype);
     if (!ztemplate) {error("no template of type %s", zarraytype->name); return 0;}
@@ -1413,11 +1403,10 @@ static t_canvas *canvas_findgraph(t_canvas *x) {
 /* this is called back from the dialog window to create a garray. 
    The otherflag requests that we find an existing graph to put it in. */
 static void canvas_arraydialog(t_canvas *parent, t_symbol *name, t_floatarg size, t_floatarg fflags, t_floatarg otherflag) {
-    t_canvas *gl;
     int flags = (int)fflags;
-    if (size < 1) size = 1;
-    if (otherflag == 0 || !(gl = canvas_findgraph(parent)))
-        gl = canvas_addcanvas(parent, &s_, 0, 1, (size>1 ? size-1 : size), -1, 0, 0, 0, 0);
+    if (size<1) size=1;
+    t_canvas *gl = otherflag ? canvas_findgraph(parent) : 0;
+    if (!gl) gl = canvas_addcanvas(parent, &s_, 0, 1, (size>1 ? size-1 : size), -1, 0, 0, 0, 0);
     graph_array(gl, sharptodollar(name), &s_float, size, flags);
 }
 
@@ -1472,13 +1461,12 @@ void garray_arrayviewlist_fillpage(t_garray *x, t_float page, t_float fTopItem) 
     int yonset=0, elemsize=0, topItem=(int)fTopItem;
     t_array *a = garray_getarray_floatonly(x, &yonset, &elemsize);
     if (!a) {error("garray_arrayviewlist_fillpage()"); return;}
-    if (page < 0) {
+    if (page<0) {
       page = 0;
-      sys_vgui("pdtk_array_listview_setpage %s %d\n",s,(int)page);
     } else if ((page * ARRAYPAGESIZE) >= a->n) {
-      page = (int)(((int)a->n - 1)/ (int)ARRAYPAGESIZE);
-      sys_vgui("pdtk_array_listview_setpage %s %d\n",s,(int)page);
+      page = int(((int)a->n - 1)/ (int)ARRAYPAGESIZE);
     }
+    sys_vgui("pdtk_array_listview_setpage %s %d\n",s,(int)page);
     sys_vgui(".%sArrayWindow.lb delete 0 %d\n",s,ARRAYPAGESIZE-1);
     for (int i = (int)page * ARRAYPAGESIZE; (i < (page+1)*ARRAYPAGESIZE && i < a->n); i++)    {
         float yval = *(float *)(a->vec + elemsize*i + yonset);
@@ -1505,7 +1493,7 @@ static void array_redraw(t_array *a, t_canvas *canvas) {
 static int canvas_xtopixels(t_canvas *x, float xval);
 static int canvas_ytopixels(t_canvas *x, float yval);
 
-    /* routine to get screen coordinates of a point in an array */
+/* routine to get screen coordinates of a point in an array */
 static void array_getcoordinate(t_canvas *canvas, char *elem, int xonset, int yonset, int wonset, int indx,
 float basex, float basey, float xinc, t_slot *xslot, t_slot *yslot, t_slot *wslot,
 float *xp, float *yp, float *wp) {
