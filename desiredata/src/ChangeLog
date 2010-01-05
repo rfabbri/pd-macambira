@@ -6,7 +6,8 @@ DesireData 2009.06... :
  * added -stdout
  * fixed osx scrolling
  * -listdev not supported anymore
-
+ * made the patch appearance more like pd
+ * fixed some UI bugs
 
 DesireData 2008.02.19 :
 
