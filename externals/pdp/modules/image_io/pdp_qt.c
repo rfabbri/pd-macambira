@@ -222,14 +222,14 @@ static void pdp_qt_open(t_pdp_qt *x, t_symbol *name)
 
     /* check if qt file */
     if(0 == quicktime_check_sig(name->s_name)){
-	post("%s: ERROR: not a quicktime file", x->x_name->s_name);
+        pd_error(x,"%s: %s not a quicktime file", x->x_name->s_name, name->s_name);
 	goto exit;
     }
 
     /* open */
     DEBUG_MSG(x->x_qt = quicktime_open(name->s_name, 1, 0);)
     if (!(x->x_qt)){
-	post("%s: ERROR: can't open file", x->x_name->s_name);
+        pd_error(x,"%s: can't open %s", x->x_name->s_name, name->s_name);
 	goto exit;
     }
 
@@ -264,7 +264,7 @@ static void pdp_qt_open(t_pdp_qt *x, t_symbol *name)
     /* check if video codec is supported */
     if (x->x_video_tracks){
 	if (!quicktime_supported_video(x->x_qt,0)) {
-	    post("%s: WARNING: unsupported video codec",x->x_name->s_name);
+	    post("%s: WARNING: unsupported video codec in %s",x->x_name->s_name);
 	    x->x_video_tracks = 0;
 	}
     }
@@ -272,7 +272,7 @@ static void pdp_qt_open(t_pdp_qt *x, t_symbol *name)
     /* check if audio codec is supported */
     if (x->x_audio_tracks){
 	if (!quicktime_supported_audio(x->x_qt,0)) {
-	    post("%s: WARNING: unsupported audio codec", x->x_name->s_name);
+	    pd_error(x,"%s: unsupported audio codec in %s", x->x_name->s_name, name->s_name);
 	    x->x_audio_tracks = 0;
 	}
     }
@@ -295,7 +295,7 @@ static void pdp_qt_open(t_pdp_qt *x, t_symbol *name)
 	    x->x_qt_cmodel = BC_RGB888;
 	}
 	else {
-	    post("%s: WARNING: can't find a usable colour model", x->x_name->s_name);
+	    post("%s: WARNING: can't find a usable colour model for %", x->x_name->s_name);
 	    x->x_video_tracks = 0;
 	}
 
@@ -305,7 +305,8 @@ static void pdp_qt_open(t_pdp_qt *x, t_symbol *name)
 
     /* no video == errors */
     if (!x->x_video_tracks) {
-        post("%s: ERROR: no usable video stream found.", x->x_name->s_name);
+        pd_error(x,"%s: no usable video stream found in %s", 
+                 x->x_name->s_name, name->s_name);
 	goto exit_close;
     }
 
