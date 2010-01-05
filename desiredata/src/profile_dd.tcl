@@ -14,7 +14,6 @@ if 1 {
 			puts [format "%8d  %s" $v $k]
 		}
 	}
-}
-if 0 {
+} else {
 	load matjuprofiler/matjuprofiler.so
 }
