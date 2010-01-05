@@ -1,5 +1,0 @@
-#N canvas 0 0 450 142 10;
-#X obj 15 16 inlet;
-#X obj 15 94 outlet;
-#X text 57 17 Test that one input gives one output;
-#X connect 0 0 1 0;

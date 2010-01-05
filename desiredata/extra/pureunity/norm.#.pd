@@ -1,8 +1,0 @@
-#N canvas 0 0 450 300 10;
-#X obj 21 24 inlet;
-#X obj 20 50 # sq;
-#X obj 20 80 #ravel;
-#X obj 21 111 #fold +;
-#X obj 21 139 #export;
-#X obj 22 170 sqrt;
-#X obj 22 201 outlet;

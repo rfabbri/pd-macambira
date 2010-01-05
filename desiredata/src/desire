@@ -1,3 +1,0 @@
-#!/bin/bash
-wish $(cd $(dirname $0) && pwd)/desire.tk "$@"
-

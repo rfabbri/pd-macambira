@@ -1,8 +1,0 @@
-#N canvas 0 0 450 300 10;
-#N canvas 0 0 450 300 foo 1;
-#X obj 10 24 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X obj 276 183 print;
-#X coords 0 -1 1 1 85 60 1 0 0;
-#X restore 145 113 pd foo;
-#X obj 319 154 pack;
