@@ -1,5 +1,0 @@
-GFSOURCE=$HOME/src/gridflow
-SUPPFILE=$GFSOURCE/tests/suppressions.valg3
-
-valgrind --suppressions=$SUPPFILE --gen-suppressions=yes "$@"
-
