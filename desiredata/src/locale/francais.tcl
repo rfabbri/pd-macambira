@@ -550,7 +550,7 @@ say gridstate "Activer le grillage de fond"
 say snap_grid "Snap to grid" ;#TODO
 say viewfont "police de l'objet"
 say consolefont "police de la console"
-say keyboarddialogfont "police du clavier virtuel"
+say keyboarddialoguefont "police du clavier virtuel"
 say keyboard_view "Clavier virtuel"
 say log_height "Log Height" ;#TODO
 say visual_diff "Visual diff" ;#TODO
