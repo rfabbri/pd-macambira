@@ -119,7 +119,6 @@ struct ex_ex {
 #define ex_ptr          ex_cont.ptr
         long ex_type;           /* type of the node */
 };
-#define exNULL  ((struct ex_ex *)0)
 
 /* defines for ex_type */
 #define ET_INT          1               /* an int */
