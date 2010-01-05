@@ -11,10 +11,11 @@ LEGEND:
 [s] observable boxes list
 [s] observable wires list
 [s] gop filter
-[s] triad (which triad???)
 [c] make List objects, to manage children, visible_children, wires, selection, selection_wires.
 
 --- those should be only things that will not be in milestones 1,2,3, until the progress bar.
+[ ] Don't expand $0, $1, etc. in the struct name. (Jonathan Wilkes, 2009.09.14)
+[ ] t_canvasenvironment->path can break in externals that access it directly (because of the type of ->dollarzero).
 [ ] glerm says: backspace key problem in virtual keyboard
 [s] rewrite [any]
 [ ] right-click on an [s] or [r] would have an option "Find Matching Sends & Receives"
@@ -37,7 +38,8 @@ LEGEND:
 [s] merge 0.41 (no?)
 [s] merge 0.42
 [s] refcounted symbols
-[c] simplify def Dialog add
+[c] redesign auto-apply so that it works without conflict with Ok/Cancel buttons
+[c] simplify def Dialogue add
 [b] rewrite [image], [display], [knob], [grid], [popup], ...
 [s] merge martin peach's tcp externs into the core
 [ ] sync pd.gif with pd_32.gif
@@ -73,8 +75,6 @@ LEGEND:
 [s] writesf_free has deadlock.
 [s] [netsend] is unreliable: buffer too full drops chunks of messages, not at message boundaries
 [b] colorised console with hyperlinked error messages
-[c] atomic undo
-[c] undo subpatch
 [c] numbox: is_log
 [c] [hradio] : chg -> is_log
 [c] [vu] props : scale should appear instead of is_log
@@ -95,7 +95,6 @@ LEGEND:
 
 [s] it might make sense to always upload subpatches but upload instances only when needed
 [s] serial got sent too early when creating [pd] with push & #N canvas (http://pastebin.ca/318318)
-[s] GOP problems are back due to recent changes in canvas_map and canvas_vis
 [s] prevent hidden subpatches/abstraction-instances from being loaded in the client all of the time.
 [b] fix gop
     [c] reimplement View get_canvas so that it does not rely on [focus]
@@ -126,6 +125,8 @@ LEGEND:
 [s] those are the externs that have to be recompiled if I want to trap calls to return values of getfn.
   ./externals/olafmatt/clone/clone.c:544:    mess1(&cv->gl_pd, gensym("dsp"), sp);
   ./externals/grill/dynext/src/main.cpp:952: mess1((t_pd *)canvas,const_cast<t_symbol *>(sym_dsp),NULL);
+
+[c] proc netsend doesn't escape newline... what else doesn't? which other chars need an escape fix?
 
 [s] allow helpfiles to load without having to "make install".
 [s] MIDI loopback pseudo-device (inside pd)
@@ -163,7 +164,6 @@ Implement (or fix) Find:
 [s] fix all issues with backslashes and braces.
 [c] implement def Canvas tidy
 [c] set tk::mac::useCGDrawing 1
-[s] differential upload
 [c] differential download (property dialogues autoapply)
 [c] differential redraw
 [b] improved dirty_lists including proper array support
@@ -293,6 +293,8 @@ Iohannes said about redirecting stdout/stderr:
 [c] make windows not get auto-resized to the width of the toolbar, so that people can have tiny windows.
 [c] <Dossy> fconfigure -encoding binary ...
 [s] implement the stuff that is in iostreams.txt
+
+[c] hcs implemented "recent files..." in devel.
 
 [c] Luke Iannini suggests some OSX bindings:
     Command-` to switch between different windows within the application.
