@@ -311,13 +311,15 @@ bassemu_install: bassemu
 	install -d $(DESTDIR)$(objectsdir)/$(BASSEMU_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(BASSEMU_NAME) \
 		--author "" \
-		--description "" \
+		--description "a synthesizer" \
 		--license "" \
 		--version ""
 	install -p $(BASSEMU_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(BASSEMU_NAME)
 	install -d $(DESTDIR)$(helpdir)/$(BASSEMU_NAME)
 	install -p $(externals_src)/bassemu/*.pd \
 		$(DESTDIR)$(helpdir)/$(BASSEMU_NAME)
+	install -p $(externals_src)/bassemu/*.pd \
+		$(DESTDIR)$(objectsdir)/$(BSAYLOR_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(BASSEMU_NAME)
 #	install -p $(externals_src)/bassemu/manual.txt \
 #		$(DESTDIR)$(manualsdir)/$(BASSEMU_NAME)
@@ -353,6 +355,8 @@ boids_install: boids
 	install -d $(DESTDIR)$(helpdir)/$(BOIDS_NAME)
 	install -p $(externals_src)/boids/boids*/*-help.pd \
 		$(DESTDIR)$(helpdir)/$(BOIDS_NAME)
+	install -p $(externals_src)/boids/boids*/*.pd \
+		$(DESTDIR)$(objectsdir)/$(BSAYLOR_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(BOIDS_NAME)
 #	install -p $(externals_src)/boids/manual.txt \
 #		$(DESTDIR)$(manualsdir)/$(BOIDS_NAME)
@@ -805,6 +809,8 @@ freeverb_install: freeverb
 	install -d $(DESTDIR)$(helpdir)/$(FREEVERB_NAME)
 	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) \
 		$(DESTDIR)$(helpdir)/$(FREEVERB_NAME)
+	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) \
+		$(DESTDIR)$(objectsdir)/$(FREEVERB_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(FREEVERB_NAME)
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/freeverb~/README \
@@ -1310,6 +1316,8 @@ iemguts_install: iemguts
 	install -d $(DESTDIR)$(helpdir)/$(IEMGUTS_NAME)
 	install -p $(externals_src)/iem/iemguts/help/*.pd \
 		$(DESTDIR)$(helpdir)/$(IEMGUTS_NAME)
+	install -p $(externals_src)/iem/iemguts/help/*.pd \
+		$(DESTDIR)$(objectsdir)/$(IEMGUTS_NAME)
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/iem/iemguts/README.txt \
 		$(DESTDIR)$(readmesdir)/$(IEMGUTS_NAME).txt
@@ -1779,56 +1787,6 @@ mrpeach_clean:
 	-rm -f -- $(externals_src)/mrpeach/*.*~
 
 
-
-
-#------------------------------------------------------------------------------#
-# MSD
-MSD_NAME=msd
-MSD_OBJECTS := $(wildcard $(externals_src)/nusmuk/msd*/*.cpp)
-#msd: $(MSD_OBJECTS:.c=.$(EXTENSION))
-msd:
-
-msd_install: msd
-	install -d $(DESTDIR)$(objectsdir)/$(MSD_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(MSD_NAME) \
-		--author "Nicolas Montgermont, Cyrille Henry, and Frank Barknecht" \
-		--description "Mass Spring Damper modeling for Pd" \
-		--license "GNU LGPL" \
-		--version "0.07"
-#	install -p $(MSD_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(MSD_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(MSD_NAME)
-	install -p $(externals_src)/nusmuk/msd*/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(MSD_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(MSD_NAME)
-#	install -p $(externals_src)/msd/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(MSD_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/nusmuk/README.txt \
-		$(DESTDIR)$(readmesdir)/$(MSD_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(MSD_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(MSD_NAME)/msd
-	install -p $(externals_src)/nusmuk/msd/*.pd \
-		$(DESTDIR)$(examplesdir)/$(MSD_NAME)/msd
-	install -d $(DESTDIR)$(examplesdir)/$(MSD_NAME)/msd2D
-	install -p $(externals_src)/nusmuk/msd2D/*.pd \
-		$(DESTDIR)$(examplesdir)/$(MSD_NAME)/msd2D
-	install -d $(DESTDIR)$(examplesdir)/$(MSD_NAME)/msd3D
-	install -p $(externals_src)/nusmuk/msd3D/*.pd \
-		$(DESTDIR)$(examplesdir)/$(MSD_NAME)/msd3D
-	install -d $(DESTDIR)$(examplesdir)/$(MSD_NAME)/editor
-	install -p $(externals_src)/nusmuk/editor/*.* \
-		$(DESTDIR)$(examplesdir)/$(MSD_NAME)/editor
-	install -p $(externals_src)/nusmuk/editor/README \
-		$(DESTDIR)$(examplesdir)/$(MSD_NAME)/editor/README.txt
-
-msd_clean:
-	-rm -f -- $(MSD_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(MSD_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/msd/*.bak
-	-rm -f -- $(externals_src)/msd/*.*~
-
-
-
 #----------------------------------------------------------------------------
 # OSCx
 OSCX_NAME=oscx
@@ -1865,6 +1823,7 @@ oscx_install: oscx
 	install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(OSCX_NAME)
 	install -d $(DESTDIR)$(helpdir)/$(OSCX_NAME)
 	install -p $(externals_src)/OSCx/doc/*.* $(DESTDIR)$(helpdir)/$(OSCX_NAME)
+	install -p $(externals_src)/OSCx/doc/*.* $(DESTDIR)$(objectsdir)/$(OSCX_NAME)
 
 
 oscx_clean:
@@ -2167,6 +2126,7 @@ pmpd_install: pmpd
 	-install -p $(externals_src)/pmpd/*.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(PMPD_NAME)
 	install -d $(DESTDIR)$(helpdir)/$(PMPD_NAME)
 	install -p $(externals_src)/pmpd/help/*.pd $(DESTDIR)$(helpdir)/$(PMPD_NAME)
+	install -p $(externals_src)/pmpd/help/*.pd $(DESTDIR)$(objectsdir)/$(PMPD_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(PMPD_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(PMPD_NAME)
 	install -p $(externals_src)/pmpd/doc/pmpd.pdf/pmpd.pdf \
@@ -2409,9 +2369,10 @@ tof_install: tof
 	install -d $(DESTDIR)$(helpdir)/$(TOF_NAME)
 	install -p $(externals_src)/tof/help/*.pd \
 		$(DESTDIR)$(helpdir)/$(TOF_NAME)
+	install -p $(externals_src)/tof/help/*.pd \
+		$(DESTDIR)$(objectsdir)/$(TOF_NAME)
 	install -p $(externals_src)/tof/abs/*.pd \
 		$(DESTDIR)$(objectsdir)/$(TOF_NAME)
-	#install -p $(externals_src)/tof/help/*.pd $(DESTDIR)$(objectsdir)/$(TOF_NAME)
 
 tof_clean:
 	-rm -f -- $(TOF_OBJECTS:.c=.$(EXTENSION))
@@ -2437,6 +2398,8 @@ toxy_install: toxy
 	install -d $(DESTDIR)$(helpdir)/$(TOXY_NAME)
 	install -p $(externals_src)/miXed/doc/help/toxy/*.*  \
 		$(DESTDIR)$(helpdir)/$(TOXY_NAME)
+	install -p $(externals_src)/miXed/doc/help/toxy/*.*  \
+		$(DESTDIR)$(objectsdir)/$(TOXY_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(TOXY_NAME)
 	install -d $(DESTDIR)$(examplesdir)/$(TOXY_NAME)
 	install -p $(externals_src)/miXed/test/toxy/*.*  \
@@ -3022,6 +2985,8 @@ flashserver_install: flashserver
 	install -d $(DESTDIR)$(helpdir)/$(FLASHSERVER_NAME)
 	install -p $(externals_src)/olafmatt/flashserver/*.pd \
 		$(DESTDIR)$(helpdir)/$(FLASHSERVER_NAME)
+	install -p $(externals_src)/olafmatt/flashserver/*.pd \
+		$(DESTDIR)$(objectsdir)/$(FLASHSERVER_NAME)
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/olafmatt/flashserver/README \
 		$(DESTDIR)$(readmesdir)/$(FLASHSERVER_NAME).txt
@@ -3147,6 +3112,8 @@ iemxmlrpc_install: iemxmlrpc
 	install -d $(DESTDIR)$(helpdir)/$(IEMXMLRPC_NAME)
 	install -p $(externals_src)/iem/iemxmlrpc/*.pd \
 		$(DESTDIR)$(helpdir)/$(IEMXMLRPC_NAME)
+	install -p $(externals_src)/iem/iemxmlrpc/*.pd \
+		$(DESTDIR)$(objectsdir)/$(IEMXMLRPC_NAME)
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/iem/iemxmlrpc/README.txt \
 		$(DESTDIR)$(readmesdir)/$(IEMXMLRPC_NAME).txt
@@ -3183,6 +3150,9 @@ earplug_install: earplug
 	install -p $(externals_src)/earplug~/*-help.pd \
 		$(externals_src)/earplug~/*.txt \
 		$(DESTDIR)$(helpdir)/$(EARPLUG_NAME)
+	install -p $(externals_src)/earplug~/*-help.pd \
+		$(externals_src)/earplug~/*.txt \
+		$(DESTDIR)$(objectsdir)/$(EARPLUG_NAME)
 
 earplug_clean:
 	-rm -f -- $(EARPLUG_OBJECTS:.c=.$(EXTENSION))
