@@ -346,10 +346,12 @@ mtl_install:
 	install -d $(DESTDIR)$(helpdir)/$(MTL_NAME)
 	install -p $(abstractions_src)/$(MTL_NAME)/*-help.pd \
 		$(DESTDIR)$(helpdir)/$(MTL_NAME)
+	install -p $(abstractions_src)/$(MTL_NAME)/*-help.pd \
+		$(DESTDIR)$(objectsdir)/$(MTL_NAME)
 	install -p $(abstractions_src)/$(MTL_NAME)/browser.pd \
 		$(DESTDIR)$(helpdir)/$(MTL_NAME)
-	install -p $(abstractions_src)/$(MTL_NAME)/1.mtlBrowser.pd  \
-		$(DESTDIR)$(helpdir)/$(MTL_NAME)
+#	install -p $(abstractions_src)/$(MTL_NAME)/1.mtlBrowser.pd \
+#		$(DESTDIR)$(helpdir)/$(MTL_NAME)
 	install -p $(abstractions_src)/$(MTL_NAME)/*.txt \
 		$(DESTDIR)$(objectsdir)/$(MTL_NAME)		
 	install -p $(abstractions_src)/$(MTL_NAME)/*.txt \
@@ -449,6 +451,8 @@ rradical_install:
 	install -d $(DESTDIR)$(helpdir)/$(RRADICAL_NAME)
 	install -p $(abstractions_src)/rradical/*/*-help.pd \
 		$(DESTDIR)$(helpdir)/$(RRADICAL_NAME)
+	install -p $(abstractions_src)/rradical/*/*-help.pd \
+		$(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)
 	install -d $(DESTDIR)$(examplesdir)/$(RRADICAL_NAME)
 	install -p $(abstractions_src)/rradical/usecases/*.* \
 		$(DESTDIR)$(examplesdir)/$(RRADICAL_NAME)
@@ -479,6 +483,9 @@ rtc-lib_install:
 	install -p $(abstractions_src)/footils/rtc-lib/rtc/*-help.pd \
 		$(abstractions_src)/footils/rtc-lib/rtc/RTC-Overview.pd \
 		$(DESTDIR)$(helpdir)/$(RTC-LIB_NAME)
+	install -p $(abstractions_src)/footils/rtc-lib/rtc/*-help.pd \
+		$(abstractions_src)/footils/rtc-lib/rtc/RTC-Overview.pd \
+		$(DESTDIR)$(objectsdir)/$(RTC-LIB_NAME)
 	install -p $(abstractions_src)/footils/rtc-lib/rtc/rtc-help/*.pd \
 		$(DESTDIR)$(helpdir)/$(RTC-LIB_NAME)/rtc-help
 
@@ -518,6 +525,8 @@ sfruit_install:
 	install -d $(DESTDIR)$(helpdir)/$(SFRUIT_NAME)
 	install -p $(abstractions_src)/sfruit/sfruit/*-help.pd \
 		$(DESTDIR)$(helpdir)/$(SFRUIT_NAME)
+	install -p $(abstractions_src)/sfruit/sfruit/*-help.pd \
+		$(DESTDIR)$(objectsdir)/$(SFRUIT_NAME)
 
 #-------------------------------------------------------------------------------
 # TIMESTRETCH
@@ -533,6 +542,8 @@ timestretch_install:
 	install -d $(DESTDIR)$(helpdir)/$(TIMESTRETCH_NAME)
 	install -p $(abstractions_src)/timestretch/*-help.pd \
 		 $(DESTDIR)$(helpdir)/$(TIMESTRETCH_NAME)
+	install -p $(abstractions_src)/timestretch/*-help.pd \
+		 $(DESTDIR)$(objectsdir)/$(TIMESTRETCH_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(TIMESTRETCH_NAME)
 #	install -p $(abstractions_src)/timestretch/doc/*.txt \
 #		 $(DESTDIR)$(manualsdir)/$(TIMESTRETCH_NAME)
