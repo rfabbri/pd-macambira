@@ -319,7 +319,7 @@ bassemu_install: bassemu
 	install -p $(externals_src)/bassemu/*.pd \
 		$(DESTDIR)$(helpdir)/$(BASSEMU_NAME)
 	install -p $(externals_src)/bassemu/*.pd \
-		$(DESTDIR)$(objectsdir)/$(BSAYLOR_NAME)
+		$(DESTDIR)$(objectsdir)/$(BASSEMU_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(BASSEMU_NAME)
 #	install -p $(externals_src)/bassemu/manual.txt \
 #		$(DESTDIR)$(manualsdir)/$(BASSEMU_NAME)
@@ -356,7 +356,7 @@ boids_install: boids
 	install -p $(externals_src)/boids/boids*/*-help.pd \
 		$(DESTDIR)$(helpdir)/$(BOIDS_NAME)
 	install -p $(externals_src)/boids/boids*/*.pd \
-		$(DESTDIR)$(objectsdir)/$(BSAYLOR_NAME)
+		$(DESTDIR)$(objectsdir)/$(BOIDS_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(BOIDS_NAME)
 #	install -p $(externals_src)/boids/manual.txt \
 #		$(DESTDIR)$(manualsdir)/$(BOIDS_NAME)
