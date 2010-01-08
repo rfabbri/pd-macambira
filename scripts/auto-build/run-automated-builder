@@ -25,8 +25,8 @@ mailbody_on_failure () {
  ## this is a somewhat simplistic expression to detect error-lines
  echo "last 20 errors ----------------------------------------"
  cat ${LOGFILE} | grep -i -e "error: " -e "cannot find" | tail -20
- echo "last 5 lines ----------------------------------------"
- tail -5 ${LOGFILE}
+ echo "last 15 lines ----------------------------------------"
+ tail -15 ${LOGFILE}
  echo ""
  echo "the full logfile - if it has been succesfully uploaded - can be viewed at:"
  echo "http://autobuild.puredata.info/auto-build/${DATE}/logs/${LOGFILE##*/}"
