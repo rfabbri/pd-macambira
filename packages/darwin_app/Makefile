@@ -81,9 +81,6 @@ darwin_app_wrapper: Info.plist
 	install -m0755 -p \
 		"$(WISH_CONTENTS)/MacOS/$(WISH_NAME)" "$(PD_APP_CONTENTS)/MacOS"
 	install -d "$(PD_APP_CONTENTS)/Resources"
-	install -m0644 -p \
-		"$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
-		"$(PD_APP_CONTENTS)/Resources"
 # only embed the Tcl/Tk Frameworks if not building against the built-in ones
 ifneq (/System,$(findstring /System,$(WISH_FRAMEWORKS_SOURCE)))
 	install -d $(PD_APP_CONTENTS)/Frameworks \
