@@ -1,6 +1,6 @@
 Windows Registry Editor Version 5.00
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Pd]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Pd-extended]
 "flags"="
 "loadlib1"="libdir"
 "loadlib2"="Gem"

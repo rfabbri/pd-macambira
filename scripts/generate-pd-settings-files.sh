@@ -30,7 +30,7 @@ MACOSX_FOOTER='</dict>\n
 </plist>\n'
 
 
-WINDOWS_HEADER='Windows Registry Editor Version 5.00\n\n[HKEY_LOCAL_MACHINE\SOFTWARE\Pd]'
+WINDOWS_HEADER='Windows Registry Editor Version 5.00\n\n[HKEY_LOCAL_MACHINE\SOFTWARE\Pd-extended]'
 
 
 # the file associations should be added here
