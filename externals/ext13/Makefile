@@ -2,7 +2,7 @@
 # LIBRARY_NAME variable. The folder for your project should have the same name
 # as your library.
 LIBRARY_NAME = ext13
-LIBRARY_VERSION = 0.17
+LIBRARY_VERSION = 0.17.0
 
 # Next, add your .c source files to the SOURCES variable.  The help files will
 # be included automatically
@@ -37,7 +37,8 @@ EXTRA_DIST = d_global13.h stream13.h ext13.h ext13.c ext13-help.pd \
 # where Pd lives
 PD_PATH = ../../pd
 # where to install the library
-libdir = /usr/local/lib
+prefix = /usr/local
+libdir = $(prefix)/lib
 pkglibdir = $(libdir)/pd-externals
 objectsdir = $(pkglibdir)
 
