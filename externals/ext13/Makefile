@@ -2,15 +2,26 @@
 # LIBRARY_NAME variable. The folder for your project should have the same name
 # as your library.
 LIBRARY_NAME = ext13
+LIBRARY_VERSION = 0.17
 
 # Next, add your source files to the SOURCES variable.
 SOURCES = catch13~.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mandelbrot.c messages.c openpatch.c piperead~.c pipewrite~.c receive13~.c receive13.c scramble~.c send13~.c send13.c sfwrite13~.c streamin13~.c streamout13~.c strippath.c throw13~.c wavinfo.c 
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
+SOURCES_Android = 
+SOURCES_CYGWIN = 
 SOURCES_Darwin = 
+SOURCES_iphoneos = 
 SOURCES_Linux = cdplayer.c ossmixer.c promiscous~.c
 SOURCES_Windows = 
+
+# if you want to include any other files in the source and binary tarballs,
+# list them here.  This can be anything from header files, READMEs, example
+# patches, documentation, etc.
+EXTRA_DIST = d_global13.h stream13.h ext13.h ext13.c ext13-help.pd \
+	CHANGES README VERSION
+
 
 #------------------------------------------------------------------------------#
 #
@@ -26,6 +37,8 @@ objectsdir = $(PD_PATH)/extra
 CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
 LDFLAGS =  
 LIBS = 
+ALLSOURCES := $(SOURCES) $(SOURCES_Android) $(SOURCES_CYGWIN) $(SOURCES_Darwin) \
+	         $(SOURCES_iphoneos) $(SOURCES_Linux) $(SOURCES_Windows)
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
@@ -66,6 +79,8 @@ ifeq ($(UNAME),Linux)
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
   LIBS += -lc
   STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
 ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   SOURCES += 
@@ -127,7 +142,7 @@ single_install: $(LIBRARY_NAME) install-doc install-exec
 
 install-doc:
 	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-#	install -m644 -p $(SOURCES:.c=-help.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -m644 -p $(SOURCES:.c=-help.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p README $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
 	install -m644 -p VERSION $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/VERSION.txt
@@ -144,19 +159,35 @@ clean:
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
 
 distclean: clean
-	-rm -f -- ../$(LIBRARY_NAME)-$(OS)-$(shell uname -m).tar.bz2
-	-rm -f -- ../$(LIBRARY_NAME)-$(OS).tar.bz2
+	-rm -f -- $(DISTBINDIR).tar.gz
+	-rm -rf -- $(DISTBINDIR)
+	-rm -f -- $(DISTDIR).tar.gz
+	-rm -rf -- $(DISTDIR)
 
-dist: all dist_$(OS)
 
-dist_linux:
-	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS)-$(shell uname -m).tar.bz2 $(LIBRARY_NAME)
+$(DISTBINDIR):
+	mkdir $(DISTBINDIR)
 
-dist_macosx:
-	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
+dist-bin: all $(DISTBINDIR)
+	install -p $(LIBRARY_NAME)-meta.pd  $(DISTBINDIR)
+	install -p $(SOURCES)  $(DISTBINDIR)
+	install -p $(SOURCES:.c=-help.pd) $(DISTBINDIR)
+	test -z "$(EXTRA_DIST)" || \
+		install -p $(EXTRA_DIST)    $(DISTBINDIR)
+#	tar --exclude-vcs -czpf $(DISTBINDIR).tar.gz $(DISTBINDIR)
 
-dist_windows:
-	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
+$(DISTDIR):
+	mkdir $(DISTDIR)
+
+dist: $(DISTDIR)
+	install -p Makefile  $(DISTDIR)
+	install -p $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
+	install -p $(ALLSOURCES)  $(DISTDIR)
+	install -p $(ALLSOURCES)  $(DISTDIR)
+	install -p $(ALLSOURCES:.c=-help.pd) $(DISTDIR)
+	test -z "$(EXTRA_DIST)" || \
+		install -p $(EXTRA_DIST)    $(DISTDIR)
+	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
 
 
 etags:
@@ -169,3 +200,4 @@ showpaths:
 	@echo "SOURCES: $(SOURCES)"
 	@echo "UNAME: $(UNAME)"
 	@echo "CPU: $(CPU)"
+
