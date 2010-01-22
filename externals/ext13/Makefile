@@ -160,7 +160,7 @@ dist_windows:
 
 
 etags:
-	etags *.[ch] ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
+	etags *.h $(SOURCES) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
 showpaths:
 	@echo "PD_PATH: $(PD_PATH)"
