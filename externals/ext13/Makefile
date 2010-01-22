@@ -4,7 +4,8 @@
 LIBRARY_NAME = ext13
 LIBRARY_VERSION = 0.17
 
-# Next, add your source files to the SOURCES variable.
+# Next, add your .c source files to the SOURCES variable.  The help files will
+# be included automatically
 SOURCES = catch13~.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mandelbrot.c messages.c openpatch.c piperead~.c pipewrite~.c receive13~.c receive13.c scramble~.c send13~.c send13.c sfwrite13~.c streamin13~.c streamout13~.c strippath.c throw13~.c wavinfo.c 
 
 # For objects that only build on certain platforms, add those to the SOURCES
@@ -15,6 +16,10 @@ SOURCES_Darwin =
 SOURCES_iphoneos = 
 SOURCES_Linux = cdplayer.c ossmixer.c promiscous~.c
 SOURCES_Windows = 
+
+# list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
+# be included automatically
+PDOBJECTS = 
 
 # if you want to include any other files in the source and binary tarballs,
 # list them here.  This can be anything from header files, READMEs, example
@@ -133,10 +138,16 @@ install: libdir_install
 
 # The meta and help files are explicitly installed to make sure they are
 # actually there.  Those files are not optional, then need to be there.
-libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-exec
+libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(INSTALL_LIB) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd \
+		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	test -z "$(SOURCES)" || \
+		$(INSTALL_LIB) $(SOURCES:.c=.$(EXTENSION)) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	test -z "$(PDOBJECTS)" || \
+		$(INSTALL_LIB) $(OBJECTS) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
 single_install: $(LIBRARY_NAME) install-doc install-exec
@@ -146,15 +157,15 @@ single_install: $(LIBRARY_NAME) install-doc install-exec
 
 install-doc:
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(INSTALL_FILE) $(SOURCES:.c=-help.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(INSTALL_FILE) $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	test -z "$(SOURCES)" || \
+		$(INSTALL_FILE) $(SOURCES:.c=-help.pd) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	test -z "$(PDOBJECTS)" || \
+		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_FILE) README $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
 	$(INSTALL_FILE) VERSION $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/VERSION.txt
 	$(INSTALL_FILE) CHANGES $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/CHANGES.txt
-
-install-exec:
-	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(INSTALL_FILE) $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 
 clean:
@@ -186,9 +197,14 @@ $(DISTDIR):
 dist: $(DISTDIR)
 	$(INSTALL_FILE) Makefile  $(DISTDIR)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
-	$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
-	$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
-	$(INSTALL_FILE) $(ALLSOURCES:.c=-help.pd) $(DISTDIR)
+	test -z "$(ALLSOURCES)" || \
+		$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
+	test -z "$(ALLSOURCES)" || \
+		$(INSTALL_FILE) $(ALLSOURCES:.c=-help.pd) $(DISTDIR)
+	test -z "$(PDOBJECTS)" || \
+		$(INSTALL_FILE) $(PDOBJECTS)  $(DISTDIR)
+	test -z "$(PDOBJECTS)" || \
+		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) $(DISTDIR)
 	test -z "$(EXTRA_DIST)" || \
 		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTDIR)
 	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
