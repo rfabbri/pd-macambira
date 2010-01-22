@@ -10,12 +10,12 @@ SOURCES = catch13~.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mandelbrot.c 
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
-SOURCES_Android = 
-SOURCES_CYGWIN = 
-SOURCES_Darwin = 
+SOURCES_android = 
+SOURCES_cygwin = 
+SOURCES_macosx = 
 SOURCES_iphoneos = 
-SOURCES_Linux = cdplayer.c ossmixer.c promiscous~.c
-SOURCES_Windows = 
+SOURCES_linux = cdplayer.c ossmixer.c promiscous~.c
+SOURCES_windows = 
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
@@ -37,7 +37,10 @@ EXTRA_DIST = d_global13.h stream13.h ext13.h ext13.c ext13-help.pd \
 # where Pd lives
 PD_PATH = ../../pd
 # where to install the library
-objectsdir = $(PD_PATH)/extra
+libdir = /usr/local/lib
+pkglibdir = $(libdir)/pd-externals
+objectsdir = $(pkglibdir)
+
 
 INSTALL = install
 INSTALL_FILE    = $(INSTALL) -p -m 644
@@ -47,14 +50,14 @@ INSTALL_DIR     = $(INSTALL) -p -m 755 -d
 CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
 LDFLAGS =  
 LIBS = 
-ALLSOURCES := $(SOURCES) $(SOURCES_Android) $(SOURCES_CYGWIN) $(SOURCES_Darwin) \
-	         $(SOURCES_iphoneos) $(SOURCES_Linux) $(SOURCES_Windows)
+ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) \
+	         $(SOURCES_iphoneos) $(SOURCES_linux) $(SOURCES_windows)
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
   CPU := $(shell uname -p)
   ifeq ($(CPU),arm) # iPhone/iPod Touch
-    SOURCES += $(SOURCES_Darwin)
+    SOURCES += $(SOURCES_macosx)
     EXTENSION = pd_darwin
     OS = iphoneos
     IPHONE_BASE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin
@@ -68,8 +71,10 @@ ifeq ($(UNAME),Darwin)
     LDFLAGS += -arch armv6 -bundle -undefined dynamic_lookup $(ISYSROOT)
     LIBS += -lc 
     STRIP = strip -x
+    DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
+    DISTBINDIR=$(DISTDIR)-$(OS)
   else # Mac OS X
-    SOURCES += $(SOURCES_Darwin)
+    SOURCES += $(SOURCES_macosx)
     EXTENSION = pd_darwin
     OS = macosx
     OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
@@ -78,10 +83,12 @@ ifeq ($(UNAME),Darwin)
     LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
     LIBS += -lc 
     STRIP = strip -x
+    DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
+    DISTBINDIR=$(DISTDIR)-$(OS)
   endif
 endif
 ifeq ($(UNAME),Linux)
-  SOURCES += $(SOURCES_Linux)
+  SOURCES += $(SOURCES_linux)
   EXTENSION = pd_linux
   OS = linux
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
@@ -93,7 +100,7 @@ ifeq ($(UNAME),Linux)
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
 ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
-  SOURCES += 
+  SOURCES += $(SOURCES_cygwin)
   EXTENSION = dll
   OS = cygwin
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
@@ -101,9 +108,11 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   LDFLAGS += -Wl,--export-dynamic -shared -L$(PD_PATH)/src
   LIBS += -lc -lpd
   STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
+  DISTBINDIR=$(DISTDIR)-$(OS)
 endif
 ifeq (MINGW,$(findstring MINGW,$(UNAME)))
-  SOURCES += $(SOURCES_Windows)
+  SOURCES += $(SOURCES_windows)
   EXTENSION = dll
   OS = windows
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -march=i686 -mtune=pentium4
@@ -112,6 +121,8 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   LDFLAGS += -s -shared -Wl,--enable-auto-import
   LIBS += -L$(PD_PATH)/src -L$(PD_PATH)/bin -L$(PD_PATH)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
   STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
+  DISTBINDIR=$(DISTDIR)-$(OS)
 endif
 
 CFLAGS += $(OPT_CFLAGS)
