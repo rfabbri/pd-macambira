@@ -34,6 +34,11 @@ PD_PATH = ../../pd
 # where to install the library
 objectsdir = $(PD_PATH)/extra
 
+INSTALL = install
+INSTALL_FILE    = $(INSTALL) -p -m 644
+INSTALL_LIB     = $(INSTALL) -p -m 644 -s
+INSTALL_DIR     = $(INSTALL) -p -m 755 -d
+
 CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
 LDFLAGS =  
 LIBS = 
@@ -129,28 +134,27 @@ install: libdir_install
 # The meta and help files are explicitly installed to make sure they are
 # actually there.  Those files are not optional, then need to be there.
 libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-exec
-	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(LIBRARY_NAME)-meta.pd $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION)))
+	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_LIB) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
 single_install: $(LIBRARY_NAME) install-doc install-exec
-	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_FILE) $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(STRIP) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
 
 install-doc:
-	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(SOURCES:.c=-help.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p README $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
-	install -m644 -p VERSION $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/VERSION.txt
-	install -m644 -p CHANGES $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/CHANGES.txt
+	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_FILE) $(SOURCES:.c=-help.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_FILE) $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_FILE) README $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
+	$(INSTALL_FILE) VERSION $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/VERSION.txt
+	$(INSTALL_FILE) CHANGES $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/CHANGES.txt
 
 install-exec:
-	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_FILE) $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 
 clean:
@@ -166,27 +170,27 @@ distclean: clean
 
 
 $(DISTBINDIR):
-	mkdir $(DISTBINDIR)
+	$(INSTALL_DIR) $(DISTBINDIR)
 
-dist-bin: all $(DISTBINDIR)
-	install -p $(LIBRARY_NAME)-meta.pd  $(DISTBINDIR)
-	install -p $(SOURCES)  $(DISTBINDIR)
-	install -p $(SOURCES:.c=-help.pd) $(DISTBINDIR)
+libdir: all $(DISTBINDIR)
+	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTBINDIR)
+	$(INSTALL_FILE) $(SOURCES)  $(DISTBINDIR)
+	$(INSTALL_FILE) $(SOURCES:.c=-help.pd) $(DISTBINDIR)
 	test -z "$(EXTRA_DIST)" || \
-		install -p $(EXTRA_DIST)    $(DISTBINDIR)
+		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTBINDIR)
 #	tar --exclude-vcs -czpf $(DISTBINDIR).tar.gz $(DISTBINDIR)
 
 $(DISTDIR):
-	mkdir $(DISTDIR)
+	$(INSTALL_DIR) $(DISTDIR)
 
 dist: $(DISTDIR)
-	install -p Makefile  $(DISTDIR)
-	install -p $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
-	install -p $(ALLSOURCES)  $(DISTDIR)
-	install -p $(ALLSOURCES)  $(DISTDIR)
-	install -p $(ALLSOURCES:.c=-help.pd) $(DISTDIR)
+	$(INSTALL_FILE) Makefile  $(DISTDIR)
+	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
+	$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
+	$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
+	$(INSTALL_FILE) $(ALLSOURCES:.c=-help.pd) $(DISTDIR)
 	test -z "$(EXTRA_DIST)" || \
-		install -p $(EXTRA_DIST)    $(DISTDIR)
+		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTDIR)
 	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
 
 
@@ -198,6 +202,7 @@ showpaths:
 	@echo "objectsdir: $(objectsdir)"
 	@echo "LIBRARY_NAME: $(LIBRARY_NAME)"
 	@echo "SOURCES: $(SOURCES)"
+	@echo "ALLSOURCES: $(ALLSOURCES)"
 	@echo "UNAME: $(UNAME)"
 	@echo "CPU: $(CPU)"
 
