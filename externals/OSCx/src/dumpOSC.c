@@ -282,7 +282,11 @@ static void *dumpOSC_new(t_symbol *compatflag,
 		  return NULL;
   }
 
-  else return NULL;
+  else {
+      error("[dumpOSC] needs at least one argument to function");
+      return NULL;
+  }
+  
 
   //x->x_b = binbuf_new();
   //x->x_outat = binbuf_getvec(x->x_b);
