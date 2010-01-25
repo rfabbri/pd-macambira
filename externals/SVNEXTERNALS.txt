@@ -19,5 +19,4 @@
 # 		svn propget svn:externals .
 
 ## example:
-# gridflow https://gridflow.ca/svn/trunk/
-gridflow http://gridflow.ca/svn/trunk/
+gridflow https://gridflow.ca/svn/trunk/
