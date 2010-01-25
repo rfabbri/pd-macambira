@@ -5,7 +5,6 @@
 #change these to your liking
 prefix = /usr/local/
 libdir = $(DESTDIR)/$(prefix)/lib/pd/extra/
-docdir = $(DESTDIR)/$(prefix)/lib/pd/doc/5.reference/
 
 INCLUDES += -I/usr/local/include/
 CFLAGS += ${INCLUDES} -shared
@@ -30,7 +29,7 @@ configure:
 #install the libraries and documentation
 install: ${TARGETS}
 	${INSTALL} -t ${libdir} ${TARGETS}
-	${INSTALL} -t ${docdir} *.pd
+	${INSTALL} -t ${libdir} *.pd
 
 clean:
 	rm -f ${TARGETS}
