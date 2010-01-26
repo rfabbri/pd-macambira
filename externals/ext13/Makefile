@@ -45,7 +45,6 @@ objectsdir = $(pkglibdir)
 
 INSTALL = install
 INSTALL_FILE    = $(INSTALL) -p -m 644
-INSTALL_LIB     = $(INSTALL) -p -m 644 -s
 INSTALL_DIR     = $(INSTALL) -p -m 755 -d
 
 CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
@@ -156,11 +155,11 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd \
 		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	test -z "$(SOURCES)" || \
-		$(INSTALL_LIB) $(SOURCES:.c=.$(EXTENSION)) \
-			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	test -z "$(SOURCES)" || (\
+		$(INSTALL_FILE) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
+		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
 	test -z "$(PDOBJECTS)" || \
-		$(INSTALL_LIB) $(OBJECTS) \
+		$(INSTALL_FILE) $(OBJECTS) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
