@@ -22,6 +22,7 @@
 #include <iostream>
 #include <stdlib.h>
 
+using namespace std;
 
 //////////////////////////////
 //
@@ -62,8 +63,8 @@ Array<type>::~Array() { }
 
 template<class type>
 void Array<type>::setAll(type aValue) {
-   for (int i=0; i<getSize(); i++) {
-      array[i] = aValue;
+  for (int i=0; i<this->getSize(); i++) {
+    this->array[i] = aValue;
    }
 }
 
@@ -77,8 +78,8 @@ void Array<type>::setAll(type aValue) {
 template<class type>
 type Array<type>::sum(void) {
    type theSum = 0;
-   for (int i=0; i<getSize(); i++) {
-      theSum += array[i];
+   for (int i=0; i<this->getSize(); i++) {
+     theSum += this->array[i];
    }
    return theSum;
 }
@@ -87,7 +88,7 @@ template<class type>
 type Array<type>::sum(int loIndex, int hiIndex) {
    type theSum = 0;
    for (int i=loIndex; i<=hiIndex; i++) {
-      theSum += array[i];
+      theSum += this->array[i];
    }
    return theSum;
 }
@@ -101,19 +102,19 @@ type Array<type>::sum(int loIndex, int hiIndex) {
 
 template<class type>
 void Array<type>::zero(int minIndex, int maxIndex) {
-   if (size == 0) return;
+   if (this->size == 0) return;
    if (minIndex == -1) minIndex = 0;
-   if (maxIndex == -1) maxIndex = size-1;
+   if (maxIndex == -1) maxIndex = this->size - 1;
 
    if (minIndex < 0 || maxIndex < 0 || minIndex > maxIndex ||
-       maxIndex >= size) {
-      cerr << "Error in zero function: min = " << minIndex
-           << " max = " << maxIndex << " size = " << size << endl;
+       maxIndex >= this->size) {
+     cerr << "Error in zero function: min = " << minIndex
+           << " max = " << maxIndex << " size = " << this->size << this->endl;
       exit(1);
    }
 
    for (int i=minIndex; i<=maxIndex; i++) {
-      array[i] = 0;
+      this->array[i] = 0;
    }
 }
 
@@ -126,12 +127,12 @@ void Array<type>::zero(int minIndex, int maxIndex) {
 
 template<class type>
 int Array<type>::operator==(const Array<type>& aArray) {
-   if (getSize() != aArray.getSize()) {
+   if (this->getSize() != aArray.getSize()) {
       return 0;
    }
    Array<type>& t = *this;
    int i;
-   for (i=0; i<getSize(); i++) {
+   for (i=0; i<this->getSize(); i++) {
       if (t[i] != aArray[i]) {
          return 0;
       }
@@ -148,20 +149,20 @@ int Array<type>::operator==(const Array<type>& aArray) {
 
 template<class type>
 Array<type>& Array<type>::operator=(const Array<type>& anArray) {
-   if (allocSize < anArray.size) {
-      if (allocSize != 0) {
-         delete [] array;
+   if (this->allocSize < anArray.size) {
+      if (this->allocSize != 0) {
+         delete [] this->array;
       }
-      allocSize = anArray.size;
-      size = anArray.size;
-      array = new type[size];
-      allowGrowthQ = anArray.allowGrowthQ;
-      growthAmount = anArray.growthAmount;
-      maxSize = anArray.maxSize;
+      this->allocSize = anArray.size;
+      this->size = anArray.size;
+      this->array = new type[this->size];
+      this->allowGrowthQ = anArray.allowGrowthQ;
+      this->growthAmount = anArray.growthAmount;
+      this->maxSize = anArray.maxSize;
    }
-   size = anArray.size;
-   for (int i=0; i<size; i++) {
-      array[i] = anArray.array[i];
+   this->size = anArray.size;
+   for (int i=0; i<this->size; i++) {
+      this->array[i] = anArray.array[i];
    }
 
    return *this;
@@ -176,14 +177,14 @@ Array<type>& Array<type>::operator=(const Array<type>& anArray) {
 
 template<class type>
 Array<type>& Array<type>::operator+=(const Array<type>& anArray) {
-   if (size != anArray.size) {
-      cerr << "Error: different size arrays " << size << " and " 
+   if (this->size != anArray.size) {
+      cerr << "Error: different size arrays " << this->size << " and " 
            << anArray.size << endl;
       exit(1);
    }
 
-   for (int i=0; i<size; i++) {
-      array[i] += anArray.array[i];
+   for (int i=0; i<this->size; i++) {
+      this->array[i] += anArray.array[i];
    }
 
    return *this;
@@ -198,8 +199,8 @@ Array<type>& Array<type>::operator+=(const Array<type>& anArray) {
 
 template<class type>
 Array<type> Array<type>::operator+(const Array<type>& anArray) const {
-   if (size != anArray.size) {
-      cerr << "Error: different size arrays " << size << " and " 
+   if (this->size != anArray.size) {
+      cerr << "Error: different size arrays " << this->size << " and " 
            << anArray.size << endl;
       exit(1);
    }
@@ -213,7 +214,7 @@ Array<type> Array<type>::operator+(const Array<type>& anArray) const {
 template<class type>
 Array<type> Array<type>::operator+(type aNumber) const {
    Array<type> anArray(*this);
-   for (int i=0; i<size; i++) {
+   for (int i=0; i<this->size; i++) {
       anArray[i] += aNumber;
    }
    return anArray;
@@ -228,14 +229,14 @@ Array<type> Array<type>::operator+(type aNumber) const {
 
 template<class type>
 Array<type>& Array<type>::operator-=(const Array<type>& anArray) {
-   if (size != anArray.size) {
-      cerr << "Error: different size arrays " << size << " and " 
+   if (this->size != anArray.size) {
+      cerr << "Error: different size arrays " << this->size << " and " 
            << anArray.size << endl;
       exit(1);
    }
 
-   for (int i=0; i<size; i++) {
-      array[i] -= anArray.array[i];
+   for (int i=0; i<this->size; i++) {
+      this->array[i] -= anArray.array[i];
    }
 
    return *this;
@@ -250,8 +251,8 @@ Array<type>& Array<type>::operator-=(const Array<type>& anArray) {
 
 template<class type>
 Array<type> Array<type>::operator-(const Array<type>& anArray) const {
-   if (size != anArray.size) {
-      cerr << "Error: different size arrays " << size << " and " 
+   if (this->size != anArray.size) {
+      cerr << "Error: different size arrays " << this->size << " and " 
            << anArray.size << endl;
       exit(1);
    }
@@ -265,7 +266,7 @@ Array<type> Array<type>::operator-(const Array<type>& anArray) const {
 template<class type>
 Array<type> Array<type>::operator-(void) const {
    Array<type> anArray(*this);
-   for (int i=0; i<size; i++) {
+   for (int i=0; i<this->size; i++) {
       anArray[i] = -anArray[i];
    }
    return anArray;
@@ -274,7 +275,7 @@ Array<type> Array<type>::operator-(void) const {
 template<class type>
 Array<type> Array<type>::operator-(type aNumber) const {
    Array<type> anArray(*this);
-   for (int i=0; i<size; i++) {
+   for (int i=0; i<this->size; i++) {
       anArray[i] -= aNumber;
    }
    return anArray;
@@ -289,14 +290,14 @@ Array<type> Array<type>::operator-(type aNumber) const {
 
 template<class type>
 Array<type>& Array<type>::operator*=(const Array<type>& anArray) {
-   if (size != anArray.size) {
-      cerr << "Error: different size arrays " << size << " and " 
+   if (this->size != anArray.size) {
+      cerr << "Error: different size arrays " << this->size << " and " 
            << anArray.size << endl;
       exit(1);
    }
 
-   for (int i=0; i<size; i++) {
-      array[i] *= anArray.array[i];
+   for (int i=0; i<this->size; i++) {
+      this->array[i] *= anArray.array[i];
    }
 
    return *this;
@@ -311,8 +312,8 @@ Array<type>& Array<type>::operator*=(const Array<type>& anArray) {
 
 template<class type>
 Array<type> Array<type>::operator*(const Array<type>& anArray) const {
-   if (size != anArray.size) {
-      cerr << "Error: different size arrays " << size << " and " 
+   if (this->size != anArray.size) {
+      cerr << "Error: different size arrays " << this->size << " and " 
            << anArray.size << endl;
       exit(1);
    }
@@ -326,7 +327,7 @@ Array<type> Array<type>::operator*(const Array<type>& anArray) const {
 template<class type>
 Array<type> Array<type>::operator*(type aNumber) const {
    Array<type> anArray(*this);
-   for (int i=0; i<size; i++) {
+   for (int i=0; i<this->size; i++) {
       anArray[i] *= aNumber;
    }
    return anArray;
@@ -339,14 +340,14 @@ Array<type> Array<type>::operator*(type aNumber) const {
 
 template<class type>
 Array<type>& Array<type>::operator/=(const Array<type>& anArray) {
-   if (size != anArray.size) {
-      cerr << "Error: different size arrays " << size << " and " 
+   if (this->size != anArray.size) {
+      cerr << "Error: different size arrays " << this->size << " and " 
            << anArray.size << endl;
       exit(1);
    }
 
-   for (int i=0; i<size; i++) {
-      array[i] /= anArray.array[i];
+   for (int i=0; i<this->size; i++) {
+      this->array[i] /= anArray.array[i];
    }
 
    return *this;
@@ -359,8 +360,8 @@ Array<type>& Array<type>::operator/=(const Array<type>& anArray) {
 
 template<class type>
 Array<type> Array<type>::operator/(const Array<type>& anArray) const {
-   if (size != anArray.size) {
-      cerr << "Error: different size arrays " << size << " and " 
+   if (this->size != anArray.size) {
+      cerr << "Error: different size arrays " << this->size << " and " 
            << anArray.size << endl;
       exit(1);
    }

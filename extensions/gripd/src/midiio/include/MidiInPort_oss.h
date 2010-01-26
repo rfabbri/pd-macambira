@@ -28,6 +28,7 @@
 typedef unsigned char uchar;
 typedef void (*MIDI_Callback_function)(int arrivalPort);
 
+void *interpretMidiInputStreamPrivate(void * x);
 
 class MidiInPort_oss : public Sequencer_oss {
    public:

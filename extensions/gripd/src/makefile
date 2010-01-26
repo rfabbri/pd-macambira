@@ -15,7 +15,7 @@ JOYSTICK = TRUE
 MIDIOSSUBTYPE = ALSA
 #MIDIOSSUBTYPE = OSS
 PDINCLUDE =  -I../../src -I../../../pd/src
-LINUXPYTHONINCLUDE = -I/usr/include/python2.2
+LINUXPYTHONINCLUDE = -I/usr/include/python2.5
 SYSTEMLIBDIR = /usr/lib
 
 #----------- Settings (Windows) -------------------------------

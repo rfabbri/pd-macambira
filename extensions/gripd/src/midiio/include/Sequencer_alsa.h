@@ -70,14 +70,14 @@ class Sequencer_alsa {
       static int    outdevcount;            // number of MIDI output devices
       static int    initialized;            // for starting buileinfodatabase
 
-      static Collection<snd_rawmidi_t*>  Sequencer_alsa::rawmidi_in;
-      static Collection<snd_rawmidi_t*>  Sequencer_alsa::rawmidi_out;
-      static Collection<int>             Sequencer_alsa::midiincard;
-      static Collection<int>             Sequencer_alsa::midioutcard;
-      static Collection<int>             Sequencer_alsa::midiindevice;
-      static Collection<int>             Sequencer_alsa::midioutdevice;
-      static Collection<char*>           Sequencer_alsa::midiinname;
-      static Collection<char*>           Sequencer_alsa::midioutname;
+      static Collection<snd_rawmidi_t*>  rawmidi_in;
+      static Collection<snd_rawmidi_t*>  rawmidi_out;
+      static Collection<int>             midiincard;
+      static Collection<int>             midioutcard;
+      static Collection<int>             midiindevice;
+      static Collection<int>             midioutdevice;
+      static Collection<char*>           midiinname;
+      static Collection<char*>           midioutname;
 
    private:
       static void   buildInfoDatabase     (void);
