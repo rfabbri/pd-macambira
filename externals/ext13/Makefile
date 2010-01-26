@@ -82,6 +82,8 @@ ifeq ($(UNAME),Darwin)
     FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
     CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include
     LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
+    # if the 'pd' binary exists, check the linking against it to aid with stripping
+    LDFLAGS += $(shell test -e $(PD_PATH)/bin/pd && echo -bundle_loader $(PD_PATH)/bin/pd)
     LIBS += -lc 
     STRIP = strip -x
     DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
