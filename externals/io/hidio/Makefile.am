@@ -1,7 +1,9 @@
 AUTOMAKE_OPTIONS = foreign
 
-noinst_PROGRAMS = hidio.@EXTENSION@
-SOURCES = hidio.c hidio_types.c
+EXEEXT = .@EXTENSION@
+
+noinst_PROGRAMS = hidio
+hidio_SOURCES = hidio.c hidio_types.c
 LDADD = 
 
 noinst_HEADERS = hidio.h input_arrays.h
@@ -9,7 +11,7 @@ noinst_HEADERS = hidio.h input_arrays.h
 EXTRA_SUBDIRS = 
 
 if MACOSX
-SOURCES += hidio_darwin.c
+hidio_SOURCES += hidio_darwin.c
 EXTRA_SUBDIRS += HID_Utilities_Source
 LDADD += HID_Utilities_Source/libHIDUtilities.a
 CFLAGS += -IHID_Utilities_Source
@@ -18,11 +20,16 @@ LDFLAGS += -bundle -undefined dynamic_lookup \
 endif
 
 if LINUX
-SOURCES += hidio_linux.c input_arrays.c
+hidio_SOURCES += hidio_linux.c input_arrays.c
+CFLAGS += -fPIC
+LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
 endif
 
 if WINDOWS
-SOURCES += hidio_windows.c
+hidio_SOURCES += hidio_windows.c
+LDADD += -L$(PD_PATH)/src -L$(PD_PATH)/bin -L$(PD_PATH)/obj -lpd
+CFLAGS += -mms-bitfields
+LDFLAGS += -s -shared
 endif
 
 # files that are included but not built
@@ -33,4 +40,3 @@ SUBDIRS = $(EXTRA_SUBDIRS)
 
 # subdirs that are always included in the dist, etc.
 DIST_SUBDIRS = HID_Utilities_Source
-
