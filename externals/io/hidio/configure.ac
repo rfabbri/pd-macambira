@@ -50,7 +50,7 @@ AC_ARG_WITH([pd],
 if test "z$with_pd" != "z"; then
     if test "z${with_pd%%/*}" = "z" ; then
         # it's an absolute path
-        if test -f $with_pd ; then
+        if test -d $with_pd ; then
 	        PD_PATH=$with_pd
         else
 	        AC_MSG_ERROR([The file \"$with_pd\" does not exist.])
@@ -73,7 +73,7 @@ fi
 
 AC_ARG_ENABLE([universal],
     [AS_HELP_STRING([--enable-universal],
-        [build universal binary on Mac OS X])], 
+        [build universal binary on Mac OS X (use with --disable-dependency-tracking)])], 
     [universal=$enableval], [universal=no])
 AM_CONDITIONAL(UNIVERSAL, test x$universal = xyes)
 if test x$universal = xyes; then
