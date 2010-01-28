@@ -59,7 +59,11 @@ AC_ARG_ENABLE([universal],
     [universal=$enableval], [universal=no])
 AM_CONDITIONAL(UNIVERSAL, test x$universal = xyes)
 if test x$universal = xyes; then
-   UNIVERSAL_FLAGS="-arch ppc -arch i386 -arch x86_64 -mmacosx-version-min=10.4"
+# I got this error:
+# ld: absolute addressing (perhaps -mdynamic-no-pic) used in _debug_post from
+# hidio.o not allowed in slidable image. Use '-read_only_relocs suppress' to
+# enable text relocs for architecture ppc
+   UNIVERSAL_FLAGS="-arch ppc -arch i386 -read_only_relocs suppress -mmacosx-version-min=10.4"
    CFLAGS="$CFLAGS -fast -ffast-math $UNIVERSAL_FLAGS"
    LDFLAGS="$LDFLAGS $UNIVERSAL_FLAGS"
 fi
@@ -86,3 +90,8 @@ AC_CONFIG_FILES([Makefile
 AC_OUTPUT
 
 dnl output some messages at the end
+
+AS_IF([test x$universal = xyes], [
+	    AC_MSG_RESULT(
+To build a Universal Binary on Mac OS X run it like this: 
+  ./configure --enable-universal --disable-dependency-tracking)])
