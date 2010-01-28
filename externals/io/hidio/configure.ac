@@ -4,9 +4,6 @@ AC_CONFIG_SRCDIR(hidio.c)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)
 
-PD_PATH=../../../pd
-CFLAGS="-DPD $CFLAGS -I$PD_PATH/src"
-
 case $host in
 *darwin*)
         MACOSX=yes
@@ -45,6 +42,27 @@ AC_PROG_MAKE_SET
 AC_SUBST(EXTENSION)
 
 AC_HEADER_STDC
+
+AC_ARG_WITH([pd],
+        [AS_HELP_STRING([--with-pd],
+           [location of pd sourcecode])], ,) 
+
+if test "z$with_pd" != "z"; then
+    if test "z${with_pd%%/*}" = "z" ; then
+        # it's an absolute path
+        if test -f $with_pd ; then
+	        PD_PATH=$with_pd
+        else
+	        AC_MSG_ERROR([The file \"$with_pd\" does not exist.])
+        fi
+    else
+        AC_MSG_ERROR([--with-pd requires an absolute path])
+    fi
+elif test -d ../../../pd; then
+	PD_PATH="../../../pd"
+fi
+AC_MSG_RESULT([checking for pd sourcecode... $PD_PATH])
+CFLAGS="-DPD $CFLAGS -I$PD_PATH/src"
 
 AC_ARG_ENABLE([debug],
     [AS_HELP_STRING([--enable-debug], [use debugging support])], 
@@ -95,3 +113,7 @@ AS_IF([test x$universal = xyes], [
 	    AC_MSG_RESULT(
 To build a Universal Binary on Mac OS X run it like this: 
   ./configure --enable-universal --disable-dependency-tracking)])
+
+echo "
+Building using Pd headers in $PD_PATH/src
+"
