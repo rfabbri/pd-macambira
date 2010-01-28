@@ -4,24 +4,28 @@ AC_CONFIG_SRCDIR(hidio.c)
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(1.9)
 
-CFLAGS="-DPD $CFLAGS"
-INCLUDES="-I../../../pd/src $INCLUDES"
+PD_PATH=../../../pd
+CFLAGS="-DPD $CFLAGS -I$PD_PATH/src"
 
 case $host in
 *darwin*)
-		MACOSX=yes
-		;;
+        MACOSX=yes
+        EXTENSION=pd_darwin
+        ;;
 *linux*)
-		LINUX=yes
-		;;
+        LINUX=yes
+        EXTENSION=pd_linux
+        ;;
 *mingw*)
-		WINDOWS=yes
-		MINGW=yes
-		;;
+        WINDOWS=yes
+        MINGW=yes
+        EXTENSION=dll
+        ;;
 *cygwin*)
-		WINDOWS=yes
-		CYGWIN=yes
-		;;
+        WINDOWS=yes
+        CYGWIN=yes
+        EXTENSION=dll
+        ;;
 esac
 AM_CONDITIONAL(ANDROID, test x$ANDROID = xyes)
 AM_CONDITIONAL(IPHONEOS, test x$IPHONEOS = xyes)
@@ -38,21 +42,20 @@ AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_MAKE_SET
 
-AC_SUBST(EXTERNTARGET)
-AC_SUBST(INCLUDES)
+AC_SUBST(EXTENSION)
 
 AC_HEADER_STDC
 
 AC_ARG_ENABLE([debug],
-	[AS_HELP_STRING([--enable-debug], [use debugging support])], 
-		[debug=$enableval])
+    [AS_HELP_STRING([--enable-debug], [use debugging support])], 
+        [debug=$enableval])
 if test x$debug = xyes; then
     CFLAGS="$CFLAGS -g"
 fi
 
 AC_ARG_ENABLE([universal],
-	[AS_HELP_STRING([--enable-universal],
-		[build universal binary on Mac OS X])], 
+    [AS_HELP_STRING([--enable-universal],
+        [build universal binary on Mac OS X])], 
     [universal=$enableval], [universal=no])
 AM_CONDITIONAL(UNIVERSAL, test x$universal = xyes)
 if test x$universal = xyes; then
@@ -62,23 +65,19 @@ if test x$universal = xyes; then
 fi
 
 # Checks for header files.
-AC_FUNC_ALLOCA
-AC_CHECK_HEADERS([fcntl.h limits.h malloc.h stddef.h stdlib.h string.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h sys/timeb.h unistd.h])
+AC_CHECK_HEADERS([malloc.h string.h sys/time.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_TYPE_INT16_T
-AC_TYPE_INT32_T
-AC_TYPE_OFF_T
-AC_TYPE_PID_T
+dnl AC_TYPE_INT16_T
+dnl AC_TYPE_INT32_T
+dnl AC_TYPE_OFF_T
+dnl AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_FUNC_ERROR_AT_LINE
 AC_FUNC_FORK
 AC_FUNC_MALLOC
-AC_FUNC_REALLOC
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS([getcwd memmove memset pow regcomp select socket strchr strrchr strstr strtol])
 
 # Specify what files are to be created.
 AC_CONFIG_FILES([Makefile
