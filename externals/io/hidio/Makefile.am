@@ -33,10 +33,16 @@ LDFLAGS += -s -shared
 endif
 
 # files that are included but not built
-EXTRA_DIST = COPYING README TODO
+EXTRA_DIST = COPYING README TODO hidio-help.pd
 
 # subdirs that are built
 SUBDIRS = $(EXTRA_SUBDIRS)
 
 # subdirs that are always included in the dist, etc.
 DIST_SUBDIRS = HID_Utilities_Source
+
+dist-hook:
+	mkdir $(distdir)/examples
+	cp -p $(srcdir)/examples/*.pd $(distdir)/examples
+	mkdir $(distdir)/test
+	cp -p $(srcdir)/test/*.pd $(distdir)/test
