@@ -1,4 +1,4 @@
-#N canvas 249 252 1031 627 10;
+#N canvas 157 178 1031 627 10;
 #X obj 488 438 comport 1 9600;
 #X msg 276 421 66;
 #X msg 234 421 64;
@@ -48,10 +48,10 @@ maybe if suid is root damage the system.;
 #X text 560 206 set poll interval for read in ms;
 #X msg 321 254 info;
 #X floatatom 569 497 10 0 0 1 baud - -;
-#X floatatom 650 538 3 0 0 3 parity - -;
-#X floatatom 678 538 3 0 0 2 stop - -;
-#X floatatom 705 537 3 0 0 3 data - -;
-#X floatatom 787 499 3 0 0 0 port - -;
+#X floatatom 644 538 3 0 0 3 parity - -;
+#X floatatom 669 538 3 0 0 2 stop - -;
+#X floatatom 694 537 3 0 0 3 data - -;
+#X floatatom 770 499 3 0 0 0 port - -;
 #X msg 544 291 devices;
 #X obj 141 74 % 255;
 #X floatatom 179 91 5 0 0 0 - - -;
@@ -60,16 +60,16 @@ maybe if suid is root damage the system.;
 #X obj 170 130 sel 0;
 #X floatatom 249 147 4 0 0 0 ascii - -;
 #X msg 524 271 open 0;
-#X obj 732 503 tgl 15 0 empty empty rts/cts -10 20 1 11 -24198 -258699
+#X obj 719 503 tgl 15 0 empty empty rts/cts -10 20 1 11 -24198 -258699
 -1 0 1;
-#X obj 759 529 tgl 15 0 empty empty xon/xoff -14 20 1 11 -24198 -258699
+#X obj 745 519 tgl 15 0 empty empty xon/xoff -14 20 1 11 -24198 -258699
 -1 0 1;
 #X text 508 537 serial packet format:;
-#X text 658 500 handshaking:;
-#X text 468 569 flow control inputs:;
-#X obj 596 569 tgl 15 0 empty empty dsr 0 20 1 11 -24198 -258699 -1
+#X text 660 487 handshaking:;
+#X text 466 569 flow control inputs:;
+#X obj 594 569 tgl 15 0 empty empty dsr 0 20 1 11 -24198 -258699 -1
 0 1;
-#X obj 623 569 tgl 15 0 empty empty cts 0 20 1 11 -24198 -258699 -1
+#X obj 619 569 tgl 15 0 empty empty cts 0 20 1 11 -24198 -258699 -1
 0 1;
 #N canvas 307 43 789 479 bauds 0;
 #X msg 319 274 baud 57600;
@@ -146,10 +146,10 @@ maybe if suid is root damage the system.;
 -1 0 1;
 #X text 17 -4 comport: a serial port interface;
 #X msg 243 176 13;
-#X obj 814 498 tgl 15 0 empty empty open -6 20 1 11 -24198 -258699
--1 0 1;
+#X obj 795 500 tgl 15 0 empty empty open -6 20 1 11 -24198 -258699
+-1 1 1;
 #X msg 565 312 ports;
-#X obj 841 531 print port_list;
+#X obj 820 534 print port_list;
 #X text 611 311 list available ports on right outlet;
 #X msg 275 208 48 49 50 51 52 53 54 55 56 57;
 #X text 137 207 send a list of bytes:;
@@ -160,15 +160,12 @@ maybe if suid is root damage the system.;
 -1 0 1;
 #X text 704 386 hang up connection on last close;
 #X text 717 398 (not on Windows);
-#X obj 910 490 print other;
-#X text 37 526 2006-2008 Martin Peach;
+#X obj 934 490 print other;
 #X text 205 176 <CR>:;
 #X text 143 254 status list on right outlet:;
 #X text 257 300 print usage info:;
-#X obj 569 460 route baud dsr cts parity stop data rtscts xonxoff port
-open ports hupcl;
-#X obj 868 497 tgl 15 0 empty empty hupcl -6 20 1 11 -24198 -258699
--1 0 1;
+#X obj 845 497 tgl 15 0 empty empty hupcl -6 20 1 11 -24198 -258699
+-1 1 1;
 #X msg 452 110 1;
 #X msg 482 110 1.5;
 #X msg 513 110 2;
@@ -178,7 +175,11 @@ open ports hupcl;
 #X text 16 30 You can send bytes directly (0-255):;
 #X text 12 112 or from the terminal:;
 #X text 56 420 messages for the bird patch:;
-#X connect 0 1 86 0;
+#X floatatom 870 510 10 0 0 1 rxerrors - -;
+#X obj 569 460 route baud dsr cts parity stop data rtscts xonxoff port
+open ports hupcl rxerrors;
+#X text 37 526 2006-2010 Martin Peach;
+#X connect 0 1 96 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
 #X connect 5 0 0 0;
@@ -218,20 +219,21 @@ open ports hupcl;
 #X connect 75 0 0 0;
 #X connect 77 0 17 0;
 #X connect 78 0 77 0;
-#X connect 86 0 42 0;
-#X connect 86 1 60 0;
-#X connect 86 2 61 0;
-#X connect 86 3 43 0;
-#X connect 86 4 44 0;
-#X connect 86 5 45 0;
-#X connect 86 6 55 0;
-#X connect 86 7 56 0;
-#X connect 86 8 46 0;
-#X connect 86 9 69 0;
-#X connect 86 10 71 0;
-#X connect 86 11 87 0;
-#X connect 86 12 81 0;
-#X connect 88 0 92 0;
-#X connect 89 0 92 0;
-#X connect 90 0 92 0;
-#X connect 92 0 17 0;
+#X connect 86 0 90 0;
+#X connect 87 0 90 0;
+#X connect 88 0 90 0;
+#X connect 90 0 17 0;
+#X connect 96 0 42 0;
+#X connect 96 1 60 0;
+#X connect 96 2 61 0;
+#X connect 96 3 43 0;
+#X connect 96 4 44 0;
+#X connect 96 5 45 0;
+#X connect 96 6 55 0;
+#X connect 96 7 56 0;
+#X connect 96 8 46 0;
+#X connect 96 9 69 0;
+#X connect 96 10 71 0;
+#X connect 96 11 85 0;
+#X connect 96 12 95 0;
+#X connect 96 13 81 0;

@@ -277,6 +277,7 @@ static void comport_output_data_bits(t_comport *x);
 static void comport_output_rtscts(t_comport *x);
 static void comport_output_xonxoff(t_comport *x);
 static void comport_output_hupcl(t_comport *x);
+static void comport_output_rxerrors(t_comport *x);
 static void comport_enum(t_comport *x);
 static void comport_info(t_comport *x);
 static void comport_devices(t_comport *x);
@@ -1096,15 +1097,14 @@ static void comport_tick(t_comport *x)
 
     x->x_hit = 0;
 
-    if(fd == INVALID_HANDLE_VALUE) return;
-
-    /* while there are bytes, read them and send them out, ignore errors */
+    if(fd != INVALID_HANDLE_VALUE)
+    { /* while there are bytes, read them and send them out, ignore errors (!??) */
 #ifdef _WIN32
-    {
-        unsigned char serial_byte[1000];
-        DWORD         dwRead;
-        OVERLAPPED    osReader = {0};
-        DWORD         dwX;
+        unsigned char   serial_byte[1000];
+        DWORD           dwRead;
+        OVERLAPPED      osReader = {0};
+        DWORD           dwX;
+        DWORD           whicherr = 0;
 
         err = 0;
 
@@ -1122,37 +1122,38 @@ static void comport_tick(t_comport *x)
         else
         {
             err = -1;
+            whicherr = GetLastError();
         }
         CloseHandle(osReader.hEvent);
-    }
 #else
-    {
-        unsigned char   serial_byte;
+        unsigned char   serial_byte[1000];
         fd_set          com_rfds;
         int             count = 0;
+        int             i;
+        int             whicherr = 0;
 
         FD_ZERO(&com_rfds);
         FD_SET(fd,&com_rfds);
-
         while((err=select(fd+1,&com_rfds,NULL,NULL,&null_tv)) > 0)
         {
-            err = read(fd,(char *) &serial_byte,1);
-            /*  while(    (err = read(fd,(char *) &serial_byte,1)) > 0){ */
-            outlet_float(x->x_data_outlet, (t_float) serial_byte);
-            ++count;
+            ioctl(fd, FIONREAD, &count); /* load count with the number of bytes in the receive buffer */
+            /*err = read(fd,(char *) &serial_byte,1);*/
+            err = read(fd,(char *) &serial_byte, count);/* try to read count bytes */
+            if (err >= 0)
+            {
+                for (i = 0; i < err; ++i ) outlet_float(x->x_data_outlet, (t_float) serial_byte);
+            }
+            else whicherr = errno;
         }
-//      if( count > 0)
-//          post("--- %d", count);
+#endif /* _WIN32 */
+        if(err < 0)
+        { /* if a read error detected */
+            if(x->rxerrors < 10) /* ten times max */
+                post("RXERRORS on serial line (%d)\n", whicherr);
+            x->rxerrors++; /* remember */
+        }
+        if (!x->x_hit) clock_delay(x->x_clock, 1);
     }
-#endif
-
-    if(err < 0)
-    { /* if a read error detected */
-        if(x->rxerrors == 0) /* post it once */
-            post("RXERRORS on serial line\n");
-        x->rxerrors = 1; /* remember */
-    }
-    if (!x->x_hit) clock_delay(x->x_clock, 1);
 }
 
 static void comport_float(t_comport *x, t_float f)
@@ -1764,6 +1765,11 @@ static void comport_output_hupcl(t_comport *x)
     comport_output_status(x, gensym("hupcl"), x->hupcl);
 }
 
+static void comport_output_rxerrors(t_comport *x)
+{
+    comport_output_status(x, gensym("rxerrors"), x->rxerrors);
+}
+
 static void comport_output_open_status(t_comport *x)
 {
     if(x->comhandle == INVALID_HANDLE_VALUE)
@@ -1790,6 +1796,7 @@ static void comport_info(t_comport *x)
     comport_output_rtscts(x);
     comport_output_xonxoff(x);
     comport_output_hupcl(x);
+    comport_output_rxerrors(x);
 }
 
 /* ---------------- HELPER ------------------------- */
