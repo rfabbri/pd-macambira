@@ -2,7 +2,7 @@
 # LIBRARY_NAME variable. The folder for your project should have the same name
 # as your library.
 LIBRARY_NAME = ext13
-LIBRARY_VERSION = 0.17.0
+LIBRARY_VERSION = 0.17
 
 # Next, add your .c source files to the SOURCES variable.  The help files will
 # be included automatically

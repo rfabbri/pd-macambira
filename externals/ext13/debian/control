@@ -8,7 +8,7 @@ Homepage: http://puredata.info
 
 Package: pd-ext13
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, pd
 Description: a collection of externals for pd
  this ist ext13, a collection of externals for pd
  most of the code comes from other pd-object or externals
