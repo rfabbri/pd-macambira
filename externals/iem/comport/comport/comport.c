@@ -1138,10 +1138,10 @@ static void comport_tick(t_comport *x)
         {
             ioctl(fd, FIONREAD, &count); /* load count with the number of bytes in the receive buffer */
             /*err = read(fd,(char *) &serial_byte,1);*/
-            err = read(fd,(char *) &serial_byte, count);/* try to read count bytes */
+            err = read(fd,(char *) serial_byte, count);/* try to read count bytes */
             if (err >= 0)
             {
-                for (i = 0; i < err; ++i ) outlet_float(x->x_data_outlet, (t_float) serial_byte);
+                for (i = 0; i < err; ++i ) outlet_float(x->x_data_outlet, (t_float) serial_byte[i]);
             }
             else whicherr = errno;
         }
