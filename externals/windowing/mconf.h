@@ -92,7 +92,7 @@ Copyright 1984, 1987, 1989, 1995 by Stephen L. Moshier
 
 /* Constant definitions for math error conditions
  */
-#ifndef NT
+#ifndef _WIN32
 #define DOMAIN		1	/* argument domain error */
 #define SING		2	/* argument singularity */
 #define OVERFLOW	3	/* overflow range error */
