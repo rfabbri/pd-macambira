@@ -1,4 +1,5 @@
 #include <m_pd.h>
+#include "g_canvas.h"
 
 #ifdef __gnu_linux__
 #include <sys/mman.h>
