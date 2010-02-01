@@ -458,12 +458,12 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
             return INVALID_HANDLE_VALUE;
         }
 
-        sprintf(buffer, "%s%d", x->serial_device_prefix, com_num);
+        sprintf_s(buffer, MAX_PATH, "%s%d", x->serial_device_prefix, com_num);
         x->serial_device = gensym(buffer);
     }
     else
     {
-        sprintf(buffer, "\\\\.\\%s", x->serial_device->s_name); /* assume the slashes were not prefixed by user */
+        sprintf_s(buffer, MAX_PATH, "\\\\.\\%s", x->serial_device->s_name); /* assume the slashes were not prefixed by user */
         x->serial_device = gensym(buffer);
     }
     post("Opening %s", &x->serial_device->s_name[4]);/* skip slashes and dot */
@@ -1567,7 +1567,7 @@ static void comport_enum(t_comport *x)
     DWORD           dw;
     for(i = 1; i < COMPORT_MAX; i++)
     {
-        sprintf(device_name, "%s%d", x->serial_device_prefix, i);
+        sprintf_s(device_name, 10, "%s%d", x->serial_device_prefix, i);
         fd = CreateFileA( device_name,
                 GENERIC_READ | GENERIC_WRITE,
                 0,
@@ -1631,7 +1631,7 @@ static void comport_ports(t_comport *x)
 
     for(i = 1; i < COMPORT_MAX; i++)
     {
-        sprintf(device_name, "%s%d", x->serial_device_prefix, i);
+        sprintf_s(device_name, 10, "%s%d", x->serial_device_prefix, i);
         fd = CreateFileA( device_name,
                 GENERIC_READ | GENERIC_WRITE,
                 0,
