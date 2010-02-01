@@ -18,6 +18,7 @@ MP 20070719 added "ports" method to output list of available ports on status out
 MP 20071011 added comport_list and write_serials for list processing based on code by Thomas O Fredericks <tof@danslchamp.org>
 MP 20071113 modified non-windows open_serial to set the index of the port when it's opened by name
 MP 20080916 fixed Windows version stop bits to set and display 1, 1.5 or 2 for "stopbits" input of 1, 1.5 or 2
+MP 20100201 use a buffer for writes, write takes place during clock callback comport_tick()
 */
 
 #include "m_pd.h"
@@ -48,35 +49,40 @@ MP 20080916 fixed Windows version stop bits to set and display 1, 1.5 or 2 for "
 
 typedef struct comport
 {
-    t_object       x_obj;
-    long           n; /* the state of a last input */
+    t_object        x_obj;
+    long            n; /* the state of a last input */
 #ifdef _WIN32
-    HANDLE         comhandle; /* holds the comport handle */
-    DCB            dcb; /* holds the comm pars */
-    DCB            dcb_old; /* holds the comm pars */
-    COMMTIMEOUTS   old_timeouts;
+    HANDLE          comhandle; /* holds the comport handle */
+    DCB             dcb; /* holds the comm pars */
+    DCB             dcb_old; /* holds the comm pars */
+    COMMTIMEOUTS    old_timeouts;
 #else
-    int            comhandle; /* holds the comport handle */
-    struct termios oldcom_termio; /* save the old com config */
-    struct termios com_termio; /* for the new com config */
+    int             comhandle; /* holds the comport handle */
+    struct termios  oldcom_termio; /* save the old com config */
+    struct termios  com_termio; /* for the new com config */
 #endif
-    t_symbol       *serial_device;
-    char           serial_device_prefix[FILENAME_MAX];/* the device name without the number */
-    short          comport; /* holds the comport # */
-    t_float        baud; /* holds the current baud rate */
-    t_float        data_bits; /* holds the current number of data bits */
-    t_float        parity_bit; /* holds the current parity */
-    t_float        stop_bits; /* holds the current number of stop bits */
-    int            xonxoff; /* nonzero if xonxoff handshaking is on */
-    int            ctsrts; /* nonzero if ctsrts handshaking is on */
-    int            hupcl; /* nonzero if hang-up on close is on */
-    short          rxerrors; /* holds the rx line errors */
-    t_clock        *x_clock;
-    int            x_hit;
-    double         x_deltime;
-    int            verbose;
-    t_outlet       *x_data_outlet;
-    t_outlet       *x_status_outlet;
+    t_symbol        *serial_device;
+    char            serial_device_prefix[FILENAME_MAX];/* the device name without the number */
+    short           comport; /* holds the comport # */
+    t_float         baud; /* holds the current baud rate */
+    t_float         data_bits; /* holds the current number of data bits */
+    t_float         parity_bit; /* holds the current parity */
+    t_float         stop_bits; /* holds the current number of stop bits */
+    int             xonxoff; /* nonzero if xonxoff handshaking is on */
+    int             ctsrts; /* nonzero if ctsrts handshaking is on */
+    int             hupcl; /* nonzero if hang-up on close is on */
+    short           rxerrors; /* holds the rx line errors */
+    t_clock         *x_clock;
+    int             x_hit;
+    double          x_deltime;
+    int             verbose;
+    t_outlet        *x_data_outlet;
+    t_outlet        *x_status_outlet;
+    unsigned char   *x_inbuf; /* read incoming serial to here */
+    unsigned char   *x_outbuf; /* write outgoing serial from here */
+    int             x_inbuf_len; /* length of inbuf */
+    int             x_outbuf_len; /* length of outbuf */
+    int             x_outbuf_wr_index; /* offset to next free location in x_outbuf */
 } t_comport;
 
 #ifndef TRUE
@@ -98,7 +104,7 @@ typedef struct comport
 
 #define COMPORT_MAX 99
 #define USE_DEVICENAME 9999 /* use the device name instead of the number */
-#define MAX_LIST 1000 /* arbitrary maximum list length for comport_list */
+#define COMPORT_BUF_SIZE 16384 /* this should be the largest possible packet size for a USB com port */
 
 #ifdef _WIN32
 /* we don't use the  table for windos cos we can set the number directly. */
@@ -235,7 +241,7 @@ static int set_rts(t_comport *x, int nr);
 static int set_xonxoff(t_comport *x, int nr);
 static int set_serial(t_comport *x);
 static int write_serial(t_comport *x, unsigned char serial_byte);
-static int write_serials(t_comport *x, unsigned char *serial_buf, size_t buf_length);
+static int write_serials(t_comport *x, unsigned char *serial_buf, int buf_length);
 static int comport_get_dsr(t_comport *x);
 static int comport_get_cts(t_comport *x);
 #ifdef _WIN32
@@ -461,7 +467,7 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
         x->serial_device = gensym(buffer);
     }
     post("Opening %s", &x->serial_device->s_name[4]);/* skip slashes and dot */
-    fd = CreateFile( x->serial_device->s_name,
+    fd = CreateFileA( x->serial_device->s_name,
         GENERIC_READ | GENERIC_WRITE,
         0,
         0,
@@ -608,73 +614,6 @@ static HANDLE close_serial(t_comport *x)
     return INVALID_HANDLE_VALUE;
 }
 
-
-static int write_serial(t_comport *x, unsigned char serial_byte)
-{
-    OVERLAPPED osWrite = {0};
-    DWORD      dwWritten;
-    DWORD      dwToWrite = 1L;
-    DWORD      dwErr;
-    DWORD      numTransferred = 0L;
-
-    osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    if (osWrite.hEvent == NULL)
-    {
-        post("Couldn't create event. Transmission aborted.");
-        return 0;
-    }
-
-    if (!WriteFile(x->comhandle, &serial_byte, dwToWrite, &dwWritten, &osWrite))
-    {
-        dwErr = GetLastError();
-        if (dwErr != ERROR_IO_PENDING)
-        {
-            post("WriteFile error: %d", (int)dwErr);
-            return 0;
-        }
-    }
-    if (!GetOverlappedResult(x->comhandle, &osWrite, &numTransferred, TRUE))
-    {/* wait for the character to be sent */
-        dwErr = GetLastError();
-        post("WriteFile:GetOverlappedResult error: %d", (int)dwErr);
-    }
-    CloseHandle(osWrite.hEvent);
-    return 1;
-}
-
-static int write_serials(t_comport *x, unsigned char *serial_buf, size_t buf_length)
-{
-    OVERLAPPED osWrite = {0};
-    DWORD      dwWritten;
-    DWORD      dwToWrite = (DWORD)buf_length;
-    DWORD      dwErr;
-    DWORD      numTransferred = 0L;
-
-    osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    if (osWrite.hEvent == NULL)
-    {
-        post("Couldn't create event. Transmission aborted.");
-        return 0;
-    }
-
-    if (!WriteFile(x->comhandle, serial_buf, dwToWrite, &dwWritten, &osWrite))
-    {
-        dwErr = GetLastError();
-        if (dwErr != ERROR_IO_PENDING)
-        {
-            post("WriteFile error: %d", (int)dwErr);
-            return 0;
-        }
-    }
-    if (!GetOverlappedResult(x->comhandle, &osWrite, &numTransferred, TRUE))
-    {/* wait for the character(s) to be sent */
-        dwErr = GetLastError();
-        post("WriteFile:GetOverlappedResult error: %d", (int)dwErr);
-    }
-    CloseHandle(osWrite.hEvent);
-    return 1;
-}
-
 static int comport_get_dsr(t_comport *x)
 {
     short  dsr_state = 0;
@@ -694,6 +633,7 @@ static int comport_get_dsr(t_comport *x)
     }
     return dsr_state;
 }
+
 int comport_get_cts(t_comport *x)
 {
     short cts_state = 0;
@@ -1026,29 +966,6 @@ static int set_serial(t_comport *x)
     return 1;
 }
 
-static int write_serial(t_comport *x, unsigned char  serial_byte)
-{
-    int result = write(x->comhandle,(char *) &serial_byte,1);
-    if (result != 1)
-        post ("[comport] write returned %d, errno is %d", result, errno);
-    return result;
-    /* flush pending I/O chars */
-/* but nowadays discards them ;-(
-    else
-    {
-        ioctl(x->comhandle,TCFLSH,TCOFLUSH);
-    }
-*/
-}
-
-static int write_serials(t_comport *x, unsigned char *serial_buf, size_t buf_length)
-{
-    int result = write(x->comhandle,(char *)serial_buf, buf_length);
-    if (result != (int)buf_length)
-        post ("[comport] write returned %d, errno is %d", result, errno);
-    return result;
-}
-
 static int comport_get_dsr(t_comport *x)
 {
     short  dsr_state = 0;
@@ -1100,7 +1017,6 @@ static void comport_tick(t_comport *x)
     if(fd != INVALID_HANDLE_VALUE)
     { /* while there are bytes, read them and send them out, ignore errors (!??) */
 #ifdef _WIN32
-        unsigned char   serial_byte[1000];
         DWORD           dwRead;
         OVERLAPPED      osReader = {0};
         DWORD           dwX;
@@ -1109,13 +1025,13 @@ static void comport_tick(t_comport *x)
         err = 0;
 
         osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-        if(ReadFile(x->comhandle, serial_byte, 1000, &dwRead, &osReader))
+        if(ReadFile(x->comhandle, x->x_inbuf, x->x_inbuf_len, &dwRead, &osReader))
         {
             if(dwRead > 0)
             {
-                for(dwX=0;dwX<dwRead;dwX++)
+                for(dwX = 0; dwX < dwRead ;dwX++)
                 {
-                    outlet_float(x->x_data_outlet, (t_float) serial_byte[dwX]);
+                    outlet_float(x->x_data_outlet, (t_float) x->x_inbuf[dwX]);
                 }
             }
         }
@@ -1126,7 +1042,6 @@ static void comport_tick(t_comport *x)
         }
         CloseHandle(osReader.hEvent);
 #else
-        unsigned char   serial_byte[1000];
         fd_set          com_rfds;
         int             count = 0;
         int             i;
@@ -1134,14 +1049,18 @@ static void comport_tick(t_comport *x)
 
         FD_ZERO(&com_rfds);
         FD_SET(fd,&com_rfds);
-        while((err=select(fd+1,&com_rfds,NULL,NULL,&null_tv)) > 0)
+        while((err = select(fd+1, &com_rfds, NULL, NULL, &null_tv)) > 0)
         {
-            ioctl(fd, FIONREAD, &count); /* load count with the number of bytes in the receive buffer */
+            ioctl(fd, FIONREAD, &count); /* load count with the number of bytes in the receive buffer... */
+            if (count > x->x_inbuf_len) count = x->x_inbuf_len; /* ...but no more than the buffer can hold */
             /*err = read(fd,(char *) &serial_byte,1);*/
-            err = read(fd,(char *) serial_byte, count);/* try to read count bytes */
+            err = read(fd,(char *)x->x_inbuf, count);/* try to read count bytes */
             if (err >= 0)
             {
-                for (i = 0; i < err; ++i ) outlet_float(x->x_data_outlet, (t_float) serial_byte[i]);
+                for (i = 0; i < err; ++i )
+                {
+                    outlet_float(x->x_data_outlet, (t_float) x->x_inbuf[i]);
+                }
             }
             else whicherr = errno;
         }
@@ -1152,8 +1071,67 @@ static void comport_tick(t_comport *x)
                 post("RXERRORS on serial line (%d)\n", whicherr);
             x->rxerrors++; /* remember */
         }
-        if (!x->x_hit) clock_delay(x->x_clock, 1);
+/* now if anything to send, send the output buffer */
+        if (0 != x->x_outbuf_wr_index)
+        {
+#ifdef _WIN32
+            OVERLAPPED osWrite = {0};
+            DWORD      dwWritten;
+            DWORD      dwToWrite = (DWORD)x->x_outbuf_wr_index;
+            DWORD      dwErr;
+            DWORD      numTransferred = 0L;
+
+            osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+            if (osWrite.hEvent == NULL)
+            {
+                post("[comport]: Couldn't create event. Transmission aborted.");
+                goto endsendevent;
+            }
+
+            else if (!WriteFile(x->comhandle, x->x_outbuf, dwToWrite, &dwWritten, &osWrite))
+            {
+                dwErr = GetLastError();
+                if (dwErr != ERROR_IO_PENDING)
+                {
+                    post("[comport]: WriteFile error: %d", (int)dwErr);
+                    goto endsendevent;
+                }
+            }
+            if (!GetOverlappedResult(x->comhandle, &osWrite, &numTransferred, TRUE))
+            {/* wait for the character(s) to be sent */
+                dwErr = GetLastError();
+                post("[comport]: WriteFile:GetOverlappedResult error: %d", (int)dwErr);
+            }
+endsendevent:
+            CloseHandle(osWrite.hEvent);
+#else
+            err = write(x->comhandle,(char *)x->x_outbuf, x->x_outbuf_wr_index);
+            if (err != x->x_outbuf_wr_index)
+            post ("[comport]: Write returned %d, errno is %d", err, errno);
+#endif /*_WIN32*/
+            x->x_outbuf_wr_index = 0; /* for now we just drop anything that didn't send */
+        }
+        if (!x->x_hit) clock_delay(x->x_clock, x->x_deltime); /* default 1 ms */
     }
+}
+
+static int write_serial(t_comport *x, unsigned char  serial_byte)
+{
+    if(x->x_outbuf_wr_index < x->x_outbuf_len)
+    {
+        x->x_outbuf[x->x_outbuf_wr_index++] = serial_byte;
+        return 1;
+    }    
+    /* handle overrun error */
+    else return 0;
+}
+
+static int write_serials(t_comport *x, unsigned char *serial_buf, int buf_length)
+{
+    int i;
+    for (i = 0; ((i < buf_length) && (x->x_outbuf_wr_index < x->x_outbuf_len)); ++x->x_outbuf_wr_index, ++i)
+        x->x_outbuf[x->x_outbuf_wr_index] = serial_buf[i];
+    return i;
 }
 
 static void comport_float(t_comport *x, t_float f)
@@ -1168,21 +1146,19 @@ static void comport_float(t_comport *x, t_float f)
 
 static void comport_list(t_comport *x, t_symbol *s, int argc, t_atom *argv)
 {
-    unsigned char   temp_array[MAX_LIST];/* arbitrary maximum list length */
+    unsigned char   temp_array[COMPORT_BUF_SIZE];/* arbitrary maximum list length */
     int             i, count;
     int             result;
 
     count = argc;
-    if (argc > MAX_LIST)
+    if (argc > COMPORT_BUF_SIZE)
     {
         post ("[comport] truncated list of %d elements to %d", argc, count);
-        count = MAX_LIST;
+        count = COMPORT_BUF_SIZE;
     }
     for(i = 0; i < count; i++)
         temp_array[i] = ((unsigned char)atom_getint(argv+i))&0xFF; /* brutal conv */
     result = write_serials(x, temp_array, count);
-    if (result < 0)
-        post ("[comport] write returned %d, errno is %d", result, errno);
 }
 
 static void *comport_new(t_symbol *s, int argc, t_atom *argv)
@@ -1265,6 +1241,23 @@ allows COM port numbers to be specified. */
 #endif
     }
 
+/* allocate memory for in and out buffers */
+    x->x_inbuf = getbytes(COMPORT_BUF_SIZE);
+    if (NULL == x->x_inbuf)
+    {
+        pd_error(x, "[comport] unable to allocate input buffer");
+        return 0;
+    }
+    x->x_inbuf_len = COMPORT_BUF_SIZE;
+    x->x_outbuf = getbytes(COMPORT_BUF_SIZE);
+    if (NULL == x->x_outbuf)
+    {
+        pd_error(x, "[comport] unable to allocate output buffer");
+        return 0;
+    }
+    x->x_outbuf_len = COMPORT_BUF_SIZE;
+    x->x_outbuf_wr_index = 0;
+
     x->rxerrors = 0; /* holds the rx line errors */
 
     x->x_data_outlet = outlet_new(&x->x_obj, &s_float);
@@ -1288,6 +1281,8 @@ static void comport_free(t_comport *x)
     clock_unset(x->x_clock);
     clock_free(x->x_clock);
     x->comhandle = close_serial(x);
+    freebytes(x->x_inbuf, x->x_inbuf_len);
+    freebytes(x->x_outbuf, x->x_outbuf_len);
 }
 
 /* ---------------- use serial settings ------------- */
@@ -1573,7 +1568,7 @@ static void comport_enum(t_comport *x)
     for(i = 1; i < COMPORT_MAX; i++)
     {
         sprintf(device_name, "%s%d", x->serial_device_prefix, i);
-        fd = CreateFile( device_name,
+        fd = CreateFileA( device_name,
                 GENERIC_READ | GENERIC_WRITE,
                 0,
                 0,
@@ -1637,7 +1632,7 @@ static void comport_ports(t_comport *x)
     for(i = 1; i < COMPORT_MAX; i++)
     {
         sprintf(device_name, "%s%d", x->serial_device_prefix, i);
-        fd = CreateFile( device_name,
+        fd = CreateFileA( device_name,
                 GENERIC_READ | GENERIC_WRITE,
                 0,
                 0,
