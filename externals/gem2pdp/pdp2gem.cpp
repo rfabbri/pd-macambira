@@ -10,6 +10,7 @@
 
 
 #include "pdp2gem.h"
+#include "Base/GemState.h"
 #include "yuv.h"
 
 CPPEXTERN_NEW_WITH_ONE_ARG(pdp2gem, t_symbol *, A_DEFSYM)
