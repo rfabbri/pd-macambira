@@ -1234,7 +1234,7 @@ allows COM port numbers to be specified. */
 
     if(fd == INVALID_HANDLE_VALUE )
     {
-        pd_error(x, "[comport] opening serial port %d failed!", com_num);
+        pd_error(x, "[comport] opening serial port %f failed!", com_num);
     }
     else
     {
