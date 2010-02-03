@@ -171,8 +171,6 @@ long baudspeedbittable[] =
 
 struct timeval null_tv;
 
-#endif /* else _WIN32 */
-
 #define BAUDRATETABLE_LEN 19
 
 static long baudratetable[] =
@@ -198,6 +196,8 @@ static long baudratetable[] =
     0L
 
 }; /* holds the baud rate selections */
+
+#endif /* else _WIN32 */
 
 /* From man cfsetospeed:
        cfsetospeed()  sets  the  output  baud  rate stored in the
@@ -506,7 +506,7 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
                 errStr = " ";
                 break;
         }
-        pd_error(x, "[comport]: could not open device %s:\n failure(%d) %s\n",
+        pd_error(x, "[comport]: could not open device %s:\n failure(%ld) %s\n",
         &x->serial_device->s_name[4], dw, errStr);
         return INVALID_HANDLE_VALUE;
     }
@@ -1025,12 +1025,19 @@ static void comport_tick(t_comport *x)
     { /* while there are bytes, read them and send them out, ignore errors (!??) */
 #ifdef _WIN32
         DWORD           dwRead;
-        OVERLAPPED      osReader = {0};
+        OVERLAPPED      osReader;
         DWORD           dwX;
         DWORD           whicherr = 0;
 
         err = 0;
-
+/* initialize all fields off osReader to zero to avoid gcc warnings about */
+/* missing initializer if we just do osReader ={0} */
+        osReader.hEvent = 0;
+        osReader.Internal = 0;
+        osReader.InternalHigh = 0;
+        osReader.Offset = 0;
+        osReader.OffsetHigh = 0;
+        osReader.Pointer = 0;
         osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
         if(ReadFile(x->comhandle, x->x_inbuf, x->x_inbuf_len, &dwRead, &osReader))
         {
@@ -1082,12 +1089,20 @@ static void comport_tick(t_comport *x)
         if (0 != x->x_outbuf_wr_index)
         {
 #ifdef _WIN32
-            OVERLAPPED osWrite = {0};
+            OVERLAPPED osWrite;
             DWORD      dwWritten;
             DWORD      dwToWrite = (DWORD)x->x_outbuf_wr_index;
             DWORD      dwErr;
             DWORD      numTransferred = 0L;
 
+/* initialize all fields off osWrite to zero to avoid gcc warnings about */
+/* missing initializer if we just do osWrite ={0} */
+            osWrite.hEvent = 0;
+            osWrite.Internal = 0;
+            osWrite.InternalHigh = 0;
+            osWrite.Offset = 0;
+            osWrite.OffsetHigh = 0;
+            osWrite.Pointer = 0;
             osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
             if (osWrite.hEvent == NULL)
             {
