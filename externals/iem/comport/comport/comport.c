@@ -1037,7 +1037,7 @@ static void comport_tick(t_comport *x)
         osReader.InternalHigh = 0;
         osReader.Offset = 0;
         osReader.OffsetHigh = 0;
-        osReader.Pointer = 0;
+        /*osReader.Pointer = 0; seems MinGW doesn't knoow about this one */
         osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
         if(ReadFile(x->comhandle, x->x_inbuf, x->x_inbuf_len, &dwRead, &osReader))
         {
@@ -1102,7 +1102,7 @@ static void comport_tick(t_comport *x)
             osWrite.InternalHigh = 0;
             osWrite.Offset = 0;
             osWrite.OffsetHigh = 0;
-            osWrite.Pointer = 0;
+            /*osWrite.Pointer = 0; seems MinGW doesn't know about this one */
             osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
             if (osWrite.hEvent == NULL)
             {
