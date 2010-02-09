@@ -2184,39 +2184,14 @@ postlude_clean:
 
 #------------------------------------------------------------------------------#
 # SIGPACK
-SIGPACK_NAME=sigpack
-SIGPACK_SRC := $(wildcard $(externals_src)/sigpack/source/*~.c)
-SIGPACK_VERSION := $(shell grep "define VERSION" \
-	$(externals_src)/sigpack/source/sIgpAck.c | cut -d '"' -f 2)
+sigpack:
+	make -C $(externals_src)/sigpack
 
-SIGPACK_OBJECTS := $(SIGPACK_SRC:.c=.o)
-$(SIGPACK_OBJECTS) : %.o : %.c
-	$(CC) $(CFLAGS) -O2 -funroll-loops -fomit-frame-pointer -o "$*.o" -c "$*.c"
-
-sigpack: $(SIGPACK_SRC:.c=.$(EXTENSION))
-
-sigpack_install: sigpack
-	install -d $(DESTDIR)$(objectsdir)/$(SIGPACK_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(SIGPACK_NAME) \
-		--author "weiss@weiss-archiv.de" \
-		--license "GNU GPL 2" \
-		--version "$(SIGPACK_VERSION)"
-	install -p $(SIGPACK_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(SIGPACK_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(SIGPACK_NAME)
-	install -p $(externals_src)/sigpack/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(SIGPACK_NAME)
-	install -p $(externals_src)/sigpack/help/*.pd \
-		$(DESTDIR)$(objectsdir)/$(SIGPACK_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(SIGPACK_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/sigpack/readme.txt \
-		$(DESTDIR)$(readmesdir)/$(SIGPACK_NAME).txt
+sigpack_install:
+	make -C $(externals_src)/sigpack DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 sigpack_clean:
-	-rm -f -- $(externals_src)/sigpack/source/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/sigpack/source/*.o
-	-rm -f -- $(externals_src)/sigpack/*/*.bak
-	-rm -f -- $(externals_src)/sigpack/*/*.*~
+	make -C $(externals_src)/sigpack clean
 
 
 #------------------------------------------------------------------------------#
@@ -2558,42 +2533,14 @@ vanilla_clean:
 
 #------------------------------------------------------------------------------#
 # WINDOWING
-WINDOWING_NAME=windowing
-WINDOWING_OBJECTS := $(wildcard $(externals_src)/windowing/*.c)
-WINDOWING_SHARED := $(wildcard $(externals_src)/windowing/shared/*.c)
-windowing_shared: $(WINDOWING_SHARED:.c=.o)
-#	$(CC) $(DYLIB_LDFLAGS) \
-#		-o $(externals_src)/windowing/libwindowing.$(DYLIB_EXTENSION) \
-#		 $(WINDOWING_SHARED:.c=.o)
+windowing:
+	make -C $(externals_src)/windowing
 
-windowing: windowing_shared $(WINDOWING_OBJECTS:.c=.$(EXTENSION))
-
-windowing_install: windowing
-	install -d $(DESTDIR)$(objectsdir)/$(WINDOWING_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(WINDOWING_NAME) \
-		--author "Joe Sarlo" \
-		--license "GPLv2 or later" 
-	install -p $(WINDOWING_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(WINDOWING_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(WINDOWING_NAME)
-	install -p $(externals_src)/windowing/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(WINDOWING_NAME)
-	install -p $(externals_src)/windowing/*-help.pd \
-		$(DESTDIR)$(objectsdir)/$(WINDOWING_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(WINDOWING_NAME)
-#	install -p $(externals_src)/windowing/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(WINDOWING_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/windowing/README \
-		$(DESTDIR)$(readmesdir)/$(WINDOWING_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(WINDOWING_NAME)
-	install -p $(externals_src)/windowing/examples/*.pd \
-		$(DESTDIR)$(examplesdir)/$(WINDOWING_NAME)
+windowing_install:
+	make -C $(externals_src)/windowing DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 windowing_clean:
-	-rm -f -- $(WINDOWING_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(WINDOWING_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/windowing/*.bak
-	-rm -f -- $(externals_src)/windowing/*.*~
+	make -C $(externals_src)/windowing clean
 
 
 #------------------------------------------------------------------------------#
