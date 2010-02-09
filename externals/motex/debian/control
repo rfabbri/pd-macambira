@@ -1,0 +1,14 @@
+Source: pd-motex
+Section: sound
+Priority: optional
+Maintainer: Paul Brossier <piem@debian.org>
+Build-Depends: debhelper (>= 7.0.50~), pure-data | pd
+Standards-Version: 3.8.3
+Homepage: http://puredata.info
+
+Package: pd-motex
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Description: Pd Externals by Iain Mott
+ A collection of externals from Iain Mott that mostly provide some 
+ math functions.

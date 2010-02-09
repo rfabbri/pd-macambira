@@ -2,15 +2,30 @@
 # LIBRARY_NAME variable. The folder for your project should have the same name
 # as your library.
 LIBRARY_NAME = motex
+LIBRARY_VERSION = 1.1.4
 
-# Next, add your source files to the SOURCES variable.
-SOURCES = getenv.c ln~.c pansig~.c pan~.c pol2rec~.c polygate~.c rec2pol~.c shuffle.c system.c
+# Next, add your .c source files to the SOURCES variable.  The help files will
+# be included automatically
+SOURCES = getenv.c ln~.c pan~.c pansig~.c pol2rec~.c polygate~.c rec2pol~.c shuffle.c system.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
-SOURCES_Darwin = 
-SOURCES_Linux = 
-SOURCES_Windows = 
+SOURCES_android = 
+SOURCES_cygwin = 
+SOURCES_macosx = 
+SOURCES_iphoneos = 
+SOURCES_linux =
+SOURCES_windows = 
+
+# list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
+# be included automatically
+PDOBJECTS = 
+
+# if you want to include any other files in the source and binary tarballs,
+# list them here.  This can be anything from header files, READMEs, example
+# patches, documentation, etc.
+EXTRA_DIST = README LICENSE
+
 
 #------------------------------------------------------------------------------#
 #
@@ -18,27 +33,63 @@ SOURCES_Windows =
 #
 #------------------------------------------------------------------------------#
 
-pd_src = ../../pd
-objectsdir = $(pd_src)/extra
+# where Pd lives
+PD_PATH = ../../pd
+# where to install the library
+prefix = /usr/local
+libdir = $(prefix)/lib
+pkglibdir = $(libdir)/pd-externals
+objectsdir = $(pkglibdir)
 
-CFLAGS = -DPD -I$(pd_src)/src -Wall -W -g
+
+INSTALL = install
+INSTALL_FILE    = $(INSTALL) -p -m 644
+INSTALL_DIR     = $(INSTALL) -p -m 755 -d
+
+CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
 LDFLAGS =  
 LIBS = 
+ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) \
+	         $(SOURCES_iphoneos) $(SOURCES_linux) $(SOURCES_windows)
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
-  SOURCES += $(SOURCES_Darwin)
-  EXTENSION = pd_darwin
-  OS = macosx
-  OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
-  FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
-  CFLAGS += -fPIC $(FAT_FLAGS)
-  LDFLAGS += -bundle -undefined dynamic_lookup $(FAT_FLAGS)
-  LIBS += -lc 
-  STRIP = strip -x
- endif
+  CPU := $(shell uname -p)
+  ifeq ($(CPU),arm) # iPhone/iPod Touch
+    SOURCES += $(SOURCES_macosx)
+    EXTENSION = pd_darwin
+    OS = iphoneos
+    IPHONE_BASE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin
+    CC=$(IPHONE_BASE)/gcc
+    CPP=$(IPHONE_BASE)/cpp
+    CXX=$(IPHONE_BASE)/g++
+    ISYSROOT = -isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.0.sdk
+    IPHONE_CFLAGS = -miphoneos-version-min=3.0 $(ISYSROOT) -arch armv6
+    OPT_CFLAGS = -fast -funroll-loops -fomit-frame-pointer
+	CFLAGS := $(IPHONE_CFLAGS) $(OPT_CFLAGS) $(CFLAGS)
+    LDFLAGS += -arch armv6 -bundle -undefined dynamic_lookup $(ISYSROOT)
+    LIBS += -lc 
+    STRIP = strip -x
+    DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
+    DISTBINDIR=$(DISTDIR)-$(OS)
+  else # Mac OS X
+    SOURCES += $(SOURCES_macosx)
+    EXTENSION = pd_darwin
+    OS = macosx
+    OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
+    FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
+    CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include
+    LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
+    # if the 'pd' binary exists, check the linking against it to aid with stripping
+    LDFLAGS += $(shell test -e $(PD_PATH)/bin/pd && echo -bundle_loader $(PD_PATH)/bin/pd)
+    LIBS += -lc 
+    STRIP = strip -x
+    DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
+    DISTBINDIR=$(DISTDIR)-$(OS)
+  endif
+endif
 ifeq ($(UNAME),Linux)
-  SOURCES += $(SOURCES_Linux)
+  SOURCES += $(SOURCES_linux)
   EXTENSION = pd_linux
   OS = linux
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
@@ -46,17 +97,33 @@ ifeq ($(UNAME),Linux)
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
   LIBS += -lc
   STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
+ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
+  SOURCES += $(SOURCES_cygwin)
+  EXTENSION = dll
+  OS = cygwin
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += 
+  LDFLAGS += -Wl,--export-dynamic -shared -L$(PD_PATH)/src
+  LIBS += -lc -lpd
+  STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
+  DISTBINDIR=$(DISTDIR)-$(OS)
 endif
 ifeq (MINGW,$(findstring MINGW,$(UNAME)))
-  SOURCES += $(SOURCES_Windows)
+  SOURCES += $(SOURCES_windows)
   EXTENSION = dll
   OS = windows
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -march=i686 -mtune=pentium4
   WINDOWS_HACKS = -D'O_NONBLOCK=1'
   CFLAGS += -mms-bitfields $(WINDOWS_HACKS)
   LDFLAGS += -s -shared -Wl,--enable-auto-import
-  LIBS += -L$(pd_src)/src -L$(pd_src)/bin -L$(pd_src)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
+  LIBS += -L$(PD_PATH)/src -L$(PD_PATH)/bin -L$(PD_PATH)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
   STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
+  DISTBINDIR=$(DISTDIR)-$(OS)
 endif
 
 CFLAGS += $(OPT_CFLAGS)
@@ -72,7 +139,6 @@ all: $(SOURCES:.c=.$(EXTENSION))
 %.$(EXTENSION): %.o
 	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS)
 	chmod a-x "$*.$(EXTENSION)"
-	rm -f -- $*.o
 
 # this links everything into a single binary file
 $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
@@ -84,28 +150,34 @@ install: libdir_install
 
 # The meta and help files are explicitly installed to make sure they are
 # actually there.  Those files are not optional, then need to be there.
-libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-exec
-	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(LIBRARY_NAME)-meta.pd $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION)))
+libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc
+	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd \
+		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	test -z "$(SOURCES)" || (\
+		$(INSTALL_FILE) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
+		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
+	test -z "$(PDOBJECTS)" || \
+		$(INSTALL_FILE) $(OBJECTS) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
 single_install: $(LIBRARY_NAME) install-doc install-exec
-	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_FILE) $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(STRIP) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
 
 install-doc:
-	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(SOURCES:.c=-help.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p README $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
-	install -m644 -p LICENCE $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
-
-install-exec:
-	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	test -z "$(SOURCES)" || \
+		$(INSTALL_FILE) $(SOURCES:.c=-help.pd) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	test -z "$(PDOBJECTS)" || \
+		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_FILE) README $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
+#	$(INSTALL_FILE) VERSION $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/VERSION.txt
+#	$(INSTALL_FILE) CHANGES $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/CHANGES.txt
 
 
 clean:
@@ -114,26 +186,51 @@ clean:
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
 
 distclean: clean
-	-rm -f -- ../$(LIBRARY_NAME)-$(OS)-$(shell uname -m).tar.bz2
-	-rm -f -- ../$(LIBRARY_NAME)-$(OS).tar.bz2
+	-rm -f -- $(DISTBINDIR).tar.gz
+	-rm -rf -- $(DISTBINDIR)
+	-rm -f -- $(DISTDIR).tar.gz
+	-rm -rf -- $(DISTDIR)
 
-dist: all dist_$(OS)
 
-dist_linux:
-	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS)-$(shell uname -m).tar.bz2 $(LIBRARY_NAME)
+$(DISTBINDIR):
+	$(INSTALL_DIR) $(DISTBINDIR)
 
-dist_macosx:
-	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
+libdir: all $(DISTBINDIR)
+	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTBINDIR)
+	$(INSTALL_FILE) $(SOURCES)  $(DISTBINDIR)
+	$(INSTALL_FILE) $(SOURCES:.c=-help.pd) $(DISTBINDIR)
+	test -z "$(EXTRA_DIST)" || \
+		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTBINDIR)
+#	tar --exclude-vcs -czpf $(DISTBINDIR).tar.gz $(DISTBINDIR)
 
-dist_windows:
-	cd .. && tar --exclude=.svn -cjpf $(LIBRARY_NAME)-$(OS).tar.bz2 $(LIBRARY_NAME)
+$(DISTDIR):
+	$(INSTALL_DIR) $(DISTDIR)
+
+dist: $(DISTDIR)
+	$(INSTALL_FILE) Makefile  $(DISTDIR)
+	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
+	test -z "$(ALLSOURCES)" || \
+		$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
+	test -z "$(ALLSOURCES)" || \
+		$(INSTALL_FILE) $(ALLSOURCES:.c=-help.pd) $(DISTDIR)
+	test -z "$(PDOBJECTS)" || \
+		$(INSTALL_FILE) $(PDOBJECTS)  $(DISTDIR)
+	test -z "$(PDOBJECTS)" || \
+		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) $(DISTDIR)
+	test -z "$(EXTRA_DIST)" || \
+		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTDIR)
+	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
 
 
 etags:
-	etags *.[ch] ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
+	etags *.h $(SOURCES) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
 showpaths:
-	@echo "pd_src: $(pd_src)"
+	@echo "PD_PATH: $(PD_PATH)"
 	@echo "objectsdir: $(objectsdir)"
 	@echo "LIBRARY_NAME: $(LIBRARY_NAME)"
 	@echo "SOURCES: $(SOURCES)"
+	@echo "ALLSOURCES: $(ALLSOURCES)"
+	@echo "UNAME: $(UNAME)"
+	@echo "CPU: $(CPU)"
+
