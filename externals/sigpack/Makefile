@@ -2,11 +2,11 @@
 # LIBRARY_NAME variable. The folder for your project should have the same name
 # as your library.
 LIBRARY_NAME = sigpack
-LIBRARY_VERSION = 0.0.3.1
+LIBRARY_VERSION = 0.0.4.1
 
 # Next, add your .c source files to the SOURCES variable.  The help files will
 # be included automatically
-SOURCES = chop~.c decimate~.c diode~.c foldback~.c foldover~.c freqdiv~.c freqshift~.c harmgen~.c rectify~.c round~.c saturate~.c sieve~.c split~.c ustep~.c vowel~.c 
+SOURCES = chop~.c decimate~.c diode~.c foldback~.c foldover~.c freqdiv~.c freqshift~.c hardlimit~.c harmgen~.c impulse~.c rectify~.c round~.c saturate~.c shape~.c sieve~.c split~.c transient~.c ustep~.c valverect~.c vowel~.c wavewrap~.c 
 
 
 # For objects that only build on certain platforms, add those to the SOURCES
@@ -25,7 +25,7 @@ PDOBJECTS =
 # if you want to include any other files in the source and binary tarballs,
 # list them here.  This can be anything from header files, READMEs, example
 # patches, documentation, etc.
-EXTRA_DIST = readme.txt sIgpAck.c LICENSE
+EXTRA_DIST = readme.txt sigpack.c LICENSE
 
 
 #------------------------------------------------------------------------------#

@@ -1,12 +1,12 @@
-#N canvas 149 271 419 288 12;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 381 374 379 281 10;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array rect 44100 float 0;
 #X coords 0 1 44099 -1 100 70 1;
 #X restore 231 159 graph;
-#X msg 21 113 bang;
+#X msg 30 116 bang;
 #X obj 62 75 osc~ 1.345;
 #X obj 75 133 tabwrite~ osc;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array osc 44100 float 0;
 #X coords 0 1 44099 -1 100 70 1;
 #X restore 230 72 graph;
@@ -16,9 +16,9 @@
 #X text 342 153 1;
 #X text 334 213 -1;
 #X obj 62 201 tabwrite~ rect;
-#X text 208 237 sIgpAck 0.01;
+#X text 277 244 sIgpAck 0.01;
 #X obj 62 165 rectify~;
-#X text 166 250 2002 www.weiss-archiv.de;
+#X text 205 256 2002 www.weiss-archiv.de;
 #X text 60 13 ---rectify~---;
 #X connect 1 0 3 0;
 #X connect 1 0 10 0;

@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+LIBRARY_NAME = sigpack
+PACKAGE = pd-$(LIBRARY_NAME)
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	make DESTDIR=$(CURDIR)/debian/$(PACKAGE) pkglibdir=/usr/lib/pd install
+
+override_dh_shlibdeps:
+	dpkg-shlibdeps $(CURDIR)/debian/$(PACKAGE)/usr/lib/pd/$(LIBRARY_NAME)/*.pd_linux \
+		-T$(CURDIR)/debian/$(PACKAGE).substvars
+

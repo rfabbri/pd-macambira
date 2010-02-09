@@ -1,0 +1,14 @@
+Debianized-By: Hans-Christoph Steiner <hans@eds.org> 
+Debianized-Date: Tue, 9 Feb 2010 17:14:25 -0400
+Original-Source: http://www.weiss-archiv.de/ext/sigpack-0.03-win32.zip
+Files: *
+Copyright: Copyright 2001-2007 weiss-archiv
+
+License: GPL-2+
+ This package is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ On Debian systems, the complete text of the GNU General Public License
+ version 2 can be found in file "/usr/share/common-licenses/GPL-2".
