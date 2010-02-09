@@ -131,8 +131,9 @@ static void *vvplus_new(t_symbol *s, int argc, t_atom *argv)
 
 void vvplus_setup(void)
 {
-  vvplus_class = class_new(gensym("vv+"), (t_newmethod)vvplus_new, 
+  vvplus_class = class_new(gensym("vvplus"), (t_newmethod)vvplus_new, 
 			    (t_method)vvplus_free, sizeof(t_vvplus), 0, A_GIMME, 0);
+  class_addcreator((t_newmethod)vvplus_new, gensym("vv+"), A_GIMME, 0);
   class_addlist(vvplus_class, vvplus_lst);
   class_addmethod  (vvplus_class, (t_method)vvplus_lst2, gensym(""), A_GIMME, 0);
   vvplus_scal_class = class_new(gensym("vv+"), 0, (t_method)vvplus_free, 

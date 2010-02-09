@@ -131,8 +131,9 @@ static void *vvminus_new(t_symbol *s, int argc, t_atom *argv)
 
 void vvminus_setup(void)
 {
-  vvminus_class = class_new(gensym("vv-"), (t_newmethod)vvminus_new, 
+  vvminus_class = class_new(gensym("vvminus"), (t_newmethod)vvminus_new, 
 			    (t_method)vvminus_free, sizeof(t_vvminus), 0, A_GIMME, 0);
+  class_addcreator((t_newmethod)vvplus_new, gensym("vv-"), A_GIMME, 0);
   class_addlist(vvminus_class, vvminus_lst);
   class_addmethod  (vvminus_class, (t_method)vvminus_lst2, gensym(""), A_GIMME, 0);
   vvminus_scal_class = class_new(gensym("vv-"), 0, (t_method)vvminus_free, 
