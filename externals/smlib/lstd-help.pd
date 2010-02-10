@@ -1,0 +1,9 @@
+#N canvas 559 356 441 199 10;
+#X text 353 169 j#|@2002;
+#X obj 375 147 SMLib-help;
+#X floatatom 74 115 5 0 0 0 - - -;
+#X obj 74 85 lstd;
+#X obj 76 47 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X connect 3 0 2 0;
+#X connect 4 0 3 0;

@@ -2228,38 +2228,17 @@ sixaxis_clean:
 	-rm -f -- $(externals_src)/io/sixaxis/*.*~
 
 
+
 #------------------------------------------------------------------------------#
 # SMLIB
-SMLIB_NAME=smlib
-# exclude SMlib.c since its just for the compiled library
-SMLIB_OBJECTS := $(wildcard $(externals_src)/smlib/source/[a-z]*.c)
-smlib: $(SMLIB_OBJECTS:.c=.$(EXTENSION))
+smlib:
+	make -C $(externals_src)/smlib
 
-smlib_install: smlib
-	install -d $(DESTDIR)$(objectsdir)/$(SMLIB_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(SMLIB_NAME) \
-		--author "Johannes Taelman <johannes.taelman@rug.ac.be>" \
-		--license "GNU GPL" \
-		--description "vector processing, vector analysis, vector synthesis, number stream analysis, number stream filters"
-	install -p $(SMLIB_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(SMLIB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(SMLIB_NAME)
-	install -p $(wildcard $(externals_src)/smlib/help/*.pd )\
-		$(DESTDIR)$(helpdir)/$(SMLIB_NAME)
-	install -p $(wildcard $(externals_src)/smlib/help/*.pd )\
-		$(DESTDIR)$(objectsdir)/$(SMLIB_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(SMLIB_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/smlib/readme.txt $(DESTDIR)$(readmesdir)/$(SMLIB_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(SMLIB_NAME)
-	install -p $(wildcard $(externals_src)/smlib/examples/*.pd) \
-		$(DESTDIR)$(examplesdir)/$(SMLIB_NAME)
+smlib_install:
+	make -C $(externals_src)/smlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 smlib_clean:
-	-rm -f -- $(SMLIB_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(externals_src)/smlib/*.o
-	-rm -f -- $(externals_src)/smlib/*.bak
-	-rm -f -- $(externals_src)/smlib/*.*~
-
+	make -C $(externals_src)/smlib clean
 
 
 #------------------------------------------------------------------------------#

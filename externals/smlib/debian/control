@@ -1,0 +1,16 @@
+Source: pd-smlib
+Section: sound
+Priority: optional
+Maintainer: Paul Brossier <piem@debian.org>
+Build-Depends: debhelper (>= 7.0.50~), puredata
+Standards-Version: 3.8.3
+Homepage: http://puredata.info
+
+Package: pd-smlib
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Description: signal processing library for mapping
+ SMLib is an external objects library for PD (pure data). It complements PD
+ with a set of objects for vector processing, vector analysis, vector
+ synthesis, number stream analysis, number stream filters.
+
