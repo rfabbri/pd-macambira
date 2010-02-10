@@ -25,7 +25,7 @@ PDOBJECTS =
 # if you want to include any other files in the source and binary tarballs,
 # list them here.  This can be anything from header files, READMEs, example
 # patches, documentation, etc.
-EXTRA_DIST = readme.txt sigpack.c LICENSE
+EXTRA_DIST = README.txt sigpack.c LICENSE
 
 
 #------------------------------------------------------------------------------#
@@ -130,7 +130,7 @@ endif
 CFLAGS += $(OPT_CFLAGS)
 
 
-.PHONY = install libdir_install single_install install-doc install-exec clean dist etags
+.PHONY = install libdir_install single_install install-doc install-exec install-examples clean dist etags
 
 all: $(SOURCES:.c=.$(EXTENSION))
 
@@ -155,11 +155,11 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd \
 		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	test -z "$(SOURCES)" || (\
+	test -z "$(strip $(SOURCES))" || (\
 		$(INSTALL_FILE) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
 		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
-	test -z "$(PDOBJECTS)" || \
-		$(INSTALL_FILE) $(OBJECTS) \
+	test -z "$(strip $(PDOBJECTS))" || \
+		$(INSTALL_FILE) $(PDOBJECTS) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
@@ -170,13 +170,13 @@ single_install: $(LIBRARY_NAME) install-doc install-exec
 
 install-doc:
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	test -z "$(SOURCES)" || \
+	test -z "$(strip $(SOURCES))" || \
 		$(INSTALL_FILE) $(SOURCES:.c=-help.pd) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	test -z "$(PDOBJECTS)" || \
+	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(INSTALL_FILE) readme.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/readme.txt
+	$(INSTALL_FILE) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
 
 install-examples:
 	test ! -d examples || (\
@@ -203,7 +203,7 @@ libdir: all $(DISTBINDIR)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTBINDIR)
 	$(INSTALL_FILE) $(SOURCES)  $(DISTBINDIR)
 	$(INSTALL_FILE) $(SOURCES:.c=-help.pd) $(DISTBINDIR)
-	test -z "$(EXTRA_DIST)" || \
+	test -z "$(strip $(EXTRA_DIST))" || \
 		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTBINDIR)
 #	tar --exclude-vcs -czpf $(DISTBINDIR).tar.gz $(DISTBINDIR)
 
@@ -213,15 +213,15 @@ $(DISTDIR):
 dist: $(DISTDIR)
 	$(INSTALL_FILE) Makefile  $(DISTDIR)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
-	test -z "$(ALLSOURCES)" || \
+	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
-	test -z "$(ALLSOURCES)" || \
+	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_FILE) $(ALLSOURCES:.c=-help.pd) $(DISTDIR)
-	test -z "$(PDOBJECTS)" || \
+	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_FILE) $(PDOBJECTS)  $(DISTDIR)
-	test -z "$(PDOBJECTS)" || \
+	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) $(DISTDIR)
-	test -z "$(EXTRA_DIST)" || \
+	test -z "$(strip $(EXTRA_DIST))" || \
 		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTDIR)
 	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
 
