@@ -7,7 +7,7 @@ Standards-Version: 3.8.3
 Homepage: http://puredata.info
 
 Package: pd-mapping
-Architecture: any
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
 Description: library for creatively mapping data
  The Mapping Library for Pd is a library of mapping primitives for mapping
