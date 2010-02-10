@@ -1,0 +1,20 @@
+#N canvas 203 196 454 322 10;
+#X text 331 261 j#|@2002;
+#X text 351 242 SMLib-help;
+#X obj 122 230 print;
+#X obj 109 55 random 10;
+#X obj 109 36 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 129 34 feed data;
+#X msg 149 130 -10;
+#X floatatom 132 91 5 0 0 0 - - -;
+#X obj 120 191 decimator 0.4;
+#X msg 226 144 clear;
+#X msg 201 92 factor 4;
+#X connect 3 0 7 0;
+#X connect 3 0 8 0;
+#X connect 4 0 3 0;
+#X connect 6 0 8 0;
+#X connect 8 0 2 0;
+#X connect 9 0 8 0;
+#X connect 10 0 8 0;
