@@ -1525,31 +1525,14 @@ loaders_clean:
 
 #------------------------------------------------------------------------------#
 # MAPPING
-MAPPING_NAME=mapping
-MAPPING_OBJECTS := $(wildcard $(externals_src)/mapping/src/*.c)
-mapping: $(MAPPING_OBJECTS:.c=.$(EXTENSION))
+mapping:
+	make -C $(externals_src)/mapping
 
-mapping_install: mapping
-	install -d $(DESTDIR)$(objectsdir)/$(MAPPING_NAME)
-# no compiled objects yet...
-#	install -p $(MAPPING_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(MAPPING_NAME)
-	install -p $(externals_src)/mapping/*.pd $(DESTDIR)$(objectsdir)/$(MAPPING_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(MAPPING_NAME)
-	install -p $(externals_src)/mapping/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(MAPPING_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(MAPPING_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/mapping/README.txt \
-		$(DESTDIR)$(readmesdir)/$(MAPPING_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(MAPPING_NAME)
-#	install -p $(externals_src)/mapping/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(MAPPING_NAME)
+mapping_install:
+	make -C $(externals_src)/mapping DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 mapping_clean:
-	-rm -f -- $(externals_src)/mapping/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/mapping/src/*.o
-	-rm -f -- $(externals_src)/mapping/*.bak
-	-rm -f -- $(externals_src)/mapping/*.*~
+	make -C $(externals_src)/mapping clean
 
 
 #------------------------------------------------------------------------------#

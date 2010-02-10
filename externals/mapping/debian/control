@@ -1,0 +1,18 @@
+Source: pd-mapping
+Section: sound
+Priority: optional
+Maintainer: Paul Brossier <piem@debian.org>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.8.3
+Homepage: http://puredata.info
+
+Package: pd-mapping
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Description: library for creatively mapping data
+ The Mapping Library for Pd is a library of mapping primitives for mapping
+ data to controls. Also included are techniques for conditioning sensor data
+ to make it usable in the context of instrument design. It is something like a
+ set of unit generators for mapping, plotting out the most basic building
+ blocks for creating instrument mappings.
+
