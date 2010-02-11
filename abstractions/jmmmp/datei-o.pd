@@ -5,13 +5,11 @@
 #X obj 31 61 hradio 15 1 0 4 empty empty empty 0 6 0 8 -262144 -1 -1
 0;
 #X obj 31 81 bang;
-#X obj 31 61 cnv 15 60 15 empty aa Datei_O 6 8 0 11 -233017 -66577
-0;
+#X obj 31 61 cnv 15 60 15 empty aa Datei_O 6 8 0 11 -233017 -1 0;
 #X obj 61 81 inlet;
 #X obj 61 101 route bang;
 #X obj 116 121 symbol;
-#X text 12 210 (C) 2006 João Pais - jmmmpais@googlemail.com
-;
+#X text 12 210 (C) 2006 João Pais - jmmmpais@googlemail.com;
 #N canvas 0 0 426 446 license 0;
 #X text 8 47 All rights reserved.;
 #X text 8 227 The names of its contributors may not be used to endorse

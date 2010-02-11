@@ -3,7 +3,7 @@
 #X obj 19 54 ctlin \$1;
 #X obj 99 54 inlet midi-sim;
 #X obj 136 104 hsl 50 8 0 127 0 0 empty empty empty -2 -6 0 8 -233017
--1 -1 600 0;
+-1 -1 2662 0;
 #X msg 133 83 set \$1;
 #X text 12 10 [m-i] - Automatic conversion of MIDI controller;
 #X text 236 150 Inlets;
@@ -51,7 +51,6 @@ in the documentation and/or other materials provided with the distribution.
 #X connect 1 0 4 0;
 #X connect 1 0 13 0;
 #X connect 1 0 14 0;
-#X connect 1 0 18 0;
 #X connect 2 0 4 0;
 #X connect 2 0 13 0;
 #X connect 2 0 14 0;

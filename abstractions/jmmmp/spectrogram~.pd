@@ -1,14 +1,14 @@
-#N canvas 181 61 560 613 10;
+#N canvas 181 61 560 570 10;
 #X obj 16 272 inlet~;
 #X obj 26 322 rfft~;
 #X obj 26 355 *~;
 #X obj 57 355 *~;
 #X obj 26 385 sqrt~;
 #X obj 26 292 hip~ 3;
-#X obj 39 481 metrum 100 1;
+#X obj 39 455 metrum 100 1;
 #X obj 59 246 hsl 100 10 1 50 0 0 \$0a \$0b Zoom -36 5 0 12 -228856
 -1 -1 0 1;
-#X obj 27 505 tabwrite~ \$0-spectrum;
+#X obj 27 475 tabwrite~ \$0-spectrum;
 #N canvas 0 0 450 300 (subpatch) 0;
 #X array \$0-spectrum 512 float 0;
 #X coords 0 1 511 0 512 180 1;
@@ -19,7 +19,7 @@
 #X obj 167 419 block~ 1024 1;
 #X text 167 299 Spectrum analyser based on M. Puckette's tutorial patch.
 Harmonic content is analysed in 512 bins resolution.;
-#X obj 17 525 outlet~;
+#X obj 17 495 outlet~;
 #X msg 167 359 xticks 0 64 1 \, yticks 0 0.25 1 \, xlabel -0.045 0
 128 256 384 512 \, ylabel -6 0 1;
 #X obj 26 435 /~ 511;
@@ -54,8 +54,8 @@ in the documentation and/or other materials provided with the distribution.
 ;
 #X text 8 27 jmmmpais@googlemail.com;
 #X text 8 7 Copyright 2006 \, João Pais;
-#X restore 16 582 pd license;
-#X text 13 564 (C) 2009 João Pais - jmmmpais@googlemail.com;
+#X restore 16 542 pd license;
+#X text 13 524 (C) 2009 João Pais - jmmmpais@googlemail.com;
 #X text 166 269 [spectrogram~] - Spectrogram with 512 bins resolution
 ;
 #X connect 0 0 5 0;
