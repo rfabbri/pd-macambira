@@ -10,7 +10,7 @@ pd_linux: gphoto.pd_linux
 .SUFFIXES: .pd_linux
 
 LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -g -W -Wshadow -Wstrict-prototypes \
+    -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch \
     -lgphoto2 -lpthread
 
@@ -19,7 +19,7 @@ LINUXINCLUDE =  -I../../src
 .c.pd_linux:
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c -ggdb
 	ld -shared -o $*.pd_linux $*.o -lc -lm -lgphoto2
-	#strip --strip-unneeded $*.pd_linux
+	strip --strip-unneeded $*.pd_linux
 	rm $*.o
 
 

@@ -1,18 +1,18 @@
-This is the readme for "gphoto" a libgphoto2 interface external for PD. 
+This is the readme for "gphoto" a digital camera interface externalPD. 
 
-popup is Copyright Ben Bogart 2009
+The PD gphoto external is Copyright Ben Bogart 2009
 
 If you have any questions/comments you can reach the author at ben@ekran.org.
 
 This program is distributed under the terms of the GNU General Public 
 License 
 
-popup is free software; you can redistribute it and/or modify
+gphoto is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or 
 (at your option) any later version.
 
-popup is distributed in the hope that it will be useful, 
+gphoto is distributed in the hope that it will be useful, 
 but WITHOUT ANY WARRANTY; without even the implied warranty of 
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details. 
@@ -26,6 +26,14 @@ USAGE:
 Put the binary in your extra folder.
 Put the helpfile in your 5.reference folder.
 
+ISSUES:
+
+libgphoto conflicts with imageMagick. If you are using gphoto with PDP or 
+Gem make sure you have compiled without imageMagick.
+
 TODO:
-* Add a function to wrap gp_error results, and set busy to 0.
-* Add getFile and getFiles functions for PTP file transfer functionality.
+
+Need to add a function that allows the user to query the details of params.
+Currently the gphoto2 command line tool must be use to find out proper param
+ranges and values.
+

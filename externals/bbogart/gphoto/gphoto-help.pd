@@ -1,55 +1,36 @@
-#N canvas 577 0 638 746 10;
-#X obj 66 606 print;
-#X msg 66 132 listconfig;
-#X msg 127 350 setconfig capture 1;
-#X msg 109 276 setconfig zoom 129;
-#X obj 107 606 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X obj 66 583 gphoto;
-#X msg 139 536 reset;
-#X msg 156 440 captureimages stop;
-#X text 20 18 This object interfaces with gphoto2 supported PTP cameras.
+#N canvas 637 363 569 399 10;
+#X msg 34 120 getconfig model;
+#X obj 23 352 print;
+#X msg 29 95 listconfig;
+#X obj 23 308 gphoto;
+#X msg 23 70 open;
+#X obj 56 331 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X msg 52 274 close;
+#X msg 47 186 capture test.jpg;
+#X text 18 11 gphoto external uses libgphoto2 to control compatible
+PTP cameras. For a list of compatible cameras see \; http://www.gphoto.org/doc/remote/
 ;
-#X text 20 38 This object is intended for remote capture control. For
-a list of supported cameras see: http://www.gphoto.org/doc/remote;
-#X text 129 606 Finished command.;
-#X msg 163 475 captureimages image.jpg 2;
-#X msg 141 384 captureimage image.jpg;
-#X text 64 107 Camera Properties;
-#X msg 80 197 configdetail \$1;
-#X symbolatom 80 179 10 0 0 0 - - -;
-#X text 185 244 Get value of a particular camera property \, ie "model"
+#X text 63 69 Autodetect cameras and attempt to open connection.;
+#X text 106 94 List available parameters;
+#X text 142 119 Get value of "model" parameter;
+#X text 173 148 Set value of a capture parameter (needed to do remote
+shutter release on Canon cameras);
+#X text 160 185 Trigger shutter and download image;
+#X text 170 214 Set value of "zoom" parameter to "11" (you can set
+these to values that are NOT campatible with the camera. Make sure
+you are using compatible values with: "gphoto2 --get-config zoom")
 ;
-#X msg 96 244 getconfig \$1;
-#X symbolatom 96 226 10 0 0 0 - - -;
-#X text 239 276 Set value of a particular camera property \, ie "zoom"
+#X text 97 274 Close connection to camera (does not retract lens!)
 ;
-#X text 127 329 Remote Capture;
-#X text 258 350 On Canon Cameras capture must be set first.;
-#X text 288 384 Capture a single image.;
-#X msg 156 420 captureimages image-%05d.jpg 2;
-#X text 354 420 Capture image every 2 seconds;
-#X text 284 440 Stop capturing images.;
-#X text 328 475 Overwrite single file every 2 seconds.;
-#X text 189 536 reset internal state (only use if you know what your
-doing \, ie camera battery dies or is dissconnected and the internal
-state no longer matches the camera state.);
-#X text 184 196 Get detailed info on a particular camera property.
-It must be in the list returned by listconfig \, ie "zoom".;
-#X text 142 125 List camera properties (arguments to get/set config).
-"capture" property must be set to list capture properties \, ie zoom.
-;
-#X connect 1 0 5 0;
-#X connect 2 0 5 0;
-#X connect 3 0 5 0;
-#X connect 5 0 0 0;
-#X connect 5 1 4 0;
-#X connect 6 0 5 0;
-#X connect 7 0 5 0;
-#X connect 11 0 5 0;
-#X connect 12 0 5 0;
-#X connect 14 0 5 0;
-#X connect 15 0 14 0;
-#X connect 17 0 5 0;
-#X connect 18 0 17 0;
-#X connect 23 0 5 0;
+#X msg 40 153 setconfig capture 1;
+#X msg 52 229 setconfig zoom 50;
+#X connect 0 0 3 0;
+#X connect 2 0 3 0;
+#X connect 3 0 1 0;
+#X connect 3 1 5 0;
+#X connect 4 0 3 0;
+#X connect 6 0 3 0;
+#X connect 7 0 3 0;
+#X connect 16 0 3 0;
+#X connect 17 0 3 0;
