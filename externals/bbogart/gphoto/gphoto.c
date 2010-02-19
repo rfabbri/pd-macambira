@@ -88,7 +88,6 @@ void *closeCam(void *gphoto) {
 	int gp_ret;
 
 	gp_camera_free(((gphoto_struct *)gphoto)->camera);
-	post("camera free");
 
 	// Send state out 2nd outlet.
 	sys_lock();
@@ -431,11 +430,10 @@ static void *gphoto_new(void) {
 	return (void *)gphoto;
 }
 
-// Destructor to cleanup camera if its still open.
+// Destructor to cleanup camera if it's still open.
 static void *gphoto_free(gphoto_struct *gphoto) {
 	if (!gphoto->connected) {
 		gp_camera_free(gphoto->camera);
-		post("camera free"); // TODO remove me!
 	}
 }
 	
