@@ -11,7 +11,7 @@
 #include <math.h>
 #endif
 
-#ifdef NT
+#ifdef _WIN32
 int random(void)
 {
     static int foo = 1489853723;
