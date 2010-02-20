@@ -1,0 +1,17 @@
+Source: pd-markex
+Section: sound
+Priority: optional
+Maintainer: Paul Brossier <piem@debian.org>
+Build-Depends: debhelper (>= 7.0.50~), puredata
+Standards-Version: 3.8.3
+Homepage: http://puredata.info
+
+Package: pd-markex
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Description: library of misc objects from Mark Danks
+ Markex is an external library of miscellaneous objects that was begun in 1994
+ and originally included in GEM.  It is largely here for the sake of old
+ projects that might still rely on it.  The included functionality has been
+ improved in other libraries.
+

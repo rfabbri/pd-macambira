@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 1997-1999 Mark Danks.
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
- * WARRANTIES, see the file, "GEM.LICENSE.TERMS" in this distribution.
+ * WARRANTIES, see the file, "LICENSE.txt" in this distribution.
  */
 
 /* Original code by Miller Puckette */
