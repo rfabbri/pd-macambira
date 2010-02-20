@@ -1,0 +1,4 @@
+#N canvas 407 449 450 300 10;
+#X text 138 59 MarkEx vector operation;
+#X text 133 181 (placeholder help patch);
+#X obj 177 112 vectorabs;

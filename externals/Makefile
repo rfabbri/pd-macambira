@@ -1107,77 +1107,6 @@ hidin_clean:
 
 
 #------------------------------------------------------------------------------#
-# HIDIO
-HIDIO_NAME = hidio
-ifeq ($(OS_NAME),windows)
-  HIDIO_SRC = hidio_windows.c hidio_types.c hidio.c
-  HIDIO_CFLAGS = $(CFLAGS) 
-  HIDIO_LIBS = $(LIBS) -lhid -lsetupapi
-endif
-ifeq ($(OS_NAME),darwin)
-  HIDIO_SRC = hidio_darwin.c hidio_types.c hidio.c
-  FRAMEWORKS = Carbon IOKit ForceFeedback
-  HIDIO_CFLAGS = $(CFLAGS) -I$(externals_src)/io/hidio/HID\ Utilities\ Source
-  HIDIO_HID_UTILITIES_SOURCE = $(externals_src)/io/hidio/HID\ Utilities\ Source
-  HIDIO_LIBS = $(LIBS) -L$(HIDIO_HID_UTILITIES_SOURCE)/build \
-    -L$(HIDIO_HID_UTILITIES_SOURCE)/build/Default \
-    -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
-endif
-ifeq ($(OS_NAME),linux)
-  HIDIO_SRC = input_arrays.c hidio_linux.c hidio_types.c hidio.c
-  HIDIO_CFLAGS = $(CFLAGS) 
-  HIDIO_LIBS = $(LIBS)
-endif
-
-HIDIO_OBJECTS := $(patsubst %.c, $(externals_src)/io/hidio/%.o, $(HIDIO_SRC))
-$(HIDIO_OBJECTS) : %.o : %.c
-	$(CC) $(HIDIO_CFLAGS) -o "$*.o" -c "$*.c"
-
-$(HIDIO_HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a:
-# Apple changed the XCode CLI tool's name in xcode2... arg
-# if on non-Mac OS X, this target just echos a message
-ifeq ($(UNAME),Darwin)
-	cd $(HIDIO_HID_UTILITIES_SOURCE) && \
-		(test -x /usr/bin/xcodebuild && /usr/bin/xcodebuild) || \
-			(test -x /usr/bin/pbxbuild && /usr/bin/pbxbuild) || \
-				echo "Not building Apple HID Utilities"
-endif
-
-$(externals_src)/io/hidio/hidio.$(EXTENSION): $(HIDIO_OBJECTS) \
-$(HIDIO_HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
-	$(CC) $(LDFLAGS) -o $(externals_src)/io/hidio/hidio.$(EXTENSION) \
-		$(HIDIO_OBJECTS) $(HIDIO_LIBS)
-#	$(STRIP) $(externals_src)/io/hidio/hidio.$(EXTENSION)
-
-hidio: $(externals_src)/io/hidio/hidio.$(EXTENSION)
-
-hidio_install: hidio
-	install -d $(DESTDIR)$(objectsdir)/$(HIDIO_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(HIDIO_NAME) \
-		--author "Hans-Christoph Steiner <hans@at.or.at>, Olaf Matthes <olaf@nullmedium.de>, David Merrill <dmerrill@media.mit.edu>" \
-		--description "I/O for USB HID and other supported devices" \
-		--license "GNU GPLv2" \
-		--version "0.0"
-	-install -p $(externals_src)/io/hidio/hidio.$(EXTENSION) $(DESTDIR)$(objectsdir)
-#	install -p $(externals_src)/io/hidio/*.pd $(DESTDIR)$(objectsdir)/$(HIDIO_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(HIDIO_NAME)
-	install -p $(externals_src)/io/hidio/*-help.pd  $(DESTDIR)$(helpdir)/$(HIDIO_NAME)
-#	install -p $(externals_src)/io/hidio/examples/*.pd $(DESTDIR)$(helpdir)/$(HIDIO_NAME)
-#	install -d $(DESTDIR)$(examplesdir)/$(HIDIO_NAME)
-#	install -p $(externals_src)/io/hidio/examples/*.pd  $(DESTDIR)$(examplesdir)/$(HIDIO_NAME)
-
-hidio_clean:
-	-rm -f -- $(HIDIO_OBJECTS:.c=.o)
-	-rm -f -- $(HIDIO_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(externals_src)/io/hidio/*.bak
-	-rm -f -- $(externals_src)/io/hidio/*.*~
-	-rm -f -- $(HIDIO_HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
-	-rm -f -- $(HIDIO_HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
-
-
-
-
-#------------------------------------------------------------------------------#
 # IEM_AMBI
 IEM_AMBI_NAME=iem_ambi
 # exclude the files for the single-file library format
@@ -1534,34 +1463,16 @@ mapping_install:
 mapping_clean:
 	make -C $(externals_src)/mapping clean
 
-
 #------------------------------------------------------------------------------#
 # MARKEX
-MARKEX_NAME=markex
-MARKEX_OBJECTS := $(wildcard $(externals_src)/markex/[a-z]*.c)
-markex: $(MARKEX_OBJECTS:.c=.$(EXTENSION))
+markex:
+	make -C $(externals_src)/markex
 
-markex_install: markex
-	install -d $(DESTDIR)$(objectsdir)/$(MARKEX_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(MARKEX_NAME) \
-		--author "Mark Danks" \
-		--license "GNU GPL"
-	install -p $(MARKEX_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(MARKEX_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(MARKEX_NAME)
-	install -p $(wildcard $(externals_src)/markex/*.pd) \
-		$(DESTDIR)$(helpdir)/$(MARKEX_NAME)
-	install -p $(wildcard $(externals_src)/markex/*.pd) \
-		$(DESTDIR)$(objectsdir)/$(MARKEX_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(MARKEX_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/markex/README \
-		$(DESTDIR)$(readmesdir)/$(MARKEX_NAME).txt
+markex_install:
+	make -C $(externals_src)/markex DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 markex_clean:
-	-rm -f -- $(externals_src)/markex/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/markex/*.o
-	-rm -f -- $(externals_src)/markex/*.bak
-	-rm -f -- $(externals_src)/markex/*.*~
+	make -C $(externals_src)/markex clean
 
 
 #------------------------------------------------------------------------------#
