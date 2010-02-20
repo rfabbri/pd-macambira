@@ -25,7 +25,7 @@ PDOBJECTS =
 # if you want to include any other files in the source and binary tarballs,
 # list them here.  This can be anything from header files, READMEs, example
 # patches, documentation, etc.
-EXTRA_DIST = readme.txt SMLib.c SMLib-help.pd SMLib.dsp SMLib.dsw SMLib.opt SMLib.plg
+EXTRA_DIST = README.txt SMLib.c SMLib-help.pd SMLib.dsp SMLib.dsw SMLib.opt SMLib.plg
 
 
 #------------------------------------------------------------------------------#
