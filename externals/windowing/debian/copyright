@@ -4,7 +4,7 @@ Original-Source: http://crca.ucsd.edu/~jsarlo/pd/windowing.tar.gz
 
 Files: bartlett~.c blackman~.c connes~.c cosine~.c gaussian~.c hamming~.c
 hanning~.c kaiser~.c lanczos~.c welch~.c
-Copyright: Copyright 2002 Joseph A. Sarlo
+Copyright: 2002, Joseph A. Sarlo
 
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@ License: GPL-2+
 
 
 Files: kaiser~.c, mconf.h
-Copyright: Copyright 1984, 1987, 1989, 1995, 2000 by Stephen L. Moshier
+Copyright: 1984, 1987, 1989, 1995, 2000, Stephen L. Moshier
 Original-Source: http://www.moshier.net/cephes-math-28.tar.gz
 
 License:

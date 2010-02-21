@@ -2,7 +2,7 @@ Debianized-By: Hans-Christoph Steiner <hans@eds.org>
 Debianized-Date: Tue, 9 Feb 2010 17:14:25 -0400
 Original-Source: http://www.weiss-archiv.de/ext/sigpack-0.04-win32.zip
 Files: *
-Copyright: Copyright 2001-2007 weiss-archiv
+Copyright: 2001-2007, weiss-archiv
 
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
