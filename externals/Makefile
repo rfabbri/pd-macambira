@@ -1595,39 +1595,17 @@ moocow_clean:
 	-rm -f -- $(MOOCOW_DIR)/*.*~
 
 
+
 #------------------------------------------------------------------------------#
 # MOONLIB
-MOONLIB_NAME=moonlib
-MOONLIB_OBJECTS := $(wildcard $(externals_src)/moonlib/*.c)
-moonlib: $(MOONLIB_OBJECTS:.c=.$(EXTENSION))
+moonlib:
+	make -C $(externals_src)/moonlib
 
-moonlib_install: moonlib
-	install -d $(DESTDIR)$(objectsdir)/$(MOONLIB_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(MOONLIB_NAME) \
-		--author "Antoine Rousseau" \
-		--version "0.2"
-	install -p $(MOONLIB_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(MOONLIB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(MOONLIB_NAME)
-	install -p $(externals_src)/moonlib/help/*.pd $(DESTDIR)$(objectsdir)/$(MOONLIB_NAME)
-	install -p $(externals_src)/moonlib/help/*.pd $(DESTDIR)$(helpdir)/$(MOONLIB_NAME)
-	install -p $(externals_src)/moonlib/help/*.gif $(DESTDIR)$(helpdir)/$(MOONLIB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(MOONLIB_NAME)/d
-	install -p $(externals_src)/moonlib/help/d/*.gif $(DESTDIR)$(helpdir)/$(MOONLIB_NAME)/d
-#	install -d $(DESTDIR)$(manualsdir)/$(MOONLIB_NAME)
-#	install -p $(externals_src)/moonlib/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(MOONLIB_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/moonlib/README.txt \
-		$(DESTDIR)$(readmesdir)/$(MOONLIB_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(MOONLIB_NAME)
-#	install -p $(externals_src)/moonlib/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(MOONLIB_NAME)
+moonlib_install:
+	make -C $(externals_src)/moonlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 moonlib_clean:
-	-rm -f -- $(MOONLIB_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(MOONLIB_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/moonlib/*.bak
-	-rm -f -- $(externals_src)/moonlib/*.*~
+	make -C $(externals_src)/moonlib clean
 
 
 
