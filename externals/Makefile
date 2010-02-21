@@ -1508,33 +1508,15 @@ maxlib_clean:
 
 #------------------------------------------------------------------------------#
 # MJLIB
-MJLIB_NAME=mjlib
-# exclude the library file mjLib.c
-MJLIB_OBJECTS := $(wildcard $(externals_src)/mjlib/[a-z]?[a-z]*.c)
-mjlib: $(MJLIB_OBJECTS:.c=.$(EXTENSION))
+mjlib:
+	make -C $(externals_src)/mjlib
 
-mjlib_install: mjlib
-	install -d $(DESTDIR)$(objectsdir)/$(MJLIB_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(MJLIB_NAME) \
-		--author "mark williamson <mark@junklight.com>" \
-		--license "GNU GPL" \
-		--version "0.1"
-	install -p $(MJLIB_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(MJLIB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(MJLIB_NAME)
-	install -p $(wildcard $(externals_src)/mjlib/doc/*.pd) \
-		$(DESTDIR)$(helpdir)/$(MJLIB_NAME)
-	install -p $(wildcard $(externals_src)/mjlib/doc/*.pd) \
-		$(DESTDIR)$(objectsdir)/$(MJLIB_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(MJLIB_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/mjlib/readme.txt \
-		$(DESTDIR)$(readmesdir)/$(MJLIB_NAME).txt
+mjlib_install:
+	make -C $(externals_src)/mjlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 mjlib_clean:
-	-rm -f -- $(externals_src)/mjlib/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/mjlib/*.o
-	-rm -f -- $(externals_src)/mjlib/*.bak
-	-rm -f -- $(externals_src)/mjlib/*.*~
+	make -C $(externals_src)/mjlib clean
+
 
 
 #------------------------------------------------------------------------------#

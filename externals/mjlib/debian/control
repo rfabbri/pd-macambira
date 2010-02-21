@@ -1,0 +1,13 @@
+Source: pd-mjlib
+Section: sound
+Priority: optional
+Maintainer: Paul Brossier <piem@debian.org>
+Build-Depends: debhelper (>= 7.0.50~), puredata
+Standards-Version: 3.8.3
+Homepage: http://puredata.info
+
+Package: pd-mjlib
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Description: library of objects for composing music
+ A library of objects for composing music written by Mark Williamson.

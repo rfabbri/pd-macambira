@@ -1,0 +1,4 @@
+#N canvas 3 48 450 300 10;
+#X obj 162 123 convolve~;
+#X text 120 178 placeholder help patch;
+#X text 147 62 from mjlib;
