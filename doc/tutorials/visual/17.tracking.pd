@@ -120,7 +120,7 @@
 #X text 368 257 Set noise threshold;
 #X text 391 145 Render source video;
 #X obj 275 237 hsl 128 15 0 1 0 1 empty empty empty -2 -8 0 10 -262130
--1 -1 0 1;
+-1 -1 1200 1;
 #X floatatom 331 259 5 0 0 0 - - -;
 #X text 21 64 1) make sure no one is in the camera picture;
 #X text 21 84 2) click the [reset( message;
