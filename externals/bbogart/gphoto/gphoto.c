@@ -1,5 +1,5 @@
 /* Gphoto PD External */
-/* Copyright Ben Bogart, 2009 */
+/* Copyright Ben Bogart, 2009/2010 */
 /* This program is distributed under the params of the GNU Public License */
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -366,23 +366,27 @@ void *captureImage(void *threadArgs) {
 	CameraFile *camerafile;
 	CameraFilePath camera_file_path;
 	t_symbol *filename;
-	
+
+	sys_lock(); 
 	filename = atom_getsymbol( ((gphoto_gimme_struct *)threadArgs)->argv ); // destination filename
+	sys_unlock(); 
 
 	gp_ret = gp_camera_capture(((gphoto_gimme_struct *)threadArgs)->gphoto->camera, GP_CAPTURE_IMAGE, &camera_file_path, NULL); 
-	if (gp_ret != 0) {error("3gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(((gphoto_gimme_struct *)threadArgs)->gphoto->camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(((gphoto_gimme_struct *)threadArgs)->gphoto->camera); return(NULL);}
 
 	fd = open( filename->s_name, O_CREAT | O_WRONLY, 0644); // create file descriptor
 
 	gp_ret = gp_file_new_from_fd(&camerafile, fd); // create gphoto file from descriptor
-	if (gp_ret != 0) {error("4gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(((gphoto_gimme_struct *)threadArgs)->gphoto->camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(((gphoto_gimme_struct *)threadArgs)->gphoto->camera); return(NULL);}
 
 	gp_ret = gp_camera_file_get(((gphoto_gimme_struct *)threadArgs)->gphoto->camera, camera_file_path.folder, camera_file_path.name,
 		     GP_FILE_TYPE_NORMAL, camerafile, NULL); // get file from camera
-	if (gp_ret != 0) {error("5gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(((gphoto_gimme_struct *)threadArgs)->gphoto->camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(((gphoto_gimme_struct *)threadArgs)->gphoto->camera); return(NULL);}
 	
 	gp_ret = gp_camera_file_delete(((gphoto_gimme_struct *)threadArgs)->gphoto->camera, camera_file_path.folder, camera_file_path.name, NULL);
-	if (gp_ret != 0) {error("6gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); gp_camera_unref(((gphoto_gimme_struct *)threadArgs)->gphoto->camera); return(NULL);}
+	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(((gphoto_gimme_struct *)threadArgs)->gphoto->camera); return(NULL);}
+
+	close(fd); // close file descriptor
 
 	// Send bang out 2nd outlet when operation is done.
 	sys_lock();

@@ -24,7 +24,7 @@ you are using compatible values with: "gphoto2 --get-config zoom")
 #X text 97 274 Close connection to camera (does not retract lens!)
 ;
 #X msg 40 153 setconfig capture 1;
-#X msg 52 229 setconfig zoom 50;
+#X msg 52 229 setconfig zoom 60;
 #X connect 0 0 3 0;
 #X connect 2 0 3 0;
 #X connect 3 0 1 0;
