@@ -794,7 +794,7 @@ frankenstein_clean:
 
 #------------------------------------------------------------------------------#
 # FREEVERB
-FREEVERB_NAME=freeverb
+FREEVERB_NAME=freeverb~
 FREEVERB_OBJECTS := $(wildcard $(externals_src)/freeverb~/*.c)
 freeverb: $(FREEVERB_OBJECTS:.c=.$(EXTENSION))
 

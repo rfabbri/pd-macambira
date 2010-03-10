@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ECHO=/sw/bin/echo
-LIBS="libdir Gem cyclone zexy creb cxc iemlib list-abs mapping markex maxlib memento mjlib motex oscx pddp pdogg pixeltango pmpd rradical sigpack smlib toxy unauthorized vbap pan freeverb hcs jmmmp ext13 ggee iem_anything flib ekext flatspace pdp pidip"
+LIBS="libdir Gem cyclone zexy creb cxc iemlib list-abs mapping markex maxlib memento mjlib motex oscx pddp pdogg pixeltango pmpd rradical sigpack smlib toxy unauthorized vbap pan hcs jmmmp ext13 ggee iem_anything flib ekext flatspace pdp pidip"
 
 GNULINUX_FONTPATH="/var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType"
 MACOSX_FONTPATH="/System/Library/Fonts /Library/Fonts ~/Library/Fonts /usr/X11R6/lib/X11/fonts/TTF /System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/lib/fonts"
