@@ -1731,7 +1731,9 @@ pan_clean:
 #------------------------------------------------------------------------------#
 # PDDP
 PDDP_NAME=pddp
-pddp:
+pddp: $(bindir)
+	$(MAKE) OPT_CFLAGS="-O2 -fno-strict-aliasing -fPIC" \
+		-C $(externals_src)/miXed/pddp
 
 
 pddp_install: pddp
@@ -2193,7 +2195,9 @@ tof_clean:
 TOXY_NAME=toxy
 # toxy is compiled straight into $(OUT_DIR)
 TOXY_OUT_DIR=$(DESTDIR)$(objectsdir)/$(TOXY_NAME)
-toxy:
+toxy: $(bindir)
+	$(MAKE) OPT_CFLAGS="-O2 -fno-strict-aliasing -fPIC" \
+		-C $(externals_src)/miXed/toxy
 
 
 toxy_install: toxy
