@@ -46,7 +46,7 @@ pidip.pd_darwin: pdp_pidip_all
 
 pidip.pd_linux: pdp_pidip_all
 	rm -f pidip.pd_linux
-	g++ -export_dynamic -shared -o pidip.pd_linux modules/*.o system/*.o $(THEORA_LIBS) $(PDP_PIDIP_LIBS) $(IMLIB_LIBS) $(DC1394_LIBS)
+	g++ -Wl,--export-dynamic -shared -o pidip.pd_linux modules/*.o system/*.o $(THEORA_LIBS) $(PDP_PIDIP_LIBS) $(IMLIB_LIBS) $(DC1394_LIBS)
 	strip --strip-unneeded pidip.pd_linux
 
 clean:
