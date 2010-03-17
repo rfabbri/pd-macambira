@@ -118,7 +118,7 @@ ifeq ($(OS_NAME),darwin)
       libpddir = $(prefix)
       libpdbindir = $(bindir)
     else
-      libpddir = $(libdir)/pd
+      libpddir = $(libdir)/pd-extended
       libpdbindir = $(libpddir)/bin
     endif
 endif

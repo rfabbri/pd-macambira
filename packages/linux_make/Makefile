@@ -82,6 +82,7 @@ deb: DEB_BUILD_ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 deb: DEB_PD_VERSION := $(shell echo $(PD_VERSION) | sed 's|\(.*\)-extended-\(.*\)|\1~cvs\2-1|')
 deb: $(bindir)
 # free desktop menu, mime, and icon support
+# perhaps the icons should go in /usr/share/pixmaps like 'scribus'
 	install -d $(DESTDIR)/usr/share/icons/hicolor/128x128/apps
 	install -p -m0644 $(packages_src)/linux_make/pd.png \
 		$(DESTDIR)/usr/share/icons/hicolor/128x128/apps/
@@ -94,26 +95,29 @@ deb: $(bindir)
 	install -d $(DESTDIR)/usr/share/applications/ 
 	install -p -m0644 $(packages_src)/linux_make/pd-extended.desktop \
 		$(DESTDIR)/usr/share/applications/
+# add mime type to .pd files
 	install -d $(DESTDIR)/usr/share/mime/packages/
 	install -p -m0644 $(packages_src)/linux_make/pd-extended.xml \
 		$(DESTDIR)/usr/share/mime/packages/
 # files for /etc
 	install -d $(DESTDIR)/etc/bash_completion.d/
-	install -p $(scripts_src)/bash_completion/pd $(DESTDIR)/etc/bash_completion.d
+	install -p -m0644 $(scripts_src)/bash_completion/pd \
+		$(DESTDIR)/etc/bash_completion.d
 	install -d $(DESTDIR)/etc/default
-	install -p $(scripts_src)/debian/default/pd $(DESTDIR)/etc/default
+	install -p -m0644 $(scripts_src)/debian/default/pd 
+		$(DESTDIR)/etc/default
 	install -d $(DESTDIR)/etc/init.d
-	install -p $(scripts_src)/debian/init.d/pd $(DESTDIR)/etc/init.d
+	install -p -m0644 $(scripts_src)/debian/init.d/pd \
+		$(DESTDIR)/etc/init.d
 # default prefs file
 	install -d $(DESTDIR)/etc/pd-extended
-	ln -s $(prefix)/lib/pd/default.pdsettings \
+	ln -s $(libpddir)/default.pdsettings \
 		$(DESTDIR)/etc/pd-extended/default.pdsettings
 	install -p $(packages_src)/linux_make/default.pdsettings $(DESTDIR)$(libpddir)
-# globla folder for user installed files
-	install -d -m0777 $(DESTDIR)/usr/share/pd
 # emacs mode for .pd files
 	install -d $(DESTDIR)/usr/share/emacs/site-lisp/
-	install -p $(scripts_src)/pd-mode.el $(DESTDIR)/usr/share/emacs/site-lisp/
+	install -p -m0644 $(scripts_src)/pd-mode.el \
+		$(DESTDIR)/usr/share/emacs/site-lisp/
 # Pd-related scripts
 	install -p $(scripts_src)/pd-diff $(DESTDIR)$(bindir)
 	install -p $(scripts_src)/config-switcher.sh $(DESTDIR)$(bindir)
