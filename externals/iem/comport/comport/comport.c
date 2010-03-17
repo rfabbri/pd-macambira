@@ -1139,20 +1139,32 @@ endsendevent:
 
 static int write_serial(t_comport *x, unsigned char  serial_byte)
 {
-    if(x->x_outbuf_wr_index < x->x_outbuf_len)
+    if(x->comhandle == INVALID_HANDLE_VALUE)
+    {
+        post ("[comport]: Serial port is not open");
+        return 0;         
+    }
+    else if(x->x_outbuf_wr_index < x->x_outbuf_len)
     {
         x->x_outbuf[x->x_outbuf_wr_index++] = serial_byte;
         return 1;
     }    
     /* handle overrun error */
-    else return 0;
+    post ("[comport]: buffer is full");
+    return 0;
 }
 
 static int write_serials(t_comport *x, unsigned char *serial_buf, int buf_length)
 {
     int i;
+    if(x->comhandle == INVALID_HANDLE_VALUE)
+    {
+        post ("[comport]: Serial port is not open");
+        return 0;         
+    }
     for (i = 0; ((i < buf_length) && (x->x_outbuf_wr_index < x->x_outbuf_len)); ++x->x_outbuf_wr_index, ++i)
         x->x_outbuf[x->x_outbuf_wr_index] = serial_buf[i];
+    if (i != buf_length) post ("[comport]: buffer is full");
     return i;
 }
 
