@@ -360,7 +360,7 @@ static float set_stopflag(t_comport *x, t_float nr)
         x->dcb.StopBits = 1; /*  ONE5STOPBITS = 1  */
         return nr;
     }
-    post("comport stopbit number (%f) out of range (0, 1.5, 2)", nr);
+    post("comport stopbit number (%g) out of range (0, 1.5, 2)", nr);
     return 0;
 }
 
@@ -681,7 +681,7 @@ static long get_baud_ratebits(t_float *baud)
         i = 8;
     }
     *baud =  baudratetable[i];
-    post("get_baud_ratebits: %f", *baud);
+    post("get_baud_ratebits: %g", *baud);
 
     return baudspeedbittable[i];
 }
@@ -1262,7 +1262,7 @@ allows COM port numbers to be specified. */
 
     if(fd == INVALID_HANDLE_VALUE )
     {
-        pd_error(x, "[comport] opening serial port %f failed!", com_num);
+        pd_error(x, "[comport] opening serial port %g failed!", com_num);
     }
     else
     {
@@ -1326,7 +1326,7 @@ static void comport_baud(t_comport *x,t_floatarg f)
 {
     if(f == x->baud)
     {
-        post("baudrate already %f\n",x->baud);
+        post("baudrate already %g\n",x->baud);
         return;
     }
 
@@ -1344,7 +1344,7 @@ static void comport_baud(t_comport *x,t_floatarg f)
 #endif
     }
     else if(x->verbose > 0)
-        post("set baudrate of %s to %f\n",
+        post("set baudrate of %s to %g\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4], x->baud);
 #else
@@ -1369,7 +1369,7 @@ static void comport_bits(t_comport *x,t_floatarg f)
         return;
     }
     else if(x->verbose > 0)
-        post("set bits of %s to %f\n",
+        post("set bits of %s to %g\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4], f);
 #else
@@ -1396,7 +1396,7 @@ static void comport_parity(t_comport *x,t_floatarg f)
         return;
     }
     else if(x->verbose > 0)
-        post("[comport] set extra paritybit of %s to %f\n",
+        post("[comport] set extra paritybit of %s to %g\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4], f);
 #else
@@ -1414,7 +1414,7 @@ static void comport_stopbit(t_comport *x, t_floatarg f)
     if(set_serial(x) == 0)
     {
 #ifdef _WIN32
-        error("[comport] ** ERROR ** could not set stopbits of device %s to %f\n",
+        error("[comport] ** ERROR ** could not set stopbits of device %s to %g\n",
             &x->serial_device->s_name[4], f);
 #else
         error("[comport] ** ERROR ** could not set extra stopbit of device %s\n",
@@ -1424,10 +1424,10 @@ static void comport_stopbit(t_comport *x, t_floatarg f)
     }
     else if(x->verbose > 0)
 #ifdef _WIN32
-        post("[comport] set stopbits of %s to %f\n",
+        post("[comport] set stopbits of %s to %g\n",
             &x->serial_device->s_name[4], f);
 #else
-        post("[comport] set extra stopbit of %s to %f\n",
+        post("[comport] set extra stopbit of %s to %g\n",
             x->serial_device->s_name, f);
 #endif
     x->stop_bits = f;
@@ -1450,7 +1450,7 @@ static void comport_rtscts(t_comport *x,t_floatarg f)
         return;
     }
     else if(x->verbose > 0)
-        post("[comport] set rts-cts of %s to %f\n",
+        post("[comport] set rts-cts of %s to %g\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4], f);
 #else
@@ -1475,7 +1475,7 @@ static void comport_dtr(t_comport *x,t_floatarg f)
 #endif
     }
     else if(x->verbose > 0)
-        post("[comport] set dtr of %s to %f\n",
+        post("[comport] set dtr of %s to %g\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4], f);
 #else
@@ -1499,7 +1499,7 @@ static void comport_rts(t_comport *x,t_floatarg f)
 #endif
     }
     else if(x->verbose > 0)
-        post("[comport] set rts of %s to %f\n",
+        post("[comport] set rts of %s to %g\n",
 #ifdef _WIN32
             &x->serial_device->s_name[4], f);
 #else
@@ -1524,7 +1524,7 @@ static void comport_xonxoff(t_comport *x,t_floatarg f)
         return;
     }
     else if(x->verbose > 0)
-        post("[comport] set xonxoff of %s to %f\n",
+        post("[comport] set xonxoff of %s to %g\n",
 #ifdef _WIN32
         &x->serial_device->s_name[4], f);
 #else
@@ -1846,7 +1846,7 @@ static void comport_verbose(t_comport *x, t_floatarg f)
 
 static void comport_help(t_comport *x)
 {
-    post("[comport] serial port %d (baud %f):", x->comport, x->baud);
+    post("[comport] serial port %d (baud %g):", x->comport, x->baud);
     if(x->comport >= 0 && x->comport < COMPORT_MAX)
     {
 #ifdef WIN32
