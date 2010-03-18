@@ -50,7 +50,7 @@ ifeq ($(UNAME),Darwin)
     STRIP = strip -x
   else # Mac OS X
     SOURCES += $(SOURCES_Darwin)
-    ifneq ($(findstring 8.11.1, $(shell uname -r)), 8.11.1)
+    ifneq ($(shell uname -r | sed 's|\([0-9][0-9]*\.[0-9][0-9]*\).*|\1|'), 8.11)
       SOURCES += $(SOURCES_iphoneos)
     endif
     EXTENSION = pd_darwin
