@@ -104,11 +104,11 @@ deb: $(bindir)
 	install -p -m0644 $(scripts_src)/bash_completion/pd \
 		$(DESTDIR)/etc/bash_completion.d
 	install -d $(DESTDIR)/etc/default
-	install -p -m0644 $(scripts_src)/debian/default/pd 
+	install -p -m0644 $(scripts_src)/debian/default/pd-extended \
 		$(DESTDIR)/etc/default
 	install -d $(DESTDIR)/etc/init.d
-	install -p -m0644 $(scripts_src)/debian/init.d/pd \
-		$(DESTDIR)/etc/init.d
+	install -p -m0644 $(scripts_src)/debian/init.d/pd-extended \
+		$(DESTDIR)/etc/init.d/
 # default prefs file
 	install -d $(DESTDIR)/etc/pd-extended
 	ln -s $(libpddir)/default.pdsettings \
@@ -121,6 +121,9 @@ deb: $(bindir)
 # Pd-related scripts
 	install -p $(scripts_src)/pd-diff $(DESTDIR)$(bindir)
 	install -p $(scripts_src)/config-switcher.sh $(DESTDIR)$(bindir)
+# rename pd executable
+	mv $(DESTDIR)$(bindir)/pd $(DESTDIR)$(bindir)/pd-extended
+	ln -s $(bindir)/pd-extended $(DESTDIR)$(bindir)/pd
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
