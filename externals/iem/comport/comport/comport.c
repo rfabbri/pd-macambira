@@ -1219,7 +1219,8 @@ allows COM port numbers to be specified. */
     serial_device_prefix = "/dev/ttyd*";
 #endif /* IRIX */
 #ifdef __linux__
-    serial_device_prefix = "/dev/tty[SU]*";
+    /* serial: ttyS?    USB-serial: ttyUSB?   USB-CDC: ttyACM? */
+    serial_device_prefix = "/dev/tty[ASU]*";
 #endif /* __linux__ */
 
     if(argc > 0 && argv->a_type == A_FLOAT)
