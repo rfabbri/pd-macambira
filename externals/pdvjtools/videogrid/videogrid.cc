@@ -1100,6 +1100,8 @@ extern "C"
             /* no fa res */
         break;
         }
+        /* amb aquest nom es prepara per poder rebre dades */
+        pd_bind(&x->x_obj.ob_pd, x->x_name);
         /* el màxim es fixa pel nombre de digits utilitzats pel nom de la imatge temporal */
         maxdigit = pow(10,BYTES_NUM_TEMP);
         if((nfil*ncol) <= maxdigit){
@@ -1747,6 +1749,8 @@ extern "C"
     }
 
     static void videogrid_destroy(t_videogrid *x){
+        /* allibera el nom */
+        pd_unbind(&x->x_obj.ob_pd, x->x_name);
         /* elimina el contingut de la cua */
         eliminarCua(&x->x_cua);
         post("Videogrid destroyed.\n");
