@@ -14,7 +14,11 @@ typedef struct _rc_tilde
     t_sample    rc_node;
 } t_rc_tilde;
 
-t_int *rc_tilde_perform(t_int *w)
+static t_int *rc_tilde_perform(t_int *w);
+static void rc_tilde_dsp(t_rc_tilde *x, t_signal **sp);
+static void *rc_tilde_new(t_floatarg f);
+
+static t_int *rc_tilde_perform(t_int *w)
 {
     t_rc_tilde      *x = (t_rc_tilde *)(w[1]);
     t_sample        *in = (t_sample *)(w[2]);
@@ -35,12 +39,12 @@ t_int *rc_tilde_perform(t_int *w)
     return (w+5);
 }
 
-void rc_tilde_dsp(t_rc_tilde *x, t_signal **sp)
+static void rc_tilde_dsp(t_rc_tilde *x, t_signal **sp)
 {
     dsp_add(rc_tilde_perform, 4, x, sp[0]->s_vec, sp[1]->s_vec, sp[0]->s_n);
 }
 
-void *rc_tilde_new(t_floatarg f)
+static void *rc_tilde_new(t_floatarg f)
 {
     t_rc_tilde *x = (t_rc_tilde *)pd_new(rc_tilde_class);
 
