@@ -399,6 +399,7 @@ static void tcpserver_send_bytes(int client, t_tcpserver *x, int argc, t_atom *a
                     if (0 != (sender_thread_result = pthread_create(&sender_thread, &sender_attr, tcpserver_send_buf_thread, (void *)ttsp)))
                     {
                         error("%s: couldn't create sender thread (%d)", objName, sender_thread_result);
+                        freebytes (ttsp, sizeof (t_tcpserver_send_params));
                         goto failed;
                     }
                     flen += j;
@@ -452,6 +453,7 @@ static void tcpserver_send_bytes(int client, t_tcpserver *x, int argc, t_atom *a
                         if ( 0!= (sender_thread_result = pthread_create(&sender_thread, &sender_attr, tcpserver_send_buf_thread, (void *)ttsp)))
                         {
                             error("%s: couldn't create sender thread (%d)", objName, sender_thread_result);
+                            freebytes (ttsp, sizeof (t_tcpserver_send_params));
                             goto failed;
                         }
                         flen += j;
@@ -493,6 +495,7 @@ static void tcpserver_send_bytes(int client, t_tcpserver *x, int argc, t_atom *a
             if ( 0!= (sender_thread_result = pthread_create(&sender_thread, &sender_attr, tcpserver_send_buf_thread, (void *)ttsp)))
             {
                 error("%s: couldn't create sender thread (%d)", objName, sender_thread_result);
+                freebytes (ttsp, sizeof (t_tcpserver_send_params));
                 goto failed;
             }
             flen += length;
@@ -1026,16 +1029,17 @@ static void tcpserver_free(t_tcpserver *x)
 {
     int     i;
 
+    post("tcp_server_free...");
     for(i = 0; i < MAX_CONNECT; i++)
     {
-      
-        if (NULL!=x->x_sr[i]) {
-          tcpserver_socketreceiver_free(x->x_sr[i]);
-          if (x->x_sr[i]->sr_fd >= 0)
+        if (x->x_sr[i] != NULL) 
+        {
+            if (x->x_sr[i]->sr_fd >= 0)
             {
-              sys_rmpollfn(x->x_sr[i]->sr_fd);
-              sys_closesocket(x->x_sr[i]->sr_fd);
+                sys_rmpollfn(x->x_sr[i]->sr_fd);
+                sys_closesocket(x->x_sr[i]->sr_fd);
             }
+            tcpserver_socketreceiver_free(x->x_sr[i]);
         }
     }
     if (x->x_connectsocket >= 0)
@@ -1043,7 +1047,7 @@ static void tcpserver_free(t_tcpserver *x)
         sys_rmpollfn(x->x_connectsocket);
         sys_closesocket(x->x_connectsocket);
     }
-
+    post("...tcp_server_free");
 }
 
 void tcpserver_setup(void)

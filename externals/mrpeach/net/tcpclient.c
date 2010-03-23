@@ -526,9 +526,11 @@ static void *tcpclient_new(t_floatarg udpflag)
 
 static void tcpclient_free(t_tcpclient *x)
 {
+    if (x->x_verbosity) post("tcpclient_free...");
     tcpclient_disconnect(x);
     clock_free(x->x_poll);
     clock_free(x->x_clock);
+    if (x->x_verbosity) post("...tcpclient_free");
 }
 
 void tcpclient_setup(void)
