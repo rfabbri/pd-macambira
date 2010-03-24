@@ -108,6 +108,7 @@ typedef struct _tcpserver
     t_int                       x_connectsocket;
     t_int                       x_nconnections;
     t_int                       x_timeout_us;
+    t_int                       x_blocked;
     t_atom                      x_msgoutbuf[MAX_UDP_RECEIVE];
     char                        x_msginbuf[MAX_UDP_RECEIVE];
 } t_tcpserver;
@@ -136,6 +137,7 @@ static void tcpserver_broadcast(t_tcpserver *x, t_symbol *s, int argc, t_atom *a
 static void tcpserver_notify(t_tcpserver *x);
 static void tcpserver_connectpoll(t_tcpserver *x);
 static void tcpserver_print(t_tcpserver *x);
+static void tcpserver_unblock(t_tcpserver *x);
 static void *tcpserver_new(t_floatarg fportno);
 static void tcpserver_free(t_tcpserver *x);
 void tcpserver_setup(void);
@@ -340,6 +342,7 @@ static void tcpserver_send_bytes(int client, t_tcpserver *x, int argc, t_atom *a
     /* process & send data */
     if(sockfd >= 0)
     {
+        if (x->x_blocked > 0) goto failed;
         /* sender thread should start out detached so its resouces will be freed when it is done */
         if (0!= (sender_thread_result = pthread_attr_init(&sender_attr)))
         {
@@ -398,6 +401,7 @@ static void tcpserver_send_bytes(int client, t_tcpserver *x, int argc, t_atom *a
                     ttsp->timeout_us = x->x_timeout_us;
                     if (0 != (sender_thread_result = pthread_create(&sender_thread, &sender_attr, tcpserver_send_buf_thread, (void *)ttsp)))
                     {
+                        ++x->x_blocked;
                         error("%s: couldn't create sender thread (%d)", objName, sender_thread_result);
                         freebytes (ttsp, sizeof (t_tcpserver_send_params));
                         goto failed;
@@ -452,6 +456,7 @@ static void tcpserver_send_bytes(int client, t_tcpserver *x, int argc, t_atom *a
                         ttsp->timeout_us = x->x_timeout_us;
                         if ( 0!= (sender_thread_result = pthread_create(&sender_thread, &sender_attr, tcpserver_send_buf_thread, (void *)ttsp)))
                         {
+                            ++x->x_blocked;
                             error("%s: couldn't create sender thread (%d)", objName, sender_thread_result);
                             freebytes (ttsp, sizeof (t_tcpserver_send_params));
                             goto failed;
@@ -494,6 +499,7 @@ static void tcpserver_send_bytes(int client, t_tcpserver *x, int argc, t_atom *a
             ttsp->timeout_us = x->x_timeout_us;
             if ( 0!= (sender_thread_result = pthread_create(&sender_thread, &sender_attr, tcpserver_send_buf_thread, (void *)ttsp)))
             {
+                ++x->x_blocked;
                 error("%s: couldn't create sender thread (%d)", objName, sender_thread_result);
                 freebytes (ttsp, sizeof (t_tcpserver_send_params));
                 goto failed;
@@ -506,7 +512,8 @@ failed:
     SETFLOAT(&output_atom[0], client+1);
     SETFLOAT(&output_atom[1], flen);
     SETFLOAT(&output_atom[2], sockfd);
-    outlet_anything( x->x_status_outlet, gensym("sent"), 3, output_atom);
+    if(x->x_blocked) outlet_anything( x->x_status_outlet, gensym("blocked"), 3, output_atom);
+    else outlet_anything( x->x_status_outlet, gensym("sent"), 3, output_atom);
 }
 
 #ifdef SIOCOUTQ
@@ -953,6 +960,11 @@ static void tcpserver_print(t_tcpserver *x)
     else post("%s: no open connections", objName);
 }
 
+static void tcpserver_unblock(t_tcpserver *x)
+{
+    x->x_blocked = 0;
+}
+
 static void *tcpserver_new(t_floatarg fportno)
 {
     t_tcpserver         *x;
@@ -1006,6 +1018,7 @@ static void *tcpserver_new(t_floatarg fportno)
     }
     x->x_connectsocket = sockfd;
     x->x_nconnections = 0;
+    x->x_blocked = 0;
     for(i = 0; i < MAX_CONNECT; i++)
     {
         x->x_sr[i] = NULL;
@@ -1022,6 +1035,7 @@ static void *tcpserver_new(t_floatarg fportno)
         x->x_addrbytes[i].a_w.w_float = 0;
     }
     x->x_timeout_us = 1000;/* default 1 ms for select call timeout when sending */
+    post ("tcpserver listening on port %d", portno);
     return (x);
 }
 
@@ -1061,6 +1075,7 @@ void tcpserver_setup(void)
     class_addmethod(tcpserver_class, (t_method)tcpserver_client_disconnect, gensym("disconnectclient"), A_DEFFLOAT, 0);
     class_addmethod(tcpserver_class, (t_method)tcpserver_socket_disconnect, gensym("disconnectsocket"), A_DEFFLOAT, 0);
     class_addmethod(tcpserver_class, (t_method)tcpserver_dump, gensym("dump"), A_FLOAT, 0);
+    class_addmethod(tcpserver_class, (t_method)tcpserver_unblock, gensym("unblock"), 0);
     class_addmethod(tcpserver_class, (t_method)tcpserver_broadcast, gensym("broadcast"), A_GIMME, 0);
     class_addmethod(tcpserver_class, (t_method)tcpserver_timeout, gensym("timeout"), A_FLOAT, 0);
     class_addlist(tcpserver_class, (t_method)tcpserver_send);
