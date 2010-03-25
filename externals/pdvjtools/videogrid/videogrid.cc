@@ -35,6 +35,7 @@ extern "C"
      * incloure estructures de dades i capceleres de funcions gàfiques bàsiques de pd
     */
     #include "g_canvas.h"
+    #include "s_stuff.h"
     /*
      * incloure estructures de dades i capceleres de funcions per traballar amb threads
     */
@@ -49,6 +50,7 @@ extern "C"
     #include <ffmpeg/avformat.h>
     #include <ffmpeg/avutil.h>
     #include <ffmpeg/swscale.h>
+
 
     /* may be your ffmpeg headers are here, at least from jaunty to karmic */
     /*
@@ -85,6 +87,9 @@ extern "C"
     typedef char pathimage[BYTESNOMFITXERIMATGE];
 
     typedef char tipus_format[BYTESTIPUSFROMAT];
+
+    t_namelist *loaded_libs = NULL;
+
 
     /* ----------------------------------- FFmpeg functions ----------------------------------- */
     int convertir_img_ff(pathimage pathFitxer, tipus_format f, int W, int H, int posi);
@@ -1727,6 +1732,33 @@ extern "C"
          * printf("S'ha instanciat un videogrid anomenat %s amb les caracteristiques seguents:",x->x_name->s_name);
          * printf("Nombre de files %d - Nombre de columnes: %d", x->x_num_fil, x->x_num_col);
         */
+        /* a Karmic es detecta que videogrid fa crash al pd al insertar un video, nomes en el cas que es carregui despres de Gem */
+
+
+        char *lliibbGem = "Gem";
+        char *lliibbVideogrid = "videogrid";
+        /*
+        if(sys_load_lib(glist_getcanvas(x->x_glist), lliibb)){
+            post("SLL diu Gem already loaded");
+        } else{
+            post("SLL diu Gem not loaded");
+        }*/
+
+        int i, posGem = 0, posVideogrid = 0;
+        t_namelist *nl;
+
+        for (i=0, nl = sys_externlist; nl; i++, nl = nl->nl_next) {
+            if(strcmp(nl->nl_string,lliibbGem)==0) {
+                posGem = i;
+            } else {
+                if(strcmp(nl->nl_string,lliibbVideogrid)==0) {
+                    posVideogrid = i;
+                }
+            }
+        }
+        if(posGem < posVideogrid) {
+            post("NOTE videogrid: Recomended load before Gem.\n");
+        }
         return (x);
     }
 
@@ -1747,6 +1779,7 @@ extern "C"
         load_tk_procs_videogrid();
         post("videogrid: version 0.2.1");
         post("written by Sergi Lario (slario@gmail.com) & Lluis Gomez i Bigorda (lluis@artefacte.org)");
+
 
         videogrid_class = class_new(gensym("videogrid"),
             (t_newmethod)videogrid_new,
