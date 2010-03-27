@@ -88,7 +88,6 @@ typedef struct _tcpserver_send_params
     int     sockfd;
     char    *byte_buf;
     size_t  length;
-    t_int   timeout_us;
 } t_tcpserver_send_params;
 
 typedef struct _tcpserver
@@ -107,7 +106,6 @@ typedef struct _tcpserver
     t_int                       x_sock_fd;
     t_int                       x_connectsocket;
     t_int                       x_nconnections;
-    t_int                       x_timeout_us;
     t_int                       x_blocked;
     t_atom                      x_msgoutbuf[MAX_UDP_RECEIVE];
     char                        x_msginbuf[MAX_UDP_RECEIVE];
@@ -124,7 +122,6 @@ static void tcpserver_send_bytes(int sockfd, t_tcpserver *x, int argc, t_atom *a
 static int tcpserver_send_buffer_avaliable_for_client(t_tcpserver *x, int client);
 #endif
 static void *tcpserver_send_buf_thread(void *arg);
-static size_t tcpserver_send_buf(int client, int sockfd, char *byte_buf, size_t length, t_int timeout_us);
 static void tcpserver_client_send(t_tcpserver *x, t_symbol *s, int argc, t_atom *argv);
 static void tcpserver_output_client_state(t_tcpserver *x, int client);
 static int tcpserver_get_socket_send_buf_size(int sockfd);
@@ -142,22 +139,7 @@ static void *tcpserver_new(t_floatarg fportno);
 static void tcpserver_free(t_tcpserver *x);
 void tcpserver_setup(void);
 static void tcpserver_dump(t_tcpserver *x, t_float dump);
-static void tcpserver_timeout(t_tcpserver *x, t_float timeout);
 static void tcpserver_hexdump(unsigned char *buf, long len);
-
-static void tcpserver_timeout(t_tcpserver *x, t_float timeout)
-{
-    /* set the timeout on the select call in tcpserver_send_buf */
-    /* this is the maximum time in microseconds to wait */
-    /* before abandoning attempt to send */
-
-    t_int timeout_us = 0;
-    if ((timeout >= 0)&&(timeout < 1000000))
-    {
-        timeout_us = (t_int)timeout;
-        x->x_timeout_us = timeout_us;
-    }
-}
 
 static void tcpserver_dump(t_tcpserver *x, t_float dump)
 {
@@ -398,7 +380,6 @@ static void tcpserver_send_bytes(int client, t_tcpserver *x, int argc, t_atom *a
                     ttsp->sockfd = sockfd;
                     ttsp->byte_buf = byte_buf;
                     ttsp->length = j;
-                    ttsp->timeout_us = x->x_timeout_us;
                     if (0 != (sender_thread_result = pthread_create(&sender_thread, &sender_attr, tcpserver_send_buf_thread, (void *)ttsp)))
                     {
                         ++x->x_blocked;
@@ -453,7 +434,6 @@ static void tcpserver_send_bytes(int client, t_tcpserver *x, int argc, t_atom *a
                         ttsp->sockfd = sockfd;
                         ttsp->byte_buf = byte_buf;
                         ttsp->length = j;
-                        ttsp->timeout_us = x->x_timeout_us;
                         if ( 0!= (sender_thread_result = pthread_create(&sender_thread, &sender_attr, tcpserver_send_buf_thread, (void *)ttsp)))
                         {
                             ++x->x_blocked;
@@ -496,7 +476,6 @@ static void tcpserver_send_bytes(int client, t_tcpserver *x, int argc, t_atom *a
             ttsp->sockfd = sockfd;
             ttsp->byte_buf = byte_buf;
             ttsp->length = length;
-            ttsp->timeout_us = x->x_timeout_us;
             if ( 0!= (sender_thread_result = pthread_create(&sender_thread, &sender_attr, tcpserver_send_buf_thread, (void *)ttsp)))
             {
                 ++x->x_blocked;
@@ -542,51 +521,6 @@ static void *tcpserver_send_buf_thread(void *arg)
     }
     freebytes (arg, sizeof (t_tcpserver_send_params));
     return NULL;
-}
-
-// send a buffer one byte at a time, no thread
-static size_t tcpserver_send_buf(int client, int sockfd, char *byte_buf, size_t length, t_int timeout_us)
-{
-    char            *bp;
-    size_t          sent = 0;
-    int             result;
-    fd_set          wfds;
-    struct timeval  timeout;
-    
-    for (bp = byte_buf, sent = 0; sent < length;)
-    {
-        FD_ZERO(&wfds);
-        FD_SET(sockfd, &wfds);
-        timeout.tv_sec = 0;
-        timeout.tv_usec = timeout_us; /* give it a short time to clear buffer */
-        result = select(sockfd+1, NULL, &wfds, NULL, &timeout);
-        if (result == -1)
-        {
-            post("%s_send_buf: select returned error %d", objName, errno);
-            break;
-        }
-        if (FD_ISSET(sockfd, &wfds))
-        {
-            result = send(sockfd, bp, 1, 0);/*(sockfd, bp, (int)(length-sent), 0);*/
-            if (result <= 0)
-            {
-                sys_sockerror("tcpserver: send");
-                post("%s_send_buf: could not send data to client %d", objName, client+1);
-                break;
-            }
-            else
-            {
-                sent += result;
-                bp += result;
-            }
-        }
-        else
-        {
-            post ("%s_send_buf: can't send right now, sent %lu of %lu", objName, sent, length);
-            return sent;/* abandon any further attempts to send so we don't block */
-        }
-    }
-    return sent;
 }
 
 /* send message to client using socket number */
@@ -860,7 +794,7 @@ static void tcpserver_broadcast(t_tcpserver *x, t_symbol *s, int argc, t_atom *a
 }
 
 /* ---------------- main tcpserver (receive) stuff --------------------- */
-
+/* tcpserver_notify is called by */
 static void tcpserver_notify(t_tcpserver *x)
 {
     int     i, k;
@@ -871,6 +805,15 @@ static void tcpserver_notify(t_tcpserver *x)
         if(x->x_sr[i]->sr_fd == x->x_sock_fd)
         {
             x->x_nconnections--;
+/* Ivica Ico Bukvic <ico@bukvic.net>:*/
+            x->x_addrbytes[0].a_w.w_float = (x->x_sr[i]->sr_addr & 0xFF000000)>>24;
+            x->x_addrbytes[1].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF0000)>>16;
+            x->x_addrbytes[2].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF00)>>8;
+            x->x_addrbytes[3].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF);
+            outlet_list(x->x_addrout, &s_list, 4L, x->x_addrbytes);
+            outlet_float(x->x_sockout, x->x_sr[i]->sr_fd); /* the socket number */
+            outlet_float(x->x_connectout, x->x_nconnections);
+/* /Ivica Ico Bukvic */
             post("%s: \"%s\" removed from list of clients", objName, x->x_sr[i]->sr_host->s_name);
             tcpserver_socketreceiver_free(x->x_sr[i]);
             x->x_sr[i] = NULL;
@@ -882,7 +825,7 @@ static void tcpserver_notify(t_tcpserver *x)
             }
         }
     }
-    outlet_float(x->x_connectout, x->x_nconnections);
+// ico    outlet_float(x->x_connectout, x->x_nconnections);
 }
 
 static void tcpserver_connectpoll(t_tcpserver *x)
@@ -911,7 +854,7 @@ static void tcpserver_connectpoll(t_tcpserver *x)
         sys_addpollfn(fd, (t_fdpollfn)tcpserver_socketreceiver_read, y);
         x->x_nconnections++;
         i = x->x_nconnections - 1;
-		x->x_sr[i] = y;
+        x->x_sr[i] = y;
         x->x_sr[i]->sr_host = gensym(inet_ntoa(incomer_address.sin_addr));
         x->x_sr[i]->sr_fd = fd;
         post("%s: accepted connection from %s on socket %d",
@@ -933,14 +876,14 @@ static void tcpserver_connectpoll(t_tcpserver *x)
         }
         else post("%s_connectpoll: getsockopt returned %d\n", objName, errno);
 #endif
-        outlet_float(x->x_connectout, x->x_nconnections);
-        outlet_float(x->x_sockout, x->x_sr[i]->sr_fd);	/* the socket number */
         x->x_sr[i]->sr_addr = ntohl(incomer_address.sin_addr.s_addr);
         x->x_addrbytes[0].a_w.w_float = (x->x_sr[i]->sr_addr & 0xFF000000)>>24;
         x->x_addrbytes[1].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF0000)>>16;
         x->x_addrbytes[2].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF00)>>8;
         x->x_addrbytes[3].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF);
         outlet_list(x->x_addrout, &s_list, 4L, x->x_addrbytes);
+        outlet_float(x->x_sockout, x->x_sr[i]->sr_fd);	/* the socket number */
+        outlet_float(x->x_connectout, x->x_nconnections);
     }
 }
 
@@ -1034,7 +977,6 @@ static void *tcpserver_new(t_floatarg fportno)
         x->x_addrbytes[i].a_type = A_FLOAT;
         x->x_addrbytes[i].a_w.w_float = 0;
     }
-    x->x_timeout_us = 1000;/* default 1 ms for select call timeout when sending */
     post ("tcpserver listening on port %d", portno);
     return (x);
 }
@@ -1077,7 +1019,6 @@ void tcpserver_setup(void)
     class_addmethod(tcpserver_class, (t_method)tcpserver_dump, gensym("dump"), A_FLOAT, 0);
     class_addmethod(tcpserver_class, (t_method)tcpserver_unblock, gensym("unblock"), 0);
     class_addmethod(tcpserver_class, (t_method)tcpserver_broadcast, gensym("broadcast"), A_GIMME, 0);
-    class_addmethod(tcpserver_class, (t_method)tcpserver_timeout, gensym("timeout"), A_FLOAT, 0);
     class_addlist(tcpserver_class, (t_method)tcpserver_send);
 }
 
