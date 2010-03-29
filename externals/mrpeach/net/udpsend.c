@@ -38,7 +38,7 @@ static void *udpsend_new(void);
 static void *udpsend_new(void)
 {
     t_udpsend *x = (t_udpsend *)pd_new(udpsend_class);
-    outlet_new(&x->x_obj, gensym("float"));
+    outlet_new(&x->x_obj, &s_float);
     x->x_fd = -1;
     return (x);
 }

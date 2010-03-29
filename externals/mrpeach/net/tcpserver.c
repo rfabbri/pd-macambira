@@ -224,7 +224,7 @@ static int tcpserver_socketreceiver_doread(t_tcpserver_socketreceiver *x)
 
     if (y->x_dump)tcpserver_hexdump(&inbuf[intail], i);
 
-    if (i > 1) outlet_list(y->x_msgout, gensym("list"), i, y->x_msgoutbuf);
+    if (i > 1) outlet_list(y->x_msgout, &s_list, i, y->x_msgoutbuf);
     else outlet_float(y->x_msgout, y->x_msgoutbuf[0].a_w.w_float);
 
  //   intail = (indx+1)&(INBUFSIZE-1);
@@ -283,7 +283,7 @@ static void tcpserver_socketreceiver_read(t_tcpserver_socketreceiver *x, int fd)
                     y->x_addrbytes[1].a_w.w_float = (y->x_sr[i]->sr_addr & 0x0FF0000)>>16;
                     y->x_addrbytes[2].a_w.w_float = (y->x_sr[i]->sr_addr & 0x0FF00)>>8;
                     y->x_addrbytes[3].a_w.w_float = (y->x_sr[i]->sr_addr & 0x0FF);
-                    outlet_list(y->x_addrout, gensym("list"), 4L, y->x_addrbytes);
+                    outlet_list(y->x_addrout, &s_list, 4L, y->x_addrbytes);
                     break;
                 }
             }
@@ -810,7 +810,7 @@ static void tcpserver_notify(t_tcpserver *x)
             x->x_addrbytes[1].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF0000)>>16;
             x->x_addrbytes[2].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF00)>>8;
             x->x_addrbytes[3].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF);
-            outlet_list(x->x_addrout, gensym("list"), 4L, x->x_addrbytes);
+            outlet_list(x->x_addrout, &s_list, 4L, x->x_addrbytes);
             outlet_float(x->x_sockout, x->x_sr[i]->sr_fd); /* the socket number */
             outlet_float(x->x_connectout, x->x_nconnections);
 /* /Ivica Ico Bukvic */
@@ -881,7 +881,7 @@ static void tcpserver_connectpoll(t_tcpserver *x)
         x->x_addrbytes[1].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF0000)>>16;
         x->x_addrbytes[2].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF00)>>8;
         x->x_addrbytes[3].a_w.w_float = (x->x_sr[i]->sr_addr & 0x0FF);
-        outlet_list(x->x_addrout, gensym("list"), 4L, x->x_addrbytes);
+        outlet_list(x->x_addrout, &s_list, 4L, x->x_addrbytes);
         outlet_float(x->x_sockout, x->x_sr[i]->sr_fd);	/* the socket number */
         outlet_float(x->x_connectout, x->x_nconnections);
     }
@@ -943,7 +943,7 @@ static void *tcpserver_new(t_floatarg fportno)
         return (0);
     }
     x = (t_tcpserver *)pd_new(tcpserver_class);
-    x->x_msgout = outlet_new(&x->x_obj, 0); /* 1st outlet for received data */
+    x->x_msgout = outlet_new(&x->x_obj, &s_anything); /* 1st outlet for received data */
    /* streaming protocol */
     if (listen(sockfd, 5) < 0)
     {
@@ -954,10 +954,10 @@ static void *tcpserver_new(t_floatarg fportno)
     else
     {
         sys_addpollfn(sockfd, (t_fdpollfn)tcpserver_connectpoll, x);
-        x->x_connectout = outlet_new(&x->x_obj, gensym("float")); /* 2nd outlet for number of connected clients */
-        x->x_sockout = outlet_new(&x->x_obj, gensym("float")); /* 3rd outlet for socket number of current client */
-        x->x_addrout = outlet_new(&x->x_obj, gensym("list")); /* 4th outlet for ip address of current client */
-        x->x_status_outlet = outlet_new(&x->x_obj, 0);/* 5th outlet for everything else */
+        x->x_connectout = outlet_new(&x->x_obj, &s_float); /* 2nd outlet for number of connected clients */
+        x->x_sockout = outlet_new(&x->x_obj, &s_float); /* 3rd outlet for socket number of current client */
+        x->x_addrout = outlet_new(&x->x_obj, &s_list); /* 4th outlet for ip address of current client */
+        x->x_status_outlet = outlet_new(&x->x_obj, &s_anything);/* 5th outlet for everything else */
     }
     x->x_connectsocket = sockfd;
     x->x_nconnections = 0;

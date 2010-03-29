@@ -38,7 +38,7 @@ static void *tcpsend_new(void);
 static void *tcpsend_new(void)
 {
     t_tcpsend *x = (t_tcpsend *)pd_new(tcpsend_class);
-    outlet_new(&x->x_obj, gensym("float"));
+    outlet_new(&x->x_obj, &s_float);
     x->x_fd = -1;
     return (x);
 }
