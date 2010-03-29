@@ -63,7 +63,7 @@ static void udpreceive_read(t_udpreceive *x, int sockfd)
     x->x_addrbytes[2].a_w.w_float = (addr & 0x0FF00)>>8;
     x->x_addrbytes[3].a_w.w_float = (addr & 0x0FF);
     x->x_addrbytes[4].a_w.w_float = port;
-    outlet_list(x->x_addrout, &s_list, 5L, x->x_addrbytes);
+    outlet_list(x->x_addrout, gensym("list"), 5L, x->x_addrbytes);
 
     if (read < 0)
     {
@@ -79,7 +79,7 @@ static void udpreceive_read(t_udpreceive *x, int sockfd)
             x->x_msgoutbuf[i].a_w.w_float = (float)(unsigned char)x->x_msginbuf[i];
         }
         /* send the list out the outlet */
-        if (read > 1) outlet_list(x->x_msgout, &s_list, read, x->x_msgoutbuf);
+        if (read > 1) outlet_list(x->x_msgout, gensym("list"), read, x->x_msgoutbuf);
         else outlet_float(x->x_msgout, x->x_msgoutbuf[0].a_w.w_float);
     }
 }
@@ -122,8 +122,8 @@ static void *udpreceive_new(t_floatarg fportno)
         return (0);
     }
     x = (t_udpreceive *)pd_new(udpreceive_class);
-    x->x_msgout = outlet_new(&x->x_obj, &s_anything);
-    x->x_addrout = outlet_new(&x->x_obj, &s_list);
+    x->x_msgout = outlet_new(&x->x_obj, 0);
+    x->x_addrout = outlet_new(&x->x_obj, gensym("list"));
     x->x_connectsocket = sockfd;
 
     /* convert the bytes in the buffer to floats in a list */

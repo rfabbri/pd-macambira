@@ -211,7 +211,7 @@ static void udpreceive_tilde_datapoll(t_udpreceive_tilde *x)
             x->x_addrbytes[2].a_w.w_float = (x->x_addr & 0x0FF00)>>8;
             x->x_addrbytes[3].a_w.w_float = (x->x_addr & 0x0FF);
             x->x_addrbytes[4].a_w.w_float = x->x_port;
-            outlet_list(x->x_addrout, &s_list, 5L, x->x_addrbytes);
+            outlet_list(x->x_addrout, gensym("list"), 5L, x->x_addrbytes);
         }
         if (ret <= 0)   /* error */
         {
@@ -624,7 +624,7 @@ static void udpreceive_tilde_info(t_udpreceive_tilde *x)
     SETFLOAT(list, (t_float)x->x_tag_errors);
     outlet_anything(x->x_outlet2, ps_tag_errors, 1, list);
 
-    outlet_list(x->x_addrout, &s_list, 5L, x->x_addrbytes);
+    outlet_list(x->x_addrout, gensym("list"), 5L, x->x_addrbytes);
 }
 
 static void udpreceive_tilde_tick(t_udpreceive_tilde *x)
@@ -655,8 +655,8 @@ static void *udpreceive_tilde_new(t_floatarg fportno, t_floatarg outlets, t_floa
         x->x_noutlets = (int)outlets + 1; // extra outlet for valid flag
         for (i = 0; i < x->x_noutlets; i++)
             outlet_new(&x->x_obj, &s_signal);
-        x->x_outlet2 = outlet_new(&x->x_obj, &s_anything);
-        x->x_addrout = outlet_new(&x->x_obj, &s_list);
+        x->x_outlet2 = outlet_new(&x->x_obj, 0);
+        x->x_addrout = outlet_new(&x->x_obj, gensym("list"));
         for (i = 0; i < 5; ++i)
         {
             x->x_addrbytes[i].a_type = A_FLOAT;

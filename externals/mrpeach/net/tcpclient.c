@@ -483,9 +483,9 @@ static void tcpclient_rcv(t_tcpclient *x)
                 x->x_addrbytes[1].a_w.w_float = (x->x_addr & 0x0FF0000)>>16;
                 x->x_addrbytes[2].a_w.w_float = (x->x_addr & 0x0FF00)>>8;
                 x->x_addrbytes[3].a_w.w_float = (x->x_addr & 0x0FF);
-                outlet_list(x->x_addrout, &s_list, 4L, x->x_addrbytes);
+                outlet_list(x->x_addrout, gensym("list"), 4L, x->x_addrbytes);
                 /* send the list out the outlet */
-                if (ret > 1) outlet_list(x->x_msgout, &s_list, ret, x->x_msgoutbuf);
+                if (ret > 1) outlet_list(x->x_msgout, gensym("list"), ret, x->x_msgoutbuf);
                 else outlet_float(x->x_msgout, x->x_msgoutbuf[0].a_w.w_float);
             }
             else
@@ -523,10 +523,10 @@ static void *tcpclient_new(t_floatarg udpflag)
     int i;
 
     t_tcpclient *x = (t_tcpclient *)pd_new(tcpclient_class);
-    x->x_msgout = outlet_new(&x->x_obj, &s_anything);	/* received data */
-    x->x_addrout = outlet_new(&x->x_obj, &s_list);
-    x->x_connectout = outlet_new(&x->x_obj, &s_float);	/* connection state */
-    x->x_statusout = outlet_new(&x->x_obj, &s_anything);/* last outlet for everything else */
+    x->x_msgout = outlet_new(&x->x_obj, 0);	/* received data */
+    x->x_addrout = outlet_new(&x->x_obj, gensym("list"));
+    x->x_connectout = outlet_new(&x->x_obj, gensym("float"));	/* connection state */
+    x->x_statusout = outlet_new(&x->x_obj, 0);/* last outlet for everything else */
     x->x_sendclock = clock_new(x, (t_method)tcpclient_sent);
     x->x_clock = clock_new(x, (t_method)tcpclient_tick);
     x->x_poll = clock_new(x, (t_method)tcpclient_poll);

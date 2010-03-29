@@ -101,9 +101,9 @@ static void tcpreceive_read(t_tcpreceive *x, int sockfd)
         x->x_addrbytes[2].a_w.w_float = (addr & 0x0FF00)>>8;
         x->x_addrbytes[3].a_w.w_float = (addr & 0x0FF);
         x->x_addrbytes[4].a_w.w_float = port;
-        outlet_list(x->x_addrout, &s_list, 5L, x->x_addrbytes);
+        outlet_list(x->x_addrout, gensym("list"), 5L, x->x_addrbytes);
         /* send the list out the outlet */
-        if (read > 1) outlet_list(x->x_msgout, &s_list, read, x->x_msgoutbuf);
+        if (read > 1) outlet_list(x->x_msgout, gensym("list"), read, x->x_msgoutbuf);
         else outlet_float(x->x_msgout, x->x_msgoutbuf[0].a_w.w_float);
     }
 }
@@ -150,9 +150,9 @@ static void *tcpreceive_new(t_floatarg fportno)
         return (0);
     }
     x = (t_tcpreceive *)pd_new(tcpreceive_class);
-    x->x_msgout = outlet_new(&x->x_obj, &s_anything);
-    x->x_addrout = outlet_new(&x->x_obj, &s_list);
-    x->x_connectout = outlet_new(&x->x_obj, &s_float);
+    x->x_msgout = outlet_new(&x->x_obj, 0);
+    x->x_addrout = outlet_new(&x->x_obj, gensym("list"));
+    x->x_connectout = outlet_new(&x->x_obj, gensym("float"));
     /* clear the connection list */
     for (i = 0; i < MAX_CONNECTIONS; ++i)
 	{
@@ -220,7 +220,7 @@ static void tcpreceive_connectpoll(t_tcpreceive *x)
             x->x_addrbytes[2].a_w.w_float = (addr & 0x0FF00)>>8;
             x->x_addrbytes[3].a_w.w_float = (addr & 0x0FF);
             x->x_addrbytes[4].a_w.w_float = port;
-            outlet_list(x->x_addrout, &s_list, 5L, x->x_addrbytes);
+            outlet_list(x->x_addrout, gensym("list"), 5L, x->x_addrbytes);
         }
         else
         {

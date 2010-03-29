@@ -573,8 +573,8 @@ static void *udpsend_tilde_new(t_floatarg inlets, t_floatarg blocksize)
         for (i = 1; i < x->x_ninlets; i++)
             inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
  
-        x->x_outlet = outlet_new(&x->x_obj, &s_float);
-        x->x_outlet2 = outlet_new(&x->x_obj, &s_list);
+        x->x_outlet = outlet_new(&x->x_obj, gensym("float"));
+        x->x_outlet2 = outlet_new(&x->x_obj, gensym("list"));
         x->x_clock = clock_new(x, (t_method)udpsend_tilde_notify);
 
         x->x_myvec = (t_int **)t_getbytes(sizeof(t_int *) * (x->x_ninlets + 3));
