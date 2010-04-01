@@ -2917,32 +2917,14 @@ iemxmlrpc_clean:
 
 #------------------------------------------------------------------------------#
 # EARPLUG
-EARPLUG_NAME=earplug~
-EARPLUG_OBJECTS := $(wildcard $(externals_src)/earplug~/*.c)
-earplug: $(EARPLUG_OBJECTS:.c=.$(EXTENSION))
+earplug:
+	make -C $(externals_src)/earplug~
 
-earplug_install: earplug
-	install -d $(DESTDIR)$(objectsdir)/$(EARPLUG_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(EARPLUG_NAME) \
-		--author "Pei Xiang" \
-		--description "filters for binaural audio spatialization, based on KEMAR impulse measurement" \
-		--license "" \
-		--version ""
-	install -p $(EARPLUG_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(EARPLUG_NAME)
-	install -p $(externals_src)/earplug~/earplug_data.txt $(DESTDIR)$(objectsdir)/$(EARPLUG_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(EARPLUG_NAME)
-	install -p $(externals_src)/earplug~/*-help.pd \
-		$(externals_src)/earplug~/*.txt \
-		$(DESTDIR)$(helpdir)/$(EARPLUG_NAME)
-	install -p $(externals_src)/earplug~/*-help.pd \
-		$(externals_src)/earplug~/*.txt \
-		$(DESTDIR)$(objectsdir)/$(EARPLUG_NAME)
+earplug_install:
+	make -C $(externals_src)/earplug~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 earplug_clean:
-	-rm -f -- $(EARPLUG_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(EARPLUG_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/earplug~/*.bak
-	-rm -f -- $(externals_src)/earplug~/*.*~
+	make -C $(externals_src)/earplug~ clean
 
 
 
