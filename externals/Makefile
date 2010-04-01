@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone deprecated earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vanilla vbap windowing zexy
+LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -138,7 +138,7 @@ else
     LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl apple
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl postlude sixaxis
+    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl postlude
   endif
 endif
 
@@ -149,7 +149,7 @@ all: $(LIB_TARGETS)
 	@echo "Compiled externals for $(OS_NAME) aka $(UNAME)"
 
 
-install: $(examplesdir) $(helpdir) $(manualsdir) $(objectsdir) $(readmesdir) \
+install: $(examplesdir) $(manualsdir) $(objectsdir) $(readmesdir) \
 all $(patsubst %, %_install,$(LIB_TARGETS))
 	@echo " "
 	@echo "externals install succeeded!"
@@ -169,7 +169,7 @@ FLATSPACE_OBJECTS := $(wildcard $(externals_src)/build/src/*.c)
 
 flatspace: $(FLATSPACE_OBJECTS:.c=.$(EXTENSION))
 
-flatspace_install: flatspace $(helpdir) $(objectsdir)
+flatspace_install: flatspace $(objectsdir)
 	install -d $(DESTDIR)$(objectsdir)/$(FLATSPACE_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(FLATSPACE_NAME) \
 		--author "Numerous" \
@@ -230,9 +230,6 @@ template_install: template
 		--license "" \
 		--version ""
 	install -p $(TEMPLATE_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(TEMPLATE_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(TEMPLATE_NAME)
-	install -p $(externals_src)/template/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(TEMPLATE_NAME)
 #	install -d $(manualsdir)/$(TEMPLATE_NAME)
 #	install -p $(externals_src)/template/manual.txt \
 #		$(manualsdir)/$(TEMPLATE_NAME)
@@ -274,9 +271,6 @@ aka.wiiremote_install: aka.wiiremote
 	install -d $(DESTDIR)$(objectsdir)/$(AKA.WIIREMOTE_NAME)
 	install -p $(externals_src)/io/aka.wiiremote/aka.wiiremote.$(EXTENSION) \
 		$(DESTDIR)$(objectsdir)/$(AKA.WIIREMOTE_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(AKA.WIIREMOTE_NAME)
-	install -p $(externals_src)/io/aka.wiiremote/*.pd \
-		$(DESTDIR)$(helpdir)/$(AKA.WIIREMOTE_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(AKA.WIIREMOTE_NAME)
 	install -p $(externals_src)/io/aka.wiiremote/*.txt \
 		$(DESTDIR)$(manualsdir)/$(AKA.WIIREMOTE_NAME)
@@ -315,9 +309,6 @@ bassemu_install: bassemu
 		--license "" \
 		--version ""
 	install -p $(BASSEMU_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(BASSEMU_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(BASSEMU_NAME)
-	install -p $(externals_src)/bassemu/*.pd \
-		$(DESTDIR)$(helpdir)/$(BASSEMU_NAME)
 	install -p $(externals_src)/bassemu/*.pd \
 		$(DESTDIR)$(objectsdir)/$(BASSEMU_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(BASSEMU_NAME)
@@ -352,9 +343,6 @@ boids_install: boids
 		--license "GNU GPL 2" \
 		--version ""
 	install -p $(BOIDS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(BOIDS_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(BOIDS_NAME)
-	install -p $(externals_src)/boids/boids*/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(BOIDS_NAME)
 	install -p $(externals_src)/boids/boids*/*.pd \
 		$(DESTDIR)$(objectsdir)/$(BOIDS_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(BOIDS_NAME)
@@ -392,12 +380,8 @@ bsaylor_install: bsaylor
 		--license "GNU GPL 2" \
 		--version ""
 	install -p $(BSAYLOR_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(BSAYLOR_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(BSAYLOR_NAME)
-	install -p $(externals_src)/bsaylor/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(BSAYLOR_NAME)
 	install -p $(externals_src)/bsaylor/help/*.pd \
 		$(DESTDIR)$(objectsdir)/$(BSAYLOR_NAME)
-	install -p $(externals_src)/bsaylor/*.wav $(DESTDIR)$(helpdir)/$(BSAYLOR_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(BSAYLOR_NAME)
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/bsaylor/README.txt \
@@ -431,8 +415,6 @@ creb_install: creb
 	install -p $(externals_src)/creb/abs/*.pd $(DESTDIR)$(objectsdir)/$(CREB_NAME)
 	install -p $(CREB_OBJECTS:.c=.$(EXTENSION)) \
 		$(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) 		$(DESTDIR)$(objectsdir)/$(CREB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(CREB_NAME)
-	install -p $(externals_src)/creb/doc/*.* $(DESTDIR)$(helpdir)/$(CREB_NAME)
 	install -p $(externals_src)/creb/doc/*.* $(DESTDIR)$(objectsdir)/$(CREB_NAME)
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/creb/doc/reference.txt \
@@ -463,9 +445,6 @@ cxc_install: cxc
 		--license "" \
 		--version ""
 	install -p $(CXC_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(CXC_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(CXC_NAME)
-	install -p $(wildcard $(externals_src)/cxc/reference/*.pd) \
-		$(DESTDIR)$(helpdir)/$(CXC_NAME)
 	install -p $(wildcard $(externals_src)/cxc/reference/*.pd) \
 		$(DESTDIR)$(objectsdir)/$(CXC_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(CXC_NAME)
@@ -506,9 +485,6 @@ cyclone_install: cyclone
 		$(DESTDIR)$(objectsdir)/$(CYCLONE_NAME)/maxmode
 # install "cyclist" command line app with pd
 	-install -p -m0755 $(externals_src)/miXed/bin/cyclist $(DESTDIR)$(bindir)
-	install -d $(DESTDIR)$(helpdir)/$(CYCLONE_NAME)
-	install -p $(externals_src)/miXed/doc/help/cyclone/*.* \
-		$(DESTDIR)$(helpdir)/$(CYCLONE_NAME)
 	install -p $(externals_src)/miXed/doc/help/cyclone/*.* \
 		$(DESTDIR)$(objectsdir)/$(CYCLONE_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(CYCLONE_NAME)
@@ -519,80 +495,6 @@ cyclone_install: cyclone
 
 cyclone_clean:
 	-$(MAKE) -C $(externals_src)/miXed/cyclone $(DEST_PATHS) clean
-
-
-
-
-#------------------------------------------------------------------------------#
-# DEPRECATED
-DEPRECATED_NAME=deprecated
-DEPRECATED_OBJECTS := $(wildcard $(externals_src)/deprecated/*.c)
-deprecated: $(DEPRECATED_OBJECTS:.c=.$(EXTENSION))
-
-deprecated_install: deprecated
-	install -d $(DESTDIR)$(objectsdir)/$(DEPRECATED_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(DEPRECATED_NAME) \
-		--author "numerous" \
-		--description "a collection of deprecated objects that still have some use" \
-		--license "" \
-		--version ""
-	install -p $(DEPRECATED_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(DEPRECATED_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(DEPRECATED_NAME)
-	install -p $(externals_src)/deprecated/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(DEPRECATED_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(DEPRECATED_NAME)
-	install -p $(externals_src)/deprecated/doc/*.* \
-		$(DESTDIR)$(manualsdir)/$(DEPRECATED_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/deprecated/README \
-#		$(DESTDIR)$(readmesdir)/$(DEPRECATED_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(DEPRECATED_NAME)
-	install -p $(externals_src)/deprecated/examples/*.pd \
-		$(DESTDIR)$(examplesdir)/$(DEPRECATED_NAME)
-
-deprecated_clean:
-	-rm -f -- $(DEPRECATED_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(DEPRECATED_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/deprecated/*.bak
-	-rm -f -- $(externals_src)/deprecated/*.*~
-
-
-
-#------------------------------------------------------------------------------#
-# DEVELLIBS
-DEVELLIBS_NAME=devellibs
-DEVELLIBS_OBJECTS := $(wildcard $(externals_src)/devellibs/*.c)
-devellibs: $(DEVELLIBS_OBJECTS:.c=.$(EXTENSION))
-
-devellibs_install: devellibs
-	install -d $(DESTDIR)$(objectsdir)/$(DEVELLIBS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(DEVELLIBS_NAME) \
-		--author "Miller Puckette and others" \
-		--description "core libraries stripped out of Pd-devel" \
-		--license "BSD" \
-		--version ""
-	install -p $(DEVELLIBS_OBJECTS:.c=.$(EXTENSION)) 
-		$(DESTDIR)$(objectsdir)/$(DEVELLIBS_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(DEVELLIBS_NAME)
-	install -p $(externals_src)/devellibs/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(DEVELLIBS_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(DEVELLIBS_NAME)
-#	install -p $(externals_src)/devellibs/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(DEVELLIBS_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/devellibs/README \
-		$(DESTDIR)$(readmesdir)/$(DEVELLIBS_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(DEVELLIBS_NAME)
-	install -p $(externals_src)/devellibs/examples/*.pd \
-		$(DESTDIR)$(examplesdir)/$(DEVELLIBS_NAME)
-
-devellibs_clean:
-	-rm -f -- $(DEVELLIBS_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(DEVELLIBS_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/devellibs/*.bak
-	-rm -f -- $(externals_src)/devellibs/*.*~
-
-
 
 
 
@@ -611,9 +513,6 @@ ekext_install: ekext
 		--license "BSD" \
 		--version ""
 	install -p $(EKEXT_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(EKEXT_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(EKEXT_NAME)
-	install -p $(externals_src)/ekext/*/*help*.pd \
-		$(DESTDIR)$(helpdir)/$(EKEXT_NAME)
 	install -p $(externals_src)/ekext/*/*help*.pd \
 		$(DESTDIR)$(objectsdir)/$(EKEXT_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(EKEXT_NAME)
@@ -667,9 +566,6 @@ fftease_install: fftease
 		--license "MIT License" \
 		--version "2.0"
 	install -p $(FFTEASE_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(FFTEASE_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(FFTEASE_NAME)
-	install -p $(externals_src)/fftease/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(FFTEASE_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(FFTEASE_NAME)
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(externals_src)/fftease/README \
@@ -683,40 +579,6 @@ fftease_clean:
 	-rm -f -- $(externals_src)/fftease/*.o
 	-rm -f -- $(externals_src)/fftease/*.bak
 	-rm -f -- $(externals_src)/fftease/*.*~
-
-
-
-#------------------------------------------------------------------------------#
-# FILE
-FILE_NAME=file
-FILE_OBJECTS := $(wildcard $(externals_src)/file/*.c)
-file: $(FILE_OBJECTS:.c=.$(EXTENSION))
-
-file_install: file
-	install -d $(DESTDIR)$(objectsdir)/$(FILE_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(FILE_NAME) \
-		--author "" \
-		--description "" \
-		--license "" \
-		--version ""
-	install -p $(FILE_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(FILE_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(FILE_NAME)
-	install -p $(externals_src)/file/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(FILE_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(FILE_NAME)
-#	install -p $(externals_src)/file/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(FILE_NAME)
-#	install -p $(externals_src)/file/README \
-#		$(DESTDIR)$(readmesdir)/$(FILE_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(FILE_NAME)
-#	install -p $(externals_src)/file/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(FILE_NAME)
-
-file_clean:
-	-rm -f -- $(FILE_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(FILE_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/file/*.bak
-	-rm -f -- $(externals_src)/file/*.*~
 
 
 
@@ -736,9 +598,6 @@ flib_install: flib
 		--description "library for feature extraction" \
 		--license "GNU GPL"
 	install -p $(FLIB_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(FLIB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(FLIB_NAME)
-	install -p $(externals_src)/postlude/flib/doc/*.pd \
-		$(DESTDIR)$(helpdir)/$(FLIB_NAME)
 	install -p $(externals_src)/postlude/flib/doc/*.pd \
 		$(DESTDIR)$(objectsdir)/$(FLIB_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(FLIB_NAME)
@@ -774,9 +633,6 @@ frankenstein_install: frankenstein
 		--license "" \
 		--version ""
 	install -p $(FRANKENSTEIN_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(FRANKENSTEIN_NAME)
-#	install -d $(DESTDIR)$(helpdir)/$(FRANKENSTEIN_NAME)
-#	install -p $(externals_src)/frankenstein/help/*.pd \
-#		$(DESTDIR)$(helpdir)/$(FRANKENSTEIN_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(FRANKENSTEIN_NAME)
 	install -p $(externals_src)/frankenstein/doc/*.* \
 		$(DESTDIR)$(manualsdir)/$(FRANKENSTEIN_NAME)
@@ -794,34 +650,14 @@ frankenstein_clean:
 
 #------------------------------------------------------------------------------#
 # FREEVERB
-FREEVERB_NAME=freeverb~
-FREEVERB_OBJECTS := $(wildcard $(externals_src)/freeverb~/*.c)
-freeverb: $(FREEVERB_OBJECTS:.c=.$(EXTENSION))
+freeverb:
+	make -C $(externals_src)/freeverb
 
-freeverb_install: freeverb
-	install -d $(DESTDIR)$(objectsdir)/$(FREEVERB_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(FREEVERB_NAME) \
-		--author "Olaf Matthes and Jezar Wakefield" \
-		--description "Freeverb is a simple implementation of the standard Schroeder/Moorer reverb model" \
-		--license "GNU GPL" \
-		--version "1.2"
-	install -p $(FREEVERB_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(FREEVERB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(FREEVERB_NAME)
-	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) \
-		$(DESTDIR)$(helpdir)/$(FREEVERB_NAME)
-	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) \
-		$(DESTDIR)$(objectsdir)/$(FREEVERB_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(FREEVERB_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/freeverb~/README \
-		$(DESTDIR)$(readmesdir)/$(FREEVERB_NAME).txt
-
+freeverb_install:
+	make -C $(externals_src)/freeverb DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 freeverb_clean:
-	-rm -f -- $(externals_src)/freeverb~/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/freeverb~/*.o
-	-rm -f -- $(externals_src)/freeverb~/*.bak
-	-rm -f -- $(externals_src)/freeverb~/*.*~
+	make -C $(externals_src)/freeverb clean
 
 
 
@@ -847,9 +683,7 @@ gem2pdp_install: gem2pdp
 #		--description "Bridges between Gem and PDP" \
 #		--version "0.6"
 	install -p $(GEM2PDP_OBJECTS:.cpp=.$(EXTENSION)) $(DESTDIR)$(objectsdir)
-#	install -d $(DESTDIR)$(helpdir)/$(GEM2PDP_NAME)
-	install -d $(DESTDIR)$(helpdir)
-	install -p $(externals_src)/gem2pdp/*.pd  $(DESTDIR)$(helpdir)
+	install -p $(externals_src)/gem2pdp/*.pd  $(DESTDIR)$(objectsdir)
 #	install -d $(DESTDIR)$(manualsdir)/$(GEM2PDP_NAME)
 #	install -p $(externals_src)/gem2pdp/manual.txt \
 #		$(DESTDIR)$(manualsdir)/$(GEM2PDP_NAME)
@@ -889,9 +723,6 @@ ggee_install: ggee
 	install -p $(GGEE_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(GGEE_NAME)
 	install -p $(shell ls -1 $(externals_src)/vbap/*.pd | grep -v '-help.pd') \
 		 $(DESTDIR)$(objectsdir)/$(GGEE_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(GGEE_NAME)
-	install -p $(externals_src)/ggee/*/*-help.pd \
-		$(externals_src)/ggee/*/*.gif $(DESTDIR)$(helpdir)/$(GGEE_NAME)
 	install -p $(externals_src)/ggee/*/*-help.pd \
 		$(externals_src)/ggee/*/*.gif $(DESTDIR)$(objectsdir)/$(GGEE_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(GGEE_NAME)
@@ -933,9 +764,6 @@ hardware_install: hardware
 		$(DESTDIR)$(objectsdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/DMXUSBPro/DMXUSBPro.pd \
 		$(DESTDIR)$(objectsdir)/$(HARDWARE_NAME)	
-	install -d $(DESTDIR)$(helpdir)/$(HARDWARE_NAME)
-	install -p $(externals_src)/hardware/*/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(HARDWARE_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/memPIO/README.txt \
 		$(DESTDIR)$(manualsdir)/$(HARDWARE_NAME)/memPIO.txt
@@ -971,11 +799,6 @@ hcs_install: hcs
 			 grep -v '\-help.pd') $(DESTDIR)$(objectsdir)/$(HCS_NAME)
 # hmm, these don't have a home yet...
 	install -p $(externals_src)/hcs/general/*.pd $(DESTDIR)$(objectsdir)/$(HCS_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(HCS_NAME)
-	install -p $(externals_src)/hcs/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(HCS_NAME)
-	install -p $(externals_src)/hcs/*.gif \
-		$(DESTDIR)$(helpdir)/$(HCS_NAME)
 	install -p $(externals_src)/hcs/*-help.pd \
 		$(DESTDIR)$(objectsdir)/$(HCS_NAME)
 	install -p $(externals_src)/hcs/*.gif \
@@ -1050,10 +873,7 @@ hid_install: hid
 		--version ""
 	-install -p $(externals_src)/hcs/hid/hid.$(EXTENSION) $(DESTDIR)$(objectsdir)
 	install -p $(externals_src)/hcs/hid/*.pd $(DESTDIR)$(objectsdir)/$(HID_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(HID_NAME)
-	install -p $(externals_src)/hcs/hid/doc/*.pd       $(DESTDIR)$(helpdir)/$(HID_NAME)
 	install -p $(externals_src)/hcs/hid/doc/*.pd       $(DESTDIR)$(objectsdir)/$(HID_NAME)
-	install -p $(externals_src)/hcs/hid/examples/*.pd $(DESTDIR)$(helpdir)/$(HID_NAME)
 	install -d $(DESTDIR)$(examplesdir)/$(HID_NAME)
 	install -p $(externals_src)/hcs/hid/examples/*.pd  $(DESTDIR)$(examplesdir)/$(HID_NAME)
 
@@ -1087,9 +907,6 @@ hidin_install: hidin
 		--description "HID input for Windows HID" \
 		--license "GNU GPL"
 	install -p $(HIDIN_DLL) $(DESTDIR)$(objectsdir)/$(HIDIN_NAME)
-#	install -d $(DESTDIR)$(helpdir)/$(HIDIN_NAME)
-#	install -p $(externals_src)/olafmatt/hidin/help/*.pd \
-#		$(DESTDIR)$(helpdir)/$(HIDIN_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(HIDIN_NAME)
 #	install -d $(DESTDIR)$(readmesdir)
 #	install -p $(externals_src)/olafmatt/hidin/README \
@@ -1122,9 +939,6 @@ iem_ambi_install: iem_ambi
 		--version ""
 	install -p $(IEM_AMBI_OBJECTS:.c=.$(EXTENSION)) \
 		$(DESTDIR)$(objectsdir)/$(IEM_AMBI_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEM_AMBI_NAME)
-	install -p $(externals_src)/iem/iem_ambi/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEM_AMBI_NAME)
 	install -p $(externals_src)/iem/iem_ambi/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEM_AMBI_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(IEM_AMBI_NAME)
@@ -1158,9 +972,6 @@ iem_bin_ambi_install: iem_bin_ambi
 		--license "GNU GPL" \
 		--version ""
 	install -p $(IEM_BIN_AMBI_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEM_BIN_AMBI_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEM_BIN_AMBI_NAME)
-	install -p $(externals_src)/iem/iem_bin_ambi/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEM_BIN_AMBI_NAME)
 	install -p $(externals_src)/iem/iem_bin_ambi/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEM_BIN_AMBI_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(IEM_BIN_AMBI_NAME)
@@ -1209,9 +1020,6 @@ iem16_install: iem16
 		--license "GNU GPL" \
 		--version "0.1"
 	install -p $(IEM16_DIR)/*.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(IEM16_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEM16_NAME)
-	install -p $(externals_src)/iem16/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEM16_NAME)
 	install -p $(externals_src)/iem16/help/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEM16_NAME)
 
@@ -1242,9 +1050,6 @@ iemguts_install: iemguts
 		--license "GNU GPL" \
 		--version ""
 	install -p $(IEMGUTS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMGUTS_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEMGUTS_NAME)
-	install -p $(externals_src)/iem/iemguts/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEMGUTS_NAME)
 	install -p $(externals_src)/iem/iemguts/help/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMGUTS_NAME)
 	install -d $(DESTDIR)$(readmesdir)
@@ -1282,11 +1087,9 @@ iemlib_install: iemlib
 	install -p $(IEMLIB_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/iemabs/*.pd $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/alias/*.pd $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/*/*-help.pd $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/*/*-help.pd $(DESTDIR)$(helpdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/*/*.mp3 $(DESTDIR)$(helpdir)/$(IEMLIB_NAME)
-	install -p $(externals_src)/iemlib/*/*.wav $(DESTDIR)$(helpdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/*/*.mp3 $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/*/*.wav $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
 	install -d $(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/examples/*.* \
 		$(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)
@@ -1301,8 +1104,6 @@ iemlib_install: iemlib
 iemlib_clean: 
 	-rm -f -- $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
 	-rmdir -- $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)
-	-rm -f -- $(DESTDIR)$(helpdir)/$(IEMLIB_NAME)/*.*
-	-rmdir -- $(DESTDIR)$(helpdir)/$(IEMLIB_NAME)
 	-rm -f -- $(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)/*.*
 	-rmdir -- $(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)
 	-rm -f -- $(DESTDIR)$(manualsdir)/$(IEMLIB_NAME)/*.*
@@ -1327,7 +1128,7 @@ $(IEMMATRIX_OBJ:.o=.$(EXTENSION)) : %.$(EXTENSION) : $(IEMMATRIX_OBJ) $(IEMMATRI
 	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(IEMMATRIX_SHARED:.c=.o) $(LIBS)
 	$(STRIP) $*.$(EXTENSION)
 	chmod 755 $*.$(EXTENSION)
-	#rm -f -- "$*.o"
+#	rm -f -- "$*.o"
 
 $(IEMMATRIX_OBJ) $(IEMMATRIX_SHARED:.c=.o) : %.o : %.c
 	$(CC) $(OPT_CFLAGS) $(CFLAGS) -o "$*.o" -c "$*.c" -I$(IEMMATRIX_ROOT)/src
@@ -1342,11 +1143,8 @@ iemmatrix_install: iemmatrix
 	install -p $(IEMMATRIX_OBJ:.o=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMMATRIX_NAME)
 	install -p $(shell ls -1 $(externals_src)/iem/iemmatrix/abs/*.* | \
 		grep -v '\-help.pd') $(DESTDIR)$(objectsdir)/$(IEMMATRIX_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEMMATRIX_NAME)
 	install -p $(externals_src)/iem/iemmatrix/doc/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEMMATRIX_NAME)
-	install -p $(externals_src)/iem/iemmatrix/abs/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(IEMMATRIX_NAME)
+		$(DESTDIR)$(objectsdir)/$(IEMMATRIX_NAME)
 	install -p $(externals_src)/iem/iemmatrix/abs/*-help.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMMATRIX_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(IEMMATRIX_NAME)
@@ -1378,9 +1176,6 @@ iem_matrix_install: iem_matrix
 		--license "GNU GPL" \
 		--version ""
 	install -p $(IEM_MATRIX_OBJ:.o=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEM_MATRIX_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEM_MATRIX_NAME)
-	install -p $(externals_src)/iem/iem_matrix/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEM_MATRIX_NAME)
 	install -p $(externals_src)/iem/iem_matrix/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEM_MATRIX_NAME)
 
@@ -1406,9 +1201,6 @@ jasch_lib_install: jasch_lib
 		--version ""
 	install -p $(JASCH_LIB_OBJECTS:.c=.$(EXTENSION)) \
 		$(DESTDIR)$(objectsdir)/$(JASCH_LIB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(JASCH_LIB_NAME)
-	install -p $(externals_src)/jasch_lib/*/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(JASCH_LIB_NAME)
 	install -p $(externals_src)/jasch_lib/*/*-help.pd \
 		$(DESTDIR)$(objectsdir)/$(JASCH_LIB_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(JASCH_LIB_NAME)
@@ -1439,9 +1231,6 @@ loaders: $(LOADERS_OBJECTS:.c=.$(EXTENSION))
 loaders_install: loaders
 	install -d $(DESTDIR)$(objectsdir)/$(LOADERS_NAME)
 	install -p $(LOADERS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LOADERS_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(LOADERS_NAME)
-#	install -p $(wildcard $(externals_src)/loaders/help/*.pd) \
-#		$(DESTDIR)$(helpdir)/$(LOADERS_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(LOADERS_NAME)
 #	install -p $(externals_src)/loaders/README.txt $(DESTDIR)$(manualsdir)/$(LOADERS_NAME)
 
@@ -1488,9 +1277,6 @@ maxlib_install: maxlib
 		--license "GNU GPL" \
 		--version "1.5.2-cvs"
 	install -p $(MAXLIB_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(MAXLIB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(MAXLIB_NAME)
-	install -p $(wildcard $(externals_src)/maxlib/help/*.pd) \
-		$(DESTDIR)$(helpdir)/$(MAXLIB_NAME)
 	install -p $(wildcard $(externals_src)/maxlib/help/*.pd) \
 		$(DESTDIR)$(objectsdir)/$(MAXLIB_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(MAXLIB_NAME)
@@ -1552,11 +1338,8 @@ moocow_install:
 	install -p $(MOOCOW_BUILD)/ext*/*.pd \
 		$(DESTDIR)$(objectsdir)/$(MOOCOW_NAME) \
 	  || echo 'moocow_install: WARNING: no library patches to install!'
-	install -d $(DESTDIR)$(helpdir)/$(MOOCOW_NAME)
 	install -p $(MOOCOW_BUILD)/doc/5.reference/*.pd \
 		$(DESTDIR)$(objectsdir)/$(MOOCOW_NAME) \
-	install -p $(MOOCOW_BUILD)/doc/5.reference/*.pd \
-		$(DESTDIR)$(helpdir)/$(MOOCOW_NAME) \
 	  || echo 'moocow_install: WARNING: no help patches to install!'
 #	install -d $(DESTDIR)$(manualsdir)/$(MOOCOW_NAME)
 #	install -p $(externals_src)/moocow/manual.txt \
@@ -1619,9 +1402,6 @@ mrpeach_install: mrpeach
 		--license "GNU GPL" \
 		--version "0.1"
 	install -p $(MRPEACH_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(MRPEACH_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(MRPEACH_NAME)
-	install -p $(externals_src)/mrpeach/*/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(MRPEACH_NAME)
 	install -p $(externals_src)/mrpeach/*/*-help.pd \
 		$(DESTDIR)$(objectsdir)/$(MRPEACH_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(MRPEACH_NAME)
@@ -1675,8 +1455,6 @@ oscx_install: oscx
 		--license "BSD" \
 		--description "objects for working with OpenSoundControl"
 	install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(OSCX_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(OSCX_NAME)
-	install -p $(externals_src)/OSCx/doc/*.* $(DESTDIR)$(helpdir)/$(OSCX_NAME)
 	install -p $(externals_src)/OSCx/doc/*.* $(DESTDIR)$(objectsdir)/$(OSCX_NAME)
 
 
@@ -1687,45 +1465,16 @@ oscx_clean:
 
 
 
-
 #------------------------------------------------------------------------------#
 # PAN
-PAN_NAME=pan
-PAN_OBJECTS := $(wildcard $(externals_src)/hcs/pan/*.c)
-pan: $(PAN_OBJECTS:.c=.$(EXTENSION))
+pan:
+	make -C $(externals_src)/hcs/pan
 
-pan_install: pan
-	install -d $(DESTDIR)$(objectsdir)/$(PAN_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PAN_NAME) \
-		--author "Hans-Christoph Steiner <hans@at.or.at>" \
-		--description "A library of panning algoritms" \
-		--license "GNU GPL" \
-		--version ""
-# everything is .pd, nothing to compile (yet?)
-#	install -p $(PAN_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(PAN_NAME)
-	install -p $(wildcard $(externals_src)/hcs/pan/*.pd) \
-		$(DESTDIR)$(objectsdir)/$(PAN_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(PAN_NAME)
-	install -p $(externals_src)/hcs/pan/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(PAN_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(PAN_NAME)
-#	install -p $(externals_src)/hcs/pan/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(PAN_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/hcs/pan/README \
-#		$(DESTDIR)$(readmesdir)/$(PAN_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(PAN_NAME)
-#	install -p $(externals_src)/hcs/pan/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(PAN_NAME)
-
+pan_install:
+	make -C $(externals_src)/hcs/pan DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 pan_clean:
-	-rm -f -- $(PAN_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(PAN_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/hcs/pan/*.bak
-	-rm -f -- $(externals_src)/hcs/pan/*.*~
-
-
+	make -C $(externals_src)/hcs/pan clean
 
 
 #------------------------------------------------------------------------------#
@@ -1748,7 +1497,6 @@ pddp_install: pddp
 	install -d $(DESTDIR)$(objectsdir)/$(PDDP_NAME)/pddp
 	install -p $(externals_src)/miXed/bin/pddp/*.tcl \
 		$(DESTDIR)$(objectsdir)/$(PDDP_NAME)/pddp
-#	install -d $(DESTDIR)$(helpdir)/$(PDDP_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(PDDP_NAME)
 	install -d $(DESTDIR)$(examplesdir)/$(PDDP_NAME)
 	install -p $(externals_src)/miXed/test/pddp/*.*  \
@@ -1801,9 +1549,6 @@ pdogg_install: pdogg
 		--license "LGPL" \
 		--version "0.2"
 	install -p $(PDOGG_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(PDOGG_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(PDOGG_NAME)
-	install -p $(externals_src)/pdogg/*/*.pd \
-		$(DESTDIR)$(helpdir)/$(PDOGG_NAME)
 	install -p $(externals_src)/pdogg/*/*.pd \
 		$(DESTDIR)$(objectsdir)/$(PDOGG_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(PDOGG_NAME)
@@ -1851,8 +1596,6 @@ pdp_install: pdp
 	install -p $(externals_src)/pdp/*.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(PDP_NAME)
 #	install -p $(externals_src)/pdp/abstractions/*.pd $(DESTDIR)$(objectsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/abstractions/*.pd $(DESTDIR)$(objectsdir)
-	install -d $(DESTDIR)$(helpdir)/$(PDP_NAME)
-	install -p $(externals_src)/pdp/doc/objects/*.* $(DESTDIR)$(helpdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/objects/*.* $(DESTDIR)$(objectsdir)/$(PDP_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/reference.txt $(DESTDIR)$(manualsdir)/$(PDP_NAME)
@@ -1889,7 +1632,6 @@ pdp_opengl_install: pdp_opengl
 	install -p $(PDP_OPENGL_BINARY) $(DESTDIR)$(objectsdir)
 	install -p $(externals_src)/pdp/opengl/abstractions/*.pd \
 		$(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(PDP_OPENGL_NAME)
 	install -p $(externals_src)/pdp/opengl/doc/objects/*.pd $(DESTDIR)$(objectsdir)
 	install -p $(externals_src)/pdp/opengl/doc/objects/*.pd $(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)
 	install -d $(DESTDIR)$(readmesdir)
@@ -1943,8 +1685,6 @@ pidip_install: pidip
 #		--description "PiDiP is Definitely in Pieces" \
 #		--license "GNU GPLv2"
 	install -p $(externals_src)/pidip/*.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(PIDIP_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(PIDIP_NAME)
-	install -p $(externals_src)/pidip/doc/*.pd $(DESTDIR)$(helpdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/doc/*.pd $(DESTDIR)$(objectsdir)/$(PIDIP_NAME)
 	install -d $(DESTDIR)$(examplesdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/patches/*.* $(DESTDIR)$(examplesdir)/$(PIDIP_NAME)
@@ -1980,10 +1720,7 @@ pmpd_install: pmpd
 		--author "Cyrille Henry" \
 		--description "Physical Modelling for Pd"
 	-install -p $(externals_src)/pmpd/*.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(PMPD_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(PMPD_NAME)
-	install -p $(externals_src)/pmpd/help/*.pd $(DESTDIR)$(helpdir)/$(PMPD_NAME)
 	install -p $(externals_src)/pmpd/help/*.pd $(DESTDIR)$(objectsdir)/$(PMPD_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(PMPD_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(PMPD_NAME)
 	install -p $(externals_src)/pmpd/doc/pmpd.pdf/pmpd.pdf \
 		$(DESTDIR)$(manualsdir)/$(PMPD_NAME)
@@ -2015,9 +1752,6 @@ postlude_install: postlude
 	install -p $(POSTLUDE_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(POSTLUDE_NAME)
 	install -p $(externals_src)/postlude/dssi/doc/output~.pd \
 		$(DESTDIR)$(objectsdir)/$(POSTLUDE_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(POSTLUDE_NAME)
-	install -p $(externals_src)/postlude/*/doc/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(POSTLUDE_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(POSTLUDE_NAME)
 #	install -p $(externals_src)/postlude/manual.txt \
 #		$(DESTDIR)$(manualsdir)/$(POSTLUDE_NAME)
@@ -2048,40 +1782,6 @@ sigpack_install:
 
 sigpack_clean:
 	make -C $(externals_src)/sigpack clean
-
-
-#------------------------------------------------------------------------------#
-# SIXAXIS
-SIXAXIS_NAME=io
-SIXAXIS_OBJECTS = $(externals_src)/io/sixaxis/sixaxis.c
-sixaxis: $(SIXAXIS_OBJECTS:.c=.$(EXTENSION))
-
-sixaxis_install: sixaxis
-	install -d $(DESTDIR)$(objectsdir)/$(SIXAXIS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(SIXAXIS_NAME) \
-		--author "Hans-Christoph Steiner" \
-		--description "supports the Sony SIXAXIS controller's accelerometer" \
-		--license "GNU GPL" \
-		--version "0.1"
-	install -p $(SIXAXIS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(SIXAXIS_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(SIXAXIS_NAME)
-	install -p $(externals_src)/io/sixaxis/*.pd \
-		$(DESTDIR)$(helpdir)/$(SIXAXIS_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(SIXAXIS_NAME)
-#	install -p $(externals_src)/io/sixaxis/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(SIXAXIS_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/io/sixaxis/README \
-#		$(DESTDIR)$(readmesdir)/$(SIXAXIS_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(SIXAXIS_NAME)
-#	install -p $(externals_src)/io/sixaxis/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(SIXAXIS_NAME)
-
-sixaxis_clean:
-	-rm -f -- $(SIXAXIS_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(SIXAXIS_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/io/sixaxis/*.bak
-	-rm -f -- $(externals_src)/io/sixaxis/*.*~
 
 
 
@@ -2143,9 +1843,9 @@ tkwidgets_install: tkwidgets
 		--description "a collection of objects based on Tk widgets" \
 		--license "GPLv2 or later" 
 	install -p $(TKWIDGETS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(TKWIDGETS_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(TKWIDGETS_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(TKWIDGETS_NAME)
 	install -p $(externals_src)/tkwidgets/*.pd \
-		$(DESTDIR)$(helpdir)/$(TKWIDGETS_NAME)
+		$(DESTDIR)$(objectsdir)/$(TKWIDGETS_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(TKWIDGETS_NAME)
 #	install -p $(externals_src)/tkwidgets/manual.txt \
 #		$(DESTDIR)$(manualsdir)/$(TKWIDGETS_NAME)
@@ -2176,9 +1876,6 @@ tof_install: tof
 		--license "Whatever Hans wants" \
 		--version "2009-09-22"
 	install -p $(TOF_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(TOF_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(TOF_NAME)
-	install -p $(externals_src)/tof/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(TOF_NAME)
 	install -p $(externals_src)/tof/help/*.pd \
 		$(DESTDIR)$(objectsdir)/$(TOF_NAME)
 	install -p $(externals_src)/tof/abs/*.pd \
@@ -2207,9 +1904,6 @@ toxy_install: toxy
 		--license "BSD" \
 		--description "objects for working with Tcl and Pd's Tk GUI"
 	cd $(externals_src)/miXed/toxy && $(MAKE) OUT_DIR=$(TOXY_OUT_DIR)
-	install -d $(DESTDIR)$(helpdir)/$(TOXY_NAME)
-	install -p $(externals_src)/miXed/doc/help/toxy/*.*  \
-		$(DESTDIR)$(helpdir)/$(TOXY_NAME)
 	install -p $(externals_src)/miXed/doc/help/toxy/*.*  \
 		$(DESTDIR)$(objectsdir)/$(TOXY_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(TOXY_NAME)
@@ -2264,16 +1958,13 @@ unauthorized_install: unauthorized
 		--description "GUI and streaming objects"
 	install -p $(externals_src)/unauthorized/*/*.$(EXTENSION) \
 		$(DESTDIR)$(objectsdir)/$(UNAUTHORIZED_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(UNAUTHORIZED_NAME)
-	install -p $(externals_src)/unauthorized/*/*.pd \
-		$(DESTDIR)$(helpdir)/$(UNAUTHORIZED_NAME)
 	install -p $(externals_src)/unauthorized/*/*.pd \
 		$(DESTDIR)$(objectsdir)/$(UNAUTHORIZED_NAME)
 	install -p $(externals_src)/unauthorized/*/*.pls \
-		$(DESTDIR)$(helpdir)/$(UNAUTHORIZED_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(UNAUTHORIZED_NAME)/blm
+		$(DESTDIR)$(objectsdir)/$(UNAUTHORIZED_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(UNAUTHORIZED_NAME)/blm
 	install -p $(externals_src)/unauthorized/blinkenlights/blm/*.* \
-		$(DESTDIR)$(helpdir)/$(UNAUTHORIZED_NAME)/blm
+		$(DESTDIR)$(objectsdir)/$(UNAUTHORIZED_NAME)/blm
 	install -d $(DESTDIR)$(manualsdir)/$(UNAUTHORIZED_NAME)
 	install -p $(externals_src)/unauthorized/*/*.txt \
 		$(DESTDIR)$(manualsdir)/$(UNAUTHORIZED_NAME)
@@ -2286,41 +1977,6 @@ unauthorized_clean:
 	-rm -f -- $(externals_src)/unauthorized/*/*.bak
 	-rm -f -- $(externals_src)/*/*.*~
 	-rm -f -- $(externals_src)/*.*~
-
-
-
-#------------------------------------------------------------------------------#
-# USBHID
-USBHID_NAME=usbhid
-USBHID_OBJECTS := $(wildcard $(externals_src)/hcs/usbhid/*.c)
-usbhid: $(USBHID_OBJECTS:.c=.$(EXTENSION))
-
-usbhid_install: usbhid
-	install -d $(DESTDIR)$(objectsdir)/$(USBHID_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(USBHID_NAME) \
-		--author "Hans-Christoph Steiner" \
-		--description "pure USB HID object for accessing HID devices" \
-		--license "GNU GPL" \
-		--version ""
-	install -p $(USBHID_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(USBHID_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(USBHID_NAME)
-	install -p $(externals_src)/hcs/usbhid/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(USBHID_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(USBHID_NAME)
-#	install -p $(externals_src)/usbhid/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(USBHID_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/usbhid/README \
-#		$(DESTDIR)$(readmesdir)/$(USBHID_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(USBHID_NAME)
-#	install -p $(externals_src)/usbhid/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(USBHID_NAME)
-
-usbhid_clean:
-	-rm -f -- $(USBHID_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(USBHID_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/usbhid/*.bak
-	-rm -f -- $(externals_src)/usbhid/*.*~
 
 
 
@@ -2339,8 +1995,6 @@ vbap_install: vbap
 	install -p $(VBAP_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(VBAP_NAME)
 	install -p $(shell ls -1 $(externals_src)/vbap/*.pd | grep -v '-help.pd') \
 		 $(DESTDIR)$(objectsdir)/$(VBAP_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(VBAP_NAME)
-	install -p $(externals_src)/vbap/*-help.pd $(DESTDIR)$(helpdir)/$(VBAP_NAME)
 	install -p $(externals_src)/vbap/*-help.pd $(DESTDIR)$(objectsdir)/$(VBAP_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(VBAP_NAME)
 #	install -p $(externals_src)/vbap/manual.txt \
@@ -2379,40 +2033,6 @@ windowing_install:
 windowing_clean:
 	make -C $(externals_src)/windowing clean
 
-
-#------------------------------------------------------------------------------#
-# XBEE
-# this is installed into the "io" library
-XBEE_NAME=io
-XBEE_SRC := $(wildcard $(externals_src)/io/xbee/*.c)
-
-XBEE_OBJECTS := $(XBEE_SRC:.c=.o)
-$(XBEE_OBJECTS) : %.o : %.c
-	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
-
-$(externals_src)/io/xbee/xbee_test.$(EXTENSION): $(XBEE_OBJECTS) 
-	$(CC) $(LDFLAGS) -o $(externals_src)/io/xbee/xbee_test.$(EXTENSION) \
-		$(XBEE_OBJECTS)
-#	$(STRIP) $(externals_src)/io/xbee/xbee_test.$(EXTENSION)
-
-xbee: $(externals_src)/io/xbee/xbee_test.$(EXTENSION)
-
-xbee_install: xbee
-	install -d $(DESTDIR)$(objectsdir)/$(XBEE_NAME)
-	install -p $(externals_src)/io/xbee/xbee_test.$(EXTENSION) \
-		$(DESTDIR)$(objectsdir)/$(XBEE_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(XBEE_NAME)
-	install -p $(externals_src)/io/xbee/*.pd \
-		$(DESTDIR)$(helpdir)/$(XBEE_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(XBEE_NAME)
-	install -p $(externals_src)/io/xbee/*.txt \
-		$(DESTDIR)$(manualsdir)/$(XBEE_NAME)
-
-xbee_clean:
-	-rm -f -- $(externals_src)/io/xbee/xbee_test.$(EXTENSION)
-	-rm -f -- $(XBEE_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/io/xbee/*.bak
-	-rm -f -- $(externals_src)/io/xbee/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -2457,12 +2077,9 @@ zexy_install: zexy
 		$(DESTDIR)$(objectsdir)/$(ZEXY_NAME)
 # an escape pattern for the abstractions with special characters
 #		grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') 
-	install -d $(DESTDIR)$(helpdir)/$(ZEXY_NAME)
-	install -p $(shell ls -1 $(externals_src)/zexy/abs/*-help.pd | \
-		sed 's|\(.*\)|"\1"|g') $(DESTDIR)$(helpdir)/$(ZEXY_NAME)
 	install -p $(shell ls -1 $(externals_src)/zexy/reference/*-help.pd | \
-		sed 's|\(.*\)|"\1"|g') $(DESTDIR)$(helpdir)/$(ZEXY_NAME)
-	install -p $(externals_src)/zexy/zexy.pd  $(DESTDIR)$(helpdir)
+		sed 's|\(.*\)|"\1"|g') $(DESTDIR)$(objectsdir)/$(ZEXY_NAME)
+	install -p $(externals_src)/zexy/zexy.pd  $(DESTDIR)$(objectsdir)
 
 zexy_clean:
 	-$(MAKE) -C $(externals_src)/zexy/src clean
@@ -2497,7 +2114,7 @@ $(PDCONTAINER_TARGETS) : %.$(EXTENSION) : $(PDCONTAINER_OBJ)
 	$(CXX) $(LDFLAGS) -o $*.$(EXTENSION) "$*.o" $(shell ls `echo "$*.o" | sed -e s/"h_[a-z]"/"\?\?"/g -e s/"map"/"Map"/g -e s/"set"/"Set"/g -e s/"queue"/"Queue"/g`) $(PDC_SHARED:.cpp=.o) $(LIBS)
 	$(STRIP) $*.$(EXTENSION)
 	chmod 755 $*.$(EXTENSION)
-	#rm -f -- "$*.o"
+#	rm -f -- "$*.o"
 
 $(PDCONTAINER_OBJ) : %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -DPDCONTAINER_SINGLE_OBJECT $(PDCONTAINER_INCLUDE) -o "$*.o" -c "$*.cpp"
@@ -2510,9 +2127,6 @@ pdcontainer_install: pdcontainer
 		--license "GPL" \
 		--version ""
 	install -p $(PDCONTAINER_TARGETS) $(DESTDIR)$(objectsdir)/$(PDCONTAINER_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(PDCONTAINER_NAME)
-	install -p $(externals_src)/grh/PDContainer/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(PDCONTAINER_NAME)
 	install -p $(externals_src)/grh/PDContainer/help/*.pd \
 		$(DESTDIR)$(objectsdir)/$(PDCONTAINER_NAME)
 	install -d $(DESTDIR)$(readmesdir)
@@ -2558,9 +2172,6 @@ adaptive_install: adaptive
 		--license "GNU GPL" \
 		--version ""
 	install -p $(ADAPTIVE_TARGETS) $(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(ADAPTIVE_NAME)
-	install -p $(externals_src)/grh/adaptive/doc/*.pd \
-		$(DESTDIR)$(helpdir)/$(ADAPTIVE_NAME)
 	install -p $(externals_src)/grh/adaptive/doc/*.pd \
 		$(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)
 	install -d $(DESTDIR)$(readmesdir)
@@ -2594,9 +2205,6 @@ iem_adaptfilt_install: iem_adaptfilt
 		--license "GNU GPL" \
 		--version ""
 	install -p $(IEMADAPT_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMADAPT_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEMADAPT_NAME)
-	install -p $(externals_src)/iem/iem_adaptfilt/help/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEMADAPT_NAME)
 	install -p $(externals_src)/iem/iem_adaptfilt/help/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMADAPT_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(IEMADAPT_NAME)
@@ -2626,9 +2234,6 @@ iem_delay_install: iem_delay
 		--license "GNU GPL" \
 		--version ""
 	install -p $(IEMDELAY_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMDELAY_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEMDELAY_NAME)
-	install -p $(externals_src)/iem/iem_delay/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEMDELAY_NAME)
 	install -p $(externals_src)/iem/iem_delay/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMDELAY_NAME)
 	install -d $(DESTDIR)$(readmesdir)
@@ -2658,9 +2263,6 @@ iem_roomsim_install: iem_roomsim
 		--license "GNU GPL" \
 		--version ""
 	install -p $(IEMROOM_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMROOM_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEMROOM_NAME)
-	install -p $(externals_src)/iem/iem_roomsim/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEMROOM_NAME)
 	install -p $(externals_src)/iem/iem_roomsim/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMROOM_NAME)
 	install -d $(DESTDIR)$(readmesdir)
@@ -2690,9 +2292,6 @@ iem_spec2_install: iem_spec2
 		--license "GNU GPL" \
 		--version ""
 	install -p $(IEMSPEC2_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMSPEC2_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEMSPEC2_NAME)
-	install -p $(externals_src)/iem/iem_spec2/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEMSPEC2_NAME)
 	install -p $(externals_src)/iem/iem_spec2/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMSPEC2_NAME)
 	install -d $(DESTDIR)$(readmesdir)
@@ -2735,9 +2334,6 @@ iem_tab_install: iem_tab
 		--license "GNU GPL" \
 		--version ""
 	install -p $(IEMTAB_TARGETS) $(DESTDIR)$(objectsdir)/$(IEMTAB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEMTAB_NAME)
-	install -p $(externals_src)/iem/iem_tab/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEMTAB_NAME)
 	install -p $(externals_src)/iem/iem_tab/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMTAB_NAME)
 	install -d $(DESTDIR)$(readmesdir)
@@ -2766,9 +2362,6 @@ flashserver_install: flashserver
 		--license "GNU GPL" \
 		--version ""
 	install -p $(FLASHSERVER_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(FLASHSERVER_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(FLASHSERVER_NAME)
-	install -p $(externals_src)/olafmatt/flashserver/*.pd \
-		$(DESTDIR)$(helpdir)/$(FLASHSERVER_NAME)
 	install -p $(externals_src)/olafmatt/flashserver/*.pd \
 		$(DESTDIR)$(objectsdir)/$(FLASHSERVER_NAME)
 	install -d $(DESTDIR)$(readmesdir)
@@ -2809,9 +2402,8 @@ hdspm_mixer_install: hdspm_mixer
 		--license "GNU GPL" \
 		--version ""
 	install -p $(HDSPM_TARGET) $(DESTDIR)$(objectsdir)/$(HDSPM_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(HDSPM_NAME)
 	install -p $(externals_src)/iem/hdspm_mixer/*.pd \
-		$(DESTDIR)$(helpdir)/$(HDSPM_NAME)
+		$(DESTDIR)$(objectsdir)/$(HDSPM_NAME)
 
 hdspm_mixer_clean:
 	-rm -f -- $(HDSPM_TARGET)
@@ -2849,9 +2441,6 @@ iemgui_install: iemgui
 		--license "GNU GPL" \
 		--version ""
 	install -p $(IEMGUI_TARGETS) $(DESTDIR)$(objectsdir)/$(IEMGUI_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEMGUI_NAME)
-	install -p $(externals_src)/iem/iemgui/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEMGUI_NAME)
 	install -p $(externals_src)/iem/iemgui/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMGUI_NAME)
 	install -d $(DESTDIR)$(readmesdir)
@@ -2893,9 +2482,6 @@ iemxmlrpc_install: iemxmlrpc
 		--license "GNU GPL" \
 		--version ""
 	install -p $(IEMXMLRPC_TARGET) $(DESTDIR)$(objectsdir)/$(IEMXMLRPC_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(IEMXMLRPC_NAME)
-	install -p $(externals_src)/iem/iemxmlrpc/*.pd \
-		$(DESTDIR)$(helpdir)/$(IEMXMLRPC_NAME)
 	install -p $(externals_src)/iem/iemxmlrpc/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMXMLRPC_NAME)
 	install -d $(DESTDIR)$(readmesdir)
@@ -2985,7 +2571,6 @@ test_locations:
 	@echo "PDDOCDIR  $(pddocdir)"
 	@echo "LIBPDDIR  $(libpddir)"
 	@echo "LIBPDBINDIR  $(libpdbindir)"
-	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
 	@echo " "
