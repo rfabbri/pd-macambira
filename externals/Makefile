@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone earplug ekext ext13 flashserver flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vanilla vbap windowing zexy
+LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone earplug ekext ext13 flashserver flatspace flib freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iem_matrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach msd oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -740,45 +740,6 @@ ggee_clean:
 	-rm -f -- $(externals_src)/ggee/*.bak
 	-rm -f -- $(externals_src)/ggee/*.*~
 
-
-#------------------------------------------------------------------------------#
-# HARDWARE
-HARDWARE_NAME=hardware
-# memPIO has some special deps, so don't include it yet.
-# uDMX requires libusb, so don't include it yet... 
-# multio.c requires libusb, so don't include it yet...  <hans@at.or.at>
-#HARDWARE_OBJECTS := $(wildcard $(externals_src)/hardware/*/*.cpp) \
-#$(wildcard $(externals_src)/hardware/*/*.c)
-#hardware: $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) $(HARDWARE_OBJECTS:.cpp=.$(EXTENSION))
-hardware:
-
-hardware_install: hardware
-	install -d $(DESTDIR)$(objectsdir)/$(HARDWARE_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(HARDWARE_NAME) \
-		--description "objects for working with hardware sensor boxes" \
-		--license "GNU GPL"
-# nothing built from source yet
-#	install -p $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) \
-#		$(DESTDIR)$(objectsdir)/$(HARDWARE_NAME)
-	install -p $(externals_src)/hardware/lanbox/lanbox.pd \
-		$(DESTDIR)$(objectsdir)/$(HARDWARE_NAME)
-	install -p $(externals_src)/hardware/DMXUSBPro/DMXUSBPro.pd \
-		$(DESTDIR)$(objectsdir)/$(HARDWARE_NAME)	
-	install -d $(DESTDIR)$(manualsdir)/$(HARDWARE_NAME)
-	install -p $(externals_src)/hardware/memPIO/README.txt \
-		$(DESTDIR)$(manualsdir)/$(HARDWARE_NAME)/memPIO.txt
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/hardware/README.txt \
-		$(DESTDIR)$(readmesdir)/$(HARDWARE_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(HARDWARE_NAME)
-#	install -p $(externals_src)/hardware/*/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(HARDWARE_NAME)
-
-hardware_clean:
-	-rm -f -- $(externals_src)/hardware/*/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/hardware/*/*.o
-	-rm -f -- $(externals_src)/hardware/*/*.bak
-	-rm -f -- $(externals_src)/hardware/*/*.*~
 
 
 #------------------------------------------------------------------------------#
