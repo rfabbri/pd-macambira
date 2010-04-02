@@ -651,13 +651,13 @@ frankenstein_clean:
 #------------------------------------------------------------------------------#
 # FREEVERB
 freeverb:
-	make -C $(externals_src)/freeverb
+	make -C $(externals_src)/freeverb~
 
 freeverb_install:
-	make -C $(externals_src)/freeverb DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/freeverb~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 freeverb_clean:
-	make -C $(externals_src)/freeverb clean
+	make -C $(externals_src)/freeverb~ clean
 
 
 
