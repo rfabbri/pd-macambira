@@ -143,21 +143,6 @@ rez_install:
 	cd "$(DESTDIR)$(bindir)" && /Developer/Tools/Rez -t APPL mac.r -o pd
 
 
-# switch Linux-only pdp_v4l to Mac-only pdp_ieee1394
-pdp_help_hack:
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(helpdir)/pdp*-help.pd
-	rm -f --  $(DESTDIR)$(helpdir)/pdp*-help.pd.bak
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(helpdir)/pdp/*.pd
-	rm -f --  $(DESTDIR)$(helpdir)/pdp/*.pd.bak
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(helpdir)/pidip/*.pd
-	rm -f --  $(DESTDIR)$(helpdir)/pidip/*.pd.bak
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(examplesdir)/pdp/*.pd
-	rm -f --  $(DESTDIR)$(examplesdir)/pdp/*.pd.bak
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(examplesdir)/pidip/*.pd
-	rm -f --  $(DESTDIR)$(examplesdir)/pidip/*.pd.bak
-	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(examplesdir)/3dp/*.pd
-	rm -f --  $(DESTDIR)$(examplesdir)/3dp/*.pd.bak
-
 darwin_app_embed_libs:
 # embed libquicktime plugins
 	install -d $(PD_APP_CONTENTS)/lib/libquicktime1

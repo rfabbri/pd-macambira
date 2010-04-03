@@ -1549,22 +1549,23 @@ pdp: $(externals_src)/pdp/pdp.$(EXTENSION)
 
 pdp_install: pdp
 	install -d $(DESTDIR)$(objectsdir)/$(PDP_NAME)
-#	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PDP_NAME) \
-#		--author "Tom Schouten" \
-#		--description "Pure Data Packet" \
-#		--license "GNU GPL"
-	install -d $(DESTDIR)$(objectsdir)
 	install -p $(externals_src)/pdp/*.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(PDP_NAME)
-#	install -p $(externals_src)/pdp/abstractions/*.pd $(DESTDIR)$(objectsdir)/$(PDP_NAME)
-	install -p $(externals_src)/pdp/abstractions/*.pd $(DESTDIR)$(objectsdir)
+	install -p $(externals_src)/pdp/abstractions/*.pd $(DESTDIR)$(objectsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/objects/*.* $(DESTDIR)$(objectsdir)/$(PDP_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/reference.txt $(DESTDIR)$(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/introduction/*.* \
 		$(DESTDIR)$(manualsdir)/$(PDP_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(PDP_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(PDP_NAME)/examples
 	install -p $(externals_src)/pdp/doc/examples/*.* \
-		$(DESTDIR)$(examplesdir)/$(PDP_NAME)
+		$(DESTDIR)$(objectsdir)/$(PDP_NAME)/examples
+ifeq ($(OS_NAME),darwin)
+# switch Linux-only pdp_v4l to Mac-only pdp_ieee1394
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(objectsdir)/$(PDP_NAME)/*.pd
+	rm -f --  $(DESTDIR)$(objectsdir)/$(PDP_NAME)/*.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(objectsdir)/$(PDP_NAME)/examples/*.pd
+	rm -f --  $(DESTDIR)$(objectsdir)/$(PDP_NAME)/examples/*.pd.bak
+endif
 
 pdp_clean:
 	-rm -f -- $(externals_src)/pdp/*.$(EXTENSION)
@@ -1590,19 +1591,27 @@ pdp_opengl_install: pdp_opengl
 		--author "Tom Schouten" \
 		--description "opengl extensions for pdp" \
 		--license "GPL v2 or later"
-	install -p $(PDP_OPENGL_BINARY) $(DESTDIR)$(objectsdir)
+	install -p $(PDP_OPENGL_BINARY) $(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)
 	install -p $(externals_src)/pdp/opengl/abstractions/*.pd \
 		$(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)
-	install -p $(externals_src)/pdp/opengl/doc/objects/*.pd $(DESTDIR)$(objectsdir)
-	install -p $(externals_src)/pdp/opengl/doc/objects/*.pd $(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)
-	install -d $(DESTDIR)$(readmesdir)
+	install -p $(externals_src)/pdp/opengl/doc/objects/*.pd \
+		$(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)
 	install -p $(externals_src)/pdp/opengl/README \
-		$(DESTDIR)$(readmesdir)/$(PDP_OPENGL_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(PDP_OPENGL_NAME)
+		$(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)/README.txt
+	install -d $(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)/examples
 	install -p $(externals_src)/pdp/opengl/doc/examples/*.pd \
-		$(DESTDIR)$(examplesdir)/$(PDP_OPENGL_NAME)
+		$(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)/examples
 	install -p $(externals_src)/pdp/opengl/test/*.pd \
-		$(DESTDIR)$(examplesdir)/$(PDP_OPENGL_NAME)
+		$(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)/examples
+ifeq ($(OS_NAME),darwin)
+# switch Linux-only pdp_v4l to Mac-only pdp_ieee1394
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' \
+		$(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)/*.pd
+	rm -f --  $(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)/*.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' \
+		$(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)/examples/*.pd
+	rm -f --  $(DESTDIR)$(objectsdir)/$(PDP_OPENGL_NAME)/examples/*.pd.bak
+endif
 
 pdp_opengl_clean:
 	make -C $(externals_src)/pdp/opengl clean
@@ -1647,18 +1656,24 @@ pidip_install: pidip
 #		--license "GNU GPLv2"
 	install -p $(externals_src)/pidip/*.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/doc/*.pd $(DESTDIR)$(objectsdir)/$(PIDIP_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(PIDIP_NAME)
-	install -p $(externals_src)/pidip/patches/*.* $(DESTDIR)$(examplesdir)/$(PIDIP_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(PIDIP_NAME)
-	install -d $(DESTDIR)$(readmesdir)
+	install -d $(DESTDIR)$(objectsdir)/$(PIDIP_NAME)/examples
+	install -p $(externals_src)/pidip/patches/*.* \
+		$(DESTDIR)$(objectsdir)/$(PIDIP_NAME)/examples
 	install -p $(externals_src)/pidip/README \
-		$(DESTDIR)$(readmesdir)/$(PIDIP_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(PIDIP_NAME)/images
+		$(DESTDIR)$(objectsdir)/$(PIDIP_NAME)/README.txt
+	install -d $(DESTDIR)$(objectsdir)/$(PIDIP_NAME)/examples/images
 	install -p $(externals_src)/pidip/patches/images/*.* \
-		$(DESTDIR)$(examplesdir)/$(PIDIP_NAME)/images
-	install -d $(DESTDIR)$(examplesdir)/$(PIDIP_NAME)/morphology
+		$(DESTDIR)$(objectsdir)/$(PIDIP_NAME)/examples/images
+	install -d $(DESTDIR)$(objectsdir)/$(PIDIP_NAME)/examples/morphology
 	install -p $(externals_src)/pidip/patches/morphology/*.* \
-		$(DESTDIR)$(examplesdir)/$(PIDIP_NAME)/morphology
+		$(DESTDIR)$(objectsdir)/$(PIDIP_NAME)/examples/morphology
+ifeq ($(OS_NAME),darwin)
+# switch Linux-only pdp_v4l to Mac-only pdp_ieee1394
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(objectsdir)/$(PIDIP_NAME)/*.pd
+	rm -f --  $(DESTDIR)$(objectsdir)/$(PIDIP_NAME)/*.pd.bak
+	sed -i.bak 's|pdp_v4l|pdp_ieee1394|' $(DESTDIR)$(objectsdir)/$(PIDIP_NAME)/examples/*.pd
+	rm -f --  $(DESTDIR)$(objectsdir)/$(PIDIP_NAME)/examples/*.pd.bak
+endif
 
 pidip_clean:
 	-rm -f -- $(externals_src)/pidip/*.$(EXTENSION)
