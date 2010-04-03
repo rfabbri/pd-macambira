@@ -1685,30 +1685,14 @@ pidip_clean:
 
 #------------------------------------------------------------------------------#
 # PMPD
-PMPD_NAME=pmpd
-PMPD_OBJECTS := $(wildcard $(externals_src)/pmpd/src/[a-oq-z]*.c) \
-$(externals_src)/pmpd/src/pmpd~.c
-pmpd: $(PMPD_OBJECTS:.c=.$(EXTENSION))
+pmpd:
+	make -C $(externals_src)/pmpd
 
-pmpd_install: pmpd
-	install -d $(DESTDIR)$(objectsdir)/$(PMPD_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PMPD_NAME) \
-		--author "Cyrille Henry" \
-		--description "Physical Modelling for Pd"
-	-install -p $(externals_src)/pmpd/*.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(PMPD_NAME)
-	install -p $(externals_src)/pmpd/help/*.pd $(DESTDIR)$(objectsdir)/$(PMPD_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(PMPD_NAME)
-	install -p $(externals_src)/pmpd/doc/pmpd.pdf/pmpd.pdf \
-		$(DESTDIR)$(manualsdir)/$(PMPD_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(PMPD_NAME)
-	install -p $(externals_src)/pmpd/exemples/*.pd \
-		$(DESTDIR)$(examplesdir)/$(PMPD_NAME)
+pmpd_install:
+	make -C $(externals_src)/pmpd DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 pmpd_clean:
-	-rm -f -- $(PMPD_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(externals_src)/pmpd/*/*.o
-	-rm -f -- $(externals_src)/pmpd/*/*.bak
-	-rm -f -- $(externals_src)/pmpd/*/*~
+	make -C $(externals_src)/pmpd clean
 
 
 
