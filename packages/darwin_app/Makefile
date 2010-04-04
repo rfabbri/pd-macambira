@@ -179,7 +179,7 @@ darwin_app_core: darwin_app_wrapper
 package: dmg
 
 VOLUME_NAME = Pd-extended
-dmg: pdp_help_hack
+dmg:
 	hdiutil create -format UDRW -fs HFS+ -srcfolder "$(BUILD_BASE)" \
 		-volname $(VOLUME_NAME) build.dmg
 # detach one with the same name first
