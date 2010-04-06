@@ -27,8 +27,8 @@
 
 #include "m_pd.h"
 #include "s_stuff.h"
-#include "codec.h"
-#include "vorbis/vorbisfile.h"
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 
 #include <sys/types.h>
 #include <string.h>

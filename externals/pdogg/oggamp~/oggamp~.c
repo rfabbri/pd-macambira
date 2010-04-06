@@ -33,7 +33,7 @@
 #include "m_pd.h"
 #include "g_canvas.h"
 	/* Vorbis includes */
-#include "codec.h"
+#include <vorbis/codec.h>
 
 #include <sys/types.h>
 #include <ctype.h>

@@ -59,7 +59,7 @@
 #endif
 
 #include "m_pd.h"             /* standard pd stuff */
-#include "vorbisenc.h"        /* vorbis encoder stuff */
+#include <vorbis/vorbisenc.h>        /* vorbis encoder stuff */
 
 #define        READ 1024      /* number of samples send to encoder at each call */
                               /* has to be even multiple of 64 */
