@@ -1,0 +1,7 @@
+#N canvas 382 214 450 300 10;
+#X obj 121 123 mypdobject;
+#X obj 120 150 print;
+#X msg 121 93 bang;
+#X text 94 36 this is an example help file;
+#X connect 0 0 1 0;
+#X connect 2 0 0 0;

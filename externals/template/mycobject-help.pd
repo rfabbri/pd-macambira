@@ -1,0 +1,8 @@
+#N canvas 382 214 450 300 10;
+#X text 94 36 this is an example help file;
+#X obj 121 123 mycobject;
+#X obj 169 87 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 4100 1;
+#X msg 93 79 rats;
+#X connect 2 0 1 0;
+#X connect 3 0 1 0;
