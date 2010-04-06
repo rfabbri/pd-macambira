@@ -1,0 +1,13 @@
+Source: pd-pdogg
+Section: sound
+Priority: optional
+Maintainer: Paul Brossier <piem@debian.org>
+Build-Depends: debhelper (>= 7.0.50~), puredata (>= 0.42.5-3.1~)
+Standards-Version: 3.8.3
+Homepage: http://puredata.info
+
+Package: pd-pdogg
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Description: a collection of ogg/vorbis externals for pd 
+ pdogg is a library for reading and writing ogg streams and files.
