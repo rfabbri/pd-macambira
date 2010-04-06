@@ -1,17 +1,23 @@
-Version 0.2
-copyright (c) 2002 by Olaf Matthes
+Version 0.25
+copyright (c) 2002-2004 by Olaf Matthes
 
-oggcast~ is a ogg/vorbis streaming external for pd (by Miller 
-Puckette) that connects to an IceCast2 server.
+pdogg~ is a collection of ogg/vorbis externals for pd (by Miller 
+Puckette).
 
+It includes:
+- oggamp~   : streaming client
+- oggcast~  : streamer (for Icecast2)
+- oggread~  : reads files from disk
+- oggwrite~ : writes files to disk
 
-To run oggcast~ place the file oggcast~.dll for win or oggcast~.pd_linux 
-in the directory of our patch or start pd with '-lib oggcast~' flag. 
+To use pdogg start pd with '-lib path\to\pdogg' flag. 
+On Win32 systems Pd 0.35 test 17 or later is necessary to get it working!
 
-To compile oggcast~ on Linux get the ogg/vorbice library from 
-http://www.vorbis.com/.
+To compile pdogg~ you need the ogg/vorbis library from 
+http://www.vorbis.com/ and under win additionally Pthreads-win32 from
+http://sources.redhat.com/pthreads-win32/.
 You have to modify the makefile to make it point to the place where the
-ogg/vorbis library is.
+libraries can be found on your system.
 
 
 This software is published under LGPL terms.
@@ -22,44 +28,39 @@ due to a bug or for other reasons.
 
 *****************************************************************************
 
-oggcast~ uses the ogg/vorbice library to encode audio data.
-The latest version of ogg/vorbis can be found at http://www.vorbice.com/
+pdogg~ uses the ogg/vorbis library to encode audio data.
+The latest version of ogg/vorbis can be found at http://www.vorbis.com/
 
-Below is the original copyright information taken from the ogg/vorbis library:
+The original version was found at:
+http://www.akustische-kunst.de/puredata/
 
-
-Copyright (c) 2001, Xiphophorus
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-
-- Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-
-- Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-
-- Neither the name of the Xiphophorus nor the names of its contributors
-may be used to endorse or promote products derived from this software
-without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Please report any bugs to olaf.matthes@gmx.de!
 
 *****************************************************************************
 
-Usage:
+oggamp~ Usage:
+
+To run oggamp~ innormal mode, just use [oggamp~] or, to get the buffer status
+displayed, use [oggamp~ 1].
+
+Message "connect <host> <mountpoint> <port>" connects to an IceCast2 server.
+Note that no response about succesfull connection is send by the server. All
+messages in the pd console window about connection status depend on the ability
+to receive data from the server.
+Use "connecturl <url>" to use url-like server adresses (like http://host:post/
+stream.ogg).
+
+Known bugs and other things:
+- pd halts for a moment when oggamp~ connects to the server. This results in a
+  short audio drop out of sound currently played back.
+- resampling not jet supported
+- playback does not stop on a buffer underrun
+- oggamp~ disconnects at end of stream, i.e. it is not possible to play back
+  files streamed one after another without manual reconnect
+
+*****************************************************************************
+
+oggcast~ Usage:
 
 Use message "vbr <samplerate> <channels> <quality>" to set the vorbis
 encoding parameters. Resampling is currently not supported, so 'samplerate' 
@@ -107,10 +108,3 @@ To play back the stream just open lacation http://<server>:<port>/<mountpoint>.
 
 Note that changing encoding parameters or header comments while oggcast~ is
 streaming to the server might result in audible dropouts.
-
-
-
-Latest version can be found at:
-http://www.akustische-kunst.de/puredata/
-
-Please report any bugs to olaf.matthes@gmx.de!

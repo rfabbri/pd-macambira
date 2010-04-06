@@ -1496,33 +1496,17 @@ pdlua_clean:
 	-rm -f -- $(externals_src)/loaders/pdlua/*.*~
 
 
+
 #------------------------------------------------------------------------------#
 # PDOGG
-PDOGG_NAME=pdogg
-PDOGG_OBJECTS := $(wildcard $(externals_src)/pdogg/*/*.c)
-pdogg: $(PDOGG_OBJECTS:.c=.$(EXTENSION))
+pdogg:
+	make -C $(externals_src)/pdogg
 
-pdogg_install: pdogg
-	install -d $(DESTDIR)$(objectsdir)/$(PDOGG_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PDOGG_NAME) \
-		--author "Olaf Matthes" \
-		--description "objects for reading, writing, and streaming ogg" \
-		--license "LGPL" \
-		--version "0.2"
-	install -p $(PDOGG_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(PDOGG_NAME)
-	install -p $(externals_src)/pdogg/*/*.pd \
-		$(DESTDIR)$(objectsdir)/$(PDOGG_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(PDOGG_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/pdogg/readme \
-		$(DESTDIR)$(readmesdir)/$(PDOGG_NAME).txt
+pdogg_install:
+	make -C $(externals_src)/pdogg DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 pdogg_clean:
-	-rm -f -- $(externals_src)/pdogg/*/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/pdogg/*/*.o
-	-rm -f -- $(externals_src)/pdogg/*/*.bak
-	-rm -f -- $(externals_src)/pdogg/*/*.*~
-	-rm -f -- $(externals_src)/pdogg/*.*~
+	make -C $(externals_src)/pdogg clean
 
 
 
@@ -1693,7 +1677,6 @@ pmpd_install:
 
 pmpd_clean:
 	make -C $(externals_src)/pmpd clean
-
 
 
 #------------------------------------------------------------------------------#
