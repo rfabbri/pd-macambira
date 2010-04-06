@@ -1,13 +1,11 @@
-# To use this Makefile for your project, first put the name of your library in
-# LIBRARY_NAME variable. The folder for your project should have the same name
-# as your library.
+## Pd library template version 1.0
+# For instructions on how to use this template, see:
+#  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = sigpack
-LIBRARY_VERSION = 0.0.4.1
 
-# Next, add your .c source files to the SOURCES variable.  The help files will
-# be included automatically
-SOURCES = chop~.c decimate~.c diode~.c foldback~.c foldover~.c freqdiv~.c freqshift~.c hardlimit~.c harmgen~.c impulse~.c rectify~.c round~.c saturate~.c shape~.c sieve~.c split~.c transient~.c ustep~.c valverect~.c vowel~.c wavewrap~.c 
-
+# add your .c source files to the SOURCES variable, help files will be
+# included automatically
+SOURCES = chop~.c decimate~.c diode~.c foldback~.c foldover~.c freqdiv~.c freqshift~.c hardlimit~.c harmgen~.c impulse~.c rectify~.c round~.c saturate~.c shape~.c sieve~.c split~.c transient~.c ustep~.c valverect~.c vowel~.c wavewrap~.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
@@ -15,17 +13,25 @@ SOURCES_android =
 SOURCES_cygwin = 
 SOURCES_macosx = 
 SOURCES_iphoneos = 
-SOURCES_linux =
+SOURCES_linux = 
 SOURCES_windows = 
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
 PDOBJECTS = 
 
+# example patches and related files, in the 'examples' subfolder
+EXAMPLES = 
+
+# manuals and related files, in the 'manual' subfolder
+MANUAL = 
+
 # if you want to include any other files in the source and binary tarballs,
-# list them here.  This can be anything from header files, READMEs, example
-# patches, documentation, etc.
-EXTRA_DIST = README.txt sigpack.c LICENSE
+# list them here.  This can be anything from header files, example patches,
+# documentation, etc.  README.txt and LICENSE.txt are required and therefore
+# automatically included
+EXTRA_DIST = sigpack.c
+
 
 
 #------------------------------------------------------------------------------#
@@ -33,6 +39,9 @@ EXTRA_DIST = README.txt sigpack.c LICENSE
 # you shouldn't need to edit anything below here, if we did it right :)
 #
 #------------------------------------------------------------------------------#
+
+# get library version from meta file
+LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
 # where Pd lives
 PD_PATH = ../../pd
@@ -120,8 +129,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   EXTENSION = dll
   OS = windows
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -march=i686 -mtune=pentium4
-  WINDOWS_HACKS = -D'O_NONBLOCK=1'
-  CFLAGS += -mms-bitfields $(WINDOWS_HACKS)
+  CFLAGS += -mms-bitfields
   LDFLAGS += -s -shared -Wl,--enable-auto-import
   LIBS += -L$(PD_PATH)/src -L$(PD_PATH)/bin -L$(PD_PATH)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
   STRIP = strip --strip-unneeded -R .note -R .comment
@@ -132,7 +140,7 @@ endif
 CFLAGS += $(OPT_CFLAGS)
 
 
-.PHONY = install libdir_install single_install install-doc install-exec install-examples clean dist etags
+.PHONY = install libdir_install single_install install-doc install-exec install-examples install-manual clean dist etags
 
 all: $(SOURCES:.c=.$(EXTENSION))
 
@@ -153,7 +161,7 @@ install: libdir_install
 
 # The meta and help files are explicitly installed to make sure they are
 # actually there.  Those files are not optional, then need to be there.
-libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples
+libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install-manual
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd \
 		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
@@ -179,11 +187,21 @@ install-doc:
 		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_FILE) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
+	$(INSTALL_FILE) LICENSE.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
 
 install-examples:
-	test ! -d examples || (\
+	test -z "$(strip $(EXAMPLES))" || \
 		$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples && \
-		$(INSTALL_FILE) examples/*.* $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples)
+		for file in $(EXAMPLES); do \
+			$(INSTALL_FILE) examples/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples; \
+		done
+
+install-manual:
+	test -z "$(strip $(MANUAL))" || \
+		$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/manual && \
+		for file in $(MANUAL); do \
+			$(INSTALL_FILE) manual/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/manual; \
+		done
 
 
 clean:
@@ -214,6 +232,8 @@ $(DISTDIR):
 
 dist: $(DISTDIR)
 	$(INSTALL_FILE) Makefile  $(DISTDIR)
+	$(INSTALL_FILE) README.txt $(DISTDIR)
+	$(INSTALL_FILE) LICENSE.txt $(DISTDIR)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
@@ -225,18 +245,29 @@ dist: $(DISTDIR)
 		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) $(DISTDIR)
 	test -z "$(strip $(EXTRA_DIST))" || \
 		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTDIR)
+	test -z "$(strip $(EXAMPLES))" || \
+		$(INSTALL_DIR) $(DISTDIR)/examples && \
+		for file in $(EXAMPLES); do \
+			$(INSTALL_FILE) examples/$$file $(DISTDIR)/examples; \
+		done
+	test -z "$(strip $(MANUAL))" || \
+		$(INSTALL_DIR) $(DISTDIR)/manual && \
+		for file in $(MANUAL); do \
+			$(INSTALL_FILE) manual/$$file $(DISTDIR)/manual; \
+		done
 	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
 
 
 etags:
 	etags *.h $(SOURCES) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
-showpaths:
+showsetup:
 	@echo "PD_PATH: $(PD_PATH)"
 	@echo "objectsdir: $(objectsdir)"
 	@echo "LIBRARY_NAME: $(LIBRARY_NAME)"
+	@echo "LIBRARY_VERSION: $(LIBRARY_VERSION)"
 	@echo "SOURCES: $(SOURCES)"
+	@echo "PDOBJECTS: $(PDOBJECTS)"
 	@echo "ALLSOURCES: $(ALLSOURCES)"
 	@echo "UNAME: $(UNAME)"
 	@echo "CPU: $(CPU)"
-

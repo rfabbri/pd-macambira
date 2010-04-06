@@ -1,12 +1,11 @@
-# To use this Makefile for your project, first put the name of your library in
-# LIBRARY_NAME variable. The folder for your project should have the same name
-# as your library.
+## Pd library template version 1.0
+# For instructions on how to use this template, see:
+#  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = ext13
-LIBRARY_VERSION = 0.17
 
-# Next, add your .c source files to the SOURCES variable.  The help files will
-# be included automatically
-SOURCES = catch13~.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mandelbrot.c messages.c openpatch.c piperead~.c pipewrite~.c receive13~.c receive13.c scramble~.c send13~.c send13.c sfwrite13~.c streamin13~.c streamout13~.c strippath.c throw13~.c wavinfo.c 
+# add your .c source files to the SOURCES variable, help files will be
+# included automatically
+SOURCES = catch13~.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mandelbrot.c messages.c openpatch.c piperead~.c pipewrite~.c receive13~.c receive13.c scramble~.c send13~.c send13.c sfwrite13~.c streamin13~.c streamout13~.c strippath.c throw13~.c wavinfo.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
@@ -21,11 +20,18 @@ SOURCES_windows =
 # be included automatically
 PDOBJECTS = 
 
+# example patches and related files, in the 'examples' subfolder
+EXAMPLES = 
+
+# manuals and related files, in the 'manual' subfolder
+MANUAL = 
+
 # if you want to include any other files in the source and binary tarballs,
-# list them here.  This can be anything from header files, READMEs, example
-# patches, documentation, etc.
-EXTRA_DIST = d_global13.h stream13.h ext13.h ext13.c ext13-help.pd \
-	CHANGES README VERSION
+# list them here.  This can be anything from header files, example patches,
+# documentation, etc.  README.txt and LICENSE.txt are required and therefore
+# automatically included
+EXTRA_DIST = d_global13.h stream13.h ext13.h ext13.c ext13-help.pd CHANGES
+
 
 
 #------------------------------------------------------------------------------#
@@ -33,6 +39,9 @@ EXTRA_DIST = d_global13.h stream13.h ext13.h ext13.c ext13-help.pd \
 # you shouldn't need to edit anything below here, if we did it right :)
 #
 #------------------------------------------------------------------------------#
+
+# get library version from meta file
+LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
 # where Pd lives
 PD_PATH = ../../pd
@@ -132,7 +141,7 @@ endif
 CFLAGS += $(OPT_CFLAGS)
 
 
-.PHONY = install libdir_install single_install install-doc install-exec install-examples clean dist etags
+.PHONY = install libdir_install single_install install-doc install-exec install-examples install-manual clean dist etags
 
 all: $(SOURCES:.c=.$(EXTENSION))
 
@@ -153,7 +162,7 @@ install: libdir_install
 
 # The meta and help files are explicitly installed to make sure they are
 # actually there.  Those files are not optional, then need to be there.
-libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples
+libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install-manual
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd \
 		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
@@ -178,15 +187,22 @@ install-doc:
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-# this is the only bit not really handled well...
-	$(INSTALL_FILE) README $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
-	$(INSTALL_FILE) VERSION $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/VERSION.txt
-	$(INSTALL_FILE) CHANGES $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/CHANGES.txt
+	$(INSTALL_FILE) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
+	$(INSTALL_FILE) LICENSE.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
 
 install-examples:
-	test ! -d examples || (\
+	test -z "$(strip $(EXAMPLES))" || \
 		$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples && \
-		$(INSTALL_FILE) examples/*.* $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples)
+		for file in $(EXAMPLES); do \
+			$(INSTALL_FILE) examples/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples; \
+		done
+
+install-manual:
+	test -z "$(strip $(MANUAL))" || \
+		$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/manual && \
+		for file in $(MANUAL); do \
+			$(INSTALL_FILE) manual/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/manual; \
+		done
 
 
 clean:
@@ -217,6 +233,8 @@ $(DISTDIR):
 
 dist: $(DISTDIR)
 	$(INSTALL_FILE) Makefile  $(DISTDIR)
+	$(INSTALL_FILE) README.txt $(DISTDIR)
+	$(INSTALL_FILE) LICENSE.txt $(DISTDIR)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
@@ -228,18 +246,29 @@ dist: $(DISTDIR)
 		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) $(DISTDIR)
 	test -z "$(strip $(EXTRA_DIST))" || \
 		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTDIR)
+	test -z "$(strip $(EXAMPLES))" || \
+		$(INSTALL_DIR) $(DISTDIR)/examples && \
+		for file in $(EXAMPLES); do \
+			$(INSTALL_FILE) examples/$$file $(DISTDIR)/examples; \
+		done
+	test -z "$(strip $(MANUAL))" || \
+		$(INSTALL_DIR) $(DISTDIR)/manual && \
+		for file in $(MANUAL); do \
+			$(INSTALL_FILE) manual/$$file $(DISTDIR)/manual; \
+		done
 	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
 
 
 etags:
 	etags *.h $(SOURCES) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
-showpaths:
+showsetup:
 	@echo "PD_PATH: $(PD_PATH)"
 	@echo "objectsdir: $(objectsdir)"
 	@echo "LIBRARY_NAME: $(LIBRARY_NAME)"
+	@echo "LIBRARY_VERSION: $(LIBRARY_VERSION)"
 	@echo "SOURCES: $(SOURCES)"
+	@echo "PDOBJECTS: $(PDOBJECTS)"
 	@echo "ALLSOURCES: $(ALLSOURCES)"
 	@echo "UNAME: $(UNAME)"
 	@echo "CPU: $(CPU)"
-
