@@ -1,10 +1,10 @@
-#For instructions on how to use this template, see:
+## Pd library template version 1.0
+# For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = template
-LIBRARY_VERSION = sed -n 's|^#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);$|\1|p' $(LIBRARY_NAME)-meta.pd
 
-# Next, add your .c source files to the SOURCES variable.  The help files will
-# be included automatically
+# add your .c source files to the SOURCES variable, help files will be
+# included automatically
 SOURCES = mycobject.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
@@ -40,7 +40,8 @@ EXTRA_DIST =
 #
 #------------------------------------------------------------------------------#
 
-# template version 1.0
+# get library version from meta file
+LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
 # where Pd lives
 PD_PATH = ../../pd
@@ -261,11 +262,13 @@ dist: $(DISTDIR)
 etags:
 	etags *.h $(SOURCES) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
-showpaths:
+showsetup:
 	@echo "PD_PATH: $(PD_PATH)"
 	@echo "objectsdir: $(objectsdir)"
 	@echo "LIBRARY_NAME: $(LIBRARY_NAME)"
+	@echo "LIBRARY_VERSION: $(LIBRARY_VERSION)"
 	@echo "SOURCES: $(SOURCES)"
+	@echo "PDOBJECTS: $(PDOBJECTS)"
 	@echo "ALLSOURCES: $(ALLSOURCES)"
 	@echo "UNAME: $(UNAME)"
 	@echo "CPU: $(CPU)"
