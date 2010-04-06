@@ -1,7 +1,7 @@
 #For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = template
-LIBRARY_VERSION = 0.0
+LIBRARY_VERSION = sed -n 's|^#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);$|\1|p' $(LIBRARY_NAME)-meta.pd
 
 # Next, add your .c source files to the SOURCES variable.  The help files will
 # be included automatically
