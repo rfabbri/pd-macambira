@@ -26,7 +26,7 @@ for pd_darwin in `find $PD_APP_CONTENTS -name '*.pd_darwin'`; do
 	if [ "x$LIBS" != "x" ]; then
 		echo "`echo $pd_darwin | sed 's|.*/\(.*\.pd_darwin$\)|\1|'` is using:"
 		for lib in $LIBS; do
-			echo -e "\t$lib"
+			echo "    $lib"
 			install -d $PD_APP_LIB
 			install -p /sw/lib/$lib $PD_APP_LIB
 			new_lib=`echo $lib | sed 's|.*/\(.*\.dylib\)|\1|'`
@@ -42,9 +42,9 @@ done
 for so in $PD_APP_LIB/*/*.so; do
 	LIBS=`otool -L $so | sed -n 's|.*/sw/lib/\(.*\.dylib\).*|\1|p'`
 	if [ "x$LIBS" != "x" ]; then
-		echo "`echo $dylib | sed 's|.*/\(.*\.dylib\)|\1|'` is using:"
+		echo "`echo $so | sed 's|.*/\(lib.*/.*\.so\)|\1|'` is using:"
 		for lib in $LIBS; do
-			echo -e "\t$lib"
+			echo "    $lib"
 			new_lib=`echo $lib | sed 's|.*/\(.*\.dylib\)|\1|'`
 			if [ -e  $PD_APP_LIB/$new_lib ]; then
 				echo "$PD_APP_LIB/$new_lib already exists, skipping copy."
@@ -63,7 +63,7 @@ for dylib in $PD_APP_LIB/*.dylib; do
 	if [ "x$LIBS" != "x" ]; then
 		echo "`echo $dylib | sed 's|.*/\(.*\.dylib\)|\1|'` is using:"
 		for lib in $LIBS; do
-			echo -e "\t$lib"
+			echo "    $lib"
 			new_lib=`echo $lib | sed 's|.*/\(.*\.dylib\)|\1|'`
 			if [ -e  $PD_APP_LIB/$new_lib ]; then
 				echo "$PD_APP_LIB/$new_lib already exists, skipping copy."
@@ -84,7 +84,7 @@ for dylib in $PD_APP_LIB/*.dylib; do
 	if [ "x$LIBS" != "x" ]; then
 		echo "`echo $dylib | sed 's|.*/\(.*\.dylib\)|\1|'` is using:"
 		for lib in $LIBS; do
-			echo -e "\t$lib"
+			echo "    $lib"
 			new_lib=`echo $lib | sed 's|.*/\(.*\.dylib\)|\1|'`
 			if [ -e  $PD_APP_LIB/$new_lib ]; then
 				echo "$PD_APP_LIB/$new_lib already exists, skipping copy."
