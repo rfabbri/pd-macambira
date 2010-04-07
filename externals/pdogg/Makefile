@@ -119,7 +119,7 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += 
   LDFLAGS += -Wl,--export-dynamic -shared -L$(PD_PATH)/src
-  LIBS += -lc -lpd
+  LIBS += -lc -lpd -lpthread
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
   DISTBINDIR=$(DISTDIR)-$(OS)
@@ -131,7 +131,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -march=i686 -mtune=pentium4
   CFLAGS += -mms-bitfields
   LDFLAGS += -s -shared -Wl,--enable-auto-import
-  LIBS += -L$(PD_PATH)/src -L$(PD_PATH)/bin -L$(PD_PATH)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
+  LIBS += -L$(PD_PATH)/src -L$(PD_PATH)/bin -L$(PD_PATH)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32 -lpthreadGC2
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
   DISTBINDIR=$(DISTDIR)-$(OS)
