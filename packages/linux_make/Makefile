@@ -121,9 +121,9 @@ deb: $(bindir)
 # Pd-related scripts
 	install -p $(scripts_src)/pd-diff $(DESTDIR)$(bindir)
 	install -p $(scripts_src)/config-switcher.sh $(DESTDIR)$(bindir)
-# rename pd executable
-	mv $(DESTDIR)$(bindir)/pd $(DESTDIR)$(bindir)/pd-extended
-	ln -s $(bindir)/pd-extended $(DESTDIR)$(bindir)/pd
+# delete these since they are provided by the 'puredata' package
+	rm -f $(DESTDIR)$(bindir)/pdsend
+	rm -f $(DESTDIR)$(bindir)/pdreceive
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
