@@ -17,7 +17,7 @@ SCRIPT_DIR=`${ECHO} $0 | sed 's|\(.*\)/.*$|\1|'`
 ROOT_DIR=${SCRIPT_DIR}/../packages
 
 GNULINUX_FILE=${ROOT_DIR}/linux_make/default.pdsettings
-MACOSX_FILE=${ROOT_DIR}/darwin_app/org.puredata.pd.default.plist
+MACOSX_FILE=${ROOT_DIR}/darwin_app/org.puredata.pdextended.default.plist
 WINDOWS_FILE=${ROOT_DIR}/win32_inno/pd-settings.reg
 WINDOWS_INNO_FILE=${ROOT_DIR}/win32_inno/pd-inno.iss.in
 WINDOWS_INNO_REG_FILE=${ROOT_DIR}/win32_inno/pd-inno.registry.reg
