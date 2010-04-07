@@ -55,7 +55,7 @@ PIDIP_VERSION := $(shell grep _VERSION= $(externals_src)/pidip/configure.ac | \
        cut -d '"' -f 2)
 
 PMPD_VERSION := $(shell grep "define VERSION" \
-	$(externals_src)/pmpd/src/pmpd.c | cut -d '"' -f 2)
+	$(externals_src)/pmpd/pmpd.c | cut -d '"' -f 2)
 
 
 TOXY_MAJOR_VERSION := $(shell grep TOXY_VERSION \
