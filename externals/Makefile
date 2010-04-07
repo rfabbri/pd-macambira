@@ -289,7 +289,7 @@ apple:
 	make -C $(externals_src)/apple
 
 apple_install:
-	make -C $(externals_src)/apple objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/apple DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 apple_clean:
 	make -C $(externals_src)/apple clean
@@ -1054,10 +1054,13 @@ iemlib_install: iemlib
 	install -d $(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/examples/*.* \
 		$(DESTDIR)$(examplesdir)/$(IEMLIB_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(IEMLIB_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)/examples
+	install -p $(externals_src)/iemlib/examples/*.* \
+		$(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)/examples
+	install -d $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)/manual
 	install -p $(externals_src)/iemlib/*.pdf $(externals_src)/iemlib/*.txt \
 		$(externals_src)/iemlib/iemabs/*.txt \
-		$(DESTDIR)$(manualsdir)/$(IEMLIB_NAME)
+		$(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)/manual
 # kludge to get a single working output~ straight in 'extra'
 	-rm -f -- $(DESTDIR)$(objectsdir)/$(IEMLIB_NAME)/output~.pd
 
@@ -1108,9 +1111,9 @@ iemmatrix_install: iemmatrix
 		$(DESTDIR)$(objectsdir)/$(IEMMATRIX_NAME)
 	install -p $(externals_src)/iem/iemmatrix/abs/*-help.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMMATRIX_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(IEMMATRIX_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(IEMMATRIX_NAME)/manual
 	install -p $(externals_src)/iem/iemmatrix/*.txt \
-		$(DESTDIR)$(manualsdir)/$(IEMMATRIX_NAME)
+		$(DESTDIR)$(objectsdir)/$(IEMMATRIX_NAME)/manual
 
 iemmatrix_clean:
 	-rm -f -- $(IEMMATRIX_OBJ:.o=.$(EXTENSION))
@@ -1536,11 +1539,12 @@ pdp_install: pdp
 	install -p $(externals_src)/pdp/*.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/abstractions/*.pd $(DESTDIR)$(objectsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/objects/*.* $(DESTDIR)$(objectsdir)/$(PDP_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(PDP_NAME)
-	install -p $(externals_src)/pdp/doc/reference.txt $(DESTDIR)$(manualsdir)/$(PDP_NAME)
-	install -p $(externals_src)/pdp/doc/introduction/*.* \
-		$(DESTDIR)$(manualsdir)/$(PDP_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(PDP_NAME)/manual
+	install -p $(externals_src)/pdp/doc/reference.txt \
+		$(DESTDIR)$(objectsdir)/$(PDP_NAME)/manual
 	install -d $(DESTDIR)$(objectsdir)/$(PDP_NAME)/examples
+	install -p $(externals_src)/pdp/doc/introduction/*.* \
+		$(DESTDIR)$(objectsdir)/$(PDP_NAME)/examples
 	install -p $(externals_src)/pdp/doc/examples/*.* \
 		$(DESTDIR)$(objectsdir)/$(PDP_NAME)/examples
 ifeq ($(OS_NAME),darwin)
@@ -1908,9 +1912,9 @@ unauthorized_install: unauthorized
 	install -d $(DESTDIR)$(objectsdir)/$(UNAUTHORIZED_NAME)/blm
 	install -p $(externals_src)/unauthorized/blinkenlights/blm/*.* \
 		$(DESTDIR)$(objectsdir)/$(UNAUTHORIZED_NAME)/blm
-	install -d $(DESTDIR)$(manualsdir)/$(UNAUTHORIZED_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(UNAUTHORIZED_NAME)/manual
 	install -p $(externals_src)/unauthorized/*/*.txt \
-		$(DESTDIR)$(manualsdir)/$(UNAUTHORIZED_NAME)
+		$(DESTDIR)$(objectsdir)/$(UNAUTHORIZED_NAME)/manual
 
 unauthorized_clean:
 	-rm -f -- $(UNAUTHORIZED_OBJECTS:.c=.$(EXTENSION))
@@ -2124,6 +2128,13 @@ adaptive_install: adaptive
 	install -p $(externals_src)/grh/adaptive/examples/*.pd \
 		$(externals_src)/grh/adaptive/examples/*.dat \
 		$(DESTDIR)$(examplesdir)/$(ADAPTIVE_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)/manual
+	install -p $(externals_src)/grh/adaptive/readme \
+		$(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)/manual/README.txt
+	install -d $(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)/examples
+	install -p $(externals_src)/grh/adaptive/examples/*.pd \
+		$(externals_src)/grh/adaptive/examples/*.dat \
+		$(DESTDIR)$(objectsdir)/$(ADAPTIVE_NAME)/examples
 
 adaptive_clean:
 	-rm -f -- $(ADAPTIVE_TARGETS)
@@ -2150,9 +2161,9 @@ iem_adaptfilt_install: iem_adaptfilt
 	install -p $(IEMADAPT_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(IEMADAPT_NAME)
 	install -p $(externals_src)/iem/iem_adaptfilt/help/*.pd \
 		$(DESTDIR)$(objectsdir)/$(IEMADAPT_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(IEMADAPT_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(IEMADAPT_NAME)/manual
 	install -p $(externals_src)/iem/iem_adaptfilt/doc/adapt_filt_lib.pdf \
-		$(DESTDIR)$(manualsdir)/$(IEMADAPT_NAME)
+		$(DESTDIR)$(objectsdir)/$(IEMADAPT_NAME)/manual
 
 iem_adaptfilt_clean:
 	-rm -f -- $(IEMADAPT_SRC:.c=.$(EXTENSION))
