@@ -16,7 +16,7 @@ WINDOWS_REG_PATH="hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6
 SCRIPT_DIR=`${ECHO} $0 | sed 's|\(.*\)/.*$|\1|'`
 ROOT_DIR=${SCRIPT_DIR}/../packages
 
-GNULINUX_FILE=${ROOT_DIR}/linux_make/default.pdsettings
+GNULINUX_FILE=${ROOT_DIR}/linux_make/default.pdextended
 MACOSX_FILE=${ROOT_DIR}/darwin_app/org.puredata.pdextended.default.plist
 WINDOWS_FILE=${ROOT_DIR}/win32_inno/pd-settings.reg
 WINDOWS_INNO_FILE=${ROOT_DIR}/win32_inno/pd-inno.iss.in

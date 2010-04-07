@@ -71,7 +71,7 @@ package: $(PACKAGE_TYPE)
 
 
 tarbz2: installer_makefile installer_readme
-	install -p $(packages_src)/linux_make/default.pdsettings $(DESTDIR)$(libpddir)
+	install -p $(packages_src)/linux_make/default.pdextended $(DESTDIR)$(libpddir)
 	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
 	cd $(DESTDIR) && \
 		tar cjf $(PACKAGE_NAME).tar.bz2  $(PACKAGE_NAME)
@@ -111,9 +111,9 @@ deb: $(bindir)
 		$(DESTDIR)/etc/init.d/
 # default prefs file
 	install -d $(DESTDIR)/etc/pd-extended
-	ln -s $(libpddir)/default.pdsettings \
-		$(DESTDIR)/etc/pd-extended/default.pdsettings
-	install -p $(packages_src)/linux_make/default.pdsettings $(DESTDIR)$(libpddir)
+	ln -s $(libpddir)/default.pdextended \
+		$(DESTDIR)/etc/pd-extended/default.pdextended
+	install -p $(packages_src)/linux_make/default.pdextended $(DESTDIR)$(libpddir)
 # emacs mode for .pd files
 	install -d $(DESTDIR)/usr/share/emacs/site-lisp/
 	install -p -m0644 $(scripts_src)/pd-mode.el \
