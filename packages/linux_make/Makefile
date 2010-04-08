@@ -124,6 +124,8 @@ deb: $(bindir)
 # delete these since they are provided by the 'puredata' package
 	rm -f $(DESTDIR)$(bindir)/pdsend
 	rm -f $(DESTDIR)$(bindir)/pdreceive
+	rm -f $(DESTDIR)/usr/share/man/man1/pdsend.1.gz
+	rm -f $(DESTDIR)/usr/share/man/man1/pdreceive.1.gz
 # debian packaging
 	test -d $(DESTDIR)/DEBIAN || mkdir -p $(DESTDIR)/DEBIAN
 	cp $(packages_src)/linux_make/debian/control $(DESTDIR)/DEBIAN
