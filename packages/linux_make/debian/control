@@ -10,7 +10,7 @@ Depends: xterm | x-terminal-emulator, ttf-dejavu-core, x-ttcidfont-conf, tcllib
 Replaces: pd-externals, gem, pd-pdp, pd-zexy
 Conflicts: pd-externals, gem, pd-pdp, pd-zexy
 Provides: pd
-Recommends: xdg-utils, puredata
+Recommends: xdg-utils, puredata, pulseaudio-utils
 Description: Pure Data with patches and a large collection of externals
  Pd (aka Pure Data) is a real-time graphical programming environment for
  audio, video, and graphical processing. It is the third major branch of the
