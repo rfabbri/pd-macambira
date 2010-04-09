@@ -1,0 +1,15 @@
+Source: pd-purepd
+Section: sound
+Priority: optional
+Maintainer: Paul Brossier <piem@debian.org>
+Build-Depends: debhelper (>= 7.0.50~), puredata (>= 0.42.5-3.1~)
+Standards-Version: 3.8.3
+Homepage: http://puredata.info
+
+Package: pd-purepd
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Description: a library of objects re-implemented using only Pd-vanilla
+ This is a library focused on re-implementing existing objects written in C
+ using only objects that are included in Pd-vanilla.  The idea is to provide
+ drop-in replacements for the binary objects usable on any platform.
