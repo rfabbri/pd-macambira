@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = controctopus gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pdsvn pixeltango purepd rradical rtc-lib puremeasurement timestretch memento-p sfruit pd-wavelet 
+LIB_TARGETS = controctopus jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pixeltango purepd rradical rtc-lib timestretch memento-p sfruit pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -49,42 +49,16 @@ $(patsubst %, %_install,$(LIB_TARGETS))
 
 
 #-------------------------------------------------------------------------------
-# TEMPLATE
-TEMPLATE_NAME = template
-template_install:
-	install -d $(DESTDIR)$(objectsdir)/$(TEMPLATE_NAME)
-	install -p $(abstractions_src)/template/*.pd $(DESTDIR)$(objectsdir)/$(TEMPLATE_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(TEMPLATE_NAME) \
-		--author "" \
-		--description "" \
-		--license "" \
-		--version "" 
-	install -d $(DESTDIR)$(helpdir)/$(TEMPLATE_NAME)
-	install -p $(abstractions_src)/template/help/*-help.pd \
-		 $(DESTDIR)$(helpdir)/$(TEMPLATE_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(TEMPLATE_NAME)
-#	install -p $(abstractions_src)/template/doc/*.txt \
-#		 $(DESTDIR)$(manualsdir)/$(TEMPLATE_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(abstractions_src)/template/README \
-#		$(DESTDIR)$(readmesdir)/$(TEMPLATE_NAME).txt
-
-
-
-#-------------------------------------------------------------------------------
 # controctopus
 CONTROCTOPUS_NAME = controctopus
 controctopus_install:
 	install -d $(DESTDIR)$(objectsdir)/$(CONTROCTOPUS_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/sfruit/controctopus/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(CONTROCTOPUS_NAME)
+	install -p $(abstractions_src)/sfruit/controctopus/*.pd \
+		$(DESTDIR)$(objectsdir)/$(CONTROCTOPUS_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(CONTROCTOPUS_NAME) \
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
 		--description "objects for learning and mapping midi and OSC controllers to pdpatches with scaling and parameter discovery - requires memento-p"
-	install -d $(DESTDIR)$(helpdir)/$(CONTROCTOPUS_NAME)
-	install -p $(abstractions_src)/sfruit/controctopus/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(CONTROCTOPUS_NAME)
 
 #-------------------------------------------------------------------------------
 # ds-abs
@@ -92,14 +66,13 @@ ds-abs_NAME = ds-abs
 ds-abs_install:
 	install -d $(DESTDIR)$(objectsdir)/$(ds-abs_NAME)
 	install -p $(abstractions_src)/sfruit/ds-abs/*.pd $(DESTDIR)$(objectsdir)/$(ds-abs_NAME)
+	install -p $(abstractions_src)/sfruit/ds-abs/help/*-help.pd \
+		 $(DESTDIR)$(objectsdir)/$(ds-abs_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(ds-abs_NAME) \
 		--author "Luke Iannini" \
 		--description "" \
 		--license "GNU GPL" \
 		--version "a comprehensive collection of objects for working with data structures" 
-	install -d $(DESTDIR)$(helpdir)/$(ds-abs_NAME)
-	install -p $(abstractions_src)/sfruit/ds-abs/help/*-help.pd \
-		 $(DESTDIR)$(helpdir)/$(ds-abs_NAME)
 
 #-------------------------------------------------------------------------------
 # GYRE
@@ -128,9 +101,6 @@ jmmmp_install:
 		--version "" 
 	install -p $(abstractions_src)/jmmmp/*.pd \
 		 $(DESTDIR)$(objectsdir)/$(JMMMP_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(JMMMP_NAME)
-	install -p $(abstractions_src)/jmmmp/*-help.pd \
-		 $(DESTDIR)$(helpdir)/$(JMMMP_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(JMMMP_NAME)
 #	install -p $(abstractions_src)/jmmmp/*.html \
 #		 $(DESTDIR)$(manualsdir)/$(JMMMP_NAME)
@@ -140,6 +110,9 @@ jmmmp_install:
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(abstractions_src)/jmmmp/jmmmp-ext.txt \
 		$(DESTDIR)$(readmesdir)/$(JMMMP_NAME).txt
+	install -d $(DESTDIR)$(objectsdir)/$(JMMMP_NAME)/manual
+	install -p $(abstractions_src)/jmmmp/jmmmp-ext.txt \
+		$(DESTDIR)$(objectsdir)/$(JMMMP_NAME)/manual/
 
 
 
@@ -153,9 +126,8 @@ keyboardkeys_install:
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(KEYBOARDKEYS_NAME) \
 		--author "Andrey Savitsky" \
 		--description "objects for using keyboard keys for scrolling and selecting"
-	install -d $(DESTDIR)$(helpdir)/$(KEYBOARDKEYS_NAME)
 	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/doc/*-help.pd \
-		 $(DESTDIR)$(helpdir)/$(KEYBOARDKEYS_NAME)
+		 $(DESTDIR)$(objectsdir)/$(KEYBOARDKEYS_NAME)
 	install -d $(DESTDIR)$(examplesdir)/$(KEYBOARDKEYS_NAME)
 	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/keyboard_main.pd \
 		 $(DESTDIR)$(examplesdir)/$(KEYBOARDKEYS_NAME)
@@ -165,15 +137,14 @@ keyboardkeys_install:
 LIST-ABS_NAME = list-abs
 list-abs_install:
 	install -d $(DESTDIR)$(objectsdir)/$(LIST-ABS_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/footils/list-abs/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(LIST-ABS_NAME)
+	install -p $(abstractions_src)/footils/list-abs/*.pd \
+		$(DESTDIR)$(objectsdir)/$(LIST-ABS_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(LIST-ABS_NAME) \
 		--author "Frank Barknecht" \
 		--license "GNU GPL" \
 		--description "a collection of objects for manipulating lists. Requires pd>=0.39"
-	install -d $(DESTDIR)$(helpdir)/$(LIST-ABS_NAME)
 	install -p $(abstractions_src)/footils/list-abs/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(LIST-ABS_NAME)
+		$(DESTDIR)$(objectsdir)/$(LIST-ABS_NAME)
 
 
 
@@ -182,20 +153,18 @@ list-abs_install:
 LA-KITCHEN_NAME = la-kitchen
 la-kitchen_install:
 	install -d $(DESTDIR)$(objectsdir)/$(LA-KITCHEN_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/La-kitchen/*.pd | \
-		grep -v '\-help.pd')    $(DESTDIR)$(objectsdir)/$(LA-KITCHEN_NAME)
+	install -p $(abstractions_src)/La-kitchen/*.pd \
+		$(DESTDIR)$(objectsdir)/$(LA-KITCHEN_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(LA-KITCHEN_NAME) \
 		--author "Charles Verron" \
 		--description "a collection of objects working with sensors"
-	install -d $(DESTDIR)$(helpdir)/$(LA-KITCHEN_NAME)
 	install -p $(abstractions_src)/La-kitchen/*-help.pd \
-		 $(DESTDIR)$(helpdir)/$(LA-KITCHEN_NAME)
+		 $(DESTDIR)$(objectsdir)/$(LA-KITCHEN_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(LA-KITCHEN_NAME)
 #	install -p $(abstractions_src)/La-kitchen/doc/*.* \
 #		 $(DESTDIR)$(manualsdir)/$(LA-KITCHEN_NAME)
-	install -d $(DESTDIR)$(readmesdir)
 	install -p $(abstractions_src)/La-kitchen/readme.txt \
-		$(DESTDIR)$(readmesdir)/$(LA_KITCHEN_NAME).txt
+		$(DESTDIR)$(objectsdir)/$(LA_KITCHEN_NAME)/README.txt
 
 
 #-------------------------------------------------------------------------------
@@ -203,75 +172,67 @@ la-kitchen_install:
 MEMENTO_NAME = memento
 memento_install:
 	install -d $(DESTDIR)$(objectsdir)/$(MEMENTO_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/rradical/memento/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(MEMENTO_NAME)
+	install -p $(abstractions_src)/rradical/memento/*.pd \
+		$(DESTDIR)$(objectsdir)/$(MEMENTO_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(MEMENTO_NAME) \
 		--author "Frank Barknecht" \
 		--license "GNU GPL" \
 		--description "a collection of objects for managing state saving"
-	install -d $(DESTDIR)$(helpdir)/$(MEMENTO_NAME)
-	install -p $(abstractions_src)/rradical/memento/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(MEMENTO_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(MEMENTO_NAME)
 	install -p $(abstractions_src)/rradical/memento/tutorial/*.* \
 		$(DESTDIR)$(manualsdir)/$(MEMENTO_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(MEMENTO_NAME)/manual
+	install -p $(abstractions_src)/rradical/memento/tutorial/*.* \
+		$(DESTDIR)$(objectsdir)/$(MEMENTO_NAME)/manual
 	install -d $(DESTDIR)$(examplesdir)/$(MEMENTO_NAME)
 	install -p $(abstractions_src)/rradical/memento/examples/*.* \
 		$(DESTDIR)$(examplesdir)/$(MEMENTO_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(MEMENTO_NAME)/examples
+	install -p $(abstractions_src)/rradical/memento/examples/*.* \
+		$(DESTDIR)$(objectsdir)/$(MEMENTO_NAME)/examples
 
 #-------------------------------------------------------------------------------
 # memento-p
 MEMENTO-P_NAME = memento-p
 memento-p_install:
 	install -d $(DESTDIR)$(objectsdir)/$(MEMENTO-P_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/sfruit/memento-p/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(MEMENTO-P_NAME)
+	install -p $(abstractions_src)/sfruit/memento-p/*.pd \
+		$(DESTDIR)$(objectsdir)/$(MEMENTO-P_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(MEMENTO-P_NAME) \
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
 		--description "an addon for Frank Barknecht's Memento adding local-state saving and support for Controctopus (a controller lib)"
-	install -d $(DESTDIR)$(helpdir)/$(MEMENTO-P_NAME)
-	install -p $(abstractions_src)/sfruit/memento-p/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(MEMENTO-P_NAME)
 
 #-------------------------------------------------------------------------------
 # nqpoly
 nqpoly_install: nqpoly_install~ nqpoly_install4
-# make a common target for the manuals so they are in one place
-	install -d $(DESTDIR)$(manualsdir)/nqpoly
-	install -p $(abstractions_src)/nqpoly/*.html	$(DESTDIR)$(manualsdir)/nqpoly
-	install -p $(abstractions_src)/nqpoly/nqpoly~/readme.txt	\
-		$(DESTDIR)$(manualsdir)/nqpoly/nqpoly~.txt
+
 
 NQPOLY_NAME = nqpoly~
 nqpoly_install~:
 	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly~/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(NQPOLY_NAME) 
-# all of the patches should be installed into help since [nqpoly~] needs to be
-# in the same directory as the patches its manipulating
 	install -p $(abstractions_src)/nqpoly/nqpoly~/*.pd \
-		$(DESTDIR)$(helpdir)/$(NQPOLY_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(NQPOLY_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly~/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(examplesdir)/$(NQPOLY_NAME)
+		$(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)
+	install -p $(abstractions_src)/nqpoly/nqpoly~/*.pd \
+		$(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)/manual
+	install -p $(abstractions_src)/nqpoly/nqpoly~/readme.txt	\
+		$(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)/manual
+	install -p $(abstractions_src)/nqpoly/*.html \
+		$(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)/manual
 
 
 NQPOLY4_NAME = nqpoly4
 nqpoly_install4:
 	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly4/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(NQPOLY4_NAME)
-# all of the patches should be installed into help since [nqpoly4] needs to be
-# in the same directory as the patches its manipulating
-	install -p $(abstractions_src)/nqpoly/nqpoly4/*.pd $(DESTDIR)$(helpdir)/$(NQPOLY4_NAME)
-# install just the help file into the root helpdir since this isn't a libdir
+	install -p $(abstractions_src)/nqpoly/nqpoly4/*.pd \
+		$(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)
+	install -p $(abstractions_src)/nqpoly/nqpoly4/*.pd \
+		$(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)
 	install -p $(abstractions_src)/nqpoly/*/*-help.pd $(DESTDIR)$(helpdir)
-	install -d $(DESTDIR)$(examplesdir)/$(NQPOLY4_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly4/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(examplesdir)/$(NQPOLY4_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)/manual
+	install -p $(abstractions_src)/nqpoly/*.html \
+		$(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)/manual
 
 #-------------------------------------------------------------------------------
 # nsend
@@ -284,25 +245,19 @@ nsend_install:
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
 		--description "multiple-inlet/outlet send and receive"
-	install -d $(DESTDIR)$(helpdir)/$(NSEND_NAME)
-	install -p $(abstractions_src)/sfruit/nsend/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(NSEND_NAME)
 
 #-------------------------------------------------------------------------------
 # nusmuk
 NUSMUK_NAME = nusmuk
 nusmuk_install:
 	install -d $(DESTDIR)$(objectsdir)/$(NUSMUK_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/nusmuk/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(NUSMUK_NAME)
+	install -p $(abstractions_src)/nusmuk/*.pd \
+		$(DESTDIR)$(objectsdir)/$(NUSMUK_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(NUSMUK_NAME) \
 		--author "Cyrille Henry" \
 		--description "a collection of objects for physical modelling"
-	install -d $(DESTDIR)$(helpdir)/$(NUSMUK_NAME)
-	install -p $(abstractions_src)/nusmuk/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(NUSMUK_NAME)
 	install -p $(abstractions_src)/nusmuk/*.wav \
-		$(DESTDIR)$(helpdir)/$(NUSMUK_NAME)
+		$(DESTDIR)$(objectsdir)/$(NUSMUK_NAME)
 
 
 
@@ -311,8 +266,7 @@ nusmuk_install:
 parazit_install:
 	install -d $(DESTDIR)$(objectsdir)
 	install -p $(abstractions_src)/parazit/parazit.pd $(DESTDIR)$(objectsdir)
-	install -d $(DESTDIR)$(helpdir)
-	install -p $(abstractions_src)/parazit/parazit-help.pd $(DESTDIR)$(helpdir)
+	install -p $(abstractions_src)/parazit/parazit-help.pd $(DESTDIR)$(objectsdir)
 
 
 
@@ -321,16 +275,10 @@ parazit_install:
 PDDP_NAME = pddp
 pddp_install:
 	install -d $(DESTDIR)$(objectsdir)/$(PDDP_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/pddp/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(PDDP_NAME)
+	install -p $(abstractions_src)/pddp/*.pd $(DESTDIR)$(objectsdir)/$(PDDP_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PDDP_NAME) \
 		--license "GNU GPL" \
 		--description "support objects for the Pure Data Documentation Project"
-	install -d $(DESTDIR)$(helpdir)/$(PDDP_NAME)
-	install -p $(abstractions_src)/pddp/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(PDDP_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(PDDP_NAME)
-#	install -d $(DESTDIR)$(examplesdir)/$(PDDP_NAME)
 
 #-------------------------------------------------------------------------------
 # mtl
@@ -391,9 +339,8 @@ pixeltango_install:
 		--license "GNU GPL" \
 		--version "0.3.4" \
 		--description "objects for creating visuals in a live performance setting"
-	install -d $(DESTDIR)$(helpdir)/$(PIXELTANGO_NAME)
 	install -p $(abstractions_src)/pixelTANGO/help/*.* \
-		$(DESTDIR)$(helpdir)/$(PIXELTANGO_NAME)
+		$(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)
 	install -d $(DESTDIR)$(examplesdir)/$(PIXELTANGO_NAME)
 	install -p $(abstractions_src)/pixelTANGO/Example-Patches/*.* \
 		$(DESTDIR)$(examplesdir)/$(PIXELTANGO_NAME)
@@ -402,6 +349,14 @@ pixeltango_install:
 		$(DESTDIR)$(manualsdir)/$(PIXELTANGO_NAME)
 	install -p $(abstractions_src)/pixelTANGO/dev-notes/*.txt \
 		$(DESTDIR)$(manualsdir)/$(PIXELTANGO_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)/manual
+	install -p $(abstractions_src)/pixelTANGO/*.txt \
+		$(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)/manual
+	install -p $(abstractions_src)/pixelTANGO/dev-notes/*.txt \
+		$(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)/manual
+	install -d $(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)/examples
+	install -p $(abstractions_src)/pixelTANGO/Example-Patches/*.* \
+		$(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)/examples
 
 pixeltango_clean:
 	-rm -f -- $(DESTDIR)$(objectsdir)/$(PIXELTANGO_NAME)/fx/*.*
@@ -414,21 +369,16 @@ pixeltango_clean:
 	-rmdir -- $(DESTDIR)$(manualsdir)/$(PIXELTANGO_NAME)
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------#
 # PUREPD
-PUREPD_NAME = purepd
+purepd:
+	make -C $(abstractions_src)/purepd
+
 purepd_install:
-	install -d $(DESTDIR)$(objectsdir)/$(PUREPD_NAME)
-	install -p $(abstractions_src)/purepd/*.pd \
-		 $(DESTDIR)$(objectsdir)/$(PUREPD_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(PUREPD_NAME)
-	install -p $(abstractions_src)/purepd/*-help.pd \
-		 $(DESTDIR)$(helpdir)/$(PUREPD_NAME)
+	make -C $(abstractions_src)/purepd DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 purepd_clean:
-	rm -f -- $(DESTDIR)$(objectsdir)/$(PUREPD_NAME)/*.*
-	rmdir -- $(DESTDIR)$(objectsdir)/$(PUREPD_NAME)
-
+	make -C $(abstractions_src)/purepd clean
 
 
 #-------------------------------------------------------------------------------
@@ -448,9 +398,6 @@ rradical_install:
 		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/rradical/stuff/*.* | \
 		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(RRADICAL_NAME)
-	install -p $(abstractions_src)/rradical/*/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(RRADICAL_NAME)
 	install -p $(abstractions_src)/rradical/*/*-help.pd \
 		$(DESTDIR)$(objectsdir)/$(RRADICAL_NAME)
 	install -d $(DESTDIR)$(examplesdir)/$(RRADICAL_NAME)
@@ -471,23 +418,21 @@ rradical_install:
 RTC-LIB_NAME = rtc
 rtc-lib_install:
 	install -d $(DESTDIR)$(objectsdir)/$(RTC-LIB_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/footils/rtc-lib/rtc/*.pd | \
-		grep -v '\-help.pd\|RTC-Overview.pd'| sed 's|\(.*\)|"\1"|g') \
+	install -p $(abstractions_src)/footils/rtc-lib/rtc/*.pd \
 		$(DESTDIR)$(objectsdir)/$(RTC-LIB_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(RTC-LIB_NAME) \
 		--author "Karlheinz Essl and Frank Barknecht" \
 		--license "Pd license" \
 		--description "Realtime Composition Library for Max ported to Pd"
-	install -d $(DESTDIR)$(helpdir)/$(RTC-LIB_NAME)
-	install -d $(DESTDIR)$(helpdir)/$(RTC-LIB_NAME)/rtc-help
-	install -p $(abstractions_src)/footils/rtc-lib/rtc/*-help.pd \
-		$(abstractions_src)/footils/rtc-lib/rtc/RTC-Overview.pd \
-		$(DESTDIR)$(helpdir)/$(RTC-LIB_NAME)
 	install -p $(abstractions_src)/footils/rtc-lib/rtc/*-help.pd \
 		$(abstractions_src)/footils/rtc-lib/rtc/RTC-Overview.pd \
 		$(DESTDIR)$(objectsdir)/$(RTC-LIB_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(RTC-LIB_NAME)/rtc-help
 	install -p $(abstractions_src)/footils/rtc-lib/rtc/rtc-help/*.pd \
-		$(DESTDIR)$(helpdir)/$(RTC-LIB_NAME)/rtc-help
+		$(DESTDIR)$(objectsdir)/$(RTC-LIB_NAME)/rtc-help
+	install -d $(DESTDIR)$(objectsdir)/$(RTC-LIB_NAME)/examples
+	install -p $(abstractions_src)/footils/rtc-lib/rtc/rtc-help/*.pd \
+		$(DESTDIR)$(objectsdir)/$(RTC-LIB_NAME)/examples
 
 
 #-------------------------------------------------------------------------------
@@ -539,11 +484,6 @@ timestretch_install:
 		--description "" \
 		--license "" \
 		--version "" 
-	install -d $(DESTDIR)$(helpdir)/$(TIMESTRETCH_NAME)
-	install -p $(abstractions_src)/timestretch/*-help.pd \
-		 $(DESTDIR)$(helpdir)/$(TIMESTRETCH_NAME)
-	install -p $(abstractions_src)/timestretch/*-help.pd \
-		 $(DESTDIR)$(objectsdir)/$(TIMESTRETCH_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(TIMESTRETCH_NAME)
 #	install -p $(abstractions_src)/timestretch/doc/*.txt \
 #		 $(DESTDIR)$(manualsdir)/$(TIMESTRETCH_NAME)
@@ -584,9 +524,11 @@ PDWAVELET_NAME = pd-wavelet
 pd-wavelet_install:
 	install -d $(DESTDIR)$(objectsdir)/$(PDWAVELET_NAME)
 	install -p $(abstractions_src)/pd-wavelet/*.pd \
-	$(DESTDIR)$(objectsdir)/$(PDWAVELET_NAME)
+		$(DESTDIR)$(objectsdir)/$(PDWAVELET_NAME)
 	install -p $(abstractions_src)/pd-wavelet/abs/*.pd \
-	$(DESTDIR)$(objectsdir)/$(PDWAVELET_NAME)
+		$(DESTDIR)$(objectsdir)/$(PDWAVELET_NAME)
+	install -p $(abstractions_src)/pd-wavelet/main.pd \
+		 $(DESTDIR)$(objectsdir)/$(PDWAVELET_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PDWAVELET_NAME) \
 		--author "Raul Diaz Poblete" \
 		--description "manipulation of audio in the wavelet domain" \
