@@ -837,6 +837,9 @@ hid_install: hid
 	install -p $(externals_src)/hcs/hid/doc/*.pd       $(DESTDIR)$(objectsdir)/$(HID_NAME)
 	install -d $(DESTDIR)$(examplesdir)/$(HID_NAME)
 	install -p $(externals_src)/hcs/hid/examples/*.pd  $(DESTDIR)$(examplesdir)/$(HID_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(HID_NAME)/examples
+	install -p $(externals_src)/hcs/hid/examples/*.pd  \
+		$(DESTDIR)$(objectsdir)/$(HID_NAME)/examples
 
 hid_clean:
 	-rm -f -- $(externals_src)/hcs/hid/*.o
