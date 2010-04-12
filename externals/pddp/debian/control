@@ -1,4 +1,4 @@
-Source: pd-template
+Source: pd-pddp
 Section: sound
 Priority: optional
 Maintainer: Paul Brossier <piem@debian.org>
@@ -6,7 +6,10 @@ Build-Depends: debhelper (>= 7.0.50~), puredata (>= 0.42.5-3.1~)
 Standards-Version: 3.8.3
 Homepage: http://puredata.info
 
-Package: pd-template
+Package: pd-pddp
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Description: 
+Description: a support library for the Pure Data Documentation Project
+ This library provides a collection of objects for making documentation easier
+ and more interactive, providing standard ways of outputting audio,
+ controlling the DSP, and making it possible to embed clickable links.

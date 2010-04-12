@@ -29,3 +29,8 @@ alpha2
 alpha1
   * prototype versions of the external "pddplink" and two pd-gui extensions
     "pddpserver.tcl", "pddpclient.tcl"
+
+- fix 0-pager.pd so that it doesn't crash if it doesn't find any files that
+  match the pattern
+
+  G.Holzmann: I added a "touch 0-pager.pd" - so it should not crash ...

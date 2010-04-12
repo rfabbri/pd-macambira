@@ -1,11 +1,11 @@
 ## Pd library template version 1.0
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
-LIBRARY_NAME = template
+LIBRARY_NAME = pddp
 
 # add your .c source files to the SOURCES variable, help files will be
 # included automatically
-SOURCES = mycobject.c
+SOURCES = pddplink.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
@@ -18,19 +18,19 @@ SOURCES_windows =
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = mypdobject.pd
+PDOBJECTS = +pager.pd dsp.pd ezoutput~.pd open.pd print.pd print_long.pd
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = bothtogether.pd
+EXAMPLES = 
 
 # manuals and related files, in the 'manual' subfolder
-MANUAL = manual.txt
+MANUAL = 
 
 # if you want to include any other files in the source and binary tarballs,
 # list them here.  This can be anything from header files, example patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = 
+EXTRA_DIST = parse_meta.pd
 
 
 
