@@ -1446,33 +1446,14 @@ pan_clean:
 
 #------------------------------------------------------------------------------#
 # PDDP
-PDDP_NAME=pddp
-pddp: $(bindir)
-	$(MAKE) OPT_CFLAGS="-O2 -fno-strict-aliasing -fPIC" \
-		-C $(externals_src)/miXed/pddp
+pddp:
+	make -C $(externals_src)/pddp
 
-
-pddp_install: pddp
-	install -d $(DESTDIR)$(objectsdir)/$(PDDP_NAME)
-#	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PDDP_NAME) \
-#		--author "PDDP" \
-#		--license "BSD" \
-#		--description "objects for working with Tcl and Pd's Tk GUI"
-# pddp is compiled straight into $(OUT_DIR)
-	cd $(externals_src)/miXed/pddp && $(MAKE) \
-		OUT_DIR=$(DESTDIR)$(objectsdir)/$(PDDP_NAME)
-	install -d $(DESTDIR)$(objectsdir)/$(PDDP_NAME)/pddp
-	install -p $(externals_src)/miXed/bin/pddp/*.tcl \
-		$(DESTDIR)$(objectsdir)/$(PDDP_NAME)/pddp
-#	install -d $(DESTDIR)$(manualsdir)/$(PDDP_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(PDDP_NAME)
-	install -p $(externals_src)/miXed/test/pddp/*.*  \
-		$(DESTDIR)$(examplesdir)/$(PDDP_NAME)
-
+pddp_install:
+	make -C $(externals_src)/pddp DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 pddp_clean:
-	-$(MAKE) -C $(externals_src)/mixed/pddp $(DEST_PATHS) clean
-
+	make -C $(externals_src)/pddp clean
 
 
 #------------------------------------------------------------------------------#

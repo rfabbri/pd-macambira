@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = controctopus jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pddp pixeltango purepd rradical rtc-lib timestretch memento-p sfruit pd-wavelet 
+LIB_TARGETS = controctopus jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pixeltango purepd rradical rtc-lib timestretch memento-p sfruit pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -269,16 +269,6 @@ parazit_install:
 	install -p $(abstractions_src)/parazit/parazit-help.pd $(DESTDIR)$(objectsdir)
 
 
-
-#-------------------------------------------------------------------------------
-# PDDP support lib
-PDDP_NAME = pddp
-pddp_install:
-	install -d $(DESTDIR)$(objectsdir)/$(PDDP_NAME)
-	install -p $(abstractions_src)/pddp/*.pd $(DESTDIR)$(objectsdir)/$(PDDP_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PDDP_NAME) \
-		--license "GNU GPL" \
-		--description "support objects for the Pure Data Documentation Project"
 
 #-------------------------------------------------------------------------------
 # mtl
