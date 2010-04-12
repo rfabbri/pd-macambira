@@ -89,19 +89,19 @@ print_macosx_nloadlib ()
 print_windows ()
 {
 	 ${ECHO} "\"loadlib$1\"=\"$2\"" >> $WINDOWS_FILE
-	 ${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: loadlib$1; ValueData: $2; Tasks: libs"  >> $WINDOWS_INNO_REG_FILE
+	 ${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib$1; ValueData: $2; Tasks: libs"  >> $WINDOWS_INNO_REG_FILE
 }
 
 print_windows_delete ()
 {
 	${ECHO} "\"${1}${2}\"=-" >> $WINDOWS_FILE
-	${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: ${1}${2}; Flags: deletevalue; Tasks: libs"  >> $WINDOWS_INNO_REG_FILE
+	${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: none; ValueName: ${1}${2}; Flags: deletevalue; Tasks: libs"  >> $WINDOWS_INNO_REG_FILE
 }
 
 print_windows_helppath ()
 {
-	${ECHO} "\"flags\"=\"" >> $WINDOWS_FILE
-	${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: flags; ValueData: ""; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_REG_FILE
+	${ECHO} "\"flags\"=\"\"" >> $WINDOWS_FILE
+	${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: flags; ValueData: ""; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_REG_FILE
 }
 
 print_windows_inno_path ()
@@ -110,14 +110,14 @@ print_windows_inno_path ()
 	IFS=';'
 	for fontpath in $WINDOWS_INNO_PATH; do
 		((++j)) 
-		${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: expandsz; ValueName: path${j}; ValueData: ${fontpath}; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_REG_FILE
+		${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: expandsz; ValueName: path${j}; ValueData: ${fontpath}; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_REG_FILE
 	done
-	${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: npath; ValueData: ${j}; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_REG_FILE
+	${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: npath; ValueData: ${j}; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_REG_FILE
 # print lines to delete existing path flags
 	${ECHO} "; delete all existing path flags" >> $WINDOWS_FILE
 	while [ $j -lt 100 ]; do
 		((++j)) 
-		${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: none; ValueName: path${j}; Flags: deletevalue; Tasks: libs"  >> $WINDOWS_INNO_REG_FILE
+		${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: none; ValueName: path${j}; Flags: deletevalue; Tasks: libs"  >> $WINDOWS_INNO_REG_FILE
 	done
 }
 
@@ -141,7 +141,7 @@ print_windows_reg_path ()
 print_windows_nloadlib ()
 {
 	 ${ECHO} "\"nloadlib\"=${1}" >> $WINDOWS_FILE
-	 ${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd; ValueType: string; ValueName: nloadlib; ValueData: ${1}; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_REG_FILE
+	 ${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: nloadlib; ValueData: ${1}; Tasks: libs; Flags: uninsdeletekey" >> $WINDOWS_INNO_REG_FILE
 }
 #==============================================================================#
 
