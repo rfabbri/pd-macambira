@@ -23,7 +23,7 @@
 #include <string.h>
 
 
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
@@ -80,13 +80,13 @@ static void draw_inlets(t_popup *x, t_glist *glist, int firsttime, int nin, int 
      {
 	  int onset = text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH) * i / nplus;
 	  if (firsttime)
-	       sys_vgui(".x%x.c create rectangle %d %d %d %d -tags {%xo%d %xo}\n",
+	       sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags {%lxo%d %lxo}\n",
 			glist_getcanvas(glist),
 			onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
 			onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height-1,
 			x, i, x);
 	  else
-	       sys_vgui(".x%x.c coords %xo%d %d %d %d %d\n",
+	       sys_vgui(".x%lx.c coords %lxo%d %d %d %d %d\n",
 			glist_getcanvas(glist), x, i,
 			onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 2,
 			onset + IOWIDTH, text_ypix(&x->x_obj, glist) + x->x_rect_height-1);
@@ -98,13 +98,13 @@ static void draw_inlets(t_popup *x, t_glist *glist, int firsttime, int nin, int 
      {
 	  int onset = text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH) * i / nplus;
 	  if (firsttime)
-	       sys_vgui(".x%x.c create rectangle %d %d %d %d -tags {%xi%d %xi}\n",
+	       sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags {%lxi%d %lxi}\n",
 			glist_getcanvas(glist),
 			onset, text_ypix(&x->x_obj, glist)-2,
 			     onset + IOWIDTH, text_ypix(&x->x_obj, glist)-1,
 			x, i, x);
 	  else
-	       sys_vgui(".x%x.c coords %xi%d %d %d %d %d\n",
+	       sys_vgui(".x%lx.c coords %lxi%d %d %d %d %d\n",
 			glist_getcanvas(glist), x, i,
 			onset, text_ypix(&x->x_obj, glist),
 			onset + IOWIDTH, text_ypix(&x->x_obj, glist)-1);
@@ -120,14 +120,14 @@ static void draw_handle(t_popup *x, t_glist *glist, int firsttime) {
   int onset = text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH);
 
   if (firsttime) {
-    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xhandle\n",
+    sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags %lxhandle\n",
 	     glist_getcanvas(glist),
 	     onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 12,
 	     onset + IOWIDTH-2, text_ypix(&x->x_obj, glist) + x->x_rect_height-4,
 	     x);
   } 
   else {
-    sys_vgui(".x%x.c coords %xhandle %d %d %d %d\n",
+    sys_vgui(".x%lx.c coords %lxhandle %d %d %d %d\n",
 	     glist_getcanvas(glist), x, 
 	     onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 12,
 	     onset + IOWIDTH-2, text_ypix(&x->x_obj, glist) + x->x_rect_height-4);
@@ -159,19 +159,19 @@ static void create_widget(t_popup *x, t_glist *glist)
   /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
   if(x->initialized)
     {
-      sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
+      sys_vgui("destroy .x%lx.c.s%lx\n",glist_getcanvas(glist),x);
 
-      sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -relief raised -background \"%s\" -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -tearoff 0\n",
+      sys_vgui("set %lxw .x%lx.c.s%lx ; menubutton $%lxw -relief raised -background \"%s\" -text \"%s\" -direction flush -menu $%lxw.menu ; menu $%lxw.menu -tearoff 0\n",
 		x,canvas,x,x,x->x_colour->s_name,temp_name->s_name,x,x);
 
       for(i=0 ; i<x->x_num_options ; i++)
         {
-          sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n", 
+          sys_vgui(".x%lx.c.s%lx.menu add command -label \"%s\" -command {.x%lx.c.s%lx configure -text \"%s\" ; popup_sel%lx \"%d\"} \n", 
                    canvas, x, x->x_options[i]->s_name, canvas, x, x->x_options[i]->s_name, x, i);
         }
     }
 
-  DEBUG(post("id: .x%x.c.s%x", canvas, x);)
+  DEBUG(post("id: .x%lx.c.s%lx", canvas, x);)
   DEBUG(post("create_widget end");)
 }
 
@@ -185,21 +185,21 @@ static void popup_drawme(t_popup *x, t_glist *glist, int firsttime)
 
   DEBUG(post("drawme %d",firsttime);)
      if (firsttime) {
-       DEBUG(post("glist %x canvas %x",x->x_glist,canvas);)
+       DEBUG(post("glist %lx canvas %lx",x->x_glist,canvas);)
        create_widget(x,glist);	       
        x->x_glist = canvas;
-       sys_vgui(".x%x.c create window %d %d -width %d -height %d -anchor nw -window .x%x.c.s%x -tags %xS\n", 
+       sys_vgui(".x%lx.c create window %d %d -width %d -height %d -anchor nw -window .x%lx.c.s%lx -tags %lxS\n", 
 		canvas,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist), x->x_width, x->x_height, x->x_glist,x,x);
               
      }     
      else {
-       sys_vgui(".x%x.c coords %xS %d %d\n",
+       sys_vgui(".x%lx.c coords %lxS %d %d\n",
 		canvas, x,
 		text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
      }
      draw_inlets(x, glist, firsttime, 2,2);
      //     draw_handle(x, glist, firsttime);
-     sys_vgui(".x%x.c.s%x configure -state \"%s\"\n", canvas, x, x->x_disabled?"disabled":"active");
+     sys_vgui(".x%lx.c.s%lx configure -state \"%s\"\n", canvas, x, x->x_disabled?"disabled":"active");
     
 
   // Output a bang to first outlet when we're ready to receive float messages the first time!. 
@@ -216,15 +216,15 @@ static void popup_erase(t_popup* x,t_glist* glist)
 
      DEBUG(post("erase start");)
        if(x->initialized){
-         sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
+         sys_vgui("destroy .x%lx.c.s%lx\n",glist_getcanvas(glist),x);
 
-         sys_vgui(".x%x.c delete %xS\n",glist_getcanvas(glist), x);
+         sys_vgui(".x%lx.c delete %lxS\n",glist_getcanvas(glist), x);
 
      /* inlets and outlets */
      
-         sys_vgui(".x%x.c delete %xi\n",glist_getcanvas(glist),x); /* Added tag for all inlets of one instance */
-         sys_vgui(".x%x.c delete %xo\n",glist_getcanvas(glist),x); /* Added tag for all outlets of one instance */
-         sys_vgui(".x%x.c delete  %xhandle\n",glist_getcanvas(glist),x,0);
+         sys_vgui(".x%lx.c delete %lxi\n",glist_getcanvas(glist),x); /* Added tag for all inlets of one instance */
+         sys_vgui(".x%lx.c delete %lxo\n",glist_getcanvas(glist),x); /* Added tag for all outlets of one instance */
+         sys_vgui(".x%lx.c delete  %lxhandle\n",glist_getcanvas(glist),x,0);
        }
 
     DEBUG(post("erase end");)
@@ -238,7 +238,7 @@ static void popup_erase(t_popup* x,t_glist* glist)
 static void popup_getrect(t_gobj *z, t_glist *owner,
     int *xp1, int *yp1, int *xp2, int *yp2)
 {
-  DEBUG(post("getrect start");)
+//  DEBUG(post("getrect start");)
 
     int width, height;
     t_popup* s = (t_popup*)z;
@@ -250,7 +250,7 @@ static void popup_getrect(t_gobj *z, t_glist *owner,
     *xp2 = text_xpix(&s->x_obj, owner) + width;
     *yp2 = text_ypix(&s->x_obj, owner) + height;
   
-    DEBUG(post("getrect end");)
+//    DEBUG(post("getrect end");)
 }
 
 static void popup_displace(t_gobj *z, t_glist *glist,
@@ -262,7 +262,7 @@ static void popup_displace(t_gobj *z, t_glist *glist,
     x->x_obj.te_ypix += dy;
     if (glist_isvisible(glist))
     {
-      if(x->initialized)sys_vgui(".x%x.c coords %xSEL %d %d %d %d\n",
+      if(x->initialized)sys_vgui(".x%lx.c coords %lxSEL %d %d %d %d\n",
 	       glist_getcanvas(glist), x,
 	       text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
 	       text_xpix(&x->x_obj, glist) + x->x_rect_width, text_ypix(&x->x_obj, glist) + x->x_rect_height-2);
@@ -280,15 +280,15 @@ static void popup_select(t_gobj *z, t_glist *glist, int state)
      t_popup *x = (t_popup *)z;
      if(x->initialized){
        if (state) {
-         sys_vgui(".x%x.c create rectangle \
-%d %d %d %d -tags %xSEL -outline blue\n",
+         sys_vgui(".x%lx.c create rectangle \
+%d %d %d %d -tags %lxSEL -outline blue\n",
 		   glist_getcanvas(glist),
 		   text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
 		   text_xpix(&x->x_obj, glist) + x->x_rect_width, text_ypix(&x->x_obj, glist) + x->x_rect_height-2,
 		   x);
        }
        else {
-         sys_vgui(".x%x.c delete %xSEL\n",
+         sys_vgui(".x%lx.c delete %lxSEL\n",
                   glist_getcanvas(glist), x);
        }
      }
@@ -407,7 +407,7 @@ static void popup_options(t_popup* x, t_symbol *s, int argc, t_atom *argv)
 	x->x_num_options = argc;
 	
 	/* delete old menu items */
-	if(visible)sys_vgui(".x%x.c.s%x.menu delete 0 end \n", x->x_glist, x);
+	if(visible)sys_vgui(".x%lx.c.s%lx.menu delete 0 end \n", x->x_glist, x);
 
         if(argc>x->x_maxoptions){
           /* resize the options-array */
@@ -419,7 +419,7 @@ static void popup_options(t_popup* x, t_symbol *s, int argc, t_atom *argv)
 	for(i=0 ; i<argc ; i++)
 	{
 		x->x_options[i] = atom_getsymbol(argv+i);
-		if(visible)sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n", 
+		if(visible)sys_vgui(".x%lx.c.s%lx.menu add command -label \"%s\" -command {.x%lx.c.s%lx configure -text \"%s\" ; popup_sel%lx \"%d\"} \n", 
 			x->x_glist, x, x->x_options[i]->s_name, x->x_glist, x, x->x_options[i]->s_name, x, i);
 	}
 
@@ -433,7 +433,7 @@ static void popup_bgcolour(t_popup* x, t_symbol* col)
 	DEBUG(post("bgcolour start");)
 
 	x->x_colour = col;
-	if(visible)sys_vgui(".x%x.c.s%x configure -background \"%s\"\n", x->x_glist, x, col->s_name);
+	if(visible)sys_vgui(".x%lx.c.s%lx configure -background \"%s\"\n", x->x_glist, x, col->s_name);
 }
 
 /* Function to change name of popup */
@@ -443,7 +443,7 @@ static void popup_name(t_popup* x, t_symbol *name)
 	DEBUG(post("name start");)
 
 	x->x_name = name;
-	if(visible)sys_vgui(".x%x.c.s%x configure -text \"%s\"\n", x->x_glist, x, name->s_name);
+	if(visible)sys_vgui(".x%lx.c.s%lx configure -text \"%s\"\n", x->x_glist, x, name->s_name);
 }
 
 /* Function to select a menu option by inlet */
@@ -455,7 +455,7 @@ static void popup_iselect(t_popup* x, t_floatarg item)
 	int i=(int)item;
 	if( i<x->x_num_options && i>=0)
 	{
-		if(visible)sys_vgui(".x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\" \n",
+		if(visible)sys_vgui(".x%lx.c.s%lx configure -text \"%s\" ; popup_sel%lx \"%d\" \n",
 			glist_getcanvas(x->x_glist), x, x->x_options[i]->s_name,x, i);
                 else popup_output(x, i);
 
@@ -477,7 +477,7 @@ static void popup_symselect(t_popup* x, t_symbol *s)
 	{
 	  if(x->x_options[i]->s_name == s->s_name)
 	  {
-	    if(visible)sys_vgui(".x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\" \n",
+	    if(visible)sys_vgui(".x%lx.c.s%lx configure -text \"%s\" ; popup_sel%lx \"%d\" \n",
                         glist_getcanvas(x->x_glist), x, x->x_options[i]->s_name,x, i);
             else popup_output(x, i);
 	    match = 1;
@@ -503,7 +503,7 @@ static void popup_set(t_popup* x, t_symbol *S, int argc, t_atom*argv)
 	{
           x->current_selection = i;
           if(visible)
-            sys_vgui(".x%x.c.s%x configure -text \"%s\"\n",
+            sys_vgui(".x%lx.c.s%lx configure -text \"%s\"\n",
                      glist_getcanvas(x->x_glist), x, x->x_options[i]->s_name);
 	} else {
           error("popup: Valid menu selections are from %d to %d\npopup: You entered %d.", 0, x->x_num_options-1, i);
@@ -518,7 +518,7 @@ static void popup_set(t_popup* x, t_symbol *S, int argc, t_atom*argv)
 	  if(x->x_options[i]->s_name == s->s_name)
             {
               x->current_selection = i;
-              if(visible)sys_vgui(".x%x.c.s%x configure -text \"%s\"\n",
+              if(visible)sys_vgui(".x%lx.c.s%lx configure -text \"%s\"\n",
                                   glist_getcanvas(x->x_glist), x, x->x_options[i]->s_name);
               return;
           }
@@ -559,7 +559,7 @@ static void popup_append(t_popup* x, t_symbol *s, int argc, t_atom *argv)
         for(i=x->x_num_options ; i<new_limit ; i++)
         {
                 x->x_options[i] = atom_getsymbol(argv+i-x->x_num_options);
-                if(visible)sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n",
+                if(visible)sys_vgui(".x%lx.c.s%lx.menu add command -label \"%s\" -command {.x%lx.c.s%lx configure -text \"%s\" ; popup_sel%lx \"%d\"} \n",
                         x->x_glist, x, x->x_options[i]->s_name, x->x_glist, x, x->x_options[i]->s_name, x, i);
         }
 
@@ -572,7 +572,7 @@ static void popup_disable(t_popup*x, t_float f){
   x->x_disabled=(f>0.f);
   if(x->x_glist && glist_isvisible(x->x_glist)){
     t_canvas *canvas=glist_getcanvas(x->x_glist);
-    sys_vgui(".x%x.c.s%x configure -state \"%s\"\n", canvas, x, x->x_disabled?"disabled":"active");
+    sys_vgui(".x%lx.c.s%lx configure -state \"%s\"\n", canvas, x, x->x_disabled?"disabled":"active");
   }
 }
 
@@ -644,7 +644,7 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
       pd_bind(&x->x_obj.ob_pd, x->x_sym);
 
       /* define proc in tcl/tk where "popup%p" is the receive, "output" is the method, and "$index" is an argument. */
-    sys_vgui("proc popup_sel%x {index} {\n pd [concat popup%p output $index \\;]\n }\n",x,x); 
+    sys_vgui("proc popup_sel%lx {index} {\n pd [concat popup%p output $index \\;]\n }\n",x,x); 
 
     /* Add symbol inlet (hard to say how this actually works?? */
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("symbol"), gensym(""));
