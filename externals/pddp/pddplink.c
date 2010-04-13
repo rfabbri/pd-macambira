@@ -12,8 +12,6 @@
 #include "m_imp.h"  /* FIXME need access to c_externdir... */
 #include "g_canvas.h"
 
-enum { PDDPLINK_PD, PDDPLINK_HTML };  /* LATER add others */
-
 typedef struct _pddplink
 {
     t_object   x_ob;
@@ -167,16 +165,8 @@ static void pddplink_click(t_pddplink *x, t_floatarg xpos, t_floatarg ypos,
 			   t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
 {
     x->x_ishit = 1;
-    switch (x->x_linktype)
-    {
-    case PDDPLINK_PD:
-	typedmess(pddplink_pdtarget(x), gensym("open"), 2, x->x_openargs);
-	break;
-    case PDDPLINK_HTML:
-        sys_vgui("after 0 {pddplink_open {%s} {%s}}\n", \
-                 x->x_ulink->s_name, x->x_dirsym->s_name);
-	break;
-    }
+    sys_vgui("pddplink_open {%s} {%s}\n",               \
+             x->x_ulink->s_name, x->x_dirsym->s_name);
     x->x_ishit = 0;
 }
 
@@ -277,12 +267,6 @@ static char *pddplink_optext(int *sizep, int ac, t_atom *av)
     return (result);
 }
 
-#ifdef PDDPLINK_DEBUG
-static void pddplink_debug(t_pddplink *x)
-{
-}
-#endif
-
 static void pddplink_free(t_pddplink *x)
 {
     if (x->x_vistext)
@@ -332,19 +316,9 @@ static void *pddplink_new(t_symbol *s, int ac, t_atom *av)
     x->x_vislength = (x->x_vistext ? strlen(x->x_vistext) : 0);
     x->x_rtextactive = 0;
     if (xgen.x_ulink)
-    {
-	int len = strlen(xgen.x_ulink->s_name);
-	if (len > 3 && !strcmp(xgen.x_ulink->s_name + len - 3, ".pd"))
-	    x->x_linktype = PDDPLINK_PD;
-	else
-	    x->x_linktype = PDDPLINK_HTML;
-	x->x_ulink = xgen.x_ulink;
-    }
+        x->x_ulink = xgen.x_ulink;
     else
-    {
-	x->x_linktype = PDDPLINK_HTML;
-	x->x_ulink = gensym("index.html");
-    }
+        x->x_ulink = gensym("Untitled");
     SETSYMBOL(&x->x_openargs[0], x->x_ulink);
     SETSYMBOL(&x->x_openargs[1], x->x_dirsym);
     x->x_ishit = 0;
@@ -386,5 +360,5 @@ void pddplink_setup(void)
 		    A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
 
     dirsym = pddplink_class->c_externdir;  /* FIXME */
-    sys_vgui("after 0 {source {%s/pddplink.tcl}}\n", dirsym->s_name);
+    sys_vgui("source {%s/pddplink.tcl}\n", dirsym->s_name);
 }
