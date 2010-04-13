@@ -11,12 +11,6 @@
 #include "m_pd.h"
 #include "m_imp.h"  /* FIXME need access to c_externdir... */
 #include "g_canvas.h"
-#include "common/loud.h"
-#include "build_counter"
-
-#ifdef KRZYSZCZ
-//#define PDDPLINK_DEBUG
-#endif
 
 enum { PDDPLINK_PD, PDDPLINK_HTML };  /* LATER add others */
 
@@ -179,7 +173,8 @@ static void pddplink_click(t_pddplink *x, t_floatarg xpos, t_floatarg ypos,
 	typedmess(pddplink_pdtarget(x), gensym("open"), 2, x->x_openargs);
 	break;
     case PDDPLINK_HTML:
-	sys_vgui("after 0 {::pddp::cliOpen {%s}}\n", x->x_ulink->s_name);
+        sys_vgui("after 0 {pddplink_open {%s} {%s}}\n", \
+                 x->x_ulink->s_name, x->x_dirsym->s_name);
 	break;
     }
     x->x_ishit = 0;
@@ -302,12 +297,12 @@ static void *pddplink_new(t_symbol *s, int ac, t_atom *av)
     xgen.x_isgopvisible = 0;
     xgen.x_vistext = 0;
     xgen.x_vissize = 0;
-    if (xgen.x_ulink = pddplink_nextsymbol(ac, av, 0, &skip))
+    if ((xgen.x_ulink = pddplink_nextsymbol(ac, av, 0, &skip)))
     {
 	t_symbol *opt;
 	ac -= skip;
 	av += skip;
-	while (opt = pddplink_nextsymbol(ac, av, 1, &skip))
+	while ((opt = pddplink_nextsymbol(ac, av, 1, &skip)))
 	{
 	    ac -= skip;
 	    av += skip;
@@ -366,18 +361,12 @@ static void *pddplink_new(t_symbol *s, int ac, t_atom *av)
 	    strcpy(x->x_vistext, x->x_ulink->s_name);
 	}
     }
-    /* disable server until it works better, it takes forever to load
-    if (x->x_linktype == PDDPLINK_HTML)
-	sys_vgui("after 0 {::pddp::srvUse {%s}}\n", x->x_dirsym->s_name); 
-    */
     return (x);
 }
 
 void pddplink_setup(void)
 {
     t_symbol *dirsym;
-    post("this is pddplink %s, %s %s build...",
-	 PDDP_VERSION, loud_ordinal(PDDP_BUILD), PDDP_RELEASE);
 
     pddplink_class = class_new(gensym("pddplink"),
 			       (t_newmethod)pddplink_new,
@@ -396,16 +385,6 @@ void pddplink_setup(void)
 		    gensym("click"),
 		    A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
 
-#ifdef PDDPLINK_DEBUG
-    class_addmethod(pddplink_class, (t_method)pddplink_debug,
-		    gensym("debug"), 0);
-    class_addmethod(pddplinkbox_class, (t_method)pddplink_debug,
-		    gensym("debug"), 0);
-#endif
-
     dirsym = pddplink_class->c_externdir;  /* FIXME */
-    sys_vgui(
-	"if {[lsearch $auto_path \"%s\"] < 0} {lappend auto_path \"%s\"}\n",
-	dirsym->s_name, dirsym->s_name);
-    sys_gui("after 0 {package require pddp}\n");
+    sys_vgui("after 0 {source {%s/pddplink.tcl}}\n", dirsym->s_name);
 }
