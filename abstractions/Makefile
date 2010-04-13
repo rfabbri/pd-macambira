@@ -128,9 +128,9 @@ keyboardkeys_install:
 		--description "objects for using keyboard keys for scrolling and selecting"
 	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/doc/*-help.pd \
 		 $(DESTDIR)$(objectsdir)/$(KEYBOARDKEYS_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(KEYBOARDKEYS_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(KEYBOARDKEYS_NAME)/examples
 	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/keyboard_main.pd \
-		 $(DESTDIR)$(examplesdir)/$(KEYBOARDKEYS_NAME)
+		 $(DESTDIR)$(objectsdir)/$(KEYBOARDKEYS_NAME)/examples
 
 #-------------------------------------------------------------------------------
 # list-abs
@@ -524,9 +524,6 @@ pd-wavelet_install:
 		--description "manipulation of audio in the wavelet domain" \
 		--license "GNU GPL v2" \
 		--version "" 
-	install -d $(DESTDIR)$(examplesdir)/$(PDWAVELET_NAME)
-	install -p $(abstractions_src)/pd-wavelet/main.pd \
-		 $(DESTDIR)$(examplesdir)/$(PDWAVELET_NAME)
 	install -d $(DESTDIR)$(readmesdir)
 	install -p $(abstractions_src)/pd-wavelet/README.txt \
 		$(DESTDIR)$(readmesdir)/$(PDWAVELET_NAME).txt
