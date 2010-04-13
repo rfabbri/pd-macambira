@@ -37,8 +37,6 @@ package:  $(PD_INNO_SETUP)
 	@echo " "
 	@echo "win32_inno install succeeded!"
 
-# makefile.mingw is available from here:
-# http://sourceforge.net/tracker/index.php?func=detail&aid=1374659&group_id=55736&atid=478072
 build_pd:
 	cd $(pd_src)/src && $(MAKE) -f makefile.mingw
 
@@ -53,7 +51,7 @@ install: pd_install prebuilt_install lib_install exe_install
 	@echo "win32_inno install succeeded!"
 
 
-prebuilt_install: pddplink_hack
+prebuilt_install:
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) extended_install
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) doc_format
 	install -p pd-settings.reg $(DESTDIR)$(prefix)
@@ -108,16 +106,6 @@ exe_install:
 	install -p $(bin_src)/wish85.exe  $(DESTDIR)$(bindir)
 	install -p $(bin_src)/tclsh85.exe  $(DESTDIR)$(bindir)
 
-
-# on Windows, the pddp tcl files need to be in pd/lib aka $(libdir)
-pddplink_hack:
-	install -d $(DESTDIR)$(libdir)/pddp
-	install -p $(externals_src)/miXed/bin/pddp/*.tcl $(DESTDIR)$(libdir)/pddp
-
-
-# here are some hacks to assemble a package from binaries
-no_compile_hacks:
-	cp -a /c/Program\ Files/pd-0.38-4 $(DESTDIR)$(prefix)/
 
 $(PD_INNO_SETUP): $(PD_INNO_SETUP).in
 	@echo "Making Inno Setup file: $(PD_INNO_SETUP)"
