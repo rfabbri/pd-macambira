@@ -21,7 +21,7 @@ SOURCES_windows =
 PDOBJECTS = +pager.pd dsp.pd ezoutput~.pd open.pd print.pd print_long.pd
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = 
+EXAMPLES = pddp.css pddplink-test-01.html pddplink-test-01.pd pddplink-test-01.xml pddplink-test-02.html pddplink-test-02.pd pddplink-test-02.xml test.bg.jpg toonepage topdf
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
@@ -30,7 +30,7 @@ MANUAL =
 # list them here.  This can be anything from header files, example patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = parse_meta.pd
+EXTRA_DIST = parse_meta.pd pddplink.tcl
 
 
 
