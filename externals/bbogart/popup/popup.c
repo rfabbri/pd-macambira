@@ -638,13 +638,14 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
       break;
     }
 
-      /* Bind the recieve "popup%p" to the widget outlet*/
-      sprintf(buf,"popup%p",x);
+      /* Bind the recieve "popup%lx" to the widget outlet*/
+      sprintf(buf,"popup%lx",x);
       x->x_sym = gensym(buf);
       pd_bind(&x->x_obj.ob_pd, x->x_sym);
 
       /* define proc in tcl/tk where "popup%p" is the receive, "output" is the method, and "$index" is an argument. */
-    sys_vgui("proc popup_sel%lx {index} {\n pd [concat popup%p output $index \\;]\n }\n",x,x); 
+    sys_vgui("proc popup_sel%lx {index} {\n pd [concat %s output $index \\;]\n }\n",
+             x, buf); 
 
     /* Add symbol inlet (hard to say how this actually works?? */
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("symbol"), gensym(""));
