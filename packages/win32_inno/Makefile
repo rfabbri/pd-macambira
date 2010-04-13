@@ -73,6 +73,7 @@ lib_install:
 	install -d $(DESTDIR)$(prefix)/
 	install -p $(bin_src)/libfftw3-3.dll  $(DESTDIR)$(prefix)/
 	install -p $(bin_src)/libfftw3f-3.dll  $(DESTDIR)$(prefix)/
+	install -p $(bin_src)/libgnurx-0.dll  $(DESTDIR)$(prefix)/
 	install -p $(bin_src)/libogg-0.dll  $(DESTDIR)$(prefix)/
 	install -p $(bin_src)/libsndfile-1.dll  $(DESTDIR)$(prefix)/
 	install -p $(bin_src)/libvorbis-0.dll  $(DESTDIR)$(prefix)/
