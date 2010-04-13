@@ -183,23 +183,23 @@ tutorials_install: $(manualsdir)
 # intro
 	install -d $(DESTDIR)$(manualsdir)/0.Intro
 	install -p $(doc_src)/tutorials/intro/*.* $(DESTDIR)$(manualsdir)/0.Intro
-	install -p $(abstractions_src)/pddp/+pager.pd $(DESTDIR)$(manualsdir)/0.Intro
+	install -p $(externals_src)/pddp/+pager.pd $(DESTDIR)$(manualsdir)/0.Intro
 # sound
 	install -d $(DESTDIR)$(manualsdir)/1.Sound
 	install -p $(doc_src)/tutorials/sound/*.* $(DESTDIR)$(manualsdir)/1.Sound
-	install -p $(abstractions_src)/pddp/+pager.pd $(DESTDIR)$(manualsdir)/1.Sound
+	install -p $(externals_src)/pddp/+pager.pd $(DESTDIR)$(manualsdir)/1.Sound
 # visual
 	install -d $(DESTDIR)$(manualsdir)/2.Image
 	install -p $(doc_src)/tutorials/visual/*.* $(DESTDIR)$(manualsdir)/2.Image
-	install -p $(abstractions_src)/pddp/+pager.pd $(DESTDIR)$(manualsdir)/2.Image
+	install -p $(externals_src)/pddp/+pager.pd $(DESTDIR)$(manualsdir)/2.Image
 # networking
 	install -d $(DESTDIR)$(manualsdir)/3.Networking
 	install -p $(doc_src)/tutorials/networking/*.* $(DESTDIR)$(manualsdir)/3.Networking
-	install -p $(abstractions_src)/pddp/+pager.pd $(DESTDIR)$(manualsdir)/3.Networking
+	install -p $(externals_src)/pddp/+pager.pd $(DESTDIR)$(manualsdir)/3.Networking
 # physical
 #	install -d $(manualsdir)/4.Physical
 #	install -p $(doc_src)/tutorials/physical/*.* $(manualsdir)/4.Physical
-#	install -p $(abstractions_src)/pddp/+pager.pd $(manualsdir)/4.Physical
+#	install -p $(externals_src)/pddp/+pager.pd $(manualsdir)/4.Physical
 
 tutorials_clean:
 	-rm -f -- $(DESTDIR)$(manualsdir)/PdDrums/*.*
@@ -242,7 +242,7 @@ devsymlinks:
 		ln -s $(pd_src)/doc/sound $(doc_src)/sound
 # put the pddp support objects in the path
 	test -e $(doc_src)/pddp/pddp || \
-		ln -s $(abstractions_src)/pddp $(doc_src)/pddp/pddp
+		ln -s $(externals_src)/pddp $(doc_src)/pddp/pddp
 
 #==============================================================================#
 #
