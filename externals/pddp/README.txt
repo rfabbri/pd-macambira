@@ -1,8 +1,15 @@
-TODO for pddp
-  * pddplink:
-    . standardize server's root directory (use $help_directory from pd.tk?)
 
-DONE for pddp
+pddp
+----
+
+This library was started to provide useful objects for documentation, and its
+name comes from the Pure Data Documentation Project.  The pddplink object is
+derived from the pddplink object written by Kzrysztof Czaja in 
+externals/miXed/pddp/pddplink.c.  That version also includes a web server.
+
+
+[pddplink] ChangeLog
+-----------------
 
 alpha3
   * .pd back-link tries not to open patches that are already open:
@@ -29,8 +36,3 @@ alpha2
 alpha1
   * prototype versions of the external "pddplink" and two pd-gui extensions
     "pddpserver.tcl", "pddpclient.tcl"
-
-- fix 0-pager.pd so that it doesn't crash if it doesn't find any files that
-  match the pattern
-
-  G.Holzmann: I added a "touch 0-pager.pd" - so it should not crash ...
