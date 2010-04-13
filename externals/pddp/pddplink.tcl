@@ -5,6 +5,9 @@ proc pddplink_open {filename dir} {
     } elseif {[file pathtype $filename] eq "absolute"} {
         menu_openhtml $filename
     } elseif {[file exists [file join $dir $filename]]} {
+        set fullpath [file normalize [file join $dir $filename]]
+        set dir [file dirname $fullpath]
+        set filename [file tail $fullpath]
         menu_doc_open $dir $filename
     } else {
         bell ;# beep on error to provide instant feedback
