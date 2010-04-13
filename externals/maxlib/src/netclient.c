@@ -3,8 +3,11 @@
 /* Extended 'netsend', connects to 'netserver'.                                 */
 /* Uses child thread to connect to server. Thus needs pd0.35-test17 or later.   */
 /* Written by Olaf Matthes (olaf.matthes@gmx.de)                                */
-/* Get source at http://www.akustische-kunst.org/puredata/maxlib/               */
-/*                                                                              */
+/* Get source at                                                                */
+/* http://pure-data.svn.sourceforge.net/viewvc/pure-data/trunk/externals/maxlib/src/netclient.c */
+/* March 26 2010                                                                */
+/* Additional fixes and improvements by Ivica Ico Bukvic <ico@bukvic.net>       */
+/* for the purpose of L2Ork http://l2ork.music.vt.edu                           */
 /* This program is free software; you can redistribute it and/or                */
 /* modify it under the terms of the GNU General Public License                  */
 /* as published by the Free Software Foundation; either version 2               */
@@ -72,16 +75,19 @@ typedef struct _netclient
 	pthread_attr_t x_threadattr;     /* attributes of child thread */
 } t_netclient;
 
-	/* one lonlely prototype */
+	/* one lonely prototype */
 static void netclient_rcv(t_netclient *x);
 
 
-	/* get's called when connection has been made */
+	/* gets called when connection status has changed */
 static void netclient_tick(t_netclient *x)
 {
-    outlet_float(x->x_outconnect, 1);
-		/* add pollfunction for checking for input */
-	sys_addpollfn(x->x_fd, (t_fdpollfn)netclient_rcv, x);
+    outlet_float(x->x_outconnect, x->x_connectstate);
+    /* add pollfunction for checking for input */
+	if (x->x_connectstate == 1)
+    {
+        sys_addpollfn(x->x_fd, (t_fdpollfn)netclient_rcv, x);
+    }
 }
 
 static void *netclient_child_connect(void *w)
@@ -154,12 +160,13 @@ static void netclient_disconnect(t_netclient *x)
 {
     if (x->x_fd >= 0)
     {
-		sys_rmpollfn(x->x_fd);
-    	sys_closesocket(x->x_fd);
-    	x->x_fd = -1;
-		x->x_connectstate = 0;
-    	outlet_float(x->x_outconnect, 0);
-    }
+        sys_rmpollfn(x->x_fd);
+        sys_closesocket(x->x_fd);
+        x->x_fd = -1;
+        x->x_connectstate = 0;
+        //outlet_float(x->x_outconnect, 0);
+        clock_delay(x->x_clock, 0); /* output connect state later */
+   }
 }
 
 static void netclient_send(t_netclient *x, t_symbol *s, int argc, t_atom *argv)
@@ -261,7 +268,8 @@ static void netclient_rcv(t_netclient *x)
 		if(ret < 0)
 		{
 			error("netclient: can not read from socket");
-			sys_closesocket(fd);
+            //sys_closesocket(fd);
+            netclient_disconnect(x);
 			return;
 		}
 		if(FD_ISSET(fd, &readset) || FD_ISSET(fd, &exceptset))
@@ -272,14 +280,16 @@ static void netclient_rcv(t_netclient *x)
 			if (ret < 0)
 			{
 				sys_sockerror("recv");
-				sys_rmpollfn(fd);
-	    		sys_closesocket(fd);
+                //sys_rmpollfn(fd);
+                //sys_closesocket(fd);
+                netclient_disconnect(x);
 			}
 			else if (ret == 0)
 			{
 	    		post("netclient: connection closed on socket %d", fd);
-				sys_rmpollfn(fd);
-	    		sys_closesocket(fd);
+				//sys_rmpollfn(fd);
+	    		//sys_closesocket(fd);
+                netclient_disconnect(x);
 			}
 			else
 			{
