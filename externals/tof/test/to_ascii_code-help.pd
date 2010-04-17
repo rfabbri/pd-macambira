@@ -1,0 +1,13 @@
+#N canvas 1371 321 506 219 10;
+#X msg 108 32 test;
+#X msg 262 34 1234;
+#X obj 95 74 tof/to_ascii_code 13;
+#X msg 173 36 list abcdef;
+#X obj 95 115 print codes;
+#X obj 214 115 print length;
+#X text 234 73 Optionnal argument: append ascii code;
+#X connect 0 0 2 0;
+#X connect 1 0 2 0;
+#X connect 2 0 4 0;
+#X connect 2 1 5 0;
+#X connect 3 0 2 0;
