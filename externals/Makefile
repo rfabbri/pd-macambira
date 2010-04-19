@@ -827,16 +827,9 @@ hid: $(externals_src)/hcs/hid/hid.$(EXTENSION)
 
 hid_install: hid
 	install -d $(DESTDIR)$(objectsdir)/$(HID_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(HID_NAME) \
-		--author "Hans-Christoph Steiner" \
-		--description "" \
-		--license "GNU GPL" \
-		--version ""
-	-install -p $(externals_src)/hcs/hid/hid.$(EXTENSION) $(DESTDIR)$(objectsdir)
+	install -p $(externals_src)/hcs/hid/hid.$(EXTENSION) \
+		$(DESTDIR)$(objectsdir)/$(HID_NAME)
 	install -p $(externals_src)/hcs/hid/*.pd $(DESTDIR)$(objectsdir)/$(HID_NAME)
-	install -p $(externals_src)/hcs/hid/doc/*.pd       $(DESTDIR)$(objectsdir)/$(HID_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(HID_NAME)
-	install -p $(externals_src)/hcs/hid/examples/*.pd  $(DESTDIR)$(examplesdir)/$(HID_NAME)
 	install -d $(DESTDIR)$(objectsdir)/$(HID_NAME)/examples
 	install -p $(externals_src)/hcs/hid/examples/*.pd  \
 		$(DESTDIR)$(objectsdir)/$(HID_NAME)/examples
