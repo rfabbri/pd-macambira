@@ -451,17 +451,12 @@ puremeasurement_install:
 SFRUIT_NAME = sfruit
 sfruit_install:
 	install -d $(DESTDIR)$(objectsdir)/$(SFRUIT_NAME)
-	install -p $(shell ls -1 $(abstractions_src)/sfruit/sfruit/*.pd | \
-		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(SFRUIT_NAME)
+	install -p $(abstractions_src)/sfruit/sfruit/*.pd \
+		$(DESTDIR)$(objectsdir)/$(SFRUIT_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(SFRUIT_NAME) \
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
 		--description "a large collection of assorted handy utilites"
-	install -d $(DESTDIR)$(helpdir)/$(SFRUIT_NAME)
-	install -p $(abstractions_src)/sfruit/sfruit/*-help.pd \
-		$(DESTDIR)$(helpdir)/$(SFRUIT_NAME)
-	install -p $(abstractions_src)/sfruit/sfruit/*-help.pd \
-		$(DESTDIR)$(objectsdir)/$(SFRUIT_NAME)
 
 #-------------------------------------------------------------------------------
 # TIMESTRETCH
