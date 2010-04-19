@@ -238,18 +238,13 @@ $(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
 
 gem: $(gem_src)/src/Gem.$(EXTENSION)
 
-gem_install: gem $(helpdir)
-	install -d $(DESTDIR)$(helpdir)/$(GEM_NAME)
-	install -p $(gem_src)/help/*.* $(DESTDIR)$(helpdir)/$(GEM_NAME)
-	install -p $(gem_src)/abstractions/*-help.pd $(DESTDIR)$(helpdir)/$(GEM_NAME)
+gem_install: gem
 	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)
 ifneq ($(OS_NAME),windows)
 	install -p $(gem_src)/src/Gem.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 endif
-# kludge to get helpfiles working since the HELPSYMBOL stuff changed
 	install -p $(gem_src)/help/*.*  $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
-	install -p $(shell ls -1 $(gem_src)/abstractions/*.* | \
-		grep -v '\-help.pd')  $(DESTDIR)$(objectsdir)/$(GEM_NAME)
+	install -p $(gem_src)/abstractions/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(GEM_NAME)
 	install -p $(gem_src)/doc/*.* $(DESTDIR)$(manualsdir)/$(GEM_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(GEM_NAME)/manual
