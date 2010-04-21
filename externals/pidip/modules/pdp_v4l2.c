@@ -406,10 +406,7 @@ static int pdp_v4l2_set_format(t_pdp_v4l2 *x, t_int index)
 {
     x->x_v4l2_format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     x->x_v4l2_format.fmt.pix.pixelformat = x->x_formats[index].pixelformat;
-    x->x_v4l2_format.fmt.pix.width = x->x_width;
-    x->x_v4l2_format.fmt.pix.height = x->x_height;
     x->x_v4l2_format.fmt.pix.field = V4L2_FIELD_ANY;
-    x->x_v4l2_format.fmt.pix.bytesperline = 0;
 
     post( "pdp_v4l2 : setting format : pixel format : %c%c%c%c", 
             x->x_v4l2_format.fmt.pix.pixelformat & 0xff,
@@ -417,17 +414,15 @@ static int pdp_v4l2_set_format(t_pdp_v4l2 *x, t_int index)
             (x->x_v4l2_format.fmt.pix.pixelformat >> 16) & 0xff,
             (x->x_v4l2_format.fmt.pix.pixelformat >> 24) & 0xff );
 
-    if (-1 == ioctl(x->x_tvfd, VIDIOC_S_FMT, &x->x_v4l2_format, EINVAL))
+    if (-1 == ioctl(x->x_tvfd, VIDIOC_S_FMT, &x->x_v4l2_format))
     { 
-       perror( "pdp_v4l2 : setting format" );
-       return -1;
+       post( "pdp_v4l2 : defaulting to format : pixel format : %c%c%c%c", 
+            x->x_v4l2_format.fmt.pix.pixelformat & 0xff,
+            (x->x_v4l2_format.fmt.pix.pixelformat >>  8) & 0xff,
+            (x->x_v4l2_format.fmt.pix.pixelformat >> 16) & 0xff,
+            (x->x_v4l2_format.fmt.pix.pixelformat >> 24) & 0xff );
     }
 
-    if ( x->x_v4l2_format.fmt.pix.pixelformat != x->x_formats[index].pixelformat )
-    {
-       post( "pdp_v4l2 : couldn't set format : wrong pixel format " );
-       return -1;
-    }
     post( "pdp_v4l2 : capture format : width : %d : height :%d : bytesperline : %d : image size : %d",
           x->x_v4l2_format.fmt.pix.width , x->x_v4l2_format.fmt.pix.height,
           x->x_v4l2_format.fmt.pix.bytesperline, x->x_v4l2_format.fmt.pix.sizeimage );
@@ -503,8 +498,6 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
     unsigned int size;
     int i;
 
-    unsigned int width, height;
-
     /* if already opened -> close */
     if (x->x_initialized) pdp_v4l2_close(x);
 
@@ -539,7 +532,7 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
 
     for (x->x_ninputs = 0; x->x_ninputs < MAX_INPUT; x->x_ninputs++) {
         x->x_inputs[x->x_ninputs].index = x->x_ninputs;
-        if (-1 == ioctl(x->x_tvfd, VIDIOC_ENUMINPUT, &x->x_inputs[x->x_ninputs], EINVAL))
+        if (-1 == ioctl(x->x_tvfd, VIDIOC_ENUMINPUT, &x->x_inputs[x->x_ninputs]))
         {
             // perror("get inputs");
             break;
@@ -553,8 +546,14 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
 
     if ( x->x_ninputs > 0 )
     {
-      if (x->x_curinput < 0) x->x_curinput = 0;
-      if (x->x_curinput >= x->x_ninputs) x->x_curinput = x->x_ninputs-1;
+      if (ioctl(x->x_tvfd, VIDIOC_G_INPUT, &x->x_curinput) < 0)
+      {
+          post("pdp_v4l2: cant get current input %d",x->x_curinput);
+      }
+      else
+      {
+          post("pdp_v4l2: current input is %d",x->x_curinput);
+      }
 
       if (ioctl(x->x_tvfd, VIDIOC_S_INPUT, &x->x_curinput) < 0)
       {
@@ -566,19 +565,11 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
          post("pdp_v4l2: switched to input %d", x->x_curinput);
       }
 
-      if (ioctl(x->x_tvfd, VIDIOC_G_INPUT, &x->x_curinput) < 0)
-      {
-          post("pdp_v4l2: cant get current input %d",x->x_curinput);
-      }
-      else
-      {
-          post("pdp_v4l2: current input is %d",x->x_curinput);
-      }
     }
 
     for (x->x_nstandards = 0; x->x_nstandards < MAX_NORM; x->x_nstandards++) {
         x->x_standards[x->x_nstandards].index = x->x_nstandards;
-        if (-1 == ioctl(x->x_tvfd, VIDIOC_ENUMSTD, &x->x_standards[x->x_nstandards], EINVAL))
+        if (-1 == ioctl(x->x_tvfd, VIDIOC_ENUMSTD, &x->x_standards[x->x_nstandards]))
         {
             // perror("get standards");
             break;
@@ -593,8 +584,14 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
     // switch to desired norm ( if available )
     if ( x->x_nstandards > 0 )
     {
-      if (x->x_curstandard < 0) x->x_curstandard = 0;
-      if (x->x_curstandard >= x->x_nstandards) x->x_curstandard = x->x_nstandards-1;
+      if (ioctl(x->x_tvfd, VIDIOC_G_STD, &x->x_curstandard) < 0)
+      {
+          post("pdp_v4l2: cant get current standard %d",x->x_curstandard);
+      }
+      else
+      {
+          post("pdp_v4l2: current standard is %d",x->x_curstandard);
+      }
 
       if (ioctl(x->x_tvfd, VIDIOC_S_STD, &x->x_curstandard) < 0)
       {
@@ -604,15 +601,6 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
       else
       {
          post("pdp_v4l2: switched to standard %d", x->x_curstandard);
-      }
-
-      if (ioctl(x->x_tvfd, VIDIOC_G_STD, &x->x_curstandard) < 0)
-      {
-          post("pdp_v4l2: cant get current standard %d",x->x_curstandard);
-      }
-      else
-      {
-          post("pdp_v4l2: current standard is %d",x->x_curstandard);
       }
     }
 
@@ -624,9 +612,8 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
     for (x->x_nformats = 0; x->x_nformats < MAX_FORMAT; x->x_nformats++) {
         x->x_formats[x->x_nformats].index = x->x_nformats;
         x->x_formats[x->x_nformats].type  = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if (-1 == ioctl(x->x_tvfd, VIDIOC_ENUM_FMT, &x->x_formats[x->x_nformats], EINVAL))
+        if (-1 == ioctl(x->x_tvfd, VIDIOC_ENUM_FMT, &x->x_formats[x->x_nformats]))
         {
-            // perror("get formats");
             break;
         }
         else
@@ -636,38 +623,28 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
     }
     if (x->x_debug) post("pdp_v4l2: device supports %d formats", x->x_nformats );
 
-    x->x_streamparam.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    ioctl(x->x_tvfd,VIDIOC_G_PARM,&x->x_streamparam);
-
-        /* controls */
-    for (i = 0; i < MAX_CTRL; i++) {
-        x->x_controls[i].id = V4L2_CID_BASE+i;
-        if (-1 == ioctl(x->x_tvfd, VIDIOC_QUERYCTRL, &x->x_controls[i], EINVAL) ||
-            (x->x_controls[i].flags & V4L2_CTRL_FLAG_DISABLED))
-            x->x_controls[i].id = -1;
-        else if (x->x_debug) post( "control %d active (i:%d)", x->x_controls[i].id, i );
-    }
-    for (i = 0; i < MAX_CTRL; i++) {
-        x->x_controls[i+MAX_CTRL].id = V4L2_CID_PRIVATE_BASE+i;
-        if (-1 == ioctl(x->x_tvfd, VIDIOC_QUERYCTRL, &x->x_controls[i+MAX_CTRL], EINVAL) ||
-            (x->x_controls[i+MAX_CTRL].flags & V4L2_CTRL_FLAG_DISABLED))
-            x->x_controls[i+MAX_CTRL].id = -1;
-        else if (x->x_debug) post( "control %d active (i:%d)", x->x_controls[i+MAX_CTRL].id, i );
-    }
-
     if ( x->x_nformats > 0 )
     {
-      if (x->x_curformat < 0) x->x_curformat = 0;
-      if (x->x_curformat >= x->x_nformats) x->x_curformat = x->x_nformats-1;
+       x->x_v4l2_format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+       if ((i = ioctl(x->x_tvfd, VIDIOC_G_FMT, &x->x_v4l2_format)) < 0) {
+          perror("pdp_v4l2: error: VIDIOC_G_FMT");
+          pdp_v4l2_close_error(x);
+          x->x_initialized = false;
+       }
+       x->x_width = x->x_v4l2_format.fmt.pix.width;
+       x->x_height = x->x_v4l2_format.fmt.pix.height;
 
-      // set the first available format
-      if ( pdp_v4l2_set_format(x, x->x_curformat) < 0 )
-      {
-         post( "pdp_v4l2 : couldn't set format : closing..." );
-         pdp_v4l2_close_error(x);
-         x->x_initialized = false;
-         return;
-      }
+       post( "pdp_v4l2 : current format is : %c%c%c%c", 
+            x->x_v4l2_format.fmt.pix.pixelformat & 0xff,
+            (x->x_v4l2_format.fmt.pix.pixelformat >>  8) & 0xff,
+            (x->x_v4l2_format.fmt.pix.pixelformat >> 16) & 0xff,
+            (x->x_v4l2_format.fmt.pix.pixelformat >> 24) & 0xff );
+
+       if ((i = ioctl(x->x_tvfd, VIDIOC_S_FMT, &x->x_v4l2_format)) < 0) {
+          perror("pdp_v4l2: error: VIDIOC_S_FMT");
+          pdp_v4l2_close_error(x);
+          x->x_initialized = false;
+       }
     }
     else
     {
@@ -675,6 +652,22 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
       pdp_v4l2_close_error(x);
       x->x_initialized = false;
       return;
+    }
+
+        /* controls */
+    for (i = 0; i < MAX_CTRL; i++) {
+        x->x_controls[i].id = V4L2_CID_BASE+i;
+        if (-1 == ioctl(x->x_tvfd, VIDIOC_QUERYCTRL, &x->x_controls[i]) ||
+            (x->x_controls[i].flags & V4L2_CTRL_FLAG_DISABLED))
+            x->x_controls[i].id = -1;
+        else if (x->x_debug) post( "control %d active (i:%d)", x->x_controls[i].id, i );
+    }
+    for (i = 0; i < MAX_CTRL; i++) {
+        x->x_controls[i+MAX_CTRL].id = V4L2_CID_PRIVATE_BASE+i;
+        if (-1 == ioctl(x->x_tvfd, VIDIOC_QUERYCTRL, &x->x_controls[i+MAX_CTRL]) ||
+            (x->x_controls[i+MAX_CTRL].flags & V4L2_CTRL_FLAG_DISABLED))
+            x->x_controls[i+MAX_CTRL].id = -1;
+        else if (x->x_debug) post( "control %d active (i:%d)", x->x_controls[i+MAX_CTRL].id, i );
     }
 
     if ( pdp_v4l2_init_mmap(x) < 0 )
@@ -853,13 +846,13 @@ static void pdp_v4l2_bang(t_pdp_v4l2 *x)
     case  V4L2_PIX_FMT_UYVY: 
         pdp_llconv(newimage, RIF_UYVY_P____U8, data, RIF_YVU__P411_S16, x->x_width, x->x_height);
         break;
+
     case  v4l2_fourcc('S', '9', '2', '0'):
-	//memcpy(data, newimage, x->x_width * x->x_height *2); 
-	//pdp_llconv(newimage, RIF_YUYV_P____S16, data, RIF_YVU__P411_S16, x->x_width, x->x_height);
-	v4lconvert_sn9c20x_to_yuv420(newimage,data,x->x_width, x->x_height,1);
+	v4lconvert_sn9c20x_to_yuv420( newimage, (unsigned char*)data, x->x_width, x->x_height,1);
 	pdp_llconv(data, RIF_YUV__P411_U8, newimage, RIF_YVU__P411_S16, x->x_width, x->x_height);
 	memcpy(data, newimage, x->x_width * x->x_height *2); 
         break;
+
     default:
 	post("pdp_v4l2: unsupported color model: %d", x->x_v4l2_format.fmt.pix.pixelformat);
 	break;
