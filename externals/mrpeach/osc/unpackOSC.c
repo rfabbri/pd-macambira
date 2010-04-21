@@ -162,6 +162,7 @@ void unpackOSC_setup(void)
         (t_newmethod)unpackOSC_new, (t_method)unpackOSC_free,
         sizeof(t_unpackOSC), 0, 0);
     class_addlist(unpackOSC_class, (t_method)unpackOSC_list);
+    class_sethelpsymbol(unpackOSC_class, gensym("routeOSC")); /* same help patch as routeOSC*/
 }
 
 /* unpackOSC_list expects an OSC packet in the form of a list of floats on [0..255] */
