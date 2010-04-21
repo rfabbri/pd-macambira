@@ -227,12 +227,12 @@ $(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
 
 $(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
 	cd $(gem_src)/src && PATH=/sw/bin:$(PATH) ./configure \
-		PKG_FTGL_CFLAGS="-I/sw/include/freetype2 -I/sw/include/FTGL" \
+		PKG_FTGL_CFLAGS="-I/sw/include -I/sw/include/freetype2 -I/sw/include/FTGL" \
 		--without-ALL \
 		--with-ftgl --with-ftgl-libs=/sw/lib \
 		--with-artoolkit-includes=/sw/include --with-artoolkit-libs=/sw/lib \
 		--with-pd=$(pd_src)
-	PATH=/sw/bin:$(PATH) $(MAKE) -C $(gem_src)/src
+	PATH=/sw/bin:$(PATH) $(MAKE) -C $(gem_src)/src LIBTOOL=glibtool
 
 gem: $(gem_src)/src/Gem.$(EXTENSION)
 
@@ -240,8 +240,8 @@ gem_install: gem
 	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)
 ifneq ($(OS_NAME),windows)
 	install -p $(gem_src)/src/Gem.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
+	install -p $(gem_src)/src/plugins/*/.libs/*.so  $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 endif
-	install -p $(gem_src)/src/plugins/*/.libs/*.*  $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 	install -p $(gem_src)/help/*.*  $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 	install -p $(gem_src)/abstractions/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)
 	install -d $(DESTDIR)$(manualsdir)/$(GEM_NAME)
