@@ -170,7 +170,8 @@ void *OSCroute_new(t_symbol *s, int argc, t_atom *argv)
   int i;	//{{raf}} n not used
   
   // EnterCallback();
-  
+  error("[OSCroute]: OSCx is deprecated! consider switching to mrpeach's [routeOSC]");
+
   if (argc > MAX_NUM) {
     post("* OSC-route: too many arguments: %ld (max %ld)", argc, MAX_NUM);
     // ExitCallback();

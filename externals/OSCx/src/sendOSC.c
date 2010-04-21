@@ -127,6 +127,8 @@ void SendData(void *htmsocket, int size, char *data);
 static void *sendOSC_new(t_floatarg udpflag)
 {
     t_sendOSC *x = (t_sendOSC *)pd_new(sendOSC_class);
+  error("[sendOSC]: OSCx is deprecated! consider switching to mrpeach's [packOSC] and [udpsend]");
+
     outlet_new(&x->x_obj, &s_float);
     x->x_htmsocket = 0;		// {{raf}}
     // set udp

@@ -41,6 +41,7 @@ static t_class* OSC_class;
 
 static void* OSC_new(t_symbol* s) {
     t_OSC *x = (t_OSC *)pd_new(OSC_class);
+    error("OSCx is deprecated! consider switching to mrpeach's osc & net objects");
     return (x);
 }
 
@@ -66,4 +67,6 @@ OSC_API void OSC_setup(void) {
   post("O  : Open Sound Control 4 PD, http://www.cnmat.berkeley.edu/OSC");
   post(" S : original code by matt wright, pd hakcs cxc, Win32-port raf@interaccess.com");
   post("  C: ver: "VERSION ", compiled: "__DATE__ " -- adapted by piotr@majdak.com");
+
+  error("OSCx is deprecated - ask IOhannes m zmoelnig why...");
 }

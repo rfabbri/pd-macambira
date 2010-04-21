@@ -263,6 +263,9 @@ static void *dumpOSC_new(t_symbol *compatflag,
   int udp = 1;
   t_symbol *castgroup=NULL;
 
+  error("[dumpOSC]: OSCx is deprecated! consider switching to mrpeach's [unpackOSC] and [udpreceive]");
+
+
   if (argc == 1) {
 	  if (argv[0].a_type==A_FLOAT)
 		  portno = (int)argv[0].a_w.w_float;
@@ -283,7 +286,7 @@ static void *dumpOSC_new(t_symbol *compatflag,
   }
 
   else {
-      error("[dumpOSC] needs at least one argument to function");
+      error("[dumpOSC] needs at least one argument (port number) to function");
       return NULL;
   }
   
