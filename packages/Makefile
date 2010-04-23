@@ -216,7 +216,7 @@ externals_install:
 # gem_install
 GEM_NAME = Gem
 $(gem_src)/src/configure: 
-	cd $(gem_src)/src && PATH=/sw/bin:$(PATH) ./autogen.sh
+	cd $(gem_src)/src && PATH=/sw/bin:"$(PATH)" ./autogen.sh
 
 $(gem_src)/src/Gem.dll: $(gem_src)/src/configure
 
@@ -226,7 +226,7 @@ $(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
 	$(MAKE) -C $(gem_src)/src
 
 $(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
-	cd $(gem_src)/src && PATH=/sw/bin:$(PATH) ./configure \
+	cd $(gem_src)/src && PATH=/sw/bin:"$(PATH)" ./configure \
 		PKG_FTGL_CFLAGS="-I/sw/include -I/sw/include/freetype2 -I/sw/include/FTGL" \
 		--without-ALL \
 		--with-ftgl --with-ftgl-libs=/sw/lib \
