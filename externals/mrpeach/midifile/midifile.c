@@ -460,7 +460,7 @@ static void midifile_list(t_midifile *x, t_symbol *s, int argc, t_atom *argv)
                     written = midifile_write_variable_length_value(x->tmpFP, x->track_chunk[0].delta_time);
                     dt_written = 1;
                 }
-                if (j == x->track_chunk[0].running_status) break;/* don't save redundant status byte */
+                if (j == x->track_chunk[0].running_status) continue;/* don't save redundant status byte */
                 if (j >= 0x80 && j <= 0xEF)x->track_chunk[0].running_status = j;/* new running status */
                 else if (j >= 0xF0 && j <= 0xF7)
                 {
