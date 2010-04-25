@@ -247,19 +247,22 @@ endif
 		install -p $(gem_src)/src/plugins/*/.libs/*.dll $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
 	install -p $(gem_src)/help/*.*  $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 	install -p $(gem_src)/abstractions/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(GEM_NAME)
-	install -p $(gem_src)/doc/*.* $(DESTDIR)$(manualsdir)/$(GEM_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(GEM_NAME)/manual
+	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual
+	install -p $(gem_src)/doc/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual
+	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual/html
 # in Gem 0.92, $(gem_src)/manual moved to $(gem_src)/doc/manual
 	(test -d $(gem_src)/manual && \
-		install -p $(gem_src)/manual/*.* $(DESTDIR)$(manualsdir)/$(GEM_NAME)/manual) || \
-		install -p $(gem_src)/doc/manual/*.* $(DESTDIR)$(manualsdir)/$(GEM_NAME)/manual
+		install -p $(gem_src)/manual/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual/html ) || \
+		install -p $(gem_src)/doc/manual/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual/html
 	for dir in $(shell ls -1 $(gem_src)/examples | grep -v CVS); do \
 		echo "installing $$dir"; \
-		install -d $(DESTDIR)$(examplesdir)/$(GEM_NAME)/$$dir ; \
-		install -p $(gem_src)/examples/$$dir/*.* $(DESTDIR)$(examplesdir)/$(GEM_NAME)/$$dir ;\
+		install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ; \
+		install -p $(gem_src)/examples/$$dir/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ;\
 	done
-	
+	install -d $(DESTDIR)$(examplesdir)
+	ln -s $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples $(DESTDIR)$(examplesdir)/$(GEM_NAME)
+	install -d  $(DESTDIR)$(manualsdir)
+	ln -s $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual $(DESTDIR)$(manualsdir)/$(GEM_NAME)
 
 
 #------------------------------------------------------------------------------
