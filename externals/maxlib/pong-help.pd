@@ -1,0 +1,5 @@
+#N canvas 253 249 450 300 10;
+#X obj 153 121 pong;
+#X text 24 14 a bouncing ball model!;
+#X text 53 45 Based on pong (for Max) version 1.5 written by Richard
+Dudas.;

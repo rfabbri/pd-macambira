@@ -1223,33 +1223,16 @@ markex_install:
 markex_clean:
 	make -C $(externals_src)/markex clean
 
-
 #------------------------------------------------------------------------------#
 # MAXLIB
-MAXLIB_NAME=maxlib
-MAXLIB_OBJECTS := $(wildcard $(externals_src)/maxlib/src/*.c)
-maxlib: $(MAXLIB_OBJECTS:.c=.$(EXTENSION))
+maxlib:
+	make -C $(externals_src)/maxlib
 
-maxlib_install: maxlib
-	install -d $(DESTDIR)$(objectsdir)/$(MAXLIB_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(MAXLIB_NAME) \
-		--author "Olaf Matthes <olaf.matthes@gmx.de>" \
-		--license "GNU GPL" \
-		--version "1.5.2-cvs"
-	install -p $(MAXLIB_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(MAXLIB_NAME)
-	install -p $(wildcard $(externals_src)/maxlib/help/*.pd) \
-		$(DESTDIR)$(objectsdir)/$(MAXLIB_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(MAXLIB_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/maxlib/README \
-		$(DESTDIR)$(readmesdir)/$(MAXLIB_NAME).txt
+maxlib_install:
+	make -C $(externals_src)/maxlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 maxlib_clean:
-	-rm -f -- $(externals_src)/maxlib/src/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/maxlib/src/*.o
-	-rm -f -- $(externals_src)/maxlib/*/*.bak
-	-rm -f -- $(externals_src)/maxlib/*/*.*~
-	-rm -f -- $(externals_src)/maxlib/*.*~
+	make -C $(externals_src)/maxlib clean
 
 
 #------------------------------------------------------------------------------#
