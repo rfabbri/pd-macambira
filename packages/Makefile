@@ -241,10 +241,10 @@ gem_install: gem
 ifneq ($(OS_NAME),windows)
 	install -p $(gem_src)/src/Gem.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 endif
-	(test -e $(gem_src)/src/plugins/filmAVI/.libs/filmAVI.so && \
-		install -p $(gem_src)/src/plugins/*/.libs/*.so $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
-	(test -e $(gem_src)/src/plugins/filmAVI/.libs/filmAVI.dll && \
-		install -p $(gem_src)/src/plugins/*/.libs/*.dll $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
+	(test -e $(gem_src)/src/plugins/filmAVI/.libs/gem_filmAVI.so && \
+		install -p $(gem_src)/src/plugins/*/.libs/gem_*.so $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
+	(test -e $(gem_src)/src/plugins/filmAVI/.libs/gem_filmAVI.dll && \
+		install -p $(gem_src)/src/plugins/*/.libs/gem_*.dll $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
 	install -p $(gem_src)/help/*.*  $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 	install -p $(gem_src)/abstractions/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)
 	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual
