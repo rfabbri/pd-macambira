@@ -38,6 +38,7 @@ static t_symbol *iem_image_calc_size(t_iem_image *x)
   char *c;
   int fd;
   FILE *fh;
+  size_t items;
   
   if(!x->x_gifsym || !x->x_gifsym->s_name)
   {
@@ -69,8 +70,9 @@ static t_symbol *iem_image_calc_size(t_iem_image *x)
     }
     else
     {
-      if(fread(buf, 22, sizeof(unsigned char), fh) < 22){
-	post("iem_image-ERROR: can not read header in %s ", namebuf);
+        items=fread(buf, 22, sizeof(unsigned char), fh);
+  	if((items < 1)||(strlen((char*)buf)<7)) {
+	post("iem_image-ERROR: can not read header in %s, only %d items read: %s.", namebuf, strlen((char*)buf), (char*) buf);
         x->x_gifsym = (t_symbol *)0;
         return((t_symbol *)0);
         };
