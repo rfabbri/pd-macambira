@@ -1,5 +1,4 @@
-/* tcpserver.c Martin Peach 20060511 working version 20060512 */
-/* 20060515 works on linux too... */
+/* tcpserver.c Martin Peach 20100501 */
 /* tcpserver.c is based on netserver: */
 /* --------------------------  netserver  ------------------------------------- */
 /*                                                                              */
@@ -914,6 +913,7 @@ static void *tcpserver_new(t_floatarg fportno)
     int                 i;
     struct sockaddr_in  server;
     int                 sockfd, portno = fportno;
+    char                optval = 1;
 
     /* create a socket */
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -927,12 +927,10 @@ static void *tcpserver_new(t_floatarg fportno)
     }
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-#ifdef IRIX
-    /* this seems to work only in IRIX but is unnecessary in
-        Linux.  Not sure what NT needs in place of this. */
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, 0, 0) < 0)
-        post("setsockopt failed\n");
-#endif
+    /* enable reuse of local address */
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
+        sys_sockerror("tcpserver: setsockopt SO_REUSEADDR");
+
     /* assign server port number */
     server.sin_port = htons((u_short)portno);
     /* name the socket */
