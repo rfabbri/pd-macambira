@@ -1,0 +1,36 @@
+#N canvas 631 295 583 358 10;
+#X obj -98 158 slipenc;
+#X obj -98 83 packOSC;
+#X msg -98 58 /test 1 2 3 192 218 219 220 221 222;
+#X obj -98 277 slipdec;
+#X text -36 159 Encodes a list of bytes for transmission through a
+serial link using SLIP (RFC1055). Useful for sending OSC through [comport].
+;
+#X text 76 315 Author: Martin Peach \, 2010/05/04;
+#X floatatom 35 142 5 0 0 0 - - -;
+#X text -35 77 SLIP is a simple encoding that prefixes each packet
+with 192 \, and replaces any occurence of 192 by the sequence 219 \,
+220 Also any occurrence of 219 will be replaced by 219 \, 221 The packet
+is ended with a final 192;
+#X text -100 0 [slipenc]: Encode a list of bytes using Serial Line
+Internet Protocol (SLIP);
+#X text -81 234 Note that SLIP limits the maximum packet size to 1006
+;
+#X obj -71 210 print encoded;
+#X obj -71 135 print original;
+#X obj -98 317 print decoded;
+#X obj -98 113 t a a;
+#X obj -98 186 t a a;
+#X text -47 279 Decodes a list of bytes that were encoded with SLIP.
+;
+#X text -100 28 [slipdec]: Decode a list of bytes using Serial Line
+Internet Protocol (SLIP);
+#X connect 0 0 14 0;
+#X connect 1 0 13 0;
+#X connect 2 0 1 0;
+#X connect 3 0 12 0;
+#X connect 6 0 0 0;
+#X connect 13 0 0 0;
+#X connect 13 1 11 0;
+#X connect 14 0 3 0;
+#X connect 14 1 10 0;
