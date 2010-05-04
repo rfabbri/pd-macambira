@@ -19,12 +19,19 @@ typedef struct _slipdec
 {
     t_object    x_obj;
     t_outlet    *x_slipdec_out;
+    t_outlet    *x_status_out;
     t_atom      *x_slip_buf;
     t_int       x_slip_length;
+    t_int       x_packet_index;
+    t_int       x_valid_SLIP;
+    t_int       x_esced;
+    t_int       x_verbose;
 } t_slipdec;
 
 static void *slipdec_new(t_symbol *s, int argc, t_atom *argv);
 static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av);
+static void slipdec_float(t_slipdec *x, t_float f);
+static void slipdec_verbosity(t_slipdec *x, t_float f);
 static void slipdec_free(t_slipdec *x);
 void slipdec_setup(void);
 
@@ -32,17 +39,18 @@ static void *slipdec_new(t_symbol *s, int argc, t_atom *argv)
 {
     int i;
     t_slipdec  *x = (t_slipdec *)pd_new(slipdec_class);
-
     x->x_slip_buf = (t_atom *)getbytes(sizeof(t_atom)*MAX_SLIP);
     if(x->x_slip_buf == NULL)
     {
         error("slipdec: unable to allocate %lu bytes for x_slip_buf", (long)sizeof(t_atom)*MAX_SLIP);
         return NULL;
     }
-    else post("slipdec: allocated %lu bytes for x_slip_buf", (long)sizeof(t_atom)*MAX_SLIP);
     /* init the slip buf atoms to float type */
     for (i = 0; i < MAX_SLIP; ++i) x->x_slip_buf[i].a_type = A_FLOAT;
     x->x_slipdec_out = outlet_new(&x->x_obj, &s_list);
+    x->x_status_out = outlet_new(&x->x_obj, &s_anything);
+    x->x_packet_index = 0;
+    x->x_valid_SLIP = 1;
     return (x);
 }
 
@@ -50,7 +58,7 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
 {
     /* SLIP decode a list of bytes */
     float   f;
-    int     i, c, esced = 0;
+    int     i, c, esced = 0, isSLIP = 1;
 
     /* for each byte in the packet, send the appropriate character sequence */
     for(i = x->x_slip_length = 0; ((i < ac) && (x->x_slip_length < MAX_SLIP)); ++i)
@@ -60,7 +68,7 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
         c = (((int)f) & 0x0FF);
         if (c != f)
         {
-            /* abort, bad input character */
+            /* abort, input list needs to be fixed before this is gonna wuk */
             pd_error (x, "slipdec: input %d out of range [0..255]", f);
             return;
         }
@@ -76,17 +84,77 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
             esced = 1;
             continue;
         }
-        if (0 != esced)
+        if (1 == esced)
         {
             if (SLIP_ESC_END == c) c = SLIP_END;
             else if (SLIP_ESC_ESC == c) c = SLIP_ESC;
+            else isSLIP = 0; /* not valid SLIP */
             esced = 0;
         }
         /* Add the character to the list */
         x->x_slip_buf[x->x_slip_length++].a_w.w_float = c;
     }
     if (0 != x->x_slip_length)
+    {
+        outlet_float(x->x_status_out, isSLIP);
         outlet_list(x->x_slipdec_out, &s_list, x->x_slip_length, x->x_slip_buf);
+    }
+}
+
+static void slipdec_float(t_slipdec *x, t_float f)
+{
+    /* SLIP decode a byte */
+    int         c;
+    /* for each byte in the packet, send the appropriate character sequence */
+    /* check each atom for byteness */
+    c = (((int)f) & 0x0FF);
+    if (c != f)
+    {
+        /* abort, input list needs to be fixed before this is gonna wuk */
+        pd_error (x, "slipdec: input %d out of range [0..255]", f);
+        x->x_slip_length = x->x_esced = x->x_packet_index = 0;
+        x->x_valid_SLIP = 1;
+        return;
+    }
+    if(SLIP_END == c)
+    {
+        if (x->x_verbose) post ("slipdec_float: SLIP_END packet index is %d", x->x_packet_index);
+        /* If it's the beginning of a packet, ignore it */
+        if (0 == x->x_packet_index) return;
+        /* send the packet */
+        else
+        {
+            if (x->x_verbose) post ("slipdec_float: end of packet");
+            outlet_float(x->x_status_out, x->x_valid_SLIP);
+            if (0 != x->x_slip_length)
+                outlet_list(x->x_slipdec_out, &s_list, x->x_slip_length, x->x_slip_buf);
+            x->x_slip_length = x->x_esced = x->x_packet_index = 0;
+            x->x_valid_SLIP = 1;
+            return;
+        }
+    }
+    if (SLIP_ESC == c)
+    {
+        if (x->x_verbose) post ("slipdec_float: SLIP_ESC %f = %d", f, c);
+        x->x_esced = 1;
+        return;
+    }
+    if (1 == x->x_esced)
+    {
+        if (SLIP_ESC_END == c) c = SLIP_END;
+        else if (SLIP_ESC_ESC == c) c = SLIP_ESC;
+        else x->x_valid_SLIP = 0; /* not valid SLIP */
+        if (x->x_verbose) post ("slipdec_float: ESCED %f = %d", f, c);
+        x->x_esced = 0;
+    }
+    /* Add the character to the list */
+    if (0 == x->x_packet_index++) x->x_slip_length = 0;
+    x->x_slip_buf[x->x_slip_length++].a_w.w_float = c;
+}
+
+static void slipdec_verbosity(t_slipdec *x, t_float f)
+{
+    x->x_verbose = (0 != f)?1:0;
 }
 
 static void slipdec_free(t_slipdec *x)
@@ -100,6 +168,8 @@ void slipdec_setup(void)
         (t_newmethod)slipdec_new, (t_method)slipdec_free,
         sizeof(t_slipdec), 0, A_GIMME, 0);
     class_addlist(slipdec_class, slipdec_list);
+    class_addfloat(slipdec_class, slipdec_float);
+    class_addmethod(slipdec_class, (t_method)slipdec_verbosity, gensym("verbosity"), A_FLOAT, 0);
     class_sethelpsymbol(slipdec_class, gensym("slipenc")); /* use slipenc-help.pd */
 }
 
