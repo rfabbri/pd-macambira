@@ -100,7 +100,7 @@ static void slipenc_list(t_slipenc *x, t_symbol *s, int ac, t_atom *av)
         if (c != f)
         {
             /* abort, bad input character */
-            pd_error (x, "slipenc: input %d out of range [0..255]", f);
+            pd_error (x, "slipenc: input %f out of range [0..255]", f);
             return;
         }
         if(SLIP_END == c)
