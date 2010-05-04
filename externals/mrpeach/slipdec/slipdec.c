@@ -96,6 +96,7 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
     }
     if (0 != x->x_slip_length)
     {
+        if(SLIP_END != c) isSLIP = 0;
         outlet_float(x->x_status_out, isSLIP);
         outlet_list(x->x_slipdec_out, &s_list, x->x_slip_length, x->x_slip_buf);
     }
