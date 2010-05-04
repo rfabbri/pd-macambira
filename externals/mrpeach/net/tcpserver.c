@@ -913,7 +913,8 @@ static void *tcpserver_new(t_floatarg fportno)
     int                 i;
     struct sockaddr_in  server;
     int                 sockfd, portno = fportno;
-    char                optval = 1;
+    int                 optVal = 1;
+    int                 optLen = sizeof(int);
 
     /* create a socket */
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -928,7 +929,12 @@ static void *tcpserver_new(t_floatarg fportno)
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
     /* enable reuse of local address */
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
+#ifdef _WIN32
+    if (setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, (char*)&optVal, optLen) == SOCKET_ERROR)
+#else
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (char*)&optVal, optLen) == -1)
+#endif
+//    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
         sys_sockerror("tcpserver: setsockopt SO_REUSEADDR");
 
     /* assign server port number */
