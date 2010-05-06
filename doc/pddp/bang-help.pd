@@ -107,16 +107,13 @@ see the effect.;
 24 by Dave Sabine as part of a project called pddp proposed by Krzysztof
 Czaja to build comprehensive documentation for Pd.;
 #N canvas 4 24 432 275 related_objects_from_other_libraries 0;
-#X obj 266 48 oneshot;
-#X obj 259 28 toddle;
-#X obj 18 48 render_trigger;
-#X obj 18 28 metroplus;
-#X obj 78 28 exciter;
-#X obj 127 28 bangfilter1+2;
-#X obj 211 28 counter;
-#X obj 108 48 countund;
-#X obj 163 48 kalashnikov;
-#X obj 236 48 init;
+#X obj 8 10 pddp/pddplink ../../extra/mjlib/metroplus-help.pd -text mjlib/metroplus;
+#X obj 8 30 pddp/pddplink ../../extra/unauthorized/exciter-help.pd -text unauthorized/exciter;
+#X obj 8 50 pddp/pddplink ../../extra/ggee/toddle-help.pd -text ggee/toddle;
+#X obj 8 70 pddp/pddplink ../../extra/iemlib/init-help.pd -text iemlib/init;
+#X obj 198 10 pddp/pddplink ../../extra/cyclone/counter-help.pd -text cyclone/counter;
+#X obj 198 30 pddp/pddplink ../../extra/markex/oneshot-help.pd -text markex/oneshot;
+#X obj 198 50 pddp/pddplink ../../extra/unauthorized/countund-help.pd -text unauthorized/countund;
 #X text 18 86 These objects are offered in Pd only if you have downloaded
 and properly installed the appropriate library. These objects may or
 may not exist in a single library.;
