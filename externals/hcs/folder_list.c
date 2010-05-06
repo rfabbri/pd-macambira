@@ -60,27 +60,35 @@ typedef struct _folder_list {
 
 static void normalize_path(t_folder_list* x, char *normalized, const char *original)
 {
+    char buf[FILENAME_MAX];
     t_symbol *cwd = canvas_getdir(x->x_canvas);
-    if(sys_isabsolutepath(original)) {
-        strncpy(normalized, original, FILENAME_MAX);
+#ifdef _WIN32
+    sys_unbashfilename(original, buf);
+#else
+    strncpy(buf, original, FILENAME_MAX);
+#endif
+    if(sys_isabsolutepath(buf)) {
+        strncpy(normalized, buf, FILENAME_MAX);
         return;
     }
     strncpy(normalized, cwd->s_name, FILENAME_MAX);
-    if(normalized[(strlen(normalized)-1)] != '/') 
+    if(normalized[(strlen(normalized)-1)] != '/') {
         strncat(normalized, "/", 1);
-    if(original[0] == '.') {
-        if(original[1] == '/') {
-            strncat(normalized, original + 2, 
+    }
+    if(buf[0] == '.') {
+        if(buf[1] == '/') {
+            strncat(normalized, buf + 2, 
                     FILENAME_MAX - strlen(normalized));
-        } else if(original[1] == '.' && original[2] == '/') {
-            strncat(normalized, original, 
+        } else if(buf[1] == '.' && buf[2] == '/') {
+            strncat(normalized, buf, 
                     FILENAME_MAX - strlen(normalized));
         }
-    } else if(original[0] != '/') {
-        strncat(normalized, original, 
+    } else if(buf[0] != '/') {
+        strncat(normalized, buf, 
                 FILENAME_MAX - strlen(normalized));
-    } else 
-        strncpy(normalized, original, FILENAME_MAX);
+    } else {
+        strncpy(normalized, buf, FILENAME_MAX);
+    }
 }
 
 static void folder_list_output(t_folder_list* x)
@@ -95,16 +103,14 @@ static void folder_list_output(t_folder_list* x)
 	DWORD errorNumber;
 	LPVOID lpErrorMessage;
 	char fullPathNameBuffer[FILENAME_MAX] = "";
-	char unbashBuffer[FILENAME_MAX] = "";
 	char outputBuffer[FILENAME_MAX] = "";
 	char *pathBuffer;
 
 // arg, looks perfect, but only in Windows Vista
 //	GetFinalPathNameByHandle(hFind,fullPathNameBuffer,FILENAME_MAX,FILE_NAME_NORMALIZED);
     GetFullPathName(normalized_path, FILENAME_MAX, fullPathNameBuffer, NULL);
-	sys_unbashfilename(fullPathNameBuffer,unbashBuffer);
 	
-	hFind = FindFirstFile(x->x_pattern->s_name, &findData);
+	hFind = FindFirstFile(fullPathNameBuffer, &findData);
 	if (hFind == INVALID_HANDLE_VALUE) 
 	{
 	   errorNumber = GetLastError();
