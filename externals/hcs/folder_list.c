@@ -103,12 +103,14 @@ static void folder_list_output(t_folder_list* x)
 	DWORD errorNumber;
 	LPVOID lpErrorMessage;
 	char fullPathNameBuffer[FILENAME_MAX] = "";
+	char unbashBuffer[FILENAME_MAX] = "";
 	char outputBuffer[FILENAME_MAX] = "";
 	char *pathBuffer;
 
 // arg, looks perfect, but only in Windows Vista
 //	GetFinalPathNameByHandle(hFind,fullPathNameBuffer,FILENAME_MAX,FILE_NAME_NORMALIZED);
     GetFullPathName(normalized_path, FILENAME_MAX, fullPathNameBuffer, NULL);
+    sys_unbashfilename(fullPathNameBuffer,unbashBuffer);
 	
 	hFind = FindFirstFile(fullPathNameBuffer, &findData);
 	if (hFind == INVALID_HANDLE_VALUE) 
