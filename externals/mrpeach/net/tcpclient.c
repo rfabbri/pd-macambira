@@ -162,7 +162,7 @@ static void *tcpclient_child_connect(void *w)
 
     if (x->x_fd >= 0)
     {
-        error("%s_connect: already connected", objName);
+        error("%s_child_connect: already connected", objName);
         return (x);
     }
 
@@ -210,11 +210,16 @@ static void *tcpclient_child_connect(void *w)
 
 static void tcpclient_connect(t_tcpclient *x, t_symbol *hostname, t_floatarg fportno)
 {
+    /* if we are not already connected, as Ivica Ico Bukvic 5/5/10 <ico@bukvic.net> noted */
+    if (0 != x->x_connectstate)
+    {
+        error("%s_connect: already connected to %s:%d on socket %d", objName, x->x_hostname, x->x_port, x->x_fd);
+        return;
+    }
     /* we get hostname and port and pass them on
        to the child thread that establishes the connection */
     x->x_hostname = hostname->s_name;
     x->x_port = fportno;
-    x->x_connectstate = 0;
     /* start child thread */
     if(pthread_create(&x->x_threadid, &x->x_threadattr, tcpclient_child_connect, x) < 0)
         post("%s: could not create new thread", objName);
@@ -545,6 +550,7 @@ static void *tcpclient_new(t_floatarg udpflag)
     }
     x->x_addr = 0L;
     x->x_blocked = 1;
+    x->x_connectstate = 0;
     /* prepare child threads */
     if(pthread_attr_init(&x->x_threadattr) < 0)
         post("%s: warning: could not prepare child thread", objName);
@@ -555,7 +561,7 @@ static void *tcpclient_new(t_floatarg udpflag)
     if(pthread_attr_setdetachstate(&x->x_sendthreadattr, PTHREAD_CREATE_DETACHED) < 0)
         post("%s: warning: could not prepare child thread", objName);
     clock_delay(x->x_poll, 0);	/* start polling the input */
-    post("tcpclient 2010 Martin Peach-style");
+    post("tcpclient 20100505 Martin Peach-style");
     return (x);
 }
 
