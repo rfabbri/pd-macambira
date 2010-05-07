@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "m_pd.h"
-#include "m_imp.h"  /* FIXME need access to c_externdir... */
 #include "g_canvas.h"
 
 /* this isn't in any header, but its declared in s_path.c */
@@ -19,21 +18,15 @@ typedef struct _helplink
 {
     t_object   x_ob;
     t_glist   *x_glist;
-    int        x_isboxed;
     int        x_isgopvisible;
     char      *x_vistext;
     int        x_vissize;
     int        x_vislength;
     int        x_rtextactive;
     t_symbol  *x_ulink;
-    t_atom     x_openargs[2];
-    int        x_linktype;
-    int        x_ishit;
 } t_helplink;
 
 static t_class *helplink_class;
-
-/* Code that might be merged back to g_text.c starts here: */
 
 static void helplink_getrect(t_gobj *z, t_glist *glist,
 			     int *xp1, int *yp1, int *xp2, int *yp2)
@@ -140,35 +133,10 @@ static t_widgetbehavior helplink_widgetbehavior =
     helplink_wbclick,
 };
 
-/* Code that might be merged back to g_text.c ends here. */
-
-/* FIXME need access to glob_pdobject... */
-static t_pd *helplink_pdtarget(t_helplink *x)
-{
-    t_pd *pdtarget = gensym("pd")->s_thing;
-    if (pdtarget && !strcmp(class_getname(*pdtarget), "pd"))
-	return (pdtarget);
-    else
-	return ((t_pd *)x);  /* internal error */
-}
-
-static void helplink_anything(t_helplink *x, t_symbol *s, int ac, t_atom *av)
-{
-    if (x->x_ishit)
-    {
-	startpost("helplink: internal error (%s", (s ? s->s_name : ""));
-	postatom(ac, av);
-	post(")");
-    }
-}
-
 static void helplink_click(t_helplink *x, t_floatarg xpos, t_floatarg ypos,
 			   t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
 {
-    x->x_ishit = 1;
-//    open_via_helppath("intro.pd", canvas_getdir((t_canvas *)x)->s_name);
-    open_via_helppath(x->x_ulink->s_name, "");
-    x->x_ishit = 0;
+    open_via_helppath(x->x_ulink->s_name, canvas_getdir(x->x_glist)->s_name);
 }
 
 static int helplink_wbclick(t_gobj *z, t_glist *glist, int xpix, int ypix,
@@ -185,86 +153,26 @@ static int helplink_wbclick(t_gobj *z, t_glist *glist, int xpix, int ypix,
     else return (0);
 }
 
-static int helplink_dooptext(char *dst, int maxsize, int ac, t_atom *av)
-{
-    int i, sz, sep, len;
-    char buf[32], *src;
-    for (i = 0, sz = 0, sep = 0; i < ac; i++, av++)
-    {
-	if (sep)
-	{
-	    sz++;
-	    if (sz >= maxsize)
-		break;
-	    else if (dst)
-	    {
-		*dst++ = ' ';
-		*dst = 0;
-	    }
-	}
-	else sep = 1;
-	if (av->a_type == A_SYMBOL)
-	    src = av->a_w.w_symbol->s_name;
-	else if (av->a_type == A_FLOAT)
-	{
-	    src = buf;
-	    sprintf(src, "%g", av->a_w.w_float);
-	}
-	else
-	{
-	    sep = 0;
-	    continue;
-	}
-	len = strlen(src);
-	sz += len;
-	if (sz >= maxsize)
-	    break;
-	else if (dst)
-	{
-	    strcpy(dst, src);
-	    dst += len;
-	}
-    }
-    return (sz);
-}
-
-static char *helplink_optext(int *sizep, int ac, t_atom *av)
-{
-    char *result;
-    int sz = helplink_dooptext(0, MAXPDSTRING, ac, av);
-    *sizep = sz + (sz >= MAXPDSTRING ? 4 : 1);
-    result = getbytes(*sizep);
-    helplink_dooptext(result, sz + 1, ac, av);
-    if (sz >= MAXPDSTRING)
-    {
-	sz = strlen(result);
-	strcpy(result + sz, "...");
-    }
-    return (result);
-}
-
 static void helplink_free(t_helplink *x)
 {
     if (x->x_vistext)
-	freebytes(x->x_vistext, x->x_vissize);
+        freebytes(x->x_vistext, x->x_vissize);
 }
 
 static void *helplink_new(t_symbol *s)
 {
     t_helplink *x = (t_helplink *) pd_new(helplink_class);
 
-    int skip;
     x->x_isgopvisible = 0;
     x->x_vistext = 0;
     x->x_vissize = 0;
     x->x_vislength = (x->x_vistext ? strlen(x->x_vistext) : 0);
     x->x_rtextactive = 0;
     x->x_glist = canvas_getcurrent();
-    x->x_ulink = s;
-    if (! x->x_ulink)
-        x->x_ulink = gensym("helplink");
-    SETSYMBOL(&x->x_openargs[0], x->x_ulink);
-    x->x_ishit = 0;
+    if (s == &s_)
+        x->x_ulink = gensym("helplink"); /* default to helplink help patch */
+    else
+        x->x_ulink = s;
 	/* do we need to set ((t_text *)x)->te_type = T_TEXT; ? */
 	if (!x->x_vistext)
 	{
@@ -284,7 +192,6 @@ void helplink_setup(void)
 			       sizeof(t_helplink),
 			       CLASS_NOINLET | CLASS_PATCHABLE,
 			       A_DEFSYMBOL, 0);
-    class_addanything(helplink_class, helplink_anything);
-    class_setwidget(helplink_class, &helplink_widgetbehavior);
 
+    class_setwidget(helplink_class, &helplink_widgetbehavior);
 }
