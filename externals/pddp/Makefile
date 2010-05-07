@@ -5,7 +5,7 @@ LIBRARY_NAME = pddp
 
 # add your .c source files to the SOURCES variable, help files will be
 # included automatically
-SOURCES = pddplink.c
+SOURCES = pddplink.c helplink.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.

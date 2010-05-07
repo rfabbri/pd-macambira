@@ -1,0 +1,14 @@
+#N canvas 314 87 424 397 12;
+#X text 20 10 first entry;
+#X text 50 50 three ways of linking to a;
+#X text 50 170 three ways of linking to a;
+#X obj 50 195 helplink http://puredata.info;
+#X obj 50 230 helplink http://puredata.info -box;
+#X text 50 290 three ways of linking to;
+#X obj 260 290 helplink dsp-help.pd -text another local patch;
+#X obj 50 315 helplink dsp-help.pd;
+#X obj 50 350 helplink dsp-help.pd -box;
+#X obj 270 170 helplink http://puredata.info -text remote URL;
+#X obj 270 50 helplink README.txt -text local file;
+#X obj 50 75 helplink README.txt;
+#X obj 50 110 helplink README.txt -box;
