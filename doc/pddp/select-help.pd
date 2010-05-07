@@ -153,7 +153,7 @@ environments.;
 #X connect 29 0 16 0;
 #X restore 24 632 pd more;
 #N canvas 0 22 456 306 related_objects_from_other_libraries 0;
-#X obj 28 15 multiselect;
+#X obj 28 15 pddplink ../../extra/markex/multiselect-help.pd -text markex/multiselect;
 #X text 19 53 These objects are offered in Pd only if you have downloaded
 and properly installed the appropriate library. These objects may or
 may not exist in a single library.;
