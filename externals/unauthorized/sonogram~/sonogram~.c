@@ -172,35 +172,35 @@ typedef struct _sonogram
 static char* sonogram_get_fill_color( t_float fspectrum )
 {
       if ( fspectrum < 0.01 ) {
-          return "#EEEEEE";
+          return "#EEEEEE ";
       } else if ( fspectrum < 0.1 ) {
-          return "#DDDDDD";
+          return "#DDDDDD ";
       } else if ( fspectrum < 0.5 ) {
-          return "#CCCCCC";
+          return "#CCCCCC ";
       } else if ( fspectrum < 1 ) {
-          return "#BBBBBB";
+          return "#BBBBBB ";
       } else if ( fspectrum < 2 ) {
-          return "#AAAAAA";
+          return "#AAAAAA ";
       } else if ( fspectrum < 5 ) {
-          return "#999999";
+          return "#999999 ";
       } else if ( fspectrum < 10 ) {
-          return "#888888";
+          return "#888888 ";
       } else if ( fspectrum < 20 ) {
-          return "#777777";
+          return "#777777 ";
       } else if ( fspectrum < 30 ) {
-          return "#666666";
+          return "#666666 ";
       } else if ( fspectrum < 40 ) {
-          return "#555555";
+          return "#555555 ";
       } else if ( fspectrum < 50 ) {
-          return "#444444";
+          return "#444444 ";
       } else if ( fspectrum < 60 ) {
-          return "#333333";
+          return "#333333 ";
       } else if ( fspectrum < 80 ) {
-          return "#222222";
+          return "#222222 ";
       } else if ( fspectrum < 100 ) {
-          return "#111111";
+          return "#111111 ";
       } else {
-          return "#000000";
+          return "#000000 ";
       }
 }
 
@@ -209,47 +209,47 @@ static char* phasogram_get_fill_color( t_int phase )
    if ( phase < 0 )
    {
       if ( phase > -10 ) {
-          return "#111111";
+          return "#111111 ";
       } else if ( phase > -20 ) {
-          return "#222222";
+          return "#222222 ";
       } else if ( phase > -30 ) {
-          return "#333333";
+          return "#333333 ";
       } else if ( phase > -40 ) {
-          return "#444444";
+          return "#444444 ";
       } else if ( phase > -50 ) {
-          return "#555555";
+          return "#555555 ";
       } else if ( phase > -60 ) {
-          return "#666666";
+          return "#666666 ";
       } else if ( phase > -70 ) {
-          return "#777777";
+          return "#777777 ";
       } else if ( phase > -80 ) {
-          return "#888888";
+          return "#888888 ";
       } else {
-          return "#999999";
+          return "#999999 ";
       }
    }
    else
    {
       if ( phase == 0 ) {
-          return "#FFFFFF";
+          return "#FFFFFF ";
       } else if ( phase < 10 ) {
-          return "#111111";
+          return "#111111 ";
       } else if ( phase < 20 ) {
-          return "#222222";
+          return "#222222 ";
       } else if ( phase < 30 ) {
-          return "#333333";
+          return "#333333 ";
       } else if ( phase < 40 ) {
-          return "#444444";
+          return "#444444 ";
       } else if ( phase < 50 ) {
-          return "#555555";
+          return "#555555 ";
       } else if ( phase < 60 ) {
-          return "#666666";
+          return "#666666 ";
       } else if ( phase < 70 ) {
-          return "#777777";
+          return "#777777 ";
       } else if ( phase < 80 ) {
-          return "#888888";
+          return "#888888 ";
       } else {
-          return "#999999";
+          return "#999999 ";
       }
    }
    // normally never reached
@@ -273,11 +273,11 @@ static void sonogram_update_point(t_sonogram *x, t_glist *glist, t_int sample, t
       {
          x->x_empty = 0;
       }
-      strcpy( newColor, sonogram_get_fill_color( fspectrum ) );
+      strncpy( newColor, sonogram_get_fill_color( fspectrum ), 8 );
 
       for ( i=0; i<x->x_zoom; i++ )
       {
-          sprintf( x->x_gifdata, "%s", strcat( newColor, " ") );
+          sprintf( x->x_gifdata, "%s", newColor );
       }
       for ( i=0; i<x->x_zoom; i++ )
       {
@@ -287,11 +287,11 @@ static void sonogram_update_point(t_sonogram *x, t_glist *glist, t_int sample, t
 
       if ( x->x_phaso )
       {
-           strcpy( newColor, phasogram_get_fill_color( phase ) );
+           strncpy( newColor, phasogram_get_fill_color( phase ), 8 );
            strcpy( x->x_gifdata, "" );
            for ( i=0; i<x->x_zoom; i++ )
            {
-                sprintf( x->x_gifdata, "%s", strcat( newColor, " ") );
+                sprintf( x->x_gifdata, "%s", newColor );
            }
            for ( i=0; i<x->x_zoom; i++ )
            {
@@ -316,10 +316,10 @@ static void sonogram_update_block(t_sonogram *x, t_glist *glist, t_int bnumber)
       fspectrum = 
          sqrt( pow( *(x->x_rdata+bnumber*x->x_blocksize+fi), 2) +
                 pow( *(x->x_idata+bnumber*x->x_blocksize+fi), 2) );
-      strcpy( color, sonogram_get_fill_color( fspectrum ) );
+      strncpy( color, sonogram_get_fill_color( fspectrum ), 8 );
       for ( i=0; i<x->x_zoom; i++ )
       {
-           strncpy( x->x_gifdata+((x->x_blocksize/2-fi-1)*x->x_zoom+i)*8, strcat( color, " "), 8 );
+           strncpy( x->x_gifdata+((x->x_blocksize/2-fi-1)*x->x_zoom+i)*8, color, 8 );
       }
     }
     for ( i=0; i<x->x_zoom; i++ )
@@ -336,10 +336,10 @@ static void sonogram_update_block(t_sonogram *x, t_glist *glist, t_int bnumber)
       {
         phase = (int) ( atan2( *(x->x_idata+bnumber*x->x_blocksize+fi), 
                       *(x->x_rdata+bnumber*x->x_blocksize+fi) )*180/M_PI );
-        strcpy( color, phasogram_get_fill_color( phase ) );
+        strncpy( color, phasogram_get_fill_color( phase ), 8 );
         for ( i=0; i<x->x_zoom; i++ )
         {
-           strncpy( x->x_gifdata+((x->x_blocksize/2-fi-1)*x->x_zoom+i)*8, strcat( color, " "), 8 );
+           strncpy( x->x_gifdata+((x->x_blocksize/2-fi-1)*x->x_zoom+i)*8, color, 8 );
         }
       }
       for ( i=0; i<x->x_zoom; i++ )
@@ -365,7 +365,7 @@ static void sonogram_erase_block(t_sonogram *x, t_glist *glist, t_int bnumber )
 
            for ( i=0; i<x->x_zoom; i++ )
            {
-                strcpy( x->x_gifdata+i*sizeof("#FFFFFF "), "#FFFFFF " );
+                strncpy( x->x_gifdata+i*sizeof("#FFFFFF "), "#FFFFFF ", 8 );
            }
            SYS_VGUI5("SONIMAGE%x put {%s} -to %d %d\n", x, x->x_gifdata, 
                                bnumber*x->x_zoom, (x->x_blocksize/2-fi)*x->x_zoom );
