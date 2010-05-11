@@ -500,8 +500,8 @@ static void wiimote_cwiid_message(t_wiimote *x, union cwiid_mesg*mesg) {
       case CWIID_EXT_NONE:
          verbose(1, "No extension attached");
          break;
+#ifdef CWIID_RPT_NUNCHUK
       case CWIID_EXT_NUNCHUK:
-#ifdef CWIID_RPT_NUNCHCUK
          post("Nunchuk extension attached");
          if(cwiid_get_acc_cal(x->wiimote, CWIID_EXT_NUNCHUK, &x->nc_acc_cal)) {
             post("Unable to retrieve nunchuk calibration");
