@@ -1,4 +1,4 @@
-#N canvas 120 25 756 631 10;
+#N canvas 1074 57 756 631 10;
 #X obj 221 187 key;
 #X msg 126 222 clear;
 #X obj 221 213 sel 65;
@@ -11,8 +11,6 @@
 #X obj 265 417 r \$0pmenu;
 #X obj 332 422 bng 15 250 50 0 \$0pmenu empty empty 17 7 0 10 -262144
 -1 -1;
-#X text 353 420 <- you can pop the menu from any gui by sending a bang
-to \$0pemenu;
 #X msg 291 320 -1;
 #X msg 224 287 colors green purple grey;
 #X obj 45 459 tof/pmenu 1 1 black white red;
@@ -26,10 +24,8 @@ colors (#ffffff);
 pops. On (1) by default.;
 #X text 296 476 1: display the indicator (the little bullet next to
 item that was last selected). On (1) by default.;
-#X obj 38 18 cnv 15 400 30 empty empty empty 20 12 0 14 -261234 -66577
+#X obj 37 18 cnv 15 400 30 empty empty empty 20 12 0 14 -261234 -66577
 0;
-#X text 40 31 tags: ui;
-#X text 38 18 description: pops a menu;
 #X obj 300 458 cnv 15 400 15 empty empty empty 20 12 0 14 -257985 -66577
 0;
 #X text 303 456 Creation arguments:;
@@ -48,19 +44,23 @@ this case.;
 #X text 346 370 Select an item by name and output it;
 #X text 320 349 Select an item by name without outputing it;
 #X text 85 501 Output: index name;
+#X text 354 420 <- you can pop the menu from any gui by sending a bang
+to \$0pmenu (because a receive is associated to it);
+#X text 38 18 Description: pops a menu;
+#X text 40 31 Tags: ui;
 #X connect 0 0 2 0;
-#X connect 1 0 14 0;
-#X connect 2 0 14 0;
-#X connect 4 0 14 0;
-#X connect 6 0 14 0;
-#X connect 7 0 14 0;
-#X connect 9 0 14 0;
-#X connect 12 0 14 0;
-#X connect 13 0 14 0;
-#X connect 14 0 5 0;
-#X connect 27 0 14 0;
-#X connect 28 0 27 0;
-#X connect 29 0 28 0;
-#X connect 31 0 14 0;
-#X connect 35 0 14 0;
-#X connect 36 0 14 0;
+#X connect 1 0 13 0;
+#X connect 2 0 13 0;
+#X connect 4 0 13 0;
+#X connect 6 0 13 0;
+#X connect 7 0 13 0;
+#X connect 9 0 13 0;
+#X connect 11 0 13 0;
+#X connect 12 0 13 0;
+#X connect 13 0 5 0;
+#X connect 24 0 13 0;
+#X connect 25 0 24 0;
+#X connect 26 0 25 0;
+#X connect 28 0 13 0;
+#X connect 32 0 13 0;
+#X connect 33 0 13 0;

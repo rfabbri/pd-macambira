@@ -1785,6 +1785,8 @@ tof_install: tof
 	install -p $(TOF_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(TOF_NAME)
 	install -p $(externals_src)/tof/help/*.pd \
 		$(DESTDIR)$(objectsdir)/$(TOF_NAME)
+	install -p $(externals_src)/tof/help/*.gif \
+		$(DESTDIR)$(objectsdir)/$(TOF_NAME)
 	install -p $(externals_src)/tof/abs/*.pd \
 		$(DESTDIR)$(objectsdir)/$(TOF_NAME)
 

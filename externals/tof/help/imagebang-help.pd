@@ -1,0 +1,48 @@
+#N canvas 285 54 658 621 10;
+#X obj 45 338 print;
+#X obj 45 152 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X text 27 49 [imagebang] only works with gifs;
+#X text 314 97 Arguments:;
+#X text 253 277 <- This [imagebang] was created with the following:
+;
+#X obj 286 341 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 285 362 s \$0pandar;
+#X obj 365 333 r \$0pandas;
+#X obj 366 361 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 42 411 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 42 502 print;
+#X obj 192 416 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 192 389 r \$0homes;
+#X obj 122 394 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 123 416 s \$0homer;
+#X text 112 458 <- This [imagebang] was created with the following:
+;
+#X text 258 299 [tof/imagebang panda.gif pandb.gif \$0pandas \$0pandar]
+;
+#X text 118 480 [tof/imagebang homea.gif homeb.gif \$0homes \$0homer]
+;
+#X text 28 69 based on [image] by ggee and moonlib;
+#X obj 45 177 tof/imagebang panda.gif pandb.gif \$0pandas \$0pandar
+;
+#X obj 42 436 tof/imagebang homea.gif homeb.gif \$0homes \$0homer;
+#X text 26 3 Description: a bang with an image;
+#X text 27 17 Tags: ui;
+#X text 351 116 1) image for the normal state (required);
+#X text 350 133 2) image for the clicked state (required);
+#X text 350 149 3) send name (optionnal);
+#X text 351 165 4) receive name (optionnal);
+#X text 27 31 Contact: mrtoftrash@gmail.com;
+#X connect 1 0 19 0;
+#X connect 5 0 6 0;
+#X connect 7 0 8 0;
+#X connect 9 0 20 0;
+#X connect 12 0 11 0;
+#X connect 13 0 14 0;
+#X connect 19 0 0 0;
+#X connect 20 0 10 0;
