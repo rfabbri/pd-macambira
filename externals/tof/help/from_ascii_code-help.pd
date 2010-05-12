@@ -1,0 +1,29 @@
+#N canvas 1080 84 708 396 10;
+#X obj 94 332 print;
+#X msg 133 156 43;
+#X obj 71 69 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X msg 108 116 32;
+#X obj 94 285 tof/from_ascii_code 13;
+#X msg 99 94 54;
+#X msg 155 197 13;
+#X text 64 29 Tags: conversion text symbols;
+#X text 64 13 Description: Convert ASCII codes into PD messages;
+#X text 134 95 Floats and lists: enter ASCII codes;
+#X text 93 68 Bang: output data;
+#X text 248 285 Optionnal argument: output data once that ASCII code
+is received;
+#X msg 121 137 65;
+#X text 185 192 Because of [form_ascii_code]'s creation argument \,
+the number 13 acts like a bang;
+#X msg 161 229 49 50 51 32 52 53 13;
+#X msg 143 176 49 50 51 32 52 53;
+#X connect 1 0 4 0;
+#X connect 2 0 4 0;
+#X connect 3 0 4 0;
+#X connect 4 0 0 0;
+#X connect 5 0 4 0;
+#X connect 6 0 4 0;
+#X connect 12 0 4 0;
+#X connect 14 0 4 0;
+#X connect 15 0 4 0;

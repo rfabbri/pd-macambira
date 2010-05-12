@@ -34,3 +34,4 @@ LINUXINCLUDE =  -I$(PDPATH)/src
 	strip --strip-unneeded $*.pd_linux
 	rm $*.o
 	mv $*.pd_linux ~/pd-externals/tof
+	cp $*-help.pd ~/pd-externals/tof

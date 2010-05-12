@@ -1,0 +1,14 @@
+#N canvas 1427 407 571 202 10;
+#X msg 49 60 test;
+#X msg 182 61 1234;
+#X obj 49 112 tof/to_ascii_code 13;
+#X msg 92 60 list abcdef;
+#X obj 49 153 print codes;
+#X text 54 19 Tags: conversion text symbols;
+#X text 55 3 Description: Convert PD messages into ASCII codes;
+#X text 188 111 Optionnal argument: append ASCII code (in this case
+13 \, a carriage return);
+#X connect 0 0 2 0;
+#X connect 1 0 2 0;
+#X connect 2 0 4 0;
+#X connect 3 0 2 0;
