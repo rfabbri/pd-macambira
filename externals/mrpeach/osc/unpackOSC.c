@@ -177,6 +177,11 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
         post("unpackOSC: packet size (%d) not a multiple of 4 bytes: dropping packet", argc);
         return;
     }
+    if(argc > MAX_MESG)
+    {
+        post("unpackOSC: packet size (%d) greater than max (%d). Change MAX_MESG and recompile if you want more.", argc, MAX_MESG);
+        return;
+    }
     /* copy the list to a byte buffer, checking for bytes only */
     for (i = 0; i < argc; ++i)
     {
@@ -208,7 +213,7 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
     if ((argc >= 8) && (strncmp(buf, "#bundle", 8) == 0))
     { /* This is a bundle message. */
 #ifdef DEBUG
-        post("unpackOSC: bundle msg: bundles not yet supported\n");
+        post("unpackOSC: bundle msg:\n");
 #endif
 
         if (argc < 16)
