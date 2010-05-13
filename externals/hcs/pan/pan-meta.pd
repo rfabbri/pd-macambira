@@ -4,6 +4,6 @@
 #X text 10 30 NAME pan;
 #X text 10 50 AUTHOR Hans-Christoph Steiner <hans@at.or.at>;
 #X text 10 70 DESCRIPTION A library of panning algoritms;
-#X text 10 90 LICENSE GNU GPL;
-#X text 10 110 VERSION ;
+#X text 10 90 LICENSE GNU GPL v2+;
+#X text 10 110 VERSION 0.1;
 #X restore 10 10 pd META;

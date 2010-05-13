@@ -1,11 +1,10 @@
-# To use this Makefile for your project, first put the name of your library in
-# LIBRARY_NAME variable. The folder for your project should have the same name
-# as your library.
+## Pd library template version 1.0
+# For instructions on how to use this template, see:
+#  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = pan
-LIBRARY_VERSION = 0.1
 
-# Next, add your .c source files to the SOURCES variable.  The help files will
-# be included automatically
+# add your .c source files to the SOURCES variable, help files will be
+# included automatically
 SOURCES = 
 
 # For objects that only build on certain platforms, add those to the SOURCES
@@ -21,10 +20,19 @@ SOURCES_windows =
 # be included automatically
 PDOBJECTS = equal_power_pan~.pd gogins_pan~.pd gpan~.pd linear_pan~.pd pan_core~.pd square_root_pan~.pd
 
+
+# example patches and related files, in the 'examples' subfolder
+EXAMPLES = 
+
+# manuals and related files, in the 'manual' subfolder
+MANUAL = 
+
 # if you want to include any other files in the source and binary tarballs,
-# list them here.  This can be anything from header files, READMEs, example
-# patches, documentation, etc.
-EXTRA_DIST = TODO
+# list them here.  This can be anything from header files, example patches,
+# documentation, etc.  README.txt and LICENSE.txt are required and therefore
+# automatically included
+EXTRA_DIST = 
+
 
 
 #------------------------------------------------------------------------------#
@@ -32,6 +40,9 @@ EXTRA_DIST = TODO
 # you shouldn't need to edit anything below here, if we did it right :)
 #
 #------------------------------------------------------------------------------#
+
+# get library version from meta file
+LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
 # where Pd lives
 PD_PATH = ../../pd
@@ -56,7 +67,7 @@ UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
   CPU := $(shell uname -p)
   ifeq ($(CPU),arm) # iPhone/iPod Touch
-    SOURCES += $(SOURCES_macosx)
+    SOURCES += $(SOURCES_iphoneos)
     EXTENSION = pd_darwin
     OS = iphoneos
     IPHONE_BASE=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin
@@ -78,7 +89,13 @@ ifeq ($(UNAME),Darwin)
     EXTENSION = pd_darwin
     OS = macosx
     OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
-    FAT_FLAGS = -arch i386 -arch ppc -mmacosx-version-min=10.4
+# build universal 32-bit on 10.4 and 32/64 on newer
+    ifeq ($(shell uname -r | sed 's|\([0-9][0-9]*\)\.[0-9][0-9]*\.[0-9][0-9]*|\1|'), 8)
+      FAT_FLAGS = -arch ppc -arch i386 -mmacosx-version-min=10.4
+    else
+      FAT_FLAGS = -arch ppc -arch i386 -arch x86_64 -mmacosx-version-min=10.4
+      SOURCES += $(SOURCES_iphoneos)
+    endif
     CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include \
       -I/Applications/Pd-extended.app/Contents/Resources/include
     LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
@@ -88,6 +105,8 @@ ifeq ($(UNAME),Darwin)
     STRIP = strip -x
     DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
     DISTBINDIR=$(DISTDIR)-$(OS)
+# install into ~/Library/Pd on Mac OS X since /usr/local isn't used much
+    pkglibdir=$(HOME)/Library/Pd
   endif
 endif
 ifeq ($(UNAME),Linux)
@@ -119,8 +138,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   EXTENSION = dll
   OS = windows
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -march=i686 -mtune=pentium4
-  WINDOWS_HACKS = -D'O_NONBLOCK=1'
-  CFLAGS += -mms-bitfields $(WINDOWS_HACKS)
+  CFLAGS += -mms-bitfields
   LDFLAGS += -s -shared -Wl,--enable-auto-import
   LIBS += -L$(PD_PATH)/src -L$(PD_PATH)/bin -L$(PD_PATH)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
   STRIP = strip --strip-unneeded -R .note -R .comment
@@ -131,7 +149,7 @@ endif
 CFLAGS += $(OPT_CFLAGS)
 
 
-.PHONY = install libdir_install single_install install-doc install-exec install-examples clean dist etags
+.PHONY = install libdir_install single_install install-doc install-exec install-examples install-manual clean dist etags
 
 all: $(SOURCES:.c=.$(EXTENSION))
 
@@ -152,7 +170,7 @@ install: libdir_install
 
 # The meta and help files are explicitly installed to make sure they are
 # actually there.  Those files are not optional, then need to be there.
-libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples
+libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install-manual
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd \
 		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
@@ -177,18 +195,28 @@ install-doc:
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-# this is the only bit not really handled well...
-#	$(INSTALL_FILE) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/
+	$(INSTALL_FILE) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
+	$(INSTALL_FILE) LICENSE.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
 
 install-examples:
-	test ! -d examples || (\
+	test -z "$(strip $(EXAMPLES))" || \
 		$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples && \
-		$(INSTALL_FILE) examples/*.* $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples)
+		for file in $(EXAMPLES); do \
+			$(INSTALL_FILE) examples/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples; \
+		done
+
+install-manual:
+	test -z "$(strip $(MANUAL))" || \
+		$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/manual && \
+		for file in $(MANUAL); do \
+			$(INSTALL_FILE) manual/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/manual; \
+		done
 
 
 clean:
 	-rm -f -- $(SOURCES:.c=.o)
 	-rm -f -- $(SOURCES:.c=.$(EXTENSION))
+	-rm -f -- $(LIBRARY_NAME).o
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
 
 distclean: clean
@@ -214,6 +242,8 @@ $(DISTDIR):
 
 dist: $(DISTDIR)
 	$(INSTALL_FILE) Makefile  $(DISTDIR)
+	$(INSTALL_FILE) README.txt $(DISTDIR)
+	$(INSTALL_FILE) LICENSE.txt $(DISTDIR)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
@@ -225,18 +255,30 @@ dist: $(DISTDIR)
 		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) $(DISTDIR)
 	test -z "$(strip $(EXTRA_DIST))" || \
 		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTDIR)
+	test -z "$(strip $(EXAMPLES))" || \
+		$(INSTALL_DIR) $(DISTDIR)/examples && \
+		for file in $(EXAMPLES); do \
+			$(INSTALL_FILE) examples/$$file $(DISTDIR)/examples; \
+		done
+	test -z "$(strip $(MANUAL))" || \
+		$(INSTALL_DIR) $(DISTDIR)/manual && \
+		for file in $(MANUAL); do \
+			$(INSTALL_FILE) manual/$$file $(DISTDIR)/manual; \
+		done
 	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
 
 
 etags:
 	etags *.h $(SOURCES) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
-showpaths:
+showsetup:
 	@echo "PD_PATH: $(PD_PATH)"
 	@echo "objectsdir: $(objectsdir)"
 	@echo "LIBRARY_NAME: $(LIBRARY_NAME)"
+	@echo "LIBRARY_VERSION: $(LIBRARY_VERSION)"
 	@echo "SOURCES: $(SOURCES)"
+	@echo "PDOBJECTS: $(PDOBJECTS)"
 	@echo "ALLSOURCES: $(ALLSOURCES)"
 	@echo "UNAME: $(UNAME)"
 	@echo "CPU: $(CPU)"
-
+	@echo "pkglibdir: $(pkglibdir)"

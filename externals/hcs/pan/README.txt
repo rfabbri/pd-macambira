@@ -1,7 +1,10 @@
 
-- check F.Moore's Elements of Computer Music for panning algorithms
+A library of stereo panning algorithms from various sources.
 
-- write pan_gogins~.c in Pd
+TODO
+====
+
+- check F.Moore's Elements of Computer Music for panning algorithms
 
 - write all_about_panning, including graphs and discussion from 
   http://www.csounds.com/ezine/autumn1999/beginners/
