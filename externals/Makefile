@@ -297,35 +297,14 @@ apple_clean:
 
 #------------------------------------------------------------------------------#
 # BASSEMU
-BASSEMU_NAME=bassemu
-BASSEMU_OBJECTS := $(wildcard $(externals_src)/bassemu/*.c)
-bassemu: $(BASSEMU_OBJECTS:.c=.$(EXTENSION))
+bassemu:
+	make -C $(externals_src)/bassemu~
 
-bassemu_install: bassemu
-	install -d $(DESTDIR)$(objectsdir)/$(BASSEMU_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(BASSEMU_NAME) \
-		--author "" \
-		--description "a synthesizer" \
-		--license "" \
-		--version ""
-	install -p $(BASSEMU_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(BASSEMU_NAME)
-	install -p $(externals_src)/bassemu/*.pd \
-		$(DESTDIR)$(objectsdir)/$(BASSEMU_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(BASSEMU_NAME)
-#	install -p $(externals_src)/bassemu/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(BASSEMU_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/bassemu/README \
-		$(DESTDIR)$(readmesdir)/$(BASSEMU_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(BASSEMU_NAME)
-#	install -p $(externals_src)/bassemu/examples/*.pd \
-		$(DESTDIR)$(examplesdir)/$(BASSEMU_NAME)
+bassemu_install:
+	make -C $(externals_src)/bassemu~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 bassemu_clean:
-	-rm -f -- $(BASSEMU_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(BASSEMU_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/bassemu/*.bak
-	-rm -f -- $(externals_src)/bassemu/*.*~
+	make -C $(externals_src)/bassemu~ clean
 
 
 

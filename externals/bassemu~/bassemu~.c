@@ -1,5 +1,5 @@
 /* (c) 2006 Ch. Klippel
- * this software is gpl'ed software, read the file "COPYING" for details
+ * this software is gpl'ed software, read the file "LICENSE.txt" for details
  */
 
 #include "m_pd.h"
