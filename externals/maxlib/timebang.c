@@ -76,17 +76,17 @@ static void timebang_tick(t_timebang *x)
 
 static void timebang_set(t_timebang *x, t_symbol *s, int ac, t_atom *av)
 {
-	int i;
+	int i, j;
 
 	if(ac == x->x_notimes * 3)
 	{
-		for(i = 0; i < ac; i += 3)
+		for(i = 0, j = 0; i < ac; i += 3, j++)
 		{
-			if (av[i].a_type == A_FLOAT) x->x_hour[x->x_notimes] = av[i].a_w.w_float;
+			if (av[i].a_type == A_FLOAT) x->x_hour[j] = av[i].a_w.w_float;
 			else { post ("timebang: first argument must be (int) hours"); return; }
-			if (av[i+1].a_type == A_FLOAT) x->x_min[x->x_notimes] = av[i+1].a_w.w_float;
+			if (av[i+1].a_type == A_FLOAT) x->x_min[j] = av[i+1].a_w.w_float;
 			else { post ("timebang: second argument must be (int) minutes"); return; }
-			if (av[i+2].a_type == A_FLOAT) x->x_sec[x->x_notimes] = av[i+2].a_w.w_float;
+			if (av[i+2].a_type == A_FLOAT) x->x_sec[j] = av[i+2].a_w.w_float;
 			else { post ("timebang: third argument must be (int) seconds"); return; }
 			x->x_over[i] = 0;
 		}
