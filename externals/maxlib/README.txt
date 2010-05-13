@@ -1,4 +1,4 @@
-maxlib - music analysis extensions library, version 1.5.2
+maxlib - music analysis extensions library
 copyright (c) 2002-2003 by Olaf Matthes
 
 maxlib is a library of non-tilde externals for pd (by Miller Puckette).
@@ -6,7 +6,7 @@ maxlib is a library of non-tilde externals for pd (by Miller Puckette).
 The objects can be very useful to analyse any musical performance. Some
 of the objects are 'borrowed' from Max (they are not ported but
 rewritten for Pd - cheap immitations).
-maxib has recently been extended by objects of more general use and some 
+maxlib has recently been extended by objects of more general use and some 
 which can be use for composition purposes.
 
 To compile maxlib on win32 (using VC++ 6.0) just type "nmake pd_nt" or use
