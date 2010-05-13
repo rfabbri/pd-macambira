@@ -7,7 +7,7 @@ Standards-Version: 3.8.3
 Homepage: http://puredata.info
 
 Package: pd-purepd
-Architecture: any
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
 Description: a library of objects re-implemented using only Pd-vanilla
  This is a library focused on re-implementing existing objects written in C
