@@ -1,4 +1,4 @@
-/* slipdec.c 20070711 Martin Peach */
+/* slipdec.c 20100513 Martin Peach */
 /* decode a list of SLIP-encoded bytes */
 #include "m_pd.h" 
 
@@ -58,10 +58,17 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
 {
     /* SLIP decode a list of bytes */
     float   f;
-    int     i, c, esced = 0, isSLIP = 1;
+    int     i = 0, c;
 
+    /* x_slip_length will be non-zero if an incomplete packet is in the buffer */
+    if ((ac + x->x_slip_length) > MAX_SLIP)
+    {
+        pd_error (x, "slipdec_list: input packet longer than %d", MAX_SLIP);
+        x->x_slip_length = x->x_esced = x->x_packet_index = 0;
+        return;
+    }
     /* for each byte in the packet, send the appropriate character sequence */
-    for(i = x->x_slip_length = 0; ((i < ac) && (x->x_slip_length < MAX_SLIP)); ++i)
+    for(; ((i < ac) && (x->x_slip_length < MAX_SLIP)); ++i)
     {
         /* check each atom for byteness */
         f = atom_getfloat(&av[i]);
@@ -81,24 +88,28 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
         }
         if (SLIP_ESC == c)
         {
-            esced = 1;
+            x->x_esced = 1;
             continue;
         }
-        if (1 == esced)
+        if (1 == x->x_esced)
         {
             if (SLIP_ESC_END == c) c = SLIP_END;
             else if (SLIP_ESC_ESC == c) c = SLIP_ESC;
-            else isSLIP = 0; /* not valid SLIP */
-            esced = 0;
+            else x->x_valid_SLIP = 0; /* not valid SLIP */
+            x->x_esced = 0;
         }
         /* Add the character to the list */
         x->x_slip_buf[x->x_slip_length++].a_w.w_float = c;
     }
     if (0 != x->x_slip_length)
     {
-        if(SLIP_END != c) isSLIP = 0;
-        outlet_float(x->x_status_out, isSLIP);
-        outlet_list(x->x_slipdec_out, &s_list, x->x_slip_length, x->x_slip_buf);
+        if(SLIP_END != c) x->x_valid_SLIP = 0;
+        outlet_float(x->x_status_out, x->x_valid_SLIP);
+        if (0 != x->x_valid_SLIP) outlet_list(x->x_slipdec_out, &s_list, x->x_slip_length, x->x_slip_buf);
+        x->x_slip_length = x->x_esced = x->x_packet_index = 0;
+        x->x_valid_SLIP = 1;
+        /* any remaining data in the list is ignored for now... */
+        if (i < ac) post("slipdec_list: dropped %d bytes after packet", ac-i);
     }
 }
 
@@ -127,7 +138,7 @@ static void slipdec_float(t_slipdec *x, t_float f)
         {
             if (x->x_verbose) post ("slipdec_float: end of packet");
             outlet_float(x->x_status_out, x->x_valid_SLIP);
-            if (0 != x->x_slip_length)
+            if ((0 != x->x_slip_length) && (0 != x->x_valid_SLIP))
                 outlet_list(x->x_slipdec_out, &s_list, x->x_slip_length, x->x_slip_buf);
             x->x_slip_length = x->x_esced = x->x_packet_index = 0;
             x->x_valid_SLIP = 1;
@@ -150,7 +161,15 @@ static void slipdec_float(t_slipdec *x, t_float f)
     }
     /* Add the character to the list */
     if (0 == x->x_packet_index++) x->x_slip_length = 0;
-    x->x_slip_buf[x->x_slip_length++].a_w.w_float = c;
+    if (x->x_slip_length < MAX_SLIP)
+    {
+        x->x_slip_buf[x->x_slip_length++].a_w.w_float = c;
+    }
+    else
+    {
+        pd_error (x, "slipdec: input packet longer than %d", x->x_slip_length);
+        x->x_slip_length = x->x_esced = x->x_packet_index = 0;
+    }
 }
 
 static void slipdec_verbosity(t_slipdec *x, t_float f)
