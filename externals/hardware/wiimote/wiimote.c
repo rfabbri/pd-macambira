@@ -51,8 +51,12 @@ typedef struct _wiimote
    int reportMode;
 
    struct acc_cal acc_cal; /* calibration for built-in accelerometer */
+#ifdef CWIID_RPT_NUNCHUK
    struct acc_cal nc_acc_cal;  /* calibration for nunchuk accelerometer */
-  struct balance_cal balance_cal;
+#endif
+#ifdef CWIID_RPT_BALANCE
+   struct balance_cal balance_cal;
+#endif
 
    // outlets:
    t_outlet *outlet_data;
@@ -319,6 +323,7 @@ static void wiimote_cwiid_ir(t_wiimote *x, struct cwiid_ir_mesg *mesg)
    }
 }
 
+#ifdef CWIID_RPT_NUNCHUK
 static void wiimote_cwiid_nunchuk(t_wiimote *x, struct cwiid_nunchuk_mesg *mesg)
 {
    t_atom ap[4];
@@ -336,7 +341,6 @@ static void wiimote_cwiid_nunchuk(t_wiimote *x, struct cwiid_nunchuk_mesg *mesg)
    roll *= -1;
    pitch = atan(a_y/a_z*cos(roll));
    */
-
    if (mesg->buttons & CWIID_NUNCHUK_BTN_C) {}
    if (mesg->buttons & CWIID_NUNCHUK_BTN_Z) {}
    /* nunchuk button */
@@ -358,6 +362,7 @@ static void wiimote_cwiid_nunchuk(t_wiimote *x, struct cwiid_nunchuk_mesg *mesg)
    SETFLOAT (ap+2, mesg->stick[CWIID_Y]);
    outlet_anything(x->outlet_data, gensym("nunchuk"), 3, ap);
 }
+#endif
 
 #ifdef CWIID_RPT_CLASSIC
 static void wiimote_cwiid_classic(t_wiimote *x, struct cwiid_classic_mesg *mesg)
@@ -843,6 +848,7 @@ static void wiimote_report(t_wiimote*x, t_symbol*s, int onoff)
     pd_error(x, "unknown report mode '%s'", s->s_name);
   }
 
+#ifdef CWIID_RPT_MOTIONPLUS
   if(CWIID_RPT_MOTIONPLUS==flag) {
       if(x->connected) {
 	int err=0;
@@ -856,6 +862,7 @@ static void wiimote_report(t_wiimote*x, t_symbol*s, int onoff)
 	}
       }
   }
+#endif
 
   if(flag!=-1) {
     if(onoff) {
