@@ -412,30 +412,14 @@ creb_clean:
 
 #------------------------------------------------------------------------------#
 # CXC
-CXC_NAME=cxc
-CXC_OBJECTS := $(wildcard $(externals_src)/cxc/???*.c)
-cxc: $(CXC_OBJECTS:.c=.$(EXTENSION))
+cxc:
+	make -C $(externals_src)/cxc
 
-cxc_install: cxc
-	install -d $(DESTDIR)$(objectsdir)/$(CXC_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(CXC_NAME) \
-		--author "jdl@xdv.org" \
-		--description "" \
-		--license "" \
-		--version ""
-	install -p $(CXC_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(CXC_NAME)
-	install -p $(wildcard $(externals_src)/cxc/reference/*.pd) \
-		$(DESTDIR)$(objectsdir)/$(CXC_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(CXC_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/cxc/README \
-		 $(DESTDIR)$(readmesdir)/$(CXC_NAME).txt
+cxc_install:
+	make -C $(externals_src)/cxc DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 cxc_clean:
-	-rm -f -- $(CXC_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(externals_src)/cxc/*.o
-	-rm -f -- $(externals_src)/cxc/*.bak
-	-rm -f -- $(externals_src)/cxc/*.*~
+	make -C $(externals_src)/cxc clean
 
 
 #------------------------------------------------------------------------------#

@@ -1,6 +1,6 @@
 
 #ifndef VERSION
-#define VERSION "0.04"
+#define VERSION "0.05"
 #endif
 
 #ifndef __DATE__ 
@@ -8,7 +8,7 @@
 #endif
 
 #include <m_pd.h>
-#include "cx.h"
+#include "cxc.h"
 
 typedef struct _cxc
 {
@@ -31,7 +31,7 @@ void bfilt2_setup();
 //void testy_tilde_setup();
 //void garlic_tilde_setup();
 void counter_setup();
-void reson_setup();
+void reson_tilde_setup();
 //void serialize_setup();
 void prepend_setup();
 void split_setup();
@@ -78,7 +78,7 @@ void cxc_setup(void)
 /*   dumpOSC_setup(); */
 /*   routeOSC_setup(); */
   counter_setup();
-  reson_setup();
+  reson_tilde_setup();
   //serialize_setup();
   prepend_setup();
   split_setup();
