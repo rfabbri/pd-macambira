@@ -1,0 +1,8 @@
+#N canvas 0 22 450 300 10;
+#X obj 138 153 hex2dec;
+#X floatatom 137 189 5 0 0 0 - - -;
+#X msg 139 105 symbol fff;
+#X msg 237 123 123;
+#X connect 0 0 1 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;

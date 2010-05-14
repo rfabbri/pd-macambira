@@ -24,7 +24,7 @@ typedef struct _cxmean
   int       x_nsampsintab;
 } t_cxmean;
 
-void *cxmean_new(t_symbol *s)
+static void *cxmean_new(t_symbol *s)
 {
   t_cxmean *x = (t_cxmean *)pd_new(cxmean_class);
   x->x_arrayname  = s;
@@ -52,7 +52,7 @@ static void cxmean_set(t_cxmean *x, t_symbol *s)
     else garray_usedindsp(a);
 }
 
-void cxmean_bang(t_cxmean *x)
+static void cxmean_bang(t_cxmean *x)
 {
   outlet_float(x->x_obj.ob_outlet,x->x_mean);
 }
@@ -123,7 +123,7 @@ typedef struct _cxavgdev
   int       x_nsampsintab;
 } t_cxavgdev;
 
-void *cxavgdev_new(t_symbol *s)
+static void *cxavgdev_new(t_symbol *s)
 {
   t_cxavgdev *x = (t_cxavgdev *)pd_new(cxavgdev_class);
   x->x_arrayname  = s;
@@ -151,7 +151,7 @@ static void cxavgdev_set(t_cxavgdev *x, t_symbol *s)
     else garray_usedindsp(a);
 }
 
-void cxavgdev_bang(t_cxavgdev *x)
+static void cxavgdev_bang(t_cxavgdev *x)
 {
   outlet_float(x->x_obj.ob_outlet,x->x_avgdev);
 }
@@ -227,7 +227,7 @@ typedef struct _cxstddev
   int       x_nsampsintab;
 } t_cxstddev;
 
-void *cxstddev_new(t_symbol *s)
+static void *cxstddev_new(t_symbol *s)
 {
   t_cxstddev *x = (t_cxstddev *)pd_new(cxstddev_class);
   x->x_arrayname  = s;
@@ -255,7 +255,7 @@ static void cxstddev_set(t_cxstddev *x, t_symbol *s)
     else garray_usedindsp(a);
 }
 
-void cxstddev_bang(t_cxstddev *x)
+static void cxstddev_bang(t_cxstddev *x)
 {
   outlet_float(x->x_obj.ob_outlet,x->x_stddev);
 }
@@ -328,7 +328,7 @@ typedef struct _mean_tilde
   int       x_nsampsintab;
 } t_mean_tilde;
 
-void *mean_tilde_new(t_symbol *s)
+static void *mean_tilde_new(t_symbol *s)
 {
   t_mean_tilde *x = (t_mean_tilde *)pd_new(mean_tilde_class);
   x->x_arrayname  = s;
@@ -384,7 +384,7 @@ static void mean_tilde_dsp(t_mean_tilde *x, t_signal **sp)
   dsp_add(mean_tilde_perform, 2, x, sp[0]->s_n);
 }
 
-void mean_tilde_bang(t_mean_tilde *x)
+static void mean_tilde_bang(t_mean_tilde *x)
 {
   outlet_float(x->x_obj.ob_outlet,x->x_mean);
 }

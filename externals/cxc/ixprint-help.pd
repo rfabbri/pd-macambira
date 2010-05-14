@@ -1,0 +1,8 @@
+#N canvas 160 134 450 300 10;
+#X obj 123 115 ixprint;
+#X msg 122 59 1 2 3;
+#X obj 173 83 pointer;
+#X msg 172 54 bang;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 2 0;

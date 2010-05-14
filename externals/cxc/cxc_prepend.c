@@ -109,9 +109,9 @@ static void prepend_set(t_prepend *x, t_symbol *s)
   x->x_s = s;
 }
 
-void prepend_setup(void)
+void cxc_prepend_setup(void)
 {
-    prepend_class = class_new(gensym("prepend"), (t_newmethod)prepend_new, 0,
+    prepend_class = class_new(gensym("cxc_prepend"), (t_newmethod)prepend_new, 0,
 				sizeof(t_prepend), 0,A_DEFSYM,NULL);
     class_addlist(prepend_class, prepend_list);
     class_addanything(prepend_class,prepend_anything);

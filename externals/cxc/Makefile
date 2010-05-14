@@ -5,7 +5,7 @@ LIBRARY_NAME = cxc
 
 # add your .c source files to the SOURCES variable, help files will be
 # included automatically
-SOURCES = ENV.c ascseq.c ascwave.c bfilt.c bfilt2.c binshift.c counter.c cxavgdev.c cxmean.c cxstddev.c delta~.c dist_normal.c hex2dec.c ixprint.c mean~.c prepend.c random1.c random1~.c random_fl.c random_fl~.c random_icg.c random_icg~.c random_tw.c reson~.c split.c utime.c
+SOURCES = ENV.c ascseq.c ascwave.c bfilt.c bfilt2.c cxc_counter.c cxavgdev.c cxc_prepend.c cxc_split.c cxmean.c cxstddev.c delta~.c dist_normal.c hex2dec.c ixprint.c mean~.c random1.c random1~.c random_fl.c random_fl~.c random_icg.c random_icg~.c random_tw.c reson~.c utime.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.

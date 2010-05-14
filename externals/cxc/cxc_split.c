@@ -163,7 +163,7 @@ static void split_set(t_split *x, t_symbol *s)
   x->x_splitter = t;
 }
 
-void split_setup(void)
+void cxc_split_setup(void)
 {
     split_class = class_new(gensym("cxc_split"), (t_newmethod)split_new, 0,
 				sizeof(t_split), 0,A_DEFSYM,NULL);

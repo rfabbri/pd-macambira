@@ -213,9 +213,9 @@ void *counter_new(t_floatarg f, t_floatarg g, t_floatarg h) /* init vals in stru
     return (x);
 }
 
-void counter_setup(void)
+void cxc_counter_setup(void)
 {
-    counter_class = class_new(gensym("counter"), (t_newmethod)counter_new, 0,
+    counter_class = class_new(gensym("cxc_counter"), (t_newmethod)counter_new, 0,
     	    sizeof(t_counter), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addbang(counter_class, (t_method)counter_bang);
     class_addmethod(counter_class, (t_method)counter_dir, gensym("fl1"), A_FLOAT, 0);

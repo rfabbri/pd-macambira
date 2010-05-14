@@ -17,7 +17,7 @@ typedef struct _cxc
 
 static t_class* cxc_class;
 
-void binshift_setup();
+//void binshift_setup();
 void ascwave_setup();
 void ascseq_setup();
 void ixprint_setup();
@@ -30,11 +30,11 @@ void bfilt2_setup();
 /* void routeOSC_setup(); */
 //void testy_tilde_setup();
 //void garlic_tilde_setup();
-void counter_setup();
+void cxc_counter_setup();
 void reson_tilde_setup();
 //void serialize_setup();
-void prepend_setup();
-void split_setup();
+void cxc_prepend_setup();
+void cxc_split_setup();
 void utime_setup();
 // RNG's
 void random1_setup();
@@ -67,7 +67,7 @@ void cxc_setup(void)
   cxc_class = class_new(gensym("cxc"), (t_newmethod)cxc_new, 0,
 			  sizeof(t_cxc), 0,0);
   ixprint_setup();
-  binshift_setup();
+//  binshift_setup();
   ascwave_setup();
   ascseq_setup();
   //  mixer_setup();
@@ -77,11 +77,11 @@ void cxc_setup(void)
 /*   sendOSC_setup(); */
 /*   dumpOSC_setup(); */
 /*   routeOSC_setup(); */
-  counter_setup();
+  cxc_counter_setup();
   reson_tilde_setup();
   //serialize_setup();
-  prepend_setup();
-  split_setup();
+  cxc_prepend_setup();
+  cxc_split_setup();
   utime_setup();
   // RNG's
   random1_setup();

@@ -13,8 +13,8 @@
 #X msg 322 145 set azwejdgb;
 #X obj 336 236 print;
 #X text 320 125 only the 1st character is used;
-#X obj 336 205 cxc.split .;
-#X obj 25 196 cxc.split .;
+#X obj 336 205 cxc_split .;
+#X obj 25 196 cxc_split .;
 #X text 110 123 set the delimiter;
 #X obj 368 308 unpack s s s s;
 #X symbolatom 367 347 10 0 0 0 - - -;
