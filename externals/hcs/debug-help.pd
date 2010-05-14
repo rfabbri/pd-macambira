@@ -1,0 +1,4 @@
+#N canvas 234 231 450 300 10;
+#X obj 148 137 debug testing;
+#X text 31 46 a simple object to control the flow of print messages
+\, and label them.;

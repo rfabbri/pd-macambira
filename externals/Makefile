@@ -720,45 +720,16 @@ ggee_clean:
 	-rm -f -- $(externals_src)/ggee/*.*~
 
 
-
 #------------------------------------------------------------------------------#
 # HCS
-HCS_NAME=hcs
-HCS_OBJECTS := $(wildcard $(externals_src)/hcs/*.c)
-hcs: $(HCS_OBJECTS:.c=.$(EXTENSION))
+hcs:
+	make -C $(externals_src)/hcs
 
-hcs_install: hcs
-	install -d $(DESTDIR)$(objectsdir)/$(HCS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(HCS_NAME) \
-		--author "Hans-Christoph Steiner <hans@at.or.at>" \
-		--description "random grab bag of object prototypes" \
-		--license "GNU GPL" \
-		--version ""
-	install -p $(HCS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(HCS_NAME)
-	install -p $(shell ls -1 $(externals_src)/hcs/*.pd | \
-			 grep -v '\-help.pd') $(DESTDIR)$(objectsdir)/$(HCS_NAME)
-# hmm, these don't have a home yet...
-	install -p $(externals_src)/hcs/general/*.pd $(DESTDIR)$(objectsdir)/$(HCS_NAME)
-	install -p $(externals_src)/hcs/*-help.pd \
-		$(DESTDIR)$(objectsdir)/$(HCS_NAME)
-	install -p $(externals_src)/hcs/*.gif \
-		$(DESTDIR)$(objectsdir)/$(HCS_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(HCS_NAME)
-#	install -p $(externals_src)/hcs/README* $(externals_src)/hcs/TODO \
-#		$(DESTDIR)$(manualsdir)/$(HCS_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/hcs/README \
-#		$(DESTDIR)$(readmesdir)/$(HCS_NAME).txt
-	install -d $(DESTDIR)$(objectsdir)/$(HCS_NAME)/examples
-	install -p $(externals_src)/hcs/examples/*.pd \
-		$(DESTDIR)$(objectsdir)/$(HCS_NAME)/examples
+hcs_install:
+	make -C $(externals_src)/hcs DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 hcs_clean:
-	-rm -f -- $(HCS_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(HCS_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/hcs/*.bak
-	-rm -f -- $(externals_src)/hcs/*.*~
-
+	make -C $(externals_src)/hcs clean
 
 
 #------------------------------------------------------------------------------#

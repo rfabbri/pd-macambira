@@ -1,4 +1,11 @@
 
+The 'hcs' library is a random grabbag of objects that are experiments that
+sometimes lead to full-fledged libraries.
+
+====
+TODO
+====
+
 - pddate compare object
 
 - make ISOdate and ISOtime accept pddate format
