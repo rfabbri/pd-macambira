@@ -117,20 +117,17 @@ keyboardkeys_install:
 	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/keyboard_main.pd \
 		 $(DESTDIR)$(objectsdir)/$(KEYBOARDKEYS_NAME)/examples
 
-#-------------------------------------------------------------------------------
-# list-abs
-LIST-ABS_NAME = list-abs
-list-abs_install:
-	install -d $(DESTDIR)$(objectsdir)/$(LIST-ABS_NAME)
-	install -p $(abstractions_src)/footils/list-abs/*.pd \
-		$(DESTDIR)$(objectsdir)/$(LIST-ABS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(LIST-ABS_NAME) \
-		--author "Frank Barknecht" \
-		--license "GNU GPL" \
-		--description "a collection of objects for manipulating lists. Requires pd>=0.39"
-	install -p $(abstractions_src)/footils/list-abs/*-help.pd \
-		$(DESTDIR)$(objectsdir)/$(LIST-ABS_NAME)
 
+#------------------------------------------------------------------------------#
+# LIST-ABS
+list-abs:
+	make -C $(abstractions_src)/footils/list-abs
+
+list-abs_install:
+	make -C $(abstractions_src)/footils/list-abs DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+list-abs_clean:
+	make -C $(abstractions_src)/footils/list-abs clean
 
 
 #-------------------------------------------------------------------------------
