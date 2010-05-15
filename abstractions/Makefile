@@ -89,31 +89,16 @@ gyre_install:
 		 $(DESTDIR)$(examplesdir)/$(GYRE_NAME)
 
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------#
 # JMMMP
-JMMMP_NAME = jmmmp
-jmmmp_install:
-	install -d $(DESTDIR)$(objectsdir)/$(JMMMP_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(JMMMP_NAME) \
-		--author "Joao Miguel Pais <jmmmpais@googlemail.com>" \
-		--description "" \
-		--license "BSD" \
-		--version "" 
-	install -p $(abstractions_src)/jmmmp/*.pd \
-		 $(DESTDIR)$(objectsdir)/$(JMMMP_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(JMMMP_NAME)
-#	install -p $(abstractions_src)/jmmmp/*.html \
-#		 $(DESTDIR)$(manualsdir)/$(JMMMP_NAME)
-#	install -d $(DESTDIR)$(examplesdir)/$(JMMMP_NAME)
-#	install -p $(abstractions_src)/jmmmp/examples/jmmmp.pd \
-#		 $(DESTDIR)$(examplesdir)/$(JMMMP_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(abstractions_src)/jmmmp/jmmmp-ext.txt \
-		$(DESTDIR)$(readmesdir)/$(JMMMP_NAME).txt
-	install -d $(DESTDIR)$(objectsdir)/$(JMMMP_NAME)/manual
-	install -p $(abstractions_src)/jmmmp/jmmmp-ext.txt \
-		$(DESTDIR)$(objectsdir)/$(JMMMP_NAME)/manual/
+jmmmp:
+	make -C $(abstractions_src)/jmmmp
 
+jmmmp_install:
+	make -C $(abstractions_src)/jmmmp DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+jmmmp_clean:
+	make -C $(abstractions_src)/jmmmp clean
 
 
 #-------------------------------------------------------------------------------
