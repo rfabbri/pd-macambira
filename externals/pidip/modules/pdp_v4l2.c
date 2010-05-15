@@ -408,7 +408,8 @@ static int pdp_v4l2_set_format(t_pdp_v4l2 *x, t_int index)
     x->x_v4l2_format.fmt.pix.pixelformat = x->x_formats[index].pixelformat;
     x->x_v4l2_format.fmt.pix.field = V4L2_FIELD_ANY;
 
-    post( "pdp_v4l2 : setting format : pixel format : %c%c%c%c", 
+    post( "pdp_v4l2 : setting format : index : %d : pixel format : %c%c%c%c", 
+            index,
             x->x_v4l2_format.fmt.pix.pixelformat & 0xff,
             (x->x_v4l2_format.fmt.pix.pixelformat >>  8) & 0xff,
             (x->x_v4l2_format.fmt.pix.pixelformat >> 16) & 0xff,
@@ -546,15 +547,6 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
 
     if ( x->x_ninputs > 0 )
     {
-      if (ioctl(x->x_tvfd, VIDIOC_G_INPUT, &x->x_curinput) < 0)
-      {
-          post("pdp_v4l2: cant get current input %d",x->x_curinput);
-      }
-      else
-      {
-          post("pdp_v4l2: current input is %d",x->x_curinput);
-      }
-
       if (ioctl(x->x_tvfd, VIDIOC_S_INPUT, &x->x_curinput) < 0)
       {
           perror("pdp_v4l2: error: VIDIOC_S_INPUT");
@@ -584,15 +576,6 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
     // switch to desired norm ( if available )
     if ( x->x_nstandards > 0 )
     {
-      if (ioctl(x->x_tvfd, VIDIOC_G_STD, &x->x_curstandard) < 0)
-      {
-          post("pdp_v4l2: cant get current standard %d",x->x_curstandard);
-      }
-      else
-      {
-          post("pdp_v4l2: current standard is %d",x->x_curstandard);
-      }
-
       if (ioctl(x->x_tvfd, VIDIOC_S_STD, &x->x_curstandard) < 0)
       {
           perror("pdp_v4l2: error: VIDIOC_S_STD");
@@ -640,11 +623,7 @@ static void pdp_v4l2_open(t_pdp_v4l2 *x, t_symbol *name)
             (x->x_v4l2_format.fmt.pix.pixelformat >> 16) & 0xff,
             (x->x_v4l2_format.fmt.pix.pixelformat >> 24) & 0xff );
 
-       if ((i = ioctl(x->x_tvfd, VIDIOC_S_FMT, &x->x_v4l2_format)) < 0) {
-          perror("pdp_v4l2: error: VIDIOC_S_FMT");
-          pdp_v4l2_close_error(x);
-          x->x_initialized = false;
-       }
+       pdp_v4l2_set_format(x, x->x_curformat);
     }
     else
     {
@@ -734,18 +713,15 @@ static void pdp_v4l2_standard(t_pdp_v4l2 *x, t_float f)
 
 static void pdp_v4l2_format(t_pdp_v4l2 *x, t_float f)
 {
-    if (!x->x_initialized){
-       post( "pdp_v4l2 : cannot set format : no device opened ");
-       return;
-    }
     if ( ( (int)f < 0 ) || ( (int)f >= x->x_nformats ) )
     {
        post( "pdp_v4l2 : format number %d out of range", (int)f );
        return;
     }
+    x->x_curformat = (int)f;
     if (x->x_initialized){
         pdp_v4l2_close(x);
-        x->x_curformat = (int)f;
+        pdp_v4l2_set_format(x, x->x_curformat);
         pdp_v4l2_open(x, x->x_device);
     }
 }
@@ -911,9 +887,9 @@ void *pdp_v4l2_new(t_symbol *vdef)
 
     x->x_tvfd = -1;
     x->x_ninputs = 0;
-    x->x_curinput = -1;
-    x->x_curstandard = -1;
-    x->x_curformat = -1;
+    x->x_curinput = 0;
+    x->x_curstandard = 0;
+    x->x_curformat = 0;
     x->x_freq = -1;
     x->x_nstandards = 0;
     x->x_nformats = 0;
