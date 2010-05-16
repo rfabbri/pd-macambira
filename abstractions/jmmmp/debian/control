@@ -7,7 +7,7 @@ Standards-Version: 3.8.3
 Homepage: http://puredata.info
 
 Package: pd-jmmmp
-Architecture: any
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
 Description: a collection of GUI objects for musical performance
  jmmmp is a collection of GUI objects for musical performance, including
