@@ -9,4 +9,6 @@ Homepage: http://puredata.info
 Package: pd-cxc
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Description: 
+Description: pd externals library powered by  zt0ln d4ta
+ cxc is a library of Pd objects for random numbers and system tool
+
