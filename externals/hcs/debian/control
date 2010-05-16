@@ -9,4 +9,6 @@ Homepage: http://puredata.info
 Package: pd-hcs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Description: 
+Description: a random grabbag of objects
+ The 'hcs' library is a random grabbag of objects that are experiments that
+ sometimes lead to full-fledged libraries.
