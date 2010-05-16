@@ -9,4 +9,6 @@ Homepage: http://puredata.info
 Package: pd-jmmmp
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Description: 
+Description: a collection of GUI objects for musical performance
+ jmmmp is a collection of GUI objects for musical performance, including
+ controlling the DAC, volume, debugging, linking up with other programs, etc.
