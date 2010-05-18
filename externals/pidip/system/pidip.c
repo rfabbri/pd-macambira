@@ -115,7 +115,7 @@ extern "C"
 /* library setup routine */
 void pidip_setup(void){
     
-    post ("PiDiP : additional video processing objects for PDP\n\tversion " PDP_PIDIP_VERSION " ( ydegoyon@free.fr )");
+    post ("PiDiP : additional video processing objects for PDP\n\tversion " PDP_PIDIP_VERSION " by Yves Degoyon and Lluis Gomez i Bigorda");
 
     pdp_intrusion_setup();
     pdp_yqt_setup();
