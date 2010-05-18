@@ -1640,7 +1640,7 @@ static void pdp_colorgrid_free(t_pdp_colorgrid *x)
 void pdp_colorgrid_setup(void)
 {
     load_tk_procs();
-    post ( pdp_colorgrid_version );
+    // post ( pdp_colorgrid_version );
     pdp_colorgrid_class = class_new(gensym("pdp_colorgrid"), (t_newmethod)pdp_colorgrid_new,
 			      (t_method)pdp_colorgrid_free, sizeof(t_pdp_colorgrid), 0, A_GIMME, 0);
     class_addmethod(pdp_colorgrid_class, (t_method)pdp_colorgrid_click, gensym("click"), A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);

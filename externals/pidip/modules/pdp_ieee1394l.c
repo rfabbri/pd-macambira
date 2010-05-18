@@ -528,7 +528,7 @@ extern "C"
 
 void pdp_ieee1394_setup(void)
 {
-    post( " pdp_ieee1394 : linux dv interface by Lluis Gomez i Bigorda (lluisgomez@hangar.org)" );
+    // post( " pdp_ieee1394 : linux dv interface by Lluis Gomez i Bigorda (lluisgomez@hangar.org)" );
 
     pdp_ieee1394_class = class_new(gensym("pdp_ieee1394"), (t_newmethod)pdp_ieee1394_new,
     	(t_method)pdp_ieee1394_free, sizeof(t_pdp_ieee1394), 0, A_DEFSYMBOL, A_DEFSYMBOL, A_NULL);
