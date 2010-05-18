@@ -10,9 +10,9 @@
 #X obj 257 124 init \$2;
 #X msg 257 144 color \$1 \$1;
 #X obj 168 84 t f f f;
-#X obj 20 110 bng 20 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#X obj 20 110 bng 12 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 20 110 cnv 20 20 20 empty \$0-cnv empty 20 12 0 14 -195568 -195568
+#X obj 20 110 cnv 12 12 12 empty \$0-cnv empty 20 12 0 14 -195568 -195568
 0;
 #X text 474 139 Inlets;
 #X text 474 199 Outlets;
@@ -66,4 +66,4 @@ in the documentation and/or other materials provided with the distribution.
 #X connect 10 2 7 0;
 #X connect 11 0 0 0;
 #X connect 21 0 24 0;
-#X coords 0 -1 1 1 20 20 2 20 110;
+#X coords 0 -1 1 1 12 12 2 20 110;
