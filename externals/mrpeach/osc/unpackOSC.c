@@ -1,10 +1,7 @@
-/* unpackOSC is like dumpOSC but outputs two lists: a list of symbols for the path  */
-/* and a list of floats and/or symbols for the data  */
+/* unpackOSC is like dumpOSC but outputs a list consisting of a single symbol for the path  */
+/* and a list of floats and/or symbols for the data, and adds an outlet for a time delay. */
 /* This allows for the separation of the protocol and its transport. */
 /* Started by Martin Peach 20060420 */
-/* This version tries to be standalone from LIBOSC MP 20060425 */
-/* MP 20060505 fixed a bug (line 209) where bytes are wrongly interpreted as negative */
-/* MP 20070705 added timestamp outlet */
 /* dumpOSC.c header follows: */
 /*
 Written by Matt Wright and Adrian Freed, The Center for New Music and
@@ -282,8 +279,7 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
         args = unpackOSC_DataAfterAlignedString(messageName, buf+x->x_raw_c);
         if (args == 0)
         {
-            post("unpackOSC: Bad message name string: (%s) Dropping entire message.",
-            messageName);
+            post("unpackOSC: Bad message name string: Dropping entire message.");
             return;
         }
 #ifdef DEBUG
