@@ -171,12 +171,12 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
 
     if ((argc%4) != 0)
     {
-        post("unpackOSC: packet size (%d) not a multiple of 4 bytes: dropping packet", argc);
+        post("unpackOSC: Packet size (%d) not a multiple of 4 bytes: dropping packet", argc);
         return;
     }
     if(argc > MAX_MESG)
     {
-        post("unpackOSC: packet size (%d) greater than max (%d). Change MAX_MESG and recompile if you want more.", argc, MAX_MESG);
+        post("unpackOSC: Packet size (%d) greater than max (%d). Change MAX_MESG and recompile if you want more.", argc, MAX_MESG);
         return;
     }
     /* copy the list to a byte buffer, checking for bytes only */
@@ -194,13 +194,13 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
             }
             else
             {
-                post("unpackOSC: data out of range (%d), dropping packet", argv[i].a_w.w_float);
+                post("unpackOSC: Data out of range (%d), dropping packet", argv[i].a_w.w_float);
                 return;
             }
         }
         else
         {
-            post("unpackOSC: data not float, dropping packet");
+            post("unpackOSC: Data not float, dropping packet");
             return;
         }
     }
@@ -307,7 +307,9 @@ static int unpackOSC_path(t_unpackOSC *x, char *path)
 
     if (path[0] != '/')
     {
-        post("unpackOSC: bad path (%s)", path);
+        for (i = 0; i < 16; ++i) if ('\0' == path[i]) break;
+        path[i] = '\0';
+        post("unpackOSC: Path doesn't begin with \"/\" (%s...)", path);
         return 0;
     }
     for (i = 1; i < MAX_MESG; ++i)
@@ -318,7 +320,7 @@ static int unpackOSC_path(t_unpackOSC *x, char *path)
             return 1;
         }
     }
-    post("unpackOSC: path too long");
+    post("unpackOSC: Path too long");
     return 0;
 }
 #define SMALLEST_POSITIVE_FLOAT 0.000001f
@@ -411,20 +413,20 @@ static void unpackOSC_PrintTypeTaggedArgs(t_unpackOSC *x, void *v, int n)
 #ifdef DEBUG
                 printf("[A 64-bit int] ");
 #endif
-                post("[A 64-bit int] not implemented");
+                post("unpackOSC: PrintTypeTaggedArgs: [A 64-bit int] not implemented");
                 p += 8;
                 break;
             case 'd':
 #ifdef DEBUG
                 printf("[A 64-bit float] ");
 #endif
-                post("[A 64-bit float] not implemented");
+                post("unpackOSC: PrintTypeTaggedArgs: [A 64-bit float] not implemented");
                 p += 8;
                 break;
             case 's': case 'S':
                 if (!unpackOSC_IsNiceString(p, typeTags+n))
                 {
-                    post("Type tag said this arg is a string but it's not!\n");
+                    post("unpackOSC: PrintTypeTaggedArgs: Type tag said this arg is a string but it's not!\n");
                     return;
                 }
                 else
@@ -467,7 +469,7 @@ static void unpackOSC_PrintTypeTaggedArgs(t_unpackOSC *x, void *v, int n)
                 myargc++;
                 break;
             default:
-                post("unpackOSC: [Unrecognized type tag %c]", *thisType);
+                post("unpackOSC: PrintTypeTaggedArgs: [Unrecognized type tag %c]", *thisType);
                 myargc++;
          }
     }
@@ -525,9 +527,7 @@ static void unpackOSC_PrintHeuristicallyTypeGuessedArgs(t_unpackOSC *x, void *v,
         else
         {
             /* unhandled .. ;) */
-#ifdef DEBUG
-            post("unpackOSC: indeterminate type: 0x%x xx", ints[i]);
-#endif
+            post("unpackOSC: PrintHeuristicallyTypeGuessedArgs: indeterminate type: 0x%x xx", ints[i]);
             i++;
         }
         x->x_data_atc = myargc;
@@ -546,7 +546,7 @@ static char *unpackOSC_DataAfterAlignedString(char *string, char *boundary)
         the last valid character in the buffer---if the string hasn't
         ended by there, something's wrong.
 
-        If the data looks wrong, return 0, and set htm_error_string */
+        If the data looks wrong, return 0 */
 
     int i;
 
@@ -577,7 +577,7 @@ static char *unpackOSC_DataAfterAlignedString(char *string, char *boundary)
         }
         if (string[i] != '\0')
         {
-            post("unpackOSC:DataAfterAlignedString: Incorrectly padded string");
+            post("unpackOSC: DataAfterAlignedString: Incorrectly padded string");
             return 0;
         }
     }
@@ -596,7 +596,7 @@ static int unpackOSC_IsNiceString(char *string, char *boundary)
 
     if ((boundary - string) %4 != 0)
     {
-        fprintf(stderr, "Internal error: IsNiceString: bad boundary\n");
+        post("unpackOSC: IsNiceString: bad boundary\n");
         return 0;
     }
 
@@ -622,7 +622,9 @@ static int unpackOSC_IsNiceString(char *string, char *boundary)
 static t_float unpackOSC_DeltaTime(OSCTimeTag tt)
 {
     static double onemillion = 1000000.0f;
+#ifdef _WIN32
     static double onethousand = 1000.0f;
+#endif /* ifdef _WIN32 */
 
     if (tt.fraction == 1 && tt.seconds == 0) return 0.0; /* immediate */
     else
