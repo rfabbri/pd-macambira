@@ -93,7 +93,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 
 #define MAX_MESG 65536
 /* MAX_MESG was 32768 MP: make same as MAX_UDP_PACKET */
-
+#define OSC_MAX_RECURSION 16 /* maximum bundle depth */
 /* ----------------------------- was dumpOSC ------------------------- */
 
 /* You may have to redefine this typedef if ints on your system
@@ -123,6 +123,7 @@ typedef struct _unpackOSC
     char        x_raw[MAX_MESG];/* bytes making up the entire OSC message */
     int         x_raw_c;/* number of bytes in OSC message */
     int         x_bundle_flag;/* non-zero if we are processing a bundle */
+    int         x_recursion_level;/* number of times we reenter unpackOSCPath */
 } t_unpackOSC;
 
 void unpackOSC_setup(void);
@@ -146,6 +147,7 @@ static void *unpackOSC_new(void)
     x->x_delay_out = outlet_new(&x->x_obj, &s_float);
     x->x_raw_c = x->x_data_atc = 0;
     x->x_bundle_flag = 0;
+    x->x_recursion_level = 0;
     return (x);
 }
 
@@ -172,11 +174,13 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
     if ((argc%4) != 0)
     {
         post("unpackOSC: Packet size (%d) not a multiple of 4 bytes: dropping packet", argc);
+        x->x_recursion_level = 0;
         return;
     }
     if(argc > MAX_MESG)
     {
         post("unpackOSC: Packet size (%d) greater than max (%d). Change MAX_MESG and recompile if you want more.", argc, MAX_MESG);
+        x->x_recursion_level = 0;
         return;
     }
     /* copy the list to a byte buffer, checking for bytes only */
@@ -195,12 +199,14 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
             else
             {
                 post("unpackOSC: Data out of range (%d), dropping packet", argv[i].a_w.w_float);
+                x->x_recursion_level = 0;
                 return;
             }
         }
         else
         {
             post("unpackOSC: Data not float, dropping packet");
+            x->x_recursion_level = 0;
             return;
         }
     }
@@ -216,6 +222,7 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
         if (argc < 16)
         {
             post("unpackOSC: Bundle message too small (%d bytes) for time tag", argc);
+            x->x_recursion_level = 0;
             return;
         }
 
@@ -242,16 +249,25 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
             if ((size % 4) != 0)
             {
                 post("unpackOSC: Bad size count %d in bundle (not a multiple of 4)", size);
+                x->x_recursion_level = 0;
                 return;
             }
             if ((size + i + 4) > argc)
             {
                 post("unpackOSC: Bad size count %d in bundle (only %d bytes left in entire bundle)",
                     size, argc-i-4);
+                x->x_recursion_level = 0;
                 return;	
             }
 
             /* Recursively handle element of bundle */
+            x->x_recursion_level++;
+            if (x->x_recursion_level > OSC_MAX_RECURSION)
+            {
+                post("unpackSOC: bundle depth %d exceeded", OSC_MAX_RECURSION);
+                x->x_recursion_level = 0;
+                return;
+            }
             unpackOSC_list(x, s, size, &argv[i+4]);
             i += 4 + size;
         }
@@ -270,6 +286,7 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
     else if ((argc == 24) && (strcmp(buf, "#time") == 0))
     {
         post("unpackOSC: Time message: %s\n :).\n", buf);
+        x->x_recursion_level = 0;
         return; 	
     }
     else
@@ -280,6 +297,7 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
         if (args == 0)
         {
             post("unpackOSC: Bad message name string: Dropping entire message.");
+            x->x_recursion_level = 0;
             return;
         }
 #ifdef DEBUG
@@ -299,6 +317,7 @@ static void unpackOSC_list(t_unpackOSC *x, t_symbol *s, int argc, t_atom *argv)
     if (x->x_data_atc >= 1)
         outlet_anything(x->x_data_out, atom_getsymbol(x->x_data_at), x->x_data_atc-1, x->x_data_at+1);
     x->x_data_atc = 0;
+    x->x_recursion_level = 0;
 }
 
 static int unpackOSC_path(t_unpackOSC *x, char *path)
@@ -309,7 +328,7 @@ static int unpackOSC_path(t_unpackOSC *x, char *path)
     {
         for (i = 0; i < 16; ++i) if ('\0' == path[i]) break;
         path[i] = '\0';
-        post("unpackOSC: Path doesn't begin with \"/\" (%s...)", path);
+        post("unpackOSC: Path doesn't begin with \"/\", dropping message");
         return 0;
     }
     for (i = 1; i < MAX_MESG; ++i)
@@ -320,7 +339,7 @@ static int unpackOSC_path(t_unpackOSC *x, char *path)
             return 1;
         }
     }
-    post("unpackOSC: Path too long");
+    post("unpackOSC: Path too long, dropping message");
     return 0;
 }
 #define SMALLEST_POSITIVE_FLOAT 0.000001f
