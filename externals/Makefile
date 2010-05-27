@@ -1689,11 +1689,9 @@ tof_install: tof
 		--license "Whatever Hans wants" \
 		--version "2009-09-22"
 	install -p $(TOF_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(TOF_NAME)
-	install -p $(externals_src)/tof/help/*.pd \
+	install -p $(externals_src)/tof/tof/*.gif \
 		$(DESTDIR)$(objectsdir)/$(TOF_NAME)
-	install -p $(externals_src)/tof/help/*.gif \
-		$(DESTDIR)$(objectsdir)/$(TOF_NAME)
-	install -p $(externals_src)/tof/abs/*.pd \
+	install -p $(externals_src)/tof/tof/*.pd \
 		$(DESTDIR)$(objectsdir)/$(TOF_NAME)
 
 tof_clean:
