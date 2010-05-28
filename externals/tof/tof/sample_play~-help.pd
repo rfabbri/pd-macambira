@@ -1,0 +1,31 @@
+#N canvas 1637 415 502 410 10;
+#X obj 58 283 dac~;
+#X obj 59 96 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 78 123 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X floatatom 171 194 5 0 0 0 - - -;
+#X text 13 -28 Description: Plays a sample;
+#X text 14 -8 Tags: Sound Table Sample;
+#X text 85 94 Inlet 1 \, bang: play sample once;
+#X text 95 120 Inlet 1 \, float: stop/play sample in a loop;
+#X text 178 146 Inlet 1 \, sample symbol: set sample;
+#X msg 96 146 sample smppl;
+#X text 209 194 Inlet 2 \, float: set playback speed;
+#X text 121 271 Outlet 1 \, signal: left channel audio output;
+#X text 120 285 Outlet 2 \, signal: right channel audio output;
+#X obj 279 10 openpanel;
+#X msg 279 31 read \$1;
+#X obj 279 -12 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 59 229 tof/sample_play~ smppl;
+#X obj 279 54 tof/sample smppl mono0.wav;
+#X connect 1 0 16 0;
+#X connect 2 0 16 0;
+#X connect 3 0 16 1;
+#X connect 9 0 16 0;
+#X connect 13 0 14 0;
+#X connect 14 0 17 0;
+#X connect 15 0 13 0;
+#X connect 16 0 0 0;
+#X connect 16 1 0 1;

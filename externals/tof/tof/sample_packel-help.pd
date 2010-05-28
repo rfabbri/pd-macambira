@@ -1,0 +1,16 @@
+#N canvas 452 313 551 304 10;
+#X text 26 12 Description: Modifies a sample's information;
+#X text 26 30 Tags: Sample Sound;
+#X text 30 60 Warning: [tof/sample_packel] is only for advanced users!
+;
+#X msg 141 181 sample test;
+#X text 220 177 Inlet 2 \, sample symbol: the sample to be modified
+;
+#X msg 57 100 end 1000;
+#X msg 92 125 start 10;
+#X text 120 99 Change the end of the sample;
+#X text 150 122 Change the start of the sample;
+#X obj 57 210 tof/sample_packel;
+#X connect 3 0 9 1;
+#X connect 5 0 9 0;
+#X connect 6 0 9 0;
