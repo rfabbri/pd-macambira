@@ -1,27 +1,26 @@
-#N canvas 101 260 679 377 10;
-#X obj 87 331 dac~;
-#X obj 28 158 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#N canvas 109 159 710 482 10;
+#X obj 87 407 dac~;
+#X obj 28 181 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X obj 44 193 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 44 216 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X floatatom 95 224 5 0 0 0 - - -;
-#X obj 192 280 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X text 48 157 Inlet 1 \, bang: Play sample once;
-#X text 63 190 Inlet 1 \, float: Start/stop playing looped sample;
-#X text 216 251 Inlet 3 \, float: Duration in ms;
-#X text 217 275 Inlet 3 \, bang: Reset to orginal duration;
+#X floatatom 175 331 5 0 0 0 - - -;
+#X text 48 180 Inlet 1 \, bang: Play sample once;
+#X text 63 213 Inlet 1 \, float: Start/stop playing looped sample;
 #X text 34 28 Description: Pitchshifts or timestretches a sample with
 the FFT method;
 #X text 32 58 Tags: Sound Sample Play;
 #X obj 458 120 tof/sample smpfft amen.wav;
-#X text 133 222 Inlet 2 \, float: Pitch (1=normal);
-#X msg 173 253 10000;
-#X obj 28 296 tof/sample_shifft~ smpfft;
-#X connect 1 0 14 0;
-#X connect 2 0 14 0;
-#X connect 3 0 14 1;
-#X connect 4 0 14 2;
-#X connect 13 0 14 2;
-#X connect 14 0 0 0;
-#X connect 14 1 0 1;
+#X text 213 329 Inlet 2 \, float: Pitch (1=normal);
+#X obj 28 372 tof/sample_shifft~ smpfft;
+#X text 171 239 Inlet 1 \, duration float: Set duration in ms;
+#X text 163 268 Inlet 1 \, duration: Reset the duration;
+#X msg 93 267 duration;
+#X msg 75 241 duration 10000;
+#X connect 1 0 10 0;
+#X connect 2 0 10 0;
+#X connect 3 0 10 1;
+#X connect 10 0 0 0;
+#X connect 10 1 0 1;
+#X connect 13 0 10 0;
+#X connect 14 0 10 0;
