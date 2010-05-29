@@ -1,4 +1,4 @@
-#N canvas 1392 171 658 474 10;
+#N canvas 1134 242 766 482 10;
 #X text 227 253 Argument 1 \, symbol: the name of the sample to record
 to;
 #X text 44 4 Description: Records into samples;
@@ -8,8 +8,6 @@ to;
 1;
 #X text 239 44 A 10 second mono sample (at a samplerate of 44100);
 #X obj 239 65 tof/sample recording 441000 1;
-#X obj 65 253 sample_record~ recording;
-#X obj 74 374 tof/sample_play~ recording;
 #X obj 75 331 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj 74 416 dac~;
@@ -21,12 +19,13 @@ to;
 #X text 332 213 Inlet 3 \, sample symbol: set the sample;
 #X text 231 171 Inlet 3 \, float: turn recording on/off. The maximum
 recording length is limited by the size of the sample;
-#X text 70 310 You can play the recorded sample with [tof/sample_play~]
-;
-#X connect 3 0 7 0;
-#X connect 4 0 7 2;
-#X connect 8 0 10 0;
-#X connect 8 1 10 1;
-#X connect 9 0 8 0;
-#X connect 11 0 8 0;
-#X connect 12 0 7 2;
+#X obj 74 374 tof/sample_play~ recording;
+#X obj 65 253 sample_record~ recording;
+#X text 130 329 Play or loop the recording;
+#X connect 3 0 16 0;
+#X connect 4 0 16 2;
+#X connect 7 0 15 0;
+#X connect 9 0 15 0;
+#X connect 10 0 16 2;
+#X connect 15 0 8 0;
+#X connect 15 1 8 1;
