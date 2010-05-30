@@ -39,7 +39,7 @@ esac
 cd "${SCRIPT_DIR}/../.."
 auto_build_root_dir=`pwd`
 echo "build root: $auto_build_root_dir" 
-rsync_distro "$auto_build_root_dir"
+#rsync_distro "$auto_build_root_dir"
 
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
 make -C "${auto_build_root_dir}/packages" set_version

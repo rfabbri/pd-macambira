@@ -16,7 +16,7 @@ for root, dirs, files in os.walk('.'):
         pass
 #    print "root: " + root
     for name in files:
-        m = re.search(".*-help\.pd$", name)
+        m = re.search(".*\.pd$", name)
         if m:
             helppatch = os.path.join(root, m.string)
             fd = open(helppatch, 'r')
@@ -28,7 +28,8 @@ for root, dirs, files in os.walk('.'):
             print helppatch
             fd = open(helppatch, 'w')
             fd.write(firstline)
-            fd.write("#X declare -lib " + library.lower() + ";\n")
+#            fd.write("#X declare -lib " + library.lower() + ";\n")
+            fd.write("#X declare -path ..;\n")
             fd.writelines(contents)
             fd.close()
 

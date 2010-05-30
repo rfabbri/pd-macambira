@@ -53,11 +53,11 @@ else
 		  case `uname` in
 				Darwin)
 					 CONFIG_DIR=~/Library/Preferences
-					 CONFIG_FILE=org.puredata.pd.plist
+					 CONFIG_FILE=org.puredata.pdextended.plist
 					 ;;
 				Linux)
 					 CONFIG_DIR=~
-					 CONFIG_FILE=.pdsettings
+					 CONFIG_FILE=.pdextended
 					 ;;
 				*)
 					 echo "Not supported on this platform."
