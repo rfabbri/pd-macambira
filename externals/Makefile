@@ -1251,7 +1251,10 @@ mrpeach_install: mrpeach
 		--license "GNU GPL" \
 		--version "0.1"
 	install -p $(MRPEACH_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(MRPEACH_NAME)
-	install -p $(externals_src)/mrpeach/*/*-help.pd \
+	install -p $(externals_src)/mrpeach/*/*.pd \
+		$(DESTDIR)$(objectsdir)/$(MRPEACH_NAME)
+	install -p $(externals_src)/mrpeach/net/test.txt \
+		$(externals_src)/mrpeach/midifile/I_Wanna_Be_Sedated.mid \
 		$(DESTDIR)$(objectsdir)/$(MRPEACH_NAME)
 #	install -d $(DESTDIR)$(manualsdir)/$(MRPEACH_NAME)
 #	install -p $(externals_src)/mrpeach/manual.txt \
