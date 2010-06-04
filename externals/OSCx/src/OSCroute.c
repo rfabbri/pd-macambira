@@ -156,6 +156,7 @@ void OSCroute_setup(void) {
   
   post("OSCroute object version " OSC_ROUTE_VERSION " by Matt Wright. pd: jdl Win32 raf.");
   post("OSCroute Copyright © 1999 Regents of the Univ. of California. All Rights Reserved.");
+  error("[OSCroute]: OSCx is deprecated! \n\tConsider switching to mrpeach's [routeOSC]");
 }
 
 
@@ -170,7 +171,6 @@ void *OSCroute_new(t_symbol *s, int argc, t_atom *argv)
   int i;	//{{raf}} n not used
   
   // EnterCallback();
-  error("[OSCroute]: OSCx is deprecated! consider switching to mrpeach's [routeOSC]");
 
   if (argc > MAX_NUM) {
     post("* OSC-route: too many arguments: %ld (max %ld)", argc, MAX_NUM);

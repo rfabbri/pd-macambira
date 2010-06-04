@@ -263,8 +263,6 @@ static void *dumpOSC_new(t_symbol *compatflag,
   int udp = 1;
   t_symbol *castgroup=NULL;
 
-  error("[dumpOSC]: OSCx is deprecated! consider switching to mrpeach's [unpackOSC] and [udpreceive]");
-
 
   if (argc == 1) {
 	  if (argv[0].a_type==A_FLOAT)
@@ -386,6 +384,8 @@ void dumpOSC_setup(void)
     	(t_newmethod)dumpOSC_new, (t_method)dumpOSC_free,
 							  sizeof(t_dumpOSC), CLASS_NOINLET, A_GIMME, 0);
     class_sethelpsymbol(dumpOSC_class, gensym("dumpOSC-help.pd"));
+
+    error("[dumpOSC]: OSCx is deprecated! \n\tConsider switching to mrpeach's [unpackOSC] and [udpreceive]");
 }
 
 
