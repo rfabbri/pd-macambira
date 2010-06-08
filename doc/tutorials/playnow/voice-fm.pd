@@ -34,7 +34,7 @@
 #X text 236 555 released under the GNU GPL;
 #X text 395 255 click to record;
 #X obj 367 379 makesymbol voice-fm-%s.wav;
-#X obj 539 249 pddp_dsp;
+#X obj 539 249 pddp/dsp;
 #X connect 0 0 2 0;
 #X connect 2 0 3 0;
 #X connect 2 0 4 0;

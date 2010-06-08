@@ -164,7 +164,7 @@
 #X text 8 532 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 225 547 released under the GNU GPL;
-#X obj 585 264 pddp_dsp;
+#X obj 585 264 pddp/dsp;
 #X obj 201 326 f;
 #X text 117 190 Watch how a basic FM synth changes the waveform.;
 #X obj 432 450 dac~;

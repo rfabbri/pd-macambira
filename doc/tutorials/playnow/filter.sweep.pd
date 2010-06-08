@@ -149,7 +149,7 @@ more expensive than bp~.;
 #X text 520 218 12000;
 #X restore 498 177 pd conversion-tables;
 #X msg 565 55 \; pitch 48 \; speed -2 \; depth 27 \; offset 56 \; q
-2 \; dsp 1;
+2 \; pd dsp 1;
 #X connect 0 0 1 1;
 #X connect 1 0 0 0;
 #X connect 2 0 1 2;
