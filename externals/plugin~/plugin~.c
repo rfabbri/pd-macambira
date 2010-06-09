@@ -122,6 +122,8 @@ static void* plugin_tilde_new (t_symbol* s_name, t_symbol* s_lib_name)
                                     (unsigned long)sys_getsr ())) {
         error("plugin~: Unable to open plugin '%s' in '%s'", s_name->s_name, x->plugin_library_filename);
         plugin_tilde_ladspa_close_plugin (x);
+      } else {
+        post("plugin~: \"%s\"", x->plugin.ladspa.type->Name);
       }
     }
   }
@@ -380,6 +382,9 @@ static void plugin_tilde_plug (Pd_Plugin_Tilde* x, t_symbol* plug_name) {
     error("plugin~: plugin not found in any library");
   if (plugin_tilde_open_plugin (x, plug_name->s_name, x->plugin_library_filename,(unsigned long)sys_getsr ()))
     error("plugin~: Unable to open plugin");
+  else {
+    post("plugin~: \"%s\"", x->plugin.ladspa.type->Name);
+  }
 }
 
 static void plugin_tilde_reset (Pd_Plugin_Tilde* x)
