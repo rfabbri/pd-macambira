@@ -70,20 +70,20 @@ LADSPADirectoryPluginSearch (const char * pcDirectory,
 
       dlerror();
       fDescriptorFunction
-	= (LADSPA_Descriptor_Function)dlsym(pvPluginHandle,
-					    "ladspa_descriptor");
+        = (LADSPA_Descriptor_Function)dlsym(pvPluginHandle,
+                                            "ladspa_descriptor");
       if (dlerror() == NULL && fDescriptorFunction) {
-	/* We've successfully found a ladspa_descriptor function. Pass
+        /* We've successfully found a ladspa_descriptor function. Pass
            it to the callback function. */
-	fCallbackFunction(pcFilename,
-			  pvPluginHandle,
-			  fDescriptorFunction,
-			  user_data);
-	dlclose (pvPluginHandle);
+        fCallbackFunction(pcFilename,
+                          pvPluginHandle,
+                          fDescriptorFunction,
+                          user_data);
+        dlclose (pvPluginHandle);
       }
       else {
-	/* It was a library, but not a LADSPA one. Unload it. */
-	dlclose(pcFilename);
+        /* It was a library, but not a LADSPA one. Unload it. */
+        dlclose(pcFilename);
       }
     }
   }
@@ -103,7 +103,7 @@ LADSPAPluginSearch(LADSPAPluginSearchCallbackFunction fCallbackFunction,
 
   pcLADSPAPath = getenv("LADSPA_PATH");
   if (!pcLADSPAPath) {
-    fprintf(stderr, "Warning: no LADSPA_PATH, assuming /usr/lib/ladspa:/usr/local/lib/ladspa\n");
+    //fprintf(stderr, "Warning: no LADSPA_PATH, assuming /usr/lib/ladspa:/usr/local/lib/ladspa\n");
     pcLADSPAPath = "/usr/lib/ladspa:/usr/local/lib/ladspa";
   }
   
