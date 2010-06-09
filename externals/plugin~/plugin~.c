@@ -30,21 +30,18 @@
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #endif
 
-#define HAVE_LOCALE_H
 #ifdef HAVE_LOCALE_H
 # include <locale.h>
-
 static char*s_locale=NULL;
 static void plugin_tilde_pushlocale(void)
 {
-  if(s_locale)verbose(2, "pushing locale '%s'", s_locale);
+  if(s_locale)verbose(1, "pushing locale '%s'", s_locale);
   s_locale=setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
 }
-
 static void plugin_tilde_poplocale(void)
 {
-  if(!s_locale)verbose(2, "popping empty locale");
+  if(!s_locale)verbose(1, "popping empty locale");
   setlocale(LC_NUMERIC, s_locale);
   s_locale=NULL;
 }
@@ -52,7 +49,7 @@ static void plugin_tilde_poplocale(void)
 static void plugin_tilde_pushlocale(void) {
   static int again=0;
   if(!again) {
-    verbose(1, "plugins~: couldn't modify locales");
+    verbose(1, "plugins~: couldn't modify locales (compiled without locale.h)");
     verbose(1, "          if you experience weird characters try running Pd with LANG=C");
   }
   again=1;
@@ -97,10 +94,7 @@ static void* plugin_tilde_new (t_symbol* s_name, t_symbol* s_lib_name)
 
   /* Allocate object struct */
   x = (Pd_Plugin_Tilde*)pd_new (plugin_tilde_class);
-  assert (x != NULL);
-
-  plugin_tilde_pushlocale();
-
+  if(NULL==x)return NULL;
   /* Initialize object struct */
   x->plugin_library = NULL;
   x->plugin_library_filename = NULL;
@@ -160,19 +154,14 @@ static void* plugin_tilde_new (t_symbol* s_name, t_symbol* s_lib_name)
   /* Allocate memory for DSP parameters */
   x->dsp_vec_length = x->num_audio_inputs + x->num_audio_outputs + 2;
   x->dsp_vec = (t_int*)calloc (x->dsp_vec_length, sizeof (t_int));
-  assert (x->dsp_vec != NULL);
-  plugin_tilde_poplocale();
+
+  if(NULL==x->dsp_vec)return NULL;
   return x;
 }
 
 static void plugin_tilde_free (Pd_Plugin_Tilde* x)
 {
   unsigned i = 0;
-  plugin_tilde_pushlocale();
-
-  /* precondition(s) */
-  assert (x != NULL);
-
   /* Unload LADSPA/VST plugin */
   plugin_tilde_close_plugin (x);
 
@@ -209,7 +198,6 @@ static void plugin_tilde_free (Pd_Plugin_Tilde* x)
     free ((void*)x->plugin_library_filename);
     x->plugin_library_filename = NULL;
   }
-  plugin_tilde_poplocale();
 }
 
 static void plugin_tilde_dsp (Pd_Plugin_Tilde* x, t_signal** sp)
@@ -280,18 +268,12 @@ static void plugin_tilde_control (Pd_Plugin_Tilde* x,
 /* Change the value of a named control port of the plug-in */
 {
   unsigned parm_num = 0;
-  plugin_tilde_pushlocale();
-
-  /* precondition(s) */
-  assert (x != NULL);
-  /* FIXME we assert that the plug-in is already properly opened */
+  if(!plugin_tilde_have_plugin(x))return;
 
   if (ctrl_name->s_name == NULL || strlen (ctrl_name->s_name) == 0) {
     pd_error(x, "plugin~: control messages must have a name and a value");
     return;
   }
-
-  if(!plugin_tilde_have_plugin(x))return;
 
   parm_num = plugin_tilde_get_parm_number (x, ctrl_name->s_name);
   if (parm_num) {
@@ -300,7 +282,7 @@ static void plugin_tilde_control (Pd_Plugin_Tilde* x,
   else {
     plugin_tilde_set_control_input_by_name (x, ctrl_name->s_name, ctrl_value);
   }
-  plugin_tilde_poplocale();}
+}
 
 static void plugin_tilde_info (Pd_Plugin_Tilde* x) {
 
@@ -310,39 +292,45 @@ static void plugin_tilde_info (Pd_Plugin_Tilde* x) {
   LADSPA_PortRangeHintDescriptor iHintDescriptor;
 
   if(!plugin_tilde_have_plugin(x))return;
-  plugin_tilde_pushlocale();
-
-  at[0].a_type = A_SYMBOL;
-  at[1].a_type = A_SYMBOL;
-  at[2].a_type = A_SYMBOL;
-  at[3].a_type = A_FLOAT;
-  at[4].a_type = A_FLOAT;
 
   for (port_index = 0; port_index < x->plugin.ladspa.type->PortCount; port_index++) {
     port_type = x->plugin.ladspa.type->PortDescriptors[port_index];
     iHintDescriptor = x->plugin.ladspa.type->PortRangeHints[port_index].HintDescriptor;
 
-    if (LADSPA_IS_PORT_INPUT (port_type))
-      at[0].a_w.w_symbol = gensym ("in");
+    t_symbol*xlet=gensym("unknown");
+    t_symbol*type=gensym("unknown");
+    t_symbol*name=gensym("unknown");
+
+    t_float bound_lo=0.;
+    t_float bound_hi=1.;
+
+    if(LADSPA_IS_PORT_INPUT (port_type))
+      xlet=gensym("in");
     else if (LADSPA_IS_PORT_OUTPUT (port_type))
-      at[0].a_w.w_symbol = gensym ("out");
+      xlet=gensym("out");
+
     if (LADSPA_IS_PORT_CONTROL (port_type))
-      at[1].a_w.w_symbol = gensym ("control");
+      type=gensym("control");
     else if (LADSPA_IS_PORT_AUDIO (port_type))
-      at[1].a_w.w_symbol = gensym ("audio");
-    at[2].a_w.w_symbol = gensym ((char*)x->plugin.ladspa.type->PortNames[port_index]); 
+      type=gensym("audio");
+
+    name=gensym(x->plugin.ladspa.type->PortNames[port_index]);
+
     if (LADSPA_IS_HINT_BOUNDED_BELOW(iHintDescriptor))
-      at[3].a_w.w_float = x->plugin.ladspa.type->PortRangeHints[port_index].LowerBound;
-    else
-      at[3].a_w.w_float = 0;
+      bound_lo=x->plugin.ladspa.type->PortRangeHints[port_index].LowerBound;
     if (LADSPA_IS_HINT_BOUNDED_ABOVE(iHintDescriptor))
-      at[4].a_w.w_float = x->plugin.ladspa.type->PortRangeHints[port_index].UpperBound;
-    else
-      at[4].a_w.w_float = 1;
+      bound_hi=x->plugin.ladspa.type->PortRangeHints[port_index].UpperBound;
+
+    //    post("port#%d: %s %s %s  %f..%f", port_index, xlet->s_name, type->s_name, name->s_name, bound_lo, bound_hi);
+
+    SETSYMBOL(at+0, xlet);
+    SETSYMBOL(at+1, type);
+    SETSYMBOL(at+2, name);
+    SETFLOAT (at+3, bound_lo);
+    SETFLOAT (at+4, bound_hi);
 
     outlet_anything (x->control_outlet, gensym ("port"), 5, at);
   }
-  plugin_tilde_poplocale();
 }
 
 static void plugin_tilde_list (Pd_Plugin_Tilde* x) {
@@ -351,7 +339,6 @@ static void plugin_tilde_list (Pd_Plugin_Tilde* x) {
   plugin_tilde_pushlocale();
   LADSPAPluginSearch(plugin_tilde_ladspa_describe,(void*)user_data);
   plugin_tilde_poplocale();
-
 }
 
 static void plugin_tilde_ladspa_describe(const char * pcFullFilename, 
@@ -363,33 +350,26 @@ static void plugin_tilde_ladspa_describe(const char * pcFullFilename,
   const LADSPA_Descriptor * psDescriptor;
   long lIndex;
 
-  
-  at[0].a_type = A_SYMBOL;
-  at[0].a_w.w_symbol = gensym ((char*)pcFullFilename); 
+
+  SETSYMBOL(at, gensym(pcFullFilename));
   outlet_anything (x->control_outlet, gensym ("library"), 1, at);
  
   for (lIndex = 0;
        (psDescriptor = fDescriptorFunction(lIndex)) != NULL;
        lIndex++) {
-    at[0].a_w.w_symbol = gensym ((char*)psDescriptor->Name); 
+    SETSYMBOL(at, gensym ((char*)psDescriptor->Name)); 
     outlet_anything (x->control_outlet, gensym ("name"), 1, at);
-    at[0].a_w.w_symbol = gensym ((char*)psDescriptor->Label); 
+    SETSYMBOL(at, gensym ((char*)psDescriptor->Label)); 
     outlet_anything (x->control_outlet, gensym ("label"), 1, at);
-    at[0].a_type = A_FLOAT;
-    at[0].a_w.w_float = psDescriptor->UniqueID; 
+    SETFLOAT(at,  psDescriptor->UniqueID);
     outlet_anything (x->control_outlet, gensym ("id"), 1, at);
-    at[0].a_type = A_SYMBOL;
-    at[0].a_w.w_symbol = gensym ((char*)psDescriptor->Maker);
+    SETSYMBOL(at, gensym ((char*)psDescriptor->Maker));
     outlet_anything (x->control_outlet, gensym ("maker"), 1, at);
   }
-
-  dlclose(pvPluginHandle);
 }
 
 static void plugin_tilde_active (Pd_Plugin_Tilde* x, t_float active) {
-
   x->dsp_active = active;
-
 }
 
 static void plugin_tilde_plug (Pd_Plugin_Tilde* x, t_symbol* plug_name) {
@@ -404,12 +384,7 @@ static void plugin_tilde_plug (Pd_Plugin_Tilde* x, t_symbol* plug_name) {
 
 static void plugin_tilde_reset (Pd_Plugin_Tilde* x)
 {
-  /* precondition(s) */
-  assert (x != NULL);
-
   plugin_tilde_ladspa_reset (x);
-
-
 }
 
 static unsigned plugin_tilde_get_parm_number (Pd_Plugin_Tilde* x,
@@ -420,7 +395,6 @@ static unsigned plugin_tilde_get_parm_number (Pd_Plugin_Tilde* x,
   long num = 0;
   char* strend = NULL;
     
-  assert (x != NULL);
   if (str == NULL) {
     return 0;
   }
@@ -516,8 +490,10 @@ const char* plugin_tilde_ladspa_search_plugin (Pd_Plugin_Tilde* x,
   user_data[1] = (void*)name;
 
   lib_name = NULL;
+  plugin_tilde_pushlocale();
   LADSPAPluginSearch (plugin_tilde_ladspa_search_plugin_callback,
                       (void*)user_data);
+  plugin_tilde_poplocale();
 
   /* The callback (allocates and) writes lib_name, if it finds the plugin */
   return lib_name;
@@ -586,10 +562,12 @@ int plugin_tilde_ladspa_open_plugin (Pd_Plugin_Tilde* x,
   x->plugin.ladspa.sample_rate = sample_rate;
 
   /* Attempt to load the plugin. */
+  plugin_tilde_pushlocale();
   x->plugin_library = loadLADSPAPluginLibrary (lib_name);
   if (x->plugin_library == NULL)
     {
       /* error */
+      plugin_tilde_poplocale();
       error("plugin~: Unable to load LADSPA plugin library \"%s\"",
            lib_name);
       return 1;
@@ -597,6 +575,7 @@ int plugin_tilde_ladspa_open_plugin (Pd_Plugin_Tilde* x,
   x->plugin.ladspa.type = findLADSPAPluginDescriptor (x->plugin_library,
                                                       lib_name,
                                                       name);
+  plugin_tilde_poplocale();
   if (x->plugin.ladspa.type == NULL)
     {
       error("plugin~: Unable to find LADSPA plugin \"%s\" within library \"%s\"",
@@ -643,8 +622,6 @@ int plugin_tilde_ladspa_open_plugin (Pd_Plugin_Tilde* x,
 void plugin_tilde_ladspa_close_plugin (Pd_Plugin_Tilde* x)
 {
   /* precondition(s) */
-  assert (x != NULL);
-
   if (x->plugin.ladspa.instance != NULL)
     {
       /* Deactivate the plugin. */
@@ -724,7 +701,7 @@ void plugin_tilde_ladspa_reset (Pd_Plugin_Tilde* x)
   if (x->plugin.ladspa.type->activate != NULL
       && x->plugin.ladspa.type->deactivate == NULL)
     {
-      post("plugin~: Warning: Plug-in defines activate() method but no deactivate() method");
+      verbose(1, "plugin~: Warning: Plug-in defines activate() method but no deactivate() method");
     }
 
   /* reset plug-in by first deactivating and then re-activating it */
