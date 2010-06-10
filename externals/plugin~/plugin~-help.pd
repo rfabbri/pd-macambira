@@ -10,13 +10,13 @@
 #X msg 67 401 control gain \$1;
 #X floatatom 67 376 0 0 0 0 - - -;
 #X obj 658 353 plugin~ sine_fcac;
-#X msg 564 309 print;
+#X msg 564 309 info;
 #X obj 200 486 dac~;
 #X obj 20 47 plugin~ lpf;
 #X obj 429 50 plugin~ lpf filter.so;
 #X text 13 11 plugin~: LADSPA plug-in hosting for Pd.;
 #X obj 66 319 loadbang;
-#X msg 16 390 print;
+#X msg 16 390 info;
 #N canvas 0 22 450 300 graph1 0;
 #X array array1 100 float 0;
 #X coords 0 1 100 -1 200 140 1;
@@ -34,8 +34,8 @@ selected LADSPA plug-in library is searched.;
 #X obj 126 218 plugin~ lpf;
 #X text 106 114 In- and outlet functionality:;
 #X text 6 249 You can investigate the inputs and outputs by sending
-a "print" message to the first inlet.;
-#X msg 130 181 print;
+a "info" message to the first inlet.;
+#X msg 130 181 info;
 #X text 12 140 The first inlet is for control input messages. The first
 outlet is for control output messages \, correspondingly.;
 #X text 425 114 The rest inlets are for audio input and the rest outlets
