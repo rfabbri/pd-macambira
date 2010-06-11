@@ -66,7 +66,18 @@ darwin_app: darwin_app_core extended_install rez_install darwin_app_embed_libs s
 	@echo "Pd.app build succeeded!"
 
 extended_install:
+# on Mac OS X 10.6/Snow Leopard don't build Gem since it needs Carbon
+ifeq ($(shell uname -r | sed 's|10\.[0-9][0-9]*\.[0-9][0-9]*|10|'),10)
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) abstractions_install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) doc_install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) externals_install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) readme_install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) welcome_install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) license_install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) noncvs_install
+else
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) extended_install
+endif
 
 #------------------------------------------------------------------------------#
 # this target is for when you already have a pre-built Pd.app and you
