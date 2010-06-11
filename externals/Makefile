@@ -135,7 +135,11 @@ ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl apple
+# on Mac OS X 10.6/Snow Leopard don't build pidip and hid since they need Carbon
+    LIB_TARGETS += pdp gem2pdp iem16 pdp_opengl apple
+    ifneq ($(shell uname -r | sed 's|10\.[0-9][0-9]*\.[0-9][0-9]*|10|'),10)
+      LIB_TARGETS += hid pidip
+    endif
   else
     # GNU/Linux, BSD, IRIX, etc.
     LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl postlude
