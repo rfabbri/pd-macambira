@@ -1,5 +1,4 @@
 /* routeOSC.c 20060424 by Martin Peach, based on OSCroute and OSC-pattern-match.c. */
-/* 20060425 cleaned up some more */
 /* OSCroute.c header follows: */
 /*
 Written by Adrian Freed, The Center for New Music and Audio Technologies,
@@ -81,10 +80,6 @@ The OpenSound Control WWW page is
     Adapted from oscpattern.c, by Matt Wright and Amar Chaudhury
 */
 
-#if HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 /* the required include files */
 #include "m_pd.h"
 
@@ -143,12 +138,12 @@ void routeOSC_setup(void)
     class_addlist(routeOSC_class, routeOSC_list);
     class_addanything(routeOSC_class, routeOSC_doanything);
     class_addmethod(routeOSC_class, (t_method)routeOSC_set, gensym("set"), A_GIMME, 0);
-    class_sethelpsymbol(routeOSC_class, gensym("routeOSC-help.pd"));
+    class_sethelpsymbol(routeOSC_class, gensym("routeOSC"));
 
     ps_emptySymbol = gensym("");
 
-    post("routeOSC object version 1.0 by Martin Peach, based on OSCroute by Matt Wright. pd: jdl Win32 raf.");
-    post("OSCroute Copyright © 1999 Regents of the Univ. of California. All Rights Reserved.");
+//    post("routeOSC object version 1.0 by Martin Peach, based on OSCroute by Matt Wright. pd: jdl Win32 raf.");
+//    post("OSCroute Copyright © 1999 Regents of the Univ. of California. All Rights Reserved.");
 }
 
 /* instance creation routine */
@@ -173,19 +168,6 @@ static void *routeOSC_new(t_symbol *s, int argc, t_atom *argv)
                 x->x_prefixes[i] = argv[i].a_w.w_symbol->s_name;
                 ++(x->x_num);
             }
-#if 0
-/* this doesn't make sense to me MP20060425 */
-            else if (argv[i].a_w.w_symbol->s_name[0] == '#' &&
-                argv[i].a_w.w_symbol->s_name[1] >= '1' &&
-                argv[i].a_w.w_symbol->s_name[1] <= '9')
-            {
-               /* The Max programmer is trying to make a patch that will be
-                 a subpatch with arguments.  We have to make an outlet for this
-                 argument. */
-                x->x_prefixes[i] = "dummy";
-                ++(x->x_num);
-            }
-#endif /* 0 */
         }
         else if (argv[i].a_type == A_FLOAT)
         {
