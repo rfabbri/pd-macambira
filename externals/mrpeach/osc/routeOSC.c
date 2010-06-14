@@ -138,7 +138,6 @@ void routeOSC_setup(void)
     class_addlist(routeOSC_class, routeOSC_list);
     class_addanything(routeOSC_class, routeOSC_doanything);
     class_addmethod(routeOSC_class, (t_method)routeOSC_set, gensym("set"), A_GIMME, 0);
-    class_sethelpsymbol(routeOSC_class, gensym("routeOSC"));
 
     ps_emptySymbol = gensym("");
 
