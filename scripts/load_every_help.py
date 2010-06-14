@@ -165,7 +165,7 @@ now = time.localtime(time.time())
 date = time.strftime('20%y-%m-%d', now)
 datestamp = time.strftime('20%y-%m-%d_%H.%M.%S', now)
 
-outputfilename = 'load_every_help-' + datestamp + '.log'
+outputfilename = 'load_every_help_' + socket.gethostname() + '_' + datestamp + '.log'
 outputfile = '/tmp/' + outputfilename
 fd = open(outputfile, 'w')
 fd.writelines(logoutput)
@@ -174,7 +174,7 @@ fd.close()
 
 # make the email report
 fromaddr = 'pd@pdlab.idmi.poly.edu'
-toaddr = 'hans@eds.org'
+toaddr = 'hans@at.or.at'
 mailoutput = []
 mailoutput.append('From: ' + fromaddr + '\n')
 mailoutput.append('To: ' + toaddr + '\n')
@@ -186,7 +186,7 @@ mailoutput.append('http://autobuild.puredata.info/auto-build/' + date + '/'
 
 
 # upload the log file to the autobuild website
-rsyncfile = 'rsync://128.238.56.50/upload/' + date + '/' + outputfilename
+rsyncfile = 'rsync://128.238.56.50/upload/' + date + '/logs/' + outputfilename
 try:
     p = subprocess.Popen(['rsync', '-ax', outputfilename, rsyncfile],
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT).wait()
@@ -197,6 +197,6 @@ except:
 
 
 mailoutput.append('______________________________________________________________________\n\n')
-server = smtplib.SMTP('mail.eds.org')
+server = smtplib.SMTP('in1.smtp.messagingengine.com')
 server.sendmail(fromaddr, toaddr, ''.join(mailoutput + logoutput))
 server.quit()
