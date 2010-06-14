@@ -65,10 +65,6 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 
 */
 
-#if HAVE_CONFIG_H 
-#include <config.h> 
-#endif
-
 #include "m_pd.h"
 
     #include <stdio.h>
