@@ -48,9 +48,7 @@ def send_to_socket(message):
         print "socket timed out while sending"
 
 def send_to_pd(message):
-    print 'Sending to pd: ' + message
     send_to_socket('; pd ' + message + ';\n')
-    print 'finished sending'
 
 def open_patch(filename):
     dir, file = os.path.split(filename)
@@ -75,7 +73,6 @@ def quit_pd(process):
     send_to_pd('quit')
     time.sleep(1)
     try:
-        print 'Trying to kill pd'
         os.kill(process.pid, signal.SIGTERM)
     except OSError:
         print 'OSError on SIGTERM'
@@ -134,14 +131,12 @@ for root, dirs, files in os.walk(docdir):
         if m:
             patchoutput = []
             patch = os.path.join(root, m.string)
-            print 'checking ' + patch
             p = launch_pd()
             try:
                 open_patch(patch)
                 time.sleep(5)
                 close_patch(patch)
                 quit_pd(p)
-                print 'Finished ' + patch + '\n\n'
             except socket.error:
                 patchoutput.append('socket.error')                 
             while True:
