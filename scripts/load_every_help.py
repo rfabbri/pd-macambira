@@ -91,6 +91,7 @@ def remove_ignorelines(list):
         'sigmund version 0.03\n',
         'pique 0.1 for PD version 23\n',
         'this is pddplink 0.1, 3rd alpha build...\n',
+        'beware! this is tot 0.1, 19th alpha build...\n',
         '\n'
         ]
     ignorepatterns = [
