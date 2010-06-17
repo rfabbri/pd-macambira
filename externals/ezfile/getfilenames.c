@@ -37,8 +37,8 @@
 #include <stdio.h>
 #include <string.h>
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -49,6 +49,7 @@ typedef struct _getfilenames {
 	t_object            x_obj;
 	t_symbol*           x_pattern;
     t_canvas*           x_canvas;    
+    int                 isnewpattern;
 #ifdef _WIN32
 	HANDLE              hFind;
 #else
@@ -159,7 +160,7 @@ static void getfilenames_rewind(t_getfilenames* x)
 		}
 	} while (FindNextFile(hFind, &findData) != 0);
 	FindClose(hFind);
-#else
+#else /* systems with glob */
 	DEBUG(post("globbing %s",normalized_path););
     x->current_glob_position = 0;
 	switch( glob( normalized_path, GLOB_TILDE, NULL, &x->glob_buffer ) )
@@ -178,7 +179,7 @@ static void getfilenames_rewind(t_getfilenames* x)
         break;
 # endif
 	}
-#endif
+#endif /* _WIN32 */
 }
 
 
@@ -210,12 +211,17 @@ static void getfilenames_set(t_getfilenames* x, t_symbol *s)
 
 static void getfilenames_symbol(t_getfilenames *x, t_symbol *s) 
 {
-   getfilenames_set(x,s);
-   getfilenames_rewind(x);
+    getfilenames_set(x,s);
+    x->isnewpattern = 1;
 }
 
 static void getfilenames_bang(t_getfilenames *x) 
 {
+    if(x->isnewpattern) 
+    {
+        getfilenames_rewind(x);
+        x->isnewpattern = 0;
+    }
     if(x->current_glob_position < x->glob_buffer.gl_pathc) 
     {
 		outlet_symbol( x->data_outlet, 
@@ -249,11 +255,11 @@ static void *getfilenames_new(t_symbol *s)
 	{
 		currentdir = canvas_getcurrentdir();
 		strncpy(buffer,currentdir->s_name,MAXPDSTRING);
-        /* TODO this should default to the patch's dir */
 		strncat(buffer,"/*",MAXPDSTRING);
 		x->x_pattern = gensym(buffer);
-		post("setting pattern to default: %s",x->x_pattern->s_name);
+		post("setting pattern to default: *");
 	}
+    x->isnewpattern = 1;
 
 	return (x);
 }
