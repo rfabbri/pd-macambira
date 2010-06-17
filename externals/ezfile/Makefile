@@ -1,11 +1,11 @@
 ## Pd library template version 1.0
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
-LIBRARY_NAME = template
+LIBRARY_NAME = ezfile
 
 # add your .c source files to the SOURCES variable, help files will be
 # included automatically
-SOURCES = mycobject.c
+SOURCES = getfilenames.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
@@ -18,7 +18,7 @@ SOURCES_windows =
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = mypdobject.pd
+PDOBJECTS = 
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = bothtogether.pd

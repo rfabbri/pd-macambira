@@ -1,9 +1,10 @@
 /* --------------------------------------------------------------------------*/
 /*                                                                           */
-/* object for getting file listings using wildcard patterns                  */
+/* object for getting file listings using wildcard patterns,                 */
+/* based on the interface of [textfile]                                      */
 /* Written by Hans-Christoph Steiner <hans@at.or.at>                         */
 /*                                                                           */
-/* Copyright (c) 2006 Hans-Christoph Steiner                                 */
+/* Copyright (c) 2010 Hans-Christoph Steiner                                 */
 /*                                                                           */
 /* This program is free software; you can redistribute it and/or             */
 /* modify it under the terms of the GNU General Public License               */
@@ -36,21 +37,27 @@
 #include <stdio.h>
 #include <string.h>
 
-static char *version = "$Revision: 1.12 $";
-
-#define DEBUG(x)
-//#define DEBUG(x) x 
+//#define DEBUG(x)
+#define DEBUG(x) x 
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
  */
-static t_class *folder_list_class;
+static t_class *getfilenames_class;
 
-typedef struct _folder_list {
+typedef struct _getfilenames {
 	t_object            x_obj;
 	t_symbol*           x_pattern;
     t_canvas*           x_canvas;    
-} t_folder_list;
+#ifdef _WIN32
+	HANDLE              hFind;
+#else
+	glob_t              glob_buffer;
+    unsigned int        current_glob_position;
+#endif
+	t_outlet            *data_outlet;
+	t_outlet            *status_outlet;
+} t_getfilenames;
 
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
@@ -58,7 +65,7 @@ typedef struct _folder_list {
 
 // TODO: make FindFirstFile display when its just a dir
 
-static void normalize_path(t_folder_list* x, char *normalized, const char *original)
+static void normalize_path(t_getfilenames* x, char *normalized, const char *original)
 {
     char buf[FILENAME_MAX];
     t_symbol *cwd = canvas_getdir(x->x_canvas);
@@ -91,9 +98,9 @@ static void normalize_path(t_folder_list* x, char *normalized, const char *origi
     }
 }
 
-static void folder_list_output(t_folder_list* x)
+static void getfilenames_rewind(t_getfilenames* x)
 {
-	DEBUG(post("folder_list_output"););
+	DEBUG(post("getfilenames_rewind"););
     char normalized_path[FILENAME_MAX] = "";
 
     normalize_path(x, normalized_path, x->x_pattern->s_name);
@@ -120,7 +127,7 @@ static void folder_list_output(t_folder_list* x)
 	   {
        case ERROR_FILE_NOT_FOUND:
        case ERROR_PATH_NOT_FOUND:
-           pd_error(x,"[folder_list] nothing found for \"%s\"",x->x_pattern->s_name);
+           pd_error(x,"[getfilenames] nothing found for \"%s\"",x->x_pattern->s_name);
            break;
        default:
            FormatMessage(
@@ -131,7 +138,7 @@ static void folder_list_output(t_folder_list* x)
                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                (LPTSTR) &lpErrorMessage,
                0, NULL );
-           pd_error(x,"[folder_list] %s", (char *)lpErrorMessage);
+           pd_error(x,"[getfilenames] %s", (char *)lpErrorMessage);
 	   }
 	   return;
 	} 
@@ -148,41 +155,36 @@ static void folder_list_output(t_folder_list* x)
             strncpy(outputBuffer, pathBuffer, FILENAME_MAX);
 			strcat(outputBuffer,"/");
 			strcat(outputBuffer,findData.cFileName);
-			outlet_symbol( x->x_obj.ob_outlet, gensym(outputBuffer) );
+			outlet_symbol( x->data_outlet, gensym(outputBuffer) );
 		}
 	} while (FindNextFile(hFind, &findData) != 0);
 	FindClose(hFind);
 #else
-	unsigned int i;
-	glob_t glob_buffer;
-	
 	DEBUG(post("globbing %s",normalized_path););
-	switch( glob( normalized_path, GLOB_TILDE, NULL, &glob_buffer ) )
+    x->current_glob_position = 0;
+	switch( glob( normalized_path, GLOB_TILDE, NULL, &x->glob_buffer ) )
 	{
     case GLOB_NOSPACE: 
-        pd_error(x,"[folder_list] out of memory for \"%s\"",normalized_path); 
+        pd_error(x,"[getfilenames] out of memory for \"%s\"",normalized_path); 
         break;
 # ifdef GLOB_ABORTED
     case GLOB_ABORTED: 
-        pd_error(x,"[folder_list] aborted \"%s\"",normalized_path); 
+        pd_error(x,"[getfilenames] aborted \"%s\"",normalized_path); 
         break;
 # endif
 # ifdef GLOB_NOMATCH
     case GLOB_NOMATCH: 
-        pd_error(x,"[folder_list] nothing found for \"%s\"",normalized_path); 
+        pd_error(x,"[getfilenames] nothing found for \"%s\"",normalized_path); 
         break;
 # endif
 	}
-	for(i = 0; i < glob_buffer.gl_pathc; i++)
-		outlet_symbol( x->x_obj.ob_outlet, gensym(glob_buffer.gl_pathv[i]) );
-	globfree( &(glob_buffer) );
 #endif
 }
 
 
-static void folder_list_set(t_folder_list* x, t_symbol *s) 
+static void getfilenames_set(t_getfilenames* x, t_symbol *s) 
 {
-	DEBUG(post("folder_list_set"););
+	DEBUG(post("getfilenames_set"););
 #ifdef _WIN32
     char *patternBuffer;
     char envVarBuffer[FILENAME_MAX];
@@ -200,31 +202,43 @@ static void folder_list_set(t_folder_list* x, t_symbol *s)
 	ExpandEnvironmentStrings(patternBuffer, envVarBuffer, FILENAME_MAX - 2);
 	x->x_pattern = gensym(envVarBuffer);
 #else  // UNIX
-    // TODO translate env vars to a full path
+    // TODO translate env vars to a full path using /bin/sh and exec
 	x->x_pattern = s;
 #endif /* _WIN32 */
 }
 
 
-static void folder_list_symbol(t_folder_list *x, t_symbol *s) 
+static void getfilenames_symbol(t_getfilenames *x, t_symbol *s) 
 {
-   folder_list_set(x,s);
-   folder_list_output(x);
+   getfilenames_set(x,s);
+   getfilenames_rewind(x);
 }
 
-
-static void *folder_list_new(t_symbol *s) 
+static void getfilenames_bang(t_getfilenames *x) 
 {
-	DEBUG(post("folder_list_new"););
+    if(x->current_glob_position < x->glob_buffer.gl_pathc) 
+    {
+		outlet_symbol( x->data_outlet, 
+                       gensym(x->glob_buffer.gl_pathv[x->current_glob_position]) );
+        x->current_glob_position++;
+    }
+    else
+        outlet_bang(x->status_outlet);
+}
 
-	t_folder_list *x = (t_folder_list *)pd_new(folder_list_class);
+static void *getfilenames_new(t_symbol *s)
+{
+	DEBUG(post("getfilenames_new"););
+
+	t_getfilenames *x = (t_getfilenames *)pd_new(getfilenames_class);
 	t_symbol *currentdir;
 	char buffer[MAXPDSTRING];
 
     x->x_canvas =  canvas_getcurrent();
 
     symbolinlet_new(&x->x_obj, &x->x_pattern);
-	outlet_new(&x->x_obj, &s_symbol);
+    x->data_outlet = outlet_new(&x->x_obj, &s_symbol);
+    x->status_outlet = outlet_new(&x->x_obj, 0);
 	
 	/* set to the value from the object argument, if that exists */
 	if (s != &s_)
@@ -235,6 +249,7 @@ static void *folder_list_new(t_symbol *s)
 	{
 		currentdir = canvas_getcurrentdir();
 		strncpy(buffer,currentdir->s_name,MAXPDSTRING);
+        /* TODO this should default to the patch's dir */
 		strncat(buffer,"/*",MAXPDSTRING);
 		x->x_pattern = gensym(buffer);
 		post("setting pattern to default: %s",x->x_pattern->s_name);
@@ -243,22 +258,29 @@ static void *folder_list_new(t_symbol *s)
 	return (x);
 }
 
-void folder_list_setup(void) 
+static void getfilenames_free(t_getfilenames *x)
 {
-	DEBUG(post("folder_list_setup"););
-	folder_list_class = class_new(gensym("folder_list"), 
-								  (t_newmethod)folder_list_new, 
-								  0,
-								  sizeof(t_folder_list), 
+	globfree( &(x->glob_buffer) );
+}
+
+void getfilenames_setup(void) 
+{
+	DEBUG(post("getfilenames_setup"););
+	getfilenames_class = class_new(gensym("getfilenames"), 
+								  (t_newmethod)getfilenames_new, 
+								  (t_method)getfilenames_free, 
+								  sizeof(t_getfilenames), 
 								  0, 
 								  A_DEFSYMBOL, 
 								  0);
 	/* add inlet datatype methods */
-	class_addbang(folder_list_class,(t_method) folder_list_output);
-	class_addsymbol(folder_list_class,(t_method) folder_list_symbol);
+	class_addbang(getfilenames_class, (t_method) getfilenames_bang);
+	class_addsymbol(getfilenames_class, (t_method) getfilenames_symbol);
 	
 	/* add inlet message methods */
-	class_addmethod(folder_list_class,(t_method) folder_list_set,gensym("set"), 
-					A_DEFSYMBOL, 0);
+	class_addmethod(getfilenames_class, (t_method) getfilenames_set,
+                    gensym("set"), A_DEFSYMBOL, 0);
+	class_addmethod(getfilenames_class, (t_method) getfilenames_rewind,
+                    gensym("rewind"), 0);
 }
 
