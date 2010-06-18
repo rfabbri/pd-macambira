@@ -48,7 +48,7 @@ static void popen_anything(t_popen *x, t_symbol *s, int argc, t_atom *argv)
   strcat(cmd, arg);
   post("sending %s",cmd);
 
-#ifdef NT
+#ifdef _WIN32
   if( (pPipe = _popen( cmd, "rt" )) == NULL )
 #else
   if( (pPipe = popen( cmd, "r" )) == NULL )
@@ -60,7 +60,7 @@ static void popen_anything(t_popen *x, t_symbol *s, int argc, t_atom *argv)
       if( fgets( x->buffer, 128, pPipe ) != NULL )
 	popen_out(x);
     }
-#ifdef NT
+#ifdef _WIN32
   _pclose( pPipe );
 #else
   pclose( pPipe );
