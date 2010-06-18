@@ -47,9 +47,9 @@ static t_class *getfilenames_class;
 
 typedef struct _getfilenames {
 	t_object            x_obj;
-	t_symbol*           x_pattern;
     t_canvas*           x_canvas;    
-    int                 isnewpattern;
+	t_symbol*           x_pattern;
+	t_symbol*           active_pattern;
 #ifdef _WIN32
 	HANDLE              hFind;
 #else
@@ -71,8 +71,21 @@ static void normalize_path(t_getfilenames* x, char *normalized, const char *orig
     char buf[FILENAME_MAX];
     t_symbol *cwd = canvas_getdir(x->x_canvas);
 #ifdef _WIN32
-    sys_unbashfilename(original, buf);
+    char patternBuffer[FILENAME_MAX];
+    char envVarBuffer[FILENAME_MAX];
+    if( (original[0] == '~') && (original[1] == '/'))
+    {
+        strcpy(patternBuffer,"%USERPROFILE%");
+        strncat(patternBuffer, original + 1, FILENAME_MAX - 1);
+    }
+    else
+    {
+        patternBuffer = original;
+    }
+	ExpandEnvironmentStrings(patternBuffer, envVarBuffer, FILENAME_MAX - 2);
+    sys_unbashfilename(envVarBuffer, buf);
 #else
+    // TODO translate env vars to a full path using /bin/sh and exec
     strncpy(buf, original, FILENAME_MAX);
 #endif
     if(sys_isabsolutepath(buf)) {
@@ -104,7 +117,7 @@ static void getfilenames_rewind(t_getfilenames* x)
 	DEBUG(post("getfilenames_rewind"););
     char normalized_path[FILENAME_MAX] = "";
 
-    normalize_path(x, normalized_path, x->x_pattern->s_name);
+    normalize_path(x, normalized_path, x->active_pattern->s_name);
 #ifdef _WIN32
 	WIN32_FIND_DATA findData;
 	HANDLE hFind;
@@ -128,7 +141,8 @@ static void getfilenames_rewind(t_getfilenames* x)
 	   {
        case ERROR_FILE_NOT_FOUND:
        case ERROR_PATH_NOT_FOUND:
-           pd_error(x,"[getfilenames] nothing found for \"%s\"",x->x_pattern->s_name);
+           pd_error(x,"[getfilenames] nothing found for \"%s\"",
+                    x->active_pattern->s_name);
            break;
        default:
            FormatMessage(
@@ -182,45 +196,13 @@ static void getfilenames_rewind(t_getfilenames* x)
 #endif /* _WIN32 */
 }
 
-
-static void getfilenames_set(t_getfilenames* x, t_symbol *s) 
-{
-	DEBUG(post("getfilenames_set"););
-#ifdef _WIN32
-    char *patternBuffer;
-    char envVarBuffer[FILENAME_MAX];
-    if( (s->s_name[0] == '~') && (s->s_name[1] == '/'))
-    {
-        patternBuffer = getbytes(FILENAME_MAX);
-        strcpy(patternBuffer,"%USERPROFILE%");
-        strncat(patternBuffer, s->s_name + 1, FILENAME_MAX - 1);
-        post("set: %s", patternBuffer);
-    }
-    else
-    {
-        patternBuffer = s->s_name;
-    }
-	ExpandEnvironmentStrings(patternBuffer, envVarBuffer, FILENAME_MAX - 2);
-	x->x_pattern = gensym(envVarBuffer);
-#else  // UNIX
-    // TODO translate env vars to a full path using /bin/sh and exec
-	x->x_pattern = s;
-#endif /* _WIN32 */
-}
-
-
-static void getfilenames_symbol(t_getfilenames *x, t_symbol *s) 
-{
-    getfilenames_set(x,s);
-    x->isnewpattern = 1;
-}
-
 static void getfilenames_bang(t_getfilenames *x) 
 {
-    if(x->isnewpattern) 
+    if(x->x_pattern != x->active_pattern) 
     {
+        x->active_pattern = x->x_pattern;
+        post("x->active_pattern %s x->x_pattern %s", x->active_pattern->s_name, x->x_pattern->s_name);
         getfilenames_rewind(x);
-        x->isnewpattern = 0;
     }
     if(x->current_glob_position < x->glob_buffer.gl_pathc) 
     {
@@ -232,6 +214,16 @@ static void getfilenames_bang(t_getfilenames *x)
         outlet_bang(x->status_outlet);
 }
 
+static void getfilenames_float(t_getfilenames *x, t_float f)
+{
+    unsigned int position = (unsigned int)f;
+    if(x->current_glob_position != position)
+    {
+        x->current_glob_position = position;
+        getfilenames_bang(x);
+    }
+}
+
 static void *getfilenames_new(t_symbol *s)
 {
 	DEBUG(post("getfilenames_new"););
@@ -240,7 +232,7 @@ static void *getfilenames_new(t_symbol *s)
 	t_symbol *currentdir;
 	char buffer[MAXPDSTRING];
 
-    x->x_canvas =  canvas_getcurrent();
+    x->x_canvas = canvas_getcurrent();
 
     symbolinlet_new(&x->x_obj, &x->x_pattern);
     x->data_outlet = outlet_new(&x->x_obj, &s_symbol);
@@ -250,6 +242,7 @@ static void *getfilenames_new(t_symbol *s)
 	if (s != &s_)
 	{
 		x->x_pattern = s;
+        verbose(4, "setting pattern to: %s", x->x_pattern->s_name);
 	}
 	else
 	{
@@ -257,9 +250,10 @@ static void *getfilenames_new(t_symbol *s)
 		strncpy(buffer,currentdir->s_name,MAXPDSTRING);
 		strncat(buffer,"/*",MAXPDSTRING);
 		x->x_pattern = gensym(buffer);
-		post("setting pattern to default: *");
+        verbose(4, "setting pattern to default: *");
 	}
-    x->isnewpattern = 1;
+    /* this is activated in getfilenames_bang() */
+    x->active_pattern = &s_;
 
 	return (x);
 }
@@ -281,11 +275,9 @@ void getfilenames_setup(void)
 								  0);
 	/* add inlet datatype methods */
 	class_addbang(getfilenames_class, (t_method) getfilenames_bang);
-	class_addsymbol(getfilenames_class, (t_method) getfilenames_symbol);
+	class_addfloat(getfilenames_class, (t_method) getfilenames_float);
 	
 	/* add inlet message methods */
-	class_addmethod(getfilenames_class, (t_method) getfilenames_set,
-                    gensym("set"), A_DEFSYMBOL, 0);
 	class_addmethod(getfilenames_class, (t_method) getfilenames_rewind,
                     gensym("rewind"), 0);
 }
