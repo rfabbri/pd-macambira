@@ -260,9 +260,9 @@ endif
 		install -p $(gem_src)/examples/$$dir/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ;\
 	done
 	install -d $(DESTDIR)$(examplesdir)
-	ln -s $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples $(DESTDIR)$(examplesdir)/$(GEM_NAME)
+	ln -s ../../extra/$(GEM_NAME)/examples $(DESTDIR)$(examplesdir)/$(GEM_NAME)
 	install -d  $(DESTDIR)$(manualsdir)
-	ln -s $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual $(DESTDIR)$(manualsdir)/$(GEM_NAME)
+	ln -s ../../extra/$(GEM_NAME)/manual $(DESTDIR)$(manualsdir)/$(GEM_NAME)
 
 
 #------------------------------------------------------------------------------
