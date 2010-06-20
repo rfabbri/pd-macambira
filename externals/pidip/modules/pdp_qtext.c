@@ -278,8 +278,6 @@ static void pdp_qtext_add(t_pdp_qtext *x, t_symbol *s, int argc, t_atom *argv)
          ndigits=0;
          piname=pname+1;
          while ( isdigit( *(piname++) ) ) ndigits++;
-         
-         ivalue=atoi(pname+1);
 
          // special case %%
          if ( ( pname != argv[0].a_w.w_symbol->s_name ) && ( *(pname+1) == '%' ) )
@@ -288,7 +286,49 @@ static void pdp_qtext_add(t_pdp_qtext *x, t_symbol *s, int argc, t_atom *argv)
             pname++;
             continue;
          } 
-         *(pdname++)=(char)ivalue;
+
+         ivalue=atoi(pname+1);
+         // encode to utf
+         if ( ivalue < 0x7F )
+         {
+            *(pdname++)=(char)ivalue;
+         }
+         else if ( ivalue <= 0x7FF )
+         {
+            *(pdname++)=(char)(192 + (ivalue/64));
+            *(pdname++)=(char)(128 + (ivalue%64));
+         }
+         else if ( ivalue <= 0xFFFF )
+         {
+            *(pdname++)=(char)(224 + (ivalue/4096));
+            *(pdname++)=(char)(128 + ((ivalue/64)%64));
+            *(pdname++)=(char)(128 + (ivalue%64));
+         }
+         else if ( ivalue <= 0x1FFFFF )
+         {
+            *(pdname++)=(char)(240 + (ivalue/262144));
+            *(pdname++)=(char)(128 + ((ivalue/4096)%64));
+            *(pdname++)=(char)(128 + ((ivalue/64)%64));
+            *(pdname++)=(char)(128 + (ivalue%64));
+         }
+         else if ( ivalue <= 0x3FFFFFF )
+         {
+            *(pdname++)=(char)(248 + (ivalue/16777216));
+            *(pdname++)=(char)(128 + ((ivalue/262144)%64));
+            *(pdname++)=(char)(128 + ((ivalue/4096)%64));
+            *(pdname++)=(char)(128 + ((ivalue/64)%64));
+            *(pdname++)=(char)(128 + (ivalue%64));
+         }
+         else if ( ivalue <= 0x7FFFFFFF )
+         {
+            *(pdname++)=(char)(252 + (ivalue/1073741824));
+            *(pdname++)=(char)(128 + ((ivalue/16777216)%64));
+            *(pdname++)=(char)(128 + ((ivalue/262144)%64));
+            *(pdname++)=(char)(128 + ((ivalue/4096)%64));
+            *(pdname++)=(char)(128 + ((ivalue/64)%64));
+            *(pdname++)=(char)(128 + (ivalue%64));
+         }
+
          pname+=ndigits+1;
       }
       else if ( !strncmp( pname, "\"", 1 ) ) // quotes are ignored unless %34
@@ -1086,8 +1126,25 @@ void pdp_qtext_setup(void)
     font = imlib_load_font(DEFAULT_FONT);
     if ( !font )
     {
-        error( "[pdp_qtext] error: could not load default font, no text rendering!" );
-        post( "\tinstall Bitstream Vera, it's free! (http://www.gnome.org/fonts/)" );
+      char **ifonts;
+      int nbfonts, jf;
+      char fname[64];
+
+        ifonts = imlib_list_fonts( &nbfonts );
+        for ( jf=0; jf<nbfonts; jf++ )
+        {
+           sprintf( fname, "%s/14", ifonts[jf] );
+           font = imlib_load_font( fname );
+           if ( !font )
+           {
+              post( "[pdp_qtext] error loading font : %s", fname );
+           }
+           else
+           {
+              post( "[pdp_qtext] using font : %s", fname );
+              break;
+           }
+        }
     }
     imlib_context_set_font( font );
 }
