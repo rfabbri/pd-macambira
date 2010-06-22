@@ -22,6 +22,7 @@ void iemtx_colon_setup(void); /* mtx_colon.c */
 void iemtx_concat_setup(void); /* mtx_concat.c */
 void iemtx_conv_setup(void); /* mtx_conv.c */
 void iemtx_cos_setup(void); /* mtx_cos.c */
+void iemtx_cumprod_setup(void); /* mtx_cumprod.c */
 void iemtx_cumsum_setup(void); /* mtx_cumsum.c */
 void iemtx_dbtopow_setup(void); /* mtx_dbtopow.c */
 void iemtx_dbtorms_setup(void); /* mtx_dbtorms.c */

@@ -24,6 +24,7 @@ void iemmatrix_sources_setup(void)
 	iemtx_concat_setup(); /* mtx_concat.c */
 	iemtx_conv_setup(); /* mtx_conv.c */
 	iemtx_cos_setup(); /* mtx_cos.c */
+	iemtx_cumprod_setup(); /* mtx_cumprod.c */
 	iemtx_cumsum_setup(); /* mtx_cumsum.c */
 	iemtx_dbtopow_setup(); /* mtx_dbtopow.c */
 	iemtx_dbtorms_setup(); /* mtx_dbtorms.c */
