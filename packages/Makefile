@@ -259,10 +259,12 @@ endif
 		install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ; \
 		install -p $(gem_src)/examples/$$dir/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ;\
 	done
+ifneq ($(OS_NAME),windows)
 	install -d $(DESTDIR)$(examplesdir)
 	ln -s ../../extra/$(GEM_NAME)/examples $(DESTDIR)$(examplesdir)/$(GEM_NAME)
 	install -d  $(DESTDIR)$(manualsdir)
 	ln -s ../../extra/$(GEM_NAME)/manual $(DESTDIR)$(manualsdir)/$(GEM_NAME)
+endif
 
 
 #------------------------------------------------------------------------------
