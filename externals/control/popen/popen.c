@@ -32,7 +32,7 @@ static void popen_anything(t_popen *x, t_symbol *s, int argc, t_atom *argv)
 {
   int i;
   char arg[MAXPDSTRING];
-  char cmd[20] = "";
+  char cmd[MAXPDSTRING] = "";
   FILE *pPipe;
   int size = 0;
   for (i=0;i<argc;i++) {
