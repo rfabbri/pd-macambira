@@ -1,7 +1,9 @@
-#N canvas 886 226 450 300 10;
-#X obj 127 128 screensaver;
+#N canvas 711 230 450 300 10;
+#X obj 127 148 screensaver;
 #X obj 130 96 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 0 1;
+-1 -1 7900 1;
 #X text 43 31 set the screensaver timer (in seconds). 0 turns the screensaver
 off;
+#X floatatom 141 126 5 0 0 1 seconds - -;
 #X connect 1 0 0 0;
+#X connect 1 0 3 0;
