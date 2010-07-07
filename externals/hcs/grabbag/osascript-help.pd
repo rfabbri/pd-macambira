@@ -1,0 +1,9 @@
+#N canvas 264 225 450 300 10;
+#X obj 47 213 osascript;
+#X text 21 23 run AppleScripts on Mac OS X;
+#X msg 33 99 tell application "safari" to open location "http://puredata.info"
+;
+#X msg 64 152 tell application "firefox" to open location "http://puredata.info"
+;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
