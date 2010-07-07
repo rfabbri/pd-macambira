@@ -144,13 +144,13 @@ static void udpsend_send(t_udpsend *x, t_symbol *s, int argc, t_atom *argv)
             e = f - d;
             if (e != 0)
             {
-                error("udpsend_send: item %d (%f) is not an integer", i, f);
+                pd_error(x, "udpsend_send: item %d (%f) is not an integer", i, f);
                 return;
             }
 	        c = (unsigned char)d;
 	        if (c != d)
             {
-                error("udpsend_send: item %d (%f) is not between 0 and 255", i, f);
+                pd_error(x, "udpsend_send: item %d (%f) is not between 0 and 255", i, f);
                 return;
             }
 #ifdef DEBUG
@@ -193,7 +193,7 @@ static void udpsend_send(t_udpsend *x, t_symbol *s, int argc, t_atom *argv)
         }
         else
         {
-            error("udpsend_send: item %d is not a float or a file name", i);
+            pd_error(x, "udpsend_send: item %d is not a float or a file name", i);
             return;
         }
     }
@@ -231,7 +231,7 @@ static void udpsend_send(t_udpsend *x, t_symbol *s, int argc, t_atom *argv)
 	        }
         }
     }
-    else error("udpsend: not connected");
+    else pd_error(x, "udpsend: not connected");
 }
 
 static void udpsend_free(t_udpsend *x)

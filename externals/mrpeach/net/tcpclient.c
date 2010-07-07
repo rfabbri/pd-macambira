@@ -266,12 +266,12 @@ static void tcpclient_send(t_tcpclient *x, t_symbol *s, int argc, t_atom *argv)
             e = f - d;
             if (e != 0)
             {
-                error("%s_send: item %d (%f) is not an integer", objName, i, f);
+                pd_error(x, "%s_send: item %d (%f) is not an integer", objName, i, f);
                 return;
             }
             if ((d < 0) || (d > 255))
             {
-                error("%s: item %d (%f) is not between 0 and 255", objName, i, f);
+                pd_error(x, "%s: item %d (%f) is not between 0 and 255", objName, i, f);
                 return;
             }
             c = (unsigned char)d;
@@ -312,7 +312,7 @@ static void tcpclient_send(t_tcpclient *x, t_symbol *s, int argc, t_atom *argv)
         }
         else
         {
-            error("%s_send: item %d is not a float or a file name", objName, i);
+            pd_error(x, "%s_send: item %d is not a float or a file name", objName, i);
             return;
         }
     }
@@ -330,7 +330,7 @@ int tcpclient_send_buf(t_tcpclient *x, char *buf, int buf_len)
     if (x->x_blocked) return 0;
     if (x->x_fd < 0)
     {
-        error("%s: not connected", objName);
+        pd_error(x, "%s: not connected", objName);
         x->x_blocked++;
         return 0;
     }
@@ -463,7 +463,7 @@ static void tcpclient_rcv(t_tcpclient *x)
         ret = select(sockfd+1, &readset, NULL, &exceptset, &ztout);
         if(ret < 0)
         {
-            error("%s: unable to read from socket", objName);
+            pd_error(x, "%s: unable to read from socket", objName);
             sys_closesocket(sockfd);
             return;
         }

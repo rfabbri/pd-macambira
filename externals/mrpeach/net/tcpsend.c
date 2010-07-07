@@ -142,13 +142,13 @@ static void tcpsend_send(t_tcpsend *x, t_symbol *s, int argc, t_atom *argv)
             e = f - d;
             if (e != 0)
             {
-                error("tcpsend_send: item %d (%f) is not an integer", i, f);
+                pd_error(x, "tcpsend_send: item %d (%f) is not an integer", i, f);
                 return;
             }
 	        c = (unsigned char)d;
 	        if (c != d)
             {
-                error("tcpsend_send: item %d (%f) is not between 0 and 255", i, f);
+                pd_error(x, "tcpsend_send: item %d (%f) is not between 0 and 255", i, f);
                 return;
             }
 #ifdef DEBUG
@@ -191,7 +191,7 @@ static void tcpsend_send(t_tcpsend *x, t_symbol *s, int argc, t_atom *argv)
         }
         else
 	    {
-            error("tcpsend_send: item %d is not a float or a file name", i);
+            pd_error(x, "tcpsend_send: item %d is not a float or a file name", i);
             return;
         }
     }
@@ -229,7 +229,7 @@ static void tcpsend_send(t_tcpsend *x, t_symbol *s, int argc, t_atom *argv)
 	        }
         }
     }
-    else error("tcpsend: not connected");
+    else pd_error(x, "tcpsend: not connected");
 }
 
 static void tcpsend_free(t_tcpsend *x)
