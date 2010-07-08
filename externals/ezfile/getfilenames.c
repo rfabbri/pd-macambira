@@ -40,6 +40,9 @@
 #define DEBUG(x)
 //#define DEBUG(x) x 
 
+// TODO check out what happens with [getfilesnames $1] and empty args
+// TODO using an A_GIMME to support floats, etc as file names
+
 /*------------------------------------------------------------------------------
  *  CLASS DEF
  */
@@ -57,8 +60,16 @@ typedef struct _getfilenames {
     unsigned int        current_glob_position;
 #endif
 	t_outlet            *data_outlet;
-	t_outlet            *status_outlet;
+	t_outlet            *info_outlet;
+	t_outlet            *endoflist_outlet;
 } t_getfilenames;
+
+/*------------------------------------------------------------------------------
+ *  GLOBAL VARIABLES
+ */
+
+/* pre-generated symbols */
+t_symbol *ps_info, *ps_matches, *ps_pattern, *ps_position, *ps_rewind;
 
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
@@ -111,6 +122,38 @@ static void normalize_path(t_getfilenames* x, char *normalized, const char *orig
         strncpy(normalized, buf, FILENAME_MAX);
     }
 }
+
+/* functions for implementing the querying methods */
+
+static void getfilenames_matches(t_getfilenames *x)
+{
+    t_atom output_atom;
+    SETFLOAT(&output_atom, (t_float)x->glob_buffer.gl_matchc);
+    outlet_anything(x->info_outlet, ps_matches, 1, &output_atom);
+}
+
+static void getfilenames_pattern(t_getfilenames *x)
+{
+    t_atom output_atom;
+    SETSYMBOL(&output_atom, x->x_pattern);
+    outlet_anything(x->info_outlet, ps_pattern, 1, &output_atom);
+}
+
+static void getfilenames_position(t_getfilenames *x)
+{
+    t_atom output_atom;
+    SETFLOAT(&output_atom, x->current_glob_position);
+    outlet_anything(x->info_outlet, ps_position, 1, &output_atom);
+}
+
+static void getfilenames_info(t_getfilenames *x)
+{
+    getfilenames_matches(x);
+    getfilenames_pattern(x);
+    getfilenames_position(x);
+}
+
+/* working functions */
 
 static void getfilenames_rewind(t_getfilenames* x)
 {
@@ -189,7 +232,7 @@ static void getfilenames_rewind(t_getfilenames* x)
 # endif
 # ifdef GLOB_NOMATCH
     case GLOB_NOMATCH: 
-        pd_error(x,"[getfilenames] nothing found for \"%s\"",normalized_path); 
+        verbose(4, "[getfilenames] nothing found for \"%s\"",normalized_path); 
         break;
 # endif
 	}
@@ -201,17 +244,19 @@ static void getfilenames_bang(t_getfilenames *x)
     if(x->x_pattern != x->active_pattern) 
     {
         x->active_pattern = x->x_pattern;
-        post("x->active_pattern %s x->x_pattern %s", x->active_pattern->s_name, x->x_pattern->s_name);
+//        post("x->active_pattern %s x->x_pattern %s", x->active_pattern->s_name, x->x_pattern->s_name);
         getfilenames_rewind(x);
+        getfilenames_info(x); /* after opening new glob, output meta info */
     }
     if(x->current_glob_position < x->glob_buffer.gl_pathc) 
     {
-		outlet_symbol( x->data_outlet, 
-                       gensym(x->glob_buffer.gl_pathv[x->current_glob_position]) );
+        getfilenames_position(x);
+		outlet_symbol(x->data_outlet, 
+                       gensym(x->glob_buffer.gl_pathv[x->current_glob_position]));
         x->current_glob_position++;
     }
     else
-        outlet_bang(x->status_outlet);
+        outlet_bang(x->endoflist_outlet);
 }
 
 static void getfilenames_float(t_getfilenames *x, t_float f)
@@ -220,9 +265,18 @@ static void getfilenames_float(t_getfilenames *x, t_float f)
     if(x->current_glob_position != position)
     {
         x->current_glob_position = position;
-        getfilenames_bang(x);
+        if(x->current_glob_position < x->glob_buffer.gl_pathc) 
+        {
+            getfilenames_position(x);
+            outlet_symbol(x->data_outlet, 
+                          gensym(x->glob_buffer.gl_pathv[x->current_glob_position]));
+        }
+        else
+            outlet_bang(x->endoflist_outlet);
     }
 }
+
+/* the core guts that make a pd object */
 
 static void *getfilenames_new(t_symbol *s)
 {
@@ -236,7 +290,8 @@ static void *getfilenames_new(t_symbol *s)
 
     symbolinlet_new(&x->x_obj, &x->x_pattern);
     x->data_outlet = outlet_new(&x->x_obj, &s_symbol);
-    x->status_outlet = outlet_new(&x->x_obj, 0);
+    x->info_outlet = outlet_new(&x->x_obj, 0);
+    x->endoflist_outlet = outlet_new(&x->x_obj, &s_bang);
 	
 	/* set to the value from the object argument, if that exists */
 	if (s != &s_)
@@ -270,7 +325,7 @@ void getfilenames_setup(void)
 								  (t_newmethod)getfilenames_new, 
 								  (t_method)getfilenames_free, 
 								  sizeof(t_getfilenames), 
-								  0, 
+								  0,
 								  A_DEFSYMBOL, 
 								  0);
 	/* add inlet datatype methods */
@@ -280,5 +335,21 @@ void getfilenames_setup(void)
 	/* add inlet message methods */
 	class_addmethod(getfilenames_class, (t_method) getfilenames_rewind,
                     gensym("rewind"), 0);
+    /* querying methods */
+	class_addmethod(getfilenames_class, (t_method) getfilenames_info,
+                    gensym("info"), 0);
+	class_addmethod(getfilenames_class, (t_method) getfilenames_matches,
+                    gensym("matches"), 0);
+	class_addmethod(getfilenames_class, (t_method) getfilenames_pattern,
+                    gensym("pattern"), 0);
+	class_addmethod(getfilenames_class, (t_method) getfilenames_position,
+                    gensym("position"), 0);
+
+    /* pre-generate often used symbols */
+    ps_rewind = gensym("rewind");
+    ps_info = gensym("info");
+    ps_matches = gensym("matches");
+    ps_pattern = gensym("pattern");
+    ps_position = gensym("position");
 }
 
