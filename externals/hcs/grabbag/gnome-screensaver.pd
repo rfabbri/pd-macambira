@@ -21,6 +21,9 @@
 #X connect 5 0 1 0;
 #X connect 6 0 1 0;
 #X restore 121 154 pd disable commands;
+#X obj 21 271 pddp/pddplink http://lists.puredata.info/pipermail/pd-list/2010-07/080680.html
+;
+#X text 8 255 TODO implement the xset stuff here:;
 #X connect 0 0 3 0;
 #X connect 2 0 1 0;
 #X connect 3 0 2 0;

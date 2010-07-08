@@ -13,6 +13,9 @@
 #X msg 359 270 /usr/bin/defaults -currentHost write com.apple.screensaver
 idleTime -int \$1;
 #X msg 34 212 what is this?;
+#X obj 38 384 pddp/pddplink http://lists.puredata.info/pipermail/pd-list/2010-07/080680.html
+;
+#X text 25 369 TODO implement the xset stuff here for linux:;
 #X connect 0 0 2 0;
 #X connect 0 0 10 0;
 #X connect 2 0 11 0;
