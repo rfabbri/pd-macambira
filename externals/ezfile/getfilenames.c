@@ -128,7 +128,7 @@ static void normalize_path(t_getfilenames* x, char *normalized, const char *orig
 static void getfilenames_matches(t_getfilenames *x)
 {
     t_atom output_atom;
-    SETFLOAT(&output_atom, (t_float)x->glob_buffer.gl_matchc);
+    SETFLOAT(&output_atom, (t_float)x->glob_buffer.gl_pathc);
     outlet_anything(x->info_outlet, ps_matches, 1, &output_atom);
 }
 
