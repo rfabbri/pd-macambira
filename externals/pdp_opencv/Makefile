@@ -1,5 +1,5 @@
-PD_DIR = /usr/local/pd
-PDP_DIR = /usr/local/pd/pdp
+PD_DIR = /Software/pd-svn/trunk/pd
+PDP_DIR = /Software/pd-svn/trunk/externals/pdp
 
 GEM_OPENCV_VERSION = 0.2
 
