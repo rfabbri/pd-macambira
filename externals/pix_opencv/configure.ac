@@ -68,6 +68,10 @@ AM_SANITY_CHECK
 AM_MAINTAINER_MODE
 AM_WITH_DMALLOC
 
+AC_CHECK_LIB(cv, cvSobel, , AC_MSG_ERROR(you need to install opencv library (libcv)))
+AC_CHECK_LIB(highgui, cvNamedWindow, , AC_MSG_ERROR(you need to install high gui library (libhighgui)))
+AC_CHECK_LIB(cvaux, cvSegmentImage, , AC_MSG_ERROR(you need to install opencv auxiliary library (libcvaux) ))
+
 echo -n "looking for pd sources (required) ... "
 if test -f $PD_DIR/src/m_pd.h
 then

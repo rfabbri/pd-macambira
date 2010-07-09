@@ -1,5 +1,5 @@
 PD_DIR = /Software/pd-svn/trunk/pd
-GEM_DIR = /usr/local/pd/gem
+GEM_DIR = /usr/src/gem-0.91-3
 
 GEM_OPENCV_VERSION = 0.2
 
