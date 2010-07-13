@@ -45,6 +45,8 @@ void udpreceive_setup(void);
 static void udpreceive_free(t_udpreceive *x);
 static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv);
 static void udpreceive_status(t_udpreceive *x);
+static void udpreceive_set_multicast_ttl(t_udpreceive *x, t_floatarg ttl_hops);
+static void udpreceive_set_multicast_loop(t_udpreceive *x, t_floatarg loop_state);
 static void udpreceive_read(t_udpreceive *x, int sockfd);
 
 static void udpreceive_read(t_udpreceive *x, int sockfd)
@@ -234,6 +236,33 @@ static void udpreceive_status(t_udpreceive *x)
     outlet_anything( x->x_addrout, gensym("total"), 1, &output_atom);
 }
 
+static void udpreceive_set_multicast_ttl(t_udpreceive *x, t_floatarg ttl_hops)
+{
+    int             sockfd = x->x_connectsocket;
+    unsigned int    multicast_ttl = ttl_hops;
+    unsigned int    size;
+
+    if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL,
+        &multicast_ttl, sizeof(multicast_ttl)) < 0) 
+        error("udpreceive: setsockopt (IP_MULTICAST_LOOP) failed");
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_ttl, &size);
+    x->x_multicast_ttl = multicast_ttl;
+}
+
+static void udpreceive_set_multicast_loop(t_udpreceive *x, t_floatarg loop_state)
+{
+    int             sockfd = x->x_connectsocket;
+    unsigned int    multicast_loop_state = loop_state;
+    unsigned int    size;
+
+
+    if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP,
+        &multicast_loop_state, sizeof(multicast_loop_state)) < 0) 
+        error("udpreceive: setsockopt (IP_MULTICAST_LOOP) failed");
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &multicast_loop_state, &size);
+    x->x_multicast_loop_state = multicast_loop_state;
+}
+
 static void udpreceive_free(t_udpreceive *x)
 {
     if (x->x_connectsocket >= 0)
@@ -250,6 +279,8 @@ void udpreceive_setup(void)
         sizeof(t_udpreceive), CLASS_DEFAULT, A_GIMME, 0);
     class_addmethod(udpreceive_class, (t_method)udpreceive_status,
         gensym("status"), 0);
+    class_addmethod(udpreceive_class, (t_method)udpreceive_set_multicast_ttl, gensym("ttl"), A_DEFFLOAT, 0);
+    class_addmethod(udpreceive_class, (t_method)udpreceive_set_multicast_loop, gensym("loop"), A_DEFFLOAT, 0);
 }
 
 /* end udpreceive.c */
