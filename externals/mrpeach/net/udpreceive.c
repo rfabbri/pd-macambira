@@ -5,6 +5,7 @@
 
 #include "m_pd.h"
 #include "s_stuff.h"
+#include <string.h>
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -27,18 +28,23 @@ static t_class *udpreceive_class;
 
 typedef struct _udpreceive
 {
-    t_object  x_obj;
-    t_outlet  *x_msgout;
-    t_outlet  *x_addrout;
-    int       x_connectsocket;
-    t_atom    x_addrbytes[5];
-    t_atom    x_msgoutbuf[MAX_UDP_RECEIVE];
-    char      x_msginbuf[MAX_UDP_RECEIVE];
+    t_object        x_obj;
+    t_outlet        *x_msgout;
+    t_outlet        *x_addrout;
+    int             x_connectsocket;
+    int             x_multicast_joined;
+    unsigned int    x_multicast_loop_state;
+    unsigned int    x_multicast_ttl;
+    long            x_total_received;
+    t_atom          x_addrbytes[5];
+    t_atom          x_msgoutbuf[MAX_UDP_RECEIVE];
+    char            x_msginbuf[MAX_UDP_RECEIVE];
 } t_udpreceive;
 
 void udpreceive_setup(void);
 static void udpreceive_free(t_udpreceive *x);
-static void *udpreceive_new(t_floatarg fportno);
+static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv);
+static void udpreceive_status(t_udpreceive *x);
 static void udpreceive_read(t_udpreceive *x, int sockfd);
 
 static void udpreceive_read(t_udpreceive *x, int sockfd)
@@ -46,6 +52,7 @@ static void udpreceive_read(t_udpreceive *x, int sockfd)
     int                 i, read = 0;
     struct sockaddr_in  from;
     socklen_t           fromlen = sizeof(from);
+    t_atom              output_atom;
     long                addr;
     unsigned short      port;
 
@@ -63,7 +70,7 @@ static void udpreceive_read(t_udpreceive *x, int sockfd)
     x->x_addrbytes[2].a_w.w_float = (addr & 0x0FF00)>>8;
     x->x_addrbytes[3].a_w.w_float = (addr & 0x0FF);
     x->x_addrbytes[4].a_w.w_float = port;
-    outlet_list(x->x_addrout, &s_list, 5L, x->x_addrbytes);
+    outlet_anything(x->x_addrout, gensym("from"), 5L, x->x_addrbytes);
 
     if (read < 0)
     {
@@ -78,19 +85,52 @@ static void udpreceive_read(t_udpreceive *x, int sockfd)
             /* convert the bytes in the buffer to floats in a list */
             x->x_msgoutbuf[i].a_w.w_float = (float)(unsigned char)x->x_msginbuf[i];
         }
+        x->x_total_received += read;
+        SETFLOAT(&output_atom, read);
+        outlet_anything(x->x_addrout, gensym("received"), 1, &output_atom);
         /* send the list out the outlet */
         if (read > 1) outlet_list(x->x_msgout, &s_list, read, x->x_msgoutbuf);
         else outlet_float(x->x_msgout, x->x_msgoutbuf[0].a_w.w_float);
     }
 }
 
-static void *udpreceive_new(t_floatarg fportno)
+static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
 {
-    t_udpreceive       *x;
-    struct sockaddr_in server;
-    int                sockfd, portno = fportno;
-    int                intarg, i;
+    t_udpreceive        *x;
+    struct sockaddr_in  server;
+    struct hostent      *hp;
+    struct ip_mreqn     mreq;
+    int                 sockfd, portno = 0;
+    int                 multicast_joined = 0;
+    unsigned int        multicast_loop_state;
+    unsigned int        multicast_ttl;
+    unsigned int        size;
+    int                 intarg, i;
+    char                addr[256] = {'\0'};
 
+#ifdef DEBUG
+    post("udpreceive_new:argc is %d s is %s", argc, s->s_name);
+#endif
+    for (i = 0; i < argc ;++i)
+    {
+        if (argv[i].a_type == A_FLOAT)
+        {
+#ifdef DEBUG
+            post ("argv[%d] is a float: %f", i, argv[i].a_w.w_float);
+#endif
+            portno = (int)argv[i].a_w.w_float;
+        }
+        else if (argv[i].a_type == A_SYMBOL)
+        {
+#ifdef DEBUG
+            post ("argv[%d] is a symbol: %s", i, argv[i].a_w.w_symbol->s_name);
+#endif
+            atom_string(&argv[i], addr, 256);
+        }
+    }
+#ifdef DEBUG
+    post("Setting port %d, address %s", portno, addr);
+#endif
     /* create a socket */
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 #ifdef DEBUG
@@ -99,17 +139,48 @@ static void *udpreceive_new(t_floatarg fportno)
     if (sockfd < 0)
     {
         sys_sockerror("udpreceive: socket");
-        return (0);
+        return 0;
     }
     server.sin_family = AF_INET;
-    server.sin_addr.s_addr = INADDR_ANY;
-
+    if (addr[0] == 0) server.sin_addr.s_addr = INADDR_ANY;
+    else 
+    {
+        hp = gethostbyname(addr);
+        if (hp == 0)
+        {
+    	    error("udpreceive: bad host?\n");
+            return 0;
+        }
+        memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
+    }
     /* enable delivery of all multicast or broadcast (but not unicast)
     * UDP datagrams to all sockets bound to the same port */
     intarg = 1;
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR,
         (char *)&intarg, sizeof(intarg)) < 0)
-        post("udpreceive: setsockopt (SO_REUSEADDR) failed");
+        error("udpreceive: setsockopt (SO_REUSEADDR) failed");
+
+    /* if a multicast address was specified, join the multicast group */
+    /* hop count defaults to 1 so we won't leave the subnet*/
+    if (0xE0000000 == (ntohl(server.sin_addr.s_addr) & 0xF0000000))
+    {
+        mreq.imr_multiaddr.s_addr = server.sin_addr.s_addr;
+        mreq.imr_address.s_addr = INADDR_ANY;
+        mreq.imr_ifindex = 0;
+        if (setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+            (char *)&mreq, sizeof(mreq)) < 0)
+            error("udpreceive: setsockopt (IP_ADD_MEMBERSHIP) failed");
+        else
+        {
+            multicast_joined = 1;
+            post ("udpreceive: added to multicast group");
+            multicast_loop_state = 0;
+            if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP,
+                &multicast_loop_state, sizeof(multicast_loop_state)) < 0) 
+                error("udpreceive: setsockopt (IP_MULTICAST_LOOP) failed");
+        }
+    }
+
 
     /* assign server port number */
     server.sin_port = htons((u_short)portno);
@@ -123,7 +194,7 @@ static void *udpreceive_new(t_floatarg fportno)
     }
     x = (t_udpreceive *)pd_new(udpreceive_class);
     x->x_msgout = outlet_new(&x->x_obj, &s_anything);
-    x->x_addrout = outlet_new(&x->x_obj, &s_list);
+    x->x_addrout = outlet_new(&x->x_obj, &s_anything);
     x->x_connectsocket = sockfd;
 
     /* convert the bytes in the buffer to floats in a list */
@@ -137,8 +208,30 @@ static void *udpreceive_new(t_floatarg fportno)
         x->x_addrbytes[i].a_type = A_FLOAT;
         x->x_addrbytes[i].a_w.w_float = 0;
     }
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &multicast_loop_state, &size);
+    //post("udpreceive: multicast loop state is %d", multicast_loop_state);
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_ttl, &size);
+    //post("udpreceive: multicast time to live is %d hop%s", multicast_ttl, (multicast_ttl == 1)?"":"s");
+    x->x_multicast_joined = multicast_joined;
+    x->x_multicast_loop_state = multicast_loop_state;
+    x->x_multicast_ttl = multicast_ttl;
+    x->x_total_received = 0L;
     sys_addpollfn(x->x_connectsocket, (t_fdpollfn)udpreceive_read, x);
     return (x);
+}
+
+static void udpreceive_status(t_udpreceive *x)
+{
+    t_atom output_atom;
+
+    SETFLOAT(&output_atom, x->x_multicast_joined);
+    outlet_anything( x->x_addrout, gensym("multicast"), 1, &output_atom);
+    SETFLOAT(&output_atom, x->x_multicast_loop_state);
+    outlet_anything( x->x_addrout, gensym("multicast_loop"), 1, &output_atom);
+    SETFLOAT(&output_atom, x->x_multicast_ttl);
+    outlet_anything( x->x_addrout, gensym("multicast_ttl"), 1, &output_atom);
+    SETFLOAT(&output_atom, x->x_total_received);
+    outlet_anything( x->x_addrout, gensym("total"), 1, &output_atom);
 }
 
 static void udpreceive_free(t_udpreceive *x)
@@ -154,7 +247,9 @@ void udpreceive_setup(void)
 {
     udpreceive_class = class_new(gensym("udpreceive"),
         (t_newmethod)udpreceive_new, (t_method)udpreceive_free,
-        sizeof(t_udpreceive), CLASS_NOINLET, A_DEFFLOAT, 0);
+        sizeof(t_udpreceive), CLASS_DEFAULT, A_GIMME, 0);
+    class_addmethod(udpreceive_class, (t_method)udpreceive_status,
+        gensym("status"), 0);
 }
 
 /* end udpreceive.c */
