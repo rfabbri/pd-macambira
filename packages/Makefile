@@ -259,6 +259,10 @@ endif
 		install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ; \
 		install -p $(gem_src)/examples/$$dir/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ;\
 	done
+# install Gem headers to make it easier to build standalone Gem objects
+	install -d $(DESTDIR)$(includedir)/Base
+	install -p $(gem_src)/src/Base/*.h $(DESTDIR)$(includedir)/Base/
+# links to keep the old-style placement for Gem examples in the Help Browser
 ifneq ($(OS_NAME),windows)
 	install -d $(DESTDIR)$(examplesdir)
 	ln -s ../../extra/$(GEM_NAME)/examples $(DESTDIR)$(examplesdir)/$(GEM_NAME)
