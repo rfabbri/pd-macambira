@@ -86,7 +86,7 @@ pix_opencv_of_bm :: ~pix_opencv_of_bm()
 void pix_opencv_of_bm :: processRGBAImage(imageStruct &image)
 {
   int px,py;
-  double meanangle=0.0, meanx=0.0, meany=0.0, maxamp=0.0, maxangle=0.0;
+  double globangle=0.0, globx=0.0, globy=0.0, maxamp=0.0, maxangle=0.0;
   int nbblocks=0;
   CvPoint orig, dest;
   double angle=0.0;
@@ -132,6 +132,9 @@ void pix_opencv_of_bm :: processRGBAImage(imageStruct &image)
                        x_velx, x_vely  );
 
   nbblocks = 0;
+  globangle = 0;
+  globx = 0;
+  globy = 0;
   for( py=0; py<x_velsize.height; py++ )
   {
     for( px=0; px<x_velsize.width; px++ )
@@ -140,8 +143,8 @@ void pix_opencv_of_bm :: processRGBAImage(imageStruct &image)
         orig.y = (py*comp_ysize)/x_velsize.height;
         dest.x = (int)(orig.x + cvGet2D(x_velx, py, px).val[0]);
         dest.y = (int)(orig.y + cvGet2D(x_vely, py, px).val[0]);
-        angle = -atan2( (double) cvGet2D(x_vely, py, px).val[0], (double) cvGet2D(x_velx, py, px).val[0] );
-        hypotenuse = sqrt( pow(orig.y - dest.y, 2) + pow(orig.x - dest.x, 2) );
+        angle = -atan2( (double) (dest.y-orig.y), (double) (dest.x-orig.x) );
+        hypotenuse = sqrt( pow(dest.y-orig.y, 2) + pow(dest.x-orig.x, 2) );
 
         /* Now draw the tips of the arrow. I do some scaling so that the
         * tips look proportional to the main line of the arrow.
@@ -156,8 +159,9 @@ void pix_opencv_of_bm :: processRGBAImage(imageStruct &image)
           orig.x = (int) (dest.x - (x_shiftsize.width/4) * cos(angle - M_PI / 4));
           orig.y = (int) (dest.y + (x_shiftsize.height/4) * sin(angle - M_PI / 4));
           cvLine( rgb, orig, dest, CV_RGB(0,0,255), (int)hypotenuse/10, CV_AA, 0 );
-          meanx = (meanx*nbblocks+cvGet2D(x_velx, py, px).val[0])/(nbblocks+1);
-          meany = (meanx*nbblocks+cvGet2D(x_vely, py, px).val[0])/(nbblocks+1);
+
+          globx = globx+cvGet2D(x_velx, py, px).val[0];
+          globy = globy+cvGet2D(x_vely, py, px).val[0];
           if ( hypotenuse > maxamp )
           {
              maxamp = hypotenuse;
@@ -170,26 +174,26 @@ void pix_opencv_of_bm :: processRGBAImage(imageStruct &image)
       }
   }
 
-  meanangle=-atan2( meany, meanx );
-  // post( "pdp_opencv_of_bm : meanangle : %f", (meanangle*180)/M_PI );
-
   if ( nbblocks >= x_minblocks )
   {
+      globangle=-atan2( globy, globx );
+      // post( "pdp_opencv_of_bm : globangle : %f", (globangle*180)/M_PI );
+
       orig.x = (int) (comp_xsize/2);
       orig.y = (int) (comp_ysize/2);
-      dest.x = (int) (orig.x+((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*cos(meanangle));
-      dest.y = (int) (orig.y-((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*sin(meanangle));
+      dest.x = (int) (orig.x+((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*cos(globangle));
+      dest.y = (int) (orig.y-((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*sin(globangle));
       cvLine( rgb, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
-      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(meanangle + M_PI / 4));
-      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(meanangle + M_PI / 4));
+      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(globangle + M_PI / 4));
+      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(globangle + M_PI / 4));
       cvLine( rgb, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
-      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(meanangle - M_PI / 4));
-      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(meanangle - M_PI / 4));
+      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(globangle - M_PI / 4));
+      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(globangle - M_PI / 4));
       cvLine( rgb, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
 
       // outputs the average angle of movement
-      meanangle = (meanangle*180)/M_PI;
-      SETFLOAT(&x_list[0], meanangle);
+      globangle = (globangle*180)/M_PI;
+      SETFLOAT(&x_list[0], globangle);
       outlet_list( m_meanout, 0, 1, x_list );
 
       // outputs the amplitude and angle of the maximum movement
@@ -208,7 +212,7 @@ void pix_opencv_of_bm :: processRGBAImage(imageStruct &image)
 void pix_opencv_of_bm :: processRGBImage(imageStruct &image)
 { 
   int px,py;
-  double meanangle=0.0, meanx=0.0, meany=0.0, maxamp=0.0, maxangle=0.0;
+  double globangle=0.0, globx=0.0, globy=0.0, maxamp=0.0, maxangle=0.0;
   int nbblocks=0;
   CvPoint orig, dest;
   double angle=0.0;
@@ -254,6 +258,9 @@ void pix_opencv_of_bm :: processRGBImage(imageStruct &image)
                        x_velx, x_vely  );
 
   nbblocks = 0;
+  globangle = 0;
+  globx = 0;
+  globy = 0;
   for( py=0; py<x_velsize.height; py++ )
   {
     for( px=0; px<x_velsize.width; px++ )
@@ -263,8 +270,8 @@ void pix_opencv_of_bm :: processRGBImage(imageStruct &image)
         orig.y = (py*comp_ysize)/x_velsize.height;
         dest.x = (int)(orig.x + cvGet2D(x_velx, py, px).val[0]);
         dest.y = (int)(orig.y + cvGet2D(x_vely, py, px).val[0]);
-        angle = -atan2( (double) cvGet2D(x_vely, py, px).val[0], (double) cvGet2D(x_velx, py, px).val[0] );
-        hypotenuse = sqrt( pow(orig.y - dest.y, 2) + pow(orig.x - dest.x, 2) );
+        angle = -atan2( (double) (dest.y-orig.y), (double) (dest.x-orig.x) );
+        hypotenuse = sqrt( pow(dest.y-orig.y, 2) + pow(dest.x-orig.x, 2) );
 
         /* Now draw the tips of the arrow. I do some scaling so that the
         * tips look proportional to the main line of the arrow.
@@ -279,8 +286,9 @@ void pix_opencv_of_bm :: processRGBImage(imageStruct &image)
           orig.x = (int) (dest.x - (x_shiftsize.width/4) * cos(angle - M_PI / 4));
           orig.y = (int) (dest.y + (x_shiftsize.height/4) * sin(angle - M_PI / 4));
           cvLine( rgb, orig, dest, CV_RGB(0,0,255), (int)hypotenuse/10, CV_AA, 0 );
-          meanx = (meanx*nbblocks+cvGet2D(x_velx, py, px).val[0])/(nbblocks+1);
-          meany = (meanx*nbblocks+cvGet2D(x_vely, py, px).val[0])/(nbblocks+1);
+
+          globx = globx+cvGet2D(x_velx, py, px).val[0];
+          globy = globy+cvGet2D(x_vely, py, px).val[0];
           if ( hypotenuse > maxamp )
           {
              maxamp = hypotenuse;
@@ -293,26 +301,26 @@ void pix_opencv_of_bm :: processRGBImage(imageStruct &image)
       }
   }
 
-  meanangle=-atan2( meany, meanx );
-  // post( "pdp_opencv_of_bm : meanangle : %f", (meanangle*180)/M_PI );
-
   if ( nbblocks >= x_minblocks )
   {
+      globangle=-atan2( globy, globx );
+      // post( "pdp_opencv_of_bm : globangle : %f", (globangle*180)/M_PI );
+
       orig.x = (int) (comp_xsize/2);
       orig.y = (int) (comp_ysize/2);
-      dest.x = (int) (orig.x+((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*cos(meanangle));
-      dest.y = (int) (orig.y-((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*sin(meanangle));
+      dest.x = (int) (orig.x+((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*cos(globangle));
+      dest.y = (int) (orig.y-((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*sin(globangle));
       cvLine( rgb, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
-      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(meanangle + M_PI / 4));
-      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(meanangle + M_PI / 4));
+      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(globangle + M_PI / 4));
+      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(globangle + M_PI / 4));
       cvLine( rgb, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
-      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(meanangle - M_PI / 4));
-      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(meanangle - M_PI / 4));
+      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(globangle - M_PI / 4));
+      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(globangle - M_PI / 4));
       cvLine( rgb, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
 
       // outputs the average angle of movement
-      meanangle = (meanangle*180)/M_PI;
-      SETFLOAT(&x_list[0], meanangle);
+      globangle = (globangle*180)/M_PI;
+      SETFLOAT(&x_list[0], globangle);
       outlet_list( m_meanout, 0, 1, x_list );
 
       // outputs the amplitude and angle of the maximum movement
@@ -335,7 +343,7 @@ void pix_opencv_of_bm :: processYUVImage(imageStruct &image)
 void pix_opencv_of_bm :: processGrayImage(imageStruct &image)
 { 
   int px,py;
-  double meanangle=0.0, meanx=0.0, meany=0.0, maxamp=0.0, maxangle=0.0;
+  double globangle=0.0, globx=0.0, globy=0.0, maxamp=0.0, maxangle=0.0;
   int nbblocks=0;
   CvPoint orig, dest;
   double angle=0.0;
@@ -377,6 +385,9 @@ void pix_opencv_of_bm :: processGrayImage(imageStruct &image)
                        x_velx, x_vely  );
 
   nbblocks = 0;
+  globangle = 0;
+  globx = 0;
+  globy = 0;
   for( py=0; py<x_velsize.height; py++ )
   {
     for( px=0; px<x_velsize.width; px++ )
@@ -386,8 +397,8 @@ void pix_opencv_of_bm :: processGrayImage(imageStruct &image)
         orig.y = (py*comp_ysize)/x_velsize.height;
         dest.x = (int)(orig.x + cvGet2D(x_velx, py, px).val[0]);
         dest.y = (int)(orig.y + cvGet2D(x_vely, py, px).val[0]);
-        angle = -atan2( (double) cvGet2D(x_vely, py, px).val[0], (double) cvGet2D(x_velx, py, px).val[0] );
-        hypotenuse = sqrt( pow(orig.y - dest.y, 2) + pow(orig.x - dest.x, 2) );
+        angle = -atan2( (double) (dest.y-orig.y), (double) (dest.x-orig.x) );
+        hypotenuse = sqrt( pow(dest.y-orig.y, 2) + pow(dest.x-orig.x, 2) );
 
         /* Now draw the tips of the arrow. I do some scaling so that the
         * tips look proportional to the main line of the arrow.
@@ -402,8 +413,9 @@ void pix_opencv_of_bm :: processGrayImage(imageStruct &image)
           orig.x = (int) (dest.x - (x_shiftsize.width/4) * cos(angle - M_PI / 4));
           orig.y = (int) (dest.y + (x_shiftsize.height/4) * sin(angle - M_PI / 4));
           cvLine( grey, orig, dest, CV_RGB(0,0,255), (int)hypotenuse/10, CV_AA, 0 );
-          meanx = (meanx*nbblocks+cvGet2D(x_velx, py, px).val[0])/(nbblocks+1);
-          meany = (meanx*nbblocks+cvGet2D(x_vely, py, px).val[0])/(nbblocks+1);
+
+          globx = globx+cvGet2D(x_velx, py, px).val[0];
+          globy = globy+cvGet2D(x_vely, py, px).val[0];
           if ( hypotenuse > maxamp )
           {
              maxamp = hypotenuse;
@@ -416,26 +428,26 @@ void pix_opencv_of_bm :: processGrayImage(imageStruct &image)
       }
   }
 
-  meanangle=-atan2( meany, meanx );
-  // post( "pdp_opencv_of_bm : meanangle : %f", (meanangle*180)/M_PI );
-
   if ( nbblocks >= x_minblocks )
   {
+      globangle=-atan2( globy, globx );
+      // post( "pdp_opencv_of_bm : globangle : %f", (globangle*180)/M_PI );
+
       orig.x = (int) (comp_xsize/2);
       orig.y = (int) (comp_ysize/2);
-      dest.x = (int) (orig.x+((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*cos(meanangle));
-      dest.y = (int) (orig.y-((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*sin(meanangle));
+      dest.x = (int) (orig.x+((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*cos(globangle));
+      dest.y = (int) (orig.y-((comp_xsize>comp_ysize)?comp_ysize/2:comp_xsize/2)*sin(globangle));
       cvLine( grey, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
-      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(meanangle + M_PI / 4));
-      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(meanangle + M_PI / 4));
+      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(globangle + M_PI / 4));
+      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(globangle + M_PI / 4));
       cvLine( grey, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
-      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(meanangle - M_PI / 4));
-      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(meanangle - M_PI / 4));
+      orig.x = (int) (dest.x - (x_shiftsize.width/2) * cos(globangle - M_PI / 4));
+      orig.y = (int) (dest.y + (x_shiftsize.height/2) * sin(globangle - M_PI / 4));
       cvLine( grey, orig, dest, CV_RGB(255,255,255), 3, CV_AA, 0 );
 
       // outputs the average angle of movement
-      meanangle = (meanangle*180)/M_PI;
-      SETFLOAT(&x_list[0], meanangle);
+      globangle = (globangle*180)/M_PI;
+      SETFLOAT(&x_list[0], globangle);
       outlet_list( m_meanout, 0, 1, x_list );
 
       // outputs the amplitude and angle of the maximum movement
