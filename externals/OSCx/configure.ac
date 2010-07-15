@@ -103,9 +103,9 @@ else
         *-*-cygwin*)
                 CFLAGS="$CFLAGS -mno-cygwin -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
 					 LDFLAGS="-Wl,--export-dynamic -shared"
-					 INCLUDES="$INCLUDES -I../../../pd/src"
+					 INCLUDES="$INCLUDES -I../../../pd/src -I/cygdrive/MinGW/include"
 					 pd_suffix=dll
-					 LIBS="-lc -lm"
+					 LIBS="-L../../../pd/src -L../../../pd/bin -L../../../pd/obj -lpd -lm -lwsock32"
 					 ;;
         *-*-mingw*)
                 CFLAGS="$CFLAGS -mms-bitfields -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
