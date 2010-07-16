@@ -101,11 +101,15 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
     t_udpreceive        *x;
     struct sockaddr_in  server;
     struct hostent      *hp;
+#ifdef MACOSX
+    struct ip_mreq     mreq;
+#else
     struct ip_mreqn     mreq;
+#endif
     int                 sockfd, portno = 0;
     int                 multicast_joined = 0;
-    unsigned int        multicast_loop_state;
-    unsigned int        multicast_ttl;
+    unsigned char       multicast_loop_state;
+    unsigned char       multicast_ttl;
     unsigned int        size;
     int                 intarg, i;
     char                addr[256] = {'\0'};
