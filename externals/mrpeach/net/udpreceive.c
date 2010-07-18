@@ -101,8 +101,8 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
     t_udpreceive        *x;
     struct sockaddr_in  server;
     struct hostent      *hp;
-#ifdef MACOSX
-    struct ip_mreq     mreq;
+#if defined MACOSX || defined _WIN32
+    struct ip_mreq      mreq;
 #else
     struct ip_mreqn     mreq;
 #endif
@@ -170,9 +170,14 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
     /* hop count defaults to 1 so we won't leave the subnet*/
     if (0xE0000000 == (ntohl(server.sin_addr.s_addr) & 0xF0000000))
     {
+#if defined MACOSX || defined _WIN32
+        mreq.imr_multiaddr.s_addr = server.sin_addr.s_addr;
+        mreq.imr_interface.s_addr = INADDR_ANY;/* can put a specific local IP address here if host is multihomed */
+#else
         mreq.imr_multiaddr.s_addr = server.sin_addr.s_addr;
         mreq.imr_address.s_addr = INADDR_ANY;
         mreq.imr_ifindex = 0;
+#endif //MACOSX || _WIN32
         if (setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
             (char *)&mreq, sizeof(mreq)) < 0)
             error("udpreceive: setsockopt (IP_ADD_MEMBERSHIP) failed");
@@ -243,7 +248,7 @@ static void udpreceive_status(t_udpreceive *x)
 static void udpreceive_set_multicast_ttl(t_udpreceive *x, t_floatarg ttl_hops)
 {
     int             sockfd = x->x_connectsocket;
-    unsigned int    multicast_ttl = ttl_hops;
+    unsigned char   multicast_ttl = ttl_hops;
     unsigned int    size;
 
     if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL,
@@ -256,7 +261,7 @@ static void udpreceive_set_multicast_ttl(t_udpreceive *x, t_floatarg ttl_hops)
 static void udpreceive_set_multicast_loop(t_udpreceive *x, t_floatarg loop_state)
 {
     int             sockfd = x->x_connectsocket;
-    unsigned int    multicast_loop_state = loop_state;
+    unsigned char   multicast_loop_state = loop_state;
     unsigned int    size;
 
 
