@@ -63,3 +63,22 @@ for dylib in $PD_APP_LIB/*.dylib; do
     fi
 done
 
+# seems like we need it one last time! phew...
+for dylib in $PD_APP_LIB/*.dylib; do
+    LIBS=`otool -L $dylib | sed -n 's|.*/sw/lib/\(.*\.dylib\).*|\1|p'`
+    if [ "x$LIBS" != "x" ]; then
+	echo "`echo $dylib | sed 's|.*/\(.*\.dylib\)|\1|'` is using:"
+	for lib in $LIBS; do
+	    echo "    $lib"
+	    new_lib=`echo $lib | sed 's|.*/\(.*\.dylib\)|\1|'`
+	    if [ -e  $PD_APP_LIB/$new_lib ]; then
+		echo "$PD_APP_LIB/$new_lib already exists, skipping copy."
+	    else
+		install -vp /sw/lib/$lib $PD_APP_LIB
+	    fi
+	    install_name_tool -id $LIB_DIR/$new_lib $PD_APP_LIB/$new_lib
+	    install_name_tool -change /sw/lib/$lib $LIB_DIR/$new_lib $dylib
+	done
+	echo " "
+    fi
+done
