@@ -38,10 +38,10 @@ LDFLAGS =  -L/usr/local/lib -lpthread  -lgavl -lgmerlin_avdec
 else
 # assume darwin here
 STRIP=strip -x
-CFLAGS += -I/sw/include -I$(externals_src)/pdp/include -DMACOSX -DUNIX -Dunix
+CFLAGS += -I/sw/include -fast -fPIC
+LDFLAGS = -bundle -undefined dynamic_lookup -L/sw/lib -lgavl -lgmerlin_avdec
 #LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -undefined dynamic_lookup \
 #		-L/sw/lib -weak_framework Carbon -lc -L/sw/lib -lgavl -lgmerlin_avdec  
-LDFLAGS = -dynamiclib -undefined dynamic_lookup -read_only_relocs warning -L/sw/lib  -lgavl -lgmerlin_avdec
 # os 10.4
 #CFLAGS += -mmacosx-version-min=10.4  -arch i386  -isysroot /Developer/SDKs/MacOSX10.4u.sdk 
 #LDFLAGS =  -L/sw/lib -lgavl -lgmerlin_avdec \
