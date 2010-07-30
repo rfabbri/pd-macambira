@@ -18,6 +18,9 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <netdb.h>
+#include <sys/ioctl.h> // for SIOCGIFCONF
+#include <net/if.h> // for SIOCGIFCONF
+#include <arpa/inet.h>
 #endif
 
 static t_class *udpsend_class;
@@ -33,6 +36,7 @@ static void udpsend_free(t_udpsend *x);
 static void udpsend_send(t_udpsend *x, t_symbol *s, int argc, t_atom *argv);
 static void udpsend_disconnect(t_udpsend *x);
 static void udpsend_connect(t_udpsend *x, t_symbol *hostname, t_floatarg fportno);
+static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc, t_atom *argv);
 static void *udpsend_new(void);
 
 static void *udpsend_new(void)
@@ -87,6 +91,8 @@ Enable sending of broadcast messages (if hostname is a broadcast address)*/
     }
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
 
+    if (0xE0000000 == (ntohl(server.sin_addr.s_addr) & 0xF0000000))
+        post ("udpsend: connecting to a multicast address");
     /* assign client port number */
     server.sin_port = htons((u_short)portno);
 
@@ -100,6 +106,83 @@ Enable sending of broadcast messages (if hostname is a broadcast address)*/
     }
     x->x_fd = sockfd;
     outlet_float(x->x_obj.ob_outlet, 1);
+}
+
+static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc, t_atom *argv)
+{
+    struct sockaddr_in  server;
+    struct sockaddr     *sa;
+    struct hostent      *hp = 0;
+    struct ifconf       ifc;
+    int                 n_ifaces = 32, i, origbuflen, found = 0;
+    char                ifname[IFNAMSIZ]; /* longest possible interface name */
+    t_symbol            *interface = gensym("none");
+    int                 if_index = -1;
+
+    if (x->x_fd < 0)
+    {
+        pd_error(x, "udpsend_set_multicast_interface: not connected");
+        return;
+    }
+    switch (argv[0].a_type)
+    {
+        case A_FLOAT:
+            if_index = (int)atom_getfloat(&argv[0]);
+            break;
+        case A_SYMBOL:
+            interface = atom_getsymbol(&argv[0]);    
+            break;
+        default:
+            pd_error(x, "udpsend_set_multicast_interface: argument not float or symbol");
+            return;
+    }
+    if (if_index == -1)
+    {
+        hp = gethostbyname(interface->s_name); // if interface is a dotted or named IP address (192.168.0.88)
+    }
+    if (hp != 0) memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
+    else // maybe interface is its name (eth0) or index (1)
+    { // scan all the interfaces to get the IP address of interface
+        // find the number of interfaces
+        origbuflen = n_ifaces * sizeof (struct ifreq);// save maximum length for free()
+        ifc.ifc_len = origbuflen; // SIOCGIFCONF changes it to valid length
+        ifc.ifc_buf = (char*)getzbytes(origbuflen);
+        if (ifc.ifc_buf != NULL)
+        { // 
+            if (ioctl(x->x_fd, SIOCGIFCONF, &ifc) < 0) // get list of interfaces
+                sys_sockerror("udpsend_set_multicast_interface: getting list of interfaces");
+            else
+            {
+                n_ifaces = ifc.ifc_len/sizeof(struct ifreq);
+                post("udpsend: %d interface%s available:", n_ifaces, (n_ifaces == 1)?"":"s");
+                for(i = 0; i < n_ifaces; i++)
+                {
+                    sa = (struct sockaddr *)&(ifc.ifc_req[i].ifr_addr);
+                    strncpy (ifname, ifc.ifc_req[i].ifr_name, IFNAMSIZ);
+                    post("[%d]: %s: %s", i, ifname, inet_ntoa(((struct sockaddr_in *)sa)->sin_addr));
+                    if
+                    (
+                        (i == if_index) ||
+                        ((if_index == -1) && (!strncmp(interface->s_name, ifname, IFNAMSIZ)))
+                    )
+                    {
+                        server.sin_addr = ((struct sockaddr_in *)sa)->sin_addr;
+                        found = 1;
+                    }
+                } 
+            }
+        }
+        freebytes(ifc.ifc_buf, origbuflen);
+
+	    if (! found)
+        {
+            post("udpsend_set_multicast_interface: bad host name? (%s)\n", interface->s_name);
+            return;
+        }
+    }
+    if (setsockopt(x->x_fd, IPPROTO_IP, IP_MULTICAST_IF, &server.sin_addr, sizeof(struct in_addr)) < 0)
+        sys_sockerror("udpsend_set_multicast_interface: setsockopt");
+    else post("udpsend multicast interface is %s", inet_ntoa(server.sin_addr));
 }
 
 static void udpsend_disconnect(t_udpsend *x)
@@ -246,6 +329,8 @@ void udpsend_setup(void)
         sizeof(t_udpsend), 0, 0);
     class_addmethod(udpsend_class, (t_method)udpsend_connect,
         gensym("connect"), A_SYMBOL, A_FLOAT, 0);
+    class_addmethod(udpsend_class, (t_method)udpsend_set_multicast_interface,
+        gensym("multicast_interface"), A_GIMME, 0);
     class_addmethod(udpsend_class, (t_method)udpsend_disconnect,
         gensym("disconnect"), 0);
     class_addmethod(udpsend_class, (t_method)udpsend_send, gensym("send"),
