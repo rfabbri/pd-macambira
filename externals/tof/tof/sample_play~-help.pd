@@ -1,31 +1,39 @@
-#N canvas 356 215 502 410 10;
-#X obj 58 283 dac~;
+#N canvas 1124 102 553 386 10;
+#X obj 61 317 dac~;
 #X obj 59 96 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj 78 123 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X floatatom 171 194 5 0 0 0 - - -;
+#X floatatom 133 183 5 0 0 0 - - -;
 #X text 13 -28 Description: Plays a sample;
 #X text 14 -8 Tags: Sound Table Sample;
 #X text 85 94 Inlet 1 \, bang: play sample once;
 #X text 95 120 Inlet 1 \, float: stop/play sample in a loop;
 #X text 178 146 Inlet 1 \, sample symbol: set sample;
 #X msg 96 146 sample smppl;
-#X text 209 194 Inlet 2 \, float: set playback speed;
-#X text 121 271 Outlet 1 \, signal: left channel audio output;
-#X text 120 285 Outlet 2 \, signal: right channel audio output;
-#X obj 279 10 openpanel;
-#X msg 279 31 read \$1;
+#X text 96 328 Outlet 1 \, signal: left channel audio output;
+#X text 97 316 Outlet 2 \, signal: right channel audio output;
 #X obj 279 -12 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
-#X obj 279 54 tof/sample smppl amen.wav;
+#X obj 279 12 tof/sample smppl amen.wav;
+#X obj 207 247 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 170 180 set playback speed;
+#X floatatom 190 203 5 0 0 0 - - -;
+#X text 227 200 set duration (in ms);
+#X obj 144 266 cyclone/Snapshot~ 100;
+#X floatatom 145 288 5 0 0 0 - - -;
 #X obj 59 229 tof/sample_play~ smppl;
-#X connect 1 0 17 0;
-#X connect 2 0 17 0;
-#X connect 3 0 17 1;
-#X connect 9 0 17 0;
-#X connect 13 0 14 0;
-#X connect 14 0 16 0;
-#X connect 15 0 13 0;
-#X connect 17 0 0 0;
-#X connect 17 1 0 1;
+#X text 180 290 Outlet 3 \, signal: progress;
+#X text 234 245 Outlet 4 \, bang: done;
+#X connect 1 0 20 0;
+#X connect 2 0 20 0;
+#X connect 3 0 20 1;
+#X connect 9 0 20 0;
+#X connect 12 0 13 0;
+#X connect 16 0 20 2;
+#X connect 18 0 19 0;
+#X connect 20 0 0 0;
+#X connect 20 1 0 1;
+#X connect 20 2 18 0;
+#X connect 20 3 14 0;

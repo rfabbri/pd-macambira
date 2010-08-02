@@ -1,26 +1,44 @@
-#N canvas 1173 49 686 393 10;
-#X msg 47 142 read \$1;
-#X obj 47 116 openpanel;
-#X obj 47 93 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#N canvas 259 224 683 625 10;
+#X obj 47 141 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X text 126 115 Inlet 1 \, read symbol: sound file to read into memory
-;
 #X text 44 17 Description: Loads a sound file (wav) as a sample;
-#X text 51 249 See also:;
 #X text 45 34 Tags: File Sound Table Sample;
-#X text 222 175 Argument 1 \, symbol: Sample name;
-#X text 223 192 (Argument 2 \, symbol): Sound file to read into memory
+#X obj 84 559 tof/sample_unpack;
+#X text 51 66 Inlet 1;
+#X text 325 160 symbol: Sample name;
+#X text 285 146 Argument 1;
+#X text 69 79 read symbol: Read sound file into the sample's tables
+;
+#X text 281 189 Argument 2 (optional):;
+#X text 324 206 symbol: Sound file to read into the sample's tables
 when created;
-#X text 224 222 (Argument 2 \, float): Set a default length to the
-table;
-#X text 281 316 The following example creates a mono (1 channel) sample
-with a 10 second table (at a sampling rate of 44100).;
-#X text 225 241 (Argument 3 \, float): Set a default number of channels
-\, either 1 or 2;
-#X obj 47 177 tof/sample test mono0.wav;
-#X obj 73 272 tof/sample_play~;
-#X obj 72 295 tof/sample_unpack;
-#X obj 283 350 tof/sample recording 441000 1;
-#X connect 0 0 12 0;
-#X connect 1 0 0 0;
-#X connect 2 0 1 0;
+#X text 323 236 float: Set the default length of the sample's tables
+;
+#X text 278 260 Argument 3 (optional):;
+#X text 319 276 float: Set a default number of channels \, either 1
+or 2;
+#X text 51 307 The following example creates a mono (1 channel) sample
+with a table size of 441000 (10 seconds at 44100hz);
+#X text 62 389 Sample playback:;
+#X text 56 533 Sample development:;
+#X obj 84 579 tof/sample_packel;
+#X text 327 398 Sample record:;
+#X obj 31 200 cnv 15 230 20 empty empty empty 20 12 0 14 -260058 -66577
+0;
+#X text 35 202 Click(open) the sample to view info;
+#X msg 73 141 read amen.wav;
+#X obj 47 177 tof/sample test amen.wav;
+#X text 71 95 bang: Display open panel;
+#X obj 79 505 tof/sample_shifft~;
+#X obj 80 481 tof/sample_granule~;
+#X obj 53 341 tof/sample empty 441000 1;
+#X obj 350 419 tof/sample_record~;
+#X obj 80 450 dac~;
+#X obj 80 428 tof/sample_play~ test;
+#X obj 80 410 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X connect 0 0 21 0;
+#X connect 20 0 21 0;
+#X connect 28 0 27 0;
+#X connect 28 1 27 1;
+#X connect 29 0 28 0;
