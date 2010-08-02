@@ -29,6 +29,7 @@ typedef struct _udpsend
 {
     t_object        x_obj;
     int             x_fd; /* the socket */
+    unsigned int    x_multicast_loop_state;
     unsigned int    x_multicast_ttl; /* time to live for multicast */
 } t_udpsend;
 
@@ -37,6 +38,7 @@ static void udpsend_free(t_udpsend *x);
 static void udpsend_send(t_udpsend *x, t_symbol *s, int argc, t_atom *argv);
 static void udpsend_disconnect(t_udpsend *x);
 static void udpsend_connect(t_udpsend *x, t_symbol *hostname, t_floatarg fportno);
+static void udpsend_set_multicast_loopback(t_udpsend *x, t_floatarg loop_state);
 static void udpsend_set_multicast_ttl(t_udpsend *x, t_floatarg ttl_hops);
 static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc, t_atom *argv);
 static void *udpsend_new(void);
@@ -57,6 +59,9 @@ static void udpsend_connect(t_udpsend *x, t_symbol *hostname,
     int                 sockfd;
     int                 portno = fportno;
     int                 broadcast = 1;/* nonzero is true */
+    unsigned char       multicast_loop_state;
+    unsigned char       multicast_ttl;
+    unsigned int        size;
 
     if (x->x_fd >= 0)
     {
@@ -95,6 +100,10 @@ Enable sending of broadcast messages (if hostname is a broadcast address)*/
 
     if (0xE0000000 == (ntohl(server.sin_addr.s_addr) & 0xF0000000))
         post ("udpsend: connecting to a multicast address");
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &multicast_loop_state, &size);
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_ttl, &size);
+    x->x_multicast_loop_state = multicast_loop_state;
+    x->x_multicast_ttl = multicast_ttl;
     /* assign client port number */
     server.sin_port = htons((u_short)portno);
 
@@ -108,6 +117,19 @@ Enable sending of broadcast messages (if hostname is a broadcast address)*/
     }
     x->x_fd = sockfd;
     outlet_float(x->x_obj.ob_outlet, 1);
+}
+
+static void udpsend_set_multicast_loopback(t_udpsend *x, t_floatarg loop_state)
+{
+    int             sockfd = x->x_fd;
+    unsigned char   multicast_loop_state = loop_state;
+    unsigned int    size;
+
+    if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP,
+        &multicast_loop_state, sizeof(multicast_loop_state)) < 0) 
+        error("udpreceive: setsockopt (IP_MULTICAST_LOOP) failed");
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &multicast_loop_state, &size);
+    x->x_multicast_loop_state = multicast_loop_state;
 }
 
 static void udpsend_set_multicast_ttl(t_udpsend *x, t_floatarg ttl_hops)
@@ -343,18 +365,13 @@ static void udpsend_free(t_udpsend *x)
 
 void udpsend_setup(void)
 {
-    udpsend_class = class_new(gensym("udpsend"), (t_newmethod)udpsend_new,
-        (t_method)udpsend_free,
-        sizeof(t_udpsend), 0, 0);
-    class_addmethod(udpsend_class, (t_method)udpsend_connect,
-        gensym("connect"), A_SYMBOL, A_FLOAT, 0);
+    udpsend_class = class_new(gensym("udpsend"), (t_newmethod)udpsend_new, (t_method)udpsend_free, sizeof(t_udpsend), 0, 0);
+    class_addmethod(udpsend_class, (t_method)udpsend_connect, gensym("connect"), A_SYMBOL, A_FLOAT, 0);
     class_addmethod(udpsend_class, (t_method)udpsend_set_multicast_ttl, gensym("multicast_ttl"), A_DEFFLOAT, 0);
-    class_addmethod(udpsend_class, (t_method)udpsend_set_multicast_interface,
-        gensym("multicast_interface"), A_GIMME, 0);
-    class_addmethod(udpsend_class, (t_method)udpsend_disconnect,
-        gensym("disconnect"), 0);
-    class_addmethod(udpsend_class, (t_method)udpsend_send, gensym("send"),
-        A_GIMME, 0);
+    class_addmethod(udpsend_class, (t_method)udpsend_set_multicast_loopback, gensym("multicast_loopback"), A_DEFFLOAT, 0);
+    class_addmethod(udpsend_class, (t_method)udpsend_set_multicast_interface, gensym("multicast_interface"), A_GIMME, 0);
+    class_addmethod(udpsend_class, (t_method)udpsend_disconnect, gensym("disconnect"), 0);
+    class_addmethod(udpsend_class, (t_method)udpsend_send, gensym("send"), A_GIMME, 0);
     class_addlist(udpsend_class, (t_method)udpsend_send);
 }
 

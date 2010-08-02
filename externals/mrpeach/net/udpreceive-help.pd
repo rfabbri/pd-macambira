@@ -1,68 +1,43 @@
-#N canvas 340 455 880 401 12;
-#X floatatom 387 305 3 0 0 0 - - -;
-#X floatatom 414 305 3 0 0 0 - - -;
-#X floatatom 441 305 3 0 0 0 - - -;
-#X floatatom 468 305 3 0 0 0 - - -;
-#X obj 171 161 udpreceive 9997;
-#X floatatom 495 306 5 0 0 0 - - -;
-#X obj 387 279 unpack 0 0 0 0 0;
-#X msg 161 131 status;
-#X obj 750 246 print xxxx;
-#X floatatom 273 226 9 0 0 0 - - -;
-#X floatatom 648 247 7 0 0 0 - - -;
-#X text 466 361 Martin Peach 2010/07/13;
-#X obj 445 219 route multicast multicast_loop multicast_ttl;
-#X obj 445 252 tgl 15 0 empty empty empty 17 7 0 10 -4034 -1 -1 0 1
+#N canvas 238 505 742 371 12;
+#X floatatom 394 264 3 0 0 0 - - -;
+#X floatatom 421 264 3 0 0 0 - - -;
+#X floatatom 448 264 3 0 0 0 - - -;
+#X floatatom 475 264 3 0 0 0 - - -;
+#X obj 171 120 udpreceive 9997;
+#X floatatom 502 265 5 0 0 0 - - -;
+#X obj 394 238 unpack 0 0 0 0 0;
+#X msg 171 90 status;
+#X floatatom 273 185 9 0 0 0 - - -;
+#X obj 454 211 tgl 15 0 empty empty empty 17 7 0 10 -4034 -1 -1 0 1
 ;
-#X obj 546 252 tgl 15 0 empty empty empty 17 7 0 10 -4034 -1 -1 0 1
-;
-#X floatatom 330 252 9 0 0 0 - - -;
-#X obj 273 193 route received total from;
-#X text 423 107 IP address to accept from (optional);
-#X msg 90 60 ttl \$1;
-#X floatatom 108 11 5 0 256 0 - - -;
-#X obj 135 85 tgl 15 0 empty empty empty 17 7 0 10 -4034 -1 -1 0 1
-;
-#X msg 135 105 loop \$1;
-#X obj 90 34 f 1;
-#X obj 90 14 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -1 -1
-;
-#X text -39 62 set multicast ttl:;
-#X text -40 106 set multicast loopback:;
-#X text -40 131 get status on right outlet:;
-#X text 166 226 bytes received:;
-#X text 179 252 total bytes received:;
-#X text 344 304 from:;
-#X text 421 128 Specify a multicast address (from 224.0.0.0 to 239.255.255.255)
+#X floatatom 333 211 9 0 0 0 - - -;
+#X text 301 76 IP address to accept from (optional);
+#X text -30 90 get status on right outlet:;
+#X text 166 185 bytes received:;
+#X text 181 209 total bytes received:;
+#X text 351 263 from:;
+#X text 299 97 Specify a multicast address (from 224.0.0.0 to 239.255.255.255)
 to use multicasting;
-#X text 284 88 Creation arguments: port number to listen on (required)
+#X text 162 57 Creation arguments: port number to listen on (required)
 ;
-#X text 246 64 [udpreceive] receives bytes over a udp connection.;
-#X obj 171 295 spigot;
-#X obj 210 275 tgl 15 0 empty empty enable_print: -77 8 0 10 -4034
+#X text 124 33 [udpreceive] receives bytes over a udp connection.;
+#X obj 171 254 spigot;
+#X obj 210 234 tgl 15 0 empty empty enable_print: -77 8 0 10 -4034
 -1 -1 0 1;
-#X obj 171 320 print received;
-#X connect 4 0 33 0;
-#X connect 4 1 16 0;
+#X obj 171 279 print received;
+#X obj 273 152 route received total from multicast;
+#X text 466 320 Martin Peach 2010/08/02;
+#X connect 4 0 19 0;
+#X connect 4 1 22 0;
 #X connect 6 0 0 0;
 #X connect 6 1 1 0;
 #X connect 6 2 2 0;
 #X connect 6 3 3 0;
 #X connect 6 4 5 0;
 #X connect 7 0 4 0;
-#X connect 12 0 13 0;
-#X connect 12 1 14 0;
-#X connect 12 2 10 0;
-#X connect 12 3 8 0;
-#X connect 16 0 9 0;
-#X connect 16 1 15 0;
-#X connect 16 2 6 0;
-#X connect 16 3 12 0;
-#X connect 18 0 4 0;
-#X connect 19 0 22 1;
-#X connect 20 0 21 0;
-#X connect 21 0 4 0;
-#X connect 22 0 18 0;
-#X connect 23 0 22 0;
-#X connect 33 0 35 0;
-#X connect 34 0 33 1;
+#X connect 19 0 21 0;
+#X connect 20 0 19 1;
+#X connect 22 0 8 0;
+#X connect 22 1 10 0;
+#X connect 22 2 6 0;
+#X connect 22 3 9 0;

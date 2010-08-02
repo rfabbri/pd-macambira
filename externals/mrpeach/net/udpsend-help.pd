@@ -1,13 +1,13 @@
 #N canvas 355 70 898 550 12;
 #X msg 198 118 disconnect;
 #X msg 17 -63 connect 127.0.0.1 9997;
-#X obj 405 368 tgl 15 0 empty empty connected 20 7 0 8 -24198 -241291
--1 1 1;
+#X obj 455 418 tgl 15 0 empty empty connected 20 7 0 8 -24198 -241291
+-1 0 1;
 #X msg 39 -41 send 0 1 2 3;
-#X text 100 345 udpsend sends bytes over a udp connection.;
-#X text 177 395 Used in conjunction with packOSC will send OSC over
+#X text 150 395 udpsend sends bytes over a udp connection.;
+#X text 227 445 Used in conjunction with packOSC will send OSC over
 udp;
-#X obj 405 345 udpsend;
+#X obj 455 395 udpsend;
 #X msg 61 -19 send ../doc/5.reference/test.txt;
 #X obj 131 27 openpanel;
 #X msg 131 51 send \$1;
@@ -34,7 +34,11 @@ udp;
 -1;
 #X text 240 270 set multicast ttl:;
 #X msg 375 295 multicast_ttl \$1;
-#X text 595 358 Martin Peach 2010/08/02;
+#X text 645 408 Martin Peach 2010/08/02;
+#X msg 425 345 multicast_loopback \$1;
+#X obj 425 323 tgl 15 0 empty empty empty 20 7 0 8 -24198 -241291 -1
+0 1;
+#X text 236 321 enable multicast loopback:;
 #X connect 0 0 6 0;
 #X connect 1 0 6 0;
 #X connect 3 0 6 0;
@@ -52,3 +56,5 @@ udp;
 #X connect 26 0 29 0;
 #X connect 27 0 26 0;
 #X connect 29 0 6 0;
+#X connect 31 0 6 0;
+#X connect 32 0 31 0;
