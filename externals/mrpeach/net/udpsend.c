@@ -27,8 +27,9 @@ static t_class *udpsend_class;
 
 typedef struct _udpsend
 {
-    t_object x_obj;
-    int      x_fd;
+    t_object        x_obj;
+    int             x_fd; /* the socket */
+    unsigned int    x_multicast_ttl; /* time to live for multicast */
 } t_udpsend;
 
 void udpsend_setup(void);
@@ -36,6 +37,7 @@ static void udpsend_free(t_udpsend *x);
 static void udpsend_send(t_udpsend *x, t_symbol *s, int argc, t_atom *argv);
 static void udpsend_disconnect(t_udpsend *x);
 static void udpsend_connect(t_udpsend *x, t_symbol *hostname, t_floatarg fportno);
+static void udpsend_set_multicast_ttl(t_udpsend *x, t_floatarg ttl_hops);
 static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc, t_atom *argv);
 static void *udpsend_new(void);
 
@@ -106,6 +108,19 @@ Enable sending of broadcast messages (if hostname is a broadcast address)*/
     }
     x->x_fd = sockfd;
     outlet_float(x->x_obj.ob_outlet, 1);
+}
+
+static void udpsend_set_multicast_ttl(t_udpsend *x, t_floatarg ttl_hops)
+{
+    int             sockfd = x->x_fd;
+    unsigned char   multicast_ttl = ttl_hops;
+    unsigned int    size;
+
+    if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL,
+        &multicast_ttl, sizeof(multicast_ttl)) < 0) 
+        error("udpsend: setsockopt (IP_MULTICAST_LOOP) failed");
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_ttl, &size);
+    x->x_multicast_ttl = multicast_ttl;
 }
 
 static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc, t_atom *argv)
@@ -333,6 +348,7 @@ void udpsend_setup(void)
         sizeof(t_udpsend), 0, 0);
     class_addmethod(udpsend_class, (t_method)udpsend_connect,
         gensym("connect"), A_SYMBOL, A_FLOAT, 0);
+    class_addmethod(udpsend_class, (t_method)udpsend_set_multicast_ttl, gensym("multicast_ttl"), A_DEFFLOAT, 0);
     class_addmethod(udpsend_class, (t_method)udpsend_set_multicast_interface,
         gensym("multicast_interface"), A_GIMME, 0);
     class_addmethod(udpsend_class, (t_method)udpsend_disconnect,
