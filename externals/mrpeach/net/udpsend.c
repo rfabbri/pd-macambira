@@ -110,6 +110,9 @@ Enable sending of broadcast messages (if hostname is a broadcast address)*/
 
 static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc, t_atom *argv)
 {
+#ifdef _WIN32
+    post ("udpsend: set multicast interface not implementeed yet");
+#else
     struct sockaddr_in  server;
     struct sockaddr     *sa;
     struct hostent      *hp = 0;
@@ -183,6 +186,7 @@ static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc
     if (setsockopt(x->x_fd, IPPROTO_IP, IP_MULTICAST_IF, &server.sin_addr, sizeof(struct in_addr)) < 0)
         sys_sockerror("udpsend_set_multicast_interface: setsockopt");
     else post("udpsend multicast interface is %s", inet_ntoa(server.sin_addr));
+#endif // _WIN32
 }
 
 static void udpsend_disconnect(t_udpsend *x)
