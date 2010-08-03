@@ -78,7 +78,7 @@ class GEM_EXTERN pix_opencv_distrans : public GemPixObj
 
 	// The output and temporary images
     	IplImage 	*dist, *dist8u1, *dist8u2, *dist8u, *dist32s;
-    	IplImage 	*src, *gray, *edge, *labels;
+    	IplImage 	*rgb, *gray, *edge, *labels;
     	IplImage 	*rgba, *alpha;
 	
 };

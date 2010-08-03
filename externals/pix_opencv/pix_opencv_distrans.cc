@@ -43,7 +43,7 @@ pix_opencv_distrans :: pix_opencv_distrans()
   dist8u2 = NULL;
   dist8u = NULL;
   dist32s = NULL;
-  src = NULL;
+  rgb = NULL;
   gray = NULL;
   edge = NULL;
   labels = NULL;
@@ -61,7 +61,7 @@ pix_opencv_distrans :: pix_opencv_distrans()
 pix_opencv_distrans :: ~pix_opencv_distrans()
 {
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &src );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &gray );
     	cvReleaseImage( &edge );
     	cvReleaseImage( &dist );
@@ -102,7 +102,7 @@ void pix_opencv_distrans :: processRGBAImage(imageStruct &image)
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &src );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &gray );
     	cvReleaseImage( &edge );
     	cvReleaseImage( &dist );
@@ -115,8 +115,8 @@ void pix_opencv_distrans :: processRGBAImage(imageStruct &image)
     	cvReleaseImage( &alpha );
 
 	//Create cv_images 
-    	src = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
-    	gray = cvCreateImage(cvSize(src->width,src->height), IPL_DEPTH_8U, 1);
+    	rgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
+    	gray = cvCreateImage(cvSize(rgb->width,rgb->height), IPL_DEPTH_8U, 1);
     	dist = cvCreateImage( cvGetSize(gray), IPL_DEPTH_32F, 1 );
     	dist8u1 = cvCloneImage( gray );
     	dist8u2 = cvCloneImage( gray );
@@ -127,16 +127,10 @@ void pix_opencv_distrans :: processRGBAImage(imageStruct &image)
     	rgba = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 4 );
     	alpha = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
     }
-    // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( rgba->imageData, image.data, image.xsize*image.ysize*4 );
     
-    CvArr* in[] = { rgba };
-    CvArr* out[] = { src, alpha };
-    int from_to[] = { 0, 0, 1, 1, 2, 2, 3, 3 };
-    //cvSet( rgba, cvScalar(1,2,3,4) );
-    cvMixChannels( (const CvArr**)in, 1, out, 2, from_to, 4 );
-
-    cvCvtColor(src, gray, CV_BGR2GRAY);
+    cvCvtColor(rgba, rgb, CV_RGBA2RGB);
+    cvCvtColor(rgb, gray, CV_RGB2GRAY);
     
     cvThreshold( gray, edge, (float)edge_thresh, (float)edge_thresh, CV_THRESH_BINARY );
 
@@ -182,10 +176,7 @@ void pix_opencv_distrans :: processRGBAImage(imageStruct &image)
     }
 
 
-    CvArr* src[] = { dist8u, alpha };
-    CvArr* dst[] = { rgba };
-    cvMixChannels( (const CvArr**)src, 2, (CvArr**)dst, 1, from_to, 4 );
-    //cvShowImage(wndname, cedge);
+    cvCvtColor(dist8u, rgba, CV_RGB2RGBA);
     memcpy( image.data, rgba->imageData, image.xsize*image.ysize*4 );
 }
 
@@ -213,7 +204,7 @@ void pix_opencv_distrans :: processRGBImage(imageStruct &image)
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &src );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &gray );
     	cvReleaseImage( &edge );
     	cvReleaseImage( &dist );
@@ -226,8 +217,8 @@ void pix_opencv_distrans :: processRGBImage(imageStruct &image)
     	cvReleaseImage( &alpha );
 
 	//Create cv_images 
-    	src = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
-    	gray = cvCreateImage(cvSize(src->width,src->height), IPL_DEPTH_8U, 1);
+    	rgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
+    	gray = cvCreateImage(cvSize(rgb->width,rgb->height), IPL_DEPTH_8U, 1);
     	dist = cvCreateImage( cvGetSize(gray), IPL_DEPTH_32F, 1 );
     	dist8u1 = cvCloneImage( gray );
     	dist8u2 = cvCloneImage( gray );
@@ -239,9 +230,9 @@ void pix_opencv_distrans :: processRGBImage(imageStruct &image)
     	alpha = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
     }
     // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
-    memcpy( src->imageData, image.data, image.xsize*image.ysize*3 );
+    memcpy( rgb->imageData, image.data, image.xsize*image.ysize*3 );
     
-    cvCvtColor(src, gray, CV_BGR2GRAY);
+    cvCvtColor(rgb, gray, CV_BGR2GRAY);
     
     cvThreshold( gray, edge, (float)edge_thresh, (float)edge_thresh, CV_THRESH_BINARY );
 
@@ -319,7 +310,7 @@ void pix_opencv_distrans :: processGrayImage(imageStruct &image)
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &src );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &gray );
     	cvReleaseImage( &edge );
     	cvReleaseImage( &dist );
@@ -332,8 +323,8 @@ void pix_opencv_distrans :: processGrayImage(imageStruct &image)
     	cvReleaseImage( &alpha );
 
 	//Create cv_images 
-    	src = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
-    	gray = cvCreateImage(cvSize(src->width,src->height), IPL_DEPTH_8U, 1);
+    	rgb = cvCreateImage(cvSize(image.xsize,image.ysize), IPL_DEPTH_8U, 3);
+    	gray = cvCreateImage(cvSize(rgb->width,rgb->height), IPL_DEPTH_8U, 1);
     	dist = cvCreateImage( cvGetSize(gray), IPL_DEPTH_32F, 1 );
     	dist8u1 = cvCloneImage( gray );
     	dist8u2 = cvCloneImage( gray );

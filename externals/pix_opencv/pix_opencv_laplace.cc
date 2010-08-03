@@ -37,9 +37,9 @@ pix_opencv_laplace :: pix_opencv_laplace()
   comp_xsize  = 0;
   comp_ysize  = 0;
 
-  frame = NULL;
+  rgb = NULL;
   rgba = NULL;
-  alpha = NULL;
+  grey = NULL;
   laplace = NULL;
   colorlaplace = NULL;
   for (i=0; i<3; i++) planes[i] = NULL;
@@ -56,9 +56,9 @@ pix_opencv_laplace :: ~pix_opencv_laplace()
     	//Destroy cv_images to clean memory
     	for( i = 0; i < 3; i++ )
     		cvReleaseImage( &planes[i] );
-    	cvReleaseImage( &frame );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &rgba );
-    	cvReleaseImage( &alpha );
+    	cvReleaseImage( &grey );
     	cvReleaseImage( &laplace );
     	cvReleaseImage( &colorlaplace );
 }
@@ -80,9 +80,9 @@ void pix_opencv_laplace :: processRGBAImage(imageStruct &image)
     	//Destroy cv_images to clean memory
     	for( i = 0; i < 3; i++ )
     		cvReleaseImage( &planes[i] );
-    	cvReleaseImage( &frame );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &rgba );
-    	cvReleaseImage( &alpha );
+    	cvReleaseImage( &grey );
     	cvReleaseImage( &laplace );
     	cvReleaseImage( &colorlaplace );
 
@@ -91,33 +91,25 @@ void pix_opencv_laplace :: processRGBAImage(imageStruct &image)
      	 	planes[i] = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
     	laplace = cvCreateImage( cvSize(image.xsize, image.ysize), IPL_DEPTH_16S, 1 );
     	colorlaplace = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 3 );
-    	frame = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 3 );
+    	rgb = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 3 );
     	rgba = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 4 );
-    	alpha = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 1 );
+    	grey = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 1 );
     }
     // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( rgba->imageData, image.data, image.xsize*image.ysize*4 );
     
-    CvArr* in[] = { rgba };
-    CvArr* out[] = { frame, alpha };
-    int from_to[] = { 0, 0, 1, 1, 2, 2, 3, 3 };
-    //cvSet( rgba, cvScalar(1,2,3,4) );
-    cvMixChannels( (const CvArr**)in, 1, out, 2, from_to, 4 );
+    cvCvtColor( rgba, rgb, CV_RGBA2RGB);
 
-	cvCvtPixToPlane( frame, planes[0], planes[1], planes[2], 0 );
-        for( i = 0; i < 3; i++ )
-        {
-            cvLaplace( planes[i], laplace, aperture_size );
-            cvConvertScaleAbs( laplace, planes[i], 1, 0 );
-        }
-        cvCvtPlaneToPix( planes[0], planes[1], planes[2], 0, colorlaplace );
-        colorlaplace->origin = frame->origin;
+    cvCvtPixToPlane( rgb, planes[0], planes[1], planes[2], 0 );
+    for( i = 0; i < 3; i++ )
+    {
+       cvLaplace( planes[i], laplace, aperture_size );
+       cvConvertScaleAbs( laplace, planes[i], 1, 0 );
+    }
+    cvCvtPlaneToPix( planes[0], planes[1], planes[2], 0, colorlaplace );
+    colorlaplace->origin = rgb->origin;
 
-
-    CvArr* src[] = { colorlaplace, alpha };
-    CvArr* dst[] = { rgba };
-    cvMixChannels( (const CvArr**)src, 2, (CvArr**)dst, 1, from_to, 4 );
-    //cvShowImage(wndname, cedge);
+    cvCvtColor( colorlaplace, rgba, CV_RGB2RGBA);
     memcpy( image.data, rgba->imageData, image.xsize*image.ysize*4 );
 }
 
@@ -126,7 +118,7 @@ void pix_opencv_laplace :: processRGBImage(imageStruct &image)
   unsigned char *pixels = image.data;
   int i;
 
-  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!frame)) {
+  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!rgb)) {
 
 	this->comp_xsize = image.xsize;
 	this->comp_ysize = image.ysize;
@@ -134,7 +126,7 @@ void pix_opencv_laplace :: processRGBImage(imageStruct &image)
     	//Destroy cv_images to clean memory
     	for( i = 0; i < 3; i++ )
     		cvReleaseImage( &planes[i] );
-    	cvReleaseImage( &frame );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &laplace );
     	cvReleaseImage( &colorlaplace );
 
@@ -143,20 +135,19 @@ void pix_opencv_laplace :: processRGBImage(imageStruct &image)
      	 	planes[i] = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
     	laplace = cvCreateImage( cvSize(image.xsize, image.ysize), IPL_DEPTH_16S, 1 );
     	colorlaplace = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 3 );
-    	frame = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 3 );
+    	rgb = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 3 );
     }
     // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
-    memcpy( frame->imageData, image.data, image.xsize*image.ysize*3 );
+    memcpy( rgb->imageData, image.data, image.xsize*image.ysize*3 );
 
-	cvCvtPixToPlane( frame, planes[0], planes[1], planes[2], 0 );
-        for( i = 0; i < 3; i++ )
-        {
-            cvLaplace( planes[i], laplace, 3 );
-            cvConvertScaleAbs( laplace, planes[i], 1, 0 );
-        }
-        cvCvtPlaneToPix( planes[0], planes[1], planes[2], 0, colorlaplace );
-        colorlaplace->origin = frame->origin;
-
+    cvCvtPixToPlane( rgb, planes[0], planes[1], planes[2], 0 );
+    for( i = 0; i < 3; i++ )
+    {
+       cvLaplace( planes[i], laplace, 3 );
+       cvConvertScaleAbs( laplace, planes[i], 1, 0 );
+    }
+    cvCvtPlaneToPix( planes[0], planes[1], planes[2], 0, colorlaplace );
+    colorlaplace->origin = rgb->origin;
 
     //cvShowImage(wndname, cedge);
     memcpy( image.data, colorlaplace->imageData, image.xsize*image.ysize*3 );
@@ -172,7 +163,7 @@ void pix_opencv_laplace :: processGrayImage(imageStruct &image)
   unsigned char *pixels = image.data;
   int i;
 
-  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!alpha)) {
+  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!grey)) {
 
 	this->comp_xsize = image.xsize;
 	this->comp_ysize = image.ysize;
@@ -180,37 +171,36 @@ void pix_opencv_laplace :: processGrayImage(imageStruct &image)
     	//Destroy cv_images to clean memory
     	for( i = 0; i < 3; i++ )
     		cvReleaseImage( &planes[i] );
-    	cvReleaseImage( &frame );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &laplace );
     	cvReleaseImage( &colorlaplace );
-    	cvReleaseImage( &alpha );
+    	cvReleaseImage( &grey );
 
 	//Create cv_images 
     	for( i = 0; i < 3; i++ )
      	 	planes[i] = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
     	laplace = cvCreateImage( cvSize(image.xsize, image.ysize), IPL_DEPTH_16S, 1 );
     	colorlaplace = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 3 );
-    	frame = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 3 );
-    	alpha = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 1 );
+    	rgb = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 3 );
+    	grey = cvCreateImage( cvSize(image.xsize,image.ysize), 8, 1 );
     }
-    // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
-    memcpy( alpha->imageData, image.data, image.xsize*image.ysize );
+    memcpy( grey->imageData, image.data, image.xsize*image.ysize );
 
-    cvCvtColor( alpha, frame, CV_GRAY2RGB);
+    cvCvtColor( grey, rgb, CV_GRAY2RGB);
 
-	cvCvtPixToPlane( frame, planes[0], planes[1], planes[2], 0 );
-        for( i = 0; i < 3; i++ )
-        {
-            cvLaplace( planes[i], laplace, 3 );
-            cvConvertScaleAbs( laplace, planes[i], 1, 0 );
-        }
-        cvCvtPlaneToPix( planes[0], planes[1], planes[2], 0, colorlaplace );
-        colorlaplace->origin = frame->origin;
+    cvCvtPixToPlane( rgb, planes[0], planes[1], planes[2], 0 );
+    for( i = 0; i < 3; i++ )
+    {
+       cvLaplace( planes[i], laplace, 3 );
+       cvConvertScaleAbs( laplace, planes[i], 1, 0 );
+    }
+    cvCvtPlaneToPix( planes[0], planes[1], planes[2], 0, colorlaplace );
+    colorlaplace->origin = rgb->origin;
 
 
-    cvCvtColor( colorlaplace, alpha, CV_RGB2GRAY);
+    cvCvtColor( colorlaplace, grey, CV_RGB2GRAY);
     //cvShowImage(wndname, cedge);
-    memcpy( image.data, alpha->imageData, image.xsize*image.ysize );
+    memcpy( image.data, grey->imageData, image.xsize*image.ysize );
 }
 
 /////////////////////////////////////////////////////////

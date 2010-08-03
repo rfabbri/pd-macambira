@@ -38,8 +38,8 @@ pix_opencv_morphology :: pix_opencv_morphology()
   comp_ysize  = 0;
 
   rgba = NULL;
-  alpha = NULL;
-  src = NULL;
+  grey = NULL;
+  rgb = NULL;
   dst = NULL;
   
   element_shape = CV_SHAPE_RECT;
@@ -53,10 +53,10 @@ pix_opencv_morphology :: pix_opencv_morphology()
 pix_opencv_morphology :: ~pix_opencv_morphology()
 {
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &src );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &dst );
     	cvReleaseImage( &rgba );
-    	cvReleaseImage( &alpha );
+    	cvReleaseImage( &grey );
 }
 
 /////////////////////////////////////////////////////////
@@ -74,25 +74,21 @@ void pix_opencv_morphology :: processRGBAImage(imageStruct &image)
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &src );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &dst );
     	cvReleaseImage( &rgba );
-    	cvReleaseImage( &alpha );
+    	cvReleaseImage( &grey );
 
 	//Create cv_images 
-    	src = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 3 );
-	dst = cvCloneImage(src);
+    	rgb = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 3 );
+	dst = cvCloneImage(rgb);
     	rgba = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 4 );
-    	alpha = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
+    	grey = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
     }
     // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( rgba->imageData, image.data, image.xsize*image.ysize*4 );
     
-    CvArr* in[] = { rgba };
-    CvArr* out[] = { src, alpha };
-    int from_to[] = { 0, 0, 1, 1, 2, 2, 3, 3 };
-    //cvSet( rgba, cvScalar(1,2,3,4) );
-    cvMixChannels( (const CvArr**)in, 1, out, 2, from_to, 4 );
+    cvCvtColor(rgba, rgb, CV_RGBA2RGB);
 
     if (this->mode == 1) { //open/close
     	int n = pos;
@@ -100,12 +96,12 @@ void pix_opencv_morphology :: processRGBAImage(imageStruct &image)
     	element = cvCreateStructuringElementEx( an*2+1, an*2+1, an, an, element_shape, 0 );
     	if( n < 0 )
     	{
-        	cvErode(src,dst,element,1);
+        	cvErode(rgb,dst,element,1);
         	cvDilate(dst,dst,element,1);
     	}
     	else
     	{
-        	cvDilate(src,dst,element,1);
+        	cvDilate(rgb,dst,element,1);
         	cvErode(dst,dst,element,1);
     	}
     	cvReleaseStructuringElement(&element);
@@ -116,20 +112,17 @@ void pix_opencv_morphology :: processRGBAImage(imageStruct &image)
     	element = cvCreateStructuringElementEx( an*2+1, an*2+1, an, an, element_shape, 0 );
     	if( n < 0 )
     	{
-        	cvErode(src,dst,element,1);
+        	cvErode(rgb,dst,element,1);
     	}
     	else
     	{
-        	cvDilate(src,dst,element,1);
+        	cvDilate(rgb,dst,element,1);
     	}
     	cvReleaseStructuringElement(&element);
 
     }
 
-    CvArr* src[] = { dst, alpha };
-    CvArr* dst[] = { rgba };
-    cvMixChannels( (const CvArr**)src, 2, (CvArr**)dst, 1, from_to, 4 );
-    //cvShowImage(wndname, cedge);
+    cvCvtColor(dst, rgba, CV_RGB2RGBA);
     memcpy( image.data, rgba->imageData, image.xsize*image.ysize*4 );
 }
 
@@ -138,21 +131,21 @@ void pix_opencv_morphology :: processRGBImage(imageStruct &image)
   unsigned char *pixels = image.data;
   int i;
 
-  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!src)) {
+  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!rgb)) {
 
 	this->comp_xsize = image.xsize;
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &src );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &dst );
 
 	//Create cv_images 
-    	src = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 4 );
-	dst = cvCloneImage(src);
+    	rgb = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 4 );
+	dst = cvCloneImage(rgb);
     }
     // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
-    memcpy( src->imageData, image.data, image.xsize*image.ysize*3 );
+    memcpy( rgb->imageData, image.data, image.xsize*image.ysize*3 );
 
     if (this->mode == 1) { //open/close
     	int n = pos;
@@ -160,12 +153,12 @@ void pix_opencv_morphology :: processRGBImage(imageStruct &image)
     	element = cvCreateStructuringElementEx( an*2+1, an*2+1, an, an, element_shape, 0 );
     	if( n < 0 )
     	{
-        	cvErode(src,dst,element,1);
+        	cvErode(rgb,dst,element,1);
         	cvDilate(dst,dst,element,1);
     	}
     	else
     	{
-        	cvDilate(src,dst,element,1);
+        	cvDilate(rgb,dst,element,1);
         	cvErode(dst,dst,element,1);
     	}
     	cvReleaseStructuringElement(&element);
@@ -176,11 +169,11 @@ void pix_opencv_morphology :: processRGBImage(imageStruct &image)
     	element = cvCreateStructuringElementEx( an*2+1, an*2+1, an, an, element_shape, 0 );
     	if( n < 0 )
     	{
-        	cvErode(src,dst,element,1);
+        	cvErode(rgb,dst,element,1);
     	}
     	else
     	{
-        	cvDilate(src,dst,element,1);
+        	cvDilate(rgb,dst,element,1);
     	}
     	cvReleaseStructuringElement(&element);
 
@@ -200,25 +193,25 @@ void pix_opencv_morphology :: processGrayImage(imageStruct &image)
   unsigned char *pixels = image.data;
   int i;
 
-  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!alpha)) {
+  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!grey)) {
 
 	this->comp_xsize = image.xsize;
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &src );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &dst );
-    	cvReleaseImage( &alpha );
+    	cvReleaseImage( &grey );
 
 	//Create cv_images 
-    	src = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 3 );
-	dst = cvCloneImage(src);
-    	alpha = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
+    	rgb = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 3 );
+	dst = cvCloneImage(rgb);
+    	grey = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
     }
     // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
-    memcpy( alpha->imageData, image.data, image.xsize*image.ysize );
+    memcpy( grey->imageData, image.data, image.xsize*image.ysize );
     
-    cvCvtColor(alpha, src, CV_GRAY2RGB);
+    cvCvtColor(grey, rgb, CV_GRAY2RGB);
     
     if (this->mode == 1) { //open/close
     	int n = pos;
@@ -226,12 +219,12 @@ void pix_opencv_morphology :: processGrayImage(imageStruct &image)
     	element = cvCreateStructuringElementEx( an*2+1, an*2+1, an, an, element_shape, 0 );
     	if( n < 0 )
     	{
-        	cvErode(src,dst,element,1);
+        	cvErode(rgb,dst,element,1);
         	cvDilate(dst,dst,element,1);
     	}
     	else
     	{
-        	cvDilate(src,dst,element,1);
+        	cvDilate(rgb,dst,element,1);
         	cvErode(dst,dst,element,1);
     	}
     	cvReleaseStructuringElement(&element);
@@ -242,19 +235,19 @@ void pix_opencv_morphology :: processGrayImage(imageStruct &image)
     	element = cvCreateStructuringElementEx( an*2+1, an*2+1, an, an, element_shape, 0 );
     	if( n < 0 )
     	{
-        	cvErode(src,dst,element,1);
+        	cvErode(rgb,dst,element,1);
     	}
     	else
     	{
-        	cvDilate(src,dst,element,1);
+        	cvDilate(rgb,dst,element,1);
     	}
     	cvReleaseStructuringElement(&element);
 
     }
 
-    cvCvtColor(dst, alpha, CV_RGB2GRAY);
+    cvCvtColor(dst, grey, CV_RGB2GRAY);
     //cvShowImage(wndname, cedge);
-    memcpy( image.data, alpha->imageData, image.xsize*image.ysize );
+    memcpy( image.data, grey->imageData, image.xsize*image.ysize );
 }
 
 /////////////////////////////////////////////////////////

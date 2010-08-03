@@ -75,7 +75,7 @@ class GEM_EXTERN pix_opencv_laplace : public GemPixObj
 
 	/////////
 	// IplImage needed
-    	IplImage 	*frame, *rgba, *alpha, *laplace, *colorlaplace, *planes[3];
+    	IplImage 	*rgb, *rgba, *grey, *laplace, *colorlaplace, *planes[3];
 	
 };
 

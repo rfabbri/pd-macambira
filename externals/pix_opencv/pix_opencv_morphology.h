@@ -78,7 +78,7 @@ class GEM_EXTERN pix_opencv_morphology : public GemPixObj
     	static void 	shapeMessCallback(void *data, t_floatarg f);
 
     	// The output and temporary images
-    	IplImage	*rgba, *alpha, *src, *dst;
+    	IplImage	*rgba, *grey, *rgb, *dst;
 	
     	IplConvKernel	*element;
 	

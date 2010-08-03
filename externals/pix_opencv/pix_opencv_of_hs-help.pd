@@ -1,4 +1,4 @@
-#N canvas 1 49 1424 780 10;
+#N canvas 5 61 1424 780 10;
 #X obj 977 55 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 189 149 454 304 gemwin 0;
@@ -114,7 +114,6 @@
 #X obj 293 613 pix_texture;
 #X obj 293 641 square 2;
 #X obj 454 618 pix_texture;
-#X obj 454 278 pix_resize 320 240;
 #X text 504 146 this object can work on small frames unless you have
 a very powerful machine;
 #X obj 455 642 square 2;
@@ -149,6 +148,7 @@ average direction and the intensity of the movement in a video stream.
 #X text 981 202 comments to ydegoyon@gmail.com;
 #X text 980 126 pix_opencv_of_hs : Haron and Schunck optical flow algorithm.
 ;
+#X obj 385 160 pix_resize 320 240;
 #X connect 1 0 2 0;
 #X connect 2 0 1 0;
 #X connect 5 0 6 0;
@@ -172,9 +172,8 @@ average direction and the intensity of the movement in a video stream.
 #X connect 28 0 24 0;
 #X connect 29 0 30 0;
 #X connect 30 0 40 0;
-#X connect 31 0 43 0;
-#X connect 32 0 46 0;
-#X connect 32 0 47 0;
+#X connect 31 0 47 0;
+#X connect 32 0 68 0;
 #X connect 33 0 32 2;
 #X connect 34 0 32 0;
 #X connect 35 0 34 0;
@@ -183,20 +182,21 @@ average direction and the intensity of the movement in a video stream.
 #X connect 38 0 34 0;
 #X connect 39 0 34 0;
 #X connect 40 0 41 0;
-#X connect 42 0 45 0;
-#X connect 43 0 48 0;
-#X connect 46 0 29 0;
-#X connect 47 0 16 0;
-#X connect 48 0 42 0;
-#X connect 48 1 11 0;
-#X connect 48 2 5 0;
-#X connect 49 0 50 0;
-#X connect 50 0 48 0;
-#X connect 51 0 61 0;
-#X connect 52 0 53 0;
-#X connect 53 0 48 0;
-#X connect 54 0 55 0;
-#X connect 55 0 48 0;
-#X connect 57 0 48 0;
-#X connect 58 0 57 0;
-#X connect 61 0 48 0;
+#X connect 42 0 44 0;
+#X connect 45 0 29 0;
+#X connect 46 0 16 0;
+#X connect 47 0 42 0;
+#X connect 47 1 11 0;
+#X connect 47 2 5 0;
+#X connect 48 0 49 0;
+#X connect 49 0 47 0;
+#X connect 50 0 60 0;
+#X connect 51 0 52 0;
+#X connect 52 0 47 0;
+#X connect 53 0 54 0;
+#X connect 54 0 47 0;
+#X connect 56 0 47 0;
+#X connect 57 0 56 0;
+#X connect 60 0 47 0;
+#X connect 68 0 46 0;
+#X connect 68 0 45 0;

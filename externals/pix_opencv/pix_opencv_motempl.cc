@@ -53,10 +53,10 @@ pix_opencv_motempl :: pix_opencv_motempl()
   min_size=50;
   max_size=500; 
 
-  img = NULL;
+  rgb = NULL;
   motion = NULL;
   rgba = NULL;
-  alpha = NULL;
+  grey = NULL;
   mhi = NULL;
   orient = NULL; 
   mask = NULL; 
@@ -67,12 +67,12 @@ pix_opencv_motempl :: pix_opencv_motempl()
 
   cvInitFont( &font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0, 1, 8 );
 
-  img = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 3);
+  rgb = cvCreateImage(cvSize(comp_xsize,comp_ysize), IPL_DEPTH_8U, 3);
   motion = cvCreateImage( cvSize(comp_xsize,comp_ysize), 8, 3 );
   cvZero( motion );
-  motion->origin = img->origin;
+  motion->origin = rgb->origin;
   rgba = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 4 );
-  alpha = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
+  grey = cvCreateImage( cvSize(comp_xsize, comp_ysize), 8, 1 );
 
 }
 
@@ -83,10 +83,10 @@ pix_opencv_motempl :: pix_opencv_motempl()
 pix_opencv_motempl :: ~pix_opencv_motempl()
 {
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &img );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &motion );
     	cvReleaseImage( &rgba );
-    	cvReleaseImage( &alpha );
+    	cvReleaseImage( &grey );
 }
 
 /////////////////////////////////////////////////////////
@@ -114,27 +114,22 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &img );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &motion );
     	cvReleaseImage( &rgba );
-    	cvReleaseImage( &alpha );
+    	cvReleaseImage( &grey );
 
 	//Create cv_images 
-    	img = cvCreateImage(cvSize(image.xsize, image.ysize), IPL_DEPTH_8U, 3);
-    	motion = cvCreateImage( cvSize(img->width,img->height), 8, 3 );
+    	rgb = cvCreateImage(cvSize(image.xsize, image.ysize), IPL_DEPTH_8U, 3);
+    	motion = cvCreateImage( cvSize(rgb->width,rgb->height), 8, 3 );
     	cvZero( motion );
-    	motion->origin = img->origin;
+    	motion->origin = rgb->origin;
     	rgba = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 4 );
-    	alpha = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
+    	grey = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
     }
-    // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
     memcpy( rgba->imageData, image.data, image.xsize*image.ysize*4 );
     
-    CvArr* in[] = { rgba };
-    CvArr* out[] = { img, alpha };
-    int from_to[] = { 0, 0, 1, 1, 2, 2, 3, 3 };
-    //cvSet( rgba, cvScalar(1,2,3,4) );
-    cvMixChannels( (const CvArr**)in, 1, out, 2, from_to, 4 );
+    cvCvtColor( rgba, rgb, CV_RGBA2RGB);
 
     // allocate images at the beginning or
     // reallocate them if the frame size is changed
@@ -161,7 +156,7 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
         mask = cvCreateImage( size, IPL_DEPTH_8U, 1 );
     }
 
-    cvCvtColor( img, buf[last], CV_BGR2GRAY ); // convert frame to grayscale
+    cvCvtColor( rgb, buf[last], CV_BGR2GRAY ); // convert frame to grayscale
 
     idx2 = (last + 1) % frame_buffer_num; // index of (last - (N-1))th frame
     last = idx2;
@@ -263,11 +258,8 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
         }
     }
 
-
-    CvArr* src[] = { motion, alpha };
-    CvArr* dst[] = { rgba };
-    cvMixChannels( (const CvArr**)src, 2, (CvArr**)dst, 1, from_to, 4 );
-    //cvShowImage(wndname, cedge);
+    
+    cvCvtColor( motion, rgba, CV_RGB2RGBA);
     memcpy( image.data, rgba->imageData, image.xsize*image.ysize*4 );
 }
 
@@ -292,21 +284,21 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &img );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &motion );
     	cvReleaseImage( &rgba );
-    	cvReleaseImage( &alpha );
+    	cvReleaseImage( &grey );
 
 	//Create cv_images 
-    	img = cvCreateImage(cvSize(image.xsize, image.ysize), IPL_DEPTH_8U, 3);
-    	motion = cvCreateImage( cvSize(img->width,img->height), 8, 3 );
+    	rgb = cvCreateImage(cvSize(image.xsize, image.ysize), IPL_DEPTH_8U, 3);
+    	motion = cvCreateImage( cvSize(rgb->width,rgb->height), 8, 3 );
     	cvZero( motion );
-    	motion->origin = img->origin;
+    	motion->origin = rgb->origin;
     	rgba = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 4 );
-    	alpha = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
+    	grey = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
     }
     // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
-    memcpy( img->imageData, image.data, image.xsize*image.ysize*3 );
+    memcpy( rgb->imageData, image.data, image.xsize*image.ysize*3 );
     
     // allocate images at the beginning or
     // reallocate them if the frame size is changed
@@ -333,7 +325,7 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
         mask = cvCreateImage( size, IPL_DEPTH_8U, 1 );
     }
 
-    cvCvtColor( img, buf[last], CV_BGR2GRAY ); // convert frame to grayscale
+    cvCvtColor( rgb, buf[last], CV_BGR2GRAY ); // convert frame to grayscale
 
     idx2 = (last + 1) % frame_buffer_num; // index of (last - (N-1))th frame
     last = idx2;
@@ -466,24 +458,24 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
 	this->comp_ysize = image.ysize;
 
     	//Destroy cv_images to clean memory
-    	cvReleaseImage( &img );
+    	cvReleaseImage( &rgb );
     	cvReleaseImage( &motion );
     	cvReleaseImage( &rgba );
-    	cvReleaseImage( &alpha );
+    	cvReleaseImage( &grey );
 
 	//Create cv_images 
-    	img = cvCreateImage(cvSize(image.xsize, image.ysize), IPL_DEPTH_8U, 3);
-    	motion = cvCreateImage( cvSize(img->width,img->height), 8, 3 );
+    	rgb = cvCreateImage(cvSize(image.xsize, image.ysize), IPL_DEPTH_8U, 3);
+    	motion = cvCreateImage( cvSize(rgb->width,rgb->height), 8, 3 );
     	cvZero( motion );
-    	motion->origin = img->origin;
+    	motion->origin = rgb->origin;
     	rgba = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 4 );
-    	alpha = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
+    	grey = cvCreateImage( cvSize(image.xsize, image.ysize), 8, 1 );
     }
     // FEM UNA COPIA DEL PACKET A image->imageData ... http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html aqui veiem la estructura de IplImage
-    memcpy( alpha->imageData, image.data, image.xsize*image.ysize );
+    memcpy( grey->imageData, image.data, image.xsize*image.ysize );
     
     // Convert to RGB
-    cvCvtColor( alpha, img, CV_GRAY2RGB);
+    cvCvtColor( grey, rgb, CV_GRAY2RGB);
     
     // allocate images at the beginning or
     // reallocate them if the frame size is changed
@@ -510,7 +502,7 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
         mask = cvCreateImage( size, IPL_DEPTH_8U, 1 );
     }
 
-    cvCvtColor( img, buf[last], CV_BGR2GRAY ); // convert frame to grayscale
+    cvCvtColor( rgb, buf[last], CV_BGR2GRAY ); // convert frame to grayscale
 
     idx2 = (last + 1) % frame_buffer_num; // index of (last - (N-1))th frame
     last = idx2;
@@ -614,9 +606,9 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
 
 
     // Convert to grayscale
-    cvCvtColor( motion, alpha, CV_RGB2GRAY);
+    cvCvtColor( motion, grey, CV_RGB2GRAY);
     //cvShowImage(wndname, cedge);
-    memcpy( image.data, alpha->imageData, image.xsize*image.ysize );
+    memcpy( image.data, grey->imageData, image.xsize*image.ysize );
 }
 
 /////////////////////////////////////////////////////////

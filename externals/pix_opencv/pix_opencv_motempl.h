@@ -109,7 +109,7 @@ class GEM_EXTERN pix_opencv_motempl : public GemPixObj
    static void 	apertureMessCallback(void *data, t_floatarg aperture);
 
    // The output and temporary images
-   IplImage 	*img, *motion, *rgba, *alpha;
+   IplImage 	*rgb, *motion, *rgba, *grey;
     
    // ring image buffer
    IplImage **buf;
