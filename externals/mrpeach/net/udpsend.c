@@ -13,6 +13,7 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <iphlpapi.h> // for interface addresses
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -94,14 +95,16 @@ Enable sending of broadcast messages (if hostname is a broadcast address)*/
     hp = gethostbyname(hostname->s_name);
     if (hp == 0)
     {
-	    post("udpsend: bad host?\n");
+        post("udpsend: bad host?\n");
         return;
     }
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
 
     if (0xE0000000 == (ntohl(server.sin_addr.s_addr) & 0xF0000000))
         post ("udpsend: connecting to a multicast address");
+    size = sizeof(multicast_loop_state);
     getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &multicast_loop_state, &size);
+    size = sizeof(multicast_ttl);
     getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_ttl, &size);
     x->x_multicast_loop_state = multicast_loop_state;
     x->x_multicast_ttl = multicast_ttl;
@@ -149,7 +152,89 @@ static void udpsend_set_multicast_ttl(t_udpsend *x, t_floatarg ttl_hops)
 static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc, t_atom *argv)
 {
 #ifdef _WIN32
-    post ("udpsend: set multicast interface not implementeed yet");
+    int                 i, n_ifaces = 32;
+    PMIB_IPADDRTABLE    pIPAddrTable;
+    DWORD               dwSize;
+    DWORD               dwRetVal = 0;
+    IN_ADDR             IPAddr;
+    LPVOID              lpMsgBuf;
+    int                 if_index = -1;
+    int                 found = 0;
+    t_symbol            *interfacename = gensym("none");
+    struct hostent      *hp = 0;
+    struct sockaddr_in  server;
+
+    if (x->x_fd < 0)
+    {
+        pd_error(x, "udpsend_set_multicast_interface: not connected");
+        return;
+    }
+    switch (argv[0].a_type)
+    {
+        case A_FLOAT:
+            if_index = (int)atom_getfloat(&argv[0]);
+            break;
+        case A_SYMBOL:
+            interfacename = atom_getsymbol(&argv[0]);    
+            break;
+        default:
+            pd_error(x, "udpsend_set_multicast_interface: argument not float or symbol");
+            return;
+    }
+    if (if_index == -1)
+    {
+        hp = gethostbyname(interfacename->s_name); // if interface is a dotted or named IP address (192.168.0.88)
+    }
+    if (hp != 0) memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
+    else // maybe interface is its index (1) (names aren't available in _WIN32)
+    {
+        /* get the list of interfaces, IPv4 only */
+        dwSize = sizeof(MIB_IPADDRTABLE)*n_ifaces;
+        if ((pIPAddrTable = (MIB_IPADDRTABLE *) getbytes(dwSize)) == NULL)
+        {
+            post("udpsend: unable to allocate %lu bytes for GetIpAddrTable", dwSize);
+            return;
+        }
+        if ((dwRetVal = GetIpAddrTable(pIPAddrTable, &dwSize, 0)) != NO_ERROR)
+        { 
+            post("udpsend: GetIpAddrTable failed with error %d", dwRetVal);
+            if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),       // Default language
+                (LPTSTR) & lpMsgBuf, 0, NULL))
+            {
+                post("udpsend: %s", lpMsgBuf);
+                LocalFree(lpMsgBuf);
+            }
+            return;
+        }
+
+        n_ifaces = pIPAddrTable->dwNumEntries;
+        post("udpsend: %d interface%s available:", n_ifaces, (n_ifaces == 1)?"":"s");
+        for (i = 0; i < n_ifaces; i++)
+        {
+            IPAddr.S_un.S_addr = (u_long) pIPAddrTable->table[i].dwAddr;
+            post("[%d]: %s", pIPAddrTable->table[i].dwIndex, inet_ntoa(IPAddr));
+            if (pIPAddrTable->table[i].dwIndex == if_index)
+            {
+                server.sin_addr = IPAddr;
+                found = 1;
+            }
+        }
+
+        if (pIPAddrTable)
+        {
+            freebytes(pIPAddrTable, dwSize);
+            pIPAddrTable = NULL;
+        }
+        if (! found)
+        {
+            post("udpsend_set_multicast_interface: bad host name? (%s)\n", interfacename->s_name);
+            return;
+        }
+    }
+    if (setsockopt(x->x_fd, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&server.sin_addr, sizeof(struct in_addr)) == SOCKET_ERROR)
+        sys_sockerror("udpsend_set_multicast_interface: setsockopt");
+    else post("udpsend multicast interface is %s", inet_ntoa(server.sin_addr));
+
 #else
     struct sockaddr_in  server;
     struct sockaddr     *sa;
@@ -215,7 +300,7 @@ static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc
         }
         freebytes(ifc.ifc_buf, origbuflen);
 
-	    if (! found)
+        if (! found)
         {
             post("udpsend_set_multicast_interface: bad host name? (%s)\n", interface->s_name);
             return;
@@ -272,16 +357,16 @@ static void udpsend_send(t_udpsend *x, t_symbol *s, int argc, t_atom *argv)
                 pd_error(x, "udpsend_send: item %d (%f) is not an integer", i, f);
                 return;
             }
-	        c = (unsigned char)d;
-	        if (c != d)
+            c = (unsigned char)d;
+            if (c != d)
             {
                 pd_error(x, "udpsend_send: item %d (%f) is not between 0 and 255", i, f);
                 return;
             }
 #ifdef DEBUG
-	        post("udpsend_send: argv[%d]: %d", i, c);
+            post("udpsend_send: argv[%d]: %d", i, c);
 #endif
-	        byte_buf[j++] = c;
+            byte_buf[j++] = c;
         }
         else if (argv[i].a_type == A_SYMBOL)
         {
@@ -353,7 +438,7 @@ static void udpsend_send(t_udpsend *x, t_symbol *s, int argc, t_atom *argv)
             {
                 sent += result;
                 bp += result;
-	        }
+            }
         }
     }
     else pd_error(x, "udpsend: not connected");
