@@ -6,7 +6,6 @@
 /* network */
 
 #include "m_pd.h"
-#include "s_stuff.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -24,6 +23,7 @@
 #include <net/if.h> // for SIOCGIFCONF
 #include <arpa/inet.h>
 #include <errno.h>
+#include <unistd.h>
 #endif // _WIN32
 #ifdef __APPLE__
 #include <ifaddrs.h> // for getifaddrs
@@ -121,7 +121,11 @@ Enable sending of broadcast messages (if hostname is a broadcast address)*/
     if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) < 0)
     {
         udpsend_sock_err(x, "udpsend connect");
-        sys_closesocket(sockfd);
+#ifdef _WIN32
+        closesocket(sockfd);
+#else
+        close(sockfd);
+#endif
         return;
     }
     x->x_fd = sockfd;
@@ -401,7 +405,11 @@ static void udpsend_disconnect(t_udpsend *x)
 {
     if (x->x_fd >= 0)
     {
-        sys_closesocket(x->x_fd);
+#ifdef _WIN32
+        closesocket(x->x_fd);
+#else
+        close(x->x_fd);
+#endif
         x->x_fd = -1;
         outlet_float(x->x_obj.ob_outlet, 0);
     }
