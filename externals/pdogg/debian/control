@@ -9,5 +9,9 @@ Homepage: http://puredata.info
 Package: pd-pdogg
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Description: a collection of ogg/vorbis externals for pd 
- pdogg is a library for reading and writing ogg streams and files.
+Description: a collection of ogg/vorbis objects for Pd
+ pdogg is a library of objects for Pd for reading and writing ogg/vorbis
+ streams and files.  There is a stream player for multichannel audio streams
+ and a streaming source client to send ogg/vorbis encoded audio streams over
+ LAN or internet using JRoar, Icecast2 or PeerCast.  There are also objects
+ for reading and writing ogg/vorbis files.
