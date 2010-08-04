@@ -23,7 +23,11 @@
 #include <sys/ioctl.h> // for SIOCGIFCONF
 #include <net/if.h> // for SIOCGIFCONF
 #include <arpa/inet.h>
-#endif
+#include <errno.h>
+#endif // _WIN32
+#ifdef __APPLE__
+#include <ifaddrs.h> // for getifaddrs
+#endif // __APPLE__
 
 static t_class *udpsend_class;
 
@@ -43,6 +47,7 @@ static void udpsend_connect(t_udpsend *x, t_symbol *hostname, t_floatarg fportno
 static void udpsend_set_multicast_loopback(t_udpsend *x, t_floatarg loop_state);
 static void udpsend_set_multicast_ttl(t_udpsend *x, t_floatarg ttl_hops);
 static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc, t_atom *argv);
+static void udpsend_sock_err(t_udpsend *x, char *err_string);
 static void *udpsend_new(void);
 
 static void *udpsend_new(void)
@@ -67,7 +72,7 @@ static void udpsend_connect(t_udpsend *x, t_symbol *hostname,
 
     if (x->x_fd >= 0)
     {
-        error("udpsend: already connected");
+        pd_error(x, "udpsend: already connected");
         return;
     }
 
@@ -78,7 +83,7 @@ static void udpsend_connect(t_udpsend *x, t_symbol *hostname,
 #endif
     if (sockfd < 0)
     {
-        sys_sockerror("udpsend: socket");
+        udpsend_sock_err(x, "udpsend socket");
         return;
     }
 /* Based on zmoelnig's patch 2221504:
@@ -86,7 +91,7 @@ Enable sending of broadcast messages (if hostname is a broadcast address)*/
 #ifdef SO_BROADCAST
     if( 0 != setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, (const void *)&broadcast, sizeof(broadcast)))
     {
-        pd_error(x, "couldn't switch to broadcast mode");
+        udpsend_sock_err(x, "couldn't switch to broadcast mode");
     }
 #endif /* SO_BROADCAST */
 
@@ -115,7 +120,7 @@ Enable sending of broadcast messages (if hostname is a broadcast address)*/
     /* try to connect. */
     if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) < 0)
     {
-        sys_sockerror("udpsend: connecting stream socket");
+        udpsend_sock_err(x, "udpsend connect");
         sys_closesocket(sockfd);
         return;
     }
@@ -131,7 +136,7 @@ static void udpsend_set_multicast_loopback(t_udpsend *x, t_floatarg loop_state)
 
     if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP,
         &multicast_loop_state, sizeof(multicast_loop_state)) < 0) 
-        error("udpreceive: setsockopt (IP_MULTICAST_LOOP) failed");
+        udpsend_sock_err(x, "udpsend setsockopt IP_MULTICAST_LOOP");
     getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &multicast_loop_state, &size);
     x->x_multicast_loop_state = multicast_loop_state;
 }
@@ -144,7 +149,7 @@ static void udpsend_set_multicast_ttl(t_udpsend *x, t_floatarg ttl_hops)
 
     if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL,
         &multicast_ttl, sizeof(multicast_ttl)) < 0) 
-        error("udpsend: setsockopt (IP_MULTICAST_LOOP) failed");
+        udpsend_sock_err(x, "udpsend setsockopt IP_MULTICAST_TTL");
     getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_ttl, &size);
     x->x_multicast_ttl = multicast_ttl;
 }
@@ -232,10 +237,73 @@ static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc
         }
     }
     if (setsockopt(x->x_fd, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&server.sin_addr, sizeof(struct in_addr)) == SOCKET_ERROR)
-        sys_sockerror("udpsend_set_multicast_interface: setsockopt");
+        udpsend_sock_err(x, "udpsend setsockopt IP_MULTICAST_IF");
     else post("udpsend multicast interface is %s", inet_ntoa(server.sin_addr));
 
-#else
+#elif defined __APPLE__
+    int                 if_index = -1;
+    int                 found = 0;
+    t_symbol            *interfacename = gensym("none");
+    struct ifaddrs      *ifap;
+    int                 i = 0;
+    int                 n_ifaces = 0;
+    struct hostent      *hp = 0;
+    struct sockaddr_in  server;
+    struct sockaddr     *sa;
+    char                ifname[IFNAMSIZ]; /* longest possible interface name */
+    
+    if (x->x_fd < 0)
+    {
+        pd_error(x, "udpsend_set_multicast_interface: not connected");
+        return;
+    }
+    switch (argv[0].a_type)
+    {
+        case A_FLOAT:
+            if_index = (int)atom_getfloat(&argv[0]);
+            break;
+        case A_SYMBOL:
+            interfacename = atom_getsymbol(&argv[0]);    
+            break;
+        default:
+            pd_error(x, "udpsend_set_multicast_interface: argument not float or symbol");
+            return;
+    }
+    if (if_index == -1)
+    {
+        hp = gethostbyname(interfacename->s_name); // if interface is a dotted or named IP address (192.168.0.88)
+    }
+    if (hp != 0) memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
+    else // maybe interface is its name (eth0) or index (1)
+    { // scan all the interfaces to get the IP address of interface
+        if (getifaddrs(&ifap)) udpsend_sock_err(x, "udpsend getifaddrs");
+        i = found = n_ifaces = 0;
+        while (NULL != ifap)
+        {
+            sa = ifap->ifa_addr;
+            if (AF_INET == sa->sa_family)
+            {
+                ++n_ifaces;
+                strncpy (ifname, ifap->ifa_name, IFNAMSIZ);
+                post("[%d]: %s: %s", i, ifname, inet_ntoa(((struct sockaddr_in *)sa)->sin_addr));
+                if((i == if_index) || ((if_index == -1) && (!strncmp(interfacename->s_name, ifname, IFNAMSIZ))))
+                { // either the index or the name match
+                    server.sin_addr = ((struct sockaddr_in *)sa)->sin_addr;
+                    found = 1;
+                }
+            }
+            i++;
+            ifap = ifap->ifa_next; // next record or NULL
+        }
+        freeifaddrs(ifap);
+        post ("udpsend: %d interfaces", n_ifaces);
+        if (!found) return;
+    }
+    if (setsockopt(x->x_fd, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&server.sin_addr, sizeof(struct in_addr)))
+        udpsend_sock_err(x, "udpsend setsockopt IP_MULTICAST_IF");
+    else post("udpsend multicast interface is %s", inet_ntoa(server.sin_addr));
+    return;
+#else // __linux__
     struct sockaddr_in  server;
     struct sockaddr     *sa;
     struct hostent      *hp = 0;
@@ -244,7 +312,7 @@ static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc
     char                ifname[IFNAMSIZ]; /* longest possible interface name */
     t_symbol            *interface = gensym("none");
     int                 if_index = -1;
-
+    
     if (x->x_fd < 0)
     {
         pd_error(x, "udpsend_set_multicast_interface: not connected");
@@ -276,7 +344,7 @@ static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc
         if (ifc.ifc_buf != NULL)
         { // 
             if (ioctl(x->x_fd, SIOCGIFCONF, &ifc) < 0) // get list of interfaces
-                sys_sockerror("udpsend_set_multicast_interface: getting list of interfaces");
+                udpsend_sock_err(x, "udpsend_set_multicast_interface: getting list of interfaces");
             else
             {
                 n_ifaces = ifc.ifc_len/sizeof(struct ifreq);
@@ -307,9 +375,26 @@ static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc
         }
     }
     if (setsockopt(x->x_fd, IPPROTO_IP, IP_MULTICAST_IF, &server.sin_addr, sizeof(struct in_addr)) < 0)
-        sys_sockerror("udpsend_set_multicast_interface: setsockopt");
+        udpsend_sock_err(x, "udpsend_set_multicast_interface: setsockopt");
     else post("udpsend multicast interface is %s", inet_ntoa(server.sin_addr));
 #endif // _WIN32
+}
+
+static void udpsend_sock_err(t_udpsend *x, char *err_string)
+{
+/* prints the last error from errno or WSAGetLasError() */
+#ifdef _WIN32
+    LPVOID              lpMsgBuf;
+    if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS
+        , NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) & lpMsgBuf, 0, NULL))
+    {
+        pd_error(x, "%s: %s (%d)", err_string, WSAGetLastError());
+        post("udpsend: %s", lpMsgBuf);
+        LocalFree(lpMsgBuf);
+    }
+#else
+    pd_error(x, "%s: %s (%d)", err_string, strerror(errno), errno);
+#endif
 }
 
 static void udpsend_disconnect(t_udpsend *x)
@@ -430,7 +515,7 @@ static void udpsend_send(t_udpsend *x, t_symbol *s, int argc, t_atom *argv)
             }
             if (result <= 0)
             {
-                sys_sockerror("udpsend");
+                udpsend_sock_err(x, "udpsend send");
                 udpsend_disconnect(x);
                 break;
             }
