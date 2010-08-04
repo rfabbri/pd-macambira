@@ -9,7 +9,7 @@ Homepage: http://puredata.info
 Package: pd-windowing
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Description: a library of windowing functions
- Hanning, Hamming, Blackman, Cosine, Connes, Bartlett, Welch, 
- Lanczos, Gaussian, and Kaiser windowing functions with are 
- applied per-block.
+Description: a library of windowing functions in Pd
+ The windowing library provides Pd objects for a list of standard windowing
+ functions, which are applied per block with each DSP tick: Hanning, Hamming,
+ Blackman, Cosine, Connes, Bartlett, Welch, Lanczos, Gaussian, and Kaiser.
