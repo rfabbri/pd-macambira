@@ -9,8 +9,10 @@ Homepage: http://puredata.info
 Package: pd-smlib
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Description: signal processing library for mapping
- SMLib is an external objects library for PD (pure data). It complements PD
- with a set of objects for vector processing, vector analysis, vector
- synthesis, number stream analysis, number stream filters.
+Description: Signal processing library for Mapping, for Pd
+ Signal processing for Mapping - a LIBrary with vector and number stream
+ processing objects for Pd, enhancing this language with objects for rapid
+ prototyping of gesture analysis.  It complements Pd with a set of objects for
+ vector processing, vector analysis, vector synthesis, number stream analysis,
+ number stream filters.
 
