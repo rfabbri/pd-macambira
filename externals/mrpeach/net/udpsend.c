@@ -164,9 +164,7 @@ static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc
     int                 i, n_ifaces = 32;
     PMIB_IPADDRTABLE    pIPAddrTable;
     DWORD               dwSize;
-    DWORD               dwRetVal = 0;
     IN_ADDR             IPAddr;
-    LPVOID              lpMsgBuf;
     int                 if_index = -1;
     int                 found = 0;
     t_symbol            *interfacename = gensym("none");
@@ -204,15 +202,9 @@ static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc
             post("udpsend: unable to allocate %lu bytes for GetIpAddrTable", dwSize);
             return;
         }
-        if ((dwRetVal = GetIpAddrTable(pIPAddrTable, &dwSize, 0)) != NO_ERROR)
+        if (GetIpAddrTable(pIPAddrTable, &dwSize, 0))
         { 
-            post("udpsend: GetIpAddrTable failed with error %d", dwRetVal);
-            if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),       // Default language
-                (LPTSTR) & lpMsgBuf, 0, NULL))
-            {
-                post("udpsend: %s", lpMsgBuf);
-                LocalFree(lpMsgBuf);
-            }
+            udpsend_sock_err(x, "udpsend_set_multicast_interface: GetIpAddrTable");
             return;
         }
 
@@ -386,14 +378,26 @@ static void udpsend_set_multicast_interface (t_udpsend *x, t_symbol *s, int argc
 
 static void udpsend_sock_err(t_udpsend *x, char *err_string)
 {
-/* prints the last error from errno or WSAGetLasError() */
+/* prints the last error from errno or WSAGetLastError() */
 #ifdef _WIN32
-    LPVOID              lpMsgBuf;
-    if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS
-        , NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) & lpMsgBuf, 0, NULL))
+    LPVOID	lpMsgBuf;
+	DWORD	dwRetVal = WSAGetLastError();
+	int		len = 0, i;
+	char	*cp;
+
+    if (len = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS
+        , NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpMsgBuf, 0, NULL))
     {
-        pd_error(x, "%s: %s (%d)", err_string, WSAGetLastError());
-        post("udpsend: %s", lpMsgBuf);
+		cp = (char *)lpMsgBuf;
+		for(i = 0; i < len; ++i)
+		{
+			if (cp[i] < 0x20)
+			{ /* end string at first weird character */
+				cp[i] = 0;
+				break;
+			}
+		}
+        pd_error(x, "%s: %s (%d)", err_string, lpMsgBuf, dwRetVal);
         LocalFree(lpMsgBuf);
     }
 #else
