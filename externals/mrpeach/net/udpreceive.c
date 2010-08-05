@@ -42,6 +42,7 @@ typedef struct _udpreceive
 void udpreceive_setup(void);
 static void udpreceive_free(t_udpreceive *x);
 static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv);
+static void udpreceive_sock_err(t_udpreceive *x, char *err_string);
 static void udpreceive_status(t_udpreceive *x);
 static void udpreceive_read(t_udpreceive *x, int sockfd);
 
@@ -72,7 +73,7 @@ static void udpreceive_read(t_udpreceive *x, int sockfd)
 
     if (read < 0)
     {
-        sys_sockerror("udpreceive_read");
+        udpreceive_sock_err(x, "udpreceive_read");
         sys_closesocket(x->x_connectsocket);
         return;
     }
@@ -97,7 +98,7 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
     t_udpreceive        *x;
     struct sockaddr_in  server;
     struct hostent      *hp;
-#if defined MACOSX || defined _WIN32
+#if defined __APPLE__ || defined _WIN32
     struct ip_mreq      mreq;
 #else
     struct ip_mreqn     mreq;
@@ -107,6 +108,7 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
     int                 intarg, i;
     char                addr[256] = {'\0'};
 
+    x = (t_udpreceive *)pd_new(udpreceive_class); /* if something fails we return 0 instead of x. Is this OK? */
 #ifdef DEBUG
     post("udpreceive_new:argc is %d s is %s", argc, s->s_name);
 #endif
@@ -137,7 +139,7 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
 #endif
     if (sockfd < 0)
     {
-        sys_sockerror("udpreceive: socket");
+        udpreceive_sock_err(x, "udpreceive: socket");
         return 0;
     }
     server.sin_family = AF_INET;
@@ -147,7 +149,7 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
         hp = gethostbyname(addr);
         if (hp == 0)
         {
-    	    error("udpreceive: bad host?\n");
+    	    pd_error(x, "udpreceive: bad host?\n");
             return 0;
         }
         memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
@@ -157,42 +159,54 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
     intarg = 1;
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR,
         (char *)&intarg, sizeof(intarg)) < 0)
-        error("udpreceive: setsockopt (SO_REUSEADDR) failed");
+        udpreceive_sock_err(x, "udpreceive: setsockopt (SO_REUSEADDR) failed");
+
+    /* assign server port number */
+    server.sin_port = htons((u_short)portno);
 
     /* if a multicast address was specified, join the multicast group */
     /* hop count defaults to 1 so we won't leave the subnet*/
     if (0xE0000000 == (ntohl(server.sin_addr.s_addr) & 0xF0000000))
     {
-#if defined MACOSX || defined _WIN32
+		server.sin_addr.s_addr = INADDR_ANY;
+	    /* first bind the socket to INADDR_ANY */
+		if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
+	    {
+	        udpreceive_sock_err(x, "udpreceive: bind");
+	        sys_closesocket(sockfd);
+	        return (0);
+	    }
+		/* second join the multicast group */
+        memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
+
+#if defined __APPLE__ || defined _WIN32
         mreq.imr_multiaddr.s_addr = server.sin_addr.s_addr;
         mreq.imr_interface.s_addr = INADDR_ANY;/* can put a specific local IP address here if host is multihomed */
 #else
         mreq.imr_multiaddr.s_addr = server.sin_addr.s_addr;
         mreq.imr_address.s_addr = INADDR_ANY;
         mreq.imr_ifindex = 0;
-#endif //MACOSX || _WIN32
+#endif //__APPLE__ || _WIN32
         if (setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
             (char *)&mreq, sizeof(mreq)) < 0)
-            error("udpreceive: setsockopt (IP_ADD_MEMBERSHIP) failed");
+            udpreceive_sock_err(x, "udpreceive: setsockopt IP_ADD_MEMBERSHIP");
         else
         {
             multicast_joined = 1;
             post ("udpreceive: added to multicast group");
         }
     }
-
-
-    /* assign server port number */
-    server.sin_port = htons((u_short)portno);
-
-    /* name the socket */
-    if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
-    {
-        sys_sockerror("udpreceive: bind");
-        sys_closesocket(sockfd);
-        return (0);
-    }
-    x = (t_udpreceive *)pd_new(udpreceive_class);
+	else
+	{
+	    /* name the socket */
+	    if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
+	    {
+	        udpreceive_sock_err(x, "udpreceive: bind");
+	        sys_closesocket(sockfd);
+	        return (0);
+	    }
+	}
+	
     x->x_msgout = outlet_new(&x->x_obj, &s_anything);
     x->x_addrout = outlet_new(&x->x_obj, &s_anything);
     x->x_connectsocket = sockfd;
@@ -212,6 +226,35 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
     x->x_total_received = 0L;
     sys_addpollfn(x->x_connectsocket, (t_fdpollfn)udpreceive_read, x);
     return (x);
+}
+
+static void udpreceive_sock_err(t_udpreceive *x, char *err_string)
+{
+/* prints the last error from errno or WSAGetLastError() */
+#ifdef _WIN32
+    LPVOID	lpMsgBuf;
+	DWORD	dwRetVal = WSAGetLastError();
+	int		len = 0, i;
+	char	*cp;
+
+    if (len = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS
+        , NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpMsgBuf, 0, NULL))
+    {
+		cp = (char *)lpMsgBuf;
+		for(i = 0; i < len; ++i)
+		{
+			if (cp[i] < 0x20)
+			{ /* end string at first weird character */
+				cp[i] = 0;
+				break;
+			}
+		}
+        pd_error(x, "%s: %s (%d)", err_string, lpMsgBuf, dwRetVal);
+        LocalFree(lpMsgBuf);
+    }
+#else
+    pd_error(x, "%s: %s (%d)", err_string, strerror(errno), errno);
+#endif
 }
 
 static void udpreceive_status(t_udpreceive *x)
