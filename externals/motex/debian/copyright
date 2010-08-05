@@ -2,7 +2,7 @@ Debianized-By: Hans-Christoph Steiner <hans@eds.org>
 Debianized-Date: Tue, 9 Feb 2010 17:14:25 -0400
 Original-Source: http://www.reverberant.com/pd/motex_1_1_3.tar.gz
 Files: *
-Copyright: 2001, Iain Mott
+Copyright: 2001, Iain Mott <iain.mott@bigpond.com>
 
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
