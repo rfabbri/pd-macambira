@@ -17,6 +17,7 @@
 #include <netinet/tcp.h>
 #include <netdb.h>
 #include <stdio.h>
+#include <errno.h>
 #endif
 
 
