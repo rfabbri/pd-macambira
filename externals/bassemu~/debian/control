@@ -1,7 +1,7 @@
 Source: pd-bassemu
 Section: sound
 Priority: optional
-Maintainer: Paul Brossier <piem@debian.org>
+Maintainer: Hans-Christoph Steiner <hans@eds.org>
 Build-Depends: debhelper (>= 7.0.50~), puredata
 Standards-Version: 3.8.3
 Homepage: http://puredata.info
@@ -9,6 +9,12 @@ Homepage: http://puredata.info
 Package: pd-bassemu
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Description: an object for transistor bass emulation
+Description: a Pd object for transistor bass emulation
  bassemu~ is an object that simulates a transistor-based electronic
- synthesizer.
+ synthesizer. This serves as a emulation of an analogue bass synth. It
+ includes the obligatory filter, saw/rect/tri/sine waveform select, an
+ extra hi-pass filter. You can also feed another signal to its left
+ inlet, and filter that, either alone or mixed to the vco.
+
+ Also included is a small, messy gop abstraction to resemble a 16-step 
+ sequencer.

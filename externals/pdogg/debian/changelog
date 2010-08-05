@@ -1,5 +1,5 @@
-pd-pdogg (0.25-1) unstable; urgency=low
+pd-pdogg (0.25-0.0) unstable; urgency=low
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial release (Closes: #591711)
 
  -- Hans-Christoph Steiner <hans@eds.org>  Thu, 21 Jan 2010 23:27:04 -0500

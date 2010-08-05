@@ -1,7 +1,7 @@
 Source: pd-freeverb
 Section: sound
 Priority: optional
-Maintainer: Paul Brossier <piem@debian.org>
+Maintainer: Hans-Christoph Steiner <hans@eds.org>
 Build-Depends: debhelper (>= 7.0.50~), puredata
 Standards-Version: 3.8.3
 Homepage: http://puredata.info
@@ -9,7 +9,9 @@ Homepage: http://puredata.info
 Package: pd-freeverb
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Description: free studio-quality Schroeder/Moorer reverb
- Freeverb is a simple implementation of the standard Schroeder/Moorer reverb
- model. It uses 8 comb filters on both the left and right channels. Note that
- this version of Freeverb doesn't contain predelay, or any EQ.
+Description: studio-quality Schroeder/Moorer reverb as a Pd object
+ Freeverb is a simple implementation of the standard Schroeder/Moorer
+ reverb model. It uses 8 comb filters on both the left and right
+ channels. Note that this version of Freeverb doesn't contain
+ predelay, or any EQ.  It is implemented as a Pd object, so it can
+ easily be inserted into a Pd patch.

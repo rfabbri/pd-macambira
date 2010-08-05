@@ -1,7 +1,7 @@
 Source: pd-maxlib
 Section: sound
 Priority: optional
-Maintainer: Paul Brossier <piem@debian.org>
+Maintainer: Hans-Christoph Steiner <hans@eds.org>
 Build-Depends: debhelper (>= 7.0.50~), puredata (>= 0.42.5-3.1~)
 Standards-Version: 3.8.3
 Homepage: http://puredata.info
@@ -9,7 +9,7 @@ Homepage: http://puredata.info
 Package: pd-maxlib
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Description: a library for analysing musical performance
+Description: a Pd library for analysing musical performance
  maxlib is a library of non-tilde externals for Pd. The objects can be very
  useful to analyse any musical performance. Some of the objects are 'borrowed'
  from Max (they are not ported but rewritten for Pd cheap immitations). maxlib

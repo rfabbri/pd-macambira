@@ -1,7 +1,7 @@
 Source: pd-ext13
 Section: sound
 Priority: optional
-Maintainer: Paul Brossier <piem@debian.org>
+Maintainer: Hans-Christoph Steiner <hans@eds.org>
 Build-Depends: debhelper (>= 7.0.50~), puredata (>= 0.42.5-3.1~)
 Standards-Version: 3.8.3
 Homepage: http://puredata.info
@@ -9,7 +9,7 @@ Homepage: http://puredata.info
 Package: pd-ext13
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Description: a collection of externals for pd
+Description: a collection of objects for Pd by dieb13
  this ist ext13, a collection of externals for pd
  most of the code comes from other pd-object or externals
  and is just modifyed. 
