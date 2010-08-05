@@ -1,18 +1,8 @@
-#N canvas 396 14 618 599 10;
-#X text 313 159 Arguments:;
-#X obj 63 513 snapshot~;
-#X obj 92 488 metro 100;
-#X obj 92 464 loadbang;
-#X obj 59 551 nbx 10 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+#N canvas 504 200 676 757 10;
+#X obj 64 576 nbx 10 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
 -1 -262144 -1 0 256;
-#X obj 381 507 soundfiler;
-#X msg 381 469 read -resize \$1 \$2;
-#X obj 381 438 list append \$0table;
-#X obj 381 405 openpanel;
-#X obj 381 381 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#X obj 254 480 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
-#X floatatom 381 533 10 0 0 0 - - -;
-#X obj 244 471 table \$0table;
 #X obj 177 297 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X msg 58 154 0.1;
@@ -21,50 +11,59 @@
 #X msg 134 250 0.9;
 #X msg 166 247 0;
 #X msg 25 154 1;
-#X obj 148 363 print UPPER;
-#X obj 143 401 print LOWER;
-#X obj 222 496 *~;
-#X obj 220 561 dac~;
-#X obj 221 525 tabread4~ \$0table;
+#X obj 151 386 print UPPER;
+#X obj 149 408 print LOWER;
+#X obj 239 527 *~;
+#X obj 231 592 dac~;
+#X obj 238 556 tabread4~ \$0table;
 #X msg 169 156 0.5;
 #X msg 201 249 0.5;
-#X text 60 11 Description: A one shot phasor~.;
-#X text 48 33 phasorshot~ is exactly like a phasor except that you
-can disabling it's looping \, therefore making it a one shot lookup
-signal.;
-#X text 55 80 Of course line~ does something similar \, but with phasorshot~
-you can change the speed DURING the ramp.;
 #X text 33 121 Inlet 1: frequency;
-#X text 159 227 Inlet 2: phasee;
 #X text 212 297 Inlet 3: loop off/on;
-#X text 310 181 1) loop off/on;
 #X msg 183 181 0;
-#X text 174 329 Outlets 2 and 3 bang when the upper (1) or lower (0)
-bound is reached.;
 #X obj 61 338 tof/phasorshot~;
-#X connect 1 0 4 0;
+#X text 48 11 Description: A feature rich phasor~.;
+#X text 48 33 phasorshot~ is like a phasor with more options:;
+#X text 76 55 + The looping of the generated signal can be disabled.
+;
+#X text 76 69 + A bang is outputed when the upper or lower bounds of
+the generated signal are reached.;
+#X text 159 227 Inlet 2: phase;
+#X text 166 336 Argument: float: loop off/on (0/1);
+#N canvas 0 22 396 311 load 0;
+#X obj 116 170 soundfiler;
+#X msg 116 132 read -resize \$1 \$2;
+#X obj 116 101 list append \$0table;
+#X obj 116 68 openpanel;
+#X obj 126 23 inlet;
+#X obj 115 210 outlet;
+#X obj 226 24 table \$0table;
+#X connect 0 0 5 0;
+#X connect 1 0 0 0;
 #X connect 2 0 1 0;
 #X connect 3 0 2 0;
-#X connect 5 0 10 0;
-#X connect 5 0 21 1;
-#X connect 6 0 5 0;
-#X connect 7 0 6 0;
-#X connect 8 0 7 0;
-#X connect 9 0 8 0;
-#X connect 12 0 35 2;
-#X connect 13 0 35 0;
-#X connect 14 0 35 0;
-#X connect 15 0 35 0;
-#X connect 16 0 35 1;
-#X connect 17 0 35 1;
-#X connect 18 0 35 0;
-#X connect 21 0 23 0;
-#X connect 23 0 22 0;
-#X connect 23 0 22 1;
-#X connect 24 0 35 0;
-#X connect 25 0 35 1;
-#X connect 33 0 35 0;
-#X connect 35 0 1 0;
-#X connect 35 0 21 0;
-#X connect 35 1 20 0;
-#X connect 35 2 19 0;
+#X connect 4 0 3 0;
+#X restore 253 501 pd load sound file;
+#X obj 63 553 cyclone/Snapshot~ 100;
+#X text 232 387 Outlets 2 and 3 bang when the upper or lower bound
+is reached.;
+#X connect 1 0 26 0;
+#X connect 2 0 19 2;
+#X connect 3 0 19 0;
+#X connect 4 0 19 0;
+#X connect 5 0 19 0;
+#X connect 6 0 19 1;
+#X connect 7 0 19 1;
+#X connect 8 0 19 0;
+#X connect 11 0 13 0;
+#X connect 13 0 12 0;
+#X connect 13 0 12 1;
+#X connect 14 0 19 0;
+#X connect 15 0 19 1;
+#X connect 18 0 19 0;
+#X connect 19 0 11 0;
+#X connect 19 0 27 0;
+#X connect 19 1 10 0;
+#X connect 19 2 9 0;
+#X connect 26 0 11 1;
+#X connect 27 0 0 0;

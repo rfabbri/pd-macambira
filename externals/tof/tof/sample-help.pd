@@ -1,4 +1,4 @@
-#N canvas 259 224 683 625 10;
+#N canvas 519 275 683 625 10;
 #X obj 47 141 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X text 44 17 Description: Loads a sound file (wav) as a sample;
@@ -25,7 +25,6 @@ with a table size of 441000 (10 seconds at 44100hz);
 #X text 327 398 Sample record:;
 #X obj 31 200 cnv 15 230 20 empty empty empty 20 12 0 14 -260058 -66577
 0;
-#X text 35 202 Click(open) the sample to view info;
 #X msg 73 141 read amen.wav;
 #X obj 47 177 tof/sample test amen.wav;
 #X text 71 95 bang: Display open panel;
@@ -37,8 +36,9 @@ with a table size of 441000 (10 seconds at 44100hz);
 #X obj 80 428 tof/sample_play~ test;
 #X obj 80 410 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X connect 0 0 21 0;
-#X connect 20 0 21 0;
+#X text 45 201 Click on [tof/sample] to view info;
+#X connect 0 0 20 0;
+#X connect 19 0 20 0;
+#X connect 27 0 26 0;
+#X connect 27 1 26 1;
 #X connect 28 0 27 0;
-#X connect 28 1 27 1;
-#X connect 29 0 28 0;
