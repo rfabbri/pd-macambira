@@ -91,7 +91,7 @@ static int pdp_opencv_haarcascade_mark(t_pdp_opencv_haarcascade *x, t_floatarg f
           x->x_xmark[i] = (int)fx;
           x->x_ymark[i] = (int)fy;
           x->x_found[i] = x->x_ftolerance;
-          post( "pdp_opencv_haarcascade : inserted point %d (%d,%d)", i, x->x_xmark[i], x->x_ymark[i] );
+          // post( "pdp_opencv_haarcascade : inserted point %d (%d,%d)", i, x->x_xmark[i], x->x_ymark[i] );
           return i;
        }
     }
@@ -236,7 +236,7 @@ static void pdp_opencv_haarcascade_process_rgb(t_pdp_opencv_haarcascade *x)
              x->x_xmark[im] = -1.0;
              x->x_ymark[im] = -1,0;
              x->x_found[im] = x->x_ftolerance;
-             post( "deleted point %d", im );
+             // post( "deleted point %d", im );
            }
         }
     }

@@ -93,8 +93,9 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = pdp_packet_header(x->x_packet1);
     short int *newdata = (short int *)pdp_packet_data(x->x_packet1); 
-    int i,j,k,im;
+    int i,j,k,im,oi;
     int marked;
+    float dist, odist;
 
     if ((x->x_width != (t_int)header->info.image.width) || 
         (x->x_height != (t_int)header->info.image.height) || (!x->image)) 
@@ -209,7 +210,7 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
                cvCalcSubdivVoronoi2D( x->x_subdiv );
             }
             // only add points included in (color-threshold)<p<(color+treshold)
-            if ( ( x->x_delaunay > 0 ) && ( x->x_xmark[x->x_delaunay-1] != -1 ) ) 
+            if ( ( x->x_delaunay > 0 ) && ( x->x_xmark[x->x_delaunay] != -1 ) ) 
             {
                int px = cvPointFrom32f(x->points[1][i]).x;
                int py = cvPointFrom32f(x->points[1][i]).y;
@@ -227,9 +228,9 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
                    uchar green = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*ppx))[ppy*3+1];
                    uchar blue = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*ppx))[ppy*3+2];
 
-                   uchar pred = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_xmark[x->x_delaunay-1]))[x->x_ymark[x->x_delaunay-1]*3];
-                   uchar pgreen = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_xmark[x->x_delaunay-1]))[x->x_ymark[x->x_delaunay-1]*3+1];
-                   uchar pblue = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_xmark[x->x_delaunay-1]))[x->x_ymark[x->x_delaunay-1]*3+2];
+                   uchar pred = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_xmark[x->x_delaunay]))[x->x_ymark[x->x_delaunay]*3];
+                   uchar pgreen = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_xmark[x->x_delaunay]))[x->x_ymark[x->x_delaunay]*3+1];
+                   uchar pblue = ((uchar*)(x->oimage->imageData + x->oimage->widthStep*x->x_xmark[x->x_delaunay]))[x->x_ymark[x->x_delaunay]*3+2];
 
                    int diff = abs(red-pred) + abs(green-pgreen) + abs(blue-pblue);
 
@@ -247,26 +248,40 @@ static void pdp_opencv_lk_process_rgb(t_pdp_opencv_lk *x)
             cvCircle( x->image, cvPointFrom32f(x->points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
 
             marked=0;
+            oi=-1;
+            dist=(x->x_width>x->x_height)?x->x_width:x->x_height;
+
             for ( im=0; im<MAX_MARKERS; im++ )
             {
+
+              if ( x->x_xmark[im] == -1 ) continue; // i don't see the point
+
+              odist=sqrt( pow( x->points[1][i].x - x->x_xmark[im], 2 ) + pow( x->points[1][i].y - x->x_ymark[im], 2 ) );
+
               // search for this point
-              if ( x->x_xmark[im] != -1.0 )
+              if ( odist <= x->x_maxmove )
               {
-               if ( ( abs( x->points[1][i].x - x->x_xmark[im] ) <= x->x_maxmove ) && ( abs( x->points[1][i].y - x->x_ymark[im] ) <= x->x_maxmove ) )
-               {
-                  char tindex[4];
-                  sprintf( tindex, "%d", im+1 );
-                  cvPutText( x->image, tindex, cvPointFrom32f(x->points[1][i]), &x->font, CV_RGB(255,255,255));
-                  x->x_xmark[im]=x->points[1][i].x;
-                  x->x_ymark[im]=x->points[1][i].y;
-                  x->x_found[im]=x->x_ftolerance;
-                  marked=1;
-                  SETFLOAT(&x->x_list[0], im+1);
-                  SETFLOAT(&x->x_list[1], x->x_xmark[im]);
-                  SETFLOAT(&x->x_list[2], x->x_ymark[im]);
-                  outlet_list( x->x_outlet1, 0, 3, x->x_list );
-               }
+                  if ( odist < dist )
+                  {
+                    dist = odist;
+                    marked=1;
+                    oi=im;
+                  }
               }
+            }
+
+            if ( oi !=-1 )
+            {      
+               char tindex[4];
+               sprintf( tindex, "%d", oi );
+               cvPutText( x->image, tindex, cvPointFrom32f(x->points[1][i]), &x->font, CV_RGB(255,255,255));
+               x->x_xmark[oi]=x->points[1][i].x;
+               x->x_ymark[oi]=x->points[1][i].y;
+               x->x_found[oi]=x->x_ftolerance;
+               SETFLOAT(&x->x_list[0], oi);
+               SETFLOAT(&x->x_list[1], x->x_xmark[oi]);
+               SETFLOAT(&x->x_list[2], x->x_ymark[oi]);
+               outlet_list( x->x_outlet1, 0, 3, x->x_list );
             }
 
             if ( x->x_markall && !marked )
@@ -515,8 +530,8 @@ static void pdp_opencv_lk_delete(t_pdp_opencv_lk *x, t_floatarg findex )
        return;
     }
 
-    x->x_xmark[(int)findex-1] = -1;
-    x->x_ymark[(int)findex-1] = -1;
+    x->x_xmark[(int)findex] = -1;
+    x->x_ymark[(int)findex] = -1;
 }
 
 static void pdp_opencv_lk_clear(t_pdp_opencv_lk *x )
@@ -637,8 +652,8 @@ void *pdp_opencv_lk_new(t_floatarg f)
   x->add_remove_pt = 0;
   x->quality = 0.1;
   x->min_distance = 10;
-  x->x_maxmove = 8;
-  x->x_ftolerance = 8;
+  x->x_maxmove = 10;
+  x->x_ftolerance = 5;
   x->x_delaunay = -1;
   x->x_threshold = -1;
 
