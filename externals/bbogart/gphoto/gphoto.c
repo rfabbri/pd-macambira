@@ -387,6 +387,7 @@ void *captureImage(void *threadArgs) {
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(((gphoto_gimme_struct *)threadArgs)->gphoto->camera); return(NULL);}
 
 	close(fd); // close file descriptor
+	gp_file_free(camerafile); // free camerafile (needed to avoid fd leaks!)
 
 	// Send bang out 2nd outlet when operation is done.
 	sys_lock();
