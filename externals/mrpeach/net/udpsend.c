@@ -138,6 +138,11 @@ static void udpsend_set_multicast_loopback(t_udpsend *x, t_floatarg loop_state)
     unsigned char   multicast_loop_state = loop_state;
     unsigned int    size;
 
+    if (x->x_fd < 0)
+    {
+        pd_error(x, "udpsend_set_multicast_loopback: not connected");
+        return;
+    }
     if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP,
         &multicast_loop_state, sizeof(multicast_loop_state)) < 0) 
         udpsend_sock_err(x, "udpsend setsockopt IP_MULTICAST_LOOP");
@@ -151,6 +156,11 @@ static void udpsend_set_multicast_ttl(t_udpsend *x, t_floatarg ttl_hops)
     unsigned char   multicast_ttl = ttl_hops;
     unsigned int    size;
 
+    if (x->x_fd < 0)
+    {
+        pd_error(x, "udpsend_set_multicast_ttl: not connected");
+        return;
+    }
     if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL,
         &multicast_ttl, sizeof(multicast_ttl)) < 0) 
         udpsend_sock_err(x, "udpsend setsockopt IP_MULTICAST_TTL");
@@ -380,24 +390,24 @@ static void udpsend_sock_err(t_udpsend *x, char *err_string)
 {
 /* prints the last error from errno or WSAGetLastError() */
 #ifdef _WIN32
-    LPVOID	lpMsgBuf;
-	DWORD	dwRetVal = WSAGetLastError();
-	int		len = 0, i;
-	char	*cp;
+    void            *lpMsgBuf;
+    unsigned long   errornumber = WSAGetLastError();
+    int             len = 0, i;
+    char            *cp;
 
     if (len = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS
-        , NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpMsgBuf, 0, NULL))
+        , NULL, errornumber, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpMsgBuf, 0, NULL))
     {
-		cp = (char *)lpMsgBuf;
-		for(i = 0; i < len; ++i)
-		{
-			if (cp[i] < 0x20)
-			{ /* end string at first weird character */
-				cp[i] = 0;
-				break;
-			}
-		}
-        pd_error(x, "%s: %s (%d)", err_string, lpMsgBuf, dwRetVal);
+        cp = (char *)lpMsgBuf;
+        for(i = 0; i < len; ++i)
+        {
+            if (cp[i] < 0x20)
+            { /* end string at first weird character */
+                cp[i] = 0;
+                break;
+            }
+        }
+        pd_error(x, "%s: %s (%d)", err_string, lpMsgBuf, errornumber);
         LocalFree(lpMsgBuf);
     }
 #else
