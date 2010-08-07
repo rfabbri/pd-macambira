@@ -1,0 +1,6 @@
+#N canvas 1 52 450 300 10;
+#X obj 131 140 noisegate~;
+#X obj 122 200 dac~;
+#X text 49 67 comment;
+#X connect 0 0 1 0;
+#X connect 0 0 1 1;
