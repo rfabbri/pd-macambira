@@ -1,3 +1,7 @@
+0.12.25 ( codename CrunchyBits )
+   fixed default font for pdp_text, pdp_qtext
+   fixed crash in pdp_theonice~
+
 0.12.24 ( codename Baltanik )
    fixed color selection bugs and help patches 
    in pdp_binary, pdp_ctrack, pdp_cmap, pdp_shape, pdp_compose
