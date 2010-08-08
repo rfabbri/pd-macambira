@@ -1,4 +1,4 @@
-/* ------------------------ mp3cast~ ---------------------------------------- */
+/* -------------------------- mp3cast~ ---------------------------------------- */
 /*                                                                              */
 /* Tilde object to send mp3-stream to shoutcast/icecast server.                 */
 /* Written by Olaf Matthes (olaf.matthes@gmx.de).                               */
@@ -72,7 +72,7 @@
 #define        MY_MP3_MALLOC_OUT_SIZE       1.25*MY_MP3_MALLOC_IN_SIZE+7200 
 
 #define        MAXDATARATE 320        /* maximum mp3 data rate is 320kbit/s */
-#define        STRBUF_SIZE 32
+#define        STRBUF_SIZE 1024
 
 static char   *mp3cast_version = "mp3cast~: mp3 streamer version 0.5, written by Yves Degoyon";
 
