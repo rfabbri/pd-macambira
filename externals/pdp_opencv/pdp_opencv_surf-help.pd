@@ -1,4 +1,4 @@
-#N canvas 667 56 833 785 10;
+#N canvas 491 56 833 785 10;
 #X text -6 -88 written by Lluis Gomez i Bigorda ( lluisgomez@hangar.org
 ) and Yves Degoyon ( ydegoyon@gmail.com );
 #X obj -17 -55 cnv 15 621 250 empty empty empty 20 12 0 14 -260097
@@ -83,7 +83,7 @@ points detection and tracking;
 #X text 144 258 mark all points;
 #X msg 84 278 mark none;
 #X text 154 279 suppress all marks;
-#X text 243 377 max movement of a marker ( default 10 pisels );
+#X text 244 378 max movement of a marker ( default 20 pixels );
 #X connect 2 0 3 0;
 #X connect 3 0 5 0;
 #X connect 4 0 5 0;

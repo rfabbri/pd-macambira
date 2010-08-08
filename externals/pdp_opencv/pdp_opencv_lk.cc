@@ -652,7 +652,7 @@ void *pdp_opencv_lk_new(t_floatarg f)
   x->add_remove_pt = 0;
   x->quality = 0.1;
   x->min_distance = 10;
-  x->x_maxmove = 10;
+  x->x_maxmove = 20;
   x->x_ftolerance = 5;
   x->x_delaunay = -1;
   x->x_threshold = -1;

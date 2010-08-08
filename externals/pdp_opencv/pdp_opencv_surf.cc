@@ -650,7 +650,7 @@ void *pdp_opencv_surf_new(t_floatarg f)
   x->x_size   = x->x_width * x->x_height;
 
   x->night_mode = 0;
-  x->x_maxmove = 10;
+  x->x_maxmove = 20;
   x->x_delaunay = -1;
   x->x_threshold = -1;
 
