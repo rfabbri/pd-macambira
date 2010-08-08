@@ -22,7 +22,7 @@ LOG
 
 #include "Base/GemPixObj.h"
 
-#define MAX_MARKERS 100
+#define MAX_MARKERS 500
 
 /*-----------------------------------------------------------------
 -------------------------------------------------------------------
@@ -72,7 +72,7 @@ class GEM_EXTERN pix_opencv_contours_boundingrect : public GemPixObj
     	void	    	floatNightmodeMess(float nightmode);
     	void	    	floatShowMess(float show);
     	void	    	floatDrawMess(float draw);
-        int             mark(float fx, float fy );
+        int             mark(float fx, float fy, float fw, float fh );
     	void	    	deleteMark(float findex);
     	// The new minimal/maximal area 
 	int 		minarea;
@@ -80,8 +80,10 @@ class GEM_EXTERN pix_opencv_contours_boundingrect : public GemPixObj
 	// to detect changes in the image size
 	int 		comp_xsize;
 	int		comp_ysize;
-        int             x_xmark[MAX_MARKERS];
-        int             x_ymark[MAX_MARKERS];
+        float           x_xmark[MAX_MARKERS];
+        float           x_ymark[MAX_MARKERS];
+        int             x_wmark[MAX_MARKERS];
+        int             x_hmark[MAX_MARKERS];
         int             x_found[MAX_MARKERS];
         int             x_ftolerance;
         int             x_mmove;

@@ -40,7 +40,7 @@ pix_opencv_surf :: pix_opencv_surf()
   m_dataout = outlet_new(this->x_obj, &s_anything);
 
   night_mode = 0;
-  x_maxmove = 8;
+  x_maxmove = 20;
   x_delaunay = -1;
   x_threshold = -1;
 
@@ -88,10 +88,11 @@ pix_opencv_surf :: ~pix_opencv_surf()
 void pix_opencv_surf :: processRGBAImage(imageStruct &image)
 {
   int i, k;
-  int im;
+  int im, oi;
   int marked;
   int descsize;
   char tindex[4];
+  float dist, odist;
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) 
   {
@@ -202,15 +203,16 @@ void pix_opencv_surf :: processRGBAImage(imageStruct &image)
 
        for ( im=0; im<MAX_MARKERS; im++ )
        {
-         if ( x_xmark[im] != -1.0 )
-         {
-           if ( ( abs( r1->pt.x - x_xmark[im] ) <= x_maxmove ) && ( abs( r1->pt.y - x_ymark[im] ) <= x_maxmove ) )
+           if ( x_xmark[im] == -1 ) continue; // no points
+
+           odist=sqrt( pow( r1->pt.x-x_xmark[im], 2 ) + pow( r1->pt.y-x_ymark[im], 2 ) );
+
+           if ( odist <= x_maxmove )
            {
              marked = 1;
              // post( "pdp_opencv_surf : point already marked" );
              break;
            }
-         }
        }
        if ( !marked )
        {
@@ -234,6 +236,11 @@ void pix_opencv_surf :: processRGBAImage(imageStruct &image)
     int neighbour = -1;
     double d, dist1 = 1000000, dist2 = 1000000;
 
+    if ( x_xmark[im] == -1 ) continue; // no points
+
+    oi=-1;
+    dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
+
     for( i = 0; i < objectKeypoints->total; i++ )
     {
       CvSURFPoint* r1 = (CvSURFPoint*)cvGetSeqElem( objectKeypoints, i );
@@ -242,23 +249,30 @@ void pix_opencv_surf :: processRGBAImage(imageStruct &image)
 
        // manually marked points
        // recognized on position
-       if ( x_xmark[im] != -1.0 )
+       odist=sqrt( pow( r1->pt.x-x_xmark[im], 2 ) + pow( r1->pt.y-x_ymark[im], 2 ) );
+
+       if ( odist <= x_maxmove )
        {
-         if ( ( abs( r1->pt.x - x_xmark[im] ) <= x_maxmove ) && ( abs( r1->pt.y - x_ymark[im] ) <= x_maxmove ) )
-         {
-           sprintf( tindex, "%d", im+1 );
-           cvPutText( rgb, tindex, cvPointFrom32f(r1->pt), &font, CV_RGB(255,255,255));
-           x_xmark[im]=r1->pt.x;
-           x_ymark[im]=r1->pt.y;
-           memcpy( (float * )x_rdesc[im], rdesc, descsize*sizeof(float));
-           x_found[im]++;
-           SETFLOAT(&x_list[0], im+1);
-           SETFLOAT(&x_list[1], x_xmark[im]);
-           SETFLOAT(&x_list[2], x_ymark[im]);
-           outlet_list( m_dataout, 0, 3, x_list );
-           break;
-         }
+           if ( odist < dist )
+           {
+             oi=im;
+             x_xmark[oi]=r1->pt.x;
+             x_ymark[oi]=r1->pt.y;
+             memcpy( (float * )x_rdesc[oi], rdesc, descsize*sizeof(float));
+             dist = odist;
+           }
        }
+     }
+
+     if ( oi !=-1 )
+     {
+        sprintf( tindex, "%d", oi );
+        cvPutText( rgb, tindex, cvPoint(x_xmark[oi],x_ymark[oi]), &font, CV_RGB(255,255,255));
+        x_found[oi] = x_ftolerance;
+        SETFLOAT(&x_list[0], oi);
+        SETFLOAT(&x_list[1], x_xmark[oi]);
+        SETFLOAT(&x_list[2], x_ymark[oi]);
+        outlet_list( m_dataout, 0, 3, x_list );
      }
   }
 
@@ -330,10 +344,11 @@ void pix_opencv_surf :: processRGBAImage(imageStruct &image)
 void pix_opencv_surf :: processRGBImage(imageStruct &image)
 { 
   int i, k;
-  int im;
+  int im, oi;
   int marked;
   int descsize;
   char tindex[4];
+  float dist, odist;
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) 
   {
@@ -443,14 +458,15 @@ void pix_opencv_surf :: processRGBImage(imageStruct &image)
 
        for ( im=0; im<MAX_MARKERS; im++ )
        {
-         if ( x_xmark[im] != -1.0 )
+         if ( x_xmark[im] == -1 ) continue; // no points
+
+         odist=sqrt( pow( r1->pt.x-x_xmark[im], 2 ) + pow( r1->pt.y-x_ymark[im], 2 ) );
+
+         if ( odist <= x_maxmove )
          {
-           if ( ( abs( r1->pt.x - x_xmark[im] ) <= x_maxmove ) && ( abs( r1->pt.y - x_ymark[im] ) <= x_maxmove ) )
-           {
              marked = 1;
              // post( "pdp_opencv_surf : point already marked" );
              break;
-           }
          }
        }
        if ( !marked )
@@ -475,6 +491,11 @@ void pix_opencv_surf :: processRGBImage(imageStruct &image)
     int neighbour = -1;
     double d, dist1 = 1000000, dist2 = 1000000;
 
+    if ( x_xmark[im] == -1 ) continue; // no points
+
+    oi=-1;
+    dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
+
     for( i = 0; i < objectKeypoints->total; i++ )
     {
       CvSURFPoint* r1 = (CvSURFPoint*)cvGetSeqElem( objectKeypoints, i );
@@ -483,23 +504,30 @@ void pix_opencv_surf :: processRGBImage(imageStruct &image)
 
        // manually marked points
        // recognized on position
-       if ( x_xmark[im] != -1.0 )
+       odist=sqrt( pow( r1->pt.x-x_xmark[im], 2 ) + pow( r1->pt.y-x_ymark[im], 2 ) );
+
+       if ( odist <= x_maxmove )
        {
-         if ( ( abs( r1->pt.x - x_xmark[im] ) <= x_maxmove ) && ( abs( r1->pt.y - x_ymark[im] ) <= x_maxmove ) )
-         {
-           sprintf( tindex, "%d", im+1 );
-           cvPutText( rgb, tindex, cvPointFrom32f(r1->pt), &font, CV_RGB(255,255,255));
-           x_xmark[im]=r1->pt.x;
-           x_ymark[im]=r1->pt.y;
-           memcpy( (float * )x_rdesc[im], rdesc, descsize*sizeof(float));
-           x_found[im]++;
-           SETFLOAT(&x_list[0], im+1);
-           SETFLOAT(&x_list[1], x_xmark[im]);
-           SETFLOAT(&x_list[2], x_ymark[im]);
-           outlet_list( m_dataout, 0, 3, x_list );
-           break;
-         }
+           if ( odist < dist )
+           {
+             oi=im;
+             x_xmark[oi]=r1->pt.x;
+             x_ymark[oi]=r1->pt.y;
+             memcpy( (float * )x_rdesc[oi], rdesc, descsize*sizeof(float));
+             dist = odist;
+           }
        }
+     }
+
+     if ( oi !=-1 )
+     {
+        sprintf( tindex, "%d", oi );
+        cvPutText( rgb, tindex, cvPoint(x_xmark[oi],x_ymark[oi]), &font, CV_RGB(255,255,255));
+        x_found[oi] = x_ftolerance;
+        SETFLOAT(&x_list[0], oi);
+        SETFLOAT(&x_list[1], x_xmark[oi]);
+        SETFLOAT(&x_list[2], x_ymark[oi]);
+        outlet_list( m_dataout, 0, 3, x_list );
      }
   }
 
@@ -574,10 +602,11 @@ void pix_opencv_surf :: processYUVImage(imageStruct &image)
 void pix_opencv_surf :: processGrayImage(imageStruct &image)
 { 
   int i, k;
-  int im;
+  int im, oi;
   int marked;
   int descsize;
   char tindex[4];
+  float dist, odist;
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) 
   {
@@ -679,16 +708,18 @@ void pix_opencv_surf :: processGrayImage(imageStruct &image)
 
        for ( im=0; im<MAX_MARKERS; im++ )
        {
-         if ( x_xmark[im] != -1.0 )
+         if ( x_xmark[im] == -1 ) continue; // no points
+
+         odist=sqrt( pow( r1->pt.x-x_xmark[im], 2 ) + pow( r1->pt.y-x_ymark[im], 2 ) );
+
+         if ( odist <= x_maxmove )
          {
-           if ( ( abs( r1->pt.x - x_xmark[im] ) <= x_maxmove ) && ( abs( r1->pt.y - x_ymark[im] ) <= x_maxmove ) )
-           {
-             marked = 1;
-             // post( "pdp_opencv_surf : point already marked" );
-             break;
-           }
+           marked = 1;
+           // post( "pdp_opencv_surf : point already marked" );
+           break;
          }
        }
+
        if ( !marked )
        {
           for ( i=0; i<MAX_MARKERS; i++)
@@ -711,6 +742,11 @@ void pix_opencv_surf :: processGrayImage(imageStruct &image)
     int neighbour = -1;
     double d, dist1 = 1000000, dist2 = 1000000;
 
+    if ( x_xmark[im] == -1 ) continue; // no points
+
+    oi=-1;
+    dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
+
     for( i = 0; i < objectKeypoints->total; i++ )
     {
       CvSURFPoint* r1 = (CvSURFPoint*)cvGetSeqElem( objectKeypoints, i );
@@ -719,23 +755,30 @@ void pix_opencv_surf :: processGrayImage(imageStruct &image)
 
        // manually marked points
        // recognized on position
-       if ( x_xmark[im] != -1.0 )
+       odist=sqrt( pow( r1->pt.x-x_xmark[im], 2 ) + pow( r1->pt.y-x_ymark[im], 2 ) );
+
+       if ( odist <= x_maxmove )
        {
-         if ( ( abs( r1->pt.x - x_xmark[im] ) <= x_maxmove ) && ( abs( r1->pt.y - x_ymark[im] ) <= x_maxmove ) )
-         {
-           sprintf( tindex, "%d", im+1 );
-           cvPutText( gray, tindex, cvPointFrom32f(r1->pt), &font, CV_RGB(255,255,255));
-           x_xmark[im]=r1->pt.x;
-           x_ymark[im]=r1->pt.y;
-           memcpy( (float * )x_rdesc[im], rdesc, descsize*sizeof(float));
-           x_found[im]++;
-           SETFLOAT(&x_list[0], im+1);
-           SETFLOAT(&x_list[1], x_xmark[im]);
-           SETFLOAT(&x_list[2], x_ymark[im]);
-           outlet_list( m_dataout, 0, 3, x_list );
-           break;
-         }
+           if ( odist < dist )
+           {
+             oi=im;
+             x_xmark[oi]=r1->pt.x;
+             x_ymark[oi]=r1->pt.y;
+             memcpy( (float * )x_rdesc[oi], rdesc, descsize*sizeof(float));
+             dist = odist;
+           }
        }
+     }
+
+     if ( oi !=-1 )
+     {
+        sprintf( tindex, "%d", oi );
+        cvPutText( gray, tindex, cvPoint(x_xmark[oi],x_ymark[oi]), &font, CV_RGB(255,255,255));
+        x_found[oi] = x_ftolerance;
+        SETFLOAT(&x_list[0], oi);
+        SETFLOAT(&x_list[1], x_xmark[oi]);
+        SETFLOAT(&x_list[2], x_ymark[oi]);
+        outlet_list( m_dataout, 0, 3, x_list );
      }
   }
 

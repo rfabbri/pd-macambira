@@ -51,7 +51,7 @@ pix_opencv_lk :: pix_opencv_lk()
   add_remove_pt = 0;
   quality = 0.1;
   min_distance = 10;
-  maxmove = 8;
+  maxmove = 20;
   markall = 0;
   ftolerance = 5;
   delaunay = -1;
@@ -104,8 +104,9 @@ pix_opencv_lk :: ~pix_opencv_lk()
 void pix_opencv_lk :: processRGBAImage(imageStruct &image)
 {
   int i, k;
-  int im;
+  int im, oi;
   int marked;
+  float dist, odist;
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) 
   {
@@ -250,27 +251,40 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
          cvCircle( rgb, cvPointFrom32f(points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
 
          marked=0;
+         oi=-1;
+         dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
+
          for ( im=0; im<MAX_MARKERS; im++ )
          {
-           // first marking
-           if ( x_xmark[im] != -1.0 )
+
+           if ( x_xmark[im] == -1 ) continue; // i don't see the point
+
+           odist=sqrt( pow( points[1][i].x - x_xmark[im], 2 ) + pow( points[1][i].y - x_ymark[im], 2 ) );
+
+           // search for the closest point
+           if ( odist <= maxmove )
            {
-             // post( "pix_opencv_lk : compare (%f,%f) to (%d,%d)", points[1][i].x, points[1][i].y, x_xmark[im], x_ymark[im] );
-             if ( ( abs( (int)points[1][i].x - x_xmark[im] ) <= maxmove ) && ( abs( (int)points[1][i].y - x_ymark[im] ) <= maxmove ) )
-             {
-               char tindex[4];
-               sprintf( tindex, "%d", im+1 );
-               cvPutText( rgb, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
-               x_xmark[im]=(int)points[1][i].x;
-               x_ymark[im]=(int)points[1][i].y;
-               x_found[im]=ftolerance;
-               marked=1;
-               SETFLOAT(&x_list[0], im+1);
-               SETFLOAT(&x_list[1], x_xmark[im]);
-               SETFLOAT(&x_list[2], x_ymark[im]);
-               outlet_list( m_dataout, 0, 3, x_list );
-             }
+               if ( odist < dist )
+               {
+                 dist = odist;
+                 marked=1;
+                 oi=im;
+               }
            }
+         }
+
+         if ( oi != -1 )
+         {
+           char tindex[4];
+             sprintf( tindex, "%d", oi );
+             cvPutText( rgb, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
+             x_xmark[oi]=(int)points[1][i].x;
+             x_ymark[oi]=(int)points[1][i].y;
+             x_found[oi]=ftolerance;
+             SETFLOAT(&x_list[0], oi);
+             SETFLOAT(&x_list[1], x_xmark[oi]);
+             SETFLOAT(&x_list[2], x_ymark[oi]);
+             outlet_list( m_dataout, 0, 3, x_list );
          }
 
          if ( markall && !marked )
@@ -369,8 +383,9 @@ void pix_opencv_lk :: processRGBAImage(imageStruct &image)
 void pix_opencv_lk :: processRGBImage(imageStruct &image)
 { 
   int i, k;
-  int im;
+  int im, oi;
   int marked;
+  float dist, odist;
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) 
   {
@@ -514,26 +529,39 @@ void pix_opencv_lk :: processRGBImage(imageStruct &image)
          cvCircle( rgb, cvPointFrom32f(points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
 
          marked=0;
+         oi=-1;
+         dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
+
          for ( im=0; im<MAX_MARKERS; im++ )
          {
-           // first marking
-           if ( x_xmark[im] != -1.0 )
+           if ( x_xmark[im] == -1 ) continue; // i don't see the point
+
+           odist=sqrt( pow( points[1][i].x - x_xmark[im], 2 ) + pow( points[1][i].y - x_ymark[im], 2 ) );
+
+           // search for this point
+           if ( odist <= maxmove )
            {
-             if ( ( abs( points[1][i].x - x_xmark[im] ) <= maxmove ) && ( abs( points[1][i].y - x_ymark[im] ) <= maxmove ) )
-             {
-               char tindex[4];
-               sprintf( tindex, "%d", im+1 );
-               cvPutText( rgb, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
-               x_xmark[im]=points[1][i].x;
-               x_ymark[im]=points[1][i].y;
-               x_found[im]=ftolerance;
-               marked=1;
-               SETFLOAT(&x_list[0], im+1);
-               SETFLOAT(&x_list[1], x_xmark[im]);
-               SETFLOAT(&x_list[2], x_ymark[im]);
-               outlet_list( m_dataout, 0, 3, x_list );
-             }
+               if ( odist < dist )
+               {
+                 dist = odist;
+                 marked=1;
+                 oi=im;
+               }
            }
+         }
+
+         if ( oi !=-1 )
+         { 
+           char tindex[4];
+              sprintf( tindex, "%d", oi );
+              cvPutText( rgb, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
+              x_xmark[oi]=points[1][i].x;
+              x_ymark[oi]=points[1][i].y;
+              x_found[oi]=ftolerance;
+              SETFLOAT(&x_list[0], oi);
+              SETFLOAT(&x_list[1], x_xmark[oi]);
+              SETFLOAT(&x_list[2], x_ymark[oi]);
+              outlet_list( m_dataout, 0, 3, x_list );
          }
 
          if ( markall && !marked )
@@ -636,8 +664,9 @@ void pix_opencv_lk :: processYUVImage(imageStruct &image)
 void pix_opencv_lk :: processGrayImage(imageStruct &image)
 { 
   int i, k;
-  int im;
+  int im, oi;
   int marked;
+  float dist, odist;
 
   if ((this->comp_xsize!=image.xsize)&&(this->comp_ysize!=image.ysize)) 
   {
@@ -774,26 +803,39 @@ void pix_opencv_lk :: processGrayImage(imageStruct &image)
          cvCircle( gray, cvPointFrom32f(points[1][i]), 3, CV_RGB(0,255,0), -1, 8,0);
 
          marked=0;
+         oi=-1;
+         dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
+
          for ( im=0; im<MAX_MARKERS; im++ )
          {
-           // first marking
-           if ( x_xmark[im] != -1.0 )
-           {
-             if ( ( abs( points[1][i].x - x_xmark[im] ) <= maxmove ) && ( abs( points[1][i].y - x_ymark[im] ) <= maxmove ) )
-             {
-               char tindex[4];
-               sprintf( tindex, "%d", im+1 );
+           if ( x_xmark[im] == -1 ) continue; // i don't see the point
+
+            odist=sqrt( pow( points[1][i].x - x_xmark[im], 2 ) + pow( points[1][i].y - x_ymark[im], 2 ) );
+
+            // search for the closest point
+            if ( odist <= maxmove )
+            {
+               if ( odist < dist )
+               {
+                 dist = odist;
+                 marked=1;
+                 oi=im;
+               }
+            }
+          }
+
+          if ( oi !=-1 )
+          { 
+             char tindex[4];
+               sprintf( tindex, "%d", oi );
                cvPutText( gray, tindex, cvPointFrom32f(points[1][i]), &font, CV_RGB(255,255,255));
-               x_xmark[im]=points[1][i].x;
-               x_ymark[im]=points[1][i].y;
-               x_found[im]=ftolerance;
-               marked=1;
-               SETFLOAT(&x_list[0], im+1);
-               SETFLOAT(&x_list[1], x_xmark[im]);
-               SETFLOAT(&x_list[2], x_ymark[im]);
+               x_xmark[oi]=points[1][i].x;
+               x_ymark[oi]=points[1][i].y;
+               x_found[oi]=ftolerance;
+               SETFLOAT(&x_list[0], oi);
+               SETFLOAT(&x_list[1], x_xmark[oi]);
+               SETFLOAT(&x_list[2], x_ymark[oi]);
                outlet_list( m_dataout, 0, 3, x_list );
-             }
-           }
          }
 
          if ( markall && !marked )
@@ -1070,13 +1112,13 @@ void  pix_opencv_lk :: deleteMess(float index)
 {
   int i;
 
-    if ( ( index < 1.0 ) || ( index > MAX_MARKERS ) )
+    if ( ( index < 0.0 ) || ( index >= MAX_MARKERS ) )
     {
        return;
     }
 
-    x_xmark[(int)index-1] = -1;
-    x_ymark[(int)index-1] = -1;
+    x_xmark[(int)index] = -1;
+    x_ymark[(int)index] = -1;
 
 }
 

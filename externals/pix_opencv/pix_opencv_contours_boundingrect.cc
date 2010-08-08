@@ -34,16 +34,16 @@ pix_opencv_contours_boundingrect :: pix_opencv_contours_boundingrect()
   inlet_new(this->x_obj, &this->x_obj->ob_pd, gensym("float"), gensym("maxarea"));
   m_dataout = outlet_new(this->x_obj, 0);
   m_countout = outlet_new(this->x_obj, 0);
-  minarea = 1;
+  minarea = 10*10;
   maxarea = 320*240;
-  comp_xsize  = 0;
-  comp_ysize  = 0;
+  comp_xsize  = 320;
+  comp_ysize  = 240;
   orig = NULL;
   gray = NULL;
   cnt_img = NULL;
   rgb = NULL;
   x_ftolerance  = 5;
-  x_mmove   = 10;
+  x_mmove   = 20;
   x_nightmode   = 0;
   x_show   = 0;
   x_draw   = 1;
@@ -72,7 +72,7 @@ pix_opencv_contours_boundingrect :: ~pix_opencv_contours_boundingrect()
 // Mark a contour
 //
 /////////////////////////////////////////////////////////
-int pix_opencv_contours_boundingrect :: mark(float fx, float fy )
+int pix_opencv_contours_boundingrect :: mark(float fx, float fy, float fw, float fh )
 {
   int i;
 
@@ -85,8 +85,10 @@ int pix_opencv_contours_boundingrect :: mark(float fx, float fy )
     {
        if ( x_xmark[i] == -1 )
        {
-          x_xmark[i] = (int)fx;
-          x_ymark[i] = (int)fy;
+          x_xmark[i] = (float)(fx+(fw/2));
+          x_ymark[i] = (float)(fy+(fh/2));
+          x_wmark[i] = (int)fw;
+          x_hmark[i] = (int)fh;
           x_found[i] = x_ftolerance;
           return i;
        }
@@ -104,10 +106,13 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
 {
   unsigned char *pixels = image.data;
   char tindex[4];
-  int im = 0;                  // Indicator of markers.
+  int im = 0, i, ic;           // Indicator of markers.
+  int oi, found;               
+  float dist, odist;           // Distances
   t_atom rlist[5];
 
-  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!orig)) {
+  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!orig)) 
+  {
 
 	this->comp_xsize = image.xsize;
 	this->comp_ysize = image.ysize;
@@ -155,43 +160,58 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
       }
     }
 
-    int i = 0;                   // Indicator of cycles.
-    int ic = 0;                  // Indicator of contours.
+    i = 0;                   // Indicator of cycles.
+    ic = 0;                  // Indicator of contours.
     for( ; contours != 0; contours = contours->h_next )
     {
         int count = contours->total; // This is number point in contour
         CvRect rect;
-        int oi, found;
 
 	rect = cvContourBoundingRect( contours, 1);
-	if ( ( (rect.width*rect.height) > minarea ) && ( (rect.width*rect.height) < maxarea ) ) {
+
+	if ( ( (rect.width*rect.height) > minarea ) && ( (rect.width*rect.height) < maxarea ) ) 
+        {
 
             found = 0;
             oi = -1;
+            dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
+
             for ( im=0; im<MAX_MARKERS; im++ )
             {
-              // check if the object is already known
-              if ( ( abs( rect.x - x_xmark[im] ) < x_mmove ) && ( abs( rect.y - x_ymark[im] ) < x_mmove ) )
+
+              if ( x_xmark[im]==-1 ) continue;  // no contours
+
+              odist=sqrt( pow( ((float)rect.x+rect.width/2)-x_xmark[im], 2 ) + pow( ((float)rect.y+rect.height/2)-x_ymark[im], 2 ) );
+
+              // search for the closest known contour
+              // that is likely to be this one
+              if ( odist < x_mmove )
               {
-                 oi=im;
-                 found=1;
-                 x_found[im] = x_ftolerance;
-                 x_xmark[im] = rect.x;
-                 x_ymark[im] = rect.y;
-                 break;
+                if ( odist < dist )
+                {
+                  found=1;
+                  oi=im;
+                  x_xmark[oi] = (float)(rect.x+rect.width/2);
+                  x_ymark[oi] = (float)(rect.y+rect.height/2);
+                  x_wmark[oi] = (int)rect.width;
+                  x_hmark[oi] = (int)rect.height;
+                  x_found[oi] = x_ftolerance;
+                  dist=odist;
+                }
               }
             }
+
             // new object detected
             if ( !found )
             {
-               oi = this->mark(rect.x, rect.y );
+               oi = this->mark(rect.x, rect.y, rect.width, rect.height );
             }
 
             if ( x_draw )
             {
 	      cvRectangle( orig, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
               sprintf( tindex, "%d", oi );
-              cvPutText( orig, tindex, cvPoint(rect.x,rect.y), &font, CV_RGB(255,255,255));
+              cvPutText( orig, tindex, cvPoint(x_xmark[oi],x_ymark[oi]), &font, CV_RGB(255,0,0));
             }
 
             if ( x_show )
@@ -210,6 +230,7 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
 	    ic++;
 	}
     }
+
     outlet_float( m_countout, ic );
 
     // delete lost objects
@@ -241,8 +262,11 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
   char tindex[4];
   t_atom rlist[5];
   int im = 0;                  // Indicator of markers.
+  int oi, found;  
+  float dist, odist;           // Distances
 
-  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!rgb)) {
+  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!rgb)) 
+  {
 
 	this->comp_xsize = image.xsize;
 	this->comp_ysize = image.ysize;
@@ -291,37 +315,51 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
     {
         int count = contours->total; // This is number point in contour
         CvRect rect;
-        int oi, found;
 
 	rect = cvContourBoundingRect( contours, 1);
-	if ( ( (rect.width*rect.height) > minarea ) && ( (rect.width*rect.height) < maxarea ) ) {
+	if ( ( (rect.width*rect.height) > minarea ) && ( (rect.width*rect.height) < maxarea ) ) 
+        {
 
             found = 0;
             oi = -1;
+            dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
+
             for ( im=0; im<MAX_MARKERS; im++ )
             {
-              // check if the object is already known
-              if ( ( abs( rect.x - x_xmark[im] ) < x_mmove ) && ( abs( rect.y - x_ymark[im] ) < x_mmove ) )
+
+              if ( x_xmark[im]==-1 ) continue;
+
+              odist=sqrt( pow( ((float)rect.x+rect.width/2)-x_xmark[im], 2 ) + pow( ((float)rect.y+rect.height/2)-x_ymark[im], 2 ) );
+
+              // search for the closest known contour
+              // that is likely to be this one
+              if ( odist < x_mmove )
               {
-                 oi=im;
-                 found=1;
-                 x_found[im] = x_ftolerance;
-                 x_xmark[im] = rect.x;
-                 x_ymark[im] = rect.y;
-                 break;
+                if ( odist < dist )
+                {
+                  found=1;
+                  oi=im;
+                  x_xmark[oi] = (float)(rect.x+rect.width/2);
+                  x_ymark[oi] = (float)(rect.y+rect.height/2);
+                  x_wmark[oi] = (int)rect.width;
+                  x_hmark[oi] = (int)rect.height;
+                  x_found[oi] = x_ftolerance;
+                  dist=odist;
+                }
               }
             }
+
             // new object detected
             if ( !found )
             {
-               oi = this->mark(rect.x, rect.y );
+               oi = this->mark(rect.x, rect.y, rect.width, rect.height );
             }
 
             if ( x_draw )
             {
 	      cvRectangle( rgb, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
               sprintf( tindex, "%d", oi );
-              cvPutText( rgb, tindex, cvPoint(rect.x,rect.y), &font, CV_RGB(255,255,255));
+              cvPutText( rgb, tindex, cvPoint(x_xmark[oi],x_ymark[oi]), &font, CV_RGB(255,0,0));
             }
 
             if ( x_show )
@@ -374,8 +412,11 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
   char tindex[4];
   t_atom rlist[5];
   int im = 0;                  // Indicator of markers.
+  int oi, found;
+  float dist, odist;           // Distances
 
-  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!orig)) {
+  if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!orig)) 
+  {
 
 	this->comp_xsize = image.xsize;
 	this->comp_ysize = image.ysize;
@@ -427,37 +468,51 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
     {
         int count = contours->total; // This is number point in contour
         CvRect rect;
-        int oi, found;
 
 	rect = cvContourBoundingRect( contours, 1);
-	if ( ( (rect.width*rect.height) > minarea ) && ( (rect.width*rect.height) < maxarea ) ) {
+	if ( ( (rect.width*rect.height) > minarea ) && ( (rect.width*rect.height) < maxarea ) ) 
+        {
 
             found = 0;
             oi = -1;
+            dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
+
             for ( im=0; im<MAX_MARKERS; im++ )
             {
-              // check if the object is already known
-              if ( ( abs( rect.x - x_xmark[im] ) < x_mmove ) && ( abs( rect.y - x_ymark[im] ) < x_mmove ) )
+
+              if ( x_xmark[im]==-1 ) continue;
+
+              odist=sqrt( pow( ((float)rect.x+rect.width/2)-x_xmark[im], 2 ) + pow( ((float)rect.y+rect.height/2)-x_ymark[im], 2 ) );
+
+              // search for the closest known contour
+              // that is likely to be this one
+              if ( odist < x_mmove )
               {
-                 oi=im;
-                 found=1;
-                 x_found[im] = x_ftolerance;
-                 x_xmark[im] = rect.x;
-                 x_ymark[im] = rect.y;
-                 break;
+                if ( odist < dist )
+                {
+                  found=1;
+                  oi=im;
+                  x_xmark[oi] = (float)(rect.x+rect.width/2);
+                  x_ymark[oi] = (float)(rect.y+rect.height/2);
+                  x_wmark[oi] = (int)rect.width;
+                  x_hmark[oi] = (int)rect.height;
+                  x_found[oi] = x_ftolerance;
+                  dist=odist;
+                }
               }
             }
+
             // new object detected
             if ( !found )
             {
-               oi = this->mark(rect.x, rect.y );
+               oi = this->mark(rect.x, rect.y, rect.width, rect.height );
             }
 
             if ( x_draw )
             {
 	      cvRectangle( cnt_img, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), cvScalarAll(255), 2, 8 , 0 );
               sprintf( tindex, "%d", oi );
-              cvPutText( cnt_img, tindex, cvPoint(rect.x,rect.y), &font, cvScalarAll(255));
+              cvPutText( cnt_img, tindex, cvPoint(x_xmark[oi],x_ymark[oi]), &font, cvScalarAll(255));
             }
 
             if ( x_show )
@@ -476,7 +531,8 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
 	    ic++;
 	}
     }
-    outlet_float( m_countout, i );
+
+    outlet_float( m_countout, ic );
 
     // delete lost objects
     for ( im=0; im<MAX_MARKERS; im++ )
@@ -593,13 +649,15 @@ void pix_opencv_contours_boundingrect :: deleteMark(t_floatarg findex )
 {
   int i;
 
-    if ( ( findex < 1.0 ) || ( findex > MAX_MARKERS ) )
+    if ( ( findex < 0.0 ) || ( findex >= MAX_MARKERS ) )
     {
        return;
     }
 
-    x_xmark[(int)findex-1] = -1;
-    x_ymark[(int)findex-1] = -1;
+    x_xmark[(int)findex] = -1;
+    x_ymark[(int)findex] = -1;
+    x_wmark[(int)findex] = -1;
+    x_hmark[(int)findex] = -1;
 }
 
 
@@ -611,6 +669,8 @@ void pix_opencv_contours_boundingrect :: floatClearMess (void)
     {
       x_xmark[i] = -1;
       x_ymark[i] = -1;
+      x_wmark[i] = -1;
+      x_hmark[i] = -1;
       x_found[i] = x_ftolerance;
     }
 }
