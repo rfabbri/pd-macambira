@@ -195,6 +195,8 @@ static void pdp_opencv_contours_boundingrect_process_rgb(t_pdp_opencv_contours_b
     // draw old contours
     for ( im=0; im<MAX_MARKERS; im++ )
     {
+        if ( x_xmark[im]==-1 ) continue;
+
         cvRectangle( x->cnt_img, cvPoint((int)(x->x_xmark[im]-x->x_wmark[im]/2),(int)(x->x_ymark[im]-x->x_hmark[im]/2)), 
                                  cvPoint((int)(x->x_xmark[im]+x->x_wmark[im]/2),(int)(x->x_ymark[im]+x->x_hmark[im]/2)), CV_RGB(0,0,255), 2, 8, 0 );
         sprintf( tindex, "%d", im );
