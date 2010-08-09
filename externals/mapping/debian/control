@@ -8,7 +8,7 @@ Homepage: http://puredata.info
 
 Package: pd-mapping
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Depends: ${shlibs:Depends}, ${misc:Depends}, pd, pd-cyclone, pd-maxlib, pd-pddp, pd-purepd, pd-unauthorized, pd-zexy
 Description: a Pd library for creatively mapping data
  The Mapping Library for Pd is a library of mapping primitives for mapping
  data to controls. Also included are techniques for conditioning sensor data
