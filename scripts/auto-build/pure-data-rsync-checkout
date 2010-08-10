@@ -26,6 +26,13 @@ for dir in /home/pd/rsync/*; do
 		  update_distro $dirname
 done
 
+for dir in /home/pd/rsync/*.git; do 
+	cd $dir
+	git pull
+	cd scripts
+	svn --ignore-externals update
+done
+
 # since the above test can cause this script to exit with an error, force it
 # to be happy to prevent getting automated error emails to root
 true 
