@@ -33,6 +33,7 @@ t_class *gphoto_class;
 typedef struct gphoto_struct {
 	t_object x_obj;
 	t_outlet *connectedOutlet;
+	pthread_attr_t threadAttr; //thread attributes, added from DM2 version.
 	Camera *camera;
 	int connected;
 
@@ -68,7 +69,7 @@ void *openCam(void *gphoto) {
 
 	// Set to connected state.
 	((gphoto_struct *)gphoto)->connected = 1;
-	
+
 	return(NULL);	
 }
 
@@ -78,7 +79,7 @@ static void wrapOpen(gphoto_struct *gphoto) {
 	pthread_t thread1;
 
 	// Create thread and pass reference to object struct
-	ret = pthread_create( &thread1, NULL, openCam, gphoto);
+	ret = pthread_create( &thread1, &gphoto->threadAttr, openCam, gphoto);
 
 	return;
 }
@@ -106,7 +107,7 @@ static void wrapClose(gphoto_struct *gphoto) {
 	pthread_t thread1;
 
 	// Create thread and pass reference to object struct
-	ret = pthread_create( &thread1, NULL, closeCam, gphoto);
+	ret = pthread_create( &thread1, &gphoto->threadAttr, closeCam, gphoto);
 
 	return;
 }
@@ -153,7 +154,9 @@ void *listConfig(void *threadArgs) {
 	// Send bang out 1st outlet when operation is done.
 	sys_lock();
 	outlet_bang(((gphoto_gimme_struct *)threadArgs)->gphoto->x_obj.ob_outlet);
-	sys_unlock();	
+	sys_unlock();
+
+	free(((gphoto_gimme_struct *)threadArgs)->argv); // suggested by Martin Peach, safe to free() from here when we alloc() from parent?
 
 	return(NULL);
 }
@@ -172,7 +175,7 @@ static void wrapListConfig(gphoto_struct *gphoto) {
 		threadArgs->gphoto = gphoto;
 
 		// Create thread
-		ret = pthread_create( &thread1, NULL, listConfig, threadArgs);
+		ret = pthread_create( &thread1, &gphoto->threadAttr, listConfig, threadArgs);
 	} else {
 		error("gphoto: ERROR: Not connected.");
 	}
@@ -244,6 +247,8 @@ void *getConfig(void *threadArgs) {
 	outlet_bang(((gphoto_gimme_struct *)threadArgs)->gphoto->x_obj.ob_outlet);
 	sys_unlock();	
 
+	free(((gphoto_gimme_struct *)threadArgs)->argv); // suggested by Martin Peach, safe to free() from here when we alloc() from parent?
+
 	return(NULL);
 }
 
@@ -265,7 +270,7 @@ static void wrapGetConfig(gphoto_struct *gphoto, t_symbol *s, int argc, t_atom *
 		memcpy(threadArgs->argv, argv, sizeof(*argv)*argc);	// copy the arguments into new space.
 
 		// Create thread
-		ret = pthread_create( &thread1, NULL, getConfig, threadArgs);
+		ret = pthread_create( &thread1, &gphoto->threadAttr, getConfig, threadArgs);
 	} else {
 		error("gphoto: ERROR: Not connected.");
 	}
@@ -331,6 +336,8 @@ void *setConfig(void *threadArgs) {
 	outlet_bang(((gphoto_gimme_struct *)threadArgs)->gphoto->x_obj.ob_outlet);
 	sys_unlock();
 
+	free(((gphoto_gimme_struct *)threadArgs)->argv); // suggested by Martin Peach, safe to free() from here when we alloc() from parent?
+
 	return(NULL);
 }
 
@@ -353,7 +360,7 @@ static void wrapSetConfig(gphoto_struct *gphoto,  t_symbol *s, int argc, t_atom 
 		memcpy(threadArgs->argv, argv, sizeof(*argv)*argc);	// copy the arguments into new space.
 
 		// Create thread
-		ret = pthread_create( &thread1, NULL, setConfig, threadArgs);
+		ret = pthread_create( &thread1, &gphoto->threadAttr, setConfig, threadArgs);
 	} else {
 		error("gphoto: ERROR: Not connected.");
 	}
@@ -382,19 +389,22 @@ void *captureImage(void *threadArgs) {
 	gp_ret = gp_camera_file_get(((gphoto_gimme_struct *)threadArgs)->gphoto->camera, camera_file_path.folder, camera_file_path.name,
 		     GP_FILE_TYPE_NORMAL, camerafile, NULL); // get file from camera
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(((gphoto_gimme_struct *)threadArgs)->gphoto->camera); return(NULL);}
+
+	gp_file_unref(camerafile); // clear camerafile
 	
 	gp_ret = gp_camera_file_delete(((gphoto_gimme_struct *)threadArgs)->gphoto->camera, camera_file_path.folder, camera_file_path.name, NULL);
 	if (gp_ret != 0) {sys_lock(); error("gphoto: ERROR: %s\n", gp_result_as_string(gp_ret)); sys_unlock(); gp_camera_unref(((gphoto_gimme_struct *)threadArgs)->gphoto->camera); return(NULL);}
 
-	close(fd); // close file descriptor
-	gp_file_free(camerafile); // free camerafile (needed to avoid fd leaks!)
-
+	//close(fd); // close file descriptor # gphoto devs say this is uneeded.
+	
 	// Send bang out 2nd outlet when operation is done.
 	sys_lock();
 	outlet_bang(((gphoto_gimme_struct *)threadArgs)->gphoto->x_obj.ob_outlet);
 	sys_unlock();
 
-	return(NULL);	
+	free(((gphoto_gimme_struct *)threadArgs)->argv); // suggested by Martin Peach, safe to free() from here when we alloc() from parent?
+
+	return(NULL);
 }
 
 // Wrap captureImage
@@ -416,7 +426,7 @@ static void wrapCaptureImage(gphoto_struct *gphoto,  t_symbol *s, int argc, t_at
 		memcpy(threadArgs->argv, argv, sizeof(*argv)*argc);	// copy the arguments into new space.
 
 		// Create thread
-		ret = pthread_create( &thread1, NULL, captureImage, threadArgs);
+		ret = pthread_create( &thread1, &gphoto->threadAttr, captureImage, threadArgs);
 	} else {
 		error("gphoto: ERROR: Not connected.");
 	}
@@ -428,6 +438,10 @@ static void *gphoto_new(void) {
 	gphoto_struct *gphoto = (gphoto_struct *) pd_new(gphoto_class);
 	outlet_new(&gphoto->x_obj, NULL);
 	gphoto->connectedOutlet = outlet_new(&gphoto->x_obj, &s_float);
+
+	// When we create a thread, make sure it is deatched, from DM2 version.
+	pthread_attr_init(&gphoto->threadAttr);
+	pthread_attr_setdetachstate(&gphoto->threadAttr, PTHREAD_CREATE_DETACHED);
 
 	// Initially the external is not "connected"
 	gphoto->connected = 0;
@@ -451,5 +465,7 @@ void gphoto_setup(void) {
 	class_addmethod(gphoto_class, (t_method) wrapSetConfig, gensym("setconfig"), A_GIMME, 0);
 	class_addmethod(gphoto_class, (t_method) wrapCaptureImage, gensym("capture"), A_GIMME, 0);
 	class_addmethod(gphoto_class, (t_method) wrapListConfig, gensym("listconfig"), 0);
+
+	post("Gphoto: SVN version w/ gp_file_free()");
 }
 
