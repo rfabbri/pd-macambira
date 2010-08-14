@@ -1,3 +1,6 @@
+0.12.25 ( codename Dangerous Modules )
+   added pdp_vloopback : some say it's dangerous, but it works smooth
+
 0.12.25 ( codename CrunchyBits )
    fixed default font for pdp_text, pdp_qtext
    fixed crash in pdp_theonice~

@@ -88,6 +88,7 @@ extern "C"
 
 #ifdef HAVE_V4L2
     void pdp_v4l2_setup(void);
+    void pdp_vloopback_setup(void);
 #endif
 
 #ifdef HAVE_LIBDV
@@ -195,6 +196,7 @@ void pidip_setup(void){
 
 #ifdef HAVE_V4L2
     pdp_v4l2_setup();
+    pdp_vloopback_setup();
 #endif
 
 #ifdef HAVE_LIBDV

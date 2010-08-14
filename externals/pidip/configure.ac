@@ -4,7 +4,7 @@ AC_INIT
 AC_CANONICAL_HOST
 AC_CONFIG_HEADER(include/pidip_config.h)
 
-PDP_PIDIP_VERSION="0.12.25"
+PDP_PIDIP_VERSION="0.12.26"
 PD_DIR=/usr/local/pd
 PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
@@ -240,9 +240,9 @@ then
 fi
 
 AC_CHECK_HEADER(linux/videodev2.h,
-                PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_v4l2.o"
-                AC_DEFINE(HAVE_V4L2, 1, build pdp_v4l2),
-                echo "   linux/videodev2.h not found: not building pdp_v4l2")
+                PDP_CAPTURE_OBJECT="$PDP_CAPTURE_OBJECT pdp_v4l2.o pdp_vloopback.o"
+                AC_DEFINE(HAVE_V4L2, 1, build pdp_v4l2 and pdp_vloopback),
+                echo "   linux/videodev2.h not found: not building pdp_v4l2 and pdp_vloopback")
 
 case "$host" in
   *-linux* )

@@ -14,7 +14,6 @@ MPEG4IP_CFLAGS = @MPEG4IP_CFLAGS@
 PDP_PIDIP_DISTRO = /mnt/c/ydegoyon.free.fr/pidip-$(PDP_PIDIP_VERSION)
 PDP_PIDIP_TARBALL = $(PDP_PIDIP_DISTRO).tar.gz
 
-
 PDP_PIDIP_CFLAGS  = $(MPEG4IP_CFLAGS) $(IMLIB_CFLAGS) \
     -DPD -DX_DISPLAY_MISSING -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
     -fPIC -Wall -W -Wstrict-prototypes \
@@ -29,10 +28,12 @@ PDP_PIDIP_CPPFLAGS  = $(MPEG4IP_CFLAGS) $(IMLIB_CFLAGS) \
 
 ifeq ($(shell uname -s),Darwin)
 all: pidip.pd_darwin
+PDP_PIDIP_SFLAGS = -D__OSX__
 endif
 
 ifeq ($(shell uname -s),Linux)
 all: pidip.pd_linux
+PDP_PIDIP_SFLAGS = -D__LINUX__
 endif
 
 pdp_pidip_all:
@@ -67,7 +68,7 @@ distro: clean all
 	rm -rf /tmp/pidip-$(PDP_PIDIP_VERSION)
 
 .c.o:
-	gcc $(PDP_PIDIP_INCLUDES) $(PDP_PIDIP_CFLAGS) -o $*.o -c $*.c
+	gcc $(PDP_PIDIP_INCLUDES) $(PDP_PIDIP_CFLAGS) $(PDP_PIDIP_SFLAGS) -o $*.o -c $*.c
 
 .cpp.o:
-	g++ $(PDP_PIDIP_INCLUDES) $(PDP_PIDIP_CPPFLAGS) -o $*.o -c $*.cpp
+	g++ $(PDP_PIDIP_INCLUDES) $(PDP_PIDIP_CPPFLAGS) $(PDP_PIDIP_SFLAGS) -o $*.o -c $*.cpp
