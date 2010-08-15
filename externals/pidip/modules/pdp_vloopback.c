@@ -59,6 +59,7 @@ typedef struct pdp_vloopback_struct
   t_outlet *x_outlet1;
 
   int x_nbframes;
+  int x_invertrb;
 
   struct video_window x_vidwin;
   struct video_picture x_vidpic;
@@ -201,6 +202,8 @@ static void pdp_vloopback_process_rgb(t_pdp_vloopback *x)
 {
   t_pdp *header = pdp_packet_header(x->x_packet0);
   char *data = (char *)pdp_packet_data(x->x_packet0);
+  char cvalue;
+  unsigned int px,py;
   int written, flength;
 
   if ( !x->x_initialized )
@@ -217,6 +220,20 @@ static void pdp_vloopback_process_rgb(t_pdp_vloopback *x)
 
   // output the image
   flength = x->x_width*x->x_height*3;
+
+  // invert red and blue channels ( with webcamstudio module )
+  if ( x->x_invertrb )
+  {
+     for ( py=0; py<x->x_height; py++ )
+     {
+       for ( px=0; px<x->x_width; px++ )
+       {
+           cvalue=*(data+3*py*x->x_width+3*px);
+           *(data+3*py*x->x_width+3*px)=*(data+3*py*x->x_width+3*px+2);
+           *(data+3*py*x->x_width+3*px+2)=cvalue;
+       }
+     }
+  }
 
   if ( ( written = write(x->x_vlfd, data, flength) ) != flength )
   {
@@ -278,6 +295,14 @@ static void pdp_vloopback_input_0(t_pdp_vloopback *x, t_symbol *s, t_floatarg f)
     }
 }
 
+static void pdp_vloopback_invertrb(t_pdp_vloopback *x, t_floatarg finvert)
+{
+    if ( ((int)finvert == 0) || ((int)finvert == 1) )
+    {
+       x->x_invertrb = (int)finvert;
+    }
+}
+
 static void pdp_vloopback_free(t_pdp_vloopback *x)
 {
     pdp_vloopback_close(x);
@@ -294,6 +319,7 @@ void *pdp_vloopback_new(t_symbol *vdev)
 
     x->x_initialized = false;
     x->x_nbframes = 0;
+    x->x_invertrb = 1;
 
     x->x_packet0 = -1;
     x->x_packet1 = -1;
@@ -330,6 +356,7 @@ void pdp_vloopback_setup(void)
     class_addmethod(pdp_vloopback_class, (t_method)pdp_vloopback_close, gensym("close"), A_NULL);
     class_addmethod(pdp_vloopback_class, (t_method)pdp_vloopback_open, gensym("open"), A_SYMBOL, A_NULL);
     class_addmethod(pdp_vloopback_class, (t_method)pdp_vloopback_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_vloopback_class, (t_method)pdp_vloopback_invertrb, gensym("invert"), A_DEFFLOAT, A_NULL);
 
 }
 

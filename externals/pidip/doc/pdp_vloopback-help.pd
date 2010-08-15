@@ -1,4 +1,4 @@
-#N canvas 261 169 712 664 10;
+#N canvas 265 177 760 664 10;
 #X obj 159 72 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
 #X msg 217 112 open \$1;
@@ -38,12 +38,16 @@ that supports v4l input ( skype \, webcamstudio \, ... );
 #X msg 66 97 loop 1;
 #X obj 217 409 pdp_xv;
 #X text 382 374 default /dev/video1;
-#X msg 357 306 open /dev/video1;
-#X msg 359 334 close;
-#X text 464 304 open a vloopback device;
-#X text 400 334 close a vloopback device;
+#X msg 362 274 open /dev/video1;
+#X msg 364 302 close;
+#X text 469 272 open a vloopback device;
+#X text 405 302 close a vloopback device;
 #X floatatom 369 410 5 0 0 0 - - -;
 #X text 411 407 number of frames written;
+#X msg 365 332 invert \$1;
+#X obj 433 333 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 455 331 invert red and blue channels ( default : 1 );
 #X connect 0 0 6 0;
 #X connect 1 0 7 0;
 #X connect 2 0 1 0;
@@ -73,3 +77,5 @@ that supports v4l input ( skype \, webcamstudio \, ... );
 #X connect 29 0 7 0;
 #X connect 32 0 17 0;
 #X connect 33 0 17 0;
+#X connect 38 0 17 0;
+#X connect 39 0 38 0;
