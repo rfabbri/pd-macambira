@@ -1,6 +1,6 @@
 // ===================================================================
 // Wiimote external for Puredata
-// Written by Mike Wozniewki (Feb 2007), www.mikewoz.com
+// Written by Mike Wozniewski (Feb 2007), www.mikewoz.com
 //
 // Requires the CWiid library (version 0.6.00) by L. Donnie Smith
 //
@@ -1139,4 +1139,10 @@ void wiimote_setup(void)
    /* set things on the wiimote */
    class_addmethod(wiimote_class, (t_method) wiimote_setRumble, gensym("setRumble"), A_FLOAT, 0);
    class_addmethod(wiimote_class, (t_method) wiimote_setLED, gensym("setLED"), A_FLOAT, 0);
+
+   post("[wiimote]: reading data from the Wii remote controller");
+   post("	(c) 2007 Mike Wozniewski");
+   post("	(c) 2008-2009 Florian Krebs");
+   post("	(c) 2009-2010 IOhannes m zmoelnig");
+   post("	version 0.3 published under the GNU General Public License");
 }
