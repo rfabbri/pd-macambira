@@ -21,7 +21,7 @@ SOURCES_windows =
 PDOBJECTS = 
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = 
+EXAMPLES = polyexample.pd
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
