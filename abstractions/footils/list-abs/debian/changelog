@@ -1,4 +1,4 @@
-pd-list-abs (0.1-0.0) unstable; urgency=low
+pd-list-abs (0.1-1) unstable; urgency=low
 
   * Initial release (Closes: #591834)
 
