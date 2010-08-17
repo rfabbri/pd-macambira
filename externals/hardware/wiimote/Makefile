@@ -23,7 +23,11 @@ VERSION=0.3.1
 # where Pd lives
 PD_PATH = ../../pd
 # where to install the library
-objectsdir = $(PD_PATH)/extra
+prefix = /usr/local
+libdir = $(prefix)/lib
+pkglibdir = $(libdir)/pd/extra
+objectsdir = $(pkglibdir)
+
 
 CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g -DVERSION=\"$(VERSION)\"
 LDFLAGS =  
@@ -39,7 +43,6 @@ ifeq ($(UNAME),Darwin)
   CFLAGS += -fPIC $(FAT_FLAGS)
   LDFLAGS += -bundle -undefined dynamic_lookup $(FAT_FLAGS)
   LIBS += -lc 
-  STRIP = strip -x
  endif
 ifeq ($(UNAME),Linux)
   SOURCES += $(SOURCES_Linux)
@@ -49,7 +52,6 @@ ifeq ($(UNAME),Linux)
   CFLAGS += -fPIC
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
   LIBS += -lc
-  STRIP = strip --strip-unneeded -R .note -R .comment
 endif
 ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   SOURCES += $(SOURCES_Windows)
@@ -60,7 +62,6 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   CFLAGS += -mms-bitfields $(WINDOWS_HACKS)
   LDFLAGS += -s -shared -Wl,--enable-auto-import
   LIBS += -L$(PD_PATH)/bin -L$(PD_PATH)/obj -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
-  STRIP = strip --strip-unneeded -R .note -R .comment
 endif
 
 CFLAGS += $(OPT_CFLAGS)
@@ -94,13 +95,11 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-exec
 	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(LIBRARY_NAME)-meta.pd $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION)))
 
 # install library linked as single binary
 single_install: $(LIBRARY_NAME) install-doc install-exec
 	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	install -m644 -p $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(STRIP) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
 
 install-doc:
 	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
@@ -111,8 +110,8 @@ install-doc:
 	install -m644 -p CHANGES $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/CHANGES.txt
 
 install-exec:
-	install -d $(objectsdir)/$(LIBRARY_NAME)
-	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+#	install -m644 -p $(wildcard *.pd) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 
 clean:
