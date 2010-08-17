@@ -18,12 +18,14 @@ SOURCES_Windows =
 #
 #------------------------------------------------------------------------------#
 
+VERSION=0.3.1
+
 # where Pd lives
 PD_PATH = ../../pd
 # where to install the library
 objectsdir = $(PD_PATH)/extra
 
-CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
+CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g -DVERSION=\"$(VERSION)\"
 LDFLAGS =  
 LIBS = -lcwiid -lbluetooth -lpthread
 

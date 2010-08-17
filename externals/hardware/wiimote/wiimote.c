@@ -1144,5 +1144,9 @@ void wiimote_setup(void)
    post("	(c) 2007 Mike Wozniewski");
    post("	(c) 2008-2009 Florian Krebs");
    post("	(c) 2009-2010 IOhannes m zmoelnig");
-   post("	version 0.3 published under the GNU General Public License");
+#ifdef VERSION
+   post("	version " VERSION " published under the GNU General Public License");
+#else
+   post("	published under the GNU General Public License");
+#endif
 }
