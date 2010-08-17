@@ -36,6 +36,10 @@ CFLAGS += -DHAVE_CWIID_MOTIONPLUS_LOWSPEED
 
 then recompile wiimote
 
+multiple bluetooth dongles
+--------------------------
+[LATER describe that]
+
 
 contact
 =======
