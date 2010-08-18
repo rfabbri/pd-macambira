@@ -6,12 +6,12 @@ AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS  = -I m4/generated -I m4
 AM_CPPFLAGS	 = -I$(top_srcdir)/../../../pd/src
 
-lib_LTLIBRARIES = wiimote.la
+externaldir = $(libdir)/pd/extra/wiimote
+
+external_LTLIBRARIES = wiimote.la
 
 SOURCES = wiimote.c
-dist_data_DATA = wiimote-help.pd
-
-
+dist_external_DATA = wiimote-help.pd
 
 wiimote_la_SOURCES = $(SOURCES)
 wiimote_la_CFLAGS = @ARCH_CFLAGS@ @PD_CFLAGS@
