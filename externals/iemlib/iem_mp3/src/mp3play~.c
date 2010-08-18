@@ -3190,18 +3190,20 @@ static int mp3play_tilde_read_frame_length_first(t_mp3play_tilde *x, int *frsz)
     unsigned long head;
     unsigned char chead;
 
+  size_t len;
+
     *frsz = 0;
     if((x->file_size) >= 4)
     {
-  fread(&chead, 1, sizeof(char), x->fh);
+  len = fread(&chead, 1, sizeof(char), x->fh);
   head = (unsigned int)chead;
-  fread(&chead, 1, sizeof(char), x->fh);
+  len = fread(&chead, 1, sizeof(char), x->fh);
   head <<= 8;
   head |= (unsigned int)chead;
-  fread(&chead, 1, sizeof(char), x->fh);
+  len = fread(&chead, 1, sizeof(char), x->fh);
   head <<= 8;
   head |= (unsigned int)chead;
-  fread(&chead, 1, sizeof(char), x->fh);
+  len = fread(&chead, 1, sizeof(char), x->fh);
   head <<= 8;
   head |= (unsigned int)chead;
   syncword = (head >> 20) & 0x0fff;
@@ -3276,18 +3278,20 @@ static int mp3play_tilde_read_frame_length_next(t_mp3play_tilde *x, int *frsz, i
     unsigned long head;
     unsigned char chead;
 
+    size_t len;
+
     *frsz = 0;
     if(begframeseek[frame_counter] < ((x->file_size) - 4))
     {
-  fread(&chead, 1, sizeof(char), x->fh);
+  len = fread(&chead, 1, sizeof(char), x->fh);
   head = (unsigned int)chead;
-  fread(&chead, 1, sizeof(char), x->fh);
+  len = fread(&chead, 1, sizeof(char), x->fh);
   head <<= 8;
   head |= (unsigned int)chead;
-  fread(&chead, 1, sizeof(char), x->fh);
+  len = fread(&chead, 1, sizeof(char), x->fh);
   head <<= 8;
   head |= (unsigned int)chead;
-  fread(&chead, 1, sizeof(char), x->fh);
+  len = fread(&chead, 1, sizeof(char), x->fh);
   head <<= 8;
   head |= (unsigned int)chead;
   if(head & (1<<20))
@@ -3371,6 +3375,8 @@ static void mp3play_tilde_do_open(t_mp3play_tilde *x, char *str, int calc_it)
     static char *layers[4] = { "Unknown" , "I", "II", "III" };
     char completefilename[400];
 
+    size_t len;
+
     if(x->file_is_open)
     {
       post("mp3play-ERROR: file is already open, please stop it first!");
@@ -3442,7 +3448,7 @@ static void mp3play_tilde_do_open(t_mp3play_tilde *x, char *str, int calc_it)
       }
       if(mp3_read_length > 0)
       {
-    fread(x->mp3inbuf, mp3_read_length, sizeof(char), x->fh);
+    len = fread(x->mp3inbuf, mp3_read_length, sizeof(char), x->fh);
     mp3_encode_return = decodeMP3(&(x->mp), x->mp3inbuf, mp3_read_length, x->mp3outbuf,
                 MY_MP3_MALLOC_IN_SIZE2, &size);
     if(mp3_encode_return == MP3_EX)
@@ -3539,6 +3545,8 @@ static t_int *mp3play_tilde_perform(t_int *w)
     float scale = x->scale, outa, outb;
     int mp3_out_index = x->mp3_out_index;
 
+    size_t len;
+
     if (!x->file_is_open)
   goto mp3play_tilde_labelzero;
     if (x->play_state != 1)
@@ -3577,7 +3585,7 @@ static t_int *mp3play_tilde_perform(t_int *w)
     goto mp3play_tilde_labelzero;
       }
 
-      fread(x->mp3inbuf, mp3_read_length, sizeof(char), x->fh);
+      len = fread(x->mp3inbuf, mp3_read_length, sizeof(char), x->fh);
       mp3_encode_return = decodeMP3(&(x->mp), x->mp3inbuf, mp3_read_length,
             x->mp3outbuf, MY_MP3_MALLOC_IN_SIZE2, &size);
       x->mp3_encode_size = size * sizeof(char) / sizeof(short);
