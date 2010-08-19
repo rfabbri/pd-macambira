@@ -272,7 +272,4 @@ void beatpipe_setup(void)
 	class_addmethod(beatpipe_class, (t_method)beatpipe_freeze,gensym("freeze"),0);
 	class_addmethod(beatpipe_class, (t_method)beatpipe_bang,gensym("continue"),0);
 	class_addlist(beatpipe_class,(t_method) beatpipe_list);
-	class_sethelpsymbol(beatpipe_class,gensym("help-beatpipe"));
-
-
 }

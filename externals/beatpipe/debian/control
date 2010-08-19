@@ -1,0 +1,19 @@
+Source: pd-beatpipe
+Section: sound
+Priority: optional
+Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
+Uploaders: Hans-Christoph Steiner <hans@eds.org>
+Build-Depends: debhelper (>= 7.0.50~), puredata
+Standards-Version: 3.9.1
+Homepage: http://puredata.info
+
+Package: pd-beatpipe
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Description: a realtime scheduler/event-delay/quantizer object for Pd
+ This object is a realtime scheduler, event-delay, and quantizer object for
+ Pure Data.  It is used for making beats and other rhythmic sequences. Any
+ list starting with a number T sent to the left inlet, will be sent to the
+ output after T beats, quantized with tpq (tick per quarter) and stripped of
+ the leading beat number. The tempo can be changed dynamically on the right
+ inlet The quantification can be set at any time with a set-tpq message.
