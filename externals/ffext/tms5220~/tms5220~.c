@@ -80,20 +80,28 @@ t_int *tms5220_tilde_perform(t_int *w) {
 	t_sample      *out =        (t_sample *)(w[3]);
 	int              n =               (int)(w[4]);
 
-	unsigned char *bytebuf = (unsigned char *)malloc(sizeof(unsigned char)*n);
+	//TODO: figure out proper resampling here:
+#define RESAMPLE_FACTOR 8
+	int rc = 0; // resample counter
+
+	unsigned char *bytebuf = (unsigned char *)malloc(sizeof(unsigned char)*n/RESAMPLE_FACTOR);
 
 	if(!bytebuf) {error("FATAL: cannot allocate signal buffer"); return w;}
 
-	tms5220_process(bytebuf, n);
+	tms5220_process(bytebuf, n/RESAMPLE_FACTOR);
 	unsigned char *pb = bytebuf;
 
-	while (n--) *out++ = (0.5+((t_sample)*pb++))/127.5;
+	while (n--) {
+		//FIXME: resampling without alias, please
+		*out++ = (0.5 + ((t_sample) *pb)) / 127.5;
+		if(!(rc = ((rc + 1) % RESAMPLE_FACTOR))) pb++;
+	}
 
 	free(bytebuf);
 
 	tms5220_tilde_update_status(x);
 	
-	return (w+5);
+	return (w + 5);
 }
 
 void tms5220_tilde_dsp(t_tms5220_tilde *x, t_signal **sp) {
