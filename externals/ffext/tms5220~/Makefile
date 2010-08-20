@@ -32,6 +32,7 @@ MANUAL =
 # automatically included
 EXTRA_DIST = 
 
+LIBS = -lsamplerate
 
 
 #------------------------------------------------------------------------------#
@@ -58,7 +59,7 @@ INSTALL_DIR     = $(INSTALL) -p -m 755 -d
 
 CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
 LDFLAGS =  
-LIBS = 
+#LIBS = 
 ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) \
 	         $(SOURCES_iphoneos) $(SOURCES_linux) $(SOURCES_windows)
 
