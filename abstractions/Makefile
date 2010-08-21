@@ -228,19 +228,16 @@ nsend_install:
 		--license "GNU GPL" \
 		--description "multiple-inlet/outlet send and receive"
 
-#-------------------------------------------------------------------------------
-# nusmuk
-NUSMUK_NAME = nusmuk
-nusmuk_install:
-	install -d $(DESTDIR)$(objectsdir)/$(NUSMUK_NAME)
-	install -p $(abstractions_src)/nusmuk/*.pd \
-		$(DESTDIR)$(objectsdir)/$(NUSMUK_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(NUSMUK_NAME) \
-		--author "Cyrille Henry" \
-		--description "a collection of objects for physical modelling"
-	install -p $(abstractions_src)/nusmuk/*.wav \
-		$(DESTDIR)$(objectsdir)/$(NUSMUK_NAME)
+#------------------------------------------------------------------------------#
+# NUSMUK
+nusmuk:
+	make -C $(abstractions_src)/nusmuk
 
+nusmuk_install:
+	make -C $(abstractions_src)/nusmuk DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+nusmuk_clean:
+	make -C $(abstractions_src)/nusmuk clean
 
 
 #-------------------------------------------------------------------------------
