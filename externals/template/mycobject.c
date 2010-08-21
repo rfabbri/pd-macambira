@@ -15,12 +15,14 @@ typedef struct mycobject
 void mycobject_float(t_mycobject *x, t_floatarg f)
 {
     post("mycobject: %f", f);
+    x=NULL; /* don't warn about unused variables */
 }
 
     /* this is called when mycobject gets the message, "rats". */
 void mycobject_rats(t_mycobject *x)
 {
     post("mycobject: rats");
+    x=NULL; /* don't warn about unused variables */
 }
 
     /* this is a pointer to the class for "mycobject", which is created in the
