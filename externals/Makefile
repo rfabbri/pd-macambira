@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive bassemu boids bsaylor creb cxc cyclone earplug ekext ext13 flashserver flatspace flib freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vanilla vbap windowing zexy
+LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cxc cyclone earplug ekext ext13 flashserver flib freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdogg pmpd sigpack smlib tof toxy unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -300,6 +300,18 @@ apple_clean:
 
 
 #------------------------------------------------------------------------------#
+# ARRAYSIZE
+arraysize:
+	make -C $(externals_src)/arraysize
+
+arraysize_install:
+	make -C $(externals_src)/arraysize DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+arraysize_clean:
+	make -C $(externals_src)/arraysize clean
+
+
+#------------------------------------------------------------------------------#
 # BASSEMU
 bassemu:
 	make -C $(externals_src)/bassemu~
@@ -378,6 +390,18 @@ bsaylor_clean:
 	-rm -f -- $(externals_src)/bsaylor/*.o
 	-rm -f -- $(externals_src)/bsaylor/*.bak
 	-rm -f -- $(externals_src)/bsaylor/*.*~
+
+
+#------------------------------------------------------------------------------#
+# COMPORT
+comport:
+	make -C $(externals_src)/comport
+
+comport_install:
+	make -C $(externals_src)/comport DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+comport_clean:
+	make -C $(externals_src)/comport clean
 
 
 #------------------------------------------------------------------------------#
@@ -467,37 +491,14 @@ cyclone_clean:
 
 #------------------------------------------------------------------------------#
 # EKEXT
-EKEXT_NAME=ekext
-EKEXT_OBJECTS := $(wildcard $(externals_src)/ekext/*/*.c) \
-	$(wildcard $(externals_src)/ekext/l*/*/*.c)
-ekext: $(EKEXT_OBJECTS:.c=.$(EXTENSION))
+ekext:
+	make -C $(externals_src)/ekext
 
-ekext_install: ekext
-	install -d $(DESTDIR)$(objectsdir)/$(EKEXT_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(EKEXT_NAME) \
-		--author "Ed Kelly <morph_2016@yahoo.co.uk>" \
-		--description "" \
-		--license "BSD" \
-		--version ""
-	install -p $(EKEXT_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(EKEXT_NAME)
-	install -p $(externals_src)/ekext/*/*help*.pd \
-		$(DESTDIR)$(objectsdir)/$(EKEXT_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(EKEXT_NAME)
-#	install -p $(externals_src)/ekext/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(EKEXT_NAME)
-#	install -p $(externals_src)/ekext/README \
-#		$(DESTDIR)$(readmesdir)/$(EKEXT_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(EKEXT_NAME)
-	install -p $(externals_src)/ekext/peakit~/peakit-listmoses.pd \
-		$(DESTDIR)$(examplesdir)/$(EKEXT_NAME)
+ekext_install:
+	make -C $(externals_src)/ekext DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 ekext_clean:
-	-rm -f -- $(EKEXT_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(EKEXT_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/ekext/*/*.bak
-	-rm -f -- $(externals_src)/ekext/*/*.*~
-
-
+	make -C $(externals_src)/ekext clean
 
 
 #------------------------------------------------------------------------------#
