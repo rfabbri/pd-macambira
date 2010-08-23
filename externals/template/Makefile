@@ -44,6 +44,8 @@ LIBS =
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
+CFLAGS += -DVERSION='"$(LIBRARY_VERSION)"'
+
 # where Pd lives
 PD_PATH = ../../pd
 # where to install the library
