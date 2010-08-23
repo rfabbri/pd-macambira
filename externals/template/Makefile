@@ -1,4 +1,4 @@
-## Pd library template version 1.0.1
+## Pd library template version 1.0.2
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = template
@@ -14,10 +14,6 @@ SOURCES_macosx =
 SOURCES_iphoneos = 
 SOURCES_linux = 
 SOURCES_windows = 
-
-# extra .c files that do not relate to a Pd object class
-# (common functionality - static library)
-SOURCES_LIB = 
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
@@ -36,6 +32,16 @@ MANUAL = manual.txt
 EXTRA_DIST = 
 
 
+
+#------------------------------------------------------------------------------#
+#
+# things you might need to edit if you are using other C libraries
+#
+#------------------------------------------------------------------------------#
+
+CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
+LDFLAGS =  
+LIBS = 
 
 #------------------------------------------------------------------------------#
 #
@@ -59,18 +65,15 @@ INSTALL = install
 INSTALL_FILE    = $(INSTALL) -p -m 644
 INSTALL_DIR     = $(INSTALL) -p -m 755 -d
 
-CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
-LDFLAGS =  
-LIBS = 
-ALLSOURCES := $(SOURCES) $(SOURCES_LIB) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) \
+ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) \
 	         $(SOURCES_iphoneos) $(SOURCES_linux) $(SOURCES_windows)
 
 DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
 ORIGDIR=pd-$(LIBRARY_NAME)_$(LIBRARY_VERSION)
 
 UNAME := $(shell uname -s)
-CPU := $(shell uname -p)
 ifeq ($(UNAME),Darwin)
+  CPU := $(shell uname -p)
   ifeq ($(CPU),arm) # iPhone/iPod Touch
     SOURCES += $(SOURCES_iphoneos)
     EXTENSION = pd_darwin
@@ -113,6 +116,7 @@ ifeq ($(UNAME),Darwin)
   endif
 endif
 ifeq ($(UNAME),Linux)
+  CPU := $(shell uname -m)
   SOURCES += $(SOURCES_linux)
   EXTENSION = pd_linux
   OS = linux
@@ -124,6 +128,7 @@ ifeq ($(UNAME),Linux)
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
 ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
+  CPU := $(shell uname -m)
   SOURCES += $(SOURCES_cygwin)
   EXTENSION = dll
   OS = cygwin
@@ -135,6 +140,7 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
 ifeq (MINGW,$(findstring MINGW,$(UNAME)))
+  CPU := $(shell uname -m)
   SOURCES += $(SOURCES_windows)
   EXTENSION = dll
   OS = windows
@@ -157,16 +163,16 @@ CFLAGS += $(OPT_CFLAGS)
 all: $(SOURCES:.c=.$(EXTENSION))
 
 %.o: %.c
-	$(CC) $(CFLAGS) -o "$@" -c "$<"
+	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
 
-%.$(EXTENSION): %.o $(SOURCES_LIB:.c=.o)
-	$(CC) $(LDFLAGS) -o "$@" $^  $(LIBS)
-	chmod a-x "$@"
+%.$(EXTENSION): %.o
+	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS)
+	chmod a-x "$*.$(EXTENSION)"
 
 # this links everything into a single binary file
-$(LIBRARY_NAME).$(EXTENSION): $(SOURCES:.c=.o) $(SOURCES_LIB:.c=.o) $(LIBRARY_NAME).o
-	$(CC) $(LDFLAGS) -o "$@" $^ $(LIBS)
-	chmod a-x $@
+$(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
+	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(LIBS)
+	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
 
 $(LIBRARY_NAME): $(LIBRARY_NAME).$(EXTENSION)
 	@echo "finished building $@"
