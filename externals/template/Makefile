@@ -3,8 +3,8 @@
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = template
 
-# add your .c source files (one object per file) to the SOURCES variable, help files will be
-# included automatically
+# add your .c source files, one object per file, to the SOURCES
+# variable, help files will be included automatically
 SOURCES = mycobject.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
@@ -18,7 +18,7 @@ EXAMPLES = bothtogether.pd
 MANUAL = manual.txt
 
 # if you want to include any other files in the source and binary tarballs,
-# list them here.  This can be anything from header files, example patches,
+# list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
 EXTRA_DIST = 
