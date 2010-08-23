@@ -165,10 +165,6 @@ $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
 	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(LIBS)
 	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
 
-$(LIBRARY_NAME): $(LIBRARY_NAME).$(EXTENSION)
-	@echo "finished building $@"
-
-
 install: libdir_install
 
 # The meta and help files are explicitly installed to make sure they are
