@@ -281,7 +281,7 @@ dpkg-source:
 	cd .. && dpkg-source -b $(LIBRARY_NAME)
 
 etags:
-	etags *.h $(SOURCES) $(SOURCES_LIB) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
+	etags *.h $(SOURCES) ../../pd/src/*.[ch] /usr/include/*.h /usr/include/*/*.h
 
 showsetup:
 	@echo "PD_PATH: $(PD_PATH)"
