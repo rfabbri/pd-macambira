@@ -7,14 +7,6 @@ LIBRARY_NAME = template
 # included automatically
 SOURCES = mycobject.c
 
-# For objects that only build on certain platforms, add those to the SOURCES
-# line for the right platforms.
-SOURCES_cygwin = 
-SOURCES_macosx = 
-SOURCES_iphoneos = 
-SOURCES_linux = 
-SOURCES_windows = 
-
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
 PDOBJECTS = mypdobject.pd
@@ -59,7 +51,6 @@ prefix = /usr/local
 libdir = $(prefix)/lib
 pkglibdir = $(libdir)/pd-externals
 objectsdir = $(pkglibdir)
-
 
 INSTALL = install
 INSTALL_FILE    = $(INSTALL) -p -m 644
