@@ -28,9 +28,9 @@ done
 
 for dir in /home/pd/rsync/*.git; do 
 	cd $dir
-	git pull
+	git pull	>> $LOGFILE 2>&1
 	cd scripts
-	svn --ignore-externals update
+	svn --ignore-externals update	>> $LOGFILE 2>&1
 done
 
 # since the above test can cause this script to exit with an error, force it
