@@ -10,7 +10,7 @@ License: Free software by Richard W.E. Furse. Do with as you will. No warranty.
 
 
 Files: plugin~.[hc] README.txt plugin~*.pd ChangeLog SConstruct
-Copyright: 2000, 2001, Jarno Sepp‰nen <jams@cs.tut.fi>
+Copyright: 2000, 2001, Jarno Sepp√§nen <jams@cs.tut.fi>
            2005, Carmen Rocco
            2010, IOhannes m. zmoelnig
 License: GPL-2+
