@@ -1,20 +1,15 @@
-## Pd library template version 1.0.1
+## Pd library template version 1.0.2
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = cxc
 
-# add your .c source files to the SOURCES variable, help files will be
-# included automatically
+# add your .c source files, one object per file, to the SOURCES
+# variable, help files will be included automatically
 SOURCES = ENV.c ascseq.c ascwave.c bfilt.c bfilt2.c cxc_counter.c cxavgdev.c cxc_prepend.c cxc_split.c cxmean.c cxstddev.c delta~.c dist_normal.c hex2dec.c ixprint.c mean~.c random1.c random1~.c random_fl.c random_fl~.c random_icg.c random_icg~.c random_tw.c reson~.c utime.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
 # line for the right platforms.
-SOURCES_android = 
-SOURCES_cygwin = 
-SOURCES_macosx = 
-SOURCES_iphoneos = 
 SOURCES_linux = proc.c
-SOURCES_windows = 
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
@@ -27,12 +22,22 @@ EXAMPLES =
 MANUAL = 
 
 # if you want to include any other files in the source and binary tarballs,
-# list them here.  This can be anything from header files, example patches,
+# list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
 EXTRA_DIST = TODO REFERENCES x_connective_pd034.diff x_connective_pd035.diff cxc.h cxc.c
 
 
+
+#------------------------------------------------------------------------------#
+#
+# things you might need to edit if you are using other C libraries
+#
+#------------------------------------------------------------------------------#
+
+CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
+LDFLAGS =  
+LIBS = 
 
 #------------------------------------------------------------------------------#
 #
@@ -42,6 +47,8 @@ EXTRA_DIST = TODO REFERENCES x_connective_pd034.diff x_connective_pd035.diff cxc
 
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
+
+CFLAGS += -DVERSION='"$(LIBRARY_VERSION)"'
 
 # where Pd lives
 PD_PATH = ../../pd
@@ -110,6 +117,7 @@ ifeq ($(UNAME),Darwin)
   endif
 endif
 ifeq ($(UNAME),Linux)
+  CPU := $(shell uname -m)
   SOURCES += $(SOURCES_linux)
   EXTENSION = pd_linux
   OS = linux
@@ -121,6 +129,7 @@ ifeq ($(UNAME),Linux)
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
 ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
+  CPU := $(shell uname -m)
   SOURCES += $(SOURCES_cygwin)
   EXTENSION = dll
   OS = cygwin
@@ -132,6 +141,7 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
 ifeq (MINGW,$(findstring MINGW,$(UNAME)))
+  CPU := $(shell uname -m)
   SOURCES += $(SOURCES_windows)
   EXTENSION = dll
   OS = windows
@@ -143,10 +153,13 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
 
+# in case somebody manually set the HELPPATCHES above
+HELPPATCHES ?= $(SOURCES:.c=-help.pd) $(PDOBJECTS:.c=-help.pd)
+
 CFLAGS += $(OPT_CFLAGS)
 
 
-.PHONY = install libdir_install single_install install-doc install-exec install-examples install-manual clean dist etags
+.PHONY = install libdir_install single_install install-doc install-exec install-examples install-manual clean dist etags $(LIBRARY_NAME)
 
 all: $(SOURCES:.c=.$(EXTENSION))
 
@@ -161,7 +174,6 @@ all: $(SOURCES:.c=.$(EXTENSION))
 $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
 	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(LIBS)
 	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
-
 
 install: libdir_install
 
@@ -186,11 +198,8 @@ single_install: $(LIBRARY_NAME) install-doc install-exec
 
 install-doc:
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	test -z "$(strip $(SOURCES))" || \
-		$(INSTALL_FILE) $(SOURCES:.c=-help.pd) \
-			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	test -z "$(strip $(PDOBJECTS))" || \
-		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) \
+	test -z "$(strip $(SOURCES) $(PDOBJECTS))" || \
+		$(INSTALL_FILE) $(HELPPATCHES) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_FILE) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
 	$(INSTALL_FILE) LICENSE.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
@@ -211,7 +220,7 @@ install-manual:
 
 
 clean:
-	-rm -f -- $(SOURCES:.c=.o)
+	-rm -f -- $(SOURCES:.c=.o) $(SOURCES_LIB:.c=.o)
 	-rm -f -- $(SOURCES:.c=.$(EXTENSION))
 	-rm -f -- $(LIBRARY_NAME).o
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
@@ -231,7 +240,7 @@ $(DISTBINDIR):
 libdir: all $(DISTBINDIR)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTBINDIR)
 	$(INSTALL_FILE) $(SOURCES)  $(DISTBINDIR)
-	$(INSTALL_FILE) $(SOURCES:.c=-help.pd) $(DISTBINDIR)
+	$(INSTALL_FILE) $(HELPPATCHES) $(DISTBINDIR)
 	test -z "$(strip $(EXTRA_DIST))" || \
 		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTBINDIR)
 #	tar --exclude-vcs -czpf $(DISTBINDIR).tar.gz $(DISTBINDIR)
@@ -249,12 +258,10 @@ dist: $(DISTDIR)
 	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
-	test -z "$(strip $(ALLSOURCES))" || \
-		$(INSTALL_FILE) $(ALLSOURCES:.c=-help.pd) $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_FILE) $(PDOBJECTS)  $(DISTDIR)
-	test -z "$(strip $(PDOBJECTS))" || \
-		$(INSTALL_FILE) $(PDOBJECTS:.pd=-help.pd) $(DISTDIR)
+	test -z "$(strip $(HELPPATCHES))" || \
+		$(INSTALL_FILE) $(HELPPATCHES) $(DISTDIR)
 	test -z "$(strip $(EXTRA_DIST))" || \
 		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTDIR)
 	test -z "$(strip $(EXAMPLES))" || \
