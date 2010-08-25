@@ -1,50 +1,56 @@
-#N canvas 86 22 759 427 10;
-#X obj 0 2 cnv 15 750 20 empty empty all_about_symbol_construction
-20 10 1 18 -233017 -66577 0;
-#X obj 716 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+#N canvas 0 0 448 503 10;
+#X obj 1 1 cnv 15 445 20 empty \$0-pddp.cnv.header symbol_construction
+20 10 1 18 -261106 -33289 0;
+#X obj 407 2 pddp/pddplink http://puredata.info/dev/pddp -text pddp
 ;
-#X text 23 389 updated for Pd version 0.37.1;
-#X obj 372 390 sprintf;
-#X obj 671 390 makesymbol;
-#X obj 579 390 makefilename;
-#X obj 494 390 list2symbol;
-#X symbolatom 396 177 55 0 0 0 - - -;
-#X obj 396 151 list2symbol;
-#X symbolatom 468 129 6 0 0 0 - - -;
-#X msg 468 103 symbol -;
-#X msg 396 73 make these into one symbol with no spaces;
-#X text 385 35 By setting a symbol on the right inlet of [list2symbol]
-\, you can create symbols without spaces:;
-#X text 532 102 <- click here to use "-";
-#X text 553 115 instead of spaces;
-#X text 9 85 There are many different ways of constructing symbols
-from various parts. You can turn lists into symbols by replacing the
-spaces with other characters or you can use objects with "format strings"
-that allow you to create symbols with more flexibility;
-#X obj 430 390 tosymbol;
-#X text 382 211 [tosymbol] works in a very similar way:;
-#X text 9 40 Many times you need to dynamically create different symbols.
+#X text 20 36 Many times you need to dynamically create different symbols.
 For example \, if you are working with many files \, you might want
 to name them with a sequential number.;
-#X symbolatom 395 316 55 0 0 0 - - -;
-#X msg 395 232 make these into one symbol with no spaces;
-#X text 578 274 instead of spaces;
-#X obj 395 292 tosymbol;
-#X text 486 144 ^-- or type here and hit enter;
-#X text 366 363 Related objects:;
-#X msg 457 260 separator -|-;
-#X text 556 261 <- click here to use "-|-";
-#X msg 18 258 list you can have up to ten members in your list.;
-#X obj 18 282 makesymbol 1%s_2%s_3%s_4%s_5%s_6%s_7%s_8%s_9%s_10%s;
-#X symbolatom 18 305 55 0 0 0 - - -;
-#X text 16 211 Using zexy's makesymbol \, you can build symbols by
-plugging lists into printf-style patterns:;
-#X connect 8 0 7 0;
-#X connect 9 0 8 1;
-#X connect 10 0 9 0;
-#X connect 11 0 8 0;
-#X connect 20 0 22 0;
-#X connect 22 0 19 0;
-#X connect 25 0 22 0;
-#X connect 27 0 28 0;
-#X connect 28 0 29 0;
+#X text 20 75 Below are some of the most common ways to build a symbol
+from various parts. Additionally \, there are externals which can perform
+more advanced functions \, which are listed below.;
+#X text 20 127 1) Using the [makefilename] object;
+#X floatatom 41 149 5 0 0 0 - - -;
+#X symbolatom 41 192 10 0 0 0 - - -;
+#X obj 41 170 makefilename file%d.wav;
+#X text 193 170 see help patch for more details;
+#X text 20 219 2) Using variable-substitution in a message box;
+#X symbolatom 41 351 12 0 0 0 - - -;
+#X msg 41 328 symbol \$1-\$2.wav;
+#X obj 41 306 pack;
+#X floatatom 41 241 5 1 12 1 month - -;
+#X floatatom 62 262 5 2000 2020 1 year - -;
+#X obj 62 283 t b a;
+#X text 20 379 3) Using externals;
+#X obj 1 481 cnv 15 445 20 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -233017 -33289 0;
+#N canvas 44 246 494 344 META 0;
+#X text 12 105 HELP_PATCH_AUTHORS Dave Sabine \, May 5 \, 2003 . Jonathan
+Wilkes revised the patch to conform to the PDDP template for Pd version
+0.42.;
+#X text 12 85 LIBRARY PDDP;
+#X text 12 5 GENRE all_about_pd;
+#X text 12 45 KEYWORDS conversion;
+#X text 12 25 NAME makefilename gatom;
+#X text 12 65 DESCRIPTION how to handle symbols in Pd;
+#X restore 392 483 pd META;
+#N canvas 14 368 428 126 Related_objects 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -261106 -33289 0;
+#X text 7 2 Symbol Construction- Related Objects;
+#X obj 22 43 makefilename;
+#X msg 114 44;
+#X restore 103 483 pd Related_objects;
+#X obj 6 483 pddp/pddplink pddp/help.pd -text help;
+#X obj 38 399 pddp/helplink zexy/list2symbol;
+#X obj 38 419 pddp/helplink cyclone/sprintf;
+#X obj 38 459 pddp/helplink zexy/makesymbol;
+#X obj 38 439 pddp/helplink cyclone/tosymbol;
+#X connect 5 0 7 0;
+#X connect 7 0 6 0;
+#X connect 11 0 10 0;
+#X connect 12 0 11 0;
+#X connect 13 0 12 0;
+#X connect 14 0 15 0;
+#X connect 15 0 12 0;
+#X connect 15 1 12 1;

@@ -1,0 +1,79 @@
+#N canvas 0 0 448 238 10;
+#X obj 1 1 cnv 15 445 20 empty \$0-pddp.cnv.header pd_META 20 10 1
+18 -261106 -33289 0;
+#X obj 407 2 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+;
+#X obj 1 216 cnv 15 445 20 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -233017 -33289 0;
+#N canvas 44 246 494 344 META 0;
+#X text 12 85 HELP_PATCH_AUTHORS Dave Sabine \, May 5 \, 2003 . Jonathan
+Wilkes revised the patch to conform to the PDDP template for Pd version
+0.42.;
+#X text 12 65 LIBRARY PDDP;
+#X text 12 5 GENRE all_about_pd;
+#X text 12 25 KEYWORDS needs_work;
+#X text 12 45 DESCRIPTION description of the pd META tags;
+#X restore 392 218 pd META;
+#N canvas 10 196 428 105 Related_objects 0;
+#X text 31 37 Hm...what to put here?;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -261106 -33289 0;
+#X text 7 2 Atoms- Related Objects;
+#X restore 103 218 pd Related_objects;
+#X obj 6 218 pddp/pddplink pddp/help.pd -text help;
+#X text 70 54 tags \, keywords \, defaults if some tags are left out
+;
+#N canvas 256 0 428 658 TAGS 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -261106 -33289 0;
+#X text 7 2 pd META - TAGS;
+#X text 31 37 Each pd META entry is a comment that begins with a tag
+in uppercase \, followed by values for that tag.;
+#X text 31 77 GENRE - describes what type of help patch this is. Possible
+values are help (for an object's help patch) \, tutorial \, or all_about_pd
+(in-depth help for a pd concept). If GENRE is omitted \, the value
+"help" is assumed.;
+#X text 31 137 NAME - name of the object. If more than one value is
+present \, it is assumed that the help patch covers multiple objects.
+This tag may also be used for tutorials and all_about_pd patches to
+show the relevant object(s) being discussed.;
+#X text 31 207 ALIAS - for an object's help patch \, any additional
+creator names for the object. For [trigger] \, this would be: ALIAS
+t;
+#X text 31 247 LICENSE - the license used for the object (not relevant
+for tutorials or all_about_pd patches). Some common values are:;
+#X text 51 277 SIBSD: three-clause BSD license;
+#X text 51 297 GPL v2: GNU/GPL license version 2;
+#X text 51 317 GPL v3: GNU/GPL license version 3;
+#X text 31 337 DESCRIPTION - short (one-line) description of an object's
+behavior. May also be used for tutorials or all_about_pd patches to
+describe the concept being discussed.;
+#X obj 1 551 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12
+0 14 -261106 -33289 0;
+#X text 7 552 TAGS for an object's inlets/outlets;
+#X text 31 587 Tags to show which messages are accepted by the inlets/outlets
+of an object. The tag starts with the word INLET or OUTLET \, followed
+by an underscore and a digit showing the xlet number:;
+#X text 31 670 There are two special designations:;
+#X text 31 647 INLET_0 - left-most inlet;
+#X text 31 690 INLET_N or OUTLET_N - variable number of xlets \, the
+exact number of which is determined by the creation arguments.;
+#X text 31 730 For objects with variable xlets \, the following may
+apply:;
+#X text 31 753 INLET_R or OUTLET_R - a right-most xlet which always
+has the same function regardless of the total number of xlets.;
+#X text 31 387 LIBRARY - name of the library to which the object belongs.
+;
+#X text 31 441 WEBSITE - website of the author or group that made the
+object/tutorial.;
+#X text 31 471 RELEASE_DATE - date when the object was made available
+to Pd users. Format = YEAR-MONTH-DAY;
+#X text 31 511 HELP_PATCH_AUTHORS - persons or groups who made/edited
+this help patch.;
+#X text 31 407 AUTHOR - multiple authors can be specified \, as well
+as additional text explaining each author's role.;
+#X text 31 793 The values may be float \, list \, bang \, symbol \,
+pointer \, anything \, as well as specific custom selectors such as
+set \, clear \, etc.;
+#X restore 144 145 pd TAGS;
+#X text 79 87 This help file is unfinished.;

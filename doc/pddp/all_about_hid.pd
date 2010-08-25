@@ -1,8 +1,4 @@
-#N canvas 21 40 773 566 10;
-#X obj 5 2 cnv 15 750 20 empty empty all_about_hid 20 10 1 18 -233017
--66577 0;
-#X obj 725 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
-;
+#N canvas 0 26 773 596 10;
 #X text 5 29 "HID" stands for "Human Interface Device". A HID is any
 device that is meant to allow humans to interact with a computer. Usually
 \, HIDs are mice \, keyboards \, joysticks \, tablets \, gamepads \,
@@ -91,7 +87,7 @@ The PHANTOM 6DOF device has six degrees of freedom: X \, Y \, Z movement
 #X text 715 261 100;
 #X text 385 275 PS/2 mice;
 #X text 385 289 Serial mice;
-#X text 375 23 LATENCY AND POLLING;
+#X text 375 25 LATENCY AND POLLING;
 #X text 375 156 REFRESH RATES OF VARIOUS DEVICES;
 #X text 11 369 Basically any device that is supported by the various
 HID layers on each OS is supported by the [hid] object. So any of those
@@ -123,3 +119,28 @@ to the 'printing' characters. [keyname] reports Shift \, Ctrl \, Alt
 #X text 692 160 refresh rate;
 #X text 12 527 [linuxhid];
 #X obj 11 347 hid;
+#X obj 1 1 cnv 15 770 20 empty \$0-pddp.cnv.header hid 20 10 1 18 -261106
+-33289 0;
+#X obj 737 2 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+;
+#X obj 1 566 cnv 15 770 20 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -233017 -33289 0;
+#N canvas 44 246 494 344 META 0;
+#X text 12 85 HELP_PATCH_AUTHORS Dave Sabine \, May 5 \, 2003 . Jonathan
+Wilkes revised the patch to conform to the PDDP template for Pd version
+0.42.;
+#X text 12 65 LIBRARY PDDP;
+#X text 12 5 GENRE all_about_pd;
+#X text 12 25 KEYWORDS needs_work;
+#X text 12 45 DESCRIPTION definition of haptics;
+#X restore 722 568 pd META;
+#N canvas 151 430 428 155 Related_objects 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -261106 -33289 0;
+#X text 7 2 hid - Related Objects;
+#X obj 19 38 key;
+#X obj 19 69 keyname;
+#X obj 19 99 keyup;
+#X restore 303 568 pd Related_objects;
+#X obj 6 568 pddp/pddplink pddp/help.pd -text help;
+#X obj 209 332 linuxhid;
