@@ -1,0 +1,163 @@
+#N canvas 0 0 555 619 10;
+#X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -228856 -66577 0;
+#X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header tabplay~ 3 12 0
+18 -204280 -1 0;
+#X obj 0 302 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
+-228856 -1 0;
+#N canvas 52 246 494 344 META 0;
+#X text 12 105 PLATFORM windows macosx gnulinux;
+#X text 12 185 LIBRARY internal;
+#X text 12 225 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 65 LICENSE SIBSD;
+#X text 12 205 AUTHOR Miller Puckette;
+#X text 12 285 HELP_PATCH_AUTHORS Updated for Pd version 0.29. Jonathan
+Wilkes revised the patch to conform to the PDDP template for Pd version
+0.42.;
+#X text 12 5 GENRE help;
+#X text 12 45 KEYWORDS signal array;
+#X text 12 85 DESCRIPTION play a table as audio (non-transposing);
+#X text 12 25 NAME tabplay~;
+#X text 12 125 INLET_0 float bang list set;
+#X text 12 145 OUTLET_0 signal;
+#X text 12 165 OUTLET_1 bang;
+#X text 12 245 RELEASE_DATE 1997;
+#X text 12 265 RELEASE_VERSION;
+#X restore 500 597 pd META;
+#X obj 0 437 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
+13 -228856 -1 0;
+#X obj 0 502 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+0 13 -228856 -1 0;
+#X obj 0 565 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
+0 13 -228856 -1 0;
+#N canvas 58 313 441 301 Related_objects 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 8 2 [tabplay~] Related Objects;
+#X text 20 38 Native Pd Objects;
+#X obj 23 63 tabread~;
+#X obj 97 63 tabread4;
+#X obj 276 89 table;
+#X text 22 146 [array];
+#X obj 23 116 soundfiler;
+#X text 85 146 and fft objects.;
+#X obj 119 116 tabread4~;
+#X obj 210 116 getsize;
+#X obj 281 116 setsize;
+#X obj 172 63 tabread;
+#X obj 247 63 tabwrite;
+#X obj 23 89 tabwrite~;
+#X obj 99 89 tabsend~;
+#X obj 179 89 tabreceive~;
+#X text 20 170 Externals and other object libraries;
+#X obj 20 190 pddp/helplink zexy/tabdump;
+#X obj 20 210 pddp/helplink linear_path;
+#X text 101 210 <-- which library is this in?;
+#X text 101 230 <-- which library is this in?;
+#X obj 20 230 pddp/helplink score;
+#X text 101 250 <-- which library is this in?;
+#X obj 20 250 pddp/helplink tabenv;
+#X obj 20 270 pddp/helplink flatspace/arraysize;
+#X restore 102 597 pd Related_objects;
+#X obj 78 311 cnv 17 3 115 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+-162280 0;
+#X obj 78 446 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+-162280 0;
+#X obj 472 3 tabplay~;
+#X obj 445 20 pddp/pddplink http://wiki.puredata.info/en/tabplay~ -text
+pdpedia: tabplay~;
+#X text 98 310 bang;
+#X text 98 328 float;
+#X text 98 365 list;
+#X text 98 393 set;
+#X obj 78 469 cnv 17 3 17 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
+-162280 0;
+#X text 98 445 signal;
+#X text 98 468 bang;
+#X text 168 468 - the right inlet sends a bang when [tabplay~] has
+finished playing through the table.;
+#X text 168 328 - sending a float n will cause [tabplay~] to start
+playing from the nth sample. (Sending 0 will play the entire sample.)
+;
+#X text 168 365 - a two-element list (x \, y) will cause [tabplay~]
+to begin at sample number x \, and continue for y samples.;
+#X floatatom 13 271 0 0 0 0 - - -;
+#X msg 13 52 set array99;
+#X obj 13 245 env~ 16384;
+#X obj 179 272 dac~ 1;
+#X obj 179 228 *~;
+#X obj 193 206 line~;
+#X msg 193 165 0.1 100;
+#X msg 209 186 0 100;
+#X text 255 166 on;
+#X text 255 186 off;
+#X text 231 206 envelope;
+#X text 231 217 generator;
+#X text 223 274 audio output;
+#X obj 179 250 hip~ 5;
+#X msg 28 119 0 44100;
+#X msg 29 98 44100;
+#X msg 28 78 bang;
+#X msg 27 139 44100 1000;
+#X text 168 520 - the name of the array or table to which [tabwrite~]
+will write data. The array or table must exist in an open Pd patch/canvas
+or an error message will appear in the console.;
+#X text 174 143 amplitude controls:;
+#N canvas 0 0 450 300 (subpatch) 0;
+#X array \$0-array 155948 float 0;
+#X coords 0 1 155948 -1 160 100 1;
+#X restore 345 167 graph;
+#N canvas 0 0 428 391 init 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X obj 23 283 soundfiler;
+#X floatatom 23 305 0 0 0 0 - - -;
+#X obj 23 204 loadbang;
+#X text 20 38 The objects below load a short soundfile into the array
+named "tabplay~-help-array.";
+#X text 20 68 If you right-click on the array and choose "Properties
+\, " you'll see the "save contents" checkbox is unmarked \, so that
+the array data is not saved as part of the patch.;
+#X text 20 110 You can always check this box to save the contents of
+the array in the patch \, but with large amounts of array data- even
+a few seconds of audio- this can create rather large Pd files.;
+#X text 20 162 Thus it is better just to load the content of the array
+when the patch opens \, as follows:;
+#X text 20 333 See the [soundfiler] help patch for more information.
+;
+#X text 8 2 [tabplay~] Initialisation Subpatch;
+#X obj 23 231 f \$0;
+#X msg 23 258 read -resize ../sound/bell.aiff \$1-array;
+#X connect 1 0 2 0;
+#X connect 3 0 10 0;
+#X connect 10 0 11 0;
+#X connect 11 0 1 0;
+#X restore 345 272 pd init;
+#X text 11 23 play a table as audio (non-transposing);
+#X text 95 75 The tabplay~ object plays through a table \, or part
+of one \, with no transposition or interpolation. It is cheaper than
+tabread4~ and there are none of tabread4~'s interpolation artifacts.
+;
+#X text 168 310 - play through the whole table.;
+#X text 168 393 - the "set" message \, followed by the name of an array
+\, permits you to switch between arrays (e.g. \, "set another_array").
+;
+#X text 168 445 - the outgoing audio signal.;
+#X text 80 520 1) symbol;
+#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 455 51 pddp/dsp-reminder;
+#X obj 98 570 pddp/pddplink all_about_arrays.pd;
+#X obj 13 165 tabplay~ \$0-array;
+#X connect 23 0 53 0;
+#X connect 24 0 22 0;
+#X connect 26 0 35 0;
+#X connect 27 0 26 1;
+#X connect 28 0 27 0;
+#X connect 29 0 27 0;
+#X connect 35 0 25 0;
+#X connect 36 0 53 0;
+#X connect 37 0 53 0;
+#X connect 38 0 53 0;
+#X connect 39 0 53 0;
+#X connect 53 0 24 0;
+#X connect 53 0 26 0;

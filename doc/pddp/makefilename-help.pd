@@ -1,138 +1,306 @@
-#N canvas 173 51 581 575 10;
-#X obj 104 539 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
-#X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
-0;
-#X text 104 483 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm
-;
-#N canvas 135 30 516 644 More_Info 0;
-#X text 17 4 COMMON USES;
-#X text 15 577 INNOVATIVE USES;
-#X text 47 19 I believe that this object was developed first to allow
+#N canvas 0 0 555 619 10;
+#X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -228856 -66577 0;
+#X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header makefilename 3 12
+0 18 -204280 -1 0;
+#X obj 0 197 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
+-228856 -1 0;
+#N canvas 51 244 494 344 META 0;
+#X text 12 105 PLATFORM windows macosx gnulinux;
+#X text 12 165 LIBRARY internal;
+#X text 12 205 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 65 LICENSE SIBSD;
+#X text 12 185 AUTHOR Miller Puckette;
+#X text 12 265 HELP_PATCH_AUTHORS Dave Sabine \, Hans-Christoph Steiner.
+Jonathan Wilkes revised the patch to conform to the PDDP template for
+Pd version 0.42.;
+#X text 12 5 GENRE help;
+#X text 12 85 DESCRIPTION format a string with a variable field;
+#X text 12 25 NAME makefilename;
+#X text 12 125 INLET_0 float symbol;
+#X text 12 145 OUTLET_0 symbol;
+#X text 12 45 KEYWORDS control conversion needs_work symbol_op;
+#X text 12 225 RELEASE_DATE 1997;
+#X text 12 245 RELEASE_VERSION;
+#X restore 500 597 pd META;
+#X obj 0 337 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
+13 -228856 -1 0;
+#X obj 0 374 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+0 13 -228856 -1 0;
+#X obj 0 497 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
+0 13 -228856 -1 0;
+#N canvas 75 446 428 187 Related_objects 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 7 1 [makefilename] Related Objects;
+#X obj 21 42 symbol;
+#X obj 71 42 int;
+#X obj 102 42 float;
+#X obj 152 42 openpanel;
+#X obj 19 96 pddp/helplink zexy/makesymbol;
+#X obj 19 116 pddp/helplink cyclone/sprintf;
+#X obj 19 136 pddp/helplink cxc/ascseq;
+#X text 19 74 Externals;
+#X restore 101 597 pd Related_objects;
+#X obj 78 206 cnv 17 3 120 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+-162280 0;
+#X text 98 205 float;
+#X obj 78 346 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+-162280 0;
+#X obj 444 3 makefilename;
+#X obj 415 20 pddp/pddplink http://wiki.puredata.info/en/makefilename
+-text pdpedia: makefilename;
+#X floatatom 49 64 0 0 0 0 - - -;
+#X text 81 143 numbered filenames;
+#X symbolatom 49 122 0 0 0 0 - - -;
+#X obj 49 91 makefilename soundfile%d.aif;
+#X obj 304 102 symbol;
+#X msg 304 54 dave;
+#X msg 343 54 drums;
+#X msg 400 54 Pd;
+#X msg 437 55 cool;
+#X obj 304 126 makefilename %s_PD.aif;
+#X symbolatom 304 150 0 0 0 0 - - -;
+#X text 168 205 - if a number (integer) is sent to the inlet \, the
+argument should be written with a "%c" \, "%d" \, or "%X" which represents
+the location of the incoming variable number in the outgoing symbol.
+Floats will be converted to integers.;
+#X text 98 255 symbol;
+#X text 98 296 list;
+#X text 98 345 symbol;
+#X text 169 392 - this object generates symbols according to a format
+string (the argument) \, for use as a series of filenames \, table
+names \, etc. Variables for numbers can be specified by using "%s"
+\, "%c" \, "%d" \, or "%X" in the string (see subpatch below). For
+variable symbols \, use "%s". No checking is done. Each [makefilename]
+object can have only one variable.;
+#X text 168 255 - if a symbol is sent to the inlet \, the argument
+should be written with a "%s" which represents the location of the
+incoming variable symbol in the outgoing symbol.;
+#X text 98 572 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm;
+#N canvas 74 23 428 594 More_Info 0;
+#X text 20 33 I believe that this object was developed first to allow
 PD to generate sequential file names - perhaps to be used in conjunction
 with [soundfiler] or [openpanel]. For example \, an audio loop recorder
 might generate a continuous series of sound files to be saved on a
 hard drive...like below:;
-#X obj 53 125 f;
-#X symbolatom 53 166 0 0 0 0 - - -;
-#X obj 82 125 + 1;
-#X obj 53 145 makefilename file-%d.aif;
-#X text 20 430 LIMITATIONS;
-#N canvas 175 22 599 615 spaces_and_multiple_variables 0;
-#X text 25 19 Instead of using spaces \, an underscore will often produce
-a tolerable compromise.;
-#X obj 210 40 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 23 127 f;
+#X symbolatom 23 168 0 0 0 0 - - -;
+#X obj 52 127 + 1;
+#X obj 23 147 makefilename file-%d.aif;
+#X obj 23 104 bng 18 250 50 0 empty empty start 22 9 1 12 -90049 -1
 -1;
-#X obj 210 64 f;
-#X symbolatom 210 119 0 0 0 0 - - -;
-#X obj 243 64 + 1;
-#X obj 210 91 makefilename I_am_%d_years_old.;
-#X text 28 143 With careful planning \, multiple variables can be incorporated
+#X symbolatom 61 358 0 0 0 0 - - -;
+#X obj 64 309 hsl 150 18 0 122 0 1 empty empty ASCII_range 2 9 1 12
+-262131 -1 -1 6800 0;
+#X floatatom 30 360 3 0 0 0 - - -;
+#X text 19 514 - only one printf pattern can be used at once;
+#X text 19 476 - This object does not provide advanced formatting and
+parsing abilities. For example \, you cannot use spaces or odd characters
+in the argument.;
+#X text 19 567 - non-printable ASCII characters show up as a little
+box.;
+#X symbolatom 264 358 0 0 0 0 - - -;
+#X obj 267 309 hsl 150 18 0 255 0 1 empty empty 0_to_FF 2 9 1 12 -262131
+-1 -1 5100 0;
+#X obj 264 338 makefilename hex=%X;
+#X floatatom 233 360 3 0 0 0 - - -;
+#X obj 61 338 makefilename ASCII=%c;
+#X text 29 381 Watch out! ASCII characters 123 and 125 (curly braces)
+lock up Pd. Also \, reserved characters that Pd uses show up with a
+backslash in front of them (comma \, semi-colon \, and backslash).
+;
+#X text 19 530 - currently \, floats are not supported via the printf
+%f pattern. You can only display the integer part of the float using
+%d or %X.;
+#X text 20 189 This file name could be used when saving the audio to
+disk.;
+#X text 20 251 The %c pattern allows you to convert ASCII numbers to
+the respective character. The %X converts the decimal number to hexadecimal.
+Both %c and %X only use integers. For floats \, everything to the right
+of the decimal is discarded.;
+#X obj 2 2 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 8 2 [makefilename] Common Uses;
+#X obj 2 216 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12
+0 14 -204280 -1 0;
+#X text 8 216 Conversions;
+#X obj 2 442 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12
+0 14 -204280 -1 0;
+#X text 8 442 Limitations;
+#X connect 1 0 3 0;
+#X connect 1 0 4 0;
+#X connect 3 0 1 1;
+#X connect 4 0 2 0;
+#X connect 5 0 1 0;
+#X connect 7 0 16 0;
+#X connect 7 0 8 0;
+#X connect 13 0 14 0;
+#X connect 13 0 15 0;
+#X connect 14 0 12 0;
+#X connect 16 0 6 0;
+#X restore 100 506 pd More_Info;
+#N canvas 105 144 428 318 all_possible_patterns 0;
+#X text 33 86 %c;
+#X text 110 86 character;
+#X text 33 106 %d or %i;
+#X text 110 106 signed decimal integer;
+#X text 33 126 %e;
+#X text 110 126 scientific notation using "e" character;
+#X text 33 146 %E;
+#X text 110 146 scientific notation using "e" character;
+#X text 33 166 %f;
+#X text 33 186 %o;
+#X text 110 186 signed octal;
+#X text 33 206 %s;
+#X text 110 206 symbol;
+#X text 33 226 %u;
+#X text 110 226 unsigned integer;
+#X text 33 246 %x;
+#X text 110 246 unsigned hexadecimal in lowercase;
+#X text 33 266 %X;
+#X text 110 266 unsigned hexadecimal in CAPS;
+#X text 33 286 %p;
+#X text 110 286 unsigned hexadecimal in lowercase preceeded by "0x"
+;
+#X text 20 37 This is a listing of all possible printf patterns used
+in Pd's [makefilename]:;
+#X text 110 166 decimal floating point (currently broken);
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 7 1 [makefilename] All Possible Patterns;
+#X restore 100 474 pd all_possible_patterns;
+#N canvas 80 12 428 594 spaces_and_multiple_variables 0;
+#X obj 223 71 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 223 90 f;
+#X symbolatom 223 135 0 0 0 0 - - -;
+#X obj 256 90 + 1;
+#X obj 223 112 makefilename I_am_%d_years_old.;
+#X text 20 197 With careful planning \, multiple variables can be incorporated
 using a stack of [makefilename]s. In the example below \, let's assume
 that this tool is used to generate file names for an audio loop recorder
 which operates 24 hours per day \, every day.;
-#X obj 31 235 loadbang;
-#X obj 31 280 metro 200;
-#X obj 31 261 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+#X obj 25 265 loadbang;
+#X obj 25 305 metro 200;
+#X obj 25 286 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
-#X obj 64 305 + 1;
-#X obj 209 349 route 0 1 2 3 4 5 6;
-#X obj 31 354 mod 24;
-#X floatatom 31 379 5 0 0 0 - - -;
-#X floatatom 31 329 0 0 0 0 - - -;
-#X obj 31 305 f;
-#X obj 53 405 sel 0;
-#X obj 218 269 f;
-#X obj 250 269 + 1;
-#X obj 218 294 mod 7;
-#X obj 218 322 pack f f;
-#X obj 230 498 makefilename Monday_%d.wav;
-#X symbolatom 65 548 0 0 0 0 - - -;
-#X obj 334 374 makefilename Saturday_%d.wav;
-#X obj 314 399 makefilename Friday_%d.wav;
-#X obj 290 326 t b f;
-#X obj 293 424 makefilename Thursday_%d.wav;
-#X obj 272 449 makefilename Wednesday_%d.wav;
-#X obj 251 474 makefilename Tuesday_%d.wav;
-#X obj 209 522 makefilename Sunday_%d.wav;
-#X text 81 377 hour of day;
-#X text 79 330 total hours;
-#X text 199 549 Crude...but effective.;
-#X obj 31 455 s dayHour;
-#X obj 53 430 s weekDay;
-#X obj 218 236 r weekDay;
-#X obj 290 300 r dayHour;
-#X text 284 271 loop through weekdays;
-#X connect 1 0 2 0;
-#X connect 2 0 4 0;
-#X connect 2 0 5 0;
-#X connect 4 0 2 1;
-#X connect 5 0 3 0;
-#X connect 7 0 9 0;
-#X connect 8 0 15 0;
-#X connect 9 0 8 0;
-#X connect 10 0 15 1;
-#X connect 11 0 29 0;
-#X connect 11 1 21 0;
-#X connect 11 2 28 0;
-#X connect 11 3 27 0;
-#X connect 11 4 26 0;
-#X connect 11 5 24 0;
-#X connect 11 6 23 0;
-#X connect 12 0 13 0;
-#X connect 13 0 16 0;
-#X connect 13 0 33 0;
-#X connect 14 0 12 0;
-#X connect 15 0 10 0;
-#X connect 15 0 14 0;
-#X connect 16 0 34 0;
-#X connect 17 0 18 0;
-#X connect 17 0 19 0;
-#X connect 18 0 17 1;
-#X connect 19 0 20 0;
-#X connect 20 0 11 0;
-#X connect 21 0 22 0;
-#X connect 23 0 22 0;
-#X connect 24 0 22 0;
-#X connect 25 0 20 0;
-#X connect 25 1 20 1;
-#X connect 26 0 22 0;
-#X connect 27 0 22 0;
-#X connect 28 0 22 0;
-#X connect 29 0 22 0;
-#X connect 35 0 17 0;
-#X connect 36 0 25 0;
-#X restore 47 605 pd spaces_and_multiple_variables;
-#X obj 53 90 bng 30 250 50 0 empty empty start 1 15 1 12 -90049 -1
+#X obj 58 330 + 1;
+#X obj 153 369 route 0 1 2 3 4 5 6;
+#X obj 25 379 mod 24;
+#X floatatom 25 404 5 0 0 0 - - -;
+#X floatatom 25 354 0 0 0 0 - - -;
+#X obj 25 330 f;
+#X obj 47 430 sel 0;
+#X obj 162 289 f;
+#X obj 194 289 + 1;
+#X obj 162 314 mod 7;
+#X obj 162 342 pack f f;
+#X obj 168 518 makefilename Monday_%d.wav;
+#X symbolatom 29 568 0 0 0 0 - - -;
+#X obj 248 394 makefilename Saturday_%d.wav;
+#X obj 232 419 makefilename Friday_%d.wav;
+#X obj 234 346 t b f;
+#X obj 216 444 makefilename Thursday_%d.wav;
+#X obj 200 469 makefilename Wednesday_%d.wav;
+#X obj 184 494 makefilename Tuesday_%d.wav;
+#X obj 153 542 makefilename Sunday_%d.wav;
+#X text 65 402 hour of day;
+#X text 63 355 total hours;
+#X text 153 569 Crude...but effective.;
+#X obj 25 480 s dayHour;
+#X obj 47 455 s weekDay;
+#X obj 162 266 r weekDay;
+#X obj 234 320 r dayHour;
+#X text 228 291 loop through weekdays;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 7 1 [makefilename] Spaces and Multiple Variables;
+#X symbolatom 22 115 0 0 0 0 - - -;
+#X obj 22 93 makefilename one%ctwo;
+#X msg 22 71 32;
+#X text 51 70 ascii character 32 (space);
+#X text 19 37 A symbol that includes a space will not be saved. An
+underscore will often produce a tolerable compromise.;
+#X obj 22 151 route symbol;
+#X obj 22 172 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#N canvas 475 61 519 621 help_with_interfaces 0;
-#X text 17 16 Building user interfaces in Pd is a difficult balance
+#X text 72 115 this symbol won't load;
+#X text 72 130 properly if saved.;
+#X text 41 171 but it's a valid symbol;
+#X connect 0 0 1 0;
+#X connect 1 0 3 0;
+#X connect 1 0 4 0;
+#X connect 3 0 1 1;
+#X connect 4 0 2 0;
+#X connect 6 0 8 0;
+#X connect 7 0 14 0;
+#X connect 8 0 7 0;
+#X connect 9 0 14 1;
+#X connect 10 0 28 0;
+#X connect 10 1 20 0;
+#X connect 10 2 27 0;
+#X connect 10 3 26 0;
+#X connect 10 4 25 0;
+#X connect 10 5 23 0;
+#X connect 10 6 22 0;
+#X connect 11 0 12 0;
+#X connect 12 0 15 0;
+#X connect 12 0 32 0;
+#X connect 13 0 11 0;
+#X connect 14 0 9 0;
+#X connect 14 0 13 0;
+#X connect 15 0 33 0;
+#X connect 16 0 17 0;
+#X connect 16 0 18 0;
+#X connect 17 0 16 1;
+#X connect 18 0 19 0;
+#X connect 19 0 10 0;
+#X connect 20 0 21 0;
+#X connect 22 0 21 0;
+#X connect 23 0 21 0;
+#X connect 24 0 19 0;
+#X connect 24 1 19 1;
+#X connect 25 0 21 0;
+#X connect 26 0 21 0;
+#X connect 27 0 21 0;
+#X connect 28 0 21 0;
+#X connect 34 0 16 0;
+#X connect 35 0 24 0;
+#X connect 39 0 44 0;
+#X connect 40 0 39 0;
+#X connect 41 0 40 0;
+#X connect 44 0 45 0;
+#X restore 100 529 pd spaces_and_multiple_variables;
+#N canvas 58 29 463 530 help_with_interfaces 0;
+#X text 21 32 Building user interfaces in Pd is a difficult balance
 between usability and performance. Pd is not winning any awards for
 usability - let's face it: it's powerful \, it's cool \, and that's
 the way we like it. You're not here because you want a colourful \,
 bevelled interface...you want the raw power that object oriented languages
 provide mixed with a few of the conveniences that a graphic environment
 affords.;
-#X obj 17 269 cnv 15 450 300 empty empty empty 20 12 0 14 -261681 -66577
+#X obj 6 221 cnv 15 450 300 empty empty empty 20 12 0 14 -261681 -66577
 0;
-#X obj 45 379 tgl 15 0 s_dsp empty DSP 18 7 0 8 -262144 -1 -1 0 1;
-#X obj 45 424 vsl 15 128 0 127 0 0 v_slider empty Volume 18 7 0 8 -262144
+#X obj 34 331 tgl 15 0 s_dsp empty DSP 18 7 0 8 -262144 -1 -1 0 1;
+#X obj 34 376 vsl 15 128 0 127 0 0 v_slider empty Volume 18 7 0 8 -262144
 -1 -1 0 1;
-#X obj 45 401 bng 15 250 50 0 b_panel empty Open_File 18 7 0 8 -262144
+#X obj 34 353 bng 15 250 50 0 b_panel empty Open_File 18 7 0 8 -262144
 -1 -1;
-#X obj 40 280 cnv 15 400 20 empty d_canvas DSP:OFF 20 12 0 8 -233017
+#X obj 29 232 cnv 15 400 20 empty d_canvas DSP:OFF 20 12 0 8 -233017
 -66577 0;
-#X obj 40 302 cnv 15 400 20 empty f_canvas FILE_OPEN:/Users/hans/cvs/pure-data/doc/pddp/all_about_lists_vs_anythings.pd
+#X obj 29 254 cnv 15 400 20 empty f_canvas FILE_OPEN:/Users/hans/cvs/pure-data/doc/pddp/all_about_lists_vs_anythings.pd
 20 12 0 8 -233017 -66577 0;
-#X obj 40 324 cnv 15 400 20 empty v_canvas VOLUME:99/100 20 12 0 8
+#X obj 29 276 cnv 15 400 20 empty v_canvas VOLUME:42/100 20 12 0 8
 -233017 -66577 0;
-#X text 187 361 The grey canvases above could;
-#X text 189 383 be used like "status bars" to;
-#X text 189 404 write relevant information to;
-#X text 186 460 [makefilename] helps to format;
-#X text 188 484 the information in a meaningful;
-#X text 189 505 way.;
-#X text 187 426 the screen.;
-#N canvas 217 22 478 328 look_inside 0;
+#X text 176 313 The grey canvases above could;
+#X text 178 335 be used like "status bars" to;
+#X text 178 356 write relevant information to;
+#X text 175 412 [makefilename] helps to format;
+#X text 177 436 the information in a meaningful;
+#X text 178 457 way.;
+#X text 176 378 the screen.;
+#N canvas 57 187 430 328 look_inside 0;
 #X obj 199 14 r b_panel;
 #X obj 235 166 r v_slider;
 #X obj 36 236 s d_canvas;
@@ -169,133 +337,29 @@ affords.;
 #X connect 16 0 4 0;
 #X connect 17 0 18 0;
 #X connect 18 0 16 0;
-#X restore 40 350 pd look_inside;
-#X text 18 156 However \, there are times when sacrifices must be made
+#X restore 29 302 pd look_inside;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 7 1 [makefilename] Help with Interfaces;
+#X text 21 137 However \, there are times when sacrifices must be made
 in the area of performance to provide users with on-screen reporting
 \, record keeping \, and sometimes even a few 'pleasantries'. Consider
-the following examples - but always weight the pros and cons when incorporating
+the following examples - but always weigh the pros and cons when incorporating
 these types of interfaces. Performance vs. Usability.;
-#X restore 298 605 pd help_with_interfaces;
-#X symbolatom 86 345 0 0 0 0 - - -;
-#X obj 90 296 hsl 150 18 0 122 0 1 empty empty ASCII_range 2 9 1 12
--262131 -1 -1 7400 0;
-#X floatatom 45 347 3 0 0 0 - - -;
-#X text 45 488 - only one printf pattern can be used at once;
-#X text 45 445 - This object does not provide advanced formatting and
-parsing abilities. For example \, you cannot use spaces or odd characters
-in the argument.;
-#X text 45 550 - non-printable ASCII characters show up as a little
-box.;
-#X text 22 209 CONVERSIONS;
-#X symbolatom 299 345 0 0 0 0 - - -;
-#X obj 303 296 hsl 150 18 0 255 0 1 empty empty 0_to_FF 2 9 1 12 -262131
--1 -1 6000 0;
-#X obj 299 325 makefilename hex=%X;
-#X floatatom 258 347 3 0 0 0 - - -;
-#X obj 86 325 makefilename ASCII=%c;
-#X text 44 378 Watch out! ASCII characters 123 and 125 (curly braces)
-lock up Pd. Also \, reserved characters that Pd uses show up with a
-backslash in front of them (comma \, semi-colon \, and backslash).
+#X restore 100 552 pd help_with_interfaces;
+#X text 11 23 format a string with a variable field;
+#X text 168 296 - if the first element of the list matches the variable
+type used \, then the list will be truncated.;
+#X text 168 345 - the output of [makefilename] is always a symbol.
 ;
-#X text 45 507 - currently \, floats are not supported via the printf
-%f pattern. You can only display the integer part of the float using
-%d or %X.;
-#X text 47 187 This file name could be used when saving the audio to
-disk.;
-#X text 35 222 The %c pattern allows you to convert ASCII numbers to
-the respective character. The %X converts the decimal number to hexadecimal.
-Both %c and %X only use integers. For floats \, everything to the right
-of the decimal is discarded.;
-#X connect 3 0 5 0;
-#X connect 3 0 6 0;
-#X connect 5 0 3 1;
-#X connect 6 0 4 0;
-#X connect 9 0 3 0;
-#X connect 12 0 22 0;
-#X connect 12 0 13 0;
-#X connect 19 0 20 0;
-#X connect 19 0 21 0;
-#X connect 20 0 18 0;
-#X connect 22 0 11 0;
-#X restore 106 507 pd More_Info;
-#N canvas 85 22 401 250 Related_Objects 0;
-#X text 25 8 Native Pd Objects;
-#X text 25 92 Externals and other object libraries;
-#X obj 42 46 symbol;
-#X obj 112 46 int;
-#X obj 156 46 openpanel;
-#X obj 31 126 strcat;
-#X obj 30 156 makesymbol;
-#X obj 30 211 ascseq;
-#X obj 30 183 sprintf;
-#X restore 379 507 pd Related_Objects;
-#X text 38 53 INLETS:;
-#X text 15 197 ARGUMENTS:;
-#X text 29 316 OUTLETS:;
-#X text 22 342 EXAMPLES:;
-#X text 21 482 SEE ALSO:;
-#X obj 10 18 makefilename;
-#X text 115 18 - FORMAT A STRING WITH A VARIABLE FIELD.;
-#X text 104 316 Symbol - The output is formatted like "symbol YOURSTRING".
-;
-#X floatatom 114 346 0 0 0 0 - - -;
-#X text 146 425 numbered filenames;
-#X obj 380 391 symbol;
-#X msg 353 343 dave;
-#X msg 412 341 drums;
-#X msg 479 344 Pd;
-#X msg 526 355 cool;
-#X obj 380 415 makefilename %s_PD.aif;
-#X text 109 115 Symbol - If a symbol is sent to the inlet \, the argument
-should be written with a "%s" which represent the location of the incoming
-variable symbol in the outgoing symbol. Lists will be truncated.;
-#X symbolatom 380 439 0 0 0 0 - - -;
-#X symbolatom 114 404 0 0 0 0 - - -;
-#X obj 115 373 makefilename soundfile%d.aif;
-#X text 392 551 updated for Pd 0.38-4;
-#X text 140 538 - Dave Sabine \, Hans-Christoph Steiner;
-#X text 107 198 This object generates symbols according to a format
-string (the argument) \, for use as a series of filenames \, table
-names \, or whatnot. You can plug in a variable number or symbol by
-putting "%s" \, "%c" \, "%d" \, or "%X" in the string. If you use"%s"
-\, be sure to send it a symbol \, the rest take numbers. there' no
-checking. Each [makefilename] object can have only one variable.;
-#X text 108 53 Integer - If a number is sent to the inlet \, the argument
-should be written with a "%c" \, "%d" \, or "%X" which represents the
-location of the incoming variable number in the outgoing symbol. Floats
-will be converted to integers.;
-#N canvas 325 212 532 324 all 0;
-#X text 37 59 %c;
-#X text 114 59 character;
-#X text 37 79 %d or %i;
-#X text 114 79 signed decimal integer;
-#X text 37 99 %e;
-#X text 114 99 scientific notation using "e" character;
-#X text 37 119 %E;
-#X text 114 119 scientific notation using "e" character;
-#X text 37 139 %f;
-#X text 37 159 %o;
-#X text 114 159 signed octal;
-#X text 37 179 %s;
-#X text 114 179 symbol;
-#X text 37 199 %u;
-#X text 114 199 unsigned integer;
-#X text 37 219 %x;
-#X text 114 219 unsigned hexadecimal in lowercase;
-#X text 37 239 %X;
-#X text 114 239 unsigned hexadecimal in CAPS;
-#X text 37 259 %p;
-#X text 114 259 unsigned hexadecimal in lowercase preceeded by "0x"
-;
-#X text 24 10 This is a listing of all possible printf patterns used
-in Pd's [makefilename]:;
-#X text 114 139 decimal floating point (currently broken);
-#X restore 201 507 pd all possible patterns;
-#X connect 13 0 24 0;
-#X connect 15 0 20 0;
+#X text 80 392 1) symbol atom;
+#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 318 529 pddp/pddplink all_about_symbol_construction.pd;
+#X connect 13 0 16 0;
 #X connect 16 0 15 0;
-#X connect 17 0 15 0;
-#X connect 18 0 15 0;
-#X connect 19 0 15 0;
-#X connect 20 0 22 0;
-#X connect 24 0 23 0;
+#X connect 17 0 22 0;
+#X connect 18 0 17 0;
+#X connect 19 0 17 0;
+#X connect 20 0 17 0;
+#X connect 21 0 17 0;
+#X connect 22 0 23 0;

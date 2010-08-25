@@ -1,68 +1,151 @@
-#N canvas 2 1 613 608 12;
-#X obj 104 540 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
-#X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
-0;
-#N canvas 85 2 595 611 More_Info 0;
-#X text 16 13 MULTI-CHANNEL AUDIO;
-#X text 32 40 All sound cards are capable of at least two channels
+#N canvas 0 0 555 619 10;
+#X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -228856 -66577 0;
+#X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header dac~ 3 12 0 18 -204280
+-1 0;
+#X obj 0 259 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
+-228856 -1 0;
+#N canvas 50 243 494 344 META 0;
+#X text 12 105 PLATFORM windows macosx gnulinux;
+#X text 12 145 LIBRARY internal;
+#X text 12 185 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 65 LICENSE SIBSD;
+#X text 12 165 AUTHOR Miller Puckette;
+#X text 12 245 HELP_PATCH_AUTHORS Dave Sabine \, May 5 \, 2003 . Jonathan
+Wilkes revised the patch to conform to the PDDP template for Pd version
+0.42.;
+#X text 12 5 GENRE help;
+#X text 12 45 KEYWORDS signal conversion;
+#X text 12 85 DESCRIPTION audio output;
+#X text 12 25 NAME dac~;
+#X text 12 125 INLET_n signal;
+#X text 12 205 RELEASE_DATE 1997;
+#X text 12 225 RELEASE_VERSION;
+#X restore 500 597 pd META;
+#X obj 0 355 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
+13 -228856 -1 0;
+#X obj 0 383 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+0 13 -228856 -1 0;
+#X obj 0 471 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
+0 13 -228856 -1 0;
+#X obj 78 268 cnv 17 3 17 empty \$0-pddp.cnv.let.n n 5 9 0 16 -228856
+-162280 0;
+#N canvas 41 417 428 171 Related_objects 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 8 2 [dac~] Related Objects;
+#X obj 63 42 switch~;
+#X text 115 42 [block~];
+#X text 20 65 (Note: having a [block~] and a [switch~] in the same
+window causes an error \, which is why [block~] is shown above as a
+comment.);
+#X text 20 117 Externals;
+#X text 19 142 [shoutcast~];
+#X text 106 142 [oggcast~];
+#X text 181 142 [mp3cast~];
+#X obj 174 42 throw~;
+#X obj 226 42 catch~;
+#X obj 278 42 send~;
+#X obj 322 42 receive~;
+#X obj 23 42 adc~;
+#X restore 101 597 pd Related_objects;
+#X obj 465 20 pddp/pddplink http://wiki.puredata.info/en/dac~ -text
+pdpedia: dac~;
+#X obj 492 3 dac~;
+#X text 109 133 default stereo signals: same as;
+#X text 198 221 all channels on an 8-channel device;
+#X obj 65 133 dac~;
+#X obj 367 135 dac~ 1 2;
+#X obj 65 160 dac~ 5;
+#X text 123 159 a mono signal to channel 5;
+#X obj 65 191 dac~ 1 3 8 6 11 15 19 22 23 24 36;
+#X text 280 191 11 channels of output;
+#X obj 65 221 dac~ 1 2 3 4 5 6 7 8;
+#X text 98 359 (none);
+#X text 98 267 signal;
+#X text 168 401 - the object defaults to 2 outgoing audio channels
+(usually a left and right stereo pair). Any number of arguments (integers)
+can be used to define multiple output channels - each integer corresponds
+to an output channel on your audio hardware.;
+#X text 168 267 - the number of inlets correspond with the number of
+arguments - each inlet represents an output channel on your audio hardware
+which corresponds to the argument you provide. If no arguments are
+provided \, then there are two inlets which represent audio channels
+1 and 2 on your computer's sound card.;
+#X text 98 475 [dac~] is an acronym meaning "Digital/Analog Converter
+Signal" and is Pd's interface to send audio information to the audio
+channels of your soundcard(s).;
+#N canvas 37 90 428 471 Multi-channel_audio 0;
+#X text 19 38 All sound cards are capable of at least two channels
 of audio. Pd supports these two channels by default and uses your system's
 generic audio drivers to communicate with your hardware. However \,
 for faster input/output and for more than two channels of audio \,
 PD incorporates the use of "PortAudio" which uses ASIO drivers to communicate
 with your hardware. So \, to instruct Pd to use more than two channels
 of audio \, your command line should read like below:;
-#X text 93 182 c:/pd/bin/pd.exe -pa -inchannels 8 -outchannels 8;
-#X text 32 211 The "-pa" switch means "PortAudio". This switch is new
+#X text 80 145 c:/pd/bin/pd.exe -pa -inchannels 8 -outchannels 8;
+#X text 19 174 The "-pa" switch means "PortAudio". This switch is new
 as of Pd version 0.37 TEST 4 and replaces the old "-asio" switch.;
-#X text 32 271 The "-inchannels" and "-outchannels" switches can be
+#X text 19 234 The "-inchannels" and "-outchannels" switches can be
 summarized by using "-channels 8" because currently PortAudio requires
 that the number of incoming and outgoing channels must be equal. This
 may change in the Pd's future...;
-#X text 32 361 To further optimize Pd's usage of your audio hardware
+#X text 19 314 To further optimize Pd's usage of your audio hardware
 \, you can explore the following:;
-#X text 42 402 - audiobuf;
-#X text 43 420 - blocksize;
-#X text 42 436 - audioindev;
-#X text 42 454 - audiooutdev;
-#X text 38 480 With the right hardware \, Pd can manage audio input
+#X text 29 355 - audiobuf;
+#X text 30 373 - blocksize;
+#X text 29 389 - audioindev;
+#X text 29 407 - audiooutdev;
+#X text 25 433 With the right hardware \, Pd can manage audio input
 and output with lower than 10 milliseconds of latency.;
-#X restore 104 514 pd More_Info;
-#N canvas 85 2 397 246 Related_Objects 0;
-#X text 25 8 Native Pd Objects;
-#X text 25 92 Externals and other object libraries;
-#X obj 98 46 switch~;
-#X obj 171 46 block~;
-#X obj 45 46 adc~;
-#X restore 104 488 pd Related_Objects;
-#X text 16 107 ARGUMENTS:;
-#X text 23 344 EXAMPLES:;
-#X text 20 487 SEE ALSO:;
-#X text 30 53 PURPOSE:;
-#X text 152 541 - Dave Sabine \, May 6 \, 2003;
-#X text 153 346 default stereo signals: same as;
-#X text 280 435 all channels on an 8-channel device;
-#X obj 33 20 dac~;
-#X text 108 18 - AUDIO OUTPUT: DIGITAL/ANALOG CONVERTER SIGNAL;
-#X text 104 53 [dac~] is an acronym meaning "Digital/Analog Converter
-Signal" and is Pd's interface to send audio information to the audio
-channels of your soundcard(s).;
-#X text 106 106 The object defaults to 2 outgoing audio channels (usually
-a left and right stereo pair). Any number of arguments (integers) can
-be used to define multiple output channels - each integer corresponds
-to an output channel on your audio hardware.;
-#X text 36 188 INLETS:;
-#X text 108 188 Signal: the number of inlets correspond with the number
-of arguments - each inlet represents an output channel on your audio
-hardware which corresponds to the argument you provide. If no arguments
-are provided \, then there are two inlets which represent audio channels
-1 and 2 on your computer's sound card.;
-#X text 107 290 The information at each inlet should be an audio signal
-(i.e. the object operates at 'audio-rate') and therefore must be connected
-to an audio outlet on a related object.;
-#X obj 109 346 dac~;
-#X obj 411 348 dac~ 1 2;
-#X obj 109 373 dac~ 5;
-#X text 167 374 a mono signal to channel 5;
-#X obj 109 404 dac~ 1 3 8 6 11 15 19 22 23 24 36;
-#X text 383 405 11 channels of output;
-#X obj 109 434 dac~ 1 2 3 4 5 6 7 8;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 7 2 [dac~] Multi-channel Audio;
+#X restore 101 545 pd Multi-channel_audio;
+#X text 80 401 n) float;
+#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 66 51 osc~ 880;
+#X obj 66 80 *~;
+#X obj 66 106 *~ 0.1;
+#X obj 96 80 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+;
+#X obj 455 51 pddp/dsp-reminder;
+#N canvas 84 189 428 347 sample_rate 0;
+#X text 19 37 [adc~] and [dac~] always operate at the sample rate that
+is specified in Pd's command line. By default \, the sample rate is
+44100 hz. But Pd operates any sample rate supported by standard audio
+hardware. Sample rates cannot be changed at run-time in Pd \, but must
+be stated in the command line when Pd is instantiated. As well \, two
+or more instances of Pd running simoultaneously can each be using different
+sample rates! Having said that \, Pd can easily upsample or downsample
+by using the [block~] object. Here are some example of the common sample
+rates:;
+#X text 19 191 c:/pd/bin/pd.exe -r 11025;
+#X text 19 221 c:/pd/bin/pd.exe -r 22050;
+#X text 19 281 c:/pd/bin/pd.exe -r 88200;
+#X text 19 176 c:/pd/bin/pd.exe -r 8000;
+#X text 19 206 c:/pd/bin/pd.exe -r 16000;
+#X text 19 236 c:/pd/bin/pd.exe -r 32000;
+#X text 19 251 c:/pd/bin/pd.exe -r 44100 CD Quality;
+#X text 19 266 c:/pd/bin/pd.exe -r 48000 DAT Quality;
+#X text 19 311 c:/pd/bin/pd.exe -r 192000 DVD-Audio Quality;
+#X text 19 296 c:/pd/bin/pd.exe -r 96000 DVD-Video/Audio Quality;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 7 2 [dac~] Sample Rate;
+#X restore 101 520 pd sample_rate;
+#N canvas 99 375 428 211 defeating_audio_computation 0;
+#X text 19 37 There may be cases when you do not want Pd to send or
+receive audio signal with your soundcard. You can manually disable
+the [dac~] and [adc~] objects separately using the "-nodac" and "-noadc"
+switch \, or disable both using the "-nosound" switch.;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 7 2 [dac~] -nodac and -noadc;
+#X restore 101 570 pd defeating_audio_computation;
+#X text 117 79 <- Click to test;
+#X text 11 23 audio output;
+#X connect 28 0 29 0;
+#X connect 29 0 30 0;
+#X connect 30 0 13 0;
+#X connect 31 0 29 1;

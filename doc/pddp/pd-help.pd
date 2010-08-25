@@ -1,0 +1,158 @@
+#N canvas 0 0 555 619 10;
+#X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -228856 -66577 0;
+#X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header pd 3 12 0 18 -204280
+-1 0;
+#X obj 0 175 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
+-228856 -1 0;
+#N canvas 46 242 494 344 META 0;
+#X text 12 125 PLATFORM windows macosx gnulinux;
+#X text 12 185 LIBRARY internal;
+#X text 12 225 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 265 RELEASE_VERSION 0.41.4;
+#X text 12 245 RELEASE_DATE 2009-06-12;
+#X text 12 85 LICENSE SIBSD;
+#X text 12 205 AUTHOR Miller Puckette;
+#X text 12 285 HELP_PATCH_AUTHORS Updated for Pd v0.41. Revised by
+Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
+;
+#X text 12 5 GENRE help;
+#X text 12 25 NAME pd;
+#X text 12 45 ALIAS page;
+#X text 12 145 INLET_N anything signal;
+#X text 12 165 OUTLET_N anything signal;
+#X text 12 105 DESCRIPTION subwindow (subpatch);
+#X text 12 65 KEYWORDS signal canvas_op;
+#X restore 500 597 pd META;
+#X obj 0 314 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
+13 -228856 -1 0;
+#X obj 0 464 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+0 13 -228856 -1 0;
+#X obj 0 539 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
+0 13 -228856 -1 0;
+#N canvas 54 478 428 109 Related_objects 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 8 2 [pd] Related Objects;
+#X obj 22 43 inlet;
+#X obj 22 73 outlet;
+#X obj 68 43 inlet~;
+#X obj 68 73 outlet;
+#X restore 102 598 pd Related_objects;
+#X obj 78 184 cnv 17 3 110 empty \$0-pddp.cnv.let.n n 5 9 0 16 -228856
+-162280 0;
+#N canvas 0 0 450 300 (subpatch) 0;
+#X restore 394 3 pd;
+#X obj 431 20 pddp/pddplink http://wiki.puredata.info/en/pd -text pdpedia:
+pd;
+#X text 11 23 subwindow (subpatch);
+#X text 98 183 anything;
+#X text 98 247 signal;
+#X text 80 483 1) symbol atom;
+#X obj 78 323 cnv 17 3 110 empty \$0-pddp.cnv.let.n n 5 9 0 16 -228856
+-162280 0;
+#X text 98 322 anything;
+#X text 98 397 signal;
+#X text 168 183 - by default \, [pd] has no inlets. For sending control
+messages \, you can create one by placing an [inlet] object inside
+the subpatch. One inlet is created for each [inlet] object \, with
+horizontal order corresponding between the inlets and the [inlet] objects
+inside the subpatch.;
+#X text 168 322 - by default \, [pd] has no outlets. For sending control
+messages you can create one by placing an [outlet] object inside the
+subpatch. One outlet is created for each [outlet] object \, with horizontal
+order corresponding between the outlets and the [outlet] objects inside
+the subpatch.;
+#X text 168 397 - you can create a signal outlet by placing an [outlet~]
+object inside the subpatch. One outlet is created for each [outlet~]
+object \, with horizontal order corresponding between the outlets and
+the [outlet~] objects inside the subpatch.;
+#X text 168 247 - you can create a signal inlet by placing an [inlet~]
+object inside the subpatch. One inlet is created for each [inlet~]
+object \, with horizontal order corresponding between the inlets and
+the [inlet~] objects inside the subpatch.;
+#X obj 101 543 pddp/pddplink all_about_canvas_properties.pd -text all_about_canvas_properties
+;
+#X text 97 42 The [pd] object provides a way to nest canvases. You
+can clik on the object to open the subwindow and see the objects inside.
+;
+#X text 97 130 You can also change the graphical properties of the
+object so that part of the subwindow is visible on the parent (referred
+to as "graph on parent" or "gop").;
+#N canvas 0 0 450 300 (subpatch) 0;
+#X restore 513 3 page;
+#X text 167 483 - (optional) specify a name for the subwindow. You
+can then use this name with the prefix "pd-" to send messages to the
+subpatch itself. Duplicate names are allowed (named messages will be
+passed to both subpatches).;
+#X text 419 3 or (deprecated);
+#N canvas 0 0 450 300 with_inlets_and_outlets 0;
+#X obj 26 50 inlet;
+#X obj 26 209 outlet;
+#X text 47 109 Use the [inlet] and [outlet] objects to add inlets and
+outlets to your subpatch.;
+#X obj 341 52 inlet;
+#X floatatom 341 79 5 0 0 0 - - -;
+#X text 46 147 The horizontal order of the [inlet]/[outlet] objects
+corresponds to the placement of the inlets/outlets on the [pd] object
+itself. I.e. \, the leftmost inlet -> leftmost [inlet] \, rightmost
+inlet -> rightmost [inlet] \, and so on.;
+#X obj 342 205 outlet;
+#X connect 0 0 1 0;
+#X connect 3 0 4 0;
+#X restore 137 107 pd with_inlets_and_outlets;
+#X floatatom 290 86 5 0 0 0 - - -;
+#X text 339 78 For help on inlets/outlets \, see:;
+#X obj 338 93 pddp/pddplink inlet-help.pd -text inlet-help;
+#X obj 338 108 pddp/pddplink inlet~-help.pd -text inlet~-help;
+#X obj 428 93 pddp/pddplink outlet-help.pd -text outlet-help;
+#X obj 428 108 pddp/pddplink outlet~-help.pd -text outlet~-help;
+#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 100 560 pddp/pddplink ../2.control.examples/12.PART2.subpatch.pd
+-text doc/2.control.examples/12.PART2.subpatch.pd;
+#X obj 100 575 pddp/pddplink ../3.audio.examples/G05.execution.order.pd
+-text doc/3.audio.examples/G05.execution.order.pd;
+#N canvas 253 436 296 107 with_no_name 0;
+#X text 19 8 You don't have to name subpatches.;
+#X text 19 23 If you're in a hurry you can just;
+#N canvas 256 287 264 105 (subpatch) 0;
+#N canvas 257 112 240 113 (subpatch) 0;
+#N canvas 244 234 309 126 (subpatch) 0;
+#X text 44 34 Ok that's enough. Remember \,;
+#X text 44 49 these windows will all go away;
+#N canvas 255 362 264 118 thats-enough 0;
+#X text 84 38 Ok \, that's it.;
+#X text 70 53 For real this time.;
+#N canvas 2 532 272 64 Really? 0;
+#X text 2 27 Seriously \,;
+#X text 2 41 you need...;
+#N canvas 6 384 266 81 What? 0;
+#X text 3 48 You keep insigating;
+#X text 4 62 pointless ...;
+#N canvas 8 249 450 72 Why? 0;
+#X text 2 39 Because your real frustrations;
+#X text 2 54 have no ...;
+#N canvas 9 129 341 101 Oh. 0;
+#X text 16 16 Also \, you're a bit obsessive/compulsive.;
+#X restore 5 5 pd Oh.;
+#X restore 7 4 pd Why?;
+#X restore 7 0 pd What?;
+#X restore 197 98 pd Really?;
+#X restore 2 102 pd thats-enough;
+#X text 44 63 when you close the parent window.;
+#X restore 138 46 pd;
+#X text 70 46 Or this:;
+#X restore 105 60 pd;
+#X text 91 33 Or this:;
+#X restore 101 65 pd;
+#X text 19 38 type "pd" in an object \, like this:;
+#X restore 382 548 pd with_no_name;
+#N canvas 0 0 450 300 click_me 0;
+#X text 110 92 This is the inside of the subpatch.;
+#X msg 172 122 1;
+#X obj 172 149 + 41;
+#X obj 172 176 print The_Answer;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X restore 50 107 pd click_me;
+#X connect 29 0 28 1;

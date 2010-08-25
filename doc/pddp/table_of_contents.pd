@@ -1,71 +1,73 @@
-#N canvas 56 22 510 577 10;
-#X obj 3 2 cnv 15 500 20 empty empty pddp 2 12 1 18 -233017 -66577
-0;
-#X obj 9 544 pddp_open;
-#X msg 10 92 acoustic_conversions;
-#X msg 10 112 arrays;
-#X msg 10 132 cyclone;
-#X msg 10 152 data_structures;
-#X msg 10 172 data_types;
-#X msg 10 192 haptics;
-#X msg 10 212 hid;
-#X msg 10 232 hid_mapping;
-#X msg 10 252 lists_vs_anythings;
-#X msg 10 272 looping;
-#X msg 10 312 scope_and_locality;
-#X msg 10 332 send_n_receive;
-#X msg 10 352 symbol_construction;
-#X msg 10 452 pddp-style-guide;
-#X msg 10 482 dynamic_sends;
-#X msg 10 512 time_measurements;
-#X text 170 113 comment;
-#X text 170 173 comment;
-#N canvas 0 22 462 312 guts 0;
-#X obj 79 119 inlet;
-#X obj 75 258 outlet;
-#X obj 78 168 symbol;
-#X obj 75 221 makefilename all_about_%s;
-#X text 46 28 this opens the "all_about_" patches;
-#X connect 0 0 2 0;
-#X connect 2 0 3 0;
-#X connect 3 0 1 0;
-#X restore 10 387 pd guts;
-#X text 170 93 audio power and RMS \, MIDI and frequency;
-#X text 170 213 physically interfacing with humans;
-#X text 170 273 making all sorts of loops;
-#X msg 10 292 midi_flags;
-#X text 170 193 controlling force and vibration feedback;
-#X text 170 233 mapping data from human interface devices;
-#X text 170 293 command line flags for using MIDI devices;
-#X obj 471 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
-;
-#X text 170 452 style recommendations for pddp patches;
-#X text 170 482 (unfinished);
-#X text 170 512 (unfinished);
-#X text 170 153 (unfinished);
-#X text 170 253 (unfinished);
-#X text 22 27 TABLE OF CONTENTS;
-#X text 7 48 pddp provides a number of overview patches called "all_about_"
+#N canvas 0 0 435 577 10;
+#X text 19 37 pddp provides a number of overview patches called "all_about_"
 patches. Here is a listing of them:;
-#X text 170 133 cyclone is the Max/MSP compatibility library;
-#X text 170 333 sending and receiving with out cords;
-#X text 170 353 building special symbols (unfinished);
-#X text 170 313 global and local scope of names;
-#X connect 2 0 20 0;
-#X connect 3 0 20 0;
-#X connect 4 0 20 0;
-#X connect 5 0 20 0;
-#X connect 6 0 20 0;
-#X connect 7 0 20 0;
-#X connect 8 0 20 0;
-#X connect 9 0 20 0;
-#X connect 10 0 20 0;
-#X connect 11 0 20 0;
-#X connect 12 0 20 0;
-#X connect 13 0 20 0;
-#X connect 14 0 20 0;
-#X connect 15 0 1 0;
-#X connect 16 0 1 0;
-#X connect 17 0 1 0;
-#X connect 20 0 1 0;
-#X connect 24 0 20 0;
+#X obj 1 1 cnv 15 445 20 empty \$0-pddp.cnv.header All_About_Pd--Table_of_contents
+20 10 1 18 -261106 -33289 0;
+#X obj 407 2 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+;
+#X obj 1 552 cnv 15 445 20 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -233017 -33289 0;
+#N canvas 44 246 494 344 META 0;
+#X text 12 85 HELP_PATCH_AUTHORS Dave Sabine \, May 5 \, 2003 . Jonathan
+Wilkes revised the patch to conform to the PDDP template for Pd version
+0.42.;
+#X text 12 65 LIBRARY PDDP;
+#X text 12 5 GENRE all_about_pd;
+#X text 12 25 KEYWORDS needs_work;
+#X text 12 45 DESCRIPTION table of contents;
+#X restore 392 554 pd META;
+#N canvas 10 462 428 105 Related_objects 0;
+#X text 31 37 Hm...what to put here?;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -261106 -33289 0;
+#X text 7 2 All About Pd- Related Objects;
+#X restore 103 554 pd Related_objects;
+#X obj 6 554 pddp/pddplink pddp/help.pd -text help;
+#X obj 19 92 pddp/pddplink all_about_arrays.pd -text arrays;
+#X obj 19 107 pddp/pddplink all_about_ascii_art.pd -text ascii_art
+;
+#X obj 19 122 pddp/pddplink all_about_atom_conversion.pd -text atom_conversion
+;
+#X obj 19 137 pddp/pddplink all_about_atoms.pd -text atoms;
+#X obj 19 152 pddp/pddplink all_about_canvas_properties.pd -text canvas_properties
+;
+#X obj 19 167 pddp/pddplink all_about_data_types.pd -text data_types
+;
+#X obj 19 182 pddp/pddplink all_about_dollarsign_zero.pd -text dollarsign_zero
+;
+#X obj 19 197 pddp/pddplink all_about_expr_and_value.pd -text expr_and_value
+;
+#X obj 19 212 pddp/pddplink all_about_expr_functions.pd -text expr_functions
+;
+#X obj 19 227 pddp/pddplink all_about_expr_if.pd -text expr_if;
+#X obj 19 242 pddp/pddplink all_about_expr_multiline.pd -text expr_multiline
+;
+#X obj 19 257 pddp/pddplink all_about_haptics.pd -text haptics;
+#X obj 19 272 pddp/pddplink all_about_help_patches.pd -text help_patches
+;
+#X obj 19 287 pddp/pddplink all_about_hid.pd -text hid;
+#X obj 19 302 pddp/pddplink all_about_libraries.pd -text libraries
+;
+#X obj 19 317 pddp/pddplink all_about_lists_vs_anythings.pd -text lists_vs_anythings
+;
+#X obj 19 332 pddp/pddplink all_about_looping.pd -text looping;
+#X obj 19 347 pddp/pddplink all_about_message_conversion.pd -text message_conversion
+;
+#X obj 19 362 pddp/pddplink all_about_messages.pd -text messages;
+#X obj 19 377 pddp/pddplink all_about_midi_flags.pd -text midi_flags
+;
+#X obj 19 407 pddp/pddplink all_about_pd_META.pd -text pd_META;
+#X obj 19 422 pddp/pddplink all_about_scope_and_locality.pd -text scope_and_locality
+;
+#X obj 19 437 pddp/pddplink all_about_send_n_receive.pd -text send_n_receive
+;
+#X obj 19 452 pddp/pddplink all_about_submitting_bugs.pd -text submitting_bugs
+;
+#X obj 19 467 pddp/pddplink all_about_symbol_construction.pd -text
+symbol_construction;
+#X obj 19 482 pddp/pddplink all_about_writing_help_patches.pd -text
+writing_help_patches;
+#X obj 19 497 pddp/pddplink all_about_z_order.pd -text z_order;
+#X obj 19 77 pddp/pddplink all_about_acoustic_conversions.pd -text
+acoustic_conversions;
+#X obj 19 392 pddp/pddplink all_about.pd -text pd;

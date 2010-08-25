@@ -1,85 +1,130 @@
-#N canvas 255 1 494 655 10;
-#X obj 32 12 notein;
-#X text 133 97 inlets : none;
-#X text 134 122 outlets:;
-#X text 134 142 left: MIDI note number;
-#X text 135 163 middle: velocity;
-#X text 133 187 right: MIDI channel number;
-#X obj 34 96 notein;
-#X floatatom 35 145 5 0 0;
-#X floatatom 52 166 5 0 0;
-#X floatatom 72 188 5 0 0;
-#X floatatom 42 383 5 0 0;
-#X floatatom 91 383 5 0 0;
-#X obj 42 350 notein 1;
-#X text 105 349 notein listening only to channel 1;
-#X text 7 396 note number;
-#X text 101 396 velocity;
-#N canvas 240 135 478 474 other_midi_objects 0;
-#X obj 7 29 ctlin;
-#X obj 49 29 pgmin;
-#X obj 92 28 bendin;
-#X obj 143 27 touchin;
-#X obj 204 27 polytouchin;
-#X obj 289 27 midiin;
-#X obj 340 26 sysexin;
-#X obj 6 85 noteout;
-#X obj 63 84 ctlout;
-#X obj 160 84 bendout;
-#X obj 217 83 touchout;
-#X obj 281 82 polytouchout;
-#X obj 370 82 midiout;
-#X obj 113 84 pgmout;
-#X obj 11 153 makenote;
-#X text 10 194 MIDI notes deconstruction:;
-#X text 8 128 MIDI note construction:;
-#X text 8 58 MIDI output:;
-#X text 8 2 MIDI input:;
-#X obj 15 226 stripnote;
-#X text 11 266 Additional useful objects for MIDI processing (Maxlib
+#N canvas 0 0 555 619 10;
+#X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -228856 -66577 0;
+#X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header notein 3 12 0 18
+-204280 -1 0;
+#X obj 0 391 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
+-228856 -1 0;
+#N canvas 49 245 494 360 META 0;
+#X text 12 105 PLATFORM windows macosx gnulinux;
+#X text 12 185 LIBRARY internal;
+#X text 12 225 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 65 LICENSE SIBSD;
+#X text 12 205 AUTHOR Miller Puckette;
+#X text 12 285 HELP_PATCH_AUTHORS This help patch was created for Pd
+version 0.35 by Michal Seta as part of a project called pddp proposed
+by Krzysztof Czaja \, managed and edited by Dave Sabine \, to build
+comprehensive documentation for Pd. Jonathan Wilkes revised the patch
+to conform to the PDDP template for Pd version 0.42.;
+#X text 12 5 GENRE help;
+#X text 12 45 KEYWORDS control MIDI;
+#X text 12 85 DESCRIPTION read incoming stream of MIDI notes;
+#X text 12 25 NAME notein;
+#X text 12 125 OUTLET_0 float;
+#X text 12 145 OUTLET_1 float;
+#X text 12 165 OUTLET_2 float;
+#X text 12 245 RELEASE_DATE 1997;
+#X text 12 265 RELEASE_VERSION;
+#X restore 500 597 pd META;
+#X obj 0 419 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
+13 -228856 -1 0;
+#X obj 0 506 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+0 13 -228856 -1 0;
+#X obj 0 568 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
+0 13 -228856 -1 0;
+#N canvas 90 178 428 390 Related_objects 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 8 2 [notein] Related Objects;
+#X obj 78 60 ctlin;
+#X obj 221 60 pgmin;
+#X obj 28 60 bendin;
+#X obj 83 87 touchin;
+#X obj 265 60 polytouchin;
+#X obj 122 60 midiin;
+#X obj 27 87 sysexin;
+#X obj 183 147 noteout;
+#X obj 80 147 ctlout;
+#X obj 28 147 bendout;
+#X obj 370 147 touchout;
+#X obj 284 147 polytouchout;
+#X obj 127 147 midiout;
+#X obj 235 147 pgmout;
+#X obj 28 201 makenote;
+#X text 25 178 MIDI note construction:;
+#X text 25 120 MIDI output:;
+#X text 25 37 MIDI input:;
+#X obj 188 201 stripnote;
+#X obj 172 60 notein;
+#X text 185 178 MIDI note deconstruction:;
+#X text 25 245 Additional useful objects for MIDI processing (Maxlib
 by Olaf Matthes);
-#X obj 148 297 chord;
-#X obj 109 296 borax;
-#X obj 54 296 score o;
-#X obj 13 296 pitch;
-#X text 15 336 Also \, from cyclone (alpha) by Krzysztof Czaja:;
-#X obj 16 359 midiformat;
-#X obj 172 359 midiflush;
-#X obj 98 359 midiparse;
-#X text 15 386 and xeq \, from the same developer;
-#X obj 16 411 xeq;
-#X text 41 402 an experimental MIDI sequencer;
-#X restore 144 497 pd other_midi_objects;
-#X obj 17 497 noteout;
-#X obj 13 286 stripnote;
-#X text 78 287 is one of the ways to deal with this situation;
-#X text 11 41 The [notein] object reads incoming MIDI notes and reports
+#X text 24 324 Also \, from cyclone (alpha) by Krzysztof Czaja:;
+#X text 25 226 Externals;
+#X obj 25 275 pddp/helplink maxlib/pitch;
+#X obj 25 290 pddp/helplink maxlib/score;
+#X obj 25 305 pddp/helplink maxlib/chord;
+#X obj 25 340 pddp/helplink cyclone/midiformat;
+#X obj 25 355 pddp/helplink cyclone/midiparse;
+#X obj 25 370 pddp/helplink cyclone/midiflush;
+#X restore 102 597 pd Related_objects;
+#X text 98 427 float;
+#X obj 78 428 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+-162280 0;
+#X obj 484 3 notein;
+#X obj 455 20 pddp/pddplink http://wiki.puredata.info/en/notein -text
+pdpedia: notein;
+#X obj 43 107 notein;
+#X floatatom 43 175 5 0 0 0 - - -;
+#X floatatom 59 154 5 0 0 0 - - -;
+#X floatatom 76 133 5 0 0 0 - - -;
+#X text 40 56 The [notein] object reads incoming MIDI notes and reports
 their note number \, velocity and channel number. Without the argument
 it reads from all MIDI channels (omni).;
-#X obj 280 526 pddp/pddplink all_about_midi_flags.pd -text all_about_midi_flags;
-#X text 14 526 for an explanation of MIDI usage in Pd see:;
-#X text 13 312 Arguments: the MIDI channel number from which to read
+#X text 98 395 (none);
+#X text 98 452 float;
+#X obj 78 453 cnv 17 3 17 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
+-162280 0;
+#X text 98 477 float;
+#X obj 78 478 cnv 17 3 17 empty \$0-pddp.cnv.let.2 2 5 9 0 16 -228856
+-162280 0;
+#X floatatom 188 282 5 0 0 0 - - -;
+#X floatatom 233 282 5 0 0 0 - - -;
+#X obj 188 249 notein 1;
+#X text 251 248 notein listening only to channel 1;
+#X text 153 295 note number;
+#X text 243 295 velocity;
+#X obj 159 182 stripnote;
+#X text 224 182 is one of the ways to deal with this situation;
+#X text 159 211 Arguments: the MIDI channel number from which to read
 (with no argument it listens to all channels):;
-#X text 80 13 - read incoming stream of MIDI notes.;
-#X text 11 207 Note: remember that a 'note-off' is a note with velocity=0.
+#X text 157 113 Note: remember that a 'note-off' is a note with velocity=0.
 Therefore [notein] reports each note twice (note-on when a key on your
 keyboard is pressed and note-off when the key is released). This could
 be sometimes misleading when tracking notes.;
-#X text 14 480 related objects;
-#X floatatom 44 449 5 0 0;
-#X floatatom 93 449 5 0 0;
-#X text 9 462 note number;
-#X text 103 462 velocity;
-#X obj 44 416 notein 17;
-#X text 107 415 notein listening only to channel 1 on port 2;
-#X text 13 582 This document was created for Pd version 0.35 by Michal
-Seta as part of a project called pddp proposed by Krzysztof Czaja \,
-managed and edited by Dave Sabine \, to build comprehensive documentation
-for Pd.;
-#X connect 6 0 7 0;
-#X connect 6 1 8 0;
-#X connect 6 2 9 0;
-#X connect 12 0 10 0;
-#X connect 12 1 11 0;
-#X connect 31 0 27 0;
-#X connect 31 1 28 0;
+#X floatatom 190 355 5 0 0 0 - - -;
+#X floatatom 241 355 5 0 0 0 - - -;
+#X text 155 368 note number;
+#X text 251 368 velocity;
+#X obj 190 322 notein 17;
+#X text 253 321 notein listening only to channel 1 on port 2;
+#X obj 364 572 pddp/pddplink all_about_midi_flags.pd -text all_about_midi_flags
+;
+#X text 98 572 for an explanation of MIDI usage in Pd see:;
+#X text 11 23 read incoming stream of MIDI notes;
+#X text 168 427 - MIDI note number.;
+#X text 168 452 - velocity.;
+#X text 80 525 1) float;
+#X text 168 477 - MIDI channel number. This inlet is available only
+if no creation argument is specified.;
+#X text 168 525 - the MIDI channel number from which to read. If no
+argument is provided [notein] reads from all channels (and sprouts
+a third inlet).;
+#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X connect 12 0 13 0;
+#X connect 12 1 14 0;
+#X connect 12 2 15 0;
+#X connect 24 0 22 0;
+#X connect 24 1 23 0;
+#X connect 36 0 32 0;
+#X connect 36 1 33 0;

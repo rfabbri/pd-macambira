@@ -1,128 +1,213 @@
-#N canvas 13 -7 937 656 10;
-#X obj 25 11 pack;
-#X text 60 11 - combine several atoms into one message;
-#X msg 24 190 bang;
-#X obj 24 210 pack 100 0 s 42;
-#X text 24 249 In the same example \, this [pack] object will recognize
+#N canvas 0 0 555 619 10;
+#X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
+14 -228856 -66577 0;
+#X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header pack 3 12 0 18 -204280
+-1 0;
+#X obj 0 113 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
+-228856 -1 0;
+#N canvas 52 245 494 370 META 0;
+#X text 12 105 PLATFORM windows macosx gnulinux;
+#X text 12 185 LIBRARY internal;
+#X text 12 225 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 65 LICENSE SIBSD;
+#X text 12 205 AUTHOR Miller Puckette;
+#X text 12 285 HELP_PATCH_AUTHORS This help patch was updated for Pd
+version 0.35 test 26 by Dave Sabine as part of a project called pddp
+proposed by Krzysztof Czaja to build comprehensive documentation for
+Pd. Jonathan Wilkes revised the patch to conform to the PDDP template
+for Pd version 0.42.;
+#X text 12 5 GENRE help;
+#X text 12 85 DESCRIPTION combine several atoms into one message;
+#X text 12 25 NAME pack;
+#X text 12 125 INLET_0 anything;
+#X text 12 145 INLET_N float symbol pointer;
+#X text 12 165 OUTLET_0 list symbol pointer float;
+#X text 12 45 KEYWORDS control needs_work list_op;
+#X text 12 245 RELEASE_DATE 1997;
+#X text 12 265 RELEASE_VERSION;
+#X restore 500 597 pd META;
+#X obj 0 396 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
+13 -228856 -1 0;
+#X obj 0 461 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+0 13 -228856 -1 0;
+#X obj 0 565 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
+0 13 -228856 -1 0;
+#N canvas 98 318 428 296 Related_objects 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 8 2 [pack] Related Objects;
+#X text 20 163 These objects are offered in Pd only if you have downloaded
+and properly installed the appropriate library. These objects may or
+may not exist in a single library.;
+#X text 19 212 The best places to find information about Pd's libraries
+is:;
+#X text 16 234 www.puredata.org and click on "Downloads" then "Software"
+;
+#X text 17 250 or;
+#X text 18 264 iem.kug.ac.at/pdb/;
+#X obj 20 36 pddp/helplink zexy/pack~;
+#X obj 20 51 pddp/helplink zexy/unpack~;
+#X obj 20 66 pddp/helplink zexy/tabdump;
+#X obj 20 81 pddp/helplink zexy/niagara;
+#X obj 20 96 pddp/helplink zexy/packel;
+#X obj 20 111 pddp/helplink zexy/repack;
+#X obj 20 126 pddp/helplink zexy/drip;
+#X obj 20 141 pddp/helplink zexy/sort;
+#X restore 102 597 pd Related_objects;
+#X obj 78 120 cnv 17 3 225 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+-162280 0;
+#X text 98 303 list;
+#X obj 78 403 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+-162280 0;
+#X obj 78 354 cnv 17 3 37 empty \$0-pddp.cnv.let.n n 5 9 0 16 -228856
+-162280 0;
+#X obj 493 3 pack;
+#X obj 465 20 pddp/pddplink http://wiki.puredata.info/en/pack -text
+pdpedia: pack;
+#X text 98 198 symbol;
+#X text 98 119 bang;
+#X text 98 159 float;
+#X text 168 119 - a "bang" to the first inlet will force [pack] to
+output the current package (i.e. \, the list of values) without resetting
+any of them.;
+#X text 98 263 pointer;
+#X text 98 402 list;
+#N canvas 82 45 428 551 pack_peculiarities 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X msg 25 103 bang;
+#X obj 25 123 pack 100 0 s 42;
+#X text 25 162 In the same example \, this [pack] object will recognize
 floats in the first \, second \, and fourth inlet \; it will recognize
 symbols in the third inlet. If it receives anything else \, then you'll
 see the "no method for ___" error message in the terminal window.;
-#X obj 25 366 pack 100 0 s 42;
-#X msg 25 328 400 1 cat 38;
-#X text 110 328 This works.;
-#X msg 37 347 cat dog 42 earth;
-#X obj 30 534 pack cat;
-#X text 24 419 So \, if [pack] understands that "100" is a float and
+#X obj 26 282 pack 100 0 s 42;
+#X msg 26 238 400 1 cat 38;
+#X text 111 238 This works.;
+#X msg 38 260 cat dog 42 earth;
+#X obj 31 448 pack cat;
+#X text 25 333 So \, if [pack] understands that "100" is a float and
 can therefore understand all incoming numbers to that inlet...then
 you might assume that the word "cat" could be written as a creation
 argument and [pack] should understand all incoming symbols. But that's
 NOT the case. If you try to define a [pack] symbol with the word "cat"
 in a creation argument \, you'll get a "bad type" error.;
-#X text 38 516 WRONG;
-#X obj 142 538 pack symbol;
-#X text 222 528 CORRECT;
-#X obj 142 559 print this_package;
-#X msg 142 517 cat;
-#X text 40 382 Note that the "s" above is an abbreviation for "symbol".
+#X text 39 430 WRONG;
+#X obj 143 452 pack symbol;
+#X text 223 442 CORRECT;
+#X obj 143 473 print this_package;
+#X msg 143 431 cat;
+#X text 41 298 Note that the "s" above is an abbreviation for "symbol".
 ;
-#X obj 30 611 pack bang;
-#X text 29 578 Same problem with bangs! This [pack] object creates
+#X obj 31 525 pack bang;
+#X text 30 492 Same problem with bangs! This [pack] object creates
 an error.;
-#X obj 416 14 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 25 144 print package_1;
+#X obj 26 315 print package_2;
+#X text 145 261 This doesn't work - the data types;
+#X text 144 278 don't correspond with the arguments.;
+#X text 20 32 In the example below \, the creation arguments are "100"
+\, "0" \, a "symbol" \, and "42". Hence \, when [pack] receives a bang
+\, it will send that information to its outlet as a list - or 'package'
+- which will be printed in your terminal window.;
+#X text 8 2 [pack] Peculiarities;
+#X connect 1 0 2 0;
+#X connect 2 0 18 0;
+#X connect 4 0 19 0;
+#X connect 5 0 4 0;
+#X connect 7 0 4 0;
+#X connect 11 0 13 0;
+#X connect 14 0 11 0;
+#X restore 171 546 pd pack_peculiarities;
+#X text 168 402 - [pack] will output its package (i.e. \, the list
+of values) when it receives a message to its left inlet.;
+#N canvas 72 44 466 546 Another_example_using_pack 0;
+#X text 181 97 is the same as;
+#X obj 23 517 print my_package;
+#X msg 46 285 1 2 dog;
+#X obj 23 211 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 416 604 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X text 448 106 [pack] can be created with any number of creation arguments.
-There will be one inlet created for each argument and the values of
-each [pack]ed element can be updated at any time using the separate
-inlets \; or they can be updated simoultaneously with a LIST of messages
-to its first inlet.;
-#X text 609 75 is the same as;
-#X obj 24 231 print package_1;
-#X obj 25 399 print package_2;
-#X obj 444 489 print my_package;
-#X msg 467 271 1 2 dog;
-#X text 518 266 This list doesn't contain enough elements \; so it
-resets only the first three elements and then outputs the entire package
-- the undefined elements will simply output their previous values.
-;
-#X obj 444 197 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X floatatom 476 376 5 0 0;
-#X floatatom 474 329 5 0 0;
-#X msg 537 423 100 earth me 42;
-#X text 548 441 Lists can only be sent to the first inlet -- this list
-will cause an error.;
-#X text 520 326 A new value for the first element will reset the first
-element and force [pack] to output the entire package of stored values.
-;
-#X text 451 16 Perhaps the best way to build creation arguments is
-to define the data types that [pack] should expect at each inlet: (i.e.
+#X floatatom 55 390 5 0 0 0 - - -;
+#X floatatom 53 343 5 0 0 0 - - -;
+#X msg 129 450 100 earth me 42;
+#X text 19 38 Perhaps the best way to build creation arguments is to
+define the data types that [pack] should expect at each inlet: (i.e.
 floats \, symbols \, or pointers -- or their abbreviations f \, s \,
 or p);
-#X obj 450 75 pack float symbol pointer;
-#X obj 704 76 pack f s p;
-#X msg 457 247 42 24 dog cat 1 2;
-#X obj 444 469 pack f f s s f f;
-#X text 572 247 This list contains new values for each element.;
-#X text 19 127 In the example below \, the creation arguments are "100
-\, 0 \, a symbol \, 42". Hence \, when [pack] receives a bang \, it
-will send that information to its outlet as a list - or 'package' -
-which will be printed in your terminal window.;
-#X text 144 348 This doesn't work - the data types;
-#X text 143 362 don't correspond with the arguments.;
-#X text 17 33 The pack object takes a series of inputs and then outputs
-a concatenated list. The number of creation arguments determines the
-number of inlets while the type of creation arguments determines the
-types of messages that [pack] should expect to receive at each inlet
-- although with some peculiarities described below.;
-#X text 463 191 Any message to the first inlet will force [pack] to
+#X obj 22 97 pack float symbol pointer;
+#X obj 276 98 pack f s p;
+#X msg 36 261 42 24 dog cat 1 2;
+#X obj 23 497 pack f f s s f f;
+#X text 42 205 Any message to the first inlet will force [pack] to
 output its package - its list of values. A bang to the first inlet
 will force [pack] to output the current values without resetting any
 of them.;
-#X text 522 366 This number box will update each of the 'float' values
+#X text 101 380 This number box will update each of the 'float' values
 and will NOT output the package - because the first inlet is not receiving
 a message - to change this behavior \, you should explore the [trigger]
 object.;
-#X text 443 523 RELATED OBJECTS;
-#X obj 442 546 trigger;
-#X obj 495 546 unpack;
-#N canvas 0 0 452 302 related_objects_from_other_libraries 0;
-#X obj 21 16 pack~;
-#X obj 61 16 unpack~;
-#X obj 113 16 tabdump;
-#X obj 169 16 niagara;
-#X obj 224 16 packel;
-#X obj 21 42 repack;
-#X obj 70 42 drip;
-#X obj 107 42 sort;
-#X text 18 86 These objects are offered in Pd only if you have downloaded
-and properly installed the appropriate library. These objects may or
-may not exist in a single library.;
-#X text 17 135 The best places to find information about Pd's libraries
-is:;
-#X text 14 157 www.puredata.org and click on "Downloads" then "Software"
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
+14 -204280 -1 0;
+#X text 8 2 [pack] Another Example;
+#X text 20 124 [pack] can be created with any number of creation arguments.
+There will be one inlet created for each argument and the values of
+each [pack]ed element can be updated at any time using the separate
+inlets \; or they can be updated simoultaneously with a list of messages
+to its first inlet.;
+#X text 151 261 This list contains new values for each item.;
+#X text 97 280 This list doesn't contain enough items \; so it resets
+only the first three items \, uses the previous values for the other
+three items \, and then outputs the entire package.;
+#X text 99 340 A new value for the first item will reset the it and
+force [pack] to output the entire package of stored values.;
+#X text 129 481 this list will cause an error.;
+#X text 128 467 Lists can only be sent to the first inlet --;
+#X connect 2 0 11 0;
+#X connect 3 0 11 0;
+#X connect 4 0 11 1;
+#X connect 4 0 11 4;
+#X connect 4 0 11 5;
+#X connect 5 0 11 0;
+#X connect 6 0 11 1;
+#X connect 10 0 11 0;
+#X connect 11 0 1 0;
+#X restore 101 573 pd Another_example_using_pack;
+#X obj 394 69 pack;
+#X obj 394 91 print;
+#X text 98 353 An inlet is created for each argument given to [pack].
+Each may store a float \, symbol \, or pointer \, depending on the
+argument given. Only the leftmost inlet will accept a list.;
+#X msg 432 46 2;
+#X floatatom 394 46 5 0 0 0 - - -;
+#X text 98 429 Note: [pack] may output a float \, symbol \, or pointer
+if only one argument is specified.;
+#X text 11 23 combine several atoms into one message;
+#X text 23 46 The [pack] object takes a series of inputs and then outputs
+a concatenated list. By default \, [pack] has two inlets \, each of
+which will accept a float.;
+#X text 168 159 - if the first argument is "float" \, "f" \, or a numeric
+value (e.g. \, "12" \, "3.4") the first element in the list will be
+set to the incoming value \, and [pack] will output its list.;
+#X text 168 303 - a list is distributed to among the inlets of [pack].
+Each element must match the atom-type specified by the creation arguments.
+Lists with more items than the total number of inlets will be truncated.
 ;
-#X text 15 173 or;
-#X text 16 187 iem.kug.ac.at/pdb/;
-#X restore 440 571 pd related_objects_from_other_libraries;
-#X text 443 601 This document was updated for Pd version 0.35 test
-26 by Dave Sabine as part of a project called pddp proposed by Krzysztof
-Czaja to build comprehensive documentation for Pd.;
-#X connect 2 0 3 0;
-#X connect 3 0 23 0;
-#X connect 5 0 24 0;
-#X connect 6 0 5 0;
-#X connect 8 0 5 0;
-#X connect 12 0 14 0;
-#X connect 15 0 12 0;
-#X connect 19 0 20 0;
-#X connect 26 0 38 0;
-#X connect 28 0 38 0;
-#X connect 29 0 38 1;
-#X connect 29 0 38 4;
-#X connect 29 0 38 5;
-#X connect 30 0 38 0;
-#X connect 31 0 38 1;
-#X connect 37 0 38 0;
-#X connect 38 0 25 0;
+#X text 168 263 - if the first argument is "pointer" or "p" \, an incoming
+pointer will be set to the first item in the list \, and [pack] will
+output its list.;
+#X text 168 198 - if the first argument is "symbol" or "s" \, an incoming
+symbol will be set to the first item in the list \, and [pack] will
+output its list. Symbol-atoms (like "foo") that lack the selector "symbol"
+are also accepted (but will be rejected for all additional inlets).
+;
+#X text 98 493 float;
+#X text 168 478 - the number of arguments determines the number of
+inlets (default is two). The symbols described under the "inlets" heading
+specify the atom-type of each inlet. You can also use a float to specify
+float-type while also initializing that inlet's value. Some peculiarities
+described below:;
+#X text 80 478 n) symbol atom;
+#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X connect 23 0 24 0;
+#X connect 26 0 23 1;
+#X connect 27 0 23 0;

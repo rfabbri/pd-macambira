@@ -2,7 +2,12 @@
 - create message-help.pd, namecanvas-help.pd and all_about_messages which
   include [namecanvas] and the additional/pd-msg docs
 
-- update route-help.pd to discuss the three modes of [route]: float mode,
-  symbol mode, and data type mode.
+- finish all_about.pd and remove table_of_contents.pd
 
-- change [pwd] to [getdir]
+- improve glossary
+
+- finish all_about_externals.pd
+
+- finish all_about_libraries.pd
+
+- update PDDP guidelines (or remove it)
