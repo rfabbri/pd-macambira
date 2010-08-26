@@ -29,6 +29,7 @@ typedef struct _slipdec
 } t_slipdec;
 
 static void *slipdec_new(t_symbol *s, int argc, t_atom *argv);
+static void slipdec_dump(t_slipdec *x, int dosend);
 static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av);
 static void slipdec_float(t_slipdec *x, t_float f);
 static void slipdec_verbosity(t_slipdec *x, t_float f);
@@ -52,6 +53,18 @@ static void *slipdec_new(t_symbol *s, int argc, t_atom *argv)
     x->x_packet_index = 0;
     x->x_valid_SLIP = 1;
     return (x);
+}
+
+static void slipdec_dump(t_slipdec *x, int dosend)
+{
+    if(dosend)
+    {
+        if ((0 != x->x_valid_SLIP) && (x->x_slip_length > 0)) 
+        outlet_list(x->x_slipdec_out, &s_list, x->x_slip_length, x->x_slip_buf);
+    }
+
+    x->x_slip_length = x->x_esced = x->x_packet_index = 0;
+    x->x_valid_SLIP = 1;
 }
 
 static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
@@ -82,9 +95,12 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
         if(SLIP_END == c)
         {
             /* If it's the beginning of a packet, ignore it */
-            if (0 == i) continue;
-            /* send the packet */
-            else break;
+            if (x->x_slip_length)
+            {
+                /* send the packet */
+                slipdec_dump(x, 1);
+            }
+            continue;
         }
         if (SLIP_ESC == c)
         {
