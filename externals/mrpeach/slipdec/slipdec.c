@@ -109,7 +109,7 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
         x->x_slip_length = x->x_esced = x->x_packet_index = 0;
         x->x_valid_SLIP = 1;
         /* any remaining data in the list is ignored for now... */
-        if (i < ac) post("slipdec_list: dropped %d bytes after packet", ac-i);
+        if (i < ac-1) post("slipdec_list: dropped %d bytes after packet", ac-1-i);
     }
 }
 
