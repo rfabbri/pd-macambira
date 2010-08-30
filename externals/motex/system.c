@@ -68,7 +68,7 @@ void *system_new(void)
 
 void system_setup(void)
 {
-  post("system_setup");
+//  post("system_setup");
   system_class = class_new(gensym("system"), (t_newmethod)system_new,
 			   (t_method)system_free, sizeof(t_system), 0, 0);
   class_addanything(system_class, system_anything);
