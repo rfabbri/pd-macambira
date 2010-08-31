@@ -3,8 +3,8 @@
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = ext13
 
-+# add your .c source files, one object per file, to the SOURCES
-+# variable, help files will be included automatically
+# add your .c source files, one object per file, to the SOURCES
+# variable, help files will be included automatically
 SOURCES = catch13~.c filesize.c ftos.c kalashnikov.c mandelbrot~.c mandelbrot.c messages.c openpatch.c piperead~.c pipewrite~.c receive13~.c receive13.c scramble~.c send13~.c send13.c sfwrite13~.c streamin13~.c streamout13~.c strippath.c throw13~.c wavinfo.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
