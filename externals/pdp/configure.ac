@@ -3,9 +3,15 @@ AC_CONFIG_HEADER(include/pdp_config.h)
 AC_PROG_CC
 AC_HEADER_STDC
 
-dnl TAG CVS WHEN RELEASE VERSION CHANGES !!!
 
-PDP_VERSION=0.12.5-darcs
+dnl TAG REPO WHEN RELEASE VERSION CHANGES !!!
+dnl After changing version, do "make mrproper ; sh bootstrap"
+
+PDP_VERSION=0.12.6-darcs
+
+
+
+
 AC_SUBST(PDP_VERSION)
 
 AC_ARG_ENABLE(mmx,    

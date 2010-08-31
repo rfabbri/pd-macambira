@@ -81,3 +81,7 @@ install: all
 	install -m 644 doc/introduction/*.pd $(prefix)/lib/pd/doc/pdp/introduction
 	install -m 644 doc/examples/*.pd $(prefix)/lib/pd/doc/pdp/examples
 	install -m 755 bin/pdp-config $(prefix)/bin
+
+release:
+	bin/snapshot `bin/release-version`
+	echo bump PDP_VERSION in configure.ac!
