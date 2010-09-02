@@ -394,33 +394,15 @@ bsaylor_clean:
 
 #------------------------------------------------------------------------------#
 # COMPORT
-COMPORT_NAME=comport
-COMPORT_SRC := $(wildcard $(externals_src)/iem/comport/comport/*.c)
-COMPORT_OBJECTS := $(COMPORT_SRC:.c=.o)
-$(COMPORT_OBJECTS) : %.o : %.c
-	$(CC) $(CFLAGS) -O2 -funroll-loops -fomit-frame-pointer -o "$*.o" -c "$*.c"
+comport:
+	make -C $(externals_src)/iem/comport/comport
 
-comport: $(COMPORT_OBJECTS:.o=.$(EXTENSION))
-
-comport_install: comport
-	install -d $(DESTDIR)$(objectsdir)/$(COMPORT_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(COMPORT_NAME) \
-		--author "(c) 1998-2005  Winfried Ritsch , 2006-2010 Martin Peach" \
-		--description "serial objects" \
-		--license "GNU LGPL 2.1" \
-		--version ""
-	install -p $(COMPORT_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(COMPORT_NAME)
-	install -p $(externals_src)/iem/comport/comport/*.pd \
-		$(DESTDIR)$(objectsdir)/$(COMPORT_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/iem/comport/comport/README.txt \
-		$(DESTDIR)$(readmesdir)/$(COMPORT_NAME).txt
+comport_install:
+	make -C $(externals_src)/iem/comport/comport \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 comport_clean:
-	-rm -f -- $(externals_src)/iem/comport/comport/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/iem/comport/comport/*.o
-	-rm -f -- $(externals_src)/iem/comport/comport/*.bak
-	-rm -f -- $(externals_src)/iem/comport/comport/*.*~
+	make -C $(externals_src)/iem/comport/comport clean
 
 
 #------------------------------------------------------------------------------#
