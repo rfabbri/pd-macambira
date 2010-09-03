@@ -12,7 +12,7 @@ SOURCES = cup.c cupd.c doubledelta.c framescore~.c framespect~.c hasc~.c hssc~.c
 PDOBJECTS = count.pd
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = lpc-cross-synthesis.pd peakit-listmoses.pd
+EXAMPLES = lpc-cross-synthesis.pd peakit-listmoses.pd beauty.wav drummach.wav stink.wav
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
@@ -21,7 +21,7 @@ MANUAL =
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = peakit~_license.txt voicing_detector~test3-help.pd maskxor-test.pd beauty.wav drummach.wav stink.wav
+EXTRA_DIST = peakit~_license.txt voicing_detector~test3-help.pd maskxor-test.pd
 
 
 

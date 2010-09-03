@@ -90,7 +90,7 @@ from the FFT;
 #X obj 44 5 inlet;
 #X obj 113 227 s \$0-weightonset;
 #X obj 243 27 loadbang;
-#X msg 119 27 ../sound/stink.wav;
+#X msg 119 27 examples/stink.wav;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 1 1 5 0;
