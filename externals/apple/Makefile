@@ -17,7 +17,7 @@ SOURCES_iphoneos = multitouch.c
 PDOBJECTS = brightness.pd cpu_temperature.pd fans.pd
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = 
+EXAMPLES = getfingerxy.pd track5fingers.pd
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
