@@ -4,5 +4,5 @@
 #X text 10 30 NAME markex;
 #X text 10 50 AUTHOR Mark Danks;
 #X text 10 70 LICENSE GNU GPL;
-#X text 11 90 VERSION 0.85;
+#X text 11 90 VERSION 0.86-svn;
 #X restore 10 10 pd META;

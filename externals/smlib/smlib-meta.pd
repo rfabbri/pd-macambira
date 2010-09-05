@@ -7,5 +7,5 @@
 #X text 10 70 LICENSE GNU GPL;
 #X text 10 90 DESCRIPTION vector processing \, vector analysis \, vector
 synthesis \, number stream analysis \, number stream filters;
-#X text 10 130 VERSION 0.12.1;
+#X text 10 130 VERSION 0.12.2-svn;
 #X restore 10 10 pd META;

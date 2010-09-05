@@ -5,5 +5,5 @@
 #X text 10 50 AUTHOR Hans-Christoph Steiner;
 #X text 10 70 DESCRIPTION support for Apple-specific functions;
 #X text 10 90 LICENSE GPLv2 or later;
-#X text 10 110 VERSION 0.1;
+#X text 10 110 VERSION 0.2-svn;
 #X restore 10 10 pd META;

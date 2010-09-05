@@ -5,5 +5,5 @@
 #X text 10 50 AUTHOR Olaf Matthes and Jezar Wakefield;
 #X text 10 70 DESCRIPTION Freeverb is a simple implementation of the standard Schroeder/Moorer reverb model;
 #X text 10 90 LICENSE GNU GPL;
-#X text 10 110 VERSION 1.2;
+#X text 10 110 VERSION 1.2.1-svn;
 #X restore 10 10 pd META;
