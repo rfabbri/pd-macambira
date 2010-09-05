@@ -53,7 +53,8 @@ pkglibdir = $(libdir)/pd-externals
 objectsdir = $(pkglibdir)
 
 INSTALL = install
-INSTALL_FILE    = $(INSTALL) -p -m 644
+INSTALL_PROGRAM = $(INSTALL) -p -m 644
+INSTALL_DATA = $(INSTALL) -p -m 644
 INSTALL_DIR     = $(INSTALL) -p -m 755 -d
 
 ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) \
@@ -171,41 +172,41 @@ install: libdir_install
 # actually there.  Those files are not optional, then need to be there.
 libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install-manual
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd \
+	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd \
 		$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	test -z "$(strip $(SOURCES))" || (\
-		$(INSTALL_FILE) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
+		$(INSTALL_PROGRAM) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
 		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
 	test -z "$(strip $(PDOBJECTS))" || \
-		$(INSTALL_FILE) $(PDOBJECTS) \
+		$(INSTALL_DATA) $(PDOBJECTS) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 
 # install library linked as single binary
 single_install: $(LIBRARY_NAME) install-doc install-exec
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(INSTALL_FILE) $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+	$(INSTALL_PROGRAM) $(LIBRARY_NAME).$(EXTENSION) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(STRIP) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/$(LIBRARY_NAME).$(EXTENSION)
 
 install-doc:
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	test -z "$(strip $(SOURCES) $(PDOBJECTS))" || \
-		$(INSTALL_FILE) $(HELPPATCHES) \
+		$(INSTALL_DATA) $(HELPPATCHES) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	$(INSTALL_FILE) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
-	$(INSTALL_FILE) LICENSE.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
+	$(INSTALL_DATA) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
+	$(INSTALL_DATA) LICENSE.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
 
 install-examples:
 	test -z "$(strip $(EXAMPLES))" || \
 		$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples && \
 		for file in $(EXAMPLES); do \
-			$(INSTALL_FILE) examples/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples; \
+			$(INSTALL_DATA) examples/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/examples; \
 		done
 
 install-manual:
 	test -z "$(strip $(MANUAL))" || \
 		$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/manual && \
 		for file in $(MANUAL); do \
-			$(INSTALL_FILE) manual/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/manual; \
+			$(INSTALL_DATA) manual/$$file $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/manual; \
 		done
 
 
@@ -228,11 +229,11 @@ $(DISTBINDIR):
 	$(INSTALL_DIR) $(DISTBINDIR)
 
 libdir: all $(DISTBINDIR)
-	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTBINDIR)
-	$(INSTALL_FILE) $(SOURCES)  $(DISTBINDIR)
-	$(INSTALL_FILE) $(HELPPATCHES) $(DISTBINDIR)
+	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd  $(DISTBINDIR)
+	$(INSTALL_DATA) $(SOURCES)  $(DISTBINDIR)
+	$(INSTALL_DATA) $(HELPPATCHES) $(DISTBINDIR)
 	test -z "$(strip $(EXTRA_DIST))" || \
-		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTBINDIR)
+		$(INSTALL_DATA) $(EXTRA_DIST)    $(DISTBINDIR)
 #	tar --exclude-vcs -czpf $(DISTBINDIR).tar.gz $(DISTBINDIR)
 
 $(DISTDIR):
@@ -242,27 +243,27 @@ $(ORIGDIR):
 	$(INSTALL_DIR) $(ORIGDIR)
 
 dist: $(DISTDIR)
-	$(INSTALL_FILE) Makefile  $(DISTDIR)
-	$(INSTALL_FILE) README.txt $(DISTDIR)
-	$(INSTALL_FILE) LICENSE.txt $(DISTDIR)
-	$(INSTALL_FILE) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
+	$(INSTALL_DATA) Makefile  $(DISTDIR)
+	$(INSTALL_DATA) README.txt $(DISTDIR)
+	$(INSTALL_DATA) LICENSE.txt $(DISTDIR)
+	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
-		$(INSTALL_FILE) $(ALLSOURCES)  $(DISTDIR)
+		$(INSTALL_DATA) $(ALLSOURCES)  $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
-		$(INSTALL_FILE) $(PDOBJECTS)  $(DISTDIR)
+		$(INSTALL_DATA) $(PDOBJECTS)  $(DISTDIR)
 	test -z "$(strip $(HELPPATCHES))" || \
-		$(INSTALL_FILE) $(HELPPATCHES) $(DISTDIR)
+		$(INSTALL_DATA) $(HELPPATCHES) $(DISTDIR)
 	test -z "$(strip $(EXTRA_DIST))" || \
-		$(INSTALL_FILE) $(EXTRA_DIST)    $(DISTDIR)
+		$(INSTALL_DATA) $(EXTRA_DIST)    $(DISTDIR)
 	test -z "$(strip $(EXAMPLES))" || \
 		$(INSTALL_DIR) $(DISTDIR)/examples && \
 		for file in $(EXAMPLES); do \
-			$(INSTALL_FILE) examples/$$file $(DISTDIR)/examples; \
+			$(INSTALL_DATA) examples/$$file $(DISTDIR)/examples; \
 		done
 	test -z "$(strip $(MANUAL))" || \
 		$(INSTALL_DIR) $(DISTDIR)/manual && \
 		for file in $(MANUAL); do \
-			$(INSTALL_FILE) manual/$$file $(DISTDIR)/manual; \
+			$(INSTALL_DATA) manual/$$file $(DISTDIR)/manual; \
 		done
 	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
 
