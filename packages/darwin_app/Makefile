@@ -180,7 +180,9 @@ darwin_app_core: darwin_app_wrapper
 # support for Info Panel Plugins mgmt
 	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
 	install -p -m0644 org.puredata.pdextended.default.plist "$(PD_APP_CONTENTS)/"
-# create directory to put Spotlight Importers into
+# since Pd-vanilla on Mac OS X doesn't have an 'include/pd' folder,
+# Pd-extended will mimic Pd-vanilla's include/pd until Pd-vanilla gets one
+	ln -s pdextended "$(PD_APP_CONTENTS)/Resources/include/pd"
 
 
 #==============================================================================#
