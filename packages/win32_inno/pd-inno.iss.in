@@ -347,7 +347,7 @@ Source: build\pd-settings.reg; DestDir: {app}; Flags: ignoreversion
 Source: build\bin\*.*; DestDir: {app}\bin; Flags: ignoreversion confirmoverwrite recursesubdirs uninsremovereadonly
 Source: build\doc\*.*; DestDir: {app}\doc; Flags: ignoreversion confirmoverwrite recursesubdirs uninsremovereadonly; Attribs: readonly
 Source: build\extra\*.*; DestDir: {app}\extra; Flags: ignoreversion recursesubdirs uninsremovereadonly promptifolder; Attribs: readonly
-Source: build\include\*.*; DestDir: {app}\bin; Flags: ignoreversion confirmoverwrite recursesubdirs uninsremovereadonly
+Source: build\include\*.*; DestDir: {app}\include; Flags: ignoreversion confirmoverwrite recursesubdirs uninsremovereadonly
 Source: build\lib\*.*; DestDir: {app}\lib; Flags: ignoreversion recursesubdirs
 #ifexist "build\gripd"
 Source: build\gripd\*.*; DestDir: {app}\gripd; Flags: ignoreversion
