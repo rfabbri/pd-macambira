@@ -1,5 +1,5 @@
-pd-ekext (0.1-1~lucid) lucid; urgency=low
+pd-ekext (0.1-1) unstable; urgency=low
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial release (Closes: #595976)
 
  -- Hans-Christoph Steiner <hans@eds.org>  Wed, 18 Aug 2010 17:14:25 -0400
