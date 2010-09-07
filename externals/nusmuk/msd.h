@@ -134,7 +134,13 @@ public:
 	{
 		for(int i = 0; i < N; ++i) {
 			t_float pold = pos[i];
-			t_float pnew = force[i] * invM + 2*pold - pos2[i]; // x[n] =Fx[n]/M+2x[n]-x[n-1]
+			t_float pnew;
+			if(invM) // if mass is mobile
+				pnew = force[i] * invM + 2*pold - pos2[i]; // x[n] =Fx[n]/M+2x[n]-x[n-1]
+			else // if mass is fixed
+				pnew = pos[i];
+			
+			// check limit
 			if(pnew < limit[i][0]) pnew = limit[i][0]; else if(pnew > limit[i][1]) pnew = limit[i][1];
 			speed[i] = (pos[i] = pnew) - (pos2[i] = pold);	// x[n-2] = x[n-1], x[n-1] = x[n],vx[n] = x[n] - x[n-1]
 
