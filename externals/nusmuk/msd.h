@@ -127,7 +127,7 @@ public:
 	
 	inline bool getMobile() const { return invM != 0; }
 	
-	inline void setMobile() { invM = M?1.f/M:1.; }
+	inline void setMobile() { invM = M?1/M:0.; }
 	inline void setFixed() { invM = 0; }
 	
 	inline void compute(t_float limit[N][2])
@@ -1265,13 +1265,17 @@ protected:
 		if(IsSymbol(argv[0])) {
 			typename IDMap<t_mass *>::iterator it;
 			//typename IDMap<t_link *>::iterator it;
-			for(it = massids.find(GetSymbol(argv[0])); it; ++it)
+			for(it = massids.find(GetSymbol(argv[0])); it; ++it) {
 				it.data()->M = ma;
+				it.data()->invM = ma?1/ma:0.; 
+			}
 		}
 		else	{
 			t_mass *m = mass.find(GetAInt(argv[0]));
-			if(m)
+			if(m) {
 				m->M = ma;
+				m->invM = ma?1/ma:0.;
+			}
 			else
 				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
 		}

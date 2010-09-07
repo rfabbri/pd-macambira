@@ -76,7 +76,7 @@ LINUXINCLUDE = -I../../../pd/src/
 # ----------------------- Mac OS X (Darwin) -----------------------
 
 
-pd_darwin:  tabosc4c~.pd_darwin tabosc4i~.pd_darwin tabread4c~.pd_darwin
+pd_darwin:  tabosci~.pd_darwin tabosc4c~.pd_darwin tabread4c~.pd_darwin
 
 .SUFFIXES: .pd_darwin
 
@@ -85,13 +85,16 @@ DARWINCFLAGS = -DPD -DUNIX -DMACOSX -O2 \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
-DARWININCLUDE =  -I/. -I../../../pd/src -I../../../pd/obj
+DARWININCLUDE =  -I/. -I../../../pd/src -I../../../pd/obj -I/Applications/Pd-0.42.5-extended-20091214.app/Contents/Resources/include
 
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -o $*.o -c $*.c
 	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o
 	rm -f $*.o ../$*.pd_darwin
 	ln -s $*/$*.pd_darwin ..
+
+
+
 
 
 
