@@ -3,11 +3,12 @@ Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Hans-Christoph Steiner <hans@eds.org>
-Build-Depends: debhelper (>= 7.0.50~), puredata (>= 0.42.5-3.1~)
+Build-Depends: debhelper (>= 7.0.50~), puredata-dev
 Standards-Version: 3.9.1
 Homepage: http://puredata.info
 
 Package: pd-template
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: 
