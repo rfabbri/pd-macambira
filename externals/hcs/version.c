@@ -29,8 +29,6 @@
 
 static char *version = "1.3";
 
-t_int version_instance_count;
-
 #define DEBUG(x)
 //#define DEBUG(x) x 
 
@@ -69,13 +67,6 @@ static void *version_new(t_symbol *s)
 	DEBUG(post("version_new"););
 
 	t_version *x = (t_version *)pd_new(version_class);
-	
-	if(!version_instance_count) 
-	{
-		post("[version] %s",version);  
-		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
-	}
-	version_instance_count++;
 
 	outlet_new(&x->x_obj, &s_list);
 	
