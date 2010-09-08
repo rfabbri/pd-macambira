@@ -32,7 +32,7 @@ EXTRA_DIST = parse_meta.pd pddplink.tcl
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
+CFLAGS = -DPD -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 

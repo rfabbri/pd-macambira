@@ -32,7 +32,7 @@ EXTRA_DIST = pdogg.c makefile.msvc HISTORY
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
+CFLAGS = -DPD -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
