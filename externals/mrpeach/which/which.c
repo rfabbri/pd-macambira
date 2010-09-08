@@ -105,41 +105,41 @@ static void which_bang(t_which *x)
     
     */
     /* try looking in the path for (objectname).(sys_dllextent) ... */
-    sys_lock();
 
     x->x_canvas = canvas_getcurrent();
-    post("which_bang: canvas is %p", x->x_canvas);
-//post("name is %s", x->x_object_name->s_name);
-//post("ext is %s", sys_dllextent);
-//post("ext2 is %s", sys_dllextent2);
+//post("which_bang: canvas is %p", x->x_canvas);
+//post("which_bang: name is %s", x->x_object_name->s_name);
+//post("which_bang: ext is %s", sys_dllextent);
+//post("which_bang: ext2 is %s", sys_dllextent2);
     fd = canvas_open(x->x_canvas, x->x_object_name->s_name, sys_dllextent,
         dirbuf, &nameptr, MAXPDSTRING, 1);
-//post("fd is %d", fd);
-    if (fd >= 0) post("1");
+//post("which_bang 1: fd is %d", fd);
+//    if (fd >= 0) post("1");
     if (fd < 0)
     {/* same, with the more generic sys_dllextent2 */
         fd = canvas_open(x->x_canvas, x->x_object_name->s_name, sys_dllextent2,
             dirbuf, &nameptr, MAXPDSTRING, 1);
-//post("fd is %d", fd);
-        if (fd >= 0) post("2");
+//post("which_bang 2: fd is %d", fd);
+//        if (fd >= 0) post("2");
     }
     if (fd < 0)
     {
+//post("which_bang: not found");
         outlet_symbol(x->x_obj.te_outlet, gensym("not found"));
         return;
     }
     result = close(fd);
-//post("dirbuf: %s", dirbuf);
-//post("nameptr: %s", nameptr);
+//post("which_bang: dirbuf: %s", dirbuf);
+//post("which_bang: nameptr: %s", nameptr);
     /* rebuild the absolute pathname */
     strncpy(filename, dirbuf, MAXPDSTRING);
     filename[MAXPDSTRING-2] = 0;
     strcat(filename, "/");
     strncat(filename, nameptr, MAXPDSTRING-strlen(filename));
     filename[MAXPDSTRING-1] = 0;
+//post("which_bang: filename: %s", filename);
     x->x_object_path = gensym(filename);
     outlet_symbol(x->x_obj.te_outlet, x->x_object_path);
-    sys_unlock();
 }
 
 
@@ -149,8 +149,8 @@ static void *which_new(t_symbol *s, int argc, t_atom *argv)
     x->x_object_name = s;
     if ((argc >= 1)&&(argv[0].a_type == A_SYMBOL)) x->x_object_name = argv[0].a_w.w_symbol;
     outlet_new(&x->x_obj, &s_anything);
-    x->x_canvas = canvas_getcurrent();/* canvas_getcurrent only seems to work in the _new function: why? */
-    post("which_new: canvas is %p", x->x_canvas);
+///    x->x_canvas = canvas_getcurrent();/* canvas_getcurrent only seems to work in the _new function: why? */
+///    post("which_new: canvas is %p", x->x_canvas);
     return (x);
 }
 
