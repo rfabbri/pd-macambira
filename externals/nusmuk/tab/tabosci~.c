@@ -173,7 +173,7 @@ static void *tabosci_tilde_new(t_symbol *s)
     x->x_f = 0;
     x->cutoff = 0;
     x->upsample = 1;
-    x->x_sr = 44100;
+    x->x_sr = 0;
     tabosci_tilde_cutoff(x,0); // comput filter coef
     return (x);
 }
