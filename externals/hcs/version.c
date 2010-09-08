@@ -2,10 +2,10 @@
 /*                                                                           */
 /* object for getting the version of Pd-extended                             */
 /* (it gets the version at compile time, so it will show the version of Pd   */
-/* that is was compiled against)
+/* that is was compiled against)                                             */
 /* Written by Hans-Christoph Steiner <hans@at.or.at>                         */
 /*                                                                           */
-/* Copyright (c) 2006 Hans-Christoph Steiner                                 */
+/* Copyright (c) 2006, 2010 Hans-Christoph Steiner                           */
 /*                                                                           */
 /* This program is free software; you can redistribute it and/or             */
 /* modify it under the terms of the GNU General Public License               */
@@ -27,7 +27,7 @@
 
 #include <m_pd.h>
 
-static char *version = "$Revision: 1.2 $";
+static char *version = "1.3";
 
 t_int version_instance_count;
 
@@ -50,11 +50,12 @@ typedef struct _version {
 static void version_output(t_version* x)
 {
 	DEBUG(post("version_output"););
-
+	int major, minor, bugfix;
 	t_atom version_data[6];
-	SETFLOAT(version_data, (t_float) PD_MAJOR_VERSION);
-	SETFLOAT(version_data + 1, (t_float) PD_MINOR_VERSION);
-	SETFLOAT(version_data + 2, (t_float) PD_BUGFIX_VERSION);
+	sys_getversion(&major, &minor, &bugfix);
+	SETFLOAT(version_data, (t_float) major);
+	SETFLOAT(version_data + 1, (t_float) minor);
+	SETFLOAT(version_data + 2, (t_float) bugfix);
 	SETSYMBOL(version_data + 3, gensym(PD_TEST_VERSION));
 	SETSYMBOL(version_data + 4, gensym(__DATE__));
 	SETSYMBOL(version_data + 5, gensym(__TIME__));
