@@ -89,13 +89,18 @@ void pdp_imageproc_mix_process(void *x, u32 width, u32 height, s16 *image, s16 *
     u32 i;
     s32 a,b;
 
-    for(i=0; i<width*height; i++){
+
+    if (*d == 0)
+      for(i=0; i<width*height; i++){
+	image[i] = image2[i];
+    }
+    else
+      for(i=0; i<width*height; i++){
 	a = (s32)image[i];
 	b = (s32)image2[i];
 	a = (a*d[0] + b*d[1]) >> 15;
 	image[i] = (s16)CLAMP16(a);
-    }
-	
+      }
 }
 
 
