@@ -27,11 +27,17 @@
 #ifndef _WIN32
 
 #include <m_pd.h>
-
-#include <sys/utsname.h>
 #include <stdlib.h>
 
-static char *version = "1.3";
+/* sadly, there is no uname in Windows, Cygwin has it tho */
+#ifdef _WIN32
+# include <windows.h>
+# include <winsock2.h>
+#else
+# include <sys/utsname.h>
+#endif
+
+static char *version = "1.4";
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
@@ -53,6 +59,10 @@ static void uname_output(t_uname* x)
 {
 	DEBUG(post("uname_output"););
 
+#ifdef _WIN32
+// TODO fake uname for Windows
+//    http://msdn.microsoft.com/en-us/library/ms724429(VS.85).aspx 
+#else
 	struct utsname utsname_struct;
 	t_atom uname_data[5];
 	
@@ -69,6 +79,7 @@ static void uname_output(t_uname* x)
 						4,
 						uname_data + 1);
 	}
+#endif /* _WIN32 */
 }
 
 
