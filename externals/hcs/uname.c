@@ -1,9 +1,9 @@
 /* --------------------------------------------------------------------------*/
 /*                                                                           */
-/* object for getting file listings using wildcard patterns                  */
+/* object for getting uname info                                             */
 /* Written by Hans-Christoph Steiner <hans@at.or.at>                         */
 /*                                                                           */
-/* Copyright (c) 2006 Hans-Christoph Steiner                                 */
+/* Copyright (c) 2006,2010 Hans-Christoph Steiner                            */
 /*                                                                           */
 /* This program is free software; you can redistribute it and/or             */
 /* modify it under the terms of the GNU General Public License               */
@@ -31,9 +31,7 @@
 #include <sys/utsname.h>
 #include <stdlib.h>
 
-static char *version = "$Revision: 1.2 $";
-
-t_int uname_instance_count;
+static char *version = "1.3";
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
@@ -51,25 +49,20 @@ typedef struct _uname {
  * IMPLEMENTATION                    
  */
 
-// TODO: regexp ~ to USERPROFILE for Windows
-// TODO: make FindFirstFile display when its just a dir
-
 static void uname_output(t_uname* x)
 {
 	DEBUG(post("uname_output"););
 
-	struct utsname *utsname_struct;
+	struct utsname utsname_struct;
 	t_atom uname_data[5];
 	
-	utsname_struct = malloc(sizeof(utsname_struct));
-
-	if ( uname(utsname_struct) > -1 )
+	if ( uname(&utsname_struct) > -1 )
 	{
-		SETSYMBOL(uname_data, gensym(utsname_struct->sysname));
-		SETSYMBOL(uname_data + 1, gensym(utsname_struct->nodename));
-		SETSYMBOL(uname_data + 2, gensym(utsname_struct->release));
-		SETSYMBOL(uname_data + 3, gensym(utsname_struct->version));
-		SETSYMBOL(uname_data + 4, gensym(utsname_struct->machine));
+		SETSYMBOL(uname_data, gensym(utsname_struct.sysname));
+		SETSYMBOL(uname_data + 1, gensym(utsname_struct.nodename));
+		SETSYMBOL(uname_data + 2, gensym(utsname_struct.release));
+		SETSYMBOL(uname_data + 3, gensym(utsname_struct.version));
+		SETSYMBOL(uname_data + 4, gensym(utsname_struct.machine));
 	
 		outlet_anything(x->x_obj.ob_outlet,
 						atom_gensym(uname_data),
@@ -84,13 +77,6 @@ static void *uname_new(t_symbol *s)
 	DEBUG(post("uname_new"););
 
 	t_uname *x = (t_uname *)pd_new(uname_class);
-	
-	if(!uname_instance_count) 
-	{
-		post("[uname] %s",version);  
-		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
-	}
-	uname_instance_count++;
 
 	outlet_new(&x->x_obj, &s_symbol);
 	
