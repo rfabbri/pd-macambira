@@ -164,4 +164,9 @@ v0.12:	2003/06/21
 	pd-0.40 compatibility
 	sdl delayed window creation
 
+0.12.6:
+        fixes to pdp_imageproc from John Harrison
+        64-bit support
+        other random fixes
+        build fixes
 
