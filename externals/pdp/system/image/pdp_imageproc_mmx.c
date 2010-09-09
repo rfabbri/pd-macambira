@@ -74,8 +74,15 @@ void pdp_imageproc_mix_setrightgain(void *x, float gain){setvec((s16 *)x + 4, ga
 void pdp_imageproc_mix_process(void *x, u32 width, u32 height, s16 *image, s16 *image2)
 {
     s16 *d = (s16 *)x;
-    unsigned int totalnbpixels = width * height;
-    pixel_mix_s16(image, image2, totalnbpixels>>2, d, d+4);
+    u32 i;
+
+    if (*d == 0)
+      for(i=0; i<width*height; i++)
+	image[i] = image2[i];
+    else {
+      unsigned int totalnbpixels = width * height;
+      pixel_mix_s16(image, image2, totalnbpixels>>2, d, d+4);
+    }
 }
 
 
