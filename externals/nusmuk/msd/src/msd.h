@@ -56,9 +56,8 @@
 #define DELARR(var) ((void)0)
 #endif
 
-
+// Maths functions
 inline t_float sqr(t_float x) { return x*x; }
-
 
 template<int N> class Link;
 
@@ -163,7 +162,11 @@ public:
 };
 
 template<int N>
-class Link {
+class Link
+//public flext_base  
+{
+//	FLEXT_HEADER(Link,flext_base)
+	
 public:
 	t_int nbr;
 	const t_symbol *Id;
@@ -174,12 +177,17 @@ public:
 	t_float puissance;
 	t_int link_type; //0 : no, 1 : tangential, 2 : normal
 	t_float tdirection1[N], tdirection2[N];
+	const t_symbol *k_tabname, *d_tabname;
+	flext::buffer *k_tab, *d_tab;
+	t_float l_tab;
 	
-	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1, t_int o=0, t_float tangent[N]=NULL,t_float pow=1, t_float lmin = 0,t_float lmax = 1e10)
+	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1, t_int o=0, t_float tangent[N]=NULL,t_float pow=1, t_float lmin = 0,t_float lmax = 1e10,const t_symbol *ktab=NULL,const t_symbol *dtab=NULL, t_int ltab=1)
 		: nbr(n),Id(id)
 		, mass1(m1),mass2(m2)
 		, K1(k1),D1(d1),D2(0),link_type(o),puissance(pow)
 		, long_min(lmin),long_max(lmax)
+		, k_tabname(ktab), d_tabname(dtab), l_tab(ltab)
+		, k_tab(NULL),d_tab(NULL)
 	{
 		for (int i=0; i<N; i++)	{
 			tdirection1[i] = 0;
@@ -200,6 +208,23 @@ public:
 				distance_old += sqr((m1->pos[i]-m2->pos[i])*tdirection1[i]);
 			distance_old  = sqrt(distance_old);
 			longueur = distance_old;
+		}
+		else if (link_type == 3) { // TAB LINK
+			distance_old = longueur = Mass<N>::dist(*mass1,*mass2);
+			if (k_tabname) {
+				if(k_tab)
+					delete k_tab;
+				k_tab = new flext::buffer(k_tabname);
+				if(!k_tab->Ok())
+   					post("warning: buffer is currently not valid!");  
+			}
+			if (d_tabname) {
+				if(d_tab)
+					delete d_tab;
+				d_tab = new flext::buffer(d_tabname);
+				if(!d_tab->Ok())
+   					post("warning: buffer is currently not valid!");  
+			}
 		}
 		/*else if (link_type == 2)	{			// NORMAL LINK 2D
 			if (N >= 2)	{
@@ -242,6 +267,23 @@ public:
 		mass2->links.erase(this);
 	}
 	
+	inline t_float interp_buf(t_float indexf, flext::buffer *buf, t_float factor) {
+		t_int size_buf=buf->Frames();
+		t_float index_factor = indexf*(size_buf-1)/factor;
+		if (index_factor > size_buf - 1)
+			return buf->Data()[(int)floor(indexf)];
+		else if (index_factor < 0)
+			return buf->Data()[0];
+		else {
+			t_int index = floor(index_factor);
+			t_float interp = index_factor - (float)index;
+			if (index=index_factor)
+				return buf->Data()[index];
+			else 
+				return interp * buf->Data()[index] + (1-interp) * buf->Data()[index+1];
+		}
+	}
+
 	// compute link forces
 	inline void compute() 
 	{
@@ -249,9 +291,7 @@ public:
 		t_float F;
 		Mass<N> *m1 = mass1,*m2 = mass2; // cache locally
 		if (m1->invM || m2->invM) { 
-			if (link_type == 0)	
-				distance = Mass<N>::dist(*m1,*m2); 
-			else if (link_type == 1) {
+			if (link_type == 1) {
 				for(int i = 0; i < N; ++i)	
 					distance += sqr((m1->pos[i]-m2->pos[i])*tdirection1[i]);
 				distance = sqrt(distance);
@@ -261,7 +301,9 @@ public:
 					distance += sqr((m1->pos[i]-m2->pos[i])*(tdirection1[i] +tdirection2[i]));
 				distance = sqrt(distance);
 			}
-	
+			else 
+				distance = Mass<N>::dist(*m1,*m2); 
+					
 			if (distance < long_min || distance > long_max || distance == 0) {
 //			for(int i = 0; i < N; ++i) {
 	//			m1->force[i] -= D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
@@ -270,28 +312,42 @@ public:
 			}
 			else {	// Lmin < L < Lmax
 				// F[n] = k1 (L[n] - L[0])/L[n] + D1 (L[n] - L[n-1])/L[n]
-				if ((distance - longueur)>0)
-					F  = (K1 * pow(distance - longueur,puissance) + D1 * (distance - distance_old))/distance ;
-				else
-					F  = (-K1 * pow(longueur - distance,puissance) + D1 * (distance - distance_old))/distance ;
-				if (link_type == 0)	
-					for(int i = 0; i < N; ++i) {
-						const t_float Fn = F * (m1->pos[i] - m2->pos[i]); // Fx = F * Lx[n]/L[n]
-						m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
-						m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+				if (link_type == 3) { // tabLink
+					t_float k_temp = 1;
+					if (k_tabname) {
+						k_temp = interp_buf(distance,k_tab,l_tab);
+					}	
+					t_float d_temp = 1;	
+					if (d_tabname) {
+						d_temp = interp_buf(distance-distance_old,d_tab,l_tab);
 					}
-				else if (link_type == 1 || (link_type == 2 && N == 2))
-					for(int i = 0; i < N; ++i) {
-						const t_float Fn = F * (m1->pos[i] - m2->pos[i])*tdirection1[i]; // Fx = F * Lx[n]/L[n]
-						m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
-						m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
-					}
-				else if (link_type == 2 && N == 3)
-					for(int i = 0; i < N; ++i) {
-						const t_float Fn = F * (m1->pos[i] - m2->pos[i])*(tdirection1[i] +tdirection2[i]); // Fx = F * Lx[n]/L[n]
-						m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
-						m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
-					}
+					F = K1*k_temp + D1*d_temp/distance; 
+				}
+				else {
+					if ((distance - longueur)>0)
+						F  = (K1 * pow(distance - longueur,puissance) + D1 * (distance - distance_old))/distance ;
+					else
+						F  = (-K1 * pow(longueur - distance,puissance) + D1 * (distance - distance_old))/distance ;
+				}
+					if (link_type == 1 || (link_type == 2 && N == 2)) // tangential
+						for(int i = 0; i < N; ++i) {
+							const t_float Fn = F * (m1->pos[i] - m2->pos[i])*tdirection1[i]; // Fx = F * Lx[n]/L[n]
+							m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+							m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+						}
+					else if (link_type == 2 && N == 3) // deprecated
+						for(int i = 0; i < N; ++i) {
+							const t_float Fn = F * (m1->pos[i] - m2->pos[i])*(tdirection1[i] +tdirection2[i]); // Fx = F * Lx[n]/L[n]
+							m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+							m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+						}
+					else 	 // usual link 
+						for(int i = 0; i < N; ++i) {
+							const t_float Fn = F * (m1->pos[i] - m2->pos[i]); // Fx = F * Lx[n]/L[n]
+							m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+							m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+						}
+				
 			}
 			
 			distance_old = distance;				// L[n-1] = L[n]			
@@ -762,7 +818,8 @@ protected:
 						0,NULL,
 						argc >= 6?GetFloat(argv[5]):1, // power
 						argc >= 7?GetFloat(argv[6]):0,
-						argc >= 8?GetFloat(argv[7]):1e10
+						argc >= 8?GetFloat(argv[7]):1e10,
+						NULL,NULL,1
 					);
 					linkids.insert(l);
 					link.insert(id_link++,l);
@@ -784,7 +841,8 @@ protected:
 					0,NULL,
 					argc >= 6?GetFloat(argv[5]):1, // power
 					argc >= 7?GetFloat(argv[6]):0,
-					argc >= 8?GetFloat(argv[7]):1e10
+					argc >= 8?GetFloat(argv[7]):1e10,
+					NULL,NULL,1
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
@@ -805,7 +863,8 @@ protected:
 					0,NULL,
 					argc >= 6?GetFloat(argv[5]):1, // power
 					argc >= 7?GetFloat(argv[6]):0,
-					argc >= 8?GetFloat(argv[7]):1e10
+					argc >= 8?GetFloat(argv[7]):1e10,
+					NULL,NULL,1
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
@@ -830,7 +889,8 @@ protected:
 				0,NULL,
 				argc >= 6?GetFloat(argv[5]):1, // power
 				argc >= 7?GetFloat(argv[6]):0,	// Lmin
-				argc >= 8?GetFloat(argv[7]):1e10// Lmax
+				argc >= 8?GetFloat(argv[7]):1e10,// Lmax
+				NULL,NULL,1
 			);
 
 			linkids.insert(l);
@@ -862,7 +922,8 @@ protected:
 					0,NULL,
 					argc >= 6?GetFloat(argv[5]):1, // power
 					argc >= 7?GetFloat(argv[6]):0,
-					argc >= 8?GetFloat(argv[7]):1e10
+					argc >= 8?GetFloat(argv[7]):1e10,
+					NULL,NULL,1
 				);
 
 				linkids.insert(l);
@@ -899,7 +960,8 @@ protected:
 						tangent,
 						argc >= 6+N?GetFloat(argv[5+N]):1, // power
 						argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
-						argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
+						argc >= 8+N?GetFloat(argv[7+N]):1e10, // Lmax
+						NULL,NULL,1
 					);
 					linkids.insert(l);
 					link.insert(id_link++,l);
@@ -922,7 +984,8 @@ protected:
 					tangent,
 					argc >= 6+N?GetFloat(argv[5+N]):1, // power
 					argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
-					argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
+					argc >= 8+N?GetFloat(argv[7+N]):1e10, // Lmax
+					NULL,NULL,1
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
@@ -944,7 +1007,8 @@ protected:
 					tangent,					// tangential
 					argc >= 6+N?GetFloat(argv[5+N]):1, // power
 					argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
-					argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
+					argc >= 8+N?GetFloat(argv[7+N]):1e10, // Lmax
+					NULL,NULL,1
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
@@ -969,13 +1033,127 @@ protected:
 				tangent,					// tangential
 				argc >= 6+N?GetFloat(argv[5+N]):1, // power
 				argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
-				argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
+				argc >= 8+N?GetFloat(argv[7+N]):1e10, // Lmax
+				NULL,NULL,1
 			);
 			linkids.insert(l);
 			link.insert(id_link++,l);
 			outlink(S_tLink,l);
 		}
 	}
+
+	// add a tab link
+	// Id, *mass1, *mass2, k_tabname, d_tabname, l_tab
+	void m_tablink(int argc,t_atom *argv) 
+	{
+		if (argc != 6) {
+			error("%s - %s Syntax : Id No/Idmass1 No/Idmass2 ktab dtab ltab",thisName(),GetString(thisTag()));
+			return;
+		}
+		if (IsSymbol(argv[1]) && IsSymbol(argv[2]))	{		// ID & ID
+			typename IDMap<t_mass *>::iterator it1,it2,it;
+			it1 = massids.find(GetSymbol(argv[1]));
+			it2 = massids.find(GetSymbol(argv[2]));
+			for(; it1; ++it1) {
+				for(it = it2; it; ++it) {						
+					t_link *l = new t_link(
+						id_link,
+						GetSymbol(argv[0]), // ID
+						it1.data(),it.data(), // pointer to mass1, mass2
+						IsSymbol(argv[3])?1:GetAFloat(argv[3]), // K1 = 1 if buffer
+						IsSymbol(argv[4])?1:GetAFloat(argv[4]), // D1
+						3,NULL,
+						1, // power
+						0, // Lmin
+						1e10, // Lmax
+						IsSymbol(argv[3])?GetSymbol(argv[3]):NULL,	// k_tabname 	
+						IsSymbol(argv[4])?GetSymbol(argv[4]):NULL, // d_tabname
+						GetAFloat(argv[5]) // l_tab
+					);
+					linkids.insert(l);
+					link.insert(id_link++,l);
+					outlink(S_tabLink,l);
+				}
+			}
+		}
+		else if (IsSymbol(argv[1])==0 && IsSymbol(argv[2]))	{	// No & ID
+			typename IDMap<t_mass *>::iterator it2,it;
+	 		t_mass *mass1 = mass.find(GetAInt(argv[1]));
+			it2 = massids.find(GetSymbol(argv[2]));
+			for(it = it2; it; ++it) {
+				t_link *l = new t_link(
+						id_link,
+						GetSymbol(argv[0]), // ID
+						mass1,it.data(), // pointer to mass1, mass2
+						IsSymbol(argv[3])?1:GetAFloat(argv[3]), // K1 = 1 if buffer
+						IsSymbol(argv[4])?1:GetAFloat(argv[4]), // D1
+						3,NULL,
+						1, // power
+						0, // Lmin
+						1e10, // Lmax
+						IsSymbol(argv[3])?GetSymbol(argv[3]):NULL,	// k_tabname 	
+						IsSymbol(argv[4])?GetSymbol(argv[4]):NULL, // d_tabname
+						GetAFloat(argv[5]) // l_tab
+				);
+				linkids.insert(l);
+				link.insert(id_link++,l);
+				outlink(S_tabLink,l);
+			}
+		}
+		else if (IsSymbol(argv[1]) && IsSymbol(argv[2])==0)	{	// ID & No
+			typename IDMap<t_mass *>::iterator it1,it;
+			it1 = massids.find(GetSymbol(argv[1]));
+	 		t_mass *mass2 = mass.find(GetAInt(argv[2]));
+			for(it = it1; it; ++it) {
+				t_link *l = new t_link(
+						id_link,
+						GetSymbol(argv[0]), // ID
+						it1.data(),mass2, // pointer to mass1, mass2
+						IsSymbol(argv[3])?1:GetAFloat(argv[3]), // K1 = 1 if buffer
+						IsSymbol(argv[4])?1:GetAFloat(argv[4]), // D1
+						3,NULL,
+						1, // power
+						0, // Lmin
+						1e10, // Lmax
+						IsSymbol(argv[3])?GetSymbol(argv[3]):NULL,	// k_tabname 	
+						IsSymbol(argv[4])?GetSymbol(argv[4]):NULL, // d_tabname
+						GetAFloat(argv[5]) // l_tab
+				);
+				linkids.insert(l);
+				link.insert(id_link++,l);
+				outlink(S_tabLink,l);
+			}
+		}
+		else	{										// No & No
+	 		t_mass *mass1 = mass.find(GetAInt(argv[1]));
+			t_mass *mass2 = mass.find(GetAInt(argv[2]));
+ 	
+   			if(!mass1 || !mass2) {
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+				return;
+			}
+	
+			t_link *l = new t_link(
+						id_link,
+						GetSymbol(argv[0]), // ID
+						mass1,mass2, // pointer to mass1, mass2
+						IsSymbol(argv[3])?1:GetAFloat(argv[3]), // K1 = 1 if buffer
+						IsSymbol(argv[4])?1:GetAFloat(argv[4]), // D1
+						3,NULL,
+						1, // power
+						0, // Lmin
+						1e10, // Lmax
+						IsSymbol(argv[3])?GetSymbol(argv[3]):NULL,	// k_tabname 	
+						IsSymbol(argv[4])?GetSymbol(argv[4]):NULL, // d_tabname
+						GetAFloat(argv[5]) // l_tab
+			);
+
+			linkids.insert(l);
+			link.insert(id_link++,l);
+			outlink(S_tabLink,l);
+		}
+	}
+
 
 	// add a normal link
 	// Id, *mass1, *mass2, K1, D1, D2, (Lmin,Lmax)
@@ -1765,9 +1943,8 @@ private:
 		SetSymbol((sortie[1]),l->Id);
 		SetInt((sortie[2]),l->mass1->nbr);
 		SetInt((sortie[3]),l->mass2->nbr);
-		SetFloat((sortie[4]),l->K1);
-		SetFloat((sortie[5]),l->D1);
-
+		l->k_tabname?SetSymbol(sortie[4],l->k_tabname):SetFloat((sortie[4]),l->K1);
+		l->d_tabname?SetSymbol(sortie[5],l->d_tabname):SetFloat((sortie[5]),l->D1);
 		if (l->link_type == 1 ||(l->link_type == 2 && N ==2))	{
 			for (int i=0; i<N; i++)
 				SetFloat((sortie[6+i]),l->tdirection1[i]);
@@ -1812,6 +1989,7 @@ private:
 	const static t_symbol *S_iLink;
 	const static t_symbol *S_tLink;
 	const static t_symbol *S_nLink;
+	const static t_symbol *S_tabLink;
 	const static t_symbol *S_Mass_deleted;
 	const static t_symbol *S_Link_deleted;
 	const static t_symbol *S_massesPos;
@@ -1855,6 +2033,7 @@ private:
 		S_iLink = MakeSymbol("iLink");
 		S_tLink = MakeSymbol("tLink");
 		S_nLink = MakeSymbol("nLink");
+		S_tabLink = MakeSymbol("tabLink");
 		S_Mass_deleted = MakeSymbol("Mass deleted");
 		S_Link_deleted = MakeSymbol("Link deleted");
 		S_massesPos = MakeSymbol("massesPos");
@@ -1942,6 +2121,7 @@ private:
 		FLEXT_CADDMETHOD_(c,0,"iLink",m_ilink);
 		FLEXT_CADDMETHOD_(c,0,"tLink",m_tlink);
 		FLEXT_CADDMETHOD_(c,0,"nLink",m_nlink);
+		FLEXT_CADDMETHOD_(c,0,"tabLink",m_tablink);
 		FLEXT_CADDMETHOD_(c,0,"get",m_get);
 		FLEXT_CADDMETHOD_(c,0,"deleteLink",m_delete_link);
 		FLEXT_CADDMETHOD_(c,0,"deleteMass",m_delete_mass);
@@ -1965,6 +2145,7 @@ private:
 	FLEXT_CALLBACK_V(m_ilink)
 	FLEXT_CALLBACK_V(m_tlink)
 	FLEXT_CALLBACK_V(m_nlink)
+	FLEXT_CALLBACK_V(m_tablink)
 	FLEXT_CALLBACK_V(m_Xmax)
 	FLEXT_CALLBACK_V(m_Xmin)
 	FLEXT_CALLBACK_V(m_forceX)
@@ -2004,6 +2185,7 @@ template<int N> const t_symbol *msdN<N>::S_Link;
 template<int N> const t_symbol *msdN<N>::S_iLink;
 template<int N> const t_symbol *msdN<N>::S_tLink;
 template<int N> const t_symbol *msdN<N>::S_nLink;
+template<int N> const t_symbol *msdN<N>::S_tabLink;
 template<int N> const t_symbol *msdN<N>::S_Mass_deleted;
 template<int N> const t_symbol *msdN<N>::S_Link_deleted;
 template<int N> const t_symbol *msdN<N>::S_massesPos;
