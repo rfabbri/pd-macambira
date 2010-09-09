@@ -1,3 +1,3 @@
-#include "../msd.h"
+#include "../src/msd.h"
 
 MSD("msd",msd,1)

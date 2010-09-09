@@ -1,4 +1,4 @@
 NAME=msd
 SRCS=main.cpp
-HDRS=../msd.h
+HDRS=../src/msd.h
 
