@@ -319,7 +319,7 @@ public:
 					if (d_tabname) {
 						d_temp = interp_buf(distance-distance_old,d_tab,l_tab);
 					}
-					F = K1*k_temp + D1*d_temp/distance; 
+					F = (K1*k_temp + D1*d_temp)/distance; 
 				}
 				else {
 					if ((distance - longueur)>0)
