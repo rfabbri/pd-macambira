@@ -75,7 +75,7 @@ public:
 		buf = new flext::buffer(Id);
 		tested=true;
 		if(!buf->Ok()) {
-   			post("error : buffer %s is currently not valid!", *Id); 
+   			post("error : table %s not found!", *Id); 
    			tested = false;
 		}
 	}
@@ -95,14 +95,14 @@ public:
   			tested = false; 
  		}  
  		else { 
-  			if(buf->Update()) { 
+  			if(!buf || buf->Update()) { 
    			// buffer parameters have been updated 
    				if(buf->Valid()) { 
-    				post("updated buffer reference"); 
+    				post("updated buffer %s reference", *Id); 
     				tested = true; 
    				} 
    				else { 
-    				post("buffer has become invalid"); 
+    				post("buffer %s has become invalid", *Id); 
     				tested = false; 
    				}
    			}  
@@ -124,7 +124,7 @@ public:
 			if (index==index_factor)
 				return buf->Data()[index];
 			else 
-				return interp * buf->Data()[index] + (1-interp) * buf->Data()[index+1];
+				return (1-interp) * buf->Data()[index] + interp * buf->Data()[index+1];
 		}
 	}
 };
@@ -243,8 +243,6 @@ public:
 	t_float puissance;
 	t_int link_type; //0 : no, 1 : tangential, 2 : normal, 3 : table
 	t_float tdirection1[N], tdirection2[N];
-	const t_symbol *k_tabname, *d_tabname;
-	flext::buffer *k_tab, *d_tab;
 	t_float l_tab, l_tab2;
 	t_int buffer_tested;
 	t_buffer *k_buffer,*d_buffer;
@@ -255,7 +253,6 @@ public:
 	, K1(k1),D1(d1),D2(0),link_type(o),puissance(pow)
 	, long_min(lmin),long_max(lmax)
 	, l_tab(ltab), l_tab2(ltab2)
-	, k_tab(NULL),d_tab(NULL)
 	, buffer_tested(1)
 	, k_buffer(ktab),d_buffer(dtab)
 	{
@@ -278,88 +275,14 @@ public:
 		}
 		else
 			distance_old = longueur = Mass<N>::dist(*mass1,*mass2); // L[n-1]
-//		else if (link_type == 3) { // TAB LINK
-//			distance_old = longueur = Mass<N>::dist(*mass1,*mass2);
-//			if (k_tabname) {
-//				if(k_tab)
-//					delete k_tab;
-//				k_tab = new flext::buffer(k_tabname);
-//				if(!k_tab->Ok()) {
-//   					post("error : buffer %s is currently not valid!", *k_tabname); 
-//   					buffer_tested *= 0;
-//				}
-//   				buffer_tested *= buffer_test(k_tab);	
-//			}
-//			if (d_tabname) {
-//				if(d_tab)
-//					delete d_tab;
-//				d_tab = new flext::buffer(d_tabname);
-//				if(!d_tab->Ok()) { 
-//   					post("error : buffer %s is currently not valid!", *d_tabname);
-//   					buffer_tested *= 0;
-//				}
-//   				buffer_tested *= buffer_test(d_tab);	
-//			}
-//		}
 		mass1->links.insert(this);
 		mass2->links.insert(this);
 	}
 	
-	~Link()
-	{
-//		if(k_tab) {
-//			delete k_tab;
-//			k_tab = NULL;
-//			k_tabname = NULL; 
-//		}
-//		if(d_tab) {
-//			delete d_tab;
-//			d_tab = NULL;
-//			d_tabname = NULL; 
-//		}
+	~Link() {
 		mass1->links.erase(this);
 		mass2->links.erase(this);
 	}
-	
-//	inline t_int buffer_test(flext::buffer *buf) {
-//		if(!buf || !buf->Valid()) { 
-//  			post("no valid buffer defined"); 
-//  			// return zero length 
-//  			return 0; 
-// 		}  
-// 		else { 
-//  			if(buf->Update()) { 
-//   			// buffer parameters have been updated 
-//   				if(buf->Valid()) { 
-//    				post("updated buffer reference"); 
-//    				return 1; 
-//   				} 
-//   				else { 
-//    				post("buffer has become invalid"); 
-//    				return 0; 
-//   				}
-//   			}  
-//  			else 
-//   				return 1;
-// 		}	   
-// 	} 
-
-//	inline t_float interp_buf(t_float indexf, flext::buffer *buf, t_float factor) {
-//		t_float size_buf=buf->Frames();
-//		t_float index_factor = indexf*(size_buf-1)/factor;
-//		if (index_factor > size_buf - 1)
-//			return buf->Data()[(int)size_buf - 1];
-//		else if (index_factor < 0)
-//			return buf->Data()[0];
-//		else {
-//			t_int index = floor(index_factor);
-//			t_float interp = index_factor - (float)index;
-//			if (index=index_factor)
-//				return buf->Data()[index];
-//			else 
-//				return interp * buf->Data()[index] + (1-interp) * buf->Data()[index+1];
-//		}
-//	}
 
 	// compute link forces
 	inline void compute() 
@@ -389,7 +312,6 @@ public:
 				if (link_type == 3 ) {//&& buffer_tested) { // tabLink
 					t_float k_temp = distance-longueur;
 					if (k_buffer && k_buffer->tested) {
-						//k_temp = interp_buf(distance,k_tab,l_tab);
 						k_temp = k_buffer->interp_buf(distance,l_tab);
 					}	
 					t_float d_temp = distance-distance_old;	
@@ -578,6 +500,9 @@ protected:
 
 	void m_bang()
 	{
+		// test all buffers
+		for (typename IndexMap<t_buffer *>::iterator bit(buffers); bit; ++bit) bit.data()->buffer_test();
+		
 		// update all links
 		for (typename IndexMap<t_link *>::iterator lit(link); lit; ++lit) lit.data()->compute();
 
@@ -1260,110 +1185,9 @@ protected:
 	// add a normal link
 	// Id, *mass1, *mass2, K1, D1, D2, (Lmin,Lmax)
 	void m_nlink(int argc,t_atom *argv) 
-	{/*
-		if (argc < 5+N || argc > 8+N) {
-			error("%s - %s Syntax : Id No/Idmass1 No/Idmass2 K D1 xa%s%s (pow Lmin Lmax)",thisName(),GetString(thisTag()),N >= 2?" ya":"",N >= 3?" za":"");
-			return;
-		}
-
-		if (N==1)	{
-			error("%s - %s : No normal Link in 1D",thisName(),GetString(thisTag()));
-			return;
-		}
-		if (IsSymbol(argv[1]) && IsSymbol(argv[2]))	{		// ID & ID
-			typename IDMap<t_mass *>::iterator it1,it2,it;
-			it1 = massids.find(GetSymbol(argv[1]));
-			it2 = massids.find(GetSymbol(argv[2]));
-			for(; it1; ++it1) {
-				for(it = it2; it; ++it) {
-					t_link *l = new t_link(
-						id_link,
-						GetSymbol(argv[0]), // ID
-						it1.data(),it.data(), // pointer to mass1, mass2
-						GetAFloat(argv[3]), // K1
-						GetAFloat(argv[4]), // D1
-						2,					// normal
-						GetAFloat(argv[5]),GetAFloat(argv[6]),N >= 3?GetAFloat(argv[7]):0,	// vector
-						(N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1),	// pow
-						(N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0),	// Lmin
-						(N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10)// Lmax
-					);
-					linkids.insert(l);
-					link.insert(id_link++,l);
-					outlink(S_nLink,l);
-				}
-			}
-		}
-		else if (IsSymbol(argv[1])==0 && IsSymbol(argv[2]))	{	// No & ID
-			typename IDMap<t_mass *>::iterator it2,it;
-	 		t_mass *mass1 = mass.find(GetAInt(argv[1]));
-			it2 = massids.find(GetSymbol(argv[2]));
-			for(it = it2; it; ++it) {
-				t_link *l = new t_link(
-					id_link,
-					GetSymbol(argv[0]), // ID
-					mass1,it.data(), // pointer to mass1, mass2
-					GetAFloat(argv[3]), // K1
-					GetAFloat(argv[4]), // D1
-					2,					// normal
-					GetAFloat(argv[5]),GetAFloat(argv[6]),N >= 3?GetAFloat(argv[7]):0,	// vector
-					(N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1),	// pow
-					(N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0),	// Lmin
-					(N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10)// Lmax
-				);
-				linkids.insert(l);
-				link.insert(id_link++,l);
-				outlink(S_nLink,l);
-			}
-		}
-		else if (IsSymbol(argv[1]) && IsSymbol(argv[2])==0)	{	// ID & No
-			typename IDMap<t_mass *>::iterator it1,it;
-			it1 = massids.find(GetSymbol(argv[1]));
-	 		t_mass *mass2 = mass.find(GetAInt(argv[2]));
-			for(it = it1; it; ++it) {
-				t_link *l = new t_link(
-					id_link,
-					GetSymbol(argv[0]), // ID
-					it.data(),mass2, // pointer to mass1, mass2
-					GetAFloat(argv[3]), // K1
-					GetAFloat(argv[4]), // D1
-					2,					// normal
-					GetAFloat(argv[5]),GetAFloat(argv[6]),N >= 3?GetAFloat(argv[7]):0,	// vector
-					(N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1),	// pow
-					(N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0),	// Lmin
-					(N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10)// Lmax
-				);
-				linkids.insert(l);
-				link.insert(id_link++,l);
-				outlink(S_nLink,l);
-			}
-		}
-		else	{										// No & No
-			t_mass *mass1 = mass.find(GetAInt(argv[1]));
-			t_mass *mass2 = mass.find(GetAInt(argv[2]));
- 	
-   			if(!mass1 || !mass2) {
-				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
-				return;
-			}
-
-			t_link *l = new t_link(
-				id_link,
-				GetSymbol(argv[0]), // ID
-				mass1,mass2, // pointer to mass1, mass2
-				GetAFloat(argv[3]), // K1
-				GetAFloat(argv[4]), // D1
-				2,					// normal
-				GetAFloat(argv[5]),GetAFloat(argv[6]),N >= 3?GetAFloat(argv[7]):0,	// vector
-				(N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1),	// pow
-				(N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0),	// Lmin
-				(N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10)// Lmax
-			);
-			linkids.insert(l);
-			link.insert(id_link++,l);
-			outlink(S_nLink,l);
-		}
-	*/}
+	{
+	// deprecated
+	}
 
 	// set Id of link(s) named Id or number No
 	void m_setLinkId(int argc,t_atom *argv) 
