@@ -311,11 +311,11 @@ public:
 			else {	// Lmin < L < Lmax
 				// F[n] = k1 (L[n] - L[0])/L[n] + D1 (L[n] - L[n-1])/L[n]
 				if (link_type == 3) { // tabLink
-					t_float k_temp = 1;
+					t_float k_temp = distance;
 					if (k_tabname) {
 						k_temp = interp_buf(distance,k_tab,l_tab);
 					}	
-					t_float d_temp = 1;	
+					t_float d_temp = distance-distance_old;	
 					if (d_tabname) {
 						d_temp = interp_buf(distance-distance_old,d_tab,l_tab);
 					}
