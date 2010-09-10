@@ -268,10 +268,10 @@ public:
 	}
 	
 	inline t_float interp_buf(t_float indexf, flext::buffer *buf, t_float factor) {
-		t_int size_buf=buf->Frames();
+		t_float size_buf=buf->Frames();
 		t_float index_factor = indexf*(size_buf-1)/factor;
 		if (index_factor > size_buf - 1)
-			return buf->Data()[(int)floor(index_factor)];
+			return buf->Data()[(int)size_buf - 1];
 		else if (index_factor < 0)
 			return buf->Data()[0];
 		else {
