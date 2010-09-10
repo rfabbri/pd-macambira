@@ -245,16 +245,16 @@ public:
 	t_float tdirection1[N], tdirection2[N];
 	const t_symbol *k_tabname, *d_tabname;
 	flext::buffer *k_tab, *d_tab;
-	t_float l_tab;
+	t_float l_tab, l_tab2;
 	t_int buffer_tested;
 	t_buffer *k_buffer,*d_buffer;
 	
-	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1, t_int o=0, t_float tangent[N]=NULL,t_float pow=1, t_float lmin = 0,t_float lmax = 1e10,t_buffer *ktab=NULL,t_buffer *dtab=NULL, t_float ltab=1)
+	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1, t_int o=0, t_float tangent[N]=NULL,t_float pow=1, t_float lmin = 0,t_float lmax = 1e10,t_buffer *ktab=NULL, t_float ltab=1, t_buffer *dtab=NULL, t_float ltab2=1)
 	: nbr(n),Id(id)
 	, mass1(m1),mass2(m2)
 	, K1(k1),D1(d1),D2(0),link_type(o),puissance(pow)
 	, long_min(lmin),long_max(lmax)
-	, l_tab(ltab)
+	, l_tab(ltab), l_tab2(ltab2)
 	, k_tab(NULL),d_tab(NULL)
 	, buffer_tested(1)
 	, k_buffer(ktab),d_buffer(dtab)
@@ -394,7 +394,10 @@ public:
 					}	
 					t_float d_temp = distance-distance_old;	
 					if (d_buffer && d_buffer->tested) {
-						d_temp = (distance-distance_old) * d_buffer->interp_buf(distance,l_tab);
+						if (distance>distance_old)
+							d_temp = d_buffer->interp_buf(distance-distance_old,l_tab2);
+						else
+							d_temp = -d_buffer->interp_buf(distance_old - distance,l_tab2);
 					}
 					F = (K1*k_temp + D1*d_temp)/distance; 
 				}
@@ -896,8 +899,7 @@ protected:
 						0,NULL,
 						argc >= 6?GetFloat(argv[5]):1, // power
 						argc >= 7?GetFloat(argv[6]):0,
-						argc >= 8?GetFloat(argv[7]):1e10,
-						NULL,NULL,1
+						argc >= 8?GetFloat(argv[7]):1e10
 					);
 					linkids.insert(l);
 					link.insert(id_link++,l);
@@ -919,8 +921,7 @@ protected:
 					0,NULL,
 					argc >= 6?GetFloat(argv[5]):1, // power
 					argc >= 7?GetFloat(argv[6]):0,
-					argc >= 8?GetFloat(argv[7]):1e10,
-					NULL,NULL,1
+					argc >= 8?GetFloat(argv[7]):1e10
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
@@ -941,8 +942,7 @@ protected:
 					0,NULL,
 					argc >= 6?GetFloat(argv[5]):1, // power
 					argc >= 7?GetFloat(argv[6]):0,
-					argc >= 8?GetFloat(argv[7]):1e10,
-					NULL,NULL,1
+					argc >= 8?GetFloat(argv[7]):1e10
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
@@ -967,8 +967,7 @@ protected:
 				0,NULL,
 				argc >= 6?GetFloat(argv[5]):1, // power
 				argc >= 7?GetFloat(argv[6]):0,	// Lmin
-				argc >= 8?GetFloat(argv[7]):1e10,// Lmax
-				NULL,NULL,1
+				argc >= 8?GetFloat(argv[7]):1e10// Lmax
 			);
 
 			linkids.insert(l);
@@ -1000,8 +999,7 @@ protected:
 					0,NULL,
 					argc >= 6?GetFloat(argv[5]):1, // power
 					argc >= 7?GetFloat(argv[6]):0,
-					argc >= 8?GetFloat(argv[7]):1e10,
-					NULL,NULL,1
+					argc >= 8?GetFloat(argv[7]):1e10
 				);
 
 				linkids.insert(l);
@@ -1038,8 +1036,7 @@ protected:
 						tangent,
 						argc >= 6+N?GetFloat(argv[5+N]):1, // power
 						argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
-						argc >= 8+N?GetFloat(argv[7+N]):1e10, // Lmax
-						NULL,NULL,1
+						argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
 					);
 					linkids.insert(l);
 					link.insert(id_link++,l);
@@ -1062,8 +1059,7 @@ protected:
 					tangent,
 					argc >= 6+N?GetFloat(argv[5+N]):1, // power
 					argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
-					argc >= 8+N?GetFloat(argv[7+N]):1e10, // Lmax
-					NULL,NULL,1
+					argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
@@ -1085,8 +1081,7 @@ protected:
 					tangent,					// tangential
 					argc >= 6+N?GetFloat(argv[5+N]):1, // power
 					argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
-					argc >= 8+N?GetFloat(argv[7+N]):1e10, // Lmax
-					NULL,NULL,1
+					argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
@@ -1111,8 +1106,7 @@ protected:
 				tangent,					// tangential
 				argc >= 6+N?GetFloat(argv[5+N]):1, // power
 				argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
-				argc >= 8+N?GetFloat(argv[7+N]):1e10, // Lmax
-				NULL,NULL,1
+				argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
 			);
 			linkids.insert(l);
 			link.insert(id_link++,l);
@@ -1124,8 +1118,8 @@ protected:
 	// Id, *mass1, *mass2, k_tabname/K1, d_tabname/D1, l_tab
 	void m_tablink(int argc,t_atom *argv) 
 	{
-		if (argc != 6) {
-			error("%s - %s Syntax : Id No/Idmass1 No/Idmass2 ktab dtab ltab",thisName(),GetString(thisTag()));
+		if (argc != 7) {
+			error("%s - %s Syntax : Id No/Idmass1 No/Idmass2 ktab lk dtab ld",thisName(),GetString(thisTag()));
 			return;
 		}
 			// Searching exisiting buffers or create one.
@@ -1142,11 +1136,11 @@ protected:
 				else
 					bk = itk.data();
 			}
-			if (IsSymbol(argv[4])) { // D tab
+			if (IsSymbol(argv[5])) { // D tab
 				typename IDMap<t_buffer *>::iterator itd;
-				itd = buffersids.find(GetSymbol(argv[4]));
+				itd = buffersids.find(GetSymbol(argv[5]));
 				if(!itd) {
-					bd = new t_buffer(id_buffer,GetSymbol(argv[4]));
+					bd = new t_buffer(id_buffer,GetSymbol(argv[5]));
 					buffersids.insert(bd);
 					buffers.insert(id_buffer++,bd);
 				}
@@ -1165,14 +1159,15 @@ protected:
 						GetSymbol(argv[0]), // ID
 						it1.data(),it.data(), // pointer to mass1, mass2
 						IsSymbol(argv[3])?1:GetAFloat(argv[3]), // K1 = 1 if buffer
-						IsSymbol(argv[4])?1:GetAFloat(argv[4]), // D1
+						IsSymbol(argv[5])?1:GetAFloat(argv[5]), // D1
 						3,NULL,
 						1, // power
 						0, // Lmin
 						1e10, // Lmax
 						IsSymbol(argv[3])?bk:NULL,	// k_tabname 	
-						IsSymbol(argv[4])?bd:NULL, // d_tabname
-						GetAFloat(argv[5]) // l_tab
+						GetAFloat(argv[4]), // l_tab
+						IsSymbol(argv[5])?bd:NULL, // d_tabname
+						GetAFloat(argv[6]) // l_tab2
 					);
 					linkids.insert(l);
 					link.insert(id_link++,l);
@@ -1190,14 +1185,15 @@ protected:
 						GetSymbol(argv[0]), // ID
 						mass1,it.data(), // pointer to mass1, mass2
 						IsSymbol(argv[3])?1:GetAFloat(argv[3]), // K1 = 1 if buffer
-						IsSymbol(argv[4])?1:GetAFloat(argv[4]), // D1
+						IsSymbol(argv[5])?1:GetAFloat(argv[5]), // D1
 						3,NULL,
 						1, // power
 						0, // Lmin
 						1e10, // Lmax
 						IsSymbol(argv[3])?bk:NULL,	// k_tabname 	
-						IsSymbol(argv[4])?bd:NULL, // d_tabname
-						GetAFloat(argv[5]) // l_tab
+						GetAFloat(argv[4]), // l_tab
+						IsSymbol(argv[5])?bd:NULL, // d_tabname
+						GetAFloat(argv[6]) // l_tab2
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
@@ -1214,14 +1210,15 @@ protected:
 						GetSymbol(argv[0]), // ID
 						it1.data(),mass2, // pointer to mass1, mass2
 						IsSymbol(argv[3])?1:GetAFloat(argv[3]), // K1 = 1 if buffer
-						IsSymbol(argv[4])?1:GetAFloat(argv[4]), // D1
+						IsSymbol(argv[5])?1:GetAFloat(argv[5]), // D1
 						3,NULL,
 						1, // power
 						0, // Lmin
 						1e10, // Lmax
 						IsSymbol(argv[3])?bk:NULL,	// k_tabname 	
-						IsSymbol(argv[4])?bd:NULL, // d_tabname
-						GetAFloat(argv[5]) // l_tab
+						GetAFloat(argv[4]), // l_tab
+						IsSymbol(argv[5])?bd:NULL, // d_tabname
+						GetAFloat(argv[6]) // l_tab2
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
@@ -1242,14 +1239,15 @@ protected:
 						GetSymbol(argv[0]), // ID
 						mass1,mass2, // pointer to mass1, mass2
 						IsSymbol(argv[3])?1:GetAFloat(argv[3]), // K1 = 1 if buffer
-						IsSymbol(argv[4])?1:GetAFloat(argv[4]), // D1
+						IsSymbol(argv[5])?1:GetAFloat(argv[5]), // D1
 						3,NULL,
 						1, // power
 						0, // Lmin
 						1e10, // Lmax
 						IsSymbol(argv[3])?bk:NULL,	// k_tabname 	
-						IsSymbol(argv[4])?bd:NULL, // d_tabname
-						GetAFloat(argv[5]) // l_tab
+						GetAFloat(argv[4]), // l_tab
+						IsSymbol(argv[5])?bd:NULL, // d_tabname
+						GetAFloat(argv[6]) // l_tab2
 			);
 
 			linkids.insert(l);
