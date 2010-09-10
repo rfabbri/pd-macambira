@@ -61,6 +61,74 @@ inline t_float sqr(t_float x) { return x*x; }
 
 template<int N> class Link;
 
+class t_buffer
+{
+public:
+	t_int nbr;
+	const t_symbol *Id;
+	const t_symbol *buf_name;
+	flext::buffer *buf;
+	bool tested;
+	t_int size;
+
+	t_buffer(t_int n,const t_symbol *id):nbr(n),Id(id) {
+		buf = new flext::buffer(Id);
+		tested=true;
+		if(!buf->Ok()) {
+   			post("error : buffer %s is currently not valid!", *Id); 
+   			tested = false;
+		}
+	}
+	
+	~t_buffer() {
+		if(buf) {
+			delete buf;
+			buf=NULL;
+			Id=NULL;
+		}
+	}	
+	
+	inline void buffer_test() {
+		if(!buf || !buf->Valid()) { 
+  			post("no valid buffer defined"); 
+  			// return zero length 
+  			tested = false; 
+ 		}  
+ 		else { 
+  			if(buf->Update()) { 
+   			// buffer parameters have been updated 
+   				if(buf->Valid()) { 
+    				post("updated buffer reference"); 
+    				tested = true; 
+   				} 
+   				else { 
+    				post("buffer has become invalid"); 
+    				tested = false; 
+   				}
+   			}  
+  			else 
+   				tested = true;
+ 		}	   
+ 	}
+ 	
+ 	inline t_float interp_buf(t_float indexf, t_float factor) {
+		t_float size_buf=buf->Frames();
+		t_float index_factor = indexf*(size_buf-1)/factor;
+		if (index_factor > size_buf - 1)
+			return buf->Data()[(int)size_buf - 1];
+		else if (index_factor < 0)
+			return buf->Data()[0];
+		else {
+			t_int index = floor(index_factor);
+			t_float interp = index_factor - (float)index;
+			if (index==index_factor)
+				return buf->Data()[index];
+			else 
+				return interp * buf->Data()[index] + (1-interp) * buf->Data()[index+1];
+		}
+	}
+};
+
 template<int N> 
 class LinkList
 	: public std::vector<Link<N> *>
@@ -179,23 +247,23 @@ public:
 	flext::buffer *k_tab, *d_tab;
 	t_float l_tab;
 	t_int buffer_tested;
+	t_buffer *k_buffer,*d_buffer;
 	
-	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1, t_int o=0, t_float tangent[N]=NULL,t_float pow=1, t_float lmin = 0,t_float lmax = 1e10,const t_symbol *ktab=NULL,const t_symbol *dtab=NULL, t_float ltab=1)
+	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1, t_int o=0, t_float tangent[N]=NULL,t_float pow=1, t_float lmin = 0,t_float lmax = 1e10,t_buffer *ktab=NULL,t_buffer *dtab=NULL, t_float ltab=1)
 	: nbr(n),Id(id)
 	, mass1(m1),mass2(m2)
 	, K1(k1),D1(d1),D2(0),link_type(o),puissance(pow)
 	, long_min(lmin),long_max(lmax)
-	, k_tabname(ktab), d_tabname(dtab), l_tab(ltab)
+	, l_tab(ltab)
 	, k_tab(NULL),d_tab(NULL)
 	, buffer_tested(1)
+	, k_buffer(ktab),d_buffer(dtab)
 	{
 		for (int i=0; i<N; i++)	{
 			tdirection1[i] = 0;
 			tdirection2[i] = 0;
 			}
-		if (link_type == 0)
-			distance_old = longueur = Mass<N>::dist(*mass1,*mass2); // L[n-1]
-		else if (link_type == 1)	{			// TANGENTIAL LINK
+		if (link_type == 1)	{			// TANGENTIAL LINK
 			t_float norme = 0;
 			for(int i = 0; i < N; ++i) 
 				norme += sqr(tangent[i]);
@@ -208,88 +276,90 @@ public:
 			distance_old  = sqrt(distance_old);
 			longueur = distance_old;
 		}
-		else if (link_type == 3) { // TAB LINK
-			distance_old = longueur = Mass<N>::dist(*mass1,*mass2);
-			if (k_tabname) {
-				if(k_tab)
-					delete k_tab;
-				k_tab = new flext::buffer(k_tabname);
-				if(!k_tab->Ok()) {
-   					post("error : buffer %s is currently not valid!", *k_tabname); 
-   					buffer_tested *= 0;
-				}
-   				buffer_tested *= buffer_test(k_tab);	
-			}
-			if (d_tabname) {
-				if(d_tab)
-					delete d_tab;
-				d_tab = new flext::buffer(d_tabname);
-				if(!d_tab->Ok()) { 
-   					post("error : buffer %s is currently not valid!", *d_tabname);
-   					buffer_tested *= 0;
-				}
-   				buffer_tested *= buffer_test(d_tab);	
-			}
-		}
+		else
+			distance_old = longueur = Mass<N>::dist(*mass1,*mass2); // L[n-1]
+//		else if (link_type == 3) { // TAB LINK
+//			distance_old = longueur = Mass<N>::dist(*mass1,*mass2);
+//			if (k_tabname) {
+//				if(k_tab)
+//					delete k_tab;
+//				k_tab = new flext::buffer(k_tabname);
+//				if(!k_tab->Ok()) {
+//   					post("error : buffer %s is currently not valid!", *k_tabname); 
+//   					buffer_tested *= 0;
+//				}
+//   				buffer_tested *= buffer_test(k_tab);	
+//			}
+//			if (d_tabname) {
+//				if(d_tab)
+//					delete d_tab;
+//				d_tab = new flext::buffer(d_tabname);
+//				if(!d_tab->Ok()) { 
+//   					post("error : buffer %s is currently not valid!", *d_tabname);
+//   					buffer_tested *= 0;
+//				}
+//   				buffer_tested *= buffer_test(d_tab);	
+//			}
+//		}
 		mass1->links.insert(this);
 		mass2->links.insert(this);
 	}
 	
 	~Link()
 	{
-		if(k_tab) {
-			delete k_tab;
-			k_tab = NULL;
-			k_tabname = NULL; 
-		}
-		if(d_tab) {
-			delete d_tab;
-			d_tab = NULL;
-			d_tabname = NULL; 
-		}
+//		if(k_tab) {
+//			delete k_tab;
+//			k_tab = NULL;
+//			k_tabname = NULL; 
+//		}
+//		if(d_tab) {
+//			delete d_tab;
+//			d_tab = NULL;
+//			d_tabname = NULL; 
+//		}
 		mass1->links.erase(this);
 		mass2->links.erase(this);
 	}
 	
-	inline t_int buffer_test(flext::buffer *buf) {
-		if(!buf || !buf->Valid()) { 
-  			post("no valid buffer defined"); 
-  			// return zero length 
-  			return 0; 
- 		}  
- 		else { 
-  			if(buf->Update()) { 
-   			// buffer parameters have been updated 
-   				if(buf->Valid()) { 
-    				post("updated buffer reference"); 
-    				return 1; 
-   				} 
-   				else { 
-    				post("buffer has become invalid"); 
-    				return 0; 
-   				}
-   			}  
-  			else 
-   				return 1;
- 		}	   
- 	} 
+//	inline t_int buffer_test(flext::buffer *buf) {
+//		if(!buf || !buf->Valid()) { 
+//  			post("no valid buffer defined"); 
+//  			// return zero length 
+//  			return 0; 
+// 		}  
+// 		else { 
+//  			if(buf->Update()) { 
+//   			// buffer parameters have been updated 
+//   				if(buf->Valid()) { 
+//    				post("updated buffer reference"); 
+//    				return 1; 
+//   				} 
+//   				else { 
+//    				post("buffer has become invalid"); 
+//    				return 0; 
+//   				}
+//   			}  
+//  			else 
+//   				return 1;
+// 		}	   
+// 	} 
 
-	inline t_float interp_buf(t_float indexf, flext::buffer *buf, t_float factor) {
-		t_float size_buf=buf->Frames();
-		t_float index_factor = indexf*(size_buf-1)/factor;
-		if (index_factor > size_buf - 1)
-			return buf->Data()[(int)size_buf - 1];
-		else if (index_factor < 0)
-			return buf->Data()[0];
-		else {
-			t_int index = floor(index_factor);
-			t_float interp = index_factor - (float)index;
-			if (index=index_factor)
-				return buf->Data()[index];
-			else 
-				return interp * buf->Data()[index] + (1-interp) * buf->Data()[index+1];
-		}
-	}
+//	inline t_float interp_buf(t_float indexf, flext::buffer *buf, t_float factor) {
+//		t_float size_buf=buf->Frames();
+//		t_float index_factor = indexf*(size_buf-1)/factor;
+//		if (index_factor > size_buf - 1)
+//			return buf->Data()[(int)size_buf - 1];
+//		else if (index_factor < 0)
+//			return buf->Data()[0];
+//		else {
+//			t_int index = floor(index_factor);
+//			t_float interp = index_factor - (float)index;
+//			if (index=index_factor)
+//				return buf->Data()[index];
+//			else 
+//				return interp * buf->Data()[index] + (1-interp) * buf->Data()[index+1];
+//		}
+//	}
 
 	// compute link forces
 	inline void compute() 
@@ -316,14 +386,15 @@ public:
 			}
 			else {	// Lmin < L < Lmax
 				// F[n] = k1 (L[n] - L[0])/L[n] + D1 (L[n] - L[n-1])/L[n]
-				if (link_type == 3 && buffer_tested) { // tabLink
+				if (link_type == 3 ) {//&& buffer_tested) { // tabLink
 					t_float k_temp = distance-longueur;
-					if (k_tabname) {
-						k_temp = interp_buf(distance,k_tab,l_tab);
+					if (k_buffer && k_buffer->tested) {
+						//k_temp = interp_buf(distance,k_tab,l_tab);
+						k_temp = k_buffer->interp_buf(distance,l_tab);
 					}	
 					t_float d_temp = distance-distance_old;	
-					if (d_tabname) {
-						d_temp = interp_buf(distance-distance_old,d_tab,l_tab);
+					if (d_buffer && d_buffer->tested) {
+						d_temp = (distance-distance_old) * d_buffer->interp_buf(distance,l_tab);
 					}
 					F = (K1*k_temp + D1*d_temp)/distance; 
 				}
@@ -358,6 +429,7 @@ public:
 		}
 	}
 };
+
 
 
 template <typename T>
@@ -484,9 +556,11 @@ protected:
 	IDMap<t_link *> linkids;		// links by name
 	IndexMap<t_mass *> mass;		// masses
 	IDMap<t_mass *> massids;		// masses by name
-	
+	IndexMap<t_buffer *> buffers;		// buffers
+	IDMap<t_buffer *> buffersids;		// buffers by name
+		
 	t_float limit[N][2];			// Limit values
-	unsigned int id_mass, id_link, mouse_grab, nearest_mass, link_deleted, mass_deleted;
+	unsigned int id_mass, id_link, id_buffer, mouse_grab, nearest_mass, link_deleted, mass_deleted;
 
 // ---------------------------------------------------------------  RESET 
 // ----------------------------------------------------------------------
@@ -1047,13 +1121,39 @@ protected:
 	}
 
 	// add a tab link
-	// Id, *mass1, *mass2, k_tabname, d_tabname, l_tab
+	// Id, *mass1, *mass2, k_tabname/K1, d_tabname/D1, l_tab
 	void m_tablink(int argc,t_atom *argv) 
 	{
 		if (argc != 6) {
 			error("%s - %s Syntax : Id No/Idmass1 No/Idmass2 ktab dtab ltab",thisName(),GetString(thisTag()));
 			return;
 		}
+			// Searching exisiting buffers or create one.
+			t_buffer *bk,*bd;
+
+			if (IsSymbol(argv[3])) { // K tab
+				typename IDMap<t_buffer *>::iterator itk;
+				itk = buffersids.find(GetSymbol(argv[3]));
+				if(!itk) {
+					bk = new t_buffer(id_buffer,GetSymbol(argv[3]));
+					buffersids.insert(bk);
+					buffers.insert(id_buffer++,bk);
+				}
+				else
+					bk = itk.data();
+			}
+			if (IsSymbol(argv[4])) { // D tab
+				typename IDMap<t_buffer *>::iterator itd;
+				itd = buffersids.find(GetSymbol(argv[4]));
+				if(!itd) {
+					bd = new t_buffer(id_buffer,GetSymbol(argv[4]));
+					buffersids.insert(bd);
+					buffers.insert(id_buffer++,bd);
+				}
+				else
+					bd = itd.data();
+			}
+			
 		if (IsSymbol(argv[1]) && IsSymbol(argv[2]))	{		// ID & ID
 			typename IDMap<t_mass *>::iterator it1,it2,it;
 			it1 = massids.find(GetSymbol(argv[1]));
@@ -1070,8 +1170,8 @@ protected:
 						1, // power
 						0, // Lmin
 						1e10, // Lmax
-						IsSymbol(argv[3])?GetSymbol(argv[3]):NULL,	// k_tabname 	
-						IsSymbol(argv[4])?GetSymbol(argv[4]):NULL, // d_tabname
+						IsSymbol(argv[3])?bk:NULL,	// k_tabname 	
+						IsSymbol(argv[4])?bd:NULL, // d_tabname
 						GetAFloat(argv[5]) // l_tab
 					);
 					linkids.insert(l);
@@ -1095,8 +1195,8 @@ protected:
 						1, // power
 						0, // Lmin
 						1e10, // Lmax
-						IsSymbol(argv[3])?GetSymbol(argv[3]):NULL,	// k_tabname 	
-						IsSymbol(argv[4])?GetSymbol(argv[4]):NULL, // d_tabname
+						IsSymbol(argv[3])?bk:NULL,	// k_tabname 	
+						IsSymbol(argv[4])?bd:NULL, // d_tabname
 						GetAFloat(argv[5]) // l_tab
 				);
 				linkids.insert(l);
@@ -1119,8 +1219,8 @@ protected:
 						1, // power
 						0, // Lmin
 						1e10, // Lmax
-						IsSymbol(argv[3])?GetSymbol(argv[3]):NULL,	// k_tabname 	
-						IsSymbol(argv[4])?GetSymbol(argv[4]):NULL, // d_tabname
+						IsSymbol(argv[3])?bk:NULL,	// k_tabname 	
+						IsSymbol(argv[4])?bd:NULL, // d_tabname
 						GetAFloat(argv[5]) // l_tab
 				);
 				linkids.insert(l);
@@ -1136,7 +1236,7 @@ protected:
 				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
 				return;
 			}
-	
+					
 			t_link *l = new t_link(
 						id_link,
 						GetSymbol(argv[0]), // ID
@@ -1147,8 +1247,8 @@ protected:
 						1, // power
 						0, // Lmin
 						1e10, // Lmax
-						IsSymbol(argv[3])?GetSymbol(argv[3]):NULL,	// k_tabname 	
-						IsSymbol(argv[4])?GetSymbol(argv[4]):NULL, // d_tabname
+						IsSymbol(argv[3])?bk:NULL,	// k_tabname 	
+						IsSymbol(argv[4])?bd:NULL, // d_tabname
 						GetAFloat(argv[5]) // l_tab
 			);
 
@@ -1911,13 +2011,16 @@ private:
 
 	void clear()
 	{
+		buffersids.reset();
+		buffers.reset();
+		
 		linkids.reset();
 		link.reset();
 
 		massids.reset();
 		mass.reset();
 		// Reset state variables 		
-		id_mass = id_link = mouse_grab = mass_deleted = link_deleted = 0;
+		id_mass = id_link = id_buffer = mouse_grab = mass_deleted = link_deleted = 0;
 	}
 	
 	void deletelink(t_link *l)
@@ -1947,8 +2050,8 @@ private:
 		SetSymbol((sortie[1]),l->Id);
 		SetInt((sortie[2]),l->mass1->nbr);
 		SetInt((sortie[3]),l->mass2->nbr);
-		l->k_tabname?SetSymbol(sortie[4],l->k_tabname):SetFloat((sortie[4]),l->K1);
-		l->d_tabname?SetSymbol(sortie[5],l->d_tabname):SetFloat((sortie[5]),l->D1);
+		l->k_buffer?SetSymbol(sortie[4],l->k_buffer->Id):SetFloat((sortie[4]),l->K1);
+		l->d_buffer?SetSymbol(sortie[5],l->d_buffer->Id):SetFloat((sortie[5]),l->D1);
 		if (l->link_type == 1 ||(l->link_type == 2 && N ==2))	{
 			for (int i=0; i<N; i++)
 				SetFloat((sortie[6+i]),l->tdirection1[i]);
