@@ -163,9 +163,7 @@ public:
 
 template<int N>
 class Link
-//public flext_base  
 {
-//	FLEXT_HEADER(Link,flext_base)
 	
 public:
 	t_int nbr;
@@ -181,7 +179,7 @@ public:
 	flext::buffer *k_tab, *d_tab;
 	t_float l_tab;
 	
-	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1, t_int o=0, t_float tangent[N]=NULL,t_float pow=1, t_float lmin = 0,t_float lmax = 1e10,const t_symbol *ktab=NULL,const t_symbol *dtab=NULL, t_int ltab=1)
+	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1, t_int o=0, t_float tangent[N]=NULL,t_float pow=1, t_float lmin = 0,t_float lmax = 1e10,const t_symbol *ktab=NULL,const t_symbol *dtab=NULL, t_float ltab=1)
 		: nbr(n),Id(id)
 		, mass1(m1),mass2(m2)
 		, K1(k1),D1(d1),D2(0),link_type(o),puissance(pow)
