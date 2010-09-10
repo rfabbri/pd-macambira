@@ -7,7 +7,7 @@ AC_HEADER_STDC
 dnl TAG REPO WHEN RELEASE VERSION CHANGES !!!
 dnl After changing version, do "make mrproper ; sh bootstrap"
 
-PDP_VERSION=0.12.6
+PDP_VERSION=0.12.7-svn
 
 
 
