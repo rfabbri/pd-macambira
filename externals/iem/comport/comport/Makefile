@@ -21,7 +21,7 @@ MANUAL =
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = CHANGES.txt comport.dsp comport.dsw comport-stress-test.pd
+EXTRA_DIST = CHANGES.txt comport.dsp comport.dsw comport-stress-test.pd makefile_win
 
 
 
