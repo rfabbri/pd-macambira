@@ -12,4 +12,4 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
 Description: a Pd object to report the size of an array
  This provides a simple object for Pure Data that reports the size of an array
- by name.
+ by name.  For historical reasons, it is packaged as a standalone object
