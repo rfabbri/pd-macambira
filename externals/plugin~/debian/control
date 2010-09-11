@@ -10,6 +10,7 @@ Homepage: http://puredata.info
 Package: pd-plugin
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Suggests: ladspa-sdk, invada-studio-plugins-ladspa, rubberband-ladspa
 Description: LADSPA and VST plug-in hosting for Pd
  This is a Pd tilde object for hosting LADSPA audio plug-ins. The
  LADSPA plug-in interface is supported completely. The object will
