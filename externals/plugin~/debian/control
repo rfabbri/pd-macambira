@@ -3,14 +3,25 @@ Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Hans-Christoph Steiner <hans@eds.org>
-Build-Depends: debhelper (>= 7.0.50~), puredata, ladspa-sdk
+Build-Depends: debhelper (>= 7.0.50~),
+               ladspa-sdk,
+               puredata
 Standards-Version: 3.9.1
 Homepage: http://puredata.info
 
 Package: pd-plugin
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
-Suggests: tap-plugins, cmt, fil-plugins, amb-plugins, caps, ladspa-sdk, mcp-plugins, omins, invada-studio-plugins-ladspa, rubberband-ladspa
+Recommends: ladspa-sdk
+Suggests: amb-plugins, 
+          caps, 
+          cmt,
+          fil-plugins, 
+          invada-studio-plugins-ladspa, 
+          mcp-plugins, 
+          omins, 
+          rubberband-ladspa, 
+          tap-plugins
 Description: LADSPA and VST plug-in hosting for Pd
  This is a Pd tilde object for hosting LADSPA audio plug-ins. The
  LADSPA plug-in interface is supported completely. The object will
