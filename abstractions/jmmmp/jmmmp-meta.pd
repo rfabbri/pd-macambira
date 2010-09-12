@@ -5,5 +5,5 @@
 #X text 10 50 AUTHOR Joao Miguel Pais <jmmmpais@googlemail.com>;
 #X text 10 70 DESCRIPTION ;
 #X text 10 90 LICENSE BSD;
-#X text 10 110 VERSION 0.2-svn;
+#X text 10 110 VERSION 0.2;
 #X restore 10 10 pd META;
