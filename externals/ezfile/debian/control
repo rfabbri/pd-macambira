@@ -10,4 +10,5 @@ Homepage: http://puredata.info
 Package: pd-ezfile
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: 

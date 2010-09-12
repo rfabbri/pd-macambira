@@ -10,6 +10,7 @@ Homepage: http://www.weiss-archiv.de/pure-data.htm
 Package: pd-sigpack
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: signal processing effects library for Pd
  A collection of objects for Pd from weiss-archiv that mostly provide some
  signal processing functions like limiting, distortion, etc. They are called

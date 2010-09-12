@@ -10,6 +10,7 @@ Homepage: http://puredata.info
 Package: pd-hcs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: a random grabbag of Pd objects by Hans-Christoph Steiner
  The 'hcs' library is a random grabbag of objects that are experiments
  that sometimes lead to full-fledged libraries.  There are objects for

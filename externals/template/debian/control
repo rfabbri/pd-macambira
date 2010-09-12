@@ -11,4 +11,5 @@ Package: pd-template
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
 Recommends: pd-libdir
+Recommends: pd-libdir
 Description: 

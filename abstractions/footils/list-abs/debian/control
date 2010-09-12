@@ -10,6 +10,7 @@ Homepage: http://puredata.info
 Package: pd-list-abs
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: a library of list operations for Pd
  list-abs is a Pd library of all sorts of operations for lists of data,
  ranging from mathematics, sorting, ranging, etc.  All of the objects are

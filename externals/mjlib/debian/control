@@ -10,6 +10,7 @@ Homepage: http://puredata.info
 Package: pd-mjlib
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: library of Pd objects for composing music
  A library of objects for composing music written by Mark Williamson.
  .

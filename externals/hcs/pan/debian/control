@@ -10,6 +10,7 @@ Homepage: http://puredata.info
 Package: pd-pan
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: a library of stereo panning algorithms for Pd
  A library of stereo panning algorithms from various sources, including equal
  power panning and linear panning.

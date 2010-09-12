@@ -10,6 +10,7 @@ Homepage: http://puredata.info
 Package: pd-ekext
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: Pd objects for music information retrieval and polyphony control
  This library is a collection of objects for analyzing audio to get musical
  information, like spectrum and peak information, to generate sound based on

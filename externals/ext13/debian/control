@@ -10,6 +10,7 @@ Homepage: http://puredata.info
 Package: pd-ext13
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: a collection of objects for Pd by dieb13
  this ist ext13, a collection of externals for pd
  most of the code comes from other pd-object or externals

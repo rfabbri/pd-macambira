@@ -10,6 +10,7 @@ Homepage: http://puredata.info
 Package: pd-maxlib
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: a Pd library for analysing musical performance
  maxlib is a library of non-tilde externals for Pd. The objects can be very
  useful to analyse any musical performance. Some of the objects are 'borrowed'

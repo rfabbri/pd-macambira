@@ -10,6 +10,7 @@ Homepage: http://puredata.info
 Package: pd-markex
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: a library Pd of misc objects from Mark Danks
  Markex is an external library of miscellaneous objects that was begun in 1994
  and originally included in GEM.  It is largely here for the sake of old

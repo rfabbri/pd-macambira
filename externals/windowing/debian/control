@@ -10,6 +10,7 @@ Homepage: http://crca.ucsd.edu/~jsarlo/pd/
 Package: pd-windowing
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Recommends: pd-libdir
 Description: a library of windowing functions in Pd
  The windowing library provides Pd objects for a list of standard windowing
  functions, which are applied per block with each DSP tick: Hanning, Hamming,
