@@ -201,8 +201,8 @@ install-doc:
 	$(INSTALL_DATA) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
 	$(INSTALL_DATA) LICENSE.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
 # added for this lib
-	$(INSTALL_DIR) $(DISTDIR)/$(objectsdir)/$(LIBRARY_NAME)/icons
-	$(INSTALL_FILE) icons/*.* $(DISTDIR)/$(objectsdir)/$(LIBRARY_NAME)/icons
+	$(INSTALL_DIR) $(DESTDIR)/$(objectsdir)/$(LIBRARY_NAME)/icons
+	$(INSTALL_DATA) icons/*.* $(DESTDIR)/$(objectsdir)/$(LIBRARY_NAME)/icons
 
 install-examples:
 	test -z "$(strip $(EXAMPLES))" || \
@@ -274,6 +274,10 @@ dist: $(DISTDIR)
 		for file in $(MANUAL); do \
 			$(INSTALL_DATA) manual/$$file $(DISTDIR)/manual; \
 		done
+# added for this lib
+	$(INSTALL_DIR) $(DISTDIR)/icons
+	$(INSTALL_DATA) icons/*.* $(DISTDIR)/icons
+# make the tarball
 	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
 
 # make a Debian source package
