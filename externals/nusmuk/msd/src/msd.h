@@ -4,13 +4,10 @@
  msd - mass spring damper model for Pure Data or Max/MSP
 
  Copyright (C) 2005  Nicolas Montgermont
- Written by Nicolas Montgermont for a Master's train in Acoustic,
- Signal processing and Computing Applied to Music (ATIAM, Paris 6) 
- at La Kitchen supervised by Cyrille Henry.
- 
+ Written by Nicolas Montgermont 
  Optimized by Thomas Grill for Flext
- Based on Pure Data by Miller Puckette and others
  Based on pmpd by Cyrille Henry 
+ Based on Pure Data by Miller Puckette and others
 
  Contact : Nicolas Montgermont, nicolas_montgermont @ yahoo dot fr
 	   Cyrille Henry, Cyrille.Henry @ la-kitchen dot fr
@@ -29,7 +26,7 @@
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
- Version 0.08 -- 26.07.2006
+ Version 0.09 -- 12.09.2010
 */
 
 // include flext header
@@ -40,7 +37,7 @@
 #include <vector>
 
 // define constants
-#define MSD_VERSION  0.07
+#define MSD_VERSION  0.09
 #define PI  3.1415926535
 
 // check for appropriate flext version
@@ -61,12 +58,10 @@ inline t_float sqr(t_float x) { return x*x; }
 
 template<int N> class Link;
 
-class t_buffer
-{
+class t_buffer {
 public:
 	t_int nbr;
 	const t_symbol *Id;
-	const t_symbol *buf_name;
 	flext::buffer *buf;
 	bool tested;
 	t_int size;
@@ -89,9 +84,12 @@ public:
 	}	
 	
 	inline void buffer_test() {
-		if(!buf || !buf->Valid()) { 
-  			post("no valid buffer defined"); 
-  			// return zero length 
+		if(!buf || !buf->Ok() ) {
+			post("no %s table",*Id); 
+  			tested = false;
+			} 
+		else if(!buf->Valid()) { 
+  			post("no valid %s table",*Id); 
   			tested = false; 
  		}  
  		else { 
@@ -130,9 +128,7 @@ public:
 };
 
 template<int N> 
-class LinkList
-	: public std::vector<Link<N> *>
-{
+class LinkList	: public std::vector<Link<N> *> {
 public:
 	void insert(Link<N> *l) 
 	{
@@ -230,8 +226,7 @@ public:
 };
 
 template<int N>
-class Link
-{
+class Link {
 	
 public:
 	t_int nbr;
@@ -358,8 +353,7 @@ public:
 
 
 template <typename T>
-inline T bitrev(T k) 
-{
+inline T bitrev(T k) {
 	T r = 0;
 	for(int i = 0; i < sizeof(k)*8; ++i) r = (r<<1)|(k&1),k >>= 1;
 	return r;
@@ -367,9 +361,7 @@ inline T bitrev(T k)
 
 // use bit-reversed key to pseudo-balance the map tree
 template <typename T>
-class IndexMap
-	: TablePtrMap<unsigned int,T,64>
-{
+class IndexMap : TablePtrMap<unsigned int,T,64> {
 public:
 	typedef TablePtrMap<unsigned int,T,64> Parent;
 	
@@ -401,9 +393,7 @@ public:
 };
 
 template <typename T>
-class IDMap
-	: TablePtrMap<const t_symbol *,TablePtrMap<T,T,4> *,4>
-{
+class IDMap	: TablePtrMap<const t_symbol *,TablePtrMap<T,T,4> *,4> {
 public:
 	// that's the container holding the data items (masses, links) of one ID
 	typedef TablePtrMap<T,T,4> Container;
@@ -449,16 +439,12 @@ public:
 
 
 template<int N>
-class msdN:
-	public flext_base
-{
+class msdN:	public flext_base {
 	FLEXT_HEADER_S(msdN,flext_base,setup)	//class with setup
  
 public:
 	// constructor with no arguments
-	msdN(int argc,t_atom *argv)
-		: id_mass(0),id_link(0)
-	{
+	msdN(int argc,t_atom *argv)		: id_mass(0),id_link(0) {
 		for(int i = 0; i < N; ++i) limit[i][0] = -1.e10,limit[i][1] = 1.e10;
 	
 		// --- define inlets and outlets ---
@@ -489,8 +475,7 @@ protected:
 
 // ---------------------------------------------------------------  RESET 
 // ----------------------------------------------------------------------
-	void m_reset() 
-	{ 
+	void m_reset() 	{ 
 		clear();
 		ToOutAnything(1,S_Reset,0,NULL);
 	}
@@ -498,8 +483,7 @@ protected:
 // --------------------------------------------------------------  COMPUTE 
 // -----------------------------------------------------------------------
 
-	void m_bang()
-	{
+	void m_bang()	{
 		// test all buffers
 		for (typename IndexMap<t_buffer *>::iterator bit(buffers); bit; ++bit) bit.data()->buffer_test();
 		
@@ -515,8 +499,7 @@ protected:
 
 	// add a mass
 	// Id, nbr, mobile, invM, speedX, posX, forceX
-	void m_mass(int argc,t_atom *argv) 
-	{
+	void m_mass(int argc,t_atom *argv) 	{
 		if(argc != 3+N) {
 			error("mass : Id mobile mass X%s%s",N >= 2?" Y":"",N >= 3?" Z":"");
 			return;
@@ -540,8 +523,7 @@ protected:
 	}
 
 	// add a force to mass(es) named Id or No
-	void m_force(int argc,t_atom *argv,int n) 
-	{
+	void m_force(int argc,t_atom *argv,int n)	{
 		if(argc != 2) {
 			error("%s - %s Syntax : Id/Nomass value",thisName(),GetString(thisTag()));
 			return;
@@ -585,8 +567,7 @@ protected:
 	 }
 
 	// displace mass(es) named Id or No to a certain position
-	void m_pos(int argc,t_atom *argv,int n) 
-	{
+	void m_pos(int argc,t_atom *argv,int n)	{
 		if(argc != 2) {
 			error("%s - %s Syntax : Id/Nomass value",thisName(),GetString(thisTag()));
 			return;
@@ -627,9 +608,9 @@ protected:
 		SetFloat(arglist[1],GetFloat(argv[2]));
 		m_pos(argc-1,arglist,GetAInt(argv[0])-1);
 	 }
+
 	// set mass to mobile
-	void m_set_mobile(int argc,t_atom *argv,bool mob = true) 
-	{
+	void m_set_mobile(int argc,t_atom *argv,bool mob = true) 	{
 		if (argc != 1) {
 			error("%s - %s Syntax : Id/Nomass",thisName(),GetString(thisTag()));
 			return;
@@ -657,8 +638,7 @@ protected:
 	inline void m_set_fixe(int argc,t_atom *argv) { m_set_mobile(argc,argv,false); }
 
 	// Delete mass
-	void m_delete_mass(int argc,t_atom *argv) 
-	{
+	void m_delete_mass(int argc,t_atom *argv)	{
 		if (argc != 1) {
 			error("%s - %s Syntax : Nomass",thisName(),GetString(thisTag()));
 			return;
@@ -683,10 +663,8 @@ protected:
 			error("%s - %s : Index not found",thisName(),GetString(thisTag()));
 	}
 
-
 	// set X,Y,Z min/max
-	void m_limit(int argc,t_atom *argv,int n,int i) 
-	{
+	void m_limit(int argc,t_atom *argv,int n,int i) 	{
 		if (argc != 1)
 			error("%s - %s Syntax : Value",thisName(),GetString(thisTag()));
 		else
@@ -723,9 +701,8 @@ protected:
 		m_limit(argc-1,arglist,GetAInt(argv[0])-1,1);
 	 }
 
-	// set Id of link(s) named Id or number No
-	void m_setMassId(int argc,t_atom *argv) 
-	{
+	// set Id of mass(s) named Id or number No
+	void m_setMassId(int argc,t_atom *argv) 	{
 		if (argc != 2) {
 			error("%s - %s Syntax : OldId/NoMass NewId",thisName(),GetString(thisTag()));
 			return;
@@ -746,9 +723,37 @@ protected:
 				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
 		}
 	}
+	
+	// set mass of mass(s) named Id or number No
+	void m_setM(int argc,t_atom *argv) {
+		if (argc != 2) {
+			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
+			return;
+		}
 
-	void m_grab_mass(int argc,t_atom *argv) 
-	{
+		const t_float ma = GetAFloat(argv[1]);
+
+		if(IsSymbol(argv[0])) {
+			typename IDMap<t_mass *>::iterator it;
+			//typename IDMap<t_link *>::iterator it;
+			for(it = massids.find(GetSymbol(argv[0])); it; ++it) {
+				it.data()->M = ma;
+				it.data()->invM = ma?1/ma:0.; 
+			}
+		}
+		else	{
+			t_mass *m = mass.find(GetAInt(argv[0]));
+			if(m) {
+				m->M = ma;
+				m->invM = ma?1/ma:0.;
+			}
+			else
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+		}
+	}
+
+	// grab nearest mass
+	void m_grab_mass(int argc,t_atom *argv) 	{
 	// grab nearest mass X Y
 		t_mass **mi;
 		t_float aux, distance;
@@ -803,8 +808,7 @@ protected:
 
 	// add a link
 	// Id, *mass1, *mass2, K1, D1, D2, (Lmin,Lmax)
-	void m_link(int argc,t_atom *argv) 
-	{
+	void m_link(int argc,t_atom *argv) 	{
 		if (argc < 5 || argc > 8) {
 			error("%s - %s Syntax : Id No/Idmass1 No/Idmass2 K D1 (pow Lmin Lmax)",thisName(),GetString(thisTag()));
 			return;
@@ -900,44 +904,14 @@ protected:
 			outlink(S_Link,l);
 		}
 	}
-	// add interactor link
+
+	// add interactor link (for compatibility)
 	// Id, Id masses1, Id masses2, K1, D1, D2, (Lmin, Lmax)
-	void m_ilink(int argc,t_atom *argv) 
-	{
-		if (argc < 6 || argc > 8) {
-			error("%s - %s Syntax : Id Idmass1 Idmass2 K D1 (pow Lmin Lmax)",thisName(),GetString(thisTag()));
-			return;
-		}
-
-		typename IDMap<t_mass *>::iterator it1,it2,it;
-		it1 = massids.find(GetSymbol(argv[1]));
-		it2 = massids.find(GetSymbol(argv[2]));
-
-		for(; it1; ++it1) {
-			for(it = it2; it; ++it) {
-				t_link *l = new t_link(
-					id_link,
-					GetSymbol(argv[0]), // ID
-					it1.data(),it.data(), // pointer to mass1, mass2
-					GetAFloat(argv[3]), // K1
-					GetAFloat(argv[4]), // D1
-					0,NULL,
-					argc >= 6?GetFloat(argv[5]):1, // power
-					argc >= 7?GetFloat(argv[6]):0,
-					argc >= 8?GetFloat(argv[7]):1e10
-				);
-
-				linkids.insert(l);
-				link.insert(id_link++,l);
-				outlink(S_iLink,l);
-			}
-		}
-	}
+	void m_ilink(int argc,t_atom *argv) {m_link(argc,argv);	}
 
 	// add a tangential link
 	// Id, *mass1, *mass2, K1, D1, D2, (Lmin,Lmax)
-	void m_tlink(int argc,t_atom *argv) 
-	{
+	void m_tlink(int argc,t_atom *argv) {
 		if (argc < 5+N || argc > 8+N) {
 			error("%s - %s Syntax : Id Nomass1 Nomass2 K D1 xa%s%s (pow Lmin Lmax)",thisName(),GetString(thisTag()),N >= 2?" ya":"",N >= 3?" za":"");
 			return;
@@ -1041,8 +1015,7 @@ protected:
 
 	// add a tab link
 	// Id, *mass1, *mass2, k_tabname/K1, d_tabname/D1, l_tab
-	void m_tablink(int argc,t_atom *argv) 
-	{
+	void m_tablink(int argc,t_atom *argv) {
 		if (argc != 7) {
 			error("%s - %s Syntax : Id No/Idmass1 No/Idmass2 ktab lk dtab ld",thisName(),GetString(thisTag()));
 			return;
@@ -1181,17 +1154,14 @@ protected:
 		}
 	}
 
-
 	// add a normal link
 	// Id, *mass1, *mass2, K1, D1, D2, (Lmin,Lmax)
-	void m_nlink(int argc,t_atom *argv) 
-	{
+	void m_nlink(int argc,t_atom *argv) {
 	// deprecated
 	}
 
 	// set Id of link(s) named Id or number No
-	void m_setLinkId(int argc,t_atom *argv) 
-	{
+	void m_setLinkId(int argc,t_atom *argv) {
 		if (argc != 2) {
 			error("%s - %s Syntax : OldId/NoLink NewId",thisName(),GetString(thisTag()));
 			return;
@@ -1214,8 +1184,7 @@ protected:
 	}
 
 	// set rigidity of link(s) named Id or number No
-	void m_setK(int argc,t_atom *argv) 
-	{
+	void m_setK(int argc,t_atom *argv) {
 		if (argc != 2) {
 			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
 			return;
@@ -1238,8 +1207,7 @@ protected:
 	}
 
 	// set damping of link(s) named Id or number No
-	void m_setD(int argc,t_atom *argv) 
-	{
+	void m_setD(int argc,t_atom *argv) {
 		if (argc != 2) {
 			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
 			return;
@@ -1262,8 +1230,7 @@ protected:
 	}
 	
 	// set max lenght of link(s) named Id or number No
-	void m_setLmax(int argc,t_atom *argv) 
-	{
+	void m_setLmax(int argc,t_atom *argv) {
 		if (argc != 2) {
 			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
 			return;
@@ -1288,8 +1255,7 @@ protected:
 	}
 
 	// set min lenght of link(s) named Id or number No
-	void m_setLmin(int argc,t_atom *argv) 
-	{
+	void m_setLmin(int argc,t_atom *argv) {
 		if (argc != 2) {
 			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
 			return;
@@ -1314,8 +1280,7 @@ protected:
 	}
 	
 	// set initial lenght of link(s) named Id or number No
-	void m_setL(int argc,t_atom *argv) 
-	{
+	void m_setL(int argc,t_atom *argv) {
 		if (argc != 2) {
 			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
 			return;
@@ -1340,30 +1305,33 @@ protected:
 				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
 		}
 	}
-
-	// set mass of mass(s) named Id or number No
-	void m_setM(int argc,t_atom *argv) 
-	{
+	
+	// set l_tab of tablink(s) named Id or number No
+	void m_setLtab(int argc,t_atom *argv) {
 		if (argc != 2) {
 			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
 			return;
 		}
 
-		const t_float ma = GetAFloat(argv[1]);
+		const t_float lon = GetAFloat(argv[1]);
 
 		if(IsSymbol(argv[0])) {
-			typename IDMap<t_mass *>::iterator it;
-			//typename IDMap<t_link *>::iterator it;
-			for(it = massids.find(GetSymbol(argv[0])); it; ++it) {
-				it.data()->M = ma;
-				it.data()->invM = ma?1/ma:0.; 
+			typename IDMap<t_link *>::iterator it;
+			for(it = linkids.find(GetSymbol(argv[0])); it; ++it) {
+				if(it.data()->link_type==3)
+					it.data()->l_tab = lon;
+				else
+					error("%s - %s : set Ltab is working only on tablink",thisName(),GetString(thisTag()));
 			}
 		}
 		else	{
-			t_mass *m = mass.find(GetAInt(argv[0]));
-			if(m) {
-				m->M = ma;
-				m->invM = ma?1/ma:0.;
+			t_link *l = link.find(GetAInt(argv[0]));
+			if(l) {
+				if(l->link_type==3)
+					l->l_tab = lon;
+				else
+					error("%s - %s : set Ltab is working only on tablink",thisName(),GetString(thisTag()));
+			
 			}
 			else
 				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
@@ -1371,8 +1339,7 @@ protected:
 	}
 	
 	// set damping of link(s) named Id
-	void m_setD2(int argc,t_atom *argv) 
-	{
+	void m_setD2(int argc,t_atom *argv) {
 		if (argc != 2) {
 			error("%s - %s Syntax : IdLink Value",thisName(),GetString(thisTag()));
 			return;
@@ -1385,8 +1352,7 @@ protected:
 	}
 
 	// Delete link
-	void m_delete_link(int argc,t_atom *argv) 
-	{
+	void m_delete_link(int argc,t_atom *argv) {
 		if (argc != 1) {
 			error("%s - %s Syntax : NtLink",thisName(),GetString(thisTag()));
 			return;
@@ -1408,8 +1374,7 @@ protected:
 // -------------------------------------------------------------------
 
 	// get attributes
-	void m_get(int argc,t_atom *argv)
-	{
+	void m_get(int argc,t_atom *argv) {
 		if(argc == 0) {
 			return;
 		}
@@ -1736,8 +1701,7 @@ protected:
 	}
 
 	// List of masses positions on first outlet
-	void m_mass_dumpl()
-	{
+	void m_mass_dumpl() {
 		if (mass_deleted ==0)	{
 			int sz = mass.size();
 			NEWARR(t_atom,sortie,sz*N);
@@ -1752,8 +1716,7 @@ protected:
 	}
 
 	// List of masses x positions on first outlet
-	void m_mass_dump_xl()
-	{	
+	void m_mass_dump_xl() {	
 		if (mass_deleted ==0)	{
 			int sz = mass.size();
 			NEWARR(t_atom,sortie,sz);
@@ -1768,8 +1731,7 @@ protected:
 	}
 
 	// List of masses y positions on first outlet
-	void m_mass_dump_yl()
-	{	
+	void m_mass_dump_yl() {	
 		if (mass_deleted ==0)	{
 			int sz = mass.size();
 			NEWARR(t_atom,sortie,sz);
@@ -1784,8 +1746,7 @@ protected:
 	}
 
 	// List of masses z positions on first outlet
-	void m_mass_dump_zl()
-	{	
+	void m_mass_dump_zl() {	
 		if (mass_deleted ==0)	{
 			int sz = mass.size();
 			NEWARR(t_atom,sortie,sz);
@@ -1800,8 +1761,7 @@ protected:
 	}
 
 	// List of masses forces on first outlet
-	void m_force_dumpl()
-	{	
+	void m_force_dumpl() {	
 		if (mass_deleted ==0)	{
 			int sz = mass.size();
 			NEWARR(t_atom,sortie,sz*N);
@@ -1816,8 +1776,7 @@ protected:
 	}
 
 	// List of masses and links infos on second outlet
-	void m_info_dumpl()
-	{	
+	void m_info_dumpl() {	
 		for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
 			outmass(S_Mass,mit.data());
 
@@ -1831,8 +1790,7 @@ protected:
 
 private:
 
-	void clear()
-	{
+	void clear() {
 		buffersids.reset();
 		buffers.reset();
 		
@@ -1845,16 +1803,14 @@ private:
 		id_mass = id_link = id_buffer = mouse_grab = mass_deleted = link_deleted = 0;
 	}
 	
-	void deletelink(t_link *l)
-	{
+	void deletelink(t_link *l) {
 		outlink(S_Link_deleted,l);
 		linkids.erase(l);
 		link.remove(l->nbr);
 		delete l;
 	}
 	
-	void outmass(const t_symbol *s,const t_mass *m)
-	{
+	void outmass(const t_symbol *s,const t_mass *m) {
 		t_atom sortie[4+N];
 		SetInt((sortie[0]),m->nbr);
 		SetSymbol((sortie[1]),m->Id);
@@ -1864,8 +1820,7 @@ private:
 		ToOutAnything(1,s,4+N,sortie);
 	}
 	
-	void outlink(const t_symbol *s,const t_link *l)
-	{
+	void outlink(const t_symbol *s,const t_link *l) {
 		t_atom sortie[15];
 		int size=6;
 		SetInt((sortie[0]),l->nbr);
@@ -1954,8 +1909,7 @@ private:
 	const static t_symbol *S_massesPosZL;
 	const static t_symbol *S_massesForcesL;
 
-	static void setup(t_classid c)
-	{
+	static void setup(t_classid c) {
 		S_Reset = MakeSymbol("Reset");
 		S_Mass = MakeSymbol("Mass");
 		S_Link = MakeSymbol("Link");
@@ -2041,6 +1995,7 @@ private:
 		FLEXT_CADDMETHOD_(c,0,"setK",m_setK);
 		FLEXT_CADDMETHOD_(c,0,"setD",m_setD);
 		FLEXT_CADDMETHOD_(c,0,"setL",m_setL);
+		FLEXT_CADDMETHOD_(c,0,"setLtab",m_setLtab);
 		FLEXT_CADDMETHOD_(c,0,"setLMin",m_setLmin);
 		FLEXT_CADDMETHOD_(c,0,"setLMax",m_setLmax);
 		FLEXT_CADDMETHOD_(c,0,"setM",m_setM);
@@ -2096,6 +2051,7 @@ private:
 	FLEXT_CALLBACK_V(m_setK)
 	FLEXT_CALLBACK_V(m_setD)
 	FLEXT_CALLBACK_V(m_setL)
+	FLEXT_CALLBACK_V(m_setLtab)
 	FLEXT_CALLBACK_V(m_setLmin)
 	FLEXT_CALLBACK_V(m_setLmax)
 	FLEXT_CALLBACK_V(m_setM)
