@@ -1,28 +1,30 @@
 ## Pd library template version 1.0.3
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
-LIBRARY_NAME = template
+LIBRARY_NAME = jmmmp
 
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically
-SOURCES = mycobject.c
+SOURCES = 
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = mypdobject.pd
+PDOBJECTS = but.pd clock.pd dacm~.pd datei-o.pd datei-r.pd datei-w.pd dsp01.pd f+.pd lbang.pd liner+~.pd liner~.pd m-i.pd maat~.pd mat~.pd metrum.pd met~.pd mk.pd oscD.pd oscS.pd rec-name.pd sguigot.pd sliders.pd snaps~.pd spectrogram~.pd stoppuhr.pd tastin.pd uhr.pd
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = bothtogether.pd
+EXAMPLES = 
 
 # manuals and related files, in the 'manual' subfolder
-MANUAL = manual.txt
+MANUAL = 
 
 # if you want to include any other files in the source and binary tarballs,
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = 
+EXTRA_DIST = appent.pd ardourjack-gui.pd array-edit.pd prepent.pd
 
+
+# NOTE: lines added below for 'icons' folder
 
 
 #------------------------------------------------------------------------------#
@@ -198,6 +200,9 @@ install-doc:
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_DATA) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
 	$(INSTALL_DATA) LICENSE.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
+# added for this lib
+	$(INSTALL_DIR) $(DISTDIR)/$(objectsdir)/$(LIBRARY_NAME)/icons
+	$(INSTALL_FILE) icons/*.* $(DISTDIR)/$(objectsdir)/$(LIBRARY_NAME)/icons
 
 install-examples:
 	test -z "$(strip $(EXAMPLES))" || \
