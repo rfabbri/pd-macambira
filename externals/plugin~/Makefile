@@ -23,7 +23,7 @@ MANUAL =
 # automatically included
 EXTRA_DIST = plugin~-gui.pd ChangeLog SConstruct jutils.h plugin~.h
 
-# special case: modified to build jload.c and jsearch.c and link it into plugin~
+# NOTE: modified to build jload.c and jsearch.c and link it into plugin~
 EXTRA_SOURCES = jsearch.c jload.c
 
 
@@ -217,6 +217,7 @@ install-manual:
 
 
 clean:
+	-rm -f -- $(EXTRA_SOURCES:.c=.o)
 	-rm -f -- $(SOURCES:.c=.o) $(SOURCES_LIB:.c=.o)
 	-rm -f -- $(SOURCES:.c=.$(EXTENSION))
 	-rm -f -- $(LIBRARY_NAME).o
