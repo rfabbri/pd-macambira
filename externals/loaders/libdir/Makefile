@@ -23,7 +23,7 @@ MANUAL =
 # automatically included
 EXTRA_DIST = TODO.txt
 
-
+# NOTE: removed help patch requirement, since this is a loader
 
 #------------------------------------------------------------------------------#
 #
@@ -193,9 +193,9 @@ single_install: $(LIBRARY_NAME) install-doc install-exec
 
 install-doc:
 	$(INSTALL_DIR) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
-	test -z "$(strip $(SOURCES) $(PDOBJECTS))" || \
-		$(INSTALL_DATA) $(HELPPATCHES) \
-			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
+#	test -z "$(strip $(SOURCES) $(PDOBJECTS))" || \
+#		$(INSTALL_DATA) $(HELPPATCHES) \
+#			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_DATA) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
 	$(INSTALL_DATA) LICENSE.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
 
@@ -232,14 +232,6 @@ distclean: clean
 $(DISTBINDIR):
 	$(INSTALL_DIR) $(DISTBINDIR)
 
-libdir: all $(DISTBINDIR)
-	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd  $(DISTBINDIR)
-	$(INSTALL_DATA) $(SOURCES)  $(DISTBINDIR)
-	$(INSTALL_DATA) $(HELPPATCHES) $(DISTBINDIR)
-	test -z "$(strip $(EXTRA_DIST))" || \
-		$(INSTALL_DATA) $(EXTRA_DIST)    $(DISTBINDIR)
-#	tar --exclude-vcs -czpf $(DISTBINDIR).tar.gz $(DISTBINDIR)
-
 $(DISTDIR):
 	$(INSTALL_DIR) $(DISTDIR)
 
@@ -255,7 +247,7 @@ dist: $(DISTDIR)
 		$(INSTALL_DATA) $(ALLSOURCES)  $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS)  $(DISTDIR)
-	test -z "$(strip $(HELPPATCHES))" || \
+#	test -z "$(strip $(HELPPATCHES))" || \
 		$(INSTALL_DATA) $(HELPPATCHES) $(DISTDIR)
 	test -z "$(strip $(EXTRA_DIST))" || \
 		$(INSTALL_DATA) $(EXTRA_DIST)    $(DISTDIR)
