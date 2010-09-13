@@ -15,12 +15,28 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X text 12 45 DESCRIPTION guidelines for writing help patches;
 #X restore 392 218 pd META;
 #N canvas 10 196 428 105 Related_objects 0;
-#X text 31 37 Hm...what to put here?;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -261106 -33289 0;
-#X text 7 2 Atoms- Related Objects;
+#X text 7 2 Writing Help Patches- Related Objects;
+#X obj 20 37 pddp/helplink pddp/pddplink;
+#X obj 20 57 pddp/helplink pddp/helplink;
+#X text 109 37 - link to other patches \, web pages \, or text files
+;
+#X text 109 57 - link to other objects' help patches;
 #X restore 103 218 pd Related_objects;
 #X obj 6 218 pddp/pddplink pddp/help.pd -text help;
-#X text 55 36 * pddplink and helplink;
-#X text 60 66 * pd META;
-#X text 75 114 This help file is unfinished.;
+#X text 380 121 * pddplink and helplink;
+#X text 380 100 * pd META;
+#X text 383 145 This help file is unfinished.;
+#X text 19 36 Legitimate Authorities;
+#X text 19 36 ______________________;
+#X text 18 151 2) Include a short example patch. Justification: it's
+the whole reason to make help files be Pd patches!;
+#X text 18 56 1) For object help patches \, do not automatically turn
+on audio when the patch opens. Justification: there is no way to detect
+how the help patch audio will interact with whatever the user is already
+doing (such as opening several help patches simultaneously). Since
+unexpected audio signals can damage equipment (and ears) it is best
+to let the user turn on audio at his/her leisure.;
+#X text 18 181 You can use pddp/helplink and pddp/pddplink. See the
+"Related_objects" subpatch below for more info:;

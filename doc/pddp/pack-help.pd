@@ -26,9 +26,9 @@ for Pd version 0.42.;
 #X text 12 245 RELEASE_DATE 1997;
 #X text 12 265 RELEASE_VERSION;
 #X restore 500 597 pd META;
-#X obj 0 396 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
+#X obj 0 394 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
-#X obj 0 461 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+#X obj 0 459 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
 0 13 -228856 -1 0;
 #X obj 0 565 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
 0 13 -228856 -1 0;
@@ -56,22 +56,19 @@ is:;
 #X restore 102 597 pd Related_objects;
 #X obj 78 120 cnv 17 3 225 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
-#X text 98 303 list;
-#X obj 78 403 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+#X text 98 266 list;
+#X obj 78 401 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
-#X obj 78 354 cnv 17 3 37 empty \$0-pddp.cnv.let.n n 5 9 0 16 -228856
+#X obj 78 350 cnv 17 3 37 empty \$0-pddp.cnv.let.n n 5 9 0 16 -228856
 -162280 0;
 #X obj 493 3 pack;
 #X obj 465 20 pddp/pddplink http://wiki.puredata.info/en/pack -text
 pdpedia: pack;
-#X text 98 198 symbol;
+#X text 98 186 symbol;
 #X text 98 119 bang;
-#X text 98 159 float;
-#X text 168 119 - a "bang" to the first inlet will force [pack] to
-output the current package (i.e. \, the list of values) without resetting
-any of them.;
-#X text 98 263 pointer;
-#X text 98 402 list;
+#X text 98 147 float;
+#X text 98 226 pointer;
+#X text 98 400 list;
 #N canvas 82 45 428 551 pack_peculiarities 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
@@ -118,8 +115,8 @@ an error.;
 #X connect 7 0 4 0;
 #X connect 11 0 13 0;
 #X connect 14 0 11 0;
-#X restore 171 546 pd pack_peculiarities;
-#X text 168 402 - [pack] will output its package (i.e. \, the list
+#X restore 171 545 pd pack_peculiarities;
+#X text 168 400 - [pack] will output its package (i.e. \, the list
 of values) when it receives a message to its left inlet.;
 #N canvas 72 44 466 546 Another_example_using_pack 0;
 #X text 181 97 is the same as;
@@ -174,40 +171,43 @@ force [pack] to output the entire package of stored values.;
 #X restore 101 573 pd Another_example_using_pack;
 #X obj 394 69 pack;
 #X obj 394 91 print;
-#X text 98 353 An inlet is created for each argument given to [pack].
-Each may store a float \, symbol \, or pointer \, depending on the
-argument given. Only the leftmost inlet will accept a list.;
 #X msg 432 46 2;
 #X floatatom 394 46 5 0 0 0 - - -;
-#X text 98 429 Note: [pack] may output a float \, symbol \, or pointer
+#X text 98 427 Note: [pack] may output a float \, symbol \, or pointer
 if only one argument is specified.;
 #X text 11 23 combine several atoms into one message;
 #X text 23 46 The [pack] object takes a series of inputs and then outputs
 a concatenated list. By default \, [pack] has two inlets \, each of
 which will accept a float.;
-#X text 168 159 - if the first argument is "float" \, "f" \, or a numeric
+#X text 168 147 - if the first argument is "float" \, "f" \, or a numeric
 value (e.g. \, "12" \, "3.4") the first element in the list will be
 set to the incoming value \, and [pack] will output its list.;
-#X text 168 303 - a list is distributed to among the inlets of [pack].
+#X text 168 266 - a list is distributed to among the inlets of [pack].
 Each element must match the atom-type specified by the creation arguments.
 Lists with more items than the total number of inlets will be truncated.
 ;
-#X text 168 263 - if the first argument is "pointer" or "p" \, an incoming
+#X text 168 226 - if the first argument is "pointer" or "p" \, an incoming
 pointer will be set to the first item in the list \, and [pack] will
 output its list.;
-#X text 168 198 - if the first argument is "symbol" or "s" \, an incoming
-symbol will be set to the first item in the list \, and [pack] will
-output its list. Symbol-atoms (like "foo") that lack the selector "symbol"
-are also accepted (but will be rejected for all additional inlets).
-;
-#X text 98 493 float;
-#X text 168 478 - the number of arguments determines the number of
+#X text 98 491 float;
+#X text 168 476 - the number of arguments determines the number of
 inlets (default is two). The symbols described under the "inlets" heading
 specify the atom-type of each inlet. You can also use a float to specify
 float-type while also initializing that inlet's value. Some peculiarities
 described below:;
-#X text 80 478 n) symbol atom;
+#X text 80 476 n) symbol atom;
 #X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X connect 23 0 24 0;
-#X connect 26 0 23 1;
-#X connect 27 0 23 0;
+#X text 168 186 - if the first argument is "symbol" or "s" \, an incoming
+symbol will be set to the first item in the list \, and [pack] will
+output its list.;
+#X text 98 319 anything;
+#X text 168 119 - a "bang" to the first inlet will force [pack] to
+output the current package (i.e. \, the list of values).;
+#X text 168 319 - an anything will be converted to a list and distributed
+in the same manner as a list.;
+#X text 98 348 An inlet is created for each argument given. Each may
+store a float \, symbol \, or pointer \, depending on the argument
+given. These inlets will not accept lists/anythings.;
+#X connect 22 0 23 0;
+#X connect 24 0 22 1;
+#X connect 25 0 22 0;

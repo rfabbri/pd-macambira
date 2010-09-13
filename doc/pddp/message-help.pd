@@ -26,9 +26,9 @@ bang_op;
 #X restore 500 597 pd META;
 #X obj 0 336 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
-#X obj 0 386 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+#X obj 0 387 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
 0 13 -228856 -1 0;
-#X obj 0 549 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
+#X obj 0 555 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
 0 13 -228856 -1 0;
 #N canvas 100 481 428 109 Related_objects 0;
 #X obj 116 43 list;
@@ -39,9 +39,9 @@ bang_op;
 #X obj 22 43 symbol;
 #X obj 72 43 float;
 #X restore 102 597 pd Related_objects;
-#X obj 78 200 cnv 17 3 125 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+#X obj 78 200 cnv 17 3 130 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
-#X obj 78 345 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+#X obj 78 345 cnv 17 3 35 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
 #X msg 482 3;
 #X obj 445 20 pddp/pddplink http://wiki.puredata.info/en/message -text
@@ -66,26 +66,26 @@ message should replace the variable in the outgoing message.;
 #X msg 23 106 list 24 48 72;
 #X text 83 131 replace "\$3" with the third element;
 #X text 84 145 of the incoming message ("72");
-#X msg 23 235 24 48 72;
-#X text 83 235 implicit list with three numbers;
-#X msg 23 258 pitch \$3;
-#X obj 23 280 print;
-#X text 83 258 third element is still "72";
+#X msg 23 236 24 48 72;
+#X text 83 236 implicit list with three numbers;
+#X msg 23 259 pitch \$3;
+#X obj 23 281 print;
+#X text 83 259 third element is still "72";
 #X text 20 303 It's important to note that you can't access the selector
 of the message using the dollarsign variables. (In the patch above
 \, "list" is the selector \, "24" is the first element \, and so on.)
 Keep this in mind when using custom selectors \, as in the following:
 ;
-#X msg 23 368 melody 67 67 67 63;
-#X text 153 369 In this message \, "melody" is the selector \,;
-#X text 153 384 and there are four elements (not five).;
-#X msg 23 404 pitch \$4;
+#X msg 23 373 melody 67 67 67 63;
+#X text 153 374 In this message \, "melody" is the selector \,;
+#X text 153 389 and there are four elements (not five).;
+#X msg 23 407 pitch \$4;
 #X obj 23 490 print;
-#X text 85 404 replace "\$4" with the fourth element ("63");
-#X msg 41 456 pitch \$5;
-#X msg 41 430 melody 65 65 65 62;
-#X text 163 435 this will output an error--;
-#X text 163 449 there is no 5th element!;
+#X text 85 407 replace "\$4" with the fourth element ("63");
+#X msg 41 459 pitch \$5;
+#X msg 41 433 melody 65 65 65 62;
+#X text 163 438 this will output an error--;
+#X text 163 452 there is no 5th element!;
 #X text 20 180 Remember that the selectors "list" and "float" can be
 omitted when the first atom in a message is a float. For example \,
 the following still works exactly as the patch above:;
@@ -104,7 +104,7 @@ the following still works exactly as the patch above:;
 #X connect 23 0 22 0;
 #X connect 29 0 30 0;
 #X connect 30 0 28 0;
-#X restore 171 457 pd dollarsign_variables;
+#X restore 171 463 pd dollarsign_variables;
 #X text 11 23 clickable message box;
 #X text 98 199 bang;
 #X text 98 213 float;
@@ -150,15 +150,15 @@ of messages boxes:;
 #X connect 11 0 23 0;
 #X connect 12 0 23 0;
 #X connect 13 0 23 0;
-#X restore 101 308 pd messages_for_changing_the_content_of_a_message_box
+#X restore 101 313 pd messages_for_changing_the_content_of_a_message_box
 ;
 #X text 98 344 anything;
 #X text 168 344 - a message box will output its message (replacing
 any dollar-sign variables with the relevant elements of the incoming
 message).;
-#X text 81 405 n) float;
-#X text 100 474 comma;
-#X text 100 508 semicolon;
+#X text 81 406 n) float;
+#X text 100 480 comma;
+#X text 100 515 semicolon;
 #N canvas 88 49 428 453 Using_Commas_in_Message_Boxes 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
@@ -196,7 +196,7 @@ next begins.;
 #X connect 12 0 13 0;
 #X connect 15 0 16 0;
 #X connect 16 0 17 0;
-#X restore 172 490 pd Using_Commas_in_Message_Boxes;
+#X restore 172 497 pd Using_Commas_in_Message_Boxes;
 #N canvas 82 29 428 495 Using_Semicolons_In_Message_Boxes 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
@@ -235,16 +235,16 @@ box:;
 #X connect 10 0 2 0;
 #X connect 12 0 9 0;
 #X connect 14 0 15 0;
-#X restore 172 526 pd Using_Semicolons_In_Message_Boxes;
+#X restore 172 533 pd Using_Semicolons_In_Message_Boxes;
 #X text 168 256 - other messages will cause the message box to send
 its message as output \, except for the "special messages" that are
 used to change the content of a message box. Click the subpatch below
 to view these "special messages":;
-#X text 168 474 - a comma may be used to separate multiple messages:
+#X text 168 480 - a comma may be used to separate multiple messages:
 ;
-#X text 178 508 - a semicolon may be used to send messages nonlocally:
+#X text 178 515 - a semicolon may be used to send messages nonlocally:
 ;
-#X text 168 405 - message boxes can contain any number of float and/or
+#X text 168 406 - message boxes can contain any number of float and/or
 symbol arguments. Message boxes may also contain special "dollar-sign
 variables" \, used to grab data from an incoming message. Click the
 subpatch below for more info:;
@@ -253,14 +253,14 @@ subpatch below for more info:;
 #X text 98 97 Clicking on a message also sends it \, so you can use
 messsage boxes as push buttons. For instance \, click here while watching
 the printout window:;
-#X text 100 420 symbol atom;
+#X text 100 421 symbol atom;
 #X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 100 553 pddp/pddplink all_about_messages.pd -text all_about_messages
+#X obj 100 559 pddp/pddplink all_about_messages.pd -text all_about_messages
 ;
-#X obj 100 568 pddp/pddplink all_about_symbol_construction.pd -text
+#X obj 100 574 pddp/pddplink all_about_symbol_construction.pd -text
 all_about_symbol_construction;
-#X obj 286 553 pddp/pddplink ../2.control.examples/04.messages.pd -text
+#X obj 286 559 pddp/pddplink ../2.control.examples/04.messages.pd -text
 doc/2.control.examples/04.messages.pd;
-#X obj 286 568 pddp/pddplink ../2.control.examples/10.more.messages.pd
+#X obj 286 574 pddp/pddplink ../2.control.examples/10.more.messages.pd
 -text doc/2.control.examples/10.more.messages.pd;
 #X connect 13 0 14 0;

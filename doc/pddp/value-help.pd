@@ -126,10 +126,6 @@ share the same name to the incoming value.;
 cause it to output its current value.;
 #X text 168 387 - the current value is output when a bang is received
 at the inlet.;
-#X text 168 439 - [value] takes one argument (a symbol) that is the
-name of the object. All [value] objects that share this name will have
-their values updated when I float is sent to the inlet of any of them.
-;
 #X text 98 229 All [value] objects with the same name receive the value
 (see subpatch below):;
 #X text 168 491 If no creation argument is given \, then the object
@@ -139,6 +135,11 @@ objects. See the help patches for [expr] \, [expr~] and [fexpr~] for
 more information.;
 #X text 80 439 1) symbol atom;
 #X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X text 168 439 - [value] takes one argument (a symbol) that is the
+name of the object. All [value] objects that share this name will have
+their values updated when a float is sent to the inlet of any of them.
+;
+#X obj 193 574 pddp/pddplink all_about_expr_and_value.pd;
 #X connect 22 0 24 0;
 #X connect 23 0 22 0;
 #X connect 25 0 22 0;
