@@ -9,7 +9,9 @@ Homepage: http://puredata.info
 
 Package: pd-purepd
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Depends: ${shlibs:Depends},
+         pd,
+         ${misc:Depends}
 Recommends: pd-libdir
 Description: a library of standard objects re-implemented using Pd-vanilla
  This is a library focused on re-implementing existing objects written in C

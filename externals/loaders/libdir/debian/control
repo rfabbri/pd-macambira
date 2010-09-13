@@ -3,13 +3,16 @@ Section: libs
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Hans-Christoph Steiner <hans@eds.org>
-Build-Depends: debhelper (>= 7.0.50~), puredata-dev
+Build-Depends: debhelper (>= 7.0.50~),
+               puredata-dev
 Standards-Version: 3.9.1
 Homepage: http://puredata.info
 
 Package: pd-libdir
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, pd
+Depends: ${shlibs:Depends},
+         pd,
+         ${misc:Depends}
 Recommends: pd-import
 Description: provides support for the libdir library format for Pd
  The 'libdir' loader is a Pure Data loader which supports the libdir
