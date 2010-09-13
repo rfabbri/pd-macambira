@@ -62,7 +62,7 @@ ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) 
 	         $(SOURCES_iphoneos) $(SOURCES_linux) $(SOURCES_windows)
 
 DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
-ORIGDIR=pd-$(LIBRARY_NAME:~=)_$(LIBRARY_VERSION)
+ORIGDIR=puredata-$(LIBRARY_NAME:~=)_$(LIBRARY_VERSION)
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
