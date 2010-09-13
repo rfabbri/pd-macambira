@@ -1,21 +1,7 @@
 #include "m_pd.h"
+#include "s_stuff.h"
+#include "g_canvas.h"
 #include <string.h>
-
-/* this includes things from g_canvas.h and s_stuff.h so it can build on
- * Debian, Ubuntu, etc. Currently, the pd packages only include m_pd.h */
-
-/* this is taken from g_canvas.h 0.43test2 */
-#define t_canvasenvironment struct _canvasenvironment
-EXTERN t_canvasenvironment *canvas_getenv(t_canvas *x);
-
-/* this is taken from s_stuff.h 0.43test2 */
-EXTERN int sys_load_lib(t_canvas *canvas, char *filename);
-extern t_symbol *sys_libdir;    /* library directory for auxilliary files */
-typedef struct _namelist    /* element in a linked list of stored strings */
-{
-    struct _namelist *nl_next;  /* next in list */
-    char *nl_string;            /* the string */
-} t_namelist;
 
 /* WARNING: KLUDGE!  */
 /*
@@ -29,7 +15,6 @@ struct _canvasenvironment
     int ce_dollarzero;     /* value of "$0" */
     t_namelist *ce_path;   /* search path */
 };
-
 
 static char *version = "1.3";
 
