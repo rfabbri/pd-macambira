@@ -5,6 +5,12 @@ Source: http://sourceforge.net/projects/pure-data/files/libraries/libdir/
 
 Copyright: 2006-2010, Hans-Christoph Steiner
 License: BSD
+
+Files: debian/patches/add_required_headers.patch
+Copyright: 1997-2009, Miller Puckette
+License: BSD
+
+License: BSD
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
