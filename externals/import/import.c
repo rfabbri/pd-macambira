@@ -1,13 +1,3 @@
-/*
- * This object loads libraries and libdirs from within a patch. It is the
- * first small step towards a patch-specific namespace.  Currently, it just
- * adds things to the global path.  It is a reimplementation of a similar/same
- * idea from Guenter Geiger's [using] object.   <hans@at.or.at>
- *
- * This object currently depends on the packages/patches/libdir-0.38-4.patch
- * for sys_load_lib_dir().
- */
-
 #include "m_pd.h"
 #include <string.h>
 
@@ -41,7 +31,7 @@ struct _canvasenvironment
 };
 
 
-static char *version = "$Revision: 1.2 $";
+static char *version = "1.3";
 
 t_int import_instance_count;
 
@@ -139,7 +129,7 @@ static void *import_new(t_symbol *s, int argc, t_atom *argv)
 	if(import_instance_count == 0) 
 	{
 		post("[import] %s",version);  
-		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
+		post("\twritten by Hans-Christoph Steiner <hans@eds.org>");
 		post("\tcompiled on "__DATE__" at "__TIME__ " ");
 		post("\tcompiled against Pd version %d.%d.%d", PD_MAJOR_VERSION, 
 			 PD_MINOR_VERSION, PD_BUGFIX_VERSION);
