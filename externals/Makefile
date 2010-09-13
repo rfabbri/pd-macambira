@@ -359,37 +359,15 @@ boids_clean:
 
 #------------------------------------------------------------------------------#
 # BSAYLOR
-BSAYLOR_NAME=bsaylor
-BSAYLOR_SRC := $(wildcard $(externals_src)/bsaylor/*~.c)
-BSAYLOR_OBJECTS := $(BSAYLOR_SRC:.c=.o)
-$(BSAYLOR_OBJECTS) : %.o : %.c
-	$(CC) $(CFLAGS) -O2 -funroll-loops -fomit-frame-pointer -o "$*.o" -c "$*.c"
+bsaylor:
+	make -C $(externals_src)/iem/bsaylor/bsaylor
 
-bsaylor: $(BSAYLOR_OBJECTS:.o=.$(EXTENSION))
-
-bsaylor_install: bsaylor
-	install -d $(DESTDIR)$(objectsdir)/$(BSAYLOR_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(BSAYLOR_NAME) \
-		--author "Benjamin R. Saylor <bensaylor@fastmail.fm>" \
-		--description "signal objects" \
-		--license "GNU GPL 2" \
-		--version ""
-	install -p $(BSAYLOR_SRC:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(BSAYLOR_NAME)
-	install -p $(externals_src)/bsaylor/help/*.pd \
-		$(DESTDIR)$(objectsdir)/$(BSAYLOR_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(BSAYLOR_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/bsaylor/README.txt \
-		$(DESTDIR)$(readmesdir)/$(BSAYLOR_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(BSAYLOR_NAME)
-#	install -p $(externals_src)/bsaylor/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(BSAYLOR_NAME)
+bsaylor_install:
+	make -C $(externals_src)/iem/bsaylor/bsaylor \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 bsaylor_clean:
-	-rm -f -- $(externals_src)/bsaylor/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/bsaylor/*.o
-	-rm -f -- $(externals_src)/bsaylor/*.bak
-	-rm -f -- $(externals_src)/bsaylor/*.*~
+	make -C $(externals_src)/iem/bsaylor/bsaylor clean
 
 
 #------------------------------------------------------------------------------#

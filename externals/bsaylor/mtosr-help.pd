@@ -1,0 +1,5 @@
+#N canvas 320 213 450 300 10;
+#X obj 177 104 mtosr;
+#X text 95 204 creation argument: samplerate at middle C.;
+#X text 46 145 takes midi note value and converts to a samplerate for
+sample playback.;

@@ -35,8 +35,8 @@
 #X text 26 44 version 0.2 \, August 12 \, 2005;
 #X text 258 43 [partconv~ <IR array> <partition size>];
 #X obj 126 426 partconv~ irL 2048;
-#X msg 419 283 read -resize noiseburst.wav irL;
-#X msg 419 307 read -resize noiseburst.wav irR;
+#X msg 419 283 read -resize examples/noiseburst.wav irL;
+#X msg 419 307 read -resize examples/noiseburst.wav irR;
 #X text 258 71 The partition size must be a power of 2 greater than
 or equal to the block size. Larger partition sizes are more efficient
 \, to a point \, but increase latency (the delay between input and
