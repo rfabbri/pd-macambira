@@ -14,6 +14,7 @@ Architecture: any
 Depends: ${shlibs:Depends},
          pd,
          ${misc:Depends}
+Recommends: pd-import
 Description: provides support for the libdir library format for Pd
  The 'libdir' loader is a Pure Data loader which supports the libdir
  library format.  The libdir library format aims to be a common
