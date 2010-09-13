@@ -1,12 +1,13 @@
-Debianized-By: Hans-Christoph Steiner <hans@eds.org> 
-Debianized-Date: Sat, 3 Apr 2010 17:14:25 -0400
-Files: *
-Copyright: 2005-2009, João Pais <jmmmpais@googlemail.com>
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?rev=135
+Name: jmmmmp
+Maintainer: João Pais
+Source: http://sourceforge.net/projects/pure-data/files/libraries/jmmmp
 
+Copyright: 2005-2009, João Pais <jmmmpais@googlemail.com>
 License: BSD
  Copyright (c) João Pais
  All rights reserved.
- 
+ .
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -18,7 +19,7 @@ License: BSD
  3. Neither the name of the University nor the names of its contributors
    may be used to endorse or promote products derived from this software
    without specific prior written permission.
- 
+ . 
  THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +31,6 @@ License: BSD
  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  SUCH DAMAGE.
- .
- On Debian systems, the complete text of the Modified BSD License 
- can be found in file "/usr/share/common-licenses/BSD".
+X-Comment: On Debian systems, the complete text of the Modified BSD
+ License can be found in file "/usr/share/common-licenses/BSD".
 

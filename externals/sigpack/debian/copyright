@@ -1,14 +1,22 @@
-Debianized-By: Hans-Christoph Steiner <hans@eds.org> 
-Debianized-Date: Tue, 9 Feb 2010 17:14:25 -0400
-Original-Source: http://www.weiss-archiv.de/ext/sigpack-0.04-win32.zip
-Files: *
-Copyright: 2001-2007, weiss-archiv
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?rev=135
+Name: sigpack
+Maintainer: weiss-archiv
+Source: http://sourceforge.net/projects/pure-data/files/libraries/sigpack/
 
+Copyright: 2001-2007, weiss-archiv
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
  (at your option) any later version.
  .
- On Debian systems, the complete text of the GNU General Public License
- version 2 can be found in file "/usr/share/common-licenses/GPL-2".
+ This package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this package; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+X-Comment: On Debian systems, the complete text of the GNU General
+ Public License can be found in `/usr/share/common-licenses/GPL-2'.

@@ -1,11 +1,11 @@
-Debianized-By: Hans-Christoph Steiner <hans@eds.org> 
-Debianized-Date: Sun, 31 Jan 2010 17:14:25 -0400
-Original-Source: http://crca.ucsd.edu/~jsarlo/pd/windowing.tar.gz
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?rev=135
+Name: windowing
+Maintainer: Joseph Sarlo
+Source: http://sourceforge.net/projects/pure-data/files/libraries/windowing/
 
 Files: bartlett~.c blackman~.c connes~.c cosine~.c gaussian~.c hamming~.c
 hanning~.c kaiser~.c lanczos~.c welch~.c
 Copyright: 2002, Joseph A. Sarlo
-
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -15,11 +15,9 @@ License: GPL-2+
  On Debian systems, the complete text of the GNU General Public License
  version 2 can be found in file "/usr/share/common-licenses/GPL-2".
 
-
 Files: kaiser~.c, mconf.h
 Copyright: 1984, 1987, 1989, 1995, 2000, Stephen L. Moshier
 Original-Source: http://www.moshier.net/cephes-math-28.tar.gz
-
 License:
 Some software in this archive may be from the book _Methods and
 Programs for Mathematical Functions_ (Prentice-Hall, 1989) or
