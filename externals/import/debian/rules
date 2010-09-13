@@ -1,8 +1,8 @@
 #!/usr/bin/make -f
 
-LIBRARY_NAME = template
-PACKAGE = pd-$(LIBRARY_NAME)
-pkglibdir = /usr/lib/pd/extra
+LIBRARY_NAME = import
+PACKAGE = puredata-$(LIBRARY_NAME)
+pkglibdir = /usr/lib/puredata/extra
 
 %:
 	dh $@ --buildsystem=makefile
