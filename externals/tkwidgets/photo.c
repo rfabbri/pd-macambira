@@ -21,7 +21,7 @@
 
 */
 
-#include "shared/tkwidgets.h"
+#include "tkwidgets.h"
 
 /* ------------------------ photo ----------------------------- */
 

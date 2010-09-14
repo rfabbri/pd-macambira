@@ -24,7 +24,7 @@
 /* TODO bind to <Configure> so that things are redrawn when the label changes */
 /* TODO add float method to set state based on == 0 and everything else */
 
-#include "shared/tkwidgets.h"
+#include "tkwidgets.h"
 
 #define DEBUG(x) x
 

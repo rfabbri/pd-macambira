@@ -1638,41 +1638,15 @@ tclpd_clean:
 
 #------------------------------------------------------------------------------#
 # TKWIDGETS
-TKWIDGETS_NAME=tkwidgets
-TKWIDGETS_OBJECTS := $(wildcard $(externals_src)/tkwidgets/*.c)
-TKWIDGETS_SHARED := $(wildcard $(externals_src)/tkwidgets/shared/*.c)
-tkwidgets_shared: $(TKWIDGETS_SHARED:.c=.o)
-#	$(CC) $(DYLIB_LDFLAGS) \
-#		-o $(externals_src)/tkwidgets/libtkwidgets.$(DYLIB_EXTENSION) \
-#		 $(TKWIDGETS_SHARED:.c=.o)
+tkwidgets:
+	make -C $(externals_src)/tkwidgets
 
-tkwidgets: tkwidgets_shared $(TKWIDGETS_OBJECTS:.c=.$(EXTENSION))
-
-tkwidgets_install: tkwidgets
-	install -d $(DESTDIR)$(objectsdir)/$(TKWIDGETS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(TKWIDGETS_NAME) \
-		--author "Hans-Christoph Steiner and other" \
-		--description "a collection of objects based on Tk widgets" \
-		--license "GPLv2 or later" 
-	install -p $(TKWIDGETS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(TKWIDGETS_NAME)
-	install -d $(DESTDIR)$(objectsdir)/$(TKWIDGETS_NAME)
-	install -p $(externals_src)/tkwidgets/*.pd \
-		$(DESTDIR)$(objectsdir)/$(TKWIDGETS_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(TKWIDGETS_NAME)
-#	install -p $(externals_src)/tkwidgets/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(TKWIDGETS_NAME)
-#	install -d $(DESTDIR)$(readmesdir)
-#	install -p $(externals_src)/tkwidgets/README \
-#		$(DESTDIR)$(readmesdir)/$(TKWIDGETS_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(TKWIDGETS_NAME)
-#	install -p $(externals_src)/tkwidgets/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(TKWIDGETS_NAME)
+tkwidgets_install:
+	make -C $(externals_src)/tkwidgets \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 tkwidgets_clean:
-	-rm -f -- $(TKWIDGETS_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(TKWIDGETS_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/tkwidgets/*.bak
-	-rm -f -- $(externals_src)/tkwidgets/*.*~
+	make -C $(externals_src)/tkwidgets clean
 
 #------------------------------------------------------------------------------#
 # TOF

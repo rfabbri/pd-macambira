@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "shared/tkwidgets.h"
+#include "tkwidgets.h"
 
 /* TODO: append options messages to options_binbuf if not visible */
 /* TODO: window name "handle1376fc00" already exists in parent */
@@ -189,7 +189,7 @@ static void create_widget(t_textwidget *x)
     tkwidgets_bind_key_events(x->canvas_id, x->widget_id);
     tkwidgets_bind_mouse_events(x->canvas_id, x->widget_id);
     /* bind to KeyRelease events to send out right outlet one key at a time */
-    sys_vgui("bind %s <KeyRelease> {+pdsend %s keyup %%N \\;} \n", 
+    sys_vgui("bind %s <KeyRelease> {+pdsend \"%s keyup %%N \"} \n", 
              x->widget_id->s_name, x->receive_name->s_name);
 /* override the standard Pd bindings for these since they cause trouble */
 #ifdef __APPLE__
@@ -316,11 +316,11 @@ static void textwidget_activate(t_gobj *z, t_glist *glist, int state)
                  TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT,
                  x->handle_id->s_name, x->all_tag->s_name);
         sys_vgui("raise %s\n", x->handle_id->s_name);
-        sys_vgui("bind %s <Button> {pdsend [concat %s resize_click 1 \\;]}\n",
+        sys_vgui("bind %s <Button> {pdsend \"%s resize_click 1 \"}",
                  x->handle_id->s_name, x->receive_name->s_name);
-        sys_vgui("bind %s <ButtonRelease> {pdsend [concat %s resize_click 0 \\;]}\n",
+        sys_vgui("bind %s <ButtonRelease> {pdsend \"%s resize_click 0 \"}",
                  x->handle_id->s_name, x->receive_name->s_name);
-        sys_vgui("bind %s <Motion> {pdsend [concat %s resize_motion %%x %%y \\;]}\n",
+        sys_vgui("bind %s <Motion> {pdsend \"%s resize_motion %%x %%y \"}",
                  x->handle_id->s_name, x->receive_name->s_name);
     }
 }
