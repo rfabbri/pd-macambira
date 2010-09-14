@@ -138,6 +138,12 @@ deb: $(bindir)
 		$(DESTDIR)/DEBIAN/control
 # add auto-generated dependencies
 	sed -i 's!^\(Depends:.*\)!\1 $(PACKAGE_DEPENDS)!' $(DESTDIR)/DEBIAN/control
+# sanitize permissions
+	chmod -R go-w $(DESTDIR)
+	chmod -R a+r $(DESTDIR)
+	find $(DESTDIR) -name \*.pd_linux | xargs chmod a-x
+	find $(DESTDIR) -name \*.pd | xargs chmod a-x
+	find $(DESTDIR) -type d | xargs chmod a+x
 	fakeroot dpkg-deb --build $(DESTDIR) $(packages_src)/linux_make/$(PACKAGE_NAME).deb
 
 
@@ -200,6 +206,7 @@ test_package:
 test_locations:
 	@echo --------------------------------------------------
 	@echo "PD_VERSION: $(PD_VERSION)"
+	@echo "DEB_PD_VERSION: $(DEB_PD_VERSION)"
 	@echo "PD-EXTENDED_VERSION: $(PD-EXTENDED_VERSION)"
 	@echo "CWD $(CWD)"
 	@echo "DESTDIR $(DESTDIR)"
