@@ -37,7 +37,8 @@
 #define TEXT_MIN_WIDTH         40
 #define TEXT_MIN_HEIGHT        20
 
-#define DEBUG(x) x
+#define DEBUG(x)
+//#define DEBUG(x) x
 
 static t_class *textwidget_class;
 static t_widgetbehavior textwidget_widgetbehavior;
@@ -189,7 +190,7 @@ static void create_widget(t_textwidget *x)
     tkwidgets_bind_key_events(x->canvas_id, x->widget_id);
     tkwidgets_bind_mouse_events(x->canvas_id, x->widget_id);
     /* bind to KeyRelease events to send out right outlet one key at a time */
-    sys_vgui("bind %s <KeyRelease> {+pdsend \"%s keyup %%N \"} \n", 
+    sys_vgui("bind %s <KeyRelease> {+pd %s keyup %%N \\;} \n", 
              x->widget_id->s_name, x->receive_name->s_name);
 /* override the standard Pd bindings for these since they cause trouble */
 #ifdef __APPLE__
@@ -316,11 +317,11 @@ static void textwidget_activate(t_gobj *z, t_glist *glist, int state)
                  TKW_HANDLE_WIDTH, TKW_HANDLE_HEIGHT,
                  x->handle_id->s_name, x->all_tag->s_name);
         sys_vgui("raise %s\n", x->handle_id->s_name);
-        sys_vgui("bind %s <Button> {pdsend \"%s resize_click 1 \"}",
+        sys_vgui("bind %s <Button> {pd [concat %s resize_click 1 \\;]}\n",
                  x->handle_id->s_name, x->receive_name->s_name);
-        sys_vgui("bind %s <ButtonRelease> {pdsend \"%s resize_click 0 \"}",
+        sys_vgui("bind %s <ButtonRelease> {pd [concat %s resize_click 0 \\;]}\n",
                  x->handle_id->s_name, x->receive_name->s_name);
-        sys_vgui("bind %s <Motion> {pdsend \"%s resize_motion %%x %%y \"}",
+        sys_vgui("bind %s <Motion> {pd [concat %s resize_motion %%x %%y \\;]}\n",
                  x->handle_id->s_name, x->receive_name->s_name);
     }
 }
@@ -399,7 +400,7 @@ static void textwidget_set_option(t_textwidget *x, t_symbol *s, int argc, t_atom
 static void textwidget_bang_output(t_textwidget* x)
 {
     /* With "," and ";" escaping thanks to JMZ */
-    sys_vgui("pdsend [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} \
+    sys_vgui("pd [concat %s output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} \
               [%s get 0.0 end]] \\;]\n", 
              x->receive_name->s_name, x->widget_id->s_name);
 }

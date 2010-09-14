@@ -228,14 +228,14 @@ void tkwidgets_erase_y_scrollbar(t_symbol *widget_id, t_symbol *scrollbar_id)
 void tkwidgets_bind_key_events(t_symbol *canvas_id, t_symbol *widget_id)
 {
 #ifdef __APPLE__
-    sys_vgui("bind %s <Mod1-Key> {::pd_bindings::sendkey %s %%K 0}\n",
+    sys_vgui("bind %s <Mod1-Key> {pdtk_canvas_ctrlkey %s %%K 0}\n",
              widget_id->s_name, canvas_id->s_name);
-    sys_vgui("bind %s <Mod1-Shift-Key> {::pd_bindings::sendkey %s %%K 1}\n",
+    sys_vgui("bind %s <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %s %%K 1}\n",
              widget_id->s_name, canvas_id->s_name);
 #else
-    sys_vgui("bind %s <Control-Key> {::pd_bindings::sendkey %s %%K 0}\n",
+    sys_vgui("bind %s <Control-Key> {pdtk_canvas_ctrlkey %s %%K 0}\n",
              widget_id->s_name, canvas_id->s_name);
-    sys_vgui("bind %s <Control-Shift-Key> {::pd_bindings::sendkey %s %%K 1}\n",
+    sys_vgui("bind %s <Control-Shift-Key> {pdtk_canvas_ctrlkey %s %%K 1}\n",
              widget_id->s_name, canvas_id->s_name);
 #endif
 }
@@ -243,7 +243,7 @@ void tkwidgets_bind_key_events(t_symbol *canvas_id, t_symbol *widget_id)
 void tkwidgets_bind_mouse_events(t_symbol *canvas_id, t_symbol *widget_id)
 {
     /* mouse buttons */
-    sys_vgui("bind %s <Button> {pdtk_canvas_mouse %s \
+    sys_vgui("bind %s <Button> {pdtk_canvas_sendclick %s \
 [expr %%X - [winfo rootx %s]] [expr %%Y - [winfo rooty %s]] %%b 0}\n",
              widget_id->s_name, canvas_id->s_name, 
              canvas_id->s_name, canvas_id->s_name);
