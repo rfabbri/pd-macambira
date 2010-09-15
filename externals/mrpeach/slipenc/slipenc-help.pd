@@ -1,12 +1,9 @@
-#N canvas 167 357 1113 568 10;
+#N canvas 351 316 1113 568 10;
 #X obj -98 77 packOSC;
 #X msg -98 52 /test 1 2 3 192 218 219 220 221 222;
-#X text 193 533 Author: Martin Peach \, 2010/05/04;
 #X floatatom -72 99 5 0 0 0 - - -;
 #X text -100 -6 [slipenc]: Encode a list of bytes using Serial Line
 Internet Protocol (SLIP);
-#X text -39 228 Note that SLIP limits the maximum packet size to 1006
-;
 #X obj -71 246 print encoded;
 #X obj -71 163 print original;
 #X obj 8 381 print decoded;
@@ -24,7 +21,7 @@ Internet Protocol (SLIP);
 #X obj -17 492 print other;
 #X obj -98 515 routeOSC /pi;
 #X floatatom -98 537 12 0 0 0 - - -;
-#X text -38 191 Encodes a list of bytes for transmission through a
+#X text -16 190 Encodes a list of bytes for transmission through a
 serial link using SLIP (RFC 1055). Useful for sending OSC through [comport].
 ;
 #X msg -52 124 192 192 192 192 192;
@@ -32,12 +29,10 @@ serial link using SLIP (RFC 1055). Useful for sending OSC through [comport].
 #X floatatom -35 313 5 0 0 0 - - -;
 #X obj -104 322 cnv 15 60 30 empty empty empty 20 12 0 14 -4034 -66577
 0;
-#X obj -98 329 slipdec;
 #X obj -103 186 cnv 15 60 30 empty empty empty 20 12 0 14 -4034 -66577
 0;
-#X obj -98 191 slipenc;
 #X msg 27 174 1 2 3 4;
-#X text 366 117 The motivation behind SLIP is the need to determine
+#X text 340 77 The motivation behind SLIP is the need to determine
 the boundaries of a packet when it is received one byte at a time \,
 as with a serial channel. Bytes are integers between 0 and 255;
 #X text -100 22 [slipdec]: Decode a list of bytes using SLIP;
@@ -49,7 +44,7 @@ as with a serial channel. Bytes are integers between 0 and 255;
 #X msg -76 290 verbosity \$1;
 #X obj -76 271 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X text 366 174 SLIP (RFC 1055) is a simple encoding that prefixes
+#X text 340 134 SLIP (RFC 1055) is a simple encoding that prefixes
 each packet with 192 \, and replaces 192s inside the packet with 219
 followed by 220 Any 219 will be replaced with 219 and 221 The packet
 ends with 192;
@@ -69,41 +64,48 @@ receiving OSC via [comport].;
 #X obj -98 427 spigot;
 #X text -35 403 select OSC messages based on the leading '/';
 #X obj -59 358 print valid;
-#X connect 0 0 9 0;
+#X text 56 234 Note that the SLIP specification limits the maximum
+packet size to 1006...;
+#X text 177 529 Author: Martin Peach \, 2010/09/15;
+#X obj -98 191 slipenc;
+#X obj -98 329 slipdec;
+#X text 57 262 ...but a float argument to slipdec or slipenc will set
+another maximum packet size;
+#X connect 0 0 7 0;
 #X connect 1 0 0 0;
-#X connect 3 0 9 0;
-#X connect 9 0 29 0;
-#X connect 9 1 7 0;
-#X connect 10 0 27 0;
-#X connect 10 1 6 0;
-#X connect 11 0 0 0;
-#X connect 12 0 0 0;
-#X connect 13 0 12 0;
-#X connect 14 0 13 0;
-#X connect 15 0 17 0;
-#X connect 16 0 52 0;
-#X connect 16 1 8 0;
-#X connect 16 1 50 0;
-#X connect 17 0 18 0;
-#X connect 17 0 20 0;
-#X connect 17 1 19 0;
-#X connect 20 0 21 0;
-#X connect 23 0 9 0;
-#X connect 24 0 27 0;
-#X connect 25 0 27 0;
-#X connect 27 0 16 0;
-#X connect 27 1 54 0;
-#X connect 29 0 10 0;
-#X connect 30 0 29 0;
-#X connect 33 0 9 0;
-#X connect 34 0 9 0;
-#X connect 36 0 27 0;
-#X connect 37 0 27 0;
-#X connect 38 0 27 0;
-#X connect 39 0 38 0;
-#X connect 45 0 27 0;
-#X connect 47 0 27 0;
-#X connect 48 0 27 0;
-#X connect 50 0 51 0;
-#X connect 51 0 52 1;
-#X connect 52 0 15 0;
+#X connect 2 0 7 0;
+#X connect 7 0 53 0;
+#X connect 7 1 5 0;
+#X connect 8 0 54 0;
+#X connect 8 1 4 0;
+#X connect 9 0 0 0;
+#X connect 10 0 0 0;
+#X connect 11 0 10 0;
+#X connect 12 0 11 0;
+#X connect 13 0 15 0;
+#X connect 14 0 48 0;
+#X connect 14 1 6 0;
+#X connect 14 1 46 0;
+#X connect 15 0 16 0;
+#X connect 15 0 18 0;
+#X connect 15 1 17 0;
+#X connect 18 0 19 0;
+#X connect 21 0 7 0;
+#X connect 22 0 54 0;
+#X connect 23 0 54 0;
+#X connect 26 0 53 0;
+#X connect 29 0 7 0;
+#X connect 30 0 7 0;
+#X connect 32 0 54 0;
+#X connect 33 0 54 0;
+#X connect 34 0 54 0;
+#X connect 35 0 34 0;
+#X connect 41 0 54 0;
+#X connect 43 0 54 0;
+#X connect 44 0 54 0;
+#X connect 46 0 47 0;
+#X connect 47 0 48 1;
+#X connect 48 0 13 0;
+#X connect 53 0 8 0;
+#X connect 54 0 14 0;
+#X connect 54 1 50 0;
