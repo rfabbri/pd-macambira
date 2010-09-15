@@ -22,6 +22,7 @@ typedef struct _slipdec
     t_outlet    *x_status_out;
     t_atom      *x_slip_buf;
     t_int       x_slip_length;
+    t_int       x_slip_max_length;
     t_int       x_packet_index;
     t_int       x_valid_SLIP;
     t_int       x_esced;
@@ -40,14 +41,28 @@ static void *slipdec_new(t_symbol *s, int argc, t_atom *argv)
 {
     int i;
     t_slipdec  *x = (t_slipdec *)pd_new(slipdec_class);
-    x->x_slip_buf = (t_atom *)getbytes(sizeof(t_atom)*MAX_SLIP);
+    
+    if (x == NULL) return x;
+    
+    x->x_slip_max_length = MAX_SLIP;// default unless a float argument is given
+    for (i = 0; i < argc; ++i)
+    {
+        if (argv[i].a_type == A_FLOAT)
+        {
+            x->x_slip_max_length = atom_getfloat(&argv[i]);
+            post("slipdec: maximum packet length is %d", x->x_slip_max_length);
+            break;
+        }
+    }
+
+    x->x_slip_buf = (t_atom *)getbytes(sizeof(t_atom)*x->x_slip_max_length);
     if(x->x_slip_buf == NULL)
     {
-        error("slipdec: unable to allocate %lu bytes for x_slip_buf", (long)sizeof(t_atom)*MAX_SLIP);
+        error("slipdec: unable to allocate %lu bytes for x_slip_buf", (long)sizeof(t_atom)*x->x_slip_max_length);
         return NULL;
     }
     /* init the slip buf atoms to float type */
-    for (i = 0; i < MAX_SLIP; ++i) x->x_slip_buf[i].a_type = A_FLOAT;
+    for (i = 0; i < x->x_slip_max_length; ++i) x->x_slip_buf[i].a_type = A_FLOAT;
     x->x_slipdec_out = outlet_new(&x->x_obj, &s_list);
     x->x_status_out = outlet_new(&x->x_obj, &s_anything);
     x->x_packet_index = 0;
@@ -74,14 +89,14 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
     int     i = 0, c;
 
     /* x_slip_length will be non-zero if an incomplete packet is in the buffer */
-    if ((ac + x->x_slip_length) > MAX_SLIP)
+    if ((ac + x->x_slip_length) > x->x_slip_max_length)
     {
-        pd_error (x, "slipdec_list: input packet longer than %d", MAX_SLIP);
+        pd_error (x, "slipdec_list: input packet longer than %d", x->x_slip_max_length);
         x->x_slip_length = x->x_esced = x->x_packet_index = 0;
         return;
     }
     /* for each byte in the packet, send the appropriate character sequence */
-    for(; ((i < ac) && (x->x_slip_length < MAX_SLIP)); ++i)
+    for(; ((i < ac) && (x->x_slip_length < x->x_slip_max_length)); ++i)
     {
         /* check each atom for byteness */
         f = atom_getfloat(&av[i]);
@@ -94,9 +109,11 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
         }
         if(SLIP_END == c)
         {
+            if (x->x_verbose) post ("slipdec_list: SLIP_END packet index is %d", x->x_packet_index);
             /* If it's the beginning of a packet, ignore it */
             if (x->x_slip_length)
             {
+                if (x->x_verbose) post ("slipdec_list: end of packet");
                 /* send the packet */
                 slipdec_dump(x, 1);
             }
@@ -104,6 +121,7 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
         }
         if (SLIP_ESC == c)
         {
+            if (x->x_verbose) post ("slipdec_list: SLIP_ESC %f = %d", f, c);
             x->x_esced = 1;
             continue;
         }
@@ -112,6 +130,7 @@ static void slipdec_list(t_slipdec *x, t_symbol *s, int ac, t_atom *av)
             if (SLIP_ESC_END == c) c = SLIP_END;
             else if (SLIP_ESC_ESC == c) c = SLIP_ESC;
             else x->x_valid_SLIP = 0; /* not valid SLIP */
+            if (x->x_verbose) post ("slipdec_list: ESCED %f = %d", f, c);
             x->x_esced = 0;
         }
         /* Add the character to the list */
@@ -177,7 +196,7 @@ static void slipdec_float(t_slipdec *x, t_float f)
     }
     /* Add the character to the list */
     if (0 == x->x_packet_index++) x->x_slip_length = 0;
-    if (x->x_slip_length < MAX_SLIP)
+    if (x->x_slip_length < x->x_slip_max_length)
     {
         x->x_slip_buf[x->x_slip_length++].a_w.w_float = c;
     }
@@ -195,7 +214,7 @@ static void slipdec_verbosity(t_slipdec *x, t_float f)
 
 static void slipdec_free(t_slipdec *x)
 {
-    if (x->x_slip_buf != NULL) freebytes((void *)x->x_slip_buf, sizeof(t_atom)*MAX_SLIP);
+    if (x->x_slip_buf != NULL) freebytes((void *)x->x_slip_buf, sizeof(t_atom)*x->x_slip_max_length);
 }
 
 void slipdec_setup(void)
