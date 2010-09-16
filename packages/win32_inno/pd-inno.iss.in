@@ -8,7 +8,7 @@
 [Setup]
 AppName=pd
 AppVerName=Pd-PD_VERSION
-AppPublisher=pure-data.org
+AppPublisher=puredata.info
 AppPublisherURL=http://puredata.org
 AppSupportURL=http://puredata.org/community/lists/
 AppUpdatesURL=http://puredata.org/downloads/

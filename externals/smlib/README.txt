@@ -124,4 +124,4 @@ example patches for design ideas.
 PD headquarters:
 http://crca.ucsd.edu/~msp/software.html
 http://iem.kug.ac.at/pd/
-http://www.pure-data.org
+http://www.puredata.info
