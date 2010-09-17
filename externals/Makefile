@@ -360,14 +360,14 @@ boids_clean:
 #------------------------------------------------------------------------------#
 # BSAYLOR
 bsaylor:
-	make -C $(externals_src)/iem/bsaylor/bsaylor
+	make -C $(externals_src)/bsaylor
 
 bsaylor_install:
-	make -C $(externals_src)/iem/bsaylor/bsaylor \
+	make -C $(externals_src)/bsaylor \
 		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 bsaylor_clean:
-	make -C $(externals_src)/iem/bsaylor/bsaylor clean
+	make -C $(externals_src)/bsaylor clean
 
 
 #------------------------------------------------------------------------------#
