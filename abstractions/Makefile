@@ -195,6 +195,7 @@ nqpoly_install~:
 	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)
 	install -p $(abstractions_src)/nqpoly/nqpoly~/*.pd \
 		$(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)/examples
 	install -p $(abstractions_src)/nqpoly/nqpoly~/*.pd \
 		$(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)
 	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)/manual
@@ -209,9 +210,10 @@ nqpoly_install4:
 	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)
 	install -p $(abstractions_src)/nqpoly/nqpoly4/*.pd \
 		$(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)
-	install -p $(abstractions_src)/nqpoly/nqpoly4/*.pd \
-		$(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)
 	install -p $(abstractions_src)/nqpoly/*/*-help.pd $(DESTDIR)$(helpdir)
+	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)/examples
+	install -p $(abstractions_src)/nqpoly/nqpoly4/*.pd \
+		$(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)/examples
 	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)/manual
 	install -p $(abstractions_src)/nqpoly/*.html \
 		$(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)/manual
