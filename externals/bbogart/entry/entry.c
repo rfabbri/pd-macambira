@@ -17,7 +17,6 @@
  * GNU General Public License for more details.                          */
 
 #include <m_pd.h>
-#include <m_imp.h>
 #include <g_canvas.h>
 #include <stdio.h>
 #include <string.h>
@@ -362,7 +361,7 @@ static void entry_displace(t_gobj *z, t_glist *glist, int dx, int dy)
                  text_xpix(&x->x_obj, glist) + x->x_width, 
                  text_ypix(&x->x_obj, glist) + x->x_height-2);*/
 //        entry_drawme(x, glist, 0);
-        canvas_fixlinesfor(glist_getcanvas(glist), (t_text*) x);
+        canvas_fixlinesfor(glist, (t_text*) x);
     }
     DEBUG(post("displace end"););
 }
@@ -425,7 +424,7 @@ static void entry_delete(t_gobj *z, t_glist *glist)
 {
     DEBUG(post("entry_delete: glist %lx", glist););    
     t_text *x = (t_text *)z;
-    canvas_deletelinesfor(glist_getcanvas(glist), x);
+    canvas_deletelinesfor(glist, x);
 }
 
        
@@ -433,15 +432,11 @@ static void entry_vis(t_gobj *z, t_glist *glist, int vis)
 {
     t_entry *x = (t_entry*)z;
     DEBUG(post("entry_vis: vis %d canvas %lx glist %lx", vis, x->x_canvas, glist););
-    t_rtext *y;
     if (vis) {
-        y = (t_rtext *) rtext_new(glist, (t_text *)z);
         entry_drawme(x, glist, 1);
     }
     else {
-        y = glist_findrtext(glist, (t_text *)z);
         entry_erase(x, glist);
-        rtext_free(y);
     }
 }
 

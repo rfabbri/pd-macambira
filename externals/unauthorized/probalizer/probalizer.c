@@ -392,7 +392,7 @@ static void probalizer_dialog(t_probalizer *x, t_symbol *s, int argc, t_atom *ar
 
 static void probalizer_delete(t_gobj *z, t_glist *glist)
 {
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void probalizer_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -699,5 +699,5 @@ void probalizer_setup(void)
 #endif
 
     class_setwidget(probalizer_class, &probalizer_widgetbehavior);
-    class_sethelpsymbol(probalizer_class, gensym("probalizer.pd"));
+
 }

@@ -352,7 +352,7 @@ static void breakpoints_displace(t_gobj *z, t_glist *glist,
     x->x_obj.te_ypix += dy;
 
     breakpoints_drawme(x, glist, 0);
-    canvas_fixlinesfor(glist_getcanvas(glist),(t_text*) x);
+    canvas_fixlinesfor(glist,(t_text*) x);
 }
 
 static void breakpoints_select(t_gobj *z, t_glist *glist, int state)
@@ -374,7 +374,7 @@ static void breakpoints_activate(t_gobj *z, t_glist *glist, int state)
 static void breakpoints_delete(t_gobj *z, t_glist *glist)
 {
     t_text *x = (t_text *)z;
-    canvas_deletelinesfor(glist_getcanvas(glist), x);
+    canvas_deletelinesfor(glist, x);
 }
 
        

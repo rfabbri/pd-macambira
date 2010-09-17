@@ -320,7 +320,7 @@ static void menubutton_w_displace(t_gobj *z, t_glist *glist,
       menubutton_w_draw_handle(x,glist,UPDATE);
       menubutton_w_draw_inlets(x, glist, UPDATE, 1,1);
       menubutton_w_drawme(x, glist, UPDATE);
-      canvas_fixlinesfor(glist_getcanvas(glist),(t_text*) x);
+      canvas_fixlinesfor(glist,(t_text*) x);
     }
     DEBUG(post("displace end");)
 }

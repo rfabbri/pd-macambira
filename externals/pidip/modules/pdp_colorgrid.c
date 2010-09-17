@@ -184,7 +184,7 @@ static void pdp_colorgrid_draw_update(t_pdp_colorgrid *x, t_glist *glist)
        // delete previous point if existing
        if (x->x_point)  
        {
-          COLORGRID_SYS_VGUI3(".x%x.c delete %xPOINT\n", canvas, x);
+          COLORGRID_SYS_VGUI3(".x%lx.c delete %lxPOINT\n", canvas, x);
        }
         
        if ( x->x_current < x->x_obj.te_xpix ) xpoint = x->x_obj.te_xpix;
@@ -194,7 +194,7 @@ static void pdp_colorgrid_draw_update(t_pdp_colorgrid *x, t_glist *glist)
        if ( x->y_current > x->x_obj.te_ypix + x->x_height - pointsize ) 
 			ypoint = x->x_obj.te_ypix + x->x_height - pointsize;
        // draw the selected point
-       COLORGRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -outline {} -fill #FF0000 -tags %xPOINT\n",
+       COLORGRID_SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -outline {} -fill #FF0000 -tags %lxPOINT\n",
 	     canvas, xpoint, ypoint, xpoint+5, ypoint+5, x);
        x->x_point = 1;
     // }  
@@ -207,7 +207,6 @@ static void pdp_colorgrid_draw_update(t_pdp_colorgrid *x, t_glist *glist)
 static void pdp_colorgrid_draw_new(t_pdp_colorgrid *x, t_glist *glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
-    char *tagRoot;
     char fname[MAXPDSTRING]=COLORGRID_IMG;
 
     char *fdata="UDYKIyBDUkVBVE9SOiBUaGUgR0lNUCdzIFBOTSBGaWx0ZXIgVmVyc2lvbiAx\
@@ -1067,30 +1066,25 @@ zNL4zNH4zND4zM/4zM74zM341dX41dX41tX419X42NX42dX42tX42tX429X4\
 7/H47/H47/H47/H47/H47/D47/D47/D47/D47/A=";
 
 
-    rtext_new(glist, (t_text *)x);
-    tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x));
-
-    //post("%s",tagRoot);
-
-    COLORGRID_SYS_VGUI3("image create photo img%x -data [base64::decode {%s}]\n",x,fdata);
+    COLORGRID_SYS_VGUI3("image create photo img%lx -data [base64::decode {%s}]\n",x,fdata);
     
-    COLORGRID_SYS_VGUI6(".x%x.c create image %d %d -image img%x -tags %sS\n", canvas,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),x,tagRoot);
-    COLORGRID_SYS_VGUI5(".x%x.c coords %sS %d %d \n",
-	     canvas, tagRoot,
+    COLORGRID_SYS_VGUI6(".x%lx.c create image %d %d -image img%lx -tags %lxS\n", canvas,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),x,x);
+    COLORGRID_SYS_VGUI5(".x%lx.c coords %lxS %d %d \n",
+	     canvas, x,
 	     x->x_obj.te_xpix + 128, x->x_obj.te_ypix + 25);
 				  
-    COLORGRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so0\n",
+    COLORGRID_SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -tags %lxo0\n",
 	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix + x->x_height+1,
 	     x->x_obj.te_xpix+7, x->x_obj.te_ypix + x->x_height+2,
-	     tagRoot);
-    COLORGRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so1\n",
+	     x);
+    COLORGRID_SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -tags %lxo1\n",
 	     canvas, x->x_obj.te_xpix+x->x_width-7, x->x_obj.te_ypix + x->x_height+1,
 	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix + x->x_height+2,
-	     tagRoot);
-    COLORGRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so2\n",
+	     x);
+    COLORGRID_SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -tags %lxo2\n",
 	     canvas, x->x_obj.te_xpix+x->x_width-131, x->x_obj.te_ypix + x->x_height+1,
 	     x->x_obj.te_xpix+x->x_width-126, x->x_obj.te_ypix + x->x_height+2,
-	     tagRoot);
+	     x);
 
     if ( x->x_pdp_colorgrid ) 
     {
@@ -1100,7 +1094,7 @@ zNL4zNH4zND4zM/4zM74zM341dX41dX41tX419X42NX42dX42tX42tX429X4\
        int ycount = 1;
        while ( xlpos < x->x_obj.te_xpix+x->x_width )
        {
-         COLORGRID_SYS_VGUI9(".x%x.c create line %d %d %d %d -fill #FFFFFF -tags %xLINE%d%d\n",
+         COLORGRID_SYS_VGUI9(".x%lx.c create line %d %d %d %d -fill #FFFFFF -tags %lxLINE%d%d\n",
 	     canvas, xlpos, x->x_obj.te_ypix,
 	     xlpos, x->x_obj.te_ypix+x->x_height,
 	     x, xcount, 0 );
@@ -1109,7 +1103,7 @@ zNL4zNH4zND4zM/4zM74zM341dX41dX41tX419X42NX42dX42tX42tX429X4\
        }
        while ( ylpos < x->x_obj.te_ypix+x->x_height )
        {
-         COLORGRID_SYS_VGUI9(".x%x.c create line %d %d %d %d -fill #FFFFFF -tags %xLINE%d%d\n",
+         COLORGRID_SYS_VGUI9(".x%lx.c create line %d %d %d %d -fill #FFFFFF -tags %lxLINE%d%d\n",
 	     canvas, x->x_obj.te_xpix, ylpos,
 	     x->x_obj.te_xpix+x->x_width, ylpos,
 	     x, 0, ycount);
@@ -1123,26 +1117,24 @@ zNL4zNH4zND4zM/4zM74zM341dX41dX41tX419X42NX42dX42tX42tX429X4\
 static void pdp_colorgrid_draw_move(t_pdp_colorgrid *x, t_glist *glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
-    char *tagRoot;
 
-    tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x)); 
-    COLORGRID_SYS_VGUI7(".x%x.c coords %xCOLORGRID %d %d %d %d\n",
+    COLORGRID_SYS_VGUI7(".x%lx.c coords %lxCOLORGRID %d %d %d %d\n",
 	     canvas, x,
 	     x->x_obj.te_xpix, x->x_obj.te_ypix,
 	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix+x->x_height);
-    COLORGRID_SYS_VGUI5(".x%x.c coords %sS %d %d \n",
-	     canvas, tagRoot,
+    COLORGRID_SYS_VGUI5(".x%lx.c coords %lxS %d %d \n",
+	     canvas, x,
 	     x->x_obj.te_xpix + 128, x->x_obj.te_ypix + 25);
-    COLORGRID_SYS_VGUI7(".x%x.c coords %so0 %d %d %d %d\n",
-	     canvas, tagRoot,
+    COLORGRID_SYS_VGUI7(".x%lx.c coords %lxo0 %d %d %d %d\n",
+	     canvas, x,
 	     x->x_obj.te_xpix, x->x_obj.te_ypix + x->x_height+1,
 	     x->x_obj.te_xpix+7, x->x_obj.te_ypix + x->x_height+2 );
-    COLORGRID_SYS_VGUI7(".x%x.c coords %so1 %d %d %d %d\n",
-	     canvas, tagRoot,
+    COLORGRID_SYS_VGUI7(".x%lx.c coords %lxo1 %d %d %d %d\n",
+	     canvas, x,
 	     x->x_obj.te_xpix+x->x_width-7, x->x_obj.te_ypix + x->x_height+1,
 	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix + x->x_height+2 );
-    COLORGRID_SYS_VGUI7(".x%x.c coords %so2 %d %d %d %d\n",
-	     canvas, tagRoot,
+    COLORGRID_SYS_VGUI7(".x%lx.c coords %lxo2 %d %d %d %d\n",
+	     canvas, x,
 	     x->x_obj.te_xpix+x->x_width-131, x->x_obj.te_ypix + x->x_height+1,
 	     x->x_obj.te_xpix+x->x_width-126, x->x_obj.te_ypix + x->x_height+2 );
     if ( x->x_point ) 
@@ -1157,7 +1149,7 @@ static void pdp_colorgrid_draw_move(t_pdp_colorgrid *x, t_glist *glist)
        int ycount = 1;
        while ( xlpos < x->x_obj.te_xpix+x->x_width )
        {
-         COLORGRID_SYS_VGUI9(".x%x.c coords %xLINE%d%d %d %d %d %d\n",
+         COLORGRID_SYS_VGUI9(".x%lx.c coords %lxLINE%d%d %d %d %d %d\n",
 	     canvas, x, xcount, 0, xlpos, x->x_obj.te_ypix,
 	     xlpos, x->x_obj.te_ypix + x->x_height);
          xlpos+=x->x_width/x->x_xlines;
@@ -1165,7 +1157,7 @@ static void pdp_colorgrid_draw_move(t_pdp_colorgrid *x, t_glist *glist)
        }
        while ( ylpos < x->x_obj.te_ypix+x->x_height )
        {
-         COLORGRID_SYS_VGUI9(".x%x.c coords %xLINE%d%d %d %d %d %d\n",
+         COLORGRID_SYS_VGUI9(".x%lx.c coords %lxLINE%d%d %d %d %d %d\n",
 	     canvas, x, 0, ycount, x->x_obj.te_xpix, ylpos,
 	     x->x_obj.te_xpix + x->x_width, ylpos);
          ylpos+=x->x_height/x->x_ylines;
@@ -1179,28 +1171,26 @@ static void pdp_colorgrid_draw_erase(t_pdp_colorgrid* x,t_glist* glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
     int i;
-    char *tagRoot;
 
-    tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x));
-    COLORGRID_SYS_VGUI3(".x%x.c delete %xCOLORGRID\n", canvas, x);
-    COLORGRID_SYS_VGUI3(".x%x.c delete %sS\n", canvas, tagRoot);
-    COLORGRID_SYS_VGUI3(".x%x.c delete %so0\n", canvas, tagRoot);
-    COLORGRID_SYS_VGUI3(".x%x.c delete %so1\n", canvas, tagRoot);
-    COLORGRID_SYS_VGUI3(".x%x.c delete %so2\n", canvas, tagRoot);
+    COLORGRID_SYS_VGUI3(".x%lx.c delete %lxCOLORGRID\n", canvas, x);
+    COLORGRID_SYS_VGUI3(".x%lx.c delete %lxS\n", canvas, x);
+    COLORGRID_SYS_VGUI3(".x%lx.c delete %lxo0\n", canvas, x);
+    COLORGRID_SYS_VGUI3(".x%lx.c delete %lxo1\n", canvas, x);
+    COLORGRID_SYS_VGUI3(".x%lx.c delete %lxo2\n", canvas, x);
     if (x->x_pdp_colorgrid)  
     {
        for (i=1; i<x->x_xlines; i++ )
        {
-           COLORGRID_SYS_VGUI4(".x%x.c delete %xLINE%d0\n", canvas, x, i);
+           COLORGRID_SYS_VGUI4(".x%lx.c delete %lxLINE%d0\n", canvas, x, i);
        }
        for (i=1; i<x->x_ylines; i++ )
        {
-           COLORGRID_SYS_VGUI4(".x%x.c delete %xLINE0%d\n", canvas, x, i);
+           COLORGRID_SYS_VGUI4(".x%lx.c delete %lxLINE0%d\n", canvas, x, i);
        }
     }
     if (x->x_point)  
     {
-          COLORGRID_SYS_VGUI3(".x%x.c delete %xPOINT\n", canvas, x);
+          COLORGRID_SYS_VGUI3(".x%lx.c delete %lxPOINT\n", canvas, x);
           x->x_point = 0;
     }
     rtext_free(glist_findrtext(glist, (t_text *)x));
@@ -1214,12 +1204,12 @@ static void pdp_colorgrid_draw_select(t_pdp_colorgrid* x,t_glist* glist)
     {
 	pd_bind(&x->x_obj.ob_pd, x->x_name);
         /* sets the item in blue */
-	COLORGRID_SYS_VGUI3(".x%x.c itemconfigure %xCOLORGRID -outline #0000FF\n", canvas, x);
+	COLORGRID_SYS_VGUI3(".x%lx.c itemconfigure %lxCOLORGRID -outline #0000FF\n", canvas, x);
     }
     else
     {
 	pd_unbind(&x->x_obj.ob_pd, x->x_name);
-	COLORGRID_SYS_VGUI3(".x%x.c itemconfigure %xCOLORGRID -outline #000000\n", canvas, x);
+	COLORGRID_SYS_VGUI3(".x%lx.c itemconfigure %lxCOLORGRID -outline #000000\n", canvas, x);
     }
 }
 
@@ -1441,7 +1431,7 @@ static void pdp_colorgrid_dialog(t_pdp_colorgrid *x, t_symbol *s, int argc, t_at
 
 static void pdp_colorgrid_delete(t_gobj *z, t_glist *glist)
 {
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void pdp_colorgrid_displace(t_gobj *z, t_glist *glist, int dx, int dy)

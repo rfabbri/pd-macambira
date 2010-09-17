@@ -443,7 +443,7 @@ static void knob_dialog(t_knob *x, t_symbol *s, int argc, t_atom *argv)
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_CONFIG);
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_IO + sr_flags);
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
-    canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
+    canvas_fixlinesfor(x->x_gui.x_glist, (t_text*)x);
 }
 
 static void knob_motion(t_knob *x, t_floatarg dx, t_floatarg dy)
@@ -636,7 +636,7 @@ static void knob_list(t_knob *x, t_symbol *s, int ac, t_atom *av)
     else if(l > 0)
     {
 	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
-	canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
+	canvas_fixlinesfor(x->x_gui.x_glist, (t_text*)x);
     }
 }
 */

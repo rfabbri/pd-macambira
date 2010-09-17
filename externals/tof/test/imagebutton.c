@@ -160,7 +160,7 @@ static void imagebutton_displace(t_gobj *z, t_glist *glist,
 		   text_xpix(&x->x_obj, glist) + x->width, text_ypix(&x->x_obj, glist) + x->height);
 
     imagebutton_drawme(x, glist, 0);
-    canvas_fixlinesfor(glist_getcanvas(glist),(t_text*) x);
+    canvas_fixlinesfor(glist,(t_text*) x);
 }
 
 static void imagebutton_select(t_gobj *z, t_glist *glist, int state)
@@ -264,7 +264,7 @@ static void imagebutton_imagesize_callback(t_imagebutton *x, t_float w, t_float 
 	DEBUG(post("received w %f h %f",w,h);)
 	x->width = w;
 	x->height = h;
-	canvas_fixlinesfor(glist_getcanvas(x->glist),(t_text*) x);
+	canvas_fixlinesfor(x->glist,(t_text*) x);
 }
 	
 	

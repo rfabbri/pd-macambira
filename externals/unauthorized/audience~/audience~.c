@@ -582,7 +582,7 @@ static void audience_delete(t_gobj *z, t_glist *glist)
 
     // post( "audience~ : delete" );
     audience_draw_erase( x, glist );
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void audience_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -1059,5 +1059,5 @@ void audience_tilde_setup(void)
 #endif
 
     class_setwidget(audience_class_tilde, &audience_widgetbehavior);
-    class_sethelpsymbol(audience_class_tilde, gensym("audience~.pd"));
+
 }

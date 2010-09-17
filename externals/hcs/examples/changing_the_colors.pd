@@ -1,4 +1,5 @@
 #N canvas 231 465 735 462 10;
+#X declare -path ..;
 #X obj 133 416 hcs/sys_gui;
 #X msg 39 15 set canvas_fill green;
 #N canvas 0 22 492 479 default 0;

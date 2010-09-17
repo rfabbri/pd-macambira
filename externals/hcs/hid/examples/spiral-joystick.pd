@@ -1,4 +1,5 @@
 #N canvas 400 56 478 473 10;
+#X declare -path ..;
 #X obj 134 99 tgl 25 0 empty empty start 1 12 1 9 -225271 -1 -1 1 1
 ;
 #X msg 216 118 open \$1;

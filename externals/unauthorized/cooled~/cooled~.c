@@ -623,7 +623,7 @@ static void cooled_vis(t_gobj *z, t_glist *glist, int vis)
 
 static void cooled_delete(t_gobj *z, t_glist *glist)
 {
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void cooled_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -1210,7 +1210,7 @@ static void cooled_zoom(t_cooled *x, t_floatarg fzoom )
        post( "cooled~ : allocated %d bytes", 128+x->x_height*x->x_zoom*sizeof("#FFFFFF ") );
     }
     if ( x->x_draw) cooled_update_part(x, x->x_glist, 0, x->x_width-1, !x->x_empty, !x->x_empty, 0);
-    canvas_fixlinesfor( glist_getcanvas( x->x_glist ), (t_text*)x );
+    canvas_fixlinesfor(x->x_glist, (t_text*)x );
 }
 
     /* modify the loop positions */
@@ -1357,7 +1357,7 @@ void cooled_tilde_setup(void)
     post(cooled_version);
     cooled_class = class_new(gensym("cooled~"), (t_newmethod)cooled_new, (t_method)cooled_free,
                     sizeof(t_cooled), 0, A_GIMME, 0);
-    class_sethelpsymbol( cooled_class, gensym("cooled~.pd") );
+
 
     // set callbacks
     cooled_widgetbehavior.w_getrectfn =    cooled_getrect;

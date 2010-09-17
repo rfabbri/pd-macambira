@@ -1,4 +1,5 @@
 #N canvas 532 145 637 496 10;
+#X declare -path ..;
 #X symbolatom 247 208 0 0 0 0 - - -;
 #X obj 232 155 pack 0 0;
 #X text 72 -108 move the Pd window around;

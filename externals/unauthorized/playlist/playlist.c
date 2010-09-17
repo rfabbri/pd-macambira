@@ -42,7 +42,7 @@
 #include "g_canvas.h"
 
 
-#ifdef NT
+#ifdef _WIN32
 #include <io.h>
 #else
 #include <unistd.h>
@@ -422,7 +422,6 @@ static void playlist_select(t_gobj *z, t_glist *glist, int selected)
 static void playlist_vis(t_gobj *z, t_glist *glist, int vis)
 {
  t_playlist *x = (t_playlist *)z;
- t_rtext *y;
 
    x->x_glist = glist;
    if (vis)
@@ -437,9 +436,7 @@ static void playlist_vis(t_gobj *z, t_glist *glist, int vis)
 
 static void playlist_delete(t_gobj *z, t_glist *glist)
 {
-  t_playlist *x = (t_playlist *)z;
-
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void playlist_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -1016,5 +1013,5 @@ void playlist_setup(void)
 #endif
 
     class_setwidget(playlist_class, &playlist_widgetbehavior);
-    class_sethelpsymbol(playlist_class, gensym("playlist.pd"));
+
 }

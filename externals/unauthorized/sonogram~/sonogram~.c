@@ -882,7 +882,7 @@ static void sonogram_vis(t_gobj *z, t_glist *glist, int vis)
 
 static void sonogram_delete(t_gobj *z, t_glist *glist)
 {
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void sonogram_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -1282,7 +1282,7 @@ static t_int *sonogram_perform(t_int *w)
        x->x_blocksize = n;
        sonogram_allocate(x);
        sonogram_update_part(x, x->x_glist, 0, x->x_size-1, !x->x_empty, 0, 0);
-       canvas_fixlinesfor( glist_getcanvas(x->x_glist), (t_text*)x );
+       canvas_fixlinesfor(x->x_glist, (t_text*)x );
     }
 
     bi = 0;
@@ -1604,7 +1604,7 @@ static void sonogram_zoom(t_sonogram *x, t_floatarg fzoom )
        post( "sonogram~ : allocated %d bytes",  128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
     }
     sonogram_update_part(x, x->x_glist, 0, x->x_size-1, !x->x_empty, !x->x_empty, 0);
-    canvas_fixlinesfor( glist_getcanvas( x->x_glist ), (t_text*)x );
+    canvas_fixlinesfor(x->x_glist, (t_text*)x );
 }
 
     /* refresh data    */
@@ -2031,7 +2031,7 @@ void sonogram_tilde_setup(void)
     post(sonogram_version);
     sonogram_class = class_new(gensym("sonogram~"), (t_newmethod)sonogram_new, (t_method)sonogram_free,
                     sizeof(t_sonogram), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_sethelpsymbol( sonogram_class, gensym("sonogram~.pd") );
+
 
     // set callbacks
     sonogram_widgetbehavior.w_getrectfn =    sonogram_getrect;

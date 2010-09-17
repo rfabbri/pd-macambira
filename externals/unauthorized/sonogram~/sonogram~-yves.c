@@ -493,7 +493,7 @@ static void sonogram_update_part(t_sonogram *x, t_glist *glist, t_int bstart, t_
                           glist_getcanvas( x->x_glist ), x->x_xpos+((x->x_size*x->x_zoom)/2), 
                           x->x_ypos+3*((x->x_blocksize/2*x->x_zoom)/2)+2, x, x );
       }
-      canvas_fixlinesfor( glist_getcanvas(x->x_glist), (t_text*)x );
+      canvas_fixlinesfor(x->x_glist, (t_text*)x );
     }
     // set borders in red
     SYS_VGUI3(".x%x.c itemconfigure %xSONOGRAM -outline #FF0000\n", glist_getcanvas(glist), x);
@@ -880,7 +880,7 @@ static void sonogram_vis(t_gobj *z, t_glist *glist, int vis)
 
 static void sonogram_delete(t_gobj *z, t_glist *glist)
 {
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void sonogram_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -1214,7 +1214,7 @@ static t_int *sonogram_perform(t_int *w)
        x->x_blocksize = n;
        sonogram_allocate(x);
        sonogram_update_part(x, x->x_glist, 0, x->x_size-1, !x->x_empty, 0, 0);
-       canvas_fixlinesfor( glist_getcanvas(x->x_glist), (t_text*)x );
+       canvas_fixlinesfor(x->x_glist, (t_text*)x );
     }
 
     bi = 0;
@@ -1531,7 +1531,7 @@ static void sonogram_zoom(t_sonogram *x, t_floatarg fzoom )
        post( "sonogram~ : allocated %d bytes",  128+(x->x_blocksize/2)*x->x_zoom*sizeof("#FFFFFF ") );
     }
     sonogram_update_part(x, x->x_glist, 0, x->x_size-1, !x->x_empty, !x->x_empty, 0);
-    canvas_fixlinesfor( glist_getcanvas( x->x_glist ), (t_text*)x );
+    canvas_fixlinesfor(x->x_glist, (t_text*)x );
 }
 
     /* refresh data    */
@@ -1977,7 +1977,7 @@ void sonogram_tilde_setup(void)
     sonogram_widgetbehavior.w_propertiesfn = NULL;
     sonogram_widgetbehavior.w_savefn =       sonogram_save;
 /*  this is needed to make the help patch work on < 0.37  */
-    class_sethelpsymbol( sonogram_class, gensym("sonogram~-help.pd") );
+
 #else
 	 class_setpropertiesfn(sonogram_class, NULL);
 	 class_setsavefn(sonogram_class, &sonogram_save);

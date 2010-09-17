@@ -374,7 +374,7 @@ static void filterbank_delete(t_gobj *z, t_glist *glist)
 
    // post( "filterbank~ : delete" );
    filterbank_draw_erase( x, glist );
-   canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+   canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void filterbank_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -664,5 +664,5 @@ void filterbank_tilde_setup(void)
     filterbank_widgetbehavior.w_savefn =       filterbank_save;
 #endif
     class_setwidget(filterbank_class_tilde, &filterbank_widgetbehavior);
-    class_sethelpsymbol(filterbank_class_tilde, gensym("filterbank~.pd"));
+
 }

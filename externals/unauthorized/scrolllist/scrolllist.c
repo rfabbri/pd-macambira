@@ -318,7 +318,7 @@ static void scrolllist_deleteobj(t_gobj *z, t_glist *glist)
 {
   t_scrolllist *x = (t_scrolllist *)z;
 
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void scrolllist_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -1034,5 +1034,5 @@ void scrolllist_setup(void)
 #endif
 
     class_setwidget(scrolllist_class, &scrolllist_widgetbehavior);
-    class_sethelpsymbol(scrolllist_class, gensym("help-scrolllist.pd"));
+
 }

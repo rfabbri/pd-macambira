@@ -314,7 +314,7 @@ static void scratcher_vis(t_gobj *z, t_glist *glist, int vis)
 
 static void scratcher_delete(t_gobj *z, t_glist *glist)
 {
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void scratcher_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -783,7 +783,7 @@ void scratcher_tilde_setup(void)
 #include "scratcher~.tk2c"
     scratcher_class = class_new(gensym("scratcher~"), (t_newmethod)scratcher_new, (t_method)scratcher_free,
                     sizeof(t_scratcher), 0, A_GIMME, 0);
-    class_sethelpsymbol( scratcher_class, gensym("scratcher~.pd") );
+
 
     // set callbacks
     scratcher_widgetbehavior.w_getrectfn =    scratcher_getrect;

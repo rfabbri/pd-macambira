@@ -13,12 +13,11 @@
 #include <math.h>
 #include <ctype.h>
 #include "m_pd.h"
-#include "m_imp.h"
 #include "g_canvas.h"
 
 #include "g_grid.h"
 
-#ifdef NT
+#ifdef _WIN32
 #include <io.h>
 #else
 #include <unistd.h>
@@ -73,7 +72,7 @@ static void grid_draw_update(t_grid *x, t_glist *glist)
        // delete previous point if existing
        if (x->x_point)  
        {
-          GRID_SYS_VGUI3(".x%x.c delete %xPOINT\n", canvas, x);
+          GRID_SYS_VGUI3(".x%lx.c delete %lxPOINT\n", canvas, x);
        }
         
        if ( x->x_current < text_xpix(&x->x_obj, glist) ) xpoint = text_xpix(&x->x_obj, glist);
@@ -83,7 +82,7 @@ static void grid_draw_update(t_grid *x, t_glist *glist)
        if ( x->y_current > text_ypix(&x->x_obj, glist) + x->x_height - pointsize ) 
 			ypoint = text_ypix(&x->x_obj, glist) + x->x_height - pointsize;
        // draw the selected point
-       GRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FF0000 -tags %xPOINT\n",
+       GRID_SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -fill #FF0000 -tags %lxPOINT\n",
 	     canvas, xpoint, ypoint, xpoint+pointsize, ypoint+pointsize, x);
        x->x_point = 1;
     // }  
@@ -96,22 +95,19 @@ static void grid_draw_update(t_grid *x, t_glist *glist)
 static void grid_draw_new(t_grid *x, t_glist *glist)
 {
   t_canvas *canvas=glist_getcanvas(glist);
-  char *tagRoot;
 
-    rtext_new(glist, (t_text *)x );
-    tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x));
-    GRID_SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -fill %s -tags %xGRID\n",
+    GRID_SYS_VGUI8(".x%lx.c create rectangle %d %d %d %d -fill %s -tags %lxGRID\n",
 	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
 	     text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height,
 	     x->x_bgcolor, x);
-    GRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so0\n",
+    GRID_SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -tags %lxo0\n",
 	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) + x->x_height+1,
 	     text_xpix(&x->x_obj, glist)+7, text_ypix(&x->x_obj, glist) + x->x_height+2,
-	     tagRoot);
-    GRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so1\n",
+	     x);
+    GRID_SYS_VGUI7(".x%lx.c create rectangle %d %d %d %d -tags %lxo1\n",
 	     canvas, text_xpix(&x->x_obj, glist)+x->x_width-7, text_ypix(&x->x_obj, glist) + x->x_height+1,
 	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist) + x->x_height+2,
-	     tagRoot);
+	     x);
 
     if ( x->x_grid ) 
     {
@@ -121,7 +117,7 @@ static void grid_draw_new(t_grid *x, t_glist *glist)
        int ycount = 1;
        while ( xlpos < text_xpix(&x->x_obj, glist)+x->x_width )
        {
-         GRID_SYS_VGUI9(".x%x.c create line %d %d %d %d -fill #FFFFFF -tags %xLINE%d%d\n",
+         GRID_SYS_VGUI9(".x%lx.c create line %d %d %d %d -fill #FFFFFF -tags %lxLINE%d%d\n",
 	     canvas, xlpos, text_ypix(&x->x_obj, glist),
 	     xlpos, text_ypix(&x->x_obj, glist)+x->x_height,
 	     x, xcount, 0 );
@@ -130,7 +126,7 @@ static void grid_draw_new(t_grid *x, t_glist *glist)
        }
        while ( ylpos < text_ypix(&x->x_obj, glist)+x->x_height )
        {
-         GRID_SYS_VGUI9(".x%x.c create line %d %d %d %d -fill #FFFFFF -tags %xLINE%d%d\n",
+         GRID_SYS_VGUI9(".x%lx.c create line %d %d %d %d -fill #FFFFFF -tags %lxLINE%d%d\n",
 	     canvas, text_xpix(&x->x_obj, glist), ylpos,
 	     text_xpix(&x->x_obj, glist)+x->x_width, ylpos,
 	     x, 0, ycount);
@@ -144,19 +140,17 @@ static void grid_draw_new(t_grid *x, t_glist *glist)
 static void grid_draw_move(t_grid *x, t_glist *glist)
 {
   t_canvas *canvas=glist_getcanvas(glist);
-  char *tagRoot;
 
-    tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x)); 
-    GRID_SYS_VGUI7(".x%x.c coords %xGRID %d %d %d %d\n",
+    GRID_SYS_VGUI7(".x%lx.c coords %lxGRID %d %d %d %d\n",
 	     canvas, x,
 	     text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
 	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist)+x->x_height);
-    GRID_SYS_VGUI7(".x%x.c coords %so0 %d %d %d %d\n",
-	     canvas, tagRoot,
+    GRID_SYS_VGUI7(".x%lx.c coords %lxo0 %d %d %d %d\n",
+	     canvas, x,
 	     text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) + x->x_height+1,
 	     text_xpix(&x->x_obj, glist)+7, text_ypix(&x->x_obj, glist) + x->x_height+2 );
-    GRID_SYS_VGUI7(".x%x.c coords %so1 %d %d %d %d\n",
-	     canvas, tagRoot,
+    GRID_SYS_VGUI7(".x%lx.c coords %lxo1 %d %d %d %d\n",
+	     canvas, x,
 	     text_xpix(&x->x_obj, glist)+x->x_width-7, text_ypix(&x->x_obj, glist) + x->x_height+1,
 	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist) + x->x_height+2 );
     if ( x->x_point ) 
@@ -171,7 +165,7 @@ static void grid_draw_move(t_grid *x, t_glist *glist)
        int ycount = 1;
        while ( xlpos < text_xpix(&x->x_obj, glist)+x->x_width )
        {
-         GRID_SYS_VGUI9(".x%x.c coords %xLINE%d%d %d %d %d %d\n",
+         GRID_SYS_VGUI9(".x%lx.c coords %lxLINE%d%d %d %d %d %d\n",
 	     canvas, x, xcount, 0, xlpos, text_ypix(&x->x_obj, glist),
 	     xlpos, text_ypix(&x->x_obj, glist) + x->x_height);
          xlpos+=x->x_width/x->x_xlines;
@@ -179,7 +173,7 @@ static void grid_draw_move(t_grid *x, t_glist *glist)
        }
        while ( ylpos < text_ypix(&x->x_obj, glist)+x->x_height )
        {
-         GRID_SYS_VGUI9(".x%x.c coords %xLINE%d%d %d %d %d %d\n",
+         GRID_SYS_VGUI9(".x%lx.c coords %lxLINE%d%d %d %d %d %d\n",
 	     canvas, x, 0, ycount, text_xpix(&x->x_obj, glist), ylpos,
 	     text_xpix(&x->x_obj, glist) + x->x_width, ylpos);
          ylpos+=x->x_height/x->x_ylines;
@@ -193,29 +187,26 @@ static void grid_draw_erase(t_grid* x,t_glist* glist)
 {
   t_canvas *canvas=glist_getcanvas(glist);
   int i;
-  char *tagRoot;
 
-    tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x));
-    GRID_SYS_VGUI3(".x%x.c delete %xGRID\n", canvas, x);
-    GRID_SYS_VGUI3(".x%x.c delete %so0\n", canvas, tagRoot);
-    GRID_SYS_VGUI3(".x%x.c delete %so1\n", canvas, tagRoot);
+    GRID_SYS_VGUI3(".x%lx.c delete %lxGRID\n", canvas, x);
+    GRID_SYS_VGUI3(".x%lx.c delete %lxo0\n", canvas, x);
+    GRID_SYS_VGUI3(".x%lx.c delete %lxo1\n", canvas, x);
     if (x->x_grid)  
     {
        for (i=1; i<x->x_xlines; i++ )
        {
-           GRID_SYS_VGUI4(".x%x.c delete %xLINE%d0\n", canvas, x, i);
+           GRID_SYS_VGUI4(".x%lx.c delete %lxLINE%d0\n", canvas, x, i);
        }
        for (i=1; i<x->x_ylines; i++ )
        {
-           GRID_SYS_VGUI4(".x%x.c delete %xLINE0%d\n", canvas, x, i);
+           GRID_SYS_VGUI4(".x%lx.c delete %lxLINE0%d\n", canvas, x, i);
        }
     }
     if (x->x_point)  
     {
-          GRID_SYS_VGUI3(".x%x.c delete %xPOINT\n", canvas, x);
+          GRID_SYS_VGUI3(".x%lx.c delete %lxPOINT\n", canvas, x);
           x->x_point = 0;
     }
-    rtext_free(glist_findrtext(glist, (t_text *)x));
 }
 
 static void grid_draw_select(t_grid* x,t_glist* glist)
@@ -226,12 +217,12 @@ static void grid_draw_select(t_grid* x,t_glist* glist)
     {
 	pd_bind(&x->x_obj.ob_pd, x->x_name);
         /* sets the item in blue */
-	GRID_SYS_VGUI3(".x%x.c itemconfigure %xGRID -outline #0000FF\n", canvas, x);
+	GRID_SYS_VGUI3(".x%lx.c itemconfigure %lxGRID -outline #0000FF\n", canvas, x);
     }
     else
     {
 	pd_unbind(&x->x_obj.ob_pd, x->x_name);
-	GRID_SYS_VGUI3(".x%x.c itemconfigure %xGRID -outline #000000\n", canvas, x);
+	GRID_SYS_VGUI3(".x%lx.c itemconfigure %lxGRID -outline #000000\n", canvas, x);
     }
 }
 
@@ -360,7 +351,7 @@ static void grid_dialog(t_grid *x, t_symbol *s, int argc, t_atom *argv)
 
 static void grid_delete(t_gobj *z, t_glist *glist)
 {
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void grid_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -586,9 +577,8 @@ static void grid_bang(t_grid *x) {
 
 static t_grid *grid_new(t_symbol *s, int argc, t_atom *argv)
 {
-    int i, zz;
+    int zz;
     t_grid *x;
-    t_pd *x2;
     char *str;
  
     // post( "grid_new : create : %s argc =%d", s->s_name, argc );
@@ -721,5 +711,5 @@ void grid_setup(void)
 #endif
 
     class_setwidget(grid_class, &grid_widgetbehavior);
-    class_sethelpsymbol(grid_class, gensym("grid.pd"));
+
 }

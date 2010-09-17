@@ -488,7 +488,7 @@ static void exciter_dialog(t_exciter *x, t_symbol *s, int argc, t_atom *argv)
 
 static void exciter_delete(t_gobj *z, t_glist *glist)
 {
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void exciter_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -818,5 +818,5 @@ void exciter_setup(void)
 #endif
 
     class_setwidget(exciter_class, &exciter_widgetbehavior);
-    class_sethelpsymbol(exciter_class, gensym("exciter.pd"));
+
 }

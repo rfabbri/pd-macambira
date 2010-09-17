@@ -390,7 +390,7 @@ static void pianoroll_dialog(t_pianoroll *x, t_symbol *s, int argc, t_atom *argv
 
 static void pianoroll_delete(t_gobj *z, t_glist *glist)
 {
-    canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
+    canvas_deletelinesfor(glist, (t_text *)z);
 }
 
 static void pianoroll_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -811,5 +811,5 @@ void pianoroll_setup(void)
 #endif
 
     class_setwidget(pianoroll_class, &pianoroll_widgetbehavior);
-    class_sethelpsymbol(pianoroll_class, gensym("pianoroll.pd"));
+
 }
