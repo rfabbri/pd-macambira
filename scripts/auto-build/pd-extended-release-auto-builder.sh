@@ -2,10 +2,12 @@
 # this script is the first attempt to have an automated updater and builder
 
 # the source dir where this script is
+## this could be done more easily with ${0%/*}
 SCRIPT_DIR=$(echo $0 | sed 's|\(.*\)/.*$|\1|')
 . $SCRIPT_DIR/auto-build-common
 
 # the name of this script
+## this could be done more easily with ${0##*/}
 SCRIPT=$(echo $0| sed 's|.*/\(.*\)|\1|g')
 
 BUILD_DIR=.
@@ -34,25 +36,17 @@ esac
 
 
 # convert into absolute path
-cd $(echo $0 | sed 's|\(.*\)/.*$|\1|')/../..
-auto_build_root_dir=$(pwd)
-echo "root: $auto_build_root_dir" 
-
-# let rsync handle the cleanup with --delete
-case $SYSTEM in
-	mingw*)
-		/c/cygwin/bin/sh -c \
-			"rsync --archive --no-links --copy-links --delete rsync://128.238.56.50/distros/pd-extended-release/ ${auto_build_root_dir}/"
-		;;
-	*)
-		rsync -a --delete rsync://128.238.56.50/distros/pd-extended-release/ ${auto_build_root_dir}/
-		;;
-esac
+cd "${SCRIPT_DIR}/../.."
+auto_build_root_dir=`pwd`
+echo "build root: $auto_build_root_dir" 
+rsync_distro "$auto_build_root_dir"
 
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
 make -C "${auto_build_root_dir}/packages" set_version
 make test_locations
+echo "mounts ----------------------------------------"
 mount
+print_ip_address
 make package_clean
 make install && make package
 
@@ -72,18 +66,18 @@ upload_build ()
 		case $SYSTEM in 
 			mingw*)
 				/c/cygwin/bin/sh -c \
-					"rsync --archive --no-links --copy-links ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}" && \
+					"rsync --archive --no-links --copy-links --chmod=a+r ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}" && \
 					md5sum ${archive} > ${archive}.md5 && \
 					/c/cygwin/bin/sh -c \
 					"rsync --archive --no-links --copy-links ${archive}.md5 rsync://128.238.56.50/upload/${DATE}/${upload_filename}.md5" && \
-                                        echo "successfully uploaded: ${upload_filename}" && \
+					echo "successfully uploaded: ${upload_filename}" && \
 					echo SUCCESS
 				;;
 			*)
-				rsync -a ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}  && \
+				rsync -a --chmod=a+r ${archive} rsync://128.238.56.50/upload/${DATE}/${upload_filename}  && \
 					md5sum ${archive} > ${archive}.md5 && \
 					rsync -a ${archive}.md5 rsync://128.238.56.50/upload/${DATE}/${upload_filename}.md5  && \
-                                        echo "successfully uploaded: ${upload_filename}" && \
+					echo "successfully uploaded: ${upload_filename}" && \
 					echo SUCCESS
 				;;
 		esac
