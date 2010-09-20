@@ -15,22 +15,22 @@ UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
  CPPFLAGS += -DLINUX
  INCLUDES += `pkg-config --cflags opencv`
- LDFLAGS =  -export_dynamic -shared
+ LDFLAGS =  -Wl,--export-dynamic -shared
  LIBS = `pkg-config --libs opencv`
  EXTENSION = pd_linux
+ SOURCES_OPT = @SOURCES_OPT@
 endif
 ifeq ($(UNAME),Darwin)
- CPPFLAGS += -DDARWIN
- INCLUDES += -I/Library/Frameworks/OpenCV.framework/Headers/
+ INCLUDES += -I/Library/Frameworks/OpenCV.framework/Headers/ -I/Applications/Pd-extended.app/Contents/Resources/include/pdextended -I/Applications/Pd-extended.app/Contents/Resources/include/
  LDFLAGS =  -bundle -undefined dynamic_lookup
  LIBS =  -lm -framework OpenCV
  EXTENSION = pd_darwin
+ SOURCES_OPT = pix_opencv_surf.cc
 endif
 
 .SUFFIXES = $(EXTENSION)
 
 SOURCES = pix_opencv_edge.cc pix_opencv_laplace.cc pix_opencv_morphology.cc pix_opencv_distrans.cc pix_opencv_motempl.cc pix_opencv_haarcascade.cc pix_opencv_contours_boundingrect.cc pix_opencv_bgsubstract.cc pix_opencv_contours_convexity.cc pix_opencv_dft.cc pix_opencv_lk.cc pix_opencv_hist_compare.cc pix_opencv_knear.cc pix_opencv_threshold.cc pix_opencv_floodfill.cc pix_opencv_athreshold.cc pix_opencv_bgstats.cc pix_opencv_camshift.cc pix_opencv_hu_compare.cc pix_opencv_pgh_compare.cc pix_opencv_hough_circles.cc pix_opencv_hough_lines.cc pix_opencv_hu_moments.cc pix_opencv_contours_convexhull.cc pix_opencv_colorfilt.cc pix_opencv_of_bm.cc pix_opencv_of_hs.cc pix_opencv_of_lk.cc
-SOURCES_OPT = @SOURCES_OPT@
 
 all: $(SOURCES:.cc=.$(EXTENSION)) $(SOURCES_OPT:.cc=.$(EXTENSION))
 
