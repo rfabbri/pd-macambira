@@ -15,13 +15,13 @@ UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
  CPPFLAGS += -DLINUX
  INCLUDES += `pkg-config --cflags opencv`
- LDFLAGS =  -export_dynamic -shared
+ LDFLAGS =  --export-dynamic -shared
  LIBS = `pkg-config --libs opencv`
  EXTENSION = pd_linux
 endif
 ifeq ($(UNAME),Darwin)
  CPPFLAGS += -DDARWIN
- INCLUDES += -I/Library/Frameworks/OpenCV.framework/Headers/
+ INCLUDES += -I/Library/Frameworks/OpenCV.framework/Headers/ -I/Applications/Pd-extended.app/Contents/Resources/include/pdextended -I/Applications/Pd-extended.app/Contents/Resources/include/
  LDFLAGS =  -bundle -undefined dynamic_lookup
  LIBS =  -lm -framework OpenCV
  EXTENSION = pd_darwin
