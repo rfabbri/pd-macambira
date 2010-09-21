@@ -1253,8 +1253,11 @@ static void MIDIbuf(int type, int chan, int param, int val, t_dssi_tilde *x){
     }
 
     t_int time_ref = x->time_ref;
+    t_int mapped;
 
     pthread_mutex_lock(&x->midiEventBufferMutex);
+
+    mapped = x->channelMap[chan + 1] - 1;
 
     x->midiEventBuf[x->bufWriteIndex].time.time.tv_sec = 
         (t_int)(clock_gettimesince(time_ref) * .001); 
@@ -1266,58 +1269,58 @@ static void MIDIbuf(int type, int chan, int param, int val, t_dssi_tilde *x){
         x->midiEventBuf[x->bufWriteIndex].type = type;
         switch (type) {
             case SND_SEQ_EVENT_NOTEON:
-                x->midiEventBuf[x->bufWriteIndex].data.note.channel = chan;
+                x->midiEventBuf[x->bufWriteIndex].data.note.channel = mapped;
                 x->midiEventBuf[x->bufWriteIndex].data.note.note = param;
                 x->midiEventBuf[x->bufWriteIndex].data.note.velocity = val;
                 break;
             case SND_SEQ_EVENT_NOTEOFF:
-                x->midiEventBuf[x->bufWriteIndex].data.note.channel = chan;
+                x->midiEventBuf[x->bufWriteIndex].data.note.channel = mapped;
                 x->midiEventBuf[x->bufWriteIndex].data.note.note = param;
                 x->midiEventBuf[x->bufWriteIndex].data.note.velocity = val;
                 break;
             case SND_SEQ_EVENT_CONTROLLER:
-                x->midiEventBuf[x->bufWriteIndex].data.control.channel = chan;
+                x->midiEventBuf[x->bufWriteIndex].data.control.channel = mapped;
                 x->midiEventBuf[x->bufWriteIndex].data.control.param = param;
                 x->midiEventBuf[x->bufWriteIndex].data.control.value = val;
                 break;
             case SND_SEQ_EVENT_PITCHBEND:
-                x->midiEventBuf[x->bufWriteIndex].data.control.channel = chan;
+                x->midiEventBuf[x->bufWriteIndex].data.control.channel = mapped;
                 x->midiEventBuf[x->bufWriteIndex].data.control.param = 0;
                 x->midiEventBuf[x->bufWriteIndex].data.control.value = val;
                 break;
             case SND_SEQ_EVENT_CHANPRESS:
-                x->midiEventBuf[x->bufWriteIndex].data.control.channel = chan;
+                x->midiEventBuf[x->bufWriteIndex].data.control.channel = mapped;
                 x->midiEventBuf[x->bufWriteIndex].data.control.param = 0;
                 x->midiEventBuf[x->bufWriteIndex].data.control.value = val;
                 break;
             case SND_SEQ_EVENT_KEYPRESS:
-                x->midiEventBuf[x->bufWriteIndex].data.note.channel = chan;
+                x->midiEventBuf[x->bufWriteIndex].data.note.channel = mapped;
                 x->midiEventBuf[x->bufWriteIndex].data.note.note = param;
                 x->midiEventBuf[x->bufWriteIndex].data.note.velocity = val;
                 break;
             case SND_SEQ_EVENT_PGMCHANGE:
-                x->instances[chan].pendingBankMSB = (param - 1) / 128;
-                x->instances[chan].pendingBankLSB = (param - 1) % 128;
-                x->instances[chan].pendingProgramChange = val;
-                x->instances[chan].uiNeedsProgramUpdate = 1; 
+                x->instances[mapped].pendingBankMSB = (param - 1) / 128;
+                x->instances[mapped].pendingBankLSB = (param - 1) % 128;
+                x->instances[mapped].pendingProgramChange = val;
+                x->instances[mapped].uiNeedsProgramUpdate = 1; 
 #if DEBUG
                 post("pgm chabge received in buffer: MSB: %d, LSB %d, prog: %d",
-                        x->instances[chan].pendingBankMSB, x->instances[chan].pendingBankLSB, val);
+                        x->instances[mapped].pendingBankMSB, x->instances[mapped].pendingBankLSB, val);
 #endif
-                dssi_tilde_program_change(x, chan);
+                dssi_tilde_program_change(x, mapped);
                 break;
         }
     }
     else if (type == SND_SEQ_EVENT_NOTEON && val == 0) {
         x->midiEventBuf[x->bufWriteIndex].type = SND_SEQ_EVENT_NOTEOFF;
-        x->midiEventBuf[x->bufWriteIndex].data.note.channel = chan;
+        x->midiEventBuf[x->bufWriteIndex].data.note.channel = mapped;
         x->midiEventBuf[x->bufWriteIndex].data.note.note = param;
         x->midiEventBuf[x->bufWriteIndex].data.note.velocity = val;
     }
 
 #if DEBUG
-    post("MIDI received in buffer: chan %d, param %d, val %d",
-            chan, param, val);
+    post("MIDI received in buffer: chan %d, param %d, val %d, mapped to %d",
+            chan, param, val, mapped);
 #endif
     x->bufWriteIndex = (x->bufWriteIndex + 1) % EVENT_BUFSIZE;
     pthread_mutex_unlock(&x->midiEventBufferMutex); /**release mutex*/
@@ -1890,7 +1893,6 @@ static t_int *dssi_tilde_perform(t_int *w)
 
             instance = x->midiEventBuf[x->bufReadIndex].data.note.channel;
 
-            instance = x->channelMap[instance + 1] - 1;
             /*This should never happen, but check anyway*/
             if(instance > x->n_instances || instance < 0){
                 post(
