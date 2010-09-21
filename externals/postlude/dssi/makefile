@@ -4,6 +4,7 @@ CSYM=dssi~
 LIBDIR=/usr/local/lib
 PDDIR=$(LIBDIR)/pd
 INSTALLPATH=$(PDDIR)/extra/
+ARCHITECTURE=i386
 DEBUG=0
 
 current: pd_linux
@@ -41,7 +42,7 @@ pd_darwin: src/$(NAME).pd_darwin
 
 .SUFFIXES: .pd_darwin
 
-DARWINCFLAGS = -DPD -O3 -Wall -W -Wshadow -Wstrict-prototypes \
+DARWINCFLAGS = -DPD -arch $(ARCHITECTURE) -O3 -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch -L/usr/local/lib/ -DDEBUG=$(DEBUG)
 
 DARWININCLUDE = -I ./ -I ../src -I/usr/local/include/ -I ./include -I/usr/local/include/dssi/
@@ -50,7 +51,7 @@ DARWININCLUDE = -I ./ -I ../src -I/usr/local/include/ -I ./include -I/usr/local/
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/jsearch.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/jload.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/dssi~.c
-	$(CC) -bundle -undefined suppress -flat_namespace -llo -o $(NAME).pd_darwin dssi~.o jload.o jsearch.o 
+	$(CC) -arch $(ARCHITECTURE) -bundle -undefined suppress -flat_namespace -llo -o $(NAME).pd_darwin dssi~.o jload.o jsearch.o 
 	rm -f *.o
 
 # ----------------------- Generic -----------------------

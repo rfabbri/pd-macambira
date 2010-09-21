@@ -26,6 +26,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <assert.h>
+
 #include "dssi~.h"
 #include "jutils.h"
 
@@ -341,11 +343,14 @@ static void dssi_tilde_connect_ports(t_dssi_tilde *x, t_int instance){
 
 }
 
-static void dssi_tilde_activate_plugin(t_dssi_tilde *x, t_float instance_f){
+static void dssi_tilde_activate_plugin(t_dssi_tilde *x, t_int instance){
 
-    t_int instance = (t_int)instance_f;
-    if(x->descriptor->LADSPA_Plugin->activate)
+    if(x->descriptor->LADSPA_Plugin->activate){
+#if DEBUG
+        post("trying to activate instance: %d", instance);
+#endif
         x->descriptor->LADSPA_Plugin->activate(x->instanceHandles[instance]);
+    }
 #if DEBUG
     post("plugin activated!");
 #endif
@@ -1559,275 +1564,287 @@ static const char* plugin_tilde_search_plugin_by_label (t_dssi_tilde *x,
 
 }
 
-static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
-    if(x->is_DSSI){
-        char *msg_type, 
-             *debug, 
-             *filename, 
-             *filepath, 
-             *key, 
-             *value, 
-             *temp,
-             mydir[MAXPDSTRING];
-        int instance = -1, 
-            pathlen, 
-            toggle, 
-            fd, 
-            n_instances = x->n_instances, 
-            count, 
-            maxpatches;
-        t_float val;
-        long filelength = 0;
-        unsigned char *raw_patch_data = NULL;
-        FILE *fp = NULL;
-        size_t filename_length, key_size, value_size;
-        dx7_patch_t *patchbuf, *firstpatch;
-        msg_type = (char *)malloc(TYPE_STRING_SIZE);
-        atom_string(argv, msg_type, TYPE_STRING_SIZE);
-        debug = NULL;
-        key = NULL;	
-        value = NULL;
-        maxpatches = 128; 
-        patchbuf = malloc(32 * sizeof(dx7_patch_t));
-        firstpatch = &patchbuf[0];
-        val = 0;
+static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) 
+{   
+    if (!x->is_DSSI) {
+        post("dssi~: plugin is not a DSSI plugin, operation not supported");
+        return 0;
+    }
+    char *msg_type, 
+         *debug, 
+         *filename, 
+         *filepath, 
+         *key, 
+         *value, 
+         *temp,
+         mydir[MAXPDSTRING];
+    int instance = -1, 
+        pathlen, 
+        toggle, 
+        fd, 
+        n_instances = x->n_instances, 
+        count, 
+        i,
+        chan,
+        maxpatches;
+    t_float val;
+    long filelength = 0;
+    unsigned char *raw_patch_data = NULL;
+    FILE *fp = NULL;
+    size_t filename_length, key_size, value_size;
+    dx7_patch_t *patchbuf, *firstpatch;
+    msg_type = (char *)malloc(TYPE_STRING_SIZE);
+    atom_string(argv, msg_type, TYPE_STRING_SIZE);
+    debug = NULL;
+    key = NULL;	
+    value = NULL;
+    maxpatches = 128; 
+    patchbuf = malloc(32 * sizeof(dx7_patch_t));
+    firstpatch = &patchbuf[0];
+    val = 0;
 
-        /*FIX: Temporary - at the moment we always load the first 32 patches to 0 */
-        if(strcmp(msg_type, "configure")){
-            instance = (int)atom_getfloatarg(2, argc, argv) - 1;
+    /*FIX: Temporary - at the moment we always load the first 32 patches to 0 */
+    if(strcmp(msg_type, "configure")){
+        instance = (int)atom_getfloatarg(2, argc, argv) - 1;
 
-            if(!strcmp(msg_type, "load") && x->descriptor->configure){
-                filename = argv[1].a_w.w_symbol->s_name;
-                post("dssi~: loading patch: %s for instance %d", filename, instance);
+        if(!strcmp(msg_type, "load") && x->descriptor->configure){
+            filename = argv[1].a_w.w_symbol->s_name;
+            post("dssi~: loading patch: %s for instance %d", filename, instance);
 
-                if(!strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter") || 
-                        !strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter6"))		{
+            if(!strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter") || 
+                    !strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter6"))		{
 
-                    key = malloc(10 * sizeof(char)); /* holds "patchesN" */
-                    strcpy(key, "patches0");
+                key = malloc(10 * sizeof(char)); /* holds "patchesN" */
+                strcpy(key, "patches0");
 
-                    /* FIX: duplicates code from load_plugin() */
-                    fd = canvas_open(x->x_canvas, filename, "",
-                            mydir, &filename, MAXPDSTRING, 0);
+                /* FIX: duplicates code from load_plugin() */
+                fd = canvas_open(x->x_canvas, filename, "",
+                        mydir, &filename, MAXPDSTRING, 0);
 
-                    if(fd >= 0){
-                        filepath = mydir;
-                        pathlen = strlen(mydir);
-                        temp = &mydir[pathlen];
-                        sprintf(temp, "/%s", filename);
-                        fp = fopen(filepath, "rb");
-                    }
-                    else{
-                        post("dssi~: unable to get file descriptor");
-                    }
-
-                    /*From dx7_voice_data by Sean Bolton */
-                    if(fp == NULL){
-                        post("dssi~: unable to open patch file: %s", filename);
-                        return 0;
-                    }
-                    if (fseek(fp, 0, SEEK_END) || 
-                            (filelength = ftell(fp)) == -1 ||
-                            fseek(fp, 0, SEEK_SET)) {
-                        post("dssi~: couldn't get length of patch file: %s", 
-                                filename);
-                        fclose(fp);
-                        return 0;
-                    }
-                    if (filelength == 0) {
-                        post("dssi~: patch file has zero length");
-                        fclose(fp);
-                        return 0;
-                    } else if (filelength > 16384) {
-                        post("dssi~: patch file is too large");
-                        fclose(fp);
-                        return 0;
-                    }
-                    if (!(raw_patch_data = (unsigned char *)
-                                malloc(filelength))) 		     			 {
-                        post(
-                                "dssi~: couldn't allocate memory for raw patch file");
-                        fclose(fp);
-                        return 0;
-                    }
-                    if (fread(raw_patch_data, 1, filelength, fp) 
-                            != (size_t)filelength) {
-                        post("dssi~: short read on patch file: %s", filename);
-                        free(raw_patch_data);
-                        fclose(fp);
-                        return 0;
-                    }
-                    fclose(fp);
-#if DEBUG
-                    post("Patch file length is %ul", filelength);
-#endif
-                    /* figure out what kind of file it is */
-                    filename_length = strlen(filename);
-                    if (filename_length > 4 &&
-                            !strcmp(filename + filename_length - 4, ".dx7") &&
-                            filelength % DX7_VOICE_SIZE_PACKED == 0) {  
-                        /* It's a raw DX7 patch bank */
-
-#if DEBUG
-                        post("Raw DX7 format patch bank passed");
-#endif
-                        count = filelength / DX7_VOICE_SIZE_PACKED;
-                        if (count > maxpatches)
-                            count = maxpatches;
-                        memcpy(firstpatch, raw_patch_data, count * 
-                                DX7_VOICE_SIZE_PACKED);
-
-                    } else if (filelength > 6 &&
-                            raw_patch_data[0] == 0xf0 &&
-                            raw_patch_data[1] == 0x43 &&
-                            /*This was used to fix some problem with Galaxy exports - possibly dump in worng format. It is not needed, but it did work, so in future, we may be able to support more formats not just DX7 */
-                            /*   ((raw_patch_data[2] & 0xf0) == 0x00 || 
-                                 raw_patch_data[2] == 0x7e) &&*/
-                            (raw_patch_data[2] & 0xf0) == 0x00 && 
-                            raw_patch_data[3] == 0x09 &&
-                            (raw_patch_data[4] == 0x10 || 
-                             raw_patch_data[4] == 0x20) &&  
-                            /* 0x10 is actual, 0x20 matches typo in manual */
-                            raw_patch_data[5] == 0x00) {  
-                        /* It's a DX7 sys-ex 32 voice dump */
-
-#if DEBUG
-                        post("SYSEX header check passed");
-#endif
-
-                        if (filelength != DX7_DUMP_SIZE_BULK ||
-                                raw_patch_data[DX7_DUMP_SIZE_BULK - 1] != 0xf7) {
-                            post("dssi~: badly formatted DX7 32 voice dump!");
-                            count = 0;
-
-#ifdef CHECKSUM_PATCH_FILES_ON_LOAD
-                        } else if (dx7_bulk_dump_checksum(&raw_patch_data[6],
-                                    DX7_VOICE_SIZE_PACKED * 32) !=
-                                raw_patch_data[DX7_DUMP_SIZE_BULK - 2]) {
-
-                            post("dssi~: DX7 32 voice dump with bad checksum!");
-                            count = 0;
-
-#endif
-                        } else {
-
-                            count = 32;
-                            if (count > maxpatches)
-                                count = maxpatches;
-                            memcpy(firstpatch, raw_patch_data + 6, count * DX7_VOICE_SIZE_PACKED);
-
-                        }
-                    } else {
-
-                        /* unsuccessful load */
-                        post("dssi~: unknown patch bank file format!");
-                        count = 0;
-
-                    }
-
-                    free(raw_patch_data);
-
-                    if(count == 32)
-                        value = encode_7in6((uint8_t *)&patchbuf[0].data[0], 
-                                count * DX7_VOICE_SIZE_PACKED);
-
-                }
-                else if(!strcmp(x->descriptor->LADSPA_Plugin->Label, 
-                            "FluidSynth-DSSI")){
-                    key = malloc(6 * sizeof(char));
-                    strcpy(key, "load");
-                    value = filename;
+                if(fd >= 0){
+                    filepath = mydir;
+                    pathlen = strlen(mydir);
+                    temp = &mydir[pathlen];
+                    sprintf(temp, "/%s", filename);
+                    fp = fopen(filepath, "rb");
                 }
                 else{
-                    post("dssi~: %s patches are not supported", 
-                            x->descriptor->LADSPA_Plugin->Label);
+                    post("dssi~: unable to get file descriptor");
                 }
 
-            }
-
-            if(!strcmp(msg_type, "dir") && x->descriptor->configure){
-                pathlen = strlen(argv[1].a_w.w_symbol->s_name) + 2;
-                x->project_dir = malloc((pathlen) * sizeof(char));
-                atom_string(&argv[1], x->project_dir, pathlen);
-                post("dssi~: project directory for instance %d has been set to: %s", instance, x->project_dir);
-                key = DSSI_PROJECT_DIRECTORY_KEY;
-                value = x->project_dir;
-            }
-
-            else if(!strcmp(msg_type, "dir"))
-                post("dssi~: %s %s: operation not supported", msg_type, 
-                        argv[1].a_w.w_symbol->s_name);
-
-            if(!strcmp(msg_type, "show") || !strcmp(msg_type, "hide")){
-                instance = (int)atom_getfloatarg(1, argc, argv) - 1;
-                if(!strcmp(msg_type, "show"))
-                    toggle = 1;
-                else
-                    toggle = 0;
-
-                if(instance == -1){
-                    while(n_instances--)
-                        dssi_show(x, n_instances, toggle);
+                /*From dx7_voice_data by Sean Bolton */
+                if(fp == NULL){
+                    post("dssi~: unable to open patch file: %s", filename);
+                    return 0;
                 }
-                else
-                    dssi_show(x, instance, toggle);
-            }
-
-        }
-
-        /*Use this to send arbitrary configure message to plugin */
-        else if(!strcmp(msg_type, "configure")){
-            key = 
-                (char *)malloc(key_size = (strlen(argv[1].a_w.w_symbol->s_name) + 2) * sizeof(char)); 
-            atom_string(&argv[1], key, key_size);
-            if(argc >= 3){	
-                if (argv[2].a_type == A_FLOAT){
-                    val = atom_getfloatarg(2, argc, argv);
-                    value = (char *)malloc(TYPE_STRING_SIZE * 
-                            sizeof(char));
-                    sprintf(value, "%.2f", val);
+                if (fseek(fp, 0, SEEK_END) || 
+                        (filelength = ftell(fp)) == -1 ||
+                        fseek(fp, 0, SEEK_SET)) {
+                    post("dssi~: couldn't get length of patch file: %s", 
+                            filename);
+                    fclose(fp);
+                    return 0;
                 }
-                else if(argv[2].a_type == A_SYMBOL){
-                    value = 
-                        (char *)malloc(value_size = 
-                                (strlen(argv[2].a_w.w_symbol->s_name) + 2) * 
-                                sizeof(char)); 
-                    atom_string(&argv[2], value, value_size);
-                }		
-
-            }	
-
-            if(argc == 4 && argv[3].a_type == A_FLOAT)
-                instance = atom_getfloatarg(3, argc, argv) - 1;
-            else if (n_instances)
-                instance = -1;
-        }
-
-        if(key != NULL && value != NULL){
-            if(instance == -1){
-                while(n_instances--){
-                    debug =	dssi_tilde_send_configure(
-                            x, key, value, n_instances);
-                    dssi_tilde_configure_buffer(x, key, value, n_instances);
+                if (filelength == 0) {
+                    post("dssi~: patch file has zero length");
+                    fclose(fp);
+                    return 0;
+                } else if (filelength > 16384) {
+                    post("dssi~: patch file is too large");
+                    fclose(fp);
+                    return 0;
                 }
-            }
-            /*FIX: Put some error checking in here to make sure instance is valid*/
-            else{
-
-                debug =	dssi_tilde_send_configure(x, key, value, instance);
-                dssi_tilde_configure_buffer(x, key, value, instance);
-            }
-        }
+                if (!(raw_patch_data = (unsigned char *)
+                            malloc(filelength))) 		     			 {
+                    post(
+                            "dssi~: couldn't allocate memory for raw patch file");
+                    fclose(fp);
+                    return 0;
+                }
+                if (fread(raw_patch_data, 1, filelength, fp) 
+                        != (size_t)filelength) {
+                    post("dssi~: short read on patch file: %s", filename);
+                    free(raw_patch_data);
+                    fclose(fp);
+                    return 0;
+                }
+                fclose(fp);
 #if DEBUG
-        post("The plugin returned %s", debug);
+                post("Patch file length is %ul", filelength);
 #endif
-        free(msg_type);
-        free(patchbuf);
-    }
-    else
-        post("dssi~: plugin is not a DSSI plugin, operation not supported");
-    return 0;
+                /* figure out what kind of file it is */
+                filename_length = strlen(filename);
+                if (filename_length > 4 &&
+                        !strcmp(filename + filename_length - 4, ".dx7") &&
+                        filelength % DX7_VOICE_SIZE_PACKED == 0) {  
+                    /* It's a raw DX7 patch bank */
 
+#if DEBUG
+                    post("Raw DX7 format patch bank passed");
+#endif
+                    count = filelength / DX7_VOICE_SIZE_PACKED;
+                    if (count > maxpatches)
+                        count = maxpatches;
+                    memcpy(firstpatch, raw_patch_data, count * 
+                            DX7_VOICE_SIZE_PACKED);
+
+                } else if (filelength > 6 &&
+                        raw_patch_data[0] == 0xf0 &&
+                        raw_patch_data[1] == 0x43 &&
+                        /*This was used to fix some problem with Galaxy exports - possibly dump in worng format. It is not needed, but it did work, so in future, we may be able to support more formats not just DX7 */
+                        /*   ((raw_patch_data[2] & 0xf0) == 0x00 || 
+                             raw_patch_data[2] == 0x7e) &&*/
+                        (raw_patch_data[2] & 0xf0) == 0x00 && 
+                        raw_patch_data[3] == 0x09 &&
+                        (raw_patch_data[4] == 0x10 || 
+                         raw_patch_data[4] == 0x20) &&  
+                        /* 0x10 is actual, 0x20 matches typo in manual */
+                        raw_patch_data[5] == 0x00) {  
+                    /* It's a DX7 sys-ex 32 voice dump */
+
+#if DEBUG
+                    post("SYSEX header check passed");
+#endif
+
+                    if (filelength != DX7_DUMP_SIZE_BULK ||
+                            raw_patch_data[DX7_DUMP_SIZE_BULK - 1] != 0xf7) {
+                        post("dssi~: badly formatted DX7 32 voice dump!");
+                        count = 0;
+
+#ifdef CHECKSUM_PATCH_FILES_ON_LOAD
+                    } else if (dx7_bulk_dump_checksum(&raw_patch_data[6],
+                                DX7_VOICE_SIZE_PACKED * 32) !=
+                            raw_patch_data[DX7_DUMP_SIZE_BULK - 2]) {
+
+                        post("dssi~: DX7 32 voice dump with bad checksum!");
+                        count = 0;
+
+#endif
+                    } else {
+
+                        count = 32;
+                        if (count > maxpatches)
+                            count = maxpatches;
+                        memcpy(firstpatch, raw_patch_data + 6, count * DX7_VOICE_SIZE_PACKED);
+
+                    }
+                } else {
+
+                    /* unsuccessful load */
+                    post("dssi~: unknown patch bank file format!");
+                    count = 0;
+
+                }
+
+                free(raw_patch_data);
+
+                if(count == 32)
+                    value = encode_7in6((uint8_t *)&patchbuf[0].data[0], 
+                            count * DX7_VOICE_SIZE_PACKED);
+
+            }
+            else if(!strcmp(x->descriptor->LADSPA_Plugin->Label, 
+                        "FluidSynth-DSSI")){
+                key = malloc(6 * sizeof(char));
+                strcpy(key, "load");
+                value = filename;
+            }
+            else{
+                post("dssi~: %s patches are not supported", 
+                        x->descriptor->LADSPA_Plugin->Label);
+            }
+
+        }
+
+        if(!strcmp(msg_type, "dir") && x->descriptor->configure){
+            pathlen = strlen(argv[1].a_w.w_symbol->s_name) + 2;
+            x->project_dir = malloc((pathlen) * sizeof(char));
+            atom_string(&argv[1], x->project_dir, pathlen);
+            post("dssi~: project directory for instance %d has been set to: %s", instance, x->project_dir);
+            key = DSSI_PROJECT_DIRECTORY_KEY;
+            value = x->project_dir;
+        }
+
+        else if(!strcmp(msg_type, "dir"))
+            post("dssi~: %s %s: operation not supported", msg_type, 
+                    argv[1].a_w.w_symbol->s_name);
+
+        if(!strcmp(msg_type, "show") || !strcmp(msg_type, "hide")){
+            instance = (int)atom_getfloatarg(1, argc, argv) - 1;
+            if(!strcmp(msg_type, "show"))
+                toggle = 1;
+            else
+                toggle = 0;
+
+            if(instance == -1){
+                while(n_instances--)
+                    dssi_show(x, n_instances, toggle);
+            }
+            else
+                dssi_show(x, instance, toggle);
+        }
+
+        if(!strcmp(msg_type, "remap")) {
+            /* remap channel to instance */
+            for(i = 0; i < x->n_instances && i < 128; i++){
+                chan = (int)atom_getfloatarg(1 + i, argc, argv);
+                post("dssi~: remapped MIDI channel %d to %d", 1+i, chan);
+                x->channelMap[i+1] = chan;
+            }
+        }
+
+    }
+
+    /*Use this to send arbitrary configure message to plugin */
+    else if(!strcmp(msg_type, "configure")){
+        key = 
+            (char *)malloc(key_size = (strlen(argv[1].a_w.w_symbol->s_name) + 2) * sizeof(char)); 
+        atom_string(&argv[1], key, key_size);
+        if(argc >= 3){	
+            if (argv[2].a_type == A_FLOAT){
+                val = atom_getfloatarg(2, argc, argv);
+                value = (char *)malloc(TYPE_STRING_SIZE * 
+                        sizeof(char));
+                sprintf(value, "%.2f", val);
+            }
+            else if(argv[2].a_type == A_SYMBOL){
+                value = 
+                    (char *)malloc(value_size = 
+                            (strlen(argv[2].a_w.w_symbol->s_name) + 2) * 
+                            sizeof(char)); 
+                atom_string(&argv[2], value, value_size);
+            }		
+
+        }	
+
+        if(argc == 4 && argv[3].a_type == A_FLOAT)
+            instance = atom_getfloatarg(3, argc, argv) - 1;
+        else if (n_instances)
+            instance = -1;
+    }
+
+    if(key != NULL && value != NULL){
+        if(instance == -1){
+            while(n_instances--){
+                debug =	dssi_tilde_send_configure(
+                        x, key, value, n_instances);
+                dssi_tilde_configure_buffer(x, key, value, n_instances);
+            }
+        }
+        /*FIX: Put some error checking in here to make sure instance is valid*/
+        else{
+
+            debug =	dssi_tilde_send_configure(x, key, value, instance);
+            dssi_tilde_configure_buffer(x, key, value, instance);
+        }
+    }
+#if DEBUG
+    post("The plugin returned %s", debug);
+#endif
+    free(msg_type);
+    free(patchbuf);
+
+    return 0;
 }
 
 static void dssi_tilde_bang(t_dssi_tilde *x)
@@ -1872,6 +1889,8 @@ static t_int *dssi_tilde_perform(t_int *w)
                 (x->bufReadIndex + 1) % EVENT_BUFSIZE) {
 
             instance = x->midiEventBuf[x->bufReadIndex].data.note.channel;
+
+            instance = x->channelMap[instance + 1] - 1;
             /*This should never happen, but check anyway*/
             if(instance > x->n_instances || instance < 0){
                 post(
@@ -2286,7 +2305,8 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
                     for(i = 0;i < x->n_instances; i++)
                         dssi_tilde_connect_ports(x, i); 
                     for(i = 0;i < x->n_instances; i++)
-                        dssi_tilde_activate_plugin(x, (t_float)i);
+                        dssi_tilde_activate_plugin(x, i);
+
                     if(x->is_DSSI){
                         for(i = 0;i < x->n_instances; i++)
                             dssi_tilde_osc_setup(x, i);
@@ -2296,6 +2316,10 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
 #endif
                         for(i = 0;i < x->n_instances; i++)
                             dssi_tilde_init_programs(x, i);
+
+                        for(i = 0; i < x->n_instances && i < 128; i++){
+                            x->channelMap[i] = i;
+                        }
                     }
                 }
             }
@@ -2317,19 +2341,29 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
             /*	x->outlets = 
                 (t_float **)calloc(x->plugin_outs, 
                 sizeof(t_float *));
-                */}
-            if(x->plugin_ins){
-                x->inlets = (t_inlet **)getbytes(x->plugin_ins * sizeof(t_inlet *)); 
-                for(i = 0;i < x->plugin_ins; i++)
-                    x->inlets[i] = inlet_new(&x->x_obj, &x->x_obj.ob_pd,						&s_signal, &s_signal);
-                /*	x->inlets = 
-                        (t_float **)calloc(x->plugin_ins, 
-                        sizeof(t_float *));
-                        */}
-                x->dsp = 1;
-                post("dssi~: %d instances of %s, ready.", x->n_instances, 
-                        x->plugin_label);
+                */
+        }
+        else 
+            post("dssi~: error: plugin has no outputs");
+        if(x->plugin_ins){
+            x->inlets = (t_inlet **)getbytes(x->plugin_ins * sizeof(t_inlet *)); 
+            for(i = 0;i < x->plugin_ins; i++)
+                x->inlets[i] = inlet_new(&x->x_obj, &x->x_obj.ob_pd,						&s_signal, &s_signal);
+            /*	x->inlets = 
+                (t_float **)calloc(x->plugin_ins, 
+                sizeof(t_float *));
+                */
+        }
+        else 
+            post("dssi~: error: plugin has no inputs");
+
+        x->dsp = 1;
+        post("dssi~: %d instances of %s, ready.", x->n_instances, 
+                x->plugin_label);
     }
+    else
+        post("dssi~: error: no plugin handle");
+
     return (void *)x;    
 }
 

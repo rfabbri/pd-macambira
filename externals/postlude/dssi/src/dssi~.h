@@ -53,7 +53,7 @@
 #define ASCII_t 116
 #define ASCII_a 97
 
-#define LOADGUI 1 /* FIX: depracate this */
+#define LOADGUI 0 /* FIX: depracate this */
 #ifdef DEBUG
 #define CHECKSUM_PATCH_FILES_ON_LOAD 1
 #endif
@@ -128,6 +128,7 @@ typedef struct _dssi_tilde {
     t_dssi_instance *instances; 
     int n_instances;
     unsigned long *instanceEventCounts;
+    unsigned char channelMap[128];
     snd_seq_event_t **instanceEventBuffers;
 
     snd_seq_event_t midiEventBuf[EVENT_BUFSIZE];
