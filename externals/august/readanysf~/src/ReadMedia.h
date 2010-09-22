@@ -28,6 +28,9 @@ extern "C" {
 #define CMD_OPEN 1
 #define CMD_QUIT 2
 
+#define SEEK_NOTHING -1
+#define SEEK_REWIND -2
+
 class ReadMedia  {
 
 	public:
@@ -51,9 +54,9 @@ class ReadMedia  {
 		int getAudioSamplerate();
 		int getAudioChannelCount();
 		int getVideoTimescale();
-		int getVideoFrameDuration();
 
 		double getLengthInSeconds(); 
+		gavl_time_t getLengthInGavlTime(); 
 		int64_t getLengthInAudioSamples();
 		int64_t getLengthInVideoFrames();
 
@@ -67,7 +70,7 @@ class ReadMedia  {
 	
 		double getATimeInSeconds();
 		double getVTimeInSeconds();
-		float getTimeInSeconds();
+		//float getTimeInSeconds();
 		float getAudioFifoSizePercentage();
 
 		void copyAudioFormat(gavl_audio_format_t * dst ); 
@@ -160,6 +163,7 @@ class ReadMedia  {
 		int64_t m_frame_seek;
 		
 		double m_length_in_seconds;
+		gavl_time_t m_length_in_gavltime;
 		int64_t m_num_samples;
 		int64_t m_num_frames;
 
@@ -174,8 +178,8 @@ class ReadMedia  {
 
 	
 		// current time of audio in seconds
-		double m_atime;
-		double m_vtime;
+		//double m_atime;
+		//double m_vtime;
 
 		int m_afifosize;
 		int m_vfifosize;

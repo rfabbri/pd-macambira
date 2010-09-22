@@ -127,6 +127,17 @@ void m_tick(t_readanysf *x, float f) {
 
 void m_stop(t_readanysf *x) {
 	x->play = false;
+	x->samplesleft=0;
+	x->count=0;
+/*
+	if( x->out_audio_frame != NULL)
+		gavl_audio_frame_mute_samples(x->out_audio_frame, &x->out_audio_format, x->out_audio_format.samples_per_frame);
+	if( x->in_audio_frame != NULL)
+		gavl_audio_frame_mute_samples(x->in_audio_frame, &x->in_audio_format, x->in_audio_format.samples_per_frame);
+	if( x->tmp_audio_frame != NULL)
+		gavl_audio_frame_mute_samples(x->tmp_audio_frame, &x->tmp_audio_format, x->tmp_audio_format.samples_per_frame);
+*/
+
 	x->rm->rewind();
 }
 
@@ -210,7 +221,6 @@ void m_open_callback( void * data) {
 	}
 	x->is_opening=false;
 	pthread_mutex_unlock(&x->mut);
-
 }
 
 void m_open(t_readanysf *x, t_symbol *s) {
@@ -291,7 +301,20 @@ static void *readanysf_new(t_float f, t_float f2, t_float f3 ) {
 	x->tmp_audio_frame=NULL;	
 	x->in_audio_frame=NULL;	
 
-	// set up the audio formats in dsp call
+	// set up the audio formats.  Need to also set them in dsp call
+	x->tmp_audio_format.samplerate = sys_getsr();
+	x->tmp_audio_format.sample_format = GAVL_SAMPLE_FLOAT ;
+	x->tmp_audio_format.interleave_mode = GAVL_INTERLEAVE_NONE;
+	x->tmp_audio_format.num_channels = x->num_channels;
+	x->tmp_audio_format.channel_locations[0] = GAVL_CHID_NONE; // Reset
+	x->tmp_audio_format.samples_per_frame = x->num_samples_per_frame;
+
+	x->out_audio_format.samplerate = sys_getsr();
+	x->out_audio_format.sample_format = GAVL_SAMPLE_FLOAT ;
+	x->out_audio_format.interleave_mode = GAVL_INTERLEAVE_NONE;
+	x->out_audio_format.num_channels = x->num_channels;
+	x->out_audio_format.channel_locations[0] = GAVL_CHID_NONE; // Reset
+
 
 	x->i2t_audio_converter=NULL;
 	x->t2o_audio_converter=NULL;
@@ -325,6 +348,7 @@ int m_get_frame( t_readanysf *x ) {
 
 	if (x->do_i2t_audio_convert) {
 		gavl_audio_convert( x->i2t_audio_converter, x->in_audio_frame, x->tmp_audio_frame) ;
+		x->tmp_audio_frame->valid_samples = x->in_audio_frame->valid_samples;
 	} else {
 		gavl_audio_frame_copy(&x->in_audio_format, x->tmp_audio_frame,  x->in_audio_frame, 
 				0,0, x->in_audio_frame->valid_samples, x->in_audio_frame->valid_samples) ;
@@ -332,7 +356,6 @@ int m_get_frame( t_readanysf *x ) {
 	}
 
 	if ( x->do_t2o_audio_convert  ) { // should be true all of the time
-		//gavl_audio_convert( t2o_audio_converter, taf, oaf );
 		gavl_audio_converter_resample( x->t2o_audio_converter, x->tmp_audio_frame, x->out_audio_frame, x->src_factor );
 		//  Don't know why, but on the first conversion, I get one extra sample
 		//  THIS SHOULD NOT HAPPEN...this is a fix for now..check it out later.
@@ -341,15 +364,14 @@ int m_get_frame( t_readanysf *x ) {
 		//			x->tmp_audio_frame->valid_samples, x->out_audio_frame->valid_samples, x->src_factor);
 			//x->samplesleft = x->out_audio_frame->valid_samples = x->num_samples_per_frame;
 		//} else {
-			x->samplesleft = x->out_audio_frame->valid_samples;
+		x->samplesleft = x->out_audio_frame->valid_samples;
 		//}
 	} else {
 		// copy the samples to the output
 		gavl_audio_frame_copy(&x->tmp_audio_format, x->out_audio_frame, x->tmp_audio_frame, 
 				0,0, x->tmp_audio_frame->valid_samples, x->tmp_audio_frame->valid_samples) ;
 		//printf("copying taf to oaf,  taf->vs %d, oaf->vs %d\n", taf->valid_samples, oaf->valid_samples);
-		x->samplesleft = x->tmp_audio_frame->valid_samples;
-		x->out_audio_frame->valid_samples = x->tmp_audio_frame->valid_samples;
+		x->samplesleft = x->out_audio_frame->valid_samples = x->tmp_audio_frame->valid_samples;
 	}
 	return ret;
 }
@@ -402,6 +424,7 @@ static t_int *readanysf_perform(t_int *w) {
 	int samples_returned = 0;
 	t_atom lst;
 
+
 	if (x->play ) { // play protects the memory accessed in m_decode_block
 		samples_returned = m_decode_block( x );	
 		if (samples_returned == 0 ) { // EOF
@@ -412,19 +435,22 @@ static t_int *readanysf_perform(t_int *w) {
 			samples_returned=0;
 		}
 	} 
-
+	
 	for (i = 0; i < x->num_channels; i++) {
 		for (j = samples_returned; j < x->blocksize;  j++) {
 			x->x_outvec[i][j] = 0.0;
 		}
 	}
 
+
 	// just set some variables
 	if ( ++x->count > x->tick ) {
 		SETFLOAT (&lst, x->rm->getAudioFifoSizePercentage() );
 		outlet_anything(x->outinfo, gensym("cache"), 1, &lst);
 		if (x->play) {
-			outlet_float(x->outinfo, x->rm->getTimeInSeconds());
+			outlet_float( x->outinfo,
+					gavl_time_to_seconds(gavl_time_unscale(x->in_audio_format.samplerate, x->in_audio_frame->timestamp))
+			);
 		}
 		x->count = 0;
 	}
@@ -434,7 +460,6 @@ static t_int *readanysf_perform(t_int *w) {
 
 void readanysf_dsp(t_readanysf *x, t_signal **sp) {
 	int i=0;
-
 	if (x->blocksize != sp[0]->s_n) {
 		x->blocksize = sp[0]->s_n;
 
@@ -458,7 +483,7 @@ void readanysf_dsp(t_readanysf *x, t_signal **sp) {
 		if(x->out_audio_frame != NULL)
 			gavl_audio_frame_destroy( x->out_audio_frame);
 		x->out_audio_frame = gavl_audio_frame_create(&x->out_audio_format);
-		printf("created new out frame in readanysf_dsp\n");
+		//printf("created new out frame in readanysf_dsp\n");
   	post("pd blocksize=%d, spf=%d", x->blocksize, x->num_samples_per_frame);
 	}
 
@@ -466,6 +491,7 @@ void readanysf_dsp(t_readanysf *x, t_signal **sp) {
 	  x->x_outvec[i] = sp[i]->s_vec;
 		    
   dsp_add(readanysf_perform, 1, x);
+	
 }
 
 static void readanysf_free(t_readanysf *x) {

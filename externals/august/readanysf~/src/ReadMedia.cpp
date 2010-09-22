@@ -15,16 +15,17 @@ ReadMedia::ReadMedia(  ) {
 
 	m_audio_frame = NULL;
 	m_video_frame = NULL;
-	m_aeof = false;
-	m_veof = false;
-	m_atime = 0.0;
-	m_vtime = 0.0;
+	m_aeof = true;
+	m_veof = true;
+	//m_atime = 0.0;
+	//m_vtime = 0.0;
 	m_video_stream_count =0;
 	m_audio_stream_count =0;
 	
-	m_pcm_seek = -1;
-	m_frame_seek = -1;
+	m_pcm_seek = SEEK_NOTHING;
+	m_frame_seek = SEEK_NOTHING;
 	m_length_in_seconds=0.0;
+	m_length_in_gavltime = 0;
 	m_num_frames=0;
 	m_num_samples=0;
 
@@ -39,7 +40,7 @@ ReadMedia::ReadMedia(  ) {
 	m_video_format.timescale=0;
 	m_video_format.framerate_mode=GAVL_FRAMERATE_CONSTANT;
 	m_video_format.chroma_placement=GAVL_CHROMA_PLACEMENT_DEFAULT;
-	//m_video_format.interlace_mode=GAVL_INTERLACE_UNKNOWN;
+	m_video_format.interlace_mode=GAVL_INTERLACE_UNKNOWN;
 	m_video_format.timecode_format.int_framerate =0;
 	m_video_format.timecode_format.flags =0;
 
@@ -155,6 +156,7 @@ int ReadMedia::decodeVideo( gavl_video_frame_t * vf ) {
 
 	if (!m_fifovideo->Get( vf )  ) {
 		if ( m_veof ) {
+			m_frame_seek = SEEK_NOTHING;
 			unlockState();
 			signalV();
 			return 0;
@@ -166,7 +168,7 @@ int ReadMedia::decodeVideo( gavl_video_frame_t * vf ) {
 		}
 	}
 
-	m_vtime = 	vf->timestamp / (double)m_video_format.timescale;
+	//m_vtime = 	vf->timestamp / (double)m_video_format.timescale;
 	unlockState();
 	signalV();
 	return 1 ;
@@ -181,7 +183,7 @@ int ReadMedia::decodeAudio( gavl_audio_frame_t * af ) {
 
 	if ( !m_fifoaudio->Get( af )  ) {
 		if ( m_aeof ) {
-			m_pcm_seek = -1;
+			m_pcm_seek = SEEK_NOTHING;
 			unlockState();
 			signalA();
 			return 0;
@@ -193,43 +195,54 @@ int ReadMedia::decodeAudio( gavl_audio_frame_t * af ) {
 		}
 	}
 
-	m_atime = af->timestamp / (double)m_audio_format.samplerate;
+	//m_atime = af->timestamp / (double)m_audio_format.samplerate;
 	unlockState();
 	signalA();
 	return 1 ;
 }
 
 bool ReadMedia::rewind() {
+	// NOTE!! Always check for stream count before setting aeof or veof
 	lockState();
 	if ( m_state == STATE_READY && m_file != NULL) {
-		if (m_audio_stream_count){
-			//m_audio_frame->valid_samples = 0;
-			m_pcm_seek = 0;	
-			m_frame_seek = -1;
-			m_aeof = false;
-			m_atime = 0;
-			// need to signal after setting eof to false;
-			unlockState();
-			signalAV();
-			lockState();
-		} 
-		if ( m_video_stream_count ) {
-			if (m_audio_stream_count == 0) {
-				m_frame_seek=0;
-				m_pcm_seek = -1;
-			}
-			m_veof = false;
-			m_vtime=0;
-			unlockState();
-			signalAV();
-			lockState();
-		}	
+		//printf("ReadMedia::rewind(), valid_samples=%d\n", m_audio_frame->valid_samples);
+		m_pcm_seek = SEEK_REWIND;	
+		if(m_audio_stream_count) m_aeof = false;
+		//m_atime = 0;
+		m_frame_seek=SEEK_REWIND;
+		if (m_video_stream_count) m_veof = false;
+		//m_vtime=0;
+
 		unlockState();
-		// fifo flush happens when we seek
+		if (m_audio_stream_count) {
+			signalA();  // only signal one or the other here
+			//printf("ReadMedia::rewind(), signaled audio\n");
+			// we are gong to flush here even though it is flushed
+			// during the audio or video thread.  This will ensure our fifo 
+			// is clean and empty.  Otherwise, the audio thread may be waiting
+			// at the bottom of its loop and not make it to the flush part even 
+			// though we signalled it.
+			if (m_fifoaudio)
+				m_fifoaudio->Flush();
+		}
+		else if (m_video_stream_count) {
+			signalV();
+			if (m_fifovideo)
+				m_fifovideo->Flush();
+		}
+
 		return true;
 	}
 	unlockState();
 	return false;
+}
+
+gavl_time_t ReadMedia::getLengthInGavlTime() {
+	gavl_time_t time = 0;
+	lockState();
+	time = m_length_in_gavltime;
+	unlockState();
+	return time;
 }
 
 double ReadMedia::getLengthInSeconds() {
@@ -264,7 +277,7 @@ bool ReadMedia::frameSeek( int64_t frames ) {
 		signalAV();
 		return true;
 	} else {
-		m_frame_seek = -1;
+		m_frame_seek = SEEK_NOTHING;
 		unlockState();
 		return false;
 	}
@@ -272,10 +285,10 @@ bool ReadMedia::frameSeek( int64_t frames ) {
 
 // NOT PUBLIC
 int64_t ReadMedia::frameSeek() {
-	int64_t tmp=-1;
+	int64_t tmp=SEEK_NOTHING;
 	lockState();
 	tmp = m_frame_seek;	
-	m_frame_seek = -1;
+	m_frame_seek = SEEK_NOTHING;
 	unlockState();
 	return tmp;
 }
@@ -288,7 +301,7 @@ bool ReadMedia::pcmSeek( int64_t samples ) {
 		signalAV();
 		return true;
 	} else {
-		m_pcm_seek = -1;
+		m_pcm_seek = SEEK_NOTHING;
 		unlockState();
 		return false;
 	}
@@ -296,10 +309,10 @@ bool ReadMedia::pcmSeek( int64_t samples ) {
 
 // NOT PUBLIC
 int64_t ReadMedia::pcmSeek() {
-	int64_t tmp=-1;
+	int64_t tmp=SEEK_NOTHING;
 	lockState();
 	tmp = m_pcm_seek;	
-	m_pcm_seek = -1;
+	m_pcm_seek = SEEK_NOTHING;
 	unlockState();
 	return tmp;
 }
@@ -312,14 +325,14 @@ bool ReadMedia::timeSeek(double seconds) {
 		if (m_audio_stream_count) {
 			m_pcm_seek = gavl_time_to_samples(m_audio_format.samplerate, gt );
 			if (m_pcm_seek >= m_num_samples || m_pcm_seek < 0) 
-				m_pcm_seek = -1;
+				m_pcm_seek = SEEK_NOTHING;
 			unlockState();
 			signalAV();
 			return true;	
-		} else if ( m_video_stream_count ) {
+		} else if ( m_video_stream_count  && m_video_format.framerate_mode == GAVL_FRAMERATE_CONSTANT ) {
 			m_frame_seek =	gavl_time_to_frames( m_video_format.timescale, m_video_format.frame_duration,  gt );
 			if (m_frame_seek >= m_num_frames || m_frame_seek < 0 )
-				m_frame_seek = -1;
+				m_frame_seek = SEEK_NOTHING;
 			unlockState();
 			signalAV();
 			return true;
@@ -343,6 +356,7 @@ void ReadMedia::openFile( char * fn, int vsize, int asize, int spf) {
 	if (  strcmp(m_filename, fn) == 0  && m_state == STATE_READY) {
 		printf("%s is already open for action. \n", m_filename);
 		unlockState();
+		callOpenCallback();
 		return;
 	}
 	*/
@@ -398,13 +412,6 @@ int ReadMedia::getVideoTimescale() {
 	return t;
 }
 
-int ReadMedia::getVideoFrameDuration() { 
-	int t=0;
-	lockState();	
-	t = m_video_format.frame_duration;
-	unlockState();
-	return t;
-}
 
 char * ReadMedia::getFilename() {
 	return  m_filename;
@@ -433,9 +440,9 @@ int ReadMedia::getState() {
 
 bool ReadMedia::isReady() { if ( getState() == STATE_READY) return true; else return false;}
 // no need to lock on these
-double ReadMedia::getATimeInSeconds() { return m_atime;};
-double ReadMedia::getVTimeInSeconds() { return m_vtime;};
-
+//double ReadMedia::getATimeInSeconds() { return m_atime;};
+//double ReadMedia::getVTimeInSeconds() { return m_vtime;};
+/*
 float ReadMedia::getTimeInSeconds() { 
 	lockState();
 	if (m_audio_stream_count > 0 ) {
@@ -447,6 +454,7 @@ float ReadMedia::getTimeInSeconds() {
 		return m_vtime;
 	}
 };
+*/
 
 float ReadMedia::getAudioFifoSizePercentage() { 
 	float f=0.0;
@@ -474,11 +482,13 @@ void ReadMedia::pealOffVideoFrames( int howmany) {
 void ReadMedia::setAEOF(bool b) { 
 	lockState();
 	m_aeof = b;
+	m_pcm_seek = SEEK_NOTHING;
 	unlockState();
 }
 void ReadMedia::setVEOF(bool b) { 
 	lockState();
 	m_veof = b;
+	m_frame_seek = SEEK_NOTHING;
 	unlockState();
 }
 
@@ -489,6 +499,7 @@ bool ReadMedia::getEOF() {
 	if (m_state == STATE_READY)
 		tmp = (m_aeof && m_veof);
 	unlockState();
+	//printf("ReadMedia:getEOF=%d, aeof=%d, veof=%d\n", tmp, m_aeof, m_veof);
 	return tmp;
 }
 
@@ -500,7 +511,12 @@ void ReadMedia::setLoop( bool b) {
 bool ReadMedia::getLoop() {
 	bool tmp = true;
 	lockState();
-	tmp = m_loop;	
+	if (m_file && bgav_can_seek( m_file) ) {
+		tmp = m_loop;	
+	} else {
+		tmp = false; // we can't loop on file, return false 
+		// but leave the loop var untouched
+	}
 	unlockState();
 	return tmp;
 }
@@ -609,6 +625,7 @@ void ReadMedia::setAudioStreamCount(int s){
 	m_audio_stream_count=s;
 	if (s == 0) // no audio streams, we are already at audio eof
 		m_aeof = true;
+	else m_aeof = false;
 	unlockState();
 }
 // NOT PUBLIC
@@ -617,6 +634,7 @@ void ReadMedia::setVideoStreamCount(int s){
 	m_video_stream_count=s; 
 	if (s==0) // if there are no video streams, video is at eof
 		m_veof = true; 
+	else m_veof =false;
 	unlockState();
 }
 
@@ -646,10 +664,10 @@ void ReadMedia::clearFile() {
 
 	m_file = bgav_create();
 	bgav_options_copy( bgav_get_options( m_file ) , m_opt);
-	m_aeof = false;
-	m_veof = false;
-	m_pcm_seek = -1;
-	m_frame_seek = -1;
+	m_aeof = true;
+	m_veof = true;
+	m_pcm_seek = SEEK_NOTHING;
+	m_frame_seek = SEEK_NOTHING;
 }
 
 // NOT PUBLIC
@@ -659,10 +677,10 @@ void ReadMedia::closeFile() {
 	if (m_file != NULL)
 		bgav_close( m_file );
 	m_file = NULL;
-	m_aeof = false;
-	m_veof = false;
-	m_pcm_seek = -1;
-	m_frame_seek = -1;
+	m_aeof = true;
+	m_veof = true;
+	m_pcm_seek = SEEK_NOTHING;
+	m_frame_seek = SEEK_NOTHING;
 
 	sprintf(m_filename, "seinettbitte!");
 }
@@ -756,6 +774,7 @@ bool ReadMedia::initFormat() {
 		}
 	} else {
 		m_video_stream_count = 0;
+		m_veof = true;
 	}
 
 	// we use the m_afifosize to see if the user app wants audio or not
@@ -775,13 +794,15 @@ bool ReadMedia::initFormat() {
 			int spf = m_audio_format.samples_per_frame; 
 			gavl_audio_format_copy(&m_audio_format, open_audio_format);
 
-			if (m_audio_frame != NULL)
+			if (m_audio_frame != NULL) {
 				gavl_audio_frame_destroy(m_audio_frame);
+			}
 
 			// set it back to original
 			m_audio_format.samples_per_frame = spf ;
 
 			m_audio_frame = gavl_audio_frame_create(&m_audio_format);
+	
 			gavl_audio_frame_mute( m_audio_frame, &m_audio_format);
 			if( m_fifoaudio != NULL )
 				delete m_fifoaudio;
@@ -790,39 +811,55 @@ bool ReadMedia::initFormat() {
 	} else {
 		// user doesn't want audio
 		m_audio_stream_count = 0;
+		m_aeof=true;
 	}
 
-	if (bgav_can_seek(m_file)) {	
-		// set seconds
-		m_length_in_seconds = gavl_time_to_seconds(  bgav_get_duration ( m_file, 0) );	
 
-		// set samples
-		if (m_audio_stream_count) 
-			if ( bgav_can_seek_sample(m_file) == 1 ) 
-				m_num_samples=	bgav_audio_duration ( m_file, 0) ;
-			else 
-				m_num_samples=	gavl_time_to_samples( m_audio_format.samplerate ,  bgav_get_duration ( m_file, 0) );
-		else 
-			m_num_samples=0;
+	m_length_in_gavltime = bgav_get_duration ( m_file, 0);;
+	m_length_in_seconds = gavl_time_to_seconds(  m_length_in_gavltime );
+	m_num_samples = 0;
+	m_num_frames = 0;
 
-			// set frames
-		if(m_video_stream_count)
-			if ( bgav_can_seek_sample(m_file) == 1 ) 
-				m_num_frames =	bgav_video_duration ( m_file, 0);
-			else 
-				m_num_frames =	gavl_time_to_frames( m_video_format.timescale, m_video_format.frame_duration ,  bgav_get_duration ( m_file, 0) );
-		else 
+	if (m_audio_stream_count) {
+		if ( bgav_can_seek_sample(m_file) == 1 ) {
+			m_num_samples=	bgav_audio_duration ( m_file, 0) ;
+	 } else { 
+			m_num_samples=	gavl_time_to_samples( m_audio_format.samplerate ,  bgav_get_duration ( m_file, 0) );
+		}
+	}
+
+	// set frames   WE NEED TO take care here for non-constant frame-rates
+	if(m_video_stream_count) {
+		if ( bgav_can_seek_sample(m_file) == 1  && m_video_format.framerate_mode == GAVL_FRAMERATE_CONSTANT) { 
+			m_num_frames =	bgav_video_duration ( m_file, 0)/ m_video_format.frame_duration;
+		} else if ( bgav_can_seek_sample(m_file) == 1  && m_video_format.framerate_mode == GAVL_FRAMERATE_VARIABLE ) {
+			// FIXME what to do with non constant frame rates?
 			m_num_frames=0;
-
-	} else { // no can seek;
-		
-		m_length_in_seconds = 0.0;
-		m_num_samples = 0;
-		m_num_frames = 0;
+		} else { 
+			m_num_frames =	gavl_time_to_frames( m_video_format.timescale, m_video_format.frame_duration ,  bgav_get_duration ( m_file, 0) );
+		}
 	}
 
-	m_pcm_seek = -1;
-	m_frame_seek = -1;
+  //	printf("m_num_frames =%lld, duration = %lld , vid_duration=%lld\n", 
+	//		m_num_frames, bgav_get_duration ( m_file, 0),  bgav_video_duration ( m_file, 0) );
+	// set seconds
+	if ( bgav_can_seek_sample(m_file) == 1) {
+		gavl_time_t atime=0,vtime=0;
+		if ( m_audio_stream_count ) 
+			atime =  gavl_samples_to_time( m_audio_format.samplerate, m_num_samples );
+		if (m_video_stream_count &&  m_video_format.frame_duration > 0) {
+			vtime =  gavl_frames_to_time( m_video_format.timescale, m_video_format.frame_duration, m_num_frames );
+		} else if ( m_video_stream_count  ) { // non constant framerate			
+			vtime = bgav_video_duration( m_file, 0);
+		}
+		// else rely on audio time
+		m_length_in_gavltime = atime > vtime ? atime :vtime;
+		m_length_in_seconds = gavl_time_to_seconds( m_length_in_gavltime );
+		//printf("atime=%ld,  vtime=%ld, l_in_sec=%f\n", atime, vtime, m_length_in_seconds);
+	} 
+
+	m_pcm_seek = SEEK_NOTHING;
+	m_frame_seek = SEEK_NOTHING;
 
 	return true;
 }
@@ -886,7 +923,6 @@ void *the_thread_opener(void *xp) {
 
 	// clearFile  deletes old file and creates new File
 	rm->clearFile();
-
 	if(!bgav_open(rm->getFile(), rm->getFilename())) {
 		printf( "Could not open file %s\n", rm->getFilename());
 		rm->setState( STATE_EMPTY );
@@ -940,6 +976,7 @@ void *the_thread_opener(void *xp) {
 	rm->setVideoStreamCount(video_stream_count);
 	rm->setAudioStreamCount(audio_stream_count);
 	
+	//printf("astream_count = %d, vstream_count=%d\n", audio_stream_count, video_stream_count);
 	if(!bgav_start(rm->getFile())) {
 		printf( "failed to start file\n");
 		rm->setState( STATE_EMPTY );
@@ -979,12 +1016,11 @@ void *the_audiofifo_filler( void * xp) {
 	int dovideo = rm->getVideoStreamCount();	
 	int spf = rm->getSamplesPerFrame();
 	int samplerate = rm->getAudioSamplerate();
-	int64_t seekto =-1;
+	int64_t seekto = SEEK_NOTHING;
 	int can_seek = bgav_can_seek ( rm->getFile() );
 	int can_seek_sample = bgav_can_seek_sample ( rm->getFile() );
 	
-	while (!rm->quitAVThreads() ) {
-
+	while ( !rm->quitAVThreads() ) {
 		//while ( rm->getAudioFifo() != NULL && rm->getAudioFifo()->FreeSpace() && !rm->getAEOF() ) {
 		while ( rm->getAudioFifo()->FreeSpace() && !rm->getAEOF() ) {
 
@@ -994,14 +1030,21 @@ void *the_audiofifo_filler( void * xp) {
 			// check to see if we need to seek
 			// if this is set, we already know we can seek on this file 
 			// and don't need to check with bgav_can_seek
-			if ( can_seek && (seekto = rm->pcmSeek() )  >= 0 ) {
-				rm->getAudioFifo()->Flush();
-				if (dovideo && rm->getVideoFifo() ) rm->getVideoFifo()->Flush();
-				if ( can_seek_sample ) {
-					bgav_seek_audio(rm->getFile() , 0, seekto );
-				} else {
-					gavl_time_t gt = gavl_samples_to_time( samplerate, seekto ) ;        
-					bgav_seek(rm->getFile(), &gt);
+			if ( can_seek ) {
+				seekto = rm->pcmSeek();
+				if (  seekto != SEEK_NOTHING ) {
+					if ( seekto == SEEK_REWIND)  {
+						// bgav_seek_audio ONLY seeks on the audio stream
+						seekto = 0;
+					//	bgav_seek_scaled(rm->getFile(), &seekto, samplerate);
+					} //else {
+					bgav_seek_scaled(rm->getFile(), &seekto, samplerate);
+					//}
+					rm->getAudioFifo()->Flush();
+					if (dovideo && rm->getVideoFifo() ) {
+						 rm->getVideoFifo()->Flush();
+						 rm->signalV();
+					}
 				}
 			}
 
@@ -1012,27 +1055,28 @@ void *the_audiofifo_filler( void * xp) {
 				if( rm->getLoop() ) {
 					if ( can_seek ) {
 						// Now, rewind the file, don't flush the fifo's
-						if (can_seek_sample) {
-							bgav_seek_audio(rm->getFile() , 0, 0);
-						} else {
-							gavl_time_t gt = 0;        
-							bgav_seek(rm->getFile(), &gt);
-						}
+						if (can_seek_sample) { // only seek on audio stream
+							bgav_seek_audio(rm->getFile(), 0, 0);
+						} else { 
+							seekto =0;
+							bgav_seek_scaled(rm->getFile(), &seekto, samplerate);
+							if (dovideo && rm->getVideoFifo() ) {
+								rm->setVEOF(false);
+								rm->signalV();
+							}
+						}	
 						// SAVE THIS FOR ANOTHER TIME, OVERLAPPED SMOOTH LOOPING 
 						//if ( rm->getLoop() > 1 && bgav_read_audio(rm->getFile(), rm->getAudioFrame(), 0,  spf ) ) {
 						// add to the fifo, overlapping
 						//		rm->getAudioFifo()->AppendOverlap( rm->getAudioFrame(), 5 );
 						//	}	
-
 						
 					} else { // this file is not seekable, what do we do?
 						printf("cannot seek on file, but we want to loop. setting end of file.\n");
 						rm->setAEOF(true);
-						rm->pcmSeek();// clear the seek var just in case
 					}
 				} else {
 					rm->setAEOF(true);
-					rm->pcmSeek(); // clear the seek var just in case
 				}
 				rm->unlockAV();
 				break;
@@ -1057,11 +1101,10 @@ void *the_videofifo_filler( void * xp) {
 	int ret = 0;
 	int first = true;
 	int doaudio = rm->getAudioStreamCount();	
-	int64_t seekto =-1;
+	int64_t seekto =SEEK_NOTHING;
 	int can_seek = bgav_can_seek ( rm->getFile() );
 	int can_seek_sample = bgav_can_seek_sample ( rm->getFile() );
 	int timescale = rm->getVideoTimescale();
-	int frame_duration = rm->getVideoFrameDuration();
 	
 	while (!rm->quitAVThreads() ) {
 	
@@ -1073,14 +1116,17 @@ void *the_videofifo_filler( void * xp) {
 			// check to see if we need to seek
 			// if this is set, we already know we can seek on this file 
 			// and don't need to check with bgav_can_seek
-			if ( (seekto = rm->frameSeek() )  >= 0 ) {
-				if (doaudio && rm->getAudioFifo()) rm->getAudioFifo()->Flush();
-				rm->getVideoFifo()->Flush();
-				gavl_time_t gt = gavl_frames_to_time  (timescale, frame_duration, seekto );        
-				if ( can_seek_sample ) {
-					bgav_seek_video(rm->getFile() , 0, gt );
-				} else {
-					bgav_seek(rm->getFile(), &gt);
+			if (can_seek) {
+				seekto = rm->frameSeek();
+				if ( seekto  >= 0 ) {  
+					if (doaudio && rm->getAudioFifo() ) rm->getAudioFifo()->Flush();
+					rm->getVideoFifo()->Flush();
+					bgav_seek_scaled(rm->getFile(), &seekto, timescale);
+				} else if (seekto == SEEK_REWIND && !doaudio) {
+					// rewind is a special case  for Video.
+					rm->getVideoFifo()->Flush();
+					seekto =0;
+					bgav_seek_scaled(rm->getFile(), &seekto, timescale);
 				}
 			}
 				
@@ -1089,22 +1135,23 @@ void *the_videofifo_filler( void * xp) {
 			if ( !ret ) {
 				// only loop from video if there is no audio
 				// audio controls loop timing
-				if ( !doaudio &&  rm->getLoop() ) {
-					
+				if ( rm->getLoop() ){
 					if ( can_seek ) {
-						// Now, rewind the file, don't flush fifos
-						if (can_seek_sample) {
-							bgav_seek_video(rm->getFile() , 0, 0);
-						} else {
-							gavl_time_t gt = 0;        
-							bgav_seek(rm->getFile(), &gt);
+						if (doaudio && can_seek_sample) {
+							// seek on video stream only if we have audio
+							// audio and video seeking are separate in sample accurate 
+							// seeking.  If no sample accurate seeking, then let audio
+							// handle seeking
+							bgav_seek_video(rm->getFile(), 0,0);
+						} else if (!doaudio) {	
+							// if we don't have audio...just seek to 0
+							seekto=0;
+							bgav_seek_scaled(rm->getFile(), &seekto, timescale);
 						}
-					} else { // this file is not seekable, what do we do?
-						printf("cannot seek on file, but we want to loop. setting end of file.\n");
+					} else { // if (can_seek)
+						printf ("We want to loop video, but we cannot seek on this video stream,setting VEOF\n");
 						rm->setVEOF(true);
-						//rm->frameSeek();// clear the seek var just in case
 					}
-					
 				} else {
 					rm->setVEOF(true);
 				}
