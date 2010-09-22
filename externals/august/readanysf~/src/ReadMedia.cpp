@@ -40,7 +40,7 @@ ReadMedia::ReadMedia(  ) {
 	m_video_format.timescale=0;
 	m_video_format.framerate_mode=GAVL_FRAMERATE_CONSTANT;
 	m_video_format.chroma_placement=GAVL_CHROMA_PLACEMENT_DEFAULT;
-	m_video_format.interlace_mode=GAVL_INTERLACE_UNKNOWN;
+	m_video_format.interlace_mode=GAVL_INTERLACE_NONE;
 	m_video_format.timecode_format.int_framerate =0;
 	m_video_format.timecode_format.flags =0;
 
