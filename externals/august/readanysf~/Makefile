@@ -5,7 +5,7 @@ GAVLPATH=/usr/local/include
 PDPATH=/usr/local/include
 
 
-VERSION=0.41
+VERSION=0.42
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
