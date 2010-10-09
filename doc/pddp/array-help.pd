@@ -6,20 +6,16 @@
 #X obj 0 235 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 46 242 494 344 META 0;
-#X text 12 105 PLATFORM windows macosx gnulinux;
-#X text 12 125 LIBRARY internal;
-#X text 12 165 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 65 LICENSE SIBSD;
-#X text 12 145 AUTHOR Miller Puckette;
-#X text 12 225 HELP_PATCH_AUTHORS Updated for Pd v0.41. Revised by
+#X text 12 65 LIBRARY internal;
+#X text 12 105 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 85 AUTHOR Miller Puckette;
+#X text 12 145 HELP_PATCH_AUTHORS Updated for Pd v0.41. Revised by
 Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
 ;
-#X text 12 5 GENRE help;
-#X text 12 45 KEYWORDS signal GUI storage array;
-#X text 12 85 DESCRIPTION graphical array from the "Put" menu;
-#X text 12 205 RELEASE_VERSION;
-#X text 12 185 RELEASE_DATE 2009;
-#X text 12 25 NAME array;
+#X text 12 5 KEYWORDS signal GUI storage array;
+#X text 12 45 DESCRIPTION graphical array from the "Put" menu;
+#X text 12 125 RELEASE_DATE 2009;
 #X restore 500 597 pd META;
 #X obj 0 261 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
@@ -55,7 +51,7 @@ Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
 -0.187019 -0.248331 -0.308664 -0.367779;
 #X coords 0 1 99 -1 40 8 1;
 #X restore 485 13 graph;
-#X obj 331 66 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 331 66 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 451 20 pddp/pddplink http://wiki.puredata.info/en/garray -text
 pdpedia: garray;

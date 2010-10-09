@@ -6,23 +6,19 @@
 #X obj 0 436 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 46 242 494 344 META 0;
-#X text 12 115 PLATFORM windows macosx gnulinux;
-#X text 12 175 LIBRARY internal;
-#X text 12 215 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 65 LICENSE SIBSD;
-#X text 12 195 AUTHOR Miller Puckette;
-#X text 12 275 HELP_PATCH_AUTHORS Updated for Pd v0.41. Revised by
+#X text 12 115 LIBRARY internal;
+#X text 12 155 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 135 AUTHOR Miller Puckette;
+#X text 12 195 HELP_PATCH_AUTHORS Updated for Pd v0.41. Revised by
 Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
 ;
-#X text 12 5 GENRE help;
-#X text 12 45 KEYWORDS signal conversion;
-#X text 12 85 DESCRIPTION precision conversion of a signal to a number
+#X text 12 5 KEYWORDS signal conversion;
+#X text 12 75 INLET_0 signal bang;
+#X text 12 95 OUTLET_0 float;
+#X text 12 175 RELEASE_DATE 1997;
+#X text 12 45 DESCRIPTION precision conversion of a signal to a number
 on demand;
-#X text 12 25 NAME vsnapshot~;
-#X text 12 135 INLET_0 signal bang;
-#X text 12 155 OUTLET_0 float;
-#X text 12 235 RELEASE_DATE 1997;
-#X text 12 255 RELEASE_VERSION;
 #X restore 500 597 pd META;
 #X obj 0 501 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

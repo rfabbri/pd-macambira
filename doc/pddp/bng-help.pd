@@ -6,22 +6,18 @@
 #X obj 0 300 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 42 244 494 344 META 0;
-#X text 12 105 PLATFORM windows macosx gnulinux;
-#X text 12 165 LIBRARY internal;
-#X text 12 65 LICENSE SIBSD;
-#X text 12 185 AUTHOR Thomas Musil;
-#X text 12 205 WEBSITE;
-#X text 12 265 HELP_PATCH_AUTHORS Jonathan Wilkes revised the patch
+#X text 12 115 LIBRARY internal;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 135 AUTHOR Thomas Musil;
+#X text 12 155 WEBSITE;
+#X text 12 195 HELP_PATCH_AUTHORS Jonathan Wilkes revised the patch
 to conform to the PDDP template for Pd version 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 85 DESCRIPTION gui-bang;
-#X text 12 125 INLET_0 anything size flashtime init send receive label
+#X text 12 45 DESCRIPTION gui-bang;
+#X text 12 65 INLET_0 anything size flashtime init send receive label
 label_pos label_font color pos delta;
-#X text 12 145 OUTLET_0 bang;
-#X text 12 25 NAME bng;
-#X text 12 45 KEYWORDS control nonlocal GUI bang_op;
-#X text 12 225 RELEASE_DATE 2009;
-#X text 12 245 RELEASE_VERSION;
+#X text 12 95 OUTLET_0 bang;
+#X text 12 5 KEYWORDS control nonlocal GUI bang_op;
+#X text 12 175 RELEASE_DATE 2009;
 #X restore 500 597 pd META;
 #X obj 0 408 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

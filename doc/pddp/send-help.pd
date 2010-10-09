@@ -6,23 +6,19 @@
 #X obj 0 240 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 54 246 494 344 META 0;
-#X text 12 125 PLATFORM windows macosx gnulinux;
-#X text 12 185 LIBRARY internal;
-#X text 12 225 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 85 LICENSE SIBSD;
-#X text 12 205 AUTHOR Miller Puckette;
-#X text 12 285 HELP_PATCH_AUTHORS Dave Sabine \, September 12 \, 2003
+#X text 12 125 LIBRARY internal;
+#X text 12 165 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 45 LICENSE SIBSD;
+#X text 12 145 AUTHOR Miller Puckette;
+#X text 12 205 HELP_PATCH_AUTHORS Dave Sabine \, September 12 \, 2003
 . Jonathan Wilkes revised the patch to conform to the PDDP template
 for Pd version 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 65 KEYWORDS control nonlocal;
-#X text 12 105 DESCRIPTION send messages without patch cords;
-#X text 12 25 NAME send;
-#X text 12 45 ALIAS s;
-#X text 12 145 INLET_0 anything;
-#X text 12 165 INLET_1 symbol;
-#X text 12 245 RELEASE_DATE 1997;
-#X text 12 265 RELEASE_VERSION;
+#X text 12 25 KEYWORDS control nonlocal;
+#X text 12 65 DESCRIPTION send messages without patch cords;
+#X text 12 5 ALIAS s;
+#X text 12 85 INLET_0 anything;
+#X text 12 105 INLET_1 symbol;
+#X text 12 185 RELEASE_DATE 1997;
 #X restore 500 597 pd META;
 #X obj 0 333 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

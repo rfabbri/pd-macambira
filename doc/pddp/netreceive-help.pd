@@ -6,23 +6,19 @@
 #X obj 0 331 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 46 242 494 344 META 0;
-#X text 12 105 PLATFORM windows macosx gnulinux;
-#X text 12 165 LIBRARY internal;
-#X text 12 205 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 65 LICENSE SIBSD;
-#X text 12 185 AUTHOR Miller Puckette;
-#X text 12 265 HELP_PATCH_AUTHORS Updated for Pd v0.41. Revised by
+#X text 12 105 LIBRARY internal;
+#X text 12 145 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 125 AUTHOR Miller Puckette;
+#X text 12 185 HELP_PATCH_AUTHORS Updated for Pd v0.41. Revised by
 Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
 ;
-#X text 12 5 GENRE help;
-#X text 12 45 KEYWORDS control network;
-#X text 12 85 DESCRIPTION listen for incoming messages from a network
+#X text 12 5 KEYWORDS control network;
+#X text 12 45 DESCRIPTION listen for incoming messages from a network
 ;
-#X text 12 25 NAME netreceive;
-#X text 12 125 OUTLET_0 anything;
-#X text 12 145 OUTLET_1 float;
-#X text 12 225 RELEASE_DATE 1997;
-#X text 12 245 RELEASE_VERSION;
+#X text 12 65 OUTLET_0 anything;
+#X text 12 85 OUTLET_1 float;
+#X text 12 165 RELEASE_DATE 1997;
 #X restore 500 597 pd META;
 #X obj 0 358 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

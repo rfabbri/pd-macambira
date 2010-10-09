@@ -113,4 +113,5 @@ atom as data. @OBJECTS symbol makefilename @LINKS all_about_messages.pd
 ;
 @TERM implicit_list @DEF  a multi-element message that starts with a float and can be understood as having an implicit selector 'list'. @OBJECTS list @LINKS all_about_messages.pd
 ;
-
+@TERM iolet @DEF an abbreviation for 'inlet or outlet'.
+;

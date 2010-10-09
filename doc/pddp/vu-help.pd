@@ -6,24 +6,20 @@
 #X obj 0 287 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 53 246 494 344 META 0;
-#X text 12 105 PLATFORM windows macosx gnulinux;
-#X text 12 205 LIBRARY internal;
-#X text 12 65 LICENSE SIBSD;
-#X text 12 225 AUTHOR Thomas Musil;
-#X text 12 245 WEBSITE;
-#X text 12 305 HELP_PATCH_AUTHORS Jonathan Wilkes revised the patch
-to conform to the PDDP template for Pd version 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 45 KEYWORDS control GUI nonlocal;
-#X text 12 85 DESCRIPTION gui-vu-meter-display;
-#X text 12 25 NAME vu;
-#X text 12 125 INLET_0 float list bang size scale receive label label_pos
+#X text 12 155 LIBRARY internal;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 175 AUTHOR Thomas Musil;
+#X text 12 195 WEBSITE;
+#X text 12 5 KEYWORDS control GUI nonlocal;
+#X text 12 45 DESCRIPTION gui-vu-meter-display;
+#X text 12 65 INLET_0 float list bang size scale receive label label_pos
 label_font color pos delta;
-#X text 12 145 INLET_1 float;
-#X text 12 165 OUTLET_0 float;
-#X text 12 185 OUTLET_1 float;
-#X text 12 265 RELEASE_DATE 2002;
-#X text 12 285 RELEASE_VERSION;
+#X text 12 95 INLET_1 float;
+#X text 12 115 OUTLET_0 float;
+#X text 12 135 OUTLET_1 float;
+#X text 12 215 RELEASE_DATE 2002;
+#X text 12 235 HELP_PATCH_AUTHORS Jonathan Wilkes revised the patch
+to conform to the PDDP template for Pd version 0.42.;
 #X restore 500 597 pd META;
 #X obj 0 435 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

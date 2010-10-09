@@ -24,7 +24,7 @@ graphically in Pd;
 #X text 78 107 This comment was created after the grey [cnv] behind
 it. If you cut and paste the canvas (or delete it then choose "Undo"
 from the "Edit" menu) \, it will cover this comment.;
-#X obj 407 2 pddp/pddplink all_about_upside_down.pd -text dppd;
 #X text 19 36 Z-order refers to the way in which overlapping objects
 are displayed. Pd currently determines z-ordering in the following
 way: The last object created will get put in front.;
+#X obj 417 2 pddp/pddplink Nmop~3pIsdn~tno9V~llV.pd -text dppd;

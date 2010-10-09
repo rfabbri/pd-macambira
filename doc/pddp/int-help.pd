@@ -5,26 +5,22 @@
 #X obj 0 234 cnv 3 550 3 empty empty inlets 15 12 0 13 -228856 -1 0
 ;
 #N canvas 49 212 482 395 META 0;
-#X text 12 125 PLATFORM windows macosx gnulinux;
-#X text 12 205 LIBRARY internal;
-#X text 12 245 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 85 LICENSE SIBSD;
-#X text 12 225 AUTHOR Miller Puckette;
-#X text 12 305 HELP_PATCH_AUTHORS This help patch was updated for Pd
+#X text 12 145 LIBRARY internal;
+#X text 12 185 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 45 LICENSE SIBSD;
+#X text 12 165 AUTHOR Miller Puckette;
+#X text 12 225 HELP_PATCH_AUTHORS This help patch was updated for Pd
 version 0.35 test 24 by Dave Sabine as part of a project called pddp
 proposed by Krzysztof Czaja to build comprehensive documentation for
 Pd. Jonathan Wilkes revised the patch to conform to the PDDP template
 for Pd version 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 65 KEYWORDS control storage;
-#X text 12 105 DESCRIPTION store an integer;
-#X text 12 25 NAME int;
-#X text 12 45 ALIAS i;
-#X text 12 145 INLET_0 bang float;
-#X text 12 165 INLET_1 float;
-#X text 12 185 OUTLET_0 float;
-#X text 12 265 RELEASE_DATE 1997;
-#X text 12 285 RELEASE_VERSION;
+#X text 12 25 KEYWORDS control storage;
+#X text 12 65 DESCRIPTION store an integer;
+#X text 12 5 ALIAS i;
+#X text 12 85 INLET_0 bang float;
+#X text 12 105 INLET_1 float;
+#X text 12 125 OUTLET_0 float;
+#X text 12 205 RELEASE_DATE 1997;
 #X restore 500 597 pd META;
 #X obj 0 375 cnv 3 550 3 empty empty outlets 15 12 0 13 -228856 -1
 0;

@@ -6,25 +6,21 @@
 #X obj 0 399 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 51 246 507 361 META 0;
-#X text 12 110 PLATFORM windows macosx gnulinux;
-#X text 12 210 LIBRARY internal;
-#X text 12 250 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 290 RELEASE_VERSION 0.41.4;
-#X text 12 270 RELEASE_DATE 2009-06-12;
-#X text 12 70 LICENSE SIBSD;
-#X text 12 230 AUTHOR Miller Puckette;
-#X text 12 310 HELP_PATCH_AUTHORS Updated for Pd version 0.33. Jonathan
+#X text 12 150 LIBRARY internal;
+#X text 12 190 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 210 RELEASE_DATE 2009-06-12;
+#X text 12 30 LICENSE SIBSD;
+#X text 12 170 AUTHOR Miller Puckette;
+#X text 12 230 HELP_PATCH_AUTHORS Updated for Pd version 0.33. Jonathan
 Wilkes revised the patch to conform to the PDDP template for Pd version
 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 25 NAME fft~;
-#X text 12 45 KEYWORDS signal block_oriented analysis needs_work (ifft~
+#X text 12 5 KEYWORDS signal block_oriented analysis needs_work (ifft~
 rfft~ rifft~ need separate help patches);
-#X text 12 130 INLET_0 signal;
-#X text 12 150 INLET_1 signal;
-#X text 12 170 OUTLET_0 signal;
-#X text 12 190 OUTLET_1 signal;
-#X text 12 90 DESCRIPTION Fourier analyses;
+#X text 12 70 INLET_0 signal;
+#X text 12 90 INLET_1 signal;
+#X text 12 110 OUTLET_0 signal;
+#X text 12 130 OUTLET_1 signal;
+#X text 12 50 DESCRIPTION Fourier analyses;
 #X restore 500 597 pd META;
 #X obj 0 460 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

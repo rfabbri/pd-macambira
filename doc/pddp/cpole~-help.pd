@@ -6,27 +6,23 @@
 #X obj 0 287 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 39 245 494 405 META 0;
-#X text 12 105 PLATFORM windows macosx gnulinux;
-#X text 12 245 LIBRARY internal;
-#X text 12 285 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 65 LICENSE SIBSD;
-#X text 12 265 AUTHOR Miller Puckette;
-#X text 12 345 HELP_PATCH_AUTHORS Updated for Pd version-0.38. Jonathan
+#X text 12 185 LIBRARY internal;
+#X text 12 225 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 205 AUTHOR Miller Puckette;
+#X text 12 265 HELP_PATCH_AUTHORS Updated for Pd version-0.38. Jonathan
 Wilkes revised the patch to conform to the PDDP template for Pd version
 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 45 KEYWORDS signal filter;
-#X text 12 85 DESCRIPTION complex one-pole (recursive) filter \, raw
+#X text 12 5 KEYWORDS signal filter;
+#X text 12 45 DESCRIPTION complex one-pole (recursive) filter \, raw
 ;
-#X text 12 25 NAME cpole~;
-#X text 12 125 INLET_0 signal;
-#X text 12 205 OUTLET_0 signal;
-#X text 12 145 INLET_1 signal;
-#X text 12 165 INLET_2 signal;
-#X text 12 185 INLET_3 signal;
-#X text 12 225 OUTLET_1 signal;
-#X text 12 305 RELEASE_DATE 1997;
-#X text 12 325 RELEASE_VERSION;
+#X text 12 65 INLET_0 signal;
+#X text 12 145 OUTLET_0 signal;
+#X text 12 85 INLET_1 signal;
+#X text 12 105 INLET_2 signal;
+#X text 12 125 INLET_3 signal;
+#X text 12 165 OUTLET_1 signal;
+#X text 12 245 RELEASE_DATE 1997;
 #X restore 500 597 pd META;
 #X obj 0 424 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

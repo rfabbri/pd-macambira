@@ -8,24 +8,20 @@ dog float cat float vis;
 #X obj 0 152 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 50 246 494 344 META 0;
-#X text 12 105 PLATFORM windows macosx gnulinux;
-#X text 12 145 LIBRARY internal;
-#X text 12 185 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 225 RELEASE_VERSION 0.41.4;
-#X text 12 205 RELEASE_DATE 2009-06-12;
-#X text 12 65 LICENSE SIBSD;
-#X text 12 165 AUTHOR Miller Puckette;
-#X text 12 245 HELP_PATCH_AUTHORS This help patch was updated for Pd
+#X text 12 85 LIBRARY internal;
+#X text 12 125 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 145 RELEASE_DATE 2009-06-12;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 105 AUTHOR Miller Puckette;
+#X text 12 165 HELP_PATCH_AUTHORS This help patch was updated for Pd
 version 0.35 test 28 by Dave Sabine as part of a project called pddp
 proposed by Krzysztof Czaja to build comprehensive documentation for
 Pd. Jonathan Wilkes revised the patch to conform to the PDDP template
 for Pd version 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 45 KEYWORDS control data_structure;
-#X text 12 85 DESCRIPTION display a polygon in a data structure instance
+#X text 12 5 KEYWORDS control data_structure;
+#X text 12 45 DESCRIPTION display a polygon in a data structure instance
 ;
-#X text 12 25 NAME drawpolygon;
-#X text 12 125 INLET_0 float;
+#X text 12 65 INLET_0 float;
 #X restore 500 597 pd META;
 #X obj 0 227 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

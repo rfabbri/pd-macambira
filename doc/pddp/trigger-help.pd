@@ -6,26 +6,22 @@
 #X obj 0 219 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 50 242 494 358 META 0;
-#X text 12 125 PLATFORM windows macosx gnulinux;
-#X text 12 185 LIBRARY internal;
-#X text 12 225 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 85 LICENSE SIBSD;
-#X text 12 205 AUTHOR Miller Puckette;
-#X text 12 285 HELP_PATCH_AUTHORS This help patch was updated for Pd
+#X text 12 135 LIBRARY internal;
+#X text 12 175 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 45 LICENSE SIBSD;
+#X text 12 155 AUTHOR Miller Puckette;
+#X text 12 215 HELP_PATCH_AUTHORS This help patch was updated for Pd
 version 0.35 test 26 by Dave Sabine as part of a project called pddp
 proposed by Krzysztof Czaja to build comprehensive documentation for
 Pd. Jonathan Wilkes revised the patch to conform to the PDDP template
 for Pd version 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 105 DESCRIPTION sequence message in right-to-left order/
+#X text 12 65 DESCRIPTION sequence message in right-to-left order/
 convert data types;
-#X text 12 145 INLET_0 anything;
-#X text 12 165 OUTLET_N anything;
-#X text 12 25 NAME trigger;
-#X text 12 45 ALIAS t;
-#X text 12 65 KEYWORDS control needs_work list_op bang_op;
-#X text 12 245 RELEASE_DATE 1997;
-#X text 12 265 RELEASE_VERSION;
+#X text 12 95 INLET_0 anything;
+#X text 12 115 OUTLET_N anything;
+#X text 12 5 ALIAS t;
+#X text 12 25 KEYWORDS control needs_work list_op bang_op;
+#X text 12 195 RELEASE_DATE 1997;
 #X restore 500 597 pd META;
 #X obj 0 256 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

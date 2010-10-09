@@ -6,22 +6,19 @@
 #X obj 0 288 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 46 242 494 344 META 0;
-#X text 12 125 PLATFORM windows macosx gnulinux;
-#X text 12 145 LIBRARY internal;
-#X text 12 185 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 85 LICENSE SIBSD;
-#X text 12 165 AUTHOR Miller Puckette;
-#X text 12 245 HELP_PATCH_AUTHORS Updated for Pd v0.41. Revised by
+#X text 12 105 LIBRARY internal;
+#X text 12 145 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 65 LICENSE SIBSD;
+#X text 12 125 AUTHOR Miller Puckette;
+#X text 12 185 HELP_PATCH_AUTHORS Updated for Pd v0.41. Revised by
 Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
 ;
-#X text 12 65 KEYWORDS control MIDI;
-#X text 12 105 DESCRIPTION MIDI input/output objects;
-#X text 12 25 NAME bendin ctlin midiin notein pgmin polytouchin sysexin
+#X text 12 45 KEYWORDS control MIDI;
+#X text 12 85 DESCRIPTION MIDI input/output objects;
+#X text 12 5 NAME bendin ctlin midiin notein pgmin polytouchin sysexin
 touchin bendout ctlout midiout noteout pgmout polytouchout touchout
 ;
-#X text 12 5 GENRE help;
-#X text 12 205 RELEASE_DATE 1997;
-#X text 12 225 RELEASE_VERSION;
+#X text 12 165 RELEASE_DATE 1997;
 #X restore 500 597 pd META;
 #X obj 0 495 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
@@ -83,7 +80,6 @@ inlet will be removed from the collection.;
 #X obj 410 123 touchout;
 #X text 10 86 MIDI input:;
 #X text 10 123 MIDI output:;
-#X text 77 161 Follow the links below for help on these objects:;
 #X obj 320 185 pddp/pddplink touchin-help.pd;
 #X obj 243 185 touchin;
 #X obj 243 210 polytouchin;
@@ -101,3 +97,5 @@ inlet will be removed from the collection.;
 #X obj 4 597 pddp/pddplink pddp/help.pd -text help;
 #X obj 465 20 pddp/pddplink http://wiki.puredata.info/en/MIDI -text
 pdpedia: MIDI;
+#X text 77 151 Right-click the objects above and choose "Help" \, or
+follow the links below for help on these objects:;

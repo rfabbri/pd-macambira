@@ -6,23 +6,20 @@
 #X obj 0 161 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 50 244 494 344 META 0;
-#X text 12 110 PLATFORM windows macosx gnulinux;
-#X text 12 130 LIBRARY internal;
-#X text 12 170 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 70 LICENSE SIBSD;
-#X text 12 150 AUTHOR Miller Puckette;
-#X text 12 230 HELP_PATCH_AUTHORS Updated for Pd version 0.40. Jonathan
+#X text 12 90 LIBRARY internal;
+#X text 12 130 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 50 LICENSE SIBSD;
+#X text 12 110 AUTHOR Miller Puckette;
+#X text 12 170 HELP_PATCH_AUTHORS Updated for Pd version 0.40. Jonathan
 Wilkes revised the patch to conform to the PDDP template for Pd version
 0.42.;
-#X text 12 90 DESCRIPTION building and using variable-length messages
+#X text 12 70 DESCRIPTION building and using variable-length messages
 ;
-#X text 12 25 NAME list append list prepend list trim list split list
+#X text 12 5 NAME list append list prepend list trim list split list
 length;
-#X text 12 50 KEYWORDS control storage needs_work list_op symbol_op
+#X text 12 30 KEYWORDS control storage needs_work list_op symbol_op
 ;
-#X text 12 5 GENRE help;
-#X text 12 190 RELEASE_DATE 2005;
-#X text 12 210 RELEASE_VERSION;
+#X text 12 150 RELEASE_DATE 2005;
 #X restore 500 598 pd META;
 #X obj 0 244 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

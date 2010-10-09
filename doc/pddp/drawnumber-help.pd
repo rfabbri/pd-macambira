@@ -8,22 +8,18 @@ dog float dog-vis;
 #X obj 0 119 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 50 243 494 344 META 0;
-#X text 12 125 PLATFORM windows macosx gnulinux;
-#X text 12 165 LIBRARY internal;
-#X text 12 205 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 245 RELEASE_VERSION 0.41.4;
-#X text 12 225 RELEASE_DATE 2009-06-12;
-#X text 12 85 LICENSE SIBSD;
-#X text 12 185 AUTHOR Miller Puckette;
-#X text 12 265 HELP_PATCH_AUTHORS Updated for Pd version 0.39. Jonathan
+#X text 12 105 LIBRARY internal;
+#X text 12 145 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 165 RELEASE_DATE 2009-06-12;
+#X text 12 45 LICENSE SIBSD;
+#X text 12 125 AUTHOR Miller Puckette;
+#X text 12 185 HELP_PATCH_AUTHORS Updated for Pd version 0.39. Jonathan
 Wilkes revised the patch to conform to the PDDP template for Pd version
 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 65 KEYWORDS control data_structure;
-#X text 12 105 DESCRIPTION display a numberic field of a template;
-#X text 12 25 NAME drawnumber;
-#X text 12 45 ALIAS drawsymbol;
-#X text 12 145 INLET_0 float;
+#X text 12 25 KEYWORDS control data_structure;
+#X text 12 65 DESCRIPTION display a numberic field of a template;
+#X text 12 5 ALIAS drawsymbol;
+#X text 12 85 INLET_0 float;
 #X restore 500 597 pd META;
 #X obj 0 204 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

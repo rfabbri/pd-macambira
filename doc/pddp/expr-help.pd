@@ -258,23 +258,19 @@ use in [expr~] are listed below:;
 #X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
 14 -228856 -66577 0;
 #N canvas 52 244 494 344 META 0;
-#X text 12 105 PLATFORM windows macosx gnulinux;
-#X text 12 185 LIBRARY internal;
-#X text 12 225 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 205 AUTHOR Shahrokh Yadegari;
-#X text 12 285 HELP_PATCH_AUTHORS Updated for Pd 0.35 test 26 and expr*
+#X text 12 125 LIBRARY internal;
+#X text 12 165 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 145 AUTHOR Shahrokh Yadegari;
+#X text 12 205 HELP_PATCH_AUTHORS Updated for Pd 0.35 test 26 and expr*
 0.4. Jonathan Wilkes revised the patch to conform to the PDDP template
 for Pd version 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 45 KEYWORDS control nonlocal trigonometry;
-#X text 12 25 NAME expr;
-#X text 12 125 INLET_0 float bang symbol list;
-#X text 12 145 INLET_N float symbol;
-#X text 12 165 OUTLET_N float;
-#X text 12 85 DESCRIPTION expression evaluation of control data;
-#X text 12 245 RELEASE_DATE 1989;
-#X text 12 265 RELEASE_VERSION;
-#X text 12 65 LICENSE GPL v2;
+#X text 12 5 KEYWORDS control nonlocal trigonometry;
+#X text 12 65 INLET_0 float bang symbol list;
+#X text 12 85 INLET_N float symbol;
+#X text 12 105 OUTLET_N float;
+#X text 12 45 DESCRIPTION expression evaluation of control data;
+#X text 12 185 RELEASE_DATE 1989;
+#X text 12 25 LICENSE GPL v2;
 #X restore 500 598 pd META;
 #N canvas 102 481 428 109 Related_objects 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0

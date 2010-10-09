@@ -6,24 +6,20 @@
 #X obj 0 185 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 51 244 494 344 META 0;
-#X text 12 105 PLATFORM windows macosx gnulinux;
-#X text 12 185 LIBRARY internal;
-#X text 12 205 AUTHOR Shahrokh Yadegari;
-#X text 12 285 HELP_PATCH_AUTHORS Updated for Pd 0.35 test 26 and expr*
+#X text 12 125 LIBRARY internal;
+#X text 12 145 AUTHOR Shahrokh Yadegari;
+#X text 12 205 HELP_PATCH_AUTHORS Updated for Pd 0.35 test 26 and expr*
 0.4. Jonathan Wilkes revised the patch to conform to the PDDP template
 for Pd version 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 45 KEYWORDS signal nonlocal trigonometry;
-#X text 12 25 NAME expr~;
-#X text 12 125 INLET_0 signal;
-#X text 12 145 INLET_N float symbol signal;
-#X text 12 165 OUTLET_N signal;
-#X text 12 85 DESCRIPTION expression evaluation of signal data (vector)
+#X text 12 5 KEYWORDS signal nonlocal trigonometry;
+#X text 12 65 INLET_0 signal;
+#X text 12 85 INLET_N float symbol signal;
+#X text 12 105 OUTLET_N signal;
+#X text 12 45 DESCRIPTION expression evaluation of signal data (vector)
 ;
-#X text 12 265 RELEASE_VERSION;
-#X text 12 225 WEBSITE http://crca.ucsd.edu/~syadegar/expr.html;
-#X text 12 245 RELEASE_DATE 1999;
-#X text 12 65 LICENSE GPL v2;
+#X text 12 165 WEBSITE http://crca.ucsd.edu/~syadegar/expr.html;
+#X text 12 185 RELEASE_DATE 1999;
+#X text 12 25 LICENSE GPL v2;
 #X restore 500 597 pd META;
 #X obj 0 368 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;

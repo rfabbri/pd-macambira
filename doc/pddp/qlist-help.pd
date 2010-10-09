@@ -6,25 +6,20 @@
 #X obj 0 351 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 304 171 494 366 META 0;
-#X text 12 195 LIBRARY internal;
-#X text 12 235 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 65 LICENSE SIBSD;
-#X text 12 215 AUTHOR Miller Puckette;
-#X text 12 295 HELP_PATCH_AUTHORS Updated for Pd version 0.35. Jonathan
+#X text 12 135 LIBRARY internal;
+#X text 12 175 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 155 AUTHOR Miller Puckette;
+#X text 12 215 HELP_PATCH_AUTHORS Updated for Pd version 0.35. Jonathan
 Wilkes revised the patch to conform to the PDDP template for Pd version
 0.42.;
-#X text 12 5 GENRE help;
-#X text 12 85 DESCRIPTION text-based sequencer;
-#X text 12 25 NAME qlist;
-#X text 12 125 INLET_0 bang print tempo rewind next clear add add2
-read write;
-#X text 12 155 OUTLET_0 list;
-#X text 12 175 OUTLET_1 bang;
-#X text 12 45 KEYWORDS control storage nonlocal filesystem list_op
-;
-#X text 12 105 PLATFORM windows macosx gnulinux;
-#X text 12 255 RELEASE_DATE 1997;
-#X text 12 275 RELEASE_VERSION;
+#X text 12 45 DESCRIPTION text-based sequencer;
+#X text 12 65 INLET_0 bang print tempo rewind next clear add add2 read
+write;
+#X text 12 95 OUTLET_0 list;
+#X text 12 115 OUTLET_1 bang;
+#X text 12 5 KEYWORDS control storage nonlocal filesystem list_op;
+#X text 12 195 RELEASE_DATE 1997;
 #X restore 500 597 pd META;
 #X obj 0 393 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
