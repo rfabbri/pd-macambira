@@ -1,34 +1,128 @@
-default: argument getdollarzero breakpoints~ phasorshot~ streamMinMax iterate param crossfade~ path onlyone openHelp folderpanel common~ increment listUnfold arguments breakpoints menubutton
+# 
+# SETUP
+#
+# Points to the folder that contains pd's /src dir
+PD_SRC = ../../../pd
+# Points to the folder that contains pd's compiled /bin dir
+PD_BIN = /Applications/Pd-extended.app/Contents/Resources
+# Points to the folder to which you want to put the built file
+OUTPUT = ~/Make/pd/tof
 
-current:
-	echo make class
 
-clean: 
-	rm -f *.pd_linux *.o
 
-# ----------------------- LINUX i386 -----------------------
+#
+# FIND OS
+#
+UNAME := $(shell uname -s)
+ifeq ($(UNAME),Linux)
+  OS_NAME = linux
+  EXTENSION = pd_linux
+  DYLIB_EXTENSION = so
+endif
+ifeq ($(UNAME),Darwin)
+  OS_NAME = darwin
+  EXTENSION = pd_darwin
+  DYLIB_EXTENSION = dylib
+endif
+ifeq (MINGW,$(findstring MINGW,$(UNAME)))
+  OS_NAME = windows
+  EXTENSION = dll
+  DYLIB_EXTENSION = dll
+endif
+ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
+  OS_NAME = windows
+  EXTENSION = dll
+  DYLIB_EXTENSION = dll
+endif
+# which CPU to compile for
+UNAME_MACHINE := $(shell uname -m)
+ifeq ($(UNAME_MACHINE),i386)
+  ARCH = i386
+endif
+ifeq ($(UNAME_MACHINE),i686)
+  ARCH = i386
+endif
+ifeq ($(UNAME_MACHINE),ppc)
+  ARCH = powerpc
+endif
 
-#paramL:  param.pd_linux
 
-#patchArguments: patchArguments.pd_linux
 
-.SUFFIXES: .pd_linux
+# 
+# COMPILE OPTIONS
+#
 
-PDPATH = ../../../pd
+CWD := $(shell pwd)
 
-TOFPATH = ../src
 
-LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes  \
-    -Wno-unused -Wno-parentheses -Wno-switch
+# turn on weak linking and dlopen support
+export MACOSX_DEPLOYMENT_TARGET = 10.3
 
-LINUXINCLUDE =  -I$(PDPATH)/src
+# DEFAULT TARGET # Find a way to list all c files target
+ALL = $((patsubst %.c,%.o,$(wildcard *.c)))
+default: $(ALL)
 
-#.pd_linux: .c
+.SUFFIXES: .$(EXTENSION) .$(SHARED_LIB)
+
+
+# this variable is to support old "win" directories, rather than "windows"
+BUILDSRC_OS_NAME = $(OS_NAME)
+
+CFLAGS = -DPD -I$(PD_SRC)/src -Wall -W $(DEBUG_CFLAGS)
+LDFLAGS =  
+LIBS = -lm
+
+ifeq ($(OS_NAME),darwin)
+# 10.4 Tiger
+  FAT_FLAGS = -arch ppc -arch ppc64 -arch i386
+# 10.5 Leopard
+#  FAT_FLAGS = -arch ppc -arch ppc7400 -arch ppc64 -arch i386 -arch x86_64
+  CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix -DDL_OPEN -arch $(ARCH)
+  LDFLAGS += -bundle -bundle_loader $(PD_BIN)/bin/pd -undefined dynamic_lookup \
+		-L/sw/lib -weak_framework Carbon -arch $(ARCH)
+  LIBS += -lc 
+  DYLIB_LDFLAGS = -dynamiclib -undefined dynamic_lookup -read_only_relocs warning -L/sw/lib
+  STRIP = strip -x
+endif
+ifeq ($(OS_NAME),linux)
+  CFLAGS +=  -DUNIX -Dunix -DDL_OPEN -fPIC
+  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LIBS += -lc
+  DYLIB_LDFLAGS = $(LDFLAGS)
+  STRIP = strip --strip-unneeded -R .note -R .comment
+endif
+ifeq ($(OS_NAME),windows)
+  BUILDSRC_OS_NAME = win
+  WINDOWS_HACKS = -D'O_NONBLOCK=1' -D'srand48(n)=srand((n))' \
+    -D'drand48()=((double)rand()/RAND_MAX)' -D'bzero(p,n)=memset(p,0,n)'
+# These don't seem to be needed:
+#	-D'PROT_READ=1' \
+#	-D'MAP_PRIVATE=2' \
+#	-D'O_NDELAY=O_NONBLOCK'
+  CFLAGS += -mms-bitfields -DMSW -DNT $(WINDOWS_HACKS)
+  LDFLAGS += -s -shared
+# all of these included libs are part of libc in UNIX platforms.  All except
+# libregex are in DLLs, so they get stripped from the external's .dll binary
+  LIBS += -L$(PD_SRC)/src -L$(PD_SRC)/bin -L$(PD_SRC)/obj -lpd \
+    -lwsock32 -liphlpapi -lpthreadGC2 -lkernel32 -luser32 -lgdi32 -lregex
+  DYLIB_LDFLAGS = -shared
+  STRIP = strip --strip-unneeded -R .note -R .comment
+endif
+
+CXXFLAGS = $(CFLAGS)
+
+
+### C files
+
 
 .c:
-	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -I $(TOFPATH) -o $*.o -c $*.c
-	ld --export-dynamic  -shared -o $*.pd_linux $*.o -lc -lm
-	strip --strip-unneeded $*.pd_linux
-	rm $*.o
-	mv $*.pd_linux ~/pd-externals/tof
+	$(CC) $(OPT_CFLAGS) $(CFLAGS)  -o "$*.o" -c "$*.c"
+	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) 
+	chmod a-x "$*.$(EXTENSION)"
+	$(STRIP) $*.$(EXTENSION)
+	rm -f -- $*.o
+	mv $*.$(EXTENSION) $(OUTPUT)
+
+
+
+
