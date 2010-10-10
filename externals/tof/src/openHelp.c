@@ -77,6 +77,9 @@ void *openHelp_new(t_symbol *s, int argc, t_atom *argv)
 }
 
 void openHelp_setup(void) {
+	
+	post("WARNING: openHelp is depracated, use open_help instead");
+	
   openHelp_class = class_new(gensym("openHelp"),
         (t_newmethod)openHelp_new,
         (t_method)openHelp_free, sizeof(t_openHelp),
