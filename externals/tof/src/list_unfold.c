@@ -5,13 +5,13 @@
 
 /* Mode 0: unfold all the list till its end or when banged.
  * Mode 1: unfold each element of the list at each bang.
- * Mode 0 is by default. Mode 1 is activated when listUnfold is
+ * Mode 0 is by default. Mode 1 is activated when list_unfold is
  * created with "wait" or "manually" as only argument.
  */
 
-static t_class *listUnfold_class;
+static t_class *list_unfold_class;
 
-typedef struct _listUnfold {
+typedef struct _list_unfold {
   t_object  		x_obj;
   t_int 			iterating;
   t_outlet* 		outlet1;
@@ -20,13 +20,13 @@ typedef struct _listUnfold {
   int 				memSize;
   int 				ac;
   t_atom*			av;
-} t_listUnfold;
+} t_list_unfold;
 
 
 
 
 
-void listUnfold_bang(t_listUnfold *x)
+void list_unfold_bang(t_list_unfold *x)
 {
 	
 	
@@ -52,7 +52,7 @@ void listUnfold_bang(t_listUnfold *x)
 }
 
 
-void listUnfold_anything(t_listUnfold *x, t_symbol* s, int ac, t_atom* av)
+void list_unfold_anything(t_list_unfold *x, t_symbol* s, int ac, t_atom* av)
 {
 	
 	
@@ -112,14 +112,14 @@ void listUnfold_anything(t_listUnfold *x, t_symbol* s, int ac, t_atom* av)
 }
 
 
-static void listUnfold_free(t_listUnfold *x)
+static void list_unfold_free(t_list_unfold *x)
 {
     freebytes(x->av, x->memSize * sizeof(*(x->av)));
 }
 
-void *listUnfold_new(t_symbol *s, int argc, t_atom *argv)
+void *list_unfold_new(t_symbol *s, int argc, t_atom *argv)
 {
-  t_listUnfold *x = (t_listUnfold *)pd_new(listUnfold_class);
+  t_list_unfold *x = (t_list_unfold *)pd_new(list_unfold_class);
   
   x->iterating = 0;
  
@@ -144,18 +144,16 @@ void *listUnfold_new(t_symbol *s, int argc, t_atom *argv)
   return (void *)x;
 }
 
-void listUnfold_setup(void) {
-	
-	post("WARNING: listUnfold is depracated, please use list_unfold instead.");
-	
-  listUnfold_class = class_new(gensym("listUnfold"),
-        (t_newmethod)listUnfold_new,
-        (t_method)listUnfold_free, sizeof(t_listUnfold),
+void list_unfold_setup(void) {
+  list_unfold_class = class_new(gensym("list_unfold"),
+        (t_newmethod)list_unfold_new,
+        (t_method)list_unfold_free, sizeof(t_list_unfold),
         CLASS_DEFAULT, 
         A_GIMME, 0);
+   
 
-  class_addbang  (listUnfold_class, listUnfold_bang);
-  class_addanything (listUnfold_class, listUnfold_anything);
-  //class_addlist (listUnfold_class, listUnfold_list);
+  class_addbang  (list_unfold_class, list_unfold_bang);
+  class_addanything (list_unfold_class, list_unfold_anything);
+  //class_addlist (list_unfold_class, list_unfold_list);
   
 }
