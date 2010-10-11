@@ -19,35 +19,35 @@ static t_class *paramGui_class;
 
 typedef struct _paramGui
 {
-  t_object					x_obj;
-  //t_outlet*					outlet;
-  //t_symbol*					canvasname;
-  t_canvas*					childcanvas;
-  //t_symbol*                 fullpath;
-  t_symbol*                 path;
-  
-  
-  int                       path_l;
-  
-  t_symbol*                 subpath;
-  int                       subpath_l;
-  int                       build;
-  t_symbol*					root;
-  
-  t_symbol*					receive;
-  int						waiting;
-  //t_symbol*					target;
-  //t_class*					empty_s;
-  //t_symbol*					root;
-
+	t_object					x_obj;
+	//t_outlet*					outlet;
+	//t_symbol*					canvasname;
+	t_canvas*			      childcanvas;
+	//t_symbol*               fullpath;
+	t_symbol*                 path;
+	int                       path_l;
+	t_symbol*                 subpath;
+	int                       subpath_l;
+	int                       build;
+	t_symbol*					root;
+	t_symbol*					receive;
+	int						waiting;
+	int		absolute;
+	t_symbol*  current;
+	//t_symbol*					target;
+	//t_class*					empty_s;
+	//t_symbol*					root;
+	
 } t_paramGui;
 
 
 static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
 	
-			// Clear the canvas
-            pd_typedmess((t_pd*)x->childcanvas,s_clear,0,NULL);
-            
+	// Clear the canvas
+	pd_typedmess((t_pd*)x->childcanvas,s_clear,0,NULL);
+
+	
+			            
             int pos_x = 0;
             int pos_y = 0;
             
@@ -63,7 +63,11 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
 			SETFLOAT(&atoms[6],20);
 			SETSYMBOL(&atoms[7],s_empty);
 			SETSYMBOL(&atoms[8],s_empty);
-			SETSYMBOL(&atoms[9],x->path);
+			if ( x->subpath != NULL) {
+				SETSYMBOL(&atoms[9],x->subpath);	
+			} else {
+			  SETSYMBOL(&atoms[9],x->path);	
+			}
 			SETFLOAT(&atoms[10],2);
 			SETFLOAT(&atoms[11],12);
 			SETFLOAT(&atoms[12],0);
@@ -95,15 +99,24 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
             
              t_param* p = get_param_list(x->root);
              
-             
+             int match;
                           
              
              while (p) {
 			
                     gui_update = 0;
-                    if (p->GUI && (strncmp(p->path->s_name,x->path->s_name,x->path_l)==0)) {
+                    if (p->GUI ) {
                     	
-                    	if ( x->subpath==NULL || (x->path_l > 0 && strncmp((p->path->s_name)+(x->path_l-1),x->subpath->s_name,x->subpath_l)==0)) {
+						match = 0;
+						if ( x->absolute ) {
+							match = (strncmp(p->path->s_name,x->subpath->s_name,x->subpath_l)==0);
+						} else  { // relative
+							match = (strncmp(p->path->s_name,x->path->s_name,x->path_l)==0);
+							if ( x->subpath != NULL ) match = match && ( strncmp((p->path->s_name)+(x->path_l),x->subpath->s_name,x->subpath_l)==0);
+						
+						}
+						
+                    	if ( match ) {
                     	
                     	
 	                        p->GUI(p->x,&ac,&av,&send,&receive);
@@ -188,7 +201,7 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
 	                                SETFLOAT(&atoms[17],-1);
 	                                pd_forwardmess((t_pd*)x->childcanvas, 18, atoms);
 	                                pos_y = pos_y + GUI_Y_STEP;
-									
+									gui_update = 0;
 	                            } else if ( (type == s_slider) || (type == s_knob) || (type == s_hsl) ) {
 	                                SETSYMBOL(&atoms[0],s_obj);
 	                                SETFLOAT(&atoms[1],pos_x);
@@ -294,8 +307,17 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
 			 
 			 // Change the build flag
 			x->build = 0;
+	if ( x->subpath != NULL) {
+		x->current = x->subpath;
+	} else {
+		x->current = NULL;
+
+	}
 			x->subpath=NULL;
-			
+			x->absolute = 0;
+	        
+	        
+				
 			// Show canvas
 			t_atom a;
 			SETFLOAT(&a,1);
@@ -318,6 +340,8 @@ static void paramGui_motion_callback(t_paramGui *x, t_float x_position, t_float 
 
 static void paramGui_bang(t_paramGui *x) {
     
+	
+	
     if (x->childcanvas && !x->waiting) {
         
         if (x->build) {
@@ -327,9 +351,6 @@ static void paramGui_bang(t_paramGui *x) {
             x->waiting = 1;
 			sys_vgui("pd [concat %s motion [winfo pointerxy .] \\;]\n",x->receive->s_name);
         } else {
-        
-			
-			
 			// Show canvas
 			t_atom a;
 			SETFLOAT(&a,1);
@@ -344,9 +365,12 @@ static void paramGui_bang(t_paramGui *x) {
 }
 
 static void paramGui_symbol(t_paramGui *x, t_symbol* s) {
-	if ( x->subpath != NULL && x->subpath != s) x->build = 1;
-	x->subpath = s;
-	x->subpath_l = strlen(x->subpath->s_name);
+	if ( x->current != s || x->build==1) {
+		x->build = 1;
+		x->subpath = s;
+		x->subpath_l = strlen(x->subpath->s_name);
+		if (x->subpath_l && x->subpath->s_name[0] == '/') x->absolute = 1;
+	}
 	paramGui_bang(x);
 }
 
@@ -356,7 +380,9 @@ static void paramGui_reset(t_paramGui *x) {
     // Hide canvas
 	t_atom a;
 	SETFLOAT(&a,0);
+	x->current = NULL;
 	pd_typedmess((t_pd*)x->childcanvas,s_vis,1,&a);
+	
 }
 
 
@@ -389,8 +415,8 @@ static void *paramGui_new(t_symbol *s, int ac, t_atom *av) {
   
   
   x->build = 1;
-  
-  
+	x->absolute = 0;
+	x->current = NULL;
   
   char buf[MAXPDSTRING];
   sprintf(buf, "#%lx", (long)x);

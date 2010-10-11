@@ -1,4 +1,4 @@
-#N canvas 430 490 403 396 10;
+#N canvas 279 400 403 396 10;
 #N canvas 429 334 525 231 /id 0;
 #X text 26 42 Abstraction /id:;
 #X text 63 67 If an abstraction's arguments contains the "/id" keyword
@@ -312,68 +312,74 @@ of this abstraction.;
 #X connect 21 0 20 0;
 #X connect 22 0 19 0;
 #X restore -16 292 pd route;
-#N canvas 8 378 991 450 gui 0;
+#N canvas 324 321 1042 460 gui 0;
 #X obj 431 21 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj 506 75 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj 431 110 tof/param gui;
-#X obj 5 219 cnv 15 300 20 empty empty empty 20 12 0 14 -4034 -66577
+#X obj 7 329 cnv 15 300 20 empty empty empty 20 12 0 14 -4034 -66577
 0;
-#X text 7 220 arguments;
+#X text 9 330 arguments;
 #X obj 5 7 cnv 15 300 20 empty empty empty 20 12 0 14 -257985 -66577
 0;
-#X obj 5 81 cnv 15 300 20 empty empty empty 20 12 0 14 -260097 -66577
+#X obj 5 151 cnv 15 300 20 empty empty empty 20 12 0 14 -260097 -66577
 0;
-#X text 10 81 inlets/outlets;
-#X text 7 244 none.;
-#X obj 8 273 cnv 15 300 20 empty empty empty 20 12 0 14 -4032 -66577
-0;
-#X text 10 274 targets;
+#X text 10 151 inlets/outlets;
+#X text 9 354 none.;
 #X text 7 7 param gui;
-#X floatatom 383 238 5 0 0 0 - - -;
-#X obj 375 365 dac~;
-#X obj 423 284 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
+#X floatatom 383 288 5 0 0 0 - - -;
+#X obj 375 415 dac~;
+#X obj 423 334 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
-#X msg 383 260 /modulation/index \$1;
-#X msg 420 305 /volume \$1;
-#X obj 529 165 cnv 15 200 20 empty empty /FM_MOD/ 2 12 0 8 -258401
+#X msg 383 310 /modulation/index \$1;
+#X msg 420 355 /volume \$1;
+#X obj 594 260 cnv 15 200 20 empty empty /FM_MOD/ 2 12 0 8 -258401
 -262144 0;
-#X obj 529 188 nbx 5 14 -1e+37 1e+37 0 0 /FM_MOD/modulation/freq /FM_MOD/modulation/freq_
+#X obj 594 283 nbx 5 14 -1e+37 1e+37 0 0 /FM_MOD/modulation/freq /FM_MOD/modulation/freq_
 modulation/freq 50 8 0 8 -1 -262144 -1 3 256;
-#X obj 529 206 nbx 5 14 -1e+37 1e+37 0 0 /FM_MOD/modulation/index /FM_MOD/modulation/index_
+#X obj 594 301 nbx 5 14 -1e+37 1e+37 0 0 /FM_MOD/modulation/index /FM_MOD/modulation/index_
 modulation/index 50 8 0 8 -1 -262144 -1 20 256;
-#X obj 529 224 hsl 100 15 0 1 0 0 /FM_MOD/volume /FM_MOD/volume_ volume
+#X obj 594 319 hsl 100 15 0 1 0 0 /FM_MOD/volume /FM_MOD/volume_ volume
 105 7 0 8 -1 -262144 -1 0 1;
-#X obj 529 242 hsl 100 15 200 2000 0 0 /FM_MOD/carrier /FM_MOD/carrier_
+#X obj 594 337 hsl 100 15 200 2000 0 0 /FM_MOD/carrier /FM_MOD/carrier_
 carrier 105 7 0 8 -1 -262144 -1 3300 1;
-#X obj 383 330 ./test-param /id FM_MOD /carrier 600;
-#X text 5 107 inlet 1 bang: creates the GUI once and then displays
-the window. All further bangs only display the GUI window without recreating
-its contents.;
-#X text 453 10 Creates the GUI once and then displays the window. All
-further bangs only display the GUI window without recreating its contents.
-;
-#X text 527 72 Creates and displays the window everytime it is banged.
-The content is always up to date \, but this slightly slower.;
-#X text 6 298 [param gui] will build a gui for all the params that
-have GUI options (set with the "/g" keyword) and that are located in
-the same patch or in any of its children.;
+#X obj 383 380 ./test-param /id FM_MOD /carrier 600;
 #X text 8 32 Automatically builds a gui for params. The values of the
 GUI elements are always up to date.;
-#X text 1 155 inlet 2 bang: creates and displays the window everytime
-it is banged. This slightly slower \, but it takes into account params
-that were created or destroyed since it was first created.;
-#X text 618 328 <-Click this abstraction's properties menu. The [iemguts/propertybang]
+#X text 618 378 <-Click this abstraction's properties menu. The [iemguts/propertybang]
 bangs the [param gui] that creates the GUI window.;
+#X obj 430 209 tof/param gui;
+#X msg 430 171 symbol FM_MOD;
+#X text 425 152 Relative;
+#X text 525 153 Absolute;
+#X text 531 73 Destroy the created GUI (the only way to force its recreation).
+;
+#X text 453 10 Builds the gui for all params that are in the current
+patch or in any children patches of this patch.;
+#X text 9 65 GUIs will only be built for params that have GUI options
+set with the /g keyword.;
+#X text 521 191 Only display the guis for params in the indicated path.
+;
+#X msg 524 171 symbol /FM_MOD/modulation;
+#X text 3 265 inlet 2 bang: destroy the previously created window (the
+only way to force its recreation if the path does not change).;
+#X text 5 177 inlet 1 bang: creates the GUIs one (or until the target
+path changes) for all params in the current patch or lower and displays
+the window.;
+#X text 4 221 inlet 1 symbol: creates the GUIs one (or until the target
+path changes) for all params that match the indicated path and displays
+the window.;
 #X connect 0 0 2 0;
 #X connect 1 0 2 1;
-#X connect 12 0 15 0;
-#X connect 14 0 16 0;
-#X connect 15 0 22 0;
-#X connect 16 0 22 0;
-#X connect 22 0 13 0;
-#X connect 22 0 13 1;
+#X connect 10 0 13 0;
+#X connect 12 0 14 0;
+#X connect 13 0 20 0;
+#X connect 14 0 20 0;
+#X connect 20 0 11 0;
+#X connect 20 0 11 1;
+#X connect 24 0 23 0;
+#X connect 31 0 23 0;
 #X restore -16 313 pd gui;
 #X text 45 183 Defines a parameter to save/restore/route/display.;
 #X text 48 205 Can save/restore any number of things in a param file.
@@ -426,7 +432,7 @@ by the value of the first argument.;
 #X obj 137 65 t b b b;
 #X obj 345 14 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#N canvas 0 0 680 639 hsvToRgb 0;
+#N canvas 0 22 680 639 hsvToRgb 0;
 #X obj 197 94 route 0;
 #X msg 197 66 \$2 \$3 \$1;
 #X obj 241 121 unpack 0 0 0;
@@ -636,7 +642,7 @@ by the value of the first argument.;
 #X connect 21 0 19 1;
 #X connect 22 0 19 2;
 #X restore 325 80 pd anim;
-#X obj -23 2 cnv 15 400 100 empty \$0c empty 20 12 0 14 -54577 -262144
+#X obj -23 2 cnv 15 400 100 empty \$0c empty 20 12 0 14 -73501 -262144
 0;
 #X text -18 54 author: mrtoftrash@gmail.com;
 #X text -19 33 tags: state routing;
