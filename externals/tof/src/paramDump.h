@@ -51,7 +51,8 @@ static void paramDump_guis(t_paramDump *x, t_symbol* s) {
 		while (p) {
 			if (p->GUI ) {
 				p->GUI(p->x,&ac,&av,&send,&receive);
-				outlet_anything(x->outlet,p->path,ac,av);
+				tof_outlet_list_prepend(x->outlet,&s_list,ac,av,p->path);
+				//outlet_anything(x->outlet,p->path,ac,av);
 				
 			}
 		p = p->next;
@@ -61,7 +62,8 @@ static void paramDump_guis(t_paramDump *x, t_symbol* s) {
 		while (p) {
 			if (p->GUI && (strncmp(p->path->s_name,s->s_name,length)==0) ) {
 				p->GUI(p->x,&ac,&av,&send,&receive);
-				outlet_anything(x->outlet,p->path,ac,av);
+				tof_outlet_list_prepend(x->outlet,&s_list,ac,av,p->path);
+				//outlet_anything(x->outlet,p->path,ac,av);
 				
 			}
 		p = p->next;
@@ -93,7 +95,7 @@ static void paramDump_symbol(t_paramDump *x, t_symbol* s) {
 	while (p) {
 		if ( p->get && (strncmp(p->path->s_name,s->s_name,length)==0) ) {
 			p->get(p->x, &selector, &ac, &av);
-			tof_outlet_anything_prepend(x->outlet,selector,ac,av,p->path);
+			tof_outlet_list_prepend(x->outlet,selector,ac,av,p->path);
 		}
 		p = p->next;
 	}
@@ -120,7 +122,7 @@ static void paramDump_bang(t_paramDump *x) {
 	while (p) {
 		if ( p->get ) {
 			p->get(p->x, &selector, &ac, &av);
-			tof_outlet_anything_prepend(x->outlet,selector,ac,av,p->path);
+			tof_outlet_list_prepend(x->outlet,selector,ac,av,p->path);
 		}
 		p = p->next;
 	}

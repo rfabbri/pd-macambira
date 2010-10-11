@@ -42,6 +42,29 @@ typedef struct _paramroot {
 static t_paramroot* PARAMROOTS;
 
 
+// set selector
+// CHANGES
+// USUALLY THE SELECTED SELECTOR WOULD ONLY BE BANG, ANYTHING OR LIST.
+// I ADDED FLOAT
+static void param_set_selector(t_symbol** selector_sym_p,int* ac_p, t_atom** av_p ) {
+	if(!(*ac_p)) {
+		*selector_sym_p = &s_bang;
+	} else if( IS_A_SYMBOL(*av_p, 0 )) {
+		
+			*selector_sym_p = atom_getsymbol(*av_p);
+			*ac_p = (*ac_p)-1;
+			*av_p = (*av_p)+1;
+		
+	} else if ( IS_A_FLOAT(*av_p, 0 ) && *ac_p == 1 ) {
+		*selector_sym_p = &s_float;
+		*ac_p = 1;
+		
+	} else {
+		*selector_sym_p = &s_list;
+	}
+}
+
+
 static t_paramroot* param_get_root(t_symbol* root) {
 	
 	if (PARAMROOTS == NULL) {

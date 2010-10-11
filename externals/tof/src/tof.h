@@ -148,18 +148,7 @@ static void tof_get_canvas_arguments(t_canvas *canvas, int *ac_p, t_atom **av_p)
 
 
 
-// set selector
-static void tof_set_selector(t_symbol** selector_sym_p,int* ac_p, t_atom** av_p ) {
-	 if(!(*ac_p)) {
-         *selector_sym_p = &s_bang;
-      } else if(IS_A_SYMBOL(*av_p, 0)) {
-			*selector_sym_p = atom_getsymbol(*av_p);
-			*ac_p = (*ac_p)-1, 
-			*av_p = (*av_p)+1;
-		} else{
-			*selector_sym_p = &s_list;
-		}
-}
+
 
 /*
 static int tof_get_tagged_argument(char tag, int ac, t_atom *av, int *start, int *count) {
@@ -257,6 +246,33 @@ static int tof_find_tagged_argument(char tag,t_symbol *name, int ac, t_atom *av,
 
 
 
+static void tof_outlet_list_prepend(t_outlet* outlet, t_symbol* s, int argc, t_atom* argv, t_symbol* pp) {
+	
+	if (s == &s_list || s == &s_float || s == &s_symbol ) {
+		int ac = argc + 1;
+		t_atom *av = (t_atom *)getbytes(ac*sizeof(t_atom));	
+		tof_copy_atoms(argv,av+1,argc);
+		SETSYMBOL(av, pp);
+		outlet_list(outlet,&s_list,ac,av);
+		freebytes(av, ac*sizeof(t_atom));
+		
+		//outlet_list(outlet,&s_list,argc,argv);
+	} else if (s == &s_bang ) {
+		t_atom a;
+		SETSYMBOL(&a,pp);
+		outlet_list(outlet,&s_list,1,&a);
+	} else {
+		int ac = argc + 2;
+		t_atom *av = (t_atom *)getbytes(ac*sizeof(t_atom));	
+		tof_copy_atoms(argv,av+2,argc);
+		SETSYMBOL(av+1, s);
+		SETSYMBOL(av, pp);
+		outlet_list(outlet,&s_list,ac,av);
+		freebytes(av, ac*sizeof(t_atom));
+		//outlet_symbol(outlet,pp);
+	}
+}
+
 static void tof_outlet_anything_prepend(t_outlet* outlet, t_symbol* s, int argc, t_atom* argv, t_symbol* pp) {
 	
 	if (s == &s_list || s == &s_float  || s == &s_symbol) {
@@ -269,7 +285,9 @@ static void tof_outlet_anything_prepend(t_outlet* outlet, t_symbol* s, int argc,
 			outlet_anything(outlet,pp,ac,av);
 			freebytes(av, ac*sizeof(t_atom));
 	} else {
-		outlet_bang(outlet);
+		//t_atom a;
+		outlet_anything(outlet,pp,0,NULL);
+		//outlet_symbol(outlet,pp);
 	}
 }
 	
@@ -279,6 +297,9 @@ static void tof_send_anything_prepend(t_symbol* target,t_symbol* selector, int a
 	if (target->s_thing) {
 		if ( selector == &s_list || selector == &s_float || selector == &s_symbol ) {
 			typedmess(target->s_thing, prepend, ac, av);
+		} else if ( selector == &s_bang) {
+			
+			typedmess(target->s_thing, prepend, 0, NULL);
 		} else {
 			int new_ac = ac + 1;
 			t_atom *new_av = getbytes(new_ac*sizeof(*new_av));	

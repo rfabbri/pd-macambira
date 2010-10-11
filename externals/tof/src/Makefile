@@ -1,18 +1,21 @@
 # 
 # SETUP
 #
+
 # Points to the folder that contains pd's /src dir
 PD_SRC = ../../../pd
-# Points to the folder that contains pd's compiled /bin dir
-PD_BIN = /Applications/Pd-extended.app/Contents/Resources
-# Points to the folder to which you want to put the built file
-OUTPUT = ~/Make/pd/tof
 
+# Points to the folder that contains pd's compiled /bin dir (for OS X)
+PD_BIN = /Applications/Pd-extended.app/Contents/Resources
+
+# Points to the folder to which you want to move the built file
+OUTPUT = ~/Make/pd/tof
 
 
 #
 # FIND OS
 #
+
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
   OS_NAME = linux
@@ -111,17 +114,45 @@ endif
 
 CXXFLAGS = $(CFLAGS)
 
+### C++ files
+%.$(EXTENSION): %.cpp
+%.$(EXTENSION): %.cc
+	$(CXX) $(OPT_CFLAGS) $(CXXFLAGS) -o "$*.o" -c "$<"
+	$(CXX) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o" $(LIBS)
+	chmod a-x "$*.$(EXTENSION)"
+#	$(STRIP) $*.$(EXTENSION)
+#	rm -f -- $*.o
+	mv $*.$(EXTENSION) $(OUTPUT)
+
+%.o: %.cpp
+%.o: %.cc
+	$(CXX) $(OPT_CFLAGS) $(CXXFLAGS) -o "$*.o" -c "$<"
+
 
 ### C files
+%.o: %.c
+	$(CC) $(OPT_CFLAGS) $(CFLAGS) -o "$*.o" -c "$*.c"
 
-
-.c:
-	$(CC) $(OPT_CFLAGS) $(CFLAGS)  -o "$*.o" -c "$*.c"
-	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) 
+%.$(EXTENSION): %.o
+	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) \
+		`test -f $*.libs && cat $*.libs`	\
+		`my_dylib=$(patsubst $(externals_src)/%,%,$(@D)); test -f $(@D)/lib$${my_dylib}.$(DYLIB_EXTENSION) && echo -L$(@D) -l$$my_dylib` \
+		`my_obj=$(patsubst $(externals_src)/%,%,$(@D)); test -f $(@D)/shared/$${my_obj}.o && echo $(@D)/shared/$${my_obj}.o` \
+		`test -f $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs && \
+			cat $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs`
 	chmod a-x "$*.$(EXTENSION)"
 	$(STRIP) $*.$(EXTENSION)
 	rm -f -- $*.o
 	mv $*.$(EXTENSION) $(OUTPUT)
+
+### C files
+#.c:
+#	$(CC) $(OPT_CFLAGS) $(CFLAGS)  -o "$*.o" -c "$*.c"
+#	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) 
+#	chmod a-x "$*.$(EXTENSION)"
+#	$(STRIP) $*.$(EXTENSION)
+#	rm -f -- $*.o
+#	mv $*.$(EXTENSION) $(OUTPUT)
 
 
 

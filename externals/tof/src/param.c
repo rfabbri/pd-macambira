@@ -314,7 +314,7 @@ static void* paramClass_new(t_symbol *s, int ac, t_atom *av)
 	  
 	  // Create memory space
 	  t_symbol* selector;
-	  tof_set_selector(&selector,&ac_p,&av_p);
+	  param_set_selector(&selector,&ac_p,&av_p);
 	  x->selector = selector;
 	  x->alloc = ac_p + 10;
 	  x->ac = ac_p;
@@ -334,7 +334,7 @@ static void* paramClass_new(t_symbol *s, int ac, t_atom *av)
       inlet_new((t_object *)x, (t_pd *)p, 0, 0);
       x->outlet = outlet_new(&x->x_obj, &s_list);
   
-  
+	//post("Selector: %s",x->selector->s_name);
   
   
   return (x);

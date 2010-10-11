@@ -1,0 +1,40 @@
+#N canvas 523 229 833 496 10;
+#X msg 103 285 anything works too;
+#X msg 91 258 symbol test;
+#X obj 62 27 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
+0;
+#X text 67 77 author: mrtoftrash@gmail.com;
+#X obj 493 309 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 67 66 tags: lists;
+#X obj 100 388 print ATOM;
+#X obj 181 389 print INDEX;
+#X obj 464 384 print ATOM;
+#X obj 575 381 print INDEX;
+#X msg 60 229 list a b c d e f g;
+#X msg 464 282 list m n o p q r s t u v;
+#X text 468 263 step 1: add list;
+#X text 513 307 step 2: bang to output each element;
+#X obj 122 313 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 147 312 bang to interrupt output;
+#X text 68 27 description: output the individual elements of a list
+and their indices \, either immediately or on bangs.;
+#X text 67 88 version: 2009-10-06 (added the second mode);
+#X text 56 199 default mode: output everything once it is received.
+;
+#X text 428 196 "wait" or "manually" mode: output one element for every
+bang .;
+#X text 67 145 list_unfold has two modes:;
+#X obj 100 362 tof/list_unfold;
+#X obj 464 358 tof/list_unfold wait;
+#X connect 0 0 21 0;
+#X connect 1 0 21 0;
+#X connect 4 0 22 0;
+#X connect 10 0 21 0;
+#X connect 11 0 22 0;
+#X connect 14 0 21 0;
+#X connect 21 0 6 0;
+#X connect 21 1 7 0;
+#X connect 22 0 8 0;
+#X connect 22 1 9 0;

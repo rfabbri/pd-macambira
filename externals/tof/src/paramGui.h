@@ -4,6 +4,17 @@ static t_class *paramGui_class;
 #define GUI_X_STEP 200
 #define GUI_Y_STEP 18
  
+ /*
+ CHANGES
+ 
+ Added a symbol message handler and a subpath variable
+ 
+ Banging inlet 2 only resets the gui but does not recreate it
+ 
+ 
+ */
+ 
+ 
  
 
 typedef struct _paramGui
@@ -14,7 +25,12 @@ typedef struct _paramGui
   t_canvas*					childcanvas;
   //t_symbol*                 fullpath;
   t_symbol*                 path;
+  
+  
   int                       path_l;
+  
+  t_symbol*                 subpath;
+  int                       subpath_l;
   int                       build;
   t_symbol*					root;
   
@@ -68,7 +84,7 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
             int i;
             t_symbol* shortpath;
             
-            int gui_built = 1;
+            int gui_update = 0;
             
             // ac & av for updating the values of the gui (p->get())
             // after it is created
@@ -79,175 +95,190 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
             
              t_param* p = get_param_list(x->root);
              
+             
+                          
+             
              while (p) {
 			
-                gui_built = 1;
+                    gui_update = 0;
                     if (p->GUI && (strncmp(p->path->s_name,x->path->s_name,x->path_l)==0)) {
-                        p->GUI(p->x,&ac,&av,&send,&receive);
-                        if ( send == NULL ) send = s_empty;
-                        if ( receive == NULL ) receive = s_empty;
-                        
-                        /* 
-                        // This code alows the positioning of the guis, but creates
-                        // too many problems
-                        if ( IS_A_FLOAT(av,0) ) {
-							pos_x = GUI_X_STEP * atom_getfloat(av);
-							av++;
-							ac--;
-						}
-						
-						if ( IS_A_FLOAT(av,0) ) {
-							pos_y = GUI_Y_STEP * atom_getfloat(av);
-							av++;
-							ac--;
-						}
-                        */
-                        if ( IS_A_SYMBOL(av,0)) {
-							
-							// Make shortpath (removes what is common between paths)
-							// Do not make shortpath if we are at the root (x->path_l==1)
-							if ( x->path_l < 2) {
-								shortpath = p->path;
-							} else {
-								shortpath = gensym(p->path->s_name + x->path_l);
+                    	
+                    	if ( x->subpath==NULL || (x->path_l > 0 && strncmp((p->path->s_name)+(x->path_l-1),x->subpath->s_name,x->subpath_l)==0)) {
+                    	
+                    	
+	                        p->GUI(p->x,&ac,&av,&send,&receive);
+	                        if ( send == NULL ) send = s_empty;
+	                        if ( receive == NULL ) receive = s_empty;
+	                        
+	                        /* 
+	                        // This code alows the positioning of the guis, but creates
+	                        // too many problems
+	                        if ( IS_A_FLOAT(av,0) ) {
+								pos_x = GUI_X_STEP * atom_getfloat(av);
+								av++;
+								ac--;
 							}
 							
-							
-							
-							
-                           type = atom_getsymbol(av);
-                           if ( type == s_nbx ) {
-                                SETSYMBOL(&atoms[0],s_obj);
-                                SETFLOAT(&atoms[1],pos_x);
-                                SETFLOAT(&atoms[2],pos_y);
-                                SETSYMBOL(&atoms[3],s_nbx);
-                                SETFLOAT(&atoms[4],5);
-                                SETFLOAT(&atoms[5],14);
-                                SETFLOAT(&atoms[6],-1.0e+37);
-                                SETFLOAT(&atoms[7],1.0e+37);
-                                SETFLOAT(&atoms[8],0);
-                                SETFLOAT(&atoms[9],0);
-                                SETSYMBOL(&atoms[10],send);
-                                SETSYMBOL(&atoms[11],receive);
-                                SETSYMBOL(&atoms[12],shortpath);
-                                SETFLOAT(&atoms[13],50);
-                                SETFLOAT(&atoms[14],8);
-                                SETFLOAT(&atoms[15],0);
-                                SETFLOAT(&atoms[16],8);
-                                SETFLOAT(&atoms[17],-262144);
-                                SETFLOAT(&atoms[18],-1);
-                                SETFLOAT(&atoms[19],-1);
-                                SETFLOAT(&atoms[20],0);
-                                SETFLOAT(&atoms[21],256);
-                                pd_forwardmess((t_pd*)x->childcanvas, 22, atoms);
-                                pos_y = pos_y + GUI_Y_STEP;
-                                
-                            } else if (type == s_bng) {
-                                SETSYMBOL(&atoms[0],s_obj);
-                                SETFLOAT(&atoms[1],pos_x);
-                                SETFLOAT(&atoms[2],pos_y);
-                                SETSYMBOL(&atoms[3],s_bng);
-                                SETFLOAT(&atoms[4],15);
-                                SETFLOAT(&atoms[5],250);
-                                SETFLOAT(&atoms[6],50);
-                                SETFLOAT(&atoms[7],0);
-                                SETSYMBOL(&atoms[8],send);
-                                SETSYMBOL(&atoms[9],receive);
-                                SETSYMBOL(&atoms[10],shortpath);
-                                SETFLOAT(&atoms[11],17);
-                                SETFLOAT(&atoms[12],7);
-                                SETFLOAT(&atoms[13],0);
-                                SETFLOAT(&atoms[14],8);
-                                SETFLOAT(&atoms[15],-262144);
-                                SETFLOAT(&atoms[16],-1);
-                                SETFLOAT(&atoms[17],-1);
-                                pd_forwardmess((t_pd*)x->childcanvas, 18, atoms);
-                                pos_y = pos_y + GUI_Y_STEP;
-                            } else if ( (type == s_slider) || (type == s_knob) || (type == s_hsl) ) {
-                                SETSYMBOL(&atoms[0],s_obj);
-                                SETFLOAT(&atoms[1],pos_x);
-                                SETFLOAT(&atoms[2],pos_y);
-                                SETSYMBOL(&atoms[3],s_hsl);
-                                SETFLOAT(&atoms[4],100);
-                                SETFLOAT(&atoms[5],15);
-                                if (ac > 1 && IS_A_FLOAT(av,1) ) {
-                                     SETFLOAT(&atoms[6],atom_getfloat(av+1));
-                                 } else {
-                                     SETFLOAT(&atoms[6],0);
-                                 }
-                                 if (ac > 2 && IS_A_FLOAT(av,2) ) {
-                                     SETFLOAT(&atoms[7],atom_getfloat(av+2));
-                                 } else {
-                                     SETFLOAT(&atoms[7],1);
-                                 }
-                                SETFLOAT(&atoms[8],0);
-                                SETFLOAT(&atoms[9],0);
-                                SETSYMBOL(&atoms[10],send);
-                                SETSYMBOL(&atoms[11],receive);
-                                SETSYMBOL(&atoms[12],shortpath);
-                                SETFLOAT(&atoms[13],105);
-                                SETFLOAT(&atoms[14],7);
-                                SETFLOAT(&atoms[15],0);
-                                SETFLOAT(&atoms[16],8);
-                                SETFLOAT(&atoms[17],-262144);
-                                SETFLOAT(&atoms[18],-1);
-                                SETFLOAT(&atoms[19],-1);
-                                SETFLOAT(&atoms[20],0);
-                                SETFLOAT(&atoms[21],1);
-                                pd_forwardmess((t_pd*)x->childcanvas, 22, atoms);
-                                pos_y = pos_y + GUI_Y_STEP;
-                                
-                            } else if (type == s_tgl) {
-                                SETSYMBOL(&atoms[0],s_obj);
-                                SETFLOAT(&atoms[1],pos_x);
-                                SETFLOAT(&atoms[2],pos_y);
-                                SETSYMBOL(&atoms[3],s_tgl);
-                                SETFLOAT(&atoms[4],15);
-                                SETFLOAT(&atoms[5],0);
-                                SETSYMBOL(&atoms[6],send);
-                                SETSYMBOL(&atoms[7],receive);
-                                SETSYMBOL(&atoms[8],shortpath);
-                                SETFLOAT(&atoms[9],17);
-                                SETFLOAT(&atoms[10],7);
-                                SETFLOAT(&atoms[11],0);
-                                SETFLOAT(&atoms[12],8);
-                                SETFLOAT(&atoms[13],-262144);
-                                SETFLOAT(&atoms[14],1);
-                                SETFLOAT(&atoms[15],-1);
-                                SETFLOAT(&atoms[16],0);
-                                SETFLOAT(&atoms[17],1);
-                                pd_forwardmess((t_pd*)x->childcanvas, 18, atoms);
-                                pos_y = pos_y + GUI_Y_STEP;
-                                
-                                
-                            } else if ( type == s_symbolatom || type == s_sym) {
-                                SETSYMBOL(&atoms[0],s_symbolatom);
-                                SETFLOAT(&atoms[1],pos_x);
-                                SETFLOAT(&atoms[2],pos_y);
-                                SETFLOAT(&atoms[3],17);
-                                SETFLOAT(&atoms[4],0);
-                                SETFLOAT(&atoms[5],0);
-                                SETFLOAT(&atoms[6],1);
-                                SETSYMBOL(&atoms[7],shortpath);
-                                SETSYMBOL(&atoms[8],receive);
-                                SETSYMBOL(&atoms[9],send);
-                                pd_forwardmess((t_pd*)x->childcanvas, 10,atoms);
-                                pos_y = pos_y + GUI_Y_STEP;
-                            } else {
-                                SETSYMBOL(&atoms[0],s_text);
-                                SETFLOAT(&atoms[1],pos_x);
-                                SETFLOAT(&atoms[2],pos_y);
-                                SETSYMBOL(&atoms[3],shortpath);
-                                pd_forwardmess((t_pd*)x->childcanvas, 4,atoms);
-                                pos_y = pos_y + GUI_Y_STEP;
-                                gui_built = 0;
-                            }
-                            
-                            if ((gui_built) && (receive != s_empty) && (p->get)) {
-                                p->get(p->x,&s_got,&ac_got,&av_got);
-                                tof_send_anything_prepend(receive,s_got,ac_got,av_got,s_set);
-                            }
-                        }
+							if ( IS_A_FLOAT(av,0) ) {
+								pos_y = GUI_Y_STEP * atom_getfloat(av);
+								av++;
+								ac--;
+							}
+	                        */
+	                        if ( IS_A_SYMBOL(av,0)) {
+								
+								// Make shortpath (removes what is common between paths)
+								// Do not make shortpath if we are at the root (x->path_l==1)
+								if ( x->path_l < 2) {
+									shortpath = p->path;
+								} else {
+									shortpath = gensym(p->path->s_name + x->path_l);
+								}
+								
+								
+								
+								
+	                           type = atom_getsymbol(av);
+	                           if ( type == s_nbx ) {
+	                                SETSYMBOL(&atoms[0],s_obj);
+	                                SETFLOAT(&atoms[1],pos_x);
+	                                SETFLOAT(&atoms[2],pos_y);
+	                                SETSYMBOL(&atoms[3],s_nbx);
+	                                SETFLOAT(&atoms[4],5);
+	                                SETFLOAT(&atoms[5],14);
+	                                SETFLOAT(&atoms[6],-1.0e+37);
+	                                SETFLOAT(&atoms[7],1.0e+37);
+	                                SETFLOAT(&atoms[8],0);
+	                                SETFLOAT(&atoms[9],0);
+	                                SETSYMBOL(&atoms[10],send);
+	                                SETSYMBOL(&atoms[11],receive);
+	                                SETSYMBOL(&atoms[12],shortpath);
+	                                SETFLOAT(&atoms[13],50);
+	                                SETFLOAT(&atoms[14],8);
+	                                SETFLOAT(&atoms[15],0);
+	                                SETFLOAT(&atoms[16],8);
+	                                SETFLOAT(&atoms[17],-262144);
+	                                SETFLOAT(&atoms[18],-1);
+	                                SETFLOAT(&atoms[19],-1);
+	                                SETFLOAT(&atoms[20],0);
+	                                SETFLOAT(&atoms[21],256);
+	                                pd_forwardmess((t_pd*)x->childcanvas, 22, atoms);
+	                                pos_y = pos_y + GUI_Y_STEP;
+								   gui_update = 1;
+	                                
+	                            } else if (type == s_bng) {
+									
+	                                SETSYMBOL(&atoms[0],s_obj);
+	                                SETFLOAT(&atoms[1],pos_x);
+	                                SETFLOAT(&atoms[2],pos_y);
+	                                SETSYMBOL(&atoms[3],s_bng);
+	                                SETFLOAT(&atoms[4],15);
+	                                SETFLOAT(&atoms[5],250);
+	                                SETFLOAT(&atoms[6],50);
+	                                SETFLOAT(&atoms[7],0);
+	                                SETSYMBOL(&atoms[8],send);
+	                                SETSYMBOL(&atoms[9],receive);
+	                                SETSYMBOL(&atoms[10],shortpath);
+	                                SETFLOAT(&atoms[11],17);
+	                                SETFLOAT(&atoms[12],7);
+	                                SETFLOAT(&atoms[13],0);
+	                                SETFLOAT(&atoms[14],8);
+	                                SETFLOAT(&atoms[15],-262144);
+	                                SETFLOAT(&atoms[16],-1);
+	                                SETFLOAT(&atoms[17],-1);
+	                                pd_forwardmess((t_pd*)x->childcanvas, 18, atoms);
+	                                pos_y = pos_y + GUI_Y_STEP;
+									
+	                            } else if ( (type == s_slider) || (type == s_knob) || (type == s_hsl) ) {
+	                                SETSYMBOL(&atoms[0],s_obj);
+	                                SETFLOAT(&atoms[1],pos_x);
+	                                SETFLOAT(&atoms[2],pos_y);
+	                                SETSYMBOL(&atoms[3],s_hsl);
+	                                SETFLOAT(&atoms[4],100);
+	                                SETFLOAT(&atoms[5],15);
+	                                if (ac > 1 && IS_A_FLOAT(av,1) ) {
+	                                     SETFLOAT(&atoms[6],atom_getfloat(av+1));
+	                                 } else {
+	                                     SETFLOAT(&atoms[6],0);
+	                                 }
+	                                 if (ac > 2 && IS_A_FLOAT(av,2) ) {
+	                                     SETFLOAT(&atoms[7],atom_getfloat(av+2));
+	                                 } else {
+	                                     SETFLOAT(&atoms[7],1);
+	                                 }
+	                                SETFLOAT(&atoms[8],0);
+	                                SETFLOAT(&atoms[9],0);
+	                                SETSYMBOL(&atoms[10],send);
+	                                SETSYMBOL(&atoms[11],receive);
+	                                SETSYMBOL(&atoms[12],shortpath);
+	                                SETFLOAT(&atoms[13],105);
+	                                SETFLOAT(&atoms[14],7);
+	                                SETFLOAT(&atoms[15],0);
+	                                SETFLOAT(&atoms[16],8);
+	                                SETFLOAT(&atoms[17],-262144);
+	                                SETFLOAT(&atoms[18],-1);
+	                                SETFLOAT(&atoms[19],-1);
+	                                SETFLOAT(&atoms[20],0);
+	                                SETFLOAT(&atoms[21],1);
+	                                pd_forwardmess((t_pd*)x->childcanvas, 22, atoms);
+	                                pos_y = pos_y + GUI_Y_STEP;
+	                                gui_update = 1;
+	                            } else if (type == s_tgl) {
+	                                SETSYMBOL(&atoms[0],s_obj);
+	                                SETFLOAT(&atoms[1],pos_x);
+	                                SETFLOAT(&atoms[2],pos_y);
+	                                SETSYMBOL(&atoms[3],s_tgl);
+	                                SETFLOAT(&atoms[4],15);
+	                                SETFLOAT(&atoms[5],0);
+	                                SETSYMBOL(&atoms[6],send);
+	                                SETSYMBOL(&atoms[7],receive);
+	                                SETSYMBOL(&atoms[8],shortpath);
+	                                SETFLOAT(&atoms[9],17);
+	                                SETFLOAT(&atoms[10],7);
+	                                SETFLOAT(&atoms[11],0);
+	                                SETFLOAT(&atoms[12],8);
+	                                SETFLOAT(&atoms[13],-262144);
+	                                SETFLOAT(&atoms[14],1);
+	                                SETFLOAT(&atoms[15],-1);
+	                                SETFLOAT(&atoms[16],0);
+	                                SETFLOAT(&atoms[17],1);
+	                                pd_forwardmess((t_pd*)x->childcanvas, 18, atoms);
+	                                pos_y = pos_y + GUI_Y_STEP;
+	                                gui_update = 1;
+	                                
+	                            } else if ( type == s_symbolatom || type == s_sym) {
+	                                SETSYMBOL(&atoms[0],s_symbolatom);
+	                                SETFLOAT(&atoms[1],pos_x);
+	                                SETFLOAT(&atoms[2],pos_y);
+	                                SETFLOAT(&atoms[3],17);
+	                                SETFLOAT(&atoms[4],0);
+	                                SETFLOAT(&atoms[5],0);
+	                                SETFLOAT(&atoms[6],1);
+	                                SETSYMBOL(&atoms[7],shortpath);
+	                                SETSYMBOL(&atoms[8],receive);
+	                                SETSYMBOL(&atoms[9],send);
+	                                pd_forwardmess((t_pd*)x->childcanvas, 10,atoms);
+	                                pos_y = pos_y + GUI_Y_STEP;
+									gui_update = 1;
+	                            } else {
+	                                SETSYMBOL(&atoms[0],s_text);
+	                                SETFLOAT(&atoms[1],pos_x);
+	                                SETFLOAT(&atoms[2],pos_y);
+	                                SETSYMBOL(&atoms[3],shortpath);
+	                                pd_forwardmess((t_pd*)x->childcanvas, 4,atoms);
+	                                pos_y = pos_y + GUI_Y_STEP;
+	                                gui_update = 0;									
+	                            }
+	                            
+	                            if ((gui_update) && (receive != s_empty) && (p->get) && (ac_got)) {
+	                                p->get(p->x,&s_got,&ac_got,&av_got);
+									//post("path: %s selector: %s ac: %i",p->path->s_name,s_got->s_name,ac_got);
+									
+	                                if ( s_got != &s_bang) tof_send_anything_prepend(receive,s_got,ac_got,av_got,s_set);
+	                            }
+								 
+	                        }
+	                    }
                     }
                 p = p->next;
             
@@ -263,6 +294,7 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
 			 
 			 // Change the build flag
 			x->build = 0;
+			x->subpath=NULL;
 			
 			// Show canvas
 			t_atom a;
@@ -279,6 +311,9 @@ static void paramGui_motion_callback(t_paramGui *x, t_float x_position, t_float 
 		paramGui_buildCanvas(x,(int) x_position,(int) y_position );
 	}
 }
+
+
+
 
 
 static void paramGui_bang(t_paramGui *x) {
@@ -308,9 +343,20 @@ static void paramGui_bang(t_paramGui *x) {
    }
 }
 
+static void paramGui_symbol(t_paramGui *x, t_symbol* s) {
+	if ( x->subpath != NULL && x->subpath != s) x->build = 1;
+	x->subpath = s;
+	x->subpath_l = strlen(x->subpath->s_name);
+	paramGui_bang(x);
+}
+
 static void paramGui_reset(t_paramGui *x) {
     x->build = 1;
-    paramGui_bang(x);
+    //paramGui_bang(x);
+    // Hide canvas
+	t_atom a;
+	SETFLOAT(&a,0);
+	pd_typedmess((t_pd*)x->childcanvas,s_vis,1,&a);
 }
 
 
@@ -424,7 +470,7 @@ void paramGui_setup(void) {
     sizeof(t_paramGui), 0, A_GIMME, 0);
 
  class_addbang(paramGui_class, paramGui_bang);
- //class_addsymbol(paramGui_class, paramGui_symbol);
+ class_addsymbol(paramGui_class, paramGui_symbol);
  
  // The mouse position callback
  class_addmethod(paramGui_class, (t_method)paramGui_motion_callback,\
