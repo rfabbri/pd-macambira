@@ -16,6 +16,7 @@ typedef struct _open_help {
   //t_outlet* outlet1;
   //t_canvas* canvas;
   t_symbol* dir;
+	t_symbol* help;
   
 } t_open_help;
 
@@ -36,6 +37,7 @@ static void open_help_bang(t_open_help *x) {
 
 static void open_help_symbol(t_open_help *x, t_symbol *s) {
 	
+	x->help = s;
 	
     //int length = tof_anything_to_string(s,ac,av,tof_buf_temp_a);
 	//strcat(tof_buf_temp_a,".pd");
@@ -59,11 +61,35 @@ static void open_help_free(t_open_help *x)
     
 }
 
+
+static void open_help_bang(t_open_help *x) {
+	if ( x->help) open_help_symbol(x,x->help);
+}
+
+
+static void open_help_click(t_open_help *x, t_floatarg xpos, t_floatarg ypos,
+						  t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
+{
+    if ( x->help) open_help_symbol(x,x->help);
+}
+
+
 void *open_help_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_open_help *x = (t_open_help *)pd_new(open_help_class);
     
   x->dir = tof_get_dir(tof_get_canvas());
+	
+	
+	
+	x->help=NULL;
+	if ( argc && IS_A_SYMBOL(argv,0)  ) {
+		x->help = atom_getsymbol(argv);
+		
+	}
+	
+	
+	
   //strcpy(tof_buf_temp_a,x->dir->s_name);
   //strcat(tof_buf_temp_a,"/");
   //x->dir = gensym(tof_buf_temp_a);
@@ -76,14 +102,16 @@ void *open_help_new(t_symbol *s, int argc, t_atom *argv)
   return (void *)x;
 }
 
+
+
 void open_help_setup(void) {
   open_help_class = class_new(gensym("open_help"),
         (t_newmethod)open_help_new,
         (t_method)open_help_free, sizeof(t_open_help),
-        CLASS_DEFAULT, 
+        0, 
         A_GIMME, 0);
 
- // class_addbang(open_help_class, open_help_bang);
+ class_addbang(open_help_class, open_help_bang);
   //class_addanything(open_help_class,open_help_anything);
   class_addsymbol(open_help_class,open_help_symbol);
   //class_addmethod(open_help_class, 
@@ -97,4 +125,8 @@ void open_help_setup(void) {
 */
   //class_addlist (open_help_class, open_help_list);
   
+	class_addmethod(open_help_class, (t_method)open_help_click,
+					gensym("click"),
+					A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
+	
 }

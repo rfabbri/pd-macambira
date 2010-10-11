@@ -1,15 +1,24 @@
-#N canvas 125 137 619 503 10;
-#X msg 77 213 symbol list;
-#X msg 157 247 symbol until;
+#N canvas 522 138 619 503 10;
+#X msg 27 167 symbol list;
+#X msg 107 201 symbol until;
 #X obj -1 29 cnv 15 400 100 empty empty empty 20 12 0 14 -249661 -66577
 0;
 #X text 4 85 author: mrtoftrash@gmail.com;
-#X msg 178 298 symbol zexy/list2symbol;
+#X msg 128 252 symbol zexy/list2symbol;
 #X text 4 28 description: searches for an external's or an abstraction's
 help file and tries to open it.;
 #X text 4 106 version: 2009-09-25;
 #X text 3 65 tags: file patch;
-#X obj 77 340 tof/open_help;
+#X obj 27 294 tof/open_help;
+#X obj 70 412 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 69 434 tof/open_help tof/param;
+#X text 102 371 If you define the name of an external or abstraction
+as an argument \, open_help will open that abstraction's or external's
+help file when you send a bang to the inlet or when you CLICK open_help.
+;
+#X text 216 433 <- CLICK;
 #X connect 0 0 8 0;
 #X connect 1 0 8 0;
 #X connect 4 0 8 0;
+#X connect 9 0 10 0;

@@ -62,7 +62,7 @@ CWD := $(shell pwd)
 export MACOSX_DEPLOYMENT_TARGET = 10.3
 
 # DEFAULT TARGET # Find a way to list all c files target
-ALL = $((patsubst %.c,%.o,$(wildcard *.c)))
+ALL = $(patsubst %.c,%.$(EXTENSION),$(wildcard *.c))
 default: $(ALL)
 
 .SUFFIXES: .$(EXTENSION) .$(SHARED_LIB)
@@ -145,14 +145,7 @@ CXXFLAGS = $(CFLAGS)
 	rm -f -- $*.o
 	mv $*.$(EXTENSION) $(OUTPUT)
 
-### C files
-#.c:
-#	$(CC) $(OPT_CFLAGS) $(CFLAGS)  -o "$*.o" -c "$*.c"
-#	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) 
-#	chmod a-x "$*.$(EXTENSION)"
-#	$(STRIP) $*.$(EXTENSION)
-#	rm -f -- $*.o
-#	mv $*.$(EXTENSION) $(OUTPUT)
+
 
 
 
