@@ -146,7 +146,7 @@ void *listUnfold_new(t_symbol *s, int argc, t_atom *argv)
 
 void listUnfold_setup(void) {
 	
-	post("WARNING: listUnfold is depracated, please use list_unfold instead.");
+	post("WARNING: listUnfold is deprecated, please use list_unfold instead.");
 	
   listUnfold_class = class_new(gensym("listUnfold"),
         (t_newmethod)listUnfold_new,

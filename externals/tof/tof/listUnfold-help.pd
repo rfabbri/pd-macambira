@@ -30,7 +30,7 @@ and their indices \, either immediately or on bangs.;
 bang .;
 #X obj 61 133 cnv 15 400 30 empty empty empty 20 12 0 14 -261234 -66577
 0;
-#X text 69 139 listUnfold is depracated. Please use list_unfold instead.
+#X text 69 139 listUnfold is deprecated. Please use list_unfold instead.
 ;
 #X connect 0 0 4 0;
 #X connect 1 0 4 0;
