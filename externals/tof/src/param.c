@@ -110,9 +110,9 @@ static void paramClass_anything(t_paramClass *x, t_symbol *s, int ac, t_atom *av
  #ifdef PARAMDEBUG
   post("RECEIVING SOMETHING");
  #endif
- if ( s == &s_bang || ac == 0 ) {
+	if ( s == &s_bang || ac == 0 ) {
 		x->ac = 0;
-		x->selector = s;
+		x->selector = &s_bang;
 	} else {
 		if(ac > x->alloc) {	
 			x->av = resizebytes(x->av, x->alloc*sizeof(*(x->av)), 

@@ -282,12 +282,13 @@ static void paramGui_buildCanvas(t_paramGui* x,int x_position,int y_position) {
 	                                pos_y = pos_y + GUI_Y_STEP;
 	                                gui_update = 0;									
 	                            }
-	                            
-	                            if ((gui_update) && (receive != s_empty) && (p->get) && (ac_got)) {
+								//p->get(p->x,&s_got,&ac_got,&av_got);
+	                            //post("path: %s selector: %s ac: %i update: %i",p->path->s_name,s_got->s_name,ac_got,gui_update);
+	                            if ((gui_update) && (receive != s_empty) && (p->get) ) {
 	                                p->get(p->x,&s_got,&ac_got,&av_got);
-									//post("path: %s selector: %s ac: %i",p->path->s_name,s_got->s_name,ac_got);
 									
-	                                if ( s_got != &s_bang) tof_send_anything_prepend(receive,s_got,ac_got,av_got,s_set);
+									
+	                                if ( s_got != &s_bang && ac_got) tof_send_anything_prepend(receive,s_got,ac_got,av_got,s_set);
 	                            }
 								 
 	                        }

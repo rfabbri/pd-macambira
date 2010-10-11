@@ -23,7 +23,13 @@ static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av
 					t_param* p = get_param_list(x->root);
 					#endif
  
-	  if (ac) {
+	  if (ac == 0) {
+		  // Its a bang?
+		  ac = 1;
+		  t_atom a;
+		  SETSYMBOL(&a,&s_bang);
+		  av = &a;
+	   }
 		  
 			   if ( s->s_name[0] == '/' && strlen(s->s_name) > 1) {
 
@@ -59,7 +65,7 @@ static void paramRoute_anything(t_paramRoute *x, t_symbol *s, int ac, t_atom *av
                 } else {
                     outlet_anything(x->x_outlet,s,ac,av);
                 }
-	  }
+	  
 	
 }
 
