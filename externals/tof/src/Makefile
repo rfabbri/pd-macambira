@@ -65,13 +65,19 @@ export MACOSX_DEPLOYMENT_TARGET = 10.3
 ALL = $(patsubst %.c,%.$(EXTENSION),$(wildcard *.c))
 default: $(ALL)
 
+clean:
+	rm *.$(EXTENSION)
+
 .SUFFIXES: .$(EXTENSION) .$(SHARED_LIB)
 
+CCWARNINGS = -Waddress -Wchar-subscripts -Wimplicit-int -Wimplicit-function-declaration -Wcomment -Wformat -Wmain -Wmissing-braces -Wnonnull -Wparentheses -Wpointer-sign -Wreturn-type -Wsequence-point -Wsign-compare -Wstrict-aliasing -Wstrict-overflow=1 -Wswitch -Wtrigraphs -Wunknown-pragmas -Wunused-label -Wunused-value -Wvolatile-register-var 
 
 # this variable is to support old "win" directories, rather than "windows"
 BUILDSRC_OS_NAME = $(OS_NAME)
 
-CFLAGS = -DPD -I$(PD_SRC)/src -Wall -W $(DEBUG_CFLAGS)
+#-Wall -W $(DEBUG_CFLAGS)
+
+CFLAGS = -DPD -I$(PD_SRC)/src $(CCWARNINGS)
 LDFLAGS =  
 LIBS = -lm
 
@@ -82,7 +88,7 @@ ifeq ($(OS_NAME),darwin)
 #  FAT_FLAGS = -arch ppc -arch ppc7400 -arch ppc64 -arch i386 -arch x86_64
   CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix -DDL_OPEN -arch $(ARCH)
   LDFLAGS += -bundle -bundle_loader $(PD_BIN)/bin/pd -undefined dynamic_lookup \
-		-L/sw/lib -weak_framework Carbon -arch $(ARCH)
+		-weak_framework Carbon -arch $(ARCH)
   LIBS += -lc 
   DYLIB_LDFLAGS = -dynamiclib -undefined dynamic_lookup -read_only_relocs warning -L/sw/lib
   STRIP = strip -x
@@ -114,6 +120,8 @@ endif
 
 CXXFLAGS = $(CFLAGS)
 
+
+
 ### C++ files
 %.$(EXTENSION): %.cpp
 %.$(EXTENSION): %.cc
@@ -122,7 +130,7 @@ CXXFLAGS = $(CFLAGS)
 	chmod a-x "$*.$(EXTENSION)"
 #	$(STRIP) $*.$(EXTENSION)
 #	rm -f -- $*.o
-	mv $*.$(EXTENSION) $(OUTPUT)
+	cp $*.$(EXTENSION) $(OUTPUT)
 
 %.o: %.cpp
 %.o: %.cc
@@ -131,19 +139,21 @@ CXXFLAGS = $(CFLAGS)
 
 ### C files
 %.o: %.c
-	$(CC) $(OPT_CFLAGS) $(CFLAGS) -o "$*.o" -c "$*.c"
+	@echo "- Building $*.o"
+	@$(CC) $(OPT_CFLAGS) $(CFLAGS) -o "$*.o" -c "$*.c"
 
 %.$(EXTENSION): %.o
-	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) \
+	@echo "- Linking $*.$(EXTENSION)"
+	@$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) \
 		`test -f $*.libs && cat $*.libs`	\
 		`my_dylib=$(patsubst $(externals_src)/%,%,$(@D)); test -f $(@D)/lib$${my_dylib}.$(DYLIB_EXTENSION) && echo -L$(@D) -l$$my_dylib` \
 		`my_obj=$(patsubst $(externals_src)/%,%,$(@D)); test -f $(@D)/shared/$${my_obj}.o && echo $(@D)/shared/$${my_obj}.o` \
 		`test -f $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs && \
 			cat $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs`
-	chmod a-x "$*.$(EXTENSION)"
-	$(STRIP) $*.$(EXTENSION)
-	rm -f -- $*.o
-	mv $*.$(EXTENSION) $(OUTPUT)
+	@chmod a-x "$*.$(EXTENSION)"
+	@$(STRIP) $*.$(EXTENSION)
+	@rm -f -- $*.o
+	@cp $*.$(EXTENSION) $(OUTPUT)
 
 
 
