@@ -312,21 +312,21 @@ of this abstraction.;
 #X connect 21 0 20 0;
 #X connect 22 0 19 0;
 #X restore -16 292 pd route;
-#N canvas 324 321 1042 460 gui 0;
+#N canvas 324 321 986 455 gui 0;
 #X obj 431 21 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj 506 75 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj 431 110 tof/param gui;
-#X obj 7 329 cnv 15 300 20 empty empty empty 20 12 0 14 -4034 -66577
+#X obj 11 292 cnv 15 300 20 empty empty empty 20 12 0 14 -4034 -66577
 0;
-#X text 9 330 arguments;
+#X text 13 293 arguments;
 #X obj 5 7 cnv 15 300 20 empty empty empty 20 12 0 14 -257985 -66577
 0;
-#X obj 5 151 cnv 15 300 20 empty empty empty 20 12 0 14 -260097 -66577
+#X obj 9 114 cnv 15 300 20 empty empty empty 20 12 0 14 -260097 -66577
 0;
-#X text 10 151 inlets/outlets;
-#X text 9 354 none.;
+#X text 14 114 inlets/outlets;
+#X text 13 317 none.;
 #X text 7 7 param gui;
 #X floatatom 383 288 5 0 0 0 - - -;
 #X obj 375 415 dac~;
@@ -350,26 +350,26 @@ GUI elements are always up to date.;
 #X text 618 378 <-Click this abstraction's properties menu. The [iemguts/propertybang]
 bangs the [param gui] that creates the GUI window.;
 #X obj 430 209 tof/param gui;
-#X msg 430 171 symbol FM_MOD;
-#X text 425 152 Relative;
-#X text 525 153 Absolute;
 #X text 531 73 Destroy the created GUI (the only way to force its recreation).
 ;
 #X text 453 10 Builds the gui for all params that are in the current
 patch or in any children patches of this patch.;
 #X text 9 65 GUIs will only be built for params that have GUI options
 set with the /g keyword.;
-#X text 521 191 Only display the guis for params in the indicated path.
-;
-#X msg 524 171 symbol /FM_MOD/modulation;
-#X text 3 265 inlet 2 bang: destroy the previously created window (the
+#X msg 531 171 symbol /FM_MOD/modulation;
+#X text 7 228 inlet 2 bang: destroy the previously created window (the
 only way to force its recreation if the path does not change).;
-#X text 5 177 inlet 1 bang: creates the GUIs one (or until the target
+#X text 9 140 inlet 1 bang: creates the GUIs one (or until the target
 path changes) for all params in the current patch or lower and displays
 the window.;
-#X text 4 221 inlet 1 symbol: creates the GUIs one (or until the target
+#X text 8 184 inlet 1 symbol: creates the GUIs one (or until the target
 path changes) for all params that match the indicated path and displays
 the window.;
+#X msg 430 171 symbol /FM_MOD;
+#X text 525 194 Only display the GUIs for params in the indicated path.
+;
+#X text 526 207 Each time the path changes \, the GUIs are rebuilt
+and this can slow down Pure Data.;
 #X connect 0 0 2 0;
 #X connect 1 0 2 1;
 #X connect 10 0 13 0;
@@ -378,7 +378,7 @@ the window.;
 #X connect 14 0 20 0;
 #X connect 20 0 11 0;
 #X connect 20 0 11 1;
-#X connect 24 0 23 0;
+#X connect 27 0 23 0;
 #X connect 31 0 23 0;
 #X restore -16 313 pd gui;
 #X text 45 183 Defines a parameter to save/restore/route/display.;
@@ -642,7 +642,7 @@ by the value of the first argument.;
 #X connect 21 0 19 1;
 #X connect 22 0 19 2;
 #X restore 325 80 pd anim;
-#X obj -23 2 cnv 15 400 100 empty \$0c empty 20 12 0 14 -73501 -262144
+#X obj -23 2 cnv 15 400 100 empty \$0c empty 20 12 0 14 -89821 -262144
 0;
 #X text -18 54 author: mrtoftrash@gmail.com;
 #X text -19 33 tags: state routing;

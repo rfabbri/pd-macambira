@@ -120,6 +120,8 @@ endif
 
 CXXFLAGS = $(CFLAGS)
 
+# Special rules
+param.$(EXTENSION): param.h paramDump.h paramGui.h paramRoute.h paramCustom.h paramFile.h paramPath.h
 
 
 ### C++ files
@@ -141,6 +143,8 @@ CXXFLAGS = $(CFLAGS)
 %.o: %.c
 	@echo "- Building $*.o"
 	@$(CC) $(OPT_CFLAGS) $(CFLAGS) -o "$*.o" -c "$*.c"
+
+
 
 %.$(EXTENSION): %.o
 	@echo "- Linking $*.$(EXTENSION)"
