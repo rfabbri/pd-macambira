@@ -38,14 +38,17 @@ typedef struct _udpreceive
     t_atom          x_addrbytes[5];
     t_atom          x_msgoutbuf[MAX_UDP_RECEIVE];
     char            x_msginbuf[MAX_UDP_RECEIVE];
+	char            addr[256]; // a multicast address or 0
 } t_udpreceive;
 
 void udpreceive_setup(void);
 static void udpreceive_free(t_udpreceive *x);
 static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv);
+static int udpreceive_new_socket(t_udpreceive *x, char *address, int port);
 static void udpreceive_sock_err(t_udpreceive *x, char *err_string);
 static void udpreceive_status(t_udpreceive *x);
 static void udpreceive_read(t_udpreceive *x, int sockfd);
+static void udpreceive_port(t_udpreceive *x, t_float portno);
 
 static void udpreceive_read(t_udpreceive *x, int sockfd)
 {
@@ -97,6 +100,61 @@ static void udpreceive_read(t_udpreceive *x, int sockfd)
 static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_udpreceive        *x;
+    int                 result = 0, portno = 0;
+    int                 i;
+
+    x = (t_udpreceive *)pd_new(udpreceive_class); /* if something fails we return 0 instead of x. Is this OK? */
+	if (NULL == x) return x;
+	x->addr[0] = '\0';
+    /* convert the bytes in the buffer to floats in a list */
+    for (i = 0; i < MAX_UDP_RECEIVE; ++i)
+    {
+        x->x_msgoutbuf[i].a_type = A_FLOAT;
+        x->x_msgoutbuf[i].a_w.w_float = 0;
+    }
+    for (i = 0; i < 5; ++i)
+    {
+        x->x_addrbytes[i].a_type = A_FLOAT;
+        x->x_addrbytes[i].a_w.w_float = 0;
+    }
+#ifdef DEBUG
+    post("udpreceive_new:argc is %d s is %s", argc, s->s_name);
+#endif
+    for (i = 0; i < argc ;++i)
+    {
+        if (argv[i].a_type == A_FLOAT)
+        { // float is taken to be a port number
+#ifdef DEBUG
+            post ("argv[%d] is a float: %f", i, argv[i].a_w.w_float);
+#endif
+            portno = (int)argv[i].a_w.w_float;
+        }
+        else if (argv[i].a_type == A_SYMBOL)
+        { // symbol is taken to be an ip address (for multicast)
+#ifdef DEBUG
+            post ("argv[%d] is a symbol: %s", i, argv[i].a_w.w_symbol->s_name);
+#endif
+            atom_string(&argv[i], x->addr, 256);
+        }
+    }
+#ifdef DEBUG
+    post("Setting port %d, address %s", portno, x->addr);
+#endif
+	
+    x->x_msgout = outlet_new(&x->x_obj, &s_anything);
+    x->x_addrout = outlet_new(&x->x_obj, &s_anything);
+
+	x->x_connectsocket = -1; // no socket
+	result = udpreceive_new_socket(x, x->addr, portno);
+    return (x);
+}
+
+static int udpreceive_new_socket(t_udpreceive *x, char *address, int port)
+{
+// return nonzero if successful in creating and binding a socket
+	int					sockfd;
+    int                 intarg;
+    int                 multicast_joined = 0;
     struct sockaddr_in  server;
     struct hostent      *hp;
 #if defined __APPLE__ || defined _WIN32
@@ -104,35 +162,13 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
 #else
     struct ip_mreqn     mreq;
 #endif
-    int                 sockfd, portno = 0;
-    int                 multicast_joined = 0;
-    int                 intarg, i;
-    char                addr[256] = {'\0'};
 
-    x = (t_udpreceive *)pd_new(udpreceive_class); /* if something fails we return 0 instead of x. Is this OK? */
-#ifdef DEBUG
-    post("udpreceive_new:argc is %d s is %s", argc, s->s_name);
-#endif
-    for (i = 0; i < argc ;++i)
-    {
-        if (argv[i].a_type == A_FLOAT)
-        {
-#ifdef DEBUG
-            post ("argv[%d] is a float: %f", i, argv[i].a_w.w_float);
-#endif
-            portno = (int)argv[i].a_w.w_float;
-        }
-        else if (argv[i].a_type == A_SYMBOL)
-        {
-#ifdef DEBUG
-            post ("argv[%d] is a symbol: %s", i, argv[i].a_w.w_symbol->s_name);
-#endif
-            atom_string(&argv[i], addr, 256);
-        }
-    }
-#ifdef DEBUG
-    post("Setting port %d, address %s", portno, addr);
-#endif
+	if (x->x_connectsocket >= 0)
+	{ 
+		// close the existing socket first
+        sys_rmpollfn(x->x_connectsocket);
+        sys_closesocket(x->x_connectsocket);
+	}
     /* create a socket */
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 #ifdef DEBUG
@@ -144,10 +180,10 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
         return 0;
     }
     server.sin_family = AF_INET;
-    if (addr[0] == 0) server.sin_addr.s_addr = INADDR_ANY;
+    if (address[0] == 0) server.sin_addr.s_addr = INADDR_ANY;
     else 
     {
-        hp = gethostbyname(addr);
+        hp = gethostbyname(address);
         if (hp == 0)
         {
     	    pd_error(x, "udpreceive: bad host?\n");
@@ -163,7 +199,7 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
         udpreceive_sock_err(x, "udpreceive: setsockopt (SO_REUSEADDR) failed");
 
     /* assign server port number */
-    server.sin_port = htons((u_short)portno);
+    server.sin_port = htons((u_short)port);
 
     /* if a multicast address was specified, join the multicast group */
     /* hop count defaults to 1 so we won't leave the subnet*/
@@ -175,7 +211,7 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
 	    {
 	        udpreceive_sock_err(x, "udpreceive: bind");
 	        sys_closesocket(sockfd);
-	        return (0);
+	        return 0;
 	    }
 		/* second join the multicast group */
         memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
@@ -204,29 +240,14 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
 	    {
 	        udpreceive_sock_err(x, "udpreceive: bind");
 	        sys_closesocket(sockfd);
-	        return (0);
+	        return 0;
 	    }
 	}
-	
-    x->x_msgout = outlet_new(&x->x_obj, &s_anything);
-    x->x_addrout = outlet_new(&x->x_obj, &s_anything);
-    x->x_connectsocket = sockfd;
-
-    /* convert the bytes in the buffer to floats in a list */
-    for (i = 0; i < MAX_UDP_RECEIVE; ++i)
-    {
-        x->x_msgoutbuf[i].a_type = A_FLOAT;
-        x->x_msgoutbuf[i].a_w.w_float = 0;
-    }
-    for (i = 0; i < 5; ++i)
-    {
-        x->x_addrbytes[i].a_type = A_FLOAT;
-        x->x_addrbytes[i].a_w.w_float = 0;
-    }
     x->x_multicast_joined = multicast_joined;
+    x->x_connectsocket = sockfd;
     x->x_total_received = 0L;
     sys_addpollfn(x->x_connectsocket, (t_fdpollfn)udpreceive_read, x);
-    return (x);
+	return 1;
 }
 
 static void udpreceive_sock_err(t_udpreceive *x, char *err_string)
@@ -268,6 +289,12 @@ static void udpreceive_status(t_udpreceive *x)
     outlet_anything( x->x_addrout, gensym("total"), 1, &output_atom);
 }
 
+static void udpreceive_port(t_udpreceive *x, t_float portno)
+{
+	int result;
+	result = udpreceive_new_socket(x, x->addr, (int)portno);
+}
+
 static void udpreceive_free(t_udpreceive *x)
 {
     if (x->x_connectsocket >= 0)
@@ -284,6 +311,8 @@ void udpreceive_setup(void)
         sizeof(t_udpreceive), CLASS_DEFAULT, A_GIMME, 0);
     class_addmethod(udpreceive_class, (t_method)udpreceive_status,
         gensym("status"), 0);
+    class_addmethod(udpreceive_class, (t_method)udpreceive_port,
+        gensym("port"), A_DEFFLOAT, 0);
 }
 
 /* end udpreceive.c */
