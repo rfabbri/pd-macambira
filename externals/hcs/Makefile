@@ -35,7 +35,7 @@ EXTRA_DIST = cursor.gif README-ifeel.txt embed.pd ifeel.h
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)/pd" -Wall -W -g
+CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
