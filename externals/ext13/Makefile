@@ -37,7 +37,7 @@ EXTRA_DIST = d_global13.h stream13.h ext13.h ext13.c ext13-help.pd CHANGES
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)/pd" -Wall -W -g
+CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
