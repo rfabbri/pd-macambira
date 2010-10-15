@@ -1,11 +1,13 @@
+#include "objectlist.h"
 
-static t_class *paramGui_class;
+
+
 
 #define GUI_X_STEP 200
 #define GUI_Y_STEP 18
 
 /*
- Version 0.3
+ Version 0.4
  */
 
 
@@ -13,6 +15,7 @@ static t_class *paramGui_class;
 /*
  CHANGES
  
+ 0.4 Added property bang code from iemguts (and objectlist.h)
  0.3 Removed absolute paths. The path must start with a 'p'
  0.2 Added a symbol message handler and a subpath variable
  0.2 Banging inlet 2 resets the gui but does not recreate it (as before)
@@ -21,7 +24,8 @@ static t_class *paramGui_class;
  */
 
 
-
+static t_class *paramGui_class;
+static t_propertiesfn originalproperties=NULL;
 
 typedef struct _paramGui
 {
@@ -400,18 +404,22 @@ static void paramGui_free(t_paramGui *x)
 	if (x->receive) {
 		pd_unbind(&x->x_obj.ob_pd,x->receive);
 	}
+	
+	removeElementFromLists((t_pd*)x);
+	
 }
 
-/*
- static void paramGui_properties(t_gobj*z, t_glist*owner) {
- t_iemguts_objlist*objs=objectsInCanvas((t_pd*)z);
- while(objs) {
- t_propertybang*x=(t_propertybang*)objs->obj;
- propertybang_bang(x);
- objs=objs->next;
- } 
- }
- */
+static void paramGui_properties(t_gobj*z, t_glist*owner) {
+	t_objectlist_element* objs= getElements((t_pd*)z);
+	if(NULL==objs) {
+		originalproperties(z, owner);
+	}
+	while(objs) {
+		t_paramGui*x = (t_paramGui*)objs->obj;
+		paramGui_bang(x);
+		objs=objs->next;
+	} 
+}
 
 static void *paramGui_new(t_symbol *s, int ac, t_atom *av) {
 	t_paramGui *x = (t_paramGui *)pd_new(paramGui_class);
@@ -468,9 +476,16 @@ static void *paramGui_new(t_symbol *s, int ac, t_atom *av) {
 	
 	
 	// SET THE PROPERTIES FUNCTION
-	//t_class *class = ((t_gobj*)currentcanvas)->g_pd;
-	//class_setpropertiesfn(class, propertybang_properties);
 	
+	t_class *class = ((t_gobj*)currentcanvas)->g_pd;
+	t_propertiesfn properties_tmp=NULL;
+	properties_tmp=class_getpropertiesfn(class);
+	if(properties_tmp!=paramGui_properties)
+		originalproperties=properties_tmp;
+	
+	class_setpropertiesfn(class, paramGui_properties);
+	
+	addElement((t_pd*)currentcanvas, (t_pd*)x);
     
 	return (x);
 }
