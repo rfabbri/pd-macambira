@@ -360,7 +360,7 @@ boids_clean:
 #------------------------------------------------------------------------------#
 # BSAYLOR
 bsaylor:
-	make -C $(externals_src)/bsaylor
+	make -C $(externals_src)/bsaylor PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 bsaylor_install:
 	make -C $(externals_src)/bsaylor \
@@ -373,7 +373,7 @@ bsaylor_clean:
 #------------------------------------------------------------------------------#
 # COMPORT
 comport:
-	make -C $(externals_src)/iem/comport/comport
+	make -C $(externals_src)/iem/comport/comport PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 comport_install:
 	make -C $(externals_src)/iem/comport/comport \
@@ -1304,7 +1304,7 @@ oscx_clean:
 #------------------------------------------------------------------------------#
 # PAN
 pan:
-	make -C $(externals_src)/hcs/pan
+	make -C $(externals_src)/hcs/pan PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 pan_install:
 	make -C $(externals_src)/hcs/pan DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1639,7 +1639,7 @@ tclpd_clean:
 #------------------------------------------------------------------------------#
 # TKWIDGETS
 tkwidgets:
-	make -C $(externals_src)/tkwidgets
+	make -C $(externals_src)/tkwidgets PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 tkwidgets_install:
 	make -C $(externals_src)/tkwidgets \
