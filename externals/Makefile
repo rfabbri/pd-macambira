@@ -1090,6 +1090,16 @@ loaders_clean:
 	-rm -f -- $(externals_src)/loaders/*.bak
 	-rm -f -- $(externals_src)/loaders/*.*~
 
+#------------------------------------------------------------------------------#
+# LIBDIR (RENAMED loaders-libdir TO AVOID POTENTIAL CONFLICTS)
+loaders-libdir:
+	make -C $(externals_src)/loaders/libdir PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+
+loaders-libdir_install:
+	make -C $(externals_src)/loaders/libdir DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+loaders-libdir_clean:
+	make -C $(externals_src)/loaders/libdir clean
 
 #------------------------------------------------------------------------------#
 # MAPPING
