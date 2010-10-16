@@ -32,7 +32,7 @@ EXTRA_DIST = parse_meta.pd pddplink.tcl
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)/pd" -Wall -W -g
+CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
@@ -58,6 +58,7 @@ INSTALL = install
 INSTALL_PROGRAM = $(INSTALL) -p -m 644
 INSTALL_DATA = $(INSTALL) -p -m 644
 INSTALL_DIR     = $(INSTALL) -p -m 755 -d
+INSTALL_FILE = $(INSTALL) -p -m 644
 
 ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) \
 	         $(SOURCES_iphoneos) $(SOURCES_linux) $(SOURCES_windows)
