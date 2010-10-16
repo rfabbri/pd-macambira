@@ -31,7 +31,7 @@ EXTRA_DIST = HISTORY automata.txt examplescore.txt maxlib-help.pd
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)/pd" -Wall -W -g
+CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
