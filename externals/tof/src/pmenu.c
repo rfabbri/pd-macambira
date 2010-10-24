@@ -16,11 +16,17 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  * GNU General Public License for more details.                          */
 
-
+/* CHANGES
+ 
+ 0.3 Added the possibility of adding anything (instead of only symbols)
+ 0.3 Split the output message into two outlets
+ 
+ */
 
 
 /* Append " x " to the following line to show debugging messages */
 #define DEBUG(x) 
+
 
 
 #include <m_pd.h>
@@ -28,6 +34,8 @@
 #include <stdio.h>
 #include <string.h>
 
+
+static char pmenu_buffer[MAXPDSTRING];
 
 
 
@@ -41,17 +49,21 @@ typedef struct _pmenu
      t_symbol*  callback;
 	
      int current_selection;
-     int x_num_options;	 
+     	 
      t_symbol* bg_color;
      t_symbol* fg_color;
      t_symbol* hi_color;
      t_symbol* co_color;
     
-     t_symbol** x_options;
-     int        x_maxoptions;
+     t_atom* options;
+     int     options_memory;
+	 int     options_count;
    
       int indicator;
       int focusing;
+	
+	t_outlet* outlet1;
+	t_outlet* outlet2;
    
 } t_pmenu;
 
@@ -59,13 +71,24 @@ typedef struct _pmenu
 
 static void pmenu_output(t_pmenu* x)
 {
-  
-  
-  
+	/*
   t_atom atoms[2];
   SETFLOAT(atoms,x->current_selection);
-  SETSYMBOL(atoms+1,x->x_options[x->current_selection]);
+  //SETSYMBOL(atoms+1,x->x_options[x->current_selection]);
+  atoms[1] = *(x->options+x->current_selection);
   outlet_list(x->x_obj.ob_outlet, &s_list, 2, atoms);
+	*/
+	outlet_float(x->outlet1, x->current_selection);
+	// outlet_anything(t_outlet *x, t_symbol *s, int argc, t_atom *argv)
+	if ( (x->options+x->current_selection)->a_type == A_SYMBOL ) {
+		outlet_symbol(x->outlet2, atom_getsymbol(x->options+x->current_selection));
+	} else {
+		outlet_float(x->outlet2, atom_getfloat(x->options+x->current_selection));
+
+	}
+	
+	
+				 
   //if ( x->send != x->s_empty && x->send->s_thing) pd_forwardmess(x->send->s_thing, 2,atoms);
 
 }
@@ -127,11 +150,9 @@ static void pmenu_save(t_gobj *z, t_binbuf *b)
 */
 
 static void pmenu_clear(t_pmenu* x) {
-	
-	x->x_num_options = 0;
+	x->options_count = 0;
 	x->current_selection = -1;
 	pmenu_w_clear(x);
-	
 }
 
 /*
@@ -155,30 +176,39 @@ static void pmenu_size(t_pmenu* x,t_symbol *s, int argc, t_atom *argv) {
 
 
 static void pmenu_add(t_pmenu* x, t_symbol *s, int argc, t_atom *argv) {
-	
-	
+	/*
+	 x->av = resizebytes(x->av, x->mem_size * sizeof(*(x->av)), 
+	 (10 + x->ac) * sizeof(*(x->av)));
+	 x->mem_size = 10 + x->ac;
+	 */
 	
 	// resize the options-array if it is too small
-	if((argc + x->x_num_options) > x->x_maxoptions){
+	if((argc + x->options_count) > x->options_memory){
           
-          x->x_options = resizebytes( x->x_options, x->x_maxoptions*sizeof(*(x->x_options)), 
-				(argc + x->x_num_options+10)*sizeof(*(x->x_options)));
-          x->x_maxoptions=argc + x->x_num_options+10;
+          x->options = resizebytes( x->options, x->options_memory*sizeof(*(x->options)), 
+				(argc + x->options_count+10)*sizeof(*(x->options)));
+          x->options_memory=argc + x->options_count+10;
     }
 	
 	int i;
 	t_symbol* label;
 	for  ( i=0;i<argc;i++) {
+		// Copy atom
+		*(x->options+x->options_count) = *(argv+i);
+		
 		if ((argv+i)->a_type==A_SYMBOL) {
 			
 		    label = atom_getsymbol(argv+i);
-		    DEBUG(post("adding option: %s",label->s_name);)
-			 x->x_options[x->x_num_options] = label;
+		   
+		} else {
+		
+				atom_string(argv+i, pmenu_buffer, MAXPDSTRING);
+				label = gensym(pmenu_buffer);
 			
-			pmenu_w_additem( x,label,x->x_num_options);
-			
-			x->x_num_options = x->x_num_options + 1;
-		 }
+		}
+		DEBUG(post("adding option: %s",label->s_name);)
+		pmenu_w_additem( x,label,x->options_count);
+		x->options_count = x->options_count + 1;
 		
 	}
 	
@@ -220,7 +250,7 @@ static int pmenu_set_float(t_pmenu* x, t_floatarg item) {
 	
 	    
 	int i=(int)item;
-	if( (i < x->x_num_options) && (i >= 0)) {
+	if( (i < x->options_count) && (i >= 0)) {
 		x->current_selection = i;
 		//if(pmenu_w_is_visible(x)) pmenu_w_text(x,x->x_options[x->current_selection]);
 		pmenu_w_activate(x);
@@ -254,8 +284,8 @@ static int pmenu_set_symbol(t_pmenu* x, t_symbol *s) {
 	int i;
         
 	/* Compare inlet symbol to each option */
-	for(i=0; i < x->x_num_options; i++) {
-	  if(x->x_options[i]->s_name == s->s_name) {
+	for(i=0; i < x->options_count; i++) {
+	  if( (x->options+i)->a_type==A_SYMBOL && atom_getsymbol(x->options+i)->s_name == s->s_name) {
 		    x->current_selection = i;
 			//if(pmenu_w_is_visible(x)) pmenu_w_text(x,s);
             pmenu_w_activate(x);
@@ -330,7 +360,8 @@ static void pmenu_free(t_pmenu*x)
 	pmenu_w_menu(x,DESTROY);
 
 	
-  if(x->x_options)freebytes(x->x_options, sizeof(t_symbol*)*x->x_maxoptions);
+   freebytes(x->options, x->options_memory * sizeof(*(x->options)));
+	
    pd_unbind(&x->x_obj.ob_pd, x->callback);
    
    //if ( x->receive != x->s_empty ) pd_unbind(&x->x_obj.ob_pd, x->receive);
@@ -347,15 +378,16 @@ static void *pmenu_new(t_symbol *s, int argc, t_atom *argv)
 
     t_pmenu *x = (t_pmenu *)pd_new(pmenu_class);
     int i;
-	char buf[256];
+	
 
 
     x->current_selection = -1;
 
-    x->x_maxoptions=10;
-    x->x_options=(t_symbol**)getbytes(sizeof(t_symbol*)*x->x_maxoptions);
+    x->options_memory=10;
+    x->options=getbytes(sizeof(*(x->options)) * x->options_memory);
+	//x->av = getbytes(x->mem_size * sizeof(*(x->av)));
  
-    x->x_num_options = 0 ;
+    x->options_count = 0 ;
   
     x->indicator = 1;
     x->focusing = 1;
@@ -380,15 +412,17 @@ static void *pmenu_new(t_symbol *s, int argc, t_atom *argv)
     }
 
       /* Bind the recieve "pmenu%p" to the widget outlet*/
-      sprintf(buf,"pmenu%p",x);
-      x->callback = gensym(buf);
+      sprintf(pmenu_buffer,"pmenu%p",x);
+      x->callback = gensym(pmenu_buffer);
       pd_bind(&x->x_obj.ob_pd, x->callback);
 
       /* define proc in tcl/tk where "pmenu%p" is the receive, "callback" is the method, and "$index" is an argument. */
     sys_vgui("proc select%x {index} {\n pd [concat pmenu%p callback $index \\;]\n }\n",x,x); 
     
 
-    outlet_new(&x->x_obj, &s_symbol);
+    x->outlet1 = outlet_new(&x->x_obj, &s_float);
+	x->outlet2 = outlet_new(&x->x_obj, &s_list);
+
    
    pmenu_w_menu(x,CREATE);
    pmenu_w_apply_colors(x);
@@ -430,7 +464,7 @@ void pmenu_setup(void) {
 
 
 
-	post("pmenu v0.02 by tof");
+	post("pmenu v0.3 by tof");
 }
 
 

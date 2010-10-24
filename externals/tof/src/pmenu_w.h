@@ -55,12 +55,7 @@ static void pmenu_w_menu(t_pmenu *x, int draw)
 	   //sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -justify left 
 	   // Create a variable to store a pointer to the menu, create the menu, create a variable to store the selected item
       sys_vgui("set %xw .%x ; menu $%xw -relief solid -tearoff 0; set %xradio -1 \n",x,x,x);
-      int i;
-	  for(i=0 ; i<x->x_num_options ; i++)
-        {
-			// Add menu itmes
-          pmenu_w_additem(x,x->x_options[i],i);
-        }
+      
   } else if ( draw == DESTROY) {
 	  //x->created = 0;
 	
@@ -75,8 +70,7 @@ static void pmenu_w_menu(t_pmenu *x, int draw)
 
 
 static void pmenu_w_pop(t_pmenu *x) {
-	
-	if (x->x_num_options > 0) {
+	if (x->options_count > 0) {
 			 //if ( x->created == 0 )  pmenu_w_menu(x, glist, CREATE);
 			 if ( x->current_selection != -1 && x->focusing) {
 				 sys_vgui("tk_popup $%xw [winfo pointerx .] [winfo pointery .] %i\n",x,x->current_selection);
