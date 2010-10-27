@@ -1,4 +1,4 @@
-#N canvas 630 256 761 526 10;
+#N canvas 133 84 761 526 10;
 #X obj 26 8 inlet;
 #X obj 256 209 outlet;
 #X obj 175 388 until;
@@ -74,7 +74,6 @@ obj 380 560 throw~ \$2-audioR \; \$1 obj 500 560 send \$2-voicemsg
 #X obj 26 208 outlet~;
 #N canvas 177 52 366 386 communications 0;
 #X obj 29 10 inlet;
-#X obj 224 59 symbol \$2;
 #N canvas 0 22 535 282 last-two 0;
 #X obj 40 92 cnv 15 150 80 empty empty empty 20 12 0 14 -233017 -66577
 0;
@@ -105,23 +104,39 @@ obj 380 560 throw~ \$2-audioR \; \$1 obj 500 560 send \$2-voicemsg
 #X obj 29 37 trigger anything anything anything bang bang;
 #X msg 44 162 \; \$3 obj 150 \$2 voicepolywrap \$4 \$1 \$5 \$6 \$7
 \$8 \$9 \;;
-#X connect 0 0 13 0;
-#X connect 1 0 8 3;
-#X connect 2 0 3 0;
-#X connect 3 0 12 0;
-#X connect 4 0 14 0;
-#X connect 5 0 8 4;
-#X connect 6 0 8 2;
-#X connect 7 0 3 1;
-#X connect 8 0 4 0;
-#X connect 9 0 10 0;
-#X connect 10 0 8 1;
-#X connect 11 0 2 0;
-#X connect 13 0 11 0;
-#X connect 13 1 8 0;
-#X connect 13 2 9 0;
-#X connect 13 3 1 0;
-#X connect 13 4 5 0;
+#N canvas 183 272 316 307 expandpath 0;
+#X obj 59 16 inlet;
+#X obj 55 271 outlet;
+#X obj 59 43 trigger bang bang;
+#X obj 59 98 list append;
+#X obj 58 153 zexy/list2symbol /;
+#X obj 158 66 symbol \$2;
+#X obj 59 67 ggee/getdir 3;
+#X connect 0 0 2 0;
+#X connect 2 0 6 0;
+#X connect 2 1 5 0;
+#X connect 3 0 4 0;
+#X connect 4 0 1 0;
+#X connect 5 0 3 1;
+#X connect 6 0 3 0;
+#X restore 194 61 pd expandpath;
+#X connect 0 0 12 0;
+#X connect 1 0 2 0;
+#X connect 2 0 11 0;
+#X connect 3 0 13 0;
+#X connect 4 0 7 4;
+#X connect 5 0 7 2;
+#X connect 6 0 2 1;
+#X connect 7 0 3 0;
+#X connect 8 0 9 0;
+#X connect 9 0 7 1;
+#X connect 10 0 1 0;
+#X connect 12 0 10 0;
+#X connect 12 1 7 0;
+#X connect 12 2 8 0;
+#X connect 12 3 14 0;
+#X connect 12 4 4 0;
+#X connect 14 0 7 3;
 #X restore 175 482 pd communications connections;
 #N canvas 875 553 450 300 connect 0;
 #X obj 89 17 inlet;
@@ -142,16 +157,21 @@ obj 380 560 throw~ \$2-audioR \; \$1 obj 500 560 send \$2-voicemsg
 #X text 122 97 <-- open this subpatch to see the instances;
 #X obj 48 310 trigger anything anything bang;
 #N canvas 100 24 601 588 \$0-voicepoly 0;
-#X obj 10 10 receive 1014-in1;
-#X obj 400 10 receive 1014-in2;
-#X obj 10 560 throw~ 1014-audio;
-#X obj 380 560 send 1014-message;
-#X obj 500 560 send 1014-nqp;
-#X obj 150 30 voicepolywrap itest 0 5 0 0 0 0;
-#X obj 150 49 voicepolywrap itest 1 5 0 0 0 0;
-#X obj 150 68 voicepolywrap itest 2 5 0 0 0 0;
-#X obj 150 87 voicepolywrap itest 3 5 0 0 0 0;
-#X obj 150 106 voicepolywrap itest 4 5 0 0 0 0;
+#X obj 10 10 receive 1081-in1;
+#X obj 400 10 receive 1081-in2;
+#X obj 10 560 throw~ 1081-audioL;
+#X obj 380 560 throw~ 1081-audioR;
+#X obj 500 560 send 1081-voicemsg;
+#X obj 150 30 voicepolywrap /Users/hans/code/pure-data/trunk/externals/manypoly/examples/../voicetest
+0 5 0 0 0 0;
+#X obj 150 49 voicepolywrap /Users/hans/code/pure-data/trunk/externals/manypoly/examples/../voicetest
+1 5 0 0 0 0;
+#X obj 150 68 voicepolywrap /Users/hans/code/pure-data/trunk/externals/manypoly/examples/../voicetest
+2 5 0 0 0 0;
+#X obj 150 87 voicepolywrap /Users/hans/code/pure-data/trunk/externals/manypoly/examples/../voicetest
+3 5 0 0 0 0;
+#X obj 150 106 voicepolywrap /Users/hans/code/pure-data/trunk/externals/manypoly/examples/../voicetest
+4 5 0 0 0 0;
 #X connect 0 0 5 0;
 #X connect 1 0 5 1;
 #X connect 1 0 6 1;

@@ -1,0 +1,22 @@
+#N canvas 466 360 450 300 10;
+#X declare -path ..;
+#X obj 97 147 voicepoly 5 voicetest;
+#X obj 109 228 dac~;
+#X obj 225 108 hsl 128 15 0 10 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X floatatom 237 130 5 0 0 0 - - -;
+#X msg 96 98 bang;
+#X obj 337 16 pddp/dsp;
+#X obj 220 170 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 48 261 three outlets are needed: 2 audio and one message outlet
+that is banged when the voice is finished.;
+#X text 23 57 two inlets are needed: the first for voice-managed messages
+\, and the second for messages that are send to all instances;
+#X obj 318 45 declare -path ..;
+#X connect 0 0 1 0;
+#X connect 0 1 1 1;
+#X connect 0 2 6 0;
+#X connect 2 0 0 1;
+#X connect 2 0 3 0;
+#X connect 4 0 0 0;
