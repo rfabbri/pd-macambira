@@ -44,6 +44,8 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <sys/ioctl.h> // for SIOCGIFCONF
+#include <net/if.h> // for SIOCGIFCONF
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <sys/time.h>
@@ -56,6 +58,8 @@
 #endif
 #ifdef _WIN32
 #include <winsock2.h>
+#include <ws2tcpip.h>
+#include <iphlpapi.h> // for interface addresses
 #include "pthread.h"
 #endif
 
@@ -86,6 +90,8 @@ typedef struct _udpsend_tilde
     t_outlet        *x_outlet2;
     t_clock         *x_clock;
     int             x_fd;
+    unsigned int    x_multicast_loop_state;
+    unsigned int    x_multicast_ttl; /* time to live for multicast */
     t_tag           x_tag;
     t_symbol*       x_hostname;
     int             x_portno;
@@ -114,11 +120,15 @@ typedef struct _udpsend_tilde
 
 /* function prototypes */
 static int udpsend_tilde_sockerror(char *s);
+static void udpsend_tilde_sock_err(t_udpsend_tilde *x, char *err_string);
 static void udpsend_tilde_closesocket(int fd);
 static void udpsend_tilde_notify(t_udpsend_tilde *x);
 static void udpsend_tilde_disconnect(t_udpsend_tilde *x);
 static void *udpsend_tilde_doconnect(void *zz);
 static void udpsend_tilde_connect(t_udpsend_tilde *x, t_symbol *host, t_floatarg fportno);
+static void udpsend_tilde_set_multicast_loopback(t_udpsend_tilde *x, t_floatarg loop_state);
+static void udpsend_tilde_set_multicast_ttl(t_udpsend_tilde *x, t_floatarg ttl_hops);
+static void udpsend_tilde_set_multicast_interface (t_udpsend_tilde *x, t_symbol *s, int argc, t_atom *argv);
 static t_int *udpsend_tilde_perform(t_int *w);
 static void udpsend_tilde_dsp(t_udpsend_tilde *x, t_signal **sp);
 static void udpsend_tilde_channels(t_udpsend_tilde *x, t_floatarg channels);
@@ -161,7 +171,10 @@ static void *udpsend_tilde_doconnect(void *zz)
     int                 sockfd;
     int                 portno;
     int                 broadcast = 1;/* nonzero is true */
+    unsigned char       multicast_loop_state;
+    unsigned char       multicast_ttl;
     t_symbol            *hostname;
+    unsigned int        size;
 
     pthread_mutex_lock(&x->x_mutex);
     hostname = x->x_hostname;
@@ -173,7 +186,7 @@ static void *udpsend_tilde_doconnect(void *zz)
     if (sockfd < 0)
     {
          post("udpsend~: connection to %s on port %d failed", hostname->s_name,portno); 
-         udpsend_tilde_sockerror("socket");
+         udpsend_tilde_sock_err(x, "udpsend~ socket");
          x->x_childthread_result = NO_CHILDTHREAD;
          return (0);
     }
@@ -206,13 +219,22 @@ static void *udpsend_tilde_doconnect(void *zz)
 
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
 
+    if (0xE0000000 == (ntohl(server.sin_addr.s_addr) & 0xF0000000))
+        post ("udpsend~: connecting to a multicast address");
+    size = sizeof(multicast_loop_state);
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &multicast_loop_state, &size);
+    size = sizeof(multicast_ttl);
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_ttl, &size);
+    x->x_multicast_loop_state = multicast_loop_state;
+    x->x_multicast_ttl = multicast_ttl;
+
     /* assign client port number */
     server.sin_port = htons((unsigned short)portno);
 
     /* try to connect */
     if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) < 0)
     {
-        udpsend_tilde_sockerror("connecting stream socket");
+        udpsend_tilde_sock_err(x, "udpsend~ connect");
         udpsend_tilde_closesocket(sockfd);
         x->x_childthread_result = NO_CHILDTHREAD;
         return (0);
@@ -276,6 +298,260 @@ static void udpsend_tilde_connect(t_udpsend_tilde *x, t_symbol *host, t_floatarg
         return;
     }
     pthread_mutex_unlock(&x->x_mutex);
+}
+
+static void udpsend_tilde_set_multicast_loopback(t_udpsend_tilde *x, t_floatarg loop_state)
+{
+    int             sockfd = x->x_fd;
+    unsigned char   multicast_loop_state = loop_state;
+    unsigned int    size;
+
+    if (x->x_fd < 0)
+    {
+        pd_error(x, "udpsend_tilde_set_multicast_loopback: not connected");
+        return;
+    }
+    if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP,
+        &multicast_loop_state, sizeof(multicast_loop_state)) < 0) 
+        udpsend_tilde_sock_err(x, "udpsend_tilde setsockopt IP_MULTICAST_LOOP");
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &multicast_loop_state, &size);
+    x->x_multicast_loop_state = multicast_loop_state;
+}
+
+static void udpsend_tilde_set_multicast_ttl(t_udpsend_tilde *x, t_floatarg ttl_hops)
+{
+    int             sockfd = x->x_fd;
+    unsigned char   multicast_ttl = ttl_hops;
+    unsigned int    size;
+
+    if (x->x_fd < 0)
+    {
+        pd_error(x, "udpsend_tilde_set_multicast_ttl: not connected");
+        return;
+    }
+    if (setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL,
+        &multicast_ttl, sizeof(multicast_ttl)) < 0) 
+        udpsend_tilde_sock_err(x, "udpsend_tilde setsockopt IP_MULTICAST_TTL");
+    getsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &multicast_ttl, &size);
+    x->x_multicast_ttl = multicast_ttl;
+}
+
+static void udpsend_tilde_set_multicast_interface (t_udpsend_tilde *x, t_symbol *s, int argc, t_atom *argv)
+{
+#ifdef _WIN32
+    int                 i, n_ifaces = 32;
+    PMIB_IPADDRTABLE    pIPAddrTable;
+    DWORD               dwSize;
+    IN_ADDR             IPAddr;
+    int                 if_index = -1;
+    int                 found = 0;
+    t_symbol            *interfacename = gensym("none");
+    struct hostent      *hp = 0;
+    struct sockaddr_in  server;
+
+    if (x->x_fd < 0)
+    {
+        pd_error(x, "udpsend_tilde_set_multicast_interface: not connected");
+        return;
+    }
+    switch (argv[0].a_type)
+    {
+        case A_FLOAT:
+            if_index = (int)atom_getfloat(&argv[0]);
+            break;
+        case A_SYMBOL:
+            interfacename = atom_getsymbol(&argv[0]);    
+            break;
+        default:
+            pd_error(x, "udpsend_tilde_set_multicast_interface: argument not float or symbol");
+            return;
+    }
+    if (if_index == -1)
+    {
+        hp = gethostbyname(interfacename->s_name); // if interface is a dotted or named IP address (192.168.0.88)
+    }
+    if (hp != 0) memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
+    else // maybe interface is its index (1) (names aren't available in _WIN32)
+    {
+        /* get the list of interfaces, IPv4 only */
+        dwSize = sizeof(MIB_IPADDRTABLE)*n_ifaces;
+        if ((pIPAddrTable = (MIB_IPADDRTABLE *) getbytes(dwSize)) == NULL)
+        {
+            post("udpsend_tilde: unable to allocate %lu bytes for GetIpAddrTable", dwSize);
+            return;
+        }
+        if (GetIpAddrTable(pIPAddrTable, &dwSize, 0))
+        { 
+            udpsend_tilde_sock_err(x, "udpsend_tilde_set_multicast_interface: GetIpAddrTable");
+            return;
+        }
+
+        n_ifaces = pIPAddrTable->dwNumEntries;
+        post("udpsend_tilde: %d interface%s available:", n_ifaces, (n_ifaces == 1)?"":"s");
+        for (i = 0; i < n_ifaces; i++)
+        {
+            IPAddr.S_un.S_addr = (u_long) pIPAddrTable->table[i].dwAddr;
+            post("[%d]: %s", pIPAddrTable->table[i].dwIndex, inet_ntoa(IPAddr));
+            if (pIPAddrTable->table[i].dwIndex == if_index)
+            {
+                server.sin_addr = IPAddr;
+                found = 1;
+            }
+        }
+
+        if (pIPAddrTable)
+        {
+            freebytes(pIPAddrTable, dwSize);
+            pIPAddrTable = NULL;
+        }
+        if (! found)
+        {
+            post("udpsend_tilde_set_multicast_interface: bad host name? (%s)\n", interfacename->s_name);
+            return;
+        }
+    }
+    if (setsockopt(x->x_fd, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&server.sin_addr, sizeof(struct in_addr)) == SOCKET_ERROR)
+        udpsend_tilde_sock_err(x, "udpsend_tilde setsockopt IP_MULTICAST_IF");
+    else post("udpsend_tilde multicast interface is %s", inet_ntoa(server.sin_addr));
+
+#elif defined __APPLE__
+    int                 if_index = -1;
+    int                 found = 0;
+    t_symbol            *interfacename = gensym("none");
+    struct ifaddrs      *ifap;
+    int                 i = 0;
+    int                 n_ifaces = 0;
+    struct hostent      *hp = 0;
+    struct sockaddr_in  server;
+    struct sockaddr     *sa;
+    char                ifname[IFNAMSIZ]; /* longest possible interface name */
+    
+    if (x->x_fd < 0)
+    {
+        pd_error(x, "udpsend_tilde_set_multicast_interface: not connected");
+        return;
+    }
+    switch (argv[0].a_type)
+    {
+        case A_FLOAT:
+            if_index = (int)atom_getfloat(&argv[0]);
+            break;
+        case A_SYMBOL:
+            interfacename = atom_getsymbol(&argv[0]);    
+            break;
+        default:
+            pd_error(x, "udpsend_tilde_set_multicast_interface: argument not float or symbol");
+            return;
+    }
+    if (if_index == -1)
+    {
+        hp = gethostbyname(interfacename->s_name); // if interface is a dotted or named IP address (192.168.0.88)
+    }
+    if (hp != 0) memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
+    else // maybe interface is its name (eth0) or index (1)
+    { // scan all the interfaces to get the IP address of interface
+        if (getifaddrs(&ifap)) udpsend_tilde_sock_err(x, "udpsend_tilde getifaddrs");
+        i = found = n_ifaces = 0;
+        while (NULL != ifap)
+        {
+            sa = ifap->ifa_addr;
+            if (AF_INET == sa->sa_family)
+            {
+                ++n_ifaces;
+                strncpy (ifname, ifap->ifa_name, IFNAMSIZ);
+                post("[%d]: %s: %s", i, ifname, inet_ntoa(((struct sockaddr_in *)sa)->sin_addr));
+                if((i == if_index) || ((if_index == -1) && (!strncmp(interfacename->s_name, ifname, IFNAMSIZ))))
+                { // either the index or the name match
+                    server.sin_addr = ((struct sockaddr_in *)sa)->sin_addr;
+                    found = 1;
+                }
+            }
+            i++;
+            ifap = ifap->ifa_next; // next record or NULL
+        }
+        freeifaddrs(ifap);
+        post ("udpsend_tilde: %d interfaces", n_ifaces);
+        if (!found) return;
+    }
+    if (setsockopt(x->x_fd, IPPROTO_IP, IP_MULTICAST_IF, (const char *)&server.sin_addr, sizeof(struct in_addr)))
+        udpsend_tilde_sock_err(x, "udpsend_tilde setsockopt IP_MULTICAST_IF");
+    else post("udpsend_tilde multicast interface is %s", inet_ntoa(server.sin_addr));
+    return;
+#else // __linux__
+    struct sockaddr_in  server;
+    struct sockaddr     *sa;
+    struct hostent      *hp = 0;
+    struct ifconf       ifc;
+    int                 n_ifaces = 32, i, origbuflen, found = 0;
+    char                ifname[IFNAMSIZ]; /* longest possible interface name */
+    t_symbol            *interface = gensym("none");
+    int                 if_index = -1;
+    
+    if (x->x_fd < 0)
+    {
+        pd_error(x, "udpsend_tilde_set_multicast_interface: not connected");
+        return;
+    }
+    switch (argv[0].a_type)
+    {
+        case A_FLOAT:
+            if_index = (int)atom_getfloat(&argv[0]);
+            break;
+        case A_SYMBOL:
+            interface = atom_getsymbol(&argv[0]);    
+            break;
+        default:
+            pd_error(x, "udpsend_tilde_set_multicast_interface: argument not float or symbol");
+            return;
+    }
+    if (if_index == -1)
+    {
+        hp = gethostbyname(interface->s_name); // if interface is a dotted or named IP address (192.168.0.88)
+    }
+    if (hp != 0) memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
+    else // maybe interface is its name (eth0) or index (1)
+    { // scan all the interfaces to get the IP address of interface
+        // find the number of interfaces
+        origbuflen = n_ifaces * sizeof (struct ifreq);// save maximum length for free()
+        ifc.ifc_len = origbuflen; // SIOCGIFCONF changes it to valid length
+        ifc.ifc_buf = (char*)getzbytes(origbuflen);
+        if (ifc.ifc_buf != NULL)
+        { // 
+            if (ioctl(x->x_fd, SIOCGIFCONF, &ifc) < 0) // get list of interfaces
+                udpsend_tilde_sock_err(x, "udpsend_tilde_set_multicast_interface: getting list of interfaces");
+            else
+            {
+                n_ifaces = ifc.ifc_len/sizeof(struct ifreq);
+                post("udpsend_tilde: %d interface%s available:", n_ifaces, (n_ifaces == 1)?"":"s");
+                for(i = 0; i < n_ifaces; i++)
+                {
+                    sa = (struct sockaddr *)&(ifc.ifc_req[i].ifr_addr);
+                    strncpy (ifname, ifc.ifc_req[i].ifr_name, IFNAMSIZ);
+                    post("[%d]: %s: %s", i, ifname, inet_ntoa(((struct sockaddr_in *)sa)->sin_addr));
+                    if
+                    (
+                        (i == if_index) ||
+                        ((if_index == -1) && (!strncmp(interface->s_name, ifname, IFNAMSIZ)))
+                    )
+                    {
+                        server.sin_addr = ((struct sockaddr_in *)sa)->sin_addr;
+                        found = 1;
+                    }
+                } 
+            }
+        }
+        freebytes(ifc.ifc_buf, origbuflen);
+
+        if (! found)
+        {
+            post("udpsend_tilde_set_multicast_interface: bad host name? (%s)\n", interface->s_name);
+            return;
+        }
+    }
+    if (setsockopt(x->x_fd, IPPROTO_IP, IP_MULTICAST_IF, &server.sin_addr, sizeof(struct in_addr)) < 0)
+        udpsend_tilde_sock_err(x, "udpsend_tilde_set_multicast_interface: setsockopt");
+    else post("udpsend_tilde multicast interface is %s", inet_ntoa(server.sin_addr));
+#endif // _WIN32
 }
 
 static t_int *udpsend_tilde_perform(t_int *w)
@@ -639,6 +915,9 @@ void udpsend_tilde_setup(void)
     class_addfloat(udpsend_tilde_class, udpsend_tilde_float);
     class_addmethod(udpsend_tilde_class, (t_method)udpsend_tilde_info, gensym("info"), 0);
     class_addmethod(udpsend_tilde_class, (t_method)udpsend_tilde_connect, gensym("connect"), A_DEFSYM, A_DEFFLOAT, 0);
+    class_addmethod(udpsend_tilde_class, (t_method)udpsend_tilde_set_multicast_ttl, gensym("multicast_ttl"), A_DEFFLOAT, 0);
+    class_addmethod(udpsend_tilde_class, (t_method)udpsend_tilde_set_multicast_loopback, gensym("multicast_loopback"), A_DEFFLOAT, 0);
+    class_addmethod(udpsend_tilde_class, (t_method)udpsend_tilde_set_multicast_interface, gensym("multicast_interface"), A_GIMME, 0);
     class_addmethod(udpsend_tilde_class, (t_method)udpsend_tilde_disconnect, gensym("disconnect"), 0);
     class_addmethod(udpsend_tilde_class, (t_method)udpsend_tilde_channels, gensym("channels"), A_FLOAT, 0);
     class_addmethod(udpsend_tilde_class, (t_method)udpsend_tilde_format, gensym("format"), A_SYMBOL, A_DEFFLOAT, 0);
@@ -661,6 +940,35 @@ void udpsend_tilde_setup(void)
 }
 
 /* Utility functions */
+
+static void udpsend_tilde_sock_err(t_udpsend_tilde *x, char *err_string)
+{
+/* prints the last error from errno or WSAGetLastError() */
+#ifdef _WIN32
+    void            *lpMsgBuf;
+    unsigned long   errornumber = WSAGetLastError();
+    int             len = 0, i;
+    char            *cp;
+
+    if (len = FormatMessageA((FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS)
+        , NULL, errornumber, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpMsgBuf, 0, NULL))
+    {
+        cp = (char *)lpMsgBuf;
+        for(i = 0; i < len; ++i)
+        {
+            if (cp[i] < 0x20)
+            { /* end string at first weird character */
+                cp[i] = 0;
+                break;
+            }
+        }
+        pd_error(x, "%s: %s (%d)", err_string, lpMsgBuf, errornumber);
+        LocalFree(lpMsgBuf);
+    }
+#else
+    pd_error(x, "%s: %s (%d)", err_string, strerror(errno), errno);
+#endif
+}
 
 static int udpsend_tilde_sockerror(char *s)
 {

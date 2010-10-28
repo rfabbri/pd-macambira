@@ -31,9 +31,10 @@
 
 
 #include "m_pd.h"
-
+#include "s_stuff.h"
 #include "udpsend~.h"
 
+#include <stdio.h>
 #include <sys/types.h>
 #include <string.h>
 #if defined(UNIX) || defined(unix)
@@ -52,6 +53,7 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h> /* for socklen_t */
+#define snprintf sprintf_s
 #endif
 
 #ifndef SOL_IP
@@ -82,13 +84,16 @@ typedef struct _udpreceive_tilde
     t_atom          x_addrbytes[5];
     int             x_socket;
     int             x_connectsocket;
+    int             x_multicast_joined;
     int             x_nconnections;
     long            x_addr;
     unsigned short  x_port;
     t_symbol        *x_hostname;
     int             x_error;
     int             x_buffering;
-    char            x_msg[256];
+#define XMSG_SIZE 256
+    char            x_msg[XMSG_SIZE];
+    char            x_addr_name[256]; // a multicast address or 0
 
     /* buffering */
     int             x_framein;// index of next empty frame in x_frames[]
@@ -119,20 +124,21 @@ static void udpreceive_tilde_closesocket(t_udpreceive_tilde* x);
 static void udpreceive_tilde_reset(t_udpreceive_tilde* x, t_floatarg buffer);
 static void udpreceive_tilde_datapoll(t_udpreceive_tilde *x);
 static void udpreceive_tilde_connectpoll(t_udpreceive_tilde *x);
-static int udpreceive_tilde_createsocket(t_udpreceive_tilde* x, int portno);
+static int udpreceive_tilde_createsocket(t_udpreceive_tilde* x, char *address, int portno);
 static t_int *udpreceive_tilde_perform(t_int *w);
 static void udpreceive_tilde_dsp(t_udpreceive_tilde *x, t_signal **sp);
 static void udpreceive_tilde_info(t_udpreceive_tilde *x);
 static void udpreceive_tilde_tick(t_udpreceive_tilde *x);
-static void *udpreceive_tilde_new(t_floatarg fportno, t_floatarg outlets, t_floatarg blocksize);
+static void *udpreceive_tilde_new(t_symbol *s, int argc, t_atom *argv);
 static void udpreceive_tilde_free(t_udpreceive_tilde *x);
 void udpreceive_tilde_setup(void);
+static void udpreceive_tilde_sock_err(t_udpreceive_tilde *x, char *err_string);
 static int udpreceive_tilde_sockerror(char *s);
 static int udpreceive_tilde_setsocketoptions(int sockfd);
 /* these would require to include some headers that are different
    between pd 0.36 and later, so it's easier to do it like this! */
-EXTERN void sys_rmpollfn(int fd);
-EXTERN void sys_addpollfn(int fd, void* fn, void *ptr);
+//EXTERN void sys_rmpollfn(int fd);
+//EXTERN void sys_addpollfn(int fd, void* fn, void *ptr);
 
 static t_class *udpreceive_tilde_class;
 static t_symbol *ps_format, *ps_channels, *ps_framesize, *ps_overflow, *ps_underflow, *ps_packets,
@@ -294,6 +300,7 @@ static void udpreceive_tilde_datapoll(t_udpreceive_tilde *x)
     }
 }
 
+/*
 static void udpreceive_tilde_connectpoll(t_udpreceive_tilde *x)
 {
     socklen_t           sockaddrlen = sizeof(struct sockaddr);
@@ -315,44 +322,110 @@ static void udpreceive_tilde_connectpoll(t_udpreceive_tilde *x)
     x->x_socket = fd;
     x->x_nbytes = 0;
     x->x_hostname = gensym(inet_ntoa(incomer_address.sin_addr));
-    sys_addpollfn(fd, udpreceive_tilde_datapoll, x);
+    sys_addpollfn(fd, (t_fdpollfn)udpreceive_tilde_datapoll, x);
     outlet_float(x->x_outlet1, 1);
 }
+*/
 
-static int udpreceive_tilde_createsocket(t_udpreceive_tilde* x, int portno)
+static int udpreceive_tilde_createsocket(t_udpreceive_tilde* x, char *address, int portno)
 {
     struct sockaddr_in  server;
+    struct hostent      *hp;
     int                 sockfd;
+    int                 intarg;
+    int                 multicast_joined = 0;
+#if defined __APPLE__ || defined _WIN32
+    struct ip_mreq      mreq;
+#else
+    struct ip_mreqn     mreq;
+#endif
 
+
+    if (x->x_socket >= 0)
+    {
+        // close the existing socket first
+        sys_rmpollfn(x->x_socket);
+        sys_closesocket(x->x_socket);
+    }
     /* create a socket */
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
     if (sockfd < 0)
     {
-        udpreceive_tilde_sockerror("socket");
+        udpreceive_tilde_sock_err(x, "udpreceive~: socket");
         return 0;
     }
     server.sin_family = AF_INET;
-    server.sin_addr.s_addr = INADDR_ANY;
+    if (address[0] == 0) server.sin_addr.s_addr = INADDR_ANY;
+    else 
+    {
+        hp = gethostbyname(address);
+        if (hp == 0)
+        {
+            pd_error(x, "udpreceive~: bad host?\n");
+            return 0;
+        }
+        memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
+    }
+    /* enable delivery of all multicast or broadcast (but not unicast)
+    * UDP datagrams to all sockets bound to the same port */
+    intarg = 1;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR,
+        (char *)&intarg, sizeof(intarg)) < 0)
+        udpreceive_tilde_sock_err(x, "udpreceive~: setsockopt (SO_REUSEADDR) failed");
 
     /* assign server port number */
-
     server.sin_port = htons((u_short)portno);
     post("udpreceive~: listening to port number %d", portno);
 
     udpreceive_tilde_setsocketoptions(sockfd);
 
-    /* name the socket */
-    if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
+    /* if a multicast address was specified, join the multicast group */
+    /* hop count defaults to 1 so we won't leave the subnet*/
+    if (0xE0000000 == (ntohl(server.sin_addr.s_addr) & 0xF0000000))
     {
-         udpreceive_tilde_sockerror("bind");
-         CLOSESOCKET(sockfd);
-         return 0;
-    }
+        server.sin_addr.s_addr = INADDR_ANY;
+        /* first bind the socket to INADDR_ANY */
+        if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
+        {
+            udpreceive_tilde_sock_err(x, "udpreceive~: bind");
+            sys_closesocket(sockfd);
+            return 0;
+        }
+        /* second join the multicast group */
+        memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
 
+#if defined __APPLE__ || defined _WIN32
+        mreq.imr_multiaddr.s_addr = server.sin_addr.s_addr;
+        mreq.imr_interface.s_addr = INADDR_ANY;/* can put a specific local IP address here if host is multihomed */
+#else
+        mreq.imr_multiaddr.s_addr = server.sin_addr.s_addr;
+        mreq.imr_address.s_addr = INADDR_ANY;
+        mreq.imr_ifindex = 0;
+#endif //__APPLE__ || _WIN32
+        if (setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+            (char *)&mreq, sizeof(mreq)) < 0)
+            udpreceive_tilde_sock_err(x, "udpreceive~: setsockopt IP_ADD_MEMBERSHIP");
+        else
+        {
+            multicast_joined = 1;
+            post ("udpreceive~: added to multicast group");
+        }
+    }
+    else
+    {
+        /* name the socket */
+        if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
+        {
+            udpreceive_tilde_sock_err(x, "udpreceive~: bind");
+             CLOSESOCKET(sockfd);
+             return 0;
+        }
+    }
+    x->x_multicast_joined = multicast_joined;
     x->x_socket = sockfd;
     x->x_nbytes = 0;
-    sys_addpollfn(sockfd, udpreceive_tilde_datapoll, x);
+    sys_addpollfn(x->x_socket, (t_fdpollfn)udpreceive_tilde_datapoll, x);
     return 1;
 }
 
@@ -471,7 +544,7 @@ static t_int *udpreceive_tilde_perform(t_int *w)
             if (x->x_error != 1)
             {
                 x->x_error = 1;
-                sprintf(x->x_msg, "udpreceive~: mp3 format not supported");
+                snprintf(x->x_msg, XMSG_SIZE, "udpreceive~: mp3 format not supported");
                 clock_delay(x->x_clock, 0);
             }
             break;
@@ -481,7 +554,7 @@ static t_int *udpreceive_tilde_perform(t_int *w)
             if (x->x_error != 2)
             {
                 x->x_error = 2;
-                sprintf(x->x_msg, "udpreceive~: aac format not supported");
+                snprintf(x->x_msg, XMSG_SIZE, "udpreceive~: aac format not supported");
                 clock_delay(x->x_clock, 0);
             }
             break;
@@ -490,7 +563,7 @@ static t_int *udpreceive_tilde_perform(t_int *w)
             if (x->x_error != 3)
             {
                 x->x_error = 3;
-                sprintf(x->x_msg, "udpreceive~: unknown format (%d)",x->x_frames[x->x_frameout].tag.format);
+                snprintf(x->x_msg, XMSG_SIZE, "udpreceive~: unknown format (%d)",x->x_frames[x->x_frameout].tag.format);
                 clock_delay(x->x_clock, 0);
             }
             break;
@@ -633,74 +706,96 @@ static void udpreceive_tilde_tick(t_udpreceive_tilde *x)
     post("%s", x->x_msg);
 }
 
-static void *udpreceive_tilde_new(t_floatarg fportno, t_floatarg outlets, t_floatarg blocksize)
+static void *udpreceive_tilde_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_udpreceive_tilde  *x;
-    int                 i;
+    int                 i, j = 0, portno = 0, outlets = 0, blocksize = 0;
 
-    if (fportno == 0) fportno = DEFAULT_PORT;
 
     x = (t_udpreceive_tilde *)pd_new(udpreceive_tilde_class);
-    if (x)
+    if (NULL == x) return NULL;
+    for (i = sizeof(t_object); i < (int)sizeof(t_udpreceive_tilde); i++)  
+        ((char *)x)[i] = 0; /* do we need to do this?*/
+
+#ifdef DEBUG
+    post("udpreceive_tilde_new:argc is %d s is %s", argc, s->s_name);
+#endif
+    for (i = 0; i < argc ;++i)
     {
-        for (i = sizeof(t_object); i < (int)sizeof(t_udpreceive_tilde); i++)  
-            ((char *)x)[i] = 0; 
-
-        if ((int)outlets < 1 || (int)outlets > DEFAULT_AUDIO_CHANNELS)
-        {
-            error("udpreceive~: Number of channels must be between 1 and %d", DEFAULT_AUDIO_CHANNELS);
-            return NULL;
+        if (argv[i].a_type == A_FLOAT)
+        { // float is taken to be a port number, a channel count, then a buffer size in that order
+#ifdef DEBUG
+            post ("argv[%d] is a float: %f", i, argv[i].a_w.w_float);
+#endif
+            if (j == 0) portno = (int)argv[i].a_w.w_float;
+            else if (j == 1) outlets = (int)argv[i].a_w.w_float;
+            else if (j == 2) blocksize = (int)argv[i].a_w.w_float;
+            ++j;
         }
-
-        x->x_noutlets = (int)outlets + 1; // extra outlet for valid flag
-        for (i = 0; i < x->x_noutlets; i++)
-            outlet_new(&x->x_obj, &s_signal);
-        x->x_outlet2 = outlet_new(&x->x_obj, &s_anything);
-        x->x_addrout = outlet_new(&x->x_obj, &s_list);
-        for (i = 0; i < 5; ++i)
-        {
-            x->x_addrbytes[i].a_type = A_FLOAT;
-            x->x_addrbytes[i].a_w.w_float = 0;
+        else if (argv[i].a_type == A_SYMBOL)
+        { // symbol is taken to be an ip address (for multicast)
+#ifdef DEBUG
+            post ("argv[%d] is a symbol: %s", i, argv[i].a_w.w_symbol->s_name);
+#endif
+            atom_string(&argv[i], x->x_addr_name, 256);
         }
-        x->x_addr = 0;
-        x->x_port = 0;
-        x->x_myvec = (t_int **)t_getbytes(sizeof(t_int *) * (x->x_noutlets + 3));
-        if (!x->x_myvec)
-        {
-            error("udpreceive~: out of memory");
-            return NULL;
-        }
+    }
+#ifdef DEBUG
+    post("Setting port %d, address %s", portno, x->addr);
+#endif
 
-        x->x_connectsocket = x->x_socket = -1;
-        x->x_nconnections = x->x_underflow = x->x_overflow = 0;
-        x->x_hostname = ps_nothing;
+
+    if (outlets < 1 || outlets > DEFAULT_AUDIO_CHANNELS)
+    {
+        error("udpreceive~: Number of channels must be between 1 and %d", DEFAULT_AUDIO_CHANNELS);
+        return NULL;
+    }
+
+    x->x_noutlets = outlets + 1; // extra outlet for valid flag
+    for (i = 0; i < x->x_noutlets; i++)
+        outlet_new(&x->x_obj, &s_signal);
+    x->x_outlet2 = outlet_new(&x->x_obj, &s_anything);
+    x->x_addrout = outlet_new(&x->x_obj, &s_list);
+    for (i = 0; i < 5; ++i)
+    {
+        x->x_addrbytes[i].a_type = A_FLOAT;
+        x->x_addrbytes[i].a_w.w_float = 0;
+    }
+    x->x_addr = 0;
+    x->x_port = 0;
+    x->x_myvec = (t_int **)t_getbytes(sizeof(t_int *) * (x->x_noutlets + 3));
+    if (!x->x_myvec)
+    {
+        error("udpreceive~: out of memory");
+        return NULL;
+    }
+    x->x_connectsocket = x->x_socket = -1;
+    x->x_nconnections = x->x_underflow = x->x_overflow = 0;
+    x->x_hostname = ps_nothing;
 /* allocate space for 16 frames of 1024 X numchannels floats*/
-        for (i = 0; i < DEFAULT_AUDIO_BUFFER_FRAMES; i++)
-        {
-            x->x_frames[i].data = (char *)t_getbytes(DEFAULT_AUDIO_BUFFER_SIZE * (x->x_noutlets-1) * sizeof(t_float));
-        }
-        x->x_clock = clock_new(&x->x_obj.ob_pd, (t_method)udpreceive_tilde_tick);
-        
-        x->x_sync = 1;
-        x->x_tag_errors = x->x_framein = x->x_frameout = x->x_valid = 0;
-        x->x_maxframes = DEFAULT_QUEUE_LENGTH;
-        x->x_vecsize = 64; /* we'll update this later */
-        if (blocksize == 0) x->x_blocksize = DEFAULT_AUDIO_BUFFER_SIZE; 
-        else if (DEFAULT_AUDIO_BUFFER_SIZE%(int)blocksize)
-        {
-            error("udpreceive~: blocksize must fit snugly in %d", DEFAULT_AUDIO_BUFFER_SIZE);
-            return NULL;
-        } 
-        else x->x_blocksize = (int)blocksize; //DEFAULT_AUDIO_BUFFER_SIZE; /* <-- the only place blocksize is set */
-        x->x_blockssincerecv = 0;
-        x->x_blocksperrecv = x->x_blocksize / x->x_vecsize;
-        x->x_buffering = 1;
-
-        if (!udpreceive_tilde_createsocket(x, (int)fportno))
-        {
-            error("udpreceive~: failed to create listening socket");
-            return (NULL);
-        }
+    for (i = 0; i < DEFAULT_AUDIO_BUFFER_FRAMES; i++)
+    {
+        x->x_frames[i].data = (char *)t_getbytes(DEFAULT_AUDIO_BUFFER_SIZE * (x->x_noutlets-1) * sizeof(t_float));
+    }
+    x->x_clock = clock_new(&x->x_obj.ob_pd, (t_method)udpreceive_tilde_tick);
+    x->x_sync = 1;
+    x->x_tag_errors = x->x_framein = x->x_frameout = x->x_valid = 0;
+    x->x_maxframes = DEFAULT_QUEUE_LENGTH;
+    x->x_vecsize = 64; /* we'll update this later */
+    if (blocksize == 0) x->x_blocksize = DEFAULT_AUDIO_BUFFER_SIZE; 
+    else if (DEFAULT_AUDIO_BUFFER_SIZE%(int)blocksize)
+    {
+        error("udpreceive~: blocksize must fit snugly in %d", DEFAULT_AUDIO_BUFFER_SIZE);
+        return NULL;
+    } 
+    else x->x_blocksize = blocksize; //DEFAULT_AUDIO_BUFFER_SIZE; /* <-- the only place blocksize is set */
+    x->x_blockssincerecv = 0;
+    x->x_blocksperrecv = x->x_blocksize / x->x_vecsize;
+    x->x_buffering = 1;
+    if (!udpreceive_tilde_createsocket(x, x->x_addr_name, portno))
+    {
+        error("udpreceive~: failed to create listening socket");
+        return NULL;
     }
     return (x);
 }
@@ -733,7 +828,7 @@ void udpreceive_tilde_setup(void)
 {
     udpreceive_tilde_class = class_new(gensym("udpreceive~"), 
         (t_newmethod) udpreceive_tilde_new, (t_method) udpreceive_tilde_free,
-        sizeof(t_udpreceive_tilde),  0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+        sizeof(t_udpreceive_tilde), CLASS_DEFAULT, A_GIMME, 0);
 
     class_addmethod(udpreceive_tilde_class, nullfn, gensym("signal"), 0);
     class_addmethod(udpreceive_tilde_class, (t_method)udpreceive_tilde_info, gensym("info"), 0);
@@ -763,6 +858,35 @@ void udpreceive_tilde_setup(void)
 }
 
 /* error handlers */
+static void udpreceive_tilde_sock_err(t_udpreceive_tilde *x, char *err_string)
+{
+/* prints the last error from errno or WSAGetLastError() */
+#ifdef _WIN32
+    LPVOID  lpMsgBuf;
+    DWORD   dwRetVal = WSAGetLastError();
+    int     len = 0, i;
+    char    *cp;
+
+    if (len = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS
+        , NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpMsgBuf, 0, NULL))
+    {
+        cp = (char *)lpMsgBuf;
+        for(i = 0; i < len; ++i)
+        {
+            if (cp[i] < 0x20)
+            { /* end string at first weird character */
+                cp[i] = 0;
+                break;
+            }
+        }
+        pd_error(x, "%s: %s (%d)", err_string, lpMsgBuf, dwRetVal);
+        LocalFree(lpMsgBuf);
+    }
+#else
+    pd_error(x, "%s: %s (%d)", err_string, strerror(errno), errno);
+#endif
+}
+
 static int udpreceive_tilde_sockerror(char *s)
 {
 #ifdef _WIN32
