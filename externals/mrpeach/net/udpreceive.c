@@ -38,7 +38,7 @@ typedef struct _udpreceive
     t_atom          x_addrbytes[5];
     t_atom          x_msgoutbuf[MAX_UDP_RECEIVE];
     char            x_msginbuf[MAX_UDP_RECEIVE];
-	char            addr[256]; // a multicast address or 0
+    char            x_addr_name[256]; // a multicast address or 0
 } t_udpreceive;
 
 void udpreceive_setup(void);
@@ -104,8 +104,8 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
     int                 i;
 
     x = (t_udpreceive *)pd_new(udpreceive_class); /* if something fails we return 0 instead of x. Is this OK? */
-	if (NULL == x) return x;
-	x->addr[0] = '\0';
+    if (NULL == x) return x;
+    x->x_addr_name[0] = '\0';
     /* convert the bytes in the buffer to floats in a list */
     for (i = 0; i < MAX_UDP_RECEIVE; ++i)
     {
@@ -134,25 +134,25 @@ static void *udpreceive_new(t_symbol *s, int argc, t_atom *argv)
 #ifdef DEBUG
             post ("argv[%d] is a symbol: %s", i, argv[i].a_w.w_symbol->s_name);
 #endif
-            atom_string(&argv[i], x->addr, 256);
+            atom_string(&argv[i], x->x_addr_name, 256);
         }
     }
 #ifdef DEBUG
     post("Setting port %d, address %s", portno, x->addr);
 #endif
-	
+
     x->x_msgout = outlet_new(&x->x_obj, &s_anything);
     x->x_addrout = outlet_new(&x->x_obj, &s_anything);
 
-	x->x_connectsocket = -1; // no socket
-	result = udpreceive_new_socket(x, x->addr, portno);
+    x->x_connectsocket = -1; // no socket
+    result = udpreceive_new_socket(x, x->x_addr_name, portno);
     return (x);
 }
 
 static int udpreceive_new_socket(t_udpreceive *x, char *address, int port)
 {
 // return nonzero if successful in creating and binding a socket
-	int					sockfd;
+    int                 sockfd;
     int                 intarg;
     int                 multicast_joined = 0;
     struct sockaddr_in  server;
@@ -163,12 +163,12 @@ static int udpreceive_new_socket(t_udpreceive *x, char *address, int port)
     struct ip_mreqn     mreq;
 #endif
 
-	if (x->x_connectsocket >= 0)
-	{ 
-		// close the existing socket first
+    if (x->x_connectsocket >= 0)
+    {
+        // close the existing socket first
         sys_rmpollfn(x->x_connectsocket);
         sys_closesocket(x->x_connectsocket);
-	}
+    }
     /* create a socket */
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 #ifdef DEBUG
@@ -186,7 +186,7 @@ static int udpreceive_new_socket(t_udpreceive *x, char *address, int port)
         hp = gethostbyname(address);
         if (hp == 0)
         {
-    	    pd_error(x, "udpreceive: bad host?\n");
+            pd_error(x, "udpreceive: bad host?\n");
             return 0;
         }
         memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
@@ -205,15 +205,15 @@ static int udpreceive_new_socket(t_udpreceive *x, char *address, int port)
     /* hop count defaults to 1 so we won't leave the subnet*/
     if (0xE0000000 == (ntohl(server.sin_addr.s_addr) & 0xF0000000))
     {
-		server.sin_addr.s_addr = INADDR_ANY;
-	    /* first bind the socket to INADDR_ANY */
-		if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
-	    {
-	        udpreceive_sock_err(x, "udpreceive: bind");
-	        sys_closesocket(sockfd);
-	        return 0;
-	    }
-		/* second join the multicast group */
+        server.sin_addr.s_addr = INADDR_ANY;
+        /* first bind the socket to INADDR_ANY */
+        if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
+        {
+            udpreceive_sock_err(x, "udpreceive: bind");
+            sys_closesocket(sockfd);
+            return 0;
+        }
+        /* second join the multicast group */
         memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
 
 #if defined __APPLE__ || defined _WIN32
@@ -233,44 +233,44 @@ static int udpreceive_new_socket(t_udpreceive *x, char *address, int port)
             post ("udpreceive: added to multicast group");
         }
     }
-	else
-	{
-	    /* name the socket */
-	    if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
-	    {
-	        udpreceive_sock_err(x, "udpreceive: bind");
-	        sys_closesocket(sockfd);
-	        return 0;
-	    }
-	}
+    else
+    {
+        /* name the socket */
+        if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
+        {
+            udpreceive_sock_err(x, "udpreceive: bind");
+            sys_closesocket(sockfd);
+            return 0;
+        }
+    }
     x->x_multicast_joined = multicast_joined;
     x->x_connectsocket = sockfd;
     x->x_total_received = 0L;
     sys_addpollfn(x->x_connectsocket, (t_fdpollfn)udpreceive_read, x);
-	return 1;
+    return 1;
 }
 
 static void udpreceive_sock_err(t_udpreceive *x, char *err_string)
 {
 /* prints the last error from errno or WSAGetLastError() */
 #ifdef _WIN32
-    LPVOID	lpMsgBuf;
-	DWORD	dwRetVal = WSAGetLastError();
-	int		len = 0, i;
-	char	*cp;
+    LPVOID  lpMsgBuf;
+    DWORD   dwRetVal = WSAGetLastError();
+    int     len = 0, i;
+    char    *cp;
 
     if (len = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS
         , NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&lpMsgBuf, 0, NULL))
     {
-		cp = (char *)lpMsgBuf;
-		for(i = 0; i < len; ++i)
-		{
-			if (cp[i] < 0x20)
-			{ /* end string at first weird character */
-				cp[i] = 0;
-				break;
-			}
-		}
+        cp = (char *)lpMsgBuf;
+        for(i = 0; i < len; ++i)
+        {
+            if (cp[i] < 0x20)
+            { /* end string at first weird character */
+                cp[i] = 0;
+                break;
+            }
+        }
         pd_error(x, "%s: %s (%d)", err_string, lpMsgBuf, dwRetVal);
         LocalFree(lpMsgBuf);
     }
@@ -291,8 +291,7 @@ static void udpreceive_status(t_udpreceive *x)
 
 static void udpreceive_port(t_udpreceive *x, t_float portno)
 {
-	int result;
-	result = udpreceive_new_socket(x, x->addr, (int)portno);
+    int result = udpreceive_new_socket(x, x->x_addr_name, (int)portno);
 }
 
 static void udpreceive_free(t_udpreceive *x)
