@@ -120,10 +120,8 @@ typedef struct _udpreceive_tilde
 } t_udpreceive_tilde;
 
 /* function prototypes */
-static void udpreceive_tilde_closesocket(t_udpreceive_tilde* x);
 static void udpreceive_tilde_reset(t_udpreceive_tilde* x, t_floatarg buffer);
 static void udpreceive_tilde_datapoll(t_udpreceive_tilde *x);
-static void udpreceive_tilde_connectpoll(t_udpreceive_tilde *x);
 static int udpreceive_tilde_createsocket(t_udpreceive_tilde* x, char *address, int portno);
 static t_int *udpreceive_tilde_perform(t_int *w);
 static void udpreceive_tilde_dsp(t_udpreceive_tilde *x, t_signal **sp);
@@ -135,25 +133,12 @@ void udpreceive_tilde_setup(void);
 static void udpreceive_tilde_sock_err(t_udpreceive_tilde *x, char *err_string);
 static int udpreceive_tilde_sockerror(char *s);
 static int udpreceive_tilde_setsocketoptions(int sockfd);
-/* these would require to include some headers that are different
-   between pd 0.36 and later, so it's easier to do it like this! */
-//EXTERN void sys_rmpollfn(int fd);
-//EXTERN void sys_addpollfn(int fd, void* fn, void *ptr);
 
 static t_class *udpreceive_tilde_class;
 static t_symbol *ps_format, *ps_channels, *ps_framesize, *ps_overflow, *ps_underflow, *ps_packets,
                 *ps_queuesize, *ps_average, *ps_sf_float, *ps_sf_16bit, *ps_sf_8bit, 
                 *ps_sf_mp3, *ps_sf_aac, *ps_sf_unknown, *ps_bitrate, *ps_hostname, *ps_nothing,
                 *ps_tag_errors;
-
-/* remove all pollfunctions and close socket */
-static void udpreceive_tilde_closesocket(t_udpreceive_tilde* x)
-{
-    sys_rmpollfn(x->x_socket);
-    outlet_float(x->x_outlet1, 0);
-    CLOSESOCKET(x->x_socket);
-    x->x_socket = -1;
-}
 
 static void udpreceive_tilde_reset(t_udpreceive_tilde* x, t_floatarg buffer)
 {
@@ -300,33 +285,6 @@ static void udpreceive_tilde_datapoll(t_udpreceive_tilde *x)
     }
 }
 
-/*
-static void udpreceive_tilde_connectpoll(t_udpreceive_tilde *x)
-{
-    socklen_t           sockaddrlen = sizeof(struct sockaddr);
-    struct sockaddr_in  incomer_address;
-    int                 fd = accept(x->x_connectsocket, (struct sockaddr*)&incomer_address, &sockaddrlen);
-
-    if (fd < 0) 
-    {
-        post("udpreceive~: accept failed");
-        return;
-    }
-    if (x->x_socket != -1)
-    {
-        post("udpreceive~: new connection");
-        udpreceive_tilde_closesocket(x);
-    }
-
-    udpreceive_tilde_reset(x, 0);
-    x->x_socket = fd;
-    x->x_nbytes = 0;
-    x->x_hostname = gensym(inet_ntoa(incomer_address.sin_addr));
-    sys_addpollfn(fd, (t_fdpollfn)udpreceive_tilde_datapoll, x);
-    outlet_float(x->x_outlet1, 1);
-}
-*/
-
 static int udpreceive_tilde_createsocket(t_udpreceive_tilde* x, char *address, int portno)
 {
     struct sockaddr_in  server;
@@ -418,8 +376,8 @@ static int udpreceive_tilde_createsocket(t_udpreceive_tilde* x, char *address, i
         if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
         {
             udpreceive_tilde_sock_err(x, "udpreceive~: bind");
-             CLOSESOCKET(sockfd);
-             return 0;
+            CLOSESOCKET(sockfd);
+            return 0;
         }
     }
     x->x_multicast_joined = multicast_joined;
