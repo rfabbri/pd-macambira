@@ -5,7 +5,7 @@ pd.tk, or cursor reset method could be done in help patch */
 #include <stdlib.h>
 #include <string.h>
 #include <m_pd.h>
-#include <g_canvas.h>
+#include "g_canvas.h"
 
 #define POLLTIME 10
 
