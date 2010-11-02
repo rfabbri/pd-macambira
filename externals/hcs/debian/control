@@ -14,7 +14,12 @@ Architecture: any
 Depends: ${shlibs:Depends},
          pd,
          ${misc:Depends},
-         pd-libdir
+         pd-cyclone,
+         pd-ggee,
+         pd-libdir,
+         pd-pddp,
+         pd-purepd,
+         pd-zexy
 Description: a random grabbag of Pd objects by Hans-Christoph Steiner
  The 'hcs' library is a random grabbag of objects that are experiments
  that sometimes lead to full-fledged libraries.  There are objects for
