@@ -12,8 +12,8 @@ Package: pd-pddp
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends}
-Recommends: pd-libdir
+         ${misc:Depends},
+         pd-libdir
 Description: a support library for the Pure Data Documentation Project
  This library provides a collection of objects for Pd for making documentation
  easier and more interactive, providing standard ways of outputting audio,

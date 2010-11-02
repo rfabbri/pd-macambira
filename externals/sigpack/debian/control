@@ -12,8 +12,8 @@ Package: pd-sigpack
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends}
-Recommends: pd-libdir
+         ${misc:Depends},
+         pd-libdir
 Description: signal processing effects library for Pd
  A collection of objects for Pd from weiss-archiv that mostly provide some
  signal processing functions like limiting, distortion, etc. They are called

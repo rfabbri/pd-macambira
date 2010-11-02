@@ -12,8 +12,8 @@ Package: pd-mjlib
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends}
-Recommends: pd-libdir
+         ${misc:Depends},
+         pd-libdir
 Description: library of Pd objects for composing music
  A library of objects for composing music written by Mark Williamson.
  .

@@ -17,7 +17,8 @@ Depends: ${shlibs:Depends},
          pd-pddp,
          pd-purepd,
          pd-unauthorized,
-         pd-zexy
+         pd-zexy,
+         pd-libdir
 Description: a Pd library for creatively mapping data
  The Mapping Library for Pd is a library of mapping primitives for mapping
  data to controls. Also included are techniques for conditioning sensor data

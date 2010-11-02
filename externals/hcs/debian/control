@@ -4,7 +4,8 @@ Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Hans-Christoph Steiner <hans@eds.org>
 Build-Depends: debhelper (>= 7.0.50~),
-               puredata (>= 0.42.5-3.1~)
+               puredata,
+               quilt (>= 0.46-7~)
 Standards-Version: 3.9.1
 Homepage: http://puredata.info
 
@@ -12,8 +13,8 @@ Package: pd-hcs
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends}
-Recommends: pd-libdir
+         ${misc:Depends},
+         pd-libdir
 Description: a random grabbag of Pd objects by Hans-Christoph Steiner
  The 'hcs' library is a random grabbag of objects that are experiments
  that sometimes lead to full-fledged libraries.  There are objects for

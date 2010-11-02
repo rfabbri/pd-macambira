@@ -12,8 +12,8 @@ Package: pd-ext13
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends}
-Recommends: pd-libdir
+         ${misc:Depends},
+         pd-libdir
 Description: a collection of objects for Pd by dieb13
  this ist ext13, a collection of externals for pd
  most of the code comes from other pd-object or externals

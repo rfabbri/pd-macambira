@@ -12,8 +12,8 @@ Package: pd-ekext
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends}
-Recommends: pd-libdir
+         ${misc:Depends},
+         pd-libdir
 Description: Pd objects for music information retrieval and polyphony control
  This library is a collection of objects for analyzing audio to get musical
  information, like spectrum and peak information, to generate sound based on
