@@ -84,12 +84,12 @@ typedef union _flint
 
 typedef struct _tag
 {                           /* size (bytes) */
-    char tag[4];            /*  4  */ /*"TAG!"*/
-    char format;            /*  1  */
-    long count;             /*  4  */
-    char channels;          /*  1  */
-    long framesize;         /*  4  */
-    char reserved[2];       /*  2  */ /* pad to 16 bytes */
+    char    tag[4];         /*  4  */ /*"TAG!"*/
+    char    format;         /*  1  */
+    int     count;          /*  4  */
+    char    channels;       /*  1  */
+    int     framesize;      /*  4  */
+    char    reserved[2];    /*  2  */ /* pad to 16 bytes */
 } t_tag;                    /*-----*/
                             /* 16  */
 
