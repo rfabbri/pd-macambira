@@ -4,7 +4,8 @@ Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Hans-Christoph Steiner <hans@eds.org>
 Build-Depends: debhelper (>= 7.0.50~),
-               puredata (>= 0.42.5-3.1~)
+               puredata,
+               quilt (>= 0.46-7~)
 Standards-Version: 3.9.1
 Homepage: http://puredata.info
 
@@ -12,8 +13,8 @@ Package: pd-maxlib
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends},
-         pd-libdir
+         pd-libdir,
+         ${misc:Depends}
 Description: a Pd library for analysing musical performance
  maxlib is a library of non-tilde externals for Pd. The objects can be very
  useful to analyse any musical performance. Some of the objects are 'borrowed'
