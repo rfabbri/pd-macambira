@@ -5,7 +5,8 @@ Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alio
 Uploaders: Hans-Christoph Steiner <hans@eds.org>
 Build-Depends: debhelper (>= 7.0.50~),
                puredata,
-               quilt (>= 0.46-7~)
+               quilt (>= 0.46-7~),
+               libvorbis-dev
 Standards-Version: 3.9.1
 Homepage: http://puredata.info
 
@@ -13,8 +14,8 @@ Package: pd-pdogg
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends},
-         pd-libdir
+         pd-libdir,
+         ${misc:Depends}
 Description: a collection of ogg/vorbis objects for Pd
  pdogg is a library of objects for Pd for reading and writing ogg/vorbis
  streams and files.  There is a stream player for multichannel audio streams
