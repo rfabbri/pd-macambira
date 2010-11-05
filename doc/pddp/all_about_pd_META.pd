@@ -77,3 +77,5 @@ pointer \, anything \, as well as specific custom selectors such as
 set \, clear \, etc.;
 #X restore 144 145 pd TAGS;
 #X text 79 87 This help file is unfinished.;
+#X text 56 124 move all the KEYWORDS values from all_about_help_patches
+to here;

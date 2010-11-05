@@ -3,12 +3,14 @@
 14 -233017 -33289 0;
 #X obj 0 168 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
-#N canvas 507 26 494 597 META 0;
-#X text 12 185 RELEASE_VERSION 0.41.4;
-#X text 158 186 Keywords:;
+#N canvas 507 26 494 625 META 1;
+#X text 12 95 RELEASE_VERSION 0.41.4;
+#X text 158 96 Keywords:;
 #X text 12 5 GENRE help;
 #X text 12 65 DESCRIPTION using help patches in Pure Data;
-#X text 117 201 control- control rate objects \; signal- audiorate
+#X text 12 25 KEYWORDS needs_work (mention how pd finds help files
+and replace 'common_terminology' subpatch with link to glossary);
+#X text 117 111 control- control rate objects \; signal- audiorate
 objects \; data_structure- objects for creating and managing data structures
 \; nonlocal- objects that can make nonlocal connections to other objects
 (i.e. \, communicate with other objects without using wires) \; storage-
@@ -23,13 +25,14 @@ object (like [drawsymbol]) \; block-oriented- see Matju's definition
 one set of units to another \; filter \; network \; trigonometry \;
 soundfile- object that can play \, manipulate \, and/or save a sound
 file (wav \, ogg \, mp3 \, etc.). \; random- object outputs a random
-value \, list \, or signal \; symbol_ops- object that manipulates or
-stores a symbol \; list_ops- object that manipulates or stores a list
-\; canvas_ops- object whose behavior only makes sense in terms of a
-canvas \; patchfile_ops- object whose behavior only makes sense in
-terms of a patchfile;
-#X text 12 25 KEYWORDS needs_work (mention how pd finds help files
-and replace 'common_terminology' subpatch with link to glossary);
+value \, list \, or signal \; symbol_op- object that manipulates or
+stores a symbol \; list_op- object that manipulates or stores a list
+\; canvas_op- object whose behavior only makes sense in terms of a
+canvas \; patchfile_op- object whose behavior only makes sense in terms
+of a patchfile \; ramp - a ramp \; bandlimited \; pd-op - object that
+can report on or manipulate global Pd operation \; anything_op - store
+or manipulate an anything \; abstraction_op - object that only makes
+sense in terms of abstractions;
 #X restore 500 597 pd META;
 #X obj 0 390 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
@@ -178,7 +181,7 @@ pdpedia: help;
 #X obj 117 344 cnv 15 352 31 empty empty empty 20 12 0 10 -1 -1 0;
 #X obj 118 345 cnv 15 350 29 empty empty empty 20 12 0 10 -261106 -1
 0;
-#X text 120 346 Some objects have a final \, rightmost inlet that has
+#X text 120 344 Some objects have a final \, rightmost inlet that has
 a specific behavior. This is identified by the letter "r".;
 #X obj 120 231 cnv 15 355 54 empty empty empty 20 12 0 10 -191407 -1
 0;
@@ -190,7 +193,7 @@ a specific behavior. This is identified by the letter "r".;
 #X obj 41 61 cnv 15 356 55 empty empty empty 20 12 0 10 -1 -1 0;
 #X obj 42 62 cnv 15 354 53 empty empty empty 20 12 0 10 -261106 -1
 0;
-#X text 44 62 Help patches start with a short example that demonstrates
+#X text 44 60 Help patches start with a short example that demonstrates
 the object being used. Most are interactive \, like the one below.
 Help patches are read-only by default \, so you can't accidentally
 overwrite anything in them.;
@@ -243,14 +246,14 @@ object box.;
 #X text 336 546 tutorials or other help;
 #X text 336 557 patches \, may be found here.;
 #X text 336 523 Important object behavior \,;
-#X text 121 229 Inlet numbers are listed \, starting from zero and
+#X text 121 227 Inlet numbers are listed \, starting from zero and
 in left-to-right order. The same goes for the outlets. Additional information
 may sometimes appear in a subpatch \, like the one above-- click it
 with the mouse to open it.;
 #X obj 99 572 pddp/pddplink all_about_messages.pd;
 #X obj 5 597 pddp/pddplink help.pd -text help;
 #X text 337 459 the object's behavior or to;
-#X text 120 300 "n" means there is a variable number of inlets \, the
+#X text 120 298 "n" means there is a variable number of inlets \, the
 exact number of which is determined by creation argument(s).;
 #X text 221 553 replace w/glossary;
 #X connect 17 0 18 0;
