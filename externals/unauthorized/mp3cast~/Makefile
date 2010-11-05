@@ -62,12 +62,20 @@ pd_linux: $(NAME).pd_linux
 
 LINUXCFLAGS = -DPD -DUNIX -DICECAST -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes \
-    -Wno-unused -Wno-parentheses -Wno-switch
+    -Wno-unused -Wno-parentheses -Wno-switch 
+
+LBITS := $(shell getconf LONG_BIT)
+ifeq ($(LBITS),64)
+   # do 64 bit stuff here, like set some CFLAGS
+ARCHFLAGS= -fPIC
+else
+ARCHFLAGS=
+endif
 
 LINUXINCLUDE =  -I../../src
 
 .c.pd_linux:
-	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -DHAVE_STRCHR -o $*.o -c $*.c
+	cc $(LINUXCFLAGS) $(ARCHFLAGS) $(LINUXINCLUDE) -DHAVE_STRCHR -o $*.o -c $*.c
 	ld --export-dynamic  -shared -o $*.pd_linux $*.o -lc -lm -L/usr/local/lib -lmp3lame
 	strip --strip-unneeded $*.pd_linux
 	rm -f $*.o ../$*.pd_linux
