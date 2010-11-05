@@ -117,7 +117,7 @@ ifeq ($(UNAME),Linux)
   PD_PATH = /usr
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += -fPIC
-  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC `pkg-config --libs vorbis vorbisenc`
   LIBS += -lc
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
