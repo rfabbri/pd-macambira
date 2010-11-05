@@ -1,27 +1,13 @@
-Description: Upstream changes introduced in version 0.1-1~maverick
- This patch has been created by dpkg-source during the package build.
- Here's the last changelog entry, hopefully it gives details on why
- those changes were made:
- .
- pd-pddp (0.1-1~maverick) maverick; urgency=low
- .
-   * Initial release (Closes: #591732)
- .
- The person named in the Author field signed this changelog entry.
+Description: workaround for headers missing from 'puredata'
+ Currently the 'puredata' package only includes the header m_pd.h, but other
+ headers are need to build this package, specifically s_stuff.h and
+ g_canvas.h.  This patch adds the two headers from 'puredata' version 0.42.6
+ until the other headers are included in Debian.
 Author: Hans-Christoph Steiner <hans@eds.org>
-Bug-Debian: http://bugs.debian.org/591732
-
----
-The information above should follow the Patch Tagging Guidelines, please
-checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
-are templates for supplementary fields that you might want to add:
-
-Origin: <vendor|upstream|other>, <url of original patch>
-Bug: <url in upstream bugtracker>
-Bug-Debian: http://bugs.debian.org/<bugnumber>
-Forwarded: <no|not-needed|url proving that it has been forwarded>
-Reviewed-By: <name and email of someone who approved the patch>
-Last-Update: <YYYY-MM-DD>
+Bug-Debian: http://bugs.debian.org/568770
+Forwarded: not-needed
+Reviewed-By: Hans-Christoph Steiner <hans@eds.org>
+Last-Update: <2010-11-05>
 
 --- /dev/null
 +++ pd-pddp-0.1/m_imp.h
