@@ -12,7 +12,7 @@ SOURCES = bp.c decimator.c deltas.c hip.c hist.c itov.c lavg.c lhist.c lhisti.c 
 PDOBJECTS = 
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = 
+EXAMPLES = beattracker.pd normalizer.pd resonate-beat.pd
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
