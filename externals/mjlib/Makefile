@@ -21,7 +21,8 @@ MANUAL =
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = VERSION mjLib.c mjLib.h StdAfx.h about.h convolve~.h metroplus.h monorhythm.h morse.h n2m.h pin~.h prob.h synapseA~.h things.h
+EXTRA_DIST = VERSION mjLib.c mjLib.h StdAfx.h about.h convolve~.h metroplus.h monorhythm.h morse.h n2m.h pin~.h prob.h synapseA~.h things.h vc70.pdb mjLib.dsw mjLib.lib mjLib.opt mjLib.plg mjLib.suo mjLib.dsp mjLib.exp mjLib.ilk mjLib.ncb mjLib.pdb mjLib.sln mjLib.vcproj
+
 
 
 
