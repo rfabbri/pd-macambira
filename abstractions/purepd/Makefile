@@ -9,7 +9,7 @@ SOURCES =
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = alternate.pd any_argument.pd clip.pd cosh.pd delta.pd delta~.pd fifo.pd float_argument.pd for++.pd gt2~.pd gt~.pd inv.pd log10.pd lt2~.pd lt~.pd moses.pd  once.pd oneshot.pd purepd_error.pd sgn~.pd sinh.pd symbol_argument.pd tanh.pd uzi.pd velocity.pd
+PDOBJECTS = ^.pd alternate.pd any_argument.pd clip.pd cosh.pd delta.pd delta~.pd fifo.pd float_argument.pd for++.pd gt2~.pd gt~.pd inv.pd log10.pd lt2~.pd lt~.pd moses.pd  once.pd oneshot.pd purepd_error.pd sgn~.pd sinh.pd symbol_argument.pd tanh.pd uzi.pd velocity.pd
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = 
