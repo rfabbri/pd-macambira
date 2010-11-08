@@ -1314,13 +1314,13 @@ oscx_clean:
 #------------------------------------------------------------------------------#
 # PAN
 pan:
-	make -C $(externals_src)/hcs/pan PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/pan PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
 pan_install:
-	make -C $(externals_src)/hcs/pan DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+	make -C $(externals_src)/pan DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 pan_clean:
-	make -C $(externals_src)/hcs/pan clean
+	make -C $(externals_src)/pan clean
 
 
 #------------------------------------------------------------------------------#
