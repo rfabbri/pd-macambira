@@ -1,4 +1,4 @@
-pd-ext13 (0.17-1) unstable; urgency=low
+pd-ext13 (0.17.1-1) unstable; urgency=low
 
   * Initial release (Closes: #591844)
 
