@@ -13,10 +13,10 @@ SOURCES_linux = ifeel.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = ISOdate.pd ISOtime.pd ascii2int.pd autoscale.pd blocksize_in_ms.pd debounce.pd debug.pd file_type.pd float2ascii.pd get-audio-dialog.pd get-midi-dialog.pd gid2group_name.pd group_name2gid.pd hostname.pd make-audio-dialog.pd mouse_region.pd noquit.pd pi.pd pointer_position.pd pwm.pd pwm~.pd split_my_msgs.pd square~.pd tcl_version.pd tkconsole.pd tremolo~.pd uid2username.pd username2uid.pd
+PDOBJECTS = ISOdate.pd ISOtime.pd ascii2int.pd autoscale.pd blocksize_in_ms.pd debounce.pd debug.pd embed.pd file_type.pd float2ascii.pd get-audio-dialog.pd get-midi-dialog.pd gid2group_name.pd group_name2gid.pd hostname.pd make-audio-dialog.pd mouse_region.pd noquit.pd pi.pd pointer_position.pd pwm.pd pwm~.pd split_my_msgs.pd square~.pd tcl_version.pd tkconsole.pd tremolo~.pd uid2username.pd username2uid.pd
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = changing_the_colors.pd move_pd_window.pd
+EXAMPLES = changing_the_colors.pd move_pd_window.pd cursors.gif
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
@@ -25,7 +25,7 @@ MANUAL =
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = cursor.gif README-ifeel.txt embed.pd ifeel.h
+EXTRA_DIST = README-ifeel.txt ifeel.h
 
 
 

@@ -1,0 +1,4 @@
+#N canvas 329 399 450 300 10;
+#X text 119 127 [embed];
+#X text 55 50 This object is used for hiding the Pd window when making
+an embedded app based on Pd.;
