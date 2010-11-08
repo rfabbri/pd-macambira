@@ -61,7 +61,7 @@
 #X text 227 459 <-- mouse buttons;
 #X text 86 366 or bang to get the current mouse position;
 #N canvas 583 22 481 747 image 0;
-#X obj 240 373 ggee/image cursor.gif;
+#X obj 240 373 moonlib/image examples/cursor.gif;
 #X restore 509 309 pd image of all cursors;
 #X msg 328 124 clock;
 #X msg 288 124 arrow;
