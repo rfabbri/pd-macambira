@@ -4,5 +4,5 @@
 #X text 10 50 AUTHOR Olaf Matthes;
 #X text 10 70 DESCRIPTION objects for reading, writing, and streaming ogg;
 #X text 10 90 LICENSE LGPL;
-#X text 10 110 VERSION 0.26-svn;
+#X text 10 110 VERSION 0.25;
 #X restore 10 10 pd META;
