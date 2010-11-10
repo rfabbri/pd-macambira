@@ -1,7 +1,7 @@
 ## Pd library template version 1.0.5
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
-LIBRARY_NAME = nusmuk_utils
+LIBRARY_NAME = nusmuk-utils
 
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically

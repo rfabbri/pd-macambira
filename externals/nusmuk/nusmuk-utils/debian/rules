@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-LIBRARY_NAME = nusmuk_utils
+LIBRARY_NAME = nusmuk-utils
 PACKAGE = pd-$(LIBRARY_NAME)
 pkglibdir = /usr/lib/pd/extra
 

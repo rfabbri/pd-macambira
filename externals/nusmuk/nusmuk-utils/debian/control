@@ -1,4 +1,4 @@
-Source: pd-nusmuk_utils
+Source: pd-nusmuk-utils
 Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
@@ -8,7 +8,7 @@ Build-Depends: debhelper (>= 7.0.50~),
 Standards-Version: 3.9.1
 Homepage: http://puredata.info
 
-Package: pd-template
+Package: pd-nusmuk-audio
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
