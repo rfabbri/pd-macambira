@@ -30,7 +30,7 @@ is at cartesian (1 \, 0.5) or to the right.;
 #X restore 95 85 pd c;
 #X obj 327 334 pddp/pddplink ../hid/polar-joystick.pd -text polar-joystick.pd
 ;
-#X obj 267 303 cartesian;
+#X obj 267 323 cartesian2spherical;
 #X obj 348 303 mapping2radians;
 #X connect 1 0 5 0;
 #X connect 5 0 2 0;

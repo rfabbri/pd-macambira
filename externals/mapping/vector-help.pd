@@ -23,7 +23,7 @@
 #X connect 1 0 2 0;
 #X coords 0 -1 1 1 30 30 1 100 100;
 #X restore 95 85 pd c;
-#X obj 267 303 cartesian;
+#X obj 267 323 cartesian2spherical;
 #X obj 348 303 mapping2radians;
 #X text 17 29 Converts cartesian coordinates(x \, y) to polar coordinates
 (radius \, angle). The angle is in radians (-pi to pi).;
