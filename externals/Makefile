@@ -709,8 +709,8 @@ ifeq ($(OS_NAME),windows)
 else
   ifeq ($(OS_NAME),darwin)
     FRAMEWORKS = Carbon IOKit ForceFeedback
-    HID_CFLAGS = $(OPT_CFLAGS) $(CFLAGS) -I$(externals_src)/hcs/hid/HID\ Utilities\ Source
-    HID_UTILITIES_SOURCE = $(externals_src)/hcs/hid/HID\ Utilities\ Source
+    HID_CFLAGS = $(OPT_CFLAGS) $(CFLAGS) -I$(externals_src)/hid/HID\ Utilities\ Source
+    HID_UTILITIES_SOURCE = $(externals_src)/hid/HID\ Utilities\ Source
     HID_LIBS = $(LIBS) -L$(HID_UTILITIES_SOURCE)/build \
 		-L$(HID_UTILITIES_SOURCE)/build/Default \
       -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
@@ -721,7 +721,7 @@ else
 endif
 
 HID_SRC = input_arrays.c hid_$(OS_NAME).c hid.c
-HID_OBJECTS := $(patsubst %.c, $(externals_src)/hcs/hid/%.o, $(HID_SRC))
+HID_OBJECTS := $(patsubst %.c, $(externals_src)/hid/%.o, $(HID_SRC))
 $(HID_OBJECTS) : %.o : %.c
 	$(CC) $(HID_CFLAGS) -o "$*.o" -c "$*.c"
 
@@ -735,28 +735,28 @@ ifeq ($(UNAME),Darwin)
 				echo "Not building Apple HID Utilities"
 endif
 
-$(externals_src)/hcs/hid/hid.$(EXTENSION): $(HID_OBJECTS) \
+$(externals_src)/hid/hid.$(EXTENSION): $(HID_OBJECTS) \
 $(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
-	$(CC) $(LDFLAGS) -o $(externals_src)/hcs/hid/hid.$(EXTENSION) \
+	$(CC) $(LDFLAGS) -o $(externals_src)/hid/hid.$(EXTENSION) \
 		$(HID_OBJECTS) $(HID_LIBS)
-#	$(STRIP) $(externals_src)/hcs/hid/hid.$(EXTENSION)
+#	$(STRIP) $(externals_src)/hid/hid.$(EXTENSION)
 
-hid: $(externals_src)/hcs/hid/hid.$(EXTENSION)
+hid: $(externals_src)/hid/hid.$(EXTENSION)
 
 hid_install: hid
 	install -d $(DESTDIR)$(objectsdir)/$(HID_NAME)
-	install -p $(externals_src)/hcs/hid/hid.$(EXTENSION) \
+	install -p $(externals_src)/hid/hid.$(EXTENSION) \
 		$(DESTDIR)$(objectsdir)/$(HID_NAME)
-	install -p $(externals_src)/hcs/hid/*.pd $(DESTDIR)$(objectsdir)/$(HID_NAME)
+	install -p $(externals_src)/hid/*.pd $(DESTDIR)$(objectsdir)/$(HID_NAME)
 	install -d $(DESTDIR)$(objectsdir)/$(HID_NAME)/examples
-	install -p $(externals_src)/hcs/hid/examples/*.pd  \
+	install -p $(externals_src)/hid/examples/*.pd  \
 		$(DESTDIR)$(objectsdir)/$(HID_NAME)/examples
 
 hid_clean:
-	-rm -f -- $(externals_src)/hcs/hid/*.o
-	-rm -f -- $(externals_src)/hcs/hid/hid.$(EXTENSION)
-	-rm -f -- $(externals_src)/hcs/hid/*.bak
-	-rm -f -- $(externals_src)/hcs/hid/*.*~
+	-rm -f -- $(externals_src)/hid/*.o
+	-rm -f -- $(externals_src)/hid/hid.$(EXTENSION)
+	-rm -f -- $(externals_src)/hid/*.bak
+	-rm -f -- $(externals_src)/hid/*.*~
 	-rm -f -- $(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
 	-rm -f -- $(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
 
