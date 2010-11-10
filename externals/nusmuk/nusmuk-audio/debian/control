@@ -12,6 +12,7 @@ Package: pd-nusmuk-audio
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends},
-          pd-libdir
-Description: 
+         ${misc:Depends}
+Description: few usefull abstractions and externals for pd made by Cyrille Henry
+
+
