@@ -13,6 +13,8 @@ Architecture: any
 Depends: ${shlibs:Depends},
          pd,
          ${misc:Depends}
-Description: few usefull abstractions and externals for pd made by Cyrille Henry
+Description: few usefull abstractions and externals for audio synthesis for pd made by Cyrille Henry
+
+This objects' collection aim at improving audio synthesis quality within Pure Data. This collection enholds band limited oscillator and objects that read tables in a more flexible way than the Pure Data native ones. Some filters and various objects are also available.
 
 

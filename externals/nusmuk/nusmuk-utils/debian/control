@@ -13,4 +13,7 @@ Architecture: any
 Depends: ${shlibs:Depends},
          pd,
          ${misc:Depends}
-Description: few usefull abstractions and externals for audio synthesis for pd made by Cyrille Henry
+Description: few usefull abstractions and externals for pd made by Cyrille Henry
+
+This is my collection of abstraction that i always use.
+the object included are : between, line3, pps, filtered_random, many_bang, rand_diff, fmod, once, randn, lb, pbank, rnd_flow, lfo, p, rnd_metro
