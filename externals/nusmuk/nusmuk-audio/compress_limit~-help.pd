@@ -24,7 +24,7 @@
 #X floatatom 121 269 5 0 0 0 - - -;
 #X obj 202 319 oscillo~;
 #X obj 189 420 oscillo~;
-#X obj 63 325 compress_limit;
+#X obj 63 324 compress_limit~;
 #X connect 0 0 17 0;
 #X connect 1 0 0 1;
 #X connect 2 0 0 0;
