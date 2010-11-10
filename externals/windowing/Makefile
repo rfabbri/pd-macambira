@@ -12,7 +12,7 @@ SOURCES = bartlett~.c blackman~.c connes~.c cosine~.c gaussian~.c hamming~.c han
 PDOBJECTS = 
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = 
+EXAMPLES = windowing.pd
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
