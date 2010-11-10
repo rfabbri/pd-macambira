@@ -431,41 +431,18 @@ cxc_clean:
 
 #------------------------------------------------------------------------------#
 # CYCLONE
-CYCLONE_NAME=cyclone
-# cyclone is compiled straight into $(OUT_DIR)
-CYCLONE_OUT_DIR=$(DESTDIR)$(objectsdir)/$(CYCLONE_NAME)
-cyclone: $(bindir)
-	$(MAKE) OPT_CFLAGS="-O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing -fPIC" \
-		-C $(externals_src)/miXed/cyclone
+cyclone:
+	make -C $(externals_src)/miXed/cyclone -f Makefile.libdir \
+		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
-cyclone_install: cyclone
-	install -d $(DESTDIR)$(objectsdir)/$(CYCLONE_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(CYCLONE_NAME) \
-		--author "Kzrysztof Czaja" \
-		--license "BSD" \
-		--description "a library for porting and running Max/MSP patches in Pd"
-# kludge to build as one-file-per-class using the miXed build system
-	cd $(externals_src)/miXed/cyclone && $(MAKE) OUT_DIR=$(CYCLONE_OUT_DIR)
-# install "maxmode" libraries into subdir, so they don't override the libdir
-	install -d $(DESTDIR)$(objectsdir)/$(CYCLONE_NAME)/maxmode
-	install -p $(externals_src)/miXed/bin/cyclone.$(EXTENSION) \
-		$(externals_src)/miXed/bin/hammer.$(EXTENSION) \
-		$(externals_src)/miXed/bin/sickle.$(EXTENSION) \
-		$(externals_src)/miXed/bin/maxmode.$(EXTENSION) \
-		$(DESTDIR)$(objectsdir)/$(CYCLONE_NAME)/maxmode
-# install "cyclist" command line app with pd
-	-install -p -m0755 $(externals_src)/miXed/bin/cyclist $(DESTDIR)$(bindir)
-	install -p $(externals_src)/miXed/doc/help/cyclone/*.* \
-		$(DESTDIR)$(objectsdir)/$(CYCLONE_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(CYCLONE_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(CYCLONE_NAME)
-	install -p $(externals_src)/miXed/test/cyclone/*.* \
-		$(DESTDIR)$(examplesdir)/$(CYCLONE_NAME)
-
+cyclone_install:
+	make -C $(externals_src)/miXed/cyclone -f Makefile.libdir \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" \
+		install
 
 cyclone_clean:
-	-$(MAKE) -C $(externals_src)/miXed/cyclone $(DEST_PATHS) clean
-
+	make -C $(externals_src)/miXed/cyclone -f Makefile.libdir \
+		clean
 
 
 #------------------------------------------------------------------------------#
