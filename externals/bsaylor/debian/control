@@ -13,8 +13,8 @@ Package: pd-bsaylor
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends},
-         pd-libdir
+         pd-libdir,
+         ${misc:Depends}
 Description: a library of FFT-based Pd objects by Ben Saylor
  bsaylor is a library of Pure Data objects by Benjamin Saylor:
  .
