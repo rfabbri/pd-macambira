@@ -632,37 +632,14 @@ gem2pdp_clean:
 
 #------------------------------------------------------------------------------#
 # GGEE
-GGEE_NAME=ggee
-# experimental needs C++ and tools is command line, so exclude
-GGEE_OBJECTS := $(wildcard $(externals_src)/ggee/[a-df-su-z]*/*.c)
-ggee: $(GGEE_OBJECTS:.c=.$(EXTENSION))
+ggee:
+	make -C $(externals_src)/ggee PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
-ggee_install: ggee
-	install -d $(DESTDIR)$(objectsdir)/$(GGEE_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(GGEE_NAME) \
-		--author "Guenter Geiger" \
-		--description "" \
-		--license "BSD" \
-		--version "0.25"
-	install -p $(GGEE_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(GGEE_NAME)
-	install -p $(shell ls -1 $(externals_src)/vbap/*.pd | grep -v '-help.pd') \
-		 $(DESTDIR)$(objectsdir)/$(GGEE_NAME)
-	install -p $(externals_src)/ggee/*/*-help.pd \
-		$(externals_src)/ggee/*/*.gif $(DESTDIR)$(objectsdir)/$(GGEE_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(GGEE_NAME)
-#	install -p $(externals_src)/ggee/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(GGEE_NAME)
-#	install -p $(externals_src)/ggee/README \
-#		$(DESTDIR)$(readmesdir)/$(GGEE_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(GGEE_NAME)
-#	install -p $(externals_src)/ggee/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(GGEE_NAME)
+ggee_install:
+	make -C $(externals_src)/ggee DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 ggee_clean:
-	-rm -f -- $(GGEE_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(GGEE_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/ggee/*.bak
-	-rm -f -- $(externals_src)/ggee/*.*~
+	make -C $(externals_src)/ggee clean
 
 
 #------------------------------------------------------------------------------#
