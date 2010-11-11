@@ -3,6 +3,14 @@ Name: nusmuk-utils
 Maintainer: Cyrille Henry <ch@chnry.net>
 Source: http://sourceforge.net/projects/pure-data/files/libraries/nusmuk-utils/
 
+Files: pbank
+Copyright: 2004, Zack Settle
+License: GPL-2+
+
+Files: randn
+Copyright: 2008, Nicolas Montgermont
+License: GPL-2+
+
 Files: *
 Copyright: 2002-2010, Cyrille Henry <ch@chnry.net>
 License: GPL-2+

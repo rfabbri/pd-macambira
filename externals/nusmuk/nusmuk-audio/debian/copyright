@@ -3,6 +3,9 @@ Name: nusmuk-audio
 Maintainer: Cyrille Henry <ch@chnry.net>
 Source: http://sourceforge.net/projects/pure-data/files/libraries/nusmuk-audio/
 
+Files: tabosc4c~, tabosci~, tabread4c~
+Copyright: Miller Puckette
+
 Files: *
 Copyright: 2002-2010, Cyrille Henry <ch@chnry.net>
 License: GPL-2+
