@@ -3,6 +3,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE
+AC_DISABLE_OPTION_CHECKING
 
 make clean
 
