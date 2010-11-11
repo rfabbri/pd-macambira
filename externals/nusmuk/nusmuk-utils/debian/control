@@ -8,7 +8,7 @@ Build-Depends: debhelper (>= 7.0.50~),
 Standards-Version: 3.9.1
 Homepage: http://puredata.info
 
-Package: pd-nusmuk-audio
+Package: pd-nusmuk-utils
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
