@@ -18,7 +18,7 @@ ifeq ($(UNAME),Linux)
  LDFLAGS =  -Wl,--export-dynamic -shared
  LIBS = `pkg-config --libs opencv`
  EXTENSION = pd_linux
- SOURCES_OPT = @SOURCES_OPT@
+ SOURCES_OPT = pix_opencv_surf.cc
 endif
 ifeq ($(UNAME),Darwin)
  INCLUDES += -I/Library/Frameworks/OpenCV.framework/Headers/ -I/Applications/Pd-extended.app/Contents/Resources/include/pdextended -I/Applications/Pd-extended.app/Contents/Resources/include/
