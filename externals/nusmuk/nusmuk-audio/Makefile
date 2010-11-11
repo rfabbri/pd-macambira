@@ -9,7 +9,7 @@ SOURCES = bq~.c tabosc4c~.c tabosci~.c tabread4c~.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = bq_coef_notch.pd additive~.pd oscillo~.pd bq_coef_peak.pd bq_coef_bp.pd pwm~.pd bq_coef_highshelf.pd compress_limit~.pd saw~.pd bq_coef_hip.pd distortion~.pd spatialisation~.pd bq_coef_lop.pd echo~.pd bq_coef_lowshelf.pd granulator~.pd
+PDOBJECTS = bq_coef_notch.pd oscillo~.pd bq_coef_peak.pd bq_coef_bp.pd pwm~.pd bq_coef_highshelf.pd compress_limit~.pd saw~.pd bq_coef_hip.pd distortion~.pd spatialisation~.pd bq_coef_lop.pd echo~.pd bq_coef_lowshelf.pd granulator~.pd
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = analog_synth_emulation.pd hanning.wav
