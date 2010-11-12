@@ -2,15 +2,15 @@
  *
  * syslog - implementation file
  *
- * copyleft (c) IOhannes m zmölnig
+ * copyright (c) 2006 IOhannes m zmÃ¶lnig
  *
- *   1999:forum::für::umläute:2004
+ *   forum::fÃ¼r::umlÃ¤ute
  *
  *   institute of electronic music and acoustics (iem)
  *
  ******************************************************
  *
- * license: GNU General Public License v.2
+ * license: GNU General Public License v.2 or later
  *
  ******************************************************/
 

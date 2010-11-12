@@ -1,6 +1,6 @@
-aconnect - connect/disconnect/query alsa-sequencers from within pd
+syslog - generate syslog messages from withn Pd
 
-Copyright (C) 2005 IOhannes m zmoelnig (zmoelnig AT iem DOT at)
+Copyright (C) 2006 IOhannes m zmoelnig (zmoelnig AT iem DOT at)
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
