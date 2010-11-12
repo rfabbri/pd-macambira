@@ -17,7 +17,6 @@ AC_SUBST(INCLUDES)
 AC_SUBST(VERSION)
 
 
-AC_ARG_WITH(pdversion, [  --with-pdversion=<ver>  enforce a certain pd-version (e.g. 0.37)])
 AC_ARG_WITH(extension, [  --with-extension=<ext>  enforce a certain extension for the dynamic library (e.g. dll)])
 
 
@@ -164,55 +163,6 @@ fi
 if test "x$with_extension" != "x"
 then
  EXT=$with_extension
-fi
-
-
-dnl Checks for pd-version, to set the correct help-path
-AC_MSG_CHECKING("pd\>=0.37")
-
-if test "$with_pdversion" != ""
-then
-echo -n "($with_pdversion)... "
-  PD_VERSION="$with_pdversion"
-else
-if test "x$cross_compiling" = "xno"
-then
-
-cat > conftest.c << EOF
-#include <stdio.h>
-#include "m_pd.h"
-int main(){
-  printf("%d.%d\n", PD_MAJOR_VERSION, PD_MINOR_VERSION);
-  return 0;
-}
-EOF
-
- if $CC $INCLUDES -o conftest.o conftest.c > /dev/null 2>&1
- then
-  PD_VERSION=`./conftest.o`
- else
-  PD_VERSION=""
- fi
-  echo -n $PD_VERSION
-else
-dnl we are cross-compiling...
- echo -n "(X)..."
- PD_VERSION="0.38"
-fi
-fi
-
-let PD_MAJORVERSION=`echo $PD_VERSION | cut -d"." -f1`+0
-let PD_MINORVERSION=`echo $PD_VERSION | cut -d"." -f2`+0
-
-
-
-if test "$PD_MAJORVERSION" -gt 0 || test "$PD_MINORVERSION" -ge 37
-then
-  REFERENCEPATH=extra/help-
-  echo " yes"
-else
-  REFERENCEPATH=doc/5.reference/
-  echo " no"
 fi
 
 AC_OUTPUT(Makefile)

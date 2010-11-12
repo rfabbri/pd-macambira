@@ -3,7 +3,7 @@ VERSION    =0.1
 
 PREFIX     =@prefix@@PDLIBDIR@
 
-INSTALL_BIN=$(PREFIX)/extra
+INSTALL_BIN=$(PREFIX)/extra/$(LIBNAME)
 
 EXT = @EXT@ 
 DEFS = @DFLAGS@ -DVERSION=\"$(VERSION)\"
@@ -32,7 +32,7 @@ SOURCES=$(sort $(filter %.c, $(wildcard *.c)))
 TARGETS = $(SOURCES:.c=.o)
 
 
-all: $(LIBNAME)
+all: $(LIBNAME).$(EXT)
 
 clean:
 	-rm -f *.o *.d
@@ -63,9 +63,9 @@ distbin: distclean all clean
 everything: clean all install distclean
 
 
-$(LIBNAME): $(TARGETS)
-	$(LD) $(LFLAGS) -o $(LIBNAME).$(EXT) *.o $(LIBS)
-	$(STRIP) $(LIBNAME).$(EXT)
+$(LIBNAME).$(EXT): $(TARGETS)
+	$(LD) $(LFLAGS) -o $@ $< $(LIBS)
+	$(STRIP) $@
 
 
 ## dependencies: as proposed by the GNU-make documentation
