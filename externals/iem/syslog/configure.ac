@@ -27,17 +27,17 @@ AC_CHECK_LIB(c, main)
 AC_CHECK_LIB(crtdll, fclose)
 
 dnl Replace `main' with a function in -lm:
-AC_CHECK_LIB(m, main)
+#AC_CHECK_LIB(m, main)
 dnl Replace `main' with a function in -lpthread:
 dnl AC_CHECK_LIB(pthread, main)
 dnl Replace `main' with a function in -lstk:
 dnl AC_CHECK_LIB(stk, main, STK=yes)
 
 
-AC_CHECK_LIB(asound, snd_seq_close)
-if test "x$ac_cv_lib_asound_snd_seq_close" = "xyes"; then
-  DFLAGS="-DHAVE_ALSA ${DFLAGS}"
-fi
+#AC_CHECK_LIB(asound, snd_seq_close)
+#if test "x$ac_cv_lib_asound_snd_seq_close" = "xyes"; then
+#  DFLAGS="-DHAVE_ALSA ${DFLAGS}"
+#fi
 
 if test "x$includedir" != "x"; then
  for id in $includedir
@@ -115,7 +115,7 @@ dnl  OK, checks for machines are here now
 dnl
 if test `uname -s` = Linux; 
 then
-  LFLAGS="-export_dynamic  -shared"
+  LFLAGS="--export-dynamic  -shared"
   CFLAGS="-fPIC $CFLAGS"
   EXT=pd_linux	
 fi
