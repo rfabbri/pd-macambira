@@ -1,7 +1,7 @@
-#N canvas 1395 150 977 618 10;
+#N canvas 2 4 977 618 10;
 #X obj 319 388 metro 250;
 #X obj 1 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 3473 1;
+-1 -1 3500 1;
 #X obj 11 236 i;
 #X obj 319 416 i;
 #X obj 323 521 sel 1;
@@ -12,49 +12,49 @@
 ;
 #X obj 72 190 sel 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16;
 #X obj 27 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2480 1;
+-1 -1 2500 1;
 #X obj 37 236 i;
 #X obj 53 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 4762 1;
+-1 -1 4800 1;
 #X obj 63 236 i;
 #X obj 79 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 5854 1;
+-1 -1 5900 1;
 #X obj 89 236 i;
 #X obj 105 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 3572 1;
+-1 -1 3600 1;
 #X obj 115 236 i;
 #X obj 131 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2480 1;
+-1 -1 2500 1;
 #X obj 141 236 i;
 #X obj 157 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 3770 1;
+-1 -1 3800 1;
 #X obj 167 236 i;
 #X obj 183 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2084 1;
+-1 -1 2100 1;
 #X obj 193 236 i;
 #X obj 209 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 4762 1;
+-1 -1 4800 1;
 #X obj 219 236 i;
 #X obj 235 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 3473 1;
+-1 -1 3500 1;
 #X obj 245 236 i;
 #X obj 261 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2580 1;
+-1 -1 2600 1;
 #X obj 271 236 i;
 #X obj 287 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2084 1;
+-1 -1 2100 1;
 #X obj 297 236 i;
 #X obj 313 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2977 1;
+-1 -1 3000 1;
 #X obj 323 236 i;
 #X obj 339 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2282 1;
+-1 -1 2300 1;
 #X obj 349 236 i;
 #X obj 365 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 3572 1;
+-1 -1 3600 1;
 #X obj 375 236 i;
 #X obj 391 46 vsl 25 129 -1 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2282 1;
+-1 -1 2300 1;
 #X obj 401 236 i;
 #X obj 179 287 outlet;
 #X floatatom 100 2 5 0 0 0 - - -;
