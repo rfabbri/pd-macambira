@@ -153,7 +153,7 @@ dnl
 dnl  OK, checks which machines are here now
 dnl this needs some rethinking when cross-compiling (?)
 dnl
-AC_CHECK_LDFLAGS([-export_dynamic -shared])
+AC_CHECK_LDFLAGS([-Wl,--export-dynamic -shared])
 
 if test `uname -s` = Linux; 
 then
