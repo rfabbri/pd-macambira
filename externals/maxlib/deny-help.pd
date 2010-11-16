@@ -1,4 +1,4 @@
-#N canvas 358 305 556 310 12;
+#N canvas 0 26 437 310 12;
 #X text 97 34 written by Olaf Matthes <olaf.matthes@gmx.de>;
 #X msg 125 65 cat;
 #X msg 147 97 dog;
@@ -9,7 +9,17 @@
 #X floatatom 40 81 5 0 0 0 - - -;
 #X obj 82 217 route float symbol;
 #X obj 82 189 deny 17 cat dog 23;
-#X text 32 18 deny :: blocks 'denyed' floats or symbols;
+#N canvas 293 158 494 344 META 0;
+#X text 12 126 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 106 AUTHOR Olaf Matthes <olaf.matthes@gmx.de>;
+#X text 12 5 KEYWORDS control;
+#X text 12 45 DESCRIPTION blocks denied floats or symbols;
+#X text 12 66 INLET_0 symbol float;
+#X text 12 86 OUTLET_0 float symbol;
+#X restore 375 278 pd META;
+#X text 32 18 deny :: blocks denied floats or symbols;
 #X connect 1 0 6 0;
 #X connect 2 0 6 0;
 #X connect 3 0 6 0;

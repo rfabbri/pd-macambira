@@ -1,4 +1,4 @@
-#N canvas 271 238 519 310 12;
+#N canvas 0 26 519 345 12;
 #X obj 30 213 nchange f;
 #X obj 371 215 nchange l;
 #X msg 367 144 bla foo dog;
@@ -18,6 +18,17 @@
 #X text 12 15 nchange :: a 'new';
 #X text 22 77 The creation argument specifies whether nchange works
 for floats \, symbols or lists.;
+#N canvas 518 27 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 105 AUTHOR Olaf Matthes <olaf.matthes@gmx.de>;
+#X text 12 45 DESCRIPTION change for floats \, symbols \, and lists
+;
+#X text 12 5 KEYWORDS control anything_op symbol_op;
+#X text 12 65 INLET_0 anything;
+#X text 12 85 OUTLET_0 anything;
+#X restore 456 317 pd META;
 #X connect 0 0 14 0;
 #X connect 1 0 10 0;
 #X connect 2 0 1 0;

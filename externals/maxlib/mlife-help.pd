@@ -1,12 +1,12 @@
-#N canvas 309 47 454 459 12;
-#X floatatom 23 424 5 0 0;
-#X floatatom 39 397 5 0 0;
-#X floatatom 76 424 5 0 0;
-#X floatatom 93 397 5 0 0;
-#X floatatom 129 424 5 0 0;
-#X floatatom 147 397 5 0 0;
-#X floatatom 183 425 5 0 0;
-#X floatatom 200 398 5 0 0;
+#N canvas 0 26 454 483 12;
+#X floatatom 23 424 5 0 0 0 - - -;
+#X floatatom 39 397 5 0 0 0 - - -;
+#X floatatom 76 424 5 0 0 0 - - -;
+#X floatatom 93 397 5 0 0 0 - - -;
+#X floatatom 129 424 5 0 0 0 - - -;
+#X floatatom 147 397 5 0 0 0 - - -;
+#X floatatom 183 425 5 0 0 0 - - -;
+#X floatatom 200 398 5 0 0 0 - - -;
 #X msg 22 33 bang;
 #X msg 69 123 randfill;
 #X msg 84 150 fill 0;
@@ -36,6 +36,17 @@
 #X msg 149 285 seed 1 4;
 #X obj 23 356 mlife 8 1 8 0;
 #X text 44 5 mlife :: a cellular automata object;
+#N canvas 464 26 494 344 META 0;
+#X text 12 155 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 135 AUTHOR Olaf Matthes <olaf.matthes@gmx.de>;
+#X text 12 5 KEYWORDS control;
+#X text 12 45 DESCRIPTION a cellular automata object;
+#X text 12 65 INLET_0 bang float randfill fill lo hi nset randseed
+seed display;
+#X text 12 105 OUTLET_N float;
+#X restore 386 452 pd META;
 #X connect 8 0 35 0;
 #X connect 9 0 35 0;
 #X connect 10 0 35 0;

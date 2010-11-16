@@ -1,12 +1,12 @@
-#N canvas 294 98 628 562 12;
-#X floatatom 20 503 8 0 0;
+#N canvas 0 26 608 549 12;
+#X floatatom 20 503 8 0 0 0 - - -;
 #X obj 20 66 notein;
 #X obj 183 376 makenote 100 250;
-#X floatatom 41 477 5 0 0;
+#X floatatom 41 477 5 0 0 0 - - -;
 #X text 43 13 beat :: beat tracker;
 #X text 97 505 beats per minute;
 #X msg 71 224 reset;
-#X obj 183 219 tgl 20 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 183 219 tgl 20 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X msg 183 346 60;
 #X msg 53 108 print;
@@ -36,6 +36,19 @@ time of arrival of current event (R) and the expected time of arrival
 (E) of the next event;
 #X text 213 439 band percentage: creates a critical time band of a
 ;
+#N canvas 316 146 494 344 META 0;
+#X text 12 185 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 165 AUTHOR Olaf Matthes <olaf.matthes@gmx.de>;
+#X text 12 85 INLET_1 float;
+#X text 12 125 OUTLET_1 float;
+#X text 12 105 OUTLET_0 float;
+#X text 12 5 KEYWORDS control analysis;
+#X text 12 45 DESCRIPTION beat tracker;
+#X text 12 65 INLET_0 float reset print;
+#X text 12 145 OUTLET_2 bang;
+#X restore 545 518 pd META;
 #X connect 1 0 21 0;
 #X connect 1 1 21 1;
 #X connect 2 0 21 0;

@@ -1,4 +1,4 @@
-#N canvas 142 53 830 657 12;
+#N canvas 0 26 761 574 12;
 #X text 78 16 sync :: extended trigger object based;
 #X text 143 35 on sync from jMax;
 #X floatatom 18 485 5 0 0 0 - - -;
@@ -37,6 +37,21 @@ from the left must have been changed since the last triggering occured.
 a time can be triggering!;
 #X text 212 90 the easy way:;
 #X msg 228 299 trigger 1;
+#N canvas 415 162 494 344 META 0;
+#X text 12 210 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 190 AUTHOR Olaf Matthes <olaf.matthes@gmx.de>;
+#X text 12 150 OUTLET_1 float;
+#X text 12 5 KEYWORDS control;
+#X text 12 45 DESCRIPTION extended trigger object based on sync from
+jMax;
+#X text 12 70 INLET_0 mode trigger float require;
+#X text 12 90 INLET_1 float;
+#X text 12 110 INLET_2 float;
+#X text 12 130 OUTLET_0 float;
+#X text 12 170 OUTLET_2 float;
+#X restore 699 546 pd META;
 #X connect 5 0 17 0;
 #X connect 6 0 17 1;
 #X connect 7 0 17 2;
