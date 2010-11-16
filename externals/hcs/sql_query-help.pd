@@ -1,8 +1,8 @@
-#N canvas 238 82 613 618 10;
-#X obj 362 244 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 4800 1;
-#X floatatom 420 276 5 0 0 0 - - -;
-#X text 395 223 age;
+#N canvas 0 26 562 464 10;
+#X obj 342 184 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X floatatom 400 216 5 0 0 0 - - -;
+#X text 375 163 age;
 #N canvas 402 387 450 300 sql 0;
 #X obj 73 37 inlet;
 #X obj 259 37 inlet;
@@ -12,28 +12,40 @@
 #X obj 61 82 print HOT;
 #X connect 0 0 5 0;
 #X connect 1 0 4 0;
-#X restore 267 428 pd sql;
-#X obj 223 495 print RESULTS;
-#X obj 349 496 print STATUS;
-#X obj 325 452 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+#X restore 247 368 pd sql;
+#X obj 203 435 print RESULTS;
+#X obj 329 436 print STATUS;
+#X obj 305 392 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
-#X text 347 453 bang when done;
-#X msg 120 232 Chinua;
-#X msg 80 233 Mary;
-#X msg 172 231 symbol Ang;
-#X obj 119 322 sql_query insert into table (name \, age) values (?
-\, ?);
-#X obj 118 105 sql_query this is a test? more ? ? ? ?;
-#X msg 39 235 bang;
-#X msg 177 268 234;
-#X msg 480 275 symbol twenty;
-#X msg 116 76 fred;
-#X msg 174 77 one;
-#X msg 234 78 2;
-#X msg 287 78 3;
-#X msg 345 78 4;
-#X obj 117 155 pddp/print;
-#X obj 344 131 pddp/print;
+#X text 327 393 bang when done;
+#X msg 100 172 Chinua;
+#X msg 60 173 Mary;
+#X msg 152 171 symbol Ang;
+#X obj 99 262 sql_query insert into table (name \, age) values (? \,
+?);
+#X obj 98 45 sql_query this is a test? more ? ? ? ?;
+#X msg 19 175 bang;
+#X msg 157 208 234;
+#X msg 460 215 symbol twenty;
+#X msg 98 16 fred;
+#X msg 154 17 one;
+#X msg 210 18 2;
+#X msg 266 18 3;
+#X msg 323 18 4;
+#X obj 98 95 pddp/print;
+#X obj 323 71 pddp/print;
+#N canvas 453 163 494 344 META 0;
+#X text 12 165 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 145 AUTHOR Hans-Christoph Steiner;
+#X text 12 45 DESCRIPTION;
+#X text 12 85 INLET_1;
+#X text 12 105 OUTLET_0;
+#X text 12 125 OUTLET_1;
+#X text 12 65 INLET_0;
+#X text 12 5 KEYWORDS control needs_work (xlets&description);
+#X restore 513 443 pd META;
 #X connect 0 0 11 1;
 #X connect 1 0 11 1;
 #X connect 3 0 4 0;

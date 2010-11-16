@@ -1,4 +1,4 @@
-#N canvas 240 53 501 567 10;
+#N canvas 0 31 501 567 10;
 #X msg 208 411 0;
 #X msg 157 412 1;
 #X text 281 361 duty cycle;

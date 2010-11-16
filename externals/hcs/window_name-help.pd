@@ -1,10 +1,10 @@
-#N canvas 78 51 576 362 10;
+#N canvas 0 26 576 352 10;
 #X obj 124 207 sys_gui;
 #X symbolatom 239 101 0 0 0 0 - - -;
 #X obj 223 32 loadbang;
 #X obj 124 148 pack float symbol;
 #X obj 59 88 hsl 128 15 0.1 1 1 1 empty empty window_alpha -2 -8 0
-10 -204800 -1 -1 12700 1;
+10 -204800 -1 -1 200 1;
 #X floatatom 56 123 5 0 0 0 - - -;
 #X msg 124 177 wm attributes \$2 -alpha \$1;
 #X text 210 274 for more options:;
@@ -96,7 +96,7 @@
 #X connect 17 0 5 0;
 #X connect 20 0 0 0;
 #X restore 60 297 pd Windows tricks;
-#N canvas 809 137 450 300 get 0;
+#N canvas 574 137 450 300 get 0;
 #X symbolatom 42 235 0 0 0 0 - - -;
 #X obj 42 191 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
@@ -185,9 +185,19 @@ canvas_name:;
 #X obj 474 177 window_name;
 #X obj 375 197 pack float symbol;
 #X obj 474 157 loadbang;
-#X obj 375 155 tgl 30 0 empty empty empty 17 7 0 10 -204786 -1 -1 1
+#X obj 375 155 tgl 30 0 empty empty empty 17 7 0 10 -204786 -1 -1 0
 1;
 #X msg 375 222 wm resizable \$2 \$1 \$1;
+#N canvas 398 189 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 105 AUTHOR Hans-Christoph Steiner;
+#X text 12 5 KEYWORDS control canvas_op;
+#X text 12 45 DESCRIPTION get the name of a window;
+#X text 12 65 INLET_0 bang;
+#X text 12 85 OUTLET_0 symbol;
+#X restore 525 330 pd META;
 #X connect 2 0 10 0;
 #X connect 3 0 6 0;
 #X connect 4 0 3 0;

@@ -1,4 +1,4 @@
-#N canvas 47 122 547 395 10;
+#N canvas 0 26 517 370 10;
 #X obj 98 40 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
 #X floatatom 95 63 5 0 0 0 User_ID - -;
@@ -15,7 +15,7 @@
 #X symbolatom 88 317 0 0 0 3 password - -;
 #X floatatom 184 317 0 0 0 3 uid - -;
 #X floatatom 215 317 0 0 0 3 gid - -;
-#X symbolatom 248 317 0 0 0 3 gecos - -;
+#X symbolatom 264 317 0 0 0 3 gecos - -;
 #X symbolatom 335 282 0 0 0 3 home_folder - -;
 #X symbolatom 395 250 0 0 0 3 shell - -;
 #X msg 269 105 symbol trash;
@@ -27,6 +27,19 @@
 -1;
 #X obj 76 224 unpack symbol symbol float float symbol symbol symbol
 ;
+#N canvas 280 175 494 344 META 0;
+#X text 12 165 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 145 AUTHOR Hans-Christoph Steiner;
+#X text 12 5 KEYWORDS control filesystem;
+#X text 12 45 DESCRIPTION fetch passwd data based on UID or username
+;
+#X text 12 65 INLET_0 float bang;
+#X text 12 85 INLET_1 float;
+#X text 12 105 OUTLET_0 anything;
+#X text 12 125 OUTLET_1 bang;
+#X restore 468 349 pd META;
 #X connect 0 0 1 0;
 #X connect 1 0 7 0;
 #X connect 3 0 7 1;

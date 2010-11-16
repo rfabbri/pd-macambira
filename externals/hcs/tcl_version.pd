@@ -1,4 +1,4 @@
-#N canvas 512 371 345 212 10;
+#N canvas 0 31 345 212 10;
 #X msg 96 69 query concat [info patchlevel];
 #X obj 96 103 toxy/tot .;
 #X obj 96 126 zexy/symbol2list .;

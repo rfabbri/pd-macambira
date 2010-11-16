@@ -1,4 +1,4 @@
-#N canvas 619 362 462 310 10;
+#N canvas 0 31 462 310 10;
 #X obj 93 84 zexy/date -----------;
 #X obj 93 31 inlet;
 #X obj 93 58 bang;

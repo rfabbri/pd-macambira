@@ -1,4 +1,4 @@
-#N canvas 536 89 539 485 10;
+#N canvas 0 26 546 485 10;
 #X msg 19 73 bang;
 #X msg 27 355 bang;
 #X obj 64 300 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -37,6 +37,18 @@ cmd.exe rules.;
 the folder of the current patch \, i.e. "/path/to/current/patch/*".
 ;
 #X msg 97 173 symbol *.pd;
+#N canvas 280 175 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 125 AUTHOR Hans-Christoph Steiner;
+#X text 12 5 KEYWORDS control filesystem;
+#X text 12 45 DESCRIPTION get listing of files based on wildcard pattern
+;
+#X text 12 65 INLET_0 bang symbol;
+#X text 12 85 INLET_1 symbol;
+#X text 12 105 OUTLET_0 symbol;
+#X restore 498 465 pd META;
 #X connect 0 0 8 0;
 #X connect 1 0 7 0;
 #X connect 4 0 8 1;

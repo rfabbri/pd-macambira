@@ -1,4 +1,4 @@
-#N canvas 256 153 461 330 10;
+#N canvas 0 26 474 344 10;
 #X obj 5 2 cnv 15 450 20 empty empty blocksize_in_ms 2 11 1 18 -233017
 -66577 0;
 #X msg 422 3 pddp;
@@ -12,5 +12,15 @@
 #X text 18 36 Output the current blocksize in ms rather than samples.
 This is currently set at a fixed blocksize of 64 \, but it will change
 dynamically in the future.;
+#N canvas 484 26 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 105 AUTHOR Hans-Christoph Steiner;
+#X text 12 45 DESCRIPTION output current blocksize in ms;
+#X text 12 65 INLET_0 bang;
+#X text 12 85 OUTLET_0 float;
+#X text 12 5 KEYWORDS control conversion abstraction;
+#X restore 412 310 pd META;
 #X connect 4 0 7 0;
 #X connect 5 0 4 0;

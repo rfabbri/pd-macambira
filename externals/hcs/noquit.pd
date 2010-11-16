@@ -1,4 +1,4 @@
-#N canvas 377 277 497 454 10;
+#N canvas 0 31 497 454 10;
 #X obj 85 49 inlet;
 #X obj 86 75 route bang float;
 #X text 38 12 this disables/enables the menu_quit proc in the GUI to

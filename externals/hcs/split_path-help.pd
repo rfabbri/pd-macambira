@@ -1,4 +1,4 @@
-#N canvas 0 22 479 355 10;
+#N canvas 0 26 430 344 10;
 #X obj 111 221 split_path;
 #X symbolatom 111 281 0 0 0 3 path - -;
 #X symbolatom 175 245 0 0 0 3 filename - -;
@@ -15,6 +15,17 @@
 #X msg 118 78 symbol no-trailing-slash;
 #X msg 146 131 symbol ../another/relative/path/to/file.pd;
 #X msg 154 179 symbol /path/with/trailing/slash/;
+#N canvas 280 175 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 125 AUTHOR Hans-Christoph Steiner;
+#X text 12 5 KEYWORDS control symbol_op;
+#X text 12 45 DESCRIPTION split a path from a file name;
+#X text 12 65 INLET_0 symbol;
+#X text 12 85 OUTLET_0 symbol;
+#X text 12 105 OUTLET_1 symbol;
+#X restore 380 324 pd META;
 #X connect 0 0 1 0;
 #X connect 0 0 4 0;
 #X connect 0 1 2 0;

@@ -1,4 +1,4 @@
-#N canvas 361 286 450 300 10;
+#N canvas 0 31 450 300 10;
 #X obj 143 88 receive pd;
 #X obj 143 111 route audio-dialog;
 #X obj 122 161 list;
