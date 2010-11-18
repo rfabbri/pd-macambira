@@ -12,6 +12,7 @@ Package: pd-template
 Architecture: any
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends},
-          pd-libdir
+         pd-libdir,
+         ${misc:Depends}
+Recommends: pd-import
 Description: 
