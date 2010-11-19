@@ -1,34 +1,34 @@
 #N canvas 228 173 595 379 10;
-#X text 212 227 frame;
+#X text 165 227 frame;
 #X text 71 265 audio out;
-#X text 25 20 Plays a sound file til it ends \, synced up to the frame
-clock. Should stay in sync when randomly accessing different frame
-numbers.;
 #X text 96 216 array;
 #X text 96 227 name;
-#X text 211 216 start;
-#X obj 377 279 soundfiler;
-#X obj 377 232 symbol \$0-array;
+#X text 164 216 start;
+#X obj 357 279 soundfiler;
+#X obj 357 232 symbol \$0-array;
 #N canvas 0 22 450 300 (subpatch) 0;
 #X array \$0-array 20756 float 2;
 #X coords 0 1 20756 -1 200 140 1;
-#X restore 376 50 graph;
+#X restore 376 38 graph;
 #X obj 94 113 frameclock 400;
 #X obj 76 322 output~;
 #X msg 108 82 78;
 #X msg 77 82 55;
 #X text 134 80 <-- try jumping to a frame;
-#X obj 377 211 loadbang;
-#X obj 436 214 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
+#X obj 357 211 loadbang;
 #X obj 95 243 tabstretcher~ \$0-array 10 44;
-#X msg 377 254 read ../../sound/voice.wav \$1;
 #X text 176 316 arguments: arrayname startframe# endframe#;
-#X connect 7 0 17 0;
-#X connect 11 0 9 0;
-#X connect 12 0 9 0;
-#X connect 14 0 7 0;
-#X connect 15 0 7 0;
-#X connect 16 0 10 0;
-#X connect 16 0 10 1;
-#X connect 17 0 6 0;
+#X msg 357 254 read -resize ../../sound/voice.wav \$1;
+#X text 246 227 frame;
+#X text 252 216 end;
+#X text 5 20 Plays a complete sound file til it ends \, synced up to
+the frame clock. The sound is stretched or shrunk based on the end
+frame number. It stays in sync when randomly accessing different frame
+numbers.;
+#X connect 6 0 16 0;
+#X connect 10 0 8 0;
+#X connect 11 0 8 0;
+#X connect 13 0 6 0;
+#X connect 14 0 9 0;
+#X connect 14 0 9 1;
+#X connect 16 0 5 0;
