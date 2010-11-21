@@ -364,7 +364,7 @@ ifeq ($(OS_NAME),windows)
 endif
 	echo "<h3>Installing Externals, Objects, and Help files</h3>" >> $(README_FILE)
 	echo "<p>" >> $(README_FILE)
-	echo "If you would like to install other externals, objects, help files, etc. there are special folders that Pd-extended uses, which are listed below.  If the folder does not exist, you should create it.  You can find out more details about this by reading that FAQ:  <a href=\"http://puredata.info/docs/faq/how-do-i-install-externals-and-help-files-with-pd-extended\" target=\"_blank\">How do I install externals and help files?</a>." >> $(README_FILE)
+	echo "If you would like to install other externals, objects, help files, etc. there are special folders that Pd-extended uses, which are listed below.  If the folder does not exist, you should create it.  You can find out more details about this by reading that FAQ:  <a href=\"http://puredata.info/docs/faq/how-do-i-install-externals-and-help-files\" target=\"_blank\">How do I install externals and help files?</a>." >> $(README_FILE)
 	echo "<dl>" >> $(README_FILE)
 ifeq ($(OS_NAME),darwin)
 	echo "<dt>Only for the current user account</dt>" >> $(README_FILE)
