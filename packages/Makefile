@@ -651,25 +651,19 @@ unpatch_pd_devel:
 abstractions_clean:
 	-$(MAKE) -C $(abstractions_src) $(DEST_PATHS) clean
 
-
 doc_clean:
-
 
 externals_clean:
 	-$(MAKE) -C $(externals_src) $(DEST_PATHS) clean
 
-
 gem_clean:
 	-$(MAKE) -C $(gem_src)/src clean
 
-
 pd_clean:
-	-$(MAKE) $(pd_src)/src $(DEST_PATHS) clean
-
+	-$(MAKE) -C $(pd_src)/src $(DEST_PATHS) clean
 
 # these targets are all from Makefile.buildlayout: install_clean cruft_clean
-clean: abstractions_clean doc_clean externals_clean gem_clean \
-pd_clean 
+clean: abstractions_clean doc_clean externals_clean gem_clean pd_clean 
 	echo "Complete clean finished."
 
 
