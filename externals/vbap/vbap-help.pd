@@ -1,4 +1,4 @@
-#N canvas 126 22 818 496 10;
+#N canvas 260 22 824 533 10;
 #X floatatom 149 218 5 0 0 2 - - -;
 #X floatatom 187 237 5 0 0 2 - - -;
 #X msg 115 163 bang;
@@ -47,7 +47,7 @@ and elevation. Here we have speakers front left and right with no elevation
 ;
 #X obj 543 440 cyclone/matrix~ 1 4 1;
 #X obj 83 185 metro 100;
-#X obj 83 163 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 83 163 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #N canvas 283 22 628 620 simple 0;
 #X floatatom 159 198 5 0 0 2 - - -;
@@ -63,7 +63,7 @@ and elevation. Here we have speakers front left and right with no elevation
 -1 -1 700 1;
 #X text 130 134 to output updated values;
 #X obj 112 155 metro 100;
-#X obj 112 133 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 112 133 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X text 197 200 (ignore elevation in 2D \, that's for 3D);
 #X obj 63 524 *~;
@@ -122,6 +122,9 @@ front). This is a classic 5.1 setup.;
 #X text 337 238 (0-100);
 #X text 297 217 (0-360);
 #X text 257 199 (0-360);
+#X text 21 490 Vector Base Amplitude Panning;
+#X text 241 489 (C) 1998-2003 \, 2006 Ville Pulkki;
+#X text 476 487 1.0.3 - 11 Mar 2006;
 #X connect 0 0 25 1;
 #X connect 1 0 25 2;
 #X connect 2 0 25 0;
