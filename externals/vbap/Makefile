@@ -12,7 +12,7 @@ SOURCES = vbap.c rvbap.c define_loudspeakers.c
 PDOBJECTS = 
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = graph-to-aziele.pd high.pd playsample~.pd recent.pd vbap-demo.pd vbap-level-config.pd vbapmodule.pd
+EXAMPLES = graph-to-aziele.pd high.pd playsample~.pd recent.pd vbap-demo.pd vbap-level-config.pd vbapmodule.pd vbapsnd.pd rvbap-demo.pd vbap.main.pd
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
@@ -21,7 +21,7 @@ MANUAL =
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = makefile.irix define_loudspeakers.h max2pd.h vbap.h
+EXTRA_DIST = define_loudspeakers.h max2pd.h vbap.h makefile.irix so_locations
 
 
 
