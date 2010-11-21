@@ -7,7 +7,7 @@ Unversity of California at Berkeley
 and written by Olaf Matthes 2003, 2007
 Pd port by Frank Barknecht
 
-See copyright in file with name COPYRIGHT  */
+See copyright in file with name LICENSE.txt  */
 
 
 #include <math.h>

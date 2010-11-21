@@ -5,7 +5,7 @@ Helsinki University of Technology
 and 
 Unversity of California at Berkeley
 
-See copyright in file with name COPYRIGHT  */
+See copyright in file with name LICENSE.txt  */
 
 #include "vbap.h"
 

@@ -1729,35 +1729,16 @@ unauthorized_clean:
 	-rm -f -- $(externals_src)/*.*~
 
 
-
 #------------------------------------------------------------------------------#
 # VBAP
-VBAP_NAME=vbap
-VBAP_OBJECTS := $(wildcard $(externals_src)/vbap/*.c)
-vbap: $(VBAP_OBJECTS:.c=.$(EXTENSION))
+vbap:
+	make -C $(externals_src)/vbap PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
 
-vbap_install: vbap
-	install -d $(DESTDIR)$(objectsdir)/$(VBAP_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(VBAP_NAME) \
-		--author "Ville Pulkki" \
-		--description "Vector Based Amplitude Panning" \
-		--version ""
-	install -p $(VBAP_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(VBAP_NAME)
-	install -p $(shell ls -1 $(externals_src)/vbap/*.pd | grep -v '-help.pd') \
-		 $(DESTDIR)$(objectsdir)/$(VBAP_NAME)
-	install -p $(externals_src)/vbap/*-help.pd $(DESTDIR)$(objectsdir)/$(VBAP_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(VBAP_NAME)
-#	install -p $(externals_src)/vbap/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(VBAP_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(VBAP_NAME)
-	install -p $(externals_src)/vbap/*-demo.pd \
-		$(DESTDIR)$(examplesdir)/$(VBAP_NAME)
+vbap_install:
+	make -C $(externals_src)/vbap DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 vbap_clean:
-	-rm -f -- $(VBAP_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(VBAP_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/vbap/*.bak
-	-rm -f -- $(externals_src)/vbap/*.*~
+	make -C $(externals_src)/vbap clean
 
 
 #------------------------------------------------------------------------------#

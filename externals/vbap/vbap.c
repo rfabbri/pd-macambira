@@ -1,11 +1,11 @@
-/* vbap.c vers 1.00b1 for ------  > xmax4.2
+/* vbap.c 
 
 written by Ville Pulkki 1999-2003
 Helsinki University of Technology 
 and 
 University of California at Berkeley 
 
-See copyright in file with name COPYRIGHT  */
+See copyright in file with name LICENSE.txt  */
 
 // Indicate that we are within VBAP object (specific to include define_loudspeakers content within vbap)
 #define VBAP_OBJECT
