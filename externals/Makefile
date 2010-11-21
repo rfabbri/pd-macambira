@@ -290,7 +290,7 @@ aka.wiiremote_clean:
 #------------------------------------------------------------------------------#
 # APPLE
 apple:
-	make -C $(externals_src)/apple PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/apple PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 apple_install:
 	make -C $(externals_src)/apple DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -302,7 +302,7 @@ apple_clean:
 #------------------------------------------------------------------------------#
 # ARRAYSIZE
 arraysize:
-	make -C $(externals_src)/arraysize PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/arraysize PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 arraysize_install:
 	make -C $(externals_src)/arraysize DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -314,7 +314,7 @@ arraysize_clean:
 #------------------------------------------------------------------------------#
 # BASSEMU
 bassemu:
-	make -C $(externals_src)/bassemu~ PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/bassemu~ PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 bassemu_install:
 	make -C $(externals_src)/bassemu~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -360,7 +360,7 @@ boids_clean:
 #------------------------------------------------------------------------------#
 # BSAYLOR
 bsaylor:
-	make -C $(externals_src)/bsaylor PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/bsaylor PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 bsaylor_install:
 	make -C $(externals_src)/bsaylor \
@@ -373,7 +373,7 @@ bsaylor_clean:
 #------------------------------------------------------------------------------#
 # COMPORT
 comport:
-	make -C $(externals_src)/iem/comport/comport PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/iem/comport/comport PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 comport_install:
 	make -C $(externals_src)/iem/comport/comport \
@@ -420,7 +420,7 @@ creb_clean:
 #------------------------------------------------------------------------------#
 # CXC
 cxc:
-	make -C $(externals_src)/cxc PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/cxc PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 cxc_install:
 	make -C $(externals_src)/cxc DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -433,7 +433,7 @@ cxc_clean:
 # CYCLONE
 cyclone:
 	make -C $(externals_src)/miXed/cyclone -f Makefile.libdir \
-		PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+		PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 cyclone_install:
 	make -C $(externals_src)/miXed/cyclone -f Makefile.libdir \
@@ -448,7 +448,7 @@ cyclone_clean:
 #------------------------------------------------------------------------------#
 # EKEXT
 ekext:
-	make -C $(externals_src)/ekext PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/ekext PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 ekext_install:
 	make -C $(externals_src)/ekext DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -460,7 +460,7 @@ ekext_clean:
 #------------------------------------------------------------------------------#
 # EXT13
 ext13:
-	make -C $(externals_src)/ext13 PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/ext13 PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 ext13_install:
 	make -C $(externals_src)/ext13 DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -575,7 +575,7 @@ frankenstein_clean:
 #------------------------------------------------------------------------------#
 # FREEVERB
 freeverb:
-	make -C $(externals_src)/freeverb~ PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/freeverb~ PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 freeverb_install:
 	make -C $(externals_src)/freeverb~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -633,7 +633,7 @@ gem2pdp_clean:
 #------------------------------------------------------------------------------#
 # GGEE
 ggee:
-	make -C $(externals_src)/ggee PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/ggee PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 ggee_install:
 	make -C $(externals_src)/ggee DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -645,7 +645,7 @@ ggee_clean:
 #------------------------------------------------------------------------------#
 # HCS
 hcs:
-	make -C $(externals_src)/hcs PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/hcs PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 hcs_install:
 	make -C $(externals_src)/hcs DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1047,7 +1047,7 @@ loaders_clean:
 #------------------------------------------------------------------------------#
 # LIBDIR (RENAMED loaders-libdir TO AVOID POTENTIAL CONFLICTS)
 loaders-libdir:
-	make -C $(externals_src)/loaders/libdir PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/loaders/libdir PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 loaders-libdir_install:
 	make -C $(externals_src)/loaders/libdir DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1058,7 +1058,7 @@ loaders-libdir_clean:
 #------------------------------------------------------------------------------#
 # MAPPING
 mapping:
-	make -C $(externals_src)/mapping PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/mapping PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 mapping_install:
 	make -C $(externals_src)/mapping DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1069,7 +1069,7 @@ mapping_clean:
 #------------------------------------------------------------------------------#
 # MARKEX
 markex:
-	make -C $(externals_src)/markex PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/markex PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 markex_install:
 	make -C $(externals_src)/markex DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1080,7 +1080,7 @@ markex_clean:
 #------------------------------------------------------------------------------#
 # MAXLIB
 maxlib:
-	make -C $(externals_src)/maxlib PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/maxlib PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 maxlib_install:
 	make -C $(externals_src)/maxlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1092,7 +1092,7 @@ maxlib_clean:
 #------------------------------------------------------------------------------#
 # MJLIB
 mjlib:
-	make -C $(externals_src)/mjlib PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/mjlib PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 mjlib_install:
 	make -C $(externals_src)/mjlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1161,7 +1161,7 @@ moocow_clean:
 #------------------------------------------------------------------------------#
 # MOONLIB
 moonlib:
-	make -C $(externals_src)/moonlib PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/moonlib PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 moonlib_install:
 	make -C $(externals_src)/moonlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1174,7 +1174,7 @@ moonlib_clean:
 #------------------------------------------------------------------------------#
 # MOTEX
 motex:
-	make -C $(externals_src)/motex PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/motex PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 motex_install:
 	make -C $(externals_src)/motex DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1268,7 +1268,7 @@ oscx_clean:
 #------------------------------------------------------------------------------#
 # PAN
 pan:
-	make -C $(externals_src)/pan PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/pan PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 pan_install:
 	make -C $(externals_src)/pan DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1280,7 +1280,7 @@ pan_clean:
 #------------------------------------------------------------------------------#
 # PDDP
 pddp:
-	make -C $(externals_src)/pddp PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/pddp PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 pddp_install:
 	make -C $(externals_src)/pddp DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1320,7 +1320,7 @@ pdlua_clean:
 #------------------------------------------------------------------------------#
 # PDOGG
 pdogg:
-	make -C $(externals_src)/pdogg PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/pdogg PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 pdogg_install:
 	make -C $(externals_src)/pdogg DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1428,7 +1428,7 @@ pdp_opengl_clean:
 #------------------------------------------------------------------------------#
 # PDVJTOOLS
 pdvjtools:
-	make -C $(externals_src)/pdvjtools PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/pdvjtools PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 pdvjtools_install:
 	make -C $(externals_src)/pdvjtools DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1491,7 +1491,7 @@ pidip_clean:
 #------------------------------------------------------------------------------#
 # PLUGIN
 plugin:
-	make -C $(externals_src)/plugin~ PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/plugin~ PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 plugin_install:
 	make -C $(externals_src)/plugin~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1503,7 +1503,7 @@ plugin_clean:
 #------------------------------------------------------------------------------#
 # PMPD
 pmpd:
-	make -C $(externals_src)/pmpd PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/pmpd PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 pmpd_install:
 	make -C $(externals_src)/pmpd DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1551,7 +1551,7 @@ postlude_clean:
 #------------------------------------------------------------------------------#
 # SIGPACK
 sigpack:
-	make -C $(externals_src)/sigpack PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/sigpack PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 sigpack_install:
 	make -C $(externals_src)/sigpack DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1564,7 +1564,7 @@ sigpack_clean:
 #------------------------------------------------------------------------------#
 # SMLIB
 smlib:
-	make -C $(externals_src)/smlib PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/smlib PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 smlib_install:
 	make -C $(externals_src)/smlib DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1603,7 +1603,7 @@ tclpd_clean:
 #------------------------------------------------------------------------------#
 # TKWIDGETS
 tkwidgets:
-	make -C $(externals_src)/tkwidgets PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/tkwidgets PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 tkwidgets_install:
 	make -C $(externals_src)/tkwidgets \
@@ -1732,7 +1732,7 @@ unauthorized_clean:
 #------------------------------------------------------------------------------#
 # VBAP
 vbap:
-	make -C $(externals_src)/vbap PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/vbap PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 vbap_install:
 	make -C $(externals_src)/vbap DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1744,7 +1744,7 @@ vbap_clean:
 #------------------------------------------------------------------------------#
 # VANILLA
 vanilla:
-	make -C $(externals_src)/vanilla PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/vanilla PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 vanilla_install:
 	make -C $(externals_src)/vanilla DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -1756,7 +1756,7 @@ vanilla_clean:
 #------------------------------------------------------------------------------#
 # WINDOWING
 windowing:
-	make -C $(externals_src)/windowing PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/windowing PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 windowing_install:
 	make -C $(externals_src)/windowing DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
@@ -2242,7 +2242,7 @@ iemxmlrpc_clean:
 #------------------------------------------------------------------------------#
 # EARPLUG
 earplug:
-	make -C $(externals_src)/earplug~ PD_PATH=$(pd_src) PD_INCLUDE=$(pd_src)/src
+	make -C $(externals_src)/earplug~ PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 earplug_install:
 	make -C $(externals_src)/earplug~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
