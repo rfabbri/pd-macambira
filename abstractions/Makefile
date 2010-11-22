@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = controctopus jmmmp keyboardkeys la-kitchen list-abs memento nqpoly nsend parazit pixeltango purepd rradical rtc-lib timestretch memento-p sfruit pd-wavelet 
+LIB_TARGETS = controctopus jmmmp keyboardkeys la-kitchen list-abs memento nsend parazit pixeltango purepd rradical rtc-lib timestretch memento-p sfruit pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -74,21 +74,6 @@ ds-abs_install:
 		--license "GNU GPL" \
 		--version "a comprehensive collection of objects for working with data structures" 
 
-#-------------------------------------------------------------------------------
-# GYRE
-GYRE_NAME = gyre
-gyre_install:
-	install -d $(DESTDIR)$(objectsdir)/$(GYRE_NAME)
-	install -p $(abstractions_src)/audionerd/GYRE/gyre.*.pd \
-		 $(DESTDIR)$(objectsdir)/$(GYRE_NAME)
-	install -d $(DESTDIR)$(manualsdir)/$(GYRE_NAME)
-	install -p $(abstractions_src)/audionerd/GYRE/gyre.html \
-		 $(DESTDIR)$(manualsdir)/$(GYRE_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(GYRE_NAME)
-	install -p $(abstractions_src)/audionerd/GYRE/gyre.pd \
-		 $(DESTDIR)$(examplesdir)/$(GYRE_NAME)
-
-
 #------------------------------------------------------------------------------#
 # JMMMP
 jmmmp:
@@ -99,23 +84,6 @@ jmmmp_install:
 
 jmmmp_clean:
 	make -C $(abstractions_src)/jmmmp clean
-
-
-#-------------------------------------------------------------------------------
-# keyboardkeys
-KEYBOARDKEYS_NAME = keyboardkeys
-keyboardkeys_install:
-	install -d $(DESTDIR)$(objectsdir)/$(KEYBOARDKEYS_NAME)
-	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/abs/*.pd \
-		 $(DESTDIR)$(objectsdir)/$(KEYBOARDKEYS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(KEYBOARDKEYS_NAME) \
-		--author "Andrey Savitsky" \
-		--description "objects for using keyboard keys for scrolling and selecting"
-	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/doc/*-help.pd \
-		 $(DESTDIR)$(objectsdir)/$(KEYBOARDKEYS_NAME)
-	install -d $(DESTDIR)$(objectsdir)/$(KEYBOARDKEYS_NAME)/examples
-	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/keyboard_main.pd \
-		 $(DESTDIR)$(objectsdir)/$(KEYBOARDKEYS_NAME)/examples
 
 
 #------------------------------------------------------------------------------#
@@ -186,39 +154,6 @@ memento-p_install:
 		--description "an addon for Frank Barknecht's Memento adding local-state saving and support for Controctopus (a controller lib)"
 
 #-------------------------------------------------------------------------------
-# nqpoly
-nqpoly_install: nqpoly_install~ nqpoly_install4
-
-
-NQPOLY_NAME = nqpoly~
-nqpoly_install~:
-	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)
-	install -p $(abstractions_src)/nqpoly/nqpoly~/*.pd \
-		$(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)
-	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)/examples
-	install -p $(abstractions_src)/nqpoly/nqpoly~/*.pd \
-		$(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)
-	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)/manual
-	install -p $(abstractions_src)/nqpoly/nqpoly~/readme.txt	\
-		$(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)/manual
-	install -p $(abstractions_src)/nqpoly/*.html \
-		$(DESTDIR)$(objectsdir)/$(NQPOLY_NAME)/manual
-
-
-NQPOLY4_NAME = nqpoly4
-nqpoly_install4:
-	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)
-	install -p $(abstractions_src)/nqpoly/nqpoly4/*.pd \
-		$(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)
-	install -p $(abstractions_src)/nqpoly/*/*-help.pd $(DESTDIR)$(helpdir)
-	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)/examples
-	install -p $(abstractions_src)/nqpoly/nqpoly4/*.pd \
-		$(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)/examples
-	install -d $(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)/manual
-	install -p $(abstractions_src)/nqpoly/*.html \
-		$(DESTDIR)$(objectsdir)/$(NQPOLY4_NAME)/manual
-
-#-------------------------------------------------------------------------------
 # nsend
 NSEND_NAME = nsend
 nsend_install:
@@ -229,7 +164,6 @@ nsend_install:
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
 		--description "multiple-inlet/outlet send and receive"
-
 
 #-------------------------------------------------------------------------------
 # parazit
@@ -394,28 +328,6 @@ rtc-lib_install:
 	install -p $(abstractions_src)/footils/rtc-lib/rtc/rtc-help/*.pd \
 		$(DESTDIR)$(objectsdir)/$(RTC-LIB_NAME)/examples
 
-
-#-------------------------------------------------------------------------------
-# PUREMEASUREMENT
-PUREMEASURE_NAME = puremeasurement
-puremeasurement_install:
-	install -d $(DESTDIR)$(objectsdir)/$(PUREMEASURE_NAME)
-	install -p $(abstractions_src)/puremeasurement/applications/*.pd $(DESTDIR)$(objectsdir)/$(PUREMEASURE_NAME)
-	install -p $(abstractions_src)/puremeasurement/tools/*.pd $(DESTDIR)$(objectsdir)/$(PUREMEASURE_NAME)
-	install -p $(abstractions_src)/puremeasurement/testsig/*.wav $(DESTDIR)$(objectsdir)/$(PUREMEASURE_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PUREMEASURE_NAME) \
-		--author "Matthias Blau" \
-		--description "patches for acoustical measurements" \
-		--license "GNU GPL v2" \
-		--version "v28II06"
-	install -d $(DESTDIR)$(examplesdir)/$(PUREMEASURE_NAME)
-	install -p $(abstractions_src)/puremeasurement/applications/*.pd \
-		 $(DESTDIR)$(examplesdir)/$(PUREMEASURE_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(abstractions_src)/puremeasurement/readme \
-		$(DESTDIR)$(readmesdir)/$(PUREMEASURE_NAME).txt
-
-
 #-------------------------------------------------------------------------------
 # sfruit
 SFRUIT_NAME = sfruit
@@ -446,31 +358,6 @@ timestretch_install:
 #	install -p $(abstractions_src)/timestretch/README \
 #		$(DESTDIR)$(readmesdir)/$(TIMESTRETCH_NAME).txt
 
-
-#-------------------------------------------------------------------------------
-# SSSAD
-SSSAD_NAME = sssad
-sssad_install:
-	install -d $(DESTDIR)$(objectsdir)/$(SSSAD_NAME)
-	install -d $(DESTDIR)$(objectsdir)/$(SSSAD_NAME)/_sssad
-	install -p $(abstractions_src)/footils/sssad/*.pd $(DESTDIR)$(objectsdir)/$(SSSAD_NAME)
-	install -p $(abstractions_src)/footils/sssad/_sssad/*.pd $(DESTDIR)$(objectsdir)/$(SSSAD_NAME)/_sssad
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(SSSAD_NAME) \
-		--author "Frank Barknecht" \
-		--description "Stupid-super-simplistic State-saving for PD" \
-		--license "same as Pd's license" \
-		--version "" 
-	install -d $(DESTDIR)$(helpdir)/$(SSSAD_NAME)
-	install -p $(abstractions_src)/footils/sssad/*-help.pd \
-		 $(DESTDIR)$(helpdir)/$(SSSAD_NAME)
-	install -p $(abstractions_src)/footils/sssad/_sssad/*-help.pd \
-		 $(DESTDIR)$(helpdir)/$(SSSAD_NAME)
-	install -d $(DESTDIR)$(examplesdir)/$(SSSAD_NAME)
-	install -p $(abstractions_src)/footils/sssad/sssad-example.pd \
-		 $(DESTDIR)$(examplesdir)/$(SSSAD_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(abstractions_src)/footils/sssad/README.txt \
-		$(DESTDIR)$(readmesdir)/$(SSSAD_NAME).txt
 
 
 #-------------------------------------------------------------------------------
