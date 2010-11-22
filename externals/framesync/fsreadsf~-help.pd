@@ -14,12 +14,11 @@ numbers.;
 #X obj 95 243 fsreadsf~ examples/sdf.wav 40;
 #X text 177 328 arguments: soundfile startframe#;
 #X text 96 216 file;
-#X obj 269 263 hsl 128 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 0 1;
-#X floatatom 265 281 5 0 0 0 - - -;
+#X obj 266 264 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 283 264 bang when done;
 #X connect 7 0 5 0;
 #X connect 8 0 5 0;
 #X connect 10 0 6 0;
 #X connect 10 0 6 1;
 #X connect 10 1 13 0;
-#X connect 13 0 14 0;
