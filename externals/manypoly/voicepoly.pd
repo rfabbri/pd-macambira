@@ -157,11 +157,6 @@ obj 380 560 throw~ \$2-audioR \; \$1 obj 500 560 send \$2-voicemsg
 #X text 122 97 <-- open this subpatch to see the instances;
 #X obj 48 310 trigger anything anything bang;
 #N canvas 100 24 601 588 \$0-voicepoly 0;
-#X obj 10 10 receive 1081-in1;
-#X obj 400 10 receive 1081-in2;
-#X obj 10 560 throw~ 1081-audioL;
-#X obj 380 560 throw~ 1081-audioR;
-#X obj 500 560 send 1081-voicemsg;
 #X restore 26 96 pd \$0-voicepoly;
 #X obj 136 209 outlet~;
 #X obj 26 124 catch~ \$0-audioL;
