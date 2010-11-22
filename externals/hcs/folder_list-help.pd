@@ -42,12 +42,12 @@ the folder of the current patch \, i.e. "/path/to/current/patch/*".
 Wilkes for Pd version 0.42.;
 #X text 12 25 LICENSE GPL v3;
 #X text 12 125 AUTHOR Hans-Christoph Steiner;
-#X text 12 5 KEYWORDS control filesystem;
 #X text 12 45 DESCRIPTION get listing of files based on wildcard pattern
 ;
 #X text 12 65 INLET_0 bang symbol;
 #X text 12 85 INLET_1 symbol;
 #X text 12 105 OUTLET_0 symbol;
+#X text 12 5 KEYWORDS control filesystem patchfile_op;
 #X restore 498 465 pd META;
 #X connect 0 0 8 0;
 #X connect 1 0 7 0;
