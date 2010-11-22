@@ -9,5 +9,8 @@
 
 Objects in the 'many' lib are based on code from Steven Pickles' (aka pix) nqpoly4 and Frank Barknecht's polypoly.  Thanks to pix's nqpoly4 because that was the real groundbreaking work that proved that a useful and reliable instance-managing object could be programmed in Pd.
 
+To install this library, unzip it, rename the folder to be just "many" without the version, and drop that folder into your user-installed libraries folder:
+http://puredata.info/docs/faq/how-do-i-install-externals-and-help-files
+
 - Hans-Christoph Steiner <hans@eds.org>
 
