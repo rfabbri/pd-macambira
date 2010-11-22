@@ -15,12 +15,12 @@ version 0.35 test 28 by Dave Sabine as part of a project called pddp
 proposed by Krzysztof Czaja to build comprehensive documentation for
 Pd. Jonathan Wilkes revised the patch to conform to the PDDP template
 for Pd version 0.42.;
-#X text 12 5 KEYWORDS signal time;
 #X text 12 45 DESCRIPTION ramp generator;
 #X text 12 65 INLET_0 float list stop;
 #X text 12 85 INLET_1 float;
 #X text 12 105 OUTLET_0 float;
 #X text 12 185 RELEASE_DATE 1997;
+#X text 12 5 KEYWORDS control time;
 #X restore 500 598 pd META;
 #X obj 0 375 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
