@@ -15,7 +15,7 @@ numbers.;
 #X array \$0-array 62079 float 2;
 #X coords 0 1 62079 -1 200 140 1;
 #X restore 376 50 graph;
-#X msg 377 254 read ../../sound/voice.wav \$1;
+#X msg 377 254 read examples/sdf.wav \$1;
 #X obj 95 112 frameclock 400;
 #X obj 76 322 output~;
 #X obj 95 243 fstabplay~ \$0-array 40;

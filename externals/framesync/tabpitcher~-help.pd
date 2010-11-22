@@ -27,7 +27,7 @@ different frame numbers.;
 #X text 184 216 play;
 #X text 177 308 arguments: arrayname startframe# play_pitch root_pitch
 ;
-#X msg 377 254 read -resize ../../sound/voice.wav \$1;
+#X msg 377 254 read -resize examples/sdf.wav \$1;
 #X connect 6 0 21 0;
 #X connect 10 0 8 0;
 #X connect 11 0 8 0;

@@ -18,7 +18,7 @@
 #X obj 357 211 loadbang;
 #X obj 95 243 tabstretcher~ \$0-array 10 44;
 #X text 176 316 arguments: arrayname startframe# endframe#;
-#X msg 357 254 read -resize ../../sound/voice.wav \$1;
+#X msg 357 254 read -resize examples/sdf.wav \$1;
 #X text 246 227 frame;
 #X text 252 216 end;
 #X text 5 20 Plays a complete sound file til it ends \, synced up to
