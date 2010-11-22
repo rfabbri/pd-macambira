@@ -32,7 +32,7 @@ EXTRA_DIST =
 #------------------------------------------------------------------------------#
 
 # -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
-CFLAGS = -DPD -I"$(PD_INCLUDE)/pd" -Wall -W -g
+CFLAGS = -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
@@ -45,7 +45,7 @@ LIBS =
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
-CFLAGS += -DVERSION='"$(LIBRARY_VERSION)"'
+CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 
 PD_INCLUDE = $(PD_PATH)/include
 # where to install the library, overridden below depending on platform
