@@ -9,7 +9,7 @@ SOURCES =
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = instances.pd instances-template.pd instances~.pd instances-template~.pd polypoly.pd polypoly-wrap.pd polypoly-voice.pd voicepoly.pd voicepoly-wrap.pd
+PDOBJECTS = instances.pd instances-template.pd instances~.pd instances-template~.pd polypoly~.pd polypoly-wrap~.pd polypoly-voice~.pd voicepoly.pd voicepoly-wrap.pd
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = tick.wav ticker-voice.pd ticker.pd tock.wav aw.wav voicetest.pd run-200voicetest.pd
