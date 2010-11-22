@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = controctopus jmmmp keyboardkeys la-kitchen list-abs memento nsend parazit pixeltango purepd rradical rtc-lib timestretch memento-p sfruit pd-wavelet 
+LIB_TARGETS = controctopus jmmmp la-kitchen list-abs memento nsend parazit pixeltango purepd rradical rtc-lib timestretch memento-p sfruit pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -407,13 +407,6 @@ devsymlinks:
 		ln -s $(pd_src)/doc/7.stuff $(abstractions_src)/../7.stuff
 	test -e $(abstractions_src)/../sound || \
 		ln -s $(pd_src)/doc/sound $(abstractions_src)/../sound
-
-# hmm, seems broken and unneeded
-#devsymlinks_keyboardkeys:
-#	test -e abs || \
-#		ln -s abs $(abstractions_src)/keyboardkeys/keyboardkeys
-#	test -e ../keyboardkeys || \
-#		ln -s ../keyboardkeys $(abstractions_src)/keyboardkeys/doc/keyboardkeys
 
 #==============================================================================#
 #
