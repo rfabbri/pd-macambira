@@ -1,6 +1,6 @@
 Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?rev=135
 Name: many
-Maintainer: 
+Maintainer: Hans-Christoph Steiner <hans@eds.org>
 Source: http://sourceforge.net/projects/pure-data/files/libraries/many/
 
 Files: *
