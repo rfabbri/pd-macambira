@@ -2,7 +2,7 @@
 #X text 79 120 Your [instances] abstraction needs two inlets and two
 outlets. First argument will be the voice index number starting from
 0 \, second argument will be the total number of voices. Four more
-arguments can be passed as arguments to [polypoly] and will be passed
+arguments can be passed as arguments to [instances] and will be passed
 on to the custom abstraction.;
 #X text 80 35 instances-template is a basic patch here only to illustrate what a
 patch designed for [instance] looks like. Feel free to use it as a
