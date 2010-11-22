@@ -432,7 +432,7 @@ cxc_clean:
 # CYCLONE
 cyclone:
 	make -C $(externals_src)/miXed/cyclone -f Makefile.libdir \
-		PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
+		PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
 
 cyclone_install:
 	make -C $(externals_src)/miXed/cyclone -f Makefile.libdir \
@@ -1394,18 +1394,6 @@ pdp_opengl_clean:
 	-rm -f -- $(PDP_OPENGL_BINARY)
 	-rm -f -- $(externals_src)/pdp_opengl/*.bak
 	-rm -f -- $(externals_src)/pdp_opengl/*.*~
-
-
-#------------------------------------------------------------------------------#
-# PDVJTOOLS
-pdvjtools:
-	make -C $(externals_src)/pdvjtools PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
-
-pdvjtools_install:
-	make -C $(externals_src)/pdvjtools DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
-
-pdvjtools_clean:
-	make -C $(externals_src)/pdvjtools clean
 
 
 #------------------------------------------------------------------------------#
