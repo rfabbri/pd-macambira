@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = controctopus jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly nsend parazit pixeltango purepd rradical rtc-lib timestretch memento-p sfruit pd-wavelet 
+LIB_TARGETS = controctopus jmmmp keyboardkeys la-kitchen list-abs memento nqpoly nsend parazit pixeltango purepd rradical rtc-lib timestretch memento-p sfruit pd-wavelet 
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -229,17 +229,6 @@ nsend_install:
 		--author "Luke Iannini" \
 		--license "GNU GPL" \
 		--description "multiple-inlet/outlet send and receive"
-
-#------------------------------------------------------------------------------#
-# NUSMUK
-nusmuk:
-	make -C $(abstractions_src)/nusmuk
-
-nusmuk_install:
-	make -C $(abstractions_src)/nusmuk DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
-
-nusmuk_clean:
-	make -C $(abstractions_src)/nusmuk clean
 
 
 #-------------------------------------------------------------------------------
