@@ -27,7 +27,7 @@
 #X obj 252 338 / 1000;
 #X obj 131 397 *;
 #X obj 131 420 %;
-#X obj 224 396 flatspace/arraysize;
+#X obj 224 396 arraysize;
 #X msg 212 430 stop;
 #N canvas 738 24 450 300 reset 0;
 #X obj 191 140 delay;

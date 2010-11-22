@@ -10,7 +10,7 @@
 #X obj 22 38 receive framesync/frameclock;
 #X text 19 21 current frame #;
 #X text 342 3 array to play;
-#X obj 133 119 flatspace/arraysize;
+#X obj 133 119 arraysize;
 #X obj 116 568 outlet~;
 #X obj 116 371 -;
 #X msg 301 496 set \$1;
