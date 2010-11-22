@@ -198,7 +198,6 @@ flatspace_install: flatspace $(objectsdir)
 				$(DESTDIR)$(objectsdir)/$(FLATSPACE_NAME)
 	install -p \
 			$(externals_src)/iem/comport/*/*-help.pd \
-			$(externals_src)/nusmuk/line3/*.pd \
 			$(externals_src)/plugin~/*.pd \
 			$(externals_src)/rhythm_estimator/*.p? \
 				$(DESTDIR)$(objectsdir)/$(FLATSPACE_NAME)
