@@ -12,7 +12,7 @@
 #X obj 40 96 purepd/symbol_argument \$1;
 #X obj 155 65 trigger bang bang bang;
 #X obj 40 176 table \$0-sample;
-#X obj 146 197 fstablooper~ \$0-sample;
+#X obj 146 197 tablooper~ \$0-sample;
 #N canvas 206 494 450 300 load 0;
 #X obj 22 113 pack symbol symbol;
 #X obj 22 136 zexy/makesymbol %s/%s;
