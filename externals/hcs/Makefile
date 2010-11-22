@@ -35,7 +35,7 @@ EXTRA_DIST = README-ifeel.txt ifeel.h
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
+CFLAGS = -DPD -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 

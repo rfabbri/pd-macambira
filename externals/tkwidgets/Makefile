@@ -31,7 +31,7 @@ EXTRA_DIST = tkwidgets.h tkwidgets.c
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
+CFLAGS = -DPD -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 

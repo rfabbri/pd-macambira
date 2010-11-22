@@ -31,7 +31,8 @@ EXTRA_DIST =
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
+# -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
+CFLAGS = -DPD -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
