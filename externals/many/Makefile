@@ -1,7 +1,7 @@
 ## Pd library template version 1.0.6
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
-LIBRARY_NAME = manypoly
+LIBRARY_NAME = many
 
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically
@@ -9,7 +9,7 @@ SOURCES =
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = instances.pd instances-template.pd instances~.pd instances-template~.pd polypoly~.pd polypoly-wrap~.pd polypoly-voice~.pd voicepoly.pd voicepoly-wrap.pd
+PDOBJECTS = instances.pd instances-template.pd instances~.pd instances-template~.pd polypoly~.pd polypoly-wrap~.pd polypoly-voice~.pd voices~.pd voices-wrap~.pd
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = tick.wav ticker-voice.pd ticker.pd tock.wav aw.wav voicetest.pd run-200voicetest.pd

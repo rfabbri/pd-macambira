@@ -13,7 +13,7 @@ as senders and receivers.;
 #X obj 142 125 pack symbol \$0;
 #X obj 142 30 bang;
 #X obj 142 7 inlet;
-#X obj 142 77 symbol \$0-voicepoly;
+#X obj 142 77 symbol \$0-voices~;
 #X msg 142 166 \; \$1 clear \; \$1 obj 10 10 receive \$2-in1 \; \$1
 obj 400 10 receive \$2-in2 \; \$1 obj 10 560 throw~ \$2-audioL \; \$1
 obj 380 560 throw~ \$2-audioR \; \$1 obj 500 560 send \$2-voicemsg
@@ -102,7 +102,7 @@ obj 380 560 throw~ \$2-audioR \; \$1 obj 500 560 send \$2-voicemsg
 #X obj 29 221 + 5;
 #X msg 29 316 \; \$1 connect \$3 0 \$2 0 \;;
 #X obj 29 37 trigger anything anything anything bang bang;
-#X msg 44 162 \; \$3 obj 150 \$2 voicepolywrap \$4 \$1 \$5 \$6 \$7
+#X msg 44 162 \; \$3 obj 150 \$2 voices-wrap~ \$4 \$1 \$5 \$6 \$7
 \$8 \$9 \;;
 #N canvas 183 272 316 307 expandpath 0;
 #X obj 59 16 inlet;
@@ -156,8 +156,8 @@ obj 380 560 throw~ \$2-audioR \; \$1 obj 500 560 send \$2-voicemsg
 #X restore 185 453 pd connect user outlets;
 #X text 122 97 <-- open this subpatch to see the instances;
 #X obj 48 310 trigger anything anything bang;
-#N canvas 100 24 601 588 \$0-voicepoly 0;
-#X restore 26 96 pd \$0-voicepoly;
+#N canvas 100 24 601 588 \$0-voices~ 0;
+#X restore 26 96 pd \$0-voices~;
 #X obj 136 209 outlet~;
 #X obj 26 124 catch~ \$0-audioL;
 #X obj 136 124 catch~ \$0-audioR;

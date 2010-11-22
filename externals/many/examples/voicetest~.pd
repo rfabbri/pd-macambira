@@ -6,7 +6,7 @@
 #X obj 320 463 outlet;
 #X text 367 463 bang when done;
 #X obj 122 337 line~;
-#X obj -15 88 print voicetest_\$1;
+#X obj -15 88 print voicetest~_\$1;
 #X obj 282 76 samplerate~;
 #X obj 267 97 /;
 #X obj 320 435 delay;
