@@ -1290,34 +1290,6 @@ pddp_clean:
 
 
 #------------------------------------------------------------------------------#
-# PDLUA
-PDLUA_NAME=pdlua
-PDLUA_OBJECTS := $(externals_src)/loaders/pdlua/src/lua.c
-pdlua: $(PDLUA_OBJECTS:.c=.$(EXTENSION))
-
-pdlua_install: pdlua
-	install -d $(DESTDIR)$(objectsdir)
-	install -p $(PDLUA_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)
-	install -p $(externals_src)/loaders/pdlua/src/pd.lua $(DESTDIR)$(objectsdir)
-	install -d $(DESTDIR)$(manualsdir)/$(PDLUA_NAME)
-	install -p $(externals_src)/loaders/pdlua/doc/*.txt \
-		$(DESTDIR)$(manualsdir)/$(PDLUA_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/loaders/pdlua/README \
-		$(DESTDIR)$(readmesdir)/$(PDLUA_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(PDLUA_NAME)
-	install -p $(externals_src)/loaders/pdlua/examples/*.* \
-		$(DESTDIR)$(examplesdir)/$(PDLUA_NAME)
-
-pdlua_clean:
-	-rm -f -- $(PDLUA_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(PDLUA_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/loaders/pdlua/*.bak
-	-rm -f -- $(externals_src)/loaders/pdlua/*.*~
-
-
-
-#------------------------------------------------------------------------------#
 # PDOGG
 pdogg:
 	make -C $(externals_src)/pdogg PD_PATH=$(pd_src) PD_INCLUDE=$(DESTDIR)$(includedir)
@@ -2268,7 +2240,8 @@ etags:
 	find $(externals_src) -type f -name '*.[ch]' -exec etags -a '{}' \;
 	find $(externals_src) -type f -name '*.cc' -exec etags -a '{}' \;
 	find $(externals_src) -type f -name '*.cpp' -exec etags -a '{}' \;
-	find $(extensions_src) -type f -name '*.[ch]' -exec etags -a '{}' \;
+	etags --append --language=none --regex="/proc[ \t]+\([^ \t]+\)/\1/" \
+		$(externals_src)/unauthorized/*/*.tk
 	find /usr/include -type f -name \*.h -exec etags -a '{}' \;
 	make etags_`uname -s`
 
