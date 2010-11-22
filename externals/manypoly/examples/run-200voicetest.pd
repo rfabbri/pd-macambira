@@ -3,7 +3,6 @@
 #X obj 132 207 hsl 60 18 0 1 0 1 empty empty pan 15 9 0 10 -204800
 -1 -1 2300 0;
 #X floatatom 135 229 5 0 0 0 - - -;
-#X obj 402 41 pddp/dsp;
 #X obj 213 320 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
 -1 -1;
 #X text 35 410 three outlets are needed: 2 audio and one message outlet
@@ -90,18 +89,18 @@ drag;
 #X restore 2 175 pd;
 #X obj 64 76 gcanvas 80 80;
 #X connect 0 0 1 0;
-#X connect 0 0 21 0;
-#X connect 7 0 8 0;
-#X connect 7 0 20 0;
-#X connect 15 0 16 0;
-#X connect 16 0 26 1;
-#X connect 20 0 26 0;
-#X connect 21 0 20 0;
-#X connect 21 1 20 1;
-#X connect 23 0 16 1;
-#X connect 26 0 18 0;
-#X connect 26 1 18 1;
-#X connect 26 2 3 0;
+#X connect 0 0 20 0;
+#X connect 6 0 7 0;
+#X connect 6 0 19 0;
+#X connect 14 0 15 0;
+#X connect 15 0 25 1;
+#X connect 19 0 25 0;
+#X connect 20 0 19 0;
+#X connect 20 1 19 1;
+#X connect 22 0 15 1;
+#X connect 25 0 17 0;
+#X connect 25 1 17 1;
+#X connect 25 2 2 0;
+#X connect 26 0 25 0;
 #X connect 27 0 26 0;
-#X connect 28 0 27 0;
-#X connect 28 1 27 1;
+#X connect 27 1 26 1;
