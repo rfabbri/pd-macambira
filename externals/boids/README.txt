@@ -2,10 +2,10 @@
 	boids package for max/msp/jitter 051219
 	
 	  Boids............................................. by eric singer
-	  boids2d, boids3d.................................. by jasch & andré sier
+	  boids2d, boids3d.................................. by jasch & andr sier
 	  jit.boids3d, jit.boids2d, xray.jit.boidsrender.... by wesley smith
 
-	© 1995-98 Eric L. Singer (eric@ericsinger.com)
+	(C) 1995-98 Eric L. Singer (eric@ericsinger.com)
 	3d adaptation 08/2005 by a. sier / jasch
 	jitter adaptation 12/2005 by w. smith
 

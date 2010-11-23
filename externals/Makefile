@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive arraysize bassemu bsaylor comport creb cxc cyclone earplug ekext ext13 freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
+LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cxc cyclone earplug ekext ext13 freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -322,38 +322,17 @@ bassemu_clean:
 	make -C $(externals_src)/bassemu~ clean
 
 
-
 #------------------------------------------------------------------------------#
 # BOIDS
-BOIDS_NAME=boids
-BOIDS_OBJECTS := $(wildcard $(externals_src)/boids/boids*/*.c)
-boids: $(BOIDS_OBJECTS:.c=.$(EXTENSION))
+boids:
+	make -C $(externals_src)/boids PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
 
-boids_install: boids
-	install -d $(DESTDIR)$(objectsdir)/$(BOIDS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(BOIDS_NAME) \
-		--author "Eric Singer, A. Sier, and Jasch" \
-		--description "2D and 3D boids flocking algorithm" \
-		--license "GNU GPL 2" \
-		--version ""
-	install -p $(BOIDS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(BOIDS_NAME)
-	install -p $(externals_src)/boids/boids*/*.pd \
-		$(DESTDIR)$(objectsdir)/$(BOIDS_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(BOIDS_NAME)
-#	install -p $(externals_src)/boids/manual.txt \
-#		$(DESTDIR)$(manualsdir)/$(BOIDS_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/boids/boids.readme.txt \
-		$(DESTDIR)$(readmesdir)/$(BOIDS_NAME).txt
-#	install -d $(DESTDIR)$(examplesdir)/$(BOIDS_NAME)
-#	install -p $(externals_src)/boids/examples/*.pd \
-#		$(DESTDIR)$(examplesdir)/$(BOIDS_NAME)
+boids_install:
+	make -C $(externals_src)/boids \
+		DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 boids_clean:
-	-rm -f -- $(BOIDS_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(BOIDS_OBJECTS:.c=.o)
-	-rm -f -- $(externals_src)/boids/*/*.bak
-	-rm -f -- $(externals_src)/boids/*/*.*~
+	make -C $(externals_src)/boids clean
 
 
 #------------------------------------------------------------------------------#

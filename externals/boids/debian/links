@@ -1,0 +1,3 @@
+usr/lib/pd/extra/boids/README.txt        usr/share/doc/pd-boids/README
+usr/lib/pd/extra/boids/examples          usr/share/doc/pd-boids/examples
+usr/share/common-licenses/GPL-2             usr/lib/pd/extra/boids/LICENSE.txt
