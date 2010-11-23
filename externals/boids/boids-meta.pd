@@ -5,5 +5,5 @@
 #X text 10 50 AUTHOR Eric Singer, A. Sier, and Jasch;
 #X text 10 70 DESCRIPTION 2D and 3D boids flocking algorithm;
 #X text 10 90 LICENSE GNU GPL 2;
-#X text 10 110 VERSION 1.1;
+#X text 10 110 VERSION 1.1.1;
 #X restore 10 10 pd META;
