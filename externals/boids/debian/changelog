@@ -1,5 +1,0 @@
-pd-boids (1.1.1-1) unstable; urgency=low
-
-  * Initial release (Closes: #604734)
-
- -- Hans-Christoph Steiner <hans@eds.org>  Tue, 23 Nov 2010 17:20:14 -0500
