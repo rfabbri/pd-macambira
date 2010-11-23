@@ -28,4 +28,4 @@ Description: a Pd library for the "boids" flocking simulator algorithm
  message to output a list of the current parameter settings.
  .
  For more information about the Boids algorithm, see Craig Reynolds'
- Web site at "http://reality.sgi.com/employees/craig/boids.html".
+ Web site at http://www.red3d.com/cwr/

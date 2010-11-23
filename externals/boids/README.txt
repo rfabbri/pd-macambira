@@ -25,7 +25,7 @@ Boids takes an integer argument which is the number of boids. Each time Boids re
 
 The flight parameters can be changed with messages. Use the 'dump' message to output a list of the current parameter settings. 
 
-For more information about the Boids algorithm, see Craig Reynolds' Web site at "http://reality.sgi.com/employees/craig/boids.html".
+For more information about the Boids algorithm, see Craig Reynolds' Web site at http://www.red3d.com/cwr/
 
 
 UB notes (version 1.1 / 20070125): 
