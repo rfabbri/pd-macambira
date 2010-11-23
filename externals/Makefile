@@ -128,21 +128,21 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cxc cyclone earplug ekext ext13 flashserver flib freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof toxy unauthorized vanilla vbap windowing zexy
+LIB_TARGETS = adaptive arraysize bassemu bsaylor comport creb cxc cyclone earplug ekext ext13 freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-# on Mac OS X 10.6/Snow Leopard don't build pidip and hid since they need Carbon
-    LIB_TARGETS += pdp gem2pdp iem16 pdp_opengl apple
+# on Mac OS X 10.6/Snow Leopard don't build hid since it needs Carbon
+    LIB_TARGETS += pdp gem2pdp iem16 apple
     ifneq ($(shell uname -r | sed 's|10\.[0-9][0-9]*\.[0-9][0-9]*|10|'),10)
-      LIB_TARGETS += hid pidip
+      LIB_TARGETS += hid
     endif
   else
     # GNU/Linux, BSD, IRIX, etc.
-    LIB_TARGETS += hid pdp pidip gem2pdp iem16 pdp_opengl postlude
+    LIB_TARGETS += hid pdp gem2pdp iem16
   endif
 endif
 
@@ -467,41 +467,6 @@ ext13_install:
 ext13_clean:
 	make -C $(externals_src)/ext13 clean
 
-
-
-#------------------------------------------------------------------------------#
-# FFTease
-FFTEASE_NAME=fftease
-FFTEASE_LIB_OBJECTS := $(wildcard $(externals_src)/fftease/lib/*.c)
-FFTEASE_OBJECTS := $(wildcard $(externals_src)/fftease/*.c)
-fftease_lib: $(FFTEASE_LIB_OBJECTS:.c=.o)
-	$(CC) $(DYLIB_LDFLAGS) \
-		-o $(externals_src)/fftease/libfftease.$(DYLIB_EXTENSION) \
-		 $(FFTEASE_LIB_OBJECTS:.c=.o)
-
-fftease: fftease_lib $(FFTEASE_OBJECTS:.c=.$(EXTENSION))
-
-fftease_install: fftease
-	install -d $(DESTDIR)$(objectsdir)/$(FFTEASE_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(FFTEASE_NAME) \
-		--author "Eric Lyon and Christopher Penrose" \
-		--description "FFTease is a collection of objects implementing various forms of spectral sound processing. These include an additive-synthesis phase vocoder, noise reduction, cross synthesis, and more unusual forms of spectral processing." \
-		--license "MIT License" \
-		--version "2.0"
-	install -p $(FFTEASE_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(FFTEASE_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(FFTEASE_NAME)
-	install -d $(DESTDIR)$(readmesdir)
-	install -p $(externals_src)/fftease/README \
-		$(DESTDIR)$(readmesdir)/$(FFTEASE_NAME).txt
-	install -d $(DESTDIR)$(examplesdir)/$(FFTEASE_NAME)
-	install -p $(externals_src)/fftease/examples/*.pd \
-		$(DESTDIR)$(examplesdir)/$(FFTEASE_NAME)
-
-fftease_clean:
-	-rm -f -- $(externals_src)/fftease/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/fftease/*.o
-	-rm -f -- $(externals_src)/fftease/*.bak
-	-rm -f -- $(externals_src)/fftease/*.*~
 
 
 
