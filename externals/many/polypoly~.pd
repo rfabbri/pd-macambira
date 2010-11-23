@@ -146,7 +146,7 @@ as senders and receivers.;
 #X obj 59 16 inlet;
 #X obj 55 271 outlet;
 #X obj 59 98 list append;
-#X obj 58 153 zexy/list2symbol /;
+#X msg 58 153 symbol \$1/\$2;
 #X obj 59 43 trigger bang anything;
 #X obj 58 67 ggee/getdir 2;
 #X connect 0 0 4 0;

@@ -14,7 +14,6 @@ Depends: ${shlibs:Depends},
          pd,
          pd-ggee,
          pd-libdir,
-         pd-zexy,
          ${misc:Depends}
 Recommends: pd-import,
             pd-pddp

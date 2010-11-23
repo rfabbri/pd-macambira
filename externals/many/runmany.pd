@@ -109,7 +109,7 @@ obj 380 560 throw~ \$2-audioR \; \$1 obj 500 560 send \$2-voicemsg
 #X obj 55 271 outlet;
 #X obj 59 43 trigger bang bang;
 #X obj 59 98 list append;
-#X obj 58 153 zexy/list2symbol /;
+#X msg 58 153 symbol \$1/\$2;
 #X obj 158 66 symbol \$2;
 #X obj 59 67 ggee/getdir 3;
 #X connect 0 0 2 0;
