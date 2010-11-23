@@ -69,7 +69,7 @@ the herding dinosaurs.;
 Use the 'dump' message to output a list of the current parameter settings.
 ;
 #X text -190 328 For more information about the Boids algorithm \,
-see Craig Reynolds' Web site at "http://reality.sgi.com/employees/craig/boids.html".
+see Craig Reynolds' Web site at http://www.red3d.com/cwr/boids/
 ;
 #X text -188 64 arguments: <float> number of boids \, <float> output
 mode;
