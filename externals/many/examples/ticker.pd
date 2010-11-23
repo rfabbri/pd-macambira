@@ -13,7 +13,7 @@
 #X obj 17 97 metro;
 #X obj 17 37 tgl 15 0 empty empty empty 17 7 0 10 -204786 -1 -1 1 1
 ;
-#X obj 47 60 hsl 128 15 10 1000 1 1 empty empty empty -2 -8 0 10 -262130
+#X obj 47 60 hsl 128 15 1 1000 1 1 empty empty empty -2 -8 0 10 -262130
 -1 -1 9800 1;
 #X floatatom 56 84 5 0 0 0 - - -;
 #X obj 17 126 float;
