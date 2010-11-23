@@ -1,5 +1,9 @@
 
-A Pd port of the VBAP object for Max/MSP by Ville Pulkki
+A Pd port of the VBAP object for Max/MSP
+
+Written by Ville Pulkki
+Helsinki University of Technology
+Laboratory of acoustics and audio signal processing
 
 http://www.acoustics.hut.fi/research/cat/vbap/
 
