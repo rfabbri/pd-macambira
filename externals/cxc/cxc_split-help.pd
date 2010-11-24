@@ -1,4 +1,4 @@
-#N canvas 100 100 576 380 10;
+#N canvas 0 31 576 417 10;
 #X msg 239 145 set x;
 #X msg 172 144 set .;
 #X obj 25 324 unpack f f f f;
@@ -27,6 +27,17 @@
 #X text 26 5 split or tokenize the incoming string at the specified
 delimiter \, digit-only substrings (including the .) are converted
 to numbers.;
+#N canvas 397 200 494 344 META 0;
+#X text 12 135 HELP_PATCH_AUTHORS Jonathan Wilkes revised the patch
+to conform to the PDDP template for Pd version 0.42.;
+#X text 12 5 KEYWORDS control list_op symbol_op;
+#X text 12 45 DESCIPTION split or tokenize the incoming string at the
+specified delimiter;
+#X text 12 75 INLET_0 anything;
+#X text 12 95 OUTLET_0 list float symbol;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 115 AUTHOR jdl@xdv.org;
+#X restore 516 392 pd META;
 #X connect 0 0 14 0;
 #X connect 1 0 14 0;
 #X connect 2 0 3 0;

@@ -1,4 +1,4 @@
-#N canvas 110 368 622 369 10;
+#N canvas 0 31 636 364 10;
 #X obj 64 102 noise~;
 #X obj 463 105 mean~ blir;
 #X obj 21 262 table blir;
@@ -85,6 +85,17 @@
 #X obj 460 304 cxstddev blir;
 #X obj 342 304 cxavgdev blir;
 #X obj 316 251 cxmean blir;
+#N canvas 567 269 494 344 META 0;
+#X text 12 135 HELP_PATCH_AUTHORS Jonathan Wilkes revised the patch
+to conform to the PDDP template for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 115 AUTHOR jdl@xdv.org;
+#X text 12 5 KEYWORDS control array;
+#X text 12 45 DESCRIPTION this is supposed to calculate the signal
+mean of an array.;
+#X text 12 95 OUTLET_0 float;
+#X text 12 75 INLET_0 float set;
+#X restore 583 337 pd META;
 #X connect 0 0 10 0;
 #X connect 1 0 9 0;
 #X connect 5 0 4 0;
