@@ -1,4 +1,4 @@
-#N canvas 72 8 636 478 10;
+#N canvas 0 26 636 478 10;
 #X msg 109 197 0;
 #X msg 77 197 -1;
 #X text 19 47 INLETS:;
@@ -28,6 +28,18 @@ values;
 #X text 184 367 Second argument: initial EOS character. See [any2bytes].
 ;
 #X obj 168 438 locale;
+#N canvas 260 141 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 65 INLET_0 anything;
+#X text 12 85 INLET_1 float;
+#X text 12 105 OUTLET_0 list;
+#X text 12 125 AUTHOR Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 12 5 KEYWORDS control conversion symbol_op;
+#X text 12 45 DESCRIPTION convert pd messages to a list of wchar_t
+values;
+#X restore 583 446 pd META;
 #X connect 0 0 17 1;
 #X connect 1 0 17 1;
 #X connect 5 0 17 0;

@@ -1,4 +1,4 @@
-#N canvas 484 16 460 391 10;
+#N canvas 0 31 460 391 10;
 #X obj 33 324 print LEFT;
 #X obj 112 324 print RIGHT;
 #X msg 24 13 alphabet foo;

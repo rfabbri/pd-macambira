@@ -1,8 +1,8 @@
-#N canvas 50 16 604 376 10;
+#N canvas 0 31 583 376 10;
 #X text 56 7 locale : access to C99-style localization;
 #X obj 41 298 locale;
 #X obj 41 320 print locale-out;
-#X text 262 342 Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 202 342 Bryan Jurish <moocow@ling.uni-potsdam.de>;
 #X msg 41 48 set;
 #X text 222 49 "set" : initialize locale from environment variables
 ;
@@ -23,6 +23,16 @@ LANG) to a locale whose floats are comma-separated rather than dot-separated
 #X msg 64 151 which;
 #X text 226 153 "which" : list supported categories;
 #X text 226 173 "bang" : alias for "set \, set LC_NUMERIC C";
+#N canvas 260 141 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 105 AUTHOR Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 12 45 DESCRIPTION access to C99-style localization;
+#X text 12 65 INLET_0 set get which bang reset;
+#X text 12 85 OUTLET_0 anything;
+#X text 12 5 KEYWORDS control;
+#X restore 531 347 pd META;
 #X connect 1 0 2 0;
 #X connect 4 0 1 0;
 #X connect 6 0 1 0;

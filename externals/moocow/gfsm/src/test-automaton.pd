@@ -1,4 +1,4 @@
-#N canvas 169 63 974 447 10;
+#N canvas 0 31 974 447 10;
 #X obj 13 7 gfsm;
 #X obj 22 324 gfsm_automaton;
 #X obj 22 359 print GFSM-1;

@@ -1,4 +1,4 @@
-#N canvas 15 14 450 300 10;
+#N canvas 0 31 450 300 10;
 #X obj 59 121 locale;
 #X obj 59 49 loadbang;
 #X msg 59 95 set \, set LC_NUMERIC C \, get;

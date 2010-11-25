@@ -1,4 +1,4 @@
-#N canvas 30 10 564 356 10;
+#N canvas 0 31 564 356 10;
 #X msg 33 21 A B C;
 #X msg 311 287 C;
 #N canvas 0 0 338 182 locale_LC_CTYPE 0;

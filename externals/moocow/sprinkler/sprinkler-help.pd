@@ -1,4 +1,4 @@
-#N canvas 193 23 510 596 10;
+#N canvas 0 26 510 607 10;
 #X floatatom 26 36 5 0 0 0 - - -;
 #X symbolatom 36 100 10 0 0 0 - - -;
 #X text 25 389 ARGUMENTS: none;
@@ -36,7 +36,17 @@ beforehand.;
 #X text 39 407 ALIASES:;
 #X text 102 407 none;
 #X text 102 432 (disabled);
-#X text 135 18 (formerly MAX-incompatible \[forward\]);
+#X text 135 18 (formerly MAX-incompatible [forward]);
+#N canvas 260 141 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 105 AUTHOR Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 12 45 DESCRIPTION dynamic control-message dissemination;
+#X text 12 5 KEYWORDS control max_compatible nonlocal;
+#X text 12 65 INLET_0 anything;
+#X text 12 85 OUTLET_0 anything;
+#X restore 451 582 pd META;
 #X connect 0 0 18 0;
 #X connect 1 0 19 0;
 #X connect 11 0 12 1;

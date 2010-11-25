@@ -1,4 +1,4 @@
-#N canvas 626 4 605 546 10;
+#N canvas 0 31 605 546 10;
 #X obj 54 288 locale;
 #X obj 36 380 print locale-out;
 #X msg 149 255 set;

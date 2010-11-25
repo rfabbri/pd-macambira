@@ -1,4 +1,4 @@
-#N canvas 430 0 616 494 10;
+#N canvas 0 31 616 494 10;
 #X obj 13 7 gfsm;
 #X msg 23 84 automaton;
 #X msg 21 43 automaton a1;

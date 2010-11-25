@@ -1,4 +1,4 @@
-#N canvas 206 54 450 300 10;
+#N canvas 0 31 450 300 10;
 #X floatatom 253 98 5 0 0 1 byte_value - -;
 #X obj 267 158 print s2a;
 #X floatatom 253 220 5 0 0 0 - - -;
@@ -11,9 +11,9 @@
 #X obj 86 127 bytes2any;
 #X obj 86 187 any2bytes;
 #X obj 100 157 print s2b;
-#X obj 253 128 string2any;
 #X obj 253 188 any2string;
-#X connect 0 0 12 0;
+#X obj 253 128 string2any;
+#X connect 0 0 13 0;
 #X connect 3 0 0 0;
 #X connect 4 0 0 0;
 #X connect 6 0 9 0;
@@ -22,6 +22,6 @@
 #X connect 9 0 10 0;
 #X connect 9 0 11 0;
 #X connect 10 0 5 0;
-#X connect 12 0 1 0;
-#X connect 12 0 13 0;
-#X connect 13 0 2 0;
+#X connect 12 0 2 0;
+#X connect 13 0 1 0;
+#X connect 13 0 12 0;

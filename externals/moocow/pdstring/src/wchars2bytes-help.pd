@@ -1,4 +1,4 @@
-#N canvas 66 8 522 426 10;
+#N canvas 0 26 488 455 10;
 #X text 11 46 INLETS:;
 #X text 269 48 OUTLETS:;
 #X text 283 64 1 - byte-valued float lists;
@@ -35,6 +35,17 @@ locale's LC_CTYPE category: here are some examples:;
 #X text 159 259 "&pi &delta" \, not ISO-8859-1 safe;
 #X obj 24 310 wchars2bytes;
 #X obj 24 334 print wchars2bytes-help;
+#N canvas 304 188 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 105 AUTHOR Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 12 85 OUTLET_0 anything;
+#X text 12 45 DESCRIPTION convert wide characters to (multiple) bytes
+;
+#X text 12 65 INLET_0 list;
+#X text 12 5 KEYWORDS control conversion;
+#X restore 436 432 pd META;
 #X connect 4 0 22 0;
 #X connect 5 0 22 0;
 #X connect 6 0 7 0;

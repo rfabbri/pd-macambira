@@ -1,4 +1,4 @@
-#N canvas 18 0 910 582 10;
+#N canvas 0 26 873 582 10;
 #X text 33 1 weightmap : map probabilities to associated integers;
 #X obj 114 364 print wmap_dump;
 #X obj 8 364 print wmap_out;
@@ -35,14 +35,14 @@ outlet-2;
 #X text 113 239 adjust maximum input-value;
 #X text 131 297 adjust length of weight-vector;
 #X msg 67 311 resize 2;
-#X floatatom 14 44 5 0 0;
+#X floatatom 14 44 5 0 0 0 - - -;
 #X text 63 43 output matching weight index;
 #X text 371 367 map IDX WEIGHT :;
 #X text 491 367 associate element IDX (int) of the stored weight-vector
 with weight WEIGHT (float). Multiple (index \, weight) pairs may also
 be specified.;
 #X text 393 335 set WEIGHTS :;
-#X text 600 556 Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 600 514 Bryan Jurish <moocow@ling.uni-potsdam.de>;
 #X text 393 253 resize SIZE : resizes the weight-vector to SIZE elements
 ;
 #X text 491 335 sets the stored weight-vector to WEIGHTS. possibly
@@ -59,6 +59,18 @@ incoming floats to generate integers at the outlet. Greater input floats
 do not neccesarily correspond to greater stored "weights" \, but greater
 "weights" do cause their associated indices to be output more frequently
 for random input floats.;
+#N canvas 260 141 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 125 AUTHOR Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 12 5 KEYWORDS control;
+#X text 12 45 DESCRIPTION map probabilities to associated integers
+;
+#X text 12 65 INLET_0 float set map zero dump max resize;
+#X text 12 85 OUTLET_0 float;
+#X text 12 105 OUTLET_1 list;
+#X restore 823 556 pd META;
 #X connect 3 0 2 0;
 #X connect 3 1 1 0;
 #X connect 18 0 3 0;

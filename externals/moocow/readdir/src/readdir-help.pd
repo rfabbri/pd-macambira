@@ -1,4 +1,4 @@
-#N canvas 44 62 540 544 10;
+#N canvas 0 26 510 574 10;
 #X msg 87 194 close;
 #X msg 54 75 bang;
 #X msg 77 144 tell;
@@ -35,6 +35,17 @@ following:;
 work on windows or any other system whose `dirent' struct is missing
 the `d_type' field. On such systems \, the TYPE selector on the first
 outlet is always the symbol `unknown'.;
+#N canvas 260 141 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 125 AUTHOR Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 12 5 KEYWORDS control filesystem;
+#X text 12 45 DESCRIPTION simple directory accessor;
+#X text 12 65 INLET_0 open bang next rewind tell seek close;
+#X text 12 85 OUTLET_0 anything;
+#X text 12 105 OUTLET_1 bang;
+#X restore 451 552 pd META;
 #X connect 0 0 26 0;
 #X connect 1 0 26 0;
 #X connect 2 0 26 0;

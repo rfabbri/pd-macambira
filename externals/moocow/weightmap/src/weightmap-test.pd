@@ -1,18 +1,18 @@
-#N canvas 33 18 810 430 10;
+#N canvas 0 31 810 430 10;
 #X obj 94 168 weightmap 3;
 #X msg 154 41 dump;
 #X obj 215 210 print wm_out2;
 #X msg 158 63 zero;
 #X msg 196 41 resize \$1;
-#X floatatom 195 12 5 0 0;
-#X floatatom 548 33 5 0 0;
-#X floatatom 598 33 5 0 0;
+#X floatatom 195 12 5 0 0 0 - - -;
+#X floatatom 548 33 5 0 0 0 - - -;
+#X floatatom 598 33 5 0 0 0 - - -;
 #X obj 548 59 pack 0 0;
 #X text 549 116 bad input;
 #X msg 412 11 set 420 24 7;
 #X msg 549 82 map \$1 \$2;
 #X msg 549 132 map 0 1 1 2 2;
-#X floatatom 106 13 5 0 0;
+#X floatatom 106 13 5 0 0 0 - - -;
 #N canvas 0 0 820 480 statistics 0;
 #X obj 146 16 inlet;
 #X msg 169 87 dump;
@@ -86,14 +86,14 @@
 #X obj 24 13 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 0 1
 ;
 #X obj 24 57 random 100;
-#X floatatom 49 12 5 0 0;
+#X floatatom 49 12 5 0 0 0 - - -;
 #X obj 335 294 print -----;
 #X msg 412 37 set 10 20 30 40;
 #X msg 68 238 0;
 #X msg 70 268 1;
 #X obj 24 35 metro 1;
 #X msg 412 61 set 50 25 25;
-#X floatatom 285 12 5 0 0;
+#X floatatom 285 12 5 0 0 0 - - -;
 #X msg 286 41 max \$1;
 #X msg 410 85 set 2 1 1;
 #X obj 6 101 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 0 1

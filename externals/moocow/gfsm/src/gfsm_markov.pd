@@ -1,4 +1,4 @@
-#N canvas 386 0 450 300 10;
+#N canvas 0 31 450 300 10;
 #X text 85 2 gfsm_markov : Markov chain using gfsm;
 #X text 181 17 for details \, see:;
 #N canvas 266 0 499 471 gfsm_markov_doc 0;

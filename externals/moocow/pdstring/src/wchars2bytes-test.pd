@@ -1,4 +1,4 @@
-#N canvas 376 34 606 300 10;
+#N canvas 0 31 606 300 10;
 #X obj 114 136 bytes2wchars;
 #X obj 138 168 print wchars;
 #X obj 323 222 locale;

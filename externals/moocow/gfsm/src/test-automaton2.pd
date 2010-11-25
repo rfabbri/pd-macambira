@@ -1,4 +1,4 @@
-#N canvas 110 261 845 398 10;
+#N canvas 0 31 845 398 10;
 #X obj 13 7 gfsm;
 #X obj 23 362 print GFSM-1;
 #X obj 116 362 print GFSM-2;

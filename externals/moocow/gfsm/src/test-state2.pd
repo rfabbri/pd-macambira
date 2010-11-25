@@ -1,4 +1,4 @@
-#N canvas 346 27 616 494 10;
+#N canvas 0 31 616 494 10;
 #X obj 13 7 gfsm;
 #X msg 23 84 automaton;
 #X msg 21 43 automaton a1;
@@ -78,7 +78,7 @@
 #X obj 243 242 symbol;
 #X obj 115 141 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#N canvas 486 0 310 377 weight_sum 1;
+#N canvas 0 31 310 377 weight_sum 0;
 #X obj 34 11 inlet;
 #X msg 34 104 arc_next;
 #X obj 34 309 f 0;

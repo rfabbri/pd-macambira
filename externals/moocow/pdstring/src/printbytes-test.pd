@@ -1,4 +1,4 @@
-#N canvas 30 10 564 356 10;
+#N canvas 0 31 564 356 10;
 #X obj 36 280 printbytes;
 #X msg 33 21 A B C;
 #X obj 36 106 any2bytes;

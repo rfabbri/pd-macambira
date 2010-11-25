@@ -1,4 +1,4 @@
-#N canvas 507 20 612 604 10;
+#N canvas 0 26 612 604 10;
 #X text 13 52 INLETS:;
 #X text 309 54 OUTLETS:;
 #X text 325 68 1 - pd messages;
@@ -23,7 +23,7 @@ text buffer). This should get re-allocated when necessary. Specify
 #X text 159 477 Right outlet gives a bang after the entire input list
 has been processed.;
 #X text 189 531 Parsed pd messages are sent to the left outlet.;
-#X text 306 580 Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 276 580 Bryan Jurish <moocow@ling.uni-potsdam.de>;
 #X text 27 83 2 - EOS character (float);
 #X text 161 121 lists of floats are converted to pd messages.;
 #X text 168 161 ... selector is ignored ...;
@@ -37,6 +37,18 @@ has been processed.;
 #X obj 24 529 print bytes2any-help;
 #X msg 54 161 StringThing 97;
 #X obj 24 350 bytes2any 128 0;
+#N canvas 260 141 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 65 INLET_0 anything;
+#X text 12 85 INLET_1 float;
+#X text 12 125 AUTHOR Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 12 45 DESCRIPTION convert pd messages to a list of wchar_t
+values;
+#X text 12 105 OUTLET_0 anything;
+#X text 12 5 KEYWORDS control conversion symbol_op anything_op;
+#X restore 553 576 pd META;
 #X connect 4 0 26 0;
 #X connect 5 0 26 0;
 #X connect 6 0 26 1;

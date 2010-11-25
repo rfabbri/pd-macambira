@@ -1,4 +1,4 @@
-#N canvas 426 16 651 599 10;
+#N canvas 0 31 651 599 10;
 #X obj 85 569 gfsm;
 #X text 15 569 SEE ALSO:;
 #X text 41 6 gfsm_state : position "pointer" for finite-state automata
@@ -27,7 +27,6 @@
 #X msg 57 347 arc_first;
 #X msg 57 364 arc_next;
 #X msg 61 434 arc_reset;
-#X obj 26 508 gfsm_state fsm-help 0;
 #X text 71 280 arcs are output as a list:;
 #X text 261 280 NEXT_STATEID LO HI WEIGHT;
 #X text 302 414 (negative labels are ignored);
@@ -55,18 +54,31 @@ ID;
 ;
 #X text 323 261 SR - boolean: use gfsmSemiring?;
 #X msg 65 246 total_weight 1;
-#X connect 12 0 25 0;
-#X connect 15 0 25 0;
-#X connect 16 0 25 0;
-#X connect 17 0 25 0;
-#X connect 20 0 25 0;
-#X connect 22 0 25 0;
-#X connect 23 0 25 0;
-#X connect 24 0 25 0;
-#X connect 25 0 11 0;
-#X connect 29 0 25 0;
-#X connect 34 0 25 0;
-#X connect 38 0 25 0;
-#X connect 40 0 25 0;
-#X connect 42 0 25 0;
-#X connect 48 0 25 0;
+#X obj 26 508 gfsm_state fsm-help 0;
+#N canvas 577 273 494 344 META 0;
+#X text 12 135 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 115 AUTHOR Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 12 5 KEYWORDS control storage;
+#X text 12 45 DESCRIPTION position "pointer" for finite-state automata
+;
+#X text 12 65 INLET_0 automaton id set degree cyclic total_weight arc_gen
+arc_first arc_next arc_nth arc_seek arc_reset add_weight;
+#X text 12 95 OUTLET_0 anything;
+#X restore 589 566 pd META;
+#X connect 12 0 48 0;
+#X connect 15 0 48 0;
+#X connect 16 0 48 0;
+#X connect 17 0 48 0;
+#X connect 20 0 48 0;
+#X connect 22 0 48 0;
+#X connect 23 0 48 0;
+#X connect 24 0 48 0;
+#X connect 28 0 48 0;
+#X connect 33 0 48 0;
+#X connect 37 0 48 0;
+#X connect 39 0 48 0;
+#X connect 41 0 48 0;
+#X connect 47 0 48 0;
+#X connect 48 0 11 0;

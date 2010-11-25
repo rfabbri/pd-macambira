@@ -1,4 +1,4 @@
-#N canvas 424 14 776 478 10;
+#N canvas 0 31 776 478 10;
 #N canvas 0 0 450 300 (subpatch) 0;
 #X array array1 4 float 3;
 #A 0 0 66 67 68;

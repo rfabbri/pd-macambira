@@ -1,4 +1,4 @@
-#N canvas 8 34 479 520 10;
+#N canvas 0 31 479 520 10;
 #X text 89 7 gfsm_automaton : weighted finite state machine;
 #X text 183 489 Bryan Jurish <moocow@ling.uni-potsdam.de>;
 #X text 7 436 SEE ALSO:;
