@@ -1,4 +1,4 @@
-#N canvas 180 482 616 243 10;
+#N canvas 0 26 536 243 10;
 #X obj 111 51 osc~;
 #X floatatom 111 29 5 0 0 0 - - -;
 #X obj 112 93 bitsplit~ 4;
@@ -29,6 +29,21 @@
 #X connect 2 0 3 0;
 #X connect 3 0 5 0;
 #X restore 383 178 pd s;
+#N canvas 379 254 494 400 META 0;
+#X text 12 205 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 165 LIBRARY external creb;
+#X text 12 5 KEYWORDS signal;
+#X text 12 45 DESCRIPTION split a signal into a parallel binary word
+;
+#X text 12 65 INLET_0 signal;
+#X text 12 85 OUTLET_0 signal;
+#X text 12 105 OUTLET_1 signal;
+#X text 12 125 OUTLET_2 signal;
+#X text 12 145 OUTLET_3 signal;
+#X text 12 185 AUTHOR Tom Schouten <tom@zwizwa.be>;
+#X text 12 25 LICENSE GPL v2;
+#X restore 485 221 pd META;
 #X connect 0 0 10 0;
 #X connect 1 0 0 0;
 #X connect 2 0 4 0;

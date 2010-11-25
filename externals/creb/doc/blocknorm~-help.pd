@@ -1,4 +1,4 @@
-#N canvas 623 54 632 460 10;
+#N canvas 3 0 565 484 10;
 #X text 62 14 blocknorm~: normalize a dsp block to RMS = 1;
 #X text 144 33 creation argument = nb channels;
 #X obj 96 349 lop~;
@@ -44,6 +44,17 @@ but normalized to preserve total state energy.;
 #X obj 134 326 hsl 128 15 100 10000 1 1 empty empty empty -2 -6 0 8
 -262144 -1 -1 8100 1;
 #X text 282 157 relative formant shift;
+#N canvas 379 254 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 105 LIBRARY external creb;
+#X text 12 5 KEYWORDS signal block_oriented;
+#X text 12 45 DESCRIPTION normalize a dsp block to RMS = 1;
+#X text 12 65 INLET_0 signal;
+#X text 12 85 OUTLET_0 signal;
+#X text 12 125 AUTHOR Tom Schouten <tom@zwizwa.be>;
+#X text 12 25 LICENSE GPL v2;
+#X restore 514 462 pd META;
 #X connect 2 0 4 0;
 #X connect 2 0 9 0;
 #X connect 4 0 3 0;

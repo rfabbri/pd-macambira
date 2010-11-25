@@ -1,18 +1,18 @@
-#N canvas 310 312 826 610 10;
+#N canvas 4 4 680 586 10;
 #X obj 146 529 vols~;
-#X floatatom 203 509 5 0 0;
+#X floatatom 203 509 5 0 0 0 - - -;
 #X obj 143 562 dac~;
 #X obj 128 131 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X msg 10 415 print;
-#X floatatom 216 431 5 0 0;
-#X floatatom 267 432 5 0 0;
+#X floatatom 216 431 5 0 0 0 - - -;
+#X floatatom 267 432 5 0 0 0 - - -;
 #X obj 54 144 noise~;
 #X obj 94 190 *~;
-#X floatatom 203 111 5 0 0;
+#X floatatom 203 111 5 0 0 0 - - -;
 #X obj 146 157 ead~;
 #X msg 360 119 lines 501 752 5003 7504 105 206 307 408;
-#X floatatom 152 110 5 0 0;
+#X floatatom 152 110 5 0 0 0 - - -;
 #X msg 361 248 linear 32 100 105;
 #X msg 360 271 linear 32 1000 1005;
 #X msg 12 465 reset;
@@ -34,6 +34,19 @@ memory in ms>;
 #X text 359 430 inlets: low/high frequency reverb time (60dB time)
 ;
 #X msg 358 351 exponential 64 1000 10;
+#N canvas 379 254 494 359 META 0;
+#X text 12 185 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS signal;
+#X text 12 45 DESCRIPTION a feedback delay network;
+#X text 12 85 INLET_1 float;
+#X text 12 65 INLET_0 signal lines linear exponential;
+#X text 12 105 INLET_2 float;
+#X text 12 125 OUTLET_0 signal;
+#X text 12 145 OUTLET_1 signal;
+#X text 12 165 AUTHOR Tom Schouten <tom@zwizwa.be>;
+#X text 12 25 LICENSE GPL v2;
+#X restore 622 562 pd META;
 #X connect 0 0 2 0;
 #X connect 0 1 2 1;
 #X connect 1 0 0 2;

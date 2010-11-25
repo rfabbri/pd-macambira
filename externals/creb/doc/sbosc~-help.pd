@@ -1,4 +1,4 @@
-#N canvas 624 424 408 499 10;
+#N canvas 0 26 349 360 10;
 #X obj 70 158 sbosc~;
 #X floatatom 101 285 5 0 0 0 - - -;
 #X obj 70 308 vol~;
@@ -11,15 +11,28 @@
 #X text 119 84 center freq;
 #X text 38 14 sbosc~: smallband periodic complex oscillator.;
 #X obj 134 53 hsl 128 15 20 20000 1 0 empty empty empty -2 -6 0 8 -262144
--1 -1 4163 1;
+-1 -1 0 1;
 #X obj 213 91 hsl 128 15 20 20000 1 0 empty empty empty -2 -6 0 8 -262144
--1 -1 7400 1;
+-1 -1 0 1;
 #X obj 85 228 idsfosc~;
 #X obj 70 256 *~;
 #X floatatom 136 206 5 0 0 0 - - -;
 #X obj 194 191 hsl 128 15 -0.99 0.99 0 0 empty empty empty -2 -6 0
-8 -262144 -1 -1 9100 1;
+8 -262144 -1 -1 0 1;
 #X text 136 188 bw;
+#N canvas 379 254 494 366 META 0;
+#X text 12 185 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 45 DESCRIPTION smallband periodic complex oscillator;
+#X text 12 5 KEYWORDS signal oscillator;
+#X text 12 65 INLET_0 signal;
+#X text 12 85 INLET_1 signal;
+#X text 12 105 INLET_2 float;
+#X text 12 125 OUTLET_0 signal;
+#X text 12 145 OUTLET_1 signal;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 165 AUTHOR Tom Schouten <tom@zwizwa.be>;
+#X restore 299 340 pd META;
 #X connect 0 0 14 0;
 #X connect 1 0 2 1;
 #X connect 2 0 3 0;

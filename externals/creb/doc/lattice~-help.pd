@@ -1,4 +1,4 @@
-#N canvas 338 162 527 557 10;
+#N canvas 0 26 433 557 10;
 #X obj 57 -77 vsl 15 250 -1 1 0 1 empty empty empty 20 8 0 8 -262144
 -1 -1 12500 1;
 #X msg 57 223 rc 0 \$1;
@@ -33,6 +33,16 @@
 #X text 139 333 [rc <index> <val>] sets reflection coefficient;
 #X text 159 311 creation argument sets order;
 #X obj 27 330 dist~ 1;
+#N canvas 379 254 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE;
+#X text 12 45 DESCRIPTION a lattic filter;
+#X text 12 5 KEYWORDS signal filter;
+#X text 12 65 INLET_0 signal rc;
+#X text 12 85 OUTLET_0 signal;
+#X text 12 105 AUTHOR Tom Schouten <tom@zwizwa.be>;
+#X restore 383 409 pd META;
 #X connect 0 0 1 0;
 #X connect 1 0 17 0;
 #X connect 2 0 9 0;
