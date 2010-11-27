@@ -1,4 +1,4 @@
-#N canvas 165 0 804 625 10;
+#N canvas 0 31 630 580 10;
 #X obj 18 107 streamin13~ 8008 4;
 #X obj 19 496 streamout13~ localhost 8008 4;
 #X text 15 13 streamin13~/out13~ :;
@@ -31,8 +31,20 @@
 #X msg 101 364 grain 512;
 #X text 185 363 the number of samples sent at a time;
 #X text 347 462 the signals to send;
-#X floatatom 19 528 5 0 0;
+#X floatatom 19 528 5 0 0 0 - - -;
 #X text 72 530 status: 1 = connected 0 = disconnected;
+#N canvas 463 219 494 344 META 0;
+#X text 12 135 RELEASE_DATE 2009-06-12;
+#X text 12 155 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 115 AUTHOR d13@klingt.org;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 5 KEYWORDS signal network;
+#X text 12 45 DESCRIPTION like streamin~/out~ from ggee but for multiple
+channels and reduced udp-traffic (warning: not well tested);
+#X text 12 75 INLET_0 signal;
+#X text 12 95 OUTLET_N signal;
+#X restore 568 547 pd META;
 #X connect 0 0 8 0;
 #X connect 0 1 9 0;
 #X connect 0 2 10 0;

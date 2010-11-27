@@ -1,4 +1,4 @@
-#N canvas 303 26 450 397 10;
+#N canvas 0 31 437 368 10;
 #X msg 102 140 1;
 #X msg 81 90 0;
 #X obj 226 21 loadbang;
@@ -16,6 +16,17 @@
 create a pipe/fifo from within a shell with mknod pipename p and use
 this construct to send signals to another program/process. useful if
 you run more than one pd or mpeg-players \, ...;
+#N canvas 447 167 494 344 META 0;
+#X text 12 125 RELEASE_DATE 2009-06-12;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 105 AUTHOR d13@klingt.org;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 5 KEYWORDS signal filesystem;
+#X text 12 45 DESCRIPTION;
+#X text 12 65 INLET_0 signal float open;
+#X text 12 85 INLET_N signal;
+#X restore 380 339 pd META;
 #X connect 0 0 7 0;
 #X connect 1 0 7 0;
 #X connect 2 0 3 0;
