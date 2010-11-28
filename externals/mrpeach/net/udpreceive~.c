@@ -53,6 +53,8 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h> /* for socklen_t */
+#endif
+#ifdef _MSC_VER
 #define snprintf sprintf_s
 #endif
 
