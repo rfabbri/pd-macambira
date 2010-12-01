@@ -28,30 +28,30 @@
 0 10 -262144 -1 -1 0 1;
 #X obj 175 58 cnv 15 28 50 empty empty empty 20 12 0 14 -99865 -66577
 0;
-#X obj 188 83 image icons/transport_play.gif;
+#X obj 188 83 image examples/transport_play.gif;
 #X obj 209 58 hsl 23 50 0 127 0 0 transport_stop empty empty -2 -8
 0 10 -262144 -1 -1 0 1;
 #X obj 206 58 cnv 15 28 50 empty empty empty 20 12 0 14 -99865 -66577
 0;
-#X obj 220 83 image icons/transport_stop.gif;
+#X obj 220 83 image examples/transport_stop.gif;
 #X obj 240 58 hsl 23 50 0 127 0 0 rec_enable_toggle empty empty -2
 -8 0 10 -262144 -1 -1 0 1;
 #X obj 237 58 cnv 15 28 50 empty empty empty 20 12 0 14 -99865 -66577
 0;
-#X obj 252 83 image icons/record_normal_red.gif;
+#X obj 252 83 image examples/record_normal_red.gif;
 #X obj 98 58 hsl 23 50 0 127 0 0 goto_end empty empty -2 -8 0 10 -262144
 -1 -1 0 1;
 #X obj 95 58 cnv 15 28 50 empty empty empty 20 12 0 14 -99865 -66577
 0;
-#X obj 109 83 image icons/transport_end.gif;
+#X obj 109 83 image examples/transport_end.gif;
 #X obj 67 58 hsl 23 50 0 127 0 0 goto_start empty empty -2 -8 0 10
 -262144 -1 -1 0 1;
 #X obj 64 58 cnv 15 28 50 empty empty empty 20 12 0 14 -99865 -66577
 0;
-#X obj 78 83 image icons/transport_start.gif;
+#X obj 78 83 image examples/transport_start.gif;
 #X obj 209 4 cnv 15 120 30 empty empty ARDOUR-GUI 5 15 0 14 -191407
 -1 0;
-#X obj 528 24 image icons/ardour_icon_48px.gif;
+#X obj 528 24 image examples/ardour_icon_48px.gif;
 #X obj 64 119 tgl 13 0 rewind rewind-i Rewind 18 8 0 8 -162280 -162280
 -1 0 1;
 #X obj 64 139 tgl 13 0 ffwd ffwd-i Forward 18 8 0 8 -162280 -162280
@@ -62,7 +62,7 @@
 -262144 -1 -1 0 1;
 #X obj 144 58 cnv 15 28 50 empty empty empty 20 12 0 14 -99865 -66577
 0;
-#X obj 157 83 image icons/transport_loop.gif;
+#X obj 157 83 image examples/transport_loop.gif;
 #X obj 144 139 tgl 13 0 prev_marker prev_marker-i Previous.marker 18
 8 0 8 -162280 -162280 -1 1 1;
 #X obj 144 159 tgl 13 0 next_marker next_marker-i Next.marker 18 8

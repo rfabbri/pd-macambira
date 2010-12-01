@@ -1,5 +1,5 @@
-#N struct farben float x float y float farbe float ynpos;
-#N canvas 188 69 399 435 10;
+#N struct 1431-color float x float y float farbe float ynpos;
+#N canvas 188 69 399 419 10;
 #X text 12 387 Released under the BSD License;
 #X text 198 160 Inlets;
 #X text 198 220 Outlets;
@@ -8,12 +8,12 @@
 #X text 198 130 - TCL Color;
 #X text 198 180 - Bang;
 #X text 198 240 - Bang;
-#X obj 52 122 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#X obj 22 122 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
 #X obj 82 162 print;
 #X text 24 183 Always the same output;
 #X text 22 10 [but] - Monochrome Bang Button;
-#X obj 22 122 but 15 31;
+#X obj 52 122 but 15 31;
 #X obj 82 122 but 15 22;
 #X obj 112 122 but 15 16;
 #X obj 142 122 but 15 13;

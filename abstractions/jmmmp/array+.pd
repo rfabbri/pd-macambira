@@ -1,6 +1,6 @@
-#N struct 1015-graph float x float y float dist float resol float width
-float stres array 1015-boxes 1015-box;
-#N struct 1015-box float y float width;
+#N struct 1094-graph float x float y float dist float resol float width
+float stres array 1094-boxes 1094-box;
+#N struct 1094-box float y float width;
 #N canvas 330 25 920 794 10;
 #N canvas 651 507 450 300 \$0-box 0;
 #X obj 40 83 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
@@ -9,7 +9,7 @@ float stres array 1015-boxes 1015-box;
 #X obj 28 114 drawpolygon 0 2 0 0 width 0;
 #X connect 0 0 2 0;
 #X restore 753 114 pd \$0-box;
-#N canvas 600 79 615 150 \$0-graph 1;
+#N canvas 600 79 615 150 \$0-graph 0;
 #X obj 19 21 struct \$0-graph float x float y float dist float resol
 float width float stres array \$0-boxes \$0-box;
 #X obj 30 100 plot -y y(0:4)(4:0)(1) \$0-boxes 0 0 0 0 dist;
@@ -71,10 +71,7 @@ float width float stres array \$0-boxes \$0-box;
 #X msg 730 418 \; array1 0 1 1 1 1 -1 -1 -1;
 #X obj 51 354 moses 1;
 #N canvas 35 70 367 459 \$0-array 0;
-#X scalar 1015-graph 0 0 0.5 0 0 2 \; 2.05714 0.5 \; 3.8 0.5 \; 3.7
-0.5 \; 3.3 0.5 \; 2.9 0.5 \; 2.7 0.5 \; 2.5 0.5 \; 2.3 0.5 \; 1.8 0.5
-\; 0.9 0.5 \; 0.1 0.5 \; 0 0.5 \; 0 0.5 \; 0.4 0.5 \; 1.7 0.5 \; 1.9
-0.5 \; 2.2 0.5 \; 1 0.5 \; 4 0.5 \; 3 0.5 \; \;;
+#X scalar 1094-graph 0 0 0 0 0 1 \; 0 0 \; \;;
 #X coords 0 0 10 4 100 70 1;
 #X restore 753 30 pd \$0-array;
 #X obj 149 116 s pd-\$0-array;
