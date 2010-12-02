@@ -4,7 +4,7 @@ syslog for Pd
 allows to send syslog messages of a settable severity from with Pd.
 
 
-installaion
+installation
 -----------
 run:
 $ ./configure
