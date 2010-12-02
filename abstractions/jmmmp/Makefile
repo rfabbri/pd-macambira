@@ -1,4 +1,4 @@
-## Pd library template version 1.0.3
+## Pd library template version 1.0.6
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = jmmmp
@@ -9,10 +9,10 @@ SOURCES =
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = but.pd clock.pd dacm~.pd datei-o.pd datei-r.pd datei-w.pd dsp01.pd f+.pd lbang.pd liner+~.pd liner~.pd m-i.pd maat~.pd mat~.pd metrum.pd met~.pd mk.pd oscD.pd oscS.pd rec-name.pd sguigot.pd sliders.pd snaps~.pd spectrogram~.pd stoppuhr.pd tastin.pd uhr.pd
+PDOBJECTS = appent.pd ardourjack-gui.pd array+.pd array-edit.pd but.pd clock.pd dacm~.pd datei-o.pd datei-r.pd datei-w.pd dsp01.pd f+.pd lbang.pd liner+~.pd liner~.pd m-i.pd maat~.pd mat~.pd metrum.pd met~.pd mk.pd oscD.pd oscS.pd pd-colors.pd prepent.pd rec-name.pd sguigot.pd sliders.pd snaps~.pd spectrogram~.pd stoppuhr.pd tastin.pd uhr.pd
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = 
+EXAMPLES = ardour_icon_48px.gif computer_keyboard.png computer_keyboard_active.png crossfade-in-S1.png crossfade-in-S2.png crossfade-in-constant-power.png crossfade-in-fast-cut.png crossfade-in-linear.png crossfade-in-long-cut.png crossfade-in-short-cut.png crossfade-in-slow-cut.png crossfade-out-S1.png crossfade-out-S2.png crossfade-out-constant-power.png crossfade-out-fast-cut.png crossfade-out-linear.png crossfade-out-long-cut.png crossfade-out-short-cut.png crossfade-out-slow-cut.png fader_belt.png fader_belt_h.png hide.png nudge_left.png nudge_right.png record_normal_red.gif record_tape_red.png strip_width.png transport_end.gif transport_loop.gif transport_play.gif transport_range.gif transport_record.gif transport_start.gif transport_stop.gif zoom_full.png zoom_in.png zoom_out.png 
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
@@ -21,10 +21,8 @@ MANUAL =
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = appent.pd ardourjack-gui.pd array-edit.pd prepent.pd
+EXTRA_DIST = 
 
-
-# NOTE: lines added below for 'icons' folder
 
 
 #------------------------------------------------------------------------------#
@@ -33,7 +31,8 @@ EXTRA_DIST = appent.pd ardourjack-gui.pd array-edit.pd prepent.pd
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
+# -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
+CFLAGS = -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
@@ -46,7 +45,7 @@ LIBS =
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
-CFLAGS += -DVERSION='"$(LIBRARY_VERSION)"'
+CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 
 PD_INCLUDE = $(PD_PATH)/include
 # where to install the library, overridden below depending on platform
@@ -64,7 +63,7 @@ ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) 
 	         $(SOURCES_iphoneos) $(SOURCES_linux) $(SOURCES_windows)
 
 DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
-ORIGDIR=pd-$(LIBRARY_NAME)_$(LIBRARY_VERSION)
+ORIGDIR=pd-$(LIBRARY_NAME:~=)_$(LIBRARY_VERSION)
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
@@ -123,6 +122,34 @@ ifeq ($(UNAME),Linux)
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
+ifeq ($(UNAME),GNU)
+  # GNU/Hurd, should work like GNU/Linux for basically all externals
+  CPU := $(shell uname -m)
+  SOURCES += $(SOURCES_linux)
+  EXTENSION = pd_linux
+  OS = linux
+  PD_PATH = /usr
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += -fPIC
+  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
+ifeq ($(UNAME),GNU/kFreeBSD)
+  # Debian GNU/kFreeBSD, should work like GNU/Linux for basically all externals
+  CPU := $(shell uname -m)
+  SOURCES += $(SOURCES_linux)
+  EXTENSION = pd_linux
+  OS = linux
+  PD_PATH = /usr
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += -fPIC
+  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
 ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   CPU := $(shell uname -m)
   SOURCES += $(SOURCES_cygwin)
@@ -142,7 +169,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   EXTENSION = dll
   OS = windows
   PD_PATH = $(shell cd "$(PROGRAMFILES)"/pd && pwd)
-  OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -march=i686 -mtune=pentium4
+  OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
   CFLAGS += -mms-bitfields
   LDFLAGS += -s -shared -Wl,--enable-auto-import
   LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
@@ -200,9 +227,6 @@ install-doc:
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	$(INSTALL_DATA) README.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/README.txt
 	$(INSTALL_DATA) LICENSE.txt $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/LICENSE.txt
-# added for this lib
-	$(INSTALL_DIR) $(DESTDIR)/$(objectsdir)/$(LIBRARY_NAME)/icons
-	$(INSTALL_DATA) icons/*.* $(DESTDIR)/$(objectsdir)/$(LIBRARY_NAME)/icons
 
 install-examples:
 	test -z "$(strip $(EXAMPLES))" || \
@@ -274,10 +298,6 @@ dist: $(DISTDIR)
 		for file in $(MANUAL); do \
 			$(INSTALL_DATA) manual/$$file $(DISTDIR)/manual; \
 		done
-# added for this lib
-	$(INSTALL_DIR) $(DISTDIR)/icons
-	$(INSTALL_DATA) icons/*.* $(DISTDIR)/icons
-# make the tarball
 	tar --exclude-vcs -czpf $(DISTDIR).tar.gz $(DISTDIR)
 
 # make a Debian source package
