@@ -2,22 +2,27 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT
 AC_CANONICAL_HOST
+AC_DISABLE_OPTION_CHECKING
 AC_CONFIG_HEADER(include/pidip_config.h)
 
-PDP_PIDIP_VERSION="0.12.26"
+PDP_PIDIP_VERSION="0.12.27"
 PD_DIR=/usr/local/pd
+ARTKP_DIR=/usr/src/ARToolKitPlus
 PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
 MPEG4IP_SOURCE_DIR=/SOURCES/mpeg4ip
 PDP_STREAMING_OBJECTS=
 PDP_CAPTURE_OBJECT=
 PDP_DC1394_OBJECT=
+PDP_ARTKP_OBJECT=
 IMLIB_LIBS=
 IMLIB_CFLAGS=
 MAGIC_LIBS=
 MAGIC_CFLAGS=
 THEORA_LIBS=
 DC1394_LIBS=
+ARTKP_CPPFLAGS=
+ARTKP_LIBS=
 enable_ffmpeg=no
 enable_mpeg4ip=no
 enable_lcapture=no
@@ -66,6 +71,19 @@ then
    AC_MSG_ERROR([pdp sources not found in ${with_pdp}])
   else
    PDP_DIR=${pdp_tree}
+  fi
+fi
+
+AC_ARG_WITH(artkpsources, [  --with-artkp=PATH       ARToolKitPlus source tree])
+if ! test -z "${with_artkp}"
+then
+  artkp_tree="`cd ${with_artkp} 2>/dev/null && pwd`"
+  if test -z "${artkp_tree}"
+  then
+   dnl  The given directory can't be found
+   AC_MSG_ERROR([ARToolKitPlus sources not found in ${with_artkp}])
+  else
+   ARTKP_DIR=${artkp_tree}
   fi
 fi
 
@@ -137,6 +155,21 @@ AC_CHECK_LIB(dc1394, dc1394_camera_enumerate,
               AC_DEFINE(HAVE_DC1394, 1, dc1394 cameras interface)
               DC1394_LIBS="-ldc1394 -lraw1394"],
               echo "dc1394 not found : not building pdp_dc1394", )
+
+AC_LANG(C++)
+SAVED_LDFLAGS=$LDFLAGS
+CXXFLAGS="-I$ARTKP_DIR/include $CXXFLAGS"
+LDFLAGS="$LDFLAGS -lARToolKitPlus"
+AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM([#include <ARToolKitPlus/TrackerMultiMarkerImpl.h>],
+          [ARToolKitPlus::TrackerMultiMarker *dummy])],
+        [AC_MSG_RESULT([libARToolKitPlus found ... building pdp_artkp.])
+        PDP_ARTKP_OBJECT="pdp_artkp.o" 
+        ARTKP_LIBS="-lARToolKitPlus"
+        ARTKP_CPPFLAGS="-I$ARTKP_DIR/include"
+        AC_DEFINE(HAVE_ARTKP, 1, augmented reality toolkit plus)],
+        [AC_MSG_WARN([libARToolKitPlus is not installed.])])
+LDFLAGS=$SAVED_LDFLAGS
 
 AC_CHECK_LIB(bz2, BZ2_bzBuffToBuffCompress, , AC_MSG_ERROR(streaming requires bz2 library!!))
 AC_CHECK_LIB(z, deflate, , AC_MSG_ERROR(streaming requires compress library!!))
@@ -295,9 +328,12 @@ AC_SUBST(IMLIB_LIBS)
 AC_SUBST(IMLIB_CFLAGS)
 AC_SUBST(THEORA_LIBS)
 AC_SUBST(DC1394_LIBS)
+AC_SUBST(ARTKP_CPPFLAGS)
+AC_SUBST(ARTKP_LIBS)
 AC_SUBST(PDP_STREAMING_OBJECTS)
 AC_SUBST(PDP_CAPTURE_OBJECT)
 AC_SUBST(PDP_DC1394_OBJECT)
+AC_SUBST(PDP_ARTKP_OBJECT)
 AC_SUBST(PDP_PIDIP_LIBS)
 AC_SUBST(PDP_PIDIP_INCLUDES)
 

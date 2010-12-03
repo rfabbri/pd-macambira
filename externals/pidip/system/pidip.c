@@ -85,6 +85,9 @@ extern "C"
     void pdp_dc1394_setup(void);
 #endif
 
+#ifdef HAVE_ARTKP
+    void pdp_artkp_setup(void);
+#endif
 
 #ifdef HAVE_V4L2
     void pdp_v4l2_setup(void);
@@ -192,6 +195,10 @@ void pidip_setup(void){
 
 #ifdef HAVE_DC1394
     pdp_dc1394_setup();
+#endif
+
+#ifdef HAVE_ARTKP
+    pdp_artkp_setup();
 #endif
 
 #ifdef HAVE_V4L2
