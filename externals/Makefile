@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cxc cyclone earplug ekext ext13 freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
+LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cxc cyclone earplug ekext ext13 freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-libdir mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -967,28 +967,8 @@ jasch_lib_clean:
 	-rm -f -- $(externals_src)/jasch_lib/*/*.*~
 
 
-
 #------------------------------------------------------------------------------#
-# LOADERS
-LOADERS_NAME=
-LOADERS_OBJECTS := $(wildcard $(externals_src)/loaders/*.c)  \
-	$(externals_src)/loaders/hexloader/hexloader.c
-loaders: $(LOADERS_OBJECTS:.c=.$(EXTENSION))
-	echo $(LOADERS_OBJECTS)
-loaders_install: loaders
-	install -d $(DESTDIR)$(objectsdir)/$(LOADERS_NAME)
-	install -p $(LOADERS_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LOADERS_NAME)
-#	install -d $(DESTDIR)$(manualsdir)/$(LOADERS_NAME)
-#	install -p $(externals_src)/loaders/README.txt $(DESTDIR)$(manualsdir)/$(LOADERS_NAME)
-
-loaders_clean:
-	-rm -f -- $(LOADERS_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(externals_src)/loaders/*.o
-	-rm -f -- $(externals_src)/loaders/*.bak
-	-rm -f -- $(externals_src)/loaders/*.*~
-
-#------------------------------------------------------------------------------#
-# LIBDIR (RENAMED loaders-libdir TO AVOID POTENTIAL CONFLICTS)
+# LOADERS-LIBDIR
 loaders-libdir:
 	make -C $(externals_src)/loaders/libdir PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
 
