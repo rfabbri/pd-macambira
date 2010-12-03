@@ -18,6 +18,7 @@ LOG
 
 #ifndef _EiC
 #include "cv.h"
+#include "cvaux.h"
 #endif
 
 #include "Base/GemPixDualObj.h"
