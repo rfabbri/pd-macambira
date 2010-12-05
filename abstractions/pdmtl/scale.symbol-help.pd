@@ -1,4 +1,4 @@
-#N canvas 1378 496 740 433 10;
+#N canvas 284 335 740 433 10;
 #X obj 123 295 print <=5;
 #X obj 225 295 print >5;
 #X msg 141 196 symbol abcd;

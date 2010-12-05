@@ -1,5 +1,5 @@
 #N canvas 652 186 450 300 10;
-#X obj 121 157 linux.process;
+#X obj 121 157 pyext.process;
 #X msg 121 204 stopping process 6853;
 #X obj 121 181 flow.prepend set;
 #X symbolatom 121 118 30 0 0 0 - - -;

@@ -1,6 +1,4 @@
-#N canvas 261 562 450 300 10;
-#X obj 79 199 arraysize;
-#X text 157 199 <- flatspace;
+#N canvas 266 540 450 300 10;
 #X obj 57 21 inlet;
 #X obj 79 126 symbol;
 #X msg 79 151 set \$1 \, bang;
@@ -8,10 +6,11 @@
 #X obj 312 61 dollarg;
 #X obj 312 26 loadbang;
 #X obj 314 93 symbol;
-#X connect 0 0 5 0;
-#X connect 2 0 3 0;
-#X connect 3 0 4 0;
-#X connect 4 0 0 0;
-#X connect 6 0 8 0;
-#X connect 7 0 6 0;
-#X connect 8 0 3 1;
+#X obj 79 199 arraysize/arraysize;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 2 0 7 0;
+#X connect 4 0 6 0;
+#X connect 5 0 4 0;
+#X connect 6 0 1 1;
+#X connect 7 0 3 0;

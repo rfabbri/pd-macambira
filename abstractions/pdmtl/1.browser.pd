@@ -1,5 +1,5 @@
-#N canvas 0 590 399 160 10;
-#N canvas 217 80 583 520 CODE 0;
+#N canvas 3 677 399 160 10;
+#N canvas 219 144 583 520 CODE 0;
 #N canvas 102 310 999 691 patch 0;
 #X obj 289 16 inlet;
 #X obj 249 35 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -175,7 +175,7 @@
 -1 -262140 0;
 #X obj 1 68 hradio 15 1 0 12 \$0hr_2_s \$0hr_2_r 3d(12) 2 8 0 10 -1
 -1 -262140 0;
-#X obj 1 83 hradio 15 1 0 12 \$0hr_3_s \$0hr_3_r ambi(25) 2 8 0 10
+#X obj 1 83 hradio 15 1 0 12 \$0hr_3_s \$0hr_3_r ambi(31) 2 8 0 10
 -1 -1 -262140 0;
 #X obj 1 98 hradio 15 1 0 12 \$0hr_4_s \$0hr_4_r anal(7) 2 8 0 10 -1
 -1 -262140 0;

@@ -1,4 +1,4 @@
-#N canvas 318 45 641 808 10;
+#N canvas 318 0 641 692 10;
 #X obj 28 178 *~;
 #X obj 13 61 noise~;
 #X obj 48 278 mix.out_~;

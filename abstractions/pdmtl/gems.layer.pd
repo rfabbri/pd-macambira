@@ -26,6 +26,8 @@
 #X msg 525 256 0.25;
 #X msg 530 206 0.5;
 #X obj 75 -44 inlet render;
+#X floatatom 202 307 5 0 0 0 - - -;
+#X floatatom 132 211 5 0 0 0 - - -;
 #X connect 0 0 2 0;
 #X connect 2 0 21 0;
 #X connect 3 0 4 0;
@@ -36,6 +38,7 @@
 #X connect 6 0 14 0;
 #X connect 7 0 21 2;
 #X connect 7 0 21 1;
+#X connect 7 0 27 0;
 #X connect 8 0 2 3;
 #X connect 9 0 10 0;
 #X connect 10 0 7 0;
@@ -45,6 +48,7 @@
 #X connect 13 0 0 0;
 #X connect 14 0 2 3;
 #X connect 14 0 12 0;
+#X connect 14 0 28 0;
 #X connect 15 0 16 0;
 #X connect 16 0 17 0;
 #X connect 16 1 18 0;
