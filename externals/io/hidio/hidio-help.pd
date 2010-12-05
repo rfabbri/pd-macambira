@@ -189,7 +189,7 @@ IDs (it is not case sensitive):;
 #X coords 0 -1 1 1 257 17 1 60 60;
 #X restore 262 83 pd serin;
 #X obj 306 244 hidio;
-#X obj 286 310 flatspace/prepend set;
+#X obj 286 310 cyclone/prepend set;
 #X obj 544 315 unpack symbol symbol float float;
 #X floatatom 683 336 2 0 0 1 instance - -;
 #X obj 65 368 route x y z rx ry rz slider dial;
