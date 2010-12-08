@@ -1,15 +1,15 @@
-/* dssi~ - A DSSI host for PD 
- * 
- * Copyright (C) 2006 Jamie Bullock and others 
+/* dssi~ - A DSSI host for PD
+ *
+ * Copyright (C) 2006 Jamie Bullock and others
  *
  * This file incorporates code from the following sources:
- * 
+ *
  * jack-dssi-host (BSD-style license): Copyright 2004 Chris Cannam, Steve Harris and Sean Bolton.
- *		   
+ *
  * Hexter (GPL license): Copyright (C) 2004 Sean Bolton and others.
- * 
+ *
  * plugin~ (GPL license): Copyright (C) 2000 Jarno Seppänen, remIXed 2005
- * 
+ *
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,11 +36,6 @@ static t_class *ph_tilde_class;
 /*From dx7_voice_data.c by Sean Bolton */
 
 static char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-/*static void init_MidiEventBuf(snd_seq_event_t *MidiEventBuf){
-  int i;
-  for(i = 0; i < EVENT_BUFSIZE; i++){
-  MidiEventBuf[i].*/
 
 /*
  * encode_7in6
@@ -104,8 +99,8 @@ dx7_bulk_dump_checksum(uint8_t *data, int length)
     return sum & 0x7F;
 }
 
-static DSSI_Descriptor * ladspa_to_dssi(
-        LADSPA_Descriptor *ladspaDesc){
+static DSSI_Descriptor *ladspa_to_dssi(LADSPA_Descriptor *ladspaDesc)
+{
     DSSI_Descriptor *dssiDesc;
     dssiDesc = (DSSI_Descriptor *)calloc(1, sizeof(DSSI_Descriptor));
     ((DSSI_Descriptor *)dssiDesc)->DSSI_API_Version = 1;
@@ -113,18 +108,7 @@ static DSSI_Descriptor * ladspa_to_dssi(
         (LADSPA_Descriptor *)ladspaDesc;
     return (DSSI_Descriptor *)dssiDesc;
 }
-/*
-   static void ph_tilde_load_plugin(const char *dll_path, void **dll_handle){
 
- *dll_handle = dlopen(dll_path, RTLD_NOW | RTLD_LOCAL);
- if (*dll_handle){
- post("%s loaded successfully", dll_path);
- }
- else
- post("Failed: %s", dlerror());
-
- }
- */
 static void ph_tilde_port_info(t_ph_tilde *x){
     t_int i;
 
@@ -139,9 +123,8 @@ static void ph_tilde_port_info(t_ph_tilde *x){
 
         LADSPA_PortDescriptor pod =	
             x->descriptor->LADSPA_Plugin->PortDescriptors[i];
-#if DEBUG
-        post("Port %d: %s", i, x->descriptor->LADSPA_Plugin->PortNames[i]);
-#endif
+        ph_debug_post("Port %d: %s", i, x->descriptor->LADSPA_Plugin->PortNames[i]);
+
         if (LADSPA_IS_PORT_AUDIO(pod)) {
             x->port_info[i].data_type.a_w.w_symbol = 
                 gensym("audio");
@@ -193,26 +176,23 @@ static void ph_tilde_port_info(t_ph_tilde *x){
             gensym ((char *)
                     x->descriptor->LADSPA_Plugin->PortNames[i]);
     }
-#if DEBUG
-    post("%d inputs, %d outputs, %d control inputs, %d control outs", x->plugin_ins, x->plugin_outs, x->plugin_controlIns, x->plugin_controlOuts);
-#endif
+    ph_debug_post("%d inputs, %d outputs, %d control inputs, %d control outs", x->plugin_ins, x->plugin_outs, x->plugin_controlIns, x->plugin_controlOuts);
+
 }
 
 static void ph_tilde_assign_ports(t_ph_tilde *x){
     int i;
 
-#if DEBUG
-    post("%d instances", x->n_instances);
-#endif
+    ph_debug_post("%d instances", x->n_instances);
+
 
     x->plugin_ins *= x->n_instances;
     x->plugin_outs *= x->n_instances;
     x->plugin_controlIns *= x->n_instances;
     x->plugin_controlOuts *= x->n_instances;
 
-#if DEBUG
-    post("%d plugin outs", x->plugin_outs);
-#endif
+    ph_debug_post("%d plugin outs", x->plugin_outs);
+
 
     x->plugin_InputBuffers = 
         (float **)malloc(x->plugin_ins * sizeof(float *));
@@ -248,9 +228,8 @@ static void ph_tilde_assign_ports(t_ph_tilde *x){
     x->plugin_ControlInPortNumbers = 
         (unsigned long *)malloc(sizeof(unsigned long) * x->plugin_controlIns);
 
-#if DEBUG		
-    post("Buffers assigned!");
-#endif
+    ph_debug_post("Buffers assigned!");
+
 
 }
 
@@ -274,9 +253,8 @@ static void ph_tilde_init_instance(t_ph_tilde *x, t_int instance){
     x->instances[instance].ui_hidden = 1;
     x->instances[instance].ui_show = 0;
     x->instances[instance].gui_pid = 0;
-#if DEBUG		
-    post("Instance %d initialized!", instance);
-#endif
+
+    ph_debug_post("Instance %d initialized!", instance);
 
 }
 
@@ -285,10 +263,9 @@ static void ph_tilde_connect_ports(t_ph_tilde *x, t_int instance){
     t_int i;
 
     for(i = 0; i < (t_int)x->descriptor->LADSPA_Plugin->PortCount; i++){
-#if DEBUG
-        post("PortCount: %d of %d", i, 
+        ph_debug_post("PortCount: %d of %d", i, 
                 x->descriptor->LADSPA_Plugin->PortCount);
-#endif
+
         LADSPA_PortDescriptor pod =
             x->descriptor->LADSPA_Plugin->PortDescriptors[i];
 
@@ -304,10 +281,9 @@ static void ph_tilde_connect_ports(t_ph_tilde *x, t_int instance){
                 x->descriptor->LADSPA_Plugin->connect_port
                     (x->instanceHandles[instance], i, 
                      x->plugin_OutputBuffers[x->ports_out++]);
-#if DEBUG
-                post("Audio Input port %d connected", x->ports_in);
+                ph_debug_post("Audio Input port %d connected", x->ports_in);
                 post("Audio Output port %d connected", x->ports_out);
-#endif
+
             }
         } 
         else if (LADSPA_IS_PORT_CONTROL(pod)) {
@@ -316,10 +292,9 @@ static void ph_tilde_connect_ports(t_ph_tilde *x, t_int instance){
                 x->instances[instance].plugin_PortControlInNumbers[i] = x->ports_controlIn;
                 x->plugin_ControlDataInput[x->ports_controlIn] = 
                     (t_float) get_port_default(x, i);
-#if DEBUG
-                post("default for port %d, controlIn, %d is %.2f",i,
+                ph_debug_post("default for port %d, controlIn, %d is %.2f",i,
                         x->ports_controlIn, x->plugin_ControlDataInput[x->ports_controlIn]);
-#endif
+
 
                 x->descriptor->LADSPA_Plugin->connect_port
                     (x->instanceHandles[instance], i, 
@@ -330,30 +305,26 @@ static void ph_tilde_connect_ports(t_ph_tilde *x, t_int instance){
                     (x->instanceHandles[instance], i, 
                      &x->plugin_ControlDataOutput[x->ports_controlOut++]);
             }
-#if DEBUG
-            post("Control Input port %d connected", x->ports_controlIn);
+            ph_debug_post("Control Input port %d connected", x->ports_controlIn);
             post("Control Output port %d connected", x->ports_controlOut);
-#endif
+
         }
     }
 
-#if DEBUG
-    post("ports connected!");
-#endif
+    ph_debug_post("ports connected!");
+
 
 }
 
 static void ph_tilde_activate_plugin(t_ph_tilde *x, t_int instance){
 
     if(x->descriptor->LADSPA_Plugin->activate){
-#if DEBUG
-        post("trying to activate instance: %d", instance);
-#endif
+        ph_debug_post("trying to activate instance: %d", instance);
+
         x->descriptor->LADSPA_Plugin->activate(x->instanceHandles[instance]);
     }
-#if DEBUG
-    post("plugin activated!");
-#endif
+    ph_debug_post("plugin activated!");
+
 }
 
 static void ph_tilde_deactivate_plugin(t_ph_tilde *x, t_float instance_f){
@@ -361,9 +332,8 @@ static void ph_tilde_deactivate_plugin(t_ph_tilde *x, t_float instance_f){
     t_int instance = (t_int)instance_f;
     if(x->descriptor->LADSPA_Plugin->deactivate)
         x->descriptor->LADSPA_Plugin->deactivate(x->instanceHandles[instance]);
-#if DEBUG
-    post("plugin deactivated!");
-#endif
+    ph_debug_post("plugin deactivated!");
+
 }
 
 static void osc_error(int num, const char *msg, const char *where)
@@ -373,9 +343,8 @@ static void osc_error(int num, const char *msg, const char *where)
 
 static void query_programs(t_ph_tilde *x, t_int instance) {
     int i;
-#if DEBUG
-    post("querying programs");
-#endif
+    ph_debug_post("querying programs");
+
     /* free old lot */
     if (x->instances[instance].pluginPrograms) {
         for (i = 0; i < x->instances[instance].plugin_ProgramCount; i++)
@@ -412,12 +381,11 @@ static void query_programs(t_ph_tilde *x, t_int instance) {
                     descriptor->Program;
                 x->instances[instance].pluginPrograms[i].Name = 
                     strdup(descriptor->Name);
-#if DEBUG
-                post("program %d is MIDI bank %lu program %lu, named '%s'",i,
+                ph_debug_post("program %d is MIDI bank %lu program %lu, named '%s'",i,
                         x->instances[instance].pluginPrograms[i].Bank,
                         x->instances[instance].pluginPrograms[i].Program,
                         x->instances[instance].pluginPrograms[i].Name);
-#endif
+
             }
         }
         /* No - it should be 0 anyway - ph_init */
@@ -531,9 +499,8 @@ static void ph_tilde_set_control_input_by_index (t_ph_tilde *x,
         return;
     }
 
-#if DEBUG
-    post("ctrl input number = %d", ctrl_input_index);
-#endif
+    ph_debug_post("ctrl input number = %d", ctrl_input_index);
+
 
 
     port = x->plugin_ControlInPortNumbers[ctrl_input_index];
@@ -546,10 +513,9 @@ static void ph_tilde_set_control_input_by_index (t_ph_tilde *x,
     else
         portno = 
             x->instances[instance].plugin_PortControlInNumbers[ctrl_input_index];
-#if DEBUG
-    post("Global ctrl input number = %d", ctrl_input_index);
+    ph_debug_post("Global ctrl input number = %d", ctrl_input_index);
     post("Global ctrl input value = %.2f", value);
-#endif   
+
 
 
 
@@ -560,15 +526,13 @@ static void ph_tilde_set_control_input_by_index (t_ph_tilde *x,
     /* Update the UI if there is one */
     if(x->is_DSSI){
         if(x->instances[instance].uiTarget == NULL){
-#if DEBUG
-            post("pluginhost~: unable to send to NULL target");
-#endif   
+            ph_debug_post("pluginhost~: unable to send to NULL target");
+
             return;
         }
         if(x->instances[instance].ui_osc_control_path == NULL){
-#if DEBUG
-            post("pluginhost~: unable to send to NULL control path");
-#endif   
+            ph_debug_post("pluginhost~: unable to send to NULL control path");
+
             return;
         }
         lo_send(x->instances[instance].uiTarget, 
@@ -643,9 +607,8 @@ static void ph_tilde_control (t_ph_tilde *x,
         return;
     }
 
-#if DEBUG
-    post("Received LADSPA control data for instance %d", instance);
-#endif
+    ph_debug_post("Received LADSPA control data for instance %d", instance);
+
 
     if (ctrl_name->s_name == NULL || strlen (ctrl_name->s_name) == 0) {
         post("pluginhost~: control messages must have a name and a value");
@@ -742,9 +705,8 @@ static void ph_tilde_ladspa_describe(const char * pcFullFilename,
     outlet_anything (x->control_outlet, gensym ("library"), 1, at);
 
     if(is_DSSI){
-#if DEBUG
-        post("DSSI plugin found by listinfo");
-#endif
+        ph_debug_post("DSSI plugin found by listinfo");
+
         for (lIndex = 0;
                 (psDescriptor = (DSSI_Descriptor *)
                  fDescriptorFunction(lIndex)) != NULL; lIndex++) 
@@ -812,9 +774,8 @@ static void ph_tilde_get_current_program(t_ph_tilde *x, int instance){
 
 static void ph_tilde_program_change(t_ph_tilde *x, int instance){
     /* jack-dssi-host queues program changes by using  pending program change variables. In the audio callback, if a program change is received via MIDI it over writes the pending value (if any) set by the GUI. If unset, or processed the value will default back to -1. The following call to select_program is then made. I don't think it eventually needs to be done this way - i.e. do we need 'pending'? */ 
-#if DEBUG
-    post("executing program change");
-#endif
+    ph_debug_post("executing program change");
+
     if (x->instances[instance].pendingProgramChange >= 0){           
         if (x->instances[instance].pendingBankLSB >= 0) {
             if (x->instances[instance].pendingBankMSB >= 0) {
@@ -836,9 +797,8 @@ static void ph_tilde_program_change(t_ph_tilde *x, int instance){
                     x->instances[instance].currentBank, x->instances[instance].currentProgram);
         }
         if (x->instances[instance].uiNeedsProgramUpdate){
-#if DEBUG
-            post("Updating GUI program");
-#endif
+            ph_debug_post("Updating GUI program");
+
             /* FIX - this is a hack to make text ui work*/
             if(x->instances[instance].uiTarget)
                 lo_send(x->instances[instance].uiTarget, 
@@ -862,12 +822,11 @@ static int osc_program_handler(t_ph_tilde *x, lo_arg **argv, int instance)
     int i;
     int found = 0;
 
-#if DEBUG
-    post("osc_program_hander active!");
+    ph_debug_post("osc_program_hander active!");
 
     post("%d programs", x->instances[instance].plugin_ProgramCount);
 
-#endif
+
     for (i = 0; i < x->instances[instance].plugin_ProgramCount; ++i) {
         if (x->instances[instance].pluginPrograms[i].Bank == bank &&
                 x->instances[instance].pluginPrograms[i].Program == program) {
@@ -886,9 +845,8 @@ static int osc_program_handler(t_ph_tilde *x, lo_arg **argv, int instance)
     x->instances[instance].pendingBankMSB = bank / 128;
     x->instances[instance].pendingBankLSB = bank % 128;
     x->instances[instance].pendingProgramChange = program;
-#if DEBUG
-    post("bank = %d, program = %d, BankMSB = %d BankLSB = %d", bank, program, x->instances[instance].pendingBankMSB, x->instances[instance].pendingBankLSB);
-#endif
+    ph_debug_post("bank = %d, program = %d, BankMSB = %d BankLSB = %d", bank, program, x->instances[instance].pendingBankMSB, x->instances[instance].pendingBankLSB);
+
     ph_tilde_program_change(x, instance);
 
     return 0;
@@ -900,9 +858,8 @@ static int osc_control_handler(t_ph_tilde *x, lo_arg **argv, int instance)
     LADSPA_Data value = argv[1]->f;
 
     x->plugin_ControlDataInput[x->instances[instance].plugin_PortControlInNumbers[port]] = value;
-#if DEBUG
-    post("OSC: port %d = %f", port, value);
-#endif
+    ph_debug_post("OSC: port %d = %f", port, value);
+
 
     return 0;
 }
@@ -911,15 +868,13 @@ static int osc_midi_handler(t_ph_tilde *x, lo_arg **argv, t_int instance)
 {
 
     int ev_type = 0, chan = 0;
-#if DEBUG
-    post("OSC: got midi request for"
+    ph_debug_post("OSC: got midi request for"
             "(%02x %02x %02x %02x)",
             argv[0]->m[0], argv[0]->m[1], argv[0]->m[2], argv[0]->m[3]);
-#endif
+
     chan = instance;
-#if DEBUG
-    post("channel: %d", chan);
-#endif
+    ph_debug_post("channel: %d", chan);
+
 
     if(argv[0]->m[1] <= 239){
         if(argv[0]->m[1] >= 224)
@@ -949,9 +904,8 @@ static int osc_configure_handler(t_ph_tilde *x, lo_arg **argv, int instance)
     const char *value = (const char *)&argv[1]->s;
     char *message;
 
-#if DEBUG
-    post("osc_configure_handler active!");
-#endif
+    ph_debug_post("osc_configure_handler active!");
+
 
     if (x->descriptor->configure) {
 
@@ -977,9 +931,8 @@ static int osc_configure_handler(t_ph_tilde *x, lo_arg **argv, int instance)
 
 static int osc_exiting_handler(t_ph_tilde *x, lo_arg **argv, int instance){
 
-#if DEBUG
-    post("exiting handler called: Freeing ui_osc");
-#endif
+    ph_debug_post("exiting handler called: Freeing ui_osc");
+
     if(x->instances[instance].uiTarget){
         lo_address_free(x->instances[instance].uiTarget);
         x->instances[instance].uiTarget = NULL;
@@ -1013,9 +966,8 @@ static int osc_update_handler(t_ph_tilde *x, lo_arg **argv, int instance)
 
     p = x->configure_buffer_head;
 
-#if DEBUG
-    post("OSC: got update request from <%s>, instance %d", url, instance);
-#endif
+    ph_debug_post("OSC: got update request from <%s>, instance %d", url, instance);
+
 
     if (x->instances[instance].uiTarget) 
         lo_address_free(x->instances[instance].uiTarget);
@@ -1072,9 +1024,8 @@ static int osc_update_handler(t_ph_tilde *x, lo_arg **argv, int instance)
     /* Send current bank/program  (-FIX- another race...) */
     if (x->instances[instance].pendingProgramChange >= 0)
         ph_tilde_program_change(x, instance);
-#if DEBUG
-    post("pendingProgramChange = %d", x->instances[instance].pendingProgramChange);
-#endif
+    ph_debug_post("pendingProgramChange = %d", x->instances[instance].pendingProgramChange);
+
     if (x->instances[instance].pendingProgramChange < 0) {
         unsigned long bank = x->instances[instance].currentBank;
         unsigned long program = x->instances[instance].currentProgram;
@@ -1090,9 +1041,8 @@ static int osc_update_handler(t_ph_tilde *x, lo_arg **argv, int instance)
     for (i = 0; i < x->plugin_controlIns; i++) {
         lo_send(x->instances[instance].uiTarget, x->instances[instance].ui_osc_control_path, "if", 
                 x->plugin_ControlInPortNumbers[i], x->plugin_ControlDataInput[i]);  
-#if DEBUG
-        post("Port: %d, Default value: %.2f", x->plugin_ControlInPortNumbers[i], x->plugin_ControlDataInput[i]);
-#endif
+        ph_debug_post("Port: %d, Default value: %.2f", x->plugin_ControlInPortNumbers[i], x->plugin_ControlDataInput[i]);
+
     }
 
     /* Send 'show' */
@@ -1111,9 +1061,8 @@ static void ph_tilde_osc_setup(t_ph_tilde *x, int instance){
         x->osc_thread = lo_server_thread_new(NULL, osc_error);
         char *osc_url_tmp;
         osc_url_tmp = lo_server_thread_get_url(x->osc_thread);
-#if DEBUG
-        post("string length of osc_url_tmp:%d", strlen(osc_url_tmp));
-#endif
+        ph_debug_post("string length of osc_url_tmp:%d", strlen(osc_url_tmp));
+
         x->osc_url_base = (char *)malloc(sizeof(char) 
                 * (strlen(osc_url_tmp) + strlen("dssi") + 1)); 
         sprintf(x->osc_url_base, "%s%s", osc_url_tmp, "dssi");
@@ -1126,17 +1075,15 @@ static void ph_tilde_osc_setup(t_ph_tilde *x, int instance){
             (strlen(x->plugin_basename) + strlen(x->descriptor->LADSPA_Plugin->Label) + 			strlen("chan00") + 3));
     sprintf(x->instances[instance].osc_url_path, "%s/%s/chan%02d", x->plugin_basename, 
             x->descriptor->LADSPA_Plugin->Label, instance); 
-#if DEBUG
-    post("OSC Path is: %s", x->instances[instance].osc_url_path);
+    ph_debug_post("OSC Path is: %s", x->instances[instance].osc_url_path);
     post("OSC thread started: %s", x->osc_url_base);
-#endif
+
 }
 
 static void ph_tilde_init_programs(t_ph_tilde *x, int instance){
 
-#if DEBUG
-    post("Setting up program data");
-#endif
+    ph_debug_post("Setting up program data");
+
     query_programs(x, instance);
     if (x->descriptor->select_program &&
             x->instances[instance].plugin_ProgramCount > 0) {
@@ -1169,16 +1116,14 @@ static void ph_tilde_load_gui(t_ph_tilde *x, int instance){
 
     /* don't use strndup - GNU only */
     /*	gui_base = strndup(x->plugin_full_path, baselen);*/
-#if DEBUG
-    post("gui_base: %s", gui_base);
-#endif
+    ph_debug_post("gui_base: %s", gui_base);
+
 
     gui_str = (char *)malloc(sizeof(char) * (strlen("channel 00") + 1));
     sprintf (gui_str,"channel %02d", instance);
 
-#if DEBUG
-    post("GUI name string, %s", gui_str);
-#endif
+    ph_debug_post("GUI name string, %s", gui_str);
+
 
     if(!(dp = opendir(gui_base))){
         post("pluginhost~: unable to find GUI in %s, continuing without...", gui_base);
@@ -1194,9 +1139,8 @@ static void ph_tilde_load_gui(t_ph_tilde *x, int instance){
                     break;
             }
         }
-#if DEBUG
-        post("GUI filename: %s", dir_entry->d_name);
-#endif
+        ph_debug_post("GUI filename: %s", dir_entry->d_name);
+
     }
 
     gui_path = (char *)malloc(sizeof(char) * (strlen(gui_base) + strlen("/") + 
@@ -1205,9 +1149,8 @@ static void ph_tilde_load_gui(t_ph_tilde *x, int instance){
     sprintf(gui_path, "%s/%s", gui_base, dir_entry->d_name);
 
     free(gui_base);
-#if DEBUG
-    post("gui_path: %s", gui_path);
-#endif
+    ph_debug_post("gui_path: %s", gui_path);
+
 
     osc_url = (char *)malloc
         (sizeof(char) * (strlen(x->osc_url_base) + 
@@ -1217,9 +1160,8 @@ static void ph_tilde_load_gui(t_ph_tilde *x, int instance){
     sprintf(osc_url, "%s/%s", x->osc_url_base, 
             x->instances[instance].osc_url_path);
     post("pluginhost~: instance %d URL: %s",instance, osc_url);
-#if DEBUG
-    post("Trying to open GUI!");
-#endif
+    ph_debug_post("Trying to open GUI!");
+
 
     x->instances[instance].gui_pid = fork();
     if (x->instances[instance].gui_pid == 0){
@@ -1230,18 +1172,16 @@ static void ph_tilde_load_gui(t_ph_tilde *x, int instance){
         exit(1); /* terminates the process */ 
     }
 
-#if DEBUG
-    post("errorcode = %d", err);
-#endif
+    ph_debug_post("errorcode = %d", err);
+
 
     free(gui_path);
     free(osc_url);
     free(gui_str);
     if(dp){
 
-#if DEBUG
-        post("directory handle closed = %d", closedir(dp));
-#endif
+        ph_debug_post("directory handle closed = %d", closedir(dp));
+
     }
 }
 
@@ -1303,10 +1243,9 @@ static void MIDIbuf(int type, int chan, int param, int val, t_ph_tilde *x){
                 x->instances[mapped].pendingBankLSB = (param - 1) % 128;
                 x->instances[mapped].pendingProgramChange = val;
                 x->instances[mapped].uiNeedsProgramUpdate = 1; 
-#if DEBUG
-                post("pgm chabge received in buffer: MSB: %d, LSB %d, prog: %d",
+                ph_debug_post("pgm chabge received in buffer: MSB: %d, LSB %d, prog: %d",
                         x->instances[mapped].pendingBankMSB, x->instances[mapped].pendingBankLSB, val);
-#endif
+
                 ph_tilde_program_change(x, mapped);
                 break;
         }
@@ -1318,10 +1257,9 @@ static void MIDIbuf(int type, int chan, int param, int val, t_ph_tilde *x){
         x->midiEventBuf[x->bufWriteIndex].data.note.velocity = val;
     }
 
-#if DEBUG
-    post("MIDI received in buffer: chan %d, param %d, val %d, mapped to %d",
+    ph_debug_post("MIDI received in buffer: chan %d, param %d, val %d, mapped to %d",
             chan, param, val, mapped);
-#endif
+
     x->bufWriteIndex = (x->bufWriteIndex + 1) % EVENT_BUFSIZE;
     pthread_mutex_unlock(&x->midiEventBufferMutex); /**release mutex*/
 }
@@ -1350,9 +1288,8 @@ static void ph_tilde_list(t_ph_tilde *x, t_symbol *s, int argc, t_atom *argv) {
         case ASCII_a: ev_type = SND_SEQ_EVENT_KEYPRESS;
                       break;
     }
-#if DEBUG
-    post("initial midi NOTE:, arg1 = %d, arg2 = %d, arg3 = %d, arg4 = %d",ev_type,chan,param,val);
-#endif
+    ph_debug_post("initial midi NOTE:, arg1 = %d, arg2 = %d, arg3 = %d, arg4 = %d",ev_type,chan,param,val);
+
     if(ev_type != 0){
         if(chan >= 0)
             MIDIbuf(ev_type, chan, param, val, x);
@@ -1405,7 +1342,6 @@ static void ph_show(t_ph_tilde *x, t_int instance, t_int toggle){
 static t_int ph_tilde_configure_buffer(t_ph_tilde *x, char *key, 
         char *value, t_int instance){
 
-    /*#ifdef BLAH*/
     t_ph_configure_pair *current, *p;
     t_int add_node;
     add_node = 0;	
@@ -1432,14 +1368,13 @@ static t_int ph_tilde_configure_buffer(t_ph_tilde *x, char *key,
     p = x->configure_buffer_head;
 
     /*FIX: eventually give ability to query this buffer (to outlet?) */
-#if DEBUG	
     while(p){
-        post("key: %s", p->key);
-        post("val: %s", p->value);
-        post("instance: %d", p->instance);
+        ph_debug_post("key: %s", p->key);
+        ph_debug_post("val: %s", p->value);
+        ph_debug_post("instance: %d", p->instance);
         p = p->next;
     }
-#endif
+
     return 0;
 }
 
@@ -1499,9 +1434,8 @@ static void ph_tilde_search_plugin_callback (
     /* Stop searching when a first matching plugin is found */
     if (*out_lib_name == NULL)
     {
-#if DEBUG
-        post("pluginhost~: searching plugin \"%s\"...", full_filename);
-#endif
+        ph_debug_post("pluginhost~: searching plugin \"%s\"...", full_filename);
+
         for(plug_index = 0;(is_DSSI ? 
                     (descriptor = 
                      (DSSI_Descriptor *)descriptor_function(plug_index)) : 
@@ -1509,17 +1443,15 @@ static void ph_tilde_search_plugin_callback (
                         ladspa_to_dssi((LADSPA_Descriptor *)
                             descriptor_function(plug_index)))->LADSPA_Plugin)) 
                 != NULL; plug_index++){
-#if DEBUG		
-            post("pluginhost~: label \"%s\"", descriptor->LADSPA_Plugin->Label);
-#endif
+            ph_debug_post("pluginhost~: label \"%s\"", descriptor->LADSPA_Plugin->Label);
+
             if (strcasecmp (name, descriptor->LADSPA_Plugin->Label) 
                     == 0)
             {
                 *out_lib_name = strdup (full_filename);
-#if DEBUG
-                post("pluginhost~: found plugin \"%s\" in library \"%s\"",
+                ph_debug_post("pluginhost~: found plugin \"%s\" in library \"%s\"",
                         name, full_filename);
-#endif
+
                 /*	if(!is_DSSI){
                         free((DSSI_Descriptor *)descriptor);
                         descriptor = NULL;
@@ -1542,9 +1474,8 @@ static const char* plugin_tilde_search_plugin_by_label (t_ph_tilde *x,
 
     user_data[0] = (void*)(&lib_name);
     user_data[1] = (void*)name;
-#if DEBUG
-    post("search plugin by label: '%s'\n", name);
-#endif
+    ph_debug_post("search plugin by label: '%s'\n", name);
+
 
     lib_name = NULL;
     LADSPAPluginSearch (ph_tilde_search_plugin_callback,
@@ -1660,9 +1591,8 @@ static t_int ph_tilde_ph_methods(t_ph_tilde *x, t_symbol *s, int argc, t_atom *a
                     return 0;
                 }
                 fclose(fp);
-#if DEBUG
-                post("Patch file length is %ul", filelength);
-#endif
+                ph_debug_post("Patch file length is %ul", filelength);
+
                 /* figure out what kind of file it is */
                 filename_length = strlen(filename);
                 if (filename_length > 4 &&
@@ -1670,9 +1600,8 @@ static t_int ph_tilde_ph_methods(t_ph_tilde *x, t_symbol *s, int argc, t_atom *a
                         filelength % DX7_VOICE_SIZE_PACKED == 0) {  
                     /* It's a raw DX7 patch bank */
 
-#if DEBUG
-                    post("Raw DX7 format patch bank passed");
-#endif
+                    ph_debug_post("Raw DX7 format patch bank passed");
+
                     count = filelength / DX7_VOICE_SIZE_PACKED;
                     if (count > maxpatches)
                         count = maxpatches;
@@ -1693,9 +1622,8 @@ static t_int ph_tilde_ph_methods(t_ph_tilde *x, t_symbol *s, int argc, t_atom *a
                         raw_patch_data[5] == 0x00) {  
                     /* It's a DX7 sys-ex 32 voice dump */
 
-#if DEBUG
-                    post("SYSEX header check passed");
-#endif
+                    ph_debug_post("SYSEX header check passed");
+
 
                     if (filelength != DX7_DUMP_SIZE_BULK ||
                             raw_patch_data[DX7_DUMP_SIZE_BULK - 1] != 0xf7) {
@@ -1709,8 +1637,9 @@ static t_int ph_tilde_ph_methods(t_ph_tilde *x, t_symbol *s, int argc, t_atom *a
 
                         post("pluginhost~: DX7 32 voice dump with bad checksum!");
                         count = 0;
-
 #endif
+
+
                     } else {
 
                         count = 32;
@@ -1829,9 +1758,8 @@ static t_int ph_tilde_ph_methods(t_ph_tilde *x, t_symbol *s, int argc, t_atom *a
             ph_tilde_configure_buffer(x, key, value, instance);
         }
     }
-#if DEBUG
-    post("The plugin returned %s", debug);
-#endif
+    ph_debug_post("The plugin returned %s", debug);
+
     free(msg_type);
     free(patchbuf);
 
@@ -1887,9 +1815,8 @@ static t_int *ph_tilde_perform(t_int *w)
                         "pluginhost~: %s: discarding spurious MIDI data, for instance %d", 
                         x->descriptor->LADSPA_Plugin->Label, 
                         instance);
-#if DEBUG
-                post("n_instances = %d", x->n_instances);
-#endif
+                ph_debug_post("n_instances = %d", x->n_instances);
+
                 continue;
             }
 
@@ -1911,18 +1838,16 @@ static t_int *ph_tilde_perform(t_int *w)
             x->instanceEventBuffers[instance]
                 [x->instanceEventCounts[instance]] = 
                 x->midiEventBuf[x->bufReadIndex];
-#if DEBUG
-            post("%s, note received on channel %d", 
+            ph_debug_post("%s, note received on channel %d", 
                     x->descriptor->LADSPA_Plugin->Label, 
                     x->instanceEventBuffers[instance]
                     [x->instanceEventCounts[instance]].data.note.channel);
-#endif
+
             x->instanceEventCounts[instance]++; 
 
-#if DEBUG
-            post("Instance event count for instance %d of %d: %d\n",
+            ph_debug_post("Instance event count for instance %d of %d: %d\n",
                     instance + 1, x->n_instances, x->instanceEventCounts[instance]);
-#endif
+
 
         }
 
@@ -2054,9 +1979,8 @@ static void ph_tilde_free_plugin(t_ph_tilde *x){
         while(instance--){
 
             if(x->instances[instance].gui_pid){
-#if DEBUG
-                post("Killing GUI process PID = %d", x->instances[instance].gui_pid);
-#endif
+                ph_debug_post("Killing GUI process PID = %d", x->instances[instance].gui_pid);
+
                 kill(x->instances[instance].gui_pid, SIGINT);
             } 
             if (x->instances[instance].pluginPrograms) {
@@ -2151,9 +2075,8 @@ static void *ph_tilde_load_plugin(t_ph_tilde *x, t_int argc, t_atom *argv){
          *plugin_label,
          plugin_dir[MAXPDSTRING];
 
-#if DEBUG
-    post("argc = %d", argc);
-#endif
+    ph_debug_post("argc = %d", argc);
+
     int i,
         stop,
         fd;
@@ -2183,10 +2106,9 @@ static void *ph_tilde_load_plugin(t_ph_tilde *x, t_int argc, t_atom *argv){
                 plugin_full_path = strdup(tmpstr);
         }
         free(argstr);
-#if DEBUG
-        post("plugin path = %s", plugin_full_path);
+        ph_debug_post("plugin path = %s", plugin_full_path);
         post("plugin name = %s", x->plugin_label);
-#endif
+
 
         if(plugin_full_path != NULL){
             /* First try to load as is: this will work if plugin_full_path is an
@@ -2200,10 +2122,9 @@ static void *ph_tilde_load_plugin(t_ph_tilde *x, t_int argc, t_atom *argv){
                     plugin_dir, &plugin_basename, MAXPDSTRING, 0);
 
             if (fd >= 0) {
-#if DEBUG
-                post("plugin directory is %s, filename is %s", 
+                ph_debug_post("plugin directory is %s, filename is %s", 
                         plugin_dir, plugin_basename);
-#endif
+
                 x->plugin_basename = strdup(plugin_basename);
                 pathlen = strlen(plugin_dir);
                 tmpstr = &plugin_dir[pathlen];
@@ -2230,9 +2151,8 @@ static void *ph_tilde_load_plugin(t_ph_tilde *x, t_int argc, t_atom *argv){
                     while(strstr(plugin_basename, ".so") == NULL)
                         plugin_basename = strtok(NULL, "/");
                     x->plugin_basename = strdup(plugin_basename);
-#if DEBUG	
-                    post("plugin basename = %s", x->plugin_basename);
-#endif
+                    ph_debug_post("plugin basename = %s", x->plugin_basename);
+
                 }
                 else{
                     post("pluginhost~: invalid plugin path, must end in .so");
@@ -2259,17 +2179,15 @@ static void *ph_tilde_load_plugin(t_ph_tilde *x, t_int argc, t_atom *argv){
                 x->n_instances = 1;
 
 
-#if DEBUG
-            post("n_instances = %d", x->n_instances);
-#endif
+            ph_debug_post("n_instances = %d", x->n_instances);
+
             x->instances = (t_ph_instance *)malloc(sizeof(t_ph_instance) * 
                     x->n_instances);
 
             if(x->descriptor){
-#if DEBUG
-                post("%s loaded successfully!", 
+                ph_debug_post("%s loaded successfully!", 
                         x->descriptor->LADSPA_Plugin->Label);
-#endif
+
 
                 /*allocate memory for port_info*/
 
@@ -2304,6 +2222,7 @@ static void *ph_tilde_load_plugin(t_ph_tilde *x, t_int argc, t_atom *argv){
                         for(i = 0;i < x->n_instances; i++)
                             ph_tilde_load_gui(x, i);
 #endif
+
                         for(i = 0;i < x->n_instances; i++)
                             ph_tilde_init_programs(x, i);
 
@@ -2394,9 +2313,8 @@ static void *ph_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
 
 static void ph_tilde_free(t_ph_tilde *x){
 
-#if DEBUG
-    post("Calling ph_tilde_free");
-#endif
+    ph_debug_post("Calling ph_tilde_free");
+
 
     ph_tilde_quit_plugin(x);
     ph_tilde_free_plugin(x);
@@ -2439,18 +2357,16 @@ void pluginhost_tilde_setup(void) {
 static int osc_message_handler(const char *path, const char *types, 
         lo_arg **argv,int argc, void *data, void *user_data)
 {
-#if DEBUG
-    post("osc_message_handler active");
-#endif
+    ph_debug_post("osc_message_handler active");
+
     int i, instance = 0;
     const char *method;
     char chantemp[2];
     t_ph_tilde *x = (t_ph_tilde *)(user_data);
 
     if (strncmp(path, "/dssi/", 6)){
-#if DEBUG
-        post("calling osc_debug_handler"); 
-#endif
+        ph_debug_post("calling osc_debug_handler"); 
+
         return osc_debug_handler(path, types, argv, argc, data, x);
     }
     for (i = 0; i < x->n_instances; i++) {
@@ -2460,59 +2376,51 @@ static int osc_message_handler(const char *path, const char *types,
             break;
         }
     }
-#if DEBUG
     for(i = 0; i < argc; i++){
-        post("got osc request %c from instance %d, path: %s", 
+        ph_debug_post("got osc request %c from instance %d, path: %s", 
                 types[i],instance,path);
     }
-#endif
+
 
     if (!x->instances[instance].osc_url_path){
-#if DEBUG
-        post("calling osc_debug_handler"); 
-#endif
+        ph_debug_post("calling osc_debug_handler"); 
+
         return osc_debug_handler(path, types, argv, argc, data, x);
     }
     method = path + 6 + strlen(x->instances[instance].osc_url_path);
     if (*method != '/' || *(method + 1) == 0){
-#if DEBUG
-        post("calling osc_debug_handler"); 
-#endif
+        ph_debug_post("calling osc_debug_handler"); 
+
         return osc_debug_handler(path, types, argv, argc, data, x);
     }
     method++;
 
     if (!strcmp(method, "configure") && argc == 2 && !strcmp(types, "ss")) {
 
-#if DEBUG
-        post("calling osc_configure_handler");
-#endif
+        ph_debug_post("calling osc_configure_handler");
+
         return osc_configure_handler(x, argv, instance);
 
     } else if (!strcmp(method, "control") && argc == 2 && !strcmp(types, "if")) {
-#if DEBUG
-        post("calling osc_control_handler");
-#endif
+        ph_debug_post("calling osc_control_handler");
+
         return osc_control_handler(x, argv, instance);
     }
 
     else if (!strcmp(method, "midi") && argc == 1 && !strcmp(types, "m")) {
 
-#if DEBUG
-        post("calling osc_midi_handler");
-#endif
+        ph_debug_post("calling osc_midi_handler");
+
         return osc_midi_handler(x, argv, instance);
 
     } else if (!strcmp(method, "program") && argc == 2 && !strcmp(types, "ii")){
-#if DEBUG
-        post("calling osc_program_handler"); 
-#endif
+        ph_debug_post("calling osc_program_handler"); 
+
         return osc_program_handler(x, argv, instance);
 
     } else if (!strcmp(method, "update") && argc == 1 && !strcmp(types, "s")){
-#if DEBUG
-        post("calling osc_update_handler"); 
-#endif
+        ph_debug_post("calling osc_update_handler"); 
+
         return osc_update_handler(x, argv, instance);
 
     } else if (!strcmp(method, "exiting") && argc == 0) {
@@ -2521,5 +2429,25 @@ static int osc_message_handler(const char *path, const char *types,
     }
 
     return osc_debug_handler(path, types, argv, argc, data, x);
+}
+
+static void ph_debug_post(const char *fmt, ...)
+{
+#if DEBUG
+    va_list args;
+    size_t fmt_length;
+    char newfmt[DEBUG_STRING_SIZE];
+
+    fmt_length = strlen(fmt);
+
+    sprintf(newfmt, "%s: ", MY_NAME);
+    strncat(newfmt, fmt, fmt_length);
+    newfmt[strlen(MY_NAME) + 2 + fmt_length] = '\n';
+    newfmt[strlen(MY_NAME) + 2 + fmt_length + 1] = '\0';
+
+    va_start(args, fmt);
+    vfprintf(stderr, newfmt, args);
+    va_end(args);
+#endif
 }
 

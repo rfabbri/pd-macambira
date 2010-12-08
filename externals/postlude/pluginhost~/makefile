@@ -5,7 +5,7 @@ LIBDIR=/usr/local/lib
 PDDIR=$(LIBDIR)/pd
 INSTALLPATH=$(PDDIR)/extra/
 ARCHITECTURE=i386
-DEBUG=0
+DEBUG=1
 
 current: pd_linux
 

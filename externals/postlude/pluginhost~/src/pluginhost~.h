@@ -43,10 +43,12 @@
 
 
 #define VERSION 0.99
+#define MY_NAME "pluginhost~"
 #define EVENT_BUFSIZE 1024
 #define OSC_BASE_MAX 1024
 #define TYPE_STRING_SIZE 20 /* Max size of event type string (must be two more bytes than needed) */
 #define DIR_STRING_SIZE 1024 /* Max size of directory string */
+#define DEBUG_STRING_SIZE 1024
 #define ASCII_n 110
 #define ASCII_p 112
 #define ASCII_c 99
@@ -180,5 +182,6 @@ static int osc_message_handler(const char *path, const char *types,
         lo_arg **argv, int argc, void *data, void *user_data);
 static LADSPA_Data get_port_default(t_ph_tilde *x, int port);
 static void MIDIbuf(int type, int chan, int param, int val, t_ph_tilde *x);
+static void ph_debug_post(const char *fmt, ...);
 
 
