@@ -1,8 +1,8 @@
 #N canvas 186 66 1411 654 10;
 #X obj 1268 524 catch~ mix;
-#X text 602 15 dssi~ - a DSSI host for Pure Data ---------------------------------
+#X text 602 15 pluginhost~ - a DSSI host for Pure Data ---------------------------------
 ;
-#X obj 7 63 cnv 15 1400 300 empty empty dssi~_instance_1 20 12 0 14
+#X obj 7 63 cnv 15 1400 300 empty empty pluginhost~_instance_1 20 12 0 14
 -257472 -66577 0;
 #X obj 443 203 line;
 #X msg 443 182 \$1 10;
@@ -44,7 +44,7 @@
 #X text 585 97 --program change--;
 #X text 105 96 -----notes-----;
 #X text 718 97 --sysex patch/bank load--;
-#X obj 5 371 cnv 15 600 300 empty empty dssi~_instance_2 20 12 0 14
+#X obj 5 371 cnv 15 600 300 empty empty pluginhost~_instance_2 20 12 0 14
 -225280 -66577 0;
 #X obj 435 620 throw~ mix;
 #X obj 474 122 loadbang;
@@ -74,13 +74,13 @@ program and control data:;
 #X text 806 212 LAST ARGUMENT GIVES PLUGIN INSTANCE TO BE CONFIGURED
 \, NO LAST ARGUMENT=(ALL INSTANCES);
 #X obj 388 620 print;
-#X text 738 458 Usage: [dssi~ <[path to libary:plugin name] or [plugin
+#X text 738 458 Usage: [pluginhost~ <[path to libary:plugin name] or [plugin
 name]> <number of plugin instances>];
-#X obj 229 291 dssi~ /usr/local/lib/dssi/hexter.so:hexter 2;
+#X obj 229 291 pluginhost~ hexter.so:hexter 2;
 #X msg 193 342 control #1 445;
 #X obj 451 394 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
 -1 -1 7900 1;
-#X obj 378 582 dssi~ sine_faaa 6 -------------;
+#X obj 378 582 pluginhost~ sine_faaa 6 -------------;
 #X obj 284 438 expr $f1 \; $f1*2 \; $f1*3 \; $f1*4 \; $f1*5 \; $f1*6
 ;
 #X obj 285 397 loadbang;

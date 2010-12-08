@@ -1,5 +1,5 @@
-NAME=dssi~
-CSYM=dssi~
+NAME=pluginhost~
+CSYM=pluginhost~
 
 LIBDIR=/usr/local/lib
 PDDIR=$(LIBDIR)/pd
@@ -30,8 +30,8 @@ LINUXINCLUDE =  -I/usr/include -I./include
 .c.pd_linux:
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/jsearch.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/jload.c
-	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/dssi~.c
-	gcc --export-dynamic  -shared -o $(NAME).pd_linux dssi~.o jload.o jsearch.o -lc -lm -llo
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/pluginhost~.c
+	gcc --export-dynamic  -shared -o $(NAME).pd_linux pluginhost~.o jload.o jsearch.o -lc -lm -llo
 #	strip --strip-unneeded $(NAME).pd_linux
 	cp $(NAME).pd_linux ~/pd-externals/
 	rm -f *.o
@@ -45,13 +45,13 @@ pd_darwin: src/$(NAME).pd_darwin
 DARWINCFLAGS = -DPD -arch $(ARCHITECTURE) -O3 -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch -L/usr/local/lib/ -DDEBUG=$(DEBUG)
 
-DARWININCLUDE = -I ./ -I ../src -I/usr/local/include/ -I ./include -I/usr/local/include/dssi/
+DARWININCLUDE = -I ./ -I ../src -I/usr/local/include/ -I ./include -I/usr/local/include/pluginhost/
 
 .c.pd_darwin:
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/jsearch.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/jload.c
-	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/dssi~.c
-	$(CC) -arch $(ARCHITECTURE) -bundle -undefined suppress -flat_namespace -llo -o $(NAME).pd_darwin dssi~.o jload.o jsearch.o 
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/pluginhost~.c
+	$(CC) -arch $(ARCHITECTURE) -bundle -undefined suppress -flat_namespace -llo -o $(NAME).pd_darwin pluginhost~.o jload.o jsearch.o 
 	rm -f *.o
 
 # ----------------------- Generic -----------------------
@@ -60,7 +60,7 @@ clean:
 	rm -f *.o *.pd_* so_locations
 
 install:
-	cp dssi~.pd_* $(INSTALLPATH)
-	install -d  $(PDDIR)/doc/5.reference/dssi/
+	cp pluginhost~.pd_* $(INSTALLPATH)
+	install -d  $(PDDIR)/doc/5.reference/pluginhost/
 	install -m 644 doc/*-help* $(PDDIR)/doc/5.reference/
-	install -m 644 doc/output~.pd $(PDDIR)/doc/5.reference/dssi/
+	install -m 644 doc/output~.pd $(PDDIR)/doc/5.reference/pluginhost/

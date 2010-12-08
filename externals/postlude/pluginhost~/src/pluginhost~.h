@@ -24,8 +24,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "m_pd.h"
-#include "dssi.h"
 #include <dlfcn.h>
 #include <lo/lo.h> 
 #include <unistd.h>
@@ -36,6 +34,9 @@
 #include <signal.h> /* for kill() */
 #include <sys/wait.h> /* for wait() */
 #include <dirent.h> /* for readdir() */
+
+#include "m_pd.h"
+#include "dssi.h"
 
 #define DX7_VOICE_SIZE_PACKED 	128 /*From hexter_types.h by Sean Bolton */
 #define DX7_DUMP_SIZE_BULK 	4096+8
@@ -69,7 +70,7 @@ typedef struct _dx7_patch_t {
     uint8_t data[128];
 } dx7_patch_t;
 
-typedef struct _dssi_instance {
+typedef struct _ph_instance {
 
     long             currentBank;
     long             currentProgram;
@@ -96,16 +97,16 @@ typedef struct _dssi_instance {
     char *osc_url_path;
     pid_t	gui_pid;
 
-} t_dssi_instance;
+} t_ph_instance;
 
-struct dssi_configure_pair {
+struct ph_configure_pair {
     t_int instance;
     char *key,
          *value;
-    struct dssi_configure_pair *next;
+    struct ph_configure_pair *next;
 }; 
 
-typedef struct dssi_configure_pair t_dssi_configure_pair;
+typedef struct ph_configure_pair t_ph_configure_pair;
 
 typedef struct _port_info {
     t_atom type,
@@ -116,7 +117,7 @@ typedef struct _port_info {
            p_default;
 } t_port_info;
 
-typedef struct _dssi_tilde {
+typedef struct _ph_tilde {
     t_object  x_obj;
     t_int is_DSSI;
     char *plugin_label;
@@ -125,7 +126,7 @@ typedef struct _dssi_tilde {
     void *plugin_handle;
     char *project_dir; /* project dircetory */
     LADSPA_Handle *instanceHandles; /*was handle*/
-    t_dssi_instance *instances; 
+    t_ph_instance *instances; 
     int n_instances;
     unsigned long *instanceEventCounts;
     unsigned char channelMap[128];
@@ -166,18 +167,18 @@ typedef struct _dssi_tilde {
     t_inlet **inlets;
     t_outlet *control_outlet;
 
-    t_dssi_configure_pair *configure_buffer_head;
+    t_ph_configure_pair *configure_buffer_head;
 
     t_int dsp; /* boolean dsp setting */
     t_int dsp_loop;
 
-} t_dssi_tilde;
+} t_ph_tilde;
 
-static char *dssi_tilde_send_configure(t_dssi_tilde *x, char *key, 
+static char *ph_tilde_send_configure(t_ph_tilde *x, char *key, 
         char *value, t_int instance);
 static int osc_message_handler(const char *path, const char *types, 
         lo_arg **argv, int argc, void *data, void *user_data);
-static LADSPA_Data get_port_default(t_dssi_tilde *x, int port);
-static void MIDIbuf(int type, int chan, int param, int val, t_dssi_tilde *x);
+static LADSPA_Data get_port_default(t_ph_tilde *x, int port);
+static void MIDIbuf(int type, int chan, int param, int val, t_ph_tilde *x);
 
 
