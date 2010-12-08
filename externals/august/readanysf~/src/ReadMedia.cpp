@@ -207,7 +207,7 @@ int ReadMedia::decodeAudio( gavl_audio_frame_t * af ) {
 			signalA();
 			return 0;
 		} else {
-			//printf("Couldn't get an audio frame, audiofifo is %f full.\n", m_fifoaudio->getSizePercentage()); // this can only happen if the fifo is empty
+			printf("Couldn't get an audio frame, audiofifo is %f full.\n", m_fifoaudio->getSizePercentage()); // this can only happen if the fifo is empty
 			unlockState();
 			signalA();
 			return -1;

@@ -1,43 +1,31 @@
 # Edit these two variables to suit your system.
 # You need both gavl and gmerlin_avdec libs to compile
-#
-GAVLPATH=/usr/local/include
-PDPATH=/usr/local/include
 
 
-VERSION=0.42
+GAVLPREFIX=/usr/local
+#GAVLPREFIX=/opt/gmerlin
+PD_INCLUDES=/usr/include
+
+
+# SHOULDN'T REALLY NEED TO EDIT BELOW HERE
+
+VERSION=0.43
 UNAME := $(shell uname)
+
 
 ifeq ($(UNAME), Linux)
 TARGET=pd_linux
+STRIP=strip --strip-unneeded
+LDFLAGS =  -L$(GAVLPREFIX)/lib -lpthread  -lgavl -lgmerlin_avdec 
+GAVLPATH=$(GAVLPREFIX)/include
+CFLAGS =  -I./  -I$(GAVLPATH) -I$(GAVLPATH)/gavl -I$(GAVLPATH)/gmerlin -I$(PD_INCLUDES) -Wall
 else
 # assume darwin here
 GAVLPATH=/sw/include
-PDPATH=/Applications/Pd-extended.app/Contents/Resources/include/
+PD_INCLUDES=/Applications/Pd-extended.app/Contents/Resources/include/
 TARGET=pd_darwin
-endif
-
-##############################################
-LBITS := $(shell getconf LONG_BIT)
-ifeq ($(LBITS),64)
-   # do 64 bit stuff here, like set some CFLAGS
-CFLAGS =  -fPIC -I./  -I$(GAVLPATH) -I$(GAVLPATH)/gavl -I$(GAVLPATH)/gmerlin -I$(PDPATH) -Wall
-else
-   # do 32 bit stuff here
-CFLAGS =  -I./  -I$(GAVLPATH)  -I$(GAVLPATH)/gavl -I$(GAVLPATH)/gmerlin -I$(PDPATH) -Wall
-endif
-
-
-ifeq ($(UNAME), Linux)
-STRIP=strip --strip-unneeded
-# optimizations?
-#CFLAGS += -O1 -funroll-loops -fomit-frame-pointer \
-#    -Wall -W -Wshadow \
-#    -Wno-unused -Wno-parentheses -Wno-switch
-LDFLAGS =  -L/usr/local/lib -lpthread  -lgavl -lgmerlin_avdec 
-else
-# assume darwin here
 STRIP=strip -x
+CFLAGS =  -I./  -I$(GAVLPATH) -I$(GAVLPATH)/gavl -I$(GAVLPATH)/gmerlin -I$(PD_INCLUDES) -Wall
 CFLAGS += -I/sw/include -fast -fPIC
 LDFLAGS = -bundle -undefined dynamic_lookup -L/sw/lib -lgavl -lgmerlin_avdec
 #LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -undefined dynamic_lookup \
@@ -49,6 +37,11 @@ LDFLAGS = -bundle -undefined dynamic_lookup -L/sw/lib -lgavl -lgmerlin_avdec
 #        -lSystem.B -arch i386  -isysroot /Developer/SDKs/MacOSX10.4u.sdk 
 endif
 
+##############################################
+LBITS := $(shell getconf LONG_BIT)
+ifeq ($(LBITS),64)
+CFLAGS +=  -fPIC 
+endif
 
 
 

@@ -91,10 +91,10 @@ void m_play(t_readanysf *x) {
 		x->play = true;  // this is the only place where play is true
 	} else {
 		if (x->is_opening ) {
-			post("Current file is still starting.");
+			post("readanysf~: Current file is still starting.");
 			post("This probably means that it is a stream and it needs to buffer in from the network.");
 		} else {
-			post("Current file is either invalid or an unsupported codec.");
+			post("readanysf~: Current file is either invalid or an unsupported codec.");
 		}
 	}
 	pthread_mutex_unlock(&x->mut);
@@ -160,10 +160,6 @@ void m_init_audio( t_readanysf *x) {
 		gavl_audio_frame_destroy(x->tmp_audio_frame);
 	x->tmp_audio_frame = gavl_audio_frame_create(&x->tmp_audio_format);
 
-	/* m_out_audio_format.samples_per_frame = (m_out_audio_format.samplerate / (double)m_get_audio_format.samplerate) * 
-		 m_get_audio_format.samples_per_frame + 10;
-	 */
-
 	if (x->i2t_audio_converter == NULL)
 		x->i2t_audio_converter = gavl_audio_converter_create( );
 	x->do_i2t_audio_convert = gavl_audio_converter_init( x->i2t_audio_converter, &x->in_audio_format, &x->tmp_audio_format); 
@@ -172,7 +168,7 @@ void m_init_audio( t_readanysf *x) {
 		x->t2o_audio_converter = gavl_audio_converter_create( );
 	x->do_t2o_audio_convert = gavl_audio_converter_init_resample( x->t2o_audio_converter, &x->out_audio_format); 
 
-	// FIXME: this should be protected
+	// this should be protected
 	x->src_factor = x->out_audio_format.samplerate / (float) x->in_audio_format.samplerate;
 	/*
 		 printf("in audio format: \n");
@@ -191,10 +187,14 @@ void m_open_callback( void * data) {
 
 	pthread_mutex_lock(&x->mut);
 	x->is_opening = true; // set it here again just to be safe
-	
+	pthread_mutex_unlock(&x->mut);
+
 	if (x->rm->isReady() && x->rm->getAudioStreamCount() ) {	
 
+		pthread_mutex_lock(&x->mut);
 		m_init_audio(x);
+		x->is_opening=false;
+		pthread_mutex_unlock(&x->mut);
 
 		// FIXME:  is it safe to call these here?
 		SETFLOAT(&lst, (float)x->rm->getAudioSamplerate() );
@@ -210,6 +210,10 @@ void m_open_callback( void * data) {
 		outlet_anything(x->outinfo, gensym("ready"), 1, &lst);
 		// set time to 0 again here just to be sure
 	} else {
+		pthread_mutex_lock(&x->mut);
+		x->is_opening=false;
+		pthread_mutex_unlock(&x->mut);
+
 		SETFLOAT(&lst, 0.0 );
 		outlet_anything(x->outinfo, gensym("samplerate"), 1, &lst);
 		SETFLOAT(&lst, 0.0 );
@@ -217,10 +221,8 @@ void m_open_callback( void * data) {
 		SETFLOAT(&lst, 0.0 );
 		outlet_anything(x->outinfo, gensym("ready"), 1, &lst);
 		outlet_float(x->outinfo, 0.0);
-		post("Invalid file or unsupported codec.");
+		post("readanysf~: Invalid file or unsupported codec.");
 	}
-	x->is_opening=false;
-	pthread_mutex_unlock(&x->mut);
 }
 
 void m_open(t_readanysf *x, t_symbol *s) {
@@ -259,7 +261,7 @@ void m_loop(t_readanysf *x, float f) {
 		x->rm->setLoop( false );
 	else 
 		x->rm->setLoop( true );
-	post("looping = %d", x->rm->getLoop());
+	post("readanysf~: looping = %d", x->rm->getLoop());
 }
 
 
@@ -332,7 +334,7 @@ static void *readanysf_new(t_float f, t_float f2, t_float f3 ) {
   outlet_float(x->outinfo, 0.0);
 	if (x->rm == NULL) {
 		x->rm = new ReadMedia ( ); // (int)sys_getsr(), x->num_channels, x->num_frames_in_fifo, x->num_samples_per_frame);
-		post("Created new readanysf~ with %d channels and internal buffer of %d * %d = %d", x->num_channels,
+		post("Created new readanysf~ with %d channels and internal buffer of %d blocks of %d samples = %d", x->num_channels,
 				x->num_frames_in_fifo, x->num_samples_per_frame, x->num_frames_in_fifo *  x->num_samples_per_frame);
 	}
 	x->rm->setOpenCallback( m_open_callback, (void *)x); 
@@ -343,7 +345,7 @@ static void *readanysf_new(t_float f, t_float f2, t_float f3 ) {
 int m_get_frame( t_readanysf *x ) {
 	int ret =0;	
 	ret = x->rm->decodeAudio(x->in_audio_frame);
-	if (ret != 1) // EOF
+	if (ret != 1) // EOF=0 or error=-1
 		return ret;
 
 	if (x->do_i2t_audio_convert) {
@@ -356,6 +358,7 @@ int m_get_frame( t_readanysf *x ) {
 	}
 
 	if ( x->do_t2o_audio_convert  ) { // should be true all of the time
+		// protect src_factor here?
 		gavl_audio_converter_resample( x->t2o_audio_converter, x->tmp_audio_frame, x->out_audio_frame, x->src_factor );
 		//  Don't know why, but on the first conversion, I get one extra sample
 		//  THIS SHOULD NOT HAPPEN...this is a fix for now..check it out later.
@@ -382,8 +385,6 @@ int m_decode_block( t_readanysf * x ) {
 
 	while( samps_to_do > 0) {
 		if ( samps_to_do <= x->samplesleft) {
-			//if (x->out_audio_frame->valid_samples < x->samplesleft) 	
-			//	printf("error\n");
 			// copy our samples out to the pd audio buffer
 			for (i = 0; i < x->num_channels; i++) {
 				for (j = 0; j <  samps_to_do ;  j++) {
@@ -395,8 +396,6 @@ int m_decode_block( t_readanysf * x ) {
 			samps_to_do = 0;
 			break;
 		} else if ( x->samplesleft > 0 ) {
-			//if( x->out_audio_frame->valid_samples  < x->samplesleft)
-			//	printf("valid_samples < samplesleft, shouldn't happen\n");
 			for (i = 0; i < x->num_channels; i++) {
 				for (j = 0; j <  x->samplesleft;  j++) {
 					x->x_outvec[i][samps_done + j] = x->out_audio_frame->channels.f[i][ x->out_audio_frame->valid_samples - x->samplesleft +j ];
@@ -407,10 +406,10 @@ int m_decode_block( t_readanysf * x ) {
 			x->samplesleft = 0;
 		} else { // samplesleft is zero
 			int ret = m_get_frame(x);
-			if (ret == 0) {
+			if (ret == 0) { // EOF
 				return samps_done;
-			} else if (ret == -1) {
-				//printf("error getting frame...must be seeking\n");
+			} else if (ret == -1) {  // error, file proly not ready
+				printf("error getting frame...must be seeking\n");
 				return ret;
 			} 
 		}
@@ -432,6 +431,7 @@ static t_int *readanysf_perform(t_int *w) {
 			outlet_bang(x->outinfo);
 		} else if (samples_returned == -1) {
 			// error in getting audio, normally from seeking
+			post("readanysf~: error on m_decode_block inside perform()");
 			samples_returned=0;
 		}
 	} 
@@ -477,14 +477,13 @@ void readanysf_dsp(t_readanysf *x, t_signal **sp) {
 		x->out_audio_format.channel_locations[0] = GAVL_CHID_NONE; // Reset
 
 		// leave enough room in our out format and frame for resampling
-		x->out_audio_format.samples_per_frame = x->num_samples_per_frame * SRC_MAX +10;
+		x->out_audio_format.samples_per_frame = ( x->num_samples_per_frame * SRC_MAX ) +10;
 		gavl_set_channel_setup (&x->out_audio_format); // Set channel locations
 		
 		if(x->out_audio_frame != NULL)
 			gavl_audio_frame_destroy( x->out_audio_frame);
 		x->out_audio_frame = gavl_audio_frame_create(&x->out_audio_format);
-		//printf("created new out frame in readanysf_dsp\n");
-  	post("pd blocksize=%d, spf=%d", x->blocksize, x->num_samples_per_frame);
+  	//post("readanysf~: pd blocksize=%d, spf=%d", x->blocksize, x->num_samples_per_frame);
 	}
 
   for (i = 0; i < x->num_channels; i++)
@@ -496,7 +495,6 @@ void readanysf_dsp(t_readanysf *x, t_signal **sp) {
 
 static void readanysf_free(t_readanysf *x) {
 	// delete the readany objs
-
 	if (x->in_audio_frame != NULL) gavl_audio_frame_destroy(x->in_audio_frame);
 	if (x->tmp_audio_frame != NULL) gavl_audio_frame_destroy(x->tmp_audio_frame);
 	if (x->out_audio_frame != NULL) gavl_audio_frame_destroy(x->out_audio_frame);
