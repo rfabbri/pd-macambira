@@ -170,8 +170,6 @@ typedef struct _ph_tilde {
     snd_seq_event_t **instanceEventBuffers;
     snd_seq_event_t midiEventBuf[EVENT_BUFSIZE];
 
-    pthread_mutex_t midiEventBufferMutex;
-
 } ph_tilde;
 
 static char *ph_tilde_send_configure(ph_tilde *x, char *key, char *value,

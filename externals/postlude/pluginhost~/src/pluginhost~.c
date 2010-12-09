@@ -1,4 +1,4 @@
-/* dssi~ - A DSSI host for PD
+/* pluginhost~ - A plugin host for Pd
  *
  * Copyright (C) 2006 Jamie Bullock and others
  *
@@ -28,7 +28,6 @@
 
 #include <stdarg.h>
 #include <assert.h>
-#include <pthread.h>
 
 #include "pluginhost~.h"
 #include "jutils.h"
@@ -1178,7 +1177,6 @@ static void ph_tilde_load_gui(ph_tilde *x, int instance)
 
     x->instances[instance].gui_pid = fork();
     if (x->instances[instance].gui_pid == 0){
-        //pthread_mutex_init(&x->midiEventBufferMutex, NULL);
         err = execlp(gui_path, gui_path, osc_url, dir_entry->d_name, 
                 x->descriptor->LADSPA_Plugin->Label, gui_str, NULL);
         perror("exec failed");
@@ -1210,8 +1208,6 @@ static void MIDIbuf(int type, unsigned int chan, int param, int val,
 
     t_int time_ref = x->time_ref;
     t_int mapped;
-
-    pthread_mutex_lock(&x->midiEventBufferMutex);
 
     mapped = x->channelMap[chan + 1] - 1;
 
@@ -1277,7 +1273,6 @@ static void MIDIbuf(int type, unsigned int chan, int param, int val,
             chan, param, val, mapped);
 
     x->bufWriteIndex = (x->bufWriteIndex + 1) % EVENT_BUFSIZE;
-    pthread_mutex_unlock(&x->midiEventBufferMutex); /**release mutex*/
 }
 
 static void ph_tilde_list(ph_tilde *x, t_symbol *s, int argc, t_atom *argv)
@@ -2088,185 +2083,187 @@ static void *ph_tilde_load_plugin(ph_tilde *x, t_int argc, t_atom *argv)
 
     stop = 0;
 
-    if (argc){
-        char *argstr = strdup(argv[0].a_w.w_symbol->s_name);
+    if (!argc){
+        post("pluginhost~: no arguments given, please supply a path");
+        return x;
+    }
 
-        if(strstr(argstr, ":") != NULL){
-            tmpstr = strtok(argstr, ":");
+    char *argstr = strdup(argv[0].a_w.w_symbol->s_name);
+
+    if(strstr(argstr, ":") != NULL){
+        tmpstr = strtok(argstr, ":");
+        plugin_full_path = strdup(tmpstr);
+        plugin_label = strtok(NULL, ":");
+        // first part of the string is empty, i.e. ':mystring'
+        if (plugin_label == NULL) {
+            x->plugin_label = plugin_full_path;
+            plugin_full_path = NULL;
+        } else {
+            x->plugin_label = strdup(plugin_label);
+        }
+    } else { 
+        x->plugin_label = strdup(argstr);
+        tmpstr = (char *)plugin_tilde_search_plugin_by_label(x, x->plugin_label);
+        if(tmpstr) {
             plugin_full_path = strdup(tmpstr);
-            plugin_label = strtok(NULL, ":");
-            // first part of the string is empty, i.e. ':mystring'
-            if (plugin_label == NULL) {
-                x->plugin_label = plugin_full_path;
-                plugin_full_path = NULL;
-            } else {
-                x->plugin_label = strdup(plugin_label);
-            }
         }
-        else{ 
-            x->plugin_label = strdup(argstr);
-            tmpstr = (char *)plugin_tilde_search_plugin_by_label(x, x->plugin_label);
-            if(tmpstr)
-                plugin_full_path = strdup(tmpstr);
+    }
+
+    free(argstr);
+    ph_debug_post("plugin path = %s", plugin_full_path);
+    ph_debug_post("plugin name = %s", x->plugin_label);
+
+    if(plugin_full_path == NULL){
+        post("pluginhost~: can't get path to plugin");
+        return x;
+    }
+
+    x->plugin_full_path = (char *)plugin_full_path;
+
+    /* search for it in the 'canvas' path, which
+     * includes the Pd search dirs and any 'extra' paths set with
+     * [declare] */
+    fd = canvas_open(x->x_canvas, plugin_full_path, "",
+            plugin_dir, &plugin_basename, MAXPDSTRING, 0);
+
+    if (fd >= 0) {
+        ph_debug_post("plugin directory is %s, filename is %s", 
+                plugin_dir, plugin_basename);
+
+        x->plugin_basename = strdup(plugin_basename);
+        pathlen = strlen(plugin_dir);
+        tmpstr = &plugin_dir[pathlen];
+        sprintf(tmpstr, "/%s", plugin_basename);
+        tmpstr = plugin_dir;
+        x->plugin_handle = loadLADSPAPluginLibrary(tmpstr);
+    } else {
+        /* try to load as is: this will work if plugin_full_path is an
+         * absolute path, or the name of a library that is in DSSI_PATH
+         * or LADSPA_PATH environment variables */
+        x->plugin_handle = loadLADSPAPluginLibrary(plugin_full_path);
+    }
+
+    if (x->plugin_handle == NULL) {
+        error("pluginhost~: can't find plugin in Pd paths, " 
+                "try using [declare] to specify the path.");
+        return x;
+    }
+
+    tmpstr = strdup(plugin_full_path);
+    /* Don't bother working out the plugin name if we used canvas_open() 
+     * to get the path */
+    if(plugin_basename == NULL){
+        if(!strstr(tmpstr, ".so")){
+            post("pluginhost~: invalid plugin path, must end in .so");
+            return x;
         }
-        free(argstr);
-        ph_debug_post("plugin path = %s", plugin_full_path);
-        post("plugin name = %s", x->plugin_label);
-
-
-        if(plugin_full_path != NULL){
-            /* First try to load as is: this will work if plugin_full_path is an
-             * absolute path, or the name of a library that is in DSSI_PATH
-             * or LADSPA_PATH environment variables */
-            x->plugin_full_path = (char *)plugin_full_path;
-            /* If that didn't work, search for it in the 'canvas' path, which
-             * includes the Pd search dirs and any 'extra' paths set with
-             * [declare] */
-            fd = canvas_open(x->x_canvas, plugin_full_path, "",
-                    plugin_dir, &plugin_basename, MAXPDSTRING, 0);
-
-            if (fd >= 0) {
-                ph_debug_post("plugin directory is %s, filename is %s", 
-                        plugin_dir, plugin_basename);
-
-                x->plugin_basename = strdup(plugin_basename);
-                pathlen = strlen(plugin_dir);
-                tmpstr = &plugin_dir[pathlen];
-                sprintf(tmpstr, "/%s", plugin_basename);
-                tmpstr = plugin_dir;
-                x->plugin_handle = loadLADSPAPluginLibrary(tmpstr);
-            } else {
-                x->plugin_handle = loadLADSPAPluginLibrary(plugin_full_path);
-            }
-
-            if (x->plugin_handle == NULL)
-                error("pluginhost~: can't find plugin in Pd paths, " 
-                        "try using [declare] to specify the path.");
-
+        plugin_basename = strtok((char *)tmpstr, "/");
+        while(strstr(plugin_basename, ".so") == NULL) {
+            plugin_basename = strtok(NULL, "/");
         }
+        x->plugin_basename = strdup(plugin_basename);
+        ph_debug_post("plugin basename = %s", x->plugin_basename);
+    }
+    free(tmpstr);
+    if(x->desc_func = (DSSI_Descriptor_Function)dlsym(x->plugin_handle,			"dssi_descriptor")){
+        x->is_DSSI = true;
+        x->descriptor = (DSSI_Descriptor *)x->desc_func(0);
+    }
+    else if(x->desc_func = 
+            (DSSI_Descriptor_Function)dlsym(x->plugin_handle,						"ladspa_descriptor")){
+        x->is_DSSI = false;
+        x->descriptor = ladspa_to_dssi((LADSPA_Descriptor *)x->desc_func(0));
+    }
 
-        if (x->plugin_handle != NULL){
-            tmpstr = strdup(plugin_full_path);
-            /* Don't bother working out the plugin name if we used canvas_open() 
-             * to get the path */
-            if(plugin_basename == NULL){
-                if(strstr(tmpstr, ".so")){
-                    plugin_basename = strtok((char *)tmpstr, "/");
-                    while(strstr(plugin_basename, ".so") == NULL)
-                        plugin_basename = strtok(NULL, "/");
-                    x->plugin_basename = strdup(plugin_basename);
-                    ph_debug_post("plugin basename = %s", x->plugin_basename);
+    if(argc >= 2) {
+        x->n_instances = (t_int)argv[1].a_w.w_float;
+    } else {
+        x->n_instances = 1;
+    }
 
-                }
-                else{
-                    post("pluginhost~: invalid plugin path, must end in .so");
-                    return (void *) x;
-                }
-            }
-            free(tmpstr);
-            if(x->desc_func = (DSSI_Descriptor_Function)dlsym(x->plugin_handle,			"ph_descriptor")){
-                x->is_DSSI = 1;
-                x->descriptor = (DSSI_Descriptor *)x->desc_func(0);
-            }
-            else if(x->desc_func = 
-                    (DSSI_Descriptor_Function)dlsym(x->plugin_handle,						"ladspa_descriptor")){
-                x->is_DSSI = 0;
-                x->descriptor = 
-                    ladspa_to_dssi((LADSPA_Descriptor *)
-                            x->desc_func(0));
-            }
+    ph_debug_post("n_instances = %d", x->n_instances);
 
+    x->instances = (ph_instance *)malloc(sizeof(ph_instance) * 
+            x->n_instances);
 
-            if(argc >= 2)
-                x->n_instances = (t_int)argv[1].a_w.w_float;
-            else
-                x->n_instances = 1;
+    if(!x->descriptor){
+        post("pluginhost~: error: couldn't get plugin descriptor");
+        return x;
+    }
 
-            ph_debug_post("n_instances = %d", x->n_instances);
+    ph_debug_post("%s loaded successfully!", 
+            x->descriptor->LADSPA_Plugin->Label);
 
-            x->instances = (ph_instance *)malloc(sizeof(ph_instance) * 
-                    x->n_instances);
+    x->port_info = (ph_port_info *)malloc
+        (x->descriptor->LADSPA_Plugin->PortCount * 
+         sizeof(ph_port_info));
 
-            if(x->descriptor){
-                ph_debug_post("%s loaded successfully!", 
-                        x->descriptor->LADSPA_Plugin->Label);
+    ph_tilde_port_info(x);
+    ph_tilde_assign_ports(x);
 
-                x->port_info = (ph_port_info *)malloc
-                    (x->descriptor->LADSPA_Plugin->PortCount * 
-                     sizeof(ph_port_info));
+    for(i = 0; i < x->n_instances; i++){
+        x->instanceHandles[i] = 
+            x->descriptor->LADSPA_Plugin->
+            instantiate(x->descriptor->LADSPA_Plugin, x->sr);
+        if (!x->instanceHandles[i]){
+            post("pluginhost~: instantiation of instance %d failed", i);
+            stop = 1;
+            break;
+        }
+    }
 
-                ph_tilde_port_info(x);
-                ph_tilde_assign_ports(x);
-                for(i = 0; i < x->n_instances; i++){
-                    x->instanceHandles[i] = 
-                        x->descriptor->LADSPA_Plugin->
-                        instantiate(x->descriptor->LADSPA_Plugin, x->sr);
-                    if (!x->instanceHandles[i]){
-                        post("pluginhost~: instantiation of instance %d failed", i);
-                        stop = 1;
-                        break;
-                    }
-                }
-                if(!stop){
-                    for(i = 0;i < x->n_instances; i++)
-                        ph_tilde_init_instance(x, i);
-                    for(i = 0;i < x->n_instances; i++)
-                        ph_tilde_connect_ports(x, i); 
-                    for(i = 0;i < x->n_instances; i++)
-                        ph_tilde_activate_plugin(x, i);
+    if(!stop){
+        for(i = 0;i < x->n_instances; i++)
+            ph_tilde_init_instance(x, i);
+        for(i = 0;i < x->n_instances; i++)
+            ph_tilde_connect_ports(x, i); 
+        for(i = 0;i < x->n_instances; i++)
+            ph_tilde_activate_plugin(x, i);
 
-                    if(x->is_DSSI){
-                        for(i = 0;i < x->n_instances; i++)
-                            ph_tilde_osc_setup(x, i);
+        if(x->is_DSSI){
+            for(i = 0;i < x->n_instances; i++)
+                ph_tilde_osc_setup(x, i);
 #if LOADGUI
-                        for(i = 0;i < x->n_instances; i++)
-                            ph_tilde_load_gui(x, i);
+            for(i = 0;i < x->n_instances; i++)
+                ph_tilde_load_gui(x, i);
 #endif
 
-                        for(i = 0;i < x->n_instances; i++)
-                            ph_tilde_init_programs(x, i);
+            for(i = 0;i < x->n_instances; i++)
+                ph_tilde_init_programs(x, i);
 
-                        for(i = 0; i < x->n_instances && i < 128; i++){
-                            x->channelMap[i] = i;
-                        }
-                    }
-                }
+            for(i = 0; i < x->n_instances && i < 128; i++){
+                x->channelMap[i] = i;
             }
         }
-        else
-            post("pluginhost~: error: plugin not loaded");
     }
-    else
-        post("pluginhost~: no arguments given, please supply a path");
 
     x->control_outlet =
         outlet_new (&x->x_obj, gensym("control"));
 
-    if (x->plugin_handle != NULL){
-        if(x->plugin_outs){
-            x->outlets = (t_outlet **)getbytes(x->plugin_outs * sizeof(t_outlet *)); 
-            for(i = 0;i < x->plugin_outs; i++)
-                x->outlets[i] = outlet_new(&x->x_obj, &s_signal);
-        }
-        else 
-            post("pluginhost~: error: plugin has no outputs");
-        if(x->plugin_ins){
-            x->inlets = (t_inlet **)getbytes(x->plugin_ins * sizeof(t_inlet *)); 
-            for(i = 0;i < x->plugin_ins; i++)
-                x->inlets[i] = inlet_new(&x->x_obj, &x->x_obj.ob_pd, 
-                        &s_signal, &s_signal);
-        }
-        else 
-            post("pluginhost~: error: plugin has no inputs");
-
-        x->dsp = 1;
-        post("pluginhost~: %d instances of %s, ready.", x->n_instances, 
-                x->plugin_label);
+    if(x->plugin_outs){
+        x->outlets = (t_outlet **)getbytes(x->plugin_outs * sizeof(t_outlet *)); 
+        for(i = 0;i < x->plugin_outs; i++)
+            x->outlets[i] = outlet_new(&x->x_obj, &s_signal);
     }
-    else
-        post("pluginhost~: error: no plugin handle");
+    else {
+        post("pluginhost~: error: plugin has no outputs");
+    }
+    if(x->plugin_ins){
+        x->inlets = (t_inlet **)getbytes(x->plugin_ins * sizeof(t_inlet *)); 
+        for(i = 0;i < x->plugin_ins; i++) {
+            x->inlets[i] = inlet_new(&x->x_obj, &x->x_obj.ob_pd, 
+                    &s_signal, &s_signal);
+        }
+    }
+    else {
+        post("pluginhost~: error: plugin has no inputs");
+    }
 
-    return (void *)x;    
+    x->dsp = true;
+    post("pluginhost~: %d instances of %s, ready.", x->n_instances, 
+            x->plugin_label);
+
+    return (void *)x;
 }
 
 
@@ -2294,14 +2291,13 @@ static void *ph_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
 
     ph_tilde_init_plugin(x);
 
-    x->sr = (t_int)sys_getsr();
-    x->sr_inv = 1 / (t_float)x->sr;
+    x->sr       = (t_int)sys_getsr();
+    x->sr_inv   = 1 / (t_float)x->sr;
     x->time_ref = (t_int)clock_getlogicaltime;
-    x->blksize = sys_getblksize();
-    x->dsp = 0;
+    x->blksize  = sys_getblksize();
+    x->dsp      = 0;
     x->x_canvas = canvas_getcurrent();
 
-    pthread_mutex_init(&x->midiEventBufferMutex, NULL);
     return ph_tilde_load_plugin(x, argc, argv);
 
 }
@@ -2434,18 +2430,22 @@ static void ph_debug_post(const char *fmt, ...)
 #if DEBUG
     va_list args;
     size_t fmt_length;
+    unsigned int currpos;
     char newfmt[DEBUG_STRING_SIZE];
+    char result[DEBUG_STRING_SIZE];
 
     fmt_length = strlen(fmt);
 
     sprintf(newfmt, "%s: ", MY_NAME);
     strncat(newfmt, fmt, fmt_length);
-    newfmt[strlen(MY_NAME) + 2 + fmt_length] = '\n';
-    newfmt[strlen(MY_NAME) + 2 + fmt_length + 1] = '\0';
+    currpos = strlen(MY_NAME) + 2 + fmt_length;
+    newfmt[currpos] = '\0';
 
     va_start(args, fmt);
-    vfprintf(stderr, newfmt, args);
+    vsprintf(result, newfmt, args);
     va_end(args);
+
+    post(result);
 #endif
 }
 
