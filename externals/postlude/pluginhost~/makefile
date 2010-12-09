@@ -16,10 +16,6 @@ pd_linux: src/$(NAME).pd_linux
 
 .SUFFIXES: .pd_linux
 
-#LINUXCFLAGS = -DPD -O3 -fPIC -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes -Werror \
-    -Wno-unused -Wno-parentheses -Wno-switch
-
 # Debug
 LINUXCFLAGS = -ggdb -g -DPD -O0 -fPIC -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
@@ -31,7 +27,7 @@ LINUXINCLUDE =  -I/usr/include -I./include
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/jsearch.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/jload.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/pluginhost~.c
-	gcc --export-dynamic  -shared -o $(NAME).pd_linux pluginhost~.o jload.o jsearch.o -lc -lm -llo
+	gcc --export-dynamic  -shared -o $(NAME).pd_linux pluginhost~.o jload.o jsearch.o -lc -lm
 #	strip --strip-unneeded $(NAME).pd_linux
 	cp $(NAME).pd_linux ~/pd-externals/
 	rm -f *.o
@@ -51,7 +47,7 @@ DARWININCLUDE = -I ./ -I ../src -I/usr/local/include/ -I ./include -I/usr/local/
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/jsearch.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/jload.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/pluginhost~.c
-	$(CC) -arch $(ARCHITECTURE) -bundle -undefined suppress -flat_namespace -llo -o $(NAME).pd_darwin pluginhost~.o jload.o jsearch.o 
+	$(CC) -arch $(ARCHITECTURE) -bundle -undefined suppress -flat_namespace  -o $(NAME).pd_darwin pluginhost~.o jload.o jsearch.o 
 	rm -f *.o
 
 # ----------------------- Generic -----------------------

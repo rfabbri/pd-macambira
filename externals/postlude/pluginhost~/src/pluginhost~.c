@@ -26,7 +26,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <stdarg.h>
 #include <assert.h>
+#include <pthread.h>
 
 #include "pluginhost~.h"
 #include "jutils.h"
@@ -109,7 +111,8 @@ static DSSI_Descriptor *ladspa_to_dssi(LADSPA_Descriptor *ladspaDesc)
     return (DSSI_Descriptor *)dssiDesc;
 }
 
-static void ph_tilde_port_info(t_ph_tilde *x){
+static void ph_tilde_port_info(ph_tilde *x)
+{
     t_int i;
 
     for (i = 0; i < (t_int)x->descriptor->LADSPA_Plugin->PortCount; i++) {
@@ -180,8 +183,9 @@ static void ph_tilde_port_info(t_ph_tilde *x){
 
 }
 
-static void ph_tilde_assign_ports(t_ph_tilde *x){
-    int i;
+static void ph_tilde_assign_ports(ph_tilde *x)
+{
+    unsigned int i;
 
     ph_debug_post("%d instances", x->n_instances);
 
@@ -233,12 +237,12 @@ static void ph_tilde_assign_ports(t_ph_tilde *x){
 
 }
 
-static void ph_tilde_init_instance(t_ph_tilde *x, t_int instance){
+static void ph_tilde_init_instance(ph_tilde *x, t_int instance)
+{
 
     x->instances[instance].pluginPrograms = NULL;
     x->instances[instance].currentBank = 0;
     x->instances[instance].currentProgram = 0;
-    x->instances[instance].uiTarget = NULL;
     x->instances[instance].ui_osc_control_path = NULL;
     x->instances[instance].ui_osc_program_path = NULL;
     x->instances[instance].ui_osc_show_path = NULL;
@@ -252,13 +256,13 @@ static void ph_tilde_init_instance(t_ph_tilde *x, t_int instance){
     x->instances[instance].pendingBankLSB = -1;
     x->instances[instance].ui_hidden = 1;
     x->instances[instance].ui_show = 0;
-    x->instances[instance].gui_pid = 0;
 
     ph_debug_post("Instance %d initialized!", instance);
 
 }
 
-static void ph_tilde_connect_ports(t_ph_tilde *x, t_int instance){
+static void ph_tilde_connect_ports(ph_tilde *x, t_int instance)
+{
 
     t_int i;
 
@@ -316,7 +320,8 @@ static void ph_tilde_connect_ports(t_ph_tilde *x, t_int instance){
 
 }
 
-static void ph_tilde_activate_plugin(t_ph_tilde *x, t_int instance){
+static void ph_tilde_activate_plugin(ph_tilde *x, t_int instance)
+{
 
     if(x->descriptor->LADSPA_Plugin->activate){
         ph_debug_post("trying to activate instance: %d", instance);
@@ -327,7 +332,8 @@ static void ph_tilde_activate_plugin(t_ph_tilde *x, t_int instance){
 
 }
 
-static void ph_tilde_deactivate_plugin(t_ph_tilde *x, t_float instance_f){
+static void ph_tilde_deactivate_plugin(ph_tilde *x, t_float instance_f)
+{
 
     t_int instance = (t_int)instance_f;
     if(x->descriptor->LADSPA_Plugin->deactivate)
@@ -341,8 +347,9 @@ static void osc_error(int num, const char *msg, const char *where)
     post("pluginhost~: osc error %d in path %s: %s\n",num, where, msg);
 }
 
-static void query_programs(t_ph_tilde *x, t_int instance) {
-    int i;
+static void query_programs(ph_tilde *x, t_int instance)
+{
+    unsigned int i;
     ph_debug_post("querying programs");
 
     /* free old lot */
@@ -394,7 +401,7 @@ static void query_programs(t_ph_tilde *x, t_int instance) {
                 */	}
 }
 
-static LADSPA_Data get_port_default(t_ph_tilde *x, int port)
+static LADSPA_Data get_port_default(ph_tilde *x, int port)
 {
     LADSPA_Descriptor *plugin = (LADSPA_Descriptor *)x->descriptor->LADSPA_Plugin;
     LADSPA_PortRangeHint hint = plugin->PortRangeHints[port];
@@ -457,7 +464,7 @@ static LADSPA_Data get_port_default(t_ph_tilde *x, int port)
     return 0.0f;
 }
 
-static unsigned ph_tilde_get_parm_number (t_ph_tilde *x,
+static unsigned ph_tilde_get_parm_number (ph_tilde *x,
         const char *str)
 /* find out if str points to a parameter number or not and return the
    number or zero.  The number string has to begin with a '#' character */
@@ -486,8 +493,8 @@ static unsigned ph_tilde_get_parm_number (t_ph_tilde *x,
     }
 }
 
-static void ph_tilde_set_control_input_by_index (t_ph_tilde *x,
-        signed ctrl_input_index,
+static void ph_tilde_set_control_input_by_index (ph_tilde *x,
+        unsigned int ctrl_input_index,
         float value,
         t_int instance)
 {
@@ -516,16 +523,13 @@ static void ph_tilde_set_control_input_by_index (t_ph_tilde *x,
     ph_debug_post("Global ctrl input number = %d", ctrl_input_index);
     post("Global ctrl input value = %.2f", value);
 
-
-
-
-
     /* set the appropriate control port value */
     x->plugin_ControlDataInput[portno] = value;
 
     /* Update the UI if there is one */
     if(x->is_DSSI){
-        if(x->instances[instance].uiTarget == NULL){
+        /* FIX:OSC */
+        /*if(x->instances[instance].uiTarget == NULL){
             ph_debug_post("pluginhost~: unable to send to NULL target");
 
             return;
@@ -534,15 +538,17 @@ static void ph_tilde_set_control_input_by_index (t_ph_tilde *x,
             ph_debug_post("pluginhost~: unable to send to NULL control path");
 
             return;
-        }
-        lo_send(x->instances[instance].uiTarget, 
+        }*/
+        /* FIX:OSC */
+        /* lo_send(x->instances[instance].uiTarget, 
                 x->instances[instance].ui_osc_control_path, "if", port, value);
+                */
     }
 
 
 }
 
-static void ph_tilde_set_control_input_by_name (t_ph_tilde *x,
+static void ph_tilde_set_control_input_by_name (ph_tilde *x,
         const char* name,
         float value,
         t_int instance)
@@ -592,23 +598,21 @@ static void ph_tilde_set_control_input_by_name (t_ph_tilde *x,
     ph_tilde_set_control_input_by_index (x, ctrl_input_index, value, instance);
 }
 
-static void ph_tilde_control (t_ph_tilde *x, 
-        t_symbol* ctrl_name, 
+static void ph_tilde_control (ph_tilde *x, t_symbol* ctrl_name, 
         t_float ctrl_value,
         t_float instance_f)
 /* Change the value of a named control port of the plug-in */
 {
     unsigned parm_num = 0;
-    t_int instance = (t_int)instance_f - 1;
-    int n_instances = x->n_instances;
+    int instance = (unsigned int)instance_f - 1;
+    unsigned int n_instances = x->n_instances;
 
-    if (instance > x->n_instances || instance < -1){
+    if (instance > (int)x->n_instances || instance < -1){
         post("pluginhost~: control: invalid instance number %d", instance);
         return;
     }
 
     ph_debug_post("Received LADSPA control data for instance %d", instance);
-
 
     if (ctrl_name->s_name == NULL || strlen (ctrl_name->s_name) == 0) {
         post("pluginhost~: control messages must have a name and a value");
@@ -637,7 +641,8 @@ static void ph_tilde_control (t_ph_tilde *x,
     }
 }
 
-static void ph_tilde_info (t_ph_tilde *x){
+static void ph_tilde_info (ph_tilde *x)
+{
     unsigned int i, 
                  ctrl_portno, 
                  audio_portno;
@@ -672,7 +677,7 @@ static void ph_tilde_info (t_ph_tilde *x){
     }
 }
 
-static void ph_tilde_ladspa_description(t_ph_tilde *x, t_atom *at, 
+static void ph_tilde_ladspa_description(ph_tilde *x, t_atom *at, 
         DSSI_Descriptor *psDescriptor){
     at[0].a_w.w_symbol = 
         gensym ((char*)psDescriptor->LADSPA_Plugin->Name); 
@@ -695,7 +700,7 @@ static void ph_tilde_ladspa_describe(const char * pcFullFilename,
         void* user_data,
         int is_DSSI) {
 
-    t_ph_tilde *x = (((void**)user_data)[0]);
+    ph_tilde *x = (((void**)user_data)[0]);
     t_atom at[1];
     DSSI_Descriptor *psDescriptor;
     long lIndex;
@@ -717,13 +722,6 @@ static void ph_tilde_ladspa_describe(const char * pcFullFilename,
         lIndex = 0;
     do{
         psDescriptor = ladspa_to_dssi((LADSPA_Descriptor *)fDescriptorFunction(lIndex++));
-        /*			psDescriptor = (DSSI_Descriptor *)calloc(1,
-                                sizeof(DSSI_Descriptor));
-                                ((DSSI_Descriptor *)psDescriptor)->DSSI_API_Version = 1;
-                                ((DSSI_Descriptor *)psDescriptor)->LADSPA_Plugin = 
-                                (LADSPA_Descriptor *)
-                                fDescriptorFunction(lIndex++);
-                                */		       
         if(psDescriptor->LADSPA_Plugin != NULL){
             ph_tilde_ladspa_description(x, &at[0], psDescriptor);
             free((DSSI_Descriptor *)psDescriptor);
@@ -731,31 +729,34 @@ static void ph_tilde_ladspa_describe(const char * pcFullFilename,
         else
             break;
     } while(1);
-    /* Not needed
-       dlclose(pvPluginHandle);
-       */
 }
 
-static void ph_tilde_list_plugins (t_ph_tilde *x) {
+static void ph_tilde_list_plugins (ph_tilde *x)
+{
     void* user_data[1];
     user_data[0] = x;
     LADSPAPluginSearch(ph_tilde_ladspa_describe,(void*)user_data);
 }
 
+/* FIX:OSC */
+#if 0
 static int osc_debug_handler(const char *path, const char *types, lo_arg **argv,
-        int argc, void *data, t_ph_tilde *x)
+        int argc, void *data, ph_tilde *x)
 {
     int i;
     printf("got unhandled OSC message:\npath: <%s>\n", path);
     for (i=0; i<argc; i++) {
         printf("arg %d '%c' ", i, types[i]);
-        lo_arg_pp(types[i], argv[i]);
+        /* FIX:OSC */
+        //lo_arg_pp(types[i], argv[i]);
         printf("\n");
     }
     return 1;
 }
+#endif
 
-static void ph_tilde_get_current_program(t_ph_tilde *x, int instance){
+static void ph_tilde_get_current_program(ph_tilde *x, int instance)
+{
     int i;
     t_atom argv[3];
 
@@ -772,7 +773,8 @@ static void ph_tilde_get_current_program(t_ph_tilde *x, int instance){
 
 }
 
-static void ph_tilde_program_change(t_ph_tilde *x, int instance){
+static void ph_tilde_program_change(ph_tilde *x, int instance)
+{
     /* jack-dssi-host queues program changes by using  pending program change variables. In the audio callback, if a program change is received via MIDI it over writes the pending value (if any) set by the GUI. If unset, or processed the value will default back to -1. The following call to select_program is then made. I don't think it eventually needs to be done this way - i.e. do we need 'pending'? */ 
     ph_debug_post("executing program change");
 
@@ -800,11 +802,13 @@ static void ph_tilde_program_change(t_ph_tilde *x, int instance){
             ph_debug_post("Updating GUI program");
 
             /* FIX - this is a hack to make text ui work*/
-            if(x->instances[instance].uiTarget)
-                lo_send(x->instances[instance].uiTarget, 
+            /* FIX:OSC */
+            /* if(x->instances[instance].uiTarget){
+               lo_send(x->instances[instance].uiTarget, 
                         x->instances[instance].ui_osc_program_path, "ii", 
                         x->instances[instance].currentBank, 
                         x->instances[instance].currentProgram);
+            } */
 
         }
         x->instances[instance].uiNeedsProgramUpdate = 0;
@@ -815,7 +819,9 @@ static void ph_tilde_program_change(t_ph_tilde *x, int instance){
     ph_tilde_get_current_program(x, instance);
 }
 
-static int osc_program_handler(t_ph_tilde *x, lo_arg **argv, int instance)
+/* FIX:OSC */
+#if 0
+static int osc_program_handler(ph_tilde *x, lo_arg **argv, int instance)
 {
     unsigned long bank = argv[0]->i;
     unsigned long program = argv[1]->i;
@@ -852,7 +858,7 @@ static int osc_program_handler(t_ph_tilde *x, lo_arg **argv, int instance)
     return 0;
 }
 
-static int osc_control_handler(t_ph_tilde *x, lo_arg **argv, int instance)
+static int osc_control_handler(ph_tilde *x, lo_arg **argv, int instance)
 {
     int port = argv[0]->i;
     LADSPA_Data value = argv[1]->f;
@@ -864,7 +870,7 @@ static int osc_control_handler(t_ph_tilde *x, lo_arg **argv, int instance)
     return 0;
 }
 
-static int osc_midi_handler(t_ph_tilde *x, lo_arg **argv, t_int instance)
+static int osc_midi_handler(ph_tilde *x, lo_arg **argv, t_int instance)
 {
 
     int ev_type = 0, chan = 0;
@@ -898,7 +904,7 @@ static int osc_midi_handler(t_ph_tilde *x, lo_arg **argv, t_int instance)
     return 0;
 }
 
-static int osc_configure_handler(t_ph_tilde *x, lo_arg **argv, int instance)
+static int osc_configure_handler(ph_tilde *x, lo_arg **argv, int instance)
 {
     const char *key = (const char *)&argv[0]->s;
     const char *value = (const char *)&argv[1]->s;
@@ -929,7 +935,8 @@ static int osc_configure_handler(t_ph_tilde *x, lo_arg **argv, int instance)
     return 0;
 }
 
-static int osc_exiting_handler(t_ph_tilde *x, lo_arg **argv, int instance){
+static int osc_exiting_handler(ph_tilde *x, lo_arg **argv, int instance)
+{
 
     ph_debug_post("exiting handler called: Freeing ui_osc");
 
@@ -956,13 +963,13 @@ static int osc_exiting_handler(t_ph_tilde *x, lo_arg **argv, int instance){
     return 0;
 }
 
-static int osc_update_handler(t_ph_tilde *x, lo_arg **argv, int instance)
+static int osc_update_handler(ph_tilde *x, lo_arg **argv, int instance)
 {
     const char *url = (char *)&argv[0]->s;
     const char *path;
     t_int i;
     char *host, *port;
-    t_ph_configure_pair *p;
+    ph_configure_pair *p;
 
     p = x->configure_buffer_head;
 
@@ -1054,9 +1061,12 @@ static int osc_update_handler(t_ph_tilde *x, lo_arg **argv, int instance)
 
     return 0;
 }
+#endif
 
-static void ph_tilde_osc_setup(t_ph_tilde *x, int instance){
+static void ph_tilde_osc_setup(ph_tilde *x, int instance)
+{
 
+#if 0
     if(instance == 0){
         x->osc_thread = lo_server_thread_new(NULL, osc_error);
         char *osc_url_tmp;
@@ -1077,10 +1087,12 @@ static void ph_tilde_osc_setup(t_ph_tilde *x, int instance){
             x->descriptor->LADSPA_Plugin->Label, instance); 
     ph_debug_post("OSC Path is: %s", x->instances[instance].osc_url_path);
     post("OSC thread started: %s", x->osc_url_base);
+#endif
 
 }
 
-static void ph_tilde_init_programs(t_ph_tilde *x, int instance){
+static void ph_tilde_init_programs(ph_tilde *x, int instance)
+{
 
     ph_debug_post("Setting up program data");
 
@@ -1099,9 +1111,11 @@ static void ph_tilde_init_programs(t_ph_tilde *x, int instance){
     }
 }
 
-static void ph_tilde_load_gui(t_ph_tilde *x, int instance){
+/* FIX:OSC */
+#if 0
+static void ph_tilde_load_gui(ph_tilde *x, int instance)
+{
     t_int err = 0;
-    char *osc_url;
     char *gui_path;
     struct dirent *dir_entry = NULL;
     char *gui_base;
@@ -1156,7 +1170,6 @@ static void ph_tilde_load_gui(t_ph_tilde *x, int instance){
         (sizeof(char) * (strlen(x->osc_url_base) + 
                          strlen(x->instances[instance].osc_url_path) + 2));
 
-    /*	char osc_url[1024];*/
     sprintf(osc_url, "%s/%s", x->osc_url_base, 
             x->instances[instance].osc_url_path);
     post("pluginhost~: instance %d URL: %s",instance, osc_url);
@@ -1184,10 +1197,13 @@ static void ph_tilde_load_gui(t_ph_tilde *x, int instance){
 
     }
 }
+#endif
 
-static void MIDIbuf(int type, int chan, int param, int val, t_ph_tilde *x){
+static void MIDIbuf(int type, unsigned int chan, int param, int val,
+        ph_tilde *x)
+{
 
-    if(chan > x->n_instances - 1 || chan < 0){
+    if(chan > x->n_instances - 1){
         post("pluginhost~: note discarded: MIDI data is destined for a channel that doesn't exist");
         return;
     }
@@ -1264,7 +1280,8 @@ static void MIDIbuf(int type, int chan, int param, int val, t_ph_tilde *x){
     pthread_mutex_unlock(&x->midiEventBufferMutex); /**release mutex*/
 }
 
-static void ph_tilde_list(t_ph_tilde *x, t_symbol *s, int argc, t_atom *argv) {
+static void ph_tilde_list(ph_tilde *x, t_symbol *s, int argc, t_atom *argv)
+{
     char *msg_type;
     int ev_type = 0;
     msg_type = (char *)malloc(TYPE_STRING_SIZE);
@@ -1301,34 +1318,38 @@ static void ph_tilde_list(t_ph_tilde *x, t_symbol *s, int argc, t_atom *argv) {
     free(msg_type);
 }
 
-static char *ph_tilde_send_configure(t_ph_tilde *x, char *key, 
-        char *value, t_int instance){
+static char *ph_tilde_send_configure(ph_tilde *x, char *key, 
+        char *value, int instance){
 
     char *debug;
 
     debug =   x->descriptor->configure(
             x->instanceHandles[instance], 
             key, value);
-    if(x->instances[instance].uiTarget != NULL && x->is_DSSI)
-        lo_send(x->instances[instance].uiTarget, 
+    /* FIX:OSC */
+    /* if(x->instances[instance].uiTarget != NULL && x->is_DSSI) {
+            lo_send(x->instances[instance].uiTarget, 
                 x->instances[instance].ui_osc_configure_path,
                 "ss", key, value);
+        }
+                */
     query_programs(x, instance);
 
     return debug;
 }
 
-static void ph_show(t_ph_tilde *x, t_int instance, t_int toggle){
-
+static void ph_show(ph_tilde *x, t_int instance, t_int toggle)
+{
+            /* FIX:OSC */
+/*
     if(x->instances[instance].uiTarget){
         if (x->instances[instance].ui_hidden && toggle) {
-            lo_send(x->instances[instance].uiTarget, 
-                    x->instances[instance].ui_osc_show_path, "");
+             lo_send(x->instances[instance].uiTarget, 
+                    x->instances[instance].ui_osc_show_path, ""); 
             x->instances[instance].ui_hidden = 0;
         }
         else if (!x->instances[instance].ui_hidden && !toggle) {
-            lo_send(x->instances[instance].uiTarget, 
-                    x->instances[instance].ui_osc_hide_path, "");
+                    x->instances[instance].ui_osc_hide_path, ""); 
             x->instances[instance].ui_hidden = 1;
         }
     }
@@ -1337,12 +1358,13 @@ static void ph_show(t_ph_tilde *x, t_int instance, t_int toggle){
         ph_tilde_load_gui(x, instance);
 
     }
+    */
 }
 
-static t_int ph_tilde_configure_buffer(t_ph_tilde *x, char *key, 
+static t_int ph_tilde_configure_buffer(ph_tilde *x, char *key, 
         char *value, t_int instance){
 
-    t_ph_configure_pair *current, *p;
+    ph_configure_pair *current, *p;
     t_int add_node;
     add_node = 0;	
     current = x->configure_buffer_head;
@@ -1356,8 +1378,8 @@ static t_int ph_tilde_configure_buffer(t_ph_tilde *x, char *key,
     if(current)
         free(current->value);
     else {
-        current = (t_ph_configure_pair *)malloc(sizeof
-                (t_ph_configure_pair));
+        current = (ph_configure_pair *)malloc(sizeof
+                (ph_configure_pair));
         current->next = x->configure_buffer_head;
         x->configure_buffer_head = current;
         current->key = strdup(key);
@@ -1378,8 +1400,9 @@ static t_int ph_tilde_configure_buffer(t_ph_tilde *x, char *key,
     return 0;
 }
 
-static t_int ph_tilde_configure_buffer_free(t_ph_tilde *x){
-    t_ph_configure_pair *curr, *prev;
+static t_int ph_tilde_configure_buffer_free(ph_tilde *x)
+{
+    ph_configure_pair *curr, *prev;
     prev = curr = NULL;
 
     for(curr = x->configure_buffer_head; curr != NULL; curr = curr->next){
@@ -1394,11 +1417,12 @@ static t_int ph_tilde_configure_buffer_free(t_ph_tilde *x){
     return 0;
 }
 
-static t_int ph_tilde_reset(t_ph_tilde *x, t_float instance_f){
+static t_int ph_tilde_reset(ph_tilde *x, t_float instance_f)
+{
 
     t_int instance = (t_int)instance_f - 1;
     if (instance == -1){
-        for(instance = 0; instance < x->n_instances; instance++) 			{
+        for(instance = 0; instance < (int)x->n_instances; instance++) 			{
             if (x->descriptor->LADSPA_Plugin->deactivate &&
                     x->descriptor->LADSPA_Plugin->activate){ 
                 x->descriptor->LADSPA_Plugin->deactivate
@@ -1466,7 +1490,7 @@ static void ph_tilde_search_plugin_callback (
     }
 }
 
-static const char* plugin_tilde_search_plugin_by_label (t_ph_tilde *x,
+static const char* plugin_tilde_search_plugin_by_label (ph_tilde *x,
         const char *name)
 {
     char* lib_name = NULL;
@@ -1486,29 +1510,30 @@ static const char* plugin_tilde_search_plugin_by_label (t_ph_tilde *x,
 
 }
 
-static t_int ph_tilde_ph_methods(t_ph_tilde *x, t_symbol *s, int argc, t_atom *argv) 
-{   
+static t_int ph_tilde_dssi_methods(ph_tilde *x, t_symbol *s, int argc, t_atom *argv) 
+{
     if (!x->is_DSSI) {
-        post("pluginhost~: plugin is not a DSSI plugin, operation not supported");
+        post(
+        "pluginhost~: plugin is not a DSSI plugin, operation not supported");
         return 0;
     }
-    char *msg_type, 
-         *debug, 
-         *filename, 
-         *filepath, 
-         *key, 
-         *value, 
-         *temp,
-         mydir[MAXPDSTRING];
-    int instance = -1, 
-        pathlen, 
-        toggle, 
-        fd, 
-        n_instances = x->n_instances, 
-        count, 
-        i,
-        chan,
-        maxpatches;
+    char *msg_type;
+    char *debug;
+    char *filename;
+    char *filepath;
+    char *key;
+    char *value;
+    char *temp;
+    char mydir[MAXPDSTRING];
+    int instance = -1;
+    int pathlen;
+    int toggle;
+    int fd;
+    int n_instances = x->n_instances;
+    int count;
+    int chan;
+    int maxpatches;
+    unsigned int i;
     t_float val;
     long filelength = 0;
     unsigned char *raw_patch_data = NULL;
@@ -1766,7 +1791,7 @@ static t_int ph_tilde_ph_methods(t_ph_tilde *x, t_symbol *s, int argc, t_atom *a
     return 0;
 }
 
-static void ph_tilde_bang(t_ph_tilde *x)
+static void ph_tilde_bang(ph_tilde *x)
 {
     t_atom at[3];
 
@@ -1789,10 +1814,12 @@ static void ph_tilde_bang(t_ph_tilde *x)
 static t_int *ph_tilde_perform(t_int *w)
 {
     int N = (t_int)(w[2]);
-    t_ph_tilde *x = (t_ph_tilde *)(w[1]);
+    ph_tilde *x = (ph_tilde *)(w[1]);
     t_float **inputs = (t_float **)(&w[3]);
     t_float **outputs = (t_float **)(&w[3] + x->plugin_ins);
-    int i, n, timediff, framediff, instance = 0; 
+    unsigned int i;
+    unsigned int instance;
+    int n, timediff, framediff;
     /*See comment for ph_tilde_plug_plugin */
     if(x->dsp){
         x->dsp_loop = 1;
@@ -1809,10 +1836,9 @@ static t_int *ph_tilde_perform(t_int *w)
 
             instance = x->midiEventBuf[x->bufReadIndex].data.note.channel;
 
-            /*This should never happen, but check anyway*/
-            if(instance > x->n_instances || instance < 0){
+            if(instance > x->n_instances){
                 post(
-                        "pluginhost~: %s: discarding spurious MIDI data, for instance %d", 
+            "pluginhost~: %s: discarding spurious MIDI data, for instance %d", 
                         x->descriptor->LADSPA_Plugin->Label, 
                         instance);
                 ph_debug_post("n_instances = %d", x->n_instances);
@@ -1890,70 +1916,43 @@ static t_int *ph_tilde_perform(t_int *w)
     return w + (x->plugin_ins + x->plugin_outs + 3);
 }
 
-static void ph_tilde_dsp(t_ph_tilde *x, t_signal **sp)
+static void ph_tilde_dsp(ph_tilde *x, t_signal **sp)
 {
-    if(x->n_instances){
+    if(!x->n_instances){
+        return;
+    }
 
 
-        t_int *dsp_vector, i, N, M;
+    t_int *dsp_vector, i, N, M;
 
-        M = x->plugin_ins + x->plugin_outs + 2;
+    M = x->plugin_ins + x->plugin_outs + 2;
 
-        dsp_vector = (t_int *) getbytes(M * sizeof(t_int));
+    dsp_vector = (t_int *) getbytes(M * sizeof(t_int));
 
-        dsp_vector[0] = (t_int)x;
-        dsp_vector[1] = (t_int)sp[0]->s_n;
+    dsp_vector[0] = (t_int)x;
+    dsp_vector[1] = (t_int)sp[0]->s_n;
 
-        for(i = 2; i < M; i++)
-            dsp_vector[i] = (t_int)sp[i - 1]->s_vec;
+    for(i = 2; i < M; i++)
+        dsp_vector[i] = (t_int)sp[i - 1]->s_vec;
 
-        dsp_addv(ph_tilde_perform, M, dsp_vector);
-
-
-        /*    int n, m;
-
-              t_float **outlets; 
-              t_float **inlets;
-
-              for(n = 0, m = 1; n < x->plugin_ins; n++, m++)
-              inlets[n] = sp[m]->s_vec;
-              for(n = 0; n < x->plugin_outs; n++, ++m)
-              outlets[n] = sp[m]->s_vec;
-
-*/ /* 
-
-      t_float **outlets = (t_float **)x->outlets;
-      t_float **inlets = (t_float **)x->inlets;
-
-      m = 1;	
-
-      for(n = 0; n < x->plugin_ins; n++)
-    *inlets++ = sp[m++]->s_vec;
-    for(n = 0; n < x->plugin_outs; n++)
-    *outlets++ = sp[m++]->s_vec;
-    */ }		
-        /* dsp_add(ph_tilde_perform, 2, sp[0]->s_n, x); */
+    dsp_addv(ph_tilde_perform, M, dsp_vector);
 
 }
 
-static void ph_tilde_quit_plugin(t_ph_tilde *x){
+static void ph_tilde_quit_plugin(ph_tilde *x)
+{
 
-    t_int i, instance;
+    int i;
+    unsigned int instance;
     for(instance = 0; instance < x->n_instances; instance++) {
-        if(x->instances[instance].uiTarget && x->is_DSSI){
-            lo_send(x->instances[instance].uiTarget, 
+        /* FIX:OSC */
+        /* if(x->instances[instance].uiTarget && x->is_DSSI){
+             lo_send(x->instances[instance].uiTarget, 
                     x->instances[instance].ui_osc_quit_path, "");
-            lo_address_free(x->instances[instance].uiTarget);
-            x->instances[instance].uiTarget = NULL;
-        }
-        /* no -- see comment in osc_exiting_handler */
-        /* if (!instances[i].inactive) { */
-        /*	if (x->descriptor->LADSPA_Plugin->deactivate) {
-                x->descriptor->LADSPA_Plugin->deactivate
-                (x->instanceHandles[instance]);
-                }*/
+            lo_address_free(x->instances[instance].uiTarget); 
+            x->instances[instance].uiTarget = NULL; */
+        
         ph_tilde_deactivate_plugin(x, (t_float)instance);
-        /* } */
         if (x->descriptor->LADSPA_Plugin &&
                 x->descriptor->LADSPA_Plugin->cleanup) {
             x->descriptor->LADSPA_Plugin->cleanup
@@ -1962,9 +1961,11 @@ static void ph_tilde_quit_plugin(t_ph_tilde *x){
     }
 }
 
-static void ph_tilde_free_plugin(t_ph_tilde *x){
+static void ph_tilde_free_plugin(ph_tilde *x)
+{
 
-    t_int i, instance;
+    int instance;
+    unsigned int i;
     if(x->plugin_label != NULL)
         free((char *)x->plugin_label);
     if(x->plugin_handle != NULL){
@@ -1978,11 +1979,13 @@ static void ph_tilde_free_plugin(t_ph_tilde *x){
 
         while(instance--){
 
+            /* FIX:OSC */
+            /*
             if(x->instances[instance].gui_pid){
                 ph_debug_post("Killing GUI process PID = %d", x->instances[instance].gui_pid);
 
                 kill(x->instances[instance].gui_pid, SIGINT);
-            } 
+            } */
             if (x->instances[instance].pluginPrograms) {
                 for (i = 0; i < 
                         x->instances[instance].plugin_ProgramCount; i++)
@@ -2016,7 +2019,6 @@ static void ph_tilde_free_plugin(t_ph_tilde *x){
         free(x->instances);
         free((t_float *)x->plugin_OutputBuffers);
 
-        /*sleep(1);*/
         if(x->plugin_ins){
             for(i = 0; i < x->plugin_ins; i++)
                 inlet_free((t_inlet *)x->inlets[i]);
@@ -2037,7 +2039,8 @@ static void ph_tilde_free_plugin(t_ph_tilde *x){
     }
 }
 
-static void ph_tilde_init_plugin(t_ph_tilde *x){
+static void ph_tilde_init_plugin(ph_tilde *x)
+{
 
     x->project_dir = NULL;
     x->configure_buffer_head = NULL;
@@ -2068,7 +2071,8 @@ static void ph_tilde_init_plugin(t_ph_tilde *x){
 
 }
 
-static void *ph_tilde_load_plugin(t_ph_tilde *x, t_int argc, t_atom *argv){
+static void *ph_tilde_load_plugin(ph_tilde *x, t_int argc, t_atom *argv)
+{
     char *plugin_basename = NULL,
          *plugin_full_path = NULL,
          *tmpstr,
@@ -2077,9 +2081,9 @@ static void *ph_tilde_load_plugin(t_ph_tilde *x, t_int argc, t_atom *argv){
 
     ph_debug_post("argc = %d", argc);
 
-    int i,
-        stop,
-        fd;
+    unsigned int i;
+    int stop;
+    int fd;
     size_t pathlen;
 
     stop = 0;
@@ -2178,22 +2182,18 @@ static void *ph_tilde_load_plugin(t_ph_tilde *x, t_int argc, t_atom *argv){
             else
                 x->n_instances = 1;
 
-
             ph_debug_post("n_instances = %d", x->n_instances);
 
-            x->instances = (t_ph_instance *)malloc(sizeof(t_ph_instance) * 
+            x->instances = (ph_instance *)malloc(sizeof(ph_instance) * 
                     x->n_instances);
 
             if(x->descriptor){
                 ph_debug_post("%s loaded successfully!", 
                         x->descriptor->LADSPA_Plugin->Label);
 
-
-                /*allocate memory for port_info*/
-
-                x->port_info = (t_port_info *)malloc
+                x->port_info = (ph_port_info *)malloc
                     (x->descriptor->LADSPA_Plugin->PortCount * 
-                     sizeof(t_port_info));
+                     sizeof(ph_port_info));
 
                 ph_tilde_port_info(x);
                 ph_tilde_assign_ports(x);
@@ -2247,21 +2247,14 @@ static void *ph_tilde_load_plugin(t_ph_tilde *x, t_int argc, t_atom *argv){
             x->outlets = (t_outlet **)getbytes(x->plugin_outs * sizeof(t_outlet *)); 
             for(i = 0;i < x->plugin_outs; i++)
                 x->outlets[i] = outlet_new(&x->x_obj, &s_signal);
-            /*	x->outlets = 
-                (t_float **)calloc(x->plugin_outs, 
-                sizeof(t_float *));
-                */
         }
         else 
             post("pluginhost~: error: plugin has no outputs");
         if(x->plugin_ins){
             x->inlets = (t_inlet **)getbytes(x->plugin_ins * sizeof(t_inlet *)); 
             for(i = 0;i < x->plugin_ins; i++)
-                x->inlets[i] = inlet_new(&x->x_obj, &x->x_obj.ob_pd,						&s_signal, &s_signal);
-            /*	x->inlets = 
-                (t_float **)calloc(x->plugin_ins, 
-                sizeof(t_float *));
-                */
+                x->inlets[i] = inlet_new(&x->x_obj, &x->x_obj.ob_pd, 
+                        &s_signal, &s_signal);
         }
         else 
             post("pluginhost~: error: plugin has no inputs");
@@ -2278,7 +2271,8 @@ static void *ph_tilde_load_plugin(t_ph_tilde *x, t_int argc, t_atom *argv){
 
 
 /* This method is currently buggy. PD's inlet/outlet handling seems buggy if you try to create ins/outs on the fly. Needs further investigation ...*/
-static void ph_tilde_plug_plugin(t_ph_tilde *x, t_symbol *s, int argc, t_atom *argv){
+static void ph_tilde_plug_plugin(ph_tilde *x, t_symbol *s, int argc, t_atom *argv)
+{
 
     x->dsp = 0;
     ph_tilde_quit_plugin(x);
@@ -2292,9 +2286,10 @@ static void ph_tilde_plug_plugin(t_ph_tilde *x, t_symbol *s, int argc, t_atom *a
     ph_tilde_load_plugin(x, argc, argv);
 }
 
-static void *ph_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
+static void *ph_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
+{
 
-    t_ph_tilde *x = (t_ph_tilde *)pd_new(ph_tilde_class);
+    ph_tilde *x = (ph_tilde *)pd_new(ph_tilde_class);
     post("\n========================================\npluginhost~: DSSI/LADSPA host - version %.2f\n========================================\n", VERSION);
 
     ph_tilde_init_plugin(x);
@@ -2311,29 +2306,31 @@ static void *ph_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
 
 }
 
-static void ph_tilde_free(t_ph_tilde *x){
+static void ph_tilde_free(ph_tilde *x)
+{
 
-    ph_debug_post("Calling ph_tilde_free");
-
+    ph_debug_post("Calling %s", __FUNCTION__);
 
     ph_tilde_quit_plugin(x);
     ph_tilde_free_plugin(x);
 
 }
 
-static void ph_tilde_sigchld_handler(int sig) {
+static void ph_tilde_sigchld_handler(int sig)
+{
     wait(NULL);
 }
 
-void pluginhost_tilde_setup(void) {
+void pluginhost_tilde_setup(void)
+{
 
     ph_tilde_class = class_new(gensym("pluginhost~"), (t_newmethod)ph_tilde_new,
-            (t_method)ph_tilde_free, sizeof(t_ph_tilde), 0, A_GIMME, 0);
+            (t_method)ph_tilde_free, sizeof(ph_tilde), 0, A_GIMME, 0);
     class_addlist(ph_tilde_class, ph_tilde_list);
     class_addbang(ph_tilde_class, ph_tilde_bang);
     class_addmethod(ph_tilde_class, 
             (t_method)ph_tilde_dsp, gensym("dsp"), 0);
-    class_addmethod(ph_tilde_class, (t_method)ph_tilde_ph_methods, 
+    class_addmethod(ph_tilde_class, (t_method)ph_tilde_dssi_methods, 
             gensym("dssi"), A_GIMME, 0);
     class_addmethod (ph_tilde_class,(t_method)ph_tilde_control, 
             gensym ("control"),A_DEFSYM, A_DEFFLOAT, A_DEFFLOAT, 0);
@@ -2350,10 +2347,11 @@ void pluginhost_tilde_setup(void) {
           class_addmethod (ph_tilde_class,(t_method)ph_tilde_deactivate_plugin,
           gensym ("deactivate"),A_DEFFLOAT - 1,0);*/
     class_sethelpsymbol(ph_tilde_class, gensym("pluginhost~-help"));
-    CLASS_MAINSIGNALIN(ph_tilde_class, t_ph_tilde, f);
+    CLASS_MAINSIGNALIN(ph_tilde_class, ph_tilde, f);
     signal(SIGCHLD, ph_tilde_sigchld_handler);
 }
-
+/* FIX:OSC */
+/*
 static int osc_message_handler(const char *path, const char *types, 
         lo_arg **argv,int argc, void *data, void *user_data)
 {
@@ -2362,7 +2360,7 @@ static int osc_message_handler(const char *path, const char *types,
     int i, instance = 0;
     const char *method;
     char chantemp[2];
-    t_ph_tilde *x = (t_ph_tilde *)(user_data);
+    ph_tilde *x = (ph_tilde *)(user_data);
 
     if (strncmp(path, "/dssi/", 6)){
         ph_debug_post("calling osc_debug_handler"); 
@@ -2430,7 +2428,7 @@ static int osc_message_handler(const char *path, const char *types,
 
     return osc_debug_handler(path, types, argv, argc, data, x);
 }
-
+*/
 static void ph_debug_post(const char *fmt, ...)
 {
 #if DEBUG
