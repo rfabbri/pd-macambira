@@ -2291,7 +2291,7 @@ static void *ph_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
 
     ph_tilde_init_plugin(x);
 
-    x->sr       = (t_int)sys_getsr();
+    x->sr       = (int)sys_getsr();
     x->sr_inv   = 1 / (t_float)x->sr;
     x->time_ref = (t_int)clock_getlogicaltime;
     x->blksize  = sys_getblksize();
@@ -2316,6 +2316,7 @@ static void ph_tilde_sigchld_handler(int sig)
 {
     wait(NULL);
 }
+
 
 void pluginhost_tilde_setup(void)
 {

@@ -116,6 +116,8 @@ typedef struct _port_info {
 
 typedef struct _ph_tilde {
 
+    t_object x_obj; /* gah, this has to be firs in the struct, WTF? */
+
     int sr;
     int blksize;
     int time_ref;
@@ -161,7 +163,6 @@ typedef struct _ph_tilde {
     t_outlet **outlets;
     t_outlet *control_outlet;
     t_canvas *x_canvas;
-    t_object x_obj;
 
     ph_port_info *port_info;
     ph_instance *instances;
