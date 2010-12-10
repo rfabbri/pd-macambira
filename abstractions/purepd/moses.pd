@@ -3,7 +3,7 @@
 #X obj 35 277 outlet;
 #X obj 239 18 inlet;
 #X obj 336 273 outlet;
-#X obj 240 61 purepd/float_argument \$1 0;
+#X obj 240 61 float_argument \$1 0;
 #X obj 36 242 spigot;
 #X obj 334 239 spigot;
 #X obj 224 111 >=;
