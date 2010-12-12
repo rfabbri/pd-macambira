@@ -38,11 +38,17 @@ array set object_tags {}
 # tag reverse mapping
 array set objects_with_tag {}
 
-# load object -> tags mapping from file
-set f [open [file join $::current_pathdir object_tags.tcllist]]
-set tmp_db [read $f]
-close $f
-unset f
+# load object -> tags mapping from file in Pd's path
+foreach pathdir [concat $::sys_searchpath $::sys_staticpath] {
+    set dir [file normalize $pathdir]
+    set testfile [file join $dir object_tags.tcllist]
+    if { [file isfile $testfile]} {
+        set f [open $testfile]
+        set tmp_db [read $f]
+        close $f
+        unset f        
+    }
+}
 
 foreach {library object tags} $tmp_db {
     # skip unwanted libraries
