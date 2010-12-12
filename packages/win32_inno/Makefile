@@ -55,6 +55,7 @@ prebuilt_install:
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) extended_install
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) doc_format
 	install -p pd-settings.reg $(DESTDIR)$(prefix)
+	install -p pd-extended.bat $(DESTDIR)$(prefix)
 
 #==============================================================================#
 #

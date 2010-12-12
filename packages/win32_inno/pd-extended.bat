@@ -1,0 +1,1 @@
+bin\pd.exe  -lib libdir -lib vanilla -lib Gem -lib cyclone -lib zexy -lib creb -lib cxc -lib iemlib -lib list-abs -lib mapping -lib markex -lib maxlib -lib mjlib -lib motex -lib oscx -lib pddp -lib pdogg -lib pmpd -lib sigpack -lib smlib -lib unauthorized -lib pan -lib hcs -lib jmmmp -lib ext13 -lib ggee -lib iem_anything -lib ekext

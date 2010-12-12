@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ECHO=/sw/bin/echo
-LIBS="libdir Gem cyclone zexy creb cxc iemlib list-abs mapping markex maxlib memento mjlib motex oscx pddp pdogg pixeltango pmpd rradical sigpack smlib toxy unauthorized vbap pan hcs jmmmp ext13 ggee iem_anything flib ekext flatspace pdp pidip"
+LIBS="libdir vanilla Gem cyclone zexy creb cxc iemlib list-abs mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib unauthorized pan hcs jmmmp ext13 ggee iem_anything ekext pdp"
 
 GNULINUX_FONTPATH="/var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType"
 MACOSX_FONTPATH="/System/Library/Fonts /Library/Fonts ~/Library/Fonts /usr/X11R6/lib/X11/fonts/TTF /System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/lib/fonts"
@@ -18,6 +18,7 @@ ROOT_DIR=${SCRIPT_DIR}/../packages
 
 GNULINUX_FILE=${ROOT_DIR}/linux_make/default.pdextended
 MACOSX_FILE=${ROOT_DIR}/darwin_app/org.puredata.pdextended.default.plist
+WINDOWS_BATCH=${ROOT_DIR}/win32_inno/pd-extended.bat
 WINDOWS_FILE=${ROOT_DIR}/win32_inno/pd-settings.reg
 WINDOWS_INNO_FILE=${ROOT_DIR}/win32_inno/pd-inno.iss.in
 WINDOWS_INNO_REG_FILE=${ROOT_DIR}/win32_inno/pd-inno.registry.reg
@@ -90,6 +91,7 @@ print_windows ()
 {
 	 ${ECHO} "\"loadlib$1\"=\"$2\"" >> $WINDOWS_FILE
 	 ${ECHO} "Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib$1; ValueData: $2; Tasks: libs"  >> $WINDOWS_INNO_REG_FILE
+         ${ECHO} -n " -lib $2" >> $WINDOWS_BATCH
 }
 
 print_windows_delete ()
@@ -164,6 +166,7 @@ print_macosx_nloadlib $i
 # run separately so some libs can be excluded on Windows
 ${ECHO} "Running for Windows:"
 
+${ECHO} -n "bin\\pd.exe " > $WINDOWS_BATCH
 ${ECHO} -e $WINDOWS_HEADER > $WINDOWS_FILE
 ${ECHO} -e $WINDOWS_INNO_HEADER > $WINDOWS_INNO_REG_FILE
 
@@ -194,6 +197,7 @@ done
 
 print_windows_reg_path
 print_windows_inno_path
+${ECHO} "" >> $WINDOWS_BATCH
 #
 TMPFILE=$WINDOWS_INNO_FILE.`date +%s`
 head -`grep -n "STARTHERE" $WINDOWS_INNO_FILE | cut -d ':' -f 1` $WINDOWS_INNO_FILE > $TMPFILE
