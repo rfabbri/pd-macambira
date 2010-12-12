@@ -4,7 +4,7 @@
 # create the item, then stick it to the canvas using a 'mouseup' message
 proc popup_create_put {putitem} {
     pdsend "$::focused_window $putitem"
-    pdsend "$::focused_window mouseup $::popup_xpix $::popup_ypix 1"
+    pdsend "$::focused_window mouseup $::popup_xcanvas $::popup_ycanvas 1"
 }
 
 # create our submenu
