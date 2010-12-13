@@ -39,17 +39,17 @@ sure you have read the following help patches first:;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
 1 18 -261106 -33289 0;
 #X text 7 1 From a symbol-atom to a float;
-#X text 20 37 There are no standard objects to turn a symbol-atom into
-a float. There are two important externals for this \, however:;
 #X obj 20 70 pddp/helplink cyclone/fromsymbol;
 #X obj 20 90 pddp/helplink zexy/symbol2list;
+#X text 20 37 There are no internal objects to turn a symbol-atom into
+a float. There are two important externals for this \, however:;
 #X restore 43 149 pd symbol-atom_to_float;
 #N canvas 14 48 428 554 float_to_symbol-atom 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
 1 18 -261106 -33289 0;
 #X text 7 1 Changing a float to a symbol-atom;
 #X obj 45 163 hsl 128 15 0 127 0 0 empty 123 empty -2 -8 0 10 -262144
--1 -1 0 1;
+-1 -1 7000 1;
 #X text 19 79 For example \, you can enter a number for the "receive-symbol"
 of the so-called IEMGUIS like the slider below. Since receive-names
 need to be symbol-atoms \, the GUI automatically converts "123" to

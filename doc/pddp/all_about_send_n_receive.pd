@@ -47,21 +47,21 @@ far beyond the scope of a single patch.;
 #X obj 16 262 send one_send;
 #X obj 16 306 receive one_send;
 #X obj 19 244 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 0;
+-1 -1 3800 0;
 #X obj 153 262 send one_send;
 #X obj 156 244 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 0;
+-1 -1 1200 0;
 #X obj 291 262 send one_send;
 #X obj 294 244 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 0;
+-1 -1 3200 0;
 #X obj 19 327 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 1;
+-1 -1 3200 1;
 #X obj 153 306 receive one_send;
 #X obj 156 327 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 1;
+-1 -1 3200 1;
 #X obj 291 306 receive one_send;
 #X obj 294 327 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 1;
+-1 -1 3200 1;
 #X text 17 289 All [receive]s of the same name will receive the "messages":
 ;
 #X text 17 224 You can have multiple [send]s with the same name:;

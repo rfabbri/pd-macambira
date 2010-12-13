@@ -10,8 +10,6 @@
 #X text 19 126 1) A selector \, which must be a symbol atom.[1];
 #X text 19 243 [1] The exceptions to this are implicit float and list
 messages. See the next subpatch for details.;
-#X text 19 146 2) Zero or more elements \, which may be any atom type
-that Pd can understand.;
 #X text 19 106 Messages in Pd are made up of the following components:
 ;
 #X text 19 183 Messages divide into two groups: those with selectors
@@ -23,6 +21,8 @@ of messages. Messages can transport all kinds of information: float
 \, symbol \, and pointer atoms \, groups of floats and symbols \, etc.
 Understanding how to build and work with messages is a key to understanding
 Pd.;
+#X text 19 146 2) Zero or more arguments \, which may be any atom type
+that Pd can understand.;
 #X restore 43 42 pd What_is_a_message_in_Pd?;
 #N canvas 18 112 428 500 Predefined_messages_in_Pd 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
@@ -34,9 +34,6 @@ by a single symbol atom.;
 1 18 -261106 -33289 0;
 #X text 20 216 5) pointer message - the selector "pointer" \, followed
 by a pointer atom.;
-#X text 20 97 1) float message - this message has the selector "float"
-\, followed by a single float atom (e.g. \, "12" \, "-4" \, "1.8").
-;
 #X text 20 186 4) list - the selector "list" \, followed by two or
 more atoms of any type (these are the elements of the list).;
 #X text 20 166 3) bang message - the single selector "bang".;
@@ -46,8 +43,6 @@ more atoms of any type (these are the elements of the list).;
 \, it looks at the selector to figure out what to do next. So that
 objects can easily communicate with one another \, Pd has several predefined
 messages:;
-#X text 20 309 Since numbers are used so often in Pd \, two shortcuts
-are provided to ease typing and reading them:;
 #X text 20 344 1) A single float atom has an implicit "float" selector.
 ;
 #X msg 41 370 1;
@@ -59,6 +54,10 @@ or "1 4 63" \, and even "1 foo fee four" are list messages.;
 #X text 81 460 is the same as...;
 #X msg 41 460 2 3 4;
 #X msg 191 460 list 2 3 4;
+#X text 20 97 1) float message - this message has the selector "float"
+\, followed by a single float atom like 12 \, -4 \, or 1.8.;
+#X text 20 309 Since numbers are used so often in Pd \, two shortcuts
+are provided to make it easier to type and read them:;
 #X restore 43 69 pd Predefined_messages_in_Pd;
 #X obj 43 183 pddp/pddplink all_about_atoms.pd;
 #N canvas 19 160 428 264 User_defined_messages_in_Pd 0;
@@ -68,17 +67,17 @@ or "1 4 63" \, and even "1 foo fee four" are list messages.;
 #X text 20 79 1) single selector messages - these are messages made
 up of a single symbol atom \, like "set" \, "clear" \, or "flush".
 ;
-#X text 20 165 These messages are also referred to as meta-messages
-\, selector series \, anythings \, and named messages based on the
-selector (e.g. \, "foo 1 2 3" is a "foo message").;
 #X text 20 37 User defined messages \, also referred to as "anythings"
 \, are messages with selectors other than those predefined by Pd (listed
 in the previous subpatch). These include:;
-#X text 20 110 2) custom selector + 1 or more elements - messages with
-a custom selector followed by one or more atoms of any type. Examples
-include "set 3 4 5" \, "threshold 30 74" \, and "foo bar 3 four".;
 #X obj 20 231 pddp/pddplink all_about_lists_vs_anythings.pd;
 #X text 20 212 For more information about "anythings" \, see:;
+#X text 20 110 2) custom selector + 1 or more arguments - messages
+with a custom selector followed by one or more atoms of any type. Examples
+include "set 3 4 5" \, "threshold 30 74" \, and "foo bar 3 four".;
+#X text 20 165 These messages are also referred to as meta-messages
+\, selector series \, and anythings. (Additionally \, a message like
+"foo 1 2 3" could be called a "foo message").;
 #X restore 43 94 pd User_defined_messages_in_Pd;
 #X obj 1 226 cnv 15 445 20 empty \$0-pddp.cnv.footer empty 20 12 0
 14 -233017 -33289 0;
@@ -114,12 +113,6 @@ make a distinction between "symbol clear" and "clear" \, how would
 #X text 90 327 refrain from outputting anything.;
 #X obj 22 351 pipe s 3000;
 #X text 95 351 <-- wait 3 seconds \, then output the message;
-#X text 19 159 Above is a message with the selector "symbol". The first
-(and only) element of the message is "foo". This is a "symbol message"
-\, one of Pd's built-in message types.;
-#X text 19 93 Above is a message with the selector "foo". You might
-also refer to this as a custom message \, the symbol atom "foo" \,
-or even a "foo message". The message has no elements.;
 #X text 7 1 Understanding Message Types;
 #X text 20 35 Remember that messages in Pd can consist of a single
 symbol atom. Consider the following:;
@@ -127,6 +120,12 @@ symbol atom. Consider the following:;
 \, have one behavior for symbol messages \, and a different behavior
 for custom messages.;
 #X text 109 274 the specified duration (3 seconds).;
+#X text 19 93 Above is a message with the selector "foo". You might
+also refer to this as a custom message \, the symbol atom "foo" \,
+or even a "foo message". The message has no arguments.;
+#X text 19 159 Above is a message with the selector "symbol". The first
+(and only) argument is "foo". This is a "symbol message" \, one of
+Pd's built-in message types.;
 #X connect 4 0 12 0;
 #X connect 5 0 12 0;
 #X connect 12 0 3 0;

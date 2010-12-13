@@ -71,19 +71,19 @@ in a row: 0 \, 1 \, 2 \, 3 \, etc. These numbers are called indices.
 Each index holds a corresponding value.;
 #X text 19 119 All of this is true in Pd \, although the word "array"
 is often used loosely to refer to three different concepts:;
-#X text 19 228 3) an array defined (and possibly represented graphically)
-as part of a data structure.;
 #X text 19 146 1) an array as defined above.;
 #X text 19 161 2) a graphical representation of an array \, or "garray"
 \, created by:;
 #X text 37 186 a) choosing "Array" from the "Put" menu \, or;
 #X text 37 201 b) creating a [table] object (in which case it's hidden
 inside a subpatch).;
+#X text 19 228 3) (less commonly) an array defined (and possibly represented
+graphically) as part of a data structure.;
 #X restore 43 42 pd What_is_an_array_in_PD;
 #N canvas 0 0 428 403 The_Put_menu_array 0;
 #N canvas 0 0 450 300 (subpatch) 0;
 #X array \$0-pddp-garray-ex1 100 float 2;
-#X coords 0 1 99 -1 200 140 1 0 0;
+#X coords 0 1 99 -1 200 140 1;
 #X restore 22 73 graph;
 #X text 233 149 the black line to change;
 #X text 227 134 (You can click-drag the;
@@ -140,7 +140,6 @@ can be anything greater than 0 (zero). At a sample rate of 441000 khz
 #X text 7 1 The [table] object;
 #X text 19 37 The [table] object is another way to create a graphical
 array.;
-#X obj 22 73 table myTable;
 #X text 19 96 If you click the [table] object in runmode you can see
 it's just a subcanvas \, inside which is a graph containing an array.
 ;
@@ -155,10 +154,11 @@ to set the name and size of the array.;
 #X text 19 249 * with the [table] object \, you cannot save the contents
 of the array with the patch. (Note: this is true even if you open [table]
 and check "save contents" in the garray properties.);
-#X text 19 309 If you're not interested in seeing the array data within
-your PD patch \, you can use the [table] object to store the array
-and corresponding table in a sub-window. Note that [table]s are more
-CPU friendly than their graphical counterpart.;
+#X obj 22 73 table myTable 10;
+#X text 138 73 (arguments are ARRAY_NAME and SIZE);
+#X text 19 309 The [table] object is useful when you don't really need
+to look at the array data. Note that [table]s are more CPU friendly
+than "Put" menu arrays.;
 #X restore 63 86 pd The_[table]_object;
 #X obj 201 87 pddp/pddplink table-help.pd;
 #X obj 201 65 pddp/pddplink array-help.pd;
@@ -212,7 +212,7 @@ menu arrays (both graphically and in their structure).;
 #N canvas 14 32 428 532 How_to_manipulate_arrays_in_PD 0;
 #N canvas 0 22 452 302 (subpatch) 0;
 #X array exampleArray 14 float 0;
-#X coords 0 2 13 -2 200 140 1 0 0;
+#X coords 0 2 13 -2 200 140 1;
 #X restore 214 378 graph;
 #N canvas 9 24 434 213 Setting_the_size_of_an_array 0;
 #X msg 214 88 \; exampleArray resize \$1;
