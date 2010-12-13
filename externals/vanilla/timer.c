@@ -34,7 +34,7 @@ static void *timer_new(t_floatarg f)
     return (x);
 }
 
-static void timer_setup(void)
+void timer_setup(void)
 {
     timer_class = class_new(gensym("timer"), (t_newmethod)timer_new, 0,
         sizeof(t_timer), 0, A_DEFFLOAT, 0);

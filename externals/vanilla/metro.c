@@ -63,7 +63,7 @@ static void *metro_new(t_floatarg f)
     return (x);
 }
 
-static void metro_setup(void)
+void metro_setup(void)
 {
     metro_class = class_new(gensym("metro"), (t_newmethod)metro_new,
         (t_method)metro_free, sizeof(t_metro), 0, A_DEFFLOAT, 0);

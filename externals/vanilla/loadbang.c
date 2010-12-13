@@ -41,7 +41,7 @@ static void loadbang_loadbang(t_loadbang *x)
         outlet_bang(x->x_obj.ob_outlet);
 }
 
-static void loadbang_setup(void)
+void loadbang_setup(void)
 {
     loadbang_class = class_new(gensym("loadbang"), (t_newmethod)loadbang_new, 0,
         sizeof(t_loadbang), CLASS_NOINLET, 0);

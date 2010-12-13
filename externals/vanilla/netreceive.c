@@ -186,7 +186,7 @@ static void netreceive_free(t_netreceive *x)
     }
 }
 
-static void netreceive_setup(void)
+void netreceive_setup(void)
 {
     netreceive_class = class_new(gensym("netreceive"),
         (t_newmethod)netreceive_new, (t_method)netreceive_free,

@@ -107,7 +107,7 @@ static void *line_new(t_floatarg f, t_floatarg grain)
     return (x);
 }
 
-static void line_setup(void)
+void line_setup(void)
 {
     line_class = class_new(gensym("line"), (t_newmethod)line_new,
         (t_method)line_free, sizeof(t_line), 0, A_DEFFLOAT, A_DEFFLOAT, 0);

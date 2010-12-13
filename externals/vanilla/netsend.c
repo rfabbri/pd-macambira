@@ -166,7 +166,7 @@ static void netsend_free(t_netsend *x)
     netsend_disconnect(x);
 }
 
-static void netsend_setup(void)
+void netsend_setup(void)
 {
     netsend_class = class_new(gensym("netsend"), (t_newmethod)netsend_new,
         (t_method)netsend_free,

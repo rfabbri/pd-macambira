@@ -65,7 +65,7 @@ static void random_seed(t_random *x, t_float f, t_float glob)
     x->x_state = f;
 }
 
-static void random_setup(void)
+void random_setup(void)
 {
     random_class = class_new(gensym("random"), (t_newmethod)random_new, 0,
         sizeof(t_random), 0, A_DEFFLOAT, 0);

@@ -531,7 +531,7 @@ static void *list_new(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
     return (newest);
 }
 
-void x_list_setup(void)
+void list_setup(void)
 {
     alist_setup();
     list_append_setup();

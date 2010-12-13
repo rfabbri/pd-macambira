@@ -49,21 +49,11 @@ static void *realtime_new(void)
     return (x);
 }
 
-static void realtime_setup(void)
+void realtime_setup(void)
 {
     realtime_class = class_new(gensym("realtime"), (t_newmethod)realtime_new, 0,
         sizeof(t_realtime), 0, 0);
     class_addbang(realtime_class, realtime_bang);
     class_addmethod(realtime_class, (t_method)realtime_bang2, gensym("bang2"),
         0);
-}
-
-void x_misc_setup(void)
-{
-    random_setup();
-    loadbang_setup();
-    namecanvas_setup();
-    serial_setup();
-    cputime_setup();
-    realtime_setup();
 }

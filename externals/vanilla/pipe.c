@@ -229,7 +229,7 @@ static void pipe_clear(t_pipe *x)
     }
 }
 
-static void pipe_setup(void)
+void pipe_setup(void)
 {
     pipe_class = class_new(gensym("pipe"), 
         (t_newmethod)pipe_new, (t_method)pipe_clear,

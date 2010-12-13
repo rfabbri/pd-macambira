@@ -58,7 +58,7 @@ static void *delay_new(t_floatarg f)
     return (x);
 }
 
-static void delay_setup(void)
+void delay_setup(void)
 {
     delay_class = class_new(gensym("delay"), (t_newmethod)delay_new,
         (t_method)delay_free, sizeof(t_delay), 0, A_DEFFLOAT, 0);

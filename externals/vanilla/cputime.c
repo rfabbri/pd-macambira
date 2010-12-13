@@ -105,7 +105,7 @@ static void *cputime_new(void)
     return (x);
 }
 
-static void cputime_setup(void)
+void cputime_setup(void)
 {
     cputime_class = class_new(gensym("cputime"), (t_newmethod)cputime_new, 0,
         sizeof(t_cputime), 0, 0);

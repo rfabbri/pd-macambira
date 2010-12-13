@@ -44,7 +44,7 @@ static void namecanvas_free(t_namecanvas *x)
     if (*x->x_sym->s_name) pd_unbind(x->x_owner, x->x_sym);
 }
 
-static void namecanvas_setup(void)
+void namecanvas_setup(void)
 {
     namecanvas_class = class_new(gensym("namecanvas"),
         (t_newmethod)namecanvas_new, (t_method)namecanvas_free,
