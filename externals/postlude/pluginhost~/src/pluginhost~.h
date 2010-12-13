@@ -48,6 +48,7 @@
 #define TYPE_STRING_SIZE  20
 #define DIR_STRING_SIZE   1024
 #define DEBUG_STRING_SIZE 1024
+#define UI_TARGET_ELEMS   2
 #define ASCII_n           110
 #define ASCII_p           112
 #define ASCII_c           99
@@ -63,14 +64,14 @@
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
 /*From dx7_voice.h by Sean Bolton */
-
 typedef struct _dx7_patch_t {
     uint8_t data[128];
 } dx7_patch_t;
 
 typedef struct _ph_instance {
 
-    unsigned int     plugin_ProgramCount;
+    unsigned int     plugin_pgm_count;
+    bool             ui_needs_pgm_update;
     char            *ui_osc_control_path;
     char            *ui_osc_configure_path;
     char            *ui_osc_program_path;
@@ -78,30 +79,28 @@ typedef struct _ph_instance {
     char            *ui_osc_hide_path;
     char            *ui_osc_quit_path;
     char            *osc_url_path;
-    long             currentBank;
-    long             currentProgram;
-    int              uiNeedsProgramUpdate;
-    int              pendingProgramChange;
-    int              pendingBankLSB;
-    int              pendingBankMSB;
+    long             current_bank;
+    long             current_pgm;
+    int              pending_pgm_change;
+    int              pending_bank_lsb;
+    int              pending_bank_msb;
     int              ui_hidden;
     int              ui_show;
+    t_atom           ui_target[UI_TARGET_ELEMS]; /* host, port */
 
-    int *plugin_PortControlInNumbers; /*not sure if this should go here?*/
-    DSSI_Program_Descriptor *pluginPrograms;
+    int *plugin_port_ctlin_numbers; /*not sure if this should go here?*/
+    DSSI_Program_Descriptor *plugin_pgms;
 
 } ph_instance;
 
 typedef struct ph_configure_pair {
 
     struct ph_configure_pair *next;
+    unsigned int instance;
     char   *value;
     char   *key;
-    int    instance;
 
 } ph_configure_pair;
-
-//typedef struct ph_configure_pair t_ph_configure_pair;
 
 typedef struct _port_info {
 
@@ -114,21 +113,21 @@ typedef struct _port_info {
 
 } ph_port_info;
 
-typedef struct _ph_tilde {
+typedef struct _ph {
 
-    t_object x_obj; /* gah, this has to be firs in the struct, WTF? */
+    t_object x_obj; /* gah, this has to be first element in the struct, WTF? */
 
     int sr;
     int blksize;
     int time_ref;
     int ports_in;
     int ports_out;
-    int ports_controlIn;
-    int ports_controlOut;
-    int bufWriteIndex;
-    int bufReadIndex;
+    int ports_control_in;
+    int ports_control_out;
+    int buf_write_index;
+    int buf_read_index;
 
-    bool is_DSSI;
+    bool is_dssi;
     bool dsp;
     bool dsp_loop;
 
@@ -141,41 +140,42 @@ typedef struct _ph_tilde {
 
     float f;
     float sr_inv;
-    float **plugin_InputBuffers;
-    float **plugin_OutputBuffers;
-    float *plugin_ControlDataInput;
-    float *plugin_ControlDataOutput;
+    float **plugin_input_buffers;
+    float **plugin_output_buffers;
+    float *plugin_control_input;
+    float *plugin_control_output;
 
     unsigned int n_instances;
     unsigned int plugin_ins;
     unsigned int plugin_outs;
-    unsigned int plugin_controlIns;
-    unsigned int plugin_controlOuts;
-    unsigned long *instanceEventCounts;
-    unsigned long *plugin_ControlInPortNumbers;
-    unsigned char channelMap[128];
+    unsigned int plugin_control_ins;
+    unsigned int plugin_control_outs;
+    unsigned long *instance_event_counts;
+    unsigned long *plugin_ctlin_port_numbers;
+    unsigned char channel_map[128];
 
     DSSI_Descriptor_Function desc_func;
     DSSI_Descriptor *descriptor;
-    LADSPA_Handle *instanceHandles;
+    LADSPA_Handle *instance_handles;
 
     t_inlet  **inlets;
     t_outlet **outlets;
-    t_outlet *control_outlet;
+    t_outlet *message_out;
     t_canvas *x_canvas;
 
     ph_port_info *port_info;
     ph_instance *instances;
     ph_configure_pair *configure_buffer_head;
 
-    snd_seq_event_t **instanceEventBuffers;
-    snd_seq_event_t midiEventBuf[EVENT_BUFSIZE];
+    snd_seq_event_t **instance_event_buffers;
+    snd_seq_event_t midi_event_buf[EVENT_BUFSIZE];
 
-} ph_tilde;
+} ph;
 
-static char *ph_tilde_send_configure(ph_tilde *x, char *key, char *value,
-        int instance);
-static void MIDIbuf(int type, unsigned int chan, int param, int val,
-        ph_tilde *x);
+static char *ph_send_configure(ph *x, const char *key, 
+        const char *value, int instance);
+static void ph_instance_send_osc(t_outlet *outlet, ph_instance *instance, 
+        t_int argc, t_atom *argv);
+static void ph_midibuf_add(ph *x, int type, unsigned int chan, int param, int value);
 static void ph_debug_post(const char *fmt, ...);
-static LADSPA_Data get_port_default(ph_tilde *x, int port);
+static LADSPA_Data get_port_default(ph *x, int port);

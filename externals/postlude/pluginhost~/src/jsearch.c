@@ -37,7 +37,7 @@ LADSPADirectoryPluginSearch (const char * pcDirectory,
     long iNeedSlash;
     struct dirent * psDirectoryEntry;
     void * pvPluginHandle;
-    int is_DSSI = 0;
+    bool is_DSSI = false;
 
     lDirLength = strlen(pcDirectory);
     if (!lDirLength)
@@ -72,13 +72,15 @@ LADSPADirectoryPluginSearch (const char * pcDirectory,
             /* This is a file and the file is a shared library! */
 
             dlerror();
-            if(fDescriptorFunction = (DSSI_Descriptor_Function)dlsym(pvPluginHandle,
-                        "ladspa_descriptor"))
-                is_DSSI = 0;
-
-            else if(fDescriptorFunction = (DSSI_Descriptor_Function)dlsym(pvPluginHandle,
-                        "dssi_descriptor"))
-                is_DSSI = 1;
+            if((fDescriptorFunction = 
+			(DSSI_Descriptor_Function)dlsym(pvPluginHandle,
+                        "ladspa_descriptor"))) {
+                is_DSSI = false;
+	    } else if ((fDescriptorFunction = 
+		    (DSSI_Descriptor_Function)dlsym(pvPluginHandle,
+                        "dssi_descriptor"))) {
+                is_DSSI = true;
+	    }
 
             if (dlerror() == NULL && fDescriptorFunction) {
                 /* We've successfully found a ladspa_descriptor function. Pass

@@ -38,8 +38,7 @@ pd_darwin: src/$(NAME).pd_darwin
 
 .SUFFIXES: .pd_darwin
 
-DARWINCFLAGS = -DPD -arch $(ARCHITECTURE) -O3 -Wall -W -Wshadow -Wstrict-prototypes \
-    -Wno-unused -Wno-parentheses -Wno-switch -L/usr/local/lib/ -DDEBUG=$(DEBUG)
+DARWINCFLAGS = -DPD -arch $(ARCHITECTURE) -O3 -Wall -Werror -L/usr/local/lib/ -DDEBUG=$(DEBUG)
 
 DARWININCLUDE = -I ./ -I ../src -I/usr/local/include/ -I ./include -I/usr/local/include/pluginhost/
 
