@@ -5,7 +5,7 @@ LIBRARY_NAME = vanilla
 
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically
-SOURCES = abs~.c bng.c clip~.c cnv.c dbtopow~.c dbtorms~.c del.c delay.c exp~.c ftom~.c hdl.c hradio.c hsl.c hslider.c key.c keyname.c keyup.c line.c list.c log~.c metro.c mtof~.c my_canvas.c my_numbox.c nbx.c netsend.c netreceive.c openpanel.c pipe.c powtodb~.c pow~.c print.c qlist.c radiobut.c radiobutton.c rdb.c rmstodb~.c rsqrt~.c savepanel.c sqrt~.c textfile.c tgl.c timer.c toggle.c vdl.c vradio.c vsl.c vslider.c vu.c wrap~.c random.c loadbang.c namecanvas.c cputime.c realtime.c bang~.c print~.c adc~.c dac~.c
+SOURCES = abs~.c bng.c clip~.c cnv.c dbtopow~.c dbtorms~.c del.c delay.c exp~.c ftom~.c hdl.c hradio.c hsl.c hslider.c key.c keyname.c keyup.c line.c list.c log~.c metro.c mtof~.c my_canvas.c my_numbox.c nbx.c netsend.c netreceive.c openpanel.c pipe.c powtodb~.c pow~.c print.c qlist.c radiobut.c radiobutton.c rdb.c rmstodb~.c rsqrt~.c savepanel.c sqrt~.c textfile.c tgl.c timer.c toggle.c vdl.c vradio.c vsl.c vslider.c vu.c wrap~.c random.c loadbang.c namecanvas.c cputime.c realtime.c bang~.c print~.c adc~.c dac~.c delread~.c delwrite~.c vd~.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
@@ -90,7 +90,7 @@ ifeq ($(UNAME),Darwin)
     EXTENSION = pd_darwin
     OS = macosx
     PD_PATH = /Applications/Pd-extended.app/Contents/Resources
-    OPT_CFLAGS = -ftree-vectorize -ftree-vectorizer-verbose=2 -fast
+    OPT_CFLAGS = 
 # build universal 32-bit on 10.4 and 32/64 on newer
     ifeq ($(shell uname -r | sed 's|\([0-9][0-9]*\)\.[0-9][0-9]*\.[0-9][0-9]*|\1|'), 8)
       FAT_FLAGS = -arch ppc -arch i386 -mmacosx-version-min=10.4
