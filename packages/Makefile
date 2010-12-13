@@ -175,7 +175,7 @@ endif
 
 # this is used for installing into a pre-build Pd binary
 extended_install: abstractions_install doc_install \
-externals_install readme_install welcome_install \
+gem_install externals_install readme_install welcome_install \
 license_install noncvs_install
 
 
