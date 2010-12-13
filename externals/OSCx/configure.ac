@@ -116,7 +116,7 @@ else
 					 ;;
         *-*-darwin*)
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
-					 LDFLAGS=" -bundle -bundle_loader ../../../pd/bin/pd -flat_namespace "
+					 LDFLAGS=" -bundle -bundle_loader ../../../pd/src/pd -undefined dynamic_lookup "
 					 pd_suffix=pd_darwin
 					 LIBS="-lc -lm"
 					 ;;
