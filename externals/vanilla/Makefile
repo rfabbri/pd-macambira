@@ -5,7 +5,7 @@ LIBRARY_NAME = vanilla
 
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically
-SOURCES = abs~.c bng.c clip~.c cnv.c dbtopow~.c dbtorms~.c del.c delay.c exp~.c ftom~.c hradio.c hsl.c hslider.c key.c keyname.c keyup.c line.c list.c log~.c metro.c mtof~.c my_canvas.c my_numbox.c nbx.c netsend.c netreceive.c openpanel.c pipe.c powtodb~.c pow~.c print.c qlist.c radiobut.c radiobutton.c rdb.c rmstodb~.c rsqrt~.c savepanel.c sqrt~.c textfile.c tgl.c timer.c toggle.c vradio.c vsl.c vslider.c vu.c wrap~.c random.c loadbang.c namecanvas.c cputime.c realtime.c
+SOURCES = abs~.c bng.c clip~.c cnv.c dbtopow~.c dbtorms~.c del.c delay.c exp~.c ftom~.c hdl.c hradio.c hsl.c hslider.c key.c keyname.c keyup.c line.c list.c log~.c metro.c mtof~.c my_canvas.c my_numbox.c nbx.c netsend.c netreceive.c openpanel.c pipe.c powtodb~.c pow~.c print.c qlist.c radiobut.c radiobutton.c rdb.c rmstodb~.c rsqrt~.c savepanel.c sqrt~.c textfile.c tgl.c timer.c toggle.c vdl.c vradio.c vsl.c vslider.c vu.c wrap~.c random.c loadbang.c namecanvas.c cputime.c realtime.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
