@@ -24,6 +24,8 @@ MANUAL =
 EXTRA_DIST = 
 
 
+HELPPATCHES = abs~-help.pd adc~_dac~-help.pd bang~-help.pd bng-help.pd clip~-help.pd cputime-help.pd dbtopow~-help.pd dbtorms~-help.pd delay-help.pd delread~-help.pd delwrite~-help.pd exp~-help.pd ftom~-help.pd hdial-help.pd hradio-help.pd hslider-help.pd key-help.pd keyname-help.pd keyup-help.pd line-help.pd list-help.pd loadbang-help.pd log~-help.pd metro-help.pd mtof~-help.pd my_canvas-help.pd namecanvas-help.pd netreceive-help.pd netsend-help.pd numbox2-help.pd openpanel-help.pd pipe-help.pd powtodb~-help.pd pow~-help.pd print-help.pd print~-help.pd q8_rsqrt~-help.pd q8_sqrt~-help.pd qlist-help.pd random-help.pd realtime-help.pd rmstodb~-help.pd rsqrt~-help.pd savepanel-help.pd sqrt~-help.pd textfile-help.pd timer-help.pd toggle-help.pd vdial-help.pd vd~-help.pd vradio-help.pd vslider-help.pd vu-help.pd wrap~-help.pd 
+
 
 #------------------------------------------------------------------------------#
 #
