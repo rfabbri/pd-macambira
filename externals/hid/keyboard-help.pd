@@ -1,5 +1,5 @@
-#N canvas 499 42 567 478 10;
-#X obj 168 91 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#N canvas 0 31 567 507 10;
+#X obj 168 91 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X obj 11 369 tgl 20 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
@@ -108,6 +108,16 @@ key_22 key_23 key_24 key_25 key_26 key_27;
 #X coords 0 -1 1 1 257 17 1 60 60;
 #X restore 216 131 pd serin;
 #X msg 216 152 open 1;
+#N canvas 577 31 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL;
+#X text 12 105 AUTHOR Hans-Christoph Steiner;
+#X text 12 65 INLET_0 float open print;
+#X text 12 45 DESCRIPTION use a keyboard device with Pd;
+#X text 12 85 OUTLET_0 list;
+#X text 12 5 KEYWORDS control user_input abstraction;
+#X restore 509 478 pd META;
 #X connect 0 0 42 0;
 #X connect 4 0 2 0;
 #X connect 4 1 3 0;

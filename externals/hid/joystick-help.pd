@@ -1,6 +1,5 @@
-#N canvas 31 125 670 468 10;
-#X declare -lib hid;
-#X obj 168 91 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#N canvas 0 31 670 468 10;
+#X obj 168 91 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X floatatom 63 234 7 0 0 3 Y-axis - -;
 #X floatatom 9 234 7 0 0 3 X-axis - -;
@@ -37,7 +36,8 @@
 #X text 218 426 released under the GNU GPL;
 #X text 414 426 $Author: eighthave $;
 #X text 414 413 $Revision: 1.11 $;
-#X obj 239 375 pddp/pddplink ../all_about_hid.pd -text all_about_hid;
+#X obj 239 375 pddp/pddplink ../all_about_hid.pd -text all_about_hid
+;
 #X text 130 376 For more info:;
 #X floatatom 245 234 5 0 0 3 hat0X - -;
 #X floatatom 288 234 5 0 0 3 hat0Y - -;
@@ -100,22 +100,38 @@ btn_8 btn_9;
 #X obj 440 92 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X text 333 73 Select your device and turn on to make noise:;
-#X obj 619 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
+#X obj 619 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+;
 #X msg 503 125 open \$1;
 #X obj 503 105 hradio 15 1 1 8 \$0-device-number empty choose_a_device
 0 -6 1 9 -262144 -1 -1 2;
 #X obj 477 105 nbx 1 14 -1e+37 1e+37 0 0 empty \$0-device-number empty
-0 -6 0 14 -166441 -1 -1 2 256;
-#X text 8 36 Use a joystick device with Pd. This object auto-calibrates
+0 -6 0 14 -166441 -1 -1 0 256;
+#X text 8 35 Use a joystick device with Pd. This object auto-calibrates
 the output of axis data. Move each element of the device thru its full
 range to calibrate it.;
 #X obj 335 215 unpack s f;
-
 #X text 422 177 (remember to calibrate all parts;
 #X text 430 190 of the joystick first);
 #X msg 394 120 print;
 #X msg 220 112 open 2;
 #X msg 225 131 open 3;
+#N canvas 674 84 494 344 META 0;
+#X text 12 245 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL;
+#X text 12 225 AUTHOR Hans-Christoph Steiner;
+#X text 12 85 OUTLET_0 float;
+#X text 12 45 DESCRIPTION use a joystick device with Pd;
+#X text 12 65 INLET_0 float open print;
+#X text 12 105 OUTLET_1 float;
+#X text 12 125 OUTLET_2 float;
+#X text 12 145 OUTLET_3 float;
+#X text 12 165 OUTLET_4 float;
+#X text 12 185 OUTLET_5 float;
+#X text 12 205 OUTLET_6 list;
+#X text 12 5 KEYWORDS control user_input abstraction;
+#X restore 610 436 pd META;
 #X connect 0 0 29 0;
 #X connect 19 0 29 0;
 #X connect 28 0 3 0;
@@ -143,4 +159,3 @@ range to calibrate it.;
 #X connect 38 1 16 0;
 #X connect 42 0 30 0;
 #X connect 43 0 29 0;
-#X connect 44 0 29 0;

@@ -1,4 +1,4 @@
-#N canvas 287 246 432 344 10;
+#N canvas 8 31 432 344 10;
 #X obj 88 30 inlet;
 #X obj 89 264 outlet;
 #X text 19 9 [hid2rad];

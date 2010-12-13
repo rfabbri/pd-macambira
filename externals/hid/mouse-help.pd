@@ -1,6 +1,6 @@
-#N canvas 163 22 660 430 10;
+#N canvas 0 31 660 430 10;
 #X symbolatom 211 280 6 0 0 1 code - -;
-#X obj 130 118 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
+#X obj 130 118 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
 #X floatatom 339 280 5 0 0 1 value - -;
 #X floatatom 140 280 5 0 0 3 wheel - -;
@@ -94,7 +94,7 @@
 #X connect 36 2 23 0;
 #X connect 36 3 17 0;
 #X restore 407 188 pd mouse-noise;
-#X obj 407 131 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
+#X obj 407 131 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
 #X text 354 107 turn this on to make some noise with the mouse;
 #X obj 211 253 unpack symbol float;
@@ -131,9 +131,22 @@ in each axis to calibrate it.;
 #X obj 500 140 hradio 15 1 1 8 \$0-device-number empty choose_a_device
 0 -6 1 9 -262144 -1 -1 1;
 #X obj 474 140 nbx 1 14 -1e+37 1e+37 0 0 empty \$0-device-number empty
-0 -6 0 14 -166441 -1 -1 1 256;
+0 -6 0 14 -166441 -1 -1 0 256;
 #X msg 76 154 print;
 #X obj 130 183 hid/mouse 1;
+#N canvas 472 31 494 344 META 0;
+#X text 12 185 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL;
+#X text 12 165 AUTHOR Hans-Christoph Steiner;
+#X text 12 45 DESCRIPTION use a mouse device with Pd;
+#X text 12 65 INLET_0 float print open refresh;
+#X text 12 85 OUTLET_0 float;
+#X text 12 105 OUTLET_1 float;
+#X text 12 125 OUTLET_2 float;
+#X text 12 145 OUTLET_3 list;
+#X text 12 5 KEYWORDS control user_input abstraction;
+#X restore 604 400 pd META;
 #X connect 1 0 36 0;
 #X connect 9 0 36 0;
 #X connect 10 0 36 0;

@@ -1,10 +1,10 @@
-#N canvas 577 303 464 467 10;
-#X declare -lib hid;
+#N canvas 0 31 464 467 10;
 #X floatatom 26 85 5 0 0 0 - - -;
 #X floatatom 26 160 0 0 0 0 - - -;
-#X obj 2 2 cnv 15 450 20 empty empty notescale 2 11 1 18 -233017
--66577 0;
-#X obj 418 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp;
+#X obj 2 2 cnv 15 450 20 empty empty notescale 2 11 1 18 -233017 -66577
+0;
+#X obj 418 3 pddp/pddplink http://puredata.info/dev/pddp -text pddp
+;
 #X floatatom 137 266 5 0 0 0 - - -;
 #X obj 140 330 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
@@ -31,6 +31,17 @@ numbers based on an output range set as arguments.;
 #X obj 137 297 notescale;
 #X obj 150 130 notescale 15 120;
 #X obj 297 130 notescale 24 48;
+#N canvas 474 31 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL;
+#X text 12 105 AUTHOR Hans-Christoph Steiner;
+#X text 12 45 DESCRIPTION scale a stream of numbers to a MIDI note
+number;
+#X text 12 65 INLET_0 float;
+#X text 12 85 OUTLET_0 float;
+#X text 12 5 KEYWORDS control abstraction;
+#X restore 406 435 pd META;
 #X connect 0 0 18 0;
 #X connect 4 0 20 0;
 #X connect 5 0 15 0;
