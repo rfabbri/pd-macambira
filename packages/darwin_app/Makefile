@@ -172,9 +172,7 @@ darwin_app_core: darwin_app_wrapper
 		pd_install 
 	install -d "$(PD_APP_CONTENTS)/Resources/bin"
 	cd "$(PD_APP_CONTENTS)/Resources" && \
-		ln -s bin Scripts
-	cd "$(PD_APP_CONTENTS)/Resources/bin" && \
-		test -e AppMain.tcl || ln -s pd.tk AppMain.tcl
+		ln -s tcl Scripts
 	cd "$(PD_APP_CONTENTS)/Resources/bin" && \
 		test -e pdextended || ln -s pd pdextended
 # support for Info Panel Plugins mgmt
