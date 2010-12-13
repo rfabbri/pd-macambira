@@ -81,6 +81,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				DESTDIR=$(DESTDIR) \
 				prefix=$(prefix) \
 				libpddir=$(libpddir) \
+				pkglibdir=$(libpddir) \
 				OPT_CFLAGS="$(OPT_CFLAGS)" \
 				UNAME=$(UNAME)
 
