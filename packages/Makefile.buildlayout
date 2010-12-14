@@ -68,12 +68,6 @@ endif
 ifeq ($(UNAME_MACHINE),ppc)
   ARCH = powerpc
 endif
-# if machine has dpkg-deb, build a Debian package
-ifeq ($(shell test -x /usr/bin/dpkg-deb && echo YES),YES)
-  PACKAGE_TYPE = deb
-else
-  PACKAGE_TYPE = tarbz2
-endif
 
 #==============================================================================#
 #

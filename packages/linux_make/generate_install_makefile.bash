@@ -12,8 +12,8 @@ SED=`echo sed "s|${ROOT_DIR}/||"`
 
 function print_file ()
 {
-	 local my_file=$1
-	 echo -e "\tinstall -p '$my_file' '\$(prefix)/$my_file'"
+     local my_file=`echo $1 | sed 's/\\\$/\$\$/g'`
+     echo -e "\tinstall -p '$my_file' '\$(prefix)/$my_file'"
 }
 
 function print_dir ()
@@ -38,9 +38,7 @@ function traverse_install_tree ()
 
 function remove_file () 
 {
-# arg, $n-help.pd causes lots of problems
-#	 local my_file=`echo $1 | sed 's|$|\\$|g'`
-	 local my_file=$1
+     local my_file=`echo $1 | sed 's/\\\$/\$\$/g'`
 	 echo -e "\trm -f -- '\$(prefix)/$my_file'"
 }
 

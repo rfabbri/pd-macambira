@@ -11,6 +11,13 @@ BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
+# if machine has dpkg-deb, build a Debian package
+ifeq ($(shell test -x /usr/bin/dpkg-shlibdeps && echo YES),YES)
+  PACKAGE_TYPE = deb
+else
+  PACKAGE_TYPE = tarbz2
+endif
+
 # for command-line UNIX versions, you need to install Pd into the same
 # directory as $(prefix) otherwise Pd won't be able to find extra, doc, etc.
 ifeq ($(PACKAGE_TYPE),deb)
@@ -156,8 +163,6 @@ installer_readme:
 
 
 installer_makefile:
-# it is very hard to escape the $ in shell scripts so delete files
-	-rm -f -- $(helpdir)/iem*/*\$$*.pd $(objectsdir)/iem*/*\$$*.pd
 # don't put the Makefile into the package yet, otherwise it'll get installed
 	./generate_install_makefile.bash  $(DESTDIR)$(prefix) > tarbz2Makefile
 	mv -i tarbz2Makefile $(DESTDIR)$(prefix)/Makefile
