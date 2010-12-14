@@ -40,20 +40,23 @@
 
 #define DX7_VOICE_SIZE_PACKED 	128 /*From hexter_types.h by Sean Bolton */
 #define DX7_DUMP_SIZE_BULK 	4096+8
+#define DX7_BANK_SIZE           32
 
 #define VERSION           0.99
 #define MY_NAME           "pluginhost~"
 #define EVENT_BUFSIZE     1024
 #define OSC_BASE_MAX      1024
-#define TYPE_STRING_SIZE  20
+#define OSC_ADDR_MAX      8192
+#define OSC_PORT          9998
 #define DIR_STRING_SIZE   1024
 #define DEBUG_STRING_SIZE 1024
+#define TYPE_STRING_SIZE  20
 #define UI_TARGET_ELEMS   2
-#define ASCII_n           110
+#define ASCII_t           116
 #define ASCII_p           112
+#define ASCII_n           110
 #define ASCII_c           99
 #define ASCII_b           98
-#define ASCII_t           116
 #define ASCII_a           97
 
 #define LOADGUI 0 /* FIX: deprecate this */
@@ -145,6 +148,7 @@ typedef struct _ph {
     float *plugin_control_input;
     float *plugin_control_output;
 
+    unsigned int osc_port;
     unsigned int n_instances;
     unsigned int plugin_ins;
     unsigned int plugin_outs;

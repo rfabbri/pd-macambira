@@ -99,6 +99,32 @@ dx7_bulk_dump_checksum(uint8_t *data, int length)
     for (i = 0; i < length; sum -= data[i++]);
     return sum & 0x7F;
 }
+/* end hexter code */
+
+/*
+ * taken from liblo lo_url_get_path by Steve Harris et al
+ */
+char *osc_get_valid_path(const char *url)
+{
+    char *path = malloc(strlen(url));
+
+    if (sscanf(url, "osc://%*[^:]:%*[0-9]%s", path)) {
+        return path;
+    }
+    if (sscanf(url, "osc.%*[^:]://%*[^:]:%*[0-9]%s", path) == 1) {
+        return path;
+    }
+    if (sscanf(url, "osc.unix://%*[^/]%s", path) == 1) {
+        return path;
+    }
+    if (sscanf(url, "osc.%*[^:]://%s", path)) {
+        return path;
+    }
+
+    /* doesnt look like an OSC URL with port number and path*/
+    return NULL;
+}
+/* end liblo code */
 
 static DSSI_Descriptor *ladspa_to_dssi(LADSPA_Descriptor *ladspaDesc)
 {
@@ -358,7 +384,7 @@ static void ph_cleanup_plugin(ph *x, unsigned int instance)
     }
 }
 
-/* FIX:OSC */
+/* TODO:OSC */
 /*
 static void osc_error(int num, const char *msg, const char *where)
 {
@@ -389,7 +415,7 @@ static void query_programs(ph *x, unsigned int i)
             x->descriptor->select_program) {
 
         /* Count the plugins first */
-        /*FIX ?? */
+        /*TODO ?? */
         for (n = 0; x->descriptor->
                 get_program(x->instance_handles[i], n); ++n);
 
@@ -527,7 +553,7 @@ static void ph_set_control_input_by_index (ph *x,
 
     instance = &x->instances[i];
 
-    /* FIX - temporary hack */
+    /* TODO - temporary hack */
     if(x->is_dssi) {
         portno = instance->plugin_port_ctlin_numbers[ctrl_input_index + 1];
     } else {
@@ -744,22 +770,12 @@ static void ph_list_plugins (ph *x)
     LADSPAPluginSearch(ph_ladspa_describe,(void*)user_data);
 }
 
-/* FIX:OSC */
-#if 0
-static int osc_debug_handler(const char *path, const char *types, lo_arg **argv,
-        int argc, void *data, ph *x)
+static void ph_osc_debug_handler(const char *path)
 {
-    int i;
-    printf("got unhandled OSC message:\npath: <%s>\n", path);
-    for (i=0; i<argc; i++) {
-        printf("arg %d '%c' ", i, types[i]);
-        /* FIX:OSC */
-        //lo_arg_pp(types[i], argv[i]);
-        printf("\n");
-    }
-    return 1;
+
+    ph_debug_post("got unhandled OSC message:\npath: <%s>\n", path);
+
 }
-#endif
 
 static void ph_get_current_pgm(ph *x, unsigned int i)
 {
@@ -812,7 +828,7 @@ static void ph_program_change(ph *x, unsigned int i)
         if (instance->ui_needs_pgm_update){
             ph_debug_post("Updating GUI program");
 
-            /* FIX - this is a hack to make text ui work*/
+            /* TODO - this is a hack to make text ui work*/
             if(x->is_dssi){
                 SETSYMBOL(argv, gensym(instance->ui_osc_program_path));
                 SETFLOAT(argv+1, instance->current_bank);
@@ -829,277 +845,264 @@ static void ph_program_change(ph *x, unsigned int i)
     ph_get_current_pgm(x, i);
 }
 
-/* FIX:OSC */
-#if 0
-static int osc_program_handler(ph *x, lo_arg **argv, int instance)
+static void ph_osc_program_handler(ph *x, t_atom *argv, unsigned int i)
 {
-    unsigned long bank = argv[0]->i;
-    unsigned long program = argv[1]->i;
-    int i;
-    int found = 0;
+    unsigned long bank;
+    unsigned long program; 
+    unsigned int n;
+    bool found;
+    ph_instance *instance;
 
-    ph_debug_post("osc_program_hander active!");
+    bank     = atom_getfloat(&argv[0]);
+    program  = atom_getfloat(&argv[1]);
+    instance = &x->instances[i];
+    found    = false;
 
-    post("%d programs", instance->plugin_pgm_count);
+    ph_debug_post("%d programs", instance->plugin_pgm_count);
 
-
-    for (i = 0; i < instance->plugin_pgm_count; ++i) {
-        if (instance->plugin_pgms[i].Bank == bank &&
-                instance->plugin_pgms[i].Program == program) {
-            post("pluginhost~: OSC: setting bank %u, program %u, name %s\n",
-                    bank, program, instance->plugin_pgms[i].Name);
-
-            found = 1;
+    for (n = 0; n < instance->plugin_pgm_count; ++n) {
+        if (instance->plugin_pgms[n].Bank == bank &&
+                instance->plugin_pgms[n].Program == program) {
+            ph_debug_post("OSC: setting bank %u, program %u, name %s\n",
+                    bank, program, instance->plugin_pgms[n].Name);
+            found = true;
             break;
         }
     }
 
     if (!found) {
-        printf(": OSC:  UI requested unknown program: bank %d, program %u: sending to plugin anyway (plugin should ignore it)\n", (int)bank,(int)program);
+        post("%s: OSC:  UI requested unknown program: bank %ul, program %ul: "
+                "sending to plugin anyway (plugin should ignore it)\n", 
+                MY_NAME, bank, program);
     }
 
-    instance->pending_bank_msb = bank / 128;
-    instance->pending_bank_lsb = bank % 128;
+    instance->pending_bank_msb   = bank / 128;
+    instance->pending_bank_lsb   = bank % 128;
     instance->pending_pgm_change = program;
-    ph_debug_post("bank = %d, program = %d, BankMSB = %d BankLSB = %d", bank, program, instance->pending_bank_msb, instance->pending_bank_lsb);
 
-    ph_program_change(x, instance);
+    ph_debug_post("bank = %d, program = %d, BankMSB = %d BankLSB = %d", 
+            bank, program, instance->pending_bank_msb,
+            instance->pending_bank_lsb);
 
-    return 0;
+    ph_program_change(x, i);
+
 }
 
-static int osc_control_handler(ph *x, lo_arg **argv, int instance)
+static void ph_osc_control_handler(ph *x, t_atom *argv, int i)
 {
-    int port = argv[0]->i;
-    LADSPA_Data value = argv[1]->f;
+    int port;
+    LADSPA_Data value; 
+    ph_instance *instance;
+
+    port     = (int)atom_getfloat(&argv[0]);
+    value    = atom_getfloat(&argv[1]);
+    instance = &x->instances[i];
 
     x->plugin_control_input[instance->plugin_port_ctlin_numbers[port]] = value;
     ph_debug_post("OSC: port %d = %f", port, value);
 
-
-    return 0;
 }
 
-static int osc_midi_handler(ph *x, lo_arg **argv, unsigned int i)
+static void ph_osc_midi_handler(ph *x, t_atom *argv, unsigned int i)
 {
-
-    int ev_type = 0, chan = 0;
-    ph_debug_post("OSC: got midi request for"
-            "(%02x %02x %02x %02x)",
-            argv[0]->m[0], argv[0]->m[1], argv[0]->m[2], argv[0]->m[3]);
-
-    chan = instance;
-    ph_debug_post("channel: %d", chan);
-
-
-    if(argv[0]->m[1] <= 239){
-        if(argv[0]->m[1] >= 224)
-            ev_type = SND_SEQ_EVENT_PITCHBEND;
-        else if(argv[0]->m[1] >= 208)
-            ev_type = SND_SEQ_EVENT_CHANPRESS;
-        else if(argv[0]->m[1] >= 192)
-            ev_type = SND_SEQ_EVENT_PGMCHANGE;
-        else if(argv[0]->m[1] >= 176)
-            ev_type = SND_SEQ_EVENT_CONTROLLER;
-        else if(argv[0]->m[1] >= 160)
-            ev_type = SND_SEQ_EVENT_KEYPRESS;
-        else if(argv[0]->m[1] >= 144)
-            ev_type = SND_SEQ_EVENT_NOTEON;
-        else if(argv[0]->m[1] >= 128)
-            ev_type = SND_SEQ_EVENT_NOTEOFF;
-    }
-    if(ev_type != 0)
-        ph_midibuf_add(x, ev_type, chan, argv[0]->m[2], argv[0]->m[3]);
-
-    return 0;
+    post("%s: warning: MIDI over OSC currently unsupported", MY_NAME);
 }
 
-static int osc_configure_handler(ph *x, lo_arg **argv, int instance)
+static void ph_osc_configure_handler(ph *x, t_atom *argv, int i)
 {
-    const char *key = (const char *)&argv[0]->s;
-    const char *value = (const char *)&argv[1]->s;
+    const char *key;
+    const char *value;
     char *message;
 
-    ph_debug_post("osc_configure_handler active!");
+    key   = atom_getsymbol(&argv[0])->s_name;
+    value = atom_getsymbol(&argv[1])->s_name;
 
+    ph_debug_post("%s()", __FUNCTION__);
 
-    if (x->descriptor->configure) {
+    if (!x->descriptor->configure) {
+        return;
+    } 
 
-        if (!strncmp(key, DSSI_RESERVED_CONFIGURE_PREFIX,
-                    strlen(DSSI_RESERVED_CONFIGURE_PREFIX))) {
-            fprintf(stderr, ": OSC: UI for plugin '' attempted to use reserved configure key \"%s\", ignoring\n", key);
-            return 0;
-        }
+    if (!strncmp(key, DSSI_RESERVED_CONFIGURE_PREFIX,
+                strlen(DSSI_RESERVED_CONFIGURE_PREFIX))) {
+        post("%s: error: OSC: UI for plugin '' attempted to use reserved "
+                "configure key \"%s\", ignoring", MY_NAME, key);
+        return;
+    }
 
-        message = x->descriptor->configure(x->instance_handles[instance], key, value);
-        if (message) {
-            printf(": on configure  '%s', plugin '' returned error '%s'\n",
-                    key, message);
-            free(message);
-        }
+    message = x->descriptor->configure(x->instance_handles[i], key, value);
 
-        query_programs(x, instance);
+    if (message) {
+        post("%s: on configure  '%s', plugin '' returned error '%s'", MY_NAME,
+                key, message);
+        free(message);
+    }
 
-    }	    
+    query_programs(x, i);
 
-    return 0;
 }
 
-static int osc_exiting_handler(ph *x, lo_arg **argv, int instance)
+static void ph_osc_exiting_handler(ph *x, t_atom *argv, int i)
 {
 
-    ph_debug_post("exiting handler called: Freeing ui_osc");
+    ph_instance *instance;
 
-    if(instance->ui_target){
-        lo_address_free(instance->ui_target);
-        instance->ui_target = NULL;
-    }
+    instance = &x->instances[i];
+
     free(instance->ui_osc_control_path);
     free(instance->ui_osc_configure_path);
     free(instance->ui_osc_hide_path);
     free(instance->ui_osc_program_path);
     free(instance->ui_osc_show_path); 
     free(instance->ui_osc_quit_path); 
-    instance->ui_target = NULL;
-    instance->ui_osc_control_path = NULL;
+    instance->ui_osc_control_path   = NULL;
     instance->ui_osc_configure_path = NULL;
-    instance->ui_osc_hide_path = NULL;
-    instance->ui_osc_program_path = NULL;
-    instance->ui_osc_show_path = NULL;
-    instance->ui_osc_quit_path = NULL;
+    instance->ui_osc_hide_path      = NULL;
+    instance->ui_osc_program_path   = NULL;
+    instance->ui_osc_show_path      = NULL;
+    instance->ui_osc_quit_path      = NULL;
+    instance->ui_hidden             = true;
 
-    instance->ui_hidden = 1;
-
-    return 0;
 }
 
-static int osc_update_handler(ph *x, lo_arg **argv, int instance)
+static void ph_osc_update_handler(ph *x, t_atom *argv, int i)
 {
-    const char *url = (char *)&argv[0]->s;
+    const char *url; 
     const char *path;
-    t_int i;
-    char *host, *port;
+    unsigned int n;
+    unsigned int ac = 3;
+    t_atom av[ac];
     ph_configure_pair *p;
+    ph_instance *instance;
 
-    p = x->configure_buffer_head;
+    instance = &x->instances[i];
+    url      = atom_getsymbol(&argv[0])->s_name;
+    p        = x->configure_buffer_head;
 
-    ph_debug_post("OSC: got update request from <%s>, instance %d", url, instance);
+    ph_debug_post("OSC: got update request from <%s>, instance %d",
+            url, instance);
 
+    path = osc_get_valid_path(url);
 
-    if (instance->ui_target) 
-        lo_address_free(instance->ui_target);
-    host = lo_url_get_hostname(url);
-    port = lo_url_get_port(url);
-    instance->ui_target = lo_address_new(host, port);
-    free(host);
-    free(port);
+    if(path == NULL) {
+        post("%s(): error: invalid url: %s", MY_NAME, url);
+        return;
+    }
 
-    path = lo_url_get_path(url);
-
-    if (instance->ui_osc_control_path) 
+    if (instance->ui_osc_control_path) {
         free(instance->ui_osc_control_path);
-    instance->ui_osc_control_path = 
-        (char *)malloc(strlen(path) + 10);
+    }
+    instance->ui_osc_control_path = malloc(strlen(path) + 10);
     sprintf(instance->ui_osc_control_path, "%s/control", path);
 
-    if (instance->ui_osc_configure_path) 
+    if (instance->ui_osc_configure_path) {
         free(instance->ui_osc_configure_path);
-    instance->ui_osc_configure_path = 
-        (char *)malloc(strlen(path) + 12);
+    }
+    instance->ui_osc_configure_path = malloc(strlen(path) + 12);
     sprintf(instance->ui_osc_configure_path, "%s/configure", path);
 
-    if (instance->ui_osc_program_path) 
-        free(instance->ui_osc_program_path); 
-    instance->ui_osc_program_path = 
-        (char *)malloc(strlen(path) + 10);
+    if (instance->ui_osc_program_path) {
+        free(instance->ui_osc_program_path);
+    }
+    instance->ui_osc_program_path = malloc(strlen(path) + 10);
     sprintf(instance->ui_osc_program_path, "%s/program", path);
 
-    if (instance->ui_osc_quit_path) 
-        free(instance->ui_osc_quit_path); 
-    instance->ui_osc_quit_path = (char *)malloc(strlen(path) + 10);
+    if (instance->ui_osc_quit_path) {
+        free(instance->ui_osc_quit_path);
+    }
+    instance->ui_osc_quit_path = malloc(strlen(path) + 10);
     sprintf(instance->ui_osc_quit_path, "%s/quit", path);
 
-    if (instance->ui_osc_show_path) 
-        free(instance->ui_osc_show_path); 
-    instance->ui_osc_show_path = (char *)malloc(strlen(path) + 10);
+    if (instance->ui_osc_show_path) {
+        free(instance->ui_osc_show_path);
+    }
+    instance->ui_osc_show_path = malloc(strlen(path) + 10);
     sprintf(instance->ui_osc_show_path, "%s/show", path);
 
-    if (instance->ui_osc_hide_path) 
-        free(instance->ui_osc_hide_path); 
+    if (instance->ui_osc_hide_path) {
+        free(instance->ui_osc_hide_path);
+    }
     instance->ui_osc_hide_path = (char *)malloc(strlen(path) + 10);
     sprintf(instance->ui_osc_hide_path, "%s/hide", path);
 
     free((char *)path);
 
     while(p){
-        if(p->instance == instance) {
-            ph_send_configure(x, p->key, p->value, instance);
+        if(p->instance == i) {
+            ph_send_configure(x, p->key, p->value, i);
         }
         p = p->next;
     }
 
     /* Send current bank/program */
     if (instance->pending_pgm_change >= 0) {
-        ph_program_change(x, instance);
+        ph_program_change(x, i);
     }
 
     ph_debug_post("pending_pgm_change = %d", instance->pending_pgm_change);
 
     if (instance->pending_pgm_change < 0) {
-        unsigned long bank = instance->current_bank;
-        unsigned long program = instance->current_pgm;
+        unsigned long bank;
+        unsigned long program;
+        ac = 3;
+
+        program = instance->current_pgm;
+        bank    = instance->current_bank;
         instance->ui_needs_pgm_update = 0;
-        if (instance->ui_target) {
-            lo_send(instance->ui_target, 
-                    instance->ui_osc_program_path, 
-                    "ii", bank, program);
-        }
+
+        SETSYMBOL(av, gensym(instance->ui_osc_program_path));
+        SETFLOAT(av+1, bank);
+        SETFLOAT(av+2, program);
+
+        ph_instance_send_osc(x->message_out, instance, ac, av);
+
     }
 
     /* Send control ports */
-    for (i = 0; i < x->plugin_control_ins; i++) {
-        lo_send(instance->ui_target, instance->ui_osc_control_path, "if", 
-                x->plugin_ctlin_port_numbers[i], x->plugin_control_input[i]);  
-        ph_debug_post("Port: %d, Default value: %.2f", x->plugin_ctlin_port_numbers[i], x->plugin_control_input[i]);
+    for (n = 0; n < x->plugin_control_ins; n++) {
+
+        ac = 3;
+
+        SETSYMBOL(av, gensym(instance->ui_osc_control_path));
+        SETFLOAT(av+1, x->plugin_ctlin_port_numbers[n]);
+        SETFLOAT(av+2, x->plugin_control_input[n]);
+
+        ph_instance_send_osc(x->message_out, instance, ac, av);
+
+        ph_debug_post("Port: %d, Default value: %.2f",
+                x->plugin_ctlin_port_numbers[n], x->plugin_control_input[n]);
 
     }
 
     /* Send 'show' */
     if (instance->ui_show) {
-        lo_send(instance->ui_target, instance->ui_osc_show_path, "");
-        instance->ui_hidden = 0;
-        instance->ui_show = 0;
-    }
 
-    return 0;
+        ac = 2;
+
+        SETSYMBOL(av, gensym(instance->ui_osc_show_path));
+        SETSYMBOL(av, gensym(""));
+
+        ph_instance_send_osc(x->message_out, instance, ac, av);
+
+        instance->ui_hidden = false;
+        instance->ui_show = false;
+    }
 }
-#endif
 
-static void ph_osc_setup(ph *x, int instance)
+static void ph_osc_setup(ph *x, unsigned int i)
 {
+    ph_instance *instance = &x->instances[i];
 
-#if 0
-    if(instance == 0){
-        x->osc_thread = lo_server_thread_new(NULL, osc_error);
-        char *osc_url_tmp;
-        osc_url_tmp = lo_server_thread_get_url(x->osc_thread);
-        ph_debug_post("string length of osc_url_tmp:%d", strlen(osc_url_tmp));
-
-        x->osc_url_base = (char *)malloc(sizeof(char) 
-                * (strlen(osc_url_tmp) + strlen("dssi") + 1)); 
-        sprintf(x->osc_url_base, "%s%s", osc_url_tmp, "dssi");
-        free(osc_url_tmp);
-        lo_server_thread_add_method(x->osc_thread, NULL, NULL, 
-                osc_message_handler, x);
-        lo_server_thread_start(x->osc_thread);
+    if(i == 0){
+        x->osc_port = OSC_PORT;
     }
-    instance->osc_url_path = (char *)malloc(sizeof(char) * 
-            (strlen(x->plugin_basename) + strlen(x->descriptor->LADSPA_Plugin->Label) + 			strlen("chan00") + 3));
+    instance->osc_url_path = malloc(sizeof(char) * 
+            (strlen(x->plugin_basename) + 
+             strlen(x->descriptor->LADSPA_Plugin->Label) + 
+             strlen("chan00") + 3));
     sprintf(instance->osc_url_path, "%s/%s/chan%02d", x->plugin_basename, 
-            x->descriptor->LADSPA_Plugin->Label, instance); 
+            x->descriptor->LADSPA_Plugin->Label, i); 
     ph_debug_post("OSC Path is: %s", instance->osc_url_path);
-    post("OSC thread started: %s", x->osc_url_base);
-#endif
 
 }
 
@@ -1120,7 +1123,7 @@ static void ph_init_programs(ph *x, unsigned int i)
     }
 }
 
-/* FIX:OSC */
+/* TODO:OSC */
 #if 0
 static void ph_load_gui(ph *x, int instance)
 {
@@ -1175,6 +1178,9 @@ static void ph_load_gui(ph *x, int instance)
     ph_debug_post("gui_path: %s", gui_path);
 
 
+    /* osc_url_base was of the form:
+     * osc.udp://127.0.0.1:9997/dssi
+     */
     osc_url = (char *)malloc
         (sizeof(char) * (strlen(x->osc_url_base) + 
                          strlen(instance->osc_url_path) + 2));
@@ -1286,9 +1292,8 @@ static void ph_midibuf_add(ph *x, int type, unsigned int chan, int param, int va
 
 static void ph_list(ph *x, t_symbol *s, int argc, t_atom *argv)
 {
-    char *msg_type;
+    char msg_type[TYPE_STRING_SIZE];
     int ev_type = 0;
-    msg_type = (char *)malloc(TYPE_STRING_SIZE);
     atom_string(argv, msg_type, TYPE_STRING_SIZE);
     int chan = (int)atom_getfloatarg(1, argc, argv) - 1;
     int param = (int)atom_getfloatarg(2, argc, argv);
@@ -1320,7 +1325,6 @@ static void ph_list(ph *x, t_symbol *s, int argc, t_atom *argv)
             }
         }
     }
-    free(msg_type);
 }
 
 static char *ph_send_configure(ph *x, const char *key, const char *value, 
@@ -1330,7 +1334,7 @@ static char *ph_send_configure(ph *x, const char *key, const char *value,
 
     debug =   x->descriptor->configure(x->instance_handles[instance],
             key, value);
-    /* FIX:OSC */
+    /* TODO:OSC */
     /* if(instance->ui_target != NULL && x->is_dssi) {
             lo_send(instance->ui_target, 
                 instance->ui_osc_configure_path,
@@ -1344,7 +1348,7 @@ static char *ph_send_configure(ph *x, const char *key, const char *value,
 
 static void ph_show(ph *x, unsigned int i, t_int toggle)
 {
-            /* FIX:OSC */
+            /* TODO:OSC */
 /*
     if(instance->ui_target){
         if (instance->ui_hidden && toggle) {
@@ -1393,7 +1397,7 @@ static t_int ph_configure_buffer(ph *x, char *key,
     current->value = strdup(value);
     p = x->configure_buffer_head;
 
-    /*FIX: eventually give ability to query this buffer (to outlet?) */
+    /*TODO: eventually give ability to query this buffer (to outlet?) */
     while(p){
         ph_debug_post("key: %s", p->key);
         ph_debug_post("val: %s", p->value);
@@ -1515,7 +1519,8 @@ static t_int ph_dssi_methods(ph *x, t_symbol *s, int argc, t_atom *argv)
         "pluginhost~: plugin is not a DSSI plugin, operation not supported");
         return 0;
     }
-    char *msg_type;
+
+    char msg_type[TYPE_STRING_SIZE];
     char *debug;
     char *filename;
     char *filepath;
@@ -1537,18 +1542,17 @@ static t_int ph_dssi_methods(ph *x, t_symbol *s, int argc, t_atom *argv)
     unsigned char *raw_patch_data = NULL;
     FILE *fp = NULL;
     size_t filename_length, key_size, value_size;
-    dx7_patch_t *patchbuf, *firstpatch;
-    msg_type = (char *)malloc(TYPE_STRING_SIZE);
+    dx7_patch_t patchbuf[DX7_BANK_SIZE];
+    dx7_patch_t *firstpatch;
     atom_string(argv, msg_type, TYPE_STRING_SIZE);
     debug = NULL;
     key = NULL;	
     value = NULL;
     maxpatches = 128; 
-    patchbuf = malloc(32 * sizeof(dx7_patch_t));
     firstpatch = &patchbuf[0];
     val = 0;
 
-    /*FIX: Temporary - at the moment we always load the first 32 patches to 0 */
+    /*TODO: Temporary - at the moment we always load the first 32 patches to 0 */
     if(strcmp(msg_type, "configure")){
         instance = (int)atom_getfloatarg(2, argc, argv) - 1;
 
@@ -1562,7 +1566,7 @@ static t_int ph_dssi_methods(ph *x, t_symbol *s, int argc, t_atom *argv)
                 key = malloc(10 * sizeof(char)); /* holds "patchesN" */
                 strcpy(key, "patches0");
 
-                /* FIX: duplicates code from load_plugin() */
+                /* TODO: duplicates code from load_plugin() */
                 fd = canvas_open(x->x_canvas, filename, "",
                         mydir, &filename, MAXPDSTRING, 0);
 
@@ -1773,7 +1777,7 @@ static t_int ph_dssi_methods(ph *x, t_symbol *s, int argc, t_atom *argv)
                 ph_configure_buffer(x, key, value, n_instances);
             }
         }
-        /*FIX: Put some error checking in here to make sure instance is valid*/
+        /*TODO: Put some error checking in here to make sure instance is valid*/
         else{
 
             debug = ph_send_configure(x, key, value, instance);
@@ -1782,10 +1786,85 @@ static t_int ph_dssi_methods(ph *x, t_symbol *s, int argc, t_atom *argv)
     }
     ph_debug_post("The plugin returned %s", debug);
 
-    free(msg_type);
-    free(patchbuf);
-
     return 0;
+}
+
+static void ph_osc_methods(ph *x, t_symbol *s, int argc, t_atom *argv) 
+{
+
+    unsigned int i;
+    const char *method;
+    char path[OSC_ADDR_MAX];
+    ph_instance *instance;
+
+    instance = NULL;
+
+    atom_string(argv, path, TYPE_STRING_SIZE);
+
+    if (strncmp(path, "/dssi/", 6)){
+        ph_osc_debug_handler(path);
+    }
+
+    for (i = 0; i < x->n_instances; i++) {
+        instance = &x->instances[i];
+        if (!strncmp(path + 6, instance->osc_url_path,
+                    strlen(instance->osc_url_path))) {
+            break;
+        }
+    }
+
+    if(instance == NULL) {
+        post("%s: error instance not found");
+        return;
+    }
+
+    if (!instance->osc_url_path){
+        ph_osc_debug_handler(path);
+    }
+
+    method = path + 6 + strlen(instance->osc_url_path);
+
+    if (*method != '/' || *(method + 1) == 0){
+        ph_osc_debug_handler(path);
+    }
+
+    method++;
+
+    switch(argc) {
+        case 2:
+
+            if (!strcmp(method, "configure") && 
+                    argv[1].a_type == A_SYMBOL &&
+                    argv[2].a_type == A_SYMBOL) {
+                ph_osc_configure_handler(x, &argv[1], i);
+            } else if (!strcmp(method, "control") &&
+                    argv[1].a_type == A_FLOAT &&
+                    argv[2].a_type == A_FLOAT) {
+                ph_osc_control_handler(x, argv, i);
+            } else if (!strcmp(method, "program") && 
+                    argv[1].a_type == A_FLOAT &&
+                    argv[2].a_type == A_FLOAT) {
+                ph_osc_program_handler(x, argv, i);
+            }
+            break;
+
+        case 1:
+            if (!strcmp(method, "midi")) {
+                ph_osc_midi_handler(x, argv, i);
+            } else if (!strcmp(method, "update") &&
+                    argv[1].a_type == A_SYMBOL) {
+                ph_osc_update_handler(x, argv, i);
+            }
+            break;
+        case 0:
+            if (!strcmp(method, "exiting")) {
+                ph_osc_exiting_handler(x, argv, i);
+            }
+            break;
+        default:
+            ph_osc_debug_handler(path);
+            break;
+    }
 }
 
 static void ph_instance_send_osc(t_outlet *outlet, ph_instance *instance, 
@@ -1998,7 +2077,7 @@ static void ph_free_plugin(ph *x)
     while(i--){
         ph_instance *instance = &x->instances[i];
 
-        /* FIX:OSC */
+        /* TODO:OSC */
         /*
            if(instance->gui_pid){
            ph_debug_post("Killing GUI process PID = %d", instance->gui_pid);
@@ -2377,107 +2456,27 @@ void pluginhost_tilde_setup(void)
             gensym ("reset"), A_DEFFLOAT, 0);
     class_addmethod (ph_class,(t_method)ph_plug_plugin,
             gensym ("plug"),A_GIMME,0);
-    /*    class_addmethod (ph_class,(t_method)ph_activate_plugin,
-          gensym ("activate"),A_DEFFLOAT - 1,0);
-          class_addmethod (ph_class,(t_method)ph_deactivate_plugin,
-          gensym ("deactivate"),A_DEFFLOAT - 1,0);*/
+    class_addmethod (ph_class, (t_method)ph_osc_methods,
+            gensym("osc"), A_GIMME, 0);
     class_sethelpsymbol(ph_class, gensym("pluginhost~-help"));
     CLASS_MAINSIGNALIN(ph_class, ph, f);
     signal(SIGCHLD, ph_sigchld_handler);
 }
-/* FIX:OSC */
-/*
-static int osc_message_handler(const char *path, const char *types, 
-        lo_arg **argv,int argc, void *data, void *user_data)
-{
-    ph_debug_post("osc_message_handler active");
 
-    int i, instance = 0;
-    const char *method;
-    char chantemp[2];
-    ph *x = (ph *)(user_data);
-
-    if (strncmp(path, "/dssi/", 6)){
-        ph_debug_post("calling osc_debug_handler"); 
-
-        return osc_debug_handler(path, types, argv, argc, data, x);
-    }
-    for (i = 0; i < x->n_instances; i++) {
-        if (!strncmp(path + 6, x->instances[i].osc_url_path,
-                    strlen(x->instances[i].osc_url_path))) {
-            instance = i;
-            break;
-        }
-    }
-    for(i = 0; i < argc; i++){
-        ph_debug_post("got osc request %c from instance %d, path: %s", 
-                types[i],instance,path);
-    }
-
-
-    if (!instance->osc_url_path){
-        ph_debug_post("calling osc_debug_handler"); 
-
-        return osc_debug_handler(path, types, argv, argc, data, x);
-    }
-    method = path + 6 + strlen(instance->osc_url_path);
-    if (*method != '/' || *(method + 1) == 0){
-        ph_debug_post("calling osc_debug_handler"); 
-
-        return osc_debug_handler(path, types, argv, argc, data, x);
-    }
-    method++;
-
-    if (!strcmp(method, "configure") && argc == 2 && !strcmp(types, "ss")) {
-
-        ph_debug_post("calling osc_configure_handler");
-
-        return osc_configure_handler(x, argv, instance);
-
-    } else if (!strcmp(method, "control") && argc == 2 && !strcmp(types, "if")) {
-        ph_debug_post("calling osc_control_handler");
-
-        return osc_control_handler(x, argv, instance);
-    }
-
-    else if (!strcmp(method, "midi") && argc == 1 && !strcmp(types, "m")) {
-
-        ph_debug_post("calling osc_midi_handler");
-
-        return osc_midi_handler(x, argv, instance);
-
-    } else if (!strcmp(method, "program") && argc == 2 && !strcmp(types, "ii")){
-        ph_debug_post("calling osc_program_handler"); 
-
-        return osc_program_handler(x, argv, instance);
-
-    } else if (!strcmp(method, "update") && argc == 1 && !strcmp(types, "s")){
-        ph_debug_post("calling osc_update_handler"); 
-
-        return osc_update_handler(x, argv, instance);
-
-    } else if (!strcmp(method, "exiting") && argc == 0) {
-
-        return osc_exiting_handler(x, argv, instance);
-    }
-
-    return osc_debug_handler(path, types, argv, argc, data, x);
-}
-*/
 static void ph_debug_post(const char *fmt, ...)
 {
 #if DEBUG
-    va_list args;
-    size_t fmt_length;
     unsigned int currpos;
-    char newfmt[DEBUG_STRING_SIZE];
-    char result[DEBUG_STRING_SIZE];
+    char     newfmt[DEBUG_STRING_SIZE];
+    char     result[DEBUG_STRING_SIZE];
+    size_t   fmt_length;
+    va_list  args;
 
     fmt_length = strlen(fmt);
 
     sprintf(newfmt, "%s: ", MY_NAME);
     strncat(newfmt, fmt, fmt_length);
-    currpos = strlen(MY_NAME) + 2 + fmt_length;
+    currpos         = strlen(MY_NAME) + 2 + fmt_length;
     newfmt[currpos] = '\0';
 
     va_start(args, fmt);
