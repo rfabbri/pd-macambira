@@ -17,7 +17,7 @@ typedef struct _sigdelwrite
     t_float x_f;
 } t_sigdelwrite;
 
-static t_class *sigdelwrite_class;
+t_class *sigdelwrite_class;
 
 extern int ugen_getsortno(void);
 
@@ -27,7 +27,7 @@ extern int ugen_getsortno(void);
 #define SAMPBLK 4
 
     /* routine to check that all delwrites/delreads/vds have same vecsize */
-static void sigdelwrite_checkvecsize(t_sigdelwrite *x, int vecsize)
+void sigdelwrite_checkvecsize(t_sigdelwrite *x, int vecsize)
 {
     if (x->x_rsortno != ugen_getsortno())
     {
