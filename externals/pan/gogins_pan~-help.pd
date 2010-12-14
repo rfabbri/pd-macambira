@@ -1,5 +1,4 @@
-#N canvas 7 59 519 390 10;
-#X declare -lib pan;
+#N canvas 0 31 519 390 10;
 #X obj 5 2 cnv 15 450 20 empty empty gogins_pan~ 2 11 1 18 -233017
 -66577 0;
 #X msg 422 3 pddp;
@@ -21,8 +20,22 @@ wrapping around more.;
 ;
 #X text 244 364 released under the GNU GPL;
 #X text 40 277 [gogins_pan~] implements an algorithm conceived by Michael
-Gogins and described here: ;
-#X obj 22 324 pddp/pddplink http://www.csounds.com/ezine/autumn1999/beginners/;
+Gogins and described here:;
+#X obj 22 324 pddp/pddplink http://www.csounds.com/ezine/autumn1999/beginners/
+;
+#N canvas 504 253 494 344 META 0;
+#X text 12 175 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL;
+#X text 12 155 AUTHOR Hans-Christoph Steiner;
+#X text 12 5 KEYWORDS signal abstraction;
+#X text 12 95 INLET_1 float;
+#X text 12 75 INLET_0 signal;
+#X text 12 115 OUTLET_0 signal;
+#X text 12 135 OUTLET_1 signal;
+#X text 12 45 DESCRIPTION pan a mono signal using an algorithm posted
+by Michael Gogins to the Csound list;
+#X restore 463 358 pd META;
 #X connect 2 0 9 1;
 #X connect 3 0 4 0;
 #X connect 4 0 9 0;
