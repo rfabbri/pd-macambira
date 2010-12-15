@@ -88,7 +88,6 @@ interpolation is meaningful.;
 will read data. The array or table must exist in an open Pd patch/canvas
 or an error message will appear in the console.;
 #N canvas 117 345 428 159 init 0;
-#X obj 23 125 s tabread4~-help-tab;
 #X msg 23 103 0 -0.8 -0.6 -0.4 -0.2 0 0.2 0.4 0.6 0.8 1;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
@@ -96,8 +95,9 @@ or an error message will appear in the console.;
 #X text 8 2 [tabread4~] [table] initialization;
 #X text 20 38 This subpatch just initializes a [table] to some values.
 (Values in a [table] are not saved in the patch.);
-#X connect 1 0 0 0;
-#X connect 3 0 1 0;
+#X obj 23 125 s \$0-array;
+#X connect 0 0 5 0;
+#X connect 2 0 0 0;
 #X restore 288 270 pd init;
 #X text 168 353 - the "set" message \, followed by the name of an array
 \, permits you to switch between arrays (e.g. \, "set another_array").
@@ -106,7 +106,8 @@ or an error message will appear in the console.;
 #X text 18 44 [tabread4~] is used to build samplers and other table
 lookup algorithms. The interpolation scheme is 4-point polynomial.
 ;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 455 51 pddp/dsp;
 #X obj 100 530 pddp/pddplink ../3.audio.examples/B03.tabread4.pd -text
 doc/3.audio.examples/B03.tabread4.pd;

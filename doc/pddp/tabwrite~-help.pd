@@ -59,9 +59,9 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 435 20 pddp/pddplink http://wiki.puredata.info/en/tabwrite~
 -text pdpedia: tabwrite~;
 #X text 11 23 write a signal in an array;
-#X msg 95 195 bang;
-#X msg 111 238 stop;
-#X obj 78 165 phasor~ 200;
+#X msg 95 194 bang;
+#X msg 111 239 stop;
+#X obj 78 170 phasor~ 200;
 #X text 98 332 bang;
 #X text 98 351 start;
 #X text 98 390 stop;
@@ -69,7 +69,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X text 98 479 (none);
 #N canvas 0 0 450 300 (subpatch) 0;
 #X array \$0-array 1000 float 0;
-#X coords 0 1 999 -1 160 100 1;
+#X coords 0 1 999 -1 160 100 1 0 0;
 #X restore 329 183 graph;
 #X msg 98 216 start 500;
 #X text 168 521 - the name of the array or table to which [tabwrite~]
@@ -93,18 +93,20 @@ element (e.g. \, "start 500" will start recording at the 500th element).
 \, permits you to switch between arrays (e.g. \, "set another_array").
 ;
 #X text 166 452 - the signal to be written to the array.;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 455 51 pddp/dsp;
 #X obj 98 570 pddp/pddplink all_about_arrays.pd;
 #X obj 171 219 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -1
 -1;
 #X obj 171 239 f \$0;
-#X msg 171 261 set \$1-array;
 #X obj 78 291 tabwrite~ \$0-array;
-#X connect 12 0 37 0;
-#X connect 13 0 37 0;
-#X connect 14 0 37 0;
-#X connect 21 0 37 0;
+#X obj 329 293 table \$0-array2;
+#X msg 171 261 set \$1-array2;
+#X connect 12 0 36 0;
+#X connect 13 0 36 0;
+#X connect 14 0 36 0;
+#X connect 21 0 36 0;
 #X connect 34 0 35 0;
-#X connect 35 0 36 0;
-#X connect 36 0 37 0;
+#X connect 35 0 38 0;
+#X connect 38 0 36 0;
