@@ -1,13 +1,16 @@
-/* dssi~ - A DSSI host for PD 
- * 
- * Copyright 2006 Jamie Bullock and others 
+/* pluginhost~ - A plugin host for Pd
+ *
+ * Copyright (C) 2006 Jamie Bullock and others
  *
  * This file incorporates code from the following sources:
- * 
+ *
  * jack-dssi-host (BSD-style license): Copyright 2004 Chris Cannam, Steve Harris and Sean Bolton.
  *
  * Hexter (GPL license): Copyright (C) 2004 Sean Bolton and others.
- * 
+ *
+ * plugin~ (GPL license): Copyright (C) 2000 Jarno Seppänen, remIXed 2005
+ *
+ * liblo (CPL license): Copyright (C) 2004 Steve Harris
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,52 +27,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include <dlfcn.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>     /* for uint8_t      */
-#include <stdlib.h>     /* for exit()       */
-#include <sys/types.h>  /* for fork()       */
-#include <signal.h>     /* for kill()       */
-#include <sys/wait.h>   /* for wait()       */
-#include <dirent.h>     /* for readdir()    */
+#include <stdbool.h>
 
 #include "m_pd.h"
 #include "dssi.h"
 
-#define DX7_VOICE_SIZE_PACKED 	128 /*From hexter_types.h by Sean Bolton */
-#define DX7_DUMP_SIZE_BULK 	4096+8
-#define DX7_BANK_SIZE           32
-
-#define VERSION           0.99
-#define MY_NAME           "pluginhost~"
+#define PH_NAME           "pluginhost~"
+#define PH_VERSION        0.99
 #define EVENT_BUFSIZE     1024
-#define OSC_BASE_MAX      1024
-#define OSC_ADDR_MAX      8192
 #define OSC_PORT          9998
-#define DIR_STRING_SIZE   1024
-#define DEBUG_STRING_SIZE 1024
-#define TYPE_STRING_SIZE  20
 #define UI_TARGET_ELEMS   2
-#define ASCII_t           116
-#define ASCII_p           112
-#define ASCII_n           110
-#define ASCII_c           99
-#define ASCII_b           98
-#define ASCII_a           97
-
-#define LOADGUI 0 /* FIX: deprecate this */
-#ifdef DEBUG
-#define CHECKSUM_PATCH_FILES_ON_LOAD 1
-#endif
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
-/*From dx7_voice.h by Sean Bolton */
-typedef struct _dx7_patch_t {
-    uint8_t data[128];
-} dx7_patch_t;
+#ifndef HEADER_PH_COMMON
 
 typedef struct _ph_instance {
 
@@ -176,10 +147,19 @@ typedef struct _ph {
 
 } ph;
 
-static char *ph_send_configure(ph *x, const char *key, 
-        const char *value, int instance);
-static void ph_instance_send_osc(t_outlet *outlet, ph_instance *instance, 
+void ph_debug_post(const char *fmt, ...);
+void ph_quit_plugin(ph *x);
+void ph_init_plugin(ph *x);
+void ph_free_plugin(ph *x);
+void ph_query_programs(ph *x, unsigned int i);
+void ph_program_change(ph *x, unsigned int i);
+void ph_instance_send_osc(t_outlet *outlet, ph_instance *instance, 
         t_int argc, t_atom *argv);
-static void ph_midibuf_add(ph *x, int type, unsigned int chan, int param, int value);
-static void ph_debug_post(const char *fmt, ...);
-static LADSPA_Data get_port_default(ph *x, int port);
+void *ph_load_plugin(ph *x, t_int argc, t_atom *argv);
+char *ph_send_configure(ph *x, const char *key, const char *value,
+        unsigned int i);
+DSSI_Descriptor *ladspa_to_dssi(LADSPA_Descriptor *ladspaDesc);
+
+#define HEADER_PH_COMMON
+#endif
+

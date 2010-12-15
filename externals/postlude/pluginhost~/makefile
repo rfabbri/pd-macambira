@@ -27,7 +27,10 @@ LINUXINCLUDE =  -I/usr/include -I./include
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/jsearch.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/jload.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/pluginhost~.c
-	gcc --export-dynamic  -shared -o $(NAME).pd_linux pluginhost~.o jload.o jsearch.o -lc -lm
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/handlers_osc.c
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/handlers_pd.c
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/ph_common.c
+	gcc --export-dynamic  -shared -o $(NAME).pd_linux pluginhost~.o jload.o jsearch.o handlers_osc.o handlers_pd.o ph_common.o -lc -lm
 #	strip --strip-unneeded $(NAME).pd_linux
 	cp $(NAME).pd_linux ~/pd-externals/
 	rm -f *.o
@@ -46,7 +49,10 @@ DARWININCLUDE = -I ./ -I ../src -I/usr/local/include/ -I ./include -I/usr/local/
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/jsearch.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/jload.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/pluginhost~.c
-	$(CC) -arch $(ARCHITECTURE) -bundle -undefined suppress -flat_namespace  -o $(NAME).pd_darwin pluginhost~.o jload.o jsearch.o 
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/handlers_osc.c
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/handlers_pd.c
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/ph_common.c
+	$(CC) -arch $(ARCHITECTURE) -bundle -undefined suppress -flat_namespace  -o $(NAME).pd_darwin pluginhost~.o jload.o jsearch.o handlers_osc.o handlers_pd.o ph_common.o
 	rm -f *.o
 
 # ----------------------- Generic -----------------------

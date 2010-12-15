@@ -1,0 +1,43 @@
+/* pluginhost~ - A plugin host for Pd
+ *
+ * Copyright (C) 2006 Jamie Bullock and others
+ *
+ * This file incorporates code from the following sources:
+ *
+ * jack-dssi-host (BSD-style license): Copyright 2004 Chris Cannam, Steve Harris and Sean Bolton.
+ *
+ * Hexter (GPL license): Copyright (C) 2004 Sean Bolton and others.
+ *
+ * plugin~ (GPL license): Copyright (C) 2000 Jarno Seppänen, remIXed 2005
+ *
+ * liblo (CPL license): Copyright (C) 2004 Steve Harris
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+#include "m_pd.h"
+#include "ph_common.h"
+
+void handle_pd_bang(ph *x);
+void handle_pd_info(ph *x);
+void handle_pd_listplugins(ph *x);
+void handle_pd_dsp(ph *x, t_signal **sp);
+void handle_pd_reset(ph *x, int i);
+void handle_pd_list(ph *x, t_symbol *s, int argc, t_atom *argv);
+void handle_pd_dssi(ph *x, t_symbol *s, int argc, t_atom *argv); 
+void handle_pd_control (ph *x, t_symbol* ctrl_name, t_float ctrl_value, 
+        int instance);
+void handle_pd_plug(ph *x, t_symbol *s, int argc, t_atom *argv);
+void handle_pd_osc(ph *x, t_symbol *s, int argc, t_atom *argv);
