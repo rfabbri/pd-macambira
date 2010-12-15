@@ -55,19 +55,6 @@ sense in terms of abstractions;
 -162280 0;
 #X obj 78 298 cnv 17 3 35 empty \$0-pddp.cnv.let.n n 5 9 0 16 -228856
 -162280 0;
-#N canvas 59 268 450 300 common_terminology 0;
-#X text 13 30 console - the main Pd window that includes the printout
-area;
-#X text 13 50 subwindow -;
-#X text 13 70 subpatch -;
-#X text 13 90 abstraction -;
-#X text 13 110 index -;
-#X text 13 200 truncate -;
-#X text 13 220 argument;
-#X text 13 240 creation argument - see "argument";
-#X text 13 130 wire - aka connection \, patch cord \, line;
-#X text 13 180 edit mode -;
-#X restore 101 552 pd common_terminology;
 #X obj 78 344 cnv 17 3 35 empty \$0-pddp.cnv.let.r r 5 9 0 16 -228856
 -162280 0;
 #N canvas 117 160 428 384 More_about_creation_arguments 0;
@@ -155,10 +142,9 @@ accepts no messages. These xlets are labeled (inactive).;
 #X msg 151 125 42;
 #X floatatom 151 147 5 0 0 0 - - -;
 #X text 180 125 <-- Click the message box;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 455 51 pddp/dsp;
 #X obj -1 0 cnv 15 552 40 empty \$0-pddp.cnv.header help_patches 3
 12 0 18 -204280 -1 0;
-#X text 11 23 using help patches in Pure Data;
 #X obj 465 20 pddp/pddplink http://wiki.puredata.info/en/help -text
 pdpedia: help;
 #X obj 426 119 cnv 15 122 44 empty empty empty 20 12 0 10 -191407 -1
@@ -251,9 +237,11 @@ in left-to-right order. The same goes for the outlets. Additional information
 may sometimes appear in a subpatch \, like the one above-- click it
 with the mouse to open it.;
 #X obj 99 572 pddp/pddplink all_about_messages.pd;
-#X obj 5 597 pddp/pddplink help.pd -text help;
 #X text 337 459 the object's behavior or to;
 #X text 120 298 "n" means there is a variable number of inlets \, the
 exact number of which is determined by creation argument(s).;
-#X text 221 553 replace w/glossary;
-#X connect 17 0 18 0;
+#X text 11 23 usage guide for internal help patches;
+#X obj 99 552 pddp/pddplink glossary.pd;
+#X obj 5 597 pddp/pddplink all_about.pd -text All About Pd
+;
+#X connect 16 0 17 0;

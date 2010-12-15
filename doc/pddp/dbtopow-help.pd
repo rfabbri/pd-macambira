@@ -63,6 +63,6 @@ will be used as input.;
 \, equal to the square of the "RMS" amplitude.;
 #X text 98 468 list;
 #X obj 99 570 pddp/pddplink all_about_acoustic_conversions.pd;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 11 0 17 0;
 #X connect 17 0 10 0;

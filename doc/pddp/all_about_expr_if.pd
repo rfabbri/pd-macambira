@@ -53,7 +53,7 @@ sly and the expr family stone;
 #X obj 72 42 select;
 #X obj 132 42 spigot;
 #X restore 103 480 pd Related_objects;
-#X obj 6 480 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 480 pddp/pddplink all_about.pd -text All About Pd;
 #X obj 23 290 expr if($f1 < 50 \, 50-$f1 \, 50);
 #X connect 3 0 24 0;
 #X connect 4 0 9 1;

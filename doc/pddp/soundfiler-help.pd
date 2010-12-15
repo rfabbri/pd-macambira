@@ -112,7 +112,7 @@ or 4 byte floating point samples in wave \, aiff \, or next formats
 soundfile need not match the number of arrays given (extras are dropped
 and unsupplied channels are zeroed out).;
 #X text 98 558 Note: The number of channels is limited to 64 .;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 575 pddp/pddplink all_about_arrays.pd;
 #X connect 18 0 19 0;
 #X connect 29 0 18 0;

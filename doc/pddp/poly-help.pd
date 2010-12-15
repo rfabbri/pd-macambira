@@ -77,7 +77,7 @@ and outputs triples containing voice number \, pitch and velocity.
 You can pack the output and use the route object to route messages
 among a bank of voices depending on the first outlet. [poly] can be
 configured to do voice stealing or not (the default.);
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 78 467 cnv 17 3 17 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
 -162280 0;
 #X obj 78 490 cnv 17 3 17 empty \$0-pddp.cnv.let.2 2 5 9 0 16 -228856

@@ -39,7 +39,7 @@ of various shape \, strength \, and frequency;
 #X obj 10 264 pddp/helplink flatspace/ff-periodic;
 #X obj 10 314 pddp/helplink flatspace/ff-constant;
 #X restore 103 354 pd Related_objects;
-#X obj 6 354 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 354 pddp/pddplink all_about.pd -text All About Pd;
 #X text 19 37 "Haptic" means relating to the sense of touch. Haptic
 feedback relates to the sense of touch at the skin level \, and the
 feeling of forces in the muscles and joints. Vibrations stimulate the

@@ -84,7 +84,7 @@ by Olaf Matthes);
 #X obj 472 3 touchout;
 #X obj 439 20 pddp/pddplink http://wiki.puredata.info/en/touchout -text
 pdpedia: touchout;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X text 98 445 list;
 #X text 168 445 - a list is distributed to the two inlets.;
 #X connect 21 0 20 0;

@@ -59,8 +59,8 @@ pdpedia: wrap~;
 #X text 74 317 [wrap~] gives the difference between the input and the
 largest integer not exceeding it (for positive numbers this is the
 fractional part).;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 13 0 16 0;
 #X connect 14 0 17 0;
 #X connect 16 0 15 0;

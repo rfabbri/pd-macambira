@@ -251,7 +251,7 @@ subpatch below for more info:;
 messsage boxes as push buttons. For instance \, click here while watching
 the printout window:;
 #X text 100 421 symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 100 559 pddp/pddplink all_about_messages.pd -text all_about_messages
 ;
 #X obj 100 574 pddp/pddplink all_about_symbol_construction.pd -text

@@ -41,7 +41,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 22 43 makefilename;
 #X msg 114 44;
 #X restore 103 483 pd Related_objects;
-#X obj 6 483 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 483 pddp/pddplink all_about.pd -text All About Pd;
 #X obj 38 399 pddp/helplink zexy/list2symbol;
 #X obj 38 419 pddp/helplink cyclone/sprintf;
 #X obj 38 459 pddp/helplink zexy/makesymbol;

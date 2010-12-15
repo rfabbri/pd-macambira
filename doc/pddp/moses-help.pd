@@ -109,7 +109,7 @@ the left outlet if they are less than the control value.;
 #X text 168 310 - if the float the left inlet is less than the control
 value \, it passes at the left inlet. If it is greater than or equal
 to the control value it passes at the right inlet.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 100 568 pddp/pddplink ../2.control.examples/18.conditional.pd
 -text doc/2.control.examples/18.conditional.pd;
 #X connect 17 0 27 0;

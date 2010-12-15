@@ -2,7 +2,7 @@
 - create message-help.pd, namecanvas-help.pd and all_about_messages which
   include [namecanvas] and the additional/pd-msg docs
 
-- finish all_about.pd and remove table_of_contents.pd
+- check pddplinks to manuals folder (e.g., in all_about_getting_help.pd)
 
 - improve glossary
 

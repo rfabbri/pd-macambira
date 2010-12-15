@@ -65,7 +65,7 @@ pitches as in "69.5" (a quarter tone higher than 69).;
 used as input.;
 #X text 158 437 - the incoming value.;
 #X obj 98 557 pddp/pddplink all_about_acoustic_conversions.pd;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 572 pddp/pddplink ../3.audio.examples/A06.frequency.pd -text
 doc/3.audio.examples/A06.frequency.pd;
 #X connect 11 0 16 0;

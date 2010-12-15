@@ -85,7 +85,7 @@ array.;
 #X text 119 200 here we just get the size of the array "array1".;
 #X text 168 519 - the name of a field within that template. (The field
 must be an array.);
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 557 pddp/pddplink all_about_arrays.pd;
 #X obj 98 572 pddp/pddplink scalar-help.pd;
 #X scalar help-getsize-template 349 282 \; 8 \; 14 \; -5 \; 10 \; 21

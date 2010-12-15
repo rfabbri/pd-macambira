@@ -71,8 +71,8 @@ same delay line.;
 #X text 98 511 Note: if the [delwrite~] runs after the [delread~] the
 minimum delay is actually one DSP period \, not zero.;
 #X text 80 440 1) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 98 542 pddp/pddplink ../3.audio.examples/G01.delay.pd -text
 doc/3.audio.examples/G01.delay.pd;
 #X obj 98 557 pddp/pddplink ../3.audio.examples/G02.delay.loop.pd -text

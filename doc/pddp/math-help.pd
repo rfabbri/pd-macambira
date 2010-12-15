@@ -96,6 +96,6 @@ the right inlet. All other math functions listed here take no arguments.
 the previous value.);
 #X text 97 403 (Note: The [atan2] and [pow] objects have a right inlet.
 See their respective help patches (links above) for more info.);
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 26 0 28 0;
 #X connect 27 0 26 0;

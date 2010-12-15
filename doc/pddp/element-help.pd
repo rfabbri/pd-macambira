@@ -124,7 +124,7 @@ the nearest endpoint.;
 scalar.;
 #X text 80 512 1) symbol atom;
 #X text 80 527 2) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 557 pddp/pddplink all_about_arrays.pd;
 #X obj 98 572 pddp/pddplink scalar-help.pd;
 #X connect 23 0 28 1;

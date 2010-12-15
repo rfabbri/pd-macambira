@@ -140,8 +140,8 @@ tabread4~ and there are none of tabread4~'s interpolation artifacts.
 ;
 #X text 168 445 - the outgoing audio signal.;
 #X text 80 520 1) symbol;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 98 570 pddp/pddplink all_about_arrays.pd;
 #X obj 13 165 tabplay~ \$0-array;
 #X connect 23 0 53 0;

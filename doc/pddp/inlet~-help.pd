@@ -171,7 +171,7 @@ upsampling/downsampling \, and the word "lin" will cause linear upsampling/downs
 See the subpatch below for more details:;
 #X text 98 77 The [inlet~] object allows signals to be sent to a subpatch
 from objects on the parent canvas.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 10 0 16 1;
 #X connect 11 0 16 0;
 #X connect 15 0 9 0;

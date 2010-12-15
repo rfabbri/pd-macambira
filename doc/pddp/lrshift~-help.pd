@@ -67,8 +67,8 @@ the shift. The rightmost (or leftmost) samples are set to zero.;
 #X text 168 520 - (integer) sets the direction and amount to shift
 the samples. Negative numbers shift samples the left \, and positive
 numbers shift to the right.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 73 182 tabreceive~ \$0-shiftin;
 #X obj 418 286 s \$0-shiftin;
 #X connect 13 0 35 0;

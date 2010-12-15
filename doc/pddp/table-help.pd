@@ -113,7 +113,7 @@ is given \, [table] objects will be named "table1" \, "table2" \, "table3"
 \, etc.);
 #X text 167 505 - (optional) initial size of the array (default is
 100).;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 576 pddp/pddplink garray-help.pd;
 #X connect 24 0 23 0;
 #X connect 28 0 30 0;

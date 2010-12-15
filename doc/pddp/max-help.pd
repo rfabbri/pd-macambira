@@ -68,7 +68,7 @@ the value at the right inlet.;
 #X text 168 453 - a float to the right inlet is stored.;
 #X text 168 490 - the two values at each inlet are compared \, and
 the greater value is output.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 18 0 28 0;
 #X connect 20 0 28 1;
 #X connect 21 0 29 0;

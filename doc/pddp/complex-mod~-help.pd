@@ -41,7 +41,7 @@ Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
 #X obj 79 409 cnv 17 3 17 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
 -162280 0;
 #X text 98 408 float;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 453 3 complex-mod~;
 #X text 11 23 complex modulator;
 #X floatatom 78 64 0 0 0 0 - - -;
@@ -77,7 +77,7 @@ up or down by any frequency shift in Hz.;
 #X text 168 488 - ???;
 #X text 98 510 signal;
 #X text 168 510 - ???;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 455 51 pddp/dsp;
 #X obj 416 20 pddp/pddplink http://wiki.puredata.info/en/complex-mod~
 -text pdpedia: complex-mod~;
 #X obj 79 269 tabwrite~ \$0-mod-output;

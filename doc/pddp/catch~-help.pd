@@ -62,8 +62,8 @@ may be no other [catch~] objects that shares this name.;
 #X obj 474 3 catch~;
 #X obj 448 20 pddp/pddplink http://wiki.puredata.info/en/catch~ -text
 pdpedia: catch~;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 224 168 catch~ signal1;
 #X obj 358 168 catch~ signal2;
 #X obj 73 220 throw~ signal1;

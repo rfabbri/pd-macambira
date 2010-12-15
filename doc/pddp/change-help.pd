@@ -86,7 +86,7 @@ value \, it will be sent to the outlet.;
 the value of [change] without outputting it.;
 #X text 18 59 The change object passes its input to the outlet only
 when it changes.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 12 0 17 0;
 #X connect 13 0 17 0;
 #X connect 14 0 17 0;

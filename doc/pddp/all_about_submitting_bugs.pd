@@ -23,7 +23,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X text 19 70 Also \, have a look in the "Find" Menu for the entry
 "Find last error.";
 #X restore 103 225 pd Related_objects;
-#X obj 6 225 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 225 pddp/pddplink all_about.pd -text All About Pd;
 #X text 20 62 1) Make sure you can reproduce the bug consistently.
 Include a brief example patch to demonstrate the bug \, using the minimum
 number of objects needed to reproduce it.;

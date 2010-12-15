@@ -413,7 +413,7 @@ right inlet is non-zero \, THEN output non-zero!;
 #X restore 281 540 pd understanding_||_LOGICAL-OR;
 #X text 98 385 Relational Operators;
 #X text 278 385 Logical Operators;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #N canvas 75 34 428 577 Relational_Operators 0;
 #X obj 0 0 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;

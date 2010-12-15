@@ -56,5 +56,5 @@ window. For more help on garrays \, see below under the heading "more_info".
 #X text 167 532 - (optional) the name of the graph. When using the
 "Put" menu \, the name is created automatically.;
 #X text 11 23 container canvas for a garray;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 572 pddp/pddplink array-help.pd -text array-help;

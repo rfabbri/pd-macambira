@@ -83,8 +83,8 @@ argument is supplied \, the input is taken to be an audio signal.;
 #X text 22 60 The [osc~] object outputs a cosine wave. With a floating-point
 argument \, [osc~] takes floating-point messages to change frequency.
 ;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 66 253 tabwrite~ \$0-array;
 #X connect 16 0 15 0;
 #X connect 17 0 31 0;

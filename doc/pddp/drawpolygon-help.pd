@@ -160,7 +160,7 @@ shape is clicked on in "edit" mode.;
 (symbol atom).;
 #X text 98 200 list;
 #X text 80 294 (symbol atoms);
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 316 557 pddp/pddplink ../4.data.structures/09.scaling.pd -text
 doc/4.data.structure/09.scaling.pd;
 #X obj 316 572 pddp/pddplink ../4.data.structures/10.onoff.pd -text

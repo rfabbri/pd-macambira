@@ -80,8 +80,8 @@ are provided \, then there are two outlets which represent audio channels
 #X text 130 151 RMS amplitude (dB);
 #X text 169 305 - the inlet to [adc~] is not used.;
 #X text 99 305 (inactive);
-#X obj 5 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 5 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #N canvas 44 65 428 471 Multi-channel_audio 0;
 #X text 19 38 All sound cards are capable of at least two channels
 of audio. Pd supports these two channels by default and uses your system's

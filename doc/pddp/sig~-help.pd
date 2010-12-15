@@ -56,8 +56,8 @@ to an audio signal.;
 #X text 113 280 In this example \, the [sig~] object converts numbers
 to an audio signal \, which the [snapshot~] converts back again.;
 #X text 168 510 - the outgoing signal.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 15 0 16 0;
 #X connect 15 0 16 0;
 #X connect 17 0 23 0;

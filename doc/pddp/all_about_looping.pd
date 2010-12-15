@@ -226,4 +226,4 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X text 263 139 Which library for;
 #X text 263 159 loopsampler and xgroove~?;
 #X restore 103 550 pd Related_objects;
-#X obj 6 550 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 550 pddp/pddplink all_about.pd -text All About Pd;

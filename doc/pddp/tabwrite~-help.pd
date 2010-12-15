@@ -93,8 +93,8 @@ element (e.g. \, "start 500" will start recording at the 500th element).
 \, permits you to switch between arrays (e.g. \, "set another_array").
 ;
 #X text 166 452 - the signal to be written to the array.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 98 570 pddp/pddplink all_about_arrays.pd;
 #X obj 171 219 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -1
 -1;

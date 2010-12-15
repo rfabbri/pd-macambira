@@ -106,8 +106,8 @@ or an error message will appear in the console.;
 #X text 18 44 [tabread4~] is used to build samplers and other table
 lookup algorithms. The interpolation scheme is 4-point polynomial.
 ;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 100 530 pddp/pddplink ../3.audio.examples/B03.tabread4.pd -text
 doc/3.audio.examples/B03.tabread4.pd;
 #X obj 100 545 pddp/pddplink ../3.audio.examples/B04.tabread4.interpolation.pd

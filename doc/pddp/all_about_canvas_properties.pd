@@ -25,7 +25,7 @@ canvas;
 #X text 33 45 The [output~] object used throughout the audio tutorials
 is a "gop" enabled abstraction. See:;
 #X restore 103 298 pd Related_objects;
-#X obj 6 298 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 298 pddp/pddplink all_about.pd -text All About Pd;
 #X text 21 37 You can access canvas properties by right-clicking on
 an empty area of a canvas and choosing "Properties". (You can also
 right-click on the object box of a subcanvas.);

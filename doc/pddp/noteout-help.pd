@@ -106,7 +106,7 @@ is to be sent. If no argument is provided [noteout] transmits on channel
 #X text 167 421 - (integer) velocity.;
 #X text 167 446 - (integer) channel number.;
 #X text 80 521 1) float;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 19 0 18 0;
 #X connect 21 0 20 0;
 #X connect 22 0 25 0;

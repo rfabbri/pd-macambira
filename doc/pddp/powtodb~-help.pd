@@ -68,8 +68,8 @@ the square of the "RMS" amplitude \, to decibels.;
 #X obj 445 20 pddp/pddplink http://wiki.puredata.info/en/powtodb~ -text
 pdpedia: powtodb~;
 #X text 11 23 convert power units to dB for audio signals;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 10 0 11 0;
 #X connect 12 0 13 0;
 #X connect 13 0 20 0;

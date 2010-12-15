@@ -89,7 +89,7 @@ by the creation argument or a value sent to its right inlet.;
 #X text 11 23 send a bang periodically ala metronome;
 #X text 168 395 - a list will be distributed to the inlets of [metro].
 ;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 16 0 23 0;
 #X connect 17 0 16 1;
 #X connect 18 0 16 0;

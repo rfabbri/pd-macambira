@@ -58,5 +58,5 @@ is in fact a pointer to the head of the sublist.;
 #X text 168 545 - field name.;
 #X text 80 530 1) symbol;
 #X text 80 545 2) symbol;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 573 pddp/pddplink scalar-help.pd;

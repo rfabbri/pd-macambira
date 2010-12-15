@@ -50,6 +50,6 @@ using the block~ object.;
 #X text 98 495 signal;
 #X text 98 458 unknown;
 #X text 80 542 1) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 98 570 pddp/pddplink all_about_arrays.pd;

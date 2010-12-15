@@ -349,7 +349,7 @@ type used \, then the list will be truncated.;
 #X text 168 345 - the output of [makefilename] is always a symbol.
 ;
 #X text 80 392 1) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 318 529 pddp/pddplink all_about_symbol_construction.pd;
 #X connect 13 0 16 0;
 #X connect 16 0 15 0;

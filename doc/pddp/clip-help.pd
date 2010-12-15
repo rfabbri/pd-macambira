@@ -132,7 +132,7 @@ clipped.;
 clipped.;
 #X text 98 335 list;
 #X text 168 335 - a list is distributed to the inlets of [clip].;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 16 0 17 0;
 #X connect 18 0 16 0;
 #X connect 20 0 24 0;

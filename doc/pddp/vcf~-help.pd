@@ -73,8 +73,8 @@ in time.;
 #X text 168 384 - the incoming signal to be filtered;
 #X text 168 543 - [vcf~] takes one argument to initialize q.;
 #X text 80 543 1) float;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X text 168 476 - the filtered signal (real part).;
 #X obj 78 500 cnv 17 3 17 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
 -162280 0;

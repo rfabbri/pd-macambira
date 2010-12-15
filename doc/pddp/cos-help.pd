@@ -80,7 +80,7 @@ pdpedia: cos;
 #X text 11 23 cosine function;
 #X text 168 467 - a list will be truncated \, and the first element
 will be used as input.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 16 0 18 0;
 #X connect 17 0 20 0;
 #X connect 19 0 24 0;

@@ -44,7 +44,7 @@ by Pd;
 #X obj 21 108 pddp/pddplink all_about_externals.pd -text Externals
 ;
 #X restore 103 218 pd Related_objects;
-#X obj 6 218 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 218 pddp/pddplink all_about.pd -text All About Pd;
 #N canvas 20 56 428 587 anythings_and_lists 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
 1 18 -261106 -33289 0;

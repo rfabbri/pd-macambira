@@ -130,7 +130,7 @@ will communicate with all other [value] objects with no name.;
 objects. See the help patches for [expr] \, [expr~] and [fexpr~] for
 more information.;
 #X text 80 439 1) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X text 168 439 - [value] takes one argument (a symbol) that is the
 name of the object. All [value] objects that share this name will have
 their values updated when a float is sent to the inlet of any of them.

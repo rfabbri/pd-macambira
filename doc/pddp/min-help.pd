@@ -67,7 +67,7 @@ right inlet \, and the greater of the two is output.;
 ;
 #X text 168 495 - the two values at the inlets are compared \, and
 the greater one is output.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X text 11 23 choose the lesser (minimum) of two values;
 #X connect 21 0 23 0;
 #X connect 23 0 22 0;

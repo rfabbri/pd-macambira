@@ -401,8 +401,8 @@ a scalar \, see the help patch for [append].;
 #X obj 21 101 pddp/pddplink ../4.data.structures/04.append.pd -text
 doc/4.data.structures/04.append.pd;
 #X restore 102 534 pd Appending_Scalars_to_a_Canvas;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 385 291 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 385 291 pddp/dsp;
 #X obj 99 576 pddp/pddplink ../4.data.structures/01.scalars.pd -text
 doc/4.data.structures/01.scalars.pd;
 #X text 303 534 <-- needs work;

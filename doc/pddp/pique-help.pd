@@ -64,8 +64,8 @@ and the maximum number of peaks to report;
 #X text 168 495 - [pique] outputs a list of peaks \, giving their peak
 number \, frequency \, amplitude \, and phase (as a cosine/sine pair).
 ;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 316 303 tabwrite~ \$0-fft-real;
 #X obj 344 338 tabwrite~ \$0-fft-imag;
 #X obj 244 117 f \$0;

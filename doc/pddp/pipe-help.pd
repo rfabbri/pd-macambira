@@ -214,7 +214,7 @@ below for more about the arguments:;
 #X text 98 327 float;
 #X text 98 340 symbol;
 #X text 98 353 pointer;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 25 0 28 0;
 #X connect 26 0 25 0;
 #X connect 27 0 25 0;

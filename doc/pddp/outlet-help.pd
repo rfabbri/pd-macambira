@@ -88,7 +88,7 @@ the outlet of canvas in which it is contained. When multiple [outlet~]
 and/or [outlet] objects are in one subpatch \, their horizontal order
 determines which outlet on the subpatch corresponds to which [outlet~]/[outlet]
 object.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 17 0 23 1;
 #X connect 18 0 23 0;
 #X connect 22 0 16 0;

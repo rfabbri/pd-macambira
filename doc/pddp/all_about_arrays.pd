@@ -59,7 +59,7 @@ for creating and managing them;
 #X text 20 76 The [expr] family objects have some limited functionality
 for dealing with arrays. See heading "Array/Table Functions" in:;
 #X restore 103 292 pd Related_objects;
-#X obj 6 292 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 292 pddp/pddplink all_about.pd -text All About Pd;
 #N canvas 14 48 428 287 What_is_an_array_in_PD 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
 1 18 -261106 -33289 0;

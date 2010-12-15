@@ -99,13 +99,13 @@ and output with lower than 10 milliseconds of latency.;
 #X text 7 2 [dac~] Multi-channel Audio;
 #X restore 101 545 pd Multi-channel_audio;
 #X text 80 401 n) float;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 66 51 osc~ 880;
 #X obj 66 80 *~;
 #X obj 66 106 *~ 0.1;
 #X obj 96 80 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
 ;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 455 51 pddp/dsp;
 #N canvas 84 189 428 347 sample_rate 0;
 #X text 19 37 [adc~] and [dac~] always operate at the sample rate that
 is specified in Pd's command line. By default \, the sample rate is

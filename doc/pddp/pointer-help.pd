@@ -174,7 +174,7 @@ on the class of scalar being output.;
 #X text 168 149 - outputs the current value of the pointer.;
 #X text 98 495 n) float;
 #X text 93 510 symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 245 575 pddp/pddplink scalar-help.pd;
 #X connect 31 0 34 0;
 #X connect 31 1 37 0;

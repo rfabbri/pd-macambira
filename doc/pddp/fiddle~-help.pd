@@ -208,8 +208,8 @@ MIDI 45.);
 #X text 98 338 See "Messages_to_fiddle~" subpatch in the example above.
 ;
 #X text 168 321 - the incoming signal.;
-#X obj 5 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 5 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 13 0 30 0;
 #X connect 14 0 15 0;
 #X connect 14 1 16 0;

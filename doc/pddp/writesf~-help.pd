@@ -85,8 +85,8 @@ give the object time to flush all the output to disk.;
 #X text 168 544 - the creation argument is the number of channels (1
 to 64).;
 #X text 80 544 1) float;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 13 0 18 0;
 #X connect 14 0 15 0;
 #X connect 14 0 17 0;

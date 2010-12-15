@@ -90,7 +90,7 @@ by Olaf Matthes);
 #X obj 78 471 cnv 17 3 17 empty \$0-pddp.cnv.let.2 2 5 9 0 16 -228856
 -162280 0;
 #X text 168 470 - ???;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 20 0 22 0;
 #X connect 21 0 22 1;
 #X connect 23 0 22 2;

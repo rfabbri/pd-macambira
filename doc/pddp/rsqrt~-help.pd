@@ -60,8 +60,8 @@ pdpedia: rsqrt~;
 #X text 74 110 [rsqrt~] takes the approximate reciprocal square root
 of the incoming signal \, using a fast \, approximate algorithm which
 is probably accurate to about 120 dB (20 bits).;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 13 0 17 0;
 #X connect 14 0 13 0;
 #X connect 14 0 13 0;

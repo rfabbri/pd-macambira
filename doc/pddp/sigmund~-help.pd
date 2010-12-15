@@ -178,8 +178,8 @@ above) \, [sigmund~] can take up to five arguments \, in any order
 \, to specify its output. Each creates (and corresponds to) an outlet.
 ;
 #X text 98 360 print - prints current setting to the console.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #N canvas 24 72 482 513 sinusoid-tracking 0;
 #X obj 74 195 sigmund~ -npeak 10 peaks;
 #X obj 74 168 phasor~;

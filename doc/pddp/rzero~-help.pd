@@ -125,8 +125,8 @@ the filter coefficient. The filter is always stable.;
 #X text 74 320 The transfer function is H(Z) = 1 - aZ^-1.;
 #X text 128 269 y[n] = x[n] - a[n] * x[n-1];
 #X text 74 249 The action of [rzero~] is:;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 98 573 pddp/pddplink ../3.audio.examples/H11.shelving.pd -text
 doc/3.audio.examples/H11.shelving.pd;
 #X connect 13 0 17 1;

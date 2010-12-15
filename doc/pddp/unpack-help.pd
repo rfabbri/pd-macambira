@@ -107,7 +107,7 @@ floats.) Each symbolic argument specifies the type of atom expected
 in the incoming list. Acceptable arguments are: "f" for float \, "p"
 for pointer \, and "s" for symbol. You can also use a float (e.g. \,
 "o") to specify float.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 17 0 37 0;
 #X connect 18 0 37 0;
 #X connect 19 0 37 0;

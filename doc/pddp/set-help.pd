@@ -185,7 +185,7 @@ object.;
 #X restore 101 552 pd Setting_Symbolic_Fields;
 #X text 80 446 1) symbol atom;
 #X text 80 464 n) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 572 pddp/pddplink ../4.data.structures/03.setting.data.pd
 -text doc/4.data.structures/03.setting.data.pd;
 #X obj 353 552 pddp/pddplink scalar-help.pd;

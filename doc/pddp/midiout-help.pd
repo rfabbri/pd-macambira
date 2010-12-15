@@ -87,6 +87,6 @@ pdpedia: midiout;
 #X text 168 457 - ???;
 #X text 168 525 - ???;
 #X text 166 306 number.) (Linux Only).;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 20 0 17 0;
 #X connect 21 0 17 1;

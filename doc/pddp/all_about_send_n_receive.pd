@@ -26,7 +26,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 21 23 pddp/pddplink all_about_externals.pd -text _________;
 #X obj 21 23 pddp/pddplink all_about_externals.pd -text Externals;
 #X restore 103 503 pd Related_objects;
-#X obj 6 503 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 503 pddp/pddplink all_about.pd -text All About Pd;
 #X text 19 27 The [send] and [receive] objects are useful for linking
 objects and subroutines together in a single canvas or throughout multiple
 patches. Understanding these objects will help 'clean up' your patches

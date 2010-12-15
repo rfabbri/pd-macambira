@@ -80,8 +80,8 @@ output to jump immediately to the target value.;
 and timing are determined by messages you send it. The messages may
 be a single target value (causing the output to jump to the target)
 or a target and a time in milliseconds (to start a new ramp).;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 98 547 pddp/pddplink ../3.audio.examples/A03.line.pd/ -text
 doc/3.audio.examples/A03.line.pd;
 #X obj 98 562 pddp/pddplink ../3.audio.examples/A04.line2.pd/ -text

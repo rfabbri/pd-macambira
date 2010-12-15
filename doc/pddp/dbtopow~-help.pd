@@ -67,8 +67,8 @@ such as [*~] and [osc~] \, depending on your hardware and math library.
 ;
 #X obj 263 199 loadbang;
 #X obj 263 221 metro 150;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 10 0 11 0;
 #X connect 12 0 18 0;
 #X connect 18 0 10 0;

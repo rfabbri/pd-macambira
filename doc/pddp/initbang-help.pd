@@ -57,7 +57,7 @@ connection will be made.;
 load;
 #X text 170 447 - a bang message is sent automatically when the containing
 patch is first opened as an embeded object in another patch.;
-#X obj 6 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X text 93 71 The abstraction below dynamically creates an outlet using
 [loadbang]. The [loadbang] object send a bang after this help patch
 has loaded.;

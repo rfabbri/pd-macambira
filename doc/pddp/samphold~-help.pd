@@ -92,8 +92,8 @@ if the specified value were the most recent value of the control input
 phasor but don't want the jump reflected in the output. Plain "reset"
 is equivalent to "reset infinity" which forces the next input to be
 sampled.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 98 573 pddp/pddplink ../3.audio.examples/C09.sample.hold.pd
 -text doc/3.audio.examples/C09.sample.hold.pd;
 #X connect 14 0 15 0;

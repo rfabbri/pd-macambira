@@ -30,7 +30,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 200 40 pddp/pddplink all_about_externals.pd -text Externals
 ;
 #X restore 103 228 pd Related_objects;
-#X obj 6 228 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 228 pddp/pddplink all_about.pd -text All About Pd;
 #X text 208 106 <- give some links to the manual;
 #X obj 43 65 pddp/pddplink all_about_atoms.pd;
 #X text 42 36 Converting between atom types in Pd can be tricky. Make

@@ -63,6 +63,6 @@ numbers are ignored.;
 #X text 11 23 square root;
 #X text 168 470 - a list will be truncated \, and the first element
 will be used as input.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 15 0 18 0;
 #X connect 18 0 14 0;

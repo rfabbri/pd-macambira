@@ -619,7 +619,7 @@ details. With the exception of the right inlet of [list split] \, All
 \, "set 5" will become "list set 5"). A bang message is converted to
 an empty list (i.e. \, "list") \, and "symbol foo" is converted to
 "list foo".;
-#X obj 4 598 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 598 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 22 0 25 0;
 #X connect 23 0 22 1;
 #X connect 24 0 22 0;

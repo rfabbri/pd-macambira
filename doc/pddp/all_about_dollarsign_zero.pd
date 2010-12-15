@@ -45,7 +45,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 20 38 pddp/helplink ggee/sendlocal;
 #X obj 20 58 pddp/helplink ggee/receivelocal;
 #X restore 103 442 pd Related_objects;
-#X obj 6 442 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 442 pddp/pddplink all_about.pd -text All About Pd;
 #X obj 35 392 pddp/pddplink ../2.control.examples/13.locality.pd -text
 doc/2.control.examples/13.locality.pd;
 #X obj 35 407 pddp/pddplink all_about_scope_and_locality.pd;

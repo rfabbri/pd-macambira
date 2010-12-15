@@ -114,7 +114,7 @@ second argument is left off \, [ctlout] transmits on channel 1 .;
 #X text 80 533 2) float;
 #X text 168 381 - a list to the left inlet is distributed among the
 inlets of [ctlout].;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 19 0 20 0;
 #X connect 21 0 20 1;
 #X connect 22 0 20 2;

@@ -103,7 +103,7 @@ the right inlet is non-zero.;
 ;
 #X text 168 406 - a (pitch \, velocity) pair is distributed to the
 two inlets. Lists with more than two elements will be truncated.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 19 0 22 0;
 #X connect 22 0 20 0;
 #X connect 22 1 21 0;

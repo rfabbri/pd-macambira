@@ -126,6 +126,6 @@ example has:;
 #X text 100 572 for more on HIDs:;
 #X text 11 23 get input from the keyboard;
 #X text 168 261 - [key] gets input directly from the keyboard.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 17 0 18 0;
 #X connect 17 0 19 0;

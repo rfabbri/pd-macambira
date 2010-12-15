@@ -172,7 +172,7 @@ extra samples.;
 #X text 168 482 - (optional) The word "hold" will cause sample/hold
 upsampling/downsampling \, and the word "lin" will cause linear upsampling/downsampling.
 See the subpatch below for more details:;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 13 0 19 1;
 #X connect 14 0 19 0;
 #X connect 18 0 12 0;

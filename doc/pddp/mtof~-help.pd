@@ -69,8 +69,8 @@ such as *~ and osc~ \, depending on your hardware and math library.
 #X text 99 265 The [mtof~] object transposes a midi value into a frequency
 in Hertz \, so that "69" goes to "440". You can specify microtonal
 pitches as in "69.5" (a quarter tone higher than 69).;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 11 0 12 0;
 #X connect 12 0 13 0;
 #X connect 14 0 15 0;

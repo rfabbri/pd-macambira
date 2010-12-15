@@ -351,7 +351,7 @@ a [cnv] \, as are the horizontal dividers below.;
 #X obj 435 221 send to_K;
 #X text 94 197 To get a cnv position \, send it a "get_pos" message
 ->;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #N canvas 404 60 483 507 (subpatch) 0;
 #X msg 144 296 bang;
 #X msg 144 321 1 30;

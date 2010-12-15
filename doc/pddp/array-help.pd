@@ -72,7 +72,7 @@ pdpedia: garray;
 ;
 #X text 80 435 5) float;
 #X text 167 420 - (radio) visual display style of elements.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #N canvas 70 34 428 450 Graphs_and_Garrays 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
@@ -116,7 +116,7 @@ array: see "more_info" below.);
 #X text 80 360 "Put" Menu Array Properties;
 #X text 94 486 For more help on arrays in Pd \, see:;
 #X obj 93 522 pddp/pddplink ../2.control.examples/15.array.pd;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 455 51 pddp/dsp;
 #X obj 93 540 pddp/pddplink ../2.control.examples/16.more.arrays.pd
 ;
 #X text 96 213 A "Put" menu array is created inside a graph.;

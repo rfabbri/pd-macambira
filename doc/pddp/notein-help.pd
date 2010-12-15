@@ -116,7 +116,7 @@ if no creation argument is specified.;
 #X text 168 525 - the MIDI channel number from which to read. If no
 argument is provided [notein] reads from all channels (and sprouts
 a third inlet).;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 12 0 13 0;
 #X connect 12 1 14 0;
 #X connect 12 2 15 0;

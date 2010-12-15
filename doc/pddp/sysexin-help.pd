@@ -85,6 +85,6 @@ by Olaf Matthes);
 #X obj 447 20 pddp/pddplink http://wiki.puredata.info/en/sysexin -text
 pdpedia: sysexin;
 #X obj 225 153 sysexin;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 27 0 14 0;
 #X connect 27 1 15 0;

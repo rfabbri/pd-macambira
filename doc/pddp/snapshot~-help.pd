@@ -71,8 +71,8 @@ to a control value whenever it receives a bang in its left outlet.
 This object is particularly useful for monitoring outputs.;
 #X text 156 329 This output updates each time bang is clicked above.
 ;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 99 572 pddp/pddplink ../3.audio.examples/C06.signal.to.control.pd
 -text doc/3.audio.examples/C06.signal.to.control.pd;
 #X connect 14 0 15 0;

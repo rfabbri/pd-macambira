@@ -73,8 +73,8 @@ its name. Other [throw~] objects may have the same name \, but there
 may only be one [catch~] that shares this name.;
 #X text 151 47 For help on [catch~] \, see:;
 #X obj 151 62 pddp/pddplink catch~-help.pd -text catch~-help;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 14 0 16 0;
 #X connect 15 0 13 0;
 #X connect 17 0 12 0;

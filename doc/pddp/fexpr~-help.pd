@@ -429,8 +429,8 @@ They may be floats or symbols \, including the special variables noted
 above ($x1 \, $f2 \, etc.). The operators and functions available for
 use in [fexpr~] are listed below:;
 #X text 98 428 symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 98 498 pddp/pddplink all_about_expr_if.pd -text expr_if;
 #X obj 98 518 pddp/pddplink all_about_expr_and_value.pd -text expr_and_value
 ;

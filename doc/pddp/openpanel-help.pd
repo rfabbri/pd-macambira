@@ -66,7 +66,7 @@ converted to a list the next time you open the patch.;
 #X text 11 23 query the user for a filename;
 #X text 168 398 - a list starting with a symbol will be truncated to
 the first element.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 13 0 25 0;
 #X connect 16 0 25 0;
 #X connect 17 0 25 0;

@@ -94,7 +94,7 @@ inlet will be removed from the collection.;
 #X obj 135 185 pddp/pddplink midiin-help.pd;
 #X obj 135 235 pddp/pddplink sysexin-help.pd;
 #X obj 135 210 pddp/pddplink midiout-help.pd;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 465 20 pddp/pddplink http://wiki.puredata.info/en/MIDI -text
 pdpedia: MIDI;
 #X text 77 151 Right-click the objects above and choose "Help" \, or

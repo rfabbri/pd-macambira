@@ -56,8 +56,6 @@ one of the objects listed above).;
 #X text 62 229 * If you're new to Pd \, it's easy to get graphs mixed
 up with garrays (i.e. \, "Array" from the "Put" menu). For help on
 garrays \, click below:;
-#X obj 62 270 pddp/pddplink garray-help.pd -text Help patch for garray
-;
 #X obj 170 328 pddp/pddplink inlet-help.pd -text inlet-help;
 #X text 98 347 signal;
 #X obj 170 374 pddp/pddplink inlet~-help.pd -text inlet~-help;
@@ -76,7 +74,7 @@ objects on the canvas. See the links below for more details:;
 #X text 98 512 (5);
 #X text 168 512 - canvas arguments are 5 floats which are not directly
 accessible: topLeftX topLeftY canvasWidth canvasHeight fontSize.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 101 575 pddp/pddplink ../3.audio.examples/G05.execution.order.pd
 -text doc/3.audio.examples/G05.execution.order.pd;
 #X text 11 23 Pure Data document window;
@@ -84,3 +82,5 @@ accessible: topLeftX topLeftY canvasWidth canvasHeight fontSize.;
 on the canvas. See the links below for more details:;
 #X text 168 406 - control outlets can be created by using [outlet]
 objects on the canvas. See the links below for more details:;
+#X obj 62 270 pddp/pddplink array-help.pd -text Help patch for "Put"
+menu array;

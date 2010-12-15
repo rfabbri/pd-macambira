@@ -72,8 +72,8 @@ of any component feedinf that channel. A sinusoidal component should
 appear in four components (or three in the special case of a sinusoid
 exactly tuned to a bin.) Frequency output is in bins \, i.e. \, units
 of SR/N.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 15 0 27 0;
 #X connect 16 0 22 0;
 #X connect 17 0 16 0;

@@ -51,6 +51,6 @@ flag: -r <n>. For example: pd -r 22050;
 #X text 99 573 DSP does not need to be turned on for [samplerate~]
 to work;
 #X text 168 482 - the sample rate.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 14 0 15 0;
 #X connect 16 0 14 0;

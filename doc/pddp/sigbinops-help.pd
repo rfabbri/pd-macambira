@@ -84,8 +84,8 @@ inlet to a value \, and allows the right inlet to receive float messages.
 #X text 98 431 float;
 #X text 167 431 - if an argument is provided \, the object's right
 inlet will accept floats instead of a signal.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 15 318 tabwrite~ \$0a;
 #X obj 103 318 tabwrite~ \$0a;
 #X obj 190 318 tabwrite~ \$0a;

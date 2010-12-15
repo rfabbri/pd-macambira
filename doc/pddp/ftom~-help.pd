@@ -70,8 +70,8 @@ infinity.);
 \, it may be much more expensive than other workaday tilde objects
 such as *~ and osc~ \, depending on your hardware and math library.
 ;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 10 0 11 0;
 #X connect 12 0 13 0;
 #X connect 13 0 21 0;

@@ -142,5 +142,5 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 19 69 keyname;
 #X obj 19 99 keyup;
 #X restore 303 568 pd Related_objects;
-#X obj 6 568 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 568 pddp/pddplink all_about.pd -text All About Pd;
 #X obj 209 332 linuxhid;

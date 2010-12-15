@@ -239,7 +239,7 @@ be sent to the rejection outlet.;
 are used \, [route] operates in "float mode"-- if symbols are used
 \, float operates in "selector mode." See the subpatches above to see
 how incoming data is handled in each mode.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 100 572 pddp/pddplink ../2.control.examples/18.conditional.pd
 -text doc/2.control.examples/18.conditional.pd;
 #X msg 300 85 Grizabella;

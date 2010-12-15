@@ -371,7 +371,7 @@ for expr family objects;
 14 -261106 -33289 0;
 #X text 6 1 [expr] Functions and Operators- Related Objects;
 #X restore 103 2570 pd Related_objects;
-#X obj 6 2570 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 2570 pddp/pddplink all_about.pd -text All About Pd;
 #X connect 2 0 4 0;
 #X connect 3 0 5 0;
 #X connect 6 0 12 0;

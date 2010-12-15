@@ -95,7 +95,7 @@ accepts all channels.;
 #X text 168 439 (integer) program change number.;
 #X text 168 464 (integer) channel number.;
 #X text 80 511 1) float;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 12 0 13 0;
 #X connect 12 1 14 0;
 #X connect 15 0 16 0;

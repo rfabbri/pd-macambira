@@ -22,7 +22,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 31 37 pddp/pddplink ../manuals/0.Intro/typing_conventions.pd
 ;
 #X restore 103 508 pd Related_objects;
-#X obj 6 508 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 508 pddp/pddplink all_about.pd -text All About Pd;
 #X text 180 36 Meaning;
 #X text 40 36 Text;
 #X text 270 36 Example;

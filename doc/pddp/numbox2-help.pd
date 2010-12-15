@@ -403,7 +403,7 @@ its appearance.;
 #X text 257 564 IEM KUG;
 #X text 232 576 graz \, austria 2002;
 #X text 425 4 [my_numbox] or [nbx];
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X text 98 295 bang;
 #X text 168 295 - output the current value;
 #X connect 13 0 16 0;

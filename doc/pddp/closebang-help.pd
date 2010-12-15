@@ -55,5 +55,5 @@ object connected to [send from-closebang-abs]. If you select the subpatch
 above in editmode and delete it \, the [closebang] object contained
 within will send a bang to the [receive] object below:;
 #X text 207 133 <- delete me;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 16 0 17 0;

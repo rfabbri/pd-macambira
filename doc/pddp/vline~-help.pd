@@ -86,8 +86,8 @@ value.;
 #X text 167 447 - time value.;
 #X text 167 470 - initial delay.;
 #X obj 41 222 loadbang;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 98 572 pddp/pddplink ../3.audio.examples/C04.control.to.signal.pd
 -text doc/3.audio.examples/C04.control.to.signal.pd;
 #X connect 24 0 25 0;

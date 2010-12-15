@@ -87,7 +87,7 @@ or [inlet] objects are in one subpatch \, their horizontal order determines
 which inlet corresponds to which [inlet~]/[inlet] object.;
 #X text 98 77 The [inlet] object allows messages to be sent to a subpatch
 from an object on the parent canvas.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 14 0 20 1;
 #X connect 15 0 20 0;
 #X connect 19 0 13 0;

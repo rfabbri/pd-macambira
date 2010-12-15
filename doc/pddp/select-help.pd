@@ -308,7 +308,7 @@ the list will be truncated.;
 creation argument. See the subpatch below for details:;
 #X text 80 476 n) float;
 #X text 98 491 symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 296 572 pddp/pddplink ../2.control.examples/18.conditional.pd
 -text doc/2.control.examples/18.conditional.pd;
 #X connect 18 0 21 0;

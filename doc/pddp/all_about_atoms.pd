@@ -165,7 +165,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X floatatom 22 43 5 0 0 0 - - -;
 #X symbolatom 22 67 10 0 0 0 - - -;
 #X restore 103 218 pd Related_objects;
-#X obj 6 218 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 218 pddp/pddplink all_about.pd -text All About Pd;
 #X text 168 42 <- give some links to the manual;
 #N canvas 7 69 428 185 Custom_atoms 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10

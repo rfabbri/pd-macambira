@@ -176,7 +176,8 @@ number).;
 #X text 483 264 implicit;
 #X text 482 293 object;
 #X text 482 279 [list];
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 100 575 pddp/pddplink http://en.wikipedia.org/wiki/Floating_point
 ;
 #X obj 99 527 pddp/pddplink all_about_messages.pd;

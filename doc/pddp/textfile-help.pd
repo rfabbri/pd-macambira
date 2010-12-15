@@ -96,7 +96,7 @@ messages.;
 sequences of messages.;
 #X restore 101 567 pd About_textfile;
 #X obj 40 369 print message;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 21 0 42 0;
 #X connect 23 0 42 0;
 #X connect 25 0 42 0;

@@ -150,7 +150,7 @@ create the field "foo" \, use the syntax below for each type:;
 #X text 81 393 1) symbol atom;
 #X text 81 411 n) symbol atom;
 #X obj 99 560 pddp/pddplink scalar-help.pd;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 576 pddp/pddplink all_about_arrays.pd;
 #X obj 257 561 pddp/pddplink ../4.data.structures/06.file.pd -text
 doc/4.data.structures/06.file.pd;

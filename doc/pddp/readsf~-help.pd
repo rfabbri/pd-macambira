@@ -101,7 +101,7 @@ A "0" stops it.;
 #X text 195 41 The [readsf~] object reads a soundfile into its signal
 outputs. You must open the soundfile in advance (a couple of seconds
 before you'll need it) using the "open" message.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 24 0 32 0;
 #X connect 26 0 27 0;
 #X connect 28 0 32 0;

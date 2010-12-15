@@ -124,7 +124,7 @@ It's neither a zero or a one \; it's not true or false \; it's just
 ;
 #X text 168 337 - [bang] takes any message supplied to its inlet and
 outputs a bang message in response.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 521 3 b;
 #X text 501 3 or;
 #X connect 15 0 17 0;

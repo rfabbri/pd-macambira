@@ -274,7 +274,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X text 12 65 DESCRIPTION definitions for list and anything in the
 context of Pd;
 #X restore 392 548 pd META;
-#X obj 6 548 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 548 pddp/pddplink all_about.pd -text All About Pd;
 #X obj 40 92 pddp/pddplink all_about_atoms.pd;
 #X obj 40 107 pddp/pddplink all_about_messages.pd;
 #X text 40 249 Anythings;

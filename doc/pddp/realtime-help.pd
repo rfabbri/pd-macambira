@@ -154,7 +154,7 @@ most other objects in pd \, the left inlet of [realtime] is a "cold"
 inlet \, i.e. \, it does not trigger the output.;
 #X text 11 23 ask operating system for elapsed real time;
 #X text 168 481 - elapsed time in milliseconds.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 15 0 21 1;
 #X connect 16 0 21 0;
 #X connect 21 0 17 0;

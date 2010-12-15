@@ -24,7 +24,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 ;
 #X text 109 57 - link to other objects' help patches;
 #X restore 103 218 pd Related_objects;
-#X obj 6 218 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 218 pddp/pddplink all_about.pd -text All About Pd;
 #X text 380 121 * pddplink and helplink;
 #X text 380 100 * pd META;
 #X text 383 145 This help file is unfinished.;

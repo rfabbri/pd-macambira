@@ -62,8 +62,8 @@ associated with this particular [send~] object.;
 #X text 80 508 1) symbol atom;
 #X text 98 542 [send~]/[receive~] only work for the default block size
 (64).;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X text 495 3 or [s~];
 #X connect 12 0 11 0;
 #X connect 13 0 12 0;

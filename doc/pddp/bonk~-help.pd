@@ -269,8 +269,8 @@ nominally 11 filters). This "velocity" is the sum of the square roots
 of the amplitudes of the bands \, normalized so that 100 is an attack
 of amplitude of about 1 . The instrument number is significant only
 if [bonk~] has a "template set" in memory.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 12 0 17 0;
 #X connect 13 0 14 0;
 #X connect 13 1 12 0;

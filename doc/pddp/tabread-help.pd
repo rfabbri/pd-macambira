@@ -110,7 +110,7 @@ at any time using the "set" message.;
 #X obj 98 577 pddp/pddplink all_about_arrays.pd -text all_about_arrays
 ;
 #X text 80 500 1) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 107 93 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -1
 -1;
 #X obj 107 113 f \$0;

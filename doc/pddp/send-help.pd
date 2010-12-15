@@ -161,7 +161,7 @@ send/receive name.;
 a single inlet which accepts any message as input. The input is sent
 to all [receive] objects with the same name (argument).;
 #X text 80 393 1) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 457 pddp/pddplink all_about_scope_and_locality.pd -text all_about_scope_and_locality
 ;
 #X text 98 493 doc/1.manual/x5.htm;

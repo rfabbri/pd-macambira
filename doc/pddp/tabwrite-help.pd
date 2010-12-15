@@ -105,7 +105,7 @@ an error message will appear in the console.;
 \, permits you to switch between arrays (e.g. \, "set another_array")
 ;
 #X text 80 498 1) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 90 117 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -1
 -1;
 #X obj 90 137 f \$0;

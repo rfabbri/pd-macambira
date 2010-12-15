@@ -373,7 +373,7 @@ to dynamically instantiate a [hradio] object with custom properties:
 #X text 257 565 IEM KUG;
 #X text 232 577 graz \, austria 2002;
 #X text 168 367 - a list is truncated to the first element.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X text 98 351 bang;
 #X text 168 351 - output the last selected value.;
 #X text 329 2 [rdb] or [radiobut] or [radiobutton];

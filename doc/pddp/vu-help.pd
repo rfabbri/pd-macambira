@@ -34,7 +34,7 @@ to conform to the PDDP template for Pd version 0.42.;
 #X obj 22 91 x_all_guis bng tgl vsl hsl hradio vradio vu cnv nbx;
 #X text 20 67 All iem-gui objects:;
 #X obj 23 43 env~;
-#X restore 102 597 pd Related_objects;
+#X restore 92 597 pd Related_objects;
 #X obj 78 296 cnv 17 3 90 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
 #X text 98 295 float;
@@ -360,7 +360,8 @@ its appearance.;
 #X text 98 328 bang;
 #X text 168 328 - a bang will output the current values of the inlets.
 ;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X connect 30 0 37 0;
 #X connect 31 0 42 0;
 #X connect 32 0 33 0;

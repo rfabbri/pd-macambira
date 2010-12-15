@@ -109,7 +109,7 @@ before sending to [get]. (See pointer-help.pd for more information.)
 ;
 #X text 80 457 1) symbol atom;
 #X text 80 472 n) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 97 563 pddp/pddplink ../04.data.structures/02.getting.data.pd
 -text doc/04.data.structures/02.getting.data.pd;
 #X obj 97 578 pddp/pddplink scalar-help.pd;

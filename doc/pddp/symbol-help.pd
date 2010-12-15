@@ -117,7 +117,7 @@ store and output the selector. E.g. \, a float will output the word
 #X text 168 350 - a symbol sent to the left inlet will be stored and
 output. Symbol atoms (e.g. \, "foo") are accepted and given the "symbol"
 selector.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X text 98 391 anything;
 #X connect 19 0 20 0;
 #X connect 19 0 21 0;

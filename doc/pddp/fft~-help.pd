@@ -90,8 +90,8 @@ of incoming real or complex signals. Complex signals are handled as
 pairs of signals (real and imaginary part.) The analysis size is one
 block (you can use the [block~] or [switch~] objects to control block
 size).;
-#X obj 5 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 5 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 98 555 pddp/pddplink ../3.audio.examples/I01.Fourier.analysis.pd
 -text doc/3.audio.examples/I01.Fourier.analysis.pd;
 #X text 98 573 also see examples I02-I10 in doc/3.audio.examples;

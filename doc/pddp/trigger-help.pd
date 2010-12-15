@@ -369,7 +369,7 @@ to the terminal window.;
 #X connect 22 0 4 0;
 #X restore 102 550 pd Converting_data_types_(cont.);
 #X text 80 328 1) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 339 501 pddp/pddplink all_about_messages.pd -text all_about_messages
 ;
 #X obj 291 574 pddp/pddplink ../2.control.examples/03.connections.pd

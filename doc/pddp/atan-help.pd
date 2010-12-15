@@ -63,6 +63,6 @@ as a numeric value between -Pi/2 and Pi/2.;
 #X text 11 23 arctangent function;
 #X text 168 464 - a list will be truncated \, and the first element
 will be used as input.;
-#X obj 3 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 3 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 17 0 18 0;
 #X connect 18 0 16 0;

@@ -65,8 +65,8 @@ a bang message.;
 #X text 168 464 - a bang takes the current sample from the signal \,
 converts it to a float \, and sends it to the outlet.;
 #X text 168 509 - the outgoing value.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 16 0 22 0;
 #X connect 18 0 22 0;
 #X connect 22 0 15 0;

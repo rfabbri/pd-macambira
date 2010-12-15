@@ -150,7 +150,7 @@ visible.;
 #X text 80 369 5) symbol atom;
 #X text 98 393 * Any of these can be numbers (float) or field names
 (symbol atom).;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 326 556 pddp/pddplink ../4.data.structures/09.scaling.pd -text
 doc/4.data.structure/09.scaling.pd;
 #X obj 326 571 pddp/pddplink ../4.data.structures/10.onoff.pd -text

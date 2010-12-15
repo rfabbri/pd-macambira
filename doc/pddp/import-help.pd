@@ -74,7 +74,7 @@ be sent out its right outlet.;
 #X text 80 471 n) symbol atom;
 #X text 167 471 - the arguments to [import] specify the libraries to
 load for patch.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 97 568 pddp/pddplink all_about_libraries.pd;
 #X connect 13 0 14 0;
 #X connect 14 0 15 0;

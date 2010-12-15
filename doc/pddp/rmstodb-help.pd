@@ -64,6 +64,6 @@ to decibels \, so that an "RMS" of 1 corresponds to 100 dB. Zero amplitude
 #X text 158 465 - lists will be truncated \, and the first element
 used as input.;
 #X obj 98 569 pddp/pddplink all_about_acoustic_conversions.pd;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 11 0 18 0;
 #X connect 18 0 10 0;

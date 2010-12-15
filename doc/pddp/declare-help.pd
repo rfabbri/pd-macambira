@@ -66,4 +66,4 @@ more" to make sure Pd sees them when the patch is loaded. Or \, if
 you have zexy installed in the directory extra/zexy (in the Pd installation")
 you can get it using "declare -stdpath extra/zexy".;
 #X text 80 185 n) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;

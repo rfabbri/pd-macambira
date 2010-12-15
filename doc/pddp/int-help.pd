@@ -131,7 +131,7 @@ is then output and stored.;
 #X text 168 334 - a float received at the right inlet is converted
 to an integer and stored for later use.;
 #X text 81 430 1) float;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 22 0 30 0;
 #X connect 24 0 30 0;
 #X connect 25 0 30 1;

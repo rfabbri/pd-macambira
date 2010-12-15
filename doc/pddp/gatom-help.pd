@@ -138,7 +138,7 @@ hundredths instead of units. Alt clicking toggles the value between
 number followed by "enter.";
 #X text 168 306 - a list is truncated to the first item.;
 #X text 11 23 atom (number box);
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 14 0 15 0;
 #X connect 16 0 17 0;
 #X connect 17 0 18 0;

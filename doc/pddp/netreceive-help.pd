@@ -87,7 +87,7 @@ will be sent to the left outlet.;
 #X obj 139 61 netreceive 3000;
 #X text 168 402 - when using TCP \, the [netreceive] object has a right
 inlet which shows the number of open connections.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 13 0 15 0;
 #X connect 32 0 14 0;
 #X connect 32 1 12 0;

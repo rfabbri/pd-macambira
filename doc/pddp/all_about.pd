@@ -20,7 +20,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 14 -261106 -33289 0;
 #X text 7 2 All About Pd- Related Objects;
 #X restore 103 354 pd Related_objects;
-#X obj 6 354 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 354 pddp/pddplink all_about.pd -text All About Pd;
 #X obj 24 229 pddp/pddplink cyclone/all_about_cyclone.pd;
 #X text 20 37 The "All About Pd" collection is a detailed reference
 for key concepts \, objects \, and settings in Pure Data.;
@@ -36,7 +36,7 @@ take a few minutes to read the following patches:;
 About Help Patches;
 #X text 20 197 If you're coming from Max/MSP/Jitter \, have a look
 at the cyclone library for compatible objects:;
-#X text 20 257 There are many more "All About..." patches here:;
-#X obj 20 277 pddp/pddplink table_of_contents.pd;
 #X text 5 311 All PDDP help patches have a link to a general help file
 in the bottom left-hand corner.;
+#X text 20 257 There are many more "All About..." patches:;
+#X obj 20 277 pddp/pddplink all_about_index.pd;

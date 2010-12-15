@@ -101,7 +101,7 @@ At least one field must be specified in order to append a new scalar.
 #X text 80 482 n) symbol atom;
 #X text 168 455 - a [struct] name that specifies the template of a
 new scalar to append.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 572 pddp/pddplink ../4.data.structures/04.append.pd -text
 doc/4.data.structures/04.append.pd;
 #X obj 98 557 pddp/pddplink all_about_z_order.pd;

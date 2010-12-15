@@ -197,8 +197,8 @@ by creation arguments or by another complex audio signal (remaining
 two inlets). The impulse response is that of "rzero" reversed in time.
 ;
 #X text 201 155 The action of [czero_rev~] is:;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 28 0 34 0;
 #X connect 29 0 34 0;
 #X connect 30 0 34 1;

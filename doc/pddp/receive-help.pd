@@ -158,7 +158,7 @@ message box. The [receive] object accepts any message as input.;
 #X text 334 110 message;
 #X text 334 122 boxes;
 #X text 80 391 1) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 439 pddp/pddplink all_about_send_n_receive.pd -text all_about_send_n_receive
 ;
 #X obj 98 454 pddp/pddplink all_about_scope_and_locality.pd -text all_about_scope_and_locality

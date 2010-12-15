@@ -180,8 +180,8 @@ operators and functions in [expr~]:;
 ;
 #X obj 101 546 pddp/pddplink all_about_expr_multiline.pd -text expr_multiline
 ;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X connect 18 0 17 0;
 #X connect 19 0 22 0;
 #X connect 20 0 22 1;

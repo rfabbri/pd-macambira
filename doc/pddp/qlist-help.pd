@@ -133,7 +133,7 @@ above for a complete list of messages and their functionalities.;
 #X text 168 402 - if you run [qlist] manually (using the "next" message)
 \, messages starting with one or more numbers are are output as a list.
 ;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 557 pddp/pddplink ../2.control.examples/23.sequencing.pd
 -text doc/2.control.examples/23.sequencing.pd;
 #X obj 98 572 pddp/pddplink ../3.audio.examples/D13.additive.qlist.pd

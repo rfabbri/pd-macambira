@@ -419,7 +419,7 @@ how to dynamically instantiate a [bng] object with custom properties:
 #X text 168 299 - a float updates the slider value and is sent to the
 outlet.;
 #X text 168 340 - a list is truncated to the first element.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X text 98 323 bang;
 #X text 168 323 - output the current slider value.;
 #X connect 20 0 23 0;

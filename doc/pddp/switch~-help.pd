@@ -167,5 +167,5 @@ value) turns it on.;
 #X text 80 388 1) float;
 #X text 80 403 2) float;
 #X text 80 418 3) float;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;

@@ -91,4 +91,4 @@ is:;
 14 -261106 -33289 0;
 #X text 7 2 MIDI flags- Related Objects;
 #X restore 103 623 pd Related_objects;
-#X obj 6 623 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 623 pddp/pddplink all_about.pd -text All About Pd;

@@ -253,7 +253,7 @@ the ramp). Hence \, the example to the left works:;
 #X text 80 474 2) float;
 #X text 168 459 - initial value \, i.e. \, the starting point of the
 first ramp.;
-#X obj 3 598 pddp/pddplink pddp/help.pd -text help;
+#X obj 3 598 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 571 pddp/pddplink ../3.audio.examples/C03.zipper.noise.pd
 -text doc/3.audio.examples/C03.zipper.noise.pd;
 #X connect 17 0 19 0;

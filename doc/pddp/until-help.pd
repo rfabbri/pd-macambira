@@ -149,7 +149,7 @@ mechanism in place to stop the loop - otherwise Pd will effectively
 freeze. (See the "Loops" subpatch below.);
 #X obj 102 555 pddp/pddplink all_about_looping.pd -text all_about_looping
 ;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 102 572 pddp/pddplink ../2.control.examples/24.loops.pd -text
 doc/2.control.examples/24.loops.pd;
 #X connect 14 0 25 0;

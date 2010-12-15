@@ -116,7 +116,7 @@ line can be found in Chapter 3.6 of the HTML documentation.;
 14 -204280 -1 0;
 #X text 7 1 [loadbang] Important Note;
 #X restore 102 551 pd Important_Note;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 12 0 17 0;
 #X connect 13 0 15 0;
 #X connect 14 0 15 1;

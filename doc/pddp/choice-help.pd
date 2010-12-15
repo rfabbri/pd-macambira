@@ -90,7 +90,7 @@ having up to ten elements.;
 #X text 168 467 - (optional) if given a nonzero creation argument \,
 [choice] tries to avoid repetitious outputs by weighting less recently
 output vectors preferentially.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 13 0 23 0;
 #X connect 14 0 13 0;
 #X connect 15 0 13 0;

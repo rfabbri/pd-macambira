@@ -181,7 +181,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 14 -261106 -33289 0;
 #X text 7 2 Scope and Locality- Related Objects;
 #X restore 103 375 pd Related_objects;
-#X obj 6 375 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 375 pddp/pddplink all_about.pd -text All About Pd;
 #X obj 59 349 pddp/pddplink ../2.control.examples/14.dollarsigns.pd
 -text doc/2.control.examples/14.dollarsigns.pd;
 #X obj 59 334 pddp/pddplink all_about_dollarsign_zero.pd;

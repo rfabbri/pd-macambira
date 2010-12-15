@@ -177,8 +177,8 @@ So for "normal" audio computations \, all blocks should also be power-of-two
 in size. HOWEVER \, if you have no [inlet~] or [outlet~] you may specify
 any other block size. This is intended for later use in video processing.
 ;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 102 576 pddp/pddplink ../3.audio.examples/J07.oversampling.pd
 -text doc/3.audio.examples/J07.oversampling.pd;
 #X text 469 3 or [switch~];

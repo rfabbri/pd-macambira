@@ -80,8 +80,8 @@ clip the signal.;
 clipped.;
 #X text 168 420 - maximum value above which the incoming signal is
 clipped.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 41 250 tabwrite~ \$0-array;
 #X connect 14 0 40 0;
 #X connect 15 0 14 0;

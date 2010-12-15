@@ -429,7 +429,7 @@ Czaja to build comprehensive documentation for Pd.;
 that has not been defined to affect gui-properties (see below).;
 #X text 98 346 See the following subpatch for messages that change
 the gui-properties of [bng]:;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 15 0 14 0;
 #X connect 17 0 18 0;
 #X connect 18 0 16 0;

@@ -176,7 +176,7 @@ is already set will reschedule its output \, cancelling the old one.
 #X text 168 465 - (optional) initial delay time (in milliseconds).
 ;
 #X text 98 208 float;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 298 550 pddp/pddplink ../2.control.examples/07.time.pd;
 #X text 11 23 bang after time delay;
 #X connect 16 0 17 0;

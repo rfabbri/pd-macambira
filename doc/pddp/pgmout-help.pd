@@ -95,7 +95,7 @@ message on.;
 #X text 168 522 - (optional) integer representing the MIDI channel
 to which the program change should be sent. Without an argument it
 will send on channel 1 by default.;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X connect 18 0 17 0;
 #X connect 19 0 17 1;
 #X connect 21 0 20 0;

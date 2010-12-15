@@ -74,8 +74,8 @@ dB.;
 #X text 75 297 [bp~] passes a sinusoid at the center frequency at unit
 gain (approximately). Other frequencies are attenuated.;
 #X text 123 66 <- scroll to change input frequency;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
-#X obj 455 51 pddp/dsp-reminder;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 455 51 pddp/dsp;
 #X obj 98 572 pddp/pddplink ../3.audio.examples/H07.measure.spectrum.pd
 -text doc/3.audio.examples/H07.measure.spectrum.pd;
 #X connect 12 0 13 0;

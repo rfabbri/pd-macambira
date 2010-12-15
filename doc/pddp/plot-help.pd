@@ -169,7 +169,7 @@ of scalars along the path of the plot.;
 #X text 168 376 - word "curve" to specify bezier.;
 #X text 80 397 1) symbol atom;
 #X text 79 263 (symbols atoms);
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 545 pddp/pddplink all_about_arrays.pd;
 #X obj 98 575 pddp/pddplink ../4.data.structures/05.array.pd -text
 doc/4.data.structures/05.array.pd;

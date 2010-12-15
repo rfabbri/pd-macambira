@@ -55,7 +55,7 @@ the period you added will be gone.;
 #X text 8 2 comment Commentary: Additional Comments About Comments
 ;
 #X restore 102 551 pd Some_Comments_On_Comments;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X text 85 217 If you want to jot down a large value like a phone number
 in pd \, use hyphens or dots so that pd will interpret it as a symbol
 atom-- otherwise Pd will change it to scientific notation!;

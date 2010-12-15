@@ -91,7 +91,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X text 12 25 NAME list float symbol;
 #X text 12 65 DESCRIPTION message syntax in Pd;
 #X restore 392 228 pd META;
-#X obj 6 228 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 228 pddp/pddplink all_about.pd -text All About Pd;
 #X text 42 153 Messages are made up of atoms. Make sure you understand
 atoms before reading about messages.;
 #N canvas 20 104 428 468 Distinguishing_Message_Types 0;

@@ -24,7 +24,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 22 42 declare;
 #X obj 22 72 import;
 #X restore 103 218 pd Related_objects;
-#X obj 6 218 pddp/pddplink pddp/help.pd -text help;
+#X obj 6 218 pddp/pddplink all_about.pd -text All About Pd;
 #X text 20 37 Explain what libraries are \, how to load them \, and
 any missing features that are currently being worked on.;
 #N canvas 14 48 428 166 How_to_load_libraries 0;

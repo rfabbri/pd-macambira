@@ -105,7 +105,7 @@ inlet -> rightmost [inlet] \, and so on.;
 #X obj 338 108 pddp/pddplink inlet~-help.pd -text inlet~-help;
 #X obj 428 93 pddp/pddplink outlet-help.pd -text outlet-help;
 #X obj 428 108 pddp/pddplink outlet~-help.pd -text outlet~-help;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 100 560 pddp/pddplink ../2.control.examples/12.PART2.subpatch.pd
 -text doc/2.control.examples/12.PART2.subpatch.pd;
 #X obj 100 575 pddp/pddplink ../3.audio.examples/G05.execution.order.pd

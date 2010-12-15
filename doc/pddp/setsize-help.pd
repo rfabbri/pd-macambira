@@ -100,7 +100,7 @@ to default values.;
 ;
 #X text 80 444 1) symbol atom;
 #X text 80 462 n) symbol atom;
-#X obj 4 597 pddp/pddplink pddp/help.pd -text help;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
 #X obj 98 557 pddp/pddplink all_about_arrays.pd;
 #X obj 98 572 pddp/pddplink scalar-help.pd;
 #X connect 16 0 17 0;
