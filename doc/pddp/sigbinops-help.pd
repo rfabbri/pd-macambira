@@ -41,20 +41,14 @@ Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
 #X obj 465 20 pddp/pddplink http://wiki.puredata.info/en/bag -text
 pdpedia: bag;
 #X text 11 23 binary operators for signals;
-#X obj 15 276 +~;
-#X obj 103 274 -~;
-#X obj 190 274 *~;
-#X obj 275 276 /~;
+#X obj 15 286 +~;
+#X obj 103 284 -~;
+#X obj 190 284 *~;
+#X obj 275 286 /~;
 #X obj 15 212 osc~ 440;
 #X obj 415 212 osc~ 675;
-#X msg 24 296 bang;
-#X obj 361 274 max~;
-#X obj 447 276 min~;
-#X msg 115 297 bang;
-#X msg 201 296 bang;
-#X msg 291 297 bang;
-#X msg 373 296 bang;
-#X msg 464 297 bang;
+#X obj 361 284 max~;
+#X obj 447 286 min~;
 #N canvas 0 0 450 300 (subpatch) 0;
 #X array \$0a 100 float 2;
 #X coords 0 1 99 -1 150 105 1;
@@ -84,35 +78,48 @@ inlet to a value \, and allows the right inlet to receive float messages.
 #X text 98 431 float;
 #X text 167 431 - if an argument is provided \, the object's right
 inlet will accept floats instead of a signal.;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 455 51 pddp/dsp;
-#X obj 15 318 tabwrite~ \$0a;
-#X obj 103 318 tabwrite~ \$0a;
-#X obj 190 318 tabwrite~ \$0a;
-#X obj 275 318 tabwrite~ \$0a;
-#X obj 361 318 tabwrite~ \$0a;
-#X obj 447 318 tabwrite~ \$0a;
-#X connect 13 0 49 0;
-#X connect 14 0 50 0;
-#X connect 15 0 51 0;
-#X connect 16 0 52 0;
+#X obj 15 333 tabwrite~ \$0a;
+#X obj 103 333 tabwrite~ \$0a;
+#X obj 190 333 tabwrite~ \$0a;
+#X obj 275 333 tabwrite~ \$0a;
+#X obj 361 333 tabwrite~ \$0a;
+#X obj 447 333 tabwrite~ \$0a;
+#X obj 21 311 bng 15 250 50 0 empty empty empty 17 7 0 10 -204786 -1
+-1;
+#X obj 109 311 bng 15 250 50 0 empty empty empty 17 7 0 10 -204786
+-1 -1;
+#X obj 196 311 bng 15 250 50 0 empty empty empty 17 7 0 10 -204786
+-1 -1;
+#X obj 281 311 bng 15 250 50 0 empty empty empty 17 7 0 10 -204786
+-1 -1;
+#X obj 367 311 bng 15 250 50 0 empty empty empty 17 7 0 10 -204786
+-1 -1;
+#X obj 453 311 bng 15 250 50 0 empty empty empty 17 7 0 10 -204786
+-1 -1;
+#X connect 13 0 43 0;
+#X connect 14 0 44 0;
+#X connect 15 0 45 0;
+#X connect 16 0 46 0;
 #X connect 17 0 13 0;
 #X connect 17 0 14 0;
 #X connect 17 0 16 0;
 #X connect 17 0 15 0;
+#X connect 17 0 19 0;
 #X connect 17 0 20 0;
-#X connect 17 0 21 0;
 #X connect 18 0 16 1;
 #X connect 18 0 15 1;
 #X connect 18 0 14 1;
 #X connect 18 0 13 1;
+#X connect 18 0 19 1;
 #X connect 18 0 20 1;
-#X connect 18 0 21 1;
-#X connect 19 0 49 0;
-#X connect 20 0 53 0;
-#X connect 21 0 54 0;
-#X connect 22 0 50 0;
-#X connect 23 0 51 0;
-#X connect 24 0 52 0;
-#X connect 25 0 53 0;
-#X connect 26 0 54 0;
+#X connect 19 0 47 0;
+#X connect 20 0 48 0;
+#X connect 49 0 43 0;
+#X connect 50 0 44 0;
+#X connect 51 0 45 0;
+#X connect 52 0 46 0;
+#X connect 53 0 47 0;
+#X connect 54 0 48 0;
