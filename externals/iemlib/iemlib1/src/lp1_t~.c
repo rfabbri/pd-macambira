@@ -7,7 +7,8 @@ iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2010 
 #include "iemlib.h"
 #include <math.h>
 
-/* -- lp1_t~ - slow dynamic lowpass-filter 1. order with tau input --- */
+/* -- lp1_t~ - slow dynamic lowpass-filter 1. order controlled by time constant tau input --- */
+/* -- now with double precision -- */
 
 typedef struct _lp1_t_tilde
 {
