@@ -33,22 +33,8 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 
 #define SC_BUFFER_SIZE 64000
 
-#include "m_pd.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "packingOSC.h"
 
-#ifdef _WIN32
-#include <winsock2.h>
-#include <sys/timeb.h>
-#else
-#include <ctype.h>
-#include <sys/time.h>
-#endif
-
-#ifdef unix
-#include <netinet/in.h>
-#endif
 /* This is from OSC-client.h :*/
 /*
 
@@ -92,14 +78,6 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
  to dereference a pointer to an 8 byte int that's not 8-byte aligned.
 */
 
-/* You may have to redefine this typedef if ints on your system
-  aren't 4 bytes. */
-typedef unsigned int uint4;
-typedef struct
-{
-    uint4 seconds;
-    uint4 fraction;
-} OSCTimeTag;
 
 /* Return the time tag 0x0000000000000001, indicating to the receiving device
    that it should process the message immediately. */
@@ -321,8 +299,8 @@ static void packOSC_openbundle(t_packOSC *x)
         result = OSC_openBundle(x->x_oscbuf, OSCTT_Immediately());
     else
         result = OSC_openBundle(x->x_oscbuf, OSCTT_CurrentTimePlusOffset((uint4)x->x_timeTagOffset));
-    if (result != 0) return;
-    x->x_bundle = 1;
+    if (result != 0) x->x_bundle = 0;
+    else x->x_bundle = 1;
     outlet_float(x->x_bdpthout, (float)x->x_oscbuf->bundleDepth);
 }
 
@@ -1074,7 +1052,7 @@ static int OSC_closeBundle(OSCbuf *buf)
     if (buf->bundleDepth == 0)
     {
         /* This handles EMPTY, ONE_MSG, ARGS, and DONE */
-        post("packOSC: Can't close bundle; no bundle is open!");
+        post("packOSC: Can't close bundle: no bundle is open!");
         return 5;
     }
 
