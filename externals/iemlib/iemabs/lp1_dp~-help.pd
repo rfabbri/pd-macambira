@@ -29,28 +29,28 @@
 #X text 21 354 2.arg:<float> interpolation_time [ms];
 #X floatatom 266 309 7 0 0 0 - - -;
 #X text 317 310 dB;
-#X obj 14 15 cnv 8 1 1 empty empty lp1_d~ 1 2 1 18 -262144 -1109 0
+#X obj 14 15 cnv 8 1 1 empty empty lp1_dp~ 1 2 1 18 -262144 -1109 0
 ;
 #X text 106 415 IEM KUG;
-#X text 85 403 musil;
+#X text 84 403 musil;
 #X text 120 403 @;
-#X text 129 403 iem.at;
+#X text 128 403 iem.at;
 #X text 89 425 Graz \, Austria;
-#X obj 56 260 lp1_d~ 440 200;
-#X text 84 9 lowpass 1.order with double precision;
+#X text 102 8 lowpass 1.order with double precision;
 #X text 41 391 (c) Thomas Musil 2000 - 2010;
+#X obj 56 260 lp1_dp~ 440 200;
 #X connect 2 0 3 0;
 #X connect 3 0 4 0;
-#X connect 4 0 34 1;
+#X connect 4 0 36 1;
 #X connect 11 0 21 0;
-#X connect 14 0 34 2;
+#X connect 14 0 36 2;
 #X connect 16 0 12 0;
 #X connect 17 0 16 0;
 #X connect 18 1 26 0;
 #X connect 18 2 19 0;
 #X connect 19 1 7 0;
 #X connect 20 0 18 1;
-#X connect 21 0 34 0;
+#X connect 21 0 36 0;
 #X connect 21 1 9 0;
 #X connect 22 0 11 0;
-#X connect 34 0 18 0;
+#X connect 36 0 18 0;
