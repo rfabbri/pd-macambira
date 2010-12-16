@@ -388,7 +388,7 @@ fontsize bgColor foregroundColor lblColor initValue logHeight;
 #X msg 22 193 obj 150 280 nbx 5 14 0 127 0 1 send receive Maia 15 -8
 0 13 14 12 23 63 256;
 #X connect 6 0 2 0;
-#X restore 170 519 pd nbx-creation-arguments;
+#X restore 170 524 pd nbx-creation-arguments;
 #X text 168 465 - if you create an [nbx] object without arguments \,
 default values are chosen for the GUI-properties. See the subpatch
 below to learn how to dynamically instantiate a [nbx] with custom properties:
@@ -403,7 +403,8 @@ its appearance.;
 #X text 257 564 IEM KUG;
 #X text 232 576 graz \, austria 2002;
 #X text 425 4 [my_numbox] or [nbx];
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X text 98 295 bang;
 #X text 168 295 - output the current value;
 #X connect 13 0 16 0;

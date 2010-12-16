@@ -153,7 +153,8 @@ for [drawsymbol]) when not in editmode. Click a number to enter values
 #X text 98 405 * Any of these can be numbers (float) or field names
 (symbol atom).;
 #X obj 98 542 pddp/pddplink drawsymbol-help.pd;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 318 542 pddp/pddplink ../4.data.structures/09.scaling.pd -text
 doc/4.data.structure/09.scaling.pd;
 #X obj 318 557 pddp/pddplink ../4.data.structures/10.onoff.pd -text

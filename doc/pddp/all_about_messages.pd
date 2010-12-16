@@ -24,41 +24,6 @@ Pd.;
 #X text 19 146 2) Zero or more arguments \, which may be any atom type
 that Pd can understand.;
 #X restore 43 42 pd What_is_a_message_in_Pd?;
-#N canvas 18 112 428 500 Predefined_messages_in_Pd 0;
-#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
-1 18 -261106 -33289 0;
-#X text 7 1 Predefined messages in Pd;
-#X text 20 131 2) symbol message - the selector "symbol" \, followed
-by a single symbol atom.;
-#X obj 1 274 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
-1 18 -261106 -33289 0;
-#X text 20 216 5) pointer message - the selector "pointer" \, followed
-by a pointer atom.;
-#X text 20 186 4) list - the selector "list" \, followed by two or
-more atoms of any type (these are the elements of the list).;
-#X text 20 166 3) bang message - the single selector "bang".;
-#X text 20 246 6) signal - an audio signal;
-#X text 7 274 Implicit float and list Messages;
-#X text 20 37 In Pd \, when an object receives a message to an inlet
-\, it looks at the selector to figure out what to do next. So that
-objects can easily communicate with one another \, Pd has several predefined
-messages:;
-#X text 20 344 1) A single float atom has an implicit "float" selector.
-;
-#X msg 41 370 1;
-#X msg 181 370 float 1;
-#X text 71 370 is the same as...;
-#X text 20 394 1) a message that starts with a float atom and is followed
-by one or more atoms has an implicit "list" selector. Thus "1 2 3"
-or "1 4 63" \, and even "1 foo fee four" are list messages.;
-#X text 81 460 is the same as...;
-#X msg 41 460 2 3 4;
-#X msg 191 460 list 2 3 4;
-#X text 20 97 1) float message - this message has the selector "float"
-\, followed by a single float atom like 12 \, -4 \, or 1.8.;
-#X text 20 309 Since numbers are used so often in Pd \, two shortcuts
-are provided to make it easier to type and read them:;
-#X restore 43 69 pd Predefined_messages_in_Pd;
 #X obj 43 183 pddp/pddplink all_about_atoms.pd;
 #N canvas 19 160 428 264 User_defined_messages_in_Pd 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
@@ -379,3 +344,38 @@ to 0;
 #X restore 290 119 pd old;
 #X obj 43 203 pddp/pddplink ../1.manual/x2.htm#s3.1;
 #X text 194 202 <- fix this;
+#N canvas 18 112 428 500 Predefined_and_implicit_messages_in_Pd 0;
+#X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
+1 18 -261106 -33289 0;
+#X text 7 1 Predefined messages in Pd;
+#X text 20 131 2) symbol message - the selector "symbol" \, followed
+by a single symbol atom.;
+#X obj 1 274 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
+1 18 -261106 -33289 0;
+#X text 20 216 5) pointer message - the selector "pointer" \, followed
+by a pointer atom.;
+#X text 20 186 4) list - the selector "list" \, followed by two or
+more atoms of any type (these are the elements of the list).;
+#X text 20 166 3) bang message - the single selector "bang".;
+#X text 20 246 6) signal - an audio signal;
+#X text 7 274 Implicit float and list Messages;
+#X text 20 37 In Pd \, when an object receives a message to an inlet
+\, it looks at the selector to figure out what to do next. So that
+objects can easily communicate with one another \, Pd has several predefined
+messages:;
+#X text 20 344 1) A single float atom has an implicit "float" selector.
+;
+#X msg 41 370 1;
+#X msg 181 370 float 1;
+#X text 71 370 is the same as...;
+#X text 20 394 1) a message that starts with a float atom and is followed
+by one or more atoms has an implicit "list" selector. Thus "1 2 3"
+or "1 4 63" \, and even "1 foo fee four" are list messages.;
+#X text 81 460 is the same as...;
+#X msg 41 460 2 3 4;
+#X msg 191 460 list 2 3 4;
+#X text 20 97 1) float message - this message has the selector "float"
+\, followed by a single float atom like 12 \, -4 \, or 1.8.;
+#X text 20 309 Since numbers are used so often in Pd \, two shortcuts
+are provided to make it easier to type and read them:;
+#X restore 43 69 pd Predefined_and_implicit_messages_in_Pd;

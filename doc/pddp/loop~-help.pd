@@ -118,7 +118,8 @@ window size only changes at phase zero crossings and the phase output
 is adjusted so that changing window size doesn't change the transposition.
 ;
 #X restore 102 575 pd About_[loop~];
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 455 51 pddp/dsp;
 #X obj 78 524 cnv 17 3 17 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
 -162280 0;

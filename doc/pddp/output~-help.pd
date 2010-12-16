@@ -80,7 +80,8 @@ channel.;
 and passed unchanged to this outlet.;
 #X text 168 409 - the incoming signal from the leftmost inlet is filtered
 and passed to this outlet.;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 99 572 pddp/pddplink ../3.audio.examples/A05.output.subpatch.pd
 -text doc/3.audio.examples/A05.output.subpatch.pd;
 #X connect 13 0 15 0;

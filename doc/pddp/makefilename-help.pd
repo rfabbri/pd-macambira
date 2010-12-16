@@ -3,7 +3,7 @@
 14 -228856 -66577 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header makefilename 3 12
 0 18 -204280 -1 0;
-#X obj 0 197 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
+#X obj 0 179 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 51 244 494 344 META 0;
 #X text 12 105 LIBRARY internal;
@@ -19,11 +19,11 @@ Pd version 0.42.;
 #X text 12 5 KEYWORDS control conversion needs_work symbol_op;
 #X text 12 165 RELEASE_DATE 1997;
 #X restore 500 597 pd META;
-#X obj 0 337 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
+#X obj 0 319 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
-#X obj 0 374 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+#X obj 0 356 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
 0 13 -228856 -1 0;
-#X obj 0 497 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
+#X obj 0 479 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
 0 13 -228856 -1 0;
 #N canvas 75 446 428 187 Related_objects 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
@@ -38,10 +38,10 @@ Pd version 0.42.;
 #X obj 19 136 pddp/helplink cxc/ascseq;
 #X text 19 74 Externals;
 #X restore 101 597 pd Related_objects;
-#X obj 78 206 cnv 17 3 120 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+#X obj 78 188 cnv 17 3 120 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
-#X text 98 205 float;
-#X obj 78 346 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+#X text 98 187 float;
+#X obj 78 328 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
 #X obj 444 3 makefilename;
 #X obj 415 20 pddp/pddplink http://wiki.puredata.info/en/makefilename
@@ -57,23 +57,22 @@ Pd version 0.42.;
 #X msg 437 55 cool;
 #X obj 304 126 makefilename %s_PD.aif;
 #X symbolatom 304 150 0 0 0 0 - - -;
-#X text 168 205 - if a number (integer) is sent to the inlet \, the
+#X text 168 187 - if a number (integer) is sent to the inlet \, the
 argument should be written with a "%c" \, "%d" \, or "%X" which represents
 the location of the incoming variable number in the outgoing symbol.
 Floats will be converted to integers.;
-#X text 98 255 symbol;
-#X text 98 296 list;
-#X text 98 345 symbol;
-#X text 169 392 - this object generates symbols according to a format
+#X text 98 237 symbol;
+#X text 98 278 list;
+#X text 98 327 symbol;
+#X text 169 374 - this object generates symbols according to a format
 string (the argument) \, for use as a series of filenames \, table
 names \, etc. Variables for numbers can be specified by using "%s"
 \, "%c" \, "%d" \, or "%X" in the string (see subpatch below). For
 variable symbols \, use "%s". No checking is done. Each [makefilename]
 object can have only one variable.;
-#X text 168 255 - if a symbol is sent to the inlet \, the argument
+#X text 168 237 - if a symbol is sent to the inlet \, the argument
 should be written with a "%s" which represents the location of the
 incoming variable symbol in the outgoing symbol.;
-#X text 98 572 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm;
 #N canvas 74 23 428 594 More_Info 0;
 #X text 20 33 I believe that this object was developed first to allow
 PD to generate sequential file names - perhaps to be used in conjunction
@@ -135,7 +134,7 @@ of the decimal is discarded.;
 #X connect 13 0 15 0;
 #X connect 14 0 12 0;
 #X connect 16 0 6 0;
-#X restore 100 506 pd More_Info;
+#X restore 100 488 pd More_Info;
 #N canvas 105 144 428 318 all_possible_patterns 0;
 #X text 33 86 %c;
 #X text 110 86 character;
@@ -165,7 +164,7 @@ in Pd's [makefilename]:;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 [makefilename] All Possible Patterns;
-#X restore 100 474 pd all_possible_patterns;
+#X restore 100 456 pd all_possible_patterns;
 #N canvas 80 12 428 594 spaces_and_multiple_variables 0;
 #X obj 223 71 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -267,7 +266,7 @@ underscore will often produce a tolerable compromise.;
 #X connect 40 0 39 0;
 #X connect 41 0 40 0;
 #X connect 44 0 45 0;
-#X restore 100 529 pd spaces_and_multiple_variables;
+#X restore 100 511 pd spaces_and_multiple_variables;
 #N canvas 58 29 463 530 help_with_interfaces 0;
 #X text 21 32 Building user interfaces in Pd is a difficult balance
 between usability and performance. Pd is not winning any awards for
@@ -342,15 +341,18 @@ in the area of performance to provide users with on-screen reporting
 \, record keeping \, and sometimes even a few 'pleasantries'. Consider
 the following examples - but always weigh the pros and cons when incorporating
 these types of interfaces. Performance vs. Usability.;
-#X restore 100 552 pd help_with_interfaces;
+#X restore 100 534 pd help_with_interfaces;
 #X text 11 23 format a string with a variable field;
-#X text 168 296 - if the first element of the list matches the variable
+#X text 168 278 - if the first element of the list matches the variable
 type used \, then the list will be truncated.;
-#X text 168 345 - the output of [makefilename] is always a symbol.
+#X text 168 327 - the output of [makefilename] is always a symbol.
 ;
-#X text 80 392 1) symbol atom;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
-#X obj 318 529 pddp/pddplink all_about_symbol_construction.pd;
+#X text 80 374 1) symbol atom;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
+#X obj 98 572 pddp/pddplink all_about_symbol_construction.pd;
+#X obj 98 554 pddp/pddplink ../1.manual/x3.htm -text Pd Manual Chapter
+3.6 - doc/1.manual/x3.htm;
 #X connect 13 0 16 0;
 #X connect 16 0 15 0;
 #X connect 17 0 22 0;

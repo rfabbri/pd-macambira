@@ -351,7 +351,8 @@ a [cnv] \, as are the horizontal dividers below.;
 #X obj 435 221 send to_K;
 #X text 94 197 To get a cnv position \, send it a "get_pos" message
 ->;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #N canvas 404 60 483 507 (subpatch) 0;
 #X msg 144 296 bang;
 #X msg 144 321 1 30;
@@ -486,7 +487,7 @@ a [cnv] \, as are the horizontal dividers below.;
 #N canvas 92 49 450 511 let's-play-pong! 0;
 #X obj 138 138 cnv 15 100 25 empty \$0-score Score:0 5 12 0 14 -233017
 -66577 0;
-#X obj 14 281 cnv 15 5 60 \$0-ps \$0-pr empty 20 12 0 14 -1 -66577
+#X obj 14 296 cnv 15 5 60 \$0-ps \$0-pr empty 20 12 0 14 -1 -66577
 0;
 #X obj 257 19 key;
 #X msg 257 112 delta 0 \$1;
@@ -556,11 +557,11 @@ a [cnv] \, as are the horizontal dividers below.;
 #X obj 84 86 b;
 #X msg 84 152 label Score:\$1;
 #X obj 84 179 s \$0-score;
-#X obj 165 24 r die;
 #X obj 165 51 sel 0;
 #X obj 165 78 0;
 #X obj 210 92 loadbang;
 #X msg 210 114 0;
+#X obj 165 24 r play;
 #X connect 0 0 3 0;
 #X connect 1 0 2 0;
 #X connect 1 0 4 0;
@@ -568,10 +569,10 @@ a [cnv] \, as are the horizontal dividers below.;
 #X connect 3 0 1 0;
 #X connect 4 0 5 0;
 #X connect 6 0 7 0;
-#X connect 7 0 8 0;
-#X connect 8 0 1 1;
-#X connect 9 0 10 0;
-#X connect 10 0 4 0;
+#X connect 7 0 1 1;
+#X connect 8 0 9 0;
+#X connect 9 0 4 0;
+#X connect 10 0 6 0;
 #X restore 101 386 pd score;
 #X obj 68 95 metro 10;
 #N canvas 0 0 450 300 once 0;
@@ -601,7 +602,7 @@ a [cnv] \, as are the horizontal dividers below.;
 #X obj 68 18 r play;
 #X obj 336 111 s play;
 #X msg 87 319 0;
-#X obj 318 297 cnv 10 10 10 \$0-bs \$0-br empty 20 12 0 14 -1 -66577
+#X obj 314 328 cnv 10 10 10 \$0-bs \$0-br empty 20 12 0 14 -1 -66577
 0;
 #X obj 257 202 v bx;
 #X obj 337 202 v px;

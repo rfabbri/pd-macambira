@@ -3,7 +3,7 @@
 14 -228856 -66577 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header ctlin 3 12 0 18
 -204280 -1 0;
-#X obj 0 306 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
+#X obj 0 301 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 51 245 494 358 META 0;
 #X text 12 125 LIBRARY internal;
@@ -22,13 +22,13 @@ to conform to the PDDP template for Pd version 0.42.;
 #X text 12 105 OUTLET_n float;
 #X text 12 185 RELEASE_DATE 1997;
 #X restore 500 597 pd META;
-#X obj 0 334 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
+#X obj 0 329 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
-#X obj 0 467 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+#X obj 0 462 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
 0 13 -228856 -1 0;
 #X obj 0 566 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
 0 13 -228856 -1 0;
-#X text 98 342 float;
+#X text 98 337 float;
 #N canvas 50 160 441 439 Related_objects 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
@@ -70,20 +70,20 @@ by Olaf Matthes);
 from the MIDI port. See a MIDI-specification chart near you for control
 change message numbers and their meannings (MIDI implementation documents
 are freely available on the internet in c=various forms).;
-#X text 98 310 (none);
-#X obj 78 343 cnv 17 3 17 empty \$0-pddp.cnv.let.1 0 5 9 0 16 -228856
+#X text 98 305 (none);
+#X obj 78 338 cnv 17 3 17 empty \$0-pddp.cnv.let.1 0 5 9 0 16 -228856
 -162280 0;
-#X text 98 367 float;
-#X obj 78 368 cnv 17 3 17 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
+#X text 98 362 float;
+#X obj 78 363 cnv 17 3 17 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
 -162280 0;
-#X text 98 392 float;
-#X obj 78 393 cnv 17 3 17 empty \$0-pddp.cnv.let.2 2 5 9 0 16 -228856
+#X text 98 387 float;
+#X obj 78 388 cnv 17 3 17 empty \$0-pddp.cnv.let.2 2 5 9 0 16 -228856
 -162280 0;
 #X obj 24 69 ctlin;
 #X floatatom 24 133 5 0 0 0 - - -;
 #X floatatom 37 112 5 0 0 0 - - -;
 #X floatatom 51 91 5 0 0 0 - - -;
-#X text 168 310 - [ctlin] reads data directly from the MIDI port;
+#X text 168 305 - [ctlin] reads data directly from the MIDI port;
 #X obj 120 136 ctlin 64;
 #X floatatom 120 177 5 0 0 0 - - -;
 #X floatatom 165 161 5 0 0 0 - - -;
@@ -100,21 +100,22 @@ are freely available on the internet in c=various forms).;
 #X obj 455 20 pddp/pddplink http://wiki.puredata.info/en/ctlin -text
 pdpedia: ctlin;
 #X text 11 23 read incoming Control Change messages;
-#X text 168 486 - (optional) controller number to process. If no arguments
+#X text 168 481 - (optional) controller number to process. If no arguments
 are present [ctlin] reads all controller data on all channels.;
 #X text 168 521 - (optional) channel number on which the controller
 is to be processed. If the second argument is absent [ctlin] reads
 all channels.;
-#X text 168 411 If only one argument is given \, [ctlin] provides the
+#X text 168 406 If only one argument is given \, [ctlin] provides the
 user with only 2 outlets: ctl. value and channel no. If 2 arguments
 are given (ctl. no. & chan. no.) only one outlet (ctl. value) is given.
 ;
-#X text 168 342 - controller value.;
-#X text 168 367 - controller number.;
-#X text 168 392 - channel number.;
-#X text 80 486 1) float;
+#X text 168 337 - controller value.;
+#X text 168 362 - controller number.;
+#X text 168 387 - channel number.;
+#X text 80 481 1) float;
 #X text 80 521 2) float;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X connect 17 0 18 0;
 #X connect 17 1 19 0;
 #X connect 17 2 20 0;

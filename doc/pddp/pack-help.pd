@@ -192,7 +192,8 @@ specify the atom-type of each inlet. You can also use a float to specify
 float-type while also initializing that inlet's value. Some peculiarities
 described below:;
 #X text 80 476 n) symbol atom;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X text 168 186 - if the first argument is "symbol" or "s" \, an incoming
 symbol will be set to the first item in the list \, and [pack] will
 output its list.;

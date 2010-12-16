@@ -90,7 +90,7 @@ are blocked bigger than they are \, there might be weirdness.;
 #X obj 49 139 t b a;
 #X obj 258 318 outlet;
 #X obj 258 181 t a;
-#X obj 201 315 tgl 15 0 \$0-tgl \$0-nothing empty 17 7 0 10 -262144
+#X obj 201 315 tgl 15 0 \$0-tgl \$0-nothing empty 17 7 0 10 -204786
 -1 -1 0 1;
 #X obj 49 187 spigot;
 #X obj 110 124 r \$0-tgl;
@@ -177,7 +177,8 @@ So for "normal" audio computations \, all blocks should also be power-of-two
 in size. HOWEVER \, if you have no [inlet~] or [outlet~] you may specify
 any other block size. This is intended for later use in video processing.
 ;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 455 51 pddp/dsp;
 #X obj 102 576 pddp/pddplink ../3.audio.examples/J07.oversampling.pd
 -text doc/3.audio.examples/J07.oversampling.pd;

@@ -3,7 +3,7 @@
 14 -228856 -66577 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header outlet 3 12 0 18
 -204280 -1 0;
-#X obj 0 414 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
+#X obj 0 399 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 46 242 494 344 META 0;
 #X text 12 85 LIBRARY internal;
@@ -18,9 +18,9 @@ Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
 #X text 12 5 KEYWORDS control nonlocal canvas_op;
 #X text 12 145 RELEASE_DATE 1997;
 #X restore 500 597 pd META;
-#X obj 0 489 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
+#X obj 0 483 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
-#X obj 0 517 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+#X obj 0 511 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
 0 13 -228856 -1 0;
 #X obj 0 566 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
 0 13 -228856 -1 0;
@@ -35,16 +35,16 @@ Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
 #X text 266 44 [switch~];
 #X text 8 3 [outlet] Related Objects;
 #X restore 102 598 pd Related_objects;
-#X obj 78 423 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+#X obj 78 408 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
-#X text 98 422 anything;
-#X text 98 493 (none);
-#X text 98 521 (none);
+#X text 98 407 anything;
+#X text 98 487 (none);
+#X text 98 515 (none);
 #X text 11 23 control outlet for a subpatch;
 #X obj 477 3 outlet;
 #X obj 451 20 pddp/pddplink http://wiki.puredata.info/en/outlet -text
 pdpedia: outlet;
-#X text 167 521 - a symbolic argument to an [outlet] object which will
+#X text 167 515 - a symbolic argument to an [outlet] object which will
 be ignored. However \, [outlet] will not create if you give it an initial
 float argument.;
 #X obj 373 259 print~;
@@ -83,12 +83,13 @@ float argument.;
 subpatch:;
 #X text 98 77 The [outlet] object allows messages to be sent from objects
 in a subpatch to objects on the parent canvas.;
-#X text 168 422 - the inlet passes any message sent to [outlet] to
+#X text 168 407 - the inlet passes any message sent to [outlet] to
 the outlet of canvas in which it is contained. When multiple [outlet~]
 and/or [outlet] objects are in one subpatch \, their horizontal order
 determines which outlet on the subpatch corresponds to which [outlet~]/[outlet]
 object.;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X connect 17 0 23 1;
 #X connect 18 0 23 0;
 #X connect 22 0 16 0;

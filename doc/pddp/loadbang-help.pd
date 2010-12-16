@@ -58,7 +58,6 @@ simple mathematic equation when this patch was loaded. In this case:
 a process automatically when this patch was loaded.;
 #X text 98 426 (none);
 #X text 98 458 bang;
-#X text 99 572 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm;
 #N canvas 96 135 428 388 More_Info 0;
 #X obj 15 149 print foo;
 #X obj 15 101 loadbang;
@@ -116,7 +115,10 @@ line can be found in Chapter 3.6 of the HTML documentation.;
 14 -204280 -1 0;
 #X text 7 1 [loadbang] Important Note;
 #X restore 102 551 pd Important_Note;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
+#X obj 101 572 pddp/pddplink ../1.manual/x3.htm -text Pd Manual Chapter
+3.6 - doc/1.manual/x3.htm;
 #X connect 12 0 17 0;
 #X connect 13 0 15 0;
 #X connect 14 0 15 1;
