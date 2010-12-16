@@ -34,7 +34,7 @@ SRC = biquad_freq_resp.c \
 	pvu~.c \
 	rvu~.c \
 	sin_phase~.c \
-	sparse_FIR~ \
+	sparse_FIR~.c \
 	soundfile_info.c \
 	split.c \
 	v2db.c \
