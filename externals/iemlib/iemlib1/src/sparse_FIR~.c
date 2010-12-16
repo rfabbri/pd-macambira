@@ -16,11 +16,13 @@ typedef struct _sparse_FIR_tilde
   t_object  x_obj;
   t_float   *x_coef_beg;
   int       *x_index_beg;
+  int       x_n_coef_resp_order;
   int       x_n_coef;
   int       x_n_coef_malloc;
   t_float   *x_history_beg;
+  int       x_n_order;
+  int       x_n_order_malloc;
   int       x_rw_index;
-  int       x_sparse_FIR_order;
   t_float   x_msi;
 } t_sparse_FIR_tilde;
 
@@ -34,8 +36,8 @@ static t_int *sparse_FIR_tilde_perform(t_int *w)
   int n = (t_int)(w[4]);
   int rw_index = x->x_rw_index;
   int i, j, ix;
-  int order = x->x_sparse_FIR_order;
-  int n_coef = x->x_n_coef;
+  int order = x->x_n_order;
+  int n_coef = x->x_n_coef_resp_order;
   int n_coef8;
   t_float sum=0.0f;
   t_float *coef = x->x_coef_beg;
@@ -105,27 +107,68 @@ sparse_FIR_tilde_perf_zero:
   return(w+5);
 }
 
-static void sparse_FIR_tilde_list(t_sparse_FIR_tilde *x, t_symbol *s, int argc, t_atom *argv)
+static void sparse_FIR_tilde_sort_within(t_sparse_FIR_tilde *x)
 {
-  int order = x->x_sparse_FIR_order;
-  int n_arg2 = argc/2, index, i;
-  int n_coef = 0;
-  int *index_pointer = x->x_index_beg;
-  t_float *coef_pointer = x->x_coef_beg;
+  int cur_order = x->x_n_order;
+  int n_coef = x->x_n_coef;
+  int index, i;
+  int n_coef_resp_order = 0;
+  int *index_pointer_within = x->x_index_beg;
+  t_float *coef_pointer_within = x->x_coef_beg;
+  int *index_pointer = x->x_index_beg + x->x_n_coef_malloc;
+  t_float *coef_pointer = x->x_coef_beg + x->x_n_coef_malloc;
   t_float coef;
   
-  for(i=0; i<n_arg2; i++)
+  for(i=0; i<n_coef; i++)
   {
-    index = (int)atom_getfloat(argv++);
-    coef = (t_float)atom_getfloat(argv++);
-    if((index >= 0) && (index < order))
+    index = index_pointer[i];
+    coef = coef_pointer[i];
+    if((index >= 0) && (index < cur_order))
     {
-      *index_pointer++ = -index;
-      *coef_pointer++ = coef;
-      n_coef++;
+      index_pointer_within[i] = -index; /* negate index for FIR direction */
+      coef_pointer_within[i] = coef;
+      n_coef_resp_order++;
     }
   }
-  x->x_n_coef = n_coef;
+  x->x_n_coef_resp_order = n_coef_resp_order;
+}
+
+static void sparse_FIR_tilde_list(t_sparse_FIR_tilde *x, t_symbol *s, int argc, t_atom *argv)
+{
+  int max_order = x->x_n_order_malloc;
+  int n_pair_arg = argc/2, index, i;
+  int n_coef = 0;
+  int *index_pointer;
+  t_float *coef_pointer;
+  t_float coef;
+  
+  if(n_pair_arg > 0)
+  {
+    if(n_pair_arg > x->x_n_coef_malloc) /* resize */
+    {
+      x->x_index_beg =  (int *)resizebytes(x->x_index_beg, 2*x->x_n_coef_malloc*sizeof(int), 2*n_pair_arg*sizeof(int));
+      x->x_coef_beg =  (t_float *)resizebytes(x->x_coef_beg, 2*x->x_n_coef_malloc*sizeof(t_float), 2*n_pair_arg*sizeof(t_float));
+      x->x_n_coef_malloc = n_pair_arg;
+    }
+    
+    index_pointer = x->x_index_beg + x->x_n_coef_malloc;
+    coef_pointer = x->x_coef_beg + x->x_n_coef_malloc;
+    
+    for(i=0; i<n_pair_arg; i++)
+    {
+      index = (int)atom_getfloat(argv++);
+      coef = (t_float)atom_getfloat(argv++);
+      if((index >= 0) && (index < max_order))
+      {
+        *index_pointer++ = index;
+        *coef_pointer++ = coef;
+        n_coef++;
+      }
+    }
+    x->x_n_coef = n_coef;
+    
+    sparse_FIR_tilde_sort_within(x);
+  }
 }
 
 static void sparse_FIR_tilde_matrix(t_sparse_FIR_tilde *x, t_symbol *s, int argc, t_atom *argv)
@@ -160,19 +203,19 @@ static void sparse_FIR_tilde_matrix(t_sparse_FIR_tilde *x, t_symbol *s, int argc
 
 static void sparse_FIR_tilde_order(t_sparse_FIR_tilde *x, t_floatarg fn)
 {
-  int n = (int)fn;
+  int n_order = (int)fn;
   
-  if(n > 0)
+  if(n_order > 0)
   {
-    if(n > x->x_sparse_FIR_order)/* resize */
+    if(n_order > x->x_n_order_malloc) /* resize */
     {
-      x->x_history_beg =  (t_float *)resizebytes(x->x_history_beg, 2*x->x_n_coef_malloc*sizeof(t_float), 2*n*sizeof(t_float));
-      x->x_index_beg =  (int *)resizebytes(x->x_index_beg, x->x_n_coef_malloc*sizeof(int), n*sizeof(int));
-      x->x_coef_beg =  (t_float *)resizebytes(x->x_coef_beg, x->x_n_coef_malloc*sizeof(t_float), n*sizeof(t_float));
-      x->x_n_coef_malloc = n;
+      x->x_history_beg =  (t_float *)resizebytes(x->x_history_beg, 2*x->x_n_order_malloc*sizeof(t_float), 2*n_order*sizeof(t_float));
+      x->x_n_order_malloc = n_order;
     }
-    x->x_sparse_FIR_order = n;
+    x->x_n_order = n_order;
     x->x_rw_index = 0;
+    
+    sparse_FIR_tilde_sort_within(x);
   }
 }
 
@@ -184,31 +227,83 @@ static void sparse_FIR_tilde_dsp(t_sparse_FIR_tilde *x, t_signal **sp)
 static void *sparse_FIR_tilde_new(t_floatarg fn)
 {
   t_sparse_FIR_tilde *x = (t_sparse_FIR_tilde *)pd_new(sparse_FIR_tilde_class);
-  int n=(int)fn;
+  int n_order=(int)fn;
+  int i;
   
   outlet_new(&x->x_obj, &s_signal);
-  x->x_msi = 0;
-  x->x_n_coef = 0;
-  if(n < 1)
-    n = 1;
-  x->x_sparse_FIR_order = n;
-  x->x_n_coef_malloc = n;
-  x->x_history_beg = (t_float *)getbytes((2*x->x_n_coef_malloc)*sizeof(t_float));
-  x->x_index_beg = (int *)getbytes(x->x_n_coef_malloc*sizeof(int));
-  x->x_coef_beg = (t_float *)getbytes(x->x_n_coef_malloc*sizeof(t_float));
+  
+  x->x_n_coef = 1;
+  x->x_n_coef_resp_order = 1;
+  x->x_n_coef_malloc = 1;
+  x->x_index_beg = (int *)getbytes(2*x->x_n_coef_malloc*sizeof(int));
+  x->x_coef_beg = (t_float *)getbytes(2*x->x_n_coef_malloc*sizeof(t_float));
+  x->x_index_beg[0] = 0;
+  x->x_index_beg[1] = 0;
+  x->x_coef_beg[0] = 0.0f;
+  x->x_coef_beg[1] = 0.0f;
+  if(n_order < 1)
+    n_order = 1;
+  x->x_n_order = n_order;
+  x->x_n_order_malloc = n_order;
+  x->x_history_beg = (t_float *)getbytes((2*x->x_n_order_malloc)*sizeof(t_float));
   x->x_rw_index = 0;
+  n_order = 2*x->x_n_order_malloc;
+  for(i=0; i<n_order; i++)
+    x->x_history_beg[i] = 0.0f;
+  
+  x->x_msi = 0;
+  
+  post("NEW: n_coef_resp_order = %d, n_coef = %d, n_coef_malloc = %d, n_order = %d, n_order_malloc = %d", x->x_n_coef_resp_order, x->x_n_coef, x->x_n_coef_malloc, x->x_n_order, x->x_n_order_malloc);
+  
   return(x);
 }
 
 static void sparse_FIR_tilde_free(t_sparse_FIR_tilde *x)
 {
-  if(x->x_history_beg)
-    freebytes(x->x_history_beg, (2*x->x_n_coef_malloc)*sizeof(t_float));
-  if(x->x_index_beg)
-    freebytes(x->x_index_beg, x->x_n_coef_malloc*sizeof(int));
-  if(x->x_coef_beg)
-    freebytes(x->x_coef_beg, x->x_n_coef_malloc*sizeof(t_float));
+  freebytes(x->x_history_beg, (2*x->x_n_order_malloc)*sizeof(t_float)); /* twice, because of my simple circle-buffer */
+  freebytes(x->x_index_beg, 2*x->x_n_coef_malloc*sizeof(int)); /* twice, because of buffering both, all coefficients and only the relevant for current order */
+  freebytes(x->x_coef_beg, 2*x->x_n_coef_malloc*sizeof(t_float)); /* twice, because of buffering both, all coefficients and only the relevant for current order */
 }
+
+/*static void sparse_FIR_tilde_dump(t_sparse_FIR_tilde *x)
+{
+  t_float *hist=x->x_history_beg;
+  int *ix=x->x_index_beg;
+  int n=x->x_n_order;
+  
+  post("n_coef_resp_order = %d, n_coef = %d, n_coef_malloc = %d, n_order = %d, n_order_malloc = %d", x->x_n_coef_resp_order, x->x_n_coef, x->x_n_coef_malloc, x->x_n_order, x->x_n_order_malloc);
+  post("HIST:");
+  
+  while(n > 8)
+  {
+    post("hist = %g, %g, %g, %g, %g, %g, %g, %g", hist[n-1], hist[n-2], hist[n-3], hist[n-4], hist[n-5], hist[n-6], hist[n-7], hist[n-8]);
+    n -= 8;
+    hist -= 8;
+  }
+  while(n > 0)
+  {
+    post("hist = %g", hist[n-1]);
+    n--;
+    hist--;
+  }
+  post("COEF:");
+  
+  hist = x->x_coef_beg;
+  n = x->x_n_coef_resp_order;
+  while(n > 8)
+  {
+    post("coef = %d@%g, %d@%g, %d@%g, %d@%g, %d@%g, %d@%g, %d@%g, %d@%g", ix[n-1],hist[n-1], ix[n-2],hist[n-2], ix[n-3],hist[n-3], ix[n-4],hist[n-4], ix[n-5],hist[n-5], ix[n-6],hist[n-6], ix[n-7],hist[n-7], ix[n-8],hist[n-8]);
+    n -= 8;
+    hist -= 8;
+  }
+  while(n > 0)
+  {
+    post("coef = %d@%g", ix[n-1],hist[n-1]);
+    n--;
+    hist--;
+  }
+  post("***********************");
+}*/
 
 void sparse_FIR_tilde_setup(void)
 {
@@ -220,4 +315,5 @@ void sparse_FIR_tilde_setup(void)
   class_addmethod(sparse_FIR_tilde_class, (t_method)sparse_FIR_tilde_matrix, gensym("matrix"), A_GIMME, 0);
   class_addmethod(sparse_FIR_tilde_class, (t_method)sparse_FIR_tilde_order, gensym("order"), A_FLOAT, 0);
   class_addmethod(sparse_FIR_tilde_class, (t_method)sparse_FIR_tilde_order, gensym("size"), A_FLOAT, 0);
+  //class_addmethod(sparse_FIR_tilde_class, (t_method)sparse_FIR_tilde_dump, gensym("dump"), 0);
 }

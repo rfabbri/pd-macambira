@@ -1,4 +1,4 @@
-#N canvas 156 22 842 608 10;
+#N canvas 125 49 971 642 10;
 #X floatatom 4 133 5 0 0 0 - - -;
 #X text 32 96 % cpu;
 #X obj 4 93 dsp;
@@ -9,7 +9,7 @@
 #X obj 112 347 gainvu~ 300;
 #X obj 174 369 vu 15 120 empty empty 8 -8 0 10 -66577 -1 1 0;
 #X obj 294 216 vsl 15 128 0 127 0 1 empty empty gain -7 -8 0 10 -225271
--42246 -90881 7500 1;
+-42246 -90881 8400 1;
 #X obj 113 95 noise~;
 #X floatatom 173 512 7 0 0 0 - - -;
 #X floatatom 17 113 5 0 0 0 - - -;
@@ -19,7 +19,6 @@
 #X text 190 555 iem.at;
 #X text 153 577 Graz \, Austria;
 #X floatatom 142 323 5 0 0 0 - - -;
-#X obj 113 179 sparse_FIR~ 256;
 #X msg 177 112 size 256;
 #X msg 367 535 0 1 1 1;
 #X msg 367 556 0 1 40 -1 80 1 120 -1 160 1;
@@ -45,17 +44,22 @@
 0.04 26 0.04 27 0.04 28 0.04 29 0.04;
 #X obj 668 81 pack 0 0.04;
 #X obj 668 59 for++ 0 29;
-#X text 366 228 A list of alternating index- and value- doubles will
+#X text 366 217 A list of alternating index- and value- doubles will
 change the coefficients of convolution. The number of pairs should
 be less than the order of FIR.;
-#X text 367 276 A matrix message will do the same.;
+#X text 365 291 A matrix message will do the same.;
 #X obj 568 93 loadbang;
 #X text 134 16 convolve a signal with a coefficent list of non zero
 index/value pairs. All values between the determined values will be
 set to zero and won't be calculated (sparse).;
-#X text 227 182 1.arg: <float> maximum convolution-length or order
+#X text 227 182 1.arg: <float> convolution-length (FIR order or size)
 ;
-#X text 176 93 will change the max. order of FIR filter.;
+#X text 177 74 will change the max. order of FIR filter (or size).
+;
+#X text 366 263 Each pair or double begins with an index followed by
+its value.;
+#X obj 113 180 sparse_FIR~ 256;
+#X msg 175 90 size 16;
 #X connect 2 0 0 0;
 #X connect 2 1 11 0;
 #X connect 3 0 2 0;
@@ -66,23 +70,24 @@ set to zero and won't be calculated (sparse).;
 #X connect 7 0 10 0;
 #X connect 7 1 4 0;
 #X connect 8 0 6 1;
-#X connect 9 0 18 0;
-#X connect 18 0 6 0;
-#X connect 19 0 18 0;
-#X connect 20 0 18 0;
-#X connect 21 0 18 0;
-#X connect 22 0 18 0;
-#X connect 23 0 36 0;
-#X connect 23 1 24 0;
-#X connect 24 0 34 0;
-#X connect 25 0 34 0;
-#X connect 26 0 23 0;
-#X connect 27 0 18 0;
-#X connect 28 0 18 0;
-#X connect 29 0 18 0;
-#X connect 32 0 18 0;
-#X connect 33 0 18 0;
-#X connect 34 0 18 0;
-#X connect 35 0 25 0;
-#X connect 36 0 35 0;
-#X connect 39 0 34 0;
+#X connect 9 0 43 0;
+#X connect 18 0 43 0;
+#X connect 19 0 43 0;
+#X connect 20 0 43 0;
+#X connect 21 0 43 0;
+#X connect 22 0 35 0;
+#X connect 22 1 23 0;
+#X connect 23 0 33 0;
+#X connect 24 0 33 0;
+#X connect 25 0 22 0;
+#X connect 26 0 43 0;
+#X connect 27 0 43 0;
+#X connect 28 0 43 0;
+#X connect 31 0 43 0;
+#X connect 32 0 43 0;
+#X connect 33 0 43 0;
+#X connect 34 0 24 0;
+#X connect 35 0 34 0;
+#X connect 38 0 33 0;
+#X connect 43 0 6 0;
+#X connect 44 0 43 0;
