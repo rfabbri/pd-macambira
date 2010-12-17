@@ -88,8 +88,6 @@ will appear in the terminal window.;
 #X restore 383 83 graph;
 #X text 346 217 mouse to draw new values.;
 #X text 346 204 Open the table and use your;
-#X text 98 538 doc/2.control.examples/15.arrays.pd;
-#X text 98 553 doc/2.control.examples/16.more.arrays.pd;
 #X text 168 375 - the "set" message allows you to read from dynamic
 sources (e.g. \, "set tabread~-help-array"). You can change the source
 at any time using the "set" message.;
@@ -123,15 +121,18 @@ resize command. More about arrays can be found below.;
 #X text 98 434 signal;
 #X text 168 434 - outputs is an audio signal which corresponds to the
 index you query using the inlet.;
-#X connect 15 0 29 0;
-#X connect 26 0 30 0;
-#X connect 27 0 36 0;
-#X connect 29 0 27 0;
-#X connect 30 0 31 0;
-#X connect 31 0 27 0;
-#X connect 32 0 34 0;
-#X connect 33 0 27 0;
-#X connect 34 0 33 0;
-#X connect 35 0 36 0;
-#X connect 36 0 14 0;
-#X connect 37 0 35 0;
+#X obj 96 538 pddp/pddplink ../2.control.examples/15.arrays.pd;
+#X obj 95 553 pddp/pddplink ../2.control.examples/16.more.arrays.pd
+;
+#X connect 15 0 27 0;
+#X connect 24 0 28 0;
+#X connect 25 0 34 0;
+#X connect 27 0 25 0;
+#X connect 28 0 29 0;
+#X connect 29 0 25 0;
+#X connect 30 0 32 0;
+#X connect 31 0 25 0;
+#X connect 32 0 31 0;
+#X connect 33 0 34 0;
+#X connect 34 0 14 0;
+#X connect 35 0 33 0;

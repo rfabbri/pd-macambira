@@ -401,7 +401,7 @@ for conversion between sliderPosition and slider value.;
 #X msg 23 248 obj 150 335 vsl 75 75 -1 1 0 1 send receive Merope 15
 -9 0 12 7 13 21 4400 0;
 #X connect 7 0 3 0;
-#X restore 170 546 pd vsl-creation-arguments;
+#X restore 170 551 pd vsl-creation-arguments;
 #X text 379 139 vslider has settable;
 #X text 11 21 vertical gui-slider;
 #X text 98 494 18;
@@ -411,7 +411,8 @@ how to dynamically instantiate a [bng] object with custom properties:
 ;
 #X text 168 314 - a float updates the slider value and is sent to the
 outlet.;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X text 98 356 list;
 #X text 168 356 - a list is truncated to the first element.;
 #X text 98 339 bang;

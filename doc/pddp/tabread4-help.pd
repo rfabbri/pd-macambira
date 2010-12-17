@@ -84,8 +84,6 @@ values at the outlet.;
 #X text 168 377 - the "set" message allows you to read from dynamic
 sources (e.g. \, "set tabread-help-array"). You can change the source
 at any time using the "set" message.;
-#X text 98 558 doc/2.control.examples/15.arrays.pd;
-#X text 98 573 doc/2.control.examples/16.more.arrays.pd;
 #X text 168 430 - outputs a floating point number representing an interpolation
 of the array value corresponding to the location described at the inlet.
 ;
@@ -99,7 +97,8 @@ of the array value corresponding to the location described at the inlet.
 or table must exist in an open Pd patch/canvas or an error message
 will appear in the console.;
 #X text 80 493 1) symbol atom;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 101 189 tabread4 \$0-array;
 #X obj 172 125 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -1
 -1;
@@ -110,12 +109,15 @@ will appear in the console.;
 -1;
 #X obj 182 67 f \$0;
 #X msg 182 89 set \$1-array;
-#X connect 16 0 27 0;
-#X connect 27 0 32 0;
-#X connect 32 0 15 0;
-#X connect 33 0 34 0;
-#X connect 34 0 35 0;
-#X connect 35 0 32 0;
-#X connect 37 0 38 0;
-#X connect 38 0 39 0;
-#X connect 39 0 32 0;
+#X obj 96 558 pddp/pddplink ../2.control.examples/15.arrays.pd;
+#X obj 96 573 pddp/pddplink ../2.control.examples/16.more.arrays.pd
+;
+#X connect 16 0 25 0;
+#X connect 25 0 30 0;
+#X connect 30 0 15 0;
+#X connect 31 0 32 0;
+#X connect 32 0 33 0;
+#X connect 33 0 30 0;
+#X connect 35 0 36 0;
+#X connect 36 0 37 0;
+#X connect 37 0 30 0;

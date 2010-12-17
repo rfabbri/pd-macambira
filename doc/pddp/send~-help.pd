@@ -3,7 +3,7 @@
 14 -228856 -66577 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header send~ 3 12 0 18
 -204280 -1 0;
-#X obj 0 355 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
+#X obj 0 332 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 48 218 494 323 META 0;
 #X text 12 105 LIBRARY internal;
@@ -19,11 +19,11 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X text 12 85 INLET_0 signal;
 #X text 12 165 RELEASE_DATE 1997;
 #X restore 500 597 pd META;
-#X obj 0 397 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
+#X obj 0 374 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
-#X obj 0 490 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
+#X obj 0 467 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
 0 13 -228856 -1 0;
-#X obj 0 539 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
+#X obj 0 516 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
 0 13 -228856 -1 0;
 #N canvas 85 482 428 109 Related_objects 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
@@ -33,7 +33,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 152 43 catch~;
 #X text 8 2 [send~] Related Objects;
 #X restore 102 597 pd Related_objects;
-#X obj 78 364 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
+#X obj 78 341 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;
 #X obj 452 3 send~;
 #X obj 455 20 pddp/pddplink http://wiki.puredata.info/en/send~ -text
@@ -41,11 +41,11 @@ pdpedia: send~;
 #X obj 157 236 send~ signal1;
 #X obj 157 213 sig~ 50;
 #X floatatom 157 189 4 0 0 0 - - -;
-#X text 98 363 signal;
-#X text 98 401 (none);
-#X text 168 363 - a [send~] object copies its input to a local buffer
+#X text 98 340 signal;
+#X text 98 378 (none);
+#X text 168 340 - a [send~] object copies its input to a local buffer
 which all receive~ objects of the same name read from.;
-#X text 168 401 - the incoming signal is sent to all [receive~] objects
+#X text 168 378 - the incoming signal is sent to all [receive~] objects
 that share the same name as the [send~] object. These objects may be
 in different windows or even different patches. Any number of [receive~]'s
 may be associated with one [send~] \, but it is an error to have two
@@ -56,15 +56,18 @@ may be associated with one [send~] \, but it is an error to have two
 #X obj 304 199 metro 150;
 #X text 11 23 one-to-many nonlocal signal connections;
 #X floatatom 284 263 5 0 0 0 - - -;
-#X text 98 572 See also: 3.audio.examples/G05.execution.order.pd;
-#X text 168 508 - [send~] takes a single argument which is the name
+#X text 168 485 - [send~] takes a single argument which is the name
 associated with this particular [send~] object.;
-#X text 80 508 1) symbol atom;
-#X text 98 542 [send~]/[receive~] only work for the default block size
+#X text 80 485 1) symbol atom;
+#X text 98 519 [send~]/[receive~] only work for the default block size
 (64).;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 455 51 pddp/dsp;
 #X text 495 3 or [s~];
+#X obj 96 571 pddp/pddplink ../3.audio.examples/G05.execution.order.pd
+;
+#X text 99 551 See also:;
 #X connect 12 0 11 0;
 #X connect 13 0 12 0;
 #X connect 18 0 19 0;

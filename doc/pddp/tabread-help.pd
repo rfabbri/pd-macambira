@@ -1,4 +1,4 @@
-#N canvas 0 0 555 619 10;
+#N canvas 0 31 555 619 10;
 #X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
 14 -228856 -66577 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header tabread 3 12 0 18
@@ -99,8 +99,6 @@ in the arrays - otherwise [tabread] will always output "0".;
 #X restore 383 83 graph;
 #X text 346 217 mouse to draw new values.;
 #X text 346 204 Open the table and use your;
-#X text 98 546 doc/2.control.examples/15.arrays.pd;
-#X text 98 561 doc/2.control.examples/16.more.arrays.pd;
 #X text 168 402 - the "set" message allows you to read from dynamic
 sources (e.g. \, "set tabread-help-array"). You can change the source
 at any time using the "set" message.;
@@ -110,7 +108,8 @@ at any time using the "set" message.;
 #X obj 98 577 pddp/pddplink all_about_arrays.pd -text all_about_arrays
 ;
 #X text 80 500 1) symbol atom;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 107 93 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -1
 -1;
 #X obj 107 113 f \$0;
@@ -121,11 +120,14 @@ at any time using the "set" message.;
 #X obj 74 227 tabread \$0-array1;
 #X msg 110 204 set \$1-array2;
 #X obj 353 184 table \$0-array2;
-#X connect 19 0 38 0;
+#X obj 98 547 pddp/pddplink ../2.control.examples/15.arrays.pd;
+#X obj 97 562 pddp/pddplink ../2.control.examples/16.more.arrays.pd
+;
+#X connect 19 0 36 0;
+#X connect 31 0 32 0;
+#X connect 32 0 35 0;
 #X connect 33 0 34 0;
 #X connect 34 0 37 0;
 #X connect 35 0 36 0;
-#X connect 36 0 39 0;
-#X connect 37 0 38 0;
-#X connect 38 0 18 0;
-#X connect 39 0 38 0;
+#X connect 36 0 18 0;
+#X connect 37 0 36 0;

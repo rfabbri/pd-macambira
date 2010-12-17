@@ -90,8 +90,6 @@ lists will be truncated). A number pair represents "value" and "index"
 0 0 0;
 #X coords 0 1 99 -1 100 70 1;
 #X restore 408 94 graph;
-#X text 98 559 doc/2.control.examples/15.arrays.pd;
-#X text 98 575 doc/2.control.examples/16.more.arrays.pd;
 #X text 11 23 write numbers to a table;
 #X text 167 434 - selects index in which to write the new value.;
 #X text 98 460 (none);
@@ -105,7 +103,8 @@ an error message will appear in the console.;
 \, permits you to switch between arrays (e.g. \, "set another_array")
 ;
 #X text 80 498 1) symbol atom;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 90 117 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -1
 -1;
 #X obj 90 137 f \$0;
@@ -119,14 +118,17 @@ an error message will appear in the console.;
 #X obj 278 202 table \$0-tabwrite_table;
 #X msg 90 159 set \$1-another_array;
 #X msg 95 228 set \$1-tabwrite_table;
+#X obj 96 558 pddp/pddplink ../2.control.examples/15.arrays.pd;
+#X obj 95 573 pddp/pddplink ../2.control.examples/16.more.arrays.pd
+;
 #X connect 15 0 16 1;
 #X connect 17 0 16 0;
+#X connect 32 0 33 0;
+#X connect 33 0 40 0;
 #X connect 34 0 35 0;
-#X connect 35 0 42 0;
+#X connect 35 0 41 0;
 #X connect 36 0 37 0;
-#X connect 37 0 43 0;
-#X connect 38 0 39 0;
-#X connect 39 0 40 0;
+#X connect 37 0 38 0;
+#X connect 38 0 16 0;
 #X connect 40 0 16 0;
-#X connect 42 0 16 0;
-#X connect 43 0 16 0;
+#X connect 41 0 16 0;
