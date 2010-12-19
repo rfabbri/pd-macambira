@@ -30,4 +30,5 @@ proc set_cords_by_editmode {mytoplevel} {
     }
 }
 
-bind all <<EditMode>> {+set_cords_by_editmode %W}
+bind PatchWindow <<EditMode>> {+set_cords_by_editmode %W editmode}
+bind PatchWindow <<Loaded>> {+set_cords_by_editmode %W loaded}
