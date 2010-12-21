@@ -1,8 +1,9 @@
-#N struct bez-array float x float y array bez-c-arr bez-c float p0x
-float p0y float p0x. float p0y. float p1x float p1y float p1x. float
-p1y. float p2x float p2y float p2x. float p2y. float p3x float p3y
-float p3x. float p3y. float rpx float rpy float rpx. float rpy.;
-#N struct bez-c float x float y;
+#N struct 1026-bez-array float x float y array 1026-bez-c-arr 1026-bez-c
+float p0x float p0y float p0x. float p0y. float p1x float p1y float
+p1x. float p1y. float p2x float p2y float p2x. float p2y. float p3x
+float p3y float p3x. float p3y. float rpx float rpy float rpx. float
+rpy.;
+#N struct 1026-bez-c float x float y;
 #N canvas 280 17 921 908 10;
 #X floatatom 415 741 5 0 0 0 - - -;
 #X obj 418 727 hsl 50 10 0 1 0 0 empty empty empty -2 -8 0 10 -228856
@@ -15,13 +16,13 @@ float p3x. float p3y. float rpx float rpy float rpx. float rpy.;
 #X obj 135 504 pack;
 #X obj 145 484 t b f;
 #X obj 125 820 unpack;
-#X msg 228 820 p0 0.142857 0.244898 \, p1 0.34 0.88 \, p2 0.9 0.4 \,
-p3 0.85 0.73;
+#X msg 228 820 p0 0.25 0.34 \, p1 0.34 0.88 \, p2 0.9 0.4 \, p3 0.85
+0.73;
 #X text 543 84 Arguments;
 #X obj 148 457 hsl 50 10 0 1 0 0 empty empty X -16 6 0 12 -228856 -1
--1 700 1;
+-1 0 1;
 #X obj 148 471 hsl 50 10 0 1 0 0 empty empty Y -16 6 0 12 -228856 -1
--1 1200 1;
+-1 0 1;
 #X obj 128 840 hsl 50 10 0 1 0 0 empty empty X -16 6 0 12 -228856 -1
 -1 4165 1;
 #X obj 128 854 hsl 50 10 0 1 0 0 empty empty Y -16 6 0 12 -228856 -1
@@ -43,7 +44,7 @@ of x is created.;
 #X text 542 385 But \, even with the points outside of the box \, the
 calculations will still work. You only loose mouse control of the graphic
 handles.;
-#X obj 135 564 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 135 564 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
 1;
 #X obj 125 697 bezier;
 #X text 165 624 dump - Dump the coordinates of the control points through
@@ -67,9 +68,6 @@ get formatted.;
 ;
 #X text 153 554 readpoint \$1 - Turn readpoint (red) display on or
 off. Readpoint shows the curent place in the buffer.;
-#X text 543 536 READPOINT NAO FUNCIONA COM VARIOS OBJECTOS \, ENVIA
-PARA BEZIER CRIADO PRIMEIRO \; TIRAR TODOS OS SENDS \, OU FAZER UM
-LOCAL SEND;
 #X text 22 29 Create a transfer function between 0 and 1 \, using the
 four control points of a cubic bézier curve.;
 #X text 546 232 - floats [0 to 1] / commands (with parameters);
@@ -97,30 +95,30 @@ the box - you won't be able to grab the graphic (see bug description)
 ;
 #X msg 125 583 readpoint \$1;
 #X msg 125 624 dump;
-#X connect 0 0 52 0;
+#X connect 0 0 51 0;
 #X connect 1 0 0 0;
-#X connect 2 0 60 0;
+#X connect 2 0 59 0;
 #X connect 3 0 27 0;
 #X connect 4 0 3 0;
 #X connect 5 0 1 0;
 #X connect 6 0 5 0;
-#X connect 7 0 58 0;
+#X connect 7 0 57 0;
 #X connect 8 0 7 0;
 #X connect 8 1 7 1;
 #X connect 9 0 14 0;
 #X connect 9 1 15 0;
 #X connect 12 0 7 0;
 #X connect 13 0 8 0;
-#X connect 26 0 64 0;
+#X connect 26 0 63 0;
 #X connect 27 0 9 0;
 #X connect 27 1 10 0;
-#X connect 53 0 27 0;
+#X connect 52 0 27 0;
+#X connect 54 0 27 0;
 #X connect 55 0 27 0;
 #X connect 56 0 27 0;
 #X connect 57 0 27 0;
-#X connect 58 0 27 0;
+#X connect 59 0 27 0;
 #X connect 60 0 27 0;
 #X connect 61 0 27 0;
-#X connect 62 0 27 0;
+#X connect 63 0 27 0;
 #X connect 64 0 27 0;
-#X connect 65 0 27 0;
