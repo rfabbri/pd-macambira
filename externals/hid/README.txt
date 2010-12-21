@@ -1,4 +1,12 @@
 
+hid - a Pd object for getting data from USB HID devices
+
+[hid] is an object for reading data from USB HID devices like keyboards, mice,
+joysticks, gamepads, keypads, and all sorts of other esoteric controllers like
+USB knobs, touchscreens, Apple IR Remotes, etc. It represents the data with a
+cross-platform message scheme which is then translated to the underlying
+native API for input devices (Linux input.h or Mac OS X HID Utilities).
+
 BINARIES
 --------
 
