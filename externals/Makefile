@@ -599,63 +599,14 @@ hcs_clean:
 
 #------------------------------------------------------------------------------#
 # HID
-HID_NAME = hid
-ifeq ($(OS_NAME),windows)
-  HID_CFLAGS = $(OPT_CFLAGS) $(CFLAGS) 
-  HID_LIBS = $(LIBS) -lhid -lsetupapi
-else
-  ifeq ($(OS_NAME),darwin)
-    FRAMEWORKS = Carbon IOKit ForceFeedback
-    HID_CFLAGS = $(OPT_CFLAGS) $(CFLAGS) -I$(externals_src)/hid/HID\ Utilities\ Source
-    HID_UTILITIES_SOURCE = $(externals_src)/hid/HID\ Utilities\ Source
-    HID_LIBS = $(LIBS) -L$(HID_UTILITIES_SOURCE)/build \
-		-L$(HID_UTILITIES_SOURCE)/build/Default \
-      -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
-  else
-    HID_CFLAGS = $(OPT_CFLAGS) $(CFLAGS) 
-    HID_LIBS = $(LIBS)
-  endif
-endif
+hid:
+	make -C $(externals_src)/hid PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
 
-HID_SRC = input_arrays.c hid_$(OS_NAME).c hid.c
-HID_OBJECTS := $(patsubst %.c, $(externals_src)/hid/%.o, $(HID_SRC))
-$(HID_OBJECTS) : %.o : %.c
-	$(CC) $(HID_CFLAGS) -o "$*.o" -c "$*.c"
-
-$(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a:
-# Apple changed the XCode CLI tool's name in xcode2... arg
-# if on non-Mac OS X, this target just echos a message
-ifeq ($(UNAME),Darwin)
-	cd $(HID_UTILITIES_SOURCE) && \
-		(test -x /usr/bin/xcodebuild && /usr/bin/xcodebuild) || \
-			(test -x /usr/bin/pbxbuild && /usr/bin/pbxbuild) || \
-				echo "Not building Apple HID Utilities"
-endif
-
-$(externals_src)/hid/hid.$(EXTENSION): $(HID_OBJECTS) \
-$(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
-	$(CC) $(LDFLAGS) -o $(externals_src)/hid/hid.$(EXTENSION) \
-		$(HID_OBJECTS) $(HID_LIBS)
-#	$(STRIP) $(externals_src)/hid/hid.$(EXTENSION)
-
-hid: $(externals_src)/hid/hid.$(EXTENSION)
-
-hid_install: hid
-	install -d $(DESTDIR)$(objectsdir)/$(HID_NAME)
-	install -p $(externals_src)/hid/hid.$(EXTENSION) \
-		$(DESTDIR)$(objectsdir)/$(HID_NAME)
-	install -p $(externals_src)/hid/*.pd $(DESTDIR)$(objectsdir)/$(HID_NAME)
-	install -d $(DESTDIR)$(objectsdir)/$(HID_NAME)/examples
-	install -p $(externals_src)/hid/examples/*.pd  \
-		$(DESTDIR)$(objectsdir)/$(HID_NAME)/examples
+hid_install:
+	make -C $(externals_src)/hid DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
 
 hid_clean:
-	-rm -f -- $(externals_src)/hid/*.o
-	-rm -f -- $(externals_src)/hid/hid.$(EXTENSION)
-	-rm -f -- $(externals_src)/hid/*.bak
-	-rm -f -- $(externals_src)/hid/*.*~
-	-rm -f -- $(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
-	-rm -f -- $(HID_UTILITIES_SOURCE)/build/Default/libHIDUtilities.a
+	make -C $(externals_src)/hid clean
 
 
 #------------------------------------------------------------------------------#
@@ -2179,7 +2130,7 @@ etags:
 	make etags_`uname -s`
 
 etags_Darwin:
-	etags -a $(externals_src)/hcs/hid/HID\ Utilities\ Source/*.[ch]
+	etags -a $(externals_src)/hid/HID\ Utilities\ Source/*.[ch]
 	find /System/Library/Frameworks  -type f -name \*.h -exec etags -a '{}' \;
 	find /Library/Frameworks  -type f -name \*.h -exec etags -a '{}' \;
 	find /sw/include -type f -name \*.h -exec etags -a '{}' \;
