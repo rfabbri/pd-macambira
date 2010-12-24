@@ -11,8 +11,41 @@ Package: pd-jmmmp
 Architecture: all
 Depends: ${shlibs:Depends},
          pd,
-         ${misc:Depends},
-         pd-libdir
+         pd-libdir,
+         ${misc:Depends}
+Recommends: pd-import
 Description: a collection of Pd GUI objects for musical performance
- jmmmp is a collection of GUI objects for musical performance, including
- controlling the DAC, volume, debugging, linking up with other programs, etc.
+ jmmmp is a collection of Pure Data GUI objects for musical
+ performance, including controlling the DAC, volume, debugging,
+ linking up with other programs, etc.
+ .
+  * array-edit - edit properties of arrays
+  * but - Monochrome bang button
+  * clock - Chronometer with display in seconds
+  * dacm~ - Mono dac~ for lazy people
+  * datei-o - Sends the message "open ../../"
+  * datei-r - Sends the message "read ../../"
+  * datei-w - Sends the message "write ../../"
+  * dsp01 - DSP switch
+  * f+ - Counter with variable increment
+  * gui-edit - edit standard GUI objects fast
+  * lbang - loadbang which can be triggered more often
+  * liner~ - practical implementation of [line~]
+  * liner+~ - practical implementation of signal envelopping
+  * mat~ - Level meter with amplitude control
+  * maat~ - Level meter with amplitude control, stereo
+  * met~ - Level meter with amplitude control, with VU
+  * metrum - Metro with GUI
+  * m-i - Automatic conversion of MIDI controller
+  * mk - shows the controller number and MIDI value
+  * oscD - Counts received OSC messages
+  * oscS - Interface for sendOSC
+  * pd-colors - Pd color palettes (Data Structures + Tcl/Tk)
+  * rec-name - Automatic naming for a record/playback engine
+  * sguigot - spigot GUI implementation
+  * sliders - GUI for incoming midi data
+  * snaps~ - snapshot~ GUI implementation
+  * spectrogram~ - Spectrogram with 512 bins resolution
+  * stoppuhr - Chronometer with two layers
+  * tastin - Gate for keyboard input
+  * uhr - Shows the time
