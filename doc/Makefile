@@ -28,7 +28,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 #==============================================================================#
 
-DOC_TARGETS = externals-howto media messageoddness pd_fileformat pd-msg pddp \
+DOC_TARGETS = media messageoddness pd_fileformat pd-msg pddp \
 tutorials
 
 # clean up after everything is installed
