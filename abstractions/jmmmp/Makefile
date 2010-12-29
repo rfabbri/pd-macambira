@@ -9,7 +9,7 @@ SOURCES =
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = appent.pd ardourjack-gui.pd array+.pd array-edit.pd but.pd clock.pd dacm~.pd datei-o.pd datei-r.pd datei-w.pd dsp01.pd f+.pd lbang.pd liner+~.pd liner~.pd m-i.pd maat~.pd mat~.pd metrum.pd met~.pd mk.pd oscD.pd oscS.pd pd-colors.pd prepent.pd rec-name.pd sguigot.pd sliders.pd snaps~.pd spectrogram~.pd stoppuhr.pd tastin.pd uhr.pd
+PDOBJECTS = appent.pd ardourjack-gui.pd array+.pd array-edit.pd bezier.pd but.pd butt.pd clock.pd dacm~.pd datei-o.pd datei-r.pd datei-w.pd dsp01.pd expr_scale.pd f+.pd lbang.pd liner+~.pd liner~.pd m-i.pd maat~.pd mat~.pd metrum.pd met~.pd mk.pd oscD.pd oscS.pd pd-colors.pd prepent.pd rec-name.pd sguigot.pd sliders.pd snaps~.pd spectrogram~.pd stoppuhr.pd stoppuhr-clock.pd tastin.pd uhr.pd
 
 # example patches and related files, in the 'examples' subfolder
 EXAMPLES = ardour_icon_48px.gif computer_keyboard.png computer_keyboard_active.png crossfade-in-S1.png crossfade-in-S2.png crossfade-in-constant-power.png crossfade-in-fast-cut.png crossfade-in-linear.png crossfade-in-long-cut.png crossfade-in-short-cut.png crossfade-in-slow-cut.png crossfade-out-S1.png crossfade-out-S2.png crossfade-out-constant-power.png crossfade-out-fast-cut.png crossfade-out-linear.png crossfade-out-long-cut.png crossfade-out-short-cut.png crossfade-out-slow-cut.png fader_belt.png fader_belt_h.png hide.png nudge_left.png nudge_right.png record_normal_red.gif record_tape_red.png strip_width.png transport_end.gif transport_loop.gif transport_play.gif transport_range.gif transport_record.gif transport_start.gif transport_stop.gif zoom_full.png zoom_in.png zoom_out.png 

@@ -1,0 +1,42 @@
+# the upstream library format includes an 'examples' directory where example
+# scripts are kept.  This directory needs to be part of the library itself so
+# that the documentation browser, aka the "Help Browser" can find and display
+# the examples.  Sometimes the example scripts include image files to
+# manipulate.
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/ardour_icon_48px.gif
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/computer_keyboard.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/computer_keyboard_active.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-in-S1.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-in-S2.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-in-constant-power.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-in-fast-cut.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-in-linear.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-in-long-cut.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-in-short-cut.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-in-slow-cut.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-out-S1.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-out-S2.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-out-constant-power.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-out-fast-cut.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-out-linear.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-out-long-cut.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-out-short-cut.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/crossfade-out-slow-cut.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/fader_belt.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/fader_belt_h.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/hide.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/nudge_left.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/nudge_right.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/record_normal_red.gif
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/record_tape_red.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/strip_width.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/transport_end.gif
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/transport_loop.gif
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/transport_play.gif
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/transport_range.gif
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/transport_record.gif
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/transport_start.gif
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/transport_stop.gif
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/zoom_full.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/zoom_in.png
+image-file-in-usr-lib usr/lib/pd/extra/jmmmp/examples/zoom_out.png
