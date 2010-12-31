@@ -8,8 +8,6 @@
 
 /* sigrsqrt - reciprocal square root good to 8 mantissa bits  */
 
-static float rsqrt_exptab[DUMTAB1SIZE], rsqrt_mantissatab[DUMTAB2SIZE];
-
 static void init_rsqrt(void)
 {
     int i;

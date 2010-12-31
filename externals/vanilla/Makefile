@@ -5,7 +5,7 @@ LIBRARY_NAME = vanilla
 
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically
-SOURCES = abs~.c bng.c clip~.c cnv.c dbtopow~.c dbtorms~.c del.c delay.c exp~.c ftom~.c hdl.c hradio.c hsl.c hslider.c key.c keyname.c keyup.c line.c list.c log~.c metro.c mtof~.c my_canvas.c my_numbox.c nbx.c netsend.c netreceive.c openpanel.c pipe.c powtodb~.c pow~.c print.c qlist.c radiobut.c radiobutton.c rdb.c rmstodb~.c rsqrt~.c savepanel.c sqrt~.c textfile.c tgl.c timer.c toggle.c vdl.c vradio.c vsl.c vslider.c vu.c wrap~.c random.c loadbang.c namecanvas.c cputime.c realtime.c bang~.c print~.c adc~.c dac~.c delread~.c delwrite~.c vd~.c
+SOURCES = abs~.c adc~.c bang~.c bng.c clip~.c cnv.c cputime.c dac~.c dbtopow~.c dbtorms~.c del.c delay.c delread~.c delwrite~.c exp~.c fft~.c framp~.c ftom~.c hdl.c hradio.c hsl.c hslider.c ifft~.c key.c keyname.c keyup.c line.c list.c loadbang.c log~.c metro.c mtof~.c my_canvas.c my_numbox.c namecanvas.c nbx.c netreceive.c netsend.c openpanel.c pipe.c powtodb~.c pow~.c print.c print~.c qlist.c radiobut.c radiobutton.c random.c rdb.c realtime.c rfft~.c rifft~.c rmstodb~.c rsqrt~.c savepanel.c sqrt~.c textfile.c tgl.c timer.c toggle.c vdl.c vd~.c vradio.c vsl.c vslider.c vu.c wrap~.c 
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
@@ -34,7 +34,7 @@ HELPPATCHES = abs~-help.pd adc~_dac~-help.pd bang~-help.pd bng-help.pd clip~-hel
 #------------------------------------------------------------------------------#
 
 # -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
-CFLAGS = -I"$(PD_INCLUDE)/pd" -Wall -W -g
+CFLAGS = -I"$(PD_INCLUDE)" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
