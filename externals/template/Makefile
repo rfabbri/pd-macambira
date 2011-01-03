@@ -122,7 +122,7 @@ ifeq ($(UNAME),ANDROID)
   NDK_TOOLCHAIN=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86
   CC=$(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-gcc
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-  CFLAGS += -fPIC
+  CFLAGS += -fPIC -I$(NDK_SYSROOT)/usr/include
   LDFLAGS += -Wl,--export-dynamic -L$(NDK_SYSROOT)/usr/lib -shared -fPIC
   LIBS += -lc
   STRIP = strip --strip-unneeded -R .note -R .comment
