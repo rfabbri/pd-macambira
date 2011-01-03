@@ -147,14 +147,13 @@ accepts no messages. These xlets are labeled (inactive).;
 12 0 18 -204280 -1 0;
 #X obj 465 20 pddp/pddplink http://wiki.puredata.info/en/help -text
 pdpedia: help;
-#X obj 426 119 cnv 15 122 44 empty empty empty 20 12 0 10 -191407 -1
+#X obj 426 89 cnv 15 122 44 empty empty empty 20 12 0 10 -191407 -1
 0;
-#X obj 423 116 cnv 15 122 44 empty empty empty 20 12 0 10 -1 -1 0;
-#X obj 424 117 cnv 15 120 42 empty empty empty 20 12 0 10 -261106 -1
+#X obj 423 86 cnv 15 122 44 empty empty empty 20 12 0 10 -1 -1 0;
+#X obj 424 87 cnv 15 120 42 empty empty empty 20 12 0 10 -261106 -1
 0;
-#X text 426 140 that produce sound.;
-#X text 426 128 appears in patches;
-#X text 426 117 The reminder above;
+#X text 426 110 that produce sound.;
+#X text 426 98 appears in patches;
 #X obj 120 301 cnv 15 352 31 empty empty empty 20 12 0 10 -191407 -1
 0;
 #X obj 117 298 cnv 15 352 31 empty empty empty 20 12 0 10 -1 -1 0;
@@ -242,6 +241,6 @@ with the mouse to open it.;
 exact number of which is determined by creation argument(s).;
 #X text 11 23 usage guide for internal help patches;
 #X obj 99 552 pddp/pddplink glossary.pd;
-#X obj 5 597 pddp/pddplink all_about.pd -text All About Pd
-;
+#X obj 5 597 pddp/pddplink all_about.pd -text All About Pd;
+#X text 426 87 The 'dsp' button;
 #X connect 16 0 17 0;

@@ -19,33 +19,15 @@
 #X restore 103 550 pd Related_objects;
 #X text 18 218 Control Examples;
 #X text 18 238 Audio Examples;
-#X obj 126 218 pddp/pddplink ../../2.control.examples/01.PART1.hello.pd
--text doc/2.control.examples/01.PART1.hello.pd;
-#X obj 126 238 pddp/pddplink ../../3.audio.examples/A00.intro.pd -text
-doc/2.audio.examples/A00.intro.pd;
 #X text 18 258 Data Structures;
-#X obj 126 258 pddp/pddplink ../../4.data.structures/01.scalars.pd
--text doc/4.data.structures/01.scalars.pd;
 #X text 18 358 Dynamic Patching;
-#X obj 126 358 pddp/pddplink ../../manuals/pd-msg/msg_and_patch/0.all_msg.pd
--text doc/manuals/pd-msg/msg_and_patch/0.all_msg.pd;
 #X text 18 278 Intro to Pd;
-#X obj 126 278 pddp/pddplink ../../manuals/0.Intro/01.hello_world.pd
--text doc/manuals/0.Intro/01.hello_world.pd;
 #X text 18 298 Audio Basics;
-#X obj 126 298 pddp/pddplink ../../manuals/1.Sound/00.controlling_dsp_processing.pd
--text doc/manuals/1.Sound/00.controlling_dsp_processing.pd;
 #X text 18 318 Intro to Gem;
-#X obj 126 318 pddp/pddplink ../../manuals/2.Image/01.gemwin.pd -text
-doc/manuals/2.Image/01.gemwin.pd;
 #X text 18 338 Networking;
-#X obj 126 338 pddp/pddplink ../../manuals/3.Networking/01.network_ports.pd
--text doc/manuals/3.Networking/01.network_ports.pd;
 #X obj 18 148 pddp/pddplink http://www.crca.ucsd.edu/~msp/Pd_documentation/index.htm
 ;
 #X text 18 199 All About Pd;
-#X obj 126 199 pddp/pddplink ../all_about.pd -text doc/5.reference/all_about.pd
-;
 #X text 18 77 Document Browser;
 #X text 126 77 click <ctrl>-b or look under the "Help" menu;
 #X obj 18 128 pddp/pddplink ../../1.manual/index.htm -text doc/1.manual/index.htm
@@ -71,6 +53,24 @@ for Pd Objects;
 ;
 #X text 18 478 Developer Docs;
 #X text 19 477 ______________;
-#X obj 18 498 pddp/pddplink ../../manuals/Externals-HOWTO/HOWTO-externals-en.html
--text Writing External Objects for Pure Data;
 #X obj 6 550 pddp/pddplink all_about.pd -text All About Pd;
+#X obj 126 199 pddp/pddplink all_about.pd -text doc/5.reference/all_about.pd
+;
+#X obj 126 218 pddp/pddplink ../2.control.examples/01.PART1.hello.pd
+-text doc/2.control.examples/01.PART1.hello.pd;
+#X obj 126 238 pddp/pddplink ../3.audio.examples/A00.intro.pd -text
+doc/2.audio.examples/A00.intro.pd;
+#X obj 126 258 pddp/pddplink ../4.data.structures/01.scalars.pd -text
+doc/4.data.structures/01.scalars.pd;
+#X obj 126 278 pddp/pddplink ../manuals/0.Intro/01.hello_world.pd -text
+doc/manuals/0.Intro/01.hello_world.pd;
+#X obj 126 298 pddp/pddplink ../manuals/1.Sound/00.controlling_dsp_processing.pd
+-text doc/manuals/1.Sound/00.controlling_dsp_processing.pd;
+#X obj 126 318 pddp/pddplink ../manuals/2.Image/01.gemwin.pd -text
+doc/manuals/2.Image/01.gemwin.pd;
+#X obj 126 338 pddp/pddplink ../manuals/3.Networking/01.network_ports.pd
+-text doc/manuals/3.Networking/01.network_ports.pd;
+#X obj 126 358 pddp/pddplink ../manuals/pd-msg/msg_and_patch/0.all_msg.pd
+-text doc/manuals/pd-msg/msg_and_patch/0.all_msg.pd;
+#X obj 18 498 pddp/pddplink ../manuals/Externals-HOWTO/HOWTO-externals-en.html
+-text Writing External Objects for Pure Data;
