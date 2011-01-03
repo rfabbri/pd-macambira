@@ -1,4 +1,4 @@
-#N canvas 0 0 917 300 10;
+#N canvas 0 31 765 300 10;
 #X obj 185 160 lpc~ 10;
 #N canvas 0 0 450 300 playsound 0;
 #X obj 68 74 inlet;
@@ -20,7 +20,7 @@
 #X connect 5 0 6 0;
 #X connect 6 0 7 0;
 #X restore 185 119 pd playsound;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array testfile 1.7683e+06 float 0;
 #X coords 0 1 1.7683e+06 -1 200 140 1;
 #X restore 516 19 graph;
@@ -38,6 +38,16 @@
 #X floatatom 242 142 5 1 100 0 poles - -;
 #X obj 184 183 lpreson~;
 #X obj 185 206 hip~ 18;
+#N canvas 620 320 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 105 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 85 OUTLET_0 signal;
+#X text 12 45 DESCRIPTION Lattice IIR filter for lpc;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 5 KEYWORDS signal filter;
+#X text 12 65 INLET_0 signal float;
+#X restore 697 255 pd META;
 #X connect 0 0 11 0;
 #X connect 0 1 11 0;
 #X connect 1 0 0 0;

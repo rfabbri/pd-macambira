@@ -1,4 +1,4 @@
-#N canvas 365 7 693 886 10;
+#N canvas 0 31 693 886 10;
 #X obj 71 321 simile~;
 #X obj 71 269 sig~;
 #X obj 113 270 sig~;
@@ -150,7 +150,7 @@ useful for phase-locked loops and other self-calibrating machines...
 #X floatatom 259 648 5 0 100 2 volume - -;
 #X obj 82 689 dac~;
 #X text 157 621 output~;
-#N canvas 0 0 450 300 graph2 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array sim 8820 float 1;
 #A 0 0.00893242 0.00894733 0.0089625 0.00897789 0.00899362 0.0090096
 0.00902575 0.00904234 0.0090591 0.00907611 0.00909355 0.00911105 0.00912905
@@ -1402,7 +1402,7 @@ useful for phase-locked loops and other self-calibrating machines...
 0.0096371 0.00966539 0.00969393 0.00972312 0.00975249 0.00978236;
 #X coords 0 1 8819 -1 300 100 1;
 #X restore 358 484 graph;
-#N canvas 0 0 450 300 graph2 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array sign 8820 float 1;
 #A 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
@@ -1735,7 +1735,7 @@ useful for phase-locked loops and other self-calibrating machines...
 1;
 #X coords 0 1 8819 -1 300 100 1;
 #X restore 358 587 graph;
-#N canvas 0 0 450 300 graph3 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array sine-1 8820 float 1;
 #A 0 -0.739 -0.742134 -0.745241 -0.748349 -0.751425 -0.75449 -0.75755
 -0.760572 -0.763594 -0.766594 -0.769572 -0.77255 -0.775491 -0.778425
@@ -4137,7 +4137,7 @@ useful for phase-locked loops and other self-calibrating machines...
 #X obj 248 238 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X msg 248 253 \; pd dsp \$1;
-#X obj 185 399 tgl 15 0 empty empty graph 0 -6 0 8 -262144 -1 -1 1
+#X obj 185 399 tgl 15 0 empty empty graph 0 -6 0 8 -262144 -1 -1 0
 1;
 #X msg 185 414 \; metro \$1;
 #X obj 268 506 bng 15 250 50 0 empty empty graph 0 -6 0 8 -262144 -1
@@ -4147,7 +4147,7 @@ useful for phase-locked loops and other self-calibrating machines...
 #X floatatom 188 690 5 0 0 0 - - -;
 #X obj 221 713 / 64;
 #X floatatom 233 745 5 0 0 0 - - -;
-#N canvas 0 0 450 300 graph2 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array score 8820 float 1;
 #A 0 0.438094 0.141779 0.0824044 0.0618505 0.0561296 0.0623698 0.0988021
 0.341186 0.087642 0.0391706 0.0256266 0.0199546 0.0175753 0.0173033
@@ -5000,7 +5000,7 @@ useful for phase-locked loops and other self-calibrating machines...
 0.00893611 0.0172416 0.114685 0.0191837 0.00906882 0.0064335 0.00541941
 0.00513921 0.00542282 0.00646134 0.00924126 0.0212836 0.107861 0.0145255
 0.00791741 0.00590706 0.0051426 0.00501545 0.00544724 0.00673092 0.0102571
-0.0327235 0.096902;
+0.0327235 0.096902 ;
 #A 6000 0.0122069 0.00737504 0.00575324 0.00516745 0.00518156 0.00579757
 0.00745284 0.0122643 0.0982692 0.039197 0.011181 0.00732271 0.00594972
 0.005509 0.00568242 0.00656155 0.00881636 0.016 0.118272 0.0263769
@@ -5414,6 +5414,21 @@ vector block. divide by the blocksize to get the average for each block.
 ;
 #X text 253 708 divide by;
 #X text 254 719 blocksize;
+#N canvas 379 254 494 344 META 0;
+#X text 12 205 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 185 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 45 DESCRIPTION compare two signals according to an error
+window;
+#X text 12 65 INLET_0 signal;
+#X text 12 85 INLET_1 signal;
+#X text 12 105 INLET_2 float;
+#X text 12 125 OUTLET_0 signal;
+#X text 12 145 OUTLET_1 signal;
+#X text 12 165 OUTLET_2;
+#X text 12 5 KEYWORDS signal needs_work (OUTLET_2?);
+#X restore 634 855 pd META;
 #X connect 0 0 13 0;
 #X connect 0 1 17 0;
 #X connect 1 0 0 0;

@@ -1,4 +1,4 @@
-#N canvas 0 0 707 528 10;
+#N canvas 0 31 637 475 10;
 #X obj 84 255 list_sum;
 #X floatatom 101 358 0 0 0 3 length - -;
 #X floatatom 84 391 0 0 0 3 total - -;
@@ -24,6 +24,20 @@
 -1;
 #X text 206 301 calculate the sum of elements in a list \, wrapping
 the list.;
+#N canvas 239 251 494 344 META 0;
+#X text 12 199 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 179 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 5 KEYWORDS control storage list_op;
+#X text 12 45 DESCRIPTION calculate the sum of elements in a list \,
+wrapping the list;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 79 INLET_0 all set clear;
+#X text 12 99 INLET_1 float;
+#X text 12 119 INLET_2 float;
+#X text 12 139 OUTLET_0 float;
+#X text 12 159 OUTLET_1 float;
+#X restore 577 446 pd META;
 #X connect 0 0 2 0;
 #X connect 0 1 1 0;
 #X connect 3 0 0 0;

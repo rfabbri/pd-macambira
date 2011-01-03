@@ -1,4 +1,4 @@
-#N canvas 0 0 956 304 10;
+#N canvas 0 31 956 304 10;
 #X obj 368 207 maskxor;
 #X obj 457 63 t b b;
 #X msg 38 157 bang;
@@ -41,7 +41,7 @@ is GNU software.;
 #X msg 678 114 1 1 0 0 0 1;
 #X msg 721 131 0 1 1 0 2 1 0;
 #X msg 669 190 mode \$1;
-#X obj 669 167 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 669 167 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X text 728 191 ... in mode 1 \, floats are only;
 #X text 729 204 passed through the left outlet;
@@ -77,6 +77,19 @@ is GNU software.;
 #X text 847 105 |;
 #X text 847 114 |;
 #X text 759 65 <;
+#N canvas 355 347 494 344 META 0;
+#X text 12 5 GENRE help;
+#X text 12 185 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 45 LICENSE GPL v3;
+#X text 12 165 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 65 DESCRIPTION exclusive-OR mask map;
+#X text 12 25 KEYWORDS control list_op;
+#X text 12 85 INLET_0 float listl listr clear bang mode;
+#X text 12 105 OUTLET_0 float;
+#X text 12 125 OUTLET_1 float;
+#X text 12 145 OUTLET_2 list;
+#X restore 887 275 pd META;
 #X connect 0 0 4 0;
 #X connect 0 1 3 0;
 #X connect 0 2 12 0;

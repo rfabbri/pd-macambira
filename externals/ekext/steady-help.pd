@@ -1,4 +1,4 @@
-#N canvas 455 323 616 303 10;
+#N canvas 0 31 616 303 10;
 #N canvas 0 22 696 311 fiddle-example 0;
 #X obj 139 187 steady;
 #X floatatom 98 223 5 0 0 3 max - -;
@@ -97,6 +97,20 @@ occurs from then onwards.;
 #X text 194 188 ...sometimes useful to filter out erroneous results
 from fiddle~ and other externs...;
 #X text 194 73 but...;
+#N canvas 379 254 494 279 META 0;
+#X text 12 185 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 165 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 5 KEYWORDS control;
+#X text 12 45 DESCRIPTION get maximum and minimum from a stream of
+numbers;
+#X text 12 65 INLET_0 float;
+#X text 12 85 INLET_1 float;
+#X text 12 105 OUTLET_0 float;
+#X text 12 125 OUTLET_1 float;
+#X text 12 145 OUTLET_2 float;
+#X restore 553 273 pd META;
 #X connect 1 0 10 0;
 #X connect 1 1 11 0;
 #X connect 1 2 12 0;

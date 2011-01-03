@@ -38,6 +38,16 @@
 #X connect 7 0 8 0;
 #X connect 8 0 1 0;
 #X restore 230 158 pd simplecounter;
+#N canvas 379 254 494 344 META 0;
+#X text 12 125 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 45 DESCRIPTION it's the simplest counter there is;
+#X text 12 65 INLET_0 float bang setbang;
+#X text 12 85 OUTLET_0 float;
+#X text 12 5 KEYWORDS control storage;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 105 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X restore 374 240 pd META;
 #X connect 0 0 8 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;

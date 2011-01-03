@@ -1,5 +1,5 @@
-#N canvas 20 27 860 633 10;
-#N canvas 0 22 450 300 graph1 0;
+#N canvas 0 31 860 633 10;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array play-01 209416 float 0;
 #X coords 0 1 209415 -1 750 71 1;
 #X restore 72 34 graph;
@@ -32,7 +32,7 @@
 #X restore 88 329 pd play-01;
 #X obj 88 299 bng 15 250 50 0 empty empty play -6 -10 0 18 -225280
 -1 -90881;
-#X obj 153 315 bng 15 250 50 0 empty bang-load load -4 -6 64 12 -228992
+#X obj 153 315 bng 15 250 50 0 empty bang-load load -4 -6 0 12 -228992
 -1 -1;
 #X floatatom 245 367 5 2 2000 1 ratio ratio_set -;
 #X floatatom 88 469 5 0 0 0 - - -;
@@ -76,17 +76,17 @@
 #X obj 273 428 spigot;
 #X obj 273 396 t f f;
 #X obj 303 412 > 0;
-#N canvas 0 22 450 300 graph1 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array hssc 204 float 0;
 #X coords 0 511 203 0 750 71 1;
 #X restore 72 107 graph;
-#N canvas 0 22 450 300 graph1 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array sssc 204 float 0;
 #X coords 0 511 203 0 750 71 1;
 #X restore 72 193 graph;
 #X obj 273 489 tabwrite sssc;
 #X obj 100 351 dac~;
-#N canvas 0 22 450 300 graph1 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array pointer 204 float 0;
 #X coords 0 1 203 0 750 11 1;
 #X restore 72 180 graph;
@@ -119,6 +119,20 @@ strongest significant spectral component;
 #X msg 559 448 \; pd dsp 1 \; bang-load bang;
 #X text 562 432 start here;
 #X text 563 489 then hit play;
+#N canvas 369 151 494 344 META 0;
+#X text 12 185 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 165 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 5 KEYWORDS signal;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 45 DESCRIPTION the highest significant spectral component
+;
+#X text 12 65 INLET_0 signal;
+#X text 12 85 INLET_1 signal;
+#X text 12 105 INLET_2 float;
+#X text 12 125 OUTLET_0 float;
+#X text 12 145 OUTLET_1 float;
+#X restore 794 598 pd META;
 #X connect 1 0 34 0;
 #X connect 1 0 34 1;
 #X connect 1 0 18 0;

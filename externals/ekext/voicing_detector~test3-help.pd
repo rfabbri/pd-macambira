@@ -1,6 +1,6 @@
-#N canvas 0 0 728 435 10;
+#N canvas 0 31 750 448 10;
 #X floatatom 128 105 5 0 100 2 thresh - -;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array testinput 1.31596e+06 float 2;
 #X coords 0 1 1.31596e+06 -1 300 60 1;
 #X restore 255 18 graph;
@@ -13,9 +13,9 @@
 #X obj 115 41 bng 15 250 50 0 empty empty play 0 -6 0 8 -262144 -1
 -1;
 #X obj 199 54 spigot;
-#X obj 228 39 tgl 15 0 empty empty loop 0 -6 0 8 -262144 -1 -1 1 1
+#X obj 228 39 tgl 15 0 empty empty loop 0 -6 0 8 -262144 -1 -1 0 1
 ;
-#X obj 235 121 tgl 15 0 empty empty on 0 -6 0 8 -262144 -1 -1 1 1;
+#X obj 235 121 tgl 15 0 empty empty on 0 -6 0 8 -262144 -1 -1 0 1;
 #N canvas 0 0 450 300 testload 0;
 #X floatatom 118 256 0 0 0 0 - - -;
 #X obj 118 168 cputime;
@@ -55,11 +55,8 @@
 #X connect 1 0 4 0;
 #X connect 2 0 3 0;
 #X connect 4 0 10 0;
-#X connect 4 2 9 0;
-#X connect 6 0 4 2;
-#X connect 8 0 4 3;
 #X restore 116 136 pd voicingdet~;
-#N canvas 0 0 450 300 graph2 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array voicing 300 float 3;
 #A 0 0 0 0 1 0 0 0 0 1 1 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 0 0 0 0 1 1 1 1 1 1 1
@@ -72,36 +69,31 @@
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 1 1 1 1 1 1 1 0 0 0 1 0;
 #X coords 0 2 299 -1 300 50 1;
 #X restore 254 223 graph;
-#N canvas 0 0 450 300 graph2 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array amdf_pitch 300 float 3;
-#A 0 inf 52.6308 inf inf inf inf inf inf inf 61.6769 inf inf 79.9839
-81.0009 81.3891 80.4557 68.64 64.1892 inf 66.4698 50.6665 inf inf inf
-inf inf inf inf 50.6665 50.6665 50.6665 72.3208 80.0773 72.0166 68.0305
-50.6665 inf inf inf inf inf inf inf 50.6665 inf inf inf inf 50.6665
-inf inf 50.6665 50.6665 inf inf inf 50.6665 77.8829 50.6665 inf 61.011
-63.8438 60.475 54.3953 52.2985 inf 58.8633 51.3383 63.4215 71.0568
-62.7265 70.8633 66.6197 inf 50.6665 inf 55.7069 50.6665 50.6665 50.6665
-inf inf inf inf inf inf inf inf inf 70.4828 68.3603 inf 72.7731 50.6665
-inf 62.1356 inf inf 50.6665 inf inf inf inf inf 50.6665 50.6665 50.6665
-71.1217 75.6314 inf inf inf inf inf inf inf inf 50.6665 inf inf inf
-50.6665 inf inf inf inf inf 78.0763 55.3107 50.6665 inf inf inf 50.6665
-inf 50.6665 inf 50.6665 58.9598 76.4972 76.5862 inf 50.6665 50.6665
-inf inf inf 56.3603 50.6665 inf inf 50.6665 inf inf 50.6665 inf 73.5356
-70.5499 76.0095 inf 50.6665 inf inf 50.9078 inf inf inf inf inf inf
-inf inf inf 63.716 79.2014 76.856 inf inf 80.648 50.6665 50.6665 inf
-50.6665 inf inf inf inf 50.6665 inf inf inf inf inf inf 50.6665 inf
-inf inf inf inf inf inf inf 68.4159 inf 50.6665 81.3498 63.4605 81.0393
-inf inf inf inf inf inf 54.5446 60.9024 50.6665 inf 50.6665 inf inf
-inf inf inf inf inf inf inf 57.4776 63.716 55.3107 inf inf inf inf
-inf inf inf 50.6665 inf 50.6665 inf inf inf 50.6665 50.6665 50.6665
-50.6665 50.6665 inf inf inf inf inf inf inf 69.3891 64.6309 inf 50.6665
-inf inf inf 50.6665 inf inf inf 50.6665 inf inf inf 70.4077 80.6965
-79.0156 80.7342 78.1348 76.2328 78.4102 78.9541 inf inf 50.6665 inf
-inf 50.6665 inf 50.6665 inf 50.6665 inf 67.0773 56.6965 inf inf 50.6665
-50.6665 inf inf inf;
+#A 0 0 52.6308 0 0 0 0 0 0 0 61.6769 0 0 79.9839 81.0009 81.3891 80.4557
+68.64 64.1892 0 66.4698 50.6665 0 0 0 0 0 0 0 50.6665 50.6665 50.6665
+72.3208 80.0773 72.0166 68.0305 50.6665 0 0 0 0 0 0 0 50.6665 0 0 0
+0 50.6665 0 0 50.6665 50.6665 0 0 0 50.6665 77.8829 50.6665 0 61.011
+63.8438 60.475 54.3953 52.2985 0 58.8633 51.3383 63.4215 71.0568 62.7265
+70.8633 66.6197 0 50.6665 0 55.7069 50.6665 50.6665 50.6665 0 0 0 0
+0 0 0 0 0 70.4828 68.3603 0 72.7731 50.6665 0 62.1356 0 0 50.6665 0
+0 0 0 0 50.6665 50.6665 50.6665 71.1217 75.6314 0 0 0 0 0 0 0 0 50.6665
+0 0 0 50.6665 0 0 0 0 0 78.0763 55.3107 50.6665 0 0 0 50.6665 0 50.6665
+0 50.6665 58.9598 76.4972 76.5862 0 50.6665 50.6665 0 0 0 56.3603 50.6665
+0 0 50.6665 0 0 50.6665 0 73.5356 70.5499 76.0095 0 50.6665 0 0 50.9078
+0 0 0 0 0 0 0 0 0 63.716 79.2014 76.856 0 0 80.648 50.6665 50.6665
+0 50.6665 0 0 0 0 50.6665 0 0 0 0 0 0 50.6665 0 0 0 0 0 0 0 0 68.4159
+0 50.6665 81.3498 63.4605 81.0393 0 0 0 0 0 0 54.5446 60.9024 50.6665
+0 50.6665 0 0 0 0 0 0 0 0 0 57.4776 63.716 55.3107 0 0 0 0 0 0 0 50.6665
+0 50.6665 0 0 0 50.6665 50.6665 50.6665 50.6665 50.6665 0 0 0 0 0 0
+0 69.3891 64.6309 0 50.6665 0 0 0 50.6665 0 0 0 50.6665 0 0 0 70.4077
+80.6965 79.0156 80.7342 78.1348 76.2328 78.4102 78.9541 0 0 50.6665
+0 0 50.6665 0 50.6665 0 50.6665 0 67.0773 56.6965 0 0 50.6665 50.6665
+0 0 0;
 #X coords 0 128 299 0 300 50 1;
 #X restore 253 159 graph;
-#N canvas 0 0 450 300 graph2 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array fiddle_pitch 300 float 3;
 #A 0 42.759 42.5032 42.473 54.6862 54.2724 88.0229 88.184 69.9998 46.2469
 46.1609 36.5253 51.6493 56.2251 57.3686 56.4619 54.6808 0 0 54.0894
@@ -197,7 +189,7 @@ inf 50.6665 inf 50.6665 inf 50.6665 inf 67.0773 56.6965 inf inf 50.6665
 #X connect 6 0 1 0;
 #X connect 7 0 1 0;
 #X restore 107 298 pd amgatewrite;
-#N canvas 0 0 450 300 graph2 0;
+#N canvas 0 0 450 300 (subpatch) 0;
 #X array amdf_gated_pitch 300 float 3;
 #A 0 0 0 0 280.892 0 152.595 0 0 0 0 0 0 0 745.652 0 715.135 0 867.135
 0 450 0 807.692 0 295.973 0 210.054 0 0 0 0 0 0 0 0 0 152.595 0 0 0
@@ -220,9 +212,9 @@ inf 50.6665 inf 50.6665 inf 50.6665 inf 67.0773 56.6965 inf inf 50.6665
 #X obj 106 322 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 105 378 s \$0-reset_counters;
-#X obj 593 56 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+#X obj 593 56 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
-#X msg 594 99 \; pd dsp \$1;
+#X msg 593 89 \; pd dsp \$1;
 #X msg 104 352 0;
 #X obj 575 326 soundfiler;
 #X obj 575 277 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -238,6 +230,19 @@ inf 50.6665 inf 50.6665 inf 50.6665 inf 67.0773 56.6965 inf inf 50.6665
 #X floatatom 36 265 5 0 0 0 - - -;
 #X obj 17 314 -;
 #X floatatom 16 339 5 0 0 0 - - -;
+#N canvas 379 254 494 344 META 0;
+#X text 12 165 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 5 KEYWORDS signal analysis;
+#X text 12 45 DESCRIPTION find a zero-crossing point within a dsp block
+;
+#X text 12 145 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 65 INLET_0 signal bang mode;
+#X text 12 85 INLET_1 float;
+#X text 12 105 OUTLET_0 float;
+#X text 12 125 OUTLET_1 float;
+#X text 12 25 LICENSE GPL v3;
+#X restore 688 400 pd META;
 #X connect 0 0 12 1;
 #X connect 2 0 12 0;
 #X connect 2 0 35 0;

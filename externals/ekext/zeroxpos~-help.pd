@@ -1,4 +1,4 @@
-#N canvas 0 0 603 357 10;
+#N canvas 0 31 603 357 10;
 #X obj 251 132 block~ 256;
 #X obj 144 150 zeroxpos~ 3;
 #X obj 40 150 zeroxpos~ -3;
@@ -78,6 +78,19 @@ of zero crossing.;
 #X text 424 150 look for zero-crossings \,;
 #X text 431 163 and output those stored;
 #X text 437 175 in memory when banged.;
+#N canvas 379 254 494 344 META 0;
+#X text 12 165 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 5 KEYWORDS signal analysis;
+#X text 12 45 DESCRIPTION find a zero-crossing point within a dsp block
+;
+#X text 12 145 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 65 INLET_0 signal bang mode;
+#X text 12 85 INLET_1 float;
+#X text 12 105 OUTLET_0 float;
+#X text 12 125 OUTLET_1 float;
+#X text 12 25 LICENSE GPL v3;
+#X restore 544 330 pd META;
 #X connect 1 0 6 0;
 #X connect 1 1 24 0;
 #X connect 2 0 5 0;

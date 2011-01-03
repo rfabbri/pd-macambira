@@ -1,4 +1,4 @@
-#N canvas 0 0 849 300 10;
+#N canvas 0 31 709 300 10;
 #X obj 141 151 listmoses;
 #X floatatom 287 137 5 0 0 0 - - -;
 #X floatatom 324 137 5 0 0 0 - - -;
@@ -20,6 +20,25 @@ contained within the first list. When used with binline~ it can be
 used to isolate particular frequency/amplitude lists where the frequencies
 are constrained \, or where the amplitudes are constrained (when used
 with _swap_).;
+#N canvas 159 147 507 333 META 0;
+#X text 12 295 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 275 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 45 DESCRIPTION split two lists up according to the values
+contained within the first list;
+#X text 12 75 INLET_0 list;
+#X text 12 95 INLET_1 list;
+#X text 12 115 INLET_2 float;
+#X text 12 135 INLET_3 float;
+#X text 12 155 OUTLET_0 list;
+#X text 12 175 OUTLET_1 list;
+#X text 12 195 OUTLET_2 list;
+#X text 12 215 OUTLET_3 list;
+#X text 12 235 OUTLET_4 list;
+#X text 12 255 OUTLET_5 list;
+#X text 12 5 KEYWORDS control list_op;
+#X restore 650 270 pd META;
 #X connect 0 0 9 0;
 #X connect 0 1 10 0;
 #X connect 0 2 11 0;

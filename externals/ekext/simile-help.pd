@@ -1,4 +1,4 @@
-#N canvas 0 0 719 285 10;
+#N canvas 0 31 653 285 10;
 #X floatatom 29 62 5 0 0 3 in-1 #0-sim-1-in-1 -;
 #X floatatom 95 63 5 0 0 3 in-2 #0-sim-1-in-2 -;
 #X floatatom 144 99 5 0 0 3 window #0-sim-1-win -;
@@ -26,6 +26,20 @@ is a 1 If thetwo numbers differ by the value of the error window then
 the output is 0.5. The second outlet is the sign \, so that if i1 >=
 i2 it is a 1 and if i1 < i2 it is a -1;
 #X text 262 114 useful for comparing pitches \, durations etc.;
+#N canvas 415 266 494 265 META 0;
+#X text 12 185 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 165 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 5 KEYWORDS control;
+#X text 12 45 DESCRIPTION compare two numbers according to an error
+window;
+#X text 12 65 INLET_0 float;
+#X text 12 85 INLET_1 float;
+#X text 12 105 INLET_2 float;
+#X text 12 125 OUTLET_0 float;
+#X text 12 145 OUTLET_1 float;
+#X restore 597 257 pd META;
 #X connect 0 0 4 0;
 #X connect 1 0 4 1;
 #X connect 2 0 4 2;

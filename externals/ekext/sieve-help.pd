@@ -1,4 +1,4 @@
-#N canvas 439 25 595 461 10;
+#N canvas 0 31 595 504 10;
 #X obj 94 346 sieve;
 #X msg 147 276 set 2 1;
 #X msg 198 276 set 7 0.86;
@@ -94,6 +94,19 @@ is wrapped and the lowest or highest is chosen respectively.;
 #X connect 11 0 0 0;
 #X connect 13 0 0 0;
 #X restore 325 298 pd register_functions;
+#N canvas 379 254 494 344 META 0;
+#X text 12 185 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 165 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 5 KEYWORDS signal needs_work (description);
+#X text 12 45 DESCRIPTION needs a description;
+#X text 12 65 INLET_0 signal;
+#X text 12 85 INLET_1 float;
+#X text 12 105 INLET_2 float;
+#X text 12 125 OUTLET_0 list;
+#X text 12 145 OUTLET_1 list;
+#X restore 538 474 pd META;
 #X connect 0 0 6 0;
 #X connect 0 1 7 0;
 #X connect 0 2 8 0;

@@ -1,4 +1,4 @@
-#N canvas 0 0 785 462 10;
+#N canvas 0 31 726 429 10;
 #X obj 76 256 polystat;
 #X floatatom 76 351 5 0 0 1 voice - -;
 #X floatatom 88 337 5 0 0 1 instances - -;
@@ -57,6 +57,21 @@ updated when another voice's instances exceed;
 #X obj 515 24 maskxor;
 #X text 44 389 Polyphony control objects by Ed Kelly \, November 2006
 ;
+#N canvas 379 254 494 344 META 0;
+#X text 12 205 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 185 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 5 KEYWORDS control MIDI;
+#X text 12 45 DESCRIPTION outpu statistics about voice usage;
+#X text 12 65 INLET_0 float mode clear print getmap voices clearall
+;
+#X text 12 85 OUTLET_0 float;
+#X text 12 105 OUTLET_1 float;
+#X text 12 125 OUTLET_2 float;
+#X text 12 145 OUTLET_3 float;
+#X text 12 165 OUTLET_4 list;
+#X restore 666 401 pd META;
 #X connect 0 0 1 0;
 #X connect 0 1 2 0;
 #X connect 0 2 3 0;

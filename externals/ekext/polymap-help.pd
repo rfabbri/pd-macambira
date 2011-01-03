@@ -1,4 +1,4 @@
-#N canvas 0 0 690 434 10;
+#N canvas 0 31 690 434 10;
 #X obj 502 26 sieve;
 #X obj 545 26 maskxor;
 #X obj 26 26 polymap;
@@ -39,6 +39,21 @@ be stored until one is set to 0 again.;
 #X text 23 100 Values are stored as messages in the form [note x y
 value( where value is either 0 or some other value.;
 #X text 217 147 noteoffs;
+#N canvas 346 235 494 344 META 0;
+#X text 12 205 HELP_PATCH_AUTHORS Ed Kelly. Revised by Jonathan Wilkes
+for Pd-extended 0.42 to conform to the PDDP template.;
+#X text 12 25 LICENSE GPL v3;
+#X text 12 185 AUTHOR Ed Kelly <morph_2016@yahoo.co.uk>;
+#X text 12 5 KEYWORDS control MIDI;
+#X text 12 45 DESCRIPTION two-dimensional polypony-resetricted map
+;
+#X text 12 65 INLET_0 note clear print print32;
+#X text 12 85 INLET_1 float;
+#X text 12 105 OUTLET_0 float;
+#X text 12 125 OUTLET_1 float;
+#X text 12 145 OUTLET_2 float;
+#X text 12 165 OUTLET_3 list;
+#X restore 624 404 pd META;
 #X connect 6 0 7 1;
 #X connect 7 0 18 0;
 #X connect 7 1 12 0;
