@@ -1,4 +1,4 @@
-## Pd library template version 1.0.6
+## Pd library template version 1.0.7
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = libdir
@@ -109,6 +109,25 @@ ifeq ($(UNAME),Darwin)
     pkglibdir=$(HOME)/Library/Pd
   endif
 endif
+# Tho Android uses Linux, we use this fake uname to provide an easy way to
+# setup all this things needed to cross-compile for Android using the NDK
+ifeq ($(UNAME),ANDROID)
+  CPU := arm
+  SOURCES += $(SOURCES_android)
+  EXTENSION = pd_linux
+  OS = android
+  PD_PATH = /usr
+  NDK_BASE=/usr/local/android-ndk
+  NDK_SYSROOT=$(NDK_BASE)/platforms/android-5/arch-arm
+  NDK_TOOLCHAIN=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86
+  CC=$(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-gcc
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += -fPIC -I$(NDK_SYSROOT)/usr/include
+  LDFLAGS += -Wl,--export-dynamic -L$(NDK_SYSROOT)/usr/lib -shared -fPIC
+  LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
 ifeq ($(UNAME),Linux)
   CPU := $(shell uname -m)
   SOURCES += $(SOURCES_linux)
@@ -169,7 +188,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   EXTENSION = dll
   OS = windows
   PD_PATH = $(shell cd "$(PROGRAMFILES)"/pd && pwd)
-  OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -march=i686 -mtune=pentium4
+  OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
   CFLAGS += -mms-bitfields
   LDFLAGS += -s -shared -Wl,--enable-auto-import
   LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
@@ -178,7 +197,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
 endif
 
 # in case somebody manually set the HELPPATCHES above
-HELPPATCHES ?= $(SOURCES:.c=-help.pd) $(PDOBJECTS:.c=-help.pd)
+HELPPATCHES ?= $(SOURCES:.c=-help.pd) $(PDOBJECTS:.pd=-help.pd)
 
 CFLAGS += $(OPT_CFLAGS)
 
@@ -260,6 +279,14 @@ distclean: clean
 
 $(DISTBINDIR):
 	$(INSTALL_DIR) $(DISTBINDIR)
+
+#libdir: all $(DISTBINDIR)
+#	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd  $(DISTBINDIR)
+#	$(INSTALL_DATA) $(SOURCES)  $(DISTBINDIR)
+#	$(INSTALL_DATA) $(HELPPATCHES) $(DISTBINDIR)
+#	test -z "$(strip $(EXTRA_DIST))" || \
+#		$(INSTALL_DATA) $(EXTRA_DIST)    $(DISTBINDIR)
+#	tar --exclude-vcs -czpf $(DISTBINDIR).tar.gz $(DISTBINDIR)
 
 $(DISTDIR):
 	$(INSTALL_DIR) $(DISTDIR)
