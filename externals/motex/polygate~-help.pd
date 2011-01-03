@@ -1,4 +1,4 @@
-#N canvas 25 21 986 603 10;
+#N canvas 0 31 986 603 10;
 #X obj 162 342 s tone1;
 #N canvas 78 354 600 400 tone2 0;
 #X obj 124 205 outlet~;
@@ -8,7 +8,7 @@
 #X connect 2 0 1 0;
 #X connect 3 0 0 0;
 #X restore 146 148 pd tone2;
-#N canvas 0 0 600 400 tone3 0;
+#N canvas 0 31 600 400 tone3 0;
 #X obj 124 205 outlet~;
 #X obj 258 182 switch~ 0;
 #X obj 266 141 r tone3;
@@ -88,7 +88,7 @@
 #X obj 267 365 s tone8;
 #X obj 317 365 s tone9;
 #X obj 368 365 s tone10;
-#X floatatom -90 333 0 0 0;
+#X floatatom -90 333 0 0 0 0 - - -;
 #N canvas 159 26 495 270 output 0;
 #X obj 338 160 t b;
 #X obj 338 110 f;
@@ -158,10 +158,10 @@
 #X text 25 95 zero = off;
 #X obj -183 355 loadbang;
 #X msg -183 378 86;
-#X floatatom -220 72 8 0 0;
-#X floatatom -19 90 4 0 10;
+#X floatatom -220 72 8 0 0 0 - - -;
+#X floatatom -19 90 4 0 10 0 - - -;
 #X msg -19 113 choice \$1;
-#X floatatom -216 207 8 0 0;
+#X floatatom -216 207 8 0 0 0 - - -;
 #X msg -220 110 ftime-epower \$1;
 #X msg -216 239 ftime-linear \$1;
 #X text -220 38 change fade-time;
@@ -169,10 +169,10 @@
 #X text -218 172 change fade-time;
 #X text -218 185 linear;
 #X obj -19 -9 metro 80;
-#X floatatom -19 -30 4 0 0;
-#X floatatom 36 -29 4 0 0;
+#X floatatom -19 -30 4 0 0 0 - - -;
+#X floatatom 36 -29 4 0 0 0 - - -;
 #X msg 75 -26 1000;
-#X floatatom -237 8 8 0 0;
+#X floatatom -237 8 8 0 0 0 - - -;
 #X obj -19 14 shuffle 1 10 0.25;
 #X msg -252 -26 200;
 #X msg -218 -25 199;
@@ -191,10 +191,23 @@
 #X msg -99 212 3000;
 #X text 424 436 IM 2001;
 #X msg -162 -86 1000;
-#X obj -87 -40 vslider 15 128 0 10 0 1 choice aaa choice 8 -8 1 10 8 18 18 5300;
+#X obj -87 -40 vsl 15 128 0 10 0 1 choice aaa choice 8 -8 1 10 -228992
+-62784 -62784 5300 1;
 #X msg -160 -39 10000;
-#X floatatom 163 61 4 0 10;
+#X floatatom 163 61 4 0 10 0 - - -;
 #X obj 142 31 r choice;
+#N canvas 649 250 494 344 META 0;
+#X text 12 165 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 105 OUTLET_0 signal;
+#X text 12 25 LICENSE GPL;
+#X text 12 5 KEYWORDS signal;
+#X text 12 145 AUTHOR Iain Mott (iain.mott@bigpond.com);
+#X text 12 45 DESCRIPTION switch between signal inputs;
+#X text 12 65 INLET_0 signal ftime-epower ftime-linear choice;
+#X text 12 85 INLET_N signal;
+#X text 12 125 OUTLET_N float;
+#X restore 665 475 pd META;
 #X connect 1 0 64 1;
 #X connect 2 0 64 2;
 #X connect 3 0 64 3;
