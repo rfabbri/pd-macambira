@@ -1,4 +1,4 @@
-#N canvas 711 171 496 439 10;
+#N canvas 1 53 496 439 10;
 #X obj 30 75 inlet;
 #X obj 25 300 outlet;
 #X text 73 300 output range: 0 to 1;

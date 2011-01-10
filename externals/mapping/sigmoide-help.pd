@@ -1,4 +1,4 @@
-#N canvas 286 139 632 475 10;
+#N canvas 1 53 632 475 10;
 #X floatatom 82 95 5 0 0 0 - - -;
 #X floatatom 82 167 5 0 0 0 - - -;
 #X floatatom 133 95 5 0 0 0 - - -;
@@ -55,6 +55,18 @@
 #X obj 262 294 multi_slider 100;
 #X obj 262 241 sigmoide;
 #X msg 262 96 0.5;
+#N canvas 485 108 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 85 INLET_1 float;
+#X text 12 125 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 65 INLET_0 float;
+#X text 12 105 OUTLET_0 float;
+#X text 12 45 DESCRIPTION;
+#X text 12 5 KEYWORDS control abstraction needs_work (DESCRIPTION?)
+;
+#X restore 574 445 pd META;
 #X connect 0 0 9 0;
 #X connect 2 0 9 1;
 #X connect 3 0 4 0;

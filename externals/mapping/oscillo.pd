@@ -1,4 +1,4 @@
-#N canvas 510 170 719 206 10;
+#N canvas 1 53 719 206 10;
 #N canvas 0 0 450 300 (subpatch) 0;
 #X array \$0-_ 100 float 2;
 #X coords 0 1 100 0 200 127 1;

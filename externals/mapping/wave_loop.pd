@@ -1,4 +1,4 @@
-#N canvas 427 93 861 865 10;
+#N canvas 1 53 828 582 10;
 #X obj 68 41 inlet;
 #X obj 271 47 inlet;
 #X obj 446 46 inlet;

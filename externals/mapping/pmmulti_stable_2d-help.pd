@@ -1,17 +1,17 @@
-#N canvas 604 59 724 805 10;
-#X text 122 399 outlet 1 : position of masses;
-#X obj 54 511 gemhead;
-#X obj 54 429 t b l;
-#X obj 54 606 translateXYZ;
-#X obj 112 537 unpack f f f;
-#X obj 112 582 * 4;
-#X obj 151 583 * 4;
+#N canvas 1 53 681 593 10;
+#X text 102 346 outlet 1 : position of masses;
+#X obj 54 451 gemhead;
+#X obj 54 369 t b l;
+#X obj 54 546 translateXYZ;
+#X obj 112 477 unpack f f f;
+#X obj 112 522 * 4;
+#X obj 151 523 * 4;
 #X obj 458 526 gemwin;
 #X msg 458 474 create \, 1;
 #X msg 475 497 destroy;
-#X obj 70 455 loadbang;
-#X msg 70 478 0;
-#X obj 54 632 square 0.1;
+#X obj 70 395 loadbang;
+#X msg 70 418 0;
+#X obj 54 572 square 0.1;
 #X obj 164 30 vsl 15 128 -1 1 0 0 empty empty empty 0 -8 0 8 -262144
 -1 -1 0 0;
 #X obj 371 13 gcanvas 100 100;
@@ -26,25 +26,37 @@
 #X obj 371 189 t l b;
 #X msg 401 262 0;
 #X msg 401 287 grab_on \$1;
-#X msg 164 182 force \$1 0;
-#X msg 215 204 force 0 \$1;
-#X obj 47 275 metro 50;
-#X obj 47 251 loadbang;
+#X msg 164 172 force \$1 0;
+#X msg 215 194 force 0 \$1;
+#X obj 47 235 metro 50;
+#X obj 47 211 loadbang;
 #X obj 401 236 delay 200;
 #X msg 435 263 0.3;
-#X text 262 366 arguments : number of stable point \, rigidity \, damping
+#X text 262 326 arguments : number of stable point \, rigidity \, damping
 ;
-#X obj 96 204 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 96 164 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X msg 115 481 1;
-#X obj 32 299 gemhead;
-#X obj 34 323 b;
-#X obj 54 367 pmmulti_stable_2d 9 0.1 0.1;
-#X obj 195 589 cart2pol;
-#X floatatom 195 623 5 0 0 0 - - -;
-#X floatatom 236 623 5 0 0 0 - - -;
-#X text 202 643 r;
-#X text 247 645 phy;
+#X msg 115 421 1;
+#X obj 32 259 gemhead;
+#X obj 34 283 b;
+#X obj 54 327 pmmulti_stable_2d 9 0.1 0.1;
+#X obj 195 529 cart2pol;
+#X floatatom 195 563 5 0 0 0 - - -;
+#X floatatom 236 563 5 0 0 0 - - -;
+#X text 202 583 r;
+#X text 247 585 phy;
+#N canvas 537 151 494 344 META 0;
+#X text 12 165 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 145 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 45 DESCRIPTION;
+#X text 12 105 INLET_2 float;
+#X text 12 125 OUTLET_0 list;
+#X text 12 5 KEYWORDS control abstraction;
+#X text 12 65 INLET_0 bang force grab grab_on;
+#X text 12 85 INLET_1 float;
+#X restore 623 581 pd META;
 #X connect 1 0 3 0;
 #X connect 2 0 1 0;
 #X connect 2 1 4 0;

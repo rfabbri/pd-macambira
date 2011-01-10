@@ -1,4 +1,4 @@
-#N canvas 344 120 833 405 10;
+#N canvas 1 53 833 405 10;
 #X text 267 23 correlation of 2 diferents streams;
 #X obj 49 192 resample 20;
 #X obj 49 219 t f f;
@@ -39,6 +39,17 @@
 #X obj 380 166 / 100;
 #X obj 473 166 / 100;
 #X text 281 44 0 = no correlation \, 1 ou -1 = high correlation;
+#N canvas 541 232 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 85 INLET_1 float;
+#X text 12 105 OUTLET_0 float;
+#X text 12 125 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 65 INLET_0 float;
+#X text 12 5 KEYWORDS control abstraction;
+#X text 12 45 DESCRIPTION correlation of 2 diferents streams;
+#X restore 773 376 pd META;
 #X connect 1 0 2 0;
 #X connect 2 0 7 0;
 #X connect 2 1 7 1;

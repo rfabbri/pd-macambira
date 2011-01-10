@@ -1,4 +1,4 @@
-#N canvas 0 0 450 300 10;
+#N canvas 1 53 450 300 10;
 #X obj 80 47 inlet;
 #X obj 150 49 inlet;
 #X obj 80 129 abs;

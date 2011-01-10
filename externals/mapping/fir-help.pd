@@ -1,4 +1,5 @@
-#N canvas 141 49 630 490 10;
+#N canvas 2 53 630 490 10;
+#X declare -lib iemmatrix;
 #X obj 174 76 loadbang;
 #X text 97 58 data;
 #X obj 93 161 t f f;
@@ -16,6 +17,17 @@
 #X text 67 407 For more info on FIR:;
 #X text 183 188 the argument is the number of co-efficients;
 #X text 328 112 these are a list of co-efficients;
+#N canvas 464 140 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 105 OUTLET_0 float;
+#X text 12 125 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 65 INLET_0 float;
+#X text 12 5 KEYWORDS control abstraction filter;
+#X text 12 45 DESCRIPTION;
+#X text 12 85 INLET_1 list;
+#X restore 573 459 pd META;
 #X connect 0 0 6 0;
 #X connect 2 0 7 0;
 #X connect 2 1 9 0;

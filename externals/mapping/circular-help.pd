@@ -1,4 +1,4 @@
-#N canvas 399 232 494 437 10;
+#N canvas 1 53 494 463 10;
 #X obj 5 2 cnv 15 450 20 empty empty circular 2 11 1 18 -233017 -66577
 0;
 #X msg 422 3 pddp;
@@ -98,7 +98,7 @@
 #X text 6 391 (C) Copyright 2007 Free Software Foundation;
 #X obj 15 207 circular;
 #X obj 262 103 gcanvas 200 200;
-#N canvas 0 22 450 300 graph1 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array \$0-curve 200 float 0;
 #X coords 0 1 199 0 200 200 1;
 #X restore 262 103 graph;
@@ -106,6 +106,17 @@
 #X obj 404 307 send \$0-y;
 #X text 17 39 This object curves the input range using a double-circular
 seat controlled by one parameter.;
+#N canvas 498 82 494 344 META 0;
+#X text 12 135 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 95 OUTLET_0 float;
+#X text 12 115 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 75 INLET_0 float;
+#X text 12 5 KEYWORDS control abstraction;
+#X text 12 45 DESCRIPTION curve the input range using a double-circular
+seat controlled by one parameter;
+#X restore 442 431 pd META;
 #X connect 4 0 11 0;
 #X connect 5 0 6 0;
 #X connect 7 0 4 0;

@@ -1,4 +1,4 @@
-#N canvas 0 0 462 312 10;
+#N canvas 1 53 462 312 10;
 #X obj 64 57 inlet;
 #X obj 144 56 inlet;
 #X obj 64 179 maximum;

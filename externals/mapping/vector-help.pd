@@ -1,4 +1,4 @@
-#N canvas 396 48 484 395 10;
+#N canvas 1 53 484 395 10;
 #X obj 5 2 cnv 15 450 20 empty empty vector 2 11 1 18 -233017 -66577
 0;
 #X floatatom 100 248 5 0 0 0 x - -;
@@ -28,6 +28,20 @@
 #X text 17 29 Converts cartesian coordinates(x \, y) to polar coordinates
 (radius \, angle). The angle is in radians (-pi to pi).;
 #X obj 100 295 vector;
+#N canvas 465 169 494 344 META 0;
+#X text 12 185 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 125 OUTLET_0 float;
+#X text 12 165 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 5 KEYWORDS control abstraction;
+#X text 12 45 DESCRIPTION convert cartesian coordinates(x \, y) to
+polar coordinates (radius \, angle). The angle is in radians (-pi to
+pi);
+#X text 12 85 INLET_0 float;
+#X text 12 105 INLET_1 float;
+#X text 12 145 OUTLET_1 float;
+#X restore 424 362 pd META;
 #X connect 1 0 16 0;
 #X connect 6 0 7 0;
 #X connect 7 0 1 0;

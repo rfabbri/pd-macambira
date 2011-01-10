@@ -1,4 +1,4 @@
-#N canvas 189 157 645 439 10;
+#N canvas 1 53 645 439 10;
 #X text 28 331 output range: 0 to 1;
 #X text 28 41 input range: 0 to 1;
 #X text 11 5 [hid_polar];

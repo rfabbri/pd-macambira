@@ -1,5 +1,5 @@
-#N canvas 654 331 475 374 10;
-#X obj 241 157 mapping/timeroll;
+#N canvas 1 53 475 391 10;
+#X obj 242 157 mapping/timeroll;
 #X obj 20 157 mapping/timeroll;
 #X obj 40 333 pddp/pddplink http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc431.htm
 ;
@@ -30,6 +30,17 @@
 #X text 23 14 Single Exponential Smoothing (ses);
 #X obj 241 117 smooth;
 #X text 329 114 (default: 0.15);
+#N canvas 471 343 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 125 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 105 OUTLET_0 float;
+#X text 12 65 INLET_0 float;
+#X text 12 45 DESCRIPTION single exponential smoothing (ses);
+#X text 12 85 INLET_1 float;
+#X text 12 5 KEYWORDS control abstraction;
+#X restore 419 364 pd META;
 #X connect 3 0 1 0;
 #X connect 3 0 9 0;
 #X connect 4 0 3 0;

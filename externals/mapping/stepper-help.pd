@@ -1,4 +1,4 @@
-#N canvas 263 162 512 393 10;
+#N canvas 1 53 512 393 10;
 #X obj 5 2 cnv 15 450 20 empty empty stepper 2 11 1 18 -233017 -66577
 0;
 #X msg 422 3 pddp;
@@ -11,7 +11,7 @@
 -1 -1 0 1;
 #X obj 28 113 hsl 200 15 0 1 0 0 empty empty empty 22 8 1 12 -225271
 -1 -1 0 1;
-#N canvas 0 22 450 300 graph1 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array \$0_ 200 float 0;
 #X coords 0 1 199 0 200 200 1;
 #X restore 261 111 graph;
@@ -59,12 +59,25 @@
 #X restore 321 79 pd draw_array;
 #X msg 321 59 bang;
 #X obj 72 199 hsl 128 15 -1 1 0 0 \$0-type empty curve_factor 5 8 1
-11 -257472 -1 -1 8000 1;
+11 -257472 -1 -1 0 1;
 #X floatatom 81 219 5 0 0 0 - - -;
 #X obj 25 243 stepper;
 #X obj 50 159 hsl 128 15 1 64 0 1 \$0-segments empty segments 5 8 1
 11 -262131 -1 -1 2217 1;
 #X floatatom 56 180 5 0 0 0 - - -;
+#N canvas 470 314 494 344 META 0;
+#X text 12 185 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 35 LICENSE GPL v2;
+#X text 12 165 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 55 DESCRIPTION;
+#X text 12 5 KEYWORDS control abstraction needs_work (DESCRIPTION?)
+;
+#X text 12 85 INLET_0 float;
+#X text 12 105 INLET_1 float;
+#X text 12 125 INLET_2 float;
+#X text 12 145 OUTLET_0 float;
+#X restore 455 363 pd META;
 #X connect 4 0 13 0;
 #X connect 5 0 6 0;
 #X connect 7 0 4 0;

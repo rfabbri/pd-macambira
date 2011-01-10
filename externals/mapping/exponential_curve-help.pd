@@ -1,4 +1,4 @@
-#N canvas 75 55 502 438 10;
+#N canvas 1 53 502 454 10;
 #X obj 5 -3 cnv 15 450 20 empty empty exponential_curve 2 11 1 18 -233017
 -66577 0;
 #X msg 422 -2 pddp;
@@ -98,19 +98,31 @@
 #X obj 262 354 pddp/open mapping-about;
 #X text 16 386 (C) Copyright 2007 Free Software Foundation;
 #X obj 272 98 gcanvas 200 200;
-#N canvas 0 22 450 300 graph1 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array \$0-curve 200 float 0;
 #X coords 0 1 199 0 200 200 1;
 #X restore 272 98 graph;
 #X obj 272 303 send \$0-x;
 #X obj 414 302 send \$0-y;
 #X obj 127 163 hsl 50 15 0 1 0 0 \$0-x-slider \$0-x-slider-receive
-x 5 9 0 11 -232576 -1 -1 1617 0;
+x 5 9 0 11 -232576 -1 -1 0 0;
 #X floatatom 133 183 7 0 0 0 - - -;
 #X text 17 34 This object curves the input range using a double-exponential
 seat controlled by one parameter.;
 #X obj 25 212 exponential_curve;
 #X text 15 71 (click in the gray area to play);
+#N canvas 465 169 494 344 META 0;
+#X text 12 155 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 95 INLET_1 float;
+#X text 12 115 OUTLET_0 float;
+#X text 12 135 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 75 INLET_0 float;
+#X text 12 5 KEYWORDS control abstraction;
+#X text 12 45 DESCRIPTION curve the input range using a double-exponential
+seat controlled by one parameter;
+#X restore 440 420 pd META;
 #X connect 4 0 18 0;
 #X connect 5 0 6 0;
 #X connect 7 0 4 0;

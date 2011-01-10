@@ -1,4 +1,5 @@
-#N canvas 511 22 572 442 12;
+#N canvas 1 53 572 468 12;
+#X declare -lib mapping -lib ggee;
 #X obj 410 58 import mapping ggee;
 #X obj 5 2 cnv 15 550 20 empty empty quadratic 2 11 1 18 -233017 -66577
 0;
@@ -110,7 +111,7 @@ y 5 9 0 11 -204800 -1 -1 4778 0;
 #X connect 18 0 8 0;
 #X restore 305 58 pd draw_array;
 #X obj 304 103 gcanvas 200 200;
-#N canvas 0 22 450 300 graph1 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array \$0-curve 200 float 0;
 #X coords 0 1 199 0 200 200 1;
 #X restore 304 103 graph;
@@ -121,6 +122,19 @@ curve.;
 #X obj 220 347 pddp/pddplink http://www.tinaja.com/text/bezmath.html
 ;
 #X obj 35 218 quadratic;
+#N canvas 464 140 494 344 META 0;
+#X text 12 175 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 95 INLET_1 float;
+#X text 12 135 OUTLET_0 float;
+#X text 12 155 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 75 INLET_0 float;
+#X text 12 5 KEYWORDS control abstraction;
+#X text 12 45 DESCRIPTION curve the input range using a quadratic bezier
+curve;
+#X text 12 115 INLET_2 float;
+#X restore 495 429 pd META;
 #X connect 5 0 22 0;
 #X connect 6 0 7 0;
 #X connect 8 0 5 0;

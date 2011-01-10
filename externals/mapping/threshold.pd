@@ -1,4 +1,4 @@
-#N canvas 696 98 414 380 10;
+#N canvas 1 53 414 380 10;
 #X obj 55 21 inlet;
 #X obj 162 104 inlet;
 #X text 204 105 valeur seuil;

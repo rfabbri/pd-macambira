@@ -1,4 +1,4 @@
-#N canvas 608 255 867 373 10;
+#N canvas 1 53 867 394 10;
 #X obj 231 157 mapping/timeroll;
 #X obj 20 157 mapping/timeroll;
 #N canvas 0 22 450 300 get 0;
@@ -19,10 +19,10 @@
 #X connect 7 0 3 0;
 #X connect 7 1 6 0;
 #X restore 278 72 pd get mouse Y;
-#X obj 278 50 tgl 15 0 empty empty empty 17 7 0 10 -204786 -1 -1 1
+#X obj 278 50 tgl 15 0 empty empty empty 17 7 0 10 -204786 -1 -1 0
 1;
 #X obj 401 57 hsl 60 15 0 1 0 0 empty empty alpha -2 -8 0 10 -262130
--1 -1 1900 1;
+-1 -1 0 1;
 #X floatatom 398 77 5 0 0 0 - - -;
 #X obj 441 157 mapping/timeroll;
 #X obj 651 157 mapping/timeroll;
@@ -42,8 +42,24 @@
 -1 -1 0 1;
 #X floatatom 538 77 5 0 0 0 - - -;
 #X obj 611 57 hsl 60 15 1 20 0 0 empty empty number_of_periods -2 -8
-0 10 -262130 -1 -1 2300 1;
+0 10 -262130 -1 -1 0 1;
 #X floatatom 608 77 5 0 0 0 - - -;
+#N canvas 433 331 494 344 META 0;
+#X text 12 245 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 85 INLET_1 float;
+#X text 12 165 OUTLET_0 float;
+#X text 12 225 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 65 INLET_0 float;
+#X text 12 5 KEYWORDS control abstraction;
+#X text 12 45 DESCRIPTION triple exponential smoothing (tes);
+#X text 12 105 INLET_2 float;
+#X text 12 125 INLET_3 float;
+#X text 12 145 INLET_4 float;
+#X text 12 185 OUTLET_1 float;
+#X text 12 205 OUTLET_2 float;
+#X restore 805 366 pd META;
 #X connect 2 0 1 0;
 #X connect 2 0 9 0;
 #X connect 3 0 2 0;

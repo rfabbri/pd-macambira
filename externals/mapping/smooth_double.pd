@@ -1,4 +1,4 @@
-#N canvas 860 490 765 388 10;
+#N canvas 1 53 765 388 10;
 #X obj 61 6 inlet;
 #X obj 300 6 inlet;
 #X obj 300 60 purepd/float_argument \$1 0.15;

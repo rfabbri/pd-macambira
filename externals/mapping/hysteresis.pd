@@ -1,4 +1,4 @@
-#N canvas 456 266 266 359 10;
+#N canvas 1 53 266 359 10;
 #X obj 117 144 moses 0;
 #X obj 87 92 t f f;
 #X obj 117 121 -;

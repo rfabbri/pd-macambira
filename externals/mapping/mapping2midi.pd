@@ -1,4 +1,4 @@
-#N canvas 0 22 454 304 10;
+#N canvas 1 53 454 304 10;
 #X obj 132 34 inlet;
 #X obj 133 222 outlet;
 #X text 182 222 7 bit integer (0-127);

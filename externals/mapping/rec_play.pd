@@ -1,4 +1,4 @@
-#N canvas 342 400 1018 507 10;
+#N canvas 1 53 946 507 10;
 #X obj 41 469 outlet;
 #X obj 79 217 table \$0-rec \$1;
 #X obj 199 21 inlet;

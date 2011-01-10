@@ -1,4 +1,4 @@
-#N canvas 0 0 450 300 10;
+#N canvas 1 53 450 300 10;
 #X obj 37 19 inlet;
 #X obj 37 241 outlet;
 #X obj 37 168 expr ( exp($f1)) / ( 1 + exp($f1));

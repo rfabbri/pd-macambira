@@ -1,4 +1,4 @@
-#N canvas 423 121 821 592 10;
+#N canvas 1 53 821 556 10;
 #X obj 68 174 t f f;
 #X floatatom 338 197 5 0 0 0 - - -;
 #X text 333 174 order: n;
@@ -17,6 +17,18 @@ n;
 #X text 310 131 mode 1 : slow \, but accurate;
 #X text 310 115 mode 0 (defult) : fast but inanuracy can grow with
 time;
+#N canvas 497 278 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 105 OUTLET_0 float;
+#X text 12 125 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 5 KEYWORDS control abstraction filter;
+#X text 12 45 DESCRIPTION compute a fir low pass mean filter of order
+n;
+#X text 12 65 INLET_0 float mode;
+#X text 12 85 INLET_1 float;
+#X restore 761 521 pd META;
 #X connect 0 0 4 0;
 #X connect 0 0 7 0;
 #X connect 0 1 10 0;

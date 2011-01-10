@@ -1,4 +1,4 @@
-#N canvas 677 121 475 375 10;
+#N canvas 1 53 475 375 10;
 #X obj 37 303 outlet;
 #X text 75 268 min;
 #X obj 37 268 float;

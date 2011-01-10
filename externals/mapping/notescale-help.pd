@@ -1,8 +1,8 @@
-#N canvas 577 303 464 467 10;
+#N canvas 1 53 464 489 10;
 #X floatatom 26 85 5 0 0 0 - - -;
 #X floatatom 26 160 0 0 0 0 - - -;
-#X obj 2 2 cnv 15 450 20 empty empty notescale 2 11 1 18 -233017
--66577 0;
+#X obj 2 2 cnv 15 450 20 empty empty notescale 2 11 1 18 -233017 -66577
+0;
 #X msg 418 3 pddp;
 #X floatatom 137 266 5 0 0 0 - - -;
 #X obj 140 330 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
@@ -30,6 +30,19 @@ numbers based on an output range set as arguments.;
 #X obj 137 297 notescale;
 #X obj 150 130 notescale 15 120;
 #X obj 297 130 notescale 24 48;
+#N canvas 466 198 494 344 META 0;
+#X text 12 165 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2;
+#X text 12 85 INLET_1 float;
+#X text 12 125 OUTLET_0 float;
+#X text 12 145 AUTHOR Cyrille Henry and Hans-Christoph Steiner;
+#X text 12 65 INLET_0 float;
+#X text 12 5 KEYWORDS control abstraction MIDI;
+#X text 12 45 DESCRIPTION scale a stream of numbers to a MIDI note
+number;
+#X text 12 105 INLET_2 float;
+#X restore 408 455 pd META;
 #X connect 0 0 18 0;
 #X connect 4 0 20 0;
 #X connect 5 0 15 0;

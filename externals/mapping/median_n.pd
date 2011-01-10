@@ -1,4 +1,4 @@
-#N canvas 609 51 652 617 10;
+#N canvas 1 53 652 617 10;
 #X declare -lib zexy;
 #X obj 468 16 import zexy;
 #X obj 88 37 inlet;
