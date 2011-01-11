@@ -82,11 +82,11 @@ Root: HKCR; SubKey: .pd; ValueType: string; ValueName: Content Type; ValueData: 
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: flags; ValueData: ; Tasks: libs; Flags: uninsdeletekey
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib1; ValueData: libdir; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib2; ValueData: vanilla; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib3; ValueData: Gem; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib4; ValueData: cyclone; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib5; ValueData: zexy; Tasks: libs
-Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: nloadlib; ValueData: 5; Tasks: libs; Flags: uninsdeletekey
-Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: none; ValueName: loadlib6; Flags: deletevalue; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib3; ValueData: extra; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib4; ValueData: Gem; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib5; ValueData: cyclone; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib6; ValueData: zexy; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: nloadlib; ValueData: 6; Tasks: libs; Flags: uninsdeletekey
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: none; ValueName: loadlib7; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: none; ValueName: loadlib8; Flags: deletevalue; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: none; ValueName: loadlib9; Flags: deletevalue; Tasks: libs

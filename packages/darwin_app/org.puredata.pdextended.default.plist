@@ -11,13 +11,15 @@
 	<key>loadlib2</key>
 	<string>vanilla</string>
 	<key>loadlib3</key>
-	<string>Gem</string>
+	<string>extra</string>
 	<key>loadlib4</key>
-	<string>cyclone</string>
+	<string>Gem</string>
 	<key>loadlib5</key>
+	<string>cyclone</string>
+	<key>loadlib6</key>
 	<string>zexy</string>
 	<key>nloadlib</key>
-	<string>5</string>
+	<string>6</string>
 	<key>path1</key>
 	<string>/System/Library/Fonts</string>
 	<key>path2</key>

@@ -1,1 +1,1 @@
-bin\pd.exe  -lib libdir -lib vanilla -lib Gem -lib cyclone -lib zexy
+bin\pd.exe  -lib libdir -lib vanilla -lib extra -lib Gem -lib cyclone -lib zexy

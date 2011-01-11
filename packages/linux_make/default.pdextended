@@ -4,9 +4,10 @@ defeatrt: 0
 flags:
 loadlib1: libdir
 loadlib2: vanilla
-loadlib3: Gem
-loadlib4: cyclone
-loadlib5: zexy
-nloadlib: 5
+loadlib3: extra
+loadlib4: Gem
+loadlib5: cyclone
+loadlib6: zexy
+nloadlib: 6
 path1: /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType
 npath: 1

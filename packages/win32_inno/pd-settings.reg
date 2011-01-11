@@ -4,12 +4,12 @@ Windows Registry Editor Version 5.00
 "flags"=""
 "loadlib1"="libdir"
 "loadlib2"="vanilla"
-"loadlib3"="Gem"
-"loadlib4"="cyclone"
-"loadlib5"="zexy"
-"nloadlib"=5
+"loadlib3"="extra"
+"loadlib4"="Gem"
+"loadlib5"="cyclone"
+"loadlib6"="zexy"
+"nloadlib"=6
 ; delete any previous loadlib flags
-"loadlib6"=-
 "loadlib7"=-
 "loadlib8"=-
 "loadlib9"=-
