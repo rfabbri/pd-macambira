@@ -1,4 +1,4 @@
-#N canvas 256 50 764 621 10;
+#N canvas 0 31 555 606 10;
 #X text 101 83 inlets:;
 #X text 115 101 1) float 0-1: distance between lists;
 #X text 117 122 2) list 1;
@@ -6,13 +6,13 @@
 #X text 95 30 list-inter: elementwise linear interpolation between
 two (float) lists.;
 #X obj 228 153 hsl 128 15 0 1 0 0 empty empty factor_(0-1) -2 -6 0
-10 -262144 -1 -1 10400 0;
+10 -262144 -1 -1 0 0;
 #X obj 225 359 vsl 15 128 0 10 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 9470 1;
+-1 -1 0 1;
 #X obj 264 359 vsl 15 128 0 10 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 7740 1;
+-1 -1 0 1;
 #X obj 304 359 vsl 15 128 0 10 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 3110 1;
+-1 -1 0 1;
 #X floatatom 225 333 5 0 0 0 - - -;
 #X floatatom 264 333 5 0 0 0 - - -;
 #X floatatom 304 333 5 0 0 0 - - -;
@@ -21,7 +21,7 @@ two (float) lists.;
 float lists of arbitrary length.;
 #X obj 225 311 unpack 0 0 0 0;
 #X obj 343 360 vsl 15 128 0 10 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 11090 1;
+-1 -1 0 1;
 #X floatatom 343 334 5 0 0 0 - - -;
 #X obj 164 307 print;
 #X text 96 63 Non-float elements in first list will be kept.;
@@ -29,6 +29,19 @@ float lists of arbitrary length.;
 #X msg 267 207 5 x 9 3;
 #X text 326 207 careful!;
 #X msg 290 255 8 7 1 10;
+#N canvas 432 135 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 155 AUTHOR Frank Barknecht;
+#X text 12 175 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 135 OUTLET_0 list;
+#X text 12 45 DESCRIPTION elementwise linear interpolation between
+two (float) lists;
+#X text 12 75 INLET_0 float;
+#X text 12 95 INLET_1 list;
+#X text 12 115 INLET_2 list;
+#X restore 497 577 pd META;
 #X connect 5 0 12 0;
 #X connect 9 0 6 0;
 #X connect 10 0 7 0;

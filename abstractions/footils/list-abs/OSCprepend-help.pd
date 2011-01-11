@@ -1,4 +1,4 @@
-#N canvas 417 189 565 469 10;
+#N canvas 0 31 565 415 10;
 #X msg 121 238 /a 1 c 3;
 #X obj 121 350 print OSC;
 #X text 52 262 ignored:;
@@ -20,6 +20,18 @@ x 1 2" will become "/synth/set x 1 2".;
 #X msg 325 285 1;
 #X text 359 287 oops...;
 #X symbolatom 324 260 10 0 0 1 type-here - -;
+#N canvas 462 89 494 396 META 0;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 125 AUTHOR Frank Barknecht;
+#X text 12 145 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 45 DESCRIPTION "Prepends" first argument to an OSC message
+list;
+#X text 12 65 INLET_0 anything;
+#X text 12 85 INLET_1 anything;
+#X text 12 105 OUTLET_0 anything;
+#X restore 504 381 pd META;
 #X connect 0 0 4 0;
 #X connect 4 0 1 0;
 #X connect 5 0 4 1;

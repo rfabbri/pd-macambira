@@ -1,4 +1,4 @@
-#N canvas 333 384 543 295 10;
+#N canvas 0 31 518 278 10;
 #X msg 52 90 a b c d 1 2;
 #X msg 165 90 a b c d 1 2;
 #X msg 288 91 a b c d 1 2;
@@ -12,6 +12,18 @@
 #X text 54 42 Concatenate a list into a single symbol using ARG1 as
 delimiter. Delimiter can be set through second inlet.;
 #X text 55 20 list-l2s;
+#N canvas 510 66 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 135 AUTHOR Frank Barknecht;
+#X text 12 155 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS control list_op symbol_op;
+#X text 12 45 DESCRIPTION concatenate a list into a single symbol using
+ARG1 as delimiter;
+#X text 12 75 INLET_0 anything;
+#X text 12 95 INLET_1 symbol;
+#X text 12 115 OUTLET_0 symbol;
+#X restore 443 251 pd META;
 #X connect 0 0 6 0;
 #X connect 1 0 7 0;
 #X connect 2 0 8 0;

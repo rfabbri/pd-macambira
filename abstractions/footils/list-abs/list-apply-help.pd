@@ -1,4 +1,4 @@
-#N canvas 156 126 802 626 10;
+#N canvas 0 26 802 590 10;
 #X obj 78 317 list-apply + 1;
 #X msg 78 285 1 2 3 4;
 #X obj 78 344 print;
@@ -21,7 +21,7 @@ is the case with for example makefilename.;
 #X msg 288 397 1 2 3 4;
 #X obj 288 439 print;
 #X obj 388 379 hradio 15 1 0 4 empty empty empty 0 -6 0 8 -262144 -1
--1 3;
+-1 0;
 #X obj 388 396 + 1;
 #X floatatom 198 398 5 0 0 2 moses-arg - -;
 #X text 128 74 Arguments:;
@@ -43,6 +43,19 @@ is applied to the list elements.;
 #X obj 503 418 list-apply change;
 #X obj 645 418 list-apply mtof;
 #X obj 79 528 list-apply prepent whatever;
+#N canvas 460 150 494 396 META 0;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 155 AUTHOR Frank Barknecht;
+#X text 12 135 OUTLET_0 list;
+#X text 12 175 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 95 INLET_1 anything;
+#X text 12 75 INLET_0 anything;
+#X text 12 45 DESCRIPTION apply the object created by [arg1 arg2] on
+every list element and return the modified list.;
+#X text 12 115 INLET_2 anything;
+#X restore 737 557 pd META;
 #X connect 0 0 2 0;
 #X connect 1 0 0 0;
 #X connect 3 0 32 0;

@@ -1,4 +1,4 @@
-#N canvas 367 75 578 673 10;
+#N canvas 0 26 583 620 10;
 #X obj 226 453 mod 2;
 #X obj 226 483 != 0;
 #X obj 274 454 mod 3;
@@ -45,6 +45,19 @@ Internally [select 0] is used.;
 #X obj 70 471 list-filter;
 #X msg 82 526 bang;
 #X msg 79 285 bang;
+#N canvas 491 26 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 155 AUTHOR Frank Barknecht;
+#X text 12 175 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 115 OUTLET_0 list;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 45 DESCRIPTION return a list of items for which the operation
+cross-connected to the rightmost in- and outlet is true.;
+#X text 12 75 INLET_0 list;
+#X text 12 95 INLET_1 float;
+#X text 12 135 OUTLET_1 float;
+#X restore 508 580 pd META;
 #X connect 0 0 1 0;
 #X connect 1 0 4 0;
 #X connect 2 0 3 0;

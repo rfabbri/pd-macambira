@@ -1,14 +1,14 @@
-#N canvas 471 527 566 348 10;
+#N canvas 0 31 566 348 10;
 #X floatatom 132 121 5 0 10 0 - - -;
 #X obj 132 174 list-sieve;
-#X obj 197 209 print MISS;
+#X obj 199 209 print MISS;
 #X obj 132 233 print FOUND;
 #X text 61 30 list-sieve;
 #X text 73 55 Look up occurence of incoming floats in a list. If found
 \, pass them along \, if not \, signal the miss in second outlet.;
 #X obj 306 157 tgl 15 0 empty empty try_me! 0 -6 0 8 -262144 -1 -1
 0 1;
-#N canvas 637 373 524 502 gameboy-player 0;
+#N canvas 500 266 524 502 gameboy-player 0;
 #X obj 173 50 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #X obj 173 105 random 12;
@@ -80,8 +80,21 @@
 #X connect 13 0 6 0;
 #X connect 13 1 6 1;
 #X restore 306 178 pd gameboy-player;
-#X obj 197 119 loadbang;
-#X msg 197 143 0 2 3 5 7 10;
+#X obj 199 119 loadbang;
+#X msg 199 143 0 2 3 5 7 10;
+#N canvas 506 181 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 165 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 45 DESCRIPTION look up occurence of incoming floats in a
+list;
+#X text 12 65 INLET_0 float;
+#X text 12 85 INLET_1 list;
+#X text 12 105 OUTLET_0 float;
+#X text 12 125 OUTLET_1 float;
+#X text 12 145 AUTHOR Frank Barknecht;
+#X restore 495 312 pd META;
 #X connect 0 0 1 0;
 #X connect 1 0 3 0;
 #X connect 1 1 2 0;

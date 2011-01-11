@@ -1,29 +1,29 @@
-#N canvas 344 116 618 692 10;
-#X obj 67 310 list-map;
-#X text 65 32 [list-map] - the swiss army knife of list-operations
+#N canvas 0 31 612 654 10;
+#X obj 67 280 list-map;
+#X text 65 22 [list-map] - the swiss army knife of list-operations
 ;
-#X obj 135 310 spigot;
-#X obj 171 293 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X obj 135 280 spigot;
+#X obj 171 263 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X msg 67 266 0 1 2 3;
-#X obj 118 347 print SERIALIZED;
-#X obj 67 376 print MAIN;
-#X msg 313 268 0 1 2 3;
-#X obj 364 349 print SERIALIZED;
-#X obj 313 378 print MAIN;
-#X floatatom 404 292 5 0 0 0 - - -;
-#X msg 67 245 bang;
-#X msg 145 265 a b c;
-#X msg 145 245 bang;
-#X obj 381 312 * 10;
-#X msg 313 244 bang;
-#X msg 72 447 0 1 2 3;
-#X obj 72 536 list trim;
-#X obj 72 516 list prepend set;
-#X msg 72 558;
-#X obj 138 471 list append -|-;
-#X msg 227 541 set;
-#X text 304 564 A more complex example:;
+#X msg 67 236 0 1 2 3;
+#X obj 118 317 print SERIALIZED;
+#X obj 67 346 print MAIN;
+#X msg 313 238 0 1 2 3;
+#X obj 364 319 print SERIALIZED;
+#X obj 313 348 print MAIN;
+#X floatatom 404 262 5 0 0 0 - - -;
+#X msg 67 215 bang;
+#X msg 145 235 a b c;
+#X msg 145 215 bang;
+#X obj 381 282 * 10;
+#X msg 313 214 bang;
+#X msg 72 417 0 1 2 3;
+#X obj 72 506 list trim;
+#X obj 72 486 list prepend set;
+#X msg 72 528;
+#X obj 138 441 list append -|-;
+#X msg 227 511 set;
+#X text 304 534 A more complex example:;
 #N canvas 164 99 846 438 filters 0;
 #N canvas 0 0 450 300 (subpatch) 0;
 #X array \$0-in 64 float 0;
@@ -209,28 +209,41 @@ coeff-slider and switch between pole and zero operation.;
 #X connect 17 0 15 0;
 #X connect 20 0 5 0;
 #X connect 20 1 9 0;
-#X restore 330 586 pd filters;
-#X text 67 626 2007 Frank Barknecht \, original idea by IOhannes m
+#X restore 330 556 pd filters;
+#X text 67 596 2007 Frank Barknecht \, original idea by IOhannes m
 zmoelnig and Thomas Musil.;
-#X obj 313 312 list-map;
-#X obj 72 471 list-map;
-#X msg 71 421 bang;
-#X text 64 72 Calls a user-defined operation for each of the incoming
+#X obj 313 282 list-map;
+#X obj 72 441 list-map;
+#X msg 71 391 bang;
+#X text 64 52 Calls a user-defined operation for each of the incoming
 list's items and returns a list of the return values.;
-#X text 64 120 [list-map] is a helper abstraction to make element-wise
+#X text 64 90 [list-map] is a helper abstraction to make element-wise
 operations on lists easy to patch. The basic idea is to bundle a list-serializer
 and a list-repacker into one object. Then you connect whatever operation
 should be applied on every list item to the right outlet and send the
 modified items back to the right inlet. Here the modified elements
 get packed into a list again and sent to the left outlet of [list-map].
 ;
-#X obj 315 460 list-map;
-#X obj 315 502 list trim;
-#X obj 315 482 list prepend set;
-#X obj 387 460 pow 3;
-#X floatatom 417 437 5 0 0 0 - - -;
-#X msg 315 435 1 2 3 4 5;
-#X msg 315 524;
+#X obj 315 430 list-map;
+#X obj 315 472 list trim;
+#X obj 315 452 list prepend set;
+#X obj 387 430 pow 3;
+#X floatatom 417 407 5 0 0 0 - - -;
+#X msg 315 405 1 2 3 4 5;
+#X msg 315 494;
+#N canvas 510 66 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 155 AUTHOR Frank Barknecht;
+#X text 12 175 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 75 INLET_0 anything;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 45 DESCRIPTION call a user-defined operation for each of
+the incoming list's items and return a list of the return values;
+#X text 12 95 INLET_1 anything;
+#X text 12 115 OUTLET_0 list;
+#X text 12 135 OUTLET_1 float symbol pointer;
+#X restore 533 611 pd META;
 #X connect 0 0 6 0;
 #X connect 0 1 2 0;
 #X connect 0 1 5 0;

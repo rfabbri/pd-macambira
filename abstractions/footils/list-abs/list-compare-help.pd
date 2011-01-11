@@ -1,4 +1,4 @@
-#N canvas 324 167 529 463 10;
+#N canvas 0 26 529 463 10;
 #X floatatom 149 244 5 0 0 0 - - -;
 #X obj 213 244 loadbang;
 #X msg 149 217 0;
@@ -17,6 +17,17 @@
 #X msg 134 115 0 1 2 3 4 5 6 seven eight;
 #X msg 134 142 0 1 2 3 4 5 6 seventy eight;
 #X msg 213 271 0 1 2 3 4 5 6 seven eight;
+#N canvas 416 170 494 396 META 0;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 125 AUTHOR Frank Barknecht;
+#X text 12 145 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 105 OUTLET_0 float;
+#X text 12 65 INLET_0 anything;
+#X text 12 85 INLET_1 anything;
+#X text 12 45 DESCRIPTION compare two lists element by element;
+#X restore 456 427 pd META;
 #X connect 0 0 6 0;
 #X connect 1 0 16 0;
 #X connect 2 0 0 0;

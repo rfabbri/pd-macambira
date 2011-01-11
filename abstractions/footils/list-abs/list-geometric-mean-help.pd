@@ -1,5 +1,5 @@
-#N struct 1015-dial float y;
-#N canvas 410 240 560 562 10;
+#N struct 1106-dial float y;
+#N canvas 0 31 540 547 10;
 #N canvas 0 0 450 300 randlist 0;
 #X obj 134 129 until;
 #X msg 246 151 set;
@@ -70,7 +70,7 @@ to:;
 #X coords 0 10 9 0 200 140 1;
 #X restore 75 152 graph;
 #N canvas 0 0 916 918 \$0-c 0;
-#X scalar 1015-dial 0 \;;
+#X scalar 1106-dial 0 \;;
 #X coords 0 0 200 140 200 140 1;
 #X restore 75 152 pd \$0-c;
 #N canvas 0 0 503 429 create 0;
@@ -122,7 +122,7 @@ to:;
 #X obj 339 148 t b b b;
 #X obj 339 274 list;
 #X obj 79 344 loadbang;
-#X msg 79 414 5.7 6 8.1 9.9 3.1 6.5 9.7 5.8 5.6 0.9;
+#X msg 79 414 0.6 6.9 3.6 5.6 0.7 3.8 3.9 5.3 9.2 9.2;
 #X text 77 30 Switch on the "show"-metro and play with the values in
 the array.;
 #N canvas 336 319 712 355 \$0-dial 0;
@@ -181,6 +181,17 @@ the array.;
 #X obj 185 453 list-harmonic-mean;
 #X obj 184 474 list-mean;
 #X text 97 450 More means:;
+#N canvas 491 26 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 105 AUTHOR Frank Barknecht;
+#X text 12 125 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 45 DESCRIPTION calculate the geometric mean of a list of
+floats;
+#X text 12 65 INLET_0 list;
+#X text 12 85 OUTLET_0 float;
+#X restore 478 520 pd META;
 #X connect 0 0 3 0;
 #X connect 1 0 0 0;
 #X connect 3 0 7 0;

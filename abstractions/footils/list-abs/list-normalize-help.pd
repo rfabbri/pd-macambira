@@ -1,4 +1,4 @@
-#N canvas 136 269 816 502 10;
+#N canvas 0 31 832 543 10;
 #X obj 145 295 list-normalize;
 #X msg 145 183 10 100 200;
 #X msg 157 204 -10 100 200;
@@ -21,27 +21,37 @@ use:;
 #X obj 145 377 print Normalized;
 #X obj 427 450 print Norm_to_3;
 #X obj 617 28 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 5600 1;
+-1 -1 0 1;
 #X obj 617 205 pack 0 0 0;
 #X obj 639 166 t b f;
 #X obj 685 169 t b f;
 #X obj 617 267 unpack 0 0 0;
 #X obj 652 28 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 7400 1;
+-1 -1 0 1;
 #X obj 685 28 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 4400 1;
+-1 -1 0 1;
 #X floatatom 617 298 5 0 0 0 - - -;
 #X floatatom 656 298 5 0 0 0 - - -;
 #X floatatom 696 298 5 0 0 0 - - -;
 #X obj 617 324 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 9611 1;
+-1 -1 0 1;
 #X obj 656 324 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 12700 1;
+-1 -1 0 1;
 #X obj 696 324 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 7551 1;
+-1 -1 0 1;
 #X text 735 94 0-127;
 #X text 740 390 0-1;
 #X obj 617 240 list-normalize;
+#N canvas 460 31 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 105 AUTHOR Frank Barknecht;
+#X text 12 125 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 85 OUTLET_0 list;
+#X text 12 45 DESCRIPTION normalize a list;
+#X text 12 65 INLET_0 list;
+#X restore 746 491 pd META;
 #X connect 0 0 9 0;
 #X connect 0 0 14 0;
 #X connect 1 0 0 0;

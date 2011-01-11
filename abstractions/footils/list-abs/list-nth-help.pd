@@ -1,4 +1,4 @@
-#N canvas 257 127 694 569 10;
+#N canvas 0 31 624 592 10;
 #X floatatom 268 339 5 0 0 1 n - -;
 #X text 136 110 Inlets: 1) list to look up in;
 #X text 134 38 look up the nth element in a list. n has to be positive
@@ -23,6 +23,16 @@ positive.;
 longer than the index give a spurious 0 as result \, but also an error
 in the console: "$x: argument out of range".;
 #X text 53 520 [list-idx] is more flexible \, but a bit slower.;
+#N canvas 506 181 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 105 AUTHOR Frank Barknecht;
+#X text 12 125 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 45 DESCRIPTION look up the nth element in a list;
+#X text 12 65 INLET_0 anything;
+#X text 12 85 OUTLET_0 float symbol pointer;
+#X restore 538 539 pd META;
 #X connect 0 0 15 1;
 #X connect 8 0 15 0;
 #X connect 10 0 15 0;

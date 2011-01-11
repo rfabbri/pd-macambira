@@ -1,4 +1,4 @@
-#N canvas 489 156 597 355 10;
+#N canvas 0 31 583 340 10;
 #X floatatom 197 104 5 0 0 0 - - -;
 #X msg 118 105 0 1 2 3 4;
 #X obj 197 163 print shorter;
@@ -31,6 +31,20 @@
 negative indices to split of elements from the back of a list.;
 #X obj 118 219 print head;
 #X obj 157 192 print tail;
+#N canvas 506 181 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 195 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 45 DESCRIPTION an advanced [list split] which also accepts
+negative indices to split elements from the back of a list;
+#X text 12 75 INLET_0 anything;
+#X text 12 95 INLET_1 float;
+#X text 12 115 OUTLET_0 list float symbol pointer;
+#X text 12 135 OUTLET_1 list float symbol pointer;
+#X text 12 155 OUTLET_2 list float symbol pointer;
+#X text 12 175 AUTHOR Frank Barknecht;
+#X restore 521 311 pd META;
 #X connect 0 0 7 1;
 #X connect 1 0 7 0;
 #X connect 3 0 6 0;

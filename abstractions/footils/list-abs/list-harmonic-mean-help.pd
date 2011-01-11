@@ -1,5 +1,5 @@
-#N struct 1029-dial float y;
-#N canvas 402 177 566 571 10;
+#N struct 1033-dial float y;
+#N canvas 0 31 566 571 10;
 #N canvas 0 0 450 300 randlist 0;
 #X obj 134 129 until;
 #X msg 246 151 set;
@@ -62,7 +62,7 @@
 #X coords 0 10 9 0 200 140 1;
 #X restore 75 152 graph;
 #N canvas 0 0 916 918 \$0-c 0;
-#X scalar 1029-dial 0 \;;
+#X scalar 1033-dial 0 \;;
 #X coords 0 0 200 140 200 140 1;
 #X restore 75 152 pd \$0-c;
 #N canvas 0 0 503 429 create 0;
@@ -143,7 +143,7 @@ the array.;
 #X connect 4 0 0 0;
 #X restore 339 363 pd scale;
 #X obj 339 313 list-harmonic-mean;
-#X msg 79 414 7.4 4.8 2 8.4 5.6 3.6 1.1 8.6 5 8.6;
+#X msg 79 414 5.7 6 8.1 9.9 3.1 6.5 9.7 5.8 5.6 0.9;
 #X connect 0 0 26 0;
 #X connect 1 0 0 0;
 #X connect 2 0 3 0;
@@ -184,6 +184,17 @@ well.;
 #X text 97 494 More means:;
 #X text 114 91 harmonic mean = n / (1/f0 + 1/f1 + 1/f2 + ... + 1/fn)
 ;
+#N canvas 491 26 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 105 AUTHOR Frank Barknecht;
+#X text 12 125 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 65 INLET_0 list;
+#X text 12 85 OUTLET_0 float;
+#X text 12 45 DESCRIPTION Calculates the harmonic mean of a list of
+floats;
+#X restore 498 530 pd META;
 #X connect 0 0 3 0;
 #X connect 1 0 0 0;
 #X connect 3 0 9 0;

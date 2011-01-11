@@ -1,24 +1,24 @@
-#N canvas 485 298 612 548 10;
+#N canvas 0 26 562 531 10;
 #X obj 93 283 list-equalize;
 #X obj 93 71 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2400 1;
+-1 -1 0 1;
 #X obj 93 248 pack 0 0 0;
 #X obj 115 209 t b f;
 #X obj 161 212 t b f;
 #X obj 93 310 unpack 0 0 0;
 #X obj 128 71 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 7300 1;
+-1 -1 0 1;
 #X obj 161 71 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2500 1;
+-1 -1 0 1;
 #X floatatom 93 341 5 0 0 0 - - -;
 #X floatatom 132 341 5 0 0 0 - - -;
 #X floatatom 172 341 5 0 0 0 - - -;
 #X obj 93 367 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2498 1;
+-1 -1 0 1;
 #X obj 132 367 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 7599 1;
+-1 -1 0 1;
 #X obj 172 367 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 2602 1;
+-1 -1 0 1;
 #X text 207 34 list-equalize:;
 #X text 227 53 scale a list so that all float elements sum up to 1
 ;
@@ -29,6 +29,17 @@
 #X msg 306 226 90 plus 10 is 100;
 #X text 40 138 0-127;
 #X text 42 427 0-1;
+#N canvas 416 170 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 115 AUTHOR Frank Barknecht;
+#X text 12 95 OUTLET_0 list;
+#X text 12 135 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 45 DESCRIPTION scale a list so that all float elements sum
+up to 1;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 75 INLET_0 anything;
+#X restore 500 502 pd META;
 #X connect 0 0 5 0;
 #X connect 1 0 2 0;
 #X connect 2 0 0 0;

@@ -8,6 +8,17 @@
 #X text 34 28 list-unitvec;
 #X text 52 48 make a unit vector out of any list \, ignoring non-float
 elements (i.e. normalize a list geometrically);
+#N canvas 506 181 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 115 AUTHOR Frank Barknecht;
+#X text 12 135 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 95 OUTLET_0 list;
+#X text 12 45 DESCRIPTION make a unit vector out of any list \, ignoring
+non-float elements (i.e. normalize a list geometrically);
+#X text 12 75 INLET_0 list;
+#X restore 385 265 pd META;
 #X connect 0 0 1 0;
 #X connect 2 0 0 0;
 #X connect 3 0 0 0;

@@ -1,6 +1,6 @@
-#N canvas 330 168 572 423 10;
+#N canvas 0 26 572 423 10;
 #X obj 85 190 hradio 15 1 0 8 empty empty POS_(zero-based) 0 -6 0 8
--262144 -1 -1 2;
+-262144 -1 -1 0;
 #X floatatom 85 210 5 0 0 0 - - -;
 #X msg 49 160 0 1 2 3 4;
 #X obj 49 288 print;
@@ -19,6 +19,19 @@
 #X floatatom 343 239 5 0 0 0 - - -;
 #X floatatom 393 240 5 0 0 0 - - -;
 #X obj 293 259 list-delete 2 3;
+#N canvas 520 35 494 396 META 0;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 145 AUTHOR Frank Barknecht;
+#X text 12 165 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 65 INLET_0 list;
+#X text 12 45 DESCRIPTION delete element at position POS from list
+;
+#X text 12 85 INLET_1 float;
+#X text 12 105 INLET_2 float;
+#X text 12 125 OUTLET_0 list;
+#X restore 507 387 pd META;
 #X connect 0 0 1 0;
 #X connect 1 0 10 1;
 #X connect 2 0 10 0;

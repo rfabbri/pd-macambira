@@ -1,4 +1,4 @@
-#N canvas 499 134 550 477 10;
+#N canvas 0 31 550 477 10;
 #X msg 195 65 bang;
 #X obj 195 132 print float;
 #X msg 49 65 bang;
@@ -24,6 +24,16 @@
 #X text 32 295 If you set a second argument \, it will be used as the
 default when the argument is blank. (0 is treated as no argument \,
 too.);
+#N canvas 506 181 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 105 AUTHOR Frank Barknecht;
+#X text 12 125 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 5 KEYWORDS control list_op abstraction_op;
+#X text 12 45 DESCRIPTION output on bang only if \$1 exists;
+#X text 12 65 INLET_0 bang;
+#X text 12 85 OUTLET_0 float symbol;
+#X restore 485 446 pd META;
 #X connect 0 0 18 0;
 #X connect 2 0 14 0;
 #X connect 3 0 16 0;

@@ -1,4 +1,4 @@
-#N canvas 239 116 682 622 10;
+#N canvas 0 31 682 622 10;
 #X msg 167 312 bang;
 #X floatatom 133 407 5 0 0 0 - - -;
 #X obj 125 478 tabread \$0-rand;
@@ -111,6 +111,19 @@ random choice \, "seed X" to seed;
 #X connect 22 1 2 1;
 #X connect 22 2 3 1;
 #X restore 125 563 pd markov-example;
+#N canvas 520 99 494 396 META 0;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 155 AUTHOR Frank Barknecht;
+#X text 12 175 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 45 DESCRIPTION use a list as a probability table for weighted
+random numbers;
+#X text 12 75 INLET_0 bang seed;
+#X text 12 95 INLET_1 list;
+#X text 12 115 OUTLET_0 float;
+#X text 12 135 OUTLET_1 float;
+#X restore 622 568 pd META;
 #X connect 0 0 22 0;
 #X connect 2 0 5 0;
 #X connect 3 0 2 0;

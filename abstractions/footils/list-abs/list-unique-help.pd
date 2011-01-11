@@ -1,4 +1,4 @@
-#N canvas 330 98 543 489 10;
+#N canvas 0 31 543 489 10;
 #X msg 93 366;
 #N canvas 0 0 450 300 show 0;
 #X obj 41 39 inlet;
@@ -23,6 +23,17 @@
 #X obj 150 212 + 1;
 #X obj 120 162 t b a;
 #X msg 120 183 list H e l l o - W o r l d;
+#N canvas 506 181 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 125 AUTHOR Frank Barknecht;
+#X text 12 145 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 45 DESCRIPTION remove duplicates from a list;
+#X text 12 65 INLET_0 anything;
+#X text 12 85 INLET_1 float;
+#X text 12 105 OUTLET_0 list;
+#X text 12 5 KEYWORDS control list_op filter;
+#X restore 474 450 pd META;
 #X connect 1 0 0 0;
 #X connect 2 0 1 0;
 #X connect 5 0 1 0;

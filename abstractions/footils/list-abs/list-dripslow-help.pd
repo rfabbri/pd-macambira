@@ -1,4 +1,4 @@
-#N canvas 356 400 543 329 10;
+#N canvas 0 26 488 309 10;
 #X msg 208 152 1 2 3 4;
 #X obj 122 229 print element;
 #X obj 208 202 print EOL;
@@ -52,6 +52,18 @@ Right outlet bangs at list's end.;
 #X connect 4 0 1 0;
 #X restore 332 219 pd drip-emulation;
 #X obj 122 180 list-dripslow;
+#N canvas 416 170 494 396 META 0;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 145 AUTHOR Frank Barknecht;
+#X text 12 165 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 45 DESCRIPTION serialize a list on demand;
+#X text 12 65 INLET_0 bang;
+#X text 12 85 INLET_1 anything;
+#X text 12 105 INLET_2 float symbol pointer;
+#X text 12 125 OUTLET_0 bang;
+#X restore 437 287 pd META;
 #X connect 0 0 8 1;
 #X connect 3 0 8 0;
 #X connect 8 0 1 0;

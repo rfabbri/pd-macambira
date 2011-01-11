@@ -1,4 +1,4 @@
-#N canvas 314 178 696 459 10;
+#N canvas 0 26 706 457 10;
 #X msg 118 97 list a b;
 #X msg 132 122 list c d e f;
 #X msg 199 225 3;
@@ -19,6 +19,17 @@ empty the internal buffer;
 #X obj 118 268 list-group 2;
 #X text 94 382 Also see;
 #X obj 161 382 list-iter;
+#N canvas 460 46 494 396 META 0;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 125 AUTHOR Frank Barknecht;
+#X text 12 105 OUTLET_0 list;
+#X text 12 145 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 85 INLET_1 float;
+#X text 12 45 DESCRIPTION group items into lists of the same size;
+#X text 12 65 INLET_0 list;
+#X restore 577 387 pd META;
 #X connect 0 0 13 0;
 #X connect 1 0 13 0;
 #X connect 2 0 13 1;

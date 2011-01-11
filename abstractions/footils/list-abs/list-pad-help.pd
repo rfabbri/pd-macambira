@@ -1,4 +1,4 @@
-#N canvas 272 125 544 509 10;
+#N canvas 0 31 554 508 10;
 #X obj 159 285 list-pad;
 #X obj 159 335 list trim;
 #X obj 159 313 list prepend set;
@@ -14,13 +14,25 @@ passed unchanged.;
 #X obj 50 29 list-pad;
 #X text 315 256 <= pad to these values;
 #X obj 212 233 loadbang;
-#X msg 159 380;
 #X text 97 105 The list of padding values is provided through the second
 inlet.;
 #X text 96 149 The result list consists of the first list padded with
 the respective values of the second list.;
+#N canvas 506 181 494 396 META 0;
+#X text 12 25 LICENSE SIBSD;
+#X text 12 135 AUTHOR Frank Barknecht;
+#X text 12 155 HELP_PATCH_AUTHORS Frank Barknecht. "pd meta" information
+added by Jonathan Wilkes for Pd version 0.42.;
+#X text 12 45 DESCRIPTION complete a list with more values \, if the
+incoming list is too short;
+#X text 12 75 INLET_0 anything;
+#X text 12 115 OUTLET_0 list;
+#X text 12 95 INLET_1 anything;
+#X text 12 5 KEYWORDS control list_op;
+#X restore 465 456 pd META;
+#X msg 159 380;
 #X connect 0 0 2 0;
-#X connect 1 0 13 0;
+#X connect 1 0 16 0;
 #X connect 2 0 1 0;
 #X connect 3 0 0 0;
 #X connect 4 0 0 1;
