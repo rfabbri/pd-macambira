@@ -1,4 +1,4 @@
-## Pd library template version 1.0.3
+## Pd library template version 1.0.7
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = list-abs
@@ -9,10 +9,10 @@ SOURCES =
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
-PDOBJECTS = OSCprepend.pd compare-any.pd last-x.pd list-abs.pd list-accum.pd list-add.pd list-apply.pd list-centroid.pd list-clip.pd list-compare.pd list-delete.pd list-dotprod.pd list-drip.pd list-drip2.pd list-dripslow.pd list-emath.pd list-enumerate.pd list-equalize.pd list-extend.pd list-fifo-delim.pd list-fifo.pd list-filter.pd list-find.pd list-geometric-mean.pd list-group.pd list-harmonic-mean.pd list-idx.pd list-insert.pd list-inter.pd list-inter-many.pd list-iter.pd list-l2s.pd list-lastx.pd list-len.pd list-lifo.pd list-makefilename.pd list-map.pd list-map2.pd list-math.pd list-mean.pd list-minmax.pd list-moses.pd list-mult.pd list-normalize.pd list-nth.pd list-onearg.pd list-pad.pd list-random.pd list-rdrip.pd list-reduce.pd list-replace.pd list-rev.pd list-rot.pd list-round.pd list-sect.pd list-seek.pd list-shellsort.pd list-sieve.pd list-sort.pd list-splat.pd list-sub.pd list-swap.pd list-tabdump.pd list-unique.pd list-unitvec.pd list-wrandom.pd prepent.pd sroute.pd take-two.pd triple-scale.pd
+PDOBJECTS = OSCprepend.pd compare-any.pd last-x.pd list-abs.pd list-accum.pd list-add.pd list-apply.pd list-centroid.pd list-clip.pd list-compare.pd list-delete.pd list-dotprod.pd list-drip.pd list-drip2.pd list-dripslow.pd list-emath.pd list-enumerate.pd list-equalize.pd list-extend.pd list-fifo-delim.pd list-fifo.pd list-filter.pd list-find.pd list-geometric-mean.pd list-group.pd list-harmonic-mean.pd list-idx.pd list-insert.pd list-inter.pd list-inter-many.pd list-iter.pd list-l2s.pd list-lastx.pd list-len.pd list-lifo.pd list-makefilename.pd list-map.pd list-map2.pd list-math.pd list-mean.pd list-minmax.pd list-moses.pd list-mult.pd list-normalize.pd list-nth.pd list-onearg.pd list-pad.pd list-random.pd list-rdrip.pd list-reduce.pd list-replace.pd list-rev.pd list-rot.pd list-round.pd list-sect.pd list-seek.pd list-shellsort.pd list-sieve.pd list-sort.pd list-splat.pd list-sub.pd list-swap.pd list-tabdump.pd list-unique.pd list-unitvec.pd list-wrandom.pd prepent.pd sroute.pd take-two.pd triple-scale.pd list-invint.pd list-makefilename-a.pd list-stddev.pd
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = 
+EXAMPLES = list-demux.pd list-inter-example.pd list-inter-gem-example.pd list-sieve-example-2.pd
 
 # manuals and related files, in the 'manual' subfolder
 MANUAL = 
@@ -21,7 +21,7 @@ MANUAL =
 # list them here.  This can be anything from header files, test patches,
 # documentation, etc.  README.txt and LICENSE.txt are required and therefore
 # automatically included
-EXTRA_DIST = 
+EXTRA_DIST = list-abs-intro.pd list-abs-intro.txt
 
 
 
@@ -31,7 +31,8 @@ EXTRA_DIST =
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)" -Wall -W -g
+# -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
+CFLAGS = -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
@@ -44,7 +45,7 @@ LIBS =
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
-CFLAGS += -DVERSION='"$(LIBRARY_VERSION)"'
+CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 
 PD_INCLUDE = $(PD_PATH)/include
 # where to install the library, overridden below depending on platform
@@ -62,7 +63,7 @@ ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) 
 	         $(SOURCES_iphoneos) $(SOURCES_linux) $(SOURCES_windows)
 
 DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
-ORIGDIR=pd-$(LIBRARY_NAME)_$(LIBRARY_VERSION)
+ORIGDIR=pd-$(LIBRARY_NAME:~=)_$(LIBRARY_VERSION)
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
@@ -108,7 +109,54 @@ ifeq ($(UNAME),Darwin)
     pkglibdir=$(HOME)/Library/Pd
   endif
 endif
+# Tho Android uses Linux, we use this fake uname to provide an easy way to
+# setup all this things needed to cross-compile for Android using the NDK
+ifeq ($(UNAME),ANDROID)
+  CPU := arm
+  SOURCES += $(SOURCES_android)
+  EXTENSION = pd_linux
+  OS = android
+  PD_PATH = /usr
+  NDK_BASE=/usr/local/android-ndk
+  NDK_SYSROOT=$(NDK_BASE)/platforms/android-5/arch-arm
+  NDK_TOOLCHAIN=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86
+  CC=$(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-gcc
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += -fPIC -I$(NDK_SYSROOT)/usr/include
+  LDFLAGS += -Wl,--export-dynamic -L$(NDK_SYSROOT)/usr/lib -shared -fPIC
+  LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
 ifeq ($(UNAME),Linux)
+  CPU := $(shell uname -m)
+  SOURCES += $(SOURCES_linux)
+  EXTENSION = pd_linux
+  OS = linux
+  PD_PATH = /usr
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += -fPIC
+  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
+ifeq ($(UNAME),GNU)
+  # GNU/Hurd, should work like GNU/Linux for basically all externals
+  CPU := $(shell uname -m)
+  SOURCES += $(SOURCES_linux)
+  EXTENSION = pd_linux
+  OS = linux
+  PD_PATH = /usr
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += -fPIC
+  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
+ifeq ($(UNAME),GNU/kFreeBSD)
+  # Debian GNU/kFreeBSD, should work like GNU/Linux for basically all externals
   CPU := $(shell uname -m)
   SOURCES += $(SOURCES_linux)
   EXTENSION = pd_linux
@@ -140,7 +188,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   EXTENSION = dll
   OS = windows
   PD_PATH = $(shell cd "$(PROGRAMFILES)"/pd && pwd)
-  OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -march=i686 -mtune=pentium4
+  OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
   CFLAGS += -mms-bitfields
   LDFLAGS += -s -shared -Wl,--enable-auto-import
   LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32

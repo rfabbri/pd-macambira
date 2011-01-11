@@ -4,5 +4,5 @@
 #X text 10 50 AUTHOR Frank Barknecht;
 #X text 10 70 LICENSE SIBSD;
 #X text 10 90 DESCRIPTION a collection of objects for manipulating lists. Requires pd>=0.39;
-#X text 10 110 VERSION 0.2-svn;
+#X text 10 110 VERSION 0.1;
 #X restore 10 10 pd META;
