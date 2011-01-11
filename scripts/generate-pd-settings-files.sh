@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ECHO=/sw/bin/echo
-LIBS="libdir vanilla Gem cyclone zexy"
+LIBS="libdir vanilla extra Gem cyclone zexy"
 
 GNULINUX_FONTPATH="/var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType"
 MACOSX_FONTPATH="/System/Library/Fonts /Library/Fonts ~/Library/Fonts /usr/X11R6/lib/X11/fonts/TTF /System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/lib/fonts"
