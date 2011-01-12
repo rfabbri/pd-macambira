@@ -17,6 +17,7 @@
 #include "m_pd.h"
 #include "s_stuff.h"
 #include <stdio.h>
+#include <string.h>
 
 #define MAXNDEV 20
 #define DEVDESCSIZE 80
@@ -137,6 +138,8 @@ static int as_getdriverid(const t_symbol*id) {
 
 static void as_params_print(t_as_params*parms) {
   int i=0;
+  post("\n=================================<");
+
   post("indevs: %d", parms->naudioindev);
   for(i=0; i<MAXAUDIOINDEV; i++) {
     post("indev: %d %d", parms->audioindev[i], parms->chindev[i]);
@@ -148,19 +151,30 @@ static void as_params_print(t_as_params*parms) {
   post("rate=%d", parms->rate);
   post("advance=%d", parms->advance);
   post("callback=%d", parms->callback);
+  post(">=================================\n");
 
 }
 static void as_params_get(t_as_params*parms) {
+  int i=0;
   memset(parms, 0, sizeof(t_as_params));
+  parms->callback=-1;
 
   sys_get_audio_params(&parms->naudioindev,  parms->audioindev,  parms->chindev,
                        &parms->naudiooutdev, parms->audiooutdev, parms->choutdev, 
                        &parms->rate,        &parms->advance,    &parms->callback);
 
 
-  post("\n=================================");
+  for(i=parms->naudioindev; i<MAXAUDIOINDEV; i++) {
+    parms->audioindev[i]=0;
+    parms->chindev[i]=0;
+  }
+  for(i=parms->naudiooutdev; i<MAXAUDIOOUTDEV; i++) {
+    parms->audiooutdev[i]=0;
+    parms->choutdev[i]=0;
+  }
+
+
   as_params_print(parms);
-  post("=================================\n");
 }
 
 
@@ -340,7 +354,7 @@ typedef enum {
   PARAM_OUTPUT,
   PARAM_INVALID
 } t_paramtype;
-static t_paramtype audiosettings_setparams_id(t_audiosettings*x, t_symbol*s) {
+static t_paramtype audiosettings_setparams_id(t_symbol*s) {
   if(gensym("@rate")==s) {
     return PARAM_RATE;
   } else if(gensym("@samplerate")==s) {
@@ -360,7 +374,7 @@ static t_paramtype audiosettings_setparams_id(t_audiosettings*x, t_symbol*s) {
 }
 
 /* find the beginning of the next parameter in the list */
-static int audiosettings_setparams_next(t_audiosettings*x, int argc, t_atom*argv) {
+static int audiosettings_setparams_next(int argc, t_atom*argv) {
   int i=0;
   for(i=0; i<argc; i++) {
     if(A_SYMBOL==argv[i].a_type) {
@@ -421,10 +435,11 @@ static void audiosettings_setparams(t_audiosettings *x, t_symbol*s, int argc, t_
   int advance=0;
   t_paramtype param=PARAM_INVALID;
 
-  advance=audiosettings_setparams_next(x, argc, argv);
+  advance=audiosettings_setparams_next(argc, argv);
   while((argc-=advance)>0) {
     argv+=advance;
-    param=audiosettings_setparams_id(x, atom_getsymbol(argv));
+    s=atom_getsymbol(argv);
+    param=audiosettings_setparams_id(s);
 
     argv++;
     argc--;
@@ -452,7 +467,7 @@ static void audiosettings_setparams(t_audiosettings *x, t_symbol*s, int argc, t_
 
     argc-=advance;
     argv+=advance;
-    advance=audiosettings_setparams_next(x, argc, argv);
+    advance=audiosettings_setparams_next(argc, argv);
   }
   if(apply) {
     audiosettings_params_apply(x);
@@ -532,7 +547,7 @@ static void *audiosettings_new(void)
 
 void audiosettings_setup(void)
 {
-  s_pdsym=gensym("pda");
+  s_pdsym=gensym("pd");
 
   post("audiosettings: audio settings manager");
   post("          Copyright (C) 2010 IOhannes m zmoelnig");
@@ -561,17 +576,16 @@ void audiosettings_setup(void)
 }
 
 
-
-
-
-
-
 static void audiosettings_testdevices(t_audiosettings *x)
 {
   int i;
 
   char indevlist[MAXNDEV][DEVDESCSIZE], outdevlist[MAXNDEV][DEVDESCSIZE];
   int indevs = 0, outdevs = 0, canmulti = 0, cancallback = 0;
+
+  if(0) {
+    pd_error(x, "this should never happen");
+  }
  
   sys_get_audio_devs((char*)indevlist, &indevs, (char*)outdevlist, &outdevs, &canmulti,
                 &cancallback, MAXNDEV, DEVDESCSIZE);
