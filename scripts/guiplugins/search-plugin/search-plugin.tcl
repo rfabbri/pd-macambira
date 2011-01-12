@@ -12,10 +12,6 @@ namespace eval ::dialog_search:: {
     variable basedir_list {}
 }
 
-# TODO filter out x,y numbers and #X, highlight obj/text/array/etc
-# TODO show the busy state somehow, grey out entry?
-# TODO add implied '^' to searches that don't contain regexp [a-zA-Z0-9 _-]
-
 # find_doc_files
 # basedir - the directory to start looking in
 proc ::dialog_search::find_doc_files { basedir } {
@@ -108,8 +104,18 @@ proc ::dialog_search::searchfile {searchtext file_contents widget filename based
     variable basedir_list
     set n 0
     foreach line $file_contents {
-        if {[regexp -nocase -- $searchtext $line]} {
-            set formatted_line [regsub {^#X (\S+) [0-9]+ [0-9]+} $line {〈\1〉}]
+        # TODO this could be optimized so that the lines are added to
+        # a var, then the regsubs are run on the whole text, then its
+        # inserted into the widget
+        if {[regexp -nocase -- "\[^a-zA-Z\]$searchtext" $line]} {
+            set line [regsub { \\} $line {}]
+            set line [regsub {\\} $line {}]
+            set line [regsub {^#X text [0-9]+ [0-9]+ (.*?);*} $line {\1}]
+            set line [regsub {^#X obj [0-9]+ [0-9]+ (.*?);*} $line {［ \1］}]
+            set line [regsub {^#X msg [0-9]+ [0-9]+ (.*?);*} $line {⃒ \1〈}]
+            set line [regsub {^#X (\S+) [0-9]+ [0-9]+(.*?);*} $line {〈\1〉\2}]
+            set formatted_line [regsub {^#N \S+ [0-9]+ [0-9]+ [0-9]+ [0-9]+ (.*?);} \
+                                    $line {[pd \1]}]
             $widget insert end "$filename: $formatted_line"
             lappend basedir_list $basedir
             incr n
