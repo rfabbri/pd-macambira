@@ -25,52 +25,57 @@
 
 static t_class *audiosettings_class;
 
-typedef struct _as_apis {
+t_symbol*s_pdsym=NULL;
+
+typedef struct _as_drivers {
   t_symbol*name;
   int      id;
 
-  struct _as_apis *next;
-} t_as_apis;
+  struct _as_drivers *next;
+} t_as_drivers;
 
+typedef struct _as_params {
+  int naudioindev, audioindev[MAXAUDIOINDEV], chindev[MAXAUDIOINDEV];
+  int naudiooutdev, audiooutdev[MAXAUDIOOUTDEV], choutdev[MAXAUDIOOUTDEV];
+  int rate, advance, callback;  
+} t_as_params;
 
-t_as_apis*as_findapi(t_as_apis*apis, const t_symbol*name) {
-  while(apis) {
-    if(name==apis->name)return apis;
-    apis=apis->next;
+t_as_drivers*as_finddriver(t_as_drivers*drivers, const t_symbol*name) {
+  while(drivers) {
+    if(name==drivers->name)return drivers;
+    drivers=drivers->next;
   }
   return NULL;
 }
 
-t_as_apis*as_findapiid(t_as_apis*apis, const int id) {
-  while(apis) {
-    if(id==apis->id)return apis;
-    apis=apis->next;
+t_as_drivers*as_finddriverid(t_as_drivers*drivers, const int id) {
+  while(drivers) {
+    if(id==drivers->id)return drivers;
+    drivers=drivers->next;
   }
   return NULL;
 }
 
-t_as_apis*as_addapi(t_as_apis*apis, t_symbol*name, int id, int overwrite) {
-  t_as_apis*api=as_findapi(apis, name);
+t_as_drivers*as_adddriver(t_as_drivers*drivers, t_symbol*name, int id, int overwrite) {
+  t_as_drivers*driver=as_finddriver(drivers, name);
 
-  if(api) {
+  if(driver) {
     if(overwrite) {
-      api->name=name;
-      api->id  =id;
+      driver->name=name;
+      driver->id  =id;
     }
-    return apis;
+    return drivers;
   }
 
-  api=(t_as_apis*)getbytes(sizeof(t_as_apis));
-  api->name=name;
-  api->id=id;
-  api->next=apis;
+  driver=(t_as_drivers*)getbytes(sizeof(t_as_drivers));
+  driver->name=name;
+  driver->id=id;
+  driver->next=drivers;
 
-  return api;
+  return driver;
 }
 
-t_as_apis*as_apiparse(t_as_apis*apis, const char*buf) {
-  t_as_apis*api=apis;
-
+t_as_drivers*as_driverparse(t_as_drivers*drivers, const char*buf) {
   int start=-1;
   int stop =-1;
 
@@ -89,14 +94,14 @@ t_as_apis*as_apiparse(t_as_apis*apis, const char*buf) {
       stop=index;
 
       if(start>=0 && start<stop) {
-        char apiname[MAXPDSTRING];
-        int  apiid;
+        char drivername[MAXPDSTRING];
+        int  driverid;
         int length=stop-start;
         if(length>=MAXPDSTRING)length=MAXPDSTRING-1;
         snprintf(substring, length, "%s", buf+start+1);
         
-        if(2==sscanf(substring, "%s %d", apiname, &apiid)) {
-          apis=as_addapi(apis, gensym(apiname), apiid, 0);
+        if(2==sscanf(substring, "%s %d", drivername, &driverid)) {
+          drivers=as_adddriver(drivers, gensym(drivername), driverid, 0);
         } else {
           post("unparseable: '%s'", substring);
         }
@@ -106,32 +111,67 @@ t_as_apis*as_apiparse(t_as_apis*apis, const char*buf) {
     }
   }
 
-  return apis;
+  return drivers;
 }
 
-static t_as_apis*APIS=NULL;
+static t_as_drivers*DRIVERS=NULL;
 
-static t_symbol*as_getapiname(const int id) {
-  t_as_apis*api=as_findapiid(APIS, id);
-  if(api) {
-    return api->name;
+static t_symbol*as_getdrivername(const int id) {
+  t_as_drivers*driver=as_finddriverid(DRIVERS, id);
+  if(driver) {
+    return driver->name;
   } else {
     return gensym("<unknown>");
   }
 }
 
-static int as_getapiid(const t_symbol*id) {
-  t_as_apis*api=as_findapi(APIS, id);
-  if(api) {
-    return api->id;
+static int as_getdriverid(const t_symbol*id) {
+  t_as_drivers*driver=as_finddriver(DRIVERS, id);
+  if(driver) {
+    return driver->id;
   }
   return -1; /* unknown */
 }
+
+
+
+static void as_params_print(t_as_params*parms) {
+  int i=0;
+  post("indevs: %d", parms->naudioindev);
+  for(i=0; i<MAXAUDIOINDEV; i++) {
+    post("indev: %d %d", parms->audioindev[i], parms->chindev[i]);
+  }
+  post("outdevs: %d", parms->naudiooutdev);
+  for(i=0; i<MAXAUDIOOUTDEV; i++) {
+    post("outdev: %d %d", parms->audiooutdev[i], parms->choutdev[i]);
+  }
+  post("rate=%d", parms->rate);
+  post("advance=%d", parms->advance);
+  post("callback=%d", parms->callback);
+
+}
+static void as_params_get(t_as_params*parms) {
+  memset(parms, 0, sizeof(t_as_params));
+
+  sys_get_audio_params(&parms->naudioindev,  parms->audioindev,  parms->chindev,
+                       &parms->naudiooutdev, parms->audiooutdev, parms->choutdev, 
+                       &parms->rate,        &parms->advance,    &parms->callback);
+
+
+  post("\n=================================");
+  as_params_print(parms);
+  post("=================================\n");
+}
+
+
 
 typedef struct _audiosettings
 {
   t_object x_obj;
   t_outlet*x_info;
+
+
+  t_as_params x_params;
 } t_audiosettings;
 
 
@@ -150,8 +190,8 @@ static void audiosettings_listdevices(t_audiosettings *x)
                      &canmulti, &cancallback, 
                      MAXNDEV, DEVDESCSIZE);
 
-  SETSYMBOL (atoms+0, gensym("api"));
-  SETSYMBOL (atoms+1, as_getapiname(sys_audioapi));
+  SETSYMBOL (atoms+0, gensym("driver"));
+  SETSYMBOL (atoms+1, as_getdrivername(sys_audioapi));
   outlet_anything(x->x_info, gensym("device"), 2, atoms);
 
   SETSYMBOL (atoms+0, gensym("multi"));
@@ -178,7 +218,7 @@ static void audiosettings_listdevices(t_audiosettings *x)
 
   SETSYMBOL(atoms+1, gensym("devices"));
   SETFLOAT (atoms+2, (t_float)outdevs);
-  outlet_anything(x->x_info, gensym("device"), 2, atoms);
+  outlet_anything(x->x_info, gensym("device"), 3, atoms);
 
   for(i=0; i<outdevs; i++) {
     SETFLOAT (atoms+1, (t_float)i);
@@ -186,59 +226,59 @@ static void audiosettings_listdevices(t_audiosettings *x)
     outlet_anything(x->x_info, gensym("device"), 3, atoms);
   }
 }
+
+/* this is the actual settings used
+ *
+ */
 static void audiosettings_listparams(t_audiosettings *x) {
   int i;
   t_atom atoms[4];
 
-  int naudioindev=1, audioindev[MAXAUDIOINDEV], chindev[MAXAUDIOINDEV];
-  int naudiooutdev, audiooutdev[MAXAUDIOOUTDEV], choutdev[MAXAUDIOOUTDEV];
-  int rate, advance, callback;
-  sys_get_audio_params(&naudioindev, audioindev, chindev,
-                       &naudiooutdev, audiooutdev, choutdev, 
-                       &rate, &advance, &callback);
-  
+  t_as_params params;
+  as_params_get(&params);
 
   SETSYMBOL (atoms+0, gensym("rate"));
-  SETFLOAT (atoms+1, (t_float)rate);
+  SETFLOAT (atoms+1, (t_float)params.rate);
   outlet_anything(x->x_info, gensym("params"), 2, atoms);
 
   SETSYMBOL (atoms+0, gensym("advance"));
-  SETFLOAT (atoms+1, (t_float)advance);
+  SETFLOAT (atoms+1, (t_float)params.advance);
   outlet_anything(x->x_info, gensym("params"), 2, atoms);
 
   SETSYMBOL (atoms+0, gensym("callback"));
-  SETFLOAT (atoms+1, (t_float)callback);
+  SETFLOAT (atoms+1, (t_float)params.callback);
   outlet_anything(x->x_info, gensym("params"), 2, atoms);
 
   SETSYMBOL(atoms+0, gensym("in"));
 
   SETSYMBOL(atoms+1, gensym("devices"));
-  SETFLOAT (atoms+2, (t_float)naudioindev);
+  SETFLOAT (atoms+2, (t_float)params.naudioindev);
   outlet_anything(x->x_info, gensym("params"), 3, atoms);
 
-  for(i=0; i<naudioindev; i++) {
-    SETFLOAT (atoms+1, (t_float)audioindev[i]);
-    SETFLOAT (atoms+2, (t_float)chindev[i]);
+  for(i=0; i<params.naudioindev; i++) {
+    SETFLOAT (atoms+1, (t_float)params.audioindev[i]);
+    SETFLOAT (atoms+2, (t_float)params.chindev[i]);
     outlet_anything(x->x_info, gensym("params"), 3, atoms);
   }
 
   SETSYMBOL(atoms+0, gensym("out"));
 
   SETSYMBOL(atoms+1, gensym("devices"));
-  SETFLOAT (atoms+2, (t_float)naudiooutdev);
+  SETFLOAT (atoms+2, (t_float)params.naudiooutdev);
   outlet_anything(x->x_info, gensym("params"), 3, atoms);
 
-  for(i=0; i<naudiooutdev; i++) {
-    SETFLOAT (atoms+1, (t_float)audiooutdev[i]);
-    SETFLOAT (atoms+2, (t_float)choutdev[i]);
+  for(i=0; i<params.naudiooutdev; i++) {
+    SETFLOAT (atoms+1, (t_float)params.audiooutdev[i]);
+    SETFLOAT (atoms+2, (t_float)params.choutdev[i]);
     outlet_anything(x->x_info, gensym("params"), 3, atoms);
   }
 }
 
-/*
- * TODO: provide a nicer interface than the "pd audio-dialog"
- */
-static void audiosettings_set(t_audiosettings *x, t_symbol*s, int argc, t_atom*argv) {
+
+static void audiosettings_params_init(t_audiosettings*x) {
+  as_params_get(&x->x_params);
+}
+static void audiosettings_params_apply(t_audiosettings*x) {
 /*
      "pd audio-dialog ..."
      #00: indev[0]
@@ -261,13 +301,268 @@ static void audiosettings_set(t_audiosettings *x, t_symbol*s, int argc, t_atom*a
      #17: advance
      #18: callback
 */
+
+  t_atom argv [2*MAXAUDIOINDEV+2*MAXAUDIOOUTDEV+3];
+  int argc=2*MAXAUDIOINDEV+2*MAXAUDIOOUTDEV+3;
+
+  int i=0;
+
+  as_params_print(&x->x_params);
+
+
+
+  for(i=0; i<MAXAUDIOINDEV; i++) {
+    SETFLOAT(argv+i+0*MAXAUDIOINDEV, (t_float)(x->x_params.audioindev[i]));
+    SETFLOAT(argv+i+1*MAXAUDIOINDEV, (t_float)(x->x_params.chindev   [i]));
+  }
+  for(i=0; i<MAXAUDIOOUTDEV; i++) {
+    SETFLOAT(argv+i+2*MAXAUDIOINDEV+0*MAXAUDIOOUTDEV,(t_float)(x->x_params.audiooutdev[i]));
+    SETFLOAT(argv+i+2*MAXAUDIOINDEV+1*MAXAUDIOOUTDEV,(t_float)(x->x_params.choutdev   [i]));
+  }
+
+  SETFLOAT(argv+2*MAXAUDIOINDEV+2*MAXAUDIOOUTDEV+0,(t_float)(x->x_params.rate));
+  SETFLOAT(argv+2*MAXAUDIOINDEV+2*MAXAUDIOOUTDEV+1,(t_float)(x->x_params.advance));
+  SETFLOAT(argv+2*MAXAUDIOINDEV+2*MAXAUDIOOUTDEV+2,(t_float)(x->x_params.callback));
+
+  if (s_pdsym->s_thing) typedmess(s_pdsym->s_thing, 
+				  gensym("audio-dialog"), 
+				  argc,
+				  argv);
+}
+
+
+/* find the beginning of the next parameter in the list */
+typedef enum {
+  PARAM_RATE,
+  PARAM_ADVANCE,
+  PARAM_CALLBACK,
+  PARAM_INPUT,
+  PARAM_OUTPUT,
+  PARAM_INVALID
+} t_paramtype;
+static t_paramtype audiosettings_setparams_id(t_audiosettings*x, t_symbol*s) {
+  if(gensym("@rate")==s) {
+    return PARAM_RATE;
+  } else if(gensym("@samplerate")==s) {
+    return PARAM_RATE;
+  } else if(gensym("@advance")==s) {
+    return PARAM_ADVANCE;
+  } else if(gensym("@buffersize")==s) {
+    return PARAM_ADVANCE;
+  } else if(gensym("@callback")==s) {
+    return PARAM_CALLBACK;
+  } else if(gensym("@input")==s) {
+    return PARAM_INPUT;
+  } else if(gensym("@output")==s) {
+    return PARAM_OUTPUT;
+  }
+  return PARAM_INVALID;
+}
+
+/* find the beginning of the next parameter in the list */
+static int audiosettings_setparams_next(t_audiosettings*x, int argc, t_atom*argv) {
+  int i=0;
+  for(i=0; i<argc; i++) {
+    if(A_SYMBOL==argv[i].a_type) {
+      t_symbol*s=atom_getsymbol(argv+i);
+      if('@'==s->s_name[0])
+	return i;
+    }
+  }
+  return i;
+}
+
+/* <rate> ... */
+static int audiosettings_setparams_rate(t_audiosettings*x, int argc, t_atom*argv) {
+  if(argc<=0)return 1;
+  t_int rate=atom_getint(argv);
+  post("::rate=%d\t", rate);
+  if(rate>0)
+    x->x_params.rate=rate;
+  return 1;
+}
+
+/* <advance> ... */
+static int audiosettings_setparams_advance(t_audiosettings*x, int argc, t_atom*argv) {
+  if(argc<=0)return 1;
+  t_int advance=atom_getint(argv);
+  if(advance>0)
+    x->x_params.advance=advance;
+
+  post("::advance=%d", advance);
+  return 1;
+}
+
+/* <callback?> ... */
+static int audiosettings_setparams_callback(t_audiosettings*x, int argc, t_atom*argv) {
+  if(argc<=0)return 1;
+  t_int callback=atom_getint(argv);
+  x->x_params.callback=callback;
+
+  post("::callback=%d", callback);
+  return 1;
+}
+
+/* [<device> <channels>]* ... */
+static int audiosettings_setparams_input(t_audiosettings*x, int argc, t_atom*argv) {
+  return 0;
+}
+
+static int audiosettings_setparams_output(t_audiosettings*x, int argc, t_atom*argv) {
+  return 0;
+}
+
+static void audiosettings_setparams(t_audiosettings *x, t_symbol*s, int argc, t_atom*argv) {
 /*
   PLAN:
     several messages that accumulate to a certain settings, and then "apply" them
 */
+  int apply=1;
+  int advance=0;
+  t_paramtype param=PARAM_INVALID;
 
-       
+  advance=audiosettings_setparams_next(x, argc, argv);
+  while((argc-=advance)>0) {
+    argv+=advance;
+    param=audiosettings_setparams_id(x, atom_getsymbol(argv));
+
+    argv++;
+    argc--;
+
+    switch(param) {
+    case PARAM_RATE:
+      advance=audiosettings_setparams_rate(x, argc, argv);
+      break;
+    case PARAM_ADVANCE:
+      advance=audiosettings_setparams_advance(x, argc, argv);
+      break;
+    case PARAM_CALLBACK:
+      advance=audiosettings_setparams_callback(x, argc, argv);
+      break;
+    case PARAM_INPUT:
+      advance=audiosettings_setparams_input(x, argc, argv);
+      break;
+    case PARAM_OUTPUT:
+      advance=audiosettings_setparams_output(x, argc, argv);
+      break;
+    default:
+      pd_error(x, "unknown parameter"); postatom(1, argv);endpost();
+      break;
+    }
+
+    argc-=advance;
+    argv+=advance;
+    advance=audiosettings_setparams_next(x, argc, argv);
+  }
+  if(apply) {
+    audiosettings_params_apply(x);
+    audiosettings_params_init (x); /* re-initialize to what we got */
+  }
 }
+
+static void audiosettings_testdevices(t_audiosettings *x);
+
+
+/*
+ */
+static void audiosettings_listdrivers(t_audiosettings *x)
+{
+  t_as_drivers*driver=NULL;
+  t_atom ap[2];
+
+  for(driver=DRIVERS; driver; driver=driver->next) {
+    SETSYMBOL(ap+0, driver->name);
+    SETFLOAT (ap+1, (t_float)(driver->id));
+    outlet_anything(x->x_info, gensym("driver"), 2, ap);    
+  }
+}
+
+static void audiosettings_setdriver(t_audiosettings *x, t_symbol*s, int argc, t_atom*argv) {
+  int id=-1;
+  s=gensym("<unknown>"); /* just re-use the argument, which is not needed anyhow */
+  switch(argc) {
+  case 0:
+    audiosettings_listdrivers(x);
+    return;
+  case 1:
+    if(A_FLOAT==argv->a_type) {
+      s=as_getdrivername(atom_getint(argv));
+      break;
+    } else if (A_SYMBOL==argv->a_type) {
+      s=atom_getsymbol(argv);
+      break;
+    }
+  }
+
+  id=as_getdriverid(s);
+  if(id<0) {
+    pd_error(x, "invalid driver '%s'", s->s_name);
+    return;
+  }
+  verbose(1, "setting driver '%s' (=%d)", s->s_name, id);
+  sys_set_audio_api(id);
+  sys_reopen_audio();
+}
+
+static void audiosettings_bang(t_audiosettings *x) {
+  audiosettings_listdrivers(x);
+  audiosettings_listdevices(x);
+  audiosettings_listparams(x);
+}
+
+
+static void audiosettings_free(t_audiosettings *x){
+
+}
+
+
+static void *audiosettings_new(void)
+{
+  t_audiosettings *x = (t_audiosettings *)pd_new(audiosettings_class);
+  x->x_info=outlet_new(&x->x_obj, 0);
+
+  char buf[MAXPDSTRING];
+  sys_get_audio_apis(buf);
+
+  DRIVERS=as_driverparse(DRIVERS, buf);
+  audiosettings_params_init (x); 
+  return (x);
+}
+
+
+void audiosettings_setup(void)
+{
+  s_pdsym=gensym("pda");
+
+  post("audiosettings: audio settings manager");
+  post("          Copyright (C) 2010 IOhannes m zmoelnig");
+  post("          for the IntegraLive project");
+  post("          institute of electronic music and acoustics (iem)");
+  post("          published under the GNU General Public License version 3 or later");
+#ifdef AUDIOSETTINGS_VERSION
+  startpost("          version:"AUDIOSETTINGS_VERSION);
+#endif
+  post("\tcompiled: "__DATE__"");
+
+  audiosettings_class = class_new(gensym("audiosettings"), (t_newmethod)audiosettings_new, (t_method)audiosettings_free,
+			     sizeof(t_audiosettings), 0, 0);
+
+  class_addbang(audiosettings_class, (t_method)audiosettings_bang);
+  class_addmethod(audiosettings_class, (t_method)audiosettings_listdrivers, gensym("listdrivers"), A_NULL);
+  class_addmethod(audiosettings_class, (t_method)audiosettings_listdevices, gensym("listdevices"), A_NULL);
+  class_addmethod(audiosettings_class, (t_method)audiosettings_listparams, gensym("listparams"), A_NULL);
+
+
+  class_addmethod(audiosettings_class, (t_method)audiosettings_setdriver, gensym("driver"), A_GIMME);
+  class_addmethod(audiosettings_class, (t_method)audiosettings_setparams, gensym("params"), A_GIMME);
+
+  class_addmethod(audiosettings_class, (t_method)audiosettings_testdevices, gensym("testdevices"), A_NULL);
+
+}
+
+
+
+
 
 
 
@@ -311,81 +606,3 @@ static void audiosettings_testdevices(t_audiosettings *x)
   post("rate=%d\tadvance=%d\tcallback=%d", rate, advance, callback);
 
 }
-/*
- */
-static void audiosettings_listapis(t_audiosettings *x)
-{
-
-  t_as_apis*api=NULL;
-
-  for(api=APIS; api; api=api->next) {
-    t_atom ap[1];
-    SETSYMBOL(ap, api->name);
-    outlet_anything(x->x_info, gensym("driver"), 1, ap);    
-  }
-}
-
-static void audiosettings_setapi(t_audiosettings *x, t_symbol*s) {
-  int id=as_getapiid(s);
-  if(id<0) {
-    pd_error(x, "invalid API: '%s'", s->s_name);
-  }
-  verbose(1, "setting API: %d", id);
-  sys_set_audio_api(id);
-  sys_reopen_audio();
-}
-
-static void audiosettings_bang(t_audiosettings *x) {
-  audiosettings_listapis(x);
-  audiosettings_listdevices(x);
-  audiosettings_listparams(x);
-}
-
-
-static void audiosettings_free(t_audiosettings *x){
-
-}
-
-
-static void *audiosettings_new(void)
-{
-  t_audiosettings *x = (t_audiosettings *)pd_new(audiosettings_class);
-  x->x_info=outlet_new(&x->x_obj, 0);
-
-  char buf[MAXPDSTRING];
-  sys_get_audio_apis(buf);
-
-  APIS=as_apiparse(APIS, buf);
-
-  return (x);
-}
-
-
-void audiosettings_setup(void)
-{
-  post("audiosettings: audio settings manager");
-  post("          Copyright (C) 2010 IOhannes m zmoelnig");
-  post("          for the IntegraLive project");
-  post("          institute of electronic music and acoustics (iem)");
-  post("          published under the GNU General Public License version 3 or later");
-#ifdef AUDIOSETTINGS_VERSION
-  startpost("          version:"AUDIOSETTINGS_VERSION);
-#endif
-  post("\tcompiled: "__DATE__"");
-
-  audiosettings_class = class_new(gensym("audiosettings"), (t_newmethod)audiosettings_new, (t_method)audiosettings_free,
-			     sizeof(t_audiosettings), 0, 0);
-
-  class_addbang(audiosettings_class, (t_method)audiosettings_bang);
-  class_addmethod(audiosettings_class, (t_method)audiosettings_listapis, gensym("listapis"), A_NULL);
-  class_addmethod(audiosettings_class, (t_method)audiosettings_listdevices, gensym("listdevices"), A_NULL);
-  class_addmethod(audiosettings_class, (t_method)audiosettings_listparams, gensym("listparams"), A_NULL);
-
-
-  class_addmethod(audiosettings_class, (t_method)audiosettings_setapi, gensym("setapi"), A_SYMBOL);
-
-
-  class_addmethod(audiosettings_class, (t_method)audiosettings_testdevices, gensym("testdevices"), A_NULL);
-
-}
-
