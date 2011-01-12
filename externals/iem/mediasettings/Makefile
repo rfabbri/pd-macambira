@@ -5,16 +5,7 @@ LIBRARY_NAME = audiosettings
 
 # add your .c source files to the SOURCES variable, help files will be
 # included automatically
-SOURCES = audiosettings.c
-
-# For objects that only build on certain platforms, add those to the SOURCES
-# line for the right platforms.
-SOURCES_android = 
-SOURCES_cygwin = 
-SOURCES_macosx = 
-SOURCES_iphoneos = 
-SOURCES_linux = 
-SOURCES_windows = 
+SOURCES = audiosettings.c midisettings.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
 # be included automatically
@@ -56,7 +47,7 @@ INSTALL = install
 INSTALL_FILE    = $(INSTALL) -p -m 644
 INSTALL_DIR     = $(INSTALL) -p -m 755 -d
 
-CFLAGS = -DPD -I$(PD_PATH)/src -Wall -W -g
+CFLAGS = -DPD -I$(PD_PATH)/src -I$(prefix)/include/pd -Wall -W -g
 LDFLAGS =  
 LIBS = 
 ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) \
