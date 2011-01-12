@@ -390,7 +390,6 @@ static int audiosettings_setparams_next(int argc, t_atom*argv) {
 static int audiosettings_setparams_rate(t_audiosettings*x, int argc, t_atom*argv) {
   if(argc<=0)return 1;
   t_int rate=atom_getint(argv);
-  post("::rate=%d\t", rate);
   if(rate>0)
     x->x_params.rate=rate;
   return 1;
@@ -403,7 +402,6 @@ static int audiosettings_setparams_advance(t_audiosettings*x, int argc, t_atom*a
   if(advance>0)
     x->x_params.advance=advance;
 
-  post("::advance=%d", advance);
   return 1;
 }
 
@@ -413,17 +411,70 @@ static int audiosettings_setparams_callback(t_audiosettings*x, int argc, t_atom*
   t_int callback=atom_getint(argv);
   x->x_params.callback=callback;
 
-  post("::callback=%d", callback);
   return 1;
 }
 
 /* [<device> <channels>]* ... */
 static int audiosettings_setparams_input(t_audiosettings*x, int argc, t_atom*argv) {
-  return 0;
+  int length=audiosettings_setparams_next(argc, argv);
+  int i;
+  int numpairs=length/2;
+
+  if(length%2)return length;
+
+  if(numpairs>MAXAUDIOINDEV)
+    numpairs=MAXAUDIOINDEV;
+
+  for(i=0; i<numpairs; i++) {
+    int dev=0;
+    int ch=0;
+
+    if(A_FLOAT==argv[2*i+0].a_type) {
+      dev=atom_getint(argv);
+    } else if (A_SYMBOL==argv[2*i+0].a_type) {
+      // LATER: get the device-id from the device-name
+      continue;
+    } else {
+      continue;
+    }
+    ch=atom_getint(argv+2*i+1);
+
+    x->x_params.audioindev[i]=dev;
+    x->x_params.chindev[i]=ch;
+  }
+
+  return length;
 }
 
 static int audiosettings_setparams_output(t_audiosettings*x, int argc, t_atom*argv) {
-  return 0;
+  int length=audiosettings_setparams_next(argc, argv);
+  int i;
+  int numpairs=length/2;
+
+  if(length%2)return length;
+
+  if(numpairs>MAXAUDIOOUTDEV)
+    numpairs=MAXAUDIOOUTDEV;
+
+  for(i=0; i<numpairs; i++) {
+    int dev=0;
+    int ch=0;
+
+    if(A_FLOAT==argv[2*i+0].a_type) {
+      dev=atom_getint(argv);
+    } else if (A_SYMBOL==argv[2*i+0].a_type) {
+      // LATER: get the device-id from the device-name
+      continue;
+    } else {
+      continue;
+    }
+    ch=atom_getint(argv+2*i+1);
+
+    x->x_params.audiooutdev[i]=dev;
+    x->x_params.choutdev[i]=ch;
+  }
+
+  return length;
 }
 
 static void audiosettings_setparams(t_audiosettings *x, t_symbol*s, int argc, t_atom*argv) {
