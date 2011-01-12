@@ -100,8 +100,11 @@ void libdir_setup(void)
 {
 /* relies on t.grill's loader functionality, fully added in 0.40 */
     sys_register_loader(libdir_loader);
-    post("libdir loader %s",version);  
-    post("\tcompiled on "__DATE__" at "__TIME__ " ");
-    post("\tcompiled against Pd version %d.%d.%d.%s", PD_MAJOR_VERSION, 
-         PD_MINOR_VERSION, PD_BUGFIX_VERSION, PD_TEST_VERSION);
+    if(sys_verbose)
+    {
+        post("libdir loader %s",version);  
+        post("\tcompiled on "__DATE__" at "__TIME__ " ");
+        post("\tcompiled against Pd version %d.%d.%d.%s", PD_MAJOR_VERSION,
+             PD_MINOR_VERSION, PD_BUGFIX_VERSION, PD_TEST_VERSION);
+    }
 }
