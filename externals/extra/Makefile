@@ -63,6 +63,26 @@ ifeq ($(UNAME),Linux)
   LIBS += -lc
   STRIP = strip --strip-unneeded -R .note -R .comment
 endif
+ifeq ($(UNAME),GNU)
+  # GNU/Hurd, should work like GNU/Linux for basically all externals
+  SOURCES += $(SOURCES_linux)
+  EXTENSION = pd_linux
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  ALL_CFLAGS += -fPIC
+  ALL_LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+endif
+ifeq ($(UNAME),GNU/kFreeBSD)
+  # Debian GNU/kFreeBSD, should work like GNU/Linux for basically all externals
+  SOURCES += $(SOURCES_linux)
+  EXTENSION = pd_linux
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  ALL_CFLAGS += -fPIC
+  ALL_LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+endif
 ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
 #  SOURCES += $(SOURCES_Linux)
   EXTENSION = dll
