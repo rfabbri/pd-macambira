@@ -7,6 +7,8 @@ package require pd_menucommands
 
 namespace eval ::dialog_search:: {
     variable selected_file {}
+    variable selected_basedir {}
+    variable basedir_list {}
 }
 
 # TODO it works funny when libdirs are symlinks
@@ -42,50 +44,62 @@ proc ::dialog_search::find_doc_files { basedir } {
 
 proc ::dialog_search::selectline {listingwidget} {
     variable selected_file
+    variable selected_basedir
+    variable basedir_list
     set selection [$listingwidget curselection]
     if {$selection eq ""} {
         set selected_file ""
     } else {
         set line [$listingwidget get $selection]
         set selected_file [string replace $line [string first ":" $line] end]
+        set selected_basedir [lindex $basedir_list $selection]
     }
 }
 
-proc ::dialog_search::readfile {file varName} {
-    upvar \#0 $varName data
-    set fp [open $file]
-    set data [split [read $fp] \n]
+proc ::dialog_search::open_line {} {
+    variable selected_file
+    variable selected_basedir
+    if {$selected_file ne ""} {
+        menu_doc_open $selected_basedir $selected_file
+    }
+}
+
+proc ::dialog_search::readfile {filename} {
+    set fp [open $filename]
+    set file_contents [split [read $fp] \n]
     close $fp
+    return $file_contents
 }
 
 proc ::dialog_search::search {searchtext} {
+    variable basedir_list {}
     set widget .search.resultslistbox
     $widget delete 0 end
-    foreach dir [concat [file join $::sys_libdir doc] $::sys_searchpath $::sys_staticpath] {
+    foreach basedir [concat [file join $::sys_libdir doc] $::sys_searchpath $::sys_staticpath] {
         # Fix the directory name, this ensures the directory name is in the
         # native format for the platform and contains a final directory seperator
-        set dir [file normalize $dir]
-        foreach docfile [find_doc_files $dir] {
-            readfile $docfile data
-            searchfile $searchtext $widget \
-                [string replace $docfile 0 [string length $dir]]
+        set basedir [file normalize $basedir]
+        foreach docfile [find_doc_files $basedir] {
+            searchfile $searchtext [readfile $docfile] $widget \
+                [string replace $docfile 0 [string length $basedir]] $basedir
         }
     }
 }
 
-proc ::dialog_search::searchfile {searchtext widget filename} {
-    global data
+proc ::dialog_search::searchfile {searchtext file_contents widget filename basedir} {
+    variable basedir_list
     set n 0
-    foreach line $data {
+    foreach line $file_contents {
         if {[regexp -nocase -- $searchtext $line]} {
             $widget insert end "$filename: $line"
+            lappend basedir_list $basedir
             incr n
         }
     }
 }
 
 proc ::dialog_search::ok {mytoplevel} {
-    pdtk_post "::dialog_search::ok\n"
+    # this is a placeholder for the standard dialog bindings
 }
 
 proc ::dialog_search::cancel {mytoplevel} {
@@ -93,42 +107,42 @@ proc ::dialog_search::cancel {mytoplevel} {
 }
 
 proc ::dialog_search::open_search_dialog {mytoplevel} {
-    if {[winfo exists .search]} {
-        wm deiconify .search
-        raise .search
+    if {[winfo exists $mytoplevel]} {
+        wm deiconify $mytoplevel
+        raise $mytoplevel
     } else {
-        create_dialog
+        create_dialog $mytoplevel
     }
 }
 
-proc ::dialog_search::create_dialog {} {
+proc ::dialog_search::create_dialog {mytoplevel} {
     variable selected_file
-    toplevel .search
-    wm title .search [_ "Search"]
-    entry .search.searchtextentry -bg white -textvar searchtext
-    bind .search.searchtextentry <Return> {::dialog_search::search $searchtext}
+    toplevel $mytoplevel
+    wm title $mytoplevel [_ "Search"]
+    entry $mytoplevel.searchtextentry -bg white -textvar searchtext \
+        -highlightcolor blue -font 18 -borderwidth 3
+    bind $mytoplevel.searchtextentry <Return> {::dialog_search::search $searchtext}
     # TODO add history like in the find box
-    bind .search.searchtextentry <Up> {set searchtext ""}
-    listbox .search.resultslistbox -yscrollcommand ".search.yscrollbar set" \
+    bind $mytoplevel.searchtextentry <Up> {set searchtext ""}
+    listbox $mytoplevel.resultslistbox -yscrollcommand "$mytoplevel.yscrollbar set" \
         -bg white -highlightcolor blue -height 30 -width 80
-    scrollbar .search.yscrollbar -command ".search.resultslistbox yview" \
+    scrollbar $mytoplevel.yscrollbar -command "$mytoplevel.resultslistbox yview" \
         -takefocus 0
-    bind .search.resultslistbox <<ListboxSelect>> \
-        "::dialog_search::selectline .search.resultslistbox"
-    bind .search.resultslistbox <Key-Return> \
-        {menu_doc_open $::sys_libdir $::dialog_search::selected_file}
-	bind .search.resultslistbox <Double-ButtonRelease-1> \
-        {menu_doc_open $::sys_libdir $::dialog_search::selected_file}
-    ::pd_bindings::dialog_bindings .search "search"
+    bind $mytoplevel.resultslistbox <<ListboxSelect>> \
+        "::dialog_search::selectline $mytoplevel.resultslistbox"
+    bind $mytoplevel.resultslistbox <Key-Return> ::dialog_search::open_line
+	bind $mytoplevel.resultslistbox <Double-ButtonRelease-1> ::dialog_search::open_line
+    ::pd_bindings::dialog_bindings $mytoplevel "search"
 
-    grid .search.searchtextentry - -sticky ew
-    grid .search.resultslistbox .search.yscrollbar -sticky news
+    grid $mytoplevel.searchtextentry - -sticky ew
+    grid $mytoplevel.resultslistbox $mytoplevel.yscrollbar -sticky news
     grid columnconfig . 0 -weight 1
     grid rowconfig    . 1 -weight 1
     
-    focus .search.searchtextentry
+    focus $mytoplevel.searchtextentry
 }
 
+# create the menu item on load
 set mymenu .menubar.help
 set inserthere [$mymenu index [_ "Report a bug"]]
 $mymenu insert $inserthere separator
