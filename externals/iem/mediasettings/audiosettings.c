@@ -566,8 +566,20 @@ static void audiosettings_setdriver(t_audiosettings *x, t_symbol*s, int argc, t_
     return;
   }
   verbose(1, "setting driver '%s' (=%d)", s->s_name, id);
+#ifdef HAVE_SYS_CLOSE_AUDIO
+  sys_close_audio();
   sys_set_audio_api(id);
   sys_reopen_audio();
+#else
+  if (s_pdsym->s_thing) {
+    t_atom ap[1];
+    SETFLOAT(ap, id);
+    typedmess(s_pdsym->s_thing, 
+              gensym("audio-setapi"), 
+              1,
+              ap);
+  }
+#endif
 }
 
 static void audiosettings_bang(t_audiosettings *x) {
