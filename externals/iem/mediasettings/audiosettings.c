@@ -104,7 +104,8 @@ t_as_drivers*as_driverparse(t_as_drivers*drivers, const char*buf) {
         if(2==sscanf(substring, "%s %d", drivername, &driverid)) {
           drivers=as_adddriver(drivers, gensym(drivername), driverid, 0);
         } else {
-          post("unparseable: '%s'", substring);
+          if((start+1)!=(stop))
+            post("unparseable: '%s' (%d-%d)", substring, start, stop);
         }
       }
       start=-1;
