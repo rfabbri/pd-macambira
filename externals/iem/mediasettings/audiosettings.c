@@ -487,6 +487,8 @@ static void audiosettings_setparams(t_audiosettings *x, t_symbol*s, int argc, t_
   int advance=0;
   t_paramtype param=PARAM_INVALID;
 
+  audiosettings_params_init (x); /* re-initialize to what we got */
+
   advance=audiosettings_setparams_next(argc, argv);
   while((argc-=advance)>0) {
     argv+=advance;
@@ -523,7 +525,6 @@ static void audiosettings_setparams(t_audiosettings *x, t_symbol*s, int argc, t_
   }
   if(apply) {
     audiosettings_params_apply(x);
-    audiosettings_params_init (x); /* re-initialize to what we got */
   }
 }
 
