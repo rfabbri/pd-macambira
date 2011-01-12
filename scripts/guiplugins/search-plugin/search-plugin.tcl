@@ -6,12 +6,15 @@ package require pd_bindings
 package require pd_menucommands
 
 namespace eval ::dialog_search:: {
+    variable searchtext {}
     variable selected_file {}
     variable selected_basedir {}
     variable basedir_list {}
 }
 
-# TODO it works funny when libdirs are symlinks
+# TODO filter out x,y numbers and #X, highlight obj/text/array/etc
+# TODO show the busy state somehow, grey out entry?
+# TODO add implied '^' to searches that don't contain regexp [a-zA-Z0-9 _-]
 
 # find_doc_files
 # basedir - the directory to start looking in
@@ -73,6 +76,8 @@ proc ::dialog_search::readfile {filename} {
 
 proc ::dialog_search::search {searchtext} {
     variable basedir_list {}
+    if {$searchtext eq ""} return
+    .search.searchtextentry selection clear
     set widget .search.resultslistbox
     $widget delete 0 end
     foreach basedir [concat [file join $::sys_libdir doc] $::sys_searchpath $::sys_staticpath] {
@@ -119,25 +124,30 @@ proc ::dialog_search::create_dialog {mytoplevel} {
     variable selected_file
     toplevel $mytoplevel
     wm title $mytoplevel [_ "Search"]
-    entry $mytoplevel.searchtextentry -bg white -textvar searchtext \
-        -highlightcolor blue -font 18 -borderwidth 3
-    bind $mytoplevel.searchtextentry <Return> {::dialog_search::search $searchtext}
+    entry $mytoplevel.searchtextentry -bg white -textvar ::dialog_search::searchtext \
+        -highlightcolor blue -font 18 -borderwidth 1
+    bind $mytoplevel.searchtextentry <Return> "$mytoplevel.searchbutton invoke"
     # TODO add history like in the find box
-    bind $mytoplevel.searchtextentry <Up> {set searchtext ""}
+    bind $mytoplevel.searchtextentry <Up> {set ::dialog_search::searchtext ""}
+    bind $mytoplevel.searchtextentry <$::modifier-Key-a> \
+        "$mytoplevel.searchtextentry selection range 0 end"
     listbox $mytoplevel.resultslistbox -yscrollcommand "$mytoplevel.yscrollbar set" \
         -bg white -highlightcolor blue -height 30 -width 80
     scrollbar $mytoplevel.yscrollbar -command "$mytoplevel.resultslistbox yview" \
         -takefocus 0
+    button $mytoplevel.searchbutton -text [_ "Search"] -takefocus 0 \
+        -command {::dialog_search::search $::dialog_search::searchtext}
+
+    grid $mytoplevel.searchtextentry $mytoplevel.searchbutton - -sticky ew
+    grid $mytoplevel.resultslistbox - $mytoplevel.yscrollbar -sticky news
+    grid columnconfigure $mytoplevel 0 -weight 1
+    grid rowconfigure    $mytoplevel 1 -weight 1
+
     bind $mytoplevel.resultslistbox <<ListboxSelect>> \
         "::dialog_search::selectline $mytoplevel.resultslistbox"
     bind $mytoplevel.resultslistbox <Key-Return> ::dialog_search::open_line
 	bind $mytoplevel.resultslistbox <Double-ButtonRelease-1> ::dialog_search::open_line
     ::pd_bindings::dialog_bindings $mytoplevel "search"
-
-    grid $mytoplevel.searchtextentry - -sticky ew
-    grid $mytoplevel.resultslistbox $mytoplevel.yscrollbar -sticky news
-    grid columnconfig . 0 -weight 1
-    grid rowconfig    . 1 -weight 1
     
     focus $mytoplevel.searchtextentry
 }
@@ -148,3 +158,5 @@ set inserthere [$mymenu index [_ "Report a bug"]]
 $mymenu insert $inserthere separator
 $mymenu insert $inserthere command -label [_ "Search"] \
     -command {::dialog_search::open_search_dialog .search}
+
+::dialog_search::open_search_dialog .search
