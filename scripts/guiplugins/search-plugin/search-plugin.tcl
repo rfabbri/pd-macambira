@@ -174,5 +174,3 @@ set inserthere [$mymenu index [_ "Report a bug"]]
 $mymenu insert $inserthere separator
 $mymenu insert $inserthere command -label [_ "Search"] \
     -command {::dialog_search::open_search_dialog .search}
-
-::dialog_search::open_search_dialog .search
