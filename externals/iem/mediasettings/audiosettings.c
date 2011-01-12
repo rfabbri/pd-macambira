@@ -174,7 +174,7 @@ static void as_params_get(t_as_params*parms) {
   }
 
 
-  as_params_print(parms);
+//  as_params_print(parms);
 }
 
 
@@ -321,7 +321,7 @@ static void audiosettings_params_apply(t_audiosettings*x) {
 
   int i=0;
 
-  as_params_print(&x->x_params);
+//  as_params_print(&x->x_params);
 
 
 
