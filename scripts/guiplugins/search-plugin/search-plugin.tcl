@@ -74,12 +74,24 @@ proc ::dialog_search::readfile {filename} {
     return $file_contents
 }
 
-proc ::dialog_search::search {searchtext} {
+proc ::dialog_search::search {} {
+    variable searchtext
     variable basedir_list {}
     if {$searchtext eq ""} return
     .search.searchtextentry selection clear
+    .search.searchtextentry configure -foreground gray -background gray90
+    .search.resultslistbox delete 0 end
+    update idletasks
+    do_search
+    # BUG? the above might cause weird bugs, so consider http://wiki.tcl.tk/1255
+    # and http://wiki.tcl.tk/1526
+#    after idle [list after 10 ::dialog_search::do_search]
+}
+
+proc ::dialog_search::do_search {} {
+    variable searchtext
+    variable basedir_list {}
     set widget .search.resultslistbox
-    $widget delete 0 end
     foreach basedir [concat [file join $::sys_libdir doc] $::sys_searchpath $::sys_staticpath] {
         # Fix the directory name, this ensures the directory name is in the
         # native format for the platform and contains a final directory seperator
@@ -89,6 +101,7 @@ proc ::dialog_search::search {searchtext} {
                 [string replace $docfile 0 [string length $basedir]] $basedir
         }
     }
+    .search.searchtextentry configure -foreground black -background white
 }
 
 proc ::dialog_search::searchfile {searchtext file_contents widget filename basedir} {
@@ -96,7 +109,8 @@ proc ::dialog_search::searchfile {searchtext file_contents widget filename based
     set n 0
     foreach line $file_contents {
         if {[regexp -nocase -- $searchtext $line]} {
-            $widget insert end "$filename: $line"
+            set formatted_line [regsub {^#X (\S+) [0-9]+ [0-9]+} $line {〈\1〉}]
+            $widget insert end "$filename: $formatted_line"
             lappend basedir_list $basedir
             incr n
         }
@@ -125,6 +139,7 @@ proc ::dialog_search::create_dialog {mytoplevel} {
     toplevel $mytoplevel
     wm title $mytoplevel [_ "Search"]
     entry $mytoplevel.searchtextentry -bg white -textvar ::dialog_search::searchtext \
+        -highlightbackground lightgray \
         -highlightcolor blue -font 18 -borderwidth 1
     bind $mytoplevel.searchtextentry <Return> "$mytoplevel.searchbutton invoke"
     # TODO add history like in the find box
@@ -136,7 +151,8 @@ proc ::dialog_search::create_dialog {mytoplevel} {
     scrollbar $mytoplevel.yscrollbar -command "$mytoplevel.resultslistbox yview" \
         -takefocus 0
     button $mytoplevel.searchbutton -text [_ "Search"] -takefocus 0 \
-        -command {::dialog_search::search $::dialog_search::searchtext}
+        -background lightgray -highlightbackground lightgray \
+        -command ::dialog_search::search
 
     grid $mytoplevel.searchtextentry $mytoplevel.searchbutton - -sticky ew
     grid $mytoplevel.resultslistbox - $mytoplevel.yscrollbar -sticky news
