@@ -1,63 +1,70 @@
-#N canvas 389 46 712 733 10;
-#X obj 119 76 httpreq;
-#X obj 73 15 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#N canvas 525 51 712 894 10;
+#X obj 119 146 httpreq;
+#X obj 44 56 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X msg 91 31 GET http://132.205.142.12/index.php;
-#X obj 136 269 unpack 0 0 0 0;
-#X floatatom 136 292 3 0 0 0 - - -;
-#X floatatom 163 292 3 0 0 0 - - -;
-#X floatatom 190 292 3 0 0 0 - - -;
-#X floatatom 217 292 3 0 0 0 - - -;
-#X text 81 310 from;
-#X obj 119 217 tcpclient;
-#X obj 153 243 tgl 15 0 empty empty connected 18 7 0 8 -24198 -13381
+#X msg 84 94 GET http://132.205.142.12/index.php;
+#X obj 136 309 unpack 0 0 0 0;
+#X floatatom 136 332 3 0 0 0 - - -;
+#X floatatom 163 332 3 0 0 0 - - -;
+#X floatatom 190 332 3 0 0 0 - - -;
+#X floatatom 217 332 3 0 0 0 - - -;
+#X text 81 350 from;
+#X obj 119 257 tcpclient;
+#X obj 153 283 tgl 15 0 empty empty connected 18 7 0 8 -24198 -13381
 -1 0 1;
-#X text 190 216 tcpclient opens a tcp socket to send and receive bytes
+#X text 190 256 tcpclient opens a tcp socket to send and receive bytes
 on;
-#X floatatom 270 302 9 0 0 0 - - -;
-#X floatatom 313 280 9 0 0 0 - - -;
-#X text 382 279 Size of the send buffer;
-#X obj 270 234 route sent buf blocked;
-#X text 340 301 Number of bytes sent;
-#X obj 356 258 print sender_blocked!;
-#X msg 85 166 connect 132.205.142.12 80;
-#X obj 119 410 httpreceive;
-#X floatatom 182 443 5 0 0 0 - - -;
-#X symbolatom 150 602 10 0 0 0 - - -;
-#X obj 150 580 prepend set;
-#X symbolatom 216 560 50 0 0 0 - - -;
-#X obj 216 538 prepend set;
-#X obj 150 486 route reason Date Content-Length Content-Type;
-#X symbolatom 350 528 50 0 0 0 - - -;
-#X obj 350 506 prepend set;
-#X floatatom 283 518 5 0 0 0 - - -;
-#X msg 111 51 GET http://132.205.142.12/nothing;
-#X msg 44 125 dump \$1;
-#X obj 44 99 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
-;
-#X obj 37 288 tgl 15 0 empty empty empty 17 7 0 10 -4034 -257985 -1
-1 1;
-#X msg 37 311 verbosity \$1;
-#X obj 457 503 print more_status;
-#X obj 76 352 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#X floatatom 270 342 9 0 0 0 - - -;
+#X floatatom 313 320 9 0 0 0 - - -;
+#X text 382 319 Size of the send buffer;
+#X obj 270 274 route sent buf blocked;
+#X text 340 341 Number of bytes sent;
+#X obj 356 298 print sender_blocked!;
+#X msg 85 206 connect 132.205.142.12 80;
+#X obj 119 450 httpreceive;
+#X floatatom 182 483 5 0 0 0 - - -;
+#X symbolatom 150 642 10 0 0 0 - - -;
+#X obj 150 620 prepend set;
+#X symbolatom 216 600 50 0 0 0 - - -;
+#X obj 216 578 prepend set;
+#X obj 150 526 route reason Date Content-Length Content-Type;
+#X symbolatom 350 568 50 0 0 0 - - -;
+#X obj 350 546 prepend set;
+#X floatatom 283 558 5 0 0 0 - - -;
+#X msg 64 74 GET http://132.205.142.12/nothing;
+#X msg 44 165 dump \$1;
+#X obj 44 139 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 37 328 tgl 15 0 empty empty empty 17 7 0 10 -4034 -257985 -1
+0 1;
+#X msg 37 351 verbosity \$1;
+#X obj 457 543 print more_status;
+#X obj 76 392 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;
-#X text 175 115 So far only GET requests are supported;
-#X text 515 686 Author: Martin Peach;
-#X text 515 703 Date: 2011/01/13;
-#X text 224 441 The right outlet is the status code.;
-#X text 166 653 The left outlet is the message body as a list of bytes
+#X text 515 726 Author: Martin Peach;
+#X text 515 743 Date: 2011/01/13;
+#X text 224 481 The right outlet is the status code.;
+#X text 166 693 The left outlet is the message body as a list of bytes
 ;
-#X text 154 465 The middle outlet is the status header as name/value
+#X text 154 505 The middle outlet is the status header as name/value
 pairs;
-#X obj 119 653 spigot;
-#X obj 119 683 print message_body;
-#X obj 152 631 tgl 15 0 empty empty printing_long_messages_can_hang_Pd
+#X obj 119 693 spigot;
+#X obj 119 723 print message_body;
+#X obj 152 671 tgl 15 0 empty empty printing_long_messages_can_hang_Pd
 17 7 0 10 -4034 -257985 -1 0 1;
-#X text 175 77 [httpreq] sends an HTTP/1.1 request as a list of bytes
+#X text 175 147 [httpreq] sends an HTTP/1.1 request as a list of bytes
 (actually float atoms) \, suitable for [tcpclient];
-#X text 195 404 [htpreceive] expects an HTTP/1.1 response as one or
+#X text 195 444 [htpreceive] expects an HTTP/1.1 response as one or
 more lists of bytes.;
-#X text 187 517 message length:;
+#X text 187 557 message length:;
+#X obj 27 14 tgl 15 0 empty empty empty 17 7 0 10 -4034 -257985 -1
+1 1;
+#X msg 27 37 verbosity \$1;
+#X msg 105 115 HEAD http://132.205.142.12/index.php;
+#X text 175 185 So far only GET and HEAD requests are supported;
+#X text 274 73 should return 404 not found;
+#X text 306 93 should return a web page;
+#X text 332 114 should return only the metainformation;
 #X connect 0 0 9 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
@@ -73,7 +80,7 @@ more lists of bytes.;
 #X connect 15 1 13 0;
 #X connect 15 2 17 0;
 #X connect 18 0 9 0;
-#X connect 19 0 42 0;
+#X connect 19 0 41 0;
 #X connect 19 1 25 0;
 #X connect 19 2 20 0;
 #X connect 22 0 21 0;
@@ -90,5 +97,8 @@ more lists of bytes.;
 #X connect 32 0 33 0;
 #X connect 33 0 19 0;
 #X connect 35 0 19 0;
-#X connect 42 0 43 0;
-#X connect 44 0 42 1;
+#X connect 41 0 42 0;
+#X connect 43 0 41 1;
+#X connect 47 0 48 0;
+#X connect 48 0 0 0;
+#X connect 49 0 0 0;
