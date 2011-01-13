@@ -12,6 +12,10 @@ namespace eval ::dialog_search:: {
     variable basedir_list {}
 }
 
+# TODO search type pulldown menu: object, message, comment, array, any
+# TODO search filenames also
+# TODO check line formatting options
+
 # find_doc_files
 # basedir - the directory to start looking in
 proc ::dialog_search::find_doc_files { basedir } {
@@ -23,7 +27,7 @@ proc ::dialog_search::find_doc_files { basedir } {
     # Look in the current directory for matching files, -type {f r}
     # means ony readable normal files are looked at, -nocomplain stops
     # an error being thrown if the returned list is empty
-    foreach fileName [glob -nocomplain -type {f r} -path $basedir *.txt *.pd] {
+    foreach fileName [glob -nocomplain -type {f r} -path $basedir $helpbrowser::doctypes] {
         lappend fileList $fileName
     }
 
@@ -103,6 +107,13 @@ proc ::dialog_search::do_search {} {
 proc ::dialog_search::searchfile {searchtext file_contents widget filename basedir} {
     variable basedir_list
     set n 0
+    set searchtext [regsub -all { } $searchtext {.*}]
+    pdtk_post "Using $searchtext\n"
+    if {[regexp -nocase -- "\[^a-zA-Z\]$searchtext" $filename]} {
+        $widget insert end "$filename:"
+        lappend basedir_list $basedir
+        incr n
+    }
     foreach line $file_contents {
         # TODO this could be optimized so that the lines are added to
         # a var, then the regsubs are run on the whole text, then its
@@ -116,7 +127,7 @@ proc ::dialog_search::searchfile {searchtext file_contents widget filename based
             set line [regsub {^#X (\S+) [0-9]+ [0-9]+(.*?);*} $line {〈\1〉\2}]
             set formatted_line [regsub {^#N \S+ [0-9]+ [0-9]+ [0-9]+ [0-9]+ (.*?);} \
                                     $line {[pd \1]}]
-            $widget insert end "$filename: $formatted_line"
+            $widget insert end "$filename:   $formatted_line"
             lappend basedir_list $basedir
             incr n
         }
