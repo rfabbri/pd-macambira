@@ -106,7 +106,7 @@ static void tcpclient_buf_size(t_tcpclient *x, t_symbol *s, int argc, t_atom *ar
 static void tcpclient_rcv(t_tcpclient *x);
 static void tcpclient_poll(t_tcpclient *x);
 static void tcpclient_unblock(t_tcpclient *x);
-static void *tcpclient_new(t_floatarg udpflag);
+static void *tcpclient_new(void);
 static void tcpclient_free(t_tcpclient *x);
 void tcpclient_setup(void);
 
@@ -245,10 +245,10 @@ static void tcpclient_send(t_tcpclient *x, t_symbol *s, int argc, t_atom *argv)
     int             i, j, d;
     unsigned char   c;
     float           f, e;
-    char            *bp;
-    int             length;
+//    char            *bp;
+//    int             length;
     size_t          sent = 0;
-    int             result;
+//    int             result;
     char            fpath[FILENAME_MAX];
     FILE            *fptr;
 
@@ -324,8 +324,8 @@ static void tcpclient_send(t_tcpclient *x, t_symbol *s, int argc, t_atom *argv)
 
 int tcpclient_send_buf(t_tcpclient *x, char *buf, int buf_len)
 {
-    fd_set          wfds;
-    struct timeval  timeout;
+//    fd_set          wfds;
+//    struct timeval  timeout;
 
     if (x->x_blocked) return 0;
     if (x->x_fd < 0)
@@ -359,13 +359,18 @@ static void tcpclient_sent(t_tcpclient *x)
 {
     t_atom  output_atom;
 
-    if (x->x_sendresult <= 0)
+    if (x->x_sendresult < 0)
     {
         sys_sockerror("tcpclient: send");
-        post("%s_send_byte: could not send data ", objName);
+        post("%s_sent: could not send data ", objName);
         x->x_blocked++;
         SETFLOAT(&output_atom, x->x_sendresult);
         outlet_anything( x->x_statusout, gensym("blocked"), 1, &output_atom);
+    }
+    else if (x->x_sendresult == 0)
+    { /* assume the message is queued and will be sent real soon now */
+        SETFLOAT(&output_atom, x->x_sendbuf_len);
+        outlet_anything( x->x_statusout, gensym("sent"), 1, &output_atom);
     }
     else
     {
@@ -414,9 +419,9 @@ static int tcpclient_set_socket_send_buf_size(t_tcpclient *x, int size)
 /* Get/set the send buffer size of client socket */
 static void tcpclient_buf_size(t_tcpclient *x, t_symbol *s, int argc, t_atom *argv)
 {
-    int     client = -1;
+//    int     client = -1;
     float   buf_size = 0;
-    t_atom  output_atom[3];
+//    t_atom  output_atom[3];
 
     if(x->x_connectstate == 0)
     {
@@ -523,7 +528,7 @@ static void tcpclient_unblock(t_tcpclient *x)
     x->x_blocked = 0;
 }
 
-static void *tcpclient_new(t_floatarg udpflag)
+static void *tcpclient_new(void)
 {
     int i;
 
@@ -561,7 +566,7 @@ static void *tcpclient_new(t_floatarg udpflag)
     if(pthread_attr_setdetachstate(&x->x_sendthreadattr, PTHREAD_CREATE_DETACHED) < 0)
         post("%s: warning: could not prepare child thread", objName);
     clock_delay(x->x_poll, 0);	/* start polling the input */
-    post("tcpclient 20100505 Martin Peach-style");
+    post("tcpclient 20110113 Martin Peach-style");
     return (x);
 }
 
@@ -577,8 +582,7 @@ static void tcpclient_free(t_tcpclient *x)
 void tcpclient_setup(void)
 {
     tcpclient_class = class_new(gensym(objName), (t_newmethod)tcpclient_new,
-        (t_method)tcpclient_free,
-        sizeof(t_tcpclient), 0, A_DEFFLOAT, 0);
+        (t_method)tcpclient_free, sizeof(t_tcpclient), 0, 0);
     class_addmethod(tcpclient_class, (t_method)tcpclient_connect, gensym("connect")
         , A_SYMBOL, A_FLOAT, 0);
     class_addmethod(tcpclient_class, (t_method)tcpclient_disconnect, gensym("disconnect"), 0);
