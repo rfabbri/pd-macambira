@@ -24,6 +24,8 @@ for dir in /home/pd/rsync/*; do
 	 dirname=$(echo $dir | sed 's|.*/\(.*\)|\1|')
 	 test -e $dir/scripts/update-developer-layout.sh && \
 		  update_distro $dirname
+         test -e $dir/pd/.git && \
+             cd $dir/pd && git pull origin master
 done
 
 for dir in /home/pd/rsync/*.git; do 
