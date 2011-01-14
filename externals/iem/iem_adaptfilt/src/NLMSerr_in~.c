@@ -6,11 +6,6 @@ lib iem_adaptfilt written by Markus Noisternig & Thomas Musil
 noisternig_AT_iem.at; musil_AT_iem.at
 (c) Institute of Electronic Music and Acoustics, Graz Austria 2005 */
 
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -115,20 +110,16 @@ static void NLMSerr_in_tilde_update(t_NLMSerr_in_tilde *x, t_floatarg f) // down
 
 static t_int *NLMSerr_in_tilde_perform_zero(t_int *w)
 {
-  t_NLMSerr_in_tilde *x = (t_NLMSerr_in_tilde *)(w[1]);
-  t_int n = (t_int)(w[2]);
-  
-  t_float **io = x->x_io_ptr_beg;
-  t_float *out;
+  t_NLMSerr_in_tilde *x = (t_NLMSerr_in_tilde *)(w[4]);
+  t_int n = (t_int)(w[5]);
+  t_float *filt_out = (t_float *)(w[3]);
   t_int i;
   
-  
-  out = io[2];
   for(i=0; i<n; i++)
   {
-    *out++ = 0.0f;
+    *filt_out++ = 0.0f;
   }
-  return (w+3);
+  return (w+6);
 }
 
 static t_int *NLMSerr_in_tilde_perform(t_int *w)
@@ -146,7 +137,7 @@ static t_int *NLMSerr_in_tilde_perform(t_int *w)
     t_float *w_filt_coeff = x->x_w_array_mem_beg;
     t_float my, my_err, sum, errin;
     t_float beta = x->x_beta;
-    t_float gamma = x->x_gamma;
+    t_float gammax = x->x_gamma;
     t_int i, j, update_counter;
     t_int update = x->x_update;
     t_int ord8=n_order&0xfffffff8;
@@ -207,7 +198,7 @@ static t_int *NLMSerr_in_tilde_perform(t_int *w)
                 }
                 for(j=0; j<ord_residual; j++)	// residual
                     sum += read_in_hist[-j] * read_in_hist[-j]; // [-j] only valid for Musil's double buffer structure
-                sum += gamma * gamma * (float)n_order; // convert gamma corresponding to filter order
+                sum += gammax * gammax * (float)n_order; // convert gammax corresponding to filter order
                 my = beta / sum;// calculate mue
                 
                 
@@ -260,7 +251,7 @@ static void *NLMSerr_in_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
     t_int i, n_order=39;
     t_symbol    *w_name;
     t_float beta=0.1f;
-    t_float gamma=0.00001f;
+    t_float gammax=0.00001f;
     
     if((argc >= 4) &&
         IS_A_FLOAT(argv,0) &&   //IS_A_FLOAT/SYMBOL from iemlib.h
@@ -270,7 +261,7 @@ static void *NLMSerr_in_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
     {
         n_order = (t_int)atom_getintarg(0, argc, argv);
         beta    = (t_float)atom_getfloatarg(1, argc, argv);
-        gamma   = (t_float)atom_getfloatarg(2, argc, argv);
+        gammax  = (t_float)atom_getfloatarg(2, argc, argv);
         w_name  = (t_symbol *)atom_getsymbolarg(3, argc, argv);
         
         if(beta < 0.0f)
@@ -278,10 +269,10 @@ static void *NLMSerr_in_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
         if(beta > 2.0f)
             beta = 2.0f;
         
-        if(gamma < 0.0f)
-            gamma = 0.0f;
-        if(gamma > 1.0f)
-            gamma = 1.0f;
+        if(gammax < 0.0f)
+            gammax = 0.0f;
+        if(gammax > 1.0f)
+            gammax = 1.0f;
         
         if(n_order < 2)
             n_order = 2;
@@ -295,7 +286,7 @@ static void *NLMSerr_in_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
         x->x_n_order = n_order;
         x->x_update = 0;
         x->x_beta = beta;
-        x->x_gamma = gamma;
+        x->x_gamma = gammax;
         // 2 times in and one time err_in memory allocation (history)
         x->x_in_hist = (t_float *)getbytes(2*x->x_n_order*sizeof(t_float));
         

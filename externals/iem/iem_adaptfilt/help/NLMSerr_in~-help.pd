@@ -1,19 +1,19 @@
 #N canvas 378 66 925 637 10;
 #N canvas 0 22 450 300 (subpatch) 0;
-#X array W 40 float 0;
-#X coords 0 1 39 -1 200 140 1;
-#X restore 545 340 graph;
+#X array W 200 float 0;
+#X coords 0 1 199 -1 200 140 1;
+#X restore 588 339 graph;
 #X msg 25 245 update \$1;
 #X msg 102 255 beta \$1;
-#X obj 272 24 tgl 15 0 empty empty empty 0 -6 0 8 -225280 -1 -1 0 1
+#X obj 272 24 tgl 15 0 empty empty empty 0 -6 0 8 -225280 -1 -1 1 1
 ;
 #X obj 272 45 dsp;
 #X floatatom 272 91 5 0 0 0 - - -;
 #X floatatom 285 70 5 0 0 0 - - -;
 #X obj 276 563 bng 15 150 20 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X text 453 230 2.arg: <float> learn-rate = beta;
-#X obj 53 275 noise~;
+#X text 516 230 2.arg: <float> learn-rate = beta;
+#X obj 225 185 noise~;
 #X obj 25 58 vradio 15 1 0 8 empty empty empty 0 -6 0 8 -225280 -1
 -1 0;
 #N canvas 165 115 464 314 (subpatch) 0;
@@ -63,8 +63,8 @@
 #X text 29 508 y(n) = W * x(n);
 #X obj 276 291 FIR~ IR 32;
 #X obj 618 73 loadbang;
-#X text 503 220 (array-sizes have to be >= then FIR_size);
-#X text 453 210 1.arg: <float> number of order of FIR-filter;
+#X text 566 220 (array-sizes have to be >= then FIR_size);
+#X text 516 210 1.arg: <float> number of order of FIR-filter;
 #X text 42 71 update every sample;
 #X text 42 56 stop \, no update;
 #X text 42 86 update every 2nd sample;
@@ -121,14 +121,14 @@
 #X restore 618 94 pd;
 #X text 643 100 update of W;
 #X text 642 89 graphical;
-#X text 453 250 4.arg: <symbol> table-name of W;
-#X text 453 240 3.arg: <float> minimum input value gamma;
+#X text 516 250 4.arg: <symbol> table-name of W;
+#X text 516 240 3.arg: <float> minimum input value gamma;
 #X text 132 317 minimum input value;
 #X msg 102 218 0.1;
 #X msg 96 299 1e-05;
 #X text 155 256 beta [0 .. 2];
 #X text 152 336 gamma [0 .. 1];
-#X obj 455 187 cnv 15 68 17 empty empty empty 20 12 0 14 -225280 -66577
+#X obj 517 187 cnv 15 68 17 empty empty empty 20 12 0 14 -225280 -66577
 0;
 #N canvas 0 22 499 295 FORMULAS 0;
 #X obj 167 52 cnv 15 150 40 empty empty empty 20 12 0 14 -225280 -66577
@@ -157,7 +157,7 @@
 #X text 116 55 output:;
 #X text 26 210 coefficient iteration:;
 #X text 188 211 W(k+1 \, i) = W(k \, i) + my(n)* e(n)* x(n);
-#X restore 455 187 pd FORMULAS;
+#X restore 518 187 pd FORMULAS;
 #X obj 102 238 cnv 14 31 14 empty empty empty 20 12 0 14 -225280 -66577
 0;
 #X floatatom 102 238 5 0 2 0 - - -;
@@ -166,35 +166,39 @@
 0;
 #X floatatom 96 319 5 0 2 0 - - -;
 #X floatatom 25 226 5 0 0 0 - - -;
-#X text 455 169 Normalized Least Mean Square (linear adaptive FIR-filter)
+#X text 518 169 Normalized Least Mean Square (linear adaptive FIR-filter)
 ;
-#X text 451 268 (C) 2005 \, m.noisternig & t.musil \, IEM \, Graz \,
+#X text 514 268 (C) 2005 \, m.noisternig & t.musil \, IEM \, Graz \,
 Austria;
-#X text 479 281 [noisternig \, musil]_AT_iem.at;
-#X obj 53 450 NLMSerr_in~ 32 0.1 1e-05 W;
-#X obj 20 390 delwrite~ causal_del 2;
-#X msg 756 387 64 44.1;
-#X obj 760 415 /;
-#X obj 760 442 print;
-#X obj 20 411 delread~ causal_del 1.45126;
+#X text 542 281 [noisternig \, musil]_AT_iem.at;
+#X obj 247 211 delwrite~ causal_del 2;
+#X msg 825 34 64 44.1;
+#X obj 829 62 /;
+#X obj 829 89 print;
 #X obj 226 475 delwrite~ feedback_del 2;
-#X obj 351 358 delread~ feedback_del 0;
-#X obj 248 415 -~;
+#X obj 301 383 -~;
 #X text 249 437 err;
 #X text 351 376 filt out;
-#X connect 1 0 72 0;
-#X connect 2 0 72 0;
+#X msg 578 541 \; W const 0;
+#X obj 54 413 delread~ causal_del 1.45126;
+#X obj 351 358 delread~ feedback_del 1.45126;
+#X obj 301 407 *~ -1;
+#X msg 366 424 -1;
+#X msg 412 425 1;
+#X obj 53 450 NLMSerr_in~ 192 0.01 1e-05 W;
+#X connect 1 0 86 0;
+#X connect 2 0 86 0;
 #X connect 3 0 4 0;
 #X connect 4 0 5 0;
 #X connect 4 1 6 0;
+#X connect 9 0 72 0;
 #X connect 9 0 24 0;
-#X connect 9 0 73 0;
 #X connect 10 0 11 0;
 #X connect 11 0 68 0;
-#X connect 13 0 72 0;
+#X connect 13 0 86 0;
 #X connect 17 0 18 0;
 #X connect 19 0 20 0;
-#X connect 24 0 80 0;
+#X connect 24 0 77 0;
 #X connect 25 0 51 0;
 #X connect 37 0 36 1;
 #X connect 39 0 36 0;
@@ -205,10 +209,13 @@ Austria;
 #X connect 64 0 2 0;
 #X connect 67 0 13 0;
 #X connect 68 0 1 0;
-#X connect 72 0 17 0;
-#X connect 72 0 78 0;
+#X connect 73 0 74 0;
 #X connect 74 0 75 0;
-#X connect 75 0 76 0;
-#X connect 77 0 72 0;
-#X connect 79 0 80 1;
-#X connect 80 0 72 1;
+#X connect 77 0 83 0;
+#X connect 81 0 86 0;
+#X connect 82 0 77 1;
+#X connect 83 0 86 1;
+#X connect 84 0 83 1;
+#X connect 85 0 83 1;
+#X connect 86 0 17 0;
+#X connect 86 0 76 0;
