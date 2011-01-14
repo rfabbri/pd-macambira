@@ -36,14 +36,13 @@ typedef struct NLMSerr_in_tilde
     t_object            x_obj;
     t_symbol            *x_w_array_sym_name;
     t_float             *x_w_array_mem_beg;
-    t_float             *x_io_ptr_beg[4];// memory: 2 sig-in and 2 sig-out vectors
     t_float             *x_in_hist;// start point double buffer for sig-in history
     t_int               x_rw_index;// read-write-index
     t_int               x_n_order;// order of filter
     t_int               x_update;// 2^n rounded value, downsampling of update speed
     t_float             x_beta;// learn rate [0 .. 2]
     t_float             x_gamma;// regularization
-    t_float             x_msi;
+    t_float             x_sig_in2;
 } t_NLMSerr_in_tilde;
 
 t_class *NLMSerr_in_tilde_class;
@@ -134,18 +133,18 @@ static t_int *NLMSerr_in_tilde_perform_zero(t_int *w)
 
 static t_int *NLMSerr_in_tilde_perform(t_int *w)
 {
-    t_NLMSerr_in_tilde *x = (t_NLMSerr_in_tilde *)(w[1]);
-    t_int n = (t_int)(w[2]);
+    t_NLMSerr_in_tilde *x = (t_NLMSerr_in_tilde *)(w[4]);
+    t_int n = (t_int)(w[5]);
     t_int n_order = x->x_n_order;   /* number of filter-order */
     t_int rw_index = x->x_rw_index;
-    t_float *in = x->x_io_ptr_beg[0];// first sig in
-    t_float *err_in = x->x_io_ptr_beg[1], errin;// second sig in
-    t_float *filt_out = x->x_io_ptr_beg[2];// first sig out
+    t_float *filt_in = (t_float *)(w[1]);// first sig in
+    t_float *err_in = (t_float *)(w[2]);// second sig in
+    t_float *filt_out = (t_float *)(w[3]);// first sig out
     t_float *write_in_hist1 = x->x_in_hist;
     t_float *write_in_hist2 = write_in_hist1+n_order;
     t_float *read_in_hist = write_in_hist2;
     t_float *w_filt_coeff = x->x_w_array_mem_beg;
-    t_float my, my_err, sum;
+    t_float my, my_err, sum, errin;
     t_float beta = x->x_beta;
     t_float gamma = x->x_gamma;
     t_int i, j, update_counter;
@@ -158,8 +157,8 @@ static t_int *NLMSerr_in_tilde_perform(t_int *w)
     
     for(i=0, update_counter=0; i<n; i++)// store history and convolve
     {
-        write_in_hist1[rw_index] = in[i]; // save inputs to variable & history
-        write_in_hist2[rw_index] = in[i];
+        write_in_hist1[rw_index] = filt_in[i]; // save inputs to variable & history
+        write_in_hist2[rw_index] = filt_in[i];
         errin = err_in[i];
         
 		// begin convolution
@@ -226,7 +225,7 @@ static t_int *NLMSerr_in_tilde_perform(t_int *w)
 
     x->x_rw_index = rw_index; // back to start
 
-    return(w+3);
+    return(w+6);
     
 NLMSerr_in_tildeperfzero:
     
@@ -234,22 +233,17 @@ NLMSerr_in_tildeperfzero:
     {
         *filt_out++ = 0.0f;
     }
-    return(w+3);
+    return(w+6);
 }
 
 static void NLMSerr_in_tilde_dsp(t_NLMSerr_in_tilde *x, t_signal **sp)
 {
-    t_int i, n = sp[0]->s_n;
-    
-    for(i=0; i<4; i++) // store io_vec
-        x->x_io_ptr_beg[i] = sp[i]->s_vec;
-    
     x->x_w_array_mem_beg = NLMSerr_in_tilde_check_array(x->x_w_array_sym_name, x->x_n_order);
 
     if(!x->x_w_array_mem_beg)
-        dsp_add(NLMSerr_in_tilde_perform_zero, 2, x, n);
+        dsp_add(NLMSerr_in_tilde_perform_zero, 5, sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, x, sp[0]->s_n);
     else
-        dsp_add(NLMSerr_in_tilde_perform, 2, x, n);
+        dsp_add(NLMSerr_in_tilde_perform, 5, sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, x, sp[0]->s_n);
 }
 
 
@@ -291,13 +285,13 @@ static void *NLMSerr_in_tilde_new(t_symbol *s, t_int argc, t_atom *argv)
         
         if(n_order < 2)
             n_order = 2;
-        if(n_order > 11111)
-            n_order = 11111;
+        if(n_order > 1111111)
+            n_order = 1111111;
         
         inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
         outlet_new(&x->x_obj, &s_signal);
         
-        x->x_msi = 0;
+        x->x_sig_in2 = 0;
         x->x_n_order = n_order;
         x->x_update = 0;
         x->x_beta = beta;
@@ -323,7 +317,7 @@ void NLMSerr_in_tilde_setup(void)
 {
     NLMSerr_in_tilde_class = class_new(gensym("NLMSerr_in~"), (t_newmethod)NLMSerr_in_tilde_new, (t_method)NLMSerr_in_tilde_free,
         sizeof(t_NLMSerr_in_tilde), 0, A_GIMME, 0);
-    CLASS_MAINSIGNALIN(NLMSerr_in_tilde_class, t_NLMSerr_in_tilde, x_msi);
+    CLASS_MAINSIGNALIN(NLMSerr_in_tilde_class, t_NLMSerr_in_tilde, x_sig_in2);
     class_addmethod(NLMSerr_in_tilde_class, (t_method)NLMSerr_in_tilde_dsp, gensym("dsp"), 0);
     class_addmethod(NLMSerr_in_tilde_class, (t_method)NLMSerr_in_tilde_update, gensym("update"), A_FLOAT, 0); // method: downsampling factor of learning (multiple of 2^N)
     class_addmethod(NLMSerr_in_tilde_class, (t_method)NLMSerr_in_tilde_beta, gensym("beta"), A_FLOAT, 0); //method: normalized learning rate
