@@ -1,11 +1,11 @@
-#N canvas 23 7 909 523 10;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 23 22 909 523 10;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array W 40 float 0;
 #X coords 0 1 39 -1 200 140 1;
 #X restore 454 335 graph;
 #X msg 25 245 update \$1;
 #X msg 102 255 beta \$1;
-#X obj 272 24 tgl 15 0 empty empty empty 0 -6 0 8 -225280 -1 -1 0 1
+#X obj 272 24 tgl 15 0 empty empty empty 0 -6 0 8 -225280 -1 -1 1 1
 ;
 #X obj 272 45 dsp;
 #X floatatom 272 91 5 0 0 0 - - -;
@@ -15,8 +15,8 @@
 #X text 453 230 2.arg: <float> learn-rate = beta;
 #X obj 53 275 noise~;
 #X obj 25 58 vradio 15 1 0 8 empty empty empty 0 -6 0 8 -225280 -1
--1 0;
-#N canvas 165 115 464 314 /SUBPATCH/ 0;
+-1 7;
+#N canvas 165 115 464 314 (subpatch) 0;
 #X obj 76 61 inlet;
 #X msg 32 163 0;
 #X msg 63 159 1;
@@ -50,7 +50,7 @@
 #X msg 96 337 gamma \$1;
 #X text 75 363 input signal;
 #X text 190 362 desired signal;
-#N canvas 0 0 450 300 graph1 0;
+#N canvas 0 22 450 300 (subpatch) 0;
 #X array IR 40 float 0;
 #X coords 0 1 39 -1 200 140 1;
 #X restore 367 11 graph;
@@ -73,7 +73,7 @@
 #X text 42 131 update every 16th sample;
 #X text 42 146 update every 32nd sample;
 #X text 42 161 update every 64th sample;
-#N canvas 0 0 474 324 /SUBPATCH/ 0;
+#N canvas 0 22 474 324 (subpatch) 0;
 #X obj 48 46 inlet;
 #X obj 205 47 inlet;
 #X msg 205 71 \; IR const 0;
@@ -101,7 +101,7 @@
 #X obj 276 442 speedlim 100;
 #X obj 83 412 cnv 8 1 1 empty empty * 0 7 0 14 -262144 -1 0;
 #X obj 247 411 cnv 8 1 1 empty empty * 0 7 0 14 -262144 -1 0;
-#N canvas 0 0 470 320 /SUBPATCH/ 0;
+#N canvas 0 22 470 320 (subpatch) 0;
 #X obj 137 73 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #X msg 137 115 39;
@@ -130,7 +130,7 @@
 #X text 152 336 gamma [0 .. 1];
 #X obj 455 187 cnv 15 68 17 empty empty empty 20 12 0 14 -225280 -66577
 0;
-#N canvas 0 0 499 295 FORMULAS 0;
+#N canvas 0 22 499 295 FORMULAS 1;
 #X obj 167 52 cnv 15 150 40 empty empty empty 20 12 0 14 -225280 -66577
 0;
 #X obj 167 123 cnv 15 270 50 empty empty empty 20 12 0 14 -225280 -66577
@@ -141,22 +141,22 @@
 #X text 231 146 >;
 #X text 232 144 _;
 #X text 232 138 _;
-#X text 277 141 2;
-#X text 340 141 2;
+#X text 283 141 2;
+#X text 346 141 2;
 #X text 311 146 gamma * blocksize);
-#X text 294 146 +;
+#X text 300 146 +;
 #X text 243 146 x[n-i];
 #X text 174 135 my(n) =;
 #X text 223 130 _________________________________;
-#X text 28 136 normalized learn rate:;
-#X text 173 54 y(n) = W * x(n);
-#X obj 225 56 cnv 11 1 1 empty empty * 0 9 0 14 -225280 -1 0;
+#X text 16 135 normalized learn rate:;
+#X text 173 56 y(n) = W * x(n);
+#X obj 237 54 cnv 11 1 1 empty empty * 0 9 0 14 -225280 -1 0;
 #X text 173 72 e(n) = d(n) - W * x(n);
-#X obj 267 74 cnv 11 1 1 empty empty * 0 9 0 14 -225280 -1 0;
+#X obj 286 71 cnv 11 1 1 empty empty * 0 9 0 14 -225280 -1 0;
 #X text 119 73 error:;
 #X text 116 55 output:;
 #X text 26 210 coefficient iteration:;
-#X text 176 213 W(k+1 \, i) = W(k \, i) + my(n)* e(n)* x(n);
+#X text 188 211 W(k+1 \, i) = W(k \, i) + my(n)* e(n)* x(n);
 #X restore 455 187 pd FORMULAS;
 #X obj 102 238 cnv 14 31 14 empty empty empty 20 12 0 14 -225280 -66577
 0;

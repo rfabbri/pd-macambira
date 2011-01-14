@@ -22,6 +22,7 @@ PD_WIN_LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames /NODEFAULTLIB:kernel /NOD
 
 
 SRC =	NLMS~.c \
+	NLMSerr_in~.c \
 	NLMSCC~.c \
 	n_CNLMS~.c \
 	n_CLNLMS~.c \
