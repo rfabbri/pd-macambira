@@ -25,7 +25,7 @@ for dir in /home/pd/rsync/*; do
 	 test -e $dir/scripts/update-developer-layout.sh && \
 		  update_distro $dirname
          test -e $dir/pd/.git && \
-             cd $dir/pd && git pull origin master
+             cd $dir/pd && git pull origin master >> $LOGFILE 2>&1
 done
 
 for dir in /home/pd/rsync/*.git; do 
