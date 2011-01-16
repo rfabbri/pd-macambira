@@ -23,7 +23,10 @@
 #endif
 
 #define MAX_MESG 65536 /* same as MAX_UDP_PACKET */
-#define MAX_BUNDLE_NESTING 32 /* maximum bundle depth */
+/* The maximum depth of bundles within bundles within bundles within...
+   This is the size of a static array.  If you exceed this limit you'll
+   get an error message. */
+#define MAX_BUNDLE_NESTING 32
 /* You may have to redefine this typedef if ints on your system
   aren't 4 bytes. */
 typedef unsigned int uint4;
