@@ -108,7 +108,6 @@ proc ::dialog_search::searchfile {searchtext file_contents widget filename based
     variable basedir_list
     set n 0
     set searchtext [regsub -all { } $searchtext {.*}]
-    pdtk_post "Using $searchtext\n"
     if {[regexp -nocase -- "\[^a-zA-Z\]$searchtext" $filename]} {
         $widget insert end "$filename:"
         lappend basedir_list $basedir
