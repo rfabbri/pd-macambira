@@ -87,22 +87,33 @@ The OpenSound Control WWW page is
 
 typedef struct _routeOSC
 {
-    t_object    x_obj; // required header
-    t_int       x_num; // Number of prefixes we store
-    char        *x_prefixes[MAX_NUM];
-    void        *x_outlets[MAX_NUM+1]; // one for each prefix plus one for everything else
+    t_object    x_obj; /* required header */
+    t_int       x_num; /* Number of prefixes we store */
+    t_int       x_verbosity; /* level of debug output required */
+//    char        *x_prefixes[MAX_NUM]; /* the OSC addresses to be matched */
+//    int         x_prefix_depth[MAX_NUM]; /* the number of slashes in each prefix */
+//    void        *x_outlets[MAX_NUM+1]; /* one for each prefix plus one for everything else */
+    char        **x_prefixes; /* the OSC addresses to be matched */
+    int         *x_prefix_depth; /* the number of slashes in each prefix */
+    void        **x_outlets; /* one for each prefix plus one for everything else */
 } t_routeOSC;
 
 /* prototypes  */
 
 void routeOSC_setup(void);
+static void routeOSC_free(t_routeOSC *x);
 static int MyPatternMatch (const char *pattern, const char *test);
 static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void routeOSC_list(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void *routeOSC_new(t_symbol *s, int argc, t_atom *argv);
 static void routeOSC_set(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
+static void routeOSC_paths(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
+static void routeOSC_verbosity(t_routeOSC *x, t_floatarg v);
+static int routeOSC_count_slashes(char *prefix);
 static char *NextSlashOrNull(char *p);
+static char *NthSlashOrNull(char *p, int n);
 static void StrCopyUntilSlash(char *target, const char *source);
+static void StrCopyUntilNthSlash(char *target, const char *source, int n);
 
 /* from
     OSC-pattern-match.c
@@ -127,6 +138,9 @@ static int MyPatternMatch (const char *pattern, const char *test)
 
 static void routeOSC_free(t_routeOSC *x)
 {
+    freebytes(x->x_prefixes, x->x_num*sizeof(char)); /* the OSC addresses to be matched */
+    freebytes(x->x_prefix_depth, x->x_num*sizeof(int));  /* the number of slashes in each prefix */
+    freebytes(x->x_outlets, x->x_num*sizeof(void *)); /* one for each prefix plus one for everything else */
 }
 
 /* initialization routine */
@@ -134,10 +148,12 @@ static void routeOSC_free(t_routeOSC *x)
 void routeOSC_setup(void)
 {
     routeOSC_class = class_new(gensym("routeOSC"), (t_newmethod)routeOSC_new,
-        (t_method)routeOSC_free,sizeof(t_routeOSC), 0, A_GIMME, 0);
+        (t_method)routeOSC_free, sizeof(t_routeOSC), 0, A_GIMME, 0);
     class_addlist(routeOSC_class, routeOSC_list);
     class_addanything(routeOSC_class, routeOSC_doanything);
     class_addmethod(routeOSC_class, (t_method)routeOSC_set, gensym("set"), A_GIMME, 0);
+    class_addmethod(routeOSC_class, (t_method)routeOSC_paths, gensym("paths"), A_GIMME, 0);
+    class_addmethod(routeOSC_class, (t_method)routeOSC_verbosity, gensym("verbosity"), A_DEFFLOAT, 0);
 
     ps_emptySymbol = gensym("");
 
@@ -158,6 +174,11 @@ static void *routeOSC_new(t_symbol *s, int argc, t_atom *argv)
         return 0;
     }
     x->x_num = 0;
+
+    x->x_prefixes = (char **)getzbytes(argc*sizeof(char)); /* the OSC addresses to be matched */
+    x->x_prefix_depth = (int *)getzbytes(argc*sizeof(int));  /* the number of slashes in each prefix */
+    x->x_outlets = (void **)getzbytes(argc*sizeof(void *)); /* one for each prefix plus one for everything else */
+
     for (i = 0; i < argc; ++i)
     {
         if (argv[i].a_type == A_SYMBOL)
@@ -165,6 +186,7 @@ static void *routeOSC_new(t_symbol *s, int argc, t_atom *argv)
             if (argv[i].a_w.w_symbol->s_name[0] == '/')
             { /* Now that's a nice prefix */
                 x->x_prefixes[i] = argv[i].a_w.w_symbol->s_name;
+                x->x_prefix_depth[i] = routeOSC_count_slashes(x->x_prefixes[i]);
                 ++(x->x_num);
             }
         }
@@ -185,6 +207,7 @@ static void *routeOSC_new(t_symbol *s, int argc, t_atom *argv)
     {
         x->x_outlets[i] = outlet_new(&x->x_obj, &s_list);
     }
+    x->x_verbosity = 0; /* quiet by default */
     return (x);
 }
 
@@ -215,16 +238,39 @@ static void routeOSC_set(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
         if (argv[i].a_w.w_symbol->s_name[0] == '/')
         { /* Now that's a nice prefix */
             x->x_prefixes[i] = argv[i].a_w.w_symbol->s_name;
+            x->x_prefix_depth[i] = routeOSC_count_slashes(x->x_prefixes[i]);
         }
     }
+}
+
+static void routeOSC_paths(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
+{ /* print  out the paths we are matching */
+    int i;
+    
+    for (i = 0; i < x->x_num; ++i) post("path[%d]: %s (depth %d)", i, x->x_prefixes[i], x->x_prefix_depth[i]);
+}
+
+static void routeOSC_verbosity(t_routeOSC *x, t_floatarg v)
+{
+    x->x_verbosity = (v == 0)? 0: 1;
+    if (x->x_verbosity) post("routeOSC_verbosity is %d", x->x_verbosity);
+}
+
+static int routeOSC_count_slashes(char *prefix)
+{ /* find the path depth of the prefix by counting the numberof slashes */
+    int i = 0;
+    char *p = prefix;
+
+    while (*p != '\0') if (*p++ == '/') i++;
+    return i;
 }
 
 static void routeOSC_list(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
     if(argc < 1)
     {
-      pd_error(x, "* routeOSC: ignoring empty list...");
-      return;
+        pd_error(x, "* routeOSC: ignoring empty list...");
+        return;
     }
     if (argv[0].a_type == A_SYMBOL)
     { 
@@ -237,39 +283,44 @@ static void routeOSC_list(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
         // output on unmatched outlet jdl 20020908
         if (argv[0].a_type == A_FLOAT)
         {
-          outlet_float(x->x_outlets[x->x_num], atom_getfloat(argv));
+            outlet_float(x->x_outlets[x->x_num], atom_getfloat(argv));
         }
         else
         {
-          pd_error(x, "* routeOSC: unrecognized atom type!");
+            pd_error(x, "* routeOSC: unrecognized atom type!");
         }
     }
 }
 
 static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
-    char *pattern, *nextSlash;
-    int i;
-    int matchedAnything;
+    char    *pattern, *nextSlash;
+    int     i, pattern_depth = 0, matchedAnything = 0;
     // post("*** routeOSC_anything(s %s, argc %ld)", s->s_name, (long) argc);
 
     pattern = s->s_name;
+    if (x->x_verbosity) post("routeOSC_doanything: pattern is %s", pattern);
     if (pattern[0] != '/')
     {
         pd_error(x, "* routeOSC: invalid message pattern %s does not begin with /", s->s_name);
         outlet_anything(x->x_outlets[x->x_num], s, argc, argv);
         return;
     }
-    matchedAnything = 0;
 
+    pattern_depth = routeOSC_count_slashes(pattern);
+    if (x->x_verbosity) post("routeOSC_doanything: pattern_depth is %i", pattern_depth);
 	nextSlash = NextSlashOrNull(pattern+1);
     if (*nextSlash == '\0')
-    {
+    { /* pattern_depth == 1 */
         /* last level of the address, so we'll output the argument list */
     
         for (i = 0; i < x->x_num; ++i)
         {
-            if (MyPatternMatch(pattern+1, x->x_prefixes[i]+1))
+            if
+            (
+                (x->x_prefix_depth[i] <= pattern_depth)
+                && (MyPatternMatch(pattern+1, x->x_prefixes[i]+1))
+            )
             {
                 ++matchedAnything;
                 // I hate stupid Max lists with a special first element
@@ -312,16 +363,27 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
         t_symbol *restOfPattern = 0; /* avoid the gensym unless we have to output */
         char patternBegin[1000];
 
-        /* Get the first level of the incoming pattern to match against all our prefixes */
-        StrCopyUntilSlash(patternBegin, pattern+1);
+        /* Get the incoming pattern to match against all our prefixes */
 
         for (i = 0; i < x->x_num; ++i)
         {
-            if (MyPatternMatch(patternBegin, x->x_prefixes[i]+1))
+            restOfPattern = 0;
+            if (x->x_prefix_depth[i] <= pattern_depth)
             {
-                ++matchedAnything;
-                if (restOfPattern == 0) restOfPattern = gensym(nextSlash);
-                outlet_anything(x->x_outlets[i], restOfPattern, argc, argv);
+                StrCopyUntilNthSlash(patternBegin, pattern+1, x->x_prefix_depth[i]);
+                if (x->x_verbosity)
+                    post("routeOSC_doanything: (%d) patternBegin is %s", i, patternBegin);
+                if (MyPatternMatch(patternBegin, x->x_prefixes[i]+1))
+                {
+                    if (x->x_verbosity)
+                        post("routeOSC_doanything: (%d) matched %s depth %d", i, x->x_prefixes[i], x->x_prefix_depth[i]);
+                    ++matchedAnything;
+                	nextSlash = NthSlashOrNull(pattern+1, x->x_prefix_depth[i]);
+                    if (x->x_verbosity)
+                        post("routeOSC_doanything: (%d) nextSlash %s", i, nextSlash);
+                    if (restOfPattern == 0) restOfPattern = gensym(nextSlash);
+                    outlet_anything(x->x_outlets[i], restOfPattern, argc, argv);
+                }
             }
         }
     }
@@ -339,6 +401,22 @@ static char *NextSlashOrNull(char *p)
     return p;
 }
 
+static char *NthSlashOrNull(char *p, int n)
+{
+    int i;
+    for (i = 0; i < n; ++i)
+    {
+        while (*p != '/')
+        { 
+            if (*p == '\0') return p;
+            p++;
+        }
+        if (i < n-1) p++; /* skip the slash unless it's the nth slash */
+    }
+    return p;
+}
+
+
 static void StrCopyUntilSlash(char *target, const char *source)
 {
     while (*source != '/' && *source != '\0')
@@ -348,6 +426,32 @@ static void StrCopyUntilSlash(char *target, const char *source)
         ++source;
     }
     *target = 0;
+}
+
+static void StrCopyUntilNthSlash(char *target, const char *source, int n)
+{ /* copy the path up but not including the nth slash */
+    int i = n;
+
+    while (i > 0)
+    {
+        while (*source != '/')
+        {
+            *target = *source;
+            if (*source == '\0') return;
+            ++target;
+            ++source;
+        }
+        i--;
+        /* got  a slash. If it's the nth, don't include it */
+        if (i == 0)
+        {
+            *target = 0;
+            return;
+        }
+        *target = *source;
+        ++source;
+        ++target;
+    }
 }
 
 /* from
