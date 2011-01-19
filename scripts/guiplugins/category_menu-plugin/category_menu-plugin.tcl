@@ -12,6 +12,7 @@ proc category_menu::load_menutree {} {
     set testfile [file join $::current_plugin_loadpath menutree.tcl]
     set f [open $testfile]
     set menutree [read $f]
+#    set menutree [regsub -all {([\{\s])\-([\s\}])} [read $f] {\1\\\\-\2}]
     close $f
     unset f        
     return $menutree
@@ -29,8 +30,12 @@ proc category_menu::create {mymenu} {
             menu $mymenu.$category.$subcategory
             $mymenu.$category add cascade -label $subcategory -menu $mymenu.$category.$subcategory
             foreach item [lindex $subcategorylist end] {
-                $mymenu.$category.$subcategory add command -label $item \
-                    -command "pdsend \"\$::focused_window obj \$::popup_xcanvas \$::popup_ycanvas $item\""
+                # replace the normal dash with a Unicode minus so that Tcl doesn't
+                # interpret the dash in the -label to make it a separator
+                $mymenu.$category.$subcategory add command \
+                    -label [regsub -all {^\-$} $item {−}] \
+                    -command \
+                    "pdsend \"\$::focused_window obj \$::popup_xcanvas \$::popup_ycanvas $item\""
             }
         }
     }
