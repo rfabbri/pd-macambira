@@ -36,7 +36,7 @@ EXTRA_SOURCES = jsearch.c jload.c
 # -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
 CFLAGS = -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
-LIBS = 
+LIBS = -ldl
 
 #------------------------------------------------------------------------------#
 #
