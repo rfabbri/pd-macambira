@@ -18,6 +18,7 @@
 
 /* CHANGES
  
+ 0.31 %p or %x in sprintf and sysvgui do not seem to give the same result, so generate the name in sprintf and feed it as a string to sysvgui
  0.3 Added the possibility of adding anything (instead of only symbols)
  0.3 Split the output message into two outlets
  
@@ -102,52 +103,7 @@ static void pmenu_callback(t_pmenu* x, t_floatarg f)
   pmenu_output(x);
   
 }
-/*
-static void pmenu_save(t_gobj *z, t_binbuf *b)
-{
-        DEBUG(post("save start");)
-    
-	
-    t_pmenu *x = (t_pmenu *)z;
-    
-    t_atom* creation = binbuf_getvec(x->x_obj.te_binbuf);
-       
-    
-    t_symbol* send = x->s_empty;
-    t_symbol* receive = x->s_empty;
-    char buf[80];
-    if ( x->send_set ) {
-        atom_string(creation + 3, buf, 80);
-        send = gensym(buf);
-	}
-	
-    if ( x->receive_set ) {
-		atom_string(creation + 4, buf, 80);
-		receive = gensym(buf);
-	}
-    
-	DEBUG(post("send: %s receive: %s",send->s_name,receive->s_name);)
-	
-    binbuf_addv(b, "ssiisiississss", gensym("#X"), gensym("obj"),
-                x->x_obj.te_xpix, x->x_obj.te_ypix ,  
-                atom_getsymbol(creation),
-                x->x_width, x->x_height, send,receive,x->saveitems,
-                x->bg_color, x->fg_color,x->hi_color,x->co_color);
-                
-	// Loop for menu items
-	int i;
-	if ( x->saveitems) {
-		for(i=0 ; i<x->x_num_options ; i++)
-		{
-			DEBUG(post("saving option: %s",x->x_options[i]->s_name);)
-			binbuf_addv(b, "s", x->x_options[i]);
-		}
-	}	
-    binbuf_addv(b, ";");
-    
-    DEBUG(post("save end");)
-}
-*/
+
 
 static void pmenu_clear(t_pmenu* x) {
 	x->options_count = 0;
@@ -155,33 +111,10 @@ static void pmenu_clear(t_pmenu* x) {
 	pmenu_w_clear(x);
 }
 
-/*
-static void pmenu_size(t_pmenu* x,t_symbol *s, int argc, t_atom *argv) {
-	
-	if (argc>2) argc =2;
-	switch (argc) {
-		case 2: if ( (argv+1)->a_type == A_FLOAT) x->x_height = atom_getfloat(argv+1);
-		case 1: if ( argv->a_type == A_FLOAT) x->x_width = atom_getfloat(argv);
-		break;
-	}
-	
-	if ( x->x_width < 10) x->x_width = 10;
-	if ( x->x_height < 10) x->x_height = 10;
-	
-	if ( pmenu_w_is_visible(x) ) {
-		pmenu_w_resize(x);
-	}
-}
-*/
 
 
 static void pmenu_add(t_pmenu* x, t_symbol *s, int argc, t_atom *argv) {
-	/*
-	 x->av = resizebytes(x->av, x->mem_size * sizeof(*(x->av)), 
-	 (10 + x->ac) * sizeof(*(x->av)));
-	 x->mem_size = 10 + x->ac;
-	 */
-	
+		
 	// resize the options-array if it is too small
 	if((argc + x->options_count) > x->options_memory){
           
@@ -330,30 +263,7 @@ static void pmenu_set(t_pmenu* x, t_symbol *S, int argc, t_atom*argv)
 
 static t_class *pmenu_class;
 
-/*
-static void pmenu_receive(t_pmenu* x, t_symbol* s) {
-	if ( x->receive != x->s_empty ) pd_unbind(&x->x_obj.ob_pd, x->receive);
-	if ( s == x->s_empty || s ==  x->s_) {
-		x->receive = x->s_empty;
-	} else {
-		x->receive = s;
-		pd_bind(&x->x_obj.ob_pd, x->receive);
-	}
-	
-}
 
-static void pmenu_send(t_pmenu* x, t_symbol* s) {
-
-	if ( s == x->s_empty || s ==  x->s_ ) {
-		x->send = x->s_empty;
-	} else {
-		x->send = s;
-	}
-	
-	
-	
-}
-*/
 
 static void pmenu_free(t_pmenu*x)
 {
@@ -366,11 +276,7 @@ static void pmenu_free(t_pmenu*x)
    
    //if ( x->receive != x->s_empty ) pd_unbind(&x->x_obj.ob_pd, x->receive);
 }
-/*
-static void pmenu_saveitems( t_pmenu* x, t_float f) {
-	x->saveitems = (f != 0);
-}
-*/
+
 
 static void *pmenu_new(t_symbol *s, int argc, t_atom *argv)
 {
@@ -413,12 +319,14 @@ static void *pmenu_new(t_symbol *s, int argc, t_atom *argv)
 
       /* Bind the recieve "pmenu%p" to the widget outlet*/
       sprintf(pmenu_buffer,"pmenu%p",x);
+	 
+	
       x->callback = gensym(pmenu_buffer);
       pd_bind(&x->x_obj.ob_pd, x->callback);
 
       /* define proc in tcl/tk where "pmenu%p" is the receive, "callback" is the method, and "$index" is an argument. */
-    sys_vgui("proc select%x {index} {\n pd [concat pmenu%p callback $index \\;]\n }\n",x,x); 
-    
+    //sys_vgui("proc select%x {index} {\n pd [concat pmenu%p callback $index \\;]\n }\n",x,x); 
+    sys_vgui("proc select%x {index} {\n pd [concat %s callback $index \\;]\n }\n",x,pmenu_buffer); 
 
     x->outlet1 = outlet_new(&x->x_obj, &s_float);
 	x->outlet2 = outlet_new(&x->x_obj, &s_list);
@@ -426,8 +334,7 @@ static void *pmenu_new(t_symbol *s, int argc, t_atom *argv)
    
    pmenu_w_menu(x,CREATE);
    pmenu_w_apply_colors(x);
-   //if (argc > 5) pmenu_add(x,&s_list,argc-5,argv+5);
-
+  
 
 DEBUG(post("pmenu new end");)
 
@@ -464,7 +371,7 @@ void pmenu_setup(void) {
 
 
 
-	post("pmenu v0.3 by tof");
+	post("pmenu v0.31 by tof");
 }
 
 
