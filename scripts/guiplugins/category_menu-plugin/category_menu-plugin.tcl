@@ -26,7 +26,7 @@ proc category_menu::create {mymenu} {
         menu $mymenu.$category
         $mymenu add cascade -label $category -menu $mymenu.$category
         foreach subcategorylist [lrange $categorylist 1 end] {
-            set subcategory [lrange $subcategorylist 0 end-1]
+            set subcategory [lindex $subcategorylist 0]
             menu $mymenu.$category.$subcategory
             $mymenu.$category add cascade -label $subcategory -menu $mymenu.$category.$subcategory
             foreach item [lindex $subcategorylist end] {
