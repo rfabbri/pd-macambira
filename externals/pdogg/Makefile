@@ -34,7 +34,7 @@ EXTRA_DIST = pdogg.c makefile.msvc HISTORY
 
 CFLAGS = -DPD -I"$(PD_INCLUDE)"/pd -Wall -W -g
 LDFLAGS =  
-LIBS = $(shell pkg-config --libs vorbis vorbisenc)
+LIBS = $(shell pkg-config --libs vorbis vorbisenc vorbisfile)
 
 #------------------------------------------------------------------------------#
 #
