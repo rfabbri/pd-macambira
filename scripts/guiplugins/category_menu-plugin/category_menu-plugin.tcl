@@ -1,3 +1,6 @@
+# This plug generates a menu tree for selecting objects from a single
+# structured textfile.  The format of the textfile is nested Tcl lists
+# defined using {} brackets.
 
 package require pd_menus
 
@@ -15,21 +18,17 @@ proc category_menu::load_menutree {} {
 }
 
 proc category_menu::create {mymenu} {
-    pdtk_post "category menu plugin\n"
     set menutree [load_menutree]
-
     $mymenu add separator
     foreach categorylist $menutree {
         set category [lindex $categorylist 0]
         menu $mymenu.$category
         $mymenu add cascade -label $category -menu $mymenu.$category
         foreach subcategorylist [lrange $categorylist 1 end] {
-            set subcategory [lindex $subcategorylist 0]
+            set subcategory [lrange $subcategorylist 0 end-1]
             menu $mymenu.$category.$subcategory
             $mymenu.$category add cascade -label $subcategory -menu $mymenu.$category.$subcategory
-            pdtk_post "subcategorylist: $subcategorylist\n"
-            foreach item [lindex $subcategorylist 1] {
-                pdtk_post "item: $item\n"
+            foreach item [lindex $subcategorylist end] {
                 $mymenu.$category.$subcategory add command -label $item \
                     -command "pdsend \"\$::focused_window obj \$::popup_xcanvas \$::popup_ycanvas $item\""
             }
