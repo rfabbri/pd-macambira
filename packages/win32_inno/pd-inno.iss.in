@@ -297,6 +297,7 @@ OutputExeFilename=Output\PACKAGE_NAME.exe
 ; packages\win32_inno
 Source: pdpatch.ico; DestDir: {app}\lib
 Source: pd.ico; DestDir: {app}\lib
+Source: pd.ico; DestDir: {app}\tcl
 ;
 ;
 ;-----------------------------------------------------------------------------
@@ -349,9 +350,7 @@ Source: build\doc\*.*; DestDir: {app}\doc; Flags: ignoreversion confirmoverwrite
 Source: build\extra\*.*; DestDir: {app}\extra; Flags: ignoreversion recursesubdirs uninsremovereadonly promptifolder; Attribs: readonly
 Source: build\include\*.*; DestDir: {app}\include; Flags: ignoreversion confirmoverwrite recursesubdirs uninsremovereadonly
 Source: build\lib\*.*; DestDir: {app}\lib; Flags: ignoreversion recursesubdirs
-#ifexist "build\gripd"
-Source: build\gripd\*.*; DestDir: {app}\gripd; Flags: ignoreversion
-#endif
+Source: build\tcl\*.*; DestDir: {app}\tcl; Flags: ignoreversion confirmoverwrite uninsremovereadonly; Attribs: readonly
 ;
 ; DLLs
 ;
