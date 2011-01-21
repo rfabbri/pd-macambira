@@ -9,8 +9,8 @@ Architecture: i386
 Depends: xterm | x-terminal-emulator, ttf-dejavu-core, x-ttcidfont-conf, tcllib
 Provides: pd
 Recommends: xdg-utils, puredata, pulseaudio-utils
-Conflicts: pdextended
-Replaces: pdextended
+Conflicts: pdextended, pdextended-extra, pdextended-vanilla, cyclist
+Replaces: pdextended, pdextended-extra, pdextended-vanilla, cyclist
 Description: Pure Data with patches and a large collection of externals
  Pd (aka Pure Data) is a real-time graphical programming environment for
  audio, video, and graphical processing. It is the third major branch of the
