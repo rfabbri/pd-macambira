@@ -89,7 +89,7 @@ clean:
 	-rm -f *.$(EXT) *.o 
 
 realclean: clean
-	-rm -f *~ _* config.*
+	-rm -f *~ _* config.h config.log config.status
 	-rm -f *.d *.d.*
 
 distclean: realclean
