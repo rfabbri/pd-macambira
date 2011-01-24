@@ -141,7 +141,9 @@ static int ms_getdriverid(const t_symbol*id) {
 typedef struct _ms_params {
   int indev[MAXMIDIINDEV], outdev[MAXMIDIOUTDEV];
   int inchannels, outchannels;
+
 } t_ms_params;
+
 static void ms_params_print(t_ms_params*parms) {
   int i=0;
   post("\n=================================<");
@@ -164,14 +166,13 @@ static void ms_params_get(t_ms_params*parms) {
 
   sys_get_midi_params(&parms->inchannels, parms->indev,
                       &parms->outchannels, parms->outdev);
+
 #if 0
-  for(i=parms->naudioindev; i<MAXAUDIOINDEV; i++) {
-    parms->audioindev[i]=0;
-    parms->chindev[i]=0;
+  for(i=parms->inchannels; i<MAXMIDIINDEV; i++) {
+    parms->indev[i]=0;
   }
-  for(i=parms->naudiooutdev; i<MAXAUDIOOUTDEV; i++) {
-    parms->audiooutdev[i]=0;
-    parms->choutdev[i]=0;
+  for(i=parms->outchannels; i<MAXMIDIOUTDEV; i++) {
+    parms->outdev[i]=0;
   }
 #endif
 
@@ -191,6 +192,12 @@ typedef struct _midisettings
 } t_midisettings;
 
 static void midisettings_params_init(t_midisettings*x) {
+  int i=0;
+  for(i=0; i<MAXMIDIINDEV ; i++) x->x_params.indev [i]=0;
+  for(i=0; i<MAXMIDIOUTDEV; i++) x->x_params.outdev[i]=0;
+
+  x->x_params.inchannels = x->x_params.outchannels = 0;
+  
   ms_params_get(&x->x_params);
 }
 
@@ -267,7 +274,7 @@ static void midisettings_listparams(t_midisettings *x) {
 }
 
 /*
- * TODO: provide a nicer interface than the "pd audio-dialog"
+ * TODO: provide a nicer interface than the "pd midi-dialog"
  */
 static void midisettings_set(t_midisettings *x, 
                              t_symbol*s, 
@@ -472,6 +479,46 @@ static void midisettings_setparams(t_midisettings *x, t_symbol*s, int argc, t_at
   }
 }
 
+static void midisettings_listdrivers(t_midisettings *x);
+static void midisettings_setdriver(t_midisettings *x, t_symbol*s, int argc, t_atom*argv) {
+  int id=-1;
+  s=gensym("<unknown>"); /* just re-use the argument, which is not needed anyhow */
+  switch(argc) {
+  case 0:
+    midisettings_listdrivers(x);
+    return;
+  case 1:
+    if(A_FLOAT==argv->a_type) {
+      s=ms_getdrivername(atom_getint(argv));
+      break;
+    } else if (A_SYMBOL==argv->a_type) {
+      s=atom_getsymbol(argv);
+      break;
+    }
+  }
+
+  id=ms_getdriverid(s);
+  if(id<0) {
+    pd_error(x, "invalid driver '%s'", s->s_name);
+    return;
+  }
+  verbose(1, "setting driver '%s' (=%d)", s->s_name, id);
+#ifdef HAVE_SYS_CLOSE_MIDI
+  sys_close_midi();
+  sys_set_midi_api(id);
+  sys_reopen_midi();
+#else
+  if (s_pdsym->s_thing) {
+    t_atom ap[1];
+    SETFLOAT(ap, id);
+    typedmess(s_pdsym->s_thing, 
+              gensym("midi-setapi"), 
+              1,
+              ap);
+  }
+#endif
+}
+
 
 
 
@@ -483,9 +530,10 @@ static void midisettings_listdrivers(t_midisettings *x)
   t_ms_drivers*driver=NULL;
 
   for(driver=DRIVERS; driver; driver=driver->next) {
-    t_atom ap[1];
-    SETSYMBOL(ap, driver->name);
-    outlet_anything(x->x_info, gensym("driver"), 1, ap);    
+    t_atom ap[2];
+    SETSYMBOL(ap+0, driver->name);
+    SETFLOAT (ap+1, (t_float)(driver->id));
+    outlet_anything(x->x_info, gensym("driver"), 2, ap);    
   }
 }
 
@@ -539,6 +587,7 @@ void midisettings_setup(void)
   class_addmethod(midisettings_class, (t_method)midisettings_listdevices, gensym("listdevices"), A_NULL);
   class_addmethod(midisettings_class, (t_method)midisettings_listparams, gensym("listparams"), A_NULL);
 
+  class_addmethod(midisettings_class, (t_method)midisettings_setdriver, gensym("driver"), A_GIMME);
 
 
   class_addmethod(midisettings_class, (t_method)midisettings_setparams, gensym("params"), A_GIMME);
