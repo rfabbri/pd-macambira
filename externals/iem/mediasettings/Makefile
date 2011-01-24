@@ -47,7 +47,7 @@ INSTALL = install
 INSTALL_FILE    = $(INSTALL) -p -m 644
 INSTALL_DIR     = $(INSTALL) -p -m 755 -d
 
-CFLAGS = -DPD -I$(PD_PATH)/src -I$(prefix)/include/pd -Wall -W -g -DHAVE_SYS_CLOSE_AUDIO
+CFLAGS = -DPD -I$(PD_PATH)/src -I$(prefix)/include/pd -Wall -W -g -DHAVE_SYS_CLOSE_AUDIO -DHAVE_SYS_CLOSE_MIDI
 LDFLAGS =  
 LIBS = 
 ALLSOURCES := $(SOURCES)
