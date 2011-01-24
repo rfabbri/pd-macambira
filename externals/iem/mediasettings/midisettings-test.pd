@@ -1,10 +1,14 @@
-#N canvas 637 448 450 300 10;
+#N canvas 639 442 450 300 10;
 #X obj 148 122 midisettings;
 #X msg 169 81 driver;
 #X obj 148 144 print INFO;
-#X msg 266 106 params;
+#X msg 262 153 params;
 #X msg 80 49 driver ALSA-MIDI;
+#X msg 252 73 listdrivers;
+#X msg 254 102 listdevices;
 #X connect 0 0 2 0;
 #X connect 1 0 0 0;
 #X connect 3 0 0 0;
 #X connect 4 0 0 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
