@@ -660,9 +660,6 @@ void midisettings_setup(void)
 
   class_addmethod(midisettings_class, (t_method)midisettings_setdriver, gensym("driver"), A_GIMME);
 
-
-  class_addmethod(midisettings_class, (t_method)midisettings_setparams, gensym("params"), A_GIMME);
-
   class_addmethod(midisettings_class, (t_method)midisettings_testdevices, gensym("testdevices"), A_NULL);
 }
 
