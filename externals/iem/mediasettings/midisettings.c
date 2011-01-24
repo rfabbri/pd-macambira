@@ -42,6 +42,19 @@ typedef struct _ms_drivers {
 } t_ms_drivers;
 
 
+static const char*ms_defaultdrivername(const int id) {
+  switch (id) {
+  case API_NONE:
+    return NULL;
+  case API_ALSA:
+    return "ALSA-MIDI";
+  default:
+    return "default-MIDI";
+  }
+  return NULL;
+}
+
+
 t_ms_drivers*ms_finddriver(t_ms_drivers*drivers, const t_symbol*name) {
   while(drivers) {
     if(name==drivers->name)return drivers;
@@ -124,8 +137,11 @@ static t_symbol*ms_getdrivername(const int id) {
   if(driver) {
     return driver->name;
   } else {
-    return gensym("<unknown>");
+    const char*name=ms_defaultdrivername(id);
+    if(name)
+      return gensym(name);
   }
+  return gensym("<unknown>");
 }
 
 static int ms_getdriverid(const t_symbol*id) {
