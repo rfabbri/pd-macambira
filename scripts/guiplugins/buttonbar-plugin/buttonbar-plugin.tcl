@@ -6,42 +6,46 @@
 # menubar will be removed.
 
 package require base64
+#package require buttonhelp
+eval [read [open [file join $::current_plugin_loadpath balloonhelp.tcl]]]
 
-proc make_pd_button {mytoplevel name} {
+proc make_pd_button {mytoplevel name description} {
     button $mytoplevel.buttonbar.$name -image buttonimage$name \
         -relief flat -borderwidth 0 -highlightthickness 0 \
         -highlightcolor grey -highlightbackground grey -padx 0 -pady 0 \
         -command "menu_send_float \$::focused_window $name 0"
     pack $mytoplevel.buttonbar.$name -side left -padx 0 -pady 0
+    balloonhelp::setBalloonHelp $mytoplevel.buttonbar.$name $description
 }
 
-proc make_iemgui_button {mytoplevel name} {
+proc make_iemgui_button {mytoplevel name description} {
     button $mytoplevel.buttonbar.$name -image buttonimage$name \
         -relief sunken -borderwidth 0 -highlightthickness 0 \
         -highlightcolor grey -highlightbackground grey -padx 0 -pady 0 \
         -command "menu_send \$::focused_window $name"
     pack $mytoplevel.buttonbar.$name -side left -padx 0 -pady 0
+    balloonhelp::setBalloonHelp $mytoplevel.buttonbar.$name $description
 }
 
 proc showhide_buttonbar {mytoplevel} {
     if { ! [winfo exists $mytoplevel.buttonbar]} {
         frame $mytoplevel.buttonbar -cursor arrow -background grey \
             -pady 0
-        make_pd_button $mytoplevel obj
-        make_pd_button $mytoplevel msg
-        make_pd_button $mytoplevel floatatom
-        make_pd_button $mytoplevel symbolatom
-        make_pd_button $mytoplevel text
-        make_iemgui_button $mytoplevel bng
-        make_iemgui_button $mytoplevel toggle
-        make_iemgui_button $mytoplevel numbox
-        make_iemgui_button $mytoplevel hslider
-        make_iemgui_button $mytoplevel vslider
-        make_iemgui_button $mytoplevel hradio
-        make_iemgui_button $mytoplevel vradio
-        make_iemgui_button $mytoplevel vumeter        
-        make_iemgui_button $mytoplevel mycnv
-        make_iemgui_button $mytoplevel menuarray
+        make_pd_button $mytoplevel obj {Object (obj)}
+        make_pd_button $mytoplevel msg {Message (msg)}
+        make_pd_button $mytoplevel floatatom {Number (floatatom)}
+        make_pd_button $mytoplevel symbolatom {Symbol (symbolatom)}
+        make_pd_button $mytoplevel text {Comment}
+        make_iemgui_button $mytoplevel bng {Bang Button \[bng]}
+        make_iemgui_button $mytoplevel toggle {Toggle \[tgl]}
+        make_iemgui_button $mytoplevel numbox {Number2 \[my_numbox]}
+        make_iemgui_button $mytoplevel hslider {Horizontal Slider \[hslider]}
+        make_iemgui_button $mytoplevel vslider {Verical Slider \[vslider]}
+        make_iemgui_button $mytoplevel hradio {Horizontal Radio Button \[hradio]}
+        make_iemgui_button $mytoplevel vradio {Vertical Radio Button \[vradio]}
+        make_iemgui_button $mytoplevel vumeter {VU Meter \[vumeter]}
+        make_iemgui_button $mytoplevel mycnv {Canvas \[mycnv]}
+        make_iemgui_button $mytoplevel menuarray {Array (menuarray)}
     }
     if {$::editmode($mytoplevel)} {
         set tkcanvas [tkcanvas_name $mytoplevel]
