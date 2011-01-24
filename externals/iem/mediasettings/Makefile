@@ -36,6 +36,7 @@ LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(
 
 # where Pd lives
 PD_PATH = ../../pd
+PD_SRC = $(PD_PATH)/src
 # where to install the library
 prefix = /usr/local
 libdir = $(prefix)/lib
@@ -47,7 +48,7 @@ INSTALL = install
 INSTALL_FILE    = $(INSTALL) -p -m 644
 INSTALL_DIR     = $(INSTALL) -p -m 755 -d
 
-CFLAGS = -DPD -I$(PD_PATH)/src -I$(prefix)/include/pd -Wall -W -g -DHAVE_SYS_CLOSE_AUDIO -DHAVE_SYS_CLOSE_MIDI
+CFLAGS = -DPD -I$(PD_SRC) -I$(prefix)/include/pd -Wall -W -g -DHAVE_SYS_CLOSE_AUDIO -DHAVE_SYS_CLOSE_MIDI
 LDFLAGS =  
 LIBS = 
 ALLSOURCES := $(SOURCES)
