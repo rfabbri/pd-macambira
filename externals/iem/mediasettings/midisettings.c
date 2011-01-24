@@ -42,12 +42,14 @@ static t_class *midisettings_class;
 
 static t_symbol*s_pdsym=NULL;
 
-typedef struct _ms_drivers {
+typedef struct _ms_symkeys {
   t_symbol*name;
   int      id;
 
-  struct _ms_drivers *next;
-} t_ms_drivers;
+  struct _ms_symkeys *next;
+} t_ms_symkeys;
+
+typedef t_ms_symkeys t_ms_drivers ;
 
 
 static const char*ms_defaultdrivername(const int id) {
@@ -62,43 +64,72 @@ static const char*ms_defaultdrivername(const int id) {
   return NULL;
 }
 
-
-t_ms_drivers*ms_finddriver(t_ms_drivers*drivers, const t_symbol*name) {
-  while(drivers) {
-    if(name==drivers->name)return drivers;
-    drivers=drivers->next;
+static t_ms_symkeys*ms_symkeys_find(t_ms_symkeys*symkeys, const t_symbol*name) {
+  while(symkeys) {
+    if(name==symkeys->name)return symkeys;
+    symkeys=symkeys->next;
   }
   return NULL;
 }
 
-t_ms_drivers*ms_finddriverid(t_ms_drivers*drivers, const int id) {
-  while(drivers) {
-    if(id==drivers->id)return drivers;
-    drivers=drivers->next;
+static t_ms_symkeys*ms_symkeys_findid(t_ms_symkeys*symkeys, const int id) {
+  while(symkeys) {
+    if(id==symkeys->id)return symkeys;
+    symkeys=symkeys->next;
   }
   return NULL;
 }
 
-t_ms_drivers*ms_adddriver(t_ms_drivers*drivers, t_symbol*name, int id, int overwrite) {
-  t_ms_drivers*driver=ms_finddriver(drivers, name);
+static t_ms_symkeys*ms_symkeys_add(t_ms_symkeys*symkeys, t_symbol*name, int id, int overwrite) {
+  t_ms_symkeys*symkey=ms_symkeys_find(symkeys, name);
 
-  if(driver) {
+  if(symkey) {
     if(overwrite) {
-      driver->name=name;
-      driver->id  =id;
+      symkey->name=name;
+      symkey->id  =id;
     }
-    return drivers;
+    return symkeys;
   }
 
-  driver=(t_ms_drivers*)getbytes(sizeof(t_ms_drivers));
-  driver->name=name;
-  driver->id=id;
-  driver->next=drivers;
+  symkey=(t_ms_symkeys*)getbytes(sizeof(t_ms_symkeys));
+  symkey->name=name;
+  symkey->id=id;
+  symkey->next=symkeys;
 
-  return driver;
+  return symkey;
 }
 
-t_ms_drivers*ms_driverparse(t_ms_drivers*drivers, const char*buf) {
+static void ms_symkeys_clear(t_ms_symkeys*symkeys) {
+  t_ms_symkeys*symkey=symkeys;
+  while(symkey) {
+    t_ms_symkeys*next=symkey->next;
+
+    symkey->name=NULL;
+    symkey->id=0;
+    symkey->next=NULL;
+
+    freebytes(symkey, sizeof(t_ms_symkeys));
+
+    symkey=next;
+  }
+}
+
+static t_symbol*ms_symkeys_getname(t_ms_symkeys*symkeys, const int id) {
+  t_ms_symkeys*driver=ms_symkeys_findid(symkeys, id);
+  if(driver)
+    return driver->name;
+  return NULL;
+}
+static int ms_symkeys_getid(t_ms_symkeys*symkeys, const t_symbol*name) {
+  t_ms_symkeys*symkey=ms_symkeys_find(symkeys, name);
+  if(symkey) {
+    return symkey->id;
+  }
+  return -1; /* unknown */
+}
+
+
+t_ms_symkeys*ms_driverparse(t_ms_symkeys*drivers, const char*buf) {
   int start=-1;
   int stop =-1;
 
@@ -124,7 +155,7 @@ t_ms_drivers*ms_driverparse(t_ms_drivers*drivers, const char*buf) {
         snprintf(substring, length, "%s", buf+start+1);
         
         if(2==sscanf(substring, "%s %d", drivername, &driverid)) {
-          drivers=ms_adddriver(drivers, gensym(drivername), driverid, 0);
+          drivers=ms_symkeys_add(drivers, gensym(drivername), driverid, 0);
         } else {
           if((start+1)!=(stop)) /* empty APIs string */
             post("unparseable: '%s'", substring);
@@ -138,13 +169,13 @@ t_ms_drivers*ms_driverparse(t_ms_drivers*drivers, const char*buf) {
   return drivers;
 }
 
-static t_ms_drivers*DRIVERS=NULL;
+static t_ms_symkeys*DRIVERS=NULL;
 
 static t_symbol*ms_getdrivername(const int id) {
-  t_ms_drivers*driver=ms_finddriverid(DRIVERS, id);
-  if(driver) {
-    return driver->name;
-  } else {
+  t_symbol*s=ms_symkeys_getname(DRIVERS, id);
+  if(s)
+    return s;
+  else {
     const char*name=ms_defaultdrivername(id);
     if(name)
       return gensym(name);
@@ -153,11 +184,7 @@ static t_symbol*ms_getdrivername(const int id) {
 }
 
 static int ms_getdriverid(const t_symbol*id) {
-  t_ms_drivers*driver=ms_finddriver(DRIVERS, id);
-  if(driver) {
-    return driver->id;
-  }
-  return -1; /* unknown */
+  return ms_symkeys_getid(DRIVERS, id);
 }
 
 
@@ -165,7 +192,6 @@ static int ms_getdriverid(const t_symbol*id) {
 typedef struct _ms_params {
   int indev[MAXMIDIINDEV], outdev[MAXMIDIOUTDEV];
   int inchannels, outchannels;
-
 } t_ms_params;
 
 static void ms_params_print(t_ms_params*parms) {
@@ -431,33 +457,29 @@ static int midisettings_setparams_next(int argc, t_atom*argv) {
   return i;
 }
 
-/* [<device> <channels>]* ... */
+/* [<device1> [<deviceN>]*] ... */
 static int midisettings_setparams_input(t_midisettings*x, int argc, t_atom*argv) {
   int length=midisettings_setparams_next(argc, argv);
   int i;
-  int numpairs=length/2;
+  int dev=0;
 
-  if(length%2)return length;
+  if(length>MAXMIDIINDEV)
+    length=MAXMIDIINDEV;
 
-  if(numpairs>MAXMIDIINDEV)
-    numpairs=MAXMIDIINDEV;
+  x->x_params.inchannels = length;
 
-  for(i=0; i<numpairs; i++) {
-    int dev=0;
-    int ch=0;
-
-    if(A_FLOAT==argv[2*i+0].a_type) {
+  for(i=0; i<length; i++) {
+    switch(argv[2*i].a_type) {
+    case A_FLOAT:
       dev=atom_getint(argv);
-    } else if (A_SYMBOL==argv[2*i+0].a_type) {
-      // LATER: get the device-id from the device-name
-      continue;
-    } else {
+      break;
+    case A_SYMBOL:
+    default:
       continue;
     }
-    ch=atom_getint(argv+2*i+1);
-
     x->x_params.indev[i]=dev;
   }
+
 
   return length;
 }
