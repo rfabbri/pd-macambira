@@ -34,15 +34,15 @@ static t_class *midisettings_class;
 
 static t_symbol*s_pdsym=NULL;
 
-typedef struct _as_drivers {
+typedef struct _ms_drivers {
   t_symbol*name;
   int      id;
 
-  struct _as_drivers *next;
-} t_as_drivers;
+  struct _ms_drivers *next;
+} t_ms_drivers;
 
 
-t_as_drivers*as_finddriver(t_as_drivers*drivers, const t_symbol*name) {
+t_ms_drivers*ms_finddriver(t_ms_drivers*drivers, const t_symbol*name) {
   while(drivers) {
     if(name==drivers->name)return drivers;
     drivers=drivers->next;
@@ -50,7 +50,7 @@ t_as_drivers*as_finddriver(t_as_drivers*drivers, const t_symbol*name) {
   return NULL;
 }
 
-t_as_drivers*as_finddriverid(t_as_drivers*drivers, const int id) {
+t_ms_drivers*ms_finddriverid(t_ms_drivers*drivers, const int id) {
   while(drivers) {
     if(id==drivers->id)return drivers;
     drivers=drivers->next;
@@ -58,8 +58,8 @@ t_as_drivers*as_finddriverid(t_as_drivers*drivers, const int id) {
   return NULL;
 }
 
-t_as_drivers*as_adddriver(t_as_drivers*drivers, t_symbol*name, int id, int overwrite) {
-  t_as_drivers*driver=as_finddriver(drivers, name);
+t_ms_drivers*ms_adddriver(t_ms_drivers*drivers, t_symbol*name, int id, int overwrite) {
+  t_ms_drivers*driver=ms_finddriver(drivers, name);
 
   if(driver) {
     if(overwrite) {
@@ -69,7 +69,7 @@ t_as_drivers*as_adddriver(t_as_drivers*drivers, t_symbol*name, int id, int overw
     return drivers;
   }
 
-  driver=(t_as_drivers*)getbytes(sizeof(t_as_drivers));
+  driver=(t_ms_drivers*)getbytes(sizeof(t_ms_drivers));
   driver->name=name;
   driver->id=id;
   driver->next=drivers;
@@ -77,7 +77,7 @@ t_as_drivers*as_adddriver(t_as_drivers*drivers, t_symbol*name, int id, int overw
   return driver;
 }
 
-t_as_drivers*as_driverparse(t_as_drivers*drivers, const char*buf) {
+t_ms_drivers*ms_driverparse(t_ms_drivers*drivers, const char*buf) {
   int start=-1;
   int stop =-1;
 
@@ -103,7 +103,7 @@ t_as_drivers*as_driverparse(t_as_drivers*drivers, const char*buf) {
         snprintf(substring, length, "%s", buf+start+1);
         
         if(2==sscanf(substring, "%s %d", drivername, &driverid)) {
-          drivers=as_adddriver(drivers, gensym(drivername), driverid, 0);
+          drivers=ms_adddriver(drivers, gensym(drivername), driverid, 0);
         } else {
           post("unparseable: '%s'", substring);
         }
@@ -116,10 +116,10 @@ t_as_drivers*as_driverparse(t_as_drivers*drivers, const char*buf) {
   return drivers;
 }
 
-static t_as_drivers*DRIVERS=NULL;
+static t_ms_drivers*DRIVERS=NULL;
 
-static t_symbol*as_getdrivername(const int id) {
-  t_as_drivers*driver=as_finddriverid(DRIVERS, id);
+static t_symbol*ms_getdrivername(const int id) {
+  t_ms_drivers*driver=ms_finddriverid(DRIVERS, id);
   if(driver) {
     return driver->name;
   } else {
@@ -127,8 +127,8 @@ static t_symbol*as_getdrivername(const int id) {
   }
 }
 
-static int as_getdriverid(const t_symbol*id) {
-  t_as_drivers*driver=as_finddriver(DRIVERS, id);
+static int ms_getdriverid(const t_symbol*id) {
+  t_ms_drivers*driver=ms_finddriver(DRIVERS, id);
   if(driver) {
     return driver->id;
   }
@@ -137,11 +137,11 @@ static int as_getdriverid(const t_symbol*id) {
 
 
 
-typedef struct _as_params {
+typedef struct _ms_params {
   int indev[MAXMIDIINDEV], outdev[MAXMIDIOUTDEV];
   int inchannels, outchannels;
-} t_as_params;
-static void as_params_print(t_as_params*parms) {
+} t_ms_params;
+static void ms_params_print(t_ms_params*parms) {
   int i=0;
   post("\n=================================<");
 
@@ -157,9 +157,9 @@ static void as_params_print(t_as_params*parms) {
   post(">=================================\n");
 
 }
-static void as_params_get(t_as_params*parms) {
+static void ms_params_get(t_ms_params*parms) {
   int i=0;
-  memset(parms, 0, sizeof(t_as_params));
+  memset(parms, 0, sizeof(t_ms_params));
 
   sys_get_midi_params(&parms->inchannels, parms->indev,
                       &parms->outchannels, parms->outdev);
@@ -174,7 +174,7 @@ static void as_params_get(t_as_params*parms) {
   }
 #endif
 
-  as_params_print(parms);
+  ms_params_print(parms);
 }
 
 
@@ -186,11 +186,11 @@ typedef struct _midisettings
   t_object x_obj;
   t_outlet*x_info;
 
-  t_as_params x_params;
+  t_ms_params x_params;
 } t_midisettings;
 
 static void midisettings_params_init(t_midisettings*x) {
-  as_params_get(&x->x_params);
+  ms_params_get(&x->x_params);
 }
 
 
@@ -208,7 +208,7 @@ static void midisettings_listdevices(t_midisettings *x)
                      MAXNDEV, DEVDESCSIZE);
 
   SETSYMBOL (atoms+0, gensym("driver"));
-  SETSYMBOL (atoms+1, as_getdrivername(sys_midiapi));
+  SETSYMBOL (atoms+1, ms_getdrivername(sys_midiapi));
   outlet_anything(x->x_info, gensym("device"), 2, atoms);
 
   SETSYMBOL(atoms+0, gensym("in"));
@@ -317,7 +317,7 @@ static void midisettings_params_apply(t_midisettings*x) {
 
   int i=0;
 
-  as_params_print(&x->x_params);
+  ms_params_print(&x->x_params);
 
 
   for(i=0; i<MAXMIDIINDEV; i++) {
@@ -479,7 +479,7 @@ static void midisettings_setparams(t_midisettings *x, t_symbol*s, int argc, t_at
 static void midisettings_listdrivers(t_midisettings *x)
 {
 
-  t_as_drivers*driver=NULL;
+  t_ms_drivers*driver=NULL;
 
   for(driver=DRIVERS; driver; driver=driver->next) {
     t_atom ap[1];
@@ -507,14 +507,9 @@ static void *midisettings_new(void)
 
   char buf[MAXPDSTRING];
   sys_get_midi_apis(buf);
+  DRIVERS=ms_driverparse(DRIVERS, buf);
 
   midisettings_params_init (x); /* re-initialize to what we got */
-
-  DRIVERS=as_driverparse(DRIVERS, buf);
-
-  //  sys_get_midi_drivers(buf);
-  //  DRIVERS=as_driverparse(DRIVERS, buf);
-
 
   return (x);
 }
