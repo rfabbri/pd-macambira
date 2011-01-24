@@ -49,7 +49,7 @@ static const char*ms_defaultdrivername(const int id) {
   case API_ALSA:
     return "ALSA-MIDI";
   default:
-    return "default-MIDI";
+    return "default-MIDI"; /* such a stupid name! */
   }
   return NULL;
 }
@@ -118,7 +118,7 @@ t_ms_drivers*ms_driverparse(t_ms_drivers*drivers, const char*buf) {
         if(2==sscanf(substring, "%s %d", drivername, &driverid)) {
           drivers=ms_adddriver(drivers, gensym(drivername), driverid, 0);
         } else {
-          if((start+1)!=(stop)) // empty APIs string
+          if((start+1)!=(stop)) /* empty APIs string */
             post("unparseable: '%s'", substring);
         }
       }
@@ -162,16 +162,25 @@ typedef struct _ms_params {
 
 static void ms_params_print(t_ms_params*parms) {
   int i=0;
+#if 0
+  const int maxin =MAXMIDIINDEV;
+  const int maxout=MAXMIDIOUTDEV;
+#else
+  const int maxin =parms->inchannels; 
+  const int maxout=parms->outchannels;
+#endif
+
   post("\n=================================<");
-
-  for(i=0; i<MAXMIDIINDEV; i++) {
-    post("indev[%d]: %d", i, parms->indev[i]);
+  if(API_ALSA == sys_midiapi) {
+    post("alsamidi: %d %d", parms->inchannels, parms->outchannels);
+  } else {
+    for(i=0; i<maxin; i++) {
+      post("indev[%d]: %d", i, parms->indev[i]);
+    }
+    for(i=0; i<maxout; i++) {
+      post("outdev[%d]: %d", i, parms->outdev[i]);
+    }
   }
-  for(i=0; i<MAXMIDIOUTDEV; i++) {
-    post("outdev[%d]: %d", i, parms->outdev[i]);
-  }
-
-  post("alsamidi: %d %d", parms->inchannels, parms->outchannels);
 
   post(">=================================\n");
 
@@ -182,15 +191,6 @@ static void ms_params_get(t_ms_params*parms) {
 
   sys_get_midi_params(&parms->inchannels, parms->indev,
                       &parms->outchannels, parms->outdev);
-
-#if 0
-  for(i=parms->inchannels; i<MAXMIDIINDEV; i++) {
-    parms->indev[i]=0;
-  }
-  for(i=parms->outchannels; i<MAXMIDIOUTDEV; i++) {
-    parms->outdev[i]=0;
-  }
-#endif
 
   ms_params_print(parms);
 }
