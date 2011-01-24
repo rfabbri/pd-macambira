@@ -64,7 +64,7 @@ static const char*ms_defaultdrivername(const int id) {
   return NULL;
 }
 
-static t_ms_symkeys*ms_symkeys_find(t_ms_symkeys*symkeys, const t_symbol*name) {
+static t_ms_symkeys*ms_symkeys_find(const t_ms_symkeys*symkeys, const t_symbol*name) {
   while(symkeys) {
     if(name==symkeys->name)return symkeys;
     symkeys=symkeys->next;
@@ -72,7 +72,7 @@ static t_ms_symkeys*ms_symkeys_find(t_ms_symkeys*symkeys, const t_symbol*name) {
   return NULL;
 }
 
-static t_ms_symkeys*ms_symkeys_findid(t_ms_symkeys*symkeys, const int id) {
+static t_ms_symkeys*ms_symkeys_findid(const t_ms_symkeys*symkeys, const int id) {
   while(symkeys) {
     if(id==symkeys->id)return symkeys;
     symkeys=symkeys->next;
@@ -114,13 +114,13 @@ static void ms_symkeys_clear(t_ms_symkeys*symkeys) {
   }
 }
 
-static t_symbol*ms_symkeys_getname(t_ms_symkeys*symkeys, const int id) {
+static t_symbol*ms_symkeys_getname(const t_ms_symkeys*symkeys, const int id) {
   t_ms_symkeys*driver=ms_symkeys_findid(symkeys, id);
   if(driver)
     return driver->name;
   return NULL;
 }
-static int ms_symkeys_getid(t_ms_symkeys*symkeys, const t_symbol*name) {
+static int ms_symkeys_getid(const t_ms_symkeys*symkeys, const t_symbol*name) {
   t_ms_symkeys*symkey=ms_symkeys_find(symkeys, name);
   if(symkey) {
     return symkey->id;
@@ -192,6 +192,9 @@ static int ms_getdriverid(const t_symbol*id) {
 typedef struct _ms_params {
   int indev[MAXMIDIINDEV], outdev[MAXMIDIOUTDEV];
   int inchannels, outchannels;
+
+  t_ms_symkeys*indevices, *outdevices;
+  unsigned int num_indevices, num_outdevices;
 } t_ms_params;
 
 static void ms_params_print(t_ms_params*parms) {
@@ -220,10 +223,32 @@ static void ms_params_print(t_ms_params*parms) {
 
 }
 static void ms_params_get(t_ms_params*parms) {
+  int i;
+  char indevlist[MAXNDEV][DEVDESCSIZE], outdevlist[MAXNDEV][DEVDESCSIZE];
+  int indevs = 0, outdevs = 0;
+
+  ms_symkeys_clear(parms->indevices);
+  ms_symkeys_clear(parms->outdevices);
   memset(parms, 0, sizeof(t_ms_params));
+
+  sys_get_midi_devs((char*)indevlist, &indevs, 
+                    (char*)outdevlist, &outdevs, 
+                    MAXNDEV, DEVDESCSIZE);
+  for(i=0; i<indevs; i++) {
+#warning LATER check how to deal with multiple devices of the same name!
+    parms->indevices=ms_symkeys_add(parms->indevices, gensym(indevlist[i]), i, 0);
+    parms->num_indevices++;
+  }
+  for(i=0; i<outdevs; i++) {
+    parms->outdevices=ms_symkeys_add(parms->outdevices, gensym(outdevlist[i]), i, 0);
+    parms->num_outdevices++;
+  }
 
   sys_get_midi_params(&parms->inchannels, parms->indev,
                       &parms->outchannels, parms->outdev);
+
+
+
 
   ms_params_print(parms);
 }
@@ -257,14 +282,7 @@ static void midisettings_listdevices(t_midisettings *x)
 
 #define MS_ALSADEV_FORMAT "ALSA-%02d"
 
-  char indevlist[MAXNDEV][DEVDESCSIZE], outdevlist[MAXNDEV][DEVDESCSIZE];
-  int indevs = 0, outdevs = 0;
-
   t_atom atoms[MAXMIDIDEV+1];
- 
-  sys_get_midi_devs((char*)indevlist, &indevs, 
-                     (char*)outdevlist, &outdevs, 
-                     MAXNDEV, DEVDESCSIZE);
 
   ms_params_get(&x->x_params);
 
@@ -278,7 +296,7 @@ static void midisettings_listdevices(t_midisettings *x)
       dummy[MAXPDSTRING-1]=0;
       devname=dummy;
     } else {
-      devname=indevlist[x->x_params.indev[i]];
+      devname=ms_symkeys_getname(x->x_params.indevices, i)->s_name;
     }
     post("indev%d: '%s'", i, devname);
     if(devname) {
@@ -299,7 +317,7 @@ static void midisettings_listdevices(t_midisettings *x)
       dummy[MAXPDSTRING-1]=0;
       devname=dummy;
     } else {
-      devname=outdevlist[x->x_params.outdev[i]];
+      devname=ms_symkeys_getname(x->x_params.outdevices, i)->s_name;
     }
     post("outdev%d: '%s'", i, devname);
     if(devname) {
@@ -312,7 +330,7 @@ static void midisettings_listdevices(t_midisettings *x)
   SETSYMBOL(atoms+0, gensym("in"));
   if(API_ALSA == sys_midiapi) {
     char dummy[MAXPDSTRING];
-    indevs=MAXMIDIINDEV;
+    int indevs=MAXMIDIINDEV;
     SETFLOAT (atoms+1, (t_float)indevs);
     outlet_anything(x->x_info, gensym("devicelist"), 2, atoms);
     for(i=0; i<indevs; i++) {
@@ -323,10 +341,10 @@ static void midisettings_listdevices(t_midisettings *x)
       outlet_anything(x->x_info, gensym("devicelist"), 3, atoms);
     }
   } else {
-    SETFLOAT (atoms+1, (t_float)indevs);
+    SETFLOAT (atoms+1, (t_float)x->x_params.num_indevices);
     outlet_anything(x->x_info, gensym("devicelist"), 2, atoms);
-    for(i=0; i<indevs; i++) {
-      SETSYMBOL(atoms+1, gensym(indevlist[i]));
+    for(i=0; i<x->x_params.num_indevices; i++) {
+      SETSYMBOL(atoms+1, ms_symkeys_getname(x->x_params.indevices, i));
       SETFLOAT (atoms+2, (t_float)i);
       outlet_anything(x->x_info, gensym("devicelist"), 3, atoms);
     }
@@ -335,8 +353,8 @@ static void midisettings_listdevices(t_midisettings *x)
   SETSYMBOL(atoms+0, gensym("out"));
   if(API_ALSA == sys_midiapi) {
     char dummy[MAXPDSTRING];
-    outdevs=MAXMIDIOUTDEV;
-    SETFLOAT (atoms+1, (t_float)outdevs);
+    int outdevs=MAXMIDIOUTDEV;
+    SETFLOAT (atoms+1, outdevs);
     outlet_anything(x->x_info, gensym("devicelist"), 2, atoms);
     for(i=0; i<outdevs; i++) {
       snprintf(dummy, MAXPDSTRING, MS_ALSADEV_FORMAT, i);
@@ -346,10 +364,10 @@ static void midisettings_listdevices(t_midisettings *x)
       outlet_anything(x->x_info, gensym("devicelist"), 3, atoms);
     }
   } else {
-    SETFLOAT (atoms+1, (t_float)outdevs);
+    SETFLOAT (atoms+1, (t_float)x->x_params.num_outdevices);
     outlet_anything(x->x_info, gensym("devicelist"), 2, atoms);
-    for(i=0; i<outdevs; i++) {
-      SETSYMBOL(atoms+1, gensym(outdevlist[i]));
+    for(i=0; i<x->x_params.outdevices; i++) {
+      SETSYMBOL(atoms+1, ms_symkeys_getname(x->x_params.outdevices, i));
       SETFLOAT (atoms+2, (t_float)i);
       outlet_anything(x->x_info, gensym("devicelist"), 3, atoms);
     }
@@ -647,6 +665,9 @@ static void *midisettings_new(void)
 {
   t_midisettings *x = (t_midisettings *)pd_new(midisettings_class);
   x->x_info=outlet_new(&x->x_obj, 0);
+
+  x->x_params.indevices=NULL;
+  x->x_params.outdevices=NULL;
 
   char buf[MAXPDSTRING];
   sys_get_midi_apis(buf);
