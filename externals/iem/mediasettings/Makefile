@@ -1,7 +1,7 @@
 ## Pd library template version 1.0
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
-LIBRARY_NAME = audiosettings
+LIBRARY_NAME = mediasettings
 
 # add your .c source files to the SOURCES variable, help files will be
 # included automatically
