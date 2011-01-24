@@ -105,7 +105,8 @@ t_ms_drivers*ms_driverparse(t_ms_drivers*drivers, const char*buf) {
         if(2==sscanf(substring, "%s %d", drivername, &driverid)) {
           drivers=ms_adddriver(drivers, gensym(drivername), driverid, 0);
         } else {
-          post("unparseable: '%s'", substring);
+          if((start+1)!=(stop)) // empty APIs string
+            post("unparseable: '%s'", substring);
         }
       }
       start=-1;
