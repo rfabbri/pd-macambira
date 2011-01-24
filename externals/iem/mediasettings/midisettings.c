@@ -554,12 +554,16 @@ static void midisettings_setdriver(t_midisettings *x, t_symbol*s, int argc, t_at
     }
   }
 
-  id=ms_getdriverid(s);
-  if(id<0) {
-    pd_error(x, "invalid driver '%s'", s->s_name);
-    return;
+  if(NULL==DRIVERS) {
+    id=sys_midiapi;
+  } else {
+    id=ms_getdriverid(s);
+    if(id<0) {
+      pd_error(x, "invalid driver '%s'", s->s_name);
+      return;
+    }
+    verbose(1, "setting driver '%s' (=%d)", s->s_name, id);
   }
-  verbose(1, "setting driver '%s' (=%d)", s->s_name, id);
 #ifdef HAVE_SYS_CLOSE_MIDI
   sys_close_midi();
   sys_set_midi_api(id);
@@ -594,6 +598,8 @@ static void midisettings_listdrivers(t_midisettings *x)
   for(driver=DRIVERS; driver; driver=driver->next) {
     count++;
   }
+
+
   SETFLOAT(ap+0, count);
   outlet_anything(x->x_info, gensym("driverlist"), 1, ap);
 
