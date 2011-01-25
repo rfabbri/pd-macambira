@@ -121,6 +121,8 @@ static void mTXBesselMatrix (MTXBessel *x, t_symbol *s,
   int n,m,ofs;
 
 
+#ifdef HAVE_MATH_BESSEL
+
   /* size check */
   if (!size) 
     post("mtx_bessel: invalid dimensions");
@@ -165,6 +167,10 @@ static void mTXBesselMatrix (MTXBessel *x, t_symbol *s,
 
      mTXBesselBang(x);
   }
+
+#else
+  post("mtx_bessel: implementation requires math.h that implements jnf and ynf Bessel functions");
+#endif
 }
 
 void mtx_bessel_setup (void)
