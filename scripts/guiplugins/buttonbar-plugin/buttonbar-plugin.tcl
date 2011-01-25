@@ -5,9 +5,10 @@
 # not in Edit Mode.  Also, if a patch is switched to Run Mode, the
 # menubar will be removed.
 
+lappend ::auto_path $::current_plugin_loadpath
+
 package require base64
-#package require buttonhelp
-eval [read [open [file join $::current_plugin_loadpath balloonhelp.tcl]]]
+package require tooltip 1.4.2
 
 proc make_pd_button {mytoplevel name description} {
     button $mytoplevel.buttonbar.$name -image buttonimage$name \
@@ -15,7 +16,7 @@ proc make_pd_button {mytoplevel name description} {
         -highlightcolor grey -highlightbackground grey -padx 0 -pady 0 \
         -command "menu_send_float \$::focused_window $name 0"
     pack $mytoplevel.buttonbar.$name -side left -padx 0 -pady 0
-    balloonhelp::setBalloonHelp $mytoplevel.buttonbar.$name $description
+    ::tooltip::tooltip $mytoplevel.buttonbar.$name $description
 }
 
 proc make_iemgui_button {mytoplevel name description} {
@@ -24,7 +25,7 @@ proc make_iemgui_button {mytoplevel name description} {
         -highlightcolor grey -highlightbackground grey -padx 0 -pady 0 \
         -command "menu_send \$::focused_window $name"
     pack $mytoplevel.buttonbar.$name -side left -padx 0 -pady 0
-    balloonhelp::setBalloonHelp $mytoplevel.buttonbar.$name $description
+    ::tooltip::tooltip $mytoplevel.buttonbar.$name $description
 }
 
 proc showhide_buttonbar {mytoplevel} {
