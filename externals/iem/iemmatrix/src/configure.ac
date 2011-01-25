@@ -75,7 +75,7 @@ AC_CHECK_LIB([gsl], [gsl_blas_dgemm])
 AC_CHECK_LIB([gsl], [gsl_eigen_nonsymm],AC_DEFINE(HAVE_GSL_EIGEN_NONSYMM,1,[can gsl compute complex eigenvalues?]))
 
 dnl for math.h Bessel/Neumann functions
-AC_CHECK_LIB([math], [jnf],AC_DEFINE(HAVE_MATH_BESSEL,1,[can math compute Bessel functions?]))
+AC_CHECK_LIB([m], [jnf],AC_DEFINE(HAVE_MATH_BESSEL,1,[can math compute Bessel functions?]))
 
 
 if test "x$with_pd" != "x"; then

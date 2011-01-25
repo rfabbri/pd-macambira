@@ -13,6 +13,7 @@
 /* can libgsl compute complex eigenvalues? */
 #undef HAVE_GSL_EIGEN_NONSYMM
 
-
+/* can math compute Bessel functions? */
+#undef HAVE_MATH_BESSEL
 
 #endif /* CONFIG_H_ */
