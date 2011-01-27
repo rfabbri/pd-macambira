@@ -12,7 +12,7 @@
 #X obj 272 297 route device devicelist;
 #X obj 17 323 route driver driverlist;
 #X obj 17 345 symbol;
-#X symbolatom 17 397 10 0 0 3 current - -;
+#X symbolatom 17 397 0 0 0 3 current - -;
 #X obj 84 345 route float;
 #X floatatom 84 366 5 0 0 0 - - -;
 #X obj 147 365 print MIDI-drivers;
@@ -29,7 +29,20 @@
 #X msg 17 47 bang;
 #X text 58 46 query current settings;
 #X obj 442 297 print oops;
-#X connect 0 0 11 0;
+#X obj 17 274 t a a;
+#X obj 90 275 spigot;
+#X obj 90 297 print MIDI;
+#X obj 139 277 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X msg 143 195 device @in UM-1 @out none;
+#X obj 467 211 r pd;
+#X obj 467 233 route midi-dialog;
+#X obj 467 255 print MD;
+#X obj 400 70 list prepend midi-dialog;
+#X obj 400 92 list trim;
+#X obj 400 114 s pd;
+#X msg 400 48 0 0 0 0 0 0 0 0 2 2;
+#X connect 0 0 30 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
 #X connect 6 0 0 0;
@@ -54,3 +67,13 @@
 #X connect 24 0 25 0;
 #X connect 24 1 26 0;
 #X connect 27 0 0 0;
+#X connect 30 0 11 0;
+#X connect 30 1 31 0;
+#X connect 31 0 32 0;
+#X connect 33 0 31 1;
+#X connect 34 0 0 0;
+#X connect 35 0 36 0;
+#X connect 36 0 37 0;
+#X connect 38 0 39 0;
+#X connect 39 0 40 0;
+#X connect 41 0 38 0;
