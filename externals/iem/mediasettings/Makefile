@@ -37,7 +37,7 @@ EXTRA_DIST =
 #------------------------------------------------------------------------------#
 
 # -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
-ALL_CFLAGS = -I"$(PD_INCLUDE)/pd"
+ALL_CFLAGS = -I"$(PD_INCLUDE)"
 ALL_LDFLAGS =  
 ALL_LIBS = 
 
@@ -57,7 +57,7 @@ LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(
 
 ALL_CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 
-PD_INCLUDE = $(PD_PATH)/include
+PD_INCLUDE = $(PD_PATH)/include/pd
 # where to install the library, overridden below depending on platform
 prefix = /usr/local
 libdir = $(prefix)/lib
@@ -143,7 +143,7 @@ ifeq ($(UNAME),Linux)
   SOURCES += $(SOURCES_linux)
   EXTENSION = pd_linux
   OS = linux
-  PD_PATH = /usr
+  PD_PATH = /usr/local
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += -fPIC
   ALL_LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
@@ -282,6 +282,7 @@ clean:
 	-rm -f -- $(LIBRARY_NAME).$(EXTENSION)
 
 distclean: clean
+	-rm -f -- *~
 	-rm -f -- $(DISTBINDIR).tar.gz
 	-rm -rf -- $(DISTBINDIR)
 	-rm -f -- $(DISTDIR).tar.gz
