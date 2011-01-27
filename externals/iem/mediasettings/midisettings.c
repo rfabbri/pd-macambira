@@ -250,7 +250,7 @@ static void ms_params_get(t_ms_params*parms) {
   parms->num_indev =(indevs >0)?indevs:0;
   parms->num_outdev=(outdevs>0)?outdevs:0;
 
-  ms_params_print(parms);
+  //  ms_params_print(parms);
 }
 
 
@@ -401,7 +401,7 @@ static void midisettings_params_apply(t_midisettings*x) {
 
   int i=0;
 
-  ms_params_print(&x->x_params);
+  // ms_params_print(&x->x_params);
 
   for(i=0; i<MIDIDIALOG_INDEVS+MIDIDIALOG_OUTDEVS+2; i++) {
     SETFLOAT(argv+i, 0);
@@ -531,7 +531,12 @@ static void midisettings_setparams(t_midisettings *x, t_symbol*s, int argc, t_at
 
   type=PARAM;
 
-  if(argc && A_SYMBOL == argv->a_type ) {
+  if(!argc) {
+    midisettings_listdevices(x);
+    return;
+  }
+
+  if(A_SYMBOL == argv->a_type ) {
     t_symbol*tsym=atom_getsymbol(argv);
     if(gensym("in")==tsym)
       type=INPUT;
@@ -712,11 +717,9 @@ void midisettings_setup(void)
   class_addmethod(midisettings_class, (t_method)midisettings_listdevices, gensym("listdevices"), A_NULL);
 
   class_addmethod(midisettings_class, (t_method)midisettings_setdriver, gensym("driver"), A_GIMME);
+  class_addmethod(midisettings_class, (t_method)midisettings_setparams, gensym("device"), A_GIMME);
 
-  class_addmethod(midisettings_class, (t_method)midisettings_testdevices, gensym("testdevices"), A_NULL);
-
-
-  class_addmethod(midisettings_class, (t_method)midisettings_setparams, gensym("devices"), A_GIMME);
+  // class_addmethod(midisettings_class, (t_method)midisettings_testdevices, gensym("testdevices"), A_NULL);
 }
 
 
