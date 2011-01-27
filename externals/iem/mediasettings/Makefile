@@ -30,6 +30,10 @@ EXTRA_DIST =
 
 
 
+DEFS = -DHAVE_SYS_CLOSE_AUDIO -DHAVE_SYS_CLOSE_MIDI
+
+
+
 #------------------------------------------------------------------------------#
 #
 # things you might need to edit if you are using other C libraries
@@ -55,7 +59,7 @@ LIBS=
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
-ALL_CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
+ALL_CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"' $(DEFS)
 
 PD_INCLUDE = $(PD_PATH)/include/pd
 # where to install the library, overridden below depending on platform
