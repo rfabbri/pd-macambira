@@ -401,10 +401,10 @@ static void midisettings_params_apply(t_midisettings*x) {
 
   int i=0;
 
-  // ms_params_print(&x->x_params);
+   ms_params_print(&x->x_params);
 
-  for(i=0; i<MIDIDIALOG_INDEVS+MIDIDIALOG_OUTDEVS+2; i++) {
-    SETFLOAT(argv+i, 0);
+  for(i=0; i<argc; i++) {
+    SETFLOAT(argv+i, (t_float)0);
   }
 
 
@@ -418,18 +418,28 @@ static void midisettings_params_apply(t_midisettings*x) {
 
     SETFLOAT(argv+1*MIDIDIALOG_INDEVS+1*MIDIDIALOG_OUTDEVS+0,(t_float)x->x_params.num_indev );
     SETFLOAT(argv+1*MIDIDIALOG_INDEVS+1*MIDIDIALOG_OUTDEVS+1,(t_float)x->x_params.num_outdev);
+    
   } else {
-    for(i=0; i<MIDIDIALOG_INDEVS; i++) {
-      SETFLOAT(argv+i+0*MIDIDIALOG_INDEVS, (t_float)x->x_params.indev[i]);
+    unsigned int pos=0;
+    for(i=0; i<x->x_params.num_indev; i++) {
+      pos=i+0*MIDIDIALOG_INDEVS;
+      SETFLOAT(argv+pos, (t_float)x->x_params.indev[i]);
     }
-    for(i=0; i<MIDIDIALOG_OUTDEVS; i++) {
-      SETFLOAT(argv+i+1*MIDIDIALOG_INDEVS, (t_float)x->x_params.outdev[i]);
+    for(i=0; i<x->x_params.num_indev; i++) {
+      pos=i+1*MIDIDIALOG_INDEVS;
+      SETFLOAT(argv+pos, (t_float)x->x_params.outdev[i]);
     }
-
-    SETFLOAT(argv+1*MIDIDIALOG_INDEVS+1*MIDIDIALOG_OUTDEVS+0,(t_float)0);
-    SETFLOAT(argv+1*MIDIDIALOG_INDEVS+1*MIDIDIALOG_OUTDEVS+1,(t_float)0);
+    pos=MIDIDIALOG_INDEVS+MIDIDIALOG_OUTDEVS;
+    SETFLOAT(argv+1*MIDIDIALOG_INDEVS+1*MIDIDIALOG_OUTDEVS+0,(t_float)x->x_params.num_indev );
+    SETFLOAT(argv+1*MIDIDIALOG_INDEVS+1*MIDIDIALOG_OUTDEVS+1,(t_float)x->x_params.num_outdev);
   }
-
+  
+  startpost("mididialog: ");
+  for(i=0; i<argc; i++) {
+  postatom(argv, argc);
+  
+  }
+endpost();
 
   if (s_pdsym->s_thing) typedmess(s_pdsym->s_thing, 
 				  gensym("midi-dialog"), 
@@ -476,7 +486,7 @@ static int midisettings_setparams_inout( int argc, t_atom*argv, t_ms_symkeys*dev
   const unsigned int length=midisettings_setparams_next(argc, argv);
   unsigned int len=length;
   unsigned int i;
-
+  
   if(len>maxnumdevices)
     len=maxnumdevices;
 
@@ -490,7 +500,7 @@ static int midisettings_setparams_inout( int argc, t_atom*argv, t_ms_symkeys*dev
       break;
     case A_SYMBOL:
      // LATER: get the device-id from the device-name
-      dev=ms_symkeys_getid(devices, atom_getsymbol(argv+i));
+      dev=1+ms_symkeys_getid(devices, atom_getsymbol(argv+i));
       if(dev<0) dev=0;
       break;
     default:
@@ -635,9 +645,6 @@ static void midisettings_setdriver(t_midisettings *x, t_symbol*s, int argc, t_at
   }
 #endif
 }
-
-
-
 
 /*
  */
