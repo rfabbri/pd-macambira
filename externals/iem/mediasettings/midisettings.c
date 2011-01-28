@@ -239,6 +239,12 @@ static void ms_params_get(t_ms_params*parms) {
     parms->indevices=ms_symkeys_add(parms->indevices, gensym(indevlist[i]), i, 0);
     parms->num_indevices++;
   }
+
+  parms->indevices=ms_symkeys_add(parms->indevices, gensym("test"), i++, 0);
+  parms->num_indevices++;
+  parms->indevices=ms_symkeys_add(parms->indevices, gensym("test"), i++, 0);
+  parms->num_indevices++;
+
   for(i=0; i<outdevs; i++) {
     parms->outdevices=ms_symkeys_add(parms->outdevices, gensym(outdevlist[i]), i, 0);
     parms->num_outdevices++;
@@ -275,101 +281,97 @@ static void midisettings_params_init(t_midisettings*x) {
   ms_params_get(&x->x_params);
 }
 
+#define MS_ALSADEV_FORMAT "ALSA-%02d"
+
+static void midisettings_listdevices_devices(t_outlet *outlet,
+						t_symbol*type,
+						t_ms_symkeys*devices,
+						const unsigned int numdevs
+						) {
+  unsigned int count=0, i=0;
+  t_atom atoms[MAXMIDIDEV+1];
+  SETSYMBOL(atoms+0, type);
+  for(i=0; i<numdevs; i++) {
+    char dummy[MAXPDSTRING];
+    char*devname=NULL;
+    if(API_ALSA == sys_midiapi) {
+      snprintf(dummy, MAXPDSTRING, MS_ALSADEV_FORMAT, i);
+      dummy[MAXPDSTRING-1]=0;
+      devname=dummy;
+    } else {
+      devname=ms_symkeys_getname(devices, i)->s_name;
+    }
+    if(devname) {
+      SETSYMBOL(atoms+count+1, gensym(devname));
+      count++;
+    }
+  }
+  outlet_anything(outlet, gensym("device"), count+1, atoms);
+}
+
+static void midisettings_listdevices_devicelist(t_outlet *outlet,
+						t_symbol*type,
+						t_ms_symkeys*devices,
+						const unsigned int numdevs,
+						const unsigned int maxdevs
+						) {
+  unsigned int i=0;
+  t_atom atoms[MAXMIDIDEV+1];
+  SETSYMBOL(atoms+0, type);
+  if(API_ALSA == sys_midiapi) {
+    char dummy[MAXPDSTRING];
+    unsigned int iodevs=maxdevs;
+    SETFLOAT (atoms+1, iodevs);
+    outlet_anything(outlet, gensym("devicelist"), 2, atoms);
+    for(i=0; i<iodevs; i++) {
+      snprintf(dummy, MAXPDSTRING, MS_ALSADEV_FORMAT, i);
+      dummy[MAXPDSTRING-1]=0;
+      SETSYMBOL(atoms+1, gensym(dummy));
+      SETFLOAT (atoms+2, (t_float)i);
+      outlet_anything(outlet, gensym("devicelist"), 3, atoms);
+    }
+  } else {
+    SETFLOAT (atoms+1, (t_float)numdevs);
+    outlet_anything(outlet, gensym("devicelist"), 2, atoms);
+    for(i=0; i<numdevs; i++) {
+      t_symbol*s=ms_symkeys_getname(devices, i);
+      if(NULL==s)continue;
+      SETSYMBOL(atoms+1, s);
+      SETFLOAT (atoms+2, (t_float)i);
+      outlet_anything(outlet, gensym("devicelist"), 3, atoms);
+    }
+  }
+}
+
+
+
 
 static void midisettings_listdevices(t_midisettings *x)
 {
-  unsigned int i, count;
-
-#define MS_ALSADEV_FORMAT "ALSA-%02d"
-
-  t_atom atoms[MAXMIDIDEV+1];
-
-  ms_params_get(&x->x_params);
-
-  SETSYMBOL(atoms+0, gensym("in"));
-  count=0;
-  for(i=0; i<x->x_params.num_indev; i++) {
-    char dummy[MAXPDSTRING];
-    char*devname=NULL;
-    if(API_ALSA == sys_midiapi) {
-      snprintf(dummy, MAXPDSTRING, MS_ALSADEV_FORMAT, i);
-      dummy[MAXPDSTRING-1]=0;
-      devname=dummy;
-    } else {
-      devname=ms_symkeys_getname(x->x_params.indevices, i)->s_name;
-    }
-    if(devname) {
-      SETSYMBOL(atoms+count+1, gensym(devname));
-      count++;
-    }
-  }
-  outlet_anything(x->x_info, gensym("device"), count+1, atoms);
+  midisettings_listdevices_devices(x->x_info,
+				   gensym("in"),
+				   x->x_params.indevices,
+				   x->x_params.num_indev);
 
 
- SETSYMBOL(atoms+0, gensym("out"));
-  count=0;
-  for(i=0; i<x->x_params.num_outdev; i++) {
-    char dummy[MAXPDSTRING];
-    char*devname=NULL;
-    if(API_ALSA == sys_midiapi) {
-      snprintf(dummy, MAXPDSTRING, MS_ALSADEV_FORMAT, i);
-      dummy[MAXPDSTRING-1]=0;
-      devname=dummy;
-    } else {
-      devname=ms_symkeys_getname(x->x_params.outdevices, i)->s_name;
-    }
-    if(devname) {
-      SETSYMBOL(atoms+count+1, gensym(devname));
-      count++;
-    }
-  }
-  outlet_anything(x->x_info, gensym("device"), count+1, atoms);
- 
-  SETSYMBOL(atoms+0, gensym("in"));
-  if(API_ALSA == sys_midiapi) {
-    char dummy[MAXPDSTRING];
-    unsigned int indevs=MAXMIDIINDEV;
-    SETFLOAT (atoms+1, (t_float)indevs);
-    outlet_anything(x->x_info, gensym("devicelist"), 2, atoms);
-    for(i=0; i<indevs; i++) {
-      snprintf(dummy, MAXPDSTRING, MS_ALSADEV_FORMAT, i);
-      dummy[MAXPDSTRING-1]=0;
-      SETSYMBOL(atoms+1, gensym(dummy));
-      SETFLOAT (atoms+2, (t_float)i);
-      outlet_anything(x->x_info, gensym("devicelist"), 3, atoms);
-    }
-  } else {
-    SETFLOAT (atoms+1, (t_float)x->x_params.num_indevices);
-    outlet_anything(x->x_info, gensym("devicelist"), 2, atoms);
-    for(i=0; i<x->x_params.num_indevices; i++) {
-      SETSYMBOL(atoms+1, ms_symkeys_getname(x->x_params.indevices, i));
-      SETFLOAT (atoms+2, (t_float)i);
-      outlet_anything(x->x_info, gensym("devicelist"), 3, atoms);
-    }
-  }
+  midisettings_listdevices_devices(x->x_info,
+				   gensym("out"),
+				   x->x_params.outdevices,
+				   x->x_params.num_outdev);
 
-  SETSYMBOL(atoms+0, gensym("out"));
-  if(API_ALSA == sys_midiapi) {
-    char dummy[MAXPDSTRING];
-    unsigned int outdevs=MAXMIDIOUTDEV;
-    SETFLOAT (atoms+1, outdevs);
-    outlet_anything(x->x_info, gensym("devicelist"), 2, atoms);
-    for(i=0; i<outdevs; i++) {
-      snprintf(dummy, MAXPDSTRING, MS_ALSADEV_FORMAT, i);
-      dummy[MAXPDSTRING-1]=0;
-      SETSYMBOL(atoms+1, gensym(dummy));
-      SETFLOAT (atoms+2, (t_float)i);
-      outlet_anything(x->x_info, gensym("devicelist"), 3, atoms);
-    }
-  } else {
-    SETFLOAT (atoms+1, (t_float)x->x_params.num_outdevices);
-    outlet_anything(x->x_info, gensym("devicelist"), 2, atoms);
-    for(i=0; i<x->x_params.num_outdevices; i++) {
-      SETSYMBOL(atoms+1, ms_symkeys_getname(x->x_params.outdevices, i));
-      SETFLOAT (atoms+2, (t_float)i);
-      outlet_anything(x->x_info, gensym("devicelist"), 3, atoms);
-    }
-  }
+
+
+  midisettings_listdevices_devicelist(x->x_info,
+				      gensym("in"),
+				      x->x_params.indevices,
+				      x->x_params.num_indevices,
+				      MAXMIDIINDEV);
+
+  midisettings_listdevices_devicelist(x->x_info,
+				      gensym("out"),
+				      x->x_params.outdevices,
+				      x->x_params.num_outdevices,
+				      MAXMIDIOUTDEV);
 }
 
 static void midisettings_params_apply(t_midisettings*x) {
@@ -399,9 +401,9 @@ static void midisettings_params_apply(t_midisettings*x) {
   t_atom argv [MIDIDIALOG_INDEVS+MIDIDIALOG_OUTDEVS+2];
   int    argc= MIDIDIALOG_INDEVS+MIDIDIALOG_OUTDEVS+2;
 
-  int i=0;
+  unsigned int i=0;
 
-   ms_params_print(&x->x_params);
+  ms_params_print(&x->x_params);
 
   for(i=0; i<argc; i++) {
     SETFLOAT(argv+i, (t_float)0);
@@ -433,13 +435,6 @@ static void midisettings_params_apply(t_midisettings*x) {
     SETFLOAT(argv+1*MIDIDIALOG_INDEVS+1*MIDIDIALOG_OUTDEVS+0,(t_float)x->x_params.num_indev );
     SETFLOAT(argv+1*MIDIDIALOG_INDEVS+1*MIDIDIALOG_OUTDEVS+1,(t_float)x->x_params.num_outdev);
   }
-  
-  startpost("mididialog: ");
-  for(i=0; i<argc; i++) {
-  postatom(argv, argc);
-  
-  }
-endpost();
 
   if (s_pdsym->s_thing) typedmess(s_pdsym->s_thing, 
 				  gensym("midi-dialog"), 
