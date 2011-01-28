@@ -148,7 +148,8 @@ ifeq ($(UNAME),Linux)
   EXTENSION = pd_linux
   OS = linux
   PD_PATH = /usr/local
-  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  OPT_CFLAGS = -g -O0
+#  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   ALL_CFLAGS += -fPIC
   ALL_LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
   ALL_LIBS += -lc
