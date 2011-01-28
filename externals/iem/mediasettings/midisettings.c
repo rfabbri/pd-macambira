@@ -84,12 +84,18 @@ static t_ms_symkeys*ms_symkeys_add(t_ms_symkeys*symkeys, t_symbol*name, int id, 
   t_ms_symkeys*symkey=ms_symkeys_find(symkeys, name);
 
   if(symkey) {
-    if(overwrite) {
-      symkey->name=name;
-      symkey->id  =id;
-    }
-    return symkeys;
+    char buf[MAXPDSTRING+1];
+    buf[MAXPDSTRING]=0;
+
+    if(!overwrite)
+      return symkeys;
+#warning LATER check how to deal with multiple devices of the same name!
+    // now this is a simple hack
+    snprintf(buf, MAXPDSTRING, "%s!", name->s_name);
+    return ms_symkeys_add(symkeys, gensym(buf), id, overwrite);
   }
+
+  
 
   symkey=(t_ms_symkeys*)getbytes(sizeof(t_ms_symkeys));
   symkey->name=name;
@@ -235,15 +241,9 @@ static void ms_params_get(t_ms_params*parms) {
                     (char*)outdevlist, &outdevs, 
                     MAXNDEV, DEVDESCSIZE);
   for(i=0; i<indevs; i++) {
-#warning LATER check how to deal with multiple devices of the same name!
-    parms->indevices=ms_symkeys_add(parms->indevices, gensym(indevlist[i]), i, 0);
+    parms->indevices=ms_symkeys_add(parms->indevices, gensym(indevlist[i]), i, 1);
     parms->num_indevices++;
   }
-
-  parms->indevices=ms_symkeys_add(parms->indevices, gensym("test"), i++, 0);
-  parms->num_indevices++;
-  parms->indevices=ms_symkeys_add(parms->indevices, gensym("test"), i++, 0);
-  parms->num_indevices++;
 
   for(i=0; i<outdevs; i++) {
     parms->outdevices=ms_symkeys_add(parms->outdevices, gensym(outdevlist[i]), i, 0);
