@@ -4,8 +4,6 @@ AC_INIT([iemmatrix],[0.2],[zmoelnig@iem.at])
 AC_CONFIG_HEADER(config.h)
 DFLAGS="${DFLAGS} -DHAVE_CONFIG_H"
 
-
-
 dnl Checks for programs.
 AC_PROG_CC
 
