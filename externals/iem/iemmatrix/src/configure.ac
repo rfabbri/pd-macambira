@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(iemmatrix.c)
+AC_INIT([iemmatrix],[0.2],[zmoelnig@iem.at])
 
 AC_CONFIG_HEADER(config.h)
 DFLAGS="${DFLAGS} -DHAVE_CONFIG_H"
