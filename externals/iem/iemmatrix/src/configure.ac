@@ -16,8 +16,6 @@ AC_SUBST(EXT)
 AC_SUBST(LD)
 AC_SUBST(STRIP)
 AC_SUBST(STRIPFLAGS)
-AC_SUBST(LIBRARY_NAME)
-AC_SUBST(LIBRARY_VERSION)
 AC_SUBST(BUILDLIBRARY)
 AC_SUBST(REFERENCEPATH)
 AC_SUBST(PDLIBDIR)
@@ -248,40 +246,6 @@ fi
 if test "x$with_extension" != "x"
 then
  EXT=$with_extension
-fi
-
-dnl check for ${LIBRARY_NAME}-version (but why...)
-AC_MSG_CHECKING("library version")
-
-if test "$with_version" != ""
-then
-  echo -n "($with_version)... "
-  LIBRARY_VERSION="$with_version"
-else
-
-if test "x$cross_compiling" = "xno"
-then
-cat > conftest.c << EOF
-#include <stdio.h>
-#include "${LIBRARY_NAME}.h"
-int main(){
-  printf("%s\n", VERSION);
-  return 0;
-}
-EOF
-
-if ${CC} ${INCLUDES} -o conftest.o conftest.c > /dev/null 2>&1
-then
-  LIBRARY_VERSION=`./conftest.o`
-  echo "$LIBRARY_VERSION"
-else
-  LIBRARY_VERSION=""
-  echo "(unknown)"
-fi
-else
-  LIBRARY_VERSION="X"
-  echo "(X)"
-fi
 fi
 
 LFLAGS=${LDFLAGS}
