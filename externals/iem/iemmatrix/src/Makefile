@@ -112,8 +112,8 @@ install-doc:
 	-install -m 644 ../doc/*.pd $(INSTALL_DOC)
 
 install-abs:
-	-install -d $(INSTALL_BIN)
-	-install -m 644 ../abs/*.pd $(INSTALL_BIN)
+	-install -d $(INSTALL_DOC)
+	-install -m 644 ../abs/*.pd $(INSTALL_DOC)
 
 dist: all realclean
 	(cd ../..;tar czvf $(TARNAME) $(LIBRARY_NAME))
