@@ -91,7 +91,7 @@ static t_ms_symkeys*ms_symkeys_add(t_ms_symkeys*symkeys, t_symbol*name, int id, 
       return symkeys;
 #warning LATER check how to deal with multiple devices of the same name!
     // now this is a simple hack
-    snprintf(buf, MAXPDSTRING, "%s!", name->s_name);
+    snprintf(buf, MAXPDSTRING, "%s [%d]", name->s_name, id);
     return ms_symkeys_add(symkeys, gensym(buf), id, overwrite);
   }
 
