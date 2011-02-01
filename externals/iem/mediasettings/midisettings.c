@@ -52,6 +52,15 @@ typedef struct _ms_symkeys {
 typedef t_ms_symkeys t_ms_drivers ;
 
 
+
+static void ms_symkeys_print(t_ms_symkeys*symkeys) {
+  while(symkeys) {
+    post("symkey[%s]=%d", (symkeys->name)?symkeys->name->s_name:"<nil>", symkeys->id);
+    symkeys=symkeys->next;
+  }
+}
+
+
 static const char*ms_defaultdrivername(const int id) {
   switch (id) {
   case API_NONE:
@@ -91,7 +100,7 @@ static t_ms_symkeys*ms_symkeys_add(t_ms_symkeys*symkeys, t_symbol*name, int id, 
       return symkeys;
 #warning LATER check how to deal with multiple devices of the same name!
     // now this is a simple hack
-    snprintf(buf, MAXPDSTRING, "%s [%d]", name->s_name, id);
+    snprintf(buf, MAXPDSTRING, "%s[%d]", name->s_name, id);
     return ms_symkeys_add(symkeys, gensym(buf), id, overwrite);
   }
 
@@ -228,8 +237,20 @@ static void ms_params_print(t_ms_params*parms) {
   post(">=================================\n");
 
 }
+
+static t_ms_symkeys*ms_params_adddevices(t_ms_symkeys*keys, unsigned int*number, char devlist[MAXNDEV][DEVDESCSIZE], unsigned int numdevs) {
+ unsigned int num=0;
+ if(number)num=*number;
+ unsigned int i;
+  for(i=0; i<numdevs; i++) {
+    num++;
+    keys=ms_symkeys_add(keys, gensym(devlist[i]), num, 1);
+  }
+ if(number)*number=num;
+ return keys;
+}
+
 static void ms_params_get(t_ms_params*parms) {
-  int i;
   char indevlist[MAXNDEV][DEVDESCSIZE], outdevlist[MAXNDEV][DEVDESCSIZE];
   int indevs = 0, outdevs = 0;
 
@@ -240,16 +261,12 @@ static void ms_params_get(t_ms_params*parms) {
   sys_get_midi_devs((char*)indevlist, &indevs, 
                     (char*)outdevlist, &outdevs, 
                     MAXNDEV, DEVDESCSIZE);
-  for(i=0; i<indevs; i++) {
-    parms->indevices=ms_symkeys_add(parms->indevices, gensym(indevlist[i]), i, 1);
-    parms->num_indevices++;
-  }
-
-  for(i=0; i<outdevs; i++) {
-    parms->outdevices=ms_symkeys_add(parms->outdevices, gensym(outdevlist[i]), i, 0);
-    parms->num_outdevices++;
-  }
-
+                    
+  parms->num_indevices=0;
+  parms->indevices=ms_params_adddevices(parms->indevices, &parms->num_indevices, indevlist, indevs);
+  parms->num_outdevices=0;
+  parms->outdevices=ms_params_adddevices(parms->outdevices, &parms->num_outdevices, outdevlist, outdevs);
+  
   sys_get_midi_params(&indevs , parms->indev,
                       &outdevs, parms->outdev);
 
@@ -279,6 +296,12 @@ static void midisettings_params_init(t_midisettings*x) {
   x->x_params.num_indev = x->x_params.num_outdev = 0;
   
   ms_params_get(&x->x_params);
+}
+
+static void midisettings_debug(t_midisettings*x) {
+ post("IN-DEVS");ms_symkeys_print(x->x_params.indevices);
+ post("OUTDEVS");ms_symkeys_print(x->x_params.outdevices);
+
 }
 
 #define MS_ALSADEV_FORMAT "ALSA-%02d"
@@ -333,11 +356,11 @@ static void midisettings_listdevices_devicelist(t_outlet *outlet,
   } else {
     SETFLOAT (atoms+1, (t_float)numdevs);
     outlet_anything(outlet, gensym("devicelist"), 2, atoms);
-    for(i=0; i<numdevs; i++) {
-      t_symbol*s=ms_symkeys_getname(devices, i);
-      if(NULL==s)continue;
-      SETSYMBOL(atoms+1, s);
-      SETFLOAT (atoms+2, (t_float)i);
+    for(i=0; i<numdevs && devices; i++, devices=devices->next) {
+      if(NULL==devices->name)
+        continue;
+      SETSYMBOL(atoms+1, devices->name);
+      SETFLOAT (atoms+2, (t_float)(devices->id));
       outlet_anything(outlet, gensym("devicelist"), 3, atoms);
     }
   }
@@ -721,7 +744,7 @@ void midisettings_setup(void)
   class_addmethod(midisettings_class, (t_method)midisettings_setdriver, gensym("driver"), A_GIMME);
   class_addmethod(midisettings_class, (t_method)midisettings_setparams, gensym("device"), A_GIMME);
 
-  // class_addmethod(midisettings_class, (t_method)midisettings_testdevices, gensym("testdevices"), A_NULL);
+  class_addmethod(midisettings_class, (t_method)midisettings_debug, gensym("print"), A_NULL);
 }
 
 
