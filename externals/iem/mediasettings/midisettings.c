@@ -518,7 +518,7 @@ static int midisettings_setparams_inout( int argc, t_atom*argv, t_ms_symkeys*dev
       break;
     case A_SYMBOL:
      // LATER: get the device-id from the device-name
-      dev=1+ms_symkeys_getid(devices, atom_getsymbol(argv+i));
+      dev=ms_symkeys_getid(devices, atom_getsymbol(argv+i));
       if(dev<0) dev=0;
       break;
     default:
