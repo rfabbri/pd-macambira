@@ -52,7 +52,7 @@ Pd version 0.42.;
 #X obj 22 224 pddp/helplink score;
 #X text 103 244 <-- which library is this in?;
 #X obj 22 244 pddp/helplink tabenv;
-#X obj 22 264 pddp/helplink flatspace/arraysize;
+#X obj 22 264 pddp/helplink arraysize;
 #X restore 102 597 pd Related_objects;
 #X obj 78 286 cnv 17 3 145 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;

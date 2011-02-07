@@ -52,7 +52,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 22 230 pddp/helplink score;
 #X text 103 250 <-- which library is this in?;
 #X obj 22 250 pddp/helplink tabenv;
-#X obj 22 270 pddp/helplink flatspace/arraysize;
+#X obj 22 270 pddp/helplink arraysize;
 #X restore 102 597 pd Related_objects;
 #X obj 78 271 cnv 17 3 100 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
 -162280 0;

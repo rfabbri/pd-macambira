@@ -179,7 +179,7 @@
 #N canvas 1434 33 816 756 setExternal 0;
 #X obj 149 605 outlet;
 #X obj 490 278 samplerate~;
-#X obj 170 380 flatspace/arraysize;
+#X obj 170 380 arraysize;
 #X msg 184 341 set \$1 \, bang;
 #X obj 154 -114 inlet table (table) (length) (rate);
 #X obj 272 28 route symbol float;
