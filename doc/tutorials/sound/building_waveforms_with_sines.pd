@@ -3,7 +3,7 @@
 #X obj 541 21 pddp/dsp;
 #X obj 11 8 cnv 15 450 40 empty empty building_waveforms_with_sines
 20 12 0 24 -228992 -66577 0;
-#X obj 467 373 ezdac~;
+#X obj 467 373 output~;
 #X obj 32 219 sixteen_harmonics wavetable;
 #X obj 522 238 random 64;
 #X obj 522 262 + 32;

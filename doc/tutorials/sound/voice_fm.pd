@@ -2,7 +2,7 @@
 #X obj 541 21 pddp/dsp;
 #X obj 11 8 cnv 15 400 40 empty empty voice_fm 20 12 0 24 -228992 -66577
 0;
-#X obj 137 371 ezdac~;
+#X obj 137 371 output~;
 #X obj 494 57 import rradical;
 #X obj 150 90 adc~;
 #X obj 150 133 fiddle~;

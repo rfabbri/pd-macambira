@@ -13,7 +13,7 @@ mic!;
 #X obj 163 157 - 100;
 #X obj 118 227 mtof;
 #X obj 516 59 import rradical;
-#X obj 126 371 ezdac~;
+#X obj 126 371 output~;
 #X obj 149 340 *~;
 #X obj 118 247 osc~;
 #X obj 180 223 mavg 200;

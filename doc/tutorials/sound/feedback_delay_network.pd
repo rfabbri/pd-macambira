@@ -3,7 +3,7 @@
 #X obj 541 21 pddp/dsp;
 #X obj 10 7 cnv 15 400 40 empty empty feedback_delay_network 20 12
 0 24 -228992 -66577 0;
-#X obj 274 374 ezdac~;
+#X obj 274 374 output~;
 #X obj 23 106 noise~;
 #X obj 23 165 *~;
 #X obj 39 146 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1

@@ -33,7 +33,6 @@
 14 -204280 -1 0;
 #X obj 29 38 dac~;
 #X text 8 2 [output~] Related Objects;
-#X obj 25 81 pddp/helplink rradical/ezdac~.pd;
 #X obj 26 61 pddp/helplink pddp/dsp;
 #X restore 102 597 pd Related_objects;
 #X obj 78 316 cnv 17 3 17 empty \$0-pddp.cnv.let.0 0 5 9 0 16 -228856
