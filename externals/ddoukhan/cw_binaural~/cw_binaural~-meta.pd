@@ -1,0 +1,6 @@
+#N canvas 339 330 200 200 10;
+#N canvas 668 307 420 300 META 1;
+#X text 10 25 AUTHOR david.doukhan@gmail.com;
+#X text 13 41 NAME cw_binaural~;
+#X text 13 9 VERSION 1.0.1;
+#X restore 10 10 pd META;
