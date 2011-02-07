@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cxc cyclone earplug ekext ext13 extra freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof vanilla vbap windowing zexy
+LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cw_binaural cxc cyclone earplug ekext ext13 extra freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -393,6 +393,19 @@ creb_clean:
 	-rm -f -- $(CREB_CXXOBJECTS:.cc=.o)
 	-rm -f -- $(externals_src)/creb/*/*.bak
 	-rm -f -- $(externals_src)/creb/*/*.*~
+
+
+#------------------------------------------------------------------------------#
+# CW_BINAURAL
+
+cw_binaural:
+	make -C $(externals_src)/ddoukhan/cw_binaural~ PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
+
+cw_binaural_install:
+	make -C $(externals_src)/ddoukhan/cw_binaural~ DESTDIR="$(DESTDIR)" objectsdir="$(objectsdir)" install
+
+cw_binaural_clean:
+	make -C $(externals_src)/ddoukhan/cw_binaural~ clean
 
 
 #------------------------------------------------------------------------------#
