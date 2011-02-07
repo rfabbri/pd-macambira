@@ -1,0 +1,24 @@
+#N canvas 855 359 391 423 10;
+#X text 105 18 cw_binaural~ creation arguments;
+#X text 21 50 each instance of the external has 3 creation arguments
+with defaults values;
+#X text 21 83 1st arg: is the length of the impulse response used for
+filtering \, default value is 128;
+#X text 22 115 2nd arg: is the filtering method: default value is 'RIFF'
+\, which means that the filtering will be done in temporal domain:
+this method has a huge computational cost \, but 0 ltency. The other
+supported filtering method is 'FFT' \, it lowers the filtering cost
+\, implies more latency \, and require to use the external in a block
+\, examples will be given later.;
+#X text 23 198 3rd arg: if set to 'nodelay' then interpolation is done
+directly on the HRIR \, and results in less computations \, but results
+in a not so good itd estimation in the interpolated filter. Otherwise
+\, we proceed to a minimalphase and pure delay decomposition of the
+HRIR. The user may chose the fractional delay algorithm used between
+'Hermite4' \, '6points' \, 'linear' \, and 'nofractional'. Default
+value for the 3rd arg is 'Hermite4' \, '6points' is also a good method
+but more expensive. 'linear' and 'nofractional' should not be used
+\, except for didactic purposes.;
+#X obj 74 359 cw_binaural~ 128 RIFF Hermite4;
+#X text 36 378 instantiation of the external with its defaults creation
+arguments;

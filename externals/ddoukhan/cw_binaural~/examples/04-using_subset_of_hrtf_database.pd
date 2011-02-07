@@ -1,0 +1,8 @@
+#N canvas 436 209 421 196 10;
+#X text 103 14 Using subset of HRTF database;
+#X text 42 60 When used for research aims \, it may be usefull to consider
+only a subset of the available impulse responses. In that aim \, you
+just need to make a directory containing the wav files corersponding
+to the subset of the impulse responses you want to use \, and give
+the path of that directory through the 'listen_db' \, 'cipic_dc' or
+'set_hrtf_db_messages';

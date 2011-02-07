@@ -1,0 +1,25 @@
+#N canvas 650 270 640 340 10;
+#X obj 166 84 inlet~;
+#X obj 221 85 inlet~;
+#X obj 278 83 inlet~;
+#X obj 153 250 outlet~;
+#X obj 255 249 outlet~;
+#X obj 416 209 block~;
+#X obj 402 105 loadbang;
+#X msg 413 170 set \$1 1;
+#X obj 406 141 expr \$1 / 2;
+#X obj 110 83 inlet;
+#X obj 151 135 cw_binaural~ \$1 FFT;
+#X text 106 22 FFT filtering should be used such than the block size
+is equal to half of the considered impulse response length used. Consequently
+\, using abstrations similar to this one allows to use spectral filtering
+in cw_binaural~ .;
+#X connect 0 0 10 0;
+#X connect 1 0 10 1;
+#X connect 2 0 10 2;
+#X connect 6 0 8 0;
+#X connect 7 0 5 0;
+#X connect 8 0 7 0;
+#X connect 9 0 10 0;
+#X connect 10 0 3 0;
+#X connect 10 1 4 0;

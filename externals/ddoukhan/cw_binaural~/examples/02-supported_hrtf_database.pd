@@ -1,0 +1,23 @@
+#N canvas 1108 244 438 547 10;
+#X text 60 9 Support for HRTF Databases;
+#X msg -18 278 listen_db /yourpath/1048/COMPENSATED/WAV/IRC_1048_C
+;
+#X text -15 125 Listen HRTF Database it can be downloaded on the website
+of IRCAM's Room Acoustics Team: see http://recherche.ircam.fr/equipes/salles/listen
+Once a given HRIR has been unzipped \, the path to the directory containing
+wavs corresponding to conpensated hrir should be given.;
+#X text -21 317 CIPIC HRTF Database the database is available in .mat
+format at http://interface.idav.ucdavis.edu/data/CIPIC_hrtf_database.zip
+it can be converted to wav files using the matlab script cipicdb2wav.m
+provided in cw_binaural archive Otherwise \, you can download the converted
+database at http://www.limsi.fr/Individu/doukhan/cipic.bz2;
+#X msg -21 490 cipic_db /yourpath/subject_003;
+#X text -3 43 cw_binaural~ provide suppport for any hrtf database \,
+assuming each impulse response is stored in a wav file whose name contains
+the azimuth and elevation of the impulse response in degree.;
+#X text -14 223 the syntax of the message to send to the external to
+load a listen hrtf database is: 'listen_db' followed by the path to
+the compensated impulse response;
+#X text -23 439 the syntax of the message to send to the external to
+load a CIPIC hrtf database is: 'cipic_db' followed by the path to the
+compensated impulse response;

@@ -1,0 +1,20 @@
+#N canvas 350 242 427 342 10;
+#X text 73 13 doing the filtering in the spectral domain;
+#X text 36 49 the filtering is the costliest step of the computations
+and can be done in the spectral domain to lower the amound of ressources
+neccessary. The patch below show how to use it.;
+#X obj 134 238 dac~;
+#X obj 154 136 *~ 360;
+#X obj 63 116 noise~;
+#X obj 148 103 phasor~ 0.1;
+#X obj 97 194 fft_binaural 128;
+#X obj 232 134 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
+-262144 -1 -1 21 256;
+#X msg 24 286 listen_db /yourpath/listen/IRC_1048_C;
+#X connect 3 0 6 2;
+#X connect 4 0 6 1;
+#X connect 5 0 3 0;
+#X connect 6 0 2 0;
+#X connect 6 1 2 1;
+#X connect 7 0 6 3;
+#X connect 8 0 6 0;

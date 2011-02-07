@@ -1,0 +1,29 @@
+#N canvas 175 52 512 755 10;
+#X text 100 16 Advanded Support for HRTF database;
+#X obj 222 408 image coordinates.gif;
+#X msg 19 549 listen_db /yourpath/1048/COMPENSATED/WAV/IRC_1048_C;
+#X text 14 527 the two messages bellow are equivalent to load listen
+HRTF;
+#X text 24 637 the two messages bellow are equivalent to load CIPIC
+HRTF;
+#X msg 20 572 set_hrtf_db /yourpath/1048/COMPENSATED/WAV/IRC_1048_C
+IRC_[0-9]+_C_R[0-9]+_T([-+]?[0-9]*//.?[0-9]+)_P([-+]?[0-9]*//.?[0-9]+)//.wav
+true true;
+#X msg 22 661 cipic_db /yourpath/subject_003;
+#X msg 22 688 set_hrtf_db /yourpath/subject_003 subject_[0-9]+_azim_([-+]?[0-9]//*.?[0-9]+)_elev_([-+]?[0-9]*//.?[0-9]+)//.wav
+true false;
+#X text 20 46 cw_binaural~ provide support for any hrtf database that
+can be used through the message set_hrtf_db \, which has 4 arguments
+1st arg is the path to the directory containing the hrtf database to
+use \, such than each impulse response is stored in a wave file whose
+name contains the azimuth and elevation of the hrtf in degree 2nd arg
+is a regexp telling how to decode the wav file name: the regexp MUST
+have 2 groups corresponding to the azimuth and elevation 3rd arg should
+have the values 'true' \, or 'false': it tells if the azimuth correspond
+to the first group of the regexp. if set to false \, then the elevation
+is the first group of the regexp 4th arg should have the values 'true'
+or 'false'. If set to true \, then the database is sampled using vertical-polar
+coordinates (like listen database) \, if set to false \, the database
+is sampled using interaural-polar coordinates (like cipic database).
+Those coordinate systems are represented in the figure bellow \, comming
+from the CIPIC Interface lab.;
