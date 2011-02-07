@@ -28,8 +28,8 @@
 #include "hrtfcont.hpp"
 #include "logstring.hpp"
 
-#define DEG2RAD (M_PIl/180)
-#define RAD2DEG (180/M_PIl)
+#define DEG2RAD (M_PI/180)
+#define RAD2DEG (180/M_PI)
 #define EPS 0.0000000000001
 
 HrtfCont::HrtfCont(const ir_key& k):
