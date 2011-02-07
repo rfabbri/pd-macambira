@@ -5,7 +5,7 @@ LIBRARY_NAME = cw_binaural~
 
 # add your .c source files, one object per file, to the SOURCES
 # variable, help files will be included automatically
-SOURCES = src/cw_binaural~.cpp #mycobject.c
+SOURCES = cw_binaural~.cpp #mycobject.c
 
 SRC=src/riff.cpp \
 	src/generic_riff.cpp \
@@ -31,10 +31,19 @@ OBJ = $(SRC:.cpp=.o)
 PDOBJECTS = #mypdobject.pd
 
 # example patches and related files, in the 'examples' subfolder
-EXAMPLES = #bothtogether.pd
+EXAMPLES = 01-getting_started.pd \
+	02-supported_hrtf_database.pd \
+	03-advanded_support_of_hrtf_database.pd \
+	04-using_subset_of_hrtf_database.pd \
+	05-cw_binaural~_creation_arguments.pd \
+	06-FFT_filtering.pd \
+	azimuth.gif \
+	coordinates.gif \
+	elevation.gif \
+	fft_binaural.pd
 
 # manuals and related files, in the 'manual' subfolder
-MANUAL = manual.txt
+MANUAL = # manual.txt
 
 # if you want to include any other files in the source and binary tarballs,
 # list them here.  This can be anything from header files, test patches,
@@ -216,7 +225,7 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
 endif
 
 # in case somebody manually set the HELPPATCHES above
-HELPPATCHES ?= $(SOURCES:.cpp=-help.pd) $(PDOBJECTS:.pd=-help.pd)
+HELPPATCHES ?= cw_binaural~-help.pd elevation.gif azimuth.gif #$(SOURCES:.cpp=-help.pd) $(PDOBJECTS:.pd=-help.pd)
 
 CFLAGS += $(OPT_CFLAGS)
 
@@ -229,7 +238,6 @@ $(OBJ) : %.o: %.cpp
 	$(CXX) $(CFLAGS) -o "$*.o" -c "$*.cpp"
 
 %.$(EXTENSION): $(OBJ)
-	echo regele extension $*.o
 	$(CXX) $(LDFLAGS) -o "$*.$(EXTENSION)" $(OBJ)  $(LIBS)
 	chmod a-x "$*.$(EXTENSION)"
 

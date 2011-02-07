@@ -1,0 +1,35 @@
+#N canvas 277 247 461 596 10;
+#X obj 122 299 cw_binaural~;
+#X obj 144 353 dac~;
+#X obj 141 245 *~ 360;
+#X obj 37 235 noise~;
+#X obj 133 221 phasor~ 0.1;
+#X floatatom 290 227 5 0 0 0 - - -;
+#X msg 32 430 listen_db /home/david/listen/1048/COMPENSATED/WAV/IRC_1048_C
+;
+#X text 19 212 audio input;
+#X text 132 201 azimuth (degree);
+#X text 271 201 elevation (degree);
+#X text 67 387 A click on this message loads the HRTF that will be
+used: it is required to perform any processing.;
+#X text 44 459 Listen HRIRs can be downloaded on the website of IRCAM's
+Room Acoustics Team: see http://recherche.ircam.fr/equipes/salles/listen
+Once a given HRIR has been unzipped \, the path to the directory containing
+wavs corresponding to conpensated hrir should be given in the message.
+;
+#X obj 178 119 image azimuth.gif;
+#X obj 350 133 image elevation.gif;
+#X text 53 27 azimuth and elevation are expressed in vertical polar
+coordinates;
+#X text 59 -61 This patch performs binaural synthesis using cw_binaural~
+;
+#X text 58 -37 More details concerning the methods used for the synthesis
+can be found in: cw_binaural~: A binaural synthesis external for pure
+data \, David Doukhan and Anne Sedes \, PDCon09;
+#X connect 0 0 1 0;
+#X connect 0 1 1 1;
+#X connect 2 0 0 1;
+#X connect 3 0 0 0;
+#X connect 4 0 2 0;
+#X connect 5 0 0 2;
+#X connect 6 0 0 0;
