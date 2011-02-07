@@ -5,78 +5,87 @@
 # not in Edit Mode.  Also, if a patch is switched to Run Mode, the
 # menubar will be removed.
 
+# TODO make it scroll the patch so it acts as an overlay
+
 lappend ::auto_path $::current_plugin_loadpath
 
 package require base64
 package require tooltip 1.4.2
 
-proc make_pd_button {mytoplevel name description} {
-    button $mytoplevel.buttonbar.$name -image buttonimage$name \
+namespace eval buttonbar {
+}
+
+proc ::buttonbar::make_pd_button {tkpathname name description} {
+    button $tkpathname.$name -image buttonbar::$name \
         -relief flat -borderwidth 0 -highlightthickness 0 \
         -highlightcolor grey -highlightbackground grey -padx 0 -pady 0 \
         -command "menu_send_float \$::focused_window $name 0"
-    pack $mytoplevel.buttonbar.$name -side left -padx 0 -pady 0
-    ::tooltip::tooltip $mytoplevel.buttonbar.$name $description
+    pack $tkpathname.$name -side left -padx 0 -pady 0
+    ::tooltip::tooltip $tkpathname.$name $description
 }
 
-proc make_iemgui_button {mytoplevel name description} {
-    button $mytoplevel.buttonbar.$name -image buttonimage$name \
+proc ::buttonbar::make_iemgui_button {tkpathname name description} {
+    button $tkpathname.$name -image buttonbar::$name \
         -relief sunken -borderwidth 0 -highlightthickness 0 \
         -highlightcolor grey -highlightbackground grey -padx 0 -pady 0 \
         -command "menu_send \$::focused_window $name"
-    pack $mytoplevel.buttonbar.$name -side left -padx 0 -pady 0
-    ::tooltip::tooltip $mytoplevel.buttonbar.$name $description
+    pack $tkpathname.$name -side left -padx 0 -pady 0
+    ::tooltip::tooltip $tkpathname.$name $description
 }
 
-proc showhide_buttonbar {mytoplevel} {
-    if { ! [winfo exists $mytoplevel.buttonbar]} {
-        frame $mytoplevel.buttonbar -cursor arrow -background grey \
+proc ::buttonbar::showhide_buttonbar {mytoplevel} {
+    set tkcanvas [tkcanvas_name $mytoplevel]
+    set buttonbar_pathname $mytoplevel.buttonbar
+    if { ! [winfo exists $buttonbar_pathname]} {
+        frame $buttonbar_pathname -cursor arrow -background grey \
             -pady 0
-        make_pd_button $mytoplevel obj {Object (obj)}
-        make_pd_button $mytoplevel msg {Message (msg)}
-        make_pd_button $mytoplevel floatatom {Number (floatatom)}
-        make_pd_button $mytoplevel symbolatom {Symbol (symbolatom)}
-        make_pd_button $mytoplevel text {Comment}
-        make_iemgui_button $mytoplevel bng {Bang Button \[bng]}
-        make_iemgui_button $mytoplevel toggle {Toggle \[tgl]}
-        make_iemgui_button $mytoplevel numbox {Number2 \[my_numbox]}
-        make_iemgui_button $mytoplevel hslider {Horizontal Slider \[hslider]}
-        make_iemgui_button $mytoplevel vslider {Verical Slider \[vslider]}
-        make_iemgui_button $mytoplevel hradio {Horizontal Radio Button \[hradio]}
-        make_iemgui_button $mytoplevel vradio {Vertical Radio Button \[vradio]}
-        make_iemgui_button $mytoplevel vumeter {VU Meter \[vumeter]}
-        make_iemgui_button $mytoplevel mycnv {Canvas \[mycnv]}
-        make_iemgui_button $mytoplevel menuarray {Array (menuarray)}
+        make_pd_button $buttonbar_pathname obj {Object (obj)}
+        make_pd_button $buttonbar_pathname msg {Message (msg)}
+        make_pd_button $buttonbar_pathname floatatom {Number (floatatom)}
+        make_pd_button $buttonbar_pathname symbolatom {Symbol (symbolatom)}
+        make_pd_button $buttonbar_pathname text {Comment}
+        make_iemgui_button $buttonbar_pathname bng {Bang Button [bng]}
+        make_iemgui_button $buttonbar_pathname toggle {Toggle [tgl]}
+        make_iemgui_button $buttonbar_pathname numbox {Number2 [my_numbox]}
+        make_iemgui_button $buttonbar_pathname hslider {Horizontal Slider [hslider]}
+        make_iemgui_button $buttonbar_pathname vslider {Verical Slider [vslider]}
+        make_iemgui_button $buttonbar_pathname hradio {Horizontal Radio Button [hradio]}
+        make_iemgui_button $buttonbar_pathname vradio {Vertical Radio Button [vradio]}
+        make_iemgui_button $buttonbar_pathname vumeter {VU Meter [vumeter]}
+        make_iemgui_button $buttonbar_pathname mycnv {Canvas [mycnv]}
+        make_iemgui_button $buttonbar_pathname menuarray {Array (menuarray)}
     }
     if {$::editmode($mytoplevel)} {
-        set tkcanvas [tkcanvas_name $mytoplevel]
         pack forget $tkcanvas
-        pack $mytoplevel.buttonbar -side top -fill x
+        pack $buttonbar_pathname -side top -fill x
         pack $tkcanvas -side top -expand 1 -fill both
     } else {
         pack forget $mytoplevel.buttonbar
     }
 }
 
-bind PatchWindow <FocusIn> {+showhide_buttonbar %W}
-bind PatchWindow <<EditMode>> {+showhide_buttonbar %W}
+proc ::buttonbar::load_button_images {loadpath} {
+    image create photo buttonbar::obj -file $loadpath/obj.gif
+    image create photo buttonbar::msg -file $loadpath/msg.gif
+    image create photo buttonbar::floatatom -file $loadpath/floatatom.gif
+    image create photo buttonbar::symbolatom -file $loadpath/symbolatom.gif
+    image create photo buttonbar::text -file $loadpath/text.gif
 
-image create photo buttonimageobj -file $::current_plugin_loadpath/obj.gif
-image create photo buttonimagemsg -file $::current_plugin_loadpath/msg.gif
-image create photo buttonimagefloatatom -file $::current_plugin_loadpath/floatatom.gif
-image create photo buttonimagesymbolatom -file $::current_plugin_loadpath/symbolatom.gif
-image create photo buttonimagetext -file $::current_plugin_loadpath/text.gif
+    image create photo buttonbar::bng -file $loadpath/bng.gif
+    image create photo buttonbar::toggle -file $loadpath/toggle.gif
+    image create photo buttonbar::numbox -file $loadpath/numbox.gif
+    image create photo buttonbar::hslider -file $loadpath/hslider.gif
+    image create photo buttonbar::vslider -file $loadpath/vslider.gif
+    image create photo buttonbar::hradio -file $loadpath/hradio.gif
+    image create photo buttonbar::vradio -file $loadpath/vradio.gif
+    image create photo buttonbar::vumeter -file $loadpath/vumeter.gif
+    image create photo buttonbar::mycnv -file $loadpath/mycnv.gif
 
-image create photo buttonimagebng -file $::current_plugin_loadpath/bng.gif
-image create photo buttonimagetoggle -file $::current_plugin_loadpath/toggle.gif
-image create photo buttonimagenumbox -file $::current_plugin_loadpath/numbox.gif
-image create photo buttonimagehslider -file $::current_plugin_loadpath/hslider.gif
-image create photo buttonimagevslider -file $::current_plugin_loadpath/vslider.gif
-image create photo buttonimagehradio -file $::current_plugin_loadpath/hradio.gif
-image create photo buttonimagevradio -file $::current_plugin_loadpath/vradio.gif
-image create photo buttonimagevumeter -file $::current_plugin_loadpath/vumeter.gif
-image create photo buttonimagemycnv -file $::current_plugin_loadpath/mycnv.gif
+    image create photo buttonbar::menuarray -file $loadpath/menuarray.gif
+}
 
-image create photo buttonimagemenuarray -file $::current_plugin_loadpath/menuarray.gif
+::buttonbar::load_button_images $::current_plugin_loadpath
 
-
+# only execute on FocusIn if it changes the state of the buttonbar
+bind PatchWindow <FocusIn> {+::buttonbar::showhide_buttonbar %W}
+bind PatchWindow <<EditMode>> {+::buttonbar::showhide_buttonbar %W}
