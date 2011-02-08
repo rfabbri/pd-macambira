@@ -1,6 +1,6 @@
 /*
     cw_binaural~: a binaural synthesis external for pure data
-    by David Doukhan - david.doukhan@gmail.com - http://www.limsi.fr/Individu/doukhan
+    by David Doukhan - david.doukhan@gmail.com - http://perso.limsi.fr/doukhan
     and Anne Sedes - sedes.anne@gmail.com
     Copyright (C) 2009-2011  David Doukhan and Anne Sedes
 

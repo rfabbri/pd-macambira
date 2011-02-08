@@ -1,11 +1,11 @@
 cw_binaural~: A binaural synthesis external
 
 Authors: 
- David Doukhan <david.doukhan@gmail.com> - http://www.limsi.fr/Individu/doukhan
+ David Doukhan <david.doukhan@gmail.com> - http://perso.limsi.fr/doukhan
  Anne Sedes <sedes.anne@gmail.com>
 
 For more details, see:
-CW_binaural: a binaural Sythesis External for Pure Data
+CW_binaural~: a binaural Synthesis External for Pure Data
 David Doukhan and Anne Sedes, PDCON09
 
 cw_binaural~ has been successfully compiled and tested on the following OS: Ubuntu Lucid Lynx, Intel MacOS 10.6, Windows 7.
