@@ -1,9 +1,7 @@
-#N canvas 175 52 512 755 10;
+#N canvas 203 22 512 755 10;
 #X text 100 16 Advanded Support for HRTF database;
 #X obj 222 408 image coordinates.gif;
 #X msg 19 549 listen_db /yourpath/1048/COMPENSATED/WAV/IRC_1048_C;
-#X text 14 527 the two messages bellow are equivalent to load listen
-HRTF;
 #X text 24 637 the two messages bellow are equivalent to load CIPIC
 HRTF;
 #X msg 20 572 set_hrtf_db /yourpath/1048/COMPENSATED/WAV/IRC_1048_C
@@ -27,3 +25,5 @@ coordinates (like listen database) \, if set to false \, the database
 is sampled using interaural-polar coordinates (like cipic database).
 Those coordinate systems are represented in the figure bellow \, comming
 from the CIPIC Interface lab.;
+#X text 14 527 the two messages bellow are equivalent to load listen
+HRTF (backslashes must be replaced with two slashes);
