@@ -1,4 +1,4 @@
-## Pd library template version 1.0.7
+## Pd library template version 1.0.8
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = template
@@ -117,15 +117,18 @@ ifeq ($(UNAME),ANDROID)
   EXTENSION = pd_linux
   OS = android
   PD_PATH = /usr
-  NDK_BASE=/usr/local/android-ndk
-  NDK_SYSROOT=$(NDK_BASE)/platforms/android-5/arch-arm
-  NDK_TOOLCHAIN=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86
-  CC=$(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-gcc
+  NDK_BASE := /usr/local/android-ndk
+  NDK_PLATFORM_VERSION := 5
+  NDK_SYSROOT=$(NDK_BASE)/platforms/android-$(NDK_PLATFORM_VERSION)/arch-arm
+  NDK_UNAME := $(shell uname -s | tr '[A-Z]' '[a-z]')
+  NDK_TOOLCHAIN=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_UNAME)-x86
+  CC := $(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-gcc --sysroot=$(NDK_SYSROOT)
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-  CFLAGS += -fPIC -I$(NDK_SYSROOT)/usr/include
-  LDFLAGS += -Wl,--export-dynamic -L$(NDK_SYSROOT)/usr/lib -shared -fPIC
+  CFLAGS += 
+  LDFLAGS += -Wl,--export-dynamic -shared
   LIBS += -lc
-  STRIP = strip --strip-unneeded -R .note -R .comment
+  STRIP := $(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-strip \
+	--strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
 ifeq ($(UNAME),Linux)
