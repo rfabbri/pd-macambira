@@ -1,0 +1,25 @@
+#N struct 1155-rgb-sel float x float y float p1x float p1y float p2x
+float p2y float p3x float p3y float p4x float p4y float p5x float p5y
+float p0x float p0y float p0x. float p0y.;
+#N canvas 186 367 411 386 10;
+#X text 12 357 Released under the BSD License;
+#X text 228 220 Inlets;
+#X text 227 270 Outlets;
+#X text 227 240 - Bang;
+#X text 227 290 - "color \$1 \$2 \$3" command;
+#X text 227 310 - number with current color;
+#X text 11 337 (C) 2010 João Pais - jmmmpais@googlemail.com;
+#X obj 13 91 swatch-gui;
+#X obj 28 274 hsl 128 15 0 127 0 0 empty \$0-slider Label -2 -8 0 10
+-85968 -73790 -1 6300 1;
+#X obj 13 236 s \$0-slider;
+#X floatatom 127 245 10 0 0 0 - - -;
+#X text 22 11 [swatch] - Pick a color using the hue-saturation chart
+;
+#X text 21 31 To choose a color \, grab the circle and move it around.
+In case the circle disappears \, clicking in the swatch will make it
+appear again.;
+#X msg 13 216 color \$1 \$2 \$3;
+#X connect 7 0 13 0;
+#X connect 7 1 10 0;
+#X connect 13 0 9 0;
