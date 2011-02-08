@@ -1,3 +1,0 @@
-explain the behavior of regex: // instead of \
-
-tells the supported OS!!
