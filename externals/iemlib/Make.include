@@ -6,16 +6,18 @@ PDSOURCE ?= /usr/local/src/pd/src
 
 EXT = pd_linux
 
-LDFLAGS = --export-dynamic -shared
-LIB = -ldl -lm -lpthread
+PD_LDFLAGS = --export-dynamic -shared $(LD_FLAGS)
+PD_LIB = -ldl -lm -lpthread $(LIB)
 
 #select either the DBG and OPT compiler flags below:
-CFLAGS = -DPD -DUNIX -W -Werror -Wno-unused \
-	-Wno-parentheses -Wno-switch -O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing \
-	-DDL_OPEN -fPIC -fno-stack-protector
+
+DBG_CFLAGS=-W -Wno-parentheses -Wno-switch -Wno-unused
+CFLAGS=-O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing
+
+PD_CFLAGS = -DPD -DUNIX -DDL_OPEN -DHAVE_G_CANVAS_H -fPIC -fno-stack-protector $(DBG_CFLAGS) $(CFLAGS)
 
 
-INCLUDE = -I. -I$(PDSOURCE)
+PD_INCLUDE = -I. -I$(PDSOURCE) -I../../../../pd/src
 
 # the sources
 SRC = $(sort $(filter %.c, $(wildcard *.c)))
@@ -32,14 +34,11 @@ clean:
 
 all: $(OBJ)
 	@echo :: $(OBJ)
-	ld $(LDFLAGS) -o $(TARGET).$(EXT) *.o $(LIB)
+	ld $(PD_LDFLAGS) -o $(TARGET).$(EXT) *.o $(PD_LIB)
 	strip --strip-unneeded $(TARGET).$(EXT)
 	-cp $(TARGET).$(EXT) ../../lib/
 
 $(OBJ) : %.o : %.c
 	touch $*.c
-	cc $(CFLAGS) $(INCLUDE) -c -o $*.o $*.c
-
-
-
+	cc $(PD_CFLAGS) $(PD_INCLUDE) -c -o $*.o $*.c
 
