@@ -9,7 +9,7 @@ EXT = pd_linux
 STRIP = strip
 
 PD_LDFLAGS = --export-dynamic -shared $(LD_FLAGS)
-PD_LIB = -lm $(LIB)
+PD_LIB = -lm -lc $(LIB)
 
 #select either the DBG and OPT compiler flags below:
 
