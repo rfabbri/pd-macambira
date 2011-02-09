@@ -1,6 +1,15 @@
 current: all
 
+PD_DEFINES = -DPD -DUNIX
+
+#################################
+# path to private Pd-headers 
 PDSOURCE ?= /usr/local/src/pd/src
+
+#define to true if private Pd-header g_canvas.h is in out search-path
+PD_DEFINES += -DHAVE_G_CANVAS_H 
+#################################
+
 
 .SUFFIXES: .pd_linux
 
@@ -15,7 +24,7 @@ PD_LIB = -lm -lc $(LIB)
 
 DBG_CFLAGS=-W -Wno-parentheses -Wno-switch -Wno-unused
 CFLAGS=-O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing
-PD_CFLAGS = -DPD -DUNIX -DDL_OPEN -DHAVE_G_CANVAS_H -fPIC -fno-stack-protector $(DBG_CFLAGS) $(CFLAGS)
+PD_CFLAGS = $(PD_DEFINES) -fPIC -fno-stack-protector $(DBG_CFLAGS) $(CFLAGS)
 
 PD_INCLUDE = -I. -I$(PDSOURCE) -I../../../../pd/src
 
