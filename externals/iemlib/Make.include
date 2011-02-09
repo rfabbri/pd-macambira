@@ -9,7 +9,7 @@ EXT = pd_linux
 STRIP = strip
 
 PD_LDFLAGS = --export-dynamic -shared $(LD_FLAGS)
-PD_LIB = -ldl -lm -lpthread $(LIB)
+PD_LIB = -lm $(LIB)
 
 #select either the DBG and OPT compiler flags below:
 
@@ -42,7 +42,3 @@ $(OBJ) : %.o : %.c
 	touch $*.c
 	$(CC) $(PD_CFLAGS) $(PD_INCLUDE) -c -o $*.o $*.c
 
-
-bla:
-	echo $(CC)
-	echo $(CP)
