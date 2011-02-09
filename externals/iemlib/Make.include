@@ -6,6 +6,8 @@ PDSOURCE ?= /usr/local/src/pd/src
 
 EXT = pd_linux
 
+STRIP = strip
+
 PD_LDFLAGS = --export-dynamic -shared $(LD_FLAGS)
 PD_LIB = -ldl -lm -lpthread $(LIB)
 
@@ -13,9 +15,7 @@ PD_LIB = -ldl -lm -lpthread $(LIB)
 
 DBG_CFLAGS=-W -Wno-parentheses -Wno-switch -Wno-unused
 CFLAGS=-O6 -funroll-loops -fomit-frame-pointer -fno-strict-aliasing
-
 PD_CFLAGS = -DPD -DUNIX -DDL_OPEN -DHAVE_G_CANVAS_H -fPIC -fno-stack-protector $(DBG_CFLAGS) $(CFLAGS)
-
 
 PD_INCLUDE = -I. -I$(PDSOURCE) -I../../../../pd/src
 
@@ -29,16 +29,20 @@ OBJ = $(SRC:.c=.o)
 #
 
 clean:
-	-rm ../../lib/$(TARGET).$(EXT) $(TARGET).$(EXT)
-	-rm *.o
+	-rm -f ../../lib/$(TARGET).$(EXT) $(TARGET).$(EXT)
+	-rm -f *.o
 
 all: $(OBJ)
 	@echo :: $(OBJ)
-	ld $(PD_LDFLAGS) -o $(TARGET).$(EXT) *.o $(PD_LIB)
-	strip --strip-unneeded $(TARGET).$(EXT)
+	$(LD) $(PD_LDFLAGS) -o $(TARGET).$(EXT) *.o $(PD_LIB)
+	$(STRIP) --strip-unneeded $(TARGET).$(EXT)
 	-cp $(TARGET).$(EXT) ../../lib/
 
 $(OBJ) : %.o : %.c
 	touch $*.c
-	cc $(PD_CFLAGS) $(PD_INCLUDE) -c -o $*.o $*.c
+	$(CC) $(PD_CFLAGS) $(PD_INCLUDE) -c -o $*.o $*.c
 
+
+bla:
+	echo $(CC)
+	echo $(CP)
