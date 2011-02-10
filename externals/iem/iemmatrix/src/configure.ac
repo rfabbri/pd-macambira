@@ -249,6 +249,6 @@ fi
 LFLAGS=${LDFLAGS}
 AC_OUTPUT(Make.config)
 AC_OUTPUT(../VERSION.txt)
-AC_OUTPUT(../doc/iemmatrix-meta.pd)
+AC_OUTPUT(../iemmatrix-meta.pd)
 
 dnl rm -f conftest.*

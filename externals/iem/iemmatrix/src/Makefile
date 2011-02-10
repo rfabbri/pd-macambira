@@ -84,10 +84,12 @@ library: $(LIBRARY_NAME)
 clean:
 	-rm -f *.$(EXT) *.o 
 
+METAFILE = ../iemmatrix-meta.pd
+
 realclean: clean
 	-rm -f *~ _* aclocal.m4 configure config.h config.log config.status
 	-rm -f *.d *.d.*
-	-rm -f ../VERSION.txt ../doc/iemmatrix-meta.pd
+	-rm -f ../VERSION.txt $(METAFILE)
 
 distclean: realclean
 	-rm -f Make.config ../*.$(EXT)
@@ -99,6 +101,9 @@ tests:  all
 	make -C $(TESTDIR)
 
 install: install-bin install-doc install-abs
+	-install -d $(INSTALL_DOC)
+	-install -m 644 ../VERSION.txt $(INSTALL_DOC)
+	-install -m 644 $(METAFILE) $(INSTALL_DOC)
 
 install-bin:
 	-install -d $(INSTALL_DOC)
