@@ -87,6 +87,7 @@ clean:
 realclean: clean
 	-rm -f *~ _* aclocal.m4 configure config.h config.log config.status
 	-rm -f *.d *.d.*
+	-rm -f ../VERSION.txt ../doc/iemmatrix-meta.pd
 
 distclean: realclean
 	-rm -f Make.config ../*.$(EXT)
