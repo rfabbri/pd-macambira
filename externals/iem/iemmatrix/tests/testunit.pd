@@ -1,5 +1,5 @@
-#N canvas 695 274 312 252 10;
-#N canvas 0 0 564 876 run-test 0;
+#N canvas 697 324 312 252 10;
+#N canvas 6 50 564 876 run-test 1;
 #X obj 87 512 r \$0-receive;
 #X obj 71 532 f;
 #X msg 96 533 0;
@@ -44,6 +44,9 @@
 #X msg 101 406 \; \$1 clear;
 #X obj 101 386 symbol;
 #X obj 71 364 t b b;
+#X obj 71 195 spigot 1;
+#X obj 133 201 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
 #X connect 0 0 1 1;
 #X connect 1 0 17 0;
 #X connect 2 0 1 1;
@@ -59,7 +62,7 @@
 #X connect 11 0 2 0;
 #X connect 11 1 6 1;
 #X connect 11 2 16 1;
-#X connect 12 0 20 0;
+#X connect 12 0 21 0;
 #X connect 12 1 14 0;
 #X connect 12 2 10 0;
 #X connect 12 3 11 0;
@@ -69,10 +72,12 @@
 #X connect 19 0 18 0;
 #X connect 20 0 1 0;
 #X connect 20 1 19 0;
+#X connect 21 0 20 0;
+#X connect 22 0 21 1;
 #X restore 94 138 pd run-test;
 #X obj 94 163 outlet;
 #X obj 94 111 inlet;
-#N canvas 487 407 450 300 1005-regressiontest 0;
+#N canvas 672 477 450 300 \$0-regressiontest 0;
 #X restore 92 186 pd \$0-regressiontest;
 #X connect 0 0 1 0;
 #X connect 2 0 0 0;
