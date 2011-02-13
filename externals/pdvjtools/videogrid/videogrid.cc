@@ -46,25 +46,11 @@ extern "C"
 
     /* ffmpeg includes */
 
-    #include <ffmpeg/avcodec.h>
-    #include <ffmpeg/avformat.h>
-    #include <ffmpeg/avutil.h>
-    #include <ffmpeg/swscale.h>
-
-
-    /* may be your ffmpeg headers are here, at least from jaunty to karmic */
-    /*
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
     #include <libavutil/avutil.h>
     #include <libswscale/swscale.h>
-    */
 
-    /* libquicktime includes */
-    // #include <quicktime/lqt.h>
-    // #include <quicktime/colormodels.h>
-    #include <lqt/lqt.h>
-    #include <lqt/colormodels.h>
 
     /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&& VIDEOGRID &&&&&&&&&&&&&&&&&&&&&&&&&&&&& */
 
@@ -296,107 +282,6 @@ extern "C"
         return 0;
     }
 
-    /* ----------------------------------- Quicktime functions ----------------------------------- */
-    int convertir_img(pathimage pathFitxer, tipus_format f, int W, int H, int posi)
-    {
-        /*
-        Quicktime per les conversions
-        */
-
-        /* RGB vectors */
-        unsigned char * qt_rows[3];
-        /* YUV vesctor frame */
-        unsigned char *qt_frame = NULL;
-        /* quicktime decoder */
-        quicktime_t *qt;
-        /* quicktime color model */
-        int qt_cmodel;
-
-        int nN = posi;
-        int x_vwidth = 0;
-        int x_vheight = 0;
-        qt = quicktime_open(pathFitxer, 1, 0);
-
-        if (!(qt)){
-            /* post("videogrid: error opening qt file"); */
-            return -1;
-        }
-
-        if (!quicktime_has_video(qt)) {
-            /* post("videogrid: no video stream"); */
-            quicktime_close(qt);
-            return -1;
-
-        }
-        else if (!quicktime_supported_video(qt,0)) {
-            /* post("videogrid: unsupported video codec\n"); */
-            quicktime_close(qt);
-            return -1;
-        }
-        else
-        {
-            qt_cmodel = BC_YUV420P;
-            x_vwidth  = quicktime_video_width(qt,0);
-            x_vheight = quicktime_video_height(qt,0);
-
-            free(qt_frame);
-            qt_frame = (unsigned char*)malloc(x_vwidth*x_vheight*4);
-
-            int size = x_vwidth * x_vheight;
-            qt_rows[0] = &qt_frame[0];
-            qt_rows[2] = &qt_frame[size];
-            qt_rows[1] = &qt_frame[size + (size>>2)];
-
-            quicktime_set_cmodel(qt, qt_cmodel);
-        }
-
-        /* int length = quicktime_video_length(qt,0); */
-        /* int Vpos = quicktime_video_position(qt,0); */
-        lqt_decode_video(qt, qt_rows, 0);
-
-        switch(qt_cmodel){
-            case BC_YUV420P:
-                /* printf(" "); */
-                /* post("videogrid: qt colormodel : BC_YUV420P"); */
-
-                /* per a fer la miniatura
-                   cada k colomnes pillem una
-                   cada l files pillem una */
-                int w = x_vwidth;
-                int h = x_vheight;
-                int k = (w/W);
-                int l = (h/H);
-
-                char nNstr[BYTES_NUM_TEMP];
-                pathimage  ig_path = PATH_TEMPORAL;
-
-                sprintf(nNstr, "%d", nN);
-                strcat(ig_path,nNstr);
-                strcat(ig_path,".");
-                strcat(ig_path,FORMAT_MINIATURA);
-                /* printf("Creacio de la imatge %s ...",ig_path); */
-                /* escriu el contingut de data a un arxiu. */
-                FILE *fp = fopen(ig_path, "w");
-                fprintf (fp, "P6\n%d %d\n255\n", W, H);
-
-                int i,j,y,u,v,r,g,b;
-
-                for (i=0;i<(l*H);i=i+l) {
-                    for (j=0;j<(k*W);j=j+k) {
-                        y=qt_rows[0][(w*i+j)];
-                        u=qt_rows[1][(w/2)*(i/2)+(j/2)];
-                        v=qt_rows[2][(w/2)*(i/2)+(j/2)];
-                        r = CLAMP8(y + 1.402 *(v-128));
-                        g = CLAMP8(y - 0.34414 *(u-128) - 0.71414 *(v-128));
-                        b = CLAMP8(y + 1.772 *(u-128));
-                        fprintf (fp, "%c%c%c", r,g,b);
-                    }
-                }
-                /* escriu el contingut de data a un arxiu.*/
-                fclose (fp);
-        }
-        return 0;
-    }
 
     /* ----------------------------------- Cue > rounded list ----------------------------------- */
     typedef char path[BYTESNOMFITXER];
@@ -669,18 +554,10 @@ extern "C"
             sys_vgui(".x%x.c delete %xS%d\n", glist_getcanvas(x->x_glist), x, x->x_ultima_img);
         }
 
-        /* FFMPEG o Quicktime per les conversions */
+        /* FFMPEG per les conversions */
         int fferror=0;
         int nN = x->x_ultima_img;
-        /*
-        if (format_adequat_v(entrada, x->x_format_list) == 0) {
-            // convertir_img(entrada,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN);
-            fferror = -1;
-
-        } else {
-        */
         fferror=convertir_img_ff(entrada,FORMAT_MINIATURA, x->x_w_cell, x->x_h_cell, nN);
-        /* } */
         /* post ("%d",fferror); */
         if (fferror>=0) {
             /* encua el nou node */
