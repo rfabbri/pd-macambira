@@ -184,11 +184,16 @@ void pix_preview :: connectMess()
     std::string str;
     str = ostr.str();
     
-    getaddrinfo("localhost", reinterpret_cast<const char*>(str.c_str()), &hints, &res); 
+    getaddrinfo("127.0.0.1", reinterpret_cast<const char*>(str.c_str()), &hints, &res); 
 
 	fprintf(stderr,"trying to connect...\n");
+
   	s = socket(res->ai_family, res->ai_socktype, 0);
-  	connect(s, res->ai_addr, res->ai_addrlen);
+
+  	if( connect(s, res->ai_addr, res->ai_addrlen) != 0)
+		fprintf(stderr,"ERROR socket connection ");
+	else
+		fprintf(stderr,"socket connection ok");
 }
 
 void pix_preview :: processImage(imageStruct &image)
