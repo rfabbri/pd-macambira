@@ -2,10 +2,22 @@ PD_DIR = @PD_DIR@
 GEM_DIR = @GEM_DIR@
 
 LIBS = @LIBS@
+CFLAGS = @CFLAGS@
 GEM2PNM_VERSION = @GEM2PNM_VERSION@
 
 GEM2PNM_DISTRO = /mnt/c/ydegoyon.free.fr/gem2pdp-$(GEM2PNM_VERSION)
 GEM2PNM_TARBALL = $(GEM2PNM_DISTRO).tar.gz
+
+# choose target by OS
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+TARGET=pd_linux
+else
+TARGET=pd_darwin
+#FF_CFLAGS=-I/sw/include ??
+#PD_DIR=/Applications/Pd-extended.app/Contents/Resources/include ??
+endif
+
 # build flags
 
 GEM2PNM_INCLUDE =  -I$(PD_DIR)/src -I.  -I$(GEM_DIR)/src -I$(PD_DIR)/src
@@ -13,22 +25,29 @@ GEM2PNM_CPPFLAGS  = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
     -Wall -W -Wno-unused -Wno-parentheses -Wno-switch \
     -DGEM2PNM_VERSION=\"$(GEM2PNM_VERSION)\" -g
 
-all: pix_preview.pd_linux
+all: pix_preview.$(TARGET)
 
 
 pix_preview.pd_linux: pix_preview.o 
 	rm -f pix_preview.pd_linux
 	gcc -Wl,--export-dynamic -shared -o pix_preview.pd_linux pix_preview.o $(LIBS)
 
+pix_preview.pd_darwin: pix_preview.o 
+	rm -f pix_preview.pd_darwin
+	g++ $(CFLAGS) -Wl -bundle -undefined dynamic_lookup -o pix_preview.pd_darwin pix_preview.o $(LIBS)
+
 clean:
 	rm -f *.o
-	rm -f pix_preview.pd_linux
+	rm -f pix_preview.pd_*
 
 distro: clean all
 	rm *.o
 
 .cpp.o:
-	g++ $(GEM2PNM_CPPFLAGS) $(GEM2PNM_INCLUDE) -o $*.o -c $*.cpp
+	cpp $(GEM2PNM_CPPFLAGS) $(GEM2PNM_INCLUDE) -o $*.o -c $*.cpp
+
+.cc.o:
+	g++ $(GEM2PNM_CPPFLAGS) $(GEM2PNM_INCLUDE) -o $*.o -c $*.cc
 
 .c.o:
 	gcc $(GEM2PNM_CPPFLAGS) $(GEM2PNM_INCLUDE) -o $*.o -c $*.c
