@@ -152,7 +152,7 @@ CPPEXTERN_NEW_WITH_TWO_ARGS(pix_preview, t_floatarg, A_DEFFLOAT, t_floatarg, A_D
     std::string str;
     str = ostr.str();
     
-    getaddrinfo("localhost", reinterpret_cast<const char*>(str.c_str()), &hints, &res); 
+    getaddrinfo("127.0.0.1", reinterpret_cast<const char*>(str.c_str()), &hints, &res); 
 
 	fprintf(stderr,"trying to connect...\n");
   	s = socket(res->ai_family, res->ai_socktype, 0);
