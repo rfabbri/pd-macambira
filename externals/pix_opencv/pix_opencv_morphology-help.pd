@@ -37,7 +37,7 @@
 #X obj 160 260 gemwin;
 #X msg 159 207 create \, 1;
 #X msg 235 208 destroy;
-#X msg 281 180 frame 5;
+#X msg 281 180 frame 25;
 #X obj 162 170 t b b b;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;
@@ -151,11 +151,4 @@
 #X connect 41 0 23 0;
 #X connect 42 0 12 0;
 #X connect 43 0 38 0;
-#X connect 43 0 40 0;
-#X connect 44 0 43 2;
-#X connect 45 0 43 0;
-#X connect 46 0 45 0;
-#X connect 47 0 45 0;
-#X connect 48 0 45 0;
-#X connect 49 0 45 0;
-#X connect 50 0 45 0;
+#X connec
