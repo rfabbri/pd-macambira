@@ -40,7 +40,7 @@ shadows changes since you SET the background image.;
 #X obj 162 241 gemwin;
 #X msg 161 188 create \, 1;
 #X msg 237 189 destroy;
-#X msg 283 161 frame 5;
+#X msg 283 161 frame 25;
 #X obj 164 126 t b b b;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;

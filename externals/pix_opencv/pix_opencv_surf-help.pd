@@ -25,7 +25,7 @@
 #X restore 289 80 pd Gem.init;
 #X obj 128 109 t b b b;
 #X msg 156 138 dimen 320 240;
-#X msg 252 139 frame 5;
+#X msg 252 139 frame 25;
 #X connect 2 0 3 0;
 #X connect 3 0 4 0;
 #X connect 3 0 9 0;

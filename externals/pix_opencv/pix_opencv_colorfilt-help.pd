@@ -17,7 +17,7 @@
 #X restore 289 80 pd Gem.init;
 #X obj 162 241 gemwin;
 #X msg 327 189 destroy;
-#X msg 283 161 frame 5;
+#X msg 283 161 frame 25;
 #X obj 164 126 t b b b;
 #X msg 161 188 dimen 320 240 \, create \, 1;
 #X connect 1 0 2 0;
