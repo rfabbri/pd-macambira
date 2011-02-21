@@ -9,7 +9,13 @@
 /* can gsl compute complex eigenvalues? */
 #undef HAVE_GSL_EIGEN_NONSYMM
 
+/* can gsl compute Bessel functions? */
+#undef HAVE_GSL_BESSEL
+
 /* Define to 1 if you have the <gsl/gsl_linalg.h> header file. */
+#undef HAVE_GSL_GSL_LINALG_H
+
+/* Define to 1 if you have the <gsl/gsl_sf_bessel.h> header file. */
 #undef HAVE_GSL_GSL_LINALG_H
 
 /* Define to 1 if you have the <inttypes.h> header file. */

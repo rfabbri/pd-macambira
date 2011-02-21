@@ -16,6 +16,9 @@
 #include "iemmatrix.h"
 #include "math.h"
 #include <stdlib.h>
+#ifdef HAVE_GSL_BESSEL
+#include <gsl/gsl_sf_bessel.h>
+#endif
 
 static t_class *mtx_bessel_class;
 
@@ -121,7 +124,7 @@ static void mTXBesselMatrix (MTXBessel *x, t_symbol *s,
   int n,m,ofs;
 
 
-#ifdef HAVE_MATH_BESSEL
+#if defined HAVE_MATH_BESSEL || defined HAVE_GSL_BESSEL
 
   /* size check */
   if (!size) 
@@ -139,16 +142,28 @@ static void mTXBesselMatrix (MTXBessel *x, t_symbol *s,
      for (n=0;n<x->l;n++) {
         x->kr[n]=(double) atom_getfloat(argv+n);
      }
-  
+ 
+#ifdef HAVE_GSL_BESSEL 
      if (x->h_re!=0) 
         for (m=0;m<x->l;m++)
            for (n=0;n<x->nmax+1;n++)
-              x->h_re[n+m*(x->nmax+1)]=jnf(n,x->kr[m]);
+              x->h_re[n+m*(x->nmax+1)]=gsl_sf_bessel_Jn(n,x->kr[m]);
 
      if (x->h_im!=0) 
         for (m=0;m<x->l;m++)
            for (n=0;n<x->nmax+1;n++)
-              x->h_im[n+m*(x->nmax+1)]=ynf(n,x->kr[m]);
+              x->h_im[n+m*(x->nmax+1)]=gsl_sf_bessel_Yn(n,x->kr[m]);
+#else
+     if (x->h_re!=0) 
+        for (m=0;m<x->l;m++)
+           for (n=0;n<x->nmax+1;n++)
+              x->h_re[n+m*(x->nmax+1)]=jn(n,x->kr[m]);
+
+     if (x->h_im!=0) 
+        for (m=0;m<x->l;m++)
+           for (n=0;n<x->nmax+1;n++)
+              x->h_im[n+m*(x->nmax+1)]=yn(n,x->kr[m]);
+#endif
 
      
      if (x->h_re!=0) {
@@ -169,7 +184,7 @@ static void mTXBesselMatrix (MTXBessel *x, t_symbol *s,
   }
 
 #else
-  post("mtx_bessel: implementation requires math.h that implements jnf and ynf Bessel functions");
+  post("mtx_bessel: implementation requires math.h that implements jn and yn Bessel functions or gsl_sf_bessel.h");
 #endif
 }
 

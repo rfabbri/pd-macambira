@@ -69,9 +69,10 @@ dnl AC_CHECK_LIB([m], [cos])
 AC_CHECK_LIB([gslcblas], [cblas_dgemm])
 AC_CHECK_LIB([gsl], [gsl_blas_dgemm])
 AC_CHECK_LIB([gsl], [gsl_eigen_nonsymm],AC_DEFINE(HAVE_GSL_EIGEN_NONSYMM,1,[can gsl compute complex eigenvalues?]))
+AC_CHECK_LIB([gsl], [gsl_sf_bessel_Jn],AC_DEFINE(HAVE_GSL_BESSEL,1,[can gsl compute Bessel functions?]))
 
 dnl for math.h Bessel/Neumann functions
-AC_CHECK_LIB([m], [jnf],AC_DEFINE(HAVE_MATH_BESSEL,1,[can math compute Bessel functions?]))
+AC_CHECK_LIB([m], [jn],AC_DEFINE(HAVE_MATH_BESSEL,1,[can math compute Bessel functions?]))
 
 
 if test "x$with_pd" != "x"; then
@@ -100,7 +101,7 @@ AC_CHECK_LIB(pd, nullfn)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(stdlib.h stdio.h string.h math.h time.h sys/time.h fftw3.h sndfile.h gsl/gsl_linalg.h)
+AC_CHECK_HEADERS(stdlib.h stdio.h string.h math.h time.h sys/time.h fftw3.h sndfile.h gsl/gsl_linalg.h gsl/gsl_sf_bessel.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
