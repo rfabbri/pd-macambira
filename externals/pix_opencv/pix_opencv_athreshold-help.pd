@@ -1,8 +1,8 @@
-#N canvas 550 25 1113 920 10;
+#N canvas 0 25 997 639 10;
 #X obj 300 -86 gemhead;
-#X obj 183 555 pix_texture;
-#X obj 183 574 square 2;
-#X obj -300 -52 cnv 15 220 70 empty empty empty 20 12 0 14 -195568
+#X obj 184 629 pix_texture;
+#X obj 184 648 square 2;
+#X obj -363 -163 cnv 15 220 70 empty empty empty 20 12 0 14 -195568
 -66577 0;
 #N canvas 0 22 454 304 gemwin 0;
 #X obj 67 89 outlet;
@@ -34,10 +34,10 @@
 #X connect 9 0 6 0;
 #X connect 10 0 7 0;
 #X connect 10 2 9 0;
-#X restore -290 -8 pd gemwin;
-#X msg -290 -26 create;
-#X obj 29 551 pix_texture;
-#X obj 29 579 square 2;
+#X restore -353 -119 pd gemwin;
+#X msg -353 -137 create;
+#X obj 30 625 pix_texture;
+#X obj 30 653 square 2;
 #X obj 181 241 separator;
 #X obj 312 -59 bng 25 250 50 0 load empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -50,33 +50,18 @@
 #X msg 318 33 auto \$1;
 #X obj 318 15 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
-#X obj 178 299 cnv 15 600 250 empty empty empty 20 12 0 14 -4034 -66577
+#X obj 148 301 cnv 15 600 310 empty empty empty 20 12 0 14 -4034 -66577
 0;
-#X text -292 -46 Create window and render;
-#X obj 183 508 pix_opencv_athreshold;
-#X floatatom 360 498 5 0 0 0 - - -;
-#X msg 298 405 mode \$1;
-#X floatatom 318 472 5 0 0 0 - - -;
-#X msg 333 364 0;
-#X msg 363 384 1;
-#X text 349 405 thresholding mode ( default 0 );
-#X text 365 362 CV_THRESH_BINARY : pixel >= threshold;
-#X text 393 384 CV_THRESH_BINARY_INV :pixel <= threshold;
-#X text 358 484 blocksize ( 1 \, 3 \, 5 \, 7 \, ... );
-#X text 393 498 ( default 3 );
-#X msg 273 308 0;
-#X msg 305 323 1;
-#X msg 240 345 method \$1;
-#X text 304 344 thresholding method ( default 0 );
-#X text 305 306 CV_ADAPTIVE_THRESH_MEAN_C : mean value;
-#X text 337 323 CV_ADAPTIVE_THRESH_GAUSSIAN_C : gaussian mask;
-#X msg 319 427 dim \$1;
-#X floatatom 370 430 5 0 0 0 - - -;
-#X text -304 77 written by Yves Degoyon ( ydegoyon@gmail.com );
-#X text -304 42 use the average of pixels in the block of pixels to
-filter only the pixels above or below that threshold \, depending on
-the mode BINARY or BINARY:INVERTED;
-#X text -303 31 pix_opencv_threshold : adaptive thresholding;
+#X text -355 -157 Create window and render;
+#X obj 184 577 pix_opencv_athreshold;
+#X floatatom 343 538 5 0 0 0 - - -;
+#X msg 238 436 mode \$1;
+#X floatatom 340 500 5 0 0 0 - - -;
+#X text 376 538 ( default 3 );
+#X msg 214 350 method \$1;
+#X msg 236 397 dim \$1;
+#X floatatom 287 400 5 0 0 0 - - -;
+#X text -357 321 written by Yves Degoyon ( ydegoyon@gmail.com );
 #X msg 413 16 colorspace RGBA;
 #X msg 518 16 colorspace RGB;
 #X msg 622 16 colorspace Grey;
@@ -123,20 +108,53 @@ the mode BINARY or BINARY:INVERTED;
 #X msg 111 53 driver 1;
 #X msg 88 -32 dialog;
 #X msg 93 -2 device /dev/dv1394-0;
-#X text 318 458 Max value used in some modes ( 0 - 255);
-#X text 410 428 value to correct the theshold;
+#X text 323 399 value to correct the theshold;
+#X text -366 -80 pix_opencv_threshold :;
+#X text 340 486 MaxValue (default 255);
+#X text 317 435 inverse mode ( default 0 );
+#X text -366 -56 Thresholding is used to segment an image by setting
+all pixels whose intensity values are above a threshold to a foreground
+value and all the remaining pixels to a background value.;
+#X text -367 -10 Whereas the conventional thresholding operator uses
+a global threshold for all pixels \, adaptive thresholding changes
+the threshold dynamically over the image. This more sophisticated version
+of thresholding can accommodate changing lighting conditions in the
+image \, e.g. those occurring as a result of a strong illumination
+gradient or shadows.;
+#X text -338 129 - zero otherwise;
+#X text -364 92 Adaptive thresholding sets a pixel dst(x \, y) value
+to:;
+#X text -338 114 - MaxValue (see MaxValue inlet) if src(x \, y) > T(x
+\, y);
+#X text -360 162 Where T(x \, y) is a threshold calculated individually
+for each pixel. For the method ADAPTIVE_THRESH_MEAN_C the threshold
+value is the mean of a blockSize x blockSize (see blocksize inlet)
+neighborhood of (x \, y) \, minus dim parameter value (see dim message).
+;
+#X text -360 238 For the method ADAPTIVE_THRESH_GAUSSIAN_C the threshold
+value is the weighted sum (i.e. cross-correlation with a Gaussian window)
+of a blockSize x blockSize neighborhood of (x \, y) \, minus dim parameter
+value.;
+#X text 341 524 blockSize;
+#X obj 288 351 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 206 328 Thresholding method ( default 0 );
+#X obj 297 437 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 306 345 0 = CV_ADAPTIVE_THRESH_MEAN_C;
+#X text 306 355 1 = CV_ADAPTIVE_THRESH_GAUSSIAN_C;
 #X connect 0 0 14 0;
 #X connect 1 0 2 0;
 #X connect 4 0 5 0;
 #X connect 5 0 4 0;
 #X connect 6 0 7 0;
-#X connect 8 0 49 0;
+#X connect 8 0 36 0;
 #X connect 9 0 12 0;
 #X connect 10 0 11 0;
 #X connect 11 0 14 1;
 #X connect 12 0 13 0;
 #X connect 13 0 14 0;
-#X connect 14 0 50 1;
+#X connect 14 0 37 1;
 #X connect 14 2 10 0;
 #X connect 15 0 14 0;
 #X connect 16 0 15 0;
@@ -144,30 +162,28 @@ the mode BINARY or BINARY:INVERTED;
 #X connect 20 0 19 2;
 #X connect 21 0 19 0;
 #X connect 22 0 19 1;
-#X connect 23 0 21 0;
-#X connect 24 0 21 0;
-#X connect 30 0 32 0;
-#X connect 31 0 32 0;
-#X connect 32 0 19 0;
+#X connect 24 0 19 0;
+#X connect 25 0 19 0;
+#X connect 26 0 25 0;
+#X connect 28 0 14 0;
+#X connect 28 0 39 0;
+#X connect 29 0 14 0;
+#X connect 30 0 14 0;
+#X connect 31 0 28 0;
+#X connect 31 0 16 0;
+#X connect 32 0 8 0;
+#X connect 33 0 35 0;
+#X connect 34 0 33 0;
+#X connect 35 0 6 0;
 #X connect 36 0 19 0;
-#X connect 37 0 36 0;
-#X connect 41 0 14 0;
-#X connect 41 0 52 0;
-#X connect 42 0 14 0;
-#X connect 43 0 14 0;
-#X connect 44 0 41 0;
-#X connect 44 0 16 0;
-#X connect 45 0 8 0;
-#X connect 46 0 48 0;
-#X connect 47 0 46 0;
-#X connect 48 0 6 0;
-#X connect 49 0 19 0;
-#X connect 50 0 45 0;
-#X connect 50 0 47 0;
-#X connect 51 0 50 2;
-#X connect 52 0 50 0;
-#X connect 53 0 52 0;
-#X connect 54 0 52 0;
-#X connect 55 0 52 0;
-#X connect 56 0 52 0;
-#X connect 57 0 52 0;
+#X connect 37 0 32 0;
+#X connect 37 0 34 0;
+#X connect 38 0 37 2;
+#X connect 39 0 37 0;
+#X connect 40 0 39 0;
+#X connect 41 0 39 0;
+#X connect 42 0 39 0;
+#X connect 43 0 39 0;
+#X connect 44 0 39 0;
+#X connect 57 0 24 0;
+#X connect 59 0 21 0;
