@@ -8,7 +8,7 @@
 
 static t_class *httpreceive_class;
 
-#define STATUS_BUF_LEN 1024
+#define STATUS_BUF_LEN 4096 /* how big can the status part get? */
 
 typedef struct _httpreceive
 {
@@ -84,7 +84,7 @@ static void httpreceive_list(t_httpreceive *x, t_symbol *s, int argc, t_atom *ar
             x->x_status_buf[x->x_status_buf_write_index+1] = 0;
             if (x->x_verbosity) post("httpreceive_list: status: %s", x->x_status_buf);
             /* get status code from first line */
-            if (1 != sscanf(x->x_status_buf, "HTTP/1.1 %d", &j))
+            if ((1 != sscanf(x->x_status_buf, "HTTP/1.1 %d", &j)) && (1 != sscanf(x->x_status_buf, "HTTP/1.0 %d", &j)))
             {
                 pd_error(x, "httpreceive_list: malformed status line");
                 post("httpreceive_list: status: %s", x->x_status_buf);
@@ -147,7 +147,7 @@ static void httpreceive_list(t_httpreceive *x, t_symbol *s, int argc, t_atom *ar
             }
         } // if end of status response
         else x->x_status_buf_write_index++;
-        if (x->x_status_buf_write_index >= STATUS_BUF_LEN)
+        if (x->x_status_buf_write_index >= x->x_status_buf_len)
         {
             pd_error(x, "httpreceive_list: status buffer full");
             x->x_status_buf_write_index = 0;
