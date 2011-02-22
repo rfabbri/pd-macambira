@@ -141,7 +141,7 @@ pd_install: pd
 	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
 # make libdir start automatically by being in new 'startup' folder
 	install -d $(DESTDIR)$(libpddir)/startup
-	ln -s ../extra/libdir.pd_darwin $(DESTDIR)$(libpddir)/startup/libdir.pd_darwin
+	ln -s ../extra/libdir $(DESTDIR)$(libpddir)/startup/libdir
 else
 #----------------------------------------------------------------------------#
 # old build system
