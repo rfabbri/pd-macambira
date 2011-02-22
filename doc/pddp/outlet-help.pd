@@ -1,4 +1,4 @@
-#N canvas 0 0 555 619 10;
+#N canvas 1 53 555 619 10;
 #X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
 14 -228856 -66577 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header outlet 3 12 0 18
@@ -83,13 +83,13 @@ float argument.;
 subpatch:;
 #X text 98 77 The [outlet] object allows messages to be sent from objects
 in a subpatch to objects on the parent canvas.;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X text 168 407 - the inlet passes any message sent to [outlet] to
 the outlet of canvas in which it is contained. When multiple [outlet~]
 and/or [outlet] objects are in one subpatch \, their horizontal order
-determines which outlet on the subpatch corresponds to which [outlet~]/[outlet]
-object.;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
-;
+corresponds to the outlets drawn on the containing object in the parent
+patch.;
 #X connect 17 0 23 1;
 #X connect 18 0 23 0;
 #X connect 22 0 16 0;
