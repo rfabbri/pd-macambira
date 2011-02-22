@@ -139,6 +139,9 @@ pd_install: pd
 	$(MAKE) -C $(pd_src) $(DEST_PATHS) $(PD_BUILD_FLAGS) install
 	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
 	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
+# make libdir start automatically by being in new 'startup' folder
+	install -d $(DESTDIR)$(libpddir)/startup
+	ln -s ../extra/libdir.pd_darwin $(DESTDIR)$(libpddir)/startup/libdir.pd_darwin
 else
 #----------------------------------------------------------------------------#
 # old build system
