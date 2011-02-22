@@ -5,9 +5,9 @@
 	<key>defeatrt</key>
 	<string>0</string>
 	<key>flags</key>
-	<string>-helppath ~/Library/Pd -helppath /Library/Pd</string>
+	<string></string>
 	<key>loadlib1</key>
-	<string>libdir</string>
+	<string>vanilla/list</string>
 	<key>loadlib2</key>
 	<string>vanilla</string>
 	<key>loadlib3</key>

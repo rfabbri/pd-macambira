@@ -2,7 +2,7 @@ Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Pd-extended]
 "flags"=""
-"loadlib1"="libdir"
+"loadlib1"="vanilla/list"
 "loadlib2"="vanilla"
 "loadlib3"="extra"
 "loadlib4"="Gem"

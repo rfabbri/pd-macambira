@@ -2,7 +2,7 @@ standardpath: 1
 verbose: 0
 defeatrt: 0
 flags:
-loadlib1: libdir
+loadlib1: vanilla/list
 loadlib2: vanilla
 loadlib3: extra
 loadlib4: Gem

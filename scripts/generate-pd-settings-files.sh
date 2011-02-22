@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ECHO=/sw/bin/echo
-LIBS="libdir vanilla extra Gem cyclone zexy"
+LIBS="vanilla/list vanilla extra Gem cyclone zexy"
 
 GNULINUX_FONTPATH="/var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType"
 MACOSX_FONTPATH="/System/Library/Fonts /Library/Fonts ~/Library/Fonts /usr/X11R6/lib/X11/fonts/TTF /System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/lib/fonts"
@@ -26,7 +26,7 @@ WINDOWS_INNO_REG_FILE=${ROOT_DIR}/win32_inno/pd-inno.registry.reg
 GNULINUX_HEADER='standardpath: 1\nverbose: 0\ndefeatrt: 0\nflags:'
 
 
-MACOSX_HEADER='<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n\t<key>defeatrt</key>\n\t<string>0</string>\n\t<key>flags</key>\n\t<string>-helppath ~/Library/Pd -helppath /Library/Pd</string>'
+MACOSX_HEADER='<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n\t<key>defeatrt</key>\n\t<string>0</string>\n\t<key>flags</key>\n\t<string></string>'
 MACOSX_FOOTER='</dict>\n
 </plist>\n'
 

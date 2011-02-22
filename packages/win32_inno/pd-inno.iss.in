@@ -80,7 +80,7 @@ Root: HKCR; SubKey: .pd; ValueType: string; ValueName: Content Type; ValueData: 
 ; STARTHERE: add pd-inno_registry after this comment:
 
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: flags; ValueData: ; Tasks: libs; Flags: uninsdeletekey
-Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib1; ValueData: libdir; Tasks: libs
+Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib1; ValueData: vanilla/list; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib2; ValueData: vanilla; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib3; ValueData: extra; Tasks: libs
 Root: HKLM; SubKey: SOFTWARE\Pd-extended; ValueType: string; ValueName: loadlib4; ValueData: Gem; Tasks: libs
