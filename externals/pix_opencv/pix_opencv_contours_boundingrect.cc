@@ -211,7 +211,7 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
             {
 	      cvRectangle( orig, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
               sprintf( tindex, "%d", oi );
-              cvPutText( orig, tindex, cvPoint(x_xmark[oi],x_ymark[oi]), &font, CV_RGB(255,0,0));
+              cvPutText( orig, tindex, cvPoint(x_xmark[oi],x_ymark[oi]), &font, CV_RGB(255,0,255));
             }
 
             if ( x_show )
@@ -359,7 +359,7 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
             {
 	      cvRectangle( rgb, cvPoint(rect.x,rect.y), cvPoint(rect.x+rect.width,rect.y+rect.height), CV_RGB(255,0,0), 2, 8 , 0 );
               sprintf( tindex, "%d", oi );
-              cvPutText( rgb, tindex, cvPoint(x_xmark[oi],x_ymark[oi]), &font, CV_RGB(255,0,0));
+              cvPutText( rgb, tindex, cvPoint(x_xmark[oi],x_ymark[oi]), &font, CV_RGB(255,0,255));
             }
 
             if ( x_show )
