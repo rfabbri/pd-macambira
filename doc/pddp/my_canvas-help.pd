@@ -345,8 +345,8 @@ change the object's appearance.;
 #X text 127 110 The blue rectangle at the top of each help patch is
 a [cnv] \, as are the horizontal dividers below.;
 #X text 98 463 13;
-#X text 257 564 IEM KUG;
-#X text 232 576 graz \, austria 2002;
+#X text 207 564 IEM KUG;
+#X text 182 576 graz \, austria 2002;
 #X msg 435 192 get_pos;
 #X obj 435 214 send to_K;
 #X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
@@ -475,13 +475,13 @@ a [cnv] \, as are the horizontal dividers below.;
 #X connect 51 0 2 0;
 #X coords 0 -1 1 1 15 15 2 100 100;
 #X restore 71 330 pd;
-#X obj 219 553 bng 14 250 50 0 \$0-bng empty empty 4 7 0 12 -262144
+#X obj 169 553 bng 14 250 50 0 \$0-bng empty empty 4 7 0 12 -262144
 -262144 -1;
 #X text 66 275 You can also use a white [cnv] to;
 #X text 66 290 conceal parts of a patch (use;
 #X text 66 305 with care);
 #N canvas 93 78 450 511 let's-play-pong! 0;
-#X obj 148 128 cnv 15 100 25 empty \$0-score Score:5 5 12 0 14 -233017
+#X obj 148 128 cnv 15 100 25 empty \$0-score Score:0 5 12 0 14 -233017
 -66577 0;
 #X obj 14 29 cnv 15 5 60 \$0-ps \$0-pr empty 20 12 0 14 -1 -66577 0
 ;
@@ -703,14 +703,17 @@ a [cnv] \, as are the horizontal dividers below.;
 #X connect 50 0 22 1;
 #X connect 51 0 17 0;
 #X restore 136 312 pd let's-play-pong!;
-#X text 235 551 musil@iem.kug.ac.at;
-#X text 221 550 c;
+#X text 185 551 musil@iem.kug.ac.at;
+#X text 171 550 c;
 #X obj 60 267 cnv 15 210 70 empty \$0-cnv empty 20 12 0 14 -262144
 -262144 0;
 #X obj 69 329 cnv 15 17 17 empty empty empty 20 12 0 14 -262144 -66577
 0;
 #X text 244 191 send it a "get_pos" message ->;
 #X text 244 176 To get a cnv position \,;
+#X text 325 551 Note: [cnv] is not to be confused;
+#X text 325 564 with the Pd canvas \, or [pd] \,;
+#X text 325 577 [table] \, etc.;
 #X connect 21 0 39 0;
 #X connect 22 0 21 0;
 #X connect 23 0 30 0;
