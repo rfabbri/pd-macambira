@@ -29,36 +29,12 @@ else
 fi
 
 
-if  test -d ../../../Gem; 
-then
-	GEM_DIR=../../../Gem
-else
-   echo "Gem sources not found"
-fi
-
 AC_ARG_WITH(pddir,       [  --with-pddir=<dir>      specify an alternate pd source tree])
-AC_ARG_WITH(gemdir,      [  --with-gemdir=<dir>     specify an alternate gem source tree])
-
-if test "$with_gemdir" != ""
-then
- GEM_DIR=$with_gemdir
-fi
 
 if test "$with_pddir" != ""
 then
  PD_DIR=$with_pddir
 fi
-
-echo -n "looking for gem sources (required) ... "
-if test -f $GEM_DIR/src/Base/GemMan.h
-then
-  AC_SUBST(GEM_DIR)
-  echo "ok." 
-else
-  echo "gem source tree not found... use ./configure --with-gemdir= option"
-  exit -1
-fi
-
 
 echo -n "looking for pd sources (required) ... "
 if test -f $PD_DIR/src/m_imp.h
