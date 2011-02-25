@@ -532,8 +532,8 @@ void  pix_opencv_of_bm :: tresholdMess(float threshold)
 
 void  pix_opencv_of_bm :: blocksizeMess(float fwidth, float fheight)
 {
-  if (fwidth>=5.0) x_blocksize.width = (int)fwidth;
-  if (fheight>=5.0) x_blocksize.height = (int)fheight;
+  if ((fwidth>=5.0)&&(fwidth<=100.0)) x_blocksize.width = (int)fwidth;
+  if ((fheight>=5.0)&&(fheight<=100.0)) x_blocksize.height = (int)fheight;
 
   x_velsize.width = (comp_xsize-x_blocksize.width)/x_shiftsize.width;
   x_velsize.height = (comp_ysize-x_blocksize.height)/x_shiftsize.height;
@@ -546,8 +546,8 @@ void  pix_opencv_of_bm :: blocksizeMess(float fwidth, float fheight)
 
 void  pix_opencv_of_bm :: shiftsizeMess(float fwidth, float fheight)
 {
-  if (fwidth>=5.0) x_shiftsize.width = (int)fwidth;
-  if (fheight>=5.0) x_shiftsize.height = (int)fheight;
+  if ((fwidth>=5.0)&&(fwidth<=100.0)) x_shiftsize.width = (int)fwidth;
+  if ((fheight>=5.0)&&(fheight<=100.0)) x_shiftsize.height = (int)fheight;
 
   x_velsize.width = (comp_xsize-x_blocksize.width)/x_shiftsize.width;
   x_velsize.height = (comp_ysize-x_blocksize.height)/x_shiftsize.height;
@@ -560,8 +560,8 @@ void  pix_opencv_of_bm :: shiftsizeMess(float fwidth, float fheight)
 
 void  pix_opencv_of_bm :: maxrangeMess(float fwidth, float fheight)
 {
-  if (fwidth>=5.0) x_maxrange.width = (int)fwidth;
-  if (fheight>=5.0) x_maxrange.height = (int)fheight;
+  if ((fwidth>=5.0)&&(fwidth<=100.0)) x_maxrange.width = (int)fwidth;
+  if ((fheight>=5.0)&&(fheight<=100.0)) x_maxrange.height = (int)fheight;
 }
 
 void  pix_opencv_of_bm :: usePreviousMess(float previous)
