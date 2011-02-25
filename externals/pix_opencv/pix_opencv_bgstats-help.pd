@@ -1,4 +1,4 @@
-#N canvas 286 25 997 639 10;
+#N canvas 286 25 1043 839 10;
 #X obj 365 487 pix_texture;
 #X obj 365 515 square 2;
 #X obj 28 -124 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
@@ -34,7 +34,7 @@
 #X connect 10 0 7 0;
 #X connect 10 2 9 0;
 #X restore 40 -78 pd gemwin;
-#X msg 40 -102 destroy;
+#X msg 40 -102 create;
 #X text 36 -122 Create window and render;
 #X obj 213 486 pix_texture;
 #X obj 213 514 square 2;
@@ -106,14 +106,10 @@ using a statitical method.;
 #X text 28 -10 Objects disappear from the background after a certain
 amount of time of presence \, they are then considered as background.
 ;
-#X text 29 19;
 #X text 28 55 Comments and support @ ydegoyon.gmail.com;
-#X msg 704 546 set;
-#X text 740 546 set the background;
-#X msg 714 556 set;
-#X text 750 556 set the background;
 #X msg 415 339 reset;
 #X text 455 341 reset the background;
+#X obj 302 164 pix_rgba;
 #X connect 0 0 1 0;
 #X connect 3 0 4 0;
 #X connect 4 0 3 0;
@@ -141,8 +137,7 @@ amount of time of presence \, they are then considered as background.
 #X connect 27 0 26 0;
 #X connect 28 0 6 0;
 #X connect 29 0 9 0;
-#X connect 30 0 25 0;
-#X connect 30 0 27 0;
+#X connect 30 0 43 0;
 #X connect 31 0 30 2;
 #X connect 32 0 38 0;
 #X connect 33 0 32 0;
@@ -151,4 +146,6 @@ amount of time of presence \, they are then considered as background.
 #X connect 36 0 32 0;
 #X connect 37 0 32 0;
 #X connect 38 0 30 0;
-#X connect 46 0 9 0;
+#X connect 41 0 9 0;
+#X connect 43 0 27 0;
+#X connect 43 0 25 0;

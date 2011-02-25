@@ -1,4 +1,4 @@
-#N canvas 1984 52 1023 804 10;
+#N canvas 462 38 1392 934 10;
 #X obj 580 466 cnv 15 550 250 empty empty empty 20 12 0 14 -24198 -66577
 0;
 #X floatatom 717 652 5 0 0 0 - - -;
@@ -39,11 +39,11 @@ to transform the contours of the shapes to be analyzed..;
 #X floatatom 833 719 5 0 0 0 - - -;
 #X text 871 720 number of contours;
 #X msg 698 575 nightmode \$1;
-#X obj 788 576 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 788 576 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 777 597 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 777 597 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
-#X obj 790 619 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 790 619 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X msg 717 596 draw \$1;
 #X text 804 595 draw bounding rectangle ( default : on );
@@ -86,7 +86,7 @@ to transform the contours of the shapes to be analyzed..;
 #X connect 10 0 7 0;
 #X connect 10 2 9 0;
 #X restore 43 84 pd gemwin;
-#X msg 43 66 destroy;
+#X msg 43 66 create;
 #X obj 444 838 pix_texture;
 #X obj 444 866 square 2;
 #X obj 596 371 separator;
@@ -111,7 +111,7 @@ to transform the contours of the shapes to be analyzed..;
 #X obj 444 345 pix_separator;
 #X obj 444 409 translateXYZ -2 0 0;
 #X obj 596 406 translateXYZ 2 0 0;
-#N canvas 0 0 450 300 vswitch 0;
+#N canvas 0 22 450 300 vswitch 0;
 #X obj 144 263 outlet;
 #X obj 36 26 inlet;
 #X obj 260 29 inlet;
@@ -140,7 +140,7 @@ to transform the contours of the shapes to be analyzed..;
 #X connect 11 1 9 0;
 #X connect 11 1 6 0;
 #X restore 536 267 pd vswitch;
-#X obj 604 267 tgl 15 0 empty load empty 17 7 0 10 -262144 -1 -1 1
+#X obj 604 267 tgl 15 0 empty load empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 478 39 gemhead;
 #X msg 517 152 device 0;
@@ -176,18 +176,17 @@ to transform the contours of the shapes to be analyzed..;
 #X text 924 297 KNOWN BUGS :: in some input data all the blobs are
 tagged with 0 label (if maxmove is very high????) ... if i put maxmove
 to zero blobs are tagged in a crazy way....;
-#X obj 593 767 rotateXYZ 180 0 0;
-#X obj 442 769 rotateXYZ 180 0 0;
 #X obj 749 988 -;
 #X msg 723 958 240;
 #X obj 723 934 t b;
 #X msg 1162 624 50;
 #X obj 834 431 loadbang;
 #X msg 799 433 50;
+#X obj 531 320 pix_rgba;
 #X connect 1 0 86 1;
 #X connect 2 0 86 2;
-#X connect 4 0 98 1;
-#X connect 4 0 100 0;
+#X connect 4 0 96 1;
+#X connect 4 0 98 0;
 #X connect 5 0 79 0;
 #X connect 6 0 79 1;
 #X connect 7 0 3 0;
@@ -233,7 +232,7 @@ to zero blobs are tagged in a crazy way....;
 #X connect 58 0 44 0;
 #X connect 59 0 61 0;
 #X connect 60 0 59 0;
-#X connect 61 0 97 0;
+#X connect 61 0 42 0;
 #X connect 62 0 76 0;
 #X connect 63 0 73 0;
 #X connect 64 0 63 2;
@@ -242,17 +241,16 @@ to zero blobs are tagged in a crazy way....;
 #X connect 67 0 87 0;
 #X connect 68 0 87 0;
 #X connect 69 0 87 0;
-#X connect 73 0 58 0;
-#X connect 73 0 60 0;
+#X connect 73 0 102 0;
 #X connect 75 0 76 1;
 #X connect 76 0 86 0;
 #X connect 77 0 80 0;
-#X connect 78 0 101 0;
+#X connect 78 0 99 0;
 #X connect 79 0 77 0;
 #X connect 81 0 76 0;
 #X connect 84 0 83 0;
 #X connect 85 0 84 0;
-#X connect 86 0 96 0;
+#X connect 86 0 37 0;
 #X connect 86 1 8 0;
 #X connect 86 2 25 0;
 #X connect 87 0 63 0;
@@ -261,12 +259,12 @@ to zero blobs are tagged in a crazy way....;
 #X connect 91 0 88 0;
 #X connect 93 0 84 0;
 #X connect 94 0 88 0;
-#X connect 96 0 37 0;
-#X connect 97 0 42 0;
-#X connect 98 0 84 0;
-#X connect 98 0 91 0;
-#X connect 99 0 98 0;
-#X connect 100 0 99 0;
-#X connect 101 0 1 0;
-#X connect 102 0 103 0;
-#X connect 103 0 75 0;
+#X connect 96 0 84 0;
+#X connect 96 0 91 0;
+#X connect 97 0 96 0;
+#X connect 98 0 97 0;
+#X connect 99 0 1 0;
+#X connect 100 0 101 0;
+#X connect 101 0 75 0;
+#X connect 102 0 60 0;
+#X connect 102 0 58 0;

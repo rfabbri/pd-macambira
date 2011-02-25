@@ -1,4 +1,4 @@
-#N canvas 265 148 1171 685 10;
+#N canvas 534 327 1171 685 10;
 #X obj -96 -15 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 0 22 454 304 gemwin 0;
@@ -40,7 +40,7 @@
 #X connect 10 2 11 0;
 #X connect 11 0 6 0;
 #X restore -89 31 pd gemwin;
-#X msg -88 9 destroy;
+#X msg -88 9 create;
 #X text -88 -12 Create window and render;
 #X obj 288 360 cnv 15 600 350 empty empty empty 20 12 0 14 -24198 -66577
 0;
@@ -146,6 +146,7 @@ specific color;
 #X floatatom 791 232 5 0 0 0 - - -;
 #X text 424 386 mark x y : mark a component;
 #X obj 315 318 pix_resize 320 240;
+#X obj 315 281 pix_rgba;
 #X connect 1 0 2 0;
 #X connect 2 0 1 0;
 #X connect 5 0 68 0;
@@ -194,7 +195,7 @@ specific color;
 #X connect 57 0 52 0;
 #X connect 58 0 55 0;
 #X connect 58 0 54 0;
-#X connect 59 0 71 0;
+#X connect 59 0 72 0;
 #X connect 60 0 59 2;
 #X connect 61 0 59 0;
 #X connect 62 0 61 0;
@@ -203,3 +204,4 @@ specific color;
 #X connect 65 0 61 0;
 #X connect 66 0 61 0;
 #X connect 71 0 12 0;
+#X connect 72 0 71 0;

@@ -1,4 +1,4 @@
-#N canvas 5 61 1424 780 10;
+#N canvas 421 83 1424 780 10;
 #X obj 977 55 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 189 149 454 304 gemwin 0;
@@ -74,7 +74,7 @@
 #X obj 296 224 separator;
 #X obj 296 250 translateXYZ -2 0 0;
 #X obj 454 253 translateXYZ 2 0 0;
-#N canvas 0 0 450 300 vswitch 0;
+#N canvas 0 22 450 300 vswitch 0;
 #X obj 144 263 outlet;
 #X obj 36 26 inlet;
 #X obj 260 29 inlet;
@@ -149,6 +149,7 @@ average direction and the intensity of the movement in a video stream.
 #X text 980 126 pix_opencv_of_hs : Haron and Schunck optical flow algorithm.
 ;
 #X obj 385 160 pix_resize 320 240;
+#X obj 385 182 pix_rgba;
 #X connect 1 0 2 0;
 #X connect 2 0 1 0;
 #X connect 5 0 6 0;
@@ -198,5 +199,6 @@ average direction and the intensity of the movement in a video stream.
 #X connect 56 0 47 0;
 #X connect 57 0 56 0;
 #X connect 60 0 47 0;
-#X connect 68 0 46 0;
-#X connect 68 0 45 0;
+#X connect 68 0 69 0;
+#X connect 69 0 45 0;
+#X connect 69 0 46 0;

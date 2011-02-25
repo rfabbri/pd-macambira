@@ -1,4 +1,4 @@
-#N canvas 0 25 1680 940 10;
+#N canvas 0 39 1680 940 10;
 #X obj 479 677 pix_texture;
 #X obj 25 -34 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
@@ -111,7 +111,7 @@ by OpenCV samples code.;
 #X msg 790 71 colorspace RGBA;
 #X msg 895 71 colorspace RGB;
 #X obj 790 43 loadbang;
-#N canvas 0 0 450 300 vswitch 0;
+#N canvas 0 22 450 300 vswitch 0;
 #X obj 144 263 outlet;
 #X obj 36 26 inlet;
 #X obj 260 29 inlet;
@@ -140,7 +140,7 @@ by OpenCV samples code.;
 #X connect 11 1 9 0;
 #X connect 11 1 6 0;
 #X restore 499 224 pd vswitch;
-#X obj 567 224 tgl 15 0 empty load empty 17 7 0 10 -262144 -1 -1 0
+#X obj 568 223 tgl 15 0 empty load empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 440 152 pix_video;
 #X obj 440 -36 gemhead;
@@ -148,6 +148,7 @@ by OpenCV samples code.;
 #X msg 488 108 driver 1;
 #X msg 465 23 dialog;
 #X msg 470 53 device /dev/dv1394-0;
+#X obj 498 249 pix_rgba;
 #X connect 0 0 15 0;
 #X connect 2 0 3 0;
 #X connect 3 0 2 0;
@@ -200,7 +201,7 @@ by OpenCV samples code.;
 #X connect 63 0 59 0;
 #X connect 64 0 62 0;
 #X connect 64 0 61 0;
-#X connect 65 0 51 0;
+#X connect 65 0 73 0;
 #X connect 66 0 65 2;
 #X connect 67 0 65 0;
 #X connect 68 0 67 0;
@@ -208,3 +209,4 @@ by OpenCV samples code.;
 #X connect 70 0 67 0;
 #X connect 71 0 67 0;
 #X connect 72 0 67 0;
+#X connect 73 0 51 0;

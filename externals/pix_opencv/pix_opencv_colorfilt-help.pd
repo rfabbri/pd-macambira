@@ -1,4 +1,4 @@
-#N canvas 345 27 925 684 10;
+#N canvas 472 125 925 684 10;
 #X obj 183 555 pix_texture;
 #X obj 659 -55 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
@@ -33,7 +33,7 @@
 #X connect 9 2 8 0;
 #X connect 10 0 6 0;
 #X restore 669 -11 pd gemwin;
-#X msg 669 -29 destroy;
+#X msg 669 -29 create;
 #X obj 178 299 cnv 15 600 250 empty empty empty 20 12 0 14 -4034 -66577
 0;
 #X text 667 -49 Create window and render;
@@ -44,7 +44,7 @@
 #X floatatom 305 503 5 0 0 0 - - -;
 #X text 349 503 RGB selected components;
 #X obj 250 401 pdp_colorgrid pdp_colorgrid1 256 0 256 50 0 50 0 1 1
-10 10 275 446;
+10 10 298 431;
 #X msg 256 363 tolerance \$1;
 #X floatatom 342 365 5 0 0 0 - - -;
 #X text 383 364 tolerance applied for the selection of colors;
@@ -78,7 +78,7 @@ or by selecting a piksel in the video window;
 #X msg 570 69 colorspace RGB;
 #X msg 466 92 colorspace Grey;
 #X obj 465 41 loadbang;
-#N canvas 0 0 450 300 vswitch 0;
+#N canvas 0 22 450 300 vswitch 0;
 #X obj 144 263 outlet;
 #X obj 36 26 inlet;
 #X obj 260 29 inlet;
@@ -107,7 +107,7 @@ or by selecting a piksel in the video window;
 #X connect 11 1 9 0;
 #X connect 11 1 6 0;
 #X restore 181 224 pd vswitch;
-#X obj 249 224 tgl 15 0 empty load empty 17 7 0 10 -262144 -1 -1 1
+#X obj 249 224 tgl 15 0 empty load empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 115 150 pix_video;
 #X obj 116 -16 gemhead;
@@ -116,7 +116,8 @@ or by selecting a piksel in the video window;
 #X msg 140 21 dialog;
 #X msg 145 51 device /dev/dv1394-0;
 #X obj 183 474 pix_opencv_colorfilt;
-#X obj 181 257 pix_resize 320 240;
+#X obj 181 266 pix_resize 320 240;
+#X obj 183 245 pix_rgba;
 #X connect 0 0 7 0;
 #X connect 2 0 3 0;
 #X connect 3 0 2 0;
@@ -154,7 +155,7 @@ or by selecting a piksel in the video window;
 #X connect 40 0 35 0;
 #X connect 41 0 38 0;
 #X connect 41 0 37 0;
-#X connect 42 0 51 0;
+#X connect 42 0 52 0;
 #X connect 43 0 42 2;
 #X connect 44 0 42 0;
 #X connect 45 0 44 0;
@@ -167,3 +168,4 @@ or by selecting a piksel in the video window;
 #X connect 50 2 9 0;
 #X connect 50 3 10 0;
 #X connect 51 0 50 0;
+#X connect 52 0 51 0;

@@ -1,4 +1,4 @@
-#N canvas 236 140 1192 685 10;
+#N canvas 331 42 1192 685 10;
 #X obj 141 -12 cnv 15 700 450 empty empty empty 20 12 0 14 -24198 -66577
 0;
 #X floatatom 288 328 5 0 0 0 - - -;
@@ -83,7 +83,7 @@
 #X msg 559 -233 colorspace RGB;
 #X msg 663 -233 colorspace Grey;
 #X obj 454 -261 loadbang;
-#N canvas 0 0 450 300 vswitch 0;
+#N canvas 0 22 450 300 vswitch 0;
 #X obj 144 263 outlet;
 #X obj 36 26 inlet;
 #X obj 260 29 inlet;
@@ -168,6 +168,7 @@
 #X obj 178 -78 pix_resize 320 240;
 #X text 642 -68 selection of a point;
 #X text 436 196 max movement of a marker ( default 20 pixels );
+#X obj 178 -40 pix_rgba;
 #X connect 1 0 32 1;
 #X connect 3 0 4 0;
 #X connect 4 0 32 0;
@@ -237,4 +238,5 @@
 #X connect 80 0 85 0;
 #X connect 82 0 83 0;
 #X connect 83 0 82 0;
-#X connect 86 0 32 0;
+#X connect 86 0 89 0;
+#X connect 89 0 32 0;

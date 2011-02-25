@@ -74,7 +74,7 @@
 #X obj 296 224 separator;
 #X obj 296 250 translateXYZ -2 0 0;
 #X obj 454 253 translateXYZ 2 0 0;
-#N canvas 0 0 450 300 vswitch 0;
+#N canvas 0 22 450 300 vswitch 0;
 #X obj 144 263 outlet;
 #X obj 36 26 inlet;
 #X obj 260 29 inlet;
@@ -147,6 +147,7 @@ average direction and the intensity of the movement in a video stream.
 #X text 627 363 threshold value for the detection of movement (default
 100);
 #X obj 383 164 pix_resize 320 240;
+#X obj 389 187 pix_rgba;
 #X connect 1 0 2 0;
 #X connect 2 0 1 0;
 #X connect 5 0 6 0;
@@ -196,5 +197,6 @@ average direction and the intensity of the movement in a video stream.
 #X connect 62 0 42 0;
 #X connect 62 1 11 0;
 #X connect 62 2 5 0;
-#X connect 66 0 45 0;
-#X connect 66 0 46 0;
+#X connect 66 0 67 0;
+#X connect 67 0 45 0;
+#X connect 67 0 46 0;

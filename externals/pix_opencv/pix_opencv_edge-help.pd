@@ -1,4 +1,4 @@
-#N canvas 582 152 784 631 10;
+#N canvas 564 22 1042 915 10;
 #X obj 347 391 cnv 15 300 67 empty empty empty 20 12 0 14 -24198 -66577
 0;
 #X obj 364 407 pix_opencv_edge;
@@ -57,7 +57,7 @@
 #X msg 495 55 open \$1;
 #X obj 483 164 pix_film;
 #X msg 501 98 auto \$1;
-#X obj 501 80 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 501 80 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #X msg 596 81 colorspace RGBA;
 #X msg 701 81 colorspace RGB;
@@ -68,7 +68,7 @@
 #X obj 212 280 pix_separator;
 #X obj 212 344 translateXYZ -2 0 0;
 #X obj 364 341 translateXYZ 2 0 0;
-#N canvas 0 0 450 300 vswitch 0;
+#N canvas 0 22 450 300 vswitch 0;
 #X obj 144 263 outlet;
 #X obj 36 26 inlet;
 #X obj 260 29 inlet;
@@ -105,6 +105,7 @@
 #X msg 294 118 driver 1;
 #X msg 271 33 dialog;
 #X msg 276 63 device /dev/dv1394-0;
+#X obj 302 257 pix_rgba;
 #X connect 1 0 11 0;
 #X connect 2 0 1 1;
 #X connect 7 0 8 0;
@@ -133,8 +134,7 @@
 #X connect 30 0 29 0;
 #X connect 31 0 13 0;
 #X connect 32 0 1 0;
-#X connect 33 0 28 0;
-#X connect 33 0 30 0;
+#X connect 33 0 41 0;
 #X connect 34 0 33 2;
 #X connect 35 0 33 0;
 #X connect 36 0 35 0;
@@ -142,3 +142,5 @@
 #X connect 38 0 35 0;
 #X connect 39 0 35 0;
 #X connect 40 0 35 0;
+#X connect 41 0 30 0;
+#X connect 41 0 28 0;
