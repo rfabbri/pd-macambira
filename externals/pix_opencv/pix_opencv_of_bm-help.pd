@@ -1,4 +1,4 @@
-#N canvas 4 61 1419 780 10;
+#N canvas 66 25 1339 660 10;
 #X obj 977 55 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 189 149 454 304 gemwin 0;
@@ -23,8 +23,8 @@
 #X connect 4 2 1 0;
 #X restore 289 80 pd Gem.init;
 #X obj 128 109 t b b b;
-#X msg 156 138 dimen 320 240;
 #X msg 247 137 frame 25;
+#X msg 156 138 dimen 640 480;
 #X connect 2 0 3 0;
 #X connect 3 0 4 0;
 #X connect 3 0 9 0;
@@ -35,8 +35,8 @@
 #X connect 6 0 0 0;
 #X connect 7 0 0 0;
 #X connect 9 0 6 0;
-#X connect 9 1 10 0;
-#X connect 9 2 11 0;
+#X connect 9 1 11 0;
+#X connect 9 2 10 0;
 #X connect 10 0 0 0;
 #X connect 11 0 0 0;
 #X restore 984 101 pd gemwin;
