@@ -1,4 +1,4 @@
-#N canvas 0 0 1339 660 10;
+#N canvas 1556 165 1339 660 10;
 #X obj 977 55 cnv 15 220 70 empty empty empty 20 12 0 14 -195568 -66577
 0;
 #N canvas 189 149 454 304 gemwin 0;
@@ -40,7 +40,7 @@
 #X connect 10 0 0 0;
 #X connect 11 0 0 0;
 #X restore 984 101 pd gemwin;
-#X msg 984 80 destroy;
+#X msg 984 80 create;
 #X text 987 62 Create window and render;
 #X obj 426 308 cnv 15 600 300 empty empty empty 20 12 0 14 -24198 -66577
 0;
@@ -119,12 +119,12 @@ a very powerful machine;
 #X obj 455 641 square 2;
 #X obj 295 201 pix_separator;
 #X obj 454 205 pix_separator;
-#X text 977 181 with a great help from Mateu Batle & Alberto de Rodrigo
+#X text 974 244 with a great help from Mateu Batle & Alberto de Rodrigo
 from the iBit foundation.;
-#X text 976 145 the main purpose of this object is to calculate the
+#X text 973 208 the main purpose of this object is to calculate the
 average direction and the intensity of the movement in a video stream.
 ;
-#X text 977 205 comments to ydegoyon@gmail.com;
+#X text 974 268 comments to ydegoyon@gmail.com;
 #X text 976 129 pix_opencv_of_lk : Lucas Kanade optical flow algorithm.
 ;
 #X obj 599 419 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
@@ -148,6 +148,9 @@ average direction and the intensity of the movement in a video stream.
 100);
 #X obj 383 164 pix_resize 320 240;
 #X obj 389 187 pix_rgba;
+#X text 974 147 IMPORTANT: this object is quite experimental. For OpticalFlow
+analisys we recommend [pix_opencv_of_bm];
+#X obj 978 178 pix_opencv_of_bm;
 #X connect 1 0 2 0;
 #X connect 2 0 1 0;
 #X connect 5 0 6 0;
