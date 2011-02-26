@@ -107,7 +107,7 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
   unsigned char *pixels = image.data;
   char tindex[4];
   int im = 0, i, ic;           // Indicator of markers.
-  int oi, found;               
+  int oi;               
   float dist, odist;           // Distances
   t_atom rlist[5];
 
@@ -172,7 +172,6 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
 	if ( ( (rect.width*rect.height) > minarea ) && ( (rect.width*rect.height) < maxarea ) ) 
         {
 
-            found = 0;
             oi = -1;
             dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
 
@@ -189,22 +188,24 @@ void pix_opencv_contours_boundingrect :: processRGBAImage(imageStruct &image)
               {
                 if ( odist < dist )
                 {
-                  found=1;
                   oi=im;
-                  x_xmark[oi] = (float)(rect.x+rect.width/2);
-                  x_ymark[oi] = (float)(rect.y+rect.height/2);
-                  x_wmark[oi] = (int)rect.width;
-                  x_hmark[oi] = (int)rect.height;
-                  x_found[oi] = x_ftolerance;
                   dist=odist;
                 }
               }
             }
 
             // new object detected
-            if ( !found )
+            if ( oi == -1 )
             {
                oi = this->mark(rect.x, rect.y, rect.width, rect.height );
+            }
+            else
+            {
+               x_xmark[oi] = (float)(rect.x+rect.width/2);
+               x_ymark[oi] = (float)(rect.y+rect.height/2);
+               x_wmark[oi] = (int)rect.width;
+               x_hmark[oi] = (int)rect.height;
+               x_found[oi] = x_ftolerance;
             }
 
             if ( x_draw )
@@ -262,7 +263,7 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
   char tindex[4];
   t_atom rlist[5];
   int im = 0;                  // Indicator of markers.
-  int oi, found;  
+  int oi;  
   float dist, odist;           // Distances
 
   if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!rgb)) 
@@ -320,7 +321,6 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
 	if ( ( (rect.width*rect.height) > minarea ) && ( (rect.width*rect.height) < maxarea ) ) 
         {
 
-            found = 0;
             oi = -1;
             dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
 
@@ -337,22 +337,24 @@ void pix_opencv_contours_boundingrect :: processRGBImage(imageStruct &image)
               {
                 if ( odist < dist )
                 {
-                  found=1;
                   oi=im;
-                  x_xmark[oi] = (float)(rect.x+rect.width/2);
-                  x_ymark[oi] = (float)(rect.y+rect.height/2);
-                  x_wmark[oi] = (int)rect.width;
-                  x_hmark[oi] = (int)rect.height;
-                  x_found[oi] = x_ftolerance;
                   dist=odist;
                 }
               }
             }
 
             // new object detected
-            if ( !found )
+            if ( oi == -1 )
             {
                oi = this->mark(rect.x, rect.y, rect.width, rect.height );
+            }
+            else
+            {
+               x_xmark[oi] = (float)(rect.x+rect.width/2);
+               x_ymark[oi] = (float)(rect.y+rect.height/2);
+               x_wmark[oi] = (int)rect.width;
+               x_hmark[oi] = (int)rect.height;
+               x_found[oi] = x_ftolerance;
             }
 
             if ( x_draw )
@@ -412,7 +414,7 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
   char tindex[4];
   t_atom rlist[5];
   int im = 0;                  // Indicator of markers.
-  int oi, found;
+  int oi;
   float dist, odist;           // Distances
 
   if ((this->comp_xsize!=image.xsize)||(this->comp_ysize!=image.ysize)||(!orig)) 
@@ -473,7 +475,6 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
 	if ( ( (rect.width*rect.height) > minarea ) && ( (rect.width*rect.height) < maxarea ) ) 
         {
 
-            found = 0;
             oi = -1;
             dist=(comp_xsize>comp_ysize)?comp_xsize:comp_ysize;
 
@@ -490,22 +491,24 @@ void pix_opencv_contours_boundingrect :: processGrayImage(imageStruct &image)
               {
                 if ( odist < dist )
                 {
-                  found=1;
                   oi=im;
-                  x_xmark[oi] = (float)(rect.x+rect.width/2);
-                  x_ymark[oi] = (float)(rect.y+rect.height/2);
-                  x_wmark[oi] = (int)rect.width;
-                  x_hmark[oi] = (int)rect.height;
-                  x_found[oi] = x_ftolerance;
                   dist=odist;
                 }
               }
             }
 
             // new object detected
-            if ( !found )
+            if ( oi == -1 )
             {
                oi = this->mark(rect.x, rect.y, rect.width, rect.height );
+            }
+            else
+            {
+               x_xmark[oi] = (float)(rect.x+rect.width/2);
+               x_ymark[oi] = (float)(rect.y+rect.height/2);
+               x_wmark[oi] = (int)rect.width;
+               x_hmark[oi] = (int)rect.height;
+               x_found[oi] = x_ftolerance;
             }
 
             if ( x_draw )
