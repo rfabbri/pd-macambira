@@ -11,11 +11,12 @@ package require Tk
 package require pdwindow 0.1
 
 namespace eval ::kiosk:: {
-    variable showmenu True
-    variable fullscreen False
-    variable hidemain False
+    variable showmenu False
+    variable fullscreen True
+    variable hidemain True
     variable windowtitle "Pd KIOSK"
     variable hidepopup True
+    variable scrollbars False
 }
 
 
@@ -31,11 +32,18 @@ if { $::kiosk::hidepopup }  {
  proc ::pdtk_canvas::pdtk_canvas_popup {mytoplevel xcanvas ycanvas hasproperties hasopen} { }
 }
 
+if { $::kiosk::scrollbars } { } {
+    proc ::pdtk_canvas::pdtk_canvas_getscroll {tkcanvas} { }
+}
 
 # this is just an empty menu
 menu .kioskmenu
 
 proc ::kiosk::makekiosk {mywin} {
+    if { $mywin == ".pdwindow" } { return; }
+
+puts "KIOSKing $mywin"
+
 #puts "makekiosk $mywin"
 #remove menu
     if { $::kiosk::showmenu } { } {
