@@ -11,10 +11,11 @@ package require Tk
 package require pdwindow 0.1
 
 namespace eval ::kiosk:: {
-    variable showmenu False
-    variable fullscreen True
-    variable hidemain True
-    variable windowtitle "FOO"
+    variable showmenu True
+    variable fullscreen False
+    variable hidemain False
+    variable windowtitle "Pd KIOSK"
+    variable hidepopup True
 }
 
 
@@ -25,12 +26,17 @@ if { $::kiosk::hidemain } {
 }
 
 
+## don't show popup menu on right-click
+if { $::kiosk::hidepopup }  {
+ proc ::pdtk_canvas::pdtk_canvas_popup {mytoplevel xcanvas ycanvas hasproperties hasopen} { }
+}
+
+
 # this is just an empty menu
 menu .kioskmenu
 
-
 proc ::kiosk::makekiosk {mywin} {
-puts "makekiosk $mywin"
+#puts "makekiosk $mywin"
 #remove menu
     if { $::kiosk::showmenu } { } {
         $mywin configure -menu .kioskmenu; 
@@ -41,28 +47,14 @@ puts "makekiosk $mywin"
     	wm attributes $mywin -fullscreen 1
     }
 
-
-    if { info exists ::kiosk::windowtitle $::kiosk::windowtitle } {
+# set the title of the window 
+# (makes mostly sense in non-fullscren...)
+    if { $::kiosk::windowtitle != "" } {
+        wm title $mywin $::kiosk::windowtitle
+    }
 }
-
-# it seems like this is getting not called for initially opened windows
-# i guess it is like that:
-#  pd starts up
-#  pd sends initial data to the GUI
-#  the guiplugins are invoked (too late to do anything with existing windows)
-
-#proc ::pd_bindings::patch_bindings {mytoplevel} {
-#puts "foo $mytoplevel"
-#	wm attributes $mytoplevel -fullscreen 1
-#}
-
-
 
 foreach kioskwin [array names ::loaded] { 
     ::kiosk::makekiosk $kioskwin 
 }
-
-#bind PatchWindow <FocusIn> { 
-#    makekiosk %W;
-#}
 
