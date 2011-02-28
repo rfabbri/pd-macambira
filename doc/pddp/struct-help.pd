@@ -27,7 +27,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 0 13 -228856 -1 0;
 #X obj 0 532 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
 0 13 -228856 -1 0;
-#N canvas 110 481 428 109 Related_objects 0;
+#N canvas 111 510 428 109 Related_objects 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 8 2 [struct] Related Objects;
@@ -58,7 +58,7 @@ pdpedia: struct;
 #X text 149 461 float;
 #X text 149 476 symbol;
 #X text 149 491 array;
-#N canvas 106 165 428 349 help-template1 0;
+#N canvas 98 230 428 349 help-template1 0;
 #X obj 23 43 struct struct-1 float x float y symbol dog array weasel
 struct-2;
 #X text 20 182 This just displays a red square to visualize the data
@@ -77,10 +77,11 @@ a symbol and "weasel" is an array of objects of the data structure
 "struct-2".;
 #X text 21 286 To learn about z-ordering with data structures \, open
 the abstraction below:;
-#X obj 24 321 z_ordering_in_data_structures;
+#X obj 21 319 pddp/pddplink ./all_about_z_order.pd -text all_about_z_order.pd
+;
 #X connect 0 0 7 0;
 #X restore 101 96 pd help-template1;
-#N canvas 105 189 428 125 help-template2 0;
+#N canvas 99 252 428 125 help-template2 0;
 #X obj 23 43 struct struct-2 float y;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
@@ -89,26 +90,26 @@ the abstraction below:;
 point "y". It's used for the elements of the array shown in the other
 template.;
 #X restore 101 118 pd help-template2;
-#N canvas 59 240 428 307 struct-help-data 0;
-#X scalar struct-1 95 57 symbol \; 17 \; 38 \; 2 \; 39 \; 14 \; \;
+#N canvas 83 305 428 348 struct-help-data 0;
+#X scalar struct-1 95 43 symbol \; 17 \; 38 \; 2 \; 39 \; 14 \; \;
 ;
-#X scalar struct-1 164 57 symbol \; 17 \; 1 \; 40 \; 2 \; 14 \; \;
+#X scalar struct-1 164 43 symbol \; 17 \; 1 \; 40 \; 2 \; 14 \; \;
 ;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 8 2 [struct] Related Objects;
-#X scalar struct-1 239 57 symbol \; 17 \; 38 \; 2 \; 39 \; 14 \; \;
+#X scalar struct-1 239 43 symbol \; 17 \; 38 \; 2 \; 39 \; 14 \; \;
 ;
-#X text 19 259 You can also right-click on each square and choose "Properties"
+#X text 19 279 You can also right-click on each square and choose "Properties"
 in both runmode and editmode to see the values associated with each
 scalar.;
-#X text 20 179 In editmode \, you can click on the squares to move
+#X text 20 178 In editmode \, you can click on the squares to move
 them. Like other objects in Pd \, you can select multiple scalars and
 move them together (notice the blue bounding box when you select them).
 A [print] object is connected to the outlet of the corresponding [struct]
 for these boxes \, so when you move them with the mouse messages will
 print to the console.;
-#X text 20 117 The three squares above are scalars that are defined
+#X text 20 103 The three squares above are scalars that are defined
 by the template "help-template1". The zigzag lines are arrays \, the
 elements of which are defined by the template "help-template2". In
 runmode you can click and drag each element to change its value.;
@@ -120,7 +121,7 @@ the patch below:;
 data will be visualized. Two data structures- "struct-1" and "struct-2"-
 are defined below in subpatches:;
 #X text 169 393 - the name of the struct;
-#N canvas 80 458 429 105 struct_names 0;
+#N canvas 81 487 429 105 struct_names 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 8 2 [struct] Struct Names;
@@ -150,7 +151,8 @@ create the field "foo" \, use the syntax below for each type:;
 #X text 81 393 1) symbol atom;
 #X text 81 411 n) symbol atom;
 #X obj 99 560 pddp/pddplink scalar-help.pd;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 98 576 pddp/pddplink all_about_arrays.pd;
 #X obj 257 561 pddp/pddplink ../4.data.structures/06.file.pd -text
 doc/4.data.structures/06.file.pd;

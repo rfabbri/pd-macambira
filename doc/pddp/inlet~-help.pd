@@ -1,4 +1,4 @@
-#N canvas 1 53 555 619 10;
+#N canvas 0 0 555 619 10;
 #X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
 14 -228856 -66577 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header inlet~ 3 12 0 18
@@ -74,7 +74,7 @@ Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
 #X obj 451 20 pddp/pddplink http://wiki.puredata.info/en/inlet~ -text
 pdpedia: inlet~;
 #X text 98 385 signal;
-#N canvas 60 123 428 466 up/downsampling 0;
+#N canvas 61 152 428 466 up/downsampling 0;
 #X obj 30 396 print~;
 #X obj 48 370 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
 -1;

@@ -1,4 +1,4 @@
-#N canvas 1 53 555 619 10;
+#N canvas 0 0 555 619 10;
 #X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
 14 -228856 -66577 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header list 3 12 0 18 -204280
@@ -27,7 +27,7 @@ length;
 0 13 -228856 -1 0;
 #X obj 0 506 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
 0 13 -228856 -1 0;
-#N canvas 99 484 428 109 Related_objects 0;
+#N canvas 92 536 428 109 Related_objects 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 [list] Related Objects;
@@ -43,7 +43,7 @@ length;
 #X obj 493 3 list;
 #X obj 465 20 pddp/pddplink http://wiki.puredata.info/en/list -text
 pdpedia: list;
-#N canvas 0 83 555 502 append 0;
+#N canvas 1 112 555 502 append 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header empty 3 12 0 14
 -204280 -1 0;
 #X obj 13 3 list append;
@@ -98,7 +98,7 @@ to the outlet.;
 #X connect 24 0 16 1;
 #X connect 25 0 16 1;
 #X restore 102 365 pd append;
-#N canvas 87 25 428 592 about-lists 0;
+#N canvas 89 83 428 592 about-lists 0;
 #X obj 22 567 print message;
 #X msg 22 380 list x.wav 44100;
 #X msg 22 538 read \$1 \$2;
@@ -163,7 +163,7 @@ implied if the first data item is a number.;
 #X msg 276 68 cornbread;
 #X text 98 510 Here are some examples showing how to use these objects
 to compose and/or use variable length messages:;
-#N canvas 19 21 525 646 simple_sequencer 0;
+#N canvas 20 53 525 646 simple_sequencer 0;
 #X obj 23 173 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 232 176 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -230,7 +230,7 @@ the list.;
 #X connect 17 0 14 0;
 #X connect 18 0 11 0;
 #X restore 401 546 pd simple_sequencer;
-#N canvas 126 39 397 569 another_sequencer 0;
+#N canvas 127 68 397 569 another_sequencer 0;
 #X obj 66 263 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 292 266 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -281,7 +281,7 @@ by taking the "pitch" output before the delay object (previously the
 #X connect 16 1 11 1;
 #X connect 16 2 19 0;
 #X restore 401 568 pd another_sequencer;
-#N canvas 47 147 447 426 serializer 0;
+#N canvas 48 176 447 426 serializer 0;
 #X obj 19 287 list split 1;
 #X obj 19 378 print;
 #X obj 19 204 until;
@@ -311,7 +311,7 @@ append" above.;
 #X connect 5 0 2 1;
 #X connect 6 0 4 0;
 #X restore 241 568 pd serializer;
-#N canvas 100 215 428 350 lists_vs_non-lists 0;
+#N canvas 101 244 428 350 lists_vs_non-lists 0;
 #X obj 23 290 list append 1 2;
 #X floatatom 23 120 5 0 0 0 - - -;
 #X msg 23 95 1 2 3;
@@ -527,7 +527,7 @@ as bang);
 #X connect 16 0 12 0;
 #X connect 26 0 12 0;
 #X restore 102 431 pd trim;
-#N canvas 1 99 555 490 length 0;
+#N canvas 2 128 555 490 length 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header empty 3 12 0 14
 -204280 -1 0;
 #X obj 0 374 cnv 3 520 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
@@ -571,7 +571,7 @@ list.;
 #X restore 102 453 pd length;
 #X text 98 307 symbol atom;
 #X text 98 322 float;
-#N canvas 49 88 428 419 list_conversion_in_Pd 0;
+#N canvas 51 146 428 419 list_conversion_in_Pd 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 [list] Conversion;

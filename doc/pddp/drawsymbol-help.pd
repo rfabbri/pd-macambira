@@ -55,7 +55,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 -text pdpedia: drawsymbol;
 #X text 98 449 Keyboard entry is not yet supported for drawsymbol.
 ;
-#N canvas 31 151 428 164 drawsymbol-help-data 0;
+#N canvas 32 180 428 164 drawsymbol-help-data 0;
 #X scalar drawsymbol-help-template 101 61 whiskers rex 1 \;;
 #X scalar drawsymbol-help-template 251 61 converse tinker 1 \;;
 #X obj 1 1 cnv 15 425 20 empty empty empty 20 12 2 14 -204280 -195568
@@ -66,7 +66,7 @@ right-click on the scalar and choose "Properties" to change its field
 values (remember to click "Ok" when you are finished).;
 #X text 6 1 Window to Display Data Structures;
 #X restore 28 62 pd drawsymbol-help-data;
-#N canvas 121 44 428 509 drawsymbol-help-template 0;
+#N canvas 123 102 428 537 drawsymbol-help-template 0;
 #X obj 23 101 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #N canvas 441 67 465 142 init 0;
@@ -79,13 +79,13 @@ parent patch.;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;
 #X connect 3 0 0 0;
-#X restore 235 324 pd init;
-#X obj 22 307 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+#X restore 235 339 pd init;
+#X obj 22 322 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
-#X obj 22 348 set drawsymbol-help-template dog-vis;
-#X obj 22 435 struct drawsymbol-help-template float x float y symbol
+#X obj 22 363 set drawsymbol-help-template dog-vis;
+#X obj 22 457 struct drawsymbol-help-template float x float y symbol
 cat symbol dog float dog-vis;
 #X obj 23 200 drawsymbol -v dog-vis dog 0 -15 900 dog=;
 #X text 20 38 [drawsymbol] is used below to display the values of two
@@ -95,9 +95,9 @@ located at the bottom of this subpatch.;
 #X text 20 148 This [drawsymbol] object displays the field "cat". A
 toggle is connected to the inlet- this toggles visibility globally
 (i.e. \, for all instances of the data structure).;
-#X text 40 304 "0" makes a single instance of a "dog" field invisible
+#X text 40 319 "0" makes a single instance of a "dog" field invisible
 ;
-#X text 19 468 This object defines the fields for this template. Their
+#X text 19 490 This object defines the fields for this template. Their
 values were initialized when the help patch was created.;
 #X text 19 219 The [drawsymbol] object for "dog" instead uses the -v
 flag. This controls visilibility of the "dog" field for only one instance
@@ -105,7 +105,7 @@ of the data structure. "-v dog-vis" means the value of the field "dog-vis"
 determines whether "dog" will be visible. If you use the -v flag you
 can no longer use the inlet of this [drawsymbol] object to control
 visibility globally.;
-#X text 19 367 Using the [set] object \, we can turn visibility on
+#X text 19 382 Using the [set] object \, we can turn visibility on
 and off for an instance of the data structure by changing the value
 of "dog-vis". Notice when you click the toggle \, visibility only changes
 for one "dog"- the one which the [set] object is currently pointing
@@ -150,7 +150,8 @@ visible.;
 #X text 80 369 5) symbol atom;
 #X text 98 393 * Any of these can be numbers (float) or field names
 (symbol atom).;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 326 556 pddp/pddplink ../4.data.structures/09.scaling.pd -text
 doc/4.data.structure/09.scaling.pd;
 #X obj 326 571 pddp/pddplink ../4.data.structures/10.onoff.pd -text

@@ -85,7 +85,7 @@ value.;
 #X text 167 358 - (optional) initial value for the right inlet.;
 #X text 142 154 All these objects share similar behavior.;
 #X msg 183 51 2 1;
-#N canvas 48 6 428 611 understanding_MOD_and_DIV 0;
+#N canvas 49 53 428 611 understanding_MOD_and_DIV 0;
 #X text 24 35 [mod] and [div] are helpful objects to determine whether
 or not a fraction produces a remainder \, or to determine the value
 of the remainder.;
@@ -177,7 +177,7 @@ no remainder) \, while \, 4 / 3 = 1 with a remainder of one.;
 #X connect 43 0 33 1;
 #X connect 43 0 32 1;
 #X restore 101 430 pd understanding_MOD_and_DIV;
-#N canvas 60 308 428 254 understanding_%_modulus 0;
+#N canvas 61 337 428 254 understanding_%_modulus 0;
 #X floatatom 21 184 0 0 0 0 - - -;
 #X text 18 36 - this object has nothing to do with percentage!;
 #X text 18 56 - a modulus is a number by which two given numbers can
@@ -197,7 +197,7 @@ is .5. Therefore \, the modulus of 7 and 9 is "2".;
 #X connect 5 0 0 0;
 #X connect 6 0 5 0;
 #X restore 281 562 pd understanding_%_modulus;
-#N canvas 86 152 428 280 understanding_&_AND 0;
+#N canvas 87 181 428 280 understanding_&_AND 0;
 #X obj 174 221 &;
 #X floatatom 228 187 5 0 0 0 - - -;
 #X floatatom 270 188 5 0 0 0 - - -;
@@ -228,7 +228,7 @@ Hence the result will be "1001" -- in other words "9".;
 #X connect 9 0 3 0;
 #X connect 9 1 4 0;
 #X restore 281 430 pd understanding_&_AND;
-#N canvas 90 161 428 293 understanding_|_OR 0;
+#N canvas 92 219 428 293 understanding_|_OR 0;
 #X floatatom 137 261 0 0 0 0 - - -;
 #X floatatom 191 205 5 0 0 0 - - -;
 #X floatatom 233 206 5 0 0 0 - - -;
@@ -260,16 +260,16 @@ bits of both its operands is a "1".;
 #X connect 8 1 4 0;
 #X connect 10 0 0 0;
 #X restore 281 452 pd understanding_|_OR;
-#N canvas 92 198 428 276 understanding_<<_LEFT-SHIFT 0;
-#X obj 21 142 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 94 256 428 294 understanding_<<_LEFT-SHIFT 0;
+#X obj 21 149 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 21 160 t b b;
-#X msg 21 181 13;
-#X obj 21 222 <<;
-#X floatatom 21 244 5 0 0 0 - - -;
-#X msg 49 181 2;
-#X floatatom 87 193 5 0 0 0 - - -;
-#X floatatom 135 193 5 0 0 0 - - -;
+#X obj 21 167 t b b;
+#X msg 21 188 13;
+#X obj 21 229 <<;
+#X floatatom 21 251 5 0 0 0 - - -;
+#X msg 49 188 2;
+#X floatatom 87 200 5 0 0 0 - - -;
+#X floatatom 135 200 5 0 0 0 - - -;
 #X text 18 35 [<<] -- This is the left shift operator and it works
 by shifting the digits of the binary representation of the first operand
 (left inlet) to the left by the number of places specified by the second
@@ -289,16 +289,16 @@ to the left giving "110100":;
 #X connect 6 0 3 0;
 #X connect 7 0 3 1;
 #X restore 281 474 pd understanding_<<_LEFT-SHIFT;
-#N canvas 81 177 428 320 understanding_>>_RIGHT-SHIFT 0;
-#X obj 21 145 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 82 206 428 348 understanding_>>_RIGHT-SHIFT 0;
+#X obj 21 162 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 21 163 t b b;
-#X floatatom 21 247 5 0 0 0 - - -;
-#X floatatom 87 196 5 0 0 0 - - -;
-#X floatatom 135 196 5 0 0 0 - - -;
-#X msg 21 184 13;
-#X obj 21 225 >>;
-#X msg 49 184 2;
+#X obj 21 180 t b b;
+#X floatatom 21 264 5 0 0 0 - - -;
+#X floatatom 87 213 5 0 0 0 - - -;
+#X floatatom 135 213 5 0 0 0 - - -;
+#X msg 21 201 13;
+#X obj 21 242 >>;
+#X msg 49 201 2;
 #X text 18 35 [>>] -- This is the sign-propagating right shift operator
 which shifts the digits of the binary representation of the first operand
 (left inlet) to the right by the number of places specified by the
@@ -307,7 +307,7 @@ The copies of the leftmost bit are added on from the left \, thereby
 preserving the sign of the number. This next examples returns 3 ("11")
 as the two right-most bits of 13 ("1101") are shifted off to the right
 and discarded.;
-#X text 13 274 Note that this object preserves negative values for
+#X text 13 291 Note that this object preserves negative values for
 negative operands. ("sign-propagating").;
 #X obj 0 0 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
@@ -321,11 +321,11 @@ negative operands. ("sign-propagating").;
 #X connect 6 0 2 0;
 #X connect 7 0 6 1;
 #X restore 281 496 pd understanding_>>_RIGHT-SHIFT;
-#N canvas 91 135 428 384 understanding_&&_LOGICAL-AND 0;
-#X msg 52 249 5;
-#X obj 21 299 &&;
-#X floatatom 21 319 5 0 0 0 - - -;
-#X floatatom 190 257 5 0 0 0 - - -;
+#N canvas 94 222 428 418 understanding_&&_LOGICAL-AND 0;
+#X msg 52 259 5;
+#X obj 21 309 &&;
+#X floatatom 21 329 5 0 0 0 - - -;
+#X floatatom 190 267 5 0 0 0 - - -;
 #X text 18 36 [&&] - This is the logical AND operator \, which returns
 a Boolean true (a one) if both operands are true. Logically it follows
 that if the first operand is false \, then the whole expression is
@@ -333,22 +333,22 @@ false \, and this is how the objects works: It first evaluates the
 left hand operand (left inlet) and if this returns false (zero) then
 \, without going any further \, it returns a false (a zero). Otherwise
 it returns the value of the second operand (right inlet).;
-#X floatatom 233 257 5 0 0 0 - - -;
-#X text 18 344 Note that this is not a bitwise operator. It compares
+#X floatatom 233 267 5 0 0 0 - - -;
+#X text 18 354 Note that this is not a bitwise operator. It compares
 floats.;
-#X obj 21 207 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 21 217 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 21 225 t b b;
-#X msg 21 249 17;
-#X text 18 135 In other words \, IF the left inlet is zero \, THEN
+#X obj 21 235 t b b;
+#X msg 21 259 17;
+#X text 18 145 In other words \, IF the left inlet is zero \, THEN
 output zero. ELSEIF the left inlet is non-zero AND the right inlet
 is zero \, then output zero. ELSEIF the left inlet is non-zero AND
 the right inlet is non-zero \, THEN output non-zero!;
-#X obj 87 207 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 87 217 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 87 225 t b b;
-#X msg 87 249 17;
-#X msg 118 249 0;
+#X obj 87 235 t b b;
+#X msg 87 259 17;
+#X msg 118 259 0;
 #X obj 0 0 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 (binops2-3) Logical-and;
@@ -366,17 +366,17 @@ the right inlet is non-zero \, THEN output non-zero!;
 #X connect 13 0 1 0;
 #X connect 14 0 1 1;
 #X restore 281 518 pd understanding_&&_LOGICAL-AND;
-#N canvas 104 167 428 373 understanding_||_LOGICAL-OR 0;
-#X msg 52 240 5;
-#X floatatom 21 310 5 0 0 0 - - -;
+#N canvas 105 196 428 400 understanding_||_LOGICAL-OR 0;
+#X msg 52 250 5;
+#X floatatom 21 320 5 0 0 0 - - -;
 #X floatatom 192 251 5 0 0 0 - - -;
 #X floatatom 235 251 5 0 0 0 - - -;
-#X text 18 335 Note that this is not a bitwise operator. It compares
+#X text 18 345 Note that this is not a bitwise operator. It compares
 floats.;
-#X obj 21 198 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 21 208 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 21 216 t b b;
-#X msg 21 240 17;
+#X obj 21 226 t b b;
+#X msg 21 250 17;
 #X text 18 35 [||] -- This is the logical OR operator and it returns
 a value of true (non-zero) if one or both of the operands is true.
 It works by first evaluating the left-hand operand (left inlet) and
@@ -384,16 +384,16 @@ It works by first evaluating the left-hand operand (left inlet) and
 and returning a non-zero. If \, however \, the left-hand operand (left
 inlet) is false \, then it returns the value of the right-hand operand
 (right inlet).;
-#X text 18 136 In other words \, IF the left inlet is non-zero \, THEN
+#X text 18 146 In other words \, IF the left inlet is non-zero \, THEN
 output non-zero. ELSEIF the left inlet is zero AND the right inlet
 is zero \, then output zero. ELSEIF the left inlet is zero AND the
 right inlet is non-zero \, THEN output non-zero!;
-#X obj 21 290 ||;
-#X obj 92 197 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 21 300 ||;
+#X obj 92 207 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 92 215 t b b;
-#X msg 92 239 0;
-#X msg 123 239 0;
+#X obj 92 225 t b b;
+#X msg 92 249 0;
+#X msg 123 249 0;
 #X obj 0 0 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 (binops2-3) Logical-or;
@@ -413,8 +413,9 @@ right inlet is non-zero \, THEN output non-zero!;
 #X restore 281 540 pd understanding_||_LOGICAL-OR;
 #X text 98 385 Relational Operators;
 #X text 278 385 Logical Operators;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
-#N canvas 75 34 428 577 Relational_Operators 0;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
+#N canvas 76 63 428 577 Relational_Operators 0;
 #X obj 0 0 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X floatatom 227 354 0 0 0 0 - - -;
@@ -493,7 +494,7 @@ inlet) and the condition (right inlet or creation argument).;
 #X connect 36 0 26 0;
 #X connect 36 1 26 1;
 #X restore 101 408 pd Relational_Operators;
-#N canvas 78 160 428 247 Logical_Operators 0;
+#N canvas 79 189 428 247 Logical_Operators 0;
 #X obj -1 0 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12
 0 14 -204280 -1 0;
 #X text 7 1 (binops2-3) Logical Operators-- a.k.a. "Bit Twiddling"

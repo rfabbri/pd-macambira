@@ -3,7 +3,7 @@
 -228856 -66577 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header abs 3 12 0 18 -204280
 -1 0;
-#X obj 0 452 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 15 12 0 13
+#X obj 0 452 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
 #N canvas 48 237 507 320 META 0;
 #X text 12 115 LIBRARY internal;
@@ -65,6 +65,7 @@ will be used as input.;
 ;
 #X text 98 459 float;
 #X text 168 459 - the incoming value.;
-#X obj 4 598 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 598 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X connect 14 0 16 0;
 #X connect 16 0 13 0;

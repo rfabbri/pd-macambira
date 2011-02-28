@@ -23,7 +23,7 @@ Jonathan Wilkes to conform to the PDDP template for Pd version 0.42.
 0 13 -228856 -1 0;
 #X obj 0 529 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
 0 13 -228856 -1 0;
-#N canvas 78 281 428 334 Related_objects 0;
+#N canvas 84 273 428 334 Related_objects 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 8 2 [table] Related Objects;
@@ -74,7 +74,7 @@ item.;
 #X text 99 321 Unfortunately there's no way to set vertical range \,
 etc.;
 #X text 98 561 For help on graphical arrays \, see:;
-#N canvas 74 252 428 203 table_vs_garray_from_Put_menu 0;
+#N canvas 74 365 428 203 table_vs_garray_from_Put_menu 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 8 2 [table] vs. "Put" menu array: what's the difference?;
@@ -113,7 +113,8 @@ is given \, [table] objects will be named "table1" \, "table2" \, "table3"
 \, etc.);
 #X text 167 505 - (optional) initial size of the array (default is
 100).;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 98 576 pddp/pddplink garray-help.pd;
 #X connect 24 0 23 0;
 #X connect 28 0 30 0;

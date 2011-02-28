@@ -1,4 +1,4 @@
-#N canvas 0 26 599 578 10;
+#N canvas 1 53 599 578 10;
 #N canvas 249 339 391 135 \$0-controlled 0;
 #X text 150 50 3I6OO9 3I6OO;
 #X restore 319 11 pd \$0-controlled;
@@ -10,7 +10,7 @@
 -1 0 1;
 #X msg 310 107 vis \$1;
 #X obj 310 134 s pd-\$0-controlled;
-#N canvas 11 26 915 645 (subpatch) 0;
+#N canvas 12 55 915 645 (subpatch) 0;
 #X obj 28 5 r pd-\$0-controlled;
 #X obj 28 27 route vis;
 #X obj 28 49 sel 1;

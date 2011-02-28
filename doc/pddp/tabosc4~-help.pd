@@ -140,7 +140,7 @@ table (e.g. \, "set table2" in the example above).;
 #X text 98 395 list;
 #X text 167 395 - a list will be truncated to the first item.;
 #X text 98 427 signal;
-#N canvas 71 165 428 199 init_tables 0;
+#N canvas 72 194 428 199 init_tables 0;
 #X msg 23 99 \; table1 sinesum 512 0.5 0.5 0.5 0.5 \; table2 cosinesum
 512 0 1;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
@@ -173,7 +173,8 @@ of the last point and the first two points \, respectively. The "sinesum"
 and "cosinesum" methods for arrays do this automatically for you if
 you just want to specify partial strengths.;
 #X text 80 471 1) symbol atom;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 455 51 pddp/dsp;
 #X obj 98 530 pddp/pddplink all_about_arrays.pd;
 #X obj 98 545 pddp/pddplink ../3.audio.examples/B01.wavetables.pd -text

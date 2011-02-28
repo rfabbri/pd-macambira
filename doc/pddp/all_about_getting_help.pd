@@ -1,4 +1,4 @@
-#N canvas 0 31 448 570 10;
+#N canvas 0 0 448 570 10;
 #X obj 1 1 cnv 15 445 20 empty \$0-pddp.cnv.header getting_help_in_Pure_Data
 20 10 1 18 -261106 -33289 0;
 #X obj 407 2 pddp/pddplink http://puredata.info/dev/pddp -text pddp
