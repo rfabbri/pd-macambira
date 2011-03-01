@@ -23,6 +23,7 @@ set ::kiosk::config(HideMain) True
 set ::kiosk::config(WindowTitle) "Pd KIOSK"
 set ::kiosk::config(HidePopup) True
 set ::kiosk::config(ScrollBars) False
+set ::kiosk::config(QuitOnClose) True
 
 
 
@@ -73,6 +74,11 @@ proc ::kiosk::makekiosk {mywin} {
 # (makes mostly sense in non-fullscren...)
     if { $::kiosk::config(WindowTitle) != "" } {
         wm title $mywin $::kiosk::config(WindowTitle)
+    }
+
+    if { $::kiosk::config(QuitOnClose) } {
+        wm protocol $mywin WM_DELETE_WINDOW "pdsend \"pd quit\""
+        #bind $mywin <Destroy> "pdsend \"pd quit\""
     }
 }
 
