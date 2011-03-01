@@ -24,6 +24,8 @@ set ::kiosk::config(WindowTitle) "Pd KIOSK"
 set ::kiosk::config(HidePopup) True
 set ::kiosk::config(ScrollBars) False
 set ::kiosk::config(QuitOnClose) True
+set ::kiosk::config(PreventClose) True
+set ::kiosk::config(Bindings) False
 
 
 
@@ -76,12 +78,32 @@ proc ::kiosk::makekiosk {mywin} {
         wm title $mywin $::kiosk::config(WindowTitle)
     }
 
-    if { $::kiosk::config(QuitOnClose) } {
-        wm protocol $mywin WM_DELETE_WINDOW "pdsend \"pd quit\""
-        #bind $mywin <Destroy> "pdsend \"pd quit\""
+# close pd if the window is closed (or no close at all)
+    if { $::kiosk::config(PreventClose) } {
+        # prevent WindowClose using Alt-F4 or clicking on the "x"
+        wm protocol $mywin WM_DELETE_WINDOW ";"
+    } {
+        # if we do allow closing of windows, we might want to Quit as well
+        if { $::kiosk::config(QuitOnClose) } {
+            #wm protocol $mywin WM_DELETE_WINDOW "pdsend \"pd quit\""
+            bind $mywin <Destroy> "pdsend \"pd quit\""
+        }
+    }
+
+# remove all special key/mouse bindings from the window
+    if { $::kiosk::config(Bindings) } { } {
+        set mycnv [tkcanvas_name $mywin ]
+        bindtags $mywin ""
+        bindtags $mycnv "$mycnv"
+# rebind ordinary keypress events
+        bind $mycnv <KeyPress>         {::pd_bindings::sendkey %W 1 %K %A 0}
+        bind $mycnv <KeyRelease>       {::pd_bindings::sendkey %W 0 %K %A 0}
+        bind $mycnv <Shift-KeyPress>   {::pd_bindings::sendkey %W 1 %K %A 1}
+        bind $mycnv <Shift-KeyRelease> {::pd_bindings::sendkey %W 0 %K %A 1}
+
+# TODO suppress Alt-F4
     }
 }
-
 
 
 ######################################
