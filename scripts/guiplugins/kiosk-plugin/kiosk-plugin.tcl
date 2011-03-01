@@ -30,7 +30,13 @@ proc ::kiosk::readconfig {{fname kiosk.cfg}} {
   if {[file exists $fname]} {
     set fp [open $fname r]
   } else {
-    return False
+      set fname [file join $::current_plugin_loadpath $fname]
+      if {[file exists $fname]} {
+          set fp [open $fname r]
+      } else {
+          puts "kiosk.cfg not found"
+          return False
+      }
   }
   while {![eof $fp]} {
     set data [gets $fp]
