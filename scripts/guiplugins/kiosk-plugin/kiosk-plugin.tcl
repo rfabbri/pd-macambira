@@ -42,8 +42,12 @@ proc ::kiosk::readconfig {{fname kiosk.cfg}} {
       }
   }
   while {![eof $fp]} {
-    set data [gets $fp]
-    set ::kiosk::config([lindex $data 0]) [lindex $data 1]
+      set data [gets $fp]
+      if { [string is list $data ] } {
+          if { [llength $data ] > 1 } {
+              set ::kiosk::config([lindex $data 0]) [lindex $data 1]
+          }
+      }
   }
 
 
@@ -92,6 +96,7 @@ proc ::kiosk::makekiosk {mywin} {
 
 # remove all special key/mouse bindings from the window
     if { $::kiosk::config(Bindings) } { } {
+puts "prevent bindigns"
         set mycnv [tkcanvas_name $mywin ]
         bindtags $mywin ""
         bindtags $mycnv "$mycnv"
@@ -100,8 +105,6 @@ proc ::kiosk::makekiosk {mywin} {
         bind $mycnv <KeyRelease>       {::pd_bindings::sendkey %W 0 %K %A 0}
         bind $mycnv <Shift-KeyPress>   {::pd_bindings::sendkey %W 1 %K %A 1}
         bind $mycnv <Shift-KeyRelease> {::pd_bindings::sendkey %W 0 %K %A 1}
-
-# TODO suppress Alt-F4
     }
 }
 
