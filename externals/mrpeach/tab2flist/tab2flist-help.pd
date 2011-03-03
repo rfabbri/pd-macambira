@@ -1,4 +1,4 @@
-#N canvas 650 129 535 282 10;
+#N canvas 1 53 535 282 10;
 #X obj 152 152 tab2flist zig;
 #X obj 10 -5 bng 15 250 50 0 empty empty empty 17 7 0 10 -4034 -257985
 -1;
@@ -23,6 +23,18 @@
 #X msg 109 92 delimiter 10 13;
 #X text 207 91 Output stops when a delimiter is encountered.;
 #X text 145 243 2009_1_28 Martin Peach;
+#N canvas 456 322 494 344 META 0;
+#X text 12 155 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 135 AUTHOR Martin Peach;
+#X text 12 5 KEYWORDS control conversion array list_op;
+#X text 12 46 DESCRIPTION output the values from an array as a list
+of floats;
+#X text 12 75 INLET_0 bang float list set delimiter;
+#X text 12 95 INLET_1 float;
+#X text 12 115 OUTLET_0 list;
+#X restore 474 246 pd META;
 #X connect 0 0 2 0;
 #X connect 1 0 0 0;
 #X connect 4 0 0 1;
