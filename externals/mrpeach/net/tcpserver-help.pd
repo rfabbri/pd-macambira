@@ -1,4 +1,4 @@
-#N canvas 485 23 1284 779 12;
+#N canvas 1 53 1284 779 12;
 #X msg 39 -10 print;
 #X floatatom 344 316 5 0 0 0 - - -;
 #X floatatom 368 366 5 0 0 0 - - -;
@@ -120,6 +120,21 @@ hang pd!;
 tcpserver will stop sending until it receives an unblock message;
 #X obj 652 359 print blocked;
 #X text -69 476 2010/03/27 Martin Peach;
+#N canvas 529 82 494 344 META 0;
+#X text 12 225 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 205 AUTHOR Martin Peach;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 5 KEYWORDS control network;
+#X text 12 45 DESCRIPTION wait for clients to connect to its port;
+#X text 12 65 INLET_0 float list client disconnectclient disconnectsocket
+send print broadcast dump clientbuf unblock;
+#X text 12 105 OUTLET_0 anything;
+#X text 12 125 OUTLET_1 float;
+#X text 12 145 OUTLET_2 float;
+#X text 12 165 OUTLET_3 list;
+#X text 12 185 OUTLET_4 sent client blocked;
+#X restore 839 398 pd META;
 #X connect 0 0 60 0;
 #X connect 3 0 4 0;
 #X connect 3 1 5 0;

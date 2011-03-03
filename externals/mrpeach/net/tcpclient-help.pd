@@ -1,4 +1,4 @@
-#N canvas 184 70 1096 649 12;
+#N canvas 1 53 1096 649 12;
 #X msg -112 56 disconnect;
 #X obj 219 439 unpack 0 0 0 0;
 #X floatatom 219 462 3 0 0 0 - - -;
@@ -8,7 +8,7 @@
 #X text 179 461 from;
 #X obj 199 387 tcpclient;
 #X obj 239 413 tgl 15 0 empty empty connected 18 7 0 8 -24198 -13381
--1 1 1;
+-1 0 1;
 #X msg -88 80 dump \$1;
 #X obj -140 65 tgl 15 0 empty empty empty 0 -6 0 8 -4034 -13381 -1
 0 1;
@@ -43,7 +43,7 @@ be transmitted or received.;
 #X text 545 281 'send' prefix is optional;
 #X obj 199 514 spigot;
 #X obj 238 491 tgl 15 0 empty empty enable_print 18 7 0 8 -24198 -13381
--1 1 1;
+-1 0 1;
 #X obj 199 543 print >>>;
 #X text 272 24 GET http:///index.phpCRLF;
 #X floatatom 374 483 9 0 0 0 - - -;
@@ -73,6 +73,21 @@ be transmitted or received.;
 must be unblocked manually;
 #X text 444 482 Number of bytes sent;
 #X obj 474 433 print sender_blocked!;
+#N canvas 529 268 494 344 META 0;
+#X text 12 215 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 195 AUTHOR Martin Peach;
+#X text 12 45 DESCRIPTION connect to a server and send and receive
+messages as lists of bytes;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 85 INLET_0 list buf verbosity connect send disconnect dump
+unblock;
+#X text 12 115 OUTLET_0 list;
+#X text 12 5 KEYWORDS control network;
+#X text 12 135 OUTLET_1 list;
+#X text 12 155 OUTLET_2 float;
+#X text 12 175 OUTLET_3 sent buf blocked;
+#X restore 733 551 pd META;
 #X connect 0 0 7 0;
 #X connect 1 0 2 0;
 #X connect 1 1 3 0;

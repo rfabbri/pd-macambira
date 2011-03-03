@@ -1,4 +1,4 @@
-#N canvas 238 314 742 409 12;
+#N canvas 1 53 742 431 12;
 #X floatatom 414 304 3 0 0 0 - - -;
 #X floatatom 441 304 3 0 0 0 - - -;
 #X floatatom 468 304 3 0 0 0 - - -;
@@ -30,6 +30,18 @@ to use multicasting;
 #X text 486 360 Martin Peach 2010/10/15;
 #X text -12 3 [udpreceive] receives datagrams over a udp connection
 and outputs them as raw bytes.;
+#N canvas 529 53 494 344 META 0;
+#X text 12 155 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 135 AUTHOR Martin Peach;
+#X text 12 5 KEYWORDS control network;
+#X text 12 45 DESCRIPTION receive datagrams over a udp connection and
+outputs them as raw bytes;
+#X text 12 75 INLET_0 status port;
+#X text 12 95 OUTLET_0 anything;
+#X text 12 115 OUTLET_1 received total from multicast;
+#X restore 657 396 pd META;
 #X connect 4 0 17 0;
 #X connect 4 1 20 0;
 #X connect 6 0 0 0;
