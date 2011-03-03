@@ -1,4 +1,4 @@
-#N canvas 334 350 923 562 12;
+#N canvas 1 53 923 562 12;
 #X obj 81 389 cnv 15 200 40 empty empty empty 20 12 0 14 -4034 -66577
 0;
 #X obj -76 40 udpreceive 9997;
@@ -46,6 +46,18 @@ it until the time occurs;
 #X text 177 319 [set( reassigns outputs from left to right;
 #X text 81 294 [paths( will print the current OSC addresses to Pd console
 ;
+#N canvas 498 257 494 344 META 0;
+#X text 12 155 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 135 AUTHOR Roman Haefeli;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 45 DESCRIPTION parses lists of floats (only integers on
+[0..255]) as OSC packets.;
+#X text 12 75 INLET_0 list verbosity paths set;
+#X text 12 95 OUTLET_N list;
+#X text 12 115 OUTLET_R list;
+#X restore 708 522 pd META;
 #X connect 1 0 7 0;
 #X connect 1 1 24 0;
 #X connect 7 0 14 0;
