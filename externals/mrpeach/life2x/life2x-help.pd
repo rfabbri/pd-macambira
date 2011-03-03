@@ -1,4 +1,4 @@
-#N canvas 374 0 898 909 10;
+#N canvas 1 53 898 909 10;
 #X obj 369 293 bng 15 250 50 0 empty empty single_step 17 7 0 10 -4160
 -4034 -4034;
 #X msg 124 46 dump;
@@ -174,7 +174,7 @@
 #X obj -44 481 r c7;
 #X obj 448 270 metro 1000;
 #X obj 417 255 tgl 15 0 empty empty run -3 -8 0 10 -4160 -4034 -4034
-1 1;
+0 1;
 #X floatatom -11 560 2 0 0 0 - - -;
 #X floatatom 6 560 2 0 0 0 - - -;
 #X floatatom 23 560 2 0 0 0 - - -;
@@ -322,11 +322,11 @@
 #X floatatom 268 114 5 0 0 0 - - -;
 #X msg 208 130 novar \$1;
 #X obj 704 407 nbx 5 14 -1e+37 1e+37 0 0 empty empty generation -65
-8 0 10 -4160 -4034 -4034 1885 256;
+8 0 10 -4160 -4034 -4034 0 256;
 #X obj 670 441 nbx 5 14 -1e+37 1e+37 0 0 empty empty delta -35 8 0
 10 -4160 -4034 -4034 0 256;
 #X obj 687 424 nbx 5 14 -1e+37 1e+37 0 0 empty empty alive -35 8 0
-10 -4160 -4034 -4034 15 256;
+10 -4160 -4034 -4034 0 256;
 #X obj 755 389 bng 15 250 50 0 empty empty dead 17 7 0 10 -258113 -262144
 -4034;
 #X obj 738 440 bng 15 250 50 0 empty empty no_variation 17 7 0 10 -258113
@@ -381,6 +381,17 @@ rows;
 #X text 33 89 flip array vertical:;
 #X text 25 109 invert values for display:;
 #X text -40 130 generations of no variation before bang:;
+#N canvas 529 268 494 344 META 0;
+#X text 12 135 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 115 AUTHOR Martin Peach;
+#X text 12 65 INLET_0 clear dump fliph flipv invert novar randomize
+reset return shift thru rule set;
+#X text 12 95 OUTLET_N list;
+#X text 12 25 LICENSE GPL v3 or later;
+#X text 12 45 DESCRIPTION Game of Life;
+#X text 12 5 KEYWORDS control;
+#X restore 784 627 pd META;
 #X connect 0 0 25 0;
 #X connect 1 0 25 0;
 #X connect 2 0 25 0;
