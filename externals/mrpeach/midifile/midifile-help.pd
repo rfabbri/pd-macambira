@@ -1,4 +1,4 @@
-#N canvas 375 332 399 237 12;
+#N canvas 1 53 399 237 12;
 #N canvas 189 27 888 819 midifile_write 0;
 #X obj 324 -2 bng 45 250 50 0 empty empty choose 5 23 0 8 -62784 -260818
 -258699;
@@ -324,3 +324,16 @@
 #X restore 76 83 pd midifile_read;
 #X text 15 10 midifile reads and writes MIDI files.;
 #X text 152 170 2010/12/11 Martin Peach;
+#N canvas 404 184 494 344 META 0;
+#X text 12 185 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 165 AUTHOR Martin Peach;
+#X text 12 5 KEYWORDS control MIDI;
+#X text 12 45 DESCRIPTION read and write MIDI files;
+#X text 12 65 INLET_0 bang float list rewind read track dump verbose
+write flush;
+#X text 12 105 OUTLET_0 list;
+#X text 12 125 OUTLET_1 float;
+#X text 12 145 OUTLET_2 bang;
+#X restore 335 202 pd META;
