@@ -1,4 +1,4 @@
-#N canvas 442 278 855 568 10;
+#N canvas 1 53 855 568 10;
 #X obj -98 77 packOSC;
 #X msg -98 52 /test 1 2 3 192 218 219 220 221 222;
 #X floatatom -72 99 5 0 0 0 - - -;
@@ -55,6 +55,17 @@ packet size to 1006...;
 #X text 31 530 Author: Martin Peach \, 2010/10/01;
 #X text 57 262 ...but a float argument to slipenc will set another
 maximum packet size;
+#N canvas 529 327 494 344 META 0;
+#X text 12 135 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 115 AUTHOR Martin Peach;
+#X text 12 5 KEYWORDS control conversion;
+#X text 12 95 OUTLET_0 anything;
+#X text 12 46 DESCRIPTION encode a list of bytes using Serial Line
+Internet Protocol (SLIP);
+#X text 12 75 INLET_0 float list;
+#X restore 693 530 pd META;
 #X connect 0 0 7 0;
 #X connect 1 0 0 0;
 #X connect 2 0 7 0;
