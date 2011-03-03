@@ -1,4 +1,4 @@
-#N canvas 317 25 826 629 10;
+#N canvas 1 53 749 629 10;
 #X obj 152 267 dac~;
 #X obj 168 205 line~;
 #X obj 171 162 hsl 128 15 0 1 0 0 empty empty level -2 -8 0 10 -4034
@@ -44,6 +44,18 @@ to the operator specified in the creation argument.;
 #X msg -166 -238 op nop;
 #X text -98 40 Print a list of allowed operators:;
 #X text -148 -92 set operator to >=:;
+#N canvas 529 140 494 344 META 0;
+#X text 12 155 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 135 AUTHOR Martin Peach;
+#X text 12 45 DESCRIPTION compare two inlet signals or floats according
+to the operator specified in the creation argument;
+#X text 12 75 INLET_0 signal op;
+#X text 12 95 INLET_1 signal;
+#X text 12 115 OUTLET_0 signal;
+#X text 12 5 KEYWORDS signal;
+#X restore 499 364 pd META;
 #X connect 1 0 4 1;
 #X connect 2 0 3 0;
 #X connect 3 0 1 0;
