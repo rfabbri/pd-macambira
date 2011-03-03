@@ -1,4 +1,4 @@
-#N canvas 387 330 609 543 10;
+#N canvas 1 53 609 569 10;
 #X obj 69 119 packOSCstream;
 #X obj 69 451 tcpsend;
 #X text -24 496 check also:;
@@ -33,6 +33,18 @@ front of every OSC packet or bundle \, so that the receiving side knows
 #X msg 56 89 [ \, /previous/page 666 \, /next/page 999 \, ];
 #X text 72 142 [packOSCstream] is meant to be a replacement for [packOSC]
 \, when sending over a stream based protocol \, such as TCP.;
+#N canvas 499 120 494 344 META 0;
+#X text 12 135 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 115 AUTHOR Roman Haefeli;
+#X text 12 75 INLET_0 anything send sendtyped prefix connect disconnect
+;
+#X text 12 45 DESCRIPTION meant to be a replacement for [packOSC] \,
+when sending over a stream based protocol \, such as TCP;
+#X text 12 95 OUTLET_0 float;
+#X text 12 5 KEYWORDS control network abstraction;
+#X restore 532 544 pd META;
 #X connect 0 0 1 0;
 #X connect 1 0 11 0;
 #X connect 5 0 1 0;

@@ -1,4 +1,4 @@
-#N canvas 170 252 558 300 10;
+#N canvas 1 53 558 300 10;
 #X obj 112 129 pipelist 1000;
 #X msg 198 83 5000;
 #X floatatom 198 107 5 0 0 0 - - -;
@@ -23,6 +23,17 @@
 #X obj 339 183 delay;
 #X obj 379 183 timer;
 #X obj 135 21 symbol;
+#N canvas 500 149 494 344 META 0;
+#X text 12 145 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 125 AUTHOR Roman Haefeli;
+#X text 12 5 KEYWORDS control list_op;
+#X text 12 45 DESCRIPTION delay lists;
+#X text 12 65 INLET_0 anything;
+#X text 12 85 INLET_1 float;
+#X text 12 105 OUTLET_0 list;
+#X restore 492 265 pd META;
 #X connect 0 0 11 0;
 #X connect 1 0 2 0;
 #X connect 2 0 0 1;
