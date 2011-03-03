@@ -1,4 +1,4 @@
-#N canvas 167 296 901 442 10;
+#N canvas 1 53 901 442 10;
 #X obj 388 325 print decoded;
 #X msg 319 159 192 192 192 192 192;
 #X floatatom 339 182 5 0 0 0 - - -;
@@ -47,6 +47,18 @@ OSC via [comport].;
 = 1;
 #X text 267 24 Verbosity might be useful if things don't seem to be
 working;
+#N canvas 500 267 494 344 META 0;
+#X text 12 155 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 135 AUTHOR Martin Peach;
+#X text 12 5 KEYWORDS control conversion;
+#X text 12 46 DESCRIPTION decode bytes from SLIP to raw. Useful for
+receiving OSC via [comport];
+#X text 12 75 INLET_0 float list verbosity;
+#X text 12 95 OUTLET_0 anything;
+#X text 12 115 OUTLET_1 float;
+#X restore 775 403 pd META;
 #X connect 1 0 11 0;
 #X connect 2 0 11 0;
 #X connect 5 0 11 0;
