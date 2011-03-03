@@ -1,4 +1,4 @@
-#N canvas 27 54 875 591 12;
+#N canvas 1 53 875 617 12;
 #X msg 83 78 rewind;
 #X obj 195 465 textfile;
 #X msg 60 55 bang;
@@ -36,7 +36,7 @@ if no more bytes.;
 #X msg 335 330 write \$1;
 #X obj 338 307 savepanel;
 #X msg 175 170 77 128 129 130;
-#X text 204 -50 The binfile object reads and writes binary files to
+#X text 254 -50 The binfile object reads and writes binary files to
 and from a buffer in memory. You can read a file and output its contents
 one byte at a time as floats.;
 #X text 422 26 To add bytes to the buffer \, first send "clear" to
@@ -63,6 +63,19 @@ the middle outlet.;
 #X obj 384 381 tgl 15 0 empty empty empty 17 7 0 10 -258113 -257985
 -1 0 1;
 #X text 688 468 Martin Peach 2009/10/13;
+#N canvas 506 311 494 344 META 0;
+#X text 12 175 HELP_PATCH_AUTHORS "pd meta" information added by Jonathan
+Wilkes for Pd version 0.42.;
+#X text 12 25 LICENSE GPL v2 or later;
+#X text 12 5 KEYWORDS control filesystem;
+#X text 12 45 DESCRIPTION read and write binary files;
+#X text 12 65 INLET_0 float bang list info read rewind clear add set
+write readat writeat symbol;
+#X text 12 95 OUTLET_0 float bang;
+#X text 12 115 OUTLET_1 list;
+#X text 12 135 OUTLET_2 bang;
+#X text 12 155 AUTHOR Martin Peach;
+#X restore 812 497 pd META;
 #X connect 0 0 10 0;
 #X connect 2 0 10 0;
 #X connect 3 0 10 0;
