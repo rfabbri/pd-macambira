@@ -188,7 +188,7 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
     // iterate through the motion components,
     // One more iteration (i == -1) corresponds to the whole image (global motion)
     j=0;
-    for( i = -1; i < seq->total; i++ ) {
+    if (seq->total) for( i = -1; i < seq->total; i++ ) {
 
         if( i < 0 ) { // case of the whole image
             comp_rect = cvRect( 0, 0, size.width, size.height );
@@ -199,7 +199,11 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
             comp_rect = ((CvConnectedComp*)cvGetSeqElem( seq, i ))->rect;
             if(( comp_rect.width + comp_rect.height < min_size )||( comp_rect.width + comp_rect.height > max_size )) // reject very small/big components 
                 continue;
+#ifdef _DARWIN_
+            color = CV_RGB(0,255,0);
+#else 
             color = CV_RGB(255,0,0);
+#endif
             magnitude = (comp_rect.width + comp_rect.height) /4;
         }
 
@@ -220,9 +224,6 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
         cvResetImageROI( mask );
         cvResetImageROI( silh );
 
-        // check for the case of little motion
-        if( count < comp_rect.width*comp_rect.height * 0.05 )
-            continue;
 
         // draw a clock with arrow indicating the direction
         center = cvPoint( (comp_rect.x + comp_rect.width/2),
@@ -259,7 +260,11 @@ void pix_opencv_motempl :: processRGBAImage(imageStruct &image)
     }
 
     
+#ifdef _DARWIN_
+    cvCvtColor( motion, rgba, CV_RGB2BGRA);
+#else 
     cvCvtColor( motion, rgba, CV_RGB2RGBA);
+#endif
     memcpy( image.data, rgba->imageData, image.xsize*image.ysize*4 );
 }
 
@@ -357,7 +362,7 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
     // iterate through the motion components,
     // One more iteration (i == -1) corresponds to the whole image (global motion)
     j=0;
-    for( i = -1; i < seq->total; i++ ) {
+    if (seq->total) for( i = -1; i < seq->total; i++ ) {
 
         if( i < 0 ) { // case of the whole image
             comp_rect = cvRect( 0, 0, size.width, size.height );
@@ -368,7 +373,11 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
             comp_rect = ((CvConnectedComp*)cvGetSeqElem( seq, i ))->rect;
             if(( comp_rect.width + comp_rect.height < min_size )||( comp_rect.width + comp_rect.height > max_size )) // reject very small/big components 
                 continue;
+#ifdef _DARWIN_
+            color = CV_RGB(0,255,0);
+#else 
             color = CV_RGB(255,0,0);
+#endif
             magnitude = (comp_rect.width + comp_rect.height) / 4;
         }
 
@@ -389,9 +398,6 @@ void pix_opencv_motempl :: processRGBImage(imageStruct &image)
         cvResetImageROI( mask );
         cvResetImageROI( silh );
 
-        // check for the case of little motion
-        if( count < comp_rect.width*comp_rect.height * 0.05 )
-            continue;
 
         // draw a clock with arrow indicating the direction
         center = cvPoint( (comp_rect.x + comp_rect.width/2),
@@ -534,7 +540,7 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
     // iterate through the motion components,
     // One more iteration (i == -1) corresponds to the whole image (global motion)
     j=0;
-    for( i = -1; i < seq->total; i++ ) {
+    if (seq->total) for( i = -1; i < seq->total; i++ ) {
 
         if( i < 0 ) { // case of the whole image
             comp_rect = cvRect( 0, 0, size.width, size.height );
@@ -545,7 +551,11 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
             comp_rect = ((CvConnectedComp*)cvGetSeqElem( seq, i ))->rect;
             if(( comp_rect.width + comp_rect.height < min_size )||( comp_rect.width + comp_rect.height > max_size )) // reject very small components
                 continue;
+#ifdef _DARWIN_
+            color = CV_RGB(0,255,0);
+#else 
             color = CV_RGB(255,0,0);
+#endif
             magnitude = (comp_rect.width + comp_rect.height) / 4;
         }
 
@@ -566,9 +576,6 @@ void pix_opencv_motempl :: processGrayImage(imageStruct &image)
         cvResetImageROI( mask );
         cvResetImageROI( silh );
 
-        // check for the case of little motion
-        if( count < comp_rect.width*comp_rect.height * 0.05 )
-            continue;
 
         // draw a clock with arrow indicating the direction
         center = cvPoint( (comp_rect.x + comp_rect.width/2),
