@@ -45,6 +45,7 @@ list-normalize -  normalize a list
 list-nth -  look up the nth element in a list. n has to be positive
 list-onearg - defaults for abstractions arguments
 list-pad -  pad a list with elements from a longer list 
+list-quicksort -  Sort a list of floats into ascending order using a quicksort
 list-random -  generate lists of pseudorandom integers
 list-rdrip -  drips or serializes a list in reverse.
 list-reduce -  apply a function of two arguments cumulatively to the items of a list

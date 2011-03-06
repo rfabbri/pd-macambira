@@ -37,6 +37,7 @@ using a Shell sort. Non-numbers are dropped;
 #X text 12 115 OUTLET_0 list;
 #X restore 611 564 pd META;
 #X msg 93 470;
+#X obj 430 541 list-quicksort;
 #X connect 1 0 20 1;
 #X connect 2 0 20 1;
 #X connect 3 0 20 1;
