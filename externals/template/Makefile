@@ -1,10 +1,11 @@
-## Pd library template version 1.0.8
+## Pd library template version 1.0.9
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = template
 
 # add your .c source files, one object per file, to the SOURCES
-# variable, help files will be included automatically
+# variable, help files will be included automatically, and for GUI
+# objects, the matching .tcl file too
 SOURCES = mycobject.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
@@ -232,6 +233,9 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install
 	test -z "$(strip $(SOURCES))" || (\
 		$(INSTALL_PROGRAM) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
 		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
+	test -z "$(strip $(shell ls $(SOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(shell ls $(SOURCES:.c=.tcl)) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
@@ -304,6 +308,8 @@ dist: $(DISTDIR)
 	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_DATA) $(ALLSOURCES)  $(DISTDIR)
+	test -z "$(strip $(shell ls $(ALLSOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(shell ls $(ALLSOURCES:.c=.tcl))  $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS)  $(DISTDIR)
 	test -z "$(strip $(HELPPATCHES))" || \
