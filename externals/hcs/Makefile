@@ -1,10 +1,11 @@
-## Pd library template version 1.0.3
+## Pd library template version 1.0.9
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
 LIBRARY_NAME = hcs
 
 # add your .c source files, one object per file, to the SOURCES
-# variable, help files will be included automatically
+# variable, help files will be included automatically, and for GUI
+# objects, the matching .tcl file too
 SOURCES = canvas_name.c ce_path.c classpath.c colorpanel.c cursor.c folder_list.c group.c helppath.c keyboard_layout.c passwd.c screensize.c setenv.c split_path.c sql_query.c stat.c sys_gui.c uname.c unsetenv.c version.c window_name.c
 
 # For objects that only build on certain platforms, add those to the SOURCES
@@ -35,7 +36,8 @@ EXTRA_DIST = README-ifeel.txt ifeel.h
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)/pd" -Wall -W -g
+# -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
+CFLAGS = -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
 LIBS = 
 
@@ -48,7 +50,7 @@ LIBS =
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
-CFLAGS += -DVERSION='"$(LIBRARY_VERSION)"'
+CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 
 PD_INCLUDE = $(PD_PATH)/include
 # where to install the library, overridden below depending on platform
@@ -66,7 +68,7 @@ ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) 
 	         $(SOURCES_iphoneos) $(SOURCES_linux) $(SOURCES_windows)
 
 DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
-ORIGDIR=pd-$(LIBRARY_NAME)_$(LIBRARY_VERSION)
+ORIGDIR=pd-$(LIBRARY_NAME:~=)_$(LIBRARY_VERSION)
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
@@ -112,7 +114,57 @@ ifeq ($(UNAME),Darwin)
     pkglibdir=$(HOME)/Library/Pd
   endif
 endif
+# Tho Android uses Linux, we use this fake uname to provide an easy way to
+# setup all this things needed to cross-compile for Android using the NDK
+ifeq ($(UNAME),ANDROID)
+  CPU := arm
+  SOURCES += $(SOURCES_android)
+  EXTENSION = pd_linux
+  OS = android
+  PD_PATH = /usr
+  NDK_BASE := /usr/local/android-ndk
+  NDK_PLATFORM_VERSION := 5
+  NDK_SYSROOT=$(NDK_BASE)/platforms/android-$(NDK_PLATFORM_VERSION)/arch-arm
+  NDK_UNAME := $(shell uname -s | tr '[A-Z]' '[a-z]')
+  NDK_TOOLCHAIN_BASE=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_UNAME)-x86
+  CC := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-gcc --sysroot=$(NDK_SYSROOT)
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += 
+  LDFLAGS += -Wl,--export-dynamic -shared
+  LIBS += -lc
+  STRIP := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-strip \
+	--strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
 ifeq ($(UNAME),Linux)
+  CPU := $(shell uname -m)
+  SOURCES += $(SOURCES_linux)
+  EXTENSION = pd_linux
+  OS = linux
+  PD_PATH = /usr
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += -fPIC
+  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
+ifeq ($(UNAME),GNU)
+  # GNU/Hurd, should work like GNU/Linux for basically all externals
+  CPU := $(shell uname -m)
+  SOURCES += $(SOURCES_linux)
+  EXTENSION = pd_linux
+  OS = linux
+  PD_PATH = /usr
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += -fPIC
+  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
+ifeq ($(UNAME),GNU/kFreeBSD)
+  # Debian GNU/kFreeBSD, should work like GNU/Linux for basically all externals
   CPU := $(shell uname -m)
   SOURCES += $(SOURCES_linux)
   EXTENSION = pd_linux
@@ -185,6 +237,9 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install
 	test -z "$(strip $(SOURCES))" || (\
 		$(INSTALL_PROGRAM) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
 		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
+	test -z "$(strip $(shell ls $(SOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(shell ls $(SOURCES:.c=.tcl)) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
@@ -257,6 +312,8 @@ dist: $(DISTDIR)
 	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_DATA) $(ALLSOURCES)  $(DISTDIR)
+	test -z "$(strip $(shell ls $(ALLSOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(shell ls $(ALLSOURCES:.c=.tcl))  $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS)  $(DISTDIR)
 	test -z "$(strip $(HELPPATCHES))" || \
