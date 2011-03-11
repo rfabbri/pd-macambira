@@ -67,9 +67,8 @@ static int libdir_loader(t_canvas *canvas, char *classname)
         if(sys_isabsolutepath(dirbuf)) // only include actual full paths
             canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path, 
                                                          dirbuf, 0);
-        if(sys_verbose)
-            post("libdir_loader: added '%s' to the canvas-local objectclass path",
-                 classname);
+        logpost(NULL, 3, "libdir_loader: added '%s' to the canvas-local objectclass path",
+                classname);
     }
     else
     {
@@ -85,13 +84,12 @@ static int libdir_loader(t_canvas *canvas, char *classname)
         strcat(helppathname, "/doc/5.reference/");
         strcat(helppathname, classname);
         sys_helppath = namelist_append(sys_helppath, helppathname, 0);
-        post("libdir_loader: added '%s' to the global objectclass path", 
-             classname);
+        logpost(NULL, 3, "libdir_loader: added '%s' to the global objectclass path", 
+                classname);
 //        post("\tThis is deprecated behavior.");
     }
     /* post("libdir_loader loaded fullclassname: '%s'\n", fullclassname); */
-    if (sys_verbose) 
-        post("Loaded libdir '%s' from '%s'", classname, dirbuf);
+    verbose(10,"Loaded libdir '%s' from '%s'", classname, dirbuf);
 
     return (1);
 }
@@ -100,11 +98,8 @@ void libdir_setup(void)
 {
 /* relies on t.grill's loader functionality, fully added in 0.40 */
     sys_register_loader(libdir_loader);
-    if(sys_verbose)
-    {
-        post("libdir loader %s",version);  
-        post("\tcompiled on "__DATE__" at "__TIME__ " ");
-        post("\tcompiled against Pd version %d.%d.%d.%s", PD_MAJOR_VERSION,
-             PD_MINOR_VERSION, PD_BUGFIX_VERSION, PD_TEST_VERSION);
-    }
+    logpost(NULL, 3, "libdir loader %s",version);  
+    logpost(NULL, 3, "\tcompiled on "__DATE__" at "__TIME__ " ");
+    logpost(NULL, 3, "\tcompiled against Pd version %d.%d.%d.%s", 
+            PD_MAJOR_VERSION, PD_MINOR_VERSION, PD_BUGFIX_VERSION, PD_TEST_VERSION);
 }
