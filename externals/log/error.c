@@ -46,7 +46,6 @@ static void error_float(t_error *x, t_float f)
 
 static void error_anything(t_error *x, t_symbol *s, int argc, t_atom *argv)
 {
-    post("error_anything %s", s->s_name);
     t_symbol* output = args2symbol(argc, argv);
     logpost(x, (const int)x->level, "%s%s%s %s",
             x->tag->s_name, (*x->tag->s_name ? ": " : ""), 
