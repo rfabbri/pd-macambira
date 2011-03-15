@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cw_binaural cxc cyclone earplug ekext ext13 extra freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir log mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdogg plugin pmpd sigpack smlib tof vanilla vbap windowing zexy
+LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cw_binaural cxc cyclone earplug ekext ext13 extra freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir log mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp pdlua pdogg plugin pmpd sigpack smlib tof vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1217,6 +1217,43 @@ pddp_install:
 
 pddp_clean:
 	make -C $(externals_src)/pddp clean
+
+
+#------------------------------------------------------------------------------#
+
+# Pdlua
+PDLUA_NAME = pdlua
+PDLUA_OBJECTS := $(wildcard $(externals_src)/pdlua/src/*.c)
+PDLUA_VERSION := $(shell grep VERSION $(externals_src)/pdlua/src/config.h | \
+	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
+
+pdlua:
+	make -C $(externals_src)/$(PDLUA_NAME)/src PD_PATH=$(pd_src) CFLAGS="$(CFLAGS)"
+
+pdlua_install: pdlua
+	install -d $(DESTDIR)$(objectsdir)/$(PDLUA_NAME)
+	echo "installing $(PDLUA_NAME) to $(DESTDIR)"
+	$(scripts_src)/generate-libdir-metafile.sh $(DESTDIR)$(objectsdir) $(PDLUA_NAME) \
+		--author "Claude Heiland-Allen Frank Barknecht Martin Peach" \
+		--license "GNU GPL" \
+		--description "lua loader for pd" \
+		--version "$(PDLUA_VERSION)"
+	install -p $(PDLUA_OBJECTS:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(PDLUA_NAME)
+	install -p $(externals_src)/pdlua/src/*.pd  $(DESTDIR)$(objectsdir)/$(PDLUA_NAME)
+	install -p $(externals_src)/pdlua/src/*.pd_lua  $(DESTDIR)$(objectsdir)/$(PDLUA_NAME)
+	install -p $(externals_src)/pdlua/src/*.pd_luax  $(DESTDIR)$(objectsdir)/$(PDLUA_NAME)
+	install -p $(externals_src)/pdlua/src/pd.lua  $(DESTDIR)$(objectsdir)/$(PDLUA_NAME)
+	install -d $(DESTDIR)$(readmesdir)
+	install -p $(externals_src)/pdlua/README $(DESTDIR)$(readmesdir)/$(PDLUA_NAME).txt
+	install -d $(DESTDIR)$(examplesdir)/$(PDLUA_NAME)
+	install -p $(externals_src)/pdlua/examples/*.pd $(DESTDIR)$(examplesdir)/$(PDLUA_NAME)
+	install -p $(externals_src)/pdlua/examples/*.pd_lua $(DESTDIR)$(examplesdir)/$(PDLUA_NAME)
+	install -p $(externals_src)/pdlua/examples/*.pd_luax $(DESTDIR)$(examplesdir)/$(PDLUA_NAME)
+	install -p $(externals_src)/pdlua/doc/*.txt $(DESTDIR)$(examplesdir)/$(PDLUA_NAME)
+pdlua_clean:
+	-rm -f -- $(PDLUA_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(externals_src)/pdlua/src/*.o
+	-rm -f -- $(externals_src)/pdlua/src/*~
 
 
 #------------------------------------------------------------------------------#
