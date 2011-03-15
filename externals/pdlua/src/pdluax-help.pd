@@ -1,0 +1,12 @@
+#N canvas 0 22 447 171 10;
+#X obj 134 144 hello;
+#X text 31 122 See also:;
+#X obj 33 88 pdluax hello;
+#X obj 123 88 pdluax hello;
+#X obj 213 88 pdluax hello;
+#X obj 303 88 pdluax hello;
+#X obj 88 144 pdlua;
+#X text 31 16 [pdluax foo] loads the source file "foo.pd_luax" on each
+object creation. Less efficient than the loader ([foo] loads "foo.pd_lua"
+just once for all time) but more flexible when developing or live-coding.
+;

@@ -1,0 +1,15 @@
+#N canvas 0 22 534 259 10;
+#X msg 44 58;
+#X text 118 58 << more methods will come (maybe);
+#X text 118 102 << global interface to pdlua;
+#X text 118 20 << load and run a Lua file (searches Pd's path);
+#X msg 17 21 load hello.lua;
+#X text 17 191 See also:;
+#X obj 37 216 hello;
+#X text 15 135 Side-effects:;
+#X obj 17 101 pdlua;
+#X obj 87 216 pdluax hello;
+#X text 29 157 [pdlua] registers a loader that allows Pd classes written
+in Lua to be loaded.;
+#X connect 0 0 8 0;
+#X connect 4 0 8 0;
