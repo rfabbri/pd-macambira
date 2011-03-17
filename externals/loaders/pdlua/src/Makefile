@@ -37,7 +37,13 @@ EXTRA_DIST = nothing
 # Lua setup
 #CFLAGS += -ansi -pedantic -O2 -fPIC -I/usr/include/lua5.1 -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
-LIBS = -llua5.1
+LIBS = 
+#LUACFLAGS = -DPD -DVERSION='"$(LIBRARY_VERSION)"'
+#LUACFLAGS += -fPIC -I"/usr/include/lua5.1" -I"$(PD_INCLUDE)/pd" -g
+LUACFLAGS = `pkg-config lua5.1 --cflags`
+LIBS = `pkg-config lua5.1 --libs` 
+LUACFLAGS += -DVERSION='"$(LIBRARY_VERSION)"'
+#LUACFLAGS += -DPD -fPIC -I"/usr/include/lua5.1" -I"$(PD_INCLUDE)/pd" -g
 
 #------------------------------------------------------------------------------#
 #
@@ -48,8 +54,6 @@ LIBS = -llua5.1
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
-LUACFLAGS = -DPD -DVERSION='"$(LIBRARY_VERSION)"'
-LUACFLAGS += -fPIC -I"/usr/include/lua5.1" -I"$(PD_INCLUDE)/pd" -g
 
 PD_INCLUDE = $(PD_PATH)/include
 # where to install the library, overridden below depending on platform
@@ -216,9 +220,11 @@ all: $(SOURCES:.c=.$(EXTENSION))
 %.o: %.c
 	@echo "compiling $(LIBRARY_NAME) version $(LIBRARY_VERSION)"
 	@echo "cflags are $(CFLAGS)"
-	@echo "optflags are $(OPTFLAGS)"
+	@echo "optcflags are $(OPT_CFLAGS)"
 	@echo "luacflags are $(LUACFLAGS)"
-	$(CC) $(CFLAGS) $(OPTFLAGS) $(LUACFLAGS) -o "$*.o" -c "$*.c"
+	@echo "ldflags are $(LDFLAGS)"
+	@echo "libs are $(LIBS)"
+	$(CC) $(CFLAGS) $(OPT_CFLAGS) $(LUACFLAGS) -o "$*.o" -c "$*.c"
 
 %.$(EXTENSION): %.o
 	@echo "linking $(LIBRARY_NAME) with $(LIBS)"
