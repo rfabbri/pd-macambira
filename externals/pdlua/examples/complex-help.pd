@@ -1,3 +1,0 @@
-#N canvas 82 285 450 282 10;
-#X obj 143 142 complex;
-#X obj 144 114 pdluax complex;
