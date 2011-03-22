@@ -37,12 +37,9 @@ EXTRA_DIST = nothing
 # Lua setup
 #CFLAGS += -ansi -pedantic -O2 -fPIC -I/usr/include/lua5.1 -I"$(PD_INCLUDE)/pd" -Wall -W -g
 LDFLAGS =  
-LIBS = 
 #LUACFLAGS = -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 #LUACFLAGS += -fPIC -I"/usr/include/lua5.1" -I"$(PD_INCLUDE)/pd" -g
-LUACFLAGS = `pkg-config lua5.1 --cflags`
-LIBS = `pkg-config lua5.1 --libs` 
-LUACFLAGS += -DVERSION='"$(LIBRARY_VERSION)"'
+LUACFLAGS = -DVERSION='"$(LIBRARY_VERSION)"'
 #LUACFLAGS += -DPD -fPIC -I"/usr/include/lua5.1" -I"$(PD_INCLUDE)/pd" -g
 
 #------------------------------------------------------------------------------#
@@ -90,6 +87,8 @@ ifeq ($(UNAME),Darwin)
     OPT_CFLAGS = -fast -funroll-loops -fomit-frame-pointer
 	CFLAGS := $(IPHONE_CFLAGS) $(OPT_CFLAGS) $(CFLAGS)
     LDFLAGS += -arch armv6 -bundle -undefined dynamic_lookup $(ISYSROOT)
+    LUACFLAGS += -I/usr/include/lua # lua is named differently on every platform, check this and change it to fit
+    LIBS += -llua  # lua is named differently on every platform, check this and change it to fit
     LIBS += -lc 
     STRIP = strip -x
     DISTBINDIR=$(DISTDIR)-$(OS)
@@ -110,6 +109,8 @@ ifeq ($(UNAME),Darwin)
     LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
     # if the 'pd' binary exists, check the linking against it to aid with stripping
     LDFLAGS += $(shell test -e $(PD_PATH)/bin/pd && echo -bundle_loader $(PD_PATH)/bin/pd)
+    LUACFLAGS += -I/usr/include/lua # lua is named differently on every platform, check this and change it to fit
+    LIBS += -llua  # lua is named differently on every platform, check this and change it to fit
     LIBS += -lc 
     STRIP = strip -x
     DISTBINDIR=$(DISTDIR)-$(OS)
@@ -134,6 +135,8 @@ ifeq ($(UNAME),ANDROID)
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += 
   LDFLAGS += -Wl,--export-dynamic -shared
+  LUACFLAGS += -I/usr/include/lua # lua is named differently on every platform, check this and change it to fit
+  LIBS += -llua  # lua is named differently on every platform, check this and change it to fit
   LIBS += -lc
   STRIP := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-strip \
 	--strip-unneeded -R .note -R .comment
@@ -148,6 +151,8 @@ ifeq ($(UNAME),Linux)
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += -fPIC -threepic
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  LUACFLAGS += -I/usr/include/lua5.1 # lua is named differently on every platform, check this and change it to fit
+  LIBS += -llua5.1  # lua is named differently on every platform, check this and change it to fit
   LIBS += -lc
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
@@ -163,6 +168,8 @@ ifeq ($(UNAME),GNU)
   CFLAGS += -fPIC
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
   LIBS += -lc
+  LUACFLAGS += -I/usr/include/lua # lua is named differently on every platform, check this and change it to fit
+  LIBS += -llua  # lua is named differently on every platform, check this and change it to fit
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
@@ -177,6 +184,8 @@ ifeq ($(UNAME),GNU/kFreeBSD)
   CFLAGS += -fPIC
   LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
   LIBS += -lc
+  LUACFLAGS += -I/usr/include/lua # lua is named differently on every platform, check this and change it to fit
+  LIBS += -llua  # lua is named differently on every platform, check this and change it to fit
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
@@ -189,6 +198,8 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
   CFLAGS += 
   LDFLAGS += -Wl,--export-dynamic -shared -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin"
+  LUACFLAGS += -I/usr/include/lua # lua is named differently on every platform, check this and change it to fit
+  LIBS += -llua  # lua is named differently on every platform, check this and change it to fit
   LIBS += -lc -lpd
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)
@@ -203,6 +214,8 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   CFLAGS += -mms-bitfields
   LDFLAGS += -s -shared -Wl,--enable-auto-import
   LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
+  LUACFLAGS += -I/usr/include/lua # lua is named differently on every platform, check this and change it to fit
+  LIBS += -llua51.dll  # lua is named differently on every platform, check this and change it to fit
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
