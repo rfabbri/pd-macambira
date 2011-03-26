@@ -138,9 +138,9 @@ static int MyPatternMatch (const char *pattern, const char *test)
 
 static void routeOSC_free(t_routeOSC *x)
 {
-    freebytes(x->x_prefixes, x->x_num*sizeof(char)); /* the OSC addresses to be matched */
+    freebytes(x->x_prefixes, x->x_num*sizeof(char *)); /* the OSC addresses to be matched */
     freebytes(x->x_prefix_depth, x->x_num*sizeof(int));  /* the number of slashes in each prefix */
-    freebytes(x->x_outlets, x->x_num*sizeof(void *)); /* one for each prefix plus one for everything else */
+    freebytes(x->x_outlets, (x->x_num+1)*sizeof(void *)); /* one for each prefix plus one for everything else */
 }
 
 /* initialization routine */
@@ -174,32 +174,37 @@ static void *routeOSC_new(t_symbol *s, int argc, t_atom *argv)
         return 0;
     }
     x->x_num = 0;
-
-    x->x_prefixes = (char **)getzbytes(argc*sizeof(char)); /* the OSC addresses to be matched */
-    x->x_prefix_depth = (int *)getzbytes(argc*sizeof(int));  /* the number of slashes in each prefix */
-    x->x_outlets = (void **)getzbytes(argc*sizeof(void *)); /* one for each prefix plus one for everything else */
-
+/* first verify that all arguments are symbols whose first character is '/' */
     for (i = 0; i < argc; ++i)
     {
         if (argv[i].a_type == A_SYMBOL)
         {
             if (argv[i].a_w.w_symbol->s_name[0] == '/')
             { /* Now that's a nice prefix */
-                x->x_prefixes[i] = argv[i].a_w.w_symbol->s_name;
-                x->x_prefix_depth[i] = routeOSC_count_slashes(x->x_prefixes[i]);
                 ++(x->x_num);
             }
-        }
-        else if (argv[i].a_type == A_FLOAT)
-        {
-            error("* routeOSC: float arguments are not OK.");
-            return 0;
+            else
+            {
+                error("routeOSC: argument %d does not begin with a slash(/).", i);
+                return(0);
+            }
         }
         else
         {
-            error("* routeOSC: unrecognized argument type!");
+            error("routeOSC: argument %d is not a symbol.", i);
             return 0;
         }
+    }
+/* now allocate the storage for each path */
+    x->x_prefixes = (char **)getzbytes(x->x_num*sizeof(char *)); /* the OSC addresses to be matched */
+    x->x_prefix_depth = (int *)getzbytes(x->x_num*sizeof(int));  /* the number of slashes in each prefix */
+    x->x_outlets = (void **)getzbytes((x->x_num+1)*sizeof(void *)); /* one for each prefix plus one for everything else */
+/* put the pointer to the path in x_prefixes */
+/* put the number of levels in x_prefix_depth */
+    for (i = 0; i < x->x_num; ++i)
+    {
+        x->x_prefixes[i] = argv[i].a_w.w_symbol->s_name;
+        x->x_prefix_depth[i] = routeOSC_count_slashes(x->x_prefixes[i]);
     }
     /* Have to create the outlets in reverse order */
     /* well, not in pd ? */
@@ -215,7 +220,7 @@ static void routeOSC_set(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
     int i;
 
-	if (argc > x->x_num)
+    if (argc > x->x_num)
     {
         pd_error (x, "routeOSC: too many paths");
         return;
@@ -309,7 +314,7 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
 
     pattern_depth = routeOSC_count_slashes(pattern);
     if (x->x_verbosity) post("routeOSC_doanything: pattern_depth is %i", pattern_depth);
-	nextSlash = NextSlashOrNull(pattern+1);
+    nextSlash = NextSlashOrNull(pattern+1);
     if (*nextSlash == '\0')
     { /* pattern_depth == 1 */
         /* last level of the address, so we'll output the argument list */
@@ -378,7 +383,7 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
                     if (x->x_verbosity)
                         post("routeOSC_doanything: (%d) matched %s depth %d", i, x->x_prefixes[i], x->x_prefix_depth[i]);
                     ++matchedAnything;
-                	nextSlash = NthSlashOrNull(pattern+1, x->x_prefix_depth[i]);
+                    nextSlash = NthSlashOrNull(pattern+1, x->x_prefix_depth[i]);
                     if (x->x_verbosity)
                         post("routeOSC_doanything: (%d) nextSlash %s", i, nextSlash);
                     if (restOfPattern == 0) restOfPattern = gensym(nextSlash);
@@ -392,7 +397,7 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
     {
         // output unmatched data on rightmost outlet a la normal 'route' object, jdl 20020908
         outlet_anything(x->x_outlets[x->x_num], s, argc, argv);
-	}
+    }
 }
 
 static char *NextSlashOrNull(char *p)
@@ -483,7 +488,7 @@ static int PatternMatch (const char *  pattern, const char * test)
             return PatternMatch (pattern, test+1);
         case ']':
         case '}':
-			      error("routeOSC: Spurious %c in pattern \".../%s/...\"",pattern[0], theWholePattern);
+                  error("routeOSC: Spurious %c in pattern \".../%s/...\"",pattern[0], theWholePattern);
             return 0;
         case '[':
             return MatchBrackets (pattern,test);
@@ -569,13 +574,13 @@ static int MatchList (const char *pattern, const char *test)
     restOfPattern++; /* skip close curly brace */
     pattern++; /* skip open curly brace */
     while (1)
-	{
+    {
         if (*pattern == ',') 
-		{
+        {
             if (PatternMatch (restOfPattern, tp)) return 1;
             tp = test;
             ++pattern;
-		}
+        }
         else if (*pattern == '}') return PatternMatch (restOfPattern, tp);
         else if (*pattern == *tp) 
         {
@@ -583,7 +588,7 @@ static int MatchList (const char *pattern, const char *test)
             ++tp;
         }
         else 
-		{
+        {
             tp = test;
             while (*pattern != ',' && *pattern != '}') pattern++;
             if (*pattern == ',') pattern++;
