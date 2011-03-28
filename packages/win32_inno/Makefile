@@ -103,6 +103,13 @@ lib_install:
 	cp -rp /usr/local/lib/reg1.2/* $(DESTDIR)$(libdir)/reg1.2
 
 
+# tcllib install
+# tcllib is an old standard lib for Tcl written in Tcl, it includes things we
+# need, like base64, so include it in the package on all platforms
+tcllib_install:
+	install -d $(DESTDIR)$(libdir)
+	cp -a /usr/local/lib/tcllib1.13/*  $(DESTDIR)$(libdir)/
+
 exe_install:
 	install -d $(DESTDIR)$(bindir)
 	install -p $(bin_src)/wish85.exe  $(DESTDIR)$(bindir)
