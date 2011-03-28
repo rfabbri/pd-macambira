@@ -214,8 +214,8 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   CFLAGS += -mms-bitfields
   LDFLAGS += -s -shared -Wl,--enable-auto-import
   LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32
-  LUACFLAGS += -I/usr/include/lua # lua is named differently on every platform, check this and change it to fit
-  LIBS += -llua51.dll  # lua is named differently on every platform, check this and change it to fit
+  LUACFLAGS += -I/usr/local/include # lua is named differently on every platform, check this and change it to fit
+  LIBS += -llua  # lua is named differently on every platform, check this and change it to fit
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
