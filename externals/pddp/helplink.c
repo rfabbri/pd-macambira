@@ -136,7 +136,25 @@ static t_widgetbehavior helplink_widgetbehavior =
 static void helplink_click(t_helplink *x, t_floatarg xpos, t_floatarg ypos,
 			   t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
 {
-    open_via_helppath(x->x_ulink->s_name, canvas_getdir(x->x_glist)->s_name);
+    char* objectname = x->x_ulink->s_name;
+    char helpname[MAXPDSTRING];
+    char dirbuf[MAXPDSTRING], *nameptr;
+    int fd = canvas_open(x->x_glist, objectname, "-help.pd",
+                         dirbuf, &nameptr, MAXPDSTRING, 0);
+    
+    if (fd < 0) {
+        /* if canvas_open() failed try open_via_helppath() */
+        pd_error(x, "didn't find %s, trying open_via_helppath()", objectname);
+        open_via_helppath(objectname, canvas_getdir(x->x_glist)->s_name);
+    } else {
+        /* if canvas_open() gave us a filehandle, then we have a helppatch to
+         * open in dirbuf and nameptr, but we don't need the filehandle */
+        close(fd);
+        pd_error(x, "found objectname %s", objectname);
+        error("dirbuf %s", dirbuf);
+        error("nameptr %s", nameptr);
+        glob_evalfile(x, gensym(nameptr), gensym(dirbuf));
+    }
 }
 
 static int helplink_wbclick(t_gobj *z, t_glist *glist, int xpix, int ypix,
