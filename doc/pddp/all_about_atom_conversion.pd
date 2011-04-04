@@ -35,7 +35,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 43 65 pddp/pddplink all_about_atoms.pd;
 #X text 42 36 Converting between atom types in Pd can be tricky. Make
 sure you have read the following help patches first:;
-#N canvas 9 155 428 140 symbol-atom_to_float 0;
+#N canvas 11 164 428 140 symbol-atom_to_float 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
 1 18 -261106 -33289 0;
 #X text 7 1 From a symbol-atom to a float;
@@ -43,19 +43,13 @@ sure you have read the following help patches first:;
 #X obj 20 90 pddp/helplink zexy/symbol2list;
 #X text 20 37 There are no internal objects to turn a symbol-atom into
 a float. There are two important externals for this \, however:;
-#X restore 43 149 pd symbol-atom_to_float;
-#N canvas 14 48 428 554 float_to_symbol-atom 0;
+#X restore 43 128 pd symbol-atom_to_float;
+#N canvas 15 77 428 554 float_to_symbol-atom 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
 1 18 -261106 -33289 0;
 #X text 7 1 Changing a float to a symbol-atom;
-#X obj 45 163 hsl 128 15 0 127 0 0 empty 123 empty -2 -8 0 10 -262144
--1 -1 7000 1;
-#X text 19 79 For example \, you can enter a number for the "receive-symbol"
-of the so-called IEMGUIS like the slider below. Since receive-names
-need to be symbol-atoms \, the GUI automatically converts "123" to
-a symbol-atom after you click "Ok" or "Apply" in the "Properties" dialogue.
-;
-#X text 181 158 <- hslider with receive-symbol "123";
+#X obj 45 201 hsl 128 15 0 127 0 0 empty 123 empty -2 -8 0 10 -262144
+-1 -1 0 1;
 #X msg 42 353 symbol 123;
 #X obj 42 375 print empty_symbol;
 #X msg 151 457 123;
@@ -66,33 +60,38 @@ a symbol-atom after you click "Ok" or "Apply" in the "Properties" dialogue.
 #X text 255 509 symbol-atom;
 #X obj 130 503 send;
 #X floatatom 93 479 5 0 0 0 - - -;
-#X text 19 395 The [makefilename] object will do the trick \, however.
-It always outputs a symbol message (remember that a symbol message
-must have a symbol-atom as an element) \, and so it can convert an
-incoming float to a symbol-atom:;
 #X text 19 494 Also see:;
 #X obj 20 514 pddp/helplink zexy/list2symbol;
 #X obj 20 529 pddp/helplink cyclone/tosymbol;
-#X text 19 36 Problem: some objects in Pd expect certain atom types
-and will complain with an error if they receive the wrong type. Other
-objects will silently make the conversion for you.;
-#X text 19 183 Note that there's no visible difference between the
-float "123" and the symbol-atom "123"-- the only difference is in how
-these character are understood by Pd. If I want to send a value to
-the slider using [send] \, there is a problem because [send] doesn't
-do any atom conversion-- if you try to create [send 123] you'll get
-an error.;
 #X text 19 267 However \, you can send a symbol message to the right
 inlet of [send] to specify the send-name. You might think that using
-a symbol message will convert the number to a symbol-atom. Unfortunately
-\, that doesn't work either-- the message box silently ignores the
-float and outputs an empty symbol:;
-#X connect 5 0 6 0;
-#X connect 7 0 9 0;
-#X connect 9 0 13 1;
-#X connect 14 0 13 0;
+a symbol message will convert the float to a symbol-atom. Unfortunately
+\, that doesn't work either-- the message box in Pd silently ignores
+the float and outputs an empty symbol:;
+#X text 19 119 For example \, you can enter a number for the "receive-symbol"
+of the so-called IEMGUIS like the slider below. Since receive-names
+need to be symbol-atoms \, the slider automatically makes "123" a symbol-atom
+after you click "Ok" or "Apply" in the "Properties" dialogue.;
+#X text 181 198 <- [hslider] with receive-symbol "123";
+#X text 19 36 Usually it is easy to distinguish between floats and
+symbol-atoms in Pd. However \, there are times when it can be useful
+to have a symbol-atom that looks like a number. This can quickly get
+confusing because there's no visible difference between the float "123"
+and the symbol-atom "123". The only difference is in how it is understood
+by Pd.;
+#X text 19 225 If I try to send a value to the slider using [send 123]
+\, there will be an error because after I type the argument "123" in
+an object box \, Pd will interpret it as a float.;
+#X text 19 395 Solution: the [makefilename] object. It always outputs
+a symbol message (remember that a symbol message must have a symbol-atom
+as an element) \, and so it will convert an incoming float to a symbol-atom:
+;
+#X connect 3 0 4 0;
+#X connect 5 0 7 0;
+#X connect 7 0 11 1;
+#X connect 12 0 11 0;
 #X restore 43 106 pd float_to_symbol-atom;
-#N canvas 22 133 428 426 multiple_atoms_to_one_symbol-atom 0;
+#N canvas 25 220 428 426 multiple_atoms_to_one_symbol-atom 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
 1 18 -261106 -33289 0;
 #X text 7 1 Concatenate multiple atoms;
@@ -119,7 +118,7 @@ that contains spaces in it. Use the %c argument with [makefilename].
 #X connect 4 0 5 0;
 #X connect 10 0 11 0;
 #X connect 12 0 10 0;
-#X restore 43 128 pd multiple_atoms_to_one_symbol-atom;
+#X restore 43 150 pd multiple_atoms_to_one_symbol-atom;
 #X text 42 171 See also:;
 #X obj 43 187 pddp/pddplink all_about_message_conversion.pd;
 #X obj 43 202 pddp/pddplink all_about_symbol_construction.pd;

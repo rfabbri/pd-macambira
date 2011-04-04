@@ -5,22 +5,23 @@
 -1 0;
 #X obj 0 220 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0 13
 -228856 -1 0;
-#N canvas 52 246 494 357 META 0;
-#X text 12 145 LIBRARY internal;
-#X text 12 185 WEBSITE http://crca.ucsd.edu/~msp/;
-#X text 12 25 LICENSE SIBSD;
-#X text 12 165 AUTHOR Miller Puckette;
-#X text 12 225 HELP_PATCH_AUTHORS Dave Sabine \, November 12 \, 2002
+#N canvas 53 275 494 357 META 0;
+#X text 12 165 LIBRARY internal;
+#X text 12 205 WEBSITE http://crca.ucsd.edu/~msp/;
+#X text 12 45 LICENSE SIBSD;
+#X text 12 185 AUTHOR Miller Puckette;
+#X text 12 245 HELP_PATCH_AUTHORS Dave Sabine \, November 12 \, 2002
 . Jonathan Wilkes revised the patch to conform to the PDDP template
 for Pd version 0.42.;
-#X text 12 5 KEYWORDS control float list bang;
-#X text 12 45 DESCRIPTION swap two numbers \, respecting right-to-left
+#X text 12 25 KEYWORDS control float list bang;
+#X text 12 65 DESCRIPTION swap two numbers \, respecting right-to-left
 order;
-#X text 12 65 INLET_0 float list bang;
-#X text 12 85 INLET_1 float;
-#X text 12 105 OUTLET_0 float;
-#X text 12 125 OUTLET_1 float;
-#X text 12 205 RELEASE_DATE 1997;
+#X text 12 85 INLET_0 float list bang;
+#X text 12 105 INLET_1 float;
+#X text 12 125 OUTLET_0 float;
+#X text 12 145 OUTLET_1 float;
+#X text 12 225 RELEASE_DATE 1997;
+#X text 12 5 ALIAS fswap;
 #X restore 500 597 pd META;
 #X obj 0 425 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12 0
 13 -228856 -1 0;
@@ -45,7 +46,7 @@ order;
 #X obj 78 380 cnv 17 3 35 empty \$0-pddp.cnv.let.1 1 5 9 0 16 -228856
 -162280 0;
 #X text 98 379 float;
-#X obj 493 3 swap;
+#X obj 443 3 swap;
 #X obj 465 20 pddp/pddplink http://wiki.puredata.info/en/swap -text
 pdpedia: swap;
 #X text 98 278 float;
@@ -217,7 +218,10 @@ before packing them up and sending them to the [route] object.;
 #X text 168 456 - outputs the value from the left inlet.;
 #X text 80 503 1) float;
 #X text 168 503 - initializes the value of the right inlet.;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
+#X obj 503 3 fswap;
+#X text 480 3 or;
 #X connect 24 0 28 0;
 #X connect 24 1 27 0;
 #X connect 25 0 24 0;

@@ -3,7 +3,7 @@
 -261106 -33289 0;
 #X obj 407 2 pddp/pddplink http://puredata.info/dev/pddp -text pddp
 ;
-#N canvas 14 48 428 202 What_is_an_atom? 0;
+#N canvas 15 77 428 202 What_is_an_atom? 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 20 10
 1 18 -261106 -33289 0;
 #X text 7 1 What is an atom in Pd?;

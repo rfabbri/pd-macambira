@@ -18,21 +18,21 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 ;
 #X restore 392 219 pd META;
 #X obj 6 219 pddp/pddplink all_about.pd -text All About Pd;
-#N canvas 24 124 428 150 Quick_Quiz! 0;
+#N canvas 25 153 428 150 Quick_Quiz! 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -261106 -33289 0;
 #X text 7 2 Messages- Related Objects;
-#X obj 22 99 bng 15 250 50 0 empty empty list 0 25 0 8 -262144 -1 -1
+#X obj 22 99 bng 15 500 50 0 empty empty list 0 25 0 8 -262144 -1 -1
 ;
-#X obj 59 99 bng 15 250 50 0 empty empty bang 0 25 0 8 -262144 -1 -1
+#X obj 69 99 bng 15 500 50 0 empty empty bang 0 25 0 8 -262144 -1 -1
 ;
-#X obj 97 99 bng 15 250 50 0 empty empty float 0 25 0 8 -262144 -1
+#X obj 117 99 bng 15 500 50 0 empty empty float 0 25 0 8 -262144 -1
 -1;
-#X obj 135 99 bng 15 250 50 0 empty empty symbol 0 25 0 8 -262144 -1
+#X obj 165 99 bng 15 500 50 0 empty empty symbol 0 25 0 8 -262144 -1
 -1;
-#X obj 176 99 bng 15 250 50 0 empty empty pop 0 25 0 8 -262144 -1 -1
+#X obj 213 99 bng 15 500 50 0 empty empty pop 0 25 0 8 -262144 -1 -1
 ;
-#X obj 211 99 bng 15 250 50 0 empty empty none_of_the_above 0 25 0
+#X obj 261 99 bng 15 500 50 0 empty empty none_of_the_above 0 25 0
 8 -262144 -1 -1;
 #X text 276 42 <- Click to find out;
 #X msg 22 43 pop quiz: What type of message is this?;
