@@ -8,7 +8,14 @@
 
 #include <stdio.h>
 #include <string.h>
+#ifdef _WIN32
+# include <io.h>
+#else
+# include <unistd.h>
+#endif
+
 #include "m_pd.h"
+#include "m_imp.h"
 #include "g_canvas.h"
 
 /* this isn't in any header, but its declared in s_path.c */
@@ -118,56 +125,36 @@ static void helplink_vis(t_gobj *z, t_glist *glist, int vis)
     }
 }
 
-static int helplink_wbclick(t_gobj *z, t_glist *glist, int xpix, int ypix,
-			    int shift, int alt, int dbl, int doit);
-
-static t_widgetbehavior helplink_widgetbehavior =
-{
-    helplink_getrect,
-    helplink_displace,
-    helplink_select,
-    helplink_activate,
-    0,
-    helplink_vis,
-    helplink_wbclick,
-};
-
-static void helplink_click(t_helplink *x, t_floatarg xpos, t_floatarg ypos,
-			   t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
+static void helplink_doclick(t_helplink *x)
 {
     char* objectname = x->x_ulink->s_name;
-    char helpname[MAXPDSTRING];
     char dirbuf[MAXPDSTRING], *nameptr;
     int fd = canvas_open(x->x_glist, objectname, "-help.pd",
                          dirbuf, &nameptr, MAXPDSTRING, 0);
     
     if (fd < 0) {
         /* if canvas_open() failed try open_via_helppath() */
-        pd_error(x, "didn't find %s, trying open_via_helppath()", objectname);
         open_via_helppath(objectname, canvas_getdir(x->x_glist)->s_name);
     } else {
         /* if canvas_open() gave us a filehandle, then we have a helppatch to
          * open in dirbuf and nameptr, but we don't need the filehandle */
         close(fd);
-        pd_error(x, "found objectname %s", objectname);
-        error("dirbuf %s", dirbuf);
-        error("nameptr %s", nameptr);
-        glob_evalfile(x, gensym(nameptr), gensym(dirbuf));
+        glob_evalfile(NULL, gensym(nameptr), gensym(dirbuf));
     }
 }
 
-static int helplink_wbclick(t_gobj *z, t_glist *glist, int xpix, int ypix,
+static int helplink_click(t_gobj *z, t_glist *glist, int xpix, int ypix,
 			    int shift, int alt, int dbl, int doit)
 {
     t_helplink *x = (t_helplink *)z;
     if (glist->gl_havewindow || x->x_isgopvisible)
     {
-	if (doit)
-	    helplink_click(x, (t_floatarg)xpix, (t_floatarg)ypix,
-			   (t_floatarg)shift, 0, (t_floatarg)alt);
-	return (1);
+        if (doit)
+            helplink_doclick(x);
+        return (1);
     }
-    else return (0);
+    else
+        return (0);
 }
 
 static void helplink_free(t_helplink *x)
@@ -200,6 +187,17 @@ static void *helplink_new(t_symbol *s)
 	}
     return (x);
 }
+
+static t_widgetbehavior helplink_widgetbehavior =
+{
+    helplink_getrect,
+    helplink_displace,
+    helplink_select,
+    helplink_activate,
+    0,
+    helplink_vis,
+    helplink_click,
+};
 
 void helplink_setup(void)
 {
