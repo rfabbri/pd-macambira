@@ -227,13 +227,16 @@ $(gem_src)/src/Gem.dll: $(gem_src)/src/configure
 
 $(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
 	cd $(gem_src)/src && ./configure \
+		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
 		--with-pd=$(pd_src) 
 	$(MAKE) -C $(gem_src)/src
 
 $(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
 	cd $(gem_src)/src && ./configure \
+		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
 		PKG_FTGL_CFLAGS="-I/sw/include -I/sw/include/freetype2 -I/sw/include/FTGL" \
 		--without-ALL \
+		--disable-mmx \
 		--with-ftgl --with-ftgl-libs=/sw/lib \
 		--with-artoolkit-includes=/sw/include --with-artoolkit-libs=/sw/lib \
 		--with-pd=$(pd_src)
