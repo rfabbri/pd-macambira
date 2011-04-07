@@ -15,8 +15,16 @@ cd $cvs_root_dir
 echo "Running svn update:"
 svn update ${SVNOPTIONS}
 echo "Running svn update for Gem:"
-for section in externals/Gem abstractions doc externals packages pd scripts; do
-	 echo "$section"
+for section in externals/Gem; do
+	 echo "Section: $section"
+	 cd $section
+         svn update ${SVNOPTIONS}
+	 cd ../..
+done
+
+echo "Running svn update for other sections:"
+for section in abstractions doc externals packages pd scripts; do
+	 echo "Section: $section"
 	 cd $section
          svn update ${SVNOPTIONS}
 	 cd ..
