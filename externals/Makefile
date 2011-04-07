@@ -128,7 +128,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cw_binaural cxc cyclone earplug ekext ext13 extra freeverb ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir log mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp loaders-pdlua pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
+LIB_TARGETS = adaptive arraysize bassemu boids bsaylor comport creb cw_binaural cxc cyclone earplug ekext ext13 extra freeverb gem ggee hcs iem_ambi iem_bin_ambi iemlib iemgui iemguts iem_adaptfilt iemmatrix iemxmlrpc iem_delay iem_roomsim iem_spec2 iem_tab jasch_lib loaders-hexloader loaders-libdir log mapping markex maxlib mjlib moocow moonlib motex mrpeach oscx pan pdcontainer pddp loaders-pdlua pdogg plugin pmpd sigpack smlib tof unauthorized vanilla vbap windowing zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -549,6 +549,75 @@ freeverb_clean:
 	make -C $(externals_src)/freeverb~ clean
 
 
+#------------------------------------------------------------------------------
+# GEM
+GEM_NAME = Gem
+$(gem_src)/src/configure:
+	cd $(gem_src)/src && ./autogen.sh
+
+$(gem_src)/src/Gem.dll: $(gem_src)/src/configure
+
+$(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
+	cd $(gem_src)/src && ./configure \
+		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
+		--with-video=plugins \
+		--with-film=plugins \
+		--with-pd=$(pd_src)
+	$(MAKE) -C $(gem_src)/src
+
+$(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
+	cd $(gem_src)/src && ./configure \
+		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
+		PKG_FTGL_CFLAGS="-I/sw/include -I/sw/include/freetype2 -I/sw/include/FTGL" \
+		--without-ALL \
+		--disable-mmx \
+		--with-ftgl --with-ftgl-libs=/sw/lib \
+		--with-artoolkit-includes=/sw/include --with-artoolkit-libs=/sw/lib \
+		--with-video=plugins \
+		--with-film=plugins \
+		--with-pd=$(pd_src)
+	$(MAKE) -C $(gem_src)/src
+
+gem: $(gem_src)/src/Gem.$(EXTENSION)
+
+gem_install: gem
+	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)
+ifneq ($(OS_NAME),windows)
+	install -p $(gem_src)/src/Gem.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
+endif
+	(test -e $(gem_src)/src/plugins/filmAVI/.libs/gem_filmAVI.so && \
+		install -p $(gem_src)/src/plugins/*/.libs/gem_*.so $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
+	(test -e $(gem_src)/src/plugins/filmAVI/.libs/gem_filmAVI.dll && \
+		install -p $(gem_src)/src/plugins/*/.libs/gem_*.dll $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
+	install -p $(gem_src)/help/*.*  $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
+	install -p $(gem_src)/abstractions/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)
+	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual
+	install -p $(gem_src)/doc/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual
+	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual/html
+# in Gem 0.92, $(gem_src)/manual moved to $(gem_src)/doc/manual
+	(test -d $(gem_src)/manual && \
+		install -p $(gem_src)/manual/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual/html ) || \
+		install -p $(gem_src)/doc/manual/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual/html
+	for dir in $(shell ls -1 $(gem_src)/examples | grep -v CVS); do \
+		echo "installing $$dir"; \
+		install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ; \
+		install -p $(gem_src)/examples/$$dir/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ;\
+	done
+# install Gem headers to make it easier to build standalone Gem objects
+	install -d $(DESTDIR)$(includedir)/Base
+	install -p $(gem_src)/src/Base/*.h $(DESTDIR)$(includedir)/Base/
+# links to keep the old-style placement for Gem examples in the Help Browser
+ifneq ($(OS_NAME),windows)
+	install -d $(DESTDIR)$(examplesdir)
+	ln -s ../../extra/$(GEM_NAME)/examples $(DESTDIR)$(examplesdir)/$(GEM_NAME)
+	install -d  $(DESTDIR)$(manualsdir)
+	ln -s ../../extra/$(GEM_NAME)/manual $(DESTDIR)$(manualsdir)/$(GEM_NAME)
+endif
+
+gem_clean:
+	-$(MAKE) -C $(gem_src)/src clean
+
+
 
 #------------------------------------------------------------------------------#
 # GEM2PDP
@@ -868,7 +937,7 @@ IEMMATRIX_SRC := $(wildcard $(IEMMATRIX_ROOT)/src/m[at]*.c)
 IEMMATRIX_ALIAS := $(wildcard $(IEMMATRIX_ROOT)/alias/*.c)
 IEMMATRIX_OBJ := $(IEMMATRIX_SRC:.c=.o) $(IEMMATRIX_ALIAS:.c=.o)
 IEMMATRIX_SHARED := $(wildcard $(IEMMATRIX_ROOT)/src/iemmatrix_binops.c) \
-                    $(wildcard $(IEMMATRIX_ROOT)/src/iemmatrix_utility.c)
+		    $(wildcard $(IEMMATRIX_ROOT)/src/iemmatrix_utility.c)
 
 iemmatrix: $(IEMMATRIX_OBJ:.o=.$(EXTENSION))
 
@@ -1759,7 +1828,7 @@ zexy_clean:
 PDCONTAINER_NAME = pdcontainer
 PDCONTAINER_INCLUDE = -I$(externals_src)/grh/PDContainer
 PDCONTAINER_SRC = $(wildcard $(externals_src)/grh/PDContainer/src/[hH]*.cpp) \
-                  $(wildcard $(externals_src)/grh/PDContainer/tinyxml/*.cpp)
+		  $(wildcard $(externals_src)/grh/PDContainer/tinyxml/*.cpp)
 PDCONTAINER_OBJ = $(PDCONTAINER_SRC:.cpp=.o)
 PDCONTAINER_TMP = $(wildcard $(externals_src)/grh/PDContainer/src/h_*.cpp)
 PDCONTAINER_TARGETS = $(PDCONTAINER_TMP:.cpp=.$(EXTENSION))
@@ -2153,7 +2222,7 @@ iemxmlrpc_install: iemxmlrpc
 		$(DESTDIR)$(readmesdir)/$(IEMXMLRPC_NAME).txt
 	install -d $(DESTDIR)$(examplesdir)/$(IEMXMLRPC_NAME)
 	install -p $(externals_src)/iem/iemxmlrpc/*.pd \
-                   $(externals_src)/iem/iemxmlrpc/*.py \
+		   $(externals_src)/iem/iemxmlrpc/*.py \
 		   $(DESTDIR)$(examplesdir)/$(IEMXMLRPC_NAME)
 
 iemxmlrpc_clean:

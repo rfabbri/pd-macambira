@@ -38,10 +38,12 @@ svn checkout $SVNOPTIONS $PDAUTH $URL pure-data
 
 cd pure-data
 
-for section in Gem videoIO; do
+cd externals
+for section in Gem; do
          echo "checking out Gem::${section}"
          svn checkout $SVNOPTIONS ${PDAUTH} ${GEMURL}/${section} ${section}
 done
+cd ..
 
 
 # make the symlinks which simulate the files being installed into the packages
