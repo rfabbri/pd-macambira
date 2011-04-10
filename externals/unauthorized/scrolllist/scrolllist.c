@@ -43,6 +43,7 @@
 
 #ifdef NT
 #include <io.h>
+#include <pthread.h>
 #else
 #include <unistd.h>
 #include <sys/types.h>

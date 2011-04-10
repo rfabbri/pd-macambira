@@ -148,7 +148,11 @@ typedef struct _sonogram
     t_int x_nbupdated;             /* number of points updated                    */
     t_glist *x_glist;              /* keep graphic context for various operations */
     t_int x_zoom;                  /* zoom factor                                 */
+	#ifndef _WIN32
     pthread_t x_updatechild;       /* thread id for the update child              */
+	#else
+	int x_updatechild;
+	#endif
     t_int x_updatestart;           /* starting position for update                */
     t_int x_updateend;             /* ending position for update                  */
     t_int x_xpos;                  /* stuck x position                            */
@@ -439,6 +443,7 @@ static void sonogram_update_part(t_sonogram *x, t_glist *glist, t_int bstart, t_
                                  t_int erase, t_int redraw, t_int keepframe)
 {
  pthread_attr_t update_child_attr;
+ pthread_t  update_child;
  t_canvas *canvas=glist_getcanvas(glist);
 
    if ( x->x_graphic )
