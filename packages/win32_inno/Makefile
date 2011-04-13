@@ -40,11 +40,19 @@ package:  $(PD_INNO_SETUP)
 build_pd:
 	cd $(pd_src)/src && $(MAKE) -f makefile.mingw
 
+PD_NAME=Pd
 pd_install: build_pd
 # the autoconf/MinGW setup doesn't compile the extras yet
 #	$(MAKE) -C $(pd_src)/src $(DEST_PATHS) bin
 #	-$(MAKE) -C $(pd_src)/src $(DEST_PATHS) install
 	$(MAKE) -C $(pd_src)/src -f makefile.mingw $(DEST_PATHS) install
+# install notes.txt into the help browser
+	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
+	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
+# make libdir start automatically by being in new 'startup' folder
+	install -d $(DESTDIR)$(libpddir)/startup
+	ln -s ../extra/libdir/libdir.$(EXTENSION) \
+		$(DESTDIR)$(libpddir)/startup/libdir.$(EXTENSION)
 
 install: pd_install prebuilt_install lib_install exe_install
 	@echo " "
@@ -108,7 +116,7 @@ lib_install:
 # need, like base64, so include it in the package on all platforms
 tcllib_install:
 	install -d $(DESTDIR)$(libdir)
-	cp -a /usr/local/lib/tcllib1.13/*  $(DESTDIR)$(libdir)/
+	cp -a /usr/local/lib/tcllib1.13 $(DESTDIR)$(libdir)/tcllib1.13
 
 exe_install:
 	install -d $(DESTDIR)$(bindir)
