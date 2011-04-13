@@ -681,7 +681,6 @@ static long get_baud_ratebits(t_float *baud)
         i = 8;
     }
     *baud =  baudratetable[i];
-    post("get_baud_ratebits: %g", *baud);
 
     return baudspeedbittable[i];
 }
@@ -690,7 +689,9 @@ static float set_baudrate(t_comport *x, t_float baud)
 {
     struct termios  *tio = &(x->com_termio);
     speed_t         baudbits = get_baud_ratebits(&baud);
-    post("set_baudrate baudbits: %d", baudbits);
+
+    if (x->verbose > 0)
+        post("[comport] set_baudrate: Setting baud rate to %g with baudbits 0x%X", baud, baudbits);
     if( cfsetispeed(tio, baudbits) != 0 )
         post("[comport]: ERROR failed to set bitrate: %d", baudbits);
     if( cfsetospeed(tio, baudbits) != 0 )
