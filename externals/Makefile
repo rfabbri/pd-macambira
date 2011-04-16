@@ -1672,13 +1672,13 @@ UNAUTHORIZED_TKFILES = $(wildcard $(externals_src)/unauthorized/*/*.tk)
 # a number of objects don't compile under MinGW (yet? they used to, but the
 # needed changes were overwritten, so they are in CVS
 ifeq ($(OS_NAME),windows)
-UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/[abcdefg-opqrsw]*/*.c)\
-$(wildcard $(externals_src)/unauthorized/c?[a-np-z]*/*.c)
+UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/[abdefg-opqrsw]*/*.c)\
+$(wildcard $(externals_src)/unauthorized/c?[^o]*/*.c)
 else
  ifeq ($(OS_NAME),darwin)
  # [cooled~] crashes Pd on Mac OS X, [vocoder~] doesn't compile
   UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/[abd-uw-z]*/*.c)\
-  $(wildcard $(externals_src)/unauthorized/c?[a-np-z]*/*.c)
+  $(wildcard $(externals_src)/unauthorized/c?[^o]*/*.c)
  else
    # GNU/Linux, BSD, IRIX, etc.
   UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/*/*.c)
