@@ -49,10 +49,6 @@ pd_install: build_pd
 # install notes.txt into the help browser
 	install -d $(DESTDIR)$(manualsdir)/$(PD_NAME)
 	install -p $(pd_src)/src/notes.txt $(DESTDIR)$(manualsdir)/$(PD_NAME)
-# make libdir start automatically by being in new 'startup' folder
-	install -d $(DESTDIR)$(libpddir)/startup
-	ln -s ../extra/libdir/libdir.$(EXTENSION) \
-		$(DESTDIR)$(libpddir)/startup/libdir.$(EXTENSION)
 
 install: pd_install prebuilt_install lib_install exe_install
 	@echo " "
@@ -64,6 +60,11 @@ prebuilt_install:
 	$(MAKE) -C $(packages_src) $(DEST_PATHS) doc_format
 	install -p pd-settings.reg $(DESTDIR)$(prefix)
 	install -p pd-extended.bat $(DESTDIR)$(prefix)
+# make libdir start automatically by being in new 'startup' folder
+	install -d $(DESTDIR)$(libpddir)/startup
+	ln -s ../extra/libdir/libdir.$(EXTENSION) \
+		$(DESTDIR)$(libpddir)/startup/libdir.$(EXTENSION)
+
 
 #==============================================================================#
 #
