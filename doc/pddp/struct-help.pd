@@ -121,30 +121,22 @@ the patch below:;
 data will be visualized. Two data structures- "struct-1" and "struct-2"-
 are defined below in subpatches:;
 #X text 169 393 - the name of the struct;
-#N canvas 81 487 429 105 struct_names 0;
+#N canvas 72 401 429 220 struct_names 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 8 2 [struct] Struct Names;
-#X text 20 39 You can't use "float" as a struct name because Pd has
-a hidden data structure named "float" used for [table] and "Put menu
-arrays".;
+#X text 20 39 You can't use "float" or "_float_array" as struct names
+because Pd has hidden data structures named "float" and "_float_array"
+\, which are used for [table] and "Put menu arrays".;
+#X msg 23 134 \; pd-_float vis 1 \; pd-_float_array vis 1;
+#X text 20 99 You can click below to reveal the canvases that contain
+them:;
 #X restore 102 541 pd struct_names;
-#X text 172 295 - clicking the object with the mouse in run mode.;
-#X text 172 310 - changing the value of a field in run mode.;
-#X text 172 325 - selecting the object in edit mode.;
-#X text 172 340 - deselecting an object in edit mode.;
-#X text 172 355 - moving a selected object in edit mode.;
 #X text 188 461 - "float foo";
 #X text 188 476 - "symbol foo";
 #X text 188 491 - "array foo bar" \, where "bar" is the name of another
 data structure to be used as a template for elements of the array.
 ;
-#X text 99 217 When a scalar is moved or edited with the mouse \, data
-is sent to the outlet of the respective [struct] object. This data
-consists of: a selector that describes the mouse action that was performed
-\, a pointer to the scalar \, and-- optionally-- a number (usually
-an x-coordinate). The selectors below correspond to the following mouse
-actions:;
 #X text 169 411 - all subsequent arguments are used to declare fields.
 Fields may be one of three types-- float \, symbol \, or array. To
 create the field "foo" \, use the syntax below for each type:;
@@ -158,3 +150,14 @@ create the field "foo" \, use the syntax below for each type:;
 doc/4.data.structures/06.file.pd;
 #X obj 257 576 pddp/pddplink ../4.data.structures/08.selection.pd -text
 doc/4.data.structures/08.selection.pd;
+#X text 99 217 When a scalar is moved or edited with the mouse \, data
+is sent to the outlet of the respective [struct] object. This data
+consists of: a selector that describes the mouse action that was performed
+\, a pointer to the scalar \, and-- optionally-- a number (usually
+a y-coordinate). The selectors below correspond to the following mouse
+actions:;
+#X text 172 295 - (run mode) clicking the object with the mouse.;
+#X text 172 310 - (run mode) changing the value of a field.;
+#X text 172 325 - (edit mode) selecting the object.;
+#X text 172 340 - (edit mode) deselecting an object.;
+#X text 172 355 - (edit mode) moving a selected object.;

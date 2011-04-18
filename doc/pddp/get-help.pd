@@ -65,7 +65,7 @@ pdpedia: get;
 #X text 166 183 bang when there are no more items;
 #X text 11 23 get values from a scalar;
 #X text 221 283 <- Click here to see the data;
-#N canvas 103 43 428 248 get-help-data 0;
+#N canvas 111 75 428 272 get-help-data 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 [get] Data Window;
@@ -73,25 +73,26 @@ pdpedia: get;
 #X scalar get-help-template 79 87 jo_napot_kivanok \;;
 #X text 62 42 Each blue rectangle is a scalar. Their appearance and
 data structure are defined by the template "get-help-template".;
-#X text 27 124 The values of the fields "x" and "y" specify the screen
-coordinates for the top left corner of each rectangle. In editmode
-you can click and drag each rectangle to change these values.;
-#X text 27 177 In addition to using the [get] object \, you can right-click
+#X text 27 187 In addition to using the [get] object \, you can right-click
 on a rectangle and choose "Properties" to view the field values of
 the scalar. (You can also change them-- once you are finished \, click
 "Ok" to update the values.);
+#X text 27 124 The "x" and "y" fields in a [struct] are special: they
+always specify the screen coordinates for the top left corner of each
+rectangle. In editmode you can click and drag each rectangle to change
+these values.;
 #X restore 106 283 pd get-help-data;
 #X msg 106 116 traverse pd-get-help-data \, next;
 #X obj 106 208 get get-help-template x y s;
-#N canvas 111 383 428 175 get-help-template 0;
+#N canvas 105 219 428 175 get-help-template 0;
 #X obj 23 118 filledpolygon 9 0 1 0 0 20 0 20 30 0 30;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 [get] Template subpatch;
 #X text 19 69 This [struct] just defines a simple data structure. The
 values for the fields were set when this help patch was created.;
-#X text 21 137 (Draw a blue rectangle);
 #X obj 21 42 struct get-help-template float x float y symbol s;
+#X text 21 137 Draw a blue rectangle with a black border.;
 #X restore 106 305 pd get-help-template;
 #X text 168 383 - one outlet is created for each field specified in
 the creation arguments. When [get] receives a pointer at its inlet
@@ -109,7 +110,8 @@ before sending to [get]. (See pointer-help.pd for more information.)
 ;
 #X text 80 457 1) symbol atom;
 #X text 80 472 n) symbol atom;
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 97 563 pddp/pddplink ../04.data.structures/02.getting.data.pd
 -text doc/04.data.structures/02.getting.data.pd;
 #X obj 97 578 pddp/pddplink scalar-help.pd;

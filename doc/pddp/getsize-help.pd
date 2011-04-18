@@ -52,7 +52,7 @@ pdpedia: getsize;
 #X obj 78 140 pointer;
 #X floatatom 78 200 5 0 0 0 - - -;
 #X obj 78 171 getsize help-getsize-template array1;
-#N canvas 82 384 428 146 help-getsize-template 0;
+#N canvas 75 373 428 146 help-getsize-template 0;
 #X obj 21 82 plot array1 500 1 10 15 20;
 #X obj 21 109 filledpolygon 509 509 0 -10 -10 10 -10 10 10 -10 10;
 #X obj 21 42 struct help-getsize-template float x float y array array1
@@ -61,7 +61,7 @@ help-getsize-array1-template;
 14 -204280 -1 0;
 #X text 7 1 [getsize] Data Structure;
 #X restore 78 233 pd help-getsize-template;
-#N canvas 83 405 428 138 help-getsize-array1-template 0;
+#N canvas 78 372 428 138 help-getsize-array1-template 0;
 #X obj 21 69 filledpolygon 0 0 0 -5 0 0 5 5 0 0 -5;
 #X obj 21 42 struct help-getsize-array1-template float y;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
@@ -85,7 +85,8 @@ array.;
 #X text 119 200 here we just get the size of the array "array1".;
 #X text 168 519 - the name of a field within that template. (The field
 must be an array.);
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 98 557 pddp/pddplink all_about_arrays.pd;
 #X obj 98 572 pddp/pddplink scalar-help.pd;
 #X scalar help-getsize-template 349 282 \; 8 \; 14 \; -5 \; 10 \; 21

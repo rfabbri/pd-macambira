@@ -25,7 +25,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 13 -228856 -1 0;
 #X obj 0 216 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8 12
 0 13 -228856 -1 0;
-#X obj 0 445 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
+#X obj 0 440 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8 12
 0 13 -228856 -1 0;
 #N canvas 55 423 428 169 Related_objects 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
@@ -53,7 +53,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 458 3 drawsymbol;
 #X obj 430 20 pddp/pddplink http://wiki.puredata.info/en/drawsymbol
 -text pdpedia: drawsymbol;
-#X text 98 449 Keyboard entry is not yet supported for drawsymbol.
+#X text 98 444 Keyboard entry is not yet supported for drawsymbol.
 ;
 #N canvas 32 180 428 164 drawsymbol-help-data 0;
 #X scalar drawsymbol-help-template 101 61 whiskers rex 1 \;;
@@ -119,7 +119,7 @@ to.;
 #X text 201 84 <- click this subpatch to see how [drawsymbol] is used.
 ;
 #X text 11 23 display a symbolic field of a template;
-#X text 98 465 Note: Attempting to scroll a symbol like a number will
+#X text 98 460 Note: Attempting to scroll a symbol like a number will
 output the following message to the console (for each pixel scrolled!):
 drawnumber_motion: symbol;
 #X text 98 503 Unfortunately \, [append] does not accept symbols. Currently
@@ -127,7 +127,7 @@ drawnumber_motion: symbol;
 like those shown in the "drawsymbol-help-template" subpatch above.
 ;
 #X text 168 161 - a list will be truncated to the first element.;
-#X text 98 425 Note: you cannot use both the -n and -v flag.;
+#X text 98 420 Note: you cannot use both the -n and -v flag.;
 #X text 80 236 0-2 flags;
 #X text 168 341 - RGB color (0=black \, 999=white \, 900=red \, 90=green
 \, 9=blue \, 555=grey \, etc.).;
@@ -148,7 +148,7 @@ visible.;
 #X text 79 253 (symbol atoms);
 #X text 80 292 1) symbol atom;
 #X text 80 369 5) symbol atom;
-#X text 98 393 * Any of these can be numbers (float) or field names
+#X text 98 388 * Any of these can be numbers (float) or field names
 (symbol atom).;
 #X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
 ;

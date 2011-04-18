@@ -54,7 +54,7 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 491 3 plot;
 #X obj 465 20 pddp/pddplink http://wiki.puredata.info/en/plot -text
 pdpedia: plot;
-#N canvas 119 152 428 287 plot-help-data 0;
+#N canvas 92 134 428 403 plot-help-data 0;
 #X scalar plot-help-template 32 98 \; 2 \; -32 \; 12 \; -54 \; -9 \;
 \; 0 0 \; 7 14 \; 27 -10 \; 0 -30 \; -40 0 \; 0 50 \; 60 0 \; \; 11
 7 \; 20 5 \; 22 14 \; -20 5 \; 20 11 \; -11 8 \; -17 16 \; \;;
@@ -64,17 +64,23 @@ pdpedia: plot;
 contains three arrays \, each of which has an associated [plot] object
 that determines how they will be displayed.;
 #X text 7 1 [plot] Window to Display Data Structures;
-#X text 19 248 To see the data itself \, select "properties" for the
-scalar by right clicking on the purple square.;
+#X text 19 256 You can click and drag control points that correspond
+to the elements of an array.;
+#X text 19 286 If the [struct] that defines the array elements has
+a "y" field but no "x" field \, then you can click on one control point
+\, then drag horizontally to change multiple elements in one swipe
+(as you can with the "Put" menu array).;
+#X text 19 345 To see/edit the data itself \, select "properties" for
+the scalar by right clicking on the purple square.;
 #X restore 371 58 pd plot-help-data;
-#N canvas 110 167 428 402 plot-help-template 0;
+#N canvas 96 163 428 436 plot-help-template 0;
 #X obj 22 42 plot array1 500 1 10 15 20;
 #X text 19 67 This first example plots the red trace (500) \, width
 1 \, at point (10 \, 15) \, with horizontal spacing 20 The black diamonds
 come from the template of the array1 element itself.;
 #X text 19 228 If a "w" variable is present in the template as for
 array3 \, it is added to the line width.;
-#X obj 21 365 filledpolygon 509 509 0 -10 -10 10 -10 10 10 -10 10;
+#X obj 21 374 filledpolygon 509 509 0 -10 -10 10 -10 10 10 -10 10;
 #X obj 22 292 struct plot-help-template float x float y array array1
 plot-help-array1-template array array2 plot-help-array2-template array
 array3 plot-help-array3-template;
@@ -88,13 +94,15 @@ array3 plot-help-array3-template;
 location (100 \, 0). Since the template for array2 contains an "x"
 variable \, play ignores x spacing requests and takes x from the data
 itself.;
+#X text 18 397 Purple square to mark the left upper corner of the scalar
+;
 #X restore 371 81 pd plot-help-template;
-#N canvas 18 119 428 228 plot-help-array1-template 0;
+#N canvas 25 161 428 241 plot-help-array1-template 0;
 #X obj 0 0 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 [plot] Element of "array1" in "plot-help-template";
-#X obj 24 188 filledpolygon 0 0 0 -5 0 0 5 5 0 0 -5;
-#X obj 23 158 struct plot-help-array1-template float y;
+#X obj 24 198 filledpolygon 0 0 0 -5 0 0 5 5 0 0 -5;
+#X obj 23 168 struct plot-help-array1-template float y;
 #X text 20 38 The following data structure is defined as an element
 of "array1" in the data structure "plot-help-template". It defines
 one "y" field \, which is a reserved field that controls the y-value
@@ -104,11 +112,11 @@ click on one of the elements (i.e. \, the small black squares defined
 by [filledpolygon]) and drag horizontally to change the y-value for
 other elements as well.;
 #X restore 12 51 pd plot-help-array1-template;
-#N canvas 17 141 428 146 plot-help-array2-template 0;
+#N canvas 18 155 428 183 plot-help-array2-template 0;
 #X obj 0 0 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 [plot] Element of "array2" in "plot-help-template";
-#X obj 22 114 struct plot-help-array2-template float x float y;
+#X obj 22 134 struct plot-help-array2-template float x float y;
 #X text 20 36 This data structure is defined as an element for "array2"
 in "plot-help-template". No drawing instructions are associated with
 this [struct]. The only graphic visible in the "plot-help-data" subwindow
@@ -116,11 +124,11 @@ is the trace itself. The thickness and color of the line are defined
 solely using the 2nd [plot] object in the "plot-help-template" subwindow.
 ;
 #X restore 12 73 pd plot-help-array2-template;
-#N canvas 17 164 428 235 plot-help-array3-template 0;
+#N canvas 19 222 428 285 plot-help-array3-template 0;
 #X obj 0 0 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 [plot] Element of "array3" in "plot-help-template";
-#X obj 22 193 struct plot-help-array3-template float y float w;
+#X obj 22 223 struct plot-help-array3-template float y float w;
 #X text 19 36 This data structure is defined as the element for "array3"
 in "plot-help-template". Since the reserved "w" field is defined here
 \, you can adjust the width of the line at each element (the mouse
@@ -129,7 +137,7 @@ that allows you to change the width). The graphical result is the wavy
 blue line in the "plot-help-data" window. For both width and y-value
 \, you can click an element and drag horizontally to select and adjust
 other elements.;
-#X text 19 144 For both width and y-value \, you can click an element
+#X text 19 174 For both width and y-value \, you can click an element
 and drag horizontally to select and adjust other elements.;
 #X restore 12 94 pd plot-help-array3-template;
 #X text 202 82 explanation is in here-->;
@@ -169,7 +177,8 @@ of scalars along the path of the plot.;
 #X text 168 376 - word "curve" to specify bezier.;
 #X text 80 397 1) symbol atom;
 #X text 79 263 (symbols atoms);
-#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide;
+#X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
+;
 #X obj 98 545 pddp/pddplink all_about_arrays.pd;
 #X obj 98 575 pddp/pddplink ../4.data.structures/05.array.pd -text
 doc/4.data.structures/05.array.pd;
