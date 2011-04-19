@@ -1,10 +1,16 @@
-## Pd library template version 1.0.3
+## Pd library template version 1.0.9
 # For instructions on how to use this template, see:
 #  http://puredata.info/docs/developer/MakefileTemplate
+#
+
+# the name of this library
+# must not contain any spaces or weird characters (as it's used for
+# filenames,...)
 LIBRARY_NAME = pdogg
 
 # add your .c source files, one object per file, to the SOURCES
-# variable, help files will be included automatically
+# variable, help files will be included automatically, and for GUI
+# objects, the matching .tcl file too
 SOURCES = oggamp~.c oggcast~.c oggread~.c oggwrite~.c
 
 # list all pd objects (i.e. myobject.pd) files here, and their helpfiles will
@@ -32,9 +38,10 @@ EXTRA_DIST = pdogg.c makefile.msvc HISTORY
 #
 #------------------------------------------------------------------------------#
 
-CFLAGS = -DPD -I"$(PD_INCLUDE)"/pd -Wall -W -g
-LDFLAGS =  
-LIBS = $(shell pkg-config --libs vorbis vorbisenc vorbisfile)
+# -I"$(PD_INCLUDE)/pd" supports the header location for 0.43
+ALL_CFLAGS = -I"$(PD_INCLUDE)"
+ALL_LDFLAGS =  
+ALL_LIBS = $(shell pkg-config --libs vorbis vorbisenc vorbisfile)
 
 #------------------------------------------------------------------------------#
 #
@@ -42,12 +49,17 @@ LIBS = $(shell pkg-config --libs vorbis vorbisenc vorbisfile)
 #
 #------------------------------------------------------------------------------#
 
+# these can be set from outside without (usually) breaking the build
+CFLAGS = -Wall -W -g
+LDFLAGS=
+LIBS=
+
 # get library version from meta file
 LIBRARY_VERSION = $(shell sed -n 's|^\#X text [0-9][0-9]* [0-9][0-9]* VERSION \(.*\);|\1|p' $(LIBRARY_NAME)-meta.pd)
 
-CFLAGS += -DVERSION='"$(LIBRARY_VERSION)"'
+ALL_CFLAGS += -DPD -DVERSION='"$(LIBRARY_VERSION)"'
 
-PD_INCLUDE = $(PD_PATH)/include
+PD_INCLUDE = $(PD_PATH)/include/pd
 # where to install the library, overridden below depending on platform
 prefix = /usr/local
 libdir = $(prefix)/lib
@@ -63,7 +75,7 @@ ALLSOURCES := $(SOURCES) $(SOURCES_android) $(SOURCES_cygwin) $(SOURCES_macosx) 
 	         $(SOURCES_iphoneos) $(SOURCES_linux) $(SOURCES_windows)
 
 DISTDIR=$(LIBRARY_NAME)-$(LIBRARY_VERSION)
-ORIGDIR=pd-$(LIBRARY_NAME)_$(LIBRARY_VERSION)
+ORIGDIR=pd-$(LIBRARY_NAME:~=)_$(LIBRARY_VERSION)
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
@@ -80,9 +92,9 @@ ifeq ($(UNAME),Darwin)
     ISYSROOT = -isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.0.sdk
     IPHONE_CFLAGS = -miphoneos-version-min=3.0 $(ISYSROOT) -arch armv6
     OPT_CFLAGS = -fast -funroll-loops -fomit-frame-pointer
-	CFLAGS := $(IPHONE_CFLAGS) $(OPT_CFLAGS) $(CFLAGS)
-    LDFLAGS += -arch armv6 -bundle -undefined dynamic_lookup $(ISYSROOT)
-    LIBS += -lc 
+    ALL_CFLAGS := $(IPHONE_CFLAGS) $(ALL_CFLAGS)
+    ALL_LDFLAGS += -arch armv6 -bundle -undefined dynamic_lookup $(ISYSROOT)
+    ALL_LIBS += -lc 
     STRIP = strip -x
     DISTBINDIR=$(DISTDIR)-$(OS)
   else # Mac OS X
@@ -98,16 +110,38 @@ ifeq ($(UNAME),Darwin)
       FAT_FLAGS = -arch ppc -arch i386 -arch x86_64 -mmacosx-version-min=10.4
       SOURCES += $(SOURCES_iphoneos)
     endif
-    CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include
-    LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
+    ALL_CFLAGS += $(FAT_FLAGS) -fPIC -I/sw/include
+    ALL_LDFLAGS += $(FAT_FLAGS) -bundle -undefined dynamic_lookup -L/sw/lib
     # if the 'pd' binary exists, check the linking against it to aid with stripping
-    LDFLAGS += $(shell test -e $(PD_PATH)/bin/pd && echo -bundle_loader $(PD_PATH)/bin/pd)
-    LIBS += -lc 
+    ALL_LDFLAGS += $(shell test -e $(PD_PATH)/bin/pd && echo -bundle_loader $(PD_PATH)/bin/pd)
+    ALL_LIBS += -lc 
     STRIP = strip -x
     DISTBINDIR=$(DISTDIR)-$(OS)
 # install into ~/Library/Pd on Mac OS X since /usr/local isn't used much
     pkglibdir=$(HOME)/Library/Pd
   endif
+endif
+# Tho Android uses Linux, we use this fake uname to provide an easy way to
+# setup all this things needed to cross-compile for Android using the NDK
+ifeq ($(UNAME),ANDROID)
+  CPU := arm
+  SOURCES += $(SOURCES_android)
+  EXTENSION = pd_linux
+  OS = android
+  PD_PATH = /usr
+  NDK_BASE := /usr/local/android-ndk
+  NDK_PLATFORM_VERSION := 5
+  NDK_SYSROOT=$(NDK_BASE)/platforms/android-$(NDK_PLATFORM_VERSION)/arch-arm
+  NDK_UNAME := $(shell uname -s | tr '[A-Z]' '[a-z]')
+  NDK_TOOLCHAIN_BASE=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_UNAME)-x86
+  CC := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-gcc --sysroot=$(NDK_SYSROOT)
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  CFLAGS += 
+  LDFLAGS += -Wl,--export-dynamic -shared
+  LIBS += -lc
+  STRIP := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-strip \
+	--strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
 ifeq ($(UNAME),Linux)
   CPU := $(shell uname -m)
@@ -116,9 +150,37 @@ ifeq ($(UNAME),Linux)
   OS = linux
   PD_PATH = /usr
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-  CFLAGS += -fPIC
-  LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
-  LIBS += -lc
+  ALL_CFLAGS += -fPIC
+  ALL_LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  ALL_LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
+ifeq ($(UNAME),GNU)
+  # GNU/Hurd, should work like GNU/Linux for basically all externals
+  CPU := $(shell uname -m)
+  SOURCES += $(SOURCES_linux)
+  EXTENSION = pd_linux
+  OS = linux
+  PD_PATH = /usr
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  ALL_CFLAGS += -fPIC
+  ALL_LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  ALL_LIBS += -lc
+  STRIP = strip --strip-unneeded -R .note -R .comment
+  DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
+endif
+ifeq ($(UNAME),GNU/kFreeBSD)
+  # Debian GNU/kFreeBSD, should work like GNU/Linux for basically all externals
+  CPU := $(shell uname -m)
+  SOURCES += $(SOURCES_linux)
+  EXTENSION = pd_linux
+  OS = linux
+  PD_PATH = /usr
+  OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+  ALL_CFLAGS += -fPIC
+  ALL_LDFLAGS += -Wl,--export-dynamic  -shared -fPIC
+  ALL_LIBS += -lc
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)-$(shell uname -m)
 endif
@@ -129,9 +191,9 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME)))
   OS = cygwin
   PD_PATH = $(cygpath $(PROGRAMFILES))/pd
   OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-  CFLAGS += 
-  LDFLAGS += -Wl,--export-dynamic -shared -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin"
-  LIBS += -lc -lpd
+  ALL_CFLAGS += 
+  ALL_LDFLAGS += -Wl,--export-dynamic -shared -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin"
+  ALL_LIBS += -lc -lpd
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
@@ -142,9 +204,9 @@ ifeq (MINGW,$(findstring MINGW,$(UNAME)))
   OS = windows
   PD_PATH = $(shell cd "$(PROGRAMFILES)"/pd && pwd)
   OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
-  CFLAGS += -mms-bitfields
-  LDFLAGS += -s -shared -Wl,--enable-auto-import
-  LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32 -lpthreadGC2
+  ALL_CFLAGS += -mms-bitfields
+  ALL_LDFLAGS += -s -shared -Wl,--enable-auto-import
+  ALL_LIBS += -L"$(PD_PATH)/src" -L"$(PD_PATH)/bin" -L"$(PD_PATH)/obj" -lpd -lwsock32 -lkernel32 -luser32 -lgdi32 -lpthreadGC2
   STRIP = strip --strip-unneeded -R .note -R .comment
   DISTBINDIR=$(DISTDIR)-$(OS)
 endif
@@ -154,21 +216,24 @@ HELPPATCHES ?= $(SOURCES:.c=-help.pd) $(PDOBJECTS:.pd=-help.pd)
 
 CFLAGS += $(OPT_CFLAGS)
 
+ALL_CFLAGS := $(ALL_CFLAGS) $(CFLAGS)
+ALL_LDFLAGS := $(LDFLAGS) $(ALL_LDFLAGS)
+ALL_LIBS := $(LIBS) $(ALL_LIBS)
 
 .PHONY = install libdir_install single_install install-doc install-exec install-examples install-manual clean dist etags $(LIBRARY_NAME)
 
 all: $(SOURCES:.c=.$(EXTENSION))
 
 %.o: %.c
-	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+	$(CC) $(ALL_CFLAGS) -o "$*.o" -c "$*.c"
 
 %.$(EXTENSION): %.o
-	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS)
+	$(CC) $(ALL_LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(ALL_LIBS)
 	chmod a-x "$*.$(EXTENSION)"
 
 # this links everything into a single binary file
 $(LIBRARY_NAME): $(SOURCES:.c=.o) $(LIBRARY_NAME).o
-	$(CC) $(LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(LIBS)
+	$(CC) $(ALL_LDFLAGS) -o $(LIBRARY_NAME).$(EXTENSION) $(SOURCES:.c=.o) $(LIBRARY_NAME).o $(ALL_LIBS)
 	chmod a-x $(LIBRARY_NAME).$(EXTENSION)
 
 install: libdir_install
@@ -182,6 +247,9 @@ libdir_install: $(SOURCES:.c=.$(EXTENSION)) install-doc install-examples install
 	test -z "$(strip $(SOURCES))" || (\
 		$(INSTALL_PROGRAM) $(SOURCES:.c=.$(EXTENSION)) $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME) && \
 		$(STRIP) $(addprefix $(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)/,$(SOURCES:.c=.$(EXTENSION))))
+	test -z "$(strip $(shell ls $(SOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(shell ls $(SOURCES:.c=.tcl)) \
+			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS) \
 			$(DESTDIR)$(objectsdir)/$(LIBRARY_NAME)
@@ -254,6 +322,8 @@ dist: $(DISTDIR)
 	$(INSTALL_DATA) $(LIBRARY_NAME)-meta.pd  $(DISTDIR)
 	test -z "$(strip $(ALLSOURCES))" || \
 		$(INSTALL_DATA) $(ALLSOURCES)  $(DISTDIR)
+	test -z "$(strip $(shell ls $(ALLSOURCES:.c=.tcl)))" || \
+		$(INSTALL_DATA) $(shell ls $(ALLSOURCES:.c=.tcl))  $(DISTDIR)
 	test -z "$(strip $(PDOBJECTS))" || \
 		$(INSTALL_DATA) $(PDOBJECTS)  $(DISTDIR)
 	test -z "$(strip $(HELPPATCHES))" || \
@@ -289,6 +359,9 @@ showsetup:
 	@echo "CFLAGS: $(CFLAGS)"
 	@echo "LDFLAGS: $(LDFLAGS)"
 	@echo "LIBS: $(LIBS)"
+	@echo "ALL_CFLAGS: $(ALL_CFLAGS)"
+	@echo "ALL_LDFLAGS: $(ALL_LDFLAGS)"
+	@echo "ALL_LIBS: $(ALL_LIBS)"
 	@echo "PD_INCLUDE: $(PD_INCLUDE)"
 	@echo "PD_PATH: $(PD_PATH)"
 	@echo "objectsdir: $(objectsdir)"
