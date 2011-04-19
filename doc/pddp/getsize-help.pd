@@ -1,7 +1,9 @@
 #N struct help-getsize-template float x float y array array1 help-getsize-array1-template
 ;
-#N struct help-getsize-array1-template float y;
+#N struct help-getsize-array1-template float y float x;
 #N canvas 0 0 555 619 10;
+#X scalar help-getsize-template 89 279 \; 7 -6 \; 7 35 \; 26 57 \;
+45 85 \; 74 90 \; 79 137 \; 48 150 \; \;;
 #X obj 0 595 cnv 15 552 21 empty \$0-pddp.cnv.footer empty 20 12 0
 14 -228856 -66577 0;
 #X obj 0 0 cnv 15 552 40 empty \$0-pddp.cnv.header getsize 3 12 0 18
@@ -49,27 +51,30 @@ Wilkes revised the patch to conform to the PDDP template for Pd version
 #X obj 473 3 getsize;
 #X obj 445 20 pddp/pddplink http://wiki.puredata.info/en/getsize -text
 pdpedia: getsize;
-#X obj 78 140 pointer;
-#X floatatom 78 200 5 0 0 0 - - -;
-#X obj 78 171 getsize help-getsize-template array1;
-#N canvas 75 373 428 146 help-getsize-template 0;
-#X obj 21 82 plot array1 500 1 10 15 20;
-#X obj 21 109 filledpolygon 509 509 0 -10 -10 10 -10 10 10 -10 10;
+#X obj 78 135 pointer;
+#X floatatom 78 190 5 0 0 0 - - -;
+#X obj 78 161 getsize help-getsize-template array1;
+#N canvas 83 204 428 227 help-getsize-template 0;
 #X obj 21 42 struct help-getsize-template float x float y array array1
 help-getsize-array1-template;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 [getsize] Data Structure;
-#X restore 78 233 pd help-getsize-template;
-#N canvas 78 372 428 138 help-getsize-array1-template 0;
-#X obj 21 69 filledpolygon 0 0 0 -5 0 0 5 5 0 0 -5;
-#X obj 21 42 struct help-getsize-array1-template float y;
+#X obj 21 138 filledpolygon 11 527 1 -10 0 175 0 175 110 -10 110;
+#X obj 21 85 plot array1 770 2 10 15 20;
+#X text 18 107 An array plotted with a yellow trace 2 pixels wide.
+;
+#X text 18 157 A black rectangle for the background.;
+#X restore 78 223 pd help-getsize-template;
+#N canvas 76 167 428 138 help-getsize-array1-template 0;
 #X obj 1 1 cnv 15 425 20 empty \$0-pddp.cnv.subheading empty 3 12 0
 14 -204280 -1 0;
 #X text 7 1 [getsize] Data Structure;
+#X obj 21 42 struct help-getsize-array1-template float y float x;
+#X obj 21 69 filledpolygon 999 5 1 -5 0 0 5 5 0 0 -5;
 #X text 18 91 This is the template for the elements of the array "array1"
-\, which is defined in "help-getsize-template".;
-#X restore 78 254 pd help-getsize-array1-template;
+\, which is defined in [pd help-getsize-template].;
+#X restore 78 244 pd help-getsize-array1-template;
 #X text 98 414 pointer;
 #X text 11 23 get the number of elements in an array;
 #X text 168 414 - a pointer to a scalar that contains an array.;
@@ -82,19 +87,18 @@ which should be an array \, and outputs the number of elements of the
 array.;
 #X text 168 504 - a struct name to specify the the template of a scalar.
 ;
-#X text 119 200 here we just get the size of the array "array1".;
+#X text 119 190 here we just get the size of the array "array1".;
 #X text 168 519 - the name of a field within that template. (The field
 must be an array.);
 #X obj 4 597 pddp/pddplink all_about_help_patches.pd -text Usage Guide
 ;
 #X obj 98 557 pddp/pddplink all_about_arrays.pd;
 #X obj 98 572 pddp/pddplink scalar-help.pd;
-#X scalar help-getsize-template 349 282 \; 8 \; 14 \; -5 \; 10 \; 21
-\; 10 \; 20 \; 70 \; 10 \; \;;
-#X text 77 332 To the right is an example data structure that contains
-an array with 9 elements. (The purple square is just a reference point.)
-;
 #X msg 78 109 traverse pd-getsize-help.pd \, next;
-#X connect 13 0 15 0;
-#X connect 15 0 14 0;
-#X connect 33 0 13 0;
+#X text 278 303 To the left is a scalar that contains;
+#X text 278 333 diamond represents one element. (The;
+#X text 278 318 an array of 7 elements. Each white;
+#X text 278 348 black background is just a reference.);
+#X connect 14 0 16 0;
+#X connect 16 0 15 0;
+#X connect 32 0 14 0;
