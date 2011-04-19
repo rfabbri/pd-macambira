@@ -62,7 +62,7 @@ prebuilt_install:
 	install -p pd-extended.bat $(DESTDIR)$(prefix)
 # make libdir start automatically by being in new 'startup' folder
 	install -d $(DESTDIR)$(libpddir)/startup
-	ln -s ../extra/libdir/libdir.$(EXTENSION) \
+	cp -a $(DESTDIR)$(libpddir)/extra/libdir/libdir.$(EXTENSION) \
 		$(DESTDIR)$(libpddir)/startup/libdir.$(EXTENSION)
 
 
