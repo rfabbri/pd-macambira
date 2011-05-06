@@ -1,5 +1,5 @@
 #N canvas 465 200 609 471 10;
-#X msg 204 251 1000;
+#X msg 202 249 1000;
 #X msg 207 273 200;
 #X floatatom 116 149 4 0 0 0 - - -;
 #X obj 178 384 timer;
@@ -27,6 +27,10 @@
 #X msg 41 54 3.14159;
 #X floatatom 93 103 4 0 0 0 - - -;
 #X msg 93 123 \$1 91 92 93 94 95;
+#X msg 291 291 stop;
+#X msg 198 229 4000;
+#X text 340 275 !! note: incompatible to speedlim;
+#X text 341 292 stop message into the second inlet;
 #X connect 0 0 13 1;
 #X connect 1 0 13 1;
 #X connect 2 0 14 0;
@@ -45,3 +49,5 @@
 #X connect 23 0 13 0;
 #X connect 24 0 25 0;
 #X connect 25 0 13 0;
+#X connect 26 0 13 1;
+#X connect 27 0 13 1;
