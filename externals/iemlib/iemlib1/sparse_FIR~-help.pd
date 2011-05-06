@@ -3,13 +3,13 @@
 #X text 32 96 % cpu;
 #X obj 4 93 dsp;
 #X obj 4 73 tgl 15 0 empty empty dsp_ON/OFF 2 -8 0 10 -225271 -42246
--90881 0 1;
+-90881 1 1;
 #X floatatom 183 494 7 0 0 0 - - -;
 #X obj 112 373 dac~;
 #X obj 112 347 gainvu~ 300;
 #X obj 174 369 vu 15 120 empty empty 8 -8 0 10 -66577 -1 1 0;
 #X obj 294 216 vsl 15 128 0 127 0 0 empty empty gain -7 -8 0 10 -225271
--42246 -90881 9400 1;
+-42246 -90881 7300 1;
 #X obj 113 95 noise~;
 #X floatatom 173 512 7 0 0 0 - - -;
 #X floatatom 17 113 5 0 0 0 - - -;
@@ -70,13 +70,14 @@ its value.;
 #X text 770 318 same as;
 #X text 771 341 same as;
 #X text 770 363 same as;
-#X msg 167 97 size 0;
+#X msg 35 236 size 0;
 #X msg 223 97 size 3;
 #X msg 163 142 size 2;
 #X msg 165 120 size 1;
 #X text 847 104 sparse list;
 #X text 680 470 sparse list;
 #X text 490 384 sparse matrix;
+#X text 29 219 ignored;
 #X connect 2 0 0 0;
 #X connect 2 1 11 0;
 #X connect 3 0 2 0;
