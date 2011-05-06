@@ -25,20 +25,21 @@ typedef struct _biquad_freq_resp
 
 static t_class *biquad_freq_resp_class;
 
-static void biquad_freq_resp_float(t_biquad_freq_resp *x, t_floatarg f)
+static void biquad_freq_resp_float(t_biquad_freq_resp *x, t_floatarg freq_phase)
 {
   t_float re1, im1, re2, im2;
   t_float c, s, a;
+  t_float pi = 4.0f * atan(1.0f);
   
-  if(f < 0.0f)
-    f = 0.0f;
-  else if(f > 180.0f)
-    f = 180.0;
-  f *= 3.14159265f;
-  f /= 180.0f;
+  if(freq_phase < 0.0f)
+    freq_phase = 0.0f;
+  else if(freq_phase > 180.0f)
+    freq_phase = 180.0;
+  freq_phase *= pi;
+  freq_phase /= 180.0f;
   
-  c = cos(f);
-  s = sin(f);
+  c = cos(freq_phase);
+  s = sin(freq_phase);
   
   re1 = x->a0 + x->a1*c + x->a2*(c*c - s*s);
   im1 = x->a1*s + x->a2*2.0f*(s*c);
@@ -81,6 +82,5 @@ void biquad_freq_resp_setup(void)
   biquad_freq_resp_class = class_new(gensym("biquad_freq_resp"), (t_newmethod)biquad_freq_resp_new, 0,
     sizeof(t_biquad_freq_resp), 0, 0);
   class_addfloat(biquad_freq_resp_class, biquad_freq_resp_float);
-    class_addlist(biquad_freq_resp_class, (t_method)biquad_freq_resp_list);
-//    class_sethelpsymbol(biquad_freq_resp_class, gensym("iemhelp/help-biquad_freq_resp"));
+  class_addlist(biquad_freq_resp_class, (t_method)biquad_freq_resp_list);
 }
