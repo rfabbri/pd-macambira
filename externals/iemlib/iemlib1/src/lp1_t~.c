@@ -1,14 +1,14 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2010 */
+iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2011 */
 
 #include "m_pd.h"
 #include "iemlib.h"
 #include <math.h>
 
 /* -- lp1_t~ - slow dynamic lowpass-filter 1. order controlled by time constant tau input --- */
-/* -- now with double precision -- */
+/* -- now with double precision; for low-frequency filters it is important to calculate the filter in double precision -- */
 
 typedef struct _lp1_t_tilde
 {
@@ -25,7 +25,7 @@ typedef struct _lp1_t_tilde
   t_float   interpol_time;
   int       ticks;
   int       counter_t;
-  t_float   x_msi;
+  t_float   x_float_sig_in;
 } t_lp1_t_tilde;
 
 static t_class *lp1_t_tilde_class;
@@ -140,6 +140,11 @@ static void lp1_t_tilde_ft1(t_lp1_t_tilde *x, t_floatarg f_time_const)
   }
 }
 
+static void lp1_t_tilde_set(t_lp1_t_tilde *x, t_floatarg w1)
+{
+  x->yn1 = (double)w1;
+}
+
 static void lp1_t_tilde_dsp(t_lp1_t_tilde *x, t_signal **sp)
 {
   int i, n=(int)sp[0]->s_n;
@@ -172,7 +177,7 @@ static void *lp1_t_tilde_new(t_symbol *s, int argc, t_atom *argv)
   inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("ft1"));
   inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("ft2"));
   outlet_new(&x->x_obj, &s_signal);
-  x->x_msi = 0;
+  x->x_float_sig_in = 0.0f;
   x->counter_t = 1;
   x->delta_t = 0.0;
   x->interpol_time = 0.0f;
@@ -207,8 +212,9 @@ void lp1_t_tilde_setup(void)
 {
   lp1_t_tilde_class = class_new(gensym("lp1_t~"), (t_newmethod)lp1_t_tilde_new,
         0, sizeof(t_lp1_t_tilde), 0, A_GIMME, 0);
-  CLASS_MAINSIGNALIN(lp1_t_tilde_class, t_lp1_t_tilde, x_msi);
+  CLASS_MAINSIGNALIN(lp1_t_tilde_class, t_lp1_t_tilde, x_float_sig_in);
   class_addmethod(lp1_t_tilde_class, (t_method)lp1_t_tilde_dsp, gensym("dsp"), 0);
   class_addmethod(lp1_t_tilde_class, (t_method)lp1_t_tilde_ft1, gensym("ft1"), A_FLOAT, 0);
   class_addmethod(lp1_t_tilde_class, (t_method)lp1_t_tilde_ft2, gensym("ft2"), A_FLOAT, 0);
+  class_addmethod(lp1_t_tilde_class, (t_method)lp1_t_tilde_set, gensym("set"), A_FLOAT, 0);
 }

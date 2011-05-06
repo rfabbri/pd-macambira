@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 */
+iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2011 */
 
 #include "m_pd.h"
 #include "iemlib.h"
@@ -41,7 +41,7 @@ typedef struct _para_bp2_tilde
   int      event_mask;
   void     *x_debug_outlet;
   t_atom   x_at[5];
-  t_float  x_msi;
+  t_float  x_float_sig_in;
 } t_para_bp2_tilde;
 
 static t_class *para_bp2_tilde_class;
@@ -286,6 +286,15 @@ static void para_bp2_tilde_ft1(t_para_bp2_tilde *x, t_floatarg f)
   }
 }
 
+static void para_bp2_tilde_set(t_para_bp2_tilde *x, t_symbol *s, int argc, t_atom *argv)
+{
+  if((argc >= 2) && IS_A_FLOAT(argv, 1) && IS_A_FLOAT(argv, 0))
+  {
+    x->wn1 = (t_float)atom_getfloatarg(0, argc, argv);
+    x->wn2 = (t_float)atom_getfloatarg(1, argc, argv);
+  }
+}
+
 static void para_bp2_tilde_print(t_para_bp2_tilde *x)
 {
   //  post("fb1 = %g, fb2 = %g, ff1 = %g, ff2 = %g, ff3 = %g", x->b1, x->b2, x->a0, x->a1, x->a2);
@@ -338,7 +347,7 @@ static void *para_bp2_tilde_new(t_symbol *s, int argc, t_atom *argv)
   inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("ft4"));
   outlet_new(&x->x_obj, &s_signal);
   x->x_debug_outlet = outlet_new(&x->x_obj, &s_list);
-  x->x_msi = 0;
+  x->x_float_sig_in = 0.0f;
   
   x->x_at[0].a_type = A_FLOAT;
   x->x_at[1].a_type = A_FLOAT;
@@ -407,12 +416,12 @@ void para_bp2_tilde_setup(void)
 {
   para_bp2_tilde_class = class_new(gensym("para_bp2~"), (t_newmethod)para_bp2_tilde_new,
         0, sizeof(t_para_bp2_tilde), 0, A_GIMME, 0);
-  CLASS_MAINSIGNALIN(para_bp2_tilde_class, t_para_bp2_tilde, x_msi);
+  CLASS_MAINSIGNALIN(para_bp2_tilde_class, t_para_bp2_tilde, x_float_sig_in);
   class_addmethod(para_bp2_tilde_class, (t_method)para_bp2_tilde_dsp, gensym("dsp"), 0);
   class_addmethod(para_bp2_tilde_class, (t_method)para_bp2_tilde_ft1, gensym("ft1"), A_FLOAT, 0);
   class_addmethod(para_bp2_tilde_class, (t_method)para_bp2_tilde_ft2, gensym("ft2"), A_FLOAT, 0);
   class_addmethod(para_bp2_tilde_class, (t_method)para_bp2_tilde_ft3, gensym("ft3"), A_FLOAT, 0);
   class_addmethod(para_bp2_tilde_class, (t_method)para_bp2_tilde_ft4, gensym("ft4"), A_FLOAT, 0);
+  class_addmethod(para_bp2_tilde_class, (t_method)para_bp2_tilde_set, gensym("set"), A_GIMME, 0);
   class_addmethod(para_bp2_tilde_class, (t_method)para_bp2_tilde_print, gensym("print"), 0);
-//  class_sethelpsymbol(para_bp2_tilde_class, gensym("iemhelp/help-para_bp2~"));
 }

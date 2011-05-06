@@ -15,7 +15,7 @@ typedef struct _vcf_filter_tilde
   t_object x_obj;
   t_float  x_wn1;
   t_float  x_wn2;
-  t_float  x_msi;
+  t_float  x_float_sig_in1;
   char     x_filtname[6];
 } t_vcf_filter_tilde;
 
@@ -300,6 +300,15 @@ static void vcf_filter_tilde_dsp(t_vcf_filter_tilde *x, t_signal **sp)
   }
 }
 
+static void vcf_filter_tilde_set(t_vcf_filter_tilde *x, t_symbol *s, int argc, t_atom *argv)
+{
+  if((argc >= 2) && IS_A_FLOAT(argv, 1) && IS_A_FLOAT(argv, 0))
+  {
+    x->x_wn1 = (t_float)atom_getfloatarg(0, argc, argv);
+    x->x_wn2 = (t_float)atom_getfloatarg(1, argc, argv);
+  }
+}
+
 static void *vcf_filter_tilde_new(t_symbol *filt_typ)
 {
   t_vcf_filter_tilde *x = (t_vcf_filter_tilde *)pd_new(vcf_filter_tilde_class);
@@ -308,7 +317,7 @@ static void *vcf_filter_tilde_new(t_symbol *filt_typ)
   inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
   inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
   outlet_new(&x->x_obj, &s_signal);
-  x->x_msi = 0;
+  x->x_float_sig_in1 = 0;
   x->x_wn1 = 0.0f;
   x->x_wn2 = 0.0f;
   c = (char *)filt_typ->s_name;
@@ -321,7 +330,7 @@ void vcf_filter_tilde_setup(void)
 {
   vcf_filter_tilde_class = class_new(gensym("vcf_filter~"), (t_newmethod)vcf_filter_tilde_new,
     0, sizeof(t_vcf_filter_tilde), 0, A_SYMBOL, 0);
-  CLASS_MAINSIGNALIN(vcf_filter_tilde_class, t_vcf_filter_tilde, x_msi);
+  CLASS_MAINSIGNALIN(vcf_filter_tilde_class, t_vcf_filter_tilde, x_float_sig_in1);
   class_addmethod(vcf_filter_tilde_class, (t_method)vcf_filter_tilde_dsp, gensym("dsp"), 0);
-//  class_sethelpsymbol(vcf_filter_tilde_class, gensym("iemhelp/help-vcf_filter~"));
+  class_addmethod(vcf_filter_tilde_class, (t_method)vcf_filter_tilde_set, gensym("set"), A_GIMME, 0);
 }
