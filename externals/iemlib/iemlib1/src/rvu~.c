@@ -22,7 +22,7 @@ typedef struct _rvu_tilde
   t_float   x_release_time;
   t_float   x_c1;
   int       x_started;
-  t_float   x_msi;
+  t_float   x_float_sig_in;
 } t_rvu_tilde;
 
 static t_class *rvu_tilde_class;
@@ -157,7 +157,7 @@ static void *rvu_tilde_new(t_floatarg metro_time, t_floatarg release_time)
   x->x_clock_metro = clock_new(x, (t_method)rvu_tilde_tick_metro);
   x->x_started = 1;
   outlet_new(&x->x_obj, &s_float);
-  x->x_msi = 0.0f;
+  x->x_float_sig_in = 0.0f;
   return(x);
 }
 
@@ -166,7 +166,7 @@ void rvu_tilde_setup(void)
   rvu_tilde_class = class_new(gensym("rvu~"), (t_newmethod)rvu_tilde_new,
     (t_method)rvu_tilde_ff, sizeof(t_rvu_tilde), 0,
     A_DEFFLOAT, A_DEFFLOAT, 0);
-  CLASS_MAINSIGNALIN(rvu_tilde_class, t_rvu_tilde, x_msi);
+  CLASS_MAINSIGNALIN(rvu_tilde_class, t_rvu_tilde, x_float_sig_in);
   class_addmethod(rvu_tilde_class, (t_method)rvu_tilde_dsp, gensym("dsp"), 0);
   class_addfloat(rvu_tilde_class, rvu_tilde_float);
   class_addmethod(rvu_tilde_class, (t_method)rvu_tilde_reset, gensym("reset"), 0);

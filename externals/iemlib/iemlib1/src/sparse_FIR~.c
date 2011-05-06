@@ -23,7 +23,7 @@ typedef struct _sparse_FIR_tilde
   int       x_n_order;
   int       x_n_order_malloc;
   int       x_rw_index;
-  t_float   x_msi;
+  t_float   x_float_sig_in;
 } t_sparse_FIR_tilde;
 
 static t_class *sparse_FIR_tilde_class;
@@ -251,7 +251,7 @@ static void *sparse_FIR_tilde_new(t_floatarg fn)
   for(i=0; i<n_order; i++)
     x->x_history_beg[i] = 0.0f;
   
-  x->x_msi = 0;
+  x->x_float_sig_in = 0.0f;
   
   post("NEW: n_coef_resp_order = %d, n_coef = %d, n_coef_malloc = %d, n_order = %d, n_order_malloc = %d", x->x_n_coef_resp_order, x->x_n_coef, x->x_n_coef_malloc, x->x_n_order, x->x_n_order_malloc);
   
@@ -309,7 +309,7 @@ void sparse_FIR_tilde_setup(void)
 {
   sparse_FIR_tilde_class = class_new(gensym("sparse_FIR~"), (t_newmethod)sparse_FIR_tilde_new,
     (t_method)sparse_FIR_tilde_free, sizeof(t_sparse_FIR_tilde), 0, A_DEFFLOAT, 0);
-  CLASS_MAINSIGNALIN(sparse_FIR_tilde_class, t_sparse_FIR_tilde, x_msi);
+  CLASS_MAINSIGNALIN(sparse_FIR_tilde_class, t_sparse_FIR_tilde, x_float_sig_in);
   class_addmethod(sparse_FIR_tilde_class, (t_method)sparse_FIR_tilde_dsp, gensym("dsp"), 0);
   class_addlist(sparse_FIR_tilde_class, (t_method)sparse_FIR_tilde_list);
   class_addmethod(sparse_FIR_tilde_class, (t_method)sparse_FIR_tilde_matrix, gensym("matrix"), A_GIMME, 0);

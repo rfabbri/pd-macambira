@@ -20,7 +20,7 @@ typedef struct _sin_phase_tilde
   int      x_counter2;
   int      x_state1;
   int      x_state2;
-  t_float  x_msi;
+  t_float  x_float_sig_in;
 } t_sin_phase_tilde;
 
 static t_class *sin_phase_tilde_class;
@@ -106,7 +106,7 @@ static void *sin_phase_tilde_new(void)
   x->x_counter2 = 0;
   x->x_state1 = 0;
   x->x_state2 = 0;
-  x->x_msi = 0;
+  x->x_float_sig_in = 0.0f;
   
   return (x);
 }
@@ -115,7 +115,7 @@ void sin_phase_tilde_setup(void)
 {
   sin_phase_tilde_class = class_new(gensym("sin_phase~"), (t_newmethod)sin_phase_tilde_new,
         0, sizeof(t_sin_phase_tilde), 0, 0);
-  CLASS_MAINSIGNALIN(sin_phase_tilde_class, t_sin_phase_tilde, x_msi);
+  CLASS_MAINSIGNALIN(sin_phase_tilde_class, t_sin_phase_tilde, x_float_sig_in);
   class_addmethod(sin_phase_tilde_class, (t_method)sin_phase_tilde_dsp, gensym("dsp"), 0);
 //  class_sethelpsymbol(sin_phase_tilde_class, gensym("iemhelp/help-sin_phase~"));
 }

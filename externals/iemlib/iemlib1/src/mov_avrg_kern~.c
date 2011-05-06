@@ -19,7 +19,7 @@ typedef struct _mov_avrg_kern_tilde
   double   x_mstime;
   int      x_nsamps;
   int      x_counter;
-  t_float  x_msi;
+  t_float  x_float_sig_in;
 } t_mov_avrg_kern_tilde;
 
 static t_class *mov_avrg_kern_tilde_class;
@@ -120,7 +120,7 @@ static void *mov_avrg_kern_tilde_new(t_floatarg mstime)
   inlet_new(&x->x_obj,  &x->x_obj.ob_pd, &s_signal, &s_signal);
   inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("ft1"));
   outlet_new(&x->x_obj, &s_signal);
-  x->x_msi = 0;
+  x->x_float_sig_in = 0.0f;
   return(x);
 }
 
@@ -128,7 +128,7 @@ void mov_avrg_kern_tilde_setup(void)
 {
   mov_avrg_kern_tilde_class = class_new(gensym("mov_avrg_kern~"), (t_newmethod)mov_avrg_kern_tilde_new,
         0, sizeof(t_mov_avrg_kern_tilde), 0, A_FLOAT, 0);
-  CLASS_MAINSIGNALIN(mov_avrg_kern_tilde_class, t_mov_avrg_kern_tilde, x_msi);
+  CLASS_MAINSIGNALIN(mov_avrg_kern_tilde_class, t_mov_avrg_kern_tilde, x_float_sig_in);
   class_addmethod(mov_avrg_kern_tilde_class, (t_method)mov_avrg_kern_tilde_dsp, gensym("dsp"), 0);
   class_addmethod(mov_avrg_kern_tilde_class, (t_method)mov_avrg_kern_tilde_ft1, gensym("ft1"), A_FLOAT, 0);
   class_addmethod(mov_avrg_kern_tilde_class, (t_method)mov_avrg_kern_tilde_reset, gensym("reset"), 0);

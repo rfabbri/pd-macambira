@@ -15,7 +15,7 @@ typedef struct _iem_pow4_tilde
 {
   t_object  x_obj;
   t_float   x_exp;
-  t_float   x_msi;
+  t_float   x_float_sig_in;
 } t_iem_pow4_tilde;
 
 static void iem_pow4_tilde_ft1(t_iem_pow4_tilde *x, t_floatarg f)
@@ -62,7 +62,7 @@ static void *iem_pow4_tilde_new(t_floatarg f)
   x->x_exp = f;
   inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("ft1"));
   outlet_new(&x->x_obj, gensym("signal"));
-  x->x_msi = 0;
+  x->x_float_sig_in = 0.0f;
   return (x);
 }
 
@@ -71,7 +71,7 @@ void iem_pow4_tilde_setup(void)
   iem_pow4_tilde_class = class_new(gensym("iem_pow4~"), (t_newmethod)iem_pow4_tilde_new, 0,
     sizeof(t_iem_pow4_tilde), 0, A_DEFFLOAT, 0);
   class_addcreator((t_newmethod)iem_pow4_tilde_new, gensym("icot~"), 0);
-  CLASS_MAINSIGNALIN(iem_pow4_tilde_class, t_iem_pow4_tilde, x_msi);
+  CLASS_MAINSIGNALIN(iem_pow4_tilde_class, t_iem_pow4_tilde, x_float_sig_in);
   class_addmethod(iem_pow4_tilde_class, (t_method)iem_pow4_tilde_dsp, gensym("dsp"), 0);
   class_addmethod(iem_pow4_tilde_class, (t_method)iem_pow4_tilde_ft1, gensym("ft1"), A_FLOAT, 0);
 //  class_sethelpsymbol(iem_pow4_tilde_class, gensym("iemhelp/help-iem_pow4~"));

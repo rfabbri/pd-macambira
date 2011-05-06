@@ -30,7 +30,7 @@ typedef struct _prvu_tilde
   t_float   x_release_time;
   t_float   x_c1;
   int       x_started;
-  t_float   x_msi;
+  t_float   x_float_sig_in;
 } t_prvu_tilde;
 
 static t_class *prvu_tilde_class;
@@ -251,7 +251,7 @@ static void *prvu_tilde_new(t_floatarg metro_time, t_floatarg hold_time,
   x->x_at[0].a_type = A_FLOAT;
   x->x_at[1].a_type = A_FLOAT;
   x->x_at[2].a_type = A_FLOAT;
-  x->x_msi = 0.0f;
+  x->x_float_sig_in = 0.0f;
   return(x);
 }
 
@@ -260,7 +260,7 @@ void prvu_tilde_setup(void)
   prvu_tilde_class = class_new(gensym("prvu~"), (t_newmethod)prvu_tilde_new,
     (t_method)prvu_tilde_ff, sizeof(t_prvu_tilde), 0,
     A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
-  CLASS_MAINSIGNALIN(prvu_tilde_class, t_prvu_tilde, x_msi);
+  CLASS_MAINSIGNALIN(prvu_tilde_class, t_prvu_tilde, x_float_sig_in);
   class_addmethod(prvu_tilde_class, (t_method)prvu_tilde_dsp, gensym("dsp"), 0);
   class_addfloat(prvu_tilde_class, prvu_tilde_float);
   class_addmethod(prvu_tilde_class, (t_method)prvu_tilde_reset, gensym("reset"), 0);
