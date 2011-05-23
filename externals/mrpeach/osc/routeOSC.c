@@ -104,7 +104,6 @@ void routeOSC_setup(void);
 static void routeOSC_free(t_routeOSC *x);
 static int MyPatternMatch (const char *pattern, const char *test);
 static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
-static void routeOSC_list(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void *routeOSC_new(t_symbol *s, int argc, t_atom *argv);
 static void routeOSC_set(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
 static void routeOSC_paths(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv);
@@ -149,7 +148,6 @@ void routeOSC_setup(void)
 {
     routeOSC_class = class_new(gensym("routeOSC"), (t_newmethod)routeOSC_new,
         (t_method)routeOSC_free, sizeof(t_routeOSC), 0, A_GIMME, 0);
-    class_addlist(routeOSC_class, routeOSC_list);
     class_addanything(routeOSC_class, routeOSC_doanything);
     class_addmethod(routeOSC_class, (t_method)routeOSC_set, gensym("set"), A_GIMME, 0);
     class_addmethod(routeOSC_class, (t_method)routeOSC_paths, gensym("paths"), A_GIMME, 0);
@@ -258,7 +256,7 @@ static void routeOSC_paths(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
 static void routeOSC_verbosity(t_routeOSC *x, t_floatarg v)
 {
     x->x_verbosity = (v == 0)? 0: 1;
-    if (x->x_verbosity) post("routeOSC_verbosity is %d", x->x_verbosity);
+    if (x->x_verbosity) post("routeOSC_verbosity(%p) is %d", x, x->x_verbosity);
 }
 
 static int routeOSC_count_slashes(char *prefix)
@@ -270,50 +268,24 @@ static int routeOSC_count_slashes(char *prefix)
     return i;
 }
 
-static void routeOSC_list(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
-{
-    if(argc < 1)
-    {
-        pd_error(x, "* routeOSC: ignoring empty list...");
-        return;
-    }
-    if (argv[0].a_type == A_SYMBOL)
-    { 
-        /* Ignore the fact that this is a "list" */
-        routeOSC_doanything(x, argv[0].a_w.w_symbol, argc-1, argv+1);
-    }
-    else
-    {
-        // pd_error(x, "* OSC-route: invalid list beginning with a number");
-        // output on unmatched outlet jdl 20020908
-        if (argv[0].a_type == A_FLOAT)
-        {
-            outlet_float(x->x_outlets[x->x_num], atom_getfloat(argv));
-        }
-        else
-        {
-            pd_error(x, "* routeOSC: unrecognized atom type!");
-        }
-    }
-}
-
 static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
     char    *pattern, *nextSlash;
     int     i, pattern_depth = 0, matchedAnything = 0;
-    // post("*** routeOSC_anything(s %s, argc %ld)", s->s_name, (long) argc);
+    int     noPath = 0; // nonzero if we are dealing with a simple list (as from a previous [routeOSC])
 
     pattern = s->s_name;
-    if (x->x_verbosity) post("routeOSC_doanything: pattern is %s", pattern);
+    if (x->x_verbosity) post("routeOSC_doanything(%p): pattern is %s", x, pattern);
     if (pattern[0] != '/')
-    {
-        pd_error(x, "* routeOSC: invalid message pattern %s does not begin with /", s->s_name);
-        outlet_anything(x->x_outlets[x->x_num], s, argc, argv);
-        return;
+    { // make a path '/'. Now s is actually the first item in the arguments list
+        pattern = gensym("/")->s_name;
+        noPath = 1;
+        if (x->x_verbosity)
+            post("routeOSC_doanything(%p): message pattern \"%s\" does not begin with /, setting path to %s", x, s->s_name, pattern);
     }
 
     pattern_depth = routeOSC_count_slashes(pattern);
-    if (x->x_verbosity) post("routeOSC_doanything: pattern_depth is %i", pattern_depth);
+    if (x->x_verbosity) post("routeOSC_doanything(%p): pattern_depth is %i", x, pattern_depth);
     nextSlash = NextSlashOrNull(pattern+1);
     if (*nextSlash == '\0')
     { /* pattern_depth == 1 */
@@ -328,34 +300,42 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
             )
             {
                 ++matchedAnything;
-                // I hate stupid Max lists with a special first element
-                if (argc == 0)
-                {
-                    outlet_bang(x->x_outlets[i]);
+                if (noPath)
+                { // just a list starting with a symbol
+                  // The special symbol is s
+                  outlet_anything(x->x_outlets[i], s, argc, argv);
                 }
-                else if (argv[0].a_type == A_SYMBOL)
+                else // normal OSC path
                 {
-                    // Promote the symbol that was argv[0] to the special symbol
-                    outlet_anything(x->x_outlets[i], argv[0].a_w.w_symbol, argc-1, argv+1);
-                }
-                else if (argc > 1)
-                {
-                    // Multiple arguments starting with a number, so naturally we have
-                    // to use a special function to output this "list", since it's what
-                    // Max originally meant by "list".
-                    outlet_list(x->x_outlets[i], 0L, argc, argv);
-                }
-                else
-                {
-                    // There was only one argument, and it was a number, so we output it
-                    // not as a list
-                    if (argv[0].a_type == A_FLOAT)
+                    // I hate stupid Max lists with a special first element
+                    if (argc == 0)
                     {
-                        outlet_float(x->x_outlets[i], argv[0].a_w.w_float);
+                        outlet_bang(x->x_outlets[i]);
+                    }
+                    else if (argv[0].a_type == A_SYMBOL)
+                    {
+                        // Promote the symbol that was argv[0] to the special symbol
+                        outlet_anything(x->x_outlets[i], argv[0].a_w.w_symbol, argc-1, argv+1);
+                    }
+                    else if (argc > 1)
+                    {
+                        // Multiple arguments starting with a number, so naturally we have
+                        // to use a special function to output this "list", since it's what
+                        // Max originally meant by "list".
+                        outlet_list(x->x_outlets[i], 0L, argc, argv);
                     }
                     else
                     {
-                        pd_error(x, "* routeOSC: unrecognized atom type!");
+                        // There was only one argument, and it was a number, so we output it
+                        // not as a list
+                        if (argv[0].a_type == A_FLOAT)
+                        {
+                            outlet_float(x->x_outlets[i], argv[0].a_w.w_float);
+                        }
+                        else
+                        {
+                            pd_error(x, "* routeOSC: unrecognized atom type!");
+                        }
                     }
                 }
             }
@@ -377,15 +357,15 @@ static void routeOSC_doanything(t_routeOSC *x, t_symbol *s, int argc, t_atom *ar
             {
                 StrCopyUntilNthSlash(patternBegin, pattern+1, x->x_prefix_depth[i]);
                 if (x->x_verbosity)
-                    post("routeOSC_doanything: (%d) patternBegin is %s", i, patternBegin);
+                    post("routeOSC_doanything(%p): (%d) patternBegin is %s", x, i, patternBegin);
                 if (MyPatternMatch(patternBegin, x->x_prefixes[i]+1))
                 {
                     if (x->x_verbosity)
-                        post("routeOSC_doanything: (%d) matched %s depth %d", i, x->x_prefixes[i], x->x_prefix_depth[i]);
+                        post("routeOSC_doanything(%p): (%d) matched %s depth %d", x, i, x->x_prefixes[i], x->x_prefix_depth[i]);
                     ++matchedAnything;
                     nextSlash = NthSlashOrNull(pattern+1, x->x_prefix_depth[i]);
                     if (x->x_verbosity)
-                        post("routeOSC_doanything: (%d) nextSlash %s", i, nextSlash);
+                        post("routeOSC_doanything(%p): (%d) nextSlash %s", x, i, nextSlash);
                     if (restOfPattern == 0) restOfPattern = gensym(nextSlash);
                     outlet_anything(x->x_outlets[i], restOfPattern, argc, argv);
                 }
