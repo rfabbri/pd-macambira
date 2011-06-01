@@ -2,9 +2,15 @@ hdspm_mixer - PD external for Linux Machines using MADI card, to control the mix
 
 Experimental - for special installations
 
+Not ready now to use, under heavy or no more development.
+
+
  (c) 2005-  Winfried Ritsch (see LICENCE.txt)
  Institute for Electronic Music - Graz
 
+
+hdspm_mixer can be also compiled as a command line program, for consoles or as
+library for other projects.
 
 Please see hdspmmixer-help.pd for more help.
 
