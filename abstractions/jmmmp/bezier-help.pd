@@ -1,10 +1,10 @@
-#N struct 1026-bez-array float x float y array 1026-bez-c-arr 1026-bez-c
+#N struct 1037-bez-array float x float y array 1037-bez-c-arr 1037-bez-c
 float p0x float p0y float p0x. float p0y. float p1x float p1y float
 p1x. float p1y. float p2x float p2y float p2x. float p2y. float p3x
 float p3y float p3x. float p3y. float rpx float rpy float rpx. float
 rpy.;
-#N struct 1026-bez-c float x float y;
-#N canvas 280 17 921 908 10;
+#N struct 1037-bez-c float x float y;
+#N canvas 280 17 921 889 10;
 #X floatatom 415 741 5 0 0 0 - - -;
 #X obj 418 727 hsl 50 10 0 1 0 0 empty empty empty -2 -8 0 10 -228856
 -1 -1 4900 0;
@@ -15,7 +15,6 @@ rpy.;
 #X msg 415 687 0 \, 1 3000;
 #X obj 135 504 pack;
 #X obj 145 484 t b f;
-#X obj 125 820 unpack;
 #X msg 228 820 p0 0.25 0.34 \, p1 0.34 0.88 \, p2 0.9 0.4 \, p3 0.85
 0.73;
 #X text 543 84 Arguments;
@@ -23,10 +22,10 @@ rpy.;
 -1 0 1;
 #X obj 148 471 hsl 50 10 0 1 0 0 empty empty Y -16 6 0 12 -228856 -1
 -1 0 1;
-#X obj 128 840 hsl 50 10 0 1 0 0 empty empty X -16 6 0 12 -228856 -1
--1 4165 1;
-#X obj 128 854 hsl 50 10 0 1 0 0 empty empty Y -16 6 0 12 -228856 -1
--1 3577 1;
+#X obj 128 820 hsl 50 10 0 1 0 0 empty empty X -16 6 0 12 -228856 -1
+-1 2405 1;
+#X obj 128 834 hsl 50 10 0 1 0 0 empty empty Y -16 6 0 12 -228856 -1
+-1 4152 1;
 #X text 135 297 default values;
 #X text 135 337 also first and last points can take any value;
 #X text 222 154 Two values define x and y coordinates;
@@ -37,14 +36,13 @@ a square ...;
 #X text 172 194 size \$1 - Define array size (minimum 2 points);
 #X text 240 789 Dump outlet: connect to a message box \, which you
 can later copy-paste.;
-#X text 105 869 Output: list with scaled x and y values;
 #X text 545 163 If no arguments are given \, the default values are
 110 100 100 When no y argument is present \, a square with dimensions
 of x is created.;
 #X text 542 385 But \, even with the points outside of the box \, the
 calculations will still work. You only loose mouse control of the graphic
 handles.;
-#X obj 135 564 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 135 564 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X obj 125 697 bezier;
 #X text 165 624 dump - Dump the coordinates of the control points through
@@ -80,7 +78,7 @@ the red boundaries. Or send pX coordinates.;
 #X text 70 814 OUTPUT;
 #X obj 415 761 s \$0-input;
 #X obj 135 677 r \$0-input;
-#X text 320 667 Send your input values between 0 and 1 here:;
+#X text 415 667 Send your input values between 0 and 1 here:;
 #X msg 125 317 p0 0 0 \, p1 0.1 0.6 \, p2 0.9 0.4 \, p3 1 1;
 #X msg 125 357 p0 0.25 0.34 \, p1 0.34 0.88 \, p2 0.9 0.4 \, p3 0.85
 0.73;
@@ -95,30 +93,30 @@ the box - you won't be able to grab the graphic (see bug description)
 ;
 #X msg 125 583 readpoint \$1;
 #X msg 125 624 dump;
-#X connect 0 0 51 0;
+#X text 65 849 Outputs: scaled x and y values;
+#X connect 0 0 49 0;
 #X connect 1 0 0 0;
-#X connect 2 0 59 0;
-#X connect 3 0 27 0;
+#X connect 2 0 57 0;
+#X connect 3 0 25 0;
 #X connect 4 0 3 0;
 #X connect 5 0 1 0;
 #X connect 6 0 5 0;
-#X connect 7 0 57 0;
+#X connect 7 0 55 0;
 #X connect 8 0 7 0;
 #X connect 8 1 7 1;
-#X connect 9 0 14 0;
-#X connect 9 1 15 0;
-#X connect 12 0 7 0;
-#X connect 13 0 8 0;
-#X connect 26 0 63 0;
-#X connect 27 0 9 0;
-#X connect 27 1 10 0;
-#X connect 52 0 27 0;
-#X connect 54 0 27 0;
-#X connect 55 0 27 0;
-#X connect 56 0 27 0;
-#X connect 57 0 27 0;
-#X connect 59 0 27 0;
-#X connect 60 0 27 0;
-#X connect 61 0 27 0;
-#X connect 63 0 27 0;
-#X connect 64 0 27 0;
+#X connect 11 0 7 0;
+#X connect 12 0 8 0;
+#X connect 24 0 61 0;
+#X connect 25 0 13 0;
+#X connect 25 1 14 0;
+#X connect 25 2 9 0;
+#X connect 50 0 25 0;
+#X connect 52 0 25 0;
+#X connect 53 0 25 0;
+#X connect 54 0 25 0;
+#X connect 55 0 25 0;
+#X connect 57 0 25 0;
+#X connect 58 0 25 0;
+#X connect 59 0 25 0;
+#X connect 61 0 25 0;
+#X connect 62 0 25 0;

@@ -4,11 +4,11 @@
 #X msg 107 179 label \$1;
 #X obj 77 209 s \$0-stunde;
 #X obj 247 209 s \$0-minute;
-#X obj 102 42 cnv 13 22 13 empty \$0-stunde 07 2 7 0 11 -233017 -1
+#X obj 102 42 cnv 13 22 15 empty \$0-stunde 19 2 8 0 11 -1 -228856
 0;
-#X obj 126 42 cnv 13 22 13 empty \$0-minute 46 2 7 0 11 -233017 -1
+#X obj 125 42 cnv 13 22 15 empty \$0-minute 46 2 8 0 11 -1 -228856
 0;
-#X obj 150 42 cnv 13 22 13 empty \$0-sek 08 2 7 0 11 -233017 -1 0;
+#X obj 148 42 cnv 13 22 15 empty \$0-sek 02 2 8 0 11 -1 -228856 0;
 #X obj 427 209 s \$0-sek;
 #X obj 377 159 mergefilename;
 #X obj 197 159 mergefilename;
@@ -74,4 +74,4 @@ in the documentation and/or other materials provided with the distribution.
 #X connect 24 1 22 0;
 #X connect 25 0 10 0;
 #X connect 25 1 19 0;
-#X coords 0 -1 1 1 74 17 1 100 40;
+#X coords 0 -1 1 1 70 17 1 101 41;
