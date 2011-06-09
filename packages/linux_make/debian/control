@@ -3,7 +3,9 @@ Version: 0.42.6~cvs1-1
 Section: sound
 Priority: optional
 Maintainer: Hans-Christoph Steiner <hans@eds.org>
+Standards-Version: 3.9.2
 Homepage: http://puredata.info
+
 Package: pd-extended
 Architecture: i386
 Depends: xterm | x-terminal-emulator, ttf-dejavu-core, x-ttcidfont-conf, tcllib
