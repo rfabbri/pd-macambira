@@ -26,8 +26,6 @@ order. Non-numbers are dropped.;
 #X text 59 525 2008 Matt Barber;
 #X obj 93 396 list-quicksort desc;
 #X obj 35 11 list-quicksort;
-#X text 298 570 [list-quicksort] is the fastest version \, as it uses
-a table internally.;
 #N canvas 506 181 494 396 META 0;
 #X text 12 25 LICENSE SIBSD;
 #X text 12 5 KEYWORDS control list_op;
