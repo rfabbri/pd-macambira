@@ -84,6 +84,7 @@ to sort the list.;
 #X connect 7 1 33 0;
 #X connect 7 2 11 0;
 #X connect 7 3 5 0;
+#X connect 7 3 19 1;
 #X connect 9 0 8 0;
 #X connect 10 0 7 0;
 #X connect 11 0 3 0;
