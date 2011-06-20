@@ -1,0 +1,15 @@
+#N canvas 530 260 527 246 10;
+#X floatatom 44 209 5 0 0 0 - - -;
+#X obj 67 103 stop_stream 100;
+#X floatatom 67 129 5 0 0 0 - - -;
+#X obj 44 72 random 111;
+#X obj 44 50 metro 50;
+#X obj 44 30 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+;
+#X text 116 130 output the last value of a stream;
+#X text 119 154 argument 1 : max time between 2 data;
+#X connect 1 0 2 0;
+#X connect 3 0 0 0;
+#X connect 3 0 1 0;
+#X connect 4 0 3 0;
+#X connect 5 0 4 0;
