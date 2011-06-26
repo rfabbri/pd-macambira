@@ -29,11 +29,27 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 
 PD_INNO_SETUP = pd-inno.iss
 
-package:  $(PD_INNO_SETUP)
+zipfolder = $(packages_src)/win32_inno/zip
+zippackage = $(zipfolder)/Pd-$(PD_VERSION)
+package: installer zip
+
+installer:  $(PD_INNO_SETUP)
 ## this pops up the GUI app
 #	start $(PD_INNO_SETUP)
 ## this compiles the package on the command line
 	/c/Program\ Files/Inno\ Setup\ 5/ISCC.exe $(PD_INNO_SETUP)
+
+zip:
+# this fake installs the above into a folder to be zipped up
+	install -d "$(zipfolder)"
+	cp "$(packages_src)/win32_inno/Output/Pd-$(PD_VERSION).exe" $(zipfolder)
+	install -d "$(zippackage)"
+	cd "$(zippackage)" && \
+		"../Pd-$(PD_VERSION).exe" //DIR=".\\" //LOG="..\\Pd-$(PD_VERSION).log" \
+			//VERYSILENT //SP- //NORESTART //NOICONS //SUPPRESSMSGBOXES \
+			//TASKS=""
+	install -p $(DESTDIR)$(prefix)/*.dll "$(zippackage)/bin/"
+	zip -9r $(zipfolder)/Pd-$(PD_VERSION).zip $(zippackage)
 	@echo " "
 	@echo "win32_inno install succeeded!"
 
