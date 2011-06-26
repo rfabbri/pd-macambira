@@ -382,7 +382,6 @@ begin
 			end;
 		end;
         BringToFrontAndRestore();
-        MsgBox('NextButtonClick:' #13#13 'The normal installation will now start.', mbInformation, MB_OK);
       end;
   end;
 
