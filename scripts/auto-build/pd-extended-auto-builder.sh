@@ -98,6 +98,7 @@ case $SYSTEM in
 		;;
 	mingw*)
 		upload_build win32_inno Output exe
+		upload_build win32_inno zip zip
 		;;
 	cygwin*)
 		upload_build win32_inno Output exe
