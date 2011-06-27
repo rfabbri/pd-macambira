@@ -30,7 +30,8 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 PD_INNO_SETUP = pd-inno.iss
 
 zipfolder = $(packages_src)/win32_inno/zip
-zippackage = $(zipfolder)/Pd-$(PD_VERSION)
+zippackage = Pd-$(PD_VERSION)
+zippackagefolder = $(zipfolder)/$(zippackagefolder)
 package: installer zip
 
 installer:  $(PD_INNO_SETUP)
@@ -43,13 +44,14 @@ zip:
 # this fake installs the above into a folder to be zipped up
 	install -d "$(zipfolder)"
 	cp "$(packages_src)/win32_inno/Output/Pd-$(PD_VERSION).exe" $(zipfolder)
-	install -d "$(zippackage)"
-	cd "$(zippackage)" && \
-		"../Pd-$(PD_VERSION).exe" //DIR=".\\" //LOG="..\\Pd-$(PD_VERSION).log" \
+	install -d "$(zippackagefolder)"
+	cd "$(zippackagefolder)" && \
+		"../$(zippackage).exe" //DIR=".\\" //LOG="..\\$(zippackage).log" \
 			//VERYSILENT //SP- //NORESTART //NOICONS //SUPPRESSMSGBOXES \
 			//TASKS=""
-	install -p $(DESTDIR)$(prefix)/*.dll "$(zippackage)/bin/"
-	zip -9r $(zipfolder)/Pd-$(PD_VERSION).zip $(zippackage)
+	install -p $(DESTDIR)$(prefix)/*.dll "$(zippackagefolder)/bin/"
+	cd "$(zipfolder)" && \
+		zip -9r $(zippackage).zip $(zippackage)
 	@echo " "
 	@echo "win32_inno install succeeded!"
 
