@@ -29,9 +29,6 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 
 PD_INNO_SETUP = pd-inno.iss
 
-zipfolder = $(packages_src)/win32_inno/zip
-zippackage = Pd-$(PD_VERSION)
-zippackagefolder = $(zipfolder)/$(zippackagefolder)
 package: installer zip
 
 installer:  $(PD_INNO_SETUP)
@@ -40,6 +37,9 @@ installer:  $(PD_INNO_SETUP)
 ## this compiles the package on the command line
 	/c/Program\ Files/Inno\ Setup\ 5/ISCC.exe $(PD_INNO_SETUP)
 
+zipfolder = $(packages_src)/win32_inno/zip
+zippackage = Pd-$(PD_VERSION)
+zippackagefolder = $(zipfolder)/$(zippackage)
 zip:
 # this fake installs the above into a folder to be zipped up
 	install -d "$(zipfolder)"
