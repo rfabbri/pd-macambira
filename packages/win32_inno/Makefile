@@ -51,7 +51,8 @@ zip:
 			//TASKS=""
 	install -p $(DESTDIR)$(prefix)/*.dll "$(zippackagefolder)/bin/"
 	cd "$(zipfolder)" && \
-		zip -9r $(zippackage).zip $(zippackage)
+		/c/cygwin/bin/sh -c \
+			"zip -9r --no-wild $(zippackage).zip $(zippackage)"
 	@echo " "
 	@echo "win32_inno install succeeded!"
 
