@@ -1,0 +1,13 @@
+#N canvas 741 231 419 363 10;
+#X text 79 295 IEM KUG;
+#X text 63 283 musil;
+#X text 93 283 @;
+#X text 99 283 iem.at;
+#X text 62 305 Graz \, Austria;
+#X text 139 139 no initial arguments;
+#X text 14 13 eval_sizeof;
+#X text 123 11 evaluates the size of;
+#X text 123 27 different data types;
+#X text 14 272 (c) Thomas Musil 2000 - 2011;
+#X obj 51 139 eval_sizeof;
+#X text 67 113 no input messages;
