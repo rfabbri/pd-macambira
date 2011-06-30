@@ -43,7 +43,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 # this variable is to support old "win" directories, rather than "windows"
 BUILDSRC_OS_NAME = $(OS_NAME)
 
-CFLAGS = -DPD -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS) -I$(gem_src)/src
+CFLAGS = -DPD -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS) -I$(gem_src)
 LDFLAGS =  
 LIBS = -lm
 
@@ -552,21 +552,21 @@ freeverb_clean:
 #------------------------------------------------------------------------------
 # GEM
 GEM_NAME = Gem
-$(gem_src)/src/configure:
-	cd $(gem_src)/src && ./autogen.sh
+$(gem_src)/configure:
+	cd $(gem_src) && ./autogen.sh
 
-$(gem_src)/src/Gem.dll: $(gem_src)/src/configure
+$(gem_src)/Gem.dll: $(gem_src)/configure
 
-$(gem_src)/src/Gem.pd_linux: $(gem_src)/src/configure
-	cd $(gem_src)/src && ./configure \
+$(gem_src)/Gem.pd_linux: $(gem_src)/configure
+	cd $(gem_src) && ./configure \
 		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
 		--with-video=plugins \
 		--with-film=plugins \
 		--with-pd=$(pd_src)
-	$(MAKE) -C $(gem_src)/src
+	$(MAKE) -C $(gem_src)
 
-$(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
-	cd $(gem_src)/src && ./configure \
+$(gem_src)/Gem.pd_darwin: $(gem_src)/configure
+	cd $(gem_src) && ./configure \
 		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
 		PKG_FTGL_CFLAGS="-I/sw/include -I/sw/include/freetype2 -I/sw/include/FTGL" \
 		--without-ALL \
@@ -576,19 +576,19 @@ $(gem_src)/src/Gem.pd_darwin: $(gem_src)/src/configure
 		--with-video=plugins \
 		--with-film=plugins \
 		--with-pd=$(pd_src)
-	$(MAKE) -C $(gem_src)/src
+	$(MAKE) -C $(gem_src)
 
-gem: $(gem_src)/src/Gem.$(EXTENSION)
+gem: $(gem_src)/Gem.$(EXTENSION)
 
 gem_install: gem
 	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)
 ifneq ($(OS_NAME),windows)
-	install -p $(gem_src)/src/Gem.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
+	install -p $(gem_src)/Gem.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 endif
-	(test -e $(gem_src)/src/plugins/filmAVI/.libs/gem_filmAVI.so && \
-		install -p $(gem_src)/src/plugins/*/.libs/gem_*.so $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
-	(test -e $(gem_src)/src/plugins/filmAVI/.libs/gem_filmAVI.dll && \
-		install -p $(gem_src)/src/plugins/*/.libs/gem_*.dll $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
+	(test -e $(gem_src)/plugins/filmAVI/.libs/gem_filmAVI.so && \
+		install -p $(gem_src)/plugins/*/.libs/gem_*.so $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
+	(test -e $(gem_src)/plugins/filmAVI/.libs/gem_filmAVI.dll && \
+		install -p $(gem_src)/plugins/*/.libs/gem_*.dll $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
 	install -p $(gem_src)/help/*.*  $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
 	install -p $(gem_src)/abstractions/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)
 	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual
@@ -605,7 +605,7 @@ endif
 	done
 # install Gem headers to make it easier to build standalone Gem objects
 	install -d $(DESTDIR)$(includedir)/Base
-	install -p $(gem_src)/src/Base/*.h $(DESTDIR)$(includedir)/Base/
+	install -p $(gem_src)/Base/*.h $(DESTDIR)$(includedir)/Base/
 # links to keep the old-style placement for Gem examples in the Help Browser
 ifneq ($(OS_NAME),windows)
 	install -d $(DESTDIR)$(examplesdir)
@@ -615,7 +615,7 @@ ifneq ($(OS_NAME),windows)
 endif
 
 gem_clean:
-	-$(MAKE) -C $(gem_src)/src clean
+	-$(MAKE) -C $(gem_src) clean
 
 
 
