@@ -16,6 +16,10 @@ iemgui written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2006 *
 #include <unistd.h>
 #endif
 
+#if     _MSC_VER >= 1300  /* since VSC 7.0 */
+#define close _close
+#endif
+
 /* ------------------------ setup routine ------------------------- */
 
 t_widgetbehavior iem_image_widgetbehavior;
