@@ -605,7 +605,7 @@ endif
 	done
 # install Gem headers to make it easier to build standalone Gem objects
 	install -d $(DESTDIR)$(includedir)/Base
-	install -p $(gem_src)/Base/*.h $(DESTDIR)$(includedir)/Base/
+	install -p $(gem_src)/src/Base/*.h $(DESTDIR)$(includedir)/Base/
 # links to keep the old-style placement for Gem examples in the Help Browser
 ifneq ($(OS_NAME),windows)
 	install -d $(DESTDIR)$(examplesdir)
