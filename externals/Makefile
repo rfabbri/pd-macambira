@@ -598,7 +598,7 @@ endif
 	(test -d $(gem_src)/manual && \
 		install -p $(gem_src)/manual/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual/html ) || \
 		install -p $(gem_src)/doc/manual/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual/html
-	for dir in $(shell ls -1 $(gem_src)/examples | grep -v CVS); do \
+	for dir in $(shell ls -1F $(gem_src)/examples | grep '/'); do \
 		echo "installing $$dir"; \
 		install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ; \
 		install -p $(gem_src)/examples/$$dir/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ;\
