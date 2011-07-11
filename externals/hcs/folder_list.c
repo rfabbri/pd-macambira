@@ -188,6 +188,7 @@ static void folder_list_set(t_folder_list* x, t_symbol *s)
     char envVarBuffer[FILENAME_MAX];
     if( (s->s_name[0] == '~') && (s->s_name[1] == '/'))
     {
+        // TODO this is probably never freed!
         patternBuffer = getbytes(FILENAME_MAX);
         strcpy(patternBuffer,"%USERPROFILE%");
         strncat(patternBuffer, s->s_name + 1, FILENAME_MAX - 1);
