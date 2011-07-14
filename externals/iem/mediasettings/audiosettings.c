@@ -24,6 +24,33 @@
 #define MAXAUDIOINDEV 4
 #define MAXAUDIOOUTDEV 4
 
+
+static void as_get_audio_params(
+    int *pnaudioindev, int *paudioindev, int *pchindev,
+    int *pnaudiooutdev, int *paudiooutdev, int *pchoutdev,
+    int *prate, int *padvance, int *pcallback, int *pblocksize) {
+#if (defined PD_MINOR_VERSION) && (PD_MINOR_VERSION >= 43)
+  sys_get_audio_params(pnaudioindev , paudioindev , pchindev,
+                       pnaudiooutdev, paudiooutdev, pchoutdev,
+                       prate, padvance, pcallback, pblocksize);
+#else
+  if(pblocksize)
+   *pblocksize=-1;
+
+  sys_get_audio_params(pnaudioindev , paudioindev , pchindev,
+                       pnaudiooutdev, paudiooutdev, pchoutdev,
+                       prate, padvance, pcallback);
+
+
+#endif
+
+
+
+}
+
+
+
+
 static t_class *audiosettings_class;
 
 t_symbol*s_pdsym=NULL;
@@ -161,7 +188,7 @@ static void as_params_get(t_as_params*parms) {
   memset(parms, 0, sizeof(t_as_params));
   parms->callback=-1;
 
-  sys_get_audio_params(	&parms->naudioindev,  parms->audioindev,  parms->chindev,
+  as_get_audio_params(	&parms->naudioindev,  parms->audioindev,  parms->chindev,
                        	&parms->naudiooutdev, parms->audiooutdev, parms->choutdev, 
                        	&parms->rate,        &parms->advance,
 			&parms->callback,    &parms->blocksize);
@@ -625,6 +652,19 @@ void audiosettings_setup(void)
 #endif
   post("\tcompiled: "__DATE__"");
 
+#if (defined PD_MINOR_VERSION) && (PD_MINOR_VERSION < 43)
+  if(1) {
+    int major, minor, bugfix;
+    sys_getversion(&major, &minor, &bugfix);
+    if(0==major && minor>=43) {
+    error("[audiosettings] have been compiled against an old version of Pd");
+    error("                that is incompatible with the one you are using!");
+    error("                recompile [audiosettings]");
+    }
+    return;
+  }
+#endif
+
   audiosettings_class = class_new(gensym("audiosettings"), (t_newmethod)audiosettings_new, (t_method)audiosettings_free,
 			     sizeof(t_audiosettings), 0, 0);
 
@@ -671,7 +711,7 @@ static void audiosettings_testdevices(t_audiosettings *x)
   int naudioindev, audioindev[MAXAUDIOINDEV], chindev[MAXAUDIOINDEV];
   int naudiooutdev, audiooutdev[MAXAUDIOOUTDEV], choutdev[MAXAUDIOOUTDEV];
   int rate, advance, callback, blocksize;
-  sys_get_audio_params(&naudioindev, audioindev, chindev,
+  as_get_audio_params(&naudioindev, audioindev, chindev,
                        &naudiooutdev, audiooutdev, choutdev, 
                        &rate, &advance, &callback, &blocksize);
   
