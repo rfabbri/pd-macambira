@@ -39,6 +39,7 @@ typedef struct _as_params {
   int naudioindev, audioindev[MAXAUDIOINDEV], chindev[MAXAUDIOINDEV];
   int naudiooutdev, audiooutdev[MAXAUDIOOUTDEV], choutdev[MAXAUDIOOUTDEV];
   int rate, advance, callback;  
+  int blocksize;
 } t_as_params;
 
 t_as_drivers*as_finddriver(t_as_drivers*drivers, const t_symbol*name) {
@@ -160,10 +161,10 @@ static void as_params_get(t_as_params*parms) {
   memset(parms, 0, sizeof(t_as_params));
   parms->callback=-1;
 
-  sys_get_audio_params(&parms->naudioindev,  parms->audioindev,  parms->chindev,
-                       &parms->naudiooutdev, parms->audiooutdev, parms->choutdev, 
-                       &parms->rate,        &parms->advance,    &parms->callback);
-
+  sys_get_audio_params(	&parms->naudioindev,  parms->audioindev,  parms->chindev,
+                       	&parms->naudiooutdev, parms->audiooutdev, parms->choutdev, 
+                       	&parms->rate,        &parms->advance,
+			&parms->callback,    &parms->blocksize);
 
   for(i=parms->naudioindev; i<MAXAUDIOINDEV; i++) {
     parms->audioindev[i]=0;
@@ -669,10 +670,10 @@ static void audiosettings_testdevices(t_audiosettings *x)
 
   int naudioindev, audioindev[MAXAUDIOINDEV], chindev[MAXAUDIOINDEV];
   int naudiooutdev, audiooutdev[MAXAUDIOOUTDEV], choutdev[MAXAUDIOOUTDEV];
-  int rate, advance, callback;
+  int rate, advance, callback, blocksize;
   sys_get_audio_params(&naudioindev, audioindev, chindev,
                        &naudiooutdev, audiooutdev, choutdev, 
-                       &rate, &advance, &callback);
+                       &rate, &advance, &callback, &blocksize);
   
   post("%d audioindev (parms)", naudioindev);
   for(i=0; i<naudioindev; i++) {
@@ -682,6 +683,6 @@ static void audiosettings_testdevices(t_audiosettings *x)
   for(i=0; i<naudiooutdev; i++) {
     post("\t#%02d: %d %d", i, audiooutdev[i], choutdev[i]);
   }
-  post("rate=%d\tadvance=%d\tcallback=%d", rate, advance, callback);
+  post("rate=%d\tadvance=%d\tcallback=%d\tblocksize=%d", rate, advance, callback, blocksize);
 
 }
