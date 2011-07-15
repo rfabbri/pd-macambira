@@ -38,37 +38,16 @@ CYCLONE_BUILD := $(shell grep CYCLONE_BUILD \
 	cut -d '"' -f 2)
 CYCLONE_VERSION := $(CYCLONE_MAJOR_VERSION) $(CYCLONE_RELEASE) $(CYCLONE_BUILD)
 
-
-GEM_VERSION := $(shell grep "GEM_VERSION" $(gem_src)/src/Base/GemVersion.h | \
-	sed -n 's|.*GEM_VERSION = "\(.*\)".*|\1|p')
+GEM_VERSION := $(shell sed -n 's|.*GEM_VERSION_MAJOR ||p' $(gem_src)/src/Base/GemVersion.h).$(shell sed -n 's|.*GEM_VERSION_MINOR ||p' $(gem_src)/src/Base/GemVersion.h)
 
 MAXLIB_VERSION := $(shell grep "define VERSION" \
 	$(externals_src)/maxlib/maxlib.c | cut -d '"' -f 2)
 
-OSC_VERSION := $(shell grep "define VERSION" $(externals_src)/OSCx/src/OSC.c | \
+OSCX_VERSION := $(shell grep "define VERSION" $(externals_src)/OSCx/src/OSC.c | \
 	cut -d '"' -f 2)
 
 PDP_VERSION := $(shell grep PDP_VERSION= $(externals_src)/pdp/configure.ac | \
 	cut -d '=' -f 2)
-
-PIDIP_VERSION := $(shell grep _VERSION= $(externals_src)/pidip/configure.ac | \
-       cut -d '"' -f 2)
-
-PMPD_VERSION := $(shell grep "define VERSION" \
-	$(externals_src)/pmpd/pmpd.c | cut -d '"' -f 2)
-
-
-TOXY_MAJOR_VERSION := $(shell grep TOXY_VERSION \
-	$(externals_src)/miXed/toxy/build_counter | cut -d ' ' -f 3 | \
-	cut -d '"' -f 2)
-TOXY_RELEASE := $(shell grep TOXY_RELEASE \
-	$(externals_src)/miXed/toxy/build_counter | cut -d ' ' -f 3 | \
-	cut -d '"' -f 2)
-TOXY_BUILD := $(shell grep TOXY_BUILD \
-	$(externals_src)/miXed/toxy/build_counter | cut -d ' ' -f 3 | \
-	cut -d '"' -f 2)
-TOXY_VERSION := $(TOXY_MAJOR_VERSION) $(TOXY_RELEASE) $(TOXY_BUILD)
-
 
 ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
@@ -355,27 +334,17 @@ endif
 	echo "<p>" >> $(README_FILE)
 	echo "Many others not listed have contributed their time and effort, this is just a list of the current developers in the SourceForge project.  But really, every Pd user is a developer and is encouraged to contribute to the CVS repository." >> $(README_FILE)
 	echo "</p>" >> $(README_FILE)
-	echo "<h3>Included Versions</h3>" >> $(README_FILE)	
-	echo "<p>These externals are all included from the Pd CVS repository:</p>" >> $(README_FILE)
+	echo "<h3>Included Libraries</h3>" >> $(README_FILE)	
+	echo "<p>To find out about which libraries are included in Pd-extended, see <a href=\"https://puredata.info/docs/LibrariesInPdExtended\" target=\"_blank\">Libraries in Pd-extended</a>.  Here's some of the libraries that are included:</p>" >> $(README_FILE)
 	echo "<ul>" >> $(README_FILE)
-	echo "<li>pure data: $(PD_VERSION) " >> $(README_FILE)
 	echo "<li>cyclone: $(CYCLONE_VERSION)" >> $(README_FILE)
 	echo "<li>gem: $(GEM_VERSION)" >> $(README_FILE)
-	echo "<li>iemlib: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<li>maxlib: $(MAXLIB_VERSION)" >> $(README_FILE)
-	echo "<li>osc: $(OSC_VERSION)" >> $(README_FILE)
-	echo "<li>pmpd: $(PMPD_VERSION)" >> $(README_FILE)
-	echo "<li>pd-abstractions: `date +20%y.%m.%d`" >> $(README_FILE)
-	echo "<li>pd-doc: `date +20%y.%m.%d`" >> $(README_FILE)
-	echo "<li>pd-externals: `date +20%y.%m.%d`" >> $(README_FILE)
-	echo "<li>pddp: `date +20%y.%m.%d`" >> $(README_FILE)
+	echo "<li>oscx: $(OSCX_VERSION)" >> $(README_FILE)
 	echo "<li>pdp: $(PDP_VERSION)" >> $(README_FILE)
-	echo "<li>pidip: $(PIDIP_VERSION)" >> $(README_FILE)
-	echo "<li>toxy: $(TOXY_VERSION)" >> $(README_FILE)
-	echo "<li>unauthorized: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<li>zexy: $(ZEXY_VERSION)" >> $(README_FILE)
 	echo "</ul>" >> $(README_FILE)
-	echo "(this package was built on `date`) <BR>" >> $(README_FILE)
+	echo "<p>(this package was built on `date`)</p>" >> $(README_FILE)
 	echo "</body></html>" >> $(README_FILE)
 
 
