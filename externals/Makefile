@@ -556,10 +556,19 @@ $(gem_src)/configure:
 	cd $(gem_src) && ./autogen.sh
 
 $(gem_src)/Gem.dll: $(gem_src)/configure
+	cd $(gem_src) && ./configure \
+		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
+		--prefix=$(PREFIX) \
+		--libdir=$(OBJECTSDIR) \
+		--with-video=plugins \
+		--with-film=plugins \
+		--with-pd=$(pd_src)
+	$(MAKE) -C $(gem_src)
 
 $(gem_src)/Gem.pd_linux: $(gem_src)/configure
 	cd $(gem_src) && ./configure \
 		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
+		--prefix=$(PREFIX) \
 		--with-video=plugins \
 		--with-film=plugins \
 		--with-pd=$(pd_src)
@@ -569,6 +578,8 @@ $(gem_src)/Gem.pd_darwin: $(gem_src)/configure
 	cd $(gem_src) && ./configure \
 		CXXFLAGS="-DHAVE_S_STUFF_H $(OPT_CFLAGS)" \
 		PKG_FTGL_CFLAGS="-I/sw/include -I/sw/include/freetype2 -I/sw/include/FTGL" \
+		--prefix=$(PREFIX) \
+		--libdir=$(OBJECTSDIR) \
 		--without-ALL \
 		--disable-mmx \
 		--with-ftgl --with-ftgl-libs=/sw/lib \
@@ -581,38 +592,7 @@ $(gem_src)/Gem.pd_darwin: $(gem_src)/configure
 gem: $(gem_src)/Gem.$(EXTENSION)
 
 gem_install: gem
-	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)
-ifneq ($(OS_NAME),windows)
-	install -p $(gem_src)/Gem.$(EXTENSION) $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
-endif
-	(test -e $(gem_src)/plugins/filmAVI/.libs/gem_filmAVI.so && \
-		install -p $(gem_src)/plugins/*/.libs/gem_*.so $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
-	(test -e $(gem_src)/plugins/filmAVI/.libs/gem_filmAVI.dll && \
-		install -p $(gem_src)/plugins/*/.libs/gem_*.dll $(DESTDIR)$(objectsdir)/$(GEM_NAME)/ ) || true
-	install -p $(gem_src)/help/*.*  $(DESTDIR)$(objectsdir)/$(GEM_NAME)/
-	install -p $(gem_src)/abstractions/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)
-	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual
-	install -p $(gem_src)/doc/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual
-	install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual/html
-# in Gem 0.92, $(gem_src)/manual moved to $(gem_src)/doc/manual
-	(test -d $(gem_src)/manual && \
-		install -p $(gem_src)/manual/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual/html ) || \
-		install -p $(gem_src)/doc/manual/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/manual/html
-	for dir in $(shell ls -1F $(gem_src)/examples | grep '/'); do \
-		echo "installing $$dir"; \
-		install -d $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ; \
-		install -p $(gem_src)/examples/$$dir/*.* $(DESTDIR)$(objectsdir)/$(GEM_NAME)/examples/$$dir ;\
-	done
-# install Gem headers to make it easier to build standalone Gem objects
-	install -d $(DESTDIR)$(includedir)/Base
-	install -p $(gem_src)/src/Base/*.h $(DESTDIR)$(includedir)/Base/
-# links to keep the old-style placement for Gem examples in the Help Browser
-ifneq ($(OS_NAME),windows)
-	install -d $(DESTDIR)$(examplesdir)
-	ln -s ../../extra/$(GEM_NAME)/examples $(DESTDIR)$(examplesdir)/$(GEM_NAME)
-	install -d  $(DESTDIR)$(manualsdir)
-	ln -s ../../extra/$(GEM_NAME)/manual $(DESTDIR)$(manualsdir)/$(GEM_NAME)
-endif
+	$(MAKE) -C $(gem_src) DESTDIR=$(DESTDIR) prefix=$(PREFIX) libdir=$(OBJECTSDIR) install
 
 gem_clean:
 	-$(MAKE) -C $(gem_src) clean
